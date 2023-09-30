@@ -10,11 +10,11 @@ with contextlib.closing(workbook):
     characters = []
 
     for i in sheet.iter_rows(min_col=1):
-        character = {"name": i[0].value, "mt": i[2].value, "attack": i[3].value,
+        characters = {"name": i[0].value, "mt": i[2].value, "attack": i[3].value,
                      "defensive": i[4].value, "health": i[5].value,
                      "speed": i[6].value, "aggro": i[7].value
-                     }
-        characters.append(character)
+                      }
+        characters.append(characters)
 
     characters = characters[1:]
 

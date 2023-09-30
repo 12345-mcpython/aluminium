@@ -1,4 +1,4 @@
-from .read_characters import character, attacker, read_characters
+from .read_data import characters, attackers, read_datas
 
-read_characters()
+read_datas()
 

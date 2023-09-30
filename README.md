@@ -1,2 +1,3 @@
 # aluminium
-Project: Aluminium / Honkai: Star Rail simulator
+
+这个项目是一个仿崩坏: 星穹铁道的命令行游戏.

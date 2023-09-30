@@ -1,8 +1,8 @@
 from decimal import Decimal
 
-from aluminium import character
-from aluminium import attacker
-from aluminium.utils import random_chance, calc_character_rate, ZERO
+from aluminium import characters
+from aluminium import attackers
+from aluminium.utils import random_chance, calc_character_rate, ZERO, calc_attacker_rate
 
 
 class Signal:
@@ -68,7 +68,10 @@ class Attacker:
 
     @classmethod
     def build_attacker(cls, aid, level):
-        return Attacker(attacker[aid][""])
+        return Attacker(attackers[aid]["name"], attackers[aid]["mt"], level,
+                        Decimal(attackers[aid]["health"]) * calc_attacker_rate(level),
+                        Decimal(attackers[aid]["defensive"]) * calc_attacker_rate(level),
+                        Decimal(attackers[aid]["attack"]) * calc_attacker_rate(level))
 
 
 class Monster(CharacterBase):
@@ -133,12 +136,15 @@ class Character(CharacterBase):
     def build_character(cls, cid, level, attacker=Attacker(), enhance=None):
         crit_chance = Decimal(".05")
         crit_attack = Decimal(".5")
-        return cls(character[cid]['name'], character[cid]['mt'], 1,
-                   Decimal(character[cid]['health']) * calc_character_rate(level, promotion=True) + attacker.health,
-                   Decimal(character[cid]['defensive']) * calc_character_rate(level, promotion=True) + attacker.defensive,
-                   Decimal(character[cid]['attack']) * calc_character_rate(level, promotion=True) + attacker.attack,
-                   character[cid]['speed'],
-                   character[cid]['aggro'], crit_chance, crit_attack, attacker, enhance)
+        if attacker.mt != characters[cid]['mt']:
+            print("警告: 武器与角色的命途属性不同! ")
+        return cls(characters[cid]['name'], characters[cid]['mt'], 1,
+                   Decimal(characters[cid]['health']) * calc_character_rate(level, promotion=True) + attacker.health,
+                   Decimal(characters[cid]['defensive']) * calc_character_rate(level,
+                                                                               promotion=True) + attacker.defensive,
+                   Decimal(characters[cid]['attack']) * calc_character_rate(level, promotion=True) + attacker.attack,
+                   characters[cid]['speed'],
+                   characters[cid]['aggro'], crit_chance, crit_attack, attacker, enhance)
 
 
 class CombatQueue:
