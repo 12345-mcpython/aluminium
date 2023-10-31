@@ -36,3 +36,7 @@ with contextlib.closing(workbook):
 
     with open("data/attackers.json", "w", encoding="utf-8") as f:
         json.dump(attackers, f, ensure_ascii=False, indent=4)
+
+
+with contextlib.closing(workbook):
+    sheet = workbook['11']

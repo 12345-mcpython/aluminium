@@ -38,7 +38,13 @@ class CharacterBase:
         self.__health: Decimal = health if health else ZERO
         self.defensive: Decimal = defensive if defensive else ZERO
         self.attack: Decimal = attack if attack else ZERO
+        self.length: Decimal = ZERO
         self.speed: int = speed if speed else 0
+        self.pd: Decimal = ZERO
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} name={self.name} level={self.level} health={self.__health} " \
+               f"defensive={self.defensive} attack={self.attack} length={self.length} speed={self.speed} pd={self.pd}>"
 
     def do_attack(self, attack_object):
         pass
@@ -73,6 +79,10 @@ class Attacker:
                         Decimal(attackers[aid]["defensive"]) * calc_attacker_rate(level),
                         Decimal(attackers[aid]["attack"]) * calc_attacker_rate(level))
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__} name={self.name} mt={self.mt} " \
+               f"level={self.health} health={self.health} defensive={self.defensive} attack={self.attack}>"
+
 
 class Monster(CharacterBase):
     def __init__(self, name: str = None,
@@ -95,6 +105,9 @@ class Monster(CharacterBase):
             print("Player health is 0")
             return Signal.PLAYER_DIED
         return Signal.OK
+
+    def __repr__(self):
+        return super().__repr__()[:-1] + f" rd={self.rd}>"
 
 
 class Character(CharacterBase):
@@ -146,20 +159,57 @@ class Character(CharacterBase):
                    characters[cid]['speed'],
                    characters[cid]['aggro'], crit_chance, crit_attack, attacker, enhance)
 
+    def __repr__(self):
+        return super().__repr__()[:-1] + f" mt={self.mt} aggro={self.aggro} attacker={self.attacker} " \
+                                         f"enhance={self.enhance} " \
+                                         f"crit_attack={self.crit_attack} crit_chance={self.crit_chance}>"
+
 
 class CombatQueue:
     def __init__(self, players: list[Character], monsters: list[Monster]):
         self.players = players
         self.monsters = monsters
+        self.queue: list[CharacterBase] = list(players) + list(monsters)
+
+    def print_queue(self):
+        print("队列")
+        for i in sorted(self.queue, key=lambda a: a.length, reverse=True):
+            print(i)
+        print()
 
     def attack(self):
-        print("战斗简介")
-        print(self.players[0].name, self.monsters[0].name)
-        while True:
-            signal_monster = self.players[0].do_attack(self.monsters[0])
-            if check_died(signal_monster):
-                return
-            signal_player = self.monsters[0].do_attack(self.players[0])
-            if check_died(signal_player):
-                return
-            print(self.players[0].health, self.monsters[0].health)
+
+        fastest = max(self.queue, key=lambda a: a.speed)
+        print("Fastest C: ", fastest)
+
+        t = 10000 / fastest.speed
+
+        print("Do tick: ", t)
+        for i in self.queue:
+            print("Init: ", i.name)
+            i.length = i.speed * t
+            print(i.length)
+            i.pd = round((10000 - i.length) / i.speed)
+            print(i.pd)
+
+        print(fastest.name)
+        self.print_queue()
+        print()
+        fastest.length = 0
+        # input()
+        for i in range(30):
+            fastest = max(self.queue, key=lambda a: a.length)
+            pd = round((10000 - fastest.length) / fastest.speed)
+            for i in self.queue:
+                if round(i.length) >= 10000:
+                    i.length = 10000
+                    continue
+                if round(i.pd) < 0:
+                    i.pd = 0
+                    continue
+                i.length += pd * i.speed
+                i.pd -= pd
+            print(fastest.name)
+            self.print_queue()
+            # input()
+            fastest.length = 0
