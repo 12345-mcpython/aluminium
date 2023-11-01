@@ -174,7 +174,7 @@ class CombatQueue:
     def print_queue(self):
         print("队列")
         for i in sorted(self.queue, key=lambda a: a.length, reverse=True):
-            print(i)
+            print(i.name, "\t", i.pd, "\t", i.length)
         print()
 
     def attack(self):
@@ -183,6 +183,9 @@ class CombatQueue:
         print("Fastest C: ", fastest)
 
         t = 10000 / fastest.speed
+
+        print("行动前: ")
+        self.print_queue()
 
         print("Do tick: ", t)
         for i in self.queue:
@@ -199,17 +202,26 @@ class CombatQueue:
         # input()
         for i in range(30):
             fastest = max(self.queue, key=lambda a: a.length)
-            pd = round((10000 - fastest.length) / fastest.speed)
-            for i in self.queue:
+            # print("行动前: ")
+            # self.print_queue()
+            for i in sorted(self.queue, key=lambda a: a.length):
                 if round(i.length) >= 10000:
                     i.length = 10000
                     continue
                 if round(i.pd) < 0:
                     i.pd = 0
                     continue
-                i.length += pd * i.speed
-                i.pd -= pd
-            print(fastest.name)
+                # print("Add length for: ", i.name, " before length: ", i.length)
+                # print((10000 - fastest.length))
+                # print(fastest.speed)
+                # print(i.speed)
+                i.length += (10000 - fastest.length) / fastest.speed * i.speed
+                # print("Add length for: ", i.name, " after length: ", i.length)
+                i.pd = round((10000 - i.length) / i.speed)
+            print("行动: ", fastest.name)
+
+            print("行动后: ")
+            print("\n")
             self.print_queue()
             # input()
             fastest.length = 0
