@@ -167,9 +167,11 @@ class Character(CharacterBase):
 
 class CombatQueue:
     def __init__(self, players: list[Character], monsters: list[Monster]):
-        self.players = players
-        self.monsters = monsters
+        self.players: list[Character] = players
+        self.monsters: list[Monster] = monsters
         self.queue: list[CharacterBase] = list(players) + list(monsters)
+        self.last_print: int = 0
+        self.points: int = 3
 
     def print_queue(self):
         print("队列")
@@ -177,7 +179,37 @@ class CombatQueue:
             print(i.name, "\t", i.pd, "\t", i.length)
         print()
 
-    def attack(self):
+    def print_health(self):
+        for i in range(1, len(self.monsters) + 1):
+            print(i, end="\t")
+        print()
+        for i in self.monsters:
+            print(i.name, end="\t")
+        print()
+        for i in self.monsters:
+            print(i.health, end="\t")
+        print()
+        print()
+        for i in range(1, len(self.players) + 1):
+            print(i, end="\t")
+        print()
+        for i in self.players:
+            print(i.name, end="\t")
+        print()
+        for i in self.players:
+            print(i.health, end="\t")
+        print()
+
+    def clear_die(self):
+        for i in self.players:
+            if i.health == 0:
+                self.players.remove(i)
+        for i in self.monsters:
+            if i.health == 0:
+                self.monsters.remove(i)
+        self.queue = list(self.players) + list(self.monsters)
+
+    def make_queue(self):
 
         fastest = max(self.queue, key=lambda a: a.speed)
 
@@ -187,10 +219,10 @@ class CombatQueue:
             i.length = i.speed * t
             i.pd = round((10000 - i.length) / i.speed)
 
-        self.print_queue()
+        # self.print_queue()
         print()
         fastest.length = 0
-        for i in range(30):
+        while True:
             fastest = max(self.queue, key=lambda a: a.length)
             for i in sorted(self.queue, key=lambda a: a.length):
                 if round(i.length) >= 10000:
@@ -201,7 +233,39 @@ class CombatQueue:
                     continue
                 i.length += (10000 - fastest.length) / fastest.speed * i.speed
                 i.pd = round((10000 - i.length) / i.speed)
+            self.print_health()
             print("行动: ", fastest.name)
-            self.print_queue()
-            # input()
+            # self.print_queue()
+            if isinstance(fastest, Character):
+                while True:
+                    message = input()
+                    command, *args = message.split(" ")
+                    if len(args) == 1:
+                        args = args[0]
+                    match command:
+                        case "a":
+                            fastest.do_attack(self.monsters[int(args) - 1])
+                            break
+                        case "cheat":
+                            for i in self.monsters:
+                                i.health = 0
+                            break
+                        case _:
+                            print("未知命令!")
+            else:
+                pass
+            self.clear_die()
+            for i in self.players:
+                if i.health != 0:
+                    break
+            else:
+                print("战斗失败")
+                return Signal.COMBAT_FAIL
+            for i in self.monsters:
+                if i.health != 0:
+                    break
+            else:
+                print("战斗结束")
+                return Signal.COMBAT_WIN
+
             fastest.length = 0

@@ -20,4 +20,4 @@ b2 = Monster("114 2", 1, De(300), De(210), De(30), 100, 10)
 b3 = Monster("114 3", 1, De(300), De(210), De(30), 100, 10)
 
 queue = CombatQueue([a, a1, a2, a3], [b, b1, b2, b3])
-queue.attack()
+queue.make_queue()
