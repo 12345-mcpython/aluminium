@@ -172,6 +172,7 @@ class CombatQueue:
         self.queue: list[CharacterBase] = list(players) + list(monsters)
         self.last_print: int = 0
         self.points: int = 3
+        self.total_aggro = sum([i.aggro for i in players])
 
     def print_queue(self):
         print("队列")
@@ -239,21 +240,37 @@ class CombatQueue:
             if isinstance(fastest, Character):
                 while True:
                     message = input()
+                    if not message:
+                        continue
                     command, *args = message.split(" ")
                     if len(args) == 1:
                         args = args[0]
                     match command:
                         case "a":
+                            if not str(args).isdigit():
+                                print("数值错误! ")
+                                continue
                             fastest.do_attack(self.monsters[int(args) - 1])
                             break
                         case "cheat":
                             for i in self.monsters:
                                 i.health = 0
                             break
+                        case "view_queue":
+                            self.print_queue()
                         case _:
                             print("未知命令!")
             else:
-                pass
+                choose_character = None
+                flag = True
+                while flag:
+                    for i in self.players:
+                        if random_chance(i.aggro / self.total_aggro):
+                            choose_character = i
+                            flag = False
+                            break
+                print(fastest.name, "对", choose_character.name, "进行攻击.")
+                fastest.do_attack(choose_character)
             self.clear_die()
             for i in self.players:
                 if i.health != 0:
