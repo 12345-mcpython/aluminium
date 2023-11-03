@@ -84,7 +84,7 @@ class Attacker:
                f"level={self.health} health={self.health} defensive={self.defensive} attack={self.attack}>"
 
 
-class Monster(CharacterBase):
+class Enemy(CharacterBase):
     def __init__(self, name: str = None,
                  level: int = None,
                  health: Decimal = None,
@@ -166,10 +166,10 @@ class Character(CharacterBase):
 
 
 class CombatQueue:
-    def __init__(self, players: list[Character], monsters: list[Monster]):
+    def __init__(self, players: list[Character], enemies: list[Enemy]):
         self.players: list[Character] = players
-        self.monsters: list[Monster] = monsters
-        self.queue: list[CharacterBase] = list(players) + list(monsters)
+        self.enemies: list[Enemy] = enemies
+        self.queue: list[CharacterBase] = list(players) + list(enemies)
         self.last_print: int = 0
         self.points: int = 3
         self.total_aggro = sum([i.aggro for i in players])
@@ -181,13 +181,13 @@ class CombatQueue:
         print()
 
     def print_health(self):
-        for i in range(1, len(self.monsters) + 1):
+        for i in range(1, len(self.enemies) + 1):
             print(i, end="\t")
         print()
-        for i in self.monsters:
+        for i in self.enemies:
             print(i.name, end="\t")
         print()
-        for i in self.monsters:
+        for i in self.enemies:
             print(i.health, end="\t")
         print()
         print()
@@ -205,10 +205,10 @@ class CombatQueue:
         for i in self.players:
             if i.health == 0:
                 self.players.remove(i)
-        for i in self.monsters:
+        for i in self.enemies:
             if i.health == 0:
-                self.monsters.remove(i)
-        self.queue = list(self.players) + list(self.monsters)
+                self.enemies.remove(i)
+        self.queue = list(self.players) + list(self.enemies)
 
     def make_queue(self):
 
@@ -222,7 +222,7 @@ class CombatQueue:
 
         # self.print_queue()
         print()
-        fastest.length = 0
+        # fastest.length = 0
         while True:
             fastest = max(self.queue, key=lambda a: a.length)
             for i in sorted(self.queue, key=lambda a: a.length):
@@ -250,10 +250,10 @@ class CombatQueue:
                             if not str(args).isdigit():
                                 print("数值错误! ")
                                 continue
-                            fastest.do_attack(self.monsters[int(args) - 1])
+                            fastest.do_attack(self.enemies[int(args) - 1])
                             break
                         case "cheat":
-                            for i in self.monsters:
+                            for i in self.enemies:
                                 i.health = 0
                             break
                         case "view_queue":
@@ -278,7 +278,7 @@ class CombatQueue:
             else:
                 print("战斗失败")
                 return Signal.COMBAT_FAIL
-            for i in self.monsters:
+            for i in self.enemies:
                 if i.health != 0:
                     break
             else:
