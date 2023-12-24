@@ -1,13 +1,24 @@
 from decimal import Decimal
 
+from enum import Enum
+
 from . import characters, attackers
 from . import (
     random_chance,
     calc_character_rate,
     ZERO,
     calc_attacker_rate,
-    select_character,
 )
+
+
+class EnhanceAttributes(Enum):
+    EFFECT_RESISTANCE = 0
+    EFFECT_HIT_RATE = 1
+    CRIT_RATE = 2
+    CRIT_DMG = 3
+    BREAK_EFFECT = 4
+    OUTGOING_HEALING_BOOST = 5
+    ENERGY_REGENERATION_RATE = 6
 
 
 class CharacterBase:
@@ -95,35 +106,8 @@ class Enemy(CharacterBase):
         self.rd: int = rd if rd else 1
         self.buffs = []
 
-    # def do_attack(self, player: CharacterBase):
-    #     if self.health == 0:
-    #         print("Can't attack.")
-    #         return Signal.CANNOT_ATTACK
-    #     player.health -= self.attack * ((200 + 10 * self.level) / (player.defensive + 200 + 10 * player.level))
-    #     if player.health <= 0:
-    #         player.health = 0
-    #         print("Player health is 0")
-    #         return Signal.PLAYER_DIED
-    #     return Signal.OK
-
     def __repr__(self):
         return super().__repr__()[:-1] + f" rd={self.rd}>"
-
-
-class EnhanceAttribute:
-    def __init__(self, attribute_name, value):
-        self.attribute_name: str = attribute_name
-        self.value: Decimal = value
-
-
-class Enhance:
-
-    def __init__(self, name, enhance_type, enhance_position, attributes):
-        self.name = name
-        self.enhance_type = enhance_type
-        self.enhance_position = enhance_position
-        self.attributes: list[EnhanceAttribute] = attributes
-        self.main_attribute: EnhanceAttribute = self.attributes[0]
 
 
 class Character(CharacterBase):
@@ -137,16 +121,14 @@ class Character(CharacterBase):
             attack: Decimal = None,
             speed: int = None,
             aggro: int = None,
-            attribute: str = "",
+            attack_attribute: str = "",
             attributes: dict[str, Decimal] = "",
             attacker: Attacker = None,
-            enhance=None,
     ):
         super().__init__(name, level, health, defensive, attack, speed)
         self.mt = mt
         self.aggro = aggro if aggro else 0
         self.attacker = attacker
-        self.enhance = enhance
         self.buffs = []
         self.attributes = attributes
 
@@ -154,7 +136,7 @@ class Character(CharacterBase):
         crit = random_chance(self.attributes['crit_chance'])
         print(process_level)
         monster.health -= (
-                (self.attack * skills[0]["table"][level - 1])
+                self.attack
                 * Decimal(
             (
                     (200 + 10 * self.level)
@@ -177,26 +159,12 @@ class Character(CharacterBase):
             cls,
             cid: int,
             level: int,
-            attacker: Attacker = Attacker(),
-            enhance: list[Enhance] = None,
+            attacker: Attacker = Attacker()
     ) -> "Character":
         crit_chance = Decimal(".05")
         crit_attack = Decimal(".5")
         if attacker.mt != characters[cid]["mt"]:
             print("警告: 武器与角色的命途属性不同! ")
-        """
-        name: str = None,
-            mt: str = None,
-            level: int = None,
-            health: Decimal = None,
-            defensive: Decimal = None,
-            attack: Decimal = None,
-            speed: int = None,
-            aggro: int = None,
-            attribute: str = "",
-            attributes: dict[str, Decimal] = "",
-            attacker: Attacker = None,
-            enhance=None,"""
         return cls(
             characters[cid]["name"],
             characters[cid]["mt"],
@@ -213,15 +181,13 @@ class Character(CharacterBase):
             characters[cid]["speed"],
             characters[cid]["aggro"],
             "None",
-            {},
-            attacker,
-            enhance,
+            {"crit_chance": crit_chance, "crit_attack": crit_attack},
+            attacker
         )
 
     def __repr__(self):
         return (
                 super().__repr__()[:-1]
                 + f" mt={self.mt} aggro={self.aggro} attacker={self.attacker} "
-                  f"enhance={self.enhance} "
-                  f"crit_attack={self.crit_attack} crit_chance={self.crit_chance}>"
+                  f"attributes={self.attributes} >"
         )

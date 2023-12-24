@@ -8,8 +8,7 @@ class Battle:
     def __init__(self, players: list[Character], enemies: list[Enemy]):
         self.players: list[Character] = players
         self.enemies: list[Enemy] = enemies
-        self.queue: list[CharacterBase] = list(players) + list(enemies)
-        self.last_print: int = 0
+        self.queue: list[Character | Enemy] = list(players) + list(enemies)
         self.points: int = 3
 
     def _print_queue(self):
@@ -52,15 +51,15 @@ class Battle:
         else:
             process_level = 0
         # 普攻
-        if command_type == "a":
+        if command_type == "a" and len(command) == 2:
             process_object = int(command[1])
             process_player.common(self.enemies[process_object], process_level, 6)
             return 1
-        elif command_type == "z":
+        elif command_type == "z" and len(command) == 2:
             process_object = int(command[1])
             process_player.bp(self.enemies[process_object], self.players[process_object], 10)
             return 1
-        elif command_type == "u":
+        elif command_type == "u" and len(command) == 2:
             process_object = int(command[1])
             process_player.ultra(self.enemies[process_object], self.players[process_object], 10)
             return 1
@@ -71,36 +70,53 @@ class Battle:
         else:
             print("未知命令!")
 
-    def battle(self):
-        # on battle start
-        move = self._init_battle()
-        # before move
-        print("行动: ", move.name)
-        if isinstance(move, Character):
-            while self._parse_command(input(), move) != 1:
-                pass
-        # after move
-        move.length = 0
-        while True:
-            # before move
-            move = self._next()
-            print("行动: ", move.name)
-            if isinstance(move, Character):
-                while self._parse_command(input(), move) != 1:
-                    pass
-            else:
-                attacked_player = select_character(self.players)
-                # on character attack
-                print(attacked_player.name, "被攻击")
-            move.length = 0
-            # after move
+    def _action(self, player):
+        while self._parse_command(input(), player) != 1:
+            pass
 
     def _check_death(self):
         for i in self.queue:
             if i.health == 0:
                 if isinstance(i, Character):
-                    # on character death
                     print(i.name, "陷入无法战斗状态")
+                    # event: on character death: call reborn
+                    if i.health == 0:
+                        self.players.remove(i)
                 else:
-                    # on enemy death
                     print(i.name, "被击杀")
+                    # event: on enemy death: call reproduced
+                    if i.health == 0:
+                        self.enemies.remove(i)
+
+    def _check_battle_status(self):
+        for i in self.players:
+            if i.health != 0:
+                break
+        else:
+            return
+
+    def _remove_player(self, i: Character):
+        self.players.remove(i)
+        self.queue.remove(i)
+
+    def _remove_enemy(self, i: Enemy):
+        self.enemies.remove(i)
+        self.queue.remove(i)
+
+    def battle(self):
+        # on battle start
+        move = self._init_battle()
+        while True:
+            # before move: apply dot attack, healing
+            self._check_death()
+            print("行动: ", move.name)
+            if isinstance(move, Character):
+                self._action(move)
+            else:
+                attacked_player = select_character(self.players)
+                # on character attack
+                print(attacked_player.name, "被攻击")
+                self._check_death()
+            move.length = 0
+            move = self._next()
+            # after move
