@@ -11,6 +11,13 @@ def random_chance(chance):
     return False
 
 
+def select_character(characters):
+    while True:
+        for character in characters:
+            if random_chance(character.aggro / sum([i.aggro for i in characters])):
+                return character
+
+
 def calc_character_rate(level, promotion=False):
     base_rate = 1 + (level - 1) * Decimal(".05")
     promotion_level = calc_promotion_level(level, promotion) * Decimal(".4")

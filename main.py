@@ -1,4 +1,4 @@
-from aluminium.models import Enemy, CombatQueue, Character, Attacker
+from aluminium import Enemy, Battle, Character, Attacker, read_data
 from decimal import Decimal as De
 
 attackers = Attacker.build_attacker(3, 1)
@@ -19,5 +19,5 @@ b1 = Enemy("114 1", 1, De(300), De(210), De(30), 100, 10)
 b2 = Enemy("114 2", 1, De(300), De(210), De(30), 100, 10)
 b3 = Enemy("114 3", 1, De(300), De(210), De(30), 100, 10)
 
-queue = CombatQueue([a, a1, a2, a3], [b, b1, b2, b3])
-queue.make_queue()
+queue = Battle([a, a1, a2, a3], [b, b1, b2, b3])
+queue.battle()
