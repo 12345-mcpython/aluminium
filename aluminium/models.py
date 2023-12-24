@@ -134,7 +134,7 @@ class Character(CharacterBase):
 
     def common(self, monster: Enemy, process_level: int, level: int) -> None:
         crit = random_chance(self.attributes['crit_chance'])
-        print(process_level)
+        print(monster.health)
         monster.health -= (
                 self.attack
                 * Decimal(

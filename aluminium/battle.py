@@ -76,21 +76,23 @@ class Battle:
 
     def _check_death(self):
         for i in self.queue:
-            if i.health == 0:
+            if i.health <= 0:
                 if isinstance(i, Character):
                     print(i.name, "陷入无法战斗状态")
                     # event: on character death: call reborn
-                    if i.health == 0:
+                    if i.health <= 0:
                         self.players.remove(i)
+                        self.queue.remove(i)
                 else:
                     print(i.name, "被击杀")
                     # event: on enemy death: call reproduced
-                    if i.health == 0:
+                    if i.health <= 0:
                         self.enemies.remove(i)
+                        self.queue.remove(i)
 
     def _check_battle_status(self):
         for i in self.players:
-            if i.health != 0:
+            if i.health > 0:
                 break
         else:
             return
@@ -103,12 +105,20 @@ class Battle:
         self.enemies.remove(i)
         self.queue.remove(i)
 
+    def _print_information(self):
+        print("\t".join([i.name for i in self.players]))
+        print("\t".join([str(i.health) for i in self.players]))
+        print()
+        print("\t".join([i.name for i in self.enemies]))
+        print("\t".join([str(i.health) for i in self.enemies]))
+
     def battle(self):
         # on battle start
         move = self._init_battle()
         while True:
             # before move: apply dot attack, healing
             self._check_death()
+            self._print_information()
             print("行动: ", move.name)
             if isinstance(move, Character):
                 self._action(move)
