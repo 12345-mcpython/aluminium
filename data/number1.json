@@ -1,0 +1,902 @@
+[
+    {
+        "level": 1,
+        "attack": 0.64,
+        "protect": 1,
+        "health": 0.8,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 2,
+        "attack": 0.766887,
+        "protect": 1.047619,
+        "health": 1.05,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 3,
+        "attack": 0.814786,
+        "protect": 1.095238,
+        "health": 1.1,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 4,
+        "attack": 1.125528,
+        "protect": 1.142857,
+        "health": 1.362518,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 5,
+        "attack": 1.181478,
+        "protect": 1.190476,
+        "health": 1.428762,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 6,
+        "attack": 1.238469,
+        "protect": 1.238095,
+        "health": 1.496191,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 7,
+        "attack": 1.296802,
+        "protect": 1.285714,
+        "health": 1.564808,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 8,
+        "attack": 1.373344,
+        "protect": 1.333333,
+        "health": 1.634615,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 9,
+        "attack": 1.416696,
+        "protect": 1.380952,
+        "health": 1.705617,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 10,
+        "attack": 1.46011,
+        "protect": 1.428571,
+        "health": 1.777814,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 11,
+        "attack": 1.60824,
+        "protect": 1.47619,
+        "health": 1.902566,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 12,
+        "attack": 1.756371,
+        "protect": 1.52381,
+        "health": 2.027318,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 13,
+        "attack": 1.904501,
+        "protect": 1.571429,
+        "health": 2.15207,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 14,
+        "attack": 2.052631,
+        "protect": 1.619048,
+        "health": 2.276821,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 15,
+        "attack": 2.200761,
+        "protect": 1.666667,
+        "health": 2.401573,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 16,
+        "attack": 2.348891,
+        "protect": 1.714286,
+        "health": 2.526325,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 17,
+        "attack": 2.497022,
+        "protect": 1.761905,
+        "health": 2.651077,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 18,
+        "attack": 2.645152,
+        "protect": 1.809524,
+        "health": 2.775828,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 19,
+        "attack": 2.793282,
+        "protect": 1.857143,
+        "health": 2.90058,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 20,
+        "attack": 2.941412,
+        "protect": 1.904762,
+        "health": 3.025332,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 21,
+        "attack": 3.19152,
+        "protect": 1.952381,
+        "health": 3.24706,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 22,
+        "attack": 3.441627,
+        "protect": 2,
+        "health": 3.468788,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 23,
+        "attack": 3.691735,
+        "protect": 2.047619,
+        "health": 3.690516,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 24,
+        "attack": 3.941842,
+        "protect": 2.095238,
+        "health": 3.912244,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 25,
+        "attack": 4.19195,
+        "protect": 2.142857,
+        "health": 4.133972,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 26,
+        "attack": 4.442057,
+        "protect": 2.190476,
+        "health": 4.355701,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 27,
+        "attack": 4.692165,
+        "protect": 2.238095,
+        "health": 4.577429,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 28,
+        "attack": 4.942272,
+        "protect": 2.285714,
+        "health": 4.799157,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 29,
+        "attack": 5.19238,
+        "protect": 2.333333,
+        "health": 5.020885,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 30,
+        "attack": 5.442487,
+        "protect": 2.380952,
+        "health": 5.242613,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 31,
+        "attack": 5.761692,
+        "protect": 2.428571,
+        "health": 5.67081,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 32,
+        "attack": 6.080898,
+        "protect": 2.47619,
+        "health": 6.099006,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 33,
+        "attack": 6.400103,
+        "protect": 2.52381,
+        "health": 6.527203,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 34,
+        "attack": 6.719308,
+        "protect": 2.571429,
+        "health": 6.9554,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 35,
+        "attack": 7.038513,
+        "protect": 2.619048,
+        "health": 7.383597,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 36,
+        "attack": 7.357718,
+        "protect": 2.666667,
+        "health": 7.811794,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 37,
+        "attack": 7.676923,
+        "protect": 2.714286,
+        "health": 8.23999,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 38,
+        "attack": 7.996129,
+        "protect": 2.761905,
+        "health": 8.668187,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 39,
+        "attack": 8.315334,
+        "protect": 2.809524,
+        "health": 9.096384,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 40,
+        "attack": 8.634539,
+        "protect": 2.857143,
+        "health": 9.524581,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 41,
+        "attack": 9.071262,
+        "protect": 2.904762,
+        "health": 10.786134,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 42,
+        "attack": 9.507986,
+        "protect": 2.952381,
+        "health": 12.047688,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 43,
+        "attack": 9.944709,
+        "protect": 3,
+        "health": 13.309242,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 44,
+        "attack": 10.381433,
+        "protect": 3.047619,
+        "health": 14.570795,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 45,
+        "attack": 10.818156,
+        "protect": 3.095238,
+        "health": 15.832349,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 46,
+        "attack": 11.25488,
+        "protect": 3.142857,
+        "health": 17.093903,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 47,
+        "attack": 11.691603,
+        "protect": 3.190476,
+        "health": 18.355456,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 48,
+        "attack": 12.128327,
+        "protect": 3.238095,
+        "health": 19.61701,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 49,
+        "attack": 12.56505,
+        "protect": 3.285714,
+        "health": 20.878564,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 50,
+        "attack": 13.001774,
+        "protect": 3.333333,
+        "health": 22.140117,
+        "speed": 1,
+        "effect_hit_rate": 0,
+        "effect_resistance": 0
+    },
+    {
+        "level": 51,
+        "attack": 13.581057,
+        "protect": 3.380952,
+        "health": 25.19852,
+        "speed": 1,
+        "effect_hit_rate": 0.008,
+        "effect_resistance": 0.004
+    },
+    {
+        "level": 52,
+        "attack": 14.16034,
+        "protect": 3.428571,
+        "health": 28.256923,
+        "speed": 1,
+        "effect_hit_rate": 0.016,
+        "effect_resistance": 0.008
+    },
+    {
+        "level": 53,
+        "attack": 14.739623,
+        "protect": 3.47619,
+        "health": 31.315326,
+        "speed": 1,
+        "effect_hit_rate": 0.024,
+        "effect_resistance": 0.012
+    },
+    {
+        "level": 54,
+        "attack": 15.318906,
+        "protect": 3.52381,
+        "health": 34.373729,
+        "speed": 1,
+        "effect_hit_rate": 0.032,
+        "effect_resistance": 0.016
+    },
+    {
+        "level": 55,
+        "attack": 15.898189,
+        "protect": 3.571429,
+        "health": 37.432132,
+        "speed": 1,
+        "effect_hit_rate": 0.04,
+        "effect_resistance": 0.02
+    },
+    {
+        "level": 56,
+        "attack": 16.477472,
+        "protect": 3.619048,
+        "health": 40.490535,
+        "speed": 1,
+        "effect_hit_rate": 0.048,
+        "effect_resistance": 0.024
+    },
+    {
+        "level": 57,
+        "attack": 17.056735,
+        "protect": 3.666667,
+        "health": 43.548938,
+        "speed": 1,
+        "effect_hit_rate": 0.056,
+        "effect_resistance": 0.028
+    },
+    {
+        "level": 58,
+        "attack": 17.636038,
+        "protect": 3.714286,
+        "health": 46.607341,
+        "speed": 1,
+        "effect_hit_rate": 0.064,
+        "effect_resistance": 0.032
+    },
+    {
+        "level": 59,
+        "attack": 18.215321,
+        "protect": 3.761905,
+        "health": 49.665744,
+        "speed": 1,
+        "effect_hit_rate": 0.072,
+        "effect_resistance": 0.036
+    },
+    {
+        "level": 60,
+        "attack": 18.794605,
+        "protect": 3.809524,
+        "health": 52.724147,
+        "speed": 1,
+        "effect_hit_rate": 0.08,
+        "effect_resistance": 0.04
+    },
+    {
+        "level": 61,
+        "attack": 19.336283,
+        "protect": 3.857143,
+        "health": 56.950449,
+        "speed": 1,
+        "effect_hit_rate": 0.088,
+        "effect_resistance": 0.044
+    },
+    {
+        "level": 62,
+        "attack": 19.877961,
+        "protect": 3.904762,
+        "health": 61.176751,
+        "speed": 1,
+        "effect_hit_rate": 0.096,
+        "effect_resistance": 0.048
+    },
+    {
+        "level": 63,
+        "attack": 20.41964,
+        "protect": 3.952381,
+        "health": 65.403053,
+        "speed": 1,
+        "effect_hit_rate": 0.104,
+        "effect_resistance": 0.052
+    },
+    {
+        "level": 64,
+        "attack": 20.961318,
+        "protect": 4,
+        "health": 69.629355,
+        "speed": 1,
+        "effect_hit_rate": 0.112,
+        "effect_resistance": 0.056
+    },
+    {
+        "level": 65,
+        "attack": 21.502996,
+        "protect": 4.047619,
+        "health": 73.855657,
+        "speed": 1.1,
+        "effect_hit_rate": 0.12,
+        "effect_resistance": 0.06
+    },
+    {
+        "level": 66,
+        "attack": 22.044675,
+        "protect": 4.095238,
+        "health": 78.081959,
+        "speed": 1.1,
+        "effect_hit_rate": 0.128,
+        "effect_resistance": 0.064
+    },
+    {
+        "level": 67,
+        "attack": 22.586353,
+        "protect": 4.142857,
+        "health": 82.308261,
+        "speed": 1.1,
+        "effect_hit_rate": 0.136,
+        "effect_resistance": 0.068
+    },
+    {
+        "level": 68,
+        "attack": 23.128032,
+        "protect": 4.190476,
+        "health": 86.534563,
+        "speed": 1.1,
+        "effect_hit_rate": 0.144,
+        "effect_resistance": 0.072
+    },
+    {
+        "level": 69,
+        "attack": 23.66971,
+        "protect": 4.238095,
+        "health": 90.760865,
+        "speed": 1.1,
+        "effect_hit_rate": 0.152,
+        "effect_resistance": 0.076
+    },
+    {
+        "level": 70,
+        "attack": 24.211388,
+        "protect": 4.285714,
+        "health": 94.987167,
+        "speed": 1.1,
+        "effect_hit_rate": 0.16,
+        "effect_resistance": 0.08
+    },
+    {
+        "level": 71,
+        "attack": 24.858698,
+        "protect": 4.333333,
+        "health": 100.289552,
+        "speed": 1.1,
+        "effect_hit_rate": 0.168,
+        "effect_resistance": 0.084
+    },
+    {
+        "level": 72,
+        "attack": 25.506008,
+        "protect": 4.380952,
+        "health": 105.591938,
+        "speed": 1.1,
+        "effect_hit_rate": 0.176,
+        "effect_resistance": 0.088
+    },
+    {
+        "level": 73,
+        "attack": 26.153318,
+        "protect": 4.428571,
+        "health": 110.894324,
+        "speed": 1.1,
+        "effect_hit_rate": 0.184,
+        "effect_resistance": 0.092
+    },
+    {
+        "level": 74,
+        "attack": 26.800628,
+        "protect": 4.47619,
+        "health": 116.19671,
+        "speed": 1.1,
+        "effect_hit_rate": 0.192,
+        "effect_resistance": 0.096
+    },
+    {
+        "level": 75,
+        "attack": 27.447938,
+        "protect": 4.52381,
+        "health": 121.499095,
+        "speed": 1.1,
+        "effect_hit_rate": 0.2,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 76,
+        "attack": 28.095248,
+        "protect": 4.571429,
+        "health": 126.801481,
+        "speed": 1.1,
+        "effect_hit_rate": 0.208,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 77,
+        "attack": 28.742558,
+        "protect": 4.619048,
+        "health": 132.103867,
+        "speed": 1.1,
+        "effect_hit_rate": 0.216,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 78,
+        "attack": 29.389868,
+        "protect": 4.666667,
+        "health": 137.406253,
+        "speed": 1.2,
+        "effect_hit_rate": 0.224,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 79,
+        "attack": 30.037178,
+        "protect": 4.714286,
+        "health": 142.708639,
+        "speed": 1.2,
+        "effect_hit_rate": 0.232,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 80,
+        "attack": 30.684488,
+        "protect": 4.761905,
+        "health": 148.011024,
+        "speed": 1.2,
+        "effect_hit_rate": 0.24,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 81,
+        "attack": 31.298178,
+        "protect": 4.809524,
+        "health": 155.487432,
+        "speed": 1.2,
+        "effect_hit_rate": 0.248,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 82,
+        "attack": 31.911868,
+        "protect": 4.857143,
+        "health": 163.240467,
+        "speed": 1.2,
+        "effect_hit_rate": 0.256,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 83,
+        "attack": 32.525558,
+        "protect": 4.904762,
+        "health": 171.280364,
+        "speed": 1.2,
+        "effect_hit_rate": 0.264,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 84,
+        "attack": 33.139247,
+        "protect": 4.952381,
+        "health": 179.617738,
+        "speed": 1.2,
+        "effect_hit_rate": 0.272,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 85,
+        "attack": 33.752937,
+        "protect": 5,
+        "health": 188.263594,
+        "speed": 1.2,
+        "effect_hit_rate": 0.28,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 86,
+        "attack": 34.366627,
+        "protect": 5.047619,
+        "health": 197.229347,
+        "speed": 1.32,
+        "effect_hit_rate": 0.288,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 87,
+        "attack": 34.980317,
+        "protect": 5.095238,
+        "health": 206.526833,
+        "speed": 1.32,
+        "effect_hit_rate": 0.296,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 88,
+        "attack": 35.594006,
+        "protect": 5.142857,
+        "health": 216.168326,
+        "speed": 1.32,
+        "effect_hit_rate": 0.304,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 89,
+        "attack": 36.207696,
+        "protect": 5.190476,
+        "health": 226.166554,
+        "speed": 1.32,
+        "effect_hit_rate": 0.312,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 90,
+        "attack": 36.821386,
+        "protect": 5.238095,
+        "health": 236.534716,
+        "speed": 1.32,
+        "effect_hit_rate": 0.32,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 91,
+        "attack": 37.435076,
+        "protect": 5.285714,
+        "health": 247.286501,
+        "speed": 1.32,
+        "effect_hit_rate": 0.328,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 92,
+        "attack": 38.048765,
+        "protect": 5.333333,
+        "health": 258.436102,
+        "speed": 1.32,
+        "effect_hit_rate": 0.336,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 93,
+        "attack": 38.662455,
+        "protect": 5.380952,
+        "health": 269.998237,
+        "speed": 1.32,
+        "effect_hit_rate": 0.344,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 94,
+        "attack": 39.276145,
+        "protect": 5.428571,
+        "health": 281.988172,
+        "speed": 1.32,
+        "effect_hit_rate": 0.352,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 95,
+        "attack": 39.889835,
+        "protect": 5.47619,
+        "health": 294.421734,
+        "speed": 1.32,
+        "effect_hit_rate": 0.36,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 96,
+        "attack": 40.503525,
+        "protect": 5.52381,
+        "health": 307.315339,
+        "speed": 1.32,
+        "effect_hit_rate": 0.368,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 97,
+        "attack": 41.117214,
+        "protect": 5.571429,
+        "health": 320.686006,
+        "speed": 1.32,
+        "effect_hit_rate": 0.376,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 98,
+        "attack": 41.730904,
+        "protect": 5.619048,
+        "health": 334.551388,
+        "speed": 1.32,
+        "effect_hit_rate": 0.384,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 99,
+        "attack": 42.344594,
+        "protect": 5.666667,
+        "health": 348.92979,
+        "speed": 1.32,
+        "effect_hit_rate": 0.392,
+        "effect_resistance": 0.1
+    },
+    {
+        "level": 100,
+        "attack": 42.958284,
+        "protect": 5.714286,
+        "health": 363.840192,
+        "speed": 1.32,
+        "effect_hit_rate": 0.4,
+        "effect_resistance": 0.1
+    }
+]

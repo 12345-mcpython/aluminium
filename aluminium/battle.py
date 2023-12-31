@@ -4,6 +4,15 @@ from . import Character, Enemy, select_character
 from .models import CharacterBase
 
 
+class SkillBuilder:
+    def __init__(self, movables: list[Enemy | Character]):
+        self.movables = movables
+
+    def build(self):
+        for i in self.movables:
+            print(i)
+
+
 class Battle:
     def __init__(self, players: list[Character], enemies: list[Enemy]):
         self.players: list[Character] = players
@@ -83,19 +92,31 @@ class Battle:
                     if i.health <= 0:
                         self.players.remove(i)
                         self.queue.remove(i)
+                    else:
+                        # event: on character reborn: ?
+                        pass
                 else:
                     print(i.name, "被击杀")
-                    # event: on enemy death: call reproduced
+                    # event: on enemy death: character call reproduced, reborn
                     if i.health <= 0:
                         self.enemies.remove(i)
                         self.queue.remove(i)
+                    else:
+                        # event: on enemy reborn: ?
+                        pass
 
     def _check_battle_status(self):
         for i in self.players:
             if i.health > 0:
                 break
         else:
-            return
+            return "failure"
+        for i in self.enemies:
+            if i.health > 0:
+                break
+        else:
+            return "successful"
+        return "battling"
 
     def _remove_player(self, i: Character):
         self.players.remove(i)
@@ -113,7 +134,7 @@ class Battle:
         print("\t".join([str(i.health) for i in self.enemies]))
 
     def battle(self):
-        # on battle start
+        # on battle start: add default buff
         move = self._init_battle()
         while True:
             # before move: apply dot attack, healing

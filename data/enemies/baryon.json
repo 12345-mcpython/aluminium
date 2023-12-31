@@ -1,0 +1,27 @@
+{
+    "name": "aluminium.enemies.baryon",
+    "attack": 18,
+    "defensive": 210,
+    "health": 55.8,
+    "speed": 83,
+    "rd": 1,
+    "crit_attack": 0.2,
+    "skill": {
+        "common": {
+            "type": "aluminium:attack",
+            "attribute": "quantum",
+            "energy": 10,
+            "value": {
+                "type": "aluminium:exact_times_related",
+                "value": 2.5,
+                "related": "attack"
+            }
+        }
+    },
+    "ai": [
+        {
+            "type": "aluminium:all_condition",
+            "action": "aluminium:skill_common"
+        }
+    ]
+}

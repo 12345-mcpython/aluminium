@@ -1,3 +1,4 @@
+import json
 from decimal import Decimal
 
 from enum import Enum
@@ -109,6 +110,11 @@ class Enemy(CharacterBase):
     def __repr__(self):
         return super().__repr__()[:-1] + f" rd={self.rd}>"
 
+    @classmethod
+    def build_enemy(cls, name, level):
+        with open(f"data/enemies/{name}.json") as f:
+            json.load()
+
 
 class Character(CharacterBase):
     def __init__(
@@ -191,3 +197,4 @@ class Character(CharacterBase):
                 + f" mt={self.mt} aggro={self.aggro} attacker={self.attacker} "
                   f"attributes={self.attributes} >"
         )
+
