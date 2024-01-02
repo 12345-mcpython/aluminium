@@ -56,7 +56,7 @@ aluminium:level_times_related - 根据行迹等级进行对有关值的乘区计
 
 aluminium:exact_times_related - 根据确定值进行对有关值的乘区计算
 
-- values: float - 乘区的确定值
+- value: float - 乘区的确定值
 - related: str / argument - 进行乘区计算的有关值
 
 

@@ -27,15 +27,15 @@ def read_data():
     #             skills.append(i)
     #
     # for character in characters:
-    #     character_skills = [i for i in skills if i['name'] == character['name']]
+    #     character_skills = [i for i in skills if i["name"] == character["name"]]
     #     character["skills"] = {}
     #     character["skills"]["skill"] = []
-    #     character["skills"]['end'] = []
-    #     character["skills"]['talent'] = []
+    #     character["skills"]["end"] = []
+    #     character["skills"]["talent"] = []
     #     for i in character_skills:
-    #         if i['attack_type'] == "战技":
+    #         if i["attack_type"] == "战技":
     #             character["skills"]["skill"].append(i)
-    #         if i['attack_type'] == "终结技":
-    #             character["skills"]['end'].append(i)
-    #         if i['attack_type'] == "天赋":
-    #             character["skills"]['talent'].append(i)
+    #         if i["attack_type"] == "终结技":
+    #             character["skills"]["end"].append(i)
+    #         if i["attack_type"] == "天赋":
+    #             character["skills"]["talent"].append(i)

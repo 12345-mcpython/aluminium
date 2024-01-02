@@ -1,3 +1,4 @@
+import json
 import random
 
 from decimal import Decimal
@@ -39,3 +40,13 @@ def calc_promotion_level(level, promotion=False):
     if level % 10 == 0 and not promotion and level != 80:
         promotion_level -= 1
     return promotion_level
+
+
+def translate(translatable_string, lang="zh_cn"):
+    with open(f"data/lang/{lang.lower()}.json") as f:
+        return json.load(f).get(translatable_string, translatable_string)
+
+
+def get_enemy_table(level: int, key: str):
+    with open("data/number1.json") as f:
+        return json.load(f)[level - 1].get(key)

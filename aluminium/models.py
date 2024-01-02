@@ -1,6 +1,5 @@
 import json
 from decimal import Decimal
-
 from enum import Enum
 
 from . import characters, attackers
@@ -10,6 +9,7 @@ from . import (
     ZERO,
     calc_attacker_rate,
 )
+from .utils import translate, get_enemy_table
 
 
 class EnhanceAttributes(Enum):
@@ -25,20 +25,24 @@ class EnhanceAttributes(Enum):
 class CharacterBase:
     def __init__(
             self,
-            name: str = None,
-            level: int = None,
-            health: float = None,
-            defensive: float = None,
-            attack: float = None,
-            speed: int = None,
+            name: str,
+            level: int,
+            health: Decimal,
+            defensive: Decimal,
+            attack: Decimal,
+            speed: int,
+            attribute: dict[str, Decimal] = None,
+            behavior: list = None
     ):
         self.name = name
-        self.level: int = level if level else 1
-        self.__health: Decimal = health if health else ZERO
-        self.defensive: Decimal = defensive if defensive else ZERO
-        self.attack: Decimal = attack if attack else ZERO
+        self.level: int = level
+        self.__health: Decimal = Decimal(health)
+        self.defensive: Decimal = Decimal(defensive)
+        self.attack: Decimal = Decimal(attack)
         self.length: Decimal = ZERO
-        self.speed: int = speed if speed else 0
+        self.speed: int = speed
+        self.attribute = attribute
+        self.behavior = behavior
         self.pd: Decimal = ZERO
         self.buffs = []
 
@@ -95,15 +99,17 @@ class Attacker:
 class Enemy(CharacterBase):
     def __init__(
             self,
-            name: str = None,
-            level: int = None,
-            health: Decimal = None,
-            defensive: Decimal = None,
-            attack: Decimal = None,
-            speed: int = None,
-            rd: int = None,
+            name: str,
+            level: int,
+            health: Decimal,
+            defensive: Decimal,
+            attack: Decimal,
+            speed: int,
+            rd: int,
+            attribute: dict[str, Decimal] = None,
+            behavior: list = None
     ):
-        super().__init__(name, level, health, defensive, attack, speed)
+        super().__init__(name, level, health, defensive, attack, speed, attribute, behavior)
         self.rd: int = rd if rd else 1
         self.buffs = []
 
@@ -113,33 +119,41 @@ class Enemy(CharacterBase):
     @classmethod
     def build_enemy(cls, name, level):
         with open(f"data/enemies/{name}.json") as f:
-            json.load()
+            data = json.load(f)
+        name = translate(data["name"])
+        attack = data["attack"] * get_enemy_table(level, "attack")
+        defensive = data["attack"] * get_enemy_table(level, "defensive")
+        health = data["attack"] * get_enemy_table(level, "health")
+        speed = data["speed"] * get_enemy_table(level, "speed")
+        rd = data["rd"]
+        attribute = data["attribute"]
+        behavior = data["behavior"]
+        return cls(name, level, health, defensive, attack, speed, rd, attribute, behavior)
 
 
 class Character(CharacterBase):
     def __init__(
             self,
-            name: str = None,
-            mt: str = None,
-            level: int = None,
-            health: Decimal = None,
-            defensive: Decimal = None,
-            attack: Decimal = None,
-            speed: int = None,
-            aggro: int = None,
-            attack_attribute: str = "",
-            attributes: dict[str, Decimal] = "",
+            name: str,
+            mt: str,
+            level: int,
+            health: Decimal,
+            defensive: Decimal,
+            attack: Decimal,
+            speed: int,
+            aggro: int,
+            attribute: dict[str, Decimal] = None,
             attacker: Attacker = None,
+            behavior: list = None
     ):
-        super().__init__(name, level, health, defensive, attack, speed)
+        super().__init__(name, level, health, defensive, attack, speed, attribute, behavior)
         self.mt = mt
         self.aggro = aggro if aggro else 0
         self.attacker = attacker
         self.buffs = []
-        self.attributes = attributes
 
-    def common(self, monster: Enemy, process_level: int, level: int) -> None:
-        crit = random_chance(self.attributes['crit_chance'])
+    def common(self, monster: Enemy, level: int) -> None:
+        crit = random_chance(self.attribute["crit_chance"])
         print(monster.health)
         monster.health -= (
                 self.attack
@@ -149,7 +163,7 @@ class Character(CharacterBase):
                     / (monster.defensive + 200 + 10 * monster.level)
             )
         )
-                * Decimal(((1 + self.attributes['crit_attack'] * self.attributes['crit_chance']) if crit else 1))
+                * Decimal(((1 + self.attribute["crit_attack"] * self.attribute["crit_chance"]) if crit else 1))
         )
 
     def bp(self, monster_center: Enemy, player_center: "Character", level: int):
@@ -186,7 +200,6 @@ class Character(CharacterBase):
             + attacker.attack,
             characters[cid]["speed"],
             characters[cid]["aggro"],
-            "None",
             {"crit_chance": crit_chance, "crit_attack": crit_attack},
             attacker
         )
@@ -195,6 +208,5 @@ class Character(CharacterBase):
         return (
                 super().__repr__()[:-1]
                 + f" mt={self.mt} aggro={self.aggro} attacker={self.attacker} "
-                  f"attributes={self.attributes} >"
+                  f"attributes={self.attribute} >"
         )
-
