@@ -43,7 +43,7 @@ def calc_promotion_level(level, promotion=False):
 
 
 def translate(translatable_string, lang="zh_cn"):
-    with open(f"data/lang/{lang.lower()}.json") as f:
+    with open(f"data/lang/{lang.lower()}.json", encoding="utf-8") as f:
         return json.load(f).get(translatable_string, translatable_string)
 
 
