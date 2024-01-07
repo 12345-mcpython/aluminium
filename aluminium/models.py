@@ -32,7 +32,7 @@ class CharacterBase:
             attack: Decimal,
             speed: int,
             attribute: dict[str, Decimal] = None,
-            behavior: list = None
+            behavior: dict[str, list[dict] | dict[str, str]] = None
     ):
         self.name = name
         self.level: int = level
@@ -154,7 +154,6 @@ class Character(CharacterBase):
 
     def common(self, monster: Enemy, level: int) -> None:
         crit = random_chance(self.attribute["crit_chance"])
-        print(monster.health)
         monster.health -= (
                 self.attack
                 * Decimal(

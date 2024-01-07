@@ -1,8 +1,6 @@
 from aluminium import Enemy, Battle, Character, Attacker, read_data
 from decimal import Decimal as De
 
-read_data()
-
 attackers = Attacker.build_attacker(3, 1)
 
 attackers_1 = Attacker.build_attacker(0, 1)

@@ -14,7 +14,7 @@
     "behavior": {
         "skill": {
             "common": {
-                "type": "aluminium:attack",
+                "type": "aluminium:single_attack",
                 "attribute": "quantum",
                 "energy": 10,
                 "value": {
@@ -24,6 +24,9 @@
                 }
             }
         },
+        "talent": [
+
+        ],
         "ai": [
             {
                 "type": "aluminium:all_condition",

@@ -4,11 +4,12 @@ from . import Character, Enemy, select_character
 
 
 class Battle:
-    def __init__(self, players: list[Character], enemies: list[Enemy]):
+    def __init__(self, players: list[Character], enemies: list[Enemy], test=False):
         self.players: list[Character] = players
         self.enemies: list[Enemy] = enemies
         self.queue: list[Character | Enemy] = [*list(players), *list(enemies)]
         self.points: int = 3
+        self.test = False
 
     def _print_queue(self):
         print("队列")
