@@ -7,9 +7,5 @@ if __name__ == "__main__":
     d = Enhance.generate_random_enhance("boot", 1, 5)
     e = Enhance.generate_random_enhance("ball", 1, 5)
     f = Enhance.generate_random_enhance("line", 1, 5)
-    print(a)
-    print(b)
-    print(c)
-    print(d)
-    print(e)
-    print(f)
+    print(a.promote_level(114514))
+    

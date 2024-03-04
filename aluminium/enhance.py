@@ -66,27 +66,33 @@ class Enhance:
         return level
 
     def promote_level(self, given_xp):
-        result = {}
-        if given_xp > xp[self.star]:
+        if given_xp > len(xp[self.star]):
             print("xp outflow")
         promote_level = self._xp_reached_level(given_xp)
+        level_range = range(self.level, promote_level + 1)
         self.xp += given_xp
         self.level += promote_level
-        if self.level == 3 and len(self.sub_attributes) == 3:
+        added = False
+        if 3 in level_range and len(self.sub_attributes) == 3:
             print("Add sub attribute")
-            a = list([i.left for i in self.sub_attributes])
+            a = list([r.left for r in self.sub_attributes])
             b = list(sub_attributes_key_table)
-            for i in a:
-                b.remove(i)
+            for he in a:
+                b.remove(he)
             added_sub_attribute_key = random.choice(b)
             added_attribute = Attribute(
                 added_sub_attribute_key,
                 sub_attribute_table[added_sub_attribute_key]["base"],
             )
             self.sub_attributes.append(added_attribute)
-        # if (self.level == 3 and len(self.sub_attributes) == 4) or self.level % 3 == 0:
-        #     print("Random promote sub attribute")
-        #     promoted_sub_attribute = random.choice(self.sub_attributes)
+            added = True
+        if len([q for q in level_range if q % 3 == 0 and q != 0]):
+            for i in [p for p in level_range if p % 3 == 0 and p != 0]:
+                if added and i == 3:
+                    continue
+                print("Random promote sub attribute")
+                promoted_sub_attribute = random.choice(self.sub_attributes)
+                print(promoted_sub_attribute)
 
     def __str__(self) -> str:
         return f"<Enhance enhance_id={self.enhance_id} positon={self.position} star={self.star} main_attribute={self.main_attribute} sub_attribute={','.join(str(i) for i in self.sub_attributes)}>"
