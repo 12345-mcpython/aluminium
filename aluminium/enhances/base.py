@@ -13,18 +13,18 @@ class Attribute:
         self.right = right
 
     def __str__(self):
-        return f"<Attribute left={self.left} right={self.right}>"
+        return f"<{type(self).__name__} left={self.left} right={self.right}>"
 
 
 class Enhance:
     def __init__(
-        self,
-        level: int,
-        enhance_id: int,
-        position: str,
-        star: int,
-        main_attribute: Attribute,
-        sub_attributes: list[Attribute],
+            self,
+            level: int,
+            enhance_id: int,
+            position: str,
+            star: int,
+            main_attribute: Attribute,
+            sub_attributes: list[Attribute],
     ):
         self.level = level
         self.enhance_id = enhance_id
@@ -32,11 +32,11 @@ class Enhance:
         self.star = star
         self.main_attribute = main_attribute
         self.sub_attributes = sub_attributes
-        self.xp = sum(xp[star][:level])
+        self.total_xp = sum(xp[star][:level])
 
     @classmethod
     def generate_random_enhance(
-        cls, position: str, enhance_id: int, star: int
+            cls, position: str, enhance_id: int, star: int
     ) -> "Enhance":
         chosen_main_attribute = random.choice(position_attributes[position])
         chosen_sub_attributes = random.sample(
@@ -57,8 +57,8 @@ class Enhance:
 
     def _xp_reached_level(self, given_xp):
         level = 0
-        total = self.xp
-        for i in xp[self.star][self.level :]:
+        total = self.total_xp
+        for i in xp[self.star][self.level:]:
             total += i
             if given_xp < total:
                 break
@@ -70,7 +70,7 @@ class Enhance:
             print("xp outflow")
         promote_level = self._xp_reached_level(given_xp)
         level_range = range(self.level, promote_level + 1)
-        self.xp += given_xp
+        self.total_xp += given_xp
         self.level += promote_level
         added = False
         if 3 in level_range and len(self.sub_attributes) == 3:
@@ -82,7 +82,7 @@ class Enhance:
             added_sub_attribute_key = random.choice(b)
             added_attribute = Attribute(
                 added_sub_attribute_key,
-                sub_attribute_table[added_sub_attribute_key]["base"],
+                sub_attribute_table[added_sub_attribute_key]["base"][self.star - 2],
             )
             self.sub_attributes.append(added_attribute)
             added = True
@@ -93,9 +93,28 @@ class Enhance:
                 print("Random promote sub attribute")
                 promoted_sub_attribute = random.choice(self.sub_attributes)
                 print(promoted_sub_attribute)
+                promoted_sub_attribute_bonus = sub_attribute_table[
+                    promoted_sub_attribute.left
+                ]["bonus"][self.star - 2]
+                promoted_sub_attribute.right += promoted_sub_attribute_bonus
 
     def __str__(self) -> str:
-        return f"<Enhance enhance_id={self.enhance_id} positon={self.position} star={self.star} main_attribute={self.main_attribute} sub_attribute={','.join(str(i) for i in self.sub_attributes)}>"
+        return f"<{type(self).__name__} enhance_id={self.enhance_id} positon={self.position} star={self.star} main_attribute={self.main_attribute} sub_attribute={','.join(str(i) for i in self.sub_attributes)}>"
+
+
+class Enhances:
+    def __init__(
+            self, hand=None, head=None, body=None, boot=None, ball=None, line=None
+    ) -> None:
+        self.hand: Enhance = hand
+        self.head: Enhance = head
+        self.body: Enhance = body
+        self.boot: Enhance = boot
+        self.ball: Enhance = ball
+        self.line: Enhance = line
+
+    def __str__(self) -> str:
+        return f"<{type(self).__name__} hand={str(self.hand)} head={str(self.head)} body={str(self.body)} boot={str(self.boot)} ball={str(self.ball)} line={str(self.line)}>"
 
 
 # data part
