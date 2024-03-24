@@ -101,6 +101,9 @@ class Enhance:
     def __str__(self) -> str:
         return f"<{type(self).__name__} enhance_id={self.enhance_id} positon={self.position} star={self.star} main_attribute={self.main_attribute} sub_attribute={','.join(str(i) for i in self.sub_attributes)}>"
 
+    def __repr__(self):
+        return str(self)
+
 
 class Enhances:
     def __init__(
@@ -115,6 +118,9 @@ class Enhances:
 
     def __str__(self) -> str:
         return f"<{type(self).__name__} hand={str(self.hand)} head={str(self.head)} body={str(self.body)} boot={str(self.boot)} ball={str(self.ball)} line={str(self.line)}>"
+
+    def __repr__(self):
+        return str(self)
 
 
 # data part
