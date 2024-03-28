@@ -1,7 +1,8 @@
 from decimal import Decimal
 
-from aluminium.enhances.base import Enhances
-from aluminium.weapons.base import Weapon
+from ..enhances.base import Enhances
+from ..event import Event
+from ..weapons.base import Weapon
 
 
 class Character:
@@ -36,3 +37,7 @@ class Character:
 
     def __repr__(self):
         return str(self)
+
+
+class CharacterEvent(Character, Event):
+    pass

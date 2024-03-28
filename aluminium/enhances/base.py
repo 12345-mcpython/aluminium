@@ -8,12 +8,15 @@ from aluminium.utils import list_str2decimal as ls2d
 
 
 class Attribute:
-    def __init__(self, left: str, right: Decimal):
+    def __init__(self, left: str, right: Decimal, extra=None):
+        if extra is None:
+            extra = []
         self.left = left
         self.right = right
+        self.extra = extra
 
     def __str__(self):
-        return f"<{type(self).__name__} left={self.left} right={self.right}>"
+        return f"<{type(self).__name__} left={self.left} right={self.right} extra={self.extra}>"
 
 
 class Enhance:
@@ -34,6 +37,7 @@ class Enhance:
         self.sub_attributes = sub_attributes
         self.total_xp = sum(xp[star][:level])
 
+    # TODO: Add speed
     @classmethod
     def generate_random_enhance(
             cls, position: str, enhance_id: int, star: int
@@ -50,10 +54,67 @@ class Enhance:
         ]
         main_attribute = Attribute(chosen_main_attribute, chosen_main_attribute_base)
         sub_attributes = [
-            Attribute(i, j)
+            Attribute(i, j, extra=[0, random.randint(1, 3)])
             for i, j in zip(chosen_sub_attributes, chosen_sub_attributes_base)
         ]
         return cls(0, enhance_id, position, star, main_attribute, sub_attributes)
+
+    # TODO: Fix number bugs
+    @classmethod
+    def generate_from_json(cls, position: str, enhance_id: int, star: int,
+                           enhance_json: dict[str, dict[str, list[int] | int]]):
+        """
+        Generate Enhance from json
+        :param position: enhance position "hand" "head" "body" "boot" "ball" "line"
+        :param enhance_id: enhance id
+        :param star: enhance star 2,3,4,5
+        :param enhance_json: {"main_attribute": {"crit_attack": 15},
+        "sub_attributes":[{"crit_chance": [3,3]}, {"health": [0,2]}, {"defensive": [1,1]}, {"speed": [1,3]}]}
+        15, 3, 0, 1, 1 is the promote count. 3, 2, 1, 3 is the sub attribute level.
+        :return: Enhance class
+        """
+        assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
+            "JSON don't have 'main_attribute' or 'sub_attributes' keys."
+        main_attribute = enhance_json["main_attribute"]
+        assert list(main_attribute.values())[0] <= 15, "The main attribute's promote level can't above 15."
+        sub_attributes = enhance_json["sub_attributes"]
+        assert sum([i[0] for i in sub_attributes.values()]) <= 5, "The sub attribute's promote level can't above 5."
+        for items, values in sub_attributes.items():
+            assert 1 <= values[1] <= 3, f"In sub attribute {items} The sub attribute level can't above 3."
+        main_attribute_left = list(main_attribute.keys())[0]
+        main_attribute_right = list(main_attribute.values())[0]
+        sub_attributes_left = list(sub_attributes.keys())
+        sub_attributes_right = list(sub_attributes.values())
+        main_attribute_value = main_attribute_table[main_attribute_left]["base"][star - 2] + \
+                               main_attribute_table[main_attribute_left]["bonus"][star - 2] * int(main_attribute_right)
+        main_attribute_class = Attribute(main_attribute_left, main_attribute_value)
+
+        sub_attributes_class = []
+
+        sub_attribute_promote_level = ls2d([".8", ".9", "1"])
+
+        for i, j in zip(sub_attributes_left, sub_attributes_right):
+            if i == "speed":
+                sub_attribute_class = Attribute(i, speed_extra_star_base[star - 2][j[1] - 1] + sub_attribute_table[i][
+                    'bonus'][star - 2] * j[0], extra=j)
+                sub_attributes_class.append(sub_attribute_class)
+                continue
+            sub_attribute_class = Attribute(i,
+                                            sub_attribute_table[i]['base'][star - 2] / Decimal(
+                                                ".8") * Decimal(sub_attribute_promote_level[j[1] - 1]) +
+                                            sub_attribute_table[i]['bonus'][star - 2] * j[0], extra=j)
+            sub_attributes_class.append(sub_attribute_class)
+
+        return cls(15, enhance_id, position, star, main_attribute_class, sub_attributes_class)
+
+    def print(self):
+        print("Level: ", self.level)
+        print(self.main_attribute.left, self.main_attribute.right)
+
+        print("sub attributes:")
+
+        for i in self.sub_attributes:
+            print(i.left, i.right, i.extra[0], i.extra[1])
 
     def _xp_reached_level(self, given_xp):
         level = 0
@@ -91,12 +152,13 @@ class Enhance:
                 if added and i == 3:
                     continue
                 print("Random promote sub attribute")
-                promoted_sub_attribute = random.choice(self.sub_attributes)
+                promoted_sub_attribute: Attribute = random.choice(self.sub_attributes)
                 print(promoted_sub_attribute)
                 promoted_sub_attribute_bonus = sub_attribute_table[
                     promoted_sub_attribute.left
                 ]["bonus"][self.star - 2]
                 promoted_sub_attribute.right += promoted_sub_attribute_bonus
+                promoted_sub_attribute.extra[0] += 1
 
     def __str__(self) -> str:
         return f"<{type(self).__name__} enhance_id={self.enhance_id} positon={self.position} star={self.star} main_attribute={self.main_attribute} sub_attribute={','.join(str(i) for i in self.sub_attributes)}>"
@@ -182,7 +244,12 @@ main_attribute_table = {
     "imaginary_damage_boost": {"base": damage_boost_base, "bonus": damage_boost_bonus},
     "wind_damage_boost": {"base": damage_boost_base, "bonus": damage_boost_bonus},
 }
-
+two_star_speed_extra_base = ls2d(["1", "1.1", "1.2"])
+three_star_speed_extra_base = ls2d(["1.2", "1.3", "1.4"])
+four_star_speed_extra_base = ls2d(["1.6", "1.8", "2.0"])
+five_star_speed_extra_base = ls2d(["2", "2.3", "2.6"])
+speed_extra_star_base = [two_star_speed_extra_base, three_star_speed_extra_base, four_star_speed_extra_base,
+                         five_star_speed_extra_base]
 speed_extra_base = ls2d(["1", "1.2", "1.6", "2"])
 speed_extra_bonus = ls2d(["0.1", "0.1", "0.2", "0.3"])
 attack_extra_base = ls2d(["6.774", "10.161", "13.548", "16.935"])

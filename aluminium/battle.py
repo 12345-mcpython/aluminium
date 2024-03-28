@@ -15,7 +15,7 @@ class Battle:
     def print_queue(self):
         print("队列")
         for i in sorted(self.queue, key=lambda a: a.length, reverse=True):
-            print(i.name, "\t", i.tick, "\t", i.length)
+            print(i.name, "\t", round(i.tick), "\t", i.length)
 
         print()
 

@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from ..event import Event
+
 
 class Enemy:
     def __init__(
@@ -27,3 +29,7 @@ class Enemy:
 
     def __repr__(self):
         return str(self)
+
+
+class EnemyEvent(Enemy, Event):
+    pass
