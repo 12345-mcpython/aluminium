@@ -8,9 +8,7 @@ from aluminium.utils import list_str2decimal as ls2d
 
 
 class Attribute:
-    def __init__(self, left: str, right: Decimal, extra=None):
-        if extra is None:
-            extra = []
+    def __init__(self, left: str, right: Decimal, extra: int = None):
         self.left = left
         self.right = right
         self.extra = extra
@@ -54,12 +52,11 @@ class Enhance:
         ]
         main_attribute = Attribute(chosen_main_attribute, chosen_main_attribute_base)
         sub_attributes = [
-            Attribute(i, j, extra=[0, random.randint(1, 3)])
+            Attribute(i, j, extra=0)
             for i, j in zip(chosen_sub_attributes, chosen_sub_attributes_base)
         ]
         return cls(0, enhance_id, position, star, main_attribute, sub_attributes)
 
-    # TODO: Fix number bugs
     @classmethod
     def generate_from_json(cls, position: str, enhance_id: int, star: int,
                            enhance_json: dict[str, dict[str, list[int] | int]]):
@@ -69,8 +66,8 @@ class Enhance:
         :param enhance_id: enhance id
         :param star: enhance star 2,3,4,5
         :param enhance_json: {"main_attribute": {"crit_attack": 15},
-        "sub_attributes":[{"crit_chance": [3,3]}, {"health": [0,2]}, {"defensive": [1,1]}, {"speed": [1,3]}]}
-        15, 3, 0, 1, 1 is the promote count. 3, 2, 1, 3 is the sub attribute level.
+                 "sub_attributes": {"crit_chance": [3], "health": [3], "defensive": [1], "speed": [3,3,3,3,3,3]}}
+        3, 3, 3, 3, 3, 3 is the promote level.
         :return: Enhance class
         """
         assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
@@ -78,9 +75,12 @@ class Enhance:
         main_attribute = enhance_json["main_attribute"]
         assert list(main_attribute.values())[0] <= 15, "The main attribute's promote level can't above 15."
         sub_attributes = enhance_json["sub_attributes"]
-        assert sum([i[0] for i in sub_attributes.values()]) <= 5, "The sub attribute's promote level can't above 5."
-        for items, values in sub_attributes.items():
-            assert 1 <= values[1] <= 3, f"In sub attribute {items} The sub attribute level can't above 3."
+        total = 0
+        for i, j in sub_attributes.items():
+            assert len(j) <= 6, f"The sub attribute '{i}' 's promote level can't above 5."
+            assert len(j) >= 1, f"The sub attribute '{i}' must have a base value."
+            total += len(j)
+        assert total <= 9, "The total sub attribute's promote level can't above 5."
         main_attribute_left = list(main_attribute.keys())[0]
         main_attribute_right = list(main_attribute.values())[0]
         sub_attributes_left = list(sub_attributes.keys())
@@ -91,19 +91,15 @@ class Enhance:
 
         sub_attributes_class = []
 
-        sub_attribute_promote_level = ls2d([".8", ".9", "1"])
-
-        for i, j in zip(sub_attributes_left, sub_attributes_right):
-            if i == "speed":
-                sub_attribute_class = Attribute(i, speed_extra_star_base[star - 2][j[1] - 1] + sub_attribute_table[i][
-                    'bonus'][star - 2] * j[0], extra=j)
-                sub_attributes_class.append(sub_attribute_class)
-                continue
-            sub_attribute_class = Attribute(i,
-                                            sub_attribute_table[i]['base'][star - 2] / Decimal(
-                                                ".8") * Decimal(sub_attribute_promote_level[j[1] - 1]) +
-                                            sub_attribute_table[i]['bonus'][star - 2] * j[0], extra=j)
-            sub_attributes_class.append(sub_attribute_class)
+        for left, right in zip(sub_attributes_left, sub_attributes_right):
+            sub_attribute_value = sub_attribute_table[left]
+            sub_attribute_base = sub_attribute_value["base"][star - 2]
+            sub_attribute_bonus = sub_attribute_value["bonus"][star - 2]
+            sub_attribute_right = sub_attribute_base
+            for value in right:
+                sub_attribute_right += sub_attribute_base + value * sub_attribute_bonus
+            sub_attribute = Attribute(left, sub_attribute_right, extra=len(right) - 1)
+            sub_attributes_class.append(sub_attribute)
 
         return cls(15, enhance_id, position, star, main_attribute_class, sub_attributes_class)
 
@@ -114,7 +110,7 @@ class Enhance:
         print("sub attributes:")
 
         for i in self.sub_attributes:
-            print(i.left, i.right, i.extra[0], i.extra[1])
+            print(i.left, i.right, i.extra)
 
     def _xp_reached_level(self, given_xp):
         level = 0
@@ -158,7 +154,7 @@ class Enhance:
                     promoted_sub_attribute.left
                 ]["bonus"][self.star - 2]
                 promoted_sub_attribute.right += promoted_sub_attribute_bonus
-                promoted_sub_attribute.extra[0] += 1
+                promoted_sub_attribute.extra += 1
 
     def __str__(self) -> str:
         return f"<{type(self).__name__} enhance_id={self.enhance_id} positon={self.position} star={self.star} main_attribute={self.main_attribute} sub_attribute={','.join(str(i) for i in self.sub_attributes)}>"
