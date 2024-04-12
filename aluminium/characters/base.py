@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from ..buffs.base import Buff
 from ..enhances.base import Enhances
 from ..event import Event
 from ..weapons.base import Weapon
@@ -37,6 +38,21 @@ class Character:
 
     def __repr__(self):
         return str(self)
+
+    def common(self, position: int):
+        pass
+
+    def enhanced_common(self, skill_type: str, position: int, enhance_level: int = None):
+        pass
+
+    def skill(self, skill_type: str, position: int):
+        pass
+
+    def ultra(self, ultra_type: str, position: int):
+        pass
+
+    def add_buff(self, buff: Buff):
+        pass
 
 
 class CharacterEvent(Character, Event):

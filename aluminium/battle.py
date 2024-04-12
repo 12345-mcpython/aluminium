@@ -1,36 +1,38 @@
-from decimal import Decimal
-from .characters.base import Character
-
-from .enemies.base import Enemy
+from .characters.base import CharacterEvent
+from .enemies.base import EnemyEvent
+from .queue import Queue
 
 
 class Battle:
-    def __init__(
-            self, character_queue: list[Character], enemy_queue: list[Enemy]
-    ) -> None:
-        self.character_queue = character_queue
-        self.enemy_queue = enemy_queue
-        self.queue: list[Character | Enemy] = list(character_queue) + list(enemy_queue)
+    def __init__(self, queue: Queue):
+        self.queue = queue
+        self.attribute = {}
+        self.status = "BATTLE_CREATED"
 
-    def print_queue(self):
-        print("队列")
-        for i in sorted(self.queue, key=lambda a: a.length, reverse=True):
-            print(i.name, "\t", round(i.tick), "\t", i.length)
+    def bind_event(self):
+        pass
 
-        print()
+    def __str__(self):
+        return f"<Battle queue={self.queue} attribute={self.attribute}>"
 
-    def calc_tick(self):
-        for i in self.queue:
-            i.tick = (Decimal(10000) - i.length) / i.speed
+    def __repr__(self):
+        return str(self)
+
+    def start_battle(self):
+        for i in self.queue.queue:
+            i.on_battle_start(self)
+        self.status = "BATTLE_STARTED"
 
     def move(self):
-        fastest = max(self.queue, key=lambda a: a.length)
-        move_tick = (Decimal(10000) - fastest.length) / fastest.speed
-        for i in self.queue:
-            i.length += i.speed * move_tick
-            if i.length > Decimal(10000):
-                i.length = Decimal(10000)
-        self.calc_tick()
+        self.queue.move()
+        self.status = "BATTLE_MOVEMENT_MOVED"
 
-    def get_move(self):
-        return max(self.queue, key=lambda a: a.length)
+    def check_death(self):
+        for i in self.queue.queue:
+            if i.health == 0:
+                if isinstance(i, CharacterEvent):
+                    if not i.on_character_died(self, i):
+                        self.queue.queue.remove(i)
+                if isinstance(i, EnemyEvent):
+                    if not i.on_enemy_died(self, i):
+                        self.queue.queue.remove(i)

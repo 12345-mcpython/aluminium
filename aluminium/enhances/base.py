@@ -105,12 +105,13 @@ class Enhance:
 
     def print(self):
         print("Level: ", self.level)
-        print(self.main_attribute.left, self.main_attribute.right)
+        print(self.main_attribute.left,
+              f"{self.main_attribute.right:.1%}" if self.main_attribute.right < 1 else round(self.main_attribute.right))
 
         print("sub attributes:")
 
         for i in self.sub_attributes:
-            print(i.left, i.right, i.extra)
+            print(i.left, f"{i.right:.1%}" if i.right < 1 else round(i.right), i.extra)
 
     def _xp_reached_level(self, given_xp):
         level = 0
