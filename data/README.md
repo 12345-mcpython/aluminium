@@ -1,0 +1,1 @@
+You can run `python generate_data.py` to generate data by using this project Dimbreath/StarRailData

@@ -4,13 +4,11 @@ from .queue import Queue
 
 
 class Battle:
-    def __init__(self, queue: Queue):
+    def __init__(self, queue: Queue, battle_type: str = "common"):
         self.queue = queue
         self.attribute = {}
         self.status = "BATTLE_CREATED"
-
-    def bind_event(self):
-        pass
+        self.battle_type = battle_type
 
     def __str__(self):
         return f"<Battle queue={self.queue} attribute={self.attribute}>"
@@ -25,7 +23,7 @@ class Battle:
 
     def move(self):
         self.queue.move()
-        self.status = "BATTLE_MOVEMENT_MOVED"
+        self.status = "BATTLE_MOVED"
 
     def check_death(self):
         for i in self.queue.queue:
