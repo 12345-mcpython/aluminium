@@ -28,7 +28,15 @@
 from aluminium.enhances.base import Enhance
 
 jsons = {"main_attribute": {"crit_attack": 15},
-         "sub_attributes": {"crit_chance": [3], "health": [3], "defensive": [1], "speed": [1, 1, 1, 1, 1, 1]}}
-enhance = Enhance.generate_from_json("hand", 1, 5, jsons)
+         "sub_attributes": {"crit_chance": [3, 3, 3, 3, 3, 3], "health": [3], "defensive": [1], "speed": [3]}}
 
-enhance.print()
+test_json = {"main_attribute": {"defensive_percent": 0},
+             "sub_attributes": {"health": [0], "health_percent": [2], "attack_percent": [1], "effect_hit_rate": [2]}}
+
+# enhance1 = Enhance.generate_from_json("hand", 1, 5, jsons)
+
+# enhance1.print()
+
+enhance2 = Enhance.generate_from_json("hand", 1, 5, test_json, level=1)
+
+enhance2.print()

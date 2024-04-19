@@ -19,3 +19,6 @@ for i, j in hard_level_group.items():
             "effect_resistance": value.get("StatusResistance", {"Value": 0})["Value"]}
     with open(f"data/hard_level_group_{i}.json", "w") as f:
         json.dump(d, f, ensure_ascii=False, indent=4)
+
+with (file_path / "ExcelOutput" / "MonsterConfig.json").open() as f:
+    pass

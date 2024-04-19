@@ -1,3 +1,4 @@
+import math
 from decimal import Decimal
 import random
 
@@ -59,9 +60,10 @@ class Enhance:
 
     @classmethod
     def generate_from_json(cls, position: str, enhance_id: int, star: int,
-                           enhance_json: dict[str, dict[str, list[int] | int]]):
+                           enhance_json: dict[str, dict[str, list[int] | int]], level: int = 15):
         """
         Generate Enhance from json
+        :param level: enhance level
         :param position: enhance position "hand" "head" "body" "boot" "ball" "line"
         :param enhance_id: enhance id
         :param star: enhance star 2,3,4,5
@@ -70,6 +72,7 @@ class Enhance:
         3, 3, 3, 3, 3, 3 is the promote level.
         :return: Enhance class
         """
+        assert level <= star * 3, f"The enhance's level can't above {star * 3}."
         assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
             "JSON don't have 'main_attribute' or 'sub_attributes' keys."
         main_attribute = enhance_json["main_attribute"]
@@ -77,10 +80,14 @@ class Enhance:
         sub_attributes = enhance_json["sub_attributes"]
         total = 0
         for i, j in sub_attributes.items():
+            assert i != list(main_attribute.keys())[0], f"The main attribute can't appear in the sub attribute."
             assert len(j) <= 6, f"The sub attribute '{i}' 's promote level can't above 5."
             assert len(j) >= 1, f"The sub attribute '{i}' must have a base value."
+            for m in j:
+                assert m <= 2, f"The sub attribute '{i}' 's promote bonus level can't above 2."
             total += len(j)
         assert total <= 9, "The total sub attribute's promote level can't above 5."
+
         main_attribute_left = list(main_attribute.keys())[0]
         main_attribute_right = list(main_attribute.values())[0]
         sub_attributes_left = list(sub_attributes.keys())
@@ -97,21 +104,22 @@ class Enhance:
             sub_attribute_bonus = sub_attribute_value["bonus"][star - 2]
             sub_attribute_right = sub_attribute_base
             for value in right:
-                sub_attribute_right += sub_attribute_base + value * sub_attribute_bonus
+                sub_attribute_right += value * sub_attribute_bonus
             sub_attribute = Attribute(left, sub_attribute_right, extra=len(right) - 1)
             sub_attributes_class.append(sub_attribute)
 
-        return cls(15, enhance_id, position, star, main_attribute_class, sub_attributes_class)
+        return cls(level, enhance_id, position, star, main_attribute_class, sub_attributes_class)
 
     def print(self):
         print("Level: ", self.level)
         print(self.main_attribute.left,
-              f"{self.main_attribute.right:.1%}" if self.main_attribute.right < 1 else round(self.main_attribute.right))
+              f"{self.main_attribute.right:.2%}" if self.main_attribute.right < 1 else math.floor(
+                  self.main_attribute.right))
 
         print("sub attributes:")
 
         for i in self.sub_attributes:
-            print(i.left, f"{i.right:.1%}" if i.right < 1 else round(i.right), i.extra)
+            print(i.left, f"{i.right:.2%}" if i.right < 1 else math.floor(i.right), i.extra)
 
     def _xp_reached_level(self, given_xp):
         level = 0
