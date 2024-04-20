@@ -102,9 +102,9 @@ class Enhance:
             sub_attribute_value = sub_attribute_table[left]
             sub_attribute_base = sub_attribute_value["base"][star - 2]
             sub_attribute_bonus = sub_attribute_value["bonus"][star - 2]
-            sub_attribute_right = sub_attribute_base
+            sub_attribute_right = Decimal(0)
             for value in right:
-                sub_attribute_right += value * sub_attribute_bonus
+                sub_attribute_right += (sub_attribute_base + value * sub_attribute_bonus)
             sub_attribute = Attribute(left, sub_attribute_right, extra=len(right) - 1)
             sub_attributes_class.append(sub_attribute)
 
