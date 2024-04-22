@@ -1,4 +1,8 @@
+from ..movable import Movable
+
+
 class Buff:
-    def __init__(self, name: str, tick: int):
-        self.name = name
-        self.tick = tick
+    def __init__(self, name: str, tick: int, given: Movable):
+        self.name: str = name
+        self.tick: int = tick
+        self.given: Movable = given

@@ -1,35 +1,20 @@
 from decimal import Decimal
 
-from ..buffs.base import Buff
 from ..enhances.base import Enhances
 from ..event import Event
+from ..movable import Movable
 from ..weapons.base import Weapon
 
 
-class Character:
-    def __init__(
-            self,
-            name: str,
-            mt: str,
-            health: Decimal,
-            defensive: Decimal,
-            attack: Decimal,
-            attributes: dict[str, Decimal],
-            speed: Decimal,
-            weapon: Weapon = None,
-            enhances: Enhances = None,
-    ):
-        self.name = name
+class Character(Movable):
+    def __init__(self, name: str, mt: str, health: Decimal, defensive: Decimal, attack: Decimal,
+                 attributes: dict[str, Decimal], speed: Decimal, level: int = 1, weapon: Weapon = None,
+                 enhances: Enhances = None):
+        super().__init__(name, health, defensive, attack, speed, attributes)
         self.mt = mt
-        self.health = health
-        self.defensive = defensive
-        self.attack = attack
-        self.attributes = attributes
+        self.level = level
         self.weapon = weapon
         self.enhances = enhances
-        self.speed = speed
-        self.tick = Decimal(0)
-        self.length = Decimal(0)
         self.buffs = []
         self.extra = {}
 
@@ -39,19 +24,28 @@ class Character:
     def __repr__(self):
         return str(self)
 
-    def common(self, position: int):
+    # ("Pioneer", "Destruction", Decimal("163.68"), Decimal("62.7"), Decimal("84.48"),
+    #                   {"crit_chance": Decimal(".05"), "crit_attack": Decimal(".05")}, Decimal("100"))
+    @classmethod
+    def build(cls, *args, **kwargs):
+        base_health, base_defensive, base_attack, base_attribute, base_speed = args[2:]
+        weapon: Weapon = kwargs.get("weapon")
+        enhances: Enhances = kwargs.get("enhances")
+        return cls(*args, **kwargs)
+
+    def common(self, skill_level: int, process_object: Movable):
         pass
 
-    def enhanced_common(self, skill_type: str, position: int, enhance_level: int = None):
+    def enhanced_common(self, skill_level: int, skill_type: str, position: int, enhance_level: int = None):
         pass
 
-    def skill(self, skill_type: str, position: int):
+    def skill(self, skill_level: int, skill_type: str, position: int):
         pass
 
-    def ultra(self, ultra_type: str, position: int):
+    def ultra(self, skill_level: int, ultra_type: str, position: int):
         pass
 
-    def add_buff(self, buff: Buff):
+    def prepare_ultra(self, skill_level: int, ultra_type: str, position: int):
         pass
 
 

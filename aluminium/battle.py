@@ -7,7 +7,6 @@ class Battle:
     def __init__(self, queue: Queue, battle_type: str = "common"):
         self.queue = queue
         self.attribute = {}
-        self.status = "BATTLE_CREATED"
         self.battle_type = battle_type
 
     def __str__(self):
@@ -19,11 +18,9 @@ class Battle:
     def start_battle(self):
         for i in self.queue.queue:
             i.on_battle_start(self)
-        self.status = "BATTLE_STARTED"
 
     def move(self):
         self.queue.move()
-        self.status = "BATTLE_MOVED"
 
     def check_death(self):
         for i in self.queue.queue:

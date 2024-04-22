@@ -2,7 +2,8 @@
 
 这个项目是一个仿《崩坏: 星穹铁道》的网页/命令行回合制游戏. 目前处于机制开发/测试环节.
 
-This project is a turn-based game imitated "a certain turn-based anime game". this project is in the mechanism development/testing phase currently.
+This project is a turn-based game imitated "a certain turn-based anime game". this project is in the mechanism
+development/testing phase currently.
 
 ## 目标
 

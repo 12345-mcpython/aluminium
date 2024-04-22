@@ -1,6 +1,6 @@
 import math
-from decimal import Decimal
 import random
+from decimal import Decimal
 
 from aluminium.utils import list_str2decimal as ls2d
 
@@ -182,12 +182,27 @@ class Enhances:
         self.boot: Enhance = boot
         self.ball: Enhance = ball
         self.line: Enhance = line
+        self.total: list[Enhance] = [hand, head, body, boot, ball, line]
 
     def __str__(self) -> str:
         return f"<{type(self).__name__} hand={str(self.hand)} head={str(self.head)} body={str(self.body)} boot={str(self.boot)} ball={str(self.ball)} line={str(self.line)}>"
 
     def __repr__(self):
         return str(self)
+
+    def calc_total_value(self):
+        total = {}
+        for i in self.total:
+            if total.get(i.main_attribute.left):
+                total[i.main_attribute.left] = i.main_attribute.right
+            else:
+                total[i.main_attribute.left] += i.main_attribute.right
+            for j in i.sub_attributes:
+                if total.get(j.left):
+                    total[j.left] = j.right
+                else:
+                    total[j.left] += j.right
+        return total
 
 
 # data part

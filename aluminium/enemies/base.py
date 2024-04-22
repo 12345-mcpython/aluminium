@@ -2,33 +2,20 @@ from decimal import Decimal
 
 from ..buffs.base import Buff
 from ..event import Event
+from ..movable import Movable
 
 
-class Enemy:
-    def __init__(
-            self,
-            name: str,
-            health: Decimal,
-            defensive: Decimal,
-            attack: Decimal,
-            stance: Decimal,
-            attributes: dict[str, Decimal],
-            speed: Decimal,
-    ):
-        self.name = name
-        self.health = health
-        self.defensive = defensive
-        self.attack = attack
+class Enemy(Movable):
+    def __init__(self, name: str, health: Decimal, defensive: Decimal, attack: Decimal, stance: Decimal,
+                 stance_weak: list[str], attributes: dict[str, Decimal], speed: Decimal):
+        super().__init__(name, health, defensive, attack, speed, attributes)
         self.stance = stance
-        self.attributes = attributes
-        self.speed = speed
-        self.tick = Decimal(0)
-        self.length = Decimal(0)
+        self.stance_weak = stance_weak
         self.buffs = []
         self.extra = {}
 
     def __str__(self) -> str:
-        return f"<{type(self).__name__} name={self.name} health={self.health} defensive={self.defensive} attack={self.attack} stance={self.stance} attributes={self.attributes} speed={self.speed} tick={self.tick} length={self.length} extra={self.extra}>"
+        return f"<{type(self).__name__} name={self.name} health={self.health} defensive={self.defensive} attack={self.attack} stance={self.stance} stance_weak={self.stance_weak} attributes={self.attributes} speed={self.speed} tick={self.tick} length={self.length} extra={self.extra}>"
 
     def __repr__(self):
         return str(self)

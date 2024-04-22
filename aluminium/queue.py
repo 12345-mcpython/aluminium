@@ -1,7 +1,7 @@
 from decimal import Decimal
-from .characters.base import Character, CharacterEvent
 
-from .enemies.base import Enemy, EnemyEvent
+from .characters.base import CharacterEvent
+from .enemies.base import EnemyEvent
 
 
 class Queue:
