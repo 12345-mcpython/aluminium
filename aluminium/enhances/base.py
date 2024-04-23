@@ -60,9 +60,10 @@ class Enhance:
 
     @classmethod
     def generate_from_json(cls, position: str, enhance_id: int, star: int,
-                           enhance_json: dict[str, dict[str, list[int] | int]], level: int = 15):
+                           enhance_json: dict[str, dict[str, list[int] | int]], level: int = 15, verify: bool = True):
         """
         Generate Enhance from json
+        :param verify: check the enhances validity
         :param level: enhance level
         :param position: enhance position "hand" "head" "body" "boot" "ball" "line"
         :param enhance_id: enhance id
@@ -72,22 +73,30 @@ class Enhance:
         3, 3, 3, 3, 3, 3 is the promote level.
         :return: Enhance class
         """
-        assert level <= star * 3, f"The enhance's level can't above {star * 3}."
-        assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
-            "JSON don't have 'main_attribute' or 'sub_attributes' keys."
-        main_attribute = enhance_json["main_attribute"]
-        assert list(main_attribute.values())[0] <= 15, "The main attribute's promote level can't above 15."
-        sub_attributes = enhance_json["sub_attributes"]
-        total = 0
-        for i, j in sub_attributes.items():
-            assert i != list(main_attribute.keys())[0], f"The main attribute can't appear in the sub attribute."
-            assert len(j) <= 6, f"The sub attribute '{i}' 's promote level can't above 5."
-            assert len(j) >= 1, f"The sub attribute '{i}' must have a base value."
-            for m in j:
-                assert m <= 2, f"The sub attribute '{i}' 's promote bonus level can't above 2."
-            total += len(j)
-        assert total <= 9, "The total sub attribute's promote level can't above 5."
 
+        # Verify part begin
+        main_attribute = enhance_json["main_attribute"]
+        sub_attributes = enhance_json["sub_attributes"]
+        if verify:
+            assert level <= star * 3, f"The enhances level can't above {star * 3}."
+            assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
+                "JSON don't have 'main_attribute' or 'sub_attributes' keys."
+
+            assert list(main_attribute.values())[0] <= 15, "The main attribute's promote level can't above 15."
+
+            total = 0
+            for i, j in sub_attributes.items():
+                assert i != list(main_attribute.keys())[
+                    0], f"The main attribute '{list(main_attribute.keys())[0]}' can't appear in the sub attribute."
+                assert len(j) <= 6, f"The sub attribute '{i}' 's promote level can't above 5."
+                assert len(j) >= 1, f"The sub attribute '{i}' must have a base value."
+                for m in j:
+                    assert m <= 2, f"The sub attribute '{i}' 's promote bonus level can't above 2."
+                total += len(j)
+            assert total <= 9, "The total sub attribute's promote level can't above 5."
+            assert list(main_attribute.keys())[0] in position_attributes[
+                position], f"Illegal main attribute '{list(main_attribute.keys())[0]}' in position '{position}'."
+        # Verify part end
         main_attribute_left = list(main_attribute.keys())[0]
         main_attribute_right = list(main_attribute.values())[0]
         sub_attributes_left = list(sub_attributes.keys())
@@ -194,15 +203,34 @@ class Enhances:
         total = {}
         for i in self.total:
             if total.get(i.main_attribute.left):
-                total[i.main_attribute.left] = i.main_attribute.right
-            else:
                 total[i.main_attribute.left] += i.main_attribute.right
+            else:
+                total[i.main_attribute.left] = i.main_attribute.right
             for j in i.sub_attributes:
                 if total.get(j.left):
-                    total[j.left] = j.right
-                else:
                     total[j.left] += j.right
+                else:
+                    total[j.left] = j.right
         return total
+
+    def wear(self, enhance: Enhance):
+        match enhance.position:
+            case "hand":
+                self.hand = enhance
+            case "head":
+                self.head = enhance
+            case "body":
+                self.body = enhance
+            case "boot":
+                self.boot = enhance
+            case "ball":
+                self.ball = enhance
+            case "line":
+                self.line = enhance
+            case _:
+                return ValueError(f"Can't wear Position {enhance.position}.")
+
+        self.total: list[Enhance] = [self.hand, self.head, self.body, self.boot, self.ball, self.line]
 
 
 # data part
