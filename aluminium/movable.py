@@ -1,3 +1,4 @@
+import math
 from decimal import Decimal
 
 from .buffs.base import Buff
@@ -10,7 +11,7 @@ class Movable:
                  attack: Decimal,
                  speed: Decimal, attributes: dict[str, Decimal]):
         self.name = name
-        self.health = health
+        self.__health = health
         self.defensive = defensive
         self.attack = attack
         self.speed = speed
@@ -18,6 +19,10 @@ class Movable:
         self.length = Decimal(0)
         self.attributes = attributes
         self.buffs = []
+
+    @property
+    def health(self):
+        return math.floor(self.__health)
 
     def add_buff(self, buff: Buff):
         self.buffs.append(buff)

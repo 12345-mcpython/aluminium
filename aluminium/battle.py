@@ -1,5 +1,5 @@
-from .characters.base import CharacterEvent
-from .enemies.base import EnemyEvent
+from aluminium.character import CharacterEvent
+from aluminium.enemy import EnemyEvent
 from .queue import Queue
 
 

@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from .base import EnemyEvent
+from aluminium.enemy import EnemyEvent
 
 
 class Baryon(EnemyEvent):

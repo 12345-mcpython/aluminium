@@ -1,8 +1,8 @@
 from decimal import Decimal
 
-from ..buffs.base import Buff
-from ..event import Event
-from ..movable import Movable
+from aluminium.buffs.base import Buff
+from aluminium.event import Event
+from aluminium.movable import Movable
 
 
 class Enemy(Movable):

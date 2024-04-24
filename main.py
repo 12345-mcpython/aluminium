@@ -25,41 +25,44 @@
 #     print("行动: ", fastest.name)
 #     fastest.length = D(0)
 #     input()
-from aluminium.enhances import Enhance, Enhances
+from aluminium.enhance import Enhance, Enhances
 
-jsons = {"main_attribute": {"attack": 15},
-         "sub_attributes": {"crit_chance": [2, 2, 2, 2, 2, 2], "health": [2], "defensive": [1], "speed": [2]}}
-
-json1 = {"main_attribute": {"health": 15},
+hand = {"main_attribute": {"health": 15},
          "sub_attributes": {"crit_chance": [2, 2, 2, 2, 2, 2], "crit_attack": [2], "defensive": [1], "speed": [2]}}
 
-json2 = {"main_attribute": {"crit_attack": 15},
+head = {"main_attribute": {"attack": 15},
          "sub_attributes": {"crit_chance": [2, 2, 2, 2, 2, 2], "health": [2], "defensive": [1], "speed": [2]}}
 
-json3 = {"main_attribute": {"speed": 15},
+body = {"main_attribute": {"crit_attack": 15},
+         "sub_attributes": {"crit_chance": [2, 2, 2, 2, 2, 2], "health": [2], "defensive": [1], "speed": [2]}}
+
+boot = {"main_attribute": {"speed": 15},
          "sub_attributes": {"crit_chance": [2, 2, 2, 2, 2, 2], "health": [2], "defensive": [1], "crit_attack": [2]}}
 
-json4 = {"main_attribute": {"attack_percent": 15},
+line = {"main_attribute": {"attack_percent": 15},
          "sub_attributes": {"crit_chance": [2, 2, 2, 2, 2, 2], "health": [2], "defensive": [1], "speed": [2]}}
 
-json5 = {"main_attribute": {"defensive_percent": 0},
+ball = {"main_attribute": {"defensive_percent": 0},
          "sub_attributes": {"health": [0], "health_percent": [2], "attack_percent": [1], "effect_hit_rate": [2]}}
 
-enhance1 = Enhance.generate_from_json("head", 1, 5, jsons)
+enhance2 = Enhance.generate_from_json("hand", 1, 5, hand)
 
-enhance2 = Enhance.generate_from_json("hand", 1, 5, json1)
+enhance1 = Enhance.generate_from_json("head", 1, 5, head)
 
-enhance3 = Enhance.generate_from_json("body", 1, 5, json2)
+enhance3 = Enhance.generate_from_json("body", 1, 5, body)
 
-enhance4 = Enhance.generate_from_json("boot", 1, 5, json3)
+enhance4 = Enhance.generate_from_json("boot", 1, 5, boot)
 
-enhance5 = Enhance.generate_from_json("line", 1, 5, json4)
+enhance5 = Enhance.generate_from_json("line", 1, 5, line)
 
-enhance6 = Enhance.generate_from_json("ball", 1, 5, json5)
+enhance6 = Enhance.generate_from_json("ball", 1, 5, ball)
 
 enhances = Enhances()
+
+#
 
 for i in [i for i in dir() if i.startswith("enhance") and i != "enhances"]:
     enhances.wear(eval(i))
 
-print(enhances.calc_total_value())
+for i, j in enhances.calc_total_value().items():
+    print(i, j)

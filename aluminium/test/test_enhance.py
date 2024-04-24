@@ -1,6 +1,6 @@
 import unittest
 
-from aluminium.enhances.base import Enhance
+from aluminium.enhance import Enhance
 
 
 class EnhanceTest(unittest.TestCase):

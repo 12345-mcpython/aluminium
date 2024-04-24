@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from .base import CharacterEvent
+from aluminium.character import CharacterEvent
 from ..damage import Damage
 from ..movable import Movable
 
