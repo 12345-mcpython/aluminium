@@ -47,9 +47,6 @@ class Character(Movable):
         defensive *= (total_value.get("defensive_percent", 0) + 1)
         attack *= (total_value.get("attack_percent", 0) + 1)
 
-        """self, name: str, mt: str, health: Decimal, defensive: Decimal, attack: Decimal,
-                 attributes: dict[str, Decimal], speed: Decimal, level: int = 1, weapon: Weapon = None,
-                 enhances: Enhances = None"""
         return cls(name, mt, health, defensive, attack, attribute, speed, level, weapon, enhances)
 
     def common(self, skill_level: int, process_object: Movable):
