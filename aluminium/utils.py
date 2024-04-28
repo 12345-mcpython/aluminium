@@ -1,4 +1,13 @@
+import random
 from decimal import Decimal
+
+ZERO = Decimal("0")
+
+
+def random_chance(chance):
+    if random.randint(1, 101) <= chance * 100:
+        return True
+    return False
 
 
 def calc_character_rate(level: int, promotion=False):
