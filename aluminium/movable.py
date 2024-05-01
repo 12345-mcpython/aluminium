@@ -1,8 +1,6 @@
 import math
 from decimal import Decimal
 
-from .buffs.base import Buff
-
 
 class Movable:
     def __init__(self, name: str,
@@ -24,7 +22,7 @@ class Movable:
     def health(self):
         return math.floor(self.__health)
 
-    def add_buff(self, buff: Buff):
+    def add_buff(self, buff: "Buff"):
         self.buffs.append(buff)
 
     def check_buff(self):

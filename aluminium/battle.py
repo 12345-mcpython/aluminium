@@ -1,5 +1,7 @@
-from aluminium.character import CharacterEvent
-from aluminium.enemy import EnemyEvent
+from typing import Optional
+
+from .character import CharacterEvent
+from .enemy import EnemyEvent
 from .queue import Queue
 
 
@@ -8,6 +10,7 @@ class Battle:
         self.queue = queue
         self.attribute = {}
         self.battle_type = battle_type
+        self.now_object: Optional[CharacterEvent | EnemyEvent] = None
 
     def __str__(self):
         return f"<Battle queue={self.queue} attribute={self.attribute}>"
@@ -19,8 +22,18 @@ class Battle:
         for i in self.queue.queue:
             i.on_battle_start(self)
 
-    def move(self):
+    def step_in(self):
         self.queue.move()
+
+    def move_start(self):
+        move_object = self.queue.get_move()
+        # calc dot
+        move_object.before_move(self)
+        self.now_object = move_object
+
+    def move_over(self):
+        self.now_object.after_move(self)
+        self.now_object = None
 
     def check_death(self):
         for i in self.queue.queue:

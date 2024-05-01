@@ -23,10 +23,10 @@ class Event:
     def on_enemy_died(self, battle, enemy) -> bool:
         pass
 
-    def before_move(self, battle, move_object):
+    def before_move(self, battle):
         pass
 
-    def after_move(self, battle, move_object):
+    def after_move(self, battle):
         pass
 
     def on_break_toughness(self, battle, breaker, broken_object):
