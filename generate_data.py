@@ -30,8 +30,18 @@ for i, j in hard_level_group_json.items():
             "stance": value.get("StanceRatio", {"Value": 1})["Value"],
             "effect_hit_rate": value.get("StatusProbability", {"Value": 0})["Value"],
             "effect_resistance": value.get("StatusResistance", {"Value": 0})["Value"]}
-    with open(f"data/hard_level_group_{i}.json", "w") as f:
+    with open(f"data/hard_level_group_{i}.json", "w", encoding="utf-8") as f:
         json.dump(d, f, ensure_ascii=False, indent=4)
+
+with (file_path / "ExcelOutput" / "AvatarBreakDamage.json").open(encoding="utf-8") as f:
+    breaking_rate: dict = json.load(f)
+
+d = {}
+for i, j in breaking_rate.items():
+    d[i] = j["BreakBaseDamage"]["Value"]
+
+with open("data/breaking_rate.json", "w", encoding="utf-8") as f:
+    json.dump(d, f, ensure_ascii=False, indent=4)
 
 # with (file_path / "ExcelOutput" / "MonsterConfig.json").open(encoding="utf-8") as f:
 #     monster_configs_json: dict = json.load(f)

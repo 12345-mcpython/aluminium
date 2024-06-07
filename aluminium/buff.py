@@ -1,4 +1,7 @@
-from ..movable import Movable
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .movable import Movable
 
 
 class Buff:

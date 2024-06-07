@@ -234,7 +234,9 @@ class Enhances:
 
 
 # data part
+# TODO: Load data from data dir
 
+# ExcelOutput\RelicMainAffixConfig.json
 speed_base = ls2d(["1.6128", "2.4192", "3.2256", "4.032"])
 speed_bonus = ls2d(["1", "1", "1.1", "1.4"])
 health_base = ls2d(["45.1584", "67.7376", "90.3168", "112.896"])
@@ -292,6 +294,8 @@ main_attribute_table = {
     "imaginary_damage_boost": {"base": damage_boost_base, "bonus": damage_boost_bonus},
     "wind_damage_boost": {"base": damage_boost_base, "bonus": damage_boost_bonus},
 }
+# ExcelOutput\RelicSubAffixConfig.json
+
 two_star_speed_extra_base = ls2d(["1", "1.1", "1.2"])
 three_star_speed_extra_base = ls2d(["1.2", "1.3", "1.4"])
 four_star_speed_extra_base = ls2d(["1.6", "1.8", "2.0"])
@@ -398,6 +402,7 @@ position_attributes = {
 }
 sub_attributes_key_table = list(sub_attribute_table.keys())
 
+# RelicExpType.json
 xp = {
     2: [170, 240, 310, 410, 500, 620],
     3: [280, 400, 520, 680, 840, 1080, 1320, 1620, 2060],

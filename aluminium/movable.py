@@ -1,6 +1,8 @@
 import math
 from decimal import Decimal
 
+from .buff import Buff
+
 
 class Movable:
     def __init__(self, name: str,
