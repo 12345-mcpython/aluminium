@@ -11,26 +11,24 @@ def random_chance(chance):
 
 
 def calc_character_rate(level: int, promotion=False):
-    base_rate = 1 + (level - 1) * Decimal('.05')
-    promotion_level = calc_promotion_level(level, promotion) * Decimal('.4')
-    return base_rate + promotion_level
+    base_rate = 1 + (level - 1) * Decimal(".05")
+    promote_count = level // 10 - (2 if not promotion else 1)
+    if promotion and level == 80:
+        promote_count -= 1
+    if level <= 20:
+        promote_count = 0
+    return base_rate + promote_count * Decimal(".4")
 
 
 def calc_attacker_rate(level, promotion=False):
-    base_rate = 1 + (level - 1) * Decimal('.15')
-    promotion_level = calc_promotion_level(level, promotion) * Decimal('1.2')
-    return base_rate + promotion_level
-
-
-def calc_promotion_level(level, promotion=False):
-    promotion_level = Decimal(level) // 10 - 1
-    if level < 10:
-        promotion_level += 1
-    if level == 80:
-        promotion_level -= 1
-    if level % 10 == 0 and not promotion and level != 80:
-        promotion_level -= 1
-    return promotion_level
+    base = Decimal("1.00") + (level - 1) * Decimal(".15")
+    first_promote = level >= 20 and promotion
+    promote_count = level // 10 - (3 if not promotion else 2)
+    if promotion and level == 80:
+        promote_count -= 1
+    if level <= 20:
+        promote_count = 0
+    return base + Decimal("1.6") * promote_count + (Decimal("1.2") if first_promote else ZERO)
 
 
 def list_str2decimal(string_list):
