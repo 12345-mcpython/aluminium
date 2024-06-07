@@ -34,7 +34,7 @@ for i, j in hard_level_group_json.items():
         json.dump(d, f, ensure_ascii=False, indent=4)
 
 with (file_path / "ExcelOutput" / "AvatarBreakDamage.json").open(encoding="utf-8") as f:
-    breaking_rate: dict = json.load(f)
+    breaking_rate: dict[str, dict] = json.load(f)
 
 d = {}
 for i, j in breaking_rate.items():
@@ -42,6 +42,66 @@ for i, j in breaking_rate.items():
 
 with open("data/breaking_rate.json", "w", encoding="utf-8") as f:
     json.dump(d, f, ensure_ascii=False, indent=4)
+
+
+def parse_relic(data: dict[str, dict], sub=False):
+    parsed_datas = {}
+    for i, j in data.items():
+        parsed_data = {"base": j["BaseValue"]["Value"], "bonus": j["LevelAdd" if not sub else "StepValue"]["Value"]}
+        parsed_datas[inner_outer_mapping[j["Property"]]] = parsed_data
+    return parsed_datas
+
+
+# 2 品质 1 头 2 手 3 身 4 鞋
+with (file_path / "ExcelOutput" / "RelicMainAffixConfig.json").open(encoding="utf-8") as f:
+    main_attributes: dict[str, dict] = json.load(f)
+
+two_star = {}
+three_star = {}
+four_star = {}
+five_star = {}
+
+part_mapping = {1: "head", 2: "hand", 3: "body", 4: "boot", 5: "ball", 6: "line"}
+
+inner_outer_mapping = {"HPDelta": "health", "AttackDelta": "attack", "HPAddedRatio": "health_percent",
+                       "AttackAddedRatio": "attack_percent", "DefenceAddedRatio": "defensive_percent",
+                       "CriticalChanceBase": "crit_chance", "CriticalDamageBase": "crit_attack",
+                       "HealRatioBase": "outgoing_healing_boost", "StatusProbabilityBase": "effect_hit_rate",
+                       "SpeedDelta": "speed", "PhysicalAddedRatio": "physical_damage_boost",
+                       "FireAddedRatio": "fire_damage_boost", "IceAddedRatio": "ice_damage_boost",
+                       "ThunderAddedRatio": "thunder_damage_boost",
+                       "WindAddedRatio": "wind_damage_boost", "QuantumAddedRatio": "quantum_damage_boost",
+                       "ImaginaryAddedRatio": "imaginary_damage_boost", "BreakDamageAddedRatioBase": "breaking_effect",
+                       "SPRatioBase": "energy_regeneration_rate", "DefenceDelta": "defensive",
+                       "StatusResistanceBase": "effect_resistance"}
+
+main_attribute_table = {2: two_star, 3: three_star, 4: four_star, 5: five_star}
+
+for i, j in main_attributes.items():
+    if len(i) != 2:
+        continue
+    match i[0]:
+        case "2":
+            two_star[part_mapping[int(i[1])]] = parse_relic(j)
+        case "3":
+            three_star[part_mapping[int(i[1])]] = parse_relic(j)
+        case "4":
+            four_star[part_mapping[int(i[1])]] = parse_relic(j)
+        case "5":
+            five_star[part_mapping[int(i[1])]] = parse_relic(j)
+        case _:
+            raise Exception("This line never run.")
+
+for i, j in main_attribute_table.items():
+    with open(f"data/relic_{i}_main_attribute.json", "w", encoding="utf-8") as f:
+        json.dump(j, f, ensure_ascii=False, indent=4)
+
+with (file_path / "ExcelOutput" / "RelicSubAffixConfig.json").open(encoding="utf-8") as f:
+    sub_attributes: dict[str, dict] = json.load(f)
+
+for i, j in sub_attributes.items():
+    with open(f"data/relic_{i}_sub_attribute.json", "w", encoding="utf-8") as f:
+        json.dump(parse_relic(j, sub=True), f, ensure_ascii=False, indent=4)
 
 # with (file_path / "ExcelOutput" / "MonsterConfig.json").open(encoding="utf-8") as f:
 #     monster_configs_json: dict = json.load(f)
