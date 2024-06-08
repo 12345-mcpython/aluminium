@@ -18,6 +18,8 @@ class ValueProvider:
         self.active = False
 
     def init(self):
+        if self.active:
+            print("Already init!")
         if not os.path.exists(f"data/{self.from_json}"):
             print(f"Unable to find json data {self.from_json}.")
             return

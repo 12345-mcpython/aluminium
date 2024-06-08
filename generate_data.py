@@ -103,6 +103,21 @@ for i, j in sub_attributes.items():
     with open(f"data/relic_{i}_sub_attribute.json", "w", encoding="utf-8") as f:
         json.dump(parse_relic(j, sub=True), f, ensure_ascii=False, indent=4)
 
+exp = {}
+
+with (file_path / "ExcelOutput" / "RelicExpType.json").open(encoding="utf-8") as f:
+    exp_json: dict[str, dict] = json.load(f)
+
+for i, j in exp_json.items():
+    ls = []
+    for k in j.values():
+        if k.get("Exp"):
+            ls.append(k.get("Exp"))
+    exp[int(i) + 1] = ls
+
+with open("data/relic_exp.json", "w", encoding="utf-8") as f:
+    json.dump(exp, f, ensure_ascii=False, indent=4)
+
 # with (file_path / "ExcelOutput" / "MonsterConfig.json").open(encoding="utf-8") as f:
 #     monster_configs_json: dict = json.load(f)
 #
