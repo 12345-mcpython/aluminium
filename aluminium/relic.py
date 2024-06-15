@@ -4,7 +4,7 @@ import math
 import random
 from decimal import Decimal
 
-from aluminium.value import RELIC_2_MAIN_ATTRIBUTE, RELIC_3_MAIN_ATTRIBUTE, RELIC_4_MAIN_ATTRIBUTE, \
+from .value import RELIC_2_MAIN_ATTRIBUTE, RELIC_3_MAIN_ATTRIBUTE, RELIC_4_MAIN_ATTRIBUTE, \
     RELIC_5_MAIN_ATTRIBUTE, RELIC_2_SUB_ATTRIBUTE, RELIC_5_SUB_ATTRIBUTE, RELIC_3_SUB_ATTRIBUTE, RELIC_4_SUB_ATTRIBUTE, \
     RELIC_EXP
 
@@ -33,7 +33,7 @@ class Attribute:
         return f"<{type(self).__name__} left={self.left} right={self.right} extra={self.extra}>"
 
 
-class Enhance:
+class Relic:
     def __init__(
             self,
             level: int,
@@ -54,7 +54,7 @@ class Enhance:
     @classmethod
     def generate_random_enhance(
             cls, position: str, enhance_id: int, star: int
-    ) -> Enhance:
+    ) -> Relic:
         star_main_attributes = main_attribute_star_mapping[str(star)][position]
         star_sub_attributes = sub_attribute_star_mapping[str(star)]
         chosen_main_attribute = random.choice(position_attributes[position])
@@ -204,17 +204,17 @@ class Enhance:
         return str(self)
 
 
-class Enhances:
+class Relics:
     def __init__(
             self, hand=None, head=None, body=None, boot=None, ball=None, line=None
     ) -> None:
-        self.hand: Enhance = hand
-        self.head: Enhance = head
-        self.body: Enhance = body
-        self.boot: Enhance = boot
-        self.ball: Enhance = ball
-        self.line: Enhance = line
-        self.total: list[Enhance] = [hand, head, body, boot, ball, line]
+        self.hand: Relic = hand
+        self.head: Relic = head
+        self.body: Relic = body
+        self.boot: Relic = boot
+        self.ball: Relic = ball
+        self.line: Relic = line
+        self.total: list[Relic] = [hand, head, body, boot, ball, line]
 
     def __str__(self) -> str:
         return f"<{type(self).__name__} hand={str(self.hand)} head={str(self.head)} body={str(self.body)} boot={str(self.boot)} ball={str(self.ball)} line={str(self.line)}>"
@@ -236,7 +236,7 @@ class Enhances:
                     total[j.left] = j.right
         return total
 
-    def wear(self, enhance: Enhance):
+    def wear(self, enhance: Relic):
         match enhance.position:
             case "hand":
                 self.hand = enhance
@@ -253,4 +253,4 @@ class Enhances:
             case _:
                 return ValueError(f"Can't wear Position {enhance.position}.")
 
-        self.total: list[Enhance] = [self.hand, self.head, self.body, self.boot, self.ball, self.line]
+        self.total: list[Relic] = [self.hand, self.head, self.body, self.boot, self.ball, self.line]

@@ -12,7 +12,7 @@ with (file_path / "TextMap" / "TextMapEN.json").open(encoding="utf-8") as f:
     translator["EN"]: dict = json.load(f)
 
 
-def get_translator(hash_code):
+def get_translator(hash_code: int):
     return {"CHS": translator["CHS"].get(str(hash_code)), "EN": translator["EN"].get(str(hash_code))}
 
 
@@ -134,3 +134,28 @@ with open("data/relic_exp.json", "w", encoding="utf-8") as f:
 #                                     i["DamageTypeResistance"]]
 #
 #     print(monster)
+
+# ExcelOutput\AvatarConfig.json
+# ExcelOutput\AvatarPromotionConfig.json
+# ExcelOutput\AvatarSkillConfig.json
+
+# BPNeed 战技点使用
+
+with (file_path / "ExcelOutput" / "AvatarSkillConfig.json").open(encoding="utf-8") as f:
+    character_skills: dict[str, dict] = json.load(f)
+
+with (file_path / "ExcelOutput" / "AvatarPromotionConfig.json").open(encoding="utf-8") as f:
+    character_promotions: dict[str, dict] = json.load(f)
+
+with (file_path / "ExcelOutput" / "AvatarConfig.json").open(encoding="utf-8") as f:
+    characters: dict[str, dict] = json.load(f)
+
+with open("data/character_skills.json", "w", encoding="utf-8") as f:
+    p = {}
+    for i, j in character_skills.items():
+        one_skill = j["1"]
+        one_character_skill = {"skill_name": get_translator(one_skill["SkillName"]["Hash"]),
+                               "skill_stance_attribute": one_skill.get("StanceDamageType"),
+                               "use_point": one_skill.get("BPNeed", {"Value": -404})["Value"]}
+        p[i] = one_character_skill
+    json.dump(p, f, ensure_ascii=False, indent=4)

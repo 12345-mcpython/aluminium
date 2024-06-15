@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from .enhance import Enhances
+from .relic import Relics
 from .event import Event
 from .movable import Movable
 from .utils import calc_character_rate
@@ -10,7 +10,7 @@ from .weapon import Weapon
 class Character(Movable):
     def __init__(self, name: str, mt: str, health: Decimal, defensive: Decimal, attack: Decimal,
                  attributes: dict[str, Decimal], speed: Decimal, level: int = 1, weapon: Weapon = None,
-                 enhances: Enhances = None):
+                 enhances: Relics = None):
         super().__init__(name, health, defensive, attack, speed, attributes)
         self.mt = mt
         self.level = level
@@ -25,10 +25,8 @@ class Character(Movable):
     def __repr__(self):
         return str(self)
 
-    # ("Pioneer", "Destruction", Decimal("163.68"), Decimal("62.7"), Decimal("84.48"),
-    #                   {"crit_chance": Decimal(".05"), "crit_attack": Decimal(".05")}, Decimal("100"))
     @classmethod
-    def build(cls, name: str, mt: str, level: int, base_value: tuple, weapon: Weapon, enhances: Enhances):
+    def build(cls, name: str, mt: str, level: int, base_value: tuple, weapon: Weapon, enhances: Relics):
         base_health, base_defensive, base_attack, base_speed = base_value
         total_value = enhances.calc_total_value()
         health = base_health * calc_character_rate(level, promotion=True) + weapon.health + total_value.get("health", 0)
