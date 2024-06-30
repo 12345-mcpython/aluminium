@@ -52,12 +52,12 @@ class DamageCalculator:
         level = character.level
         breaking_effect = character.attributes["breaking_effect"]
         attribute_rates = {"physical": Decimal(2),
-                           "quantum": Decimal(0.5),
+                           "quantum": Decimal("0.5"),
                            "fire": Decimal(2),
                            "ice": Decimal(1),
                            "thunder": Decimal(1),
-                           "imaginary": Decimal(0.5),
-                           "wind": Decimal(1.5)}
+                           "imaginary": Decimal("0.5"),
+                           "wind": Decimal("1.5")}
         attribute_rate = attribute_rates[breaking_attribute]
         breaking_rate = Decimal(str(value.BREAKING_RATE.read(str(level))))
         damage = breaking_rate * attribute_rate * (Decimal(1) + Decimal(str(breaking_effect))) * (

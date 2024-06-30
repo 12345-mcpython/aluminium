@@ -1,4 +1,4 @@
-from .values import ValueProvider
+from .value_provider import ValueProvider
 
 HARD_LEVEL_GROUP_WORLD = ValueProvider("hard_level_group_1.json").init()
 HARD_LEVEL_GROUP_MAIN_LINE = ValueProvider("hard_level_group_2.json").init()
