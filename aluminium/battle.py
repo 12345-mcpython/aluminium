@@ -5,6 +5,12 @@ from .enemy import EnemyEvent
 from .queue import Queue
 
 
+# battle start -> step in -> before move -> check death ->
+# "player -> waiting process / enemy -> do process" -> check_death ->
+# after move -> check death -> check all death -> if True -> battle end
+# else -> loop to "step in"
+
+
 class Battle:
     def __init__(self, queue: Queue, battle_type: str = "common"):
         self.queue = queue
@@ -21,16 +27,22 @@ class Battle:
     def start_battle(self):
         for i in self.queue.queue:
             i.on_battle_start(self)
+        return self
 
     def step_in(self):
         self.queue.move()
 
+    # before move
     def move_start(self):
         move_object = self.queue.get_move()
         # calc dot
         move_object.before_move(self)
         self.now_object = move_object
 
+    def response(self):
+        pass
+
+    # after move
     def move_over(self):
         self.now_object.after_move(self)
         self.now_object = None
@@ -44,3 +56,13 @@ class Battle:
                 if isinstance(i, EnemyEvent):
                     if not i.on_enemy_died(self, i):
                         self.queue.queue.remove(i)
+
+    def check_fail(self):
+        if all([i.health == 0 for i in self.queue.queue if isinstance(i, CharacterEvent)]):
+            return True
+        return False
+
+    def check_win(self):
+        if all([i.health == 0 for i in self.queue.queue if isinstance(i, EnemyEvent)]):
+            return True
+        return False
