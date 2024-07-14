@@ -1,10 +1,15 @@
+import typing
 from decimal import Decimal
+
 
 from .relic import Relics
 from .event import Event
 from .movable import Movable
 from .utils import calc_character_rate
 from .weapon import Weapon
+if typing.TYPE_CHECKING:
+    from .damage import Damage
+    from .enemy import Enemy
 
 
 class Character(Movable):
@@ -60,6 +65,12 @@ class Character(Movable):
         pass
 
     def prepare_ultra(self, skill_level: int, ultra_type: str, position: int):
+        pass
+
+    def attack_object(self, enemy: Enemy):
+        pass
+
+    def get_damage(self, damage: Damage):
         pass
 
 

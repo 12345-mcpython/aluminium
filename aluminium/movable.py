@@ -26,6 +26,3 @@ class Movable:
 
     def add_buff(self, buff: "Buff"):
         self.buffs.append(buff)
-
-    def check_buff(self):
-        pass

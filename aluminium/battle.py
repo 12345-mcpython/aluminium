@@ -2,6 +2,7 @@ from typing import Optional
 
 from .character import CharacterEvent
 from .enemy import EnemyEvent
+from .movable import Movable
 from .queue import Queue
 
 
@@ -39,8 +40,8 @@ class Battle:
         move_object.before_move(self)
         self.now_object = move_object
 
-    def response(self):
-        pass
+    def enemy_action(self, movable: Movable):
+        self.now_object.attack_object(movable)
 
     # after move
     def move_over(self):

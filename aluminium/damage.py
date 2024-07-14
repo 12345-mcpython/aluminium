@@ -64,18 +64,6 @@ class DamageCalculator:
                 stance_length + 2) / 4
         return Damage(damage, "breaking", breaking_attribute, character)
 
-    @classmethod
-    def calc_skill_damage(cls, giver: Character, attack, damage_rate, damage_attribute, damage_type):
-        """
-        :param giver: damage giver
-        :param attack: after attack boost attack value
-        :param damage_rate: in skill viewer
-        :param damage_attribute: in skill viewer
-        :param damage_type: damage type
-        :return: Damage class
-        """
-        return Damage(attack * damage_rate, damage_type, damage_attribute, giver)
-
     # Utils part
     @classmethod
     def calc_attack_boost(cls, attack: Decimal, attack_percent: Decimal, attack_value: Decimal):
