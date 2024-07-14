@@ -4,15 +4,26 @@ from decimal import Decimal
 from .buff import Buff
 from .event import Event
 from .movable import Movable
+from .value import HARD_LEVEL_GROUP_WORLD, HARD_LEVEL_GROUP_VIRTUAL, HARD_LEVEL_GROUP_MAIN_LINE, \
+    HARD_LEVEL_GROUP_SPECIAL
 
 if typing.TYPE_CHECKING:
     from .character import Character
     from .damage import Damage
 
 
+def _stance_weak_not_in(stance_list: list[str]):
+    stances = ["physical", "fire", "ice", "thunder", "wind", "quantum", "imaginary"]
+    ni = []
+    for i in stances:
+        if i not in stance_list:
+            ni.append(i)
+    return ni
+
+
 class Enemy(Movable):
-    def __init__(self, name: str, health: Decimal, defensive: Decimal, attack: Decimal, stance: Decimal,
-                 stance_weak: list[str], attributes: dict[str, Decimal], speed: Decimal):
+    def __init__(self, name: str, health: Decimal, defensive: Decimal, attack: Decimal, speed: Decimal, stance: Decimal,
+                 stance_weak: list[str], attributes: dict[str, Decimal]):
         super().__init__(name, health, defensive, attack, speed, attributes)
         self.stance = stance
         self.stance_weak = stance_weak
@@ -35,8 +46,30 @@ class Enemy(Movable):
 
     def get_damage(self, damage: Damage):
         pass
+
     def register_skill(self):
         pass
+
+    @classmethod
+    def build(cls, name: str, level: int, hard_level_group_id: int,
+              base_value: tuple[Decimal, Decimal, Decimal, Decimal],
+              bonus_value: tuple[Decimal, Decimal, Decimal, Decimal], stance: list[str],
+              stance_length: int, extra_attribute: dict[str, Decimal]):
+        base_health, base_defensive, base_attack, base_speed = base_value
+        bonus_health, bonus_defensive, bonus_attack, bonus_speed = bonus_value
+        hard_level_groups = {1: HARD_LEVEL_GROUP_WORLD, 2: HARD_LEVEL_GROUP_MAIN_LINE, 3: HARD_LEVEL_GROUP_VIRTUAL,
+                             1401: HARD_LEVEL_GROUP_SPECIAL}
+        hard_level_group_mapping = hard_level_groups[hard_level_group_id].read(level)
+        health, defensive, attack, speed = base_health * hard_level_group_mapping[
+            "health"] * bonus_health, base_defensive * hard_level_group_mapping[
+                                               "defensive"] * bonus_defensive, base_attack * \
+                                           hard_level_group_mapping["attack"] * bonus_attack, base_speed * \
+                                           hard_level_group_mapping["speed"] * bonus_speed
+        attribute = extra_attribute.copy()
+        for i in _stance_weak_not_in(stance):
+            if not attribute.get(f"{i}_resistance"):
+                attribute[f"{i}_resistance"] = Decimal(".2")
+        return cls(name, health, defensive, attack, speed, Decimal(stance_length), stance, attribute)
 
 
 class EnemyEvent(Enemy, Event):

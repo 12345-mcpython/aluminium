@@ -11,15 +11,29 @@ relic = Relic.generate_from_json("head", 1, 5, {"main_attribute": {"crit_attack"
                                                                    "speed": [3, 3, 3, 3, 3, 3]}}, 15)
 
 
-class TestEnemy(EnemyEvent):
+class TestEnemy1(EnemyEvent):
     def register_skill(self):
         self.skills[1] = self.skill1
 
     def skill1(self):
-        return Damage(Decimal("2.5") * self.attack, "quantum", "single", self)
+        return Damage(Decimal("2.5") * self.attack, Decimal(0), "quantum", "single", self)
 
     def attack_object(self, character):
-        character.do_attack(self.skills[self.cursor])
+        character.get_damage(self.skills[self.cursor])
+
+
+class TestEnemy2(EnemyEvent):
+    def register_skill(self):
+        self.skills[1] = self.skill1
+        self.skills[2] = self.skill2
+
+    def skill1(self):
+        self.cursor = 2
+        return Damage(Decimal("2.5") * self.attack, Decimal(0), "imaginary", "single", self)
+
+    def skill2(self):
+        self.cursor = 1
+        return Damage(Decimal("1.5") * self.attack, Decimal("1.5") * self.attack, "imaginary", "spread", self)
 
 
 # The character and enemy class should use build() method to get the instance

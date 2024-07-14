@@ -12,8 +12,20 @@ if TYPE_CHECKING:
 
 
 class Damage:
-    def __init__(self, damage_value: Decimal, damage_type: str, damage_attribute: str, damage_giver: Movable):
+    def __init__(self, damage_value: Decimal, near_damage_value: Decimal, damage_type: str, damage_attribute: str,
+                 damage_giver: Movable):
+        """
+
+        :param damage_value: center damage value
+        :param near_damage_value: near the center damage value. only use in "spread" skill
+        :param damage_type: single spread group
+        :param damage_attribute: 7 element
+        :param damage_giver: object to give the damage
+        """
         self.damage_value = damage_value
+        self.near_damage_value = near_damage_value
+        assert damage_type in ["physical", "fire", "ice", "thunder", "wind", "quantum",
+                               "imaginary"], f"No such element: {damage_type}"
         self.damage_type = damage_type
         self.damage_attribute = damage_attribute
         self.damage_giver = damage_giver
