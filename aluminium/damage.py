@@ -1,14 +1,10 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Optional, TYPE_CHECKING
 
 from . import value
 from .movable import Movable
 from .utils import random_chance
-
-if TYPE_CHECKING:
-    from .character import Character
 
 
 class Damage:
@@ -24,11 +20,11 @@ class Damage:
         """
         self.damage_value = damage_value
         self.near_damage_value = near_damage_value
-        assert damage_type in ["physical", "fire", "ice", "thunder", "wind", "quantum",
-                               "imaginary"], f"No such element: {damage_type}"
         self.damage_type = damage_type
         self.damage_attribute = damage_attribute
         self.damage_giver = damage_giver
+        assert damage_type in ["physical", "fire", "ice", "thunder", "wind", "quantum",
+                               "imaginary"], f"No such element: {damage_type}"
 
     def __repr__(self):
         return f"<Damage damage_value={self.damage_value} damage_type={self.damage_type} damage_attribute={self.damage_attribute} damage_giver={self.damage_giver}"
@@ -60,7 +56,7 @@ class DamageCalculator:
 
     # Generate damage part
     @classmethod
-    def calc_breaking_attack(cls, stance_length: int, breaking_attribute: str, character: Optional[Character]):
+    def calc_breaking_attack(cls, stance_length: int, breaking_attribute: str, character):
         level = character.level
         breaking_effect = character.attributes["breaking_effect"]
         attribute_rates = {"physical": Decimal(2),
@@ -74,7 +70,7 @@ class DamageCalculator:
         breaking_rate = Decimal(str(value.BREAKING_RATE.read(str(level))))
         damage = breaking_rate * attribute_rate * (Decimal(1) + Decimal(str(breaking_effect))) * (
                 stance_length + 2) / 4
-        return Damage(damage, "breaking", breaking_attribute, character)
+        return Damage(damage, Decimal(0), "breaking", breaking_attribute, character)
 
     # Utils part
     @classmethod

@@ -1,4 +1,4 @@
-import typing
+from collections import namedtuple
 from decimal import Decimal
 
 from .buff import Buff
@@ -7,9 +7,9 @@ from .movable import Movable
 from .value import HARD_LEVEL_GROUP_WORLD, HARD_LEVEL_GROUP_VIRTUAL, HARD_LEVEL_GROUP_MAIN_LINE, \
     HARD_LEVEL_GROUP_SPECIAL
 
-if typing.TYPE_CHECKING:
-    from .character import Character
-    from .damage import Damage
+EBase = namedtuple("EBase", "base_health, base_defensive, base_attack, base_speed")
+
+EBonus = namedtuple("EBonus", "bonus_health, bonus_defensive, bonus_attack, bonus_speed")
 
 
 def _stance_weak_not_in(stance_list: list[str]):
@@ -41,14 +41,14 @@ class Enemy(Movable):
     def add_buff(self, buff: Buff):
         pass
 
-    def attack_object(self, character: Character):
+    def attack_object(self, character):
         pass
 
-    def get_damage(self, damage: Damage):
+    def get_damage(self, damage):
         pass
 
     def register_skill(self):
-        pass
+        return self
 
     @classmethod
     def build(cls, name: str, level: int, hard_level_group_id: int,
@@ -69,7 +69,8 @@ class Enemy(Movable):
         for i in _stance_weak_not_in(stance):
             if not attribute.get(f"{i}_resistance"):
                 attribute[f"{i}_resistance"] = Decimal(".2")
-        return cls(name, health, defensive, attack, speed, Decimal(stance_length), stance, attribute)
+        bd = cls(name, health, defensive, attack, speed, Decimal(stance_length), stance, attribute)
+        return bd.register_skill()
 
 
 class EnemyEvent(Enemy, Event):

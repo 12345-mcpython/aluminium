@@ -1,15 +1,10 @@
-import typing
 from decimal import Decimal
 
-
-from .relic import Relics
 from .event import Event
 from .movable import Movable
+from .relic import Relics
 from .utils import calc_character_rate
 from .weapon import Weapon
-if typing.TYPE_CHECKING:
-    from .damage import Damage
-    from .enemy import Enemy
 
 
 class Character(Movable):
@@ -21,6 +16,8 @@ class Character(Movable):
         self.level = level
         self.weapon = weapon
         self.enhances = enhances
+        self.skills = {}
+        self.skill_level = {}
         self.buffs = []
         self.extra = {}
 
@@ -50,27 +47,16 @@ class Character(Movable):
         defensive *= (total_value.get("defensive_percent", 0) + 1)
         attack *= (total_value.get("attack_percent", 0) + 1)
 
-        return cls(name, mt, health, defensive, attack, attribute, speed, level, weapon, enhances)
+        bd = cls(name, mt, health, defensive, attack, attribute, speed, level, weapon, enhances)
+        return bd.register_skill()
 
-    def common(self, skill_level: int, process_object: Movable):
+    def register_skill(self):
+        return self
+
+    def attack_object(self, enemy):
         pass
 
-    def enhanced_common(self, skill_level: int, skill_type: str, position: int, enhance_level: int = None):
-        pass
-
-    def skill(self, skill_level: int, skill_type: str, position: int):
-        pass
-
-    def ultra(self, skill_level: int, ultra_type: str, position: int):
-        pass
-
-    def prepare_ultra(self, skill_level: int, ultra_type: str, position: int):
-        pass
-
-    def attack_object(self, enemy: Enemy):
-        pass
-
-    def get_damage(self, damage: Damage):
+    def get_damage(self, damage):
         pass
 
 
