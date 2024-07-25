@@ -12,3 +12,8 @@ development/testing phase currently.
 3. 完善事件系统 Improve event system
 4. 开发网页及 API Develop website and API
 5. 编写功能测试/单元测试 Write functional tests and unit tests.
+
+## 导出 json
+
+使用[该工具 (抓包准确度100%)](https://github.com/IceDynamix/reliquary-archive)
+或 [该工具 (ocr识别准确度80%)](https://github.com/kel-z/HSR-Scanner/releases/latest) 导出角色遗器与光锥属性.

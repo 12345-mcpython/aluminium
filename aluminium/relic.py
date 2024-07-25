@@ -76,7 +76,8 @@ class Relic:
 
     @classmethod
     def generate_from_json(cls, position: str, enhance_id: int, star: int,
-                           enhance_json: dict[str, dict[str, list[int] | int]], level: int = 15, verify: bool = True):
+                           enhance_json: dict[str, dict[str, list[int] | int]], level: int = 15, verify: bool = True,
+                           format_version: int = 1):
         """
         Generate Enhance from json
         :param verify: check the enhances validity
@@ -94,7 +95,7 @@ class Relic:
         main_attribute = enhance_json["main_attribute"]
         sub_attributes = enhance_json["sub_attributes"]
 
-        if verify:
+        if verify and format_version == 1:
             assert level <= star * 3, f"The enhances level can't above {star * 3}."
             assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
                 "JSON don't have 'main_attribute' or 'sub_attributes' keys."
@@ -116,8 +117,6 @@ class Relic:
         # Verify part end
         main_attribute_left = list(main_attribute.keys())[0]
         main_attribute_right = list(main_attribute.values())[0]
-        sub_attributes_left = list(sub_attributes.keys())
-        sub_attributes_right = list(sub_attributes.values())
         star_main_attributes = main_attribute_star_mapping[str(star)]
         star_sub_attributes = sub_attribute_star_mapping[str(star)]
         main_attribute_value = Decimal(str(star_main_attributes[position][main_attribute_left]["base"])) + \
@@ -125,18 +124,30 @@ class Relic:
             main_attribute_right)
 
         main_attribute_class = Attribute(main_attribute_left, main_attribute_value)
-
         sub_attributes_class = []
+        if format_version == 1:
+            sub_attributes_left = list(sub_attributes.keys())
+            sub_attributes_right = list(sub_attributes.values())
 
-        for left, right in zip(sub_attributes_left, sub_attributes_right):
-            sub_attribute_value = star_sub_attributes[left]
-            sub_attribute_base = Decimal(str(sub_attribute_value["base"]))
-            sub_attribute_bonus = Decimal(str(sub_attribute_value["bonus"]))
-            sub_attribute_right = Decimal(0)
-            for value in right:
-                sub_attribute_right += (sub_attribute_base + value * sub_attribute_bonus)
-            sub_attribute = Attribute(left, sub_attribute_right, extra=len(right) - 1)
-            sub_attributes_class.append(sub_attribute)
+            for left, right in zip(sub_attributes_left, sub_attributes_right):
+                sub_attribute_value = star_sub_attributes[left]
+                sub_attribute_base = Decimal(str(sub_attribute_value["base"]))
+                sub_attribute_bonus = Decimal(str(sub_attribute_value["bonus"]))
+                sub_attribute_right = Decimal(0)
+                for value in right:
+                    sub_attribute_right += (sub_attribute_base + value * sub_attribute_bonus)
+                sub_attribute = Attribute(left, sub_attribute_right, extra=len(right) - 1)
+                sub_attributes_class.append(sub_attribute)
+        elif format_version == 2:
+            for key, value in sub_attributes:
+                sub_attribute_value = star_sub_attributes[key]
+                sub_attribute_base = Decimal(str(sub_attribute_value["base"]))
+                sub_attribute_bonus = Decimal(str(sub_attribute_value["bonus"]))
+                sub_attribute = Attribute(key, sub_attribute_base * (value["promote_level"] + 1) + sub_attribute_bonus *
+                                          value["attribute_level"], extra=value["promote_level"])
+                sub_attributes_class.append(sub_attribute)
+        else:
+            raise Exception("Unknown format version:", format_version)
 
         return cls(level, enhance_id, position, star, main_attribute_class, sub_attributes_class)
 
