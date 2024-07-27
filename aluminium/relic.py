@@ -76,10 +76,11 @@ class Relic:
 
     @classmethod
     def generate_from_json(cls, position: str, enhance_id: int, star: int,
-                           enhance_json: dict[str, dict[str, list[int] | int]], level: int = 15, verify: bool = True,
-                           format_version: int = 1):
+                           enhance_json: dict, format_version: int = 1,
+                           level: int = 15, verify: bool = True):
         """
         Generate Enhance from json
+        :param format_version:
         :param verify: check the enhances validity
         :param level: enhance level
         :param position: enhance position "hand" "head" "body" "boot" "ball" "line"
@@ -114,6 +115,11 @@ class Relic:
             assert total <= 9, "The total sub attribute's promote level can't above 5."
             assert list(main_attribute.keys())[0] in position_attributes[
                 position], f"Illegal main attribute '{list(main_attribute.keys())[0]}' in position '{position}'."
+        if verify and format_version == 2:
+            assert level <= star * 3, f"The enhances level can't above {star * 3}."
+            assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
+                "JSON don't have 'main_attribute' or 'sub_attributes' keys."
+
         # Verify part end
         main_attribute_left = list(main_attribute.keys())[0]
         main_attribute_right = list(main_attribute.values())[0]
@@ -139,7 +145,7 @@ class Relic:
                 sub_attribute = Attribute(left, sub_attribute_right, extra=len(right) - 1)
                 sub_attributes_class.append(sub_attribute)
         elif format_version == 2:
-            for key, value in sub_attributes:
+            for key, value in sub_attributes.items():
                 sub_attribute_value = star_sub_attributes[key]
                 sub_attribute_base = Decimal(str(sub_attribute_value["base"]))
                 sub_attribute_bonus = Decimal(str(sub_attribute_value["bonus"]))

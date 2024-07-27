@@ -59,12 +59,15 @@ class Enemy(Movable):
         bonus_health, bonus_defensive, bonus_attack, bonus_speed = bonus_value
         hard_level_groups = {1: HARD_LEVEL_GROUP_WORLD, 2: HARD_LEVEL_GROUP_MAIN_LINE, 3: HARD_LEVEL_GROUP_VIRTUAL,
                              1401: HARD_LEVEL_GROUP_SPECIAL}
-        hard_level_group_mapping = hard_level_groups[hard_level_group_id].read(level)
-        health, defensive, attack, speed = base_health * hard_level_group_mapping[
-            "health"] * bonus_health, base_defensive * hard_level_group_mapping[
-                                               "defensive"] * bonus_defensive, base_attack * \
-                                           hard_level_group_mapping["attack"] * bonus_attack, base_speed * \
-                                           hard_level_group_mapping["speed"] * bonus_speed
+        hard_level_group_mapping = hard_level_groups[hard_level_group_id].read(str(level))
+        health, defensive, attack, speed = Decimal(str(base_health)) * Decimal(str(hard_level_group_mapping[
+                                                                                       "health"])) * Decimal(
+            str(bonus_health)), Decimal(str(base_defensive)) * Decimal(
+            str(hard_level_group_mapping[
+                    "defensive"])) * Decimal(str(bonus_defensive)), base_attack * \
+                                           Decimal(str(hard_level_group_mapping["attack"])) * Decimal(
+            str(bonus_attack)), base_speed * \
+                                           Decimal(str(hard_level_group_mapping["speed"])) * Decimal(str(bonus_speed))
         attribute = extra_attribute.copy()
         for i in _stance_weak_not_in(stance):
             if not attribute.get(f"{i}_resistance"):

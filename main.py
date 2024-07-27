@@ -3,7 +3,7 @@ from decimal import Decimal
 from aluminium.character import CharacterEvent
 from aluminium.damage import Damage
 from aluminium.enemy import EnemyEvent, EBase, EBonus
-from aluminium.relic import Relic
+from aluminium.relic import Relic, Relics
 
 
 class TestEnemy1(EnemyEvent):
@@ -51,39 +51,146 @@ class TestCharacter1(CharacterEvent):
         pass
 
 
-relic_body = Relic.generate_from_json("body", 1, 5, {"main_attribute": {"crit_attack": 15},
-                                                     "sub_attributes": {"crit_chance": [1, 2, 1, 2],
-                                                                        "health": [2],
-                                                                        "defensive": [1, 1, 1],
-                                                                        "speed": [2]}})
+relic_body = Relic.generate_from_json("body", 1, 5, {
+    "main_attribute": {
+        "crit_attack": 15
+    },
+    "sub_attributes": {
+        "defensive": {
+            "promote_level": 1,
+            "attribute_level": 1
+        },
+        "defensive_percent": {
+            "promote_level": 0,
+            "attribute_level": 1
+        },
+        "speed": {
+            "promote_level": 3,
+            "attribute_level": 4
+        },
+        "breaking_effect": {
+            "promote_level": 1,
+            "attribute_level": 1
+        }
+    }
+}, 2)
 
-relic_head = Relic.generate_from_json("head", 1, 5, {"main_attribute": {"health": 15},
-                                                     "sub_attributes": {"crit_chance": [1, 2],
-                                                                        "effect_resistance": [2],
-                                                                        "defensive": [1],
-                                                                        "speed": [2]}})
+relic_head = Relic.generate_from_json("head", 1, 5, {
+    "main_attribute": {
+        "health": 15
+    },
+    "sub_attributes": {
+        "speed": {
+            "promote_level": 2,
+            "attribute_level": 0
+        },
+        "crit_chance": {
+            "promote_level": 2,
+            "attribute_level": 5
+        },
+        "crit_attack": {
+            "promote_level": 0,
+            "attribute_level": 1
+        },
+        "breaking_effect": {
+            "promote_level": 1,
+            "attribute_level": 0
+        }
+    }}, 2)
 
-relic_boot = Relic.generate_from_json("boot", 1, 5, {"main_attribute": {"speed": 15},
-                                                     "sub_attributes": {"crit_chance": [1, 2],
-                                                                        "effect_resistance": [2],
-                                                                        "defensive": [1],
-                                                                        "effect_hit_rate": [1, 1]}})
+relic_boot = Relic.generate_from_json("boot", 1, 5, {
+    "main_attribute": {
+        "speed": 15
+    },
+    "sub_attributes": {
+        "attack": {
+            "promote_level": 0,
+            "attribute_level": 1
+        },
+        "defensive": {
+            "promote_level": 2,
+            "attribute_level": 2
+        },
+        "crit_attack": {
+            "promote_level": 0,
+            "attribute_level": 1
+        },
+        "effect_resistance": {
+            "promote_level": 2,
+            "attribute_level": 6
+        }
+    }
+}, 2)
 
-relic_hand = Relic.generate_from_json("hand", 1, 5, {"main_attribute": {"attack": 15},
-                                                     "sub_attributes": {"crit_chance": [1, 2],
-                                                                        "effect_resistance": [2],
-                                                                        "defensive": [1],
-                                                                        "speed": [2]}})
-relic_line = Relic.generate_from_json("ball", 1, 5, {"main_attribute": {"thunder_damage_boost": 15},
-                                                     "sub_attributes": {"crit_chance": [1, 2],
-                                                                        "crit_attack": [2, 2],
-                                                                        "defensive": [1],
-                                                                        "speed": [2]}})
-relic_ball = Relic.generate_from_json("line", 1, 5, {"main_attribute": {"attack_percent": 15},
-                                                     "sub_attributes": {"crit_chance": [1, 2],
-                                                                        "crit_attack": [2],
-                                                                        "defensive": [1],
-                                                                        "speed": [2]}})
+relic_hand = Relic.generate_from_json("hand", 1, 5, {
+    "main_attribute": {
+        "attack": 15
+    },
+    "sub_attributes": {
+        "defensive": {
+            "promote_level": 1,
+            "attribute_level": 2
+        },
+        "speed": {
+            "promote_level": 3,
+            "attribute_level": 3
+        },
+        "crit_attack": {
+            "promote_level": 0,
+            "attribute_level": 0
+        },
+        "effect_hit_rate": {
+            "promote_level": 0,
+            "attribute_level": 1
+        }
+    }
+}, 2)
+relic_line = Relic.generate_from_json("ball", 1, 5, {
+    "main_attribute": {
+        "defensive_percent": 15
+    },
+    "sub_attributes": {
+        "speed": {
+            "promote_level": 1,
+            "attribute_level": 2
+        },
+        "crit_attack": {
+            "promote_level": 2,
+            "attribute_level": 3
+        },
+        "effect_hit_rate": {
+            "promote_level": 0,
+            "attribute_level": 2
+        },
+        "effect_resistance": {
+            "promote_level": 2,
+            "attribute_level": 4
+        }
+    }
+}, 2)
+relic_ball = Relic.generate_from_json("line", 1, 5, {
+    "main_attribute": {
+        "energy_regeneration_rate": 15
+    },
+    "sub_attributes": {
+        "health": {
+            "promote_level": 2,
+            "attribute_level": 2
+        },
+        "defensive_percent": {
+            "promote_level": 0,
+            "attribute_level": 2
+        },
+        "crit_attack": {
+            "promote_level": 1,
+            "attribute_level": 2
+        },
+        "effect_resistance": {
+            "promote_level": 1,
+            "attribute_level": 2
+        }
+    }
+}, 2)
 
 enemy1_base = EBase(base_health=Decimal("55.8"), base_speed=Decimal("83"), base_attack=Decimal("18"),
                     base_defensive=Decimal("210"))
@@ -106,3 +213,14 @@ enemies = []
 characters = []
 
 # queue = Queue()
+
+relics = Relics()
+
+relics.wear(relic_head)
+relics.wear(relic_hand)
+relics.wear(relic_body)
+relics.wear(relic_ball)
+relics.wear(relic_boot)
+relics.wear(relic_line)
+
+print(relics.calc_total_value())
