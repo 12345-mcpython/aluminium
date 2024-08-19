@@ -140,5 +140,5 @@ for i, j in characters_tool_data.items():
         character_data.append(relic)
     characters_dump_data[i] = character_data
 
-with open("dump_data.json", "w", encoding="utf-8") as f:
+with open("data/dump_data.json", "w", encoding="utf-8") as f:
     json.dump(characters_dump_data, f, indent=4, ensure_ascii=False)

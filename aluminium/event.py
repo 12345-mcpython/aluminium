@@ -29,5 +29,8 @@ class Event:
     def after_move(self, battle):
         pass
 
-    def on_break_toughness(self, battle, breaker, broken_object):
+    def on_break_stance(self, battle, breaker, broken_object):
+        pass
+
+    def on_heal_stance(self, battle, breaker, broken_object):
         pass

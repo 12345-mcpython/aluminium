@@ -35,10 +35,14 @@ class TestEnemy2(EnemyEvent):
 # The character and enemy class should use build() method to get the instance
 # not use the Class().
 class TestCharacter1(CharacterEvent):
+    def enhance_1(self):
+        pass
+
     def register_skill(self):
         self.skills["common"] = self.common
         self.skills["skill"] = self.skill
-        self.skills["ultra"] = self.ultra
+        self.skills["ultra_1"] = self.ultra
+        self.skills["ultra_2"] = self.ultra
         return self
 
     def skill(self):
@@ -48,6 +52,12 @@ class TestCharacter1(CharacterEvent):
         pass
 
     def ultra(self):
+        pass
+
+    def ultra_sp(self):
+        pass
+
+    def on_break_stance(self, battle, breaker, broken_object):
         pass
 
 
