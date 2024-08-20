@@ -4,12 +4,14 @@ import pathlib
 print("aluminium data generator 1.0.0")
 print("data version: 2.4.0")
 
-if pathlib.Path("data/data_path.txt").exists():
-    file_path = pathlib.Path(pathlib.Path("data/data_path.txt").read_text(encoding="utf-8"))
+data_path_file = pathlib.Path("data/data_path.txt")
+
+if data_path_file.exists():
+    file_path = pathlib.Path(data_path_file.read_text(encoding="utf-8").strip())
     print(f"use data path: {file_path}")
 else:
     file_path = pathlib.Path(input("Input the StarRailData project dir: "))
-    pathlib.Path("data/data_path.txt").write_text(str(file_path.absolute()), encoding="utf-8")
+    data_path_file.write_text(str(file_path.absolute()), encoding="utf-8")
 
 hard_level_group = {}
 
@@ -41,9 +43,8 @@ for i in hard_level_group_json:
 
     hard_level_group.setdefault(hard_level_group_id, {})[hard_level_group_level] = data_parsed
 
-for i, j in hard_level_group.items():
-    with open(f"data/hard_level_group_{i}.json", "w", encoding="utf-8") as f:
-        json.dump(j, f, ensure_ascii=False, indent=4)
+with open(f"data/hard_level_group.json", "w", encoding="utf-8") as f:
+    json.dump(hard_level_group, f, ensure_ascii=False, indent=4)
 
 with (file_path / "ExcelOutput" / "AvatarBreakDamage.json").open(encoding="utf-8") as f:
     breaking_rate = json.load(f)
@@ -101,11 +102,19 @@ for i in main_attribute_json_data:
 
     main_attribute_data_parsed[star][part][left] = parsed_data
 
-with open("main_attribute.json", "w", encoding="utf-8") as f:
+with open("data/main_attribute.json", "w", encoding="utf-8") as f:
     json.dump(main_attribute_data_parsed, f, indent=4, ensure_ascii=False)
 
+sub_attribute_data_parsed = {}
+
 for i in sub_attribute_json_data:
-    pass
+    star = i["GroupID"]
+    left = inner_outer_mapping[i["Property"]]
+    parsed_data = parse_relic(i, True)
+    sub_attribute_data_parsed.setdefault(star, {})[left] = parsed_data
+
+with open("data/sub_attribute.json", "w", encoding="utf-8") as f:
+    json.dump(sub_attribute_data_parsed, f, indent=4, ensure_ascii=False)
 
 # RelicSubAffixConfig.json 副词条
 # RelicMainAffixConfig.json 主词条
