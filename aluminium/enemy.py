@@ -4,8 +4,7 @@ from decimal import Decimal
 from .buff import Buff
 from .event import Event
 from .movable import Movable
-from .value import HARD_LEVEL_GROUP_WORLD, HARD_LEVEL_GROUP_VIRTUAL, HARD_LEVEL_GROUP_MAIN_LINE, \
-    HARD_LEVEL_GROUP_SPECIAL
+from .value import HARD_LEVEL_GROUP
 
 EBase = namedtuple("EBase", "base_health, base_defensive, base_attack, base_speed")
 
@@ -57,9 +56,7 @@ class Enemy(Movable):
               stance_length: int, extra_attribute: dict[str, Decimal]):
         base_health, base_defensive, base_attack, base_speed = base_value
         bonus_health, bonus_defensive, bonus_attack, bonus_speed = bonus_value
-        hard_level_groups = {1: HARD_LEVEL_GROUP_WORLD, 2: HARD_LEVEL_GROUP_MAIN_LINE, 3: HARD_LEVEL_GROUP_VIRTUAL,
-                             1401: HARD_LEVEL_GROUP_SPECIAL}
-        hard_level_group_mapping = hard_level_groups[hard_level_group_id].read(str(level))
+        hard_level_group_mapping = HARD_LEVEL_GROUP.read()[str(hard_level_group_id)][str(level)]
         health, defensive, attack, speed = Decimal(str(base_health)) * Decimal(str(hard_level_group_mapping[
                                                                                        "health"])) * Decimal(
             str(bonus_health)), Decimal(str(base_defensive)) * Decimal(

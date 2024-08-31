@@ -4,23 +4,23 @@ import math
 import random
 from decimal import Decimal
 
-from .value import RELIC_2_MAIN_ATTRIBUTE, RELIC_3_MAIN_ATTRIBUTE, RELIC_4_MAIN_ATTRIBUTE, \
-    RELIC_5_MAIN_ATTRIBUTE, RELIC_2_SUB_ATTRIBUTE, RELIC_5_SUB_ATTRIBUTE, RELIC_3_SUB_ATTRIBUTE, RELIC_4_SUB_ATTRIBUTE, \
-    RELIC_EXP
+from .value import MAIN_ATTRIBUTE, SUB_ATTRIBUTE
 
-position_attributes = {i: list(j.keys()) for i, j in RELIC_2_MAIN_ATTRIBUTE.read().items()}
+position_attributes = {i: list(j.keys()) for i, j in MAIN_ATTRIBUTE.read("2").items()}
 
-main_attribute_star_mapping = {"2": RELIC_2_MAIN_ATTRIBUTE.read(), "3": RELIC_3_MAIN_ATTRIBUTE.read(),
-                               "4": RELIC_4_MAIN_ATTRIBUTE.read(),
-                               "5": RELIC_5_MAIN_ATTRIBUTE.read()}
+main_attribute_star_mapping = {"2": MAIN_ATTRIBUTE.read("2"), "3": MAIN_ATTRIBUTE.read("3"),
+                               "4": MAIN_ATTRIBUTE.read("4"),
+                               "5": MAIN_ATTRIBUTE.read("5")}
 
-sub_attribute_star_mapping = {"2": RELIC_2_SUB_ATTRIBUTE.read(), "3": RELIC_3_SUB_ATTRIBUTE.read(),
-                              "4": RELIC_4_SUB_ATTRIBUTE.read(),
-                              "5": RELIC_5_SUB_ATTRIBUTE.read()}
+sub_attribute_star_mapping = {"2": SUB_ATTRIBUTE.read("2"), "3": SUB_ATTRIBUTE.read("3"),
+                              "4": SUB_ATTRIBUTE.read("4"),
+                              "5": SUB_ATTRIBUTE.read("5")}
 
-sub_attributes_key_table = list(RELIC_2_MAIN_ATTRIBUTE.read().keys())
+sub_attributes_key_table = list(MAIN_ATTRIBUTE.read("2").keys())
 
-xp = RELIC_EXP.read()
+
+# TODO: add xp
+# xp = RELIC_EXP.read()
 
 
 class Attribute:
@@ -49,7 +49,7 @@ class Relic:
         self.star = star
         self.main_attribute = main_attribute
         self.sub_attributes = sub_attributes
-        self.total_xp = sum(xp[str(star)][:level])
+        # self.total_xp = sum(xp[str(star)][:level])
 
     @classmethod
     def generate_random_enhance(

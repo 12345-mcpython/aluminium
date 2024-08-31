@@ -11,8 +11,8 @@ def get_promote_level(attribute, value, star):
     value = Decimal(str(value))
     if attribute in percent:
         value /= 100
-    with open(f"data/relic_{star}_sub_attribute.json") as f:
-        sub_data = json.load(f)
+    with open(f"data/sub_attribute.json") as f:
+        sub_data = json.load(f)[str(star)]
     base = Decimal(str(sub_data[attribute]['base']))
     bonus = Decimal(str(sub_data[attribute]['bonus']))
     cursor = 0
@@ -132,7 +132,7 @@ characters_dump_data = {}
 for i, j in characters_tool_data.items():
     character_data = []
     for k in j:
-        relic = {"set": k['set'], "type": parse_slot(k["slot"]),
+        relic = {"set": k['name'], "type": parse_slot(k["slot"]),
                  "json": {"main_attribute": {parse_main_attribute(k['mainstat'], k['slot']): k['level']},
                           "sub_attributes": {parse_sub_attribute(abc['key']): get_promote_level(
                               parse_sub_attribute(abc['key']), abc['value'], k['rarity']) for abc in
