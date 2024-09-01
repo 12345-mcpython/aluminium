@@ -65,17 +65,8 @@ def parse_relic(data: dict[str, dict], sub=False):
 
 part_mapping = {1: "head", 2: "hand", 3: "body", 4: "boot", 5: "ball", 6: "line"}
 
-inner_outer_mapping = {"HPDelta": "health", "AttackDelta": "attack", "HPAddedRatio": "health_percent",
-                       "AttackAddedRatio": "attack_percent", "DefenceAddedRatio": "defensive_percent",
-                       "CriticalChanceBase": "crit_chance", "CriticalDamageBase": "crit_attack",
-                       "HealRatioBase": "outgoing_healing_boost", "StatusProbabilityBase": "effect_hit_rate",
-                       "SpeedDelta": "speed", "PhysicalAddedRatio": "physical_damage_boost",
-                       "FireAddedRatio": "fire_damage_boost", "IceAddedRatio": "ice_damage_boost",
-                       "ThunderAddedRatio": "thunder_damage_boost",
-                       "WindAddedRatio": "wind_damage_boost", "QuantumAddedRatio": "quantum_damage_boost",
-                       "ImaginaryAddedRatio": "imaginary_damage_boost", "BreakDamageAddedRatioBase": "breaking_effect",
-                       "SPRatioBase": "energy_regeneration_rate", "DefenceDelta": "defensive",
-                       "StatusResistanceBase": "effect_resistance"}
+with open("data/relic_mappings.json") as f:
+    inner_outer_mapping = json.load(f)
 
 with (file_path / "ExcelOutput" / "RelicMainAffixConfig.json").open(encoding="utf-8") as f:
     main_attribute_json_data = json.load(f)
@@ -116,7 +107,11 @@ for i in sub_attribute_json_data:
 with open("data/sub_attribute.json", "w", encoding="utf-8") as f:
     json.dump(sub_attribute_data_parsed, f, indent=4, ensure_ascii=False)
 
-# RelicSubAffixConfig.json 副词条
-# RelicMainAffixConfig.json 主词条
+with (file_path / "ExcelOutput" / "AvatarConfig.json").open(encoding="utf-8") as f:
+    character_data_json = json.load(f)
 
-# BPNeed 战技点使用
+characters_data = {}
+
+for character in character_data_json:
+    character_data = {"id": character["AvatarID"], "attribute": character["DamageType"],
+                      "energy_max": character["SPNeed"]["Value"]}

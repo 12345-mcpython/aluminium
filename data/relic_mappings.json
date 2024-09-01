@@ -1,0 +1,23 @@
+{
+  "HPDelta": "health",
+  "AttackDelta": "attack",
+  "HPAddedRatio": "health_percent",
+  "AttackAddedRatio": "attack_percent",
+  "DefenceAddedRatio": "defensive_percent",
+  "CriticalChanceBase": "crit_chance",
+  "CriticalDamageBase": "crit_attack",
+  "HealRatioBase": "outgoing_healing_boost",
+  "StatusProbabilityBase": "effect_hit_rate",
+  "SpeedDelta": "speed",
+  "PhysicalAddedRatio": "physical_damage_boost",
+  "FireAddedRatio": "fire_damage_boost",
+  "IceAddedRatio": "ice_damage_boost",
+  "ThunderAddedRatio": "thunder_damage_boost",
+  "WindAddedRatio": "wind_damage_boost",
+  "QuantumAddedRatio": "quantum_damage_boost",
+  "ImaginaryAddedRatio": "imaginary_damage_boost",
+  "BreakDamageAddedRatioBase": "breaking_effect",
+  "SPRatioBase": "energy_regeneration_rate",
+  "DefenceDelta": "defensive",
+  "StatusResistanceBase": "effect_resistance"
+}

@@ -1,2 +1,3 @@
 *.json
 *.txt
+!relic_mappings.json
