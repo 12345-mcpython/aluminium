@@ -22,7 +22,7 @@ def calc_character_rate(level: int, promotion=False):
 
 def calc_attacker_rate(level, promotion=False):
     base = Decimal("1.00") + (level - 1) * Decimal(".15")
-    first_promote = level >= 20 and promotion
+    first_promote = level > 20 or (level == 20 and promotion)
     promote_count = level // 10 - (3 if not promotion else 2)
     if promotion and level == 80:
         promote_count -= 1
