@@ -87,7 +87,7 @@ class Relic:
         :param enhance_id: enhance id
         :param star: enhance star 2,3,4,5
         :param enhance_json: {"main_attribute": {"crit_attack": 15},
-                 "sub_attributes": {"crit_chance": [3], "health": [3], "defensive": [1], "speed": [3,3,3,3,3,3]}}
+                 "sub_attributes": {"crit_chance": [3], "health": [3], "defence": [1], "speed": [3,3,3,3,3,3]}}
         3, 3, 3, 3, 3, 3 is the promote level.
         :return: Enhance class
         """

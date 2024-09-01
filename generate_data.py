@@ -1,8 +1,8 @@
 import json
 import pathlib
 
-print("aluminium data generator 1.0.0")
-print("data version: 2.4.0")
+print("aluminium data generator 1.0.0-dev")
+print("use data version: 2.4.0")
 
 data_path_file = pathlib.Path("data/data_path.txt")
 
@@ -12,6 +12,17 @@ if data_path_file.exists():
 else:
     file_path = pathlib.Path(input("Input the StarRailData project dir: "))
     data_path_file.write_text(str(file_path.absolute()), encoding="utf-8")
+
+with (file_path / "TextMap" / "TextMapCHS.json").open(encoding="utf-8") as f:
+    translate_chn = json.load(f)
+
+with (file_path / "TextMap" / "TextMapEN.json").open(encoding="utf-8") as f:
+    translate_en = json.load(f)
+
+
+def translate(hash_key: int):
+    return {"chinese": translate_chn[str(hash_key)], "english": translate_en[str(hash_key)]}
+
 
 hard_level_group = {}
 
@@ -110,8 +121,23 @@ with open("data/sub_attribute.json", "w", encoding="utf-8") as f:
 with (file_path / "ExcelOutput" / "AvatarConfig.json").open(encoding="utf-8") as f:
     character_data_json = json.load(f)
 
+with (file_path / "ExcelOutput" / "AvatarPromotionConfig.json").open(encoding="utf-8") as f:
+    character_promote_json = json.load(f)
+
 characters_data = {}
 
 for character in character_data_json:
     character_data = {"id": character["AvatarID"], "attribute": character["DamageType"],
-                      "energy_max": character["SPNeed"]["Value"]}
+                      "short_name": character["AvatarVOTag"],
+                      "max_energy": character["SPNeed"]["Value"], "name": translate(character["AvatarName"]["Hash"])}
+    characters_data[character["AvatarID"]] = character_data
+
+characters_promote_data = {}
+
+for character_promote in character_promote_json:
+    if not character_promote.get("Promotion"):
+        continue
+    character_promote_data = {
+        "health": {"base": {character_promote["HPBase"]["Value"]}, "bonus": character_promote["HPAdd"]["Value"]},
+        "defence": {"base": {character_promote["HPBase"]["Value"]}, "bonus": character_promote["HPAdd"]["Value"]},
+        "health": {"base": {character_promote["HPBase"]["Value"]}, "bonus": character_promote["HPAdd"]["Value"]}}

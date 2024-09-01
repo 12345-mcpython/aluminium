@@ -3,7 +3,7 @@ from decimal import Decimal
 
 path = input("Enter tool's json: ")
 
-percent = ["effect_hit_rate", "effect_resistance", "attack_percent", "health_percent", "defensive_percent",
+percent = ["effect_hit_rate", "effect_resistance", "attack_percent", "health_percent", "defence_percent",
            "crit_chance", "crit_attack", "breaking_effect"]
 
 
@@ -53,7 +53,7 @@ def parse_main_attribute(attribute, part):
         case "ATK" if part != "Hands":
             return "attack_percent"
         case "DEF":
-            return "defensive_percent"
+            return "defence_percent"
         case "HP" if part == "Head":
             return "health"
         case "HP" if part != "Head":
@@ -95,9 +95,9 @@ def parse_sub_attribute(attribute):
         case "ATK_":
             return "attack_percent"
         case "DEF":
-            return "defensive"
+            return "defence"
         case "DEF_":
-            return "defensive_percent"
+            return "defence_percent"
         case "HP":
             return "health"
         case "HP_":

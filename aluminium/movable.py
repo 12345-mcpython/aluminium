@@ -7,12 +7,12 @@ from .buff import Buff
 class Movable:
     def __init__(self, name: str,
                  health: Decimal,
-                 defensive: Decimal,
+                 defence: Decimal,
                  attack: Decimal,
                  speed: Decimal, attributes: dict[str, Decimal]):
         self.name = name
         self.__health = health
-        self.defensive = defensive
+        self.defence = defence
         self.attack = attack
         self.speed = speed
         self.tick = Decimal(0)

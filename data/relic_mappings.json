@@ -3,7 +3,7 @@
   "AttackDelta": "attack",
   "HPAddedRatio": "health_percent",
   "AttackAddedRatio": "attack_percent",
-  "DefenceAddedRatio": "defensive_percent",
+  "DefenceAddedRatio": "defence_percent",
   "CriticalChanceBase": "crit_chance",
   "CriticalDamageBase": "crit_attack",
   "HealRatioBase": "outgoing_healing_boost",
@@ -18,6 +18,6 @@
   "ImaginaryAddedRatio": "imaginary_damage_boost",
   "BreakDamageAddedRatioBase": "breaking_effect",
   "SPRatioBase": "energy_regeneration_rate",
-  "DefenceDelta": "defensive",
+  "DefenceDelta": "defence",
   "StatusResistanceBase": "effect_resistance"
 }

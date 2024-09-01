@@ -33,9 +33,9 @@ class Damage:
 class DamageCalculator:
     # Area part
     @classmethod
-    def calc_defensive_area(cls, damage, attacker_level, attacked_defensive):
+    def calc_defence_area(cls, damage, attacker_level, attacked_defence):
         return damage.damage_value * (200 + 10 * attacker_level) / (
-                attacked_defensive + 200 + 10 * attacker_level)
+                attacked_defence + 200 + 10 * attacker_level)
 
     @classmethod
     def calc_crit_area(cls, damage, crit_chance: Decimal, crit_attack: Decimal):
