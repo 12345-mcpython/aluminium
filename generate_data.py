@@ -1,5 +1,6 @@
 import json
 import pathlib
+import sys
 
 print("aluminium data generator 1.0.0-dev")
 print("use data version: 2.4.0")
@@ -21,7 +22,8 @@ with (file_path / "TextMap" / "TextMapEN.json").open(encoding="utf-8") as f:
 
 
 def translate(hash_key: int):
-    return {"chinese": translate_chn[str(hash_key)], "english": translate_en[str(hash_key)]}
+    return {"chinese": translate_chn.get(str(hash_key), "").replace("{NICKNAME}", "开拓者"),
+            "english": translate_en.get(str(hash_key), "").replace("{NICKNAME}", "Trailblazer")}
 
 
 hard_level_group = {}
@@ -29,14 +31,10 @@ hard_level_group = {}
 with (file_path / "ExcelOutput" / "HardLevelGroup.json").open(encoding="utf-8") as f:
     hard_level_group_json = json.load(f)
 
-"""d[key] = {
-            "attack": value.get("AttackRatio", {"Value": 1})["Value"],
-            "defensive": value.get("DefenceRatio", {"Value": 1})["Value"],
-            "health": value.get("HPRatio", {"Value": 1})["Value"],
-            "speed": value.get("SpeedRatio", {"Value": 1})["Value"],
-            "stance": value.get("StanceRatio", {"Value": 1})["Value"],
-            "effect_hit_rate": value.get("StatusProbability", {"Value": 0})["Value"],
-            "effect_resistance": value.get("StatusResistance", {"Value": 0})["Value"]}"""
+if not isinstance(hard_level_group_json, list):
+    print("StarRailData data version incorrect.")
+    print("Please download the latest StarRailData and replace the old path in data/data_path.txt.")
+    sys.exit(1)
 
 for i in hard_level_group_json:
     hard_level_group_id = i["HardLevelGroup"]
@@ -44,7 +42,7 @@ for i in hard_level_group_json:
 
     data_parsed = {
         "attack": i.get("AttackRatio", {}).get("Value", 1),
-        "defensive": i.get("DefenceRatio", {}).get("Value", 1),
+        "defence": i.get("DefenceRatio", {}).get("Value", 1),
         "health": i.get("HPRatio", {}).get("Value", 1),
         "speed": i.get("SpeedRatio", {}).get("Value", 1),
         "stance": i.get("StanceRatio", {}).get("Value", 1),
@@ -67,8 +65,6 @@ for i in breaking_rate:
 with open("data/breaking_rate.json", "w", encoding="utf-8") as f:
     json.dump(d, f, ensure_ascii=False, indent=4)
 
-
-# 2 品质 1 头 2 手 3 身 4 鞋
 
 def parse_relic(data: dict[str, dict], sub=False):
     return {"base": data["BaseValue"]["Value"], "bonus": data["LevelAdd" if not sub else "StepValue"]["Value"]}
@@ -124,20 +120,53 @@ with (file_path / "ExcelOutput" / "AvatarConfig.json").open(encoding="utf-8") as
 with (file_path / "ExcelOutput" / "AvatarPromotionConfig.json").open(encoding="utf-8") as f:
     character_promote_json = json.load(f)
 
-characters_data = {}
+characters_basic_data = {}
 
 for character in character_data_json:
-    character_data = {"id": character["AvatarID"], "attribute": character["DamageType"],
+    character_data = {"id": character["AvatarID"], "attribute": character["DamageType"].lower(),
                       "short_name": character["AvatarVOTag"],
                       "max_energy": character["SPNeed"]["Value"], "name": translate(character["AvatarName"]["Hash"])}
-    characters_data[character["AvatarID"]] = character_data
+    characters_basic_data[character["AvatarID"]] = character_data
 
-characters_promote_data = {}
+characters_value_data = {}
 
 for character_promote in character_promote_json:
     if not character_promote.get("Promotion"):
         continue
-    character_promote_data = {
-        "health": {"base": {character_promote["HPBase"]["Value"]}, "bonus": character_promote["HPAdd"]["Value"]},
-        "defence": {"base": {character_promote["HPBase"]["Value"]}, "bonus": character_promote["HPAdd"]["Value"]},
-        "health": {"base": {character_promote["HPBase"]["Value"]}, "bonus": character_promote["HPAdd"]["Value"]}}
+    character_value_data = {
+        "health": character_promote["HPBase"]["Value"],
+        "attack": character_promote["AttackBase"]["Value"],
+        "defence": character_promote["DefenceBase"]["Value"],
+        "speed": character_promote["SpeedBase"]["Value"],
+        "aggro": character_promote["BaseAggro"]["Value"]
+    }
+    characters_value_data[character_promote["AvatarID"]] = character_value_data
+
+characters_data_no_skill = {}
+
+for cid, character in characters_basic_data.items():
+    character_value_data = characters_value_data[cid]
+    characters_data_no_skill[cid] = dict(**character, **character_value_data)
+
+with open("data/character_data.json", "w", encoding="utf-8") as f:
+    json.dump(characters_data_no_skill, f, indent=4, ensure_ascii=False, sort_keys=True)
+
+with (file_path / "ExcelOutput" / "AvatarSkillConfig.json").open(encoding="utf-8") as f:
+    character_skill_json = json.load(f)
+
+character_skills = {}
+
+for skill in character_skill_json:
+    skill_owner = skill["SkillID"] // 100
+    skill_number = skill["SkillID"] % 100
+    # stance_list 0 单体 1 全部 2 扩散
+    character_skills.setdefault(skill_owner, {})[skill_number] = {"name": translate(skill["SkillName"]["Hash"]),
+                                                                  "attack_type": skill.get("AttackType"),
+                                                                  "stance_list": skill["ShowStanceList"],
+                                                                  "skill_effect": skill.get("SkillEffect"),
+                                                                  "skill_id": skill["SkillID"],
+                                                                  "param_list": skill["ParamList"],
+                                                                  "skill_introduction": translate(
+                                                                      skill["SkillDesc"]["Hash"])}
+with open("data/skills.json", "w", encoding="utf-8") as f:
+    json.dump(character_skills, f, indent=4, ensure_ascii=False)

@@ -54,7 +54,7 @@ class DamageCalculator:
     def calc_damage_reduce_area(cls, damage, reduce_value: Decimal):
         return damage.damage_value * (1 - reduce_value)
 
-    # Generate damage part
+    # base damage part
     @classmethod
     def calc_breaking_attack(cls, stance_length: int, breaking_attribute: str, character):
         level = character.level
