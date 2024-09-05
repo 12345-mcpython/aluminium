@@ -26,6 +26,10 @@ def translate(hash_key: int):
             "english": translate_en.get(str(hash_key), "").replace("{NICKNAME}", "Trailblazer")}
 
 
+def parse_stance_list(stance_list: list):
+    return {"single": stance_list[0]["Value"], "all": stance_list[1]["Value"], "spread": stance_list[2]["Value"]}
+
+
 hard_level_group = {}
 
 with (file_path / "ExcelOutput" / "HardLevelGroup.json").open(encoding="utf-8") as f:
@@ -122,7 +126,10 @@ with (file_path / "ExcelOutput" / "AvatarPromotionConfig.json").open(encoding="u
 
 characters_basic_data = {}
 
+character_id_mapping = {}
+
 for character in character_data_json:
+    character_id_mapping[character["AvatarID"]] = translate(character["AvatarName"]["Hash"])
     character_data = {"id": character["AvatarID"], "attribute": character["DamageType"].lower(),
                       "short_name": character["AvatarVOTag"],
                       "max_energy": character["SPNeed"]["Value"], "name": translate(character["AvatarName"]["Hash"])}
@@ -151,6 +158,9 @@ for cid, character in characters_basic_data.items():
 with open("data/character_data.json", "w", encoding="utf-8") as f:
     json.dump(characters_data_no_skill, f, indent=4, ensure_ascii=False, sort_keys=True)
 
+with open("data/character_id_mappings.json", "w", encoding="utf-8") as f:
+    json.dump(character_id_mapping, f, indent=4, ensure_ascii=False, sort_keys=True)
+
 with (file_path / "ExcelOutput" / "AvatarSkillConfig.json").open(encoding="utf-8") as f:
     character_skill_json = json.load(f)
 
@@ -160,13 +170,16 @@ for skill in character_skill_json:
     skill_owner = skill["SkillID"] // 100
     skill_number = skill["SkillID"] % 100
     # stance_list 0 单体 1 全部 2 扩散
-    character_skills.setdefault(skill_owner, {})[skill_number] = {"name": translate(skill["SkillName"]["Hash"]),
-                                                                  "attack_type": skill.get("AttackType"),
-                                                                  "stance_list": skill["ShowStanceList"],
-                                                                  "skill_effect": skill.get("SkillEffect"),
-                                                                  "skill_id": skill["SkillID"],
-                                                                  "param_list": skill["ParamList"],
-                                                                  "skill_introduction": translate(
-                                                                      skill["SkillDesc"]["Hash"])}
+    character_skills.setdefault(skill_owner, {}).setdefault(skill_number, []).append(
+        {"name": translate(skill["SkillName"]["Hash"]),
+         "attack_type": skill.get("AttackType"),
+         "stance_list": parse_stance_list(
+             skill["ShowStanceList"]),
+         "skill_effect": skill.get("SkillEffect"),
+         "skill_id": skill["SkillID"],
+         "param_list": skill["ParamList"],
+         "skill_introduction": translate(
+             skill["SkillDesc"]["Hash"])})
+
 with open("data/skills.json", "w", encoding="utf-8") as f:
-    json.dump(character_skills, f, indent=4, ensure_ascii=False)
+    json.dump(character_skills, f, indent=4, ensure_ascii=False, sort_keys=True)
