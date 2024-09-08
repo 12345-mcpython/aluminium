@@ -33,3 +33,7 @@ def calc_attacker_rate(level, promotion=False):
 
 def list_str2decimal(string_list):
     return [Decimal(i) for i in string_list]
+
+
+def read_cbase(cid: int):
+    pass

@@ -1,9 +1,11 @@
+import os
 from decimal import Decimal
 
-from aluminium.character import CharacterEvent
 from aluminium.damage import Damage
 from aluminium.enemy import EnemyEvent, EBase, EBonus
 from aluminium.relic import Relic, Relics
+
+os.chdir(os.path.dirname(__file__))
 
 
 class TestEnemy1(EnemyEvent):
@@ -34,51 +36,26 @@ class TestEnemy2(EnemyEvent):
 
 # The character and enemy class should use build() method to get the instance
 # not use the Class().
-class TestCharacter1(CharacterEvent):
-    def enhance_1(self):
-        pass
-
-    def register_skill(self):
-        self.skills["common"] = self.common
-        self.skills["skill"] = self.skill
-        self.skills["ultra_1"] = self.ultra
-        self.skills["ultra_2"] = self.ultra
-        return self
-
-    def skill(self):
-        pass
-
-    def common(self):
-        pass
-
-    def ultra(self):
-        pass
-
-    def ultra_sp(self):
-        pass
-
-    def on_break_stance(self, battle, breaker, broken_object):
-        pass
 
 
 relic_body = Relic.generate_from_json("body", 1, 5, {
     "main_attribute": {
-        "crit_attack": 15
+        "crit_chance": 15
     },
     "sub_attributes": {
-        "defence": {
-            "promote_level": 1,
-            "attribute_level": 1
+        "health": {
+            "promote_level": 2,
+            "attribute_level": 2
         },
-        "defence_percent": {
+        "defence": {
             "promote_level": 0,
             "attribute_level": 1
         },
-        "speed": {
-            "promote_level": 3,
-            "attribute_level": 4
+        "health_percent": {
+            "promote_level": 2,
+            "attribute_level": 3
         },
-        "breaking_effect": {
+        "crit_attack": {
             "promote_level": 1,
             "attribute_level": 1
         }
@@ -90,44 +67,45 @@ relic_head = Relic.generate_from_json("head", 1, 5, {
         "health": 15
     },
     "sub_attributes": {
-        "speed": {
-            "promote_level": 2,
-            "attribute_level": 0
+        "attack": {
+            "promote_level": 0,
+            "attribute_level": 2
+        },
+        "attack_percent": {
+            "promote_level": 0,
+            "attribute_level": 2
         },
         "crit_chance": {
-            "promote_level": 2,
+            "promote_level": 3,
             "attribute_level": 5
-        },
-        "crit_attack": {
-            "promote_level": 0,
-            "attribute_level": 1
         },
         "breaking_effect": {
             "promote_level": 1,
             "attribute_level": 0
         }
-    }}, 2)
+    }
+}, 2)
 
 relic_boot = Relic.generate_from_json("boot", 1, 5, {
     "main_attribute": {
-        "speed": 15
+        "attack_percent": 15
     },
     "sub_attributes": {
         "attack": {
-            "promote_level": 0,
-            "attribute_level": 1
-        },
-        "defence": {
-            "promote_level": 2,
+            "promote_level": 1,
             "attribute_level": 2
         },
-        "crit_attack": {
+        "health_percent": {
+            "promote_level": 3,
+            "attribute_level": 2
+        },
+        "crit_chance": {
             "promote_level": 0,
             "attribute_level": 1
         },
-        "effect_resistance": {
-            "promote_level": 2,
-            "attribute_level": 6
+        "breaking_effect": {
+            "promote_level": 0,
+            "attribute_level": 2
         }
     }
 }, 2)
@@ -137,44 +115,44 @@ relic_hand = Relic.generate_from_json("hand", 1, 5, {
         "attack": 15
     },
     "sub_attributes": {
-        "defence": {
-            "promote_level": 1,
-            "attribute_level": 2
-        },
-        "speed": {
-            "promote_level": 3,
-            "attribute_level": 3
-        },
-        "crit_attack": {
+        "health_percent": {
             "promote_level": 0,
             "attribute_level": 0
         },
-        "effect_hit_rate": {
-            "promote_level": 0,
-            "attribute_level": 1
+        "attack_percent": {
+            "promote_level": 1,
+            "attribute_level": 4
+        },
+        "crit_chance": {
+            "promote_level": 1,
+            "attribute_level": 2
+        },
+        "crit_attack": {
+            "promote_level": 2,
+            "attribute_level": 3
         }
     }
 }, 2)
 relic_line = Relic.generate_from_json("ball", 1, 5, {
     "main_attribute": {
-        "defence_percent": 15
+        "physical_damage_boost": 15
     },
     "sub_attributes": {
+        "attack": {
+            "promote_level": 1,
+            "attribute_level": 4
+        },
+        "defence": {
+            "promote_level": 0,
+            "attribute_level": 1
+        },
         "speed": {
             "promote_level": 1,
-            "attribute_level": 2
-        },
-        "crit_attack": {
-            "promote_level": 2,
             "attribute_level": 3
         },
         "effect_hit_rate": {
-            "promote_level": 0,
-            "attribute_level": 2
-        },
-        "effect_resistance": {
             "promote_level": 2,
-            "attribute_level": 4
+            "attribute_level": 2
         }
     }
 }, 2)
@@ -184,20 +162,20 @@ relic_ball = Relic.generate_from_json("line", 1, 5, {
     },
     "sub_attributes": {
         "health": {
-            "promote_level": 2,
-            "attribute_level": 2
+            "promote_level": 0,
+            "attribute_level": 1
         },
         "defence_percent": {
+            "promote_level": 1,
+            "attribute_level": 3
+        },
+        "crit_chance": {
             "promote_level": 0,
             "attribute_level": 2
         },
-        "crit_attack": {
-            "promote_level": 1,
-            "attribute_level": 2
-        },
-        "effect_resistance": {
-            "promote_level": 1,
-            "attribute_level": 2
+        "effect_hit_rate": {
+            "promote_level": 3,
+            "attribute_level": 3
         }
     }
 }, 2)
@@ -234,3 +212,5 @@ relics.wear(relic_boot)
 relics.wear(relic_line)
 
 print(relics.calc_total_value())
+
+print(type(__file__))

@@ -1,3 +1,4 @@
+from collections import namedtuple
 from decimal import Decimal
 
 from .event import Event
@@ -5,6 +6,10 @@ from .movable import Movable
 from .relic import Relics
 from .utils import calc_character_rate
 from .weapon import Weapon
+
+CBase = namedtuple("CBase", "base_health, base_defence, base_attack, base_speed")
+
+CBonus = namedtuple("CBonus", "bonus_health, bonus_defence, bonus_attack, bonus_speed")
 
 
 class Character(Movable):
