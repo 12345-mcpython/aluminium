@@ -138,7 +138,7 @@ for character in character_data_json:
 characters_value_data = {}
 
 for character_promote in character_promote_json:
-    if not character_promote.get("Promotion"):
+    if character_promote.get("MaxLevel") != 20:
         continue
     character_value_data = {
         "health": character_promote["HPBase"]["Value"],
@@ -179,7 +179,8 @@ for skill in character_skill_json:
          "skill_id": skill["SkillID"],
          "param_list": skill["ParamList"],
          "skill_introduction": translate(
-             skill["SkillDesc"]["Hash"])})
+             skill["SkillDesc"]["Hash"]),
+         "level": skill["Level"], "max_level": skill["MaxLevel"]})
 
 with open("data/skills.json", "w", encoding="utf-8") as f:
     json.dump(character_skills, f, indent=4, ensure_ascii=False, sort_keys=True)
