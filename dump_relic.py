@@ -79,11 +79,11 @@ def parse_main_attribute(attribute, part):
         case "Ice DMG Boost":
             return "ice_damage_boost"
         case "Lightning DMG Boost":
-            return "lightning_damage_boost"
+            return "thunder_damage_boost"
         case "Quantum DMG Boost":
             return "quantum_damage_boost"
         case "Imaginary DMG Boost":
-            return "fire_damage_boost"
+            return "imaginary_damage_boost"
         case "Outgoing Healing Boost":
             return "outgoing_healing_boost"
 

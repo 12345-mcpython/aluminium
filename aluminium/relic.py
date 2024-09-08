@@ -242,6 +242,8 @@ class Relics:
     def calc_total_value(self):
         total = {}
         for i in self.total:
+            if not i:
+                continue
             if total.get(i.main_attribute.left):
                 total[i.main_attribute.left] += i.main_attribute.right
             else:
