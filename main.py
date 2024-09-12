@@ -180,14 +180,15 @@ relic_ball = Relic.generate_from_json("line", 1, 5, {
     }
 }, 2)
 
+# enemy defence base is 200 + level * 10
 enemy1_base = EBase(base_health=Decimal("55.8"), base_speed=Decimal("83"), base_attack=Decimal("18"),
-                    base_defence=Decimal("210"))
+                    base_defence=Decimal(str(210 + 10 * 74)))
 
 enemy1_bonus = EBonus(bonus_defence=Decimal("1"), bonus_speed=Decimal("1"), bonus_attack=Decimal("1"),
                       bonus_health=Decimal("1"))
 
 enemy2_base = EBase(base_health=Decimal("55.8"), base_speed=Decimal("100"), base_attack=Decimal("18"),
-                    base_defence=Decimal("210"))
+                    base_defence=Decimal(str(210 + 10 * 74)))
 
 enemy2_bonus = EBonus(bonus_defence=Decimal("1"), bonus_speed=Decimal("1"), bonus_attack=Decimal("1"),
                       bonus_health=Decimal("1"))
@@ -212,5 +213,3 @@ relics.wear(relic_boot)
 relics.wear(relic_line)
 
 print(relics.calc_total_value())
-
-print(type(__file__))
