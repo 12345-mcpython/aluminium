@@ -33,13 +33,18 @@ class Character(Movable):
         return str(self)
 
     @classmethod
-    def build(cls, name: str, mt: str, level: int, base_value: tuple, weapon: Weapon, enhances: Relics):
+    def build(cls, name: str, mt: str, level: int, base_value: CBase, weapon: Weapon, relics: Relics):
         base_health, base_defence, base_attack, base_speed = base_value
-        total_value = enhances.calc_total_value()
-        health = base_health * calc_character_rate(level, promotion=True) + weapon.health + total_value.get("health", 0)
-        defence = base_defence * calc_character_rate(level, promotion=True) + weapon.defence + total_value.get(
+        total_value = relics.calc_total_value()
+        health = (base_health * calc_character_rate(level, promotion=True) + weapon.health) * (
+                total_value.get("health_percent", 0) + 1) + total_value.get("health",
+                                                                            0)
+        defence = (base_defence * calc_character_rate(level, promotion=True) + weapon.defence) * (
+                total_value.get("defence_percent", 0) + 1) + total_value.get(
             "defence", 0)
-        attack = base_attack * calc_character_rate(level, promotion=True) + weapon.attack + total_value.get("attack", 0)
+        attack = (base_attack * calc_character_rate(level, promotion=True) + weapon.attack) * (
+                total_value.get("health_percent", 0) + 1) + total_value.get("attack",
+                                                                            0)
         speed = base_speed + total_value.get("speed", 0)
         attribute = {"crit_attack": Decimal(.5) + total_value.get("crit_attack", 0),
                      "crit_chance": Decimal(.05) + total_value.get("crit_chance", 0),
@@ -52,7 +57,7 @@ class Character(Movable):
         defence *= (total_value.get("defence_percent", 0) + 1)
         attack *= (total_value.get("attack_percent", 0) + 1)
 
-        bd = cls(name, mt, health, defence, attack, attribute, speed, level, weapon, enhances)
+        bd = cls(name, mt, health, defence, attack, attribute, speed, level, weapon, relics)
         return bd.register_skill()
 
     def register_skill(self):
