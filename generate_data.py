@@ -178,9 +178,46 @@ for skill in character_skill_json:
          "skill_effect": skill.get("SkillEffect"),
          "skill_id": skill["SkillID"],
          "param_list": skill["ParamList"],
+         # regex: #\d\[i\]\%
          "skill_introduction": translate(
              skill["SkillDesc"]["Hash"]),
          "level": skill["Level"], "max_level": skill["MaxLevel"]})
 
 with open("data/skills.json", "w", encoding="utf-8") as f:
     json.dump(character_skills, f, indent=4, ensure_ascii=False, sort_keys=True)
+
+weapons = {}
+
+weapon_mappings = {"Mage": "all", "Priest": "healing", "Warrior": "destruction", "Knight": "protection",
+                   "Rogue": "single", "Warlock": "debuff", "Shaman": "help"}
+
+with (file_path / "ExcelOutput" / "EquipmentConfig.json").open(encoding="utf-8") as f:
+    weapons_json = json.load(f)
+
+with (file_path / "ExcelOutput" / "EquipmentPromotionConfig.json").open(encoding="utf-8") as f:
+    weapons_promotion_json = json.load(f)
+
+for weapon in weapons_json:
+    weapons[weapon["EquipmentID"]] = {"name": translate(weapon["EquipmentName"]["Hash"]),
+                                      "type": weapon_mappings[weapon["AvatarBaseType"]]}
+
+weapons_promotion_data = {}
+
+for weapon_promotion in weapons_promotion_json:
+    if weapon_promotion.get("MaxLevel") != 20:
+        continue
+    weapon_promotion_data = {
+        "health": weapon_promotion["BaseHP"]["Value"],
+        "attack": weapon_promotion["BaseAttack"]["Value"],
+        "defence": weapon_promotion["BaseDefence"]["Value"]
+    }
+    weapons_promotion_data[weapon_promotion["EquipmentID"]] = weapon_promotion_data
+
+weapons_data = {}
+
+for eid, character in weapons.items():
+    weapon_promotion_data = weapons_promotion_data[eid]
+    weapons_data[eid] = dict(**character, **weapon_promotion_data)
+
+with open("data/weapons.json", "w", encoding="utf-8") as f:
+    json.dump(weapons_data, f, indent=4, ensure_ascii=False, sort_keys=True)
