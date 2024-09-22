@@ -18,11 +18,7 @@ class Movable:
         self.tick = Decimal(0)
         self.length = Decimal(0)
         self.attributes = attributes
-        self.buffs = []
 
     @property
     def health(self):
         return math.floor(self.__health)
-
-    def add_buff(self, buff: "Buff"):
-        self.buffs.append(buff)

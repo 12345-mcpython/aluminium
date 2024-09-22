@@ -22,12 +22,9 @@ class Character(Movable):
         self.weapon = weapon
         self.enhances = enhances
         self.skills = {}
-        self.skill_level = {}
-        self.buffs = []
-        self.extra = {}
 
     def __str__(self) -> str:
-        return f"<{type(self).__name__} name={self.name} mt={self.mt} health={self.health} defence={self.defence} speed={self.speed} attack={self.attack} attributes={self.attributes} weapon={self.weapon} enhances={self.enhances} tick={self.tick} length={self.length} extra={self.extra}>"
+        return f"<{type(self).__name__} name={self.name} mt={self.mt} health={self.health} defence={self.defence} speed={self.speed} attack={self.attack} attributes={self.attributes} weapon={self.weapon} enhances={self.enhances} tick={self.tick} length={self.length}>"
 
     def __repr__(self):
         return str(self)
@@ -62,12 +59,6 @@ class Character(Movable):
 
     def register_skill(self):
         return self
-
-    def attack_object(self, enemy):
-        pass
-
-    def get_damage(self, damage):
-        pass
 
 
 class CharacterEvent(Character, Event):

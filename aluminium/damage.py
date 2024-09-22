@@ -8,7 +8,8 @@ from .utils import random_chance
 
 
 class Damage:
-    def __init__(self, damage_value: Decimal, near_damage_value: Decimal, damage_type: str, damage_attribute: str,
+    def __init__(self, damage_value: Decimal, damage_stance: int, near_damage_value: Decimal, damage_type: str,
+                 damage_attribute: str,
                  damage_giver: Movable):
         """
 
@@ -19,6 +20,7 @@ class Damage:
         :param damage_giver: object to give the damage
         """
         self.damage_value = damage_value
+        self.damage_stance = damage_stance
         self.near_damage_value = near_damage_value
         self.damage_type = damage_type
         self.damage_attribute = damage_attribute
@@ -27,7 +29,7 @@ class Damage:
                                "imaginary"], f"No such element: {damage_type}"
 
     def __repr__(self):
-        return f"<Damage damage_value={self.damage_value} damage_type={self.damage_type} damage_attribute={self.damage_attribute} damage_giver={self.damage_giver}"
+        return f"<Damage damage_value={self.damage_value} damage_stance={self.damage_stance} damage_type={self.damage_type} damage_attribute={self.damage_attribute} damage_giver={self.damage_giver}"
 
 
 class DamageCalculator:
@@ -70,7 +72,7 @@ class DamageCalculator:
         breaking_rate = Decimal(str(value.BREAKING_RATE.read(str(level))))
         damage = breaking_rate * attribute_rate * (Decimal(1) + Decimal(str(breaking_effect))) * (
                 stance_length + 2) / 4
-        return Damage(damage, Decimal(0), "breaking", breaking_attribute, character)
+        return Damage(damage, 0, Decimal(0), "breaking", breaking_attribute, character)
 
     # Utils part
     @classmethod
