@@ -1,4 +1,7 @@
 class Event:
+    def __init__(self, movable):
+        self.movable = movable
+
     def on_battle_start(self, battle):
         pass
 

@@ -20,22 +20,22 @@ def _stance_weak_not_in(stance_list: list[str]):
 
 
 class Enemy(Movable):
-    def __init__(self, name: str, health: Decimal, defence: Decimal, attack: Decimal, speed: Decimal, stance: Decimal,
+    def __init__(self, event: type[Event], name: str, health: Decimal, defence: Decimal, attack: Decimal,
+                 speed: Decimal,
+                 stance: Decimal,
                  stance_weak: list[str], attributes: dict[str, Decimal]):
-        super().__init__(name, health, defence, attack, speed, attributes)
+        super().__init__(event, name, health, defence, attack, speed, attributes)
         self.stance = stance
         self.stance_weak = stance_weak
         self.skills = {}
         self.cursor = 1
 
-    def __str__(self) -> str:
-        return f"<{type(self).__name__} name={self.name} health={self.health} defence={self.defence} attack={self.attack} stance={self.stance} stance_weak={self.stance_weak} attributes={self.attributes} speed={self.speed} tick={self.tick} length={self.length} extra={self.extra} cursor={self.cursor}>"
-
-    def __repr__(self):
-        return str(self)
+    def __repr__(self) -> str:
+        p = "self."
+        return f"<{type(self).__name__} health={self.health} defense={self.defence} attack={self.attack} speed={self.speed} length={self.length} tick={self.tick} stance={self.stance} stance_weak={', '.join(self.stance_weak)}>"
 
     @classmethod
-    def build(cls, name: str, level: int, hard_level_group_id: int,
+    def build(cls, event: type[Event], name: str, level: int, hard_level_group_id: int,
               base_value: tuple[Decimal, Decimal, Decimal, Decimal],
               bonus_value: tuple[Decimal, Decimal, Decimal, Decimal], stance: list[str],
               stance_length: int, extra_attribute: dict[str, Decimal]):
@@ -54,12 +54,9 @@ class Enemy(Movable):
         for i in _stance_weak_not_in(stance):
             if not attribute.get(f"{i}_resistance"):
                 attribute[f"{i}_resistance"] = Decimal(".2")
-        bd = cls(name, health, defence, attack, speed, Decimal(stance_length), stance, attribute)
-        return bd.register_skill()
+        bd = cls(event, name, health, defence, attack, speed, Decimal(stance_length), stance, attribute)
+        bd.register_skill()
+        return bd
 
     def register_skill(self):
         pass
-
-
-class EnemyEvent(Enemy, Event):
-    pass

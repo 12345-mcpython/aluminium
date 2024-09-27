@@ -1,19 +1,16 @@
-import typing
 from decimal import Decimal
 
-from aluminium.character import CharacterEvent
-from aluminium.enemy import EnemyEvent
-
-CE = typing.TypeVar("CE", CharacterEvent, EnemyEvent)
+from aluminium.character import Character
+from aluminium.enemy import Enemy
 
 
 class Queue:
     def __init__(
-            self, character_queue: list[CE], enemy_queue: list[CE]
+            self, character_queue: list[Character], enemy_queue: list[Enemy]
     ) -> None:
         self.character_queue = character_queue
         self.enemy_queue = enemy_queue
-        self.queue: list[CE] = list(character_queue) + list(enemy_queue)
+        self.queue: list[Character | Enemy] = list(character_queue) + list(enemy_queue)
 
     def print(self):
         print("队列")
@@ -37,16 +34,16 @@ class Queue:
     def get_move(self):
         return max(self.queue, key=lambda a: a.length)
 
-    def move_front(self, refactor_object: CE, length):
+    def move_front(self, refactor_object: Character | Enemy, length):
         refactor_object.length += Decimal(length)
         if refactor_object.length > Decimal(10000):
             refactor_object.length = Decimal(10000)
         self.calc_tick()
 
-    def set_speed(self, refactor_object: CE, speed):
+    def set_speed(self, refactor_object: Character | Enemy, speed):
         refactor_object.speed = Decimal(speed)
         self.calc_tick()
 
-    def move_back(self, refactor_object: CE, length):
+    def move_back(self, refactor_object: Character | Enemy, length):
         refactor_object.length -= Decimal(length)
         self.calc_tick()

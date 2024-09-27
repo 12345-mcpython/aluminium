@@ -1,25 +1,28 @@
 import os
 from decimal import Decimal
 
+from aluminium.character import CBase, Character
 from aluminium.damage import Damage
-from aluminium.enemy import EnemyEvent, EBase, EBonus
+from aluminium.enemy import EBase, EBonus, Enemy
+from aluminium.event import Event
 from aluminium.relic import Relic, Relics
+from aluminium.weapon import Weapon
 
 os.chdir(os.path.dirname(__file__))
 
 
-class TestEnemy1(EnemyEvent):
+class TestEnemy1(Enemy):
     def register_skill(self):
         self.skills[1] = self.skill1
 
     def skill1(self):
-        return Damage(Decimal("2.5") * self.attack, Decimal(0), "quantum", "single", self)
+        return Damage(Decimal("2.5") * self.attack, 0, Decimal(0), "quantum", "single", self)
 
     def attack_object(self, character):
         character.get_damage(self.skills[self.cursor])
 
 
-class TestEnemy2(EnemyEvent):
+class TestEnemy2(Enemy):
     def register_skill(self):
         self.skills[1] = self.skill1
         self.skills[2] = self.skill2
@@ -27,11 +30,26 @@ class TestEnemy2(EnemyEvent):
 
     def skill1(self):
         self.cursor = 2
-        return Damage(Decimal("2.5") * self.attack, Decimal(0), "imaginary", "single", self)
+        return Damage(Decimal("2.5") * self.attack, 0, Decimal(0), "imaginary", "single", self)
 
     def skill2(self):
         self.cursor = 1
-        return Damage(Decimal("1.5") * self.attack, Decimal("1.5") * self.attack, "imaginary", "spread", self)
+        return Damage(Decimal("1.5") * self.attack, 0, Decimal("1.5") * self.attack, "imaginary", "spread", self)
+
+
+class TestCharacter1(Character):
+    def on_battle_start(self, battle):
+        print("on battle start", self, battle)
+
+    def register_skill(self):
+        self.skills["common"] = self.skill1
+        self.skills["bp"] = self.skill2
+
+    def skill1(self):
+        return Damage(Decimal("1.5") * self.attack, 30, Decimal(0), "physical", "single", self)
+
+    def skill2(self):
+        return Damage(Decimal("2.5") * self.attack, 60, Decimal(0), "physical", "single", self)
 
 
 # The character and enemy class should use build() method to get the instance
@@ -193,15 +211,9 @@ enemy2_base = EBase(base_health=Decimal("55.8"), base_speed=Decimal("100"), base
 enemy2_bonus = EBonus(bonus_defence=Decimal("1"), bonus_speed=Decimal("1"), bonus_attack=Decimal("1"),
                       bonus_health=Decimal("1"))
 
-enemy1 = TestEnemy1.build("Test Enemy 1", 74, 1, enemy1_base, enemy1_bonus, ["ice", "wind"], 30, {})
+enemy1 = TestEnemy1.build(Event, "Test Enemy 1", 74, 1, enemy1_base, enemy1_bonus, ["ice", "wind"], 30, {})
 
-enemy2 = TestEnemy2.build("Test Enemy 2", 74, 1, enemy2_base, enemy2_bonus, ["physics", "thunder"], 60, {})
-
-enemies = []
-
-characters = []
-
-# queue = Queue()
+enemy2 = TestEnemy2.build(Event, "Test Enemy 2", 74, 1, enemy2_base, enemy2_bonus, ["physics", "thunder"], 60, {})
 
 relics = Relics()
 
@@ -212,4 +224,14 @@ relics.wear(relic_ball)
 relics.wear(relic_boot)
 relics.wear(relic_line)
 
-print(relics.calc_total_value())
+character1 = TestCharacter1.build(Event, "Test Character 1", "No", 80,
+                                  CBase(Decimal("184.8"), Decimal("69.3"), Decimal("81.84"), Decimal("98"), 100),
+                                  Weapon("?", "?", 80, Decimal("0"), Decimal("0"), Decimal("0")),
+                                  relics)
+
+character2 = TestCharacter1.build(Event, "Test Character 2", "No", 80,
+                                  CBase(Decimal("201"), Decimal("70"), Decimal("85"), Decimal("100"), 125),
+                                  Weapon("?", "?", 80, Decimal("0"), Decimal("0"), Decimal("0")),
+                                  relics)
+
+print(enemy1, "\n", enemy2, "\n", character1, "\n", character2)

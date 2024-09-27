@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import namedtuple
 from decimal import Decimal
 
@@ -7,17 +9,17 @@ from .relic import Relics
 from .utils import calc_character_rate
 from .weapon import Weapon
 
-CBase = namedtuple("CBase", "base_health, base_defence, base_attack, base_speed")
-
-CBonus = namedtuple("CBonus", "bonus_health, bonus_defence, bonus_attack, bonus_speed")
+CBase = namedtuple("CBase", "base_health, base_defence, base_attack, base_speed, aggro")
 
 
 class Character(Movable):
-    def __init__(self, name: str, mt: str, health: Decimal, defence: Decimal, attack: Decimal,
+    def __init__(self, event: type[Event], name: str, mt: str, health: Decimal, defence: Decimal, attack: Decimal,
+                 aggro: int,
                  attributes: dict[str, Decimal], speed: Decimal, level: int = 1, weapon: Weapon = None,
                  enhances: Relics = None):
-        super().__init__(name, health, defence, attack, speed, attributes)
+        super().__init__(event, name, health, defence, attack, speed, attributes)
         self.mt = mt
+        self.aggro = aggro
         self.level = level
         self.weapon = weapon
         self.enhances = enhances
@@ -30,8 +32,9 @@ class Character(Movable):
         return str(self)
 
     @classmethod
-    def build(cls, name: str, mt: str, level: int, base_value: CBase, weapon: Weapon, relics: Relics):
-        base_health, base_defence, base_attack, base_speed = base_value
+    def build(cls, event: type[Event], name: str, mt: str, level: int, base_value: CBase, weapon: Weapon,
+              relics: Relics):
+        base_health, base_defence, base_attack, base_speed, aggro = base_value
         total_value = relics.calc_total_value()
         health = (base_health * calc_character_rate(level, promotion=True) + weapon.health) * (
                 total_value.get("health_percent", 0) + 1) + total_value.get("health",
@@ -43,6 +46,7 @@ class Character(Movable):
                 total_value.get("health_percent", 0) + 1) + total_value.get("attack",
                                                                             0)
         speed = base_speed + total_value.get("speed", 0)
+        print(total_value)
         attribute = {"crit_attack": Decimal(.5) + total_value.get("crit_attack", 0),
                      "crit_chance": Decimal(.05) + total_value.get("crit_chance", 0),
                      "effect_resistance": total_value.get("effect_resistance", 0),
@@ -54,12 +58,9 @@ class Character(Movable):
         defence *= (total_value.get("defence_percent", 0) + 1)
         attack *= (total_value.get("attack_percent", 0) + 1)
 
-        bd = cls(name, mt, health, defence, attack, attribute, speed, level, weapon, relics)
-        return bd.register_skill()
+        bd = cls(event, name, mt, health, defence, attack, aggro, attribute, speed, level, weapon, relics)
+        bd.register_skill()
+        return bd
 
     def register_skill(self):
-        return self
-
-
-class CharacterEvent(Character, Event):
-    pass
+        pass
