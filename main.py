@@ -1,10 +1,12 @@
 import os
 from decimal import Decimal
 
+from aluminium.battle import Battle
 from aluminium.character import CBase, Character
 from aluminium.damage import Damage
 from aluminium.enemy import EBase, EBonus, Enemy
 from aluminium.event import Event
+from aluminium.queue import Queue
 from aluminium.relic import Relic, Relics
 from aluminium.weapon import Weapon
 
@@ -38,8 +40,6 @@ class TestEnemy2(Enemy):
 
 
 class TestCharacter1(Character):
-    def on_battle_start(self, battle):
-        print("on battle start", self, battle)
 
     def register_skill(self):
         self.skills["common"] = self.skill1
@@ -56,7 +56,7 @@ class TestCharacter1(Character):
 # not use the Class().
 
 
-relic_body = Relic.generate_from_json("body", 1, 5, {
+relic_body = Relic.generate_from_json(Event, "body", 1, 5, {
     "main_attribute": {
         "crit_chance": 15
     },
@@ -80,7 +80,7 @@ relic_body = Relic.generate_from_json("body", 1, 5, {
     }
 }, 2)
 
-relic_head = Relic.generate_from_json("head", 1, 5, {
+relic_head = Relic.generate_from_json(Event, "head", 1, 5, {
     "main_attribute": {
         "health": 15
     },
@@ -104,7 +104,7 @@ relic_head = Relic.generate_from_json("head", 1, 5, {
     }
 }, 2)
 
-relic_boot = Relic.generate_from_json("boot", 1, 5, {
+relic_boot = Relic.generate_from_json(Event, "boot", 1, 5, {
     "main_attribute": {
         "attack_percent": 15
     },
@@ -128,7 +128,7 @@ relic_boot = Relic.generate_from_json("boot", 1, 5, {
     }
 }, 2)
 
-relic_hand = Relic.generate_from_json("hand", 1, 5, {
+relic_hand = Relic.generate_from_json(Event, "hand", 1, 5, {
     "main_attribute": {
         "attack": 15
     },
@@ -151,7 +151,7 @@ relic_hand = Relic.generate_from_json("hand", 1, 5, {
         }
     }
 }, 2)
-relic_line = Relic.generate_from_json("ball", 1, 5, {
+relic_line = Relic.generate_from_json(Event, "ball", 1, 5, {
     "main_attribute": {
         "physical_damage_boost": 15
     },
@@ -174,7 +174,7 @@ relic_line = Relic.generate_from_json("ball", 1, 5, {
         }
     }
 }, 2)
-relic_ball = Relic.generate_from_json("line", 1, 5, {
+relic_ball = Relic.generate_from_json(Event, "line", 1, 5, {
     "main_attribute": {
         "energy_regeneration_rate": 15
     },
@@ -211,9 +211,9 @@ enemy2_base = EBase(base_health=Decimal("55.8"), base_speed=Decimal("100"), base
 enemy2_bonus = EBonus(bonus_defence=Decimal("1"), bonus_speed=Decimal("1"), bonus_attack=Decimal("1"),
                       bonus_health=Decimal("1"))
 
-enemy1 = TestEnemy1.build(Event, "Test Enemy 1", 74, 1, enemy1_base, enemy1_bonus, ["ice", "wind"], 30, {})
+enemy1 = TestEnemy1.build(Event, "Test E 1", 74, 1, enemy1_base, enemy1_bonus, ["ice", "wind"], 30, {})
 
-enemy2 = TestEnemy2.build(Event, "Test Enemy 2", 74, 1, enemy2_base, enemy2_bonus, ["physics", "thunder"], 60, {})
+enemy2 = TestEnemy2.build(Event, "Test E 2", 74, 1, enemy2_base, enemy2_bonus, ["physics", "thunder"], 60, {})
 
 relics = Relics()
 
@@ -224,14 +224,57 @@ relics.wear(relic_ball)
 relics.wear(relic_boot)
 relics.wear(relic_line)
 
-character1 = TestCharacter1.build(Event, "Test Character 1", "No", 80,
-                                  CBase(Decimal("184.8"), Decimal("69.3"), Decimal("81.84"), Decimal("98"), 100),
-                                  Weapon("?", "?", 80, Decimal("0"), Decimal("0"), Decimal("0")),
+character1 = TestCharacter1.build(Event, "Test C 1", "No", 80,
+                                  CBase(Decimal("184.8"), Decimal("69.3"), Decimal("81.84"), Decimal("98"), 100, 120),
+                                  Weapon(Event, "?1", "?", 80, Decimal("48"), Decimal("24"), Decimal("24")),
                                   relics)
 
-character2 = TestCharacter1.build(Event, "Test Character 2", "No", 80,
-                                  CBase(Decimal("201"), Decimal("70"), Decimal("85"), Decimal("100"), 125),
-                                  Weapon("?", "?", 80, Decimal("0"), Decimal("0"), Decimal("0")),
+character2 = TestCharacter1.build(Event, "Test C 2", "No", 80,
+                                  CBase(Decimal("201"), Decimal("70"), Decimal("85"), Decimal("100"), 125, 140),
+                                  Weapon(Event, "?2", "?", 80, Decimal("38.4"), Decimal("12"), Decimal("69.6")),
                                   relics)
 
-print(enemy1, "\n", enemy2, "\n", character1, "\n", character2)
+# print(enemy1, "\n", enemy2, "\n", character1, "\n", character2)
+
+battle_queue = Queue([character1, character2], [enemy1, enemy2])
+
+battle = Battle(battle_queue)
+
+battle.start_battle()
+move = None
+
+while battle.over():
+    battle.print_info()
+    print("行动: ", move if not move else move.name)
+    while True:
+        command = input()
+        if command == "step_in":
+            if move:
+                move.length = 0
+            battle.step_in()
+            break
+        elif command == "queue":
+            battle.queue.print()
+        elif command == "pi":
+            battle.print_more_info()
+        elif command == "common" and move:
+            print("释放普攻")
+        elif command == "skill" and move:
+            print("释放战绩")
+        elif command == "ultra" and move:
+            print("释放终结技")
+        elif command == "cheat":
+            for enemy in battle.queue.enemy_queue:
+                enemy.health = 0
+            print("成功作弊!")
+        elif command == "kill_player":
+            for character in battle.queue.character_queue:
+                character.health = 0
+        elif not command:
+            pass
+        else:
+            print("未知命令!")
+    move = battle.get_move()
+    battle.check_death()
+    print(battle.check_win())
+    print(battle.check_fail())

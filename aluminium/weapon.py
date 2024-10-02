@@ -1,12 +1,14 @@
 from decimal import Decimal
 
-from aluminium.utils import calc_attacker_rate
+from .event import Event
+from .utils import calc_attacker_rate
 
 
 class Weapon:
     def __init__(
-            self, name: str, mt: str, level: int, health: Decimal, defence: Decimal, attack: Decimal
+            self, event: type[Event], name: str, mt: str, level: int, health: Decimal, defence: Decimal, attack: Decimal
     ):
+        self.event = event
         self.name = name
         self.mt = mt
         self.level = level
@@ -21,10 +23,10 @@ class Weapon:
         return str(self)
 
     @classmethod
-    def build(cls, name: str, mt: str, level: int, base_health: Decimal, base_defense: Decimal, base_attack: Decimal,
+    def build(cls, event: type[Event], name: str, mt: str, level: int, base_health: Decimal, base_defense: Decimal, base_attack: Decimal,
               promotion: bool = True):
         health = base_health * calc_attacker_rate(level, promotion)
         defense = base_defense * calc_attacker_rate(level, promotion)
         attack = base_attack * calc_attacker_rate(level, promotion)
 
-        return cls(name, mt, level, health, defense, attack)
+        return cls(event, name, mt, level, health, defense, attack)

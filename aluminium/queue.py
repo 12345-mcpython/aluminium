@@ -18,12 +18,15 @@ class Queue:
             print(i.name, "\t", round(i.tick), "\t", i.length)
         print()
 
+    def init_queue(self):
+        self.calc_tick()
+
     def calc_tick(self):
         for i in self.queue:
             i.tick = (Decimal(10000) - i.length) / i.speed
 
     def move(self):
-        fastest = max(self.queue, key=lambda a: a.length)
+        fastest = min(self.queue, key=lambda a: a.tick)
         move_tick = (Decimal(10000) - fastest.length) / fastest.speed
         for i in self.queue:
             i.length += i.speed * move_tick

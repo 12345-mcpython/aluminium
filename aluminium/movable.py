@@ -23,3 +23,7 @@ class Movable:
     @property
     def health(self):
         return math.floor(self.__health)
+
+    @health.setter
+    def health(self, value):
+        self.__health = value

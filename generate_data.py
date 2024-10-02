@@ -145,7 +145,9 @@ for character_promote in character_promote_json:
         "attack": character_promote["AttackBase"]["Value"],
         "defence": character_promote["DefenceBase"]["Value"],
         "speed": character_promote["SpeedBase"]["Value"],
-        "aggro": character_promote["BaseAggro"]["Value"]
+        "aggro": character_promote["BaseAggro"]["Value"],
+        "crit_chance": character_promote["CriticalChance"]["Value"],
+        "crit_damage": character_promote["CriticalDamage"]["Value"]
     }
     characters_value_data[character_promote["AvatarID"]] = character_value_data
 

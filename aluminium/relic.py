@@ -4,6 +4,7 @@ import math
 import random
 from decimal import Decimal
 
+from .event import Event
 from .value import MAIN_ATTRIBUTE, SUB_ATTRIBUTE
 
 position_attributes = {i: list(j.keys()) for i, j in MAIN_ATTRIBUTE.read("2").items()}
@@ -36,15 +37,17 @@ class Attribute:
 class Relic:
     def __init__(
             self,
+            event: type[Event],
             level: int,
-            enhance_id: int,
+            name: str,
             position: str,
             star: int,
             main_attribute: Attribute,
             sub_attributes: list[Attribute],
     ):
+        self.event = event
         self.level = level
-        self.enhance_id = enhance_id
+        self.name = name
         self.position = position
         self.star = star
         self.main_attribute = main_attribute
@@ -52,8 +55,8 @@ class Relic:
         # self.total_xp = sum(xp[str(star)][:level])
 
     @classmethod
-    def generate_random_enhance(
-            cls, position: str, enhance_id: int, star: int
+    def generate_random_relic(
+            cls, event: type[Event], name: str, position: str, star: int
     ) -> Relic:
         star_main_attributes = main_attribute_star_mapping[str(star)][position]
         star_sub_attributes = sub_attribute_star_mapping[str(star)]
@@ -72,33 +75,33 @@ class Relic:
             Attribute(i, j, extra=0)
             for i, j in zip(chosen_sub_attributes, chosen_sub_attributes_base)
         ]
-        return cls(0, enhance_id, position, star, main_attribute, sub_attributes)
+        return cls(event, 0, name, position, star, main_attribute, sub_attributes)
 
     @classmethod
-    def generate_from_json(cls, position: str, enhance_id: int, star: int,
-                           enhance_json: dict, format_version: int = 1,
+    def generate_from_json(cls, event: type[Event], position: str, name: int, star: int,
+                           relic_json: dict, format_version: int = 1,
                            level: int = 15, verify: bool = True):
         """
-        Generate Enhance from json
+        Generate Relic from json
         :param format_version:
-        :param verify: check the enhances validity
-        :param level: enhance level
-        :param position: enhance position "hand" "head" "body" "boot" "ball" "line"
-        :param enhance_id: enhance id
-        :param star: enhance star 2,3,4,5
-        :param enhance_json: {"main_attribute": {"crit_attack": 15},
+        :param verify: check the relics validity
+        :param level: relic level
+        :param position: relic position "hand" "head" "body" "boot" "ball" "line"
+        :param name: name
+        :param star: relic star 2,3,4,5
+        :param relic_json: {"main_attribute": {"crit_attack": 15},
                  "sub_attributes": {"crit_chance": [3], "health": [3], "defence": [1], "speed": [3,3,3,3,3,3]}}
         3, 3, 3, 3, 3, 3 is the promote level.
-        :return: Enhance class
+        :return: relic class
         """
 
         # Verify part begin
-        main_attribute = enhance_json["main_attribute"]
-        sub_attributes = enhance_json["sub_attributes"]
+        main_attribute = relic_json["main_attribute"]
+        sub_attributes = relic_json["sub_attributes"]
 
         if verify and format_version == 1:
-            assert level <= star * 3, f"The enhances level can't above {star * 3}."
-            assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
+            assert level <= star * 3, f"The relics level can't above {star * 3}."
+            assert all([relic_json.get("main_attribute"), relic_json.get("sub_attributes")]), \
                 "JSON don't have 'main_attribute' or 'sub_attributes' keys."
 
             assert list(main_attribute.values())[0] <= 15, "The main attribute's promote level can't above 15."
@@ -116,8 +119,8 @@ class Relic:
             assert list(main_attribute.keys())[0] in position_attributes[
                 position], f"Illegal main attribute '{list(main_attribute.keys())[0]}' in position '{position}'."
         if verify and format_version == 2:
-            assert level <= star * 3, f"The enhances level can't above {star * 3}."
-            assert all([enhance_json.get("main_attribute"), enhance_json.get("sub_attributes")]), \
+            assert level <= star * 3, f"The relics level can't above {star * 3}."
+            assert all([relic_json.get("main_attribute"), relic_json.get("sub_attributes")]), \
                 "JSON don't have 'main_attribute' or 'sub_attributes' keys."
 
         # Verify part end
@@ -155,7 +158,7 @@ class Relic:
         else:
             raise Exception("Unknown format version:", format_version)
 
-        return cls(level, enhance_id, position, star, main_attribute_class, sub_attributes_class)
+        return cls(event, level, name, position, star, main_attribute_class, sub_attributes_class)
 
     def print(self):
         print("Level: ", self.level)
@@ -215,7 +218,7 @@ class Relic:
                 promoted_sub_attribute.extra += 1
 
     def __str__(self) -> str:
-        return f"<{type(self).__name__} enhance_id={self.enhance_id} positon={self.position} star={self.star} main_attribute={self.main_attribute} sub_attribute={','.join(str(i) for i in self.sub_attributes)}>"
+        return f"<{type(self).__name__} name={self.name} positon={self.position} star={self.star} main_attribute={self.main_attribute} sub_attribute={','.join(str(i) for i in self.sub_attributes)}>"
 
     def __repr__(self):
         return str(self)
@@ -255,21 +258,21 @@ class Relics:
                     total[j.left] = j.right
         return total
 
-    def wear(self, enhance: Relic):
-        match enhance.position:
+    def wear(self, relic: Relic):
+        match relic.position:
             case "hand":
-                self.hand = enhance
+                self.hand = relic
             case "head":
-                self.head = enhance
+                self.head = relic
             case "body":
-                self.body = enhance
+                self.body = relic
             case "boot":
-                self.boot = enhance
+                self.boot = relic
             case "ball":
-                self.ball = enhance
+                self.ball = relic
             case "line":
-                self.line = enhance
+                self.line = relic
             case _:
-                return ValueError(f"Can't wear Position {enhance.position}.")
+                return ValueError(f"Can't wear Position {relic.position}.")
 
         self.total: list[Relic] = [self.hand, self.head, self.body, self.boot, self.ball, self.line]
