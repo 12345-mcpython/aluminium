@@ -42,16 +42,21 @@ class Battle:
         self.move_object = None
 
     def check_death(self):
-        for i in self.queue.queue:
+        for i in self.queue.get_movable():
             if i.health == 0:
                 if isinstance(i, Character):
                     # on_character_died 返回 False 则不默认处理 died 事件用于复活
                     if not i.event.on_character_died(self, i):
                         print(i.name, "卒")
+                        i.length = -2 ** 32
+                        i.saw = False
                 if isinstance(i, Enemy):
                     if not i.event.on_enemy_died(self, i):
                         print(i.name, "卒")
+                        i.length = -2 ** 32
+                        i.saw = False
 
+    # all thing died
     def check_fail(self):
         if all([i.health == 0 for i in self.queue.queue if isinstance(i, Character)]):
             return True
@@ -69,23 +74,23 @@ class Battle:
         return character.skills[skill_name]["type"]
 
     def print_info(self):
-        for index, enemy in enumerate(self.queue.enemy_queue):
+        for index, enemy in enumerate(self.queue.get_enemy_list()):
             print(
                 f"{index} \"{enemy.name}\" {enemy.health / math.floor(enemy.max_health):.3%} {enemy.stance}/{enemy.max_stance}")
         print()
-        for index, character in enumerate(self.queue.character_queue):
+        for index, character in enumerate(self.queue.get_character_list()):
             print(f"{index} \"{character.name}\" {character.health}/{math.floor(character.max_health)} "
                   f"{character.energy / character.max_energy:.0%} 预留buff")
 
     def print_more_info(self):
-        for index, enemy in enumerate(self.queue.enemy_queue):
+        for index, enemy in enumerate(self.queue.get_enemy_list()):
             print(
                 f"{index} \"{enemy.name}\" {enemy.health / math.floor(enemy.max_health):.3%} {enemy.stance}/{enemy.max_stance}")
             print(f"行动值: {enemy.tick} {enemy.length} {enemy.attributes}")
             print(
                 f"health: {enemy.health}/{math.floor(enemy.max_health)} attack: {enemy.attack} defensive: {enemy.defence} speed: {enemy.speed}")
         print()
-        for index, character in enumerate(self.queue.character_queue):
+        for index, character in enumerate(self.queue.get_character_list()):
             print(f"{index} \"{character.name}\" {character.health}/{math.floor(character.max_health)} "
                   f"{character.energy / character.max_energy:.0%} 预留buff")
             print(f"行动值: {character.tick} {character.length} {character.attributes}")

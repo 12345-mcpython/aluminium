@@ -151,6 +151,7 @@ relic_hand = Relic.generate_from_json(Event, "hand", 1, 5, {
         }
     }
 }, 2)
+
 relic_line = Relic.generate_from_json(Event, "ball", 1, 5, {
     "main_attribute": {
         "physical_damage_boost": 15
@@ -174,6 +175,7 @@ relic_line = Relic.generate_from_json(Event, "ball", 1, 5, {
         }
     }
 }, 2)
+
 relic_ball = Relic.generate_from_json(Event, "line", 1, 5, {
     "main_attribute": {
         "energy_regeneration_rate": 15
@@ -211,9 +213,23 @@ enemy2_base = EBase(base_health=Decimal("55.8"), base_speed=Decimal("100"), base
 enemy2_bonus = EBonus(bonus_defence=Decimal("1"), bonus_speed=Decimal("1"), bonus_attack=Decimal("1"),
                       bonus_health=Decimal("1"))
 
-enemy1 = TestEnemy1.build(Event, "Test E 1", 74, 1, enemy1_base, enemy1_bonus, ["ice", "wind"], 30, {})
 
-enemy2 = TestEnemy2.build(Event, "Test E 2", 74, 1, enemy2_base, enemy2_bonus, ["physics", "thunder"], 60, {})
+class EnemyEvent1(Event):
+    def __init__(self, movable):
+        super().__init__(movable)
+        self.died = False
+
+    def on_enemy_died(self, battle, enemy) -> bool:
+        if self.died:
+            return super().on_enemy_died(battle, enemy)
+        enemy.health += 1
+        self.died = True
+        return True
+
+
+enemy1 = TestEnemy1.build(EnemyEvent1, "Test E 1", 74, 1, enemy1_base, enemy1_bonus, ["ice", "wind"], 30, {})
+
+enemy2 = TestEnemy2.build(Event, "Test E 2", 74, 1, enemy2_base, enemy2_bonus, ["physical", "thunder"], 60, {})
 
 relics = Relics()
 
@@ -224,7 +240,19 @@ relics.wear(relic_ball)
 relics.wear(relic_boot)
 relics.wear(relic_line)
 
-character1 = TestCharacter1.build(Event, "Test C 1", "No", 80,
+
+class Event1(Event):
+    def on_battle_start(self, battle: Battle):
+        print("on_battle_start called")
+        self.movable.health *= .5
+        for character in battle.queue.character_queue:
+            if character != self.movable:
+                character.health *= .5
+        for enemy in battle.queue.enemy_queue:
+            enemy.health *= .25
+
+
+character1 = TestCharacter1.build(Event1, "Test C 1", "No", 80,
                                   CBase(Decimal("184.8"), Decimal("69.3"), Decimal("81.84"), Decimal("98"), 100, 120),
                                   Weapon(Event, "?1", "?", 80, Decimal("48"), Decimal("24"), Decimal("24")),
                                   relics)
@@ -235,8 +263,9 @@ character2 = TestCharacter1.build(Event, "Test C 2", "No", 80,
                                   relics)
 
 # print(enemy1, "\n", enemy2, "\n", character1, "\n", character2)
-
+#
 battle_queue = Queue([character1, character2], [enemy1, enemy2])
+battle_queue.reset()
 
 battle = Battle(battle_queue)
 
@@ -248,12 +277,9 @@ while battle.over():
     print("行动: ", move if not move else move.name)
     while True:
         command = input()
-        if command == "step_in":
-            if move:
-                move.length = 0
-            battle.step_in()
+        if command == "si":
             break
-        elif command == "queue":
+        elif command == "q":
             battle.queue.print()
         elif command == "pi":
             battle.print_more_info()
@@ -274,7 +300,13 @@ while battle.over():
             pass
         else:
             print("未知命令!")
+    if move:
+        move.length = 0
+        battle.queue.calc_tick()
+    battle.step_in()
     move = battle.get_move()
     battle.check_death()
-    print(battle.check_win())
-    print(battle.check_fail())
+    if battle.check_win():
+        print("战斗成功")
+    if battle.check_fail():
+        print("战斗失败")

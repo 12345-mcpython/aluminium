@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from aluminium.character import Character
-from aluminium.enemy import Enemy
+from .character import Character
+from .enemy import Enemy
 
 
 class Queue:
@@ -12,30 +12,44 @@ class Queue:
         self.enemy_queue = enemy_queue
         self.queue: list[Character | Enemy] = list(character_queue) + list(enemy_queue)
 
+    def get_enemy_list(self):
+        return [i for i in self.enemy_queue if i.saw]
+
+    def get_character_list(self):
+        return [i for i in self.character_queue if i.saw]
+
+    def get_movable(self):
+        return [i for i in self.queue if i.saw]
+
     def print(self):
         print("队列")
-        for i in sorted(self.queue, key=lambda a: a.tick):
+        for i in sorted(self.get_movable(), key=lambda a: a.tick):
             print(i.name, "\t", round(i.tick), "\t", i.length)
         print()
+
+    def reset(self):
+        for i in self.get_movable():
+            i.length = 0
+            i.tick = 0
 
     def init_queue(self):
         self.calc_tick()
 
     def calc_tick(self):
-        for i in self.queue:
+        for i in self.get_movable():
             i.tick = (Decimal(10000) - i.length) / i.speed
 
     def move(self):
-        fastest = min(self.queue, key=lambda a: a.tick)
+        fastest = min(self.get_movable(), key=lambda a: a.tick)
         move_tick = (Decimal(10000) - fastest.length) / fastest.speed
-        for i in self.queue:
+        for i in self.get_movable():
             i.length += i.speed * move_tick
             if i.length > Decimal(10000):
                 i.length = Decimal(10000)
         self.calc_tick()
 
     def get_move(self):
-        return max(self.queue, key=lambda a: a.length)
+        return max(self.get_movable(), key=lambda a: a.length)
 
     def move_front(self, refactor_object: Character | Enemy, length):
         refactor_object.length += Decimal(length)

@@ -15,16 +15,16 @@ class Event:
         pass
 
     def on_enemy_killed(self, battle, enemy, killer) -> bool:
-        pass
+        return False
 
     def on_character_killed(self, battle, character, killer) -> bool:
-        pass
+        return False
 
     def on_character_died(self, battle, character) -> bool:
-        pass
+        return False
 
     def on_enemy_died(self, battle, enemy) -> bool:
-        pass
+        return False
 
     def before_move(self, battle):
         pass

@@ -18,6 +18,7 @@ class Movable:
         self.speed = speed
         self.tick = Decimal(0)
         self.length = Decimal(0)
+        self.saw = True
         self.attributes = attributes
 
     @property
