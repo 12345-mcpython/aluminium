@@ -3,7 +3,7 @@ import pathlib
 import sys
 
 print("aluminium data generator 1.0.0-dev")
-print("data version: 2.5.0")
+print("data version: 2.6.0")
 
 data_path_file = pathlib.Path("data/data_path.txt")
 

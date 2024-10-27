@@ -1,1 +1,1 @@
-You can run `python generate_data.py` to generate data by using this project [Dimbreath/StarRailData/](https://github.com/Dimbreath/StarRailData/)
+You can run `python generate_data.py` to generate data by using this project ~~[Dimbreath/StarRailData/](https://github.com/Dimbreath/StarRailData/)~~ [Yuuki](https://gitlab.com/YuukiPS/SR-Resources).
