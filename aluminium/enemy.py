@@ -32,7 +32,6 @@ class Enemy(Movable):
         self.cursor = 1
 
     def __repr__(self) -> str:
-        p = "self."
         return f"<{type(self).__name__} health={self.health} defense={self.defence} attack={self.attack} speed={self.speed} length={self.length} tick={self.tick} stance={self.stance}/{self.max_stance} stance_weak={self.stance_weak} attributes={self.attributes}>"
 
     @classmethod
@@ -56,8 +55,4 @@ class Enemy(Movable):
             if not attribute.get(f"{i}_resistance"):
                 attribute[f"{i}_resistance"] = Decimal(".2")
         bd = cls(event, name, health, defence, attack, speed, Decimal(stance_length), stance, attribute)
-        bd.register_skill()
         return bd
-
-    def register_skill(self):
-        pass

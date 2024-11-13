@@ -30,6 +30,10 @@ def parse_stance_list(stance_list: list):
     return {"single": stance_list[0]["Value"], "all": stance_list[1]["Value"], "spread": stance_list[2]["Value"]}
 
 
+def parse_param_list(param_list: list):
+    return [i["Value"] for i in param_list]
+
+
 hard_level_group = {}
 
 with (file_path / "ExcelOutput" / "HardLevelGroup.json").open(encoding="utf-8") as f:
@@ -179,7 +183,7 @@ for skill in character_skill_json:
              skill["ShowStanceList"]),
          "skill_effect": skill.get("SkillEffect"),
          "skill_id": skill["SkillID"],
-         "param_list": skill["ParamList"],
+         "param_list": parse_param_list(skill["ParamList"]),
          # regex: #\d\[i\]\%
          "skill_introduction": translate(
              skill["SkillDesc"]["Hash"]),

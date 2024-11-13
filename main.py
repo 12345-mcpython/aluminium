@@ -3,7 +3,6 @@ from decimal import Decimal
 
 from aluminium.battle import Battle
 from aluminium.character import CBase, Character
-from aluminium.damage import Damage
 from aluminium.enemy import EBase, EBonus, Enemy
 from aluminium.event import Event
 from aluminium.queue import Queue
@@ -14,42 +13,16 @@ os.chdir(os.path.dirname(__file__))
 
 
 class TestEnemy1(Enemy):
-    def register_skill(self):
-        self.skills[1] = self.skill1
-
-    def skill1(self):
-        return Damage(Decimal("2.5") * self.attack, 0, Decimal(0), "quantum", "single", self)
-
-    def attack_object(self, character):
-        character.get_damage(self.skills[self.cursor])
+    pass
 
 
 class TestEnemy2(Enemy):
-    def register_skill(self):
-        self.skills[1] = self.skill1
-        self.skills[2] = self.skill2
-        return self
-
-    def skill1(self):
-        self.cursor = 2
-        return Damage(Decimal("2.5") * self.attack, 0, Decimal(0), "imaginary", "single", self)
-
-    def skill2(self):
-        self.cursor = 1
-        return Damage(Decimal("1.5") * self.attack, 0, Decimal("1.5") * self.attack, "imaginary", "spread", self)
+    pass
 
 
 class TestCharacter1(Character):
-
-    def register_skill(self):
-        self.skills["common"] = self.skill1
-        self.skills["bp"] = self.skill2
-
-    def skill1(self):
-        return Damage(Decimal("1.5") * self.attack, 30, Decimal(0), "physical", "single", self)
-
-    def skill2(self):
-        return Damage(Decimal("2.5") * self.attack, 60, Decimal(0), "physical", "single", self)
+    def common(self, attack_object: Enemy):
+        attack_object.health -= Decimal(self.skills_rate[self.skills_level] * self.attack)
 
 
 # The character and enemy class should use build() method to get the instance

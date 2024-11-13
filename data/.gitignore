@@ -1,3 +1,4 @@
 *.json
 *.txt
 !relic_mappings.json
+!skill_mapping.json

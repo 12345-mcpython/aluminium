@@ -33,6 +33,10 @@ class Damage:
 
 
 class DamageCalculator:
+    @classmethod
+    def calc_skill_damage(cls, character, skill_value):
+        pass
+
     # Area part
     @classmethod
     def calc_defence_area(cls, damage, attacker_level, attacked_defence):
