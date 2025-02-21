@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'idea'
+}
+
+group = 'com.laosun'
+version = '1.0-SNAPSHOT'
+
+application {
+    mainClass = 'com.laosun.Main'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    implementation 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+    implementation 'com.google.code.gson:gson:2.12.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+idea {
+    module {
+        downloadSources true
+    }
+}
+
+tasks.register('data', JavaExec) {
+    group 'data'
+    classpath sourceSets.main.runtimeClasspath
+    systemProperty 'aluminium.dataDir', dataPath
+    mainClass = "com.laosun.aluminium.data.Main"
+}
