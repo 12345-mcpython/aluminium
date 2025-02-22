@@ -1,29 +1,21 @@
 plugins {
     id 'java'
-    id 'application'
-    id 'idea'
-}
-
-application {
-    mainClass = 'com.laosun.Main'
 }
 
 group = 'com.laosun'
 version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation project(":beans")
-    implementation 'org.projectlombok:lombok:1.18.36'
-    annotationProcessor 'org.projectlombok:lombok:1.18.36'
     implementation 'com.google.code.gson:gson:2.12.1'
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -33,9 +25,9 @@ test {
     useJUnitPlatform()
 }
 
-idea {
-    module {
-        downloadSources true
-    }
+tasks.register('data', JavaExec) {
+    group 'data'
+    classpath sourceSets.main.runtimeClasspath
+    systemProperty 'aluminium.dataDir', dataPath
+    mainClass = "com.laosun.aluminium.data.Main"
 }
-
