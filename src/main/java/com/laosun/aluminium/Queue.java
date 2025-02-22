@@ -1,33 +1,49 @@
 package com.laosun.aluminium;
 
-import com.laosun.aluminium.models.Moveable;
+import com.laosun.aluminium.models.CanHit;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+
+import com.laosun.aluminium.models.Moveable;
 
 @Getter
 @ToString
-public class Queue {
+public final class Queue {
     private final ArrayList<Moveable> queue = new ArrayList<>();
-
-    public Queue() {
-    }
 
     public <T extends Moveable> void add(List<T> list) {
         queue.addAll(list);
     }
 
     public void initialize() {
-        for (Moveable moveable : queue) {
-            moveable.setTime(10000.0 / moveable.getSpeed());
+        calcTime();
+    }
+
+    public void reset() {
+        for (Moveable m : queue) {
+            m.setLength(0);
+            m.setTime(0);
         }
+        calcTime();
+    }
+
+    public void calcTime() {
+        for (Moveable moveable : queue) {
+            moveable.setTime((10000.0 - moveable.getLength()) / moveable.getSpeed());
+        }
+        queue.sort(Comparator.comparingDouble(Moveable::getTime));
     }
 
     public void move() {
+        double time = getFastest().getTime();
+        for (Moveable moveable : queue) {
+            moveable.setLength(time * moveable.getSpeed());
+            if (moveable.getLength() > 10000.0) {
+                moveable.setLength(10000.0);
+            }
+        }
     }
 
     public Moveable getTop() {
@@ -36,5 +52,18 @@ public class Queue {
 
     public Moveable getFastest() {
         return Collections.min(queue, Comparator.comparingDouble(Moveable::getTime));
+    }
+
+    public void print() {
+        System.out.println("name\tlength\ttime\tspeed");
+        for (Moveable m : queue) {
+            System.out.println(((CanHit) m).getName() + "\t" + Math.round(m.getLength()) + "\t\t" + Math.round(m.getTime()) + "\t\t" + m.getSpeed());
+        }
+        System.out.println();
+    }
+
+    public void setTopZero() {
+        queue.getFirst().setLength(0);
+        calcTime();
     }
 }

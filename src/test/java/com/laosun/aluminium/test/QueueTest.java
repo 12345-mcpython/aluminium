@@ -1,14 +1,18 @@
-package com.laosun;
+package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Queue;
-import com.laosun.aluminium.beans.Model;
-import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Moveable;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class Main {
-    public static void main(String[] args) {
+import static org.junit.jupiter.api.Assertions.*;
+
+import com.laosun.aluminium.models.Character;
+
+public class QueueTest {
+    @Test
+    public void testCalcTime() {
         Character c1 = new Character("test 1", 100, 100, 100, 100, 110);
         Character c2 = new Character("test 2", 200, 200, 200, 100, 150);
         Character c3 = new Character("test 3", 100, 100, 100, 100, 130);
@@ -21,21 +25,14 @@ public class Main {
         Character c10 = new Character("test 10", 200, 200, 200, 100, 143);
         Queue q = new Queue();
         q.add(List.of(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10));
-        System.out.println("Init");
         q.initialize();
-        q.print();
-        System.out.println("Start move");
-        q.move();
-        q.print();
-        System.out.println("Set top zero");
-        q.setTopZero();
-        q.print();
-        System.out.println("Start move");
-        q.move();
-        q.print();
-//        System.out.println(q);
-//        System.out.println(c1);
-//        System.out.println(c2);
-//        System.out.println(Model.TEST);
+        for (Moveable moveable : q.getQueue()) {
+            assertEquals(moveable.getTime(), 10000.0 / moveable.getSpeed());
+        }
+    }
+
+    @Test
+    public void testMove() {
+
     }
 }
