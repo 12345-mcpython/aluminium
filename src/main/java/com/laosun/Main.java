@@ -1,6 +1,7 @@
 package com.laosun;
 
 import com.laosun.aluminium.Queue;
+import com.laosun.aluminium.beans.Model;
 import com.laosun.aluminium.models.Character;
 
 import java.util.List;
@@ -15,5 +16,6 @@ public class Main {
         System.out.println(q);
         System.out.println(c1);
         System.out.println(c2);
+        System.out.println(Model.TEST);
     }
 }
