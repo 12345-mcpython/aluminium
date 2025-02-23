@@ -1,12 +1,12 @@
 package com.laosun.aluminium;
 
-import com.laosun.aluminium.models.CanHit;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.util.*;
 
 import com.laosun.aluminium.models.Moveable;
+import com.laosun.aluminium.models.CanHit;
 
 @Getter
 @ToString
@@ -39,11 +39,12 @@ public final class Queue {
     public void move() {
         double time = getFastest().getTime();
         for (Moveable moveable : queue) {
-            moveable.setLength(time * moveable.getSpeed());
+            moveable.setLength(moveable.getLength() + time * moveable.getSpeed());
             if (moveable.getLength() > 10000.0) {
                 moveable.setLength(10000.0);
             }
         }
+        calcTime();
     }
 
     public Moveable getTop() {
