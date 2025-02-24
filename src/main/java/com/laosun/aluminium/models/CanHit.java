@@ -13,13 +13,23 @@ public abstract class CanHit extends Moveable {
     private double maxHealth;
     private double defence;
     private double attack;
+    private boolean death = false;
 
-    public CanHit(String name, double health, double maxHealth, double defense, double attack, double speed) {
+    private double inBattleHealth;
+    private double inBattleMaxHealth;
+    private double inBattleAttack;
+    private double inBattleDefence;
+
+    public CanHit(String name, double health, double defense, double attack, double speed) {
         super(speed);
         this.name = name;
         this.health = health;
-        this.maxHealth = maxHealth;
+        this.maxHealth = health;
         this.defence = defense;
         this.attack = attack;
+        this.inBattleDefence = defense;
+        this.inBattleHealth = health;
+        this.inBattleMaxHealth = health;
+        this.inBattleAttack = attack;
     }
 }
