@@ -4,14 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.HardLevelGroup;
+import com.laosun.aluminium.beans.RelicMainAttribute;
 import com.laosun.aluminium.data.origin.DoubleGetter;
 import com.laosun.aluminium.data.origin.RawHardLevelGroup;
+import com.laosun.aluminium.data.origin.RawRelicMainAffixConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+
+import static com.laosun.aluminium.beans.Model.PART_MAPPING;
 
 public class Main {
     public static void exportHardLevelGroups(String projectDir) throws IOException {
@@ -36,6 +40,23 @@ public class Main {
             }
         }
         Files.write(Path.of("data/hard_level_groups.json"), gson.toJson(hardLevelGroups).getBytes());
+    }
+
+    public static void exportRelicAttributes(String projectDir) throws IOException {
+        Map<Integer, Map<Integer, RelicMainAttribute>> p = new HashMap<>();
+        String relicMainAffixConfigString = Files.readString(Path.of(projectDir + "/ExcelOutput/RelicMainAffixConfig.json"));
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        List<RawRelicMainAffixConfig> rawRelicMainAffixConfigList = gson.fromJson(relicMainAffixConfigString, new TypeToken<>() {
+        });
+        for (RawRelicMainAffixConfig rawRelicMainAffixConfig : rawRelicMainAffixConfigList) {
+            int groupId = rawRelicMainAffixConfig.GroupID();
+            if (groupId > 100) {
+                continue;
+            }
+            String part = PART_MAPPING.get(groupId % 10);
+            int star = groupId / 10;
+
+        }
     }
 
     public static void main(String[] args) throws IOException {

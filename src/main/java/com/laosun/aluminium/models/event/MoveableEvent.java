@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Moveable;
 
 public interface MoveableEvent {
-    default void on_battle_start(Battle battle, Moveable moveable) {
+    default void onBattleStart(Battle battle, Moveable moveable) {
 
     }
 }
