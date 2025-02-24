@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 public class Character extends CanHit {
-    public Character(String name, double health, double maxHealth, double defence, double attack, double speed) {
-        super(name, health, maxHealth, defence, attack, speed);
+    public Character(String name, double health, double defence, double attack, double speed) {
+        super(name, health, defence, attack, speed);
     }
 }
