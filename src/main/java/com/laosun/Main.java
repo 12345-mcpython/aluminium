@@ -21,7 +21,7 @@ public class Main {
         Enemy c9 = new Enemy("test 4", 100, 100, 100, 132);
         Enemy c10 = new Enemy("test 5", 200, 200, 100, 143) {
             @Override
-            public void on_battle_start(Battle battle, Moveable moveable) {
+            public void onBattleStart(Battle battle, Moveable moveable) {
                 System.out.println("Battle start");
                 battle.getQueue().print();
                 moveable.move(1000);

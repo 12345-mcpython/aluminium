@@ -28,7 +28,7 @@ public class Battle {
     public void startBattle() {
         queue.initialize();
         for (Moveable moveable : queue.getQueue()) {
-            moveable.on_battle_start(this, moveable);
+            moveable.onBattleStart(this, moveable);
         }
     }
 
