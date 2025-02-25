@@ -16,16 +16,17 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static com.laosun.aluminium.beans.Model.PART_MAPPING;
+import static com.laosun.aluminium.beans.Model.RELIC_MAPPING;
 
 public class Main {
     public static void exportHardLevelGroups(String projectDir) throws IOException {
         Map<Integer, Map<Integer, HardLevelGroup>> hardLevelGroups = new HashMap<>();
-        String hardLevelGroupString = Files.readString(Path.of(projectDir + "/ExcelOutput/HardLevelGroup.json"));
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        var hardLevelGroupString = Files.readString(Path.of(projectDir + "/ExcelOutput/HardLevelGroup.json"));
+        var gson = new GsonBuilder().setPrettyPrinting().create();
         List<RawHardLevelGroup> rawHardLevelGroupList = gson.fromJson(hardLevelGroupString, new TypeToken<>() {
         });
         for (RawHardLevelGroup rawHardLevelGroup : rawHardLevelGroupList) {
-            HardLevelGroup h = new HardLevelGroup(
+            var h = new HardLevelGroup(
                     Objects.requireNonNullElse(rawHardLevelGroup.AttackRatio(), new DoubleGetter(0.0)).Value(),
                     Objects.requireNonNullElse(rawHardLevelGroup.DefenceRatio(), new DoubleGetter(0.0)).Value(),
                     Objects.requireNonNullElse(rawHardLevelGroup.HPRatio(), new DoubleGetter(0.0)).Value(),
@@ -43,32 +44,42 @@ public class Main {
     }
 
     public static void exportRelicAttributes(String projectDir) throws IOException {
-        Map<Integer, Map<Integer, RelicMainAttribute>> p = new HashMap<>();
-        String relicMainAffixConfigString = Files.readString(Path.of(projectDir + "/ExcelOutput/RelicMainAffixConfig.json"));
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Map<Integer, Map<String, Map<String, Map<String, Double>>>> p = new HashMap<>();
+        var relicMainAffixConfigString = Files.readString(Path.of(projectDir + "/ExcelOutput/RelicMainAffixConfig.json"));
+        var gson = new GsonBuilder().setPrettyPrinting().create();
         List<RawRelicMainAffixConfig> rawRelicMainAffixConfigList = gson.fromJson(relicMainAffixConfigString, new TypeToken<>() {
         });
-        for (RawRelicMainAffixConfig rawRelicMainAffixConfig : rawRelicMainAffixConfigList) {
+        for (var rawRelicMainAffixConfig : rawRelicMainAffixConfigList) {
             int groupId = rawRelicMainAffixConfig.GroupID();
             if (groupId > 100) {
                 continue;
             }
-            String part = PART_MAPPING.get(groupId % 10);
-            int star = groupId / 10;
-
+            var part = PART_MAPPING.get(groupId % 10);
+            var star = groupId / 10;
+            var left = RELIC_MAPPING.get(rawRelicMainAffixConfig.Property());
+            var processData = Utils.processRelicMainAttribute(rawRelicMainAffixConfig);
+            if (!p.containsKey(star)) {
+                p.put(star, new HashMap<>());
+            }
+            if (!p.get(star).containsKey(part)) {
+                p.get(star).put(part, new HashMap<>());
+            }
+            p.get(star).get(part).put(left, processData);
         }
+        Files.write(Path.of("data/main_attribute.json"), gson.toJson(p).getBytes());
     }
 
     public static void main(String[] args) throws IOException {
         if (!new File("data").exists()) {
-            boolean ignored = new File("data").mkdir();
+            var ignored = new File("data").mkdir();
         }
-        String projectDir = System.getProperty("aluminium.dataDir");
-        File dir = new File(projectDir);
+        var projectDir = System.getProperty("aluminium.dataDir");
+        var dir = new File(projectDir);
         if (!dir.exists()) {
             System.out.println("Directory does not exist.");
             System.exit(1);
         }
         exportHardLevelGroups(projectDir);
+        exportRelicAttributes(projectDir);
     }
 }
