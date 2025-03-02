@@ -39,3 +39,8 @@ idea {
     }
 }
 
+jar {
+    from('data') {
+        into 'data'
+    }
+}
