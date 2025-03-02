@@ -1,10 +1,8 @@
 package com.laosun.aluminium.data;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.HardLevelGroup;
-import com.laosun.aluminium.beans.RelicMainAttribute;
 import com.laosun.aluminium.data.origin.DoubleGetter;
 import com.laosun.aluminium.data.origin.RawHardLevelGroup;
 import com.laosun.aluminium.data.origin.RawRelicMainAffixConfig;

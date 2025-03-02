@@ -31,3 +31,10 @@ tasks.register('data', JavaExec) {
     systemProperty 'aluminium.dataDir', dataPath
     mainClass = "com.laosun.aluminium.data.Main"
 }
+
+tasks.register('copyMultipleFolders', Copy) {
+    from 'data'
+    into '../data'
+}
+
+data.finalizedBy(copyMultipleFolders)
