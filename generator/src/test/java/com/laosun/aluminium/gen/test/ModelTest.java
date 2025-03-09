@@ -1,4 +1,4 @@
-package com.laosun.aluminium.data.test;
+package com.laosun.aluminium.gen.test;
 
 import com.laosun.aluminium.beans.Model;
 import org.junit.jupiter.api.Assertions;
