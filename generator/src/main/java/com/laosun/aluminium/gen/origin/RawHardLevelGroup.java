@@ -1,4 +1,4 @@
-package com.laosun.aluminium.data.origin;
+package com.laosun.aluminium.gen.origin;
 
 
 public record RawHardLevelGroup(int Level, int HardLevelGroup, DoubleGetter AttackRatio, DoubleGetter DefenceRatio,
