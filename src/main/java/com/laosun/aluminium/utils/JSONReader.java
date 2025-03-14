@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class JSONReader {
+public final class JSONReader {
     public static <T> T fromJSON(String jsonName, Type type) {
         try {
             String json = Files.readString(Path.of("data/" + jsonName));
