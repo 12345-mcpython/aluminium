@@ -29,7 +29,7 @@ tasks.register('data', JavaExec) {
     group 'data'
     classpath sourceSets.main.runtimeClasspath
     systemProperty 'aluminium.dataDir', dataPath
-    mainClass = "com.laosun.aluminium.data.Main"
+    mainClass = "com.laosun.aluminium.gen.Main"
 }
 
 tasks.register('copyMultipleFolders', Copy) {
