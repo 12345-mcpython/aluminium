@@ -26,10 +26,13 @@ public class Battle {
     }
 
     public void startBattle() {
-        queue.initialize();
-        for (Moveable moveable : queue.getQueue()) {
+        for (Moveable moveable : queue.getCharacters()) {
             moveable.onBattleStart(this, moveable);
         }
+        for (Moveable moveable : queue.getEnemies()) {
+            moveable.onBattleStart(this, moveable);
+        }
+        queue.calcTime();
     }
 
     public Moveable getMoveableByName(String name) {

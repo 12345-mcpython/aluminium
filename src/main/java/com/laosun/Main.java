@@ -7,8 +7,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Enemy;
 import com.laosun.aluminium.models.Moveable;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class Main {
@@ -26,16 +24,13 @@ public class Main {
             @Override
             public void onBattleStart(Battle battle, Moveable moveable) {
                 System.out.println("Battle start");
-                battle.getQueue().print();
                 moveable.move(2000);
-                battle.getQueue().calcTime();
-                battle.getQueue().print();
             }
         };
-        Queue q = new Queue();
-        q.add(List.of(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10));
+        Queue q = new Queue(List.of(c1, c2, c3, c4, c5), List.of(c6, c7, c8, c9, c10));
         Battle battle = new Battle(q);
         battle.startBattle();
+        battle.getQueue().print();
         System.out.println(Constant.RELIC_MAIN_ATTRIBUTES);
     }
 }
