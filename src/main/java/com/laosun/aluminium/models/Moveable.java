@@ -5,6 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * The base of all item in the queue
+ * @author laosun
+ * @since core version 1.0.0
+ */
 @Getter
 @Setter
 @ToString
