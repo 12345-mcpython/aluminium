@@ -19,5 +19,6 @@ public class Main {
         }
         HardLevelGroupGenerator.exportHardLevelGroups(projectDir);
         RelicAttributeGenerator.exportRelicMainAttributes(projectDir);
+        RelicAttributeGenerator.exportRelicSubAttributes(projectDir);
     }
 }

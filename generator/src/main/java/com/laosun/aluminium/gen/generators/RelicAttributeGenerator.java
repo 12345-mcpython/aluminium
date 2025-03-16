@@ -57,26 +57,22 @@ public class RelicAttributeGenerator {
 
         List<RawRelicSubAffixConfig> configs = readJsonConfig(
                 Path.of(projectDir, EXCEL_OUTPUT_DIR, RELIC_SUB_AFFIX_CONFIG),
-                new TypeToken<List<RawRelicSubAffixConfig>>() {}
+                new TypeToken<>() {}
         );
 
-//        for (RawRelicSubAffixConfig config : configs) {
-//            int groupId = config.GroupID();
-//            if (groupId > 100) continue;
-//
-//            int star = groupId / 10;
-//            String part = PART_MAPPING.get(groupId % 10);
-//            String attributeKey = RELIC_MAPPING.get(config.Property());
-//
-//            Map<String, Double> processedData = Utils.processRelicSubAttribute(config);
-//
-//            subAttributesMap
-//                    .computeIfAbsent(star, k -> new HashMap<>())
-//                    .computeIfAbsent(part, k -> new HashMap<>())
-//                    .put(attributeKey, processedData);
-//        }
-//
-//        writeJsonFile(Path.of(OUTPUT_SUB_ATTRIBUTE), subAttributesMap);
+        for (RawRelicSubAffixConfig config : configs) {
+
+            int star = config.GroupID();
+            String attributeKey = RELIC_MAPPING.get(config.Property());
+
+            Map<String, Double> processedData = Utils.processRelicSubAttribute(config);
+
+            subAttributesMap
+                    .computeIfAbsent(star, k -> new HashMap<>())
+                    .put(attributeKey, processedData);
+        }
+
+        writeJsonFile(Path.of(OUTPUT_SUB_ATTRIBUTE), subAttributesMap);
     }
 
     private static <T> List<T> readJsonConfig(Path configPath, TypeToken<List<T>> typeToken) throws IOException {
