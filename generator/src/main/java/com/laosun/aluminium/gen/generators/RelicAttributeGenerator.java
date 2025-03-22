@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.gen.Utils;
-import com.laosun.aluminium.gen.origin.RawRelicMainAffixConfig;
-import com.laosun.aluminium.gen.origin.RawRelicSubAffixConfig;
+import com.laosun.aluminium.gen.origin.RawRelicConfig.RawRelicMainAffixConfig;
+import com.laosun.aluminium.gen.origin.RawRelicConfig.RawRelicSubAffixConfig;
 
 import java.io.IOException;
 import java.nio.file.Files;
