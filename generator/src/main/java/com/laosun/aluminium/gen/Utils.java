@@ -1,8 +1,8 @@
 package com.laosun.aluminium.gen;
 
 import com.laosun.aluminium.gen.origin.DoubleGetter;
-import com.laosun.aluminium.gen.origin.RawRelicMainAffixConfig;
-import com.laosun.aluminium.gen.origin.RawRelicSubAffixConfig;
+import com.laosun.aluminium.gen.origin.RawRelicConfig.RawRelicMainAffixConfig;
+import com.laosun.aluminium.gen.origin.RawRelicConfig.RawRelicSubAffixConfig;
 
 import java.util.Map;
 import java.util.Objects;
