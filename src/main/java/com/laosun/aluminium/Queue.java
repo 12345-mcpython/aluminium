@@ -14,9 +14,9 @@ import com.laosun.aluminium.models.CanHit;
 /**
  * The battle queue like HSR.
  * {@link com.laosun.aluminium.models.Character} and {@link com.laosun.aluminium.models.Enemy} can move with this queue.
+ * @see Moveable
  *
  * @author laosun
- * @see Moveable
  * @since core version 1.0.0
  */
 @Getter
