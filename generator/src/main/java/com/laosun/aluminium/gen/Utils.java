@@ -8,11 +8,17 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Utils {
+    public static DoubleGetter getDoubleGetter(DoubleGetter getter) {
+        return Objects.requireNonNullElse(getter, new DoubleGetter(0.0));
+    }
+
     public static Map<String, Double> processRelicMainAttribute(RawRelicMainAffixConfig p) {
-        return Map.ofEntries(Map.entry("base", Objects.requireNonNullElse(p.BaseValue(), new DoubleGetter(0.0)).Value()), Map.entry("bonus", Objects.requireNonNullElse(p.LevelAdd(), new DoubleGetter(0.0)).Value()));
+        return Map.ofEntries(Map.entry("base", getDoubleGetter(p.BaseValue()).Value()),
+                Map.entry("bonus", getDoubleGetter(p.LevelAdd()).Value()));
     }
 
     public static Map<String, Double> processRelicSubAttribute(RawRelicSubAffixConfig p) {
-        return Map.ofEntries(Map.entry("base", Objects.requireNonNullElse(p.BaseValue(), new DoubleGetter(0.0)).Value()), Map.entry("bonus", Objects.requireNonNullElse(p.StepValue(), new DoubleGetter(0.0)).Value()));
+        return Map.ofEntries(Map.entry("base", getDoubleGetter(p.BaseValue()).Value()),
+                Map.entry("bonus", getDoubleGetter(p.StepValue()).Value()));
     }
 }

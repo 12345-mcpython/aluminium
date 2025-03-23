@@ -1,5 +1,6 @@
 package com.laosun.aluminium.beans;
 
-public record HardLevelGroup(double attack, double defence, double health, double speed, double stance, double effectHitRate,
-                             double effectResistance) {
+public record HardLevelGroup(double attackRatio, double defenceRatio, double healthRatio, double speedRatio,
+                             double stanceRatio, double effectHitRateRatio,
+                             double effectResistanceRatio) {
 }
