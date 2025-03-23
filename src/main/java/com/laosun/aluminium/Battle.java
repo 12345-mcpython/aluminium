@@ -8,6 +8,11 @@ import java.util.List;
 
 import com.laosun.aluminium.models.Moveable;
 
+/**
+ * The main class of battle
+ * @author laosun
+ * @since core version 1.0.0
+ * */
 @Getter
 @Setter
 public class Battle {
