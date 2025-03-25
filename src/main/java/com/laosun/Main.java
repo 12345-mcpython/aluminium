@@ -6,6 +6,7 @@ import com.laosun.aluminium.Queue;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Enemy;
 import com.laosun.aluminium.models.Moveable;
+import com.laosun.aluminium.models.Relic;
 
 import java.util.List;
 
@@ -31,6 +32,6 @@ public class Main {
         Battle battle = new Battle(q);
         battle.startBattle();
         battle.getQueue().print();
-        System.out.println(Constant.RELIC_MAIN_ATTRIBUTES);
+        System.out.println(Relic.createRandomLevelZero(Relic.Type.HAND, 5));
     }
 }
