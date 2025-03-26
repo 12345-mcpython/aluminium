@@ -5,8 +5,8 @@ public class RelicException extends RuntimeException {
         super(message);
     }
 
-    public static class RelicNotFoundException extends RelicException {
-        public RelicNotFoundException(String message) {
+    public static class RelicWrongPartException extends RelicException {
+        public RelicWrongPartException(String message) {
             super(message);
         }
     }
