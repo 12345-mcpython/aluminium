@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models;
 
+import com.google.gson.Gson;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.exceptions.RelicException;
 import com.laosun.aluminium.utils.MapUtils;
@@ -10,17 +11,21 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 @Setter
 @ToString
 public class Relic {
+    public int level;
+
     public Type relicType;
     public Attribute mainAttribute;
     public List<Attribute> subAttributes;
 
-    public static Relic create(Type relicType, Attribute mainAttribute, List<Attribute> subAttributes) {
+    public static Relic create(int level, Type relicType, Attribute mainAttribute, List<Attribute> subAttributes) {
         Relic relic = new Relic();
+        relic.level = level;
         relic.relicType = relicType;
         relic.mainAttribute = mainAttribute;
         relic.subAttributes = subAttributes;
@@ -28,7 +33,7 @@ public class Relic {
     }
 
     public static Relic createRandomLevelZero(@NotNull Type relicType, int star) {
-        if(star <= 2 || star > 5){
+        if (star <= 2 || star > 5) {
             throw new RelicException("Star level expected star 2-5 but given " + star);
         }
         var partValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType());
@@ -39,28 +44,36 @@ public class Relic {
         );
         subCandidates.removeIf(e -> e.getKey().equals(mainAttribute.left()));
 
-        var selectedSubEntries = MapUtils.getRandomList(subCandidates, 3);
+        var selectedSubEntries = MapUtils.getRandomList(subCandidates, new Random().nextInt(3, 5));
         var subAttributes = selectedSubEntries.stream()
                 .map(e -> new Attribute(e.getKey(), e.getValue().get("base")))
                 .toList();
-        return create(relicType, mainAttribute, subAttributes);
+        return create(0, relicType, mainAttribute, subAttributes);
     }
 
-    public static Relic createBySetting(@NotNull Type relicType, Relic.Config setting) {
+    public static Relic createBySetting(@NotNull Type relicType, int star, int level, Setting setting) {
+        var mainAttributeLevel = setting.mainAttribute;
+        var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType()).get(mainAttributeLevel.attribute);
+
         return null;
     }
 
     @Getter
-    public static class Config {
-        private final Pair mainAttribute;
-        private final List<Pair> subAttributes;
+    public static class Setting {
+        private final AttributeLevel mainAttribute;
+        private final List<AttributeLevel> subAttributes;
 
-        public Config(Pair mainAttributeL, List<Pair> subAttributesL) {
+        public Setting(AttributeLevel mainAttributeL,
+                       List<AttributeLevel> subAttributesL) {
             this.mainAttribute = mainAttributeL;
             this.subAttributes = subAttributesL;
         }
 
-        public record Pair(String left, int right) {
+        public static Setting fromJson(String json){
+            return new Gson().fromJson(json, Setting.class);
+        }
+
+        public record AttributeLevel(String attribute, int promoteLevel, int attributeLevel) {
         }
     }
 
