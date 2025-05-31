@@ -1,1 +1,0 @@
-You can get data at [turnbasedgamedata](https://gitlab.com/Dimbreath/turnbasedgamedata).
