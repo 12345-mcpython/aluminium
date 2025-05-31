@@ -79,6 +79,7 @@ public class Relic {
     }
 
     @Getter
+    @ToString
     public static class Setting {
         @SerializedName("main_attribute")
         private final Map<String, Integer> mainAttribute;
