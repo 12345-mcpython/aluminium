@@ -56,8 +56,10 @@ public class Relic {
     }
 
     public static Relic createBySetting(@NotNull Type relicType, int star, int level, Setting setting) {
-        var mainAttributeLevel = setting.mainAttribute;
         var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType()).get(setting.getMainAttribute());
+        if (mainAttributeValue == null) {
+            throw new RelicException(String.format("Main attribute '%s' not found in such Relic.Type: '%s'", setting.getMainAttribute(), relicType.getType()));
+        }
         var mainAttributeBase = mainAttributeValue.get("base");
         var mainAttributeBonus = mainAttributeValue.get("bonus");
         var mainAttributeClass = new Attribute(setting.getMainAttribute(), mainAttributeBase + mainAttributeBonus * level);
@@ -78,8 +80,10 @@ public class Relic {
 
     @Getter
     public static class Setting {
-        @SerializedName("main_attribute") private final Map<String, Integer> mainAttribute;
-        @SerializedName("sub_attributes") private final Map<String, AttributeLevel> subAttributes;
+        @SerializedName("main_attribute")
+        private final Map<String, Integer> mainAttribute;
+        @SerializedName("sub_attributes")
+        private final Map<String, AttributeLevel> subAttributes;
 
         public Setting(Map<String, Integer> mainAttributeL,
                        Map<String, AttributeLevel> subAttributesL) {
