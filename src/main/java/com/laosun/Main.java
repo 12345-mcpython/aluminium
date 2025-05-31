@@ -33,5 +33,7 @@ public class Main {
         battle.startBattle();
         battle.getQueue().print();
         System.out.println(Relic.createRandomLevelZero(Relic.Type.HAND, 5));
+        String data = "{ \"main_attribute\": { \"crit_attack\": 15 }, \"sub_attributes\": { \"health_percent\": { \"promote_level\": 3, \"attribute_level\": 5 }, \"speed\": { \"promote_level\": 0, \"attribute_level\": 1 }, \"effect_hit_rate\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"breaking_effect\": { \"promote_level\": 0, \"attribute_level\": 0 } } }";
+        System.out.println(Relic.createBySetting(Relic.Type.BODY, 5, 15, data));
     }
 }
