@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.exceptions.RelicException;
 import com.laosun.aluminium.utils.MapUtils;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @Getter
@@ -18,14 +20,16 @@ import java.util.Random;
 @ToString
 public class Relic {
     public int level;
-
+    public String name;
+    public int star;
     public Type relicType;
     public Attribute mainAttribute;
     public List<Attribute> subAttributes;
 
-    public static Relic create(int level, Type relicType, Attribute mainAttribute, List<Attribute> subAttributes) {
+    public static Relic create(int level, int star, Type relicType, Attribute mainAttribute, List<Attribute> subAttributes) {
         Relic relic = new Relic();
         relic.level = level;
+        relic.star = star;
         relic.relicType = relicType;
         relic.mainAttribute = mainAttribute;
         relic.subAttributes = subAttributes;
@@ -48,32 +52,55 @@ public class Relic {
         var subAttributes = selectedSubEntries.stream()
                 .map(e -> new Attribute(e.getKey(), e.getValue().get("base")))
                 .toList();
-        return create(0, relicType, mainAttribute, subAttributes);
+        return create(0, star, relicType, mainAttribute, subAttributes);
     }
 
     public static Relic createBySetting(@NotNull Type relicType, int star, int level, Setting setting) {
         var mainAttributeLevel = setting.mainAttribute;
-        var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType()).get(mainAttributeLevel.attribute);
+        var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType()).get(setting.getMainAttribute());
+        var mainAttributeBase = mainAttributeValue.get("base");
+        var mainAttributeBonus = mainAttributeValue.get("bonus");
+        var mainAttributeClass = new Attribute(setting.getMainAttribute(), mainAttributeBase + mainAttributeBonus * level);
+        var subAttributeClasses = new ArrayList<Attribute>();
+        for (var subAttributes : setting.getSubAttributes()) {
+            var subAttributeValue = Constant.RELIC_SUB_ATTRIBUTES.get(star).get(subAttributes);
+            var subAttributeBase = subAttributeValue.get("base");
+            var subAttributeBonus = subAttributeValue.get("bonus");
+            var calc = subAttributeBase * (setting.subAttributes.get(subAttributes).promoteLevel + 1) + subAttributeBonus * setting.subAttributes.get(subAttributes).attributeLevel;
+            subAttributeClasses.add(new Attribute(subAttributes, calc, setting.subAttributes.get(subAttributes).promoteLevel));
+        }
+        return create(level, star, relicType, mainAttributeClass, subAttributeClasses);
+    }
 
-        return null;
+    public static Relic createBySetting(@NotNull Type relicType, int star, int level, String data) {
+        return createBySetting(relicType, star, level, Setting.fromJson(data));
     }
 
     @Getter
     public static class Setting {
-        private final AttributeLevel mainAttribute;
-        private final List<AttributeLevel> subAttributes;
+        @SerializedName("main_attribute") private final Map<String, Integer> mainAttribute;
+        @SerializedName("sub_attributes") private final Map<String, AttributeLevel> subAttributes;
 
-        public Setting(AttributeLevel mainAttributeL,
-                       List<AttributeLevel> subAttributesL) {
+        public Setting(Map<String, Integer> mainAttributeL,
+                       Map<String, AttributeLevel> subAttributesL) {
             this.mainAttribute = mainAttributeL;
             this.subAttributes = subAttributesL;
         }
 
-        public static Setting fromJson(String json){
+        public static Setting fromJson(String json) {
             return new Gson().fromJson(json, Setting.class);
         }
 
-        public record AttributeLevel(String attribute, int promoteLevel, int attributeLevel) {
+        public record AttributeLevel(@SerializedName("promote_level") int promoteLevel,
+                                     @SerializedName("attribute_level") int attributeLevel) {
+        }
+
+        public String getMainAttribute() {
+            return mainAttribute.entrySet().iterator().next().getKey();
+        }
+
+        public List<String> getSubAttributes() {
+            return new ArrayList<>(subAttributes.keySet());
         }
     }
 
