@@ -1,6 +1,7 @@
 package com.laosun;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.Queue;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
@@ -45,5 +46,6 @@ public class Main {
         RelicSuit hya = new RelicSuit();
         hya.addMore(hyaBody, hyaLine, hyaBall, hyaBoot, hyaHand, hyaHead);
         System.out.println(hya.calcTotalValue());
+        System.out.println(Constant.WEAPONS.get(23042).getName().english());
     }
 }
