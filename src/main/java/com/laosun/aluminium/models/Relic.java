@@ -10,10 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Getter
 @Setter
@@ -56,6 +53,7 @@ public class Relic {
     }
 
     public static Relic createBySetting(@NotNull Type relicType, int star, int level, Setting setting) {
+        var subAttributesValueMap = Constant.RELIC_SUB_ATTRIBUTES.get(star);
         var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType()).get(setting.getMainAttribute());
         if (mainAttributeValue == null) {
             throw new RelicException(String.format("Main attribute '%s' not found in such Relic.Type: '%s'", setting.getMainAttribute(), relicType.getType()));
@@ -65,7 +63,7 @@ public class Relic {
         var mainAttributeClass = new Attribute(setting.getMainAttribute(), mainAttributeBase + mainAttributeBonus * level);
         var subAttributeClasses = new ArrayList<Attribute>();
         for (var subAttributes : setting.getSubAttributes()) {
-            var subAttributeValue = Constant.RELIC_SUB_ATTRIBUTES.get(star).get(subAttributes);
+            var subAttributeValue = subAttributesValueMap.get(subAttributes);
             var subAttributeBase = subAttributeValue.get("base");
             var subAttributeBonus = subAttributeValue.get("bonus");
             var calc = subAttributeBase * (setting.subAttributes.get(subAttributes).promoteLevel + 1) + subAttributeBonus * setting.subAttributes.get(subAttributes).attributeLevel;
@@ -126,6 +124,14 @@ public class Relic {
         LINE("line");
 
         private final String type;
+
+        private static Map<String, Type> MP = Map.ofEntries(Map.entry("head", HEAD), Map.entry("boot", BOOT),
+                Map.entry("hand", HAND), Map.entry("body", BODY),
+                Map.entry("ball", BALL), Map.entry("line", LINE));
+
+        public static Type getType(String type) {
+            return MP.get(type);
+        }
 
         Type(String string) {
             this.type = string;
