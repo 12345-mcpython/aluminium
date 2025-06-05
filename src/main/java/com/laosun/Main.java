@@ -30,7 +30,7 @@ public class Main {
         Battle battle = new Battle(q);
         battle.startBattle();
         battle.getQueue().print();
-        // System.out.println(Relic.createRandomLevelZero(Relic.Type.HAND, 5));
+        System.out.println(Relic.createRandomLevelZero(Relic.Type.HAND, 5));
         String hyaBodyJson = "{ \"main_attribute\": { \"crit_attack\": 15 }, \"sub_attributes\": { \"health_percent\": { \"promote_level\": 3, \"attribute_level\": 5 }, \"speed\": { \"promote_level\": 0, \"attribute_level\": 1 }, \"effect_hit_rate\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"breaking_effect\": { \"promote_level\": 0, \"attribute_level\": 0 } } }";
         String hyaLineJson = "{ \"main_attribute\": { \"energy_regeneration_rate\": 15 }, \"sub_attributes\": { \"defence\": { \"promote_level\": 1, \"attribute_level\": 0 }, \"attack_percent\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"defence_percent\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"effect_resistance\": { \"promote_level\": 1, \"attribute_level\": 0 } } }";
         String hyaBallJson = "{ \"main_attribute\": { \"health_percent\": 15 }, \"sub_attributes\": { \"health\": { \"promote_level\": 0, \"attribute_level\": 0 }, \"defence\": { \"promote_level\": 2, \"attribute_level\": 2 }, \"crit_chance\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"crit_attack\": { \"promote_level\": 2, \"attribute_level\": 4 } } }";
