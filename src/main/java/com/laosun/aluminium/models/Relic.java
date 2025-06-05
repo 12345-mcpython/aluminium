@@ -23,6 +23,8 @@ public class Relic {
     public Attribute mainAttribute;
     public List<Attribute> subAttributes;
 
+    public static final List<String> SUB_ATTRIBUTE_LIST = List.of("health", "attack", "defence", "health_percent", "attack_percent", "defence_percent", "speed", "crit_chance", "crit_attack", "effect_hit_rate", "effect_resistance", "breaking_effect");
+
     public static Relic create(int level, int star, Type relicType, Attribute mainAttribute, List<Attribute> subAttributes) {
         Relic relic = new Relic();
         relic.level = level;
@@ -40,20 +42,18 @@ public class Relic {
         var partValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType());
         var entry = MapUtils.getRandomEntry(partValue);
         var mainAttribute = new Attribute(entry.getKey(), entry.getValue().get("base"));
-        var subCandidates = new ArrayList<>(
-                Constant.RELIC_SUB_ATTRIBUTES.get(star).entrySet()
-        );
-        subCandidates.removeIf(e -> e.getKey().equals(mainAttribute.left()));
+        var subCandidates = new ArrayList<>(SUB_ATTRIBUTE_LIST);
+        subCandidates.removeIf(e -> e.equals(mainAttribute.left()));
 
         var selectedSubEntries = MapUtils.getRandomList(subCandidates, new Random().nextInt(3, 5));
         var subAttributes = selectedSubEntries.stream()
-                .map(e -> new Attribute(e.getKey(), e.getValue().get("base")))
+                .map(e -> new Attribute(e, Constant.RELIC_SUB_ATTRIBUTES.getAttributeGroupByStar(star).getAttributeByName(e).base()))
                 .toList();
         return create(0, star, relicType, mainAttribute, subAttributes);
     }
 
     public static Relic createBySetting(@NotNull Type relicType, int star, int level, Setting setting) {
-        var subAttributesValueMap = Constant.RELIC_SUB_ATTRIBUTES.get(star);
+        var subAttributesValueMap = Constant.RELIC_SUB_ATTRIBUTES.getAttributeGroupByStar(star);
         var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType()).get(setting.getMainAttribute());
         if (mainAttributeValue == null) {
             throw new RelicException(String.format("Main attribute '%s' not found in such Relic.Type: '%s'", setting.getMainAttribute(), relicType.getType()));
@@ -63,9 +63,9 @@ public class Relic {
         var mainAttributeClass = new Attribute(setting.getMainAttribute(), mainAttributeBase + mainAttributeBonus * level);
         var subAttributeClasses = new ArrayList<Attribute>();
         for (var subAttributes : setting.getSubAttributes()) {
-            var subAttributeValue = subAttributesValueMap.get(subAttributes);
-            var subAttributeBase = subAttributeValue.get("base");
-            var subAttributeBonus = subAttributeValue.get("bonus");
+            var subAttributeValue = subAttributesValueMap.getAttributeByName(subAttributes);
+            var subAttributeBase = subAttributeValue.base();
+            var subAttributeBonus = subAttributeValue.bonus();
             var calc = subAttributeBase * (setting.subAttributes.get(subAttributes).promoteLevel + 1) + subAttributeBonus * setting.subAttributes.get(subAttributes).attributeLevel;
             subAttributeClasses.add(new Attribute(subAttributes, calc, setting.subAttributes.get(subAttributes).promoteLevel));
         }
@@ -125,7 +125,7 @@ public class Relic {
 
         private final String type;
 
-        private static Map<String, Type> MP = Map.ofEntries(Map.entry("head", HEAD), Map.entry("boot", BOOT),
+        private static final Map<String, Type> MP = Map.ofEntries(Map.entry("head", HEAD), Map.entry("boot", BOOT),
                 Map.entry("hand", HAND), Map.entry("body", BODY),
                 Map.entry("ball", BALL), Map.entry("line", LINE));
 
