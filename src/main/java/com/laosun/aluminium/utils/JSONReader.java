@@ -14,8 +14,7 @@ public final class JSONReader {
             String json = Files.readString(Path.of("data/" + jsonName), StandardCharsets.UTF_8);
             return new Gson().fromJson(json, type);
         } catch (IOException e) {
-            System.out.println("Unable to read resource.");
+            throw new RuntimeException("Unable to read resource: " + jsonName, e);
         }
-        return null;
     }
 }
