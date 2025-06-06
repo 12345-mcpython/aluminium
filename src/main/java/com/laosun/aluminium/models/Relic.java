@@ -39,9 +39,9 @@ public class Relic {
         if (star <= 2 || star > 5) {
             throw new RelicException("Star level expected star 2-5 but given " + star);
         }
-        var partValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType());
+        var partValue = Constant.RELIC_MAIN_ATTRIBUTES.getAttributeByStar(star).get(relicType.getType());
         var entry = MapUtils.getRandomEntry(partValue);
-        var mainAttribute = new Attribute(entry.getKey(), entry.getValue().get("base"));
+        var mainAttribute = new Attribute(entry.getKey(), entry.getValue().base());
         var subCandidates = new ArrayList<>(SUB_ATTRIBUTE_LIST);
         subCandidates.removeIf(e -> e.equals(mainAttribute.left()));
 
@@ -54,12 +54,12 @@ public class Relic {
 
     public static Relic createBySetting(@NotNull Type relicType, int star, int level, Setting setting) {
         var subAttributesValueMap = Constant.RELIC_SUB_ATTRIBUTES.getAttributeGroupByStar(star);
-        var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.get(star).get(relicType.getType()).get(setting.getMainAttribute());
+        var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.getAttributeByStar(star).get(relicType.getType()).get(setting.getMainAttribute());
         if (mainAttributeValue == null) {
             throw new RelicException(String.format("Main attribute '%s' not found in such Relic.Type: '%s'", setting.getMainAttribute(), relicType.getType()));
         }
-        var mainAttributeBase = mainAttributeValue.get("base");
-        var mainAttributeBonus = mainAttributeValue.get("bonus");
+        var mainAttributeBase = mainAttributeValue.base();
+        var mainAttributeBonus = mainAttributeValue.bonus();
         var mainAttributeClass = new Attribute(setting.getMainAttribute(), mainAttributeBase + mainAttributeBonus * level);
         var subAttributeClasses = new ArrayList<Attribute>();
         for (var subAttributes : setting.getSubAttributes()) {
