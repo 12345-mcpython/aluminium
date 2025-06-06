@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RelicSuit {
+public final class RelicSuit {
     public Relic hand;
     public Relic head;
     public Relic body;
