@@ -47,7 +47,9 @@ public final class RelicSuit {
             if (mainAttr != null) {
                 String mainKey = mainAttr.left();
                 double mainValue = mainAttr.right();
-                totalMap.merge(mainKey, mainValue, Double::sum);
+                // totalMap.merge(mainKey, mainValue, Double::sum);
+                Double current = totalMap.getOrDefault(mainKey, 0.0);
+                totalMap.put(mainKey, current + mainValue);
             }
 
             List<Relic.Attribute> subAttrs = relic.getSubAttributes();
@@ -58,7 +60,9 @@ public final class RelicSuit {
                     }
                     String subKey = subAttr.left();
                     double subValue = subAttr.right();
-                    totalMap.merge(subKey, subValue, Double::sum);
+                    // totalMap.merge(subKey, subValue, Double::sum);
+                    Double current = totalMap.getOrDefault(subKey, 0.0);
+                    totalMap.put(subKey, current + subValue);
                 }
             }
         }
