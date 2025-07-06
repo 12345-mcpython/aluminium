@@ -14,9 +14,9 @@ import com.laosun.aluminium.models.CanHit;
 /**
  * The battle queue like HSR.
  * {@link com.laosun.aluminium.models.Character} and {@link com.laosun.aluminium.models.Enemy} can move with this queue.
- * @see Moveable
  *
  * @author laosun
+ * @see Moveable
  * @since core version 1.0.0
  */
 @Getter
@@ -57,6 +57,9 @@ public final class Queue {
 
     public void calcTime() {
         for (Moveable moveable : queue) {
+            if (moveable.getSpeed() == 0) {
+                continue;
+            }
             moveable.setTime((10000.0 - moveable.getLength()) / moveable.getSpeed());
         }
         queue.sort(Comparator.comparingDouble(Moveable::getTime));
@@ -65,6 +68,9 @@ public final class Queue {
     public void move() {
         double time = queue.getFirst().getTime();
         for (Moveable moveable : queue) {
+            if (moveable.getSpeed() == 0) {
+                continue;
+            }
             moveable.setLength(moveable.getLength() + time * moveable.getSpeed());
             if (moveable.getLength() > 10000.0) {
                 moveable.setLength(10000.0);
