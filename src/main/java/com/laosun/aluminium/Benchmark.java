@@ -51,7 +51,6 @@ public class Benchmark {
             });
         }
 
-        // 等待所有线程完成
         latch.await();
         executor.shutdown();
 
@@ -71,7 +70,7 @@ public class Benchmark {
                 );
                 suits.addToSuit(relic);
             }
-            var test = suits.calcTotalValue(); // 确保此方法无副作用
+            var test = suits.calcTotalValue();
         }
     }
 }
