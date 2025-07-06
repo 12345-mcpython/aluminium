@@ -26,11 +26,13 @@ public class Main {
                 moveable.move(2000);
             }
         };
+        Summon summon = new Summon("test summon 1", 100, 100, 100, 132);
         Queue q = new Queue(List.of(c1, c2, c3, c4, c5), List.of(c6, c7, c8, c9, c10));
+        q.add(List.of(summon));
         Battle battle = new Battle(q);
         battle.startBattle();
         battle.getQueue().print();
-        System.out.println(Relic.createRandomLevelZero(Relic.Type.HAND, 5));
+        System.out.println(Relic.createRandomLevelZero(Relic.Type.BODY, 5));
         String hyaBodyJson = "{ \"main_attribute\": { \"crit_attack\": 15 }, \"sub_attributes\": { \"health_percent\": { \"promote_level\": 3, \"attribute_level\": 5 }, \"speed\": { \"promote_level\": 0, \"attribute_level\": 1 }, \"effect_hit_rate\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"breaking_effect\": { \"promote_level\": 0, \"attribute_level\": 0 } } }";
         String hyaLineJson = "{ \"main_attribute\": { \"energy_regeneration_rate\": 15 }, \"sub_attributes\": { \"defence\": { \"promote_level\": 1, \"attribute_level\": 0 }, \"attack_percent\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"defence_percent\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"effect_resistance\": { \"promote_level\": 1, \"attribute_level\": 0 } } }";
         String hyaBallJson = "{ \"main_attribute\": { \"health_percent\": 15 }, \"sub_attributes\": { \"health\": { \"promote_level\": 0, \"attribute_level\": 0 }, \"defence\": { \"promote_level\": 2, \"attribute_level\": 2 }, \"crit_chance\": { \"promote_level\": 1, \"attribute_level\": 2 }, \"crit_attack\": { \"promote_level\": 2, \"attribute_level\": 4 } } }";
@@ -52,6 +54,7 @@ public class Main {
         RelicSuit hya = new RelicSuit();
         hya.addMore(hyaBody, hyaLine, hyaBall, hyaBoot, hyaHand, hyaHead);
         System.out.println(hya.calcTotalValue());
-        System.out.println(Constant.WEAPONS.get(23042).getName().english());
+        System.out.println(Constant.WEAPONS.get(23042).name().english());
+        System.out.println(Constant.CHARACTERS.get(1409).name().english());
     }
 }

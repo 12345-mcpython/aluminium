@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.beans.Translate;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -8,10 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class Weapon {
-    public record Name(String chinese, String english) {
-    }
-
-    private Name name;
+    private Translate name;
     private String description;
     private double health;
     private double attack;
