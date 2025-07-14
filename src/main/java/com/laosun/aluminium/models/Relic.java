@@ -53,6 +53,7 @@ public class Relic {
     }
 
     public static Relic createBySetting(@NotNull Type relicType, int star, int level, Setting setting) {
+        checkLegal(setting);
         var subAttributesValueMap = Constant.RELIC_SUB_ATTRIBUTES.getAttributeGroupByStar(star);
         var mainAttributeValue = Constant.RELIC_MAIN_ATTRIBUTES.getAttributeByStar(star).get(relicType.getType()).get(setting.getMainAttribute());
         if (mainAttributeValue == null) {
@@ -74,6 +75,18 @@ public class Relic {
 
     public static Relic createBySetting(@NotNull Type relicType, int star, int level, String data) {
         return createBySetting(relicType, star, level, Setting.fromJson(data));
+    }
+
+    private static void checkLegal(Relic.Setting setting) {
+        if (setting.getMainAttributeLevel() > 15 || setting.getMainAttributeLevel() < 0) {
+            throw new RelicException(String.format("Main attribute `%s` level must be between 0 and 15", setting.getMainAttribute()));
+        }
+
+        for (Map.Entry<String, Setting.AttributeLevel> attributeLevelEntry : setting.subAttributes.entrySet()) {
+            if (attributeLevelEntry.getValue().attributeLevel > (attributeLevelEntry.getValue().promoteLevel + 1) * 2) {
+                throw new RelicException(String.format("Sub attribute `%s` level must be between 0 and " + (attributeLevelEntry.getValue().attributeLevel - 1) * 2, attributeLevelEntry.getKey()));
+            }
+        }
     }
 
     @Getter
@@ -100,6 +113,10 @@ public class Relic {
 
         public String getMainAttribute() {
             return mainAttribute.entrySet().iterator().next().getKey();
+        }
+
+        public Integer getMainAttributeLevel() {
+            return mainAttribute.entrySet().iterator().next().getValue();
         }
 
         public List<String> getSubAttributes() {
