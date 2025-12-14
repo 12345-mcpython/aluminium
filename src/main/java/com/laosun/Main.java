@@ -5,6 +5,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.Queue;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.utils.LevelPromotionCalc;
 
 import java.util.List;
 
@@ -56,5 +57,10 @@ public class Main {
         System.out.println(hya.calcTotalValue());
         System.out.println(Constant.WEAPONS.get(23042).name().english());
         System.out.println(Constant.CHARACTERS.get(1409).name().english());
+
+        System.out.println(LevelPromotionCalc.calcCharacterRate(80));
+        System.out.println(LevelPromotionCalc.calcAttackerRate(80));
+        System.out.println(Constant.CHARACTERS.get(1409).health());
+        System.out.println(Constant.WEAPONS.get(23042).health());
     }
 }

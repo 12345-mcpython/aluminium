@@ -82,7 +82,9 @@ public final class Queue {
     public void print() {
         System.out.println("name\tlength\ttime\tspeed");
         for (Moveable m : this.queue) {
-            System.out.println(((CanHit) m).getName() + "\t" + Math.round(m.getLength()) + "\t\t" + Math.round(m.getTime()) + "\t\t" + m.getSpeed());
+            if (m instanceof CanHit m1) {
+                System.out.println(m1.getName() + "\t" + Math.round(m1.getLength()) + "\t\t" + Math.round(m1.getTime()) + "\t\t" + m1.getSpeed());
+            }
         }
         System.out.println();
     }
@@ -90,5 +92,10 @@ public final class Queue {
     public void setTopZero() {
         queue.getFirst().setLength(0);
         calcTime();
+    }
+
+    public int testPosition(Moveable moveable) {
+        var tick = 10000.0 / moveable.getSpeed();
+        return (int) tick;
     }
 }
