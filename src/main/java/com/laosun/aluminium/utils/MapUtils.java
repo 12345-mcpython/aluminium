@@ -7,7 +7,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-public class MapUtils {
+public final class MapUtils {
     /**
      * 从Map中随机获取一个条目（键值对）
      * @param map 非空的Map
