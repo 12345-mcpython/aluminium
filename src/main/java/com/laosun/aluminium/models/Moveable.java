@@ -6,17 +6,15 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * The base of all item in the queue
- * @author laosun
- * @since core version 1.0.0
+ * 可行动角色基类：管理行动长度、时间、速度
  */
 @Getter
 @Setter
 @ToString
 public abstract class Moveable implements MoveableEvent, Comparable<Moveable> {
-    private double length;
-    private double time;
-    private double speed;
+    private double length; // 行动长度（积累到10000触发行动）
+    private double time;   // 下次行动时间
+    private double speed;  // 行动速度（影响长度积累速度）
 
     public Moveable(double speed) {
         this.length = 0;
@@ -24,11 +22,14 @@ public abstract class Moveable implements MoveableEvent, Comparable<Moveable> {
         this.speed = speed;
     }
 
+    /** 移动（积累行动长度） */
     public void move(double length) {
         this.length += length;
     }
 
-    public int compareTo(Moveable moveable) {
-        return Double.compare(this.length, moveable.getLength());
+    /** 比较器：按下次行动时间升序排序 */
+    @Override
+    public int compareTo(Moveable o) {
+        return Double.compare(this.time, o.getTime());
     }
 }
