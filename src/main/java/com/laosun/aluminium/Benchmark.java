@@ -15,7 +15,7 @@ public class Benchmark {
     public record Suit(String set, String type, Relic.Setting json) {
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    static void main() throws InterruptedException {
         int roundSingle = 1000000;
         long start = System.nanoTime();
         Map<Integer, List<Suit>> data = JSONReader.fromJSON("dump_data.json", new TypeToken<Map<Integer, List<Suit>>>() {
