@@ -107,7 +107,7 @@ public final class Queue {
     /** 根据阵营获取存活角色 */
     public List<CanHit> getAliveByCamp(Camp camp) {
         return combatants.stream()
-                .filter(CanHit::isAlive)
+                .filter(c -> c.getHealth() != 0)
                 .filter(c -> c.getCamp() == camp)
                 .collect(Collectors.toList());
     }
