@@ -7,17 +7,17 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.function.Function;
 
 @Getter
 @Setter
 @ToString(callSuper = true)
-public abstract class CanHit extends Moveable implements MoveableEvent {
+public abstract class CanHit implements MoveableEvent {
     private String name;
     private double health;
     private double maxHealth;
     private double defence;
     private double attack;
+    private double speed;
     private boolean death = false;
     private Camp camp; // 阵营（关键：统一管理所有战斗角色）
 
@@ -27,13 +27,13 @@ public abstract class CanHit extends Moveable implements MoveableEvent {
     private double inBattleDefence;
 
     public CanHit(String name, Camp camp, double health, double defence, double attack, double speed) {
-        super(speed);
         this.name = name;
         this.camp = camp;
         this.health = health;
         this.maxHealth = health;
         this.defence = defence;
         this.attack = attack;
+        this.speed = speed;
         // 初始化战斗属性（与基础属性一致，可通过buff修改）
         this.inBattleDefence = defence;
         this.inBattleHealth = health;
@@ -44,22 +44,7 @@ public abstract class CanHit extends Moveable implements MoveableEvent {
 
     // ------------------- 事件默认实现（子类可重写） -------------------
     @Override
-    public void onBattleStart(Battle battle, Moveable moveable) {
+    public void onBattleStart(Battle battle, CanHit canHit) {
         System.out.printf("[%s] JOIN BATTLE（CAMP：%s）%n", getName(), getCamp().name());
     }
-
-    @Override
-    public void onBeforeAction(Battle battle, Moveable moveable) {}
-
-    @Override
-    public void onAfterAction(Battle battle, Moveable moveable) {}
-
-    @Override
-    public void onBeAttacked(Battle battle, Moveable attacker) {}
-
-    @Override
-    public void onTakeDamage(double damage) {}
-
-    @Override
-    public void onDeath() {}
 }
