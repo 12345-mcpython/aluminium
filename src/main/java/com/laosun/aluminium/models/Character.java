@@ -13,7 +13,7 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 public class Character extends CanHit {
-    private CharacterSkills characterSkills;
+    private CharacterSkills characterSkills = new CharacterSkills(null, null, null, null, null, null);;
 
     public Character(String name, Camp camp, double health, double defence, double attack, double speed) {
         super(name, camp, health, defence, attack, speed);
@@ -28,7 +28,6 @@ public class Character extends CanHit {
         if (characterData == null) {
             throw new CharacterException.CharacterNotFoundException(String.format("Character '%s' not found", cid));
         }
-        // 此处可扩展：根据等级调整属性（如 health = baseHealth * level * 0.1）
         return new Character(characterData.name(), camp, characterData.health(), characterData.defence(), characterData.attack(), characterData.speed());
     }
 }
