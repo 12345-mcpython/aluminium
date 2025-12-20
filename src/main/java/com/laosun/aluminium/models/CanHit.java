@@ -19,8 +19,9 @@ public abstract class CanHit implements MoveableEvent {
     private double attack;
     private double speed;
     private boolean death = false;
-    private Camp camp; // 阵营（关键：统一管理所有战斗角色）
+    private Camp camp;
 
+    // IMPORTANT: EDIT THIS NOT EDIT ABOVE!!!!!!!!!!!!!!
     private double inBattleHealth;
     private double inBattleMaxHealth;
     private double inBattleAttack;

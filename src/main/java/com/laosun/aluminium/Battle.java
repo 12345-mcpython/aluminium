@@ -2,9 +2,8 @@ package com.laosun.aluminium;
 
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.SkillRequest;
+import com.laosun.aluminium.models.*;
+import com.laosun.aluminium.models.Character;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -59,13 +58,22 @@ public class Battle {
 
     public boolean performSkill(CanHit performer, SkillRequest skillRequest, List<CanHit> targets) {
         if (currentMove == null && skillRequest.skill != SkillType.ULTRA) {
-            IO.println("Can't perform " + skillRequest.skill + " because " + skillRequest.name + " is not a ULTRA skill.");
+            IO.println("Can't perform " + skillRequest.skill);
             return false;
         }
-        IO.println("Performing skill");
-        targets.forEach(target -> {
-            target.setHealth(target.getHealth() - 100);
-        });
+        if (performer instanceof Character character) {
+            Skill s = switch (skillRequest.skill) {
+                case ULTRA -> character.getCharacterSkills().ultra;
+                case COMMON -> character.getCharacterSkills().common;
+                case SKILL -> character.getCharacterSkills().skill;
+                case TALENT -> character.getCharacterSkills().talent;
+                case SUMMON_SKILL -> character.getCharacterSkills().summonSkill;
+                case SUMMON_TALENT -> character.getCharacterSkills().summonTalent;
+            };
+            s.performSkill(performer, targets);
+        } else if (performer instanceof Enemy e) {
+
+        }
         return true;
     }
 }
