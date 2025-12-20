@@ -5,6 +5,8 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 
+import java.nio.charset.Charset;
+
 public class Main {
     static void main() {
         System.out.println(Relic.createRandomLevelZero(Relic.Type.BODY, 5));
@@ -39,6 +41,6 @@ public class Main {
 
         BattleDemo.main();
 
-        System.out.println(System.getProperty("file.encoding"));
+        System.out.println(Charset.defaultCharset().displayName());
     }
 }
