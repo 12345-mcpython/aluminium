@@ -1,6 +1,9 @@
 package com.laosun.aluminium;
 
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.SkillAttackType;
+import com.laosun.aluminium.enums.SkillEffectType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 
@@ -38,13 +41,22 @@ public class BattleDemo {
 
         Enemy goblin = new Enemy("GOBLIN", Camp.ENEMY, 800, 100, 200, 160);
 
-        int[] pList = new int[]{100, 200, 300, 400, 500, 600};
-        Skill p = new Skill(4, "Test", "Test") {
+        double[] pList = new double[]{100, 200, 300, 400, 500, 600};
+        Skill p = new Skill(4, "Test", "Test", new double[][]{pList}) {
             @Override
-            protected boolean performSkill(List<CanHit> performer) {
+            public boolean performSkill(CanHit performer, List<CanHit> accepter) {
+                accepter.forEach(accept -> {
+                    IO.println(accept.getName());
+                    IO.println(getSkillValue()[0][this.getLevel()]);
+                    IO.println(accept.getHealth() - getSkillValue()[0][this.getLevel()]);
+                    accept.setInBattleHealth(accept.getHealth() - getSkillValue()[0][this.getLevel()]);
+                });
                 return true;
             }
         };
+
+        CharacterSkills cs = new CharacterSkills(p, p, p, null, null, null);
+        c4.setCharacterSkills(cs);
 
         // Battle
         List<CanHit> allCombatants = Arrays.asList(warrior, mage, wolf, orc, goblin, c1, c2, c3, c4);
@@ -53,9 +65,15 @@ public class BattleDemo {
 
         // Start
         battle.startBattle();
+
+        IO.println("before");
+        battle.getActionQueue().printStatus();
+
+        battle.performSkill(c4, new SkillRequest(5, SkillEffectType.DAMAGE, SkillType.ULTRA, SkillAttackType.ALL), battle.getActionQueue().getCombatantQueue().stream().filter(canHit -> canHit.getCamp() == Camp.ENEMY).toList());
         // MAZA SKILL RELEASED IN THIS
         // Waiting for move
         // STATE
+        IO.println("after");
 
         // Push front
         battle.pushTime();

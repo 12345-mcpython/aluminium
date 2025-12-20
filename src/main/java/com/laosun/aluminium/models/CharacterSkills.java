@@ -11,6 +11,7 @@ public class CharacterSkills {
     public Skill common;
     public Skill skill;
     public Skill ultra;
+    // talent should use "event listener"
     public Skill talent;
     public Skill summonTalent;
     public Skill summonSkill;
