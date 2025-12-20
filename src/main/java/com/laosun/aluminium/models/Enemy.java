@@ -9,6 +9,8 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 public class Enemy extends CanHit {
+    private EnemySkills enemySkills;
+
     public Enemy(String name, Camp camp, double health, double defence, double attack, double speed) {
         super(name, camp, health, defence, attack, speed);
     }

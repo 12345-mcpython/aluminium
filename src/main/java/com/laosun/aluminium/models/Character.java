@@ -13,6 +13,8 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 public class Character extends CanHit {
+    private CharacterSkills characterSkills;
+
     public Character(String name, Camp camp, double health, double defence, double attack, double speed) {
         super(name, camp, health, defence, attack, speed);
     }

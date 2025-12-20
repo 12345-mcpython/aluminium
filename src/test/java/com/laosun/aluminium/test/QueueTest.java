@@ -2,8 +2,7 @@ package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Queue;
 import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Moveable;
+import com.laosun.aluminium.models.Signal;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -26,16 +25,16 @@ public class QueueTest {
         Character c9 = new Character("test 9", Camp.PLAYER, 100, 100, 100, 132);
         Character c10 = new Character("test 10", Camp.PLAYER, 200, 200, 100, 143);
         Queue q = new Queue(List.of(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10));
-        for (Moveable moveable : q.getActionQueue()) {
+        for (Signal moveable : q.getActionQueue()) {
             assertEquals(moveable.getTime(), 10000.0 / moveable.getSpeed());
         }
         q.progressTime();
-        for (Moveable moveable : q.getActionQueue()) {
+        for (Signal moveable : q.getActionQueue()) {
             assertEquals(moveable.getTime(), (10000.0 - moveable.getLength()) / moveable.getSpeed());
             assertEquals(moveable.getLength(), (10000.0 / q.getActionQueue().getFirst().getSpeed()) * moveable.getSpeed());
         }
-        q.resetCombatantLength((CanHit) q.getActionQueue().getFirst());
-        for (Moveable moveable : q.getActionQueue()) {
+        q.resetCombatantLength(q.getActionQueue().getFirst());
+        for (Signal moveable : q.getActionQueue()) {
             assertEquals(moveable.getTime(), (10000.0 - moveable.getLength()) / moveable.getSpeed());
         }
     }

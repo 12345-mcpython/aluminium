@@ -2,7 +2,7 @@ package com.laosun.aluminium;
 
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Moveable;
+import com.laosun.aluminium.models.Signal;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -12,41 +12,126 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 战斗队列：基于速度计算行动顺序，支持动态调整（模仿HSR回合制）
+ * A battle queue system that implements an Active Time Battle (ATB) mechanism.
+ * <p>
+ * This class manages combatants in a turn-based system where each character's
+ * action time is determined by their speed attribute. The system maintains
+ * two separate lists for different purposes:
+ * <ul>
+ *   <li>{@code combatantQueue} - An unsorted list of all combatants for reference</li>
+ *   <li>{@code actionQueue} - A sorted list of moveable entities by their next action time</li>
+ * </ul>
+ * </p>
+ * <p>
+ * The ATB system works by having each combatant accumulate "length" (progress toward action)
+ * based on their speed. When a combatant's length reaches the threshold (10000),
+ * they are ready to act.
+ * </p>
+ *
+ * @see CanHit
+ * @see Signal
+ * @see Camp
  */
 @Getter
 @ToString
 public final class Queue {
-    private static final double ACTION_THRESHOLD = 10000.0; // 行动所需长度阈值
-    private final List<CanHit> combatants = new ArrayList<>(); // 所有战斗角色（统一管理）
-    private final List<Moveable> actionQueue = new ArrayList<>(); // 排序后的行动队列
+    /**
+     * The action threshold value when a combatant can perform an action.
+     */
+    private static final double ACTION_THRESHOLD = 10000.0;
 
-    // 构造器
-    public Queue() {}
+    /**
+     * An unsorted list containing all combatants in the battle.
+     * Used for quick reference and lookup operations.
+     */
+    private final List<CanHit> combatantQueue = new ArrayList<>();
+
+    /**
+     * A sorted {@code Signal} list containing all moveable entities ordered by their next action time.
+     * Used to determine turn order in the battle.
+     */
+    private final List<Signal> actionQueue = new ArrayList<>();
+
+    /**
+     * Constructs an empty battle queue.
+     */
+    public Queue() {
+    }
+
+    /**
+     * Constructs a battle queue with initial combatants.
+     *
+     * @param initialCombatants the initial list of combatants to add to the queue
+     */
     public Queue(List<CanHit> initialCombatants) {
         addCombatants(initialCombatants);
     }
 
-    // ------------------- 角色管理 -------------------
+    /**
+     * Adds a single combatant to the battle queue.
+     * <p>
+     * The combatant will be added to both {@code combatantQueue} and {@code actionQueue}.
+     * After addition, the action times are recalculated for all combatants.
+     * </p>
+     *
+     * @param combatant the combatant to add to the queue
+     * @throws NullPointerException if the combatant is null
+     */
     public void addCombatant(CanHit combatant) {
-        if (combatant != null && !combatants.contains(combatant)) {
-            combatants.add(combatant);
-            actionQueue.add(combatant);
-            calcActionTimes(); // 新增角色后重新排序
+        if (combatant != null && !combatantQueue.contains(combatant)) {
+            combatantQueue.add(combatant);
+            actionQueue.add(new Signal(combatant, combatant.getSpeed()));
+            calcActionTimes();
         }
     }
 
+    /**
+     * Adds multiple combatants to the battle queue.
+     * <p>
+     * Each combatant will be added individually using {@link #addCombatant(CanHit)}.
+     * </p>
+     *
+     * @param combatants the list of combatants to add to the queue
+     */
     public void addCombatants(List<CanHit> combatants) {
         combatants.forEach(this::addCombatant);
     }
 
+    /**
+     * Removes a combatant from the battle queue.
+     * <p>
+     * The combatant will be removed from both {@code combatantQueue} and {@code actionQueue}.
+     * </p>
+     *
+     * @param combatant the combatant to remove from the queue
+     */
     public void removeCombatant(CanHit combatant) {
-        combatants.remove(combatant);
-        actionQueue.remove(combatant);
+        combatantQueue.remove(combatant);
+        removeSignalByCanHit(combatant);
     }
 
-    // ------------------- 队列计算 -------------------
-    /** 初始化队列：重置所有角色的行动长度和时间 */
+    private void removeSignalByCanHit(CanHit canHit) {
+        Signal signal = null;
+        for (Signal s : actionQueue) {
+            if (s.getCanHit() == canHit) {
+                signal = s;
+            }
+        }
+        actionQueue.remove(signal);
+    }
+
+    public void addSignal(Signal signal) {
+        actionQueue.add(signal);
+    }
+
+    /**
+     * Initializes the battle queue by resetting all moveable entities.
+     * <p>
+     * This method sets the {@code length} and {@code time} of all moveable entities to 0,
+     * then recalculates their action times. This is typically called at the start of a battle
+     * or when resetting the battle state.
+     * </p>
+     */
     public void initialize() {
         actionQueue.forEach(m -> {
             m.setLength(0);
@@ -55,28 +140,49 @@ public final class Queue {
         calcActionTimes();
     }
 
-    /** 计算所有角色的下次行动时间 */
+    /**
+     * Calculates the next action time for all moveable entities in the queue.
+     * <p>
+     * The action time is calculated using the formula:
+     * {@code time = (ACTION_THRESHOLD - length) / speed}
+     * </p>
+     * <p>
+     * Special cases:
+     * <ul>
+     *   <li>If speed ≤ 0, the combatant's time is set to {@link Double#MAX_VALUE}
+     *       (effectively never acting)</li>
+     * </ul>
+     * After calculation, the {@code actionQueue} is sorted in ascending order by action time.
+     * </p>
+     */
     public void calcActionTimes() {
         actionQueue.forEach(moveable -> {
             if (moveable.getSpeed() <= 0) {
-                moveable.setTime(Double.MAX_VALUE); // 速度为0无法行动
+                moveable.setTime(Double.MAX_VALUE);
                 return;
             }
-            // 下次行动时间 = 剩余所需长度 / 速度
             double remaining = ACTION_THRESHOLD - moveable.getLength();
             moveable.setTime(remaining / moveable.getSpeed());
         });
-        // 按行动时间升序排序（时间越短越先行动）
-        actionQueue.sort(Comparator.comparingDouble(Moveable::getTime));
+        actionQueue.sort(Comparator.comparingDouble(Signal::getTime));
     }
 
-    /** 推进时间到下一个角色行动 */
+    /**
+     * Advances the battle timeline to allow the next combatant to act.
+     * <p>
+     * This method progresses time by the amount needed for the first combatant in the
+     * {@code actionQueue} to reach the action threshold. All combatants accumulate
+     * action length based on their speed during this time progression.
+     * </p>
+     *
+     * @return the amount of time that has passed in the battle timeline
+     */
     public double progressTime() {
         if (actionQueue.isEmpty()) return 0;
-        Moveable next = actionQueue.getFirst();
+        Signal next = actionQueue.getFirst();
         double timePassed = next.getTime();
 
-        // 所有角色积累行动长度 = 时间 * 速度
+        // All combatants accumulate action length = time * speed
         actionQueue.forEach(m -> {
             if (m.getSpeed() > 0) {
                 m.setLength(Math.min(ACTION_THRESHOLD, m.getLength() + timePassed * m.getSpeed()));
@@ -86,56 +192,91 @@ public final class Queue {
         return timePassed;
     }
 
-    // ------------------- 工具方法 -------------------
-    /** 获取下一个行动的角色 */
-    public CanHit getNextCombatant() {
+    /**
+     * Retrieves the next combatant who is ready to act.
+     *
+     * @return the next combatant in line to act, or {@code null} if no combatant is ready
+     */
+    public Signal getNextCombatant() {
         return actionQueue.stream()
-                .filter(m -> m instanceof CanHit)
-                .map(m -> (CanHit) m)
                 .findFirst()
                 .orElse(null);
     }
 
-    /** 角色行动后重置行动长度 */
-    public void resetCombatantLength(CanHit combatant) {
+    /**
+     * Resets the action length of a specific combatant to 0.
+     * <p>
+     * This is typically called after a combatant has performed an action,
+     * resetting their progress toward the next action.
+     * </p>
+     *
+     * @param combatant the combatant whose action length should be reset
+     */
+    public void resetCombatantLength(Signal combatant) {
         if (combatant != null && actionQueue.contains(combatant)) {
             combatant.setLength(0);
             calcActionTimes();
         }
     }
 
-    /** 根据阵营获取存活角色 */
+    /**
+     * Retrieves all alive combatants belonging to a specific camp.
+     *
+     * @param camp the camp to filter combatants by
+     * @return a list of alive combatants in the specified camp
+     */
     public List<CanHit> getAliveByCamp(Camp camp) {
-        return combatants.stream()
+        return combatantQueue.stream()
                 .filter(c -> c.getHealth() != 0)
                 .filter(c -> c.getCamp() == camp)
                 .collect(Collectors.toList());
     }
 
-    /** 检查阵营是否全灭 */
+    /**
+     * Checks if all combatants in a specific camp have been defeated (health = 0).
+     *
+     * @param camp the camp to check
+     * @return {@code true} if no alive combatants remain in the camp, {@code false} otherwise
+     */
     public boolean isCampWiped(Camp camp) {
         return getAliveByCamp(camp).isEmpty();
     }
 
-    /** 动态调整角色速度（如buff效果） */
-    public void adjustSpeed(CanHit combatant, double delta) {
+    /**
+     * Adjusts the speed of a combatant and recalculates action times.
+     * <p>
+     * This method is used to apply speed buffs or debuffs to combatants.
+     * After adjusting the speed, the action times are recalculated for all combatants.
+     * </p>
+     *
+     * @param combatant the combatant whose speed should be adjusted
+     * @param value     the new speed value
+     */
+    public void adjustSpeed(Signal combatant, double value) {
         if (combatant != null) {
-            combatant.setSpeed(Math.max(1, combatant.getSpeed() + delta)); // 速度最低为1
+            combatant.setSpeed(value);
+            combatant.getCanHit().setSpeed(value);
             calcActionTimes();
         }
     }
 
-    /** 打印队列状态（调试用） */
+    /**
+     * Prints the current status of all combatants in the battle queue.
+     * <p>
+     * This method displays a formatted table showing each combatant's name, camp,
+     * health, action length, and next action time. Useful for debugging and
+     * monitoring battle state.
+     * </p>
+     */
     public void printStatus() {
         System.out.println("\n=== STATUS ===");
-        System.out.printf("%-10s %-8s %-8s %-8s %-8s%n",
-                "CHARACTER NAME", "CAMP", "HEALTH", "LENGTH", "TIME");
-        actionQueue.forEach(m -> {
-            if (m instanceof CanHit c) {
-                System.out.printf("%-10s %-8s %-8.0f %-8.0f %-8.1f%n",
-                        c.getName(), c.getCamp().name(), c.getInBattleHealth(),
-                        c.getLength(), c.getTime());
-            }
+        System.out.printf("%-10s %-8s %-8s %-8s %-8s %-8s%n",
+                "C NAME", "CAMP", "HEALTH", "LENGTH", "TIME", "ID");
+        actionQueue.forEach(c -> {
+            System.out.printf("%-10s %-8s %-8.0f %-8.0f %-8.1f %d %n",
+                    c.getCanHit().getName(), c.getCanHit().getCamp().name(), c.getCanHit().getInBattleHealth(),
+                    c.getLength(), c.getTime(), c.getId());
+
         });
         System.out.println("====================\n");
     }
