@@ -11,6 +11,19 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BattleDemo {
+    private static Skill generateTestSkill(SkillType skillType) {
+        double[][] pList = {{100}, {200}, {300}, {400}, {500}, {600}};
+        return new Skill(4, "Test", "Test", pList, skillType, SkillAttackType.ALL, SkillEffectType.DAMAGE) {
+            @Override
+            public boolean performSkill(CanHit performer, List<CanHit> accepter) {
+                accepter.forEach(accept -> {
+                    accept.setInBattleHealth(accept.getHealth() - getSkillValue()[this.getLevel()][0]);
+                });
+                return true;
+            }
+        };
+    }
+
     public static void main() {
         // Character
         Character warrior = new Character("WARRIOR", Camp.PLAYER, 1500, 300, 400, 180);
@@ -41,21 +54,11 @@ public class BattleDemo {
 
         Enemy goblin = new Enemy("GOBLIN", Camp.ENEMY, 800, 100, 200, 160);
 
-        double[] pList = new double[]{100, 200, 300, 400, 500, 600};
-        Skill p = new Skill(4, "Test", "Test", new double[][]{pList}) {
-            @Override
-            public boolean performSkill(CanHit performer, List<CanHit> accepter) {
-                accepter.forEach(accept -> {
-                    IO.println(accept.getName());
-                    IO.println(getSkillValue()[0][this.getLevel()]);
-                    IO.println(accept.getHealth() - getSkillValue()[0][this.getLevel()]);
-                    accept.setInBattleHealth(accept.getHealth() - getSkillValue()[0][this.getLevel()]);
-                });
-                return true;
-            }
-        };
 
-        CharacterSkills cs = new CharacterSkills(p, p, p, null, null, null);
+        CharacterSkills cs = new CharacterSkills(generateTestSkill(SkillType.COMMON),
+                generateTestSkill(SkillType.SKILL),
+                generateTestSkill(SkillType.ULTRA), generateTestSkill(SkillType.TALENT),
+                generateTestSkill(SkillType.SUMMON_TALENT), generateTestSkill(SkillType.SUMMON_SKILL));
         c4.setCharacterSkills(cs);
 
         // Battle
@@ -69,7 +72,14 @@ public class BattleDemo {
         IO.println("before");
         battle.getActionQueue().printStatus();
 
-        battle.performSkill(c4, new SkillRequest(5, SkillEffectType.DAMAGE, SkillType.ULTRA, SkillAttackType.ALL), battle.getActionQueue().getCombatantQueue().stream().filter(canHit -> canHit.getCamp() == Camp.ENEMY).toList());
+        boolean result = battle.performSkill(c4, SkillType.ULTRA,
+                battle.getActionQueue().getCombatantQueue()
+                        .stream()
+                        .filter(canHit -> canHit.getCamp() == Camp.ENEMY)
+                        .toList());
+        if (!result) {
+            IO.println("error!");
+        }
         // MAZA SKILL RELEASED IN THIS
         // Waiting for move
         // STATE
@@ -80,6 +90,10 @@ public class BattleDemo {
 
         IO.println("1");
         battle.getActionQueue().printStatus();
+
+        if (!battle.askTopMove()) {
+
+        }
 
         IO.println("2");
         battle.getActionQueue().resetCombatantLength(battle.getActionQueue().getNextCombatant());

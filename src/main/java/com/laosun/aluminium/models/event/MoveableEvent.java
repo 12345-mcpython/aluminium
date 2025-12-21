@@ -12,13 +12,4 @@ public interface MoveableEvent {
 
     default void onAfterMove(Battle battle, CanHit canHit) {
     }
-
-    default void onBeAttacked(Battle battle, CanHit attacker) {
-    }
-
-    default void onTakeDamage(double damage) {
-    }
-
-    default void onDeath() {
-    }
 }
