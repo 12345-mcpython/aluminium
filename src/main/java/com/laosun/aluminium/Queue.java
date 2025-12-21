@@ -111,13 +111,7 @@ public final class Queue {
     }
 
     private void removeSignalByCanHit(CanHit canHit) {
-        Signal signal = null;
-        for (Signal s : actionQueue) {
-            if (s.getCanHit() == canHit) {
-                signal = s;
-            }
-        }
-        actionQueue.remove(signal);
+        actionQueue.removeIf(signal -> signal.getCanHit() == canHit);
     }
 
     public void addSignal(Signal signal) {

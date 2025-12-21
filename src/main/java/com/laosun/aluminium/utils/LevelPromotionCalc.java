@@ -8,7 +8,7 @@ public final class LevelPromotionCalc {
         if (promotion && level == 80) {
             promoteCount -= 1;
         }
-        if (level <= 20) {
+        if (level <= 20 && !promotion) {
             promoteCount = 0;
         }
 

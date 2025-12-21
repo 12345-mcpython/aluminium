@@ -9,9 +9,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-/**
- * 战斗核心类：管理战斗流程、结束条件、角色行动
- */
+
 @Getter
 @Setter
 public class Battle {
@@ -24,9 +22,7 @@ public class Battle {
         this.actionQueue = actionQueue;
     }
 
-    /**
-     * 开始战斗（主循环）
-     */
+
     public void startBattle() {
         System.out.println("===== BATTLE START =====");
         actionQueue.initialize();
@@ -49,20 +45,17 @@ public class Battle {
         return true;
     }
 
-    /**
-     * 工具方法：获取某阵营的存活目标（用于行动选择）
-     */
     public List<CanHit> getAliveTargets(Camp camp) {
         return actionQueue.getAliveByCamp(camp);
     }
 
-    public boolean performSkill(CanHit performer, SkillRequest skillRequest, List<CanHit> targets) {
-        if (currentMove == null && skillRequest.skill != SkillType.ULTRA) {
-            IO.println("Can't perform " + skillRequest.skill);
+    public boolean performSkill(CanHit performer, SkillType skillType, List<CanHit> targets) {
+        if (currentMove == null && skillType != SkillType.ULTRA) {
+            IO.println("Can't perform not ultra skill!");
             return false;
         }
         if (performer instanceof Character character) {
-            Skill s = switch (skillRequest.skill) {
+            Skill s = switch (skillType) {
                 case ULTRA -> character.getCharacterSkills().ultra;
                 case COMMON -> character.getCharacterSkills().common;
                 case SKILL -> character.getCharacterSkills().skill;
