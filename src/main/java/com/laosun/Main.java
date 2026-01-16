@@ -1,6 +1,5 @@
 package com.laosun;
 
-import com.laosun.aluminium.BattleDemo;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
@@ -36,9 +35,14 @@ public class Main {
         IO.println(Constant.CHARACTERS.get(1409).name().english());
 
         IO.println(LevelPromotionCalc.calcCharacterRate(80));
-        IO.println(LevelPromotionCalc.calcAttackerRate(80));
+        IO.println(LevelPromotionCalc.calcWeaponRate(80));
         IO.println(Constant.CHARACTERS.get(1409).health());
         IO.println(Constant.WEAPONS.get(23042).health());
+        Weapon wp = Weapon.build(23042, 80);
+        IO.println(wp);
+        Character character = Character.build(1409, 80, false, hya, wp, null,
+                new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3));
+        IO.println(character);
         // IO.println(Character.build(1003, 20, true, hya, null));
         // TEST CALC
         // In game

@@ -15,7 +15,7 @@ public final class LevelPromotionCalc {
         return baseRate + promoteCount * 0.4;
     }
 
-    public static double calcAttackerRate(int level, boolean promotion) {
+    public static double calcWeaponRate(int level, boolean promotion) {
         double baseRate = 1.00 + (level - 1) * 0.15;
 
         boolean firstPromote = level > 20 || (level == 20 && promotion);
@@ -35,7 +35,7 @@ public final class LevelPromotionCalc {
         return calcCharacterRate(level, false);
     }
 
-    public static double calcAttackerRate(int level) {
-        return calcAttackerRate(level, false);
+    public static double calcWeaponRate(int level) {
+        return calcWeaponRate(level, false);
     }
 }
