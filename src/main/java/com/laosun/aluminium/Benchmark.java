@@ -1,9 +1,10 @@
 package com.laosun.aluminium;
 
 import com.google.gson.reflect.TypeToken;
-import com.laosun.aluminium.models.Relic;
-import com.laosun.aluminium.models.RelicSuit;
+import com.laosun.aluminium.models.*;
+import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.utils.JSONReader;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,15 @@ public class Benchmark {
                 );
                 suits.addToSuit(relic);
             }
-            var test = suits.calcTotalValue();
+            buildCharacter(suits);
+            Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
+            suits.calcTotalValue(relicValue);
         }
+    }
+
+    private static void buildCharacter(RelicSuit suit) {
+        Weapon wp = Weapon.build(23042, 80);
+        Character character = Character.build(1409, 80, false, suit, wp,
+                new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3));
     }
 }

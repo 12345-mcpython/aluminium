@@ -4,6 +4,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 import java.nio.charset.Charset;
 
@@ -30,7 +31,9 @@ public class Main {
         IO.println(hyaHead);
         RelicSuit hya = new RelicSuit();
         hya.addMore(hyaBody, hyaLine, hyaBall, hyaBoot, hyaHand, hyaHead);
-        IO.println(hya.calcTotalValue());
+        Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
+        hya.calcTotalValue(relicValue);
+        IO.println(relicValue);
         IO.println(Constant.WEAPONS.get(23042).name().english());
         IO.println(Constant.CHARACTERS.get(1409).name().english());
 
@@ -40,9 +43,11 @@ public class Main {
         IO.println(Constant.WEAPONS.get(23042).health());
         Weapon wp = Weapon.build(23042, 80);
         IO.println(wp);
-        Character character = Character.build(1409, 80, false, hya, wp, null,
+        Character character = Character.build(1409, 80, false, hya, wp,
                 new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3));
-        IO.println(character);
+        IO.println(character.getHealth());
+        IO.println(character.getDefence());
+        IO.println(character.getSpeed());
         // IO.println(Character.build(1003, 20, true, hya, null));
         // TEST CALC
         // In game
