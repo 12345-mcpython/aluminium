@@ -9,7 +9,7 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 public class Summon extends CanHit {
-    public Summon(String name, Camp camp, double health, double defence, double attack, double speed) {
-        super(name, camp, health, defence, attack, speed);
+    public Summon(String name, double health, double defence, double attack, double speed) {
+        super(name, Camp.PLAYER, health, defence, attack, speed);
     }
 }

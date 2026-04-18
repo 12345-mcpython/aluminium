@@ -1,9 +1,6 @@
 package com.laosun.aluminium.models;
 
-import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.models.event.CanHitEvent;
-import com.laosun.aluminium.models.event.MoveableEvent;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public abstract class CanHit implements MoveableEvent, CanHitEvent {
+public abstract class CanHit {
     private String name;
     private double health;
     private double maxHealth;
@@ -42,17 +39,9 @@ public abstract class CanHit implements MoveableEvent, CanHitEvent {
         this.defence = defence;
         this.attack = attack;
         this.speed = speed;
-        // 初始化战斗属性（与基础属性一致，可通过buff修改）
         this.inBattleDefence = defence;
         this.inBattleHealth = health;
         this.inBattleMaxHealth = health;
         this.inBattleAttack = attack;
-    }
-
-
-    // ------------------- 事件默认实现（子类可重写） -------------------
-    @Override
-    public void onBattleStart(Battle battle, CanHit canHit) {
-        System.out.printf("[%s] JOIN BATTLE（CAMP：%s）%n", getName(), getCamp().name());
     }
 }

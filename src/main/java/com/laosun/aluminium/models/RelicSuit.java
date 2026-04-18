@@ -1,5 +1,7 @@
 package com.laosun.aluminium.models;
 
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,10 +34,9 @@ public final class RelicSuit {
         }
     }
 
-    public Map<String, Double> calcTotalValue() {
-        Map<String, Double> totalMap = new HashMap<>();
+    public void calcTotalValue(Object2DoubleOpenHashMap<String> relicValue) {
         if (total == null || total.isEmpty()) {
-            return totalMap;
+            return;
         }
 
         for (Relic relic : total) {
@@ -45,9 +46,7 @@ public final class RelicSuit {
 
             Relic.Attribute mainAttr = relic.getMainAttribute();
             if (mainAttr != null) {
-                String mainKey = mainAttr.left();
-                double mainValue = mainAttr.right();
-                totalMap.merge(mainKey, mainValue, Double::sum);
+                relicValue.addTo(mainAttr.left(), mainAttr.right());
             }
 
             List<Relic.Attribute> subAttrs = relic.getSubAttributes();
@@ -56,17 +55,16 @@ public final class RelicSuit {
                     if (subAttr == null) {
                         continue;
                     }
-                    String subKey = subAttr.left();
-                    double subValue = subAttr.right();
-                    totalMap.merge(subKey, subValue, Double::sum);
+                    relicValue.addTo(subAttr.left(), subAttr.right());
                 }
             }
         }
-        return totalMap;
     }
 
     @Override
     public String toString() {
-        return calcTotalValue().toString();
+        Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
+        calcTotalValue(relicValue);
+        return relicValue.toString();
     }
 }
