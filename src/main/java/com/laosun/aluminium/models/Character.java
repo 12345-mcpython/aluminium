@@ -1,53 +1,37 @@
 package com.laosun.aluminium.models;
 
-import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.enums.SkillAttackType;
-import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
 @ToString(callSuper = true)
 public class Character extends CanHit {
-    private double energyRegenerationRate = 1;
     private double maxEnergy;
-    private EnergyProcessor energyProcessor;
     private RelicSuit relicSuit;
     private Weapon weapon;
-    private static Skill tempSkill = new Skill(0, "Test", "Test", null, null, null, null) {
-        @Override
-        public boolean performSkill(CanHit performer, List<CanHit> accepter) {
-            return true;
-        }
-    };
-    private CharacterSkills characterSkills = new CharacterSkills(tempSkill, tempSkill, tempSkill, tempSkill, tempSkill, tempSkill);
 
-
-    public Character(String name, Camp camp, double health, double defence, double attack, double speed) {
-        super(name, camp, health, defence, attack, speed);
-        setEnergyProcessor(new DefaultEnergyProcessor(0, getMaxEnergy()));
+    public Character(String name, double health, double defence, double attack, double speed) {
+        super(name, Camp.PLAYER, health, defence, attack, speed);
     }
 
-    public Character(Translate name, Camp camp, double health, double defence, double attack, double speed) {
-        super(name.english(), camp, health, defence, attack, speed);
+    public Character(Translate name, double health, double defence, double attack, double speed) {
+        super(name.english(), Camp.PLAYER, health, defence, attack, speed);
     }
 
-    public static Character build(int cid, int level, boolean isPromote, RelicSuit suit, Weapon weapon, CharacterSkills characterSkills) {
-        return build(cid, level, isPromote, suit, weapon, characterSkills, new ExtraBasicPromote());
+    public static Character build(int cid, int level, boolean isPromote, RelicSuit suit, Weapon weapon) {
+        return build(cid, level, isPromote, suit, weapon,new ExtraBasicPromote());
     }
 
-    public static Character build(int cid, int level, boolean isPromote, RelicSuit suit, Weapon weapon, CharacterSkills characterSkills, ExtraBasicPromote extraBasicPromote) {
+    public static Character build(int cid, int level, boolean isPromote, RelicSuit suit, Weapon weapon, ExtraBasicPromote extraBasicPromote) {
         CharacterData characterData = Constant.CHARACTERS.get(cid);
         if (characterData == null) {
             throw new CharacterException.CharacterNotFoundException(String.format("Character '%s' not found", cid));
@@ -57,25 +41,100 @@ public class Character extends CanHit {
         double baseDefence = characterData.defence() * rate + weapon.getDefence();
         double baseAttack = characterData.attack() * rate + weapon.getAttack();
         double baseSpeed = characterData.speed();
-        IO.println(rate);
-        Map<String, Double> relicValue = suit.calcTotalValue();
-        baseHealth = baseHealth * (1 + relicValue.get("health_percent") + extraBasicPromote.healthPercent()) + relicValue.get("health") + extraBasicPromote.health();
-        baseDefence = baseDefence * (1 + relicValue.get("defence_percent") + extraBasicPromote.defencePercent()) + relicValue.get("defence") + extraBasicPromote.defence();
-        baseAttack = baseAttack * (1 + relicValue.get("attack_percent") + extraBasicPromote.attackPercent()) + relicValue.get("attack") + extraBasicPromote.attack();
-        baseSpeed = baseSpeed * (1 + extraBasicPromote.speedPercent()) + relicValue.get("speed") + extraBasicPromote.speed();
+        Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
+        suit.calcTotalValue(relicValue);
+        baseHealth = baseHealth * (1 + relicValue.getOrDefault("health_percent", 0.0) + extraBasicPromote.healthPercent()) + relicValue.getOrDefault("health", 0.0) + extraBasicPromote.health();
+        baseDefence = baseDefence * (1 + relicValue.getOrDefault("defence_percent", 0.0) + extraBasicPromote.defencePercent()) + relicValue.getOrDefault("defence", 0.0) + extraBasicPromote.defence();
+        baseAttack = baseAttack * (1 + relicValue.getOrDefault("attack_percent", 0.0) + extraBasicPromote.attackPercent()) + relicValue.getOrDefault("attack", 0.0) + extraBasicPromote.attack();
+        baseSpeed = baseSpeed * (1 + extraBasicPromote.speedPercent()) + relicValue.getOrDefault("speed", 0.0) + extraBasicPromote.speed();
 
-        Character a = new Character(characterData.name(), Camp.PLAYER, baseHealth, baseDefence, baseAttack, baseSpeed);
+        Character a = new Character(characterData.name(), baseHealth, baseDefence, baseAttack, baseSpeed);
         a.relicSuit = suit;
-        a.maxEnergy = characterData.maxEnergy();
-        a.characterSkills = characterSkills;
         a.weapon = weapon;
         return a;
     }
 
-    // TODO: write it!
-    public static class DefaultEnergyProcessor extends EnergyProcessor {
-        public DefaultEnergyProcessor(double energy, double maxEnergy) {
-            super(energy, maxEnergy);
+    public static class Builder {
+        private int cid;
+        private Translate name;
+        private double health;
+        private double defence;
+        private double attack;
+        private int level;
+        private double maxEnergy;
+        private RelicSuit relicSuit;
+        private Weapon weapon;
+        private boolean isPromote;
+        private ExtraBasicPromote extraBasicPromote;
+
+        public Builder promote() {
+            this.isPromote = true;
+            return this;
+        }
+
+        public Builder cid(int cid) {
+            this.cid = cid;
+            return this;
+        }
+
+        public Builder name(Translate name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder health(double health) {
+            this.health = health;
+            return this;
+        }
+
+        public Builder defence(double defence) {
+            this.defence = defence;
+            return this;
+        }
+
+        public Builder attack(double attack) {
+            this.attack = attack;
+            return this;
+        }
+
+        public Builder basicData(double health, double defence, double attack) {
+            this.health = health;
+            this.defence = defence;
+            this.attack = attack;
+            return this;
+        }
+
+        public Builder extraValue(ExtraBasicPromote extraBasicPromote) {
+            this.extraBasicPromote = extraBasicPromote;
+            return this;
+        }
+
+        public Builder level(int level) {
+            this.level = level;
+            return this;
+        }
+
+        public Character build() {
+            CharacterData characterData = Constant.CHARACTERS.get(cid);
+            if (characterData == null) {
+                throw new CharacterException.CharacterNotFoundException(String.format("Character '%s' not found", cid));
+            }
+            double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
+            double baseHealth = characterData.health() * rate + weapon.getHealth();
+            double baseDefence = characterData.defence() * rate + weapon.getDefence();
+            double baseAttack = characterData.attack() * rate + weapon.getAttack();
+            double baseSpeed = characterData.speed();
+            Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
+            relicSuit.calcTotalValue(relicValue);
+            baseHealth = baseHealth * (1 + relicValue.getOrDefault("health_percent", 0.0) + extraBasicPromote.healthPercent()) + relicValue.getOrDefault("health", 0.0) + extraBasicPromote.health();
+            baseDefence = baseDefence * (1 + relicValue.getOrDefault("defence_percent", 0.0) + extraBasicPromote.defencePercent()) + relicValue.getOrDefault("defence", 0.0) + extraBasicPromote.defence();
+            baseAttack = baseAttack * (1 + relicValue.getOrDefault("attack_percent", 0.0) + extraBasicPromote.attackPercent()) + relicValue.getOrDefault("attack", 0.0) + extraBasicPromote.attack();
+            baseSpeed = baseSpeed * (1 + extraBasicPromote.speedPercent()) + relicValue.getOrDefault("speed", 0.0) + extraBasicPromote.speed();
+
+            Character a = new Character(characterData.name(), baseHealth, baseDefence, baseAttack, baseSpeed);
+            a.relicSuit = relicSuit;
+            a.weapon = weapon;
+            return a;
         }
     }
 }
