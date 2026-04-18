@@ -42,9 +42,13 @@ public class Main {
         IO.println(Constant.CHARACTERS.get(1409).health());
         IO.println(Constant.WEAPONS.get(23042).health());
         Weapon wp = Weapon.build(23042, 80);
-        IO.println(wp);
-        Character character = Character.build(1409, 80, false, hya, wp,
-                new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3));
+        Character character = new Character.Builder()
+                .cid(1409)
+                .level(80)
+                .relicSuit(hya)
+                .weapon(wp)
+                .extraValue(new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3))
+                .build();
         IO.println(character.getHealth());
         IO.println(character.getDefence());
         IO.println(character.getSpeed());

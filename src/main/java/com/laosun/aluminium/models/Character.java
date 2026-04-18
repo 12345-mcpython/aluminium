@@ -19,39 +19,8 @@ public class Character extends CanHit {
     private RelicSuit relicSuit;
     private Weapon weapon;
 
-    public Character(String name, double health, double defence, double attack, double speed) {
-        super(name, Camp.PLAYER, health, defence, attack, speed);
-    }
-
-    public Character(Translate name, double health, double defence, double attack, double speed) {
+    private Character(Translate name, double health, double defence, double attack, double speed) {
         super(name.english(), Camp.PLAYER, health, defence, attack, speed);
-    }
-
-    public static Character build(int cid, int level, boolean isPromote, RelicSuit suit, Weapon weapon) {
-        return build(cid, level, isPromote, suit, weapon,new ExtraBasicPromote());
-    }
-
-    public static Character build(int cid, int level, boolean isPromote, RelicSuit suit, Weapon weapon, ExtraBasicPromote extraBasicPromote) {
-        CharacterData characterData = Constant.CHARACTERS.get(cid);
-        if (characterData == null) {
-            throw new CharacterException.CharacterNotFoundException(String.format("Character '%s' not found", cid));
-        }
-        double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
-        double baseHealth = characterData.health() * rate + weapon.getHealth();
-        double baseDefence = characterData.defence() * rate + weapon.getDefence();
-        double baseAttack = characterData.attack() * rate + weapon.getAttack();
-        double baseSpeed = characterData.speed();
-        Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
-        suit.calcTotalValue(relicValue);
-        baseHealth = baseHealth * (1 + relicValue.getOrDefault("health_percent", 0.0) + extraBasicPromote.healthPercent()) + relicValue.getOrDefault("health", 0.0) + extraBasicPromote.health();
-        baseDefence = baseDefence * (1 + relicValue.getOrDefault("defence_percent", 0.0) + extraBasicPromote.defencePercent()) + relicValue.getOrDefault("defence", 0.0) + extraBasicPromote.defence();
-        baseAttack = baseAttack * (1 + relicValue.getOrDefault("attack_percent", 0.0) + extraBasicPromote.attackPercent()) + relicValue.getOrDefault("attack", 0.0) + extraBasicPromote.attack();
-        baseSpeed = baseSpeed * (1 + extraBasicPromote.speedPercent()) + relicValue.getOrDefault("speed", 0.0) + extraBasicPromote.speed();
-
-        Character a = new Character(characterData.name(), baseHealth, baseDefence, baseAttack, baseSpeed);
-        a.relicSuit = suit;
-        a.weapon = weapon;
-        return a;
     }
 
     public static class Builder {
@@ -106,6 +75,16 @@ public class Character extends CanHit {
 
         public Builder extraValue(ExtraBasicPromote extraBasicPromote) {
             this.extraBasicPromote = extraBasicPromote;
+            return this;
+        }
+
+        public Builder relicSuit(RelicSuit relicSuit) {
+            this.relicSuit = relicSuit;
+            return this;
+        }
+
+        public Builder weapon(Weapon weapon) {
+            this.weapon = weapon;
             return this;
         }
 
