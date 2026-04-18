@@ -79,7 +79,12 @@ public class Benchmark {
 
     private static void buildCharacter(RelicSuit suit) {
         Weapon wp = Weapon.build(23042, 80);
-        Character character = Character.build(1409, 80, false, suit, wp,
-                new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3));
+        Character character = new Character.Builder()
+                .cid(1409)
+                .level(80)
+                .relicSuit(suit)
+                .weapon(wp)
+                .extraValue(new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3))
+                .build();
     }
 }
