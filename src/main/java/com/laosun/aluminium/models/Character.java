@@ -7,6 +7,7 @@ import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -30,7 +31,7 @@ public class Character extends CanHit {
         private boolean isPromote = false;
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
 
-        public Builder promote() {
+        public Builder isPromote() {
             this.isPromote = true;
             return this;
         }
@@ -61,14 +62,34 @@ public class Character extends CanHit {
         }
 
         public Character build() {
+            validate(cid);
+            CharacterData characterData = Constant.CHARACTERS.get(cid);
+            double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
+            Calculator.CalcData calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
+            Character character = new Character(characterData.name(), calcData.health, calcData.defence, calcData.attack, calcData.speed);
+            character.relicSuit = relicSuit;
+            character.weapon = weapon;
+            return character;
+        }
+
+        private void validate(int cid) {
             if (cid == 0) {
                 throw new CharacterException("cid can't be null or 0");
             }
-            CharacterData characterData = Constant.CHARACTERS.get(cid);
-            if (characterData == null) {
+            if (Constant.CHARACTERS.get(cid) == null) {
                 throw new CharacterException.CharacterNotFoundException(String.format("Character '%s' not found", cid));
             }
-            double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
+        }
+    }
+
+    @AllArgsConstructor
+    private static class Calculator {
+        private CharacterData characterData;
+        private Weapon weapon;
+        private RelicSuit relicSuit;
+        private ExtraBasicPromote extraBasicPromote;
+
+        public CalcData calculate(double rate) {
             double baseHealth = characterData.health() * rate + weapon.getHealth();
             double baseDefence = characterData.defence() * rate + weapon.getDefence();
             double baseAttack = characterData.attack() * rate + weapon.getAttack();
@@ -79,11 +100,16 @@ public class Character extends CanHit {
             baseDefence = baseDefence * (1 + relicValue.getOrDefault("defence_percent", 0.0) + extraBasicPromote.defencePercent()) + relicValue.getOrDefault("defence", 0.0) + extraBasicPromote.defence();
             baseAttack = baseAttack * (1 + relicValue.getOrDefault("attack_percent", 0.0) + extraBasicPromote.attackPercent()) + relicValue.getOrDefault("attack", 0.0) + extraBasicPromote.attack();
             baseSpeed = baseSpeed * (1 + extraBasicPromote.speedPercent()) + relicValue.getOrDefault("speed", 0.0) + extraBasicPromote.speed();
+            return new CalcData(baseHealth, baseDefence, baseAttack, baseSpeed);
+        }
 
-            Character a = new Character(characterData.name(), baseHealth, baseDefence, baseAttack, baseSpeed);
-            a.relicSuit = relicSuit;
-            a.weapon = weapon;
-            return a;
+        @AllArgsConstructor
+        public static class CalcData {
+            private double health;
+            private double defence;
+            private double attack;
+            private double speed;
         }
     }
+
 }
