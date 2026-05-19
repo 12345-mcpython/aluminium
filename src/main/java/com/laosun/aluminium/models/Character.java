@@ -15,7 +15,6 @@ import lombok.ToString;
 @Setter
 @ToString(callSuper = true)
 public class Character extends CanHit {
-    private double maxEnergy;
     private RelicSuit relicSuit;
     private Weapon weapon;
 
@@ -25,16 +24,11 @@ public class Character extends CanHit {
 
     public static class Builder {
         private int cid;
-        private Translate name;
-        private double health;
-        private double defence;
-        private double attack;
-        private int level;
-        private double maxEnergy;
+        private int level = 1;
         private RelicSuit relicSuit;
-        private Weapon weapon;
-        private boolean isPromote;
-        private ExtraBasicPromote extraBasicPromote;
+        private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null);
+        private boolean isPromote = false;
+        private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
 
         public Builder promote() {
             this.isPromote = true;
@@ -43,33 +37,6 @@ public class Character extends CanHit {
 
         public Builder cid(int cid) {
             this.cid = cid;
-            return this;
-        }
-
-        public Builder name(Translate name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder health(double health) {
-            this.health = health;
-            return this;
-        }
-
-        public Builder defence(double defence) {
-            this.defence = defence;
-            return this;
-        }
-
-        public Builder attack(double attack) {
-            this.attack = attack;
-            return this;
-        }
-
-        public Builder basicData(double health, double defence, double attack) {
-            this.health = health;
-            this.defence = defence;
-            this.attack = attack;
             return this;
         }
 
@@ -94,6 +61,9 @@ public class Character extends CanHit {
         }
 
         public Character build() {
+            if (cid == 0) {
+                throw new CharacterException("cid can't be null or 0");
+            }
             CharacterData characterData = Constant.CHARACTERS.get(cid);
             if (characterData == null) {
                 throw new CharacterException.CharacterNotFoundException(String.format("Character '%s' not found", cid));
