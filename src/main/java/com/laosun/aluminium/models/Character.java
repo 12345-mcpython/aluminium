@@ -1,10 +1,11 @@
 package com.laosun.aluminium.models;
 
-import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.exceptions.CharacterException;
+import com.laosun.aluminium.utils.CharacterDataProvider;
+import com.laosun.aluminium.utils.ConstantCharacterDataProvider;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ import lombok.ToString;
 public class Character extends CanHit {
     private RelicSuit relicSuit;
     private Weapon weapon;
+    private CharacterDataProvider characterDataProvider;
 
     private Character(Translate name, double health, double defence, double attack, double speed) {
         super(name.english(), Camp.PLAYER, health, defence, attack, speed);
@@ -30,6 +32,7 @@ public class Character extends CanHit {
         private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null);
         private boolean isPromote = false;
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
+        private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
 
         public Builder isPromote() {
             this.isPromote = true;
@@ -61,9 +64,14 @@ public class Character extends CanHit {
             return this;
         }
 
+        public Builder characterDataProvider(CharacterDataProvider characterDataProvider) {
+            this.characterDataProvider = characterDataProvider;
+            return this;
+        }
+
         public Character build() {
             validate(cid);
-            CharacterData characterData = Constant.CHARACTERS.get(cid);
+            CharacterData characterData = characterDataProvider.get(cid);
             double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
             Calculator.CalcData calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
             Character character = new Character(characterData.name(), calcData.health, calcData.defence, calcData.attack, calcData.speed);
@@ -76,7 +84,7 @@ public class Character extends CanHit {
             if (cid == 0) {
                 throw new CharacterException("cid can't be null or 0");
             }
-            if (Constant.CHARACTERS.get(cid) == null) {
+            if (characterDataProvider.get(cid) == null) {
                 throw new CharacterException.CharacterNotFoundException(String.format("Character '%s' not found", cid));
             }
         }
