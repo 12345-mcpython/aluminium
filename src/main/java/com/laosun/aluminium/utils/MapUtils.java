@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public final class MapUtils {
     /**
      * 从Map中随机获取一个条目（键值对）
+     *
      * @param map 非空的Map
      * @return 随机选中的条目
      * @throws IllegalArgumentException 如果Map为空或null

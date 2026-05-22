@@ -19,7 +19,6 @@ import lombok.ToString;
 public class Character extends CanHit {
     private RelicSuit relicSuit;
     private Weapon weapon;
-    private CharacterDataProvider characterDataProvider;
 
     private Character(Translate name, double health, double defence, double attack, double speed) {
         super(name.english(), Camp.PLAYER, health, defence, attack, speed);
@@ -28,7 +27,7 @@ public class Character extends CanHit {
     public static class Builder {
         private int cid;
         private int level = 1;
-        private RelicSuit relicSuit;
+        private RelicSuit relicSuit = new RelicSuit();
         private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null);
         private boolean isPromote = false;
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
@@ -70,8 +69,7 @@ public class Character extends CanHit {
         }
 
         public Character build() {
-            validate(cid);
-            CharacterData characterData = characterDataProvider.get(cid);
+            CharacterData characterData = validateAndGet(cid);
             double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
             Calculator.CalcData calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
             Character character = new Character(characterData.name(), calcData.health, calcData.defence, calcData.attack, calcData.speed);
@@ -80,13 +78,15 @@ public class Character extends CanHit {
             return character;
         }
 
-        private void validate(int cid) {
+        private CharacterData validateAndGet(int cid) {
             if (cid == 0) {
                 throw new CharacterException("cid can't be null or 0");
             }
-            if (characterDataProvider.get(cid) == null) {
+            CharacterData cd = characterDataProvider.get(cid);
+            if (cd == null) {
                 throw new CharacterException.CharacterNotFoundException(String.format("Character '%s' not found", cid));
             }
+            return cd;
         }
     }
 

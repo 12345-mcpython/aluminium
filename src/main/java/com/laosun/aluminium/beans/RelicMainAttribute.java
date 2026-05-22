@@ -9,9 +9,6 @@ public record RelicMainAttribute(@SerializedName("2") Map<String, Map<String, At
                                  @SerializedName("4") Map<String, Map<String, Attribute>> star4,
                                  @SerializedName("5") Map<String, Map<String, Attribute>> star5) {
 
-    public record Attribute(double base, double bonus) {
-    }
-
     public Map<String, Map<String, Attribute>> getAttributeByStar(int star) {
         return switch (star) {
             case 2 -> star2;
@@ -20,5 +17,8 @@ public record RelicMainAttribute(@SerializedName("2") Map<String, Map<String, At
             case 5 -> star5;
             default -> throw new IllegalArgumentException("Invalid star: " + star);
         };
+    }
+
+    public record Attribute(double base, double bonus) {
     }
 }
