@@ -8,6 +8,16 @@ public record RelicSubAttribute(
         @SerializedName("4") AttributeGroup star4,
         @SerializedName("5") AttributeGroup star5
 ) {
+    public AttributeGroup getAttributeGroupByStar(int star) {
+        return switch (star) {
+            case 2 -> star2;
+            case 3 -> star3;
+            case 4 -> star4;
+            case 5 -> star5;
+            default -> throw new IllegalStateException("Unexpected star: " + star);
+        };
+    }
+
     public record AttributeGroup(@SerializedName("health_percent") Attribute healthPercent,
                                  @SerializedName("defence_percent") Attribute defencePercent,
                                  @SerializedName("crit_attack") Attribute critAttack,
@@ -40,15 +50,5 @@ public record RelicSubAttribute(
     }
 
     public record Attribute(double base, double bonus) {
-    }
-
-    public AttributeGroup getAttributeGroupByStar(int star) {
-        return switch (star) {
-            case 2 -> star2;
-            case 3 -> star3;
-            case 4 -> star4;
-            case 5 -> star5;
-            default -> throw new IllegalStateException("Unexpected star: " + star);
-        };
     }
 }

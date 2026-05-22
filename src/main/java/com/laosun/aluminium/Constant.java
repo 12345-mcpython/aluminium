@@ -5,7 +5,6 @@ import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.RelicMainAttribute;
 import com.laosun.aluminium.beans.RelicSubAttribute;
 import com.laosun.aluminium.beans.WeaponData;
-import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.utils.JSONReader;
 
 import java.util.Map;

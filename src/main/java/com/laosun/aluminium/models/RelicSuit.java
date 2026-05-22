@@ -3,9 +3,7 @@ package com.laosun.aluminium.models;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class RelicSuit {
     public Relic hand;
@@ -17,6 +15,7 @@ public final class RelicSuit {
     public List<Relic> total = new ArrayList<>();
 
     public void addToSuit(Relic relic) {
+        if (relic == null) return;
         switch (relic.relicType) {
             case Relic.Type.HAND -> hand = relic;
             case Relic.Type.HEAD -> head = relic;

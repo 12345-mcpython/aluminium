@@ -13,9 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Benchmark {
-    public record Suit(String set, String type, Relic.Setting json) {
-    }
-
     static void main() throws InterruptedException {
         int roundSingle = 1000000;
         long start = System.nanoTime();
@@ -86,5 +83,8 @@ public class Benchmark {
                 .weapon(wp)
                 .extraValue(new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3))
                 .build();
+    }
+
+    public record Suit(String set, String type, Relic.Setting json) {
     }
 }
