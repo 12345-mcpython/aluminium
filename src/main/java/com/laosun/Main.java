@@ -41,6 +41,7 @@ public class Main {
         IO.println(LevelPromotionCalc.calcWeaponRate(80));
         IO.println(Constant.CHARACTERS.get(1409).health());
         IO.println(Constant.WEAPONS.get(23042).health());
+        IO.println(Constant.WEAPONS.get(23042).weaponSkillData().getFirst().abilityProperties());
         Weapon wp = Weapon.build(23042, 80);
         Character character = new Character.Builder()
                 .cid(1409)
