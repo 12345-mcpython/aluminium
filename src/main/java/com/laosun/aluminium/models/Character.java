@@ -104,10 +104,31 @@ public class Character extends CanHit {
             double baseSpeed = characterData.speed();
             Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
             relicSuit.calcTotalValue(relicValue);
-            baseHealth = baseHealth * (1 + relicValue.getOrDefault("health_percent", 0.0) + extraBasicPromote.healthPercent()) + relicValue.getOrDefault("health", 0.0) + extraBasicPromote.health();
-            baseDefence = baseDefence * (1 + relicValue.getOrDefault("defence_percent", 0.0) + extraBasicPromote.defencePercent()) + relicValue.getOrDefault("defence", 0.0) + extraBasicPromote.defence();
-            baseAttack = baseAttack * (1 + relicValue.getOrDefault("attack_percent", 0.0) + extraBasicPromote.attackPercent()) + relicValue.getOrDefault("attack", 0.0) + extraBasicPromote.attack();
-            baseSpeed = baseSpeed * (1 + extraBasicPromote.speedPercent()) + relicValue.getOrDefault("speed", 0.0) + extraBasicPromote.speed();
+            baseHealth = new DoubleValue(baseHealth)
+                    .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("health_percent", 0.0)))
+                    .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.healthPercent()))
+                    .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("health", 0.0)))
+                    .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.health()))
+                    .get();
+            baseDefence = new DoubleValue(baseDefence)
+                    .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("defence_percent", 0.0)))
+                    .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.defencePercent()))
+                    .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("defence", 0.0)))
+                    .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.defence()))
+                    .get();
+            baseAttack = new DoubleValue(baseAttack)
+                    .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("attack_percent", 0.0)))
+                    .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.attackPercent()))
+                    .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("attack", 0.0)))
+                    .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.attack()))
+                    .get();
+            // addPercent 0 is placeholder
+            baseSpeed = new DoubleValue(baseSpeed)
+                    .addModifier(DoubleValue.Modifier.addPercent(0))
+                    .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.speedPercent()))
+                    .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("speed", 0.0)))
+                    .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.speed()))
+                    .get();
             return new CalcData(baseHealth, baseDefence, baseAttack, baseSpeed);
         }
 
