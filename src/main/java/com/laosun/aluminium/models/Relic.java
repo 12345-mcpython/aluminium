@@ -10,20 +10,22 @@ import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 @Getter
 @Setter
 @ToString
 public class Relic {
+    public static final List<String> SUB_ATTRIBUTE_LIST = List.of("health", "attack", "defence", "health_percent", "attack_percent", "defence_percent", "speed", "crit_chance", "crit_attack", "effect_hit_rate", "effect_resistance", "breaking_effect");
     public int level;
     public String name;
     public int star;
     public Type relicType;
     public Attribute mainAttribute;
     public List<Attribute> subAttributes;
-
-    public static final List<String> SUB_ATTRIBUTE_LIST = List.of("health", "attack", "defence", "health_percent", "attack_percent", "defence_percent", "speed", "crit_chance", "crit_attack", "effect_hit_rate", "effect_resistance", "breaking_effect");
 
     public static Relic create(int level, int star, Type relicType, Attribute mainAttribute, List<Attribute> subAttributes) {
         Relic relic = new Relic();
@@ -90,6 +92,30 @@ public class Relic {
     }
 
     @Getter
+    public enum Type {
+
+        HEAD("head"),
+        HAND("hand"),
+        BODY("body"),
+        BOOT("boot"),
+        BALL("ball"),
+        LINE("line");
+
+        private static final Map<String, Type> MP = Map.ofEntries(Map.entry("head", HEAD), Map.entry("boot", BOOT),
+                Map.entry("hand", HAND), Map.entry("body", BODY),
+                Map.entry("ball", BALL), Map.entry("line", LINE));
+        private final String type;
+
+        Type(String string) {
+            this.type = string;
+        }
+
+        public static Type getType(String type) {
+            return MP.get(type);
+        }
+    }
+
+    @Getter
     @ToString
     public static class Setting {
         @SerializedName("main_attribute")
@@ -107,10 +133,6 @@ public class Relic {
             return new Gson().fromJson(json, Setting.class);
         }
 
-        public record AttributeLevel(@SerializedName("promote_level") int promoteLevel,
-                                     @SerializedName("attribute_level") int attributeLevel) {
-        }
-
         public String getMainAttribute() {
             return mainAttribute.entrySet().iterator().next().getKey();
         }
@@ -122,36 +144,15 @@ public class Relic {
         public List<String> getSubAttributes() {
             return new ArrayList<>(subAttributes.keySet());
         }
+
+        public record AttributeLevel(@SerializedName("promote_level") int promoteLevel,
+                                     @SerializedName("attribute_level") int attributeLevel) {
+        }
     }
 
     public record Attribute(String left, double right, int promoteLevel) {
         public Attribute(String left, double right) {
             this(left, right, 0);
-        }
-    }
-
-    @Getter
-    public enum Type {
-
-        HEAD("head"),
-        HAND("hand"),
-        BODY("body"),
-        BOOT("boot"),
-        BALL("ball"),
-        LINE("line");
-
-        private final String type;
-
-        private static final Map<String, Type> MP = Map.ofEntries(Map.entry("head", HEAD), Map.entry("boot", BOOT),
-                Map.entry("hand", HAND), Map.entry("body", BODY),
-                Map.entry("ball", BALL), Map.entry("line", LINE));
-
-        public static Type getType(String type) {
-            return MP.get(type);
-        }
-
-        Type(String string) {
-            this.type = string;
         }
     }
 }
