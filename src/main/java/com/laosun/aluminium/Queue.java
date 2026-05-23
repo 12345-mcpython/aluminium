@@ -2,6 +2,7 @@ package com.laosun.aluminium;
 
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Signal;
 import lombok.Getter;
 import lombok.ToString;
@@ -80,7 +81,7 @@ public final class Queue {
     public void addCombatant(CanHit combatant) {
         if (combatant != null && !combatantQueue.contains(combatant)) {
             combatantQueue.add(combatant);
-            actionQueue.add(new Signal(combatant, combatant.getSpeed()));
+            actionQueue.add(new Signal(combatant, combatant.getSpeed().get()));
             calcActionTimes();
         }
     }
@@ -221,7 +222,7 @@ public final class Queue {
      */
     public List<CanHit> getAliveByCamp(Camp camp) {
         return combatantQueue.stream()
-                .filter(c -> c.getHealth() != 0)
+                .filter(c -> c.getHealth().get() != 0)
                 .filter(c -> c.getCamp() == camp)
                 .collect(Collectors.toList());
     }
@@ -249,7 +250,7 @@ public final class Queue {
     public void adjustSpeed(Signal combatant, double value) {
         if (combatant != null) {
             combatant.setSpeed(value);
-            combatant.getCanHit().setSpeed(value);
+            combatant.getCanHit().getSpeed().addModifier(DoubleValue.Modifier.pure(value));
             calcActionTimes();
         }
     }
