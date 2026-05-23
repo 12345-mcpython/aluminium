@@ -6,13 +6,13 @@ import lombok.AllArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DoubleValue {
+public class DoubleValue implements Cloneable {
     private final double baseValue;
     private double value;
 
-    private final List<Modifier> multiplyPercentModifiers = new ArrayList<>();
-    private final List<Modifier> addPercentModifiers = new ArrayList<>();
-    private final List<Modifier> valueModifiers = new ArrayList<>();
+    private List<Modifier> multiplyPercentModifiers = new ArrayList<>();
+    private List<Modifier> addPercentModifiers = new ArrayList<>();
+    private List<Modifier> valueModifiers = new ArrayList<>();
 
     public DoubleValue(double baseValue) {
         this.baseValue = baseValue;
@@ -20,9 +20,18 @@ public class DoubleValue {
     }
 
     @AllArgsConstructor
-    public static class Modifier {
+    public static class Modifier implements Cloneable {
         private ModifierType modifierType;
         private double value;
+
+        @Override
+        public Modifier clone() {
+            try {
+                return (Modifier) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         public enum ModifierType {
             ADD_PERCENT,
@@ -51,6 +60,10 @@ public class DoubleValue {
         }
     }
 
+    public static DoubleValue zero() {
+        return new DoubleValue(0.0);
+    }
+
     public double get() {
         return value;
     }
@@ -68,7 +81,9 @@ public class DoubleValue {
     }
 
     public DoubleValue removeModifier(Modifier modifier) {
-        boolean removed = addPercentModifiers.remove(modifier) || valueModifiers.remove(modifier) || multiplyPercentModifiers.remove(modifier);
+        boolean removed = addPercentModifiers.remove(modifier);
+        removed |= valueModifiers.remove(modifier);
+        removed |= multiplyPercentModifiers.remove(modifier);
         if (removed) compute();
         return this;
     }
@@ -96,5 +111,27 @@ public class DoubleValue {
         }
 
         value = baseValue * percentModifiersTotal * multiplyPercentTotal + valueModifiersTotal;
+    }
+
+    @Override
+    public DoubleValue clone() {
+        try {
+            DoubleValue copy = (DoubleValue) super.clone();
+            copy.addPercentModifiers = new ArrayList<>();
+            copy.multiplyPercentModifiers = new ArrayList<>();
+            copy.valueModifiers = new ArrayList<>();
+            addPercentModifiers.forEach(m -> copy.addPercentModifiers.add(m.clone()));
+            multiplyPercentModifiers.forEach(m -> copy.multiplyPercentModifiers.add(m.clone()));
+            valueModifiers.forEach(m -> copy.valueModifiers.add(m.clone()));
+            copy.compute();
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("<DoubleValue: %f>", value);
     }
 }

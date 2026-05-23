@@ -20,7 +20,7 @@ public class Character extends CanHit {
     private RelicSuit relicSuit;
     private Weapon weapon;
 
-    private Character(Translate name, double health, double defence, double attack, double speed) {
+    private Character(Translate name, DoubleValue health, DoubleValue defence, DoubleValue attack, DoubleValue speed) {
         super(name.english(), Camp.PLAYER, health, defence, attack, speed);
     }
 
@@ -98,46 +98,42 @@ public class Character extends CanHit {
         private ExtraBasicPromote extraBasicPromote;
 
         public CalcData calculate(double rate) {
-            double baseHealth = characterData.health() * rate + weapon.getHealth();
-            double baseDefence = characterData.defence() * rate + weapon.getDefence();
-            double baseAttack = characterData.attack() * rate + weapon.getAttack();
-            double baseSpeed = characterData.speed();
             Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
             relicSuit.calcTotalValue(relicValue);
-            baseHealth = new DoubleValue(baseHealth)
+            DoubleValue baseHealth = new DoubleValue(characterData.health() * rate + weapon.getHealth())
                     .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("health_percent", 0.0)))
                     .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.healthPercent()))
                     .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("health", 0.0)))
                     .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.health()))
-                    .get();
-            baseDefence = new DoubleValue(baseDefence)
+                    ;
+            DoubleValue baseDefence = new DoubleValue(characterData.defence() * rate + weapon.getDefence())
                     .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("defence_percent", 0.0)))
                     .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.defencePercent()))
                     .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("defence", 0.0)))
                     .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.defence()))
-                    .get();
-            baseAttack = new DoubleValue(baseAttack)
+                    ;
+            DoubleValue baseAttack = new DoubleValue(characterData.attack() * rate + weapon.getAttack())
                     .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("attack_percent", 0.0)))
                     .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.attackPercent()))
                     .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("attack", 0.0)))
                     .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.attack()))
-                    .get();
+                    ;
             // addPercent 0 is placeholder
-            baseSpeed = new DoubleValue(baseSpeed)
+            DoubleValue baseSpeed = new DoubleValue(characterData.speed())
                     .addModifier(DoubleValue.Modifier.addPercent(0))
                     .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.speedPercent()))
                     .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("speed", 0.0)))
                     .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.speed()))
-                    .get();
+                    ;
             return new CalcData(baseHealth, baseDefence, baseAttack, baseSpeed);
         }
 
         @AllArgsConstructor
         public static class CalcData {
-            private double health;
-            private double defence;
-            private double attack;
-            private double speed;
+            private DoubleValue health;
+            private DoubleValue defence;
+            private DoubleValue attack;
+            private DoubleValue speed;
         }
     }
 
