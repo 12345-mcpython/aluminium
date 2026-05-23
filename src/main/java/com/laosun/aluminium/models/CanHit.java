@@ -20,14 +20,13 @@ public abstract class CanHit {
     private final DoubleValue critAttack = DoubleValue.zero();
     private final DoubleValue breakEffect = DoubleValue.zero();
     private final DoubleValue outgoingHealingBoost = DoubleValue.zero();
-    private boolean death = false;
     private final Camp camp;
-
     // IMPORTANT: EDIT THIS NOT EDIT ABOVE!!!!!!!!!!!!!!
     private final DoubleValue inBattleHealth;
     private final DoubleValue inBattleMaxHealth;
     private final DoubleValue inBattleAttack;
     private final DoubleValue inBattleDefence;
+    private final boolean death = false;
 
     public CanHit(String name, Camp camp, DoubleValue health, DoubleValue defence, DoubleValue attack, DoubleValue speed) {
         this.name = name;
