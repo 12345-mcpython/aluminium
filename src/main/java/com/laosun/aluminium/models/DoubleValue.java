@@ -19,47 +19,6 @@ public class DoubleValue implements Cloneable {
         compute();
     }
 
-    @AllArgsConstructor
-    public static class Modifier implements Cloneable {
-        private ModifierType modifierType;
-        private double value;
-
-        @Override
-        public Modifier clone() {
-            try {
-                return (Modifier) super.clone();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public enum ModifierType {
-            ADD_PERCENT,
-            MULTIPLY_PERCENT,
-            PURE_VALUE
-        }
-
-        public static Modifier addPercentNumber(double percentValue) {
-            return new Modifier(ModifierType.ADD_PERCENT, percentValue / 100.0);
-        }
-
-        public static Modifier multiplyPercentNumber(double percentValue) {
-            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue / 100.0);
-        }
-
-        public static Modifier addPercent(double percentValue) {
-            return new Modifier(ModifierType.ADD_PERCENT, percentValue);
-        }
-
-        public static Modifier multiplyPercent(double percentValue) {
-            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue);
-        }
-
-        public static Modifier pure(double value) {
-            return new Modifier(ModifierType.PURE_VALUE, value);
-        }
-    }
-
     public static DoubleValue zero() {
         return new DoubleValue(0.0);
     }
@@ -133,5 +92,46 @@ public class DoubleValue implements Cloneable {
     @Override
     public String toString() {
         return String.format("<DoubleValue: %f>", value);
+    }
+
+    @AllArgsConstructor
+    public static class Modifier implements Cloneable {
+        private ModifierType modifierType;
+        private double value;
+
+        public static Modifier addPercentNumber(double percentValue) {
+            return new Modifier(ModifierType.ADD_PERCENT, percentValue / 100.0);
+        }
+
+        public static Modifier multiplyPercentNumber(double percentValue) {
+            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue / 100.0);
+        }
+
+        public static Modifier addPercent(double percentValue) {
+            return new Modifier(ModifierType.ADD_PERCENT, percentValue);
+        }
+
+        public static Modifier multiplyPercent(double percentValue) {
+            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue);
+        }
+
+        public static Modifier pure(double value) {
+            return new Modifier(ModifierType.PURE_VALUE, value);
+        }
+
+        @Override
+        public Modifier clone() {
+            try {
+                return (Modifier) super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public enum ModifierType {
+            ADD_PERCENT,
+            MULTIPLY_PERCENT,
+            PURE_VALUE
+        }
     }
 }

@@ -8,8 +8,8 @@ public record WeaponData(Translate name, @SerializedName("skill_description") Tr
                          double defence, double health, String type,
                          @SerializedName("weapon_skill_data") List<SkillData> weaponSkillData) {
     public record SkillData(int level, @SerializedName("skill_value") List<Double> skillValue,
-                     @SerializedName("ability_property") List<AbilityProperty> abilityProperties) {
-        public record AbilityProperty(String attribute, String value) {
+                            @SerializedName("ability_property") List<AbilityProperty> abilityProperties) {
+        public record AbilityProperty(String attribute, double value) {
         }
     }
 }

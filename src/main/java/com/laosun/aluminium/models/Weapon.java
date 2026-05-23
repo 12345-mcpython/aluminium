@@ -20,6 +20,7 @@ public class Weapon {
     private double attack;
     private double defence;
     private String type;
+    private WeaponAttribute weaponAttribute;
 
     public static Weapon build(int wid, int level, boolean isPromote) {
         WeaponData wp = Constant.WEAPONS.get(wid);
@@ -30,10 +31,13 @@ public class Weapon {
         return new Weapon(wp.name(), "", wp.health() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
                 wp.attack() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
                 wp.defence() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
-                wp.type());
+                wp.type(), new WeaponAttribute("", 0));
     }
 
     public static Weapon build(int wid, int level) {
         return build(wid, level, false);
+    }
+
+    public record WeaponAttribute(String attribute, double value) {
     }
 }
