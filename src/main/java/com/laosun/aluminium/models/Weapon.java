@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -20,18 +23,22 @@ public class Weapon {
     private double attack;
     private double defence;
     private String type;
-    private WeaponAttribute weaponAttribute;
+    private List<WeaponAttribute> weaponAttribute;
 
     public static Weapon build(int wid, int level, boolean isPromote) {
         WeaponData wp = Constant.WEAPONS.get(wid);
+        List<WeaponAttribute> weaponAttribute = new ArrayList<>();
         if (wp == null) {
             throw new RuntimeException("Weapon not found!");
+        }
+        for (WeaponData.SkillData.AbilityProperty p : wp.weaponSkillData().getFirst().abilityProperties()) {
+            weaponAttribute.add(new WeaponAttribute(p.attribute(), p.value()));
         }
 
         return new Weapon(wp.name(), "", wp.health() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
                 wp.attack() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
                 wp.defence() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
-                wp.type(), new WeaponAttribute("", 0));
+                wp.type(), weaponAttribute);
     }
 
     public static Weapon build(int wid, int level) {
