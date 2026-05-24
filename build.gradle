@@ -40,11 +40,11 @@ idea {
     }
 }
 
-jar {
-    from('data') {
-        into 'data'
-    }
-}
+//jar {
+//    from('data') {
+//        into 'data'
+//    }
+//}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

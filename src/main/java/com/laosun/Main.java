@@ -56,26 +56,6 @@ public class Main {
         DoubleValue dp = character.getHealth().clone();
         dp.addModifier(DoubleValue.Modifier.addPercent(0.20));
         IO.println(dp);
-        // IO.println(Character.build(1003, 20, true, hya, null));
-        // TEST CALC
-        // In game
-        // HP ATK DEF SPD
-        // 5223 1280 1348 219
-        // CALC LOGIC
-        // Base HP: 147.84 (lv1 character base value) * 7.35 (lv80 promoting rate + 52.8 (lv1 light cone base value) * 22.05 (lv80 LC promoting value) = 2250.864
-        // Add skill: 10% promotion
-        // Add relic: 705.56 value + 90.717% promotion (see below result)
-        // formula: (147.84 * 7.35 + 52.8 * 22.05) * (1 + 0.90717 + 0.10) + 705.56
-        // Equal to: 5223.42669488 equal to 5223
-
-        // BASE SPD: 110 (character base data)
-        // Add relic: 62.432 6% + 6%
-        // Add skill: 4 + 3 + 3 + 2 + 2 = 14
-        // Add light cone: 18%
-        // formula: 110 * (1 + 0.06 + 0.06 + 0.18) + 62.432 + 14 = 219.432 equal to 219
-
-        // BattleDemo.main();
-
         IO.println(Charset.defaultCharset().displayName());
     }
 }
