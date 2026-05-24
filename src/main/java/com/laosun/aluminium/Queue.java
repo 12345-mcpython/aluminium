@@ -54,12 +54,6 @@ public final class Queue {
     private final List<Signal> actionQueue = new ArrayList<>();
 
     /**
-     * Constructs an empty battle queue.
-     */
-    public Queue() {
-    }
-
-    /**
      * Constructs a battle queue with initial combatants.
      *
      * @param initialCombatants the initial list of combatants to add to the queue
@@ -268,7 +262,7 @@ public final class Queue {
         System.out.printf("%-10s %-8s %-8s %-8s %-8s %-8s%n",
                 "C NAME", "CAMP", "HEALTH", "LENGTH", "TIME", "ID");
         actionQueue.forEach(c -> {
-            System.out.printf("%-10s %-8s %-8.0f %-8.0f %-8.1f %d %n",
+            System.out.printf("%-10s %-8s %s %-8.0f %-8.1f %d %n",
                     c.getCanHit().getName(), c.getCanHit().getCamp().name(), c.getCanHit().getInBattleHealth(),
                     c.getLength(), c.getTime(), c.getId());
 
