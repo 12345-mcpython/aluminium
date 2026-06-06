@@ -4,6 +4,7 @@ import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.exceptions.CharacterException;
+import com.laosun.aluminium.utils.AttributeBuilder;
 import com.laosun.aluminium.utils.CharacterDataProvider;
 import com.laosun.aluminium.utils.ConstantCharacterDataProvider;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
@@ -13,6 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import static com.laosun.aluminium.enums.AttributeType.*;
+
 @Getter
 @Setter
 @ToString(callSuper = true)
@@ -20,8 +23,8 @@ public class Character extends CanHit {
     private RelicSuit relicSuit;
     private Weapon weapon;
 
-    private Character(Translate name, DoubleValue health, DoubleValue defence, DoubleValue attack, DoubleValue speed) {
-        super(name.english(), Camp.PLAYER, health, defence, attack, speed);
+    private Character(Translate name, DoubleValue[] attributes) {
+        super(name.english(), Camp.PLAYER, attributes);
     }
 
     public static class Builder {
@@ -71,8 +74,8 @@ public class Character extends CanHit {
         public Character build() {
             CharacterData characterData = validateAndGet(cid);
             double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
-            Calculator.CalcData calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
-            Character character = new Character(characterData.name(), calcData.health, calcData.defence, calcData.attack, calcData.speed);
+            AttributeBuilder calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
+            Character character = new Character(characterData.name(), calcData.build());
             character.relicSuit = relicSuit;
             character.weapon = weapon;
             return character;
@@ -97,39 +100,21 @@ public class Character extends CanHit {
         private RelicSuit relicSuit;
         private ExtraBasicPromote extraBasicPromote;
 
-        public CalcData calculate(double rate) {
+        private AttributeBuilder calculate(double rate) {
             Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
             relicSuit.calcTotalValue(relicValue);
-            DoubleValue baseHealth = new DoubleValue(characterData.health() * rate + weapon.getHealth())
-                    .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("health_percent", 0.0), DoubleValue.Modifier.ModifierSource.RELIC))
-                    .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.healthPercent()))
-                    .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("health", 0.0), DoubleValue.Modifier.ModifierSource.RELIC))
-                    .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.health()));
-            DoubleValue baseDefence = new DoubleValue(characterData.defence() * rate + weapon.getDefence())
-                    .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("defence_percent", 0.0), DoubleValue.Modifier.ModifierSource.RELIC))
-                    .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.defencePercent()))
-                    .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("defence", 0.0), DoubleValue.Modifier.ModifierSource.RELIC))
-                    .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.defence()));
-            DoubleValue baseAttack = new DoubleValue(characterData.attack() * rate + weapon.getAttack())
-                    .addModifier(DoubleValue.Modifier.addPercent(relicValue.getOrDefault("attack_percent", 0.0), DoubleValue.Modifier.ModifierSource.RELIC))
-                    .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.attackPercent()))
-                    .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("attack", 0.0), DoubleValue.Modifier.ModifierSource.RELIC))
-                    .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.attack()));
-            // addPercent 0 is placeholder
-            DoubleValue baseSpeed = new DoubleValue(characterData.speed())
-                    .addModifier(DoubleValue.Modifier.addPercent(0))
-                    .addModifier(DoubleValue.Modifier.addPercent(extraBasicPromote.speedPercent()))
-                    .addModifier(DoubleValue.Modifier.pure(relicValue.getOrDefault("speed", 0.0), DoubleValue.Modifier.ModifierSource.RELIC))
-                    .addModifier(DoubleValue.Modifier.pure(extraBasicPromote.speed()));
-            return new CalcData(baseHealth, baseDefence, baseAttack, baseSpeed);
-        }
-
-        @AllArgsConstructor
-        public static class CalcData {
-            private DoubleValue health;
-            private DoubleValue defence;
-            private DoubleValue attack;
-            private DoubleValue speed;
+            AttributeBuilder atb = new AttributeBuilder();
+            atb.setBase(HEALTH, characterData.health() * rate)
+                    .setBase(ATTACK, characterData.attack() * rate)
+                    .setBase(DEFENCE, characterData.defence() * rate)
+                    .setBase(SPEED, characterData.speed());
+            atb.addBase(HEALTH, weapon.getHealth())
+                    .addBase(DEFENCE, weapon.getDefence())
+                    .addBase(ATTACK, weapon.getAttack());
+            relicSuit.appendTo(atb);
+            weapon.appendAttribute(atb);
+            extraBasicPromote.appendTo(atb);
+            return atb;
         }
     }
 

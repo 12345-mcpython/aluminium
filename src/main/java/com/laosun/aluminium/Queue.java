@@ -1,5 +1,6 @@
 package com.laosun.aluminium;
 
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.DoubleValue;
@@ -75,7 +76,7 @@ public final class Queue {
     public void addCombatant(CanHit combatant) {
         if (combatant != null && !combatantQueue.contains(combatant)) {
             combatantQueue.add(combatant);
-            actionQueue.add(new Signal(combatant, combatant.getSpeed().get()));
+            actionQueue.add(new Signal(combatant, combatant.getAttribute(AttributeType.SPEED).get()));
             calcActionTimes();
         }
     }
@@ -216,7 +217,7 @@ public final class Queue {
      */
     public List<CanHit> getAliveByCamp(Camp camp) {
         return combatantQueue.stream()
-                .filter(c -> c.getHealth().get() != 0)
+                .filter(c -> c.getAttribute(AttributeType.HEALTH).get() != 0)
                 .filter(c -> c.getCamp() == camp)
                 .collect(Collectors.toList());
     }
@@ -244,7 +245,7 @@ public final class Queue {
     public void adjustSpeed(Signal combatant, double value) {
         if (combatant != null) {
             combatant.setSpeed(value);
-            combatant.getCanHit().getSpeed().addModifier(DoubleValue.Modifier.pure(value));
+            combatant.getCanHit().getAttribute(AttributeType.SPEED).addModifier(DoubleValue.Modifier.pure(value));
             calcActionTimes();
         }
     }
@@ -263,7 +264,7 @@ public final class Queue {
                 "C NAME", "CAMP", "HEALTH", "LENGTH", "TIME", "ID");
         actionQueue.forEach(c -> {
             System.out.printf("%-10s %-8s %s %-8.0f %-8.1f %d %n",
-                    c.getCanHit().getName(), c.getCanHit().getCamp().name(), c.getCanHit().getInBattleHealth(),
+                    c.getCanHit().getName(), c.getCanHit().getCamp().name(), c.getCanHit().getAttribute(AttributeType.HEALTH),
                     c.getLength(), c.getTime(), c.getId());
 
         });

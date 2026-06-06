@@ -1,6 +1,7 @@
 package com.laosun;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
@@ -48,12 +49,12 @@ public class Main {
                 .level(80)
                 .relicSuit(hya)
                 .weapon(wp)
-                .extraValue(new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.3))
+                .extraValue(new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.12))
                 .build();
-        IO.println(character.getHealth());
-        IO.println(character.getDefence());
-        IO.println(character.getSpeed());
-        DoubleValue dp = character.getHealth().clone();
+        IO.println(character.getAttribute(AttributeType.HEALTH));
+        IO.println(character.getAttribute(AttributeType.DEFENCE));
+        IO.println(character.getAttribute(AttributeType.SPEED));
+        DoubleValue dp = character.getAttribute(AttributeType.HEALTH).clone();
         dp.addModifier(DoubleValue.Modifier.addPercent(0.20));
         IO.println(dp);
         IO.println(Charset.defaultCharset().displayName());

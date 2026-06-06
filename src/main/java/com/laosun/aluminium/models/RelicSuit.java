@@ -1,9 +1,13 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.utils.AttributeBuilder;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 
 public final class RelicSuit {
     public Relic hand;
@@ -56,6 +60,46 @@ public final class RelicSuit {
                     }
                     relicValue.addTo(subAttr.left(), subAttr.right());
                 }
+            }
+        }
+    }
+
+    public void appendTo(AttributeBuilder attributeBuilder) {
+        if (total == null || total.isEmpty()) {
+            return;
+        }
+
+        for (Relic relic : total) {
+            if (relic == null) {
+                continue;
+            }
+
+            Relic.Attribute mainAttr = relic.getMainAttribute();
+            if (mainAttr != null) {
+                appendAttribute(attributeBuilder, mainAttr);
+            }
+
+            List<Relic.Attribute> subAttrs = relic.getSubAttributes();
+            if (subAttrs != null && !subAttrs.isEmpty()) {
+                for (Relic.Attribute subAttr : subAttrs) {
+                    if (subAttr == null) {
+                        continue;
+                    }
+                    appendAttribute(attributeBuilder, subAttr);
+                }
+            }
+        }
+    }
+
+    private void appendAttribute(AttributeBuilder attributeBuilder, Relic.Attribute attribute) {
+        AttributeType at = attribute.left().transform(AttributeType::fromString);
+        if (PERCENT_TO_BASE.containsKey(at)) {
+            attributeBuilder.addPercent(at, attribute.right(), DoubleValue.Modifier.ModifierSource.RELIC);
+        } else {
+            if (at.isPercent) {
+                attributeBuilder.addPercentPoint(at, attribute.right(), DoubleValue.Modifier.ModifierSource.RELIC);
+            } else {
+                attributeBuilder.addPure(at, attribute.right(), DoubleValue.Modifier.ModifierSource.RELIC);
             }
         }
     }
