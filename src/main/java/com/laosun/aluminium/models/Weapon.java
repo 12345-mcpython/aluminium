@@ -3,6 +3,8 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.beans.WeaponData;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.utils.AttributeBuilder;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +13,8 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 
 @Getter
 @Setter
@@ -25,6 +29,7 @@ public class Weapon {
     private String type;
     private List<WeaponAttribute> weaponAttribute;
 
+
     public static Weapon build(int wid, int level, boolean isPromote) {
         WeaponData wp = Constant.WEAPONS.get(wid);
         List<WeaponAttribute> weaponAttribute = new ArrayList<>();
@@ -32,7 +37,7 @@ public class Weapon {
             throw new RuntimeException("Weapon not found!");
         }
         for (WeaponData.SkillData.AbilityProperty p : wp.weaponSkillData().getFirst().abilityProperties()) {
-            weaponAttribute.add(new WeaponAttribute(p.attribute(), p.value()));
+            weaponAttribute.add(new WeaponAttribute(AttributeType.fromString(p.attribute()), p.value()));
         }
 
         return new Weapon(wp.name(), "", wp.health() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
@@ -45,6 +50,20 @@ public class Weapon {
         return build(wid, level, false);
     }
 
-    public record WeaponAttribute(String attribute, double value) {
+    public void appendAttribute(AttributeBuilder atb) {
+        for (WeaponAttribute wa : weaponAttribute) {
+            if (PERCENT_TO_BASE.containsKey(wa.attribute)) {
+                atb.addPercent(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.RELIC);
+            } else {
+                if (wa.attribute.isPercent) {
+                    atb.addPercentPoint(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.RELIC);
+                } else {
+                    atb.addPure(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.RELIC);
+                }
+            }
+        }
+    }
+
+    public record WeaponAttribute(AttributeType attribute, double value) {
     }
 }
