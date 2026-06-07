@@ -49,7 +49,7 @@ public final class RelicSuit {
 
             Relic.Attribute mainAttr = relic.getMainAttribute();
             if (mainAttr != null) {
-                relicValue.addTo(mainAttr.left(), mainAttr.right());
+                relicValue.addTo(mainAttr.getName(), mainAttr.getValue());
             }
 
             List<Relic.Attribute> subAttrs = relic.getSubAttributes();
@@ -58,48 +58,62 @@ public final class RelicSuit {
                     if (subAttr == null) {
                         continue;
                     }
-                    relicValue.addTo(subAttr.left(), subAttr.right());
+                    relicValue.addTo(subAttr.getName(), subAttr.getValue());
                 }
             }
         }
     }
 
     public void appendTo(AttributeBuilder attributeBuilder) {
-        if (total == null || total.isEmpty()) {
-            return;
-        }
+        if (total == null || total.isEmpty()) return;
+
+        // 聚合容器：AttributeType -> 总数值（百分比的按原始值累加）
+        Object2DoubleOpenHashMap<AttributeType> aggregate = new Object2DoubleOpenHashMap<>();
 
         for (Relic relic : total) {
-            if (relic == null) {
-                continue;
+            if (relic == null) continue;
+            // 处理主属性
+            Relic.Attribute main = relic.getMainAttribute();
+            if (main != null) addToAggregate(aggregate, main);
+            // 处理副属性
+            List<Relic.Attribute> subs = relic.getSubAttributes();
+            if (subs != null) {
+                for (Relic.Attribute sub : subs) {
+                    if (sub != null) addToAggregate(aggregate, sub);
+                }
             }
+        }
 
-            Relic.Attribute mainAttr = relic.getMainAttribute();
-            if (mainAttr != null) {
-                appendAttribute(attributeBuilder, mainAttr);
-            }
-
-            List<Relic.Attribute> subAttrs = relic.getSubAttributes();
-            if (subAttrs != null && !subAttrs.isEmpty()) {
-                for (Relic.Attribute subAttr : subAttrs) {
-                    if (subAttr == null) {
-                        continue;
-                    }
-                    appendAttribute(attributeBuilder, subAttr);
+        // 批量应用到 AttributeBuilder
+        for (var entry : aggregate.object2DoubleEntrySet()) {
+            AttributeType type = entry.getKey();
+            double value = entry.getDoubleValue();
+            if (PERCENT_TO_BASE.containsKey(type)) {
+                attributeBuilder.addPercent(type, value, DoubleValue.Modifier.ModifierSource.RELIC);
+            } else {
+                if (type.isPercent) {
+                    attributeBuilder.addPercentPoint(type, value, DoubleValue.Modifier.ModifierSource.RELIC);
+                } else {
+                    attributeBuilder.addPure(type, value, DoubleValue.Modifier.ModifierSource.RELIC);
                 }
             }
         }
     }
 
+    private void addToAggregate(Object2DoubleOpenHashMap<AttributeType> agg, Relic.Attribute attr) {
+        AttributeType type = attr.getType();
+        agg.addTo(type, attr.getValue());
+    }
+
     private void appendAttribute(AttributeBuilder attributeBuilder, Relic.Attribute attribute) {
-        AttributeType at = attribute.left().transform(AttributeType::fromString);
+        AttributeType at = attribute.getType();
         if (PERCENT_TO_BASE.containsKey(at)) {
-            attributeBuilder.addPercent(at, attribute.right(), DoubleValue.Modifier.ModifierSource.RELIC);
+            attributeBuilder.addPercent(at, attribute.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
         } else {
             if (at.isPercent) {
-                attributeBuilder.addPercentPoint(at, attribute.right(), DoubleValue.Modifier.ModifierSource.RELIC);
+                attributeBuilder.addPercentPoint(at, attribute.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
             } else {
-                attributeBuilder.addPure(at, attribute.right(), DoubleValue.Modifier.ModifierSource.RELIC);
+                attributeBuilder.addPure(at, attribute.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
             }
         }
     }

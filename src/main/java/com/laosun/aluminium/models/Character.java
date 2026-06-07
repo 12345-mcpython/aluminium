@@ -8,13 +8,13 @@ import com.laosun.aluminium.utils.AttributeBuilder;
 import com.laosun.aluminium.utils.CharacterDataProvider;
 import com.laosun.aluminium.utils.ConstantCharacterDataProvider;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import static com.laosun.aluminium.enums.AttributeType.*;
+import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BASE;
 
 @Getter
 @Setter
@@ -101,8 +101,6 @@ public class Character extends CanHit {
         private ExtraBasicPromote extraBasicPromote;
 
         private AttributeBuilder calculate(double rate) {
-            Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
-            relicSuit.calcTotalValue(relicValue);
             AttributeBuilder atb = new AttributeBuilder();
             atb.setBase(HEALTH, characterData.health() * rate)
                     .setBase(ATTACK, characterData.attack() * rate)
@@ -114,6 +112,8 @@ public class Character extends CanHit {
             relicSuit.appendTo(atb);
             weapon.appendAttribute(atb);
             extraBasicPromote.appendTo(atb);
+            atb.addPercentPoint(CRIT_CHANCE, characterData.critChance(), BASE);
+            atb.addPercentPoint(CRIT_ATTACK, characterData.critAttack(), BASE);
             return atb;
         }
     }

@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.exceptions.RelicException;
 import com.laosun.aluminium.utils.MapUtils;
 import lombok.Getter;
@@ -45,7 +46,7 @@ public class Relic {
         var entry = MapUtils.getRandomEntry(partValue);
         var mainAttribute = new Attribute(entry.getKey(), entry.getValue().base());
         var subCandidates = new ArrayList<>(SUB_ATTRIBUTE_LIST);
-        subCandidates.removeIf(e -> e.equals(mainAttribute.left()));
+        subCandidates.removeIf(e -> e.equals(mainAttribute.name));
 
         var selectedSubEntries = MapUtils.getRandomList(subCandidates, new Random().nextInt(3, 5));
         var subAttributes = selectedSubEntries.stream()
@@ -150,9 +151,23 @@ public class Relic {
         }
     }
 
-    public record Attribute(String left, double right, int promoteLevel) {
-        public Attribute(String left, double right) {
-            this(left, right, 0);
+    @Getter
+    public static class Attribute {
+        private final String name;      // 原始字符串
+        private final double value;
+        private final int promoteLevel;
+
+        private final AttributeType type; // 预先解析
+
+        public Attribute(String name, double value, int promoteLevel) {
+            this.name = name;
+            this.value = value;
+            this.type = AttributeType.fromString(name);
+            this.promoteLevel = promoteLevel;
+        }
+
+        public Attribute(String name, double value) {
+            this(name, value, 0);
         }
     }
 }
