@@ -57,6 +57,10 @@ public class Main {
         DoubleValue dp = character.getAttribute(AttributeType.HEALTH).clone();
         dp.addModifier(DoubleValue.Modifier.addPercent(0.20));
         IO.println(dp);
+        IO.println();
+        for (DoubleValue db : character.getAttributes()) {
+            IO.println(db);
+        }
         IO.println(Charset.defaultCharset().displayName());
     }
 }
