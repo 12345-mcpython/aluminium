@@ -262,12 +262,9 @@ public final class Queue {
         System.out.println("\n=== STATUS ===");
         System.out.printf("%-10s %-8s %-8s %-8s %-8s %-8s%n",
                 "C NAME", "CAMP", "HEALTH", "LENGTH", "TIME", "ID");
-        actionQueue.forEach(c -> {
-            System.out.printf("%-10s %-8s %s %-8.0f %-8.1f %d %n",
-                    c.getCanHit().getName(), c.getCanHit().getCamp().name(), c.getCanHit().getAttribute(AttributeType.HEALTH),
-                    c.getLength(), c.getTime(), c.getId());
-
-        });
+        actionQueue.forEach(c -> System.out.printf("%-10s %-8s %s %-8.0f %-8.1f %d %n",
+                c.getCanHit().getName(), c.getCanHit().getCamp().name(), c.getCanHit().getAttribute(AttributeType.HEALTH),
+                c.getLength(), c.getTime(), c.getId()));
         System.out.println("====================\n");
     }
 }
