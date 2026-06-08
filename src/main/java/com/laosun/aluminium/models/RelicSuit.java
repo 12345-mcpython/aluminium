@@ -16,7 +16,7 @@ public final class RelicSuit {
     public Relic boot;
     public Relic ball;
     public Relic line;
-    public List<Relic> total = new ArrayList<>();
+    public final List<Relic> total = new ArrayList<>();
 
     public void addToSuit(Relic relic) {
         if (relic == null) return;
@@ -38,7 +38,7 @@ public final class RelicSuit {
     }
 
     public void calcTotalValue(Object2DoubleOpenHashMap<String> relicValue) {
-        if (total == null || total.isEmpty()) {
+        if (total.isEmpty()) {
             return;
         }
 

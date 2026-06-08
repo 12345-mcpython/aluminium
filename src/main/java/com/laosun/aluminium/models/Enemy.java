@@ -12,8 +12,4 @@ public class Enemy extends CanHit {
     public Enemy(String name, Camp camp, DoubleValue[] attributes) {
         super(name, camp, attributes);
     }
-//
-//    public Enemy(String name, Camp camp, DoubleValue health, DoubleValue defence, DoubleValue attack, DoubleValue speed) {
-//        super(name, camp, health, defence, attack, speed);
-//    }
 }
