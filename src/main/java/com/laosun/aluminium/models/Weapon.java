@@ -50,7 +50,7 @@ public class Weapon {
         return build(wid, level, false);
     }
 
-    public void appendAttribute(AttributeBuilder atb) {
+    public void appendTo(AttributeBuilder atb) {
         for (WeaponAttribute wa : weaponAttribute) {
             if (PERCENT_TO_BASE.containsKey(wa.attribute)) {
                 atb.addPercent(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.RELIC);

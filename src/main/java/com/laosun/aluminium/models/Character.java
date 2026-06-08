@@ -110,7 +110,7 @@ public class Character extends CanHit {
                     .addBase(DEFENCE, weapon.getDefence())
                     .addBase(ATTACK, weapon.getAttack());
             relicSuit.appendTo(atb);
-            weapon.appendAttribute(atb);
+            weapon.appendTo(atb);
             extraBasicPromote.appendTo(atb);
             atb.addPercentPoint(CRIT_CHANCE, characterData.critChance(), BASE);
             atb.addPercentPoint(CRIT_ATTACK, characterData.critAttack(), BASE);
