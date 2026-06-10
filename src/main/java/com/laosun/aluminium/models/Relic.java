@@ -153,7 +153,7 @@ public class Relic {
 
     @Getter
     public static class Attribute {
-        private final String name;      // 原始字符串
+        private final String name;
         private final double value;
         private final int promoteLevel;
 
@@ -168,6 +168,11 @@ public class Relic {
 
         public Attribute(String name, double value) {
             this(name, value, 0);
+        }
+
+        @Override
+        public String toString() {
+            return "<Attribute name=" + name + ", value=" + value + ", promoteLevel=" + promoteLevel + ">";
         }
     }
 }
