@@ -65,7 +65,7 @@ public final class RelicSuit {
     }
 
     public void appendTo(AttributeBuilder attributeBuilder) {
-        if (total == null || total.isEmpty()) return;
+        if (total.isEmpty()) return;
 
         // 聚合容器：AttributeType -> 总数值（百分比的按原始值累加）
         Object2DoubleOpenHashMap<AttributeType> aggregate = new Object2DoubleOpenHashMap<>();
