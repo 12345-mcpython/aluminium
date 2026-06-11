@@ -141,25 +141,9 @@ public class Relic {
         }
     }
 
-    @Getter
-    public static class Attribute {
-        private final AttributeType type;
-        private final double value;
-        private final int promoteLevel;
-
-        public Attribute(AttributeType type, double value, int promoteLevel) {
-            this.type = type;
-            this.value = value;
-            this.promoteLevel = promoteLevel;
-        }
-
+    public record Attribute(AttributeType type, double value, int promoteLevel) {
         public Attribute(AttributeType type, double value) {
             this(type, value, 0);
-        }
-
-        @Override
-        public String toString() {
-            return "<Attribute name=" + type + ", value=" + value + ", promoteLevel=" + promoteLevel + ">";
         }
     }
 
@@ -171,10 +155,10 @@ public class Relic {
         private int star = 5;          // 默认 5 星
         private int level = 0;
         private RelicType type;
-        private AttributeType mainAttributeName;
+        private AttributeType mainAttributeType;
         private final List<SubAttributeSpec> subSpecs = new ArrayList<>();
 
-        private record SubAttributeSpec(AttributeType name, int promoteLevel, int attributeLevel) {
+        private record SubAttributeSpec(AttributeType type, int promoteLevel, int attributeLevel) {
         }
 
         public Builder star(int star) {
@@ -192,13 +176,13 @@ public class Relic {
             return this;
         }
 
-        public Builder mainAttribute(AttributeType name) {
-            this.mainAttributeName = name;
+        public Builder mainAttribute(AttributeType type) {
+            this.mainAttributeType = type;
             return this;
         }
 
-        public Builder subAttribute(AttributeType name, int promoteLevel, int attributeLevel) {
-            subSpecs.add(new SubAttributeSpec(name, promoteLevel, attributeLevel));
+        public Builder subAttribute(AttributeType type, int promoteLevel, int attributeLevel) {
+            subSpecs.add(new SubAttributeSpec(type, promoteLevel, attributeLevel));
             return this;
         }
 
@@ -206,26 +190,26 @@ public class Relic {
             if (type == null) {
                 throw new IllegalStateException("Relic type must be set");
             }
-            if (mainAttributeName == null) {
+            if (mainAttributeType == null) {
                 throw new IllegalStateException("Main attribute must be set");
             }
 
-            var mainAttrMap = Constant.RELIC_MAIN_ATTRIBUTES.getAttributeByStar(star).get(mainAttributeName);
-            if (!mainAttrMap.containsKey(mainAttributeName)) {
-                throw new RelicException("Main attribute '" + mainAttributeName +
+            var mainAttrMap = Constant.RELIC_MAIN_ATTRIBUTES.getAttributeByStar(star).get(type);
+            if (!mainAttrMap.containsKey(mainAttributeType)) {
+                throw new RelicException("Main attribute '" + mainAttributeType +
                         "' is not valid for relic type " + type);
             }
-            var mainAttrValue = mainAttrMap.get(mainAttributeName);
+            var mainAttrValue = mainAttrMap.get(mainAttributeType);
             double mainFinal = mainAttrValue.base() + mainAttrValue.bonus() * level;
-            Attribute mainAttr = new Attribute(mainAttributeName, mainFinal);
+            Attribute mainAttr = new Attribute(mainAttributeType, mainFinal);
 
             List<Attribute> subAttrs = new ArrayList<>();
             var subAttrGroup = Constant.RELIC_SUB_ATTRIBUTES.getAttributeGroupByStar(star);
             for (SubAttributeSpec spec : subSpecs) {
-                var subVal = subAttrGroup.getAttributeByName(spec.name);
+                var subVal = subAttrGroup.getAttributeByName(spec.type);
                 double subFinal = subVal.base() * (spec.promoteLevel + 1) +
                         subVal.bonus() * spec.attributeLevel;
-                subAttrs.add(new Attribute(spec.name, subFinal, spec.promoteLevel));
+                subAttrs.add(new Attribute(spec.type, subFinal, spec.promoteLevel));
             }
 
             return Relic.create(level, star, type, mainAttr, subAttrs);

@@ -27,6 +27,10 @@ public class Character extends CanHit {
         super(name.english(), Camp.PLAYER, attributes);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
         private int cid;
         private int level = 1;
