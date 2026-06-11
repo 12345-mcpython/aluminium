@@ -9,19 +9,72 @@ import org.junit.jupiter.api.Test;
 
 public class CharacterTest {
     @Test
-    public void test() {
-        String hyaBodyJson = "{ \"main_attribute\": { \"outgoing_healing_boost\": 15 }, \"sub_attributes\": { \"health_percent\": { \"promote_level\": 1, \"attribute_level\": 3 }, \"defence_percent\": { \"promote_level\": 0, \"attribute_level\": 0 }, \"speed\": { \"promote_level\": 1, \"attribute_level\": 1 }, \"crit_attack\": { \"promote_level\": 2, \"attribute_level\": 5 } } }";
-        String hyaLineJson = "{ \"main_attribute\": { \"energy_regeneration_rate\": 15 }, \"sub_attributes\": { \"health_percent\": { \"promote_level\": 3, \"attribute_level\": 3 }, \"speed\": { \"promote_level\": 1, \"attribute_level\": 4 }, \"effect_resistance\": { \"promote_level\": 1, \"attribute_level\": 3 }, \"breaking_effect\": { \"promote_level\": 0, \"attribute_level\": 2 } } }";
-        String hyaBallJson = "{ \"main_attribute\": { \"health_percent\": 15 }, \"sub_attributes\": { \"defence\": { \"promote_level\": 0, \"attribute_level\": 2 }, \"speed\": { \"promote_level\": 3, \"attribute_level\": 5 }, \"crit_chance\": { \"promote_level\": 2, \"attribute_level\": 3 }, \"effect_resistance\": { \"promote_level\": 0, \"attribute_level\": 2 } } }";
-        String hyaBootJson = "{ \"main_attribute\": { \"speed\": 15 }, \"sub_attributes\": { \"health_percent\": { \"promote_level\": 3, \"attribute_level\": 4 }, \"defence_percent\": { \"promote_level\": 0, \"attribute_level\": 2 }, \"crit_attack\": { \"promote_level\": 1, \"attribute_level\": 1 }, \"effect_resistance\": { \"promote_level\": 0, \"attribute_level\": 0 } } }";
-        String hyaHandJson = "{ \"main_attribute\": { \"attack\": 15 }, \"sub_attributes\": { \"defence\": { \"promote_level\": 0, \"attribute_level\": 1 }, \"health_percent\": { \"promote_level\": 1, \"attribute_level\": 3 }, \"speed\": { \"promote_level\": 3, \"attribute_level\": 3 }, \"effect_resistance\": { \"promote_level\": 0, \"attribute_level\": 0 } } }";
-        String hyaHeadJson = "{ \"main_attribute\": { \"health\": 15 }, \"sub_attributes\": { \"health_percent\": { \"promote_level\": 1, \"attribute_level\": 1 }, \"speed\": { \"promote_level\": 3, \"attribute_level\": 7 }, \"crit_chance\": { \"promote_level\": 0, \"attribute_level\": 1 }, \"effect_hit_rate\": { \"promote_level\": 1, \"attribute_level\": 2 } } }";
-        Relic hyaBody = Relic.createBySetting(RelicType.BODY, 5, 15, hyaBodyJson);
-        Relic hyaLine = Relic.createBySetting(RelicType.LINE, 5, 15, hyaLineJson);
-        Relic hyaBall = Relic.createBySetting(RelicType.BALL, 5, 15, hyaBallJson);
-        Relic hyaBoot = Relic.createBySetting(RelicType.BOOT, 5, 15, hyaBootJson);
-        Relic hyaHand = Relic.createBySetting(RelicType.HAND, 5, 15, hyaHandJson);
-        Relic hyaHead = Relic.createBySetting(RelicType.HEAD, 5, 15, hyaHeadJson);
+    public void testAttributeValue() {
+        Relic hyaBody = Relic.builder()
+                .type(RelicType.BODY)
+                .star(5)
+                .level(15)
+                .mainAttribute(AttributeType.OUTGOING_HEALING_BOOST)
+                .subAttribute(AttributeType.HEALTH_PERCENT, 1, 3)
+                .subAttribute(AttributeType.DEFENCE_PERCENT, 0, 0)
+                .subAttribute(AttributeType.SPEED, 1, 1)
+                .subAttribute(AttributeType.CRIT_ATTACK, 2, 5)
+                .build();
+
+        Relic hyaLine = Relic.builder()
+                .type(RelicType.LINE)
+                .star(5)
+                .level(15)
+                .mainAttribute(AttributeType.ENERGY_REGENERATION_RATE)
+                .subAttribute(AttributeType.HEALTH_PERCENT, 3, 3)
+                .subAttribute(AttributeType.SPEED, 1, 4)
+                .subAttribute(AttributeType.EFFECT_RESISTANCE, 1, 3)
+                .subAttribute(AttributeType.BREAKING_EFFECT, 0, 2)
+                .build();
+
+        Relic hyaBall = Relic.builder()
+                .type(RelicType.BALL)
+                .star(5)
+                .level(15)
+                .mainAttribute(AttributeType.HEALTH_PERCENT)
+                .subAttribute(AttributeType.DEFENCE, 0, 2)
+                .subAttribute(AttributeType.SPEED, 3, 5)
+                .subAttribute(AttributeType.CRIT_CHANCE, 2, 3)
+                .subAttribute(AttributeType.EFFECT_RESISTANCE, 0, 2)
+                .build();
+
+        Relic hyaBoot = Relic.builder()
+                .type(RelicType.BOOT)
+                .star(5)
+                .level(15)
+                .mainAttribute(AttributeType.SPEED)
+                .subAttribute(AttributeType.HEALTH_PERCENT, 3, 4)
+                .subAttribute(AttributeType.DEFENCE_PERCENT, 0, 2)
+                .subAttribute(AttributeType.CRIT_ATTACK, 1, 1)
+                .subAttribute(AttributeType.EFFECT_RESISTANCE, 0, 0)
+                .build();
+
+        Relic hyaHand = Relic.builder()
+                .type(RelicType.HAND)
+                .star(5)
+                .level(15)
+                .mainAttribute(AttributeType.ATTACK)
+                .subAttribute(AttributeType.DEFENCE, 0, 1)
+                .subAttribute(AttributeType.HEALTH_PERCENT, 1, 3)
+                .subAttribute(AttributeType.SPEED, 3, 3)
+                .subAttribute(AttributeType.EFFECT_RESISTANCE, 0, 0)
+                .build();
+
+        Relic hyaHead = Relic.builder()
+                .type(RelicType.HEAD)
+                .star(5)
+                .level(15)
+                .mainAttribute(AttributeType.HEALTH)
+                .subAttribute(AttributeType.HEALTH_PERCENT, 1, 1)
+                .subAttribute(AttributeType.SPEED, 3, 7)
+                .subAttribute(AttributeType.CRIT_CHANCE, 0, 1)
+                .subAttribute(AttributeType.EFFECT_HIT_RATE, 1, 2)
+                .build();
         RelicSuit hya = new RelicSuit();
         hya.addMore(hyaBody, hyaLine, hyaBall, hyaBoot, hyaHand, hyaHead);
         Weapon wp = Weapon.build(23042, 80);
