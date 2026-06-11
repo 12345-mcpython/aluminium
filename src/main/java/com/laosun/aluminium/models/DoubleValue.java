@@ -28,10 +28,9 @@ public class DoubleValue implements Cloneable {
     }
 
 
-    public DoubleValue addBase(double value) {
+    public void addBase(double value) {
         baseValue = baseValue + value;
         compute();
-        return this;
     }
     // end undo
 
@@ -44,7 +43,7 @@ public class DoubleValue implements Cloneable {
         return value;
     }
 
-    public DoubleValue addModifier(Modifier modifier) {
+    public void addModifier(Modifier modifier) {
         if (modifier.modifierType == Modifier.ModifierType.ADD_PERCENT) {
             addPercentModifiers.add(modifier);
         } else if (modifier.modifierType == Modifier.ModifierType.PURE_VALUE) {
@@ -55,15 +54,13 @@ public class DoubleValue implements Cloneable {
             throw new IllegalArgumentException("Unknown modifier type: " + modifier.modifierType);
         }
         compute();
-        return this;
     }
 
-    public DoubleValue removeModifier(Modifier modifier) {
+    public void removeModifier(Modifier modifier) {
         boolean removed = addPercentModifiers.remove(modifier);
         removed |= valueModifiers.remove(modifier);
         removed |= multiplyPercentModifiers.remove(modifier);
         if (removed) compute();
-        return this;
     }
 
     public List<Modifier> filterBySource(Modifier.ModifierSource type) {

@@ -19,5 +19,7 @@ public class DoubleValueTest {
         Assertions.assertEquals(105, dw.get(), 0.0001, dw.toString());
         dw.addModifier(DoubleValue.Modifier.multiplyPercent(0.1));
         Assertions.assertEquals(115.5, dw.get(), 0.0001, dw.toString());
+        dw.clearModifiers();
+        Assertions.assertEquals(100, dw.get(), 0.0001, dw.toString());
     }
 }

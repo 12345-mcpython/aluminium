@@ -1,7 +1,6 @@
 package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import org.junit.jupiter.api.Assertions;
