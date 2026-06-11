@@ -1,6 +1,8 @@
 package com.laosun.aluminium;
 
 import com.google.gson.reflect.TypeToken;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.utils.JSONReader;
@@ -64,12 +66,12 @@ public class Benchmark {
             RelicSuit suits = new RelicSuit();
             for (Suit suit : entry.getValue()) {
                 Relic relic = Relic.createBySetting(
-                        Relic.Type.getType(suit.type), 5, 15, suit.json
+                        RelicType.getType(suit.type), 5, 15, suit.json
                 );
                 suits.addToSuit(relic);
             }
             buildCharacter(suits);
-            Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
+            Object2DoubleOpenHashMap<AttributeType> relicValue = new Object2DoubleOpenHashMap<>();
             suits.calcTotalValue(relicValue);
         }
     }
