@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
@@ -21,12 +22,12 @@ public final class RelicSuit {
     public void addToSuit(Relic relic) {
         if (relic == null) return;
         switch (relic.relicType) {
-            case Relic.Type.HAND -> hand = relic;
-            case Relic.Type.HEAD -> head = relic;
-            case Relic.Type.BODY -> body = relic;
-            case Relic.Type.BOOT -> boot = relic;
-            case Relic.Type.BALL -> ball = relic;
-            case Relic.Type.LINE -> line = relic;
+            case RelicType.HAND -> hand = relic;
+            case RelicType.HEAD -> head = relic;
+            case RelicType.BODY -> body = relic;
+            case RelicType.BOOT -> boot = relic;
+            case RelicType.BALL -> ball = relic;
+            case RelicType.LINE -> line = relic;
         }
         total.add(relic);
     }
@@ -37,7 +38,7 @@ public final class RelicSuit {
         }
     }
 
-    public void calcTotalValue(Object2DoubleOpenHashMap<String> relicValue) {
+    public void calcTotalValue(Object2DoubleOpenHashMap<AttributeType> relicValue) {
         if (total.isEmpty()) {
             return;
         }
@@ -49,7 +50,7 @@ public final class RelicSuit {
 
             Relic.Attribute mainAttr = relic.getMainAttribute();
             if (mainAttr != null) {
-                relicValue.addTo(mainAttr.getName(), mainAttr.getValue());
+                relicValue.addTo(mainAttr.getType(), mainAttr.getValue());
             }
 
             List<Relic.Attribute> subAttrs = relic.getSubAttributes();
@@ -58,7 +59,7 @@ public final class RelicSuit {
                     if (subAttr == null) {
                         continue;
                     }
-                    relicValue.addTo(subAttr.getName(), subAttr.getValue());
+                    relicValue.addTo(subAttr.getType(), subAttr.getValue());
                 }
             }
         }
@@ -120,7 +121,7 @@ public final class RelicSuit {
 
     @Override
     public String toString() {
-        Object2DoubleOpenHashMap<String> relicValue = new Object2DoubleOpenHashMap<>();
+        Object2DoubleOpenHashMap<AttributeType> relicValue = new Object2DoubleOpenHashMap<>();
         calcTotalValue(relicValue);
         return relicValue.toString();
     }
