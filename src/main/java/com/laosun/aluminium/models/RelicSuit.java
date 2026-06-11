@@ -50,7 +50,7 @@ public final class RelicSuit {
 
             Relic.Attribute mainAttr = relic.getMainAttribute();
             if (mainAttr != null) {
-                relicValue.addTo(mainAttr.getType(), mainAttr.getValue());
+                relicValue.addTo(mainAttr.type(), mainAttr.value());
             }
 
             List<Relic.Attribute> subAttrs = relic.getSubAttributes();
@@ -59,7 +59,7 @@ public final class RelicSuit {
                     if (subAttr == null) {
                         continue;
                     }
-                    relicValue.addTo(subAttr.getType(), subAttr.getValue());
+                    relicValue.addTo(subAttr.type(), subAttr.value());
                 }
             }
         }
@@ -102,19 +102,19 @@ public final class RelicSuit {
     }
 
     private void addToAggregate(Object2DoubleOpenHashMap<AttributeType> agg, Relic.Attribute attr) {
-        AttributeType type = attr.getType();
-        agg.addTo(type, attr.getValue());
+        AttributeType type = attr.type();
+        agg.addTo(type, attr.value());
     }
 
     private void appendAttribute(AttributeBuilder attributeBuilder, Relic.Attribute attribute) {
-        AttributeType at = attribute.getType();
+        AttributeType at = attribute.type();
         if (PERCENT_TO_BASE.containsKey(at)) {
-            attributeBuilder.addPercent(at, attribute.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+            attributeBuilder.addPercent(at, attribute.value(), DoubleValue.Modifier.ModifierSource.RELIC);
         } else {
             if (at.isPercent) {
-                attributeBuilder.addPercentPoint(at, attribute.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+                attributeBuilder.addPercentPoint(at, attribute.value(), DoubleValue.Modifier.ModifierSource.RELIC);
             } else {
-                attributeBuilder.addPure(at, attribute.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+                attributeBuilder.addPure(at, attribute.value(), DoubleValue.Modifier.ModifierSource.RELIC);
             }
         }
     }
