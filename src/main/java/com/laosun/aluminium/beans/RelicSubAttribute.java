@@ -1,6 +1,7 @@
 package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.enums.AttributeType;
 
 public record RelicSubAttribute(
         @SerializedName("2") AttributeGroup star2,
@@ -30,20 +31,20 @@ public record RelicSubAttribute(
                                  @SerializedName("breaking_effect") Attribute breakingEffect,
                                  @SerializedName("speed") Attribute speed,
                                  @SerializedName("crit_chance") Attribute critChance) {
-        public Attribute getAttributeByName(String attributeName) {
+        public Attribute getAttributeByName(AttributeType attributeName) {
             return switch (attributeName) {
-                case "health" -> health;
-                case "attack" -> attack;
-                case "defence" -> defence;
-                case "health_percent" -> healthPercent;
-                case "attack_percent" -> attackPercent;
-                case "defence_percent" -> defencePercent;
-                case "speed" -> speed;
-                case "crit_chance" -> critChance;
-                case "crit_attack" -> critAttack;
-                case "effect_hit_rate" -> effectHitRate;
-                case "effect_resistance" -> effectResistance;
-                case "breaking_effect" -> breakingEffect;
+                case HEALTH -> health;
+                case ATTACK -> attack;
+                case DEFENCE -> defence;
+                case HEALTH_PERCENT -> healthPercent;
+                case ATTACK_PERCENT -> attackPercent;
+                case DEFENCE_PERCENT -> defencePercent;
+                case SPEED -> speed;
+                case CRIT_CHANCE -> critChance;
+                case CRIT_ATTACK -> critAttack;
+                case EFFECT_HIT_RATE -> effectHitRate;
+                case EFFECT_RESISTANCE -> effectResistance;
+                case BREAKING_EFFECT -> breakingEffect;
                 default -> throw new IllegalStateException("Unexpected attribute: " + attributeName);
             };
         }
