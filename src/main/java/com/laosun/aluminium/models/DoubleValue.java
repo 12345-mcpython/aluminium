@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DoubleValue implements Cloneable {
+public final class DoubleValue implements Cloneable {
     private double baseValue;
     private double value;
 
@@ -138,12 +138,13 @@ public class DoubleValue implements Cloneable {
                 sb.append(String.format("%.5f", modifier.value));
             }
         }
+        sb.append(">");
         return sb.toString();
     }
 
     @AllArgsConstructor
     @Getter
-    public static class Modifier implements Cloneable {
+    public static final class Modifier implements Cloneable {
         private ModifierType modifierType;
         private double value;
         private ModifierSource source;
