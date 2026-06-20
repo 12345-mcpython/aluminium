@@ -115,6 +115,8 @@ public class Main {
         for (DoubleValue db : character.getAttributes()) {
             IO.println(db);
         }
+        SkillPoint.printTree(SkillPoint.init(1409));
+
         IO.println(Charset.defaultCharset().displayName());
     }
 }
