@@ -68,15 +68,12 @@ public final class RelicSuit {
     public void appendTo(AttributeBuilder attributeBuilder) {
         if (total.isEmpty()) return;
 
-        // 聚合容器：AttributeType -> 总数值（百分比的按原始值累加）
         Object2DoubleOpenHashMap<AttributeType> aggregate = new Object2DoubleOpenHashMap<>();
 
         for (Relic relic : total) {
             if (relic == null) continue;
-            // 处理主属性
             Relic.Attribute main = relic.getMainAttribute();
             if (main != null) addToAggregate(aggregate, main);
-            // 处理副属性
             List<Relic.Attribute> subs = relic.getSubAttributes();
             if (subs != null) {
                 for (Relic.Attribute sub : subs) {
@@ -85,7 +82,6 @@ public final class RelicSuit {
             }
         }
 
-        // 批量应用到 AttributeBuilder
         for (var entry : aggregate.object2DoubleEntrySet()) {
             AttributeType type = entry.getKey();
             double value = entry.getDoubleValue();

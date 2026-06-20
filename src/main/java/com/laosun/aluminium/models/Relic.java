@@ -152,7 +152,7 @@ public class Relic {
     }
 
     public static class Builder {
-        private int star = 5;          // 默认 5 星
+        private int star = 5;
         private int level = 0;
         private RelicType type;
         private AttributeType mainAttributeType;

@@ -1,11 +1,14 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.utils.AttributeBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class SkillPoint {
+import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
+
+public final class SkillPoint {
     public int pointId;
     public String pointType;
     public com.laosun.aluminium.beans.SkillPoint.Attribute attribute;
@@ -104,4 +107,42 @@ public class SkillPoint {
             System.out.print(roots.get(i).toTreeString());
         }
     }
+
+    public static Map<AttributeType, Double> sumAttributes(List<SkillPoint> roots) {
+        Map<AttributeType, Double> total = new HashMap<>();
+        if (roots == null || roots.isEmpty()) {
+            return total;
+        }
+
+        Deque<SkillPoint> stack = new ArrayDeque<>(roots);
+
+        while (!stack.isEmpty()) {
+            SkillPoint node = stack.pop();
+            if (node.attribute != null) {
+                AttributeType type = node.attribute.name();
+                double value = node.attribute.value();
+                total.merge(type, value, Double::sum);
+            }
+            if (node.children != null && !node.children.isEmpty()) {
+                stack.addAll(node.children);
+            }
+        }
+        return total;
+    }
+
+    public static void appendTo(List<SkillPoint> roots, AttributeBuilder builder) {
+        Map<AttributeType, Double> total = sumAttributes(roots);
+        for (Map.Entry<AttributeType, Double> entry : total.entrySet()) {
+            if (PERCENT_TO_BASE.containsKey(entry.getKey())) {
+                builder.addPercent(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+            } else {
+                if (entry.getKey().isPercent) {
+                    builder.addPercentPoint(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+                } else {
+                    builder.addPure(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+                }
+            }
+        }
+    }
+
 }

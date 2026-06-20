@@ -79,6 +79,7 @@ public class Character extends CanHit {
             CharacterData characterData = validateAndGet(cid);
             double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
             AttributeBuilder calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
+            SkillPoint.appendTo(SkillPoint.init(cid), calcData);
             Character character = new Character(characterData.name(), calcData.build());
             character.relicSuit = relicSuit;
             character.weapon = weapon;

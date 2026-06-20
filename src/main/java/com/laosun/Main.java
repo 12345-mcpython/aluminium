@@ -103,7 +103,7 @@ public class Main {
                 .level(80)
                 .relicSuit(hya)
                 .weapon(wp)
-                .extraValue(new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.12))
+                .extraValue(new ExtraBasicPromote(0, 0, 0, 0, 0, 0, 0, 0.12))
                 .build();
         IO.println(character.getAttribute(AttributeType.HEALTH));
         IO.println(character.getAttribute(AttributeType.DEFENCE));
@@ -116,6 +116,7 @@ public class Main {
             IO.println(db);
         }
         SkillPoint.printTree(SkillPoint.init(1409));
+        IO.println(SkillPoint.sumAttributes(SkillPoint.init(1409)));
 
         IO.println(Charset.defaultCharset().displayName());
     }
