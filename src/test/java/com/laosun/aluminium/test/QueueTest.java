@@ -1,15 +1,6 @@
 package com.laosun.aluminium.test;
 
-import com.laosun.aluminium.Queue;
-import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.models.Signal;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.laosun.aluminium.models.Character;
 
 public class QueueTest {
     @Test
