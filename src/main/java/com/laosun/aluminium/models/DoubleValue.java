@@ -71,12 +71,11 @@ public class DoubleValue implements Cloneable {
         return result;
     }
 
-    public DoubleValue clearModifiers() {
+    public void clearModifiers() {
         addPercentModifiers.clear();
         multiplyPercentModifiers.clear();
         valueModifiers.clear();
         compute();
-        return this;
     }
 
     private void compute() {
@@ -234,7 +233,7 @@ public class DoubleValue implements Cloneable {
             BASE,
             RELIC,
             WEAPON,
-            SKILL,
+            SKILL_POINT,
             EXTRA,
             RELIC_SET,
             BUFF,
