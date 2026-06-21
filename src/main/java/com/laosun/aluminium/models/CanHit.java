@@ -7,7 +7,7 @@ import lombok.ToString;
 
 
 @Getter
-@ToString(callSuper = true)
+@ToString
 public abstract class CanHit {
     private final String name;
     private final DoubleValue[] attributes;
