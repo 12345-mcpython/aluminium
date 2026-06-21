@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,21 +96,18 @@ public final class DoubleValue implements Cloneable {
         value = baseValue * percentModifiersTotal * multiplyPercentTotal + valueModifiersTotal;
     }
 
+    @SneakyThrows
     @Override
     public DoubleValue clone() {
-        try {
-            DoubleValue copy = (DoubleValue) super.clone();
-            copy.addPercentModifiers = new ArrayList<>();
-            copy.multiplyPercentModifiers = new ArrayList<>();
-            copy.valueModifiers = new ArrayList<>();
-            addPercentModifiers.forEach(m -> copy.addPercentModifiers.add(m.clone()));
-            multiplyPercentModifiers.forEach(m -> copy.multiplyPercentModifiers.add(m.clone()));
-            valueModifiers.forEach(m -> copy.valueModifiers.add(m.clone()));
-            copy.compute();
-            return copy;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        DoubleValue copy = (DoubleValue) super.clone();
+        copy.addPercentModifiers = new ArrayList<>();
+        copy.multiplyPercentModifiers = new ArrayList<>();
+        copy.valueModifiers = new ArrayList<>();
+        addPercentModifiers.forEach(m -> copy.addPercentModifiers.add(m.clone()));
+        multiplyPercentModifiers.forEach(m -> copy.multiplyPercentModifiers.add(m.clone()));
+        valueModifiers.forEach(m -> copy.valueModifiers.add(m.clone()));
+        copy.compute();
+        return copy;
     }
 
     @Override
@@ -214,13 +212,10 @@ public final class DoubleValue implements Cloneable {
             return new Modifier(ModifierType.PURE_VALUE, value, source, sourceRoleId);
         }
 
+        @SneakyThrows
         @Override
         public Modifier clone() {
-            try {
-                return (Modifier) super.clone();
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
-            }
+            return (Modifier) super.clone();
         }
 
         public enum ModifierType {

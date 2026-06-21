@@ -1,6 +1,7 @@
 package com.laosun;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.Queue;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.models.*;
@@ -9,6 +10,7 @@ import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 import java.nio.charset.Charset;
+import java.util.List;
 
 public class Main {
     static void main() {
@@ -117,6 +119,26 @@ public class Main {
         }
         SkillPoint.printTree(SkillPoint.init(1409));
         IO.println(SkillPoint.sumAttributes(SkillPoint.init(1409)));
+
+        Character c1 = Character.builder().cid(1001).build();
+        Character c2 = Character.builder().cid(1002).build();
+        Character c3 = Character.builder().cid(1003).build();
+        Character c4 = Character.builder().cid(1004).build();
+
+        IO.println(c1);
+        IO.println(c2);
+        IO.println(c3);
+        IO.println(c4);
+
+        Queue q = new Queue(List.of(c1, c2, c3, c4));
+        q.initialize();
+        q.printActionQueue();
+        q.move();
+        q.printActionQueue();
+        q.setTopZero();
+        q.printActionQueue();
+        q.move();
+        q.printActionQueue();
 
         IO.println(Charset.defaultCharset().displayName());
     }
