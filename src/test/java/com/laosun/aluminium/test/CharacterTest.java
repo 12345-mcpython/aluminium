@@ -83,7 +83,7 @@ public class CharacterTest {
                 .level(80)
                 .relicSuit(hya)
                 .weapon(wp)
-                .extraValue(new ExtraBasicPromote(0, 0, 0, 14, 0.1, 0, 0, 0.12))
+                .extraValue(new ExtraBasicPromote(0, 0, 0, 0, 0, 0, 0, 0.12))
                 .build();
         // Game Data
         Assertions.assertEquals(5379, character.getAttribute(AttributeType.HEALTH).get(), 1.0);
