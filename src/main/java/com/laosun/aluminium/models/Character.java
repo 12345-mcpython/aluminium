@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 import static com.laosun.aluminium.enums.AttributeType.*;
 import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BASE;
 
@@ -35,7 +37,7 @@ public class Character extends CanHit {
         private int cid;
         private int level = 1;
         private RelicSuit relicSuit = new RelicSuit();
-        private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, null);
+        private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
         private boolean isPromote = false;
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
         private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
