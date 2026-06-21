@@ -29,9 +29,10 @@ public final class DoubleValue implements Cloneable {
     }
 
 
-    public void addBase(double value) {
+    public DoubleValue addBase(double value) {
         baseValue = baseValue + value;
         compute();
+        return this;
     }
     // end undo
 
