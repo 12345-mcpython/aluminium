@@ -6,6 +6,23 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * All character and equipment attribute types used in combat stat calculation.
+ *
+ * <p>Attributes fall into two categories:
+ * <ul>
+ *   <li><b>Base attributes</b> ({@code isPercent = false}): HEALTH, ATTACK, DEFENCE, SPEED —
+ *   these have raw numeric values and can receive percentage-based bonuses via their
+ *   corresponding PERCENT variants.</li>
+ *   <li><b>Percent/rate attributes</b> ({@code isPercent = true}): all others — these
+ *   represent ratios (e.g. CRIT_CHANCE is between 0 and 1) and are not affected by
+ *   percentage-based bonus conversion.</li>
+ * </ul>
+ *
+ * <p>In the internal attribute array built by {@link com.laosun.aluminium.utils.AttributeBuilder},
+ * PERCENT-typed attributes are stored as {@code null} because their values are merged into
+ * the corresponding base attribute's modifier list.
+ */
 @Getter
 public enum AttributeType {
     @SerializedName("health") HEALTH("health", false),
@@ -45,8 +62,15 @@ public enum AttributeType {
 
     @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost");
 
+    /**
+     * The string identifier used in JSON serialization and game data files.
+     */
     public final String attributeString;
 
+    /**
+     * Whether this attribute represents a percentage/ratio rather than a raw value.
+     * {@code true} for attributes like CRIT_CHANCE, DAMAGE_BOOST, etc.
+     */
     public final boolean isPercent;
 
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
@@ -66,6 +90,13 @@ public enum AttributeType {
         this.isPercent = isPercent;
     }
 
+    /**
+     * Looks up an attribute type by its string identifier (case-insensitive).
+     *
+     * @param string the attribute string, e.g. "health", "crit_chance"
+     * @return the matching {@code AttributeType}
+     * @throws IllegalArgumentException if no match is found
+     */
     public static AttributeType fromString(String string) {
         if (BY_STRING.containsKey(string)) {
             return BY_STRING.get(string);
