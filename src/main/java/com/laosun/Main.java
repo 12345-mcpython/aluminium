@@ -12,7 +12,21 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import java.nio.charset.Charset;
 import java.util.List;
 
+/**
+ * Application entry point — a demonstration harness for the Aluminium game simulator.
+ *
+ * <p>This main method exercises the full pipeline:
+ * <ol>
+ *   <li>Creates individually configured relics via the {@link Relic.Builder}</li>
+ *   <li>Assembles a {@link RelicSuit} and computes total relic values</li>
+ *   <li>Loads weapon and character data from JSON resources</li>
+ *   <li>Builds a fully-equipped {@link Character} with all stat calculations</li>
+ *   <li>Prints the character's skill point tree</li>
+ *   <li>Simulates a turn-based action {@link Queue} with multiple characters</li>
+ * </ol>
+ */
 public class Main {
+    /** Demonstration entry point. */
     static void main() {
         IO.println(Relic.createRandomLevelZero(RelicType.BODY, 5));
         Relic hyaBody = Relic.builder()
