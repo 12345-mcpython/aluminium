@@ -4,6 +4,9 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import lombok.Getter;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * Abstract base for all entities that can participate in combat.
@@ -15,13 +18,21 @@ import lombok.ToString;
 @Getter
 @ToString
 public abstract class CanHit {
-    /** The display name of this entity. */
+    /**
+     * The display name of this entity.
+     */
     private final String name;
-    /** Combat attributes indexed by {@link AttributeType#ordinal()}. */
+    /**
+     * Combat attributes indexed by {@link AttributeType#ordinal()}.
+     */
     private final DoubleValue[] attributes;
-    /** Faction alignment. */
+    /**
+     * Faction alignment.
+     */
     private final Camp camp;
-    /** Whether this entity has been defeated. */
+    /**
+     * Whether this entity has been defeated.
+     */
     private final boolean death = false;
 
     /**

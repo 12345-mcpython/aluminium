@@ -56,6 +56,16 @@ public class Character extends CanHit {
     }
 
     /**
+     * Creates a character directly from pre-computed attributes (for testing / quick setup).
+     */
+    public static Character fromAttributes(Translate name, DoubleValue[] attributes) {
+        Character ch = new Character(name, attributes);
+        ch.relicSuit = new RelicSuit();
+        ch.weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
+        return ch;
+    }
+
+    /**
      * Creates a new builder for constructing a character.
      *
      * @return a fresh builder instance
