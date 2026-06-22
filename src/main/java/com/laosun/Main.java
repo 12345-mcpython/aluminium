@@ -12,21 +12,7 @@ import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import java.nio.charset.Charset;
 import java.util.List;
 
-/**
- * Application entry point — a demonstration harness for the Aluminium game simulator.
- *
- * <p>This main method exercises the full pipeline:
- * <ol>
- *   <li>Creates individually configured relics via the {@link Relic.Builder}</li>
- *   <li>Assembles a {@link RelicSuit} and computes total relic values</li>
- *   <li>Loads weapon and character data from JSON resources</li>
- *   <li>Builds a fully-equipped {@link Character} with all stat calculations</li>
- *   <li>Prints the character's skill point tree</li>
- *   <li>Simulates a turn-based action {@link Queue} with multiple characters</li>
- * </ol>
- */
 public class Main {
-    /** Demonstration entry point. */
     static void main() {
         IO.println(Relic.createRandomLevelZero(RelicType.BODY, 5));
         Relic hyaBody = Relic.builder()
@@ -134,24 +120,42 @@ public class Main {
         SkillPoint.printTree(SkillPoint.init(1409));
         IO.println(SkillPoint.sumAttributes(SkillPoint.init(1409)));
 
-        Character c1 = Character.builder().cid(1001).build();
+        Character c1 = Character.builder().cid(1001).extraValue(new ExtraBasicPromote(0, 0, 0, 9, 0, 0, 0, 0))
+                .build();
         Character c2 = Character.builder().cid(1002).build();
         Character c3 = Character.builder().cid(1003).build();
         Character c4 = Character.builder().cid(1004).build();
 
-        IO.println(c1);
-        IO.println(c2);
-        IO.println(c3);
-        IO.println(c4);
-
         Queue q = new Queue(List.of(c1, c2, c3, c4));
         q.initialize();
+        IO.println("=== init ===");
         q.printActionQueue();
+
+        IO.println("getNext() == null: " + (q.getNext() == null));           // true, no one at action point yet
+        IO.println("getCurrentActor() == null: " + (q.getCurrentActor() == null)); // true
+
         q.move();
+        IO.println("=== move 1 -> " + q.getCurrentActor().getCanHit().getName() + " ===");
+        IO.println("getNext() != null: " + (q.getNext() != null));           // true
+        IO.println("getCurrentActor() != null: " + (q.getCurrentActor() != null)); // true
         q.printActionQueue();
+
         q.setTopZero();
+        IO.println("=== reset -> next is " + q.peekNext().getName() + " ===");
+        IO.println("getNext() == null: " + (q.getNext() == null));           // true, setTopZero clears
+        IO.println("getCurrentActor() == null: " + (q.getCurrentActor() == null)); // true
         q.printActionQueue();
+
         q.move();
+        IO.println("=== move 2 -> " + q.getCurrentActor().getCanHit().getName() + " ===");
+        IO.println("getNext() != null: " + (q.getNext() != null));
+        IO.println("getCurrentActor() != null: " + (q.getCurrentActor() != null));
+        q.printActionQueue();
+
+        q.setTopZero();
+        IO.println("=== reset -> next is " + q.peekNext().getName() + " ===");
+        IO.println("getNext() == null: " + (q.getNext() == null));
+        IO.println("getCurrentActor() == null: " + (q.getCurrentActor() == null));
         q.printActionQueue();
 
         IO.println(Charset.defaultCharset().displayName());
