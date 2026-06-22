@@ -14,7 +14,22 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Performance benchmark for character building and relic processing.
+ *
+ * <p>Runs 1 million single-threaded iterations followed by 1 million multi-threaded
+ * iterations of the full character construction pipeline:
+ * <ol>
+ *   <li>Load pre-computed relic suit data from {@code dump_data.json}</li>
+ *   <li>For each character entry, build relics and construct a character with weapon</li>
+ *   <li>Compute total relic values</li>
+ * </ol>
+ *
+ * <p>Thread count equals {@link Runtime#availableProcessors()}. Timing is measured
+ * via {@link System#nanoTime()}.
+ */
 public class Benchmark {
+    /** Entry point for benchmark execution. */
     static void main() throws InterruptedException {
         int roundSingle = 1000000;
         long start = System.nanoTime();
@@ -87,6 +102,9 @@ public class Benchmark {
                 .build();
     }
 
+    /**
+     * Intermediate deserialization record for {@code dump_data.json}.
+     */
     public record Suit(String set, String type, Relic.Setting json) {
     }
 }

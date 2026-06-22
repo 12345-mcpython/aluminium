@@ -16,20 +16,41 @@ import java.util.List;
 
 import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 
+/**
+ * A weapon (light cone) equipped by a character.
+ *
+ * <p>Weapons provide base stat bonuses (HP/ATK/DEF) and ability properties
+ * that are applied as modifiers during attribute calculation.
+ */
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 public class Weapon {
+    /** Display name (bilingual). */
     private Translate name;
+    /** Skill description text. */
     private String description;
+    /** Base health contributed by this weapon. */
     private double health;
+    /** Base attack contributed by this weapon. */
     private double attack;
+    /** Base defence contributed by this weapon. */
     private double defence;
+    /** Weapon type string (e.g. "Destruction"). */
     private String type;
+    /** Ability properties that provide attribute modifiers. */
     private List<WeaponAttribute> weaponAttribute;
 
-
+    /**
+     * Builds a weapon from game data by ID, applying level scaling.
+     *
+     * @param wid       the weapon's game ID
+     * @param level     weapon level (1-80)
+     * @param isPromote whether the weapon is promoted at the ascension threshold
+     * @return the constructed weapon
+     * @throws RuntimeException if the weapon ID is not found
+     */
     public static Weapon build(int wid, int level, boolean isPromote) {
         WeaponData wp = Constant.WEAPONS.get(wid);
         List<WeaponAttribute> weaponAttribute = new ArrayList<>();
@@ -47,10 +68,22 @@ public class Weapon {
                 wp.type(), weaponAttribute);
     }
 
+    /**
+     * Builds a weapon without promotion.
+     *
+     * @param wid   the weapon's game ID
+     * @param level weapon level (1-80)
+     * @return the constructed weapon
+     */
     public static Weapon build(int wid, int level) {
         return build(wid, level, false);
     }
 
+    /**
+     * Applies this weapon's ability modifiers to the attribute builder.
+     *
+     * @param atb the builder to append to
+     */
     public void appendTo(AttributeBuilder atb) {
         for (WeaponAttribute wa : weaponAttribute) {
             if (PERCENT_TO_BASE.containsKey(wa.attribute)) {
@@ -65,6 +98,9 @@ public class Weapon {
         }
     }
 
+    /**
+     * An ability property that maps an attribute type to a value.
+     */
     public record WeaponAttribute(AttributeType attribute, double value) {
     }
 }
