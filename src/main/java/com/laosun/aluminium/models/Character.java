@@ -36,8 +36,8 @@ public class Character extends CanHit {
     public static class Builder {
         private int cid;
         private int level = 1;
-        private RelicSuit relicSuit = new RelicSuit();
-        private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
+        private RelicSuit relicSuit;
+        private Weapon weapon;
         private boolean isPromote = false;
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
         private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
@@ -80,11 +80,13 @@ public class Character extends CanHit {
         public Character build() {
             CharacterData characterData = validateAndGet(cid);
             double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
-            AttributeBuilder calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
+            RelicSuit suit = relicSuit != null ? relicSuit : new RelicSuit();
+            Weapon wp = weapon != null ? weapon : new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
+            AttributeBuilder calcData = new Calculator(characterData, wp, suit, extraBasicPromote).calculate(rate);
             SkillPoint.appendTo(SkillPoint.init(cid), calcData);
             Character character = new Character(characterData.name(), calcData.build());
-            character.relicSuit = relicSuit;
-            character.weapon = weapon;
+            character.relicSuit = suit;
+            character.weapon = wp;
             return character;
         }
 
