@@ -8,37 +8,59 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 /**
- * A turn-based action queue that determines combatant turn order by speed.
+ * A turn-based action queue using absolute-time-based turn ordering.
+ * <p><b>Thread-safety:</b> This class is NOT thread-safe. It is designed to be used
+ * exclusively on the main game/logic thread. External synchronization is required
+ * if accessed from multiple threads.
  *
- * <p>Each combatant gets a {@link Signal} tracking speed, accumulated action length,
- * and predicted time until the next action. The time to next action is computed as:
- * <pre>{@code time = (ACTION_THRESHOLD - length) / speed}</pre> where {@code ACTION_THRESHOLD = 10000}.
+ * <p>Each combatant's {@link Signal} stores a <b>next action time</b> (absolute global time).
+ * The queue maintains a global {@link #elapsed} clock and a {@link PriorityQueue} ordered by
+ * {@code nextActionTime}. This avoids per-frame O(n) iterations and O(n log n) re-sorts.
  *
- * <p>The combatant with the smallest time value acts first. When a combatant acts
- * ({@link #move()}), time passes, all combatants advance their action length proportionally,
- * and the queue is re-sorted.
+ * <p><b>Algorithm:</b>
+ * <ul>
+ *   <li>{@link #move()} — peeks the smallest {@code nextActionTime}, advances {@code elapsed}
+ *   to that point. No iteration needed.</li>
+ *   <li>{@link #setTopZero()} — removes the first combatant, advances its
+ *   {@code nextActionTime += 10000 / speed}, and re-inserts. O(log n).</li>
+ *   <li>{@link #initialize()} — resets elapsed to zero, computes initial {@code nextActionTime}
+ *   for all combatants. O(n log n).</li>
+ *   <li>{@link #addCombatant(CanHit)} — computes {@code nextActionTime = elapsed + 10000 / speed},
+ *   offers to heap. O(log n).</li>
+ * </ul>
+ *
+ * <p>Derived display properties:
+ * <pre>{@code timeRemaining  = max(0, nextActionTime - elapsed)
+ * actionLength    = max(0, 10000 - timeRemaining * speed)}</pre>
  *
  * <p>Usage:
  * <pre>{@code
  * Queue q = new Queue(List.of(char1, char2, char3));
  * q.initialize();
- * q.move(); // advance to next combatant's turn
- * q.setTopZero(); // reset the current combatant's action length
+ * q.move();         // advance to next combatant's turn
+ * q.setTopZero();   // reset the acting combatant's action cycle
  * }</pre>
  */
 @Getter
 @ToString
 public final class Queue {
-    /** The distance value that triggers an action (set by game mechanics). */
     private static final double ACTION_THRESHOLD = 10000;
 
-    /** All combatants participating in the action queue. */
-    private final List<CanHit> combatantQueue = new ArrayList<>();
+    /**
+     * Global elapsed time since simulation start.
+     */
+    private double elapsed;
 
-    /** Action signals ordered by predicted time to next action. */
-    private final List<Signal> actionQueue = new ArrayList<>();
+    /** The combatant currently at their action point (set by move(), cleared by setTopZero()). */
+    private Signal currentActor;
+
+    /**
+     * Heap ordered by {@link Signal#nextActionTime} (ascending).
+     */
+    private final PriorityQueue<Signal> heap = new PriorityQueue<>();
 
     /**
      * Creates a queue with an initial set of combatants.
@@ -49,103 +71,309 @@ public final class Queue {
         addCombatants(initialCombatants);
     }
 
+    // ─── Combatant management ──────────────────────────────────────────
+
     /**
-     * Adds a single combatant to the queue and recalculates turn order.
+     * Returns the combatant that will act next (without advancing time).
+     * This is the combatant with the smallest {@code nextActionTime}.
+     */
+    public CanHit peekNext() {
+        Signal s = heap.peek();
+        return s != null ? s.getCanHit() : null;
+    }
+
+    /**
+     * Returns the combatant whose turn it is right now — i.e. the top of
+     * the heap with remaining time <= 0. Returns {@code null} if no one
+     * is at their action point, or if the queue is empty.
      *
-     * @param combatant the combatant to add; null or duplicates are ignored
+     * <p>Typically called after {@link #move()} to get the acting combatant:</p>
+     * <pre>{@code
+     * queue.move();
+     * CanHit actor = queue.getNext();  // the combatant who acts now
+     * }</pre>
+     */
+    public CanHit getNext() {
+        Signal s = heap.peek();
+        if (s == null) return null;
+        return s.getNextActionTime() <= elapsed ? s.getCanHit() : null;
+    }
+
+    /**
+     * Returns the remaining time until the next combatant acts.
+     */
+    public double timeUntilNext() {
+        Signal s = heap.peek();
+        return s != null ? Math.max(0, s.getNextActionTime() - elapsed) : 0;
+    }
+
+    /**
+     * Returns the combatant at the given logical queue position.
+     * Note: requires snapshotting the heap; use sparingly.
+     *
+     * @param index queue position (0 = next to act)
+     * @return the combatant at that position
+     */
+    public CanHit getCombatant(int index) {
+        return snapshot().get(index).getCanHit();
+    }
+
+    /**
+     * Returns the number of combatants in the queue.
+     */
+    public int size() {
+        return heap.size();
+    }
+
+    /**
+     * Adds a single combatant. Starts its cycle at the current global time.
+     * Duplicates are ignored.
+     *
+     * @param combatant the combatant to add; null is silently ignored
      */
     public void addCombatant(CanHit combatant) {
-        if (combatant != null && !combatantQueue.contains(combatant)) {
-            combatantQueue.add(combatant);
-            actionQueue.add(new Signal(combatant));
-            calcTime();
+        if (combatant == null) {
+            return;
         }
+        for (Signal s : heap) {
+            if (s.getCanHit() == combatant) {
+                return;
+            }
+        }
+        Signal sig = new Signal(combatant);
+        sig.setNextActionTime(elapsed + sig.cycleTime());
+        heap.offer(sig);
     }
 
     /**
      * Adds multiple combatants at once.
-     *
-     * @param combatants the combatants to add
      */
     public void addCombatants(List<CanHit> combatants) {
-        combatants.forEach(this::addCombatant);
+        for (CanHit c : combatants) {
+            addCombatant(c);
+        }
     }
 
     /**
-     * Resets all action lengths and times to zero, then recalculates.
+     * Removes a combatant and its signal from the queue.
+     *
+     * @param combatant the combatant to remove
+     * @return {@code true} if found and removed
+     */
+    public boolean removeCombatant(CanHit combatant) {
+        if (combatant == null) {
+            return false;
+        }
+        return heap.removeIf(s -> s.getCanHit() == combatant);
+    }
+
+    // ─── Simulation ────────────────────────────────────────────────────
+
+    /**
+     * Resets the simulation: all combatants' action cycles start from time zero.
      */
     public void initialize() {
-        actionQueue.forEach(m -> {
-            m.setLength(0);
-            m.setTime(0);
-        });
-        calcTime();
+        elapsed = 0;
+        currentActor = null;
+        List<Signal> snapshot = new ArrayList<>(heap);
+        heap.clear();
+        for (Signal s : snapshot) {
+            s.refreshSpeed();
+            s.setNextActionTime(s.cycleTime());
+            heap.offer(s);
+        }
     }
 
     /**
-     * Recomputes predicted times for all signals and sorts by time (ascending).
+     * Advances time to the next combatant's action.
      *
-     * <p>Time = {@code (ACTION_THRESHOLD - length) / speed}. Combatants with zero
-     * or negative speed are pushed to the end of the queue.
-     */
-    public void calcTime() {
-        actionQueue.forEach(moveable -> {
-            if (moveable.getSpeed() <= 0) {
-                moveable.setTime(Double.MAX_VALUE);
-                return;
-            }
-            double remaining = ACTION_THRESHOLD - moveable.getLength();
-            moveable.setTime(remaining / moveable.getSpeed());
-        });
-        actionQueue.sort(Comparator.comparingDouble(Signal::getTime));
-    }
-
-    /**
-     * Advances to the next combatant's action.
-     *
-     * <p>Time passes equal to the first combatant's remaining time. All combatants
-     * advance their action length accordingly. The queue is then re-sorted.
+     * <p>No iteration over all combatants — only advances the global clock.
+     * The combatant that acts will have {@code nextActionTime == elapsed}
+     * after this call (i.e., zero remaining time).
      *
      * @return the amount of time that passed
      */
     public double move() {
-        if (actionQueue.isEmpty()) return 0;
-        Signal next = actionQueue.getFirst();
-        double timePassed = next.getTime();
-
-        actionQueue.forEach(m -> {
-            if (m.getSpeed() > 0) {
-                m.setLength(Math.min(ACTION_THRESHOLD, m.getLength() + timePassed * m.getSpeed()));
-            }
-        });
-        calcTime();
+        if (heap.isEmpty()) {
+            currentActor = null;
+            return 0;
+        }
+        Signal next = heap.peek();
+        double timePassed = Math.max(0, next.getNextActionTime() - elapsed);
+        elapsed = next.getNextActionTime();
+        currentActor = next;
         return timePassed;
     }
 
     /**
-     * Resets the current (first) combatant's action length, making them
-     * need a full cycle before acting again. Re-sorts the queue.
+     * Resets the current (first) combatant's action cycle: removes from top,
+     * advances their next action time by one full cycle, and re-inserts.
+     *
+     * <p>O(log n): one {@code poll()} + one {@code offer()}.
      */
     public void setTopZero() {
-        actionQueue.getFirst().setLength(0);
-        actionQueue.getFirst().setTime(0);
-        calcTime();
+        if (heap.isEmpty()) {
+            currentActor = null;
+            return;
+        }
+        Signal acting = heap.peek();
+        heap.remove(acting);
+        acting.refreshSpeed();
+        acting.setNextActionTime(elapsed + acting.cycleTime());
+        heap.offer(acting);
+        currentActor = null;
+    }
+
+    /**
+     * Returns the Signal that is currently at its action point (set by move()).
+     * Null if no one is currently acting.
+     */
+    public Signal getCurrentActor() {
+        return currentActor;
+    }
+
+    // ─── Action manipulation ─────────────────────────────
+
+    /**
+     * Delays the target combatant's next action by the given time value (推条).
+     *
+     * <p>Adds {@code delay} to the target's {@code nextActionTime}, pushing
+     * their turn further into the future. If the target is currently at the
+     * top of the heap and within the delay window, this effectively moves
+     * the next turn to another combatant.
+     *
+     * <p>Cost: O(n log n) due to heap rebuild after key modification.
+     *
+     * @param target the combatant to delay
+     * @param delay  amount of time to push back (must be &ge; 0)
+     * @return {@code true} if the target was found and delayed
+     */
+    public boolean delayAction(CanHit target, double delay) {
+        if (target == null || delay < 0) {
+            return false;
+        }
+        for (Signal s : heap) {
+            if (s.getCanHit() == target) {
+                s.setNextActionTime(s.getNextActionTime() + delay);
+                rebuildHeap();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Advances the target combatant's next action by the given time value (拉条).
+     *
+     * <p>Subtracts {@code advance} from the target's {@code nextActionTime},
+     * pulling their turn closer. The next action time is clamped so it never
+     * goes before the current global {@link #elapsed} time (cannot act in the past).
+     *
+     * <p>A value larger than the remaining time results in an immediate action
+     * ({@code nextActionTime == elapsed}), meaning the target will act next.
+     *
+     * <p>Cost: O(n log n) due to heap rebuild after key modification.
+     *
+     * @param target  the combatant to advance
+     * @param advance amount of time to pull forward (must be &ge; 0)
+     * @return {@code true} if the target was found and advanced
+     */
+    public boolean advanceAction(CanHit target, double advance) {
+        if (target == null || advance < 0) {
+            return false;
+        }
+        for (Signal s : heap) {
+            if (s.getCanHit() == target) {
+                s.setNextActionTime(Math.max(elapsed, s.getNextActionTime() - advance));
+                rebuildHeap();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Advances the target combatant's next action by a percentage of their
+     * remaining time.
+     *
+     * <p>If {@code percent = 1.0} (100%), the target acts immediately.
+     * If {@code percent = 0.5} (50%), half the remaining wait is skipped.
+     *
+     * @param target  the combatant to advance
+     * @param percent fraction of remaining time to skip (0.0 ~ 1.0)
+     * @return {@code true} if the target was found and advanced
+     */
+    public boolean advanceActionByPercent(CanHit target, double percent) {
+        if (target == null || percent < 0 || percent > 1) {
+            return false;
+        }
+        for (Signal s : heap) {
+            if (s.getCanHit() == target) {
+                double remaining = Math.max(0, s.getNextActionTime() - elapsed);
+                double advance = remaining * percent;
+                s.setNextActionTime(s.getNextActionTime() - advance);
+                rebuildHeap();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ─── Derived display values ────────────────────────────────────────
+
+    /**
+     * Computes the remaining time until the given signal's next action.
+     */
+    public double getTimeRemaining(Signal s) {
+        return Math.max(0, s.getNextActionTime() - elapsed);
+    }
+
+    /**
+     * Computes the accumulated action length for the given signal.
+     */
+    public double getActionLength(Signal s) {
+        double remaining = getTimeRemaining(s);
+        return Math.max(0, ACTION_THRESHOLD - remaining * s.getSpeed());
+    }
+
+    /**
+     * Returns a time-ordered snapshot of all signals for display or iteration.
+     * O(n log n) — use sparingly (debug only).
+     */
+    public List<Signal> snapshot() {
+        List<Signal> list = new ArrayList<>(heap);
+        list.sort(Comparator.comparingDouble(Signal::getNextActionTime));
+        return list;
     }
 
     /**
      * Prints the current action queue status to stdout.
      */
     public void printActionQueue() {
-        if (actionQueue.isEmpty()) {
+        if (heap.isEmpty()) {
             System.out.println("Action queue is empty.");
             return;
         }
-        System.out.println("=== Action Queue Status ===");
-        for (int i = 0; i < actionQueue.size(); i++) {
-            Signal s = actionQueue.get(i);
+        List<Signal> ordered = snapshot();
+        System.out.println("=== Action Queue Status (elapsed=" + String.format("%.2f", elapsed) + ") ===");
+        for (int i = 0; i < ordered.size(); i++) {
+            Signal s = ordered.get(i);
             System.out.printf("[%d] name = %s, time=%.2f, length=%.2f, speed=%.2f%n",
-                    i, s.getCanHit().getName(), s.getTime(), s.getLength(), s.getSpeed());
+                    i, s.getCanHit().getName(), getTimeRemaining(s), getActionLength(s), s.getSpeed());
         }
         System.out.println("===========================");
+    }
+
+    // ─── Internal ──────────────────────────────────────────────────────
+
+    /**
+     * Rebuilds the heap after in-place key modifications. O(n log n).
+     */
+    private void rebuildHeap() {
+        List<Signal> snapshot = new ArrayList<>(heap);
+        heap.clear();
+        for (Signal s : snapshot) {
+            heap.offer(s);
+        }
     }
 }
