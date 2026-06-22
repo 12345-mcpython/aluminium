@@ -9,6 +9,8 @@ import java.util.*;
 import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 
 public final class SkillPoint {
+    private static final Map<Integer, List<SkillPoint>> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+
     public int pointId;
     public String pointType;
     public com.laosun.aluminium.beans.SkillPoint.Attribute attribute;
@@ -21,6 +23,10 @@ public final class SkillPoint {
     }
 
     public static List<SkillPoint> init(int cid) {
+        return CACHE.computeIfAbsent(cid, unused -> buildTree(cid));
+    }
+
+    private static List<SkillPoint> buildTree(int cid) {
         List<com.laosun.aluminium.beans.SkillPoint> beanList = Constant.SKILL_POINTS.get(cid);
         if (beanList == null || beanList.isEmpty()) {
             return java.util.Collections.emptyList();
@@ -134,12 +140,12 @@ public final class SkillPoint {
         Map<AttributeType, Double> total = sumAttributes(roots);
         for (Map.Entry<AttributeType, Double> entry : total.entrySet()) {
             if (PERCENT_TO_BASE.containsKey(entry.getKey())) {
-                builder.addPercent(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+                builder.addPercent(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_POINT);
             } else {
                 if (entry.getKey().isPercent) {
-                    builder.addPercentPoint(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+                    builder.addPercentPoint(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_POINT);
                 } else {
-                    builder.addPure(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.RELIC);
+                    builder.addPure(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_POINT);
                 }
             }
         }

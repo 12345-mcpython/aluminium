@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class DoubleValue implements Cloneable {
     private double baseValue;
@@ -21,20 +22,33 @@ public final class DoubleValue implements Cloneable {
         compute();
     }
 
-    // These can't undo!
     public DoubleValue base(double base) {
         baseValue = base;
         compute();
         return this;
     }
 
-
     public DoubleValue addBase(double value) {
         baseValue = baseValue + value;
         compute();
         return this;
     }
-    // end undo
+
+    public void baseNoCompute(double base) {
+        baseValue = base;
+    }
+
+    public void addBaseNoCompute(double value) {
+        baseValue = baseValue + value;
+    }
+
+    public void addModifierNoCompute(Modifier modifier) {
+        switch (modifier.modifierType) {
+            case ADD_PERCENT -> addPercentModifiers.add(modifier);
+            case MULTIPLY_PERCENT -> multiplyPercentModifiers.add(modifier);
+            case PURE_VALUE -> valueModifiers.add(modifier);
+        }
+    }
 
 
     public static DoubleValue zero() {
@@ -46,14 +60,10 @@ public final class DoubleValue implements Cloneable {
     }
 
     public void addModifier(Modifier modifier) {
-        if (modifier.modifierType == Modifier.ModifierType.ADD_PERCENT) {
-            addPercentModifiers.add(modifier);
-        } else if (modifier.modifierType == Modifier.ModifierType.PURE_VALUE) {
-            valueModifiers.add(modifier);
-        } else if (modifier.modifierType == Modifier.ModifierType.MULTIPLY_PERCENT) {
-            multiplyPercentModifiers.add(modifier);
-        } else {
-            throw new IllegalArgumentException("Unknown modifier type: " + modifier.modifierType);
+        switch (modifier.modifierType) {
+            case ADD_PERCENT -> addPercentModifiers.add(modifier);
+            case MULTIPLY_PERCENT -> multiplyPercentModifiers.add(modifier);
+            case PURE_VALUE -> valueModifiers.add(modifier);
         }
         compute();
     }
@@ -67,9 +77,15 @@ public final class DoubleValue implements Cloneable {
 
     public List<Modifier> filterBySource(Modifier.ModifierSource type) {
         List<Modifier> result = new ArrayList<>();
-        result.addAll(multiplyPercentModifiers.stream().filter(value -> value.source == type).toList());
-        result.addAll(addPercentModifiers.stream().filter(value -> value.source == type).toList());
-        result.addAll(valueModifiers.stream().filter(value -> value.source == type).toList());
+        for (Modifier m : multiplyPercentModifiers) {
+            if (m.source == type) result.add(m);
+        }
+        for (Modifier m : addPercentModifiers) {
+            if (m.source == type) result.add(m);
+        }
+        for (Modifier m : valueModifiers) {
+            if (m.source == type) result.add(m);
+        }
         return result;
     }
 
@@ -77,6 +93,11 @@ public final class DoubleValue implements Cloneable {
         addPercentModifiers.clear();
         multiplyPercentModifiers.clear();
         valueModifiers.clear();
+        compute();
+    }
+
+    // called once after batch additions from AttributeBuilder
+    public void commit() {
         compute();
     }
 
@@ -217,6 +238,21 @@ public final class DoubleValue implements Cloneable {
         @Override
         public Modifier clone() {
             return (Modifier) super.clone();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Modifier that)) return false;
+            return Double.compare(that.value, value) == 0 &&
+                    sourceRoleId == that.sourceRoleId &&
+                    modifierType == that.modifierType &&
+                    source == that.source;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(modifierType, value, source, sourceRoleId);
         }
 
         public enum ModifierType {

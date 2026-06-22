@@ -40,9 +40,10 @@ public class Weapon {
             weaponAttribute.add(new WeaponAttribute(AttributeType.fromString(p.attribute()), p.value()));
         }
 
-        return new Weapon(wp.name(), "", wp.health() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
-                wp.attack() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
-                wp.defence() * LevelPromotionCalc.calcWeaponRate(level, isPromote),
+        double rate = LevelPromotionCalc.calcWeaponRate(level, isPromote);
+        return new Weapon(wp.name(), "", wp.health() * rate,
+                wp.attack() * rate,
+                wp.defence() * rate,
                 wp.type(), weaponAttribute);
     }
 
@@ -53,12 +54,12 @@ public class Weapon {
     public void appendTo(AttributeBuilder atb) {
         for (WeaponAttribute wa : weaponAttribute) {
             if (PERCENT_TO_BASE.containsKey(wa.attribute)) {
-                atb.addPercent(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.RELIC);
+                atb.addPercent(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.WEAPON);
             } else {
                 if (wa.attribute.isPercent) {
-                    atb.addPercentPoint(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.RELIC);
+                    atb.addPercentPoint(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.WEAPON);
                 } else {
-                    atb.addPure(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.RELIC);
+                    atb.addPure(wa.attribute, wa.value, DoubleValue.Modifier.ModifierSource.WEAPON);
                 }
             }
         }

@@ -13,25 +13,25 @@ public class AttributeBuilder {
     private final Map<AttributeType, DoubleValue> attributeMap = new EnumMap<>(AttributeType.class);
 
     public AttributeBuilder setBase(AttributeType type, double value) {
-        getOrCreate(type).base(value);
+        getOrCreate(type).baseNoCompute(value);
         return this;
     }
 
     public AttributeBuilder addBase(AttributeType type, double value) {
-        getOrCreate(type).addBase(value);
+        getOrCreate(type).addBaseNoCompute(value);
         return this;
     }
 
     // HEALTH ATTACK PERCENT SPEED should call these
     public AttributeBuilder addPure(AttributeType type, double value, DoubleValue.Modifier.ModifierSource source) {
         AttributeType targetType = PERCENT_TO_BASE.getOrDefault(type, type);
-        getOrCreate(targetType).addModifier(DoubleValue.Modifier.pure(value, source));
+        getOrCreate(targetType).addModifierNoCompute(DoubleValue.Modifier.pure(value, source));
         return this;
     }
 
     public AttributeBuilder addPercent(AttributeType type, double percent, DoubleValue.Modifier.ModifierSource source) {
         AttributeType targetType = PERCENT_TO_BASE.getOrDefault(type, type);
-        getOrCreate(targetType).addModifier(DoubleValue.Modifier.addPercent(percent, source));
+        getOrCreate(targetType).addModifierNoCompute(DoubleValue.Modifier.addPercent(percent, source));
         return this;
     }
     // end call
@@ -48,7 +48,13 @@ public class AttributeBuilder {
             if (PERCENT_TO_BASE.containsKey(type)) {
                 result[type.ordinal()] = null;
             } else {
-                result[type.ordinal()] = attributeMap.getOrDefault(type, DoubleValue.zero());
+                DoubleValue dv = attributeMap.get(type);
+                if (dv != null) {
+                    dv.commit();
+                    result[type.ordinal()] = dv;
+                } else {
+                    result[type.ordinal()] = DoubleValue.zero();
+                }
             }
         }
         return result;

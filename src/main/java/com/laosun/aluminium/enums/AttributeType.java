@@ -3,6 +3,9 @@ package com.laosun.aluminium.enums;
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 public enum AttributeType {
     @SerializedName("health") HEALTH("health", false),
@@ -46,6 +49,14 @@ public enum AttributeType {
 
     public final boolean isPercent;
 
+    private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
+
+    static {
+        for (AttributeType type : values()) {
+            BY_STRING.put(type.attributeString.toLowerCase(), type);
+        }
+    }
+
     AttributeType(String string) {
         this(string, true);
     }
@@ -56,10 +67,8 @@ public enum AttributeType {
     }
 
     public static AttributeType fromString(String string) {
-        for (AttributeType attributeType : AttributeType.values()) {
-            if (attributeType.attributeString.equalsIgnoreCase(string)) {
-                return attributeType;
-            }
+        if (BY_STRING.containsKey(string)) {
+            return BY_STRING.get(string);
         }
         throw new IllegalArgumentException("Unknown AttributeType: " + string);
     }
