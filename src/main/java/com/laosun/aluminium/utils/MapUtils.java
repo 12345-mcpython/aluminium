@@ -3,7 +3,6 @@ package com.laosun.aluminium.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -13,16 +12,23 @@ public final class MapUtils {
             throw new IllegalArgumentException("Map can't be null or empty");
         }
 
-        List<Map.Entry<K, V>> entries = new ArrayList<>(map.entrySet());
-        int randomIndex = ThreadLocalRandom.current().nextInt(entries.size());
-
-        return entries.get(randomIndex);
+        int targetIndex = ThreadLocalRandom.current().nextInt(map.size());
+        int currentIndex = 0;
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (currentIndex == targetIndex) {
+                return entry;
+            }
+            currentIndex++;
+        }
+        throw new IllegalStateException("unreachable");
     }
 
     public static <T> List<T> getRandomList(List<T> list, int sampleSize) {
-        Random random = new Random();
+        if (list.size() < sampleSize) {
+            throw new IllegalArgumentException("List size can't be less than sample size");
+        }
 
-        return random.ints(0, list.size())
+        return ThreadLocalRandom.current().ints(0, list.size())
                 .distinct()
                 .limit(sampleSize)
                 .mapToObj(list::get)

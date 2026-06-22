@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @Setter
@@ -62,7 +63,7 @@ public class Relic {
         var subCandidates = new ArrayList<>(SUB_ATTRIBUTE_LIST);
         subCandidates.removeIf(e -> e.equals(mainAttribute.type));
 
-        var selectedSubEntries = MapUtils.getRandomList(subCandidates, new Random().nextInt(3, 5));
+        var selectedSubEntries = MapUtils.getRandomList(subCandidates, ThreadLocalRandom.current().nextInt(3, 5));
         var subAttributes = selectedSubEntries.stream()
                 .map(e -> new Attribute(e, Constant.RELIC_SUB_ATTRIBUTES.getAttributeGroupByStar(star).getAttributeByName(e).base()))
                 .toList();
@@ -120,8 +121,10 @@ public class Relic {
             this.subAttributes = subAttributesL;
         }
 
+        private static final Gson GSON = new Gson();
+
         public static Setting fromJson(String json) {
-            return new Gson().fromJson(json, Setting.class);
+            return GSON.fromJson(json, Setting.class);
         }
 
         public AttributeType getMainAttribute() {
