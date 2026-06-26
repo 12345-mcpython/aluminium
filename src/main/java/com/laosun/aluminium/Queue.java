@@ -54,7 +54,12 @@ public final class Queue {
      */
     private double elapsed;
 
-    /** The combatant currently at their action point (set by move(), cleared by setTopZero()). */
+    /**
+     * The combatant currently at their action point (set by move(), cleared by setTopZero()).
+     * -- GETTER --
+     * Returns the Signal that is currently at its action point (set by move()).
+     * Null if no one is currently acting.
+     */
     private Signal currentActor;
 
     /**
@@ -68,6 +73,9 @@ public final class Queue {
      * @param initialCombatants the starting combatants, may be empty
      */
     public Queue(List<CanHit> initialCombatants) {
+        if (initialCombatants.isEmpty()) {
+            throw new IllegalArgumentException("Initial combatants cannot be empty");
+        }
         addCombatants(initialCombatants);
     }
 
@@ -224,14 +232,6 @@ public final class Queue {
         currentActor = null;
     }
 
-    /**
-     * Returns the Signal that is currently at its action point (set by move()).
-     * Null if no one is currently acting.
-     */
-    public Signal getCurrentActor() {
-        return currentActor;
-    }
-
     // ─── Action manipulation ─────────────────────────────
 
     /**
@@ -372,8 +372,6 @@ public final class Queue {
     private void rebuildHeap() {
         List<Signal> snapshot = new ArrayList<>(heap);
         heap.clear();
-        for (Signal s : snapshot) {
-            heap.offer(s);
-        }
+        heap.addAll(snapshot);
     }
 }
