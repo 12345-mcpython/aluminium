@@ -1,0 +1,192 @@
+Queue output should be these:
+
+
+=== init ===
+=== Action Queue Status (elapsed=0.00) ===
+[0] name = March 7th, time=90.91, length=0.00, speed=110.00
+[1] name = Dan Heng, time=90.91, length=0.00, speed=110.00
+[2] name = Welt, time=98.04, length=0.00, speed=102.00
+[3] name = Himeko, time=104.17, length=0.00, speed=96.00
+===========================
+getNext() == null: true
+getCurrentActor() == null: true
+=== move 0 -> March 7th ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=90.91) ===
+[0] name = March 7th, time=0.00, length=10000.00, speed=110.00
+[1] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[2] name = Welt, time=7.13, length=9272.73, speed=102.00
+[3] name = Himeko, time=13.26, length=8727.27, speed=96.00
+===========================
+=== reset -> next is Dan Heng ===
+getNext() == null: false
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=90.91) ===
+[0] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[1] name = Welt, time=7.13, length=9272.73, speed=102.00
+[2] name = Himeko, time=13.26, length=8727.27, speed=96.00
+[3] name = March 7th, time=90.91, length=0.00, speed=110.00
+===========================
+=== move 1 -> Dan Heng ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=90.91) ===
+[0] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[1] name = Welt, time=7.13, length=9272.73, speed=102.00
+[2] name = Himeko, time=13.26, length=8727.27, speed=96.00
+[3] name = March 7th, time=90.91, length=0.00, speed=110.00
+===========================
+=== reset -> next is Welt ===
+getNext() == null: true
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=90.91) ===
+[0] name = Welt, time=7.13, length=9272.73, speed=102.00
+[1] name = Himeko, time=13.26, length=8727.27, speed=96.00
+[2] name = March 7th, time=90.91, length=0.00, speed=110.00
+[3] name = Dan Heng, time=90.91, length=0.00, speed=110.00
+===========================
+=== move 2 -> Welt ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=98.04) ===
+[0] name = Welt, time=0.00, length=10000.00, speed=102.00
+[1] name = Himeko, time=6.13, length=9411.76, speed=96.00
+[2] name = March 7th, time=83.78, length=784.31, speed=110.00
+[3] name = Dan Heng, time=83.78, length=784.31, speed=110.00
+===========================
+=== reset -> next is Himeko ===
+getNext() == null: true
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=98.04) ===
+[0] name = Himeko, time=6.13, length=9411.76, speed=96.00
+[1] name = March 7th, time=83.78, length=784.31, speed=110.00
+[2] name = Dan Heng, time=83.78, length=784.31, speed=110.00
+[3] name = Welt, time=98.04, length=0.00, speed=102.00
+===========================
+=== move 3 -> Himeko ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=104.17) ===
+[0] name = Himeko, time=0.00, length=10000.00, speed=96.00
+[1] name = March 7th, time=77.65, length=1458.33, speed=110.00
+[2] name = Dan Heng, time=77.65, length=1458.33, speed=110.00
+[3] name = Welt, time=91.91, length=625.00, speed=102.00
+===========================
+=== reset -> next is March 7th ===
+getNext() == null: true
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=104.17) ===
+[0] name = March 7th, time=77.65, length=1458.33, speed=110.00
+[1] name = Dan Heng, time=77.65, length=1458.33, speed=110.00
+[2] name = Welt, time=91.91, length=625.00, speed=102.00
+[3] name = Himeko, time=104.17, length=0.00, speed=96.00
+===========================
+=== move 4 -> March 7th ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=181.82) ===
+[0] name = March 7th, time=0.00, length=10000.00, speed=110.00
+[1] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[2] name = Welt, time=14.26, length=8545.45, speed=102.00
+[3] name = Himeko, time=26.52, length=7454.55, speed=96.00
+===========================
+=== reset -> next is Dan Heng ===
+getNext() == null: false
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=181.82) ===
+[0] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[1] name = Welt, time=14.26, length=8545.45, speed=102.00
+[2] name = Himeko, time=26.52, length=7454.55, speed=96.00
+[3] name = March 7th, time=90.91, length=0.00, speed=110.00
+===========================
+=== move 5 -> Dan Heng ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=181.82) ===
+[0] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[1] name = Welt, time=14.26, length=8545.45, speed=102.00
+[2] name = Himeko, time=26.52, length=7454.55, speed=96.00
+[3] name = March 7th, time=90.91, length=0.00, speed=110.00
+===========================
+=== reset -> next is Welt ===
+getNext() == null: true
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=181.82) ===
+[0] name = Welt, time=14.26, length=8545.45, speed=102.00
+[1] name = Himeko, time=26.52, length=7454.55, speed=96.00
+[2] name = March 7th, time=90.91, length=0.00, speed=110.00
+[3] name = Dan Heng, time=90.91, length=0.00, speed=110.00
+===========================
+=== move 6 -> Welt ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=196.08) ===
+[0] name = Welt, time=0.00, length=10000.00, speed=102.00
+[1] name = Himeko, time=12.25, length=8823.53, speed=96.00
+[2] name = March 7th, time=76.65, length=1568.63, speed=110.00
+[3] name = Dan Heng, time=76.65, length=1568.63, speed=110.00
+===========================
+=== reset -> next is Himeko ===
+getNext() == null: true
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=196.08) ===
+[0] name = Himeko, time=12.25, length=8823.53, speed=96.00
+[1] name = March 7th, time=76.65, length=1568.63, speed=110.00
+[2] name = Dan Heng, time=76.65, length=1568.63, speed=110.00
+[3] name = Welt, time=98.04, length=0.00, speed=102.00
+===========================
+=== move 7 -> Himeko ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=208.33) ===
+[0] name = Himeko, time=0.00, length=10000.00, speed=96.00
+[1] name = March 7th, time=64.39, length=2916.67, speed=110.00
+[2] name = Dan Heng, time=64.39, length=2916.67, speed=110.00
+[3] name = Welt, time=85.78, length=1250.00, speed=102.00
+===========================
+=== reset -> next is March 7th ===
+getNext() == null: true
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=208.33) ===
+[0] name = March 7th, time=64.39, length=2916.67, speed=110.00
+[1] name = Dan Heng, time=64.39, length=2916.67, speed=110.00
+[2] name = Welt, time=85.78, length=1250.00, speed=102.00
+[3] name = Himeko, time=104.17, length=0.00, speed=96.00
+===========================
+=== move 8 -> March 7th ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=272.73) ===
+[0] name = March 7th, time=0.00, length=10000.00, speed=110.00
+[1] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[2] name = Welt, time=21.39, length=7818.18, speed=102.00
+[3] name = Himeko, time=39.77, length=6181.82, speed=96.00
+===========================
+=== reset -> next is Dan Heng ===
+getNext() == null: false
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=272.73) ===
+[0] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[1] name = Welt, time=21.39, length=7818.18, speed=102.00
+[2] name = Himeko, time=39.77, length=6181.82, speed=96.00
+[3] name = March 7th, time=90.91, length=0.00, speed=110.00
+===========================
+=== move 9 -> Dan Heng ===
+getNext() != null: true
+getCurrentActor() != null: true
+=== Action Queue Status (elapsed=272.73) ===
+[0] name = Dan Heng, time=0.00, length=10000.00, speed=110.00
+[1] name = Welt, time=21.39, length=7818.18, speed=102.00
+[2] name = Himeko, time=39.77, length=6181.82, speed=96.00
+[3] name = March 7th, time=90.91, length=0.00, speed=110.00
+===========================
+=== reset -> next is Welt ===
+getNext() == null: true
+getCurrentActor() == null: true
+=== Action Queue Status (elapsed=272.73) ===
+[0] name = Welt, time=21.39, length=7818.18, speed=102.00
+[1] name = Himeko, time=39.77, length=6181.82, speed=96.00
+[2] name = March 7th, time=90.91, length=0.00, speed=110.00
+[3] name = Dan Heng, time=90.91, length=0.00, speed=110.00
+===========================
