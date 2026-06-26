@@ -4,4 +4,4 @@ a game like HSR written by java
 
 ## generator
 
-You can use [this](https://gist.github.com/12345-mcpython/7a4032165da00a74dbc7bccdbe3d9500#file-generate_data-py) Python script and turnbasedgamedata to generate data. You need to copy it into src/main/resources.
+You can use [this](https://gist.github.com/12345-mcpython/7a4032165da00a74dbc7bccdbe3d9500#file-generate_data-py) Python script and [turnbasedgamedata](https://gitlab.com/Dimbreath/turnbasedgamedata) to generate data. You need to copy it into src/main/resources.

@@ -134,30 +134,19 @@ public class Main {
         IO.println("getNext() == null: " + (q.getNext() == null));           // true, no one at action point yet
         IO.println("getCurrentActor() == null: " + (q.getCurrentActor() == null)); // true
 
-        q.move();
-        IO.println("=== move 1 -> " + q.getCurrentActor().getCanHit().getName() + " ===");
-        IO.println("getNext() != null: " + (q.getNext() != null));           // true
-        IO.println("getCurrentActor() != null: " + (q.getCurrentActor() != null)); // true
-        q.printActionQueue();
+        for (int i = 0; i < 10; i++) {
+            q.move();
+            IO.println("=== move " + i + " -> " + q.getCurrentActor().getCanHit().getName() + " ===");
+            IO.println("getNext() != null: " + (q.getNext() != null));           // true
+            IO.println("getCurrentActor() != null: " + (q.getCurrentActor() != null)); // true
+            q.printActionQueue();
 
-        q.setTopZero();
-        IO.println("=== reset -> next is " + q.peekNext().getName() + " ===");
-        IO.println("getNext() == null: " + (q.getNext() == null));           // true, setTopZero clears
-        IO.println("getCurrentActor() == null: " + (q.getCurrentActor() == null)); // true
-        q.printActionQueue();
-
-        q.move();
-        IO.println("=== move 2 -> " + q.getCurrentActor().getCanHit().getName() + " ===");
-        IO.println("getNext() != null: " + (q.getNext() != null));
-        IO.println("getCurrentActor() != null: " + (q.getCurrentActor() != null));
-        q.printActionQueue();
-
-        q.setTopZero();
-        IO.println("=== reset -> next is " + q.peekNext().getName() + " ===");
-        IO.println("getNext() == null: " + (q.getNext() == null));
-        IO.println("getCurrentActor() == null: " + (q.getCurrentActor() == null));
-        q.printActionQueue();
-
+            q.setTopZero();
+            IO.println("=== reset -> next is " + q.peekNext().getName() + " ===");
+            IO.println("getNext() == null: " + (q.getNext() == null));           // true, setTopZero clears
+            IO.println("getCurrentActor() == null: " + (q.getCurrentActor() == null)); // true
+            q.printActionQueue();
+        }
         IO.println(Charset.defaultCharset().displayName());
     }
 }
