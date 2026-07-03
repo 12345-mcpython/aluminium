@@ -27,19 +27,33 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 @ToString
 @AllArgsConstructor
 public class Weapon {
-    /** Display name (bilingual). */
+    /**
+     * Display name (bilingual).
+     */
     private Translate name;
-    /** Skill description text. */
+    /**
+     * Skill description text.
+     */
     private String description;
-    /** Base health contributed by this weapon. */
+    /**
+     * Base health contributed by this weapon.
+     */
     private double health;
-    /** Base attack contributed by this weapon. */
+    /**
+     * Base attack contributed by this weapon.
+     */
     private double attack;
-    /** Base defence contributed by this weapon. */
+    /**
+     * Base defence contributed by this weapon.
+     */
     private double defence;
-    /** Weapon type string (e.g. "Destruction"). */
+    /**
+     * Weapon type string (e.g. "Destruction").
+     */
     private String type;
-    /** Ability properties that provide attribute modifiers. */
+    /**
+     * Ability properties that provide attribute modifiers.
+     */
     private List<WeaponAttribute> weaponAttribute;
 
     /**

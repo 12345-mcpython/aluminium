@@ -15,5 +15,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public record CharacterData(Translate name, String attribute, String mt, String id, double attack, double defence,
                             double health, int speed, @Nullable @SerializedName("max_energy")
-                            Double maxEnergy, @SerializedName("crit_chance") double critChance, @SerializedName("crit_attack") double critAttack) {
+                            Double maxEnergy, @SerializedName("crit_chance") double critChance,
+                            @SerializedName("crit_attack") double critAttack) {
 }

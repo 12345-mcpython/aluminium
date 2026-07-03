@@ -46,12 +46,16 @@ import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BA
 @Setter
 @ToString(callSuper = true)
 public class Character extends CanHit {
-    /** The relic suit equipped on this character. */
+    /**
+     * The relic suit equipped on this character.
+     */
     private RelicSuit relicSuit;
-    /** The weapon (light cone) equipped on this character. */
+    /**
+     * The weapon (light cone) equipped on this character.
+     */
     private Weapon weapon;
 
-    private Character(Translate name, DoubleValue[] attributes) {
+    protected Character(Translate name, DoubleValue[] attributes) {
         super(name.english(), Camp.PLAYER, attributes);
     }
 

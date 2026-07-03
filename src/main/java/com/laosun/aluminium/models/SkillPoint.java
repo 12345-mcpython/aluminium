@@ -25,20 +25,34 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  * </ul>
  */
 public final class SkillPoint {
-    /** Cache of built skill trees, keyed by character ID. */
+    /**
+     * Cache of built skill trees, keyed by character ID.
+     */
     private static final Map<Integer, List<SkillPoint>> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
-    /** Unique point ID within the character's tree. */
+    /**
+     * Unique point ID within the character's tree.
+     */
     public int pointId;
-    /** Type string (e.g. "atk", "hp", "def"). */
+    /**
+     * Type string (e.g. "atk", "hp", "def").
+     */
     public String pointType;
-    /** Optional attribute bonus granted by this node. */
+    /**
+     * Optional attribute bonus granted by this node.
+     */
     public com.laosun.aluminium.beans.SkillPoint.Attribute attribute;
-    /** Whether this node is a root (has no parent). */
+    /**
+     * Whether this node is a root (has no parent).
+     */
     public boolean root = false;
-    /** Child nodes in the tree. */
+    /**
+     * Child nodes in the tree.
+     */
     public List<SkillPoint> children;
-    /** Parent node, or null if this is a root. */
+    /**
+     * Parent node, or null if this is a root.
+     */
     public SkillPoint parent;
 
     public SkillPoint() {
@@ -106,41 +120,6 @@ public final class SkillPoint {
         return roots;
     }
 
-    @Override
-    public String toString() {
-        Integer parentId = (parent != null) ? parent.pointId : null;
-        return String.format("SkillPoint{id=%d, type='%s', attr=%s, root=%s, parentId=%s, childrenCount=%d}",
-                pointId, pointType, attribute, root, parentId, children != null ? children.size() : 0);
-    }
-
-    /**
-     * Returns a formatted tree representation (ASCII art).
-     *
-     * @return multi-line tree string
-     */
-    public String toTreeString() {
-        return toTreeString("", true);
-    }
-
-    private String toTreeString(String prefix, boolean isTail) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(prefix)
-                .append(isTail ? "|___" : "|---")
-                .append("[").append(pointId).append("]")
-                .append(" (").append(pointType).append(")")
-                .append(root ? " [ROOT]" : "")
-                .append("\n");
-
-        if (children != null && !children.isEmpty()) {
-            for (int i = 0; i < children.size(); i++) {
-                SkillPoint child = children.get(i);
-                boolean lastChild = (i == children.size() - 1);
-                sb.append(child.toTreeString(prefix + (isTail ? "    " : "│   "), lastChild));
-            }
-        }
-        return sb.toString();
-    }
-
     /**
      * Prints the skill tree to stdout.
      *
@@ -204,6 +183,41 @@ public final class SkillPoint {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        Integer parentId = (parent != null) ? parent.pointId : null;
+        return String.format("SkillPoint{id=%d, type='%s', attr=%s, root=%s, parentId=%s, childrenCount=%d}",
+                pointId, pointType, attribute, root, parentId, children != null ? children.size() : 0);
+    }
+
+    /**
+     * Returns a formatted tree representation (ASCII art).
+     *
+     * @return multi-line tree string
+     */
+    public String toTreeString() {
+        return toTreeString("", true);
+    }
+
+    private String toTreeString(String prefix, boolean isTail) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(prefix)
+                .append(isTail ? "|___" : "|---")
+                .append("[").append(pointId).append("]")
+                .append(" (").append(pointType).append(")")
+                .append(root ? " [ROOT]" : "")
+                .append("\n");
+
+        if (children != null && !children.isEmpty()) {
+            for (int i = 0; i < children.size(); i++) {
+                SkillPoint child = children.get(i);
+                boolean lastChild = (i == children.size() - 1);
+                sb.append(child.toTreeString(prefix + (isTail ? "    " : "│   "), lastChild));
+            }
+        }
+        return sb.toString();
     }
 
 }
