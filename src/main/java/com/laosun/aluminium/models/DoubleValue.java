@@ -48,6 +48,15 @@ public final class DoubleValue implements Cloneable {
     }
 
     /**
+     * Creates a zero-valued instance with no modifiers.
+     *
+     * @return a new {@code DoubleValue} with base 0
+     */
+    public static DoubleValue zero() {
+        return new DoubleValue(0.0);
+    }
+
+    /**
      * Replaces the base value and recomputes the final value.
      *
      * @param base the new base value
@@ -104,16 +113,6 @@ public final class DoubleValue implements Cloneable {
             case MULTIPLY_PERCENT -> multiplyPercentModifiers.add(modifier);
             case PURE_VALUE -> valueModifiers.add(modifier);
         }
-    }
-
-
-    /**
-     * Creates a zero-valued instance with no modifiers.
-     *
-     * @return a new {@code DoubleValue} with base 0
-     */
-    public static DoubleValue zero() {
-        return new DoubleValue(0.0);
     }
 
     /**
@@ -269,13 +268,21 @@ public final class DoubleValue implements Cloneable {
     @AllArgsConstructor
     @Getter
     public static final class Modifier implements Cloneable {
-        /** How this modifier affects the final value. */
+        /**
+         * How this modifier affects the final value.
+         */
         private ModifierType modifierType;
-        /** The modifier's numeric magnitude. */
+        /**
+         * The modifier's numeric magnitude.
+         */
         private double value;
-        /** Which system produced this modifier. */
+        /**
+         * Which system produced this modifier.
+         */
         private ModifierSource source;
-        /** Optional role/source identifier for precise tracking. */
+        /**
+         * Optional role/source identifier for precise tracking.
+         */
         private int sourceRoleId;
 
         // these need to call with number for example 18 represent to 18% boost
@@ -380,36 +387,64 @@ public final class DoubleValue implements Cloneable {
             return Objects.hash(modifierType, value, source, sourceRoleId);
         }
 
-        /** The mathematical operation a modifier performs. */
+        /**
+         * The mathematical operation a modifier performs.
+         */
         public enum ModifierType {
-            /** Additive percentage: all values are summed. */
+            /**
+             * Additive percentage: all values are summed.
+             */
             ADD_PERCENT,
-            /** Multiplicative bonus: each applied independently as (1 + pct). */
+            /**
+             * Multiplicative bonus: each applied independently as (1 + pct).
+             */
             MULTIPLY_PERCENT,
-            /** Flat value added after all percentage operations. */
+            /**
+             * Flat value added after all percentage operations.
+             */
             PURE_VALUE
         }
 
-        /** Which game system produced this modifier. */
+        /**
+         * Which game system produced this modifier.
+         */
         public enum ModifierSource {
             UNKNOWN,
-            /** Character base stats. */
+            /**
+             * Character base stats.
+             */
             BASE,
-            /** Equipped relic. */
+            /**
+             * Equipped relic.
+             */
             RELIC,
-            /** Equipped weapon (light cone). */
+            /**
+             * Equipped weapon (light cone).
+             */
             WEAPON,
-            /** Skill point (trace) bonus. */
+            /**
+             * Skill point (trace) bonus.
+             */
             SKILL_POINT,
-            /** Extra basic promotion bonus. */
+            /**
+             * Extra basic promotion bonus.
+             */
             EXTRA,
-            /** Relic set bonus. */
+            /**
+             * Relic set bonus.
+             */
             RELIC_SET,
-            /** Active buff. */
+            /**
+             * Active buff.
+             */
             BUFF,
-            /** Active debuff. */
+            /**
+             * Active debuff.
+             */
             DEBUFF,
-            /** Test/dummy source. */
+            /**
+             * Test/dummy source.
+             */
             TEST
         }
     }

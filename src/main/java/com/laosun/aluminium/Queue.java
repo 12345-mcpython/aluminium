@@ -48,12 +48,14 @@ import java.util.PriorityQueue;
 @ToString
 public final class Queue {
     private static final double ACTION_THRESHOLD = 10000;
-
+    /**
+     * Heap ordered by {@link Signal#nextActionTime} (ascending).
+     */
+    private final PriorityQueue<Signal> heap = new PriorityQueue<>();
     /**
      * Global elapsed time since simulation start.
      */
     private double elapsed;
-
     /**
      * The combatant currently at their action point (set by move(), cleared by setTopZero()).
      * -- GETTER --
@@ -61,11 +63,6 @@ public final class Queue {
      * Null if no one is currently acting.
      */
     private Signal currentActor;
-
-    /**
-     * Heap ordered by {@link Signal#nextActionTime} (ascending).
-     */
-    private final PriorityQueue<Signal> heap = new PriorityQueue<>();
 
     /**
      * Creates a queue with an initial set of combatants.

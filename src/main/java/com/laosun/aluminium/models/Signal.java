@@ -22,10 +22,6 @@ import org.jetbrains.annotations.NotNull;
 @Setter
 public final class Signal implements Comparable<Signal>, Cloneable {
     /**
-     * The combatant this signal represents.
-     */
-    private CanHit canHit;
-    /**
      * The combatant's current speed (should be refreshed when buffs/debuffs change speed).
      */
     public double speed;
@@ -33,6 +29,10 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * Absolute global time when this combatant will act next.
      */
     public double nextActionTime;
+    /**
+     * The combatant this signal represents.
+     */
+    private CanHit canHit;
     /**
      * Unique identifier for this signal.
      */

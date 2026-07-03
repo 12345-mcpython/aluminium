@@ -62,17 +62,6 @@ public enum AttributeType {
 
     @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost");
 
-    /**
-     * The string identifier used in JSON serialization and game data files.
-     */
-    public final String attributeString;
-
-    /**
-     * Whether this attribute represents a percentage/ratio rather than a raw value.
-     * {@code true} for attributes like CRIT_CHANCE, DAMAGE_BOOST, etc.
-     */
-    public final boolean isPercent;
-
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
 
     static {
@@ -80,6 +69,16 @@ public enum AttributeType {
             BY_STRING.put(type.attributeString.toLowerCase(), type);
         }
     }
+
+    /**
+     * The string identifier used in JSON serialization and game data files.
+     */
+    public final String attributeString;
+    /**
+     * Whether this attribute represents a percentage/ratio rather than a raw value.
+     * {@code true} for attributes like CRIT_CHANCE, DAMAGE_BOOST, etc.
+     */
+    public final boolean isPercent;
 
     AttributeType(String string) {
         this(string, true);
