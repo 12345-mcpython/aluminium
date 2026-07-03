@@ -4,9 +4,6 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import lombok.Getter;
 import lombok.ToString;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 /**
  * Abstract base for all entities that can participate in combat.
@@ -17,7 +14,7 @@ import java.util.Objects;
  */
 @Getter
 @ToString
-public abstract class CanHit {
+public abstract class CanHit implements MoveEvent, KillEvent, AttackEvent {
     /**
      * The display name of this entity.
      */

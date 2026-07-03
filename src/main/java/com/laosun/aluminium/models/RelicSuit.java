@@ -17,20 +17,34 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  * into an {@link AttributeBuilder} or a raw value map.
  */
 public final class RelicSuit {
-    /** Hand-slot relic. */
-    public Relic hand;
-    /** Head-slot relic. */
-    public Relic head;
-    /** Body-slot relic. */
-    public Relic body;
-    /** Boot-slot relic. */
-    public Relic boot;
-    /** Ball (planar sphere) relic. */
-    public Relic ball;
-    /** Line (link rope) relic. */
-    public Relic line;
-    /** All relics in this suit (for iteration). */
+    /**
+     * All relics in this suit (for iteration).
+     */
     public final List<Relic> total = new ArrayList<>();
+    /**
+     * Hand-slot relic.
+     */
+    public Relic hand;
+    /**
+     * Head-slot relic.
+     */
+    public Relic head;
+    /**
+     * Body-slot relic.
+     */
+    public Relic body;
+    /**
+     * Boot-slot relic.
+     */
+    public Relic boot;
+    /**
+     * Ball (planar sphere) relic.
+     */
+    public Relic ball;
+    /**
+     * Line (link rope) relic.
+     */
+    public Relic line;
 
     /**
      * Adds a relic to the appropriate slot based on its type.

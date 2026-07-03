@@ -2,6 +2,7 @@ package com.laosun.aluminium;
 
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.*;
+import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.utils.JSONReader;
 
@@ -26,15 +27,25 @@ import java.util.Map;
  */
 public final class Constant {
     /** <star level> part attribute <base bonus> <double value> */
-    /** Relic main attribute value tables (keyed by star level 2-5). */
+    /**
+     * Relic main attribute value tables (keyed by star level 2-5).
+     */
     public static final RelicMainAttribute RELIC_MAIN_ATTRIBUTES;
-    /** Relic sub-attribute value tables (keyed by star level 2-5). */
+    /**
+     * Relic sub-attribute value tables (keyed by star level 2-5).
+     */
     public static final RelicSubAttribute RELIC_SUB_ATTRIBUTES;
-    /** Weapon base data indexed by weapon ID. */
+    /**
+     * Weapon base data indexed by weapon ID.
+     */
     public static final Map<Integer, WeaponData> WEAPONS;
-    /** Character base data indexed by character ID. */
+    /**
+     * Character base data indexed by character ID.
+     */
     public static final Map<Integer, CharacterData> CHARACTERS;
-    /** Skill point tree data indexed by character ID. */
+    /**
+     * Skill point tree data indexed by character ID.
+     */
     public static final Map<Integer, List<SkillPoint>> SKILL_POINTS;
 
     /**

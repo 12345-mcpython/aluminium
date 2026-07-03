@@ -36,7 +36,9 @@ import java.util.concurrent.ThreadLocalRandom;
 @Setter
 @ToString
 public class Relic {
-    /** The pool of valid sub-attribute types. */
+    /**
+     * The pool of valid sub-attribute types.
+     */
     public static final List<AttributeType> SUB_ATTRIBUTE_LIST = List.of(
             AttributeType.HEALTH,
             AttributeType.ATTACK,
@@ -51,17 +53,29 @@ public class Relic {
             AttributeType.EFFECT_RESISTANCE,
             AttributeType.BREAKING_EFFECT
     );
-    /** Current upgrade level (0-15). */
+    /**
+     * Current upgrade level (0-15).
+     */
     public int level;
-    /** Display name of the relic. */
+    /**
+     * Display name of the relic.
+     */
     public String name;
-    /** Star rating (2-5). */
+    /**
+     * Star rating (2-5).
+     */
     public int star;
-    /** Equipment slot this relic occupies. */
+    /**
+     * Equipment slot this relic occupies.
+     */
     public RelicType relicType;
-    /** The main (primary) attribute of this relic. */
+    /**
+     * The main (primary) attribute of this relic.
+     */
     public Attribute mainAttribute;
-    /** The sub-attributes (3-4 entries) of this relic. */
+    /**
+     * The sub-attributes (3-4 entries) of this relic.
+     */
     public List<Attribute> subAttributes;
 
     /**
@@ -169,6 +183,13 @@ public class Relic {
     }
 
     /**
+     * Creates a new {@link Builder} for programmatic relic construction.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
      * A serializable specification for reconstructing a relic's attribute configuration.
      *
      * <p>Used for persisting relic state as JSON or programmatic specification.
@@ -176,6 +197,7 @@ public class Relic {
     @Getter
     @ToString
     public static class Setting {
+        private static final Gson GSON = new Gson();
         @SerializedName("main_attribute")
         private final Map<AttributeType, Integer> mainAttribute;
         @SerializedName("sub_attributes")
@@ -187,29 +209,37 @@ public class Relic {
             this.subAttributes = subAttributesL;
         }
 
-        private static final Gson GSON = new Gson();
-
-        /** Deserializes a setting from a JSON string. */
+        /**
+         * Deserializes a setting from a JSON string.
+         */
         public static Setting fromJson(String json) {
             return GSON.fromJson(json, Setting.class);
         }
 
-        /** Returns the single main attribute type. */
+        /**
+         * Returns the single main attribute type.
+         */
         public AttributeType getMainAttribute() {
             return mainAttribute.entrySet().iterator().next().getKey();
         }
 
-        /** Returns the main attribute's level. */
+        /**
+         * Returns the main attribute's level.
+         */
         public Integer getMainAttributeLevel() {
             return mainAttribute.entrySet().iterator().next().getValue();
         }
 
-        /** Returns all sub-attribute types in this setting. */
+        /**
+         * Returns all sub-attribute types in this setting.
+         */
         public List<AttributeType> getSubAttributes() {
             return new ArrayList<>(subAttributes.keySet());
         }
 
-        /** Sub-attribute promotion and level state. */
+        /**
+         * Sub-attribute promotion and level state.
+         */
         public record AttributeLevel(@SerializedName("promote_level") int promoteLevel,
                                      @SerializedName("attribute_level") int attributeLevel) {
         }
@@ -225,24 +255,14 @@ public class Relic {
     }
 
     /**
-     * Creates a new {@link Builder} for programmatic relic construction.
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
      * Fluent builder for creating relics with precise attribute control.
      */
     public static class Builder {
+        private final List<SubAttributeSpec> subSpecs = new ArrayList<>();
         private int star = 5;
         private int level = 0;
         private RelicType type;
         private AttributeType mainAttributeType;
-        private final List<SubAttributeSpec> subSpecs = new ArrayList<>();
-
-        private record SubAttributeSpec(AttributeType type, int promoteLevel, int attributeLevel) {
-        }
 
         public Builder star(int star) {
             this.star = star;
@@ -274,7 +294,7 @@ public class Relic {
          *
          * @return the constructed relic
          * @throws IllegalStateException if type or main attribute not set
-         * @throws RelicException       if the main attribute is invalid for the relic type
+         * @throws RelicException        if the main attribute is invalid for the relic type
          */
         public Relic build() {
             if (type == null) {
@@ -303,6 +323,9 @@ public class Relic {
             }
 
             return Relic.create(level, star, type, mainAttr, subAttrs);
+        }
+
+        private record SubAttributeSpec(AttributeType type, int promoteLevel, int attributeLevel) {
         }
     }
 }

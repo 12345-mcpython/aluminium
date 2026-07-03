@@ -3,6 +3,9 @@ package com.laosun;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.Queue;
 import com.laosun.aluminium.battle.Battle;
+import com.laosun.aluminium.battle.Skill;
+import com.laosun.aluminium.battle.Skill.*;
+import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.models.*;
@@ -10,7 +13,9 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -155,85 +160,138 @@ public class Main {
         Character c1 = Battle.createPlayer("C1", 3000, 500, 300, 200);
         Character c2 = Battle.createPlayer("C2", 3000, 500, 300, 180);
         Character c3 = Battle.createPlayer("C3", 3000, 500, 300, 160);
-        Character c4 = Battle.createPlayer("C4", 3000, 500, 300, 120);
+        Character c4 = new Character(new Translate("C4", "C4"),
+                Battle.makeAttrs(3000, 500, 300, 120)) {
+            @Override
+            public void onBattleStart(Battle b, CanHit self) {
+                IO.println("  [C4] I'm the slowest, but I'll finish this!");
+            }
+
+            @Override
+            public void afterMove(Battle b, CanHit self) {
+                IO.println("  [C4] My turn done.");
+            }
+
+            @Override
+            public boolean onEnemyKilled(Battle b, CanHit killer, CanHit enemy) {
+                IO.println("  [C4] " + enemy.getName() + " slain!");
+                return true;
+            }
+        };
         Enemy e1 = Battle.createEnemy("E1", 4000, 400, 300, 150);
         Enemy e2 = Battle.createEnemy("E2", 4000, 400, 300, 100);
         Enemy e3 = Battle.createEnemy("E3", 4000, 400, 300, 80);
         Enemy e4 = Battle.createEnemy("E4", 4000, 400, 300, 80);
 
+        Map<CanHit, List<Skill>> skillMap = new LinkedHashMap<>();
+        skillMap.put(c1, List.of(
+                new Skill("Strike", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 1.0, TargetScope.SINGLE_ENEMY, 1))),
+                new Skill("Triple Slash", SkillType.SKILL, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 2.0, TargetScope.THREE_ENEMIES, 0)))
+        ));
+        skillMap.put(c2, List.of(
+                new Skill("HP Strike", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.HP, 0.5, TargetScope.SINGLE_ENEMY, 1))),
+                new Skill("Heal", SkillType.SKILL, List.of(new SkillEffect(EffectType.HEAL, StatScale.HP, 0.4, TargetScope.SINGLE_ALLY, 1)))
+        ));
+        skillMap.put(c3, List.of(
+                new Skill("Strike", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 1.0, TargetScope.SINGLE_ENEMY, 1))),
+                new Skill("AoE Slash", SkillType.SKILL, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 2.0, TargetScope.ALL_ENEMIES, 0)))
+        ));
+        skillMap.put(c4, List.of(
+                new Skill("Strike", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 1.0, TargetScope.SINGLE_ENEMY, 1))),
+                new Skill("Advance", SkillType.SKILL, List.of(new SkillEffect(EffectType.ADVANCE, StatScale.ATK, 0.5, TargetScope.SINGLE_ALLY, 1)))
+        ));
+        skillMap.put(e1, List.of(new Skill("Claw", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 0.8, TargetScope.SINGLE_ENEMY, 1)))));
+        skillMap.put(e2, List.of(new Skill("Double Claw", SkillType.COMMON, List.of(
+                new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 0.8, TargetScope.SINGLE_ENEMY, 1),
+                new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 0.6, TargetScope.ALL_ENEMIES, 0)
+        ))));
+        skillMap.put(e3, List.of(new Skill("Claw", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 0.8, TargetScope.SINGLE_ENEMY, 1)))));
+        skillMap.put(e4, List.of(new Skill("Claw", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 0.8, TargetScope.SINGLE_ENEMY, 1)))));
+
         Battle b = new Battle(
                 new Queue(List.of(c1, c2, c3, c4)),
-                new Queue(List.of(e1, e2, e3, e4))
+                new Queue(List.of(e1, e2, e3, e4)),
+                skillMap
         );
 
         IO.println("\n======== Battle Demo ========");
 
         Battle.Result r = b.start();
-        printResult(r);
+        printResult(b, r);
+        // c1 skill (3-target blast) on e3 center
+        r = act(b, r, 1, List.of(2));
+        // c2 skill to heal himself
+        r = act(b, r, 1, List.of(1));
+        // c3 common on e1
+        r = act(b, r, 0, List.of(0));
+        // e1 (enemy auto)
+        r = act(b, r);
+        // c4 skill advance c2
+        r = act(b, r, 1, List.of(1));
 
-        // --- manual steps for the first round ---
-
-        // c1 attacks e3 (index 2), kills
-        r = act(b, r, 2);
-        // c2 attacks e2 (index 1), kills
-        r = act(b, r, 1);
-        // c3 attacks e1 (index 0), doesn't kill
-        r = act(b, r, 0);
-        // e1 attacks random player
-        r = act(b, r, -1);
-        // c4 attacks e1 (index 0), kills
-        r = act(b, r, 0);
-
-        // --- auto battle the rest ---
         while (!r.over()) {
-            r = act(b, r, -1);
+            r = act(b, r);
         }
-
         IO.println("Winner: " + r.winner());
 
         // ==================== Manual battle ====================
         try {
             manualBattle();
         } catch (Exception e) {
-            IO.println("\n[Manual battle skipped: " + e.getClass().getSimpleName() + "]. Try to run without gradle.");
+            IO.println("\n[Manual battle skipped: " + e.getClass().getSimpleName() + "]");
         }
     }
 
-    /** Act with the current actor from prev, then push to next. */
-    static Battle.Result act(Battle b, Battle.Result prev, int targetIdx) {
+    /**
+     * Auto act: player uses skill on first alive enemy, enemy uses random skill.
+     */
+    static Battle.Result act(Battle b, Battle.Result prev) {
         if (prev.over()) return prev;
-
-        // 1. current actor acts
         Battle.Result r;
         if ("player".equals(prev.actorType())) {
+            int idx = 1; // use 'skill' by default
             var alive = prev.enemyTeam().stream().filter(Battle.TeamSnapshot::alive).toList();
-            int idx = targetIdx >= 0 ? targetIdx : prev.enemyTeam().indexOf(alive.getFirst());
-            r = b.attack(idx);
+            if (alive.isEmpty()) return prev;
+            int tidx = prev.enemyTeam().indexOf(alive.getFirst());
+            r = b.useSkill(idx, List.of(tidx));
         } else {
-            r = b.attackRandom();
+            r = b.useRandomSkill();
         }
-        printResult(r);
+        printResult(b, r);
         if (r.over()) return r;
-
-        // 2. advance to next actor
         r = b.pushQueue();
-        printResult(r);
+        printResult(b, r);
         return r;
     }
 
-    static void printResult(Battle.Result r) {
+    /**
+     * Player uses skill with explicit index and targets, then pushes.
+     */
+    static Battle.Result act(Battle b, Battle.Result prev, int skillIndex, List<Integer> targets) {
+        if (prev.over()) return prev;
+        Battle.Result r = b.useSkill(skillIndex, targets);
+        printResult(b, r);
+        if (r.over()) return r;
+        r = b.pushQueue();
+        printResult(b, r);
+        return r;
+    }
+
+    static void printResult(Battle b, Battle.Result r) {
         String actorLine = r.currentActor() != null
                 ? String.format("[%s] %-6s", r.actorType(), r.currentActor().getName())
                 : "       done";
 
-        String actionLine = r.targetName() != null
-                ? String.format("  --> %s  dmg=%.0f%s",
-                        r.targetName(), r.damage(), r.targetDead() ? "  KILL" : "")
-                : "";
+        String skills = r.skills() != null && !r.skills().isEmpty()
+                ? " skills=" + r.skills().stream().map(Skill::name).toList() : "";
 
-        IO.println(actorLine + actionLine);
+        IO.println(actorLine + skills);
+        if (r.log() != null) {
+            IO.println("  " + r.log());
+        }
         IO.println("  P: " + teamLine(r.playerTeam()));
         IO.println("  E: " + teamLine(r.enemyTeam()));
+        b.printQueue();
         if (r.over()) {
             IO.println("  === OVER, winner=" + r.winner() + " ===");
         }
@@ -243,8 +301,8 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         for (var t : team) {
             sb.append(String.format("%s %8s", t.alive()
-                    ? String.format("%-6s", t.name())
-                    : String.format("%-6s", t.name() + "†"),
+                            ? String.format("%-6s", t.name())
+                            : String.format("%-6s", t.name() + "†"),
                     String.format("%.0f/%.0f", t.currentHp(), t.maxHp())));
             sb.append("  ");
         }
@@ -258,52 +316,69 @@ public class Main {
         Character p2 = Battle.createPlayer("Hero2", 2500, 800, 300, 140);
 
         Enemy m1 = Battle.createEnemy("Goblin", 3000, 350, 200, 120);
-        Enemy m2 = Battle.createEnemy("Orc",    5000, 450, 350, 100);
-        Enemy m3 = Battle.createEnemy("Slime",  1500, 200, 100, 80);
+        Enemy m2 = Battle.createEnemy("Orc", 5000, 450, 350, 100);
+        Enemy m3 = Battle.createEnemy("Slime", 1500, 200, 100, 80);
+
+        Map<CanHit, List<Skill>> skillMap = new LinkedHashMap<>();
+        skillMap.put(p1, List.of(
+                new Skill("Strike", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 1.0, TargetScope.SINGLE_ENEMY, 1))),
+                new Skill("Slash", SkillType.SKILL, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 2.0, TargetScope.SINGLE_ENEMY, 1)))
+        ));
+        skillMap.put(p2, List.of(
+                new Skill("Strike", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 1.0, TargetScope.SINGLE_ENEMY, 1))),
+                new Skill("Heal", SkillType.SKILL, List.of(new SkillEffect(EffectType.HEAL, StatScale.HP, 0.4, TargetScope.SINGLE_ALLY, 1)))
+        ));
+        skillMap.put(m1, List.of(new Skill("Claw", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 0.8, TargetScope.SINGLE_ENEMY, 1)))));
+        skillMap.put(m2, List.of(new Skill("Smash", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 1.2, TargetScope.ALL_ENEMIES, 0)))));
+        skillMap.put(m3, List.of(new Skill("Bite", SkillType.COMMON, List.of(new SkillEffect(EffectType.DAMAGE, StatScale.ATK, 0.8, TargetScope.SINGLE_ENEMY, 1)))));
 
         Battle b = new Battle(
                 new Queue(List.of(p1, p2)),
-                new Queue(List.of(m1, m2, m3))
+                new Queue(List.of(m1, m2, m3)),
+                skillMap
         );
 
         IO.println("\n======== Manual Battle ========");
-        IO.println("Commands: 0 1 2 = attack enemy by index, q = quit\n");
+        IO.println("Input: <skill> <target>  (e.g. '0 1' = skill[0] on enemy[1])");
+        IO.println("       'q' to quit\n");
 
         Battle.Result r = b.start();
-        printResult(r);
+        printResult(b, r);
 
         Scanner sc = new Scanner(System.in);
         while (!r.over()) {
             if ("player".equals(r.actorType())) {
-                var enemies = r.enemyTeam().stream().filter(Battle.TeamSnapshot::alive).toList();
-                if (enemies.isEmpty()) break;
-
-                StringBuilder prompt = new StringBuilder("  Pick target (");
-                for (int i = 0; i < r.enemyTeam().size(); i++) {
-                    var t = r.enemyTeam().get(i);
-                    if (t.alive()) prompt.append(i).append("=").append(t.name()).append(" ");
-                }
-                prompt.append("): ");
-                IO.println(prompt.toString());
+                IO.println("  Targets: E=" + targetsStr(r.enemyTeam()) + " P=" + targetsStr(r.playerTeam()));
 
                 String input = sc.nextLine().trim();
                 if ("q".equalsIgnoreCase(input)) break;
 
                 try {
-                    int idx = Integer.parseInt(input);
-                    r = b.attack(idx);
+                    String[] parts = input.split("\\s+");
+                    int skillIdx = Integer.parseInt(parts[0]);
+                    int targetIdx = Integer.parseInt(parts[1]);
+                    r = b.useSkill(skillIdx, List.of(targetIdx));
                 } catch (Exception e) {
                     IO.println("  Invalid! " + e.getMessage());
                     continue;
                 }
             } else {
-                r = b.attackRandom();
+                r = b.useRandomSkill();
             }
-            printResult(r);
+            printResult(b, r);
             if (r.over()) break;
             r = b.pushQueue();
-            printResult(r);
+            printResult(b, r);
         }
         IO.println("Winner: " + r.winner());
+    }
+
+    static String targetsStr(List<Battle.TeamSnapshot> team) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < team.size(); i++) {
+            var t = team.get(i);
+            if (t.alive()) sb.append(i).append("=").append(t.name()).append(" ");
+        }
+        return sb.toString();
     }
 }

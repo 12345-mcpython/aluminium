@@ -6,16 +6,28 @@ package com.laosun.aluminium.enums;
  * <p>Corresponds to the different types of abilities in Honkai: Star Rail.
  */
 public enum SkillType {
-    /** Basic attack. */
+    /**
+     * Basic attack.
+     */
     COMMON,
-    /** Skill (consumes skill points). */
+    /**
+     * Skill (consumes skill points).
+     */
     SKILL,
-    /** Ultimate (energy-based). */
+    /**
+     * Ultimate (energy-based).
+     */
     ULTRA,
-    /** Passive talent. */
+    /**
+     * Passive talent.
+     */
     TALENT,
-    /** Active skill of a summoned entity. */
+    /**
+     * Active skill of a summoned entity.
+     */
     SUMMON_SKILL,
-    /** Passive talent of a summoned entity. */
+    /**
+     * Passive talent of a summoned entity.
+     */
     SUMMON_TALENT
 }

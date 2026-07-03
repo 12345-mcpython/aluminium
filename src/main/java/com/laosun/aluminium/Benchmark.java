@@ -29,7 +29,9 @@ import java.util.concurrent.Executors;
  * via {@link System#nanoTime()}.
  */
 public class Benchmark {
-    /** Entry point for benchmark execution. */
+    /**
+     * Entry point for benchmark execution.
+     */
     static void main() throws InterruptedException {
         int roundSingle = 1000000;
         long start = System.nanoTime();
