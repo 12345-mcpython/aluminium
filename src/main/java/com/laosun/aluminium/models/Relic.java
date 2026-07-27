@@ -9,6 +9,7 @@ import com.laosun.aluminium.exceptions.RelicException;
 import com.laosun.aluminium.utils.MapUtils;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +36,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Getter
 @Setter
 @ToString
-public class Relic {
+public class Relic implements Cloneable {
     /**
      * The pool of valid sub-attribute types.
      */
@@ -187,6 +188,18 @@ public class Relic {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    /**
+     * Clone a new instance for distribution
+     */
+    @SneakyThrows
+    @Override
+    public Relic clone() {
+        Relic cp = (Relic) super.clone();
+        // Attribute is record so can copy by ArrayList construction
+        cp.subAttributes = new ArrayList<>(subAttributes);
+        return cp;
     }
 
     /**

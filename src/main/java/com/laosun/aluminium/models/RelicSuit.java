@@ -4,6 +4,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +17,11 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  * <p>Manages per-slot storage and provides methods to aggregate all relic attributes
  * into an {@link AttributeBuilder} or a raw value map.
  */
-public final class RelicSuit {
+public final class RelicSuit implements Cloneable {
     /**
      * All relics in this suit (for iteration).
      */
-    public final List<Relic> total = new ArrayList<>();
+    private final List<Relic> total = new ArrayList<>();
     /**
      * Hand-slot relic.
      */
@@ -167,5 +168,18 @@ public final class RelicSuit {
         Object2DoubleOpenHashMap<AttributeType> relicValue = new Object2DoubleOpenHashMap<>();
         calcTotalValue(relicValue);
         return relicValue.toString();
+    }
+
+    @SneakyThrows
+    @Override
+    public RelicSuit clone() {
+        RelicSuit cp = new RelicSuit();
+        if (hand != null) cp.addToSuit(hand.clone());
+        if (head != null) cp.addToSuit(head.clone());
+        if (body != null) cp.addToSuit(body.clone());
+        if (boot != null) cp.addToSuit(boot.clone());
+        if (ball != null) cp.addToSuit(ball.clone());
+        if (line != null) cp.addToSuit(line.clone());
+        return cp;
     }
 }

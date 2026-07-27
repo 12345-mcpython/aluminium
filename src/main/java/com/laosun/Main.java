@@ -115,5 +115,7 @@ public class Main {
         }
         SkillPoint.printTree(SkillPoint.init(1409));
         IO.println(SkillPoint.sumAttributes(SkillPoint.init(1409)));
+
+        // Battle battle = new Battle();
     }
 }
