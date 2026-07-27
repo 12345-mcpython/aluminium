@@ -14,7 +14,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-public abstract class CanHit implements MoveEvent, KillEvent, AttackEvent {
+public abstract class CanHit {
     /**
      * The display name of this entity.
      */
