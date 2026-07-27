@@ -46,6 +46,17 @@ public abstract class CanHit {
     }
 
     /**
+     * Copy construction
+     *
+     * @param other what you want to copy
+     */
+    public CanHit(CanHit other) {
+        this.name = other.name;
+        this.camp = other.camp;
+        this.attributes = other.attributes.clone();
+    }
+
+    /**
      * Returns the {@link DoubleValue} for the given attribute type.
      *
      * @param attributeType the attribute to look up

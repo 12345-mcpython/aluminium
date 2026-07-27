@@ -60,13 +60,24 @@ public class Character extends CanHit {
     }
 
     /**
+     * Copy construction
+     *
+     * @param other what you want to copy
+     */
+    public Character(Character other) {
+        super(other);
+        this.relicSuit = other.relicSuit != null ? other.relicSuit.clone() : null;
+        this.weapon = other.weapon != null ? other.weapon.clone() : null;
+    }
+
+    /**
      * Creates a character directly from pre-computed attributes (for testing / quick setup).
      */
     public static Character fromAttributes(Translate name, DoubleValue[] attributes) {
-        Character ch = new Character(name, attributes);
-        ch.relicSuit = new RelicSuit();
-        ch.weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
-        return ch;
+        Character c = new Character(name, attributes);
+        c.relicSuit = new RelicSuit();
+        c.weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
+        return c;
     }
 
     /**
@@ -78,14 +89,15 @@ public class Character extends CanHit {
         return new Builder();
     }
 
+
     /**
      * Fluent builder for constructing a {@link Character} with full combat stats.
      */
     public static class Builder {
         private int cid;
         private int level = 1;
-        private RelicSuit relicSuit;
-        private Weapon weapon;
+        private RelicSuit relicSuit = new RelicSuit();
+        private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
         private boolean isPromote = false;
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
         private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
@@ -159,13 +171,11 @@ public class Character extends CanHit {
         public Character build() {
             CharacterData characterData = validateAndGet(cid);
             double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
-            RelicSuit suit = relicSuit != null ? relicSuit : new RelicSuit();
-            Weapon wp = weapon != null ? weapon : new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
-            AttributeBuilder calcData = new Calculator(characterData, wp, suit, extraBasicPromote).calculate(rate);
+            AttributeBuilder calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
             SkillPoint.appendTo(SkillPoint.init(cid), calcData);
             Character character = new Character(characterData.name(), calcData.build());
-            character.relicSuit = suit;
-            character.weapon = wp;
+            character.relicSuit = relicSuit;
+            character.weapon = weapon;
             return character;
         }
 
