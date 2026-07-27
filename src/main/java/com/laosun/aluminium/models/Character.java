@@ -214,5 +214,4 @@ public class Character extends CanHit {
             return atb;
         }
     }
-
 }
