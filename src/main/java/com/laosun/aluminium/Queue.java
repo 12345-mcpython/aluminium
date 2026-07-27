@@ -65,10 +65,17 @@ public final class Queue {
     private Signal currentActor;
 
     /**
+     * Empty initializer
+     */
+    public Queue() {
+    }
+
+    /**
      * Creates a queue with an initial set of combatants.
      *
      * @param initialCombatants the starting combatants, may be empty
      */
+
     public Queue(List<CanHit> initialCombatants) {
         if (initialCombatants.isEmpty()) {
             throw new IllegalArgumentException("Initial combatants cannot be empty");
@@ -153,7 +160,7 @@ public final class Queue {
     /**
      * Adds multiple combatants at once.
      */
-    public void addCombatants(List<CanHit> combatants) {
+    public void addCombatants(List<? extends CanHit> combatants) {
         for (CanHit c : combatants) {
             addCombatant(c);
         }

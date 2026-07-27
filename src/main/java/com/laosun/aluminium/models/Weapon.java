@@ -6,10 +6,7 @@ import com.laosun.aluminium.beans.WeaponData;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +23,7 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 @Setter
 @ToString
 @AllArgsConstructor
-public class Weapon {
+public class Weapon implements Cloneable {
     /**
      * Display name (bilingual).
      */
@@ -110,6 +107,14 @@ public class Weapon {
                 }
             }
         }
+    }
+
+    @Override
+    @SneakyThrows
+    public Weapon clone() {
+        Weapon clone = (Weapon) super.clone();
+        clone.weaponAttribute = new ArrayList<>(weaponAttribute);
+        return clone;
     }
 
     /**
