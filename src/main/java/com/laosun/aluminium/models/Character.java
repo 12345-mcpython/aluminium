@@ -80,6 +80,15 @@ public class Character extends CanHit {
         return c;
     }
 
+    public static Character fromAttributes(String name, double health, double defence, double attack, double speed) {
+        AttributeBuilder attributeBuilder = new AttributeBuilder();
+        attributeBuilder.setBase(HEALTH, health);
+        attributeBuilder.setBase(DEFENCE, defence);
+        attributeBuilder.setBase(ATTACK, attack);
+        attributeBuilder.setBase(SPEED, speed);
+        return new Character(new Translate(name, name), attributeBuilder.build());
+    }
+
     /**
      * Creates a new builder for constructing a character.
      *

@@ -236,6 +236,16 @@ public final class Queue {
         currentActor = null;
     }
 
+    public void resetSignal(Signal signal) {
+        if(signal == null || !heap.contains(signal)) {
+            return;
+        }
+        heap.remove(signal);
+        signal.refreshSpeed();
+        signal.setNextActionTime(elapsed + signal.cycleTime());
+        heap.offer(signal);
+    }
+
     // ─── Action manipulation ─────────────────────────────
 
     /**
