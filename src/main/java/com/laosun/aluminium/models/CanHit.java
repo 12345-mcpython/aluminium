@@ -2,6 +2,8 @@ package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.models.event.BattleEvent;
+import com.laosun.aluminium.models.event.MoveEvent;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -14,7 +16,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-public abstract class CanHit {
+public abstract class CanHit implements BattleEvent, MoveEvent {
     /**
      * The display name of this entity.
      */

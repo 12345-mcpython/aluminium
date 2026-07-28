@@ -1,5 +1,6 @@
 package com.laosun;
 
+import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
@@ -7,6 +8,8 @@ import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+
+import java.util.List;
 
 public class Main {
     static void main() {
@@ -116,6 +119,19 @@ public class Main {
         SkillPoint.printTree(SkillPoint.init(1409));
         IO.println(SkillPoint.sumAttributes(SkillPoint.init(1409)));
 
+        Character c1 = Character.fromAttributes("c1", 100, 100, 100, 100);
+        Character c2 = Character.fromAttributes("c2", 200, 200, 100, 200);
+        Character c3 = Character.fromAttributes("c3", 300, 500, 100, 160);
+
+        Enemy e1 = Enemy.fromAttributes("e1", 100, 100, 100, 100);
+        Enemy e2 = Enemy.fromAttributes("e1", 100, 100, 100, 160);
+        Enemy e3 = Enemy.fromAttributes("e1", 100, 100, 100, 125);
         // Battle battle = new Battle();
+        Battle battle = new Battle(List.of(c1, c2, c3), List.of(e1, e2, e3));
+        battle.startBattle();
+        battle.printBattle();
+        battle.stepForward();
+        battle.printBattle();
+
     }
 }
