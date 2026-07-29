@@ -5,7 +5,7 @@ package com.laosun.aluminium.enums;
  *
  * <p>Corresponds to the different types of abilities in Honkai: Star Rail.
  */
-public enum SkillType {
+public enum Skill {
     /**
      * Basic attack.
      */

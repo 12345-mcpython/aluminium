@@ -48,6 +48,8 @@ public final class Constant {
      */
     public static final Map<Integer, List<SkillPoint>> SKILL_POINTS;
 
+    public static final Map<Integer, Map<Integer, Skill>> SKILLS;
+
     /**
      * Maps percentage-type attributes to their corresponding base-type attributes.
      * E.g. HEALTH_PERCENT → HEALTH means health percentage bonuses are merged
@@ -68,6 +70,8 @@ public final class Constant {
         CHARACTERS = JSONReader.fromJSON("character_data.json", new TypeToken<Map<Integer, CharacterData>>() {
         }.getType());
         SKILL_POINTS = JSONReader.fromJSON("point.json", new TypeToken<Map<Integer, List<SkillPoint>>>() {
+        }.getType());
+        SKILLS = JSONReader.fromJSON("skills.json", new TypeToken<Map<Integer, Map<Integer, Skill>>>() {
         }.getType());
     }
 }
