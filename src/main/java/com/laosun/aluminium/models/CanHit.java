@@ -2,10 +2,14 @@ package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.event.BattleEvent;
 import com.laosun.aluminium.models.event.MoveEvent;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
+
+import java.util.EnumMap;
 
 /**
  * Abstract base for all entities that can participate in combat.
@@ -29,10 +33,17 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
      * Faction alignment.
      */
     private final Camp camp;
+
+    @Setter
+    private EnumMap<SkillType, Skill> skills;
+    /**
+     * Current hit points.
+     */
+    private double currentHp;
     /**
      * Whether this entity has been defeated.
      */
-    private final boolean death = false;
+    private boolean death = false;
 
     /**
      * Constructs a combat entity.
@@ -45,6 +56,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
         this.name = name;
         this.camp = camp;
         this.attributes = attributes;
+        this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
+        this.skills = new EnumMap<>(SkillType.class);
     }
 
     /**
@@ -55,7 +68,10 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
     public CanHit(CanHit other) {
         this.name = other.name;
         this.camp = other.camp;
+        this.skills = new EnumMap<>(other.skills);
         this.attributes = other.attributes.clone();
+        this.currentHp = other.currentHp;
+        this.death = other.death;
     }
 
     /**
@@ -76,5 +92,45 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
      */
     public void setAttribute(AttributeType attributeType, DoubleValue value) {
         attributes[attributeType.ordinal()] = value;
+    }
+
+    /**
+     * Returns the maximum hit points from the HEALTH attribute.
+     */
+    public double getMaxHp() {
+        return attributes[AttributeType.HEALTH.ordinal()].get();
+    }
+
+    /**
+     * Applies damage to this entity, reducing current HP.
+     * If HP drops to zero or below, the entity is marked dead.
+     *
+     * @param damage the amount of damage to take
+     * @return {@code true} if the entity died from this damage
+     */
+    public boolean takeDamage(double damage) {
+        if (death || damage <= 0) {
+            return false;
+        }
+        currentHp -= damage;
+        if (currentHp <= 0) {
+            currentHp = 0;
+            death = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Restores HP to this entity, capped at max HP.
+     * Has no effect on dead entities.
+     *
+     * @param amount the amount to heal
+     */
+    public void heal(double amount) {
+        if (death || amount <= 0) {
+            return;
+        }
+        currentHp = Math.min(currentHp + amount, getMaxHp());
     }
 }
