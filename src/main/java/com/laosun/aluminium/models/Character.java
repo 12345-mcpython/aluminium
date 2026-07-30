@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import com.laosun.aluminium.utils.CharacterDataProvider;
@@ -13,7 +14,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.laosun.aluminium.enums.AttributeType.*;
 import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BASE;
@@ -111,6 +114,10 @@ public class Character extends CanHit {
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
         private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
 
+        private final EnumMap<SkillType, Integer> skillLevel = new EnumMap<>(SkillType.class);
+
+        private final EnumMap<SkillType, Skill> customSkills = new EnumMap<>(SkillType.class);
+
         /**
          * Marks the character as promoted (ascended) at their current level.
          */
@@ -126,6 +133,16 @@ public class Character extends CanHit {
          */
         public Builder cid(int cid) {
             this.cid = cid;
+            return this;
+        }
+
+        public Builder skillLevel(SkillType skillType) {
+            skillLevel.put(skillType, skillLevel.get(skillType) + 1);
+            return this;
+        }
+
+        public Builder skill(SkillType skillType, Skill skill) {
+            customSkills.put(skillType, skill);
             return this;
         }
 
@@ -185,7 +202,26 @@ public class Character extends CanHit {
             Character character = new Character(characterData.name(), calcData.build());
             character.relicSuit = relicSuit;
             character.weapon = weapon;
+            EnumMap<SkillType, Skill> skills = new EnumMap<>(SkillType.class);
+            for (Map.Entry<SkillType, Integer> entry : skillLevel.entrySet()) {
+                SkillType type = entry.getKey();
+                int level = entry.getValue();
+                int skillId = getSkillIdByType(type);
+                skills.put(type, new DefaultSkill(cid, skillId, level));
+            }
+            skills.putAll(customSkills);
+            character.setSkills(skills);
+
             return character;
+        }
+
+        private static int getSkillIdByType(SkillType type) {
+            return switch (type) {
+                case COMMON, SUMMON_SKILL -> 1;
+                case SKILL -> 2;
+                case ULTRA -> 3;
+                case TALENT, SUMMON_TALENT -> 4;
+            };
         }
 
         private CharacterData validateAndGet(int cid) {

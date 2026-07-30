@@ -7,8 +7,13 @@ import com.laosun.aluminium.models.Character;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Battle {
     public Queue queue;
+
+    public List<Character> characters;
+
+    public List<Enemy> enemies;
 
     public Signal currentMove;
 
@@ -25,6 +30,8 @@ public class Battle {
     }
 
     public Battle(List<Character> characterQueue, List<Enemy> enemyQueue) {
+        characters = characterQueue;
+        enemies = enemyQueue;
         queue = new Queue();
         queue.addCombatants(characterQueue);
         queue.addCombatants(enemyQueue);
@@ -35,8 +42,7 @@ public class Battle {
         for (Signal signal : queue.snapshot()) {
             signal.getCanHit().onBattleStart(this);
         }
-        processAddRequests();
-        processAdvanceRequests();
+        processRequests();
     }
 
     public void stepForward() {
@@ -88,26 +94,16 @@ public class Battle {
         }
 
         currentMove = null;
+
+        removeDeadCombatants();
+
+        processRequests();
+    }
+
+    public void processRequests() {
         processSkillRequests();
         processAddRequests();
         processAdvanceRequests();
-    }
-
-
-    /**
-     * Add CanHit request for avoiding CME
-     *
-     * @param canHit add request object
-     */
-    public void addRequest(CanHit canHit) {
-        addRequestItems.add(canHit);
-    }
-
-    public void skillRequest(Skill skill, CanHit user, List<CanHit> target) {
-        if (skill == null || user == null || target == null) {
-            return;
-        }
-        skillRequests.add(new SkillRequest(skill, user, target));
     }
 
     private void processSkillRequests() {
@@ -123,6 +119,45 @@ public class Battle {
             }
             req.skill().execute(this, req.object(), req.target());
         }
+    }
+
+    public void skillRequest(Skill skill, CanHit user, List<CanHit> target) {
+        if (skill == null || user == null || target == null) {
+            return;
+        }
+        skillRequests.add(new SkillRequest(skill, user, target));
+    }
+
+    public void addRequest(CanHit canHit) {
+        addRequestItems.add(canHit);
+    }
+
+    public double calculateDamage(CanHit attacker, CanHit defender,
+                                  double baseDamage, List<DoubleValue.Modifier> extraModifiers) {
+        DoubleValue damage = new DoubleValue(baseDamage);
+
+        if (extraModifiers != null) {
+            for (DoubleValue.Modifier mod : extraModifiers) {
+                if (mod.getModifierType() == DoubleValue.Modifier.ModifierType.ADD_PERCENT) {
+                    damage.addModifier(mod);
+                }
+            }
+        }
+
+        double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
+        double critDmg = attacker.getAttribute(AttributeType.CRIT_ATTACK).get();
+        if (Math.random() < critRate) {
+            damage.addModifier(DoubleValue.Modifier.multiplyPercent(critDmg, DoubleValue.Modifier.ModifierSource.BUFF));
+            System.out.println("crit attack!");
+        }
+
+        return Math.max(1, damage.get());
+    }
+
+    public void applyDamage(CanHit target, double damage) {
+        double currentHp = target.getAttribute(AttributeType.HEALTH).get();
+        double newHp = Math.max(0, currentHp - damage);
+        target.takeDamage(damage);
     }
 
     private void processAddRequests() {
@@ -149,6 +184,14 @@ public class Battle {
             queue.advanceActionByPercent(advanceRequest.object, advanceRequest.rate);
         }
         advanceRequests.clear();
+    }
+
+    private void removeDeadCombatants() {
+        for (Signal signal : queue.snapshot()) {
+            if (signal.getCanHit().isDeath()) {
+                queue.removeCombatant(signal.getCanHit());
+            }
+        }
     }
 
     public List<Signal> getQueueSnapshot() {
