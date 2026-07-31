@@ -4,11 +4,14 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.tests.TestSkillGroup1;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
+import java.util.EnumMap;
 import java.util.List;
 
 public class Main {
@@ -124,14 +127,34 @@ public class Main {
         Character c3 = Character.fromAttributes("c3", 300, 500, 100, 160);
 
         Enemy e1 = Enemy.fromAttributes("e1", 100, 100, 100, 100);
-        Enemy e2 = Enemy.fromAttributes("e1", 100, 100, 100, 160);
-        Enemy e3 = Enemy.fromAttributes("e1", 100, 100, 100, 125);
+        Enemy e2 = Enemy.fromAttributes("e2", 100, 100, 100, 160);
+        Enemy e3 = Enemy.fromAttributes("e3", 100, 100, 100, 125);
         // Battle battle = new Battle();
         Battle battle = new Battle(List.of(c1, c2, c3), List.of(e1, e2, e3));
+        IO.println("battle init finished");
         battle.startBattle();
+        IO.println("Battle started");
+        battle.printBattle();
+        battle.castUltra(c1, battle.enemies);
+        battle.processRequests();
+        IO.println("Release ULTRA!");
         battle.printBattle();
         battle.stepForward();
+        IO.println("Move");
         battle.printBattle();
-
+        battle.beforeMove();
+        Signal current = battle.queue.getCurrentActor();
+        if (current == null) {
+            IO.println("ERROR! Quitting!");
+            return;
+        }
+        IO.println("current: " + current.getCanHit().getName() + "\n");
+        CanHit actor = current.getCanHit();
+        battle.useSkill(actor.getSkills().get(SkillType.SKILL), battle.enemies);
+        IO.println("Actor: " + actor.getName() + " RELEASE SKILL!\n");
+        if (actor.isDeath()) {
+            battle.afterMove();
+        }
+        battle.printBattle();
     }
 }

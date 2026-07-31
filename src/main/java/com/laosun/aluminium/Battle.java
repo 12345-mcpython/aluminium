@@ -1,6 +1,7 @@
 package com.laosun.aluminium;
 
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 
@@ -26,7 +27,7 @@ public class Battle {
     public record AdvanceRequest(CanHit object, double rate) {
     }
 
-    public record SkillRequest(Skill skill, CanHit object, List<CanHit> target) {
+    public record SkillRequest(Skill skill, CanHit object, List<? extends CanHit> target) {
     }
 
     public Battle(List<Character> characterQueue, List<Enemy> enemyQueue) {
@@ -36,6 +37,43 @@ public class Battle {
         queue.addCombatants(characterQueue);
         queue.addCombatants(enemyQueue);
         queue.initialize();
+    }
+
+    public void castImmediate(Skill skill, CanHit user, List<? extends CanHit> targets) {
+        if (skill == null || user == null || targets == null) return;
+        if (user.isDeath()) return;
+
+        skill.execute(this, user, targets);
+
+        processRequests();
+
+        removeDeadCombatants();
+    }
+
+    public boolean requestSkill(Skill skill, CanHit user, List<? extends CanHit> target) {
+        if (skill == null || user == null || target == null) {
+            return false;
+        }
+        if (user.isDeath()) {
+            return false;
+        }
+        skillRequest(skill, user, target);
+        return true;
+    }
+
+    // After releasing ultra skill must call processRequests()!
+    public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
+        if (user == null || user.isDeath()) {
+            return false;
+        }
+        Skill ultra = user.getSkills().get(SkillType.ULTRA);
+        if (ultra == null) {
+            return false;
+        }
+        if (!requestSkill(ultra, user, targets)) {
+            return false;
+        }
+        return true;
     }
 
     public void startBattle() {
@@ -68,7 +106,7 @@ public class Battle {
         // TODO: Skill
     }
 
-    public boolean useSkill(Skill skill, List<CanHit> target) {
+    public boolean useSkill(Skill skill, List<? extends CanHit> target) {
         if (currentMove == null || skill == null || target == null) {
             return false;
         }
@@ -117,18 +155,19 @@ public class Battle {
             if (req.object.isDeath()) {
                 continue;
             }
+            IO.println("REQUEST: " + req.object);
             req.skill().execute(this, req.object(), req.target());
         }
     }
 
-    public void skillRequest(Skill skill, CanHit user, List<CanHit> target) {
+    private void skillRequest(Skill skill, CanHit user, List<? extends CanHit> target) {
         if (skill == null || user == null || target == null) {
             return;
         }
         skillRequests.add(new SkillRequest(skill, user, target));
     }
 
-    public void addRequest(CanHit canHit) {
+    private void addRequest(CanHit canHit) {
         addRequestItems.add(canHit);
     }
 
@@ -199,6 +238,18 @@ public class Battle {
     }
 
     public void printBattle() {
+        printHp();
         queue.printActionQueue();
+    }
+
+    public void printHp() {
+        System.out.println("=== HP Status ===");
+        for (Character c : characters) {
+            System.out.printf("%s: %.0f / %.0f%n", c.getName(), c.getCurrentHp(), c.getMaxHp());
+        }
+        for (Enemy e : enemies) {
+            System.out.printf("%s: %.0f / %.0f%n", e.getName(), e.getCurrentHp(), e.getMaxHp());
+        }
+        System.out.println("================");
     }
 }

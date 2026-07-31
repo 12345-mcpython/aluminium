@@ -32,7 +32,7 @@ public class DefaultSkill implements Skill {
     }
 
     @Override
-    public void execute(Battle battle, CanHit user, List<CanHit> target) {
+    public void execute(Battle battle, CanHit user, List<? extends CanHit> target) {
         if (target == null || target.isEmpty()) {
             return;
         }
