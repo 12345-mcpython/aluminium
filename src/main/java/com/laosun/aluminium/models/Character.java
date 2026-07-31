@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,20 @@ public class Character extends CanHit {
         attributeBuilder.setBase(DEFENCE, defence);
         attributeBuilder.setBase(ATTACK, attack);
         attributeBuilder.setBase(SPEED, speed);
-        return new Character(new Translate(name, name), attributeBuilder.build());
+        // CONSTRUCT TEST SKILL
+        EnumMap<SkillType, Integer> skillLevel = new EnumMap<>(SkillType.class);
+        EnumMap<SkillType, Skill> skills = new EnumMap<>(SkillType.class);
+        Arrays.stream(SkillType.values()).forEach(t -> skillLevel.put(t, 1));
+        for (Map.Entry<SkillType, Integer> entry : skillLevel.entrySet()) {
+            SkillType type = entry.getKey();
+            int level = entry.getValue();
+            int skillId = 1;
+            skills.put(type, new DefaultSkill(1001, skillId, level));
+        }
+        // END
+        Character character = new Character(new Translate(name, name), attributeBuilder.build());
+        character.setSkills(skills);
+        return character;
     }
 
     /**
@@ -117,6 +131,11 @@ public class Character extends CanHit {
         private final EnumMap<SkillType, Integer> skillLevel = new EnumMap<>(SkillType.class);
 
         private final EnumMap<SkillType, Skill> customSkills = new EnumMap<>(SkillType.class);
+
+        // init default skill level for 1
+        {
+            Arrays.stream(SkillType.values()).forEach(t -> skillLevel.put(t, 1));
+        }
 
         /**
          * Marks the character as promoted (ascended) at their current level.
@@ -206,22 +225,14 @@ public class Character extends CanHit {
             for (Map.Entry<SkillType, Integer> entry : skillLevel.entrySet()) {
                 SkillType type = entry.getKey();
                 int level = entry.getValue();
-                int skillId = getSkillIdByType(type);
-                skills.put(type, new DefaultSkill(cid, skillId, level));
+                // WRITE 1 for placeholder will change TODO
+                // Future will not have placeholder skill
+                skills.put(type, new DefaultSkill(cid, 1, level));
             }
             skills.putAll(customSkills);
             character.setSkills(skills);
 
             return character;
-        }
-
-        private static int getSkillIdByType(SkillType type) {
-            return switch (type) {
-                case COMMON, SUMMON_SKILL -> 1;
-                case SKILL -> 2;
-                case ULTRA -> 3;
-                case TALENT, SUMMON_TALENT -> 4;
-            };
         }
 
         private CharacterData validateAndGet(int cid) {

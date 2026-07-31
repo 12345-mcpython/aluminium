@@ -15,10 +15,10 @@ public class SkillData {
 
     private static final SkillData EMPTY = new SkillData(0, "", EMPTY_PARAMS, EMPTY_STANCE);
 
-    private int maxLevel;
-    private String skillType;
-    private List<List<Double>> skills;
-    private Skill.StanceList stanceList;
+    private final int maxLevel;
+    private final String skillType;
+    private final List<List<Double>> skills;
+    private final Skill.StanceList stanceList;
 
     public SkillData(int maxLevel, String skillType, List<List<Double>> skills, Skill.StanceList stanceList) {
         this.maxLevel = maxLevel;
@@ -28,6 +28,7 @@ public class SkillData {
     }
 
     public static SkillData init(int cid, int skillID) {
+        IO.println(cid + "_" + skillID);
         Map<Integer, Skill> skillMap = Constant.SKILLS.get(cid);
         if (skillMap == null) {
             return EMPTY;

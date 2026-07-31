@@ -12,7 +12,7 @@ public class TestSkillGroup1 {
     // 对指定敌方单体造成等同于<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>攻击力的冰属性伤害。
     public static class TestSkill1 implements Skill {
         private final int level;
-        private static final SkillData DATA = SkillData.init(1001, 1);
+        private static final SkillData DATA = SkillData.init(1001, 3);
 
         public TestSkill1(int level) {
             this.level = level;
@@ -29,7 +29,7 @@ public class TestSkillGroup1 {
         }
 
         @Override
-        public void execute(Battle battle, CanHit user, List<CanHit> target) {
+        public void execute(Battle battle, CanHit user, List<? extends CanHit> target) {
             CanHit c = target.getFirst();
             List<Double> params = getData().getSkills().get(level - 1);
 
@@ -39,7 +39,9 @@ public class TestSkillGroup1 {
             double baseDamage = attack * multiplier;
 
             double finalDamage = battle.calculateDamage(user, c, baseDamage, List.of());
-            battle.applyDamage(c, finalDamage);
+            for(CanHit targetSkill : target) {
+                battle.applyDamage(targetSkill, finalDamage);
+            }
         }
     }
 }

@@ -9,5 +9,5 @@ public interface Skill {
 
     SkillData getData();
 
-    void execute(Battle battle, CanHit user, List<CanHit> target);
+    void execute(Battle battle, CanHit user, List<? extends CanHit> target);
 }
