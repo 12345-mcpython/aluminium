@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 
 import java.util.List;
 
-public interface Skill {
-    int getLevel();
+public abstract class Skill {
+    public abstract int getLevel();
 
-    SkillData getData();
+    public abstract SkillData getData();
 
-    void execute(Battle battle, CanHit user, List<? extends CanHit> target);
+    public abstract void execute(Battle battle, CanHit user, List<? extends CanHit> target);
 }

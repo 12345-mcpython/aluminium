@@ -10,7 +10,7 @@ import java.util.List;
 
 public class TestSkillGroup1 {
     // 对指定敌方单体造成等同于<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>攻击力的冰属性伤害。
-    public static class TestSkill1 implements Skill {
+    public static class TestSkill1 extends Skill {
         private final int level;
         private static final SkillData DATA = SkillData.init(1001, 3);
 
