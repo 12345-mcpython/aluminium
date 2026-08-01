@@ -59,6 +59,8 @@ public class Character extends CanHit {
      */
     private Weapon weapon;
 
+    private EnumMap<SkillType, Integer> skillLevel;
+
     protected Character(Translate name, DoubleValue[] attributes) {
         super(name.english(), Camp.PLAYER, attributes);
     }
@@ -72,6 +74,7 @@ public class Character extends CanHit {
         super(other);
         this.relicSuit = other.relicSuit != null ? other.relicSuit.clone() : null;
         this.weapon = other.weapon != null ? other.weapon.clone() : null;
+        this.skillLevel = other.skillLevel != null ? other.skillLevel.clone() : null;
     }
 
     /**
@@ -104,6 +107,14 @@ public class Character extends CanHit {
         Character character = new Character(new Translate(name, name), attributeBuilder.build());
         character.setSkills(skills);
         return character;
+    }
+
+    public void setSkillByClass(SkillType skillType, Class<? extends Skill> skillClass) {
+        try {
+            setSkill(skillType, skillClass.getConstructor(Integer.class).newInstance(skillLevel.get(skillType)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -231,7 +242,7 @@ public class Character extends CanHit {
             }
             skills.putAll(customSkills);
             character.setSkills(skills);
-
+            character.setSkillLevel(skillLevel);
             return character;
         }
 

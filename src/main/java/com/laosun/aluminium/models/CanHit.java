@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 
 /**
@@ -82,6 +83,10 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
      */
     public DoubleValue getAttribute(AttributeType attributeType) {
         return attributes[attributeType.ordinal()];
+    }
+
+    public void setSkill(SkillType skillType, Skill skill) {
+        skills.put(skillType, skill);
     }
 
     /**

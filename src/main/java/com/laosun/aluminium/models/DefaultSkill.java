@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class DefaultSkill implements Skill {
+public class DefaultSkill extends Skill {
     private final int cid;
     private final int skillId;
     private final int level;
