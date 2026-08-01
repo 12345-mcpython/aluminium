@@ -124,6 +124,7 @@ public class Main {
 
         Character c1 = Character.fromAttributes("c1", 100, 100, 100, 100);
         Character c2 = Character.fromAttributes("c2", 200, 200, 100, 200);
+        c2.setSkill(SkillType.SKILL, new TestSkillGroup1.TestSkill1(1));
         Character c3 = Character.fromAttributes("c3", 300, 500, 100, 160);
 
         Enemy e1 = Enemy.fromAttributes("e1", 100, 100, 100, 100);
@@ -136,7 +137,6 @@ public class Main {
         IO.println("Battle started");
         battle.printBattle();
         battle.castUltra(c1, battle.enemies);
-        battle.processRequests();
         IO.println("Release ULTRA!");
         battle.printBattle();
         battle.stepForward();
@@ -152,9 +152,7 @@ public class Main {
         CanHit actor = current.getCanHit();
         battle.useSkill(actor.getSkills().get(SkillType.SKILL), battle.enemies);
         IO.println("Actor: " + actor.getName() + " RELEASE SKILL!\n");
-        if (actor.isDeath()) {
-            battle.afterMove();
-        }
+        battle.afterMove();
         battle.printBattle();
     }
 }

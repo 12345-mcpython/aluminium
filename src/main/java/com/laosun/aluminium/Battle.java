@@ -62,6 +62,7 @@ public class Battle {
     }
 
     // After releasing ultra skill must call processRequests()!
+    // NO BEFAN YOY DID IT
     public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
         if (user == null || user.isDeath()) {
             return false;
@@ -73,6 +74,7 @@ public class Battle {
         if (!requestSkill(ultra, user, targets)) {
             return false;
         }
+        processRequests();
         return true;
     }
 
