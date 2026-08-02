@@ -93,6 +93,7 @@ public class Main {
             IO.println("  [2] 敌人设置 (Enemy Setup)");
             IO.println("  [3] 开始战斗 (Start Battle)");
             IO.println("  [4] 角色图鉴 (Character Database)");
+            IO.println("  [6] 快速开始 (预设队伍直接开战)");
             IO.println("  [5] 退出 (Exit)");
             String choice = IO.readln("选择: ");
             if (choice == null) {
@@ -103,6 +104,7 @@ public class Main {
                 case "2" -> enemyMenu();
                 case "3" -> startBattle();
                 case "4" -> databaseMenu();
+                case "6" -> quickStart();
                 case "5" -> {
                     running = false;
                     IO.println("再见！");
@@ -110,6 +112,82 @@ public class Main {
                 default -> IO.println("无效选择。");
             }
         }
+    }
+
+    // ─── 队伍预设 ──────────────────────────────────────────────────────
+
+    private static final int[][] PRESET_TEAMS = {
+            {1001, 1002, 1003, 1211},   // 星穹开局队
+            {1005, 1204, 1003, 1217},   // 雷火爆发队
+            {1310, 1303, 8005, 1301},   // 击破队
+            {1220, 1223, 1309, 1304},   // 追猎队
+            {1402, 1313, 1202, 1217},   // 记忆队
+            {1501, 1502, 1504, 1505}    // 欢愉队
+    };
+
+    private static final String[] PRESET_NAMES = {
+            "星穹开局队", "雷火爆发队", "击破队", "追猎队", "记忆队", "欢愉队"
+    };
+
+    private static void printPresetTeams() {
+        for (int i = 0; i < PRESET_TEAMS.length; i++) {
+            StringBuilder sb = new StringBuilder("  [" + (i + 1) + "] " + PRESET_NAMES[i] + ": ");
+            for (int cid : PRESET_TEAMS[i]) {
+                sb.append(rosterName(cid)).append(" ");
+            }
+            IO.println(sb.toString());
+        }
+    }
+
+    private static String rosterName(int cid) {
+        for (int i = 0; i < ROSTER.length; i++) {
+            if (ROSTER[i] == cid) {
+                return ROSTER_NAMES[i];
+            }
+        }
+        return "角色#" + cid;
+    }
+
+    private static int rosterIndex(int cid) {
+        for (int i = 0; i < ROSTER.length; i++) {
+            if (ROSTER[i] == cid) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static void applyPreset(int preset) {
+        PARTY.clear();
+        for (int cid : PRESET_TEAMS[preset]) {
+            int idx = rosterIndex(cid);
+            PARTY.add(new PartyMember(cid, ROSTER_NAMES[idx], 0, DEFAULT_WEAPON, DEFAULT_RELIC_SET));
+        }
+        IO.println("已应用预设队伍: " + PRESET_NAMES[preset]);
+    }
+
+    /** 快速开始: 选择预设队伍 (也可回车用当前队伍) 直接进入战斗. */
+    private static void quickStart() {
+        IO.println();
+        IO.println("========== 快速开始 ==========");
+        printPresetTeams();
+        IO.println("  当前队伍 (" + PARTY.size() + "人)" + (PARTY.isEmpty() ? " (空)" : "") + " — 回车直接开战");
+        String line = IO.readln("选择预设队伍 (1-6, 0/回车 = 使用当前队伍): ");
+        if (line == null) {
+            return;
+        }
+        try {
+            int preset = Integer.parseInt(line.trim()) - 1;
+            if (preset >= 0 && preset < PRESET_TEAMS.length) {
+                applyPreset(preset);
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        if (PARTY.isEmpty()) {
+            IO.println("队伍为空, 请先组队。");
+            return;
+        }
+        startBattle();
     }
 
     // ─── 组队 ──────────────────────────────────────────────────────────
@@ -122,7 +200,7 @@ public class Main {
             IO.println("========== 组队 ==========");
             printTeam();
             IO.println("  [a] 添加角色   [r] 移除角色   [e] 设置星魂   [q] 装备 (光锥/遗器)"
-                    + "   [c] 清空队伍   [d] 完成");
+                    + "   [p] 预设队伍   [c] 清空队伍   [d] 完成");
             String choice = IO.readln("选择: ");
             if (choice == null) {
                 return;
@@ -132,6 +210,17 @@ public class Main {
                 case "r" -> removeCharacter();
                 case "e" -> setEidolon();
                 case "q" -> equipmentMenu();
+                case "p" -> {
+                    printPresetTeams();
+                    String line = IO.readln("选择预设队伍 (1-6, 0 取消): ");
+                    try {
+                        int preset = Integer.parseInt(line == null ? "" : line.trim()) - 1;
+                        if (preset >= 0 && preset < PRESET_TEAMS.length) {
+                            applyPreset(preset);
+                        }
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
                 case "c" -> {
                     PARTY.clear();
                     IO.println("队伍已清空。");
@@ -193,26 +282,60 @@ public class Main {
             return;
         }
         printRoster();
-        String line = IO.readln("输入角色编号添加 (如 1 = 三月七, 0 取消): ");
+        String line = IO.readln("输入角色编号添加 (或输入名字搜索, 如 \"希儿\", 0 取消): ");
         if (line == null) {
             return;
         }
-        try {
-            int index = Integer.parseInt(line.trim()) - 1;
-            if (index < 0 || index >= ROSTER.length) {
-                IO.println("无效编号。");
-                return;
-            }
-            int cid = ROSTER[index];
-            if (PARTY.stream().anyMatch(m -> m.cid() == cid)) {
-                IO.println("该角色已在队伍中。");
-                return;
-            }
-            PARTY.add(new PartyMember(cid, ROSTER_NAMES[index], 0, DEFAULT_WEAPON, DEFAULT_RELIC_SET));
-            IO.println("添加 " + ROSTER_NAMES[index] + " (cid " + cid + ")...");
-        } catch (NumberFormatException e) {
-            IO.println("请输入数字。");
+        Integer index = findRosterIndex(line);
+        if (index == null) {
+            IO.println("未找到该角色。");
+            return;
         }
+        int cid = ROSTER[index];
+        if (PARTY.stream().anyMatch(m -> m.cid() == cid)) {
+            IO.println("该角色已在队伍中。");
+            return;
+        }
+        PARTY.add(new PartyMember(cid, ROSTER_NAMES[index], 0, DEFAULT_WEAPON, DEFAULT_RELIC_SET));
+        IO.println("添加 " + ROSTER_NAMES[index] + " (cid " + cid + ")...");
+    }
+
+    /**
+     * 解析输入为角色池编号: 先按数字, 再按名字 (子串) 搜索.
+     *
+     * @return 角色池下标, 未找到返回 {@code null}
+     */
+    private static Integer findRosterIndex(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            int index = Integer.parseInt(input.trim()) - 1;
+            if (index >= 0 && index < ROSTER.length) {
+                return index;
+            }
+            return null;
+        } catch (NumberFormatException ignored) {
+        }
+        String name = input.trim();
+        List<Integer> matches = new ArrayList<>();
+        for (int i = 0; i < ROSTER_NAMES.length; i++) {
+            if (ROSTER_NAMES[i].contains(name)) {
+                matches.add(i);
+            }
+        }
+        if (matches.size() == 1) {
+            return matches.getFirst();
+        }
+        if (!matches.isEmpty()) {
+            StringBuilder sb = new StringBuilder("匹配到多个: ");
+            for (int i : matches) {
+                sb.append("[").append(i + 1).append("]").append(ROSTER_NAMES[i]).append(" ");
+            }
+            IO.println(sb.toString().trim());
+            return null;
+        }
+        return null;
     }
 
     private static void removeCharacter() {
@@ -515,6 +638,8 @@ public class Main {
         IO.println("Battle started!");
 
         boolean auto = false;
+        boolean quit = false;
+        int rounds = 0;
         while (!battle.isOver()) {
             // 终结技插队: 任意时刻 (含敌方回合) 均可插入施放能量已满的终结技.
             if (!auto) {
@@ -542,7 +667,13 @@ public class Main {
                 } else if (auto) {
                     autoAct(battle, character);
                 } else {
-                    auto = playerAct(battle, character);
+                    int act = playerAct(battle, character);
+                    if (act == 1) {
+                        auto = true;
+                    } else if (act == 2) {
+                        quit = true;
+                        break;
+                    }
                 }
             } else if (actor instanceof Summon summon) {
                 battle.summonAction(summon);
@@ -552,15 +683,35 @@ public class Main {
                 battle.enemyTurn(enemy);
             }
             battle.afterMove();
+            rounds++;
         }
 
         printBattleStatus(battle);
         IO.println();
+        if (quit) {
+            IO.println("=== 战斗中止 (撤退) ===");
+            return;
+        }
+        IO.println("战斗结束: 共 " + rounds + " 次行动。");
         if (battle.isPlayerWon()) {
             IO.println("=== 胜利! 敌方被全部击败! ===");
+            IO.println("剩余我方: " + partySummary(battle));
         } else {
             IO.println("=== 败北... 我方队伍全灭。 ===");
         }
+    }
+
+    /** 紧凑的剩余我方状态摘要. */
+    private static String partySummary(Battle battle) {
+        StringBuilder sb = new StringBuilder();
+        for (CanHit ally : battle.getAlivePlayerUnits()) {
+            if (sb.length() > 0) {
+                sb.append("  ");
+            }
+            sb.append(ally.getName()).append(" ")
+                    .append(String.format("%.0f%%", ally.getHpPercent() * 100));
+        }
+        return sb.length() == 0 ? "(全灭)" : sb.toString();
     }
 
     /**
@@ -627,20 +778,17 @@ public class Main {
 
     private static void databaseMenu() {
         printRoster();
-        String line = IO.readln("输入角色编号查看详细数据 (0 返回): ");
+        String line = IO.readln("输入角色编号查看详细数据 (或输入名字搜索, 0 返回): ");
         if (line == null) {
             return;
         }
-        try {
-            int index = Integer.parseInt(line.trim()) - 1;
-            if (index < 0 || index >= ROSTER.length) {
-                return;
-            }
-            int cid = ROSTER[index];
-            showCharacterData(buildCharacter(new PartyMember(cid, ROSTER_NAMES[index], 6,
-                    DEFAULT_WEAPON, DEFAULT_RELIC_SET)));
-        } catch (NumberFormatException ignored) {
+        Integer index = findRosterIndex(line);
+        if (index == null) {
+            return;
         }
+        int cid = ROSTER[index];
+        showCharacterData(buildCharacter(new PartyMember(cid, ROSTER_NAMES[index], 6,
+                DEFAULT_WEAPON, DEFAULT_RELIC_SET)));
     }
 
     /** 展示角色完整数据: 属性/技能/行迹/星魂/装备. */
@@ -759,29 +907,41 @@ public class Main {
     /**
      * 玩家选择行动: 普攻/战技/终结技/欢愉技, 治疗与辅助技能自动切换为友方目标选择.
      *
-     * @return 是否切换为自动战斗
+     * @return 0 = 继续, 1 = 切换自动战斗, 2 = 撤退 (退出战斗)
      */
-    private static boolean playerAct(Battle battle, Character character) {
+    private static int playerAct(Battle battle, Character character) {
         List<Enemy> alive = battle.getAliveEnemies();
         IO.println();
-        IO.println(">>> " + character.getName() + " 的回合 (战技点: " + battle.getSkillPoints() + ")");
-        IO.println("  [1] 普攻  [2] 战技 (1 SP)  [3] 终结技"
-                + (character.getEnergy() >= character.getMaxEnergy() ? " [就绪!]" : "")
-                + (character.getSkills().containsKey(SkillType.ELATION)
-                ? "  [4] 欢愉技 (笑点 " + String.format("%.0f", battle.getLaughPoints()) + ")" : "")
-                + "  [i] 检查数据  [v] 行动条  [a] 自动战斗");
+        IO.println(">>> " + character.getName() + " 的回合   (战技点 " + battle.getSkillPoints()
+                + "  |  敌方: " + enemySummary(alive) + ")");
+        StringBuilder line = new StringBuilder("  [1] 普攻  [2] 战技");
+        if (battle.getSkillPoints() <= 0) {
+            line.append(" (无SP)");
+        }
+        line.append("  [3] 终结技");
+        if (character.getEnergy() >= character.getMaxEnergy()) {
+            line.append(" [就绪!]");
+        }
+        if (character.getSkills().containsKey(SkillType.ELATION)) {
+            line.append("  [4] 欢愉技 (笑点 ").append(String.format("%.0f", battle.getLaughPoints())).append(")");
+        }
+        IO.println(line.toString());
+        IO.println("  [i] 检查  [v] 行动条  [t] 敌方详情  [b] 队友状态  [a] 自动  [q] 撤退"
+                + "   (回车 = 普攻)");
         String choice = IO.readln("选择: ");
-        if (choice == null) {
-            IO.println("自动战斗已开启!");
-            autoAct(battle, character);
-            return true;
+        if (choice == null || choice.trim().isEmpty()) {
+            if (!alive.isEmpty()) {
+                battle.useSkill(character.getSkills().get(SkillType.COMMON),
+                        List.of(pickByWeakness(battle, character, alive)));
+            }
+            return 0;
         }
         choice = choice.trim().toLowerCase();
         switch (choice) {
             case "a" -> {
                 IO.println("自动战斗已开启!");
                 autoAct(battle, character);
-                return true;
+                return 1;
             }
             case "i" -> {
                 inspect(battle, character);
@@ -791,9 +951,21 @@ public class Main {
                 showActionBar(battle);
                 return playerAct(battle, character);
             }
+            case "t" -> {
+                showEnemyDetail(battle);
+                return playerAct(battle, character);
+            }
+            case "b" -> {
+                showAllyStatus(battle);
+                return playerAct(battle, character);
+            }
+            case "q" -> {
+                IO.println("撤退! 返回主菜单。");
+                return 2;
+            }
         }
         if (alive.isEmpty()) {
-            return false;
+            return 0;
         }
         Skill skill = switch (choice) {
             case "2" -> character.getSkills().get(SkillType.SKILL);
@@ -803,26 +975,27 @@ public class Main {
         };
         if (skill == null) {
             IO.println("该技能不可用。");
-            return false;
+            return 0;
         }
         // 治疗/辅助/护盾类技能 → 选择友方目标.
         if (isFriendlySkill(skill)) {
             List<CanHit> allies = battle.getAlivePlayerUnits();
             if (allies.isEmpty()) {
-                return false;
+                return 0;
             }
             IO.println("  友方目标:");
             for (int i = 0; i < allies.size(); i++) {
                 CanHit ally = allies.get(i);
                 IO.println("    [" + (i + 1) + "] " + ally.getName() + " (HP "
                         + String.format("%.0f", ally.getCurrentHp()) + "/"
-                        + String.format("%.0f", ally.getMaxHp()) + ")");
+                        + String.format("%.0f", ally.getMaxHp()) + ")"
+                        + (ally == character ? " [自身]" : ""));
             }
             int pick = pickIndex(allies.size());
             battle.useSkill(skill, List.of(allies.get(pick)));
-            return false;
+            return 0;
         }
-        // 攻击类技能 → 选择敌方目标.
+        // 攻击类技能 → 选择敌方目标 (回车 = 按弱点自动选).
         IO.println("  敌方目标:");
         for (int i = 0; i < alive.size(); i++) {
             Enemy e = alive.get(i);
@@ -830,15 +1003,16 @@ public class Main {
                     + String.format("%.0f", e.getCurrentHp()) + ", 韧性 "
                     + String.format("%.0f", e.getCurrentToughness()) + "/"
                     + String.format("%.0f", e.getMaxToughness())
-                    + (e.isBroken() ? ", 已击破" : "") + ")");
+                    + (e.isBroken() ? ", 已击破" : "")
+                    + (e.isWeakTo(character.getElement()) ? ", 弱点" : "") + ")");
         }
         int pick = pickIndex(alive.size());
         battle.useSkill(skill, List.of(alive.get(pick)));
-        return false;
+        return 0;
     }
 
     private static int pickIndex(int size) {
-        String line = IO.readln("  选择目标 (1-" + size + "): ");
+        String line = IO.readln("  选择目标 (1-" + size + ", 回车 = 1): ");
         try {
             int pick = Integer.parseInt(line == null ? "" : line.trim());
             if (pick >= 1 && pick <= size) {
@@ -847,6 +1021,60 @@ public class Main {
         } catch (NumberFormatException ignored) {
         }
         return 0;
+    }
+
+    /** 紧凑的敌方血量摘要 (用于回合提示行). */
+    private static String enemySummary(List<Enemy> alive) {
+        if (alive.isEmpty()) {
+            return "(无)";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Enemy e : alive) {
+            if (sb.length() > 0) {
+                sb.append("  ");
+            }
+            String name = e.getName();
+            String shortName = name.length() > 6 ? name.substring(0, 6) : name;
+            sb.append(shortName).append(" ")
+                    .append(String.format("%.0f%%", e.getHpPercent() * 100));
+        }
+        return sb.toString();
+    }
+
+    /** 敌方详情: 血量/韧性/弱点/状态. */
+    private static void showEnemyDetail(Battle battle) {
+        IO.println();
+        IO.println("=== 敌方详情 ===");
+        for (Enemy e : battle.getAliveEnemies()) {
+            IO.println("  " + e.getName() + " HP "
+                    + String.format("%.0f", e.getCurrentHp()) + "/"
+                    + String.format("%.0f", e.getMaxHp()) + " 韧性 "
+                    + String.format("%.0f", e.getCurrentToughness()) + "/"
+                    + String.format("%.0f", e.getMaxToughness())
+                    + (e.isBroken() ? " [已击破]" : ""));
+            StringBuilder weak = new StringBuilder("    弱点: ");
+            for (Element el : e.getWeaknesses()) {
+                weak.append(el.string).append(" ");
+            }
+            IO.println(weak.toString());
+            showBuffs(e);
+        }
+    }
+
+    /** 队友状态: 血量/能量/护盾/状态. */
+    private static void showAllyStatus(Battle battle) {
+        IO.println();
+        IO.println("=== 我方状态 ===");
+        for (CanHit ally : battle.getAlivePlayerUnits()) {
+            IO.println("  " + ally.getName() + " HP "
+                    + String.format("%.0f", ally.getCurrentHp()) + "/"
+                    + String.format("%.0f", ally.getMaxHp()) + " 能量 "
+                    + String.format("%.0f", ally.getEnergy()) + "/"
+                    + String.format("%.0f", ally.getMaxEnergy())
+                    + " 护盾 " + String.format("%.0f", ally.getShield())
+                    + (ally.getControlState() != null ? " [控制: " + ally.getControlState().name() + "]" : ""));
+            showBuffs(ally);
+        }
     }
 
     /** 是否为治疗/辅助/护盾类 (作用于友方) 技能. */
