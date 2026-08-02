@@ -29,5 +29,10 @@ public enum SkillType {
     /**
      * Passive talent of a summoned entity.
      */
-    SUMMON_TALENT
+    SUMMON_TALENT,
+    /**
+     * 欢愉技 (Elation skill, HSR.md §3.3): generates laugh points and is cast
+     * during Aha's 「阿哈时刻」.
+     */
+    ELATION
 }

@@ -125,6 +125,9 @@ public class AttributeBuilder {
                 if (dv != null) {
                     dv.commit();
                     result[type.ordinal()] = dv;
+                } else if (type == AttributeType.DAMAGE_REDUCTION) {
+                    // 减伤区 is multiplicative: Π(1 - 减伤), so the base must be 1 (HSR.md §2.2).
+                    result[type.ordinal()] = new DoubleValue(1.0);
                 } else {
                     result[type.ordinal()] = DoubleValue.zero();
                 }

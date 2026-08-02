@@ -60,7 +60,34 @@ public enum AttributeType {
 
     @SerializedName("all_damage_type_boost") ALL_DAMAGE_TYPE_BOOST("all_damage_type_boost"),
 
-    @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost");
+    @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost"),
+
+    // ─── Damage region attributes (HSR.md §2) ───────────────────────────
+
+    @SerializedName("normal_damage_boost") NORMAL_DAMAGE_BOOST("normal_damage_boost"),
+    @SerializedName("skill_damage_boost") SKILL_DAMAGE_BOOST("skill_damage_boost"),
+    @SerializedName("ultra_damage_boost") ULTRA_DAMAGE_BOOST("ultra_damage_boost"),
+    @SerializedName("follow_up_damage_boost") FOLLOW_UP_DAMAGE_BOOST("follow_up_damage_boost"),
+    @SerializedName("dot_damage_boost") DOT_DAMAGE_BOOST("dot_damage_boost"),
+
+    /** 易伤 (damage taken): additive, cap 3.5. Owned by the defender. */
+    @SerializedName("vulnerability") VULNERABILITY("vulnerability"),
+    /** 减伤 (damage reduction): multiplicative 1 - x, floor 0.01. Owned by the defender. */
+    @SerializedName("damage_reduction") DAMAGE_REDUCTION("damage_reduction"),
+    /** 虚弱 (weakness taken): additive, floor 0.2. Owned by the attacker. */
+    @SerializedName("weakness_ratio") WEAKNESS_RATIO("weakness_ratio"),
+    /** 抗性穿透: reduces the target's elemental resistance. */
+    @SerializedName("resistance_penetration") RESISTANCE_PENETRATION("resistance_penetration"),
+    /** 真实伤害: bonus multiplier applied to the final damage. */
+    @SerializedName("true_damage") TRUE_DAMAGE("true_damage"),
+    /** 持续伤害提高 (DoT taken boost): defender-side multiplier for DoT damage. */
+    @SerializedName("dot_taken") DOT_TAKEN("dot_taken"),
+    /** 超击破伤害提高: independent super-break damage boost (HSR.md 超击破). */
+    @SerializedName("super_break_damage_boost") SUPER_BREAK_DAMAGE_BOOST("super_break_damage_boost"),
+    /** 削韧值提高: boosts final toughness damage (HSR.md 超击破). */
+    @SerializedName("toughness_boost") TOUGHNESS_BOOST("toughness_boost"),
+    /** 弱点击破效率提高: boosts final toughness damage (HSR.md 超击破). */
+    @SerializedName("weakness_break_efficiency") WEAKNESS_BREAK_EFFICIENCY("weakness_break_efficiency");
 
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
 

@@ -1,10 +1,13 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.Element;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.exceptions.CharacterException;
+import com.laosun.aluminium.models.kit.KitRegistry;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import com.laosun.aluminium.utils.CharacterDataProvider;
 import com.laosun.aluminium.utils.ConstantCharacterDataProvider;
@@ -14,6 +17,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
@@ -61,6 +65,43 @@ public class Character extends CanHit {
 
     private EnumMap<SkillType, Integer> skillLevel;
 
+    /**
+     * The character ID from character_data.json.
+     */
+    @Getter
+    private int cid = 0;
+
+    /**
+     * 忆灵 (memosprites) currently owned by this character (HSR.md §2).
+     */
+    private final List<Summon> summons = new ArrayList<>();
+
+    /**
+     * Active 行迹技能 (trace passives) and 星魂 (eidolon passives) of this
+     * character (HSR.md §5).
+     */
+    @Setter
+    private List<Trace> traces = List.of();
+
+    /**
+     * The unlocked eidolon level (0-6).
+     */
+    @Getter
+    private int eidolonLevel = 0;
+
+    /**
+     * Whether this character is in an enhanced state (强化状态), swapping
+     * their basic/skill for the enhanced versions (skill IDs 8/9/10).
+     */
+    @Setter
+    private boolean enhanced = false;
+
+    /**
+     * The skill set before entering the enhanced state, restored on exit.
+     */
+    @Setter
+    private EnumMap<SkillType, Skill> unenhancedSkills = null;
+
     protected Character(Translate name, DoubleValue[] attributes) {
         super(name.english(), Camp.PLAYER, attributes);
     }
@@ -72,6 +113,7 @@ public class Character extends CanHit {
      */
     public Character(Character other) {
         super(other);
+        this.cid = other.cid;
         this.relicSuit = other.relicSuit != null ? other.relicSuit.clone() : null;
         this.weapon = other.weapon != null ? other.weapon.clone() : null;
         this.skillLevel = other.skillLevel != null ? other.skillLevel.clone() : null;
@@ -133,6 +175,7 @@ public class Character extends CanHit {
     public static class Builder {
         private int cid;
         private int level = 1;
+        private int eidolonLevel = 0;
         private RelicSuit relicSuit = new RelicSuit();
         private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
         private boolean isPromote = false;
@@ -163,6 +206,14 @@ public class Character extends CanHit {
          */
         public Builder cid(int cid) {
             this.cid = cid;
+            return this;
+        }
+
+        /**
+         * Unlocks eidolon ranks (星魂) up to the given level (0-6).
+         */
+        public Builder eidolon(int eidolonLevel) {
+            this.eidolonLevel = Math.max(0, Math.min(6, eidolonLevel));
             return this;
         }
 
@@ -230,19 +281,62 @@ public class Character extends CanHit {
             AttributeBuilder calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
             SkillPoint.appendTo(SkillPoint.init(cid), calcData);
             Character character = new Character(characterData.name(), calcData.build());
+            character.cid = cid;
             character.relicSuit = relicSuit;
             character.weapon = weapon;
+            character.setLevel(level);
+            character.setElement(Element.fromString(characterData.attribute()));
+            character.setAggro(characterData.aggro());
+            double maxEnergy = characterData.maxEnergy() != null ? characterData.maxEnergy() : 0;
+            // Some characters (e.g. Castorice) have no energy bar in the data but
+            // still cast ultimates — give them a default bar.
+            if (maxEnergy <= 0 && Constant.SKILLS.get(cid) != null && Constant.SKILLS.get(cid).containsKey(3)) {
+                maxEnergy = 100;
+            }
+            character.setMaxEnergy(maxEnergy);
             EnumMap<SkillType, Skill> skills = new EnumMap<>(SkillType.class);
+            Map<Integer, Integer> eidolonSkillBonuses = KitRegistry.skillLevelBonuses(cid, eidolonLevel,
+                    Constant.EIDOLONS.get(cid));
             for (Map.Entry<SkillType, Integer> entry : skillLevel.entrySet()) {
                 SkillType type = entry.getKey();
-                int level = entry.getValue();
-                // WRITE 1 for placeholder will change TODO
-                // Future will not have placeholder skill
-                skills.put(type, new DefaultSkill(cid, 1, level));
+                if (type == SkillType.ELATION) {
+                    continue; // elation skill loaded separately below
+                }
+                int baseLevel = entry.getValue();
+                // skills.json convention: 1 = basic attack, 2 = skill, 3 = ultimate, 4 = talent
+                int skillId = switch (type) {
+                    case COMMON -> 1;
+                    case SKILL -> 2;
+                    case ULTRA -> 3;
+                    case TALENT -> 4;
+                    default -> 1;
+                };
+                // 星魂 skill-level bonuses (e.g. rank 3: 终结技+2级), capped at the skill's max.
+                int level = baseLevel + eidolonSkillBonuses.getOrDefault(skillId, 0);
+                Integer maxLevel = Constant.SKILLS.get(cid) != null
+                        ? Constant.SKILLS.get(cid).get(skillId) != null
+                        ? Constant.SKILLS.get(cid).get(skillId).maxLevel() : null : null;
+                if (maxLevel != null) {
+                    level = Math.min(level, maxLevel);
+                }
+                skills.put(type, new DataSkill(cid, skillId, level));
+            }
+            // 欢愉技 (HSR.md §3.3): skill id 20 is the ElationDamage skill if present.
+            if (Constant.SKILLS.get(cid) != null && Constant.SKILLS.get(cid).containsKey(20)) {
+                skills.put(SkillType.ELATION, new DataSkill(cid, 20, 1));
             }
             skills.putAll(customSkills);
             character.setSkills(skills);
             character.setSkillLevel(skillLevel);
+            character.setEidolonLevel(eidolonLevel);
+            // 行迹技能 (trace passives) + 星魂 (eidolon passives) + 光锥被动 + 遗器套装4件效果.
+            List<Trace> allTraces = new ArrayList<>(KitRegistry.traces(cid, Constant.SKILL_POINTS.get(cid)));
+            allTraces.addAll(KitRegistry.eidolons(cid, eidolonLevel, Constant.EIDOLONS.get(cid)));
+            if (weapon.getPassiveTrace() != null) {
+                allTraces.add(weapon.getPassiveTrace());
+            }
+            allTraces.addAll(relicSuit.getSetTraces());
+            character.setTraces(allTraces);
             return character;
         }
 
@@ -288,6 +382,7 @@ public class Character extends CanHit {
             extraBasicPromote.appendTo(atb);
             atb.addPercentPoint(CRIT_CHANCE, characterData.critChance(), BASE);
             atb.addPercentPoint(CRIT_ATTACK, characterData.critAttack(), BASE);
+            relicSuit.appendSetBonuses(atb);
             return atb;
         }
     }

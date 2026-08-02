@@ -22,7 +22,6 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
 public class Weapon implements Cloneable {
     /**
      * Display name (bilingual).
@@ -54,6 +53,27 @@ public class Weapon implements Cloneable {
     private List<WeaponAttribute> weaponAttribute;
 
     /**
+     * The light cone's conditional passive (光锥被动), interpreted from its
+     * description. Always-on stat parts are covered by {@link #weaponAttribute}.
+     */
+    @Setter
+    private Trace passiveTrace;
+
+    /**
+     * Constructs a weapon from base stats and ability properties.
+     */
+    public Weapon(Translate name, String description, double health, double attack, double defence,
+                  String type, List<WeaponAttribute> weaponAttribute) {
+        this.name = name;
+        this.description = description;
+        this.health = health;
+        this.attack = attack;
+        this.defence = defence;
+        this.type = type;
+        this.weaponAttribute = weaponAttribute;
+    }
+
+    /**
      * Builds a weapon from game data by ID, applying level scaling.
      *
      * @param wid       the weapon's game ID
@@ -73,10 +93,18 @@ public class Weapon implements Cloneable {
         }
 
         double rate = LevelPromotionCalc.calcWeaponRate(level, isPromote);
-        return new Weapon(wp.name(), "", wp.health() * rate,
+        Weapon weapon = new Weapon(wp.name(), "", wp.health() * rate,
                 wp.attack() * rate,
                 wp.defence() * rate,
                 wp.type(), weaponAttribute);
+        String chineseDesc = wp.skillDescription() != null ? wp.skillDescription().chinese() : "";
+        List<String> propertyStrings = weaponAttribute.stream().map(a -> a.attribute().attributeString).toList();
+        // 20*** 光锥使用手写被动 (LightConePassives), 其余回退到通用解释器.
+        List<Double> skillValue = wp.weaponSkillData().getFirst().skillValue();
+        Trace handWritten = com.laosun.aluminium.models.kit.LightConePassives.forWeapon(wid, skillValue);
+        weapon.setPassiveTrace(handWritten != null ? handWritten
+                : GenericPassives.interpretWeaponPassive(chineseDesc, skillValue, propertyStrings));
+        return weapon;
     }
 
     /**

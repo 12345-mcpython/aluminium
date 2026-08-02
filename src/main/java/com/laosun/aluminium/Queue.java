@@ -333,6 +333,43 @@ public final class Queue {
         return false;
     }
 
+    /**
+     * Delays the target combatant's next action by a percentage of their
+     * remaining time (推条).
+     *
+     * @param target  the combatant to delay
+     * @param percent fraction of remaining time to add (0.0 ~ 1.0)
+     * @return {@code true} if the target was found and delayed
+     */
+    public boolean delayActionByPercent(CanHit target, double percent) {
+        if (target == null || percent < 0) {
+            return false;
+        }
+        for (Signal s : heap) {
+            if (s.getCanHit() == target) {
+                double remaining = Math.max(0, s.getNextActionTime() - elapsed);
+                double delay = remaining * percent;
+                s.setNextActionTime(s.getNextActionTime() + delay);
+                rebuildHeap();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Refreshes the cached speed of the given combatant's signal.
+     * Call after applying/removing speed-affecting buffs.
+     */
+    public void refreshSpeed(CanHit target) {
+        for (Signal s : heap) {
+            if (s.getCanHit() == target) {
+                s.refreshSpeed();
+                return;
+            }
+        }
+    }
+
     // ─── Derived display values ────────────────────────────────────────
 
     /**

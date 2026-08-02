@@ -78,6 +78,10 @@ public class Relic implements Cloneable {
      * The sub-attributes (3-4 entries) of this relic.
      */
     public List<Attribute> subAttributes;
+    /**
+     * The relic set this piece belongs to (遗器套装, 0 = none).
+     */
+    public int setId = 0;
 
     /**
      * Directly constructs a relic with the given properties.
@@ -274,6 +278,7 @@ public class Relic implements Cloneable {
         private final List<SubAttributeSpec> subSpecs = new ArrayList<>();
         private int star = 5;
         private int level = 0;
+        private int setId = 0;
         private RelicType type;
         private AttributeType mainAttributeType;
 
@@ -284,6 +289,14 @@ public class Relic implements Cloneable {
 
         public Builder level(int level) {
             this.level = level;
+            return this;
+        }
+
+        /**
+         * Sets the relic set (遗器套装) this piece belongs to.
+         */
+        public Builder set(int setId) {
+            this.setId = setId;
             return this;
         }
 
@@ -335,7 +348,9 @@ public class Relic implements Cloneable {
                 subAttrs.add(new Attribute(spec.type, subFinal, spec.promoteLevel));
             }
 
-            return Relic.create(level, star, type, mainAttr, subAttrs);
+            Relic relic = Relic.create(level, star, type, mainAttr, subAttrs);
+            relic.setId = setId;
+            return relic;
         }
 
         private record SubAttributeSpec(AttributeType type, int promoteLevel, int attributeLevel) {

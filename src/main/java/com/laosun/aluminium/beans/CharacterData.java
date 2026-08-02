@@ -14,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
  * {@code null} energy values in the source data.
  */
 public record CharacterData(Translate name, String attribute, String mt, String id, double attack, double defence,
-                            double health, int speed, @Nullable @SerializedName("max_energy")
+                            double health, int speed, double aggro,
+                            @Nullable @SerializedName("max_energy")
                             Double maxEnergy, @SerializedName("crit_chance") double critChance,
                             @SerializedName("crit_attack") double critAttack) {
 }

@@ -109,6 +109,111 @@ public final class RelicSuit implements Cloneable {
     }
 
     /**
+     * Computes the piece count per relic set (遗器套装).
+     *
+     * @return map of set ID → piece count
+     */
+    public java.util.Map<Integer, Integer> getSetCounts() {
+        java.util.Map<Integer, Integer> counts = new java.util.HashMap<>();
+        for (Relic relic : total) {
+            if (relic != null && relic.setId > 0) {
+                counts.merge(relic.setId, 1, Integer::sum);
+            }
+        }
+        return counts;
+    }
+
+    /**
+     * Applies the permanent set-bonus stats (2-piece and 4-piece properties)
+     * as modifiers. HSR requires 2/4 pieces respectively.
+     *
+     * @param attributeBuilder the builder to append to
+     */
+    public void appendSetBonuses(AttributeBuilder attributeBuilder) {
+        for (var entry : getSetCounts().entrySet()) {
+            int setId = entry.getKey();
+            int count = entry.getValue();
+            com.laosun.aluminium.beans.RelicSet set = com.laosun.aluminium.Constant.RELIC_SETS.get(setId);
+            if (set == null) {
+                continue;
+            }
+            if (count >= 2 && set.two() != null) {
+                appendProperties(attributeBuilder, set.two().properties());
+            }
+            if (count >= 4 && set.four() != null) {
+                appendProperties(attributeBuilder, set.four().properties());
+            }
+        }
+    }
+
+    private void appendProperties(AttributeBuilder attributeBuilder,
+                                  List<com.laosun.aluminium.beans.RelicSet.SetSkill.Property> properties) {
+        if (properties == null) {
+            return;
+        }
+        for (var property : properties) {
+            AttributeType type = AttributeType.fromString(property.attribute());
+            double value = property.value();
+            if (PERCENT_TO_BASE.containsKey(type)) {
+                attributeBuilder.addPercent(type, value, DoubleValue.Modifier.ModifierSource.RELIC_SET);
+            } else if (type.isPercent) {
+                attributeBuilder.addPercentPoint(type, value, DoubleValue.Modifier.ModifierSource.RELIC_SET);
+            } else {
+                attributeBuilder.addPure(type, value, DoubleValue.Modifier.ModifierSource.RELIC_SET);
+            }
+        }
+    }
+
+    /**
+     * Builds the battle passives from 4-piece set bonuses whose effects are
+     * conditional (described by text), e.g. "当装备者施放终结技时...".
+     * Stat buffs that duplicate the set's permanent properties are skipped.
+     *
+     * @return list of trace passives
+     */
+    public List<Trace> getSetTraces() {
+        List<Trace> traces = new ArrayList<>();
+        for (var entry : getSetCounts().entrySet()) {
+            int setId = entry.getKey();
+            int count = entry.getValue();
+            com.laosun.aluminium.beans.RelicSet set = com.laosun.aluminium.Constant.RELIC_SETS.get(setId);
+            if (set == null || count < 4 || set.four() == null) {
+                continue;
+            }
+            String desc = set.four().desc() != null ? set.four().desc().chinese() : "";
+            List<Trace> interpreted = GenericPassives.interpretTrace(desc, set.four().param());
+            for (Trace trace : interpreted) {
+                if (trace instanceof GenericPassives.IsStatBuff statBuff) {
+                    // Skip stat buffs already granted permanently by the set properties.
+                    AttributeType attribute = statBuff.getAttribute();
+                    if (hasProperty(set.four(), attribute) || hasProperty(set.two(), attribute)) {
+                        continue;
+                    }
+                }
+                traces.add(trace);
+            }
+        }
+        return traces;
+    }
+
+    private boolean hasProperty(com.laosun.aluminium.beans.RelicSet.SetSkill skill, AttributeType attribute) {
+        if (skill == null || skill.properties() == null) {
+            return false;
+        }
+        for (var property : skill.properties()) {
+            try {
+                AttributeType propertyType = AttributeType.fromString(property.attribute());
+                AttributeType propertyBase = PERCENT_TO_BASE.getOrDefault(propertyType, propertyType);
+                if (propertyBase == attribute) {
+                    return true;
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return false;
+    }
+
+    /**
      * Aggregates all relic attributes and appends them as modifiers to the builder.
      *
      * @param attributeBuilder the builder to append modifications to
