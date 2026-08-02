@@ -173,7 +173,12 @@ public final class DamageCalculator {
         double bonus = context != null ? context.extraCritChance() : 0;
         double critRate = Math.min(1, attr(attacker, CRIT_CHANCE) + bonus);
         double critDmg = attr(attacker, CRIT_ATTACK);
-        return Math.random() < critRate ? 1 + critDmg : 1;
+        boolean crit = Math.random() < critRate;
+        if (crit) {
+            IO.println("  ★ " + attacker.getName() + " 暴击了! (暴击伤害 x"
+                    + String.format("%.2f", 1 + critDmg) + ")");
+        }
+        return crit ? 1 + critDmg : 1;
     }
 
     /**

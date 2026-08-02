@@ -76,8 +76,8 @@ public class Main {
     private static final List<PartyMember> PARTY = new ArrayList<>();
     private static int enemyPreset = 1;
 
-    /** 默认装备. */
-    private static final int DEFAULT_WEAPON = 23042;
+    /** 默认装备: 光锥为空 (0 = 未装备), 遗器默认 102 号套装. */
+    private static final int NO_WEAPON = 0;
     private static final int DEFAULT_RELIC_SET = 102;
 
     public static void main(String[] args) {
@@ -161,7 +161,7 @@ public class Main {
         PARTY.clear();
         for (int cid : PRESET_TEAMS[preset]) {
             int idx = rosterIndex(cid);
-            PARTY.add(new PartyMember(cid, ROSTER_NAMES[idx], 0, DEFAULT_WEAPON, DEFAULT_RELIC_SET));
+            PARTY.add(new PartyMember(cid, ROSTER_NAMES[idx], 0, NO_WEAPON, DEFAULT_RELIC_SET));
         }
         IO.println("已应用预设队伍: " + PRESET_NAMES[preset]);
     }
@@ -240,7 +240,7 @@ public class Main {
         for (int i = 0; i < PARTY.size(); i++) {
             PartyMember m = PARTY.get(i);
             Character c = buildCharacter(m);
-            String weapon = weaponName(m.weaponId());
+            String weapon = m.weaponId() > 0 ? weaponName(m.weaponId()) : "无";
             IO.println("  [" + (i + 1) + "] " + c.getName() + " (cid " + c.getCid()
                     + ", 星魂 " + m.eidolon() + ")");
             IO.println("      HP " + String.format("%.0f", c.getMaxHp())
@@ -248,9 +248,9 @@ public class Main {
                     + "  DEF " + String.format("%.0f", def(c))
                     + "  SPD " + String.format("%.1f", spd(c))
                     + "  元素 " + c.getElement().string);
-            IO.println("      光锥: " + weapon + "  遗器: " + m.relicSetId() + " 号套装"
-                    + (m.weaponId() == DEFAULT_WEAPON ? " (默认)" : "")
+            IO.println("      光锥: " + weapon + "  遗器: " + relicSetName(m.relicSetId())
                     + (m.relicSetId() == DEFAULT_RELIC_SET ? " (默认)" : ""));
+            IO.println("      套装效果: " + relicSetSummary(m.relicSetId()));
         }
     }
 
@@ -296,7 +296,7 @@ public class Main {
             IO.println("该角色已在队伍中。");
             return;
         }
-        PARTY.add(new PartyMember(cid, ROSTER_NAMES[index], 0, DEFAULT_WEAPON, DEFAULT_RELIC_SET));
+        PARTY.add(new PartyMember(cid, ROSTER_NAMES[index], 0, NO_WEAPON, DEFAULT_RELIC_SET));
         IO.println("添加 " + ROSTER_NAMES[index] + " (cid " + cid + ")...");
     }
 
@@ -408,15 +408,16 @@ public class Main {
         while (editing) {
             IO.println();
             IO.println("===== 装备管理: " + c.getName() + " =====");
-            IO.println("  光锥: " + weaponName(m.weaponId())
-                    + "  遗器: " + m.relicSetId() + " 号套装");
+            IO.println("  光锥: " + (m.weaponId() > 0 ? weaponName(m.weaponId()) : "无")
+                    + "  遗器: " + relicSetName(m.relicSetId()));
+            IO.println("  套装效果: " + relicSetSummary(m.relicSetId()));
             IO.println("  HP " + String.format("%.0f", c.getMaxHp())
                     + "  ATK " + String.format("%.0f", atk(c))
                     + "  DEF " + String.format("%.0f", def(c))
                     + "  SPD " + String.format("%.1f", spd(c))
                     + "  暴击率 " + String.format("%.1f%%", crit(c) * 100)
                     + "  暴击伤害 " + String.format("%.1f%%", cdmg(c) * 100));
-            IO.println("  [1] 更换光锥   [2] 更换遗器套装   [3] 卸下装备   [d] 完成");
+            IO.println("  [1] 更换光锥   [2] 更换遗器套装   [3] 卸下光锥 (遗器恢复默认)   [d] 完成");
             String choice = IO.readln("选择: ");
             if (choice == null) {
                 return;
@@ -425,9 +426,9 @@ public class Main {
                 case "1" -> m = changeWeapon(index, m);
                 case "2" -> m = changeRelicSet(index, m);
                 case "3" -> {
-                    m = new PartyMember(m.cid(), m.name(), m.eidolon(), DEFAULT_WEAPON, DEFAULT_RELIC_SET);
+                    m = new PartyMember(m.cid(), m.name(), m.eidolon(), NO_WEAPON, DEFAULT_RELIC_SET);
                     PARTY.set(index, m);
-                    IO.println("已恢复默认装备。");
+                    IO.println("已卸下光锥, 遗器恢复默认 (" + relicSetName(DEFAULT_RELIC_SET) + ")。");
                 }
                 case "d" -> editing = false;
                 default -> IO.println("无效选择。");
@@ -479,27 +480,18 @@ public class Main {
         return m;
     }
 
-    /** 更换遗器套装: 列出套装 (2/4 件套效果). */
+    /** 更换遗器套装: 列出套装及 2/4 件套效果. */
     private static PartyMember changeRelicSet(int index, PartyMember m) {
         IO.println();
-        IO.println("===== 遗器套装列表 =====");
+        IO.println("===== 遗器套装列表 (2件 | 4件) =====");
         List<Integer> setIds = new ArrayList<>();
-        int shown = 0;
-        StringBuilder line = new StringBuilder("  ");
         for (var entry : Constant.RELIC_SETS.entrySet()) {
             setIds.add(entry.getKey());
             com.laosun.aluminium.beans.RelicSet set = entry.getValue();
-            String two = set != null && set.two() != null && set.two().desc() != null
-                    ? set.two().desc().chinese() : "";
-            line.append(String.format("[%d]%s ", setIds.size(), entry.getKey()));
-            shown++;
-            if (shown % 6 == 0) {
-                IO.println(line.toString());
-                line = new StringBuilder("  ");
-            }
-        }
-        if (line.toString().trim().length() > 2) {
-            IO.println(line.toString());
+            String two = clip(formatDesc(set != null ? set.two() : null), 42);
+            String four = clip(formatDesc(set != null ? set.four() : null), 52);
+            IO.println(String.format("  [%d] %s (%s): 2件: %s | 4件: %s",
+                    setIds.size(), relicSetName(entry.getKey()), entry.getKey(), two, four));
         }
         String pick = IO.readln("选择套装编号 (0 取消): ");
         try {
@@ -507,14 +499,14 @@ public class Main {
             if (idx >= 0 && idx < setIds.size()) {
                 int setId = setIds.get(idx);
                 com.laosun.aluminium.beans.RelicSet set = Constant.RELIC_SETS.get(setId);
-                IO.println("  2件套: " + bonusDesc(set != null ? set.two() : null));
-                IO.println("  4件套: " + bonusDesc(set != null ? set.four() : null));
+                IO.println("  2件套: " + formatDesc(set != null ? set.two() : null));
+                IO.println("  4件套: " + formatDesc(set != null ? set.four() : null));
                 String ok = IO.readln("确认装备 (y/n): ");
                 if (ok != null && ok.trim().equalsIgnoreCase("y")) {
                     PartyMember updated = new PartyMember(m.cid(), m.name(), m.eidolon(), m.weaponId(), setId);
                     PARTY.set(index, updated);
                     Character c = buildCharacter(updated);
-                    IO.println("装备 " + setId + " 号套装: HP " + String.format("%.0f", c.getMaxHp())
+                    IO.println("装备 " + relicSetName(setId) + ": HP " + String.format("%.0f", c.getMaxHp())
                             + "  ATK " + String.format("%.0f", atk(c))
                             + "  DEF " + String.format("%.0f", def(c))
                             + "  SPD " + String.format("%.1f", spd(c)));
@@ -526,21 +518,74 @@ public class Main {
         return m;
     }
 
-    private static String bonusDesc(com.laosun.aluminium.beans.RelicSet.SetSkill set) {
+    /** 套装的简短效果摘要 (2件 + 4件, 用于列表行). */
+    private static String relicSetSummary(int setId) {
+        com.laosun.aluminium.beans.RelicSet set = Constant.RELIC_SETS.get(setId);
+        if (set == null) {
+            return "(无)";
+        }
+        return clip("2件: " + formatDesc(set.two()) + " | 4件: " + formatDesc(set.four()), 90);
+    }
+
+    /** 套装名称 (中文), 缺失时回退为编号. */
+    private static String relicSetName(int setId) {
+        com.laosun.aluminium.beans.RelicSet set = Constant.RELIC_SETS.get(setId);
+        if (set == null || set.name() == null || set.name().chinese() == null
+                || set.name().chinese().isEmpty()) {
+            return setId + " 号套装";
+        }
+        return set.name().chinese();
+    }
+
+    /** 将描述中的 #N[i]% / #N[f1]% / #N[f2]% 占位符替换为实际参数值, 并去除富文本标签. */
+    private static String formatDesc(com.laosun.aluminium.beans.RelicSet.SetSkill set) {
         if (set == null || set.desc() == null || set.desc().chinese() == null) {
             return "(无)";
         }
         String desc = set.desc().chinese();
-        return desc.substring(0, Math.min(60, desc.length())) + (desc.length() > 60 ? "..." : "");
+        List<Double> params = set.param() != null ? set.param() : List.of();
+        desc = desc.replaceAll("<[^>]+>", "");
+        java.util.regex.Matcher matcher = java.util.regex.Pattern
+                .compile("#(\\d+)\\[(i|f1|f2)\\](%)?").matcher(desc);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            int idx = Integer.parseInt(matcher.group(1)) - 1;
+            double value = idx >= 0 && idx < params.size() ? params.get(idx) : 0;
+            String formatted = switch (matcher.group(2)) {
+                case "i" -> String.format("%.0f", value * 100);
+                case "f1" -> trimZeros(String.format("%.1f", value * 100));
+                default -> trimZeros(String.format("%.2f", value * 100));
+            };
+            matcher.appendReplacement(sb, java.util.regex.Matcher.quoteReplacement(
+                    formatted + (matcher.group(3) != null ? "%" : "")));
+        }
+        matcher.appendTail(sb);
+        return sb.toString().trim();
+    }
+
+    private static String trimZeros(String s) {
+        return s.endsWith(".0") ? s.substring(0, s.length() - 2) : s;
+    }
+
+    private static String clip(String s, int max) {
+        return s.length() > max ? s.substring(0, max) + "..." : s;
+    }
+
+    private static String bonusDesc(com.laosun.aluminium.beans.RelicSet.SetSkill set) {
+        return formatDesc(set);
     }
 
     // ─── 角色/装备构建 ─────────────────────────────────────────────────
 
-    /** 根据配置构建角色 (含光锥与遗器套装). */
+    /** 根据配置构建角色 (光锥可为空, 遗器套装必带). */
     private static Character buildCharacter(PartyMember m) {
-        return Character.builder().cid(m.cid()).level(80).isPromote().eidolon(m.eidolon())
-                .relicSuit(buildRelicSuit(m.relicSetId(), m.cid()))
-                .weapon(Weapon.build(m.weaponId(), 80)).build();
+        Character.Builder builder = Character.builder().cid(m.cid()).level(80).isPromote()
+                .eidolon(m.eidolon())
+                .relicSuit(buildRelicSuit(m.relicSetId(), m.cid()));
+        if (m.weaponId() > 0) {
+            builder.weapon(Weapon.build(m.weaponId(), 80));
+        }
+        return builder.build();
     }
 
     /** 按套装 ID 构建 6 件遗器 (主词条按部位选择, 副词条通用双爆/攻击/速度). */
@@ -715,7 +760,57 @@ public class Main {
     }
 
     /**
-     * 终结技插队 (HSR.md §3.3): 能量满的我方角色可以在任意时刻插入施放终结技.
+     * 队友插队终结技 (当前角色回合内): 能量已满的其他角色可立即施放终结技,
+     * 不消耗当前角色的行动.
+     *
+     * @return 是否成功施放了至少一个终结技
+     */
+    private static boolean insertAlliedUlt(Battle battle, Character current) {
+        List<Character> ready = battle.getAliveCharacters().stream()
+                .filter(c -> c != current && c.getMaxEnergy() > 0
+                        && c.getEnergy() >= c.getMaxEnergy())
+                .toList();
+        if (ready.isEmpty()) {
+            IO.println("没有能量已满的队友。");
+            return false;
+        }
+        IO.println();
+        IO.println(">>> 终结技插队 (能量已满的队友):");
+        for (int i = 0; i < ready.size(); i++) {
+            IO.println("  [" + (i + 1) + "] " + ready.get(i).getName() + " 立即施放终结技");
+        }
+        String choice = IO.readln("选择 (0/回车 取消): ");
+        if (choice == null) {
+            return false;
+        }
+        try {
+            int idx = Integer.parseInt(choice.trim()) - 1;
+            if (idx < 0 || idx >= ready.size()) {
+                return false;
+            }
+            Character ally = ready.get(idx);
+            List<Enemy> alive = battle.getAliveEnemies();
+            if (alive.isEmpty()) {
+                return false;
+            }
+            IO.println("  敌方目标:");
+            for (int i = 0; i < alive.size(); i++) {
+                Enemy e = alive.get(i);
+                IO.println("    [" + (i + 1) + "] " + e.getName() + " (HP "
+                        + String.format("%.0f", e.getCurrentHp()) + ")");
+            }
+            int pick = pickIndex(alive.size());
+            battle.castUltra(ally, List.of(alive.get(pick)));
+            IO.println(">>> " + ally.getName() + " 插队施放了终结技!");
+            return true;
+        } catch (NumberFormatException ignored) {
+            return false;
+        }
+    }
+
+    /**
+     * 终结技插队 (HSR.md §3.3): 能量满的我方角色可以在任意时刻插入施放终结技 —
+     * 战斗开始无人行动时、角色行动完成后但其他角色尚未行动时、敌方回合之间.
      *
      * @return 是否切换为自动战斗
      */
@@ -788,7 +883,7 @@ public class Main {
         }
         int cid = ROSTER[index];
         showCharacterData(buildCharacter(new PartyMember(cid, ROSTER_NAMES[index], 6,
-                DEFAULT_WEAPON, DEFAULT_RELIC_SET)));
+                NO_WEAPON, DEFAULT_RELIC_SET)));
     }
 
     /** 展示角色完整数据: 属性/技能/行迹/星魂/装备. */
@@ -921,12 +1016,22 @@ public class Main {
         line.append("  [3] 终结技");
         if (character.getEnergy() >= character.getMaxEnergy()) {
             line.append(" [就绪!]");
+        } else {
+            line.append(" (").append(String.format("%.0f", character.getEnergy())).append("/")
+                    .append(String.format("%.0f", character.getMaxEnergy())).append(")");
         }
         if (character.getSkills().containsKey(SkillType.ELATION)) {
             line.append("  [4] 欢愉技 (笑点 ").append(String.format("%.0f", battle.getLaughPoints())).append(")");
         }
+        List<Character> readyAllies = battle.getAliveCharacters().stream()
+                .filter(c -> c != character && c.getMaxEnergy() > 0
+                        && c.getEnergy() >= c.getMaxEnergy())
+                .toList();
+        if (!readyAllies.isEmpty()) {
+            line.append("  [5] 队友插队终结技 (").append(readyAllies.size()).append("人)");
+        }
         IO.println(line.toString());
-        IO.println("  [i] 检查  [v] 行动条  [t] 敌方详情  [b] 队友状态  [a] 自动  [q] 撤退"
+        IO.println("  [i] 检查  [v] 行动条  [s] 全队信息  [t] 敌方详情  [b] 队友状态  [a] 自动  [q] 撤退"
                 + "   (回车 = 普攻)");
         String choice = IO.readln("选择: ");
         if (choice == null || choice.trim().isEmpty()) {
@@ -951,6 +1056,10 @@ public class Main {
                 showActionBar(battle);
                 return playerAct(battle, character);
             }
+            case "s" -> {
+                showAllCombatInfo(battle);
+                return playerAct(battle, character);
+            }
             case "t" -> {
                 showEnemyDetail(battle);
                 return playerAct(battle, character);
@@ -963,9 +1072,20 @@ public class Main {
                 IO.println("撤退! 返回主菜单。");
                 return 2;
             }
+            case "5" -> {
+                // 队友插队终结技: 不消耗当前角色行动, 重新选择.
+                insertAlliedUlt(battle, character);
+                return playerAct(battle, character);
+            }
         }
         if (alive.isEmpty()) {
             return 0;
+        }
+        if (choice.equals("3") && character.getEnergy() < character.getMaxEnergy()) {
+            IO.println("能量不足 (" + String.format("%.0f", character.getEnergy()) + "/"
+                    + String.format("%.0f", character.getMaxEnergy())
+                    + "), 终结技未施放 — 请重新选择行动。");
+            return playerAct(battle, character);
         }
         Skill skill = switch (choice) {
             case "2" -> character.getSkills().get(SkillType.SKILL);
@@ -1077,6 +1197,141 @@ public class Main {
         }
     }
 
+    /** 全角色战斗信息: 我方全体 (含忆灵, 含阵亡) + 敌方全体的完整状态一览. */
+    private static void showAllCombatInfo(Battle battle) {
+        IO.println();
+        IO.println("══════════ 我方战斗信息 (" + battle.characters.size() + "人) ══════════");
+        for (Character c : battle.characters) {
+            showCombatUnit(battle, c);
+            for (Summon summon : c.getSummons()) {
+                if (!summon.isDeath()) {
+                    showCombatUnit(battle, summon);
+                }
+            }
+        }
+        IO.println("══════════ 敌方战斗信息 ══════════");
+        List<Enemy> enemies = battle.getAliveEnemies();
+        if (enemies.isEmpty()) {
+            IO.println("  (无存活敌人)");
+        }
+        for (Enemy e : enemies) {
+            IO.println("  ◆ " + e.getName() + "  " + elementLabel(e.getElement()));
+            IO.println("      HP " + String.format("%.0f", e.getCurrentHp()) + "/"
+                    + String.format("%.0f", e.getMaxHp()) + " ("
+                    + String.format("%.0f%%", e.getHpPercent() * 100) + ")  韧性 "
+                    + String.format("%.0f", e.getCurrentToughness()) + "/"
+                    + String.format("%.0f", e.getMaxToughness())
+                    + (e.isBroken() ? " [已击破]" : "")
+                    + (e.getControlState() != null ? " [控制: " + e.getControlState().name() + "]" : ""));
+            StringBuilder weak = new StringBuilder("      弱点: ");
+            for (Element el : e.getWeaknesses()) {
+                weak.append(elementLabel(el)).append(" ");
+            }
+            IO.println(weak.toString().trim());
+            showBuffs(e);
+        }
+        IO.println("  ── 战技点: " + battle.getSkillPoints()
+                + "  笑点: " + String.format("%.0f", battle.getLaughPoints()) + " ──");
+    }
+
+    /** 单个单位的完整战斗数据块 (角色/忆灵通用). */
+    private static void showCombatUnit(Battle battle, CanHit unit) {
+        String tag = unit.isDeath() ? " [阵亡]" : "";
+        StringBuilder header = new StringBuilder("  ◆ " + unit.getName() + tag);
+        if (unit instanceof Character c) {
+            header.append("  (cid ").append(c.getCid()).append(")  ")
+                    .append(elementLabel(c.getElement())).append("  ")
+                    .append(pathLabel(pathOf(c.getCid())));
+            if (c.getSummons() != null && !c.getSummons().isEmpty()) {
+                header.append("  [忆灵]");
+            }
+        } else if (unit instanceof Summon) {
+            header.append("  (忆灵)  ").append(elementLabel(unit.getElement()));
+        } else {
+            header.append("  ").append(elementLabel(unit.getElement()));
+        }
+        IO.println(header.toString());
+        IO.println("      HP " + String.format("%.0f", unit.getCurrentHp()) + "/"
+                + String.format("%.0f", unit.getMaxHp()) + " ("
+                + String.format("%.0f%%", unit.getHpPercent() * 100) + ")"
+                + "  能量 " + String.format("%.0f", unit.getEnergy()) + "/"
+                + String.format("%.0f", unit.getMaxEnergy())
+                + "  护盾 " + String.format("%.0f", unit.getShield()));
+        if (unit instanceof Character c) {
+            IO.println("      ATK " + String.format("%.0f", atk(c))
+                    + "  DEF " + String.format("%.0f", def(c))
+                    + "  SPD " + String.format("%.1f", spd(c))
+                    + "  暴击率 " + String.format("%.1f%%", crit(c) * 100)
+                    + "  暴击伤害 " + String.format("%.1f%%", cdmg(c) * 100));
+            IO.println("      效果命中 " + String.format("%.1f%%", ehr(c) * 100)
+                    + "  效果抵抗 " + String.format("%.1f%%", er(c) * 100)
+                    + "  击破特攻 " + String.format("%.1f%%", be(c) * 100)
+                    + "  行动 " + String.format("%.1f", actionAv(battle, c)) + " AV");
+        } else {
+            IO.println("      ATK " + String.format("%.0f", attrOf(unit, AttributeType.ATTACK))
+                    + "  DEF " + String.format("%.0f", attrOf(unit, AttributeType.DEFENCE))
+                    + "  SPD " + String.format("%.1f", attrOf(unit, AttributeType.SPEED))
+                    + "  行动 " + String.format("%.1f", actionAv(battle, unit)) + " AV");
+        }
+        StringBuilder state = new StringBuilder("      状态: 正常");
+        if (unit.getControlState() != null) {
+            state = new StringBuilder("      状态: 控制 [" + unit.getControlState().name() + "]");
+        }
+        if (unit instanceof Character c && c.isEnhanced()) {
+            state.append("  [强化状态]");
+        }
+        IO.println(state.toString());
+        showBuffs(unit);
+    }
+
+    /** 单位在行动条上的剩余行动值. */
+    private static double actionAv(Battle battle, CanHit unit) {
+        for (Signal signal : battle.getQueueSnapshot()) {
+            if (signal.getCanHit() == unit) {
+                return signal.nextActionTime;
+            }
+        }
+        return -1;
+    }
+
+    private static double attrOf(CanHit unit, AttributeType type) {
+        var value = unit.getAttribute(type);
+        return value != null ? value.get() : 0;
+    }
+
+    private static String elementLabel(Element element) {
+        if (element == null) {
+            return "无";
+        }
+        return switch (element) {
+            case FIRE -> "火";
+            case ICE -> "冰";
+            case WIND -> "风";
+            case THUNDER -> "雷";
+            case QUANTUM -> "量子";
+            case IMAGINARY -> "虚数";
+            case PHYSICAL -> "物理";
+        };
+    }
+
+    private static String pathLabel(String mt) {
+        if (mt == null) {
+            return "未知";
+        }
+        return switch (mt) {
+            case "destruction" -> "毁灭";
+            case "healing" -> "丰饶";
+            case "single" -> "巡猎";
+            case "all" -> "智识";
+            case "help" -> "同谐";
+            case "protection" -> "存护";
+            case "debuff" -> "虚无";
+            case "memory" -> "记忆";
+            case "elation" -> "欢愉";
+            default -> mt;
+        };
+    }
+
     /** 是否为治疗/辅助/护盾类 (作用于友方) 技能. */
     private static boolean isFriendlySkill(Skill skill) {
         if (!(skill instanceof DataSkill dataSkill)) {
@@ -1152,23 +1407,17 @@ public class Main {
     private static void inspect(Battle battle, Character character) {
         IO.println();
         IO.println("=== " + character.getName() + " 状态 ===");
-        IO.println("  生命: " + String.format("%.0f", character.getCurrentHp()) + "/"
-                + String.format("%.0f", character.getMaxHp())
-                + "  攻击: " + String.format("%.0f", atk(character))
-                + "  防御: " + String.format("%.0f", def(character))
-                + "  速度: " + String.format("%.1f", spd(character)));
-        IO.println("  暴击率: " + String.format("%.1f%%", crit(character) * 100)
-                + "  暴击伤害: " + String.format("%.1f%%", cdmg(character) * 100)
-                + "  效果命中: " + String.format("%.1f%%", ehr(character) * 100)
-                + "  效果抵抗: " + String.format("%.1f%%", er(character) * 100));
-        IO.println("  能量: " + String.format("%.0f", character.getEnergy()) + "/"
-                + String.format("%.0f", character.getMaxEnergy())
-                + "  击破特攻: " + String.format("%.1f%%", be(character) * 100)
-                + "  护盾: " + String.format("%.0f", character.getShield()));
-        IO.println("  当前状态: " + (character.getControlState() != null
-                ? character.getControlState().name() : "正常")
-                + (character.isEnhanced() ? " [强化状态]" : ""));
-        showBuffs(character);
+        showCombatUnit(battle, character);
+        IO.println("  技能等级: 普攻 Lv." + skillLevel(character, SkillType.COMMON)
+                + " 战技 Lv." + skillLevel(character, SkillType.SKILL)
+                + " 终结技 Lv." + skillLevel(character, SkillType.ULTRA)
+                + " 天赋 Lv." + skillLevel(character, SkillType.TALENT)
+                + (character.getSkills().containsKey(SkillType.ELATION) ? " 欢愉技 Lv.1" : ""));
+    }
+
+    private static int skillLevel(Character c, SkillType type) {
+        Skill skill = c.getSkills().get(type);
+        return skill != null ? skill.getLevel() : 0;
     }
 
     /** 展示当前行动条顺序与战局信息. */
@@ -1200,12 +1449,17 @@ public class Main {
         }
         IO.println("  增益/减益:");
         for (Buff buff : unit.getBuffs()) {
-            IO.println("    · " + buff.getName() + " ("
+            StringBuilder line = new StringBuilder("    · " + buff.getName() + " ("
                     + (buff.getDuration() >= 0 ? buff.getDuration() + " 回合" : "永久")
                     + (buff.getControl() != null ? ", 控制: " + buff.getControl() : "")
                     + (buff.getDotDamage() > 0 ? ", DOT " + String.format("%.0f", buff.getDotDamage()) : "")
                     + (buff.getHealPerTurn() > 0 ? ", 回复 " + String.format("%.0f", buff.getHealPerTurn()) : "")
                     + ")");
+            IO.println(line.toString());
+            String mods = buffModifiersSummary(buff);
+            if (!mods.isEmpty()) {
+                IO.println("        [" + mods + "]");
+            }
         }
         if (!unit.getDots().isEmpty()) {
             IO.println("  持续伤害:");
@@ -1214,6 +1468,69 @@ public class Main {
                         + " (" + dot.getElement().string + ", " + dot.getDuration() + " 回合)");
             }
         }
+    }
+
+    /** 增益的数值修正摘要, 如 "攻击+24%, 速度+12". */
+    private static String buffModifiersSummary(Buff buff) {
+        if (buff.getModifiers() == null || buff.getModifiers().isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Buff.ModifierEntry entry : buff.getModifiers()) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            String label = attributeLabel(entry.attribute());
+            double value = entry.modifier().getValue();
+            boolean percent = entry.modifier().getModifierType()
+                    != com.laosun.aluminium.models.DoubleValue.Modifier.ModifierType.PURE_VALUE;
+            if (percent) {
+                sb.append(label).append(value >= 0 ? "+" : "").append(String.format("%.1f", value * 100)).append("%");
+            } else {
+                sb.append(label).append(value >= 0 ? "+" : "").append(String.format("%.1f", value));
+            }
+        }
+        return sb.toString();
+    }
+
+    private static String attributeLabel(AttributeType type) {
+        return switch (type) {
+            case ATTACK -> "攻击";
+            case ATTACK_PERCENT -> "攻击%";
+            case DEFENCE -> "防御";
+            case DEFENCE_PERCENT -> "防御%";
+            case HEALTH -> "生命";
+            case HEALTH_PERCENT -> "生命%";
+            case SPEED -> "速度";
+            case SPEED_PERCENT -> "速度%";
+            case CRIT_CHANCE -> "暴击率";
+            case CRIT_ATTACK -> "暴击伤害";
+            case EFFECT_HIT_RATE -> "效果命中";
+            case EFFECT_RESISTANCE -> "效果抵抗";
+            case BREAKING_EFFECT -> "击破特攻";
+            case ENERGY_REGENERATION_RATE -> "能量恢复效率";
+            case OUTGOING_HEALING_BOOST -> "治疗量";
+            case HEAL_TAKEN_RATIO -> "受治疗量";
+            case VULNERABILITY -> "受到伤害";
+            case ALL_DAMAGE_TYPE_BOOST -> "全伤害";
+            case NORMAL_DAMAGE_BOOST -> "普攻伤害";
+            case SKILL_DAMAGE_BOOST -> "战技伤害";
+            case ULTRA_DAMAGE_BOOST -> "终结技伤害";
+            case DOT_DAMAGE_BOOST -> "持续伤害";
+            case ELATION_DAMAGE_BOOST -> "欢愉伤害";
+            case SUPER_BREAK_DAMAGE_BOOST -> "超击破伤害";
+            case DAMAGE_REDUCTION -> "减伤";
+            case DEFENCE_IGNORE -> "无视防御";
+            case RESISTANCE_PENETRATION -> "穿透";
+            case FIRE_DAMAGE_BOOST -> "火伤";
+            case ICE_DAMAGE_BOOST -> "冰伤";
+            case WIND_DAMAGE_BOOST -> "风伤";
+            case THUNDER_DAMAGE_BOOST -> "雷伤";
+            case QUANTUM_DAMAGE_BOOST -> "量子伤";
+            case IMAGINARY_DAMAGE_BOOST -> "虚数伤";
+            case PHYSICAL_DAMAGE_BOOST -> "物伤";
+            default -> type.name();
+        };
     }
 
     // ─── 属性辅助 ──────────────────────────────────────────────────────

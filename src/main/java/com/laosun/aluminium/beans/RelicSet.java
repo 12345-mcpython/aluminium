@@ -11,7 +11,9 @@ import java.util.List;
  * bonus is either more permanent properties or a conditional effect described
  * by {@code desc}/{@code param}.
  */
-public record RelicSet(@SerializedName("2") SetSkill two, @SerializedName("4") SetSkill four) {
+public record RelicSet(@SerializedName("name") Translate name,
+                       @SerializedName("2") SetSkill two,
+                       @SerializedName("4") SetSkill four) {
 
     /**
      * One set bonus tier.

@@ -378,9 +378,7 @@ public class Battle {
             }
             SkillType type = resolveSkillType(req.object(), req.skill());
             currentSkillType = type;
-            IO.println("== " + req.object().getName() + " uses "
-                    + (type == SkillType.ULTRA ? "ULTRA" : type == SkillType.SKILL ? "SKILL" : "ATTACK")
-                    + " [" + req.skill() + "] ==");
+            IO.println("== " + req.object().getName() + " 使用 " + skillTypeLabel(type) + "! ==");
             req.skill().execute(this, req.object(), req.target());
             applyActionCosts(req.object(), type);
             // 强化状态: skills/ults with the "Enhance" effect swap the character's
@@ -395,6 +393,17 @@ public class Battle {
             triggerAfterAction(req.object(), type, req.target());
         }
         currentSkillType = SkillType.COMMON;
+    }
+
+    private static String skillTypeLabel(SkillType type) {
+        return switch (type) {
+            case COMMON -> "普攻";
+            case SKILL -> "战技";
+            case ULTRA -> "终结技";
+            case TALENT -> "天赋";
+            case SUMMON_SKILL, SUMMON_TALENT -> "忆灵技";
+            case ELATION -> "欢愉技";
+        };
     }
 
     private boolean hasEnhancedSkill(int cid, int skillId) {
@@ -627,6 +636,7 @@ public class Battle {
             }
         }
         DamageContext effectiveContext = extraCrit != 0 ? context.withExtraCrit(extraCrit) : context;
+        announceAttack(attacker, defender, context);
         double damage = DamageCalculator.calculateDamage(attacker, defender, base * traceMultiplier, effectiveContext);
         applyDamage(defender, damage, attacker);
         // Being hit restores 10 energy (HSR.md §3.3).
@@ -655,10 +665,21 @@ public class Battle {
             }
         }
         DamageContext effectiveContext = extraCrit != 0 ? context.withExtraCrit(extraCrit) : context;
+        announceAttack(attacker, defender, context);
         double damage = DamageCalculator.calculateDamage(attacker, defender, base * traceMultiplier, effectiveContext);
         applyDamage(defender, damage, attacker);
         // Being hit restores 10 energy (HSR.md §3.3).
         defender.gainEnergy(10);
+    }
+
+    /**
+     * 战斗叙事: 攻击宣告 (谁向谁发起攻击, 何种元素).
+     */
+    private static void announceAttack(CanHit attacker, CanHit defender, DamageContext context) {
+        String element = context != null && context.element() != null
+                ? context.element().string : "无属性";
+        IO.println("  " + attacker.getName() + " 向 " + defender.getName()
+                + " 发起攻击! (" + element + ")");
     }
 
     /**
@@ -824,12 +845,17 @@ public class Battle {
             return;
         }
         boolean died = target.takeDamage(damage);
-        IO.println("  " + target.getName() + " took " + String.format("%.0f", damage)
-                + " damage (" + String.format("%.0f/%.0f", target.getCurrentHp(), target.getMaxHp()) + " HP"
-                + (target.getShield() > 0 ? ", " + String.format("%.0f", target.getShield()) + " shield" : "")
-                + ")");
+        String hpInfo = String.format("%.0f/%.0f", target.getCurrentHp(), target.getMaxHp()) + " HP"
+                + (target.getShield() > 0 ? ", " + String.format("%.0f", target.getShield()) + " 护盾" : "");
+        if (attacker != null) {
+            IO.println("  " + target.getName() + " 受到 " + attacker.getName() + " 的 "
+                    + String.format("%.0f", damage) + " 点伤害! (" + hpInfo + ")");
+        } else {
+            IO.println("  " + target.getName() + " 受到 " + String.format("%.0f", damage)
+                    + " 点伤害! (" + hpInfo + ")");
+        }
         if (died) {
-            IO.println("  *** " + target.getName() + " was defeated! ***");
+            IO.println("  *** " + target.getName() + " 被击败了! ***");
             checkBattleEnd();
         }
         // 行迹技能 / 星魂 hooks (HSR.md §5).
@@ -855,7 +881,9 @@ public class Battle {
         }
         double heal = DamageCalculator.calculateHeal(healer, target, baseHeal);
         target.heal(heal);
-        IO.println("  " + target.getName() + " healed " + String.format("%.0f", heal) + " HP!");
+        IO.println("  " + healer.getName() + " 为 " + target.getName() + " 恢复 "
+                + String.format("%.0f", heal) + " 点生命! (HP "
+                + String.format("%.0f/%.0f", target.getCurrentHp(), target.getMaxHp()) + ")");
     }
 
     public void applyShield(CanHit target, double amount, CanHit source) {
@@ -885,8 +913,8 @@ public class Battle {
             }
         }
         target.applyBuff(buff);
-        IO.println("  " + target.getName() + " gains [" + buff.getName() + "] for "
-                + (buff.getDuration() >= 0 ? buff.getDuration() + " turns" : "the battle"));
+        IO.println("  " + target.getName() + " 获得 [" + buff.getName() + "] ("
+                + (buff.getDuration() >= 0 ? buff.getDuration() + " 回合" : "整场战斗") + ")");
         queue.refreshSpeed(target);
     }
 
@@ -948,14 +976,15 @@ public class Battle {
         if (skill.attackType() == com.laosun.aluminium.enums.SkillAttackType.ALL
                 && getAlivePlayerUnits().size() > 1) {
             List<? extends CanHit> targets = getAlivePlayerUnits();
-            IO.println("== " + enemy.getName() + " uses [" + skill.name() + "] (ALL) ==");
+            IO.println("== " + enemy.getName() + " 对全体发起攻击 [" + skill.name() + "]! ==");
             for (CanHit target : targets) {
                 dealAttackDamage(enemy, target, skill.multiplier(), 0,
                         DamageContext.of(DamageType.NORMAL, enemy.getElement()));
             }
         } else {
             CanHit target = selectTargetByAggro(getAlivePlayerUnits());
-            IO.println("== " + enemy.getName() + " uses [" + skill.name() + "] on " + target.getName() + " ==");
+            IO.println("== " + enemy.getName() + " 向 " + target.getName()
+                    + " 发起攻击 [" + skill.name() + "]! ==");
             dealAttackDamage(enemy, target, skill.multiplier(), 0,
                     DamageContext.of(DamageType.NORMAL, enemy.getElement()));
         }
@@ -1200,7 +1229,7 @@ public class Battle {
             if (target == null) {
                 return;
             }
-            IO.println("== " + summon.getName() + " uses 忆灵技 on " + target.getName() + " ==");
+            IO.println("== " + summon.getName() + " 对 " + target.getName() + " 使用忆灵技! ==");
             executeSkill(secondary, summon, List.of(target));
             return;
         }
@@ -1212,7 +1241,7 @@ public class Battle {
         if (skill == null) {
             return;
         }
-        IO.println("== " + summon.getName() + " attacks " + target.getName() + " ==");
+        IO.println("== " + summon.getName() + " 向 " + target.getName() + " 发起攻击! ==");
         executeSkill(skill, summon, List.of(target));
     }
 
