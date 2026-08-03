@@ -12,8 +12,11 @@ import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public class Main {
+    private static final Logger logger = Logger.getLogger("main");
+
     static void main() {
         IO.println(Relic.createRandomLevelZero(RelicType.BODY, 5));
         Relic hyaBody = Relic.builder()
