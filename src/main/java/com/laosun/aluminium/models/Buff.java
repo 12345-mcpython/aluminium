@@ -12,7 +12,7 @@ public interface Buff {
     boolean canAct();
 
     // apply attribute boost at the buff append
-    boolean applyEffect(CanHit target);
+    void applyEffect(CanHit target);
 
     // remove attribute boost at the buff over
     void removeBuff(CanHit target);

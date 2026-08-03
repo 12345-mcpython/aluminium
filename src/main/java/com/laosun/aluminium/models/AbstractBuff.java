@@ -30,7 +30,7 @@ public abstract class AbstractBuff implements Buff {
     public abstract boolean canAct();
 
     @Override
-    public abstract boolean applyEffect(CanHit target);
+    public abstract void applyEffect(CanHit target);
 
     @Override
     public abstract void removeBuff(CanHit target);
