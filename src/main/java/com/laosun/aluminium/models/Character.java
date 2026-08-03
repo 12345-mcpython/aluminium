@@ -115,6 +115,10 @@ public class Character extends CanHit {
         setSkill(skillType, skillFunction.apply(skillLevel.get(skillType)));
     }
 
+    public void setSkillLevel(SkillType skillType, int skillLevel) {
+        this.skillLevel.put(skillType, skillLevel);
+    }
+
     /**
      * Creates a new builder for constructing a character.
      *
