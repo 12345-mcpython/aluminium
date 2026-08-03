@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
 
 /**
@@ -45,6 +44,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
      * Whether this entity has been defeated.
      */
     private boolean death = false;
+
+    private BuffManager buffManager;
 
     /**
      * Constructs a combat entity.

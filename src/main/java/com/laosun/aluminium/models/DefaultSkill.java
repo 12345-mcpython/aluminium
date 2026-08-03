@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+
+// TODO: DELETE IT BECAUSE OF EVERY CHARACTERS HAS EVERY SKILLS
 public class DefaultSkill extends Skill {
     private final int cid;
     private final int skillId;
