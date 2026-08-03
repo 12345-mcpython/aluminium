@@ -28,7 +28,6 @@ public class SkillData {
     }
 
     public static SkillData init(int cid, int skillID) {
-        IO.println(cid + "_" + skillID);
         Map<Integer, Skill> skillMap = Constant.SKILLS.get(cid);
         if (skillMap == null) {
             return EMPTY;

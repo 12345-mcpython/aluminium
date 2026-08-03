@@ -19,9 +19,8 @@ public class BoostDamageBuff extends AbstractBuff {
     }
 
     @Override
-    public boolean applyEffect(CanHit target) {
+    public void applyEffect(CanHit target) {
         target.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).addModifier(DoubleValue.Modifier.pure(rate, DoubleValue.Modifier.ModifierSource.BUFF, id));
-        return true;
     }
 
     @Override

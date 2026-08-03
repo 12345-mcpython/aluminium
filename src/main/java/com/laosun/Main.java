@@ -124,6 +124,7 @@ public class Main {
         }
         SkillPoint.printTree(SkillPoint.init(1409));
         IO.println(SkillPoint.sumAttributes(SkillPoint.init(1409)));
+        IO.println("\n\n");
 
         // battle test
         Character c1 = Character.fromAttributes("c1", 100, 100, 100, 100);
@@ -132,9 +133,9 @@ public class Main {
         c2.setSkillByClass(SkillType.ULTRA, TestSkillGroup1.TestSkill1::new);
         Character c3 = Character.fromAttributes("c3", 300, 500, 100, 160);
 
-        Enemy e1 = Enemy.fromAttributes("e1", 100, 100, 100, 100);
-        Enemy e2 = Enemy.fromAttributes("e2", 100, 100, 100, 160);
-        Enemy e3 = Enemy.fromAttributes("e3", 100, 100, 100, 125);
+        Enemy e1 = Enemy.fromAttributes("e1", 1000, 100, 100, 100);
+        Enemy e2 = Enemy.fromAttributes("e2", 1000, 100, 100, 160);
+        Enemy e3 = Enemy.fromAttributes("e3", 1000, 100, 100, 125);
         Battle battle = new Battle(List.of(c1, c2, c3), List.of(e1, e2, e3));
         IO.println("battle init finished");
         battle.startBattle();
