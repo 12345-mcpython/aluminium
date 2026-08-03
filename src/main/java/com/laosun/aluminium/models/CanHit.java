@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.SkillType;
@@ -45,7 +46,15 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
      */
     private boolean death = false;
 
-    private BuffManager buffManager;
+    private final BuffManager buffManager;
+
+    // test event behavior
+    public Runnable beforeMove = () -> {
+    };
+    public Runnable afterMove = () -> {
+    };
+    public Runnable onBattleStart = () -> {
+    };
 
     /**
      * Constructs a combat entity.
@@ -60,6 +69,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
         this.attributes = attributes;
         this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
         this.skills = new EnumMap<>(SkillType.class);
+        this.buffManager = new BuffManager(this);
     }
 
     /**
@@ -68,12 +78,21 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
      * @param other what you want to copy
      */
     public CanHit(CanHit other) {
+        // need to clone
         this.name = other.name;
         this.camp = other.camp;
         this.skills = new EnumMap<>(other.skills);
         this.attributes = other.attributes.clone();
-        this.currentHp = other.currentHp;
-        this.death = other.death;
+        // don't need to clone
+        this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
+        this.death = false;
+        this.buffManager = new BuffManager(this);
+        this.beforeMove = () -> {
+        };
+        this.afterMove = () -> {
+        };
+        this.onBattleStart = () -> {
+        };
     }
 
     /**
@@ -138,5 +157,20 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
             return;
         }
         currentHp = Math.min(currentHp + amount, getMaxHp());
+    }
+
+    @Override
+    public void beforeMove(Battle battle) {
+        beforeMove.run();
+    }
+
+    @Override
+    public void afterMove(Battle battle) {
+        afterMove.run();
+    }
+
+    @Override
+    public void onBattleStart(Battle battle) {
+        onBattleStart.run();
     }
 }

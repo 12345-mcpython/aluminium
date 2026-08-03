@@ -7,6 +7,7 @@ import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.buffs.BoostDamageBuff;
 import com.laosun.aluminium.models.tests.TestSkillGroup1;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -128,9 +129,14 @@ public class Main {
 
         // battle test
         Character c1 = Character.fromAttributes("c1", 100, 100, 100, 100);
+        c1.onBattleStart = () -> IO.println("c1 onBattleStart");
         Character c2 = Character.fromAttributes("c2", 200, 200, 100, 200);
         c2.setSkillLevel(SkillType.ULTRA, 5);
         c2.setSkillByClass(SkillType.ULTRA, TestSkillGroup1.TestSkill1::new);
+        c2.beforeMove = () -> {
+            c2.takeDamage(10);
+            c2.getBuffManager().addBuff(new BoostDamageBuff(c2, 2, .5));
+        };
         Character c3 = Character.fromAttributes("c3", 300, 500, 100, 160);
 
         Enemy e1 = Enemy.fromAttributes("e1", 1000, 100, 100, 100);
@@ -144,19 +150,38 @@ public class Main {
         battle.castUltra(c1, battle.enemies);
         IO.println("Release ULTRA!");
         battle.printBattle();
+        round(battle);
+        c3.getBuffManager().addBuff(new ControlledBuff(c3, 2));
+        round(battle);
+        round(battle);
+        round(battle);
+        round(battle);
+        round(battle);
+    }
+
+    public static void round(Battle battle) {
         battle.stepForward();
         IO.println("Move");
         battle.printBattle();
         battle.beforeMove();
         Signal current = battle.queue.getCurrentActor();
-        if (current == null) {
-            IO.println("ERROR! Quitting!");
-            return;
+        if (current != null) {
+            if (!(current.getCanHit() instanceof Enemy)) {
+                IO.println("current character: " + current.getCanHit().getName());
+                CanHit actor = current.getCanHit();
+                IO.println("Actor: " + actor.getName() + " start release skill!\n");
+                if (battle.performAction(actor.getSkills().get(SkillType.SKILL), battle.enemies)) {
+                    IO.println("Skill release successful");
+                } else {
+                    IO.println("Skill release failed. May be controlled or died");
+                }
+            } else {
+                IO.println("current enemy: " + current.getCanHit().getName());
+                IO.println("Skip");
+            }
+        } else {
+            IO.println("Character can't move or cause error!");
         }
-        IO.println("current: " + current.getCanHit().getName() + "\n");
-        CanHit actor = current.getCanHit();
-        battle.useSkill(actor.getSkills().get(SkillType.SKILL), battle.enemies);
-        IO.println("Actor: " + actor.getName() + " RELEASE SKILL!\n");
         battle.afterMove();
         battle.printBattle();
     }

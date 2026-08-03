@@ -19,7 +19,7 @@ public class BuffManager {
     }
 
     public void removeBuff(AbstractBuff buff) {
-        if (buff == null || !buffs.contains(buff)) return;
+        if (buff == null || !buffs.remove(buff)) return;
         buff.removeBuff(instance);
     }
 
@@ -32,10 +32,19 @@ public class BuffManager {
         return true;
     }
 
+    /**
+     * For decrease <code>Buff</code> duration
+     * In the future may have more usage
+     */
     public void tick() {
-        for (AbstractBuff buff : buffs) {
+        buffs.removeIf(buff -> {
             buff.tickEffect(instance);
-        }
+            if (buff.duration() <= 0) {
+                buff.removeBuff(instance);
+                return true;
+            }
+            return false;
+        });
     }
 
     public void clearAll() {
