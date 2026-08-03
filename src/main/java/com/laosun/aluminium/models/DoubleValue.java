@@ -170,6 +170,19 @@ public final class DoubleValue implements Cloneable {
         return result;
     }
 
+    public Modifier findFirstBySourceAndId(Modifier.ModifierSource type, int id) {
+        for (Modifier m : multiplyPercentModifiers) {
+            if (m.source == type && m.sourceRoleId == id) return m;
+        }
+        for (Modifier m : addPercentModifiers) {
+            if (m.source == type && m.sourceRoleId == id) return m;
+        }
+        for (Modifier m : valueModifiers) {
+            if (m.source == type && m.sourceRoleId == id) return m;
+        }
+        return null;
+    }
+
     /**
      * Removes all modifiers and recomputes the value (returns to base only).
      */
