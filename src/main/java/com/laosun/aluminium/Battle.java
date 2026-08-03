@@ -157,7 +157,6 @@ public class Battle {
             if (req.object.isDeath()) {
                 continue;
             }
-            IO.println("REQUEST: " + req.object);
             req.skill().execute(this, req.object(), req.target());
         }
     }
