@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static com.laosun.aluminium.enums.AttributeType.*;
 import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BASE;
@@ -109,12 +110,8 @@ public class Character extends CanHit {
         return character;
     }
 
-    public void setSkillByClass(SkillType skillType, Class<? extends Skill> skillClass) {
-        try {
-            setSkill(skillType, skillClass.getConstructor(Integer.class).newInstance(skillLevel.get(skillType)));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void setSkillByClass(SkillType skillType, Function<Integer, ? extends Skill> skillFunction) {
+        setSkill(skillType, skillFunction.apply(skillLevel.get(skillType)));
     }
 
     /**
