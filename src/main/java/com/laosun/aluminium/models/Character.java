@@ -106,6 +106,7 @@ public class Character extends CanHit {
         }
         // END
         Character character = new Character(new Translate(name, name), attributeBuilder.build());
+        character.setSkillLevel(skillLevel);
         character.setSkills(skills);
         return character;
     }
