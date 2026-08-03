@@ -11,7 +11,6 @@ import com.laosun.aluminium.models.tests.TestSkillGroup1;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
-import java.util.EnumMap;
 import java.util.List;
 
 public class Main {
@@ -124,7 +123,7 @@ public class Main {
 
         Character c1 = Character.fromAttributes("c1", 100, 100, 100, 100);
         Character c2 = Character.fromAttributes("c2", 200, 200, 100, 200);
-        c2.setSkill(SkillType.SKILL, new TestSkillGroup1.TestSkill1(1));
+        c2.setSkillByClass(SkillType.ULTRA, TestSkillGroup1.TestSkill1::new);
         Character c3 = Character.fromAttributes("c3", 300, 500, 100, 160);
 
         Enemy e1 = Enemy.fromAttributes("e1", 100, 100, 100, 100);
