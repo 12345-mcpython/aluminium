@@ -11,15 +11,18 @@ import com.laosun.aluminium.models.buffs.BoostDamageBuff;
 import com.laosun.aluminium.models.tests.TestSkillGroup1;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 public class Main {
-    private static final Logger logger = Logger.getLogger("main");
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     static void main() {
         // calculate test
+        logger.info("Starting Battle");
+        logger.error("Battle has been started");
         IO.println(Relic.createRandomLevelZero(RelicType.BODY, 5));
         Relic hyaBody = Relic.builder()
                 .type(RelicType.BODY)
