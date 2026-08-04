@@ -8,6 +8,7 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buffs.BoostDamageBuff;
+import com.laosun.aluminium.models.buffs.StunBuff;
 import com.laosun.aluminium.models.tests.TestSkillGroup1;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -21,9 +22,8 @@ public class Main {
 
     static void main() {
         // calculate test
-        logger.info("Starting Battle");
-        logger.error("Battle has been started");
-        IO.println(Relic.createRandomLevelZero(RelicType.BODY, 5));
+        logger.info("Starting calculate test");
+        logger.info(String.valueOf(Relic.createRandomLevelZero(RelicType.BODY, 5)));
         Relic hyaBody = Relic.builder()
                 .type(RelicType.BODY)
                 .star(5)
@@ -89,25 +89,25 @@ public class Main {
                 .subAttribute(AttributeType.CRIT_CHANCE, 0, 1)
                 .subAttribute(AttributeType.EFFECT_HIT_RATE, 1, 2)
                 .build();
-        IO.println(hyaBody);
-        IO.println(hyaLine);
-        IO.println(hyaBall);
-        IO.println(hyaBoot);
-        IO.println(hyaHand);
-        IO.println(hyaHead);
+        logger.info(String.valueOf(hyaBody));
+        logger.info(String.valueOf(hyaLine));
+        logger.info(String.valueOf(hyaBall));
+        logger.info(String.valueOf(hyaBoot));
+        logger.info(String.valueOf(hyaHand));
+        logger.info(String.valueOf(hyaHead));
         RelicSuit hya = new RelicSuit();
         hya.addMore(hyaBody, hyaLine, hyaBall, hyaBoot, hyaHand, hyaHead);
         Object2DoubleOpenHashMap<AttributeType> relicValue = new Object2DoubleOpenHashMap<>();
         hya.calcTotalValue(relicValue);
-        IO.println(relicValue);
-        IO.println(Constant.WEAPONS.get(23042).name().english());
-        IO.println(Constant.CHARACTERS.get(1409).name().english());
+        logger.info(String.valueOf(relicValue));
+        logger.info(Constant.WEAPONS.get(23042).name().english());
+        logger.info(Constant.CHARACTERS.get(1409).name().english());
 
-        IO.println(LevelPromotionCalc.calcCharacterRate(80));
-        IO.println(LevelPromotionCalc.calcWeaponRate(80));
-        IO.println(Constant.CHARACTERS.get(1409).health());
-        IO.println(Constant.WEAPONS.get(23042).health());
-        IO.println(Constant.WEAPONS.get(23042).weaponSkillData().getFirst().abilityProperties());
+        logger.info(String.valueOf(LevelPromotionCalc.calcCharacterRate(80)));
+        logger.info(String.valueOf(LevelPromotionCalc.calcWeaponRate(80)));
+        logger.info(String.valueOf(Constant.CHARACTERS.get(1409).health()));
+        logger.info(String.valueOf(Constant.WEAPONS.get(23042).health()));
+        logger.info(Constant.WEAPONS.get(23042).weaponSkillData().getFirst().abilityProperties().toString());
         Weapon wp = Weapon.build(23042, 80);
         Character character = Character.builder()
                 .cid(1409)
@@ -116,19 +116,17 @@ public class Main {
                 .weapon(wp)
                 .extraValue(new ExtraBasicPromote(0, 0, 0, 0, 0, 0, 0, 0.12))
                 .build();
-        IO.println(character.getAttribute(AttributeType.HEALTH));
-        IO.println(character.getAttribute(AttributeType.DEFENCE));
-        IO.println(character.getAttribute(AttributeType.SPEED));
+        logger.info(String.valueOf(character.getAttribute(AttributeType.HEALTH)));
+        logger.info(String.valueOf(character.getAttribute(AttributeType.DEFENCE)));
+        logger.info(String.valueOf(character.getAttribute(AttributeType.SPEED)));
         DoubleValue dp = character.getAttribute(AttributeType.HEALTH).clone();
         dp.addModifier(DoubleValue.Modifier.addPercent(0.20));
-        IO.println(dp);
-        IO.println();
+        logger.info(String.valueOf(dp));
         for (DoubleValue db : character.getAttributes()) {
-            IO.println(db);
+            logger.info(String.valueOf(db));
         }
         SkillPoint.printTree(SkillPoint.init(1409));
-        IO.println(SkillPoint.sumAttributes(SkillPoint.init(1409)));
-        IO.println("\n\n");
+        logger.info(SkillPoint.sumAttributes(SkillPoint.init(1409)).toString());
 
         // battle test
         Character c1 = Character.fromAttributes("c1", 100, 100, 100, 100);
@@ -154,13 +152,13 @@ public class Main {
         IO.println("Release ULTRA!");
         battle.printBattle();
         round(battle);
-        c3.getBuffManager().addBuff(new ControlledBuff(c3, 2));
-        round(battle);
-        round(battle);
-        round(battle);
-        round(battle);
-        round(battle);
+        c3.getBuffManager().addBuff(new StunBuff(c3, 2));
+        for (int i = 0; i < 20; i++) {
+            round(battle);
+        }
     }
+
+    public static int tick = 0;
 
     public static void round(Battle battle) {
         battle.stepForward();
@@ -172,6 +170,10 @@ public class Main {
             if (!(current.getCanHit() instanceof Enemy)) {
                 IO.println("current character: " + current.getCanHit().getName());
                 CanHit actor = current.getCanHit();
+                if (actor.getName().equals("c3")) {
+                    tick++;
+                }
+                IO.println(tick);
                 IO.println("Actor: " + actor.getName() + " start release skill!\n");
                 if (battle.performAction(actor.getSkills().get(SkillType.SKILL), battle.enemies)) {
                     IO.println("Skill release successful");
