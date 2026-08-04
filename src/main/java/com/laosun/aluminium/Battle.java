@@ -94,7 +94,12 @@ public class Battle {
         if (currentMove == null) {
             return;
         }
-        currentMove.getCanHit().beforeMove(this);
+        CanHit actor = currentMove.getCanHit();
+        actor.getBuffManager().beforeMove();
+        if (actor.isDeath()) {
+            return;
+        }
+        actor.beforeMove(this);
     }
 
     public boolean performAction(Skill skill, List<? extends CanHit> targets) {
@@ -131,6 +136,7 @@ public class Battle {
         CanHit actor = currentMove.getCanHit();
 
         if (actor.isDeath()) {
+            actor.getBuffManager().clearAll();
             queue.removeCombatant(actor);
         } else {
             queue.setTopZero();
@@ -138,7 +144,7 @@ public class Battle {
         currentMove = null;
         removeDeadCombatants();
         actor.afterMove(this);
-        actor.getBuffManager().tick();
+        actor.getBuffManager().afterMove();
         processRequests();
     }
 

@@ -33,13 +33,27 @@ public class BuffManager {
     }
 
     /**
-     * For decrease <code>Buff</code> duration
-     * In the future may have more usage
+     * Settles early buffs before the owner's move (tick duration, remove expired).
      */
-    public void tick() {
+    public void beforeMove() {
+        processBuffTick(true);
+    }
+
+    /**
+     * Settles late buffs after the owner's move (tick duration, remove expired).
+     */
+    public void afterMove() {
+        processBuffTick(false);
+    }
+
+    private void processBuffTick(boolean early) {
         buffs.removeIf(buff -> {
+            if (buff.isEarlyBuff != early) {
+                return false;
+            }
             buff.tickEffect(instance);
             if (buff.duration() <= 0) {
+                IO.println("remove: " + buff);
                 buff.removeBuff(instance);
                 return true;
             }

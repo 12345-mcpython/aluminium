@@ -9,7 +9,7 @@ public class BoostDamageBuff extends AbstractBuff {
     private final double rate;
 
     public BoostDamageBuff(CanHit source, int duration, double rate) {
-        super(source, duration);
+        super(source, duration, false);
         this.rate = rate;
     }
 
@@ -32,6 +32,6 @@ public class BoostDamageBuff extends AbstractBuff {
 
     @Override
     public void tickEffect(CanHit target) {
-        remainingDuration--;
+        decreaseDuration();
     }
 }
