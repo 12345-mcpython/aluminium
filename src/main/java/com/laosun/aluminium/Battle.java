@@ -143,8 +143,10 @@ public class Battle {
         }
         currentMove = null;
         removeDeadCombatants();
-        actor.afterMove(this);
-        actor.getBuffManager().afterMove();
+        if (!actor.isDeath()) {
+            actor.afterMove(this);
+            actor.getBuffManager().afterMove();
+        }
         processRequests();
     }
 
