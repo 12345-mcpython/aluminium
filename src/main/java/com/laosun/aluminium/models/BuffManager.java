@@ -14,6 +14,7 @@ public class BuffManager {
         if (buff == null) {
             return;
         }
+        buff.setSource(instance);
         buffs.add(buff);
         buff.applyEffect(instance);
     }
@@ -55,6 +56,7 @@ public class BuffManager {
             if (buff.duration() <= 0) {
                 IO.println("remove: " + buff);
                 buff.removeBuff(instance);
+                buffs.remove(buff);
                 return true;
             }
             return false;

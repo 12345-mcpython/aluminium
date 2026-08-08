@@ -5,8 +5,8 @@ package com.laosun.aluminium.models;
 // BUFF MANAGER ONLY NEED to MANAGE IT!
 public interface Buff {
     CanHit getSource();
+    void setSource(CanHit source);
 
-    //
     // true can continue move
     // false can ignore the move
     boolean canAct();
