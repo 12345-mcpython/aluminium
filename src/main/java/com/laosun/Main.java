@@ -9,6 +9,8 @@ import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buffs.BoostDamageBuff;
 import com.laosun.aluminium.models.buffs.StunBuff;
+import com.laosun.aluminium.models.buffs.TestBuff;
+import com.laosun.aluminium.models.buffs.TestBuff1;
 import com.laosun.aluminium.models.tests.TestSkillGroup1;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -134,7 +136,7 @@ public class Main {
         c2.setSkillByClass(SkillType.ULTRA, TestSkillGroup1.TestSkill1::new);
         c2.beforeMove = () -> {
             c2.takeDamage(10);
-            c2.getBuffManager().addBuff(new BoostDamageBuff(c2, 2, .5));
+            c2.getBuffManager().addBuff(new BoostDamageBuff(2, .5));
         };
         Character c3 = Character.fromAttributes("c3", 300, 500, 100, 160);
 
@@ -152,7 +154,9 @@ public class Main {
         IO.println("Round 1 started");
         round(battle);
         IO.println("Round 1 ended");
-        c3.getBuffManager().addBuff(new StunBuff(c3, 2));
+        c3.getBuffManager().addBuff(new StunBuff(2));
+        c2.getBuffManager().addBuff(new TestBuff(3));
+        c2.getBuffManager().addBuff(new TestBuff1(4));
         IO.println("Add buff");
         for (int i = 0; i < 40; i++) {
             round(battle);

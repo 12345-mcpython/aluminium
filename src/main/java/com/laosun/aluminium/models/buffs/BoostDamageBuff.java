@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.DoubleValue;
 public class BoostDamageBuff extends AbstractBuff {
     private final double rate;
 
-    public BoostDamageBuff(CanHit source, int duration, double rate) {
-        super(source, duration, false);
+    public BoostDamageBuff(int duration, double rate) {
+        super(duration, false);
         this.rate = rate;
     }
 

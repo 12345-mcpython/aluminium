@@ -3,28 +3,29 @@ package com.laosun.aluminium.models.buffs;
 import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 
-public class StunBuff extends AbstractBuff {
-    public StunBuff(int duration) {
-        super(duration, true);
+public class TestBuff extends AbstractBuff {
+    public TestBuff(int duration) {
+        super(duration, false);
     }
 
     @Override
     public boolean canAct() {
-        return false;
+        return true;
     }
 
     @Override
     public void applyEffect(CanHit target) {
-
+        IO.println("TestBuff: applyEffect");
     }
 
     @Override
     public void removeBuff(CanHit target) {
-        IO.println("Stun buff has been removed");
+        IO.println("TestBuff: removeBuff");
     }
 
     @Override
     public void tickEffect(CanHit target) {
+        IO.println("TestBuff: tickEffect");
         decreaseDuration();
     }
 }
