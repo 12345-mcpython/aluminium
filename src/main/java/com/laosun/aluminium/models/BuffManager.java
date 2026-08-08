@@ -56,7 +56,6 @@ public class BuffManager {
             if (buff.duration() <= 0) {
                 IO.println("remove: " + buff);
                 buff.removeBuff(instance);
-                buffs.remove(buff);
                 return true;
             }
             return false;
