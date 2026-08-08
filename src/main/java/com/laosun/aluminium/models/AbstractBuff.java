@@ -3,7 +3,7 @@ package com.laosun.aluminium.models;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractBuff implements Buff {
-    protected final CanHit source;
+    protected CanHit source;
     protected int remainingDuration;
     protected final int id;
     protected final boolean isEarlyBuff;
@@ -11,11 +11,15 @@ public abstract class AbstractBuff implements Buff {
 
     private static final AtomicInteger ID_GENERATOR = new AtomicInteger(1);
 
-    public AbstractBuff(CanHit source, int duration, boolean isEarlyBuff) {
-        this.source = source;
+    public AbstractBuff(int duration, boolean isEarlyBuff) {
         this.remainingDuration = duration;
         this.isEarlyBuff = isEarlyBuff;
         this.id = ID_GENERATOR.getAndIncrement();
+    }
+
+    @Override
+    public void setSource(CanHit h) {
+        source = h;
     }
 
     @Override
@@ -41,7 +45,7 @@ public abstract class AbstractBuff implements Buff {
     public abstract void tickEffect(CanHit target);
 
     protected void decreaseDuration() {
-        IO.println("Decrease buff duration!");
+        IO.println("Decreasing buff duration! " + getClass().getSimpleName() + " " + remainingDuration);
         remainingDuration--;
     }
 }
