@@ -33,11 +33,13 @@ public class TestSkillGroup1 {
             CanHit c = target.getFirst();
             List<Double> params = getData().getSkills().get(level - 1);
 
+            // params.getFirst()
             double multiplier = (params != null && !params.isEmpty()) ? params.getFirst() : 1.0;
 
             double attack = user.getAttribute(AttributeType.ATTACK).get();
             double baseDamage = attack * multiplier;
 
+            // character canHit
             double finalDamage = battle.calculateDamage(user, c, baseDamage, List.of());
             battle.applyDamage(target.getFirst(), finalDamage);
         }
