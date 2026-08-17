@@ -26,9 +26,9 @@ import java.util.Map;
  * base attributes for modifier redirection during calculation.
  */
 public final class Constant {
-    /** <star level> part attribute <base bonus> <double value> */
     /**
      * Relic main attribute value tables (keyed by star level 2-5).
+     * <star level> part attribute <base bonus> <double value>
      */
     public static final RelicMainAttribute RELIC_MAIN_ATTRIBUTES;
     /**

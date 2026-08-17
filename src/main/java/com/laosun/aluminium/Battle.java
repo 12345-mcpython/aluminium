@@ -182,6 +182,15 @@ public class Battle {
         addRequestItems.add(canHit);
     }
 
+
+    /**
+     * Calculate damage according to the object
+     * @param attacker the object which caused damage
+     * @param defender ? I don't know
+     * @param baseDamage the base value of the skill
+     * @param extraModifiers extra modifiers for the damage
+     * @return damage value
+     */
     public double calculateDamage(CanHit attacker, CanHit defender,
                                   double baseDamage, List<DoubleValue.Modifier> extraModifiers) {
         DoubleValue damage = new DoubleValue(baseDamage);
