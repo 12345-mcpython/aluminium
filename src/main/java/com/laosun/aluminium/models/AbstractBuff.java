@@ -44,6 +44,10 @@ public abstract class AbstractBuff implements Buff {
     @Override
     public abstract void tickEffect(CanHit target);
 
+    public boolean isSameKind(AbstractBuff other) {
+        return this.getClass() == other.getClass();
+    }
+
     protected void decreaseDuration() {
         IO.println("Decreasing buff duration! " + getClass().getSimpleName() + " " + remainingDuration);
         remainingDuration--;

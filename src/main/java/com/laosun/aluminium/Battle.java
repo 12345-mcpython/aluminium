@@ -154,6 +154,7 @@ public class Battle {
         processSkillRequests();
         processAddRequests();
         processAdvanceRequests();
+        removeDeadCombatants();
     }
 
     private void processSkillRequests() {

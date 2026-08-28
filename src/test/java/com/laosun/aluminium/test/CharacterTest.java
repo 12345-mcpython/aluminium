@@ -9,6 +9,33 @@ import org.junit.jupiter.api.Test;
 
 public class CharacterTest {
     @Test
+    public void takeDamageAndHeal() {
+        Character c = Character.fromAttributes("c", 1000, 100, 100, 100);
+        Assertions.assertEquals(1000, c.getCurrentHp());
+
+        Assertions.assertFalse(c.takeDamage(300));
+        Assertions.assertEquals(700, c.getCurrentHp());
+
+        Assertions.assertTrue(c.takeDamage(700));
+        Assertions.assertEquals(0, c.getCurrentHp());
+        Assertions.assertFalse(c.takeDamage(100), "dead target should not take more damage");
+        Assertions.assertEquals(0, c.getCurrentHp());
+    }
+
+    @Test
+    public void healCapsAtMaxHp() {
+        Character c = Character.fromAttributes("c", 1000, 100, 100, 100);
+        c.takeDamage(400);
+        Assertions.assertEquals(600, c.getCurrentHp());
+
+        c.heal(1000);
+        Assertions.assertEquals(1000, c.getCurrentHp(), "heal should not exceed max hp");
+
+        c.heal(0);
+        Assertions.assertEquals(1000, c.getCurrentHp(), "zero heal should be ignored");
+    }
+
+    @Test
     public void testAttributeValue() {
         Relic hyaBody = Relic.builder()
                 .type(RelicType.BODY)
