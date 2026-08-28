@@ -1,20 +1,28 @@
 package com.laosun.aluminium.models;
 
-import lombok.AllArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
 public class BuffManager {
     private CanHit instance;
     private final List<AbstractBuff> buffs = new ArrayList<>();
+    private boolean blocked = false;
+
+    public BuffManager(CanHit instance) {
+        this.instance = instance;
+    }
 
     public void addBuff(AbstractBuff buff) {
         if (buff == null) {
             return;
         }
-        buff.setSource(instance);
+        for (int i = buffs.size() - 1; i >= 0; i--) {
+            AbstractBuff existed = buffs.get(i);
+            if (existed.isSameKind(buff)) {
+                buffs.remove(i);
+                existed.removeBuff(instance);
+            }
+        }
         buffs.add(buff);
         buff.applyEffect(instance);
     }
@@ -25,6 +33,9 @@ public class BuffManager {
     }
 
     public boolean canAct() {
+        if (blocked) {
+            return false;
+        }
         for (AbstractBuff buff : buffs) {
             if (!buff.canAct()) {
                 return false;
@@ -37,6 +48,7 @@ public class BuffManager {
      * Settles early buffs before the owner's move (tick duration, remove expired).
      */
     public void beforeMove() {
+        blocked = false;
         processBuffTick(true);
     }
 
@@ -52,10 +64,13 @@ public class BuffManager {
             if (buff.isEarlyBuff != early) {
                 return false;
             }
+            boolean couldAct = buff.canAct();
             buff.tickEffect(instance);
             if (buff.duration() <= 0) {
-                IO.println("remove: " + buff);
                 buff.removeBuff(instance);
+                if (!couldAct) {
+                    blocked = true;
+                }
                 return true;
             }
             return false;
