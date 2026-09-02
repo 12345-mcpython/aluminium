@@ -1,8 +1,10 @@
 package com.laosun.aluminium.enums;
 
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.beans.EliteGroup;
 import lombok.Getter;
 
+import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,6 +81,20 @@ public enum AttributeType {
      * {@code true} for attributes like CRIT_CHANCE, DAMAGE_BOOST, etc.
      */
     public final boolean isPercent;
+
+    private static final Map<DamageElement, AttributeType> BOOST_DAMAGE_MAPPING = Map.ofEntries(
+            Map.entry(DamageElement.PHYSICAL, PHYSICAL_DAMAGE_BOOST),
+            Map.entry(DamageElement.FIRE, FIRE_DAMAGE_BOOST),
+            Map.entry(DamageElement.ICE, ICE_DAMAGE_BOOST),
+            Map.entry(DamageElement.THUNDER, THUNDER_DAMAGE_BOOST),
+            Map.entry(DamageElement.WIND, WIND_DAMAGE_BOOST),
+            Map.entry(DamageElement.QUANTUM, QUANTUM_DAMAGE_BOOST),
+            Map.entry(DamageElement.IMAGINARY, IMAGINARY_DAMAGE_BOOST)
+    );
+
+    public static AttributeType getBoostByElement(DamageElement elementType) {
+        return BOOST_DAMAGE_MAPPING.get(elementType);
+    }
 
     AttributeType(String string) {
         this(string, true);
