@@ -153,6 +153,54 @@ public class ExtraTrueDamageTest {
     }
 
     @Test
+    public void additionalDamageStopsWhenTheMainDamageAlreadyKilledTheTarget() {
+        Character robin = character();
+        Character mainC = character();
+        Enemy fragile = enemy("boss", 50, 0);        // 主C 普攻恰好 50 → 当场击杀
+        Battle battle = battle(List.of(robin, mainC), List.of(fragile));
+        ConcertoBuff concerto = new ConcertoBuff(2, robin);
+        robin.getBuffManager().addBuff(concerto);
+
+        battle.castImmediate(singleAttack(), mainC, List.of(fragile));
+
+        // 事件照常触发（确实发生了一次攻击），但主目标已死 → 附加伤害不再产生
+        Assertions.assertEquals(1, concerto.triggerCount);
+        Assertions.assertEquals(50, damageTaken(fragile), EPS);
+    }
+
+    @Test
+    public void zoneStyleAdditionalDamageSkipsKilledTargetsAndFallsBackToSurvivors() {
+        Character tribbie = character();
+        Character mainC = character();
+        Enemy fragile = enemy("e1", 50, 0);          // 当前 HP 最高的目标，但会被主伤害打死
+        Enemy survivor = enemy("e2", 200_000, 0);
+        Enemy low = enemy("e3", 100_000, 0);
+        Battle battle = battle(List.of(tribbie, mainC), List.of(fragile, survivor, low));
+        tribbie.getBuffManager().addBuff(new TribbieZoneBuff(2, tribbie));
+
+        battle.castImmediate(aoeAttack(), mainC, List.of(survivor));
+
+        // AOE 每敌 90：e1 被击杀 → 3 次附加伤害全部落到"当前存活 + HP 最高"的 e2
+        Assertions.assertEquals(50, damageTaken(fragile), EPS);          // 尸体不再受伤
+        Assertions.assertEquals(90 + 360, damageTaken(survivor), EPS);
+        Assertions.assertEquals(90, damageTaken(low), EPS);
+    }
+
+    @Test
+    public void zoneStyleAdditionalDamageDoesNotTriggerWhenEveryHitTargetDies() {
+        Character tribbie = character();
+        Character mainC = character();
+        Enemy fragile = enemy("boss", 50, 0);
+        Battle battle = battle(List.of(tribbie, mainC), List.of(fragile));
+        tribbie.getBuffManager().addBuff(new TribbieZoneBuff(2, tribbie));
+
+        battle.castImmediate(aoeAttack(), mainC, List.of(fragile));
+
+        // 被击目标全灭 → 3 次附加伤害一次都不产生（不转火到未被攻击的目标）
+        Assertions.assertEquals(50, damageTaken(fragile), EPS);
+    }
+
+    @Test
     public void additionalDamageGoesThroughZonesWhileTrueDamageSkipsThem() {
         Character attacker = character();
         Enemy armoured = enemy("boss", 1_000_000, 1150);                  // 防御 1150
