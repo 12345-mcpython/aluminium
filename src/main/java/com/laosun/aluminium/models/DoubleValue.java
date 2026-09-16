@@ -56,6 +56,10 @@ public final class DoubleValue implements Cloneable {
         return new DoubleValue(0.0);
     }
 
+    public static DoubleValue one() {
+        return new DoubleValue(1.0);
+    }
+
     /**
      * Replaces the base value and recomputes the final value.
      *
