@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,6 +74,11 @@ public class Enemy extends CanHit {
      * 击破状态剩余回合数（跳回合/推条由 P4-4 维护，P4-1 只留字段）。
      */
     private int brokenRemainTurns;
+
+    /**
+     * 身上的持续伤害（P4-5）。**按施加顺序结算**（HSR.md §7「先上先结算」），所以用 List 不用 Set。
+     */
+    private final List<Dot> dots = new ArrayList<>();
 
     public Enemy(String name, Camp camp, DoubleValue[] attributes) {
         super(name, camp, attributes);
@@ -150,5 +157,25 @@ public class Enemy extends CanHit {
         brokenElement = null;
         brokenRemainTurns = 0;
         stance = maxStance;
+    }
+
+    /**
+     * 挂上一个持续伤害（P4-5）。同一元素可以叠多个（"先上先结算"，不做同类刷新）。
+     *
+     * @param dot 持续伤害
+     */
+    public void addDot(Dot dot) {
+        if (dot != null) {
+            dots.add(dot);
+        }
+    }
+
+    /**
+     * 移除一个持续伤害（结算完最后一次时由 {@code Battle.tickDots} 调用）。
+     *
+     * @param dot 持续伤害
+     */
+    public void removeDot(Dot dot) {
+        dots.remove(dot);
     }
 }

@@ -157,7 +157,7 @@
 |                       | P4-2 削韧判定                                  | ☑   |
 |                       | P4-3 击破伤害                                  | ☑   |
 |                       | P4-4 击破状态/推条/跳回合                      | ☑   |
-|                       | P4-5 DOT                                       | ☐   |
+|                       | P4-5 DOT                                       | ☑   |
 |                       | P4-6 超击破                                    | ☐   |
 | **P5 仇恨 + 敌人AI**  | P5-1 Path 仇恨值                               | ☐   |
 |                       | P5-2 受击概率 + 嘲讽                           | ☐   |
@@ -1134,77 +1134,34 @@
 
 ---
 
-### P4-5 DOT（持续伤害）
+### P4-5 DOT（持续伤害）✅
 
-- **目标**：击破元素附着 DOT（火→灼烧、雷→触电、物理→裂伤、风→风暴），敌人回合开始结算，"先上先结算"。
+- **目标**：击破元素附着 DOT（火→灼烧、雷→触电、物理→裂伤、风→风化），敌人回合开始结算，"先上先结算"。
   （冰/量子/虚数三系击破效果——冻结/纠缠/禁锢，见 P10-1 统一成表）
-- **涉及文件**：新建 `models/Dot.java`、`models/Enemy.java`、`Battle.java`、新建 `test/DotTest.java`
-- **怎么做**：
-    1. 新类（ **完全独立，不依赖 Buff 体系**，最简单）：
-       ```java
-       @Getter
-       public class Dot {
-           private final CanHit source;          // 施放者（Damage.attacker 不允许为 null，必须带来源）
-           private final DamageElement element;  // 灼烧=FIRE / 触电=THUNDER / 裂伤=PHYSICAL / 风暴=WIND
-           private final double baseDamage;      // 每回合伤害（击破基数 × DOT_RATIO，见步骤 4）
-           private int remainingTurns;
-  
-           public Dot(CanHit source, DamageElement element, double baseDamage, int remainingTurns) {
-               this.source = source;
-               this.element = element;
-               this.baseDamage = baseDamage;
-               this.remainingTurns = remainingTurns;
-           }
-  
-           /** 结算一次；返回 true 表示本回合是最后一遍，结算后应移除 */
-           public boolean tick() {
-               remainingTurns--;
-               return remainingTurns <= 0;
-           }
-       }
-       ```
-    2. `Enemy` 加：
-       ```java
-       private final List<Dot> dots = new ArrayList<>();
-  
-       public void addDot(Dot dot) {
-           dots.add(dot);
-       }
-  
-       public void removeDot(Dot dot) {
-           dots.remove(dot);
-       }
-       ```
-    3. `Battle.beforeMove` 里对 Enemy 分支结算（先上先结算 = 按列表顺序）：
-       ```java
-       for (Enemy enemy : enemies) {
-           if (enemy.isDeath()) {
-               continue;
-           }
-           for (Dot dot : new ArrayList<>(enemy.getDots())) {
-               Damage d = new Damage(dot.getSource(), enemy, dot.getElement(), DamageType.DOT, dot.getBaseDamage());
-               // 走完整流水线：DOT 吃增伤（Battle 装配属性增伤）、不吃暴击（DamageType.DOT 不可暴）；
-               // 易伤/减伤由 P1-7 的 onDamage 钩子注入 —— 这正是 HSR 规则
-               applyDamage(enemy, d);
-               if (dot.tick()) {
-                   enemy.removeDot(dot);
-               }
-           }
-       }
-       ```
-       易伤/减伤对 DOT 生效（HSR 规则）：走 `applyDamage` 后由 P1-7 的钩子自动生效，不需要额外分支。
-    4. 击破瞬间自动挂 DOT：在 P4-2 的 `reduceToughness` 里 `breakEnemy` 之后：
-       ```java
-       double dotPerTurn = Constant.BREAKING_RATE.get(user.getLevel()) / 10.0 * Constant.DOT_RATIO;
-       enemy.addDot(new Dot(user, element, dotPerTurn, Constant.DOT_TURNS));   // 按击破元素匹配灼烧/触电/…
-       ```
-       `Constant` 加：`public static final double DOT_RATIO = 0.5;`、`public static final int DOT_TURNS = 3;`（示例值，TODO
-       数据校准）
-- **验收**：`DotTest`：
-    - 敌挂灼烧 `enemy.addDot(new Dot(source, FIRE, 500, 2))`，调用 `battle.beforeMove()` 后 HP -500；再 1 次又 -500；第 3
-      次不再扣（DOT 已移除）
-    - 先上先结算：灼烧 + 触电各 500 → 每回合先扣灼烧再扣触电（顺序可断言伤害日志顺序 or 只断言总扣血 1000）
-    - 伤害类型是 `DamageType.DOT` 且不可暴击（回调确认）
+- **涉及文件**：新建 `models/Dot.java`、`models/Enemy.java`、`models/BreakDamageCalculator.java`、
+  `Battle.java`、`Constant.java`、新建 `test/DotTest.java`
+- **怎么做**（实测修订：**DOT 挂在"敌人自己的回合开始"，不是每次 beforeMove 都全体结算**）：
+    1. `Dot`（独立类，不依赖 Buff 体系）：`source / element / baseDamage / remainingTurns` +
+       `boolean tick()`（返回 true = 最后一次，调用方移除）。
+    2. `Enemy` 加 `private final List<Dot> dots`（**List 不是 Set**，顺序 = 先上先结算）+ `addDot/removeDot`。
+    3. `Battle.tickDots(Enemy)`：快照迭代、按顺序造 {@code DamageType.DOT} 走 `applyDamage`
+       （吃增伤/防御/抗性，易伤/减伤由 `onDamage` 钩子注入；不可暴击由 `DamageType.DOT` 自己挡），
+       `tick()` 为 true 就移除；**被 DOT 打死就停止后续结算**。
+       调用点：`Battle.beforeMove()` 里 `actor instanceof Enemy` 时先结算一次（= 该敌人回合开始）。
+    4. 击破链挂 DOT：`breakEnemy` → 击破伤害 → 推条 → `attachBreakDot` → 击破回能；
+       `attachBreakDot` 只对 `Constant.DOT_ELEMENTS`（火/雷/物理/风）生效，
+       base = `BreakDamageCalculator.breakBaseOf(attacker) × Constant.DOT_RATIO`
+       （顺手把 `/10` 单位换算收进 `breakBaseOf`，避免两处各写一遍）。
+    5. `Constant` 加 `DOT_RATIO = 0.5`、`DOT_TURNS = 3`（**示例值 TODO data**：HSR.md 只写
+       "基础倍率由等级与击破特攻决定（查数值表）"，逐元素倍率还没拿到）、
+       `DOT_ELEMENTS = EnumSet.of(FIRE, THUNDER, PHYSICAL, WIND)`。
+- **验收**：`DotTest`（6 条，全绿）：
+    - base 500、防 100、Lv80 → 每回合结算 `500 × 1000/1100`；2 次后自身移除，第 3 次 `tickDots` = 0
+    - **先上先结算**：记录 `onDamage` 的 `Enemy` 子类断言收到 `[THUNDER, FIRE]`（施加顺序）
+    - DOT 吃增伤（+100% 翻倍）、`DOT.isCrittable() == false`、`DOT.isBoostable() == true`
+    - 姬子击破冰锋 → 挂 1 个 FIRE DOT，`baseDamage = 376.75535 × DOT_RATIO`
+    - 冰属性击破（临时把弱点改成 ICE）→ **不挂** DOT（冻结不是 DOT）
+    - `stepForward() + beforeMove()`：先动的敌人（速度 200）回合开始时自动结算 DOT
 - **依赖**：P1-2（DOT 类型）、P4-3、P4-4
 
 ---
