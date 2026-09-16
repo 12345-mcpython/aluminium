@@ -1,13 +1,10 @@
 package com.laosun.aluminium.models.tests;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Skill;
 import com.laosun.aluminium.models.SkillData;
+import com.laosun.aluminium.models.SkillExecutor;
 
 import java.util.List;
 
@@ -33,22 +30,7 @@ public class TestSkillGroup1 {
 
         @Override
         public void execute(Battle battle, CanHit user, List<? extends CanHit> target) {
-            CanHit c = target.getFirst();
-            List<Double> params = getData().getSkills().get(level - 1);
-
-            // params.getFirst()
-            double multiplier = (params != null && !params.isEmpty()) ? params.getFirst() : 1.0;
-
-            double attack = user.getAttribute(AttributeType.ATTACK).get();
-            double baseDamage = attack * multiplier;
-
-            DamageElement element = getData().getElement();
-            if (element == null) {
-                return;   // 非伤害技能不构造 Damage（TODO P1-8 正经分派）
-            }
-            // character canHit
-            battle.applyDamage(target.getFirst(),
-                    new Damage(user, c, element, DamageType.NORMAL, baseDamage));
+            SkillExecutor.execute(battle, this, user, target);
         }
     }
 
