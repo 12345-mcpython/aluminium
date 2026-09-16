@@ -120,11 +120,61 @@ public class Battle {
             return;
         }
         CanHit actor = currentMove.getCanHit();
+        if (actor instanceof Enemy enemy) {
+            tickDots(enemy);                         // P4-5：敌人回合开始时先结算持续伤害
+            if (enemy.isDeath()) {
+                return;
+            }
+        }
         actor.getBuffManager().beforeMove();
         if (actor.isDeath()) {
             return;
         }
         actor.beforeMove(this);
+    }
+
+    /**
+     * 结算一个敌人身上的持续伤害（P4-5）：**先上先结算**（按施加顺序）。
+     *
+     * <p>DOT 走完整乘区（吃增伤、吃防御/抗性，易伤/减伤由 {@code onDamage} 钩子注入），
+     * 但不可暴击——由 {@link DamageType#DOT} 的 {@code crittable=false} 表达。
+     *
+     * @param enemy 目标
+     * @return 本次结算的总伤害（所有 DOT 之和）
+     */
+    public double tickDots(Enemy enemy) {
+        if (enemy == null || enemy.isDeath()) {
+            return 0;
+        }
+        double total = 0;
+        for (Dot dot : new ArrayList<>(enemy.getDots())) {       // 快照迭代：结算中可能移除
+            if (enemy.isDeath()) {
+                break;                                           // 被 DOT 打死 → 剩下的不再结算
+            }
+            Damage damage = new Damage(dot.getSource(), enemy, dot.getElement(),
+                    DamageType.DOT, dot.getBaseDamage());
+            total += applyDamage(enemy, damage);
+            if (dot.tick()) {
+                enemy.removeDot(dot);
+            }
+        }
+        return total;
+    }
+
+    /**
+     * 击破附带持续伤害（P4-5）：只有火/雷/物理/风 才有
+     * （冰=冻结、量子=纠缠、虚数=禁锢，P10-1 统一成表）。
+     *
+     * @param attacker 击破者（DOT 的来源，也是伤害的攻击者）
+     * @param enemy    被击破的目标
+     * @param element  击破元素
+     */
+    private void attachBreakDot(CanHit attacker, Enemy enemy, DamageElement element) {
+        if (!Constant.DOT_ELEMENTS.contains(element)) {
+            return;
+        }
+        enemy.addDot(new Dot(attacker, element,
+                BreakDamageCalculator.breakBaseOf(attacker) * Constant.DOT_RATIO, Constant.DOT_TURNS));
     }
 
     public boolean performAction(Skill skill, List<? extends CanHit> targets) {
@@ -314,6 +364,7 @@ public class Battle {
         enemy.setBrokenRemainTurns(Constant.BROKEN_REMAIN_TURNS);
         applyDamage(enemy, BreakDamageCalculator.build(attacker, enemy, element, stanceDamage));   // P4-3
         delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // P4-4 推条
+        attachBreakDot(attacker, enemy, element);                                                  // P4-5 DOT
         gainBreakEnergy(attacker, enemy);            // P3-3
         return true;
     }

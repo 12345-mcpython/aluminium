@@ -4,11 +4,14 @@ import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.*;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.utils.JSONReader;
 
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Global constants and static game data loaded at startup.
@@ -160,6 +163,24 @@ public final class Constant {
      * 击破持续回合数（P4-4）：敌人被击破后跳过这么多个自己的回合，然后韧性回满。
      */
     public static final int BROKEN_REMAIN_TURNS = 2;
+
+    /**
+     * 击破 DOT 每次结算的基础伤害 = 击破基数 × 本比例（**示例值，TODO data**：
+     * HSR.md §2 只写"基础倍率由等级与击破特攻决定（查数值表）"，逐元素倍率还没拿到）。
+     */
+    public static final double DOT_RATIO = 0.5;
+
+    /**
+     * 击破 DOT 持续结算次数（**示例值，TODO data**）。
+     */
+    public static final int DOT_TURNS = 3;
+
+    /**
+     * 会附带持续伤害的击破元素：火=灼烧、雷=触电、物理=裂伤、风=风化（GLOSSARY_EXTRA 10000012）。
+     * 冰=冻结、量子=纠缠、虚数=禁锢，属控制类击破效果 → P10-1 统一成表。
+     */
+    public static final Set<DamageElement> DOT_ELEMENTS =
+            EnumSet.of(DamageElement.FIRE, DamageElement.THUNDER, DamageElement.PHYSICAL, DamageElement.WIND);
 
     static {
         RELIC_MAIN_ATTRIBUTES = JSONReader.fromJSON("main_attribute.json", RelicMainAttribute.class);

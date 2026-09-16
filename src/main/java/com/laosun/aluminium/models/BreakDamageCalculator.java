@@ -27,6 +27,21 @@ public final class BreakDamageCalculator {
     }
 
     /**
+     * 该等级的击破基数（已按项目单位 {@code /10}）。
+     *
+     * @param attacker 攻击者（用它的等级）
+     * @return 击破基数（80 级 = 376.75535）
+     * @throws IllegalArgumentException 该等级没有数据（fail fast，别静默算成 0）
+     */
+    public static double breakBaseOf(CanHit attacker) {
+        Double raw = Constant.BREAKING_RATE.get(attacker.getLevel());
+        if (raw == null) {
+            throw new IllegalArgumentException("No breaking rate for level " + attacker.getLevel());
+        }
+        return raw / 10.0;                                   // 数据文件是 10 倍值
+    }
+
+    /**
      * 造一发击破伤害（**不结算**；调用方拿它去 {@link Battle#applyDamage}）。
      *
      * @param attacker     造成击破的人（等级决定击破基数、属性决定击破特攻）
@@ -37,13 +52,8 @@ public final class BreakDamageCalculator {
      * @throws IllegalArgumentException 该等级没有击破基数（数据缺失，fail fast）
      */
     public static Damage build(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
-        Double raw = Constant.BREAKING_RATE.get(attacker.getLevel());
-        if (raw == null) {
-            throw new IllegalArgumentException("No breaking rate for level " + attacker.getLevel());
-        }
-        double breakBase = raw / 10.0;                       // 数据文件是 10 倍值
         double breakingEffect = attacker.getAttribute(AttributeType.BREAKING_EFFECT).get();
         return new Damage(attacker, enemy, element, DamageType.BREAK,
-                breakBase * (1 + breakingEffect) * stanceDamage);
+                breakBaseOf(attacker) * (1 + breakingEffect) * stanceDamage);
     }
 }
