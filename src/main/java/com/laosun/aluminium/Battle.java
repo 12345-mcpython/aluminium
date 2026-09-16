@@ -311,6 +311,7 @@ public class Battle {
             return false;
         }
         enemy.breakEnemy(element);
+        applyDamage(enemy, BreakDamageCalculator.build(attacker, enemy, element, stanceDamage));   // P4-3
         gainBreakEnergy(attacker, enemy);            // P3-3
         return true;
     }

@@ -155,7 +155,7 @@
 |                       | P3-4 技能回能数据化（SPBase 落库，暂缓）        | ☐   |
 | **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ☑   |
 |                       | P4-2 削韧判定                                  | ☑   |
-|                       | P4-3 击破伤害                                  | ☐   |
+|                       | P4-3 击破伤害                                  | ☑   |
 |                       | P4-4 击破状态/推条/跳回合                      | ☐   |
 |                       | P4-5 DOT                                       | ☐   |
 |                       | P4-6 超击破                                    | ☐   |
@@ -1066,36 +1066,33 @@
 
 ---
 
-### P4-3 击破伤害
+### P4-3 击破伤害 ✅
 
 - **目标**：击破瞬间结算：`击破伤害 = 击破基数(等级) × (1+击破特攻) × 技能削韧值 × 防御区 × 抗性区 × 减伤区`。
   **不可暴击、不吃攻击力/增伤**。
   ⚠ **单位必须成套（HSR.md §7.1）**：文档给的是 80 级**基础击破基数 3767**（削韧单位"常规"，普攻=1）、**超击破 376.7**
-  （削韧单位"点"，普攻=10）。本任务用 `breaking_rate.json / 10 = 376.755`，因此**传入的削韧值必须是"点"刻度**
+  （削韧单位"点"，普攻=10）。本任务用 `breaking_rate.json / 10 = 376.75535`，因此**传入的削韧值必须是"点"刻度**
   （例：112.5 = 30 × 2.5 × 1.5）。哪天改用 3767，削韧值要同步 /10，否则差 10 倍；P4-6 与本任务同刻度。
-- **涉及文件**：新建 `models/BreakDamageCalculator.java`、`Battle.java`、新建 `test/BreakDamageTest.java`
+- **涉及文件**：新建 `models/BreakDamageCalculator.java`（**实测改成静态工具类**，与 `EnemyFactory`/`EnemyScaler` 同风格，
+  不是 `new BreakDamageCalculator().build(...)`）、`Constant.java`、`Battle.java`、新建 `test/BreakDamageTest.java`
 - **怎么做**：
-    1. 新建类（ **只需 1 个方法**）：
+    1. `Constant` 加 `public static final Map<Integer, Double> BREAKING_RATE;`（静态块里 `JSONReader` 加载
+       `breaking_rate.json`，key = 等级 1..120）。
+    2. 静态工厂（**只需 1 个方法**）：
        ```java
-       public class BreakDamageCalculator {
-           public Damage build(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
-               double breakBase = Constant.BREAKING_RATE.get(attacker.getLevel()) / 10.0; // 数据文件是 10 倍值
-               double be = attacker.getAttribute(AttributeType.BREAKING_EFFECT).get();
-               // 把 (1+BE) × 削韧值 折进 base；防御/抗性由 Battle.assemble 统一装配，别在这里重复塞
-               Damage d = new Damage(attacker, enemy, element, DamageType.BREAK,
-                       breakBase * (1 + be) * stanceDamage);
-               // 易伤/减伤由 P1-7 的 onDamage 钩子注入；Battle 端 applyDamage 直接结算
-               return d;
-           }
+       public static Damage build(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
+           Double raw = Constant.BREAKING_RATE.get(attacker.getLevel());
+           if (raw == null) throw new IllegalArgumentException("No breaking rate for level " + attacker.getLevel());
+           double breakBase = raw / 10.0;                                    // 数据文件是 10 倍值
+           double be = attacker.getAttribute(AttributeType.BREAKING_EFFECT).get();
+           return new Damage(attacker, enemy, element, DamageType.BREAK,
+                   breakBase * (1 + be) * stanceDamage);                     // 防御/抗性交给 applyDamage 装配
        }
        ```
-    2. `Constant` 加 `public static final Map<Integer, Double> BREAKING_RATE;`（加载 `breaking_rate.json`，key 是 int 等级）
-    3. P4-2 的调用处（`reduceToughness` 里）已写好：`build(...)` → `battle.applyDamage(e, d)` → 推条（P4-4）→
-       `gainBreakEnergy(user, e)`（P3-3），本任务只需把 `build` 写出来
-- **验收**：`BreakDamageTest`（攻击者 Lv80、击破特攻 300%、削韧值 112.5、敌防 1150、无抗性、无减伤）：
-    - `breakBase = 376.75535`；`(1+3.0) × 112.5 = 450`；防御区 `1000/2150`
-    - 期望 `376.75535 × 4.0 × 112.5 × (1000.0/2150.0) ≈ 78855.8`（容差 1.0）
-    - `DamageType.BREAK.isCrittable() == false`（回归）
+    3. P4-2 的击破链里插一行：`applyDamage(enemy, BreakDamageCalculator.build(...))` → 再 `gainBreakEnergy`。
+- **验收**：`BreakDamageTest`（5 条，全绿）：基数 3767.5535/10；3.0 击破特攻 + 112.5 削韧 + 敌防 1150
+  → **78855.8**（容差 1.0）；增伤 +500% 结果不变（同时断言 `BREAK.isCrittable()==false`）；
+  击破特攻 0 时退化成 `376.75535 × 30 × 防御区`；等级缺数据 → `IllegalArgumentException`。
 - **依赖**：P1-3、P4-2
 
 ---
