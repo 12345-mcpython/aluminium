@@ -245,6 +245,7 @@ public class Character extends CanHit {
             skills.putAll(customSkills);
             character.setSkills(skills);
             character.setSkillLevel(skillLevel);
+            character.setLevel(level);
             return character;
         }
 
