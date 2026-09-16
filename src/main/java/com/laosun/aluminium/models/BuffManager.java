@@ -1,5 +1,8 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.models.event.DamageEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +60,18 @@ public class BuffManager {
      */
     public void afterMove() {
         processBuffTick(false);
+    }
+
+    /**
+     * Lets every buff that reacts to damage touch the zones of the hit being settled.
+     * Called by {@link CanHit#onDamage(Battle, Damage)} before {@code Damage.toValue()}.
+     */
+    public void onDamage(Battle battle, Damage damage) {
+        for (AbstractBuff buff : buffs) {
+            if (buff instanceof DamageEvent event) {
+                event.onDamage(battle, damage);
+            }
+        }
     }
 
     private void processBuffTick(boolean early) {

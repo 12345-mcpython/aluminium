@@ -5,6 +5,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.event.BattleEvent;
+import com.laosun.aluminium.models.event.DamageEvent;
 import com.laosun.aluminium.models.event.MoveEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,7 @@ import java.util.EnumMap;
  */
 @Getter
 @ToString
-public abstract class CanHit implements BattleEvent, MoveEvent {
+public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent {
     /**
      * The display name of this entity.
      */
@@ -180,5 +181,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
     @Override
     public void onBattleStart(Battle battle) {
         onBattleStart.run();
+    }
+
+    /**
+     * Damage-settlement hook (P1-7), fired for both sides before the zones are multiplied.
+     *
+     * <p>The default relays to {@link BuffManager#onDamage(Battle, Damage)}, so buffs can
+     * inject 易伤 / 减伤 / 虚弱. Subclasses that override it (character talents, boss
+     * mechanics) <b>must call {@code super.onDamage(battle, damage)}</b>, otherwise their
+     * own buffs stop working.
+     */
+    @Override
+    public void onDamage(Battle battle, Damage damage) {
+        buffManager.onDamage(battle, damage);
     }
 }
