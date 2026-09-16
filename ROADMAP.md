@@ -106,7 +106,7 @@
 |                       | P1-5 Battle 装配（增伤/暴击/防区）+ 旧入口删除 | ☑   |
 |                       | P1-6 抗性区接入                                | ☑   |
 |                       | P1-7 DamageEvent 钩子（易伤/减伤/虚弱）        | ☑   |
-|                       | P1-8 技能执行器（单→多目标分派）               | ☐   |
+|                       | P1-8 技能执行器（单→多目标分派）               | ☑   |
 |                       | P1-9 附加伤害 + 真伤                           | ☐   |
 | **P2 真实怪物数据**   | P2-1 MonsterBean + Constant 加载               | ☐   |
 |                       | P2-2 Enemy 弱点/抗性字段                       | ☐   |
@@ -445,73 +445,40 @@
 
 ---
 
-### P1-8 技能执行器（single → aoe → blast → bounce）
+### P1-8 技能执行器（single → aoe → blast → bounce）✅
 
 - **目标**：伤害技能不再只打第一个目标；按 `SkillEffectType` 自动分派多段/多目标。
-- **涉及文件**：新建 `models/SkillExecutor.java`、`models/DefaultSkill.java`、新建 `test/SkillExecutorTest.java`
-- **怎么做**：
-    1. 新建 `SkillExecutor`，唯一静态入口 + 内部分派（整段可以直接抄进新文件）：
-       ```java
-       public final class SkillExecutor {
-  
-           private SkillExecutor() {
-           }
-  
-           public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets) {
-               SkillData data = skill.getData();
-               SkillEffectType effect = data.getEffect();
-               if (!effect.isDamaging()) {
-                   return;                              // 非伤害段：TODO 后续阶段再分派
-               }
-               if (targets.isEmpty()) {
-                   return;
-               }
-               double attack = user.getAttribute(AttributeType.ATTACK).get();
-               List<Double> params = data.getSkills().get(skill.getLevel() - 1);
-               double multiplier = params.getFirst();   // 简化：倍率取第 1 个参数
-               double base = attack * multiplier;
-               DamageElement element = data.getElement();   // isDamaging 已保证非 null
-               switch (effect) {
-                   case SINGLE_ATTACK, MAZE_ATTACK ->
-                           hit(battle, user, element, base, List.of(targets.getFirst()));
-                   case AOE_ATTACK -> {
-                       for (CanHit t : targets) {
-                           hit(battle, user, element, base, List.of(t));
-                       }
-                   }
-                   case BLAST -> {                      // 主目标 + 相邻（按传入列表顺序取第 2 个）
-                       hit(battle, user, element, base, List.of(targets.getFirst()));
-                       if (targets.size() > 1) {
-                           hit(battle, user, element, base, List.of(targets.get(1)));
-                       }
-                   }
-                   case BOUNCE -> {                     // 段数 = params 第 2 项，如 [0.5, 3]；目标随机
-                       int times = (int) (double) params.get(1);
-                       for (int i = 0; i < times; i++) {
-                           CanHit t = targets.get(battle.getRng().nextInt(targets.size()));
-                           hit(battle, user, element, base, List.of(t));
-                       }
-                   }
-                   default -> {
-                   }
-               }
-           }
-  
-           private static void hit(Battle battle, CanHit user, DamageElement element, double base,
-                                   List<? extends CanHit> targets) {
-               CanHit target = (CanHit) targets.getFirst();
-               battle.applyDamage(target, new Damage(user, target, element, base));
-           }
-       }
-       ```
-    2. `DefaultSkill.execute` 改为一行委托：`SkillExecutor.execute(battle, this, user, target);`
-- **验收**：`SkillExecutorTest`（`Character.fromAttributes` + `DefaultSkill(1001, 1, 1)` 的 SINGLE_ATTACK 直接调 execute）：
-    - 单目标：1 敌，伤害 = 攻击 100 × 倍率 0.5 × 乘区 = 50
-    - AOE：3 敌各受 50（且只扣一次 HP）
-    - BLAST：2 敌 → 主目标 + 第二个都被打
-    - BOUNCE：param `[0.5, 3]` → 3 段，每段 50，目标每次从列表中取
-- **依赖**：P1-5（applyDamage 新签名）→ 其实 P1-5 已把 DefaultSkill 改过再改一次，正常
-- **说明**：AOE 的"全体"目标由调用方传入（Main / AI 决定打谁），SkillExecutor 只负责按 effect 把 targets 摊开。
+- **涉及文件**：新建 `models/SkillExecutor.java`、`models/DefaultSkill.java`（一行委托）、
+  `models/tests/TestSkillGroup1.java`（一行委托）、新建 `test/SkillExecutorTest.java`
+- **落地**：唯一静态入口 `SkillExecutor.execute(battle, skill, user, targets)`。
+    1. **调用方只给"主目标"**（`targets.getFirst()`）——"打几个"是技能属性，不是调用方的选择：
+       | effect | 受击集合 |
+       |---|---|
+       | `SINGLE_ATTACK` / `MAZE_ATTACK` | 主目标 |
+       | `AOE_ATTACK` | `battle.enemies` 里全部存活者 |
+       | `BLAST` | 主目标 + 战场序列（`battle.enemies` 顺序）左右相邻各 1 |
+       | `BOUNCE` | N 段，每段从存活敌人随机（N = `params.get(1)`，缺省 1） |
+       非伤害 effect（HEAL / BUFF / CONTROL / SUMMON / PASSIVE）直接 return，留给 P6/P7/P9 分派。
+    2. **判定顺序很关键**（三条都是真实数据逼出来的）：
+        - **先判 `effect.isDamaging()`，再取 params**：护盾技的 param 第 1 项不是伤害倍率
+          （cid 1001 槽位 2 是 `Defence`，`[0.38, 3, …]` 是护盾系数 / 持续回合）；
+        - **空参数真实存在**（cid 1001 槽位 6 `MazeAttack` 的 `param_list = [[]]`）→ 判空跳过，不能抛；
+        - `isDamaging()` 但 `element == null` → **抛 `IllegalStateException`**：这是数据错误，fail fast
+          好过静默跳过让这一击凭空消失。
+    3. 每段独立走 `battle.applyDamage(...)`：**每段独立判定暴击、独立结算**（全局约定）。
+       伤害类型暂时一律 `NORMAL`（4 参构造器），P8-2 接真实槽位后再按 普攻/战技/终结技 映射。
+- **验收**：`SkillExecutorTest`（10 个用例；攻击者 ATK=100、受击者 DEFENCE=0、无增伤/暴击 ⇒ 一击 = ATK × 倍率）：
+    - 单目标：真实数据 `DefaultSkill(1001, 1, 1)`（倍率 0.5）→ 主目标 50、副目标 0
+    - AOE：真实数据 `DefaultSkill(1001, 3, 1)`（倍率 0.9）→ 3 敌**各** 90
+    - 非伤害技能：`DefaultSkill(1001, 2, 1)`（护盾）→ 0 伤害（0.38 没被当成倍率）
+    - 空参数：`DefaultSkill(1001, 6, 1)` → 0 伤害且不抛
+    - BLAST：主目标取中间 → 3 敌全中；主目标取最左 → 只中左侧两位（证"相邻按站位"而不是"按传参顺序"）
+    - BOUNCE：`params [0.5, 3]` → 3 段共 150；`params [0.5]` → 1 段 50
+    - 主目标已死：AOE 照打存活者，尸体不再受伤
+    - 委托：`TestSkillGroup1.TestSkill1` 与 `DefaultSkill` 行为一致
+- **遗留**：`BLAST` 的"相邻"用 `battle.enemies` 顺序当站位，P7-4 波次 / 召唤物进场后要复核；
+  `aliveEnemies()` 目前只看 `battle.enemies`，敌方召唤物（P9-4）进场后要一起算。
+- **依赖**：P1-5
 
 ---
 
