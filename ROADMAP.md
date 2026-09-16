@@ -148,7 +148,7 @@
 |                       | P2-3 EnemyScaler 等级属性公式                  | ☑   |
 |                       | P2-4 EnemyFactory                              | ☑   |
 | **P3 能量系统**       | P3-0 能量机制调研（数据 + 文档双证）             | ☑   |
-|                       | P3-1 能量字段 + gainEnergy + EnergyProvider     | ☐   |
+|                       | P3-1 能量字段 + gainEnergy + EnergyProvider     | ☑   |
 |                       | P3-2 回能接入 + 大招条件                       | ☐   |
 |                       | P3-3 击破回能联动                              | ☐   |
 |                       | P3-4 技能回能数据化（SPBase 落库）              | ☐   |
@@ -773,20 +773,18 @@
 2. 回能入口只有 `EnergyProvider`：**机制挂在 provider 上，不写在 Battle 里**。
    常规角色用 `StandardEnergyProvider`（普攻 20/战技 30/终结技 5/受击 10/击杀 5/击破 5），
    特殊角色各自实现 provider（P8-3 才落地具体角色，P3 只给接口 + 标准实现 + 测试替身）。
-3. 需要预留的钩子（P3 先留接口，方法体空实现；实现归 P8）：
-   `onBattleStart` / `onWaveStart` / `onTurnStart` / `onSkillCast(user, skill, hitTargets)` /
-   `onUltCast` / `onTakingHit` / `onKill(target)` / `onBreak(target)` / `onAllyAttack(attacker, hitTargets)` /
-   `onSkillPointSpent(n)` / `onHeal(target)` / `onHpLoss(target, amount)` / `onDotTick(source)` /
-   `onSummon` / `onEnergyGain(amount)` / `onChargeConvert` / `modifyEnergyEfficiency()` / `grantEnergyTo(target, amount)`。
+3. 触发源清单（**只是调研结论，不落成接口**）：P3 只落 5 个钩子
+   —— `onSkillCast(user, skill, hitTargets)` / `onUltCast` / `onTakingHit` / `onKill` / `onBreak`；
+   开场 / 波次 / 回合开始 / 队友攻击 / 战技点消耗 / 治疗 / 损血 / DOT 跳伤 / 忆灵召唤 / 回能效率
+   这些来源等真做角色（P8-3）时按 C 表逐个补，别提前铺。
 4. **技能回能取数据 SPBase 而不是写死 20/30/5**（P3-4 补 `skills.json` 的 `sp_base`；
    弹射类还要 `sp_hit_ratio_sum`，见口径 3/4）。写死的常量只做"没有数据时的兜底"。
 5. 结算顺序固定三点：**终结技先清零再回自身 5**（由 provider 决定）；
-   **受击回能不受 `damage.isCountsAsAttack()` 影响**（受击是被动）；**击杀回能记给 `damage.getAttacker()`**；
-   团队充能要能指定目标（`grantEnergyTo`），不能只给自己。
+   **击杀回能记给 `damage.getAttacker()`**；**受击方是 `target`**（受击是被动，不看"是否算攻击"以外的条件）。
 
 ---
 
-### P3-1 能量字段 + gainEnergy
+### P3-1 能量字段 + gainEnergy ✅
 
 - **目标**：`CanHit` 有能量字段与唯一入账口 `gainEnergy`；**回能规则全部由 `EnergyProvider` 提供**，
   常规角色 = `StandardEnergyProvider`，特殊角色各自实现（P8-3 落地），P3 只给接口 + 标准实现 + 测试替身。
@@ -800,28 +798,18 @@
            public static EnergyGain fixed(double amount)  { return new EnergyGain(amount, false); } // 如流萤 60% 上限、按上限百分比回能
        }
        ```
-    2. 新建 `EnergyProvider`（接口，全部 `default` 空实现；P3 只定义签名，P8-3 才填具体角色）：
+    2. 新建 `EnergyProvider`（接口，全部 `default` 空实现；P3 只落这 5 个钩子，够挂 P3-2/P3-3 的调用点；
+       其余触发源（开场/回合/队友攻击/战技点/治疗/DOT/忆灵…）**等真做角色时再加**，别提前铺接口）：
        ```java
        public interface EnergyProvider {
-           default EnergyGain onSkillCast(CanHit user, Skill skill, Set<CanHit> hitTargets) { return null; }
+           default EnergyGain onSkillCast(CanHit user, Skill skill, Set<? extends CanHit> hitTargets) { return null; }
            default EnergyGain onUltCast(CanHit user, Skill skill) { return null; }     // 终结技自身回能（标准=5，清零后结算）
            default EnergyGain onTakingHit(CanHit target, Damage damage) { return null; }
            default EnergyGain onKill(CanHit attacker, CanHit target) { return null; }
            default EnergyGain onBreak(CanHit attacker, CanHit target) { return null; }
-           default EnergyGain onBattleStart(CanHit self, Battle battle) { return null; }
-           default EnergyGain onWaveStart(CanHit self, Battle battle) { return null; }
-           default EnergyGain onTurnStart(CanHit self, Battle battle) { return null; }
-           default EnergyGain onAllyAttack(CanHit self, CanHit attacker, Set<CanHit> hitTargets) { return null; }
-           default EnergyGain onSkillPointSpent(CanHit self, int amount) { return null; }
-           default EnergyGain onHeal(CanHit self, CanHit target, double amount) { return null; }
-           default EnergyGain onHpLoss(CanHit self, CanHit target, double amount) { return null; }
-           default EnergyGain onDotTick(CanHit self, CanHit source) { return null; }
-           default EnergyGain onEnergyGain(CanHit self, double amount) { return null; }
-           default double modifyEnergyEfficiency(CanHit self) { return 0; }           // 加算在 (1+回能率) 里
        }
        ```
-       > 触发源的完整清单见 P3-0 的 C 表；P3 只挂其中 5 个（技能/受击/击杀/击破/终结技），
-       > 其余签名先占位，P8-3 再填实现——**不要提前给角色写 provider**。
+       > 触发源的完整清单留在 P3-0 的 C 表（调研结论），**不落成接口**。
     3. `StandardEnergyProvider implements EnergyProvider`（常规档 + 数据兜底）：
        ```java
        public class StandardEnergyProvider implements EnergyProvider {
@@ -850,7 +838,7 @@
        public double gainEnergy(EnergyGain gain) {
            if (gain == null || gain.amount() <= 0 || !hasEnergyBar()) return 0;
            double efficiency = gain.affectedByEfficiency()
-                   ? 1 + getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get() + energyProvider.modifyEnergyEfficiency(this)
+                   ? 1 + getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get()
                    : 1;
            double added = Math.min(maxEnergy - currentEnergy, gain.amount() * efficiency);
            currentEnergy += added;
@@ -860,6 +848,9 @@
        ```
        > 溢出能量（`overflowEnergy`）暂不实现（P3-0 口径 6 / 千冶·刃 80 点溢出存储），
        > 等 P8 有真实角色再补，不要现在设计。
+       > 拷贝构造里 `maxEnergy` / `energyProvider` 要跟着复制，`currentEnergy` 故意从 0 开始（新战斗实例）。
+    6. **实测踩到的数据坑（已修）**：追加攻击 / 天赋槽位的 `attack_type` 在 `skills.json` 里是 `null`，
+       `switch` 直接炸 NPE → `StandardEnergyProvider` 必须先判空再 switch（P8-2 接真实技能槽时注意同一个坑）。
 - **验收**：`EnergyTest`：
     - 回能率 50%（`setAttribute(ENERGY_REGENERATION_RATE, new DoubleValue(0.5))`）→ `gainEnergy(20) == 30`、
       `currentEnergy == 30`
