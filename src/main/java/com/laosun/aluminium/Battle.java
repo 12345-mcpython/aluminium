@@ -277,6 +277,45 @@ public class Battle {
     }
 
     /**
+     * 削韧 + 击破触发（P4-2）：**战斗内唯一的削韧入口**，{@link SkillExecutor} 每段伤害结算后调用。
+     *
+     * <p>规则（HSR.md §3.2 / §7.1）：
+     * <ul>
+     *   <li><b>只有命中弱点才削韧</b>——非弱点元素一点都不削（"无视弱点削韧"是乱破/姬子·启行这类
+     *       角色特性，等 P8-7 数据化，别在这里开默认口子）</li>
+     *   <li>没有韧性条（数据里确有 {@code stance = 0} 的怪）/ 已击破 / 已死亡 → 不削</li>
+     *   <li>韧性归零 → 由这里触发击破（{@code Enemy.reduceStance} 自己不做判定）</li>
+     * </ul>
+     *
+     * <p>击破链的顺序（后续任务往这里加东西）：击破状态 → 击破伤害（P4-3）→ 推条（P4-4）→
+     * 挂 DOT（P4-5）→ 击破回能（P3-3）。
+     *
+     * @param attacker     攻击者（击破伤害与击破回能都记给他）
+     * @param enemy        挨打的目标
+     * @param element      这一段伤害的元素（决定是否弱点，也是击破元素）
+     * @param stanceDamage 削韧点数（技能 {@code stance_list} 的值，单位「点」）
+     * @return {@code true} = 这一段把韧性打空并触发了击破
+     */
+    public boolean reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
+        if (attacker == null || enemy == null || stanceDamage <= 0) {
+            return false;
+        }
+        if (enemy.isDeath() || enemy.isBroken() || !enemy.hasToughnessBar()) {
+            return false;
+        }
+        if (!enemy.isWeakTo(element)) {
+            return false;
+        }
+        enemy.reduceStance(stanceDamage);
+        if (enemy.getStance() > 0) {
+            return false;
+        }
+        enemy.breakEnemy(element);
+        gainBreakEnergy(attacker, enemy);            // P3-3
+        return true;
+    }
+
+    /**
      * 击破回能（P3-3）：击破瞬间由 P4-4 调这**一个**口子，规则仍归击破者自己的 provider
      * （标准实现给 5；乱破 +10、同谐开拓者 +10、忘归人 +3 这类等真做角色时再各自实现）。
      *
