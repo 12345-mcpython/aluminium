@@ -187,8 +187,13 @@ public class Main {
                     IO.println("Skill release failed. May be controlled or died");
                 }
             } else {
-                IO.println("current enemy: " + current.getCanHit().getName());
-                IO.println("Skip");
+                Enemy enemy = (Enemy) current.getCanHit();
+                if (battle.handleBrokenTurn(enemy)) {      // P4-4：击破中 → 跳过这个回合
+                    IO.println("[BROKEN] " + enemy.getName() + " skips this turn");
+                } else {
+                    IO.println("current enemy: " + enemy.getName());
+                    IO.println("Skip");                    // TODO P5-5：敌人行动
+                }
             }
         } else {
             IO.println("Character can't move or cause error!");
