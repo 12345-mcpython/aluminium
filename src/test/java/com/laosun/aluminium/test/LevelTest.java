@@ -20,14 +20,11 @@ public class LevelTest {
     }
 
     @Test
-    public void factoryDefaultsToEighty() {
-        Assertions.assertEquals(80, Character.fromAttributes("x", 100, 100, 100, 100).getLevel());
-        Assertions.assertEquals(80, Enemy.fromAttributes("e", 100, 100, 100, 100).getLevel());
-    }
-
-    @Test
-    public void levelIsMutable() {
+    public void factoryDefaultsToEightyAndLevelIsMutable() {
         Character character = Character.fromAttributes("x", 100, 100, 100, 100);
+
+        Assertions.assertEquals(80, character.getLevel());
+        Assertions.assertEquals(80, Enemy.fromAttributes("e", 100, 100, 100, 100).getLevel());
 
         character.setLevel(95);
 

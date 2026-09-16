@@ -60,20 +60,15 @@ public class DamagePipelineTest {
     }
 
     @Test
-    public void elementBoostIsApplied() {
+    public void boostZoneWiresElementAndGlobalBoost() {
         Character attacker = attacker();
         attacker.setAttribute(AttributeType.FIRE_DAMAGE_BOOST, new DoubleValue(0.3));
 
         Assertions.assertEquals(1300, settle(attacker, defender(0)), EPS);
-    }
 
-    @Test
-    public void attackTypeBoostStacksIntoTheSameZone() {
-        Character attacker = attacker();
-        attacker.setAttribute(AttributeType.FIRE_DAMAGE_BOOST, new DoubleValue(0.3));
+        // 攻击类型增伤与元素增伤加算进同一个区：1 + 0.3 + 0.2 = 1.5
         attacker.setAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST, new DoubleValue(0.2));
 
-        // 增伤区是加算：1 + 0.3 + 0.2 = 1.5
         Assertions.assertEquals(1500, settle(attacker, defender(0)), EPS);
     }
 
@@ -89,7 +84,7 @@ public class DamagePipelineTest {
     }
 
     @Test
-    public void nonCrittableTypeNeverRolls() {
+    public void nonCrittableTypeSkipsCritZone() {
         Character attacker = attacker();
         attacker.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(1.0));
         attacker.setAttribute(AttributeType.CRIT_ATTACK, new DoubleValue(1.0));
