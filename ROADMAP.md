@@ -37,9 +37,9 @@
 
 | 类                              | 作用                                                             | 你要知道的口子                                                                                             |
 |---------------------------------|------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| `Battle`                        | 战斗循环/行动条/伤害入口                                         | `applyDamage`（**唯一结算入口**：装配+扣血+返回结算值）/ `assemble`（私有装配）/ `getRng` / `processRequests` / `castUltra` / `advanceRequest` |
-| `models.Damage`                 | 伤害对象（attacker/defender/element/type/skillBaseValue + `List<Area>` 乘区） | `toValue()` / `breakdown()` / 7 个乘区 accessor（`boostArea()` …）/ `addBoost` 等装配口 |
-| `models.CanHit`                 | 所有参战实体基类                                                 | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel`（P1-4）/ `onDamage`（P1-7，`DamageEvent` 转发给 BuffManager） |
+| `Battle`                        | 战斗循环/行动条/伤害入口                                         | `applyDamage`（**唯一结算入口**：装配+扣血+返回结算值）/ `assemble`（私有装配）/ `applyAdditionalDamage` / `applyTrueDamage` / `targetableEnemies`（可被选目标的唯一出口）/ `getRng` |
+| `models.Damage`                 | 伤害对象（attacker/defender/element/type/skillBaseValue + `List<Area>` 乘区） | `toValue()` / `breakdown()` / 7 个乘区 accessor / `addBoost` 等装配口 / `crit`·`fixedCrit` / `trueDamage` / `notCountsAsAttack` |
+| `models.CanHit`                 | 所有参战实体基类                                                 | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel`（P1-4）/ `onDamage`（`DamageEvent`）/ `afterAttack`（`AttackEvent`）/ `isInvulnerable` |
 | `models.DoubleValue`            | 属性值（base × (1+Σadd%) × Π(1+mul%) + Σpure）。**P1-3 起被 `Damage.PercentArea`（可累加乘区）复用** | `Modifier.addPercent / multiplyPercent / pure`（带 source/roleId，可按来源撤销）                          |
 | `models.BuffManager`            | Buff 挂载/到期                                                   | `addBuff` / `canAct` / `beforeMove` / `afterMove`                                                          |
 | `models.AbstractBuff`           | Buff 基类                                                        | `applyEffect` / `removeBuff` / `tickEffect` / `duration()`                                                 |
@@ -99,7 +99,7 @@
 
 | 阶段                  | 任务                                           | 状态 |
 |-----------------------|------------------------------------------------|------|
-| **P1 伤害流水线**     | P1-1 DamageType 枚举                           | ☑   |
+| **P1 伤害流水线** ✅  | P1-1 DamageType 枚举                           | ☑   |
 |                       | P1-2 Damage 挂 DamageType                      | ☑   |
 |                       | P1-3 Area 乘区体系 + toValue                   | ☑   |
 |                       | P1-4 CanHit.level                              | ☑   |
@@ -107,7 +107,7 @@
 |                       | P1-6 抗性区接入                                | ☑   |
 |                       | P1-7 DamageEvent 钩子（易伤/减伤/虚弱）        | ☑   |
 |                       | P1-8 技能执行器（单→多目标分派）               | ☑   |
-|                       | P1-9 附加伤害 + 真伤                           | ☐   |
+|                       | P1-9 附加伤害 + 真实伤害                      | ☑   |
 | **P2 真实怪物数据**   | P2-1 MonsterBean + Constant 加载               | ☐   |
 |                       | P2-2 Enemy 弱点/抗性字段                       | ☐   |
 |                       | P2-3 EnemyScaler 等级属性公式                  | ☐   |
@@ -482,30 +482,50 @@
 
 ---
 
-### P1-9 附加伤害 + 真伤
+### P1-9 附加伤害 + 真实伤害 ✅
 
-- **目标**：两套特殊伤害类型：`ADDITIONAL`（附加伤害，引用前段伤害倍率）与 `TRUE`（真伤，跳过乘区）。
-- **涉及文件**：`models/Damage.java`（`notCountsAsAttack` 已有则直接用）、`Battle.java`、新建 `test/ExtraTrueDamageTest.java`
-- **怎么做**：
-    1. `Battle` 加字段 `private double lastHitDamage = 0;`（P1-7 钩子里结算完后更新：`lastHitDamage = <该段结算值>`）
-    2. 追加段构造（示例：缇宝式"对目标追加 24% 结算伤害"）：
+- **目标**：两套特殊伤害类型——`ADDITIONAL`（附加伤害）与 `TRUE`（真实伤害），并给"角色特定效果生成伤害"
+  一个落点（`AttackEvent`）。
+- **涉及文件**：新建 `models/event/AttackEvent.java`、`models/CanHit.java`、`models/BuffManager.java`、
+  `models/SkillExecutor.java`、`models/Damage.java`、`Battle.java`、新建 `test/ExtraTrueDamageTest.java`
+- **两份角色文档定下来的语义**（`E:\code\blog\hsr\1309_知更鸟.md` / `1403_缇宝.md`）：
+    | 来源 | 触发 | base | 元素 | 双暴 |
+    |---|---|---|---|---|
+    | 1309 知更鸟 终结技【协奏】 | 我方**每次施放攻击后**（1 次） | 自身攻击力 × 120% | 固定物理 | **固定 100% / 150%**（星魂6 再 +450%） |
+    | 1403 缇宝 战技结界 | 我方攻击后，**每有 1 名目标受到攻击**（AOE 打 3 → 3 次） | 缇宝生命上限 × 12% | 固定量子 | 面板 |
+    | 1403 缇宝 E1 | 同上 | **本次攻击总伤害值 × 24%** | 量子 | — |
+    官方定义：**「附加伤害：使受击者额外受到 1 次伤害，本次伤害不视为造成了 1 次攻击」**。
+- **落地**：
+    1. **`AttackEvent`（攻击级事件，第四个事件家族成员）**：
        ```java
-       Damage extra = new Damage(attacker, target, element, lastHitDamage * 0.24, DamageType.ADDITIONAL);
-       extra.notCountsAsAttack();   // 不回能、不削韧（P3/P4 判断 countsAsAttack）
-       battle.applyDamage(target, extra);
+       default void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
+                                List<? extends CanHit> hitTargets, double totalDamage) { }
        ```
-    3. 真伤段：
-       ```java
-       Damage trueDmg = new Damage(attacker, target, element, baseValue, DamageType.TRUE);
-       trueDmg.trueDamage().notCountsAsAttack();
-       battle.applyDamage(target, trueDmg);
-       ```
-    4. 真伤的 `toValue()` 已由 P1-3 的 `TRUE_DMG_SKIP_ZONES` 开关控制（跳过防/抗/减伤，保留 base）
-- **验收**：`ExtraTrueDamageTest`：
-    - 主伤害结算 20,000 → `lastHitDamage == 20000` → 追加段 24% → 入账 4,800
-    - `extra.getCountsAsAttack() == false`（`Damage` 加 `@Getter`）
-    - 真伤：敌人防御 10000 / 抗性 0.9 全区填满 → `trueDamage()` 后 `toValue() == baseValue`
-- **依赖**：P1-7（钩子记录 lastHitDamage）、P1-3（trueDamage 开关）
+       - 由 `SkillExecutor` 在一次技能全部段结算完**广播给全体我方**（`battle.characters`）——知更鸟的【协奏】、
+         缇宝的结界挂在他们自己身上，主C 攻击时他们才出手，所以只遍历"攻击者的 buff"是不够的；
+       - `hitTargets` = **实际命中过**的目标（含当场死亡的，用于缇宝的"每有 1 名目标受到攻击"计数）；
+         `mainTarget` = 调用方选的主目标（AOE 时它不是命中顺序里的第一个）；
+       - `totalDamage` = 各段结算值之和（`TODO data (D2)`：溢出是否计入尚未定论）。
+    2. **触发不递归**：附加伤害 / 真伤段走 `Battle.applyDamage`，**不经过 `SkillExecutor`** → 不会再触发
+       `AttackEvent`；这也正对上官方那句"不视为造成了 1 次攻击"。
+    3. **附加伤害走完整乘区**（base 是面板值：攻击力 / 生命上限 × 倍率），入口：
+       `Battle.applyAdditionalDamage(attacker, target, element, base)`，内部 `notCountsAsAttack()`。
+    4. **真伤跳过全部乘区**（base 通常是"本次攻击总伤害 × %"的衍生值），入口：
+       `Battle.applyTrueDamage(attacker, target, element, base)`，内部 `trueDamage().notCountsAsAttack()`。
+    5. **`Damage.fixedCrit(isCrit, critDamage)`**：由效果**指定**本段双暴（知更鸟固定 100%/150%）；
+       `Battle.assemble` 在此标志下**不再按面板骰、也不覆盖**——补上了"面板双暴会覆盖固定值"的缺口。
+    6. **D1 = 主目标**：知更鸟附加伤害的目标取 `mainTarget`，主目标已死则本次不产生伤害（文档没写目标，按
+       忠于"1 次 + 打被攻击的那个"处理；`TODO data`：P8-3 做真实知更鸟时按游戏实测校准）。
+- **验收**：`ExtraTrueDamageTest`（6 个用例；辅助角色 ATK 100 / 生命上限 1000、无增伤与暴击面板）：
+    - 知更鸟式：AOE（每敌 90）→ 附加伤害**只触发 1 次**、只落在**主目标**（120 × 固定暴击 2.5 = 300）
+    - **固定双暴不被面板覆盖**：攻击者面板暴击率 0，附加伤害仍是 300（不是 120）
+    - **不递归**：附加伤害段不再触发 `AttackEvent`（triggerCount 仍是 1）
+    - 缇宝式：AOE 打 3 敌 → 3 次 ×（12% × 1000 = 120），每次都落在"被击目标中当前 HP 最高"者
+    - 缇宝 E1 式：真伤 = 本次攻击总伤害 × 24%，**不被防御 10000 / 抗性 0.9 削减**
+    - 语义差：同样 base 1000，附加伤害吃防御区（×1000/2150），真伤原样 1000
+- **遗留**：`TODO data (D2)` 溢出是否计入 `totalDamage`；`TODO P8-3` 真实角色实现（知更鸟【协奏】/缇宝结界
+  + E1/E2 完整链路）。
+- **依赖**：P1-7（`AttackEvent` 与 `DamageEvent` 同族）、P1-5
 
 ---
 
@@ -1182,6 +1202,8 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
 ### P5-4 TargetSelector
 
 - **目标**：给出选择策略：主策略 = 仇恨加权随机。
+- **⚠ 候选集口径**：必须用 `Battle.targetableEnemies()`（未死目标）——它现在是"能否被选中"的**唯一出口**
+  （`SkillExecutor` 已在用）。别在上层自己 filter，否则上下层口径会分叉，而"选到尸体"正是鞭尸的来源。
 - **涉及文件**：新建 `models/ai/TargetSelector.java`、新建 `test/TargetSelectorTest.java`
 - **怎么做**：
     1. 纯静态，按累计权重选：
@@ -1700,10 +1722,15 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
        ```java
        if (e.getPhase() == 0 && e.getHpRatio() < 0.5) e.setPhase(1);   // 换招 = 技能列表切第二套（condition 里表达）
        ```
-    2. 受击反击：P1-7 的 `DamageListener` 钩子已具备 → 新建 `CounterMechanic`（挂 boss；被非召唤伤害命中 → 追加一段
-       `DamageType.ADDITIONAL`、`notCountsAsAttack()` 反击，倍率走 `Constant.BOSS_COUNTER_RATIO`，TODO 数据校准）
+    2. 受击反击：用 `DamageEvent`（P1-7，注意已从 `DamageListener` 改名）→ 新建 `CounterMechanic`（挂 boss；
+       被非召唤伤害命中 → 追加一段 `DamageType.ADDITIONAL`、`notCountsAsAttack()` 的反击，**反击目标 = 该段的
+       `damage.getAttacker()`，即"施放技能的个体"**，倍率走 `Constant.BOSS_COUNTER_RATIO`，TODO 数据校准）
     3. 控制免疫：`Enemy` 加 `public boolean isImmuneTo(String resistKey)`（查 `debuffResist`）；奥钦 `debuff_resistance`
        `STAT_CTRL: 0.5` → P6-1 的 `hitChance` 传 `"STAT_CTRL"` 自然半减，无需新代码
+    4. ⚠ **阶段推进绝不能用"0 血不死"实现**：`CanHit.takeDamage` 在 HP≤0 时立刻 `death = true`。要演出/锁血，
+       用 `setInvulnerable(true)`（`Battle.applyDamage` 对它返回 0，P1-9 补丁加的语义位），再**显式重置 HP** 进入下一段；
+       否则要么阶段被跳过（Boss 提前退场），要么后续每段继续走完整结算 = **鞭尸**。
+       多血条（`hp_bars`）同样按"打空一段 → invulnerable → 重置 HP → 下一段"实现。
 - **验收**：`BossMechanicTest`：奥钦 HP 降到 50% 以下 → 下个回合用 phase 1 技能；boss 受击后追加反击段且
   `getCountsAsAttack() == false`；冰锋（`STAT_CTRL_Frozen=1`）对冻结免疫
 - **依赖**：P9-2、P1-7、P6-1
