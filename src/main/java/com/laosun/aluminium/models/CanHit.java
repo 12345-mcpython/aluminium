@@ -54,6 +54,17 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent {
      */
     private boolean death = false;
 
+    /**
+     * Temporarily cannot take damage: boss phase transition / invulnerability window
+     * (转阶段无敌、锁血演出).
+     *
+     * <p>Orthogonal to {@link #death}: an invulnerable target is still a legal target
+     * (an AOE still "hits" it, for 0 damage) but {@code Battle.applyDamage} settles
+     * nothing on it — this is what keeps a transitioning boss from being 鞭尸.
+     */
+    @Setter
+    private boolean invulnerable = false;
+
     private final BuffManager buffManager;
 
     // test event behavior

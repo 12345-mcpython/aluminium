@@ -5,7 +5,6 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillEffectType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,13 +75,13 @@ public final class SkillExecutor {
             case SINGLE_ATTACK, MAZE_ATTACK -> hit(battle, user, element, base, mainTarget);
 
             case AOE_ATTACK -> {
-                for (CanHit target : aliveEnemies(battle)) {
+                for (Enemy target : battle.targetableEnemies()) {
                     hit(battle, user, element, base, target);
                 }
             }
 
             case BLAST -> {
-                List<CanHit> alive = aliveEnemies(battle);
+                List<Enemy> alive = battle.targetableEnemies();
                 int center = alive.indexOf(mainTarget);      // 站位顺序 = battle.enemies 顺序
                 if (center < 0) {
                     hit(battle, user, element, base, mainTarget);   // 主目标已死 → hit 内部会跳过
@@ -98,12 +97,13 @@ public final class SkillExecutor {
             }
 
             case BOUNCE -> {
-                List<CanHit> alive = aliveEnemies(battle);
-                if (alive.isEmpty()) {
-                    return;
-                }
                 int hits = params.size() > 1 ? (int) (double) params.get(1) : 1;   // 段数缺省 1
                 for (int i = 0; i < hits; i++) {
+                    // 每段重新取存活目标：中途击杀就换人，而不是把段数空放给尸体
+                    List<Enemy> alive = battle.targetableEnemies();
+                    if (alive.isEmpty()) {
+                        return;                                     // 全死 → 剩余段数作废
+                    }
                     hit(battle, user, element, base, alive.get(battle.getRng().nextInt(alive.size())));
                 }
             }
@@ -111,19 +111,6 @@ public final class SkillExecutor {
             default -> {
             }
         }
-    }
-
-    /**
-     * Alive enemies on the field, in battlefield order (P7-4 波次做了再换）。
-     */
-    private static List<CanHit> aliveEnemies(Battle battle) {
-        List<CanHit> alive = new ArrayList<>();
-        for (Enemy enemy : battle.enemies) {
-            if (!enemy.isDeath()) {
-                alive.add(enemy);
-            }
-        }
-        return alive;
     }
 
     private static void hit(Battle battle, CanHit user, DamageElement element, double base, CanHit target) {

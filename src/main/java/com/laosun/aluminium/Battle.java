@@ -214,12 +214,31 @@ public class Battle {
      * @return the settled damage, or {@code 0} if the target was already dead
      */
     public double applyDamage(CanHit target, Damage damage) {
-        if (target.isDeath()) {
-            return 0;
+        if (target.isDeath() || target.isInvulnerable()) {
+            return 0;                  // 尸体 / 转阶段无敌：不结算（也就不会鞭尸）
         }
         double settled = assemble(damage);
         target.takeDamage(settled);
         return settled;
+    }
+
+    /**
+     * Enemies that may be selected as attack targets (= alive), in battlefield order.
+     *
+     * <p>Single source of truth for "who can be hit": {@link SkillExecutor} uses it today,
+     * the target selector (P5-4) and wave handling (P7-4) must use the same judgement so
+     * that no caller ever picks a corpse (那才是鞭尸的来源).
+     *
+     * @return a fresh list of alive enemies
+     */
+    public List<Enemy> targetableEnemies() {
+        List<Enemy> targets = new ArrayList<>();
+        for (Enemy enemy : enemies) {
+            if (!enemy.isDeath()) {
+                targets.add(enemy);
+            }
+        }
+        return targets;
     }
 
     /**
