@@ -38,16 +38,16 @@
 | 类                              | 作用                                                             | 你要知道的口子                                                                                             |
 |---------------------------------|------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | `Battle`                        | 战斗循环/行动条/伤害入口                                         | `calculateDamage` / `applyDamage` / `processRequests` / `castUltra` / `advanceRequest` / `addRequestItems` |
-| `models.Damage`                 | 伤害对象（已有 attacker/defender/element/skillBaseValue 4 字段） | P1-2 起扩展                                                                                                |
+| `models.Damage`                 | 伤害对象（attacker/defender/element/type/skillBaseValue + `List<Area>` 乘区） | `toValue()` / `breakdown()` / 7 个乘区 accessor（`boostArea()` …）/ `addBoost` 等装配口 |
 | `models.CanHit`                 | 所有参战实体基类                                                 | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / 无 level（P1-4 加）                            |
-| `models.DoubleValue`            | 属性值（base × (1+Σadd%) × Π(1+mul%) + Σpure）                   | `Modifier.addPercent / multiplyPercent / pure`                                                             |
+| `models.DoubleValue`            | 属性值（base × (1+Σadd%) × Π(1+mul%) + Σpure）。**P1-3 起被 `Damage.PercentArea`（可累加乘区）复用** | `Modifier.addPercent / multiplyPercent / pure`（带 source/roleId，可按来源撤销）                          |
 | `models.BuffManager`            | Buff 挂载/到期                                                   | `addBuff` / `canAct` / `beforeMove` / `afterMove`                                                          |
 | `models.AbstractBuff`           | Buff 基类                                                        | `applyEffect` / `removeBuff` / `tickEffect` / `duration()`                                                 |
-| `models.Skill` / `DefaultSkill` | 技能抽象 + 默认实现（打 target.getFirst()）                      | P1-8 改造                                                                                                  |
+| `models.Skill` / `DefaultSkill` | 技能抽象 + 默认实现（打 target.getFirst()；**skillId 写死 1**）   | P1-8 改造；P8-2 接真实槽位映射                                                                              |
 | `models.SkillData`              | 技能运行时数据                                                   | `getElement()` / `getEffect()` / `getStanceList()` / `getSkills()`（倍率表）                               |
 | `Queue`                         | 行动条（10000/speed，heap）                                      | `move` / `setTopZero` / `delayAction` / `advanceActionByPercent` / `addCombatant`                          |
 | `Constant`                      | 数据加载总入口                                                   | `CHARACTERS` / `WEAPONS` / `SKILLS` / `SKILL_POINTS`                                                       |
-| `models.Character`              | 角色（builder 已含 level 但没存下来）                            | P1-4 补 `getLevel()`                                                                                       |
+| `models.Character`              | 角色。**Builder 面板管线已全**（level 缩放/光锥/遗器/行迹），缺 element/path/aggro 字段 | P1-4 补 `getLevel()`；P8-1 补 element/path/aggro + `CharacterFactory`                                     |
 | `models.Enemy`                  | 敌人（无弱点/韧性/抗性）                                         | P1-6 / P2-2 / P4-1 扩展                                                                                    |
 | `enums.SkillEffectType`         | 11 值 + Category                                                 | `isDamaging()` 判断是否走伤害流水线                                                                        |
 
@@ -59,21 +59,49 @@
 | `monster_template_config.json` | 模板基础属性：`template_id → {attack, defence, health, speed, stance, stance_count, stance_type, effect_resistance}`                                                                                              | **1002011**：attack=18, defence=210, health=69.75, speed=100, stance=60, stance_count=1, stance_type=Ice, effect_resistance=0.2                           |
 | `hard_level_group.json`        | `{组: {等级: {attack, defence, health, speed, stance, effect_hit_rate, effect_resistance}}}`                                                                                                                      | 组1 Lv90: `{36.821384, 5.238095, 236.53471, 1.32, 1, 0.32, 0.1}`                                                                                          |
 | `breaking_rate.json`           | `等级 → 击破基数（原始 10 倍值）`                                                                                                                                                                                 | Lv80 = **3767.5535 → 公式里 /10 = 376.75535**                                                                                                             |
-| `skills.json`                  | `cid → {槽位 → {attack_type, max_level, param_list, skill_effect, stance_list{single,all,spread}, element}}`                                                                                                      | 槽位 1=普攻 2=战技 3=终结技（敌人技能不在此文件，见 P5-3）                                                                                                |
+| `skills.json`                  | `cid → {槽位 → {attack_type, max_level, param_list, skill_effect, stance_list{single,all,spread}, element}}`                                                                                                      | 槽位 1=普攻 2=战技 3=终结技 4=天赋 6=迷宫攻击 7=秘技；**敌人技能不在本文件 → P9-1 自建**                                                        |
+| `character_data.json`          | 角色基础：`cid → {name, attribute(元素小写), mt(命途), max_energy, aggro, attack/defence/health/speed, crit_*}`                                                                                                 | 景元 1204：thunder / mt=all / energy=130 / aggro=75 / hp158.4 / atk95.04 / def66 / speed99                                                      |
+| `character_id_mappings.json`   | `cid → {chinese, english}` 名字对照（character_data 已含 name，此文件仅生成脚本/校验用）                                                                                                                          | 1204 → 景元 / Jing Yuan                                                                                                                         |
+| `enemy_skills.json`            | **P9-1 自建**：`template_id → [{name, attack_type, effect, element, multiplier, stance, hits, ai_weight, condition}]`                                                                                            | 数据源缺失（turnbasedgamedata 未下发怪物技能表）；自建最小表，找到源数据后只换 `Constant` 加载                                                                             |
 | `stage.json`                   | `stage_id → {type, hard_level_group, level, monster:[{Monster0:id,...}(一波)]}`                                                                                                                                   | `103201`：level 29，monster = 1022020/1023010/1022020                                                                                                     |
+
+### 0.5 机制文档（公式以此为准）
+
+| 文档 | 内容 | 用法 |
+|---|---|---|
+| `E:\code\blog\hsr\HSR.md` | 乘区总览（§2）、行动/破韧/仇恨（§3）、治疗护盾（§4）、忆灵（§5）、欢愉（§6）、超击破（§7） | **公式有疑义时以它为准**；本文档里所有乘区公式都已按它核对过 |
+| `E:\code\blog\hsr\GLOSSARY.md` / `GLOSSARY_EXTRA.md` | 游戏名词表（含官方描述原文） | 查"某词到底什么意思"、判断某个效果属于哪个乘区 |
+
+已核对结论（P1-3 落地时逐条对过）：
+
+- §2.2 伤害修饰区 = 增伤 `1+Σ` × 易伤 `1+Σ`（cap **3.5**）× 减伤 `Π(1-r)`（floor **0.01**）× 虚弱 `1-Σ`（floor **0.2**）—— 与 `Damage` 的四个区一致。
+- §2.5 抗性区 = `1 - 抗性`，抗性范围 `-100% ~ 90%` ⇒ 抗性区 `0.1 ~ 2.0`；**负抗是全效**（不是半效）。
+- §2.4 防御区 `(200+10L)/(def+200+10L)`，其中 `def = 原始防御 × (1 - 减防% - 防御穿透%)`（**减防与穿透加算**），上限 1、不为负。
+- §6.4/§6.5 欢愉伤害：**吃双爆区、不吃增伤区**（"不受伤害提高类效果所影响"）⇒ `DamageType.ELATION(isCrittable=true, isBoostable=false)`。
+- §7.2 超击破：不吃攻击力/常规增伤/双暴，吃等级、击破特攻、削韧值、超击破独立增伤、易伤、防御、抗性、减伤。
+- §7.1 单位：80 级**基础击破基数 3767**（削韧单位 1）vs **超击破 376.7**（削韧单位 10）——两套刻度不可混用。
+- §2.2 增伤区/易伤区各自都是「**伤害类型** + **攻击类型**」加算进同一个区：所以 P7/P8 的"战技/终结技/追加攻击增伤"
+  也往 `BoostArea` 灌（Buff 侧按 skill_type 过滤），不是新开一个区。
+- §4 治疗/护盾（P6-2 用）：`治疗 = 基础 × (1 + Σ治疗加成) × (1 - Σ治疗降低)`；`护盾 = 基础 × (1 + Σ护盾量提高)`。
 
 ---
 
 ## 1. 进度总览
 
-**主线顺序**：`P1 → P2 → P4(能量) → P3(韧性击破) → P5(仇恨+AI) → P6(命中/治疗/护盾) → P7(轮次/胜负/关卡) → P8(收尾)`。 P4
+**主线顺序**：`P1 → P2 → P3(能量) → P4(韧性击破) → P5(仇恨+AI) → P6(命中/治疗/护盾) → P7(轮次/胜负/关卡) → P8(角色数据化) → P9(怪物全机制) → P10(机制补完) → P11(收尾)`。 P3
 零依赖可随时插入；P5-1/P5-2 需在 P5-3 前。
+
+**"角色和怪物什么时候进来"一句话版**：
+
+- **角色**：P1–P7 一律 `Character.fromAttributes` 占位 → **P8 起全部换真实角色**（`CharacterFactory`：面板/元素/命途/能量/真实技能/战技点）。天赋与追加攻击 P8-3，SP P8-4。
+- **怪物**：**P2 进真实面板数据**（属性/弱点/抗性/等级换算）→ **P5 进"会普攻打人"**（仇恨选目标 + 敌人回合）→ **P9 进全机制**（真实技能表、技能选择 AI、召唤、精英/Boss 换招/反击/控制免疫）。
+- **全机制补完**：七系击破异常、控制状态机、通用 Buff 与刷新规则、速度操纵、终结技插入、Debuff 数据化 → 集中在 **P10**，全部是"把已开口子填满"，无新架构。
 
 | 阶段                  | 任务                                           | 状态 |
 |-----------------------|------------------------------------------------|------|
-| **P1 伤害流水线**     | P1-1 DamageType 枚举                           | ☐   |
-|                       | P1-2 Damage 挂 damageType                      | ☐   |
-|                       | P1-3 乘区累加器 + toValue                      | ☐   |
+| **P1 伤害流水线**     | P1-1 DamageType 枚举                           | ☑   |
+|                       | P1-2 Damage 挂 DamageType                      | ☑   |
+|                       | P1-3 Area 乘区体系 + toValue                   | ☑   |
 |                       | P1-4 CanHit.level                              | ☐   |
 |                       | P1-5 Battle 装配（增伤/暴击/防区）+ 旧入口删除 | ☐   |
 |                       | P1-6 抗性区接入                                | ☐   |
@@ -106,9 +134,25 @@
 |                       | P7-3 胜负状态机                                | ☐   |
 |                       | P7-4 StageBean + 波次                          | ☐   |
 |                       | P7-5 StageFactory + 难度                       | ☐   |
-| **P8 收尾**           | P8-1 Main 修复 + demo 包拆分                   | ☐   |
-|                       | P8-2 真实内容演示（冰锋战）                    | ☐   |
-|                       | P8-3 测试总盘点 + 基准 + 零警告                | ☐   |
+| **P8 角色数据化**     | P8-1 CharacterFactory + 角色字段补全           | ☐   |
+|                       | P8-2 技能装配（真实槽位 → 真实倍率）           | ☐   |
+|                       | P8-3 天赋 + 追加攻击                           | ☐   |
+|                       | P8-4 战技点（SP）                              | ☐   |
+|                       | P8-5 真实队伍装配（StageFactory 换真角色）     | ☐   |
+| **P9 怪物全机制**     | P9-1 敌人技能数据（enemy_skills.json 自建）    | ☐   |
+|                       | P9-2 EnemySkill 全效果                         | ☐   |
+|                       | P9-3 敌方 AI 技能选择器                        | ☐   |
+|                       | P9-4 召唤物（summon_id）                       | ☐   |
+|                       | P9-5 Boss 机制（换招/反击/免疫）               | ☐   |
+| **P10 机制补完**      | P10-1 七系击破异常全量                         | ☐   |
+|                       | P10-2 控制异常状态机                           | ☐   |
+|                       | P10-3 Buff 体系完善（属性 + 刷新规则）         | ☐   |
+|                       | P10-4 速度与行动条操纵                         | ☐   |
+|                       | P10-5 终结技插入                               | ☐   |
+|                       | P10-6 Debuff 基础概率数据化                    | ☐   |
+| **P11 收尾**          | P11-1 Main 修复 + demo 包拆分                  | ☐   |
+|                       | P11-2 真实内容演示（冰锋战）                   | ☐   |
+|                       | P11-3 测试总盘点 + 基准 + 零警告               | ☐   |
 
 ---
 
@@ -121,133 +165,103 @@
 
 ---
 
-### P1-1 DamageType 枚举
+### P1-1 DamageType 枚举 ✅
 
-- **目标**：区分伤害类型（普攻/战技/大招/击破/持续/真伤…），知道哪些类型不可暴击。
-- **涉及文件**：新建 `src/main/java/com/laosun/aluminium/enums/DamageType.java`、新建 `test/DamageTypeTest.java`
-- **怎么做**：
-    1. 枚举 12 值：`NORMAL, SKILL, ULTRA, ADDITIONAL, BREAK, SUPER_BREAK, DOT, EXTRA, TECHNIQUE, MEMORY, ELATION, TRUE`
-    2. 加 `boolean isCrittable()`，规则：
+- **目标**：区分伤害类型（普攻/战技/大招/击破/持续/真伤…），并把「不可暴击」「不吃增伤」两条规则变成类型自带的数据。
+- **涉及文件**：`src/main/java/com/laosun/aluminium/enums/DamageType.java`、`test/DamageTypeTest.java`
+- **落地**：
+    1. 12 值：`NORMAL, SKILL, ULTRA, ADDITIONAL, BREAK, SUPER_BREAK, DOT, EXTRA, TECHNIQUE, MEMORY, ELATION, TRUE`
+    2. `boolean isCrittable()`：
         - 可暴击：`NORMAL / SKILL / ULTRA / ADDITIONAL / EXTRA / TECHNIQUE / MEMORY / ELATION`
-        - **不可暴击**：`BREAK / SUPER_BREAK / DOT / TRUE`（HSR：击破、超击破、持续伤害、真实伤害不吃双暴）
-    3. 加 `static DamageType fromString(String)`，按 `name()` 大小写不敏感查找，未知抛 `IllegalArgumentException`
-- **验收**：`DamageTypeTest`：
-    - `values().length == 12`
-    - `!DamageType.BREAK.isCrittable()`、`!DamageType.SUPER_BREAK.isCrittable()`、`!DamageType.DOT.isCrittable()`、
-      `!DamageType.TRUE.isCrittable()`
-    - `DamageType.fromString("break") == DamageType.BREAK`
+          （欢愉伤害吃双爆：HSR.md §6.4 的欢愉伤害公式里有双爆区）
+        - **不可暴击**：`BREAK / SUPER_BREAK / DOT / TRUE`（击破、超击破、持续伤害、真实伤害不吃双暴）
+    3. `boolean isBoostable()`：**击破 / 超击破 / 真伤 / 欢愉不吃增伤**，其余（含 DOT）都吃——P1-3 的
+       `BoostArea.applies()` 直接消费这个标志，所以不再靠"记得别调 addBoost"。
+       （欢愉依据：HSR.md §6.5 + GLOSSARY「欢愉伤害不受伤害提高类效果所影响」）
+    4. `static DamageType fromString(String)`：按枚举上的 `name` 字符串**大小写不敏感**查找（key 就是 `MP` 表里的
+       `normal / skill / super_break / …`），未知抛 `IllegalArgumentException`。
+- **验收**：`DamageTypeTest`（5 个用例：12 值、crit 规则、boost 规则、大小写不敏感、未知抛异常）。
 - **依赖**：无（纯新增）
 
 ---
 
-### P1-2 Damage 挂 damageType
+### P1-2 Damage 挂 DamageType ✅
 
 - **目标**：`Damage` 增加伤害类型字段，旧构造器保持兼容。
-- **涉及文件**：`models/Damage.java`、新建 `test/DamageSkeletonTest.java`
-- **怎么做**：
-    1. `Damage` 加字段 `private final DamageType damageType;`
-    2. 新构造器
-       `Damage(CanHit attacker, CanHit defender, DamageElement element, double skillBaseValue, DamageType damageType)`
-    3. 旧 4 参构造器委托：`this(attacker, defender, element, skillBaseValue, DamageType.NORMAL)`
-    4. `element` 保持 `@NonNull`（Lombok 会生成空检查 + `Objects.requireNonNull` 已有）
-- **验收**：`DamageSkeletonTest`：
-    - `new Damage(a, d, DamageElement.FIRE, 1000)` 的 `getDamageType() == DamageType.NORMAL`
-    - `new Damage(a, d, null, 1000, DamageType.BREAK)` 抛 `NullPointerException`
-    - `DamageType.BREAK.isCrittable()` 为 false（防回归）
+- **涉及文件**：`models/Damage.java`、`test/DamageZoneTest.java`（骨架断言并入乘区测试，不再单开文件）
+- **落地**：
+    1. 字段 `private final DamageType type;`（getter 由类级 `@Getter` 生成 → `getType()`）
+    2. 新构造器 `Damage(CanHit attacker, CanHit defender, DamageElement element, DamageType type, double skillBaseValue)`
+    3. 旧 4 参构造器委托：`this(attacker, defender, element, DamageType.NORMAL, skillBaseValue)`
+    4. `element` / `type` 都自己写 `Objects.requireNonNull`——**注意**：字段上的 Lombok `@NonNull` 只对"它自己生成的
+       构造器/setter"插检查，对手写构造器**不生效**（旧文档那句"Lombok 会生成空检查"是错的，已修正）
+- **验收**：`DamageZoneTest` 的 `legacyConstructorDefaultsToNormalType`、`nullElementOrTypeIsRejected`。
 - **依赖**：P1-1
 
 ---
 
-### P1-3 乘区累加器 + toValue（纯代数，不碰 Battle）
+### P1-3 乘区体系：Area 继承 + ArrayList 统一清算（纯代数，不碰 Battle）✅
 
-- **目标**：`Damage` 能自己算最终值。 **这是全引擎最核心的一个任务，公式抄下面，别自由发挥。**
-- **涉及文件**：`models/Damage.java`、`Constant.java`（加 clamp 常量）、新建 `test/DamageZoneTest.java`
-- **怎么做**：
-    1. `Constant` 加常量块：
-       ```java
-       public static final double VULNERABLE_CAP    = 3.5;   // 易伤区上限
-       public static final double REDUCTION_MIN     = 0.01;  // 减伤区整体下限
-       public static final double WEAKNESS_MIN      = 0.2;   // 虚弱区下限
-       public static final double RESIST_MIN        = -1.0;  // 抗性下限(-100%)
-       public static final double RESIST_MAX        = 0.9;   // 抗性上限(90%)
-       public static final boolean TRUE_DMG_SKIP_ZONES = true; // 真伤跳过乘区开关
-       ```
-    2. `Damage` 加私有累加器 + 公开设置方法（全部返回 `this` 以便链式）：
-       ```java
-       private final List<Double> boosts          = new ArrayList<>();   // 增伤（加算）
-       private final List<Double> vulnerabilities = new ArrayList<>();   // 易伤（加算, cap 3.5）
-       private final List<Double> reductions      = new ArrayList<>();   // 减伤（乘算Π）
-       private final List<Double> weaknesses      = new ArrayList<>();   // 虚弱（加算, min 0.2）
-       private boolean crit;
-       private double critDmg;
-       private int attackerLevel = 80;
-       private double defenderDef;
-       private double defIgnore;
-       private double resist;
-       private double penetration;
-       private boolean trueDamage;
-       private boolean countsAsAttack = true;   // P1-9/P3/P4 用：附加/真伤段 = false（类级 @Getter 生成 isCountsAsAttack()）
-  
-       private static double sum(List<Double> list) {
-           double s = 0;
-           for (double d : list) s += d;
-           return s;
-       }
-  
-       public Damage addBoost(double pct)      { boosts.add(pct); return this; }
-       public Damage addVulnerable(double pct) { vulnerabilities.add(pct); return this; }
-       public Damage addReduction(double pct)  { reductions.add(pct); return this; }
-       public Damage addWeakness(double pct)   { weaknesses.add(pct); return this; }
-       public Damage crit(boolean isCrit, double criticalDamage) {
-           this.crit = isCrit;
-           this.critDmg = criticalDamage;
-           return this;
-       }
-       public Damage defence(int level, double def, double ignore) {   // ignore clamp [0,1]
-           this.attackerLevel = level;
-           this.defenderDef = def;
-           this.defIgnore = Math.max(0, Math.min(1, ignore));
-           return this;
-       }
-       public Damage resist(double raw, double pen) {   // 抗性 = clamp(raw - pen, RESIST_MIN, RESIST_MAX)
-           this.resist = raw;
-           this.penetration = pen;
-           return this;
-       }
-       public Damage trueDamage()        { this.trueDamage = true; return this; }
-       public Damage notCountsAsAttack() { this.countsAsAttack = false; return this; }
-       ```
-    3. `toValue()` 按 HSR 顺序连乘：
-       ```java
-       public double toValue() {
-           if (trueDamage && Constant.TRUE_DMG_SKIP_ZONES) return skillBaseValue;
-           double v = skillBaseValue;
-           v *= 1 + sum(boosts);                                    // 1. 增伤
-           v *= Math.min(1 + sum(vulnerabilities), Constant.VULNERABLE_CAP); // 2. 易伤 (cap)
-           double red = 1; for (double r : reductions) red *= Math.max(0, Math.min(1, r));
-           v *= Math.max(red, Constant.REDUCTION_MIN);              // 3. 减伤 (min)
-           v *= Math.max(1 - sum(weaknesses), Constant.WEAKNESS_MIN); // 4. 虚弱 (min)
-           v *= crit ? 1 + critDmg : 1;                             // 5. 暴击
-           double defEff = Math.max(0, defenderDef * (1 - defIgnore));
-           v *= (200 + 10.0 * attackerLevel) / (defEff + 200 + 10.0 * attackerLevel); // 6. 防御
-           double res = Math.max(Constant.RESIST_MIN, Math.min(Constant.RESIST_MAX, resist - penetration));
-           v *= 1 - res;                                            // 7. 抗性
-           return v;
-       }
-       ```
-    4. clamp 常量一律用 `Constant.*`， **不要**在公式里写数字。
-- **验收**：`DamageZoneTest`（base 一律 1000，逐区断言，每区单独一个用例）：
-    - 增伤：`addBoost(0.3).addBoost(0.2)` → 1500
-    - 易伤上限：`addVulnerable(2.0).addVulnerable(2.0)` → 3500（第 2 个被 cap：1+4=5 → 3.5）
-    - 减伤下限：`addReduction(0.9).addReduction(0.9).addReduction(0.9)` → 10（0.1³=0.001 → clamp 0.01）
-    - 虚弱下限：`addWeakness(0.9).addWeakness(0.3)` → 200（1-1.2 → 0.2）
-    - 暴击：`crit(true, 1.0)` → 2000；`crit(false, …)` → 1000
-    - 防御区：`defence(80, 1150, 0)` → 1000 × (1000/2150) ≈ 465.116（精确断言
-      `assertEquals(1000.0 * 1000.0 / 2150.0, v, 1e-6)`）
-    - 防御穿透：`defence(80, 1150, 0.5)` → 1000 × (1000/ (575+1000)) ≈ 635.0
-    - 抗性区：`resist(0.2, 0.4)` → 1200（0.2-0.4 = -0.2）
-    - 抗性 clamp：`resist(1.2, 0)` → 100（1.2 → 0.9）
-    - 真伤跳过：填满所有区 + `trueDamage()` → 1000（原样）
+- **目标**：`Damage` 能自己算最终值。**每个乘区是一个 `Area` 子类：吃自己需要的参数，吐一个倍率；
+  `Damage` 把它们装进 `List<Area>`，`toValue()` 里统一连乘。**
+- **涉及文件**：`models/Damage.java`、`Constant.java`（乘区常量块）、`enums/DamageType.java`（`isBoostable`）、
+  `test/DamageZoneTest.java`
+- **代码即规范**：本任务已落地，实现见 `models/Damage.java`；下面只留设计与不变量，不再复制整段代码。
+- **结构**：
+    ```
+    Damage
+     ├─ double skillBaseValue                         ← 基础值，不进任何乘区
+     ├─ List<Area> damageArea = new ArrayList<>()      ← 统一容器，只装被用到过的区（没用过的区 = 1.0）
+     └─ toValue():  for (Area a : damageArea) if (a.applies(type)) v *= a.getRate();
+
+    Area (abstract) ·············· double getRate()   ← 唯一出口，final：rate() 经 min()/max() 钳制后输出倍率
+     │                              double rate()      ← 子类实现：原始（未钳制）倍率
+     │                              boolean applies(DamageType)
+     ├─ PercentArea (abstract) ···· 内部 base 1.0 的 DoubleValue；addPercent / multiplyPercent / raw / removeModifiersFrom
+     │   ├─ BoostArea       add(pct)           → 1 + Σ增伤                applies: type.isBoostable()
+     │   ├─ VulnerableArea  add(pct)           → min(1 + Σ易伤, 3.5)
+     │   ├─ ReductionArea   add(r) r∈[0,1]      → max(Π(1-r), 0.01)
+     │   └─ WeaknessArea    add(w)             → max(1 - Σw, 0.2)
+     ├─ CritArea      set(crit, critDmg)       → crit ? 1+暴伤 : 1       applies: type.isCrittable()
+     ├─ DefenceArea   set(level, def, ignore)  → (200+10L) / (defEff + 200+10L)
+     └─ ResistArea    set(resist, pen)         → 1 - clamp(resist - pen)
+    ```
+- **四条不变量**（破了就是 bug，不是风格问题）：
+    1. **基础值不进乘区**：`skillBaseValue` 只是连乘的起点，永远不塞进 `DoubleValue`。
+    2. **随机数不进乘区**：暴击骰子在 `Battle`（用注入的 `Random`），`CritArea` 只记「暴没暴、暴伤多少」——测试因此
+       不需要给 `Damage` 播种，P5-3 / P9-3 的 AI 选招也能改切"期望暴击"。
+    3. **钳制不可绕过，且边界必须写在"拥有它"的那个区里**：`getRate()` 是 `final`，用
+       `Math.clamp(rate(), min(), max())` 施加（JDK 21+；`min > max` 会 fail fast）。**基类默认 `min() = -∞`、
+       `max() = +∞`（不设策略）**；官方边界一律由区自己声明：易伤 cap 3.5、减伤 floor 0.01、虚弱 floor 0.2（§2.2）、
+       抗性 `1 - clamp(res)` ∈ [0.1, 2.0]（§2.5）、暴击 ≥ 1。`PercentArea` 另加一条 **sanity** 下限 0（"系数非负"，
+       游戏里不存在负增伤/负易伤，0 只为防"负系数把伤害翻符号"）——注释里已标明**它不是游戏规则**，别当成官方下限。
+    4. **"这段不吃那个区"必须是声明的**：由 `Area.applies(DamageType)` 决定（击破/超击破/真伤不吃增伤走
+       `isBoostable()`；DOT/击破/真伤不吃双暴走 `isCrittable()`），不靠调用方自律。
+- **容器约定**：一个区最多一个实例（`boostArea()` 等 7 个懒创建口，未用过就不进 List）；区间是纯连乘、可交换，
+  遍历顺序不影响结果；`getDamageArea()` 返回只读快照（测试/日志用，战斗循环内部直接走字段）。
+- **附带产出**：`breakdown()` 逐区输出倍率（`base → 各区 → final`），给日志/前端做公式分解；
+  `PercentArea.removeModifiersFrom(source, roleId)` 支持按来源撤销（P10-3 用）。
+- **验收**：`DamageZoneTest`（23 个用例，base 一律 1000）：
+    - 空区 → 1000（`getDamageArea().isEmpty()`）
+    - 增伤加算：`addBoost(0.3).addBoost(0.2)` → 1500
+    - 易伤 cap：`addVulnerable(2.0)×2` → 3500（`raw().get() == 5.0`，`getRate() == 3.5`）
+    - 减伤：`addReduction(0.9)³` → 10（0.001 → floor 0.01）；入参 clamp：`addReduction(1.5).addReduction(-0.5)` → 10
+    - 虚弱：`addWeakness(0.9).addWeakness(0.3)` → 200
+    - 暴击：`crit(true, 1.0)` → 2000；`crit(false, 1.0)` → 1000
+    - 防御：`defence(80, 1150, 0)` → `1000 × 1000/2150`；穿透 `defence(80, 1150, 0.5)` → `1000 × 1000/1575`
+    - 抗性：`resist(0.2, 0.4)` → 1200；clamp `resist(1.2, 0)` → 100
+    - 真伤：全区填满 + `trueDamage()` → 1000
+    - 容器：同类型只建一个区；`getDamageArea()` 不可变（`clear()` 抛 `UnsupportedOperationException`）
+    - 区可脱开 `Damage` 单测：`new Damage.VulnerableArea().add(2.0).add(2.0).getRate() == 3.5`
+    - 顺序无关：先抗性后增伤 == 先增伤后抗性 == 1200
+    - 类型适用：BREAK 段跳过增伤/暴击但保留防御；DOT 段吃增伤、不吃暴击
+    - 按来源撤销：`addVulnerable(0.5, BUFF, 7)` → 1500，`removeModifiersFrom(BUFF, 7)` → 1000
+- **已确认（HSR.md §2.5）**：抗性区 = `1 - 抗性`，抗性范围 `-100% ~ 90%` ⇒ 抗性区 `0.1 ~ 2.0`，**负抗全效**——所以
+  `resist(0.2, 0.4) → 1200`、`resist(-1.5, 0) → 2000` 都是正确值（早前怀疑的"负抗半效"是那个 Python 项目的自家
+  简化，不采纳）。
+- **后续接线注意（HSR.md §2.4）**：防御区里 `减防%` 与 `防御穿透%` 是**加算**进同一个括号
+  （`def × (1 - clamp(减防 + 穿透))`）。当前 `defence(level, def, ignore)` 只暴露"穿透"一个参数，P4 接入减防 debuff
+  时要把两者**合并后传入**——别各自乘一遍，否则会重复减防。
 - **依赖**：P1-2
 
 ---
@@ -282,12 +296,12 @@
        public double calculateDamage(Damage damage) {
            CanHit attacker = damage.getAttacker();
            CanHit defender = damage.getDefender();
-           // 1) 增伤区：元素增伤 + 全增伤
+           // 1) 增伤区：元素增伤 + 全增伤（击破/超击破/真伤会被 BoostArea.applies() 自动跳过）
            AttributeType boost = AttributeType.getBoostByElement(damage.getElement());
            if (boost != null) damage.addBoost(attacker.getAttribute(boost).get());
            damage.addBoost(attacker.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
-           // 2) 暴击区（读属性，注入 rng；不可暴类型强制不暴）
-           if (damage.getDamageType().isCrittable()) {
+           // 2) 暴击区（读属性，注入 rng；不可暴类型即便记了也会被 CritArea.applies() 跳过）
+           if (damage.getType().isCrittable()) {
                double rate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
                boolean isCrit = rate > 0 && rng.nextDouble() < rate;
                damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get());
@@ -368,12 +382,14 @@
        }
        ```
     4. 示例 Buff `VulnerabilityBuff extends AbstractBuff implements DamageListener`：
-        - 构造 `(duration, double ratio)`，`onDamage` 里 `damage.addVulnerable(ratio)`（易伤 50% 就是
-          `new VulnerabilityBuff(2, 0.5)`）
+        - 构造 `(duration, double ratio)`，`onDamage` 里
+          `damage.addVulnerable(ratio, Modifier.ModifierSource.DEBUFF, id)`（`id` 是 `AbstractBuff` 的
+          protected 字段，子类直接可用；P1-3 的 Area 就是靠它做到「按来源撤销」）。易伤 50% 即
+          `new VulnerabilityBuff(2, 0.5)`
         - `applyEffect/removeBuff/tickEffect` 参照 `BoostDamageBuff` 模板（本 buff 不改属性，前两个留空）
 - **验收**：`DamageHookTest`：
     - 挂易伤 50% → 基础 1000 结算 1500；2 回合后（`beforeMove`+`afterMove` 各触发一次 tick）再打回 1000
-    - 再写一个 `ReductionBuff`（`damage.addReduction(0.3)`）→ 结算 700
+    - 再写一个 `ReductionBuff`（`damage.addReduction(0.3, Modifier.ModifierSource.DEBUFF, id)`）→ 结算 700
     - 钩子对 `DamageType.BREAK` 也生效（P4 复用它）
 - **依赖**：P1-5、P1-6
 
@@ -698,6 +714,7 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
        }
        ```
     4. `Constant.ENERGY_GAIN_*` 全部替换魔法数字
+       （战技点 SP 消耗不归本任务——P8-4 接入 `performAction`）
 - **验收**：`EnergyBattleTest`：
     - 回能率 0：普攻后 `currentEnergy == 20`；战技后 +30；释放终结技后清零，且终结技自身回 5（ **顺序定义**：先清零再回
       5，测试按此写）
@@ -814,6 +831,9 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
 
 - **目标**：击破瞬间结算：`击破伤害 = 击破基数(等级) × (1+击破特攻) × 技能削韧值 × 防御区 × 抗性区 × 减伤区`。
   **不可暴击、不吃攻击力/增伤**。
+  ⚠ **单位必须成套（HSR.md §7.1）**：文档给的是 80 级**基础击破基数 3767**（削韧单位"常规"，普攻=1）、**超击破 376.7**
+  （削韧单位"点"，普攻=10）。本任务用 `breaking_rate.json / 10 = 376.755`，因此**传入的削韧值必须是"点"刻度**
+  （例：112.5 = 30 × 2.5 × 1.5）。哪天改用 3767，削韧值要同步 /10，否则差 10 倍；P4-6 与本任务同刻度。
 - **涉及文件**：新建 `models/BreakDamageCalculator.java`、`Battle.java`、新建 `test/BreakDamageTest.java`
 - **怎么做**：
     1. 新建类（ **只需 1 个方法**）：
@@ -877,6 +897,7 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
 ### P4-5 DOT（持续伤害）
 
 - **目标**：击破元素附着 DOT（火→灼烧、雷→触电、物理→裂伤、风→风暴），敌人回合开始结算，"先上先结算"。
+  （冰/量子/虚数三系击破效果——冻结/纠缠/禁锢，见 P10-1 统一成表）
 - **涉及文件**：新建 `models/Dot.java`、`models/Enemy.java`、`Battle.java`、新建 `test/DotTest.java`
 - **怎么做**：
     1. 新类（ **完全独立，不依赖 Buff 体系**，最简单）：
@@ -1023,6 +1044,8 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
        }
        ```
     2. `Character` 加 `@Setter private Path path = Path.OTHER;`（builder `path(Path)` 链）
+    3. **数据校准**：`character_data.json` 每角色有 `aggro` 字段（景元 1204 = 75），比枚举硬编码更准 ——
+       P8-1 接入后 `Battle.aggroOf` 优先读角色数据，本枚举降级为兜底（无数据时 150/125/100）
 - **验收**：`AggroTest`：一个 `path = Path.PRESERVATION` 的角色 `getPath().getAggro() == 150`；
   `Path.fromName("毁灭") == DESTRUCTION`
 
@@ -1092,7 +1115,7 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
 ### P5-3 EnemySkill（敌人普攻）
 
 - **目标**：敌人有能执行的技能。数据里 **没有**敌人技能表（skills.json 只有角色），先用模板简化：普攻 = 攻击力 × 100%，元素取
-  `stance_type`。
+  `stance_type`。（P9-1 建 `enemy_skills.json` 后本任务被 P9-2 替换，简化实现保留为兜底）
 - **涉及文件**：新建 `models/EnemySkill.java`、`models/Enemy.java`（挂 skills）、`utils/EnemyFactory.java`、新建
   `test/EnemySkillTest.java`
 - **怎么做**：
@@ -1407,11 +1430,401 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
 
 ---
 
-## 9. 阶段 P8：演示与收尾
+## 9. 阶段 P8：角色数据化（真实角色全机制）
+
+**本阶段结束时的成果**：`CharacterFactory.create(1204, 80)` 一条命令造出真实景元（面板/能量/元素/命途全对），普攻·战技·终结技走
+`skills.json` 真实倍率，天赋触发追加攻击，战技点（SP）真实流转。 **"角色什么时候进来" = P8**：P1–P7 全部用
+`Character.fromAttributes` 占位，P8 之后一律 `CharacterFactory` + 真实技能。
+
+**阶段内顺序**：`P8-1 → P8-2 → P8-3 → P8-4 → P8-5`（P8-4 零依赖可插队）。
 
 ---
 
-### P8-1 Main 修复 + demo 包拆分
+### P8-1 CharacterFactory + 角色字段补全
+
+- **目标**：一条命令造真实角色；把 `character_data.json` 里已有的字段（元素/命途/aggro/能量上限）接进战斗模型。
+- **涉及文件**：`models/Character.java`、`beans/CharacterData.java`（补 `aggro` 组件）、新建 `utils/CharacterFactory.java`、新建
+  `test/CharacterFactoryTest.java`
+- **怎么做**：
+    1. `Character` 加字段（`Builder.build()` 一并填上，老代码不受影响）：
+       ```java
+       @Getter private DamageElement element;   // character_data.attribute（小写 "thunder"）
+       @Getter private Path path;               // character_data.mt（"destruction"/"preservation"/"all"...）
+       @Getter private int aggro;               // character_data.aggro（景元=75）
+       ```
+       `build()` 里：
+       ```java
+       character.setElement(DamageElement.fromString(characterData.attribute()));
+       character.setPath(Path.fromName(characterData.mt()));
+       character.setAggro(characterData.aggro());
+       ```
+       `DamageElement.fromString` 加大小写不敏感（P1-1 已有 fromString 模式，照着补）；`Path` 的 `fromName` 加英文串映射
+       （`"destruction" → DESTRUCTION`、`"preservation" → PRESERVATION`，其余 → OTHER，TODO 全表校准）。
+       `maxEnergy`：P3-1 在 `CanHit` 有默认 100；`CharacterFactory` 里覆盖：
+       `c.setMaxEnergy(cd.maxEnergy() != null ? cd.maxEnergy() : 100)`。
+       `CharacterData` record 补组件 `@SerializedName("aggro") int aggro`（JSON 每角色都有，如景元 75；缺省 0 时 `aggroOf`
+       兜底 100）。
+    2. 新建 `utils/CharacterFactory.java`：
+       ```java
+       public static Character create(int cid, int level) {
+           Character c = Character.builder().cid(cid).level(level).isPromote().build();  // 面板管线已具备
+           c.setSkills(RealSkillSet.of(cid, c.getSkillLevel()));   // P8-2；此前先 DefaultSkill(cid, slot, level)
+           return c;
+       }
+       ```
+    3. `Character.fromAttributes` 顶部加注释 `// 仅测试/占位用，P8 后新代码禁止使用`
+- **验收**：`CharacterFactoryTest`：
+    - `create(1204, 80)`：`getName().equals("Jing Yuan")`、`getElement() == THUNDER`、`getPath()` 非兜底值、
+      `getMaxEnergy() == 130`、`getAggro() == 75`、`getLevel() == 80`
+    - 面板校验：`getAttribute(HEALTH).get() == characterData.health() × LevelPromotionCalc.calcCharacterRate(80, true)`（±1e-3）
+    - 老 `fromAttributes` 测试全部仍绿（占位入口保留）
+- **依赖**：P1-4（level）、P5-1（Path 映射）、P2-2（DamageElement.fromString）
+
+---
+
+### P8-2 技能装配（真实槽位 → 真实倍率）
+
+- **目标**：`SkillType` 槽位对上 `skills.json` 的 skill_id；`DefaultSkill`/`SkillExecutor` 用的全是真实倍率、元素、削韧值。
+- **涉及文件**：`Constant.java`、`models/Character.java`、`models/DefaultSkill.java`、`models/SkillExecutor.java`、新建
+  `test/RealSkillTest.java`
+- **怎么做**：
+    1. 槽位映射只许一处（`Constant` 加）：
+       ```java
+       public static final Map<SkillType, Integer> SKILL_SLOT = Map.of(
+               SkillType.COMMON, 1, SkillType.SKILL, 2, SkillType.ULTRA, 3,
+               SkillType.TALENT, 4, SkillType.MAZE, 6, SkillType.TECHNIQUE, 7);
+       ```
+    2. `Character.Builder.build()` 里 `new DefaultSkill(cid, 1, level)` → `new DefaultSkill(cid, Constant.SKILL_SLOT.get(type), level)`
+       （一行改动；COMMON 仍是 1，老测试全绿）
+    3. `SkillExecutor` 的 `default` 分支目前静默：改成提示 + 归属标注：
+       ```java
+       default -> IO.println("[P8-2] 非伤害 effect: " + effect + "（RESTORE/SUPPORT/DEFENCE→P10-3，IMPAIR→P10-6，SUMMON→P9-4，ENHANCE 纯被动）");
+       ```
+    4. 能量：P8-1 后 `getMaxEnergy()` 即真实值（景元 130），P3-2 的 `castUltra` 无需改
+- **验收**：`RealSkillTest`：
+    - 景元 `getSkills().get(COMMON).getData()` 的 param 列表 === `Constant.SKILLS.get(1204).get(1).paramList()`
+    - `getSkills().get(ULTRA).getData().getSkillType().equals("Ultra")`
+    - 景元战技（AOE）打 3 敌：每敌伤害 = attack × param[0] × 乘区（±1e-6）
+- **依赖**：P8-1、P1-8
+
+---
+
+### P8-3 天赋 + 追加攻击（两个代表角色）
+
+- **目标**：`TALENT`（skill_id=4）真正生效。先做两个无召唤的代表：克拉拉 1107（受击反击）、希儿 1102（击杀额外回合）。
+- **涉及文件**：新建 `models/ai/TalentTrigger.java`、新建 `models/talents/ClaraCounterTalent.java`、
+  `models/talents/SeeleKillTalent.java`、`Battle.java`、新建 `test/TalentTest.java`
+- **怎么做**：
+    1. 触发器接口 + 注册（复用已有 `models/event` 事件体系）：
+       ```java
+       public interface TalentTrigger { void onEvent(Battle battle, BattleEvent event); }
+       ```
+       `Battle` 加 `List<TalentTrigger> talents = new ArrayList<>();` + `registerTalent(...)`；
+       `BattleEvent` 加 `type` 字段（`HIT / KILL / TURN_END / ULTRA`），在 `applyDamage`（命中/击杀后）与 `afterMove`（回合后）各发一次。
+    2. `ClaraCounterTalent`：收到 `HIT` 且受击者是本人 → 读 `SkillData.init(1107, 4)` 的 param[0] 倍率 →
+       `SkillExecutor` 追加段（`DamageType.ADDITIONAL`，`notCountsAsAttack`）
+    3. `SeeleKillTalent`：收到 `KILL` 且击杀者是本人 → `battle.grantExtraTurn(self)`（P7-2）+ 自身增伤 40%（固定值
+       `Constant.SEELE_ULTRA_BOOST`，TODO 数据校准）
+    4. `CharacterFactory.create` 末尾按 cid 注册（`switch (cid) { case 1107 -> register(new ClaraCounterTalent(c)); ... }`，未知角色跳过）
+- **验收**：`TalentTest`：
+    - 克拉拉被打：追加 1 段（HP 再降 `attack × 0.8`），`DamageType.ADDITIONAL` 且 `getCountsAsAttack() == false`（不回能不削韧）
+    - 希儿击杀敌人：该角色行动条立即提前（`peekNext()` 是她的一次新行动）
+- **依赖**：P1-9（追加伤害）、P7-2（额外回合）、P3-2（回能挂点）
+
+---
+
+### P8-4 战技点（SP）
+
+- **目标**：战斗资源"战技点"：开局 3 点、上限 5；普攻 +1、战技 -1、终结技不消耗。
+- **涉及文件**：`Battle.java`、`Constant.java`、新建 `test/SkillPointTest.java`
+- **怎么做**：
+    1. `Constant`：`public static final int SKILL_POINT_MAX = 5;`、`public static final int SKILL_POINT_START = 3;`
+    2. `Battle`：
+       ```java
+       @Getter private int skillPoints = Constant.SKILL_POINT_START;
+       public void gainSkillPoint(int n) { skillPoints = Math.min(Constant.SKILL_POINT_MAX, skillPoints + n); }
+       public boolean spendSkillPoint() { if (skillPoints <= 0) return false; skillPoints--; return true; }
+       ```
+    3. `performAction` 里按 `skill.getData().getSkillType()`：
+       ```java
+       case "Normal" -> gainSkillPoint(1);
+       case "BPSkill" -> { if (!spendSkillPoint()) { IO.println("[SP] 战技点不足"); return false; } }
+       case "Ultra" -> { /* 不消耗 */ }
+       ```
+- **验收**：`SkillPointTest`：开局 3；普攻 → 4，连放 2 次封顶 5；战技 → 减 1；0 点放战技 → `performAction` 返回 false 且无伤害
+- **依赖**：P8-2（skillType 判定立足点）；零依赖可插队
+
+---
+
+### P8-5 真实队伍装配（StageFactory 换真角色）
+
+- **目标**：P7-5 的双人 `fromAttributes` 临时队换成 4 人真队；光锥/遗器沿用 Builder 已有管线。
+- **涉及文件**：`utils/StageFactory.java`、新建 `test/RealTeamTest.java`
+- **怎么做**：
+    1. `StageFactory.load(stageId)` 里：
+       ```java
+       List<Character> team = List.of(
+               CharacterFactory.create(1204, 80),   // 景元（雷）
+               CharacterFactory.create(1102, 80),   // 希儿（量子）
+               CharacterFactory.create(1107, 80),   // 克拉拉（物理）
+               CharacterFactory.create(1105, 80));  // 娜塔莎（治疗，P10-3 后真生效）
+       ```
+    2. 每个角色再 `.weapon(...)` / `.relicSuit(...)`：先从 `Constant.WEAPONS` 挑同命途光锥（数值被动 P10-3 再接，先只吃面板）
+- **验收**：`RealTeamTest`：`load(103201)` → `team.size()==4`、每个 `getElement()` 非 null、Battle 能完整跑一轮不炸
+- **依赖**：P8-1、P7-5
+
+---
+
+## 10. 阶段 P9：怪物全机制（多技能 · 精英 · Boss · 召唤）
+
+**本阶段结束时的成果**：敌人不再只有"平 A"。技能表数据化（P9-1）→ 全效果执行（P9-2）→ 按权重选技能（P9-3）→ 会召唤
+（P9-4）→ Boss 会换招/反击/免疫控制（P9-5）。 **"怪物什么时候进来" = P2（面板数据）→ P5（会普攻）→ P9（全机制）**。
+
+**阶段内顺序**：`P9-1 → P9-2 → P9-3 → P9-4 → P9-5` 串行。
+
+---
+
+### P9-1 敌人技能数据（enemy_skills.json 自建）
+
+- **目标**：敌人技能表。 **turnbasedgamedata 没下发怪物技能**（`skills.json` 只有角色），先自建最小表；找到源数据后只替换
+  `Constant` 加载处，其余代码不动。
+- **涉及文件**：新建 `src/main/resources/data/enemy_skills.json`、新建 `beans/EnemySkillBean.java`、`Constant.java`、新建
+  `test/EnemySkillDataTest.java`
+- **怎么做**：
+    1. bean：
+       ```java
+       public record EnemySkillBean(String name, String attackType,   // COMMON / SKILL / ULTRA
+               String effect,        // SingleAttack / AoEAttack / Blast / Impair / Summon
+               String element, double multiplier, int stance, int hits,   // hits: 目标数（0=全体）
+               double aiWeight, String condition,   // condition: null / "hp<0.5" / "firstTurn"
+               int summonId, String debuffKey, double debuffChance) {}
+       ```
+    2. 首批手写 3 个怪（对齐 P9-2/P9-4 验收）：
+       - 冰锋 1002011：`{普攻 SingleAttack Ice ×1.0 stance30 w1.0}`、`{战技 AoEAttack Ice ×0.6 stance30 w1.2 condition "hp<0.5"}`
+       - 奥钦 8034010：普攻 ×1.0 + `Impair` 技能（`debuffKey="STAT_CTRL"`，P10-2 生效）
+       - 灯塔 8033020：普攻 ×1.0 + `{Summon ×0 stance30 w1.0 condition "hp<0.8" summonId=8032040}`
+    3. `Constant.ENEMY_SKILLS = JSONReader.fromJSON("enemy_skills.json", ...)`（key = monster **template_id**，
+       `EnemyFactory` 按 `cfg.templateId()` 查）
+- **验收**：`EnemySkillDataTest`：`Constant.ENEMY_SKILLS.get(1002011).size() == 2`；普攻条目 `multiplier == 1.0`、`stance == 30`
+- **依赖**：P2-1（加载模式参照）
+
+---
+
+### P9-2 EnemySkill 全效果（替换 P5-3 简化版）
+
+- **目标**：`EnemySkill` 从 bean 构造，按 effect 复用 P1-8 伤害分派（AOE/BLAST/SINGLE），不再硬编码 ×1.0 单目标。
+- **涉及文件**：`models/EnemySkill.java`、`utils/EnemyFactory.java`、新建 `test/EnemySkillFullTest.java`
+- **怎么做**：
+    1. `EnemySkill` 改造成持有 `EnemySkillBean`；`getElement()/getEffect()/getStance()` 透传 bean 字段
+    2. 给 `SkillExecutor` 加"无 SkillData 入口"（敌人技能不占用 `skills.json`）：
+       ```java
+       public static void executeSimple(Battle battle, DamageElement element, SkillEffectType effect,
+                                        int stance, double multiplier, CanHit user, List<? extends CanHit> targets)
+       ```
+       内部复用现有 switch（single/aoe/blast/bounce），削韧挂点（P4-2）原样生效；`EnemySkill.execute` 一行委托它。
+    3. `EnemyFactory.create`：`Constant.ENEMY_SKILLS.get(cfg.templateId())` 全部挂上；无表 → 兜底普攻（P5-3 代码保留）
+- **验收**：`EnemySkillFullTest`：冰锋 Lv90 战技打 3 人 → 每敌 `attack × 0.6 × 防区`；普攻仍 ×1.0；按 bean 削韧 30
+- **依赖**：P9-1、P5-3、P1-8
+
+---
+
+### P9-3 敌方 AI 技能选择器
+
+- **目标**：敌人回合先选技能再选目标（P5-4 已有目标选择）。
+- **涉及文件**：新建 `models/ai/SkillSelector.java`、`Main.java`、新建 `test/SkillSelectorTest.java`
+- **怎么做**：
+    1. 纯静态：
+       ```java
+       public static EnemySkill next(Enemy e, Battle battle, Random rng) {
+           List<EnemySkill> usable = e.getSkillList().stream()
+                   .filter(s -> s.conditionOk(e))   // "hp<0.5" / "firstTurn" / null
+                   .toList();
+           double total = usable.stream().mapToDouble(EnemySkill::getAiWeight).sum();
+           double roll = rng.nextDouble() * total;
+           for (EnemySkill s : usable) { roll -= s.getAiWeight(); if (roll <= 0) return s; }
+           return usable.getLast();
+       }
+       ```
+    2. `Main.round()` 敌人分支：
+       ```java
+       EnemySkill s = SkillSelector.next(e, battle, battle.getRng());
+       List<? extends CanHit> targets = s.hits() == 0 ? aliveAllies : List.of(TargetSelector.select(...));
+       battle.performAction(e.getSkills().get(SkillType.COMMON), targets);  // P9-2 后每个技能独立注册
+       ```
+       （技能直接查 `e.getSkillList()`，不塞 `SkillType` 枚举也行——以 P9-2 结构为准）
+- **验收**：`SkillSelectorTest`：w1.0/w1.2 两技能跑 1000 次 → 次数比 ≈ 1:1.2（±3%）；`condition "hp<0.5"` 满血时选不到战技
+- **依赖**：P9-2、P5-5
+
+---
+
+### P9-4 召唤物（summon_id 机制）
+
+- **目标**：`monster_config.summon_id` 生效：敌人技能召唤实体入战，实体可受击、会死亡移除。
+- **涉及文件**：`models/Summon.java`（现有基类）、新建 `utils/SummonFactory.java`、`Battle.java`、`models/Enemy.java`、新建
+  `test/SummonTest.java`
+- **怎么做**：
+    1. `SummonFactory.create(summonId, level)`：召唤物同样有 `monster_config` entry（如 8032030 `"All or Nothing"`）→ 直接
+       `EnemyFactory.create` + `setSummon(true)`（`Enemy` 加 `@Getter @Setter private boolean summon;`）
+    2. `Battle` 加 `public void summon(Enemy boss, int summonId)`：`summonId` 若在 `MONSTERS` 里 → `EnemyFactory.create` →
+       `enemies.add` + 请求队列进场（复用 `addRequestItems`，见 P7-4）
+    3. `Enemy` 加 `@Getter private final List<Enemy> summons = new ArrayList<>();`；本体重伤 → 召唤物同判移除
+       （`removeDeadCombatants` 清理）
+    4. 技能触发：P9-1 bean `effect == "Summon"` → `battle.summon(self, bean.summonId())`
+- **验收**：`SummonTest`：灯塔 8033020（hp<0.8 触发）→ `battle.enemies.size() == 2`；召唤物被打死 → 数量回落；本体死 → 召唤物全清
+- **依赖**：P9-2、P5-5、P7-4
+- **注**：忆灵（角色专属召唤、面板快照本体、`DamageType.MEMORY`）仍属远期（见 §13），本任务只做通用怪物召唤。
+
+---
+
+### P9-5 Boss 机制（phase 换招 / 受击反击 / 控制免疫）
+
+- **目标**：精英/Boss 行为：HP 阈值换招、受击反击、按 `debuff_resistance` 免疫控制。
+- **涉及文件**：`models/Enemy.java`、`models/buffs/CounterMechanic.java`、`Main.java`、新建 `test/BossMechanicTest.java`
+- **怎么做**：
+    1. `Enemy` 加 `@Getter @Setter private int phase = 0;`；敌方回合开场：
+       ```java
+       if (e.getPhase() == 0 && e.getHpRatio() < 0.5) e.setPhase(1);   // 换招 = 技能列表切第二套（condition 里表达）
+       ```
+    2. 受击反击：P1-7 的 `DamageListener` 钩子已具备 → 新建 `CounterMechanic`（挂 boss；被非召唤伤害命中 → 追加一段
+       `DamageType.ADDITIONAL`、`notCountsAsAttack()` 反击，倍率走 `Constant.BOSS_COUNTER_RATIO`，TODO 数据校准）
+    3. 控制免疫：`Enemy` 加 `public boolean isImmuneTo(String resistKey)`（查 `debuffResist`）；奥钦 `debuff_resistance`
+       `STAT_CTRL: 0.5` → P6-1 的 `hitChance` 传 `"STAT_CTRL"` 自然半减，无需新代码
+- **验收**：`BossMechanicTest`：奥钦 HP 降到 50% 以下 → 下个回合用 phase 1 技能；boss 受击后追加反击段且
+  `getCountsAsAttack() == false`；冰锋（`STAT_CTRL_Frozen=1`）对冻结免疫
+- **依赖**：P9-2、P1-7、P6-1
+
+---
+
+## 11. 阶段 P10：机制补完（全战斗规则闭环）
+
+**本阶段结束时的成果**：战斗里所有"规则"齐了——七系击破异常、控制状态机、通用 Buff 与刷新规则、速度操纵、终结技插入、
+Debuff 数据化。 **没有新系统，只有把已开口子填满。**
+
+**阶段内顺序**：`P10-1 → P10-2 → P10-3 → P10-4 → P10-5 → P10-6`（P10-4/P10-5 零依赖可插队）。
+
+---
+
+### P10-1 七系击破异常全量
+
+- **目标**：P4-5 只做了 4 系 DOT（灼烧/触电/裂伤/风暴）；补冰（冻结）、量子（纠缠）、虚数（禁锢）。统一成"表驱动"。
+- **涉及文件**：`Constant.java`、`Battle.java`（P4-5 挂点改查表）、新建 `test/BreakEffectAllTest.java`
+- **怎么做**：
+    1. `Constant`：
+       ```java
+       public record BreakEffect(double dotRatio, int dotTurns, double delayPercent, String control) {}
+       public static final Map<DamageElement, BreakEffect> BREAK_EFFECTS = Map.of(
+               DamageElement.FIRE,      new BreakEffect(0.5, 3, 0.0,  null),        // 灼烧 DOT
+               DamageElement.THUNDER,   new BreakEffect(0.5, 3, 0.0,  null),        // 触电 DOT
+               DamageElement.PHYSICAL,  new BreakEffect(0.5, 3, 0.0,  null),        // 裂伤 DOT
+               DamageElement.WIND,      new BreakEffect(0.5, 3, 0.0,  null),        // 风暴 DOT
+               DamageElement.ICE,       new BreakEffect(0.0, 0, 0.5,  "FREEZE"),    // 冻结：跳回合 + 推条
+               DamageElement.QUANTUM,   new BreakEffect(0.5, 3, 0.2,  null),        // 纠缠：DOT + 延迟
+               DamageElement.IMAGINARY, new BreakEffect(0.0, 0, 0.3,  "IMPRISON")); // 禁锢：延迟
+       ```
+       （比例先按示例值，TODO 数据校准）
+    2. P4-5 `reduceToughness` 里的挂 DOT 代码改为查 `BREAK_EFFECTS.get(element)`；击破推条统一 = 固定 25% + `delayPercent`
+    3. `FREEZE` 的"跳回合"接 P10-2 状态机（本任务先只做 DOT 与推条差异）
+- **验收**：`BreakEffectAllTest`：冰击破 → 无 DOT、推条 = 25%+50%；量子击破 → DOT 每回合 500×3 且推条 25%+20%；物理击破 →
+  仅 DOT（回归 P4-5）
+- **依赖**：P4-5、P4-4
+
+---
+
+### P10-2 控制异常状态机
+
+- **目标**：冻结/禁锢/纠缠/眩晕统一成"效果命中 → 上状态 → 状态期 canAct/延迟生效"。
+- **涉及文件**：新建 `models/buffs/ControlBuff.java`、`models/BuffManager.java`、`Battle.java`、新建 `test/ControlTest.java`
+- **怎么做**：
+    1. `ControlBuff extends AbstractBuff`：`canAct() return false`（冻结/眩晕）；禁锢/纠缠不改 canAct，靠 `delayPercent` 在
+       `applyEffect` 时推条（P10-4 的 `delayMovePercent`）
+    2. `BuffManager` 加 `public boolean hasControl()`（复用已有 `canAct` 接口，P4-4 的 BROKEN 跳回合分支旁加同款判断）
+    3. 冻结特有：跳过回合时受伤害 +30%（`Constant.FROZEN_VULN = 0.3`，示例值 TODO）
+    4. 施加方：技能 `IMPAIR` → `battle.applyDebuffChance(...)`（P6-1 已写帮手）→ 命中才 `addBuff`；先 `Enemy.isImmuneTo`（P9-5）
+       过滤——**注意 key 精确匹配**（冰锋 `STAT_CTRL_Frozen=1` → 冻结 0%；奥钦 `STAT_CTRL=0.5` → 全部控制半减）
+- **验收**：`ControlTest`：冰锋被冻结技能命中 → `hitChance == 0`（免疫）；普通怪冻结 → 该敌回合跳过、结束后恢复；禁锢 →
+  行动条延迟 30%；冻结期受伤害 ×1.3
+- **依赖**：P6-1、P9-5、P4-4
+
+---
+
+### P10-3 Buff 体系完善（属性类 + 刷新规则）
+
+- **目标**：`StatModifierBuff`（攻击/防御/速度/减伤百分比）+ 刷新规则（同源覆盖、异源叠加）；治疗/护盾技能（RESTORE/DEFENCE）
+  落地。
+- **涉及文件**：新建 `models/buffs/StatModifierBuff.java`、`models/BuffManager.java`、`models/SkillExecutor.java`、新建
+  `test/BuffRuleTest.java`
+- **怎么做**：
+    1. `StatModifierBuff extends AbstractBuff implements DamageListener`：构造 `(duration, AttributeType, double pct)`；
+       `applyEffect` → `target.addPercent(attr, pct)`；`removeBuff` → 减去同等值（`tickEffect` 参照 `BoostDamageBuff` 模板）
+    2. `BuffManager.addBuff` 加刷新规则：**同 class + 同 target → 覆盖**（移除旧的、重置 duration，取新值）；不同 class → 叠加；
+       同 class 不同来源 → 取绝对值大者（HSR 近似规则，TODO 数据校准）
+    3. `SkillExecutor` 非伤害分支落地：
+       - `RESTORE` → `battle.calculateHeal`（P6-2），倍率读 `param_list[0]`、固定值 `param_list[1]`
+       - `SUPPORT/DEFENCE` → `StatModifierBuff` / `grantShield`（P6-3）
+       - `ENHANCE` → 纯被动，不执行（打印 TODO）
+    4. 光锥/遗器数值被动（P8-5 遗留）用本 buff 表达：`Weapon` 加 `passives: List<BuffSpec>`（先常量表，TODO 数据校准）
+- **验收**：`BuffRuleTest`：攻 +50% 2 回合 → 伤害 ×1.5；同 buff 再上 → duration 刷新不叠加；到期 → 伤害回到 ×1.0；娜塔莎
+  治疗打出 1560（P6-2 数字回归）
+- **依赖**：P6-2、P6-3、P1-7
+
+---
+
+### P10-4 速度与行动条操纵
+
+- **目标**：速度 buff/debuff 真实影响行动条；公开"推条/拉条" API（P4-4 的内部逻辑上移）。
+- **涉及文件**：`Queue.java`、`Battle.java`、新建 `test/SpeedBuffTest.java`
+- **怎么做**：
+    1. `Queue` 加 `public void notifySpeedChanged(CanHit c)`：按当前 `SPEED` 重算 `cycleTime`（保留 `nextActionTime`，只改后续步进）
+    2. `StatModifierBuff`（P10-3）挂 `AttributeType.SPEED` 时 → `battle.getQueue().notifySpeedChanged(target)`
+    3. `Battle` 公开两个 API（P4-4 的击破推条改调这里，删重复代码）：
+       ```java
+       public void delayMovePercent(CanHit c, double pct) {
+           queue.delayAction(c, 10000.0 / c.getAttribute(AttributeType.SPEED).get() * pct);
+       }
+       public void advanceMovePercent(CanHit c, double pct) { queue.advanceActionByPercent(c, pct); }
+       ```
+- **验收**：`SpeedBuffTest`：speed 100 减速 30% → 下次行动间隔 ≈ 10000/70 = 142.857；拉条 50% → 行动提前半圈
+- **依赖**：P10-3、P7-1（行动值口径）
+
+---
+
+### P10-5 终结技插入
+
+- **目标**：终结技任意时点可放（P3-2 已支持任意时点调用）；明确规则：不消耗行动条、不占回合、先清零再回自身 5。
+- **涉及文件**：`Battle.java`、`Main.java`、新建 `test/UltraInsertTest.java`
+- **怎么做**：
+    1. 规则确认：`castUltra` 只要求 `currentEnergy >= maxEnergy`（P3-2 已有）；`Main.round()` 我方分支加"回合开始前可放大招"的
+       输入位（demo：`if (IO.ask("放 ult? ")) battle.castUltra(...)`）
+    2. 防御性：`castUltra` 后不触发 `afterMove`；`processRequests` 不产生新回合（`stepForward` 不推进）
+    3. 追击角色先清后回口径（P3-2）不变
+- **验收**：`UltraInsertTest`：满能量 → 任意时点 `castUltra` true；行动条无变化（`getTimeRemaining` 前后一致）；能量 =
+  5 × (1+回能率)
+- **依赖**：P3-2、P7-2
+
+---
+
+### P10-6 Debuff 基础概率数据化
+
+- **目标**：`IMPAIR` 技能的基础概率从 `param_list` 读，喂给 P6-1 的 `hitChance`。
+- **涉及文件**：`models/SkillData.java`、`Battle.java`、新建 `test/DebuffChanceDataTest.java`
+- **怎么做**：
+    1. `SkillData` 加 `public double debuffChance()`：约定 `param_list` 第 3 项为几率（先校准 2 个技能，失败再调 index；加注释
+       说明约定来源与校准方法）
+    2. `SkillExecutor` 的 `IMPAIR` 分支：
+       ```java
+       double p = data.debuffChance();
+       if (battle.applyDebuffChance(caster, target, p, "STAT_CTRL")) { /* P10-2 上 ControlBuff */ }
+       ```
+- **验收**：`DebuffChanceDataTest`：读出的概率 ≠ 0 且与手写 baseChance 一致；沿用 P6-1 三例做数字回归
+- **依赖**：P10-2、P6-1、P8-2
+
+---
+
+## 12. 阶段 P11：演示与收尾
+
+---
+
+### P11-1 Main 修复 + demo 包拆分
 
 - **目标**：`Main` 变成 `public static void main(String[] args)` 入口，逻辑拆进 `demo/`。
 - **涉及文件**：`Main.java`、新建 `src/main/java/com/laosun/aluminium/demo/CharacterDemo.java`、`demo/BattleDemo.java`
@@ -1423,30 +1836,29 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
 
 ---
 
-### P8-2 真实内容演示（冰锋战）
+### P11-2 真实内容演示（冰锋战）
 
-- **目标**：冰锋（弱火/雷）+ 2 角色（火/雷属性技能）演示完整循环：普攻→削韧→击破→推条→跳回合→DOT→回能→大招。
+- **目标**：冰锋（弱火/雷）+ 2 真角色（火/雷属性技能）演示完整循环：普攻→削韧→击破→推条→跳回合→DOT→回能→大招→WIN。
 - **涉及文件**：`demo/BattleDemo.java`、按需小修 `Battle`/`Enemy`
 - **怎么做**：
-    1. 角色：`Character.builder().cid(...)` 选火/雷角色的真实 cid（如雷电将军风格角色），或 `fromAttributes` +
-       `DefaultSkill` 指定 `element`（`DefaultSkill` 目前 element 走数据——简化：用 `Character.fromAttributes` + 自定义
-       `Skill` 子类固定 element=FIRE）
+    1. 角色：`CharacterFactory.create(1109, 80)`（虎克·火）+ `CharacterFactory.create(1204, 80)`（景元·雷）；敌方
+       `EnemyFactory.create(1002011, 29)`（stage 103201 的 level 29）
     2. 回合循环：
        ```java
        while (battle.getStatus() == Battle.Status.RUNNING) {
            battle.stepForward();
            battle.beforeMove();
-           // 我方：ask 玩家输入或自动按顺序放技能（battle.performAction(...)）
-           // 敌方：P5-5 的目标选择 + 普攻
+           // 我方：ask 玩家输入或自动按顺序放技能（battle.performAction(...)，SP 不够自动普攻）
+           // 敌方：P9-3 的技能选择 + P5-4 的目标选择
            battle.afterMove();
        }
        ```
-    3. 每步 `battle.printBattle()` + 韧性打印（P4 之后补 `printHp` 加韧性/`[BROKEN]`/DOT 标记）
+    3. 每步 `battle.printBattle()`：HP + 韧性/`[BROKEN]`/DOT 标记 + 战技点（P8-4）+ `castUltra` 提示（P10-5）
 - **验收**：一遍跑通：削韧 → 击破伤害 → 敌人跳回合 → DOT 扣血 → 我方满能量放大招 → 敌人死亡 → WIN
 
 ---
 
-### P8-3 测试总盘点 + 基准 + 零警告
+### P11-3 测试总盘点 + 基准 + 零警告
 
 - **目标**：全部验收测试在，`gradlew test` 全绿，出 Benchmark 对比，零编译警告。
 - **涉及文件**：`Benchmark.java`、各测试类
@@ -1458,14 +1870,15 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
 
 ---
 
-## 10. 远期（只记规格，不排实现）
+## 13. 远期（只记规格，不排实现）
 
-> 做完 P1–P8 再开。以下只保证"有规格锚点"，不承诺顺序。
+> 做完 P1–P11 再开。以下只保证"有规格锚点"，不承诺顺序。
+> 原"召唤物/Boss 机制"已排入 P9-4 / P9-5，此处只留它们做不完的部分。
 
 | 项目                 | 规格锚点                                                                                                                                                                                                   |
 |----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **C 召唤物/忆灵**    | `Summon` 现有基类；忆灵 = 独立血条/能量/可受击/可选中，伤害类型 `MEMORY`，面板快照本体；传统召唤物（追加攻击 `ADDITIONAL`、无实体）。`models/Memosprite` 新类                                              |
-| **B4 Boss 机制**     | 受击反击（`onDamage` 钩子已具备）、半血换招（Enemy 加 `phase` 字段）、召唤（`summon_id` 数据已有，`WaveManager` 复用）                                                                                     |
+| **C 忆灵（角色专属召唤）** | P9-4 只做通用怪物召唤；忆灵 = 独立血条/能量/可受击/可选中，伤害类型 `MEMORY`，面板快照本体，角色专属召唤物。`models/Memosprite` 新类                                                                     |
+| **B4 Boss 专属机制库** | P9-5 已有换招/反击/免疫；此处留给只属于个别 Boss 的机制：召唤自带 buff、连锁技能、护盾阶段、死亡强制自爆等（每个 = 一个 `BossMechanic` 子类）                                                              |
 | **D5 模拟宇宙/欢愉** | 祝福池化 = `BuffManager` 抽 3 选 1；欢愉伤害公式：`基础值 × 欢愉倍率 × (1+欢愉度) × (1+增笑) × (1+笑点×5/(笑点+240))`，禁攻击力/属性增伤；阿哈行动单位：`速度 = 80 + 最快/5 + 第二/10 + 第三/20 + 最慢/50` |
 | **界面**             | `Battle.getQueueSnapshot / printHp` 已有 CLI 化出口；UI 层未来接 `Battle` 事件流即可                                                                                                                       |
 
@@ -1479,5 +1892,11 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
 4. **P4 击破**：这是"像不像 HSR 游戏"的分水岭，做完就能看到冰锋被火打的完整表演。
 5. **P5 敌人 AI**：靠 P2 的真实攻击力 + P1 的伤害流水线，敌人第一次"会打人"。
 6. **P7 关卡**：全部机制齐了才谈关卡，之前 StageFactory 造出来也是死的。
+7. **P8 角色为什么最后才来**：真实角色技能面很宽（治疗/辅助/控制/召唤），依赖 P6 的命中治疗护盾、P7 的额外回合；
+   放前面必然满屏 TODO。地基本来就能用 `fromAttributes` 占位测，不亏。
+8. **P9 怪物全机制紧随其后**：AI（P5）+ 命中（P6）+ 行动条（P7）三块地皮备好，"会打人"升级成"会打团"。唯一的外部
+   风险是怪物技能数据源缺失——P9-1 用自建表隔离，找到源数据只换加载处。
+9. **P10 机制补完**：全是已开口子的填充，原则一条——**没有新架构，只填数据**；任何任务做到一半发现需要新架构，
+   说明它跑偏了，回退并拆小。
 
 **每步保持：可编译 → `.\gradlew.bat test` → 提交。**
