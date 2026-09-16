@@ -86,6 +86,41 @@
 
 ---
 
+### 0.6 怪物数据陷阱（P2 实测记录，别再踩）
+
+| # | 陷阱 | 事实 | 处理 |
+|---|---|---|---|
+| 1 | **`hp_modify_ratio` 是幽灵字段** | tbgd 只有 `HPModifyRatio`，**没有** `HealthModifyRatio`；解析器猜错字段名后留了个恒为 1 的 `hp_modify_ratio`。真实血量系数在本数据的 **`health_modify_ratio`**（100201101：真实 0.266667 vs 幽灵 1；802501003：1.979167 vs 1） | bean 不读幽灵字段；`Constant` 注释写明 |
+| 2 | **`attack_modify_ratio` 未导出** | tbgd 的 `AttackModifyRatio` 有 **444/2649** 个怪 ≠ 1（如 100201506 = 0.33333302），本数据整体缺这一列 | 已从 tbgd 生成补丁文件 `monster_attack_modify_ratio.json`（只含 ≠1 的 444 条），`Constant` 装载时合并 |
+| 3 | **`effect_hit_rate` / `effect_resistance` 是加值不是系数** | 组1·Lv90 给 0.32 / 0.1；冰锋模板 `effect_resistance` 0.2 → **0.2 + 0.1 = 0.3（30%）** 才对得上 HSR.md §1.2；相乘会得到 0.02 | bean 字段名去掉 `Ratio` 后缀 + 注释说明 |
+| 4 | **等级组的字段名 ≠ bean 字段名** | JSON 键是 `attack/defence/health/speed/stance`，bean 若写成 `attackRatio` 之类，Gson 静默读成 **0** | 一律用 `@SerializedName`（已修 `HardLevelGroup`） |
+| 5 | **组号/等级来自关卡** | 怪的 `hard_level_group` 通常是 1；真正决定难度的是 `StageConfig` 的 `HardLevelGroup` + `Level` | P2 由调用方显式传参；关卡驱动留 P7-4 |
+| 6 | **精英组有两张表** | 普通关卡 `EliteGroup`；无限波次（`_StageInfiniteGroup`）用 `InfiniteEliteGroup`（绝境王虫 ×6.2、破晓之眼 ×5.0）。用错表血量差几倍；两者都来自**波组**而非怪自身 | 本数据暂无 `elite_group.json`；P2 只留系数参数（缺省 1），接表留 P7-4/P9 |
+
+同时验证过：**tbgd 与本仓库数据同版本**（2649 个 id 全部对得上；`HPModifyRatio` 不一致 0 条、`SpeedModifyRatio` 0 条、`DefenceModifyRatio` 仅 1 条 = 800205073）。
+
+> ⚠ `monster_attack_modify_ratio.json` 放在被 `.gitignore` 忽略的 `data/` 目录里，但**已用 `git add -f` 纳入版本控制**（否则新克隆会缺文件、`MonsterDataTest` 直接红；同时 `git clean -xdf` 也删不掉它）。
+> **正解在导出脚本**：等 `monster_config.json` 自己带上 `attack_modify_ratio` 列之后，删掉这个补丁文件与 `Constant.normalizeMonsterConfigs` 里的合并代码即可。
+>
+> 再生成命令（需 `E:\turnbasedgamedata`，即 `data/data_path.txt` 指向的数据源）：
+> ```powershell
+> $t = Get-Content 'E:\turnbasedgamedata\ExcelOutput\MonsterConfig.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+> $o = Get-Content 'src\main\resources\data\monster_config.json' -Raw -Encoding UTF8 | ConvertFrom-Json
+> $m = @{}; foreach ($e in $t) { if ($e.MonsterID) { $m[[int]$e.MonsterID] = $e } }
+> $r = @{}
+> foreach ($p in $o.PSObject.Properties) {
+>   $e = $m[[int]$p.Name]
+>   if ($e -and $e.AttackModifyRatio -and [math]::Abs([double]$e.AttackModifyRatio.Value - 1) -gt 1e-9) {
+>     $r[[string]$p.Name] = [double]$e.AttackModifyRatio.Value
+>   }
+> }
+> [System.IO.File]::WriteAllText('src\main\resources\data\monster_attack_modify_ratio.json',
+>     (($r | ConvertTo-Json -Depth 2) + "`n"), (New-Object System.Text.UTF8Encoding($false)))
+> # 期望：444 条，约 12KB
+> ```
+
+---
+
 ## 1. 进度总览
 
 **主线顺序**：`P1 → P2 → P3(能量) → P4(韧性击破) → P5(仇恨+AI) → P6(命中/治疗/护盾) → P7(轮次/胜负/关卡) → P8(角色数据化) → P9(怪物全机制) → P10(机制补完) → P11(收尾)`。 P3
@@ -108,7 +143,7 @@
 |                       | P1-7 DamageEvent 钩子（易伤/减伤/虚弱）        | ☑   |
 |                       | P1-8 技能执行器（单→多目标分派）               | ☑   |
 |                       | P1-9 附加伤害 + 真实伤害                      | ☑   |
-| **P2 真实怪物数据**   | P2-1 MonsterBean + Constant 加载               | ☐   |
+| **P2 真实怪物数据**   | P2-1 MonsterBean + Constant 加载               | ☑   |
 |                       | P2-2 Enemy 弱点/抗性字段                       | ☐   |
 |                       | P2-3 EnemyScaler 等级属性公式                  | ☐   |
 |                       | P2-4 EnemyFactory                              | ☐   |
@@ -534,7 +569,10 @@
     - **击杀即停 · 部分**：3 敌中当前 HP 最高的那个被主伤害击杀 → 3 次附加伤害全部落到**存活**的次高者（尸体不受伤）
     - **击杀即停 · 全灭**：被击目标全灭 → 附加伤害一次都不产生（不转火到未被攻击的目标）
 - **遗留**：`TODO data (D2)` 溢出是否计入 `totalDamage`；`TODO P8-3` 真实角色实现（知更鸟【协奏】/缇宝结界
-  + E1/E2 完整链路）。
+  + E1/E2 完整链路）。**另有一处概念区分**：HSR.md §2 的「**真实伤害乘区**」`1 + 真伤加成%` 是给"真伤段"额外乘的
+  **独立乘区**（某些光锥/遗器/星魂给"造成的真实伤害提高 X%"），与 `DamageType.TRUE`（这一段**跳过**全部乘区）
+  是两回事——**目前未实现**（`AttributeType` 里没有该字段、`Damage` 也没有对应 `Area`），等 P8-3 / P10-3 有真实
+  效果引用时再加。
 - **依赖**：P1-7（`AttackEvent` 与 `DamageEvent` 同族）、P1-5
 
 ---
