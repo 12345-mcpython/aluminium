@@ -32,6 +32,7 @@
 | 单段单目标 | `Damage` 永远是「单段·单目标」；一个技能 = N 个 Damage（AOE→每敌 1 个；BLAST→主目标+相邻；BOUNCE→循环 N 次）                 |
 | 判别口诀   | **有伤害要结算 ⇒ 构造 `Damage`；不造 `Damage` ⇒ 无伤害**（治疗/护盾/回能/上 Buff 不构造 Damage）                             |
 | 每段独立   | 每段伤害独立判定暴击、独立结算（HSR 规则）                                                                                   |
+| 角色机制   | 引擎不认角色：`Battle`/`SkillExecutor`/`Damage`/`CanHit` 里**禁止 `cid` 判断**。角色机制先数据化（P8-7 触发器表 + 效果词表），写不成数据的才允许专用类，并在 P8-0 的 triage 表登记 |
 
 ### 0.3 现有代码速查（实现前扫一眼）
 
@@ -171,11 +172,15 @@
 |                       | P7-3 胜负状态机                                | ☐   |
 |                       | P7-4 StageBean + 波次                          | ☐   |
 |                       | P7-5 StageFactory + 难度                       | ☐   |
-| **P8 角色数据化**     | P8-1 CharacterFactory + 角色字段补全           | ☐   |
+| **P8 角色数据化**     | P8-0 角色机制数据化（架构总纲，先读）          | ☑   |
+|                       | P8-1 CharacterFactory + 角色字段补全           | ☐   |
 |                       | P8-2 技能装配（真实槽位 → 真实倍率）           | ☐   |
 |                       | P8-3 天赋 + 追加攻击                           | ☐   |
 |                       | P8-4 战技点（SP）                              | ☐   |
 |                       | P8-5 真实队伍装配（StageFactory 换真角色）     | ☐   |
+|                       | P8-6 事件补齐（触发器宿主）                    | ☐   |
+|                       | P8-7 触发器表 + 效果词表（角色内容数据化）     | ☐   |
+|                       | P8-8 层数资源 Resource（替代能量条）           | ☐   |
 | **P9 怪物全机制**     | P9-1 敌人技能数据（enemy_skills.json 自建）    | ☐   |
 |                       | P9-2 EnemySkill 全效果                         | ☐   |
 |                       | P9-3 敌方 AI 技能选择器                        | ☐   |
@@ -1677,6 +1682,60 @@
 `Character.fromAttributes` 占位，P8 之后一律 `CharacterFactory` + 真实技能。
 
 **阶段内顺序**：`P8-1 → P8-2 → P8-3 → P8-4 → P8-5`（P8-4 零依赖可插队）。
+**P8-6 / P8-7 / P8-8 是 P8-3 的正路**：先补事件与触发器表，再让代表角色尽量**纯数据化**；
+P8-3 里的 `switch (cid)` 只是过渡实现。
+
+---
+
+### P8-0 角色机制数据化（架构总纲，先读）✅
+
+> 起因：调研完能量机制后发现「一堆机制各自依赖特定角色」（93 个角色 × 天赋/行迹×3/星魂×6/秘技/追加攻击/光锥/遗器）。
+> 一个角色一个 Java 类必然失控，所以先把架构定死。
+
+**1) 三分法判据（先问"引擎有没有这个能力"，而不是"这是哪个角色"）**
+
+| 机制长什么样 | 归到哪 | 例子 |
+|---|---|---|
+| 在某事件后，做一件**引擎已有能力**的事（加成 / 附加伤害 / 真伤 / 回能 / 上 buff / 额外回合 / 削韧 / 治疗 / 护盾） | **数据**（触发器 + 条件 + 效果） | 知更鸟「队友每次攻击后 +2 能量」、缇宝「我方每命中 1 目标 +1.5」、驭空「队友行动后 +2」、姬子「终结技每消灭 1 敌 +5」 |
+| 需要引擎**还不具备**的能力 | **引擎任务**（先补能力，再做数据） | 「层数替代能量条」（黄泉/飞霄/白厄/昔涟）、「全队损血/治疗转资源」（遐蝶）、「按能量上限百分比回能」（停云/藿藿/星期日） |
+| 需要跨系统状态机，数据表达不出来 | **逃生舱**：一个 Java 类 + 在本文档登记 | 刻律德菈【军功】↔【爵位】双轨 + 目标变更重置充能；万敌【血仇】阈值切换 |
+
+**反模式（违反即返工）**：`Battle` / `SkillExecutor` / `Damage` / `CanHit` 里**禁止出现 `cid` 判断**；
+唯一允许的地方是装配点（`CharacterFactory`）与 provider/触发器注册表。
+
+**2) 缺的三样基础设施**
+
+1. **事件补齐**（现在只有 `BattleEvent / MoveEvent / DamageEvent / AttackEvent`）→ P8-6。
+   还缺 `SkillCastEvent`、`EnergyEvent`、`HpLossEvent`、`HealEvent`、`KillEvent`、`BreakEvent`；
+   补完这 6 个，P3-0 C 表里的 12 类触发源就全部有宿主。
+2. **触发器表 + 效果词表**（角色内容 = 数据，`resources/characters/<cid>.json`）→ P8-7。
+3. **层数资源升一等公民**（`Resource`）→ P8-8。P3-0 B 表那 15 个「非常规」角色
+   （姬子/刃/貊泽/三月七/翡翠/乱破/万敌/刻律德菈/长夜月/不死途/千冶·刃/黄泉/飞霄/白厄/昔涟）
+   **本质是同一个东西**：`Resource{id, scope, max, onGain, onFull, onSpend}`。
+   做了它，"特殊能量条"从「9 个角色各写一个类」变成「9 条数据 + 1 个引擎类」。
+
+**3) 落地纪律**
+
+- **机制先行、角色当验收**：每补一个引擎能力，顺手数据化 1–2 个代表角色（克拉拉/希儿就是 P8-3 的样本），
+  不要试图一次做 93 个。
+- **triage 表**（下面这张）是"依赖角色的机制"的唯一 backlog：可枚举、可排序、可勾。
+
+**4) 角色机制 triage 表（骨架；能量类已由 P3-0 完成调研）**
+
+| cid | 角色 | 机制 | 归类 | 落地 |
+|---|---|---|---|---|
+| 1309 | 知更鸟 | 队友每次攻击 +2 能量（魂2 +3）；战技额外 +5；秘技每波次 +5 | 数据 | P8-7（`onAllyAttack` + `GAIN_ENERGY`） |
+| 1403 | 缇宝 | 我方每命中 1 目标 +1.5 能量；开场 +30 | 数据 | P8-7 |
+| 1202 | 停云 | 终结技为单体回 50 能量（魂6 60）；秘技自回 50 | 数据（需 op 支持"目标=队友"） | P8-7 |
+| 1207 | 驭空 | 持【鸣弦号令】时队友每次行动后 +2 | 数据 | P8-7 + P8-6（回合事件） |
+| 1003 | 姬子 | 击破弱点 +1【充能】；终结技每击杀 +5 能量 | 数据 + Resource | P8-6（击破事件）+ P8-8 |
+| 1205 | 刃 | 战技不回能；受伤/耗血攒【充能】→ 满层追击 | 引擎能力 + 数据 | P8-6（`HpLossEvent`）+ P8-8 |
+| 1308 | 黄泉 | 【残梦】替代能量条（上限 9；负面/战技/开场获取） | 引擎能力 | P8-8 + `EnergyProvider` 桥接 |
+| 1407 | 遐蝶 | 无能量条；【新蕊】按全队损血 1:1 / 治疗转化 | 引擎能力 | P8-8 + P8-6 |
+| 1220 | 飞霄 | 【飞黄】每 2 次我方攻击 +1（上限 12，6 点开大） | 引擎能力 | P8-8 + 攻击计数器 |
+| 1412 | 刻律德菈 | 【军功】↔【爵位】双轨；目标变更充能重置为 0 | **专用类（逃生舱）** | P8-3 模式，登记在案 |
+
+> 后续每补一类机制（削韧/击破/DOT/受击反击/Buff 体系/光锥/遗器），照这张表的格式各开一张。
 
 ---
 
@@ -1813,6 +1872,76 @@
     2. 每个角色再 `.weapon(...)` / `.relicSuit(...)`：先从 `Constant.WEAPONS` 挑同命途光锥（数值被动 P10-3 再接，先只吃面板）
 - **验收**：`RealTeamTest`：`load(103201)` → `team.size()==4`、每个 `getElement()` 非 null、Battle 能完整跑一轮不炸
 - **依赖**：P8-1、P7-5
+
+---
+
+### P8-6 事件补齐（触发器宿主）
+
+- **目标**：把 P3-0 C 表的 12 类触发源都变成事件，让"角色机制"只订阅事件，不再往 `Battle` 里塞逻辑。
+- **涉及文件**：新建 `models/event/SkillCastEvent.java`、`EnergyEvent.java`、`HpLossEvent.java`、
+  `HealEvent.java`、`KillEvent.java`、`BreakEvent.java`、`TurnStartEvent.java`；
+  `models/CanHit.java`（实现并转发给 `BuffManager`）；`Battle.java`、`models/SkillExecutor.java`（发事件）；
+  新建 `test/EventBusTest.java`
+- **怎么做**：
+    1. 照 `AttackEvent` 的现成模式：接口 + 全部 `default` 空实现 + `CanHit` 转发 `BuffManager` + `Battle` 广播给友方。
+    2. 每个事件必须携带足够还原事实的字段：
+       - `SkillCastEvent(battle, user, skill, hitTargets)`（非伤害技能也要发）
+       - `EnergyEvent(battle, target, actuallyAdded)`（用 `gainEnergy` 返回的**实际入账值**）
+       - `HpLossEvent(battle, target, before, after, source)`（`after - before` 就是损血量，遐蝶/万敌/刃要）
+       - `HealEvent(battle, healer, target, amount)`、`KillEvent(battle, attacker, target)`、
+         `BreakEvent(battle, attacker, target, element)`、`TurnStartEvent(battle, actor)`
+    3. 发送点：`SkillExecutor.execute`（技能）、`Battle.applyEnergyGain`（能量）、`CanHit.takeDamage`/`heal`
+       （损血/治疗，注意附加伤害/真伤口径与 `isCountsAsAttack()` 一致）、`Battle.grantHitAndKillEnergy`
+       （击杀）、`Battle.gainBreakEnergy`（击破）、`Battle.beforeMove`（回合开始）。
+    4. **不要**顺手把效果实现也写了——本任务只发事件 + 测试收到事件，效果归 P8-7/P8-8。
+- **验收**：`EventBusTest`：挂一个测试 buff，断言收到的 `(事件, 角色, 数值)` 序列；
+  DOT/附加伤害不发 `KillEvent`；无能量条角色不发 `EnergyEvent`。
+- **依赖**：P1-7（事件模式已成型）
+
+---
+
+### P8-7 触发器表 + 效果词表（角色内容数据化）
+
+- **目标**：角色机制 = 数据表（`resources/characters/<cid>.json`），引擎只做解释；从此**不写 `XxxTalent.java`**。
+- **涉及文件**：新建 `beans/TriggerSpec.java`、`beans/EffectSpec.java`、`models/TriggerTable.java`（解释器）、
+  `Constant.java`（加载）、新建 `src/main/resources/characters/*.json`、新建 `test/TriggerTableTest.java`
+- **怎么做**：
+    1. 表结构：
+       ```json
+       { "cid": 1403,
+         "resources": [{ "id": "tribbie_charge", "scope": "SELF", "max": 3 }],
+         "triggers": [
+           { "on": "SKILL_CAST",  "when": ["self"],            "do": [{ "op": "GAIN_ENERGY", "amount": 30 }] },
+           { "on": "ALLY_ATTACK", "when": ["attacker!=self"],   "do": [{ "op": "GAIN_ENERGY", "amount": 1.5 }] } ] }
+       ```
+    2. 第一版 op 词表（**只做引擎已有能力**，别扩）：`MODIFY_ATTR` / `ADD_DAMAGE` / `TRUE_DAMAGE` /
+       `GAIN_ENERGY` / `GAIN_RESOURCE` / `SPEND_RESOURCE` / `APPLY_BUFF` / `EXTRA_TURN` / `ADVANCE` /
+       `REDUCE_TOUGHNESS` / `HEAL` / `SHIELD`；每个 op 一个 `record` 实现，`switch` 只在解释器里。
+    3. 装载：`CharacterFactory` 造角色时把该 cid 的表挂成触发器列表；**未登记 = 空表（不是错误）**。
+    4. 数据源：blog 文档（`E:\code\blog\hsr\<id>_<名>.md`）+ tbgd 技能文案；每条效果写清出处，数值缺失标 `TODO data`。
+- **验收**：`TriggerTableTest`：**不写任何 Java 角色类**，纯数据跑通两个真实角色——
+  缇宝 1403（我方每命中 1 目标 +1.5 能量）与知更鸟 1309（队友每次攻击 +2 能量）；
+  再补一条"未登记角色 = 空表、战斗不炸"。
+- **依赖**：P8-6、P3-1（能量入账口）
+
+---
+
+### P8-8 层数资源 Resource（替代能量条）
+
+- **目标**：一个通用 `Resource`，让"层数当能量/层数触发大招"的角色（P3-0 A/B 表）不写专用类。
+- **涉及文件**：新建 `models/Resource.java`、`models/ResourceManager.java`；`CanHit.java`（挂 manager）、
+  `Constant.java`、新建 `test/ResourceTest.java`
+- **怎么做**：
+    1. `Resource(id, scope, max, initial)`；`ResourceManager.gain/spend/get/isFull`，满了不溢出并发"满"事件
+       （`onFull` 效果仍归触发器表，别硬编码）。
+    2. **资源不等于能量**：黄泉是"【残梦】满 9 才能放大招"——用 `EnergyProvider` 把资源接到
+       `isEnergyFull()`/`castUltra` 上（P3 已经把这条口子留成 provider），**不要**改 `CanHit` 的能量语义。
+    3. 三个来源先做：事件触发获得（P8-7 `GAIN_RESOURCE`）、主动消耗（`SPEND_RESOURCE`）、
+       转化（损血/治疗 → 资源，需要 P8-6 的 `HpLossEvent`/`HealEvent`）。
+    4. `scope` 至少支持 `SELF` / `PARTY`（三月七【充能】、大丽花全队共享那类以后再说）。
+- **验收**：`ResourceTest`：加满触发"满"且不溢出；消耗到 0；`HpLossEvent` 下"每损失 1 点生命 +1 资源"正确；
+  测试替身 provider 让"资源满 → `castUltra` 可用"。
+- **依赖**：P8-6、P8-7
 
 ---
 
@@ -2144,5 +2273,9 @@ Debuff 数据化。 **没有新系统，只有把已开口子填满。**
    风险是怪物技能数据源缺失——P9-1 用自建表隔离，找到源数据只换加载处。
 9. **P10 机制补完**：全是已开口子的填充，原则一条——**没有新架构，只填数据**；任何任务做到一半发现需要新架构，
    说明它跑偏了，回退并拆小。
+10. **角色机制为什么在 P8-0 先定架构**：93 个角色 × (天赋 + 行迹×3 + 星魂×6 + 秘技 + 追加攻击) 一个角色一个类是
+    维护地狱。所以先定三分法（数据 / 引擎能力 / 逃生舱）与"引擎禁止判 cid"的红线，再补事件（P8-6）→
+    触发器表（P8-7）→ 层数资源（P8-8）。**顺序上永远是机制先行、角色当验收**：
+    P1–P7+P10 补引擎能力，每个能力顺手数据化 1–2 个代表角色，不做全量。
 
 **每步保持：可编译 → `.\gradlew.bat test` → 提交。**
