@@ -4,6 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.models.event.AttackEvent;
 import com.laosun.aluminium.models.event.BattleEvent;
 import com.laosun.aluminium.models.event.DamageEvent;
 import com.laosun.aluminium.models.event.MoveEvent;
@@ -12,6 +13,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.EnumMap;
+import java.util.List;
 
 /**
  * Abstract base for all entities that can participate in combat.
@@ -22,7 +24,7 @@ import java.util.EnumMap;
  */
 @Getter
 @ToString
-public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent {
+public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, AttackEvent {
     /**
      * The display name of this entity.
      */
@@ -205,5 +207,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent {
     @Override
     public void onDamage(Battle battle, Damage damage) {
         buffManager.onDamage(battle, damage);
+    }
+
+    /**
+     * Attack-level hook (P1-9), broadcast to every ally once an attack is fully settled.
+     *
+     * <p>The default relays to {@link BuffManager#afterAttack(Battle, CanHit, CanHit, List, double)},
+     * so buffs like 知更鸟【协奏】/缇宝结界 can spawn 附加伤害 / 真伤 off someone else's attack.
+     * Subclasses that override it <b>must call {@code super}</b>.
+     */
+    @Override
+    public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
+                            List<? extends CanHit> hitTargets, double totalDamage) {
+        buffManager.afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage);
     }
 }

@@ -1,6 +1,8 @@
 package com.laosun.aluminium;
 
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
@@ -223,6 +225,31 @@ public class Battle {
     }
 
     /**
+     * 附加伤害：面板型 base（攻击力 / 生命上限 × 倍率），**走完整乘区**（增伤/防御/抗性/易伤都吃）。
+     *
+     * <p>官方定义：「使受击者额外受到 1 次伤害，本次伤害不视为造成了 1 次攻击」——
+     * 所以置 {@code notCountsAsAttack()}（不回能、不削韧、不触发攻击级事件）。
+     *
+     * @param base 已经算好的基础值（例：知更鸟 120% 攻击力 / 缇宝 12% 生命上限）
+     * @return 该段结算值（0 = 未造成伤害）
+     */
+    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
+        Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
+        return applyDamage(target, extra.notCountsAsAttack());
+    }
+
+    /**
+     * 真实伤害：固定数额，或"本次攻击总伤害 × %"这类衍生值——**跳过全部乘区**，不视为一次攻击。
+     *
+     * @param base 真伤数额（不再受防御/抗性/增伤/暴击/易伤影响）
+     * @return 该段结算值（0 = 未造成伤害）
+     */
+    public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
+        Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
+        return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack());
+    }
+
+    /**
      * Enemies that may be selected as attack targets (= alive), in battlefield order.
      *
      * <p>Single source of truth for "who can be hit": {@link SkillExecutor} uses it today,
@@ -261,8 +288,8 @@ public class Battle {
         }
         damage.addBoost(attacker.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
 
-        // 2) 暴击区：只有可暴击类型才骰；全引擎唯一的随机点，用注入的 rng（可复现）
-        if (damage.getType().isCrittable()) {
+        // 2) 暴击区：可暴击类型才骰；效果已指定双暴（fixedCrit）时不再覆盖
+        if (damage.getType().isCrittable() && !damage.isCritFixed()) {
             double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
             boolean isCrit = critRate > 0 && rng.nextDouble() < critRate;
             damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get());

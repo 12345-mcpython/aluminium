@@ -81,6 +81,11 @@ public class Damage {
      * {@code false} (P3 energy gain and P4 toughness only look at this).
      */
     private boolean countsAsAttack = true;
+    /**
+     * Whether this segment's crit was fixed by the effect that created it（如知更鸟附加伤害
+     * 固定 100% 暴击率 / 150% 暴伤）：{@code Battle.assemble} 不会按面板再骰一次。
+     */
+    private boolean critFixed;
 
     public Damage(CanHit attacker, CanHit defender, DamageElement element, DamageType type, double skillBaseValue) {
         this.attacker = attacker;
@@ -246,6 +251,21 @@ public class Damage {
      */
     public Damage crit(boolean isCrit, double criticalDamage) {
         critArea().set(isCrit, criticalDamage);
+        return this;
+    }
+
+    /**
+     * 由效果**指定**本段双暴（例：知更鸟附加伤害固定 100% 暴击率 / 150% 暴伤）。
+     *
+     * <p>与 {@link #crit(boolean, double)} 的区别：这个会置位 {@code critFixed}，
+     * {@code Battle.assemble} 因此**不会**再按攻击者面板骰一次、也不会用面板暴伤覆盖它。
+     *
+     * @param isCrit         本段是否暴击
+     * @param criticalDamage 本段固定暴伤（0.5 = +50%）
+     */
+    public Damage fixedCrit(boolean isCrit, double criticalDamage) {
+        critArea().set(isCrit, criticalDamage);
+        this.critFixed = true;
         return this;
     }
 
