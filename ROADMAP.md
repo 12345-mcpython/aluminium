@@ -143,10 +143,10 @@
 |                       | P1-7 DamageEvent 钩子（易伤/减伤/虚弱）        | ☑   |
 |                       | P1-8 技能执行器（单→多目标分派）               | ☑   |
 |                       | P1-9 附加伤害 + 真实伤害                      | ☑   |
-| **P2 真实怪物数据**   | P2-1 MonsterBean + Constant 加载               | ☑   |
-|                       | P2-2 Enemy 弱点/抗性字段                       | ☐   |
-|                       | P2-3 EnemyScaler 等级属性公式                  | ☐   |
-|                       | P2-4 EnemyFactory                              | ☐   |
+| **P2 真实怪物数据** ✅ | P2-1 MonsterBean + Constant 加载               | ☑   |
+|                       | P2-2 Enemy 弱点 + 韧性数值                     | ☑   |
+|                       | P2-3 EnemyScaler 等级属性公式                  | ☑   |
+|                       | P2-4 EnemyFactory                              | ☑   |
 | **P3 能量系统**       | P3-1 能量字段 + gainEnergy                     | ☐   |
 |                       | P3-2 回能接入 + 大招条件                       | ☐   |
 |                       | P3-3 击破回能联动                              | ☐   |
@@ -577,143 +577,88 @@
 
 ---
 
-## 3. 阶段 P2：真实怪物数据
+## 3. 阶段 P2：真实怪物数据（只做数值）
 
-**本阶段结束时的成果**：`EnemyFactory.create(1002011, 90)` 一条命令造出面板属性正确的冰锋（弱火/雷、冰抗 0.2、Lv90
-HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
+**本阶段结束时的成果**：`EnemyFactory.create(1002011, 90, 1)` 一条命令造出面板正确的冰锋（HP≈16498.296、
+防御≈1100、速度 132、弱火/雷、冰抗 0.2、韧性 60），并且抗性直接进入伤害流水线。
 
----
-
-### P2-1 MonsterBean + Constant 加载
-
-- **目标**：把 `monster_config.json` 解析成 bean，能查询弱点/抗性/倍率。
-- **涉及文件**：新建 `beans/MonsterBean.java`、`Constant.java`、新建 `test/MonsterBeanTest.java`
-- **怎么做**：
-    1. `MonsterBean`（record，Gson 直接映射，字段名与 JSON 一致，`damage_resistance` 用 `@SerializedName`）：
-       ```java
-       public record MonsterBean(Translate name,
-               @SerializedName("template_id") int templateId,
-               @SerializedName("elite_group") int eliteGroup,
-               @SerializedName("hard_level_group") int hardLevelGroup,
-               @SerializedName("stance_weak") List<String> stanceWeak,
-               @SerializedName("hp_modify_ratio") double hpModifyRatio,
-               @SerializedName("defence_modify_ratio") double defenceModifyRatio,
-               @SerializedName("health_modify_ratio") double healthModifyRatio,
-               @SerializedName("speed_modify_ratio") double speedModifyRatio,
-               @SerializedName("stance_modify_ratio") double stanceModifyRatio,
-               @SerializedName("damage_resistance") Map<String, Double> damageResistance,
-               @SerializedName("debuff_resistance") Map<String, Double> debuffResistance,
-               @SerializedName("summon_id") List<Integer> summonId) {}
-       ```
-       另建 `beans/MonsterTemplateBean.java` 映射 `monster_template_config.json`：
-       `(Translate name, double attack, double defence, double health, double speed, double stance, int stanceCount, String stanceType, double effectResistance)`
-    2. `Constant` 加：
-       ```java
-       public static final Map<Integer, MonsterBean> MONSTERS =
-               JSONReader.fromJSON("monster_config.json", new TypeToken<Map<Integer, MonsterBean>>() {}.getType());
-       public static final Map<Integer, MonsterTemplateBean> MONSTER_TEMPLATES =
-               JSONReader.fromJSON("monster_template_config.json", new TypeToken<Map<Integer, MonsterTemplateBean>>() {}.getType());
-       ```
-    3. 顺手把 `beans/HardLevelGroup` 的 record 组件加 `@SerializedName`（现在没有，Gson 按 record 组件名匹配不上 JSON 的
-       `"attack"` 等短名）：
-       ```java
-       public record HardLevelGroup(
-               @SerializedName("attack") double attackRatio,
-               @SerializedName("defence") double defenceRatio,
-               @SerializedName("health") double healthRatio,
-               @SerializedName("speed") double speedRatio,
-               @SerializedName("stance") double stanceRatio,
-               @SerializedName("effect_hit_rate") double effectHitRateRatio,
-               @SerializedName("effect_resistance") double effectResistanceRatio) {
-       }
-       ```
-    4. `Constant` 加 `public static final Map<Integer, Map<Integer, HardLevelGroup>> HARD_LEVEL_GROUPS;`，加载
-       `hard_level_group.json`
-- **验收**：`MonsterBeanTest`：
-    - `Constant.MONSTERS.get(1002011)` 非空；`stanceWeak()` == `["Fire", "Thunder"]`；`damageResistance().get("Ice")` ==
-      0.2；`templateId() == 1002011`
-    - `Constant.MONSTER_TEMPLATES.get(1002011).health() == 69.75`、`.stance() == 60`
-    - `Constant.HARD_LEVEL_GROUPS.get(1).get(90).healthRatio() == 236.53471`（±1e-4）
-- **依赖**：无（纯数据层）
+**本阶段只做数值**（用户明确要求）：弱点与韧性只是把数据搬到 `Enemy` 上，**削韧与击破机制留 P4**；
+免控（`debuff_resistance`）P6-1、召唤 P9-4、多阶段血量 P9-5。等级与等级组来自**关卡**，所以由调用方传参
+（关卡驱动留 P7-4）。数据陷阱先读 **§0.6**。
 
 ---
 
-### P2-2 Enemy 挂弱点/抗性
+### P2-1 MonsterBean + Constant 加载 ✅
 
-- **目标**：`Enemy` 能回答"某元素是不是我弱点""我对某元素抗性多少"。
-- **涉及文件**：`models/Enemy.java`、新建 `test/WeaknessTest.java`
-- **怎么做**：
-    1. `Enemy` 加 `@Setter private Set<DamageElement> stanceWeak = Set.of();`
-    2. 加 `public boolean isWeak(DamageElement e) { return stanceWeak.contains(e); }`
-    3. 加便捷构造：
-       `Enemy(String name, DoubleValue[] attributes, Set<DamageElement> stanceWeak, Map<DamageElement, Double> damageResist)`（
-       `damageResist` 字段 P1-6 已有）
-    4. `damage_resistance` 的 String key → 元素转换用 `DamageElement.fromString`（对 `"Unknown"` 返回 null，防御一下）
-- **验收**：`WeaknessTest`：
-    - 冰锋式构造（weak `{FIRE, THUNDER}`，resist `{ICE:0.2}`）→ `isWeak(FIRE)` true、`isWeak(ICE)` false
-    - 天然免疫检查：`getDamageResist().get(DamageElement.ICE) == 0.2`
-- **依赖**：P1-6、P2-1
+- **目标**：把 `monster_template_config.json` / `monster_config.json` / `hard_level_group.json` 装进 `Constant`。
+- **涉及文件**：新建 `beans/MonsterTemplate.java`、`beans/MonsterConfig.java`、修 `beans/HardLevelGroup.java`、
+  `Constant.java`、`data/monster_attack_modify_ratio.json`（补丁数据）、新建 `test/MonsterDataTest.java`
+- **落地**：
+    1. `Constant` 加 `MONSTER_TEMPLATES` / `MONSTER_CONFIGS` / `HARD_LEVEL_GROUPS`
+    2. `HardLevelGroup` 必须用 `@SerializedName`（JSON 键是 `attack` 而不是 `attackRatio`，否则 Gson 静默读成 0）；
+       `effect_hit_rate` / `effect_resistance` 是**加值**，字段名因此去掉 `Ratio` 后缀
+    3. 攻击修正列在数据里整个缺失 → 从 tbgd 生成补丁文件，装载时由 `Constant.normalizeMonsterConfigs` 合并
+       （其余系数缺失按 1.0；`stance_weak` 缺失 → 空集合、`damage_resistance` 缺失 → 空表）
+    4. 与 tbgd 的版本一致性已核实：2649 个 id 全部对得上，`HPModifyRatio`/`SpeedModifyRatio` 不一致 **0** 条、
+       `DefenceModifyRatio` **1** 条（800205073）
+- **验收**：`MonsterDataTest`（7 个用例）：冰锋模板/实例字段、五个系数装载后无 null、
+  **血量字段陷阱**（802501003 = 1.979167、100201101 = 0.266667）、攻击修正来自补丁（100201506 = 0.33333302）、
+  组1·Lv90 与组3·Lv120 的七个系数
+- **依赖**：无
 
 ---
 
-### P2-3 EnemyScaler 等级属性公式
+### P2-2 Enemy 挂弱点 + 韧性数值 ✅
 
-- **目标**：敌人属性 = 模板基础值 × `hard_level_group[组][等级]` 乘区 × `monster_config` 自身修改倍率。
-- **涉及文件**：新建 `utils/EnemyScaler.java`、新建 `test/EnemyScalerTest.java`
-- **怎么做**：
-    1. 一段纯静态函数，入参：`(MonsterTemplateBean tpl, MonsterBean cfg, int level)`：
-       ```java
-       public static ScaledStats scale(MonsterTemplateBean tpl, MonsterBean cfg, int level) {
-           HardLevelGroup hlg = Constant.HARD_LEVEL_GROUPS.get(cfg.hardLevelGroup()).get(level);
-           return new ScaledStats(
-               tpl.health()  * hlg.healthRatio()  * cfg.healthModifyRatio(),
-               tpl.defence() * hlg.defenceRatio() * cfg.defenceModifyRatio(),
-               tpl.attack()  * hlg.attackRatio()  * cfg.hpModifyRatio(),      // 注意: 攻击对应 hp_modify_ratio
-               tpl.speed()   * hlg.speedRatio()   * cfg.speedModifyRatio(),
-               tpl.stance()  * hlg.stanceRatio()  * cfg.stanceModifyRatio(),
-               hlg.effectHitRateRatio(), hlg.effectResistanceRatio()
-           );
-       }
-       public record ScaledStats(double health, double defence, double attack, double speed,
-                                 double stance, double effectHitRate, double effectResistance) {}
-       ```
-       （先照抄，数值对不对由验收断言校准：如果 80/90 级跟游戏面板对不上，微调乘区顺序即可，不影响结构）
-    2. `elite_group` 暂无数据文件，先 `×1.0` 并注释 `// TODO elite_group`
-- **验收**：`EnemyScalerTest`（冰锋 template 1002011 + cfg 1002011 + Lv90）：
-    - `health ≈ 69.75 × 236.53471 ≈ 16498.30`
-    - `defence ≈ 210 × 5.238095 ≈ 1100.00`
-    - `attack ≈ 18 × 36.821384 ≈ 662.78`（×hpModifyRatio=1）
-    - `speed == 132.00`、`stance == 60`、`effectResistance == 0.1`
-    - 容差 `1e-2`
+- **目标**：`Enemy` 带上击破所需的**数据**——弱点集合与韧性数值（机制留 P4）。
+- **涉及文件**：`models/Enemy.java`（验收并入 `EnemyFactoryTest`，不单开"测 setter"的空用例）
+- **落地**：`Enemy` 加 `stanceWeak`（默认空集合）、`stance` / `maxStance`、`stanceCount`、`stanceType`，
+  以及判定入口 `public boolean isWeakTo(DamageElement)`——它是 P4-2「弱点削韧」的**唯一调用点**，
+  别再直接摸集合（否则以后改判定规则会漏调用点）。抗性字段 `damageResist` P1-6 已有。
+- **验收**：`EnemyFactoryTest.weaknessAndToughnessAreCarriedOver`：弱火/雷、`isWeakTo(FIRE)` 真 /
+  `isWeakTo(ICE)` 假 / `isWeakTo(null)` 假、韧性 60/60、条数 1、韧性属性冰
+- **依赖**：P2-1（数据来源）、P1-6（抗性字段）
+
+---
+
+### P2-3 EnemyScaler 等级属性公式 ✅
+
+- **目标**：`敌人属性 = 模板基础值 × 等级组系数 × 实例自身调整 × 精英组系数`。
+- **涉及文件**：新建 `models/EnemyStats.java`、`models/EnemyScaler.java`、修 `beans/EliteGroup.java`、
+  新建 `test/EnemyScalerTest.java`
+- **落地**：
+    1. `EnemyStats` = **纯数值**结果（hp/attack/defence/speed/stance/effectHitRate/effectResistance），
+       不依赖 `Enemy`，便于单独对拍公式
+    2. `EnemyScaler.scale(template, config, group[, elite])`：血量用 `config.hpRatio()`（= `health_modify_ratio`，
+       **不是**幽灵字段 `hp_modify_ratio`）；**效果抵抗是加值**（模板 + 等级组），不是相乘
+    3. 精英组系数用现成的 `EliteGroup` record 作参数（`NO_ELITE_BONUS` 为缺省）——「从 `EliteGroup` 还是
+       `InfiniteEliteGroup` 取、怎么随关卡走」留给 P7-4 / P9
+- **验收**：`EnemyScalerTest`（4 个用例）：
+    - 冰锋 × 组1·Lv90：HP `69.75 × 236.53471 = 16498.296`、攻击 `18 × 36.821384 = 662.784912`、
+      防御 `210 × 5.238095 = 1099.99995`（≈ `200 + 10×90`）、速度 132、韧性 60
+    - 效果抵抗加值：`0.2 + 0.1 = 0.3`（相乘会得到 0.02）
+    - 缺省重载 == `NO_ELITE_BONUS`
+    - **会话对拍值**：绝境碎星王虫（802501003 × 组3·Lv120 × `EliteGroup(6.2, 1.1, 1, 1, 1)`）
+      → HP `2232 × 1938.7634 × 1.979167 × 6.2 ≈ 53,099,832` ✅（与游戏实测吻合；不带精英组 ≈ 8,564,489）
 - **依赖**：P2-1
 
 ---
 
-### P2-4 EnemyFactory
+### P2-4 EnemyFactory ✅
 
-- **目标**：一条命令造出真实敌人（属性 + 弱点 + 抗性 + 等级）。
-- **涉及文件**：新建 `utils/EnemyFactory.java`、新建 `test/EnemyFactoryTest.java`
-- **怎么做**：
-    1. `public static Enemy create(int monsterId, int level)`：
-       ```java
-       MonsterBean cfg = Constant.MONSTERS.get(monsterId);
-       MonsterTemplateBean tpl = Constant.MONSTER_TEMPLATES.get(cfg.templateId());
-       ScaledStats s = EnemyScaler.scale(tpl, cfg, level);
-       AttributeBuilder atb = new AttributeBuilder();
-       atb.setBase(HEALTH, s.health()).setBase(DEFENCE, s.defence())
-          .setBase(ATTACK, s.attack()).setBase(SPEED, s.speed());
-       Enemy e = new Enemy(cfg.name().english(), atb.build(), parseWeak(cfg), parseResist(cfg));
-       e.setLevel(level);
-       return e;
-       ```
-    2. `parseWeak`：`stance_weak` 字符串列表 → `EnumSet<DamageElement>`；`parseResist`：key→`DamageElement.fromString`（null
-       跳过）
-- **验收**：`EnemyFactoryTest`：
-    - `EnemyFactory.create(1002011, 90)`：
-        - `isWeak(FIRE)` / `isWeak(THUNDER)` true
-        - `getDamageResist().get(ICE) == 0.2`
-        - `getLevel() == 90`、`getMaxHp() ≈ 16498.30`
-- **依赖**：P2-2、P2-3
+- **目标**：`EnemyFactory.create(monsterId, level, hardLevelGroup)` 一条命令造出面板正确的敌人。
+- **涉及文件**：新建 `models/EnemyFactory.java`、新建 `test/EnemyFactoryTest.java`
+- **落地**：查三段数据（实例 → 模板 → 等级组）→ `EnemyScaler.scale` → `AttributeBuilder` 灌
+  HEALTH / ATTACK / DEFENCE / SPEED / EFFECT_RESISTANCE → `new Enemy(name, attributes)`，再设
+  `level`（P1-4，进防御区）、`damageResist`（P1-6，抗性区直接生效）、`stanceWeak`（P2-2 弱点）、
+  `stance`/`maxStance`/`stanceCount`/`stanceType`。实例 / 模板 / 等级组等级缺任一 → `IllegalArgumentException`（fail fast）。
+- **验收**：`EnemyFactoryTest`（5 个用例）：
+    - `create(1002011, 90, 1)`：HP 16498.296（初始 HP = 上限）、防御 ≈1100、攻击 662.784912、速度 132、等级 90
+    - 弱点/韧性三态断言（见 P2-2）
+    - **抗性进流水线**：用冰伤打它 → 结算 = `base × 1000/(def+1000) × 0.8`（防御区 × 冰抗 0.2）
+    - 补丁攻击修正进面板：100201506 → 攻击 = 模板 × 组1·Lv90 × 0.33333302
+    - 未知实例 / 未知等级组等级 → 抛异常
+- **依赖**：P2-1、P2-2、P2-3
 
 ---
 
