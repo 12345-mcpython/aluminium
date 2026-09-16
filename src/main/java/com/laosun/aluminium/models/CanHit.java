@@ -35,6 +35,13 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
      */
     private final Camp camp;
 
+    /**
+     * Combat level (P1-4): feeds the defence zone now, break base (P4) and enemy
+     * stat scaling (P2-4) later. Defaults to 80 so existing code keeps working.
+     */
+    @Setter
+    private int level = 80;
+
     @Setter
     private EnumMap<SkillType, Skill> skills;
     /**
@@ -81,6 +88,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent {
         // need to clone
         this.name = other.name;
         this.camp = other.camp;
+        this.level = other.level;
         this.skills = new EnumMap<>(other.skills);
         this.attributes = other.attributes.clone();
         // don't need to clone
