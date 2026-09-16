@@ -311,8 +311,49 @@ public class Battle {
             return false;
         }
         enemy.breakEnemy(element);
+        enemy.setBrokenRemainTurns(Constant.BROKEN_REMAIN_TURNS);
         applyDamage(enemy, BreakDamageCalculator.build(attacker, enemy, element, stanceDamage));   // P4-3
+        delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // P4-4 推条
         gainBreakEnergy(attacker, enemy);            // P3-3
+        return true;
+    }
+
+    /**
+     * 按目标行动周期的百分比推条（P4-4）：{@code delay = 周期 × percent}，
+     * 周期 = {@code 10000 / 速度}（与 {@code Queue} 的 {@code ACTION_THRESHOLD} 一致）。
+     *
+     * @param target  被推条的目标
+     * @param percent 推条比例（0 ~ 1，HSR 击破 = 0.25）
+     * @return {@code true} = 目标在行动条里且真的被推了
+     */
+    public boolean delayMovePercent(CanHit target, double percent) {
+        if (target == null || percent <= 0) {
+            return false;
+        }
+        double speed = target.getAttribute(AttributeType.SPEED).get();
+        if (speed <= 0) {
+            return false;
+        }
+        return queue.delayAction(target, 10000.0 / speed * percent);
+    }
+
+    /**
+     * 击破中的敌人轮到自己回合时调用（P4-4）：递减击破回合数，到 0 就恢复韧性，并返回"本回合被跳过"。
+     *
+     * <p>调用方（现在的 {@code Main} 演示、P5-5 的敌方回合执行）拿到 {@code true} 就不要让他行动，
+     * 直接走 {@link #afterMove()}。
+     *
+     * @param enemy 轮到行动的那个敌人
+     * @return {@code true} = 他还在击破中，本回合不行动
+     */
+    public boolean handleBrokenTurn(Enemy enemy) {
+        if (enemy == null || !enemy.isBroken()) {
+            return false;
+        }
+        enemy.setBrokenRemainTurns(enemy.getBrokenRemainTurns() - 1);
+        if (enemy.getBrokenRemainTurns() <= 0) {
+            enemy.recoverFromBroken();
+        }
         return true;
     }
 

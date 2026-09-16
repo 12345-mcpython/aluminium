@@ -151,6 +151,16 @@ public final class Constant {
      */
     public static final Map<Integer, Double> BREAKING_RATE;
 
+    /**
+     * 击破推条比例（P4-4）：击破瞬间把目标行动条往后推 25%（单位 = 该目标的行动周期）。
+     */
+    public static final double BREAK_DELAY_RATIO = 0.25;
+
+    /**
+     * 击破持续回合数（P4-4）：敌人被击破后跳过这么多个自己的回合，然后韧性回满。
+     */
+    public static final int BROKEN_REMAIN_TURNS = 2;
+
     static {
         RELIC_MAIN_ATTRIBUTES = JSONReader.fromJSON("main_attribute.json", RelicMainAttribute.class);
         RELIC_SUB_ATTRIBUTES = JSONReader.fromJSON("sub_attribute.json", RelicSubAttribute.class);

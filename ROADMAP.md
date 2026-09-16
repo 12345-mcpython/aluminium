@@ -156,7 +156,7 @@
 | **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ☑   |
 |                       | P4-2 削韧判定                                  | ☑   |
 |                       | P4-3 击破伤害                                  | ☑   |
-|                       | P4-4 击破状态/推条/跳回合                      | ☐   |
+|                       | P4-4 击破状态/推条/跳回合                      | ☑   |
 |                       | P4-5 DOT                                       | ☐   |
 |                       | P4-6 超击破                                    | ☐   |
 | **P5 仇恨 + 敌人AI**  | P5-1 Path 仇恨值                               | ☐   |
@@ -1097,33 +1097,39 @@
 
 ---
 
-### P4-4 击破状态：推条 + 跳回合 + 恢复
+### P4-4 击破状态：推条 + 跳回合 + 恢复 ✅
 
 - **目标**：击破后敌人行动被推迟 25% 行动条；击破期间敌人的回合被跳过；2 回合后恢复。
-- **涉及文件**：`Battle.java`、`models/Enemy.java`（若需）、`Main.java`（演示分支）、新建 `test/BreakStateTest.java`
-- **怎么做**：
-    1. 击破瞬间（P4-2 的 `reduceToughness` 里、`gainBreakEnergy` 之前）加：
+- **涉及文件**：`Battle.java`、`Constant.java`、`Main.java`（演示分支）、新建 `test/BreakStateTest.java`
+- **怎么做**（实测：跳回合逻辑放 **Battle**，不放 Main——P5-5 的敌方回合执行要复用同一个口子）：
+    1. `Constant` 加 `BREAK_DELAY_RATIO = 0.25`、`BROKEN_REMAIN_TURNS = 2`（**常量不许写在 Enemy 里**，
+       所以 `Enemy.breakEnemy(element)` 只做状态转换，持续回合数由 Battle 装配）。
+    2. `Battle` 加两个助手：
        ```java
-       battle.queue.delayAction(enemy, 10000.0 / enemy.getAttribute(AttributeType.SPEED).get() * 0.25);  // 25% 行动条
-       ```
-       或加 `Battle` 助手 `delayMovePercent(CanHit c, double percent)`（内部算 cycleTime）
-    2. 敌人回合开头跳过：`Main.round()` 的敌人分支改成：
-       ```java
-       if (current.getCanHit() instanceof Enemy e && e.isBroken()) {
-           e.setBrokenRemainTurns(e.getBrokenRemainTurns() - 1);
-           if (e.getBrokenRemainTurns() <= 0) {
-               e.recoverFromBroken();
-           }
-           IO.println("[BROKEN] " + e.getName() + " skips this turn");   // 不行动，直接 afterMove
-       } else if (current.getCanHit() instanceof Enemy e) {
-           // P5-5 之后再接敌人行动；现在只打印 TODO
+       public boolean delayMovePercent(CanHit target, double percent) {   // 推条 = 行动周期 × percent
+           if (target == null || percent <= 0) return false;
+           double speed = target.getAttribute(AttributeType.SPEED).get();
+           if (speed <= 0) return false;
+           return queue.delayAction(target, 10000.0 / speed * percent);
+       }
+
+       /** 击破中的敌人轮到自己回合时调用；返回 true = 本回合不行动 */
+       public boolean handleBrokenTurn(Enemy enemy) {
+           if (enemy == null || !enemy.isBroken()) return false;
+           enemy.setBrokenRemainTurns(enemy.getBrokenRemainTurns() - 1);
+           if (enemy.getBrokenRemainTurns() <= 0) enemy.recoverFromBroken();
+           return true;
        }
        ```
-    3. 击破回能：`reduceToughness` 末尾 `battle.gainBreakEnergy(user, e);`（步骤 2 的代码里已含）
-- **验收**：`BreakStateTest`：
-    - 击破前记录 `getTimeRemaining(enemySignal)` → 击破后增大（≈ 原剩余 + 0.25×cycle）
-    - `isBroken()` 期间敌人轮到时 `[BROKEN]` 输出且不造成伤害
-    - `brokenRemainTurns` 从 2 递减到 0 后 `isBroken() == false`、韧性回满
+    3. 击破链插两行（顺序固定）：`breakEnemy` → 击破伤害 → **推条** → **`setBrokenRemainTurns(2)`** → 击破回能。
+    4. `Main.round()` 的敌人分支改成先问 `handleBrokenTurn`：true → 打 `[BROKEN] ... skips this turn` 不行动；
+       false → 现在的占位打印（P5-5 接真实敌人行动）。
+- **验收**：`BreakStateTest`（4 条，全绿）：
+    - 击破后目标 `timeRemaining` 增加**恰好 0.25 × 周期**（冰锋速度 132 → 周期 75.76）
+    - `handleBrokenTurn` 第 1 次 → 剩 1 回合仍击破；第 2 次 → 剩 0、`isBroken()` false、韧性回满 60；
+      再调返回 false（不跳过）
+    - 韧性回满后能**再破一次**，击破回能再给一次
+    - `delayMovePercent` 对 null / 0 / 负数返回 false
 - **依赖**：P3-3、P4-2/P4-3
 
 ---
