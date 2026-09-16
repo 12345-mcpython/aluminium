@@ -143,6 +143,14 @@ public final class Constant {
      */
     public static final double ENERGY_GAIN_BREAK = 5;
 
+    /**
+     * 击破基数表：等级 → 基数（P4-3）。**数据文件里是 10 倍值**，用的时候要 {@code /10}
+     * （80 级 = 3767.5535 → 376.75535）。
+     *
+     * <p>见 {@code models/BreakDamageCalculator} 的单位说明：本项目削韧值统一用「点」刻度。
+     */
+    public static final Map<Integer, Double> BREAKING_RATE;
+
     static {
         RELIC_MAIN_ATTRIBUTES = JSONReader.fromJSON("main_attribute.json", RelicMainAttribute.class);
         RELIC_SUB_ATTRIBUTES = JSONReader.fromJSON("sub_attribute.json", RelicSubAttribute.class);
@@ -165,6 +173,8 @@ public final class Constant {
                 }.getType()),
                 JSONReader.fromJSON("monster_attack_modify_ratio.json", new TypeToken<Map<Integer, Double>>() {
                 }.getType()));
+        BREAKING_RATE = JSONReader.fromJSON("breaking_rate.json", new TypeToken<Map<Integer, Double>>() {
+        }.getType());
     }
 
     /**
