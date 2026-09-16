@@ -38,7 +38,11 @@ public class SkillExecutorTest {
     }
 
     private static Enemy enemy(String name) {
-        return Enemy.fromAttributes(name, HP, 0, 100, 100);
+        return enemy(name, HP);
+    }
+
+    private static Enemy enemy(String name, double hp) {
+        return Enemy.fromAttributes(name, hp, 0, 100, 100);
     }
 
     private static Battle battle(Character attacker, List<Enemy> enemies) {
@@ -46,7 +50,7 @@ public class SkillExecutorTest {
     }
 
     private static double damageTaken(Enemy enemy) {
-        return HP - enemy.getCurrentHp();
+        return enemy.getMaxHp() - enemy.getCurrentHp();   // 用各自的满血，别假设都是 HP 常量
     }
 
     private static Skill singleAttack() {
@@ -219,5 +223,47 @@ public class SkillExecutorTest {
 
         Assertions.assertEquals(90, damageTaken(first), EPS);
         Assertions.assertEquals(90, damageTaken(second), EPS);
+    }
+
+    @Test
+    public void bounceRetargetsLivingEnemiesInsteadOfWastingHits() {
+        Character attacker = attacker();
+        Enemy fragile = enemy("e1", 100);        // 每段 100 → 一击即死
+        Enemy tough = enemy("e2");
+        Battle battle = battle(attacker, List.of(fragile, tough));
+        Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(1.0, 3.0));
+
+        battle.castImmediate(bounce, attacker, List.of(fragile));
+
+        Assertions.assertEquals(0, fragile.getCurrentHp(), EPS);
+        // 3 段一段不浪费：中途击杀后必须重新弹到存活目标
+        Assertions.assertEquals(300, damageTaken(fragile) + damageTaken(tough), EPS);
+    }
+
+    @Test
+    public void bounceStopsWhenEveryTargetIsDead() {
+        Character attacker = attacker();
+        Enemy fragile = enemy("e1", 100);
+        Battle battle = battle(attacker, List.of(fragile));
+        Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(1.0, 3.0));
+
+        battle.castImmediate(bounce, attacker, List.of(fragile));
+
+        // 已无存活目标 → 剩余段数作废（不鞭尸，也不空放）
+        Assertions.assertEquals(100, damageTaken(fragile), EPS);
+    }
+
+    @Test
+    public void invulnerableTargetTakesNoDamageWhileOthersStillDo() {
+        Character attacker = attacker();
+        Enemy transitioning = enemy("boss");
+        transitioning.setInvulnerable(true);      // 转阶段无敌 / 锁血演出
+        Enemy other = enemy("e2");
+        Battle battle = battle(attacker, List.of(transitioning, other));
+
+        battle.castImmediate(aoeAttack(), attacker, List.of(other));
+
+        Assertions.assertEquals(0, damageTaken(transitioning), EPS);   // 无敌期间不掉血
+        Assertions.assertEquals(90, damageTaken(other), EPS);          // 其他目标照常
     }
 }
