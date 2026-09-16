@@ -22,7 +22,6 @@ import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BU
 public class DamageZoneTest {
     private static final double BASE = 1000.0;
     private static final double EPS = 1e-6;
-    private static final double DEFENCE_TERM_80 = 200.0 + 10.0 * 80;
 
     private Damage damage() {
         return new Damage(null, null, DamageElement.FIRE, DamageType.NORMAL, BASE);
@@ -55,19 +54,14 @@ public class DamageZoneTest {
     }
 
     @Test
-    public void reductionIsMultiplicativeAndFloored() {
-        Damage damage = damage().addReduction(0.9).addReduction(0.9).addReduction(0.9);
+    public void reductionIsMultiplicativeFlooredAndInputClamped() {
+        // 乘算 + 兜底：0.1³ = 0.001 → 0.01
+        Assertions.assertEquals(10,
+                damage().addReduction(0.9).addReduction(0.9).addReduction(0.9).toValue(), EPS);
 
-        // 0.1³ = 0.001 → 兜底到 0.01
-        Assertions.assertEquals(10, damage.toValue(), EPS);
-    }
-
-    @Test
-    public void reductionInputIsClampedToOne() {
-        Damage damage = damage().addReduction(1.5).addReduction(-0.5);
-
-        // 1.5 → 1（系数 0），-0.5 → 0（系数 1）→ 乘积 0 → 兜底 0.01
-        Assertions.assertEquals(10, damage.toValue(), EPS);
+        // 入参先 clamp 到 [0,1]：1.5 → 1（系数 0）、-0.5 → 0（系数 1）→ 乘积 0 → 兜底 0.01
+        Assertions.assertEquals(10,
+                damage().addReduction(1.5).addReduction(-0.5).toValue(), EPS);
     }
 
     @Test
@@ -79,13 +73,11 @@ public class DamageZoneTest {
     }
 
     @Test
-    public void everyFloorIsDeclaredByTheZoneThatOwnsIt() {
-        // 增伤 / 易伤：游戏里没有负增伤，0 只是 PercentArea 的 sanity 兜底（防负系数翻符号）
+    public void sanityFloorVersusOfficialFloors() {
+        // 增伤 / 易伤：游戏里没有负增伤，0 只是 PercentArea 的 sanity 兜底（防负系数把伤害翻符号）；
+        // 官方下限只有减伤 0.01 与虚弱 0.2，已由各自用例断言，这里不重复
         Assertions.assertEquals(0.0, damage().addBoost(-1.5).boostArea().getRate(), EPS);
         Assertions.assertEquals(0.0, damage().addVulnerable(-1.5).vulnerableArea().getRate(), EPS);
-        // 官方下限各自由本区声明（HSR.md §2.2）
-        Assertions.assertEquals(0.01, damage().addReduction(1.0).reductionArea().getRate(), EPS);
-        Assertions.assertEquals(0.2, damage().addWeakness(1.0).weaknessArea().getRate(), EPS);
         // 计算型区不设下限：防御公式自身恒正，0 防御时正好 1.0
         Assertions.assertEquals(1.0, new Damage.DefenceArea().set(80, 0, 0).getRate(), EPS);
     }
@@ -102,7 +94,6 @@ public class DamageZoneTest {
 
         Assertions.assertEquals(1000.0 / 2150.0, damage.defenceArea().getRate(), EPS);
         Assertions.assertEquals(BASE * 1000.0 / 2150.0, damage.toValue(), EPS);
-        Assertions.assertEquals(1000.0 / 2150.0, DEFENCE_TERM_80 / (1150 + DEFENCE_TERM_80), EPS);
     }
 
     @Test
@@ -186,10 +177,9 @@ public class DamageZoneTest {
 
     @Test
     public void zonesAreTestableWithoutDamage() {
+        // 区不依赖 Damage 也能单测：累加区一个 + 计算区一个（其余区的数值已由各自用例断言）
         Assertions.assertEquals(3.5, new Damage.VulnerableArea().add(2.0).add(2.0).getRate(), EPS);
         Assertions.assertEquals(1000.0 / 2150.0, new Damage.DefenceArea().set(80, 1150, 0).getRate(), EPS);
-        Assertions.assertEquals(1.2, new Damage.ResistArea().set(0.2, 0.4).getRate(), EPS);
-        Assertions.assertEquals(0.01, new Damage.ReductionArea().add(0.9).add(0.9).add(0.9).getRate(), EPS);
     }
 
     @Test
@@ -224,14 +214,23 @@ public class DamageZoneTest {
     }
 
     @Test
-    public void modifiersCanBeRemovedBySource() {
-        Damage damage = damage().addVulnerable(0.5, BUFF, 7);
+    public void modifiersCarrySourceAndCanBeRemovedBySource() {
+        Damage damage = damage()
+                .addVulnerable(0.5, BUFF, 7)
+                .addBoost(0.2, ModifierSource.BUFF, 3)
+                .addBoost(0.3, ModifierSource.RELIC, 4);
 
-        Assertions.assertEquals(1500, damage.toValue(), EPS);
+        // 增伤 1+0.5、易伤 1+0.5 → 2250
+        Assertions.assertEquals(2250, damage.toValue(), EPS);
+        Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.BUFF).size());
+        Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.RELIC).size());
 
+        // 按来源撤销：Buff 到期/被驱散（P10-3）就是走这个口子
         damage.vulnerableArea().removeModifiersFrom(BUFF, 7);
+        damage.boostArea().removeModifiersFrom(ModifierSource.BUFF, 3);
 
-        Assertions.assertEquals(1000, damage.toValue(), EPS);
+        Assertions.assertEquals(1300, damage.toValue(), EPS);
+        Assertions.assertEquals(1.3, damage.boostArea().getRate(), EPS);
     }
 
     @Test
@@ -245,33 +244,16 @@ public class DamageZoneTest {
     }
 
     @Test
-    public void legacyConstructorDefaultsToNormalType() {
-        Damage damage = new Damage(null, null, DamageElement.FIRE, BASE);
+    public void constructorContract() {
+        // 4 参兼容构造器：伤害类型缺省 NORMAL
+        Damage legacy = new Damage(null, null, DamageElement.FIRE, BASE);
+        Assertions.assertEquals(DamageType.NORMAL, legacy.getType());
+        Assertions.assertEquals(BASE, legacy.toValue(), EPS);
 
-        Assertions.assertEquals(DamageType.NORMAL, damage.getType());
-        Assertions.assertEquals(BASE, damage.toValue(), EPS);
-    }
-
-    @Test
-    public void nullElementOrTypeIsRejected() {
+        // element / type 都不允许为 null
         Assertions.assertThrows(NullPointerException.class,
                 () -> new Damage(null, null, null, DamageType.BREAK, BASE));
         Assertions.assertThrows(NullPointerException.class,
                 () -> new Damage(null, null, DamageElement.FIRE, null, BASE));
-    }
-
-    @Test
-    public void modifierSourceKeepsAttribution() {
-        Damage damage = damage()
-                .addBoost(0.2, ModifierSource.BUFF, 3)
-                .addBoost(0.3, ModifierSource.RELIC, 4);
-
-        Assertions.assertEquals(1.5, damage.boostArea().getRate(), EPS);
-        Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.BUFF).size());
-        Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.RELIC).size());
-
-        damage.boostArea().removeModifiersFrom(ModifierSource.BUFF, 3);
-
-        Assertions.assertEquals(1.3, damage.boostArea().getRate(), EPS);
     }
 }
