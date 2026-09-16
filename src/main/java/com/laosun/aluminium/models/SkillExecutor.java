@@ -98,11 +98,11 @@ public final class SkillExecutor {
 
         switch (effect) {
             case SINGLE_ATTACK, MAZE_ATTACK ->
-                    totalDamage += hit(battle, user, element, base, mainTarget, hitTargets);
+                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, true);
 
             case AOE_ATTACK -> {
                 for (Enemy target : battle.targetableEnemies()) {
-                    totalDamage += hit(battle, user, element, base, target, hitTargets);
+                    totalDamage += hit(battle, data, user, element, base, target, hitTargets, true);
                 }
             }
 
@@ -110,14 +110,14 @@ public final class SkillExecutor {
                 List<Enemy> alive = battle.targetableEnemies();
                 int center = alive.indexOf(mainTarget);      // 站位顺序 = battle.enemies 顺序
                 if (center < 0) {
-                    totalDamage += hit(battle, user, element, base, mainTarget, hitTargets);
+                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, true);
                 } else {
-                    totalDamage += hit(battle, user, element, base, alive.get(center), hitTargets);
+                    totalDamage += hit(battle, data, user, element, base, alive.get(center), hitTargets, true);
                     if (center > 0) {
-                        totalDamage += hit(battle, user, element, base, alive.get(center - 1), hitTargets);
+                        totalDamage += hit(battle, data, user, element, base, alive.get(center - 1), hitTargets, false);
                     }
                     if (center < alive.size() - 1) {
-                        totalDamage += hit(battle, user, element, base, alive.get(center + 1), hitTargets);
+                        totalDamage += hit(battle, data, user, element, base, alive.get(center + 1), hitTargets, false);
                     }
                 }
             }
@@ -130,8 +130,8 @@ public final class SkillExecutor {
                     if (alive.isEmpty()) {
                         break;                                     // 全死 → 剩余段数作废
                     }
-                    totalDamage += hit(battle, user, element, base,
-                            alive.get(battle.getRng().nextInt(alive.size())), hitTargets);
+                    totalDamage += hit(battle, data, user, element, base,
+                            alive.get(battle.getRng().nextInt(alive.size())), hitTargets, true);
                 }
             }
 
@@ -158,17 +158,51 @@ public final class SkillExecutor {
     }
 
     /**
-     * Settles one hit and accumulates it into the attack summary.
+     * Settles one hit, reduces toughness (P4-2) and accumulates it into the attack summary.
      *
+     * @param mainTarget 这一段是不是打在"主目标/中心"上（BLAST 用：中心扣 {@code single}、相邻扣 {@code spread}）
      * @return the settled damage of this hit (0 if the target was dead / invulnerable)
      */
-    private static double hit(Battle battle, CanHit user, DamageElement element, double base, CanHit target,
-                              Set<CanHit> hitTargets) {
+    private static double hit(Battle battle, SkillData data, CanHit user, DamageElement element, double base,
+                              CanHit target, Set<CanHit> hitTargets, boolean mainTarget) {
         if (target == null || target.isDeath()) {
             return 0;
         }
         hitTargets.add(target);                      // 命中事实（含随后死亡的）——"每有 1 名目标受到攻击"
         // 4 参构造器 → DamageType.NORMAL；P8-2 接真实槽位后再按 普攻/战技/终结技 映射
-        return battle.applyDamage(target, new Damage(user, target, element, base));
+        Damage damage = new Damage(user, target, element, base);
+        double settled = battle.applyDamage(target, damage);
+        applyStanceDamage(battle, data, user, element, damage, target, mainTarget);
+        return settled;
+    }
+
+    /**
+     * 削韧（P4-2）：只有「算一次攻击」的伤害才削韧，削韧值按技能形状取 {@code stance_list}。
+     *
+     * <p>数据实测（{@code skills.json} 全量统计）：单体/秘技/弹射用 {@code single}（30=1 单位、60=2、90=3），
+     * 群攻用 {@code all}，**扩散用 {@code single}（中心）+ {@code spread}（相邻）**——
+     * 例：姬子战技 = {@code 60/0/30}。
+     *
+     * @param mainTarget 是否主目标（决定 BLAST 取哪个字段）
+     */
+    private static void applyStanceDamage(Battle battle, SkillData data, CanHit user, DamageElement element,
+                                          Damage damage, CanHit target, boolean mainTarget) {
+        if (!damage.isCountsAsAttack() || !(target instanceof Enemy enemy)) {
+            return;                                  // 附加伤害 / 真伤不削韧
+        }
+        battle.reduceToughness(user, enemy, element, stanceValue(data, mainTarget));
+    }
+
+    /**
+     * 该技能这一段打在一个目标上的削韧点数。
+     */
+    private static double stanceValue(SkillData data, boolean mainTarget) {
+        // 注意：StanceList 在 beans.Skill 里（与 models.Skill 同名不同包），这里用全限定名
+        com.laosun.aluminium.beans.Skill.StanceList stance = data.getStanceList();
+        return switch (data.getEffect()) {
+            case AOE_ATTACK -> stance.all();
+            case BLAST -> mainTarget ? stance.single() : stance.spread();
+            default -> stance.single();
+        };
     }
 }

@@ -154,7 +154,7 @@
 |                       | P3-3 击破回能联动                              | ☑   |
 |                       | P3-4 技能回能数据化（SPBase 落库，暂缓）        | ☐   |
 | **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ☑   |
-|                       | P4-2 削韧判定                                  | ☐   |
+|                       | P4-2 削韧判定                                  | ☑   |
 |                       | P4-3 击破伤害                                  | ☐   |
 |                       | P4-4 击破状态/推条/跳回合                      | ☐   |
 |                       | P4-5 DOT                                       | ☐   |
@@ -1019,53 +1019,49 @@
 
 ---
 
-### P4-2 削韧判定
+### P4-2 削韧判定 ✅
 
-- **目标**：每段伤害按技能 `stance_list` 削韧（先只做「弱点命中才削韧」，非弱点减半留 TODO）；削满归零触发击破。
-- **涉及文件**：`Battle.java`、`models/SkillExecutor.java`、`Constant.java`、新建 `test/ToughnessBattleTest.java`
-- **怎么做**：
-    1. `Constant` 加：`public static final double TOUGHNESS_NON_WEAK_RATIO = 0.5;`
-    2. `SkillExecutor.hit(...)` 里、`applyDamage` 之前插入（注意 `hit` 已持有 `SkillData data`，直接传下去）：
+- **目标**：每段伤害按技能 `stance_list` 削韧（命中弱点才削），削空触发击破。
+- **涉及文件**：`Battle.java`、`models/SkillExecutor.java`、新建 `test/ToughnessBattleTest.java`
+- **怎么做**（实测修订 2 处，见下）：
+    1. **削韧入口放 `Battle.reduceToughness(attacker, enemy, element, stanceDamage)`**（不是 `SkillExecutor` 私有方法）：
+       理由——击破链要碰 `queue`/`gainBreakEnergy`/`applyDamage`，全是 Battle 级资源；P5-3 敌人攻击也能复用。
        ```java
-       reduceToughness(battle, user, element, data, dmg);
-       ```
-       方法实现（削韧值按技能类型从 `stance_list` 取）：
-       ```java
-       private static void reduceToughness(Battle battle, CanHit user, DamageElement element,
-                                          SkillData data, Damage dmg) {
-           if (!dmg.isCountsAsAttack()) {                  // 附加/真伤不削韧
-               return;
-           }
-           CanHit target = dmg.getDefender();
-           if (!(target instanceof Enemy e)) {
-               return;
-           }
-           if (e.isBroken()) {                             // 已击破不再削
-               return;
-           }
-           if (!e.isWeak(element)) {                       // 先只对弱点削（非弱点减半留 TODO）
-               return;
-           }
-           double amount = switch (data.getEffect()) {
-               case AOE_ATTACK -> data.getStanceList().all();
-               case BLAST -> data.getStanceList().spread();
-               default -> data.getStanceList().single();
-           };
-           e.reduceToughness(amount);
-           if (e.getCurrentToughness() <= 0) {
-               e.breakEnemy(element);
-               Damage d = new BreakDamageCalculator().build(user, e, element, amount);   // P4-3
-               battle.applyDamage(e, d);                      // 易伤/减伤由 onDamage 钩子注入
-               battle.gainBreakEnergy(user, e);               // P3-3
-           }
+       public boolean reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
+           if (attacker == null || enemy == null || stanceDamage <= 0) return false;
+           if (enemy.isDeath() || enemy.isBroken() || !enemy.hasToughnessBar()) return false;
+           if (!enemy.isWeakTo(element)) return false;          // ← 修订 1
+           enemy.reduceStance(stanceDamage);
+           if (enemy.getStance() > 0) return false;
+           enemy.breakEnemy(element);
+           gainBreakEnergy(attacker, enemy);                    // P3-3（P4-3/4/5 往这条链上加东西）
+           return true;
        }
        ```
-    3. AOE 的"全体削韧"= 每个目标单独扣 `all` 值；单目标扣 `single`（`hit` 里对每个目标各调一次 `reduceToughness`，`BLAST`
-       主目标传 `spread`）
-- **验收**：`ToughnessBattleTest`：
-    - 冰锋（韧性 60，弱火）吃普攻（stance 30）：`currentToughness == 30`
-    - 非弱点攻击（冰锋被冰打）：韧性 **不变**（先只做弱点命中，减半规则 TODO）
-    - 连续两段普攻 → 第 2 段触发 `isBroken() == true`
+    2. `SkillExecutor.hit(...)` 结算完伤害后按技能形状削韧：
+       ```java
+       private static double stanceValue(SkillData data, boolean mainTarget) {
+           var stance = data.getStanceList();       // beans.Skill.StanceList（与 models.Skill 同名不同包）
+           return switch (data.getEffect()) {
+               case AOE_ATTACK -> stance.all();
+               case BLAST -> mainTarget ? stance.single() : stance.spread();   // ← 修订 2
+               default -> stance.single();        // 单体 / 秘技 / 弹射
+           };
+       }
+       ```
+       只有 `damage.isCountsAsAttack()` 且目标是 `Enemy` 才削（附加伤害/真伤不削韧）。
+- **两处修订（原计划写错了，以数据为准）**：
+    1. **非弱点不削韧**，没有「非弱点减半」这回事（HSR.md §3.2 是"弱点击破"）。
+       `Constant.TOUGHNESS_NON_WEAK_RATIO` **不加**；"无视弱点削韧"（乱破/姬子·启行）是角色特性 → P8-7。
+    2. **扩散（BLAST）不是"主目标传 spread"**：全量统计 `skills.json` 后确认
+       `single` 是中心值、`spread` 是相邻值（姬子战技 = `60/0/30`、大黑塔 = `45/0/30`）。
+- **验收**：`ToughnessBattleTest`（6 条，全绿）：
+    - 姬子普攻（Fire 30）→ 冰锋韧性 60 → 30；冰属性普攻（非弱点）→ 韧性不变
+    - 两段普攻削空 → `isBroken()` + `brokenElement == FIRE` + 击破回能 5（能量 20×2+5=45）
+    - 击破后再打：韧性仍 0、击破回能只给一次（20×3+5=65）
+    - 战技 Blast：中心 −60（削空→击破）、左右各 −30；终结技 AoE：全体 −60 全破
+- **注意**：扩散的"相邻"按 `battle.enemies` 站位顺序（`targetableEnemies().indexOf(mainTarget)`），
+  写测试时**主目标必须放在中间**，否则只有一侧相邻。
 - **依赖**：P1-8、P4-1
 
 ---
