@@ -147,9 +147,11 @@
 |                       | P2-2 Enemy 弱点 + 韧性数值                     | ☑   |
 |                       | P2-3 EnemyScaler 等级属性公式                  | ☑   |
 |                       | P2-4 EnemyFactory                              | ☑   |
-| **P3 能量系统**       | P3-1 能量字段 + gainEnergy                     | ☐   |
+| **P3 能量系统**       | P3-0 能量机制调研（数据 + 文档双证）             | ☑   |
+|                       | P3-1 能量字段 + gainEnergy + EnergyProvider     | ☐   |
 |                       | P3-2 回能接入 + 大招条件                       | ☐   |
 |                       | P3-3 击破回能联动                              | ☐   |
+|                       | P3-4 技能回能数据化（SPBase 落库）              | ☐   |
 | **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ☐   |
 |                       | P4-2 削韧判定                                  | ☐   |
 |                       | P4-3 击破伤害                                  | ☐   |
@@ -668,17 +670,166 @@
 
 ---
 
+### P3-0 能量机制调研（数据 + 文档双证，开工前必读）✅
+
+**三个数据源（优先级从高到低）**
+
+| 用途 | 来源 | 说明 |
+|---|---|---|
+| 能量上限 | `src/main/resources/data/character_data.json` 的 `max_energy` | 93 个角色；`null` 只有 1407 遐蝶 |
+| 技能基础回能 | tbgd `ExcelOutput/AvatarSkillConfig.json` 的 `SPBase` | **本项目 `skills.json` 里没有这个字段**，要用得先补数据（见 P3-4） |
+| 机制文案 | `E:\code\blog\hsr\<id>_<名>.md`（88 篇角色文档）+ tbgd `TextMap/TextMapCHS.json` 技能描述 | 星魂/行迹文案在配置里是**命名键**（`AvatarRankDesc_120201`），TextMap 只有哈希键 → 星魂/行迹只能看 blog 文档 |
+
+**数据口径（实测，别再猜）**
+
+1. `AvatarConfig.SPNeed` = 能量上限，与 `character_data.max_energy` 93/93 完全一致（可互相校验）。
+2. `AvatarSkillConfig.SPBase` = 该技能基础回能。常规档：**普攻 20 / 战技 30 / 终结技 5**。
+   **终结技一律 5**（饮月 3 段、米沙多段、银枝弹射 6 次，SPBase 都是 5）→ 终结技不做段数乘算。
+3. **弹射/多段技能的 SPBase 是"每段值"**：艾丝妲/桑博/那刻夏/同谐开拓者（1+4 段）SPBase=6 → 6×5=30；
+   瓦尔特（1+2 段）SPBase=10 → 10×3=30。**总量仍是常规 30**，不要误判成"战技只回 6"。
+4. 每段是否回能由能力配置 `Config/ConfigAbility/Avatar/Avatar_*_Ability.json` 的 `SPHitRatio` 控制
+   （默认 1，可以给分数）。实测：饮月 `{1, 0.2, 0.14, 0.15}`、大黑塔 `{1, 0.3, 0.4}`、艾丝妲 `{1}`。
+   → **引擎不能对所有多段技能做"段数 × SPBase"**，段数乘算只对"每段 SPHitRatio=1"的弹射类成立。
+5. 反例文案：1224 三月七（巡猎）强化普攻明写「恢复的能量不随段数提高而提高」（天赋 122408）。
+6. 受击基准 10：文档没有直接数值，由 `1105 娜塔莎 星魂4「受到攻击后额外恢复5点」`、
+   `1221 云璃「受到攻击后额外恢复15点」` 反推存在基准值；击杀/击破基准（暂定 5）只在文档里以"额外"形式出现，
+   ExcelOutput 内**没有**这些常量表，等 P9 数据校准（`EnergyBarConfig.json` 是空对象）。
+7. 真离档的技能（不是弹射折算，是真比其他角色少）：1212 镜流 战技 20、1402 阿格莱雅 战技 20、
+   1502 爻光 普攻 30、饮月强化普攻 20/30/35/40（分技能固定）。
+8. 完全不回能的技能（SPBase 空）：1201 青雀（战技）、1205 刃（战技，文案「该战技无法恢复能量」）、
+   1213 饮月（战技，牌面「不视为使用战技」）、1310 流萤（战技，改为固定恢复 60% 能量上限）、
+   1315 波提欧（战技，文案同刃）、1501 火花（战技，牌面「不视为使用战技」）。
+9. 追加攻击基础回能（数据，0=不写）：景元 0、砂金 1、雪衣/大丽花 2、
+   黑塔/布洛妮娅/克拉拉/三月七(巡猎)/真理医生/缇宝/赛飞儿/不死途 5、
+   三月七/姬子/卡芙卡/刃/彦卿/云璃/貊泽/翡翠/阿格莱雅 10、大黑塔 30。
+
+**A. 没有常规能量条（替代资源，优先级最高）**
+
+| id | 角色 | 替代资源 | 获取方式（文档实测） |
+|---|---|---|---|
+| 1407 | 遐蝶 | 【新蕊】 | `max_energy=null`；上限 = 5.3125×队伍最高等级²（≤2000 时钳到 2000）；我方每损失 1 点生命 +1（死龙在场时不涨）；治疗量 100% 转化（每目标累计 ≤上限 12%）；秘技 / 星魂2 = 上限 30% |
+| 1308 | 黄泉 | 【残梦】上限 9 | 任意单位施放技能期间使敌方陷入负面 → +1（每次技能最多 1）；战技 +1；行迹开场 +5；星魂2 回合开始 +1；溢出转【四相断我】 |
+| 1220 | 飞霄 | 【飞黄】上限 12，6 点开大 | 技能 SPBase 全空；我方每施放 2 次攻击 +1；秘技 +1；行迹开场 +3；星魂2 追加攻击 +1（每回合 ≤6） |
+| 1408 | 白厄 | 【火种】上限 12（可溢出 3） | 战技 +2；成为任意技能目标 +1；行迹开场 +1、变身结束 +3；星魂6 开场 +6 且取消溢出上限 |
+| 1415 | 昔涟 | 【追忆】上限 24（12 点开大） | 普攻 +1、强化普攻/战技 +3；队友消耗【未来】行动 +1；行迹开场 +2/+3/+6；星魂2 +12；另可为阿格莱雅/海瑟音/风堇回 70/60/24 能量 |
+| 1506 | 银狼LV.999 | 【隐藏分】60 激活，可溢出 240 | 四个技能 SPBase 全空 |
+
+**B. 独立"充能/层数"资源（不是能量条，但会换成能量）**
+
+| id | 角色 | 资源 → 能量 |
+|---|---|---|
+| 1003 | 姬子 | 【充能】上限 3（击破弱点 +1、开场 +1）→ 满 3 发动追加攻击 |
+| 1205 | 刃 | 受伤/耗血 +1【充能】（≤5 层，每次受击最多 1 层）→ 满层追加攻击；星魂6 上限降为 4 |
+| 1223 | 貊泽 | 战技 +9【充能】→ 每消耗 3 点发动 1 次追加攻击 |
+| 1224 | 三月七(巡猎) | 【充能】上限 10（普攻 +1、师父攻击/终结技 +1、星魂2 +1）→ 满 7 立即行动、强化普攻 |
+| 1314 | 翡翠 | 每命中 1 敌 +1 充能 → 满 8 发动追加攻击 |
+| 1317 | 乱破 | 击破 +1【充能】（≤10）→ 强化普攻第 3 段消耗 |
+| 1321 | 大丽花 | 独立资源不涉及 |
+| 1404 | 万敌 | 每损失 1% 生命 +1【充能】（≤200）→ 100 进【血仇】、150 额外回合 |
+| 1412 | 刻律德菈 | 【充能】上限 8（战技 +1/终结技 +2/军功持有者普攻战技 +1）→ 满 6 升【爵位】；能量另靠军功者普攻/战技 +5 |
+| 1413 | 长夜月 | 【忆质】/【至暗之谜】充能，与能量双轨 |
+| 1504 | 不死途 | 【充能】初始 2 上限 3（终结技 +3、秘技 +1）→ 每次消耗 1 点发动追加攻击 |
+| 1507 | 千冶·刃 | 结界期间我方每次攻击 +1 充能 → 满 9 且生命>1 时消耗 9 换 **25 能量** |
+| 1304 | 砂金 | 【盲注】（受击 +1~+2）→ 满 7 发动追加攻击（不换能量） |
+| 1308/1220/1408/1415/1506 | 见 A 表 | 直接替代能量条 |
+| 8007/8008 | 开拓者·记忆 | 我方全体每累计恢复 10 点能量 → 迷迷 +1% 充能 |
+
+**C. 额外回能触发源（按钩子分类，P3-2 的挂点清单）**
+
+| 触发 | 角色（数值） |
+|---|---|
+| 战斗开始 | 瓦尔特+30、银狼+20、希露瓦+15、景元+15、饮月+15、藿藿+30、椒丘+15、加拉赫+20(魂1)、貊泽+20(魂1)、大丽花+35、缇宝+30、长夜月+70、三月七(巡猎)+30(秘技)、白厄(队友)+25(秘技)、开拓者毁灭+15、黄泉+5(残梦)、昔涟+2/+3/+6(魂2+12)、星魂类同下 |
+| 波次开始 | 知更鸟(秘技领域)+5 |
+| 回合开始 | 银狼+5、阮·梅+5、三月七(巡猎)+5(魂4)、星期日+8(魂4)、开拓者存护+5(持盾)、姬子·启行+5(条件)、那刻夏+30(无【质性揭露】时)、黄泉+1(魂2) |
+| 受击 | 云璃+15(天赋额外)、娜塔莎+5(魂4)、符玄+5(魂4，队友受击)、玲可+2(魂，持【求生反应】者受击) |
+| 击杀 | 姬子+5/每消灭 1 敌(终结技)、卡芙卡+5(行迹，触电目标被消灭)、佩拉+5(魂1)、希儿+15(魂4)、黑天鹅+8(魂4，敌方回合开始或被消灭)、开拓者毁灭+10(魂1，终结技击杀) |
+| 击破 | 同谐开拓者+10(天赋)、乱破+10(行迹)/+20(魂1 退出结印)、忘归人+3(魂2) |
+| 队友攻击 / 命中目标数 | 银枝 每命中 1 目标 +3、大黑塔 每命中 1 目标 +3(≤5 目标)、缇宝 每命中 1 目标 +1.5、知更鸟 队友攻击 +2(魂2 +3)、驭空 队友行动 +2、丹恒·腾荒 【同袍】攻击 +6、不死途 【饲饵】被队友攻击 +8、刻律德菈 军功持有者普攻/战技 +5、千冶·刃 我方攻击 +1 充能 |
+| 消耗战技点 | 米沙 每消耗 1 点 +2、寒鸦 承负恢复触发 +2、花火 队友消耗战技点 +1 |
+| 治疗/生命 | 藿藿 每次治疗 +1、遐蝶 损血→【新蕊】、流萤 战技耗 40% 生命上限换 60% 能量上限、万敌 损血→充能 |
+| DOT 跳伤 | 卡芙卡+2(魂4 触电)、桂乃芬+2(魂4 灼烧)、虎克+5(攻击灼烧目标)、佩拉+10(攻击负面目标) |
+| 忆灵/召唤物 | 风堇 被召唤 +15(首次额外 +30)、知更鸟·晴歌 被召唤 +20、长夜月 我方忆灵施放技能 +5、开拓者·记忆 忆灵行动 +8(魂2)、托帕 账账攻击 +10/魂2 +5/秘技 +60、景元 神君每段 +2(魂4)、真理医生 天赋追加攻击 +15(魂4)、灵砂 普攻 +10(行迹) |
+| 能量恢复效率 | 艾丝妲 +15%(魂4 条件)、彦卿 +10%(魂2 条件)、同谐开拓者 +25%(魂2，3 回合) |
+| 为队友充能 | 停云 终结技单体 +50(魂6 +60)、藿藿 队友各 20% 上限、星期日 20% 上限(下限 40)、知更鸟·晴歌 20% 上限、白厄秘技队友 +25、姬子·启行 助战技 +4、白露 +8(魂1)、刻律德菈 +2(魂1)、昔涟 给阿格莱雅/海瑟音/风堇 70/60/24 |
+
+**D. 能量上限/门槛离档（P3 不能写死 100）**
+
+240：云璃（耗 120）/流萤/长夜月；350：阿格莱雅；480：绯英；220：大黑塔；180：银枝（双档 90/180）/爻光；
+160：知更鸟/万敌/千冶·刃/开拓者记忆与欢愉；150：姬子·启行/不死途；135：符玄/丹恒·腾荒；115：波提欧；
+12：飞霄（耗 6）/白厄；9：黄泉；24：昔涟（耗 12）；60：银狼LV.999；无：遐蝶。
+另有溢出存储：千冶·刃（行迹【百炼骨】最多存 80 点溢出能量）、银狼LV.999（+240）、白厄【火种】（+3）。
+
+**E. 文档未提及能量机制（判"未知"，别当常规）**
+
+1002 丹恒、1008 阿兰、1013 黑塔、1101 布洛妮娅、1107 克拉拉、1214 雪衣、1410 海瑟音。
+
+**F. 明确只有常规档的角色**（普攻 20 / 战技 30 / 终结技 5 / 受击 10，无额外条目）
+
+1203 罗刹、1206 素裳、1304 砂金、1314 翡翠、1404 万敌、1406 赛飞儿、1501 火花、1513 砂金·戏浪。
+
+**G. 对 P3 设计的影响**
+
+1. `maxEnergy` 必须来自 `character_data.json`（缺失 = 0，即"无能量条"，别默认 100）。
+2. 回能入口只有 `EnergyProvider`：**机制挂在 provider 上，不写在 Battle 里**。
+   常规角色用 `StandardEnergyProvider`（普攻 20/战技 30/终结技 5/受击 10/击杀 5/击破 5），
+   特殊角色各自实现 provider（P8-3 才落地具体角色，P3 只给接口 + 标准实现 + 测试替身）。
+3. 需要预留的钩子（P3 先留接口，方法体空实现；实现归 P8）：
+   `onBattleStart` / `onWaveStart` / `onTurnStart` / `onSkillCast(user, skill, hitTargets)` /
+   `onUltCast` / `onTakingHit` / `onKill(target)` / `onBreak(target)` / `onAllyAttack(attacker, hitTargets)` /
+   `onSkillPointSpent(n)` / `onHeal(target)` / `onHpLoss(target, amount)` / `onDotTick(source)` /
+   `onSummon` / `onEnergyGain(amount)` / `onChargeConvert` / `modifyEnergyEfficiency()` / `grantEnergyTo(target, amount)`。
+4. **技能回能取数据 SPBase 而不是写死 20/30/5**（P3-4 补 `skills.json` 的 `sp_base`；
+   弹射类还要 `sp_hit_ratio_sum`，见口径 3/4）。写死的常量只做"没有数据时的兜底"。
+5. 结算顺序固定三点：**终结技先清零再回自身 5**（由 provider 决定）；
+   **受击回能不受 `damage.isCountsAsAttack()` 影响**（受击是被动）；**击杀回能记给 `damage.getAttacker()`**；
+   团队充能要能指定目标（`grantEnergyTo`），不能只给自己。
+
+---
+
 ### P3-1 能量字段 + gainEnergy
 
-- **目标**：`CanHit` 有能量与回能公式。
-- **涉及文件**：`models/CanHit.java`、`Constant.java`、新建 `test/EnergyTest.java`
+- **目标**：`CanHit` 有能量字段与唯一入账口 `gainEnergy`；**回能规则全部由 `EnergyProvider` 提供**，
+  常规角色 = `StandardEnergyProvider`，特殊角色各自实现（P8-3 落地），P3 只给接口 + 标准实现 + 测试替身。
+- **涉及文件**：`models/CanHit.java`、`Constant.java`、新建 `models/energy/EnergyGain.java`、
+  `models/energy/EnergyProvider.java`、`models/energy/StandardEnergyProvider.java`、新建 `test/EnergyTest.java`
 - **怎么做**：
-    1. `CanHit` 加：
+    1. 新建 `EnergyGain`（record：一次回能的语义，区分是否吃回能效率）：
        ```java
-       @Setter private double currentEnergy = 0;
-       @Setter private double maxEnergy = 100;   // 数据化 TODO: character_data 有 energy 表则替换
+       public record EnergyGain(double amount, boolean affectedByEfficiency) {
+           public static EnergyGain normal(double amount) { return new EnergyGain(amount, true); }
+           public static EnergyGain fixed(double amount)  { return new EnergyGain(amount, false); } // 如流萤 60% 上限、按上限百分比回能
+       }
        ```
-    2. `Constant` 加回能基础值（示例值，先按 HSR 通用惯例，数据校准后只改这里）：
+    2. 新建 `EnergyProvider`（接口，全部 `default` 空实现；P3 只定义签名，P8-3 才填具体角色）：
+       ```java
+       public interface EnergyProvider {
+           default EnergyGain onSkillCast(CanHit user, Skill skill, Set<CanHit> hitTargets) { return null; }
+           default EnergyGain onUltCast(CanHit user, Skill skill) { return null; }     // 终结技自身回能（标准=5，清零后结算）
+           default EnergyGain onTakingHit(CanHit target, Damage damage) { return null; }
+           default EnergyGain onKill(CanHit attacker, CanHit target) { return null; }
+           default EnergyGain onBreak(CanHit attacker, CanHit target) { return null; }
+           default EnergyGain onBattleStart(CanHit self, Battle battle) { return null; }
+           default EnergyGain onWaveStart(CanHit self, Battle battle) { return null; }
+           default EnergyGain onTurnStart(CanHit self, Battle battle) { return null; }
+           default EnergyGain onAllyAttack(CanHit self, CanHit attacker, Set<CanHit> hitTargets) { return null; }
+           default EnergyGain onSkillPointSpent(CanHit self, int amount) { return null; }
+           default EnergyGain onHeal(CanHit self, CanHit target, double amount) { return null; }
+           default EnergyGain onHpLoss(CanHit self, CanHit target, double amount) { return null; }
+           default EnergyGain onDotTick(CanHit self, CanHit source) { return null; }
+           default EnergyGain onEnergyGain(CanHit self, double amount) { return null; }
+           default double modifyEnergyEfficiency(CanHit self) { return 0; }           // 加算在 (1+回能率) 里
+       }
+       ```
+       > 触发源的完整清单见 P3-0 的 C 表；P3 只挂其中 5 个（技能/受击/击杀/击破/终结技），
+       > 其余签名先占位，P8-3 再填实现——**不要提前给角色写 provider**。
+    3. `StandardEnergyProvider implements EnergyProvider`（常规档 + 数据兜底）：
+       ```java
+       public class StandardEnergyProvider implements EnergyProvider {
+           // 普攻 20 / 战技 30 / 终结技 5 / 受击 10 / 击杀 5 / 击破 5
+           // 技能优先读技能数据 sp_base（P3-4 接进来），没有数据才退回 Constant 兜底
+       }
+       ```
+    4. `Constant` 加兜底常量（**只是没有技能数据时的默认值**，不是唯一真相）：
        ```java
        public static final double ENERGY_GAIN_BASIC = 20;
        public static final double ENERGY_GAIN_SKILL = 30;
@@ -687,80 +838,129 @@
        public static final double ENERGY_GAIN_KILL = 5;
        public static final double ENERGY_GAIN_BREAK = 5;
        ```
-    3. `CanHit` 加：
+    5. `CanHit` 加字段与入账口（**只这一条写能量的路径**）：
        ```java
-       public double gainEnergy(double base) {
-           double gained = base * (1 + getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get());
-           currentEnergy = Math.min(maxEnergy, currentEnergy + gained);
-           return gained;
+       @Setter private double currentEnergy = 0;
+       @Setter private double maxEnergy = 0;        // 0 = 无能量条（1407 遐蝶就是这种）；取值见 P3-0 G1
+       @Setter private EnergyProvider energyProvider = new StandardEnergyProvider();
+       public boolean hasEnergyBar() { return maxEnergy > 0; }
+       public boolean isEnergyFull() { return hasEnergyBar() && currentEnergy >= maxEnergy; }
+
+       /** 返回实际入账值（会被上限截断），不是理论回能值 */
+       public double gainEnergy(EnergyGain gain) {
+           if (gain == null || gain.amount() <= 0 || !hasEnergyBar()) return 0;
+           double efficiency = gain.affectedByEfficiency()
+                   ? 1 + getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get() + energyProvider.modifyEnergyEfficiency(this)
+                   : 1;
+           double added = Math.min(maxEnergy - currentEnergy, gain.amount() * efficiency);
+           currentEnergy += added;
+           return added;
        }
+       public double gainEnergy(double amount) { return gainEnergy(EnergyGain.normal(amount)); }
        ```
+       > 溢出能量（`overflowEnergy`）暂不实现（P3-0 口径 6 / 千冶·刃 80 点溢出存储），
+       > 等 P8 有真实角色再补，不要现在设计。
 - **验收**：`EnergyTest`：
     - 回能率 50%（`setAttribute(ENERGY_REGENERATION_RATE, new DoubleValue(0.5))`）→ `gainEnergy(20) == 30`、
       `currentEnergy == 30`
-    - 上限：`gainEnergy(200)` 后 `currentEnergy == maxEnergy`
+    - `EnergyGain.fixed(20)` 不吃回能率 → 加 20
+    - 上限：`maxEnergy = 100` 时 `gainEnergy(200)` → 实际入账 100、`currentEnergy == 100`、`isEnergyFull()`
+    - `maxEnergy = 0`（无能量条）：`gainEnergy(20) == 0`、`hasEnergyBar()` false、`isEnergyFull()` false
+    - 返回实际入账值：离满只差 5 时 `gainEnergy(20) == 5`
 - **依赖**：无（`DoubleValue` 已有；没属性值的 getAttribute 返回 0 值对象，安全）
 
 ---
 
 ### P3-2 回能接入 + 大招条件
 
-- **目标**：战斗行为自动回能；`castUltra` 检查满能量、释放后清零。
+- **目标**：战斗行为自动回能（走 `EnergyProvider`）；`castUltra` 检查满能量、释放后清零并按 provider 回能。
 - **涉及文件**：`Battle.java`、新建 `test/EnergyBattleTest.java`
 - **怎么做**：
-    1. `Battle` 加 `public void grantEnergy(CanHit c, double base) { c.gainEnergy(base); }`
-    2. 回能挂点（先做最小集合，够演示）：
-        - 技能释放：在 `SkillExecutor.execute`（P1-8）末尾按 `attack_type` 区分：
-          ```java
-          // SkillExecutor.execute 末尾：
-          String attackType = skill.getData().getSkillType();   // "Normal" / "BPSkill" / "Ultra"
-          double baseEnergy = switch (attackType) {
-              case "Normal" -> Constant.ENERGY_GAIN_BASIC;
-              case "BPSkill" -> Constant.ENERGY_GAIN_SKILL;
-              case "Ultra" -> Constant.ENERGY_GAIN_ULTRA;
-              default -> 0;
-          };
-          battle.grantEnergy(user, baseEnergy);
-          ```
-        - 受击回能：放 `Battle.applyDamage`：入账后 `grantEnergy(target, Constant.ENERGY_GAIN_HIT);`（敌人也能回能，无妨）
-        - 击杀回能：`applyDamage` 里 `if (target.isDeath()) grantEnergy(attacker, Constant.ENERGY_GAIN_KILL);`
-    3. `castUltra` 改造（先清零，再结算终结技自身回能 5）：
+    1. `Battle` 加唯一入账口（团队充能也走这里）：
+       ```java
+       /** 战斗内唯一回能入口：规则由 target 自己的 provider 决定（P3 用标准实现） */
+       public double applyEnergyGain(CanHit target, EnergyGain gain) {
+           return target == null ? 0 : target.gainEnergy(gain);
+       }
+       public double grantEnergy(CanHit target, double amount) { return applyEnergyGain(target, EnergyGain.normal(amount)); }
+       ```
+    2. 技能释放：挂点在 `Battle.executeSkill` 那一层，**不放 `SkillExecutor`**——那里有"非伤害技能提前 return"的路径，
+       而增益/治疗技能同样要回能；并且 `hitTargets` 只有执行完才知道：
+       ```java
+       EnergyGain gain = user.getEnergyProvider().onSkillCast(user, skill, hitTargets);
+       if (gain != null) applyEnergyGain(user, gain);
+       ```
+       标准实现按 `attack_type`：`Normal` → 20、`BPSkill` → 30、其它 → 0（终结技不在这一步给，见第 4 条）
+    3. 受击 / 击杀：放 `Battle.applyDamage`，**用真实结算结果，不要读请求参数**：
+       ```java
+       if (damage.isCountsAsAttack()) applyEnergyGain(target, target.getEnergyProvider().onTakingHit(target, damage));
+       if (target.isDeath()) applyEnergyGain(damage.getAttacker(), attacker.getEnergyProvider().onKill(attacker, target));
+       ```
+       击杀回能记给 `damage.getAttacker()`（附加伤害/真实伤害也有 attacker）；受击方是 `target`。
+       DOT/附加伤害是否给"受击方"回能，留到 P4 实测再定（先只在 `isCountsAsAttack()` 时给）。
+    4. `castUltra` 改造（先清零，再让 provider 结算终结技自身回能）：
        ```java
        public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
-           if (user == null || user.isDeath() || user.getCurrentEnergy() < user.getMaxEnergy()) {
-               return false;
-           }
+           if (user == null || user.isDeath() || !user.isEnergyFull()) return false;
            Skill ultra = user.getSkills().get(SkillType.ULTRA);
-           if (ultra == null) {
-               return false;
-           }
-           if (!requestSkill(ultra, user, targets)) {
-               return false;
-           }
+           if (ultra == null) return false;
+           if (!requestSkill(ultra, user, targets)) return false;
            processRequests();
-           user.setCurrentEnergy(0);                          // 先清零
-           user.gainEnergy(Constant.ENERGY_GAIN_ULTRA);       // 再回 5 × (1+回能率)
+           user.setCurrentEnergy(0);                                        // 先清零
+           EnergyGain gain = user.getEnergyProvider().onUltCast(user, ultra); // 标准实现 = 5
+           if (gain != null) applyEnergyGain(user, gain);
            return true;
        }
        ```
-    4. `Constant.ENERGY_GAIN_*` 全部替换魔法数字
-       （战技点 SP 消耗不归本任务——P8-4 接入 `performAction`）
+       `isEnergyFull()` 对 `maxEnergy == 0`（1407 遐蝶这类）永远 false → 走不了终结技，符合"没有常规能量条"。
+    5. 战技点消耗回能（米沙/花火/寒鸦）：不归本任务，P8-4 接 `performAction` 时调 `onSkillPointSpent`
 - **验收**：`EnergyBattleTest`：
-    - 回能率 0：普攻后 `currentEnergy == 20`；战技后 +30；释放终结技后清零，且终结技自身回 5（ **顺序定义**：先清零再回
-      5，测试按此写）
+    - 回能率 0：普攻后 `currentEnergy == 20`；战技后 +30；终结技清零后自身 +5（**顺序定义**：先清零再回 5）
     - 角色被打 1 次 → +10；打死敌人者 → +5
-    - `castUltra` 能量不满 → false；满 → true 且清零
-- **依赖**：P3-1、P1-8（技能类型区分挂点）
+    - `maxEnergy = 0` 的角色打人/被打 → 能量始终 0，不抛异常
+    - 换测试替身 provider（受击回 99）→ 挂点确实读 `energyProvider`，不是写死的常量
+    - `castUltra` 能量不满 → false 且能量不变；满 → true 且清零后 +5
+- **依赖**：P3-1、P1-8
 
 ---
 
 ### P3-3 击破回能联动
 
-- **目标**：击破瞬间给施放方回能 5（P4-4 调用这一个口子）。
-- **涉及文件**：`Battle.java`（加
-  `public void gainBreakEnergy(CanHit attacker) { grantEnergy(attacker, Constant.ENERGY_GAIN_BREAK); }`）
-- **验收**：`EnergyBattleTest` 补一条：调 `gainBreakEnergy(x)` 后 `x.currentEnergy == 5 × (1+回能率)`
-- **依赖**：P3-1
+- **目标**：击破瞬间给施放方回能（P4-4 只调这一个口子，规则仍归 provider）。
+- **涉及文件**：`Battle.java`
+- **怎么做**：
+    ```java
+    public double gainBreakEnergy(CanHit attacker, CanHit target) {
+        if (attacker == null) return 0;
+        EnergyGain gain = attacker.getEnergyProvider().onBreak(attacker, target);
+        return gain == null ? 0 : applyEnergyGain(attacker, gain);
+    }
+    ```
+    标准实现给 5（P3-0 口径 6：基准值来自文档"额外"反推，等 P9 校准）。
+- **验收**：`EnergyBattleTest` 补一条：`gainBreakEnergy(x, enemy)` 后 `x.currentEnergy == 5 × (1+回能率)`；
+    乱破 +10、同谐开拓者 +10、忘归人 +3(魂2) 这类留给 P8 的角色 provider。
+- **依赖**：P3-1、P3-2
+
+---
+
+### P3-4 技能回能数据化（SPBase 落库）
+
+- **目标**：技能回能不要写死 20/30/5，改成读数据（P3-0 口径 2/3/4）。
+- **涉及文件**：新建 `src/main/resources/data/skill_energy.json`（`data/` 被 gitignore → 生成后 `git add -f`）、
+  `models/Skill` 数据类、`models/energy/StandardEnergyProvider.java`、新建 `test/SkillEnergyDataTest.java`
+- **怎么做**：
+    1. 生成 `skill_energy.json`：`{"<skill_id>": {"sp_base": N, "sp_hit_ratio_sum": M}}`
+        - `sp_base` ← `ExcelOutput/AvatarSkillConfig.json` 的 `SPBase`
+        - `sp_hit_ratio_sum` ← `Config/ConfigAbility/Avatar/Avatar_*_Ability.json` 的 `SPHitRatio` 按技能聚合（默认 1）
+        - 只保留本项目 `skills.json` 里真实存在的 skill_id（103 个角色 × 6 槽）
+    2. 技能数据类加 `spBase` / `spHitRatioSum`（缺省 `-1` = 无数据）
+    3. `StandardEnergyProvider`：有数据 → `EnergyGain.normal(sp_base × sp_hit_ratio_sum)`；无数据 → `Constant` 兜底
+    4. **不要再乘段数**：弹射类的 `sp_base` 已经是每段值，`sp_hit_ratio_sum` 已经含段数（P3-0 口径 3/4）
+- **验收**：`SkillEnergyDataTest`：
+    - 银枝战技 130202 → 30；艾丝妲战技 100902 → 30（6 × 5）；瓦尔特战技 100402 → 30（10 × 3）
+    - 青雀战技 120102 → 0（不回能）；刃战技 120502 → 0；流萤战技 131002 → 0（改由角色 provider 给 60% 上限）
+    - 景元追加攻击 → 0、黑塔追加攻击 → 5（对齐 HSR.md §3.3 的示例）
+- **依赖**：P3-1（provider 接口）；真角色接线仍是 P8-3
 
 ---
 
@@ -843,7 +1043,7 @@
                e.breakEnemy(element);
                Damage d = new BreakDamageCalculator().build(user, e, element, amount);   // P4-3
                battle.applyDamage(e, d);                      // 易伤/减伤由 onDamage 钩子注入
-               battle.gainBreakEnergy(user);                  // P3-3
+               battle.gainBreakEnergy(user, e);               // P3-3
            }
        }
        ```
@@ -882,7 +1082,7 @@
        ```
     2. `Constant` 加 `public static final Map<Integer, Double> BREAKING_RATE;`（加载 `breaking_rate.json`，key 是 int 等级）
     3. P4-2 的调用处（`reduceToughness` 里）已写好：`build(...)` → `battle.applyDamage(e, d)` → 推条（P4-4）→
-       `gainBreakEnergy(user)`（P3-3），本任务只需把 `build` 写出来
+       `gainBreakEnergy(user, e)`（P3-3），本任务只需把 `build` 写出来
 - **验收**：`BreakDamageTest`（攻击者 Lv80、击破特攻 300%、削韧值 112.5、敌防 1150、无抗性、无减伤）：
     - `breakBase = 376.75535`；`(1+3.0) × 112.5 = 450`；防御区 `1000/2150`
     - 期望 `376.75535 × 4.0 × 112.5 × (1000.0/2150.0) ≈ 78855.8`（容差 1.0）
@@ -913,7 +1113,7 @@
            // P5-5 之后再接敌人行动；现在只打印 TODO
        }
        ```
-    3. 击破回能：`reduceToughness` 末尾 `battle.gainBreakEnergy(user);`（步骤 2 的代码里已含）
+    3. 击破回能：`reduceToughness` 末尾 `battle.gainBreakEnergy(user, e);`（步骤 2 的代码里已含）
 - **验收**：`BreakStateTest`：
     - 击破前记录 `getTimeRemaining(enemySignal)` → 击破后增大（≈ 原剩余 + 0.25×cycle）
     - `isBroken()` 期间敌人轮到时 `[BROKEN]` 输出且不造成伤害
@@ -1490,8 +1690,9 @@
        ```
        `DamageElement.fromString` 加大小写不敏感（P1-1 已有 fromString 模式，照着补）；`Path` 的 `fromName` 加英文串映射
        （`"destruction" → DESTRUCTION`、`"preservation" → PRESERVATION`，其余 → OTHER，TODO 全表校准）。
-       `maxEnergy`：P3-1 在 `CanHit` 有默认 100；`CharacterFactory` 里覆盖：
-       `c.setMaxEnergy(cd.maxEnergy() != null ? cd.maxEnergy() : 100)`。
+       `maxEnergy`：P3-1 里 `CanHit` 默认 0（= 无能量条）；`CharacterFactory` 里按数据覆盖：
+       `c.setMaxEnergy(cd.maxEnergy() != null ? cd.maxEnergy() : 0)`——**1407 遐蝶就是 null，不能兜底成 100**
+       （P3-0 A 表）；上限离档的还有 1220 飞霄 12（终结技只耗 6，等 P8-3 接 `ultCost`）。
        `CharacterData` record 补组件 `@SerializedName("aggro") int aggro`（JSON 每角色都有，如景元 75；缺省 0 时 `aggroOf`
        兜底 100）。
     2. 新建 `utils/CharacterFactory.java`：
