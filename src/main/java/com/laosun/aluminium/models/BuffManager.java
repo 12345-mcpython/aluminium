@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.models.event.AttackEvent;
 import com.laosun.aluminium.models.event.DamageEvent;
 
 import java.util.ArrayList;
@@ -70,6 +71,19 @@ public class BuffManager {
         for (AbstractBuff buff : buffs) {
             if (buff instanceof DamageEvent event) {
                 event.onDamage(battle, damage);
+            }
+        }
+    }
+
+    /**
+     * Lets every buff react to a finished attack（知更鸟【协奏】/缇宝结界的"我方攻击后"）.
+     * Called by {@link CanHit#afterAttack(Battle, CanHit, CanHit, List, double)}.
+     */
+    public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
+                            List<? extends CanHit> hitTargets, double totalDamage) {
+        for (AbstractBuff buff : buffs) {
+            if (buff instanceof AttackEvent event) {
+                event.afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage);
             }
         }
     }
