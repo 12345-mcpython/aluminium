@@ -111,6 +111,38 @@ public final class Constant {
      */
     public static final boolean TRUE_DMG_SKIP_ZONES = true;
 
+    /**
+     * 常规普攻的回能（P3 兜底值）。
+     *
+     * <p>取自 tbgd {@code AvatarSkillConfig.SPBase} 的常规档（ROADMAP P3-0 口径 2）：
+     * 普攻 20 / 战技 30 / 终结技 5 是全角色通用值，**多段（弹射）技能的数据是「每段值」**
+     * （艾丝妲/桑博/那刻夏/同谐开拓者 6×5、瓦尔特 10×3），总量仍是 30，别按段数再乘一次。
+     * P3-4 把技能数据落库后，这里只作为「没有技能数据时」的兜底。
+     */
+    public static final double ENERGY_GAIN_BASIC = 20;
+    /**
+     * 常规战技的回能（P3 兜底值）。见 {@link #ENERGY_GAIN_BASIC}。
+     */
+    public static final double ENERGY_GAIN_SKILL = 30;
+    /**
+     * 常规终结技的回能（P3 兜底值）。终结技一律 5（饮月 3 段、米沙多段、银枝弹射 6 次都是 5），
+     * 不做段数乘算；释放时先清零再回这 5 点。
+     */
+    public static final double ENERGY_GAIN_ULTRA = 5;
+    /**
+     * 受击回能基准（P3）。文档没给直接数值，由「娜塔莎星魂4 受到攻击后**额外**恢复 5 点」、
+     * 「云璃受到攻击后**额外**恢复 15 点」反推存在基准值 10；等 P9 用数据校准。
+     */
+    public static final double ENERGY_GAIN_HIT = 10;
+    /**
+     * 击杀回能基准（P3，待校准）。文档里只以「额外恢复」形式出现。
+     */
+    public static final double ENERGY_GAIN_KILL = 5;
+    /**
+     * 击破回能基准（P3，待校准）。P4-4 击破时调用。
+     */
+    public static final double ENERGY_GAIN_BREAK = 5;
+
     static {
         RELIC_MAIN_ATTRIBUTES = JSONReader.fromJSON("main_attribute.json", RelicMainAttribute.class);
         RELIC_SUB_ATTRIBUTES = JSONReader.fromJSON("sub_attribute.json", RelicSubAttribute.class);

@@ -8,6 +8,9 @@ import com.laosun.aluminium.models.event.AttackEvent;
 import com.laosun.aluminium.models.event.BattleEvent;
 import com.laosun.aluminium.models.event.DamageEvent;
 import com.laosun.aluminium.models.event.MoveEvent;
+import com.laosun.aluminium.models.energy.EnergyGain;
+import com.laosun.aluminium.models.energy.EnergyProvider;
+import com.laosun.aluminium.models.energy.StandardEnergyProvider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -67,6 +70,29 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     @Setter
     private boolean invulnerable = false;
 
+    /**
+     * 能量当前值（P3）。没有能量条的角色恒为 0。
+     */
+    @Setter
+    private double currentEnergy = 0;
+
+    /**
+     * 能量上限（P3）。{@code 0} = 没有能量条（1407 遐蝶就是这种）：{@link #hasEnergyBar()} 为
+     * {@code false}，任何回能都不入账，也没有「满能量放大招」这回事。
+     *
+     * <p>真实上限来自 {@code character_data.json} 的 {@code max_energy}（93 个角色里只有遐蝶是
+     * null）。离档的很多：飞霄/白厄 12、黄泉 9、昔涟 24、流萤/云璃/长夜月 240、银枝/爻光 180、
+     * 阿格莱雅 350、绯英 480 —— 见 ROADMAP 的 P3-0 D 表。
+     */
+    @Setter
+    private double maxEnergy = 0;
+
+    /**
+     * 回能规则（P3）。常规角色用 {@link StandardEnergyProvider}，特殊角色各自实现本接口。
+     */
+    @Setter
+    private EnergyProvider energyProvider = new StandardEnergyProvider();
+
     private final BuffManager buffManager;
 
     // test event behavior
@@ -109,6 +135,10 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
         this.death = false;
         this.buffManager = new BuffManager(this);
+        // 配置类字段要跟着复制；currentEnergy 是新战斗实例，故意从 0 开始
+        this.maxEnergy = other.maxEnergy;
+        this.currentEnergy = 0;
+        this.energyProvider = other.energyProvider;
         this.beforeMove = () -> {
         };
         this.afterMove = () -> {
@@ -179,6 +209,55 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
             return;
         }
         currentHp = Math.min(currentHp + amount, getMaxHp());
+    }
+
+    /**
+     * 是否有能量条（{@code maxEnergy > 0}）。
+     *
+     * @return {@code true} if this entity has an energy bar
+     */
+    public boolean hasEnergyBar() {
+        return maxEnergy > 0;
+    }
+
+    /**
+     * 是否满能量（可以放终结技）。没有能量条的角色永远 {@code false}。
+     *
+     * @return {@code true} if the energy bar is full
+     */
+    public boolean isEnergyFull() {
+        return hasEnergyBar() && currentEnergy >= maxEnergy;
+    }
+
+    /**
+     * 入账一次回能（P3 唯一的能量增长口）。
+     *
+     * <p>公式（HSR.md §3.3）：{@code 最终获得能量 = 基础获得能量 × (1 + 能量恢复效率%)}；
+     * {@link EnergyGain#affectedByEfficiency()} 为 {@code false} 时不吃效率加成。
+     *
+     * @param gain 一次回能描述
+     * @return **实际入账值**（被上限截断后的值，不是理论回能值）
+     */
+    public double gainEnergy(EnergyGain gain) {
+        if (gain == null || gain.amount() <= 0 || !hasEnergyBar()) {
+            return 0;
+        }
+        double efficiency = gain.affectedByEfficiency()
+                ? 1 + getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get()
+                : 1;
+        double added = Math.min(maxEnergy - currentEnergy, gain.amount() * efficiency);
+        currentEnergy += added;
+        return added;
+    }
+
+    /**
+     * 便捷入口：按基础值入账（走回能效率）。
+     *
+     * @param amount base energy
+     * @return 实际入账值
+     */
+    public double gainEnergy(double amount) {
+        return gainEnergy(EnergyGain.normal(amount));
     }
 
     @Override
