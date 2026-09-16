@@ -11,7 +11,7 @@ import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.UN
 
 public class DoubleValueTest {
     @Test
-    public void test() {
+    public void modifierStackingAndRemoval() {
         DoubleValue dw = new DoubleValue(100);
         Assertions.assertEquals(100, dw.get(), 0.0001, dw.toString());
         dw.addModifier(DoubleValue.Modifier.pure(100, TEST));
