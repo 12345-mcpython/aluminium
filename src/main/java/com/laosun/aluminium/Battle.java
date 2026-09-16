@@ -261,6 +261,11 @@ public class Battle {
                 : 0.0;
         damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
 
+        // 5) 钩子：实体级 DamageEvent（HSR.md §2.2：虚弱=攻击方负面、易伤=受击方负面、减伤=受击方增益）
+        //    双方都发；默认实现转发给各自的 BuffManager，子类重写可做天赋/Boss 机制
+        attacker.onDamage(this, damage);
+        defender.onDamage(this, damage);
+
         return Math.max(1, damage.toValue());
     }
 
