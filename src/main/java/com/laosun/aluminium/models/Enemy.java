@@ -58,6 +58,21 @@ public class Enemy extends CanHit {
      */
     private DamageElement stanceType;
 
+    /**
+     * 是否处于击破状态（P4-2 判定、P4-4 恢复）。
+     */
+    private boolean broken;
+
+    /**
+     * 本次击破的元素（P4-3 击破伤害 / P4-5 DOT 类型用）。
+     */
+    private DamageElement brokenElement;
+
+    /**
+     * 击破状态剩余回合数（跳回合/推条由 P4-4 维护，P4-1 只留字段）。
+     */
+    private int brokenRemainTurns;
+
     public Enemy(String name, Camp camp, DoubleValue[] attributes) {
         super(name, camp, attributes);
     }
@@ -86,5 +101,54 @@ public class Enemy extends CanHit {
      */
     public boolean isWeakTo(DamageElement element) {
         return element != null && stanceWeak.contains(element);
+    }
+
+    /**
+     * 是否有韧性条（{@code maxStance > 0}）。
+     *
+     * <p>P4-2 的削韧/击破判定统一走这里，别各自去摸 {@link #maxStance}——数据里确实有韧性为 0 的怪。
+     *
+     * @return {@code true} if this enemy can be broken at all
+     */
+    public boolean hasToughnessBar() {
+        return maxStance > 0;
+    }
+
+    /**
+     * 削韧（P4-2 每段伤害调用一次）。
+     *
+     * <p><b>归零不自动击破</b>——击破判定要区分弱点击破/非弱点削韧（P4-2 的口径），
+     * 所以这里只负责扣数并夹到 0。已击破的目标在恢复前不再削韧（韧性条是空的）。
+     *
+     * @param amount 削韧点数（技能 {@code stance_list} 的值 × 弱点/非弱点系数）
+     */
+    public void reduceStance(double amount) {
+        if (broken || amount <= 0) {
+            return;
+        }
+        stance = Math.max(0, stance - amount);
+    }
+
+    /**
+     * 进入击破状态（P4-2 在韧性归零时调用）。
+     *
+     * @param element 造成击破的元素（{@code null} = 未知，不断言）
+     */
+    public void breakEnemy(DamageElement element) {
+        broken = true;
+        brokenElement = element;
+        stance = 0;
+    }
+
+    /**
+     * 退出击破状态并把韧性条填满（P4-4：击破持续回合结束时调用）。
+     *
+     * <p>多韧性条（{@link #stanceCount} {@code > 1}）的逐条消耗留给 P4-4，本任务只恢复满值。
+     */
+    public void recoverFromBroken() {
+        broken = false;
+        brokenElement = null;
+        brokenRemainTurns = 0;
+        stance = maxStance;
     }
 }

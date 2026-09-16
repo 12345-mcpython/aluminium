@@ -153,7 +153,7 @@
 |                       | P3-2 回能接入 + 大招条件                       | ☑   |
 |                       | P3-3 击破回能联动                              | ☑   |
 |                       | P3-4 技能回能数据化（SPBase 落库，暂缓）        | ☐   |
-| **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ☐   |
+| **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ☑   |
 |                       | P4-2 削韧判定                                  | ☐   |
 |                       | P4-3 击破伤害                                  | ☐   |
 |                       | P4-4 击破状态/推条/跳回合                      | ☐   |
@@ -986,37 +986,35 @@
 
 ---
 
-### P4-1 Enemy 韧性字段
+### P4-1 Enemy 韧性字段 ✅
 
 - **目标**：敌人有韧性/击破状态。
 - **涉及文件**：`models/Enemy.java`、新建 `test/ToughnessTest.java`
-- **怎么做**：
-    1. `Enemy` 加：
+- **怎么做**（实测修订：**沿用 P2-2 已有的 `stance` / `maxStance` 命名**，不新造 `maxToughness`/`currentToughness`）：
+    1. `Enemy` 加击破状态（`@Getter/@Setter` 是类级的，直接加字段就有访问器）：
        ```java
-       @Getter private double maxToughness;
-       @Getter private double currentToughness;
-       @Getter private boolean broken = false;
-       @Getter @Setter private int brokenRemainTurns = 0;
-       @Getter private DamageElement brokenElement;
-       public void setToughness(double toughness) { this.maxToughness = toughness; this.currentToughness = toughness; }
+       private boolean broken;                      // 是否处于击破状态
+       private DamageElement brokenElement;         // 击破元素（P4-3 击破伤害 / P4-5 DOT 用）
+       private int brokenRemainTurns;               // 剩余回合数，由 P4-4 维护（P4-1 只留字段，不写死 2）
        ```
-    2. 削韧方法（P4-2 调用）：
+    2. 判定 + 状态机（P4-2/P4-4 调用）：
        ```java
-       public void reduceToughness(double amount) {
-           if (broken || amount <= 0) return;
-           currentToughness = Math.max(0, currentToughness - amount);
+       public boolean hasToughnessBar() { return maxStance > 0; }   // 数据里确有韧性 0 的怪
+
+       public void reduceStance(double amount) {
+           if (broken || amount <= 0) return;                        // 击破期间韧性条是空的
+           stance = Math.max(0, stance - amount);                    // 归零**不自动击破**
        }
-       public void breakEnemy(DamageElement element) {
-           broken = true; brokenElement = element; brokenRemainTurns = 2; currentToughness = 0;
-       }
-       public void recoverFromBroken() { broken = false; brokenElement = null; currentToughness = maxToughness; }
+       public void breakEnemy(DamageElement element) { broken = true; brokenElement = element; stance = 0; }
+       public void recoverFromBroken() { broken = false; brokenElement = null; brokenRemainTurns = 0; stance = maxStance; }
        ```
-    3. 韧性单位 =「点」（`EnemyScaler` 的 stance 直接就是点，冰锋 60）
-- **验收**：`ToughnessTest`：
-    - `setToughness(60)` → 当前 60；`reduceToughness(30)` → 30；再 `reduceToughness(30)` → 0 且 `isBroken()` 仍
-      false（归零不自动破，由 P4-2 判定）
-    - `breakEnemy(FIRE)` → `isBroken()` true、`brokenElement == FIRE`
-    - `recoverFromBroken()` → `currentToughness == 60`
+    3. 韧性单位 =「点」（`EnemyScaler` 的 stance 直接就是点，冰锋 60）；多韧性条 `stanceCount` 的逐条消耗留 P4-4。
+- **验收**：`ToughnessTest`（6 条，全绿）：
+    - 冰锋 @90/组1：`maxStance == stance == 60`、`hasToughnessBar()`、初始未击破
+    - `reduceStance(30)` → 30；再 30 → 0 且 `isBroken()` 仍 false（归零≠击破，判定在 P4-2）；再削不变负
+    - `breakEnemy(FIRE)` → `broken` + `brokenElement == FIRE` + `stance == 0`；`recoverFromBroken()` → 未击破、元素清空、`stance == 60`
+    - 击破期间 `reduceStance(30)` 无效；`reduceStance(0/-5)` 无效
+    - 没有韧性条的怪（`fromAttributes`）恒为 0，击破/恢复都不炸
 - **依赖**：无
 
 ---
