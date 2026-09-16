@@ -277,6 +277,22 @@ public class Battle {
     }
 
     /**
+     * 击破回能（P3-3）：击破瞬间由 P4-4 调这**一个**口子，规则仍归击破者自己的 provider
+     * （标准实现给 5；乱破 +10、同谐开拓者 +10、忘归人 +3 这类等真做角色时再各自实现）。
+     *
+     * @param attacker 造成击破的人
+     * @param target   被击破的目标
+     * @return 实际入账值
+     */
+    public double gainBreakEnergy(CanHit attacker, CanHit target) {
+        if (attacker == null) {
+            return 0;
+        }
+        EnergyGain gain = attacker.getEnergyProvider().onBreak(attacker, target);
+        return gain == null ? 0 : applyEnergyGain(attacker, gain);
+    }
+
+    /**
      * 受击回能 + 击杀回能（P3-2）。
      *
      * <p>口径：附加伤害 / 真实伤害「不视为造成了 1 次攻击」→ 两边都不回能；

@@ -150,8 +150,8 @@
 | **P3 能量系统**       | P3-0 能量机制调研（数据 + 文档双证）             | ☑   |
 |                       | P3-1 能量字段 + gainEnergy + EnergyProvider     | ☑   |
 |                       | P3-2 回能接入 + 大招条件                       | ☑   |
-|                       | P3-3 击破回能联动                              | ☐   |
-|                       | P3-4 技能回能数据化（SPBase 落库）              | ☐   |
+|                       | P3-3 击破回能联动                              | ☑   |
+|                       | P3-4 技能回能数据化（SPBase 落库，暂缓）        | ☐   |
 | **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ☐   |
 |                       | P4-2 削韧判定                                  | ☐   |
 |                       | P4-3 击破伤害                                  | ☐   |
@@ -918,10 +918,10 @@
 
 ---
 
-### P3-3 击破回能联动
+### P3-3 击破回能联动 ✅
 
 - **目标**：击破瞬间给施放方回能（P4-4 只调这一个口子，规则仍归 provider）。
-- **涉及文件**：`Battle.java`
+- **涉及文件**：`Battle.java`、`test/EnergyBattleTest.java`
 - **怎么做**：
     ```java
     public double gainBreakEnergy(CanHit attacker, CanHit target) {
@@ -931,14 +931,18 @@
     }
     ```
     标准实现给 5（P3-0 口径 6：基准值来自文档"额外"反推，等 P9 校准）。
-- **验收**：`EnergyBattleTest` 补一条：`gainBreakEnergy(x, enemy)` 后 `x.currentEnergy == 5 × (1+回能率)`；
-    乱破 +10、同谐开拓者 +10、忘归人 +3(魂2) 这类留给 P8 的角色 provider。
+- **验收**：`EnergyBattleTest` 补 2 条：`gainBreakEnergy(x, enemy)` 后 `x.currentEnergy == 5`；
+    回能率 50% 时 `== 7.5`；`gainBreakEnergy(null, enemy) == 0` 不炸。
+    乱破 +10、同谐开拓者 +10、忘归人 +3(魂2) 这类留给角色 provider（暂不做）。
 - **依赖**：P3-1、P3-2
 
 ---
 
-### P3-4 技能回能数据化（SPBase 落库）
+### P3-4 技能回能数据化（SPBase 落库，暂缓）
 
+- **状态**：**暂缓**。标准档常量（20/30/5）已经给出所有常规角色的**正确总量**，
+  只有离档技能会差（镜流/阿格莱雅战技 20、爻光普攻 30、青雀/刃/饮月/流萤/波提欧/火花 战技 0）——
+  这些属于「真做角色」时才需要保真的东西，跟 P8-2/P8-3 一起做，别单独提前。
 - **目标**：技能回能不要写死 20/30/5，改成读数据（P3-0 口径 2/3/4）。
 - **涉及文件**：新建 `src/main/resources/data/skill_energy.json`（`data/` 被 gitignore → 生成后 `git add -f`）、
   `models/Skill` 数据类、`models/energy/StandardEnergyProvider.java`、新建 `test/SkillEnergyDataTest.java`
