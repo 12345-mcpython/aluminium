@@ -2,7 +2,10 @@ package com.laosun.aluminium.models.tests;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Skill;
 import com.laosun.aluminium.models.SkillData;
 
@@ -39,9 +42,13 @@ public class TestSkillGroup1 {
             double attack = user.getAttribute(AttributeType.ATTACK).get();
             double baseDamage = attack * multiplier;
 
+            DamageElement element = getData().getElement();
+            if (element == null) {
+                return;   // 非伤害技能不构造 Damage（TODO P1-8 正经分派）
+            }
             // character canHit
-            double finalDamage = battle.calculateDamage(user, c, baseDamage, List.of());
-            battle.applyDamage(target.getFirst(), finalDamage);
+            battle.applyDamage(target.getFirst(),
+                    new Damage(user, c, element, DamageType.NORMAL, baseDamage));
         }
     }
 

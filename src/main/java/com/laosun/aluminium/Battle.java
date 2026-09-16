@@ -7,6 +7,7 @@ import com.laosun.aluminium.models.Character;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class Battle {
@@ -24,6 +25,12 @@ public class Battle {
 
     private final ArrayList<SkillRequest> skillRequests = new ArrayList<>();
 
+    /**
+     * Injected random source (crit rolls / target selection); a fixed seed makes a
+     * whole battle reproducible.
+     */
+    private final Random rng;
+
     public record AdvanceRequest(CanHit object, double rate) {
     }
 
@@ -31,12 +38,21 @@ public class Battle {
     }
 
     public Battle(List<Character> characterQueue, List<Enemy> enemyQueue) {
+        this(characterQueue, enemyQueue, new Random());
+    }
+
+    public Battle(List<Character> characterQueue, List<Enemy> enemyQueue, Random rng) {
         characters = characterQueue;
         enemies = enemyQueue;
+        this.rng = rng;
         queue = new Queue();
         queue.addCombatants(characterQueue);
         queue.addCombatants(enemyQueue);
         queue.initialize();
+    }
+
+    public Random getRng() {
+        return rng;
     }
 
     public void castImmediate(Skill skill, CanHit user, List<? extends CanHit> targets) {
@@ -185,39 +201,67 @@ public class Battle {
 
 
     /**
-     * Calculate damage according to the object
-     * @param attacker the object which caused damage
-     * @param defender ? I don't know
-     * @param baseDamage the base value of the skill
-     * @param extraModifiers extra modifiers for the damage
-     * @return damage value
+     * Assembles every damage zone on the given hit, settles it and applies it to the
+     * target, returning the damage actually settled.
+     *
+     * <p>This is the <b>only</b> public settlement entry point. To learn how much a hit
+     * deals, use the returned value — do not assemble it a second time: assembly is
+     * additive ({@code addBoost} appends a modifier to the boost zone), so assembling the
+     * same {@link Damage} twice would count 增伤/易伤/减伤/虚弱 twice.
+     *
+     * @param target the combatant taking the hit
+     * @param damage the hit (约定：一段伤害 = 一个 Damage 对象)
+     * @return the settled damage, or {@code 0} if the target was already dead
      */
-    public double calculateDamage(CanHit attacker, CanHit defender,
-                                  double baseDamage, List<DoubleValue.Modifier> extraModifiers) {
-        DoubleValue damage = new DoubleValue(baseDamage);
-
-        if (extraModifiers != null) {
-            for (DoubleValue.Modifier mod : extraModifiers) {
-                if (mod.getModifierType() == DoubleValue.Modifier.ModifierType.ADD_PERCENT) {
-                    damage.addModifier(mod);
-                }
-            }
+    public double applyDamage(CanHit target, Damage damage) {
+        if (target.isDeath()) {
+            return 0;
         }
-
-        double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
-        double critDmg = attacker.getAttribute(AttributeType.CRIT_ATTACK).get();
-        if (Math.random() < critRate) {
-            damage.addModifier(DoubleValue.Modifier.multiplyPercent(critDmg, DoubleValue.Modifier.ModifierSource.BUFF));
-            System.out.println("crit attack!");
-        }
-
-        return Math.max(1, damage.get());
+        double settled = assemble(damage);
+        target.takeDamage(settled);
+        return settled;
     }
 
-    public void applyDamage(CanHit target, double damage) {
-        double currentHp = target.getAttribute(AttributeType.HEALTH).get();
-        double newHp = Math.max(0, currentHp - damage);
-        target.takeDamage(damage);
+    /**
+     * Zone assembly + settlement: 增伤 → 暴击 → 防御 → 抗性 → {@link Damage#toValue()}.
+     *
+     * <p>Private on purpose: the only way in is {@link #applyDamage(CanHit, Damage)}, which
+     * makes "the same hit assembled twice" structurally impossible.
+     *
+     * @param damage the hit to assemble and settle
+     * @return the final damage of this hit, floored at 1
+     */
+    private double assemble(Damage damage) {
+        CanHit attacker = damage.getAttacker();
+        CanHit defender = damage.getDefender();
+
+        // 1) 增伤区：元素增伤 + 全增伤（击破/超击破/真伤会被 BoostArea.applies() 自动跳过）
+        AttributeType elementBoost = AttributeType.getBoostByElement(damage.getElement());
+        if (elementBoost != null) {
+            damage.addBoost(attacker.getAttribute(elementBoost).get());
+        }
+        damage.addBoost(attacker.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
+
+        // 2) 暴击区：只有可暴击类型才骰；全引擎唯一的随机点，用注入的 rng（可复现）
+        if (damage.getType().isCrittable()) {
+            double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
+            boolean isCrit = critRate > 0 && rng.nextDouble() < critRate;
+            damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get());
+        }
+
+        // 3) 防御区：攻击者等级 / 受击者防御 / 攻击者无视防御
+        damage.defence(attacker.getLevel(),
+                defender.getAttribute(AttributeType.DEFENCE).get(),
+                attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get());
+
+        // 4) 抗性区：受击者抗性 - 攻击者穿透，再 clamp（HSR.md §2.5，负抗全效）
+        //    注：弱点击破不改变抗性（§2.5；P4 复核）
+        double rawResist = defender instanceof Enemy enemy
+                ? enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)
+                : 0.0;
+        damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
+
+        return Math.max(1, damage.toValue());
     }
 
     private void processAddRequests() {
