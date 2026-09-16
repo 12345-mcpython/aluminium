@@ -141,6 +141,26 @@ public class EnergyBattleTest {
         Assertions.assertEquals(99, dummy.getCurrentEnergy(), EPS, "受击回能读的是被打者自己的 provider");
     }
 
+    @Test
+    public void breakEnergyGoesToTheBreaker() {
+        Character hero = character("hero", 120);
+        Enemy dummy = dummy(1_000_000);
+        Battle battle = newBattle(hero, dummy);
+
+        Assertions.assertEquals(5, battle.gainBreakEnergy(hero, dummy), EPS);
+        Assertions.assertEquals(5, hero.getCurrentEnergy(), EPS, "击破回能基准 5（P4-4 击破时调这个口子）");
+        Assertions.assertEquals(0, battle.gainBreakEnergy(null, dummy), EPS, "没有击破者 → 0，不炸");
+    }
+
+    @Test
+    public void breakEnergyScalesWithEnergyRegenerationRate() {
+        Character hero = character("hero", 120);
+        hero.setAttribute(AttributeType.ENERGY_REGENERATION_RATE, new DoubleValue(0.5));
+        Battle battle = newBattle(hero, dummy(1_000_000));
+
+        Assertions.assertEquals(7.5, battle.gainBreakEnergy(hero, battle.enemies.getFirst()), EPS);
+    }
+
     private static Character character(String name, double maxEnergy) {
         Character c = Character.fromAttributes(name, 10_000, 100, 100, 100);
         c.setMaxEnergy(maxEnergy);
