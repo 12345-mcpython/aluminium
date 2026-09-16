@@ -44,12 +44,28 @@ public final class SkillExecutor {
     /**
      * Expands one skill activation into hits, settles them and broadcasts the attack event.
      *
+     * <p>这里是**技能回能的唯一挂点**（P3-2）：不管这条技能有没有伤害（增益/护盾/治疗也要回能），
+     * 也不管参数是否为空，施放结束都会给施放者结算一次
+     * {@link Battle#grantSkillEnergy(CanHit, Skill, Set)}。
+     *
      * @param battle  the running battle (targets are taken from {@code battle.targetableEnemies()})
      * @param skill   the skill being used (its {@link SkillData} decides the shape)
      * @param user    the caster
      * @param targets the caller's selection; only the first entry (main target) is used
      */
     public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets) {
+        Set<CanHit> hitTargets = new LinkedHashSet<>();   // 实际命中过的目标（含当场死亡的）
+        resolveHits(battle, skill, user, targets, hitTargets);
+        battle.grantSkillEnergy(user, skill, hitTargets);
+    }
+
+    /**
+     * 把一次技能施放展开成 N 段伤害并结算（能量不在这里给，见 {@link #execute}）。
+     *
+     * @param hitTargets 输出参数：实际命中集
+     */
+    private static void resolveHits(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets,
+                                    Set<CanHit> hitTargets) {
         SkillData data = skill.getData();
         SkillEffectType effect = data.getEffect();
 
@@ -78,7 +94,6 @@ public final class SkillExecutor {
         double base = user.getAttribute(AttributeType.ATTACK).get() * params.getFirst();
         CanHit mainTarget = targets.getFirst();
 
-        Set<CanHit> hitTargets = new LinkedHashSet<>();   // 实际命中过的目标（含当场死亡的）
         double totalDamage = 0;
 
         switch (effect) {

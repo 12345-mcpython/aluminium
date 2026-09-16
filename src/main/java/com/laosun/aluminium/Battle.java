@@ -6,10 +6,12 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.energy.EnergyGain;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 
 public class Battle {
@@ -82,8 +84,8 @@ public class Battle {
     // After releasing ultra skill must call processRequests()!
     // NO BEFAN YOY DID IT
     public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
-        if (user == null || user.isDeath()) {
-            return false;
+        if (user == null || user.isDeath() || !user.isEnergyFull()) {
+            return false;                       // 没满能量放不了（没有能量条的角色永远放不了）
         }
         Skill ultra = user.getSkills().get(SkillType.ULTRA);
         if (ultra == null) {
@@ -92,7 +94,12 @@ public class Battle {
         if (!requestSkill(ultra, user, targets)) {
             return false;
         }
-        processRequests();
+        processRequests();                      // 大招本体结算：Ultra 槽在 onSkillCast 里不回能，不会重复给
+        user.setCurrentEnergy(0);               // 先清零
+        EnergyGain ultraGain = user.getEnergyProvider().onUltCast(user, ultra);
+        if (ultraGain != null) {
+            applyEnergyGain(user, ultraGain);   // 再回自身的 5 点（× 回能效率）
+        }
         return true;
     }
 
@@ -220,8 +227,84 @@ public class Battle {
             return 0;                  // 尸体 / 转阶段无敌：不结算（也就不会鞭尸）
         }
         double settled = assemble(damage);
-        target.takeDamage(settled);
+        boolean died = target.takeDamage(settled);
+        grantHitAndKillEnergy(target, damage, died);     // P3-2：受击回能 / 击杀回能
         return settled;
+    }
+
+    /**
+     * 战斗内**唯一**回能入口（P3-2）：规则由 {@code target} 自己的
+     * {@link com.laosun.aluminium.models.energy.EnergyProvider} 决定；团队充能（停云/藿藿/星期日）
+     * 将来也从这里给别的目标回能。
+     *
+     * @param target 回能的人
+     * @param gain   一次回能描述（基础值 + 是否吃回能效率）
+     * @return 实际入账值（被上限截断后），入账不了就是 0
+     */
+    public double applyEnergyGain(CanHit target, EnergyGain gain) {
+        return target == null ? 0 : target.gainEnergy(gain);
+    }
+
+    /**
+     * 便捷入口：按基础值给某人回能（走回能效率）。
+     *
+     * @param target 回能的人
+     * @param amount 基础回能值
+     * @return 实际入账值
+     */
+    public double grantEnergy(CanHit target, double amount) {
+        return applyEnergyGain(target, EnergyGain.normal(amount));
+    }
+
+    /**
+     * 技能回能挂点（P3-2）：由 {@link SkillExecutor} 在技能执行处调用——只有那里知道
+     * **实际命中集**（AOE 打全场、BLAST 打三格、BOUNCE 每段换目标）。
+     *
+     * <p>注意区分：这里是"施放技能的"回能（普攻 20 / 战技 30），终结技不走 {@code onSkillCast}
+     * （它在 {@link #castUltra} 里先清零再回 5）。
+     *
+     * @param user       施放者
+     * @param skill      施放的技能
+     * @param hitTargets 实际命中集（增益/治疗类技能为空集）
+     * @return 实际入账值
+     */
+    public double grantSkillEnergy(CanHit user, Skill skill, Set<? extends CanHit> hitTargets) {
+        if (user == null) {
+            return 0;
+        }
+        EnergyGain gain = user.getEnergyProvider().onSkillCast(user, skill, hitTargets);
+        return gain == null ? 0 : applyEnergyGain(user, gain);
+    }
+
+    /**
+     * 受击回能 + 击杀回能（P3-2）。
+     *
+     * <p>口径：附加伤害 / 真实伤害「不视为造成了 1 次攻击」→ 两边都不回能；
+     * 击杀了目标的那一发只结算击杀回能（记给 {@code damage.getAttacker()}），
+     * 挨打的那一方已经死了就不必再涨能量。
+     *
+     * @param target 挨打的人
+     * @param damage 这一发伤害
+     * @param died   这一发是否打死了 {@code target}
+     */
+    private void grantHitAndKillEnergy(CanHit target, Damage damage, boolean died) {
+        if (!damage.isCountsAsAttack()) {
+            return;
+        }
+        if (!died) {
+            EnergyGain hitGain = target.getEnergyProvider().onTakingHit(target, damage);
+            if (hitGain != null) {
+                applyEnergyGain(target, hitGain);
+            }
+            return;
+        }
+        CanHit attacker = damage.getAttacker();
+        if (attacker != null) {
+            EnergyGain killGain = attacker.getEnergyProvider().onKill(attacker, target);
+            if (killGain != null) {
+                applyEnergyGain(attacker, killGain);
+            }
+        }
     }
 
     /**

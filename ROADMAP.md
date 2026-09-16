@@ -149,7 +149,7 @@
 |                       | P2-4 EnemyFactory                              | ☑   |
 | **P3 能量系统**       | P3-0 能量机制调研（数据 + 文档双证）             | ☑   |
 |                       | P3-1 能量字段 + gainEnergy + EnergyProvider     | ☑   |
-|                       | P3-2 回能接入 + 大招条件                       | ☐   |
+|                       | P3-2 回能接入 + 大招条件                       | ☑   |
 |                       | P3-3 击破回能联动                              | ☐   |
 |                       | P3-4 技能回能数据化（SPBase 落库）              | ☐   |
 | **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ☐   |
@@ -862,56 +862,59 @@
 
 ---
 
-### P3-2 回能接入 + 大招条件
+### P3-2 回能接入 + 大招条件 ✅
 
 - **目标**：战斗行为自动回能（走 `EnergyProvider`）；`castUltra` 检查满能量、释放后清零并按 provider 回能。
-- **涉及文件**：`Battle.java`、新建 `test/EnergyBattleTest.java`
+- **涉及文件**：`Battle.java`、`models/SkillExecutor.java`、新建 `test/EnergyBattleTest.java`
 - **怎么做**：
     1. `Battle` 加唯一入账口（团队充能也走这里）：
        ```java
-       /** 战斗内唯一回能入口：规则由 target 自己的 provider 决定（P3 用标准实现） */
+       /** 战斗内唯一回能入口：规则由 target 自己的 provider 决定 */
        public double applyEnergyGain(CanHit target, EnergyGain gain) {
            return target == null ? 0 : target.gainEnergy(gain);
        }
        public double grantEnergy(CanHit target, double amount) { return applyEnergyGain(target, EnergyGain.normal(amount)); }
        ```
-    2. 技能释放：挂点在 `Battle.executeSkill` 那一层，**不放 `SkillExecutor`**——那里有"非伤害技能提前 return"的路径，
-       而增益/治疗技能同样要回能；并且 `hitTargets` 只有执行完才知道：
+    2. 技能回能：**挂点在 `SkillExecutor.execute`，规则在 `Battle.grantSkillEnergy`**
+       （原来打算放 `Battle.executeSkill` 层，但技能是经 `skill.execute(...)` 多态进入的，
+       Battle 里没有现成的 hitTargets；真正知道命中集的地方只有 `SkillExecutor`）：
        ```java
-       EnergyGain gain = user.getEnergyProvider().onSkillCast(user, skill, hitTargets);
-       if (gain != null) applyEnergyGain(user, gain);
+       // SkillExecutor.execute：把主体拆成 private resolveHits(...)，命中集往外传
+       Set<CanHit> hitTargets = new LinkedHashSet<>();
+       resolveHits(battle, skill, user, targets, hitTargets);
+       battle.grantSkillEnergy(user, skill, hitTargets);   // 一条路径、必然执行一次
        ```
-       标准实现按 `attack_type`：`Normal` → 20、`BPSkill` → 30、其它 → 0（终结技不在这一步给，见第 4 条）
+       这样**非伤害技能（护盾/增益/治疗）也回能**（`resolveHits` 提前 return 不影响），
+       参数为空 / 段数为 0 的情况同样只给一次。标准实现按 `attack_type`：`Normal` → 20、
+       `BPSkill` → 30、其它 → 0（终结技不在这一步给，见第 4 条）。
     3. 受击 / 击杀：放 `Battle.applyDamage`，**用真实结算结果，不要读请求参数**：
        ```java
-       if (damage.isCountsAsAttack()) applyEnergyGain(target, target.getEnergyProvider().onTakingHit(target, damage));
-       if (target.isDeath()) applyEnergyGain(damage.getAttacker(), attacker.getEnergyProvider().onKill(attacker, target));
+       double settled = assemble(damage);
+       boolean died = target.takeDamage(settled);
+       grantHitAndKillEnergy(target, damage, died);
        ```
-       击杀回能记给 `damage.getAttacker()`（附加伤害/真实伤害也有 attacker）；受击方是 `target`。
-       DOT/附加伤害是否给"受击方"回能，留到 P4 实测再定（先只在 `isCountsAsAttack()` 时给）。
+       私有方法里的口径：`!damage.isCountsAsAttack()` → 两边都不回能（附加伤害/真伤「不视为造成了
+       1 次攻击」）；没死 → 受击方按自己的 provider 回能；死了 → 击杀回能记给
+       `damage.getAttacker()`（挨打的那方已经死了就不涨能量）。
     4. `castUltra` 改造（先清零，再让 provider 结算终结技自身回能）：
        ```java
-       public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
-           if (user == null || user.isDeath() || !user.isEnergyFull()) return false;
-           Skill ultra = user.getSkills().get(SkillType.ULTRA);
-           if (ultra == null) return false;
-           if (!requestSkill(ultra, user, targets)) return false;
-           processRequests();
-           user.setCurrentEnergy(0);                                        // 先清零
-           EnergyGain gain = user.getEnergyProvider().onUltCast(user, ultra); // 标准实现 = 5
-           if (gain != null) applyEnergyGain(user, gain);
-           return true;
-       }
+       if (user == null || user.isDeath() || !user.isEnergyFull()) return false;
+       ...
+       processRequests();
+       user.setCurrentEnergy(0);                                        // 先清零
+       EnergyGain gain = user.getEnergyProvider().onUltCast(user, ultra); // 标准实现 = 5
+       if (gain != null) applyEnergyGain(user, gain);
        ```
        `isEnergyFull()` 对 `maxEnergy == 0`（1407 遐蝶这类）永远 false → 走不了终结技，符合"没有常规能量条"。
-    5. 战技点消耗回能（米沙/花火/寒鸦）：不归本任务，P8-4 接 `performAction` 时调 `onSkillPointSpent`
-- **验收**：`EnergyBattleTest`：
-    - 回能率 0：普攻后 `currentEnergy == 20`；战技后 +30；终结技清零后自身 +5（**顺序定义**：先清零再回 5）
-    - 角色被打 1 次 → +10；打死敌人者 → +5
-    - `maxEnergy = 0` 的角色打人/被打 → 能量始终 0，不抛异常
-    - 换测试替身 provider（受击回 99）→ 挂点确实读 `energyProvider`，不是写死的常量
-    - `castUltra` 能量不满 → false 且能量不变；满 → true 且清零后 +5
+    5. 战技点消耗回能（米沙/花火/寒鸦）：不归本任务，P8-4 接 `performAction` 时再补钩子。
+- **验收**：`EnergyBattleTest`（7 条）：
+    - 普攻 +20、非伤害战技 +30（护盾技照样回能）、回能率 50% 时普攻 +30
+    - 终结技：不满 → false 且能量不变；满 → 清零后 +5
+    - 受击 +10；打死敌人者 +5；附加伤害/真伤不给受击方回能
+    - `maxEnergy = 0`：打人/被打能量恒 0、`hasEnergyBar()` false、`castUltra` false
+    - 测试替身 provider（技能回 7 / 受击回 99）→ 挂点确实读各自的 `energyProvider`
 - **依赖**：P3-1、P1-8
+- **注意**：`Main.java` 里有旧 demo 调 `castUltra`，那时角色还没有能量（P11-1 修 Main 时一起处理）。
 
 ---
 
