@@ -62,6 +62,39 @@ public final class Constant {
             AttributeType.SPEED_PERCENT, AttributeType.SPEED
     );
 
+    /**
+     * Upper bound of the vulnerability zone multiplier (易伤区系数上限).
+     */
+    public static final double VULNERABLE_CAP = 3.5;
+    /**
+     * Lower bound of the damage-reduction zone multiplier (减伤区系数下限).
+     */
+    public static final double REDUCTION_MIN = 0.01;
+    /**
+     * Lower bound of the weakness zone multiplier (虚弱区系数下限).
+     */
+    public static final double WEAKNESS_MIN = 0.2;
+    /**
+     * Lower bound of the raw resistance value (-100%).
+     */
+    public static final double RESIST_MIN = -1.0;
+    /**
+     * Upper bound of the raw resistance value (90%).
+     */
+    public static final double RESIST_MAX = 0.9;
+    /**
+     * Level-independent term of the defence zone formula.
+     */
+    public static final double DEFENCE_CONST = 200.0;
+    /**
+     * Per-level term of the defence zone formula.
+     */
+    public static final double DEFENCE_PER_LEVEL = 10.0;
+    /**
+     * Whether true damage skips every damage zone (真伤跳过乘区开关).
+     */
+    public static final boolean TRUE_DMG_SKIP_ZONES = true;
+
     static {
         RELIC_MAIN_ATTRIBUTES = JSONReader.fromJSON("main_attribute.json", RelicMainAttribute.class);
         RELIC_SUB_ATTRIBUTES = JSONReader.fromJSON("sub_attribute.json", RelicSubAttribute.class);
