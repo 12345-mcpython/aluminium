@@ -36,7 +36,7 @@ public class CharacterTest {
     }
 
     @Test
-    public void testAttributeValue() {
+    public void relicWeaponAndTraceScaling() {
         Relic hyaBody = Relic.builder()
                 .type(RelicType.BODY)
                 .star(5)
