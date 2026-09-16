@@ -6,6 +6,7 @@ import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.utils.JSONReader;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,21 @@ public final class Constant {
     public static final Map<Integer, List<SkillPoint>> SKILL_POINTS;
 
     public static final Map<Integer, Map<Integer, Skill>> SKILLS;
+
+    /**
+     * 怪物模板基础属性（{@code monster_template_config.json}）：template_id → 基础值。
+     */
+    public static final Map<Integer, MonsterTemplate> MONSTER_TEMPLATES;
+    /**
+     * 怪物实例数据（{@code monster_config.json}）：monster_id → 实例系数 / 弱点 / 抗性。
+     * 装载时已由 {@link #normalizeMonsterConfigs} 补全缺失系数，下游拿到的一定非 null。
+     */
+    public static final Map<Integer, MonsterConfig> MONSTER_CONFIGS;
+    /**
+     * 等级组系数（{@code hard_level_group.json}）：组号 → 等级 → 系数。
+     * 组号与等级来自关卡（StageConfig）；P2 阶段由调用方显式传入。
+     */
+    public static final Map<Integer, Map<Integer, HardLevelGroup>> HARD_LEVEL_GROUPS;
 
     /**
      * Maps percentage-type attributes to their corresponding base-type attributes.
@@ -106,5 +122,51 @@ public final class Constant {
         }.getType());
         SKILLS = JSONReader.fromJSON("skills.json", new TypeToken<Map<Integer, Map<Integer, Skill>>>() {
         }.getType());
+        MONSTER_TEMPLATES = JSONReader.fromJSON("monster_template_config.json",
+                new TypeToken<Map<Integer, MonsterTemplate>>() {
+                }.getType());
+        HARD_LEVEL_GROUPS = JSONReader.fromJSON("hard_level_group.json",
+                new TypeToken<Map<Integer, Map<Integer, HardLevelGroup>>>() {
+                }.getType());
+        MONSTER_CONFIGS = normalizeMonsterConfigs(
+                JSONReader.fromJSON("monster_config.json", new TypeToken<Map<Integer, MonsterConfig>>() {
+                }.getType()),
+                JSONReader.fromJSON("monster_attack_modify_ratio.json", new TypeToken<Map<Integer, Double>>() {
+                }.getType()));
+    }
+
+    /**
+     * 补全实例数据里缺的系数，让下游（EnemyScaler）永远拿到确定值：
+     * <ul>
+     *   <li><b>攻击修正</b>：本数据没导出 tbgd 的 {@code AttackModifyRatio}（2649 个怪里 444 个 ≠ 1），
+     *   从补丁文件 {@code monster_attack_modify_ratio.json} 合并；表里没有的按 1.0。</li>
+     *   <li>其余系数缺失时按 1.0（游戏语义 = 不修正）。</li>
+     *   <li>{@code stance_weak} 缺失（有 102 个怪的条目没有这一项）→ 空列表；{@code damage_resistance} → 空表。</li>
+     * </ul>
+     */
+    private static Map<Integer, MonsterConfig> normalizeMonsterConfigs(Map<Integer, MonsterConfig> raw,
+                                                                      Map<Integer, Double> attackRatios) {
+        Map<Integer, Double> patches = attackRatios == null ? Map.of() : attackRatios;
+        Map<Integer, MonsterConfig> normalized = new LinkedHashMap<>();
+        raw.forEach((id, config) -> normalized.put(id, new MonsterConfig(
+                config.name(),
+                config.templateId(),
+                config.eliteGroup(),
+                config.hardLevelGroup(),
+                config.stanceWeak() == null ? List.of() : List.copyOf(config.stanceWeak()),
+                orOne(config.hpRatio()),
+                patches.getOrDefault(id, orOne(config.attackRatio())),
+                orOne(config.defenceRatio()),
+                orOne(config.speedRatio()),
+                orOne(config.stanceRatio()),
+                config.damageResistance() == null ? Map.of() : Map.copyOf(config.damageResistance()))));
+        return Map.copyOf(normalized);
+    }
+
+    /**
+     * 缺失的修正系数按 1.0（不修正）。
+     */
+    private static double orOne(Double value) {
+        return value == null ? 1.0 : value;
     }
 }
