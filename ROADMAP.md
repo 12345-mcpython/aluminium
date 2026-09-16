@@ -39,7 +39,7 @@
 |---------------------------------|------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | `Battle`                        | 战斗循环/行动条/伤害入口                                         | `applyDamage`（**唯一结算入口**：装配+扣血+返回结算值）/ `assemble`（私有装配）/ `getRng` / `processRequests` / `castUltra` / `advanceRequest` |
 | `models.Damage`                 | 伤害对象（attacker/defender/element/type/skillBaseValue + `List<Area>` 乘区） | `toValue()` / `breakdown()` / 7 个乘区 accessor（`boostArea()` …）/ `addBoost` 等装配口 |
-| `models.CanHit`                 | 所有参战实体基类                                                 | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel`（P1-4 已加，默认 80）                |
+| `models.CanHit`                 | 所有参战实体基类                                                 | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel`（P1-4）/ `onDamage`（P1-7，`DamageEvent` 转发给 BuffManager） |
 | `models.DoubleValue`            | 属性值（base × (1+Σadd%) × Π(1+mul%) + Σpure）。**P1-3 起被 `Damage.PercentArea`（可累加乘区）复用** | `Modifier.addPercent / multiplyPercent / pure`（带 source/roleId，可按来源撤销）                          |
 | `models.BuffManager`            | Buff 挂载/到期                                                   | `addBuff` / `canAct` / `beforeMove` / `afterMove`                                                          |
 | `models.AbstractBuff`           | Buff 基类                                                        | `applyEffect` / `removeBuff` / `tickEffect` / `duration()`                                                 |
@@ -105,7 +105,7 @@
 |                       | P1-4 CanHit.level                              | ☑   |
 |                       | P1-5 Battle 装配（增伤/暴击/防区）+ 旧入口删除 | ☑   |
 |                       | P1-6 抗性区接入                                | ☑   |
-|                       | P1-7 onDamage 钩子（易伤/减伤/虚弱）           | ☐   |
+|                       | P1-7 DamageEvent 钩子（易伤/减伤/虚弱）        | ☑   |
 |                       | P1-8 技能执行器（单→多目标分派）               | ☐   |
 |                       | P1-9 附加伤害 + 真伤                           | ☐   |
 | **P2 真实怪物数据**   | P2-1 MonsterBean + Constant 加载               | ☐   |
@@ -383,37 +383,64 @@
 
 ---
 
-### P1-7 onDamage 钩子（Buff 拦截乘区）
+### P1-7 DamageEvent 钩子（Buff / 天赋拦截乘区）✅
 
-- **目标**：伤害清算前允许 Buff 改乘区（易伤/减伤/虚弱都从这里进）。
-- **涉及文件**：`models/event/BattleEvent.java`（加接口）、`models/BuffManager.java`（加 getter）、 新建
-  `models/buffs/DamageListener.java`、新建 `models/buffs/VulnerabilityBuff.java`、新建 `test/DamageHookTest.java`
-- **怎么做**：
-    1. `BuffManager` 加 `public List<AbstractBuff> getBuffs() { return buffs; }`
-    2. 新接口：
+- **目标**：伤害清算前允许 Buff（以及角色天赋、Boss 机制）改乘区——易伤 / 减伤 / 虚弱都从这里进。
+- **涉及文件**：新建 `models/event/DamageEvent.java`、`models/CanHit.java`（实现 + 转发）、
+  `models/BuffManager.java`（`onDamage` 转发）、新建 `models/buffs/VulnerabilityBuff.java`、
+  新建 `models/buffs/ReductionBuff.java`、新建 `test/DamageHookTest.java`
+- **落地**：
+    1. 事件接口与既有事件同族（`models/event/`，`default` 空实现）：
        ```java
-       public interface DamageListener {
-           void onDamage(Battle battle, Damage damage);  // 在 toValue 前被调用
-       }
-       ```
-    3. `Battle.assemble`（私有装配）在 `toValue()` 之前插入：
-       ```java
-       for (AbstractBuff b : defender.getBuffManager().getBuffs()) {
-           if (b instanceof DamageListener listener) {
-               listener.onDamage(this, damage);
+       public interface DamageEvent {
+           default void onDamage(Battle battle, Damage damage) {
            }
        }
        ```
-    4. 示例 Buff `VulnerabilityBuff extends AbstractBuff implements DamageListener`：
-        - 构造 `(duration, double ratio)`，`onDamage` 里
-          `damage.addVulnerable(ratio, Modifier.ModifierSource.DEBUFF, id)`（`id` 是 `AbstractBuff` 的
-          protected 字段，子类直接可用；P1-3 的 Area 就是靠它做到「按来源撤销」）。易伤 50% 即
-          `new VulnerabilityBuff(2, 0.5)`
-        - `applyEffect/removeBuff/tickEffect` 参照 `BoostDamageBuff` 模板（本 buff 不改属性，前两个留空）
-- **验收**：`DamageHookTest`：
-    - 挂易伤 50% → 基础 1000 结算 1500；2 回合后（`beforeMove`+`afterMove` 各触发一次 tick）再打回 1000
-    - 再写一个 `ReductionBuff`（`damage.addReduction(0.3, Modifier.ModifierSource.DEBUFF, id)`）→ 结算 700
-    - 钩子对 `DamageType.BREAK` 也生效（P4 复用它）
+       于是三件事件并排：`BattleEvent.onBattleStart` / `MoveEvent.beforeMove|afterMove` / `DamageEvent.onDamage`。
+    2. `CanHit implements BattleEvent, MoveEvent, DamageEvent`，默认把事件转发给 BuffManager：
+       ```java
+       @Override
+       public void onDamage(Battle battle, Damage damage) {
+           buffManager.onDamage(battle, damage);   // 子类重写时必须调 super，否则自己的 buff 失效
+       }
+       ```
+       这样"角色天赋 / Boss 机制直接改承伤"有了落点，不必伪装成 Buff。
+    3. `BuffManager.onDamage` 转发给关心的 Buff（遍历留在 manager 内部，**因此不需要 `getBuffs()`**，
+       也不存在外部改列表导致 `ConcurrentModificationException` 的口子）：
+       ```java
+       public void onDamage(Battle battle, Damage damage) {
+           for (AbstractBuff buff : buffs) {
+               if (buff instanceof DamageEvent event) {
+                   event.onDamage(battle, damage);
+               }
+           }
+       }
+       ```
+    4. `Battle.assemble` 第 5 步（抗性区之后、`toValue()` 之前）**双方都发**：
+       ```java
+       // HSR.md §2.2：虚弱=攻击方负面、易伤=受击方负面、减伤=受击方增益
+       attacker.onDamage(this, damage);
+       defender.onDamage(this, damage);
+       ```
+    5. `VulnerabilityBuff` / `ReductionBuff extends AbstractBuff implements DamageEvent`：
+       构造 `(duration, ratio)`，`super(duration, false)`（后置 buff，随 `afterMove` 递减），
+       `onDamage` 里 `damage.addVulnerable(ratio, DEBUFF, id)` / `damage.addReduction(ratio, BUFF, id)`。
+- **关键设计：这类 buff 与 `BoostDamageBuff` 不是一类**
+    - `BoostDamageBuff` 是**改属性**：`applyEffect` 往属性上挂 Modifier，`removeBuff` 摘掉，有持久状态。
+    - 易伤 / 减伤 / 虚弱**没有持久状态**：只在每段伤害结算时注入到那一段的 `Damage` 乘区上。所以
+      `applyEffect` / `removeBuff` **留空**，只有 `tickEffect` 减时长——照抄属性 buff 会在 `applyEffect`
+      里改属性，导致"易伤对所有人生效 + 每次结算叠加"。
+    - 来源标记按 §2.2：易伤 `DEBUFF`、减伤 `BUFF`、虚弱 `DEBUFF`；配合 `AbstractBuff.id` 唯一，
+      可按来源撤销（P10-3 到期/驱散）。
+- **验收**：`DamageHookTest`（7 个用例；受击者 DEFENCE=0、攻击者无增伤/暴击属性，base 1000）：
+    - 易伤 50% → 1500
+    - `beforeMove()` 后仍 1500（后置 buff 不该在 `beforeMove` tick）
+    - 2 次 `afterMove()` 后（duration 2 走完）→ 1000（修正被摘掉）
+    - 减伤 30% → 700
+    - 同类替换：连挂 50% / 90% → 1900（不是叠加成 2250）
+    - 钩子对 `DamageType.BREAK` 也生效 → 1500（击破跳过增伤/双暴，但吃易伤，P4 复用）
+    - **攻击方侧**虚弱 40%（测试内嵌 buff）→ 600
 - **依赖**：P1-5、P1-6
 
 ---
