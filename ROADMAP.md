@@ -37,9 +37,9 @@
 
 | 类                              | 作用                                                             | 你要知道的口子                                                                                             |
 |---------------------------------|------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| `Battle`                        | 战斗循环/行动条/伤害入口                                         | `calculateDamage` / `applyDamage` / `processRequests` / `castUltra` / `advanceRequest` / `addRequestItems` |
+| `Battle`                        | 战斗循环/行动条/伤害入口                                         | `applyDamage`（**唯一结算入口**：装配+扣血+返回结算值）/ `assemble`（私有装配）/ `getRng` / `processRequests` / `castUltra` / `advanceRequest` |
 | `models.Damage`                 | 伤害对象（attacker/defender/element/type/skillBaseValue + `List<Area>` 乘区） | `toValue()` / `breakdown()` / 7 个乘区 accessor（`boostArea()` …）/ `addBoost` 等装配口 |
-| `models.CanHit`                 | 所有参战实体基类                                                 | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / 无 level（P1-4 加）                            |
+| `models.CanHit`                 | 所有参战实体基类                                                 | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel`（P1-4 已加，默认 80）                |
 | `models.DoubleValue`            | 属性值（base × (1+Σadd%) × Π(1+mul%) + Σpure）。**P1-3 起被 `Damage.PercentArea`（可累加乘区）复用** | `Modifier.addPercent / multiplyPercent / pure`（带 source/roleId，可按来源撤销）                          |
 | `models.BuffManager`            | Buff 挂载/到期                                                   | `addBuff` / `canAct` / `beforeMove` / `afterMove`                                                          |
 | `models.AbstractBuff`           | Buff 基类                                                        | `applyEffect` / `removeBuff` / `tickEffect` / `duration()`                                                 |
@@ -102,9 +102,9 @@
 | **P1 伤害流水线**     | P1-1 DamageType 枚举                           | ☑   |
 |                       | P1-2 Damage 挂 DamageType                      | ☑   |
 |                       | P1-3 Area 乘区体系 + toValue                   | ☑   |
-|                       | P1-4 CanHit.level                              | ☐   |
-|                       | P1-5 Battle 装配（增伤/暴击/防区）+ 旧入口删除 | ☐   |
-|                       | P1-6 抗性区接入                                | ☐   |
+|                       | P1-4 CanHit.level                              | ☑   |
+|                       | P1-5 Battle 装配（增伤/暴击/防区）+ 旧入口删除 | ☑   |
+|                       | P1-6 抗性区接入                                | ☑   |
 |                       | P1-7 onDamage 钩子（易伤/减伤/虚弱）           | ☐   |
 |                       | P1-8 技能执行器（单→多目标分派）               | ☐   |
 |                       | P1-9 附加伤害 + 真伤                           | ☐   |
@@ -266,96 +266,119 @@
 
 ---
 
-### P1-4 CanHit.level（等级贯穿伤害）
+### P1-4 CanHit.level（等级贯穿伤害）✅
 
 - **目标**：防御区、击破基数、敌人属性都要等级。`CanHit` 增加 level，角色把 builder 的 level 存下来。
-- **涉及文件**：`models/CanHit.java`、`models/Character.java`、新建 `test/LevelTest.java`
-- **怎么做**：
-    1. `CanHit` 加 `private int level = 80;` + `@Setter`（默认 80，老代码不用改）
-    2. `Character.Builder.build()` 末尾：`character.setLevel(level);`
+- **涉及文件**：`models/CanHit.java`、`models/Character.java`、`test/LevelTest.java`
+- **落地**：
+    1. `CanHit` 加 `@Setter private int level = 80;`（默认 80，老代码不用改）；拷贝构造器里补 `this.level = other.level;`
+       （`Character(CanHit other)` 走这条链，不补会静默重置成 80）
+    2. `Character.Builder.build()` 末尾：`character.setLevel(level);`（builder 自己的 level 默认 1，是等级缩放用的那个值）
     3. `Enemy.fromAttributes(...)` 不用改（默认 80；真实怪物由 P2-4 传等级）
-- **验收**：`LevelTest`：
-    - `Character.builder().cid(1409).level(90).build().getLevel() == 90`（需要 Constant，先跑一次确认数据加载 OK）
-    - `Character.fromAttributes("x", 100, 100, 100, 100).getLevel() == 80`
-    - `Enemy.fromAttributes("e", 100, 100, 100, 100).getLevel() == 80`
+- **验收**：`LevelTest`（3 个用例）：
+    - `Character.builder().cid(1409).level(90).build().getLevel() == 90`
+      （builder 的 weapon/relicSuit/extraBasicPromote 都有非空默认值，所以只给 cid + level 就能 build）
+    - `Character.fromAttributes("x", 100, 100, 100, 100).getLevel() == 80`、`Enemy.fromAttributes(...)` 同理
+    - `setLevel(95)` 后 `getLevel() == 95`（可变，供测试与后续等级缩放用）
 - **依赖**：无（独立，做完错开也行）
 
 ---
 
-### P1-5 Battle 装配（增伤 + 暴击 + 防区）+ 旧入口删除
+### P1-5 Battle 装配（增伤 + 暴击 + 防区）+ 旧入口删除 ✅
 
-- **目标**：`Battle.calculateDamage` 从「简易公式」改成「装配 Damage 乘区」；`applyDamage` 重复算 hp 的代码删掉（旧 E2 在此完成）。
-- **涉及文件**：`Battle.java`、`models/DefaultSkill.java`、`models/tests/TestSkillGroup1.java`、新建
+- **目标**：伤害结算从「简易公式」改成「装配 Damage 乘区」；旧入口删除（旧 E2 在此完成）。
+- **涉及文件**：`Battle.java`、`models/DefaultSkill.java`、`models/tests/TestSkillGroup1.java`、
   `test/DamagePipelineTest.java`
-- **怎么做**：
-    1. `Battle` 加 `private final Random rng;`，构造器：老签名 `Battle(List<Character>, List<Enemy>)` 委托
-       `this(…, new Random())`；新签名 `Battle(List<Character>, List<Enemy>, Random rng)`；加 `public Random getRng()`
-       （P1-8 / P5-4 要用）
-    2. **新入口**（保留同名，改签名）：
+- **落地**：
+    1. `Battle` 注入随机源：老签名 `Battle(List<Character>, List<Enemy>)` 委托 `this(…, new Random())`；新签名
+       `Battle(List<Character>, List<Enemy>, Random rng)`；加 `public Random getRng()`（P1-8 / P5-4 要用）
+    2. **唯一公开结算入口**：
        ```java
-       public double calculateDamage(Damage damage) {
+       public double applyDamage(CanHit target, Damage damage) {
+           if (target.isDeath()) return 0;
+           double settled = assemble(damage);
+           target.takeDamage(settled);          // HP 只在 takeDamage 里减
+           return settled;                      // 想知道"这一击打多少" → 用返回值
+       }
+
+       /** 乘区装配 + 清算。private：外部只能经 applyDamage 进入。 */
+       private double assemble(Damage damage) {
            CanHit attacker = damage.getAttacker();
            CanHit defender = damage.getDefender();
-           // 1) 增伤区：元素增伤 + 全增伤（击破/超击破/真伤会被 BoostArea.applies() 自动跳过）
-           AttributeType boost = AttributeType.getBoostByElement(damage.getElement());
-           if (boost != null) damage.addBoost(attacker.getAttribute(boost).get());
+           // 1) 增伤区：元素增伤 + 全增伤（击破/超击破/真伤由 BoostArea.applies() 自动跳过）
+           AttributeType elementBoost = AttributeType.getBoostByElement(damage.getElement());
+           if (elementBoost != null) damage.addBoost(attacker.getAttribute(elementBoost).get());
            damage.addBoost(attacker.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
-           // 2) 暴击区（读属性，注入 rng；不可暴类型即便记了也会被 CritArea.applies() 跳过）
+           // 2) 暴击区：只有可暴类型才骰；全引擎唯一的随机点，用注入的 rng（可复现）
            if (damage.getType().isCrittable()) {
-               double rate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
-               boolean isCrit = rate > 0 && rng.nextDouble() < rate;
+               double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
+               boolean isCrit = critRate > 0 && rng.nextDouble() < critRate;
                damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get());
            }
-           // 3) 防御区（攻击者等级 / 受击者防御 / 攻击者减防穿透）
-           double defIgnore = attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get();
-           damage.defence(attacker.getLevel(), defender.getAttribute(AttributeType.DEFENCE).get(), defIgnore);
-           // 抗性区在 P1-6 接
-           return damage.toValue();
-       }
-       public void applyDamage(CanHit target, Damage damage) {
-           if (target.isDeath()) return;
-           target.takeDamage(calculateDamage(damage));  // hp 只减一次，都在 takeDamage
+           // 3) 防御区：攻击者等级 / 受击者防御 / 攻击者无视防御
+           damage.defence(attacker.getLevel(),
+                   defender.getAttribute(AttributeType.DEFENCE).get(),
+                   attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get());
+           // 4) 抗性区 → P1-6
+           return Math.max(1, damage.toValue());   // 最小伤害钳制留在 Battle（P1-3 已定）
        }
        ```
-    3. **删除**旧 `calculateDamage(CanHit, CanHit, double, List<DoubleValue.Modifier>)` 和旧
-       `applyDamage(CanHit, double)`； 编译报错的话把 `DefaultSkill` 与 `TestSkillGroup1` 的调用改为：
+    3. **为什么只有一个公开入口**（本任务的关键设计）：装配是**追加**语义（`addBoost` 往增伤区 append Modifier），
+       所以对同一个 `Damage` 装配两次会把增伤/易伤/减伤/虚弱各算两份——而且是**部分**翻倍（暴击/防御/抗性是 `set`
+       赋值，不受影响），症状是 1300 → 1600 这种"看着不离谱"的虚高，最难查。原先设想的
+       `public calculateDamage(Damage)` + `applyDamage` 双入口，正好制造了"先看一眼数值、再让它生效"的踩雷路径。
+       **改成单入口后这个错误在结构上不可能发生**，也不必给 `Damage` 加幂等标志。
+       （将来真出现"不扣血只要数值"的需求——P5-3 AI 干跑、P11 日志预演——再加 `previewDamage(Damage)`，**那时**才需要
+       幂等守卫。）
+    4. **删除**旧 `calculateDamage(CanHit, CanHit, double, List<DoubleValue.Modifier>)` 与
+       `applyDamage(CanHit, double)`（顺带删掉里面"算了 `currentHp/newHp` 又丢掉"的死代码）；`DefaultSkill` 与
+       `TestSkillGroup1` 改为：
        ```java
-       Damage dmg = new Damage(user, c, element, baseDamage);
-       battle.applyDamage(c, dmg);
+       DamageElement element = getData().getElement();
+       if (element == null) {
+           return;   // 非伤害技能不构造 Damage（全局约定：不造 Damage ⇒ 无伤害）；TODO P1-8 正经分派
+       }
+       // TODO P1-8：伤害类型先一律 NORMAL，之后按技能槽位映射 普攻/战技/终结技
+       battle.applyDamage(c, new Damage(user, c, element, DamageType.NORMAL, baseDamage));
        ```
-       （element 从 `getData().getElement()` 取；若为 null 说明是非伤害技能，走 P1-8 的分派，先给个 `DamageElement.PHYSICAL`
-       占位并标 `// TODO P1-8`）
-    4. `judgeCrit` 用 `rng.nextDouble()`，不再 `Math.random()`
-- **验收**：`DamagePipelineTest`（构造 `Character.fromAttributes` + `setAttribute` 塞属性）：
-    - 火增伤 0.3、暴击率 0：`base 1000` + `FIRE_DAMAGE_BOOST` 0.3 → `calculateDamage` == 1300
-    - 暴击确定性：`CRIT_CHANCE=0.6, CRIT_ATTACK=1.0`，用 `new Battle(characters, enemies, new Random(0))` → 对种子 0 的
-      `nextDouble()` 首值断言暴击与否（先跑一次打印 rng 输出再写死断言，保证复现）
-    - 防御区：攻击者 level 80，受击者 DEFENCE=1150 → 1000 × (1000/2150)
-    - `takeDamage` 后 HP 精确 = 原 HP - 结算值（确认无重复扣血）
-    - 老 `applyDamage(target, double)` 编译不通过 = 已删除（E2 完成）
+- **验收**：`DamagePipelineTest`（9 个用例；攻击者 = `Character.fromAttributes`，默认 Lv80、无光锥遗器，所以增伤与
+  暴击属性都从 0 起）：
+    - 元素增伤：`FIRE_DAMAGE_BOOST=0.3`、受击者 DEFENCE=0 → 1300
+    - 加算进同一区：再加 `ALL_DAMAGE_TYPE_BOOST=0.2` → 1500（增伤区是 `1+Σ`，不是各乘一遍）
+    - 暴击可复现：`Random(0)` 首值 ≈ 0.7310 → `CRIT_CHANCE=0.5` 不暴（1000）、`=0.9` 暴击（2000）
+    - 不可暴类型：`DamageType.BREAK` + `CRIT_CHANCE=1.0` → `1000 × 1000/2150`（不骰暴击，防御区照常生效）
+    - 防御区：受击者 DEFENCE=1150 → `1000 × 1000/2150`
+    - 防御穿透：`DEFENCE_IGNORE=0.5` → `1000 × 1000/1575`
+    - HP 只减一次：`applyDamage` 返回值 == `HP前 − HP后`
+    - 已死目标：返回 0、HP 不变
+    - **入口唯一性（可执行断言）**：旧两个签名反射取不到；`assemble` 是 private；`Battle` 公开方法里接收 `Damage`
+      的只有 1 个
 - **依赖**：P1-3、P1-4
 
 ---
 
-### P1-6 抗性区接入
+### P1-6 抗性区接入 ✅
 
 - **目标**：`Enemy` 挂 `damageResist`，`Battle` 装配第 4 步接抗性区。
-- **涉及文件**：`models/Enemy.java`、`Battle.java`（P1-5 代码里加一行）、新建 `test/ResistZoneTest.java`
-- **怎么做**：
-    1. `Enemy` 加 `@Setter private Map<DamageElement, Double> damageResist = Map.of();`
-    2. `Battle.calculateDamage` 的 3) 之后加：
+- **涉及文件**：`models/Enemy.java`、`Battle.java`、`test/ResistZoneTest.java`
+- **落地**：
+    1. `Enemy` 加 `private Map<DamageElement, Double> damageResist = Map.of();`（类上已有 `@Getter @Setter`，字段即可；
+       表里没有的元素视为 0 抗性）。**P2-2 直接从这个字段灌 `monster_config.json` 的 `damage_resistance`**，结构不变。
+    2. `Battle.assemble` 第 4 步：
        ```java
-       // 4) 抗性区：受击者抗性表 + 攻击者抗性穿透(暂无: DAMAGE_PENETRATION 已有属性)
-       double raw = defender instanceof Enemy e ? e.getDamageResist().getOrDefault(damage.getElement(), 0.0) : 0.0;
-       double pen = attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get();
-       damage.resist(raw, pen);
+       // 4) 抗性区：受击者抗性 - 攻击者穿透，再 clamp（HSR.md §2.5，负抗全效）
+       //    注：弱点击破不改变抗性（§2.5；P4 复核）
+       double rawResist = defender instanceof Enemy enemy
+               ? enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)
+               : 0.0;
+       damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
        ```
-    3. 击破状态不改变抗性（P4 再验证，先留注释）
-- **验收**：`ResistZoneTest`：
-    - 敌人 `damageResist = {ICE: 0.2, FIRE: 1.2}`：
-        - 冰伤穿透 0.4 → 1200（0.2-0.4）
-        - 火伤穿透 0 → 100（1.2 clamp 0.9）
-        - 无表中元素（如 PHYSICAL）→ 1000
+- **验收**：`ResistZoneTest`（5 个用例，受击者 DEFENCE=0 以隔离抗性区）：
+    - ICE 抗 0.2 + 穿透 0.4 → 1200（抗性 -0.2）
+    - ICE 抗 0.2 + 穿透 0.5 → 1300（**负抗全效**，不是半效）
+    - FIRE 抗 1.2 + 穿透 0 → 100（clamp 0.9）
+    - 表里没有的元素（PHYSICAL）→ 1000
+    - 受击者是 `Character`（没有抗性表）→ 1000
 - **依赖**：P1-5
 
 ---
@@ -373,7 +396,7 @@
            void onDamage(Battle battle, Damage damage);  // 在 toValue 前被调用
        }
        ```
-    3. `Battle.calculateDamage` 在 `toValue()` 之前插入：
+    3. `Battle.assemble`（私有装配）在 `toValue()` 之前插入：
        ```java
        for (AbstractBuff b : defender.getBuffManager().getBuffs()) {
            if (b instanceof DamageListener listener) {
@@ -842,13 +865,11 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
            public Damage build(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
                double breakBase = Constant.BREAKING_RATE.get(attacker.getLevel()) / 10.0; // 数据文件是 10 倍值
                double be = attacker.getAttribute(AttributeType.BREAKING_EFFECT).get();
-               // 把 (1+BE) × 削韧值 折进 base，防御/抗性/易伤/减伤复用 Damage 乘区
-               Damage d = new Damage(attacker, enemy, element, breakBase * (1 + be) * stanceDamage, DamageType.BREAK);
-               d.defence(attacker.getLevel(), enemy.getAttribute(AttributeType.DEFENCE).get(),
-                         attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get());
-               d.resist(enemy.getDamageResist().getOrDefault(element, 0.0),
-                        attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
-               return d;   // 易伤/减伤由 P1-7 的 onDamage 钩子注入，Battle 端 applyDamage 直接结算
+               // 把 (1+BE) × 削韧值 折进 base；防御/抗性由 Battle.assemble 统一装配，别在这里重复塞
+               Damage d = new Damage(attacker, enemy, element, DamageType.BREAK,
+                       breakBase * (1 + be) * stanceDamage);
+               // 易伤/减伤由 P1-7 的 onDamage 钩子注入；Battle 端 applyDamage 直接结算
+               return d;
            }
        }
        ```
@@ -942,17 +963,17 @@ HP≈16498）。 依赖链严格 `P2-1 → P2-2 → P2-3 → P2-4`。
                continue;
            }
            for (Dot dot : new ArrayList<>(enemy.getDots())) {
-               Damage d = new Damage(dot.getSource(), enemy, dot.getElement(), dot.getBaseDamage(), DamageType.DOT);
-               d.defence(dot.getSource().getLevel(), enemy.getAttribute(AttributeType.DEFENCE).get(), 0);
-               d.resist(enemy.getDamageResist().getOrDefault(dot.getElement(), 0.0), 0);
-               enemy.takeDamage(d.toValue());   // 不走 calculateDamage：DOT 段不接受暴击/增伤
+               Damage d = new Damage(dot.getSource(), enemy, dot.getElement(), DamageType.DOT, dot.getBaseDamage());
+               // 走完整流水线：DOT 吃增伤（Battle 装配属性增伤）、不吃暴击（DamageType.DOT 不可暴）；
+               // 易伤/减伤由 P1-7 的 onDamage 钩子注入 —— 这正是 HSR 规则
+               applyDamage(enemy, d);
                if (dot.tick()) {
                    enemy.removeDot(dot);
                }
            }
        }
        ```
-       易伤/减伤对 DOT 生效（HSR 规则）留 TODO：把 `d.toValue()` 换成走 `onDamage` 钩子的版本即可。
+       易伤/减伤对 DOT 生效（HSR 规则）：走 `applyDamage` 后由 P1-7 的钩子自动生效，不需要额外分支。
     4. 击破瞬间自动挂 DOT：在 P4-2 的 `reduceToughness` 里 `breakEnemy` 之后：
        ```java
        double dotPerTurn = Constant.BREAKING_RATE.get(user.getLevel()) / 10.0 * Constant.DOT_RATIO;
