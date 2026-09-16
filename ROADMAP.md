@@ -851,6 +851,18 @@
        > 拷贝构造里 `maxEnergy` / `energyProvider` 要跟着复制，`currentEnergy` 故意从 0 开始（新战斗实例）。
     6. **实测踩到的数据坑（已修）**：追加攻击 / 天赋槽位的 `attack_type` 在 `skills.json` 里是 `null`，
        `switch` 直接炸 NPE → `StandardEnergyProvider` 必须先判空再 switch（P8-2 接真实技能槽时注意同一个坑）。
+    7. **设计取舍：为什么能量放在 `CanHit` 而不是 `Character`**（评审结论 = 保持现状）：
+        - 回能钩子全部以 `CanHit` 类型结算：`Battle.applyDamage(target, damage)` 的 `target`、
+          `damage.getAttacker()` / `getDefender()`、`SkillExecutor` 的 `user`、`Battle.castUltra(CanHit user, …)`。
+          放 `Character` 就要在这 5 处 `instanceof Character`。
+        - **忆灵是要能量的**（HSR.md §5.1：独立单位，有血条/能量/手动技能），而 `Summon extends CanHit`；
+          放 `Character` 的话 P9 加忆灵还得再改这一层。
+        - 与既有字段同级：`currentHp` / `takeDamage` / `heal` / `buffManager` / `isInvulnerable` 本来就在
+          `CanHit` 上，只把能量下沉会造出"有 HP 没能量"的不对称。
+        - **已知代价**：`Enemy` / 传统召唤物（神君、账账）没有能量条，现在白拿一个 `maxEnergy = 0` 的字段
+          （靠 0 静默成 no-op，`EnergyBattleTest` 有断言）。数据侧也印证能量是玩家侧资源：
+          `character_data.json` 有 `max_energy`，而 `AvatarServantConfig`（7 条召唤物）与怪物表都没有。
+        - 备选方案（**已否决，别再改**）：B = `HasEnergy` 接口 + 5 处 instanceof；C = 组合出 `EnergyBar`。
 - **验收**：`EnergyTest`：
     - 回能率 50%（`setAttribute(ENERGY_REGENERATION_RATE, new DoubleValue(0.5))`）→ `gainEnergy(20) == 30`、
       `currentEnergy == 30`
