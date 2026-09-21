@@ -989,7 +989,7 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
 |---|---|
 | 敌方**战斗循环**（谁在什么时候驱动敌人回合） | `Battle` 不自己驱动敌方回合：`enemyTurn` 在 `Main` 里（P5-5 按 ROADMAP 的做法）。完整循环封装留给 P11-1。**AI 本身（选目标 + 技能）已实现**，见 §19 |
 | 胜负判定 | ✅ P7-3（`Battle.Status` + `stepForward` 终态保护），见 §6.3 |
-| 关卡与波次 | ✅ P7-4：`stage.json` 懒加载 + `WaveManager` 逐波进怪，见 §21 |
+| 关卡与波次 | ✅ P7-4 + P7-5：`stage.json` 懒加载、`WaveManager` 逐波进怪、`StageFactory.load(id)` 一键组装，见 §21 |
 | 效果命中判定 | ✅ P6-1（公式 + 掷骰 + 施加入口），但**基础概率还没有数据来源** |
 | 护盾 | ✅ P6-3（先扣盾再扣血、不叠加、吸收量计入"造成伤害"） |
 | 终结技插入 | 无（`castUltra` 只是立即排队结算，不是插入行动轴）；额外回合期间禁止插入**别人**的终结技 ✅ P7-2 |
@@ -1324,4 +1324,28 @@ battle.processRequests();  // ⚠ 必须调，进怪是"排队入场"（addReque
 - 我方全灭则照常判负 —— 有没有待进的波都救不了团灭。
 - 🚧 **没有"波间清理"配置**：数据里没有这一项，所以 `nextWave()` 只做"进怪"，
   不清 buff、不重置行动条。将来拿到配置时扩展点就在 `nextWave()` 里。
+
+### 21.3 关卡工厂（`StageFactory`，P7-5）
+
+```java
+Battle battle = StageFactory.load(103201);          // 队伍就位、第 1 波已入场、已开打
+Battle battle = StageFactory.load(103201, team, rng); // 自带队伍（P8-5 换真队走这条）
+```
+
+`load()` 做完四件事，缺任何一件都会得到"看起来能跑但状态不对"的战斗：
+
+1. `new Battle(team, new ArrayList<>(), rng)` —— **敌队先空着**（怪由波次追加）；
+2. `new WaveManager(battle, stage)` —— 同时把波次登记进 `Battle`（见 §21.2 的接缝）；
+3. `battle.startBattle()` —— 否则状态停在 `NOT_STARTED`，`stepForward()` 也不会推进；
+4. `waves.nextWave()` + `battle.processRequests()` —— 进第 1 波并**结算入场**，
+   少了最后这步怪只躺在 `addRequestItems` 里，行动条上是空的。
+
+**难度完全来自关卡数据**：`StageBean.hardLevelGroup` + `level` 直接喂给
+`EnemyFactory.create(id, level, hardLevelGroup)`，所以同一个怪在不同关卡里不一样强，
+调用方不需要传任何系数。
+
+⚠ **队伍是临时的**：P7-5 时还没有 `CharacterFactory`（P8-1），所以默认队伍来自
+`StageFactory.temporaryTeam()` —— 3 个 `fromAttributes` 占位角色（速度 100 / 134 / 90，
+带 120 能量上限，否则永远放不出终结技）。它**不是角色**：没有光锥、遗器、真实技能与命途。
+生命周期到 P8-5 为止，那时换成 `CharacterFactory` 造的 4 人真队。
 
