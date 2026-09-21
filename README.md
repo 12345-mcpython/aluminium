@@ -22,10 +22,20 @@ The generated files must be placed under **`src/main/resources/data/`** (that di
 target of the `/data/` classpath prefix that `JSONReader` reads from). Placing them in
 `src/main/resources/` itself will not work.
 
+**Run the script from `src/main/resources/`**, i.e. `cd src/main/resources && python
+/path/to/generate_data.py`. It writes into `./data/` **relative to the current directory**, and it
+reads `./data/data_path.txt` (which holds the `turnbasedgamedata` checkout path) from there too.
+Running it from the repository root therefore writes a stray `./data/` and prompts for the data
+path; if that happens, just move the output into `src/main/resources/data/`.
+
+The current script emits **27 files** — including `eidolons.json`, `relic_sets.json`, `growth.json`,
+`materials.json`, `recommend.json`, `enhanced_skills.json`, `global_buffs.json` and
+`property_names.json`. The Java engine does not read all of them yet (see `engine.md` §18).
+
 > **This step is required before anything can run.** Most game data is not committed:
 > `src/main/resources/data/` is listed in `.gitignore`, and only two files there are tracked —
 > the patch file `monster_attack_modify_ratio.json` and the hand-written `enemy_skills.json`.
-> A fresh `git clone` therefore has none of the **16 generated data files**
+> A fresh `git clone` therefore has none of the **27 generated data files**
 > (`skills.json`, `monster_config.json`, `stage.json`, …), and **every test fails**.
 
 ### What a missing data file looks like
