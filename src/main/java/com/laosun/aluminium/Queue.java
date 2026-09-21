@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -53,9 +52,13 @@ public final class Queue {
      */
     private static final double EPSILON = 1e-9;
     /**
-     * Heap ordered by {@link Signal#nextActionTime} (ascending).
+     * Heap ordered by {@link Signal#nextActionTime} (ascending), with the E4 scheduling
+     * sequence as tie-break so equal action values have a defined order.
+     *
+     * <p>比较器写成显式 lambda（而不是靠 {@link Signal} 的 {@code Comparable} 自然序）：
+     * 意图清楚，且 {@link #snapshot()} 复用同一个比较规则，两者不可能漂移。
      */
-    private final PriorityQueue<Signal> heap = new PriorityQueue<>();
+    private final PriorityQueue<Signal> heap = new PriorityQueue<>(Signal::compareTo);
     /**
      * Global elapsed time since simulation start.
      */
@@ -162,6 +165,7 @@ public final class Queue {
             }
         }
         Signal sig = new Signal(combatant);
+        sig.markScheduled();                 // E4：同行动值时的裁决序号
         sig.markActed(elapsed);              // remaining = cycleTime()，next = elapsed + cycleTime()
         heap.offer(sig);
     }
@@ -202,6 +206,11 @@ public final class Queue {
         for (Signal s : snapshot) {
             s.refreshSpeed();
             // P7-1：首轮 150，后续每轮 100 → 首个周期 ×1.5
+            //
+            // E4：这里**不**重新取排期序号。序号在 addCombatant() 建 Signal 时就按**入场顺序**
+            // 发好了，而这里迭代的是 heap 的内部数组 —— 它的顺序由堆结构决定，速度不同的人
+            // 位置本就不同。若在这里重新取号，"同速单位按入场顺序出手"就不成立了。
+            // initialize() 的职责只是把时钟归零 + 施加首轮系数。
             s.markFirstRound();                  // 顺带把 remaining 置为 1.5 × cycleTime()
             s.setNextActionTime(s.getRemaining());
             heap.offer(s);
@@ -287,6 +296,7 @@ public final class Queue {
         }
         acting.refreshSpeed();
         acting.endFirstRound();                      // 首轮系数用完即止
+        acting.markScheduled();                      // E4：重新预约 → 换新序号（排到同级末尾）
         acting.markActed(elapsed);                   // remaining = cycleTime()，next = elapsed + 周期
         heap.offer(acting);
     }
@@ -298,6 +308,7 @@ public final class Queue {
         heap.remove(signal);
         signal.refreshSpeed();
         signal.endFirstRound();
+        signal.markScheduled();              // E4：重新预约 → 换新序号
         signal.markActed(elapsed);
         heap.offer(signal);
         return true;
@@ -437,11 +448,19 @@ public final class Queue {
 
     /**
      * Returns a time-ordered snapshot of all signals for display or iteration.
-     * O(n log n) — use sparingly (debug only).
+     *
+     * <p>排序口径与 {@link Signal#compareTo} **完全一致**：先比 {@code nextActionTime}，
+     * 相等时比排期序号（P7 修正 E4）。这样 {@code snapshot()} 的顺序就是实际出手顺序，
+     * 不会出现"显示的和真正行动的不一样"。
+     *
+     * <p>为什么直接复用 {@link Signal#compareTo} 而不是另写一份比较规则：
+     * 两份规则迟早会漂移，那正是 E4 里"显示顺序 ≠ 出手顺序"的来源。
+     *
+     * <p>O(n log n)，调试用；返回的是副本，改它不影响行动条。
      */
     public List<Signal> snapshot() {
         List<Signal> list = new ArrayList<>(heap);
-        list.sort(Comparator.comparingDouble(Signal::getNextActionTime));
+        list.sort(Signal::compareTo);
         return list;
     }
 

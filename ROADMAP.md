@@ -1591,19 +1591,23 @@
 
 ---
 
-### P7-1b 行动条三处修正（E1/E2/E3）✅
+### P7-1b 行动条四处修正（E1/E2/E3/E4）✅
 
-P7-1 落地后复查 `Queue`/`Signal` 时发现的三个真缺陷，与 P7-1 同批修掉：
+P7-1 落地后复查 `Queue`/`Signal` 时发现的四个真缺陷，与 P7-1 同批修掉：
 
 | 编号 | 缺陷 | 修法 |
 |---|---|---|
 | **E1** | `setTopZero()` 重置的是**堆顶**而不是 `currentActor`；在 `move()`→`afterMove()` 窗口里动过键（推/拉条）就会重置错人 → 行动者连动两次 | 重置 `currentActor`；为 `null` 或已被移出队里时直接返回 |
 | **E2** | 速度变化后**没人调** `refreshSpeed()`：加速要等该单位下一次行动才生效，减速却因为 `nextActionTime` 是绝对时间而"看起来立刻生效"（不对称） | `CanHit.setAttribute(SPEED…)` 与属性型 buff 显式 `notifySpeedChanged()` → `Battle.onSpeedChanged` → `Queue.refreshSpeed(target)`，按 §5.1 的剩余距离换算 |
 | **E3** | `advanceActionByPercent` 缺 clamp：`a-(a-e)·p` 在 binary64 下可能小于 `elapsed`，`move()` 会把全局时钟往回拨 | 两侧都 clamp（`remaining` 取 max 0、结果取 max `elapsed`）；`move()` 里时钟也改成只增不减 |
+| **E4** | `Signal.compareTo` 只比 `nextActionTime`，**相等时顺序未定义** → 同速单位谁先出手碰运气；且 `snapshot()` 按堆数组排序，"显示顺序 ≠ 出手顺序" | `Signal` 记全局递增的**排期序号**，`compareTo` 相等时比它（先排期的先动）；`snapshot()` 复用同一个比较规则 |
 
-- **验收**：`QueueActionManipulationTest`（8 条）。三条修正都做过**变异验证**：
-  把每处修回错误实现，对应测试必须变红。
-- **仍未修**：`Signal.compareTo` 只比 `nextActionTime`，同值时的先后顺序不受保证（E4）。
+- **验收**：`QueueActionManipulationTest`（8 条）+ `QueueTieBreakTest`（8 条）。四条修正都做过**变异验证**：
+  把每处修回错误实现，对应测试必须变红（E1: 2 红，E2 通知: 1 红，E2 公式: 2 红，E3 clamp: 2 红，E4: 4 红）。
+- **E4 的两个决定**（避免以后被"优化"掉）：
+    1. **`initialize()` 不重新取号**：它迭代的是 heap 内部数组，顺序由堆结构决定；
+       在那里换号会破坏"同速单位按入场顺序出手"。
+    2. **推条 / 拉条不重新取号**：把它们算成"重新排期"会导致"谁刚被拉条谁就先手"这种反直觉结果。
 
 ---
 
