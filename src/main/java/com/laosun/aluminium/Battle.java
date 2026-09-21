@@ -120,6 +120,18 @@ public class Battle {
         currentMove = queue.getCurrentActor();
     }
 
+    /**
+     * 当前轮次（P7-1）：由行动条的累计行动值推算，首轮 = 1。
+     *
+     * <p>一轮 = 100 行动值、首轮 = 150（见 {@code Queue.initialize()}）。
+     * 这只是查询口；真正的轮次驱动（胜负判定、关卡回合上限）在 P7-3。
+     *
+     * @return 轮次，从 1 开始
+     */
+    public int getRound() {
+        return queue.getRound();
+    }
+
     public void beforeMove() {
         if (currentMove == null) {
             return;

@@ -49,6 +49,25 @@ import java.util.PriorityQueue;
 public final class Queue {
     private static final double ACTION_THRESHOLD = 10000;
     /**
+     * 一轮的行动值（P7-1）：后续每轮 100。
+     */
+    private static final double ROUND_ACTION_VALUE = 100;
+    /**
+     * 首轮行动值倍率（P7-1）：首轮总行动值 **150**，之后每轮 **100**。
+     *
+     * <p>所以 <b>速度 100 的单位首轮要等 150 才动，第二圈起每 100 动一次</b>；
+     * 速度 200 的单位首轮等 75。这不是"首轮整体延后"，而是每个单位的**第一个周期**被拉长 1.5 倍
+     * —— 所以首轮里高速单位能多动一次（速度 240 在 150 之内能动两次）。
+     *
+     * <p>注意：只有 {@link #initialize()} 施加这个系数（战斗开场）；
+     * {@link #setTopZero()} / {@link #addCombatant} 之后都按正常周期排队。
+     */
+    private static final double FIRST_ROUND_MULTIPLIER = 1.5;
+    /**
+     * 浮点比较用的极小量：把"正好落在轮末"的 elapsed 归到上一轮（见 {@link #getRound()}）。
+     */
+    private static final double EPSILON = 1e-9;
+    /**
      * Heap ordered by {@link Signal#nextActionTime} (ascending).
      */
     private final PriorityQueue<Signal> heap = new PriorityQueue<>();
@@ -71,16 +90,17 @@ public final class Queue {
     }
 
     /**
-     * Creates a queue with an initial set of combatants.
+     * Creates a queue with an initial set of combatants, **already initialized**
+     * （即首轮 150 行动值的系数已经施加，与 {@code Battle} 的用法一致）。
      *
-     * @param initialCombatants the starting combatants, may be empty
+     * @param initialCombatants the starting combatants; must not be empty
      */
-
     public Queue(List<CanHit> initialCombatants) {
         if (initialCombatants.isEmpty()) {
             throw new IllegalArgumentException("Initial combatants cannot be empty");
         }
         addCombatants(initialCombatants);
+        initialize();
     }
 
     // ─── Combatant management ──────────────────────────────────────────
@@ -138,8 +158,12 @@ public final class Queue {
     }
 
     /**
-     * Adds a single combatant. Starts its cycle at the current global time.
+     * Adds a single combatant, scheduled one full cycle from the current global time.
      * Duplicates are ignored.
+     *
+     * <p>⚠ 这里**不施加**首轮 1.5 系数（P7-1 只作用于 {@link #initialize()}）：
+     * 中途入场的单位（召唤物、P9-4）按正常周期排队。若将来要让"首轮"也覆盖中途入场，
+     * 改这里并同步改 {@code QueueRoundTest}。
      *
      * @param combatant the combatant to add; null is silently ignored
      */
@@ -182,7 +206,8 @@ public final class Queue {
     // ─── Simulation ────────────────────────────────────────────────────
 
     /**
-     * Resets the simulation: all combatants' action cycles start from time zero.
+     * Resets the simulation: all combatants' action cycles start from time zero,
+     * with the **first round stretched to 150 action value** (P7-1).
      */
     public void initialize() {
         elapsed = 0;
@@ -191,9 +216,35 @@ public final class Queue {
         heap.clear();
         for (Signal s : snapshot) {
             s.refreshSpeed();
-            s.setNextActionTime(s.cycleTime());
+            // P7-1：首轮 150，后续每轮 100 → 首个周期 ×1.5
+            s.setNextActionTime(s.cycleTime() * FIRST_ROUND_MULTIPLIER);
             heap.offer(s);
         }
+    }
+
+    /**
+     * 当前是第几轮（P7-1）：按累计行动值推算，{@code 首轮 = 1}。
+     *
+     * <p>区间的口径是"**闭右端**"：
+     * <pre>
+     *   第 1 轮：elapsed ∈ [0, 150]
+     *   第 2 轮：elapsed ∈ (150, 250]
+     *   第 3 轮：elapsed ∈ (250, 350]   … 每轮 100
+     * </pre>
+     * 也就是"某一轮结束的那一刻（elapsed 正好落在轮末）仍算这一轮"——
+     * 因为行动值是连续推进的，{@code elapsed == 150} 表示首轮刚走完，下一轮还没开始。
+     * 实现上用 {@code -EPS} 把落在边界上的值归到上一轮。
+     *
+     * <p>够演示/日志用；真正的轮次驱动（胜负判定、关卡回合上限）在 P7-3。
+     *
+     * @return 轮次，从 1 开始
+     */
+    public int getRound() {
+        double firstRound = ROUND_ACTION_VALUE * FIRST_ROUND_MULTIPLIER;
+        if (elapsed <= firstRound) {
+            return 1;
+        }
+        return 2 + (int) ((elapsed - firstRound - EPSILON) / ROUND_ACTION_VALUE);
     }
 
     /**
