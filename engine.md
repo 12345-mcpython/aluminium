@@ -656,47 +656,17 @@ Damage(type = SUPER_BREAK)   → 走完整装配，但 BoostArea/CritArea 自动
 
 | 钩子 | 调用点 | 标准值 | 触发条件 |
 |---|---|---|---|
-| `onSkillCast(user, skill, hitTargets)` | `SkillExecutor.execute` | **读数据** `SkillData.spBase`（普攻 20 / 战技 30） | 每次施放一次（**不是**每段） |
-| `onUltCast(user, skill)` | `Battle.castUltra`（清零后） | **读数据**（终结技一律 5） | 放出终结技 |
+| `onSkillCast(user, skill, hitTargets)` | `SkillExecutor.execute` | 普攻 **20** / 战技 **30** / 其它 **0**（常量） | 每次施放一次（**不是**每段） |
+| `onUltCast(user, skill)` | `Battle.castUltra`（清零后） | **5**（常量） | 放出终结技 |
 | `onTakingHit(target, damage)` | `applyDamage` | **10**（常量） | **没死** 且这一发「算一次攻击」 |
 | `onKill(attacker, target)` | `applyDamage` | **5**（常量） | **打死了**，记录给 `damage.getAttacker()`；**与伤害类型无关** |
 | `onBreak(attacker, target)` | `reduceToughness` | **5**（常量） | 触发击破 |
 
-**技能回能已数据化**（P3-4，2026-09-21）：普攻/战技/终结技三项读
-`skills.json` 的 `sp_base`（源自 tbgd `AvatarSkillConfig.SPBase`），不再写死 20/30/5。
-受击/击杀/击破仍是常量（文档只写「额外恢复 N 点」，没有更好的数据源）。
-数据缺失时由 `Constant.ENERGY_GAIN_*` 兜底/作文档用。
-
-#### ⚠ `spBase == null` 表示"这个技能不回能"，不要兜底
-
-93 个角色里有 **6 个一个技能都不回能**（数据里三项 `sp_base` 全是 `null`）：
-
-| 角色 | 能量上限 | 实际资源 |
-|---|---|---|
-| 飞霄 1220 | 12 | 层数（大招阈值 6） |
-| 黄泉 1308 | 9 | 层数 |
-| 遐蝶 1407 | **null（无能量条）** | 【新蕊】 |
-| 白厄 1408 | 12 | 【火种】 |
-| 昔涟 1415 | 24 | 【追忆】（见 §9.5） |
-| 银狼LV.999 1506 | 60 | 欢愉体系 |
-
-修之前引擎对她们照发 20/30/5 —— **等于凭空造出能量**。所以 `null` 必须当成"不回能"，
-`StandardEnergyProvider.gainOf` 因此返回 `null` 而不是兜底成 20。护栏见
-`EnergyGainDataTest.specialResourceCharactersGainNoEnergyFromSkills`（含端到端一条）。
-
-#### ⚠ 多段/弹射技能的 `spBase` 是"每段"值 —— 引擎**不做段数乘算**（已知缺口）
-
-P3-0 实测：艾丝妲/桑博/那刻夏/同谐开拓者 `sp_base = 6`（1+4 段）、瓦尔特 `= 10`（1+2 段），
-乘段数后总量才是常规 30。每段是否真回能还受能力配置 `SPHitRatio` 控制，
-而**那个字段不在本项目数据里**，所以引擎直接取原值 → 这 6 个角色的战技回能偏低：
-
-| 角色 | `sp_base`（战技） | 备注 |
-|---|---|---|
-| 艾丝妲 1009 / 桑博 1108 / 那刻夏 1405 / 同谐开拓者 8005、8006 | 6 | 多段，总量应为 ~30 |
-| 瓦尔特 1004 | 10 | 多段 |
-| 镜流 1212 / 阿格莱雅 1402 | 20 | **非**多段，是真离档 |
-
-`EnergyGainDataTest.documentsTheOffScheduleSet` 把这 8 个**穷举登记**（再多一个就变红）。
+**为什么这些值仍是常量**（2026-09-21 试过又退回）：数据里有 `sp_base`
+（tbgd `AvatarSkillConfig.SPBase`），但**多段/弹射技能的 `sp_base` 是"每段"值**
+（艾丝妲 6、瓦尔特 10），乘段数才对，而段数乘算依赖能力配置的 `SPHitRatio`
+（**本项目数据里没有**）。直接取原值会让那 6 个角色偏低，而常量给出的正是**正确总量**。
+数据化的正路见 ROADMAP P3-4（先聚合 `SPHitRatio`）。
 
 **受击回能与击杀回能是两条不同的口径，别用同一个开关卡**（2026-09-19 修正）：
 
@@ -749,54 +719,53 @@ castUltra(user, targets):
 
 `isEnergyFull()` 要求 `maxEnergy > 0 && currentEnergy >= maxEnergy` —— 所以没有能量条的角色永远放不了大招。
 
-### 9.4 技能回能数据化 ✅（P3-4，2026-09-21）
+### 9.4 特殊供能角色走独立 provider ✅（2026-09-21）
 
-普攻/战技/终结技的回能**已改为读 `skills.json` 的 `sp_base`**（源自 tbgd
-`AvatarSkillConfig.SPBase`），不再写死 20/30/5。受击/击杀/击破仍是常量
-（文档只写「额外恢复 N 点」，没有更好的数据源）；`Constant.ENERGY_GAIN_*` 降级为兜底/文档。
+**6 个角色不走常规能量**，而是层数/特殊资源：
 
-`SkillData` 现在带两个新字段（都由 `Skill` bean 直读数据）：
-
-| 字段 | 来源 | 含义 |
+| 角色 | `maxEnergy` | 实际资源 |
 |---|---|---|
-| `spBase` | `sp_base` | 施放这个技能**回多少能量** |
-| `spNeed` | `sp_need` | **开大阈值**（只有终结技有值） |
-
-两者**都不是**"能量上限"：93 个角色里有 5 个的 `sp_need ≠ max_energy`
-（云璃 240/120、银枝 180/90、绯英 480/240、飞霄 12/6、昔涟 24/12）。
-云璃/银枝/绯英是标准能量但阈值 ≠ 上限（攒 120 就能放，放完清零）；
-飞霄/昔涟是层数资源（见 §9.5）。
-
-#### ⚠ `spBase == null` 表示"这个技能不回能"，**不要兜底**
-
-93 个角色里有 **6 个一个技能都不回能**（三项 `sp_base` 全是 `null`）：
-
-| 角色 | 能量上限 | 实际资源 |
-|---|---|---|
-| 飞霄 1220 | 12 | 层数（大招阈值 6） |
+| 飞霄 1220 | 12 | 层数（开大阈值 6） |
 | 黄泉 1308 | 9 | 层数 |
 | 遐蝶 1407 | **null（无能量条）** | 【新蕊】 |
 | 白厄 1408 | 12 | 【火种】 |
 | 昔涟 1415 | 24 | 【追忆】（见 §9.5） |
 | 银狼LV.999 1506 | 60 | 欢愉体系 |
 
-修之前引擎对她们照发 20/30/5 —— **等于凭空造出能量**。所以 `null` 必须当成"不回能"，
-`StandardEnergyProvider.gainOf` 因此返回 `null` 而不是兜底。护栏见
-`EnergyGainDataTest.specialResourceCharactersGainNoEnergyFromSkills`（含端到端一条）。
+他们在 `CharacterFactory` 装配点上被换成
+`NoConventionalEnergyProvider` —— 5 个钩子**全部**返回
+`null`（任何来源都不入账）。
 
-#### ⚠ 多段/弹射技能的 `spBase` 是"每段"值 —— 引擎**不做段数乘算**（已知缺口）
+**为什么必须拦满 5 个钩子，而不是只改技能那两条**：`castUltra` 的门槛是
+`currentEnergy >= maxEnergy`，而他们的上限很低（黄泉 **9**、飞霄/白厄 **12**）。
+只堵 `onSkillCast`/`onUltCast` 的话，`onTakingHit`（+10）等三条照发 ——
+**黄泉挨一下就能凑满并放出一个本不该存在的终结技**（他们槽位 3 确实是 `Ultra`）。
+护栏：`SpecialEnergyProviderTest`（provider 全钩子 + 工厂注入 + 端到端"能量恒为 0"）。
 
-P3-0 实测：艾丝妲/桑博/那刻夏/同谐开拓者 `sp_base = 6`（1+4 段）、瓦尔特 `= 10`（1+2 段），
-乘段数后总量才是常规 30。每段是否真回能受能力配置 `SPHitRatio` 控制，
-而**那个字段不在本项目数据里**，所以引擎直接取原值 → 这 6 个角色的战技回能偏低：
+**为什么判定放装配点而不是 `StandardEnergyProvider` 里**：这是**设计归类**
+（"这个角色不用常规能量体系"），不是单条数据事实。P8-0 的三分法把这类判断归给
+provider / 装配点，那也是唯一允许出现 `cid` 的地方。等 P8-8 的 `Resource` 抽象落地，
+把这张 `cid` 表演化成"角色 → 资源实现"的注册表即可。
 
-| 角色 | `sp_base`（战技） | 备注 |
+**与 `maxEnergy == 0` 的区别**：那是**没有能量条**（遐蝶），`CanHit.gainEnergy` 本身即
+no-op，用不用这个 provider 都一样；本 provider 管的是"**有**能量池但不该从常规途径涨"的角色。
+
+#### `sp_base` / `sp_need`：已读进模型，但**不驱动回能**
+
+`SkillData` 带两个字段（`Skill` bean 直读数据）：
+
+| 字段 | 来源 | 含义 |
 |---|---|---|
-| 艾丝妲 1009 / 桑博 1108 / 那刻夏 1405 / 同谐开拓者 8005、8006 | 6 | 多段，总量应为 ~30 |
-| 瓦尔特 1004 | 10 | 多段 |
-| 镜流 1212 / 阿格莱雅 1402 | 20 | **非**多段，是真离档 |
+| `spBase` | `sp_base` | 施放这个技能回多少能量（tbgd `AvatarSkillConfig.SPBase`） |
+| `spNeed` | `sp_need` | **开大阈值**（只有终结技有值） |
 
-`EnergyGainDataTest.documentsTheOffScheduleSet` 把这 8 个**穷举登记**（再多一个就变红）。
+⚠ **回能仍走常量**，没有用 `spBase`：数据里多段/弹射技能的 `sp_base` 是**每段值**
+（艾丝妲 6、瓦尔特 10），乘段数才对，而段数乘算要能力配置的 `SPHitRatio`（本项目没有）。
+直接用原值会让那 6 个角色偏低，常量反而是**正确总量**。数据化的正路见 ROADMAP P3-4。
+
+`spNeed` 也**还没接进 `castUltra`**：93 个角色里有 5 个 `sp_need ≠ max_energy`
+（云璃 240/120、银枝 180/90、绯英 480/240、飞霄 12/6、昔涟 24/12）。
+其中云璃/银枝/绯英是标准能量、只是"攒到阈值就能放"，所以引擎现在会让他们攒过头。
 
 > ✅ 已修：早先这里记着"`max_energy` 读出来了但从未接进角色，数据造出来的角色全都没有能量条"。
 > P8-1 已在 `Character.Builder.build()` 里接上（`null → 0`，不兜底成 100），

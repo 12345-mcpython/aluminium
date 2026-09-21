@@ -10,21 +10,23 @@ import java.util.Set;
 /**
  * 常规回能：普攻 20 / 战技 30 / 终结技 5 / 受击 10 / 击杀 5 / 击破 5。
  *
- * <p>数据来源见 {@code ROADMAP.md} 的 P3-0：普攻/战技/终结技取自 tbgd
- * {@code AvatarSkillConfig.SPBase}，受击/击杀/击破的基础值由角色文档反推（文档只写「额外恢复 N 点」）。
+ * <p>数据来源见 {@code ROADMAP.md} 的 P3-0：普攻/战技/终结技的常规档取自 tbgd
+ * {@code AvatarSkillConfig.SPBase}（终结技一律 5，多段技能按每段折算后总量同为 30），
+ * 受击/击杀/击破的基础值由角色文档反推（文档只写「额外恢复 N 点」），
+ * 因此数值集中放在 {@link Constant#ENERGY_GAIN_BASIC} 一类的常量里。
  *
- * <p><b>技能回能已改为读数据</b>（{@code SkillData.spBase}，见 {@link com.laosun.aluminium.models.SkillData}）：
- * <ul>
- *   <li>{@code spBase} 为 {@code null} → **这个技能不回能**。这是"层数/特殊资源"角色
- *       （飞霄、黄泉、遐蝶、白厄、昔涟、银狼LV.999）的诚实表达 —— 他们一个技能都不涨能量。
- *       修之前引擎照发 20/30/5，等于凭空给她们造出能量。</li>
- *   <li>否则按数据给（多数是 20/30/5，爻光普攻是 30）。</li>
- * </ul>
- * 常量 {@link Constant#ENERGY_GAIN_BASIC} 等现在只是**兜底/文档**用途（数据缺失时用）。
+ * <p><b>为什么又回到常量</b>（2026-09-21）：曾短暂改成读 {@code SkillData.spBase}，
+ * 但数据里多段/弹射技能的 {@code spBase} 是**每段值**（艾丝妲 6、瓦尔特 10），
+ * 乘段数才对，而段数乘算依赖能力配置的 {@code SPHitRatio}（本项目数据里没有）——
+ * 直接取原值会让那 6 个角色偏低。常量给出的是**正确总量**，所以退回常量更准。
+ * 数据化的正路见 ROADMAP P3-4（聚合 {@code SPHitRatio} 后再接）。
  *
- * <p>暂时**不处理**的：多段/弹射技能段数乘算（需要 {@code SPHitRatio}，本项目数据里没有）；
- * 追加攻击（{@code AttackType} 为空或非 Normal/BPSkill 的技能）不回能；
- * 秘技 / 迷宫技能不回能；角色级加成与特殊来源交给各自的 provider（P8-3）。
+ * <p><b>不走常规能量的角色不在这里判断</b>：飞霄/黄泉/遐蝶/白厄/昔涟/银狼LV.999
+ * 用的是层数/特殊资源，由 {@link NoConventionalEnergyProvider} 在装配点注入 ——
+ * 见 {@code CharacterFactory} 与 {@code engine.md} §9.5。
+ *
+ * <p>暂时**不处理**的：追加攻击（{@code AttackType} 为空或非 Normal/BPSkill 的技能）不回能，
+ * 秘技 / 迷宫技能不回能，角色级加成与特殊来源交给各自的 provider（P8-3）。
  */
 public class StandardEnergyProvider implements EnergyProvider {
 
@@ -39,29 +41,15 @@ public class StandardEnergyProvider implements EnergyProvider {
             return null;
         }
         return switch (attackType) {
-            case "Normal", "BPSkill" -> gainOf(skill.getData().getSpBase());
+            case "Normal" -> EnergyGain.normal(Constant.ENERGY_GAIN_BASIC);
+            case "BPSkill" -> EnergyGain.normal(Constant.ENERGY_GAIN_SKILL);
             default -> null;    // Ultra 走 onUltCast；Maze / 追加攻击等本阶段不回能
         };
     }
 
     @Override
     public EnergyGain onUltCast(CanHit user, Skill skill) {
-        // 终结技的回能与技能同一口径：数据里 sp_base 一律 5，但"不回能"的角色是 null。
-        Double base = skill == null || skill.getData() == null ? null : skill.getData().getSpBase();
-        return gainOf(base);
-    }
-
-    /**
-     * {@code spBase} → 回能量；{@code null} 或非正数表示**这个技能不回能**。
-     *
-     * <p>为什么 null 必须当成"不回能"而不是"用默认值兜底"：那 6 个特殊资源角色
-     * 在游戏里确实一点能量都不涨，兜底会直接改变她们的强度。
-     */
-    private static EnergyGain gainOf(Double spBase) {
-        if (spBase == null || spBase <= 0) {
-            return null;
-        }
-        return EnergyGain.normal(spBase);
+        return EnergyGain.normal(Constant.ENERGY_GAIN_ULTRA);
     }
 
     @Override
