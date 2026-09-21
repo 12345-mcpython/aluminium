@@ -424,9 +424,24 @@ processSkillRequests() → processAddRequests() → processAdvanceRequests() →
 - `isInvulnerable()`（转阶段无敌）与死亡正交：无敌目标**仍然可被选中**（AOE 会"打中"它、伤害为 0），
   但 `applyDamage` 不结算。
 
-### 6.3 胜负判定 ❌
+### 6.3 胜负判定 ✅ P7-3
 
-**没有**。`Battle` 不判"全灭/超时"，`P7-3` 才做。
+`Battle` 带一个四态状态机：
+
+```
+  NOT_STARTED ──startBattle()──▶ RUNNING ──一方全灭──▶ WIN / LOSE（终态，不回退）
+```
+
+- `Battle.getStatus()` / `Battle.isOver()` 是查询口；`checkResult()` 是判定口（幂等）。
+- 判定时机：`removeDeadCombatants()` 末尾（清完尸体顺手判），以及 `startBattle()` 开头。
+- **终态之后 `stepForward()` 不再推进**行动条（`isOver()` 直接返回），
+  所以"打完之后时钟还在走"这种问题不会再出现。
+- 口径：
+  - 某一方**全灭**即负 —— `allMatch(isDeath)`，所以**空列表也算全灭**（被清光了）；
+  - `NOT_STARTED` 时**不判**（战斗还没开场，谈不上胜负）；
+  - 两边同时全灭 → **LOSE**（先判负后判胜，且有终态保护，不会来回改判）。
+- ⚠ 死者仍留在 `characters` / `enemies` 列表里，所以判定用的是列表上的 `isDeath()`，
+  而不是"队列里还有没有人"（尸体早就被移出行动条了）。
 
 ---
 
@@ -967,13 +982,13 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
 
 | 项 | 说明 |
 |---|---|
-| 敌方**战斗循环**（谁在什么时候驱动敌人回合） | `Battle` 不自己驱动敌方回合：`enemyTurn` 在 `Main` 里（P5-5 按 ROADMAP 的做法）。完整循环封装留给 P7-3 胜负状态机 / P11-1。**AI 本身（选目标 + 技能）已实现**，见 §19 |
-| 胜负判定 | 无全灭/超时判定 |
-| 关卡与波次 | `stage.json` 未加载，无波次切换 |
+| 敌方**战斗循环**（谁在什么时候驱动敌人回合） | `Battle` 不自己驱动敌方回合：`enemyTurn` 在 `Main` 里（P5-5 按 ROADMAP 的做法）。完整循环封装留给 P11-1。**AI 本身（选目标 + 技能）已实现**，见 §19 |
+| 胜负判定 | ✅ P7-3（`Battle.Status` + `stepForward` 终态保护），见 §6.3 |
+| 关卡与波次 | `stage.json` 未加载，无波次切换（P7-4） |
 | 效果命中判定 | ✅ P6-1（公式 + 掷骰 + 施加入口），但**基础概率还没有数据来源** |
 | 护盾 | ✅ P6-3（先扣盾再扣血、不叠加、吸收量计入"造成伤害"） |
-| 终结技插入 | 无（`castUltra` 只是立即排队结算，不是插入行动轴） |
-| 速度操纵 | 无 buff 改速度，且无人调 `refreshSpeed()` |
+| 终结技插入 | 无（`castUltra` 只是立即排队结算，不是插入行动轴）；额外回合期间禁止插入**别人**的终结技 ✅ P7-2 |
+| 速度操纵 | ✅ P7-1b / E2（速度变化立刻重排行动条） |
 | 忆灵 / 欢愉 | 只有属性/类型占位，无机制 |
 | 七系击破异常 | 只有 4 种 DOT，冻结/纠缠/禁锢未做 |
 | 多韧性条 | `stanceCount > 1` 未处理（恢复时直接回满） |
@@ -1193,7 +1208,8 @@ Damage(type = damage_type, element)   // 走 Battle.applyDamage 统一装配
 5. battle.processRequests()          // ⚠ performAction 只是排队，结算在这里
 ```
 
-- 完整的战斗循环封装（含胜负判定）留给 P7-3 / P11-1。
+- 胜负判定已由 `Battle.Status` 提供（✅ P7-3，见 §6.3）；**完整的战斗循环封装**
+  （自动驱动双方回合）仍留给 P11-1 —— `Main` 里现在是一段手写循环。
 - `Battle.getOpponents(self)` 给出对手阵营列表（不过滤死亡）。
 
 ---
