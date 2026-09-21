@@ -36,6 +36,21 @@ test {
     useJUnitPlatform()
 }
 
+/*
+ * 让 `gradle run` 的输出（以及测试里的 System.out）用 UTF-8 编码。
+ *
+ * 为什么需要：Windows 上 JVM 默认按**平台 ANSI 编码**写 stdout（中文环境是 GBK），
+ * 而现代终端 / PowerShell 7 的代码页是 UTF-8（65001）—— 两边不一致，中文全是乱码。
+ * JDK 18+ 认这三个属性（file.encoding 已不再管 stdout/stderr）。
+ */
+tasks.withType(JavaExec).configureEach {
+    jvmArgs '-Dfile.encoding=UTF-8', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'
+}
+
+tasks.withType(Test).configureEach {
+    jvmArgs '-Dfile.encoding=UTF-8', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'
+}
+
 idea {
     module {
         downloadSources = true
