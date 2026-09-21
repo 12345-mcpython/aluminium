@@ -85,18 +85,20 @@ public class Main {
         printQueue(battle);
         System.out.println();
 
-        int round = 0;
-        while (!isOver(battle) && round < 45) {
-            round++;
-            System.out.println("────────────────── 第 " + round + " 回合 ──────────────────");
+        int actions = 0;
+        while (!isOver(battle) && actions < 60) {
+            actions++;
+            // P7-1：轮次由行动条的累计行动值推算（首轮 150、之后每轮 100），不再自己数
+            System.out.println("────────── 第 " + battle.getRound() + " 轮（第 " + actions
+                    + " 次行动，累计行动值 " + fmt(battle.queue.getElapsed()) + "）──────────");
             step(battle);
             System.out.println();
         }
 
         System.out.println("=".repeat(78));
         System.out.println(firstAliveEnemy(battle) == null
-                ? " 战斗结束：我方胜利（" + round + " 回合）"
-                : " 达到回合上限，战斗未结束（剩余敌人 "
+                ? " 战斗结束：我方胜利（" + battle.getRound() + " 轮 / " + actions + " 次行动）"
+                : " 达到行动次数上限，战斗未结束（剩余敌人 "
                         + battle.targetableEnemies().size() + " 只）");
         System.out.println("=".repeat(78));
         battle.printHp();
