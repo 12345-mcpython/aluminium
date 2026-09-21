@@ -158,12 +158,12 @@
 |                       | P4-3 击破伤害                                  | ☑   |
 |                       | P4-4 击破状态/推条/跳回合                      | ☑   |
 |                       | P4-5 DOT                                       | ☑   |
-|                       | P4-6 超击破                                    | ☐   |
-| **P5 仇恨 + 敌人AI**  | P5-1 Path 仇恨值                               | ☐   |
-|                       | P5-2 受击概率 + 嘲讽                           | ☐   |
-|                       | P5-3 EnemySkill（敌人普攻）                    | ☐   |
-|                       | P5-4 TargetSelector                            | ☐   |
-|                       | P5-5 敌方回合执行                              | ☐   |
+|                       | P4-6 超击破                                    | ☑   |
+| **P5 仇恨 + 敌人AI**  | P5-1 Path 仇恨值                               | ☑   |
+|                       | P5-2 受击概率 + 嘲讽                           | ☑   |
+|                       | P5-3 EnemySkill（敌人普攻）                    | ☑   |
+|                       | P5-4 TargetSelector                            | ☑   |
+|                       | P5-5 敌方回合执行                              | ☑   |
 | **P6 命中/治疗/护盾** | P6-1 效果命中与抵抗                            | ☐   |
 |                       | P6-2 治疗乘区                                  | ☐   |
 |                       | P6-3 护盾                                      | ☐   |
@@ -1166,34 +1166,61 @@
 
 ---
 
-### P4-6 超击破（进阶）
+### P4-6 超击破（进阶）✅
 
-- **目标**：同谐开拓者终结技生效期间（简化：队友挂 `SuperBreakBuff`），攻击 **已被击破**的敌人时，该段按超击破公式结算。
-- **涉及文件**：新建 `models/buffs/SuperBreakBuff.java`、`Battle.java`、新建 `test/SuperBreakTest.java`
+> **状态：已实现（2026-09-19）**。全量测试 174/174 绿。`Constant.SUPER_BREAK_BOOST = 0.4` 仍是
+> **示例值（TODO data）**，且**削韧值提高 / 弱点击破效率**两个属性尚未加入 `AttributeType`——
+> 它们同时影响 §3.2 的破韧公式，属后续任务。
+
+- **目标**：同谐开拓者终结技生效期间（简化：队友挂 `SuperBreakBuff`），我方攻击时把**打不进去的那部分削韧值**
+  转化成超击破伤害。两种场景：① 敌人**已被击破**（整发削韧都转化）；② **这一发把敌人打破**（超出的那部分转化，
+  于是同一发里同时吃到击破伤害与超击破伤害）。
+- **涉及文件**：新建 `models/buffs/SuperBreakBuff.java`、`Battle.java`、`models/SkillExecutor.java`、
+  新建 `test/SuperBreakTest.java`
 - **怎么做**：
     1. `SuperBreakBuff extends AbstractBuff`：只标记，`applyEffect` 空实现（模板同 `VulnerabilityBuff`，
        `canAct() return true`）
-    2. `Battle` 加：
+    2. `Battle` 加（用 `BuffManager.hasBuff`，**不要**遍历内部列表——`BuffManager` 不暴露 `getBuffs()`，
+       这是 P1-7 的封装决定，见 `CODE_REVIEW.md` 的 H-7）：
        ```java
        public boolean isSuperBreakActive(CanHit attacker) {
-           for (AbstractBuff b : attacker.getBuffManager().getBuffs()) {
-               if (b instanceof SuperBreakBuff) {
-                   return true;
-               }
-           }
-           return false;
+           return attacker != null && attacker.getBuffManager().hasBuff(SuperBreakBuff.class);
        }
        ```
     3. `Constant` 加：`public static final double SUPER_BREAK_BOOST = 0.4;`（示例常量的 0.4；削韧提高/弱点击破效率留 TODO）
-    4. 超击破公式（参照 P4-3 组织，加在 `SkillExecutor` 里；`stanceDamage` = P4-2 该段实际削韧值）：
+    4. **削韧值口径（2026-09-19 确认，别写错）**：设敌人剩余韧性 `T`、技能标称削韧 `S`（= `stance_list` 的值）：
+
+       | 情形 | 击破伤害用 | 超击破伤害用 |
+       |---|---|---|
+       | 未击破 且 `T > S`（没打空） | 无 | 无 |
+       | 未击破 且 `S ≥ T`（这一发把韧性打空） | `min(S, T)` = **实际值**（`reduceStance` 的返回值） | `max(0, S − T)` = **超出部分** |
+       | 敌人已 `broken`（`T = 0`） | 无 | `S`（整发都算超出） |
+
+       即 `S` 被**拆成两半**给两条链，相加恒等于 `S`，不重不漏。
+       例（技能 60、怪物 30 韧性、带 buff）→ **技能伤害 + 30 击破伤害 + 30 超击破伤害**。
+       > ⚠️ 不要理解成"超击破用标称值、击破用实际值"就完事 —— 关键在**超出部分** `S − T`。
+       > 若按"整发 `S` 都算超击破"，破韧的那一发会把 `S` 用两次（击破 + 超击破），重复计算。
+
+       > ⚠️ **超击破不受"只有弱点才削韧"的限制**：敌人**已处于击破状态**时，整发标称削韧都算超出，
+       > **与元素是否命中弱点无关**（官方文案的条件里只有"敌人处于弱点击破状态"，没有元素限制）。
+       > 所以非弱点攻击打已击破的敌人**照样**产生超击破段；但**未击破**时非弱点攻击什么都不产生
+       > （那一步仍然严格"只有弱点才削"）。`SuperBreakTest` 两条对调用例各钉一头。
+
+       ⚠️ 因此 `Battle.reduceToughness` 目前只返回 `boolean`（是否破韧）**不够用**：
+       它内部把超出部分丢掉了。本任务的实现把它换成了
+       `public record StanceResult(double consumed, double overkill, double breakDamage, boolean broke)`。
+       `breakDamage` 是**额外**加进来的：击破伤害是在 `reduceToughness` 内部经 `applyDamage` 结算的，
+       调用方拿不到 —— 若不带出来，一次攻击的 `AttackEvent.totalDamage` 会漏掉整条击破链。
+       `Enemy.reduceStance` 的返回值够用（`S − consumed` 即超出部分），不必改 `Enemy`。
+    5. 超击破公式（参照 P4-3 组织，加在 `SkillExecutor` 里；`superBreakStance` = 上表的**超出部分**）：
        ```java
-       // SkillExecutor.hit 内：目标已击破 && 施放方有 SuperBreakBuff 时，用超击破替换普通伤害段
+       // SkillExecutor.hit 内：施放方有 SuperBreakBuff 时，把"超出部分"转化成一发超击破伤害
        private static Damage superBreak(Battle battle, CanHit user, CanHit target,
-                                        DamageElement element, double stanceDamage) {
+                                        DamageElement element, double superBreakStance) {
            double breakBase = Constant.BREAKING_RATE.get(user.getLevel()) / 10.0;
            double be = user.getAttribute(AttributeType.BREAKING_EFFECT).get();
            Damage d = new Damage(user, target, element,
-                   breakBase * (1 + be) * stanceDamage * (1 + Constant.SUPER_BREAK_BOOST), DamageType.SUPER_BREAK);
+                   breakBase * (1 + be) * superBreakStance * (1 + Constant.SUPER_BREAK_BOOST), DamageType.SUPER_BREAK);
            d.defence(user.getLevel(), target.getAttribute(AttributeType.DEFENCE).get(),
                      user.getAttribute(AttributeType.DEFENCE_IGNORE).get());
            d.resist(target instanceof Enemy e ? e.getDamageResist().getOrDefault(element, 0.0) : 0.0,
@@ -1201,16 +1228,37 @@
            return d;   // 易伤/减伤走 onDamage 钩子；不调 addBoost（超击破不吃攻击/属性增伤）
        }
        ```
-- **验收**：`SuperBreakTest`（Lv80、BE 300%、削韧 112.5、超击破提高 40%、敌防 1150、无抗/易伤/减伤）：
-    - `376.75535 × 4.0 × 112.5 × 1.4 × (1000.0/2150.0) ≈ 110398`（容差 2.0）
-    - 未挂 Buff 或敌人未击破 → 不触发（走普通伤害）
-- **依赖**：P4-3、P1-7
+       触发条件：**施放方**身上有 `SuperBreakBuff`（用 `BuffManager.hasBuff`，已就绪）
+       **且** 超出部分 `> 0` —— 该条件同时覆盖两种场景：敌人本来就已经击破（整发削韧都算超出），
+       以及这一发把敌人打破（剩余韧性之外的那部分算超出）。
+- **验收**：`SuperBreakTest`（✅ 已实现，9 条用例，2026-09-19）：
+    - **破韧那一发（核心用例）**：敌人 `T = 30`、技能 `S = 60`、带 buff
+      → 同一发里既有击破伤害（按 **30**）又有超击破伤害（按 **30**），两者**都不为零**
+    - **整发都是超出**（敌人已 `broken`，`T = 0`）→ 超击破用整发 `S = 60`
+    - **刚好打空**（`S = T = 60`）→ 有击破、**无**超击破（超出部分为 0）
+    - **`T > S`（没打空）** → 两者都不产生
+    - **未挂 Buff** → 不产生超击破段，超出部分就是浪费（只有击破伤害）
+    - **非弱点打已击破的敌人** → **照样产生超击破**（用整发标称削韧）
+    - 对照：**未击破 + 非弱点** → 什么都不产生（削韧那一步仍然只有弱点才削）
+    - **多目标 AOE** → **每个目标各触发一次超击破**（各自用自己的剩余韧性算超出部分）
+    - **一次攻击行为只算一次**：`AttackEvent` 恰好广播一次，且 `totalDamage`
+      包含 技能伤害 + 击破伤害 + 超击破伤害 三种类型（不能只算技能那一段）
+- **依赖**：P4-3、P1-7、P4-6 自身的 `SuperBreakBuff` + `BuffManager.hasBuff`
 
 ---
 
-## 6. 阶段 P5：仇恨 + 敌人 AI
+## 6. 阶段 P5：仇恨 + 敌人 AI ✅
 
 **本阶段结束时的成果**：敌人有自己的回合，会按仇恨加权随机选我方目标、普攻打人。 顺序 `P5-1 → P5-2 → P5-3 → P5-4 → P5-5`。
+
+> **状态：已实现（2026-09-19）**，测试 197/197 绿。落地时的三处与本文档的偏差，以代码为准：
+> 1. **P5-1 直接用角色数据**：`character_data.json` 的 `aggro` 列**就是游戏倍率本身**
+>    （存护 150 / 毁灭 125 / 其他 100 / 巡猎·智识 75，93 个角色全量核对一致），
+>    所以 `Character` 直接接它，`Path` 枚举只作为缺数据时的兜底 —— 不用等 P8-1。
+> 2. **P5-2 的嘲讽是纯标记**（无 `extraPercent`），且落点在 P5-4 的目标选择，不在 `aggroOf`。
+> 3. **P5-3 用数据表而不是硬编码**：新建了 `enemy_skills.json`（键 = **怪物实例 id**）。
+>    ⚠ 数据源里没有敌人技能表，**倍率是猜的**，每条带 `guessed: true`；没配条目的怪走兜底
+>    （倍率 1.0、单段、元素取自身 `stance_type`）。P9-1/P9-2 接真实表时只换数据文件。
 
 ---
 
@@ -1250,62 +1298,75 @@
 
 ### P5-2 受击概率 + 嘲讽
 
-- **目标**：`Battle` 提供仇恨表与加权选择工具。
-- **涉及文件**：`Battle.java`、`models/CanHit.java`（嘲讽 = 已有 Buff 系统实现 `TauntBuff`）、新建
-  `test/AggroBattleTest.java`
+- **目标**：`Battle` 提供仇恨表与加权选择工具；`TauntBuff` 提供"硬指定目标"的标记。
+- **涉及文件**：`Battle.java`、`models/CanHit.java`、`models/BuffManager.java`（加 `findBuff`）、
+  新建 `models/buffs/TauntBuff.java`、新建 `test/AggroBattleTest.java`
 - **怎么做**：
-    1. `Battle` 加：
+    1. `Battle` 加纯仇恨表（**嘲讽不在这里**，见第 3 条）：
        ```java
        public Map<CanHit, Double> getAggroTable(List<? extends CanHit> allies) {
            double total = allies.stream().mapToDouble(this::aggroOf).sum();
            return allies.stream().collect(toMap(a -> a, a -> aggroOf(a) / total));
        }
-  
+
        public double aggroOf(CanHit a) {                       // public：P5-4 的 TargetSelector 要跨包调用
-           double aggro = a instanceof Character c ? c.getPath().getAggro() : 100;
-           for (AbstractBuff b : a.getBuffManager().getBuffs()) {   // getBuffs：P1-7 已加
-               if (b instanceof TauntBuff t) {
-                   aggro *= 1 + t.getExtraPercent();           // 嘲讽：仇恨 × (1 + 百分比)
-               }
-           }
-           return aggro;
+           return a instanceof Character c ? c.getPath().getAggro() : 100;
        }
        ```
        （`toMap` 需要 `import static java.util.stream.Collectors.toMap;`）
-    2. 嘲讽 Buff（新建 `models/buffs/TauntBuff.java`）：
+    2. 嘲讽 Buff（新建 `models/buffs/TauntBuff.java`）——**纯标记，没有数值**：
        ```java
        public class TauntBuff extends AbstractBuff {
-           @Getter
-           private final double extraPercent;
-  
-           public TauntBuff(int duration, double extraPercent) {
+           public TauntBuff(int duration) {
                super(duration, false);
-               this.extraPercent = extraPercent;
            }
-  
+
            @Override
            public boolean canAct() {
                return true;
            }
-  
+
            @Override
            public void applyEffect(CanHit target) {
            }
-  
+
            @Override
            public void removeBuff(CanHit target) {
            }
-  
+
            @Override
            public void tickEffect(CanHit target) {
                decreaseDuration();
            }
        }
        ```
+    3. **嘲讽是"硬指定目标"，不是仇恨加权**（原设计写成 `aggro *= 1 + extraPercent` 是错的：
+       乘法只能提高概率，永远做不到"只能选中"）。正确语义：
+       > 嘲讽 buff 只要被附加，攻击方（角色或怪物）的**单体攻击**与**扩散攻击的中心**
+       > 就只能选中被附加嘲讽的那个个体。**双向生效**（我方单体/扩散打敌方时同理）。
+       - 落点在 **P5-4 的 `TargetSelector`**，不在 `aggroOf`；
+       - `TargetSelector` 需要一个**攻击意图**参数（单体 / 扩散 / 群攻）：只有单体与扩散的中心受约束，
+         群攻本来打全体、不受影响；弹射待定（见 `DOC_VS_CODE.md` A-1 的边界表）；
+       - 嘲讽者**已死亡**或**不在被打的那一方** → 约束失效，退回仇恨加权（不能强制选中尸体）；
+       - `TauntBuff` 因此不需要 `extraPercent`，也不该有 `getExtraPercent()`。
+    4. `BuffManager` 加"按类型取实例"的口子（`TargetSelector` 要拿到嘲讽者**本人**，
+       光知道"有没有"不够；**不要**暴露 `getBuffs()`，遍历留在 manager 内部是 P1-7 的决定）：
+       ```java
+       /** 取身上第一个该类型的 buff，没有则 null。它是 hasBuff 的严格超集。 */
+       public <T extends AbstractBuff> T findBuff(Class<T> kind) {
+           for (AbstractBuff buff : buffs) {
+               if (buff.getClass() == kind) {
+                   return kind.cast(buff);
+               }
+           }
+           return null;
+       }
+       ```
 - **验收**：`AggroBattleTest`：
     - 2 角色：存护 (150) + 其他 (100) → 概率 0.6 / 0.4（`assertEquals(0.6, table.get(preservation), 1e-6)`）
-    - 给其他挂 `TauntBuff(2, 1.0)` → 其概率 = 200/350 ≈ 0.5714
-- **依赖**：P5-1、P1-7（getBuffs）
+    - 给其他挂 `TauntBuff(2)` → **仇恨表本身不变**（嘲讽不改数值），
+      但 `TargetSelector` 的单体/扩散中心**恒为该角色**（用固定种子跑多次断言每次都是他）
+- **依赖**：P5-1、P1-7（封装约定：遍历留在 manager 内，用 `findBuff`）
 
 ---
 
@@ -1449,7 +1510,7 @@
     - base 1.0, hit 0.5, resist 0.3 → 1.0（clamp）
     - base 0.8, hit 0.25, resist 0.2 → 0.8
     - 冰锋（`STAT_CTRL_Frozen: 1`）冰冻技能 → 0.0
-- **依赖**：P2-4（enemy 数据）、P1-7（getBuffs 若需要）
+- **依赖**：P2-4（enemy 数据）、P1-7（封装约定：遍历留在 `BuffManager` 内，需要取实例时用 `findBuff`）
 
 ---
 
