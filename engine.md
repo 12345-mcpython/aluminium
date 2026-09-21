@@ -937,7 +937,7 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
 
 ## 14. 数据装载（`Constant` / `JSONReader`）
 
-`Constant` 的静态块（类首次加载时执行）装载 8 张表：
+`Constant` 的静态块（类首次加载时执行）装载 8 组 / 10 张表（`MONSTER_CONFIGS` 吃两个文件）：
 
 | 表 | 文件 | 可变性 |
 |---|---|---|
@@ -948,13 +948,68 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
 | `SKILLS` | `skills.json` | ⚠️ 可变（含嵌套） |
 | `MONSTER_TEMPLATES` | `monster_template_config.json` | ⚠️ 可变 |
 | `HARD_LEVEL_GROUPS` | `hard_level_group.json` | ⚠️ 可变（含嵌套） |
-| `MONSTER_CONFIGS` | `monster_config.json` + 补丁 | ✅ `Map.copyOf`（唯一不可变的） |
+| `MONSTER_CONFIGS` | `monster_config.json` + 补丁 `monster_attack_modify_ratio.json` | ✅ `Map.copyOf`（唯一不可变的） |
 | `BREAKING_RATE` | `breaking_rate.json` | ⚠️ 可变 |
 
-> ⚠️ `public static final` 只锁引用不锁内容，**七张表可被运行时修改**（`Constant.SKILLS.clear()` 是合法的）。
-> 另外 `challenge_*.json`、`character_id_mappings.json`、`elation_basic_level_damage.json`
-> **完全没有被加载**（前两个是挑战模式数据，后两个目前是死数据）。
->
+懒加载（不占静态块）：`Constant.stages()` ← `stage.json`（见下）。
+B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SKILLS` / 合并进 `MONSTER_CONFIGS`）。
+
+> 另外 `Benchmark` 会读 `dump_data.json`，但 **generator 不产出它**（是个遗留的基准输入）；
+
+> ⚠️ `public static final` 只锁引用不锁内容，**这些表可被运行时修改**（`Constant.SKILLS.clear()` 是合法的）。
+
+### 14.1 生成器产出 vs 引擎实际加载
+
+`generate_data.py` 现在产出 **27 个文件**，引擎只用到其中 **11 个**
+（另外还读 2 个非 generator 产出的文件）。差额登记如下 —— 免得再出现
+"文档说没有、其实文件早就在"的偏差（本仓库此前那份 9/1 的快照就少了 11 个文件、
+`character_data.json` 也没有 `rarity`）。
+
+**A. generator 产出且引擎已加载（11）**
+
+`main_attribute` · `sub_attribute` · `weapons` · `character_data` · `point` · `skills` ·
+`monster_template_config` · `hard_level_group` · `monster_config` · `breaking_rate` · `stage`
+
+**B. 非 generator 产出但引擎已加载（2）**
+
+| 文件 | 说明 |
+|---|---|
+| `monster_attack_modify_ratio` | 仓库内的补丁文件（人工维护），由 `normalizeMonsterConfigs` 合并 |
+| `enemy_skills` | 仓库内手写技能表（P5-3） |
+
+**C. generator 产出但引擎完全不读（12）** —— 都是"为后续阶段准备 / 喂给文档导出脚本"的：
+
+| 文件 | 大概内容 | 为什么没读 |
+|---|---|---|
+| `challenge_maze.json` / `challenge_story_maze.json` / `challenge_boss_maze.json` | 挑战模式关卡与波次 | 未加载；P7-4 只做了 `stage.json` |
+| `character_id_mappings.json` | 角色 id → 译名 | 用不上（`character_data.json` 自带 name） |
+| `elation_basic_level_damage.json` | 欢愉（阿哈）体系基础等级伤害（101 条） | 未加载；P10 欢愉体系要用，见 §18.4 |
+| `eidolons.json` | 星魂 | 未加载；P8 星魂相关 |
+| `enhanced_ranks.json` | 强化形态星魂 | 未加载；同上 |
+| `enhanced_skills.json` | **强化形态技能**（10 个角色，基础 id + 1,000,000） | 未加载；这也是 `skills.json` 比早先那份小的原因（强化角色搬了出去） |
+| `global_buffs.json` | 全局辅助技能（仓库技，仅 1407 / 1506） | 未加载；属 P8-0 三分法的"跨系统"类 |
+| `growth.json` | 各晋阶基准面板 + 晋阶消耗（93 角色 / 651 行） | 未加载；**它是 `LevelPromotionCalc` 那份游戏表的原始数据**，见 §12.2 的近似说明 |
+| `relic_sets.json` | 遗器套装效果（60 套 / 92 条） | 未加载；引擎目前只用 `main_attribute`/`sub_attribute` 的**数值**，**套装效果没接**（P10-3） |
+| `materials.json` | 培养材料 | 纯展示 |
+| `recommend.json` | 游戏内置推荐光锥 / 遗器 / 词条 | 纯展示 |
+| `enhanced_hints.json` | 角色加强说明（10 个角色） | 纯展示 |
+| `property_names.json` | 属性的官方中文名（56 条） | 日志 / UI 本地化可用 |
+| `text_ids.txt` | 翻译缺失的 text id 清单 | 当前 0 行（无缺失） |
+
+**D. 既不是 A/B、也不是 generator 产出的辅助文件（4）**
+
+| 文件 | 说明 |
+|---|---|
+| `versions.json` | generator **读**它做末尾的覆盖率统计（不是它的产出） |
+| `pending_text_ids.txt` | 翻译待查清单（`export_glossary.py` 一类脚本用） |
+| `skill_segments.json` / `skill_segments.csv` | 技能分段数据，`export_skill_segments.py` 为文档生成 |
+
+> 账目（已用脚本核对）：generator 产出 **27** 个 = **A 11 个已加载** + **C 16 个未加载**。
+> B（`monster_attack_modify_ratio`、`enemy_skills`）与 D（4 个辅助文件）都**不在**这 27 个里。
+> C 那张表按"用途"合行写了，所以行数（14）少于文件数（16）——
+> `challenge_*` 3 个、`eidolons`+`enhanced_ranks` 2 个都是各占一行。
+> 要查"引擎读哪些"，看 A/B 两组即可。
+
 > **`stage.json`（9 MB / 约 2.9 万条关卡）是懒加载的**，走 `Constant.stages()`（P7-4）：
 > 它是最大的数据表，而多数测试与 demo 根本不碰关卡，塞进静态块等于每次 `Constant`
 > 初始化都多付 ~35 MB 堆。另外它**缺失时返回空表而不抛异常** —— 一个可选功能不该把

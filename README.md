@@ -22,15 +22,33 @@ The generated files must be placed under **`src/main/resources/data/`** (that di
 target of the `/data/` classpath prefix that `JSONReader` reads from). Placing them in
 `src/main/resources/` itself will not work.
 
-**Run the script from `src/main/resources/`**, i.e. `cd src/main/resources && python
-/path/to/generate_data.py`. It writes into `./data/` **relative to the current directory**, and it
-reads `./data/data_path.txt` (which holds the `turnbasedgamedata` checkout path) from there too.
-Running it from the repository root therefore writes a stray `./data/` and prompts for the data
-path; if that happens, just move the output into `src/main/resources/data/`.
+From either the repository root or `src/main/resources/`:
+
+```
+python /path/to/generate_data.py
+```
+
+The script looks for `data/data_path.txt` (which holds the `turnbasedgamedata` checkout path) in
+this order — the current directory's `data/`, then the current directory's
+`src/main/resources/data/`, then the script's own `data/` — **and writes its output into whichever
+`data/` it found**. So running it from the repository root writes straight into
+`src/main/resources/data/`, and running it from your data-tooling directory writes there. Only if
+none of those exist will it prompt for the path (and then store it next to the script).
+
+> ⚠️ The "current directory first" order matters: an earlier version of the script preferred the
+> script's own directory, which meant regenerating from the repo root silently refreshed a *different*
+> copy and left the committed-under-gitignore data stale.
 
 The current script emits **27 files** — including `eidolons.json`, `relic_sets.json`, `growth.json`,
 `materials.json`, `recommend.json`, `enhanced_skills.json`, `global_buffs.json` and
-`property_names.json`. The Java engine does not read all of them yet (see `engine.md` §18).
+`property_names.json`. The Java engine only reads 11 of them; `engine.md` §14.1 registers which are
+loaded and which are generated-but-unused.
+
+> **This step is required before anything can run.** Most game data is not committed:
+> `src/main/resources/data/` is listed in `.gitignore`, and only two files there are tracked —
+> the patch file `monster_attack_modify_ratio.json` and the hand-written `enemy_skills.json`.
+> A fresh `git clone` therefore has none of the **27 generated data files**
+> (`skills.json`, `monster_config.json`, `stage.json`, …), and **every test fails**.
 
 > **This step is required before anything can run.** Most game data is not committed:
 > `src/main/resources/data/` is listed in `.gitignore`, and only two files there are tracked —
