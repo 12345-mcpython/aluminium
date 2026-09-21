@@ -1,9 +1,13 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.beans.EnemySkillData;
 import com.laosun.aluminium.beans.HardLevelGroup;
 import com.laosun.aluminium.beans.MonsterConfig;
 import com.laosun.aluminium.beans.MonsterTemplate;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.utils.AttributeBuilder;
 
 import java.util.Map;
@@ -70,7 +74,38 @@ public final class EnemyFactory {
         enemy.setMaxStance(stats.stance());
         enemy.setStanceCount(template.stanceCount());
         enemy.setStanceType(template.stanceType());
+        installEnemySkill(enemy, monsterId, template);
         return enemy;
+    }
+
+    /**
+     * 给敌人装上它的普攻（P5-3）。
+     *
+     * <p>技能来自 {@code enemy_skills.json}（{@link Constant#ENEMY_SKILLS}）。
+     * 该表**只覆盖了演示用的几只怪**，其余怪物没有条目 —— 这时退回一个兜底普攻：
+     * 倍率 1.0、单段、元素取自身的 {@code stance_type}。这样"任何怪都能打人"，
+     * 不会因为没数据就站着不动。
+     *
+     * <p>元素解析顺序：表里的 {@code element} → 怪物自身的 {@code stance_type} → 物理
+     * （{@code stance_type} 也可能是 null，数据里确有这种条目）。
+     *
+     * <p>⚠ 倍率是猜的，见 {@link com.laosun.aluminium.beans.EnemySkillData}。
+     */
+    private static void installEnemySkill(Enemy enemy, int monsterId, MonsterTemplate template) {
+        EnemySkillData data = Constant.ENEMY_SKILLS.get(monsterId);
+        DamageElement element = data == null ? null : data.element();
+        if (element == null) {
+            element = template.stanceType() == null ? null : template.stanceType();
+        }
+        if (element == null) {
+            element = DamageElement.PHYSICAL;
+        }
+        DamageType type = data == null || data.damageType() == null
+                ? DamageType.NORMAL
+                : DamageType.fromString(data.damageType());
+        double multiplier = data == null ? 1.0 : data.multiplier();
+        int hits = data == null ? 1 : data.hits();
+        enemy.setSkill(SkillType.COMMON, new EnemySkill(element, multiplier, hits, type));
     }
 
     private static String displayName(MonsterConfig config, int monsterId) {

@@ -4,6 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillEffectType;
+import com.laosun.aluminium.models.buffs.SuperBreakBuff;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -98,32 +99,40 @@ public final class SkillExecutor {
 
         switch (effect) {
             case SINGLE_ATTACK, MAZE_ATTACK ->
-                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, true);
+                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets,
+                            data.getStanceList().single());
 
             case AOE_ATTACK -> {
+                double stance = data.getStanceList().all();
                 for (Enemy target : battle.targetableEnemies()) {
-                    totalDamage += hit(battle, data, user, element, base, target, hitTargets, true);
+                    totalDamage += hit(battle, data, user, element, base, target, hitTargets, stance);
                 }
             }
 
             case BLAST -> {
                 List<Enemy> alive = battle.targetableEnemies();
                 int center = alive.indexOf(mainTarget);      // 站位顺序 = battle.enemies 顺序
+                double centreStance = data.getStanceList().single();
+                double neighbourStance = data.getStanceList().spread();
                 if (center < 0) {
-                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, true);
+                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, centreStance);
                 } else {
-                    totalDamage += hit(battle, data, user, element, base, alive.get(center), hitTargets, true);
+                    totalDamage += hit(battle, data, user, element, base, alive.get(center), hitTargets, centreStance);
                     if (center > 0) {
-                        totalDamage += hit(battle, data, user, element, base, alive.get(center - 1), hitTargets, false);
+                        totalDamage += hit(battle, data, user, element, base, alive.get(center - 1),
+                                hitTargets, neighbourStance);
                     }
                     if (center < alive.size() - 1) {
-                        totalDamage += hit(battle, data, user, element, base, alive.get(center + 1), hitTargets, false);
+                        totalDamage += hit(battle, data, user, element, base, alive.get(center + 1),
+                                hitTargets, neighbourStance);
                     }
                 }
             }
 
             case BOUNCE -> {
                 int hits = params.size() > 1 ? (int) (double) params.get(1) : 1;   // 段数缺省 1
+                // H-3：弹射的 single 是**整个技能的总削韧**，要均摊到每一段，否则段数越多削得越多
+                double perHitStance = stanceValue(data, true) / Math.max(1, hits);
                 for (int i = 0; i < hits; i++) {
                     // 每段重新取存活目标：中途击杀就换人，而不是把段数空放给尸体
                     List<Enemy> alive = battle.targetableEnemies();
@@ -131,7 +140,7 @@ public final class SkillExecutor {
                         break;                                     // 全死 → 剩余段数作废
                     }
                     totalDamage += hit(battle, data, user, element, base,
-                            alive.get(battle.getRng().nextInt(alive.size())), hitTargets, true);
+                            alive.get(battle.getRng().nextInt(alive.size())), hitTargets, perHitStance);
                 }
             }
 
@@ -160,11 +169,15 @@ public final class SkillExecutor {
     /**
      * Settles one hit, reduces toughness (P4-2) and accumulates it into the attack summary.
      *
-     * @param mainTarget 这一段是不是打在"主目标/中心"上（BLAST 用：中心扣 {@code single}、相邻扣 {@code spread}）
+     * <p>削韧走"两条链分同一个标称值"的口径（P4-6）：{@link Battle#reduceToughness} 会同时给出
+     * 实际削掉的值与超出部分，后者在施放方持有 {@link SuperBreakBuff} 时变成一发超击破伤害。
+     *
+     * @param stanceDamage 这一段要削的韧性点数（已由调用方按技能形状与段数算好：AOE 用 {@code all}、
+     *                     BLAST 中心 {@code single} / 相邻 {@code spread}、BOUNCE 为总值均摊到每段）
      * @return the settled damage of this hit (0 if the target was dead / invulnerable)
      */
     private static double hit(Battle battle, SkillData data, CanHit user, DamageElement element, double base,
-                              CanHit target, Set<CanHit> hitTargets, boolean mainTarget) {
+                              CanHit target, Set<CanHit> hitTargets, double stanceDamage) {
         if (target == null || target.isDeath()) {
             return 0;
         }
@@ -172,29 +185,58 @@ public final class SkillExecutor {
         // 4 参构造器 → DamageType.NORMAL；P8-2 接真实槽位后再按 普攻/战技/终结技 映射
         Damage damage = new Damage(user, target, element, base);
         double settled = battle.applyDamage(target, damage);
-        applyStanceDamage(battle, data, user, element, damage, target, mainTarget);
+        settled += applyStanceDamage(battle, user, element, damage, target, stanceDamage);
         return settled;
     }
 
     /**
-     * 削韧（P4-2）：只有「算一次攻击」的伤害才削韧，削韧值按技能形状取 {@code stance_list}。
+     * 削韧（P4-2）+ 超击破（P4-6）：只有「算一次攻击」的伤害才削韧。
      *
      * <p>数据实测（{@code skills.json} 全量统计）：单体/秘技/弹射用 {@code single}（30=1 单位、60=2、90=3），
      * 群攻用 {@code all}，**扩散用 {@code single}（中心）+ {@code spread}（相邻）**——
-     * 例：姬子战技 = {@code 60/0/30}。
+     * 例：姬子战技 = {@code 60/0/30}。弹射的 {@code single} 是整个技能的**总值**，按段数均摊（H-3）。
      *
-     * @param mainTarget 是否主目标（决定 BLAST 取哪个字段）
+     * @param stanceDamage 这一段实际要削的点数（0 = 这个形状不削韧）
+     * @return 本段**额外**结算的伤害（击破伤害 + 超击破伤害；0 = 都没有）。它们是在
+     *         {@code Battle.reduceToughness} 内部 / {@link #applySuperBreak} 里结算的，
+     *         所以要靠返回值累加进本次攻击的总额 —— 否则 {@code AttackEvent.totalDamage}
+     *         会漏掉整条击破链。
+     *         <p>这两段都是**派生段**（已置 {@code notCountsAsAttack()}）：不给受击方回能
+     *         （一次攻击行为只回一次，由主段负责），但击杀时仍给攻击者回能
      */
-    private static void applyStanceDamage(Battle battle, SkillData data, CanHit user, DamageElement element,
-                                          Damage damage, CanHit target, boolean mainTarget) {
-        if (!damage.isCountsAsAttack() || !(target instanceof Enemy enemy)) {
-            return;                                  // 附加伤害 / 真伤不削韧
+    private static double applyStanceDamage(Battle battle, CanHit user, DamageElement element,
+                                            Damage damage, CanHit target, double stanceDamage) {
+        if (stanceDamage <= 0 || !damage.isCountsAsAttack() || !(target instanceof Enemy enemy)) {
+            return 0;                                // 附加伤害 / 真伤不削韧
         }
-        battle.reduceToughness(user, enemy, element, stanceValue(data, mainTarget));
+        Battle.StanceResult stance = battle.reduceToughness(user, enemy, element, stanceDamage);
+        return stance.breakDamage() + applySuperBreak(battle, user, enemy, element, stance.superBreakStance());
     }
 
     /**
-     * 该技能这一段打在一个目标上的削韧点数。
+     * 超击破（P4-6）：把"打不进韧性条的那部分削韧值"转化成一发 {@link DamageType#SUPER_BREAK} 伤害。
+     *
+     * <p>触发条件只有两个：施放方持有 {@link SuperBreakBuff}（纯标记），且
+     * {@code superBreakStance > 0}（敌人本来就已经击破，或这一发把它打破）。
+     *
+     * <p>注意 {@code superBreakStance} 是**超出部分**而不是整发削韧值：破韧的那一发里，
+     * 前一半削韧已经用于击破（{@link BreakDamageCalculator}），这里只能用超出的那一半，
+     * 否则同一个标称削韧值会被用两次。
+     *
+     * @param superBreakStance 超出剩余韧性的那部分削韧值
+     * @return 本段结算的超击破伤害（0 = 没触发）
+     */
+    private static double applySuperBreak(Battle battle, CanHit user, Enemy enemy, DamageElement element,
+                                          double superBreakStance) {
+        if (superBreakStance <= 0 || !user.getBuffManager().hasBuff(SuperBreakBuff.class)) {
+            return 0;
+        }
+        Damage superBreak = BreakDamageCalculator.buildSuperBreak(user, enemy, element, superBreakStance);
+        return battle.applyDamage(enemy, superBreak);
+    }
+
+    /**
+     * 该技能**单段**打在一个目标上的削韧点数（不含弹射的段数均摊，均摊在 {@code BOUNCE} 分支里做）。
      */
     private static double stanceValue(SkillData data, boolean mainTarget) {
         // 注意：StanceList 在 beans.Skill 里（与 models.Skill 同名不同包），这里用全限定名

@@ -9,7 +9,9 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.energy.EnergyGain;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -94,8 +96,11 @@ public class Battle {
         if (!requestSkill(ultra, user, targets)) {
             return false;
         }
+        // H-5：**先清零**（ROADMAP P3-2 的顺序），再让大招本体结算。
+        // 顺序反了会吃掉大招自己赚的能量：processRequests() 里的击杀回能 / 击破回能都记给
+        // damage.getAttacker()（= 放大招的人），先结算后清零就把那几笔抹掉了。
+        user.setCurrentEnergy(0);
         processRequests();                      // 大招本体结算：Ultra 槽在 onSkillCast 里不回能，不会重复给
-        user.setCurrentEnergy(0);               // 先清零
         EnergyGain ultraGain = user.getEnergyProvider().onUltCast(user, ultra);
         if (ultraGain != null) {
             applyEnergyGain(user, ultraGain);   // 再回自身的 5 点（× 回能效率）
@@ -153,7 +158,8 @@ public class Battle {
             }
             Damage damage = new Damage(dot.getSource(), enemy, dot.getElement(),
                     DamageType.DOT, dot.getBaseDamage());
-            total += applyDamage(enemy, damage);
+            // KILL_ONLY：DOT 不是"一次攻击行为"，不给受击方回能；但 DOT 击杀仍记给施加者
+            total += applyDamage(enemy, damage, EnergyGrant.KILL_ONLY);
             if (dot.tick()) {
                 enemy.removeDot(dot);
             }
@@ -273,12 +279,26 @@ public class Battle {
      * @return the settled damage, or {@code 0} if the target was already dead
      */
     public double applyDamage(CanHit target, Damage damage) {
+        return applyDamage(target, damage, EnergyGrant.ALL);
+    }
+
+    /**
+     * 内部结算入口：比公开版本多一个"这一段允许结算哪种回能"的参数。
+     *
+     * <p>为什么需要它（2026-09-19 口径）：**一次攻击行为只给受击方回一次能**。
+     * 一次攻击可以派生多种伤害类型（技能伤害 → 击破伤害 → 超击破伤害），如果每段都给受击方
+     * 回能，受击方就会因为"被打得更狠"而回更多能 —— 这不对。所以只有这一发的**主段**带
+     * {@link EnergyGrant#ALL}，派生段一律 {@link EnergyGrant#KILL_ONLY}。
+     *
+     * @param grant 这一段允许结算的回能种类
+     */
+    private double applyDamage(CanHit target, Damage damage, EnergyGrant grant) {
         if (target.isDeath() || target.isInvulnerable()) {
             return 0;                  // 尸体 / 转阶段无敌：不结算（也就不会鞭尸）
         }
         double settled = assemble(damage);
         boolean died = target.takeDamage(settled);
-        grantHitAndKillEnergy(target, damage, died);     // P3-2：受击回能 / 击杀回能
+        grantHitAndKillEnergy(target, damage, died, grant);     // P3-2：受击回能 / 击杀回能
         return settled;
     }
 
@@ -333,6 +353,9 @@ public class Battle {
      * <ul>
      *   <li><b>只有命中弱点才削韧</b>——非弱点元素一点都不削（"无视弱点削韧"是乱破/姬子·启行这类
      *       角色特性，等 P8-7 数据化，别在这里开默认口子）</li>
+     *   <li><b>但超击破不受弱点限制</b>：敌人**已处于击破状态**时，整发标称削韧都算"超出部分"，
+     *       与元素是否命中弱点无关（官方文案的条件里只有"敌人处于弱点击破状态"）。
+     *       非弱点攻击打已击破的敌人照样产生超击破段</li>
      *   <li>没有韧性条（数据里确有 {@code stance = 0} 的怪）/ 已击破 / 已死亡 → 不削</li>
      *   <li>韧性归零 → 由这里触发击破（{@code Enemy.reduceStance} 自己不做判定）</li>
      * </ul>
@@ -340,33 +363,87 @@ public class Battle {
      * <p>击破链的顺序（后续任务往这里加东西）：击破状态 → 击破伤害（P4-3）→ 推条（P4-4）→
      * 挂 DOT（P4-5）→ 击破回能（P3-3）。
      *
+     * <p><b>返回值同时给出"超出部分"（P4-6）</b>：设技能标称削韧 {@code S}、剩余韧性 {@code T}，
+     * 这一个 {@code S} 会被**拆给两条链**——击破伤害用 {@code min(S,T)}（{@link StanceResult#consumed()}），
+     * 超击破伤害用 {@code max(0, S-T)}（{@link StanceResult#overkill()}），相加恒等于 {@code S}。
+     * 所以调用方不能只留一个数，否则破韧的那一发会漏掉超击破段。
+     *
      * @param attacker     攻击者（击破伤害与击破回能都记给他）
      * @param enemy        挨打的目标
      * @param element      这一段伤害的元素（决定是否弱点，也是击破元素）
-     * @param stanceDamage 削韧点数（技能 {@code stance_list} 的值，单位「点」）
-     * @return {@code true} = 这一段把韧性打空并触发了击破
+     * @param stanceDamage 削韧点数（技能 {@code stance_list} 的值，单位「点」；**不是**每段固定值，
+     *                     弹射类由 {@link SkillExecutor} 把总值均摊到每一段）
+     * @return 这一段的削韧结果（实际削掉多少 / 超出多少 / 是否触发击破）
      */
-    public boolean reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
+    public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
         if (attacker == null || enemy == null || stanceDamage <= 0) {
-            return false;
+            return StanceResult.NONE;
         }
-        if (enemy.isDeath() || enemy.isBroken() || !enemy.hasToughnessBar()) {
-            return false;
+        // 弱点判定必须在"已击破"分支**之前**：超击破是"把打不进韧性条的削韧转化掉"，
+        // 前提仍是"这一发本来就削得动韧性"（只有弱点才削）。若先判 broken 就返回整发超出，
+        // 非弱点攻击打已击破的敌人也会凭空产生超击破 —— 这是错的。
+        if (enemy.isDeath()) {
+            return StanceResult.NONE;
+        }
+        if (enemy.isBroken() || !enemy.hasToughnessBar()) {
+            // 韧性条已空（已击破 / 数据里 stance = 0 的怪）⇒ 整发标称削韧都落不进韧性条，
+            // 全部算"超出部分"，这就是超击破的输入（P4-6）。
+            //
+            // **这里刻意不判弱点**：官方文案是"攻击处于弱点击破状态的敌人后，会将本次攻击的
+            // 削韧值转化为 1 次超击破伤害"——条件里只有"敌人已处于击破状态"，没有元素限制。
+            // 所以非弱点元素打已击破的敌人**照样**产生超击破（用整发标称削韧值）。
+            // 对比下面的常规削韧：那一步仍然严格"只有弱点才削"。
+            return new StanceResult(0, stanceDamage, 0, false);
         }
         if (!enemy.isWeakTo(element)) {
-            return false;
+            return StanceResult.NONE;        // 未击破时：非弱点一点都不削，也就没有超出部分
         }
-        enemy.reduceStance(stanceDamage);
+        // H-4：击破伤害按**这一段实际削掉的值**算，不是技能的标称削韧值
+        double consumed = enemy.reduceStance(stanceDamage);
+        double overkill = stanceDamage - consumed;                 // P4-6：超出部分 = 超击破的输入
         if (enemy.getStance() > 0) {
-            return false;
+            return new StanceResult(consumed, 0, 0, false);        // 没打空：没有超出部分可用
         }
         enemy.breakEnemy(element);
         enemy.setBrokenRemainTurns(Constant.BROKEN_REMAIN_TURNS);
-        applyDamage(enemy, BreakDamageCalculator.build(attacker, enemy, element, stanceDamage));   // P4-3
+        // 击破伤害在这里就结算掉了，所以必须把结算值带出去 —— 它属于**这一次攻击**，
+        // 漏掉会让 AttackEvent.totalDamage 少算一整条击破链。
+        // KILL_ONLY：击破是主段派生的额外伤害，不给受击方回能（一次攻击只回一次）；
+        // 但若主段没打死、击破补刀打死，击杀回能仍然记给攻击者。
+        double breakDamage = applyDamage(enemy,
+                BreakDamageCalculator.build(attacker, enemy, element, consumed), EnergyGrant.KILL_ONLY); // P4-3
         delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // P4-4 推条
         attachBreakDot(attacker, enemy, element);                                                  // P4-5 DOT
         gainBreakEnergy(attacker, enemy);            // P3-3
-        return true;
+        return new StanceResult(consumed, overkill, breakDamage, true);
+    }
+
+    /**
+     * 一次削韧的结果（P4-6）。
+     *
+     * <p>两个削韧数**相加恒等于这一段的标称削韧值**，不重不漏。
+     *
+     * @param consumed    真正从韧性条上扣掉的点数（击破伤害用这个）
+     * @param overkill    超出剩余韧性的点数（超击破伤害用这个；没打空时为 0）
+     * @param breakDamage 这一次触发的**击破伤害结算值**（0 = 没触发击破）。
+     *                    它是在本方法内部经 {@link #applyDamage} 结算的，调用方拿不到，
+     *                    所以必须由返回值带出去 —— 否则一次攻击的"总伤害"会漏掉击破链
+     *                    （见 {@code AttackEvent#totalDamage}）
+     * @param broke       这一段是否把韧性打空并触发了击破
+     */
+    public record StanceResult(double consumed, double overkill, double breakDamage, boolean broke) {
+
+        /**
+         * 这一发没削到任何东西（没削韧 / 非弱点 / 目标已死）：两条链都不产生。
+         */
+        public static final StanceResult NONE = new StanceResult(0, 0, 0, false);
+
+        /**
+         * 超击破的削韧值输入：{@code max(0, S - T)} 的等价形式（见 {@code Battle.reduceToughness}）。
+         */
+        public double superBreakStance() {
+            return overkill;
+        }
     }
 
     /**
@@ -409,6 +486,66 @@ public class Battle {
     }
 
     /**
+     * 某个单位当前的仇恨值（P5-1/P5-2）：决定敌人选中它的概率。
+     *
+     * <p>取值优先级：角色数据里的 {@code aggro}（它就是游戏倍率本身：存护 150 / 毁灭 125 /
+     * 其他 100 / 巡猎·智识 75）→ 没有数据时退回命途的默认档 → 非角色（敌人/召唤物）给 100。
+     *
+     * <p>**嘲讽不在这里**：嘲讽是"只能选中"的硬约束，由 {@link TargetSelector} 处理。
+     * 用乘法把它塞进仇恨值只能提高概率，永远做不到"只能选中"。
+     *
+     * @param entity 要查询的单位
+     * @return 仇恨值（&gt; 0）
+     */
+    public double aggroOf(CanHit entity) {
+        if (entity instanceof Character character) {
+            if (character.getAggro() > 0) {
+                return character.getAggro();
+            }
+            return character.getPath().getAggro();
+        }
+        return 100;                                  // 敌人 / 召唤物：没有命途，给常规档
+    }
+
+    /**
+     * 仇恨表：{@code 单位 → 受击概率}（P5-2）。概率之和为 1。
+     *
+     * @param allies 参选单位（调用方负责先过滤死亡目标）
+     * @return 有序的 单位 → 概率 映射；空列表返回空表
+     */
+    public Map<CanHit, Double> getAggroTable(List<? extends CanHit> allies) {
+        Map<CanHit, Double> table = new LinkedHashMap<>();
+        double total = 0;
+        for (CanHit ally : allies) {
+            total += aggroOf(ally);
+        }
+        if (total <= 0) {
+            return table;
+        }
+        for (CanHit ally : allies) {
+            table.put(ally, aggroOf(ally) / total);
+        }
+        return table;
+    }
+
+    /**
+     * 某个单位的对手阵营成员（P5-5）：我方 → 敌人；敌人 → 我方。
+     *
+     * <p>**不过滤死亡**（调用方按需过滤）：这里只回答"阵营是谁"，不回答"谁能被打"。
+     * 若将来引入第三方阵营（{@link com.laosun.aluminium.enums.Camp#NEUTRAL}），
+     * 这个方法的语义需要重新定义。
+     *
+     * @param self 查询者
+     * @return 对手阵营的列表（就是 {@code characters} / {@code enemies} 本身，不是拷贝）
+     */
+    public List<? extends CanHit> getOpponents(CanHit self) {
+        if (self == null || self.getCamp() == null) {
+            return List.of();
+        }
+        return self.getCamp() == com.laosun.aluminium.enums.Camp.PLAYER ? enemies : characters;
+    }
+
+    /**
      * 击破回能（P3-3）：击破瞬间由 P4-4 调这**一个**口子，规则仍归击破者自己的 provider
      * （标准实现给 5；乱破 +10、同谐开拓者 +10、忘归人 +3 这类等真做角色时再各自实现）。
      *
@@ -427,57 +564,111 @@ public class Battle {
     /**
      * 受击回能 + 击杀回能（P3-2）。
      *
-     * <p>口径：附加伤害 / 真实伤害「不视为造成了 1 次攻击」→ 两边都不回能；
-     * 击杀了目标的那一发只结算击杀回能（记给 {@code damage.getAttacker()}），
-     * 挨打的那一方已经死了就不必再涨能量。
+     * <p><b>两条口径不同，别用同一个开关卡：</b>
+     * <ul>
+     *   <li><b>受击回能</b>：要求这一发「算一次攻击」（{@code countsAsAttack}）。
+     *       附加伤害 / 真实伤害按官方定义「不视为造成了 1 次攻击」→ 挨打方不回能。</li>
+     *   <li><b>击杀回能</b>：只看"这一发有没有把目标打死"，**与该伤害是否算攻击无关**。
+     *       任何归属到攻击者的伤害（普攻、战技、击破、超击破、DOT、附加伤害、真伤……）
+     *       只要打死了怪，就给 {@code damage.getAttacker()} 结算击杀回能。</li>
+     * </ul>
+     *
+     * <p>两条分开的原因：附加伤害/真伤可以击杀，但"击杀"这件事本身仍然发生了 ——
+     * 用 {@code countsAsAttack} 一起卡掉会让附加伤害补刀拿不到击杀回能。
      *
      * @param target 挨打的人
      * @param damage 这一发伤害
      * @param died   这一发是否打死了 {@code target}
      */
-    private void grantHitAndKillEnergy(CanHit target, Damage damage, boolean died) {
-        if (!damage.isCountsAsAttack()) {
+    private void grantHitAndKillEnergy(CanHit target, Damage damage, boolean died, EnergyGrant grant) {
+        if (!died) {
+            grantHitEnergy(target, damage, grant);
             return;
         }
-        if (!died) {
-            EnergyGain hitGain = target.getEnergyProvider().onTakingHit(target, damage);
-            if (hitGain != null) {
-                applyEnergyGain(target, hitGain);
-            }
+        grantKillEnergy(target, damage, grant);
+    }
+
+    /**
+     * 受击回能：只有**这一次攻击的主段**才给挨打的那一方回能。
+     *
+     * <p>两道门槛：① 这一发必须「算一次攻击」（附加伤害 / 真伤不视为攻击）；
+     * ② {@code grant} 必须允许受击回能（击破 / 超击破 / DOT 这些派生段不允许，
+     * 否则一次攻击会因为"打出了更多伤害类型"而给受击方回更多能）。
+     */
+    private void grantHitEnergy(CanHit target, Damage damage, EnergyGrant grant) {
+        if (grant != EnergyGrant.ALL || !damage.isCountsAsAttack()) {
+            return;
+        }
+        EnergyGain hitGain = target.getEnergyProvider().onTakingHit(target, damage);
+        if (hitGain != null) {
+            applyEnergyGain(target, hitGain);
+        }
+    }
+
+    /**
+     * 击杀回能：记给 {@code damage.getAttacker()}，**不看** {@code countsAsAttack}
+     * （任何归属到角色的伤害击杀了怪都该回能，2026-09-19 口径）。
+     *
+     * <p>但**看 {@code grant}**：击杀只结算一次。所以主段带 {@link EnergyGrant#ALL}，
+     * 派生段（击破 / 超击破 / DOT / 附加伤害 / 真伤）带 {@link EnergyGrant#KILL_ONLY} ——
+     * 这样"主段没打死、派生段补刀打死"时击杀回能不会漏，
+     * 而"主段已经打死"时派生段也不会重复给（它本来就因为目标已死而不结算）。
+     */
+    private void grantKillEnergy(CanHit target, Damage damage, EnergyGrant grant) {
+        if (grant == EnergyGrant.NONE) {
             return;
         }
         CanHit attacker = damage.getAttacker();
-        if (attacker != null) {
-            EnergyGain killGain = attacker.getEnergyProvider().onKill(attacker, target);
-            if (killGain != null) {
-                applyEnergyGain(attacker, killGain);
-            }
+        if (attacker == null) {
+            return;
         }
+        EnergyGain killGain = attacker.getEnergyProvider().onKill(attacker, target);
+        if (killGain != null) {
+            applyEnergyGain(attacker, killGain);
+        }
+    }
+
+    /**
+     * 这一段伤害允许结算哪些回能（见 {@code Battle.applyDamage} 的内部重载）。
+     */
+    private enum EnergyGrant {
+        /** 主段：受击回能 + 击杀回能都结算（角色主动施放技能的伤害段）。 */
+        ALL,
+        /** 派生段：只结算击杀回能（击破 / 超击破 / DOT / 附加伤害 / 真伤）。 */
+        KILL_ONLY,
+        /** 什么都不结算（预留）。 */
+        NONE
     }
 
     /**
      * 附加伤害：面板型 base（攻击力 / 生命上限 × 倍率），**走完整乘区**（增伤/防御/抗性/易伤都吃）。
      *
      * <p>官方定义：「使受击者额外受到 1 次伤害，本次伤害不视为造成了 1 次攻击」——
-     * 所以置 {@code notCountsAsAttack()}（不回能、不削韧、不触发攻击级事件）。
+     * 所以置 {@code notCountsAsAttack()}（**受击方**不回能、不削韧、不触发攻击级事件）。
+     * 但它**归属攻击者**，因此击杀时照样给攻击者结算击杀回能（见 {@link #grantKillEnergy}）。
      *
      * @param base 已经算好的基础值（例：知更鸟 120% 攻击力 / 缇宝 12% 生命上限）
      * @return 该段结算值（0 = 未造成伤害）
      */
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
         Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
-        return applyDamage(target, extra.notCountsAsAttack());
+        // KILL_ONLY：附加伤害是某次攻击派生的额外伤害，不给受击方回能；击杀仍记给攻击者
+        return applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
     }
 
     /**
      * 真实伤害：固定数额，或"本次攻击总伤害 × %"这类衍生值——**跳过全部乘区**，不视为一次攻击。
+     *
+     * <p>同样置 {@code notCountsAsAttack()}：受击方不回能、不削韧；但归属攻击者，
+     * 击杀时照给攻击者结算击杀回能（见 {@link #grantKillEnergy}）。
      *
      * @param base 真伤数额（不再受防御/抗性/增伤/暴击/易伤影响）
      * @return 该段结算值（0 = 未造成伤害）
      */
     public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
         Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
-        return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack());
+        // KILL_ONLY：真伤同样是派生伤害，不给受击方回能；击杀仍记给攻击者
+        return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), EnergyGrant.KILL_ONLY);
     }
 
     /**

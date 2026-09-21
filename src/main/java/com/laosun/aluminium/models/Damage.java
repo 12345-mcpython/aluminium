@@ -87,6 +87,30 @@ public class Damage {
      */
     private boolean critFixed;
 
+    /**
+     * 这个实体在本段伤害里是不是**受击方**。
+     *
+     * <p>{@code Battle.assemble} 会把 {@code DamageEvent} 同时广播给攻击方与受击方（§2.2 要求），
+     * 所以注入乘区的 buff 必须自己判断"我挂在哪一侧"，否则挂在敌人身上的易伤会连它自己的输出一起提高。
+     * 判定统一走这里，别在 buff 里各自写 {@code damage.getDefender() == ...}。
+     *
+     * @param entity 要判定的实体（{@code null} → {@code false}）
+     * @return {@code true} = 它是本段的受击方
+     */
+    public boolean isOnDefenderSide(CanHit entity) {
+        return entity != null && entity == defender;
+    }
+
+    /**
+     * 这个实体在本段伤害里是不是**攻击方**（虚弱这类"攻击方负面"就这么判）。
+     *
+     * @param entity 要判定的实体（{@code null} → {@code false}）
+     * @return {@code true} = 它是本段的攻击方
+     */
+    public boolean isOnAttackerSide(CanHit entity) {
+        return entity != null && entity == attacker;
+    }
+
     public Damage(CanHit attacker, CanHit defender, DamageElement element, DamageType type, double skillBaseValue) {
         this.attacker = attacker;
         this.defender = defender;

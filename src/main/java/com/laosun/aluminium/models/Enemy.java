@@ -127,13 +127,24 @@ public class Enemy extends CanHit {
      * <p><b>归零不自动击破</b>——击破判定要区分弱点击破/非弱点削韧（P4-2 的口径），
      * 所以这里只负责扣数并夹到 0。已击破的目标在恢复前不再削韧（韧性条是空的）。
      *
+     * <p><b>返回实际消耗值（H-4）</b>：击破伤害必须按"这一段真的削掉了多少"结算，
+     * 而不是按技能的标称削韧值——剩 10 点韧性挨一发 30 点技能，只有 10 点算数。
+     * 调用方另需注意：超击破（P4-6）用的是**超出部分** {@code amount - consumed}，
+     * 所以本方法的返回值与调用方手里的标称值要一起用，别只留一个。
+     *
      * @param amount 削韧点数（技能 {@code stance_list} 的值 × 弱点/非弱点系数）
+     * @return 实际从韧性条上扣掉的点数（0 = 没削动：已击破 / 非正数 / 条已空）
      */
-    public void reduceStance(double amount) {
-        if (broken || amount <= 0) {
-            return;
+    public double reduceStance(double amount) {
+        if (broken || amount <= 0 || stance <= 0) {
+            // stance <= 0：韧性条已经空了（正常情况下会同时 broken，但本方法的守卫不应假设调用方
+            // 一定按顺序走）。显式挡掉才能保证返回值语义是 min(amount, 剩余韧性)，
+            // 否则超击破会算出"超出部分 = amount - 0 = 整发"，对一条空的韧性条凭空产生超击破。
+            return 0;
         }
-        stance = Math.max(0, stance - amount);
+        double consumed = Math.min(stance, amount);
+        stance -= consumed;
+        return consumed;
     }
 
     /**
