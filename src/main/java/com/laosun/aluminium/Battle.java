@@ -296,10 +296,17 @@ public class Battle {
         if (target.isDeath() || target.isInvulnerable()) {
             return 0;                  // 尸体 / 转阶段无敌：不结算（也就不会鞭尸）
         }
-        double settled = assemble(damage);
+        double settled = assemble(damage);                       // 乘区后的伤害（这是"打出去多少"）
+        double hpBefore = target.getCurrentHp();
         boolean died = target.takeDamage(settled);
+        double hpLoss = hpBefore - target.getCurrentHp();
+        double shieldAbsorbed = target.getLastShieldAbsorbed();
         grantHitAndKillEnergy(target, damage, died, grant);     // P3-2：受击回能 / 击杀回能
-        return settled;
+        // 返回值 = 这一击**实际生效**的伤害 = 被盾吸走的 + 真的掉的血。
+        // 目标是"打在有盾的目标上不能显示成 0"，同时**不能**把 settled 与盾吸收量相加
+        // （settled 是"打出去的量"，盾吸走的那部分本来就在里面，相加会正好翻倍）。
+        // 恒等式：settled == shieldAbsorbed + hpLoss（盾先吃、吃完才扣血）；分开算只是为了两段都可观察。
+        return shieldAbsorbed + hpLoss;
     }
 
     /**
@@ -526,6 +533,154 @@ public class Battle {
             table.put(ally, aggroOf(ally) / total);
         }
         return table;
+    }
+
+    /**
+     * 负面效果的生效概率（P6-1）：
+     *
+     * <pre>
+     * 生效概率 = 基础概率 × (1 + 施加方效果命中%) × (1 - 受击方效果抵抗%) × (1 - 特定负面效果抵抗%)
+     * </pre>
+     *
+     * <p>结果 clamp 到 {@code [0, 1]}：
+     * <ul>
+     *   <li>效果命中是**乘区**，所以命中 32% 时 80% 基础概率 → {@code 0.8 × 1.32 = 1.056 → 1.0}
+     *       （不会超过 100%，但也不会有"超额命中转成别的收益"）；</li>
+     *   <li>效果抵抗同样乘算：抵抗 30% 时 100% 基础概率 → {@code 0.7}；</li>
+     *   <li>{@code specificResistKey} 是数据里的 {@code STAT_*} 串（见 {@code Enemy.debuffResist}）：
+     *       冰锋 {@code {"STAT_CTRL_Frozen": 1}} → 关键因子 {@code (1 - 1) = 0} → **完全免疫**。
+     *       只有 {@link Enemy} 有这张表，角色没有。</li>
+     * </ul>
+     *
+     * <p>**只算概率，不掷骰**：掷骰在 {@link #rollDebuff}（用注入的 rng），
+     * 这样 AI 可以"只看期望"而不消耗随机数。
+     *
+     * @param caster            施加者（读 {@code EFFECT_HIT_RATE}）
+     * @param target            受击者（读 {@code EFFECT_RESISTANCE} 与可能的特定抵抗）
+     * @param baseChance        技能面板上的基础概率（0.8 = 80%）
+     * @param specificResistKey 特定抵抗键；{@code null} 或目标不是敌人 → 不查
+     * @return 生效概率，落在 {@code [0, 1]}
+     */
+    public double hitChance(CanHit caster, CanHit target, double baseChance, String specificResistKey) {
+        if (caster == null || target == null) {
+            return 0;
+        }
+        double hit = caster.getAttribute(AttributeType.EFFECT_HIT_RATE).get();
+        double resist = target.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
+        double specific = 0;
+        if (target instanceof Enemy enemy && specificResistKey != null) {
+            specific = enemy.getDebuffResist().getOrDefault(specificResistKey, 0.0);
+        }
+        return Math.clamp(baseChance * (1 + hit) * (1 - resist) * (1 - specific), 0, 1);
+    }
+
+    /**
+     * 失败判定之后，是否真的把这次负面效果挂上去（P6-1）。
+     *
+     * <p>用**注入的 {@link #rng}** 掷骰：同一个种子 → 同一场战斗可复现。
+     *
+     * @param caster          施加者（读它的效果命中）
+     * @param target          受击者（读它的效果抵抗 / 特定抵抗）
+     * @param baseChance      技能面板上的基础概率（0.8 = 80%）
+     * @param specificResistKey 特定负面效果抵抗的键（数据里的 {@code STAT_*} 串），{@code null} = 不查
+     * @return {@code true} = 命中，可以挂 buff
+     */
+    public boolean rollDebuff(CanHit caster, CanHit target, double baseChance, String specificResistKey) {
+        return rng.nextDouble() < hitChance(caster, target, baseChance, specificResistKey);
+    }
+
+    /**
+     * 挂一个负面效果：先过命中判定，命中才 {@code addBuff}（P6-1）。
+     *
+     * <p>这是"技能侧施加 debuff"的统一入口 —— 别在技能里直接调 {@code addBuff}，
+     * 否则效果命中与抵抗就被绕过去了。
+     *
+     * @param caster           施加者
+     * @param target           目标
+     * @param buff             要挂的 buff
+     * @param baseChance       基础概率
+     * @param specificResistKey 特定抵抗键（可为 {@code null}）
+     * @return {@code true} = 挂上了
+     */
+    public boolean tryApplyDebuff(CanHit caster, CanHit target, com.laosun.aluminium.models.AbstractBuff buff,
+                                  double baseChance, String specificResistKey) {
+        if (caster == null || target == null || buff == null || target.isDeath()) {
+            return false;
+        }
+        if (!rollDebuff(caster, target, baseChance, specificResistKey)) {
+            return false;
+        }
+        target.getBuffManager().addBuff(buff);
+        return true;
+    }
+
+    /**
+     * 治疗量（P6-2）：**不碰 {@code Damage}**，是独立的一套乘区。
+     *
+     * <pre>
+     * 治疗量 = 基础量 × (1 + 治疗加成) × (1 + 受疗加成)
+     * </pre>
+     *
+     * <p>两个因子都是乘算，且分别来自**不同的人**：
+     * {@code OUTGOING_HEALING_BOOST} 读施加治疗的人（奶妈的行迹/光锥），
+     * {@code HEAL_TAKEN_RATIO} 读被治疗的人（受疗加成；**负数就是治疗降低** ——
+     * 游戏里没有单独的"治疗降低"属性，见 {@code AttributeType}）。
+     *
+     * <p>只算数值，**不改 HP**：执行在 {@link #heal(CanHit, CanHit, double)}。
+     *
+     * @param healer     施加治疗的人（{@code null} → 只算受疗侧）
+     * @param target     被治疗的人
+     * @param baseAmount 基础治疗量（技能倍率 × 属性 + 固定值，由调用方算好）
+     * @return 最终治疗量（可能为负 —— 治疗降低 > 100% 时；调用方按 0 处理会由 heal 挡掉）
+     */
+    public double calculateHeal(CanHit healer, CanHit target, double baseAmount) {
+        if (target == null) {
+            return 0;
+        }
+        double outgoing = healer == null ? 0
+                : healer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
+        double taken = target.getAttribute(AttributeType.HEAL_TAKEN_RATIO).get();
+        return baseAmount * (1 + outgoing) * (1 + taken);
+    }
+
+    /**
+     * 执行一次治疗（P6-2）：先算治疗量，再落到目标 HP 上（{@code CanHit.heal} 自己封顶、死者无效）。
+     *
+     * @return **实际回复的 HP**（被上限截断后；目标已死或治疗量 ≤ 0 时是 0）
+     */
+    public double heal(CanHit healer, CanHit target, double baseAmount) {
+        if (target == null || target.isDeath()) {
+            return 0;
+        }
+        double amount = calculateHeal(healer, target, baseAmount);
+        if (amount <= 0) {
+            return 0;
+        }
+        double before = target.getCurrentHp();
+        target.heal(amount);
+        return target.getCurrentHp() - before;
+    }
+
+    /**
+     * 获得护盾（P6-3）。
+     *
+     * <p><b>不叠加</b>：直接覆盖当前护盾值（游戏里护盾通常不可叠加；同源刷新按覆盖处理）。
+     * 因为 {@link CanHit#takeDamage} 是"先扣盾再扣血"，所以"盾破前不死"是自动成立的。
+     *
+     * <p>🚧 护盾提高词条（护盾量提高 / 获得护盾量提高）**还没有对应属性**
+     * （{@code AttributeType} 里没有），所以现在护盾量就是传入值 —— 等有真实效果引用时再加。
+     *
+     * @param target 获得护盾的人（已死则无效）
+     * @param amount 护盾量（≤ 0 视为清除护盾）
+     * @return 实际设置后的护盾值
+     */
+    public double grantShield(CanHit target, double amount) {
+        if (target == null || target.isDeath()) {
+            return 0;
+        }
+        double value = Math.max(0, amount);
+        target.setShield(value);
+        return value;
     }
 
     /**
