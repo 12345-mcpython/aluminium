@@ -78,19 +78,16 @@ public class SkillData {
      * 施放这个技能**回多少能量**（{@code skills.json} 的 {@code sp_base}）：tbgd
      * {@code AvatarSkillConfig.SPBase}。
      *
-     * <p>常规档：普攻 20 / 战技 30 / 终结技 5 —— 这正是引擎早先写死的
-     * {@code Constant.ENERGY_GAIN_BASIC/SKILL/ULTRA}。落库之后有两类能被正确表达：
-     * <ul>
-     *   <li><b>完全不回能的角色</b>（{@code null}）：飞霄 1220、黄泉 1308、遐蝶 1407、
-     *       白厄 1408、昔涟 1415、银狼LV.999 1506 —— 他们走的是"层数/特殊资源"，
-     *       一个技能都不涨能量。</li>
-     *   <li><b>离档值</b>：爻光 1502 普攻 = 30（不是 20）。</li>
-     * </ul>
+     * <p>常规档：普攻 20 / 战技 30 / 终结技 5 —— 与 {@code Constant.ENERGY_GAIN_*} 一致。
      *
-     * <p>⚠ <b>多段/弹射技能的 {@code sp_base} 是"每段"值</b>（P3-0 实测）：艾丝妲/桑博/
-     * 那刻夏/同谐开拓者 = 6、瓦尔特 = 10，乘段数后总量才是常规 30。
-     * 每段是否真回能还受能力配置 {@code SPHitRatio} 控制，而**那个字段不在本项目数据里**，
-     * 所以引擎当前**不做段数乘算**，直接取本值 —— 后果见 {@code EnergyGainDataTest} 的登记表。
+     * <p>⚠ <b>本字段目前不驱动回能</b>（{@link com.laosun.aluminium.models.energy.StandardEnergyProvider}
+     * 仍用常量）。原因是数据里**多段/弹射技能的 {@code sp_base} 是"每段"值**
+     * （艾丝妲/桑博/那刻夏/同谐开拓者 6、瓦尔特 10），乘段数才对，而段数乘算依赖能力配置的
+     * {@code SPHitRatio}（本项目数据里没有）。常量给出的反而是**正确总量**。
+     * 数据化的正路见 ROADMAP P3-4（先聚合 {@code SPHitRatio}）。
+     *
+     * <p>保留读取的价值：它是 {@code SPHitRatio} 聚合的输入，也是"哪些技能不回能"的原始事实
+     * （{@code null} = 该技能不回能）。
      */
     private final Double spBase;
 

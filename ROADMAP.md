@@ -958,25 +958,27 @@
 
 ### P3-4 技能回能数据化（SPBase 落库）🚧 部分完成
 
-- **状态**（2026-09-21）：
-    - ✅ **已做**：`sp_base` 落库（`skills.json` 的新字段）+ `Skill`/`SkillData` 读取 +
-      `StandardEnergyProvider` 改读数据。**修掉一个真缺陷**：6 个"特殊资源"角色
-      （飞霄/黄泉/遐蝶/白厄/昔涟/银狼LV.999）此前被凭空发 20/30/5 能量，现在正确为"不回能"。
-    - ⏳ **未做**：`sp_hit_ratio_sum` 聚合。所以**多段/弹射技能的段数乘算仍然缺失**，
-      6 个角色（艾丝妲/桑博/那刻夏/同谐开拓者 ×2、瓦尔特）的战技回能偏低（取到每段值 6/10）。
-- **还差的那一步怎么做**（数据源已确认存在）：
+- **状态**（2026-09-21，含一次试错与退回）：
+    - ✅ **`sp_base` 落库**：`skills.json` 有新字段，`Skill`/`SkillData` 能读。
+      （**但回能仍走常量** —— 见下条。）
+    - ❌ **试过又退回**：一度把 `StandardEnergyProvider` 改成读 `sp_base`。**这是错的** ——
+      多段/弹射技能的 `sp_base` 是**每段值**（艾丝妲 6、瓦尔特 10），乘段数才对，
+      而段数乘算要 `SPHitRatio`（本项目数据里没有）。直接取原值会让那 6 个角色偏低；
+      **常量给出的才是正确总量**，所以退回常量。
+    - ✅ **顺带修掉的那个真缺陷换了实现方式**：6 个"特殊资源"角色
+      （飞霄/黄泉/遐蝶/白厄/昔涟/银狼LV.999）此前被凭空发能量。现在**不在 provider 里判空**，
+      而是由 `CharacterFactory` 在装配点注入 `NoConventionalEnergyProvider`（5 个钩子全不入账）——
+      因为这是**设计归类**而非单条数据事实，且只堵技能那两条会漏掉受击/击杀/击破
+      （黄泉上限 9，挨一下就能凑满、放出不该有的终结技）。见 `engine.md` §9.4。
+- **还没做的那一步**（数据源已确认存在）：
     1. `Config/ConfigAbility/Avatar/Avatar_*_Ability.json` 里有 `SPHitRatio`
        （实测艾丝妲为 `{"IsDynamic": false, "FixedValue": {"Value": 1}}`，**每个伤害动作一个**）。
        248 个文件，需要**按技能把 SPHitRatio 求和**（默认 1）。
-    2. 生成 `data/skill_energy.json`：`{"<skill_id>": {"sp_base": N, "sp_hit_ratio_sum": M}}`
-       （`data/` 被 gitignore → 生成后 `git add -f`）。
-    3. `StandardEnergyProvider`：`EnergyGain.normal(sp_base × sp_hit_ratio_sum)`；
-       无数据 → `Constant` 兜底。
-    4. **不要再额外乘段数**：弹射类的 `sp_base` 已是每段值，`sp_hit_ratio_sum` 已含段数（P3-0 口径 3/4）。
+    2. 聚合结果落到 `sp_base` 旁边（或新建 `data/skill_energy.json`）。
+    3. 那时再把 `StandardEnergyProvider` 接成 `sp_base × sp_hit_ratio_sum`；
+       **不要再额外乘段数**（弹射类的 `sp_base` 已是每段值，`sp_hit_ratio_sum` 已含段数）。
 - **验收**（补 `SkillEnergyDataTest`）：银枝战技 130202 → 30；艾丝妲战技 100902 → 30（6 × 5）；
   瓦尔特战技 100402 → 30（10 × 3）；景元追加攻击 → 0；黑塔追加攻击 → 5。
-- **现有护栏**：`EnergyGainDataTest` 已把 6 个"不回能"角色、爻光离档值（普攻 30）、
-  以及 8 个"战技离档"角色**穷举登记**，所以补上聚合后这些断言会立刻提示需要更新哪几个。
 - **依赖**：P3-1（provider 接口）；真角色接线仍是 P8-3
 
 ---
