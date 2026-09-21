@@ -635,7 +635,7 @@ Damage(type = SUPER_BREAK)   → 走完整装配，但 BoostArea/CritArea 自动
 
 | 字段 | 说明 |
 |---|---|
-| `currentEnergy` / `maxEnergy` | `maxEnergy == 0` ⇒ **没有能量条**（如 1407 遐蝶，她的资源是【新蕊】，见 §9.4），任何回能都是 no-op |
+| `currentEnergy` / `maxEnergy` | `maxEnergy == 0` ⇒ **没有能量条**（如 1407 遐蝶，她的资源是【新蕊】，见 §9.4 / §9.5），任何回能都是 no-op |
 | `energyProvider` | 默认 `StandardEnergyProvider`，特殊角色各自实现 |
 
 唯一入账口 `gainEnergy(EnergyGain gain)`：
@@ -656,11 +656,47 @@ Damage(type = SUPER_BREAK)   → 走完整装配，但 BoostArea/CritArea 自动
 
 | 钩子 | 调用点 | 标准值 | 触发条件 |
 |---|---|---|---|
-| `onSkillCast(user, skill, hitTargets)` | `SkillExecutor.execute` | 普攻 **20** / 战技 **30** / 其它 **0** | 每次施放一次（**不是**每段） |
-| `onUltCast(user, skill)` | `Battle.castUltra`（清零后） | **5** | 放出终结技 |
-| `onTakingHit(target, damage)` | `applyDamage` | **10** | **没死** 且这一发「算一次攻击」 |
-| `onKill(attacker, target)` | `applyDamage` | **5** | **打死了**，记录给 `damage.getAttacker()`；**与伤害类型无关** |
-| `onBreak(attacker, target)` | `reduceToughness` | **5** | 触发击破 |
+| `onSkillCast(user, skill, hitTargets)` | `SkillExecutor.execute` | **读数据** `SkillData.spBase`（普攻 20 / 战技 30） | 每次施放一次（**不是**每段） |
+| `onUltCast(user, skill)` | `Battle.castUltra`（清零后） | **读数据**（终结技一律 5） | 放出终结技 |
+| `onTakingHit(target, damage)` | `applyDamage` | **10**（常量） | **没死** 且这一发「算一次攻击」 |
+| `onKill(attacker, target)` | `applyDamage` | **5**（常量） | **打死了**，记录给 `damage.getAttacker()`；**与伤害类型无关** |
+| `onBreak(attacker, target)` | `reduceToughness` | **5**（常量） | 触发击破 |
+
+**技能回能已数据化**（P3-4，2026-09-21）：普攻/战技/终结技三项读
+`skills.json` 的 `sp_base`（源自 tbgd `AvatarSkillConfig.SPBase`），不再写死 20/30/5。
+受击/击杀/击破仍是常量（文档只写「额外恢复 N 点」，没有更好的数据源）。
+数据缺失时由 `Constant.ENERGY_GAIN_*` 兜底/作文档用。
+
+#### ⚠ `spBase == null` 表示"这个技能不回能"，不要兜底
+
+93 个角色里有 **6 个一个技能都不回能**（数据里三项 `sp_base` 全是 `null`）：
+
+| 角色 | 能量上限 | 实际资源 |
+|---|---|---|
+| 飞霄 1220 | 12 | 层数（大招阈值 6） |
+| 黄泉 1308 | 9 | 层数 |
+| 遐蝶 1407 | **null（无能量条）** | 【新蕊】 |
+| 白厄 1408 | 12 | 【火种】 |
+| 昔涟 1415 | 24 | 【追忆】（见 §9.5） |
+| 银狼LV.999 1506 | 60 | 欢愉体系 |
+
+修之前引擎对她们照发 20/30/5 —— **等于凭空造出能量**。所以 `null` 必须当成"不回能"，
+`StandardEnergyProvider.gainOf` 因此返回 `null` 而不是兜底成 20。护栏见
+`EnergyGainDataTest.specialResourceCharactersGainNoEnergyFromSkills`（含端到端一条）。
+
+#### ⚠ 多段/弹射技能的 `spBase` 是"每段"值 —— 引擎**不做段数乘算**（已知缺口）
+
+P3-0 实测：艾丝妲/桑博/那刻夏/同谐开拓者 `sp_base = 6`（1+4 段）、瓦尔特 `= 10`（1+2 段），
+乘段数后总量才是常规 30。每段是否真回能还受能力配置 `SPHitRatio` 控制，
+而**那个字段不在本项目数据里**，所以引擎直接取原值 → 这 6 个角色的战技回能偏低：
+
+| 角色 | `sp_base`（战技） | 备注 |
+|---|---|---|
+| 艾丝妲 1009 / 桑博 1108 / 那刻夏 1405 / 同谐开拓者 8005、8006 | 6 | 多段，总量应为 ~30 |
+| 瓦尔特 1004 | 10 | 多段 |
+| 镜流 1212 / 阿格莱雅 1402 | 20 | **非**多段，是真离档 |
+
+`EnergyGainDataTest.documentsTheOffScheduleSet` 把这 8 个**穷举登记**（再多一个就变红）。
 
 **受击回能与击杀回能是两条不同的口径，别用同一个开关卡**（2026-09-19 修正）：
 
@@ -708,26 +744,83 @@ castUltra(user, targets):
   requestSkill(...)
   user.setCurrentEnergy(0)                 ← 先清零
   processRequests()                        ← 再结算本体（击杀/击破回能因此能留下）
-  onUltCast → 回自身的 5 点
+  onUltCast → 回自身（读数据，终结技一律 5）
 ```
 
 `isEnergyFull()` 要求 `maxEnergy > 0 && currentEnergy >= maxEnergy` —— 所以没有能量条的角色永远放不了大招。
 
-### 9.4 技能回能数据化 ❌（P3-4，暂缓）
+### 9.4 技能回能数据化 ✅（P3-4，2026-09-21）
 
-`Constant.ENERGY_GAIN_*` 是**兜底常量**，不是从 `skills.json` 读的真实 `SPBase`。
-离档角色（镜流/阿格莱雅战技 20、爻光普攻 30、青雀/刃/饮月/流萤/波提欧/火花战技 0）目前会算错。
+普攻/战技/终结技的回能**已改为读 `skills.json` 的 `sp_base`**（源自 tbgd
+`AvatarSkillConfig.SPBase`），不再写死 20/30/5。受击/击杀/击破仍是常量
+（文档只写「额外恢复 N 点」，没有更好的数据源）；`Constant.ENERGY_GAIN_*` 降级为兜底/文档。
 
-> ⚠️ **`character_data.json` 的 `max_energy` 读出来了但从未接进角色**：
-> `Character.Builder.Calculator.calculate` 只用 health/attack/defence/speed/crit*，
-> `CanHit.maxEnergy` 保持默认 0 ⇒ 数据造出来的角色**全部没有能量条**，回能全 no-op、放不了大招。
-> 只有测试里手动 `setMaxEnergy(...)`。这是未修的高优先级问题。
->
-> 接线时注意 **1407 遐蝶的 `max_energy` 是 `null`，而这是设计而非缺值**：
-> 她没有常规能量条，资源是【新蕊】（上限 `5.3125 × 队伍最高等级²`，钳到 2000；
-> 来源为"我方每损失 1 点生命 +1 / 治疗量 100% 转化"），属于 P8-8「层数资源替代能量条」的范围。
-> bean 用 `Double` 而不是 `double` 正是为了容纳它（`double` 表示不了 null）；
-> 消费侧按 `cd.maxEnergy() != null ? cd.maxEnergy() : 0` 处理即可，别 auto-unbox，也别兜底成 100。
+`SkillData` 现在带两个新字段（都由 `Skill` bean 直读数据）：
+
+| 字段 | 来源 | 含义 |
+|---|---|---|
+| `spBase` | `sp_base` | 施放这个技能**回多少能量** |
+| `spNeed` | `sp_need` | **开大阈值**（只有终结技有值） |
+
+两者**都不是**"能量上限"：93 个角色里有 5 个的 `sp_need ≠ max_energy`
+（云璃 240/120、银枝 180/90、绯英 480/240、飞霄 12/6、昔涟 24/12）。
+云璃/银枝/绯英是标准能量但阈值 ≠ 上限（攒 120 就能放，放完清零）；
+飞霄/昔涟是层数资源（见 §9.5）。
+
+#### ⚠ `spBase == null` 表示"这个技能不回能"，**不要兜底**
+
+93 个角色里有 **6 个一个技能都不回能**（三项 `sp_base` 全是 `null`）：
+
+| 角色 | 能量上限 | 实际资源 |
+|---|---|---|
+| 飞霄 1220 | 12 | 层数（大招阈值 6） |
+| 黄泉 1308 | 9 | 层数 |
+| 遐蝶 1407 | **null（无能量条）** | 【新蕊】 |
+| 白厄 1408 | 12 | 【火种】 |
+| 昔涟 1415 | 24 | 【追忆】（见 §9.5） |
+| 银狼LV.999 1506 | 60 | 欢愉体系 |
+
+修之前引擎对她们照发 20/30/5 —— **等于凭空造出能量**。所以 `null` 必须当成"不回能"，
+`StandardEnergyProvider.gainOf` 因此返回 `null` 而不是兜底。护栏见
+`EnergyGainDataTest.specialResourceCharactersGainNoEnergyFromSkills`（含端到端一条）。
+
+#### ⚠ 多段/弹射技能的 `spBase` 是"每段"值 —— 引擎**不做段数乘算**（已知缺口）
+
+P3-0 实测：艾丝妲/桑博/那刻夏/同谐开拓者 `sp_base = 6`（1+4 段）、瓦尔特 `= 10`（1+2 段），
+乘段数后总量才是常规 30。每段是否真回能受能力配置 `SPHitRatio` 控制，
+而**那个字段不在本项目数据里**，所以引擎直接取原值 → 这 6 个角色的战技回能偏低：
+
+| 角色 | `sp_base`（战技） | 备注 |
+|---|---|---|
+| 艾丝妲 1009 / 桑博 1108 / 那刻夏 1405 / 同谐开拓者 8005、8006 | 6 | 多段，总量应为 ~30 |
+| 瓦尔特 1004 | 10 | 多段 |
+| 镜流 1212 / 阿格莱雅 1402 | 20 | **非**多段，是真离档 |
+
+`EnergyGainDataTest.documentsTheOffScheduleSet` 把这 8 个**穷举登记**（再多一个就变红）。
+
+> ✅ 已修：早先这里记着"`max_energy` 读出来了但从未接进角色，数据造出来的角色全都没有能量条"。
+> P8-1 已在 `Character.Builder.build()` 里接上（`null → 0`，不兜底成 100），
+> 所以 `CharacterFactory.create(1204, 80).getMaxEnergy() == 130`、`昔涟 == 24`。
+
+### 9.5 昔涟 1415：不是能量系统，是【追忆】层数 ⚠（P8-8）
+
+她的面板写着「最大能量 24」、终结技行写着「释放所需能量 12（上限 24）」，
+但读角色文档（`1415_昔涟.md`）后结论完全不同 —— **她攒的是【追忆】点数，不是能量**：
+
+- 天赋：战斗开始或昔涟行动后，其他队友及其忆灵获得【未来】；持有者行动时消耗【未来】，
+  使昔涟获得 **1 点【追忆】**。
+- **【追忆】达到 24 点可激活终结技**；进入【往昔的涟漪】状态后，**达到 12 点**即可激活；
+  池子 24，可溢出至 **27**。
+- 终结技（`sp_need = 12`，参数 `[1, 24, 0.25, 12]`）还会**激活全体队友的终结技**，
+  且**单场战斗只能放 1 次**。
+- 数据侧印证：她的普攻/战技/终结技 `sp_base` **全是 `null`** → 一个技能都不回能。
+
+**所以数据里的 `sp_need = 12` 是"涟漪状态下的阈值"，不是"消耗 12"**；第一次的 24
+只出现在天赋文本与参数表里。别把它读成"前 24 后 12 的消耗"。
+
+引擎当前的表达力：`maxEnergy = 24` 读到了，但**没有【追忆】这个资源**，
+`castUltra` 判的是 `currentEnergy >= maxEnergy` —— 对她只能靠外部灌能量模拟。
+按 P8-0 的三分法，这属于"引擎还不具备的能力" → **P8-8 的 `Resource` 抽象**，不在 P8-2 里特判。
 
 ---
 
@@ -889,11 +982,12 @@ castUltra(user, targets):
 
 ### 12.6 存在的缺口 ⚠️
 
-- `CharacterData` 里的 `attribute`（元素）、`mt`（命途）**都没读** →
-  角色没有元素字段（`P8-1`）。**命途已接**（P5-1，见 §19.1）；`aggro` 也一并接了。
-- `maxEnergy` 没接（见 §9.4）。
+- ✅ 已修（P8-1）：`character_data` 的 `attribute`（元素）、`mt`（命途）、`aggro`、`max_energy`
+  现在都接进了 `Character`/`CanHit`；真实角色一律走 `CharacterFactory.create(cid, level)`。
 - `Character` 的拷贝构造器**浅拷贝属性数组**（`DoubleValue` 与原件共享）→
   给副本挂 buff 会改到原件的面板。当前无调用者。
+- ⚠️ 中间档位晋阶倍率是**线性近似**，与游戏「面板成长」表不相等（只有 Lv1/Lv80 两个锚点重合），
+  见 §12.2 与 `CharacterFactoryTest.onlyTheLevel1AndLevel80AnchorsMatchTheGameTable`。
 
 ---
 
