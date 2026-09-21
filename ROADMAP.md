@@ -152,7 +152,7 @@
 |                       | P3-1 能量字段 + gainEnergy + EnergyProvider     | ✅   |
 |                       | P3-2 回能接入 + 大招条件                       | ✅   |
 |                       | P3-3 击破回能联动                              | ✅   |
-|                       | P3-4 技能回能数据化（SPBase 落库，暂缓）        | ☐   |
+|                       | P3-4 技能回能数据化（SPBase 落库，部分完成）   | 部分 |
 | **P4 韧性/击破**      | P4-1 Enemy 韧性字段                            | ✅   |
 |                       | P4-2 削韧判定                                  | ✅   |
 |                       | P4-3 击破伤害                                  | ✅   |
@@ -956,26 +956,27 @@
 
 ---
 
-### P3-4 技能回能数据化（SPBase 落库，暂缓）
+### P3-4 技能回能数据化（SPBase 落库）🚧 部分完成
 
-- **状态**：**暂缓**。标准档常量（20/30/5）已经给出所有常规角色的**正确总量**，
-  只有离档技能会差（镜流/阿格莱雅战技 20、爻光普攻 30、青雀/刃/饮月/流萤/波提欧/火花 战技 0）——
-  这些属于「真做角色」时才需要保真的东西，跟 P8-2/P8-3 一起做，别单独提前。
-- **目标**：技能回能不要写死 20/30/5，改成读数据（P3-0 口径 2/3/4）。
-- **涉及文件**：新建 `src/main/resources/data/skill_energy.json`（`data/` 被 gitignore → 生成后 `git add -f`）、
-  `models/Skill` 数据类、`models/energy/StandardEnergyProvider.java`、新建 `test/SkillEnergyDataTest.java`
-- **怎么做**：
-    1. 生成 `skill_energy.json`：`{"<skill_id>": {"sp_base": N, "sp_hit_ratio_sum": M}}`
-        - `sp_base` ← `ExcelOutput/AvatarSkillConfig.json` 的 `SPBase`
-        - `sp_hit_ratio_sum` ← `Config/ConfigAbility/Avatar/Avatar_*_Ability.json` 的 `SPHitRatio` 按技能聚合（默认 1）
-        - 只保留本项目 `skills.json` 里真实存在的 skill_id（103 个角色 × 6 槽）
-    2. 技能数据类加 `spBase` / `spHitRatioSum`（缺省 `-1` = 无数据）
-    3. `StandardEnergyProvider`：有数据 → `EnergyGain.normal(sp_base × sp_hit_ratio_sum)`；无数据 → `Constant` 兜底
-    4. **不要再乘段数**：弹射类的 `sp_base` 已经是每段值，`sp_hit_ratio_sum` 已经含段数（P3-0 口径 3/4）
-- **验收**：`SkillEnergyDataTest`：
-    - 银枝战技 130202 → 30；艾丝妲战技 100902 → 30（6 × 5）；瓦尔特战技 100402 → 30（10 × 3）
-    - 青雀战技 120102 → 0（不回能）；刃战技 120502 → 0；流萤战技 131002 → 0（改由角色 provider 给 60% 上限）
-    - 景元追加攻击 → 0、黑塔追加攻击 → 5（对齐 HSR.md §3.3 的示例）
+- **状态**（2026-09-21）：
+    - ✅ **已做**：`sp_base` 落库（`skills.json` 的新字段）+ `Skill`/`SkillData` 读取 +
+      `StandardEnergyProvider` 改读数据。**修掉一个真缺陷**：6 个"特殊资源"角色
+      （飞霄/黄泉/遐蝶/白厄/昔涟/银狼LV.999）此前被凭空发 20/30/5 能量，现在正确为"不回能"。
+    - ⏳ **未做**：`sp_hit_ratio_sum` 聚合。所以**多段/弹射技能的段数乘算仍然缺失**，
+      6 个角色（艾丝妲/桑博/那刻夏/同谐开拓者 ×2、瓦尔特）的战技回能偏低（取到每段值 6/10）。
+- **还差的那一步怎么做**（数据源已确认存在）：
+    1. `Config/ConfigAbility/Avatar/Avatar_*_Ability.json` 里有 `SPHitRatio`
+       （实测艾丝妲为 `{"IsDynamic": false, "FixedValue": {"Value": 1}}`，**每个伤害动作一个**）。
+       248 个文件，需要**按技能把 SPHitRatio 求和**（默认 1）。
+    2. 生成 `data/skill_energy.json`：`{"<skill_id>": {"sp_base": N, "sp_hit_ratio_sum": M}}`
+       （`data/` 被 gitignore → 生成后 `git add -f`）。
+    3. `StandardEnergyProvider`：`EnergyGain.normal(sp_base × sp_hit_ratio_sum)`；
+       无数据 → `Constant` 兜底。
+    4. **不要再额外乘段数**：弹射类的 `sp_base` 已是每段值，`sp_hit_ratio_sum` 已含段数（P3-0 口径 3/4）。
+- **验收**（补 `SkillEnergyDataTest`）：银枝战技 130202 → 30；艾丝妲战技 100902 → 30（6 × 5）；
+  瓦尔特战技 100402 → 30（10 × 3）；景元追加攻击 → 0；黑塔追加攻击 → 5。
+- **现有护栏**：`EnergyGainDataTest` 已把 6 个"不回能"角色、爻光离档值（普攻 30）、
+  以及 8 个"战技离档"角色**穷举登记**，所以补上聚合后这些断言会立刻提示需要更新哪几个。
 - **依赖**：P3-1（provider 接口）；真角色接线仍是 P8-3
 
 ---

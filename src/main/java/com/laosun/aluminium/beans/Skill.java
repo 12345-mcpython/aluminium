@@ -11,7 +11,9 @@ public record Skill(@SerializedName("attack_type") String attackType, @Serialize
                     @SerializedName("skill_effect") String skillEffect, @SerializedName("skill_id") int skillID,
                     @SerializedName("skill_introduction") Translate skillIntroduction,
                     @SerializedName("stance_list") StanceList stanceList,
-                    DamageElement element) {
+                    DamageElement element,
+                    @SerializedName("sp_need") Double spNeed,
+                    @SerializedName("sp_base") Double spBase) {
     public record StanceList(int single, int all, int spread) {
     }
 }
