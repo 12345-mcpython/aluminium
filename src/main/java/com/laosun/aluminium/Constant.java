@@ -70,6 +70,14 @@ public final class Constant {
     public static final Map<Integer, Map<Integer, HardLevelGroup>> HARD_LEVEL_GROUPS;
 
     /**
+     * 敌人技能表（{@code enemy_skills.json}，P5-3 自建）：{@code 怪物实例 id → 技能}。
+     *
+     * <p>⚠ 这张表的**倍率是猜的**（数据源里没有敌人技能表），每条数据带 {@code guessed} 标记。
+     * 见 {@link com.laosun.aluminium.beans.EnemySkillData}。
+     */
+    public static final Map<Integer, EnemySkillData> ENEMY_SKILLS;
+
+    /**
      * Maps percentage-type attributes to their corresponding base-type attributes.
      * E.g. HEALTH_PERCENT → HEALTH means health percentage bonuses are merged
      * into the HEALTH attribute's modifier list.
@@ -165,6 +173,17 @@ public final class Constant {
     public static final int BROKEN_REMAIN_TURNS = 2;
 
     /**
+     * 超击破独立增伤（P4-6）：{@code 1 + SUPER_BREAK_BOOST} 乘进超击破伤害。
+     *
+     * <p>与常规增伤区**无关**——超击破不吃属性/攻击类型增伤（由 {@code DamageType.SUPER_BREAK}
+     * 的 {@code isBoostable() == false} 挡掉），所以它是一个**独立乘区**，只能从这里取。
+     *
+     * <p>**示例值，TODO data**：文档只写"2.2 版本仅开拓者·同谐提供"（其行迹按场上敌人数给
+     * 20%~60%），没有可查的数值表，先用 0.4 占位。
+     */
+    public static final double SUPER_BREAK_BOOST = 0.4;
+
+    /**
      * 击破 DOT 每次结算的基础伤害 = 击破基数 × 本比例（**示例值，TODO data**：
      * HSR.md §2 只写"基础倍率由等级与击破特攻决定（查数值表）"，逐元素倍率还没拿到）。
      */
@@ -206,6 +225,16 @@ public final class Constant {
                 }.getType()));
         BREAKING_RATE = JSONReader.fromJSON("breaking_rate.json", new TypeToken<Map<Integer, Double>>() {
         }.getType());
+        // enemy_skills.json 顶层是 { "_comment": [...], "skills": {怪物id: {...}} }，
+        // 用一个内联 record 只取 skills（Gson 会忽略未声明的 _comment）。
+        EnemySkillsFile enemySkills = JSONReader.fromJSON("enemy_skills.json", EnemySkillsFile.class);
+        ENEMY_SKILLS = Map.copyOf(enemySkills.skills());
+    }
+
+    /**
+     * {@code enemy_skills.json} 的顶层结构（只为跳过 {@code _comment}）。
+     */
+    private record EnemySkillsFile(Map<Integer, EnemySkillData> skills) {
     }
 
     /**

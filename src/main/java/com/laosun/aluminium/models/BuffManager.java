@@ -27,6 +27,7 @@ public class BuffManager {
                 existed.removeBuff(instance);
             }
         }
+        buff.setOwner(instance);      // C-1：记录持有者，供按侧注入乘区的 buff 判断自己站在哪一边
         buffs.add(buff);
         buff.applyEffect(instance);
     }
@@ -104,6 +105,55 @@ public class BuffManager {
             }
             return false;
         });
+    }
+
+    /**
+     * 身上是否挂着某一类的 buff（P4-6 / P8-7 / P10-2 都要用）。
+     *
+     * <p>为什么是"问一类"而不是"把列表交出去"（P1-7 的设计决定）：遍历与判定留在 manager 内部，
+     * 外部拿不到可变列表，也就不存在"调用方改列表导致 {@code ConcurrentModificationException}"的口子。
+     *
+     * <p>按 {@code getClass()} 精确匹配，与 {@link AbstractBuff#isSameKind(AbstractBuff)} 同一口径
+     * ——子类不算父类（要判"有没有某条血统"请自己传父类并改用 {@code isInstance} 语义的新方法，
+     * 不要在这里偷偷放宽）。
+     *
+     * @param kind 要查询的 buff 类型
+     * @return {@code true} = 身上有这一类的 buff
+     */
+    public boolean hasBuff(Class<? extends AbstractBuff> kind) {
+        if (kind == null) {
+            return false;
+        }
+        for (AbstractBuff buff : buffs) {
+            if (buff.getClass() == kind) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 取身上第一个该类型的 buff，没有则 {@code null}（P5-2 起需要：目标选择器要拿到
+     * **嘲讽者本人**，光知道"有没有"不够）。
+     *
+     * <p>它是 {@link #hasBuff(Class)} 的严格超集（{@code findBuff(X) != null} 即"有"）。
+     * 仍然**不暴露 {@code getBuffs()}**：遍历留在 manager 内部是 P1-7 的决定，
+     * 把可变列表交出去会多一个 {@code ConcurrentModificationException} 的口子。
+     *
+     * @param kind 要查询的 buff 类型
+     * @param <T>  buff 类型
+     * @return 该类型的第一个 buff，没有则 {@code null}
+     */
+    public <T extends AbstractBuff> T findBuff(Class<T> kind) {
+        if (kind == null) {
+            return null;
+        }
+        for (AbstractBuff buff : buffs) {
+            if (buff.getClass() == kind) {
+                return kind.cast(buff);
+            }
+        }
+        return null;
     }
 
     public void clearAll() {

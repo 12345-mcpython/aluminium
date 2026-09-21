@@ -111,6 +111,48 @@ public class DamageHookTest {
         Assertions.assertEquals(600, settle(attacker, enemy()), EPS);
     }
 
+    // ==================================================================
+    // C-1：注入乘区的 buff 必须只看自己站在哪一侧
+    //   Battle.assemble 把 DamageEvent 广播给攻守双方，所以"挂在哪一侧"必须由 buff 自己判，
+    //   否则挂在敌人身上的易伤会连它自己的输出一起提高、挂在角色身上的减伤会削自己的输出。
+    // ==================================================================
+
+    @Test
+    public void vulnerabilityOnTheAttackerDoesNotBoostItsOwnAttacks() {
+        Character attacker = attacker();
+        attacker.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+
+        // 受击方身上没有易伤 → 这一击就是干净的 1000（易伤只算"我挨的那一下"）
+        Assertions.assertEquals(1000, settle(attacker, enemy()), EPS);
+    }
+
+    @Test
+    public void vulnerabilityStillAppliesWhenItsOwnerIsTheDefender() {
+        // 与上一条配对：挂对了侧就必须照常生效（防止"一刀切不生效"的假修复）
+        Character attacker = attacker();
+        Enemy enemy = enemy();
+        enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+
+        Assertions.assertEquals(1500, settle(attacker, enemy), EPS);
+    }
+
+    @Test
+    public void reductionOnTheAttackerDoesNotWeakenItsOwnAttacks() {
+        Character attacker = attacker();
+        attacker.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
+
+        Assertions.assertEquals(1000, settle(attacker, enemy()), EPS, "减伤只挡「我挨的那一下」");
+    }
+
+    @Test
+    public void reductionStillAppliesWhenItsOwnerIsTheDefender() {
+        Character attacker = attacker();
+        Enemy enemy = enemy();
+        enemy.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
+
+        Assertions.assertEquals(700, settle(attacker, enemy), EPS);
+    }
+
     /**
      * 测试内嵌的攻击方负面 buff：证明 {@code DamageEvent} 会在攻击方一侧被触发。
      * （生产用的 WeaknessBuff 留给 P10-3 统一做。）

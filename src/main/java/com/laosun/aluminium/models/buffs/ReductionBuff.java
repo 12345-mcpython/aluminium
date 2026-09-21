@@ -12,6 +12,10 @@ import com.laosun.aluminium.models.event.DamageEvent;
  *
  * <p>和 {@link VulnerabilityBuff} 一样是"结算时注入乘区"的 buff：不改属性、无持久状态。
  * 来源标记用 {@link ModifierSource#BUFF}（减伤 = 受击方增益，HSR.md §2.2）。
+ *
+ * <p><b>按侧生效（C-1）</b>：{@code Battle.assemble} 会把 {@code DamageEvent} 广播给攻守双方，
+ * 所以必须用 {@link AbstractBuff#owner} 判"我是不是本段的受击方"——否则减伤 buff 会让持有者
+ * **自己的输出**也乘 0.7。
  */
 public class ReductionBuff extends AbstractBuff implements DamageEvent {
     private final double ratio;
@@ -43,6 +47,9 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
 
     @Override
     public void onDamage(Battle battle, Damage damage) {
+        if (!damage.isOnDefenderSide(owner)) {
+            return;                                  // C-1：减伤只挡"我挨的那一下"，不削弱"我打出去的那一下"
+        }
         damage.addReduction(ratio, ModifierSource.BUFF, id);
     }
 }

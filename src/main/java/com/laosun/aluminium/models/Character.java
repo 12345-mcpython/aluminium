@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.utils.AttributeBuilder;
@@ -62,6 +63,21 @@ public class Character extends CanHit {
 
     private EnumMap<SkillType, Integer> skillLevel;
 
+    /**
+     * 命途（P5-1）：决定基础仇恨值，进而决定敌人选中该角色的概率。
+     * 由 {@code character_data.json} 的 {@code mt} 解析，缺数据时 {@link Path#OTHER}。
+     */
+    private Path path = Path.OTHER;
+
+    /**
+     * 角色自身的仇恨值（{@code character_data.json} 的 {@code aggro}）。
+     *
+     * <p>它就是游戏倍率本身（存护 150 / 毁灭 125 / 其他 100 / 巡猎·智识 75），
+     * 所以 {@code Battle.aggroOf} 优先用它，{@code path} 只作为没有该数据时的兜底。
+     * {@code 0} = 没有数据。
+     */
+    private int aggro;
+
     protected Character(Translate name, DoubleValue[] attributes) {
         super(name.english(), Camp.PLAYER, attributes);
     }
@@ -76,6 +92,8 @@ public class Character extends CanHit {
         this.relicSuit = other.relicSuit != null ? other.relicSuit.clone() : null;
         this.weapon = other.weapon != null ? other.weapon.clone() : null;
         this.skillLevel = other.skillLevel != null ? other.skillLevel.clone() : null;
+        this.path = other.path;
+        this.aggro = other.aggro;
     }
 
     /**
@@ -140,6 +158,10 @@ public class Character extends CanHit {
         private boolean isPromote = false;
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
         private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
+        /**
+         * 显式指定的命途；{@code null} = 用角色数据里的 {@code mt} 推导（默认路径）。
+         */
+        private Path path;
 
         private final EnumMap<SkillType, Integer> skillLevel = new EnumMap<>(SkillType.class);
 
@@ -213,6 +235,14 @@ public class Character extends CanHit {
         }
 
         /**
+         * 显式指定命途（默认从角色数据的 {@code mt} 推导，一般不用调）。
+         */
+        public Builder path(Path path) {
+            this.path = path;
+            return this;
+        }
+
+        /**
          * Sets a custom data provider for character base stats (for testing).
          */
         public Builder characterDataProvider(CharacterDataProvider characterDataProvider) {
@@ -246,6 +276,9 @@ public class Character extends CanHit {
             character.setSkills(skills);
             character.setSkillLevel(skillLevel);
             character.setLevel(level);
+            // P5-1：命途与仇恨来自角色数据（mt=命途字符串，aggro=游戏倍率本身）
+            character.setPath(this.path != null ? this.path : Path.fromMt(characterData.mt()));
+            character.setAggro(characterData.aggro() > 0 ? characterData.aggro() : 0);
             return character;
         }
 

@@ -1,0 +1,75 @@
+{
+    "_comment": [
+        "敌人技能表（P5-3 自建）。",
+        "",
+        "⚠ 本项目的游戏数据里【没有】敌人技能表：skills.json 只有角色技能，tbgd 的下发数据也没有",
+        "怪物技能倍率。所以下面这些倍率是【猜】的，不是实测值 —— 每条都标了 guessed=true。",
+        "找到源数据后（P9-1/P9-2）只换这张表与 Constant 的加载，引擎侧不需要改。",
+        "",
+        "键 = monster_config.json 的【怪物实例 id】（不是 template_id）。",
+        "",
+        "字段：",
+        "  id           技能 id（唯一，留作 P9 接真实技能表时的键）",
+        "  name         显示名（中/英）",
+        "  element      伤害元素；null = 用该怪自身的 stance_type（模板里的韧性属性）",
+        "  multiplier   倍率：伤害 base = 敌人攻击力 x multiplier",
+        "  hits         段数（每段独立结算、独立判定暴击）",
+        "  damage_type  伤害类型，字符串见 DamageType.fromString（normal / skill / ...）",
+        "  guessed      true = 倍率是猜的",
+        "",
+        "倍率取值的依据（只为让数值量级合理，不是复刻）：",
+        "  1.0   —— 常规杂兵的单体普攻。",
+        "  0.6   —— 低阶小怪（次元扑满这类）打得更轻。",
+        "  1.0 x 2 段 —— 多段型敌人（虚卒·践踏者）的普攻，每段独立暴击。",
+        "",
+        "覆盖范围：只给演示用到的 5 只怪配了条目。其余怪物由 EnemyFactory 兜底（倍率 1.0、",
+        "单段、元素取自身 stance_type），所以任何怪都能打人，不会因为没数据就站着不动。"
+    ],
+    "skills": {
+        "1002011": {
+            "id": 100201101,
+            "name": { "chinese": "冰锋突刺", "english": "Ice Edge Thrust" },
+            "element": "Ice",
+            "multiplier": 1.0,
+            "hits": 1,
+            "damage_type": "normal",
+            "guessed": true
+        },
+        "8013010": {
+            "id": 801301001,
+            "name": { "chinese": "连续踏击", "english": "Trampling Stomp" },
+            "element": "Physical",
+            "multiplier": 1.0,
+            "hits": 2,
+            "damage_type": "normal",
+            "guessed": true
+        },
+        "8032010": {
+            "id": 803201001,
+            "name": { "chinese": "警棍挥击", "english": "Baton Swipe" },
+            "element": "Physical",
+            "multiplier": 1.0,
+            "hits": 1,
+            "damage_type": "normal",
+            "guessed": true
+        },
+        "8002040": {
+            "id": 800204001,
+            "name": { "chinese": "横冲直撞", "english": "Reckless Charge" },
+            "element": "Physical",
+            "multiplier": 0.6,
+            "hits": 1,
+            "damage_type": "normal",
+            "guessed": true
+        },
+        "8001010": {
+            "id": 800101001,
+            "name": { "chinese": "烈焰喷吐", "english": "Flame Spit" },
+            "element": "Fire",
+            "multiplier": 1.0,
+            "hits": 1,
+            "damage_type": "normal",
+            "guessed": true
+        }
+    }
+}

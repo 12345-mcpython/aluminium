@@ -1,205 +1,366 @@
 package com.laosun;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.*;
+import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.buffs.BoostDamageBuff;
-import com.laosun.aluminium.models.buffs.StunBuff;
-import com.laosun.aluminium.models.buffs.TestBuff;
-import com.laosun.aluminium.models.buffs.TestBuff1;
-import com.laosun.aluminium.models.tests.TestSkillGroup1;
-import com.laosun.aluminium.utils.LevelPromotionCalc;
-import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
+import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.DefaultSkill;
+import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.Enemy;
+import com.laosun.aluminium.models.EnemyFactory;
+import com.laosun.aluminium.models.ExtraBasicPromote;
+import com.laosun.aluminium.models.Relic;
+import com.laosun.aluminium.models.RelicSuit;
+import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.Skill;
+import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.ai.TargetSelector;
+import com.laosun.aluminium.models.buffs.SuperBreakBuff;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
+/**
+ * aluminium 引擎演示：一场完整的战斗。
+ *
+ * <p>这份 `main` 只走引擎当前**真正支持**的东西：
+ * <ul>
+ *   <li>角色面板：真实数据（character_data → 等级缩放 → 光锥 → 遗器 → 行迹 → 额外加成）</li>
+ *   <li>敌人面板：真实数据（{@link EnemyFactory#create} = 模板 × 等级组 × 实例系数）</li>
+ *   <li>行动条：{@code 10000 / 速度}，击破推条 25%</li>
+ *   <li>回合流程：{@code stepForward → beforeMove → 出手 → afterMove}</li>
+ *   <li>伤害：完整乘区（增伤 / 暴击 / 防御 / 抗性 / 易伤）+ 事件钩子</li>
+ *   <li>韧性：削韧 → 击破伤害 → 推条 → 挂 DOT → 击破回能</li>
+ *   <li>超击破：带 {@link SuperBreakBuff} 时，超出韧性条的削韧转化成一发额外伤害</li>
+ *   <li>DOT：敌人回合开始时按"先上先结算"结算</li>
+ *   <li>能量：技能回能 / 受击回能 / 击杀回能 / 终结技清零再回 5 / 满能量才能放大招</li>
+ *   <li>生死：HP 归零 → 移出行动条；任一方全灭 → 战斗结束</li>
+ * </ul>
+ *
+ * <p><b>引擎还没有的</b>（demo 里用近似手段绕开，并标注了）：
+ * 敌方 AI（P5）、治疗/护盾（P6）、轮次制 150/100 与关卡波次（P7）、敌方真实技能表（P9）。
+ *
+ * <p>随机数全程走注入的 {@link Random}：固定种子 → 整场可复现。
+ */
 public class Main {
-    // private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    static void main() {
-        IO.println(Relic.createRandomLevelZero(RelicType.BODY, 5));
-        Relic hyaBody = Relic.builder()
-                .type(RelicType.BODY)
-                .star(5)
-                .level(15)
-                .mainAttribute(AttributeType.OUTGOING_HEALING_BOOST)
-                .subAttribute(AttributeType.HEALTH_PERCENT, 1, 3)
-                .subAttribute(AttributeType.DEFENCE_PERCENT, 0, 0)
-                .subAttribute(AttributeType.SPEED, 1, 1)
-                .subAttribute(AttributeType.CRIT_ATTACK, 2, 5)
-                .build();
+    public static void main() {
+        System.out.println("=".repeat(78));
+        System.out.println(" aluminium 战斗演示：姬子 / 三月七 / 罗刹  vs  冰锋 + 基层员工·外勤 + 次元扑满");
+        System.out.println("=".repeat(78));
+        System.out.println();
 
-        Relic hyaLine = Relic.builder()
-                .type(RelicType.LINE)
-                .star(5)
-                .level(15)
-                .mainAttribute(AttributeType.ENERGY_REGENERATION_RATE)
-                .subAttribute(AttributeType.HEALTH_PERCENT, 3, 3)
-                .subAttribute(AttributeType.SPEED, 1, 4)
-                .subAttribute(AttributeType.EFFECT_RESISTANCE, 1, 3)
-                .subAttribute(AttributeType.BREAKING_EFFECT, 0, 2)
-                .build();
+        List<Character> team = List.of(himeko(), march7th(), luocha());
 
-        Relic hyaBall = Relic.builder()
-                .type(RelicType.BALL)
-                .star(5)
-                .level(15)
-                .mainAttribute(AttributeType.HEALTH_PERCENT)
-                .subAttribute(AttributeType.DEFENCE, 0, 2)
-                .subAttribute(AttributeType.SPEED, 3, 5)
-                .subAttribute(AttributeType.CRIT_CHANCE, 2, 3)
-                .subAttribute(AttributeType.EFFECT_RESISTANCE, 0, 2)
-                .build();
-
-        Relic hyaBoot = Relic.builder()
-                .type(RelicType.BOOT)
-                .star(5)
-                .level(15)
-                .mainAttribute(AttributeType.SPEED)
-                .subAttribute(AttributeType.HEALTH_PERCENT, 3, 4)
-                .subAttribute(AttributeType.DEFENCE_PERCENT, 0, 2)
-                .subAttribute(AttributeType.CRIT_ATTACK, 1, 1)
-                .subAttribute(AttributeType.EFFECT_RESISTANCE, 0, 0)
-                .build();
-
-        Relic hyaHand = Relic.builder()
-                .type(RelicType.HAND)
-                .star(5)
-                .level(15)
-                .mainAttribute(AttributeType.ATTACK)
-                .subAttribute(AttributeType.DEFENCE, 0, 1)
-                .subAttribute(AttributeType.HEALTH_PERCENT, 1, 3)
-                .subAttribute(AttributeType.SPEED, 3, 3)
-                .subAttribute(AttributeType.EFFECT_RESISTANCE, 0, 0)
-                .build();
-
-        Relic hyaHead = Relic.builder()
-                .type(RelicType.HEAD)
-                .star(5)
-                .level(15)
-                .mainAttribute(AttributeType.HEALTH)
-                .subAttribute(AttributeType.HEALTH_PERCENT, 1, 1)
-                .subAttribute(AttributeType.SPEED, 3, 7)
-                .subAttribute(AttributeType.CRIT_CHANCE, 0, 1)
-                .subAttribute(AttributeType.EFFECT_HIT_RATE, 1, 2)
-                .build();
-        IO.println(hyaBody);
-        IO.println(hyaLine);
-        IO.println(hyaBall);
-        IO.println(hyaBoot);
-        IO.println(hyaHand);
-        IO.println(hyaHead);
-        RelicSuit hya = new RelicSuit();
-        hya.addMore(hyaBody, hyaLine, hyaBall, hyaBoot, hyaHand, hyaHead);
-        Object2DoubleOpenHashMap<AttributeType> relicValue = new Object2DoubleOpenHashMap<>();
-        hya.calcTotalValue(relicValue);
-        IO.println(relicValue);
-        IO.println(Constant.WEAPONS.get(23042).name().english());
-        IO.println(Constant.CHARACTERS.get(1409).name().english());
-
-        IO.println(LevelPromotionCalc.calcCharacterRate(80));
-        IO.println(LevelPromotionCalc.calcWeaponRate(80));
-        IO.println(Constant.CHARACTERS.get(1409).health());
-        IO.println(Constant.WEAPONS.get(23042).health());
-        IO.println(Constant.WEAPONS.get(23042).weaponSkillData().getFirst().abilityProperties());
-        Weapon wp = Weapon.build(23042, 80);
-        Character character = Character.builder()
-                .cid(1409)
-                .level(80)
-                .relicSuit(hya)
-                .weapon(wp)
-                .extraValue(new ExtraBasicPromote(0, 0, 0, 0, 0, 0, 0, 0.12))
-                .build();
-        IO.println(character.getAttribute(AttributeType.HEALTH));
-        IO.println(character.getAttribute(AttributeType.DEFENCE));
-        IO.println(character.getAttribute(AttributeType.SPEED));
-        DoubleValue dp = character.getAttribute(AttributeType.HEALTH).clone();
-        dp.addModifier(DoubleValue.Modifier.addPercent(0.20));
-        IO.println(dp);
-        IO.println();
-        for (DoubleValue db : character.getAttributes()) {
-            IO.println(db);
+        // ── 敌人：真实数据。三只简单杂兵，各有弱点/抗性，且都装了 enemy_skills.json 的普攻 ──
+        //  冰锋 1002011   弱火/雷、冰抗 0.2、韧性 60
+        //  基层员工 8032010  物理
+        //  次元扑满 8002040  低倍率（0.6）的小怪
+        List<Enemy> enemies = new ArrayList<>(List.of(
+                EnemyFactory.create(1002011, 90, 1),
+                EnemyFactory.create(8032010, 90, 1),
+                EnemyFactory.create(8002040, 90, 1)));
+        for (Enemy enemy : enemies) {
+            // 真实血量偏低，拉高一点让战斗能打满几个回合、看得到 DOT 与击破循环。
+            // 生命上限存在属性数组的 HEALTH 槽里；currentHp 没有 setter，所以提高上限后 heal 补满。
+            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(48_000));
+            enemy.heal(48_000);
+            enemy.setMaxEnergy(0);               // 怪物没有能量条：maxEnergy == 0 → 所有回能 no-op
+            printEnemy(enemy);
         }
-        SkillPoint.printTree(SkillPoint.init(1409));
-        IO.println(SkillPoint.sumAttributes(SkillPoint.init(1409)));
-        IO.println("\n\n");
+        System.out.println();
 
-        // battle test
-        Character c1 = Character.fromAttributes("c1", 100, 100, 100, 100);
-        c1.onBattleStart = () -> IO.println("c1 onBattleStart");
-        Character c2 = Character.fromAttributes("c2", 200, 200, 100, 200);
-        c2.setSkillLevel(SkillType.ULTRA, 5);
-        c2.setSkillByClass(SkillType.ULTRA, TestSkillGroup1.TestSkill1::new);
-        c2.beforeMove = () -> {
-            c2.takeDamage(10);
-            c2.getBuffManager().addBuff(new BoostDamageBuff(2, .5));
-        };
-        Character c3 = Character.fromAttributes("c3", 300, 500, 100, 160);
-
-        Enemy e1 = Enemy.fromAttributes("e1", 1000, 100, 100, 100);
-        Enemy e2 = Enemy.fromAttributes("e2", 1000, 100, 100, 160);
-        Enemy e3 = Enemy.fromAttributes("e3", 1000, 100, 100, 125);
-        Battle battle = new Battle(List.of(c1, c2, c3), List.of(e1, e2, e3));
-        IO.println("battle init finished");
+        // ── 开战 ───────────────────────────────────────────────────────────────
+        Battle battle = new Battle(team, enemies, new Random(20260919));
         battle.startBattle();
-        IO.println("Battle started");
-        battle.printBattle();
-        battle.castUltra(c1, battle.enemies);
-        IO.println("Release ULTRA!");
-        battle.printBattle();
-        IO.println("Round 1 started");
-        round(battle);
-        IO.println("Round 1 ended");
-        c3.getBuffManager().addBuff(new StunBuff(2));
-        c2.getBuffManager().addBuff(new TestBuff(3));
-        c2.getBuffManager().addBuff(new TestBuff1(4));
-        IO.println("Add buff");
-        for (int i = 0; i < 40; i++) {
-            round(battle);
+
+        // 对应开拓者·同谐【伴舞】的简化：队友身上挂一个超击破标记
+        team.getFirst().getBuffManager().addBuff(new SuperBreakBuff(99));
+        System.out.println("[开场] 姬子 获得 SuperBreakBuff（超击破标记）");
+        printQueue(battle);
+        System.out.println();
+
+        int round = 0;
+        while (!isOver(battle) && round < 30) {
+            round++;
+            System.out.println("────────────────── 第 " + round + " 回合 ──────────────────");
+            step(battle);
+            System.out.println();
+        }
+
+        System.out.println("=".repeat(78));
+        System.out.println(firstAliveEnemy(battle) == null
+                ? " 战斗结束：我方胜利（" + round + " 回合）"
+                : " 达到回合上限，战斗未结束（剩余敌人 "
+                        + battle.targetableEnemies().size() + " 只）");
+        System.out.println("=".repeat(78));
+        battle.printHp();
+    }
+
+    // ==================================================================
+    // 一个回合
+    // ==================================================================
+
+    private static void step(Battle battle) {
+        battle.stepForward();
+        Signal current = battle.queue.getCurrentActor();
+        if (current == null) {
+            System.out.println("[行动条] 没有可行动的单位");
+            return;
+        }
+        CanHit actor = current.getCanHit();
+
+        // 1) 回合开始：敌人先结算 DOT，再跑 buff 与实体的 beforeMove 钩子
+        battle.beforeMove();
+        if (actor.isDeath()) {
+            System.out.println("[死亡] " + actor.getName() + " 在自己回合开始前被 DOT 结算掉了");
+            battle.afterMove();
+            return;
+        }
+
+        // 2) 出手
+        if (actor instanceof Enemy enemy) {
+            enemyTurn(battle, enemy);
+        } else {
+            characterTurn(battle, (Character) actor);
+        }
+
+        // 3) 回合结束：行动值归位 / 死者移出行动条 / buff 结算
+        battle.afterMove();
+        printQueue(battle);
+    }
+
+    /** 我方回合：能量满就放大招，否则用战技（非弱点退回普攻）。 */
+    private static void characterTurn(Battle battle, Character hero) {
+        System.out.println("[我方] " + hero.getName()
+                + "  HP " + fmt(hero.getCurrentHp()) + "/" + fmt(hero.getMaxHp())
+                + "  能量 " + fmt(hero.getCurrentEnergy()) + "/" + fmt(hero.getMaxEnergy()));
+
+        Enemy target = firstAliveEnemy(battle);
+        if (target == null) {
+            return;
+        }
+
+        // 满能量 → 终结技（引擎会先清零、结算本体、再回自身 5 点）
+        if (hero.isEnergyFull() && hero.getSkills().containsKey(SkillType.ULTRA)) {
+            System.out.println("        → 能量已满，释放【终结技】");
+            double hpBefore = target.getCurrentHp();
+            if (!battle.castUltra(hero, List.of(target))) {
+                System.out.println("        → 终结技释放失败");
+                return;
+            }
+            report(hero, target, hpBefore);
+            return;
+        }
+
+        Skill skill = hero.getSkills().get(SkillType.SKILL);
+        boolean weaknessHit = skill != null && skill.getData() != null
+                && target.isWeakTo(skill.getData().getElement());
+        if (!weaknessHit) {
+            skill = hero.getSkills().get(SkillType.COMMON);      // 非弱点 → 普攻
+        }
+        if (skill == null) {
+            return;
+        }
+        System.out.println("        → 使用" + (weaknessHit ? "【战技】" : "【普攻】"));
+        double hpBefore = target.getCurrentHp();
+        if (!battle.performAction(skill, List.of(target))) {
+            System.out.println("        → 出手失败（死亡 / 被控 / 行动条状态不对）");
+            return;
+        }
+        // ⚠️ performAction 只是**排队**；真正的结算在 afterMove() 的 processRequests() 里。
+        //    这里显式结算一次，好让下面的战报拿到真实数值（真实战斗循环里由 afterMove 负责）。
+        battle.processRequests();
+        report(hero, target, hpBefore);
+    }
+
+    /**
+     * 敌方回合（P5-5）：**引擎自己的 AI**，不再是手工打人。
+     *
+     * <p>流程：击破中 → 跳过；否则用 {@link TargetSelector} 按仇恨加权选一个活着的我方目标，
+     * 再用敌人自己的 {@link com.laosun.aluminium.models.EnemySkill} 出手
+     * （技能来自 {@code enemy_skills.json}，倍率是猜的，见该文件说明）。
+     */
+    private static void enemyTurn(Battle battle, Enemy enemy) {
+        System.out.println("[敌方] " + enemy.getName()
+                + "  HP " + fmt(enemy.getCurrentHp()) + "/" + fmt(enemy.getMaxHp())
+                + (enemy.isBroken() ? "  【已被击破 " + enemy.getBrokenElement() + "】" : "")
+                + "  韧性 " + fmt(enemy.getStance()) + "/" + fmt(enemy.getMaxStance()));
+
+        // 击破中：由调用方主动问，返回 true 表示"本回合跳过"
+        if (battle.handleBrokenTurn(enemy)) {
+            System.out.println("        → 处于击破状态，本回合不行动（剩 "
+                    + enemy.getBrokenRemainTurns() + " 回合恢复）");
+            return;
+        }
+
+        // 候选集 = 活着的我方（"谁能被选中"由调用方过滤，别选到尸体）
+        List<CanHit> candidates = new ArrayList<>();
+        for (Character c : battle.characters) {
+            if (!c.isDeath()) {
+                candidates.add(c);
+            }
+        }
+        if (candidates.isEmpty()) {
+            return;
+        }
+
+        // P5-4：按仇恨加权随机选目标（存护 150 比常规 100 更容易被打）
+        CanHit target = TargetSelector.select(battle, candidates, TargetSelector.Intent.SINGLE, battle.getRng());
+        Skill attack = enemy.getSkills().get(SkillType.COMMON);
+        if (target == null || attack == null) {
+            System.out.println("        → 没有可攻击的目标或技能");
+            return;
+        }
+
+        System.out.println("        → 选中 " + target.getName()
+                + "（仇恨 " + fmt(battle.aggroOf(target)) + "，全队总 "
+                + fmt(candidates.stream().mapToDouble(battle::aggroOf).sum()) + "）");
+        double hpBefore = target.getCurrentHp();
+        if (!battle.performAction(attack, List.of(target))) {
+            System.out.println("        → 出手失败");
+            return;
+        }
+        battle.processRequests();                    // 同上：排队后显式结算，好让战报拿到真实数值
+        System.out.println("        → " + enemy.getName() + " 造成 " + fmt(hpBefore - target.getCurrentHp())
+                + "：" + target.getName() + " HP " + fmt(target.getCurrentHp())
+                + "/" + fmt(target.getMaxHp())
+                + "，受击回能 → " + fmt(target.getCurrentEnergy()));
+        if (target.isDeath()) {
+            System.out.println("        → " + target.getName() + " 被击败，移出行动条");
         }
     }
 
-    public static int tick = 0;
+    // ==================================================================
+    // 输出
+    // ==================================================================
 
-    public static void round(Battle battle) {
-        IO.println("Round started");
-        battle.stepForward();
-        IO.println("Move");
-        battle.printBattle();
-        battle.beforeMove();
-        Signal current = battle.queue.getCurrentActor();
-        if (current != null) {
-            if (!(current.getCanHit() instanceof Enemy)) {
-                IO.println("current character: " + current.getCanHit().getName());
-                CanHit actor = current.getCanHit();
-                if (actor.getName().equals("c3")) {
-                    tick++;
-                }
-                IO.println(tick);
-                IO.println("Actor: " + actor.getName() + " start release skill!\n");
-                if (battle.performAction(actor.getSkills().get(SkillType.SKILL), battle.enemies)) {
-                    IO.println("Skill release successful");
-                } else {
-                    IO.println("Skill release failed. May be controlled or died");
-                }
-            } else {
-                Enemy enemy = (Enemy) current.getCanHit();
-                if (battle.handleBrokenTurn(enemy)) {      // P4-4：击破中 → 跳过这个回合
-                    IO.println("[BROKEN] " + enemy.getName() + " skips this turn");
-                } else {
-                    IO.println("current enemy: " + enemy.getName());
-                    IO.println("Skip");                    // TODO P5-5：敌人行动
-                }
-            }
-        } else {
-            IO.println("Character can't move or cause error!");
+    private static void report(Character hero, Enemy target, double hpBefore) {
+        System.out.println("        → " + hero.getName() + " 造成 " + fmt(hpBefore - target.getCurrentHp())
+                + "，能量 " + fmt(hero.getCurrentEnergy()) + "/" + fmt(hero.getMaxEnergy())
+                + "；" + target.getName()
+                + " HP " + fmt(target.getCurrentHp()) + "/" + fmt(target.getMaxHp())
+                + "，韧性 " + fmt(target.getStance()) + "/" + fmt(target.getMaxStance())
+                + (target.isBroken() ? " 【击破 " + target.getBrokenElement() + "】" : "")
+                + (target.getDots().isEmpty() ? "" : "  DOT×" + target.getDots().size()));
+        if (target.isDeath()) {
+            System.out.println("        → " + target.getName() + " 被击败");
         }
-        battle.afterMove();
-        battle.printBattle();
-        IO.println("Round finished\n\n");
+    }
+
+    private static void printEnemy(Enemy enemy) {
+        System.out.println("[敌人] " + enemy.getName()
+                + "  Lv" + enemy.getLevel()
+                + "  HP " + fmt(enemy.getMaxHp())
+                + "  攻 " + fmt(enemy.getAttribute(AttributeType.ATTACK).get())
+                + "  防 " + fmt(enemy.getAttribute(AttributeType.DEFENCE).get())
+                + "  速 " + fmt(enemy.getAttribute(AttributeType.SPEED).get()));
+        System.out.println("        弱点 " + enemy.getStanceWeak()
+                + "  韧性 " + fmt(enemy.getMaxStance())
+                + "  抗性 " + enemy.getDamageResist());
+    }
+
+    private static void printQueue(Battle battle) {
+        List<String> names = new ArrayList<>();
+        for (Signal signal : battle.getQueueSnapshot()) {
+            names.add(signal.getCanHit().getName()
+                    + "(" + fmt(battle.queue.getTimeRemaining(signal)) + ")");
+        }
+        System.out.println("[行动条] " + String.join(" → ", names));
+    }
+
+    // ==================================================================
+    // 组队（真实面板）
+    // ==================================================================
+
+    private static Character himeko() {
+        // 姬子 1003：火 / 速度 96 / 能量上限 120
+        RelicSuit relics = new RelicSuit();
+        relics.addMore(
+                relic(RelicType.HEAD, AttributeType.HEALTH, 705.6, AttributeType.CRIT_CHANCE, 0.12),
+                relic(RelicType.HAND, AttributeType.ATTACK, 352.8, AttributeType.ATTACK_PERCENT, 0.18),
+                relic(RelicType.BODY, AttributeType.ATTACK_PERCENT, 0.5, AttributeType.CRIT_ATTACK, 0.24),
+                relic(RelicType.BOOT, AttributeType.SPEED, 25, AttributeType.BREAKING_EFFECT, 0.3),
+                relic(RelicType.BALL, AttributeType.FIRE_DAMAGE_BOOST, 0.4, AttributeType.CRIT_CHANCE, 0.1),
+                relic(RelicType.LINE, AttributeType.ATTACK_PERCENT, 0.6, AttributeType.CRIT_ATTACK, 0.2));
+
+        Character hero = Character.builder()
+                .cid(1003)
+                .level(80)
+                .weapon(Weapon.build(23001, 80))
+                .relicSuit(relics)
+                .extraValue(new ExtraBasicPromote(0, 0, 0, 0, 0, 0, 0.12, 0))
+                .build();
+        hero.setMaxEnergy(120);
+        installSkills(hero, 1003);
+        return hero;
+    }
+
+    private static Character march7th() {
+        Character hero = Character.builder().cid(1001).level(80).build();
+        hero.setMaxEnergy(120);
+        installSkills(hero, 1001);
+        return hero;
+    }
+
+    private static Character luocha() {
+        Character hero = Character.builder().cid(1203).level(80).build();
+        hero.setMaxEnergy(100);
+        installSkills(hero, 1203);
+        return hero;
+    }
+
+    /**
+     * 显式装配真实技能槽。
+     *
+     * <p>注意这里**手工按槽位号**建 {@link DefaultSkill}（1=普攻、2=战技、3=终结技、
+     * 4=天赋、6=迷宫攻击、7=秘技）—— 因为 {@code Character.Builder} 现在把 6 个槽位
+     * 全指向槽位 1（P8-2 的占位）。这段装配就是 P8-2 要正式做掉的东西。
+     */
+    private static void installSkills(Character hero, int cid) {
+        hero.setSkill(SkillType.COMMON, new DefaultSkill(cid, 1, 1));
+        hero.setSkill(SkillType.SKILL, new DefaultSkill(cid, 2, 1));
+        hero.setSkill(SkillType.ULTRA, new DefaultSkill(cid, 3, 1));
+        hero.setSkill(SkillType.TALENT, new DefaultSkill(cid, 4, 1));
+        hero.setSkill(SkillType.SUMMON_SKILL, new DefaultSkill(cid, 6, 1));
+        hero.setSkill(SkillType.SUMMON_TALENT, new DefaultSkill(cid, 7, 1));
+    }
+
+    /** 手工造一件遗器：主词条 + 一条副词条（真实随机生成见 {@code Relic.createRandomLevelZero}）。 */
+    private static Relic relic(RelicType type, AttributeType main, double mainValue,
+                               AttributeType sub, double subValue) {
+        return Relic.create(15, 5, type,
+                new Relic.Attribute(main, mainValue),
+                List.of(new Relic.Attribute(sub, subValue)));
+    }
+
+    // ==================================================================
+    // 工具
+    // ==================================================================
+
+    private static boolean isOver(Battle battle) {
+        return firstAliveEnemy(battle) == null || firstAliveCharacter(battle) == null;
+    }
+
+    private static Enemy firstAliveEnemy(Battle battle) {
+        List<Enemy> alive = battle.targetableEnemies();
+        return alive.isEmpty() ? null : alive.getFirst();
+    }
+
+    private static Character firstAliveCharacter(Battle battle) {
+        for (Character c : battle.characters) {
+            if (!c.isDeath()) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    private static String fmt(double value) {
+        return String.format("%.0f", value);
     }
 }
