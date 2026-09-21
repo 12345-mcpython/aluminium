@@ -171,7 +171,7 @@
 |                       | P7-2 额外回合                                  | ✅   |
 |                       | P7-3 胜负状态机                                | ✅   |
 |                       | P7-4 StageBean + 波次                          | ✅   |
-|                       | P7-5 StageFactory + 难度                       | ☐   |
+|                       | P7-5 StageFactory + 难度                       | ✅   |
 | **P8 角色数据化**     | P8-0 角色机制数据化（架构总纲，先读）          | ☑   |
 |                       | P8-1 CharacterFactory + 角色字段补全           | ☐   |
 |                       | P8-2 技能装配（真实槽位 → 真实倍率）           | ☐   |
@@ -1694,26 +1694,30 @@ P7-1 落地后复查 `Queue`/`Signal` 时发现的四个真缺陷，与 P7-1 同
   期间还踩了两次：字符串常量其实在**嵌套类**的常量池里（不在 `Constant` 里）；
   以及编译器会把 `stages()` 内联，所以要断言 `Method stages:` 而不是 `StageHolder`。
 - **依赖**：P7-3（胜负状态机）
-### P7-5 StageFactory + 难度
+### P7-5 StageFactory + 难度 ✅
 
 - **目标**：`StageFactory.load(stageId)`：按 stage 的 `hard_level_group`/`level` 组装一个可运行 Battle。
 - **涉及文件**：新建 `utils/StageFactory.java`、新建 `test/StageFactoryTest.java`
-- **怎么做**：
-    1. `public static Battle load(int stageId)`：
-       ```java
-       public static Battle load(int stageId) {
-           StageBean stage = Constant.STAGES.get(stageId);
-           List<Character> team = List.of(
-                   Character.fromAttributes("P1", 100, 100, 100, 100),
-                   Character.fromAttributes("P2", 100, 100, 100, 100));   // 临时，TODO 数据化
-           Battle battle = new Battle(team, List.of());
-           new WaveManager(battle, stage).nextWave();
-           return battle;
-       }
-       ```
-- **验收**：`StageFactoryTest`：`load(103201)` 返回 Battle；`battle.enemies.size() == 3`；`stepForward()` 首轮后
-  `status != NOT_STARTED`（P7-3 后的 RUNNING）
-- **依赖**：P7-4、P2-4、P7-3
+- **实际怎么做**（与计划有出入，记录差异）：
+    1. 计划里写 `Constant.STAGES.get(stageId)` —— 那张表在 P7-4 改成了**懒加载**
+       `Constant.stages()`（9 MB，不放进静态块），所以这里用新入口。
+    2. `load()` 一共要做四件事，计划里只写了一件半：
+       ① 建 Battle（敌队先空着）；② 建 `WaveManager`（同时把波次登记进 `Battle`）；
+       ③ **`startBattle()`**（否则状态停在 `NOT_STARTED`，`stepForward()` 不推进；
+       计划的验收里写了"`stepForward()` 后 status != NOT_STARTED"，但没写这一步）；
+       ④ `nextWave()` + **`processRequests()`**（进怪是排队入场，漏了就只躺在
+       `addRequestItems` 里，行动条上是空的 —— 计划的代码片段就漏了这个）。
+    3. 加了重载 `load(stageId, team, rng)`：P8-5 要换真队、测试要固定种子，都得走它。
+       另外 `requireStage(id)` / `hasStage(id)` 把"关卡不存在"的报错说清楚 ——
+       包含 `stage.json` 未生成（返回空表）与 id 写错两种情况，信息不同。
+    4. 临时队伍给了 **3 人**（速度 100/134/90，各不相同以便行动条有区分度），
+       并**设了 120 能量上限** —— `fromAttributes` 的 `maxEnergy` 默认 0 表示"没有能量条"，
+       那种角色永远放不出终结技，关卡跑起来会缺一条主分支。
+- **验收**：`StageFactoryTest`（9 条）：能开打 / 难度来自关卡（高等级关卡怪血量更高）/
+  怪与关卡数据一致 / 固定种子可复现 / 能连跑回合 / 多波可进下一波 / 临时队伍可用 /
+  可自带队伍 / 非法输入被拒（含自解释报错）。
+- **变异验证**：① 去掉 `processRequests()` → 2 红；② 去掉 `startBattle()` → 3 红。
+- **依赖**：P7-4（`StageBean` + `WaveManager`）、P7-3（状态机）
 
 ---
 
