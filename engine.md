@@ -668,16 +668,16 @@ castUltra(user, targets):
 
 ---
 
-## 11. 增减伤 · 治疗 · 护盾的地位
+## 11. 增减伤 · 治疗 · 护盾 · 命中
 
 | 机制 | 状态 |
 |---|---|
 | 增伤 / 易伤 / 减伤 / 虚弱 | ✅ 四个区都实现，前三个有事件钩子 |
 | 暴击 / 防御 / 抗性 / 穿透 / 无视防御 | ✅ |
-| **治疗** | 🚧 只有 `CanHit.heal(amount)`（封顶到 `maxHp`、死者无效）。**治疗乘区没有**：`OUTGOING_HEALING_BOOST` 与 `HEAL_TAKEN_RATIO` 定义了但全仓库无读取者；没有任何地方调用 `heal()`。 |
-| **护盾** | ❌ 完全没有：无字段、无吸收逻辑、无 `Damage` 交互。`SkillEffectType.DEFENCE`（护盾技）在 `SkillExecutor` 里直接 return。 |
-| **效果命中 / 抵抗** | ❌ 没有命中判定公式。`EFFECT_HIT_RATE` / `EFFECT_RESISTANCE` 属性存在，但没有任何代码用它们算概率；`EnemyFactory` 还**漏了**把缩放后的 `effectHitRate` 写进敌人（`EnemyStats` 有值，`Enemy` 恒 0）。 |
-| **Debuff 基础概率** | ❌ 未数据化 |
+| **效果命中 / 抵抗** | ✅ P6-1：`Battle.hitChance` / `rollDebuff` / `tryApplyDebuff`，见 §20.1 |
+| **治疗** | ✅ P6-2：`Battle.calculateHeal` / `heal`，见 §20.2 |
+| **护盾** | ✅ P6-3：`CanHit.shield` + 先扣盾再扣血 + `Battle.grantShield`，见 §20.3 |
+| **Debuff 基础概率** | 🚧 公式与入口已就绪（P6-1），但**技能数据里还没有"基础概率"字段** —— 各 debuff 技的概率值要等 P9/P10 数据化 |
 | **控制异常状态机** | 🚧 只有最简单的 `StunBuff`（`canAct()=false`）；冻结/纠缠/禁锢等七系效果未做 |
 
 ---
@@ -871,8 +871,8 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
 | 敌方**战斗循环**（谁在什么时候驱动敌人回合） | `Battle` 不自己驱动敌方回合：`enemyTurn` 在 `Main` 里（P5-5 按 ROADMAP 的做法）。完整循环封装留给 P7-3 胜负状态机 / P11-1。**AI 本身（选目标 + 技能）已实现**，见 §19 |
 | 胜负判定 | 无全灭/超时判定 |
 | 关卡与波次 | `stage.json` 未加载，无波次切换 |
-| 效果命中判定 | 无概率公式，`EFFECT_HIT_RATE` 无用 |
-| 护盾 | 完全没有 |
+| 效果命中判定 | ✅ P6-1（公式 + 掷骰 + 施加入口），但**基础概率还没有数据来源** |
+| 护盾 | ✅ P6-3（先扣盾再扣血、不叠加、吸收量计入"造成伤害"） |
 | 终结技插入 | 无（`castUltra` 只是立即排队结算，不是插入行动轴） |
 | 速度操纵 | 无 buff 改速度，且无人调 `refreshSpeed()` |
 | 忆灵 / 欢愉 | 只有属性/类型占位，无机制 |
@@ -988,9 +988,9 @@ Buff 也拿不到"这一段是用什么槽位打出来的"。
 | §3.4 **仇恨系统 / 受击概率** | ✅ 已实现（P5-1/P5-2）：`Path` + `CharacterData.aggro` + `Battle.aggroOf/getAggroTable`。见 §19.1 |
 | §3.4 **嘲讽** | ✅ 已实现（P5-2）：`TauntBuff` 是纯标记，**硬指定目标**（单体 / 扩散中心）而非仇恨加权 —— 与 §3.4 的"按百分比提高仇恨值"写法不同，见 §19.2 与 `DOC_VS_CODE.md` A-1 |
 | §3.4 **嘲讽** | ❌ 未实现。**且规格这里与实际规则不符**：§3.4 写"按百分比提高角色仇恨值"（加权），实际规则是**硬指定目标** —— 嘲讽 buff 被附加后，攻击方（角色或怪物）的**单体攻击**与**扩散攻击的中心**只能选中该个体（双向）。所以嘲讽不是 `aggroOf` 里的乘法，而是目标选择阶段的强制约束；`TauntBuff` 应是**纯标记、无数值**。详见 `DOC_VS_CODE.md` A-1 |
-| §3.5 **效果命中与抵抗的生效概率公式** | ❌ 无实现；且 `EnemyFactory` 漏了把 `effectHitRate` 写进敌人（`Enemy` 里恒 0） |
-| §4 **护盾** | ❌ 无字段、无吸收逻辑（P6-3） |
-| §4 **治疗乘区** | 🚧 只有 `CanHit.heal(amount)`，两个治疗属性无人读（P6-2） |
+| §3.5 **效果命中与抵抗的生效概率公式** | ✅ 已实现（P6-1）：公式与 §3.5 一致，三个因子乘算。顺手修了 `EnemyFactory` 漏写 `effectHitRate` 的问题（之前敌人命中恒 0）。见 §20.1 |
+| §4 **护盾** | ✅ 已实现（P6-3）：`CanHit.shield` 先于 HP 被扣、不叠加。🚧 规格里的"护盾量提高"没有对应属性，护盾量目前就是传入值 |
+| §4 **治疗乘区** | ✅ 已实现（P6-2）：`Battle.calculateHeal/heal`。⚠ 规格的 `(1 - 治疗降低)` 与 `(1 + 受疗加成)` 合并成一个因子（`HEAL_TAKEN_RATIO` 取负即降低），因为属性表里没有单独的"治疗降低" |
 | §5 **忆灵系统**（独立单位/面板快照/连携攻击） | ❌ `Summon` 类从未被实例化 |
 | §6 **欢愉体系**（阿哈速度/笑点/好活当赏/欢愉伤害公式） | ❌ 只有 `DamageType.ELATION` 与 `AttributeType.ELATION_DAMAGE_BOOST` 两个占位；`elation_basic_level_damage.json`（101 条）**从未被加载** |
 | §7 **超击破** | ✅ 已实现（P4-6，2026-09-19）：`SuperBreakBuff` + `BreakDamageCalculator.buildSuperBreak` + `SkillExecutor` 里追加 `SUPER_BREAK` 段。**但**公式里的 `(1 + 削韧值提高)` 与 `(1 + 弱点击破效率提高)` 仍缺（属性不存在），`SUPER_BREAK_BOOST = 0.4` 是示例值 |
@@ -1096,4 +1096,65 @@ Damage(type = damage_type, element)   // 走 Battle.applyDamage 统一装配
 
 - 完整的战斗循环封装（含胜负判定）留给 P7-3 / P11-1。
 - `Battle.getOpponents(self)` 给出对手阵营列表（不过滤死亡）。
+
+---
+
+## 20. 命中 · 治疗 · 护盾 ✅ P6
+
+### 20.1 效果命中与抵抗（P6-1）
+
+```
+生效概率 = 基础概率 × (1 + 施加方效果命中) × (1 - 受击方效果抵抗) × (1 - 特定负面效果抵抗)
+```
+
+**三个因子都是乘算**（不是"命中减抵抗"），结果 clamp 到 `[0, 1]`：
+
+| 因子 | 来源 |
+|---|---|
+| 效果命中 | 施加者的 `EFFECT_HIT_RATE`（敌人从 `EnemyScaler` 的 `group.effectHitRate()` 来，90 级 = 0.32） |
+| 效果抵抗 | 受击者的 `EFFECT_RESISTANCE`（敌人是**加值**：模板 + 等级组） |
+| 特定负面效果抵抗 | 只有 `Enemy` 有：`debuffResist`（来自 `monster_config.json` 的 `debuff_resistance`，键是 `STAT_*` 串）。`(1 - specific)` 为 0 ⇒ **完全免疫** |
+
+三个入口，**别绕过**：
+
+- `hitChance(caster, target, base, key)` —— **只算概率，不掷骰**（AI 可以只看期望）。
+- `rollDebuff(...)` —— 用注入的 `rng` 掷骰（同种子 → 同结果）。
+- `tryApplyDebuff(caster, target, buff, base, key)` —— **技能侧施加 debuff 的统一入口**：
+  先过判定，命中才 `addBuff`。直接调 `target.getBuffManager().addBuff(...)` 会把命中/抵抗绕过去。
+
+数据实测：2649 条怪里 **999 条**带 `debuff_resistance`；出现过的键有
+`STAT_CTRL_Frozen / STAT_CTRL / STAT_Confine / STAT_Entangle / STAT_DOT_Burn / STAT_DOT_Electric / STAT_DOT_Poison`。
+
+> 🚧 **技能数据里还没有"基础概率"字段**（`skills.json` 没有这一列），所以现在
+> `baseChance` 只能由调用方写死。要把各 debuff 技的概率数据化，得等 P9/P10。
+
+### 20.2 治疗（P6-2）
+
+```
+治疗量 = 基础量 × (1 + 治疗加成) × (1 + 受疗加成)
+```
+
+- 两个因子来自**不同的人**：`OUTGOING_HEALING_BOOST` 读奶妈，`HEAL_TAKEN_RATIO` 读被治疗者。
+- **没有单独的"治疗降低"属性**：`HEAL_TAKEN_RATIO` 取负数就是治疗降低
+  （公式里 `(1 - 治疗降低)` 与 `(1 + 受疗加成)` 合并成同一个因子）。
+- `Battle.calculateHeal(healer, target, base)` 只算数值；`Battle.heal(...)` 执行并返回
+  **实际回复量**（撞 `maxHp` 后截断，不是理论治疗量）。
+- 治疗**不碰 `Damage`**：它是独立的一套乘区（不暴击、不吃增伤、不吃防御/抗性/易伤）。
+- 基础量由调用方算（`倍率 × 属性 + 固定值`）；`heal` 的倍率位、选谁当目标都是调用方的事。
+
+### 20.3 护盾（P6-3）
+
+- `CanHit.shield`（当前护盾）+ `CanHit.takeDamage` **先扣盾再扣血**：
+  盾吸收 `min(shield, damage)`，剩下的才进 HP。所以"**盾破前不死**"是自动成立的。
+- **不叠加**：`Battle.grantShield(target, amount)` 直接**覆盖**当前值（≤0 视为清盾）。
+- `CanHit.lastShieldAbsorbed`：上一次 `takeDamage` 被盾吸走的量。
+  ⚠ 它在 `takeDamage` 里**必须在任何 `return` 之前赋值** —— 盾把伤害全吃掉时会提前 return，
+  漏掉就会让调用方读到上一次的陈旧值（实测过一次：返回伤害正好翻倍）。
+- `Battle.applyDamage` 的返回值 = **被盾吸走的 + 真的掉的血**。
+  为什么不是"直接返回乘区后的伤害"：目标是"打在有盾的目标上不能显示成 0"
+  （否则 `AttackEvent.totalDamage` 与"本次攻击总伤害 × %"这类效果会失真）。
+  ⚠ 恒等式：`乘区后的伤害 == shieldAbsorbed + hpLoss`（盾先吃、吃完才扣血），
+  所以**不能**把"乘区后的伤害"与盾吸收量相加（会正好翻倍）。
+- 🚧 **没有"护盾量提高"属性**（`AttributeType` 里没有），所以护盾量就是传入值 ——
+  与"治疗降低"同类的缺口，等有真实效果引用时再加。
 
