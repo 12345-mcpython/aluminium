@@ -157,7 +157,24 @@ public class Main {
             return;
         }
 
+        // 战技形状分流（P6-2 / P6-3）：治疗技给自己人回血、护盾技给自己人上盾，
+        // 其余（伤害类）照旧打敌人。
         Skill skill = hero.getSkills().get(SkillType.SKILL);
+        if (skill != null && skill.getData() != null) {
+            switch (skill.getData().getEffect()) {
+                case RESTORE -> {
+                    healTurn(battle, hero, skill);
+                    return;
+                }
+                case DEFENCE -> {
+                    shieldTurn(battle, hero, skill);
+                    return;
+                }
+                default -> {
+                }
+            }
+        }
+
         boolean weaknessHit = skill != null && skill.getData() != null
                 && target.isWeakTo(skill.getData().getElement());
         if (!weaknessHit) {
@@ -176,6 +193,49 @@ public class Main {
         //    这里显式结算一次，好让下面的战报拿到真实数值（真实战斗循环里由 afterMove 负责）。
         battle.processRequests();
         report(hero, target, hpBefore);
+    }
+
+    /**
+     * 治疗（P6-2）：基础量 = 攻击力 × 倍率，再过"治疗加成 × 受疗加成"。
+     *
+     * <p>引擎只提供 {@code Battle.heal(healer, target, base)}；选谁当目标、倍率取哪个
+     * 参数位（治疗技的 {@code param_list[0][0]}）是**调用方**的事。
+     */
+    private static void healTurn(Battle battle, Character hero, Skill skill) {
+        Character patient = lowestHpRateCharacter(battle);
+        if (patient == null) {
+            return;
+        }
+        double multiplier = skill.getData().getSkills()
+                .get(Math.min(skill.getLevel(), skill.getData().getSkills().size()) - 1).getFirst();
+        double base = hero.getAttribute(AttributeType.ATTACK).get() * multiplier;
+        System.out.println("        → 使用【战技·治疗】，目标 " + patient.getName());
+        double before = patient.getCurrentHp();
+        double healed = battle.heal(hero, patient, base);
+        System.out.println("        → 基础治疗 " + fmt(base) + " → 实际回复 " + fmt(healed)
+                + "：" + patient.getName() + " HP " + fmt(before) + " → " + fmt(patient.getCurrentHp())
+                + "/" + fmt(patient.getMaxHp()));
+        hero.gainEnergy(com.laosun.aluminium.models.energy.EnergyGain.normal(30));
+    }
+
+    /**
+     * 护盾（P6-3）：基础量 = 防御力 × 倍率（三月七战技的 {@code param_list[0][0]} 是护盾系数）。
+     *
+     * <p>引擎只提供 {@code Battle.grantShield(target, amount)}，量由调用方算。
+     */
+    private static void shieldTurn(Battle battle, Character hero, Skill skill) {
+        Character ally = lowestHpRateCharacter(battle);
+        if (ally == null) {
+            return;
+        }
+        double multiplier = skill.getData().getSkills()
+                .get(Math.min(skill.getLevel(), skill.getData().getSkills().size()) - 1).getFirst();
+        double base = hero.getAttribute(AttributeType.DEFENCE).get() * multiplier;
+        System.out.println("        → 使用【战技·护盾】，目标 " + ally.getName());
+        double shield = battle.grantShield(ally, base);
+        System.out.println("        → 护盾量 " + fmt(shield) + "（基础 " + fmt(base) + "）→ "
+                + ally.getName() + " 护盾 " + fmt(ally.getShield()));
+        hero.gainEnergy(com.laosun.aluminium.models.energy.EnergyGain.normal(30));
     }
 
     /**
@@ -229,6 +289,7 @@ public class Main {
         System.out.println("        → " + enemy.getName() + " 造成 " + fmt(hpBefore - target.getCurrentHp())
                 + "：" + target.getName() + " HP " + fmt(target.getCurrentHp())
                 + "/" + fmt(target.getMaxHp())
+                + (target.getShield() > 0 ? "（护盾 " + fmt(target.getShield()) + "）" : "")
                 + "，受击回能 → " + fmt(target.getCurrentEnergy()));
         if (target.isDeath()) {
             System.out.println("        → " + target.getName() + " 被击败，移出行动条");
@@ -358,6 +419,23 @@ public class Main {
             }
         }
         return null;
+    }
+
+    /** 血量比例最低的存活角色（治疗/护盾的简化选目标策略）。 */
+    private static Character lowestHpRateCharacter(Battle battle) {
+        Character worst = null;
+        double worstRate = Double.MAX_VALUE;
+        for (Character c : battle.characters) {
+            if (c.isDeath()) {
+                continue;
+            }
+            double rate = c.getCurrentHp() / c.getMaxHp();
+            if (rate < worstRate) {
+                worstRate = rate;
+                worst = c;
+            }
+        }
+        return worst;
     }
 
     private static String fmt(double value) {

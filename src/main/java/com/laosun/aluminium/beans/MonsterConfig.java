@@ -20,7 +20,8 @@ import java.util.Map;
  * 由 {@link com.laosun.aluminium.Constant} 从补丁文件 {@code monster_attack_modify_ratio.json} 合并；
  * 各系数在 {@code Constant} 里统一补全，装载后的实例不会是 {@code null}。
  *
- * <p>机制字段（{@code debuff_resistance} / {@code summon_id}）本阶段不读，等 P6-1 / P9-4 再加。
+ * <p>机制字段：{@code debuff_resistance} P6-1 接（例：冰锋 {@code {"STAT_CTRL_Frozen": 1}} =
+ * 完全免疫冻结）；{@code summon_id} 留给 P9-4。
  */
 public record MonsterConfig(Translate name,
                             @SerializedName("template_id") int templateId,
@@ -32,5 +33,6 @@ public record MonsterConfig(Translate name,
                             @SerializedName("defence_modify_ratio") Double defenceRatio,
                             @SerializedName("speed_modify_ratio") Double speedRatio,
                             @SerializedName("stance_modify_ratio") Double stanceRatio,
-                            @SerializedName("damage_resistance") Map<DamageElement, Double> damageResistance) {
+                            @SerializedName("damage_resistance") Map<DamageElement, Double> damageResistance,
+                            @SerializedName("debuff_resistance") Map<String, Double> debuffResistance) {
 }

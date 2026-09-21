@@ -261,7 +261,8 @@ public final class Constant {
                 orOne(config.defenceRatio()),
                 orOne(config.speedRatio()),
                 orOne(config.stanceRatio()),
-                config.damageResistance() == null ? Map.of() : Map.copyOf(config.damageResistance()))));
+                config.damageResistance() == null ? Map.of() : Map.copyOf(config.damageResistance()),
+                config.debuffResistance() == null ? Map.of() : Map.copyOf(config.debuffResistance()))));
         return Map.copyOf(normalized);
     }
 

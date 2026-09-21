@@ -33,6 +33,18 @@ public class Enemy extends CanHit {
     private Map<DamageElement, Double> damageResist = Map.of();
 
     /**
+     * 特定负面效果抵抗（P6-1）：键是数据里的 {@code STAT_*} 字符串，值是**减免比例**。
+     *
+     * <p>例：冰锋 {@code {"STAT_CTRL_Frozen": 1}} = 完全免疫冻结（1 = 100% 抵抗）。
+     * 参与 {@code Battle.hitChance} 的最后一个因子 {@code (1 - specific)}。
+     *
+     * <p>数据实测：2649 条怪里 999 条带这一列；出现过的键有
+     * {@code STAT_CTRL_Frozen / STAT_CTRL / STAT_Confine / STAT_Entangle /
+     * STAT_DOT_Burn / STAT_DOT_Electric / STAT_DOT_Poison} 等。
+     */
+    private Map<String, Double> debuffResist = Map.of();
+
+    /**
      * 弱点元素（来自 {@code monster_config.json} 的 {@code stance_weak}）。默认空集合 = 无弱点
      * （数据里有 102 个条目没有这一项）。
      *

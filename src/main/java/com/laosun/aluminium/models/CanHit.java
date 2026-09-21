@@ -179,15 +179,50 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
+     * 当前护盾值（P6-3）。{@code 0} = 没有盾。
+     *
+     * <p>护盾**先于 HP 被扣**（{@link #takeDamage(double)}），且**不叠加**：
+     * 新盾由 {@code Battle.grantShield} 直接覆盖旧值，不做相加。
+     */
+    @Setter
+    private double shield = 0;
+
+    /**
+     * 上一次 {@link #takeDamage(double)} 被护盾挡掉的量（P6-3）。
+     *
+     * <p>存在的理由：护盾吸收的伤害**也是这一击造成的伤害** ——
+     * {@code Battle.applyDamage} 的返回值要把"打进盾里的部分"算进去，
+     * 否则"打在有盾的目标上"会显示成造成 0 伤害（击杀回能/攻击事件总伤害都会失真）。
+     * 每次 {@code takeDamage} 都会重写它。
+     */
+    @Setter
+    private double lastShieldAbsorbed = 0;
+
+    /**
      * Applies damage to this entity, reducing current HP.
      * If HP drops to zero or below, the entity is marked dead.
+     *
+     * <p><b>护盾先扣（P6-3）</b>：伤害先由 {@link #shield} 吸收，盾被打空后剩下的才扣 HP。
+     * 所以"有盾时不会死"是自动成立的；被吸收的量记在 {@link #lastShieldAbsorbed}。
      *
      * @param damage the amount of damage to take
      * @return {@code true} if the entity died from this damage
      */
     public boolean takeDamage(double damage) {
+        lastShieldAbsorbed = 0;                      // 每次结算先清空，避免读到上一次的值
         if (death || damage <= 0) {
             return false;
+        }
+        if (shield > 0) {
+            double absorbed = Math.min(shield, damage);
+            shield -= absorbed;
+            damage -= absorbed;
+            // ⚠ 必须在**任何 return 之前**赋值：盾把伤害全吃掉时下面会提前 return，
+            //   漏掉这行会让调用方读到上一次的陈旧值（实测过一次：返回伤害翻倍）。
+            lastShieldAbsorbed = absorbed;
+            if (damage <= 0) {
+                return false;                        // 全被盾吃掉：HP 不动，当然也没死
+            }
         }
         currentHp -= damage;
         if (currentHp <= 0) {

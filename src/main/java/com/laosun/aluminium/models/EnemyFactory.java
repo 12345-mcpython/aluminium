@@ -64,11 +64,14 @@ public final class EnemyFactory {
                 .setBase(ATTACK, stats.attack())
                 .setBase(DEFENCE, stats.defence())
                 .setBase(SPEED, stats.speed())
-                .setBase(EFFECT_RESISTANCE, stats.effectResistance());
+                .setBase(EFFECT_RESISTANCE, stats.effectResistance())
+                // P6-1：效果命中必须落进面板，否则敌人的命中恒为 0（EnemyStats 里算了却没人用）
+                .setBase(EFFECT_HIT_RATE, stats.effectHitRate());
 
         Enemy enemy = new Enemy(displayName(config, monsterId), attributes.build());
         enemy.setLevel(level);                                  // P1-4：等级进防御区
         enemy.setDamageResist(config.damageResistance());       // P1-6：抗性区直接生效
+        enemy.setDebuffResist(config.debuffResistance());        // P6-1：特定负面效果抵抗
         enemy.setStanceWeak(Set.copyOf(config.stanceWeak()));   // P2-2：弱点（P4 削韧判定用）
         enemy.setStance(stats.stance());
         enemy.setMaxStance(stats.stance());
