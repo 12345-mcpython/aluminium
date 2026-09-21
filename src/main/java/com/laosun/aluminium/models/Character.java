@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
@@ -294,9 +295,13 @@ public class Character extends CanHit {
             for (Map.Entry<SkillType, Integer> entry : skillLevel.entrySet()) {
                 SkillType type = entry.getKey();
                 int level = entry.getValue();
-                // WRITE 1 for placeholder will change TODO
-                // Future will not have placeholder skill
-                skills.put(type, new DefaultSkill(cid, 1, level));
+                // P8-2：每个槽位解析**自己的** skill_id（此前恒为 1，六个槽位都是普攻的数据）。
+                // SkillType 里没有地图普攻/秘技，所以那两个槽位暂不装配（见 Constant.SKILL_SLOT）。
+                Integer slot = Constant.SKILL_SLOT.get(type);
+                if (slot == null) {
+                    continue;
+                }
+                skills.put(type, new DefaultSkill(cid, slot, level));
             }
             skills.putAll(customSkills);
             character.setSkills(skills);

@@ -69,11 +69,13 @@ public class Main {
                 EnemyFactory.create(8032010, 90, 1),
                 EnemyFactory.create(8002040, 90, 1)));
         for (Enemy enemy : enemies) {
-            // 真实血量在 2k~20k 量级；这里定 12000，让 demo 能在几十回合内真正分出胜负
-            // （注意我方这是"无光锥无遗器"的基础面板，每次普攻只有几百伤害）。
+            // ⚠ 这个数值随"技能倍率是否真实"变过两次：
+            //   - 早先六个槽位全解析到**普攻**（P8-2 修的），普攻对单只有几百伤害 → 定 12000；
+            //   - 槽位修好后战技/终结技用上**真实倍率**（姬子战技打 3 目标、对单上万），
+            //     12000 会被一发秒掉 → 提到 30000，让战斗回到"几十次行动"的量级。
             // 生命上限存在属性数组的 HEALTH 槽里；currentHp 没有 setter，所以提高上限后 heal 补满。
-            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(12_000));
-            enemy.heal(12_000);
+            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(30_000));
+            enemy.heal(30_000);
             enemy.setMaxEnergy(0);               // 怪物没有能量条：maxEnergy == 0 → 所有回能 no-op
             printEnemy(enemy);
         }
@@ -155,9 +157,10 @@ public class Main {
             return;
         }
 
-        // 满能量 → 终结技（引擎会先清零、结算本体、再回自身 5 点）
-        if (hero.isEnergyFull() && hero.getSkills().containsKey(SkillType.ULTRA)) {
-            System.out.println("        → 能量已满，释放【终结技】");
+        // 攒够开大阈值 → 终结技（引擎会先清零、结算本体、再回自身 5 点）
+        // P3-4：判据是 battle.isUltraReady（读技能数据的 sp_need），不必攒满上限
+        if (battle.isUltraReady(hero) && hero.getSkills().containsKey(SkillType.ULTRA)) {
+            System.out.println("        → 能量已达到开大阈值，释放【终结技】");
             double hpBefore = target.getCurrentHp();
             if (!battle.castUltra(hero, List.of(target))) {
                 System.out.println("        → 终结技释放失败");

@@ -175,7 +175,7 @@
 |                       | P7-5 StageFactory + 难度                       | ✅   |
 | **P8 角色数据化**     | P8-0 角色机制数据化（架构总纲，先读）          | ✅   |
 |                       | P8-1 CharacterFactory + 角色字段补全           | ✅   |
-|                       | P8-2 技能装配（真实槽位 → 真实倍率）           | ☐   |
+|                       | P8-2 技能装配（真实槽位 → 真实倍率，槽位部分） | 部分 |
 |                       | P8-3 天赋 + 追加攻击                           | ☐   |
 |                       | P8-4 战技点（SP）                              | ☐   |
 |                       | P8-5 真实队伍装配（StageFactory 换真角色）     | ☐   |
@@ -1827,29 +1827,41 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
 - **变异验证**：① `null → 100` 兜底 → 1 红；② `fromString` 改回大小写敏感 → 4 红；
   ③ 去掉 `max(0, …)` 下界 → 2 红。
 - **依赖**：P1-4（level）、P5-1（Path 映射）、P2-2（DamageElement）
-### P8-2 技能装配（真实槽位 → 真实倍率）
+### P8-2 技能装配（真实槽位 → 真实倍率）🚧 槽位部分完成
 
 - **目标**：`SkillType` 槽位对上 `skills.json` 的 skill_id；`DefaultSkill`/`SkillExecutor` 用的全是真实倍率、元素、削韧值。
-- **涉及文件**：`Constant.java`、`models/Character.java`、`models/DefaultSkill.java`、`models/SkillExecutor.java`、新建
-  `test/RealSkillTest.java`
-- **怎么做**：
-    1. 槽位映射只许一处（`Constant` 加）：
-       ```java
-       public static final Map<SkillType, Integer> SKILL_SLOT = Map.of(
-               SkillType.COMMON, 1, SkillType.SKILL, 2, SkillType.ULTRA, 3,
-               SkillType.TALENT, 4, SkillType.MAZE, 6, SkillType.TECHNIQUE, 7);
-       ```
-    2. `Character.Builder.build()` 里 `new DefaultSkill(cid, 1, level)` → `new DefaultSkill(cid, Constant.SKILL_SLOT.get(type), level)`
-       （一行改动；COMMON 仍是 1，老测试全绿）
-    3. `SkillExecutor` 的 `default` 分支目前静默：改成提示 + 归属标注：
-       ```java
-       default -> IO.println("[P8-2] 非伤害 effect: " + effect + "（RESTORE/SUPPORT/DEFENCE→P10-3，IMPAIR→P10-6，SUMMON→P9-4，ENHANCE 纯被动）");
-       ```
-    4. 能量：P8-1 后 `getMaxEnergy()` 即真实值（景元 130），P3-2 的 `castUltra` 无需改
-- **验收**：`RealSkillTest`：
-    - 景元 `getSkills().get(COMMON).getData()` 的 param 列表 === `Constant.SKILLS.get(1204).get(1).paramList()`
-    - `getSkills().get(ULTRA).getData().getSkillType().equals("Ultra")`
-    - 景元战技（AOE）打 3 敌：每敌伤害 = attack × param[0] × 乘区（±1e-6）
+- **涉及文件**：`Constant.java`、`models/Character.java`、`models/Battle.java`、新建
+  `test/SkillSlotMappingTest.java`、新建 `test/UltraThresholdTest.java`
+- **实际怎么做**（2026-09-21）：
+    1. `Constant.SKILL_SLOT` 只放**4 项**（`COMMON=1 / SKILL=2 / ULTRA=3 / TALENT=4`）。
+       计划里的 `SkillType.MAZE` / `SkillType.TECHNIQUE` **这两个枚举值不存在** ——
+       `SkillType` 只有 `COMMON/SKILL/ULTRA/TALENT/SUMMON_SKILL/SUMMON_TALENT`。
+       数据里槽位 6/7 确实是地图普攻与秘技，但要覆盖它们得先**加枚举值**，本项没做。
+    2. `Character.Builder.build()` 改成按 `SKILL_SLOT` 取各自槽位（`SKILL_SLOT` 没有的类型跳过）。
+       ⚠ 这一行改动的影响比计划说的大：修之前**六个槽位全是普攻**，所以
+       "倍率/削韧/元素"从来没用过真实值。demo 里姬子战技因此从"几百"变成"16938"，
+       敌人血量要跟着从 12000 提到 30000 才不至于一发秒。
+    3. ⚠ **计划第 4 条是错的**：写着"P3-2 的 `castUltra` 无需改"，但 `castUltra` 判的是
+       `isEnergyFull()`（`currentEnergy >= maxEnergy`），而 5 个角色的**开大阈值低于上限**
+       （云璃 120/240、银枝 90/180、绯英 240/480、飞霄 6/12、昔涟 12/24）——
+       不改的话云璃会攒到 240 才肯放。所以补了 `Battle.isUltraReady` / `ultraEnergyCost`
+       （读 `spNeed`，缺失退回 `maxEnergy`），**放开后清零**。
+       角色文档写的是「释放所需能量 120（上限 240）」——"所需"是门槛。
+    4. 没做计划第 3 条（`SkillExecutor` 的 default 分支加提示）：本项聚焦槽位与阈值，
+       非伤害 effect 的处理仍留给 P10-3/P10-6/P9-4。
+- **验收**：`SkillSlotMappingTest`（8 条）：槽位表本身 / 各槽位拿到自己的数据 /
+  与 `Constant.SKILLS` 逐字段对齐 / 削韧按槽位 / 非伤害槽位无元素 / 等级上限按槽位 /
+  93 角色 × 4 槽位都能装配 / **等级未接入的缺口登记**。
+  `UltraThresholdTest`（9 条）：阈值来自数据 / 常规角色不受影响 / 阈值 ≤ 上限（全角色）/
+  恰好 5 个低于上限 / 云璃 120 可放 / 放开即清零 / 常规角色仍需攒满 /
+  无能量条永远放不了 / 特殊资源角色攒不起来。
+- **仍未做**（本项剩下的）：
+    - **等级没接进伤害**：`SkillExecutor` 取 `params.getFirst()`，所以技能 1 级与 8 级打的一样
+      （数据是对的，景元普攻第 8 档 = 1.2）。`SkillSlotMappingTest.skillLevelIsNotAppliedYet` 钉住了它。
+    - 槽位 6/7（需要先加 `SkillType` 枚举值）。
+    - `SkillExecutor` 的 non-damaging default 分支提示。
+- **变异验证**：把槽位映射改回恒为 1 → `UltraThresholdTest` 4 红；
+  去掉 `CharacterFactory` 的特殊 provider 注入 → `SpecialEnergyProviderTest` 3 红。
 - **依赖**：P8-1、P1-8
 
 ---

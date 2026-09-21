@@ -5,6 +5,7 @@ import com.laosun.aluminium.beans.*;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.utils.JSONReader;
 
 import java.util.EnumSet;
@@ -143,6 +144,25 @@ public final class Constant {
         }
     }
 
+
+    /**
+     * {@link SkillType} → {@code skills.json} 里的**技能槽位号**（P8-2）。
+     *
+     * <p>数据的槽位约定：<b>1 普攻 / 2 战技 / 3 终结技 / 4 天赋 / 5（无）/ 6 地图普攻 / 7 秘技</b>，
+     * 且 {@code skill_id = 角色id × 100 + 槽位}（638 条技能**全部**满足，已核对）。
+     *
+     * <p>⚠ 为什么只有这 4 项：{@link SkillType} 里没有地图普攻/秘技对应的枚举值，
+     * 所以槽位 6/7 无法映射 —— 想覆盖它们得先加枚举值（见 ROADMAP P8-2 的偏差记录）。
+     *
+     * <p>⚠ 这张表必须**只有一份**：修之前 {@code Character.Builder.build()} 把每个槽位
+     * 都写成 {@code new DefaultSkill(cid, 1, level)}，于是普攻/战技/终结技/天赋**全部**解析到槽位 1，
+     * 后果是六个槽位的倍率、削韧、元素、{@code sp_need} 全是普攻的。
+     */
+    public static final Map<SkillType, Integer> SKILL_SLOT = Map.of(
+            SkillType.COMMON, 1,
+            SkillType.SKILL, 2,
+            SkillType.ULTRA, 3,
+            SkillType.TALENT, 4);
 
     /**
      * Maps percentage-type attributes to their corresponding base-type attributes.

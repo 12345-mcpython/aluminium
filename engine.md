@@ -466,17 +466,34 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 `models/DefaultSkill` 是**唯一的 `Skill` 生产实现**，`getData()` 用 `static ConcurrentMap` 按
 `cid + "_" + skillId` 缓存；`execute()` 一行委托给 `SkillExecutor`。
 
-### 7.2 技能槽位映射 🚧
+### 7.2 技能槽位映射 ✅（P8-2 的槽位部分，2026-09-21）
 
-`SkillType` 枚举有 6 个值（`COMMON`/`SKILL`/`ULTRA`/`TALENT`/`SUMMON_SKILL`/`SUMMON_TALENT`），
-但 `Character.Builder.build()` 与 `Character.fromAttributes(...)` 都写死：
+映射表只有一份：`Constant.SKILL_SLOT`。
 
-```java
-skills.put(type, new DefaultSkill(cid, 1, level));   // ← skillId 恒为 1
-```
+| `SkillType` | 槽位 | 数据里的攻击类型 |
+|---|---|---|
+| `COMMON` | **1** | `Normal` |
+| `SKILL` | **2** | `BPSkill` |
+| `ULTRA` | **3** | `Ultra` |
+| `TALENT` | **4** | 空（`null`） |
 
-**后果：六个槽位解析到的都是槽位 1（普攻）的数据。** 所以当前引擎里"战技/终结技/天赋"的倍率与削韧值
-全都是普攻的。这是 `P8-2` 的正式任务，不是 bug 而是已知占位。
+数据约定：**1 普攻 / 2 战技 / 3 终结技 / 4 天赋 / 5（无）/ 6 地图普攻 / 7 秘技**，
+且 `skill_id = 角色id × 100 + 槽位`（638 条技能**全部**满足，已核对）。
+
+> ✅ 已修：修之前 `Character.Builder.build()` 与 `Character.fromAttributes(...)` 都写死
+> `new DefaultSkill(cid, 1, level)` —— **六个槽位解析到的全是槽位 1（普攻）的数据**，
+> 于是"战技/终结技/天赋"的倍率、削韧、元素、`sp_need` 全是普攻的。
+> ⚠ 这个 bug 长期没被发现，因为既有测试（`SkillExecutorTest`/`SuperBreakTest`）都**自己构造**
+> `new DefaultSkill(cid, 槽位, …)`，而 `EnergyTest` 验的是 provider 分派 ——
+> "角色实际拿到什么技能"这条路没人走过。现由 `SkillSlotMappingTest` 覆盖。
+
+⚠ **槽位 6/7 仍未装配**：`SkillType` 里没有地图普攻/秘技对应的枚举值，
+所以 `SKILL_SLOT` 只有 4 项。要覆盖它们得先加枚举值（见 ROADMAP P8-2）。
+
+⚠ **等级还没接进伤害**：`SkillData.getSkills()` 返回**整张**逐级参数表，
+而 `SkillExecutor` 取的是 `params.getFirst()` —— 所以技能等级 1 与 8 打出的都是**第 1 档**倍率。
+数据是对的（景元普攻第 8 档 = 1.2），只是执行器还没按等级取行。
+`SkillSlotMappingTest.skillLevelIsNotAppliedYet` 记录了这个缺口。
 
 `SkillData.init` 在查不到 `cid`/槽位时返回 `EMPTY`（`PHYSICAL` + `ENHANCE` + 空参数）
 → 因为 `ENHANCE` 不是伤害类，技能会**静默零伤害**且 `requestSkill` 仍返回 `true`。这是易踩的坑。
@@ -718,6 +735,23 @@ castUltra(user, targets):
 ```
 
 `isEnergyFull()` 要求 `maxEnergy > 0 && currentEnergy >= maxEnergy` —— 所以没有能量条的角色永远放不了大招。
+
+**但真正的门槛是"开大阈值"而不是"满能量"**（P3-4 跟进）：`Battle.isUltraReady(user)` 判
+`currentEnergy >= ultraEnergyCost(user)`，而 `ultraEnergyCost` 优先读技能数据的
+`spNeed`，缺失时退回 `maxEnergy`。93 个角色里有 5 个阈值**低于**上限：
+
+| 角色 | 需要 | 上限 |
+|---|---|---|
+| 云璃 1221 | **120** | 240 |
+| 银枝 1302 | **90** | 180 |
+| 绯英 1505 | **240** | 480 |
+| 飞霄 1220 | **6** | 12 |
+| 昔涟 1415 | **12** | 24（层数，见 §9.5） |
+
+角色文档写的是「**释放所需能量** 120（上限 240）」——"所需"是门槛。
+放开后**清零**：对"阈值 == 上限"的多数角色与老行为等价，对上面的例外等价于"消耗掉阈值那部分"。
+`Main` 的 demo 也用 `battle.isUltraReady(...)` 判，不再自己看 `isEnergyFull()`。
+护栏：`UltraThresholdTest`（含"恰好 5 个角色阈值低于上限"的穷举登记）。
 
 ### 9.4 特殊供能角色走独立 provider ✅（2026-09-21）
 
