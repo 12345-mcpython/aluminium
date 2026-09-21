@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.exceptions.CharacterException;
@@ -78,6 +79,18 @@ public class Character extends CanHit {
      */
     private int aggro;
 
+    /**
+     * 攻击元素（P8-1）：来自 {@code character_data.json} 的 {@code attribute}。
+     *
+     * <p>⚠ 该字段是**全小写**的（{@code "thunder"}），而 {@code skills.json} 的
+     * {@code element} 是首字母大写（{@code "Thunder"}）—— 所以解析走
+     * {@link DamageElement#fromString}（大小写不敏感）。
+     *
+     * <p>{@code null} = 没有数据（{@code fromAttributes} 造的占位角色就是这样）。
+     * 占位角色没有元素是**如实反映**，不要给它兜一个假元素。
+     */
+    private DamageElement element;
+
     protected Character(Translate name, DoubleValue[] attributes) {
         super(name.english(), Camp.PLAYER, attributes);
     }
@@ -94,10 +107,16 @@ public class Character extends CanHit {
         this.skillLevel = other.skillLevel != null ? other.skillLevel.clone() : null;
         this.path = other.path;
         this.aggro = other.aggro;
+        this.element = other.element;
     }
 
     /**
-     * Creates a character directly from pre-computed attributes (for testing / quick setup).
+     * Creates a character directly from pre-computed attributes.
+     *
+     * <p>⚠ <b>仅测试 / 占位用，P8 之后新代码禁止使用</b>（P8-1）。
+     * 它造出来的角色没有元素、没有命途差异、能量上限为 0、技能全是
+     * {@link DefaultSkill} 占位 —— 真实角色请用
+     * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}。
      */
     public static Character fromAttributes(Translate name, DoubleValue[] attributes) {
         Character c = new Character(name, attributes);
@@ -106,6 +125,13 @@ public class Character extends CanHit {
         return c;
     }
 
+    /**
+     * 从属性值直接造一个占位角色（仅测试用）。
+     *
+     * <p>⚠ <b>P8 之后新代码禁止使用</b>：造出来的角色没有元素、没有命途差异、
+     * 能量上限为 0（放不出终结技）、技能全是 {@link DefaultSkill} 占位。
+     * 真实角色请用 {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}。
+     */
     public static Character fromAttributes(String name, double health, double defence, double attack, double speed) {
         AttributeBuilder attributeBuilder = new AttributeBuilder();
         attributeBuilder.setBase(HEALTH, health);
@@ -279,6 +305,11 @@ public class Character extends CanHit {
             // P5-1：命途与仇恨来自角色数据（mt=命途字符串，aggro=游戏倍率本身）
             character.setPath(this.path != null ? this.path : Path.fromMt(characterData.mt()));
             character.setAggro(characterData.aggro() > 0 ? characterData.aggro() : 0);
+            // P8-1：元素同样来自角色数据（attribute 是全小写，解析口径见 DamageElement#fromString）
+            character.setElement(DamageElement.fromString(characterData.attribute()));
+            // P8-1：能量上限按数据来。**null 必须保持 0（= 没有能量条），不能兜底成 100** ——
+            // 全数据里只有 1407 遐蝶是 null，兜底会凭空给她造出一条能量条（P3-0 A 表）。
+            character.setMaxEnergy(characterData.maxEnergy() != null ? characterData.maxEnergy() : 0);
             return character;
         }
 

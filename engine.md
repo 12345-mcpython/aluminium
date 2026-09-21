@@ -813,8 +813,14 @@ castUltra(user, targets):
 
 ### 12.2 等级缩放公式（`LevelPromotionCalc`）
 
-**角色**：`rate = 1 + (level-1)×0.05 + promoteCount×0.4`
+**角色**：`rate = 1 + (level-1)×0.05 + max(0, promoteCount)×0.4`
 　`promoteCount = level/10 - (突破 ? 1 : 2)`；`level==80 且突破` 再 `-1`；`level<=20 且未突破` 时归 0。
+
+> ⚠️ **`max(0, …)` 是 P8-1 补的下界**：低等级配"已突破"原本会算出**负晋阶**
+> （Lv1 → `1/10 - 1 = -1`），把 1 级面板压到 **0.6 倍**（景元生命 158.4 → 95.04）。
+> 而 95.04 恰好是他的**攻击**值，所以现象看起来像"属性数组索引错位"，极易误诊
+> （P8-1 时我就误诊了一轮）。1 级角色不可能"负晋阶"，所以下界必须是 0；见下表 Lv1 突破列。
+> 上表其余档位（20/21/70/79/80/90）**不受影响**，作者验证过的锚点依然成立。
 
 **光锥**：`rate = 1 + (level-1)×0.15 + 1.6×promoteCount + (首次突破 ? 1.2 : 0)`
 　`promoteCount` 仅在 `level>20` 时算：`level/10 - (突破 ? 2 : 3)`；`level==80 且突破` 再 `-1`。
@@ -826,7 +832,7 @@ castUltra(user, targets):
 
 | 等级 | 角色 未突破 | 角色 突破 | 光锥 未突破 | 光锥 突破 |
 |---|---|---|---|---|
-| 1 | 1.00 | 0.60 | 1.00 | 1.00 |
+| 1 | 1.00 | 1.00 | 1.00 | 1.00 |
 | 20 | 1.95 | 2.35 | 3.85 | 5.05 |
 | 21 | 2.00 | 2.40 | 3.60 | 5.20 |
 | 40 | 3.75 | 4.15 | 9.65 | 11.25 |
@@ -849,6 +855,13 @@ castUltra(user, targets):
 > 那是错的 —— 起因是 `character_data.json` 里没有 Lv80 参照物，我把"找不到参照"
 > 误判成了"未经校验"，并进一步推成了结论。**推断错、且当时写成了断言。**
 > 实际倍率曲线（上表）在 20/21、70/79、80、90 各档都平滑且符合游戏档位。
+>
+> ⚠️ **但中间档位与游戏「面板成长」表并不相等，别拿去对拍**（P8-1 补记）：
+> 该表每一档的基准值是 **`1 + 等级档×0.4`**（景元晋阶 5/70 → `475.2/158.4 = 3.00`），
+> 而本公式在 Lv70 给 **6.85**。**只有 Lv1 与 Lv80 两个锚点和游戏表重合**
+> （Lv80：`538.56/158.4 = 3.40` 是档位基准，满级面板 `1164.24/158.4 = 7.35` 才是本公式）。
+> 这与 ROADMAP P1-4 记的"模拟器倍率公式"口径一致 —— 它本来就是首尾对齐的近似，
+> `CharacterFactoryTest.onlyTheLevel1AndLevel80AnchorsMatchTheGameTable` 把这条差异钉住了。
 
 ### 12.3 光锥（`Weapon`）🚧
 
@@ -1344,8 +1357,49 @@ Battle battle = StageFactory.load(103201, team, rng); // 自带队伍（P8-5 换
 `EnemyFactory.create(id, level, hardLevelGroup)`，所以同一个怪在不同关卡里不一样强，
 调用方不需要传任何系数。
 
-⚠ **队伍是临时的**：P7-5 时还没有 `CharacterFactory`（P8-1），所以默认队伍来自
+⚠ **队伍是临时的**：P7-5 时还没有 `CharacterFactory`（P8-1 已提供），所以默认队伍来自
 `StageFactory.temporaryTeam()` —— 3 个 `fromAttributes` 占位角色（速度 100 / 134 / 90，
 带 120 能量上限，否则永远放不出终结技）。它**不是角色**：没有光锥、遗器、真实技能与命途。
 生命周期到 P8-5 为止，那时换成 `CharacterFactory` 造的 4 人真队。
+
+---
+
+## 22. 角色工厂（`CharacterFactory`）✅ P8-1
+
+```java
+Character jingYuan = CharacterFactory.create(1204, 80);
+jingYuan.getElement();     // THUNDER
+jingYuan.getPath();        // ERUDITION
+jingYuan.getMaxEnergy();   // 130
+jingYuan.getAggro();       // 75
+```
+
+它只是 `Character.builder()` 的薄封装 —— 面板管线（等级缩放 / 光锥 / 遗器 / 行迹 / 额外加成）
+在 P2 就完备了，P8-1 补的是**角色身份字段**：
+
+| 字段 | 来源 | 说明 |
+|---|---|---|
+| `element` | `character_data.attribute` | 该字段是**全小写**（`"thunder"`），而 `skills.json` 的 `element` 是首字母大写（`"Thunder"`）→ 解析必须大小写不敏感（P8-1 加的） |
+| `path` | `character_data.mt` | 数据里的命途名与游戏内不同（`protection`=存护、`all`=智识、`help`=同谐…），映射在 `Path.fromMt`（P5 就有） |
+| `aggro` | `character_data.aggro` | 游戏倍率本身：存护 150 / 毁灭 125 / 其他 100 / 巡猎·智识 75 |
+| `maxEnergy` | `character_data.max_energy` | ⚠ **null 必须落成 0（= 没有能量条），不能兜底成 100** —— 93 个角色里只有 1407 遐蝶是 null |
+
+**与 `Character.fromAttributes` 的分工**：那个是测试/占位入口（无元素、命途兜底 `OTHER`、
+能量上限 0、技能全 `DefaultSkill`），P8-1 起在 javadoc 里标了"新代码禁止使用"。
+真实角色一律走 `CharacterFactory`。
+
+**面板是什么**（P8-1 实测，景元 Lv80 满晋阶）：
+
+```
+生命 158.4 × 7.35             = 1164.24      （他没有生命行迹）
+攻击  95.04 × 7.35 × (1+0.28) =  894.13632   （行迹：攻击 4+4+6+6+8 = 28%）
+防御  66   × 7.35 × (1+0.125) =  545.7375    （行迹：防御 5+7.5 = 12.5%）
+速度  99                                      （不吃等级缩放）
+```
+
+注意**行迹是无条件应用的**（`build()` 里调 `SkillPoint.appendTo`），所以面板不等于
+`数据 × 倍率`。这一点很容易误判成"属性索引错位"（P8-1 时我就误诊了一轮）。
+
+🚧 **技能仍是占位**：`create()` 造出来的技能是 `DefaultSkill`（槽位 1），
+真实倍率是 P8-2；天赋/追加攻击是 P8-3。本类**不负责**填技能。
 

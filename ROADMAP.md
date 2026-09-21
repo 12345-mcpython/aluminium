@@ -173,7 +173,7 @@
 |                       | P7-4 StageBean + 波次                          | ✅   |
 |                       | P7-5 StageFactory + 难度                       | ✅   |
 | **P8 角色数据化**     | P8-0 角色机制数据化（架构总纲，先读）          | ☑   |
-|                       | P8-1 CharacterFactory + 角色字段补全           | ☐   |
+|                       | P8-1 CharacterFactory + 角色字段补全           | ✅   |
 |                       | P8-2 技能装配（真实槽位 → 真实倍率）           | ☐   |
 |                       | P8-3 天赋 + 追加攻击                           | ☐   |
 |                       | P8-4 战技点（SP）                              | ☐   |
@@ -1785,49 +1785,44 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
 
 ---
 
-### P8-1 CharacterFactory + 角色字段补全
+### P8-1 CharacterFactory + 角色字段补全 ✅
 
-- **目标**：一条命令造真实角色；把 `character_data.json` 里已有的字段（元素/命途/aggro/能量上限）接进战斗模型。
-- **涉及文件**：`models/Character.java`、`beans/CharacterData.java`（补 `aggro` 组件）、新建 `utils/CharacterFactory.java`、新建
-  `test/CharacterFactoryTest.java`
-- **怎么做**：
-    1. `Character` 加字段（`Builder.build()` 一并填上，老代码不受影响）：
-       ```java
-       @Getter private DamageElement element;   // character_data.attribute（小写 "thunder"）
-       @Getter private Path path;               // character_data.mt（"destruction"/"preservation"/"all"...）
-       @Getter private int aggro;               // character_data.aggro（景元=75）
-       ```
-       `build()` 里：
-       ```java
-       character.setElement(DamageElement.fromString(characterData.attribute()));
-       character.setPath(Path.fromName(characterData.mt()));
-       character.setAggro(characterData.aggro());
-       ```
-       `DamageElement.fromString` 加大小写不敏感（P1-1 已有 fromString 模式，照着补）；`Path` 的 `fromName` 加英文串映射
-       （`"destruction" → DESTRUCTION`、`"preservation" → PRESERVATION`，其余 → OTHER，TODO 全表校准）。
-       `maxEnergy`：P3-1 里 `CanHit` 默认 0（= 无能量条）；`CharacterFactory` 里按数据覆盖：
-       `c.setMaxEnergy(cd.maxEnergy() != null ? cd.maxEnergy() : 0)`——**1407 遐蝶就是 null，不能兜底成 100**
-       （P3-0 A 表）；上限离档的还有 1220 飞霄 12（终结技只耗 6，等 P8-3 接 `ultCost`）。
-       `CharacterData` record 补组件 `@SerializedName("aggro") int aggro`（JSON 每角色都有，如景元 75；缺省 0 时 `aggroOf`
-       兜底 100）。
-    2. 新建 `utils/CharacterFactory.java`：
-       ```java
-       public static Character create(int cid, int level) {
-           Character c = Character.builder().cid(cid).level(level).isPromote().build();  // 面板管线已具备
-           c.setSkills(RealSkillSet.of(cid, c.getSkillLevel()));   // P8-2；此前先 DefaultSkill(cid, slot, level)
-           return c;
-       }
-       ```
-    3. `Character.fromAttributes` 顶部加注释 `// 仅测试/占位用，P8 后新代码禁止使用`
-- **验收**：`CharacterFactoryTest`：
-    - `create(1204, 80)`：`getName().equals("Jing Yuan")`、`getElement() == THUNDER`、`getPath()` 非兜底值、
-      `getMaxEnergy() == 130`、`getAggro() == 75`、`getLevel() == 80`
-    - 面板校验：`getAttribute(HEALTH).get() == characterData.health() × LevelPromotionCalc.calcCharacterRate(80, true)`（±1e-3）
-    - 老 `fromAttributes` 测试全部仍绿（占位入口保留）
-- **依赖**：P1-4（level）、P5-1（Path 映射）、P2-2（DamageElement.fromString）
-
----
-
+- **目标**：一条命令造真实角色；把 `character_data.json` 里已有的字段接进战斗模型。
+- **涉及文件**：`models/Character.java`、`enums/DamageElement.java`、
+  `utils/LevelPromotionCalc.java`（修 bug）、新建 `utils/CharacterFactory.java`、
+  新建 `test/CharacterFactoryTest.java`
+- **实际怎么做**（与计划有出入，记录差异）：
+    1. 计划要做的三件事里**有两件 P5 已经做了**：`CharacterData` 早有 `aggro` 组件、
+       Builder 早就在 `setPath(Path.fromMt(mt))` + `setAggro(...)`。所以 P8-1 只剩：
+       加 `element` 字段、按数据设 `maxEnergy`、让 `DamageElement.fromString` 大小写不敏感。
+    2. `DamageElement.fromString` 原来只吃首字母大写（`skills.json` 的口径），
+       而 `character_data.attribute` 是**全小写**（`"thunder"`）→ 解析会**静默返回 null**。
+       改成大小写不敏感 + 忽略首尾空白；`"Unknown"` 仍然返回 null。
+    3. `maxEnergy` 直接来自数据，`null → 0`（= 无能量条）。**不兜底成 100** ——
+       93 个角色里只有 1407 遐蝶是 null。
+    4. 选了 **5 个真实角色**做完整字段核对（覆盖 5 种元素 / 5 种命途 / 4 档仇恨 / 4 档能量）：
+       1204 景元（雷·智识·130·75）、1102 希儿（量子·巡猎·120·75）、
+       1107 克拉拉（物理·毁灭·110·125）、1105 娜塔莎（物理·丰饶·90·100）、
+       1001 三月七（冰·存护·120·**150**）。
+       前三+娜塔莎是 P8-5 的目标队伍，三月七补上 150 仇恨那一档。
+    5. 另选 3 个**数据边界**角色只做能量断言：1407 遐蝶（null）、1220 飞霄（12）、1308 黄泉（9）。
+- **⚠ 顺手修掉一个潜伏 bug（`calcCharacterRate` 负晋阶）**：
+  低等级配 `promotion=true` 会算出负晋阶次数（Lv1 → `1/10 - 1 = -1`），
+  把 **Lv1 面板压到 0.6 倍**（景元生命 158.4 → 95.04）。加了 `max(0, promoteCount)` 下界。
+  **这个 bug 极难诊断**：95.04 恰好等于景元的**攻击**值，所以现象看起来完全像
+  "属性数组索引错位"（我先按这个方向查了半天）。修完 Lv1 倍率 = 1.0。
+  20/21/70/79/80/90 各档**不受影响**，作者验证过的 7.35 等锚点依然成立。
+- **⚠ 另一处误判（我自己）**：断言面板时漏了 `point.json` 的行迹加成
+  （`build()` 里无条件 `SkillPoint.appendTo`）。景元攻击 894.136 = `95.04 × 7.35 × 1.28`、
+  防御 545.7375 = `66 × 7.35 × 1.125`。失败值又长得像"错位"，害我第二次误诊。
+  现在测试从 `SkillPoint.sumAttributes` 显式把行迹算进去，并断言那 28% / 12.5%。
+- **验收**：`CharacterFactoryTest`（14 条）：景元身份字段 / 面板（含行迹）/ 晋阶锚点 /
+  负晋阶回归 / 5 人字段全表 / 大小写不敏感 / 全部 93 角色元素可解析 /
+  3 个能量边界 / 有能量条的角色 / 等级影响面板 / 占位入口无身份 / 未知 cid /
+  工厂角色能进战斗。
+- **变异验证**：① `null → 100` 兜底 → 1 红；② `fromString` 改回大小写敏感 → 4 红；
+  ③ 去掉 `max(0, …)` 下界 → 2 红。
+- **依赖**：P1-4（level）、P5-1（Path 映射）、P2-2（DamageElement）
 ### P8-2 技能装配（真实槽位 → 真实倍率）
 
 - **目标**：`SkillType` 槽位对上 `skills.json` 的 skill_id；`DefaultSkill`/`SkillExecutor` 用的全是真实倍率、元素、削韧值。
