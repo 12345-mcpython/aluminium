@@ -138,9 +138,47 @@ public class Battle {
 
     // After releasing ultra skill must call processRequests()!
     // NO BEFAN YOY DID IT
+    /**
+     * 这个单位现在能不能放终结技（P3-4 跟进）：**攒够"开大阈值"就行，不必攒满上限**。
+     *
+     * <p>阈值来自技能数据的 {@code spNeed}（tbgd {@code AvatarSkillConfig.SPNeed}，
+     * 见 {@link com.laosun.aluminium.models.SkillData#getSpNeed()}）。
+     * 93 个角色里有 5 个的阈值**低于**上限 —— 云璃 120/240、银枝 90/180、绯英 240/480、
+     * 飞霄 6/12、昔涟 12/24。数据缺失时退回"攒满 {@code maxEnergy}"（老行为）。
+     *
+     * <p>放出去之后**清零**（见 {@link #castUltra}）：对阈值 == 上限的多数角色这与原来等价；
+     * 对上面的例外，等价于"放一次消耗掉阈值那部分"。游戏文档写的是
+     * 「释放所需能量 120（上限 240）」—— "所需"是**门槛**。
+     *
+     * <p>⚠ 这是 `Battle` 上唯一读 {@code spNeed} 的地方，所以将来若要区分
+     * "消耗阈值"与"清零"，改这里与 {@link #castUltra} 一处即可。
+     */
+    public boolean isUltraReady(CanHit user) {
+        if (user == null || !user.hasEnergyBar()) {
+            return false;                       // 没有能量条（如遐蝶 1407）永远放不了
+        }
+        double threshold = ultraEnergyCost(user);
+        return user.getCurrentEnergy() >= threshold;
+    }
+
+    /**
+     * 这个单位放终结技所需的能量：优先技能数据的 {@code spNeed}，否则退回 {@code maxEnergy}。
+     */
+    public double ultraEnergyCost(CanHit user) {
+        if (user == null) {
+            return Double.MAX_VALUE;
+        }
+        Skill ultra = user.getSkills().get(SkillType.ULTRA);
+        Double spNeed = ultra == null || ultra.getData() == null ? null : ultra.getData().getSpNeed();
+        if (spNeed != null && spNeed > 0) {
+            return spNeed;
+        }
+        return user.getMaxEnergy();
+    }
+
     public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
-        if (user == null || user.isDeath() || !user.isEnergyFull()) {
-            return false;                       // 没满能量放不了（没有能量条的角色永远放不了）
+        if (user == null || user.isDeath() || !isUltraReady(user)) {
+            return false;                       // 没攒够放不了（没有能量条的角色永远放不了）
         }
         // P7-2：额外回合期间禁止插入**别人**的终结技。
         // 规则见 HSR.md §3.1；不拦的话"额外回合"可以被终结技无限续下去。
