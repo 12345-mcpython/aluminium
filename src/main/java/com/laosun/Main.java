@@ -38,11 +38,11 @@ import java.util.Random;
  *   <li>超击破：带 {@link SuperBreakBuff} 时，超出韧性条的削韧转化成一发额外伤害</li>
  *   <li>DOT：敌人回合开始时按"先上先结算"结算</li>
  *   <li>能量：技能回能 / 受击回能 / 击杀回能 / 终结技清零再回 5 / 满能量才能放大招</li>
- *   <li>生死：HP 归零 → 移出行动条；任一方全灭 → 战斗结束</li>
+ *   <li>生死：HP 归零 → 移出行动条；任一方全灭 → 战斗结束（P7-3 状态机）</li>
  * </ul>
  *
  * <p><b>引擎还没有的</b>（demo 里用近似手段绕开，并标注了）：
- * 敌方 AI（P5）、治疗/护盾（P6）、轮次制 150/100 与关卡波次（P7）、敌方真实技能表（P9）。
+ * 关卡波次（P7-4）、忆灵（P9）、欢愉体系（P10）。
  *
  * <p>随机数全程走注入的 {@link Random}：固定种子 → 整场可复现。
  */
@@ -86,7 +86,7 @@ public class Main {
         System.out.println();
 
         int actions = 0;
-        while (!isOver(battle) && actions < 60) {
+        while (!battle.isOver() && actions < 60) {
             actions++;
             // P7-1：轮次由行动条的累计行动值推算（首轮 150、之后每轮 100），不再自己数
             System.out.println("────────── 第 " + battle.getRound() + " 轮（第 " + actions
@@ -96,10 +96,13 @@ public class Main {
         }
 
         System.out.println("=".repeat(78));
-        System.out.println(firstAliveEnemy(battle) == null
-                ? " 战斗结束：我方胜利（" + battle.getRound() + " 轮 / " + actions + " 次行动）"
-                : " 达到行动次数上限，战斗未结束（剩余敌人 "
-                        + battle.targetableEnemies().size() + " 只）");
+        // P7-3：胜负由 Battle 的状态机给，不在 demo 里自己数活人
+        System.out.println(switch (battle.getStatus()) {
+            case WIN -> " 战斗结束：我方胜利（" + battle.getRound() + " 轮 / " + actions + " 次行动）";
+            case LOSE -> " 战斗结束：我方全灭（" + battle.getRound() + " 轮 / " + actions + " 次行动）";
+            default -> " 达到行动次数上限，战斗未结束（剩余敌人 "
+                    + battle.targetableEnemies().size() + " 只）";
+        });
         System.out.println("=".repeat(78));
         battle.printHp();
     }
@@ -406,22 +409,9 @@ public class Main {
     // 工具
     // ==================================================================
 
-    private static boolean isOver(Battle battle) {
-        return firstAliveEnemy(battle) == null || firstAliveCharacter(battle) == null;
-    }
-
     private static Enemy firstAliveEnemy(Battle battle) {
         List<Enemy> alive = battle.targetableEnemies();
         return alive.isEmpty() ? null : alive.getFirst();
-    }
-
-    private static Character firstAliveCharacter(Battle battle) {
-        for (Character c : battle.characters) {
-            if (!c.isDeath()) {
-                return c;
-            }
-        }
-        return null;
     }
 
     /** 血量比例最低的存活角色（治疗/护盾的简化选目标策略）。 */

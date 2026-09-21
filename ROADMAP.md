@@ -169,7 +169,7 @@
 |                       | P6-3 护盾                                      | ☑   |
 | **P7 轮次/胜负/关卡** | P7-1 轮次制行动值（150/100）                   | ✅   |
 |                       | P7-2 额外回合                                  | ✅   |
-|                       | P7-3 胜负状态机                                | ☐   |
+|                       | P7-3 胜负状态机                                | ✅   |
 |                       | P7-4 StageBean + 波次                          | ☐   |
 |                       | P7-5 StageFactory + 难度                       | ☐   |
 | **P8 角色数据化**     | P8-0 角色机制数据化（架构总纲，先读）          | ☑   |
@@ -1636,32 +1636,29 @@ P7-1 落地后复查 `Queue`/`Signal` 时发现的四个真缺陷，与 P7-1 同
 
 ---
 
-### P7-3 胜负状态机
+### P7-3 胜负状态机 ✅
 
 - **目标**：`Battle` 有 `NOT_STARTED / RUNNING / WIN / LOSE`，双方全灭后停表。
-- **涉及文件**：`Battle.java`、新建 `test/BattleResultTest.java`
-- **怎么做**：
-    1. `Battle` 加：
-       ```java
-       public enum Status { NOT_STARTED, RUNNING, WIN, LOSE }
-  
-       @Getter
-       private Status status = Status.NOT_STARTED;
-  
-       public void startBattle() {
-           status = Status.RUNNING;
-           // 原有 onBattleStart / processRequests 逻辑保留
-       }
-       ```
-    2. `removeDeadCombatants()` 末尾：
-       ```java
-       if (enemies.stream().allMatch(CanHit::isDeath)) status = Status.WIN;
-       else if (characters.stream().allMatch(CanHit::isDeath)) status = Status.LOSE;
-       if (status != Status.RUNNING) { /* 标记: queue 不再 move */ }
-       ```
-    3. `stepForward()` 开头：`if (status == Status.WIN || status == Status.LOSE) return;`
-- **验收**：`BattleResultTest`：把敌人打死（`takeDamage(999999)` 后调公开的 `battle.processRequests()` 触发死亡清理）→
-  `status == WIN` 且 `stepForward()` 不再推进；全员死 → LOSE
+- **涉及文件**：`Battle.java`、`Main.java`（demo 改用状态机）、新建 `test/BattleResultTest.java`
+- **实际怎么做**（与计划有出入，记录差异）：
+    1. `Battle.Status` 四态 + `status` 字段 + `getStatus()` / `isOver()`；
+       判定口是**公开的幂等方法 `checkResult()`**（计划里没有这个口子，但它让测试与将来的
+       关卡驱动都能直接问"现在判出来了吗"）。
+    2. 判定时机放在 `removeDeadCombatants()` 末尾（清完尸体顺手判）—— 覆盖
+       `processRequests()` 与 `afterMove()` 两条路，不必在每个出口各写一遍。
+    3. 另外在 `startBattle()` 末尾判一次：否则"敌方列表为空"的开场会永远停在 `RUNNING`
+       （没人可打，也就没人触发判定）。
+    4. **`NOT_STARTED` 时不判**：战斗还没开场，谈不上胜负。计划里没写这条，
+       少了它"开场前把人打死"会立刻判负。
+    5. 终态**不回退**：`checkResult()` 在非 `RUNNING` 时直接返回，所以"已判胜之后我方又团灭"
+       不会改判成 `LOSE`。
+- **口径**：一方全灭即负（`allMatch(isDeath)`，**空列表也算全灭**）；
+  两边同时全灭 → `LOSE`（先判负后判胜）。
+- **验收**：`BattleResultTest`（10 条）：初始态 / 开战转 RUNNING / 敌灭判胜且时钟停 /
+  我方灭判负 / 同时全灭判负 / 开场前不判 / 终态不改判 / 空阵营算全灭 /
+  状态按实例（非 static）/ 中途保持 RUNNING。
+- **变异验证**：① `stepForward` 去掉终态保护 → 1 红；② `checkResult` 去掉终态保护 → 2 红；
+  ③ 把"判胜"提到"判负"之前 → 1 红。
 - **依赖**：无
 
 ---

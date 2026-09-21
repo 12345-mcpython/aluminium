@@ -17,6 +17,21 @@ import java.util.Set;
 
 
 public class Battle {
+    /**
+     * 战斗状态机（P7-3）。
+     *
+     * <pre>
+     *   NOT_STARTED ──startBattle()──▶ RUNNING ──一方全灭──▶ WIN / LOSE
+     *                                   ▲                      │
+     *                                   └──── (不回退) ────────┘
+     * </pre>
+     *
+     * <p>{@code WIN} / {@code LOSE} 是**终态**：{@link #stepForward()} 不再推进行动条。
+     */
+    public enum Status {
+        NOT_STARTED, RUNNING, WIN, LOSE
+    }
+
     public Queue queue;
 
     public List<Character> characters;
@@ -24,6 +39,12 @@ public class Battle {
     public List<Enemy> enemies;
 
     public Signal currentMove;
+
+    /**
+     * 当前战斗状态（P7-3）。开场是 {@link Status#NOT_STARTED}，由 {@link #startBattle()} 转成
+     * {@link Status#RUNNING}。
+     */
+    private Status status = Status.NOT_STARTED;
 
     public ArrayList<CanHit> addRequestItems = new ArrayList<>();
 
@@ -139,15 +160,60 @@ public class Battle {
     }
 
     public void startBattle() {
+        status = Status.RUNNING;
         for (Signal signal : queue.snapshot()) {
             signal.getCanHit().onBattleStart(this);
         }
         processRequests();
+        checkResult();
     }
 
     public void stepForward() {
+        if (isOver()) {
+            return;                                  // 终态：不再推进行动条（P7-3）
+        }
         queue.move();
         currentMove = queue.getCurrentActor();
+    }
+
+    /**
+     * 当前战斗状态（P7-3）。
+     */
+    public Status getStatus() {
+        return status;
+    }
+
+    /**
+     * 战斗是否已经结束（胜或负）。
+     */
+    public boolean isOver() {
+        return status == Status.WIN || status == Status.LOSE;
+    }
+
+    /**
+     * 判定胜负并落状态（P7-3）。**幂等**：已经是终态就什么都不做（终态不回退）。
+     *
+     * <p>口径：
+     * <ul>
+     *   <li>某一方**全灭**即判负 —— 用 {@code allMatch(isDeath)}，所以**空列表也算全灭**
+     *       （空的一方就是被清光了）。</li>
+     *   <li>{@link Status#NOT_STARTED} 时不判：战斗还没开场，谈不上胜负。
+     *       所以这个判定只在 {@link #startBattle()} 之后生效。</li>
+     *   <li>两边同时全灭 → {@code LOSE}（先判负后判胜，且**不会**从终态继续判定）。</li>
+     * </ul>
+     *
+     * @return 判定之后的当前状态
+     */
+    public Status checkResult() {
+        if (status != Status.RUNNING) {
+            return status;
+        }
+        if (characters.stream().allMatch(CanHit::isDeath)) {
+            status = Status.LOSE;
+        } else if (enemies.stream().allMatch(CanHit::isDeath)) {
+            status = Status.WIN;
+        }
+        return status;
     }
 
     /**
@@ -991,6 +1057,7 @@ public class Battle {
                 queue.removeCombatant(signal.getCanHit());
             }
         }
+        checkResult();                               // P7-3：清完尸体后顺手判胜负
     }
 
     public List<Signal> getQueueSnapshot() {
