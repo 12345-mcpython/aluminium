@@ -191,6 +191,25 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
+     * 直接设定"距离行动点还剩多少行动值"，并同步 {@link #nextActionTime}（P7-2）。
+     *
+     * <p>{@code remaining} 与 {@code nextActionTime} 是同一个状态的两份账本
+     * （见 {@code engine.md} §5.6），所以改其中一个就必须同步另一个 ——
+     * 这个方法就是为了让调用方不必自己保证这一点。
+     *
+     * <p>目前的唯一调用方是 {@link com.laosun.aluminium.Queue#grantExtraTurn}：
+     * 额外回合会把行动者的行动时间临时按到 {@code elapsed} 上，结束后再用这里还原，
+     * 这样"额外回合不消耗行动值"。
+     *
+     * @param elapsed   队列的当前全局时钟
+     * @param remaining 剩余行动值（{@code >= 0}）
+     */
+    public void setRemaining(double elapsed, double remaining) {
+        this.remaining = Math.max(0, remaining);
+        this.nextActionTime = elapsed + this.remaining;
+    }
+
+    /**
      * 返回"从当前时刻起排下一次行动"要用多久（首轮含 ×1.5 系数）。
      */
     public double nextCycleLength() {

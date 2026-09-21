@@ -70,6 +70,28 @@ public final class Queue {
      * Null if no one is currently acting.
      */
     private Signal currentActor;
+    /**
+     * 待消费的**额外回合**行动者（P7-2）：下一次 {@link #move()} 由他行动，
+     * 且**不推进时钟**（所以也不消耗行动值、不改变轮次）。
+     *
+     * <p>为 {@code null} = 没有额外回合。用 {@code ==} 比较身份，{@code CanHit} 没重写 equals。
+     */
+    private CanHit extraTurnActor;
+    /**
+     * 发出额外回合时，该行动者原本的 {@code nextActionTime}（P7-2）。
+     *
+     * <p>额外回合的实现是"把他的行动时间临时按到 {@code elapsed}"（见 {@link #grantExtraTurn}），
+     * 行动完必须还回去，否则他的一次**正常**回合就被这次额外回合吃掉了。
+     * 存的是发出时的快照，避免额外回合期间别人又推/拉了他的行动条。
+     */
+    private double extraTurnOriginalTime;
+    /**
+     * 额外回合行动完之后、下一次 {@link #move()} 时要还原的排期（P7-2）。
+     *
+     * <p>为什么不在额外回合里直接还原：还原之后堆顶又是他，下一次 {@code move()} 会直接推
+     * 他的**正常**回合，额外回合就白送了。所以推迟到下一次 {@code move()} 开头。
+     */
+    private ExtraTurnRestore pendingRestore;
 
     /**
      * Empty initializer
@@ -259,6 +281,14 @@ public final class Queue {
             currentActor = null;
             return 0;
         }
+        // P7-2：先处理"上一次额外回合留下的待还原排期"，再做正常推进。
+        if (pendingRestore != null) {
+            applyPendingRestore();
+        }
+        // P7-2：额外回合插队。时钟**不动**，所以行动值不消耗、轮次也不变。
+        if (extraTurnActor != null) {
+            return moveExtraTurn();
+        }
         Signal next = heap.peek();
         double timePassed = Math.max(0, next.getNextActionTime() - elapsed);
         elapsed = Math.max(elapsed, next.getNextActionTime());   // 时钟不倒退
@@ -271,6 +301,123 @@ public final class Queue {
         }
         currentActor = next;
         return timePassed;
+    }
+
+    /**
+     * 消费一个额外回合（P7-2）：让 {@link #extraTurnActor} 立刻行动，时钟不动。
+     *
+     * <p><b>为什么要把他的 {@code nextActionTime} 临时按到 {@code elapsed}</b>：
+     * 下游（{@code Battle.afterMove()}）是按"{@code currentActor} 是堆顶"来收尾的 ——
+     * 它会调 {@link #setTopZero()} 把行动者的周期从 {@code elapsed} 重新算起。
+     * 所以"额外回合"这个插队语义必须以"他此刻就排在队首"的形式表达出来，
+     * 否则堆顶还是别人，行动条就乱了。
+     *
+     * <p>按过去之后**不能在这里还**（还了堆顶又是他，下一次 {@code move()} 会直接推他的
+     * 正常回合）；还原推迟到下一次 {@code move()} 开头的 {@link #applyPendingRestore()}。
+     *
+     * @return 恒为 {@code 0}：额外回合不推进时钟
+     */
+    private double moveExtraTurn() {
+        CanHit actor = extraTurnActor;
+        extraTurnActor = null;
+
+        Signal signal = null;
+        for (Signal s : heap) {
+            if (s.getCanHit() == actor) {
+                signal = s;
+                break;
+            }
+        }
+        if (signal == null) {
+            // 他在拿到额外回合之后死了 / 被移出了队列 —— 这次额外回合作废，退回正常推进。
+            currentActor = null;
+            return move();
+        }
+
+        // 临时按到 elapsed，让下游（Battle.afterMove → setTopZero）按"他就在队首"正常收尾。
+        // ⚠ 信号**留在堆里**（只改键 + 重建堆）：取出去的话，setTopZero() 的
+        // heap.remove(acting) 会失败，行动者会被静默丢掉。
+        // ⚠ 他原本的排期**不能在这里还**：还了之后堆顶又变成他，下一次 move() 会
+        // 直接推他的正常回合，额外回合等于没生效。所以记进 pendingRestore，
+        // 留到下一次 move() 开头处理。
+        pendingRestore = new ExtraTurnRestore(actor, extraTurnOriginalTime);
+        signal.setRemaining(elapsed, 0);
+        rebuildHeap();
+
+        currentActor = signal;
+        return 0;
+    }
+
+    /**
+     * 消费额外回合留下的"待还原排期"（P7-2）。
+     */
+    private record ExtraTurnRestore(CanHit actor, double originalActionTime) {
+    }
+
+    /**
+     * 把额外回合行动者的排期还原成"发出额外回合时的那个值"（P7-2）。
+     *
+     * <p>发生在"额外回合已经行动完、他的周期已经被 {@link #setTopZero()} 按正常速度重排"之后，
+     * 所以这一步就是把白送的那一次抹掉 —— 他的正常回合仍然在原位置等他。
+     */
+    private void applyPendingRestore() {
+        ExtraTurnRestore restore = pendingRestore;
+        pendingRestore = null;
+        for (Signal s : heap) {
+            if (s.getCanHit() == restore.actor()) {
+                s.setRemaining(elapsed, Math.max(0, restore.originalActionTime() - elapsed));
+                rebuildHeap();
+                return;
+            }
+        }
+        // 他已经不在队里了（死了 / 被移除）：没什么可还原的。
+    }
+
+    /**
+     * 给 {@code actor} 一个**额外回合**（P7-2）：下一次 {@link #move()} 由他行动，
+     * 且**不消耗行动值**（时钟不动 → 轮次也不变）。
+     *
+     * <p>语义要点：
+     * <ul>
+     *   <li>额外回合**不是**"把他的行动条拉满"。拉条会提前他的**正常**回合，
+     *       而额外回合是白送一次、他的正常回合排期原封不动 ——
+     *       所以这里把他的行动时间临时按到 {@code elapsed}，行动完再还原。</li>
+     *   <li>每次 {@code grantExtraTurn} 只生效一次；重复调用同一个目标等价于一次
+     *       （不会攒多次额外回合）。</li>
+     *   <li>目标已死亡 / 不在队列里 → 返回 {@code false}，没有额外回合。</li>
+     *   <li>同一时刻只有一个人能持有额外回合；再给别人会**替换**掉上一个。</li>
+     * </ul>
+     *
+     * <p>典型用法（P5 的击杀型天赋，如希儿）：在 {@code afterMove()} 里 —
+     * 也就是 {@code setTopZero()} 之后 — 调用，这样存下的"原本排期"是他行动完被推后的那一个。
+     *
+     * @param actor 获得额外回合的单位
+     * @return {@code true} = 已安排额外回合
+     */
+    public boolean grantExtraTurn(CanHit actor) {
+        if (actor == null || actor.isDeath()) {
+            return false;
+        }
+        Signal signal = null;
+        for (Signal s : heap) {
+            if (s.getCanHit() == actor) {
+                signal = s;
+                break;
+            }
+        }
+        if (signal == null) {
+            return false;                            // 不在队里（未入场 / 已移除）
+        }
+        extraTurnActor = actor;
+        extraTurnOriginalTime = signal.getNextActionTime();
+        return true;
+    }
+
+    /**
+     * 当前是否安排了额外回合；是的话返回那个行动者（P7-2）。没有则 {@code null}。
+     */
+    public CanHit getExtraTurnActor() {
+        return extraTurnActor;
     }
 
     /**
