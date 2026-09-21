@@ -168,7 +168,7 @@
 |                       | P6-2 治疗乘区                                  | ☑   |
 |                       | P6-3 护盾                                      | ☑   |
 | **P7 轮次/胜负/关卡** | P7-1 轮次制行动值（150/100）                   | ✅   |
-|                       | P7-2 额外回合                                  | ☐   |
+|                       | P7-2 额外回合                                  | ✅   |
 |                       | P7-3 胜负状态机                                | ☐   |
 |                       | P7-4 StageBean + 波次                          | ☐   |
 |                       | P7-5 StageFactory + 难度                       | ☐   |
@@ -1611,23 +1611,28 @@ P7-1 落地后复查 `Queue`/`Signal` 时发现的四个真缺陷，与 P7-1 同
 
 ---
 
-### P7-2 额外回合
+### P7-2 额外回合 ✅
 
 - **目标**：`Battle.grantExtraTurn(canHit)`：立即行动，不消耗回合计数。
-- **涉及文件**：`Battle.java`、`Queue.java`（复用 `advanceActionByPercent(target, 1.0)` 即可）
-- **怎么做**：
-    1. `Battle` 加：
-       ```java
-       public void grantExtraTurn(CanHit c) {
-           queue.advanceActionByPercent(c, 1.0);  // 立即行动
-           // 回合计数不变: Queue 无回合计数, 由 P7-1 的 getRound 推算 elapsed — 天然满足
-       }
-       ```
-    2. ⚠ **必须配上 E1 的修法**（见 P7-1b）：额外回合的典型场景就是
-       "行动者正在行动期间，另一个人被拉到行动点"。此时堆顶已经不是行动者，
-       如果 `setTopZero()` 还在重置堆顶，行动者的周期不会被消费掉 → 他会连动两次。
-       E1 已把这个前置条件修好了。
-- **验收**：`QueueRoundTest` 补：`grantExtraTurn` 后 `queue.peekNext() == c` 且 `c` 行动后 `getRound()` 不变（一次性）
+- **涉及文件**：`Battle.java`、`Queue.java`、`Signal.java`、新建 `test/ExtraTurnTest.java`
+- **实际怎么做**（与计划有出入，记录差异）：
+    1. 计划里写"复用 `advanceActionByPercent(target, 1.0)` 即可" —— **这是错的**。
+       按比例拉条是把他的**正常**回合提前（消耗掉它），而额外回合是**白送一次、
+       正常回合排期原封不动**。两者不是一回事，所以需要独立的插队机制。
+    2. `Queue` 记 `extraTurnActor` + `extraTurnOriginalTime`；`move()` 见到它就
+       "时钟不动地"让他行动（`moveExtraTurn()`），并把他的行动时间临时按到 `elapsed`，
+       好让 `Battle.afterMove()` → `setTopZero()` 照常收尾。
+    3. ⚠ **信号必须留在堆里**（只改键 + 重建堆）。第一版我把它 `heap.remove` 出去了，
+       `setTopZero()` 的 `heap.remove(acting)` 随之失败 —— **行动者被静默丢掉**，
+       行动条直接空掉。这是本项最隐蔽的坑。
+    4. ⚠ **原本的排期不能在额外回合里还原**：还了之后堆顶又是他，下一次 `move()`
+       会直接推他的正常回合，额外回合等于没生效。所以记进 `pendingRestore`，
+       推迟到下一次 `move()` 开头处理。
+    5. `castUltra` 加规则：额外回合期间禁止插入**别人**的终结技（本人可以）。
+- **验收**：`ExtraTurnTest`（9 条）：立刻行动 / 时钟不动 / 轮次不变 / 正常回合不被消耗 /
+  插队 / 只生效一次 / 死人拿不到 / 队外拿不到 / 拿到后死亡作废 / 终结技插入限制。
+- **变异验证**：① 不还原原排期 → 1 红；② 额外回合推进时钟 → 5 红；③ 去掉终结技拦截 → 1 红。
+- **依赖**：E1（已随 P7-1b 修好）
 
 ---
 

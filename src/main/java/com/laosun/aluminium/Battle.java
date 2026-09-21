@@ -113,6 +113,12 @@ public class Battle {
         if (user == null || user.isDeath() || !user.isEnergyFull()) {
             return false;                       // 没满能量放不了（没有能量条的角色永远放不了）
         }
+        // P7-2：额外回合期间禁止插入**别人**的终结技。
+        // 规则见 HSR.md §3.1；不拦的话"额外回合"可以被终结技无限续下去。
+        CanHit extraTurnActor = queue.getExtraTurnActor();
+        if (extraTurnActor != null && extraTurnActor != user) {
+            return false;
+        }
         Skill ultra = user.getSkills().get(SkillType.ULTRA);
         if (ultra == null) {
             return false;
@@ -142,6 +148,31 @@ public class Battle {
     public void stepForward() {
         queue.move();
         currentMove = queue.getCurrentActor();
+    }
+
+    /**
+     * 给 {@code actor} 一个**额外回合**（P7-2）：下一次 {@link #stepForward()} 由他行动，
+     * 且**不消耗行动值**（时钟不动 → 轮次不变，见 {@link #getRound()}）。
+     *
+     * <p>典型用法是击杀型天赋（希儿等，ROADMAP P5-9）：在 {@code afterMove()} 里
+     * ——也就是 {@code queue.setTopZero()} 之后——调用，这样他的**正常**回合排期原封不动，
+     * 额外回合是白送的一次。
+     *
+     * <p>额外回合期间**不能插入别人的终结技**（见 {@link #castUltra}）——
+     * 这是规则要求；在额外回合里再插一次终结技会把"额外"变成"无限连"。
+     *
+     * @param actor 获得额外回合的单位
+     * @return {@code true} = 已安排；目标已死 / 不在队列里则 {@code false}
+     */
+    public boolean grantExtraTurn(CanHit actor) {
+        return queue.grantExtraTurn(actor);
+    }
+
+    /**
+     * 当前安排的额外回合行动者（P7-2）；没有则 {@code null}。
+     */
+    public CanHit getExtraTurnActor() {
+        return queue.getExtraTurnActor();
     }
 
     /**

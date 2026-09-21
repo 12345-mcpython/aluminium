@@ -337,7 +337,46 @@ Damage = skillBaseValue
 `Queue.snapshot()` 现在**直接复用 `Signal.compareTo`** 排序（不再另写一份比较规则），
 所以"显示顺序 == 出手顺序"。
 
-### 5.6 已知薄弱点 ⚠️（尚未修）
+### 5.6 额外回合（P7-2）✅
+
+`Battle.grantExtraTurn(actor)`：下一次 `stepForward()` 由他行动，**时钟不动**
+⇒ 不消耗行动值、轮次不变、**他的正常回合排期原封不动**。
+
+```
+   t=0    grantExtraTurn(actor)                  他原本排在 107.14
+   t=0    stepForward() → actor 行动             时钟仍为 0（move() 返回 0）
+   之后   actor 的周期被 setTopZero() 重排到 71.43
+   下一次 stepForward()：先还原成 107.14 → fast 在 75 行动 → actor 在 107.14 行动
+```
+
+**与"拉条"的区别**（最容易混淆的一点）：
+
+| | 拉条 `advanceActionByPercent` | 额外回合 `grantExtraTurn` |
+|---|---|---|
+| 对正常回合 | **消耗**它（提前到当前） | 保留它，额外白送一次 |
+| 时钟 | 可能前进 | 不动 |
+
+实现要点（三处，都在 `Queue` 里）：
+
+1. `grantExtraTurn()` 记下他**当时的** `nextActionTime`（`extraTurnOriginalTime`），
+   并在 `move()` 里把他的行动时间**临时**按到 `elapsed`，让下游
+   （`Battle.afterMove()` → `setTopZero()`）按"他此刻就是队首"正常收尾。
+2. **信号必须留在堆里**（只改键 + 重建堆）。取出去的话 `setTopZero()` 的
+   `heap.remove(acting)` 会失败，行动者被静默丢掉。
+3. 原本的排期**不能**在额外回合里还 —— 还了之后堆顶又是他，下一次 `move()` 会直接推他的
+   **正常**回合。所以推迟到下一次 `move()` 开头（`pendingRestore`）。
+
+规则与边界：
+
+- 每次 `grantExtraTurn` 只生效一次，重复调用同一个目标等价于一次（不会攒多次）。
+- 同一时刻只有一个人持有额外回合，再给别人会**替换**掉上一个。
+- 目标已死 / 不在队列里 → `false`，没有额外回合。
+- 拿到额外回合之后死掉 → 这次额外回合作废，正常推进继续（不会卡住行动条）。
+- **额外回合期间禁止插入别人的终结技**（`Battle.castUltra` 里拦）；额外回合本人可以放。
+  不拦的话"额外回合"能被终结技无限续下去。
+- 额外回合里 DOT 会照常结算（它按"回合"递减，额外回合是一次真正的回合）。
+
+### 5.7 已知薄弱点 ⚠️（尚未修）
 
 - **`Signal.remaining` 与 `nextActionTime` 是两份状态**：除法/乘法不是精确二进制运算，
   多次 `refreshSpeed` 后两者会有 ulp 级漂移。目前 `remaining` 只在"重排"时被读，
@@ -1043,7 +1082,7 @@ Buff 也拿不到"这一段是用什么槽位打出来的"。
 | `HSR.md` | 状态 |
 |---|---|
 | §3.1 **首轮行动值 150、后续每轮 100** | ✅ 已实现（P7-1）：`Constant.ROUND_ACTION_VALUE = 100` / `Constant.FIRST_ROUND_MULTIPLIER = 1.5`，`Queue.initialize()` 施加首轮系数、`Queue.getRound()` 按累计行动值分轮。见 §5.4 |
-| §3.1 **额外回合**（不消耗回合数、期间不可插入终结技） | ❌（P7-2） |
+| §3.1 **额外回合**（不消耗回合数、期间不可插入终结技） | ✅ 已实现（P7-2）：`Battle.grantExtraTurn` / `Queue.grantExtraTurn`；期间 `castUltra` 拦住非本人的终结技。见 §5.6 |
 | §3.2 **弱点击破效率** / **削韧值提高** | ❌ 属性都不存在；超击破公式（§7.3）需要它们 |
 | §3.4 **仇恨系统 / 受击概率** | ✅ 已实现（P5-1/P5-2）：`Path` + `CharacterData.aggro` + `Battle.aggroOf/getAggroTable`。见 §19.1 |
 | §3.4 **嘲讽** | ✅ 已实现（P5-2）：`TauntBuff` 是纯标记，**硬指定目标**（单体 / 扩散中心）而非仇恨加权 —— 与 §3.4 的"按百分比提高仇恨值"写法不同，见 §19.2 与 `DOC_VS_CODE.md` A-1 |
