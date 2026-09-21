@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Global constants and static game data loaded at startup.
@@ -76,6 +77,72 @@ public final class Constant {
      * 见 {@link com.laosun.aluminium.beans.EnemySkillData}。
      */
     public static final Map<Integer, EnemySkillData> ENEMY_SKILLS;
+
+    /**
+     * 关卡表（{@code stage.json}）：{@code stage_id → }{@link StageBean}。**懒加载**。
+     *
+     * <p>为什么不像其它数据表那样塞进静态块：{@code stage.json} 有 9 MB / 约 2.9 万条关卡，
+     * 比其它所有数据加起来还大，而绝大多数测试和 demo 根本不碰关卡。
+     * 放进静态块等于让每次 {@code Constant} 初始化都多付 ~35 MB 堆 + 几十毫秒。
+     *
+     * <p>⚠ 与其它数据表的第二点差别：{@code stage.json} 缺失时这里返回**空表**而不是抛异常。
+     * 它只服务关卡驱动（P7-4/P7-5），而 `Constant` 的静态块是"碰一下就整个测试套件一起挂"
+     * 的地方 —— 一个可选功能不该把全套测试拖下水。取不到关卡时由调用方
+     * （{@code StageFactory.load}）给出自解释的报错。
+     *
+     * @return 关卡表；数据文件缺失时为空表
+     */
+    public static Map<Integer, StageBean> stages() {
+        return StageHolder.LOADED;
+    }
+
+    /**
+     * 关卡表被**解析过几次**（0 或 1）—— 仅供测试观测懒加载（P7-4）。
+     *
+     * <p>为什么需要它：Java 没有公开 API 能查询"某个类是否已初始化"而不触发初始化，
+     * 所以"没人调 {@link #stages()} 就不该读 stage.json"这件事在测试里需要一个可观测点。
+     * 计入的是**解析尝试**（文件缺失导致的失败也算）—— 那正是要推迟的工作。
+     *
+     * <p>刻意放在**独立的类**里，不放进 {@link StageHolder}：{@code StageHolder} 的静态字段
+     * 按声明顺序初始化，把计数器放在被调用者后面会读到默认值 0。
+     */
+    public static int stageLoadAttempts() {
+        return StageProbe.LOAD_ATTEMPTS.get();
+    }
+
+    /**
+     * 见 {@link #stageLoadAttempts()}：与 {@link StageHolder} 分开的计数器，
+     * 避免静态字段初始化顺序把计数读成 0。
+     */
+    private static final class StageProbe {
+        private static final AtomicInteger LOAD_ATTEMPTS = new AtomicInteger();
+    }
+
+    /**
+     * 关卡表的懒加载载体。
+     *
+     * <p>关键在 {@code LOADED} 是 {@link StageHolder} 的静态字段：**嵌套类在首次被引用时**
+     * 才初始化，所以 {@code Constant} 的静态块跑完也不会解析 {@code stage.json}，
+     * 直到有人真的调 {@link #stages()}。
+     */
+    private static final class StageHolder {
+        private static final Map<Integer, StageBean> LOADED = load();
+
+        private static Map<Integer, StageBean> load() {
+            StageProbe.LOAD_ATTEMPTS.incrementAndGet();
+            try {
+                return Map.copyOf(JSONReader.fromJSON("stage.json",
+                        new TypeToken<Map<Integer, StageBean>>() {
+                        }.getType()));
+            } catch (IllegalStateException e) {
+                // 数据没生成 → 空表。真要用关卡的人会在 StageFactory.load 拿到明确的报错。
+                return Map.of();
+
+
+            }
+        }
+    }
+
 
     /**
      * Maps percentage-type attributes to their corresponding base-type attributes.

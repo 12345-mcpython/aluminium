@@ -46,6 +46,14 @@ public class Battle {
      */
     private Status status = Status.NOT_STARTED;
 
+    /**
+     * 波次管理（P7-4）；非波次战斗为 {@code null}。
+     *
+     * <p>存在的唯一理由是让 {@link #checkResult()} 知道"敌队是空的"到底是
+     * **打赢了**还是**这一波还没进**。
+     */
+    private WaveManager waveManager;
+
     public ArrayList<CanHit> addRequestItems = new ArrayList<>();
 
     public ArrayList<AdvanceRequest> advanceRequests = new ArrayList<>();
@@ -208,12 +216,28 @@ public class Battle {
         if (status != Status.RUNNING) {
             return status;
         }
+        // P7-4：还有没进的波 → 敌队为空只代表"这一波还没进"，不能判胜。
+        boolean pendingWaves = waveManager != null && waveManager.hasPendingWaves();
         if (characters.stream().allMatch(CanHit::isDeath)) {
-            status = Status.LOSE;
-        } else if (enemies.stream().allMatch(CanHit::isDeath)) {
+            status = Status.LOSE;                    // 我方全灭是真输了，有没有待进的波都一样
+        } else if (enemies.stream().allMatch(CanHit::isDeath) && !pendingWaves) {
             status = Status.WIN;
         }
         return status;
+    }
+
+    /**
+     * 登记波次管理器（P7-4）。由 {@link WaveManager} 的构造函数调用，业务代码不用手调。
+     */
+    public void setWaveManager(WaveManager waveManager) {
+        this.waveManager = waveManager;
+    }
+
+    /**
+     * 当前波次管理器（P7-4）；非波次战斗为 {@code null}。
+     */
+    public WaveManager getWaveManager() {
+        return waveManager;
     }
 
     /**
