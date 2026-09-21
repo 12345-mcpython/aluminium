@@ -17,6 +17,7 @@ import lombok.ToString;
 
 import java.util.EnumMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Abstract base for all entities that can participate in combat.
@@ -164,11 +165,24 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * Replaces the {@link DoubleValue} at the given attribute index.
      *
+     * <p>若替换的是 {@code SPEED} 且数值真的变了，会通知 {@link #notifySpeedChanged()}
+     * —— 这是"速度变化 → 重排行动条"（P7 修正 E2）的**唯一触发点**，
+     * 所以改速度请走这里（或改 {@code DoubleValue} 之后再调 {@code notifySpeedChanged()}），
+     * 不要在别处偷偷改速度属性。
+     *
      * @param attributeType the attribute to set
      * @param value         the new value object
      */
     public void setAttribute(AttributeType attributeType, DoubleValue value) {
+        DoubleValue previous = attributes[attributeType.ordinal()];
         attributes[attributeType.ordinal()] = value;
+        if (attributeType == AttributeType.SPEED) {
+            double oldSpeed = previous == null ? 0 : previous.get();
+            double newSpeed = value == null ? 0 : value.get();
+            if (oldSpeed != newSpeed) {
+                notifySpeedChanged();
+            }
+        }
     }
 
     /**
@@ -176,6 +190,34 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     public double getMaxHp() {
         return attributes[AttributeType.HEALTH.ordinal()].get();
+    }
+
+    /**
+     * 速度属性变化时的回调（P7 修正 E2）。
+     *
+     * <p>{@code Battle} 构造时把它指到"重排该单位的行动时间"（{@code Queue.refreshSpeed}）。
+     * 在此之前 {@code Signal} 缓存的 {@code speed} 只在几个"重置周期"的时机被刷新，
+     * 于是加速/减速不会立刻反映到行动条上。
+     */
+    private transient Consumer<CanHit> speedChangeListener;
+
+    /**
+     * 通知"这个单位的速度变了"。由 {@code Battle.onSpeedChanged} 调用，
+     * 别在别处直接调（否则行动条重排的规则会散落）。
+     */
+    public void notifySpeedChanged() {
+        if (speedChangeListener != null) {
+            speedChangeListener.accept(this);
+        }
+    }
+
+    /**
+     * 由 {@code Battle} 注入：速度变化时怎么重排行动条。
+     *
+     * @param listener 回调；{@code null} = 不通知（例如没有队列的单元测试）
+     */
+    public void setSpeedChangeListener(Consumer<CanHit> listener) {
+        this.speedChangeListener = listener;
     }
 
     /**

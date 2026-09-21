@@ -257,12 +257,26 @@ Damage = skillBaseValue
 
 `Queue` 用 **绝对时间 + 最小堆**（`PriorityQueue<Signal>`）而不是相对剩余值：
 
-- 每个 `Signal` 存 `nextActionTime`（绝对全局时间），速度 `speed` 在创建时缓存（`refreshSpeed()` 刷新）。
+- 每个 `Signal` 同时记两个量：
+  - `nextActionTime`（**绝对全局时间**，堆的排序键）；
+  - `remaining`（**距离行动点还剩多少行动值**，速度无关）。
 - 一个行动周期 `cycleTime() = 10000 / speed`（`Queue.ACTION_THRESHOLD = 10000`）。
-- 全局时钟 `elapsed`：`move()` 把 `elapsed` 推进到堆顶的 `nextActionTime`，并把堆顶设为 `currentActor`。
-- `setTopZero()`：把**堆顶**重置为 `elapsed + cycleTime()`，然后 `currentActor = null`。
+- 全局时钟 `elapsed`：`move()` 把 `elapsed` 推进到堆顶的 `nextActionTime`，把堆顶设为 `currentActor`，
+  并按推进量扣减所有信号的 `remaining`。
+- `setTopZero()`：把**行动者**（`currentActor`，不是堆顶）重置为 `elapsed + cycleTime()`，然后清空 `currentActor`。
 - 展示用派生值：`timeRemaining = max(0, nextActionTime - elapsed)`；
   `actionLength = max(0, 10000 - timeRemaining × speed)`。
+
+#### 为什么 `remaining` 要单独记（而不是用百分比）
+
+首轮（§5.4）的一次预约被拉长到 `1.5 × cycleTime()`，于是"预约长度"这个分母在首轮和之后不同
+（速度 100 时是 150 vs 100）。**距离是速度无关的**：行动条上"还差多少格"不随速度变化，
+速度只决定"每单位时间走几格"。所以速度变化时按
+`新 remaining = (旧 remaining / 旧预约长度) × 新预约长度` 换算 —— 已经走掉的进度不变，
+没走完的那部分按新速度重算。
+
+反过来，如果把进度记成百分比，速度一变就没法同时处理"分母换了"和"分子要缩放"两件事，
+首轮系数会被算成 `nextActionTime / cycleTime() = 1.5`，clamp 之后变成"立刻行动"。
 
 ### 5.2 行动条操纵
 
@@ -270,21 +284,42 @@ Damage = skillBaseValue
 |---|---|
 | `delayAction(target, amount)` | 推条：`nextActionTime += amount`（击破用 25% 周期） |
 | `advanceAction(target, amount)` | 拉条：`nextActionTime = max(elapsed, nextActionTime - amount)` |
-| `advanceActionByPercent(target, pct)` | 按剩余时间百分比提前（`p ∈ [0,1]`） |
+| `advanceActionByPercent(target, pct)` | 按剩余时间百分比提前（`p ∈ [0,1]`），**两侧都 clamp** |
 | `resetSignal(signal)` | 重置到 `elapsed + cycleTime()` |
 
 `Battle` 侧对应 `delayMovePercent(target, percent)`（周期 × percent）与
 `advanceRequest(target, rate)`（排队后由 `processRequests` 处理）。
 
-### 5.3 已知薄弱点 ⚠️（尚未修）
+### 5.3 速度变化即时重排（P7 修正 E2）✅
+
+速度变化 **立刻**反映到行动条上：触发点只有两个 —— `CanHit.setAttribute(SPEED, …)`（数值真的变了才通知）
+与属性型 buff 的 `applyEffect/removeBuff`（它们显式调 `notifySpeedChanged()`）。
+`CanHit.notifySpeedChanged()` → `Battle.onSpeedChanged` → `Queue.refreshSpeed(target)`。
+
+语义是"**已经走掉的进度不变，剩余等待按新速度重算**"（见 §5.1）。两个边界：
+
+- 刚行动完（进度 0）→ 按新速度重排整整一轮；
+- 刚好要行动 → **预约长度不打折**：加速不会让人凭空提前，只是把等待等比缩短。
+
+### 5.4 首轮行动值 150 / 后续 100（P7-1）✅
+
+- 一轮 = 100 行动值；**首轮 = 150**。
+- 实现上不是"整体延后 150"，而是 **每个单位的第一次预约乘 1.5**：
+  速度 100 的单位首轮等 150，之后每 100 动一次；速度 200 的单位首轮等 75。
+  所以首轮里高速单位能多动几次（速度 240 周期 41.67，150 之内能动 3 次）。
+- **只在 `Queue.initialize()`（战斗开场）施加**；`setTopZero()` / `addCombatant()` 之后都按正常周期排队
+  （`Signal.endFirstRound()` 会在该信号第一次行动后清掉系数）。
+- `Queue.getRound()` 按累计 `elapsed` 分轮，区间**闭右端**：
+  第 1 轮 `[0, 150]`、第 2 轮 `(150, 250]`、第 3 轮 `(250, 350]` ……
+
+### 5.5 已知薄弱点 ⚠️（尚未修）
 
 - **同行动值无裁决**：`Signal.compareTo` 只比 `nextActionTime`，相等时 `PriorityQueue` 顺序不受保证；
   而 `snapshot()` 是对堆数组做稳定排序，**显示顺序可能不等于实际出手顺序**（`Signal.id` 字段存在但从未赋值）。
-- **`setTopZero()` 重置的是堆顶而不是 `currentActor`**：今天恰好成立，一旦在 `move()`→`afterMove()`
-  窗口内动了键（推/拉条）就会重置错人。
-- **速度变化后无人调 `refreshSpeed()`**：加速 buff 要等该角色下一次行动才反映到行动条，减速则看起来立刻生效（不对称）。
-- **`advanceActionByPercent` 缺 clamp**：`a-(a-e)*p` 在 binary64 下可能小于 `elapsed`，
-  而 `move()` 直接把 `elapsed` 赋成该值 → 全局时钟轻微倒走。
+- **`Signal.remaining` 与 `nextActionTime` 是两份状态**：除法/乘法不是精确二进制运算，
+  多次 `refreshSpeed` 后两者会有 ulp 级漂移。目前 `remaining` 只在"重排"时被读，
+  而 `nextActionTime` 是唯一的排序键，所以漂移不影响出手顺序，但将来若要拿 `remaining` 当权威值，
+  得先合并成一个字段。
 
 ---
 
@@ -982,7 +1017,7 @@ Buff 也拿不到"这一段是用什么槽位打出来的"。
 
 | `HSR.md` | 状态 |
 |---|---|
-| §3.1 **首轮行动值 150、后续每轮 100** | ❌ 引擎只有 `10000 / 速度`，**没有轮次概念**（P7-1 正题） |
+| §3.1 **首轮行动值 150、后续每轮 100** | ✅ 已实现（P7-1）：`Constant.ROUND_ACTION_VALUE = 100` / `Constant.FIRST_ROUND_MULTIPLIER = 1.5`，`Queue.initialize()` 施加首轮系数、`Queue.getRound()` 按累计行动值分轮。见 §5.4 |
 | §3.1 **额外回合**（不消耗回合数、期间不可插入终结技） | ❌（P7-2） |
 | §3.2 **弱点击破效率** / **削韧值提高** | ❌ 属性都不存在；超击破公式（§7.3）需要它们 |
 | §3.4 **仇恨系统 / 受击概率** | ✅ 已实现（P5-1/P5-2）：`Path` + `CharacterData.aggro` + `Battle.aggroOf/getAggroTable`。见 §19.1 |
@@ -1013,9 +1048,9 @@ Buff 也拿不到"这一段是用什么槽位打出来的"。
 1. **超击破落地的前置比 ROADMAP P4-6 写的多**：公式里的 `(1 + 削韧值提高)` 与
    `(1 + 弱点击破效率提高)` 需要**两个新属性**，而 ROADMAP 只提了新建 buff、加常量、改 `Battle`。
    这两个属性同时也会修正 §3.2 的破韧公式，属于同一批工作。
-2. **"首轮 150 / 后续 100" 影响所有速度阈值的校验**：现在引擎里一切以
-   `10000 / 速度` 为准（例如"冰锋 132 速 → 周期 75.76"），
-   一旦 P7-1 引入轮次制，所有涉及行动值的测试锚点都要复核。
+2. **"首轮 150 / 后续 100" 影响所有速度阈值的校验**：✅ 已在 P7-1 落地并复核。
+   首轮的行动时间 = `1.5 × 10000 / 速度`（冰锋 132 速 → **113.64**，而不是 75.76），
+   之后的周期才是 `10000 / 速度`。`QueueTest` 的锚点已按此更新。
 
 ---
 

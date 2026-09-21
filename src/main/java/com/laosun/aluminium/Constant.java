@@ -201,6 +201,28 @@ public final class Constant {
     public static final Set<DamageElement> DOT_ELEMENTS =
             EnumSet.of(DamageElement.FIRE, DamageElement.THUNDER, DamageElement.PHYSICAL, DamageElement.WIND);
 
+    /**
+     * 一轮的行动值（P7-1）：后续每轮 **100**。
+     *
+     * <p>本项目里"行动值（Action Value, AV）"是**时间量纲**：速度 100 的单位一个周期走
+     * 100 行动值，所以 {@link com.laosun.aluminium.Queue#move()} 推进的 {@code elapsed}
+     * 就是累计行动值，{@link com.laosun.aluminium.Queue#getRound()} 直接拿它分轮。
+     */
+    public static final double ROUND_ACTION_VALUE = 100;
+
+    /**
+     * 首轮行动值倍率（P7-1）：首轮总行动值 **150**，之后每轮 **100**。
+     *
+     * <p>所以速度 100 的单位首轮要等 150 才动，第二圈起每 100 动一次；速度 200 的单位
+     * 首轮等 75。这不是"首轮整体延后"，而是每个单位的**第一个周期**被拉长 1.5 倍 ——
+     * 首轮里高速单位能多动几次（速度 240 的周期 41.67，首轮 150 之内能动 3 次）。
+     *
+     * <p>⚠ 只有 {@link com.laosun.aluminium.Queue#initialize()}（战斗开场）施加这个系数；
+     * {@code setTopZero()} / {@code addCombatant()} 之后都按正常周期排队。
+     * 中途变速时靠 {@link com.laosun.aluminium.models.Signal#isFirstRound()} 记账保留它。
+     */
+    public static final double FIRST_ROUND_MULTIPLIER = 1.5;
+
     static {
         RELIC_MAIN_ATTRIBUTES = JSONReader.fromJSON("main_attribute.json", RelicMainAttribute.class);
         RELIC_SUB_ATTRIBUTES = JSONReader.fromJSON("sub_attribute.json", RelicSubAttribute.class);

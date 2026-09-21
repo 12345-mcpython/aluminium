@@ -55,6 +55,30 @@ public class Battle {
         queue.addCombatants(characterQueue);
         queue.addCombatants(enemyQueue);
         queue.initialize();
+        // P7 修正 E2：把"速度变化 → 重排行动条"接上。没有这条，加速/减速不会立刻生效
+        // （Signal 缓存的 speed 只会在 initialize/setTopZero/resetSignal 这三个时机被刷新）。
+        for (Character c : characterQueue) {
+            c.setSpeedChangeListener(this::onSpeedChanged);
+        }
+        for (Enemy e : enemyQueue) {
+            e.setSpeedChangeListener(this::onSpeedChanged);
+        }
+    }
+
+    /**
+     * 某个单位的速度变了 → 按"已积累的行动进度"重排他的行动时间（P7 修正 E2）。
+     *
+     * <p>调用方是 {@link CanHit#notifySpeedChanged()}；它会先比对旧值，
+     * 只有真的变化了才通知，所以这里不需要再做判重。
+     *
+     * @param target 速度发生变化的单位
+     */
+    private void onSpeedChanged(CanHit target) {
+        if (target == null || target.isDeath()) {
+            return;
+        }
+        queue.refreshSpeed(target);
+        currentMove = queue.getCurrentActor();       // 重排可能改了谁是下一个
     }
 
     public Random getRng() {
