@@ -170,7 +170,7 @@
 | **P7 轮次/胜负/关卡** | P7-1 轮次制行动值（150/100）                   | ✅   |
 |                       | P7-2 额外回合                                  | ✅   |
 |                       | P7-3 胜负状态机                                | ✅   |
-|                       | P7-4 StageBean + 波次                          | ☐   |
+|                       | P7-4 StageBean + 波次                          | ✅   |
 |                       | P7-5 StageFactory + 难度                       | ☐   |
 | **P8 角色数据化**     | P8-0 角色机制数据化（架构总纲，先读）          | ☑   |
 |                       | P8-1 CharacterFactory + 角色字段补全           | ☐   |
@@ -1663,51 +1663,37 @@ P7-1 落地后复查 `Queue`/`Signal` 时发现的四个真缺陷，与 P7-1 同
 
 ---
 
-### P7-4 StageBean + 波次
+### P7-4 StageBean + 波次 ✅
 
-- **目标**：解析 `stage.json`，按 `monster` 列表（每项一波）依次进怪，波间可配置清理。
-- **涉及文件**：新建 `beans/StageBean.java`、`Constant.java`、新建 `models/WaveManager.java`、新建
-  `test/WaveManagerTest.java`
-- **怎么做**：
-    1. Bean：
-       ```java
-       public record StageBean(String type,
-               @SerializedName("hard_level_group") int hardLevelGroup,
-               int level,
-               List<Map<String, Integer>> monster) {}
-       ```
-       `Constant.STAGES = fromJSON("stage.json", TypeToken<Map<Integer, StageBean>>)`
-    2. `WaveManager`：
-       ```java
-       public class WaveManager {
-           private final Battle battle;
-           private final StageBean stage;
-           private int waveIndex = -1;
-  
-           public WaveManager(Battle battle, StageBean stage) {
-               this.battle = battle;
-               this.stage = stage;
-           }
-  
-           public boolean nextWave() {
-               if (++waveIndex >= stage.monster().size()) {
-                   return false;
-               }
-               for (int id : stage.monster().get(waveIndex).values()) {
-                   Enemy e = EnemyFactory.create(id, stage.level());
-                   battle.enemies.add(e);
-                   battle.addRequestItems.add(e);   // 复用 addRequestItems 进场
-               }
-               return true;
-           }
-       }
-       ```
-       注意进怪时机：`Battle.processRequests` 的 `processAddRequests` 会入队
-- **验收**：`WaveManagerTest`：stage 103201（3 怪 1 波）→ `nextWave()` true，`battle.enemies.size() == 3`；第 2 次调
-  false（若多波依次减数量）
-
----
-
+- **目标**：解析 `stage.json`，按 `monster` 列表（每项一波）依次进怪。
+- **涉及文件**：新建 `beans/StageBean.java`、`Constant.java`、新建 `models/WaveManager.java`、
+  `Battle.java`、新建 `test/WaveManagerTest.java`、新建 `test/StageLazyLoadTest.java`
+- **实际怎么做**（与计划有出入，记录差异）：
+    1. `StageBean` 按计划写，另加两个读法辅助：`waveCount()`、`monsterIds(i)`
+       （波内 id 必须按 `MonsterN` 的 N 序读，不能当无序集合用）。
+    2. `Constant.STAGES` **没有**做成静态常量字段，改成 **懒加载** `Constant.stages()`。
+       原因：实测 `stage.json` = 29303 条 / 解析 72 ms / **+35 MB 堆**，
+       比其它所有数据加起来还大，而多数测试和 demo 根本不碰关卡。
+       实测数据：没有它，全套测试的 `Constant` 初始化都要多付这笔钱。
+       实现用嵌套类 `StageHolder`（`LOADED` 是它的静态字段 → 首次引用才初始化）。
+    3. ⚠ 与其它数据表的第二点差别：`stage.json` **缺失时返回空表而不抛**。
+       它只服务关卡驱动，而 `Constant` 静态块是"抛一下就整个测试套件一起挂"的地方 ——
+       一个可选功能不该把全套测试拖下水。取不到关卡时由 P7-5 的 `StageFactory.load` 给明确报错。
+    4. `EnemyFactory.create` 的实际签名是 `(monsterId, level, hardLevelGroup)`（**三个**参数），
+       计划里写的两参数版本不存在。`WaveManager` 用三参数版。
+    5. `WaveManager.nextWave()` 里加了 `battle.checkResult()` 重新判定，并给它加了 `hasPendingWaves()`。
+    6. **`Battle.checkResult()` 必须接入波次**（计划里完全没提，是本项真正的坑）：
+       P7-3 的判据是"一方全灭"，而波次模式里"敌队为空"只代表**这一波还没进**。
+       所以 `Battle` 记一个 `waveManager`，`checkResult()` 在"还有待进的波"时不判胜。
+       不接这一步，`startBattle()` 会因为敌队为空**立刻判胜**，战斗根本开不起来。
+- **验收**：`WaveManagerTest`（15 条）+ `StageLazyLoadTest`（2 条，懒加载护栏）
+- **变异验证**：① 去掉 `!pendingWaves` 判断 → 4 红；② 把 `stages()` 挪回静态块 → 懒加载护栏 1 红。
+- **⚠ 关于懒加载护栏的教训**（写下来免得重犯）：第一版用"运行期解析计数快照"做断言，
+  结果**单独跑绿、全套红** —— 共享 JVM 里别的测试类先调了 `stages()`，快照自然失效。
+  改成反汇编 `Constant.class`、只切出 `static {}` 那一段来检查（编译产物是死的，与顺序无关）。
+  期间还踩了两次：字符串常量其实在**嵌套类**的常量池里（不在 `Constant` 里）；
+  以及编译器会把 `stages()` 内联，所以要断言 `Method stages:` 而不是 `StageHolder`。
+- **依赖**：P7-3（胜负状态机）
 ### P7-5 StageFactory + 难度
 
 - **目标**：`StageFactory.load(stageId)`：按 stage 的 `hard_level_group`/`level` 组装一个可运行 Battle。

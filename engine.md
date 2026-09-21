@@ -939,8 +939,13 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
 | `BREAKING_RATE` | `breaking_rate.json` | ⚠️ 可变 |
 
 > ⚠️ `public static final` 只锁引用不锁内容，**七张表可被运行时修改**（`Constant.SKILLS.clear()` 是合法的）。
-> 另外 `stage.json`(9 MB)、`challenge_*.json`、`character_id_mappings.json`、`elation_basic_level_damage.json`
-> **完全没有被加载**（前两个是关卡数据，P7-4 才用；后两个目前是死数据）。
+> 另外 `challenge_*.json`、`character_id_mappings.json`、`elation_basic_level_damage.json`
+> **完全没有被加载**（前两个是挑战模式数据，后两个目前是死数据）。
+>
+> **`stage.json`（9 MB / 约 2.9 万条关卡）是懒加载的**，走 `Constant.stages()`（P7-4）：
+> 它是最大的数据表，而多数测试与 demo 根本不碰关卡，塞进静态块等于每次 `Constant`
+> 初始化都多付 ~35 MB 堆。另外它**缺失时返回空表而不抛异常** —— 一个可选功能不该把
+> 整个测试套件拖下水（护栏见 `StageLazyLoadTest`）。
 
 `JSONReader.fromJSON` 用 UTF-8 + try-with-resources 读 classpath `/data/`。
 > ⚠️ 它的 javadoc 说"资源缺失返回 null"，实际是 `Objects.requireNonNull` **抛 NPE**；
@@ -984,7 +989,7 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
 |---|---|
 | 敌方**战斗循环**（谁在什么时候驱动敌人回合） | `Battle` 不自己驱动敌方回合：`enemyTurn` 在 `Main` 里（P5-5 按 ROADMAP 的做法）。完整循环封装留给 P11-1。**AI 本身（选目标 + 技能）已实现**，见 §19 |
 | 胜负判定 | ✅ P7-3（`Battle.Status` + `stepForward` 终态保护），见 §6.3 |
-| 关卡与波次 | `stage.json` 未加载，无波次切换（P7-4） |
+| 关卡与波次 | ✅ P7-4：`stage.json` 懒加载 + `WaveManager` 逐波进怪，见 §21 |
 | 效果命中判定 | ✅ P6-1（公式 + 掷骰 + 施加入口），但**基础概率还没有数据来源** |
 | 护盾 | ✅ P6-3（先扣盾再扣血、不叠加、吸收量计入"造成伤害"） |
 | 终结技插入 | 无（`castUltra` 只是立即排队结算，不是插入行动轴）；额外回合期间禁止插入**别人**的终结技 ✅ P7-2 |
@@ -1272,4 +1277,51 @@ Damage(type = damage_type, element)   // 走 Battle.applyDamage 统一装配
   所以**不能**把"乘区后的伤害"与盾吸收量相加（会正好翻倍）。
 - 🚧 **没有"护盾量提高"属性**（`AttributeType` 里没有），所以护盾量就是传入值 ——
   与"治疗降低"同类的缺口，等有真实效果引用时再加。
+
+---
+
+## 21. 关卡与波次 ✅ P7-4
+
+### 21.1 数据（`stage.json`）
+
+```
+"103201": {
+    "type": "Mainline",
+    "hard_level_group": 1,
+    "level": 29,
+    "monster": [ { "Monster0": 1022020, "Monster1": 1023010, "Monster2": 1022020 } ]
+}
+```
+
+- **`monster` 的每一项是一波**，所以 `monster.size()` 就是波数。
+  数据里既有单波（103201：3 只）、也有多波（310030：3 波，最后一波 5 只）。
+- 波内是 `{"MonsterN": id}`：`N` 只是**位置序号**，所以要按 `Monster0, Monster1, …`
+  的顺序读（Gson 给的是 `LinkedHashMap`，保持插入顺序）。
+  `StageBean.monsterIds(i)` 就是干这个的。
+- 同一只怪可以在同一波里出现多次（`Monster0` 与 `Monster2` 同 id）—— 那是**多个独立实例**。
+- ⚠ `hard_level_group` 必须写 `@SerializedName("hard_level_group")`：JSON 是下划线风格、
+  Java 是驼峰，Gson 不会自动换算。漏了会静默拿到 **0**，直到
+  `EnemyFactory` 报 `No hard level group 0 at level 29` 才暴露。
+- 加载方式见 §18：**懒加载**（`Constant.stages()`），且文件缺失时返回空表。
+
+### 21.2 波次（`WaveManager`）
+
+```java
+Battle battle = new Battle(team, new ArrayList<>(), rng);   // 敌队先空着
+WaveManager waves = new WaveManager(battle, Constant.stages().get(103201));
+battle.startBattle();
+waves.nextWave();          // 进第 1 波
+battle.processRequests();  // ⚠ 必须调，进怪是"排队入场"（addRequestItems）
+```
+
+- 进怪走 `Battle.addRequestItems` → `processAddRequests()` → `Queue.addCombatant`，
+  所以新怪是从**当前行动值**起跑的，不会回到 0 重开一轮 —— 这正是波次该有的表现。
+- ⚠ **`nextWave()` 之后必须 `processRequests()`**，否则怪只躺在 `addRequestItems` 里。
+- **胜负与波次的接缝**（最容易踩的一处）：`Battle.checkResult()` 的判据是"一方全灭"，
+  而波次模式里"敌队是空的"只是**这一波还没进**。所以 `Battle` 会问
+  `WaveManager.hasPendingWaves()`：**还有波没进就不判胜**。
+  敌方空 + 有待进的波 → 仍 `RUNNING`。
+- 我方全灭则照常判负 —— 有没有待进的波都救不了团灭。
+- 🚧 **没有"波间清理"配置**：数据里没有这一项，所以 `nextWave()` 只做"进怪"，
+  不清 buff、不重置行动条。将来拿到配置时扩展点就在 `nextWave()` 里。
 
