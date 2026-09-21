@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * P8-1 验收：{@code CharacterFactory} + 角色身份字段补全。
@@ -39,6 +40,31 @@ public class CharacterFactoryTest {
         Assertions.assertEquals(Path.ERUDITION, jingYuan.getPath());
         Assertions.assertEquals(130, jingYuan.getMaxEnergy(), 1e-9);
         Assertions.assertEquals(75, jingYuan.getAggro());
+    }
+
+    /**
+     * 所有角色都能读到星级，且取值只有 4 / 5（P8-2 的前置）。
+     *
+     * <p>{@code rarity} 是 generator 从 {@code AvatarConfig.Rarity}
+     * （形如 {@code CombatPowerAvatarRarityType5}）取末位数字得来的，
+     * 数据里是 **23 个 4★ + 70 个 5★**（与 docs 的 index 表一致）。
+     *
+     * <p>为什么现在就钉住：**P8-2 的技能等级上限按星级不同**（技能装配前必须先能读到它），
+     * 而 {@code CharacterData} 这个 record 一旦漏了字段，Gson 会静默给 0 —— 不报错、只是全错。
+     */
+    @Test
+    public void everyCharacterHasAStarRating() {
+        Map<Integer, Long> distribution = com.laosun.aluminium.Constant.CHARACTERS.values().stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        CharacterData::rarity, java.util.stream.Collectors.counting()));
+
+        Assertions.assertEquals(Set.of(4, 5), distribution.keySet(),
+                "星级只该有 4 与 5，实际 " + distribution);
+        Assertions.assertEquals(23L, distribution.get(4), "4★ 数量");
+        Assertions.assertEquals(70L, distribution.get(5), "5★ 数量");
+
+        Assertions.assertEquals(5, CharacterFactory.data(1204).rarity(), "景元是 5★");
+        Assertions.assertEquals(4, CharacterFactory.data(1001).rarity(), "三月七是 4★");
     }
 
     /**
