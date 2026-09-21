@@ -24,11 +24,11 @@ import java.util.PriorityQueue;
  * <ul>
  *   <li>{@link #move()} — peeks the smallest {@code nextActionTime}, advances {@code elapsed}
  *   to that point. No iteration needed.</li>
- *   <li>{@link #setTopZero()} — removes the first combatant, advances its
- *   {@code nextActionTime += 10000 / speed}, and re-inserts. O(log n).</li>
- *   <li>{@link #initialize()} — resets elapsed to zero, computes initial {@code nextActionTime}
- *   for all combatants. O(n log n).</li>
- *   <li>{@link #addCombatant(CanHit)} — computes {@code nextActionTime = elapsed + 10000 / speed},
+ *   <li>{@link #setTopZero()} — takes the combatant on top of the heap, resets it to
+ *   {@code elapsed + cycleTime()}, and re-inserts. O(log n).</li>
+ *   <li>{@link #initialize()} — resets elapsed to zero, computes the first
+ *   {@code nextActionTime} for all combatants (first round ×1.5). O(n log n).</li>
+ *   <li>{@link #addCombatant(CanHit)} — computes {@code nextActionTime = elapsed + cycleTime()},
  *   offers to heap. O(log n).</li>
  * </ul>
  *
@@ -48,21 +48,6 @@ import java.util.PriorityQueue;
 @ToString
 public final class Queue {
     private static final double ACTION_THRESHOLD = 10000;
-    /**
-     * 一轮的行动值（P7-1）：后续每轮 100。
-     */
-    private static final double ROUND_ACTION_VALUE = 100;
-    /**
-     * 首轮行动值倍率（P7-1）：首轮总行动值 **150**，之后每轮 **100**。
-     *
-     * <p>所以 <b>速度 100 的单位首轮要等 150 才动，第二圈起每 100 动一次</b>；
-     * 速度 200 的单位首轮等 75。这不是"首轮整体延后"，而是每个单位的**第一个周期**被拉长 1.5 倍
-     * —— 所以首轮里高速单位能多动一次（速度 240 在 150 之内能动两次）。
-     *
-     * <p>注意：只有 {@link #initialize()} 施加这个系数（战斗开场）；
-     * {@link #setTopZero()} / {@link #addCombatant} 之后都按正常周期排队。
-     */
-    private static final double FIRST_ROUND_MULTIPLIER = 1.5;
     /**
      * 浮点比较用的极小量：把"正好落在轮末"的 elapsed 归到上一轮（见 {@link #getRound()}）。
      */
@@ -177,7 +162,7 @@ public final class Queue {
             }
         }
         Signal sig = new Signal(combatant);
-        sig.setNextActionTime(elapsed + sig.cycleTime());
+        sig.markActed(elapsed);              // remaining = cycleTime()，next = elapsed + cycleTime()
         heap.offer(sig);
     }
 
@@ -217,7 +202,8 @@ public final class Queue {
         for (Signal s : snapshot) {
             s.refreshSpeed();
             // P7-1：首轮 150，后续每轮 100 → 首个周期 ×1.5
-            s.setNextActionTime(s.cycleTime() * FIRST_ROUND_MULTIPLIER);
+            s.markFirstRound();                  // 顺带把 remaining 置为 1.5 × cycleTime()
+            s.setNextActionTime(s.getRemaining());
             heap.offer(s);
         }
     }
@@ -240,11 +226,11 @@ public final class Queue {
      * @return 轮次，从 1 开始
      */
     public int getRound() {
-        double firstRound = ROUND_ACTION_VALUE * FIRST_ROUND_MULTIPLIER;
+        double firstRound = Constant.ROUND_ACTION_VALUE * Constant.FIRST_ROUND_MULTIPLIER;
         if (elapsed <= firstRound) {
             return 1;
         }
-        return 2 + (int) ((elapsed - firstRound - EPSILON) / ROUND_ACTION_VALUE);
+        return 2 + (int) ((elapsed - firstRound - EPSILON) / Constant.ROUND_ACTION_VALUE);
     }
 
     /**
@@ -253,6 +239,9 @@ public final class Queue {
      * <p>No iteration over all combatants — only advances the global clock.
      * The combatant that acts will have {@code nextActionTime == elapsed}
      * after this call (i.e., zero remaining time).
+     *
+     * <p>{@code elapsed} **只增不减**：即便某个信号因为浮点误差落在当前时钟之前
+     * （见 {@link #advanceActionByPercent} 的说明），时钟也不会倒退。
      *
      * @return the amount of time that passed
      */
@@ -263,38 +252,78 @@ public final class Queue {
         }
         Signal next = heap.peek();
         double timePassed = Math.max(0, next.getNextActionTime() - elapsed);
-        elapsed = next.getNextActionTime();
+        elapsed = Math.max(elapsed, next.getNextActionTime());   // 时钟不倒退
+        // P7 修正 E2：把这段时钟推进记到所有人的"周期进度"账本上，
+        // 这样中途变速才能按"已经走了几成"重排（见 Signal#refreshSpeed(double)）。
+        if (timePassed > 0) {
+            for (Signal s : heap) {
+                s.advanceProgress(timePassed);
+            }
+        }
         currentActor = next;
         return timePassed;
     }
 
     /**
-     * Resets the current (first) combatant's action cycle: removes from top,
-     * advances their next action time by one full cycle, and re-inserts.
+     * Resets the **current actor's** action cycle (see {@link #move()}): its next action is
+     * one full cycle from now, and it is re-inserted into the heap.
      *
-     * <p>O(log n): one {@code poll()} + one {@code offer()}.
+     * <p><b>为什么要用 currentActor 而不是堆顶</b>：这个方法的名字与含义是"行为结束了，
+     * 把**行动者**推回队尾"。堆顶只是"此刻最早的人"，二者在遇到行动条操纵后就不再等价 ——
+     * 例如拉条把某人拉到 {@code elapsed} 之后，堆顶会变成那个人，若按堆顶重置，
+     * 行动者的周期没重置（他会连动两次），而被重置的是别人。
+     *
+     * <p>{@code currentActor == null}（没调 {@link #move()} 就调了本方法）时什么都不做：
+     * 静默地把堆顶推后一个周期等于"跳过一个人的回合"，那是更坏的失败方式。
      */
     public void setTopZero() {
-        if (heap.isEmpty()) {
-            currentActor = null;
-            return;
+        Signal acting = currentActor;
+        if (acting == null) {
+            return;                                  // 没有正在行动的人 → 无事可做（不要动堆顶）
         }
-        Signal acting = heap.peek();
-        heap.remove(acting);
-        acting.refreshSpeed();
-        acting.setNextActionTime(elapsed + acting.cycleTime());
-        heap.offer(acting);
         currentActor = null;
+        if (!heap.remove(acting)) {
+            return;                                  // 他已经不在队里了（已死被移除）
+        }
+        acting.refreshSpeed();
+        acting.endFirstRound();                      // 首轮系数用完即止
+        acting.markActed(elapsed);                   // remaining = cycleTime()，next = elapsed + 周期
+        heap.offer(acting);
     }
 
-    public void resetSignal(Signal signal) {
+    public boolean resetSignal(Signal signal) {
         if(signal == null || !heap.contains(signal)) {
-            return;
+            return false;
         }
         heap.remove(signal);
         signal.refreshSpeed();
-        signal.setNextActionTime(elapsed + signal.cycleTime());
+        signal.endFirstRound();
+        signal.markActed(elapsed);
         heap.offer(signal);
+        return true;
+    }
+
+    /**
+     * 速度变化后重排该单位的行动时间（P7 修正 E2）：把他的行动时间按"已积累进度"等比换算。
+     *
+     * <p>调用方是 {@code Battle.onSpeedChanged}（由 {@code CanHit} 的属性变化回调触发）。
+     * 目标不在队里（已死 / 未入场）时返回 {@code false}，不报错。
+     *
+     * @param target 速度发生变化的单位
+     * @return {@code true} = 他的行动时间被重排了
+     */
+    public boolean refreshSpeed(CanHit target) {
+        if (target == null) {
+            return false;
+        }
+        for (Signal signal : heap) {
+            if (signal.getCanHit() == target) {
+                signal.refreshSpeed(elapsed);
+                rebuildHeap();                       // 键改了，堆需要重排
+                return true;
+            }
+        }
+        return false;
     }
 
     // ─── Action manipulation ─────────────────────────────
@@ -364,6 +393,11 @@ public final class Queue {
      * <p>If {@code percent = 1.0} (100%), the target acts immediately.
      * If {@code percent = 0.5} (50%), half the remaining wait is skipped.
      *
+     * <p>⚠ <b>必须 clamp</b>：{@code a - (a-e)·p ≥ e} 在数学上成立，但 binary64 不保证 ——
+     * 差一个 ulp 就会让 {@code nextActionTime} **略小于 {@code elapsed}**，
+     * 于是 {@link #move()} 会把全局时钟往回拨，接着 {@link #setTopZero()} 就会去重置
+     * 那个"落在过去"的单位，导致真正的行动者连动两次。所以这里与 {@link #advanceAction} 一样取 max。
+     *
      * @param target  the combatant to advance
      * @param percent fraction of remaining time to skip (0.0 ~ 1.0)
      * @return {@code true} if the target was found and advanced
@@ -376,7 +410,7 @@ public final class Queue {
             if (s.getCanHit() == target) {
                 double remaining = Math.max(0, s.getNextActionTime() - elapsed);
                 double advance = remaining * percent;
-                s.setNextActionTime(s.getNextActionTime() - advance);
+                s.setNextActionTime(Math.max(elapsed, s.getNextActionTime() - advance));
                 rebuildHeap();
                 return true;
             }

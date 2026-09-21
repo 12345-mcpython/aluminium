@@ -167,7 +167,7 @@
 | **P6 命中/治疗/护盾** | P6-1 效果命中与抵抗                            | ☑   |
 |                       | P6-2 治疗乘区                                  | ☑   |
 |                       | P6-3 护盾                                      | ☑   |
-| **P7 轮次/胜负/关卡** | P7-1 轮次制行动值（150/100）                   | ☐   |
+| **P7 轮次/胜负/关卡** | P7-1 轮次制行动值（150/100）                   | ✅   |
 |                       | P7-2 额外回合                                  | ☐   |
 |                       | P7-3 胜负状态机                                | ☐   |
 |                       | P7-4 StageBean + 波次                          | ☐   |
@@ -1571,19 +1571,39 @@
 
 ---
 
-### P7-1 轮次制行动值
+### P7-1 轮次制行动值 ✅
 
-- **目标**：首轮总行动值 150、之后每轮 100（当前是 10000/speed 恒定）。
-- **涉及文件**：`Queue.java`、新建 `test/QueueRoundTest.java`
-- **怎么做**：
-    1. `Queue.initialize()` 里首圈系数 1.5：
-       ```java
-       s.setNextActionTime(s.cycleTime() * 1.5);   // 首轮 150 行动值
-       ```
-       `setTopZero()/resetSignal()/addCombatant()` 保持 `+cycleTime()`（100 行动值/圈）
-    2. 加 `public int getRound()`（按 `elapsed` 推算：`(int)(elapsed / 100) + 1`，够演示用）
-- **验收**：`QueueRoundTest`：speed 100 → `move()` 后 elapsed=150；再 3 次各 +100；speed 200 → 首圈 75
+- **目标**：首轮总行动值 150、之后每轮 100（原先是 10000/speed 恒定）。
+- **涉及文件**：`Queue.java`、`Constant.java`、`Signal.java`、新建 `test/QueueRoundTest.java`、
+  `test/QueueActionManipulationTest.java`
+- **实际怎么做**（与计划有出入，记录差异）：
+    1. 首圈系数 1.5 **不是**只改 `initialize()`：`Signal` 需要记住"这一次预约是否含首轮系数"
+       （`firstRound` 标记），否则该单位中途变速 / 被重置周期时无法判断新周期要不要乘 1.5。
+    2. `Signal` 另外记 **`remaining`（剩余行动值，速度无关）**。原因见 `engine.md` §5.1：
+       首轮的预约长度是 150、之后是 100，用百分比记账在速度变化时无法换算。
+    3. 常量进 `Constant`（`ROUND_ACTION_VALUE = 100`、`FIRST_ROUND_MULTIPLIER = 1.5`），
+       而不是留在 `Queue` 里当 `private` —— `Signal` 也要用它。
+    4. `getRound()`：`(int)(elapsed / 100) + 1` 在 `elapsed == 150` 时会给 2，**是错的**；
+       改成闭右端区间（见 `engine.md` §5.4）。
+- **验收**：`QueueRoundTest` + `QueueActionManipulationTest`（speed 100 → 首轮 elapsed 150；
+  speed 200 → 首轮 75；`setTopZero` 之后 +100）
 - **依赖**：无
+
+---
+
+### P7-1b 行动条三处修正（E1/E2/E3）✅
+
+P7-1 落地后复查 `Queue`/`Signal` 时发现的三个真缺陷，与 P7-1 同批修掉：
+
+| 编号 | 缺陷 | 修法 |
+|---|---|---|
+| **E1** | `setTopZero()` 重置的是**堆顶**而不是 `currentActor`；在 `move()`→`afterMove()` 窗口里动过键（推/拉条）就会重置错人 → 行动者连动两次 | 重置 `currentActor`；为 `null` 或已被移出队里时直接返回 |
+| **E2** | 速度变化后**没人调** `refreshSpeed()`：加速要等该单位下一次行动才生效，减速却因为 `nextActionTime` 是绝对时间而"看起来立刻生效"（不对称） | `CanHit.setAttribute(SPEED…)` 与属性型 buff 显式 `notifySpeedChanged()` → `Battle.onSpeedChanged` → `Queue.refreshSpeed(target)`，按 §5.1 的剩余距离换算 |
+| **E3** | `advanceActionByPercent` 缺 clamp：`a-(a-e)·p` 在 binary64 下可能小于 `elapsed`，`move()` 会把全局时钟往回拨 | 两侧都 clamp（`remaining` 取 max 0、结果取 max `elapsed`）；`move()` 里时钟也改成只增不减 |
+
+- **验收**：`QueueActionManipulationTest`（8 条）。三条修正都做过**变异验证**：
+  把每处修回错误实现，对应测试必须变红。
+- **仍未修**：`Signal.compareTo` 只比 `nextActionTime`，同值时的先后顺序不受保证（E4）。
 
 ---
 
@@ -1599,6 +1619,10 @@
            // 回合计数不变: Queue 无回合计数, 由 P7-1 的 getRound 推算 elapsed — 天然满足
        }
        ```
+    2. ⚠ **必须配上 E1 的修法**（见 P7-1b）：额外回合的典型场景就是
+       "行动者正在行动期间，另一个人被拉到行动点"。此时堆顶已经不是行动者，
+       如果 `setTopZero()` 还在重置堆顶，行动者的周期不会被消费掉 → 他会连动两次。
+       E1 已把这个前置条件修好了。
 - **验收**：`QueueRoundTest` 补：`grantExtraTurn` 后 `queue.peekNext() == c` 且 `c` 行动后 `getRound()` 不变（一次性）
 
 ---
