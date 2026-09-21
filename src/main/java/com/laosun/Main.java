@@ -65,10 +65,11 @@ public class Main {
                 EnemyFactory.create(8032010, 90, 1),
                 EnemyFactory.create(8002040, 90, 1)));
         for (Enemy enemy : enemies) {
-            // 真实血量偏低，拉高一点让战斗能打满几个回合、看得到 DOT 与击破循环。
+            // 真实血量在 2k~20k 量级；这里定 12000，让 demo 能在几十回合内真正分出胜负
+            // （注意我方这是"无光锥无遗器"的基础面板，每次普攻只有几百伤害）。
             // 生命上限存在属性数组的 HEALTH 槽里；currentHp 没有 setter，所以提高上限后 heal 补满。
-            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(48_000));
-            enemy.heal(48_000);
+            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(12_000));
+            enemy.heal(12_000);
             enemy.setMaxEnergy(0);               // 怪物没有能量条：maxEnergy == 0 → 所有回能 no-op
             printEnemy(enemy);
         }
@@ -85,7 +86,7 @@ public class Main {
         System.out.println();
 
         int round = 0;
-        while (!isOver(battle) && round < 30) {
+        while (!isOver(battle) && round < 45) {
             round++;
             System.out.println("────────────────── 第 " + round + " 回合 ──────────────────");
             step(battle);
