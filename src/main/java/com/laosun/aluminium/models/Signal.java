@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * A combatant's position in the turn-based action queue.
  *
@@ -35,9 +37,28 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     private CanHit canHit;
     /**
-     * Unique identifier for this signal.
+     * 同行动值时的**排期序号**（P7 修正 E4）：越小越先行动。
+     *
+     * <p>为什么需要它：{@link #nextActionTime} 相等时 {@code PriorityQueue} 的顺序是**未定义**的
+     * （它只保证堆顶是最小元素，不保证相等元素的先后）。于是"两个同速单位谁先出手"会变成
+     * 碰运气，而 {@link com.laosun.aluminium.Queue#snapshot()} 又是对堆数组做稳定排序 ——
+     * <b>显示出来的顺序可能不等于实际出手顺序</b>。
+     *
+     * <p>裁决语义："**先被排进队的先行动**"：{@link #markScheduled()} 在每次"排期"
+     * （入场建号 / 行动后重新预约 / {@code resetSignal}）时取一个全局递增号。
+     *
+     * <p>⚠ 行动条操纵（推条 / 拉条 / 按比例拉条）**不**重新取号，只改 {@link #nextActionTime}：
+     * 把它们也算成"重新排期"会导致"谁刚被拉条谁就先手"这种反直觉结果。
+     * 所以把 A 拉到和 B 同一时刻时，B 仍然先动（B 的排期更早）。
      */
-    private int id = 0;
+    private long sequence;
+    /**
+     * 全局递增的排期序号发号器。
+     *
+     * <p>{@code static} 是刻意的：序号只需要在同一场战斗**内部**可比，
+     * 而同一 JVM 里可能连续跑很多场战斗（测试尤其如此），共享一个发号器最简单也最不容易出错。
+     */
+    private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
     /**
      * 距离下一个行动点还剩多少**行动值**（P7 修正 E2）。
      *
@@ -185,7 +206,35 @@ public final class Signal implements Comparable<Signal>, Cloneable {
 
     @Override
     public int compareTo(@NotNull Signal o) {
-        return Double.compare(this.nextActionTime, o.nextActionTime);
+        int byTime = Double.compare(this.nextActionTime, o.nextActionTime);
+        if (byTime != 0) {
+            return byTime;
+        }
+        return Long.compare(this.sequence, o.sequence);     // E4：同行动值 → 先排期的先动
+    }
+
+    /**
+     * 取一个新的排期序号（P7 修正 E4）。由 {@link com.laosun.aluminium.Queue} 在
+     * "这个信号（重新）排期"时调用：建 Signal 入队（{@code addCombatant()}）、
+     * 行动后 {@code setTopZero()}、以及 {@code resetSignal()}。
+     *
+     * <p>⚠ 两处**不要**调它：
+     * <ul>
+     *   <li>推条 / 拉条 / 按比例拉条 —— 那只改行动值。若拉条也换号，
+     *       就变成"谁刚被拉条谁先手"这种反直觉结果；</li>
+     *   <li>{@code initialize()} —— 它迭代的是 heap 的**内部数组**，顺序由堆结构决定，
+     *       在那里换号会破坏"同速单位按入场顺序出手"。</li>
+     * </ul>
+     */
+    public void markScheduled() {
+        this.sequence = SEQUENCE_GENERATOR.getAndIncrement();
+    }
+
+    /**
+     * 排期序号（越小越先行动）。仅供测试与调试断言同行动值时的先后。
+     */
+    public long getSequence() {
+        return sequence;
     }
 
     /**

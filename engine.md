@@ -312,14 +312,39 @@ Damage = skillBaseValue
 - `Queue.getRound()` 按累计 `elapsed` 分轮，区间**闭右端**：
   第 1 轮 `[0, 150]`、第 2 轮 `(150, 250]`、第 3 轮 `(250, 350]` ……
 
-### 5.5 已知薄弱点 ⚠️（尚未修）
+### 5.5 同行动值裁决（P7 修正 E4）✅
 
-- **同行动值无裁决**：`Signal.compareTo` 只比 `nextActionTime`，相等时 `PriorityQueue` 顺序不受保证；
-  而 `snapshot()` 是对堆数组做稳定排序，**显示顺序可能不等于实际出手顺序**（`Signal.id` 字段存在但从未赋值）。
+`nextActionTime` 相等时 **`compareTo` 比排期序号**（`Signal.sequence`，全局递增，越小越先）：
+
+```
+先比 nextActionTime；相等 → 比 sequence（先排期的先行动）
+```
+
+为什么需要：`PriorityQueue` 只保证堆顶是最小元素，**相等元素的先后是未定义的**；
+而 `snapshot()` 原来是对堆数组做稳定排序 —— 于是"两个同速单位谁先出手"变成碰运气，
+而且**显示出来的顺序可能不等于实际出手顺序**。
+
+序号在什么时候换：
+
+| 时机 | 是否换号 | 理由 |
+|---|---|---|
+| `addCombatant()`（建 Signal） | ✅ | 按入场顺序发号 |
+| `setTopZero()`（行动后重新预约） | ✅ | 行动者排到同级末尾 |
+| `resetSignal()` | ✅ | 等价于重新排期 |
+| `initialize()` | ❌ | 它迭代的是 **heap 内部数组**，顺序由堆结构决定；在这里换号会破坏"同速按入场顺序出手" |
+| 推条 / 拉条 / 按比例拉条 | ❌ | 只改行动值。若拉条也换号，就变成"谁刚被拉条谁先手" |
+
+`Queue.snapshot()` 现在**直接复用 `Signal.compareTo`** 排序（不再另写一份比较规则），
+所以"显示顺序 == 出手顺序"。
+
+### 5.6 已知薄弱点 ⚠️（尚未修）
+
 - **`Signal.remaining` 与 `nextActionTime` 是两份状态**：除法/乘法不是精确二进制运算，
   多次 `refreshSpeed` 后两者会有 ulp 级漂移。目前 `remaining` 只在"重排"时被读，
   而 `nextActionTime` 是唯一的排序键，所以漂移不影响出手顺序，但将来若要拿 `remaining` 当权威值，
   得先合并成一个字段。
+- **`Signal` 仍实现 `Cloneable` 且 `clone()` 是浅拷贝**：克隆会连 `sequence` 一起复制，
+  两个克隆同时进堆就会有相同序号。目前没有任何调用方，属预防性备注。
 
 ---
 
