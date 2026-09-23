@@ -10,6 +10,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.lang.IO.println;
+
 /**
  * Turns one skill activation into the right number of {@link Damage} objects.
  *
@@ -61,6 +63,49 @@ public final class SkillExecutor {
     }
 
     /**
+     * 非伤害技能的**未分派诊断日志**开关（P8-2 计划第 3 条）。
+     *
+     * <p>{@link #resolveHits} 在"不是伤害类技能"时**静默 return** —— 也就是说治疗/护盾/buff/
+     * 控制/召唤这些技能被施放后**什么都不发生**（只有回能照给）。这在真实队伍里很难察觉：
+     * 日志上看技能"放出去了"，只是没有任何效果。所以这里给一个可开关的诊断。
+     *
+     * <p>为什么默认**关**：{@code Main} 的 demo 每回合都在放治疗与护盾，默认开会刷屏。
+     * 计划里原本想直接 {@code IO.println}，实测会污染 demo 输出，故改为显式开关。
+     */
+    private static boolean logNotDispatched = false;
+
+    /**
+     * 打开/关闭"非伤害技能未分派"的诊断日志。测试与排查时打开，正式跑保持关闭。
+     */
+    public static void setLogNotDispatched(boolean enabled) {
+        logNotDispatched = enabled;
+    }
+
+    /**
+     * 记录"这条技能没有被打出去"。同时标注它**归哪个阶段**实现 ——
+     * 免得看到"施法成功但没效果"时无从下手。
+     */
+    private static void logNotDispatched(Skill skill, CanHit user, SkillEffectType effect,
+                                        List<? extends CanHit> targets) {
+        if (!logNotDispatched) {
+            return;
+        }
+        String phase = switch (effect.getCategory()) {
+            case HEAL -> "P6-2 已实现（走 Battle.heal，不经本执行器）";
+            case BUFF -> "P10-3 Buff 体系";
+            case CONTROL -> "P10-6 Debuff / 控制";
+            case SUMMON -> "P9-4 召唤物";
+            case PASSIVE -> "纯被动，本就不该作为行动施放";
+            case DAMAGE -> "伤害类（不该走到这里）";
+        };
+        var data = skill.getData();
+        println("[SkillExecutor] 未分派：" + data.getSkillType() + " / " + effect
+                + "（" + user.getName() + "，目标 "
+                + (targets == null ? "null" : targets.size() + " 个")
+                + "）→ 归属 " + phase);
+    }
+
+    /**
      * 把一次技能施放展开成 N 段伤害并结算（能量不在这里给，见 {@link #execute}）。
      *
      * @param hitTargets 输出参数：实际命中集
@@ -72,6 +117,7 @@ public final class SkillExecutor {
 
         // 1) 先判是否伤害技能：护盾/治疗/buff 技的 param 第 1 项不是伤害倍率
         if (!effect.isDamaging() || targets == null || targets.isEmpty()) {
+            logNotDispatched(skill, user, effect, targets);
             return;                                  // TODO P6/P7/P9：治疗/护盾/控制/召唤再分派
         }
 

@@ -517,6 +517,36 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 `SkillData.init` 在查不到 `cid`/槽位时返回 `EMPTY`（`PHYSICAL` + `ENHANCE` + 空参数）
 → 因为 `ENHANCE` 不是伤害类，技能会**静默零伤害**且 `requestSkill` 仍返回 `true`。这是易踩的坑。
 
+### 7.2b 非伤害技能：静默不分派 + 可开关诊断 ⚠（P8-2）
+
+`SkillExecutor.resolveHits` 在"不是伤害类技能"时**直接 return** —— 也就是说
+治疗 / 护盾 / buff / 控制 / 召唤技能**被施放后什么都不发生**（只有**回能**照给，见 §7.4）。
+
+这是**分阶段设计**，不是遗漏：各效果的宿主在别处。
+
+| 效果类别 | 谁负责 | 现状 |
+|---|---|---|
+| `RESTORE`（治疗） | `Battle.heal`（P6-2） | ✅ 已实现，**但没有任何地方自动分派** —— 要调用方自己调（`Main` 就是这么做的） |
+| `DEFENCE`（护盾） | `Battle.grantShield`（P6-3） | ✅ 已实现，同样靠调用方分派 |
+| `SUPPORT`（增益） | P10-3 Buff 体系 | ❌ |
+| `IMPAIR`（控制/减益） | P10-6 | ❌ |
+| `SUMMON`（召唤） | P9-4 | ❌ |
+| `ENHANCE` | 纯被动 | 本就不该作为"行动"施放 |
+
+**这个静默很难察觉**：日志上技能"放出去了"、能量也涨了，只是没有任何效果。
+所以加了一个**默认关闭**的诊断开关：
+
+```java
+SkillExecutor.setLogNotDispatched(true);   // 排查时打开
+// → [SkillExecutor] 未分派：BPSkill / RESTORE（Natasha，目标 1 个）
+//   → 归属 P6-2 已实现（走 Battle.heal，不经本执行器）
+```
+
+> ⚠ 计划里原本想用 `IO.println` **无条件**打印，实测会刷屏（demo 每回合都在治疗/护盾），
+> 故改为开关。护栏：`SkillExecutorDiagnosticTest` —— 其中
+> `diagnosticDoesNotChangeBehaviour` 明确断言"**打开日志后治疗仍然不生效**"，
+> 把"加日志 ≠ 实现效果"钉住。
+
 ### 7.3 技能展开（`SkillExecutor`）✅
 
 唯一入口 `SkillExecutor.execute(battle, skill, user, targets)`，调用方**只给主目标**

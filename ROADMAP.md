@@ -175,7 +175,7 @@
 |                       | P7-5 StageFactory + 难度                       | ✅   |
 | **P8 角色数据化**     | P8-0 角色机制数据化（架构总纲，先读）          | ✅   |
 |                       | P8-1 CharacterFactory + 角色字段补全           | ✅   |
-|                       | P8-2 技能装配（真实槽位 → 真实倍率，槽位部分） | 部分 |
+|                       | P8-2 技能装配（真实槽位 → 真实倍率）           | ✅   |
 |                       | P8-3 天赋 + 追加攻击                           | ☐   |
 |                       | P8-4 战技点（SP）                              | ☐   |
 |                       | P8-5 真实队伍装配（StageFactory 换真角色）     | ☐   |
@@ -1827,7 +1827,7 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
 - **变异验证**：① `null → 100` 兜底 → 1 红；② `fromString` 改回大小写敏感 → 4 红；
   ③ 去掉 `max(0, …)` 下界 → 2 红。
 - **依赖**：P1-4（level）、P5-1（Path 映射）、P2-2（DamageElement）
-### P8-2 技能装配（真实槽位 → 真实倍率）🚧 槽位部分完成
+### P8-2 技能装配（真实槽位 → 真实倍率）✅
 
 - **目标**：`SkillType` 槽位对上 `skills.json` 的 skill_id；`DefaultSkill`/`SkillExecutor` 用的全是真实倍率、元素、削韧值。
 - **涉及文件**：`Constant.java`、`models/Character.java`、`models/Battle.java`、新建
@@ -1849,26 +1849,21 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
        角色文档写的是「释放所需能量 120（上限 240）」——"所需"是门槛。
     4. 没做计划第 3 条（`SkillExecutor` 的 default 分支加提示）：本项聚焦槽位与阈值，
        非伤害 effect 的处理仍留给 P10-3/P10-6/P9-4。
-- **验收**：`SkillSlotMappingTest`（8 条）：槽位表本身 / 各槽位拿到自己的数据 /
-  与 `Constant.SKILLS` 逐字段对齐 / 削韧按槽位 / 非伤害槽位无元素 / 等级上限按槽位 /
-  93 角色 × 4 槽位都能装配 / **等级未接入的缺口登记**。
-  `UltraThresholdTest`（9 条）：阈值来自数据 / 常规角色不受影响 / 阈值 ≤ 上限（全角色）/
-  恰好 5 个低于上限 / 云璃 120 可放 / 放开即清零 / 常规角色仍需攒满 /
-  无能量条永远放不了 / 特殊资源角色攒不起来。
-- **仍未做**（本项剩下的）：
-    - `SkillExecutor` 的 non-damaging default 分支提示（计划第 3 条）。
-    - **秘技的效果**（非"挂上技能"）：例如景元"下一场战斗开始时【神君】+3 段"
-      —— 需要 P8-6 的事件补齐 + P8-7 的触发器表。目前 `startBattle()` 只把技能挂上。
-- **✅ 槽位 6/7 已装配**（2026-09-21，按"地图技能应在战斗 init 附加"的意见做的）：
-    - `SkillType` 补了 `MAZE`(6) / `TECHNIQUE`(7)，并加 `isIntrinsic()` 作分界线
-      —— 常驻四槽位 vs 地图两槽位。
-    - `Character.Builder` 只装常驻槽位；`Battle.startBattle()` → `attachBattleSkills()`
-      给我方角色附加地图普攻与秘技（不覆盖已显式装过的）。
-    - 顺带给 `Character` 加了 `cid` 字段（附加那一刻装配点已远，角色得自己记得 id）。
-    - 覆盖：`mapSkillsAreAttachedAtBattleStartNotAtBuild`（造角色时没有 / 开战后有且解析到
-      自己的槽位）、`explicitlyInstalledMapSkillIsNotOverwritten`、
-      `everyCharacterGetsMapSkillsAtBattleStart`（93 角色穷举）。
-    - 变异验证：去掉 `attachBattleSkills()` → 3 红。
+- **验收**：`SkillSlotMappingTest`（13 条）+ `UltraThresholdTest`（9 条）+
+  `SkillExecutorDiagnosticTest`（5 条）。
+- **仍未做**（都是**其它阶段**的活，不是本项遗留）：
+    - **非伤害技能的"效果"**：`SkillExecutor` 对非伤害类**静默 return**，
+      所以治疗/护盾/buff/控制/召唤技能被施放后**什么都不发生**（只有回能照给）。
+      这是设计上的分阶段：治疗走 `Battle.heal`（P6-2 已实现，但**没有任何地方自动分派**）、
+      buff 是 P10-3、控制是 P10-6、召唤是 P9-4。
+      本项只加了**可开关的诊断日志**让这个静默可见（见下条）。
+    - **秘技的效果**：例如景元"下一场战斗开始时【神君】+3 段" —— 需要 P8-6 事件 + P8-7 触发器表。
+- **✅ 计划第 3 条（`default` 分支提示）已做，但改了形式**：
+  计划想直接 `IO.println`，但那会在**每次治疗/护盾**时打印 —— demo 每回合都在放，
+  会刷屏。所以改成**默认关闭的开关** `SkillExecutor.setLogNotDispatched(boolean)`，
+  日志内容还标注了**归属阶段**（`P6-2 已实现（走 Battle.heal，不经本执行器）` / P10-3 / P10-6 / P9-4）。
+  覆盖：`SkillExecutorDiagnosticTest`（开了会打印 / 默认不打印 / 护盾也报 /
+  伤害技能不报 / **诊断不改变行为**——治疗仍然不生效，这条把"加日志 ≠ 实现效果"钉住）。
 - **⚠ 一处自我更正**：我曾把"技能等级没接进伤害"记成缺口，**这是错的**。
   `SkillExecutor` 一直用 `int index = skill.getLevel() - 1` 取逐级参数表的第 N 行。
   出错原因很蠢：我构造了 8 级技能，却断言 `getData().getSkills().getFirst()` 是 1.2 ——
@@ -1876,7 +1871,8 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
   现已改为端到端断言：8 级 / 1 级的**实际伤害**比 = 2.4（`skillLevelScalesActualDamage`）。
   真正成立的事实只是"**装配出来的角色默认技能等级为 1**"，那属于 P8 成长系统，不是缺口。
 - **变异验证**：把槽位映射改回恒为 1 → `UltraThresholdTest` 4 红；
-  去掉 `CharacterFactory` 的特殊 provider 注入 → `SpecialEnergyProviderTest` 3 红。
+  去掉 `CharacterFactory` 的特殊 provider 注入 → `SpecialEnergyProviderTest` 3 红；
+  去掉 `attachBattleSkills()` → `SkillSlotMappingTest` 3 红。
 - **依赖**：P8-1、P1-8
 
 ---
