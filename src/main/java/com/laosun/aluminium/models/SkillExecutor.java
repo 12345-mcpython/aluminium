@@ -118,7 +118,10 @@ public final class SkillExecutor {
         // 1) 先判是否伤害技能：护盾/治疗/buff 技的 param 第 1 项不是伤害倍率
         if (!effect.isDamaging() || targets == null || targets.isEmpty()) {
             logNotDispatched(skill, user, effect, targets);
-            return;                                  // TODO P6/P7/P9：治疗/护盾/控制/召唤再分派
+            // 非伤害技能到此为止：**只有回能照给**（见 execute），效果由各自阶段实现 ——
+            // 治疗/护盾是 Battle.heal / grantShield（P6-2/P6-3，但**没有自动分派**）、
+            // buff 是 P10-3、控制 P10-6、召唤 P9-4。见 engine.md §7.2b
+            return;
         }
 
         // 2) 伤害技能必有元素；缺了属于数据错误，fail fast 好过让这一击静默消失

@@ -20,6 +20,28 @@ import java.util.Map;
  *
  * <p>{@link com.laosun.aluminium.models.Damage.Area#applies(DamageType)} consumes
  * both flags, so a zone removes itself instead of relying on callers not to add it.
+ *
+ * <h2>哪些值真的在用 ⚠</h2>
+ *
+ * <p>这些枚举值是**照规格铺的**，但引擎目前只用到一部分。别以为声明了就等于接上了：
+ *
+ * <table>
+ *   <tr><th>类型</th><th>现状</th></tr>
+ *   <tr><td>{@link #NORMAL}</td><td>✅ 角色技能的**唯一**实际出口 —— 数据里没有
+ *       {@code damage_type} 字段（见 {@code skills.json} 的键），所以战技/终结技也记 {@code NORMAL}。
+ *       ⚠ 目前**没有行为差异**：{@code NORMAL}/{@code SKILL}/{@code ULTRA} 的
+ *       可暴击与可增伤标志相同，所以暂时不影响数值</td></tr>
+ *   <tr><td>{@link #ADDITIONAL} / {@link #TRUE}</td><td>✅ 附加伤害 / 真伤（P1-9）</td></tr>
+ *   <tr><td>{@link #BREAK} / {@link #SUPER_BREAK} / {@link #DOT}</td><td>✅ 击破 / 超击破 / 持续伤害（P4）</td></tr>
+ *   <tr><td>{@link #SKILL} / {@link #ULTRA}</td><td>❌ **引用 0 处** —— 等技能数据补上
+ *       {@code damage_type} 才能区分（目前一律 {@code NORMAL}）</td></tr>
+ *   <tr><td>{@link #EXTRA}</td><td>❌ **引用 0 处** —— 规格里的"额外伤害"，无来源</td></tr>
+ *   <tr><td>{@link #TECHNIQUE}</td><td>❌ **引用 0 处** —— 秘技伤害；秘技本身现在只在
+ *       {@code Battle.startBattle()} 被挂上（P8-2），效果未实现（P8-6）</td></tr>
+ *   <tr><td>{@link #MEMORY}</td><td>❌ **引用 0 处** —— 忆灵伤害，要等 P9-4 召唤物</td></tr>
+ *   <tr><td>{@link #ELATION}</td><td>❌ **引用 0 处** —— 欢愉体系（P10）；连
+ *       {@code elation_basic_level_damage.json} 都还没加载</td></tr>
+ * </table>
  */
 @Getter
 public enum DamageType {

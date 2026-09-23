@@ -27,10 +27,13 @@ import java.util.Set;
  * <p>与 {@link Character#fromAttributes} 的分工：那个是测试/占位入口（无元素、无命途、
  * 能量上限 0、技能全占位），这个是真实角色入口。**P8 之后新代码一律用这个。**
  *
- * <p>⚠ <b>技能仍是占位</b>：P8-1 不做技能装配，所以 {@code create()} 造出来的角色
- * 技能是 {@code DefaultSkill}（槽位 1）。真实倍率是 P8-2。
- * 本类留了 {@link #create(int, int, boolean)} 的扩展点，但**不要**在这里填技能 ——
- * 装配点应该在 P8-2 的 {@code RealSkillSet} 里。
+ * <p><b>技能装配在 P8-2 已接</b>：{@code create()} 造出来的角色带**真实槽位映射**的
+ * {@code DefaultSkill}（普攻 1 / 战技 2 / 终结技 3 / 天赋 4），映射表只有一份
+ * （{@code Constant.SKILL_SLOT}），装配点是 {@code Character.Builder#build()}
+ * —— 见 {@code engine.md} §7.2。地图普攻（6）/ 秘技（7）不在这里装，
+ * 由 {@code Battle.startBattle()} 附加。
+ *
+ * <p>⚠ 本类**只管角色身份与资源**，不碰技能倍率：追加攻击/召唤物是 P8-3/P9-4。
  */
 public final class CharacterFactory {
     /**
