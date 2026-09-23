@@ -6,44 +6,51 @@ import com.laosun.aluminium.beans.StageBean;
 import java.util.List;
 
 /**
- * 关卡波次管理（P7-4）：按 {@link StageBean#monster()} 的每一项（= 一波）依次进怪。
+ * Stage wave management (P7-4): spawns monsters in order, one entry of
+ * {@link StageBean#monster()} (= one wave) at a time.
  *
  * <pre>{@code
  * WaveManager waves = new WaveManager(battle, Constant.stages().get(103201));
- * battle.startBattle();          // 此时敌队是空的，但因为有"待生成的波"，不会被判胜
- * waves.nextWave();              // 进第 1 波
- * // …打…
+ * battle.startBattle();          // the enemy team is empty here, but because there are
+ *                                // "waves still to spawn" it is not judged a win
+ * waves.nextWave();              // enter wave 1
+ * // …fight…
  * if (battle.isOver() && waves.hasNextWave()) {
- *     waves.nextWave();          // 进下一波，战斗继续
+ *     waves.nextWave();          // enter the next wave, the battle continues
  * }
  * }</pre>
  *
- * <p><b>胜负与波次的关系</b>（P7-3 × P7-4 的接缝，最容易踩的一处）：
- * {@code Battle.checkResult()} 把"一方全灭"当作战斗结束，而"敌队是空的"在波次模式里
- * 只是**这一波还没进**。所以 {@link Battle} 会问到本类
- * （{@link #hasPendingWaves()}）：还有波没进就不再判胜。
+ * <p><b>How victory/defeat relates to waves</b> (the P7-3 × P7-4 seam, the easiest place to
+ * trip over): {@code Battle.checkResult()} treats "one side is wiped out" as the battle
+ * ending, whereas in wave mode "the enemy team is empty" only means **this wave has not
+ * spawned yet**. So {@link Battle} asks this class
+ * ({@link #hasPendingWaves()}): as long as waves remain, no victory is declared.
  *
- * <p>⚠ 数据里**没有**"波间清理"的配置项。所以本类也不擅自清 buff / 重置行动条 ——
- * 换波时只做"进怪"这一件事。将来若拿到波间配置，扩展点就在 {@link #nextWave()} 里。
+ * <p>⚠ The data has **no** "between-wave cleanup" config item. So this class likewise does
+ * not presume to clear buffs / reset the action bar — on a wave change it does only one
+ * thing: spawn the monsters. If between-wave config ever appears, the extension point is
+ * inside {@link #nextWave()}.
  */
 public class WaveManager {
     private final Battle battle;
     private final StageBean stage;
     /**
-     * 已经进到第几波（从 0 开始）。{@code -1} = 一波都还没进。
+     * Which wave has been entered already (starting from 0). {@code -1} = not even one wave
+     * has been entered.
      */
     private int waveIndex = -1;
 
     /**
-     * @param battle 目标战斗（会把自己登记到 {@link Battle#setWaveManager}，供胜负判定查询）
-     * @param stage  关卡数据
+     * @param battle the target battle (it registers itself with
+     *               {@link Battle#setWaveManager}, so the victory judgement can query it)
+     * @param stage  the stage data
      */
     public WaveManager(Battle battle, StageBean stage) {
         if (battle == null) {
-            throw new IllegalArgumentException("battle 不能为 null");
+            throw new IllegalArgumentException("battle must not be null");
         }
         if (stage == null) {
-            throw new IllegalArgumentException("stage 不能为 null");
+            throw new IllegalArgumentException("stage must not be null");
         }
         this.battle = battle;
         this.stage = stage;
@@ -51,13 +58,15 @@ public class WaveManager {
     }
 
     /**
-     * 进下一波：把这波的怪造出来、加进 {@code battle.enemies}，并**排队入场**。
+     * Enter the next wave: create this wave's monsters, add them to {@code battle.enemies},
+     * and **queue them for entry**.
      *
-     * <p>入场走 {@code Battle.addRequestItems}（{@code processRequests()} 的
-     * {@code processAddRequests} 会把它推进行动条），所以怪是从**当前行动值**起跑的，
-     * 不会回到 0 重开一轮 —— 这正是波次该有的表现。
+     * <p>Entry goes through {@code Battle.addRequestItems} ({@code processAddRequests} of
+     * {@code processRequests()} pushes it into the action bar), so the monsters start running
+     * from the **current action value** and do not go back to 0 to restart a round — which is
+     * exactly how waves should behave.
      *
-     * @return {@code true} = 进了一波；没有下一波则 {@code false}
+     * @return {@code true} = a wave was entered; {@code false} if there is no next wave
      */
     public boolean nextWave() {
         if (!hasNextWave()) {
@@ -65,56 +74,61 @@ public class WaveManager {
         }
         waveIndex++;
         spawnWave(waveIndex);
-        // 新一波进来了 → 重新判定（进怪前那次 checkResult 可能什么都没定）
+        // A new wave came in → judge again (the checkResult before spawning may have
+        // decided nothing)
         battle.checkResult();
         return true;
     }
 
     /**
-     * 是否还有没进的波。
+     * Whether any wave is still un-entered.
      */
     public boolean hasNextWave() {
         return waveIndex + 1 < stage.waveCount();
     }
 
     /**
-     * 是否还有**没进**的波 —— {@link Battle} 判胜负时问的就是这个。
+     * Whether any wave is still **un-entered** — this is what {@link Battle} asks when
+     * judging victory/defeat.
      *
-     * <p>名字里强调 pending：{@link #hasNextWave()} 是"还能进下一波"，
-     * 语义相同但这里是给胜负判定看的，故意分开命名以免将来两边改混。
+     * <p>The name stresses pending: {@link #hasNextWave()} means "can still enter the next
+     * wave"; the semantics are the same, but this one is for the victory judgement, and it is
+     * deliberately named separately so the two cannot be confused later.
      */
     public boolean hasPendingWaves() {
         return hasNextWave();
     }
 
     /**
-     * 已经进到第几波（从 0 开始）。一波都没进时返回 {@code -1}。
+     * Which wave has been entered already (starting from 0). Returns {@code -1} when not even
+     * one wave has been entered.
      */
     public int getWaveIndex() {
         return waveIndex;
     }
 
     /**
-     * 总波数。
+     * Total number of waves.
      */
     public int getWaveCount() {
         return stage.waveCount();
     }
 
     /**
-     * 当前波（也就是最后一波已进的那波）的敌人是否已全部阵亡。
+     * Whether every enemy of the current wave (that is, the last wave entered) has died.
      *
-     * <p>⚠ 一波都没进时敌队是空的，这里返回 {@code true}（空集全灭）。
-     * 拿它当"该换波了"的判断前请先确认 {@link #getWaveIndex()} {@code >= 0}。
+     * <p>⚠ When not even one wave has been entered the enemy team is empty and this returns
+     * {@code true} (the empty set is fully wiped out). Before using it as the "time to change
+     * wave" test, first confirm {@link #getWaveIndex()} {@code >= 0}.
      *
-     * @return 当前波的敌人是否全部阵亡
+     * @return whether every enemy of the current wave has died
      */
     public boolean isCurrentWaveCleared() {
         return battle.enemies.stream().allMatch(CanHit::isDeath);
     }
 
     /**
-     * 当前这一波活着的敌人。
+     * The enemies of the current wave that are still alive.
      */
     public List<Enemy> aliveEnemies() {
         return battle.enemies.stream().filter(e -> !e.isDeath()).toList();
@@ -124,7 +138,7 @@ public class WaveManager {
         for (int monsterId : stage.monsterIds(index)) {
             Enemy enemy = EnemyFactory.create(monsterId, stage.level(), stage.hardLevelGroup());
             battle.enemies.add(enemy);
-            battle.addRequestItems.add(enemy);           // 由 processRequests 推进行动条
+            battle.addRequestItems.add(enemy);           // processRequests pushes it into the action bar
         }
     }
 }

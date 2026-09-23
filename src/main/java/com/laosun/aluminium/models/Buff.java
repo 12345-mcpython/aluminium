@@ -1,18 +1,20 @@
 package com.laosun.aluminium.models;
 
 /**
- * 增益/减益的契约：{@link com.laosun.aluminium.models.BuffManager} 只负责**管理**
- * （挂载 / 移除 / 每回合递减），**改属性是 buff 自己的事** ——
- * {@link #applyEffect} 挂 modifier、{@link #removeBuff} 摘掉。
+ * Contract of a buff / debuff: {@link com.laosun.aluminium.models.BuffManager} is only responsible
+ * for **managing** it (attach / remove / decrement each turn), **changing attributes is the buff's
+ * own job** — {@link #applyEffect} attaches the modifier, {@link #removeBuff} takes it off.
  *
- * <p>⚠ 这条分工是**已经成立**的设计，不是待办：{@link AbstractBuff} 实现本接口，
- * 属性型 buff（`SpeedBoostBuff` / `BoostDamageBuff` / `TauntBuff` …）都在
- * `applyEffect` / `removeBuff` 里改属性。原先这里是三行 `// TODO`，容易被误读成
- * "架构还没做对"，所以改成说明。
+ * <p>⚠ This division of labour is an **already-settled** design, not a todo: {@link AbstractBuff}
+ * implements this interface, and attribute-type buffs (`SpeedBoostBuff` / `BoostDamageBuff` /
+ * `TauntBuff` …) all change attributes inside `applyEffect` / `removeBuff`. This used to be three
+ * lines of `// TODO` here, easily misread as "the architecture is not right yet", so it was turned
+ * into an explanation.
  *
- * <p>另一个容易混的点：**注入型** buff（`VulnerabilityBuff` / `ReductionBuff`）没有持久状态，
- * 它们的 `applyEffect` / `removeBuff` 是空的，只在每次结算时把修正注入到**那一段**
- * `Damage` 的乘区上。两种的区分见 {@code engine.md} §10.2。
+ * <p>Another easily confused point: **injection-type** buffs (`VulnerabilityBuff` /
+ * `ReductionBuff`) have no persistent state; their `applyEffect` / `removeBuff` are empty and they
+ * only inject the correction into the zones of **that one segment's** `Damage` at each settlement.
+ * For how the two are told apart, see {@code engine.md} §10.2.
  */
 public interface Buff {
     CanHit getSource();

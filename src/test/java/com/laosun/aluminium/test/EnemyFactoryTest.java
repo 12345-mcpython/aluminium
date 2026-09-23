@@ -19,9 +19,11 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * P2-4 acceptance: 工厂造出的敌人面板、弱点、抗性都对，并且**抗性真的进入了伤害流水线**。
+ * P2-4 acceptance: the stat sheet, weaknesses and resistances of the enemies the factory produces are
+ * all correct, and **the resistance really does enter the damage pipeline**.
  *
- * <p>锚点：冰锋 1002011 在组1·Lv90 → HP≈16498.296、防御≈1100、速度 132、弱火/雷、冰抗 0.2、韧性 60。
+ * <p>Anchor: Ice Edge 1002011 at group 1 · Lv90 → HP≈16498.296, DEF≈1100, speed 132, weak to
+ * fire/lightning, ice RES 0.2, toughness 60.
  */
 public class EnemyFactoryTest {
     private static final double EPS = 1e-6;
@@ -31,11 +33,11 @@ public class EnemyFactoryTest {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
 
         Assertions.assertEquals(16498.296, enemy.getMaxHp(), 1e-3);
-        Assertions.assertEquals(16498.296, enemy.getCurrentHp(), 1e-3, "初始 HP = 生命上限");
+        Assertions.assertEquals(16498.296, enemy.getCurrentHp(), 1e-3, "initial HP = max HP");
         Assertions.assertEquals(1099.99995, enemy.getAttribute(AttributeType.DEFENCE).get(), 1e-4);
         Assertions.assertEquals(662.784912, enemy.getAttribute(AttributeType.ATTACK).get(), 1e-6);
         Assertions.assertEquals(132, enemy.getAttribute(AttributeType.SPEED).get(), EPS);
-        Assertions.assertEquals(90, enemy.getLevel(), "等级来自关卡，进防御区");
+        Assertions.assertEquals(90, enemy.getLevel(), "the level comes from the stage and feeds the defence zone");
     }
 
     @Test
@@ -46,7 +48,7 @@ public class EnemyFactoryTest {
         Assertions.assertTrue(enemy.isWeakTo(DamageElement.FIRE));
         Assertions.assertFalse(enemy.isWeakTo(DamageElement.ICE));
         Assertions.assertFalse(enemy.isWeakTo(null));
-        Assertions.assertEquals(60, enemy.getMaxStance(), EPS);      // 模板 stance 60 × 组1·Lv90 的 1
+        Assertions.assertEquals(60, enemy.getMaxStance(), EPS);      // template stance 60 × group 1·Lv90's 1
         Assertions.assertEquals(60, enemy.getStance(), EPS);
         Assertions.assertEquals(1, enemy.getStanceCount());
         Assertions.assertEquals(DamageElement.ICE, enemy.getStanceType());
@@ -63,13 +65,13 @@ public class EnemyFactoryTest {
 
         double settled = battle.applyDamage(iceEdge, iceHit);
 
-        // 防御区 = 1000 / (def + 1000)（攻击者 Lv80）；抗性区 = 1 - 0.2（冰锋冰抗 0.2）
+        // defence zone = 1000 / (def + 1000) (attacker Lv80); resistance zone = 1 - 0.2 (Ice Edge's ice RES 0.2)
         Assertions.assertEquals(1000.0 * 1000.0 / (defence + 1000.0) * 0.8, settled, EPS);
     }
 
     @Test
     public void patchedAttackRatioReachesThePanel() {
-        // 100201506 的攻击修正在 tbgd 里是 0.33333302，本项目数据缺这一列 → 由补丁文件合并
+        // 100201506's attack adjustment is 0.33333302 in tbgd; this project's data lacks that column → merged from a patch file
         EnemyConfigAndTemplate pair = configOf(100201506);
         Enemy enemy = EnemyFactory.create(100201506, 90, 1);
 

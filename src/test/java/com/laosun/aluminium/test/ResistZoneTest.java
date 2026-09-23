@@ -17,7 +17,7 @@ import java.util.Random;
 
 /**
  * P1-6 acceptance: the resistance zone reads the defender's per-element table
- * (HSR.md §2.5: 抗性区 = 1 - clamp(抗性 - 穿透), 抗性 ∈ [-100%, 90%]).
+ * (HSR.md §2.5: resistance zone = 1 - clamp(resistance - penetration), resistance ∈ [-100%, 90%]).
  *
  * <p>Every defender here has DEFENCE = 0 so the resistance zone is isolated.
  */
@@ -51,19 +51,19 @@ public class ResistZoneTest {
 
     @Test
     public void resistanceIsReducedByPenetration() {
-        // ICE 抗 0.2 - 穿透 0.4 = -0.2 → 抗性区 1.2
+        // ICE res 0.2 - penetration 0.4 = -0.2 → resistance zone 1.2
         Assertions.assertEquals(1200, settle(attacker(0.4), enemy(), DamageElement.ICE), EPS);
     }
 
     @Test
     public void negativeResistanceKeepsFullEffect() {
-        // ICE 抗 0.2 - 穿透 0.5 = -0.3 → 抗性区 1.3（负抗全效，HSR.md §2.5）
+        // ICE res 0.2 - penetration 0.5 = -0.3 → resistance zone 1.3 (negative resistance at full effect, HSR.md §2.5)
         Assertions.assertEquals(1300, settle(attacker(0.5), enemy(), DamageElement.ICE), EPS);
     }
 
     @Test
     public void resistanceIsClampedToNinetyPercent() {
-        // FIRE 抗 1.2 → clamp 0.9 → 抗性区 0.1
+        // FIRE res 1.2 → clamp 0.9 → resistance zone 0.1
         Assertions.assertEquals(100, settle(attacker(0.0), enemy(), DamageElement.FIRE), EPS);
     }
 

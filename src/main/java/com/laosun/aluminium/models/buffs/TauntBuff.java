@@ -4,29 +4,33 @@ import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * 嘲讽（P5-2）：**纯标记，没有数值**。
+ * Taunt (P5-2): **a pure marker, with no numeric value**.
  *
- * <p>语义（作者口径，不是"按百分比提高仇恨值"）：
+ * <p>Semantics (the author's definition, not "raise the aggro value by a percentage"):
  * <blockquote>
- * 嘲讽 buff 只要被附加，攻击方的**单体攻击**与**扩散攻击的中心**
- * 就只能选中被附加嘲讽的那个个体。**双向生效**——我方单体/扩散打敌方时同理。
+ * As long as the taunt buff is attached, the attacker's **single-target attacks** and the **centre of a blast
+ * attack** can only select the individual the taunt is attached to. **It works in both directions** — the same
+ * applies when our side uses single-target/blast attacks on the enemy.
  * </blockquote>
  *
- * <p>所以它**不是** {@code aggroOf} 里的乘法（乘法只能提高概率，做不到"只能选中"），
- * 而是目标选择阶段的**硬约束**，落在 {@code TargetSelector} 里：
+ * <p>So it is **not** a multiplier inside {@code aggroOf} (a multiplier can only raise the probability, it cannot
+ * achieve "can only select"), but a **hard constraint** at the target-selection stage, living in
+ * {@code TargetSelector}:
  * <ul>
- *   <li>候选集里存在"身上挂着本 buff 的存活个体" → 直接返回它，跳过仇恨加权；</li>
- *   <li>群攻（AOE）本来就打全体，不受影响；</li>
- *   <li>嘲讽者已死亡 / 不在被打的那一方 → 约束失效，退回仇恨加权（不能强制选中尸体）。</li>
+ *   <li>if the candidate set contains "a living individual carrying this buff" → return it directly, skipping the
+ *       aggro weighting;</li>
+ *   <li>an AoE attack hits everyone anyway, so it is unaffected;</li>
+ *   <li>if the taunter is dead / is not on the side being attacked → the constraint lapses and we fall back to
+ *       aggro weighting (a corpse must not be force-selected).</li>
  * </ul>
  *
- * <p>模板同 {@link VulnerabilityBuff}：后置 buff（随 {@code afterMove} 递减时长），
- * 不改属性、无持久状态。
+ * <p>The same template as {@link VulnerabilityBuff}: a post-move buff (its duration ticks down with
+ * {@code afterMove}), it changes no attributes and has no persistent state.
  */
 public class TauntBuff extends AbstractBuff {
 
     /**
-     * @param duration 持续回合数
+     * @param duration the number of turns it lasts
      */
     public TauntBuff(int duration) {
         super(duration, false);
@@ -39,12 +43,12 @@ public class TauntBuff extends AbstractBuff {
 
     @Override
     public void applyEffect(CanHit target) {
-        // 纯标记：不改属性
+        // a pure marker: it changes no attributes
     }
 
     @Override
     public void removeBuff(CanHit target) {
-        // 同上：没有持久状态可清
+        // as above: there is no persistent state to clear
     }
 
     @Override

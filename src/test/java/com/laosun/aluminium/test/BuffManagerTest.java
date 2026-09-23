@@ -103,7 +103,7 @@ public class BuffManagerTest {
     }
 
     // ==================================================================
-    // H-7：buff 查询口（P4-6 超击破 / P8-7 触发器 / P10-2 控制状态机的前置）
+    // H-7: the buff query point (the prerequisite for P4-6 super break / P8-7 triggers / P10-2 the control state machine)
     // ==================================================================
 
     @Test
@@ -112,26 +112,26 @@ public class BuffManagerTest {
         BuffManager manager = c.getBuffManager();
         BoostDamageBuff buff = new BoostDamageBuff(2, .5);
 
-        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "还没挂 → false");
+        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "not attached yet → false");
         manager.addBuff(buff);
-        Assertions.assertTrue(manager.hasBuff(BoostDamageBuff.class), "挂上 → true");
-        Assertions.assertFalse(manager.hasBuff(StunBuff.class), "没挂的类别 → false");
+        Assertions.assertTrue(manager.hasBuff(BoostDamageBuff.class), "attached → true");
+        Assertions.assertFalse(manager.hasBuff(StunBuff.class), "a category that is not attached → false");
 
         manager.removeBuff(buff);
-        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "摘掉 → 回到 false");
+        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "removed → back to false");
     }
 
     @Test
     public void hasBuffTracksExpiryAndRejectsBadInput() {
         Character c = character();
         BuffManager manager = c.getBuffManager();
-        manager.addBuff(new BoostDamageBuff(1, .5));      // 后置 buff，duration 1
+        manager.addBuff(new BoostDamageBuff(1, .5));      // post-move buff, duration 1
 
         manager.beforeMove();
-        Assertions.assertTrue(manager.hasBuff(BoostDamageBuff.class), "后置 buff 不该在 beforeMove 到期");
+        Assertions.assertTrue(manager.hasBuff(BoostDamageBuff.class), "a post-move buff must not expire on beforeMove");
 
         manager.afterMove();
-        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "到期后应该查不到");
-        Assertions.assertFalse(manager.hasBuff(null), "null 返回 false，不炸");
+        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "after expiry it should no longer be found");
+        Assertions.assertFalse(manager.hasBuff(null), "null returns false without blowing up");
     }
 }

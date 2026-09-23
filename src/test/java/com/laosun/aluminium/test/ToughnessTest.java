@@ -7,10 +7,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * P4-1 acceptance: 敌人的韧性 / 击破状态。
+ * P4-1 acceptance: an enemy's toughness / broken state.
  *
- * <p>锚点：冰锋 1002011 @组1·Lv90 → 韧性 60（模板 60 × 等级组 1）。
- * 本任务只做状态机，**归零不自动击破**（击破判定在 P4-2），击破持续时间/跳回合在 P4-4。
+ * <p>Anchor: Ice Edge 1002011 @ group 1 · Lv90 → toughness 60 (template 60 × level group 1).
+ * This task only builds the state machine, and **reaching zero does not break automatically**
+ * (the break judgement is in P4-2); the broken duration / turn skipping is in P4-4.
  */
 public class ToughnessTest {
     private static final double EPS = 1e-6;
@@ -37,10 +38,10 @@ public class ToughnessTest {
 
         iceEdge.reduceStance(30);
         Assertions.assertEquals(0, iceEdge.getStance(), EPS);
-        Assertions.assertFalse(iceEdge.isBroken(), "韧性归零不等于击破：判定在 P4-2");
+        Assertions.assertFalse(iceEdge.isBroken(), "toughness reaching zero is not the same as a break: that judgement is in P4-2");
 
         iceEdge.reduceStance(10);
-        Assertions.assertEquals(0, iceEdge.getStance(), EPS, "已经是 0，不会变负");
+        Assertions.assertEquals(0, iceEdge.getStance(), EPS, "already 0, it will not go negative");
     }
 
     @Test
@@ -56,7 +57,7 @@ public class ToughnessTest {
         Assertions.assertFalse(iceEdge.isBroken());
         Assertions.assertNull(iceEdge.getBrokenElement());
         Assertions.assertEquals(0, iceEdge.getBrokenRemainTurns());
-        Assertions.assertEquals(60, iceEdge.getStance(), EPS, "恢复 = 韧性回满");
+        Assertions.assertEquals(60, iceEdge.getStance(), EPS, "recovery = toughness refilled");
     }
 
     @Test
@@ -66,7 +67,7 @@ public class ToughnessTest {
 
         iceEdge.reduceStance(30);
 
-        Assertions.assertEquals(0, iceEdge.getStance(), EPS, "击破期间韧性条是空的");
+        Assertions.assertEquals(0, iceEdge.getStance(), EPS, "during a break the toughness bar is empty");
         Assertions.assertTrue(iceEdge.isBroken());
     }
 
@@ -82,7 +83,7 @@ public class ToughnessTest {
 
     @Test
     public void enemyWithoutToughnessBarStaysAtZero() {
-        Enemy noBar = Enemy.fromAttributes("dummy", 1000, 100, 100, 100);   // 没有 stance 数据
+        Enemy noBar = Enemy.fromAttributes("dummy", 1000, 100, 100, 100);   // no stance data
 
         Assertions.assertFalse(noBar.hasToughnessBar());
         noBar.reduceStance(30);
@@ -91,6 +92,6 @@ public class ToughnessTest {
 
         noBar.breakEnemy(DamageElement.PHYSICAL);
         noBar.recoverFromBroken();
-        Assertions.assertEquals(0, noBar.getStance(), EPS, "恢复也只是回到 0");
+        Assertions.assertEquals(0, noBar.getStance(), EPS, "recovery merely returns it to 0");
     }
 }

@@ -48,15 +48,17 @@ import java.util.PriorityQueue;
 public final class Queue {
     private static final double ACTION_THRESHOLD = 10000;
     /**
-     * 浮点比较用的极小量：把"正好落在轮末"的 elapsed 归到上一轮（见 {@link #getRound()}）。
+     * Tiny quantity used for float comparison: attributes an {@code elapsed} that lands exactly
+     * on a round boundary to the *previous* round (see {@link #getRound()}).
      */
     private static final double EPSILON = 1e-9;
     /**
      * Heap ordered by {@link Signal#nextActionTime} (ascending), with the E4 scheduling
      * sequence as tie-break so equal action values have a defined order.
      *
-     * <p>比较器写成显式 lambda（而不是靠 {@link Signal} 的 {@code Comparable} 自然序）：
-     * 意图清楚，且 {@link #snapshot()} 复用同一个比较规则，两者不可能漂移。
+     * <p>The comparator is written as an explicit lambda (rather than relying on {@link Signal}'s
+     * {@code Comparable} natural order): the intent is clear, and {@link #snapshot()} reuses the
+     * exact same comparison rule, so the two can never drift apart.
      */
     private final PriorityQueue<Signal> heap = new PriorityQueue<>(Signal::compareTo);
     /**
@@ -71,25 +73,31 @@ public final class Queue {
      */
     private Signal currentActor;
     /**
-     * 待消费的**额外回合**行动者（P7-2）：下一次 {@link #move()} 由他行动，
-     * 且**不推进时钟**（所以也不消耗行动值、不改变轮次）。
+     * Pending **extra turn** actor (P7-2): the next {@link #move()} is performed by them,
+     * and it **does not advance the clock** (so it consumes no action value and does not
+     * change the round either).
      *
-     * <p>为 {@code null} = 没有额外回合。用 {@code ==} 比较身份，{@code CanHit} 没重写 equals。
+     * <p>{@code null} = no extra turn. Identity is compared with {@code ==}; {@code CanHit}
+     * does not override equals.
      */
     private CanHit extraTurnActor;
     /**
-     * 发出额外回合时，该行动者原本的 {@code nextActionTime}（P7-2）。
+     * When the extra turn was granted, that actor's original {@code nextActionTime} (P7-2).
      *
-     * <p>额外回合的实现是"把他的行动时间临时按到 {@code elapsed}"（见 {@link #grantExtraTurn}），
-     * 行动完必须还回去，否则他的一次**正常**回合就被这次额外回合吃掉了。
-     * 存的是发出时的快照，避免额外回合期间别人又推/拉了他的行动条。
+     * <p>The extra turn is implemented by temporarily pinning their action time to {@code elapsed}
+     * (see {@link #grantExtraTurn}); it MUST be handed back afterwards, otherwise one of their
+     * **normal** turns gets eaten by this extra turn.
+     * What is stored is the snapshot taken at grant time, so that if someone else pushes or pulls
+     * their action bar during the extra turn it does not matter.
      */
     private double extraTurnOriginalTime;
     /**
-     * 额外回合行动完之后、下一次 {@link #move()} 时要还原的排期（P7-2）。
+     * The schedule to restore on the next {@link #move()} after the extra turn actor has acted (P7-2).
      *
-     * <p>为什么不在额外回合里直接还原：还原之后堆顶又是他，下一次 {@code move()} 会直接推
-     * 他的**正常**回合，额外回合就白送了。所以推迟到下一次 {@code move()} 开头。
+     * <p>Why not restore it right inside the extra turn: after restoring, the top of the heap is
+     * them again, and the next {@code move()} would directly advance their **normal** turn — the
+     * extra turn would have been given away for nothing. So it is deferred to the start of the
+     * next {@code move()}.
      */
     private ExtraTurnRestore pendingRestore;
 
@@ -101,7 +109,8 @@ public final class Queue {
 
     /**
      * Creates a queue with an initial set of combatants, **already initialized**
-     * （即首轮 150 行动值的系数已经施加，与 {@code Battle} 的用法一致）。
+     * (i.e. the first-round 150 action value multiplier has already been applied, matching
+     * how {@code Battle} uses it).
      *
      * @param initialCombatants the starting combatants; must not be empty
      */
@@ -171,9 +180,10 @@ public final class Queue {
      * Adds a single combatant, scheduled one full cycle from the current global time.
      * Duplicates are ignored.
      *
-     * <p>⚠ 这里**不施加**首轮 1.5 系数（P7-1 只作用于 {@link #initialize()}）：
-     * 中途入场的单位（召唤物、P9-4）按正常周期排队。若将来要让"首轮"也覆盖中途入场，
-     * 改这里并同步改 {@code QueueRoundTest}。
+     * <p>⚠ The first-round ×1.5 multiplier is **NOT** applied here (P7-1 only affects
+     * {@link #initialize()}): units that join mid-battle (summons, P9-4) are queued at their
+     * normal cycle. If the "first round" should later cover mid-battle entries too, change this
+     * and update {@code QueueRoundTest} accordingly.
      *
      * @param combatant the combatant to add; null is silently ignored
      */
@@ -187,7 +197,7 @@ public final class Queue {
             }
         }
         Signal sig = new Signal(combatant);
-        sig.markScheduled();                 // E4：同行动值时的裁决序号
+        sig.markScheduled();                 // E4: tie-break sequence number for equal action values
         sig.markActed(elapsed);              // remaining = cycleTime()，next = elapsed + cycleTime()
         heap.offer(sig);
     }
@@ -227,34 +237,38 @@ public final class Queue {
         heap.clear();
         for (Signal s : snapshot) {
             s.refreshSpeed();
-            // P7-1：首轮 150，后续每轮 100 → 首个周期 ×1.5
+            // P7-1: first round 150, every later round 100 → the first cycle is ×1.5
             //
-            // E4：这里**不**重新取排期序号。序号在 addCombatant() 建 Signal 时就按**入场顺序**
-            // 发好了，而这里迭代的是 heap 的内部数组 —— 它的顺序由堆结构决定，速度不同的人
-            // 位置本就不同。若在这里重新取号，"同速单位按入场顺序出手"就不成立了。
-            // initialize() 的职责只是把时钟归零 + 施加首轮系数。
-            s.markFirstRound();                  // 顺带把 remaining 置为 1.5 × cycleTime()
+            // E4: the scheduling sequence number is deliberately **not** re-drawn here. The number
+            // was already issued by entry order when addCombatant() created the Signal, and what is
+            // iterated here is the heap's internal array — its order is determined by the heap
+            // structure, so people with different speeds sit in different positions anyway. If the
+            // number were re-drawn here, "units with equal speed act in entry order" would no longer
+            // hold. initialize()'s only job is to zero the clock and apply the first-round multiplier.
+            s.markFirstRound();                  // also sets remaining to 1.5 × cycleTime()
             s.setNextActionTime(s.getRemaining());
             heap.offer(s);
         }
     }
 
     /**
-     * 当前是第几轮（P7-1）：按累计行动值推算，{@code 首轮 = 1}。
+     * Which round it currently is (P7-1): derived from accumulated action value, {@code first round = 1}.
      *
-     * <p>区间的口径是"**闭右端**"：
+     * <p>The intervals are **closed on the right**:
      * <pre>
-     *   第 1 轮：elapsed ∈ [0, 150]
-     *   第 2 轮：elapsed ∈ (150, 250]
-     *   第 3 轮：elapsed ∈ (250, 350]   … 每轮 100
+     *   round 1: elapsed ∈ [0, 150]
+     *   round 2: elapsed ∈ (150, 250]
+     *   round 3: elapsed ∈ (250, 350]   … 100 per round
      * </pre>
-     * 也就是"某一轮结束的那一刻（elapsed 正好落在轮末）仍算这一轮"——
-     * 因为行动值是连续推进的，{@code elapsed == 150} 表示首轮刚走完，下一轮还没开始。
-     * 实现上用 {@code -EPS} 把落在边界上的值归到上一轮。
+     * That is, "the instant a round ends (elapsed lands exactly on the round boundary) still counts
+     * as that round" — because action value advances continuously, and {@code elapsed == 150} means
+     * the first round has just finished and the next one has not begun.
+     * The implementation uses {@code -EPS} to attribute boundary values to the previous round.
      *
-     * <p>够演示/日志用；真正的轮次驱动（胜负判定、关卡回合上限）在 P7-3。
+     * <p>Good enough for demos/logging; the real round driving (win/loss determination, stage turn
+     * limits) is in P7-3.
      *
-     * @return 轮次，从 1 开始
+     * @return the round, starting from 1
      */
     public int getRound() {
         double firstRound = Constant.ROUND_ACTION_VALUE * Constant.FIRST_ROUND_MULTIPLIER;
@@ -271,8 +285,9 @@ public final class Queue {
      * The combatant that acts will have {@code nextActionTime == elapsed}
      * after this call (i.e., zero remaining time).
      *
-     * <p>{@code elapsed} **只增不减**：即便某个信号因为浮点误差落在当前时钟之前
-     * （见 {@link #advanceActionByPercent} 的说明），时钟也不会倒退。
+     * <p>{@code elapsed} **only ever increases**: even if some signal falls before the current
+     * clock due to floating-point error (see the note in {@link #advanceActionByPercent}), the
+     * clock never goes backwards.
      *
      * @return the amount of time that passed
      */
@@ -281,19 +296,22 @@ public final class Queue {
             currentActor = null;
             return 0;
         }
-        // P7-2：先处理"上一次额外回合留下的待还原排期"，再做正常推进。
+        // P7-2: first handle "the pending restore left over from the previous extra turn",
+        // then do the normal advance.
         if (pendingRestore != null) {
             applyPendingRestore();
         }
-        // P7-2：额外回合插队。时钟**不动**，所以行动值不消耗、轮次也不变。
+        // P7-2: the extra turn cuts the line. The clock does **not** move, so no action value is
+        // consumed and the round does not change either.
         if (extraTurnActor != null) {
             return moveExtraTurn();
         }
         Signal next = heap.peek();
         double timePassed = Math.max(0, next.getNextActionTime() - elapsed);
-        elapsed = Math.max(elapsed, next.getNextActionTime());   // 时钟不倒退
-        // P7 修正 E2：把这段时钟推进记到所有人的"周期进度"账本上，
-        // 这样中途变速才能按"已经走了几成"重排（见 Signal#refreshSpeed(double)）。
+        elapsed = Math.max(elapsed, next.getNextActionTime());   // the clock never goes backwards
+        // P7 fix E2: record this clock advance on everyone's "cycle progress" ledger, so that a
+        // mid-flight speed change can be rescheduled by "how far along they already are"
+        // (see Signal#refreshSpeed(double)).
         if (timePassed > 0) {
             for (Signal s : heap) {
                 s.advanceProgress(timePassed);
@@ -304,18 +322,21 @@ public final class Queue {
     }
 
     /**
-     * 消费一个额外回合（P7-2）：让 {@link #extraTurnActor} 立刻行动，时钟不动。
+     * Consumes one extra turn (P7-2): makes {@link #extraTurnActor} act immediately, with the clock
+     * not moving.
      *
-     * <p><b>为什么要把他的 {@code nextActionTime} 临时按到 {@code elapsed}</b>：
-     * 下游（{@code Battle.afterMove()}）是按"{@code currentActor} 是堆顶"来收尾的 ——
-     * 它会调 {@link #setTopZero()} 把行动者的周期从 {@code elapsed} 重新算起。
-     * 所以"额外回合"这个插队语义必须以"他此刻就排在队首"的形式表达出来，
-     * 否则堆顶还是别人，行动条就乱了。
+     * <p><b>Why their {@code nextActionTime} must be temporarily pinned to {@code elapsed}</b>:
+     * the downstream code ({@code Battle.afterMove()}) finishes up based on "{@code currentActor} is
+     * the top of the heap" — it calls {@link #setTopZero()} to recompute the actor's cycle from
+     * {@code elapsed}. So the line-cutting semantics of an "extra turn" MUST be expressed as "they
+     * are now at the front of the queue", otherwise the top of the heap is still someone else and
+     * the action bar gets scrambled.
      *
-     * <p>按过去之后**不能在这里还**（还了堆顶又是他，下一次 {@code move()} 会直接推他的
-     * 正常回合）；还原推迟到下一次 {@code move()} 开头的 {@link #applyPendingRestore()}。
+     * <p>Once pinned, it **MUST NOT be handed back here** (handing it back puts them on top of the
+     * heap again, and the next {@code move()} would directly advance their normal turn); the restore
+     * is deferred to {@link #applyPendingRestore()} at the start of the next {@code move()}.
      *
-     * @return 恒为 {@code 0}：额外回合不推进时钟
+     * @return always {@code 0}: an extra turn does not advance the clock
      */
     private double moveExtraTurn() {
         CanHit actor = extraTurnActor;
@@ -329,17 +350,21 @@ public final class Queue {
             }
         }
         if (signal == null) {
-            // 他在拿到额外回合之后死了 / 被移出了队列 —— 这次额外回合作废，退回正常推进。
+            // They died / were removed from the queue after receiving the extra turn — this extra turn
+            // is void, fall back to a normal advance.
             currentActor = null;
             return move();
         }
 
-        // 临时按到 elapsed，让下游（Battle.afterMove → setTopZero）按"他就在队首"正常收尾。
-        // ⚠ 信号**留在堆里**（只改键 + 重建堆）：取出去的话，setTopZero() 的
-        // heap.remove(acting) 会失败，行动者会被静默丢掉。
-        // ⚠ 他原本的排期**不能在这里还**：还了之后堆顶又变成他，下一次 move() 会
-        // 直接推他的正常回合，额外回合等于没生效。所以记进 pendingRestore，
-        // 留到下一次 move() 开头处理。
+        // Temporarily pin to elapsed so the downstream code (Battle.afterMove → setTopZero) can
+        // finish up normally on the basis that "they are at the front of the queue".
+        // ⚠ The signal **stays in the heap** (only the key is changed + the heap is rebuilt): if it
+        // were taken out, setTopZero()'s heap.remove(acting) would fail and the actor would be
+        // silently dropped.
+        // ⚠ Their original schedule **MUST NOT be handed back here**: doing so would put them back
+        // on top of the heap, the next move() would directly advance their normal turn, and the
+        // extra turn would effectively not have happened. So it is recorded into pendingRestore and
+        // left for the start of the next move() to handle.
         pendingRestore = new ExtraTurnRestore(actor, extraTurnOriginalTime);
         signal.setRemaining(elapsed, 0);
         rebuildHeap();
@@ -349,16 +374,18 @@ public final class Queue {
     }
 
     /**
-     * 消费额外回合留下的"待还原排期"（P7-2）。
+     * The "pending schedule restore" left behind by consuming an extra turn (P7-2).
      */
     private record ExtraTurnRestore(CanHit actor, double originalActionTime) {
     }
 
     /**
-     * 把额外回合行动者的排期还原成"发出额外回合时的那个值"（P7-2）。
+     * Restores the extra-turn actor's schedule to "the value it had when the extra turn was
+     * granted" (P7-2).
      *
-     * <p>发生在"额外回合已经行动完、他的周期已经被 {@link #setTopZero()} 按正常速度重排"之后，
-     * 所以这一步就是把白送的那一次抹掉 —— 他的正常回合仍然在原位置等他。
+     * <p>This happens after "the extra turn has been acted out and their cycle has already been
+     * rescheduled at normal speed by {@link #setTopZero()}", so this step simply erases that
+     * freebie — their normal turn is still waiting for them at its original position.
      */
     private void applyPendingRestore() {
         ExtraTurnRestore restore = pendingRestore;
@@ -370,29 +397,32 @@ public final class Queue {
                 return;
             }
         }
-        // 他已经不在队里了（死了 / 被移除）：没什么可还原的。
+        // They are no longer in the queue (dead / removed): there is nothing to restore.
     }
 
     /**
-     * 给 {@code actor} 一个**额外回合**（P7-2）：下一次 {@link #move()} 由他行动，
-     * 且**不消耗行动值**（时钟不动 → 轮次也不变）。
+     * Gives {@code actor} an **extra turn** (P7-2): the next {@link #move()} is performed by them,
+     * and it **consumes no action value** (the clock does not move → the round does not change either).
      *
-     * <p>语义要点：
+     * <p>Semantic points:
      * <ul>
-     *   <li>额外回合**不是**"把他的行动条拉满"。拉条会提前他的**正常**回合，
-     *       而额外回合是白送一次、他的正常回合排期原封不动 ——
-     *       所以这里把他的行动时间临时按到 {@code elapsed}，行动完再还原。</li>
-     *   <li>每次 {@code grantExtraTurn} 只生效一次；重复调用同一个目标等价于一次
-     *       （不会攒多次额外回合）。</li>
-     *   <li>目标已死亡 / 不在队列里 → 返回 {@code false}，没有额外回合。</li>
-     *   <li>同一时刻只有一个人能持有额外回合；再给别人会**替换**掉上一个。</li>
+     *   <li>An extra turn is **NOT** "filling up their action bar". Filling the bar moves their
+     *       **normal** turn earlier, whereas an extra turn is a freebie and their normal turn's
+     *       schedule stays untouched — so here their action time is temporarily pinned to
+     *       {@code elapsed} and restored after they act.</li>
+     *   <li>Each {@code grantExtraTurn} takes effect only once; calling it repeatedly on the same
+     *       target is equivalent to one call (extra turns do not accumulate).</li>
+     *   <li>Target already dead / not in the queue → returns {@code false}, no extra turn.</li>
+     *   <li>Only one person can hold an extra turn at a time; granting it to someone else
+     *       **replaces** the previous holder.</li>
      * </ul>
      *
-     * <p>典型用法（P5 的击杀型天赋，如希儿）：在 {@code afterMove()} 里 —
-     * 也就是 {@code setTopZero()} 之后 — 调用，这样存下的"原本排期"是他行动完被推后的那一个。
+     * <p>Typical usage (P5's on-kill talents, e.g. Seele): call it inside {@code afterMove()} —
+     * that is, after {@code setTopZero()} — so that the stored "original schedule" is the one from
+     * after they acted and got pushed back.
      *
-     * @param actor 获得额外回合的单位
-     * @return {@code true} = 已安排额外回合
+     * @param actor the unit that receives the extra turn
+     * @return {@code true} = the extra turn has been scheduled
      */
     public boolean grantExtraTurn(CanHit actor) {
         if (actor == null || actor.isDeath()) {
@@ -406,7 +436,7 @@ public final class Queue {
             }
         }
         if (signal == null) {
-            return false;                            // 不在队里（未入场 / 已移除）
+            return false;                            // not in the queue (not yet entered / removed)
         }
         extraTurnActor = actor;
         extraTurnOriginalTime = signal.getNextActionTime();
@@ -414,7 +444,8 @@ public final class Queue {
     }
 
     /**
-     * 当前是否安排了额外回合；是的话返回那个行动者（P7-2）。没有则 {@code null}。
+     * Whether an extra turn is currently scheduled; if so, returns that actor (P7-2).
+     * {@code null} if there is none.
      */
     public CanHit getExtraTurnActor() {
         return extraTurnActor;
@@ -424,27 +455,30 @@ public final class Queue {
      * Resets the **current actor's** action cycle (see {@link #move()}): its next action is
      * one full cycle from now, and it is re-inserted into the heap.
      *
-     * <p><b>为什么要用 currentActor 而不是堆顶</b>：这个方法的名字与含义是"行为结束了，
-     * 把**行动者**推回队尾"。堆顶只是"此刻最早的人"，二者在遇到行动条操纵后就不再等价 ——
-     * 例如拉条把某人拉到 {@code elapsed} 之后，堆顶会变成那个人，若按堆顶重置，
-     * 行动者的周期没重置（他会连动两次），而被重置的是别人。
+     * <p><b>Why use currentActor instead of the top of the heap</b>: the name and meaning of this
+     * method is "the action is over, push the **actor** back to the end of the queue". The top of
+     * the heap is merely "whoever is earliest right now", and the two stop being equivalent once
+     * action-bar manipulation is involved — for example, after an advance pulls someone to
+     * {@code elapsed}, the top of the heap becomes that person; resetting by heap top would leave
+     * the actor's cycle un-reset (they would act twice in a row) while someone else got reset.
      *
-     * <p>{@code currentActor == null}（没调 {@link #move()} 就调了本方法）时什么都不做：
-     * 静默地把堆顶推后一个周期等于"跳过一个人的回合"，那是更坏的失败方式。
+     * <p>When {@code currentActor == null} (this method was called without calling {@link #move()}),
+     * nothing is done: silently pushing the heap top back by one cycle amounts to "skipping someone's
+     * turn", which is a worse way to fail.
      */
     public void setTopZero() {
         Signal acting = currentActor;
         if (acting == null) {
-            return;                                  // 没有正在行动的人 → 无事可做（不要动堆顶）
+            return;                                  // nobody is acting → nothing to do (do NOT touch the heap top)
         }
         currentActor = null;
         if (!heap.remove(acting)) {
-            return;                                  // 他已经不在队里了（已死被移除）
+            return;                                  // they are no longer in the queue (died and were removed)
         }
         acting.refreshSpeed();
-        acting.endFirstRound();                      // 首轮系数用完即止
-        acting.markScheduled();                      // E4：重新预约 → 换新序号（排到同级末尾）
-        acting.markActed(elapsed);                   // remaining = cycleTime()，next = elapsed + 周期
+        acting.endFirstRound();                      // the first-round multiplier applies once only
+        acting.markScheduled();                      // E4: re-schedule → new sequence number (queued after equals)
+        acting.markActed(elapsed);                   // remaining = cycleTime(), next = elapsed + cycle
         heap.offer(acting);
     }
 
@@ -455,20 +489,22 @@ public final class Queue {
         heap.remove(signal);
         signal.refreshSpeed();
         signal.endFirstRound();
-        signal.markScheduled();              // E4：重新预约 → 换新序号
+        signal.markScheduled();              // E4: re-schedule → new sequence number
         signal.markActed(elapsed);
         heap.offer(signal);
         return true;
     }
 
     /**
-     * 速度变化后重排该单位的行动时间（P7 修正 E2）：把他的行动时间按"已积累进度"等比换算。
+     * After a speed change, reschedules that unit's action time (P7 fix E2): their action time is
+     * rescaled in proportion to the "progress already accumulated".
      *
-     * <p>调用方是 {@code Battle.onSpeedChanged}（由 {@code CanHit} 的属性变化回调触发）。
-     * 目标不在队里（已死 / 未入场）时返回 {@code false}，不报错。
+     * <p>The caller is {@code Battle.onSpeedChanged} (triggered by {@code CanHit}'s attribute-change
+     * callback). If the target is not in the queue (dead / not yet entered) it returns {@code false}
+     * rather than raising.
      *
-     * @param target 速度发生变化的单位
-     * @return {@code true} = 他的行动时间被重排了
+     * @param target the unit whose speed changed
+     * @return {@code true} = their action time was rescheduled
      */
     public boolean refreshSpeed(CanHit target) {
         if (target == null) {
@@ -477,7 +513,7 @@ public final class Queue {
         for (Signal signal : heap) {
             if (signal.getCanHit() == target) {
                 signal.refreshSpeed(elapsed);
-                rebuildHeap();                       // 键改了，堆需要重排
+                rebuildHeap();                       // the key changed, the heap needs reordering
                 return true;
             }
         }
@@ -487,7 +523,7 @@ public final class Queue {
     // ─── Action manipulation ─────────────────────────────
 
     /**
-     * Delays the target combatant's next action by the given time value (推条).
+     * Delays the target combatant's next action by the given time value (delay/push-back).
      *
      * <p>Adds {@code delay} to the target's {@code nextActionTime}, pushing
      * their turn further into the future. If the target is currently at the
@@ -515,7 +551,7 @@ public final class Queue {
     }
 
     /**
-     * Advances the target combatant's next action by the given time value (拉条).
+     * Advances the target combatant's next action by the given time value (advance/pull-forward).
      *
      * <p>Subtracts {@code advance} from the target's {@code nextActionTime},
      * pulling their turn closer. The next action time is clamped so it never
@@ -551,10 +587,11 @@ public final class Queue {
      * <p>If {@code percent = 1.0} (100%), the target acts immediately.
      * If {@code percent = 0.5} (50%), half the remaining wait is skipped.
      *
-     * <p>⚠ <b>必须 clamp</b>：{@code a - (a-e)·p ≥ e} 在数学上成立，但 binary64 不保证 ——
-     * 差一个 ulp 就会让 {@code nextActionTime} **略小于 {@code elapsed}**，
-     * 于是 {@link #move()} 会把全局时钟往回拨，接着 {@link #setTopZero()} 就会去重置
-     * 那个"落在过去"的单位，导致真正的行动者连动两次。所以这里与 {@link #advanceAction} 一样取 max。
+     * <p>⚠ <b>The clamp is mandatory</b>: {@code a - (a-e)·p ≥ e} holds mathematically, but binary64
+     * does not guarantee it — being off by one ulp makes {@code nextActionTime} **slightly less than
+     * {@code elapsed}**, so {@link #move()} would wind the global clock backwards and then
+     * {@link #setTopZero()} would go and reset the unit that "fell into the past", causing the real
+     * actor to act twice in a row. Hence max() is taken here just as in {@link #advanceAction}.
      *
      * @param target  the combatant to advance
      * @param percent fraction of remaining time to skip (0.0 ~ 1.0)
@@ -596,14 +633,17 @@ public final class Queue {
     /**
      * Returns a time-ordered snapshot of all signals for display or iteration.
      *
-     * <p>排序口径与 {@link Signal#compareTo} **完全一致**：先比 {@code nextActionTime}，
-     * 相等时比排期序号（P7 修正 E4）。这样 {@code snapshot()} 的顺序就是实际出手顺序，
-     * 不会出现"显示的和真正行动的不一样"。
+     * <p>The ordering rule is **exactly the same** as {@link Signal#compareTo}: first compare
+     * {@code nextActionTime}, and on a tie compare the scheduling sequence number (P7 fix E4). That
+     * way the order of {@code snapshot()} is the actual acting order, and "what is displayed differs
+     * from who actually acts" cannot happen.
      *
-     * <p>为什么直接复用 {@link Signal#compareTo} 而不是另写一份比较规则：
-     * 两份规则迟早会漂移，那正是 E4 里"显示顺序 ≠ 出手顺序"的来源。
+     * <p>Why reuse {@link Signal#compareTo} directly instead of writing a second comparison rule:
+     * two rules would drift apart sooner or later, and that is exactly where E4's "display order ≠
+     * acting order" came from.
      *
-     * <p>O(n log n)，调试用；返回的是副本，改它不影响行动条。
+     * <p>O(n log n), for debugging; what is returned is a copy, so modifying it does not affect the
+     * action bar.
      */
     public List<Signal> snapshot() {
         List<Signal> list = new ArrayList<>(heap);

@@ -8,14 +8,18 @@ import com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource;
 import com.laosun.aluminium.models.event.DamageEvent;
 
 /**
- * 减伤：目标受到的伤害降低 {@code ratio}（0.3 = -30%，进入乘算的减伤区）。挂在**受击方**身上。
+ * Reduction: the damage the target takes is lowered by {@code ratio} (0.3 = -30%, entering the
+ * multiplicative reduction zone). Attached to the **defending side**.
  *
- * <p>和 {@link VulnerabilityBuff} 一样是"结算时注入乘区"的 buff：不改属性、无持久状态。
- * 来源标记用 {@link ModifierSource#BUFF}（减伤 = 受击方增益，HSR.md §2.2）。
+ * <p>Like {@link VulnerabilityBuff}, it is a buff that "injects a damage zone at settlement time":
+ * it changes no attributes and holds no persistent state.
+ * Its source tag is {@link ModifierSource#BUFF} (reduction = a buff on the defending side,
+ * HSR.md §2.2).
  *
- * <p><b>按侧生效（C-1）</b>：{@code Battle.assemble} 会把 {@code DamageEvent} 广播给攻守双方，
- * 所以必须用 {@link AbstractBuff#owner} 判"我是不是本段的受击方"——否则减伤 buff 会让持有者
- * **自己的输出**也乘 0.7。
+ * <p><b>Applies per side (C-1)</b>: {@code Battle.assemble} broadcasts the {@code DamageEvent} to
+ * both the attacking and defending sides, so {@link AbstractBuff#owner} MUST be used to decide
+ * "am I the defending side of this instance" — otherwise the reduction buff would also multiply the
+ * holder's **own output** by 0.7.
  */
 public class ReductionBuff extends AbstractBuff implements DamageEvent {
     private final double ratio;
@@ -32,12 +36,12 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
 
     @Override
     public void applyEffect(CanHit target) {
-        // 不改属性
+        // changes no attributes
     }
 
     @Override
     public void removeBuff(CanHit target) {
-        // 无持久状态
+        // no persistent state
     }
 
     @Override
@@ -48,7 +52,7 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
     @Override
     public void onDamage(Battle battle, Damage damage) {
         if (!damage.isOnDefenderSide(owner)) {
-            return;                                  // C-1：减伤只挡"我挨的那一下"，不削弱"我打出去的那一下"
+            return;                                  // C-1: reduction only blocks "the hit I take", it does not weaken "the hit I deal"
         }
         damage.addReduction(ratio, ModifierSource.BUFF, id);
     }

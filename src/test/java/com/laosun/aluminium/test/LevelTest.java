@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 public class LevelTest {
     @Test
     public void builderLevelReachesCombatant() {
-        // 1409 = 风堇（已在 character_data.json）；Builder 的 weapon / relicSuit /
-        // extraBasicPromote 都有非空默认值，所以只给 cid + level 就能 build。
+        // 1409 = Hyacine (already in character_data.json); the Builder's weapon / relicSuit /
+        // extraBasicPromote all have non-empty defaults, so giving only cid + level is enough to build.
         Character character = Character.builder().cid(1409).level(90).build();
 
         Assertions.assertEquals(90, character.getLevel());

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 关卡数据（{@code stage.json}，P7-4）：{@code stage_id → 关卡}。
+ * Stage data ({@code stage.json}, P7-4): {@code stage_id → stage}.
  *
  * <pre>{@code
  * "103201": {
@@ -17,24 +17,26 @@ import java.util.Map;
  * }
  * }</pre>
  *
- * <p><b>怎么读</b>：
+ * <p><b>How to read it</b>:
  * <ul>
- *   <li>{@link #monster()} 的**每一项是一波**（{@code List} 的元素 = 波），所以
- *       {@code monster().size()} 就是波数；</li>
- *   <li>每一波是 {@code {"Monster0": id, "Monster1": id, …}} —— 用 {@code Map}
- *       接住（键名 {@code MonsterN} 只是位置序号，不含语义）；
- *       <b>顺序必须是 {@code Monster0, Monster1, …}</b>，所以反序列化后要取
- *       {@link java.util.LinkedHashMap} 的**插入顺序**，不能当无序集合用；</li>
- *   <li>怪物的等级由 {@link #level()} + {@link #hardLevelGroup()} 决定，
- *       两者一起喂给 {@code EnemyFactory.create(id, level, hardLevelGroup)}。</li>
+ *   <li>**Each entry** of {@link #monster()} is one wave (the elements of the {@code List} = waves), so
+ *       {@code monster().size()} is the number of waves;</li>
+ *   <li>each wave is {@code {"Monster0": id, "Monster1": id, …}} — caught with a {@code Map}
+ *       (the key names {@code MonsterN} are just positional indices and carry no semantics);
+ *       <b>the order must be {@code Monster0, Monster1, …}</b>, so after deserialisation you have to take the
+ *       **insertion order** of the {@link java.util.LinkedHashMap}, it must not be used as an unordered
+ *       collection;</li>
+ *   <li>a monster's level is decided by {@link #level()} + {@link #hardLevelGroup()}, and the two are fed
+ *       together into {@code EnemyFactory.create(id, level, hardLevelGroup)}.</li>
  * </ul>
  *
- * <p>⚠ 同一只怪可以在同一波里出现多次（{@code Monster0} 与 {@code Monster2} 同 id），
- * 这是**多个独立实例**，不是同一只。
+ * <p>⚠ The same monster may appear several times in one wave ({@code Monster0} and {@code Monster2} with the same
+ * id) — those are **several independent instances**, not the same one.
  *
- * <p>⚠ {@code hardLevelGroup} 必须带 {@code @SerializedName("hard_level_group")}：
- * JSON 键是下划线风格、Java 是驼峰，Gson 不会自动换算。少了它会静默拿到 **0**，
- * 直到 {@code EnemyFactory} 报 "No hard level group 0 at level …" 才暴露。
+ * <p>⚠ {@code hardLevelGroup} must carry {@code @SerializedName("hard_level_group")}:
+ * the JSON key is underscore style while Java is camel case, and Gson does not convert automatically. Without it
+ * you silently get **0**, and it only shows up when {@code EnemyFactory} reports
+ * "No hard level group 0 at level …".
  */
 public record StageBean(
         String type,
@@ -43,17 +45,17 @@ public record StageBean(
         List<Map<String, Integer>> monster) {
 
     /**
-     * 波数（{@code monster} 元素个数）。数据缺失时为 0。
+     * The number of waves (the element count of {@code monster}). Zero when the data is missing.
      */
     public int waveCount() {
         return monster == null ? 0 : monster.size();
     }
 
     /**
-     * 第 {@code index} 波的怪物 id 列表，按 {@code Monster0, Monster1, …} 的顺序。
+     * The list of monster ids in wave {@code index}, in the order {@code Monster0, Monster1, …}.
      *
-     * @param index 波序号（从 0 开始）
-     * @return 该波的怪物 id；越界或数据缺失返回空列表
+     * @param index the wave index (starting from 0)
+     * @return the monster ids of that wave; out of range or missing data returns an empty list
      */
     public List<Integer> monsterIds(int index) {
         if (monster == null || index < 0 || index >= monster.size()) {

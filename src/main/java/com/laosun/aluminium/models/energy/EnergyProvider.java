@@ -7,72 +7,77 @@ import com.laosun.aluminium.models.Skill;
 import java.util.Set;
 
 /**
- * 回能规则（P3）。
+ * Energy gain rules (P3).
  *
- * <p>常规角色用 {@link StandardEnergyProvider}（普攻 20 / 战技 30 / 终结技 5 / 受击 10 /
- * 击杀 5 / 击破 5）；特殊角色以后各自实现本接口，机制侧不需要为角色改一行代码。
+ * <p>Regular characters use {@link StandardEnergyProvider} (basic attack 20 / skill 30 / ultimate 5 / taking a hit
+ * 10 / kill 5 / break 5); special characters implement this interface on their own later, and the mechanics side
+ * does not need a single line of code changed for a character.
  *
- * <p>约定：
+ * <p>Conventions:
  * <ul>
- *   <li>每个方法返回 {@code null} = 该事件不回能，实现类只覆盖自己关心的钩子。</li>
- *   <li>返回的 {@link EnergyGain} 只是「基础值 + 是否吃回能效率」，真正的入账由
- *   {@link CanHit#gainEnergy(EnergyGain)} 做（截断上限、返回实际入账值）。</li>
- *   <li>这里不做任何扣血/上限/死亡判定——那是调用方（{@code Battle}）的事。</li>
+ *   <li>A method returning {@code null} = that event gives no energy; an implementation only overrides the hooks it
+ *   cares about.</li>
+ *   <li>The returned {@link EnergyGain} is only "base value + whether it benefits from energy gain rate"; the
+ *   actual crediting is done by {@link CanHit#gainEnergy(EnergyGain)} (clamping to the cap, returning the amount
+ *   actually credited).</li>
+ *   <li>No HP loss / cap / death checks happen here — that is the caller's ({@code Battle}) business.</li>
  * </ul>
  */
 public interface EnergyProvider {
 
     /**
-     * 施放技能（普攻 / 战技 / 其它非终结技槽位）时。
+     * When a skill is cast (basic attack / skill / any other non-ultimate slot).
      *
-     * @param user       施放者
-     * @param skill      施放的技能
-     * @param hitTargets 本次实际命中的目标（可能为空集合：增益/治疗类技能打不到人）
-     * @return 回能描述，{@code null} = 不回能
+     * @param user       the caster
+     * @param skill      the skill cast
+     * @param hitTargets the targets actually hit this time (may be an empty set: buff/healing skills hit nobody)
+     * @return the energy gain description, {@code null} = no energy gain
      */
     default EnergyGain onSkillCast(CanHit user, Skill skill, Set<? extends CanHit> hitTargets) {
         return null;
     }
 
     /**
-     * 施放终结技时（调用方已先清零，所以这里给的是"放完大招回多少"）。
+     * When the ultimate is cast (the caller has already zeroed the energy first, so what is returned here is
+     * "how much comes back after the ultimate is cast").
      *
-     * @param user  施放者
-     * @param skill 终结技
-     * @return 回能描述，{@code null} = 不回能
+     * @param user  the caster
+     * @param skill the ultimate
+     * @return the energy gain description, {@code null} = no energy gain
      */
     default EnergyGain onUltCast(CanHit user, Skill skill) {
         return null;
     }
 
     /**
-     * 受到一次伤害后。
+     * After taking one instance of damage.
      *
-     * @param target 被打的人
-     * @param damage 已入账的那一发伤害（调用方只在 {@code isCountsAsAttack()} 时调用）
-     * @return 回能描述，{@code null} = 不回能
+     * @param target the one who was hit
+     * @param damage the instance of damage that has already been credited (the caller only calls this when
+     *               {@code isCountsAsAttack()})
+     * @return the energy gain description, {@code null} = no energy gain
      */
     default EnergyGain onTakingHit(CanHit target, Damage damage) {
         return null;
     }
 
     /**
-     * 击杀目标后。
+     * After killing a target.
      *
-     * @param attacker 击杀者（{@code damage.getAttacker()}）
-     * @param target   被击杀的目标
-     * @return 回能描述，{@code null} = 不回能
+     * @param attacker the killer ({@code damage.getAttacker()})
+     * @param target   the target that was killed
+     * @return the energy gain description, {@code null} = no energy gain
      */
     default EnergyGain onKill(CanHit attacker, CanHit target) {
         return null;
     }
 
     /**
-     * 击破弱点后。
+     * After breaking a weakness.
      *
-     * @param attacker 造成击破的人
-     * @param target   被击破的目标
-     * @return 回能描述，{@code null} = 不回能
+     * @param attacker the one who caused the break
+     * @param target   the target that was broken
+     * @return the energy gain description, {@code null} = no energy gain
      */
     default EnergyGain onBreak(CanHit attacker, CanHit target) {
         return null;

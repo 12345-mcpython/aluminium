@@ -17,23 +17,23 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P6-1 验收：效果命中与抵抗。
+ * P6-1 acceptance: effect hit rate and resistance.
  *
  * <pre>
- * 生效概率 = 基础概率 × (1 + 施加方命中) × (1 - 受击方抵抗) × (1 - 特定负面效果抵抗)，clamp [0,1]
+ * chance to land = base chance × (1 + caster's hit rate) × (1 - target's resistance) × (1 - specific debuff resistance), clamp [0,1]
  * </pre>
  *
- * <p>三个因子**都是乘算**（不是"命中减抵抗"）。锚点（ROADMAP）：
- * base 1.0 + 命中 0 + 抵抗 0.3 → 0.7；命中 0.5 时 → 1.0（clamp）；
- * base 0.8 + 命中 0.25 + 抵抗 0.2 → 0.8。
+ * <p>All three factors are **multiplied** (it is not "hit rate minus resistance"). Anchors (ROADMAP):
+ * base 1.0 + hit 0 + resist 0.3 → 0.7; with hit 0.5 → 1.0 (clamp);
+ * base 0.8 + hit 0.25 + resist 0.2 → 0.8.
  */
 public class HitResistTest {
     private static final double EPS = 1e-9;
 
     @Test
     public void chanceIsBaseTimesHitTimesResist() {
-        Character caster = caster(0, 0);                 // 命中 0
-        Enemy target = enemyWithResist(0.3, null);       // 抵抗 0.3
+        Character caster = caster(0, 0);                 // hit 0
+        Enemy target = enemyWithResist(0.3, null);       // resist 0.3
 
         Assertions.assertEquals(0.7, newBattle(caster, target).hitChance(caster, target, 1.0, null), EPS,
                 "1.0 × (1+0) × (1-0.3) = 0.7");
@@ -45,7 +45,7 @@ public class HitResistTest {
         Enemy target = enemyWithResist(0.3, null);
 
         Assertions.assertEquals(1.0, newBattle(caster, target).hitChance(caster, target, 1.0, null), EPS,
-                "1.0 × 1.5 × 0.7 = 1.05 → clamp 到 1.0");
+                "1.0 × 1.5 × 0.7 = 1.05 → clamped to 1.0");
     }
 
     @Test
@@ -58,8 +58,8 @@ public class HitResistTest {
     }
 
     /**
-     * 特定负面效果抵抗：冰锋的 {@code debuff_resistance = {"STAT_CTRL_Frozen": 1}}
-     * → 冻结完全免疫（概率 0），其余效果不受影响。
+     * Specific debuff resistance: 冰锋's {@code debuff_resistance = {"STAT_CTRL_Frozen": 1}}
+     * → fully immune to freeze (chance 0), other effects are unaffected.
      */
     @Test
     public void specificResistanceCanNullifyTheChance() {
@@ -67,23 +67,24 @@ public class HitResistTest {
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
 
         Assertions.assertEquals(1.0, iceEdge.getDebuffResist().get("STAT_CTRL_Frozen"), EPS,
-                "冰锋数据里就是 100% 抵抗冻结");
+                "in Ice Edge's data it is 100% resistance to freeze");
         Assertions.assertEquals(0.0,
                 newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_CTRL_Frozen"), EPS,
-                "特定抵抗 1.0 → 关键因子 (1-1) = 0 → 完全免疫");
+                "specific resistance 1.0 → the key factor (1-1) = 0 → fully immune");
 
-        // 注意冰锋自身还有 30% 效果抵抗（模板 0.2 + 等级组 0.1），所以"不受特定抵抗影响"
-        // ≠ 概率 1.0，而是 1.0 × (1 - 0.3) = 0.7
+        // note that 冰锋 itself also has 30% effect resistance (template 0.2 + level group 0.1), so "unaffected by
+        // the specific resistance" ≠ a chance of 1.0, it is 1.0 × (1 - 0.3) = 0.7
         Assertions.assertEquals(0.7,
                 newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_DOT_Burn"), EPS,
-                "没配的键按 0 算 → 只剩通用的 30% 效果抵抗");
+                "a key that was not configured counts as 0 → only the generic 30% effect resistance is left");
         Assertions.assertEquals(0.7,
                 newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, null), EPS,
-                "不指定键就不查特定抵抗 → 同上");
+                "without a key the specific resistance is not looked up → same as above");
     }
 
     /**
-     * 角色的效果抵抗走面板（{@code EFFECT_RESISTANCE}），且**没有**特定抵抗表。
+     * A character's effect resistance comes from the stat sheet ({@code EFFECT_RESISTANCE}), and there is **no**
+     * specific resistance table.
      */
     @Test
     public void characterUsesPanelResistanceOnly() {
@@ -93,22 +94,23 @@ public class HitResistTest {
 
         Assertions.assertEquals(0.6,
                 newBattle(caster, victim).hitChance(caster, victim, 1.0, "STAT_CTRL_Frozen"), EPS,
-                "角色没有特定抵抗表，只有面板抵抗 0.4");
+                "characters have no specific resistance table, only the stat sheet resistance 0.4");
     }
 
     /**
-     * 敌人的效果命中**必须落进面板**：{@code EnemyScaler} 算出了 0.32（组1·Lv90），
-     * 但早期 {@code EnemyFactory} 漏了往面板写，敌人命中恒为 0（审查报告 M-5）。
+     * An enemy's effect hit rate **must make it onto the stat sheet**: {@code EnemyScaler} computed 0.32
+     * (group 1·Lv90), but early on {@code EnemyFactory} forgot to write it to the sheet, so the enemy's hit rate was
+     * always 0 (review report M-5).
      */
     @Test
     public void enemyEffectHitRateReachesThePanel() {
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
 
         Assertions.assertEquals(0.32, iceEdge.getAttribute(AttributeType.EFFECT_HIT_RATE).get(), 1e-9,
-                "组1·Lv90 的效果命中 = 0.32");
+                "group 1·Lv90 effect hit rate = 0.32");
         Assertions.assertEquals(0.3, iceEdge.getAttribute(AttributeType.EFFECT_RESISTANCE).get(), 1e-9,
-                "效果抵抗是加值：模板 0.2 + 等级组 0.1（P2-3）");
-        // 敌人当施加者时，0.32 的命中真的会放大概率
+                "effect resistance is additive: template 0.2 + level group 0.1 (P2-3)");
+        // when the enemy is the caster, the 0.32 hit rate really does raise the chance
         Character victim = Character.fromAttributes("victim", 10_000, 100, 100, 100);
         Assertions.assertEquals(1.0, newBattle(iceEdge, victim).hitChance(iceEdge, victim, 1.0, null), EPS);
         Assertions.assertEquals(0.66, newBattle(iceEdge, victim).hitChance(iceEdge, victim, 0.5, null), 1e-9,
@@ -116,24 +118,25 @@ public class HitResistTest {
     }
 
     /**
-     * {@code tryApplyDebuff}：命中才挂上；被完全免疫时不会挂上。
+     * {@code tryApplyDebuff}: the debuff is only attached when the roll lands; it is not attached when it is fully
+     * immune.
      */
     @Test
     public void tryApplyDebuffGatesOnTheRoll() {
-        // 必定命中：命中 0 抵抗 0 基础 1.0 → 概率 1.0（rng.nextDouble() < 1 恒真）
+        // guaranteed to land: hit 0, resist 0, base 1.0 → chance 1.0 (rng.nextDouble() < 1 is always true)
         Character caster = caster(0, 0);
         Enemy target = enemyWithResist(0, null);
         Battle battle = newBattle(caster, target);
 
         Assertions.assertTrue(battle.tryApplyDebuff(caster, target, new StunBuff(2), 1.0, null),
-                "概率 1.0 → 必定挂上");
+                "chance 1.0 → always attached");
         Assertions.assertTrue(target.getBuffManager().hasBuff(StunBuff.class));
 
-        // 必定失败：冰锋免疫冻结 → 概率 0.0
+        // guaranteed to fail: 冰锋 is immune to freeze → chance 0.0
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         Battle battle2 = newBattle(caster, iceEdge);
         Assertions.assertFalse(battle2.tryApplyDebuff(caster, iceEdge, new StunBuff(2), 1.0, "STAT_CTRL_Frozen"),
-                "概率 0.0 → 挂不上");
+                "chance 0.0 → cannot be attached");
         Assertions.assertFalse(iceEdge.getBuffManager().hasBuff(StunBuff.class));
     }
 
@@ -142,7 +145,7 @@ public class HitResistTest {
         Character caster = caster(0, 0);
         Enemy target = enemyWithResist(0.5, null);
 
-        // 同一 seed → 同一串结果
+        // the same seed → the same sequence of results
         StringBuilder a = new StringBuilder();
         StringBuilder b = new StringBuilder();
         Battle first = new Battle(List.of(caster), List.of(target), new Random(7));
@@ -151,9 +154,9 @@ public class HitResistTest {
             a.append(first.rollDebuff(caster, target, 0.5, null) ? '1' : '0');
             b.append(second.rollDebuff(caster, target, 0.5, null) ? '1' : '0');
         }
-        Assertions.assertEquals(a.toString(), b.toString(), "注入同种子的 Random → 可复现");
+        Assertions.assertEquals(a.toString(), b.toString(), "injecting a Random with the same seed → reproducible");
         Assertions.assertTrue(a.toString().contains("1") && a.toString().contains("0"),
-                "0.5 概率下 32 次里两种结果都该出现");
+                "at a 0.5 chance both outcomes should appear within 32 rolls");
     }
 
     // ==================================================================
@@ -165,7 +168,7 @@ public class HitResistTest {
         return c;
     }
 
-    /** 一个自造敌人：只设效果抵抗与（可选的）特定抵抗。 */
+    /** A hand-made enemy: only effect resistance and (optionally) specific resistance are set. */
     private static Enemy enemyWithResist(double resist, String specificKey) {
         AttributeBuilder builder = new AttributeBuilder();
         builder.setBase(AttributeType.HEALTH, 10_000)

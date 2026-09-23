@@ -16,7 +16,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * One damage instance — always a single hit on a single target (P1-3 起自带乘区体系).
+ * One damage instance — always a single hit on a single target (it has carried its own
+ * damage-zone system since P1-3).
  *
  * <p>A skill that produces N hits builds N {@code Damage} objects; an instance is only
  * built when something actually has to be settled.
@@ -82,30 +83,34 @@ public class Damage {
      */
     private boolean countsAsAttack = true;
     /**
-     * Whether this segment's crit was fixed by the effect that created it（如知更鸟附加伤害
-     * 固定 100% 暴击率 / 150% 暴伤）：{@code Battle.assemble} 不会按面板再骰一次。
+     * Whether this segment's crit was fixed by the effect that created it (e.g. Robin's
+     * additional damage fixes 100% crit rate / 150% crit DMG): {@code Battle.assemble}
+     * will not roll again from the stat sheet.
      */
     private boolean critFixed;
 
     /**
-     * 这个实体在本段伤害里是不是**受击方**。
+     * Is this entity the **defender** in this damage segment?
      *
-     * <p>{@code Battle.assemble} 会把 {@code DamageEvent} 同时广播给攻击方与受击方（§2.2 要求），
-     * 所以注入乘区的 buff 必须自己判断"我挂在哪一侧"，否则挂在敌人身上的易伤会连它自己的输出一起提高。
-     * 判定统一走这里，别在 buff 里各自写 {@code damage.getDefender() == ...}。
+     * <p>{@code Battle.assemble} broadcasts the {@code DamageEvent} to both the attacker and
+     * the defender (§2.2 requires it), so a buff that injects a zone MUST decide for itself
+     * "which side am I attached to"; otherwise a vulnerability sitting on the enemy would also
+     * boost that enemy's own outgoing damage. The check goes through here and only here —
+     * do not write {@code damage.getDefender() == ...} separately in each buff.
      *
-     * @param entity 要判定的实体（{@code null} → {@code false}）
-     * @return {@code true} = 它是本段的受击方
+     * @param entity the entity to test ({@code null} → {@code false})
+     * @return {@code true} = it is the defender of this segment
      */
     public boolean isOnDefenderSide(CanHit entity) {
         return entity != null && entity == defender;
     }
 
     /**
-     * 这个实体在本段伤害里是不是**攻击方**（虚弱这类"攻击方负面"就这么判）。
+     * Is this entity the **attacker** in this damage segment (that is how attacker-side
+     * debuffs such as weakness are judged)?
      *
-     * @param entity 要判定的实体（{@code null} → {@code false}）
-     * @return {@code true} = 它是本段的攻击方
+     * @param entity the entity to test ({@code null} → {@code false})
+     * @return {@code true} = it is the attacker of this segment
      */
     public boolean isOnAttackerSide(CanHit entity) {
         return entity != null && entity == attacker;
@@ -127,7 +132,8 @@ public class Damage {
     }
 
     // ==================================================================
-    // 乘区取用口：懒创建，只走这里，保证「一个区最多一个实例」
+    // Zone accessors: lazily created, and only through here, guaranteeing
+    // "at most one instance per zone"
     // ==================================================================
 
     @Getter(AccessLevel.NONE)
@@ -146,7 +152,7 @@ public class Damage {
     private ResistArea resistArea;
 
     /**
-     * 增伤区（不存在时创建）。
+     * DMG boost zone (created if it does not exist).
      */
     public BoostArea boostArea() {
         if (boostArea == null) {
@@ -156,7 +162,7 @@ public class Damage {
     }
 
     /**
-     * 易伤区（不存在时创建）。
+     * Vulnerability zone (created if it does not exist).
      */
     public VulnerableArea vulnerableArea() {
         if (vulnerableArea == null) {
@@ -166,7 +172,7 @@ public class Damage {
     }
 
     /**
-     * 减伤区（不存在时创建）。
+     * Reduction zone (created if it does not exist).
      */
     public ReductionArea reductionArea() {
         if (reductionArea == null) {
@@ -176,7 +182,7 @@ public class Damage {
     }
 
     /**
-     * 虚弱区（不存在时创建）。
+     * Weakness zone (created if it does not exist).
      */
     public WeaknessArea weaknessArea() {
         if (weaknessArea == null) {
@@ -186,7 +192,7 @@ public class Damage {
     }
 
     /**
-     * 暴击区（不存在时创建）。
+     * Crit zone (created if it does not exist).
      */
     public CritArea critArea() {
         if (critArea == null) {
@@ -196,7 +202,7 @@ public class Damage {
     }
 
     /**
-     * 防御区（不存在时创建）。
+     * Defence zone (created if it does not exist).
      */
     public DefenceArea defenceArea() {
         if (defenceArea == null) {
@@ -206,7 +212,7 @@ public class Damage {
     }
 
     /**
-     * 抗性区（不存在时创建）。
+     * Resistance zone (created if it does not exist).
      */
     public ResistArea resistArea() {
         if (resistArea == null) {
@@ -216,18 +222,21 @@ public class Damage {
     }
 
     // ==================================================================
-    // 装配口：参数语义在这里定死，Battle / Buff 只传数字
+    // Assembly side: parameter semantics are nailed down here; Battle / Buff
+    // only hand over numbers
     // ==================================================================
 
     /**
-     * 增伤区：加算（0.3 = 30%）。击破 / 超击破 / 真伤不吃本区。
+     * DMG boost zone: additive (0.3 = 30%). Break / super break / true damage does not
+     * take this zone.
      */
     public Damage addBoost(double pct) {
         return addBoost(pct, ModifierSource.UNKNOWN, 0);
     }
 
     /**
-     * 增伤区（带来源）：来源信息便于按来源撤销与排错。
+     * DMG boost zone (with source): the source info makes it easy to revoke by source and
+     * to debug.
      */
     public Damage addBoost(double pct, ModifierSource source, int roleId) {
         boostArea().add(pct, source, roleId);
@@ -235,7 +244,7 @@ public class Damage {
     }
 
     /**
-     * 易伤区：加算，读取倍率时统一下 cap。
+     * Vulnerability zone: additive; the cap is applied uniformly when the multiplier is read.
      */
     public Damage addVulnerable(double pct) {
         return addVulnerable(pct, ModifierSource.UNKNOWN, 0);
@@ -247,7 +256,8 @@ public class Damage {
     }
 
     /**
-     * 减伤区：{@code r} 取 [0,1]，内部 clamp 后以 {@code -r} 进乘算（系数 = Π(1 - r)）。
+     * Reduction zone: {@code r} is taken in [0,1]; after an internal clamp it enters the
+     * multiplication as {@code -r} (coefficient = Π(1 - r)).
      */
     public Damage addReduction(double pct) {
         return addReduction(pct, ModifierSource.UNKNOWN, 0);
@@ -259,7 +269,7 @@ public class Damage {
     }
 
     /**
-     * 虚弱区：系数 = 1 - Σ虚弱。
+     * Weakness zone: coefficient = 1 - Σ weakness.
      */
     public Damage addWeakness(double pct) {
         return addWeakness(pct, ModifierSource.UNKNOWN, 0);
@@ -271,7 +281,8 @@ public class Damage {
     }
 
     /**
-     * 暴击区：骰子在外面（{@code Battle} 用注入的 Random），这里只记「暴没暴、暴伤多少」。
+     * Crit zone: the dice are rolled outside ({@code Battle} uses its injected Random);
+     * here we only record "did it crit, and how much crit DMG".
      */
     public Damage crit(boolean isCrit, double criticalDamage) {
         critArea().set(isCrit, criticalDamage);
@@ -279,13 +290,15 @@ public class Damage {
     }
 
     /**
-     * 由效果**指定**本段双暴（例：知更鸟附加伤害固定 100% 暴击率 / 150% 暴伤）。
+     * Have the effect **dictate** this segment's crit pair (e.g. Robin's additional damage
+     * fixes 100% crit rate / 150% crit DMG).
      *
-     * <p>与 {@link #crit(boolean, double)} 的区别：这个会置位 {@code critFixed}，
-     * {@code Battle.assemble} 因此**不会**再按攻击者面板骰一次、也不会用面板暴伤覆盖它。
+     * <p>Difference from {@link #crit(boolean, double)}: this one sets {@code critFixed},
+     * so {@code Battle.assemble} will **not** roll again from the attacker's stat sheet,
+     * nor overwrite it with the sheet's crit DMG.
      *
-     * @param isCrit         本段是否暴击
-     * @param criticalDamage 本段固定暴伤（0.5 = +50%）
+     * @param isCrit         whether this segment crits
+     * @param criticalDamage this segment's fixed crit DMG (0.5 = +50%)
      */
     public Damage fixedCrit(boolean isCrit, double criticalDamage) {
         critArea().set(isCrit, criticalDamage);
@@ -294,11 +307,11 @@ public class Damage {
     }
 
     /**
-     * 防御区：(200 + 10 × 攻击者等级) / (有效防御 + 200 + 10 × 攻击者等级)。
+     * Defence zone: (200 + 10 × attacker level) / (effective DEF + 200 + 10 × attacker level).
      *
-     * @param attackerLevel   攻击者等级
-     * @param defenderDefence 受击者防御力
-     * @param defenceIgnore   无视防御比例，clamp 到 [0,1]
+     * @param attackerLevel   attacker level
+     * @param defenderDefence defender's DEF
+     * @param defenceIgnore   DEF-ignore ratio, clamped to [0,1]
      */
     public Damage defence(int attackerLevel, double defenderDefence, double defenceIgnore) {
         defenceArea().set(attackerLevel, defenderDefence, defenceIgnore);
@@ -306,7 +319,7 @@ public class Damage {
     }
 
     /**
-     * 抗性区：系数 = 1 - clamp(抗性 - 穿透, {@link Constant#RESIST_MIN}, {@link Constant#RESIST_MAX})。
+     * Resistance zone: coefficient = 1 - clamp(RES - penetration, {@link Constant#RESIST_MIN}, {@link Constant#RESIST_MAX}).
      */
     public Damage resist(double resist, double penetration) {
         resistArea().set(resist, penetration);
@@ -324,7 +337,7 @@ public class Damage {
     }
 
     // ==================================================================
-    // 清算
+    // Settlement
     // ==================================================================
 
     /**
@@ -350,7 +363,8 @@ public class Damage {
     }
 
     /**
-     * Per-zone multiplier breakdown of this hit, for logs / UI（这一击由哪些乘区乘出来）。
+     * Per-zone multiplier breakdown of this hit, for logs / UI (which zones multiplied this
+     * hit out).
      *
      * @return an insertion-ordered map: {@code base} → each zone name → {@code final}
      */
@@ -377,7 +391,8 @@ public class Damage {
     }
 
     // ==================================================================
-    // 乘区家族：抽象契约 + 两条支线（可累加区 / 计算区）
+    // The zone family: the abstract contract + two branches (accumulating zone /
+    // computed zone)
     // ==================================================================
 
     /**
@@ -449,8 +464,8 @@ public class Damage {
         /**
          * Sanity floor, <b>not</b> a game rule: an accumulating zone never returns a
          * negative multiplier, because a negative factor would flip the sign of the whole
-         * hit. There is no negative 增伤/易伤 in the game data; zones with an <i>official</i>
-         * floor (reduction 0.01, weakness 0.2 — HSR.md §2.2) override this.
+         * hit. There is no negative DMG boost / vulnerability in the game data; zones with an
+         * <i>official</i> floor (reduction 0.01, weakness 0.2 — HSR.md §2.2) override this.
          */
         @Override
         protected double min() {
@@ -490,7 +505,8 @@ public class Damage {
     }
 
     /**
-     * 增伤区：{@code 1 + Σ增伤}。击破 / 超击破 / 真伤不吃本区。
+     * DMG boost zone: {@code 1 + Σ DMG boost}. Break / super break / true damage does not
+     * take this zone.
      */
     public static final class BoostArea extends PercentArea {
         @Override
@@ -509,7 +525,8 @@ public class Damage {
     }
 
     /**
-     * 易伤区：{@code 1 + Σ易伤}，整体 cap 到 {@link Constant#VULNERABLE_CAP}。
+     * Vulnerability zone: {@code 1 + Σ vulnerability}, capped as a whole at
+     * {@link Constant#VULNERABLE_CAP}.
      */
     public static final class VulnerableArea extends PercentArea {
         @Override
@@ -528,8 +545,8 @@ public class Damage {
     }
 
     /**
-     * 减伤区：{@code Π(1 - r)} —— 每个 {@code r} 进来先 clamp 到 [0,1]，乘积再以
-     * {@link Constant#REDUCTION_MIN} 兜底。
+     * Reduction zone: {@code Π(1 - r)} — each {@code r} is clamped to [0,1] on the way in,
+     * and the product is then floored at {@link Constant#REDUCTION_MIN}.
      */
     public static final class ReductionArea extends PercentArea {
         @Override
@@ -553,7 +570,7 @@ public class Damage {
     }
 
     /**
-     * 虚弱区：{@code 1 - Σ虚弱}，以 {@link Constant#WEAKNESS_MIN} 兜底。
+     * Weakness zone: {@code 1 - Σ weakness}, floored at {@link Constant#WEAKNESS_MIN}.
      */
     public static final class WeaknessArea extends PercentArea {
         @Override
@@ -572,7 +589,8 @@ public class Damage {
     }
 
     /**
-     * 暴击区：{@code crit ? 1 + 暴伤 : 1}。骰子在 {@code Battle}，这里只记账。
+     * Crit zone: {@code crit ? 1 + crit DMG : 1}. The dice live in {@code Battle}; here we
+     * only keep the books.
      */
     public static final class CritArea extends Area {
         private boolean crit;
@@ -601,8 +619,8 @@ public class Damage {
     }
 
     /**
-     * 防御区：{@code (200 + 10L) / (effDef + 200 + 10L)}，
-     * 其中 {@code effDef = def × (1 - clamp(无视防御))}。
+     * Defence zone: {@code (200 + 10L) / (effDef + 200 + 10L)},
+     * where {@code effDef = def × (1 - clamp(DEF ignore))}.
      */
     public static final class DefenceArea extends Area {
         private int attackerLevel = 80;
@@ -630,7 +648,7 @@ public class Damage {
     }
 
     /**
-     * 抗性区：{@code 1 - clamp(抗性 - 穿透, RESIST_MIN, RESIST_MAX)}。
+     * Resistance zone: {@code 1 - clamp(RES - penetration, RESIST_MIN, RESIST_MAX)}.
      */
     public static final class ResistArea extends Area {
         private double resist;
@@ -654,7 +672,8 @@ public class Damage {
 
         @Override
         protected double rate() {
-            // 抗性区 = 1 - 抗性，抗性取值范围 [-1, 0.9] ⇒ 抗性区 [0.1, 2.0]（HSR.md §2.5，负抗全效）
+            // Resistance zone = 1 - RES, RES ranges over [-1, 0.9] ⇒ resistance zone [0.1, 2.0]
+            // (HSR.md §2.5, negative RES applies at full effect)
             double resolved = Math.clamp(resist - penetration, Constant.RESIST_MIN, Constant.RESIST_MAX);
             return 1 - resolved;
         }

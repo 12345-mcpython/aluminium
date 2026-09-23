@@ -8,11 +8,12 @@ import com.laosun.aluminium.models.Damage;
  * before the zones are multiplied — the attacker first, then the defender.
  *
  * <p>{@link com.laosun.aluminium.models.CanHit CanHit} implements it and relays to its
- * {@code BuffManager}, so buffs (易伤 / 减伤 / 虚弱) inject their zones here; subclasses
- * may override it for character talents or boss mechanics.
+ * {@code BuffManager}, so buffs (vulnerability (易伤) / reduction (减伤) / weakness (虚弱)) inject
+ * their zones here; subclasses may override it for character talents or boss mechanics.
  *
- * <p>Which side owns which zone (HSR.md §2.2): 增伤 = 攻击方增益（由属性装配）、
- * 虚弱 = 攻击方负面、易伤 = 受击方负面、减伤 = 受击方增益。
+ * <p>Which side owns which zone (HSR.md §2.2): DMG boost (增伤) = attacker-side buff (assembled from
+ * attributes), weakness (虚弱) = attacker-side debuff, vulnerability (易伤) = defender-side debuff,
+ * reduction (减伤) = defender-side buff.
  */
 public interface DamageEvent {
     default void onDamage(Battle battle, Damage damage) {

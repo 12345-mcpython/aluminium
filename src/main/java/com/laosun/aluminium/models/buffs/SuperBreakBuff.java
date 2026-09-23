@@ -4,38 +4,46 @@ import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * 超击破（P4-6）的触发标记：**纯标记，没有数值**。
+ * The trigger marker for super break (P4-6): **a pure marker, with no numeric value**.
  *
- * <p>语义（对应开拓者·同谐终结技【伴舞】："攻击处于弱点击破状态的敌方目标后，会将本次攻击的削韧值
- * 转化为 1 次超击破伤害"）——挂在**攻击方**身上；由它决定"这一发攻击能不能产生超击破段"，
- * 至于产生多少，由 {@code SkillExecutor} 按下面的口径算。
+ * <p>Semantics (matching Trailblazer · Harmony's ultimate 【伴舞】: "after attacking an enemy
+ * target that is in the weakness-broken state, converts this attack's toughness reduction
+ * value into 1 instance of super break damage") — it is attached to the **attacker**; it
+ * decides "can this attack produce a super break segment", and how much is produced is
+ * computed by {@code SkillExecutor} under the convention below.
  *
- * <h2>削韧值的分配口径（别写错）</h2>
- * 设敌人剩余韧性 {@code T}、技能标称削韧 {@code S}：
+ * <h2>How the toughness reduction value is split (do not get this wrong)</h2>
+ * Let the enemy's remaining toughness be {@code T} and the skill's nominal toughness
+ * reduction be {@code S}:
  * <pre>
- *   情形                    击破伤害用          超击破伤害用
- *   T &gt; S（没打空）        无                  无
- *   S &gt;= T（这一发打破）    min(S, T) 实际值    max(0, S - T) 超出部分
- *   敌人已 broken（T = 0）  无                  S（整发都算超出）
+ *   case                        break damage uses    super break damage uses
+ *   T &gt; S (not emptied)        none                 none
+ *   S &gt;= T (broken this hit)   min(S, T), actual    max(0, S - T), the excess
+ *   enemy already broken (T = 0) none                S (the whole hit counts as excess)
  * </pre>
- * 两条链分的是同一个 {@code S}，相加恒等于 {@code S}，不重不漏。
- * 所以"破韧的那一发"会**同时**产生击破伤害与超击破伤害（例：技能 60、怪物 30 韧性
- * → 技能伤害 + 30 击破伤害 + 30 超击破伤害）。
+ * The two chains split the same {@code S}, and their sum is always {@code S} — nothing
+ * double-counted, nothing missed. Therefore "the hit that broke the toughness" produces
+ * break damage and super break damage **at the same time** (example: skill 60, monster 30
+ * toughness → skill damage + 30 break damage + 30 super break damage).
  *
- * <p>注意超击破仍然**只对弱点属性生效** —— 它沿用"只有命中弱点才削韧"这条前提
- * （见 {@code Battle.reduceToughness}），非弱点攻击打已击破的敌人不会产生超击破段。
+ * <p>Note that super break still **only works on weakness elements** — it inherits the
+ * premise that "only weakness hits reduce toughness" (see {@code Battle.reduceToughness}),
+ * so a non-weakness attack on an already-broken enemy produces no super break segment.
  *
- * <p>模板同 {@link VulnerabilityBuff}：不改属性、没有需要清理的持久状态，
- * 所以 {@code applyEffect} / {@code removeBuff} 都是空的，只有 {@code tickEffect} 减时长。
- * 与它的区别是：本类连 {@code DamageEvent} 都不实现 —— 它不在结算时注入乘区，
- * 而是由 {@code SkillExecutor} 主动额外构造一段 {@code DamageType.SUPER_BREAK} 伤害。
+ * <p>The template is the same as {@link VulnerabilityBuff}: it does not change attributes and
+ * has no persistent state to clean up, so {@code applyEffect} / {@code removeBuff} are both
+ * empty and only {@code tickEffect} decrements the duration. The difference from that class
+ * is: this one does not even implement {@code DamageEvent} — it does not inject a zone at
+ * settlement time; instead {@code SkillExecutor} actively builds one extra
+ * {@code DamageType.SUPER_BREAK} damage segment.
  *
  * @see com.laosun.aluminium.enums.DamageType#SUPER_BREAK
  */
 public class SuperBreakBuff extends AbstractBuff {
 
     /**
-     * @param duration 持续回合数（模板同 {@link VulnerabilityBuff}：后置 buff，随 {@code afterMove} 递减）
+     * @param duration duration in turns (same template as {@link VulnerabilityBuff}: a
+     *                 post-move buff, decremented with {@code afterMove})
      */
     public SuperBreakBuff(int duration) {
         super(duration, false);
@@ -48,12 +56,12 @@ public class SuperBreakBuff extends AbstractBuff {
 
     @Override
     public void applyEffect(CanHit target) {
-        // 纯标记：不改属性
+        // Pure marker: changes no attributes
     }
 
     @Override
     public void removeBuff(CanHit target) {
-        // 同上：没有持久状态可清
+        // Same as above: no persistent state to clear
     }
 
     @Override

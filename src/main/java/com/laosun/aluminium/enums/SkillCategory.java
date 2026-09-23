@@ -4,67 +4,71 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 技能在**数据里的** {@code attack_type}（{@code skills.json} 的原始值）。
+ * A skill's **data-side** {@code attack_type} (the raw value in {@code skills.json}).
  *
- * <p>⚠ <b>命名</b>：本枚举**刻意不叫** {@code SkillAttackType} —— 那个名字已被
- * {@link SkillAttackType}（目标形状：单体/扩散/群攻）占用，是**另一个轴**。
- * 本枚举是"这是什么档次的技能"，与 {@link SkillEffectType}（技能干了什么）也正交。
+ * <p>⚠ <b>Naming</b>: this enum is **deliberately not called** {@code SkillAttackType} — that name is already
+ * taken by {@link SkillAttackType} (target shape: single target / blast / AoE), which is **another axis**.
+ * This enum answers "what class of skill is this", and it is orthogonal to {@link SkillEffectType} (what the skill
+ * actually does) as well.
  *
- * <p><b>为什么需要这个枚举</b>：数据把 {@code attack_type} 存成裸字符串，而引擎里
- * 有两处要按它分支（战技点结算、技能回能）。用字符串 {@code switch} 的问题是
- * **数据侧改拼写或新增类型时会静默失配** —— 落到 {@code default} 分支被吞掉，
- * 既没有编译期保护，也没有运行期报错。集中到这个枚举后，"数据值 → 引擎语义"
- * 只有一处定义，新增类型时编译器会逼着每个 {@code switch} 表态。
+ * <p><b>Why this enum is needed</b>: the data stores {@code attack_type} as a bare string, and the engine has two
+ * places that branch on it (skill point settlement, skill energy gain). The problem with a string {@code switch} is
+ * that **a spelling change or a new type on the data side fails silently** — it falls into the {@code default}
+ * branch and is swallowed, with neither compile-time protection nor a runtime error. Once it is centralised into
+ * this enum, "data value → engine semantics" is defined in exactly one place, and adding a new type forces the
+ * compiler to make every {@code switch} take a stand.
  *
- * <p>⚠ <b>与 {@link SkillType} 不是一套东西</b>，别互相替换：
+ * <p>⚠ <b>This is not the same thing as {@link SkillType}</b>, do not substitute one for the other:
  * <ul>
- *   <li>{@code SkillType} 是**槽位类别**（角色身上装了哪个槽），含 {@code SUMMON_SKILL} /
- *       {@code SUMMON_TALENT} 两个数据里不存在的值；</li>
- *   <li>本枚举是**数据里的攻击类型**，含 {@code ASSIST} / {@code ELATION_DAMAGE}
- *       两个 {@code SkillType} 里没有的值。</li>
+ *   <li>{@code SkillType} is a **slot category** (which slot is equipped on the character), and contains the two
+ *       values {@code SUMMON_SKILL} / {@code SUMMON_TALENT} that do not exist in the data;</li>
+ *   <li>this enum is the **attack type in the data**, and contains the two values {@code ASSIST} /
+ *       {@code ELATION_DAMAGE} that {@code SkillType} does not have.</li>
  * </ul>
- * 两者的交集只有 {@code Normal / BPSkill / Ultra / Maze / MazeNormal} 那五个。
+ * The only overlap between the two is those five values {@code Normal / BPSkill / Ultra / Maze / MazeNormal}.
  *
- * <p>数据实测（638 条技能，{@code skills.json}）：
- * {@code Normal} 122、{@code Ultra} 114、{@code BPSkill} 109、{@code MazeNormal} 94、
- * {@code Maze} 93、{@code null} 94（天赋与追加攻击）、{@code ElationDamage} 9、
- * {@code Assist} 3。
+ * <p>Measured on the data (638 skills, {@code skills.json}):
+ * {@code Normal} 122, {@code Ultra} 114, {@code BPSkill} 109, {@code MazeNormal} 94,
+ * {@code Maze} 93, {@code null} 94 (talents and follow-up attacks), {@code ElationDamage} 9,
+ * {@code Assist} 3.
  */
 public enum SkillCategory {
-    /** 战斗内普攻（数据 {@code "Normal"}）。 */
+    /** In-battle basic attack (data {@code "Normal"}). */
     NORMAL("Normal"),
-    /** 战技（数据 {@code "BPSkill"}）。 */
+    /** Skill (data {@code "BPSkill"}). */
     BPSKILL("BPSkill"),
-    /** 终结技（数据 {@code "Ultra"}）。 */
+    /** Ultimate (data {@code "Ultra"}). */
     ULTRA("Ultra"),
-    /** 地图普攻（数据 {@code "MazeNormal"}）：**战斗外**用的那一击。 */
+    /** Map basic attack (data {@code "MazeNormal"}): the hit used **outside battle**. */
     MAZE_NORMAL("MazeNormal"),
-    /** 秘技（数据 {@code "Maze"}）：战斗外主动施放。 */
+    /** Technique (data {@code "Maze"}): cast actively outside battle. */
     MAZE("Maze"),
-    /** 助战技（数据 {@code "Assist"}，实测 3 条）。 */
+    /** Assist skill (data {@code "Assist"}, 3 measured). */
     ASSIST("Assist"),
-    /** 欢愉伤害技能（数据 {@code "ElationDamage"}，实测 9 条，P10 欢愉体系）。 */
+    /** Elation damage skill (data {@code "ElationDamage"}, 9 measured, P10 Elation system). */
     ELATION_DAMAGE("ElationDamage"),
     /**
-     * 数据里 {@code attack_type} 为空 —— 实测 94 条，都是**天赋与追加攻击**
-     * （它们不是"主动出手"，所以没有攻击类型）。
+     * {@code attack_type} is empty in the data — 94 measured, all of them **talents and follow-up attacks**
+     * (they are not an "active cast", so they have no attack type).
      */
     UNSPECIFIED(""),
     /**
-     * 数据里出现了本项目还不认识的取值。
+     * A value this project does not yet recognise showed up in the data.
      *
-     * <p>刻意**不抛异常**：数据是外部产物，多一个新类型就炸引擎是稳定性问题。
-     * 这里选择"安全降级 + 可观测"，由 {@link #isKnownValue()} 让调用方决定要不要出声。
+     * <p>Deliberately **does not throw**: the data is an external artefact, and blowing up the engine over one new
+     * type is a stability problem. Here we choose "degrade safely + stay observable", and {@link #isKnownValue()}
+     * lets the caller decide whether to make noise.
      */
     UNKNOWN("");
 
     /**
-     * 本枚举承认的**全部**数据取值（含 {@code "ElationDamage"} 这种大小写混写）。
+     * **All** data values this enum recognises (including mixed-case ones like {@code "ElationDamage"}).
      *
-     * <p>唯一真源：{@link #fromString} 查它，{@link #isKnownValue()} 也查它。
+     * <p>The single source of truth: {@link #fromString} looks it up, and {@link #isKnownValue()} looks it up too.
      *
-     * <p>键一律经 {@link #normalize} 归一化 —— 否则"大小写不敏感"就只是
-     * javadoc 里的一句空话（第一版就是这么错的：键存原样，查表用小写，永远查不到）。
+     * <p>The keys are always normalised through {@link #normalize} — otherwise "case-insensitive" would just be an
+     * empty phrase in the javadoc (that is exactly how the first version got it wrong: the keys were stored as-is
+     * while lookups used lower case, so they could never be found).
      */
     private static final Map<String, SkillCategory> BY_VALUE = new HashMap<>();
 
@@ -77,7 +81,8 @@ public enum SkillCategory {
     }
 
     /**
-     * 取值归一化：去首尾空白 + 转小写。建表与查表**必须**走同一个函数。
+     * Value normalisation: trim whitespace + lower case. Building the table and looking up in it **must** go
+     * through the same function.
      */
     private static String normalize(String raw) {
         return raw == null ? "" : raw.trim().toLowerCase(java.util.Locale.ROOT);
@@ -90,57 +95,57 @@ public enum SkillCategory {
     }
 
     /**
-     * 数据里的原始字符串（{@code UNSPECIFIED} / {@code UNKNOWN} 为空串）。
+     * The raw string from the data ({@code UNSPECIFIED} / {@code UNKNOWN} are the empty string).
      */
     public String value() {
         return value;
     }
 
     /**
-     * 这个方法是不是 {@code null} 的替代品 —— 即数据里**本来就没有**攻击类型。
+     * Whether this value is a stand-in for {@code null} — i.e. the data **simply has no** attack type.
      *
-     * <p>用于"天赋/追加攻击"这类分支：它们是合法的空，不是数据错误。
+     * <p>Used for branches like "talents/follow-up attacks": they are a legitimate empty, not a data error.
      */
     public boolean isUnspecified() {
         return this == UNSPECIFIED;
     }
 
     /**
-     * 这个值是不是数据里**真实存在**的合法取值。
+     * Whether this value is a legitimate value that **really exists** in the data.
      *
-     * <p>{@code false} 表示两类之一：{@link #UNSPECIFIED}（合法空）或
-     * {@link #UNKNOWN}（引擎不认识的数据）。数据校验/诊断时用它。
+     * <p>{@code false} means one of two things: {@link #UNSPECIFIED} (legitimate empty) or
+     * {@link #UNKNOWN} (data the engine does not recognise). Used for data validation/diagnostics.
      */
     public boolean isKnownValue() {
         return this != UNSPECIFIED && this != UNKNOWN;
     }
 
     /**
-     * 这个类型算不算**战斗内的一次主动出手**。
+     * Whether this type counts as **one active cast inside battle**.
      *
-     * <p>{@code true}：普攻 / 战技 / 终结技。{@code false}：地图普攻、秘技
-     * （都在战斗外）、助战技、欢愉伤害、天赋与追加攻击（数据里为空）。
+     * <p>{@code true}: basic attack / skill / ultimate. {@code false}: map basic attack, technique
+     * (both outside battle), assist skill, elation damage, talents and follow-up attacks (empty in the data).
      *
-     * <p>注意**不要**拿它当"要不要结算战技点"的判据 —— 战技点的规则是
-     * "普攻 +1 / 战技 -1 / 其余中性"，由
-     * {@link com.laosun.aluminium.models.skillpoint.SkillPointPolicy} 表达。
+     * <p>Note: do **not** use this as the test for "should skill points be settled" — the skill point rule is
+     * "basic attack +1 / skill -1 / everything else neutral", expressed by
+     * {@link com.laosun.aluminium.models.skillpoint.SkillPointPolicy}.
      */
     public boolean isCombatAction() {
         return this == NORMAL || this == BPSKILL || this == ULTRA;
     }
 
     /**
-     * 把数据里的字符串解析成枚举，**大小写不敏感**且会去掉首尾空白。
+     * Parses a string from the data into the enum, **case-insensitively** and trimming whitespace.
      *
-     * <p>解析规则：
+     * <p>Parsing rules:
      * <ul>
-     *   <li>{@code null} 或空串 → {@link #UNSPECIFIED}（数据里的合法空）；</li>
-     *   <li>认识的取值 → 对应枚举；</li>
-     *   <li>不认识的取值 → {@link #UNKNOWN}（**不抛异常**，见该值说明）。</li>
+     *   <li>{@code null} or the empty string → {@link #UNSPECIFIED} (a legitimate empty in the data);</li>
+     *   <li>a recognised value → the matching enum constant;</li>
+     *   <li>an unrecognised value → {@link #UNKNOWN} (**does not throw**, see the note on that constant).</li>
      * </ul>
      *
-     * @param raw 数据里的 {@code attack_type}
-     * @return 永远非 {@code null}
+     * @param raw the {@code attack_type} from the data
+     * @return never {@code null}
      */
     public static SkillCategory fromString(String raw) {
         if (raw == null || raw.isBlank()) {

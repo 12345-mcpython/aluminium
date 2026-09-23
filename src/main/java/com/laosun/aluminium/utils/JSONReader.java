@@ -13,16 +13,18 @@ import java.nio.charset.StandardCharsets;
  *
  * <p>Uses Gson for deserialization. All resources are read with UTF-8 encoding.
  *
- * <p><b>数据文件不在仓库里。</b>{@code src/main/resources/data/} 被 {@code .gitignore} 排除
- * （唯一入库的是补丁文件 {@code monster_attack_modify_ratio.json}），所以一次 {@code git clone}
- * 之后这些文件都不存在，必须先用 README 里那个生成脚本产出。缺文件时本类会抛
- * {@link IllegalStateException} 并带上文件名与生成指引 —— 见 {@link #fromJSON(String, Type)}。
+ * <p><b>The data files are not in the repository.</b> {@code src/main/resources/data/} is excluded by
+ * {@code .gitignore} (the only one checked in is the patch file {@code monster_attack_modify_ratio.json}),
+ * so right after a {@code git clone} none of these files exist and they must first be produced with the
+ * generator script in the README. When a file is missing, this class throws {@link IllegalStateException}
+ * carrying the file name and generation guidance — see {@link #fromJSON(String, Type)}.
  */
 public final class JSONReader {
     private static final Gson GSON = new Gson();
 
     /**
-     * 游戏数据的存放目录（相对 classpath），也是报错信息里给用户看的路径。
+     * The directory where game data is stored (relative to the classpath), and also the path shown to the
+     * user in error messages.
      */
     private static final String DATA_DIR = "/data/";
 
@@ -33,16 +35,18 @@ public final class JSONReader {
      * @param type     the target Gson type token
      * @param <T>      the expected return type
      * @return the deserialized object
-     * @throws IllegalStateException 资源不存在（通常是还没生成数据，见类 javadoc）
+     * @throws IllegalStateException the resource does not exist (usually the data has not been generated
+     *                               yet, see the class javadoc)
      */
     @SneakyThrows
     public static <T> T fromJSON(String jsonName, Type type) {
         String resourcePath = DATA_DIR + jsonName;
         InputStream stream = JSONReader.class.getResourceAsStream(resourcePath);
         if (stream == null) {
-            // 故意不抛 NPE 也不返回 null：数据缺失是"环境没准备好"，不是"代码有 bug"，
-            // 所以报错必须自解释 —— 否则新手只会看到一个与真实原因无关的
-            // ExceptionInInitializerError（Constant 静态块里抛出的任何异常都会变成它）。
+            // Deliberately neither throwing NPE nor returning null: missing data means "the environment is
+            // not prepared", not "the code has a bug", so the error MUST be self-explanatory — otherwise a
+            // newcomer only sees an ExceptionInInitializerError unrelated to the real cause (any exception
+            // thrown from Constant's static block turns into that).
             throw new IllegalStateException("""
                     缺少数据文件 %s（应位于 src/main/resources%s）
                     游戏数据不在仓库里（.gitignore 排除了 src/main/resources/data/），\

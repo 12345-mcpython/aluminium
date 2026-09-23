@@ -20,15 +20,17 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * P1-9 acceptance: 附加伤害 (additional damage) and 真实伤害 (true damage), reproduced from the
- * real kits of 1309 知更鸟 and 1403 缇宝 (see {@code E:\code\blog\hsr\1309_知更鸟.md} /
+ * P1-9 acceptance: additional damage (附加伤害) and true damage (真实伤害), reproduced from the
+ * real kits of 1309 Robin and 1403 Tribbie (see {@code E:\code\blog\hsr\1309_知更鸟.md} /
  * {@code 1403_缇宝.md}).
  *
- * <p><b>附加伤害</b> official definition: "使受击者额外受到 1 次伤害，本次伤害不视为造成了 1 次攻击"
- * → it goes through the full zones (its base is a panel value: 攻击力 / 生命上限 × 倍率) and is
+ * <p><b>Additional damage (附加伤害)</b> official definition: "makes the hit target take 1 extra
+ * instance of damage; this damage is not considered to have dealt 1 attack"
+ * → it goes through the full zones (its base is a panel value: ATK / MaxHP × multiplier) and is
  * flagged {@code notCountsAsAttack()}.
  *
- * <p><b>真伤</b> (缇宝 E1): base is derived from 本次攻击总伤害值, so it skips every zone.
+ * <p><b>True damage (真伤)</b> (Tribbie E1): the base is derived from this attack's total damage
+ * value, so it skips every zone.
  *
  * <p>Attackers are plain Lv80 characters with ATK 100 / MaxHP 1000 and no boost or crit panel
  * attributes; defenders below use DEFENCE 0 unless stated otherwise.
@@ -57,11 +59,11 @@ public class ExtraTrueDamageTest {
     }
 
     private static Skill singleAttack() {
-        return new DefaultSkill(1001, 1, 1);       // 真实数据：SingleAttack ×0.5
+        return new DefaultSkill(1001, 1, 1);       // real data: SingleAttack ×0.5
     }
 
     private static Skill aoeAttack() {
-        return new DefaultSkill(1001, 3, 1);       // 真实数据：AoEAttack ×0.9
+        return new DefaultSkill(1001, 3, 1);       // real data: AoEAttack ×0.9
     }
 
     @Test
@@ -75,14 +77,14 @@ public class ExtraTrueDamageTest {
         ConcertoBuff concerto = new ConcertoBuff(2, robin);
         robin.getBuffManager().addBuff(concerto);
 
-        battle.castImmediate(aoeAttack(), mainC, List.of(main));    // 主目标 = e2
+        battle.castImmediate(aoeAttack(), mainC, List.of(main));    // main target = e2
 
-        // 主C 的 AOE：每敌 90；附加伤害只触发 1 次、只落在主目标身上
-        // 120（120% × 知更鸟攻击力 100）× 固定暴击 2.5（100% 暴击率 / 150% 暴伤）= 300
+        // mainC's AOE: 90 per enemy; additional damage triggers only 1 time and lands only on the main target
+        // 120 (120% × Robin's ATK 100) × fixed crit 2.5 (100% crit rate / 150% crit DMG) = 300
         Assertions.assertEquals(90, damageTaken(first), EPS);
         Assertions.assertEquals(90 + 300, damageTaken(main), EPS);
         Assertions.assertEquals(90, damageTaken(third), EPS);
-        Assertions.assertEquals(1, concerto.triggerCount, "每次施放攻击后只触发 1 次");
+        Assertions.assertEquals(1, concerto.triggerCount, "triggers only once after each attack cast");
     }
 
     @Test
@@ -93,7 +95,7 @@ public class ExtraTrueDamageTest {
         Battle battle = battle(List.of(robin, mainC), List.of(boss));
         robin.getBuffManager().addBuff(new ConcertoBuff(2, robin));
 
-        // 攻击者面板暴击率 = 0：若 assemble 仍按面板骰，附加伤害就只有 120 而不是 300
+        // attacker's panel crit rate = 0: if assemble still rolled by the panel, additional damage would be only 120 instead of 300
         battle.castImmediate(singleAttack(), mainC, List.of(boss));
 
         Assertions.assertEquals(50 + 300, damageTaken(boss), EPS);
@@ -110,7 +112,7 @@ public class ExtraTrueDamageTest {
 
         battle.castImmediate(singleAttack(), mainC, List.of(boss));
 
-        // 附加伤害段"不视为造成了 1 次攻击" → 不会递归触发
+        // the additional damage instance "is not considered to have dealt 1 attack" → no recursive trigger
         Assertions.assertEquals(1, concerto.triggerCount);
         Assertions.assertEquals(50 + 300, damageTaken(boss), EPS);
     }
@@ -127,8 +129,8 @@ public class ExtraTrueDamageTest {
 
         battle.castImmediate(aoeAttack(), mainC, List.of(mid));
 
-        // AOE ×0.9 → 各 90；结界"每有 1 名目标受到攻击" → 3 次 × (12% × 生命上限 1000 = 120)
-        // 每次都挑"被击目标中当前 HP 最高"者 → 全部落在 e1
+        // AOE ×0.9 → 90 each; the zone fires "for each target that is attacked" → 3 times × (12% × MaxHP 1000 = 120)
+        // each time it picks the "highest current HP among the hit targets" → all of them land on e1
         Assertions.assertEquals(90 + 360, damageTaken(high), EPS);
         Assertions.assertEquals(90, damageTaken(mid), EPS);
         Assertions.assertEquals(90, damageTaken(low), EPS);
@@ -138,17 +140,17 @@ public class ExtraTrueDamageTest {
     public void zoneE1StyleTrueDamageUsesTheAttackTotalAndIgnoresEveryZone() {
         Character tribbie = character();
         Character mainC = character();
-        Enemy boss = enemy("boss", 1_000_000, 10_000);                    // 防御 10000
-        boss.setDamageResist(Map.of(DamageElement.QUANTUM, 0.9));         // 量子抗性 0.9
+        Enemy boss = enemy("boss", 1_000_000, 10_000);                    // DEFENCE 10000
+        boss.setDamageResist(Map.of(DamageElement.QUANTUM, 0.9));         // quantum RES 0.9
         Battle battle = battle(List.of(tribbie, mainC), List.of(boss));
         tribbie.getBuffManager().addBuff(new TribbieE1Buff(2, tribbie));
 
-        // 主C 普攻（冰，×0.5）：100 × 0.5 = 50 → 防御区 1000 / (10000 + 1000)
+        // mainC's basic attack (ice, ×0.5): 100 × 0.5 = 50 → defence zone 1000 / (10000 + 1000)
         double mainDamage = 50.0 * 1000.0 / 11_000.0;
 
         battle.castImmediate(singleAttack(), mainC, List.of(boss));
 
-        // 真伤 = 本次攻击总伤害 × 24%（D2 未定：这里不发生溢出，两种口径一致）
+        // true damage = this attack's total damage × 24% (D2 undecided: no overflow occurs here, so both readings agree)
         Assertions.assertEquals(mainDamage * 1.24, damageTaken(boss), 1e-9);
     }
 
@@ -156,14 +158,14 @@ public class ExtraTrueDamageTest {
     public void additionalDamageStopsWhenTheMainDamageAlreadyKilledTheTarget() {
         Character robin = character();
         Character mainC = character();
-        Enemy fragile = enemy("boss", 50, 0);        // 主C 普攻恰好 50 → 当场击杀
+        Enemy fragile = enemy("boss", 50, 0);        // mainC's basic attack is exactly 50 → killed on the spot
         Battle battle = battle(List.of(robin, mainC), List.of(fragile));
         ConcertoBuff concerto = new ConcertoBuff(2, robin);
         robin.getBuffManager().addBuff(concerto);
 
         battle.castImmediate(singleAttack(), mainC, List.of(fragile));
 
-        // 事件照常触发（确实发生了一次攻击），但主目标已死 → 附加伤害不再产生
+        // the event fires as usual (an attack did happen), but the main target is already dead → no more additional damage
         Assertions.assertEquals(1, concerto.triggerCount);
         Assertions.assertEquals(50, damageTaken(fragile), EPS);
     }
@@ -172,7 +174,7 @@ public class ExtraTrueDamageTest {
     public void zoneStyleAdditionalDamageSkipsKilledTargetsAndFallsBackToSurvivors() {
         Character tribbie = character();
         Character mainC = character();
-        Enemy fragile = enemy("e1", 50, 0);          // 当前 HP 最高的目标，但会被主伤害打死
+        Enemy fragile = enemy("e1", 50, 0);          // the highest current-HP target, but it will be killed by the main damage
         Enemy survivor = enemy("e2", 200_000, 0);
         Enemy low = enemy("e3", 100_000, 0);
         Battle battle = battle(List.of(tribbie, mainC), List.of(fragile, survivor, low));
@@ -180,8 +182,8 @@ public class ExtraTrueDamageTest {
 
         battle.castImmediate(aoeAttack(), mainC, List.of(survivor));
 
-        // AOE 每敌 90：e1 被击杀 → 3 次附加伤害全部落到"当前存活 + HP 最高"的 e2
-        Assertions.assertEquals(50, damageTaken(fragile), EPS);          // 尸体不再受伤
+        // AOE 90 per enemy: e1 is killed → all 3 additional damage instances land on e2, the "currently alive + highest HP" one
+        Assertions.assertEquals(50, damageTaken(fragile), EPS);          // a corpse takes no more damage
         Assertions.assertEquals(90 + 360, damageTaken(survivor), EPS);
         Assertions.assertEquals(90, damageTaken(low), EPS);
     }
@@ -196,29 +198,30 @@ public class ExtraTrueDamageTest {
 
         battle.castImmediate(aoeAttack(), mainC, List.of(fragile));
 
-        // 被击目标全灭 → 3 次附加伤害一次都不产生（不转火到未被攻击的目标）
+        // every hit target dies → none of the 3 additional damage instances is produced (no retargeting to targets that were not attacked)
         Assertions.assertEquals(50, damageTaken(fragile), EPS);
     }
 
     @Test
     public void additionalDamageGoesThroughZonesWhileTrueDamageSkipsThem() {
         Character attacker = character();
-        Enemy armoured = enemy("boss", 1_000_000, 1150);                  // 防御 1150
+        Enemy armoured = enemy("boss", 1_000_000, 1150);                  // DEFENCE 1150
         Battle battle = battle(List.of(attacker), List.of(armoured));
 
         double additional = battle.applyAdditionalDamage(attacker, armoured, DamageElement.PHYSICAL, 1000);
         double trueDamage = battle.applyTrueDamage(attacker, armoured, DamageElement.PHYSICAL, 1000);
 
-        // 附加伤害的 base 是面板值 → 吃防御区；真伤 → 原样
+        // additional damage's base is a panel value → goes through the defence zone; true damage → as-is
         Assertions.assertEquals(1000.0 * 1000.0 / 2150.0, additional, EPS);
         Assertions.assertEquals(1000, trueDamage, EPS);
     }
 
     // ==================================================================
-    // 测试内嵌的"角色效果"：真实实现留给 P8-3，这里按文档数值复刻
+    // "Character effects" embedded in the test: the real implementation is left to P8-3;
+    // here they are reproduced with the documented values
     // ==================================================================
 
-    /** 无实际效果的伤害反应型 buff 骨架（applyEffect / removeBuff 留空，只减时长）。 */
+    /** Skeleton for a damage-reacting buff with no actual effect (applyEffect / removeBuff left empty; only the duration decreases). */
     private abstract static class DamageReactor extends AbstractBuff {
         protected final CanHit owner;
 
@@ -245,7 +248,7 @@ public class ExtraTrueDamageTest {
             decreaseDuration();
         }
 
-        /** 被击目标中"当前生命值最高"的存活者；全死返回 null。 */
+        /** The "highest current HP" survivor among the hit targets; null if all are dead. */
         protected static CanHit highestHpAlive(List<? extends CanHit> candidates) {
             CanHit best = null;
             for (CanHit candidate : candidates) {
@@ -261,8 +264,10 @@ public class ExtraTrueDamageTest {
     }
 
     /**
-     * 1309 知更鸟【协奏】：我方目标每次施放攻击后，造成 1 次等于自身 120% 攻击力的物理附加伤害，
-     * 固定 100% 暴击率 / 150% 暴伤。目标取**主目标**（D1(i)），主目标已死则本次跳过。
+     * 1309 Robin 【协奏】: after an ally target casts an attack, deal 1 instance of physical
+     * additional damage equal to 120% of her own ATK, with a fixed 100% crit rate / 150% crit DMG.
+     * The target is the **main target** (D1(i)); if the main target is already dead, this instance is
+     * skipped.
      */
     private static class ConcertoBuff extends DamageReactor implements AttackEvent {
         private int triggerCount;
@@ -276,18 +281,19 @@ public class ExtraTrueDamageTest {
                                 List<? extends CanHit> hitTargets, double totalDamage) {
             triggerCount++;
             if (mainTarget == null || mainTarget.isDeath()) {
-                return;                                   // D1(i)：主目标已死 → 本次不产生伤害
+                return;                                   // D1(i): main target already dead → no damage this instance
             }
             double base = owner.getAttribute(AttributeType.ATTACK).get() * 1.2;
             Damage extra = new Damage(owner, mainTarget, DamageElement.PHYSICAL, DamageType.ADDITIONAL, base);
-            extra.fixedCrit(true, 1.5).notCountsAsAttack();   // 固定 100% / 150%
+            extra.fixedCrit(true, 1.5).notCountsAsAttack();   // fixed 100% / 150%
             battle.applyDamage(mainTarget, extra);
         }
     }
 
     /**
-     * 1403 缇宝结界：我方攻击后"每有 1 名目标受到攻击"，对被击目标中当前生命值最高者造成
-     * 1 次等于缇宝 12% 生命上限的量子附加伤害。
+     * 1403 Tribbie zone (结界): after an ally attacks, "for each target that is attacked", deal
+     * 1 instance of quantum additional damage equal to 12% of Tribbie's MaxHP to the hit target with
+     * the highest current HP.
      */
     private static class TribbieZoneBuff extends DamageReactor implements AttackEvent {
         private TribbieZoneBuff(int duration, CanHit owner) {
@@ -301,7 +307,7 @@ public class ExtraTrueDamageTest {
             for (int i = 0; i < hitTargets.size(); i++) {
                 CanHit target = highestHpAlive(hitTargets);
                 if (target == null) {
-                    return;                               // 全死 → 剩余次数作废
+                    return;                               // all dead → the remaining instances are void
                 }
                 battle.applyAdditionalDamage(owner, target, DamageElement.QUANTUM, base);
             }
@@ -309,8 +315,10 @@ public class ExtraTrueDamageTest {
     }
 
     /**
-     * 1403 缇宝 E1：对（造成附加伤害的）目标额外造成等同于本次攻击总伤害值 24% 的真实伤害。
-     * 这里用主目标近似"造成附加伤害的目标"（TODO P8-3 按 E1 完整链路接线）。
+     * 1403 Tribbie E1: to the target (of the additional damage) deal extra true damage equal to 24%
+     * of this attack's total damage value.
+     * Here the main target is used as an approximation of "the target the additional damage was
+     * dealt to" (TODO P8-3: wire it up through E1's full chain).
      */
     private static class TribbieE1Buff extends DamageReactor implements AttackEvent {
         private TribbieE1Buff(int duration, CanHit owner) {

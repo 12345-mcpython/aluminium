@@ -55,11 +55,12 @@ import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BA
 @ToString(callSuper = true)
 public class Character extends CanHit {
     /**
-     * 角色 id（{@code character_data.json} 的键）。
+     * Character id (the key of {@code character_data.json}).
      *
-     * <p>存在的理由：技能数据是按 {@code cid} 查的（{@code Constant.SKILLS.get(cid)}），
-     * 而地图普攻/秘技是**战斗开场才附加**的（见 {@code Battle#startBattle}）——
-     * 那一刻装配点已经远了，所以角色得自己记得自己的 id。
+     * <p>Why it exists: skill data is looked up by {@code cid} ({@code Constant.SKILLS.get(cid)}),
+     * and the overworld basic attack / technique are **attached only at battle start**
+     * (see {@code Battle#startBattle}) — by that moment the assembly point (装配点) is long gone,
+     * so the character has to remember its own id.
      */
     private int cid;
 
@@ -75,29 +76,31 @@ public class Character extends CanHit {
     private EnumMap<SkillType, Integer> skillLevel;
 
     /**
-     * 命途（P5-1）：决定基础仇恨值，进而决定敌人选中该角色的概率。
-     * 由 {@code character_data.json} 的 {@code mt} 解析，缺数据时 {@link Path#OTHER}。
+     * Path (命途) (P5-1): determines the base aggro value, and thereby the probability that an enemy
+     * selects this character. Parsed from {@code mt} in {@code character_data.json}; {@link Path#OTHER}
+     * when the data is missing.
      */
     private Path path = Path.OTHER;
 
     /**
-     * 角色自身的仇恨值（{@code character_data.json} 的 {@code aggro}）。
+     * This character's own aggro value ({@code aggro} in {@code character_data.json}).
      *
-     * <p>它就是游戏倍率本身（存护 150 / 毁灭 125 / 其他 100 / 巡猎·智识 75），
-     * 所以 {@code Battle.aggroOf} 优先用它，{@code path} 只作为没有该数据时的兜底。
-     * {@code 0} = 没有数据。
+     * <p>It is the game multiplier itself (Preservation 150 / Destruction 125 / others 100 /
+     * Hunt · Erudition 75), so {@code Battle.aggroOf} prefers it and {@code path} only serves as the
+     * fallback when that data is absent. {@code 0} = no data.
      */
     private int aggro;
 
     /**
-     * 攻击元素（P8-1）：来自 {@code character_data.json} 的 {@code attribute}。
+     * Attack element (P8-1): comes from {@code attribute} in {@code character_data.json}.
      *
-     * <p>⚠ 该字段是**全小写**的（{@code "thunder"}），而 {@code skills.json} 的
-     * {@code element} 是首字母大写（{@code "Thunder"}）—— 所以解析走
-     * {@link DamageElement#fromString}（大小写不敏感）。
+     * <p>⚠ That field is **all lowercase** ({@code "thunder"}), while {@code element} in
+     * {@code skills.json} is capitalized ({@code "Thunder"}) — so parsing goes through
+     * {@link DamageElement#fromString} (case-insensitive).
      *
-     * <p>{@code null} = 没有数据（{@code fromAttributes} 造的占位角色就是这样）。
-     * 占位角色没有元素是**如实反映**，不要给它兜一个假元素。
+     * <p>{@code null} = no data (this is the case for the placeholder characters made by
+     * {@code fromAttributes}). A placeholder having no element is a **faithful reflection** of the data;
+     * do not give it a fake element as a fallback.
      */
     private DamageElement element;
 
@@ -124,10 +127,10 @@ public class Character extends CanHit {
     /**
      * Creates a character directly from pre-computed attributes.
      *
-     * <p>⚠ <b>仅测试 / 占位用，P8 之后新代码禁止使用</b>（P8-1）。
-     * 它造出来的角色没有元素、没有命途差异、能量上限为 0、技能全是
-     * {@link DefaultSkill} 占位 —— 真实角色请用
-     * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}。
+     * <p>⚠ <b>For tests / placeholders only; new code after P8 MUST NOT use it</b> (P8-1).
+     * The characters it makes have no element, no path differences, an energy cap of 0, and skills that are
+     * all {@link DefaultSkill} placeholders — for a real character use
+     * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}.
      */
     public static Character fromAttributes(Translate name, DoubleValue[] attributes) {
         Character c = new Character(name, attributes);
@@ -137,11 +140,12 @@ public class Character extends CanHit {
     }
 
     /**
-     * 从属性值直接造一个占位角色（仅测试用）。
+     * Build a placeholder character straight from attribute values (tests only).
      *
-     * <p>⚠ <b>P8 之后新代码禁止使用</b>：造出来的角色没有元素、没有命途差异、
-     * 能量上限为 0（放不出终结技）、技能全是 {@link DefaultSkill} 占位。
-     * 真实角色请用 {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}。
+     * <p>⚠ <b>New code after P8 MUST NOT use it</b>: the character it makes has no element, no path
+     * differences, an energy cap of 0 (cannot cast an ultimate), and skills that are all
+     * {@link DefaultSkill} placeholders.
+     * For a real character use {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}.
      */
     public static Character fromAttributes(String name, double health, double defence, double attack, double speed) {
         AttributeBuilder attributeBuilder = new AttributeBuilder();
@@ -196,7 +200,8 @@ public class Character extends CanHit {
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
         private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
         /**
-         * 显式指定的命途；{@code null} = 用角色数据里的 {@code mt} 推导（默认路径）。
+         * An explicitly specified path; {@code null} = derive it from {@code mt} in the character data
+         * (the default route).
          */
         private Path path;
 
@@ -272,7 +277,8 @@ public class Character extends CanHit {
         }
 
         /**
-         * 显式指定命途（默认从角色数据的 {@code mt} 推导，一般不用调）。
+         * Explicitly specify the path (by default it is derived from {@code mt} in the character data;
+         * normally there is no need to call this).
          */
         public Builder path(Path path) {
             this.path = path;
@@ -305,9 +311,11 @@ public class Character extends CanHit {
             for (Map.Entry<SkillType, Integer> entry : skillLevel.entrySet()) {
                 SkillType type = entry.getKey();
                 int level = entry.getValue();
-                // P8-2：每个槽位解析**自己的** skill_id（此前恒为 1，六个槽位都是普攻的数据）。
-                // 只装"角色常驻"的槽位：地图普攻(6)/秘技(7) 是地图技能，由 Battle.startBattle() 附加；
-                // 召唤物槽位属于忆灵（P9-4），都不在这里装。
+                // P8-2: every slot resolves **its own** skill_id (previously it was always 1, so all six
+                // slots had the basic attack's data).
+                // Only equip the "always-on character" slots: the overworld basic attack (6) / technique (7)
+                // are overworld skills attached by Battle.startBattle(); the summon slot belongs to memosprites
+                // (P9-4), so neither is equipped here.
                 if (!type.isIntrinsic()) {
                     continue;
                 }
@@ -322,13 +330,15 @@ public class Character extends CanHit {
             character.setSkillLevel(skillLevel);
             character.setLevel(level);
             character.setCid(cid);
-            // P5-1：命途与仇恨来自角色数据（mt=命途字符串，aggro=游戏倍率本身）
+            // P5-1: path and aggro come from the character data (mt = path string, aggro = the game multiplier itself)
             character.setPath(this.path != null ? this.path : Path.fromMt(characterData.mt()));
             character.setAggro(characterData.aggro() > 0 ? characterData.aggro() : 0);
-            // P8-1：元素同样来自角色数据（attribute 是全小写，解析口径见 DamageElement#fromString）
+            // P8-1: the element likewise comes from the character data (attribute is all lowercase; for the
+            // parsing convention see DamageElement#fromString)
             character.setElement(DamageElement.fromString(characterData.attribute()));
-            // P8-1：能量上限按数据来。**null 必须保持 0（= 没有能量条），不能兜底成 100** ——
-            // 全数据里只有 1407 遐蝶是 null，兜底会凭空给她造出一条能量条（P3-0 A 表）。
+            // P8-1: the energy cap follows the data. **A null MUST stay 0 (= no energy bar); it must NOT fall
+            // back to 100** — 1407 遐蝶 is the only null in the whole data set, and a fallback would conjure
+            // an energy bar for her out of thin air (P3-0 table A).
             character.setMaxEnergy(characterData.maxEnergy() != null ? characterData.maxEnergy() : 0);
             return character;
         }

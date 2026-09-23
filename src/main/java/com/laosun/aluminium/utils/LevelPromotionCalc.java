@@ -16,14 +16,17 @@ public final class LevelPromotionCalc {
     /**
      * Calculates the character stat multiplier for the given level and promotion status.
      *
-     * <p>公式：{@code 1 + (等级-1)×0.05 + 晋阶次数×0.4}。晋阶次数由等级档位推出
-     * （每 10 级一档、每档 0.4），也就是游戏 {@code AvatarPromotionConfig} 的 7 行：
-     * 晋阶 0（≤20）/ 1（≤30）/ 2（≤40）/ 3（≤50）/ 4（≤60）/ 5（≤70）/ 6（≤80）。
+     * <p>Formula: {@code 1 + (level-1)×0.05 + promotion count×0.4}. The promotion count is derived
+     * from the level bracket (one bracket per 10 levels, 0.4 per bracket), i.e. the 7 rows of the
+     * game's {@code AvatarPromotionConfig}:
+     * ascension 0 (≤20) / 1 (≤30) / 2 (≤40) / 3 (≤50) / 4 (≤60) / 5 (≤70) / 6 (≤80).
      *
-     * <p>⚠ <b>晋阶次数要 clamp 到 ≥ 0</b>（P8-1 修正）：原来低等级配 {@code promotion=true}
-     * 会算出**负数**（Lv1 → {@code 1/10 - 1 = -1}），于是"已晋阶"反而把 Lv1 面板压到 0.6 倍
-     * （景元基础生命 158.4 → 95.04，正好等于他的**攻击** 95.04，看串了非常容易误判成索引错位）。
-     * 一个 1 级角色不可能"负晋阶"，所以下界必须是 0。
+     * <p>⚠ <b>The promotion count MUST be clamped to ≥ 0</b> (fixed in P8-1): previously a low level
+     * combined with {@code promotion=true} produced a **negative** value (Lv1 → {@code 1/10 - 1 = -1}),
+     * so "already promoted" actually squeezed the Lv1 stat sheet down to 0.6× (Jing Yuan's (景元) base
+     * HP 158.4 → 95.04, which happens to equal his **attack** 95.04 — misreading the two is very easy
+     * and looks like an index shift). A level-1 character cannot have a "negative promotion", so the
+     * lower bound must be 0.
      *
      * @param level     character level (1-80)
      * @param promotion whether the character is promoted at the current ascension threshold
@@ -40,7 +43,7 @@ public final class LevelPromotionCalc {
             promoteCount = 0;
         }
 
-        return baseRate + Math.max(0, promoteCount) * 0.4;   // 负晋阶不存在
+        return baseRate + Math.max(0, promoteCount) * 0.4;   // a negative promotion does not exist
     }
 
     /**

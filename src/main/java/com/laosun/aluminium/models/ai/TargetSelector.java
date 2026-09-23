@@ -8,20 +8,24 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 目标选择（P5-4）：决定"这一次攻击打谁"。
+ * Target selection (P5-4): decides "who this attack hits".
  *
- * <p>两条策略，按优先级：
+ * <p>Two strategies, in priority order:
  * <ol>
- *   <li><b>嘲讽硬约束</b>：候选里存在活着的嘲讽者 → 直接选中它（见 {@link TauntBuff}）。
- *       只对 {@link Intent#SINGLE} 与 {@link Intent#BLAST} 生效 —— 单体与扩散的**中心**受约束；
- *       群攻本来打全体，不需要选；弹射每段各自随机，不受约束。</li>
- *   <li><b>仇恨加权随机</b>：按 {@code 该单位仇恨 / 候选总仇恨} 的概率抽一个。
- *       存护 150 比常规 100 更容易被打到。</li>
+ *   <li><b>Taunt as a hard constraint</b>: if a living taunter exists among the candidates → pick it
+ *       directly (see {@link TauntBuff}). Only applies to {@link Intent#SINGLE} and
+ *       {@link Intent#BLAST} — the **center** of a single-target and of a blast is constrained; AOE
+ *       already hits everyone, so nothing needs choosing; bounces are random per hit and are not
+ *       constrained.</li>
+ *   <li><b>Aggro-weighted random</b>: draw one with probability
+ *       {@code that unit's aggro / total candidate aggro}. Preservation (存护) 150 is more likely to
+ *       be hit than the usual 100.</li>
  * </ol>
  *
- * <p><b>候选集口径</b>：调用方必须传"活着的对手"。别在这里自己过滤阵营 ——
- * 引擎里"谁可以被选为目标"的唯一出口是 {@code Battle.targetableEnemies()}（敌方）
- * 与调用方自筛的我方列表；选到尸体就是鞭尸的来源。
+ * <p><b>What counts as the candidate set</b>: the caller MUST pass "the living opponents". Do not
+ * filter by faction here yourself — the single outlet in the engine for "who can be selected as a
+ * target" is {@code Battle.targetableEnemies()} (for the enemy side) plus the caller's own filtered
+ * friendly list; selecting a corpse is exactly where corpse-hitting comes from.
  */
 public final class TargetSelector {
 
@@ -29,27 +33,28 @@ public final class TargetSelector {
     }
 
     /**
-     * 这次攻击的"意图"——决定嘲讽是否约束目标选择。
+     * The "intent" of this attack — decides whether taunt constrains target selection.
      */
     public enum Intent {
-        /** 单体攻击：受嘲讽约束。 */
+        /** Single-target attack: constrained by taunt. */
         SINGLE,
-        /** 扩散攻击（中心 + 相邻）：**中心**受嘲讽约束。 */
+        /** Blast attack (center + adjacent): the **center** is constrained by taunt. */
         BLAST,
-        /** 群攻：打全体，不受嘲讽约束。 */
+        /** AOE: hits everyone, not constrained by taunt. */
         AOE,
-        /** 弹射/随机：每段各自随机，不受嘲讽约束。 */
+        /** Bounce/random: each hit is random on its own, not constrained by taunt. */
         RANDOM
     }
 
     /**
-     * 按意图选一个主目标。
+     * Select one primary target according to the intent.
      *
-     * @param battle     进行中的战斗（用来查仇恨值）
-     * @param candidates 候选目标（**必须已过滤死亡**；空列表返回 {@code null}）
-     * @param intent     攻击意图
-     * @param rng        注入的随机源（保证可复现）
-     * @return 选中的目标；没有候选则 {@code null}
+     * @param battle     the battle in progress (used to look up aggro)
+     * @param candidates candidate targets (**must already be filtered for death**; an empty list
+     *                   returns {@code null})
+     * @param intent     attack intent
+     * @param rng        injected random source (so results are reproducible)
+     * @return the selected target; {@code null} if there is no candidate
      */
     public static CanHit select(Battle battle, List<? extends CanHit> candidates, Intent intent, Random rng) {
         if (candidates == null || candidates.isEmpty()) {
@@ -57,19 +62,20 @@ public final class TargetSelector {
         }
         CanHit taunted = findTaunter(candidates, intent);
         if (taunted != null) {
-            return taunted;                     // 嘲讽是硬约束：跳过随机
+            return taunted;                     // taunt is a hard constraint: skip the random roll
         }
         return weighted(battle, candidates, rng);
     }
 
     /**
-     * 候选里活着的嘲讽者（同一个候选集里理论上只该有一个；多个时取第一个）。
+     * A living taunter among the candidates (in theory there should be only one per candidate set;
+     * when there are several, take the first).
      *
-     * @return 嘲讽者；没有 / 意图不受约束 → {@code null}
+     * @return the taunter; none / the intent is not constrained → {@code null}
      */
     private static CanHit findTaunter(List<? extends CanHit> candidates, Intent intent) {
         if (intent != Intent.SINGLE && intent != Intent.BLAST) {
-            return null;                        // 群攻打全体、弹射逐段随机：不受嘲讽影响
+            return null;                        // AOE hits everyone, bounces are random per hit: unaffected by taunt
         }
         for (CanHit candidate : candidates) {
             if (!candidate.isDeath() && candidate.getBuffManager().hasBuff(TauntBuff.class)) {
@@ -80,7 +86,7 @@ public final class TargetSelector {
     }
 
     /**
-     * 仇恨加权随机。
+     * Aggro-weighted random.
      */
     private static CanHit weighted(Battle battle, List<? extends CanHit> candidates, Random rng) {
         double total = 0;
@@ -88,7 +94,7 @@ public final class TargetSelector {
             total += battle.aggroOf(candidate);
         }
         if (total <= 0) {
-            return candidates.getFirst();        // 全都 0 权重：退化为取第一个，不做除零
+            return candidates.getFirst();        // all weights are 0: degrade to taking the first, no division by zero
         }
         double roll = rng.nextDouble() * total;
         for (CanHit candidate : candidates) {
@@ -97,6 +103,6 @@ public final class TargetSelector {
                 return candidate;
             }
         }
-        return candidates.getLast();             // 浮点误差兜底
+        return candidates.getLast();             // fallback for floating-point error
     }
 }

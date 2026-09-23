@@ -11,24 +11,27 @@ import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
 import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Consumer;
 
 
 public class Battle {
     /**
-     * 战斗状态机（P7-3）。
+     * Battle state machine (P7-3).
      *
      * <pre>
-     *   NOT_STARTED ──startBattle()──▶ RUNNING ──一方全灭──▶ WIN / LOSE
+     *   NOT_STARTED ──startBattle()──▶ RUNNING ──one side wiped out──▶ WIN / LOSE
      *                                   ▲                      │
-     *                                   └──── (不回退) ────────┘
+     *                                   └──── (no rollback) ───┘
      * </pre>
      *
-     * <p>{@code WIN} / {@code LOSE} 是**终态**：{@link #stepForward()} 不再推进行动条。
+     * <p>{@code WIN} / {@code LOSE} are **terminal states**: {@link #stepForward()} no longer advances the action bar.
      */
     public enum Status {
         NOT_STARTED, RUNNING, WIN, LOSE
@@ -43,85 +46,89 @@ public class Battle {
     public Signal currentMove;
 
     /**
-     * 当前战斗状态（P7-3）。开场是 {@link Status#NOT_STARTED}，由 {@link #startBattle()} 转成
-     * {@link Status#RUNNING}。
+     * The current battle status (P7-3). It starts as {@link Status#NOT_STARTED}, and {@link #startBattle()}
+     * turns it into {@link Status#RUNNING}.
      */
     private Status status = Status.NOT_STARTED;
 
     /**
-     * 波次管理（P7-4）；非波次战斗为 {@code null}。
+     * Wave management (P7-4); {@code null} for a non-wave battle.
      *
-     * <p>存在的唯一理由是让 {@link #checkResult()} 知道"敌队是空的"到底是
-     * **打赢了**还是**这一波还没进**。
+     * <p>Its only reason to exist is to let {@link #checkResult()} know whether "the enemy team is empty"
+     * means **won** or **this wave has not entered yet**.
      */
     private WaveManager waveManager;
 
     public ArrayList<CanHit> addRequestItems = new ArrayList<>();
 
     /**
-     * 战技点策略（P8-4）：**全队共享**的一个池子，不是每个角色各有一条。
+     * Skill points (战技点) policy (P8-4): **one pool shared by the whole team**, not one track per character.
      *
-     * <p>{@code Battle} 本身**不认识战技点的规则** —— 只持有一个
-     * {@link SkillPointPolicy} 并在"决定出手"时问它一次（见 {@link #useSkill}）。
-     * 为什么这样拆：战技点的规则会长出角色级修正（布洛妮娅「战技 50% 概率 +1」、
-     * 素裳「打击破目标战技 +1」、花火「上限 +2」…），若都往这里加分支，
-     * {@code Battle} 会堆满"因为某个角色"的判断，违反 P8-0 的三分法。
-     * 详见 {@code DOC_VS_CODE.md} §F 的 <b>F-8</b>。
+     * <p>{@code Battle} itself **does not know the skill point rules** -- it only holds a
+     * {@link SkillPointPolicy} and asks it once when "deciding to act" (see {@link #useSkill}).
+     * Why split it this way: skill point rules keep growing character-level corrections (Bronya (布洛妮娅)
+     * "skill has a 50% chance of +1", Sushang (素裳) "skill on a weakness-broken target +1",
+     * Sparkle (花火) "max +2", ...). If all of those branches were added here,
+     * {@code Battle} would fill up with "because of some character" conditionals, violating the P8-0 three-way split.
+     * See <b>F-8</b> in §F of {@code DOC_VS_CODE.md}.
      *
-     * <p>默认是 {@link StandardSkillPointPolicy}（开局 3 / 上限 5 / 我方普攻 +1 / 战技 -1 /
-     * 其余中性）。要在队伍里换一套规则（例如花火抬高上限）就换掉这个字段 ——
-     * 它是可控的注入点，对调用方是**稳定 API**（读值/加值/花值三个方法不变）。
+     * <p>The default is {@link StandardSkillPointPolicy} (start 3 / max 5 / our basic attack +1 / skill -1 /
+     * everything else neutral). To swap in another rule set for the team (e.g. Sparkle (花火) raising the max),
+     * replace this field -- it is a controllable injection point and a **stable API** to callers
+     * (the three methods read/add/spend do not change).
      */
     public SkillPointPolicy skillPointPolicy = new StandardSkillPointPolicy();
 
-    /** 当前战技点（P8-4）。等价于 {@code skillPointPolicy.getValue()}。 */
+    /** Current skill points (P8-4). Equivalent to {@code skillPointPolicy.getValue()}. */
     public int getSkillPoints() {
         return skillPointPolicy.getValue();
     }
 
-    /** 战技点的常规上限（P8-4）。等价于 {@code skillPointPolicy.getMax()}。 */
+    /** The regular skill point cap (P8-4). Equivalent to {@code skillPointPolicy.getMax()}. */
     public int getSkillPointMax() {
         return skillPointPolicy.getMax();
     }
 
-    /** 战技点是否够放一次战技（P8-4）。 */
+    /** Whether there are enough skill points to cast one skill (P8-4). */
     public boolean hasSkillPoint() {
         return skillPointPolicy.canAfford();
     }
 
     /**
-     * 直接回复战技点（P8-4），封顶常规上限。
+     * Directly restore skill points (P8-4), capped at the regular maximum.
      *
-     * <p>给"普攻 +1"之外的显式来源用：秘技、遗器（过客 4 件套）、角色机制。
+     * <p>For explicit sources other than "basic attack +1": techniques, relics (the 4-piece 过客 set),
+     * character mechanics.
      *
-     * @param n 要加的点数；{@code <= 0} 时不做任何事
+     * @param n the number of points to add; does nothing when {@code <= 0}
      */
     public void gainSkillPoint(int n) {
         skillPointPolicy.gain(n);
     }
 
     /**
-     * 消耗 1 点战技点（P8-4）。
+     * Spend 1 skill point (P8-4).
      *
-     * @return 是否消耗成功；{@code false} 表示点数已为 0（调用方应当阻止这次出手）
+     * @return whether the spend succeeded; {@code false} means the count was already 0 (the caller should block this action)
      */
     public boolean spendSkillPoint() {
         return skillPointPolicy.spend();
     }
 
     /**
-     * 按技能结算战技点（P8-4）。**内部收口点**，供 {@link #useSkill} 与演示里的
-     * 治疗/护盾分支共用 —— 后者自己直接调 {@code Battle.heal/grantShield}，
-     * 绕过了 {@link #useSkill}，所以得显式补这一下，否则"治疗战技不耗点"。
+     * Settle skill points for a skill (P8-4). **The internal funnel point**, shared by {@link #useSkill} and
+     * the heal/shield branches in the demos -- the latter call {@code Battle.heal/grantShield} directly,
+     * bypassing {@link #useSkill}, so this has to be called explicitly, otherwise "a healing skill costs no points".
      *
-     * <p>规则全在策略里（含阵营判断），这里只转发。
+     * <p>All the rules live in the policy (including the camp check); this only forwards.
      *
-     * @param skill 要结算的技能
-     * @param user  出手者 —— **必须显式传入**。早先这里从 {@code currentMove} 猜出手者，
-     *              结果在"没有行动者"的场景（直接调用的测试、演示的治疗分支）猜出
-     *              {@code null}，而 {@code null != Camp.PLAYER} 会让策略静默变成空操作 ——
-     *              一个不报错的错误答案。显式传参让这类误用暴露成编译错误。
-     * @return 这次出手是否**可以继续**（战技点足够）；普攻/终结技/追加攻击一律 true
+     * @param skill the skill to settle
+     * @param user  the actor -- **must be passed explicitly**. Earlier this guessed the actor from
+     *              {@code currentMove}, and in scenarios with no actor (directly-called tests, the demo's
+     *              healing branch) it guessed {@code null}, while {@code null != Camp.PLAYER} silently turned
+     *              the policy into a no-op -- a wrong answer that reports no error. Passing it explicitly makes
+     *              this kind of misuse surface as a compile error.
+     * @return whether this action **may continue** (enough skill points); basic attack/ultimate/follow-up attack are always true
      */
     public boolean applySkillPointCost(Skill skill, CanHit user) {
         return skillPointPolicy.onSkillCast(user, skill);
@@ -155,30 +162,60 @@ public class Battle {
         queue.addCombatants(characterQueue);
         queue.addCombatants(enemyQueue);
         queue.initialize();
-        // P7 修正 E2：把"速度变化 → 重排行动条"接上。没有这条，加速/减速不会立刻生效
-        // （Signal 缓存的 speed 只会在 initialize/setTopZero/resetSignal 这三个时机被刷新）。
+        // P7 fix E2: wire up "speed change → re-sort the action bar". Without this, a speed buff/debuff does
+        // not take effect immediately (the speed cached in Signal is only refreshed at
+        // initialize/setTopZero/resetSignal).
         for (Character c : characterQueue) {
             c.setSpeedChangeListener(this::onSpeedChanged);
         }
         for (Enemy e : enemyQueue) {
             e.setSpeedChangeListener(this::onSpeedChanged);
         }
+        listenToSkillPointChanges();
     }
 
     /**
-     * 某个单位的速度变了 → 按"已积累的行动进度"重排他的行动时间（P7 修正 E2）。
+     * Wire the skill point policy's change reports into event broadcasting (P8-6).
      *
-     * <p>调用方是 {@link CanHit#notifySpeedChanged()}；它会先比对旧值，
-     * 只有真的变化了才通知，所以这里不需要再做判重。
+     * <p>The policy reports after it "really credited / really spent", and {@code Battle} only broadcasts --
+     * that way {@code Battle} does not need to know the skill point rules (nor to **guess** what just happened
+     * by "subtracting the before and after values", an inference that silently goes wrong at the cap).
      *
-     * @param target 速度发生变化的单位
+     * <p>Only {@link StandardSkillPointPolicy} is wired: other implementations that also want to emit events
+     * can hook up {@code setListener} themselves at the assembly point -- the engine makes no special case for
+     * any one implementation.
+     */
+    private void listenToSkillPointChanges() {
+        if (skillPointPolicy instanceof StandardSkillPointPolicy standard) {
+            standard.setListener(new StandardSkillPointPolicy.Listener() {
+                @Override
+                public void onGained(int amount) {
+                    broadcastSkillPointGained(amount);
+                }
+
+                @Override
+                public void onSpent(int amount) {
+                    broadcastSkillPointSpent(amount);
+                }
+            });
+        }
+    }
+
+    /**
+     * A unit's speed changed → re-sort its action time from the "action progress already accumulated"
+     * (P7 fix E2).
+     *
+     * <p>The caller is {@link CanHit#notifySpeedChanged()}; it compares against the old value first and only
+     * notifies on a real change, so no duplicate check is needed here.
+     *
+     * @param target the unit whose speed changed
      */
     private void onSpeedChanged(CanHit target) {
         if (target == null || target.isDeath()) {
             return;
         }
         queue.refreshSpeed(target);
-        currentMove = queue.getCurrentActor();       // 重排可能改了谁是下一个
+        currentMove = queue.getCurrentActor();       // the re-sort may have changed who is next
     }
 
     public Random getRng() {
@@ -210,30 +247,34 @@ public class Battle {
     // After releasing ultra skill must call processRequests()!
     // NO BEFAN YOY DID IT
     /**
-     * 这个单位现在能不能放终结技（P3-4 跟进）：**攒够"开大阈值"就行，不必攒满上限**。
+     * Whether this unit can cast its ultimate right now (P3-4 follow-up): **reaching the "ult threshold" is
+     * enough, it does not have to be filled to the maximum**.
      *
-     * <p>阈值来自技能数据的 {@code spNeed}（tbgd {@code AvatarSkillConfig.SPNeed}，
-     * 见 {@link com.laosun.aluminium.models.SkillData#getSpNeed()}）。
-     * 93 个角色里有 5 个的阈值**低于**上限 —— 云璃 120/240、银枝 90/180、绯英 240/480、
-     * 飞霄 6/12、昔涟 12/24。数据缺失时退回"攒满 {@code maxEnergy}"（老行为）。
+     * <p>The threshold comes from the skill data's {@code spNeed} (tbgd {@code AvatarSkillConfig.SPNeed},
+     * see {@link com.laosun.aluminium.models.SkillData#getSpNeed()}).
+     * 5 of the 93 characters have a threshold **below** the maximum -- Yunli (云璃) 120/240,
+     * Argenti (银枝) 90/180, 绯英 240/480, Feixiao (飞霄) 6/12, Cyrene (昔涟) 12/24. When the data is missing
+     * it falls back to "fill {@code maxEnergy}" (the old behaviour).
      *
-     * <p>放出去之后**清零**（见 {@link #castUltra}）：对阈值 == 上限的多数角色这与原来等价；
-     * 对上面的例外，等价于"放一次消耗掉阈值那部分"。游戏文档写的是
-     * 「释放所需能量 120（上限 240）」—— "所需"是**门槛**。
+     * <p>After it is cast it is **zeroed** (see {@link #castUltra}): for the majority of characters whose
+     * threshold == max this is equivalent to before; for the exceptions above it is equivalent to
+     * "one cast consumes the threshold part". The game docs say
+     * "Energy required to cast 120 (max 240)" -- "required" is a **gate**.
      *
-     * <p>⚠ 这是 `Battle` 上唯一读 {@code spNeed} 的地方，所以将来若要区分
-     * "消耗阈值"与"清零"，改这里与 {@link #castUltra} 一处即可。
+     * <p>⚠ This is the only place on `Battle` that reads {@code spNeed}, so if the distinction between
+     * "consume the threshold" and "zero out" is ever needed, changing this place and {@link #castUltra} is enough.
      */
     public boolean isUltraReady(CanHit user) {
         if (user == null || !user.hasEnergyBar()) {
-            return false;                       // 没有能量条（如遐蝶 1407）永远放不了
+            return false;                       // no energy bar (e.g. Castorice (遐蝶) 1407) can never cast
         }
         double threshold = ultraEnergyCost(user);
         return user.getCurrentEnergy() >= threshold;
     }
 
     /**
-     * 这个单位放终结技所需的能量：优先技能数据的 {@code spNeed}，否则退回 {@code maxEnergy}。
+     * The energy this unit needs to cast its ultimate: prefers the skill data's {@code spNeed},
+     * otherwise falls back to {@code maxEnergy}.
      */
     public double ultraEnergyCost(CanHit user) {
         if (user == null) {
@@ -249,10 +290,10 @@ public class Battle {
 
     public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
         if (user == null || user.isDeath() || !isUltraReady(user)) {
-            return false;                       // 没攒够放不了（没有能量条的角色永远放不了）
+            return false;                       // not enough accumulated, cannot cast (characters without an energy bar can never cast)
         }
-        // P7-2：额外回合期间禁止插入**别人**的终结技。
-        // 规则见 HSR.md §3.1；不拦的话"额外回合"可以被终结技无限续下去。
+        // P7-2: during an extra turn, inserting **someone else's** ultimate is forbidden.
+        // Rule in HSR.md §3.1; without this block, an "extra turn" could be extended forever by ultimates.
         CanHit extraTurnActor = queue.getExtraTurnActor();
         if (extraTurnActor != null && extraTurnActor != user) {
             return false;
@@ -264,14 +305,15 @@ public class Battle {
         if (!requestSkill(ultra, user, targets)) {
             return false;
         }
-        // H-5：**先清零**（ROADMAP P3-2 的顺序），再让大招本体结算。
-        // 顺序反了会吃掉大招自己赚的能量：processRequests() 里的击杀回能 / 击破回能都记给
-        // damage.getAttacker()（= 放大招的人），先结算后清零就把那几笔抹掉了。
+        // H-5: **zero it first** (the order in ROADMAP P3-2), then let the ultimate body settle.
+        // Reversing the order eats the energy the ultimate itself earns: the kill energy / break energy
+        // inside processRequests() are both credited to damage.getAttacker() (= the one casting the ultimate),
+        // so settling first and zeroing afterwards wipes those entries out.
         user.setCurrentEnergy(0);
-        processRequests();                      // 大招本体结算：Ultra 槽在 onSkillCast 里不回能，不会重复给
+        processRequests();                      // ultimate body settles: the Ultra slot gains no energy in onSkillCast, so no double credit
         EnergyGain ultraGain = user.getEnergyProvider().onUltCast(user, ultra);
         if (ultraGain != null) {
-            applyEnergyGain(user, ultraGain);   // 再回自身的 5 点（× 回能效率）
+            applyEnergyGain(user, ultraGain);   // then the 5 points of its own (× energy gain rate)
         }
         return true;
     }
@@ -287,17 +329,20 @@ public class Battle {
     }
 
     /**
-     * 战斗开场附加**地图技能**（P8-2）：地图普攻（槽位 6）与秘技（槽位 7）。
+     * Attach the **map skills** at the start of a battle (P8-2): map basic attack (slot 6) and
+     * technique (slot 7).
      *
-     * <p>为什么在这里而不是在 {@code CharacterFactory} 里：这两个槽位是**地图上的东西**，
-     * 不是角色常驻技能 —— 它们只在"进入战斗"这一刻才有意义。
-     * 数据里地图普攻的攻击类型是 {@code MazeNormal}、秘技是 {@code Maze}，
-     * 而战斗内普攻是槽位 1 的 {@code Normal}，两者不是一回事。
+     * <p>Why here and not in {@code CharacterFactory}: these two slots are **things on the map**,
+     * not a character's permanent skills -- they only make sense at the moment of "entering battle".
+     * In the data the map basic attack's attack type is {@code MazeNormal} and the technique's is {@code Maze},
+     * while the in-battle basic attack is the {@code Normal} of slot 1; the two are not the same thing.
      *
-     * <p>秘技的**效果**（例如景元"下一场战斗开始时【神君】+3 段"）要等 P8-6 的事件补齐 +
-     * 触发器表，本方法只把技能本身挂上（数据可读、可执行）。
+     * <p>The technique's **effect** (e.g. Jing Yuan (景元) "at the start of the next battle 【神君】+3 hits")
+     * has to wait for the P8-6 events plus the trigger table; this method only attaches the skill itself
+     * (readable and executable from the data).
      *
-     * <p>只给我方角色附加：怪物没有地图技能（{@code EnemyFactory} 装的是自己的普攻）。
+     * <p>Only our characters get them: monsters have no map skills ({@code EnemyFactory} installs their own
+     * basic attack).
      */
     private void attachBattleSkills() {
         for (Character character : characters) {
@@ -306,7 +351,7 @@ public class Battle {
             }
             for (SkillType type : List.of(SkillType.MAZE, SkillType.TECHNIQUE)) {
                 if (character.getSkills().containsKey(type)) {
-                    continue;                        // 已显式装过（测试或自定义）就不覆盖
+                    continue;                        // already explicitly installed (test or custom): do not overwrite
                 }
                 Integer slot = Constant.SKILL_SLOT.get(type);
                 if (slot == null) {
@@ -319,48 +364,50 @@ public class Battle {
 
     public void stepForward() {
         if (isOver()) {
-            return;                                  // 终态：不再推进行动条（P7-3）
+            return;                                  // terminal state: the action bar is no longer advanced (P7-3)
         }
         queue.move();
         currentMove = queue.getCurrentActor();
     }
 
     /**
-     * 当前战斗状态（P7-3）。
+     * The current battle status (P7-3).
      */
     public Status getStatus() {
         return status;
     }
 
     /**
-     * 战斗是否已经结束（胜或负）。
+     * Whether the battle is already over (won or lost).
      */
     public boolean isOver() {
         return status == Status.WIN || status == Status.LOSE;
     }
 
     /**
-     * 判定胜负并落状态（P7-3）。**幂等**：已经是终态就什么都不做（终态不回退）。
+     * Decide the outcome and set the status (P7-3). **Idempotent**: once terminal it does nothing
+     * (terminal states never roll back).
      *
-     * <p>口径：
+     * <p>The rules:
      * <ul>
-     *   <li>某一方**全灭**即判负 —— 用 {@code allMatch(isDeath)}，所以**空列表也算全灭**
-     *       （空的一方就是被清光了）。</li>
-     *   <li>{@link Status#NOT_STARTED} 时不判：战斗还没开场，谈不上胜负。
-     *       所以这个判定只在 {@link #startBattle()} 之后生效。</li>
-     *   <li>两边同时全灭 → {@code LOSE}（先判负后判胜，且**不会**从终态继续判定）。</li>
+     *   <li>A side being **wiped out** means that side loses -- this uses {@code allMatch(isDeath)}, so
+     *       **an empty list also counts as wiped out** (an empty side has simply been cleared).</li>
+     *   <li>At {@link Status#NOT_STARTED} nothing is decided: the battle has not started, so there is no
+     *       outcome to speak of. So this judgement only takes effect after {@link #startBattle()}.</li>
+     *   <li>Both sides wiped out at the same time → {@code LOSE} (loss is checked before win, and it will
+     *       **not** keep judging from a terminal state).</li>
      * </ul>
      *
-     * @return 判定之后的当前状态
+     * @return the current status after the judgement
      */
     public Status checkResult() {
         if (status != Status.RUNNING) {
             return status;
         }
-        // P7-4：还有没进的波 → 敌队为空只代表"这一波还没进"，不能判胜。
+        // P7-4: there are waves not yet entered → an empty enemy team only means "this wave has not entered", so no win.
         boolean pendingWaves = waveManager != null && waveManager.hasPendingWaves();
         if (characters.stream().allMatch(CanHit::isDeath)) {
-            status = Status.LOSE;                    // 我方全灭是真输了，有没有待进的波都一样
+            status = Status.LOSE;                    // our side being wiped out is a real loss, with or without pending waves
         } else if (enemies.stream().allMatch(CanHit::isDeath) && !pendingWaves) {
             status = Status.WIN;
         }
@@ -368,51 +415,53 @@ public class Battle {
     }
 
     /**
-     * 登记波次管理器（P7-4）。由 {@link WaveManager} 的构造函数调用，业务代码不用手调。
+     * Register the wave manager (P7-4). Called by the {@link WaveManager} constructor; business code does not
+     * call it by hand.
      */
     public void setWaveManager(WaveManager waveManager) {
         this.waveManager = waveManager;
     }
 
     /**
-     * 当前波次管理器（P7-4）；非波次战斗为 {@code null}。
+     * The current wave manager (P7-4); {@code null} for a non-wave battle.
      */
     public WaveManager getWaveManager() {
         return waveManager;
     }
 
     /**
-     * 给 {@code actor} 一个**额外回合**（P7-2）：下一次 {@link #stepForward()} 由他行动，
-     * 且**不消耗行动值**（时钟不动 → 轮次不变，见 {@link #getRound()}）。
+     * Give {@code actor} an **extra turn** (P7-2): the next {@link #stepForward()} is taken by it,
+     * and it **costs no action value** (the clock does not move → the round does not change, see {@link #getRound()}).
      *
-     * <p>典型用法是击杀型天赋（希儿等，ROADMAP P5-9）：在 {@code afterMove()} 里
-     * ——也就是 {@code queue.setTopZero()} 之后——调用，这样他的**正常**回合排期原封不动，
-     * 额外回合是白送的一次。
+     * <p>The typical use is a kill-type talent (Seele (希儿) and the like, ROADMAP P5-9): call it inside
+     * {@code afterMove()} -- that is, after {@code queue.setTopZero()} -- so that its **normal** turn schedule
+     * stays untouched and the extra turn is a free one.
      *
-     * <p>额外回合期间**不能插入别人的终结技**（见 {@link #castUltra}）——
-     * 这是规则要求；在额外回合里再插一次终结技会把"额外"变成"无限连"。
+     * <p>During an extra turn, **someone else's ultimate must not be inserted** (see {@link #castUltra}) --
+     * that is a rule requirement; inserting another ultimate inside an extra turn turns "extra" into
+     * "infinite chain".
      *
-     * @param actor 获得额外回合的单位
-     * @return {@code true} = 已安排；目标已死 / 不在队列里则 {@code false}
+     * @param actor the unit that gets the extra turn
+     * @return {@code true} = scheduled; {@code false} if the target is dead / not in the queue
      */
     public boolean grantExtraTurn(CanHit actor) {
         return queue.grantExtraTurn(actor);
     }
 
     /**
-     * 当前安排的额外回合行动者（P7-2）；没有则 {@code null}。
+     * The currently scheduled extra-turn actor (P7-2); {@code null} if there is none.
      */
     public CanHit getExtraTurnActor() {
         return queue.getExtraTurnActor();
     }
 
     /**
-     * 当前轮次（P7-1）：由行动条的累计行动值推算，首轮 = 1。
+     * The current round (P7-1): derived from the action bar's accumulated action value; the first round = 1.
      *
-     * <p>一轮 = 100 行动值、首轮 = 150（见 {@code Queue.initialize()}）。
-     * 这只是查询口；真正的轮次驱动（胜负判定、关卡回合上限）在 P7-3。
+     * <p>One round = 100 action value, the first round = 150 (see {@code Queue.initialize()}).
+     * This is only a query point; the real round driving (outcome decision, stage round limit) is in P7-3.
      *
-     * @return 轮次，从 1 开始
+     * @return the round, starting from 1
      */
     public int getRound() {
         return queue.getRound();
@@ -424,7 +473,7 @@ public class Battle {
         }
         CanHit actor = currentMove.getCanHit();
         if (actor instanceof Enemy enemy) {
-            tickDots(enemy);                         // P4-5：敌人回合开始时先结算持续伤害
+            tickDots(enemy);                         // P4-5: settle damage over time first when the enemy's turn starts
             if (enemy.isDeath()) {
                 return;
             }
@@ -437,26 +486,27 @@ public class Battle {
     }
 
     /**
-     * 结算一个敌人身上的持续伤害（P4-5）：**先上先结算**（按施加顺序）。
+     * Settle the damage over time on one enemy (P4-5): **first applied, first settled** (in application order).
      *
-     * <p>DOT 走完整乘区（吃增伤、吃防御/抗性，易伤/减伤由 {@code onDamage} 钩子注入），
-     * 但不可暴击——由 {@link DamageType#DOT} 的 {@code crittable=false} 表达。
+     * <p>DOT goes through the full damage zones (it takes DMG boost and defence/resistance; vulnerability/reduction
+     * are injected by the {@code onDamage} hook), but it cannot crit -- expressed by {@link DamageType#DOT}'s
+     * {@code crittable=false}.
      *
-     * @param enemy 目标
-     * @return 本次结算的总伤害（所有 DOT 之和）
+     * @param enemy the target
+     * @return the total damage settled this time (the sum of all DOTs)
      */
     public double tickDots(Enemy enemy) {
         if (enemy == null || enemy.isDeath()) {
             return 0;
         }
         double total = 0;
-        for (Dot dot : new ArrayList<>(enemy.getDots())) {       // 快照迭代：结算中可能移除
+        for (Dot dot : new ArrayList<>(enemy.getDots())) {       // snapshot iteration: settlement may remove entries
             if (enemy.isDeath()) {
-                break;                                           // 被 DOT 打死 → 剩下的不再结算
+                break;                                           // killed by a DOT → the rest is not settled
             }
             Damage damage = new Damage(dot.getSource(), enemy, dot.getElement(),
                     DamageType.DOT, dot.getBaseDamage());
-            // KILL_ONLY：DOT 不是"一次攻击行为"，不给受击方回能；但 DOT 击杀仍记给施加者
+            // KILL_ONLY: a DOT is not "one attack action", so the victim gains no energy; but a DOT kill is still credited to the applier
             total += applyDamage(enemy, damage, EnergyGrant.KILL_ONLY);
             if (dot.tick()) {
                 enemy.removeDot(dot);
@@ -466,12 +516,12 @@ public class Battle {
     }
 
     /**
-     * 击破附带持续伤害（P4-5）：只有火/雷/物理/风 才有
-     * （冰=冻结、量子=纠缠、虚数=禁锢，P10-1 统一成表）。
+     * Weakness break's attached damage over time (P4-5): only Fire/Lightning/Physical/Wind have it
+     * (Ice = Frozen, Quantum = Entanglement, Imaginary = Imprisonment; P10-1 unified it into a table).
      *
-     * @param attacker 击破者（DOT 的来源，也是伤害的攻击者）
-     * @param enemy    被击破的目标
-     * @param element  击破元素
+     * @param attacker the breaker (the DOT's source, and the damage's attacker)
+     * @param enemy    the target that was broken
+     * @param element  the break element
      */
     private void attachBreakDot(CanHit attacker, Enemy enemy, DamageElement element) {
         if (!Constant.DOT_ELEMENTS.contains(element)) {
@@ -503,8 +553,8 @@ public class Battle {
         if (user.isDeath()) {
             return false;
         }
-        // 战技点（P8-4）：规则全在 skillPointPolicy 里（含我方/敌方的阵营判断），
-        // Battle 只问一次"这次出手成不成立" —— 不认识任何角色，见 §F 的 F-8。
+        // Skill points (P8-4): all the rules are in skillPointPolicy (including the our-side/enemy-side camp
+        // check); Battle only asks once "does this action hold up" -- it knows no character, see F-8 in §F.
         if (!skillPointPolicy.onSkillCast(user, skill)) {
             return false;
         }
@@ -571,10 +621,10 @@ public class Battle {
      * <p>This is the <b>only</b> public settlement entry point. To learn how much a hit
      * deals, use the returned value — do not assemble it a second time: assembly is
      * additive ({@code addBoost} appends a modifier to the boost zone), so assembling the
-     * same {@link Damage} twice would count 增伤/易伤/减伤/虚弱 twice.
+     * same {@link Damage} twice would count DMG boost/vulnerability/reduction/weakness twice.
      *
      * @param target the combatant taking the hit
-     * @param damage the hit (约定：一段伤害 = 一个 Damage 对象)
+     * @param damage the hit (convention: one damage instance = one Damage object)
      * @return the settled damage, or {@code 0} if the target was already dead
      */
     public double applyDamage(CanHit target, Damage damage) {
@@ -582,67 +632,90 @@ public class Battle {
     }
 
     /**
-     * 内部结算入口：比公开版本多一个"这一段允许结算哪种回能"的参数。
+     * The internal settlement entry point: one parameter more than the public version, "which kind of energy
+     * gain this instance is allowed to settle".
      *
-     * <p>为什么需要它（2026-09-19 口径）：**一次攻击行为只给受击方回一次能**。
-     * 一次攻击可以派生多种伤害类型（技能伤害 → 击破伤害 → 超击破伤害），如果每段都给受击方
-     * 回能，受击方就会因为"被打得更狠"而回更多能 —— 这不对。所以只有这一发的**主段**带
-     * {@link EnergyGrant#ALL}，派生段一律 {@link EnergyGrant#KILL_ONLY}。
+     * <p>Why it is needed (the 2026-09-19 rule): **one attack action grants the victim energy only once**.
+     * One attack can derive several damage types (skill damage → break damage → super break damage); if every
+     * instance granted the victim energy, the victim would gain more energy for "being hit harder" -- which
+     * is wrong. So only the **main instance** of a hit carries {@link EnergyGrant#ALL}; derived instances are
+     * always {@link EnergyGrant#KILL_ONLY}.
      *
-     * @param grant 这一段允许结算的回能种类
+     * @param grant which kinds of energy gain this instance may settle
      */
     private double applyDamage(CanHit target, Damage damage, EnergyGrant grant) {
         if (target.isDeath() || target.isInvulnerable()) {
-            return 0;                  // 尸体 / 转阶段无敌：不结算（也就不会鞭尸）
+            return 0;                  // corpse / phase-transition invulnerability: not settled (so no hitting a corpse either)
         }
-        double settled = assemble(damage);                       // 乘区后的伤害（这是"打出去多少"）
+        double settled = assemble(damage);                       // damage after the zones (this is "how much was dealt")
         double hpBefore = target.getCurrentHp();
         boolean died = target.takeDamage(settled);
         double hpLoss = hpBefore - target.getCurrentHp();
         double shieldAbsorbed = target.getLastShieldAbsorbed();
-        grantHitAndKillEnergy(target, damage, died, grant);     // P3-2：受击回能 / 击杀回能
-        // 返回值 = 这一击**实际生效**的伤害 = 被盾吸走的 + 真的掉的血。
-        // 目标是"打在有盾的目标上不能显示成 0"，同时**不能**把 settled 与盾吸收量相加
-        // （settled 是"打出去的量"，盾吸走的那部分本来就在里面，相加会正好翻倍）。
-        // 恒等式：settled == shieldAbsorbed + hpLoss（盾先吃、吃完才扣血）；分开算只是为了两段都可观察。
+        // P8-6: HP loss and being killed are two **facts**, both emitted here. Placed before the energy
+        // settlement -- the event means "an HP change happened", independent of the energy rule (who gains how
+        // much, whether it counts as an attack).
+        if (hpLoss > 0) {
+            broadcastHpLoss(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
+        }
+        if (died) {
+            broadcastKill(damage.getAttacker(), target);
+        }
+        grantHitAndKillEnergy(target, damage, died, grant);     // P3-2: hit energy gain / kill energy gain
+        // The return value = the damage this hit **actually had effect** with = shield-absorbed + HP really lost.
+        // The goal is that "hitting a shielded target must not display as 0", while **not** adding settled to
+        // the shield absorption (settled is "the amount dealt", and the part the shield absorbed is already in
+        // it; adding them would exactly double it).
+        // Identity: settled == shieldAbsorbed + hpLoss (the shield is eaten first, HP is deducted only after it
+        // runs out); computing them separately is just so that both parts stay observable.
         return shieldAbsorbed + hpLoss;
     }
 
     /**
-     * 战斗内**唯一**回能入口（P3-2）：规则由 {@code target} 自己的
-     * {@link com.laosun.aluminium.models.energy.EnergyProvider} 决定；团队充能（停云/藿藿/星期日）
-     * 将来也从这里给别的目标回能。
+     * The **only** energy gain entry point inside battle (P3-2): the rules are decided by {@code target}'s own
+     * {@link com.laosun.aluminium.models.energy.EnergyProvider}; team charging (Tingyun (停云)/Huohuo (藿藿)/
+     * Sunday (星期日)) will in the future also grant energy to other targets from here.
      *
-     * @param target 回能的人
-     * @param gain   一次回能描述（基础值 + 是否吃回能效率）
-     * @return 实际入账值（被上限截断后），入账不了就是 0
+     * @param target the one gaining energy
+     * @param gain   one energy gain description (base value + whether it takes the energy gain rate)
+     * @return the value actually credited (after truncation by the cap); 0 if nothing can be credited
      */
     public double applyEnergyGain(CanHit target, EnergyGain gain) {
-        return target == null ? 0 : target.gainEnergy(gain);
+        if (target == null) {
+            return 0;
+        }
+        double added = target.gainEnergy(gain);
+        // P8-6: only emit when the amount actually credited > 0 -- "blocked by the cap" should not count as gaining energy
+        if (added > 0) {
+            broadcastEnergyGain(target, added);
+        }
+        return added;
     }
 
     /**
-     * 便捷入口：按基础值给某人回能（走回能效率）。
+     * Convenience entry point: grant someone energy by base value (goes through the energy gain rate).
      *
-     * @param target 回能的人
-     * @param amount 基础回能值
-     * @return 实际入账值
+     * @param target the one gaining energy
+     * @param amount the base energy gain value
+     * @return the value actually credited
      */
     public double grantEnergy(CanHit target, double amount) {
         return applyEnergyGain(target, EnergyGain.normal(amount));
     }
 
     /**
-     * 技能回能挂点（P3-2）：由 {@link SkillExecutor} 在技能执行处调用——只有那里知道
-     * **实际命中集**（AOE 打全场、BLAST 打三格、BOUNCE 每段换目标）。
+     * Skill energy gain hook point (P3-2): called by {@link SkillExecutor} where the skill is executed -- only
+     * there does it know the **actual hit set** (AOE hits everyone, BLAST hits three slots, BOUNCE switches
+     * target every instance).
      *
-     * <p>注意区分：这里是"施放技能的"回能（普攻 20 / 战技 30），终结技不走 {@code onSkillCast}
-     * （它在 {@link #castUltra} 里先清零再回 5）。
+     * <p>Note the distinction: this is the energy gain for "casting a skill" (basic attack 20 / skill 30);
+     * the ultimate does not go through {@code onSkillCast} (it zeroes first and then gains 5 in
+     * {@link #castUltra}).
      *
-     * @param user       施放者
-     * @param skill      施放的技能
-     * @param hitTargets 实际命中集（增益/治疗类技能为空集）
-     * @return 实际入账值
+     * @param user       the caster
+     * @param skill      the skill cast
+     * @param hitTargets the actual hit set (empty for buff/healing skills)
+     * @return the value actually credited
      */
     public double grantSkillEnergy(CanHit user, Skill skill, Set<? extends CanHit> hitTargets) {
         if (user == null) {
@@ -653,99 +726,126 @@ public class Battle {
     }
 
     /**
-     * 削韧 + 击破触发（P4-2）：**战斗内唯一的削韧入口**，{@link SkillExecutor} 每段伤害结算后调用。
+     * Toughness reduction + weakness break trigger (P4-2): **the only toughness reduction entry point in
+     * battle**, called by {@link SkillExecutor} after each damage instance settles.
      *
-     * <p>规则（HSR.md §3.2 / §7.1）：
+     * <p>The rules (HSR.md §3.2 / §7.1):
      * <ul>
-     *   <li><b>只有命中弱点才削韧</b>——非弱点元素一点都不削（"无视弱点削韧"是乱破/姬子·启行这类
-     *       角色特性，等 P8-7 数据化，别在这里开默认口子）</li>
-     *   <li><b>但超击破不受弱点限制</b>：敌人**已处于击破状态**时，整发标称削韧都算"超出部分"，
-     *       与元素是否命中弱点无关（官方文案的条件里只有"敌人处于弱点击破状态"）。
-     *       非弱点攻击打已击破的敌人照样产生超击破段</li>
-     *   <li>没有韧性条（数据里确有 {@code stance = 0} 的怪）/ 已击破 / 已死亡 → 不削</li>
-     *   <li>韧性归零 → 由这里触发击破（{@code Enemy.reduceStance} 自己不做判定）</li>
+     *   <li><b>Only hitting a weakness reduces toughness</b> -- a non-weakness element reduces none of it
+     *       ("toughness reduction ignoring weakness" is a character trait of Rappa (乱破)/Himeko (姬子)·启行
+     *       and the like; wait for P8-7 to put it in data, do not open a default hole here)</li>
+     *   <li><b>But super break is not restricted by weakness</b>: while the enemy **is already in the broken
+     *       state**, the whole nominal toughness reduction counts as "the excess part", regardless of whether
+     *       the element hits a weakness (the official wording's only condition is "the enemy is in the
+     *       weakness-broken state"). A non-weakness attack on an already broken enemy still produces a super
+     *       break instance</li>
+     *   <li>No toughness bar (the data really does contain enemies with {@code stance = 0}) / already broken /
+     *       already dead → no reduction</li>
+     *   <li>Toughness reaching zero → the break is triggered from here ({@code Enemy.reduceStance} does no
+     *       judgement itself)</li>
      * </ul>
      *
-     * <p>击破链的顺序（后续任务往这里加东西）：击破状态 → 击破伤害（P4-3）→ 推条（P4-4）→
-     * 挂 DOT（P4-5）→ 击破回能（P3-3）。
+     * <p>The order of the break chain (later tasks add things here): broken state → break damage (P4-3) →
+     * action delay (P4-4) → attach DOT (P4-5) → break energy gain (P3-3).
      *
-     * <p><b>返回值同时给出"超出部分"（P4-6）</b>：设技能标称削韧 {@code S}、剩余韧性 {@code T}，
-     * 这一个 {@code S} 会被**拆给两条链**——击破伤害用 {@code min(S,T)}（{@link StanceResult#consumed()}），
-     * 超击破伤害用 {@code max(0, S-T)}（{@link StanceResult#overkill()}），相加恒等于 {@code S}。
-     * 所以调用方不能只留一个数，否则破韧的那一发会漏掉超击破段。
+     * <p><b>The return value also gives the "excess part" (P4-6)</b>: let the skill's nominal toughness
+     * reduction be {@code S} and the remaining toughness {@code T}; this one {@code S} is **split between two
+     * chains** -- break damage uses {@code min(S,T)} ({@link StanceResult#consumed()}), super break damage uses
+     * {@code max(0, S-T)} ({@link StanceResult#overkill()}), and the two always sum to {@code S}.
+     * So the caller must not keep only one number, otherwise the instance that breaks the toughness would drop
+     * the super break part.
      *
-     * @param attacker     攻击者（击破伤害与击破回能都记给他）
-     * @param enemy        挨打的目标
-     * @param element      这一段伤害的元素（决定是否弱点，也是击破元素）
-     * @param stanceDamage 削韧点数（技能 {@code stance_list} 的值，单位「点」；**不是**每段固定值，
-     *                     弹射类由 {@link SkillExecutor} 把总值均摊到每一段）
-     * @return 这一段的削韧结果（实际削掉多少 / 超出多少 / 是否触发击破）
+     * @param attacker     the attacker (break damage and break energy gain are both credited to it)
+     * @param enemy        the target being hit
+     * @param element      the element of this damage instance (decides the weakness, and is also the break
+     *                     element)
+     * @param stanceDamage the toughness reduction points (the skill's {@code stance_list} value, in units of
+     *                     "points"; **not** a fixed per-instance value -- for bounces {@link SkillExecutor}
+     *                     spreads the total evenly over each instance)
+     * @return the toughness reduction result of this instance (how much was actually reduced / how much
+     *         exceeded / whether a break was triggered)
      */
     public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
         if (attacker == null || enemy == null || stanceDamage <= 0) {
             return StanceResult.NONE;
         }
-        // 弱点判定必须在"已击破"分支**之前**：超击破是"把打不进韧性条的削韧转化掉"，
-        // 前提仍是"这一发本来就削得动韧性"（只有弱点才削）。若先判 broken 就返回整发超出，
-        // 非弱点攻击打已击破的敌人也会凭空产生超击破 —— 这是错的。
+        // The weakness check must come **before** the "already broken" branch: super break is "converting the
+        // toughness reduction that cannot enter the toughness bar", and its premise is still "this instance
+        // could reduce toughness in the first place" (only a weakness reduces). If broken were checked first
+        // and the whole instance returned as excess, a non-weakness attack on an already broken enemy would
+        // conjure a super break out of nothing -- which is wrong.
         if (enemy.isDeath()) {
             return StanceResult.NONE;
         }
         if (enemy.isBroken() || !enemy.hasToughnessBar()) {
-            // 韧性条已空（已击破 / 数据里 stance = 0 的怪）⇒ 整发标称削韧都落不进韧性条，
-            // 全部算"超出部分"，这就是超击破的输入（P4-6）。
+            // The toughness bar is empty (already broken / an enemy with stance = 0 in the data) ⇒ the whole
+            // nominal toughness reduction cannot enter the toughness bar, so all of it counts as "the excess
+            // part" -- that is the input to super break (P4-6).
             //
-            // **这里刻意不判弱点**：官方文案是"攻击处于弱点击破状态的敌人后，会将本次攻击的
-            // 削韧值转化为 1 次超击破伤害"——条件里只有"敌人已处于击破状态"，没有元素限制。
-            // 所以非弱点元素打已击破的敌人**照样**产生超击破（用整发标称削韧值）。
-            // 对比下面的常规削韧：那一步仍然严格"只有弱点才削"。
+            // **The weakness check is deliberately skipped here**: the official wording is "after attacking an
+            // enemy in the weakness-broken state, this attack's toughness reduction value is converted into 1
+            // super break damage" -- the only condition is "the enemy is already in the broken state", with no
+            // element restriction. So a non-weakness element hitting an already broken enemy **still** produces
+            // super break (using the whole nominal toughness reduction value).
+            // Compare the regular toughness reduction below: that step is still strictly "only a weakness
+            // reduces".
             return new StanceResult(0, stanceDamage, 0, false);
         }
         if (!enemy.isWeakTo(element)) {
-            return StanceResult.NONE;        // 未击破时：非弱点一点都不削，也就没有超出部分
+            return StanceResult.NONE;        // while not broken: a non-weakness reduces nothing at all, so there is no excess part
         }
-        // H-4：击破伤害按**这一段实际削掉的值**算，不是技能的标称削韧值
+        // H-4: break damage is computed from **the value this instance actually reduced**, not the skill's nominal toughness reduction
         double consumed = enemy.reduceStance(stanceDamage);
-        double overkill = stanceDamage - consumed;                 // P4-6：超出部分 = 超击破的输入
+        double overkill = stanceDamage - consumed;                 // P4-6: the excess part = the input to super break
         if (enemy.getStance() > 0) {
-            return new StanceResult(consumed, 0, 0, false);        // 没打空：没有超出部分可用
+            return new StanceResult(consumed, 0, 0, false);        // not emptied: no excess part available
         }
         enemy.breakEnemy(element);
         enemy.setBrokenRemainTurns(Constant.BROKEN_REMAIN_TURNS);
-        // 击破伤害在这里就结算掉了，所以必须把结算值带出去 —— 它属于**这一次攻击**，
-        // 漏掉会让 AttackEvent.totalDamage 少算一整条击破链。
-        // KILL_ONLY：击破是主段派生的额外伤害，不给受击方回能（一次攻击只回一次）；
-        // 但若主段没打死、击破补刀打死，击杀回能仍然记给攻击者。
+        // P8-6: the break **fact** is emitted here (the only entry point -- an already broken enemy never
+        // reaches this line a second time).
+        // Placed before damage/delay/DOT/energy: listeners want the moment of "just got broken".
+        broadcastBreak(attacker, enemy, element);
+        // The break damage is settled right here, so the settled value must be carried out -- it belongs to
+        // **this attack**, and dropping it would make AttackEvent.totalDamage miss a whole break chain.
+        // KILL_ONLY: the break is extra damage derived from the main instance, so the victim gains no energy
+        // (one attack grants energy only once); but if the main instance did not kill and the break finishes it
+        // off, the kill energy gain is still credited to the attacker.
         double breakDamage = applyDamage(enemy,
                 BreakDamageCalculator.build(attacker, enemy, element, consumed), EnergyGrant.KILL_ONLY); // P4-3
-        delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // P4-4 推条
+        delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // P4-4 action delay
         attachBreakDot(attacker, enemy, element);                                                  // P4-5 DOT
         gainBreakEnergy(attacker, enemy);            // P3-3
         return new StanceResult(consumed, overkill, breakDamage, true);
     }
 
     /**
-     * 一次削韧的结果（P4-6）。
+     * The result of one toughness reduction (P4-6).
      *
-     * <p>两个削韧数**相加恒等于这一段的标称削韧值**，不重不漏。
+     * <p>The two toughness reduction numbers **always sum to this instance's nominal toughness reduction**,
+     * with nothing double-counted and nothing dropped.
      *
-     * @param consumed    真正从韧性条上扣掉的点数（击破伤害用这个）
-     * @param overkill    超出剩余韧性的点数（超击破伤害用这个；没打空时为 0）
-     * @param breakDamage 这一次触发的**击破伤害结算值**（0 = 没触发击破）。
-     *                    它是在本方法内部经 {@link #applyDamage} 结算的，调用方拿不到，
-     *                    所以必须由返回值带出去 —— 否则一次攻击的"总伤害"会漏掉击破链
-     *                    （见 {@code AttackEvent#totalDamage}）
-     * @param broke       这一段是否把韧性打空并触发了击破
+     * @param consumed    the points actually deducted from the toughness bar (break damage uses this)
+     * @param overkill    the points beyond the remaining toughness (super break damage uses this; 0 when the
+     *                    bar was not emptied)
+     * @param breakDamage the **settled break damage** triggered this time (0 = no break triggered).
+     *                    It is settled inside this method via {@link #applyDamage}, which the caller cannot
+     *                    reach, so it must be carried out through the return value -- otherwise an attack's
+     *                    "total damage" would miss the break chain
+     *                    (see {@code AttackEvent#totalDamage})
+     * @param broke       whether this instance emptied the toughness and triggered a break
      */
     public record StanceResult(double consumed, double overkill, double breakDamage, boolean broke) {
 
         /**
-         * 这一发没削到任何东西（没削韧 / 非弱点 / 目标已死）：两条链都不产生。
+         * This instance reduced nothing (no toughness reduction / non-weakness / target already dead):
+         * neither chain is produced.
          */
         public static final StanceResult NONE = new StanceResult(0, 0, 0, false);
 
         /**
-         * 超击破的削韧值输入：{@code max(0, S - T)} 的等价形式（见 {@code Battle.reduceToughness}）。
+         * The toughness reduction input for super break: an equivalent form of {@code max(0, S - T)}
+         * (see {@code Battle.reduceToughness}).
          */
         public double superBreakStance() {
             return overkill;
@@ -753,12 +853,12 @@ public class Battle {
     }
 
     /**
-     * 按目标行动周期的百分比推条（P4-4）：{@code delay = 周期 × percent}，
-     * 周期 = {@code 10000 / 速度}（与 {@code Queue} 的 {@code ACTION_THRESHOLD} 一致）。
+     * Delay the action by a percentage of the target's action period (P4-4): {@code delay = period × percent},
+     * period = {@code 10000 / speed} (consistent with {@code Queue}'s {@code ACTION_THRESHOLD}).
      *
-     * @param target  被推条的目标
-     * @param percent 推条比例（0 ~ 1，HSR 击破 = 0.25）
-     * @return {@code true} = 目标在行动条里且真的被推了
+     * @param target  the target being delayed
+     * @param percent the delay ratio (0 ~ 1, HSR weakness break = 0.25)
+     * @return {@code true} = the target is in the action bar and was really delayed
      */
     public boolean delayMovePercent(CanHit target, double percent) {
         if (target == null || percent <= 0) {
@@ -772,13 +872,14 @@ public class Battle {
     }
 
     /**
-     * 击破中的敌人轮到自己回合时调用（P4-4）：递减击破回合数，到 0 就恢复韧性，并返回"本回合被跳过"。
+     * Called when a broken enemy's turn comes up (P4-4): decrements the broken turn count, restores toughness
+     * at 0, and returns "this turn is skipped".
      *
-     * <p>调用方（现在的 {@code Main} 演示、P5-5 的敌方回合执行）拿到 {@code true} 就不要让他行动，
-     * 直接走 {@link #afterMove()}。
+     * <p>When the caller (today the {@code Main} demo, in P5-5 the enemy turn execution) gets {@code true},
+     * it must not let it act and goes straight to {@link #afterMove()}.
      *
-     * @param enemy 轮到行动的那个敌人
-     * @return {@code true} = 他还在击破中，本回合不行动
+     * @param enemy the enemy whose turn it is
+     * @return {@code true} = it is still broken, so it does not act this turn
      */
     public boolean handleBrokenTurn(Enemy enemy) {
         if (enemy == null || !enemy.isBroken()) {
@@ -792,16 +893,18 @@ public class Battle {
     }
 
     /**
-     * 某个单位当前的仇恨值（P5-1/P5-2）：决定敌人选中它的概率。
+     * A unit's current aggro value (P5-1/P5-2): it decides the probability of the enemy selecting it.
      *
-     * <p>取值优先级：角色数据里的 {@code aggro}（它就是游戏倍率本身：存护 150 / 毁灭 125 /
-     * 其他 100 / 巡猎·智识 75）→ 没有数据时退回命途的默认档 → 非角色（敌人/召唤物）给 100。
+     * <p>Priority: the {@code aggro} in the character data (it is the game multiplier itself: Preservation
+     * 150 / Destruction 125 / others 100 / Hunt·Erudition 75) → when there is no data, fall back to the path's
+     * default tier → non-characters (enemies/summons) get 100.
      *
-     * <p>**嘲讽不在这里**：嘲讽是"只能选中"的硬约束，由 {@link TargetSelector} 处理。
-     * 用乘法把它塞进仇恨值只能提高概率，永远做不到"只能选中"。
+     * <p>**Taunt is not here**: taunt is the hard constraint of "can only be selected", handled by
+     * {@link TargetSelector}. Squeezing it into the aggro value by multiplication can only raise the
+     * probability and can never achieve "can only be selected".
      *
-     * @param entity 要查询的单位
-     * @return 仇恨值（&gt; 0）
+     * @param entity the unit to query
+     * @return the aggro value (&gt; 0)
      */
     public double aggroOf(CanHit entity) {
         if (entity instanceof Character character) {
@@ -810,14 +913,14 @@ public class Battle {
             }
             return character.getPath().getAggro();
         }
-        return 100;                                  // 敌人 / 召唤物：没有命途，给常规档
+        return 100;                                  // enemies / summons: no path, so give the regular tier
     }
 
     /**
-     * 仇恨表：{@code 单位 → 受击概率}（P5-2）。概率之和为 1。
+     * The aggro table: {@code unit → hit probability} (P5-2). The probabilities sum to 1.
      *
-     * @param allies 参选单位（调用方负责先过滤死亡目标）
-     * @return 有序的 单位 → 概率 映射；空列表返回空表
+     * @param allies the candidate units (the caller is responsible for filtering out dead targets first)
+     * @return an ordered unit → probability mapping; an empty list returns an empty table
      */
     public Map<CanHit, Double> getAggroTable(List<? extends CanHit> allies) {
         Map<CanHit, Double> table = new LinkedHashMap<>();
@@ -835,30 +938,30 @@ public class Battle {
     }
 
     /**
-     * 负面效果的生效概率（P6-1）：
+     * The application chance of a debuff (P6-1):
      *
      * <pre>
-     * 生效概率 = 基础概率 × (1 + 施加方效果命中%) × (1 - 受击方效果抵抗%) × (1 - 特定负面效果抵抗%)
+     * chance = base chance × (1 + caster's effect hit rate%) × (1 - victim's effect resistance%) × (1 - specific debuff resistance%)
      * </pre>
      *
-     * <p>结果 clamp 到 {@code [0, 1]}：
+     * <p>The result is clamped to {@code [0, 1]}:
      * <ul>
-     *   <li>效果命中是**乘区**，所以命中 32% 时 80% 基础概率 → {@code 0.8 × 1.32 = 1.056 → 1.0}
-     *       （不会超过 100%，但也不会有"超额命中转成别的收益"）；</li>
-     *   <li>效果抵抗同样乘算：抵抗 30% 时 100% 基础概率 → {@code 0.7}；</li>
-     *   <li>{@code specificResistKey} 是数据里的 {@code STAT_*} 串（见 {@code Enemy.debuffResist}）：
-     *       冰锋 {@code {"STAT_CTRL_Frozen": 1}} → 关键因子 {@code (1 - 1) = 0} → **完全免疫**。
-     *       只有 {@link Enemy} 有这张表，角色没有。</li>
+     *   <li>Effect hit rate is a **damage zone**, so with 32% hit rate an 80% base chance → {@code 0.8 × 1.32 = 1.056 → 1.0}
+     *       (it never exceeds 100%, but there is also no "excess hit converted into some other benefit");</li>
+     *   <li>Effect resistance multiplies the same way: with 30% resistance a 100% base chance → {@code 0.7};</li>
+     *   <li>{@code specificResistKey} is a {@code STAT_*} string from the data (see {@code Enemy.debuffResist}):
+     *       冰锋 {@code {"STAT_CTRL_Frozen": 1}} → the key factor {@code (1 - 1) = 0} → **completely immune**.
+     *       Only {@link Enemy} has this table; characters do not.</li>
      * </ul>
      *
-     * <p>**只算概率，不掷骰**：掷骰在 {@link #rollDebuff}（用注入的 rng），
-     * 这样 AI 可以"只看期望"而不消耗随机数。
+     * <p>**Only the probability is computed, no dice are rolled**: the roll is in {@link #rollDebuff} (using the
+     * injected rng), so an AI can "look only at the expectation" without consuming random numbers.
      *
-     * @param caster            施加者（读 {@code EFFECT_HIT_RATE}）
-     * @param target            受击者（读 {@code EFFECT_RESISTANCE} 与可能的特定抵抗）
-     * @param baseChance        技能面板上的基础概率（0.8 = 80%）
-     * @param specificResistKey 特定抵抗键；{@code null} 或目标不是敌人 → 不查
-     * @return 生效概率，落在 {@code [0, 1]}
+     * @param caster            the applier (reads {@code EFFECT_HIT_RATE})
+     * @param target            the victim (reads {@code EFFECT_RESISTANCE} and possibly a specific resistance)
+     * @param baseChance        the base chance on the skill panel (0.8 = 80%)
+     * @param specificResistKey the specific resistance key; {@code null} or the target is not an enemy → not looked up
+     * @return the application chance, falling in {@code [0, 1]}
      */
     public double hitChance(CanHit caster, CanHit target, double baseChance, String specificResistKey) {
         if (caster == null || target == null) {
@@ -874,32 +977,32 @@ public class Battle {
     }
 
     /**
-     * 失败判定之后，是否真的把这次负面效果挂上去（P6-1）。
+     * After the chance check, whether this debuff is actually applied (P6-1).
      *
-     * <p>用**注入的 {@link #rng}** 掷骰：同一个种子 → 同一场战斗可复现。
+     * <p>Rolls with the **injected {@link #rng}**: the same seed → the same battle is reproducible.
      *
-     * @param caster          施加者（读它的效果命中）
-     * @param target          受击者（读它的效果抵抗 / 特定抵抗）
-     * @param baseChance      技能面板上的基础概率（0.8 = 80%）
-     * @param specificResistKey 特定负面效果抵抗的键（数据里的 {@code STAT_*} 串），{@code null} = 不查
-     * @return {@code true} = 命中，可以挂 buff
+     * @param caster           the applier (reads its effect hit rate)
+     * @param target           the victim (reads its effect resistance / specific resistance)
+     * @param baseChance       the base chance on the skill panel (0.8 = 80%)
+     * @param specificResistKey the key of the specific debuff resistance (a {@code STAT_*} string from the data), {@code null} = not looked up
+     * @return {@code true} = it hit, so the buff may be applied
      */
     public boolean rollDebuff(CanHit caster, CanHit target, double baseChance, String specificResistKey) {
         return rng.nextDouble() < hitChance(caster, target, baseChance, specificResistKey);
     }
 
     /**
-     * 挂一个负面效果：先过命中判定，命中才 {@code addBuff}（P6-1）。
+     * Apply a debuff: the hit check comes first, and only on a hit is {@code addBuff} called (P6-1).
      *
-     * <p>这是"技能侧施加 debuff"的统一入口 —— 别在技能里直接调 {@code addBuff}，
-     * 否则效果命中与抵抗就被绕过去了。
+     * <p>This is the unified entry point for "a skill applying a debuff" -- do not call {@code addBuff}
+     * directly inside a skill, otherwise effect hit rate and resistance are bypassed.
      *
-     * @param caster           施加者
-     * @param target           目标
-     * @param buff             要挂的 buff
-     * @param baseChance       基础概率
-     * @param specificResistKey 特定抵抗键（可为 {@code null}）
-     * @return {@code true} = 挂上了
+     * @param caster           the applier
+     * @param target           the target
+     * @param buff             the buff to apply
+     * @param baseChance       the base chance
+     * @param specificResistKey the specific resistance key (may be {@code null})
+     * @return {@code true} = it was applied
      */
     public boolean tryApplyDebuff(CanHit caster, CanHit target, com.laosun.aluminium.models.AbstractBuff buff,
                                   double baseChance, String specificResistKey) {
@@ -914,23 +1017,26 @@ public class Battle {
     }
 
     /**
-     * 治疗量（P6-2）：**不碰 {@code Damage}**，是独立的一套乘区。
+     * Healing amount (P6-2): it **does not touch {@code Damage}**; it is an independent set of damage zones.
      *
      * <pre>
-     * 治疗量 = 基础量 × (1 + 治疗加成) × (1 + 受疗加成)
+     * healing = base amount × (1 + outgoing healing boost) × (1 + healing taken boost)
      * </pre>
      *
-     * <p>两个因子都是乘算，且分别来自**不同的人**：
-     * {@code OUTGOING_HEALING_BOOST} 读施加治疗的人（奶妈的行迹/光锥），
-     * {@code HEAL_TAKEN_RATIO} 读被治疗的人（受疗加成；**负数就是治疗降低** ——
-     * 游戏里没有单独的"治疗降低"属性，见 {@code AttributeType}）。
+     * <p>Both factors multiply, and they come from **different people**:
+     * {@code OUTGOING_HEALING_BOOST} is read from the one applying the heal (the healer's traces/light cone),
+     * {@code HEAL_TAKEN_RATIO} is read from the one being healed (the healing taken bonus; **a negative value
+     * is healing reduction** -- the game has no separate "healing reduction" attribute, see
+     * {@code AttributeType}).
      *
-     * <p>只算数值，**不改 HP**：执行在 {@link #heal(CanHit, CanHit, double)}。
+     * <p>It only computes the number and **does not change HP**: the execution is in
+     * {@link #heal(CanHit, CanHit, double)}.
      *
-     * @param healer     施加治疗的人（{@code null} → 只算受疗侧）
-     * @param target     被治疗的人
-     * @param baseAmount 基础治疗量（技能倍率 × 属性 + 固定值，由调用方算好）
-     * @return 最终治疗量（可能为负 —— 治疗降低 > 100% 时；调用方按 0 处理会由 heal 挡掉）
+     * @param healer     the one applying the heal ({@code null} → only the healing-taken side is computed)
+     * @param target     the one being healed
+     * @param baseAmount the base healing amount (skill multiplier × attribute + flat value, computed by the caller)
+     * @return the final healing amount (may be negative -- when healing reduction > 100%; a caller treating it
+     *         as 0 will be blocked by heal)
      */
     public double calculateHeal(CanHit healer, CanHit target, double baseAmount) {
         if (target == null) {
@@ -943,9 +1049,11 @@ public class Battle {
     }
 
     /**
-     * 执行一次治疗（P6-2）：先算治疗量，再落到目标 HP 上（{@code CanHit.heal} 自己封顶、死者无效）。
+     * Perform one heal (P6-2): compute the healing amount first, then apply it to the target's HP
+     * ({@code CanHit.heal} caps it itself and does nothing for the dead).
      *
-     * @return **实际回复的 HP**（被上限截断后；目标已死或治疗量 ≤ 0 时是 0）
+     * @return the **HP actually restored** (after truncation by the cap; 0 when the target is dead or the
+     *         healing amount ≤ 0)
      */
     public double heal(CanHit healer, CanHit target, double baseAmount) {
         if (target == null || target.isDeath()) {
@@ -957,21 +1065,29 @@ public class Battle {
         }
         double before = target.getCurrentHp();
         target.heal(amount);
-        return target.getCurrentHp() - before;
+        double healed = target.getCurrentHp() - before;
+        // P8-6: only emit when HP was really restored (healing at full HP is 0 and is not a heal event)
+        if (healed > 0) {
+            broadcastHeal(healer, target, healed);
+        }
+        return healed;
     }
 
     /**
-     * 获得护盾（P6-3）。
+     * Gain a shield (P6-3).
      *
-     * <p><b>不叠加</b>：直接覆盖当前护盾值（游戏里护盾通常不可叠加；同源刷新按覆盖处理）。
-     * 因为 {@link CanHit#takeDamage} 是"先扣盾再扣血"，所以"盾破前不死"是自动成立的。
+     * <p><b>No stacking</b>: it directly overwrites the current shield value (shields in this game normally do
+     * not stack; a refresh from the same source is treated as an overwrite).
+     * Because {@link CanHit#takeDamage} is "deduct shield first, then HP", "not dying before the shield breaks"
+     * holds automatically.
      *
-     * <p>🚧 护盾提高词条（护盾量提高 / 获得护盾量提高）**还没有对应属性**
-     * （{@code AttributeType} 里没有），所以现在护盾量就是传入值 —— 等有真实效果引用时再加。
+     * <p>🚧 The shield-boost entries (shield amount boost / shield gained boost) **have no corresponding
+     * attribute yet** (there is none in {@code AttributeType}), so for now the shield amount is just the value
+     * passed in -- add them when a real effect references them.
      *
-     * @param target 获得护盾的人（已死则无效）
-     * @param amount 护盾量（≤ 0 视为清除护盾）
-     * @return 实际设置后的护盾值
+     * @param target the one gaining the shield (no effect if already dead)
+     * @param amount the shield amount (≤ 0 is treated as clearing the shield)
+     * @return the shield value actually set
      */
     public double grantShield(CanHit target, double amount) {
         if (target == null || target.isDeath()) {
@@ -983,14 +1099,14 @@ public class Battle {
     }
 
     /**
-     * 某个单位的对手阵营成员（P5-5）：我方 → 敌人；敌人 → 我方。
+     * The members of a unit's opposing camp (P5-5): our side → enemies; enemies → our side.
      *
-     * <p>**不过滤死亡**（调用方按需过滤）：这里只回答"阵营是谁"，不回答"谁能被打"。
-     * 若将来引入第三方阵营（{@link com.laosun.aluminium.enums.Camp#NEUTRAL}），
-     * 这个方法的语义需要重新定义。
+     * <p>**It does not filter out the dead** (the caller filters as needed): it only answers "whose camp is
+     * this", not "who can be hit". If a third camp is introduced in the future
+     * ({@link com.laosun.aluminium.enums.Camp#NEUTRAL}), the semantics of this method need to be redefined.
      *
-     * @param self 查询者
-     * @return 对手阵营的列表（就是 {@code characters} / {@code enemies} 本身，不是拷贝）
+     * @param self the querier
+     * @return the list of the opposing camp (it is {@code characters} / {@code enemies} itself, not a copy)
      */
     public List<? extends CanHit> getOpponents(CanHit self) {
         if (self == null || self.getCamp() == null) {
@@ -1000,12 +1116,14 @@ public class Battle {
     }
 
     /**
-     * 击破回能（P3-3）：击破瞬间由 P4-4 调这**一个**口子，规则仍归击破者自己的 provider
-     * （标准实现给 5；乱破 +10、同谐开拓者 +10、忘归人 +3 这类等真做角色时再各自实现）。
+     * Break energy gain (P3-3): P4-4 calls this **one** funnel point at the moment of the break; the rules
+     * still belong to the breaker's own provider (the standard implementation gives 5; Rappa (乱破) +10,
+     * Harmony Trailblazer (同谐开拓者) +10, Fugue (忘归人) +3 and the like get their own implementations when the
+     * characters are really built).
      *
-     * @param attacker 造成击破的人
-     * @param target   被击破的目标
-     * @return 实际入账值
+     * @param attacker the one who caused the break
+     * @param target   the target that was broken
+     * @return the value actually credited
      */
     public double gainBreakEnergy(CanHit attacker, CanHit target) {
         if (attacker == null) {
@@ -1015,24 +1133,109 @@ public class Battle {
         return gain == null ? 0 : applyEnergyGain(attacker, gain);
     }
 
+    // ==================================================================
+    // P8-6 event broadcasting
+    //
+    // Broadcast rules (**deliberately unified**, so that the next batch of events does not invent a third
+    // way of writing it):
+    //
+    //   * Directly involved parties **always** receive it (even if it is an enemy). Reason: an event
+    //     describes a **fact**, unrelated to camp; and elite/Boss mechanics such as counters and immunity
+    //     also need to subscribe to the things happening to themselves.
+    //   * Our side **additionally, all of them** receive it -- `AttackEvent` already established this
+    //     convention (Robin (知更鸟) 【协奏】/ Tribbie (缇宝) field hangs on the support itself, and "after each
+    //     time one of our targets casts an attack" is subscribed by each of them).
+    //   * Our members are **de-duplicated**: if a `CanHit` already received it as an involved party, it does
+    //     not receive it a second time (otherwise the same buff is called twice and the effect doubles).
+    //
+    // `TurnStartEvent` was not created separately: turn start/end is already expressed by
+    // `MoveEvent.beforeMove/afterMove` (`CanHit` implements and forwards it), so adding another layer would
+    // be a duplicate abstraction.
+    // ==================================================================
+
     /**
-     * 受击回能 + 击杀回能（P3-2）。
+     * Deliver an event to "the directly involved parties + our entire side (de-duplicated)".
      *
-     * <p><b>两条口径不同，别用同一个开关卡：</b>
+     * @param targets  the directly involved parties (may contain {@code null}, which is skipped)
+     * @param consumer the delivery action
+     */
+    private void dispatch(Consumer<CanHit> consumer, CanHit... targets) {
+        Set<CanHit> notified = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (CanHit target : targets) {
+            if (target != null && notified.add(target)) {
+                consumer.accept(target);
+            }
+        }
+        for (Character ally : characters) {
+            if (notified.add(ally)) {
+                consumer.accept(ally);
+            }
+        }
+    }
+
+    /** Energy credited (P8-6). */
+    private void broadcastEnergyGain(CanHit target, double added) {
+        dispatch(t -> t.onEnergyGain(this, target, added), target);
+    }
+
+    /** HP loss (P8-6). {@code source} is this hit's attacker and may be {@code null}. */
+    private void broadcastHpLoss(CanHit target, double before, double after, CanHit source, double amount) {
+        dispatch(t -> t.onHpLoss(this, target, before, after, source, amount), target, source);
+    }
+
+    /** Kill (P8-6). */
+    private void broadcastKill(CanHit attacker, CanHit victim) {
+        dispatch(t -> t.onKill(this, attacker, victim), victim, attacker);
+    }
+
+    /** Heal (P8-6). */
+    private void broadcastHeal(CanHit healer, CanHit target, double healed) {
+        dispatch(t -> t.onHeal(this, healer, target, healed), target, healer);
+    }
+
+    /** Weakness break (P8-6). */
+    private void broadcastBreak(CanHit attacker, CanHit target, DamageElement element) {
+        dispatch(t -> t.onBreak(this, attacker, target, element), target, attacker);
+    }
+
+    /**
+     * Skill points credited (P8-6). Only delivered to our side -- skill points are a **resource of our team**
+     * and the enemy has no share.
+     */
+    private void broadcastSkillPointGained(int amount) {
+        for (Character ally : characters) {
+            ally.onSkillPointGained(this, amount);
+        }
+    }
+
+    /** Skill points spent (P8-6). Only delivered to our side, same as {@link #broadcastSkillPointGained}. */
+    private void broadcastSkillPointSpent(int amount) {
+        for (Character ally : characters) {
+            ally.onSkillPointSpent(this, amount);
+        }
+    }
+
+    /**
+     * Hit energy gain + kill energy gain (P3-2).
+     *
+     * <p><b>The two rules differ, do not gate them with the same switch:</b>
      * <ul>
-     *   <li><b>受击回能</b>：要求这一发「算一次攻击」（{@code countsAsAttack}）。
-     *       附加伤害 / 真实伤害按官方定义「不视为造成了 1 次攻击」→ 挨打方不回能。</li>
-     *   <li><b>击杀回能</b>：只看"这一发有没有把目标打死"，**与该伤害是否算攻击无关**。
-     *       任何归属到攻击者的伤害（普攻、战技、击破、超击破、DOT、附加伤害、真伤……）
-     *       只要打死了怪，就给 {@code damage.getAttacker()} 结算击杀回能。</li>
+     *   <li><b>Hit energy gain</b>: requires this instance to "count as an attack" ({@code countsAsAttack}).
+     *       Additional damage / true damage, by the official definition, "does not count as dealing 1 attack"
+     *       → the one being hit gains no energy.</li>
+     *   <li><b>Kill energy gain</b>: it only looks at "did this instance kill the target", **regardless of
+     *       whether that damage counts as an attack**. Any damage attributed to the attacker (basic attack,
+     *       skill, break, super break, DOT, additional damage, true damage, ...), as long as it killed the
+     *       monster, settles kill energy gain for {@code damage.getAttacker()}.</li>
      * </ul>
      *
-     * <p>两条分开的原因：附加伤害/真伤可以击杀，但"击杀"这件事本身仍然发生了 ——
-     * 用 {@code countsAsAttack} 一起卡掉会让附加伤害补刀拿不到击杀回能。
+     * <p>Why they are separate: additional damage/true damage can kill, but the "kill" itself still happened
+     * -- gating them together with {@code countsAsAttack} would leave additional damage's finishing blow
+     * without kill energy gain.
      *
-     * @param target 挨打的人
-     * @param damage 这一发伤害
-     * @param died   这一发是否打死了 {@code target}
+     * @param target the one being hit
+     * @param damage this hit's damage
+     * @param died   whether this instance killed {@code target}
      */
     private void grantHitAndKillEnergy(CanHit target, Damage damage, boolean died, EnergyGrant grant) {
         if (!died) {
@@ -1043,11 +1246,11 @@ public class Battle {
     }
 
     /**
-     * 受击回能：只有**这一次攻击的主段**才给挨打的那一方回能。
+     * Hit energy gain: only the **main instance of this attack** grants energy to the side being hit.
      *
-     * <p>两道门槛：① 这一发必须「算一次攻击」（附加伤害 / 真伤不视为攻击）；
-     * ② {@code grant} 必须允许受击回能（击破 / 超击破 / DOT 这些派生段不允许，
-     * 否则一次攻击会因为"打出了更多伤害类型"而给受击方回更多能）。
+     * <p>Two gates: ① this instance must "count as an attack" (additional damage / true damage do not count
+     * as attacks); ② {@code grant} must allow hit energy gain (derived instances such as break / super break /
+     * DOT do not, otherwise one attack would give the victim more energy for "dealing more damage types").
      */
     private void grantHitEnergy(CanHit target, Damage damage, EnergyGrant grant) {
         if (grant != EnergyGrant.ALL || !damage.isCountsAsAttack()) {
@@ -1060,13 +1263,14 @@ public class Battle {
     }
 
     /**
-     * 击杀回能：记给 {@code damage.getAttacker()}，**不看** {@code countsAsAttack}
-     * （任何归属到角色的伤害击杀了怪都该回能，2026-09-19 口径）。
+     * Kill energy gain: credited to {@code damage.getAttacker()}, **not looking at** {@code countsAsAttack}
+     * (any damage attributed to a character that kills a monster should give energy, the 2026-09-19 rule).
      *
-     * <p>但**看 {@code grant}**：击杀只结算一次。所以主段带 {@link EnergyGrant#ALL}，
-     * 派生段（击破 / 超击破 / DOT / 附加伤害 / 真伤）带 {@link EnergyGrant#KILL_ONLY} ——
-     * 这样"主段没打死、派生段补刀打死"时击杀回能不会漏，
-     * 而"主段已经打死"时派生段也不会重复给（它本来就因为目标已死而不结算）。
+     * <p>But it **does look at {@code grant}**: a kill is settled only once. So the main instance carries
+     * {@link EnergyGrant#ALL} and derived instances (break / super break / DOT / additional damage / true
+     * damage) carry {@link EnergyGrant#KILL_ONLY} -- this way "the main instance did not kill, a derived
+     * instance finishes it off" does not miss the kill energy gain, while "the main instance already killed"
+     * does not give it twice from a derived instance (which would not settle anyway, the target being dead).
      */
     private void grantKillEnergy(CanHit target, Damage damage, EnergyGrant grant) {
         if (grant == EnergyGrant.NONE) {
@@ -1083,45 +1287,51 @@ public class Battle {
     }
 
     /**
-     * 这一段伤害允许结算哪些回能（见 {@code Battle.applyDamage} 的内部重载）。
+     * Which energy gains this damage instance is allowed to settle (see the internal overload of
+     * {@code Battle.applyDamage}).
      */
     private enum EnergyGrant {
-        /** 主段：受击回能 + 击杀回能都结算（角色主动施放技能的伤害段）。 */
+        /** Main instance: both hit energy gain and kill energy gain are settled (the damage instance of a skill a character casts). */
         ALL,
-        /** 派生段：只结算击杀回能（击破 / 超击破 / DOT / 附加伤害 / 真伤）。 */
+        /** Derived instance: only kill energy gain is settled (break / super break / DOT / additional damage / true damage). */
         KILL_ONLY,
-        /** 什么都不结算（预留）。 */
+        /** Nothing is settled (reserved). */
         NONE
     }
 
     /**
-     * 附加伤害：面板型 base（攻击力 / 生命上限 × 倍率），**走完整乘区**（增伤/防御/抗性/易伤都吃）。
+     * Additional damage: a panel-type base (ATK / max HP × multiplier) that **goes through the full damage
+     * zones** (it takes DMG boost/defence/resistance/vulnerability).
      *
-     * <p>官方定义：「使受击者额外受到 1 次伤害，本次伤害不视为造成了 1 次攻击」——
-     * 所以置 {@code notCountsAsAttack()}（**受击方**不回能、不削韧、不触发攻击级事件）。
-     * 但它**归属攻击者**，因此击杀时照样给攻击者结算击杀回能（见 {@link #grantKillEnergy}）。
+     * <p>The official definition: "makes the victim take 1 extra instance of damage; this damage does not count
+     * as dealing 1 attack" -- so {@code notCountsAsAttack()} is set (**the victim** gains no energy, no
+     * toughness is reduced, no attack-level event is triggered).
+     * But it **is attributed to the attacker**, so on a kill the attacker still settles kill energy gain
+     * (see {@link #grantKillEnergy}).
      *
-     * @param base 已经算好的基础值（例：知更鸟 120% 攻击力 / 缇宝 12% 生命上限）
-     * @return 该段结算值（0 = 未造成伤害）
+     * @param base the already-computed base value (e.g. Robin (知更鸟) 120% ATK / Tribbie (缇宝) 12% max HP)
+     * @return the settled value of this instance (0 = no damage dealt)
      */
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
         Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
-        // KILL_ONLY：附加伤害是某次攻击派生的额外伤害，不给受击方回能；击杀仍记给攻击者
+        // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
         return applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
     }
 
     /**
-     * 真实伤害：固定数额，或"本次攻击总伤害 × %"这类衍生值——**跳过全部乘区**，不视为一次攻击。
+     * True damage: a fixed amount, or a derived value such as "this attack's total damage × %" -- it **skips
+     * every damage zone** and does not count as an attack.
      *
-     * <p>同样置 {@code notCountsAsAttack()}：受击方不回能、不削韧；但归属攻击者，
-     * 击杀时照给攻击者结算击杀回能（见 {@link #grantKillEnergy}）。
+     * <p>{@code notCountsAsAttack()} is likewise set: the victim gains no energy and no toughness is reduced;
+     * but it is attributed to the attacker, so on a kill the attacker still settles kill energy gain
+     * (see {@link #grantKillEnergy}).
      *
-     * @param base 真伤数额（不再受防御/抗性/增伤/暴击/易伤影响）
-     * @return 该段结算值（0 = 未造成伤害）
+     * @param base the true damage amount (no longer affected by defence/resistance/DMG boost/crit/vulnerability)
+     * @return the settled value of this instance (0 = no damage dealt)
      */
     public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
         Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
-        // KILL_ONLY：真伤同样是派生伤害，不给受击方回能；击杀仍记给攻击者
+        // KILL_ONLY: true damage is likewise derived damage, so the victim gains no energy; a kill is still credited to the attacker
         return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), EnergyGrant.KILL_ONLY);
     }
 
@@ -1130,7 +1340,7 @@ public class Battle {
      *
      * <p>Single source of truth for "who can be hit": {@link SkillExecutor} uses it today,
      * the target selector (P5-4) and wave handling (P7-4) must use the same judgement so
-     * that no caller ever picks a corpse (那才是鞭尸的来源).
+     * that no caller ever picks a corpse (that is where corpse-hitting comes from).
      *
      * @return a fresh list of alive enemies
      */
@@ -1145,7 +1355,7 @@ public class Battle {
     }
 
     /**
-     * Zone assembly + settlement: 增伤 → 暴击 → 防御 → 抗性 → {@link Damage#toValue()}.
+     * Zone assembly + settlement: DMG boost → crit → defence → resistance → {@link Damage#toValue()}.
      *
      * <p>Private on purpose: the only way in is {@link #applyDamage(CanHit, Damage)}, which
      * makes "the same hit assembled twice" structurally impossible.
@@ -1157,34 +1367,39 @@ public class Battle {
         CanHit attacker = damage.getAttacker();
         CanHit defender = damage.getDefender();
 
-        // 1) 增伤区：元素增伤 + 全增伤（击破/超击破/真伤会被 BoostArea.applies() 自动跳过）
+        // 1) DMG boost zone: element boost + all-type boost (break/super break/true damage are skipped
+        //    automatically by BoostArea.applies())
         AttributeType elementBoost = AttributeType.getBoostByElement(damage.getElement());
         if (elementBoost != null) {
             damage.addBoost(attacker.getAttribute(elementBoost).get());
         }
         damage.addBoost(attacker.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
 
-        // 2) 暴击区：可暴击类型才骰；效果已指定双暴（fixedCrit）时不再覆盖
+        // 2) Crit zone: only crittable types roll; an effect that already fixed the crit (fixedCrit) is not
+        //    overwritten
         if (damage.getType().isCrittable() && !damage.isCritFixed()) {
             double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
             boolean isCrit = critRate > 0 && rng.nextDouble() < critRate;
             damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get());
         }
 
-        // 3) 防御区：攻击者等级 / 受击者防御 / 攻击者无视防御
+        // 3) Defence zone: attacker level / victim defence / attacker defence ignore
         damage.defence(attacker.getLevel(),
                 defender.getAttribute(AttributeType.DEFENCE).get(),
                 attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get());
 
-        // 4) 抗性区：受击者抗性 - 攻击者穿透，再 clamp（HSR.md §2.5，负抗全效）
-        //    注：弱点击破不改变抗性（§2.5；P4 复核）
+        // 4) Resistance zone: victim resistance - attacker penetration, then clamp (HSR.md §2.5, negative
+        //    resistance is fully effective)
+        //    Note: weakness break does not change resistance (§2.5; P4 re-check)
         double rawResist = defender instanceof Enemy enemy
                 ? enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)
                 : 0.0;
         damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
 
-        // 5) 钩子：实体级 DamageEvent（HSR.md §2.2：虚弱=攻击方负面、易伤=受击方负面、减伤=受击方增益）
-        //    双方都发；默认实现转发给各自的 BuffManager，子类重写可做天赋/Boss 机制
+        // 5) Hook: entity-level DamageEvent (HSR.md §2.2: weakness = attacker's debuff, vulnerability = victim's
+        //    debuff, reduction = victim's buff)
+        //    Both sides are notified; the default implementation forwards to each one's BuffManager, and
+        //    subclasses can override it for talents/Boss mechanics
         attacker.onDamage(this, damage);
         defender.onDamage(this, damage);
 
@@ -1223,7 +1438,7 @@ public class Battle {
                 queue.removeCombatant(signal.getCanHit());
             }
         }
-        checkResult();                               // P7-3：清完尸体后顺手判胜负
+        checkResult();                               // P7-3: decide the outcome right after clearing the corpses
     }
 
     public List<Signal> getQueueSnapshot() {

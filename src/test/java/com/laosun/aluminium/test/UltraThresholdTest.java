@@ -14,41 +14,43 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 终结技的**开大阈值**（P3-4 跟进）：攒够 {@code sp_need} 就能放，不必攒满 {@code maxEnergy}。
+ * The ultimate's **cast threshold** (P3-4 follow-up): once {@code sp_need} is reached the ultimate can be cast; the
+ * {@code maxEnergy} bar does not have to be full.
  *
- * <p>93 个角色里有 5 个阈值**低于**上限（数据与角色文档一致）：
+ * <p>5 of the 93 characters have a threshold **below** their cap (the data agrees with the character docs):
  *
  * <pre>
- *   云璃 1221  需要 120 / 上限 240     飞霄 1220  需要 6  / 上限 12
- *   银枝 1302  需要  90 / 上限 180     昔涟 1415  需要 12 / 上限 24（层数，见 §9.5）
- *   绯英 1505  需要 240 / 上限 480
+ *   Yunli (云璃) 1221  needs 120 / cap 240      Feixiao (飞霄) 1220  needs 6  / cap 12
+ *   Argenti (银枝) 1302  needs  90 / cap 180      Cyrene (昔涟) 1415  needs 12 / cap 24 (stacks, see §9.5)
+ *   绯英 1505  needs 240 / cap 480
  * </pre>
  *
- * <p>角色文档写的是「**释放所需能量** 120（上限 240）」——"所需"是门槛。
- * 修之前引擎判 {@code currentEnergy >= maxEnergy}，所以云璃会攒到 240 才肯放。
+ * <p>The character docs say "**energy required to cast** 120 (cap 240)" — "required" is the threshold.
+ * Before the fix the engine tested {@code currentEnergy >= maxEnergy}, so Yunli would only cast after piling up to
+ * 240.
  */
 public class UltraThresholdTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // 一、门槛值来自数据
+    // I. The threshold value comes from the data
     // ==================================================================
 
     /**
-     * {@code ultraEnergyCost} 读 {@code sp_need}；多数角色它等于上限。
+     * {@code ultraEnergyCost} reads {@code sp_need}; for most characters it equals the cap.
      */
     @Test
     public void ultraCostComesFromTheSkillData() {
-        Battle battle = newBattle(CharacterFactory.create(1221, 80));   // 云璃
+        Battle battle = newBattle(CharacterFactory.create(1221, 80));   // Yunli (云璃)
         Character yunli = battle.characters.getFirst();
 
-        Assertions.assertEquals(240, yunli.getMaxEnergy(), EPS, "面板上限是 240");
+        Assertions.assertEquals(240, yunli.getMaxEnergy(), EPS, "the stat cap is 240");
         Assertions.assertEquals(120, battle.ultraEnergyCost(yunli), EPS,
-                "开大只需要 120（数据 sp_need）");
+                "casting the ultimate only needs 120 (data sp_need)");
     }
 
     /**
-     * 阈值 == 上限的常规角色不受影响（景元 130/130）。
+     * Regular characters whose threshold == cap are unaffected (Jing Yuan (景元) 130/130).
      */
     @Test
     public void regularCharactersThresholdEqualsTheirCap() {
@@ -59,7 +61,7 @@ public class UltraThresholdTest {
         Assertions.assertEquals(jingYuan.getMaxEnergy(), battle.ultraEnergyCost(jingYuan), EPS);
     }
 
-    /** 全部 93 个角色：阈值必须 ≤ 上限，且 > 0。 */
+    /** All 93 characters: the threshold must be ≤ the cap and > 0. */
     @Test
     public void thresholdNeverExceedsTheCap() {
         for (var entry : Constant.CHARACTERS.entrySet()) {
@@ -68,16 +70,16 @@ public class UltraThresholdTest {
             double cost = battle.ultraEnergyCost(c);
 
             if (!c.hasEnergyBar()) {
-                Assertions.assertEquals(0, cost, EPS, "cid=" + entry.getKey() + " 没有能量条");
+                Assertions.assertEquals(0, cost, EPS, "cid=" + entry.getKey() + " has no energy bar");
                 continue;
             }
-            Assertions.assertTrue(cost > 0, "cid=" + entry.getKey() + " 阈值应当为正");
+            Assertions.assertTrue(cost > 0, "cid=" + entry.getKey() + " threshold should be positive");
             Assertions.assertTrue(cost <= c.getMaxEnergy() + EPS,
-                    "cid=" + entry.getKey() + " 阈值 " + cost + " 不该超过上限 " + c.getMaxEnergy());
+                    "cid=" + entry.getKey() + " threshold " + cost + " must not exceed the cap " + c.getMaxEnergy());
         }
     }
 
-    /** 恰好 5 个角色的阈值低于上限 —— 穷举登记，多一个少一个都要显式改。 */
+    /** Exactly 5 characters have a threshold below their cap — exhaustively registered, one more or one fewer must be changed explicitly. */
     @Test
     public void exactlyFiveCharactersHaveALowerThreshold() {
         int lower = 0;
@@ -92,15 +94,15 @@ public class UltraThresholdTest {
             }
         }
         Assertions.assertEquals(5, lower,
-                "阈值低于上限的角色应为 5（云璃/银枝/绯英/飞霄/昔涟）");
+                "there should be 5 characters with a threshold below their cap (Yunli (云璃)/Argenti (银枝)/Evanescia (绯英)/Feixiao (飞霄)/Cyrene (昔涟))");
     }
 
     // ==================================================================
-    // 二、判定与消耗
+    // II. The check and the consumption
     // ==================================================================
 
     /**
-     * 核心：云璃攒到 **120** 就能放，不必等到 240。
+     * Core: Yunli can cast once she has **120**, she does not have to wait for 240.
      */
     @Test
     public void yunliCanCastAtHalfOfHerCap() {
@@ -108,16 +110,17 @@ public class UltraThresholdTest {
         Battle battle = newBattle(yunli);
 
         yunli.setCurrentEnergy(119);
-        Assertions.assertFalse(battle.isUltraReady(yunli), "差 1 点还不能放");
+        Assertions.assertFalse(battle.isUltraReady(yunli), "1 point short, it cannot be cast yet");
         Assertions.assertFalse(battle.castUltra(yunli, List.of(firstEnemy(battle))));
 
         yunli.setCurrentEnergy(120);
-        Assertions.assertTrue(battle.isUltraReady(yunli), "到 120 就能放");
+        Assertions.assertTrue(battle.isUltraReady(yunli), "at 120 it can be cast");
         Assertions.assertTrue(battle.castUltra(yunli, List.of(firstEnemy(battle))));
     }
 
     /**
-     * 放完之后**清零**：对阈值 < 上限的角色，等价于"消耗掉阈值那部分"。
+     * After casting it is **zeroed**: for a character whose threshold < cap, that is equivalent to "consuming the
+     * threshold part".
      */
     @Test
     public void castingConsumesTheStoredEnergy() {
@@ -127,14 +130,14 @@ public class UltraThresholdTest {
         yunli.setCurrentEnergy(120);
         Assertions.assertTrue(battle.castUltra(yunli, List.of(firstEnemy(battle))));
 
-        // 引擎会在本体结算后再给 5 点（onUltCast），所以是 5 而不是 0
+        // the engine gives 5 points back after the ultimate itself settles (onUltCast), so it is 5 and not 0
         Assertions.assertEquals(5, yunli.getCurrentEnergy(), EPS,
-                "放开后清零，再回自身的 5 点");
-        Assertions.assertFalse(battle.isUltraReady(yunli), "刚放完不能再放");
+                "zeroed after casting, then the character's own 5 points come back");
+        Assertions.assertFalse(battle.isUltraReady(yunli), "right after casting it cannot cast again");
     }
 
     /**
-     * 常规角色行为不变：攒满才放。
+     * Regular characters behave unchanged: they cast only when full.
      */
     @Test
     public void regularCharacterStillNeedsFullEnergy() {
@@ -151,7 +154,7 @@ public class UltraThresholdTest {
     }
 
     /**
-     * 没有能量条的角色（遐蝶 1407）永远放不了 —— 她连 {@code hasEnergyBar()} 都是 false。
+     * A character with no energy bar (Castorice (遐蝶) 1407) can never cast — even her {@code hasEnergyBar()} is false.
      */
     @Test
     public void noEnergyBarStillCannotCast() {
@@ -159,15 +162,17 @@ public class UltraThresholdTest {
         Battle battle = newBattle(castorice);
 
         Assertions.assertFalse(castorice.hasEnergyBar());
-        castorice.setCurrentEnergy(9999);        // 就算硬灌也不行
+        castorice.setCurrentEnergy(9999);        // even force-feeding energy does not help
         Assertions.assertFalse(battle.isUltraReady(castorice));
         Assertions.assertFalse(battle.castUltra(castorice, List.of(firstEnemy(battle))));
     }
 
     /**
-     * 特殊资源角色即便被硬灌到上限也放不出 —— provider 不给她能量，但这里验证判定本身也不放行
-     * （她的 {@code sp_need} 是 12、上限 24，所以灌到 20 反而"够门槛"了 ——
-     *  这正是为什么真正的防线是 {@code NoConventionalEnergyProvider} 让她攒不起来）。
+     * A special-resource character cannot cast even when force-fed to the cap — the provider gives her no energy,
+     * but this verifies that the check itself does not let her through either
+     * (her {@code sp_need} is 12 and her cap is 24, so feeding her to 20 would actually be "enough for the
+     *  threshold" — which is exactly why the real line of defence is {@code NoConventionalEnergyProvider} keeping
+     *  her from accumulating at all).
      */
     @Test
     public void specialResourceCharacterCannotAccumulateInRealBattle() {
@@ -175,7 +180,7 @@ public class UltraThresholdTest {
         Battle battle = newBattle(cyrene);
         Enemy enemy = firstEnemy(battle);
 
-        // 真实战斗里跑几轮：她的能量必须恒为 0，因此永远不满足门槛
+        // run a few rounds of a real battle: her energy must stay at 0, so the threshold is never met
         for (int i = 0; i < 8 && !battle.isOver(); i++) {
             battle.stepForward();
             if (battle.currentMove == null) {
@@ -185,7 +190,7 @@ public class UltraThresholdTest {
             battle.beforeMove();
             if (actor == cyrene) {
                 Assertions.assertFalse(battle.isUltraReady(cyrene),
-                        "能量恒为 0 → 永远不该 ready，实际 " + cyrene.getCurrentEnergy());
+                        "energy is always 0 → it must never be ready, actual " + cyrene.getCurrentEnergy());
             }
             battle.afterMove();
         }

@@ -33,62 +33,69 @@ public class Enemy extends CanHit {
     private Map<DamageElement, Double> damageResist = Map.of();
 
     /**
-     * 特定负面效果抵抗（P6-1）：键是数据里的 {@code STAT_*} 字符串，值是**减免比例**。
+     * Specific debuff resistance (P6-1): the key is a {@code STAT_*} string from the data,
+     * the value is the **mitigation ratio**.
      *
-     * <p>例：冰锋 {@code {"STAT_CTRL_Frozen": 1}} = 完全免疫冻结（1 = 100% 抵抗）。
-     * 参与 {@code Battle.hitChance} 的最后一个因子 {@code (1 - specific)}。
+     * <p>Example: Ice Edge {@code {"STAT_CTRL_Frozen": 1}} = fully immune to freeze
+     * (1 = 100% resistance). It participates as the last factor {@code (1 - specific)}
+     * of {@code Battle.hitChance}.
      *
-     * <p>数据实测：2649 条怪里 999 条带这一列；出现过的键有
+     * <p>Measured against the data: 999 of the 2649 monsters carry this column; the keys
+     * that occur include
      * {@code STAT_CTRL_Frozen / STAT_CTRL / STAT_Confine / STAT_Entangle /
-     * STAT_DOT_Burn / STAT_DOT_Electric / STAT_DOT_Poison} 等。
+     * STAT_DOT_Burn / STAT_DOT_Electric / STAT_DOT_Poison} and so on.
      */
     private Map<String, Double> debuffResist = Map.of();
 
     /**
-     * 弱点元素（来自 {@code monster_config.json} 的 {@code stance_weak}）。默认空集合 = 无弱点
-     * （数据里有 102 个条目没有这一项）。
+     * Weakness elements (from {@code stance_weak} in {@code monster_config.json}). Empty by
+     * default = no weakness (102 entries in the data lack this item).
      *
-     * <p>这是**数据**：命中弱点元素可以削韧，判定与削韧机制在 P4-2 实现。
+     * <p>This is **data**: hitting a weakness element allows toughness reduction; the
+     * judgement and the toughness-reduction mechanic are implemented in P4-2.
      */
     private Set<DamageElement> stanceWeak = Set.of();
 
     /**
-     * 韧性当前值（P4 削韧会减它；数值由 {@code EnemyScaler} 给出：模板 × 等级组 × 实例系数）。
+     * Current toughness (P4 toughness reduction decreases it; the value is given by
+     * {@code EnemyScaler}: template × level group × instance multiplier).
      */
     private double stance;
 
     /**
-     * 韧性上限（= 初始 {@link #stance}）。
+     * Max toughness (= the initial {@link #stance}).
      */
     private double maxStance;
 
     /**
-     * 韧性条数（多段韧性条，来自模板 {@code stance_count}）。
+     * Number of toughness bars (multi-bar toughness, from the template's {@code stance_count}).
      */
     private int stanceCount;
 
     /**
-     * 该怪自身的韧性属性（模板 {@code stance_type}）。
+     * This monster's own toughness element (template {@code stance_type}).
      */
     private DamageElement stanceType;
 
     /**
-     * 是否处于击破状态（P4-2 判定、P4-4 恢复）。
+     * Whether it is in the broken state (judged in P4-2, recovered in P4-4).
      */
     private boolean broken;
 
     /**
-     * 本次击破的元素（P4-3 击破伤害 / P4-5 DOT 类型用）。
+     * The element of this break (used by P4-3 break damage / P4-5 DOT type).
      */
     private DamageElement brokenElement;
 
     /**
-     * 击破状态剩余回合数（跳回合/推条由 P4-4 维护，P4-1 只留字段）。
+     * Remaining turns of the broken state (turn skipping / action delay is maintained by
+     * P4-4; P4-1 only keeps the field).
      */
     private int brokenRemainTurns;
 
     /**
-     * 身上的持续伤害（P4-5）。**按施加顺序结算**（HSR.md §7「先上先结算」），所以用 List 不用 Set。
+     * The damage-over-time effects on it (P4-5). **Settled in application order**
+     * (HSR.md §7 "first applied, first settled"), which is why this is a List and not a Set.
      */
     private final List<Dot> dots = new ArrayList<>();
 
@@ -112,10 +119,11 @@ public class Enemy extends CanHit {
     /**
      * Whether the given element is one of this enemy's weaknesses.
      *
-     * <p>P4-2 uses this as the single judgement point for「弱点削韧」——别再直接摸
-     * {@link #stanceWeak}，否则以后改判定规则会漏掉调用点。
+     * <p>P4-2 uses this as the single judgement point for "weakness toughness reduction" —
+     * do not reach for {@link #stanceWeak} directly any more, or a future change to the
+     * judgement rule will miss the call sites.
      *
-     * @param element the damage element of an incoming hit（{@code null} → {@code false}）
+     * @param element the damage element of an incoming hit ({@code null} → {@code false})
      * @return {@code true} if the element is a weakness
      */
     public boolean isWeakTo(DamageElement element) {
@@ -123,9 +131,10 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * 是否有韧性条（{@code maxStance > 0}）。
+     * Whether it has a toughness bar ({@code maxStance > 0}).
      *
-     * <p>P4-2 的削韧/击破判定统一走这里，别各自去摸 {@link #maxStance}——数据里确实有韧性为 0 的怪。
+     * <p>P4-2's toughness-reduction / break judgement goes through here uniformly — do not
+     * each reach for {@link #maxStance}: the data really does contain monsters with 0 toughness.
      *
      * @return {@code true} if this enemy can be broken at all
      */
@@ -134,24 +143,32 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * 削韧（P4-2 每段伤害调用一次）。
+     * Toughness reduction (P4-2 calls this once per damage segment).
      *
-     * <p><b>归零不自动击破</b>——击破判定要区分弱点击破/非弱点削韧（P4-2 的口径），
-     * 所以这里只负责扣数并夹到 0。已击破的目标在恢复前不再削韧（韧性条是空的）。
+     * <p><b>Reaching zero does not break automatically</b> — the break judgement has to
+     * distinguish weakness break from non-weakness toughness reduction (the P4-2 stance), so
+     * this method is only responsible for deducting and clamping at 0. A target that is
+     * already broken is no longer reduced before it recovers (the toughness bar is empty).
      *
-     * <p><b>返回实际消耗值（H-4）</b>：击破伤害必须按"这一段真的削掉了多少"结算，
-     * 而不是按技能的标称削韧值——剩 10 点韧性挨一发 30 点技能，只有 10 点算数。
-     * 调用方另需注意：超击破（P4-6）用的是**超出部分** {@code amount - consumed}，
-     * 所以本方法的返回值与调用方手里的标称值要一起用，别只留一个。
+     * <p><b>Returns the amount actually consumed (H-4)</b>: break damage must be settled on
+     * "how much did this segment really shave off", not on the skill's nominal toughness
+     * reduction — 10 points of toughness left taking a 30-point skill means only 10 counts.
+     * Callers must also note: super break (P4-6) uses the **excess** {@code amount - consumed},
+     * so the return value of this method and the nominal value the caller holds are needed
+     * together; do not keep only one of them.
      *
-     * @param amount 削韧点数（技能 {@code stance_list} 的值 × 弱点/非弱点系数）
-     * @return 实际从韧性条上扣掉的点数（0 = 没削动：已击破 / 非正数 / 条已空）
+     * @param amount toughness reduction points (the skill's {@code stance_list} value ×
+     *               weakness / non-weakness coefficient)
+     * @return the points actually deducted from the toughness bar (0 = nothing shaved off:
+     *         already broken / non-positive / bar already empty)
      */
     public double reduceStance(double amount) {
         if (broken || amount <= 0 || stance <= 0) {
-            // stance <= 0：韧性条已经空了（正常情况下会同时 broken，但本方法的守卫不应假设调用方
-            // 一定按顺序走）。显式挡掉才能保证返回值语义是 min(amount, 剩余韧性)，
-            // 否则超击破会算出"超出部分 = amount - 0 = 整发"，对一条空的韧性条凭空产生超击破。
+            // stance <= 0: the toughness bar is already empty (normally that coincides with
+            // broken, but this guard must not assume the caller always goes in order). Only by
+            // blocking it explicitly is the return value guaranteed to mean min(amount,
+            // remaining toughness); otherwise super break would compute "excess = amount - 0 =
+            // the whole hit" and conjure a super break out of an empty toughness bar.
             return 0;
         }
         double consumed = Math.min(stance, amount);
@@ -160,9 +177,9 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * 进入击破状态（P4-2 在韧性归零时调用）。
+     * Enter the broken state (P4-2 calls this when toughness reaches zero).
      *
-     * @param element 造成击破的元素（{@code null} = 未知，不断言）
+     * @param element the element that caused the break ({@code null} = unknown, not asserted)
      */
     public void breakEnemy(DamageElement element) {
         broken = true;
@@ -171,9 +188,11 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * 退出击破状态并把韧性条填满（P4-4：击破持续回合结束时调用）。
+     * Leave the broken state and refill the toughness bar (P4-4: called when the broken
+     * duration in turns ends).
      *
-     * <p>多韧性条（{@link #stanceCount} {@code > 1}）的逐条消耗留给 P4-4，本任务只恢复满值。
+     * <p>Bar-by-bar consumption for multi-bar toughness ({@link #stanceCount} {@code > 1})
+     * is left to P4-4; this task only restores the value to full.
      */
     public void recoverFromBroken() {
         broken = false;
@@ -183,9 +202,10 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * 挂上一个持续伤害（P4-5）。同一元素可以叠多个（"先上先结算"，不做同类刷新）。
+     * Attach one damage-over-time effect (P4-5). The same element can stack multiple copies
+     * ("first applied, first settled"; no same-type refresh).
      *
-     * @param dot 持续伤害
+     * @param dot the damage-over-time effect
      */
     public void addDot(Dot dot) {
         if (dot != null) {
@@ -194,9 +214,10 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * 移除一个持续伤害（结算完最后一次时由 {@code Battle.tickDots} 调用）。
+     * Remove one damage-over-time effect (called by {@code Battle.tickDots} after its last
+     * settlement).
      *
-     * @param dot 持续伤害
+     * @param dot the damage-over-time effect
      */
     public void removeDot(Dot dot) {
         dots.remove(dot);

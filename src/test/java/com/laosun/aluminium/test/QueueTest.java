@@ -8,10 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * 行动条基础行为。
+ * Basic action bar behaviour.
  *
- * <p>⚠ 数值锚点含 **P7-1 的首轮系数 1.5**：速度 100 的首轮行动值 = {@code 10000/100 × 1.5 = 150}，
- * 速度 200 = {@code 50 × 1.5 = 75}；第二圈起回到正常周期（100 / 50）。
+ * <p>⚠ The numeric anchors include **P7-1's first-round coefficient 1.5**: the first-round action
+ * value for speed 100 = {@code 10000/100 × 1.5 = 150}, and for speed 200 = {@code 50 × 1.5 = 75};
+ * from the second lap onwards it returns to the normal period (100 / 50).
  */
 public class QueueTest {
     @Test
@@ -20,8 +21,8 @@ public class QueueTest {
         Character fast = Character.fromAttributes("fast", 100, 100, 100, 200);
         Queue q = new Queue(List.of(slow, fast));
 
-        Assertions.assertEquals(fast, q.peekNext(), "速度高的先动（首轮系数对所有人一致，不改顺序）");
-        Assertions.assertEquals(75, q.timeUntilNext(), 1e-9, "首轮：10000/200 × 1.5 = 75");
+        Assertions.assertEquals(fast, q.peekNext(), "the higher speed acts first (the first-round coefficient is the same for everyone, so it does not change the order)");
+        Assertions.assertEquals(75, q.timeUntilNext(), 1e-9, "first round: 10000/200 × 1.5 = 75");
     }
 
     @Test
@@ -32,7 +33,7 @@ public class QueueTest {
 
         double timePassed = q.move();
 
-        Assertions.assertEquals(75, timePassed, 1e-9, "首轮：速度 200 等 75");
+        Assertions.assertEquals(75, timePassed, 1e-9, "first round: speed 200 waits 75");
         Assertions.assertEquals(fast, q.getNext());
         Assertions.assertEquals(0, q.timeUntilNext(), 1e-9);
     }

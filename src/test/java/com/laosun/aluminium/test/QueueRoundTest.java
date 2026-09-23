@@ -12,15 +12,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P7-1 验收：轮次制行动值。
+ * P7-1 acceptance: round-based action value.
  *
  * <pre>
- * 首轮总行动值 150，之后每轮 100      ⇒ 每个单位的**首个周期** = 10000/速度 × 1.5
+ * first round total action value 150, then 100 per round      ⇒ each unit's **first cycle** = 10000/speed × 1.5
  * </pre>
  *
- * <p>含义：速度 100 的单位首轮要等 150 才动（第二圈起每 100 动一次）；
- * 速度 200 的单位首轮等 75 —— 所以**首轮里高速单位能多动一次**
- * （速度 240 的周期是 41.67，首轮 150 之内能动 3 次）。
+ * <p>Meaning: a unit with speed 100 waits 150 in the first round (from the second lap it acts every
+ * 100); a unit with speed 200 waits 75 in the first round — so **a fast unit gets an extra action
+ * within the first round**
+ * (a unit with speed 240 has a cycle of 41.67, so it can act 3 times within the first round's 150).
  */
 public class QueueRoundTest {
     private static final double EPS = 1e-9;
@@ -29,17 +30,17 @@ public class QueueRoundTest {
     public void firstRoundIsOneAndAHalfCycles() {
         Queue q = new Queue(List.of(character("speed100", 100)));
 
-        Assertions.assertEquals(150, q.timeUntilNext(), EPS, "首轮：10000/100 × 1.5 = 150");
-        Assertions.assertEquals(1, q.getRound(), "还没走，是第 1 轮");
+        Assertions.assertEquals(150, q.timeUntilNext(), EPS, "first round: 10000/100 × 1.5 = 150");
+        Assertions.assertEquals(1, q.getRound(), "nothing has moved yet, it is round 1");
     }
 
     @Test
     public void laterRoundsAreExactlyOneCycle() {
         Queue q = new Queue(List.of(character("speed100", 100)));
 
-        Assertions.assertEquals(150, q.move(), EPS, "首轮 150");
+        Assertions.assertEquals(150, q.move(), EPS, "first round 150");
         q.setTopZero();
-        Assertions.assertEquals(100, q.move(), EPS, "第 2 轮起每轮 100");
+        Assertions.assertEquals(100, q.move(), EPS, "100 per round from round 2 on");
         q.setTopZero();
         Assertions.assertEquals(100, q.move(), EPS);
         q.setTopZero();
@@ -48,19 +49,19 @@ public class QueueRoundTest {
 
     @Test
     public void fastUnitActsBeforeTheFirstRoundEnds() {
-        // 速度 200：首轮 75，所以 150 之内能动两次（t=75、t=125）
+        // speed 200: first round 75, so it can act twice within 150 (t=75, t=125)
         Queue q = new Queue(List.of(character("speed200", 200)));
 
-        Assertions.assertEquals(75, q.move(), EPS, "第一次行动在 75");
+        Assertions.assertEquals(75, q.move(), EPS, "the first action is at 75");
         q.setTopZero();
-        Assertions.assertEquals(50, q.move(), EPS, "第二次在 125（75 + 50）");
+        Assertions.assertEquals(50, q.move(), EPS, "the second is at 125 (75 + 50)");
         q.setTopZero();
-        Assertions.assertEquals(50, q.move(), EPS, "第三次在 175 —— 已经进入第 2 轮");
+        Assertions.assertEquals(50, q.move(), EPS, "the third is at 175 — round 2 has already begun");
     }
 
     @Test
     public void firstRoundMultiplierDoesNotChangeTheOrder() {
-        // 所有人都 ×1.5 ⇒ 首轮顺序与纯速度顺序一致
+        // everyone ×1.5 ⇒ the first-round order matches the pure speed order
         Character slow = character("slow", 100);
         Character mid = character("mid", 150);
         Character fast = character("fast", 200);
@@ -70,7 +71,7 @@ public class QueueRoundTest {
         Assertions.assertEquals(75, q.timeUntilNext(), EPS);
         q.move();
         q.setTopZero();
-        Assertions.assertEquals(mid, q.peekNext(), "第二个是 150 速（周期 66.67）");
+        Assertions.assertEquals(mid, q.peekNext(), "the second is the 150-speed one (cycle 66.67)");
     }
 
     @Test
@@ -78,32 +79,32 @@ public class QueueRoundTest {
         Queue q = new Queue(List.of(character("speed100", 100)));
 
         Assertions.assertEquals(1, q.getRound(), "elapsed = 0");
-        q.move();                                    // elapsed = 150 → 首轮结束
-        Assertions.assertEquals(1, q.getRound(), "elapsed = 150 仍算第 1 轮");
+        q.move();                                    // elapsed = 150 → the first round ends
+        Assertions.assertEquals(1, q.getRound(), "elapsed = 150 still counts as round 1");
         q.setTopZero();
 
         q.move();                                    // elapsed = 250
-        Assertions.assertEquals(2, q.getRound(), "elapsed = 250 → 第 2 轮");
+        Assertions.assertEquals(2, q.getRound(), "elapsed = 250 → round 2");
         q.setTopZero();
 
         q.move();                                    // elapsed = 350
-        Assertions.assertEquals(3, q.getRound(), "elapsed = 350 → 第 3 轮");
+        Assertions.assertEquals(3, q.getRound(), "elapsed = 350 → round 3");
     }
 
     @Test
     public void battleExposesTheRound() {
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
-        Enemy enemy = EnemyFactory.create(1002011, 90, 1);      // 速度 132 > 100，先动
+        Enemy enemy = EnemyFactory.create(1002011, 90, 1);      // speed 132 > 100, so it acts first
         Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
 
-        Assertions.assertEquals(1, battle.getRound(), "开场是第 1 轮");
+        Assertions.assertEquals(1, battle.getRound(), "it is round 1 at the start");
         battle.stepForward();
-        Assertions.assertEquals(1, battle.getRound(), "冰锋 132 速首轮在 75.76 行动，仍是第 1 轮");
+        Assertions.assertEquals(1, battle.getRound(), "Ice Edge acts at 75.76 in the first round at 132 speed, still round 1");
     }
 
     @Test
     public void midBattleJoinerIsNotStretched() {
-        // P7-1 只作用于 initialize()：中途入场按正常周期（这是刻意的，见 addCombatant 的注释）
+        // P7-1 only affects initialize(): entering mid-battle uses the normal cycle (deliberate — see the note on addCombatant)
         Queue q = new Queue(List.of(character("speed100", 100)));
         q.move();
         q.setTopZero();                              // elapsed = 150
@@ -111,8 +112,9 @@ public class QueueRoundTest {
         Character joiner = character("joiner", 100);
         q.addCombatant(joiner);
 
-        // joiner 排在 elapsed + 100 = 250；当前堆顶是 speed100（elapsed+100 = 250）——
-        // 两者同值，谁先由堆决定，这里只断言"joiner 等的是 100 而不是 150"
+        // joiner is queued at elapsed + 100 = 250; the current heap top is speed100 (elapsed+100 = 250) —
+        // both have the same value, so which goes first is decided by the heap; here we only assert that
+        // "joiner waits 100, not 150"
         Assertions.assertEquals(100, q.getTimeRemaining(q.getHeap().stream()
                 .filter(s -> s.getCanHit() == joiner).findFirst().orElseThrow()), EPS);
     }

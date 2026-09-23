@@ -22,24 +22,24 @@ public class DamageTypeTest {
         Assertions.assertTrue(DamageType.EXTRA.isCrittable());
         Assertions.assertTrue(DamageType.TECHNIQUE.isCrittable());
         Assertions.assertTrue(DamageType.MEMORY.isCrittable());
-        Assertions.assertTrue(DamageType.ELATION.isCrittable(), "欢愉伤害吃双爆区（HSR.md §6.4）");
+        Assertions.assertTrue(DamageType.ELATION.isCrittable(), "elation damage does get crit stats (HSR.md §6.4)");
 
-        Assertions.assertFalse(DamageType.BREAK.isCrittable(), "击破不吃双暴");
-        Assertions.assertFalse(DamageType.SUPER_BREAK.isCrittable(), "超击破不吃双暴");
-        Assertions.assertFalse(DamageType.DOT.isCrittable(), "持续伤害不吃双暴");
-        Assertions.assertFalse(DamageType.TRUE.isCrittable(), "真实伤害不吃双暴");
+        Assertions.assertFalse(DamageType.BREAK.isCrittable(), "break damage never crits");
+        Assertions.assertFalse(DamageType.SUPER_BREAK.isCrittable(), "super break damage never crits");
+        Assertions.assertFalse(DamageType.DOT.isCrittable(), "DOT never crits");
+        Assertions.assertFalse(DamageType.TRUE.isCrittable(), "true damage never crits");
     }
 
     @Test
     public void boostRules() {
         Assertions.assertTrue(DamageType.NORMAL.isBoostable());
         Assertions.assertTrue(DamageType.SKILL.isBoostable());
-        Assertions.assertTrue(DamageType.DOT.isBoostable(), "持续伤害吃增伤");
+        Assertions.assertTrue(DamageType.DOT.isBoostable(), "DOT is boosted by the damage-bonus zone");
 
-        Assertions.assertFalse(DamageType.BREAK.isBoostable(), "击破不吃增伤");
-        Assertions.assertFalse(DamageType.SUPER_BREAK.isBoostable(), "超击破不吃增伤");
-        Assertions.assertFalse(DamageType.TRUE.isBoostable(), "真实伤害不吃增伤");
-        Assertions.assertFalse(DamageType.ELATION.isBoostable(), "欢愉伤害不受伤害提高类效果影响（HSR.md §6.5）");
+        Assertions.assertFalse(DamageType.BREAK.isBoostable(), "break damage is not boosted");
+        Assertions.assertFalse(DamageType.SUPER_BREAK.isBoostable(), "super break damage is not boosted");
+        Assertions.assertFalse(DamageType.TRUE.isBoostable(), "true damage is not boosted");
+        Assertions.assertFalse(DamageType.ELATION.isBoostable(), "elation damage is unaffected by damage-increasing effects (HSR.md §6.5)");
     }
 
     @Test

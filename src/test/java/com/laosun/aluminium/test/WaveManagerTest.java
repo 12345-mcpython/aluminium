@@ -17,22 +17,26 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * P7-4 验收：关卡数据（{@code stage.json}）+ 波次。
+ * P7-4 acceptance: stage data ({@code stage.json}) + waves.
  *
- * <p>覆盖两类东西：
+ * <p>Covers two kinds of thing:
  * <ol>
- *   <li>数据层：{@link StageBean} 的读法（波 = {@code monster} 的元素、波内顺序 = {@code MonsterN} 的 N 序）；</li>
- *   <li>流程层：{@link WaveManager} 逐波进怪，且**敌队为空不等于打赢**（P7-3 × P7-4 的接缝）。</li>
+ *   <li>The data layer: how {@link StageBean} is read (a wave = an element of {@code monster}; the
+ *   order within a wave = the N order of {@code MonsterN});</li>
+ *   <li>The flow layer: {@link WaveManager} spawning monsters wave by wave, and **an empty enemy
+ *   team does not equal a win** (the seam between P7-3 × P7-4).</li>
  * </ol>
  *
- * <p>⚠ 依赖 {@code stage.json} 的测试用 {@link Assumptions#assumeFalse} 兜底：
- * 这张表是 generator 产出的，未生成时 {@link Constant#stages()} 是空表
- * （刻意设计成不拖垮整个测试套件，见 {@code Constant.stages()} 的说明）。
+ * <p>⚠ Tests that depend on {@code stage.json} fall back to {@link Assumptions#assumeFalse}:
+ * that table is produced by a generator, and when it has not been generated
+ * {@link Constant#stages()} is an empty table (deliberately designed not to drag down the whole
+ * test suite — see the notes on {@code Constant.stages()}).
  */
 public class WaveManagerTest {
 
     /**
-     * 数据层：{@code monster} 的每一项是一波，波内 id 按 {@code MonsterN} 的 N 排序读出。
+     * The data layer: each element of {@code monster} is one wave, and the ids within a wave are read
+     * sorted by the N of {@code MonsterN}.
      */
     @Test
     public void stageBeanReadsWavesAndMonsterOrder() {
@@ -40,15 +44,15 @@ public class WaveManagerTest {
                 wave(10, 20, 30),
                 wave(40)));
 
-        Assertions.assertEquals(2, stage.waveCount(), "monster 的两个元素 = 两波");
+        Assertions.assertEquals(2, stage.waveCount(), "two elements of monster = two waves");
         Assertions.assertEquals(List.of(10, 20, 30), stage.monsterIds(0));
         Assertions.assertEquals(List.of(40), stage.monsterIds(1));
-        Assertions.assertEquals(List.of(), stage.monsterIds(2), "越界给空列表，不抛");
-        Assertions.assertEquals(List.of(), stage.monsterIds(-1), "负数下标也给空列表");
+        Assertions.assertEquals(List.of(), stage.monsterIds(2), "out of range gives an empty list, does not throw");
+        Assertions.assertEquals(List.of(), stage.monsterIds(-1), "a negative index also gives an empty list");
     }
 
     /**
-     * 数据层：真的 {@code stage.json} —— stage 103201 是 1 波 3 只。
+     * The data layer: the real {@code stage.json} — stage 103201 is 1 wave of 3.
      */
     @Test
     public void stageDataHasTheExpectedShape() {
@@ -61,57 +65,59 @@ public class WaveManagerTest {
     }
 
     /**
-     * 数据层：多波关卡（310030 有 3 波）—— 波数直接来自 {@code monster} 的元素个数。
+     * The data layer: a multi-wave stage (310030 has 3 waves) — the wave count comes directly from
+     * the number of elements of {@code monster}.
      */
     @Test
     public void multiWaveStageIsReadAsMultipleWaves() {
         StageBean stage = stage(310030);
 
-        Assertions.assertTrue(stage.waveCount() >= 2, "310030 应当是多波关卡");
+        Assertions.assertTrue(stage.waveCount() >= 2, "310030 should be a multi-wave stage");
         Assertions.assertFalse(stage.monsterIds(0).isEmpty());
         Assertions.assertFalse(stage.monsterIds(1).isEmpty());
     }
 
     /**
-     * 进一波：怪被造出来、加进敌对列表、并排队入场。
+     * Entering a wave: the monsters are created, added to the enemy list, and queued to enter.
      */
     @Test
     public void nextWaveSpawnsTheWaveAndQueuesIt() {
         Battle battle = waveBattle(103201);
         WaveManager waves = battle.getWaveManager();
 
-        Assertions.assertTrue(waves.hasNextWave(), "还有第 1 波没进");
-        Assertions.assertEquals(-1, waves.getWaveIndex(), "一波都还没进");
+        Assertions.assertTrue(waves.hasNextWave(), "wave 1 has not been entered yet");
+        Assertions.assertEquals(-1, waves.getWaveIndex(), "not a single wave has been entered yet");
 
         Assertions.assertTrue(waves.nextWave());
         Assertions.assertEquals(0, waves.getWaveIndex());
-        Assertions.assertEquals(3, battle.enemies.size(), "103201 第 1 波 3 只");
-        Assertions.assertEquals(3, battle.addRequestItems.size(), "都排队等着入场");
+        Assertions.assertEquals(3, battle.enemies.size(), "103201 wave 1 has 3 monsters");
+        Assertions.assertEquals(3, battle.addRequestItems.size(), "all queued waiting to enter");
 
         battle.processRequests();
         Assertions.assertEquals(4, battle.queue.size(),
-                "入场后进了行动条：1 名角色 + 3 只怪（角色在构造时就入了队）");
+                "after entering they are in the action bar: 1 character + 3 monsters (the character joined the queue at construction)");
         Assertions.assertEquals(3, battle.targetableEnemies().size());
     }
 
     /**
-     * 标准用法：{@code startBattle()} 之后再进波，行动条里是"我方 + 这一波的怪"。
+     * The standard usage: enter a wave after {@code startBattle()}, and the action bar holds
+     * "our side + this wave's monsters".
      */
     @Test
     public void wavesJoinTheQueueAlongsideTheParty() {
         Battle battle = waveBattle(103201);
         battle.startBattle();
-        Assertions.assertEquals(1, battle.queue.size(), "开场只有我方 1 人");
+        Assertions.assertEquals(1, battle.queue.size(), "at the start only our 1 character");
 
         battle.getWaveManager().nextWave();
         battle.processRequests();
 
-        Assertions.assertEquals(4, battle.queue.size(), "1 名角色 + 3 只怪");
+        Assertions.assertEquals(4, battle.queue.size(), "1 character + 3 monsters");
         Assertions.assertEquals(3, battle.targetableEnemies().size());
     }
 
     /**
-     * 单波关卡：进完就没有下一波了。
+     * A single-wave stage: once entered, there is no next wave.
      */
     @Test
     public void singleWaveStageHasNoNextWave() {
@@ -120,12 +126,12 @@ public class WaveManagerTest {
 
         Assertions.assertTrue(waves.nextWave());
         Assertions.assertFalse(waves.hasNextWave());
-        Assertions.assertFalse(waves.nextWave(), "没有下一波时返回 false");
-        Assertions.assertEquals(3, battle.enemies.size(), "不会重复进怪");
+        Assertions.assertFalse(waves.nextWave(), "returns false when there is no next wave");
+        Assertions.assertEquals(3, battle.enemies.size(), "monsters are not spawned twice");
     }
 
     /**
-     * 多波关卡：一波一波进，每次只加那一波的怪。
+     * A multi-wave stage: enter them one at a time, and each time only that wave's monsters are added.
      */
     @Test
     public void multiWaveStageSpawnsOneWaveAtATime() {
@@ -141,15 +147,17 @@ public class WaveManagerTest {
 
         Assertions.assertTrue(waves.nextWave());
         Assertions.assertEquals(firstWaveSize + secondWaveSize, battle.enemies.size(),
-                "第二波是**追加**，不是替换");
+                "the second wave is **appended**, not a replacement");
         Assertions.assertEquals(1, waves.getWaveIndex());
     }
 
     /**
-     * 核心接缝：**敌队为空 ≠ 打赢**。还有波没进时，{@code checkResult()} 不能判胜。
+     * The core seam: **an empty enemy team ≠ a win**. While waves remain unentered, {@code checkResult()}
+     * must not judge a win.
      *
-     * <p>这是 P7-3 与 P7-4 之间最容易踩的一处：P7-3 的判据是"一方全灭"，
-     * 而波次模式里"敌队是空的"只是**这一波还没进**。
+     * <p>This is the easiest place to trip between P7-3 and P7-4: P7-3's criterion is "one side is
+     * wiped out", whereas in wave mode "the enemy team is empty" merely means **this wave has not
+     * entered yet**.
      */
     @Test
     public void pendingWavesDoNotCountAsAWonBattle() {
@@ -159,12 +167,12 @@ public class WaveManagerTest {
         battle.startBattle();
 
         Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
-                "敌队是空的，但还有波没进 → 不能判胜");
+                "the enemy team is empty, but waves remain unentered → must not judge a win");
         Assertions.assertEquals(Battle.Status.RUNNING, battle.checkResult());
     }
 
     /**
-     * 打完最后一波才判胜。
+     * The battle is only judged won after the last wave is cleared.
      */
     @Test
     public void theBattleIsWonOnlyAfterTheLastWave() {
@@ -174,18 +182,19 @@ public class WaveManagerTest {
         waves.nextWave();
         battle.processRequests();
 
-        // 把这一波全打死
+        // Kill the whole wave
         for (Enemy enemy : battle.enemies) {
             enemy.takeDamage(999_999_999);
         }
         battle.processRequests();
 
-        Assertions.assertFalse(waves.hasNextWave(), "只有一波，已经进完了");
+        Assertions.assertFalse(waves.hasNextWave(), "there is only one wave and it has already been entered");
         Assertions.assertEquals(Battle.Status.WIN, battle.getStatus());
     }
 
     /**
-     * 多波关卡里，第 1 波灭掉**不**判胜；进第 2 波之后战斗继续。
+     * In a multi-wave stage, wiping out wave 1 does **not** judge a win; after entering wave 2 the
+     * battle continues.
      */
     @Test
     public void clearingAnIntermediateWaveDoesNotEndTheBattle() {
@@ -201,21 +210,22 @@ public class WaveManagerTest {
         battle.processRequests();
 
         Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
-                "还有第 2 波 → 不能判胜");
+                "wave 2 is still to come → must not judge a win");
         Assertions.assertTrue(waves.isCurrentWaveCleared());
 
         int before = battle.enemies.size();
         Assertions.assertTrue(waves.nextWave());
         battle.processRequests();
 
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(), "新一波进来了，继续打");
+        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(), "a new wave has entered, keep fighting");
         Assertions.assertTrue(battle.enemies.size() > before);
-        Assertions.assertFalse(waves.isCurrentWaveCleared(), "新一波是活的");
+        Assertions.assertFalse(waves.isCurrentWaveCleared(), "the new wave is alive");
         Assertions.assertFalse(waves.aliveEnemies().isEmpty());
     }
 
     /**
-     * 我方全灭时，就算还有没进的波也是输 —— "要不要再进一波"救不了团灭。
+     * When our side is wiped out, it is a loss even if waves remain unentered — "should we enter
+     * another wave" cannot save a team wipe.
      */
     @Test
     public void aWipedPartyStillLosesWithPendingWaves() {
@@ -231,7 +241,8 @@ public class WaveManagerTest {
     }
 
     /**
-     * 中途入场的怪是从**当前行动值**起跑的，不是回到 0 重开一轮。
+     * Monsters entering mid-battle start from the **current action value**, rather than resetting to
+     * 0 and starting a new round.
      */
     @Test
     public void lateWaveEnemiesEnterFromTheCurrentActionValue() {
@@ -240,7 +251,7 @@ public class WaveManagerTest {
         battle.startBattle();
 
         battle.stepForward();
-        battle.afterMove();                              // 时钟走了一段（敌人 132 速先动）
+        battle.afterMove();                              // the clock has advanced a bit (the 132-speed enemy acts first)
         double elapsedBefore = battle.queue.getElapsed();
         Assertions.assertTrue(elapsedBefore > 0);
 
@@ -250,14 +261,14 @@ public class WaveManagerTest {
         for (Enemy enemy : battle.enemies) {
             double remaining = battle.queue.getTimeRemaining(signalOf(battle, enemy));
             Assertions.assertTrue(remaining > 0 && remaining < Double.MAX_VALUE,
-                    "新怪的剩余行动值是正数且有限");
+                    "a new monster's remaining action value is positive and finite");
             Assertions.assertTrue(battle.queue.getElapsed() >= elapsedBefore,
-                    "进怪不会把时钟拨回去");
+                    "spawning monsters does not wind the clock back");
         }
     }
 
     /**
-     * 没有波次管理器的普通战斗不受影响（P7-3 的行为不变）。
+     * An ordinary battle with no wave manager is unaffected (P7-3's behavior is unchanged).
      */
     @Test
     public void battlesWithoutWavesBehaveAsBefore() {
@@ -272,35 +283,36 @@ public class WaveManagerTest {
     }
 
     /**
-     * 关卡表最多解析一次，重复取用命中缓存。
+     * The stage table is parsed at most once; repeated access hits the cache.
      *
-     * <p>懒加载的护栏（"静态块不解析 stage.json"）在 {@link StageLazyLoadTest} ——
-     * 那边单独一个类，因为本类里别的用例会先把表加载掉。
+     * <p>The lazy-loading guardrail ("the static block does not parse stage.json") is in
+     * {@link StageLazyLoadTest} — that is a separate class because other cases in this class would
+     * load the table first.
      */
     @Test
     public void stageTableIsLoadedAtMostOnceAndCached() {
         Map<Integer, StageBean> first = Constant.stages();
         Map<Integer, StageBean> second = Constant.stages();
 
-        Assertions.assertSame(first, second, "重复取用必须命中同一份缓存，不能重复解析");
+        Assertions.assertSame(first, second, "repeated access must hit the same cache, not re-parse");
         Assertions.assertEquals(1, Constant.stageLoadAttempts(),
-                "stage.json 只解析一次，实际 " + Constant.stageLoadAttempts() + " 次");
+                "stage.json is parsed only once, actually " + Constant.stageLoadAttempts() + " times");
     }
 
     /**
-     * 关卡表里至少有 1 万条关卡（数据完整性 sanity check）。
+     * The stage table has at least 10,000 stages (a data-integrity sanity check).
      */
     @Test
     public void stageTableHasTheWholeDataSet() {
-        Assumptions.assumeFalse(Constant.stages().isEmpty(), "stage.json 未生成");
+        Assumptions.assumeFalse(Constant.stages().isEmpty(), "stage.json has not been generated");
 
         Assertions.assertTrue(Constant.stages().size() > 10_000,
-                "stage.json 应当有上万条关卡，实际 " + Constant.stages().size());
+                "stage.json should have tens of thousands of stages, actual " + Constant.stages().size());
     }
 
     // ==================================================================
 
-    /** 造一个"空敌队 + 波次管理器"的战斗（P7-4 的标准用法）。 */
+    /** Builds a battle with "an empty enemy team + a wave manager" (P7-4's standard usage). */
     private static Battle waveBattle(int stageId) {
         StageBean stage = stage(stageId);
         Battle battle = new Battle(List.of(character("hero", 100)), new ArrayList<>(), new Random(0));
@@ -308,16 +320,16 @@ public class WaveManagerTest {
         return battle;
     }
 
-    /** 取关卡；没有数据就 skip（stage.json 是 generator 产出的，见类注释）。 */
+    /** Fetches a stage; skips if there is no data (stage.json is produced by a generator — see the class docs). */
     private static StageBean stage(int stageId) {
         StageBean stage = Constant.stages().get(stageId);
         Assumptions.assumeFalse(Constant.stages().isEmpty(),
-                "缺少 stage.json（generator 产出），跳过关卡相关断言");
-        Assertions.assertNotNull(stage, "stage.json 里应当有 " + stageId);
+                "missing stage.json (generator output), skipping the stage-related assertions");
+        Assertions.assertNotNull(stage, "stage.json should contain " + stageId);
         return stage;
     }
 
-    /** 按 {@code Monster0..N} 的顺序造一波（模拟 Gson 读出来的 LinkedHashMap）。 */
+    /** Builds one wave in {@code Monster0..N} order (simulating the LinkedHashMap Gson reads). */
     private static Map<String, Integer> wave(int... ids) {
         Map<String, Integer> wave = new LinkedHashMap<>();
         for (int i = 0; i < ids.length; i++) {
@@ -334,6 +346,6 @@ public class WaveManagerTest {
         return battle.queue.getHeap().stream()
                 .filter(s -> s.getCanHit() == enemy)
                 .findFirst()
-                .orElseThrow(() -> new AssertionError(enemy.getName() + " 不在行动条里"));
+                .orElseThrow(() -> new AssertionError(enemy.getName() + " is not in the action bar"));
     }
 }

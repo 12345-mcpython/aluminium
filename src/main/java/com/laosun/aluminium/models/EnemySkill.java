@@ -9,21 +9,26 @@ import com.laosun.aluminium.enums.DamageType;
 import java.util.List;
 
 /**
- * 敌人技能（P5-3）：从 {@code enemy_skills.json} 的数据驱动，不是硬编码。
+ * Enemy skill (P5-3): data-driven from {@code enemy_skills.json}, not hard-coded.
  *
- * <p>与角色技能的区别：它**不走** {@link SkillData}/倍率表（那是角色技能的结构），
- * 而是直接用"攻击力 × 倍率 × 段数"出伤害。所以 {@link #getData()} 返回 {@code null}，
- * {@link #execute} 全自定义 —— 这也是 {@code SkillExecutor} 不该被它复用的原因
- * （角色技能那套削韧/形状分派逻辑对敌人不适用：敌人不打韧性条）。
+ * <p>Difference from character skills: it does **not** go through {@link SkillData}/the multiplier
+ * table (that is the character-skill structure); instead it deals damage directly as
+ * "attack × multiplier × hits". That is why {@link #getData()} returns {@code null} and
+ * {@link #execute} is fully custom — and also why {@code SkillExecutor} must not be reused for it
+ * (the character-skill toughness-reduction/shape-dispatch logic does not apply to enemies: enemies
+ * do not attack the toughness bar).
  *
- * <p>每段独立走 {@link Battle#applyDamage}：**每段独立判定暴击、独立结算**（与角色技能一致）。
+ * <p>Each hit goes through {@link Battle#applyDamage} independently: **each hit rolls crit and
+ * settles on its own** (consistent with character skills).
  *
- * <p>⚠ 倍率的来源见 {@link EnemySkillData}：数据源里没有敌人技能表，这些值是猜的。
+ * <p>⚠ For the origin of the multipliers see {@link EnemySkillData}: the data source has no enemy
+ * skill table, so these values are guesses.
  *
- * @param element    伤害元素（生成时已从数据 / 怪物 {@code stance_type} 解析好，不为 null）
- * @param multiplier 倍率（伤害 base = 攻击力 × multiplier）
- * @param hits       段数（至少 1）
- * @param type       伤害类型
+ * @param element    damage element (already resolved at construction time from the data / the
+ *                   monster's {@code stance_type}, never null)
+ * @param multiplier multiplier (damage base = attack × multiplier)
+ * @param hits       number of hits (at least 1)
+ * @param type       damage type
  */
 public class EnemySkill extends Skill {
 
@@ -59,7 +64,8 @@ public class EnemySkill extends Skill {
     /**
      * {@inheritDoc}
      *
-     * @return 永远 {@code null}：敌人技能不用角色的倍率表，执行逻辑全在 {@link #execute}
+     * @return always {@code null}: enemy skills do not use the character multiplier table; the
+     * execution logic lives entirely in {@link #execute}
      */
     @Override
     public SkillData getData() {
@@ -67,14 +73,15 @@ public class EnemySkill extends Skill {
     }
 
     /**
-     * 对主目标连续打 {@link #hits} 段。
+     * Hits the primary target {@link #hits} times in a row.
      *
-     * <p>只打"主目标"：敌人的多段技能在这里是"同一目标多段"，不做扩散/群攻
-     * （那需要按技能形状分派，留到 P9-2 接真实技能表时再做）。
+     * <p>It only hits the "primary target": a multi-hit enemy skill here means "multiple hits on the
+     * same target", with no splash/AOE (that would need dispatch by skill shape, left for when the
+     * real skill table is wired up in P9-2).
      *
-     * @param battle 进行中的战斗
-     * @param user   施加者（敌人）
-     * @param target 调用方选好的目标列表（只取第一个）
+     * @param battle the battle in progress
+     * @param user   the applier (an enemy)
+     * @param target the target list chosen by the caller (only the first is used)
      */
     @Override
     public void execute(Battle battle, CanHit user, List<? extends CanHit> target) {
@@ -88,7 +95,7 @@ public class EnemySkill extends Skill {
         double base = user.getAttribute(AttributeType.ATTACK).get() * multiplier;
         for (int i = 0; i < hits; i++) {
             if (victim.isDeath()) {
-                break;                               // 中途打死就不再补刀（不鞭尸）
+                break;                               // once killed mid-way, stop hitting (no overkill on a corpse)
             }
             battle.applyDamage(victim, new Damage(user, victim, element, type, base));
         }

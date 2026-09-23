@@ -19,21 +19,22 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * 技能**槽位映射**（P8-2 的核心）：{@code SkillType} → {@code skills.json} 的槽位号。
+ * Skill **slot mapping** (the core of P8-2): {@code SkillType} → the slot number in {@code skills.json}.
  *
- * <p>修之前 {@code Character.Builder.build()} 把每个槽位都写成
- * {@code new DefaultSkill(cid, 1, level)} —— 于是普攻/战技/终结技/天赋**全部**解析到槽位 1，
- * 六个槽位的倍率、削韧、元素、{@code sp_need} 全是普攻的。
+ * <p>Before the fix, {@code Character.Builder.build()} wrote every slot as
+ * {@code new DefaultSkill(cid, 1, level)} — so basic attack / skill / ultimate / talent **all**
+ * resolved to slot 1, and the multipliers, toughness reduction, element and {@code sp_need} of all
+ * six slots were those of the basic attack.
  *
- * <p>为什么这个 bug 一直没被发现：既有的 `SkillExecutorTest` / `SuperBreakTest` 都**自己
- * 构造** `new DefaultSkill(cid, 槽位, ...)`，从不检查 builder 装出来的东西；
- * 而 `EnergyTest` 验的又是 provider 的分派逻辑。所以"角色实际拿到什么技能"这条路没人走过。
- * 这个类就补那一段。
+ * <p>Why this bug went unnoticed for so long: the existing `SkillExecutorTest` / `SuperBreakTest`
+ * both **construct** `new DefaultSkill(cid, slot, ...)` themselves and never check what the builder
+ * assembled; and `EnergyTest` verifies the provider's dispatch logic. So nobody ever walked the path
+ * of "what skill does a character actually get". This class fills that gap.
  */
 public class SkillSlotMappingTest {
     private static final double EPS = 1e-9;
 
-    /** 槽位表本身：1 普攻 / 2 战技 / 3 终结技 / 4 天赋 / 6 地图普攻 / 7 秘技（5 在数据里不存在）。 */
+    /** The slot table itself: 1 basic attack / 2 skill / 3 ultimate / 4 talent / 6 map basic attack / 7 technique (5 does not exist in the data). */
     @Test
     public void slotTableIsTheSingleSourceOfTruth() {
         Assertions.assertEquals(Map.of(
@@ -45,51 +46,53 @@ public class SkillSlotMappingTest {
                         SkillType.TECHNIQUE, 7),
                 Constant.SKILL_SLOT);
 
-        // 召唤物的两个槽位属于忆灵（P9-4），不在角色槽位表里
+        // The summon's two slots belong to the memosprite (P9-4) and are not in the character slot table
         Assertions.assertFalse(Constant.SKILL_SLOT.containsKey(SkillType.SUMMON_SKILL));
         Assertions.assertFalse(Constant.SKILL_SLOT.containsKey(SkillType.SUMMON_TALENT));
 
-        // 常驻 vs 战斗开场附加的分界
+        // The dividing line between intrinsic and attached-at-battle-start
         for (SkillType type : new SkillType[]{SkillType.COMMON, SkillType.SKILL,
                 SkillType.ULTRA, SkillType.TALENT}) {
-            Assertions.assertTrue(type.isIntrinsic(), type + " 应当是常驻技能");
+            Assertions.assertTrue(type.isIntrinsic(), type + " should be an intrinsic skill");
         }
         for (SkillType type : new SkillType[]{SkillType.MAZE, SkillType.TECHNIQUE,
                 SkillType.SUMMON_SKILL, SkillType.SUMMON_TALENT}) {
-            Assertions.assertFalse(type.isIntrinsic(), type + " 不该是常驻技能");
+            Assertions.assertFalse(type.isIntrinsic(), type + " should not be an intrinsic skill");
         }
     }
 
     /**
-     * 地图普攻/秘技**不在造角色时装配**，而在 {@code Battle.startBattle()} 附加。
+     * Map basic attack / technique are **not assembled when the character is created**, but attached
+     * in {@code Battle.startBattle()}.
      *
-     * <p>这是刻意的分层：地图普攻（槽位 6，攻击类型 {@code MazeNormal}）与秘技（槽位 7，
-     * {@code Maze}）是地图上的东西；战斗内普攻是槽位 1 的 {@code Normal}，两者不是一回事。
+     * <p>This is a deliberate layering: the map basic attack (slot 6, attack type {@code MazeNormal})
+     * and the technique (slot 7, {@code Maze}) are things on the map; the in-battle basic attack is
+     * slot 1's {@code Normal}, and the two are not the same thing.
      */
     @Test
     public void mapSkillsAreAttachedAtBattleStartNotAtBuild() {
         Character hero = CharacterFactory.create(1204, 80);
 
-        // 造出来时：没有地图技能
+        // When created: no map skills
         Assertions.assertFalse(hero.getSkills().containsKey(SkillType.MAZE),
-                "角色刚造出来不该有地图普攻");
+                "a freshly created character should not have the map basic attack");
         Assertions.assertFalse(hero.getSkills().containsKey(SkillType.TECHNIQUE),
-                "角色刚造出来不该有秘技");
-        // 常驻的四个都在
+                "a freshly created character should not have the technique");
+        // All four intrinsic ones are present
         for (SkillType type : new SkillType[]{SkillType.COMMON, SkillType.SKILL,
                 SkillType.ULTRA, SkillType.TALENT}) {
-            Assertions.assertTrue(hero.getSkills().containsKey(type), type + " 应当常驻");
+            Assertions.assertTrue(hero.getSkills().containsKey(type), type + " should be intrinsic");
         }
 
-        // 开战后：地图技能被附加，且解析到**自己的槽位**
+        // After the battle starts: map skills are attached, and resolve to **their own slots**
         Battle battle = newBattle(hero);
         for (SkillType type : new SkillType[]{SkillType.MAZE, SkillType.TECHNIQUE}) {
             Skill attached = hero.getSkills().get(type);
-            Assertions.assertNotNull(attached, "开战后应当附加 " + type);
+            Assertions.assertNotNull(attached, "should be attached after the battle starts: " + type);
             int slot = Constant.SKILL_SLOT.get(type);
             var raw = Constant.SKILLS.get(hero.getCid()).get(slot);
             Assertions.assertEquals(raw.attackType(), attached.getData().getSkillType(),
-                    type + " 应当解析到槽位 " + slot);
+                    type + " should resolve to slot " + slot);
         }
         Assertions.assertEquals("MazeNormal", hero.getSkills().get(SkillType.MAZE)
                 .getData().getSkillType());
@@ -97,7 +100,7 @@ public class SkillSlotMappingTest {
                 .getData().getSkillType());
     }
 
-    /** 显式装过的地图技能不被开场覆盖（测试/自定义场景）。 */
+    /** A map skill explicitly installed is not overwritten at battle start (tests / custom scenarios). */
     @Test
     public void explicitlyInstalledMapSkillIsNotOverwritten() {
         Character hero = CharacterFactory.create(1204, 80);
@@ -107,13 +110,14 @@ public class SkillSlotMappingTest {
         newBattle(hero);
 
         Assertions.assertSame(custom, hero.getSkills().get(SkillType.MAZE),
-                "已经有的不该被重新装配");
+                "an existing one should not be re-assembled");
     }
 
     /**
-     * 真实角色：每个槽位拿到**自己的**数据，不再是普攻的。
+     * A real character: each slot gets **its own** data, no longer the basic attack's.
      *
-     * <p>用景元（1204）：普攻单体 0.5 / 战技全体 / 终结技全体 / 天赋弹射。
+     * <p>Using Jing Yuan (1204): basic attack single-target 0.5 / skill blast / ultimate AoE /
+     * talent bounce.
      */
     @Test
     public void eachSlotResolvesItsOwnData() {
@@ -124,21 +128,21 @@ public class SkillSlotMappingTest {
         Skill ultra = jingYuan.getSkills().get(SkillType.ULTRA);
         Skill talent = jingYuan.getSkills().get(SkillType.TALENT);
 
-        // 攻击类型各不相同（修之前四个都是 "Normal"）
+        // The attack types all differ (before the fix all four were "Normal")
         Assertions.assertEquals("Normal", common.getData().getSkillType());
         Assertions.assertEquals("BPSkill", skill.getData().getSkillType());
         Assertions.assertEquals("Ultra", ultra.getData().getSkillType());
-        Assertions.assertNull(talent.getData().getSkillType(), "天赋槽的攻击类型数据里是 null");
+        Assertions.assertNull(talent.getData().getSkillType(), "the talent slot's attack type is null in the data");
     }
 
     /**
-     * 与 {@code Constant.SKILLS} 的原始数据逐字段对齐（P8-2 的验收式）。
+     * Field-by-field alignment with the raw data in {@code Constant.SKILLS} (P8-2's acceptance test).
      */
     @Test
     public void builderDataMatchesTheRawSkillData() {
         int cid = 1204;
         Character jingYuan = CharacterFactory.create(cid, 80);
-        newBattle(jingYuan);                 // 开战以附加地图技能，这样六个槽位都能对
+        newBattle(jingYuan);                 // start a battle to attach the map skills, so all six slots can be compared
 
         for (Map.Entry<SkillType, Integer> entry : Constant.SKILL_SLOT.entrySet()) {
             int slot = entry.getValue();
@@ -146,18 +150,19 @@ public class SkillSlotMappingTest {
             var data = jingYuan.getSkills().get(entry.getKey()).getData();
 
             Assertions.assertEquals(raw.attackType(), data.getSkillType(),
-                    entry.getKey() + " 的攻击类型");
+                    entry.getKey() + "'s attack type");
             Assertions.assertEquals(raw.maxLevel(), data.getMaxLevel(),
-                    entry.getKey() + " 的等级上限");
+                    entry.getKey() + "'s max level");
             Assertions.assertEquals(raw.paramList(), data.getSkills(),
-                    entry.getKey() + " 的参数表");
+                    entry.getKey() + "'s parameter table");
             Assertions.assertEquals(raw.stanceList().single(), data.getStanceList().single(),
-                    entry.getKey() + " 的单体削韧");
+                    entry.getKey() + "'s single-target toughness reduction");
         }
     }
 
     /**
-     * 削韧值也按槽位走：景元普攻单体 30 / 战技全体 30 / 终结技全体 60 / 天赋单体 15。
+     * Toughness reduction values also follow the slot: Jing Yuan's basic attack single-target 30 /
+     * skill AoE 30 / ultimate AoE 60 / talent single-target 15.
      */
     @Test
     public void stanceValuesFollowTheSlot() {
@@ -175,23 +180,24 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * 元素也按槽位走：娜塔莎的战技/终结技是**治疗**（数据里 `element = Unknown` → null），
-     * 而她的普攻是物理伤害。
+     * Element also follows the slot: Natasha's skill/ultimate are **healing** (in the data
+     * `element = Unknown` → null), while her basic attack deals physical damage.
      */
     @Test
     public void nonDamagingSlotsHaveNoElement() {
         Character natasha = CharacterFactory.create(1105, 80);
 
         Assertions.assertNotNull(natasha.getSkills().get(SkillType.COMMON).getData().getElement(),
-                "普攻是物理伤害");
+                "the basic attack deals physical damage");
         Assertions.assertNull(natasha.getSkills().get(SkillType.SKILL).getData().getElement(),
-                "战技是治疗 → 无元素");
+                "the skill is healing → no element");
         Assertions.assertNull(natasha.getSkills().get(SkillType.ULTRA).getData().getElement(),
-                "终结技是治疗 → 无元素");
+                "the ultimate is healing → no element");
     }
 
     /**
-     * 等级上限按槽位不同（普攻 10 / 战技·终结技·天赋 15）——证明"读的是自己槽位的 max_level"。
+     * The max level differs by slot (basic attack 10 / skill · ultimate · talent 15) — proving that
+     * "what is read is its own slot's max_level".
      */
     @Test
     public void maxLevelComesFromTheSlot() {
@@ -203,11 +209,13 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * 全部 93 个角色的**常驻**四槽位都能装配（数据齐全，没有 EMPTY 兜底）。
+     * All 93 characters' four **intrinsic** slots can be assembled (the data is complete, with no
+     * EMPTY fallback).
      *
-     * <p>判据用"参数表非空"：{@code SkillData.EMPTY} 的参数表是空的。
-     * 地图技能（6/7）不在这里查 —— 它们开战后才附加，由
-     * {@link #mapSkillsAreAttachedAtBattleStartNotAtBuild()} 覆盖。
+     * <p>The criterion is "the parameter table is non-empty": {@code SkillData.EMPTY}'s parameter
+     * table is empty.
+     * The map skills (6/7) are not checked here — they are only attached after the battle starts,
+     * and are covered by {@link #mapSkillsAreAttachedAtBattleStartNotAtBuild()}.
      */
     @Test
     public void everyCharacterHasAllIntrinsicSlots() {
@@ -216,15 +224,16 @@ public class SkillSlotMappingTest {
             for (SkillType type : List.of(SkillType.COMMON, SkillType.SKILL,
                     SkillType.ULTRA, SkillType.TALENT)) {
                 Skill skill = c.getSkills().get(type);
-                Assertions.assertNotNull(skill, "cid=" + cid + " 缺 " + type);
+                Assertions.assertNotNull(skill, "cid=" + cid + " is missing " + type);
                 Assertions.assertFalse(skill.getData().getSkills().isEmpty(),
-                        "cid=" + cid + " 的 " + type + " 参数表为空（数据没取到？）");
+                        "cid=" + cid + "'s " + type + " parameter table is empty (data not fetched?)");
             }
         });
     }
 
     /**
-     * 全部 93 个角色的**地图槽位**（6/7）开战后也都能附加且参数非空。
+     * All 93 characters' **map slots** (6/7) can also be attached after the battle starts, with
+     * non-empty parameters.
      */
     @Test
     public void everyCharacterGetsMapSkillsAtBattleStart() {
@@ -233,38 +242,44 @@ public class SkillSlotMappingTest {
             newBattle(c);
             for (SkillType type : List.of(SkillType.MAZE, SkillType.TECHNIQUE)) {
                 Skill skill = c.getSkills().get(type);
-                Assertions.assertNotNull(skill, "cid=" + cid + " 开战后缺 " + type);
+                Assertions.assertNotNull(skill, "cid=" + cid + " is missing " + type + " after the battle starts");
                 Assertions.assertFalse(skill.getData().getSkills().isEmpty(),
-                        "cid=" + cid + " 的 " + type + " 参数表为空");
+                        "cid=" + cid + "'s " + type + " parameter table is empty");
             }
         });
     }
 
     /**
-     * 技能**等级确实接进了伤害**：{@code SkillExecutor} 用 {@code skill.getLevel() - 1} 取参数行。
+     * Skill **level really is wired into damage**: {@code SkillExecutor} takes the parameter row with
+     * {@code skill.getLevel() - 1}.
      *
-     * <p>⚠ 我先前在这里写过"等级还没接进伤害"——**那是错的**，已更正。
-     * 起因：我构造了一个 8 级技能、却断言 {@code getData().getSkills().getFirst()} 是 1.2，
-     * 而 {@code getSkills()} 返回的是**整张**逐级表，取 {@code getFirst()} 当然还是第 1 档。
-     * 我把自己取错行当成了引擎没取行。
+     * <p>⚠ I previously wrote "the level is not wired into damage yet" here — **that was wrong**, and
+     * it has been corrected.
+     * How it came about: I built an level-8 skill but asserted that
+     * {@code getData().getSkills().getFirst()} was 1.2, whereas {@code getSkills()} returns the
+     * **entire** per-level table, so {@code getFirst()} of course still returns tier 1.
+     * I mistook my own wrong row lookup for the engine not looking up a row.
      *
-     * <p>真实调用链：{@code skill.getLevel()} → {@code index = level - 1} → {@code levels.get(index)}。
-     * 端到端见 {@link #skillLevelScalesActualDamage}。
+     * <p>The real call chain: {@code skill.getLevel()} → {@code index = level - 1} →
+     * {@code levels.get(index)}.
+     * For the end-to-end view see {@link #skillLevelScalesActualDamage}.
      */
     @Test
     public void skillLevelSelectsTheParameterRow() {
         Character hero = CharacterFactory.create(1204, 80);
         List<List<Double>> table = hero.getSkills().get(SkillType.COMMON).getData().getSkills();
 
-        Assertions.assertEquals(0.5, table.getFirst().getFirst(), EPS, "第 1 档 = 0.5");
-        Assertions.assertEquals(1.2, table.get(7).getFirst(), EPS, "第 8 档 = 1.2");
+        Assertions.assertEquals(0.5, table.getFirst().getFirst(), EPS, "tier 1 = 0.5");
+        Assertions.assertEquals(1.2, table.get(7).getFirst(), EPS, "tier 8 = 1.2");
         Assertions.assertEquals(table.get(7), table.get(8 - 1), "level 8 → index 7");
     }
 
     /**
-     * 端到端：同一技能 1 级与 8 级打出的伤害之比 = 倍率之比（1.2 / 0.5 = 2.4）。
+     * End to end: the ratio of the damage dealt by the same skill at level 1 vs level 8 = the ratio
+     * of the multipliers (1.2 / 0.5 = 2.4).
      *
-     * <p>这条把"等级接入"钉死 —— 同时覆盖 {@code SkillExecutor} 的取行、倍率取值与伤害管线。
+     * <p>This nails down "level is wired in" — it covers {@code SkillExecutor}'s row lookup, the
+     * multiplier lookup and the damage pipeline at once.
      */
     @Test
     public void skillLevelScalesActualDamage() {
@@ -272,16 +287,18 @@ public class SkillSlotMappingTest {
         double lv8 = damageOfBasicAttack(8);
 
         Assertions.assertEquals(1.2 / 0.5, lv8 / lv1, 1e-6,
-                "8 级 / 1 级的伤害比应等于倍率比 2.4，实际 " + (lv8 / lv1));
-        Assertions.assertTrue(lv1 > 0 && lv8 > lv1, "等级越高伤害越高");
+                "the damage ratio of level 8 / level 1 should equal the multiplier ratio 2.4, actual " + (lv8 / lv1));
+        Assertions.assertTrue(lv1 > 0 && lv8 > lv1, "the higher the level, the higher the damage");
     }
 
     /**
-     * 但**装配出来的角色默认是 1 级技能**：{@code Builder} 的 {@code skillLevel} 初值就是 1，
-     * 要升级得调 {@code skillLevel(type)}（+1）或 {@code setSkillLevel(type, level)}。
+     * But **a character assembled by the factory starts at skill level 1**: {@code Builder}'s
+     * {@code skillLevel} initial value is 1; to level up, call {@code skillLevel(type)} (+1) or
+     * {@code setSkillLevel(type, level)}.
      *
-     * <p>这不是缺陷：技能等级属于 P8 的成长系统（行迹/星魂会加等级），
-     * 本项只负责"槽位对、数据对、等级能生效"。
+     * <p>This is not a defect: skill level belongs to P8's progression system (traces/eidolons add
+     * levels); this item is only responsible for "the slot is right, the data is right, the level
+     * takes effect".
      */
     @Test
     public void factoryCharactersStartAtSkillLevelOne() {
@@ -289,18 +306,18 @@ public class SkillSlotMappingTest {
         for (SkillType type : List.of(SkillType.COMMON, SkillType.SKILL,
                 SkillType.ULTRA, SkillType.TALENT)) {
             Assertions.assertEquals(1, hero.getSkills().get(type).getLevel(),
-                    type + " 的初始技能等级是 1");
+                    type + "'s initial skill level is 1");
         }
 
-        // 提升两级后，实际打出的是第 3 档倍率
+        // After raising it two levels, what is actually used is the tier-3 multiplier
         Character leveled = Character.builder().cid(1204).level(80).isPromote()
                 .skillLevel(SkillType.COMMON).skillLevel(SkillType.COMMON).build();
         Assertions.assertEquals(3, leveled.getSkills().get(SkillType.COMMON).getLevel());
         Assertions.assertEquals(0.7, leveled.getSkills().get(SkillType.COMMON)
-                .getData().getSkills().get(2).getFirst(), EPS, "3 级 → 第 3 档 = 0.7");
+                .getData().getSkills().get(2).getFirst(), EPS, "level 3 → tier 3 = 0.7");
     }
 
-    /** 用指定技能等级打一发普攻，返回对敌人造成的伤害。 */
+    /** Deals one basic attack at the given skill level, returning the damage dealt to the enemy. */
     private static double damageOfBasicAttack(int level) {
         Character hero = CharacterFactory.create(1204, 80);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
@@ -313,7 +330,7 @@ public class SkillSlotMappingTest {
         return 1_000_000 - enemy.getCurrentHp();
     }
 
-    /** 开一场最小战斗（只为触发 {@code startBattle()} 的地图技能附加）。 */
+    /** Starts a minimal battle (only to trigger {@code startBattle()}'s map-skill attachment). */
     private static Battle newBattle(Character hero) {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));

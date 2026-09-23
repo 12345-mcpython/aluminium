@@ -57,74 +57,81 @@ public final class Constant {
     public static final Map<Integer, Map<Integer, Skill>> SKILLS;
 
     /**
-     * 怪物模板基础属性（{@code monster_template_config.json}）：template_id → 基础值。
+     * Monster template base attributes ({@code monster_template_config.json}): template_id → base value.
      */
     public static final Map<Integer, MonsterTemplate> MONSTER_TEMPLATES;
     /**
-     * 怪物实例数据（{@code monster_config.json}）：monster_id → 实例系数 / 弱点 / 抗性。
-     * 装载时已由 {@link #normalizeMonsterConfigs} 补全缺失系数，下游拿到的一定非 null。
+     * Monster instance data ({@code monster_config.json}): monster_id → instance ratios / weakness / resistance.
+     * Missing ratios are already filled in at load time by {@link #normalizeMonsterConfigs}, so downstream code
+     * is guaranteed to get non-null values.
      */
     public static final Map<Integer, MonsterConfig> MONSTER_CONFIGS;
     /**
-     * 等级组系数（{@code hard_level_group.json}）：组号 → 等级 → 系数。
-     * 组号与等级来自关卡（StageConfig）；P2 阶段由调用方显式传入。
+     * Level group ratios ({@code hard_level_group.json}): group number → level → ratio.
+     * The group number and level come from the stage (StageConfig); at the P2 stage they are passed in
+     * explicitly by the caller.
      */
     public static final Map<Integer, Map<Integer, HardLevelGroup>> HARD_LEVEL_GROUPS;
 
     /**
-     * 敌人技能表（{@code enemy_skills.json}，P5-3 自建）：{@code 怪物实例 id → 技能}。
+     * Enemy skill table ({@code enemy_skills.json}, self-built in P5-3): {@code monster instance id → skill}.
      *
-     * <p>⚠ 这张表的**倍率是猜的**（数据源里没有敌人技能表），每条数据带 {@code guessed} 标记。
-     * 见 {@link com.laosun.aluminium.beans.EnemySkillData}。
+     * <p>⚠ The **multipliers in this table are guessed** (the data source has no enemy skill table);
+     * every entry carries a {@code guessed} flag. See
+     * {@link com.laosun.aluminium.beans.EnemySkillData}.
      */
     public static final Map<Integer, EnemySkillData> ENEMY_SKILLS;
 
     /**
-     * 关卡表（{@code stage.json}）：{@code stage_id → }{@link StageBean}。**懒加载**。
+     * Stage table ({@code stage.json}): {@code stage_id → }{@link StageBean}. **Lazily loaded**.
      *
-     * <p>为什么不像其它数据表那样塞进静态块：{@code stage.json} 有 9 MB / 约 2.9 万条关卡，
-     * 比其它所有数据加起来还大，而绝大多数测试和 demo 根本不碰关卡。
-     * 放进静态块等于让每次 {@code Constant} 初始化都多付 ~35 MB 堆 + 几十毫秒。
+     * <p>Why it is not shoved into the static block like the other data tables: {@code stage.json} is
+     * 9 MB / roughly 29,000 stages, larger than all the other data put together, and the vast majority of
+     * tests and demos never touch stages at all. Putting it in the static block would mean paying
+     * ~35 MB of heap + tens of milliseconds on **every** {@code Constant} initialization.
      *
-     * <p>⚠ 与其它数据表的第二点差别：{@code stage.json} 缺失时这里返回**空表**而不是抛异常。
-     * 它只服务关卡驱动（P7-4/P7-5），而 `Constant` 的静态块是"碰一下就整个测试套件一起挂"
-     * 的地方 —— 一个可选功能不该把全套测试拖下水。取不到关卡时由调用方
-     * （{@code StageFactory.load}）给出自解释的报错。
+     * <p>⚠ The second difference from the other data tables: when {@code stage.json} is missing this
+     * returns an **empty table** instead of throwing. It only serves stage-driven code (P7-4/P7-5), and
+     * the static block of `Constant` is the place where "one touch brings down the entire test suite" —
+     * an optional feature must not drag the whole suite down with it. When the stages cannot be loaded,
+     * the caller ({@code StageFactory.load}) produces a self-explanatory error.
      *
-     * @return 关卡表；数据文件缺失时为空表
+     * @return the stage table; an empty table when the data file is missing
      */
     public static Map<Integer, StageBean> stages() {
         return StageHolder.LOADED;
     }
 
     /**
-     * 关卡表被**解析过几次**（0 或 1）—— 仅供测试观测懒加载（P7-4）。
+     * How many times the stage table has been **parsed** (0 or 1) — for tests to observe lazy loading only (P7-4).
      *
-     * <p>为什么需要它：Java 没有公开 API 能查询"某个类是否已初始化"而不触发初始化，
-     * 所以"没人调 {@link #stages()} 就不该读 stage.json"这件事在测试里需要一个可观测点。
-     * 计入的是**解析尝试**（文件缺失导致的失败也算）—— 那正是要推迟的工作。
+     * <p>Why it is needed: Java exposes no public API to ask "has this class been initialized" without
+     * triggering initialization, so the statement "nobody calls {@link #stages()} ⇒ stage.json must not be
+     * read" needs an observable point in tests. What is counted is the **parse attempt** (a failure caused by
+     * a missing file counts too) — that is exactly the work being deferred.
      *
-     * <p>刻意放在**独立的类**里，不放进 {@link StageHolder}：{@code StageHolder} 的静态字段
-     * 按声明顺序初始化，把计数器放在被调用者后面会读到默认值 0。
+     * <p>Deliberately placed in a **separate class** rather than inside {@link StageHolder}: the static fields
+     * of {@code StageHolder} are initialized in declaration order, so putting the counter after the callee
+     * would read the default value 0.
      */
     public static int stageLoadAttempts() {
         return StageProbe.LOAD_ATTEMPTS.get();
     }
 
     /**
-     * 见 {@link #stageLoadAttempts()}：与 {@link StageHolder} 分开的计数器，
-     * 避免静态字段初始化顺序把计数读成 0。
+     * See {@link #stageLoadAttempts()}: a counter separate from {@link StageHolder}, so that static field
+     * initialization order cannot read the count as 0.
      */
     private static final class StageProbe {
         private static final AtomicInteger LOAD_ATTEMPTS = new AtomicInteger();
     }
 
     /**
-     * 关卡表的懒加载载体。
+     * The lazy-loading carrier for the stage table.
      *
-     * <p>关键在 {@code LOADED} 是 {@link StageHolder} 的静态字段：**嵌套类在首次被引用时**
-     * 才初始化，所以 {@code Constant} 的静态块跑完也不会解析 {@code stage.json}，
-     * 直到有人真的调 {@link #stages()}。
+     * <p>The key is that {@code LOADED} is a static field of {@link StageHolder}: **a nested class is
+     * initialized only when it is first referenced**, so the static block of {@code Constant} finishes
+     * without parsing {@code stage.json}, until somebody actually calls {@link #stages()}.
      */
     private static final class StageHolder {
         private static final Map<Integer, StageBean> LOADED = load();
@@ -136,7 +143,7 @@ public final class Constant {
                         new TypeToken<Map<Integer, StageBean>>() {
                         }.getType()));
             } catch (IllegalStateException e) {
-                // 数据没生成 → 空表。真要用关卡的人会在 StageFactory.load 拿到明确的报错。
+                // Data was not generated → empty table. Anyone who really needs stages gets a clear error in StageFactory.load.
                 return Map.of();
 
 
@@ -146,20 +153,23 @@ public final class Constant {
 
 
     /**
-     * {@link SkillType} → {@code skills.json} 里的**技能槽位号**（P8-2）。
+     * {@link SkillType} → the **skill slot number** in {@code skills.json} (P8-2).
      *
-     * <p>数据的槽位约定：<b>1 普攻 / 2 战技 / 3 终结技 / 4 天赋 / 5（无）/ 6 地图普攻 / 7 秘技</b>，
-     * 且 {@code skill_id = 角色id × 100 + 槽位}（638 条技能**全部**满足，已核对）。
+     * <p>The slot convention in the data: <b>1 basic attack / 2 skill / 3 ultimate / 4 talent / 5 (none) /
+     * 6 overworld basic attack / 7 technique</b>, and {@code skill_id = character id × 100 + slot}
+     * (all 638 skills satisfy this; verified).
      *
-     * <p>⚠ 槽位 5 在数据里不存在（93 个角色的技能集里都没有），所以这里也没有对应项。
+     * <p>⚠ Slot 5 does not exist in the data (none of the 93 characters' skill sets has one), so there is no
+     * entry for it here either.
      *
-     * <p>⚠ {@code MAZE} / {@code TECHNIQUE} 虽然是角色自己的技能，但**不在造角色时装**
-     * （见 {@link SkillType#isIntrinsic()}）：它们是地图技能，由
-     * {@code Battle.startBattle()} 在开场附加。这张表被两处共同使用。
+     * <p>⚠ Although {@code MAZE} / {@code TECHNIQUE} are the character's own skills, they are **not equipped
+     * when building the character** (see {@link SkillType#isIntrinsic()}): they are overworld skills, attached
+     * at battle start by {@code Battle.startBattle()}. This table is used by both places.
      *
-     * <p>⚠ 这张表必须**只有一份**：修之前 {@code Character.Builder.build()} 把每个槽位
-     * 都写成 {@code new DefaultSkill(cid, 1, level)}，于是普攻/战技/终结技/天赋**全部**解析到槽位 1，
-     * 后果是六个槽位的倍率、削韧、元素、{@code sp_need} 全是普攻的。
+     * <p>⚠ This table **must exist in exactly one copy**: before the fix, {@code Character.Builder.build()}
+     * wrote {@code new DefaultSkill(cid, 1, level)} for every slot, so basic attack / skill / ultimate / talent
+     * **all** resolved to slot 1; the consequence was that all six slots had the multipliers, toughness
+     * reduction, element and {@code sp_need} of the basic attack.
      */
     public static final Map<SkillType, Integer> SKILL_SLOT = Map.of(
             SkillType.COMMON, 1,
@@ -182,15 +192,15 @@ public final class Constant {
     );
 
     /**
-     * Upper bound of the vulnerability zone multiplier (易伤区系数上限).
+     * Upper bound of the vulnerability zone (易伤区) multiplier.
      */
     public static final double VULNERABLE_CAP = 3.5;
     /**
-     * Lower bound of the damage-reduction zone multiplier (减伤区系数下限).
+     * Lower bound of the damage-reduction zone (减伤区) multiplier.
      */
     public static final double REDUCTION_MIN = 0.01;
     /**
-     * Lower bound of the weakness zone multiplier (虚弱区系数下限).
+     * Lower bound of the weakness zone (虚弱区) multiplier.
      */
     public static final double WEAKNESS_MIN = 0.2;
     /**
@@ -215,131 +225,153 @@ public final class Constant {
     public static final boolean TRUE_DMG_SKIP_ZONES = true;
 
     /**
-     * 常规普攻的回能（P3 兜底值）。
+     * Regular basic-attack energy gain (P3 fallback value).
      *
-     * <p>取自 tbgd {@code AvatarSkillConfig.SPBase} 的常规档（ROADMAP P3-0 口径 2）：
-     * 普攻 20 / 战技 30 / 终结技 5 是全角色通用值，**多段（弹射）技能的数据是「每段值」**
-     * （艾丝妲/桑博/那刻夏/同谐开拓者 6×5、瓦尔特 10×3），总量仍是 30，别按段数再乘一次。
-     * P3-4 把技能数据落库后，这里只作为「没有技能数据时」的兜底。
+     * <p>Taken from the regular tier of tbgd {@code AvatarSkillConfig.SPBase} (ROADMAP P3-0 definition 2):
+     * basic attack 20 / skill 30 / ultimate 5 are universal values for all characters, and **the data for
+     * multi-hit (bouncing) skills is the "per-hit value"** (Asta / Sampo / Anaxa / Harmony Trailblazer 6×5,
+     * Welt 10×3); the total is still 30, do not multiply by the number of hits again.
+     * After P3-4 puts skill data into the database, this only serves as the fallback for "when there is no
+     * skill data".
      */
     public static final double ENERGY_GAIN_BASIC = 20;
     /**
-     * 常规战技的回能（P3 兜底值）。见 {@link #ENERGY_GAIN_BASIC}。
+     * Regular skill energy gain (P3 fallback value). See {@link #ENERGY_GAIN_BASIC}.
      */
     public static final double ENERGY_GAIN_SKILL = 30;
     /**
-     * 常规终结技的回能（P3 兜底值）。终结技一律 5（饮月 3 段、米沙多段、银枝弹射 6 次都是 5），
-     * 不做段数乘算；释放时先清零再回这 5 点。
+     * Regular ultimate energy gain (P3 fallback value). Ultimates are always 5 (Dan Heng • Imbibitor Lunae
+     * has 3 hits, Misha has multiple hits, Argenti bounces 6 times — all 5), with no multiplication by hit
+     * count; on cast the gauge is zeroed first and then these 5 points are gained.
      */
     public static final double ENERGY_GAIN_ULTRA = 5;
     /**
-     * 受击回能基准（P3）。文档没给直接数值，由「娜塔莎星魂4 受到攻击后**额外**恢复 5 点」、
-     * 「云璃受到攻击后**额外**恢复 15 点」反推存在基准值 10；等 P9 用数据校准。
+     * Baseline energy gain on being hit (P3). The document gives no direct number; it is inferred backwards
+     * from "Natasha E4 recovers **an extra** 5 points after being attacked" and "Yunli recovers **an extra**
+     * 15 points after being attacked" that a baseline value of 10 exists; to be calibrated with data in P9.
      */
     public static final double ENERGY_GAIN_HIT = 10;
     /**
-     * 击杀回能基准（P3，待校准）。文档里只以「额外恢复」形式出现。
+     * Baseline energy gain on kill (P3, pending calibration). It only ever appears in the documents in the
+     * form "extra recovery".
      */
     public static final double ENERGY_GAIN_KILL = 5;
     /**
-     * 击破回能基准（P3，待校准）。P4-4 击破时调用。
+     * Baseline energy gain on weakness break (P3, pending calibration). Called on weakness break in P4-4.
      */
     public static final double ENERGY_GAIN_BREAK = 5;
 
     /**
-     * 战技点上限（P8-4）：**全队共享**的一个池子，不是每个角色各有一条。
+     * Skill point (SP) cap (P8-4): **one pool shared by the whole team**, not one bar per character.
      *
-     * <p>数值来自游戏规则而非数据表 —— {@code skills.json} 里**没有**战技点字段，
-     * 实测 638 条技能中普攻 122 条、战技 109 条的 {@code sp_need} **全是 null**
-     * （有值的 99 条全是终结技，那是开大能量门槛，见 §9.4）。
-     * 所以战技点只能来自规则：上限 5、开局 3、普攻 +1、战技 -1。
+     * <p>The value comes from the game rules rather than a data table — {@code skills.json} has **no**
+     * skill point field, and of the 638 skills measured, the {@code sp_need} of all 122 basic attacks and all
+     * 109 skills is **null** (the 99 entries that do have a value are all ultimates, which is the ultimate
+     * energy threshold, see §9.4). So skill points can only come from the rules: cap 5, 3 at the start,
+     * +1 per basic attack, -1 per skill.
      *
-     * <p>⚠ <b>上限不是恒定 5</b>：花火天赋「上限额外 +2」、光锥「每有 1 名欢愉命途角色 +1」，
-     * 甚至有光锥的触发条件是「上限 ≥ 6」。引擎目前**没有**"改队伍级资源上限"的口子 ——
-     * 已登记为 {@code DOC_VS_CODE.md} §F 的 <b>F-1</b>，等 P8-7 前后处理。
+     * <p>⚠ <b>The cap is not always 5</b>: Sparkle's talent "cap +2" and a light cone's "for each character
+     * on the Path of Elation +1", and some light cones even trigger on "cap ≥ 6". The engine currently has
+     * **no** hook for "changing a team-level resource cap" — registered as <b>F-1</b> in
+     * {@code DOC_VS_CODE.md} §F, to be handled around P8-7.
      */
     public static final int SKILL_POINT_MAX = 5;
 
     /**
-     * 开局战技点（P8-4）。见 {@link #SKILL_POINT_MAX}。
+     * Skill points at the start of battle (P8-4). See {@link #SKILL_POINT_MAX}.
      *
-     * <p>⚠ <b>开局也不是恒定 3</b>：{@code RELICS.md} 过客 4 件套「战斗开始时立即为我方
-     * 恢复 1 个战技点」→ 开局 4（两个角色穿就是 5）。根因是**遗器套装效果整体没接**
-     * （{@code relic_sets.json} 连装载都没装载）—— 已登记为 §F 的 <b>F-2</b>。
+     * <p>⚠ <b>The start value is not always 3 either</b>: {@code RELICS.md} gives the 4-piece Passerby set
+     * "at the start of battle immediately recover 1 skill point for our side" → start at 4 (5 if two
+     * characters wear it). The root cause is that **relic set effects are not wired up at all**
+     * ({@code relic_sets.json} is not even loaded) — registered as <b>F-2</b> in §F.
      */
     public static final int SKILL_POINT_START = 3;
 
     /**
-     * 一次普攻恢复的战技点（P8-4）。见 {@link #SKILL_POINT_MAX}。
+     * Skill points recovered by one basic attack (P8-4). See {@link #SKILL_POINT_MAX}.
      */
     public static final int SKILL_POINT_GAIN_BASIC = 1;
 
     /**
-     * 击破基数表：等级 → 基数（P4-3）。**数据文件里是 10 倍值**，用的时候要 {@code /10}
-     * （80 级 = 3767.5535 → 376.75535）。
+     * Weakness break base value table: level → base value (P4-3). **The values in the data file are scaled
+     * by 10×**, so use them with {@code /10} (level 80 = 3767.5535 → 376.75535).
      *
-     * <p>见 {@code models/BreakDamageCalculator} 的单位说明：本项目削韧值统一用「点」刻度。
+     * <p>See the unit note in {@code models/BreakDamageCalculator}: this project uniformly uses the "point"
+     * scale for toughness reduction values.
      */
     public static final Map<Integer, Double> BREAKING_RATE;
 
     /**
-     * 击破推条比例（P4-4）：击破瞬间把目标行动条往后推 25%（单位 = 该目标的行动周期）。
+     * Weakness break delay ratio (P4-4): at the instant of the break, push the target's action bar back by
+     * 25% (unit = that target's own action period).
      */
     public static final double BREAK_DELAY_RATIO = 0.25;
 
     /**
-     * 击破持续回合数（P4-4）：敌人被击破后跳过这么多个自己的回合，然后韧性回满。
+     * Weakness break duration in turns (P4-4): after an enemy is broken it skips this many of its own turns,
+     * then toughness is restored to full.
      */
     public static final int BROKEN_REMAIN_TURNS = 2;
 
     /**
-     * 超击破独立增伤（P4-6）：{@code 1 + SUPER_BREAK_BOOST} 乘进超击破伤害。
+     * Super break independent DMG boost (P4-6): {@code 1 + SUPER_BREAK_BOOST} is multiplied into super break
+     * damage.
      *
-     * <p>与常规增伤区**无关**——超击破不吃属性/攻击类型增伤（由 {@code DamageType.SUPER_BREAK}
-     * 的 {@code isBoostable() == false} 挡掉），所以它是一个**独立乘区**，只能从这里取。
+     * <p>It is **unrelated** to the regular DMG boost zone — super break does not take elemental / attack-type
+     * DMG boosts (blocked by {@code DamageType.SUPER_BREAK}'s {@code isBoostable() == false}), so it is an
+     * **independent damage zone** and can only be read from here.
      *
-     * <p>**示例值，TODO data**：文档只写"2.2 版本仅开拓者·同谐提供"（其行迹按场上敌人数给
-     * 20%~60%），没有可查的数值表，先用 0.4 占位。
+     * <p>**Example value, TODO data**: the document only says "in version 2.2 only Harmony Trailblazer
+     * provides it" (their traces give 20%~60% depending on the number of enemies on the field), and there is
+     * no lookup table available, so 0.4 is used as a placeholder.
      */
     public static final double SUPER_BREAK_BOOST = 0.4;
 
     /**
-     * 击破 DOT 每次结算的基础伤害 = 击破基数 × 本比例（**示例值，TODO data**：
-     * HSR.md §2 只写"基础倍率由等级与击破特攻决定（查数值表）"，逐元素倍率还没拿到）。
+     * Base damage of one weakness break DOT tick = break base value × this ratio (**example value, TODO data**:
+     * HSR.md §2 only says "the base multiplier is determined by level and break effect (look it up in the value
+     * table)" — the per-element multipliers have not been obtained yet).
      */
     public static final double DOT_RATIO = 0.5;
 
     /**
-     * 击破 DOT 持续结算次数（**示例值，TODO data**）。
+     * Number of weakness break DOT ticks (**example value, TODO data**).
      */
     public static final int DOT_TURNS = 3;
 
     /**
-     * 会附带持续伤害的击破元素：火=灼烧、雷=触电、物理=裂伤、风=风化（GLOSSARY_EXTRA 10000012）。
-     * 冰=冻结、量子=纠缠、虚数=禁锢，属控制类击破效果 → P10-1 统一成表。
+     * Break elements that carry a damage-over-time effect: fire = burn, lightning = shock, physical = bleed,
+     * wind = wind shear (GLOSSARY_EXTRA 10000012).
+     * Ice = freeze, quantum = entanglement, imaginary = imprisonment, which are control-type break effects →
+     * to be consolidated into a table in P10-1.
      */
     public static final Set<DamageElement> DOT_ELEMENTS =
             EnumSet.of(DamageElement.FIRE, DamageElement.THUNDER, DamageElement.PHYSICAL, DamageElement.WIND);
 
     /**
-     * 一轮的行动值（P7-1）：后续每轮 **100**。
+     * Action value of one round (P7-1): **100** for every round after that.
      *
-     * <p>本项目里"行动值（Action Value, AV）"是**时间量纲**：速度 100 的单位一个周期走
-     * 100 行动值，所以 {@link com.laosun.aluminium.Queue#move()} 推进的 {@code elapsed}
-     * 就是累计行动值，{@link com.laosun.aluminium.Queue#getRound()} 直接拿它分轮。
+     * <p>In this project "action value (AV)" is a **time dimension**: a unit with speed 100 covers
+     * 100 action value in one period, so the {@code elapsed} advanced by
+     * {@link com.laosun.aluminium.Queue#move()} is accumulated action value, and
+     * {@link com.laosun.aluminium.Queue#getRound()} splits it into rounds directly.
      */
     public static final double ROUND_ACTION_VALUE = 100;
 
     /**
-     * 首轮行动值倍率（P7-1）：首轮总行动值 **150**，之后每轮 **100**。
+     * First-round action value multiplier (P7-1): the first round totals **150** action value, every round
+     * after that **100**.
      *
-     * <p>所以速度 100 的单位首轮要等 150 才动，第二圈起每 100 动一次；速度 200 的单位
-     * 首轮等 75。这不是"首轮整体延后"，而是每个单位的**第一个周期**被拉长 1.5 倍 ——
-     * 首轮里高速单位能多动几次（速度 240 的周期 41.67，首轮 150 之内能动 3 次）。
+     * <p>So a unit with speed 100 has to wait 150 to act in the first round, then acts every 100 from the
+     * second lap on; a unit with speed 200 waits 75 in the first round. This is not "the whole first round is
+     * delayed" but rather each unit's **first period** being stretched 1.5× — in the first round fast units
+     * can act more often (a speed-240 unit has a period of 41.67 and can act 3 times within the first round's
+     * 150).
      *
-     * <p>⚠ 只有 {@link com.laosun.aluminium.Queue#initialize()}（战斗开场）施加这个系数；
-     * {@code setTopZero()} / {@code addCombatant()} 之后都按正常周期排队。
-     * 中途变速时靠 {@link com.laosun.aluminium.models.Signal#isFirstRound()} 记账保留它。
+     * <p>⚠ Only {@link com.laosun.aluminium.Queue#initialize()} (battle start) applies this multiplier;
+     * after {@code setTopZero()} / {@code addCombatant()} everything is queued with the normal period.
+     * When speed changes mid-battle it is preserved by accounting through
+     * {@link com.laosun.aluminium.models.Signal#isFirstRound()}.
      */
     public static final double FIRST_ROUND_MULTIPLIER = 1.5;
 
@@ -367,25 +399,28 @@ public final class Constant {
                 }.getType()));
         BREAKING_RATE = JSONReader.fromJSON("breaking_rate.json", new TypeToken<Map<Integer, Double>>() {
         }.getType());
-        // enemy_skills.json 顶层是 { "_comment": [...], "skills": {怪物id: {...}} }，
-        // 用一个内联 record 只取 skills（Gson 会忽略未声明的 _comment）。
+        // The top level of enemy_skills.json is { "_comment": [...], "skills": {monster id: {...}} };
+        // use an inline record to take only skills (Gson ignores the undeclared _comment).
         EnemySkillsFile enemySkills = JSONReader.fromJSON("enemy_skills.json", EnemySkillsFile.class);
         ENEMY_SKILLS = Map.copyOf(enemySkills.skills());
     }
 
     /**
-     * {@code enemy_skills.json} 的顶层结构（只为跳过 {@code _comment}）。
+     * The top-level structure of {@code enemy_skills.json} (only to skip {@code _comment}).
      */
     private record EnemySkillsFile(Map<Integer, EnemySkillData> skills) {
     }
 
     /**
-     * 补全实例数据里缺的系数，让下游（EnemyScaler）永远拿到确定值：
+     * Fill in the ratios missing from the instance data so that downstream code (EnemyScaler) always gets a
+     * definite value:
      * <ul>
-     *   <li><b>攻击修正</b>：本数据没导出 tbgd 的 {@code AttackModifyRatio}（2649 个怪里 444 个 ≠ 1），
-     *   从补丁文件 {@code monster_attack_modify_ratio.json} 合并；表里没有的按 1.0。</li>
-     *   <li>其余系数缺失时按 1.0（游戏语义 = 不修正）。</li>
-     *   <li>{@code stance_weak} 缺失（有 102 个怪的条目没有这一项）→ 空列表；{@code damage_resistance} → 空表。</li>
+     *   <li><b>Attack modifier</b>: this data set does not export tbgd's {@code AttackModifyRatio}
+     *   (444 of the 2649 monsters are ≠ 1), so it is merged from the patch file
+     *   {@code monster_attack_modify_ratio.json}; anything not in the table is 1.0.</li>
+     *   <li>Other missing ratios are 1.0 (game semantics = no modification).</li>
+     *   <li>{@code stance_weak} missing (102 monster entries do not have this item) → empty list;
+     *   {@code damage_resistance} → empty map.</li>
      * </ul>
      */
     private static Map<Integer, MonsterConfig> normalizeMonsterConfigs(Map<Integer, MonsterConfig> raw,
@@ -409,7 +444,7 @@ public final class Constant {
     }
 
     /**
-     * 缺失的修正系数按 1.0（不修正）。
+     * A missing modifier ratio is 1.0 (no modification).
      */
     private static double orOne(Double value) {
         return value == null ? 1.0 : value;

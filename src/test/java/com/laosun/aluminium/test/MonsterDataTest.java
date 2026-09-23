@@ -13,9 +13,10 @@ import java.util.Map;
 /**
  * P2-1 acceptance: the three monster data files load with the right shapes and values.
  *
- * <p>锚点数据（与 `E:\code\blog\hsr\HSR.md` §1.2 / 会话里的实测对拍一致）：
- * 冰锋 1002011 模板 `18 / 210 / 69.75 / 100 / 60`、弱火+雷、抗物理/冰/风/量子/虚数 0.2；
- * 等级组 1·Lv90 = `36.821384 / 5.238095 / 236.53471 / 1.32 / 1 / 0.32 / 0.1`。
+ * <p>Anchor data (matching `E:\code\blog\hsr\HSR.md` §1.2 / the measurements taken in the session):
+ * 冰锋 1002011 template `18 / 210 / 69.75 / 100 / 60`, weak to fire+lightning, resistance to
+ * physical/ice/wind/quantum/imaginary 0.2;
+ * level group 1·Lv90 = `36.821384 / 5.238095 / 236.53471 / 1.32 / 1 / 0.32 / 0.1`.
  */
 public class MonsterDataTest {
     private static final double EPS = 1e-9;
@@ -68,18 +69,18 @@ public class MonsterDataTest {
 
     @Test
     public void hpRatioUsesHealthModifyRatioAndNotTheGhostField() {
-        // 802501003 是会话里对拍过的绝境实例：真实血量系数 1.979167；
-        // 同一个条目里的 hp_modify_ratio 是幽灵字段（恒 1），用它血量会差一倍。
+        // 802501003 is a 绝境 instance measured in the session: the real HP ratio is 1.979167;
+        // the hp_modify_ratio in the same entry is a ghost field (always 1), using it would double the HP.
         Assertions.assertEquals(1.979167, Constant.MONSTER_CONFIGS.get(802501003).hpRatio(), EPS);
-        // 100201101 更极端：真实 0.266667，幽灵字段 1
+        // 100201101 is even more extreme: the real value is 0.266667, the ghost field says 1
         Assertions.assertEquals(0.266667, Constant.MONSTER_CONFIGS.get(100201101).hpRatio(), EPS);
     }
 
     @Test
     public void attackRatioIsPatchedFromTbgd() {
-        // 本数据没导出 tbgd 的 AttackModifyRatio → 由补丁文件补上（100201506 = 0.33333302）
+        // this data set did not export tbgd's AttackModifyRatio → it is filled in by the patch file (100201506 = 0.33333302)
         Assertions.assertEquals(0.33333302, Constant.MONSTER_CONFIGS.get(100201506).attackRatio(), 1e-8);
-        // 没被修正的怪取 1.0
+        // monsters that were not patched take 1.0
         Assertions.assertEquals(1.0, Constant.MONSTER_CONFIGS.get(1002011).attackRatio(), EPS);
     }
 
@@ -100,7 +101,7 @@ public class MonsterDataTest {
     public void highLevelGroupRatiosLoad() {
         HardLevelGroup level120 = Constant.HARD_LEVEL_GROUPS.get(3).get(120);
 
-        // 会话验证过的绝境等级组（组3·Lv120）：血量系数 1938.7634
+        // a 绝境 level group verified in the session (group 3·Lv120): HP ratio 1938.7634
         Assertions.assertEquals(1938.7634, level120.health(), EPS);
         Assertions.assertEquals(49.879406, level120.attack(), EPS);
         Assertions.assertEquals(5.714286, level120.defence(), EPS);

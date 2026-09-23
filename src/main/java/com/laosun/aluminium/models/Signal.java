@@ -37,48 +37,56 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     private CanHit canHit;
     /**
-     * 同行动值时的**排期序号**（P7 修正 E4）：越小越先行动。
+     * The **scheduling sequence number** used to break equal action values (P7 fix E4): the smaller it is, the
+     * earlier the combatant acts.
      *
-     * <p>为什么需要它：{@link #nextActionTime} 相等时 {@code PriorityQueue} 的顺序是**未定义**的
-     * （它只保证堆顶是最小元素，不保证相等元素的先后）。于是"两个同速单位谁先出手"会变成
-     * 碰运气，而 {@link com.laosun.aluminium.Queue#snapshot()} 又是对堆数组做稳定排序 ——
-     * <b>显示出来的顺序可能不等于实际出手顺序</b>。
+     * <p>Why it is needed: when {@link #nextActionTime} ties, the order of a {@code PriorityQueue} is **undefined**
+     * (it only guarantees the heap top is the smallest element, not the relative order of equal elements). So "which
+     * of two equal-speed units acts first" turns into a coin flip, and since
+     * {@link com.laosun.aluminium.Queue#snapshot()} does a stable sort over the heap array —
+     * <b>the displayed order may not equal the actual acting order</b>.
      *
-     * <p>裁决语义："**先被排进队的先行动**"：{@link #markScheduled()} 在每次"排期"
-     * （入场建号 / 行动后重新预约 / {@code resetSignal}）时取一个全局递增号。
+     * <p>The tie-break semantics: "**whoever was enqueued first acts first**": {@link #markScheduled()} takes a
+     * globally increasing number on every "scheduling" (creating a number on entry / re-booking after acting /
+     * {@code resetSignal}).
      *
-     * <p>⚠ 行动条操纵（推条 / 拉条 / 按比例拉条）**不**重新取号，只改 {@link #nextActionTime}：
-     * 把它们也算成"重新排期"会导致"谁刚被拉条谁就先手"这种反直觉结果。
-     * 所以把 A 拉到和 B 同一时刻时，B 仍然先动（B 的排期更早）。
+     * <p>⚠ Action bar manipulation (push-back / pull-forward / proportional pull-forward) does **not** take a new
+     * number, it only changes {@link #nextActionTime}: counting those as "re-scheduling" would produce the
+     * counter-intuitive result that "whoever was just pulled forward gets the initiative".
+     * So when A is pulled to the same instant as B, B still acts first (B was scheduled earlier).
      */
     private long sequence;
     /**
-     * 全局递增的排期序号发号器。
+     * The globally increasing scheduling-sequence number generator.
      *
-     * <p>{@code static} 是刻意的：序号只需要在同一场战斗**内部**可比，
-     * 而同一 JVM 里可能连续跑很多场战斗（测试尤其如此），共享一个发号器最简单也最不容易出错。
+     * <p>{@code static} is deliberate: sequence numbers only need to be comparable **within** the same battle,
+     * and many battles may run back to back in the same JVM (in tests especially), so sharing one generator is the
+     * simplest approach and the least likely to go wrong.
      */
     private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
     /**
-     * 距离下一个行动点还剩多少**行动值**（P7 修正 E2）。
+     * How much **action value** is left until the next action point (P7 fix E2).
      *
-     * <p>为什么必须单独记账、而且**必须用"距离"而不是"百分比"**：
-     * 首轮（P7-1）的周期被拉长到 1.5 倍，于是"当前周期"的分母在首轮和之后是不同的
-     * （150 vs 100）。一旦把进度记成百分比，速度变化时就没法换算 —— 百分比乘以新周期
-     * 会同时改掉两个东西。而<b>距离是速度无关的</b>：行动条上"还差多少格"不随速度变化，
-     * 速度只决定"每单位时间走几格"。所以：
+     * <p>Why it has to be tracked separately, and **must be a "distance" rather than a "percentage"**:
+     * the first round (P7-1) stretches the cycle to 1.5×, so the denominator of the "current cycle" differs
+     * between the first round and the rounds after it (150 vs 100). Once progress is recorded as a percentage it
+     * can no longer be converted when the speed changes — a percentage times the new cycle would change two things
+     * at once. A <b>distance, however, is speed-independent</b>: "how many squares are left" on the action bar does
+     * not change with speed, speed only decides "how many squares are covered per unit of time". Therefore:
      *
      * <ul>
-     *   <li>速度变化 → 距离不变，按新速度把剩余距离换算成时间；</li>
-     *   <li>时间推进 → 距离减少，减少量就是推进的时间。</li>
+     *   <li>speed change → the distance stays, and the remaining distance is converted to time at the new speed;</li>
+     *   <li>time advance → the distance shrinks, by exactly the amount of time advanced.</li>
      * </ul>
      *
-     * <p>首轮不变式：{@code nextActionTime - elapsed == remaining} 在 {@code markFirstRound()}
-     * 时成立（都是 {@code 1.5 × cycleTime()}），且此后一直成立 —— 这正是 E2 修复要保住的东西。
+     * <p>First-round invariant: {@code nextActionTime - elapsed == remaining} holds when
+     * {@code markFirstRound()} is called (both are {@code 1.5 × cycleTime()}), and keeps holding from then on —
+     * this is exactly what the E2 fix has to preserve.
      */
     private double remaining = 0;
     /**
-     * 这个信号是否还没走完首轮排期（P7-1）：首轮的一次预约要乘 ×1.5。
+     * Whether this signal has not yet finished its first-round scheduling (P7-1): the first-round booking is
+     * multiplied by ×1.5.
      */
     private boolean firstRound = false;
 
@@ -105,54 +113,58 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * 速度变化后立刻重算行动时间（P7 修正 E2）。
+     * Recomputes the action time immediately after a speed change (P7 fix E2).
      *
      * <pre>
-     *   progress  = clamp(remaining / 旧的一次预约长度, 0, 1)   // 旧预约长度含首轮系数
-     *   newLength = 新周期 × (首轮 ? 1.5 : 1)
+     *   progress  = clamp(remaining / old booking length, 0, 1)   // the old booking length includes the first-round factor
+     *   newLength = new cycle × (first round ? 1.5 : 1)
      *   remaining = progress × newLength
      *   next      = elapsed + remaining
      * </pre>
      *
-     * <p>语义：<b>已经走掉的那部分进度不变，没走完的那部分按新速度重算</b>。
+     * <p>Semantics: <b>the progress already travelled stays unchanged, and the part not yet travelled is recomputed
+     * at the new speed</b>.
      * <ul>
-     *   <li>刚行动完（progress = 0）→ 按新速度重排整整一轮；</li>
-     *   <li>刚好要行动（progress = 1）→ {@code remaining} 仍是整轮长度，也就是
-     *       <b>预约长度不打折</b>：加速不会让人"凭空提前"，只是把等待等比缩短；</li>
-     *   <li>中途变速 → 剩余等待按新旧周期等比缩放。</li>
+     *   <li>just acted (progress = 0) → the whole round is re-booked at the new speed;</li>
+     *   <li>about to act (progress = 1) → {@code remaining} is still the full round length, i.e.
+     *       <b>the booking length is not discounted</b>: a speed boost does not let someone "skip ahead out of
+     *       thin air", it only shortens the wait proportionally;</li>
+     *   <li>speed change halfway through → the remaining wait is scaled in proportion to the old and new cycles.</li>
      * </ul>
      *
-     * <p>⚠ 分母必须是"**这一次预约原本的长度**"（{@link #nextCycleLength()}，首轮含 1.5），
-     * 不能用 {@code cycleTime()}：首轮的预约是 150 而周期是 100，用 100 当分母会算出
-     * progress = 1.5，速度一变就会把首轮系数抹成"立刻行动"。
+     * <p>⚠ The denominator must be "**the length this booking originally had**" ({@link #nextCycleLength()},
+     * which includes the 1.5 of the first round), and must not be {@code cycleTime()}: in the first round the
+     * booking is 150 while the cycle is 100, so using 100 as the denominator yields progress = 1.5, and one speed
+     * change would erase the first-round factor into "act immediately".
      *
-     * @param elapsed 队列的当前全局时钟
+     * @param elapsed the queue's current global clock
      */
     public void refreshSpeed(double elapsed) {
         double oldLength = nextCycleLength();
         double progress = oldLength > 0 ? Math.clamp(remaining / oldLength, 0, 1) : 0;
-        refreshSpeed();                              // 先更新 speed，再算新周期
+        refreshSpeed();                              // update speed first, then compute the new cycle
         double newLength = nextCycleLength();
         remaining = progress * newLength;
         nextActionTime = elapsed + remaining;
     }
 
     /**
-     * 时间推进：剩余距离等量减少（{@link com.laosun.aluminium.Queue#move()} 移动时钟时调用）。
+     * Time advance: the remaining distance shrinks by the same amount (called when
+     * {@link com.laosun.aluminium.Queue#move()} moves the clock).
      *
-     * <p>距离是速度无关的，所以这里**不需要**知道速度、也不需要按首轮换算 ——
-     * 推进 75 秒，行动条就前进 75 格。
+     * <p>The distance is speed-independent, so this method does **not** need to know the speed, nor does it need a
+     * first-round conversion — advance 75 seconds and the action bar moves forward 75 squares.
      *
-     * @param delta 本段推进的实际时间
+     * @param delta the actual time advanced by this step
      */
     public void advanceProgress(double delta) {
         remaining -= delta;
     }
 
     /**
-     * 行动点被消费掉：按当前速度重新预约一个完整周期（首轮的话含 ×1.5）。
+     * The action point has been consumed: book a whole new cycle at the current speed (×1.5 in the first round).
      *
-     * @param elapsed 队列的当前全局时钟
+     * @param elapsed the queue's current global clock
      */
     public void markActed(double elapsed) {
         remaining = nextCycleLength();
@@ -160,9 +172,9 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * 标记这个信号正处于"首轮"（P7-1）：这一次预约要乘 ×1.5。
+     * Marks this signal as being in its "first round" (P7-1): this booking is multiplied by ×1.5.
      *
-     * <p>首次预约的长度就是 {@code 1.5 × cycleTime()}，所以距离也从这里起步。
+     * <p>The length of the first booking is exactly {@code 1.5 × cycleTime()}, so the distance starts from there.
      */
     public void markFirstRound() {
         this.firstRound = true;
@@ -170,39 +182,40 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * 首轮结束：之后排期不再乘 {@link Constant#FIRST_ROUND_MULTIPLIER}。
+     * The first round is over: later bookings no longer multiply by {@link Constant#FIRST_ROUND_MULTIPLIER}.
      */
     public void endFirstRound() {
         this.firstRound = false;
     }
 
     /**
-     * 这个信号是否还没走完首轮排期（P7-1）。
+     * Whether this signal has not yet finished its first-round scheduling (P7-1).
      */
     public boolean isFirstRound() {
         return firstRound;
     }
 
     /**
-     * 距离下一个行动点还剩多少行动值（速度无关）。
+     * How much action value is left until the next action point (speed-independent).
      */
     public double getRemaining() {
         return remaining;
     }
 
     /**
-     * 直接设定"距离行动点还剩多少行动值"，并同步 {@link #nextActionTime}（P7-2）。
+     * Directly sets "how much action value is left until the action point" and synchronises
+     * {@link #nextActionTime} (P7-2).
      *
-     * <p>{@code remaining} 与 {@code nextActionTime} 是同一个状态的两份账本
-     * （见 {@code engine.md} §5.6），所以改其中一个就必须同步另一个 ——
-     * 这个方法就是为了让调用方不必自己保证这一点。
+     * <p>{@code remaining} and {@code nextActionTime} are two ledgers of the same state
+     * (see {@code engine.md} §5.6), so changing one of them means the other must be synchronised —
+     * this method exists precisely so that callers do not have to guarantee that themselves.
      *
-     * <p>目前的唯一调用方是 {@link com.laosun.aluminium.Queue#grantExtraTurn}：
-     * 额外回合会把行动者的行动时间临时按到 {@code elapsed} 上，结束后再用这里还原，
-     * 这样"额外回合不消耗行动值"。
+     * <p>The only caller at the moment is {@link com.laosun.aluminium.Queue#grantExtraTurn}:
+     * an extra turn temporarily pins the actor's action time onto {@code elapsed}, and restores it through here
+     * afterwards, so that "an extra turn does not consume action value".
      *
-     * @param elapsed   队列的当前全局时钟
-     * @param remaining 剩余行动值（{@code >= 0}）
+     * @param elapsed   the queue's current global clock
+     * @param remaining the remaining action value ({@code >= 0})
      */
     public void setRemaining(double elapsed, double remaining) {
         this.remaining = Math.max(0, remaining);
@@ -210,7 +223,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * 返回"从当前时刻起排下一次行动"要用多久（首轮含 ×1.5 系数）。
+     * Returns how long "scheduling the next action from the current instant" takes (×1.5 factor in the first round).
      */
     public double nextCycleLength() {
         return cycleTime() * (firstRound ? Constant.FIRST_ROUND_MULTIPLIER : 1.0);
@@ -229,20 +242,21 @@ public final class Signal implements Comparable<Signal>, Cloneable {
         if (byTime != 0) {
             return byTime;
         }
-        return Long.compare(this.sequence, o.sequence);     // E4：同行动值 → 先排期的先动
+        return Long.compare(this.sequence, o.sequence);     // E4: equal action value → whoever was scheduled first acts first
     }
 
     /**
-     * 取一个新的排期序号（P7 修正 E4）。由 {@link com.laosun.aluminium.Queue} 在
-     * "这个信号（重新）排期"时调用：建 Signal 入队（{@code addCombatant()}）、
-     * 行动后 {@code setTopZero()}、以及 {@code resetSignal()}。
+     * Takes a new scheduling sequence number (P7 fix E4). Called by {@link com.laosun.aluminium.Queue} when
+     * "this signal is (re)scheduled": creating a Signal and enqueueing it ({@code addCombatant()}),
+     * {@code setTopZero()} after acting, and {@code resetSignal()}.
      *
-     * <p>⚠ 两处**不要**调它：
+     * <p>⚠ Two places must **not** call it:
      * <ul>
-     *   <li>推条 / 拉条 / 按比例拉条 —— 那只改行动值。若拉条也换号，
-     *       就变成"谁刚被拉条谁先手"这种反直觉结果；</li>
-     *   <li>{@code initialize()} —— 它迭代的是 heap 的**内部数组**，顺序由堆结构决定，
-     *       在那里换号会破坏"同速单位按入场顺序出手"。</li>
+     *   <li>push-back / pull-forward / proportional pull-forward — those only change the action value. If a
+     *       pull-forward also took a new number, it would become the counter-intuitive result "whoever was just
+     *       pulled forward gets the initiative";</li>
+     *   <li>{@code initialize()} — it iterates over the heap's **internal array**, whose order is decided by the
+     *       heap structure, and taking numbers there would break "equal-speed units act in entry order".</li>
      * </ul>
      */
     public void markScheduled() {
@@ -250,7 +264,8 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * 排期序号（越小越先行动）。仅供测试与调试断言同行动值时的先后。
+     * The scheduling sequence number (the smaller it is, the earlier the combatant acts). Only for tests and
+     * debugging assertions about the order of equal action values.
      */
     public long getSequence() {
         return sequence;

@@ -17,65 +17,70 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 行动条的三处修正（P7 前置）：
+ * Three fixes to the action bar (P7 prerequisites):
  * <ol>
- *   <li><b>E1</b>：{@code setTopZero()} 重置的是 {@code currentActor}，不是堆顶 ——
- *       遇到"行动期间把别人拉到最前"时不会错轴；{@code currentActor == null} 时什么都不做。</li>
- *   <li><b>E2</b>：速度变化会**立刻**重排行动时间（按已积累的进度比例换算），
- *       而不是等他下一次排周期才生效。</li>
- *   <li><b>E3</b>：{@code advanceActionByPercent} 做 clamp、{@code move()} 保护时钟不倒退 ——
- *       否则行动者会连动两次。</li>
+ *   <li><b>E1</b>: {@code setTopZero()} resets {@code currentActor}, not the heap top — so it does
+ *       not misalign the timeline when someone else is pulled to the very front during an action;
+ *       when {@code currentActor == null} it does nothing.</li>
+ *   <li><b>E2</b>: a speed change **immediately** re-schedules the action time (converted by the
+ *       progress already accumulated) instead of waiting for the next cycle scheduling.</li>
+ *   <li><b>E3</b>: {@code advanceActionByPercent} clamps and {@code move()} guards the clock against
+ *       going backwards — otherwise the actor would act twice in a row.</li>
  * </ol>
  */
 public class QueueActionManipulationTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // E1：setTopZero 认人
+    // E1: setTopZero knows who the actor is
     // ==================================================================
 
     /**
-     * 行动期间"把别人拉到最前"（模拟 P7-2 额外回合 / P10-4 拉条）：
-     * 此时堆顶已经不是行动者了，{@code setTopZero()} 必须仍然重置**行动者**。
+     * "Pull someone else to the very front" during an action (simulating P7-2 extra turns / P10-4
+     * action advance): at that point the heap top is no longer the actor, and {@code setTopZero()}
+     * MUST still reset the **actor**.
      *
-     * <p>修之前的行为：重置堆顶（= 被拉上来的 B），A 的周期没重置 → A 会连动两次。
+     * <p>Behaviour before the fix: it reset the heap top (= B, who was pulled up), A's cycle was not
+     * reset → A would act twice in a row.
      *
-     * <p>⚠ 这里刻意让 A 与 B 的时间**不相等**（250 vs 187.5）：相等键的堆内顺序
-     * 未定义（见 P7 修正 E4，那条还没修），断言"谁是堆顶"会变成碰运气。
-     * "时间恰好相等"的那种情况由 {@link #actorIsNotSkippedWhenAnotherSignalSitsInThePast} 覆盖，
-     * 那条只断言行动者被重置、不断言堆顶身份。
+     * <p>⚠ Here A's and B's times are deliberately made **unequal** (250 vs 187.5): the in-heap order
+     * of equal keys is undefined (see P7 fix E4, which is not fixed yet), so asserting "who is the
+     * heap top" would be a coin flip. The "times happen to be equal" case is covered by
+     * {@link #actorIsNotSkippedWhenAnotherSignalSitsInThePast}, which only asserts that the actor was
+     * reset and does not assert the heap top's identity.
      */
     @Test
     public void setTopZeroResetsTheActorEvenWhenSomeoneElseWasPulledAhead() {
-        Character a = character("A", 100);               // 先动（150）
-        Character b = character("B", 80);                // 周期 125 → 首轮 187.5
+        Character a = character("A", 100);               // acts first (150)
+        Character b = character("B", 80);                // cycle 125 → first round 187.5
         Queue q = new Queue(List.of(a, b));
 
-        q.move();                                        // A 行动，elapsed = 150
+        q.move();                                        // A acts, elapsed = 150
         Assertions.assertEquals(a, q.getCurrentActor().getCanHit());
 
-        // 把 A 推后（推条）：A 250，B 187.5 → 堆顶变成 B，而"正在行动的人"仍是 A。
+        // push A back (action delay): A 250, B 187.5 → the heap top becomes B, while "the one acting" is still A.
         q.delayAction(a, 100);
         Assertions.assertEquals(187.5, signalOf(q, b).getNextActionTime(), EPS);
-        Assertions.assertEquals(b, q.peekNext(), "现在堆顶是 B，不是行动者 A");
+        Assertions.assertEquals(b, q.peekNext(), "the heap top is now B, not the actor A");
 
-        q.setTopZero();                                  // 结束 A 的回合
+        q.setTopZero();                                  // end A's turn
 
         Assertions.assertEquals(250, signalOf(q, a).getNextActionTime(), EPS,
-                "A（行动者）的周期被重置：elapsed + 100");
+                "A (the actor) had its cycle reset: elapsed + 100");
         Assertions.assertEquals(187.5, signalOf(q, b).getNextActionTime(), EPS,
-                "B 不受影响（他仍是 187.5，下一个该他动）");
-        Assertions.assertNull(q.getCurrentActor(), "行动者已清空");
+                "B is unaffected (it is still 187.5, and it is next to act)");
+        Assertions.assertNull(q.getCurrentActor(), "the actor has been cleared");
 
         q.move();
-        Assertions.assertEquals(b, q.getCurrentActor().getCanHit(), "接着动的是 B");
+        Assertions.assertEquals(b, q.getCurrentActor().getCanHit(), "B acts next");
         Assertions.assertEquals(187.5, q.getElapsed(), EPS);
     }
 
     /**
-     * 没调 {@code move()} 就调 {@code setTopZero()}：什么都不做。
+     * Calling {@code setTopZero()} without having called {@code move()}: nothing happens.
      *
-     * <p>修之前会静默把堆顶推后一整个周期 —— 等于"跳过一个人的回合"，是更坏的失败方式。
+     * <p>Before the fix it would silently push the heap top back by a whole cycle — equivalent to
+     * "skipping someone's turn", which is the worse failure mode.
      */
     @Test
     public void setTopZeroWithoutAMoveDoesNothing() {
@@ -86,21 +91,22 @@ public class QueueActionManipulationTest {
         q.setTopZero();
 
         Assertions.assertEquals(before, signalOf(q, a).getNextActionTime(), EPS,
-                "没有正在行动的人 → 一个字节都不该改");
+                "there is no acting unit → not one byte should change");
     }
 
     // ==================================================================
-    // E2：速度变化立刻重排
+    // E2: a speed change re-schedules immediately
     // ==================================================================
 
     /**
-     * 中途加速：按**已积累进度**换算剩余等待。
+     * Speed boost mid-battle: the remaining wait is converted by the **progress already accumulated**.
      *
-     * <p>速度 100 → 周期 100，首轮 next = 150（进度账本 = 1/1.5 = 2/3）。
-     * 队里的敌人 132 速（首轮 113.64）先动，跑两次 {@code move()} 后 elapsed = 150，
-     * hero 刚行动完（next = 250、进度归 0）。
+     * <p>Speed 100 → cycle 100, first round next = 150 (progress ledger = 1/1.5 = 2/3).
+     * The enemy in the team has 132 speed (first round 113.64) and acts first; after running
+     * {@code move()} twice, elapsed = 150 and hero has just finished acting (next = 250, progress
+     * back to 0).
      *
-     * <p>此时把速度翻倍到 200（周期 50）：新 next = elapsed + (1 - 0) × 50 = 200。
+     * <p>Now double the speed to 200 (cycle 50): the new next = elapsed + (1 - 0) × 50 = 200.
      */
     @Test
     public void speedChangeReSchedulesTheSignalImmediately() {
@@ -108,31 +114,32 @@ public class QueueActionManipulationTest {
         Battle battle = new Battle(List.of(hero), List.of(dummy()), new Random(0));
         Queue q = battle.queue;
 
-        // 敌人 132 速 → 首轮 10000/132 × 1.5；比 hero 的 150 早，所以他先动
+        // enemy at 132 speed → first round 10000/132 × 1.5; earlier than hero's 150, so it acts first
         Assertions.assertEquals(10000.0 / 132 * 1.5, signalOf(q, dummyOf(battle)).getNextActionTime(), 1e-6);
 
-        q.move();                                        // 敌人先动
+        q.move();                                        // the enemy acts
         Assertions.assertNotEquals(hero, q.getCurrentActor().getCanHit());
         q.setTopZero();
-        q.move();                                        // 现在轮到 hero，elapsed = 150
+        q.move();                                        // now it is hero's turn, elapsed = 150
         Assertions.assertEquals(hero, q.getCurrentActor().getCanHit());
         q.setTopZero();                                  // hero → next = 250
 
         Signal heroSignal = signalOf(q, hero);
         Assertions.assertEquals(250, heroSignal.getNextActionTime(), EPS);
 
-        hero.getBuffManager().addBuff(new SpeedBoostBuff(2, 1.0));   // 速度 100 → 200
+        hero.getBuffManager().addBuff(new SpeedBoostBuff(2, 1.0));   // speed 100 → 200
 
         Assertions.assertEquals(200, heroSignal.getNextActionTime(), EPS,
-                "立刻重排：150 + (1 - 0) × 50 = 200（而不是等下一次排周期）");
+                "immediately re-scheduled: 150 + (1 - 0) × 50 = 200 (instead of waiting for the next cycle scheduling)");
         Assertions.assertEquals(200, hero.getAttribute(AttributeType.SPEED).get(), EPS,
-                "面板也确实变成了 200");
+                "the stat sheet really did become 200");
     }
 
     /**
-     * 移除加速后同样立刻回退到原周期。
+     * Removing the speed boost likewise falls back to the original cycle immediately.
      *
-     * <p>hero 速度 200 → 首轮 75，比 132 速敌人的 113.64 早，所以这次确实是 hero 先动。
+     * <p>hero at speed 200 → first round 75, earlier than the 132-speed enemy's 113.64, so this time
+     * hero really does act first.
      */
     @Test
     public void removingTheSpeedBuffReSchedulesBack() {
@@ -141,29 +148,32 @@ public class QueueActionManipulationTest {
         Queue q = battle.queue;
 
         SpeedBoostBuff buff = new SpeedBoostBuff(2, 1.0);
-        hero.getBuffManager().addBuff(buff);             // hero 速度 200 → 周期 50、首轮 75
-        q.move();                                        // hero 先动（75 < 敌人 113.64）
+        hero.getBuffManager().addBuff(buff);             // hero speed 200 → cycle 50, first round 75
+        q.move();                                        // hero acts first (75 < enemy's 113.64)
         Assertions.assertEquals(hero, q.getCurrentActor().getCanHit());
         q.setTopZero();                                  // hero → 75 + 50 = 125
 
         Assertions.assertEquals(125, signalOf(q, hero).getNextActionTime(), EPS);
 
-        hero.getBuffManager().removeBuff(buff);          // 速度回到 100
+        hero.getBuffManager().removeBuff(buff);          // speed back to 100
 
-        // 刚行动完（进度 0）→ 新 next = 75 + (1 - 0) × 100 = 175
+        // just acted (progress 0) → new next = 75 + (1 - 0) × 100 = 175
         Assertions.assertEquals(175, signalOf(q, hero).getNextActionTime(), EPS,
-                "移除加速也立刻生效");
+                "removing the speed boost also takes effect immediately");
     }
 
     /**
-     * 直接改属性（不走 buff）也会触发重排 —— 触发点在 {@code CanHit.setAttribute}。
+     * Changing the attribute directly (not through a buff) also triggers the re-scheduling — the
+     * trigger point is {@code CanHit.setAttribute}.
      *
-     * <p>这里断言的是 **首轮系数被保留**：速度 100 的单位首轮预约长度是
-     * {@code 100 × 1.5 = 150}，也就是行动条上还剩 150 格。把速度改成 200（周期 50）后，
-     * 剩下那 150 格按新速度走：{@code 150 / 200 × 10000 = 75}。
+     * <p>What this asserts is that the **first-round coefficient is preserved**: a unit at speed 100
+     * has a first-round reservation length of {@code 100 × 1.5 = 150}, i.e. 150 squares left on the
+     * action bar. After changing the speed to 200 (cycle 50), those remaining 150 squares are walked
+     * at the new speed: {@code 150 / 200 × 10000 = 75}.
      *
-     * <p>错误实现会算出别的值：用 {@code cycleTime()}（100）当分母反推进度会得到 1.5，
-     * clamp 成 1 之后变成"立刻行动"（0）；直接丢掉首轮系数会算出 50。
+     * <p>A wrong implementation computes something else: using {@code cycleTime()} (100) as the
+     * denominator to back out the progress gives 1.5, which clamps to 1 and becomes "act immediately"
+     * (0); simply dropping the first-round coefficient gives 50.
      */
     @Test
     public void settingTheSpeedAttributeDirectlyAlsoReSchedules() {
@@ -172,22 +182,23 @@ public class QueueActionManipulationTest {
         Queue q = battle.queue;
         Signal signal = signalOf(q, hero);
 
-        Assertions.assertEquals(150, signal.getNextActionTime(), EPS, "改动前：首轮 150");
-        Assertions.assertEquals(150, signal.getRemaining(), EPS, "行动条上还剩 150 格");
+        Assertions.assertEquals(150, signal.getNextActionTime(), EPS, "before the change: first round 150");
+        Assertions.assertEquals(150, signal.getRemaining(), EPS, "there are still 150 squares left on the action bar");
 
         hero.setAttribute(AttributeType.SPEED, new DoubleValue(200));
 
         Assertions.assertEquals(75, signal.getNextActionTime(), EPS,
-                "剩余 150 格按速度 200 走：150 / 200 × 10000 = 75");
+                "the remaining 150 squares are walked at speed 200: 150 / 200 × 10000 = 75");
     }
 
     // ==================================================================
-    // E3：clamp，行动者不会连动两次
+    // E3: clamp, the actor does not act twice in a row
     // ==================================================================
 
     /**
-     * {@code advanceActionByPercent(…, 1.0)} 刚好把行动时间压到 {@code elapsed}：
-     * 时钟不会倒退、行动者也不会因为"落在过去"而被 {@code move()} 反复消费。
+     * {@code advanceActionByPercent(…, 1.0)} pushes the action time exactly down to {@code elapsed}:
+     * the clock does not go backwards, and the actor is not repeatedly consumed by {@code move()}
+     * for "lying in the past".
      */
     @Test
     public void advanceByPercentNeverGoesBelowElapsed() {
@@ -196,27 +207,30 @@ public class QueueActionManipulationTest {
 
         q.move();                                        // elapsed = 150
         q.setTopZero();                                  // A → 250
-        q.advanceActionByPercent(a, 1.0);                // 100%：应该刚好到 elapsed
+        q.advanceActionByPercent(a, 1.0);                // 100%: should land exactly on elapsed
 
-        Assertions.assertEquals(150, signalOf(q, a).getNextActionTime(), EPS, "clamp 到 elapsed");
+        Assertions.assertEquals(150, signalOf(q, a).getNextActionTime(), EPS, "clamped to elapsed");
 
-        Assertions.assertEquals(0, q.move(), EPS, "时钟已经在 150，不倒退也不前进");
-        Assertions.assertEquals(a, q.getCurrentActor().getCanHit(), "A 立刻再动");
-        Assertions.assertEquals(150, q.getElapsed(), EPS, "时钟不倒退");
+        Assertions.assertEquals(0, q.move(), EPS, "the clock is already at 150, so it neither goes back nor forward");
+        Assertions.assertEquals(a, q.getCurrentActor().getCanHit(), "A acts again immediately");
+        Assertions.assertEquals(150, q.getElapsed(), EPS, "the clock does not go backwards");
     }
 
     /**
-     * clamp 的**必要性**：把一个已经落在 {@code elapsed} 之前（哪怕只差一个 ulp）的信号
-     * 再按比例拉条时，{@code remaining} 必须取 max 到 0，否则"差额"是负数、拉条会把他
-     * 推得**更靠过去**，接着 {@link Queue#move()} 就会把全局时钟往回拨。
+     * The **necessity** of the clamp: when a signal that already lies before {@code elapsed} (even
+     * by a single ulp) is advanced by a percentage again, {@code remaining} MUST be maxed to 0 —
+     * otherwise the "difference" is negative and the advance would push it **further into the past**,
+     * and {@link Queue#move()} would then wind the global clock backwards.
      *
-     * <p>这条不是空想：binary64 下 {@code a - (a-e)·p ≥ e} 数学上成立但浮点上不保证，
-     * 而且行动条操纵（P10-4 拉条 / P7-2 额外回合）本来就会把信号排到 {@code elapsed} 上，
-     * 后续再叠加一次拉条就会踩到这里。
+     * <p>This is not hypothetical: in binary64 {@code a - (a-e)·p ≥ e} holds mathematically but is
+     * not guaranteed in floating point, and action-bar manipulation (P10-4 action advance / P7-2
+     * extra turn) already schedules signals onto {@code elapsed}, so stacking one more advance on top
+     * lands right here.
      *
-     * <p>构造方式：从堆里取出信号引用（{@code Queue} 的"剩余距离"账本只在
-     * move/setTopZero/refreshSpeed 时同步，所以直接改 {@code nextActionTime} 不会破坏本测试
-     * 要验证的逻辑 —— {@code advanceActionByPercent} 只读 {@code nextActionTime}）。
+     * <p>How it is constructed: take the signal reference out of the heap (the {@code Queue}'s
+     * "remaining distance" ledger is only synchronised on move/setTopZero/refreshSpeed, so changing
+     * {@code nextActionTime} directly does not break the logic this test verifies —
+     * {@code advanceActionByPercent} only reads {@code nextActionTime}).
      */
     @Test
     public void advanceByPercentClampsASignalThatIsAlreadyInThePast() {
@@ -224,23 +238,25 @@ public class QueueActionManipulationTest {
         Queue q = new Queue(List.of(a));
         Signal signal = signalOf(q, a);
 
-        signal.setNextActionTime(q.getElapsed() - 1e-7);   // 已经落在过去
+        signal.setNextActionTime(q.getElapsed() - 1e-7);   // already lies in the past
 
         q.advanceActionByPercent(a, 0.5);
 
         Assertions.assertEquals(0, signal.getNextActionTime(), EPS,
-                "clamp 到 elapsed(0)，而不是被推得更靠过去");
+                "clamped to elapsed(0), instead of being pushed further into the past");
 
-        Assertions.assertEquals(0, q.move(), EPS, "时钟不倒退");
-        Assertions.assertEquals(a, q.getCurrentActor().getCanHit(), "他立刻行动");
+        Assertions.assertEquals(0, q.move(), EPS, "the clock does not go backwards");
+        Assertions.assertEquals(a, q.getCurrentActor().getCanHit(), "it acts immediately");
     }
 
     /**
-     * 核心断言：把**另一个人**拉到行动点上（与 {@code elapsed} 同值）之后，
-     * {@code setTopZero()} 仍然只重置刚行动的那个，且他不会连动。
+     * The core assertion: after pulling **another person** onto the action point (the same value as
+     * {@code elapsed}), {@code setTopZero()} still resets only the one that just acted, and it does
+     * not act twice.
      *
-     * <p>此时两人的 {@code nextActionTime} 都是 150 —— 相等键的堆内顺序未定义（P7 修正 E4），
-     * 所以这里只断言"行动者被重置"和"时钟不倒退"，**不**断言堆顶身份。
+     * <p>At this point both units' {@code nextActionTime} are 150 — the in-heap order of equal keys
+     * is undefined (P7 fix E4), so only "the actor was reset" and "the clock does not go backwards"
+     * are asserted here, and the heap top's identity is **not**.
      */
     @Test
     public void actorIsNotSkippedWhenAnotherSignalSitsInThePast() {
@@ -248,21 +264,21 @@ public class QueueActionManipulationTest {
         Character b = character("B", 100);
         Queue q = new Queue(List.of(a, b));
 
-        q.move();                                        // A 行动，elapsed = 150
-        q.advanceAction(b, 1000);                        // B 被拉到 150（clamp 到 elapsed，与 A 同值）
+        q.move();                                        // A acts, elapsed = 150
+        q.advanceAction(b, 1000);                        // B is pulled to 150 (clamped to elapsed, the same value as A)
 
         Assertions.assertEquals(150, signalOf(q, b).getNextActionTime(), EPS);
 
-        q.setTopZero();                                  // 结束 A 的回合（重置的必须是 A）
+        q.setTopZero();                                  // end A's turn (the one reset MUST be A)
 
         Assertions.assertEquals(250, signalOf(q, a).getNextActionTime(), EPS,
-                "A 被推回 250（下一轮才轮到他）");
+                "A is pushed back to 250 (its next turn comes next round)");
         Assertions.assertEquals(150, signalOf(q, b).getNextActionTime(), EPS,
-                "B 仍在 150（没被当成行动者重置掉）");
+                "B is still at 150 (it was not reset as if it were the actor)");
 
         q.move();
-        Assertions.assertEquals(b, q.getCurrentActor().getCanHit(), "下一个行动的是 B（不是 A 连动）");
-        Assertions.assertEquals(150, q.getElapsed(), EPS, "时钟没有倒退");
+        Assertions.assertEquals(b, q.getCurrentActor().getCanHit(), "B acts next (not A acting twice)");
+        Assertions.assertEquals(150, q.getElapsed(), EPS, "the clock did not go backwards");
     }
 
     // ==================================================================
@@ -275,25 +291,26 @@ public class QueueActionManipulationTest {
         return EnemyFactory.create(1002011, 90, 1);
     }
 
-    /** 队里那个敌人（冰锋，132 速）：首轮 {@code 10000/132 × 1.5 ≈ 113.64}，比速度 100 的角色（150）先动。 */
+    /** The enemy in the team (Ice Edge 冰锋, 132 speed): first round {@code 10000/132 × 1.5 ≈ 113.64}, so it acts before a speed-100 character (150). */
     private static CanHit dummyOf(Battle battle) {
         return battle.enemies.getFirst();
     }
 
     /**
-     * 按 {@code CanHit} 的**身份**在堆里找它的信号。
+     * Finds a signal in the heap by the {@code CanHit}'s **identity**.
      *
-     * <p>⚠ 不能用 {@code getHeap().stream().findFirst()} 那种写法：{@code PriorityQueue}
-     * 的迭代顺序是**堆数组顺序**，不是时间顺序，也不保证与插入顺序一致 ——
-     * 两个同速单位会互换结果（我第一版就是这么写错的）。
-     * 这里用 {@code equals}（{@code CanHit} 没重写它 → 身份比较）过滤，再断言唯一。
+     * <p>⚠ You MUST NOT write it as {@code getHeap().stream().findFirst()}: the iteration order of a
+     * {@code PriorityQueue} is the **heap-array order**, not time order, and it is not guaranteed to
+     * match insertion order either — two units of equal speed will swap results (my first version got
+     * it wrong exactly this way). Here it filters with {@code equals} ({@code CanHit} does not
+     * override it → identity comparison) and then asserts uniqueness.
      */
     private static Signal signalOf(Queue q, CanHit target) {
         List<Signal> matches = q.getHeap().stream()
                 .filter(s -> s.getCanHit().equals(target))
                 .toList();
         Assertions.assertEquals(1, matches.size(),
-                target.getName() + " 在行动条里应当只出现一次，实际 " + matches.size() + " 次");
+                target.getName() + " should appear exactly once in the action bar, but appears " + matches.size() + " times");
         return matches.getFirst();
     }
 }

@@ -25,176 +25,188 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * aluminium 引擎演示：一场完整的战斗。
+ * aluminium engine demo: one complete battle.
  *
- * <p>这份 `main` 只走引擎当前**真正支持**的东西：
+ * <p>This `main` only walks through what the engine **actually supports** right now:
  * <ul>
- *   <li>角色面板：真实数据（character_data → 等级缩放 → 光锥 → 遗器 → 行迹 → 额外加成）</li>
- *   <li>敌人面板：真实数据（{@link EnemyFactory#create} = 模板 × 等级组 × 实例系数）</li>
- *   <li>行动条：{@code 10000 / 速度}，击破推条 25%</li>
- *   <li>回合流程：{@code stepForward → beforeMove → 出手 → afterMove}</li>
- *   <li>伤害：完整乘区（增伤 / 暴击 / 防御 / 抗性 / 易伤）+ 事件钩子</li>
- *   <li>韧性：削韧 → 击破伤害 → 推条 → 挂 DOT → 击破回能</li>
- *   <li>超击破：带 {@link SuperBreakBuff} 时，超出韧性条的削韧转化成一发额外伤害</li>
- *   <li>DOT：敌人回合开始时按"先上先结算"结算</li>
- *   <li>能量：技能回能 / 受击回能 / 击杀回能 / 终结技清零再回 5 / 满能量才能放大招</li>
- *   <li>生死：HP 归零 → 移出行动条；任一方全灭 → 战斗结束（P7-3 状态机）</li>
+ *   <li>Character stats: real data (character_data → level scaling → light cone → relics → traces → extra bonuses)</li>
+ *   <li>Enemy stats: real data ({@link EnemyFactory#create} = template × level group × instance coefficient)</li>
+ *   <li>Action bar: {@code 10000 / speed}, weakness break push-forward 25%</li>
+ *   <li>Turn flow: {@code stepForward → beforeMove → cast → afterMove}</li>
+ *   <li>Damage: the full damage zones (DMG boost / crit / defence / resistance / vulnerability) + event hooks</li>
+ *   <li>Toughness: toughness reduction → break damage → push-forward → apply DOT → break energy gain</li>
+ *   <li>Super break: with a {@link SuperBreakBuff}, toughness reduction past the toughness bar turns into one extra hit of damage</li>
+ *   <li>DOT: settled at the start of the enemy's turn, "applied first, settled first"</li>
+ *   <li>Energy: skill energy gain / energy gain when hit / energy gain on kill / the ultimate zeroes energy and then returns 5 / only a full energy bar allows the ultimate</li>
+ *   <li>Life and death: HP at zero → removed from the action bar; either side wiped out → battle over (P7-3 state machine)</li>
  * </ul>
  *
- * <p><b>这份 demo 故意不用的东西</b>：
+ * <p><b>Things this demo deliberately does not use</b>:
  * <ul>
- *   <li>关卡/波次（P7-4/P7-5 已实现，见 {@code StageFactory}）—— 这里手搭 3 只固定敌人，
- *       因为要逐条展示"弱点 / 抗性 / 韧性 / 技能倍率"这些数据，逐波进怪反而看不清；</li>
- *   <li>忆灵（P9）、欢愉体系（P10）—— 引擎还没有。</li>
+ *   <li>Stages/waves (P7-4/P7-5 are implemented, see {@code StageFactory}) — here 3 fixed enemies are hand-built,
+ *       because the point is to display the "weakness / resistance / toughness / skill multiplier" data item by item,
+ *       and walking wave by wave would only make that harder to read;</li>
+ *   <li>Memosprites (P9), the Elation system (P10) — the engine does not have them yet.</li>
  * </ul>
  *
- * <p>随机数全程走注入的 {@link Random}：固定种子 → 整场可复现。
+ * <p>The random numbers all come from the injected {@link Random}: a fixed seed → the whole battle is reproducible.
  */
 public class Main {
 
     /**
-     * 演示 AI 的战技点储备（P8-4）：点数高过这个值才肯放战技，否则普攻回点。
+     * Skill point (战技点, SP) reserve of the demo AI (P8-4): it only casts the skill when the points are above this
+     * value, otherwise it uses the basic attack to get a point back.
      *
-     * <p>这是**演示策略**，不是引擎规则 —— 引擎只提供"够不够"，怎么花由调用方定。
+     * <p>This is a **demo strategy**, not an engine rule — the engine only provides "is there enough", and how to spend
+     * it is up to the caller.
      */
     private static final int SKILL_POINT_RESERVE = 1;
 
     public static void main() {
         System.out.println("=".repeat(78));
-        System.out.println(" aluminium 战斗演示：姬子 / 三月七 / 罗刹  vs  冰锋 + 基层员工·外勤 + 次元扑满");
+        System.out.println(" aluminium battle demo: Himeko (姬子) / March 7th (三月七) / Luocha (罗刹)  vs  Ice Edge (冰锋) + Junior Staff·Field Agent (基层员工·外勤) + Warp Trotter (次元扑满)");
         System.out.println("=".repeat(78));
         System.out.println();
 
         List<Character> team = List.of(himeko(), march7th(), luocha());
 
-        // ── 敌人：真实数据。三只简单杂兵，各有弱点/抗性，且都装了 enemy_skills.json 的普攻 ──
-        //  冰锋 1002011   弱火/雷、冰抗 0.2、韧性 60
-        //  基层员工 8032010  物理
-        //  次元扑满 8002040  低倍率（0.6）的小怪
+        // ── Enemies: real data. Three simple mooks, each with its own weakness/resistance, and all of them
+        //    carry the basic attack from enemy_skills.json ──
+        //  冰锋 1002011  weak to fire/lightning, ice resistance 0.2, toughness 60
+        //  基层员工 8032010  physical
+        //  次元扑满 8002040  a low-multiplier (0.6) trash mob
         List<Enemy> enemies = new ArrayList<>(List.of(
                 EnemyFactory.create(1002011, 90, 1),
                 EnemyFactory.create(8032010, 90, 1),
                 EnemyFactory.create(8002040, 90, 1)));
         for (Enemy enemy : enemies) {
-            // ⚠ 这个数值随"技能倍率是否真实"变过两次：
-            //   - 早先六个槽位全解析到**普攻**（P8-2 修的），普攻对单只有几百伤害 → 定 12000；
-            //   - 槽位修好后战技/终结技用上**真实倍率**（姬子战技打 3 目标、对单上万），
-            //     12000 会被一发秒掉 → 提到 30000，让战斗回到"几十次行动"的量级。
-            // 生命上限存在属性数组的 HEALTH 槽里；currentHp 没有 setter，所以提高上限后 heal 补满。
+            // ⚠ This value changed twice as "whether the skill multipliers are real" changed:
+            //   - earlier all six slots resolved to the **basic attack** (fixed in P8-2), and a single-target basic
+            //     attack only does a few hundred damage → so it was set to 12000;
+            //   - after the slots were fixed, skills/ultimates used the **real multipliers** (Himeko's (姬子) skill
+            //     hits 3 targets and does tens of thousands on a single target), so 12000 would be one-shot →
+            //     raised to 30000, which puts the battle back at the scale of "a few dozen actions".
+            // The HP cap lives in the HEALTH slot of the attribute array; currentHp has no setter, so after raising
+            // the cap we top it up with heal.
             enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(30_000));
             enemy.heal(30_000);
-            enemy.setMaxEnergy(0);               // 怪物没有能量条：maxEnergy == 0 → 所有回能 no-op
+            enemy.setMaxEnergy(0);               // monsters have no energy bar: maxEnergy == 0 → every energy gain is a no-op
             printEnemy(enemy);
         }
         System.out.println();
 
-        // ── 开战 ───────────────────────────────────────────────────────────────
+        // ── Battle start ─────────────────────────────────────────────────────
         Battle battle = new Battle(team, enemies, new Random(20260919));
         battle.startBattle();
 
-        // 对应开拓者·同谐【伴舞】的简化：队友身上挂一个超击破标记
+        // A simplified version of Trailblazer·Harmony 【伴舞】: hang a super break marker on a teammate
         team.getFirst().getBuffManager().addBuff(new SuperBreakBuff(99));
-        System.out.println("[开场] 姬子 获得 SuperBreakBuff（超击破标记）");
+        System.out.println("[Opening] Himeko gains SuperBreakBuff (super break marker)");
         printQueue(battle);
         System.out.println();
 
         int actions = 0;
         while (!battle.isOver() && actions < 60) {
             actions++;
-            // P7-1：轮次由行动条的累计行动值推算（首轮 150、之后每轮 100），不再自己数
-            System.out.println("────────── 第 " + battle.getRound() + " 轮（第 " + actions
-                    + " 次行动，累计行动值 " + fmt(battle.queue.getElapsed()) + "）──────────");
+            // P7-1: the round is derived from the action bar's accumulated action value (150 for the first round,
+            // 100 for every round after), it is no longer counted by hand
+            System.out.println("────────── Round " + battle.getRound() + " (action " + actions
+                    + ", total action value " + fmt(battle.queue.getElapsed()) + ")──────────");
             step(battle);
             System.out.println();
         }
 
         System.out.println("=".repeat(78));
-        // P7-3：胜负由 Battle 的状态机给，不在 demo 里自己数活人
+        // P7-3: win/lose comes from the Battle state machine, the demo does not count the living itself
         System.out.println(switch (battle.getStatus()) {
-            case WIN -> " 战斗结束：我方胜利（" + battle.getRound() + " 轮 / " + actions + " 次行动）";
-            case LOSE -> " 战斗结束：我方全灭（" + battle.getRound() + " 轮 / " + actions + " 次行动）";
-            default -> " 达到行动次数上限，战斗未结束（剩余敌人 "
-                    + battle.targetableEnemies().size() + " 只）";
+            case WIN -> " Battle over: victory (" + battle.getRound() + " rounds / " + actions + " actions)";
+            case LOSE -> " Battle over: our team wiped out (" + battle.getRound() + " rounds / " + actions + " actions)";
+            default -> " Action limit reached, battle not over (enemies left "
+                    + battle.targetableEnemies().size() + ")";
         });
         System.out.println("=".repeat(78));
         battle.printHp();
     }
 
     // ==================================================================
-    // 一个回合
+    // One turn
     // ==================================================================
 
     private static void step(Battle battle) {
         battle.stepForward();
         Signal current = battle.queue.getCurrentActor();
         if (current == null) {
-            System.out.println("[行动条] 没有可行动的单位");
+            System.out.println("[Action bar] no unit can act");
             return;
         }
         CanHit actor = current.getCanHit();
 
-        // 1) 回合开始：敌人先结算 DOT，再跑 buff 与实体的 beforeMove 钩子
+        // 1) Turn start: enemies settle DOT first, then the buff and entity beforeMove hooks run
         battle.beforeMove();
         if (actor.isDeath()) {
-            System.out.println("[死亡] " + actor.getName() + " 在自己回合开始前被 DOT 结算掉了");
+            System.out.println("[Death] " + actor.getName() + " was settled by DOT before their turn began");
             battle.afterMove();
             return;
         }
 
-        // 2) 出手
+        // 2) Cast
         if (actor instanceof Enemy enemy) {
             enemyTurn(battle, enemy);
         } else {
             characterTurn(battle, (Character) actor);
         }
 
-        // 3) 回合结束：行动值归位 / 死者移出行动条 / buff 结算
+        // 3) Turn end: action value reset / the dead are removed from the action bar / buffs settle
         battle.afterMove();
         printQueue(battle);
     }
 
-    /** 我方回合：能量满就放大招，否则用战技（非弱点 / 没战技点 → 退回普攻）。 */
+    /** Our turn: cast the ultimate when energy is full, otherwise use the skill (not a weakness / no SP → fall back to the basic attack). */
     private static void characterTurn(Battle battle, Character hero) {
-        System.out.println("[我方] " + hero.getName()
+        System.out.println("[Ally] " + hero.getName()
                 + "  HP " + fmt(hero.getCurrentHp()) + "/" + fmt(hero.getMaxHp())
-                + "  能量 " + fmt(hero.getCurrentEnergy()) + "/" + fmt(hero.getMaxEnergy())
-                + "  战技点 " + battle.getSkillPoints() + "/" + Constant.SKILL_POINT_MAX);
+                + "  Energy " + fmt(hero.getCurrentEnergy()) + "/" + fmt(hero.getMaxEnergy())
+                + "  SP " + battle.getSkillPoints() + "/" + Constant.SKILL_POINT_MAX);
 
         Enemy target = firstAliveEnemy(battle);
         if (target == null) {
             return;
         }
 
-        // 攒够开大阈值 → 终结技（引擎会先清零、结算本体、再回自身 5 点）
-        // P3-4：判据是 battle.isUltraReady（读技能数据的 sp_need），不必攒满上限
+        // Enough for the ultimate threshold → ultimate (the engine zeroes the energy first, settles the ultimate
+        // itself, then gives the caster 5 points back)
+        // P3-4: the test is battle.isUltraReady (it reads sp_need from the skill data), the bar does not have to be full
         if (battle.isUltraReady(hero) && hero.getSkills().containsKey(SkillType.ULTRA)) {
-            System.out.println("        → 能量已达到开大阈值，释放【终结技】");
+            System.out.println("        → energy reached the ultimate threshold, casting [Ultimate]");
             double hpBefore = target.getCurrentHp();
             if (!battle.castUltra(hero, List.of(target))) {
-                System.out.println("        → 终结技释放失败");
+                System.out.println("        → ultimate cast failed");
                 return;
             }
             report(hero, target, hpBefore);
             return;
         }
 
-        // 没战技点就打普攻（P8-4）—— 但治疗/护盾角色的**保命牌**不能因为缺 1 点就丢掉，
-        // 所以先问一次"够不够"，不够就直接挑普攻，不再分派治疗/护盾分支。
+        // No skill points → basic attack (P8-4) — but a healing/shielding character's **panic button** must not be
+        // thrown away just because 1 point is missing, so we first ask once "is there enough"; if not, we go straight
+        // to the basic attack and stop dispatching the heal/shield branches.
         //
-        // ⚠ 这里留 1 点**储备**：不加这个的话三个角色每次行动都放战技，开局 3 点两下就见底，
-        //    然后只能普攻回点 —— 20 轮里主 C 只放得出一次战技，演示反而看不出战斗长什么样。
-        //    留 1 点让"回点"和"花点"交替发生，这才是战技点该有的节奏。
+        // ⚠ 1 point of **reserve** is kept here: without it all three characters cast a skill on every action, the
+        //    opening 3 points are gone after two actions, and then they can only basic-attack to get points back —
+        //    over 20 rounds the main DPS would only get one skill off, and the demo would not show what a battle
+        //    looks like. Keeping 1 point makes "getting points back" and "spending points" alternate, which is the
+        //    rhythm skill points (SP) are supposed to have.
         Skill skill = hero.getSkills().get(SkillType.SKILL);
         boolean canUseSkill = battle.getSkillPoints() > SKILL_POINT_RESERVE;
         if (canUseSkill && skill != null && skill.getData() != null) {
             switch (skill.getData().getEffect()) {
                 case RESTORE -> {
-                    battle.applySkillPointCost(skill, hero);     // 治疗战技也不白放（P8-4）
+                    battle.applySkillPointCost(skill, hero);     // a healing skill is not free either (P8-4)
                     healTurn(battle, hero, skill);
                     return;
                 }
                 case DEFENCE -> {
-                    battle.applySkillPointCost(skill, hero);     // 护盾战技同上
+                    battle.applySkillPointCost(skill, hero);     // same for the shield skill
                     shieldTurn(battle, hero, skill);
                     return;
                 }
@@ -206,28 +218,30 @@ public class Main {
         boolean castSkill = canUseSkill && skill != null && skill.getData() != null
                 && target.isWeakTo(skill.getData().getElement());
         if (!castSkill) {
-            skill = hero.getSkills().get(SkillType.COMMON);      // 非弱点 / 缺战技点 → 普攻
+            skill = hero.getSkills().get(SkillType.COMMON);      // not a weakness / short of SP → basic attack
         }
         if (skill == null) {
             return;
         }
-        System.out.println("        → 使用" + (castSkill ? "【战技】" : "【普攻】"));
+        System.out.println("        → using " + (castSkill ? "[Skill]" : "[Basic ATK]"));
         double hpBefore = target.getCurrentHp();
         if (!battle.performAction(skill, List.of(target))) {
-            System.out.println("        → 出手失败（死亡 / 被控 / 行动条状态不对）");
+            System.out.println("        → action failed (dead / controlled / wrong action-bar state)");
             return;
         }
-        // ⚠️ performAction 只是**排队**；真正的结算在 afterMove() 的 processRequests() 里。
-        //    这里显式结算一次，好让下面的战报拿到真实数值（真实战斗循环里由 afterMove 负责）。
+        // ⚠️ performAction only **queues**; the actual settlement happens in afterMove()'s processRequests().
+        //    We settle explicitly once here so the battle report below gets the real numbers (in the real battle
+        //    loop afterMove takes care of it).
         battle.processRequests();
         report(hero, target, hpBefore);
     }
 
     /**
-     * 治疗（P6-2）：基础量 = 攻击力 × 倍率，再过"治疗加成 × 受疗加成"。
+     * Healing (P6-2): base amount = ATK × multiplier, then run through "healing boost × incoming healing boost".
      *
-     * <p>引擎只提供 {@code Battle.heal(healer, target, base)}；选谁当目标、倍率取哪个
-     * 参数位（治疗技的 {@code param_list[0][0]}）是**调用方**的事。
+     * <p>The engine only provides {@code Battle.heal(healer, target, base)}; who to pick as the target and which
+     * parameter slot to take the multiplier from (the healing skill's {@code param_list[0][0]}) is the **caller's**
+     * business.
      */
     private static void healTurn(Battle battle, Character hero, Skill skill) {
         Character patient = lowestHpRateCharacter(battle);
@@ -237,19 +251,20 @@ public class Main {
         double multiplier = skill.getData().getSkills()
                 .get(Math.min(skill.getLevel(), skill.getData().getSkills().size()) - 1).getFirst();
         double base = hero.getAttribute(AttributeType.ATTACK).get() * multiplier;
-        System.out.println("        → 使用【战技·治疗】，目标 " + patient.getName());
+        System.out.println("        → using [Skill: Heal], target " + patient.getName());
         double before = patient.getCurrentHp();
         double healed = battle.heal(hero, patient, base);
-        System.out.println("        → 基础治疗 " + fmt(base) + " → 实际回复 " + fmt(healed)
-                + "：" + patient.getName() + " HP " + fmt(before) + " → " + fmt(patient.getCurrentHp())
+        System.out.println("        → base heal " + fmt(base) + " → actual restore " + fmt(healed)
+                + ": " + patient.getName() + " HP " + fmt(before) + " → " + fmt(patient.getCurrentHp())
                 + "/" + fmt(patient.getMaxHp()));
         hero.gainEnergy(com.laosun.aluminium.models.energy.EnergyGain.normal(30));
     }
 
     /**
-     * 护盾（P6-3）：基础量 = 防御力 × 倍率（三月七战技的 {@code param_list[0][0]} 是护盾系数）。
+     * Shield (P6-3): base amount = DEF × multiplier (March 7th's skill uses {@code param_list[0][0]} as the shield
+     * coefficient).
      *
-     * <p>引擎只提供 {@code Battle.grantShield(target, amount)}，量由调用方算。
+     * <p>The engine only provides {@code Battle.grantShield(target, amount)}, the amount is computed by the caller.
      */
     private static void shieldTurn(Battle battle, Character hero, Skill skill) {
         Character ally = lowestHpRateCharacter(battle);
@@ -259,34 +274,34 @@ public class Main {
         double multiplier = skill.getData().getSkills()
                 .get(Math.min(skill.getLevel(), skill.getData().getSkills().size()) - 1).getFirst();
         double base = hero.getAttribute(AttributeType.DEFENCE).get() * multiplier;
-        System.out.println("        → 使用【战技·护盾】，目标 " + ally.getName());
+        System.out.println("        → using [Skill: Shield], target " + ally.getName());
         double shield = battle.grantShield(ally, base);
-        System.out.println("        → 护盾量 " + fmt(shield) + "（基础 " + fmt(base) + "）→ "
-                + ally.getName() + " 护盾 " + fmt(ally.getShield()));
+        System.out.println("        → shield amount " + fmt(shield) + " (base " + fmt(base) + ") → "
+                + ally.getName() + " shield " + fmt(ally.getShield()));
         hero.gainEnergy(com.laosun.aluminium.models.energy.EnergyGain.normal(30));
     }
 
     /**
-     * 敌方回合（P5-5）：**引擎自己的 AI**，不再是手工打人。
+     * Enemy turn (P5-5): the **engine's own AI**, no longer hitting people by hand.
      *
-     * <p>流程：击破中 → 跳过；否则用 {@link TargetSelector} 按仇恨加权选一个活着的我方目标，
-     * 再用敌人自己的 {@link com.laosun.aluminium.models.EnemySkill} 出手
-     * （技能来自 {@code enemy_skills.json}，倍率是猜的，见该文件说明）。
+     * <p>Flow: broken → skip; otherwise use {@link TargetSelector} to pick a living target on our side weighted by
+     * aggro, then act with the enemy's own {@link com.laosun.aluminium.models.EnemySkill}
+     * (the skills come from {@code enemy_skills.json}, and the multipliers are guessed, see the note in that file).
      */
     private static void enemyTurn(Battle battle, Enemy enemy) {
-        System.out.println("[敌方] " + enemy.getName()
+        System.out.println("[Enemy] " + enemy.getName()
                 + "  HP " + fmt(enemy.getCurrentHp()) + "/" + fmt(enemy.getMaxHp())
-                + (enemy.isBroken() ? "  【已被击破 " + enemy.getBrokenElement() + "】" : "")
-                + "  韧性 " + fmt(enemy.getStance()) + "/" + fmt(enemy.getMaxStance()));
+                + (enemy.isBroken() ? "  [Broken " + enemy.getBrokenElement() + "]" : "")
+                + "  Toughness " + fmt(enemy.getStance()) + "/" + fmt(enemy.getMaxStance()));
 
-        // 击破中：由调用方主动问，返回 true 表示"本回合跳过"
+        // Broken: the caller has to ask on its own; returning true means "skip this turn"
         if (battle.handleBrokenTurn(enemy)) {
-            System.out.println("        → 处于击破状态，本回合不行动（剩 "
-                    + enemy.getBrokenRemainTurns() + " 回合恢复）");
+            System.out.println("        → broken, skips this turn ("
+                    + enemy.getBrokenRemainTurns() + " turns to recover)");
             return;
         }
 
-        // 候选集 = 活着的我方（"谁能被选中"由调用方过滤，别选到尸体）
+        // Candidate set = our living members (the caller filters "who can be targeted", do not pick a corpse)
         List<CanHit> candidates = new ArrayList<>();
         for (Character c : battle.characters) {
             if (!c.isDeath()) {
@@ -297,60 +312,60 @@ public class Main {
             return;
         }
 
-        // P5-4：按仇恨加权随机选目标（存护 150 比常规 100 更容易被打）
+        // P5-4: pick the target randomly weighted by aggro (Preservation 150 is easier to hit than the regular 100)
         CanHit target = TargetSelector.select(battle, candidates, TargetSelector.Intent.SINGLE, battle.getRng());
         Skill attack = enemy.getSkills().get(SkillType.COMMON);
         if (target == null || attack == null) {
-            System.out.println("        → 没有可攻击的目标或技能");
+            System.out.println("        → no targetable target or skill");
             return;
         }
 
-        System.out.println("        → 选中 " + target.getName()
-                + "（仇恨 " + fmt(battle.aggroOf(target)) + "，全队总 "
-                + fmt(candidates.stream().mapToDouble(battle::aggroOf).sum()) + "）");
+        System.out.println("        → selected " + target.getName()
+                + " (aggro " + fmt(battle.aggroOf(target)) + ", team total "
+                + fmt(candidates.stream().mapToDouble(battle::aggroOf).sum()) + ")");
         double hpBefore = target.getCurrentHp();
         if (!battle.performAction(attack, List.of(target))) {
-            System.out.println("        → 出手失败");
+            System.out.println("        → action failed");
             return;
         }
-        battle.processRequests();                    // 同上：排队后显式结算，好让战报拿到真实数值
-        System.out.println("        → " + enemy.getName() + " 造成 " + fmt(hpBefore - target.getCurrentHp())
-                + "：" + target.getName() + " HP " + fmt(target.getCurrentHp())
+        battle.processRequests();                    // as above: settle explicitly after queueing so the battle report gets the real numbers
+        System.out.println("        → " + enemy.getName() + " deals " + fmt(hpBefore - target.getCurrentHp())
+                + " to " + target.getName() + " HP " + fmt(target.getCurrentHp())
                 + "/" + fmt(target.getMaxHp())
-                + (target.getShield() > 0 ? "（护盾 " + fmt(target.getShield()) + "）" : "")
-                + "，受击回能 → " + fmt(target.getCurrentEnergy()));
+                + (target.getShield() > 0 ? " (shield " + fmt(target.getShield()) + ")" : "")
+                + ", energy on hit → " + fmt(target.getCurrentEnergy()));
         if (target.isDeath()) {
-            System.out.println("        → " + target.getName() + " 被击败，移出行动条");
+            System.out.println("        → " + target.getName() + " defeated, removed from the action bar");
         }
     }
 
     // ==================================================================
-    // 输出
+    // Output
     // ==================================================================
 
     private static void report(Character hero, Enemy target, double hpBefore) {
-        System.out.println("        → " + hero.getName() + " 造成 " + fmt(hpBefore - target.getCurrentHp())
-                + "，能量 " + fmt(hero.getCurrentEnergy()) + "/" + fmt(hero.getMaxEnergy())
-                + "；" + target.getName()
+        System.out.println("        → " + hero.getName() + " deals " + fmt(hpBefore - target.getCurrentHp())
+                + ", energy " + fmt(hero.getCurrentEnergy()) + "/" + fmt(hero.getMaxEnergy())
+                + "; " + target.getName()
                 + " HP " + fmt(target.getCurrentHp()) + "/" + fmt(target.getMaxHp())
-                + "，韧性 " + fmt(target.getStance()) + "/" + fmt(target.getMaxStance())
-                + (target.isBroken() ? " 【击破 " + target.getBrokenElement() + "】" : "")
+                + ", toughness " + fmt(target.getStance()) + "/" + fmt(target.getMaxStance())
+                + (target.isBroken() ? " [Break " + target.getBrokenElement() + "]" : "")
                 + (target.getDots().isEmpty() ? "" : "  DOT×" + target.getDots().size()));
         if (target.isDeath()) {
-            System.out.println("        → " + target.getName() + " 被击败");
+            System.out.println("        → " + target.getName() + " defeated");
         }
     }
 
     private static void printEnemy(Enemy enemy) {
-        System.out.println("[敌人] " + enemy.getName()
+        System.out.println("[Enemy data] " + enemy.getName()
                 + "  Lv" + enemy.getLevel()
                 + "  HP " + fmt(enemy.getMaxHp())
-                + "  攻 " + fmt(enemy.getAttribute(AttributeType.ATTACK).get())
-                + "  防 " + fmt(enemy.getAttribute(AttributeType.DEFENCE).get())
-                + "  速 " + fmt(enemy.getAttribute(AttributeType.SPEED).get()));
-        System.out.println("        弱点 " + enemy.getStanceWeak()
-                + "  韧性 " + fmt(enemy.getMaxStance())
-                + "  抗性 " + enemy.getDamageResist());
+                + "  ATK " + fmt(enemy.getAttribute(AttributeType.ATTACK).get())
+                + "  DEF " + fmt(enemy.getAttribute(AttributeType.DEFENCE).get())
+                + "  SPD " + fmt(enemy.getAttribute(AttributeType.SPEED).get()));
+        System.out.println("        Weakness " + enemy.getStanceWeak()
+                + "  Toughness " + fmt(enemy.getMaxStance())
+                + "  Resist " + enemy.getDamageResist());
     }
 
     private static void printQueue(Battle battle) {
@@ -359,15 +374,15 @@ public class Main {
             names.add(signal.getCanHit().getName()
                     + "(" + fmt(battle.queue.getTimeRemaining(signal)) + ")");
         }
-        System.out.println("[行动条] " + String.join(" → ", names));
+        System.out.println("[Action bar] " + String.join(" → ", names));
     }
 
     // ==================================================================
-    // 组队（真实面板）
+    // Team building (real stats)
     // ==================================================================
 
     private static Character himeko() {
-        // 姬子 1003：火 / 速度 96 / 能量上限 120
+        // 姬子 1003: fire / speed 96 / max energy 120
         RelicSuit relics = new RelicSuit();
         relics.addMore(
                 relic(RelicType.HEAD, AttributeType.HEALTH, 705.6, AttributeType.CRIT_CHANCE, 0.12),
@@ -397,7 +412,7 @@ public class Main {
         return hero;
     }
 
-    /** 手工造一件遗器：主词条 + 一条副词条（真实随机生成见 {@code Relic.createRandomLevelZero}）。 */
+    /** Hand-build a relic: one main affix + one sub affix (real random generation is in {@code Relic.createRandomLevelZero}). */
     private static Relic relic(RelicType type, AttributeType main, double mainValue,
                                AttributeType sub, double subValue) {
         return Relic.create(15, 5, type,
@@ -406,7 +421,7 @@ public class Main {
     }
 
     // ==================================================================
-    // 工具
+    // Utilities
     // ==================================================================
 
     private static Enemy firstAliveEnemy(Battle battle) {
@@ -414,7 +429,7 @@ public class Main {
         return alive.isEmpty() ? null : alive.getFirst();
     }
 
-    /** 血量比例最低的存活角色（治疗/护盾的简化选目标策略）。 */
+    /** The living character with the lowest HP ratio (the simplified target-picking strategy for healing/shielding). */
     private static Character lowestHpRateCharacter(Battle battle) {
         Character worst = null;
         double worstRate = Double.MAX_VALUE;

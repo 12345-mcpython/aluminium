@@ -68,27 +68,34 @@ public class SkillData {
      */
     private final SkillEffectType effect;
     /**
-     * 开大阈值（{@code skills.json} 的 {@code sp_need}）：**只有终结技有值**，其余为 {@code null}。
+     * Ultimate activation threshold (the {@code sp_need} of {@code skills.json}): **only ultimates
+     * have a value**, the rest are {@code null}.
      *
-     * <p>它就是 tbgd {@code AvatarSkillConfig.SPNeed}。⚠ **不等于能量上限**：93 个角色里有 5 个
-     * 两者的比值是 2:1（云璃 240/120、银枝 180/90、绯英 480/240、飞霄 12/6、昔涟 24/12）。
-     * 另见 {@link #spBase}。
+     * <p>It is exactly tbgd's {@code AvatarSkillConfig.SPNeed}. ⚠ **It is NOT equal to the energy
+     * cap**: of the 93 characters, 5 have a 2:1 ratio between the two (Yunli 240/120, Argenti
+     * 180/90, 绯英 480/240, Feixiao 12/6, Cyrene (昔涟) 24/12).
+     * See also {@link #spBase}.
      */
     private final Double spNeed;
     /**
-     * 施放这个技能**回多少能量**（{@code skills.json} 的 {@code sp_base}）：tbgd
-     * {@code AvatarSkillConfig.SPBase}。
+     * **How much energy** is gained by casting this skill (the {@code sp_base} of
+     * {@code skills.json}): tbgd's {@code AvatarSkillConfig.SPBase}.
      *
-     * <p>常规档：普攻 20 / 战技 30 / 终结技 5 —— 与 {@code Constant.ENERGY_GAIN_*} 一致。
+     * <p>Regular tiers: basic attack 20 / skill 30 / ultimate 5 — consistent with
+     * {@code Constant.ENERGY_GAIN_*}.
      *
-     * <p>⚠ <b>本字段目前不驱动回能</b>（{@link com.laosun.aluminium.models.energy.StandardEnergyProvider}
-     * 仍用常量）。原因是数据里**多段/弹射技能的 {@code sp_base} 是"每段"值**
-     * （艾丝妲/桑博/那刻夏/同谐开拓者 6、瓦尔特 10），乘段数才对，而段数乘算依赖能力配置的
-     * {@code SPHitRatio}（本项目数据里没有）。常量给出的反而是**正确总量**。
-     * 数据化的正路见 ROADMAP P3-4（先聚合 {@code SPHitRatio}）。
+     * <p>⚠ <b>This field does not drive energy gain at present</b>
+     * ({@link com.laosun.aluminium.models.energy.StandardEnergyProvider} still uses the constants).
+     * The reason is that in the data the {@code sp_base} of **multi-hit / bouncing skills is a
+     * "per-hit" value** (Asta / Sampo / Anaxa / Harmony Trailblazer 6, Welt 10), and it would have
+     * to be multiplied by the hit count to be correct — but multiplying by hit count depends on
+     * the ability config's {@code SPHitRatio} (absent from this project's data). The constants
+     * happen to give the **correct total** instead.
+     * The proper data-driven path is ROADMAP P3-4 (aggregate {@code SPHitRatio} first).
      *
-     * <p>保留读取的价值：它是 {@code SPHitRatio} 聚合的输入，也是"哪些技能不回能"的原始事实
-     * （{@code null} = 该技能不回能）。
+     * <p>Value of keeping the read: it is the input for aggregating {@code SPHitRatio}, and it is
+     * also the raw fact of "which skills grant no energy gain" ({@code null} = that skill grants
+     * no energy gain).
      */
     private final Double spBase;
 
@@ -124,15 +131,17 @@ public class SkillData {
     }
 
     /**
-     * 数据里的 {@code attack_type} 解析成的枚举 —— **判分支请用这个**，不要拿
-     * {@link #getSkillType()} 的裸字符串做 {@code switch}/{@code equals}。
+     * The enum parsed from the data's {@code attack_type} — **use this to branch**, do not take the
+     * bare string from {@link #getSkillType()} and {@code switch}/{@code equals} on it.
      *
-     * <p>裸字符串的问题：数据侧改拼写或新增类型时**静默失配**（落 {@code default} 被吞掉）。
-     * 走枚举则"数据值 → 引擎语义"只有一处定义（{@link SkillCategory#fromString}），
-     * 新增类型时编译器会逼着每个 {@code switch} 表态。
+     * <p>The problem with the bare string: when the data side changes the spelling or adds a new
+     * type it **fails to match silently** (it falls into {@code default} and is swallowed).
+     * Going through the enum means "data value → engine semantics" is defined in exactly one place
+     * ({@link SkillCategory#fromString}), and when a new type is added the compiler forces every
+     * {@code switch} to take a position.
      *
-     * @return 永远非 {@code null}；数据为空时是 {@link SkillCategory#UNSPECIFIED}，
-     *         数据取值不认识时是 {@link SkillCategory#UNKNOWN}
+     * @return never {@code null}; {@link SkillCategory#UNSPECIFIED} when the data is empty, and
+     *         {@link SkillCategory#UNKNOWN} when the data value is not recognized
      */
     public SkillCategory getCategory() {
         return SkillCategory.fromString(skillType);

@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 关卡工厂（P7-5）：给一个 {@code stage_id}，组装出一个**可以直接开打**的 {@link Battle}。
+ * Stage factory (P7-5): given a {@code stage_id}, assemble a {@link Battle} that is **ready to fight**.
  *
  * <pre>{@code
  * Battle battle = StageFactory.load(103201);
  * while (!battle.isOver()) {
- *     battle.stepForward();   // currentMove = 当前行动者
+ *     battle.stepForward();   // currentMove = the current actor
  *     battle.beforeMove();
- *     // …出手…
+ *     // …take the action…
  *     battle.afterMove();
  *     if (battle.getWaveManager().isCurrentWaveCleared()
  *             && battle.getWaveManager().hasNextWave()) {
@@ -28,18 +28,22 @@ import java.util.Random;
  * }
  * }</pre>
  *
- * <p>难度来自关卡本身：{@code StageBean} 的 {@code hardLevelGroup} + {@code level}
- * 直接喂给 {@link com.laosun.aluminium.models.EnemyFactory#create(int, int, int)}，
- * 所以"同一个怪在不同关卡里不一样强"是数据决定的，不需要调用方传系数。
+ * <p>Difficulty comes from the stage itself: {@code StageBean}'s {@code hardLevelGroup} +
+ * {@code level} are fed straight to
+ * {@link com.laosun.aluminium.models.EnemyFactory#create(int, int, int)}, so "the same monster is
+ * not equally strong in different stages" is decided by the data and the caller does not need to
+ * pass any multiplier.
  *
- * <p>⚠ <b>队伍是临时的</b>：P7-5 阶段还没有 {@code CharacterFactory}（P8-1），
- * 所以 {@link #load(int)} 用 {@link #temporaryTeam()} 造一支占位队。
- * 生命周期到 P8-5 为止 —— 那时会换成真实的 4 人队。详见 {@link #temporaryTeam()}。
+ * <p>⚠ <b>The team is temporary</b>: at the P7-5 stage there is no {@code CharacterFactory} yet
+ * (P8-1), so {@link #load(int)} uses {@link #temporaryTeam()} to build a placeholder team.
+ * Its lifetime ends at P8-5 — at that point it will be replaced by a real 4-character team. See
+ * {@link #temporaryTeam()}.
  */
 public final class StageFactory {
     /**
-     * 占位角色的能量上限：{@code CanHit.maxEnergy} 默认 0 表示"没有能量条"，
-     * 那种角色永远放不出终结技。给它一个值是为了让 demo/关卡至少能走到大招分支。
+     * The placeholder characters' max energy: {@code CanHit.maxEnergy} defaults to 0, meaning "no
+     * energy bar", and such a character can never cast an ultimate. Giving it a value is so that the
+     * demo/stage can at least reach the ultimate branch.
      */
     private static final double TEMPORARY_MAX_ENERGY = 120;
 
@@ -47,95 +51,100 @@ public final class StageFactory {
     }
 
     /**
-     * 按关卡 id 组装一场**已经开打**的战斗：队伍就位、第 1 波已入场并排进行动条。
+     * Assemble a **battle already under way** from a stage id: the team is in place, wave 1 has
+     * entered and been ordered onto the action bar.
      *
-     * <p>用固定种子的调用方请用 {@link #load(int, List, Random)}。
+     * <p>Callers who want a fixed seed should use {@link #load(int, List, Random)}.
      *
-     * @param stageId 关卡 id（见 {@code StageBean}）
-     * @return 可直接 {@code stepForward()} 的战斗
-     * @throws IllegalArgumentException 关卡不存在（含 {@code stage.json} 未生成的情况）
+     * @param stageId stage id (see {@code StageBean})
+     * @return a battle that can be {@code stepForward()}ed right away
+     * @throws IllegalArgumentException if the stage does not exist (including the case where
+     *                                  {@code stage.json} has not been generated)
      */
     public static Battle load(int stageId) {
         return load(stageId, temporaryTeam(), new Random());
     }
 
     /**
-     * 按关卡 id + 指定队伍/随机源组装战斗。
+     * Assemble a battle from a stage id plus the given team/random source.
      *
-     * @param stageId 关卡 id
-     * @param team    我方队伍（不可为空）
-     * @param rng     随机源；固定种子可让整场可复现
-     * @return 可直接 {@code stepForward()} 的战斗
-     * @throws IllegalArgumentException 关卡不存在、队伍为空
+     * @param stageId stage id
+     * @param team    our team (must not be empty)
+     * @param rng     random source; a fixed seed makes the whole battle reproducible
+     * @return a battle that can be {@code stepForward()}ed right away
+     * @throws IllegalArgumentException if the stage does not exist or the team is empty
      */
     public static Battle load(int stageId, List<Character> team, Random rng) {
         StageBean stage = requireStage(stageId);
         if (team == null || team.isEmpty()) {
-            throw new IllegalArgumentException("队伍不能为空（stage " + stageId + "）");
+            throw new IllegalArgumentException("the team must not be empty (stage " + stageId + ")");
         }
-        // 敌队先给空列表：怪由 WaveManager 按波次追加
+        // the enemy team starts as an empty list: monsters are appended wave by wave by WaveManager
         Battle battle = new Battle(team, new ArrayList<>(), rng == null ? new Random() : rng);
         WaveManager waves = new WaveManager(battle, stage);
 
         battle.startBattle();
         if (!waves.nextWave()) {
-            throw new IllegalArgumentException("关卡 " + stageId + " 没有任何一波怪物");
+            throw new IllegalArgumentException("stage " + stageId + " has no monsters in any wave");
         }
-        battle.processRequests();          // 进怪是"排队入场"，必须结算一次才进行动条
+        battle.processRequests();          // monsters entering is a "queued entry": it MUST be settled once before they go on the action bar
         return battle;
     }
 
     /**
-     * 取关卡数据。
+     * Get the stage data.
      *
-     * @param stageId 关卡 id
-     * @return 关卡数据
-     * @throws IllegalArgumentException 关卡不存在，或数据文件没生成
+     * @param stageId stage id
+     * @return the stage data
+     * @throws IllegalArgumentException if the stage does not exist, or the data file was not generated
      */
     public static StageBean requireStage(int stageId) {
         StageBean stage = Constant.stages().get(stageId);
         if (stage == null) {
             throw new IllegalArgumentException(Constant.stages().isEmpty()
-                    ? "关卡数据未加载（stage.json 是 generator 产出的，见 README 的 generator 一节）"
-                    : "未知关卡 id: " + stageId);
+                    ? "stage data not loaded (stage.json is generator output; see the generator section of the README)"
+                    : "unknown stage id: " + stageId);
         }
         return stage;
     }
 
     /**
-     * 关卡是否存在（且数据已生成）。
+     * Whether the stage exists (and its data has been generated).
      */
     public static boolean hasStage(int stageId) {
         return Constant.stages().containsKey(stageId);
     }
 
     /**
-     * **临时**队伍：3 人占位，速度各不相同（好让行动条顺序有区分度）。
+     * **Temporary** team: 3 placeholders, each with a different speed (so the action-bar order is
+     * distinguishable).
      *
      * <pre>
-     *   临时角色 A  速度 100    —— 基准
-     *   临时角色 B  速度 134    —— 先手
-     *   临时角色 C  速度  90    —— 后手
+     *   temporary character A  speed 100    —— baseline
+     *   temporary character B  speed 134    —— acts first
+     *   temporary character C  speed  90    —— acts last
      * </pre>
      *
-     * <p>⚠ 这不是"角色"，只是能站进战斗的占位数据：没有光锥、遗器、真实技能与命途
-     * （{@code fromAttributes} 给的是 {@code DefaultSkill}，命途 {@code OTHER}）。
-     * P8-5 会把它换成 {@code CharacterFactory} 造的 4 人真队，本方法届时删除。
+     * <p>⚠ These are not "characters", only placeholder data that can stand in a battle: no light
+     * cone, no relics, no real skills and no path ({@code fromAttributes} hands out
+     * {@code DefaultSkill}, path {@code OTHER}).
+     * P8-5 will replace it with a real 4-character team built by {@code CharacterFactory}, and this
+     * method will be deleted then.
      *
-     * <p>面板量级刻意取"能打完一关"的水平（HP 1 万 / 攻防 100），
-     * 而不是真实角色面板 —— 真面板要等 P8-1。
+     * <p>The stat magnitudes deliberately sit at the "can finish a stage" level (HP 10k / atk+def
+     * 100) rather than a real character's stat sheet — the real stat sheet has to wait for P8-1.
      */
     public static List<Character> temporaryTeam() {
         List<Character> team = new ArrayList<>();
-        team.add(temporaryCharacter("临时角色 A", 100));
-        team.add(temporaryCharacter("临时角色 B", 134));
-        team.add(temporaryCharacter("临时角色 C", 90));
+        team.add(temporaryCharacter("Temporary Character A", 100));
+        team.add(temporaryCharacter("Temporary Character B", 134));
+        team.add(temporaryCharacter("Temporary Character C", 90));
         return team;
     }
 
     private static Character temporaryCharacter(String name, int speed) {
         Character character = Character.fromAttributes(name, 10_000, 100, 100, speed);
-        character.setMaxEnergy(TEMPORARY_MAX_ENERGY);   // 否则永远放不出终结技
+        character.setMaxEnergy(TEMPORARY_MAX_ENERGY);   // otherwise it can never cast an ultimate
         character.setCurrentEnergy(0);
         return character;
     }

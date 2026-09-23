@@ -59,7 +59,7 @@ public class DamageHookTest {
         Enemy enemy = enemy();
         enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
 
-        enemy.getBuffManager().beforeMove();     // 后置 buff：beforeMove 不动它
+        enemy.getBuffManager().beforeMove();     // a late buff: beforeMove does not touch it
 
         Assertions.assertEquals(1500, settle(attacker(), enemy), EPS);
     }
@@ -71,7 +71,7 @@ public class DamageHookTest {
         Assertions.assertEquals(1500, settle(attacker(), enemy), EPS);
 
         enemy.getBuffManager().afterMove();
-        enemy.getBuffManager().afterMove();      // duration 2 → 0，到期即摘掉修正
+        enemy.getBuffManager().afterMove();      // duration 2 → 0; on expiry the modifier is removed
 
         Assertions.assertEquals(1000, settle(attacker(), enemy), EPS);
     }
@@ -98,13 +98,13 @@ public class DamageHookTest {
         Enemy enemy = enemy();
         enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
 
-        // 击破不吃增伤/双暴（BoostArea / CritArea 的 applies() 挡掉），但吃易伤 —— P4 复用它
+        // break gets no DMG boost / crit stats (blocked by BoostArea / CritArea's applies()), but it does get vulnerability — P4 reuses this
         Assertions.assertEquals(1500, settle(attacker(), enemy, DamageType.BREAK), EPS);
     }
 
     @Test
     public void attackerSideWeaknessFeedsTheWeaknessZone() {
-        // 虚弱是"攻击方负面"（HSR.md §2.2）→ 钩子必须也遍历攻击方
+        // weakness is an "attacker-side debuff" (HSR.md §2.2) → the hook must iterate the attacker side too
         Character attacker = attacker();
         attacker.getBuffManager().addBuff(new WeaknessBuff(2, 0.4));
 
@@ -112,9 +112,11 @@ public class DamageHookTest {
     }
 
     // ==================================================================
-    // C-1：注入乘区的 buff 必须只看自己站在哪一侧
-    //   Battle.assemble 把 DamageEvent 广播给攻守双方，所以"挂在哪一侧"必须由 buff 自己判，
-    //   否则挂在敌人身上的易伤会连它自己的输出一起提高、挂在角色身上的减伤会削自己的输出。
+    // C-1: a buff that injects a damage zone must look only at which side it stands on
+    //   Battle.assemble broadcasts DamageEvent to both the attacking and defending sides, so "which
+    //   side it is attached to" must be judged by the buff itself; otherwise vulnerability attached
+    //   to an enemy would also raise its own output, and reduction attached to a character would
+    //   weaken its own output.
     // ==================================================================
 
     @Test
@@ -122,13 +124,13 @@ public class DamageHookTest {
         Character attacker = attacker();
         attacker.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
 
-        // 受击方身上没有易伤 → 这一击就是干净的 1000（易伤只算"我挨的那一下"）
+        // the defending side has no vulnerability → this hit is a clean 1000 (vulnerability only counts for "the hit I take")
         Assertions.assertEquals(1000, settle(attacker, enemy()), EPS);
     }
 
     @Test
     public void vulnerabilityStillAppliesWhenItsOwnerIsTheDefender() {
-        // 与上一条配对：挂对了侧就必须照常生效（防止"一刀切不生效"的假修复）
+        // paired with the previous case: attached to the right side it must still take effect (guards against a fake fix that just disables everything)
         Character attacker = attacker();
         Enemy enemy = enemy();
         enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
@@ -141,7 +143,7 @@ public class DamageHookTest {
         Character attacker = attacker();
         attacker.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
 
-        Assertions.assertEquals(1000, settle(attacker, enemy()), EPS, "减伤只挡「我挨的那一下」");
+        Assertions.assertEquals(1000, settle(attacker, enemy()), EPS, "reduction only blocks 「the hit I take」");
     }
 
     @Test
@@ -154,8 +156,9 @@ public class DamageHookTest {
     }
 
     /**
-     * 测试内嵌的攻击方负面 buff：证明 {@code DamageEvent} 会在攻击方一侧被触发。
-     * （生产用的 WeaknessBuff 留给 P10-3 统一做。）
+     * An attacker-side debuff buff embedded in the test: proving that {@code DamageEvent} is also
+     * triggered on the attacker side.
+     * (The production WeaknessBuff is left to P10-3 to do uniformly.)
      */
     private static class WeaknessBuff extends AbstractBuff implements DamageEvent {
         private final double ratio;

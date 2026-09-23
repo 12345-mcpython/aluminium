@@ -20,55 +20,59 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * 特殊供能角色走**独立 {@link EnergyProvider}**（{@link NoConventionalEnergyProvider}）。
+ * Special energy-provider characters use an **independent {@link EnergyProvider}**
+ * ({@link NoConventionalEnergyProvider}).
  *
- * <p>背景：飞霄 1220 / 黄泉 1308 / 遐蝶 1407 / 白厄 1408 / 昔涟 1415 / 银狼LV.999 1506
- * 在游戏里攒的不是能量，而是层数 / 【新蕊】/【火种】/【追忆】等资源。
+ * <p>Background: Feixiao 1220 / Acheron 1308 / Castorice 1407 / Phainon 1408 / Cyrene 1415 /
+ * Silver Wolf LV.999 1506 accumulate, in the game, not energy but stacks / resources such as
+ * 【新蕊】/【火种】/【追忆】.
  *
- * <p>为什么必须拦满 5 个钩子：{@code castUltra} 的门槛是 {@code currentEnergy >= maxEnergy}，
- * 而这些角色的上限很低（黄泉 **9**、飞霄/白厄 **12**）。只堵技能那两条的话，
- * 他们挨一两下就能凑满并**放出一个本不该存在的终结技**（槽位 3 确实是 {@code Ultra}）。
- * 这个类就是那条护栏。
+ * <p>Why all 5 hooks MUST be blocked: {@code castUltra}'s threshold is
+ * {@code currentEnergy >= maxEnergy}, and these characters' caps are very low (Acheron **9**,
+ * Feixiao/Phainon **12**). If only the two skill hooks were plugged, they would fill up after taking
+ * one or two hits and **cast an ultimate that should not exist** (slot 3 really is {@code Ultra}).
+ * This class is that guardrail.
  *
- * <p>为什么不放在 {@link StandardEnergyProvider} 里判空：那是**设计归类**而不是单条数据事实，
- * 按 P8-0 的三分法归 provider / 装配点（也是唯一允许出现 {@code cid} 的地方）。
+ * <p>Why the empty check does not live in {@link StandardEnergyProvider}: that is a **design
+ * classification** rather than a single data fact, so per P8-0's three-way split it belongs to the
+ * provider / assembly point (which is also the only place {@code cid} is allowed to appear).
  */
 public class SpecialEnergyProviderTest {
     private static final double EPS = 1e-9;
 
-    /** 全项目"走特殊资源"的角色，逐个明确写出来（多一个少一个都要显式改）。 */
+    /** Every character in the project that "uses a special resource", written out one by one (adding or removing one must be an explicit change). */
     private static final int[] SPECIAL = {1220, 1308, 1407, 1408, 1415, 1506};
 
     private final EnergyProvider standard = new StandardEnergyProvider();
     private final EnergyProvider none = new NoConventionalEnergyProvider();
 
     // ==================================================================
-    // 一、provider 本身
+    // 1. The provider itself
     // ==================================================================
 
-    /** 5 个钩子全部不入账 —— 这是"任何来源都不该回能"的完整表达。 */
+    /** All 5 hooks credit nothing — this is the complete expression of "no source should grant energy". */
     @Test
     public void specialProviderGrantsNothingFromAnySource() {
-        Character any = CharacterFactory.create(1308, 80);      // 黄泉
+        Character any = CharacterFactory.create(1308, 80);      // Acheron
         Skill skill = realSkill(1308, SkillType.COMMON);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         var hit = new com.laosun.aluminium.models.Damage(any, enemy,
                 com.laosun.aluminium.enums.DamageElement.THUNDER,
                 com.laosun.aluminium.enums.DamageType.NORMAL, 100);
 
-        Assertions.assertNull(none.onSkillCast(any, skill, Set.of()), "技能施放");
-        Assertions.assertNull(none.onUltCast(any, realSkill(1308, SkillType.ULTRA)), "终结技");
-        Assertions.assertNull(none.onTakingHit(any, hit), "受击");
-        Assertions.assertNull(none.onKill(any, any), "击杀");
-        Assertions.assertNull(none.onBreak(any, any), "击破");
+        Assertions.assertNull(none.onSkillCast(any, skill, Set.of()), "skill cast");
+        Assertions.assertNull(none.onUltCast(any, realSkill(1308, SkillType.ULTRA)), "ultimate");
+        Assertions.assertNull(none.onTakingHit(any, hit), "taking a hit");
+        Assertions.assertNull(none.onKill(any, any), "kill");
+        Assertions.assertNull(none.onBreak(any, any), "break");
     }
 
-    /** 对照：常规 provider 的同样 5 个钩子都会给（受击 10 / 击杀 5 / 击破 5）。 */
+    /** Control: the standard provider's same 5 hooks all grant something (hit 10 / kill 5 / break 5). */
     @Test
     public void standardProviderGrantsFromEverySource() {
         Character regular = CharacterFactory.create(1204, 80);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        // onTakingHit 自己会判 damage == null（那是"没有伤害事件"），所以这里给一发真伤害
+        // onTakingHit checks damage == null itself (that means "no damage event"), so give it a real damage instance here
         var hit = new com.laosun.aluminium.models.Damage(regular, enemy,
                 com.laosun.aluminium.enums.DamageElement.THUNDER,
                 com.laosun.aluminium.enums.DamageType.NORMAL, 100);
@@ -84,35 +88,35 @@ public class SpecialEnergyProviderTest {
         Assertions.assertEquals(5, standard.onBreak(regular, regular).amount(), EPS);
     }
 
-    /** 常规 provider 仍走常量（20/30/5），与 ROADMAP P3-0 的常规档一致 —— 不依赖技能数据。 */
+    /** The standard provider still uses the constants (20/30/5), matching ROADMAP P3-0's standard tier — it does not depend on skill data. */
     @Test
     public void standardProviderUsesTheConventionalConstants() {
-        Character yaoGuang = CharacterFactory.create(1502, 80);   // 爻光：普攻数据是 30（离档）
+        Character yaoGuang = CharacterFactory.create(1502, 80);   // Yao Guang: the basic-attack data says 30 (off-tier)
         Assertions.assertEquals(20, standard.onSkillCast(yaoGuang,
                         realSkill(1502, SkillType.COMMON), Set.of()).amount(), EPS,
-                "常规 provider 给常量 20（离档值的保真留给 P3-4 的数据化）");
+                "the standard provider grants the constant 20 (fidelity to the off-tier value is left to P3-4's datafication)");
     }
 
     // ==================================================================
-    // 二、装配点
+    // 2. The assembly point
     // ==================================================================
 
-    /** {@code CharacterFactory} 给这 6 个角色换上了特殊 provider。 */
+    /** {@code CharacterFactory} swaps in the special provider for these 6 characters. */
     @Test
     public void factoryInjectsTheSpecialProvider() {
         for (int cid : SPECIAL) {
             Character c = CharacterFactory.create(cid, 80);
             Assertions.assertTrue(c.getEnergyProvider() instanceof NoConventionalEnergyProvider,
-                    "cid=" + cid + " 应当是特殊 provider，实际 " + c.getEnergyProvider().getClass().getSimpleName());
+                    "cid=" + cid + " should use the special provider, actual " + c.getEnergyProvider().getClass().getSimpleName());
             Assertions.assertTrue(CharacterFactory.usesSpecialResource(cid));
         }
         Character jingYuan = CharacterFactory.create(1204, 80);
         Assertions.assertTrue(jingYuan.getEnergyProvider() instanceof StandardEnergyProvider,
-                "常规角色仍然是标准 provider");
+                "a regular character still uses the standard provider");
         Assertions.assertFalse(CharacterFactory.usesSpecialResource(1204));
     }
 
-    /** 占位入口不受影响（它不查角色数据，也就没有 cid 可判）。 */
+    /** Placeholder entry points are unaffected (it does not look up character data, so there is no cid to judge by). */
     @Test
     public void placeholderCharactersKeepTheStandardProvider() {
         Character placeholder = Character.fromAttributes("hero", 10_000, 100, 100, 100);
@@ -120,13 +124,14 @@ public class SpecialEnergyProviderTest {
     }
 
     // ==================================================================
-    // 三、端到端：这才是防回归的部分
+    // 3. End to end: this is the anti-regression part
     // ==================================================================
 
     /**
-     * 核心：黄泉挨打**一点能量都不涨**。
+     * The core: Acheron gains **not a single point of energy** from being hit.
      *
-     * <p>她上限只有 9，修之前挨一下（+10）就满，能直接放出终结技。
+     * <p>Her cap is only 9; before the fix one hit (+10) filled it and she could cast an ultimate
+     * straight away.
      */
     @Test
     public void acheronGainsNothingFromBeingHit() {
@@ -135,7 +140,7 @@ public class SpecialEnergyProviderTest {
         Battle battle = new Battle(List.of(acheron), List.of(enemy), new Random(0));
         battle.startBattle();
 
-        // 让敌人打她几下：敌人 132 速先动
+        // Let the enemy hit her a few times: the enemy has 132 speed and acts first
         for (int i = 0; i < 6 && !battle.isOver(); i++) {
             battle.stepForward();
             if (battle.currentMove == null) {
@@ -152,13 +157,13 @@ public class SpecialEnergyProviderTest {
         }
 
         Assertions.assertEquals(0, acheron.getCurrentEnergy(), EPS,
-                "黄泉的能量应当恒为 0（受击/技能都不入账），实际 " + acheron.getCurrentEnergy());
+                "Acheron's energy should always be 0 (neither hits nor skills are credited), actual " + acheron.getCurrentEnergy());
         Assertions.assertFalse(acheron.isEnergyFull(),
-                "永远不该满能量 —— 满了就能放出不该存在的终结技");
+                "she should never be at full energy — being full lets her cast an ultimate that should not exist");
     }
 
     /**
-     * 对照：景元同样挨打，能量会涨（受击回能 10）。
+     * Control: Jing Yuan takes the same hits, and his energy does rise (taking a hit grants 10 energy).
      */
     @Test
     public void regularCharacterStillGainsFromBeingHit() {
@@ -183,11 +188,12 @@ public class SpecialEnergyProviderTest {
         }
 
         Assertions.assertTrue(jingYuan.getCurrentEnergy() > 0,
-                "常规角色应当有能量入账，实际 " + jingYuan.getCurrentEnergy());
+                "a regular character should have energy credited, actual " + jingYuan.getCurrentEnergy());
     }
 
     /**
-     * 6 个特殊角色在真实战斗里**能量恒为 0**（穷举，避免只保一个）。
+     * The 6 special characters have **energy constantly at 0** in a real battle (exhaustive, to avoid
+     * protecting only one of them).
      */
     @Test
     public void everySpecialResourceCharacterStaysAtZeroEnergy() {
@@ -212,7 +218,7 @@ public class SpecialEnergyProviderTest {
                 battle.afterMove();
             }
             Assertions.assertEquals(0, c.getCurrentEnergy(), EPS,
-                    "cid=" + cid + "（" + c.getName() + "）的能量应当恒为 0");
+                    "cid=" + cid + " (" + c.getName() + ")'s energy should always be 0");
         }
     }
 
@@ -223,12 +229,12 @@ public class SpecialEnergyProviderTest {
             case COMMON -> 1;
             case SKILL -> 2;
             case ULTRA -> 3;
-            default -> throw new IllegalArgumentException("本测试只用 1/2/3 槽");
+            default -> throw new IllegalArgumentException("this test only uses slots 1/2/3");
         };
         return new DefaultSkill(cid, slot, 1);
     }
 
-    /** 敌人的普攻（P5-3 装在敌人身上的技能）。 */
+    /** The enemy's basic attack (the skill P5-3 attaches to enemies). */
     private static Skill enemySkill(Enemy enemy) {
         return enemy.getSkills().values().iterator().next();
     }

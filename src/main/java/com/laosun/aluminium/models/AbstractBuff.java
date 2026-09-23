@@ -11,13 +11,17 @@ public abstract class AbstractBuff implements Buff {
     protected final boolean isEarlyBuff;
 
     /**
-     * 这个 buff 当前挂在谁身上（由 {@link BuffManager#addBuff(AbstractBuff)} 在挂载时写入）。
+     * Who this buff is currently attached to (written by {@link BuffManager#addBuff(AbstractBuff)} at
+     * attach time).
      *
-     * <p>存在的理由：{@code Battle.assemble} 会把 {@code DamageEvent} 广播给**攻击方与受击方双方**，
-     * 而"易伤（受击方负面）"/"减伤（受击方增益）"这类只在结算时注入乘区的 buff 必须知道
-     * 自己是不是本段的受击方——否则挂在敌人身上的易伤会连它自己打人也一起加伤。
+     * <p>Why it exists: {@code Battle.assemble} broadcasts {@code DamageEvent} to **both the attacker and
+     * the target**, and buffs like "vulnerability (易伤, a debuff on the target)" / "reduction (减伤, a buff
+     * on the target)" that only inject a damage zone during settlement MUST know whether they are the target
+     * of this instance — otherwise vulnerability attached to an enemy would also boost the damage when that
+     * enemy itself attacks.
      *
-     * <p>与 {@link #source}（施加者）不是一回事，别混：{@code source} 是谁挂的，{@code owner} 是挂在谁身上。
+     * <p>It is not the same thing as {@link #source} (the applier), do not confuse them: {@code source} is
+     * who applied it, {@code owner} is who it is attached to.
      */
     @Setter
     protected CanHit owner;
