@@ -1856,8 +1856,19 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
   恰好 5 个低于上限 / 云璃 120 可放 / 放开即清零 / 常规角色仍需攒满 /
   无能量条永远放不了 / 特殊资源角色攒不起来。
 - **仍未做**（本项剩下的）：
-    - 槽位 6/7（需要先给 `SkillType` 加"地图普攻/秘技"两个枚举值）。
     - `SkillExecutor` 的 non-damaging default 分支提示（计划第 3 条）。
+    - **秘技的效果**（非"挂上技能"）：例如景元"下一场战斗开始时【神君】+3 段"
+      —— 需要 P8-6 的事件补齐 + P8-7 的触发器表。目前 `startBattle()` 只把技能挂上。
+- **✅ 槽位 6/7 已装配**（2026-09-21，按"地图技能应在战斗 init 附加"的意见做的）：
+    - `SkillType` 补了 `MAZE`(6) / `TECHNIQUE`(7)，并加 `isIntrinsic()` 作分界线
+      —— 常驻四槽位 vs 地图两槽位。
+    - `Character.Builder` 只装常驻槽位；`Battle.startBattle()` → `attachBattleSkills()`
+      给我方角色附加地图普攻与秘技（不覆盖已显式装过的）。
+    - 顺带给 `Character` 加了 `cid` 字段（附加那一刻装配点已远，角色得自己记得 id）。
+    - 覆盖：`mapSkillsAreAttachedAtBattleStartNotAtBuild`（造角色时没有 / 开战后有且解析到
+      自己的槽位）、`explicitlyInstalledMapSkillIsNotOverwritten`、
+      `everyCharacterGetsMapSkillsAtBattleStart`（93 角色穷举）。
+    - 变异验证：去掉 `attachBattleSkills()` → 3 红。
 - **⚠ 一处自我更正**：我曾把"技能等级没接进伤害"记成缺口，**这是错的**。
   `SkillExecutor` 一直用 `int index = skill.getLevel() - 1` 取逐级参数表的第 N 行。
   出错原因很蠢：我构造了 8 级技能，却断言 `getData().getSkills().getFirst()` 是 1.2 ——

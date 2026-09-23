@@ -207,11 +207,43 @@ public class Battle {
 
     public void startBattle() {
         status = Status.RUNNING;
+        attachBattleSkills();
         for (Signal signal : queue.snapshot()) {
             signal.getCanHit().onBattleStart(this);
         }
         processRequests();
         checkResult();
+    }
+
+    /**
+     * 战斗开场附加**地图技能**（P8-2）：地图普攻（槽位 6）与秘技（槽位 7）。
+     *
+     * <p>为什么在这里而不是在 {@code CharacterFactory} 里：这两个槽位是**地图上的东西**，
+     * 不是角色常驻技能 —— 它们只在"进入战斗"这一刻才有意义。
+     * 数据里地图普攻的攻击类型是 {@code MazeNormal}、秘技是 {@code Maze}，
+     * 而战斗内普攻是槽位 1 的 {@code Normal}，两者不是一回事。
+     *
+     * <p>秘技的**效果**（例如景元"下一场战斗开始时【神君】+3 段"）要等 P8-6 的事件补齐 +
+     * 触发器表，本方法只把技能本身挂上（数据可读、可执行）。
+     *
+     * <p>只给我方角色附加：怪物没有地图技能（{@code EnemyFactory} 装的是自己的普攻）。
+     */
+    private void attachBattleSkills() {
+        for (Character character : characters) {
+            if (character.isDeath()) {
+                continue;
+            }
+            for (SkillType type : List.of(SkillType.MAZE, SkillType.TECHNIQUE)) {
+                if (character.getSkills().containsKey(type)) {
+                    continue;                        // 已显式装过（测试或自定义）就不覆盖
+                }
+                Integer slot = Constant.SKILL_SLOT.get(type);
+                if (slot == null) {
+                    continue;
+                }
+                character.setSkill(type, new DefaultSkill(character.getCid(), slot, 1));
+            }
+        }
     }
 
     public void stepForward() {
