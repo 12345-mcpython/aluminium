@@ -151,8 +151,11 @@ public final class Constant {
      * <p>数据的槽位约定：<b>1 普攻 / 2 战技 / 3 终结技 / 4 天赋 / 5（无）/ 6 地图普攻 / 7 秘技</b>，
      * 且 {@code skill_id = 角色id × 100 + 槽位}（638 条技能**全部**满足，已核对）。
      *
-     * <p>⚠ 为什么只有这 4 项：{@link SkillType} 里没有地图普攻/秘技对应的枚举值，
-     * 所以槽位 6/7 无法映射 —— 想覆盖它们得先加枚举值（见 ROADMAP P8-2 的偏差记录）。
+     * <p>⚠ 槽位 5 在数据里不存在（93 个角色的技能集里都没有），所以这里也没有对应项。
+     *
+     * <p>⚠ {@code MAZE} / {@code TECHNIQUE} 虽然是角色自己的技能，但**不在造角色时装**
+     * （见 {@link SkillType#isIntrinsic()}）：它们是地图技能，由
+     * {@code Battle.startBattle()} 在开场附加。这张表被两处共同使用。
      *
      * <p>⚠ 这张表必须**只有一份**：修之前 {@code Character.Builder.build()} 把每个槽位
      * 都写成 {@code new DefaultSkill(cid, 1, level)}，于是普攻/战技/终结技/天赋**全部**解析到槽位 1，
@@ -162,7 +165,9 @@ public final class Constant {
             SkillType.COMMON, 1,
             SkillType.SKILL, 2,
             SkillType.ULTRA, 3,
-            SkillType.TALENT, 4);
+            SkillType.TALENT, 4,
+            SkillType.MAZE, 6,
+            SkillType.TECHNIQUE, 7);
 
     /**
      * Maps percentage-type attributes to their corresponding base-type attributes.

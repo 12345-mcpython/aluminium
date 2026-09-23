@@ -55,6 +55,15 @@ import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BA
 @ToString(callSuper = true)
 public class Character extends CanHit {
     /**
+     * 角色 id（{@code character_data.json} 的键）。
+     *
+     * <p>存在的理由：技能数据是按 {@code cid} 查的（{@code Constant.SKILLS.get(cid)}），
+     * 而地图普攻/秘技是**战斗开场才附加**的（见 {@code Battle#startBattle}）——
+     * 那一刻装配点已经远了，所以角色得自己记得自己的 id。
+     */
+    private int cid;
+
+    /**
      * The relic suit equipped on this character.
      */
     private RelicSuit relicSuit;
@@ -109,6 +118,7 @@ public class Character extends CanHit {
         this.path = other.path;
         this.aggro = other.aggro;
         this.element = other.element;
+        this.cid = other.cid;
     }
 
     /**
@@ -296,7 +306,11 @@ public class Character extends CanHit {
                 SkillType type = entry.getKey();
                 int level = entry.getValue();
                 // P8-2：每个槽位解析**自己的** skill_id（此前恒为 1，六个槽位都是普攻的数据）。
-                // SkillType 里没有地图普攻/秘技，所以那两个槽位暂不装配（见 Constant.SKILL_SLOT）。
+                // 只装"角色常驻"的槽位：地图普攻(6)/秘技(7) 是地图技能，由 Battle.startBattle() 附加；
+                // 召唤物槽位属于忆灵（P9-4），都不在这里装。
+                if (!type.isIntrinsic()) {
+                    continue;
+                }
                 Integer slot = Constant.SKILL_SLOT.get(type);
                 if (slot == null) {
                     continue;
@@ -307,6 +321,7 @@ public class Character extends CanHit {
             character.setSkills(skills);
             character.setSkillLevel(skillLevel);
             character.setLevel(level);
+            character.setCid(cid);
             // P5-1：命途与仇恨来自角色数据（mt=命途字符串，aggro=游戏倍率本身）
             character.setPath(this.path != null ? this.path : Path.fromMt(characterData.mt()));
             character.setAggro(characterData.aggro() > 0 ? characterData.aggro() : 0);

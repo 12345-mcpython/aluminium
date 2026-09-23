@@ -470,15 +470,27 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 
 映射表只有一份：`Constant.SKILL_SLOT`。
 
-| `SkillType` | 槽位 | 数据里的攻击类型 |
-|---|---|---|
-| `COMMON` | **1** | `Normal` |
-| `SKILL` | **2** | `BPSkill` |
-| `ULTRA` | **3** | `Ultra` |
-| `TALENT` | **4** | 空（`null`） |
+| `SkillType` | 槽位 | 数据里的攻击类型 | 何时装配 |
+|---|---|---|---|
+| `COMMON` | **1** | `Normal` | 造角色时（常驻） |
+| `SKILL` | **2** | `BPSkill` | 造角色时（常驻） |
+| `ULTRA` | **3** | `Ultra` | 造角色时（常驻） |
+| `TALENT` | **4** | 空（`null`） | 造角色时（常驻） |
+| `MAZE` | **6** | `MazeNormal` | **`Battle.startBattle()` 附加** |
+| `TECHNIQUE` | **7** | `Maze` | **`Battle.startBattle()` 附加** |
 
-数据约定：**1 普攻 / 2 战技 / 3 终结技 / 4 天赋 / 5（无）/ 6 地图普攻 / 7 秘技**，
+数据约定：**1 普攻 / 2 战技 / 3 终结技 / 4 天赋 / 5（数据里不存在）/ 6 地图普攻 / 7 秘技**，
 且 `skill_id = 角色id × 100 + 槽位`（638 条技能**全部**满足，已核对）。
+
+**为什么地图普攻/秘技不在造角色时装**（`SkillType.isIntrinsic()` 是那条分界线）：
+它们是**地图上的东西**，只在"进入战斗"这一刻才有意义 ——
+地图普攻（槽位 6）是大地图上打怪、以及"进入战斗时削韧"那一下，
+而**战斗内普攻是槽位 1** 的 `Normal`，两者不是一回事。
+所以 `CharacterFactory` 造出来的角色身上没有它们，`Battle.startBattle()` 才挂上
+（`attachBattleSkills()` 只给我方角色、且不覆盖已显式装过的）。
+
+> ⚠ 秘技的**效果**（例如景元"下一场战斗开始时【神君】+3 段"）还没做 ——
+> 那要等 P8-6 的事件补齐 + 触发器表。目前只把技能本身挂上（数据可读、可执行）。
 
 > ✅ 已修：修之前 `Character.Builder.build()` 与 `Character.fromAttributes(...)` 都写死
 > `new DefaultSkill(cid, 1, level)` —— **六个槽位解析到的全是槽位 1（普攻）的数据**，
@@ -486,9 +498,6 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 > ⚠ 这个 bug 长期没被发现，因为既有测试（`SkillExecutorTest`/`SuperBreakTest`）都**自己构造**
 > `new DefaultSkill(cid, 槽位, …)`，而 `EnergyTest` 验的是 provider 分派 ——
 > "角色实际拿到什么技能"这条路没人走过。现由 `SkillSlotMappingTest` 覆盖。
-
-⚠ **槽位 6/7 仍未装配**：`SkillType` 里没有地图普攻/秘技对应的枚举值，
-所以 `SKILL_SLOT` 只有 4 项。要覆盖它们得先加枚举值（见 ROADMAP P8-2）。
 
 ✅ **技能等级是接进伤害的**：`SkillExecutor` 用 `int index = skill.getLevel() - 1` 取
 `SkillData.getSkills()`（整张逐级表）的第 N 行，所以 8 级打的是第 8 档倍率。

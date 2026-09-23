@@ -33,19 +33,81 @@ import java.util.Random;
 public class SkillSlotMappingTest {
     private static final double EPS = 1e-9;
 
-    /** 槽位表本身：1 普攻 / 2 战技 / 3 终结技 / 4 天赋，且只有这 4 项。 */
+    /** 槽位表本身：1 普攻 / 2 战技 / 3 终结技 / 4 天赋 / 6 地图普攻 / 7 秘技（5 在数据里不存在）。 */
     @Test
     public void slotTableIsTheSingleSourceOfTruth() {
         Assertions.assertEquals(Map.of(
                         SkillType.COMMON, 1,
                         SkillType.SKILL, 2,
                         SkillType.ULTRA, 3,
-                        SkillType.TALENT, 4),
+                        SkillType.TALENT, 4,
+                        SkillType.MAZE, 6,
+                        SkillType.TECHNIQUE, 7),
                 Constant.SKILL_SLOT);
 
-        // SkillType 里没有地图普攻/秘技，所以槽位 6/7 刻意不映射
+        // 召唤物的两个槽位属于忆灵（P9-4），不在角色槽位表里
         Assertions.assertFalse(Constant.SKILL_SLOT.containsKey(SkillType.SUMMON_SKILL));
         Assertions.assertFalse(Constant.SKILL_SLOT.containsKey(SkillType.SUMMON_TALENT));
+
+        // 常驻 vs 战斗开场附加的分界
+        for (SkillType type : new SkillType[]{SkillType.COMMON, SkillType.SKILL,
+                SkillType.ULTRA, SkillType.TALENT}) {
+            Assertions.assertTrue(type.isIntrinsic(), type + " 应当是常驻技能");
+        }
+        for (SkillType type : new SkillType[]{SkillType.MAZE, SkillType.TECHNIQUE,
+                SkillType.SUMMON_SKILL, SkillType.SUMMON_TALENT}) {
+            Assertions.assertFalse(type.isIntrinsic(), type + " 不该是常驻技能");
+        }
+    }
+
+    /**
+     * 地图普攻/秘技**不在造角色时装配**，而在 {@code Battle.startBattle()} 附加。
+     *
+     * <p>这是刻意的分层：地图普攻（槽位 6，攻击类型 {@code MazeNormal}）与秘技（槽位 7，
+     * {@code Maze}）是地图上的东西；战斗内普攻是槽位 1 的 {@code Normal}，两者不是一回事。
+     */
+    @Test
+    public void mapSkillsAreAttachedAtBattleStartNotAtBuild() {
+        Character hero = CharacterFactory.create(1204, 80);
+
+        // 造出来时：没有地图技能
+        Assertions.assertFalse(hero.getSkills().containsKey(SkillType.MAZE),
+                "角色刚造出来不该有地图普攻");
+        Assertions.assertFalse(hero.getSkills().containsKey(SkillType.TECHNIQUE),
+                "角色刚造出来不该有秘技");
+        // 常驻的四个都在
+        for (SkillType type : new SkillType[]{SkillType.COMMON, SkillType.SKILL,
+                SkillType.ULTRA, SkillType.TALENT}) {
+            Assertions.assertTrue(hero.getSkills().containsKey(type), type + " 应当常驻");
+        }
+
+        // 开战后：地图技能被附加，且解析到**自己的槽位**
+        Battle battle = newBattle(hero);
+        for (SkillType type : new SkillType[]{SkillType.MAZE, SkillType.TECHNIQUE}) {
+            Skill attached = hero.getSkills().get(type);
+            Assertions.assertNotNull(attached, "开战后应当附加 " + type);
+            int slot = Constant.SKILL_SLOT.get(type);
+            var raw = Constant.SKILLS.get(hero.getCid()).get(slot);
+            Assertions.assertEquals(raw.attackType(), attached.getData().getSkillType(),
+                    type + " 应当解析到槽位 " + slot);
+        }
+        Assertions.assertEquals("MazeNormal", hero.getSkills().get(SkillType.MAZE)
+                .getData().getSkillType());
+        Assertions.assertEquals("Maze", hero.getSkills().get(SkillType.TECHNIQUE)
+                .getData().getSkillType());
+    }
+
+    /** 显式装过的地图技能不被开场覆盖（测试/自定义场景）。 */
+    @Test
+    public void explicitlyInstalledMapSkillIsNotOverwritten() {
+        Character hero = CharacterFactory.create(1204, 80);
+        Skill custom = new DefaultSkill(1204, 6, 1);
+        hero.setSkill(SkillType.MAZE, custom);
+
+        newBattle(hero);
+
+        Assertions.assertSame(custom, hero.getSkills().get(SkillType.MAZE),
+                "已经有的不该被重新装配");
     }
 
     /**
@@ -76,6 +138,7 @@ public class SkillSlotMappingTest {
     public void builderDataMatchesTheRawSkillData() {
         int cid = 1204;
         Character jingYuan = CharacterFactory.create(cid, 80);
+        newBattle(jingYuan);                 // 开战以附加地图技能，这样六个槽位都能对
 
         for (Map.Entry<SkillType, Integer> entry : Constant.SKILL_SLOT.entrySet()) {
             int slot = entry.getValue();
@@ -140,19 +203,39 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * 全部 93 个角色 × 4 个槽位都能装配（数据齐全，没有 EMPTY 兜底）。
+     * 全部 93 个角色的**常驻**四槽位都能装配（数据齐全，没有 EMPTY 兜底）。
      *
-     * <p>用一个"非空参数表"作判据：`SkillData.EMPTY` 的参数表是空的。
+     * <p>判据用"参数表非空"：{@code SkillData.EMPTY} 的参数表是空的。
+     * 地图技能（6/7）不在这里查 —— 它们开战后才附加，由
+     * {@link #mapSkillsAreAttachedAtBattleStartNotAtBuild()} 覆盖。
      */
     @Test
-    public void everyCharacterHasAllFourSlots() {
+    public void everyCharacterHasAllIntrinsicSlots() {
         Constant.CHARACTERS.keySet().forEach(cid -> {
             Character c = CharacterFactory.create(cid, 80);
-            for (Map.Entry<SkillType, Integer> entry : Constant.SKILL_SLOT.entrySet()) {
-                Skill skill = c.getSkills().get(entry.getKey());
-                Assertions.assertNotNull(skill, "cid=" + cid + " 缺 " + entry.getKey());
+            for (SkillType type : List.of(SkillType.COMMON, SkillType.SKILL,
+                    SkillType.ULTRA, SkillType.TALENT)) {
+                Skill skill = c.getSkills().get(type);
+                Assertions.assertNotNull(skill, "cid=" + cid + " 缺 " + type);
                 Assertions.assertFalse(skill.getData().getSkills().isEmpty(),
-                        "cid=" + cid + " 的 " + entry.getKey() + " 参数表为空（数据没取到？）");
+                        "cid=" + cid + " 的 " + type + " 参数表为空（数据没取到？）");
+            }
+        });
+    }
+
+    /**
+     * 全部 93 个角色的**地图槽位**（6/7）开战后也都能附加且参数非空。
+     */
+    @Test
+    public void everyCharacterGetsMapSkillsAtBattleStart() {
+        Constant.CHARACTERS.keySet().forEach(cid -> {
+            Character c = CharacterFactory.create(cid, 80);
+            newBattle(c);
+            for (SkillType type : List.of(SkillType.MAZE, SkillType.TECHNIQUE)) {
+                Skill skill = c.getSkills().get(type);
+                Assertions.assertNotNull(skill, "cid=" + cid + " 开战后缺 " + type);
+                Assertions.assertFalse(skill.getData().getSkills().isEmpty(),
+                        "cid=" + cid + " 的 " + type + " 参数表为空");
             }
         });
     }
@@ -203,7 +286,8 @@ public class SkillSlotMappingTest {
     @Test
     public void factoryCharactersStartAtSkillLevelOne() {
         Character hero = CharacterFactory.create(1204, 80);
-        for (SkillType type : Constant.SKILL_SLOT.keySet()) {
+        for (SkillType type : List.of(SkillType.COMMON, SkillType.SKILL,
+                SkillType.ULTRA, SkillType.TALENT)) {
             Assertions.assertEquals(1, hero.getSkills().get(type).getLevel(),
                     type + " 的初始技能等级是 1");
         }
@@ -227,5 +311,13 @@ public class SkillSlotMappingTest {
         battle.startBattle();
         battle.castImmediate(new DefaultSkill(1204, 1, level), hero, List.of(enemy));
         return 1_000_000 - enemy.getCurrentHp();
+    }
+
+    /** 开一场最小战斗（只为触发 {@code startBattle()} 的地图技能附加）。 */
+    private static Battle newBattle(Character hero) {
+        Enemy enemy = EnemyFactory.create(1002011, 90, 1);
+        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        battle.startBattle();
+        return battle;
     }
 }
