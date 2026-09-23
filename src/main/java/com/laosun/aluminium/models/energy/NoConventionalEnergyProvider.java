@@ -7,31 +7,40 @@ import com.laosun.aluminium.models.Skill;
 import java.util.Set;
 
 /**
- * **不走常规能量**的角色的 {@link EnergyProvider}：5 个钩子全部返回 {@code null}（= 不入账）。
+ * The {@link EnergyProvider} for characters that **do not use conventional energy**: all 5
+ * hooks return {@code null} (= not credited).
  *
- * <p>适用对象是"层数/特殊资源"角色 —— 他们在游戏里攒的不是能量，
- * 而是【追忆】/【新蕊】/【火种】/点数之类的资源（飞霄 1220、黄泉 1308、遐蝶 1407、
- * 白厄 1408、昔涟 1415、银狼LV.999 1506）。装配点见
- * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}。
+ * <p>It applies to "stack / special resource" characters — what they build up in the game is
+ * not energy but resources such as 【追忆】/【新蕊】/【火种】/points (Feixiao 1220, Acheron 1308,
+ * Castorice 1407, Phainon 1408, Cyrene 1415, Silver Wolf LV.999 1506). The assembly point is
+ * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}.
  *
- * <p><b>为什么必须是一个独立 provider，而不是在 {@link StandardEnergyProvider} 里判空</b>：
+ * <p><b>Why it must be a separate provider rather than a null check inside
+ * {@link StandardEnergyProvider}</b>:
  * <ul>
- *   <li>这是**设计归类**（"这个角色不用常规能量体系"），不是单条数据事实。
- *       P8-0 的三分法把这类判断归给 provider / 装配点，那里也是唯一允许出现 {@code cid} 的地方。</li>
- *   <li>常规 provider 有 5 个钩子。只堵技能那两条（{@code sp_base == null}）会留下
- *       {@code onTakingHit} / {@code onKill} / {@code onBreak} 三条照发能量 —— 实测后果很严重：
- *       {@code castUltra} 的门槛是 {@code currentEnergy >= maxEnergy}，而黄泉的上限只有 **9**、
- *       飞霄/白厄只有 **12**，所以"挨一两下"就能凑满并**放出一个本不该存在的终结技**
- *       （他们的槽位 3 确实是 {@code Ultra} 技能）。</li>
+ *   <li>This is a **design classification** ("this character does not use the conventional
+ *       energy system"), not a single data fact. The P8-0 three-way split assigns judgements
+ *       like this to the provider / assembly point, which is also the only place allowed to
+ *       mention {@code cid}.</li>
+ *   <li>The conventional provider has 5 hooks. Blocking only the two skill ones
+ *       ({@code sp_base == null}) would leave {@code onTakingHit} / {@code onKill} /
+ *       {@code onBreak} still granting energy — with severe measured consequences:
+ *       {@code castUltra}'s threshold is {@code currentEnergy >= maxEnergy}, while Acheron's
+ *       cap is only **9** and Feixiao's / Phainon's only **12**, so "taking a hit or two"
+ *       fills them up and **unleashes an ultimate that should not exist** (their slot 3
+ *       really is an {@code Ultra} skill).</li>
  * </ul>
  *
- * <p>接上它之后，这些角色的表现是"能量恒为 0、永远放不出终结技"—— 这是**显式且可测**的状态，
- * 而不是靠数据巧合挡住一条、漏掉三条。等 P8-8 的 {@code Resource} 抽象落地，
- * 把这个 provider 换成真的资源实现即可（接线点已经就位）。
+ * <p>Once this is wired up, these characters behave as "energy is always 0, an ultimate can
+ * never be cast" — an **explicit and testable** state, rather than relying on a data
+ * coincidence to block one path and miss three. When the P8-8 {@code Resource} abstraction
+ * lands, simply swap this provider for a real resource implementation (the wiring point is
+ * already in place).
  *
- * <p>⚠ 注意区分 {@code maxEnergy == 0}（**没有能量条**，如遐蝶 1407）：那种情况
- * {@code CanHit.gainEnergy} 本身就是 no-op，用不用本 provider 都一样。
- * 本 provider 管的是"**有**能量池但不该从常规途径涨"的角色（黄泉 9、飞霄 12…）。
+ * <p>⚠ Note the distinction from {@code maxEnergy == 0} (**no energy bar at all**, e.g.
+ * Castorice 1407): in that case {@code CanHit.gainEnergy} is already a no-op, so using this
+ * provider or not makes no difference. This provider is about characters that **do** have an
+ * energy pool but must not gain it through conventional routes (Acheron 9, Feixiao 12…).
  */
 public class NoConventionalEnergyProvider implements EnergyProvider {
 

@@ -4,71 +4,76 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Skill;
 
 /**
- * 战技点的**策略**：把"该不该花、花多少、怎么涨"从 {@code Battle} 里抽出来。
+ * The **policy** for skill points (战技点, SP): it pulls "should it be spent, how much, and how does it grow" out of
+ * {@code Battle}.
  *
- * <p><b>为什么要有这个接口</b>（这是 P8-4 复核后追加的架构决定，见
- * {@code DOC_VS_CODE.md} §F 的 <b>F-8</b>）：战技点是**队伍级**资源，但它的规则会长出来 ——
- * 布洛妮娅「施放战技时 50% 概率恢复 1 点」、素裳「对击破目标施放战技后恢复 1 点」、
- * 花火「上限额外 +2」、过客 4 件套「战斗开始时恢复 1 点」…
- * 如果这些都往 {@code Battle.useSkill} 里加分支，{@code Battle} 会堆满
- * "因为某个角色"的判断，正好违反 P8-0 的三分法。
+ * <p><b>Why this interface exists</b> (an architecture decision added after the P8-4 review, see <b>F-8</b> of
+ * {@code DOC_VS_CODE.md} §F): skill points are a **team-level** resource, but their rules keep growing —
+ * Bronya's (布洛妮娅) "50% chance to restore 1 point when casting the skill", Sushang's (素裳) "restore 1 point
+ * after casting the skill on a broken target", Sparkle's (花火) "max +2", the 4-piece Passerby set "restore 1 point
+ * at the start of battle"…
+ * If all of these were added as branches inside {@code Battle.useSkill}, {@code Battle} would fill up with
+ * "because some character" checks, which is exactly what the P8-0 three-way split forbids.
  *
- * <p>抽成策略后：
+ * <p>After extracting it into a policy:
  * <ul>
- *   <li>{@code Battle} 只知道"问一次策略能不能出手"（{@link #onSkillCast}），
- *       **不认识任何角色**；</li>
- *   <li>角色级修正将来由**别的实现**（或本实现读取外部注册的效果表）注入，
- *       注入点是装配点（{@code CharacterFactory}，P8-0 唯一允许出现 {@code cid} 的地方）
- *       或 P8-7 的触发器表；</li>
- *   <li>引擎侧不新增对"某个角色"的依赖 —— 这是这条抽象存在的全部理由。</li>
+ *   <li>{@code Battle} only knows how to "ask the policy once whether it can act" ({@link #onSkillCast}),
+ *       and **knows no character at all**;</li>
+ *   <li>character-level corrections will be injected in future by **another implementation** (or by this one
+ *       reading an externally registered effect table); the injection point is the assembly point
+ *       ({@code CharacterFactory}, the only place P8-0 allows a {@code cid} to appear) or the P8-7 trigger table;</li>
+ *   <li>the engine side gains no new dependency on "some character" — that is the entire reason this abstraction
+ *       exists.</li>
  * </ul>
  *
- * <p><b>与 {@code EnergyProvider} 的分工</b>（照抄那套成功模式，别混）：
+ * <p><b>The split of labour with {@code EnergyProvider}</b> (copy that successful pattern, do not confuse them):
  * <ul>
- *   <li>{@code EnergyProvider} 是**每个单位一份**的，因为能量条是**个人**资源；</li>
- *   <li>本接口是**每场战斗一份**的，因为战技点是**全队共享**的。</li>
+ *   <li>{@code EnergyProvider} is **one per unit**, because the energy bar is a **personal** resource;</li>
+ *   <li>this interface is **one per battle**, because skill points are **shared by the whole team**.</li>
  * </ul>
  *
- * <p>⚠ 本接口**不承诺**能表达"每当战技点被消耗时…"这类**事件驱动**的角色机制
- * （米沙「我方全体每消耗 1 个战技点 → 下次终结技 +1 段」、花火「我方消耗战技点时
- * 额外回 1 点能量」）。那些要监听"战技点被消耗"这件**事**，属 P8-7 的触发器表
- * （需要新事件 {@code SkillPointSpentEvent}）—— 见 {@code DOC_VS_CODE.md} §F 的 F-4。
+ * <p>⚠ This interface **does not promise** to express **event-driven** character mechanics such as "whenever a
+ * skill point is spent…" (Misha's (米沙) "every 1 skill point our side spends → +1 hit on the next ultimate",
+ * Sparkle's (花火) "when our side spends a skill point, gain 1 extra energy"). Those need to listen to the **event**
+ * "a skill point was spent", which belongs to the P8-7 trigger table (it needs a new event
+ * {@code SkillPointSpentEvent}) — see F-4 of {@code DOC_VS_CODE.md} §F.
  */
 public interface SkillPointPolicy {
 
     /**
-     * 某个单位**即将施放**一个技能时调用一次，由策略决定战技点的增减。
+     * Called once when a unit is **about to cast** a skill; the policy decides how the skill points change.
      *
-     * <p>调用时机是"决定出手"那一层（{@code Battle.useSkill}），**不是**结算伤害之后 ——
-     * 与"出手"原子，避免出现"没花出去却打出来了"。
+     * <p>The call timing is the "decide to act" layer ({@code Battle.useSkill}), **not** after the damage is
+     * settled — it is atomic with "acting", which avoids "it was never spent yet the hit came out".
      *
-     * @param user  出手者（非 {@code null}；调用方已判过"还活着"）
-     * @param skill 要施放的技能（非 {@code null}；其 {@code getData()} 可能为 {@code null}，
-     *              例如敌人的 {@code EnemySkill}）
-     * @return 这次出手是否**可以继续**；{@code false} 表示资源不足，调用方必须放弃这次出手
+     * @param user  the caster (not {@code null}; the caller has already checked "still alive")
+     * @param skill the skill to cast (not {@code null}; its {@code getData()} may be {@code null},
+     *              for example an enemy's {@code EnemySkill})
+     * @return whether this action **may continue**; {@code false} means there are not enough resources and the
+     *         caller must abandon this action
      */
     boolean onSkillCast(CanHit user, Skill skill);
 
-    /** 当前值。 */
+    /** The current value. */
     int getValue();
 
-    /** 常规上限。 */
+    /** The regular maximum. */
     int getMax();
 
     /**
-     * 直接加值（封在常规上限内），返回实际入账量。
+     * Adds a value directly (capped at the regular maximum) and returns the amount actually credited.
      *
-     * <p>给"普攻 +1"之外的显式来源用（秘技、遗器、角色机制）。
+     * <p>For explicit sources other than "basic attack +1" (techniques, relics, character mechanics).
      */
     int gain(int delta);
 
-    /** 是否够消耗一次（{@code > 0}）。 */
+    /** Whether there is enough for one spend ({@code > 0}). */
     boolean canAfford();
 
     /**
-     * 扣掉一次消耗。
+     * Spends one charge.
      *
-     * @return 是否成功；{@code false} 表示不足（值不变）
+     * @return whether it succeeded; {@code false} means not enough (the value is unchanged)
      */
     boolean spend();
 }

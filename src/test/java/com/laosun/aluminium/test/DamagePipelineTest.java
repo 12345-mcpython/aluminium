@@ -28,7 +28,7 @@ import java.util.Random;
 public class DamagePipelineTest {
     private static final double EPS = 1e-6;
     private static final double BASE = 1000.0;
-    /** 攻击者 80 级时防御区的等级项：200 + 10 × 80。 */
+    /** The level term of the defence zone when the attacker is level 80: 200 + 10 × 80. */
     private static final double LEVEL_TERM = 1000.0;
 
     private static Character attacker() {
@@ -66,7 +66,7 @@ public class DamagePipelineTest {
 
         Assertions.assertEquals(1300, settle(attacker, defender(0)), EPS);
 
-        // 攻击类型增伤与元素增伤加算进同一个区：1 + 0.3 + 0.2 = 1.5
+        // attack-type DMG boost and elemental DMG boost add up into the same zone: 1 + 0.3 + 0.2 = 1.5
         attacker.setAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST, new DoubleValue(0.2));
 
         Assertions.assertEquals(1500, settle(attacker, defender(0)), EPS);
@@ -74,13 +74,13 @@ public class DamagePipelineTest {
 
     @Test
     public void critFollowsTheInjectedRandom() {
-        // Random(0) 的首值 ≈ 0.7310 —— 用它把"暴/不暴"两个分支都钉死
+        // the first value of Random(0) ≈ 0.7310 — it is used to pin down both the "crit / no crit" branches
         double firstRoll = new Random(0).nextDouble();
         Assertions.assertTrue(firstRoll > 0.5 && firstRoll < 0.9,
-                "断言前提：Random(0) 首值应落在 0.5 ~ 0.9，实际 " + firstRoll);
+                "assertion premise: the first value of Random(0) should lie in 0.5 ~ 0.9, actual " + firstRoll);
 
-        Assertions.assertEquals(1000, critSettled(0.5, 1.0), EPS);   // roll > 0.5 → 不暴
-        Assertions.assertEquals(2000, critSettled(0.9, 1.0), EPS);   // roll < 0.9 → 暴击
+        Assertions.assertEquals(1000, critSettled(0.5, 1.0), EPS);   // roll > 0.5 → no crit
+        Assertions.assertEquals(2000, critSettled(0.9, 1.0), EPS);   // roll < 0.9 → crit
     }
 
     @Test
@@ -89,7 +89,7 @@ public class DamagePipelineTest {
         attacker.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(1.0));
         attacker.setAttribute(AttributeType.CRIT_ATTACK, new DoubleValue(1.0));
 
-        // BREAK：不吃双暴（连骰都不骰），防御区照常生效
+        // BREAK: does not take crit stats (not even a roll), while the defence zone applies as usual
         Assertions.assertEquals(BASE * LEVEL_TERM / (1150 + LEVEL_TERM),
                 settle(attacker, defender(1150), DamageType.BREAK, BASE), EPS);
     }
@@ -127,7 +127,7 @@ public class DamagePipelineTest {
     public void deadTargetTakesNothing() {
         Character attacker = attacker();
         Enemy defender = defender(0);
-        defender.takeDamage(defender.getCurrentHp());   // 直接打死
+        defender.takeDamage(defender.getCurrentHp());   // kill it outright
         Assertions.assertTrue(defender.isDeath());
 
         Damage damage = new Damage(attacker, defender, DamageElement.FIRE, DamageType.NORMAL, BASE);
@@ -138,20 +138,20 @@ public class DamagePipelineTest {
 
     @Test
     public void settlementHasExactlyOnePublicEntryPoint() throws Exception {
-        // 旧入口必须已删除（E2 完成）
+        // the old entry points MUST be gone (E2 complete)
         Assertions.assertThrows(NoSuchMethodException.class, () -> Battle.class.getDeclaredMethod(
                 "calculateDamage", CanHit.class, CanHit.class, double.class, List.class));
         Assertions.assertThrows(NoSuchMethodException.class, () -> Battle.class.getDeclaredMethod(
                 "applyDamage", CanHit.class, double.class));
 
-        // 装配口必须私有：外部只能经 applyDamage 进入
+        // the assembly entry point MUST be private: from outside you can only get in through applyDamage
         Assertions.assertTrue(Modifier.isPrivate(Battle.class
                 .getDeclaredMethod("assemble", Damage.class).getModifiers()));
 
-        // 公开 API 里接收 Damage 的方法只能有一个
+        // among the public API, there can be only one method that takes a Damage
         long publicDamageEntries = Arrays.stream(Battle.class.getMethods())
                 .filter(method -> Arrays.asList(method.getParameterTypes()).contains(Damage.class))
                 .count();
-        Assertions.assertEquals(1, publicDamageEntries, "结算入口必须唯一");
+        Assertions.assertEquals(1, publicDamageEntries, "the settlement entry point MUST be unique");
     }
 }

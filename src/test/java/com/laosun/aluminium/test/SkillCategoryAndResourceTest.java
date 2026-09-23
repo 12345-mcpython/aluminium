@@ -6,25 +6,25 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * 重构（2026-09-23）引入的两个通用抽象：
- * {@link SkillCategory}（数据里的 {@code attack_type} 枚举化）与
- * {@link Resource}（有边界的队伍级资源）。
+ * Two generic abstractions introduced by the refactor (2026-09-23):
+ * {@link SkillCategory} (enumification of the data's {@code attack_type}) and
+ * {@link Resource} (a bounded party-level resource).
  *
- * <p>它们存在的理由都是**稳定性**：
+ * <p>The reason both exist is **stability**:
  * <ul>
- *   <li>{@code SkillCategory} 消灭"裸字符串 switch → 数据改拼写就静默失配"这一类 bug
- *       （{@code DOC_VS_CODE.md} §F 的 F-6）；</li>
- *   <li>{@code Resource} 给"上限 / 溢出 / 原子消耗"一个有名字的边界语义，
- *       战技点与 P8-8 的层数资源共用（{@code DOC_VS_CODE.md} §F 的 F-1/F-7）。
+ *   <li>{@code SkillCategory} eliminates the class of bugs "bare string switch → a spelling change
+ *       in the data silently fails to match" ({@code DOC_VS_CODE.md} §F, F-6);</li>
+ *   <li>{@code Resource} gives "cap / overflow / atomic spend" a named boundary semantics, shared
+ *       by skill points and the P8-8 stack resource ({@code DOC_VS_CODE.md} §F, F-1/F-7).
  * </ul>
  */
 public class SkillCategoryAndResourceTest {
 
     // ==================================================================
-    // SkillCategory：解析必须稳健（数据是外部产物）
+    // SkillCategory: parsing must be robust (the data is an external artifact)
     // ==================================================================
 
-    /** 数据里真实存在的 7 个取值都要解析到位。 */
+    /** All 7 values that really exist in the data must parse correctly. */
     @Test
     public void knownValuesRoundTrip() {
         Assertions.assertEquals(SkillCategory.NORMAL, SkillCategory.fromString("Normal"));
@@ -36,7 +36,7 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(SkillCategory.ELATION_DAMAGE, SkillCategory.fromString("ElationDamage"));
     }
 
-    /** {@code value()} 必须能反查回数据原值 —— 否则将来写回数据会对不上。 */
+    /** {@code value()} must be able to look the original data value back up — otherwise writing back to the data later would not line up. */
     @Test
     public void valueMatchesTheDataString() {
         Assertions.assertEquals("Normal", SkillCategory.NORMAL.value());
@@ -49,10 +49,11 @@ public class SkillCategoryAndResourceTest {
     }
 
     /**
-     * {@code null} / 空串 → {@code UNSPECIFIED}，**不是** {@code UNKNOWN}。
+     * {@code null} / empty string → {@code UNSPECIFIED}, **not** {@code UNKNOWN}.
      *
-     * <p>这个区分很重要：天赋与追加攻击在数据里的 {@code attack_type} 就是空
-     * （实测 94 条），那是**合法的空**，不是"数据有问题"。
+     * <p>This distinction matters a lot: the {@code attack_type} of talents and follow-up attacks is
+     * simply empty in the data (94 entries measured); that is a **legitimate empty**, not
+     * "the data is broken".
      */
     @Test
     public void nullAndBlankAreUnspecifiedNotUnknown() {
@@ -60,28 +61,30 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(SkillCategory.UNSPECIFIED, SkillCategory.fromString(""));
         Assertions.assertEquals(SkillCategory.UNSPECIFIED, SkillCategory.fromString("   "));
         Assertions.assertTrue(SkillCategory.UNSPECIFIED.isUnspecified());
-        Assertions.assertFalse(SkillCategory.UNSPECIFIED.isKnownValue(), "合法空不算'认识的取值'");
+        Assertions.assertFalse(SkillCategory.UNSPECIFIED.isKnownValue(), "a legitimate empty does not count as a 'recognized value'");
     }
 
     /**
-     * ⚠ <b>核心稳定性断言</b>：不认识的取值**不抛异常**，降级成 {@code UNKNOWN}。
+     * ⚠ <b>Core stability assertion</b>: an unrecognized value **does not throw**, it degrades to
+     * {@code UNKNOWN}.
      *
-     * <p>数据是外部产物 —— 多一个新类型就炸引擎是稳定性问题。这里选择
-     * "安全降级 + 可观测"（{@code isKnownValue()} 让调用方决定要不要出声）。
+     * <p>The data is an external artifact — blowing up the engine because of one new type is a
+     * stability problem. Here "safe degradation + observability" is chosen
+     * ({@code isKnownValue()} lets the caller decide whether to speak up).
      */
     @Test
     public void unknownValueDegradesInsteadOfThrowing() {
         SkillCategory weird = SkillCategory.fromString("SomeFutureType");
         Assertions.assertEquals(SkillCategory.UNKNOWN, weird);
         Assertions.assertFalse(weird.isKnownValue());
-        Assertions.assertFalse(weird.isUnspecified(), "不认识 ≠ 合法空，两者要能区分");
+        Assertions.assertFalse(weird.isUnspecified(), "unrecognized ≠ legitimate empty; the two must be distinguishable");
 
-        // 极端输入也不能炸
+        // Extreme input must not blow up either
         Assertions.assertEquals(SkillCategory.UNKNOWN, SkillCategory.fromString("\u0000"));
         Assertions.assertEquals(SkillCategory.UNKNOWN, SkillCategory.fromString("Normal2"));
     }
 
-    /** 大小写不敏感 + 去空白 —— 数据侧风格不统一时不该失配。 */
+    /** Case-insensitive + trimming — a non-uniform style on the data side should not fail to match. */
     @Test
     public void parsingIsCaseInsensitiveAndTrims() {
         Assertions.assertEquals(SkillCategory.NORMAL, SkillCategory.fromString("normal"));
@@ -90,40 +93,40 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(SkillCategory.ELATION_DAMAGE, SkillCategory.fromString("elationdamage"));
     }
 
-    /** 只有普攻/战技/终结技算"战斗内主动出手"；地图技能与空值都不算。 */
+    /** Only basic attack / skill / ultimate count as "actively acting in combat"; map skills and empty values do not. */
     @Test
     public void combatActionClassification() {
         Assertions.assertTrue(SkillCategory.NORMAL.isCombatAction());
         Assertions.assertTrue(SkillCategory.BPSKILL.isCombatAction());
         Assertions.assertTrue(SkillCategory.ULTRA.isCombatAction());
 
-        Assertions.assertFalse(SkillCategory.MAZE_NORMAL.isCombatAction(), "地图普攻在战斗外");
-        Assertions.assertFalse(SkillCategory.MAZE.isCombatAction(), "秘技在战斗外");
-        Assertions.assertFalse(SkillCategory.UNSPECIFIED.isCombatAction(), "天赋/追加攻击不是主动出手");
-        Assertions.assertFalse(SkillCategory.UNKNOWN.isCombatAction(), "不认识的取值不能默认当成主动出手");
+        Assertions.assertFalse(SkillCategory.MAZE_NORMAL.isCombatAction(), "a map basic attack is outside combat");
+        Assertions.assertFalse(SkillCategory.MAZE.isCombatAction(), "a technique is outside combat");
+        Assertions.assertFalse(SkillCategory.UNSPECIFIED.isCombatAction(), "a talent / follow-up attack is not actively acting");
+        Assertions.assertFalse(SkillCategory.UNKNOWN.isCombatAction(), "an unrecognized value must not default to actively acting");
         Assertions.assertFalse(SkillCategory.ASSIST.isCombatAction());
         Assertions.assertFalse(SkillCategory.ELATION_DAMAGE.isCombatAction());
     }
 
     // ==================================================================
-    // Resource：三个边界
+    // Resource: the three boundaries
     // ==================================================================
 
-    /** 常规路径不越过上限，且返回**实际**入账量。 */
+    /** The regular path does not cross the cap, and returns the **actual** amount credited. */
     @Test
     public void gainClampedStopsAtMax() {
         Resource r = new Resource("sp", 5, 3);
 
-        Assertions.assertEquals(2, r.gainClamped(2), "3 + 2 = 5，全额入账");
+        Assertions.assertEquals(2, r.gainClamped(2), "3 + 2 = 5, credited in full");
         Assertions.assertEquals(5, r.getValue());
         Assertions.assertTrue(r.isFull());
 
-        Assertions.assertEquals(0, r.gainClamped(1), "已满 → 实际入账 0");
-        Assertions.assertEquals(0, r.gainClamped(100), "一次加 100 也是 0");
+        Assertions.assertEquals(0, r.gainClamped(1), "already full → 0 actually credited");
+        Assertions.assertEquals(0, r.gainClamped(100), "adding 100 at once is 0 as well");
         Assertions.assertEquals(5, r.getValue());
     }
 
-    /** 加非正数是调用方的 bug：静默忽略，**不能**变成扣值。 */
+    /** Adding a non-positive number is a caller bug: ignored silently, and **must not** turn into a deduction. */
     @Test
     public void nonPositiveGainIsIgnored() {
         Resource r = new Resource("sp", 5, 3);
@@ -131,46 +134,50 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(0, r.gainClamped(0));
         Assertions.assertEquals(0, r.gainClamped(-5));
         Assertions.assertEquals(0, r.gain(-5));
-        Assertions.assertEquals(3, r.getValue(), "不能被'加负数'扣下去");
+        Assertions.assertEquals(3, r.getValue(), "must not be deducted by 'adding a negative number'");
     }
 
-    /** 默认**不允许溢出**：没配额度时 {@code gain} 与 {@code gainClamped} 等价。 */
+    /** Overflow is **not allowed** by default: with no allowance configured, {@code gain} and {@code gainClamped} are equivalent. */
     @Test
     public void overflowIsOffByDefault() {
         Resource r = new Resource("sp", 5, 5);
         Assertions.assertEquals(0, r.getMaxOverflow());
 
-        Assertions.assertEquals(0, r.gain(3), "没配溢出额度 → 加不进去");
+        Assertions.assertEquals(0, r.gain(3), "no overflow allowance configured → cannot be added");
         Assertions.assertEquals(5, r.getValue());
     }
 
     /**
-     * 配了溢出额度才能存到上限之上，且**封在 max + overflow**。
+     * Only with an overflow allowance configured can it be stored above the cap, and it is
+     * **capped at max + overflow**.
      *
-     * <p>对应花火终结技「恢复 4/6 个战技点，若恢复时战技点溢出，则记录溢出的战技点数，
-     * 最多记录 10 点」（{@code 1306_花火.md}）—— 引擎侧只提供"可溢出且封顶"的能力。
+     * <p>Corresponds to Sparkle's ultimate "restore 4/6 skill points; if skill points overflow when
+     * restoring, record the number of overflowing skill points, up to 10" ({@code 1306_花火.md}) —
+     * the engine side only provides the "can overflow and is capped" capability.
      */
     @Test
     public void overflowIsExplicitAndCapped() {
         Resource r = new Resource("sp", 5, 5);
         r.setMaxOverflow(10);
 
-        Assertions.assertEquals(6, r.gain(6), "5 + 6 = 11（≤ 15）全额入账");
+        Assertions.assertEquals(6, r.gain(6), "5 + 6 = 11 (≤ 15), credited in full");
         Assertions.assertEquals(11, r.getValue());
-        Assertions.assertTrue(r.isFull(), "超过常规上限了，当然算 full");
-        Assertions.assertFalse(r.isCapped(), "但还没到 5 + 10 = 15");
+        Assertions.assertTrue(r.isFull(), "above the regular cap, so of course it counts as full");
+        Assertions.assertFalse(r.isCapped(), "but it has not reached 5 + 10 = 15 yet");
 
-        Assertions.assertEquals(4, r.gain(100), "15 - 11 = 4，封在绝对上限");
+        Assertions.assertEquals(4, r.gain(100), "15 - 11 = 4, capped at the absolute maximum");
         Assertions.assertEquals(15, r.getValue());
         Assertions.assertTrue(r.isCapped());
     }
 
     /**
-     * 下调溢出额度会把**越界的存量夹掉**，保证不变式 {@code value ≤ max + overflow} 成立。
+     * Lowering the overflow allowance **clamps the out-of-range stored value**, keeping the
+     * invariant {@code value ≤ max + overflow} true.
      *
-     * <p>⚠ 这是我第一版写错的地方：当时只改额度不夹值，于是能造出
-     * {@code max=5, overflow=0, value=15} 这种非法状态 —— 之后所有
-     * {@code isCapped()} / {@code gain()} 的判断都会失准，而且**不报错**。
+     * <p>⚠ This is where my first version was wrong: at the time it only changed the allowance
+     * without clamping the value, so it could produce an illegal state like
+     * {@code max=5, overflow=0, value=15} — after which every {@code isCapped()} / {@code gain()}
+     * judgement is off, and it **raises no error**.
      */
     @Test
     public void loweringOverflowReclampsToKeepTheInvariant() {
@@ -181,25 +188,25 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertTrue(r.isCapped());
 
         r.setMaxOverflow(0);
-        Assertions.assertEquals(5, r.getValue(), "越界的存量被夹到新的绝对上限");
-        Assertions.assertTrue(r.isCapped(), "5 就是现在的绝对上限");
+        Assertions.assertEquals(5, r.getValue(), "the out-of-range stored value is clamped to the new absolute maximum");
+        Assertions.assertTrue(r.isCapped(), "5 is the current absolute maximum");
         Assertions.assertTrue(r.isFull());
-        Assertions.assertEquals(0, r.missingToMax(), "不变式没破：value ≤ max");
-        Assertions.assertEquals(0, r.gain(1), "满的，加不进去");
+        Assertions.assertEquals(0, r.missingToMax(), "the invariant is not broken: value ≤ max");
+        Assertions.assertEquals(0, r.gain(1), "it is full, cannot be added to");
     }
 
-    /** 上调额度不会动存量，只是之后能加更多。 */
+    /** Raising the allowance does not touch the stored value, it just allows adding more afterwards. */
     @Test
     public void raisingOverflowKeepsCurrentValue() {
         Resource r = new Resource("sp", 5, 3);
         r.setMaxOverflow(10);
 
-        Assertions.assertEquals(3, r.getValue(), "存量不动");
-        Assertions.assertEquals(8, r.gain(8), "5 + 10 = 15 是新绝对上限");
+        Assertions.assertEquals(3, r.getValue(), "the stored value is untouched");
+        Assertions.assertEquals(8, r.gain(8), "5 + 10 = 15 is the new absolute maximum");
         Assertions.assertEquals(11, r.getValue());
     }
 
-    /** 负的溢出额度视为 0。 */
+    /** A negative overflow allowance is treated as 0. */
     @Test
     public void negativeOverflowIsClampedToZero() {
         Resource r = new Resource("sp", 5, 0);
@@ -209,25 +216,25 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(0, r.gain(1));
     }
 
-    /** {@code spend} = "能扣多少扣多少"；{@code spendExactly} = "不够就一点都不扣"。 */
+    /** {@code spend} = "deduct as much as it can"; {@code spendExactly} = "if it is not enough, deduct nothing at all". */
     @Test
     public void spendVersusSpendExactly() {
         Resource r = new Resource("sp", 5, 3);
 
-        // 能扣多少扣多少（DOT 掉血那类语义）
-        Assertions.assertEquals(3, r.spend(10), "只有 3，全扣掉");
+        // Deduct as much as it can (the semantics of taking DoT HP loss, say)
+        Assertions.assertEquals(3, r.spend(10), "only 3 available, all of it deducted");
         Assertions.assertEquals(0, r.getValue());
 
-        // 原子语义（战技点那类：不足 = 这次没花出去）
+        // Atomic semantics (the skill point kind: insufficient = nothing was spent this time)
         r.setValue(2);
         Assertions.assertTrue(r.spendExactly(2));
         Assertions.assertEquals(0, r.getValue());
 
-        Assertions.assertFalse(r.spendExactly(1), "不够 → 失败");
-        Assertions.assertEquals(0, r.getValue(), "失败的消耗不能扣成负数");
+        Assertions.assertFalse(r.spendExactly(1), "not enough → fails");
+        Assertions.assertEquals(0, r.getValue(), "a failed spend must not deduct into the negative");
     }
 
-    /** {@code setValue} 是无保护的原始写入，但**仍然夹取**（存档恢复用）。 */
+    /** {@code setValue} is an unprotected raw write, but it **still clamps** (used for save restoration). */
     @Test
     public void setValueClampsButDoesNotFail() {
         Resource r = new Resource("sp", 5, 0);
@@ -239,31 +246,31 @@ public class SkillCategoryAndResourceTest {
 
         r.setMaxOverflow(3);
         r.setValue(999);
-        Assertions.assertEquals(8, r.getValue(), "夹到 max + overflow");
+        Assertions.assertEquals(8, r.getValue(), "clamped to max + overflow");
     }
 
-    /** 初始值也会被夹取 —— 构造时给越界的值不该炸，也不该留下非法状态。 */
+    /** The initial value is clamped too — passing an out-of-range value to the constructor should neither blow up nor leave an illegal state. */
     @Test
     public void initialValueIsClamped() {
         Assertions.assertEquals(5, new Resource("sp", 5, 99).getValue());
         Assertions.assertEquals(0, new Resource("sp", 5, -99).getValue());
     }
 
-    /** 非法构造参数要**快速失败**（这类是编码错误，不是数据错误，不该静默）。 */
+    /** Illegal constructor arguments must **fail fast** (these are coding errors, not data errors, and must not be silent). */
     @Test
     public void invalidConstructionFailsFast() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new Resource(null, 5, 0));
         Assertions.assertThrows(IllegalArgumentException.class, () -> new Resource("  ", 5, 0));
         Assertions.assertThrows(IllegalArgumentException.class, () -> new Resource("sp", -1, 0));
 
-        // max = 0 是合法的：一个"只读"资源
+        // max = 0 is legal: a "read-only" resource
         Resource zero = new Resource("zero", 0, 0);
         Assertions.assertTrue(zero.isFull());
         Assertions.assertTrue(zero.isCapped());
         Assertions.assertEquals(0, zero.gain(5));
     }
 
-    /** {@code missingToMax} 与 {@code isEmpty} 的边界。 */
+    /** The boundaries of {@code missingToMax} and {@code isEmpty}. */
     @Test
     public void queryHelpers() {
         Resource r = new Resource("sp", 5, 0);
@@ -279,6 +286,6 @@ public class SkillCategoryAndResourceTest {
 
         r.setMaxOverflow(5);
         r.gain(3);
-        Assertions.assertEquals(0, r.missingToMax(), "溢出时也是 0，不是负数");
+        Assertions.assertEquals(0, r.missingToMax(), "when overflowing it is 0 too, not negative");
     }
 }

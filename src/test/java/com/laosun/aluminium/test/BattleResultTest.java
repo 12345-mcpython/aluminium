@@ -10,17 +10,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P7-3 验收：胜负状态机。
+ * P7-3 acceptance: the win/loss state machine.
  *
  * <pre>
- *   NOT_STARTED ──startBattle()──▶ RUNNING ──一方全灭──▶ WIN / LOSE（终态，不回退）
+ *   NOT_STARTED ──startBattle()──▶ RUNNING ──one side wiped out──▶ WIN / LOSE (terminal, never reverted)
  * </pre>
  *
- * <p>要点：
+ * <p>Key points:
  * <ul>
- *   <li>终态之后 {@code stepForward()} **不再推进**行动条；</li>
- *   <li>{@code NOT_STARTED} 时不判胜负（还没开场，谈不上输赢）；</li>
- *   <li>一边**空列表**也算"全灭"（被清光了）。</li>
+ *   <li>After a terminal state {@code stepForward()} **no longer advances** the action bar;</li>
+ *   <li>While {@code NOT_STARTED} no win/loss is judged (the battle has not begun, so there is no
+ *   win or loss to speak of);</li>
+ *   <li>An **empty list** on one side also counts as "wiped out" (cleared out).</li>
  * </ul>
  */
 public class BattleResultTest {
@@ -31,7 +32,7 @@ public class BattleResultTest {
         Battle battle = newBattle();
 
         Assertions.assertEquals(Battle.Status.NOT_STARTED, battle.getStatus());
-        Assertions.assertFalse(battle.isOver(), "还没开场不算结束");
+        Assertions.assertFalse(battle.isOver(), "it is not over before the battle has started");
     }
 
     @Test
@@ -45,7 +46,7 @@ public class BattleResultTest {
     }
 
     /**
-     * 敌人全灭 → WIN，且终态之后行动条不再前进。
+     * All enemies wiped out → WIN, and after the terminal state the action bar no longer advances.
      */
     @Test
     public void wipingOutTheEnemiesWinsAndStopsTheClock() {
@@ -53,7 +54,7 @@ public class BattleResultTest {
         battle.startBattle();
 
         battle.enemies.getFirst().takeDamage(999_999);
-        battle.processRequests();                     // 公开入口：触发死亡清理 + 判定
+        battle.processRequests();                     // public entry point: triggers death cleanup + judgment
 
         Assertions.assertEquals(Battle.Status.WIN, battle.getStatus());
         Assertions.assertTrue(battle.isOver());
@@ -63,12 +64,12 @@ public class BattleResultTest {
         battle.stepForward();
 
         Assertions.assertEquals(elapsedBefore, battle.queue.getElapsed(), EPS,
-                "终态之后 stepForward() 不再推进时钟");
-        Assertions.assertNull(battle.currentMove, "也没有人处于行动点");
+                "after a terminal state stepForward() no longer advances the clock");
+        Assertions.assertNull(battle.currentMove, "and nobody is at their action point");
     }
 
     /**
-     * 我方全灭 → LOSE。
+     * Our side wiped out → LOSE.
      */
     @Test
     public void wipingOutThePartyLoses() {
@@ -85,9 +86,10 @@ public class BattleResultTest {
     }
 
     /**
-     * 两边同时全灭 → LOSE（先判负后判胜）。
+     * Both sides wiped out at the same time → LOSE (loss is judged before win).
      *
-     * <p>定这条口径是因为"同时"必须有个确定结果，不能随判定顺序摇摆。
+     * <p>This rule was set because "at the same time" must have a definite outcome and must not
+     * waver with the order of judgment.
      */
     @Test
     public void mutualDestructionIsALoss() {
@@ -104,7 +106,8 @@ public class BattleResultTest {
     }
 
     /**
-     * 开场前（{@code NOT_STARTED}）就算全员阵亡也不判负 —— 战斗还没开始。
+     * Before the battle starts ({@code NOT_STARTED}), not even a full wipe is judged a loss — the
+     * battle has not begun.
      */
     @Test
     public void nothingIsJudgedBeforeTheBattleStarts() {
@@ -116,7 +119,8 @@ public class BattleResultTest {
     }
 
     /**
-     * 终态不回退：已经判胜之后再把人打死也不会变成 LOSE。
+     * No reverting from a terminal state: killing someone after a win has already been judged does
+     * not turn it into a LOSE.
      */
     @Test
     public void theResultIsFinal() {
@@ -132,11 +136,11 @@ public class BattleResultTest {
         }
         battle.processRequests();
 
-        Assertions.assertEquals(Battle.Status.WIN, battle.getStatus(), "胜负已定，不再改判");
+        Assertions.assertEquals(Battle.Status.WIN, battle.getStatus(), "the result is decided, it is not re-judged");
     }
 
     /**
-     * 空的一方也算全灭：没有敌人的战斗开场即胜。
+     * An empty side also counts as wiped out: a battle with no enemies is won at the start.
      */
     @Test
     public void anEmptySideCountsAsWipedOut() {
@@ -149,7 +153,8 @@ public class BattleResultTest {
     }
 
     /**
-     * 打完一场之后状态是终态，再来一场互不影响（状态不是 static）。
+     * After one battle finishes the status is terminal, and starting another is independent of it
+     * (the status is not static).
      */
     @Test
     public void statusIsPerBattleInstance() {
@@ -162,11 +167,11 @@ public class BattleResultTest {
         Battle second = newBattle();
 
         Assertions.assertEquals(Battle.Status.NOT_STARTED, second.getStatus(),
-                "新战斗的状态不受上一场影响");
+                "the new battle's status is unaffected by the previous one");
     }
 
     /**
-     * 正常打一场：中途状态是 RUNNING，终态是 WIN。
+     * Fighting a normal battle: the status is RUNNING in the middle and WIN at the end.
      */
     @Test
     public void statusIsRunningWhileTheBattleGoesOn() {
@@ -177,7 +182,7 @@ public class BattleResultTest {
         battle.afterMove();
 
         Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
-                "还没分出胜负就一直是 RUNNING");
+                "it stays RUNNING until the outcome is decided");
         Assertions.assertFalse(battle.isOver());
     }
 

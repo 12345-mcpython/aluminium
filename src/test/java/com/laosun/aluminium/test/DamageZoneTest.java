@@ -47,7 +47,7 @@ public class DamageZoneTest {
     public void vulnerableIsCapped() {
         Damage damage = damage().addVulnerable(2.0).addVulnerable(2.0);
 
-        // 未 clamp 的原始值仍是 5.0，读出倍率时才 cap 到 3.5
+        // The un-clamped raw value is still 5.0; it is only capped to 3.5 when the rate is read
         Assertions.assertEquals(5.0, damage.vulnerableArea().raw().get(), EPS);
         Assertions.assertEquals(3.5, damage.vulnerableArea().getRate(), EPS);
         Assertions.assertEquals(3500, damage.toValue(), EPS);
@@ -55,11 +55,11 @@ public class DamageZoneTest {
 
     @Test
     public void reductionIsMultiplicativeFlooredAndInputClamped() {
-        // 乘算 + 兜底：0.1³ = 0.001 → 0.01
+        // Multiplication + floor: 0.1³ = 0.001 → 0.01
         Assertions.assertEquals(10,
                 damage().addReduction(0.9).addReduction(0.9).addReduction(0.9).toValue(), EPS);
 
-        // 入参先 clamp 到 [0,1]：1.5 → 1（系数 0）、-0.5 → 0（系数 1）→ 乘积 0 → 兜底 0.01
+        // The input is clamped to [0,1] first: 1.5 → 1 (factor 0), -0.5 → 0 (factor 1) → product 0 → floor 0.01
         Assertions.assertEquals(10,
                 damage().addReduction(1.5).addReduction(-0.5).toValue(), EPS);
     }
@@ -68,17 +68,19 @@ public class DamageZoneTest {
     public void weaknessIsFloored() {
         Damage damage = damage().addWeakness(0.9).addWeakness(0.3);
 
-        // 1 - 1.2 = -0.2 → 兜底到 0.2
+        // 1 - 1.2 = -0.2 → floored to 0.2
         Assertions.assertEquals(200, damage.toValue(), EPS);
     }
 
     @Test
     public void sanityFloorVersusOfficialFloors() {
-        // 增伤 / 易伤：游戏里没有负增伤，0 只是 PercentArea 的 sanity 兜底（防负系数把伤害翻符号）；
-        // 官方下限只有减伤 0.01 与虚弱 0.2，已由各自用例断言，这里不重复
+        // DMG boost / vulnerability: there is no negative DMG boost in the game; 0 is just PercentArea's
+        // sanity floor (guarding against a negative factor flipping the damage sign);
+        // the only official lower bounds are reduction 0.01 and weakness 0.2, already asserted by their
+        // own cases, so they are not repeated here
         Assertions.assertEquals(0.0, damage().addBoost(-1.5).boostArea().getRate(), EPS);
         Assertions.assertEquals(0.0, damage().addVulnerable(-1.5).vulnerableArea().getRate(), EPS);
-        // 计算型区不设下限：防御公式自身恒正，0 防御时正好 1.0
+        // Computed zones have no lower bound: the defence formula is always positive itself, and at 0 defence it is exactly 1.0
         Assertions.assertEquals(1.0, new Damage.DefenceArea().set(80, 0, 0).getRate(), EPS);
     }
 
@@ -106,15 +108,15 @@ public class DamageZoneTest {
 
     @Test
     public void defenceIgnoreIsClampedToUnitRange() {
-        // 1.5 → clamp 到 1 → 有效防御 0 → 防御区倍率 1.0
+        // 1.5 → clamped to 1 → effective defence 0 → defence zone rate 1.0
         Assertions.assertEquals(1.0, damage().defence(80, 1150, 1.5).defenceArea().getRate(), EPS);
-        // -0.5 → clamp 到 0 → 等价于完全不无视防御
+        // -0.5 → clamped to 0 → equivalent to ignoring no defence at all
         Assertions.assertEquals(1000.0 / 2150.0, damage().defence(80, 1150, -0.5).defenceArea().getRate(), EPS);
     }
 
     @Test
     public void resistanceZone() {
-        // 0.2 - 0.4 = -0.2 → 负抗（当前按全效实现）
+        // 0.2 - 0.4 = -0.2 → negative resistance (currently implemented at full effect)
         Assertions.assertEquals(1200, damage().resist(0.2, 0.4).toValue(), EPS);
     }
 
@@ -126,7 +128,7 @@ public class DamageZoneTest {
 
     @Test
     public void resistanceIsClampedToMin() {
-        // HSR.md §2.5：抗性取值范围 -100% ~ 90% ⇒ 抗性区 0.1 ~ 2.0（负抗全效）
+        // HSR.md §2.5: resistance ranges over -100% ~ 90% ⇒ resistance zone 0.1 ~ 2.0 (negative resistance at full effect)
         Assertions.assertEquals(2000, damage().resist(-1.5, 0).toValue(), EPS);
         Assertions.assertEquals(2.0, damage().resist(-1.5, 0).resistArea().getRate(), EPS);
     }
@@ -137,7 +139,7 @@ public class DamageZoneTest {
                 .addBoost(0.5)
                 .crit(true, 1.0);
 
-        // 欢愉伤害：吃双爆区，不受伤害提高类效果影响（HSR.md §6.4 / §6.5）
+        // Elation damage: takes the crit zone, but is unaffected by damage-increase effects (HSR.md §6.4 / §6.5)
         Assertions.assertEquals(2000, damage.toValue(), EPS);
     }
 
@@ -177,7 +179,8 @@ public class DamageZoneTest {
 
     @Test
     public void zonesAreTestableWithoutDamage() {
-        // 区不依赖 Damage 也能单测：累加区一个 + 计算区一个（其余区的数值已由各自用例断言）
+        // A zone can be unit-tested without a Damage too: one additive zone + one computed zone
+        // (the values of the other zones are already asserted by their own cases)
         Assertions.assertEquals(3.5, new Damage.VulnerableArea().add(2.0).add(2.0).getRate(), EPS);
         Assertions.assertEquals(1000.0 / 2150.0, new Damage.DefenceArea().set(80, 1150, 0).getRate(), EPS);
     }
@@ -198,7 +201,7 @@ public class DamageZoneTest {
                 .crit(true, 1.0)
                 .defence(80, 1150, 0);
 
-        // 增伤 / 暴击被 applies() 挡掉，防御区照常生效
+        // DMG boost / crit are blocked by applies(), the defence zone still takes effect as usual
         Assertions.assertFalse(damage.boostArea().applies(DamageType.BREAK));
         Assertions.assertFalse(damage.critArea().applies(DamageType.BREAK));
         Assertions.assertEquals(BASE * 1000.0 / 2150.0, damage.toValue(), EPS);
@@ -220,12 +223,12 @@ public class DamageZoneTest {
                 .addBoost(0.2, ModifierSource.BUFF, 3)
                 .addBoost(0.3, ModifierSource.RELIC, 4);
 
-        // 增伤 1+0.5、易伤 1+0.5 → 2250
+        // DMG boost 1+0.5, vulnerability 1+0.5 → 2250
         Assertions.assertEquals(2250, damage.toValue(), EPS);
         Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.BUFF).size());
         Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.RELIC).size());
 
-        // 按来源撤销：Buff 到期/被驱散（P10-3）就是走这个口子
+        // Removal by source: a Buff expiring / being dispelled (P10-3) is exactly this opening
         damage.vulnerableArea().removeModifiersFrom(BUFF, 7);
         damage.boostArea().removeModifiersFrom(ModifierSource.BUFF, 3);
 
@@ -245,12 +248,12 @@ public class DamageZoneTest {
 
     @Test
     public void constructorContract() {
-        // 4 参兼容构造器：伤害类型缺省 NORMAL
+        // 4-arg legacy constructor: damage type defaults to NORMAL
         Damage legacy = new Damage(null, null, DamageElement.FIRE, BASE);
         Assertions.assertEquals(DamageType.NORMAL, legacy.getType());
         Assertions.assertEquals(BASE, legacy.toValue(), EPS);
 
-        // element / type 都不允许为 null
+        // neither element nor type is allowed to be null
         Assertions.assertThrows(NullPointerException.class,
                 () -> new Damage(null, null, null, DamageType.BREAK, BASE));
         Assertions.assertThrows(NullPointerException.class,

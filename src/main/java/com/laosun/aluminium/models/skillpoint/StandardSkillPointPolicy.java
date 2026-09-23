@@ -7,113 +7,174 @@ import com.laosun.aluminium.models.Resource;
 import com.laosun.aluminium.models.Skill;
 
 /**
- * 标准战技点策略（P8-4）：开局 3、上限 5、**我方**普攻 +1、战技 -1、其余中性。
+ * Standard skill point (SP) policy (P8-4): start at 3, cap 5, **our side's** basic attack +1,
+ * skill -1, everything else neutral.
  *
- * <p>规则表（见 {@code engine.md} §9.6 的完整对照与差距清单）：
+ * <p>Rule table (see the full comparison and gap list in {@code engine.md} §9.6):
  *
  * <table border="1">
- *   <tr><th>技能类别</th><th>战技点</th></tr>
+ *   <tr><th>Skill category</th><th>Skill points</th></tr>
  *   <tr><td>{@link SkillCategory#NORMAL}</td><td>+{@link Constant#SKILL_POINT_GAIN_BASIC}</td></tr>
- *   <tr><td>{@link SkillCategory#BPSKILL}</td><td>-1，不够则**不能出手**</td></tr>
- *   <tr><td>其他（含 {@code ULTRA}、地图技能、天赋/追加攻击的 {@code UNSPECIFIED}）</td>
- *       <td>中性</td></tr>
+ *   <tr><td>{@link SkillCategory#BPSKILL}</td><td>-1; if there are not enough, the unit **cannot act**</td></tr>
+ *   <tr><td>Everything else (including {@code ULTRA}, map skills, and the {@code UNSPECIFIED} of talents/follow-up attacks)</td>
+ *       <td>neutral</td></tr>
  * </table>
  *
- * <p><b>为什么只算我方</b>：敌人也走 {@code Battle.performAction} 出手，技能同样是
- * {@code Normal} —— 不判阵营的话敌人每打一下我方的战技点就 +1。
- * 判据用 {@link com.laosun.aluminium.enums.Camp#PLAYER}（"我方单位"）而不是
- * "是不是玩家操控"：将来加友方召唤物（忆灵，P9-4）时它们**也应该**供点，
- * 这个行为由 {@code SkillPointGameParityTest} 钉住。
+ * <p><b>Why only our side is counted</b>: enemies also act through {@code Battle.performAction}, and
+ * their skills are {@code Normal} as well — without a camp check, every enemy hit would give our side
+ * +1 skill point. The test uses {@link com.laosun.aluminium.enums.Camp#PLAYER} ("a unit on our side")
+ * rather than "is it player-controlled": when friendly summons (memosprite, P9-4) are added later they
+ * **should** also supply points, and this behaviour is pinned by {@code SkillPointGameParityTest}.
  *
- * <p>⚠ <b>已知偏差</b>（{@code DOC_VS_CODE.md} §F 的 <b>F-3</b>）：这里对
- * {@code NORMAL} 一刀切 +1，而游戏里**强化普攻有例外** —— 波提欧的强化普攻
- * 「无法恢复战技点」、青雀的强化普攻「恢复 1 个战技点」。数据里两者都是
- * {@code "Normal"}（无单独类型），所以本实现**对青雀正确、对波提欧错误**。
- * ⚠ **不要改成"强化普攻一律 +0"**（会把青雀改坏）—— 正解是**每个技能自带
- * 战技点增量字段**（数据补全）。本类留了 {@link #gainForCast} 作为覆盖点。
+ * <p>⚠ <b>Known deviation</b> (<b>F-3</b> in §F of {@code DOC_VS_CODE.md}): here {@code NORMAL} is
+ * uniformly +1, whereas in the game **enhanced basic attacks have exceptions** — Boothill's (波提欧)
+ * enhanced basic attack "cannot restore skill points", while Qingque's (青雀) enhanced basic attack
+ * "restores 1 skill point". In the data both are {@code "Normal"} (there is no separate type), so this
+ * implementation is **correct for Qingque and wrong for Boothill**.
+ * ⚠ **Do not change it to "enhanced basic attacks are always +0"** (that would break Qingque) — the
+ * right fix is a **per-skill skill-point delta field** (a data completion). This class leaves
+ * {@link #gainForCast} as the override point.
  *
- * <p>⚠ <b>角色级修正没接</b>（同 §F 的 F-4）：布洛妮娅「战技 50% 概率 +1」、
- * 素裳「打击破目标战技 +1」、花火「上限 +2」等全部要等 P8-7 触发器表。
- * 本类**刻意不知道任何角色** —— 加这些时请继承并覆盖 {@link #gainForCast}
- * （或由 P8-7 的效果表驱动），**不要**在这里写 {@code cid} 判断。
+ * <p>⚠ <b>Character-level modifiers are not wired up</b> (F-4 in the same §F): Bronya's (布洛妮娅)
+ * "50% chance to +1 on skill", Sushang's (素裳) "+1 on a skill that hits a broken target", Sparkle's
+ * (花火) "cap +2" and so on all have to wait for the P8-7 trigger table. This class **deliberately knows
+ * no character** — when adding these, extend and override {@link #gainForCast} (or drive it from the
+ * P8-7 effect table), and do **not** write {@code cid} checks here.
  */
 public class StandardSkillPointPolicy implements SkillPointPolicy {
 
     /**
-     * 战技点这个资源本身。用 {@link Resource} 而不是裸 {@code int}，
-     * 是为了和 P8-8 的层数资源共用一个有边界语义的抽象（见该类说明）。
+     * The skill point resource itself. {@link Resource} is used instead of a bare {@code int} so that
+     * it shares one bounded-semantics abstraction with P8-8's stack resources (see that class's
+     * description).
      */
     private final Resource resource;
 
     /**
-     * 用标准值构造：上限 {@link Constant#SKILL_POINT_MAX}、开局
-     * {@link Constant#SKILL_POINT_START}。
+     * Construct with the standard values: cap {@link Constant#SKILL_POINT_MAX}, start
+     * {@link Constant#SKILL_POINT_START}.
      */
     public StandardSkillPointPolicy() {
         this(Constant.SKILL_POINT_MAX, Constant.SKILL_POINT_START);
     }
 
     /**
-     * 用指定的上限/开局构造（给测试与将来的"上限被光锥/角色抬高"用，见 §F 的 F-1）。
+     * Construct with the given cap/start value (for tests and for the future "cap raised by a light
+     * cone/character", see F-1 in §F).
      *
-     * @param max     常规上限
-     * @param initial 开局值（夹到 {@code [0, max]}）
+     * @param max     the conventional cap
+     * @param initial the start value (clamped to {@code [0, max]})
      */
     public StandardSkillPointPolicy(int max, int initial) {
         this.resource = new Resource("skill_point", max, initial);
     }
 
     /**
-     * 暴露底层资源 —— 给"改上限 / 配溢出额度"这类队伍级修正用
-     * （花火的上限 +2、溢出储存 10 点都属于这一类）。
+     * Exposes the underlying resource — for team-level modifiers like "change the cap / configure an
+     * overflow allowance" (Sparkle's (花火) cap +2 and the 10-point overflow store both belong here).
      */
     public Resource resource() {
         return resource;
     }
 
+    /**
+     * Reporting hook for the skill points' **actual change** (P8-6).
+     *
+     * <p>Why the policy reports it instead of {@code Battle} comparing the before/after values: the
+     * policy is the only component that knows "whether it actually went up this time and by how much"
+     * (for example, when already at cap after a basic attack the actual credited amount is 0, and no
+     * event should be fired). {@code Battle} is only responsible for broadcasting the reported events
+     * to the team — that way {@code Battle} still **does not need to know the skill point rules**
+     * (see F-8 in §F).
+     */
+    public interface Listener {
+        /** Actually credited {@code amount} points ({@code > 0}). */
+        void onGained(int amount);
+
+        /** Actually spent {@code amount} points ({@code > 0}). */
+        void onSpent(int amount);
+    }
+
+    private static final Listener NO_OP = new Listener() {
+        @Override
+        public void onGained(int amount) {
+        }
+
+        @Override
+        public void onSpent(int amount) {
+        }
+    };
+
+    private Listener listener = NO_OP;
+
+    /**
+     * Attach the change-reporting hook. Passing {@code null} is equivalent to removing it (back to
+     * a no-op).
+     *
+     * @param listener the reporting hook
+     */
+    public void setListener(Listener listener) {
+        this.listener = listener == null ? NO_OP : listener;
+    }
+
     @Override
     public boolean onSkillCast(CanHit user, Skill skill) {
         if (user == null || user.getCamp() != com.laosun.aluminium.enums.Camp.PLAYER) {
-            return true;                        // 敌方行动不碰我方战技点
+            return true;                        // an enemy action does not touch our skill points
         }
         SkillCategory category = categoryOf(skill);
         if (category == null) {
-            return true;                        // 没有技能数据（敌人技能/空技能）→ 中性
+            return true;                        // no skill data (enemy skill / empty skill) → neutral
         }
         return switch (category) {
             case NORMAL -> {
-                gain(gainForCast(user, skill, category));
+                // use gain()'s **return value** (the actual credited amount) instead of the nominal
+                // one: it is 0 when already at cap, and no event should be fired
+                int gained = gain(gainForCast(user, skill, category));
+                if (gained > 0) {
+                    listener.onGained(gained);
+                }
                 yield true;
             }
-            case BPSKILL -> spend();
+            case BPSKILL -> {
+                if (spend()) {
+                    listener.onSpent(1);
+                    yield true;
+                }
+                yield false;                    // not enough → the action does not happen, and **no** spend event is fired
+            }
             // ULTRA / MAZE / MAZE_NORMAL / ASSIST / ELATION_DAMAGE /
-            // UNSPECIFIED（天赋·追加攻击）/ UNKNOWN（数据不认识）→ 中性
+            // UNSPECIFIED (talent·follow-up attack) / UNKNOWN (a value the data does not recognise) → neutral
             default -> true;
         };
     }
 
     /**
-     * 一次普攻**该回多少**战技点（默认 {@link Constant#SKILL_POINT_GAIN_BASIC}）。
+     * How many skill points one basic attack **should restore** (default
+     * {@link Constant#SKILL_POINT_GAIN_BASIC}).
      *
-     * <p>这是本类的**首要覆盖点**：将来"花火在队伍里 +1"「强化普攻不回点」这类
-     * 角色级修正，由子类或 P8-7 的效果表覆盖它产生，而**不需要改 {@code Battle}**。
+     * <p>This is the class's **primary override point**: character-level modifiers such as "Sparkle
+     * (花火) in the team gives +1" or "an enhanced basic attack restores no points" are produced by a
+     * subclass or the P8-7 effect table overriding it, and **without changing {@code Battle}**.
      *
-     * @param user     出手者
-     * @param skill    技能
-     * @param category 已解析好的类别（调用方保证非 {@code null}）
-     * @return 要加的战技点（{@code <= 0} 表示不加）
+     * @param user     the acting unit
+     * @param skill    the skill
+     * @param category the already-resolved category (the caller guarantees it is not {@code null})
+     * @return the skill points to add ({@code <= 0} means add none)
      */
     protected int gainForCast(CanHit user, Skill skill, SkillCategory category) {
         return Constant.SKILL_POINT_GAIN_BASIC;
     }
 
     /**
-     * 解析技能类别。
+     * Resolves the skill category.
      *
-     * <p>⚠ 走 {@code SkillData.getCategory()} 而不是裸字符串 {@code switch} ——
-     * 后者在数据侧改拼写或新增取值时会**静默失配**（见 {@code DOC_VS_CODE.md} §F 的 F-6）。
+     * <p>⚠ Go through {@code SkillData.getCategory()} and not a bare-string {@code switch} — the
+     * latter **silently mismatches** when the data side changes a spelling or adds a new value (see
+     * F-6 in §F of {@code DOC_VS_CODE.md}).
      *
-     * @return {@code null} 表示"没有类别可言"（技能或技能数据为空），调用方按中性处理
+     * @return {@code null} means "there is no category to speak of" (the skill or its skill data is
+     * empty); the caller treats it as neutral
      */
     protected SkillCategory categoryOf(Skill skill) {
         if (skill == null || skill.getData() == null) {

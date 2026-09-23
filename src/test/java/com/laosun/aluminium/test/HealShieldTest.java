@@ -16,18 +16,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P6-2 / P6-3 验收：治疗乘区与护盾。
+ * P6-2 / P6-3 acceptance: the healing damage zone and shields.
  *
  * <pre>
- * 治疗量 = 基础量 × (1 + 治疗加成) × (1 + 受疗加成)        ← 两个因子来自不同的人
- * 护盾：伤害先扣盾，盾破前不死；护盾不叠加
+ * healing = base amount × (1 + outgoing healing boost) × (1 + heal taken ratio)   ← the two factors come from different people
+ * shield: damage drains the shield first, and you do not die before the shield breaks; shields do not stack
  * </pre>
  */
 public class HealShieldTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // P6-2 治疗乘区
+    // P6-2 healing damage zone
     // ==================================================================
 
     @Test
@@ -50,7 +50,7 @@ public class HealShieldTest {
         Battle battle = newBattle(healer, target);
 
         Assertions.assertEquals(500, battle.calculateHeal(healer, target, 1000), EPS,
-                "受疗 -50% → 1000 × 1 × 0.5 = 500（游戏里没有单独的『治疗降低』属性，用负数表达）");
+                "heal taken -50% → 1000 × 1 × 0.5 = 500 (the game has no separate \"healing reduction\" attribute, so a negative number expresses it)");
     }
 
     @Test
@@ -65,14 +65,14 @@ public class HealShieldTest {
         double before = target.getCurrentHp();
         double healed = battle.heal(healer, target, 1000);
 
-        Assertions.assertEquals(1560, healed, EPS, "实际回复量 = 乘区后的治疗量");
+        Assertions.assertEquals(1560, healed, EPS, "the actual amount restored = the heal amount after the damage zones");
         Assertions.assertEquals(before + 1560, target.getCurrentHp(), EPS);
 
-        // 再奶一次：这次会撞上限，返回的是**实际**回复量
+        // Heal once more: this time it hits the cap, and what is returned is the **actual** amount restored
         double healed2 = battle.heal(healer, target, 100_000);
-        Assertions.assertEquals(target.getMaxHp(), target.getCurrentHp(), EPS, "不超上限");
+        Assertions.assertEquals(target.getMaxHp(), target.getCurrentHp(), EPS, "does not exceed the cap");
         Assertions.assertEquals(target.getMaxHp() - (before + 1560), healed2, EPS,
-                "返回值是实际回复量，不是理论治疗量");
+                "the return value is the actual amount restored, not the theoretical heal amount");
     }
 
     @Test
@@ -84,12 +84,12 @@ public class HealShieldTest {
         target.takeDamage(999_999);
         Assertions.assertTrue(target.isDeath());
 
-        Assertions.assertEquals(0, battle.heal(healer, target, 1000), EPS, "死人不能被治疗");
+        Assertions.assertEquals(0, battle.heal(healer, target, 1000), EPS, "a dead man cannot be healed");
         Assertions.assertEquals(0, target.getCurrentHp(), EPS);
     }
 
     // ==================================================================
-    // P6-3 护盾
+    // P6-3 shield
     // ==================================================================
 
     @Test
@@ -100,8 +100,8 @@ public class HealShieldTest {
         Assertions.assertEquals(500, battle.grantShield(target, 500), EPS);
         target.takeDamage(300);
 
-        Assertions.assertEquals(200, target.getShield(), EPS, "盾 500 - 300 = 200");
-        Assertions.assertEquals(target.getMaxHp(), target.getCurrentHp(), EPS, "HP 一点没掉");
+        Assertions.assertEquals(200, target.getShield(), EPS, "shield 500 - 300 = 200");
+        Assertions.assertEquals(target.getMaxHp(), target.getCurrentHp(), EPS, "HP did not drop at all");
     }
 
     @Test
@@ -110,17 +110,17 @@ public class HealShieldTest {
         Battle battle = newBattle(character("ally"), target);
         battle.grantShield(target, 500);
 
-        target.takeDamage(300);                                  // 盾 → 200
-        boolean died = target.takeDamage(300);                   // 盾吃 200，剩下 100 进 HP
+        target.takeDamage(300);                                  // shield → 200
+        boolean died = target.takeDamage(300);                   // the shield eats 200, the remaining 100 goes into HP
 
-        Assertions.assertFalse(died, "盾破不死");
-        Assertions.assertEquals(0, target.getShield(), EPS, "盾空了");
+        Assertions.assertFalse(died, "breaking the shield does not kill");
+        Assertions.assertEquals(0, target.getShield(), EPS, "the shield is empty");
         Assertions.assertEquals(target.getMaxHp() - 100, target.getCurrentHp(), EPS, "HP -100");
         Assertions.assertFalse(target.isDeath());
     }
 
     /**
-     * 护盾**不叠加**：新盾覆盖旧值，不相加。
+     * Shields **do not stack**: a new shield overwrites the old value instead of adding to it.
      */
     @Test
     public void shieldDoesNotStack() {
@@ -130,14 +130,15 @@ public class HealShieldTest {
         battle.grantShield(target, 500);
         battle.grantShield(target, 300);
 
-        Assertions.assertEquals(300, target.getShield(), EPS, "覆盖而不是 800");
-        Assertions.assertEquals(0, battle.grantShield(target, -50), EPS, "≤ 0 视为清盾");
+        Assertions.assertEquals(300, target.getShield(), EPS, "overwrite, not 800");
+        Assertions.assertEquals(0, battle.grantShield(target, -50), EPS, "≤ 0 is treated as clearing the shield");
         Assertions.assertEquals(0, target.getShield(), EPS);
     }
 
     /**
-     * 被打进盾里的伤害**要算进这一击的伤害**（否则"打在有盾的目标上"会显示成 0，
-     * {@code AttackEvent.totalDamage} 与击杀回能都会失真）。
+     * Damage that goes into the shield **must count towards the damage of this hit** (otherwise "hitting a
+     * shielded target" would show as 0, and {@code AttackEvent.totalDamage} and kill energy gain would both
+     * be distorted).
      */
     @Test
     public void damageAbsorbedByTheShieldStillCountsAsDamageDealt() {
@@ -145,20 +146,21 @@ public class HealShieldTest {
         Character target = character("target");
         target.setMaxEnergy(120);
         Battle battle = newBattle(attacker, target);
-        battle.grantShield(target, 10_000);                      // 盾远大于这一击
+        battle.grantShield(target, 10_000);                      // the shield is far larger than this hit
 
         double hpBefore = target.getCurrentHp();
         double dealt = battle.applyDamage(target, new Damage(attacker, target,
                 DamageElement.ICE, DamageType.NORMAL, 1000));
 
-        // 这一击的**结算值**要先过防御区（角色防御 100）：1000 × 1600/(100+1600) ≈ 941.18
+        // The **settled value** of this hit must first go through the defence zone (character defence 100):
+        // 1000 × 1600/(100+1600) ≈ 941.18
         double levelTerm = com.laosun.aluminium.Constant.DEFENCE_CONST
                 + com.laosun.aluminium.Constant.DEFENCE_PER_LEVEL * attacker.getLevel();
         double settled = 1000 * levelTerm / (100 + levelTerm);
 
-        Assertions.assertEquals(hpBefore, target.getCurrentHp(), EPS, "HP 没动（全被盾吃了）");
+        Assertions.assertEquals(hpBefore, target.getCurrentHp(), EPS, "HP did not move (all eaten by the shield)");
         Assertions.assertEquals(settled, target.getLastShieldAbsorbed(), EPS);
-        Assertions.assertEquals(settled, dealt, EPS, "返回的是「结算值 + 盾吸收量」");
+        Assertions.assertEquals(settled, dealt, EPS, "what is returned is \"settled value + shield absorbed\"");
     }
 
     @Test
@@ -170,7 +172,7 @@ public class HealShieldTest {
         target.setInvulnerable(true);
         Assertions.assertEquals(0, battle.applyDamage(target, new Damage(
                 character("x"), target, DamageElement.ICE, DamageType.NORMAL, 1000)), EPS);
-        Assertions.assertEquals(500, target.getShield(), EPS, "无敌期间连盾都不掉");
+        Assertions.assertEquals(500, target.getShield(), EPS, "while invulnerable not even the shield drops");
     }
 
     // ==================================================================

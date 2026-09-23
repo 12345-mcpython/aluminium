@@ -18,73 +18,76 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 /**
- * 战技点（P8-4）：开局 3、上限 5、我方普攻 +1、战技 -1、终结技与追加攻击中性。
+ * Skill points (战技点, SP) (P8-4): start 3, cap 5, our basic attack +1, skill -1, ultimate and follow-up attacks
+ * neutral.
  *
- * <p><b>数据事实</b>：{@code skills.json} 里**没有**战技点字段 —— 638 条技能中普攻 122 条、
- * 战技 109 条的 {@code sp_need} 全是 {@code null}（有值的 99 条全是终结技，那是开大能量门槛，
- * 见 {@code engine.md} §9.4）。所以战技点只能来自游戏规则，落在 {@link Constant} 里。
+ * <p><b>Data fact</b>: {@code skills.json} has **no** skill point field — among the 638 skills, the
+ * {@code sp_need} of all 122 basic attacks and 109 skills is {@code null} (the 99 entries that do have a value are
+ * all ultimates, and that is the ultimate energy threshold, see {@code engine.md} §9.4). So skill points can only
+ * come from the game rules, and they live in {@link Constant}.
  *
- * <p>本测试刻意**不用** {@code castImmediate}（那是绕过队列的测试/演示入口，按设计不碰战技点），
- * 全部走 {@code stepForward → beforeMove → performAction → afterMove} 的真实链路，
- * 否则测的是"没有战技点的世界"。
+ * <p>This test deliberately does **not** use {@code castImmediate} (that is a test/demo entry point that bypasses
+ * the queue and by design does not touch skill points); everything goes through the real chain
+ * {@code stepForward → beforeMove → performAction → afterMove}, otherwise what is tested is "a world without skill
+ * points".
  */
 public class SkillPointTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // 1. 池子本身
+    // 1. The pool itself
     // ==================================================================
 
-    /** 开局 3 点，上限 5。 */
+    /** Starts at 3 points, caps at 5. */
     @Test
     public void startsAtThreeAndCapsAtFive() {
         Battle battle = newBattle();
 
-        Assertions.assertEquals(3, battle.getSkillPoints(), "开局战技点");
+        Assertions.assertEquals(3, battle.getSkillPoints(), "skill points at the start");
         Assertions.assertEquals(Constant.SKILL_POINT_START, battle.getSkillPoints());
         Assertions.assertEquals(5, Constant.SKILL_POINT_MAX);
 
         battle.gainSkillPoint(1);
         Assertions.assertEquals(4, battle.getSkillPoints());
         battle.gainSkillPoint(1);
-        Assertions.assertEquals(5, battle.getSkillPoints(), "到 5");
+        Assertions.assertEquals(5, battle.getSkillPoints(), "reaches 5");
         battle.gainSkillPoint(1);
-        Assertions.assertEquals(5, battle.getSkillPoints(), "封顶，不溢出");
+        Assertions.assertEquals(5, battle.getSkillPoints(), "capped, no overflow");
         battle.gainSkillPoint(100);
-        Assertions.assertEquals(5, battle.getSkillPoints(), "一次加 100 也只到 5");
+        Assertions.assertEquals(5, battle.getSkillPoints(), "adding 100 at once still only reaches 5");
     }
 
-    /** 消耗到 0 之后再多消耗要返回 false（而不是变成负数）。 */
+    /** After spending down to 0, any further spend must return false (rather than going negative). */
     @Test
     public void spendingStopsAtZero() {
         Battle battle = newBattle();
 
         for (int i = 0; i < 3; i++) {
-            Assertions.assertTrue(battle.spendSkillPoint(), "第 " + (i + 1) + " 次消耗应当成功");
+            Assertions.assertTrue(battle.spendSkillPoint(), "spend #" + (i + 1) + " should succeed");
         }
         Assertions.assertEquals(0, battle.getSkillPoints());
         Assertions.assertFalse(battle.hasSkillPoint());
 
-        Assertions.assertFalse(battle.spendSkillPoint(), "0 点时应当失败");
-        Assertions.assertEquals(0, battle.getSkillPoints(), "失败不能变成负数");
+        Assertions.assertFalse(battle.spendSkillPoint(), "at 0 points it should fail");
+        Assertions.assertEquals(0, battle.getSkillPoints(), "a failure must not go negative");
     }
 
-    /** 回复非正数是调用方的 bug：静默忽略，别当成"扣点"。 */
+    /** Gaining a non-positive amount is a caller bug: ignore it silently, do not treat it as "spending a point". */
     @Test
     public void gainingNonPositiveAmountIsIgnored() {
         Battle battle = newBattle();
 
         battle.gainSkillPoint(0);
-        Assertions.assertEquals(3, battle.getSkillPoints(), "加 0 不变");
+        Assertions.assertEquals(3, battle.getSkillPoints(), "adding 0 changes nothing");
         battle.gainSkillPoint(-5);
-        Assertions.assertEquals(3, battle.getSkillPoints(), "加负数不能变成扣点");
+        Assertions.assertEquals(3, battle.getSkillPoints(), "adding a negative must not turn into a spend");
     }
 
     // ==================================================================
-    // 2. 真实链路：performAction 真的会改战技点
+    // 2. The real chain: performAction really does change skill points
     // ==================================================================
 
-    /** 真实链路里放一次普攻 → +1。 */
+    /** One basic attack through the real chain → +1. */
     @Test
     public void basicAttackInRealActionFlowGainsOnePoint() {
         Battle battle = newBattle();
@@ -93,10 +96,10 @@ public class SkillPointTest {
         Assertions.assertEquals(3, battle.getSkillPoints());
         Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, Slot.COMMON),
                 () -> List.of(firstEnemy(battle))));
-        Assertions.assertEquals(4, battle.getSkillPoints(), "普攻 +1");
+        Assertions.assertEquals(4, battle.getSkillPoints(), "basic attack +1");
     }
 
-    /** 真实链路里放一次战技 → -1。 */
+    /** One skill cast through the real chain → -1. */
     @Test
     public void skillInRealActionFlowSpendsOnePoint() {
         Battle battle = newBattle();
@@ -104,10 +107,10 @@ public class SkillPointTest {
 
         Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, Slot.SKILL),
                 () -> List.of(firstEnemy(battle))));
-        Assertions.assertEquals(2, battle.getSkillPoints(), "战技 -1");
+        Assertions.assertEquals(2, battle.getSkillPoints(), "skill -1");
     }
 
-    /** 连放普攻到封顶：3 → 4 → 5 → 5。 */
+    /** Basic attacks in a row up to the cap: 3 → 4 → 5 → 5. */
     @Test
     public void repeatedBasicAttacksCapAtFive() {
         Battle battle = newBattle();
@@ -117,22 +120,23 @@ public class SkillPointTest {
             Assertions.assertTrue(
                     actWithRealTurn(battle, hero, () -> skill(hero, Slot.COMMON),
                             () -> List.of(firstEnemy(battle))),
-                    "第 " + (i + 1) + " 次普攻");
+                    "basic attack #" + (i + 1) + "");
         }
 
-        Assertions.assertEquals(5, battle.getSkillPoints(), "普攻连打封顶 5");
+        Assertions.assertEquals(5, battle.getSkillPoints(), "basic attacks in a row cap at 5");
     }
 
     // ==================================================================
-    // 3. 0 点时战技放不出来，且**没有伤害**
+    // 3. At 0 points the skill cannot be cast, and deals **no damage**
     // ==================================================================
 
     /**
-     * 核心：0 战技点时放战技 → {@code performAction} 返回 false，且目标一滴血不掉。
+     * The core case: casting the skill at 0 skill points → {@code performAction} returns false, and the target
+     * loses not a single point of HP.
      *
-     * <p>"没有伤害"这一条必须一起断言：{@code performAction} 只是**排队**，
-     * 真正的结算在 {@code afterMove → processRequests}。如果扣点失败却已经把请求
-     * 排进了队列，就会得到"没花钱却打出去了"。
+     * <p>The "no damage" part must be asserted together: {@code performAction} only **queues**, the actual
+     * settlement happens in {@code afterMove → processRequests}. If the cost had failed but the request was
+     * already queued, we would get "it was never paid for yet the hit came out".
      */
     @Test
     public void skillWithNoPointsFailsAndDealsNoDamage() {
@@ -141,22 +145,22 @@ public class SkillPointTest {
         Enemy target = firstEnemy(battle);
 
         while (battle.spendSkillPoint()) {
-            // 把池子清零
+            // drain the pool to zero
         }
         Assertions.assertEquals(0, battle.getSkillPoints());
 
         double hpBefore = target.getCurrentHp();
         Assertions.assertFalse(actWithoutAfterMove(battle, hero, () -> skill(hero, Slot.SKILL), List.of(target)),
-                "0 战技点 → 出手不成立");
-        Assertions.assertEquals(0, battle.getSkillPoints(), "失败的出手不能扣成负数");
-        Assertions.assertEquals(hpBefore, target.getCurrentHp(), EPS, "失败的出手不能造成伤害");
+                "0 skill points → the action does not happen");
+        Assertions.assertEquals(0, battle.getSkillPoints(), "a failed action must not deduct below zero");
+        Assertions.assertEquals(hpBefore, target.getCurrentHp(), EPS, "a failed action must not deal damage");
     }
 
     // ==================================================================
-    // 4. 终结技与追加攻击是"中性"的
+    // 4. The ultimate and follow-up attacks are "neutral"
     // ==================================================================
 
-    /** 终结技既不消耗也不回复战技点（大招收尾回的那 5 点只进能量，不进战技点）。 */
+    /** The ultimate neither spends nor restores skill points (the 5 points given back at the end go to energy, not to skill points). */
     @Test
     public void ultimateNeitherSpendsNorGainsSkillPoints() {
         Character jingYuan = CharacterFactory.create(1204, 80);
@@ -166,28 +170,30 @@ public class SkillPointTest {
         jingYuan.setCurrentEnergy(200);
         Assertions.assertTrue(battle.castUltra(jingYuan, List.of(firstEnemy(battle))));
 
-        Assertions.assertEquals(before, battle.getSkillPoints(), "终结技不碰战技点");
+        Assertions.assertEquals(before, battle.getSkillPoints(), "the ultimate does not touch skill points");
     }
 
     /**
-     * 追加攻击 / 天赋：数据里 {@code attack_type} 是 {@code null}，必须走中性分支。
+     * Follow-up attacks / talents: their {@code attack_type} is {@code null} in the data, so they must take the
+     * neutral branch.
      *
-     * <p>⚠ 这条防的是把 {@code switch} 写成"不是普攻就是战技"（{@code default -> 扣点}）的写法：
-     * 那样天赋与追加攻击会悄悄吃战技点，而 P8-3 一做追加攻击就会立刻踩到。
+     * <p>⚠ This one guards against writing the {@code switch} as "if it is not a basic attack then it is a skill"
+     * ({@code default -> spend}): that way talents and follow-up attacks would quietly eat skill points, and the
+     * moment P8-3 adds follow-up attacks it would be hit immediately.
      */
     @Test
     public void nullAttackTypeIsNeutral() {
         Battle battle = newBattle();
         Skill talentLike = skill(CharacterFactory.create(1003, 80), Slot.TALENT);
-        Assertions.assertNull(talentLike.getData().getSkillType(), "前提：天赋的 attack_type 是 null");
+        Assertions.assertNull(talentLike.getData().getSkillType(), "precondition: the talent's attack_type is null");
 
         int before = battle.getSkillPoints();
         Assertions.assertTrue(battle.applySkillPointCost(talentLike, battle.characters.getFirst()),
-                "中性技能不阻挡出手");
-        Assertions.assertEquals(before, battle.getSkillPoints(), "不涨不跌");
+                "a neutral skill does not block the action");
+        Assertions.assertEquals(before, battle.getSkillPoints(), "neither rises nor falls");
     }
 
-    /** 地图普攻（槽位 6，{@code MazeNormal}）也按中性处理，不算"普攻回点"。 */
+    /** The map basic attack (slot 6, {@code MazeNormal}) is treated as neutral too, it does not count as "basic attack restores a point". */
     @Test
     public void mazeAttackTypeIsNeutral() {
         Battle battle = newBattle();
@@ -195,24 +201,25 @@ public class SkillPointTest {
 
         int before = battle.getSkillPoints();
         Assertions.assertTrue(battle.applySkillPointCost(maze, battle.characters.getFirst()));
-        Assertions.assertEquals(before, battle.getSkillPoints(), "MazeNormal 中性");
+        Assertions.assertEquals(before, battle.getSkillPoints(), "MazeNormal is neutral");
     }
 
     // ==================================================================
-    // 5. 只算我方：敌人的普攻不能给我方送点
+    // 5. Only our side counts: an enemy's basic attack must not feed our pool
     // ==================================================================
 
     /**
-     * 敌方行动不能改变我方战技点。
+     * An enemy action must not change our skill points.
      *
-     * <p>⚠ <b>这条测试的陷阱（已修）</b>：敌人的默认技能 {@code EnemySkill} 的
-     * {@code getData()} **恒为 null**（它不走角色倍率表，见该类 javadoc），
-     * 于是在 {@code applySkillPointCost} 的 null 保护处就返回了 ——
-     * 拿默认技能测"敌方不影响战技点"，**无论有没有阵营判断都会通过**。
-     * 我第一次就是这么写的，靠变异测试才发现（去掉阵营判断后依然绿）。
+     * <p>⚠ <b>The trap in this test (already fixed)</b>: the enemy's default skill {@code EnemySkill} has a
+     * {@code getData()} that is **always null** (it does not go through the character multiplier table, see that
+     * class's javadoc), so it returns early at the null guard in {@code applySkillPointCost} —
+     * testing "the enemy does not affect skill points" with the default skill **passes whether or not the camp
+     * check exists**. That is exactly how I wrote it the first time, and only mutation testing exposed it (it
+     * stayed green after the camp check was removed).
      *
-     * <p>所以这里**手工给敌人装一个真实角色普攻**（{@code attack_type = "Normal"}）：
-     * 只有这样才能真正走到分支上，让"阵营判断"成为唯一能挡住它的东西。
+     * <p>So here we **hand the enemy a real character basic attack** ({@code attack_type = "Normal"}):
+     * only that way does it actually reach the branch, making the "camp check" the only thing that can stop it.
      */
     @Test
     public void enemyBasicAttackDoesNotFeedThePlayerPool() {
@@ -220,40 +227,40 @@ public class SkillPointTest {
         Enemy enemy = firstEnemy(battle);
         Character hero = battle.characters.getFirst();
 
-        // 前提自检：默认的敌人技能 getData() 是 null，测不出阵营判断
+        // precondition self-check: the default enemy skill's getData() is null, so it cannot test the camp check
         Assertions.assertNull(enemySkill(enemy).getData(),
-                "前提：EnemySkill 没有角色倍率数据，直接测它是空转");
+                "precondition: EnemySkill has no character multiplier data, testing it directly is a no-op");
 
-        // 换成"真实角色的普攻"（Normal）—— 数据非 null，才会真的走到战技点分支
+        // swap in "a real character's basic attack" (Normal) — the data is non-null, so it really reaches the skill point branch
         enemy.setSkill(SkillType.COMMON, new DefaultSkill(1003, 1, 1));
         int before = battle.getSkillPoints();
         Assertions.assertTrue(actWithRealTurn(battle, enemy, () -> enemy.getSkills().get(SkillType.COMMON),
-                () -> List.of(hero)), "敌人这次普攻本身应当成功");
+                () -> List.of(hero)), "the enemy's basic attack itself should succeed");
 
         Assertions.assertEquals(before, battle.getSkillPoints(),
-                "敌方行动不能改变我方战技点（去掉阵营判断这条就会失败）");
+                "an enemy action must not change our skill points (this fails once the camp check is removed)");
     }
 
     // ==================================================================
-    // 6. applySkillPointCost 是**原子**的
+    // 6. applySkillPointCost is **atomic**
     // ==================================================================
 
-    /** 0 点时试图放战技：返回 false，且点数不变（不能先扣成 -1 再判断）。 */
+    /** Trying to cast the skill at 0 points: returns false and the count is unchanged (it must not deduct to -1 and then check). */
     @Test
     public void skillPointCostIsAtomicAtZero() {
         Battle battle = newBattle();
         Skill skill = battle.characters.getFirst().getSkills().get(SkillType.SKILL);
 
         while (battle.spendSkillPoint()) {
-            // 清零
+            // zero it out
         }
         Assertions.assertFalse(battle.applySkillPointCost(skill, battle.characters.getFirst()),
-                "点数不足 → 失败");
-        Assertions.assertEquals(0, battle.getSkillPoints(), "失败的那次不能扣成 -1");
+                "not enough points → failure");
+        Assertions.assertEquals(0, battle.getSkillPoints(), "the failed attempt must not deduct to -1");
     }
 
     // ==================================================================
-    // 辅助
+    // Helpers
     // ==================================================================
 
     private enum Slot {
@@ -270,7 +277,7 @@ public class SkillPointTest {
         return new DefaultSkill(hero.getCid(), slot.slot, 1);
     }
 
-    /** 姬子 1003：槽位 1/2 在数据里分别是 {@code Normal} / {@code BPSkill}。 */
+    /** Himeko (姬子) 1003: in the data slots 1/2 are {@code Normal} / {@code BPSkill} respectively. */
     private static Battle newBattle() {
         return newBattle(CharacterFactory.create(1003, 80));
     }
@@ -282,15 +289,16 @@ public class SkillPointTest {
         return battle;
     }
 
-    /** 敌人的普攻（P5-3 装在敌人身上的技能）。 */
+    /** The enemy's basic attack (the skill P5-3 equips on enemies). */
     private static Skill enemySkill(Enemy enemy) {
         return enemy.getSkills().values().iterator().next();
     }
 
     /**
-     * 按真实流程让 {@code actor} 出一次手，**并收尾**（{@code afterMove}）。
+     * Has {@code actor} take one action through the real flow, **and finishes it** ({@code afterMove}).
      *
-     * <p>行动值最先到的可能是敌人（冰锋 132 速 > 姬子 96 速），所以要先跳到 actor 的回合。
+     * <p>The one whose action value arrives first may be the enemy (冰锋 has speed 132 > Himeko's 96), so we have to
+     * skip ahead to the actor's turn.
      */
     private static boolean actWithRealTurn(Battle battle, CanHit actor, Supplier<Skill> skill,
                                            Supplier<List<? extends CanHit>> targets) {
@@ -299,7 +307,7 @@ public class SkillPointTest {
         return result;
     }
 
-    /** 同上，但**不**收尾 —— 留给调用方在结算前做断言（"没伤害"那条要用）。 */
+    /** As above, but does **not** finish it — left to the caller to assert before settlement (the "no damage" case needs this). */
     private static boolean actWithoutAfterMove(Battle battle, CanHit actor, Supplier<Skill> skill,
                                                List<? extends CanHit> targets) {
         for (int i = 0; i < 30; i++) {
@@ -313,7 +321,7 @@ public class SkillPointTest {
             }
             battle.afterMove();
         }
-        Assertions.fail("30 步内没轮到 " + actor.getName() + " 的回合");
+        Assertions.fail("it was not " + actor.getName() + "'s turn within 30 steps");
         return false;
     }
 

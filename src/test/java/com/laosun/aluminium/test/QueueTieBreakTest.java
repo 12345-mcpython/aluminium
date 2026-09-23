@@ -11,23 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 行动条的同行动值裁决（P7 修正 E4）。
+ * Tie-breaking on equal action values in the action bar (P7 fix E4).
  *
- * <p>修之前 {@code Signal.compareTo} 只比 {@code nextActionTime}，相等时
- * {@code PriorityQueue} 的顺序**未定义** —— "两个同速单位谁先出手"变成碰运气，
- * 而且 {@code snapshot()} 是按堆数组稳定排序，**显示顺序可能与实际出手顺序不一致**。
+ * <p>Before the fix {@code Signal.compareTo} only compared {@code nextActionTime}, so when they were
+ * equal the {@code PriorityQueue} order was **undefined** — "which of two units with the same speed
+ * acts first" became a matter of luck, and {@code snapshot()} sorted the heap array stably, so the
+ * **displayed order could disagree with the actual turn order**.
  *
- * <p>修法：{@code Signal} 记一个全局递增的**排期序号**，{@code compareTo} 在行动值相等时比它
- * （先排期的先动）。
+ * <p>The fix: {@code Signal} records a globally increasing **schedule sequence number**, and
+ * {@code compareTo} compares it when the action values are equal (the one scheduled earlier acts
+ * first).
  */
 public class QueueTieBreakTest {
     private static final double EPS = 1e-9;
 
     /**
-     * 同速单位的出手顺序必须是**入场顺序**，而且可复现 —— 反复跑同一场战斗结果一致。
+     * The turn order of same-speed units must be the **entry order**, and must be reproducible —
+     * running the same battle repeatedly gives the same result.
      *
-     * <p>断言两件事：{@code peekNext()} 拿到第一个入场的；以及连续 {@code move()} 的顺序
-     * 与入场顺序一致。修之前这几条会随堆内部状态变化而随机失败。
+     * <p>Two things are asserted: {@code peekNext()} returns the first one to enter; and the order
+     * of consecutive {@code move()} calls agrees with the entry order. Before the fix these would
+     * fail randomly with the heap's internal state.
      */
     @Test
     public void equalSpeedsActInEntryOrder() {
@@ -36,7 +40,7 @@ public class QueueTieBreakTest {
         Character third = character("third", 100);
         Queue q = new Queue(List.of(first, second, third));
 
-        Assertions.assertEquals(first, q.peekNext(), "先入场的先行动");
+        Assertions.assertEquals(first, q.peekNext(), "the one that entered first acts first");
 
         Assertions.assertEquals(first, nextActor(q));
         Assertions.assertEquals(second, nextActor(q));
@@ -44,24 +48,25 @@ public class QueueTieBreakTest {
     }
 
     /**
-     * 同一场战斗跑两遍必须得到完全相同的出手顺序（确定性）。
+     * Running the same battle twice must give exactly the same turn order (determinism).
      *
-     * <p>用"同速 + 多单位"把相等键堆满，让未定义顺序真的有机会暴露出来。
+     * <p>"Same speed + many units" is used to fill the heap with equal keys, giving the undefined
+     * order a real chance to show itself.
      */
     @Test
     public void equalSpeedOrderIsDeterministicAcrossRuns() {
         List<String> firstRun = runEqualSpeedBatch(8);
         List<String> secondRun = runEqualSpeedBatch(8);
 
-        Assertions.assertEquals(firstRun, secondRun, "同一构造两次运行必须给出同一顺序");
+        Assertions.assertEquals(firstRun, secondRun, "two runs of the same setup must give the same order");
         Assertions.assertEquals(
                 List.of("c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7").subList(0, 8),
                 firstRun.subList(0, 8),
-                "首轮就是入场顺序");
+                "the first round is exactly the entry order");
     }
 
     /**
-     * {@code snapshot()} 的顺序必须**等于**实际出手顺序（E4 的第二个症状）。
+     * The order of {@code snapshot()} must **equal** the actual turn order (E4's second symptom).
      */
     @Test
     public void snapshotOrderMatchesActualTurnOrder() {
@@ -76,14 +81,16 @@ public class QueueTieBreakTest {
             actual.add(nextActor(q));
         }
 
-        Assertions.assertEquals(actual, displayed, "显示顺序必须等于出手顺序");
+        Assertions.assertEquals(actual, displayed, "the displayed order must equal the turn order");
     }
 
     /**
-     * 行动条操纵**不**重新取号：把一个单位拉到与前面的人同一行动值，他仍然排在后面。
+     * Action bar manipulation does **not** re-take a sequence number: pulling a unit to the same
+     * action value as someone ahead of it still leaves it behind them.
      *
-     * <p>这条是刻意定下的语义。如果拉条也换序号，"谁被拉条谁就先手"，
-     * 会让 P7-2 额外回合 / P10-4 拉条的先后变得反直觉且难以预测。
+     * <p>This is a deliberately chosen semantics. If advancing also changed the sequence number, it
+     * would be "whoever gets advanced goes first", which would make the ordering of P7-2 extra turns
+     * / P10-4 action advance counter-intuitive and hard to predict.
      */
     @Test
     public void advancingToTheSameActionValueDoesNotJumpAhead() {
@@ -93,42 +100,45 @@ public class QueueTieBreakTest {
 
         long seqA = signalOf(q, a).getSequence();
         long seqB = signalOf(q, b).getSequence();
-        Assertions.assertTrue(seqA < seqB, "A 先入场 → 序号更小");
-        Assertions.assertEquals(a, q.peekNext(), "同行动值 150 → 排期更早的 A 先动");
+        Assertions.assertTrue(seqA < seqB, "A entered first → smaller sequence number");
+        Assertions.assertEquals(a, q.peekNext(), "same action value 150 → A, scheduled earlier, acts first");
 
-        // 两人都在 150 行动过一轮，都被重新预约到 250（速度 100 → 周期 100）。
-        // ⚠ 不能用 advanceAction(…, 1e9) 把某人"拉到最前"来制造对齐：clamp 会把他按到
-        // elapsed 上，而 move() 又会把时钟拖到那里 —— 他会连动两次。
+        // Both acted once at action value 150 and were both rescheduled to 250 (speed 100 → period 100).
+        // ⚠ advanceAction(…, 1e9) MUST NOT be used to "pull someone to the very front" and create the
+        // alignment: the clamp would pin them to elapsed, and move() would then drag the clock there —
+        // they would act twice in a row.
         Assertions.assertEquals(a, nextActor(q));
         Assertions.assertEquals(b, nextActor(q));
         Assertions.assertEquals(250, signalOf(q, a).getNextActionTime(), EPS);
         Assertions.assertEquals(250, signalOf(q, b).getNextActionTime(), EPS);
-        Assertions.assertEquals(150, q.getElapsed(), EPS, "两人都在 150 行动，时钟就停在 150");
+        Assertions.assertEquals(150, q.getElapsed(), EPS, "both acted at 150, so the clock stops at 150");
 
-        // 现在把 A 拉后到 280、再把 B 也拉后到 280：两者同值。
-        // 用 delayAction 而不是 advanceAction，避免把任何一方排到 elapsed 上。
-        // 注意断言用的序号要取**行动之后**的：两人都刚重新预约过，序号已经换新。
+        // Now delay A to 280, then delay B to 280 as well: both have the same value.
+        // delayAction is used rather than advanceAction, to avoid scheduling either one onto elapsed.
+        // Note the sequence numbers asserted must be the ones **after acting**: both were just
+        // rescheduled, so their sequence numbers have been renewed.
         long seqAAfterActing = signalOf(q, a).getSequence();
         long seqBAfterActing = signalOf(q, b).getSequence();
         Assertions.assertTrue(seqAAfterActing < seqBAfterActing,
-                "同一时刻行动时 A 先（A 的预约更早）→ 重新取号后 A 仍更小");
+                "acting at the same moment, A goes first (A was scheduled earlier) → after re-taking sequence numbers A is still smaller");
 
         q.delayAction(a, 30);
         q.delayAction(b, 30);
 
         Assertions.assertEquals(280, signalOf(q, a).getNextActionTime(), EPS);
         Assertions.assertEquals(280, signalOf(q, b).getNextActionTime(), EPS);
-        Assertions.assertEquals(seqAAfterActing, signalOf(q, a).getSequence(), "推条不重新取号");
-        Assertions.assertEquals(seqBAfterActing, signalOf(q, b).getSequence(), "推条不重新取号");
-        Assertions.assertEquals(a, q.peekNext(), "同行动值 280 → 排期更早的 A 先动");
+        Assertions.assertEquals(seqAAfterActing, signalOf(q, a).getSequence(), "an action bar push does not re-take a sequence number");
+        Assertions.assertEquals(seqBAfterActing, signalOf(q, b).getSequence(), "an action bar push does not re-take a sequence number");
+        Assertions.assertEquals(a, q.peekNext(), "same action value 280 → A, scheduled earlier, acts first");
 
-        Assertions.assertEquals(a, nextActor(q), "A 先手");
-        Assertions.assertEquals(b, nextActor(q), "然后才是 B");
+        Assertions.assertEquals(a, nextActor(q), "A goes first");
+        Assertions.assertEquals(b, nextActor(q), "then B");
     }
 
     /**
-     * 行动者被重新预约后拿到**新**序号，于是不会靠旧序号插到同级前面：
-     * 行动者回到队尾，下一个同级的人接手。
+     * After an actor is rescheduled it gets a **new** sequence number, so it cannot use its old
+     * sequence number to cut in ahead of its tier: the actor goes to the back of the queue and the
+     * next one in the same tier takes over.
      */
     @Test
     public void actorGoesToTheBackOfItsTierAfterActing() {
@@ -137,16 +147,17 @@ public class QueueTieBreakTest {
         Queue q = new Queue(List.of(a, b));
 
         long seqBefore = signalOf(q, a).getSequence();
-        Assertions.assertEquals(a, nextActor(q));                 // A 行动并重新预约
+        Assertions.assertEquals(a, nextActor(q));                 // A acts and is rescheduled
 
         Assertions.assertTrue(signalOf(q, a).getSequence() > seqBefore,
-                "行动后换新序号（排到同级末尾）");
-        Assertions.assertEquals(b, q.peekNext(), "B 在 150，A 已到 250");
-        Assertions.assertEquals(b, nextActor(q), "接下来是 B");
+                "after acting it takes a new sequence number (queued at the end of its tier)");
+        Assertions.assertEquals(b, q.peekNext(), "B is at 150, A has moved to 250");
+        Assertions.assertEquals(b, nextActor(q), "next up is B");
     }
 
     /**
-     * 死亡移除之后，剩下的人仍然按序出手，不会因为堆重建而乱掉。
+     * After a death removal, the remaining ones still act in order and are not thrown off by the
+     * heap being rebuilt.
      */
     @Test
     public void removalKeepsDeterministicOrder() {
@@ -159,33 +170,35 @@ public class QueueTieBreakTest {
 
         Assertions.assertEquals(a, q.peekNext());
         Assertions.assertEquals(a, nextActor(q));
-        Assertions.assertEquals(c, nextActor(q), "b 被移除后轮到 c");
+        Assertions.assertEquals(c, nextActor(q), "after b is removed it is c's turn");
     }
 
     /**
-     * 速度不同（行动值不同）时，裁决序号不该抢戏：还是行动值小的先动。
+     * When speeds differ (action values differ), the tie-break sequence number must not steal the
+     * show: the smaller action value still acts first.
      *
-     * <p>⚠ 这里只断言"谁先动"，**不**断言两个同值信号里谁先 ——
-     * 那取决于两人的序号大小，而 fast 行动后会被重新取号（见
-     * {@link #actorGoesToTheBackOfItsTierAfterActing}）。
-     * 本条要证明的是：{@code compareTo} 永远以行动值当第一关键字。
+     * <p>⚠ Here only "who acts first" is asserted, **not** which of two signals with the same value
+     * comes first — that depends on the two sequence numbers, and after acting the fast one is
+     * rescheduled (see {@link #actorGoesToTheBackOfItsTierAfterActing}).
+     * What this test proves is: {@code compareTo} always uses the action value as the primary key.
      */
     @Test
     public void sequenceNeverOverridesTheActionValue() {
-        Character slow = character("slow", 100);      // 首轮 150
-        Character fast = character("fast", 200);      // 首轮 75
+        Character slow = character("slow", 100);      // first round 150
+        Character fast = character("fast", 200);      // first round 75
         Queue q = new Queue(List.of(slow, fast));
 
         Assertions.assertNotEquals(signalOf(q, slow).getSequence(), signalOf(q, fast).getSequence(),
-                "两个信号必须拿到不同的序号");
-        Assertions.assertEquals(fast, q.peekNext(), "fast 的行动值 75 < 150，先动");
+                "the two signals must get different sequence numbers");
+        Assertions.assertEquals(fast, q.peekNext(), "fast's action value 75 < 150, so it acts first");
 
-        Assertions.assertEquals(fast, nextActor(q), "fast 先出手");
+        Assertions.assertEquals(fast, nextActor(q), "fast goes first");
         Assertions.assertEquals(75, q.getElapsed(), EPS);
     }
 
     /**
-     * 中途入场（召唤物 / P9-4）拿的是新序号，和同刻的旧单位比时排在后面。
+     * A latecomer entering mid-battle (a summon / P9-4) gets a new sequence number, and compared
+     * with an old unit at the same instant it is placed behind.
      */
     @Test
     public void latecomerGetsAHigherSequence() {
@@ -196,12 +209,12 @@ public class QueueTieBreakTest {
         q.addCombatant(late);
 
         Assertions.assertTrue(signalOf(q, early).getSequence() < signalOf(q, late).getSequence(),
-                "早入场的序号更小");
+                "the one that entered earlier has the smaller sequence number");
     }
 
     // ==================================================================
 
-    /** 造 8 个同速单位，记录前 8 次出手的名字。 */
+    /** Builds 8 same-speed units and records the names of the first 8 turns. */
     private static List<String> runEqualSpeedBatch(int count) {
         List<CanHit> characters = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -216,7 +229,7 @@ public class QueueTieBreakTest {
         return order;
     }
 
-    /** {@code move()} + {@code setTopZero()}：消费掉一个回合并返回行动者。 */
+    /** {@code move()} + {@code setTopZero()}: consumes one turn and returns the actor. */
     private static CanHit nextActor(Queue q) {
         q.move();
         CanHit actor = q.getCurrentActor().getCanHit();
@@ -233,7 +246,7 @@ public class QueueTieBreakTest {
                 .filter(s -> s.getCanHit().equals(target))
                 .toList();
         Assertions.assertEquals(1, matches.size(),
-                target.getName() + " 在行动条里应当只出现一次，实际 " + matches.size() + " 次");
+                target.getName() + " should appear only once in the action bar, actually " + matches.size() + " times");
         return matches.getFirst();
     }
 }

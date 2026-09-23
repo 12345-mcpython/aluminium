@@ -11,9 +11,9 @@ import lombok.ToString;
  * <p>Summons are typically aligned with {@link Camp#PLAYER} and may inherit
  * stats from their summoner.
  *
- * <p>🚧 <b>骨架，尚未接入</b>（P9-4 忆灵/召唤物）：全项目**没有任何地方
- * {@code new Summon(...)}**，`SkillEffectType.SUMMON`（数据里 8 条）也没有分派。
- * 与"忆灵"相关的机制（独立行动条、面板快照、连携攻击）都还没做。
+ * <p>🚧 <b>Skeleton, not wired up yet</b> (P9-4 memosprites/summons): the whole project has **nowhere that calls
+ * {@code new Summon(...)}**, and `SkillEffectType.SUMMON` (8 entries in the data) is not dispatched either.
+ * The mechanics related to "memosprites" (their own action bar, a stat snapshot, joint attacks) are not done yet.
  */
 @Getter
 @Setter

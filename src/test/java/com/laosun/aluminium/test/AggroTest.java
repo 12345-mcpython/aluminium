@@ -13,10 +13,10 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * P5-1 / P5-2 验收：命途仇恨值、仇恨表、以及"嘲讽不改数值"。
+ * P5-1 / P5-2 acceptance: path aggro values, the aggro table, and "taunt does not change the numbers".
  *
- * <p>锚点（已用 {@code character_data.json} 的 {@code aggro} 列全量核对）：
- * 存护 150 / 毁灭 125 / 其他 100 / 巡猎·智识 75。
+ * <p>Anchors (fully cross-checked against the {@code aggro} column of {@code character_data.json}):
+ * Preservation 150 / Destruction 125 / other 100 / Hunt·Erudition 75.
  */
 public class AggroTest {
     private static final double EPS = 1e-9;
@@ -26,21 +26,21 @@ public class AggroTest {
         Assertions.assertEquals(150, Path.PRESERVATION.getAggro());
         Assertions.assertEquals(125, Path.DESTRUCTION.getAggro());
         Assertions.assertEquals(100, Path.OTHER.getAggro());
-        Assertions.assertEquals(75, Path.HUNT.getAggro(), "巡猎比常规低，别当成 100");
+        Assertions.assertEquals(75, Path.HUNT.getAggro(), "Hunt is lower than the usual value; do not treat it as 100");
         Assertions.assertEquals(75, Path.ERUDITION.getAggro());
         Assertions.assertEquals(Path.DESTRUCTION, Path.fromName("毁灭"));
         Assertions.assertEquals(Path.PRESERVATION, Path.fromName("存护"));
-        Assertions.assertEquals(Path.OTHER, Path.fromName("不存在的命途"), "未收录降级而不是炸");
+        Assertions.assertEquals(Path.OTHER, Path.fromName("nonexistent path"), "an unlisted path degrades instead of blowing up");
     }
 
     @Test
     public void pathIsDerivedFromCharacterData() {
-        Character preservation = Character.builder().cid(1104).level(80).build();   // 杰帕德：存护
-        Character destruction = Character.builder().cid(1212).level(80).build();    // 镜流：毁灭
-        Character hunt = Character.builder().cid(1209).level(80).build();           // 彦卿：巡猎
+        Character preservation = Character.builder().cid(1104).level(80).build();   // Gepard (杰帕德): Preservation
+        Character destruction = Character.builder().cid(1212).level(80).build();    // Jingliu (镜流): Destruction
+        Character hunt = Character.builder().cid(1209).level(80).build();           // Yanqing (彦卿): Hunt
 
         Assertions.assertEquals(Path.PRESERVATION, preservation.getPath());
-        Assertions.assertEquals(150, preservation.getAggro(), "仇恨值直接来自角色的 aggro 列");
+        Assertions.assertEquals(150, preservation.getAggro(), "aggro comes straight from the character's aggro column");
         Assertions.assertEquals(Path.DESTRUCTION, destruction.getPath());
         Assertions.assertEquals(125, destruction.getAggro());
         Assertions.assertEquals(Path.HUNT, hunt.getPath());
@@ -64,16 +64,16 @@ public class AggroTest {
         Battle battle = new Battle(List.of(withAggro(100)), List.of(dummy()), new Random(0));
 
         Assertions.assertEquals(100, battle.aggroOf(battle.enemies.getFirst()), EPS,
-                "敌人没有命途，走常规档");
+                "an enemy has no path, so it uses the conventional tier");
 
         Map<com.laosun.aluminium.models.CanHit, Double> table = battle.getAggroTable(List.of(withAggro(150)));
-        Assertions.assertEquals(1.0, table.values().iterator().next(), EPS, "只有一个候选 → 概率 1");
-        Assertions.assertTrue(battle.getAggroTable(List.of()).isEmpty(), "空列表 → 空表，不除零");
+        Assertions.assertEquals(1.0, table.values().iterator().next(), EPS, "only one candidate → probability 1");
+        Assertions.assertTrue(battle.getAggroTable(List.of()).isEmpty(), "empty list → empty table, no division by zero");
     }
 
     // ==================================================================
 
-    /** 造一个指定仇恨值的角色：直接设 aggro，绕开数据。 */
+    /** Build a character with the given aggro: set aggro directly, bypassing the data. */
     private static Character withAggro(int aggro) {
         Character c = Character.fromAttributes("c" + aggro, 10_000, 100, 100, 100);
         c.setAggro(aggro);

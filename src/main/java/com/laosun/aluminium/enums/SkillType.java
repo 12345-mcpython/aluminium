@@ -5,12 +5,15 @@ package com.laosun.aluminium.enums;
  *
  * <p>Corresponds to the different types of abilities in Honkai: Star Rail.
  *
- * <p>按"什么时候进入战斗模型"分两类，这个区分很重要（见 {@link #isIntrinsic()}）：
+ * <p>The split is by "when it enters the battle model", and this distinction matters a lot (see
+ * {@link #isIntrinsic()}):
  * <ul>
- *   <li><b>常驻</b>：{@link #COMMON} / {@link #SKILL} / {@link #ULTRA} / {@link #TALENT}
- *       —— 角色一造出来就该有，由 {@code Character.Builder.build()} 装配；</li>
- *   <li><b>战斗开场附加</b>：{@link #MAZE} / {@link #TECHNIQUE}
- *       ——地图上用的东西，由 {@code Battle.startBattle()} 附加，不常驻在角色身上。</li>
+ *   <li><b>Permanent</b>: {@link #COMMON} / {@link #SKILL} / {@link #ULTRA} / {@link #TALENT}
+ *       — a character should already have these the moment it is created; assembled by
+ *       {@code Character.Builder.build()};</li>
+ *   <li><b>Attached at battle start</b>: {@link #MAZE} / {@link #TECHNIQUE}
+ *       — things used on the map; attached by {@code Battle.startBattle()}, not permanently carried
+ *       on the character.</li>
  * </ul>
  */
 public enum SkillType {
@@ -31,17 +34,20 @@ public enum SkillType {
      */
     TALENT,
     /**
-     * 地图普攻（技能槽位 6）：在大地图上打怪、以及"进入战斗时削弱对应属性韧性"那一下。
+     * Map basic attack (skill slot 6): the one that attacks monsters on the overworld map, and also
+     * the hit that "reduces the matching-element toughness when entering battle".
      *
-     * <p>数据里的攻击类型是 {@code MazeNormal}、效果 {@code MazeAttack}。
-     * 它**不是**战斗内的普攻（那是 {@link #COMMON}）。
+     * <p>The attack type in the data is {@code MazeNormal}, the effect is {@code MazeAttack}.
+     * It is **not** the in-battle basic attack (that is {@link #COMMON}).
      */
     MAZE,
     /**
-     * 秘技（技能槽位 7）：地图上主动施放的强化效果（数据里攻击类型 {@code Maze}）。
+     * Technique (秘技) (skill slot 7): a buff actively cast on the map (attack type {@code Maze} in
+     * the data).
      *
-     * <p>多数角色的秘技效果是"下一场战斗开始时生效"（例如景元 +3 段【神君】），
-     * 所以它的**触发时机**是战斗开始 —— 详见 ROADMAP P8-6 的事件补齐。
+     * <p>For most characters the technique's effect is "takes effect when the next battle starts"
+     * (for example Jing Yuan (景元) +3 stacks of 【神君】 (Lightning-Lord)), so its **trigger timing**
+     * is the start of battle — see the event completion work in ROADMAP P8-6.
      */
     TECHNIQUE,
     /**
@@ -54,14 +60,14 @@ public enum SkillType {
     SUMMON_TALENT;
 
     /**
-     * 这个槽位是不是**角色常驻**技能（一造出来就该有）。
+     * Is this slot a **character-permanent** skill (one a character should have the moment it is created)?
      *
-     * <p>{@link #MAZE} / {@link #TECHNIQUE} 返回 {@code false}：它们是战斗开场才附加的，
-     * 所以 {@code CharacterFactory} 造出来的角色身上**没有**它们
-     * （装配点见 {@code Constant.SKILL_SLOT} 与 {@code Battle#startBattle()}）。
+     * <p>{@link #MAZE} / {@link #TECHNIQUE} return {@code false}: they are only attached at the start of
+     * battle, so a character built by {@code CharacterFactory} does **not** carry them
+     * (for the assembly point see {@code Constant.SKILL_SLOT} and {@code Battle#startBattle()}).
      *
-     * <p>召唤物的两个槽位也返回 {@code false}：它们属于忆灵/召唤物，不是角色自己的技能
-     * （P9-4）。
+     * <p>The two summon slots also return {@code false}: they belong to a memosprite/summon, not to the
+     * character's own skills (P9-4).
      */
     public boolean isIntrinsic() {
         return this == COMMON || this == SKILL || this == ULTRA || this == TALENT;

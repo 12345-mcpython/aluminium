@@ -6,21 +6,22 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.DoubleValue;
 
 /**
- * 速度增益（P7-3 之前的测试替身 / 也是 P10-4 的一个最小样本）：
- * {@code SPEED × (1 + rate)}。
+ * Speed boost (a test double from before P7-3 / also a minimal sample for P10-4):
+ * {@code SPEED × (1 + rate)}.
  *
- * <p>它存在的意义是**触发速度变化**，好验证 {@code Battle.onSpeedChanged} →
- * {@code Queue.refreshSpeed} 那条重排链路真的接通了（P7 修正 E2）。
- * 生产用的速度 buff 等 P10-4 一起做。
+ * <p>Its reason to exist is to **trigger a speed change**, so that the reordering chain
+ * {@code Battle.onSpeedChanged} → {@code Queue.refreshSpeed} can be verified to be really connected
+ * (P7 fix E2). The production speed buff will be made together with P10-4.
  *
- * <p>属性型 buff 的模板：{@code applyEffect} 挂 {@link DoubleValue.Modifier}（带自己的 id），
- * {@code removeBuff} 按 id 精确摘除，{@code tickEffect} 只减时长。
+ * <p>The template for attribute-type buffs: {@code applyEffect} attaches a {@link DoubleValue.Modifier}
+ * (carrying its own id), {@code removeBuff} removes it precisely by id, and {@code tickEffect} only
+ * decrements the duration.
  */
 public class SpeedBoostBuff extends AbstractBuff {
     private final double rate;
 
     public SpeedBoostBuff(int duration, double rate) {
-        super(duration, false);          // 后置 buff：随 afterMove 递减
+        super(duration, false);          // post-move buff: decremented with afterMove
         this.rate = rate;
     }
 

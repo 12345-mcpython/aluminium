@@ -71,11 +71,13 @@ public enum DamageElement {
     );
 
     /**
-     * 按**小写**键索引的元素表，供 {@link #fromString} 做大小写不敏感查找（P8-1）。
+     * An element table indexed by **lowercase** key, so {@link #fromString} can look up
+     * case-insensitively (P8-1).
      *
-     * <p>为什么需要：{@code skills.json} 里写的是 {@code "Thunder"}（首字母大写），
-     * 而 {@code character_data.json} 的 {@code attribute} 写的是 {@code "thunder"}（全小写）。
-     * 两个数据文件的口径不一致，所以解析必须两种都吃。
+     * <p>Why it is needed: {@code skills.json} writes {@code "Thunder"} (capitalised first
+     * letter), while the {@code attribute} of {@code character_data.json} writes
+     * {@code "thunder"} (all lowercase). The two data files use inconsistent conventions, so
+     * parsing MUST accept both.
      */
     private static final Map<String, DamageElement> BY_LOWER_NAME = MP.entrySet().stream()
             .collect(Collectors.toUnmodifiableMap(
@@ -89,9 +91,9 @@ public enum DamageElement {
     /**
      * Looks up an element by its raw game-data string (e.g. {@code "Fire"}).
      *
-     * <p><b>大小写不敏感</b>（P8-1）：{@code skills.json} 用 {@code "Thunder"}、
-     * {@code character_data.json} 用 {@code "thunder"}，同一份数据里两种写法都有。
-     * 首尾空白也会被忽略。
+     * <p><b>Case insensitive</b> (P8-1): {@code skills.json} uses {@code "Thunder"},
+     * {@code character_data.json} uses {@code "thunder"} — both spellings occur in the same
+     * data set. Leading and trailing whitespace is ignored as well.
      *
      * @param sp the raw element value, e.g. from the {@code element} field of a skill
      * @return the matching element, or {@code null} for {@code "Unknown"} /

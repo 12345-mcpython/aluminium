@@ -19,27 +19,29 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 非伤害技能的**未分派诊断**（P8-2 计划第 3 条）。
+ * The **undispatched diagnostic** for non-damaging skills (item 3 of the P8-2 plan).
  *
- * <p>背景：{@code SkillExecutor.resolveHits} 在"不是伤害类技能"时**静默 return** ——
- * 治疗/护盾/buff/控制/召唤被施放后**什么都不发生**（只有回能照给）。
- * 真实队伍里很难察觉：日志上技能"放出去了"，只是没有任何效果。
+ * <p>Background: {@code SkillExecutor.resolveHits} **silently returns** when "the skill is not a
+ * damaging one" — after a heal/shield/buff/control/summon is cast **nothing at all happens** (only
+ * the energy gain is still given). That is very hard to notice in a real team: in the log the skill
+ * "went off", there was just no effect.
  *
- * <p>所以加了一个可开关的诊断日志（归属标注到 P6-2 / P10-3 / P10-6 / P9-4）。
- * 计划原本想直接 {@code IO.println}，但 demo 每回合都在放治疗与护盾 —— 默认会刷屏，
- * 故改为显式开关。这个类同时验证"开了会打印"与"默认不打印"。
+ * <p>So a toggleable diagnostic log was added (labelling the owning phase as P6-2 / P10-3 / P10-6 /
+ * P9-4). The plan originally wanted a bare {@code IO.println}, but the demo casts heals and shields
+ * every turn — that would flood the output by default, so it was changed to an explicit switch. This
+ * class verifies both "it prints when enabled" and "it does not print by default".
  */
 public class SkillExecutorDiagnosticTest {
     private static final double EPS = 1e-9;
 
     @AfterEach
     public void restore() {
-        SkillExecutor.setLogNotDispatched(false);      // 别把开关漏给别的测试
+        SkillExecutor.setLogNotDispatched(false);      // do not leak the switch into other tests
     }
 
     /**
-     * 打开开关后，放一个治疗技（娜塔莎战技 = {@code Restore}）会打印未分派提示，
-     * 且标注归属 P6-2。
+     * With the switch turned on, casting a healing skill (Natasha's (娜塔莎) skill = {@code Restore})
+     * prints the undispatched notice and labels its owner as P6-2.
      */
     @Test
     public void diagnosticReportsNonDamagingSkillsWhenEnabled() {
@@ -51,15 +53,16 @@ public class SkillExecutorDiagnosticTest {
             battle.castImmediate(new DefaultSkill(1105, 2, 1), natasha, List.of(natasha));
         });
 
-        Assertions.assertTrue(out.contains("未分派"), "应当打印未分派提示，实际输出：" + out);
-        Assertions.assertTrue(out.contains("RESTORE"), "应当带效果类型，实际：" + out);
-        Assertions.assertTrue(out.contains("娜塔莎") || out.contains("Natasha"),
-                "应当带施放者，实际：" + out);
-        Assertions.assertTrue(out.contains("P6-2"), "应当标注归属阶段，实际：" + out);
+        Assertions.assertTrue(out.contains("NOT DISPATCHED"), "it should print the undispatched notice; actual output: " + out);
+        Assertions.assertTrue(out.contains("RESTORE"), "it should carry the effect type; actual: " + out);
+        Assertions.assertTrue(out.contains("Natasha"),
+                "it should carry the caster; actual: " + out);
+        Assertions.assertTrue(out.contains("P6-2"), "it should label the owning phase; actual: " + out);
     }
 
     /**
-     * **默认关闭**：不打印。demo 每回合都在治疗/护盾，默认开会刷屏。
+     * **Off by default**: nothing is printed. The demo heals/shields every turn, so having it on by
+     * default would flood the output.
      */
     @Test
     public void diagnosticIsOffByDefault() {
@@ -69,12 +72,13 @@ public class SkillExecutorDiagnosticTest {
         String out = capture(() ->
                 battle.castImmediate(new DefaultSkill(1105, 2, 1), natasha, List.of(natasha)));
 
-        Assertions.assertFalse(out.contains("未分派"),
-                "默认不该打印诊断，实际输出：" + out);
+        Assertions.assertFalse(out.contains("NOT DISPATCHED"),
+                "the diagnostic should not be printed by default; actual output: " + out);
     }
 
     /**
-     * 护盾技（三月七战技 = {@code Defence}）走的是同一条静默路径，归属 P10-3。
+     * A shield skill (March 7th's (三月七) skill = {@code Defence}) goes through the same silent path
+     * and is labelled P10-3.
      */
     @Test
     public void shieldSkillIsAlsoReported() {
@@ -86,12 +90,12 @@ public class SkillExecutorDiagnosticTest {
             battle.castImmediate(new DefaultSkill(1001, 2, 1), march7th, List.of(march7th));
         });
 
-        Assertions.assertTrue(out.contains("DEFENCE"), "应当报告 DEFENCE，实际：" + out);
-        Assertions.assertTrue(out.contains("P10-3"), "应当标注 P10-3，实际：" + out);
+        Assertions.assertTrue(out.contains("DEFENCE"), "it should report DEFENCE; actual: " + out);
+        Assertions.assertTrue(out.contains("P10-3"), "it should label P10-3; actual: " + out);
     }
 
     /**
-     * 伤害技能**不**触发诊断（它走的是正常分派路径）。
+     * A damaging skill does **not** trigger the diagnostic (it goes down the normal dispatch path).
      */
     @Test
     public void damagingSkillsDoNotTriggerTheDiagnostic() {
@@ -105,31 +109,32 @@ public class SkillExecutorDiagnosticTest {
             battle.castImmediate(new DefaultSkill(1204, 1, 1), jingYuan, List.of(enemy));
         });
 
-        Assertions.assertFalse(out.contains("未分派"), "伤害技能不该报告，实际：" + out);
-        Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp(), "它确实打出去了");
+        Assertions.assertFalse(out.contains("NOT DISPATCHED"), "a damaging skill should not report; actual: " + out);
+        Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp(), "it really did fire");
     }
 
     /**
-     * 诊断**不影响行为**：非伤害技能仍然是"只有回能、没有效果"。
+     * The diagnostic **does not affect behaviour**: a non-damaging skill is still "energy only, no
+     * effect".
      *
-     * <p>这条把当前的真实状态钉住 —— 打开日志不等于实现了效果。
+     * <p>This pins the current real state — turning the log on is not the same as implementing the effect.
      */
     @Test
     public void diagnosticDoesNotChangeBehaviour() {
         Character natasha = CharacterFactory.create(1105, 80);
         Battle battle = newBattle(natasha);
-        natasha.takeDamage(natasha.getMaxHp() / 2);      // currentHp 没有 setter，用受伤制造缺口
+        natasha.takeDamage(natasha.getMaxHp() / 2);      // currentHp has no setter, so take damage to create a gap
         double hpBefore = natasha.getCurrentHp();
         double energyBefore = natasha.getCurrentEnergy();
-        Assertions.assertTrue(hpBefore < natasha.getMaxHp(), "确实掉了血，才有得治");
+        Assertions.assertTrue(hpBefore < natasha.getMaxHp(), "HP really did drop, so there is something to heal");
 
         SkillExecutor.setLogNotDispatched(true);
         battle.castImmediate(new DefaultSkill(1105, 2, 1), natasha, List.of(natasha));
 
         Assertions.assertEquals(hpBefore, natasha.getCurrentHp(), EPS,
-                "治疗技仍然不生效（效果是 P6-2 的另一条路径，不走本执行器）");
+                "the healing skill still has no effect (the effect is another path in P6-2 and does not go through this executor)");
         Assertions.assertTrue(natasha.getCurrentEnergy() > energyBefore,
-                "但回能照给（P3-2：技能回能与有没有伤害无关）");
+                "but the energy gain is still given (P3-2: skill energy gain is independent of whether there is damage)");
     }
 
     // ==================================================================
@@ -141,7 +146,7 @@ public class SkillExecutorDiagnosticTest {
         return battle;
     }
 
-    /** 捕获 {@code System.out}（{@code IO.println} 就是写 stdout）。 */
+    /** Captures {@code System.out} ({@code IO.println} writes to stdout). */
     private static String capture(Runnable action) {
         PrintStream original = System.out;
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();

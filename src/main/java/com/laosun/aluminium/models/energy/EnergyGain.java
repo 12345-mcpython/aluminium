@@ -3,18 +3,20 @@ package com.laosun.aluminium.models.energy;
 /**
  * One energy grant, as produced by an {@link EnergyProvider}.
  *
- * <p>HSR rule (HSR.md §3.3): {@code 最终获得能量 = 基础获得能量 × (1 + 能量恢复效率%)}.
- * A few sources deliberately bypass the efficiency multiplier (按能量上限百分比回能，
- * 例如流萤「固定恢复等同于自身 60% 能量上限的能量」)，so the two cases are modelled
- * explicitly instead of being conflated into one number.
+ * <p>HSR rule (HSR.md §3.3): {@code final energy gained = base energy gained × (1 + energy
+ * regeneration rate %)}.
+ * A few sources deliberately bypass the efficiency multiplier (energy gain as a percentage of max
+ * energy, e.g. Firefly's 「restores a fixed amount of energy equal to 60% of her own max energy」),
+ * so the two cases are modelled explicitly instead of being conflated into one number.
  *
- * @param amount                base energy before {@code (1 + 能量恢复效率)}
- * @param affectedByEfficiency {@code true} = 走回能效率公式，{@code false} = 定值入账
+ * @param amount                base energy before {@code (1 + energy regeneration rate)}
+ * @param affectedByEfficiency {@code true} = goes through the energy-regeneration formula,
+ *                             {@code false} = credited as a fixed value
  */
 public record EnergyGain(double amount, boolean affectedByEfficiency) {
 
     /**
-     * A normal grant: scales with {@code 能量恢复效率}.
+     * A normal grant: scales with the {@code energy regeneration rate}.
      *
      * @param amount base energy
      * @return the grant descriptor
@@ -24,7 +26,7 @@ public record EnergyGain(double amount, boolean affectedByEfficiency) {
     }
 
     /**
-     * A fixed grant: {@code 能量恢复效率} is ignored.
+     * A fixed grant: the {@code energy regeneration rate} is ignored.
      *
      * @param amount energy actually granted
      * @return the grant descriptor

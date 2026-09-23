@@ -11,74 +11,81 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
- * P7-4 的懒加载护栏：{@code stage.json}（9 MB / 约 2.9 万条关卡）不该在
- * {@code Constant} 初始化时被解析，而应等到第一次真的要关卡时。
+ * The lazy-loading guard rail for P7-4: {@code stage.json} (9 MB / about 29,000 stages) must not be parsed
+ * when {@code Constant} is initialized, but should wait until stages are really needed for the first time.
  *
- * <p>为什么值得有条护栏：{@code stage.json} 比其它所有数据加起来还大。
- * 把它挪回静态块，等于每次 {@code Constant} 初始化都多付 ~35 MB 堆 + 几十毫秒。
+ * <p>Why it deserves a guard rail: {@code stage.json} is larger than all the other data put together.
+ * Moving it back into the static block would mean paying ~35 MB of heap + tens of milliseconds on **every**
+ * {@code Constant} initialization.
  *
- * <p><b>怎么做到与用例顺序无关</b>：不看运行期状态，直接看 {@code Constant.class} 的
- * 静态初始化块里有没有关卡相关符号。
- * 运行期状态（解析了几次）在共享 JVM 里**必然**依赖哪个测试类先跑 ——
- * 我第一版就是这么写的：单独跑绿、全套红。而 class 文件是死的，谁都改不了它。
+ * <p><b>How it is made independent of test-case order</b>: it does not look at runtime state but directly
+ * at whether the static initializer block of {@code Constant.class} contains any stage-related symbol.
+ * Runtime state (how many times it was parsed) **inevitably** depends on which test class ran first in the
+ * shared JVM — my first version was written that way: green when run alone, red in the full suite. The class
+ * file, however, is dead and nobody can change it.
  */
 public class StageLazyLoadTest {
 
     /**
-     * 关卡表只解析一次（缓存语义），且返回的就是同一份实例。
+     * The stage table is parsed only once (cache semantics), and what is returned is the very same instance.
      */
     @Test
     public void stagesAreParsedOnceAndCached() {
         Map<Integer, StageBean> first = Constant.stages();
         Map<Integer, StageBean> second = Constant.stages();
 
-        Assertions.assertSame(first, second, "重复取用必须命中同一份缓存");
+        Assertions.assertSame(first, second, "repeated access MUST hit the same cache entry");
         Assertions.assertTrue(Constant.stageLoadAttempts() <= 1,
-                "stage.json 最多解析一次，实际 " + Constant.stageLoadAttempts() + " 次");
+                "stage.json is parsed at most once, actually " + Constant.stageLoadAttempts() + " times");
     }
 
     /**
-     * 核心护栏：{@link Constant} 的**静态初始化块**里不该出现关卡表。
+     * The core guard rail: the **static initializer block** of {@link Constant} must not mention the stage
+     * table.
      *
-     * <p>为什么必须只切静态块、不能扫整个类：{@code stages()} 方法体里本来就会出现
-     * {@code Constant$StageHolder.LOADED}（那是懒加载的读取口），扫整个类必然误报。
+     * <p>Why only the static block may be sliced out and the whole class must not be scanned: the body of
+     * the {@code stages()} method will naturally contain {@code Constant$StageHolder.LOADED} (that is the
+     * lazy-loading read point), so scanning the whole class would necessarily produce a false positive.
      *
-     * <p>做法：反汇编 {@code Constant.class}，从 {@code static {}} 行开始，
-     * 收集到下一个成员声明为止，断言这段里既没有 {@code stage.json}
-     * 也没有 {@code StageHolder}。
+     * <p>The method: disassemble {@code Constant.class}, start at the {@code static {}} line, collect until
+     * the next member declaration, and assert that this stretch contains neither {@code stage.json} nor
+     * {@code StageHolder}.
      *
-     * <p>反向断言 {@code Constant$StageHolder} 里**确实有** {@code stage.json}，
-     * 否则本测试会退化成"字符串根本不在项目里"的空断言。
+     * <p>The reverse assertion is that {@code Constant$StageHolder} **really does** contain
+     * {@code stage.json}, otherwise this test would degenerate into an empty assertion of "the string is not
+     * in the project at all".
      *
-     * <p>与用例顺序无关、与数据文件是否生成也无关（只看编译产物）。
+     * <p>Independent of test-case order, and also independent of whether the data files were generated
+     * (it only looks at the compilation output).
      */
     @Test
     public void staticInitializerDoesNotTouchTheStageTable() {
         String disassembly = disassemble(Constant.class.getName());
-        Assumptions.assumeTrue(disassembly != null, "拿不到 javap，跳过字节码级护栏");
+        Assumptions.assumeTrue(disassembly != null, "javap unavailable, skipping the bytecode-level guard rail");
 
         String clinit = sliceStaticInitializer(disassembly);
-        Assertions.assertFalse(clinit.isBlank(), "没切到静态块，javap 输出格式变了吗？");
+        Assertions.assertFalse(clinit.isBlank(), "the static block was not sliced out — did the javap output format change?");
         Assertions.assertFalse(clinit.contains("stage.json"),
-                "Constant 的静态块里出现了 stage.json → 懒加载被破坏：\n" + clinit);
+                "stage.json appears in Constant's static block → lazy loading is broken:\n" + clinit);
         Assertions.assertFalse(clinit.contains("StageHolder"),
-                "Constant 的静态块里引用了 StageHolder → 懒加载被破坏：\n" + clinit);
-        // 编译器会把 stages()/load() 内联，所以上面两条抓不到"顺手调一下 stages()"。
-        // 真正不可能出现在静态块里的是"解析这个文件"本身。
+                "StageHolder is referenced in Constant's static block → lazy loading is broken:\n" + clinit);
+        // The compiler will inline stages()/load(), so the two checks above cannot catch
+        // "calls stages() while it is at it". What truly cannot appear in the static block is
+        // "parsing this file" itself.
         Assertions.assertFalse(clinit.contains("Method stages:"),
-                "Constant 的静态块里调用了 stages() → 懒加载被破坏：\n" + clinit);
+                "stages() is called in Constant's static block → lazy loading is broken:\n" + clinit);
         Assertions.assertFalse(clinit.contains("Method load:"),
-                "Constant 的静态块里调用了 load() → 懒加载被破坏：\n" + clinit);
+                "load() is called in Constant's static block → lazy loading is broken:\n" + clinit);
 
         String holder = disassemble("com.laosun.aluminium.Constant$StageHolder");
-        Assumptions.assumeTrue(holder != null, "拿不到 StageHolder 的反汇编");
+        Assumptions.assumeTrue(holder != null, "could not obtain a disassembly of StageHolder");
         Assertions.assertTrue(holder.contains("stage.json"),
-                "懒加载载体里应当有 stage.json，否则本测试没有意义");
+                "the lazy-loading carrier should contain stage.json, otherwise this test is meaningless");
     }
 
     // ==================================================================
 
-    /** 用当前 JDK 的 javap 反汇编指定类；拿不到就返回 {@code null}（由调用方 skip）。 */
+    /** Disassemble the given class with the current JDK's javap; return {@code null} when unavailable (the caller skips). */
     private static String disassemble(String className) {
         try {
             String javap = System.getProperty("java.home") + "/bin/javap";
@@ -94,11 +101,13 @@ public class StageLazyLoadTest {
     }
 
     /**
-     * 切出 {@code static {}} 那一段（javap 把静态初始化块标成 {@code static {}}）。
+     * Slice out the {@code static {}} stretch (javap labels the static initializer block as
+     * {@code static {}}).
      *
-     * <p>javap 的缩进规律：静态块自己顶格写成 {@code static {};}，块体缩进 4 空格，
-     * 下一个成员声明顶格（缩进 2 空格，如 {@code public static final ...}）。
-     * 所以"遇到下一个缩进 ≤ 2 的非空行"就是块结束。
+     * <p>javap's indentation rule: the static block itself is written flush left as {@code static {}};, the
+     * block body is indented by 4 spaces, and the next member declaration is flush left (indented 2 spaces,
+     * e.g. {@code public static final ...}).
+     * So "the first non-blank line with indent ≤ 2" marks the end of the block.
      */
     private static String sliceStaticInitializer(String disassembly) {
         StringBuilder clinit = new StringBuilder();
@@ -111,7 +120,7 @@ public class StageLazyLoadTest {
             if (inside) {
                 int indent = line.length() - line.stripLeading().length();
                 if (!line.isBlank() && indent <= 2) {
-                    break;                                  // 下一个成员，静态块结束
+                    break;                                  // next member, the static block ends
                 }
                 clinit.append(line).append('\n');
             }

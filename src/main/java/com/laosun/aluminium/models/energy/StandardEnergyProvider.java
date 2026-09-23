@@ -8,25 +8,32 @@ import com.laosun.aluminium.models.Skill;
 import java.util.Set;
 
 /**
- * 常规回能：普攻 20 / 战技 30 / 终结技 5 / 受击 10 / 击杀 5 / 击破 5。
+ * Conventional energy gain: basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 /
+ * kill 5 / break 5.
  *
- * <p>数据来源见 {@code ROADMAP.md} 的 P3-0：普攻/战技/终结技的常规档取自 tbgd
- * {@code AvatarSkillConfig.SPBase}（终结技一律 5，多段技能按每段折算后总量同为 30），
- * 受击/击杀/击破的基础值由角色文档反推（文档只写「额外恢复 N 点」），
- * 因此数值集中放在 {@link Constant#ENERGY_GAIN_BASIC} 一类的常量里。
+ * <p>Data sources are in {@code ROADMAP.md} under P3-0: the conventional tiers for basic
+ * attack / skill / ultimate come from tbgd's {@code AvatarSkillConfig.SPBase} (ultimate is
+ * always 5; multi-hit skills convert per hit and still total 30), while the base values for
+ * taking a hit / kill / break were reverse-engineered from the character documents (the
+ * documents only say "additionally restores N points"), so the numbers are centralised in
+ * constants such as {@link Constant#ENERGY_GAIN_BASIC}.
  *
- * <p><b>为什么又回到常量</b>（2026-09-21）：曾短暂改成读 {@code SkillData.spBase}，
- * 但数据里多段/弹射技能的 {@code spBase} 是**每段值**（艾丝妲 6、瓦尔特 10），
- * 乘段数才对，而段数乘算依赖能力配置的 {@code SPHitRatio}（本项目数据里没有）——
- * 直接取原值会让那 6 个角色偏低。常量给出的是**正确总量**，所以退回常量更准。
- * 数据化的正路见 ROADMAP P3-4（聚合 {@code SPHitRatio} 后再接）。
+ * <p><b>Why we went back to constants</b> (2026-09-21): we briefly switched to reading
+ * {@code SkillData.spBase}, but in the data the {@code spBase} of multi-hit / bouncy skills
+ * is a **per-hit value** (Asta 6, Welt 10) and would have to be multiplied by the hit count,
+ * while that multiplication depends on the ability config's {@code SPHitRatio} (not present
+ * in this project's data) — taking the raw value directly makes those 6 characters come out
+ * low. Constants give the **correct total**, so going back to constants is more accurate. The
+ * proper data-driven route is ROADMAP P3-4 (aggregate {@code SPHitRatio} first, then wire it up).
  *
- * <p><b>不走常规能量的角色不在这里判断</b>：飞霄/黄泉/遐蝶/白厄/昔涟/银狼LV.999
- * 用的是层数/特殊资源，由 {@link NoConventionalEnergyProvider} 在装配点注入 ——
- * 见 {@code CharacterFactory} 与 {@code engine.md} §9.5。
+ * <p><b>Characters that do not use conventional energy are not judged here</b>: Feixiao /
+ * Acheron / Castorice / Phainon / Cyrene / Silver Wolf LV.999 use stacks / special resources
+ * and are injected at the assembly point by {@link NoConventionalEnergyProvider} — see
+ * {@code CharacterFactory} and {@code engine.md} §9.5.
  *
- * <p>暂时**不处理**的：追加攻击（{@code AttackType} 为空或非 Normal/BPSkill 的技能）不回能，
- * 秘技 / 迷宫技能不回能，角色级加成与特殊来源交给各自的 provider（P8-3）。
+ * <p>**Not handled** for now: additional attacks (skills whose {@code AttackType} is empty or
+ * is neither Normal nor BPSkill) gain no energy, techniques / maze skills gain no energy, and
+ * character-level bonuses and special sources are left to their respective providers (P8-3).
  */
 public class StandardEnergyProvider implements EnergyProvider {
 
@@ -35,13 +42,15 @@ public class StandardEnergyProvider implements EnergyProvider {
         if (skill == null || skill.getData() == null) {
             return null;
         }
-        // ⚠ 走 SkillCategory 枚举，不要拿裸字符串 switch：数据侧改拼写或新增取值时，
-        //    字符串 switch 会静默失配（落 default 被吞掉，无编译期保护）。
-        //    见 DOC_VS_CODE.md §F 的 F-6。
+        // ⚠ Switch on the SkillCategory enum, never on a bare string: when the data side
+        //    changes the spelling or adds a value, a string switch fails silently (it falls
+        //    into default and is swallowed, with no compile-time protection).
+        //    See F-6 in DOC_VS_CODE.md §F.
         return switch (skill.getData().getCategory()) {
             case NORMAL -> EnergyGain.normal(Constant.ENERGY_GAIN_BASIC);
             case BPSKILL -> EnergyGain.normal(Constant.ENERGY_GAIN_SKILL);
-            // Ultra 走 onUltCast；Maze / 追加攻击（UNSPECIFIED）/ 未知取值 本阶段不回能
+            // Ultra goes through onUltCast; Maze / additional attacks (UNSPECIFIED) /
+            // unknown values gain no energy at this stage
             default -> null;
         };
     }

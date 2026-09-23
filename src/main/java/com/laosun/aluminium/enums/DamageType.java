@@ -6,41 +6,47 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * The damage type of one damage instance (普攻/战技/终结技/击破/持续/真伤…).
+ * The damage type of one damage instance (basic attack / skill / ultimate / break / DOT / true damage…).
  *
  * <p>Two game rules live on the type itself as data, so callers never have to
  * remember them:
  * <ul>
  *   <li>{@link #isCrittable()} — break / super break / DOT / true damage never crit
- *   （击破、超击破、持续伤害、真实伤害不吃双暴）；欢愉伤害吃双爆（HSR.md §6.4）。</li>
+ *   (break, super break, DOT and true damage get no crit stats); elation damage does get crit stats
+ *   (HSR.md §6.4).</li>
  *   <li>{@link #isBoostable()} — break / super break / true damage are not boosted by
- *   the damage-bonus zone（击破与真伤不吃增伤），欢愉伤害同样不受伤害提高类效果影响
- *   （HSR.md §6.5 / GLOSSARY）。</li>
+ *   the damage-bonus zone (break and true damage get no DMG boost), and elation damage is likewise
+ *   unaffected by damage-increasing effects
+ *   (HSR.md §6.5 / GLOSSARY).</li>
  * </ul>
  *
  * <p>{@link com.laosun.aluminium.models.Damage.Area#applies(DamageType)} consumes
  * both flags, so a zone removes itself instead of relying on callers not to add it.
  *
- * <h2>哪些值真的在用 ⚠</h2>
+ * <h2>Which values are actually used ⚠</h2>
  *
- * <p>这些枚举值是**照规格铺的**，但引擎目前只用到一部分。别以为声明了就等于接上了：
+ * <p>These enum values are **laid out to spec**, but the engine currently only uses some of them.
+ * Do not assume that being declared means being wired up:
  *
  * <table>
- *   <tr><th>类型</th><th>现状</th></tr>
- *   <tr><td>{@link #NORMAL}</td><td>✅ 角色技能的**唯一**实际出口 —— 数据里没有
- *       {@code damage_type} 字段（见 {@code skills.json} 的键），所以战技/终结技也记 {@code NORMAL}。
- *       ⚠ 目前**没有行为差异**：{@code NORMAL}/{@code SKILL}/{@code ULTRA} 的
- *       可暴击与可增伤标志相同，所以暂时不影响数值</td></tr>
- *   <tr><td>{@link #ADDITIONAL} / {@link #TRUE}</td><td>✅ 附加伤害 / 真伤（P1-9）</td></tr>
- *   <tr><td>{@link #BREAK} / {@link #SUPER_BREAK} / {@link #DOT}</td><td>✅ 击破 / 超击破 / 持续伤害（P4）</td></tr>
- *   <tr><td>{@link #SKILL} / {@link #ULTRA}</td><td>❌ **引用 0 处** —— 等技能数据补上
- *       {@code damage_type} 才能区分（目前一律 {@code NORMAL}）</td></tr>
- *   <tr><td>{@link #EXTRA}</td><td>❌ **引用 0 处** —— 规格里的"额外伤害"，无来源</td></tr>
- *   <tr><td>{@link #TECHNIQUE}</td><td>❌ **引用 0 处** —— 秘技伤害；秘技本身现在只在
- *       {@code Battle.startBattle()} 被挂上（P8-2），效果未实现（P8-6）</td></tr>
- *   <tr><td>{@link #MEMORY}</td><td>❌ **引用 0 处** —— 忆灵伤害，要等 P9-4 召唤物</td></tr>
- *   <tr><td>{@link #ELATION}</td><td>❌ **引用 0 处** —— 欢愉体系（P10）；连
- *       {@code elation_basic_level_damage.json} 都还没加载</td></tr>
+ *   <tr><th>Type</th><th>Status</th></tr>
+ *   <tr><td>{@link #NORMAL}</td><td>✅ The **only** actual outlet of character skills — the data has
+ *       no {@code damage_type} field (see the keys of {@code skills.json}), so skills/ultimates are
+ *       recorded as {@code NORMAL} too.
+ *       ⚠ There is currently **no behavioral difference**: the crittable and boostable flags of
+ *       {@code NORMAL}/{@code SKILL}/{@code ULTRA} are identical, so for now it does not affect the
+ *       numbers</td></tr>
+ *   <tr><td>{@link #ADDITIONAL} / {@link #TRUE}</td><td>✅ Additional damage / true damage (P1-9)</td></tr>
+ *   <tr><td>{@link #BREAK} / {@link #SUPER_BREAK} / {@link #DOT}</td><td>✅ Break / super break / DOT (P4)</td></tr>
+ *   <tr><td>{@link #SKILL} / {@link #ULTRA}</td><td>❌ **0 references** — cannot be distinguished
+ *       until the skill data gains a {@code damage_type} (everything is {@code NORMAL} for now)</td></tr>
+ *   <tr><td>{@link #EXTRA}</td><td>❌ **0 references** — the "extra damage" in the spec, with no source</td></tr>
+ *   <tr><td>{@link #TECHNIQUE}</td><td>❌ **0 references** — technique damage; the technique itself is
+ *       currently only attached in {@code Battle.startBattle()} (P8-2) and its effect is not
+ *       implemented (P8-6)</td></tr>
+ *   <tr><td>{@link #MEMORY}</td><td>❌ **0 references** — memosprite damage, waiting on P9-4 summons</td></tr>
+ *   <tr><td>{@link #ELATION}</td><td>❌ **0 references** — the elation system (P10); not even
+ *       {@code elation_basic_level_damage.json} has been loaded yet</td></tr>
  * </table>
  */
 @Getter

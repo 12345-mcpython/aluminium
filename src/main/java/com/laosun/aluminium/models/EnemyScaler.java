@@ -6,25 +6,30 @@ import com.laosun.aluminium.beans.MonsterConfig;
 import com.laosun.aluminium.beans.MonsterTemplate;
 
 /**
- * 敌人属性数值公式（P2-3）：把「模板基础值 / 关卡等级组 / 实例自身调整 / 精英组」乘成最终面板。
+ * Enemy attribute value formula (P2-3): multiplies "template base value / stage level group /
+ * per-instance adjustment / elite group" into the final stat sheet.
  *
  * <pre>
- * 敌人属性 = 模板基础值 × 等级组系数 × 实例自身调整 × 精英组系数
+ * enemy attribute = template base value × level group multiplier × per-instance adjustment × elite group multiplier
  * </pre>
  *
- * <p>这条链与游戏实测对拍过（绝境碎星王虫阶段 1 = 53,099,832，误差 &lt; 0.001%）。
- * 三条容易踩的规则：
+ * <p>This chain has been cross-checked against in-game measurements (Despair Starcrusher Swarm King
+ * phase 1 = 53,099,832, error &lt; 0.001%). Three rules that are easy to trip over:
  * <ul>
- *   <li><b>血量</b>用 {@code config.hpRatio()}（= tbgd 的 {@code HPModifyRatio}，在本项目数据里叫
- *   {@code health_modify_ratio}），<b>不是</b>那个恒为 1 的幽灵字段 {@code hp_modify_ratio}；</li>
- *   <li><b>效果抵抗是加值</b>：模板值 + 等级组值（冰锋 0.2 + 组1·Lv90 的 0.1 = 0.3 = 30%），相乘会得到 0.02；</li>
- *   <li><b>精英组系数来自波组</b>，不是怪自身；本数据暂无该表，所以由调用方作为参数传入。</li>
+ *   <li><b>HP</b> uses {@code config.hpRatio()} (= tbgd's {@code HPModifyRatio}, called
+ *   {@code health_modify_ratio} in this project's data), <b>NOT</b> that ghost field
+ *   {@code hp_modify_ratio} which is always 1;</li>
+ *   <li><b>Effect RES is additive</b>: template value + level group value (Ice Edge (冰锋) 0.2 +
+ *   group 1 · Lv90's 0.1 = 0.3 = 30%); multiplying would give 0.02;</li>
+ *   <li><b>The elite group multiplier comes from the wave group</b>, not from the monster itself;
+ *   this dataset has no such table yet, so it is passed in by the caller as a parameter.</li>
  * </ul>
  */
 public final class EnemyScaler {
 
     /**
-     * 无精英组加成（系数全 1）——本数据目录还没有 elite_group.json，接表留 P7-4 / P9。
+     * No elite group bonus (all multipliers 1) — this data directory has no elite_group.json yet;
+     * wiring the table up is left to P7-4 / P9.
      */
     public static final EliteGroup NO_ELITE_BONUS = new EliteGroup(1, 1, 1, 1, 1);
 
@@ -32,20 +37,23 @@ public final class EnemyScaler {
     }
 
     /**
-     * 按"无精英组加成"缩放。
+     * Scales as if there were "no elite group bonus".
      */
     public static EnemyStats scale(MonsterTemplate template, MonsterConfig config, HardLevelGroup group) {
         return scale(template, config, group, NO_ELITE_BONUS);
     }
 
     /**
-     * 缩放一个敌人实例的完整面板。
+     * Scales the complete stat sheet of one enemy instance.
      *
-     * @param template 模板基础值（{@code monster_template_config.json}）
-     * @param config   实例自身调整系数（{@code monster_config.json}，装载时已补全缺失字段）
-     * @param group    关卡等级组系数（{@code hard_level_group.json}，组号与等级都来自关卡）
-     * @param elite    精英组别系数（来自波组；无加成传 {@link #NO_ELITE_BONUS}）
-     * @return 最终数值面板
+     * @param template template base value ({@code monster_template_config.json})
+     * @param config   per-instance adjustment multipliers ({@code monster_config.json}; missing fields
+     *                 are already filled in on load)
+     * @param group    stage level group multipliers ({@code hard_level_group.json}; both the group
+     *                 number and the level come from the stage)
+     * @param elite    elite group multipliers (from the wave group; pass {@link #NO_ELITE_BONUS} when
+     *                 there is no bonus)
+     * @return the final stat sheet
      */
     public static EnemyStats scale(MonsterTemplate template, MonsterConfig config, HardLevelGroup group,
                                    EliteGroup elite) {

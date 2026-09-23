@@ -3,11 +3,20 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.event.AttackEvent;
 import com.laosun.aluminium.models.event.BattleEvent;
+import com.laosun.aluminium.models.event.BreakEvent;
 import com.laosun.aluminium.models.event.DamageEvent;
+import com.laosun.aluminium.models.event.EnergyEvent;
+import com.laosun.aluminium.models.event.HealEvent;
+import com.laosun.aluminium.models.event.HpLossEvent;
+import com.laosun.aluminium.models.event.KillEvent;
 import com.laosun.aluminium.models.event.MoveEvent;
+import com.laosun.aluminium.models.event.SkillCastEvent;
+import com.laosun.aluminium.models.event.SkillPointGainedEvent;
+import com.laosun.aluminium.models.event.SkillPointSpentEvent;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
@@ -28,7 +37,9 @@ import java.util.function.Consumer;
  */
 @Getter
 @ToString
-public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, AttackEvent {
+public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, AttackEvent,
+        SkillCastEvent, EnergyEvent, HpLossEvent, HealEvent, KillEvent, BreakEvent,
+        SkillPointGainedEvent, SkillPointSpentEvent {
     /**
      * The display name of this entity.
      */
@@ -72,24 +83,26 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private boolean invulnerable = false;
 
     /**
-     * 能量当前值（P3）。没有能量条的角色恒为 0。
+     * Current energy (P3). Characters with no energy bar are always 0.
      */
     @Setter
     private double currentEnergy = 0;
 
     /**
-     * 能量上限（P3）。{@code 0} = 没有能量条（1407 遐蝶就是这种）：{@link #hasEnergyBar()} 为
-     * {@code false}，任何回能都不入账，也没有「满能量放大招」这回事。
+     * Energy cap (P3). {@code 0} = no energy bar (1407 遐蝶 is like this): {@link #hasEnergyBar()} is
+     * {@code false}, no energy gain is ever credited, and there is no such thing as "casting the ultimate
+     * at full energy".
      *
-     * <p>真实上限来自 {@code character_data.json} 的 {@code max_energy}（93 个角色里只有遐蝶是
-     * null）。离档的很多：飞霄/白厄 12、黄泉 9、昔涟 24、流萤/云璃/长夜月 240、银枝/爻光 180、
-     * 阿格莱雅 350、绯英 480 —— 见 ROADMAP 的 P3-0 D 表。
+     * <p>The real caps come from {@code max_energy} in {@code character_data.json} (of the 93 characters
+     * only 遐蝶 is null). Many are way off the common tier: 飞霄/白厄 12, 黄泉 9, 昔涟 24,
+     * 流萤/云璃/长夜月 240, 银枝/爻光 180, 阿格莱雅 350, 绯英 480 — see the P3-0 D table in ROADMAP.
      */
     @Setter
     private double maxEnergy = 0;
 
     /**
-     * 回能规则（P3）。常规角色用 {@link StandardEnergyProvider}，特殊角色各自实现本接口。
+     * Energy gain rules (P3). Regular characters use {@link StandardEnergyProvider}; special characters
+     * each implement this interface themselves.
      */
     @Setter
     private EnergyProvider energyProvider = new StandardEnergyProvider();
@@ -136,7 +149,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
         this.death = false;
         this.buffManager = new BuffManager(this);
-        // 配置类字段要跟着复制；currentEnergy 是新战斗实例，故意从 0 开始
+        // Configuration-like fields must be copied along too; currentEnergy belongs to a new battle
+        // instance and deliberately starts at 0
         this.maxEnergy = other.maxEnergy;
         this.currentEnergy = 0;
         this.energyProvider = other.energyProvider;
@@ -165,10 +179,11 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * Replaces the {@link DoubleValue} at the given attribute index.
      *
-     * <p>若替换的是 {@code SPEED} 且数值真的变了，会通知 {@link #notifySpeedChanged()}
-     * —— 这是"速度变化 → 重排行动条"（P7 修正 E2）的**唯一触发点**，
-     * 所以改速度请走这里（或改 {@code DoubleValue} 之后再调 {@code notifySpeedChanged()}），
-     * 不要在别处偷偷改速度属性。
+     * <p>If what is replaced is {@code SPEED} and the value really changed, this notifies
+     * {@link #notifySpeedChanged()} — this is the **only trigger point** for "speed change → reorder the
+     * action bar" (P7 fix E2), so go through here to change speed (or call
+     * {@code notifySpeedChanged()} after modifying the {@code DoubleValue}),
+     * do **not** quietly change the speed attribute anywhere else.
      *
      * @param attributeType the attribute to set
      * @param value         the new value object
@@ -193,17 +208,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * 速度属性变化时的回调（P7 修正 E2）。
+     * Callback fired when the speed attribute changes (P7 fix E2).
      *
-     * <p>{@code Battle} 构造时把它指到"重排该单位的行动时间"（{@code Queue.refreshSpeed}）。
-     * 在此之前 {@code Signal} 缓存的 {@code speed} 只在几个"重置周期"的时机被刷新，
-     * 于是加速/减速不会立刻反映到行动条上。
+     * <p>{@code Battle} points this at "reschedule this unit's action time" ({@code Queue.refreshSpeed})
+     * when it is constructed. Before that, the {@code speed} cached by {@code Signal} was only refreshed at
+     * a few "reset the period" moments, so a speed buff/debuff would not be reflected on the action bar
+     * immediately.
      */
     private transient Consumer<CanHit> speedChangeListener;
 
     /**
-     * 通知"这个单位的速度变了"。由 {@code Battle.onSpeedChanged} 调用，
-     * 别在别处直接调（否则行动条重排的规则会散落）。
+     * Notify that "this unit's speed changed". Called by {@code Battle.onSpeedChanged};
+     * do not call it directly anywhere else (otherwise the action-bar reordering rules would scatter).
      */
     public void notifySpeedChanged() {
         if (speedChangeListener != null) {
@@ -212,30 +228,30 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * 由 {@code Battle} 注入：速度变化时怎么重排行动条。
+     * Injected by {@code Battle}: how to reorder the action bar when speed changes.
      *
-     * @param listener 回调；{@code null} = 不通知（例如没有队列的单元测试）
+     * @param listener the callback; {@code null} = do not notify (e.g. a unit test with no queue)
      */
     public void setSpeedChangeListener(Consumer<CanHit> listener) {
         this.speedChangeListener = listener;
     }
 
     /**
-     * 当前护盾值（P6-3）。{@code 0} = 没有盾。
+     * Current shield value (P6-3). {@code 0} = no shield.
      *
-     * <p>护盾**先于 HP 被扣**（{@link #takeDamage(double)}），且**不叠加**：
-     * 新盾由 {@code Battle.grantShield} 直接覆盖旧值，不做相加。
+     * <p>The shield is **drained before HP** ({@link #takeDamage(double)}), and it **does not stack**:
+     * a new shield has {@code Battle.grantShield} overwrite the old value outright, with no addition.
      */
     @Setter
     private double shield = 0;
 
     /**
-     * 上一次 {@link #takeDamage(double)} 被护盾挡掉的量（P6-3）。
+     * How much of the last {@link #takeDamage(double)} was blocked by the shield (P6-3).
      *
-     * <p>存在的理由：护盾吸收的伤害**也是这一击造成的伤害** ——
-     * {@code Battle.applyDamage} 的返回值要把"打进盾里的部分"算进去，
-     * 否则"打在有盾的目标上"会显示成造成 0 伤害（击杀回能/攻击事件总伤害都会失真）。
-     * 每次 {@code takeDamage} 都会重写它。
+     * <p>Why it exists: the damage absorbed by the shield **is also damage dealt by this hit** — the return
+     * value of {@code Battle.applyDamage} has to count "the part that went into the shield", otherwise
+     * "hitting a shielded target" would show as dealing 0 damage (kill energy gain / the total damage of
+     * the attack event would both be distorted). Every {@code takeDamage} overwrites it.
      */
     @Setter
     private double lastShieldAbsorbed = 0;
@@ -244,14 +260,15 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Applies damage to this entity, reducing current HP.
      * If HP drops to zero or below, the entity is marked dead.
      *
-     * <p><b>护盾先扣（P6-3）</b>：伤害先由 {@link #shield} 吸收，盾被打空后剩下的才扣 HP。
-     * 所以"有盾时不会死"是自动成立的；被吸收的量记在 {@link #lastShieldAbsorbed}。
+     * <p><b>The shield is drained first (P6-3)</b>: damage is absorbed by {@link #shield} first, and only
+     * what is left after the shield is emptied is deducted from HP. So "you cannot die while shielded" holds
+     * automatically; the absorbed amount is recorded in {@link #lastShieldAbsorbed}.
      *
      * @param damage the amount of damage to take
      * @return {@code true} if the entity died from this damage
      */
     public boolean takeDamage(double damage) {
-        lastShieldAbsorbed = 0;                      // 每次结算先清空，避免读到上一次的值
+        lastShieldAbsorbed = 0;                      // clear it at the start of every settlement so a stale value cannot be read
         if (death || damage <= 0) {
             return false;
         }
@@ -259,11 +276,12 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
             double absorbed = Math.min(shield, damage);
             shield -= absorbed;
             damage -= absorbed;
-            // ⚠ 必须在**任何 return 之前**赋值：盾把伤害全吃掉时下面会提前 return，
-            //   漏掉这行会让调用方读到上一次的陈旧值（实测过一次：返回伤害翻倍）。
+            // ⚠ This assignment MUST come **before any return**: when the shield eats all the damage the
+            //   code below returns early, and missing this line would let the caller read a stale value
+            //   from the previous hit (measured once: the returned damage came out doubled).
             lastShieldAbsorbed = absorbed;
             if (damage <= 0) {
-                return false;                        // 全被盾吃掉：HP 不动，当然也没死
+                return false;                        // all eaten by the shield: HP untouched, and certainly not dead
             }
         }
         currentHp -= damage;
@@ -289,7 +307,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * 是否有能量条（{@code maxEnergy > 0}）。
+     * Whether this entity has an energy bar ({@code maxEnergy > 0}).
      *
      * @return {@code true} if this entity has an energy bar
      */
@@ -298,7 +316,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * 是否满能量（可以放终结技）。没有能量条的角色永远 {@code false}。
+     * Whether the energy bar is full (the ultimate can be cast). Always {@code false} for characters with
+     * no energy bar.
      *
      * @return {@code true} if the energy bar is full
      */
@@ -307,13 +326,14 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * 入账一次回能（P3 唯一的能量增长口）。
+     * Credit one energy gain (the only entry point for energy growth in P3).
      *
-     * <p>公式（HSR.md §3.3）：{@code 最终获得能量 = 基础获得能量 × (1 + 能量恢复效率%)}；
-     * {@link EnergyGain#affectedByEfficiency()} 为 {@code false} 时不吃效率加成。
+     * <p>Formula (HSR.md §3.3): {@code final energy gained = base energy gained × (1 + energy regeneration
+     * rate%)}; when {@link EnergyGain#affectedByEfficiency()} is {@code false} the efficiency bonus does
+     * not apply.
      *
-     * @param gain 一次回能描述
-     * @return **实际入账值**（被上限截断后的值，不是理论回能值）
+     * @param gain the description of one energy gain
+     * @return the **actually credited amount** (after being truncated by the cap, not the theoretical gain)
      */
     public double gainEnergy(EnergyGain gain) {
         if (gain == null || gain.amount() <= 0 || !hasEnergyBar()) {
@@ -328,10 +348,10 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * 便捷入口：按基础值入账（走回能效率）。
+     * Convenience entry point: credit by base value (goes through energy regeneration efficiency).
      *
      * @param amount base energy
-     * @return 实际入账值
+     * @return the actually credited amount
      */
     public double gainEnergy(double amount) {
         return gainEnergy(EnergyGain.normal(amount));
@@ -355,9 +375,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * Damage-settlement hook (P1-7), fired for both sides before the zones are multiplied.
      *
-     * <p>The default relays to {@link BuffManager#onDamage(Battle, Damage)}, so buffs can
-     * inject 易伤 / 减伤 / 虚弱. Subclasses that override it (character talents, boss
-     * mechanics) <b>must call {@code super.onDamage(battle, damage)}</b>, otherwise their
+     * <p>The default relays to {@link BuffManager#onDamage(Battle, Damage)}, so buffs can inject
+     * vulnerability (易伤) / reduction (减伤) / weakness (虚弱). Subclasses that override it (character
+     * talents, boss mechanics) <b>must call {@code super.onDamage(battle, damage)}</b>, otherwise their
      * own buffs stop working.
      */
     @Override
@@ -369,12 +389,89 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Attack-level hook (P1-9), broadcast to every ally once an attack is fully settled.
      *
      * <p>The default relays to {@link BuffManager#afterAttack(Battle, CanHit, CanHit, List, double)},
-     * so buffs like 知更鸟【协奏】/缇宝结界 can spawn 附加伤害 / 真伤 off someone else's attack.
-     * Subclasses that override it <b>must call {@code super}</b>.
+     * so buffs like 知更鸟【协奏】/ 缇宝结界 can spawn additional damage (附加伤害) / true damage (真伤) off
+     * someone else's attack. Subclasses that override it <b>must call {@code super}</b>.
      */
     @Override
     public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
                             List<? extends CanHit> hitTargets, double totalDamage) {
         buffManager.afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage);
+    }
+
+    // ==================================================================
+    // P8-6 events: all of them forward through the same path as DamageEvent/AttackEvent
+    // (BuffManager then iterates over the buffs). When overriding these methods you MUST call super,
+    // otherwise the buffs on this entity will not receive the event.
+    // ==================================================================
+
+    /**
+     * Skill cast (P8-6). **Fired for non-damaging skills too** — it is the trigger source for
+     * healing / shielding / pure-buff skills.
+     */
+    @Override
+    public void onSkillCast(Battle battle, CanHit user, Skill skill,
+                            List<? extends CanHit> hitTargets, List<? extends CanHit> targets) {
+        buffManager.onSkillCast(battle, user, skill, hitTargets, targets);
+    }
+
+    /**
+     * Energy credited (P8-6). {@code actuallyAdded} is the **actual** credited value (after being truncated
+     * by the cap).
+     */
+    @Override
+    public void onEnergyGain(Battle battle, CanHit target, double actuallyAdded) {
+        buffManager.onEnergyGain(battle, target, actuallyAdded);
+    }
+
+    /**
+     * HP loss (P8-6). {@code amount} is the **HP actually lost** (excluding what the shield absorbed).
+     */
+    @Override
+    public void onHpLoss(Battle battle, CanHit target, double before, double after,
+                         CanHit source, double amount) {
+        buffManager.onHpLoss(battle, target, before, after, source, amount);
+    }
+
+    /**
+     * Healing (P8-6). {@code actuallyHealed} is the **actual amount restored** (0 at full HP, in which case
+     * the event is not fired).
+     */
+    @Override
+    public void onHeal(Battle battle, CanHit healer, CanHit target, double actuallyHealed) {
+        buffManager.onHeal(battle, healer, target, actuallyHealed);
+    }
+
+    /**
+     * Kill (P8-6). Same definition as kill energy gain: it does **not** look at {@code countsAsAttack}
+     * (an additional-damage last hit counts too).
+     */
+    @Override
+    public void onKill(Battle battle, CanHit attacker, CanHit victim) {
+        buffManager.onKill(battle, attacker, victim);
+    }
+
+    /**
+     * Weakness break (P8-6). Fired only once, at "the instant toughness is emptied".
+     */
+    @Override
+    public void onBreak(Battle battle, CanHit attacker, CanHit target, DamageElement element) {
+        buffManager.onBreak(battle, attacker, target, element);
+    }
+
+    /**
+     * Skill point credited (P8-6). Only our own units receive it (skill points are our team's resource).
+     */
+    @Override
+    public void onSkillPointGained(Battle battle, int amount) {
+        buffManager.onSkillPointGained(battle, amount);
+    }
+
+    /**
+     * Skill point spent (P8-6). ⚠ It is **not** fired when skill points are insufficient and the action
+     * does not go through.
+     */
+    @Override
+    public void onSkillPointSpent(Battle battle, int amount) {
+        buffManager.onSkillPointSpent(battle, amount);
     }
 }

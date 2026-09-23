@@ -9,19 +9,21 @@ import java.util.Map;
 /**
  * Per-instance monster data, deserialized from {@code monster_config.json}
  * (tbgd {@code MonsterConfig}) — the "difficulty knob" layer on top of
- * {@link MonsterTemplate}: {@code 实例系数 × 等级组系数 × 模板基础值}.
+ * {@link MonsterTemplate}: {@code instance multiplier × level-group multiplier × template base value}.
  *
- * <p><b>⚠ 血量字段陷阱</b>（已对原始 tbgd 逐条核实）：tbgd 的血量修正叫 {@code HPModifyRatio}，
- * 在本文件里是 <b>{@code health_modify_ratio}</b>（即 {@link #hpRatio()}）；同文件里那个
- * {@code hp_modify_ratio} 是解析器遗留的<b>幽灵字段</b>（tbgd 没有 {@code HealthModifyRatio}），
- * 恒为默认值 1，<b>永远不要用它</b>。例：100201101 真实血量系数 0.266667，而幽灵字段是 1。
+ * <p><b>⚠ The HP-field trap</b> (verified entry by entry against the original tbgd): tbgd calls its HP
+ * modifier {@code HPModifyRatio}, which in this file is <b>{@code health_modify_ratio}</b> (i.e.
+ * {@link #hpRatio()}); the {@code hp_modify_ratio} in the same file is a <b>ghost field</b> left over
+ * from the parser (tbgd has no {@code HealthModifyRatio}), it is always the default 1, and you must
+ * <b>never use it</b>. Example: 100201101 has a real HP multiplier of 0.266667, while the ghost field is 1.
  *
- * <p><b>⚠ 缺失字段</b>：本数据没有攻击修正（tbgd 的 {@code AttackModifyRatio}，2649 个怪里 444 个 ≠ 1），
- * 由 {@link com.laosun.aluminium.Constant} 从补丁文件 {@code monster_attack_modify_ratio.json} 合并；
- * 各系数在 {@code Constant} 里统一补全，装载后的实例不会是 {@code null}。
+ * <p><b>⚠ Missing field</b>: this data has no attack modifier (tbgd's {@code AttackModifyRatio}, which
+ * is ≠ 1 for 444 of the 2649 monsters); {@link com.laosun.aluminium.Constant} merges it in from the
+ * patch file {@code monster_attack_modify_ratio.json}; all the multipliers are filled in uniformly in
+ * {@code Constant}, so a loaded instance is never {@code null}.
  *
- * <p>机制字段：{@code debuff_resistance} P6-1 接（例：冰锋 {@code {"STAT_CTRL_Frozen": 1}} =
- * 完全免疫冻结）；{@code summon_id} 留给 P9-4。
+ * <p>Mechanic fields: {@code debuff_resistance} is wired up in P6-1 (example: Ice Edge (冰锋)
+ * {@code {"STAT_CTRL_Frozen": 1}} = fully immune to Frozen); {@code summon_id} is left for P9-4.
  */
 public record MonsterConfig(Translate name,
                             @SerializedName("template_id") int templateId,

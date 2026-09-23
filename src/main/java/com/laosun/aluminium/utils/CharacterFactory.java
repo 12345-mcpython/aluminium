@@ -10,7 +10,7 @@ import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
 import java.util.Set;
 
 /**
- * 角色工厂（P8-1）：一条命令造出**真实角色**。
+ * Character factory (P8-1): build a **real character** with one call.
  *
  * <pre>{@code
  * Character jingYuan = CharacterFactory.create(1204, 80);
@@ -20,72 +20,80 @@ import java.util.Set;
  * jingYuan.getAggro();        // 75
  * }</pre>
  *
- * <p>它其实就是 {@code Character.builder()} 的一层薄封装 —— 面板管线（等级缩放 / 光锥 /
- * 遗器 / 行迹 / 额外加成）在 P2 就完备了，P8-1 补的是**角色身份字段**：
- * 元素、命途、仇恨、能量上限（见 {@code Character.Builder#build()}）。
+ * <p>It is essentially a thin wrapper around {@code Character.builder()} — the stat pipeline
+ * (level scaling / light cone / relics / traces / extra bonuses) was already complete in P2; what
+ * P8-1 added is the **character identity fields**: element, path, aggro, max energy (see
+ * {@code Character.Builder#build()}).
  *
- * <p>与 {@link Character#fromAttributes} 的分工：那个是测试/占位入口（无元素、无命途、
- * 能量上限 0、技能全占位），这个是真实角色入口。**P8 之后新代码一律用这个。**
+ * <p>Division of labour with {@link Character#fromAttributes}: that one is the test/placeholder
+ * entry point (no element, no path, max energy 0, all skills placeholders); this one is the real
+ * character entry point. **After P8 all new code uses this one.**
  *
- * <p><b>技能装配在 P8-2 已接</b>：{@code create()} 造出来的角色带**真实槽位映射**的
- * {@code DefaultSkill}（普攻 1 / 战技 2 / 终结技 3 / 天赋 4），映射表只有一份
- * （{@code Constant.SKILL_SLOT}），装配点是 {@code Character.Builder#build()}
- * —— 见 {@code engine.md} §7.2。地图普攻（6）/ 秘技（7）不在这里装，
- * 由 {@code Battle.startBattle()} 附加。
+ * <p><b>Skill assembly is wired up in P8-2</b>: a character built by {@code create()} carries
+ * {@code DefaultSkill} with the **real slot mapping** (basic attack 1 / skill 2 / ultimate 3 /
+ * talent 4); there is only one mapping table ({@code Constant.SKILL_SLOT}) and the assembly point is
+ * {@code Character.Builder#build()} — see {@code engine.md} §7.2. Map basic attack (6) / technique (7)
+ * are not installed here; they are attached by {@code Battle.startBattle()}.
  *
- * <p>⚠ 本类**只管角色身份与资源**，不碰技能倍率：追加攻击/召唤物是 P8-3/P9-4。
+ * <p>⚠ This class **only handles character identity and resources** and does not touch skill
+ * multipliers: follow-up attacks/summons are P8-3/P9-4.
  */
 public final class CharacterFactory {
     /**
-     * 走**层数/特殊资源**而不是常规能量的角色（P8-0 三分法里的"引擎还不具备的能力"）。
+     * Characters that go through **stacks/special resources** instead of conventional energy (the
+     * "capabilities the engine does not have yet" bucket of the P8-0 three-way split).
      *
-     * <p>他们在游戏里攒的是【追忆】/【新蕊】/【火种】/点数，常规回能对他们是无意义的；
-     * 而 {@code castUltra} 只看 {@code currentEnergy >= maxEnergy}，
-     * 所以不拦的话他们能靠"挨打"凑满并放出不该存在的终结技（黄泉上限才 9）。
+     * <p>What they accumulate in the game is 【追忆】 (Reminiscence) / 【新蕊】 (New Bud) / 【火种】
+     * (Kindling) / points; conventional energy gain is meaningless for them. And {@code castUltra}
+     * only looks at {@code currentEnergy >= maxEnergy}, so without blocking them they could fill the
+     * bar by "getting hit" and fire an ultimate that should not exist (Acheron (黄泉) caps at 9).
      *
-     * <p>判定放在装配点是 P8-0 明确允许的（provider 注册表 / 装配点是唯一允许出现 cid 的地方）。
-     * 等 P8-8 的 {@code Resource} 落地后，这张表演化成"角色 → 资源实现"的注册表。
+     * <p>Putting the check at the assembly point is explicitly allowed by P8-0 (the provider registry /
+     * the assembly point are the only places where a cid may appear). Once P8-8's {@code Resource}
+     * lands, this table evolves into a "character → resource implementation" registry.
      */
     private static final Set<Integer> SPECIAL_RESOURCE_CHARACTERS = Set.of(
-            1220,   // 飞霄：层数（大招阈值 6，上限 12）
-            1308,   // 黄泉：层数（上限 9）
-            1407,   // 遐蝶：【新蕊】（max_energy 为 null，本来就没有能量条）
-            1408,   // 白厄：【火种】（上限 12）
-            1415,   // 昔涟：【追忆】（见 engine.md §9.5）
-            1506    // 银狼LV.999：欢愉体系
+            1220,   // Feixiao (飞霄): stacks (ultimate threshold 6, cap 12)
+            1308,   // Acheron (黄泉): stacks (cap 9)
+            1407,   // Castorice (遐蝶): 【新蕊】 (max_energy is null; there was never an energy bar)
+            1408,   // Phainon (白厄): 【火种】 (cap 12)
+            1415,   // Cyrene (昔涟): 【追忆】 (see engine.md §9.5)
+            1506    // Silver Wolf LV.999 (银狼LV.999): the Elation (欢愉) system
     );
 
-    /** 上述角色共用的"不入账"provider（无状态，可共享）。 */
+    /** The "not credited" provider shared by the characters above (stateless, so shareable). */
     private static final EnergyProvider NO_CONVENTIONAL_ENERGY = new NoConventionalEnergyProvider();
 
     private CharacterFactory() {
     }
 
     /**
-     * 造一个满晋阶的真实角色。
+     * Build a fully promoted real character.
      *
-     * <p>"满晋阶"指晋阶到当前等级的上限（Lv80 → 晋阶 6 次），这正是
-     * {@code LevelPromotionCalc.calcCharacterRate(level, true)} 里的 {@code true}。
-     * 景元 Lv80 已晋阶的生命正好 = {@code 158.4 × 7.35 = 1164.24}，与游戏内一致。
+     * <p>"Fully promoted" means promoted up to the cap for the current level (Lv80 → promoted 6
+     * times), which is exactly the {@code true} in
+     * {@code LevelPromotionCalc.calcCharacterRate(level, true)}.
+     * Jing Yuan (景元) Lv80 promoted HP is exactly = {@code 158.4 × 7.35 = 1164.24}, matching the game.
      *
-     * @param cid   角色 id（见 {@code character_data.json}）
-     * @param level 等级（1-80）
-     * @return 真实角色
-     * @throws CharacterException 角色不存在
+     * @param cid   character id (see {@code character_data.json})
+     * @param level level (1-80)
+     * @return the real character
+     * @throws CharacterException if the character does not exist
      */
     public static Character create(int cid, int level) {
         return create(cid, level, true);
     }
 
     /**
-     * 造一个真实角色。
+     * Build a real character.
      *
-     * @param cid       角色 id
-     * @param level     等级（1-80）
-     * @param promoted  是否已晋阶（{@code false} = 未晋阶，面板更低；两者差异见
-     *                  {@link LevelPromotionCalc#calcCharacterRate(int, boolean)}）
-     * @return 真实角色
-     * @throws CharacterException 角色不存在
+     * @param cid      character id
+     * @param level    level (1-80)
+     * @param promoted whether the character is promoted ({@code false} = not promoted, lower stat
+     *                 sheet; for the difference between the two see
+     *                 {@link LevelPromotionCalc#calcCharacterRate(int, boolean)})
+     * @return the real character
+     * @throws CharacterException if the character does not exist
      */
     public static Character create(int cid, int level, boolean promoted) {
         Character.Builder builder = Character.builder().cid(cid).level(level);
@@ -93,7 +101,7 @@ public final class CharacterFactory {
             builder = builder.isPromote();
         }
         Character character = builder.build();
-        // 层数/特殊资源角色：换掉常规回能（否则靠挨打就能凑满能量、放出不该有的终结技）
+        // stack/special-resource characters: swap out conventional energy gain (otherwise they could fill the bar just by getting hit and fire an ultimate they should not have)
         if (SPECIAL_RESOURCE_CHARACTERS.contains(cid)) {
             character.setEnergyProvider(NO_CONVENTIONAL_ENERGY);
         }
@@ -101,29 +109,31 @@ public final class CharacterFactory {
     }
 
     /**
-     * 这个角色是否走层数/特殊资源（而非常规能量）。
+     * Whether this character goes through stacks/special resources (rather than conventional energy).
      *
-     * <p>给调用方一个"先问再接"的口子，也方便测试与将来的 P8-8 注册表复用同一张表。
+     * <p>Gives the caller a "ask first, then wire up" hook, and also lets tests and the future P8-8
+     * registry reuse the same table.
      */
     public static boolean usesSpecialResource(int cid) {
         return SPECIAL_RESOURCE_CHARACTERS.contains(cid);
     }
 
     /**
-     * 角色是否存在（数据里有没有这个 id）。
+     * Whether the character exists (whether this id is in the data).
      *
-     * <p>给调用方一个"先问再建"的口子，免得靠 catch {@link CharacterException} 探路。
+     * <p>Gives the caller an "ask first, then build" hook, so it does not have to probe by catching
+     * {@link CharacterException}.
      */
     public static boolean exists(int cid) {
         return Constant.CHARACTERS.containsKey(cid);
     }
 
     /**
-     * 取原始角色数据（不做面板计算）。
+     * Get the raw character data (without computing the stat sheet).
      *
-     * @param cid 角色 id
-     * @return 数据行
-     * @throws CharacterException 角色不存在
+     * @param cid character id
+     * @return the data row
+     * @throws CharacterException if the character does not exist
      */
     public static CharacterData data(int cid) {
         CharacterData data = Constant.CHARACTERS.get(cid);

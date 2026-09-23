@@ -21,37 +21,41 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 /**
- * 重构的**目的验证**：引擎是否真的"不认识角色机制"却又能被角色机制扩展。
+ * **Purpose verification** for the refactor: can the engine really be extended by character mechanics
+ * while itself "knowing nothing about character mechanics"?
  *
- * <p>{@code DOC_VS_CODE.md} §F 的 <b>F-8</b> 说"战技点的策略要从 {@code Battle} 抽出去"，
- * 本类就是那句话的验收 —— 全程**不改引擎一行**，只替换
- * {@link Battle#skillPointPolicy}，看引擎会不会照着新规则走。
+ * <p><b>F-8</b> in {@code DOC_VS_CODE.md} §F says "the skill point policy must be pulled out of
+ * {@code Battle}", and this class is the acceptance test for that sentence — **without changing a single
+ * line of the engine**, it only swaps {@link Battle#skillPointPolicy} and sees whether the engine follows
+ * the new rules.
  *
- * <p>三个断言分别对应未来三类真实需求：
+ * <p>The three assertions correspond to three kinds of real-world needs in the future:
  * <ol>
- *   <li>{@link #customPolicyChangesTheBasicAttackGain()} —— 角色级供点
- *       （花火"每 3 次普攻额外 +1"、素裳"打击破目标 +1"）；</li>
- *   <li>{@link #customPolicyRaisesTheCap()} —— 上限类修正
- *       （花火天赋 +2、欢愉光锥每名欢愉角色 +1，对应 §F 的 F-1）；</li>
- *   <li>{@link #customPolicyCanChangeTheStartingValue()} —— 开局类修正
- *       （过客 4 件套"战斗开始时 +1"，对应 §F 的 F-2）。</li>
+ *   <li>{@link #customPolicyChangesTheBasicAttackGain()} — character-level point provision
+ *       (Sparkle "every 3 basic attacks +1 extra", Sushang "+1 when hitting a broken target");</li>
+ *   <li>{@link #customPolicyRaisesTheCap()} — cap-type modifications
+ *       (Sparkle's talent +2, the Elation light cone +1 per Elation character, corresponding to F-1 in §F);</li>
+ *   <li>{@link #customPolicyCanChangeTheStartingValue()} — start-of-battle modifications
+ *       (the 4-piece Passerby set "at the start of battle +1", corresponding to F-2 in §F).</li>
  * </ol>
  *
- * <p>⚠ 这些子类是**测试替身**，不是要交付的角色实现 —— 真做角色时应该由
- * P8-7 的触发器表驱动（{@code cid} 只出现在装配点或效果表里，P8-0 三分法）。
- * 本类证明的是"引擎侧的口子够用"，不是"角色已经做了"。
+ * <p>⚠ These subclasses are **test doubles**, not character implementations to be delivered — when
+ * characters are really implemented they should be driven by the P8-7 trigger table ({@code cid} only
+ * appears at an assembly point (装配点) or in an effect table, the P8-0 three-way split (三分法)).
+ * What this class proves is "the hooks on the engine side are sufficient", not "the characters are
+ * already done".
  */
 public class SkillPointPolicyExtensibilityTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // 1. 角色级供点：换掉策略 → 引擎照新规则走
+    // 1. Character-level point provision: swap the policy → the engine follows the new rules
     // ==================================================================
 
     /**
-     * 自定义策略：普攻回 **2** 点（而不是 1）。
+     * Custom policy: a basic attack restores **2** points (instead of 1).
      *
-     * <p>模拟"花火在队伍里，普攻额外 +1"这类效果。
+     * <p>Simulates effects like "Sparkle is on the team, basic attacks give +1 extra".
      */
     private static final class DoubleGainPolicy extends StandardSkillPointPolicy {
         @Override
@@ -65,64 +69,65 @@ public class SkillPointPolicyExtensibilityTest {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
         Character hero = battle.characters.getFirst();
 
-        // 换策略 —— 这是唯一的"接线"动作，Battle 一行没改
+        // Swap the policy — this is the only "wiring" action, and not one line of Battle was changed
         battle.skillPointPolicy = new DoubleGainPolicy();
-        Assertions.assertEquals(3, battle.getSkillPoints(), "开局仍是 3（策略的初始值）");
+        Assertions.assertEquals(3, battle.getSkillPoints(), "the start is still 3 (the policy's initial value)");
 
-        // ⚠ 策略从 3 起，一次普攻 +2 → 4（封顶 5），所以断言"至少涨了 2 而不是 1"
+        // ⚠ The policy starts at 3 and one basic attack gives +2 → 4 (capped at 5), so assert
+        // "it grew by at least 2 rather than 1"
         Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, 1),
                 () -> List.of(firstEnemy(battle))));
         Assertions.assertEquals(5, battle.getSkillPoints(),
-                "3 + 2 = 5（若还是内置的 +1 则是 4）");
+                "3 + 2 = 5 (it would be 4 if the built-in +1 were still in effect)");
     }
 
     // ==================================================================
-    // 2. 上限类修正：上限不再是常量 5
+    // 2. Cap-type modifications: the cap is no longer the constant 5
     // ==================================================================
 
     /**
-     * 自定义策略：上限 **7**、开局 3（花火天赋 +2 的效果）。
+     * Custom policy: cap **7**, start 3 (the effect of Sparkle's talent +2).
      *
-     * <p>对应 {@code DOC_VS_CODE.md} §F 的 <b>F-1</b>：引擎原先把上限写死在
-     * {@code Constant.SKILL_POINT_MAX}，无法被队伍配置抬高。
+     * <p>Corresponds to <b>F-1</b> in {@code DOC_VS_CODE.md} §F: the engine used to hard-code the cap in
+     * {@code Constant.SKILL_POINT_MAX}, so it could not be raised by team configuration.
      */
     @Test
     public void customPolicyRaisesTheCap() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
         battle.skillPointPolicy = new StandardSkillPointPolicy(7, 3);
 
-        Assertions.assertEquals(7, battle.getSkillPointMax(), "上限跟着策略走，不再是常量 5");
+        Assertions.assertEquals(7, battle.getSkillPointMax(), "the cap follows the policy, no longer the constant 5");
         Assertions.assertEquals(3, battle.getSkillPoints());
 
         battle.gainSkillPoint(100);
-        Assertions.assertEquals(7, battle.getSkillPoints(), "封在新的上限 7");
+        Assertions.assertEquals(7, battle.getSkillPoints(), "capped at the new cap of 7");
     }
 
     // ==================================================================
-    // 3. 开局类修正：开局不再是常量 3
+    // 3. Start-of-battle modifications: the start value is no longer the constant 3
     // ==================================================================
 
     /**
-     * 自定义策略：开局 **4**、上限 5（过客 4 件套"战斗开始时 +1"的效果）。
+     * Custom policy: start **4**, cap 5 (the effect of the 4-piece Passerby set "at the start of battle +1").
      *
-     * <p>对应 {@code DOC_VS_CODE.md} §F 的 <b>F-2</b>。
+     * <p>Corresponds to <b>F-2</b> in {@code DOC_VS_CODE.md} §F.
      */
     @Test
     public void customPolicyCanChangeTheStartingValue() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
         battle.skillPointPolicy = new StandardSkillPointPolicy(5, 4);
 
-        Assertions.assertEquals(4, battle.getSkillPoints(), "开局 4，不再是常量 3");
+        Assertions.assertEquals(4, battle.getSkillPoints(), "the start is 4, no longer the constant 3");
         Assertions.assertEquals(5, battle.getSkillPointMax());
     }
 
     // ==================================================================
-    // 4. 默认策略不能被绕过：接口是唯一入口
+    // 4. The default policy must not be bypassed: the interface is the only entry point
     // ==================================================================
 
     /**
-     * 默认策略下，{@code Battle} 的读写口与策略**永远一致** ——
-     * 不存在"引擎里还有一份没人管的战技点状态"。
+     * Under the default policy, {@code Battle}'s read/write accessors and the policy are **always
+     * consistent** — there is no "second, unmanaged copy of the skill point state inside the engine".
      */
     @Test
     public void battleFacadeNeverDivergesFromThePolicy() {
@@ -138,7 +143,7 @@ public class SkillPointPolicyExtensibilityTest {
         Assertions.assertEquals(policy.canAfford(), battle.hasSkillPoint());
 
         while (battle.spendSkillPoint()) {
-            // 清空
+            // drain it
         }
         Assertions.assertEquals(0, battle.getSkillPoints());
         Assertions.assertFalse(battle.hasSkillPoint());
@@ -146,7 +151,8 @@ public class SkillPointPolicyExtensibilityTest {
     }
 
     /**
-     * 默认策略就是游戏基础规则，一个字都没变 —— 重构不该改行为。
+     * The default policy is exactly the base game rule, not one word changed — a refactor must not change
+     * behaviour.
      */
     @Test
     public void defaultPolicyIsStillTheVanillaRule() {
@@ -160,27 +166,29 @@ public class SkillPointPolicyExtensibilityTest {
         Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, 1),
                 () -> List.of(firstEnemy(battle))));
         Assertions.assertEquals(Constant.SKILL_POINT_START + Constant.SKILL_POINT_GAIN_BASIC,
-                battle.getSkillPoints(), "普攻 +1（默认策略）");
+                battle.getSkillPoints(), "basic attack +1 (default policy)");
     }
 
     // ==================================================================
-    // 5. 策略注入对"敌方"的语义也成立
+    // 5. Policy injection also holds for "enemy" semantics
     // ==================================================================
 
     /**
-     * 自定义策略**自己**决定要不要判阵营 —— 引擎不再替它判断。
+     * The custom policy **itself** decides whether to check the camp — the engine no longer judges on its
+     * behalf.
      *
-     * <p>这条把责任边界固定下来：敌方行动算不算战技点，是**策略**的事
-     * （{@code StandardSkillPointPolicy} 判 {@code Camp.PLAYER}），
-     * 不是 {@code Battle} 的事。将来加"友方召唤物"（P9-4）要调这条规则时，
-     * 改的是策略，不是引擎。
+     * <p>This pins down the boundary of responsibility: whether an enemy action counts towards skill points
+     * is the **policy's** business ({@code StandardSkillPointPolicy} checks {@code Camp.PLAYER}), not
+     * {@code Battle}'s. When "friendly summons" (P9-4) are added later and this rule has to be adjusted,
+     * what changes is the policy, not the engine.
      */
     @Test
     public void campJudgementBelongsToThePolicyNotTheBattle() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
         Enemy enemy = firstEnemy(battle);
 
-        // 故意换成"不判阵营"的策略：敌人普攻也该涨点（证明是策略在管，不是引擎）
+        // Deliberately swap in a policy that does not check the camp: an enemy basic attack should gain a
+        // point too (proving the policy is in charge, not the engine)
         battle.skillPointPolicy = new StandardSkillPointPolicy() {
             @Override
             public boolean onSkillCast(CanHit user, Skill skill) {
@@ -196,11 +204,11 @@ public class SkillPointPolicyExtensibilityTest {
         Assertions.assertTrue(actWithRealTurn(battle, enemy,
                 () -> new DefaultSkill(1003, 1, 1), () -> List.of(battle.characters.getFirst())));
         Assertions.assertEquals(before + 1, battle.getSkillPoints(),
-                "换成不判阵营的策略后，敌方普攻也会涨点 → 说明阵营判断在策略里，不在 Battle 里");
+                "with a policy that does not check the camp, an enemy basic attack gains a point too → so the camp judgement lives in the policy, not in Battle");
     }
 
     // ==================================================================
-    // 辅助
+    // helpers
     // ==================================================================
 
     private static Skill skill(Character hero, int slot) {
@@ -234,7 +242,7 @@ public class SkillPointPolicyExtensibilityTest {
             }
             battle.afterMove();
         }
-        Assertions.fail("30 步内没轮到 " + actor.getName() + " 的回合");
+        Assertions.fail("the turn of " + actor.getName() + " did not come up within 30 steps");
         return false;
     }
 

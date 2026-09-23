@@ -5,44 +5,47 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * 命途（P5-1）。命途决定**基础仇恨值**，进而决定敌人单体/扩散攻击选中该角色的概率。
+ * Path (命途) (P5-1). The Path determines the **base aggro value**, and thereby the
+ * probability that a single-target / blast enemy attack selects that character.
  *
- * <p>仇恨值是"权重的绝对值"，不是百分比：受击概率 = {@code 该角色仇恨 / 全队总仇恨}。
- * 官方档位（<b>已用 {@code character_data.json} 的 {@code aggro} 列全量核对过</b>，
- * 93 个角色里每个档位都对得上）：
+ * <p>Aggro is "an absolute weight", not a percentage: hit probability =
+ * {@code that character's aggro / the whole team's total aggro}.
+ * The official tiers (<b>fully verified against the {@code aggro} column of
+ * {@code character_data.json}</b>, every tier matches for all 93 characters):
  *
  * <pre>
  *   protection（存护）  150
  *   destruction（毁灭） 125
- *   其余命途            100
- *   single（巡猎）/ all（智识） 75   ← 比常规还低，别当成 100
+ *   all other Paths     100
+ *   single（巡猎）/ all（智识） 75   ← lower than the standard tier, do not treat it as 100
  * </pre>
  *
- * <p>{@code mt} 是 {@code character_data.json} 里的原始字符串，全部取值只有 9 个：
- * {@code all / debuff / destruction / elation / healing / help / memory / protection / single}。
- * 未列出的值一律落到 {@link #OTHER}（= 100），不做 fail fast —— 数据加新命途时应该降级而不是炸。
+ * <p>{@code mt} is the raw string from {@code character_data.json}; it has only 9 possible
+ * values: {@code all / debuff / destruction / elation / healing / help / memory / protection / single}.
+ * Any unlisted value falls through to {@link #OTHER} (= 100) with no fail fast — when the data
+ * gains a new Path it should degrade rather than blow up.
  */
 @Getter
 public enum Path {
-    /** 存护：仇恨 150。 */
+    /** Preservation: aggro 150. */
     PRESERVATION("protection", 150),
-    /** 毁灭：仇恨 125。 */
+    /** Destruction: aggro 125. */
     DESTRUCTION("destruction", 125),
-    /** 巡猎：仇恨 75（比常规低）。 */
+    /** Hunt: aggro 75 (lower than the standard tier). */
     HUNT("single", 75),
-    /** 智识：仇恨 75。 */
+    /** Erudition: aggro 75. */
     ERUDITION("all", 75),
-    /** 同谐：仇恨 100。 */
+    /** Harmony: aggro 100. */
     HARMONY("help", 100),
-    /** 虚无：仇恨 100。 */
+    /** Nihility: aggro 100. */
     NIHILITY("debuff", 100),
-    /** 丰饶：仇恨 100。 */
+    /** Abundance: aggro 100. */
     ABUNDANCE("healing", 100),
-    /** 欢愉：仇恨 100。 */
+    /** Elation: aggro 100. */
     ELATION("elation", 100),
-    /** 记忆：仇恨 100。 */
+    /** Remembrance: aggro 100. */
     REMEMBRANCE("memory", 100),
-    /** 未知/缺失命途的兜底：仇恨 100。 */
+    /** Fallback for an unknown / missing Path: aggro 100. */
     OTHER("", 100);
 
     private static final Map<String, Path> BY_MT = Map.ofEntries(
@@ -57,11 +60,11 @@ public enum Path {
             Map.entry("memory", REMEMBRANCE));
 
     /**
-     * 数据侧的原始命途字符串（{@code character_data.json} 的 {@code mt}）。
+     * The raw Path string on the data side (the {@code mt} of {@code character_data.json}).
      */
     private final String mt;
     /**
-     * 基础仇恨值。
+     * Base aggro value.
      */
     private final int aggro;
 
@@ -71,20 +74,21 @@ public enum Path {
     }
 
     /**
-     * 按数据侧的 {@code mt} 查命途（大小写敏感，取值见类注释）。
+     * Look up a Path by the data side's {@code mt} (case sensitive; values are in the class
+     * comment).
      *
-     * @param mt 命途字符串；{@code null} 或未收录 → {@link #OTHER}
-     * @return 命途（永不返回 {@code null}）
+     * @param mt the Path string; {@code null} or unlisted → {@link #OTHER}
+     * @return the Path (never {@code null})
      */
     public static Path fromMt(String mt) {
         return mt == null ? OTHER : BY_MT.getOrDefault(mt, OTHER);
     }
 
     /**
-     * 按中文名查命途（给"存护/毁灭"这类人工输入用）。
+     * Look up a Path by its Chinese name (for manual input such as "存护/毁灭").
      *
-     * @param name 中文命途名；未收录 → {@link #OTHER}
-     * @return 命途（永不返回 {@code null}）
+     * @param name the Chinese Path name; unlisted → {@link #OTHER}
+     * @return the Path (never {@code null})
      */
     public static Path fromName(String name) {
         return switch (name == null ? "" : name) {

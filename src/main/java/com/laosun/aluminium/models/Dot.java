@@ -4,40 +4,44 @@ import com.laosun.aluminium.enums.DamageElement;
 import lombok.Getter;
 
 /**
- * 击破附带的持续伤害（P4-5）：灼烧（火）/ 触电（雷）/ 裂伤（物理）/ 风化（风）。
+ * Damage over time attached to a weakness break (P4-5): burn (Fire) / shock (Lightning) /
+ * bleed (Physical) / wind shear (Wind).
  *
- * <p>独立于 Buff 体系的最简单形态——只管"每回合扣多少、还剩几回合"，
- * 每回合开始由 {@code Battle.tickDots(Enemy)} 按**施加顺序**结算（HSR.md §7「先上先结算」）。
+ * <p>The simplest form, independent of the Buff system — it only tracks "how much is deducted each
+ * turn, how many turns are left"; at the start of each turn {@code Battle.tickDots(Enemy)} settles
+ * it in **application order** (HSR.md §7 "first applied, first settled").
  *
- * <p>DOT 伤害走完整乘区（吃增伤、吃防御/抗性/易伤），但**不可暴击**
- * ——由 {@link com.laosun.aluminium.enums.DamageType#DOT} 自己的
- * {@code (crittable=false, boostable=true)} 表达，不需要在这里判。
+ * <p>DOT damage goes through the full zone set (it takes DMG boost, DEF / RES / vulnerability),
+ * but it **cannot crit** — expressed by
+ * {@link com.laosun.aluminium.enums.DamageType#DOT}'s own
+ * {@code (crittable=false, boostable=true)}, so there is no need to test for it here.
  */
 @Getter
 public class Dot {
 
     /**
-     * 施加者（{@code Damage} 的 attacker 不允许为 null，所以必须记来源）。
+     * The applier ({@code Damage}'s attacker is not allowed to be null, so the source MUST be recorded).
      */
     private final CanHit source;
     /**
-     * 持续伤害元素：火 / 雷 / 物理 / 风（冰=冻结、量子=纠缠、虚数=禁锢，P10-1 统一成表）。
+     * DoT element: Fire / Lightning / Physical / Wind (Ice = freeze, Quantum = entanglement,
+     * Imaginary = imprisonment, unified into a table in P10-1).
      */
     private final DamageElement element;
     /**
-     * 每次结算的基础伤害（击破基数 × {@code Constant.DOT_RATIO}）。
+     * Base damage per settlement (break base × {@code Constant.DOT_RATIO}).
      */
     private final double baseDamage;
     /**
-     * 剩余结算次数。
+     * Remaining number of settlements.
      */
     private int remainingTurns;
 
     /**
-     * @param source         施加者
-     * @param element        持续伤害元素
-     * @param baseDamage     每次结算的基础伤害（还没过乘区）
-     * @param remainingTurns 还能结算几次
+     * @param source         the applier
+     * @param element        the DoT element
+     * @param baseDamage     base damage per settlement (has not been through the zones yet)
+     * @param remainingTurns how many more times it can settle
      */
     public Dot(CanHit source, DamageElement element, double baseDamage, int remainingTurns) {
         this.source = source;
@@ -47,9 +51,9 @@ public class Dot {
     }
 
     /**
-     * 结算一次（由 {@code Battle.tickDots} 在扣完血后调用）。
+     * Settles once (called by {@code Battle.tickDots} after the HP deduction is done).
      *
-     * @return {@code true} = 这是最后一次，调用方应把它从目标身上移除
+     * @return {@code true} = this was the last one, the caller should remove it from the target
      */
     public boolean tick() {
         remainingTurns--;

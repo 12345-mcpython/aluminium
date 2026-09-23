@@ -16,18 +16,20 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * P8-1 验收：{@code CharacterFactory} + 角色身份字段补全。
+ * P8-1 acceptance: {@code CharacterFactory} + completion of the character identity fields.
  *
- * <p>本项**不做技能装配**（那是 P8-2），所以这里断言的是：元素 / 命途 / 仇恨 / 能量上限 /
- * 等级 / 面板缩放 —— 也就是"一个角色的身份与数值"，不含机制。
+ * <p>This item **does not do skill assembly** (that is P8-2), so what is asserted here is:
+ * element / path / aggro / energy cap / level / panel scaling — that is, "a character's identity
+ * and numbers", without mechanics.
  *
- * <p>选人原则：5 人是 P8-5 的目标队伍 + 存护，覆盖 8 种元素中的 5 种、5 种命途、
- * 4 档仇恨、4 档能量；另有 3 个**数据边界**角色（null / 12 / 9 能量）只做能量断言。
+ * <p>Character selection principle: the 5 are the P8-5 target team + Preservation, covering 5 of
+ * the 8 elements, 5 paths, 4 aggro tiers, 4 energy tiers; plus 3 **data boundary** characters
+ * (null / 12 / 9 energy) that only get energy assertions.
  */
 public class CharacterFactoryTest {
 
     // ==================================================================
-    // 主验收：景元
+    // Main acceptance: Jing Yuan
     // ==================================================================
 
     @Test
@@ -43,14 +45,15 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * 所有角色都能读到星级，且取值只有 4 / 5（P8-2 的前置）。
+     * Every character's star rating can be read, and the only values are 4 / 5 (a prerequisite of P8-2).
      *
-     * <p>{@code rarity} 是 generator 从 {@code AvatarConfig.Rarity}
-     * （形如 {@code CombatPowerAvatarRarityType5}）取末位数字得来的，
-     * 数据里是 **23 个 4★ + 70 个 5★**（与 docs 的 index 表一致）。
+     * <p>{@code rarity} is obtained by the generator from the last digit of
+     * {@code AvatarConfig.Rarity} (of the form {@code CombatPowerAvatarRarityType5}); in the data it
+     * is **23 four-stars + 70 five-stars** (consistent with the docs' index table).
      *
-     * <p>为什么现在就钉住：**P8-2 的技能等级上限按星级不同**（技能装配前必须先能读到它），
-     * 而 {@code CharacterData} 这个 record 一旦漏了字段，Gson 会静默给 0 —— 不报错、只是全错。
+     * <p>Why pin it down now: **in P8-2 the skill level cap differs by star rating** (it must be
+     * readable before skill assembly), and if the {@code CharacterData} record is missing a field,
+     * Gson silently gives 0 — no error, just everything wrong.
      */
     @Test
     public void everyCharacterHasAStarRating() {
@@ -59,28 +62,31 @@ public class CharacterFactoryTest {
                         CharacterData::rarity, java.util.stream.Collectors.counting()));
 
         Assertions.assertEquals(Set.of(4, 5), distribution.keySet(),
-                "星级只该有 4 与 5，实际 " + distribution);
-        Assertions.assertEquals(23L, distribution.get(4), "4★ 数量");
-        Assertions.assertEquals(70L, distribution.get(5), "5★ 数量");
+                "the star rating should only be 4 and 5, actually " + distribution);
+        Assertions.assertEquals(23L, distribution.get(4), "number of 4★");
+        Assertions.assertEquals(70L, distribution.get(5), "number of 5★");
 
-        Assertions.assertEquals(5, CharacterFactory.data(1204).rarity(), "景元是 5★");
-        Assertions.assertEquals(4, CharacterFactory.data(1001).rarity(), "三月七是 4★");
+        Assertions.assertEquals(5, CharacterFactory.data(1204).rarity(), "Jing Yuan is 5★");
+        Assertions.assertEquals(4, CharacterFactory.data(1001).rarity(), "March 7th is 4★");
     }
 
     /**
-     * 面板缩放核对：{@code 最终面板 = 数据基础值 × calcCharacterRate(80, true)}，
-     * **再叠加 {@code point.json} 的行迹加成**（后者在 {@code build()} 里无条件应用）。
+     * Panel scaling check: {@code final panel = data base value × calcCharacterRate(80, true)},
+     * **then plus the trace bonuses from {@code point.json}** (the latter applied unconditionally in
+     * {@code build()}).
      *
      * <pre>
-     *   景元的行迹：攻击 4+4+6+6+8 = 28%、防御 5+7.5 = 12.5%，没有生命行迹
-     *   攻击 95.04  × 7.35 × 1.28   = 894.13632
-     *   防御 66     × 7.35 × 1.125  = 545.7375
-     *   生命 158.4  × 7.35          = 1164.24
+     *   Jing Yuan's traces: attack 4+4+6+6+8 = 28%, defence 5+7.5 = 12.5%, no HP trace
+     *   attack  95.04  × 7.35 × 1.28   = 894.13632
+     *   defence 66     × 7.35 × 1.125  = 545.7375
+     *   HP      158.4  × 7.35          = 1164.24
      * </pre>
      *
-     * <p>⚠ 我第一版把攻击/防御直接断言成 {@code 数据 × 倍率}、**漏了行迹**，失败值
-     * 894.136 / 545.7375 看起来像"属性数组索引错位"，害我误诊了一轮。
-     * 这里改成从 {@code SkillPoint.sumAttributes} 显式把行迹算进去 —— 测试自己会解释那 28%/12.5%。
+     * <p>⚠ My first version asserted attack / defence directly as {@code data × multiplier} and
+     * **missed the traces**; the failure values 894.136 / 545.7375 looked like "attribute array
+     * index misalignment", which sent me down a wrong diagnosis for one round.
+     * Here it was changed to explicitly include the traces via {@code SkillPoint.sumAttributes} —
+     * the test explains that 28% / 12.5% by itself.
      */
     @Test
     public void panelIsScaledFromTheData() {
@@ -91,64 +97,71 @@ public class CharacterFactoryTest {
 
         double traceAttack = traces.getOrDefault(AttributeType.ATTACK_PERCENT, 0.0);
         double traceDefence = traces.getOrDefault(AttributeType.DEFENCE_PERCENT, 0.0);
-        Assertions.assertEquals(0.28, traceAttack, 1e-9, "景元的攻击行迹合计 28%");
-        Assertions.assertEquals(0.125, traceDefence, 1e-9, "景元的防御行迹合计 12.5%");
+        Assertions.assertEquals(0.28, traceAttack, 1e-9, "Jing Yuan's attack traces total 28%");
+        Assertions.assertEquals(0.125, traceDefence, 1e-9, "Jing Yuan's defence traces total 12.5%");
 
         Assertions.assertEquals(data.health() * rate,
                 jingYuan.getAttribute(AttributeType.HEALTH).get(), 1e-3,
-                "他没有生命行迹");
+                "he has no HP trace");
         Assertions.assertEquals(data.attack() * rate * (1 + traceAttack),
                 jingYuan.getAttribute(AttributeType.ATTACK).get(), 1e-3);
         Assertions.assertEquals(data.defence() * rate * (1 + traceDefence),
                 jingYuan.getAttribute(AttributeType.DEFENCE).get(), 1e-3);
-        // 速度不吃等级缩放，也没有速度行迹
+        // speed does not take level scaling, and there is no speed trace
         Assertions.assertEquals(data.speed(),
                 jingYuan.getAttribute(AttributeType.SPEED).get(), 1e-9);
         Assertions.assertEquals(1164.24, jingYuan.getAttribute(AttributeType.HEALTH).get(), 1e-3,
-                "景元 Lv80 满晋阶生命（游戏内值）");
+                "Jing Yuan Lv80 fully ascended HP (in-game value)");
     }
 
     /**
-     * 晋阶倍率只保证 **Lv1 与 Lv80 两个锚点**，中间档位是**线性近似**，不是游戏值。
+     * The ascension multiplier only guarantees **the two anchors Lv1 and Lv80**; the intermediate
+     * tiers are a **linear approximation**, not game values.
      *
-     * <p>实测 {@code calcCharacterRate}：Lv20 → 2.35、Lv40 → 4.15、Lv70 → **6.85**；
-     * 而 docs 的「面板成长」表里晋阶 2/40 是 {@code 285.12 / 158.4 = 1.80}、
-     * 晋阶 5/70 是 {@code 475.2 / 158.4 = 3.00}（即 1 + 等级档 × 0.4）。
-     * 所以**不要**拿中间档位去对拍游戏面板 —— 公式只是首尾对得上（这与 ROADMAP P1-4
-     * 记的"模拟器倍率公式"一致：那本来就是近似）。
+     * <p>Measured {@code calcCharacterRate}: Lv20 → 2.35, Lv40 → 4.15, Lv70 → **6.85**;
+     * whereas in the docs' "panel growth" table, ascension 2/40 is
+     * {@code 285.12 / 158.4 = 1.80} and ascension 5/70 is {@code 475.2 / 158.4 = 3.00}
+     * (that is, 1 + level tier × 0.4).
+     * So **do not** use the intermediate tiers to cross-check against the game panel — the formula
+     * only lines up at the two ends (this is consistent with the "simulator multiplier formula"
+     * recorded in ROADMAP P1-4: it was an approximation to begin with).
      *
-     * <p>这条把"哪些锚点是可信的"写进测试，免得下次又有人（包括我）拿 Lv70 去断言 475.2。
+     * <p>This one writes "which anchors are trustworthy" into the test, so that next time nobody
+     * (including me) asserts 475.2 at Lv70 again.
      */
     @Test
     public void onlyTheLevel1AndLevel80AnchorsMatchTheGameTable() {
-        // 可信锚点 1：Lv1 未晋阶 = 基础值
+        // Trustworthy anchor 1: Lv1 unascended = base value
         Assertions.assertEquals(1.0, LevelPromotionCalc.calcCharacterRate(1, false), 1e-9);
         Assertions.assertEquals(158.4,
                 158.4 * LevelPromotionCalc.calcCharacterRate(1, false), 1e-9);
 
-        // 可信锚点 2：Lv80 已晋阶 = ×7.35（景元满级 1164.24 / 三月七 1058.4）
+        // Trustworthy anchor 2: Lv80 ascended = ×7.35 (Jing Yuan max level 1164.24 / March 7th 1058.4)
         Assertions.assertEquals(7.35, LevelPromotionCalc.calcCharacterRate(80, true), 1e-9);
         Assertions.assertEquals(1164.24,
                 158.4 * LevelPromotionCalc.calcCharacterRate(80, true), 1e-3);
         Assertions.assertEquals(1058.4,
                 144.0 * LevelPromotionCalc.calcCharacterRate(80, true), 1e-3);
 
-        // 中间档位：记录当前公式值，**并显式记录它与游戏表的差异**
+        // Intermediate tiers: record the current formula value, **and explicitly record its difference from the game table**
         Assertions.assertEquals(6.85, LevelPromotionCalc.calcCharacterRate(70, true), 1e-9);
         Assertions.assertNotEquals(475.2 / 158.4,
                 LevelPromotionCalc.calcCharacterRate(70, true), 1e-6,
-                "Lv70 是线性近似的偏差档位，不是游戏值（游戏表是 3.00 倍）");
+                "Lv70 is a deviating tier of the linear approximation, not a game value (the game table is 3.00×)");
     }
 
     /**
-     * P8-1 修掉的一个潜伏 bug：低等级配"已晋阶"曾算出**负晋阶**。
+     * A latent bug fixed in P8-1: a low level combined with "ascended" once produced a
+     * **negative ascension**.
      *
-     * <p>原来 Lv1 + {@code promotion=true} 得到 {@code promoteCount = 1/10 - 1 = -1}，
-     * 倍率 0.6 —— 于是"已晋阶"反而把 1 级面板压到 6 折（景元生命 158.4 → 95.04）。
-     * 而 95.04 恰好是他**攻击**的数值，所以这个 bug 看起来像"属性数组索引错位"，
-     * 极容易误诊（我一开始就误诊了）。
+     * <p>Originally Lv1 + {@code promotion=true} gave {@code promoteCount = 1/10 - 1 = -1}, a
+     * multiplier of 0.6 — so "ascended" actually pushed the level-1 panel down to 60% (Jing Yuan's
+     * HP 158.4 → 95.04).
+     * And 95.04 happens to be his **attack** value, so this bug looked like "attribute array index
+     * misalignment" and was extremely easy to misdiagnose (I misdiagnosed it at first myself).
      *
-     * <p>1 级角色不可能有负晋阶，所以下界是 0，Lv1 倍率必须恰好是 1.0。
+     * <p>A level-1 character cannot have a negative ascension, so the lower bound is 0, and the Lv1
+     * multiplier must be exactly 1.0.
      */
     @Test
     public void lowLevelsNeverGetNegativePromotion() {
@@ -156,15 +169,16 @@ public class CharacterFactoryTest {
         Assertions.assertEquals(1.0, LevelPromotionCalc.calcCharacterRate(1, false), 1e-9);
         for (int level = 1; level <= 80; level++) {
             Assertions.assertTrue(LevelPromotionCalc.calcCharacterRate(level, true) >= 1.0,
-                    "Lv" + level + " 已晋阶的倍率不该小于 1");
+                    "Lv" + level + " ascended multiplier should not be less than 1");
             Assertions.assertTrue(LevelPromotionCalc.calcCharacterRate(level, true)
                             >= LevelPromotionCalc.calcCharacterRate(level, false),
-                    "Lv" + level + "：已晋阶的面板不该低于未晋阶");
+                    "Lv" + level + ": the ascended panel should not be lower than the unascended one");
         }
     }
 
     /**
-     * 未晋阶的面板**不高于**已晋阶（Lv70 下确实更低 —— Lv80 两者相同，见上一条）。
+     * The unascended panel is **never higher than** the ascended one (at Lv70 it really is lower —
+     * at Lv80 the two are the same, see the test above).
      */
     @Test
     public void unpromotedPanelIsNeverHigher() {
@@ -175,7 +189,7 @@ public class CharacterFactoryTest {
 
         Assertions.assertTrue(promoted.getAttribute(AttributeType.HEALTH).get()
                         > unpromoted.getAttribute(AttributeType.HEALTH).get(),
-                "Lv70 已晋阶的面板应当更高");
+                "the Lv70 ascended panel should be higher");
         Assertions.assertEquals(CharacterFactory.data(1204).health() * promotedRate,
                 promoted.getAttribute(AttributeType.HEALTH).get(), 1e-3);
         Assertions.assertEquals(CharacterFactory.data(1204).health() * unpromotedRate,
@@ -183,13 +197,15 @@ public class CharacterFactoryTest {
     }
 
     // ==================================================================
-    // 字段覆盖：元素 / 命途 / 仇恨 / 能量
+    // Field coverage: element / path / aggro / energy
     // ==================================================================
 
     /**
-     * 5 个真实角色的身份字段全表核对（值直接取自 {@code character_data.json}）。
+     * Full-table check of the identity fields of 5 real characters (values taken directly from
+     * {@code character_data.json}).
      *
-     * <p>故意让这 5 人的元素、命途、仇恨、能量**两两不同**，一个测试覆盖多档。
+     * <p>The element, path, aggro and energy of these 5 are deliberately made **pairwise different**,
+     * so one test covers several tiers.
      */
     @Test
     public void identityFieldsMatchTheDataForTheTargetTeam() {
@@ -201,12 +217,12 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * 元素解析必须**大小写不敏感**：{@code character_data.attribute} 是全小写
-     * （{@code "thunder"}），而 {@code skills.json} 的 {@code element} 是首字母大写
-     * （{@code "Thunder"}）。同一份数据里两种写法都存在。
+     * Element parsing must be **case-insensitive**: {@code character_data.attribute} is all
+     * lowercase ({@code "thunder"}), whereas the {@code element} of {@code skills.json} is
+     * capitalized ({@code "Thunder"}). Both spellings exist in the same data set.
      *
-     * <p>修之前 {@code fromString} 是精确匹配，全小写输入会**静默返回 null** ——
-     * 元素字段就成了 null，而不是报错。
+     * <p>Before the fix {@code fromString} was an exact match, so all-lowercase input
+     * **silently returned null** — the element field became null instead of raising an error.
      */
     @Test
     public void elementParsingIsCaseInsensitive() {
@@ -214,11 +230,11 @@ public class CharacterFactoryTest {
         Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("thunder"));
         Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("THUNDER"));
         Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("  thunder  "),
-                "首尾空白应当被忽略");
+                "leading and trailing whitespace should be ignored");
         Assertions.assertEquals(DamageElement.QUANTUM, DamageElement.fromString("Quantum"));
         Assertions.assertEquals(DamageElement.QUANTUM, DamageElement.fromString("quantum"));
 
-        // 非伤害技能在数据里写 "Unknown" → 必须仍然是 null，不能变成某个元素
+        // Non-damaging skills are written "Unknown" in the data → must still be null, not become some element
         Assertions.assertNull(DamageElement.fromString("Unknown"));
         Assertions.assertNull(DamageElement.fromString("unknown"));
         Assertions.assertNull(DamageElement.fromString(""));
@@ -227,41 +243,41 @@ public class CharacterFactoryTest {
 
     @Test
     public void identityFieldsAreCaseInsensitivelyParsedForEveryCharacter() {
-        // 全部 93 个角色的 attribute 都应当能解析出元素（数据里只有 7 种元素，全都存在）
+        // All 93 characters' attribute should parse to an element (only 7 elements exist in the data, all present)
         com.laosun.aluminium.Constant.CHARACTERS.forEach((cid, data) -> {
             DamageElement element = DamageElement.fromString(data.attribute());
             Assertions.assertNotNull(element,
-                    "角色 " + cid + " 的 attribute=" + data.attribute() + " 解析不出元素");
+                    "character " + cid + "'s attribute=" + data.attribute() + " does not parse to an element");
         });
     }
 
     // ==================================================================
-    // 能量边界（P3-0 A 表点名的三个）
+    // Energy boundaries (the three named by the P3-0 A table)
     // ==================================================================
 
     /**
-     * 能量上限的三个数据边界：
+     * The three data boundaries of the energy cap:
      * <ul>
-     *   <li>1407 遐蝶 —— 全数据里唯一的 {@code null}。**必须保持 0（无能量条）**，
-     *       兜底成 100 会凭空给她造出一条能量条；</li>
-     *   <li>1220 飞霄 —— 12（终结技只耗 6）；</li>
-     *   <li>1308 黄泉 —— 9（实际走"层数替代能量条"，见 P8-8）。</li>
+     *   <li>1407 遐蝶 — the only {@code null} in the whole data set. **Must stay 0 (no energy bar)**;
+     *       falling back to 100 would conjure an energy bar for her out of nothing;</li>
+     *   <li>1220 Feixiao — 12 (the ultimate only costs 6);</li>
+     *   <li>1308 Acheron — 9 (actually uses "stacks in place of an energy bar", see P8-8).</li>
      * </ul>
      */
     @Test
     public void energyEdgeCasesAreKeptFaithfully() {
-        Assertions.assertNull(CharacterFactory.data(1407).maxEnergy(), "遐蝶的能量确实是 null");
+        Assertions.assertNull(CharacterFactory.data(1407).maxEnergy(), "Castorice's energy really is null");
         Assertions.assertEquals(0, CharacterFactory.create(1407, 80).getMaxEnergy(), 1e-9,
-                "null 必须落成 0 = 没有能量条，不能兜底成 100");
+                "null must land as 0 = no energy bar; it must not fall back to 100");
         Assertions.assertFalse(CharacterFactory.create(1407, 80).hasEnergyBar(),
-                "遐蝶没有能量条");
+                "Castorice has no energy bar");
 
         Assertions.assertEquals(12, CharacterFactory.create(1220, 80).getMaxEnergy(), 1e-9);
         Assertions.assertEquals(9, CharacterFactory.create(1308, 80).getMaxEnergy(), 1e-9);
     }
 
     /**
-     * 有能量条的角色：{@code hasEnergyBar()} 为真、初始能量为 0。
+     * Characters that have an energy bar: {@code hasEnergyBar()} is true and the starting energy is 0.
      */
     @Test
     public void charactersWithEnergyHaveAnEnergyBar() {
@@ -269,15 +285,15 @@ public class CharacterFactoryTest {
 
         Assertions.assertTrue(jingYuan.hasEnergyBar());
         Assertions.assertEquals(0, jingYuan.getCurrentEnergy(), 1e-9);
-        Assertions.assertFalse(jingYuan.isEnergyFull(), "开局不该是满能量");
+        Assertions.assertFalse(jingYuan.isEnergyFull(), "should not start at full energy");
     }
 
     // ==================================================================
-    // 中间入场 / 老入口
+    // Mid-battle entry / legacy entry point
     // ==================================================================
 
     /**
-     * 等级不同 → 面板不同（1 级与 80 级）。
+     * Different level → different panel (level 1 and level 80).
      */
     @Test
     public void levelChangesThePanel() {
@@ -289,26 +305,27 @@ public class CharacterFactoryTest {
                 > low.getAttribute(AttributeType.HEALTH).get());
         Assertions.assertEquals(CharacterFactory.data(1204).health(),
                 low.getAttribute(AttributeType.HEALTH).get(), 1e-3,
-                "Lv1 就是数据基础值（倍率 1.0）");
+                "Lv1 is just the data base value (multiplier 1.0)");
     }
 
     /**
-     * 老的占位入口仍然可用，但**没有**元素（如实反映"这不是角色"）。
+     * The legacy placeholder entry point still works, but has **no** element (faithfully reflecting
+     * "this is not a character").
      *
-     * <p>这条同时说明为什么 P8 之后新代码不该再用它。
+     * <p>This also explains why new code after P8 should not use it any more.
      */
     @Test
     public void placeholderEntryStillWorksButHasNoIdentity() {
         Character placeholder = Character.fromAttributes("hero", 10_000, 100, 100, 100);
 
         Assertions.assertEquals("hero", placeholder.getName());
-        Assertions.assertNull(placeholder.getElement(), "占位角色没有元素");
-        Assertions.assertEquals(Path.OTHER, placeholder.getPath(), "占位角色命途是兜底值");
-        Assertions.assertEquals(0, placeholder.getMaxEnergy(), 1e-9, "占位角色没有能量条");
+        Assertions.assertNull(placeholder.getElement(), "the placeholder character has no element");
+        Assertions.assertEquals(Path.OTHER, placeholder.getPath(), "the placeholder character's path is the fallback value");
+        Assertions.assertEquals(0, placeholder.getMaxEnergy(), 1e-9, "the placeholder character has no energy bar");
     }
 
     /**
-     * 未知 cid → 自解释的异常；{@code exists} 可以提前问。
+     * Unknown cid → a self-explanatory exception; {@code exists} can be asked in advance.
      */
     @Test
     public void unknownCharacterIsRejected() {
@@ -320,7 +337,7 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * 工厂造出来的角色能直接进战斗（面板 / 元素 / 命途都齐了）。
+     * A character produced by the factory can join a battle directly (panel / element / path all present).
      */
     @Test
     public void factoryCharactersCanJoinABattle() {
@@ -333,9 +350,9 @@ public class CharacterFactoryTest {
                 java.util.List.of(jingYuan, seele), java.util.List.of(enemy), new java.util.Random(0));
         battle.startBattle();
 
-        Assertions.assertEquals(3, battle.queue.size(), "2 名角色 + 1 只怪");
+        Assertions.assertEquals(3, battle.queue.size(), "2 characters + 1 monster");
         Assertions.assertEquals(com.laosun.aluminium.Battle.Status.RUNNING, battle.getStatus());
-        // 仇恨来自数据（景元 75 / 希儿 75），所以受击概率对半
+        // aggro comes from the data (Jing Yuan 75 / Seele 75), so the chance of being hit is even
         Assertions.assertEquals(75, battle.aggroOf(jingYuan));
         Assertions.assertEquals(75, battle.aggroOf(seele));
     }

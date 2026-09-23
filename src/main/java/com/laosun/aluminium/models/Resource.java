@@ -1,56 +1,62 @@
 package com.laosun.aluminium.models;
 
 /**
- * 一个**队伍级**的数值资源：有当前值、最大容量，可选最大可溢出上限。
+ * A **team-level** numeric resource: it has a current value, a maximum capacity, and an optional
+ * maximum overflow allowance.
  *
- * <p><b>为什么要有这个类</b>：战技点（P8-4）和 P8-8 的层数资源
- * （黄泉【残梦】、飞霄【飞黄】、白厄【火种】、昔涟【追忆】、遐蝶【新蕊】…）本质是
- * 同一个东西 —— 一个会被"某个事件"加减、有容量上限、满了要发信号的计数器。
- * 不抽出来的话，每个角色都要在引擎里加一条"因为某个角色"的分支（违反 P8-0 三分法）。
+ * <p><b>Why this class has to exist</b>: skill points (SP) (P8-4) and P8-8's stack resources
+ * (Acheron's 【残梦】, Feixiao's 【飞黄】, Phainon's 【火种】, Cyrene's 【追忆】, Castorice's 【新蕊】…)
+ * are essentially the same thing — a counter that some event adds to or subtracts from, that has a
+ * capacity cap, and that fires a signal when full. Without extracting it, every character would need
+ * a "because of some character" branch inside the engine (violating P8-0's three-way split).
  *
- * <p><b>三个边界（都实测过，不是随手写的）</b>：
+ * <p><b>Three boundaries (all measured in practice, not written off the cuff)</b>:
  * <ol>
- *   <li>常规路径（{@link #gainClamped} / {@link #gain}）**不会超过 {@link #getMax()}**；</li>
- *   <li>溢出是**显式且封顶**的：只有 {@link #setMaxOverflow} 配了上限之后，
- *       {@link #gain} 才会把值存到 {@code max} 之上，且封在 {@code max + maxOverflow}。
- *       ⚠ 默认 {@code maxOverflow == 0}，所以"不小心用 gain 就溢出"是不可能的；</li>
- *   <li>{@link #setValue} 是**无保护的原始写入**（向下夹到 0，向上夹到 {@code max + maxOverflow}），
- *       给"存档恢复 / 调试"用 —— 常规玩法请走 gain/spend。</li>
+ *   <li>The normal path ({@link #gainClamped} / {@link #gain}) **never exceeds {@link #getMax()}**;</li>
+ *   <li>Overflow is **explicit and capped**: only after {@link #setMaxOverflow} has configured a
+ *       limit will {@link #gain} store the value above {@code max}, and it is capped at
+ *       {@code max + maxOverflow}.
+ *       ⚠ By default {@code maxOverflow == 0}, so "overflowing by accident with gain" is impossible;</li>
+ *   <li>{@link #setValue} is an **unprotected raw write** (clamped down to 0, up to
+ *       {@code max + maxOverflow}), intended for "save restoration / debugging" — normal gameplay
+ *       should go through gain/spend.</li>
  * </ol>
  *
- * <p>为什么需要溢出：游戏里确实有"上限 5 但可以临时存到 10"的机制 ——
- * 花火终结技「恢复 4/6 个战技点，若恢复时战技点溢出，则记录溢出的战技点数，
- * 最多记录 10 点」（见 {@code 1306_花火.md}）。
+ * <p>Why overflow is needed: the game really does have mechanics like "cap is 5 but can temporarily
+ * be stored up to 10" — Sparkle's ultimate 「restores 4/6 skill points; if skill points overflow when
+ * restoring, the overflowed skill point count is recorded, up to 10 points」 (see
+ * {@code 1306_花火.md}).
  *
- * <p><b>线程模型</b>：和 {@code Battle} 一样按单线程使用，不做同步 ——
- * 一场战斗在一个线程里推进。
+ * <p><b>Threading model</b>: like {@code Battle}, used single-threaded, with no synchronization —
+ * one battle is advanced on one thread.
  *
  * @see com.laosun.aluminium.models.skillpoint.SkillPointPolicy
  */
 public class Resource {
 
     /**
-     * 资源标识（如 {@code "skill_point"}），用于日志与将来的 ResourceManager 注册表。
+     * Resource identifier (e.g. {@code "skill_point"}), used for logging and for the future
+     * ResourceManager registry.
      */
     private final String id;
 
     /**
-     * 常规上限。{@link #getValue()} 只有在溢出状态下才会超过它。
+     * The normal cap. {@link #getValue()} only exceeds it while in an overflow state.
      */
     private final int max;
 
     private int value;
 
     /**
-     * 最大可溢出量（默认 0 = 不允许溢出）。见类说明第 2 条。
+     * Maximum overflow amount (default 0 = overflow not allowed). See point 2 of the class docs.
      */
     private int maxOverflow;
 
     /**
-     * @param id       资源标识
-     * @param max      常规上限
-     * @param initial  初始值（会夹到 {@code [0, max]}）
-     * @throws IllegalArgumentException {@code id} 为空，或 {@code max < 0}
+     * @param id       resource identifier
+     * @param max      normal cap
+     * @param initial  initial value (clamped to {@code [0, max]})
+     * @throws IllegalArgumentException {@code id} is blank, or {@code max < 0}
      */
     public Resource(String id, int max, int initial) {
         if (id == null || id.isBlank()) {
@@ -81,21 +87,22 @@ public class Resource {
     }
 
     /**
-     * 当前值离常规上限还差多少（已满或溢出时为 0）。
+     * How far the current value is from the normal cap (0 when full or overflowing).
      */
     public int missingToMax() {
         return Math.max(0, max - value);
     }
 
     /**
-     * 是否达到**常规**上限（溢出时也为 true）。
+     * Whether the **normal** cap has been reached (also true while overflowing).
      */
     public boolean isFull() {
         return value >= max;
     }
 
     /**
-     * 是否已到**绝对**上限（含溢出额度），即"再加也加不进去了"。
+     * Whether the **absolute** cap has been reached (including the overflow allowance), i.e.
+     * "no more can be added at all".
      */
     public boolean isCapped() {
         return value >= absoluteMax();
@@ -106,11 +113,13 @@ public class Resource {
     }
 
     /**
-     * 加值并**夹在常规上限**内（不允许溢出），返回**实际入账**的量。
+     * Adds a value and **clamps it to the normal cap** (overflow not allowed), returning the amount
+     * **actually credited**.
      *
-     * <p>{@code delta <= 0} 时什么都不做（"加负数"是调用方的 bug，静默忽略比抛异常友好）。
+     * <p>When {@code delta <= 0} nothing is done ("adding a negative" is a caller bug; silently
+     * ignoring it is friendlier than throwing).
      *
-     * @return 实际加进去的量（因为封顶而少于 {@code delta} 时更小；可能为 0）
+     * @return the amount actually added (smaller than {@code delta} when capped; may be 0)
      */
     public int gainClamped(int delta) {
         if (delta <= 0) {
@@ -122,12 +131,13 @@ public class Resource {
     }
 
     /**
-     * 加值，**可溢出**到 {@link #getMaxOverflow()} 为止（未配溢出时等价于 {@link #gainClamped}），
-     * 返回**实际入账**的量。
+     * Adds a value, **allowed to overflow** up to {@link #getMaxOverflow()} (equivalent to
+     * {@link #gainClamped} when no overflow is configured), returning the amount **actually credited**.
      *
-     * <p>"溢出"这件事必须由调用方**显式**表达：默认溢出额度是 0，所以这个方法的默认行为
-     * 与 {@link #gainClamped} 完全一致。只有配过溢出额度的资源（例如花火在队伍里时的战技点）
-     * 才可能存到上限之上。
+     * <p>"Overflow" MUST be expressed **explicitly** by the caller: the default overflow allowance is
+     * 0, so this method's default behavior is exactly the same as {@link #gainClamped}. Only a
+     * resource with a configured overflow allowance (for example skill points while Sparkle is on the
+     * team) can ever be stored above its cap.
      */
     public int gain(int delta) {
         if (delta <= 0) {
@@ -139,9 +149,10 @@ public class Resource {
     }
 
     /**
-     * 扣值，不会低于 0，返回**实际扣掉**的量。
+     * Spends a value, never dropping below 0, returning the amount **actually spent**.
      *
-     * @return 实际扣除量；资源为空时是 0（调用方应据此判断"这次消耗没成功"）
+     * @return the amount actually spent; 0 when the resource is empty (the caller should use this to
+     *         decide that "this spend did not succeed")
      */
     public int spend(int delta) {
         if (delta <= 0) {
@@ -153,12 +164,15 @@ public class Resource {
     }
 
     /**
-     * 扣掉指定的值，**不够就一点都不扣**（原子语义）。
+     * Spends exactly the given value, **spending none of it at all if there is not enough** (atomic
+     * semantics).
      *
-     * <p>与 {@link #spend} 的区别在这里：战技点不足时必须是"这次没花出去"，
-     * 而不是"花到 0 为止"。{@link #spend} 是"能扣多少扣多少"，适合 DOT 掉血那类。
+     * <p>This is where it differs from {@link #spend}: when skill points are insufficient it MUST be
+     * "this spend did not go through", not "spend down to 0". {@link #spend} is "spend as much as you
+     * can", which suits things like DOT damage.
      *
-     * @return 是否扣成功（资源不足时 false，且值不变）
+     * @return whether the spend succeeded (false and the value unchanged when the resource is
+     *         insufficient)
      */
     public boolean spendExactly(int delta) {
         if (delta <= 0) {
@@ -172,37 +186,41 @@ public class Resource {
     }
 
     /**
-     * 设置最大溢出额度（{@code overflow < 0} 视为 0）。
+     * Sets the maximum overflow allowance ({@code overflow < 0} is treated as 0).
      *
-     * <p><b>不变式</b>：{@code value ∈ [0, max + maxOverflow]} **永远成立**。
-     * 所以下调额度时，超出新绝对上限的存量会被**夹掉**（例如
-     * {@code max=5, overflow=10, value=15} → 把 overflow 设为 0 → value 变成 5）。
+     * <p><b>Invariant</b>: {@code value ∈ [0, max + maxOverflow]} **always holds**.
+     * So when the allowance is lowered, any stock above the new absolute cap is **clamped away**
+     * (for example {@code max=5, overflow=10, value=15} → set overflow to 0 → value becomes 5).
      *
-     * <p>为什么宁可丢存量也不能让值越界：不变量一旦破了，之后所有
-     * {@code isCapped()} / {@code missingToMax()} / {@code gain()} 的判断全部失准，
-     * 而且**不报错**（第一版就是这样：只改额度不夹值，于是 value 可以停在 15
-     * 而绝对上限是 5，属于静默的非法状态）。
+     * <p>Why lose stock rather than let the value go out of range: once the invariant is broken, all
+     * subsequent {@code isCapped()} / {@code missingToMax()} / {@code gain()} decisions become wrong,
+     * and **silently so** (the first version did exactly that: it changed the allowance without
+     * clamping the value, so value could stay at 15 while the absolute cap was 5 — a silent illegal
+     * state).
      *
-     * <p>现实里这条只会被"战斗中卸下提供溢出额度的 buff"这类情况触发，
-     * 且夹掉是合理的（容量没了，多出来的自然存不住）。
+     * <p>In practice this is only triggered by things like "a buff that provides the overflow
+     * allowance is removed mid-battle", and clamping away is the right answer (the capacity is gone,
+     * so the excess naturally cannot be kept).
      */
     public void setMaxOverflow(int overflow) {
         this.maxOverflow = Math.max(0, overflow);
-        // 重新夹一次，保证不变式不被破坏（含"额度变小"与"额度变大"两个方向）
+        // Re-clamp once to guarantee the invariant is not broken (covering both "allowance shrinks"
+        // and "allowance grows")
         this.value = clamp(this.value);
     }
 
     /**
-     * 原始写入（无保护，只做夹取）：给存档恢复 / 调试用。
+     * Raw write (unprotected, clamping only): for save restoration / debugging.
      *
-     * <p>夹取范围是 {@code [0, max + maxOverflow]}。
+     * <p>The clamping range is {@code [0, max + maxOverflow]}.
      */
     public void setValue(int newValue) {
         this.value = clamp(newValue);
     }
 
     /**
-     * 清空到 0（战斗开始时重置那类操作用；要恢复到初始值请重新构造或 setValue）。
+     * Clears to 0 (for operations like resetting at the start of a battle; to restore the initial
+     * value, reconstruct or use setValue).
      */
     public void clear() {
         this.value = 0;

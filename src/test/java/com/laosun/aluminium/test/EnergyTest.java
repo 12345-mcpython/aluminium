@@ -17,10 +17,12 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 /**
- * P3-1 acceptance: 能量字段 + 唯一入账口 {@code gainEnergy} + 常规 provider 的数值映射。
+ * P3-1 acceptance: the energy field + the single credit entry point {@code gainEnergy} + the
+ * standard provider's numeric mapping.
  *
- * <p>数值口径见 ROADMAP 的 P3-0：普攻 20 / 战技 30 / 终结技 5 / 受击 10 / 击杀 5 / 击破 5；
- * 终结技先清零再回 5（清零在 P3-2 的 {@code castUltra} 里做）。
+ * <p>For the numbers see ROADMAP's P3-0: basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 /
+ * kill 5 / break 5;
+ * the ultimate clears to zero first and then regains 5 (the clear is done in P3-2's {@code castUltra}).
  */
 public class EnergyTest {
     private static final double EPS = 1e-6;
@@ -43,7 +45,7 @@ public class EnergyTest {
 
         double added = c.gainEnergy(EnergyGain.fixed(20));
 
-        Assertions.assertEquals(20, added, EPS, "定值回能不吃回能效率（按上限百分比回能那种）");
+        Assertions.assertEquals(20, added, EPS, "a fixed energy gain does not take energy regeneration rate (the kind that restores a percentage of the cap)");
         Assertions.assertEquals(20, c.getCurrentEnergy(), EPS);
     }
 
@@ -52,19 +54,19 @@ public class EnergyTest {
         Character c = withEnergyBar(100);
         c.setCurrentEnergy(95);
 
-        Assertions.assertEquals(5, c.gainEnergy(20), EPS, "离满只差 5 → 实际入账 5");
+        Assertions.assertEquals(5, c.gainEnergy(20), EPS, "only 5 short of full → 5 actually credited");
         Assertions.assertEquals(100, c.getCurrentEnergy(), EPS);
         Assertions.assertTrue(c.isEnergyFull());
-        Assertions.assertEquals(0, c.gainEnergy(20), EPS, "满了之后再加 = 0");
+        Assertions.assertEquals(0, c.gainEnergy(20), EPS, "adding after full = 0");
         Assertions.assertEquals(100, c.getCurrentEnergy(), EPS);
     }
 
     @Test
     public void entityWithoutEnergyBarNeverGains() {
-        Character c = Character.fromAttributes("no-energy-bar", 1000, 100, 100, 100);   // maxEnergy 默认 0
+        Character c = Character.fromAttributes("no-energy-bar", 1000, 100, 100, 100);   // maxEnergy defaults to 0
 
         Assertions.assertFalse(c.hasEnergyBar());
-        Assertions.assertFalse(c.isEnergyFull(), "没有能量条就没有「满能量」");
+        Assertions.assertFalse(c.isEnergyFull(), "with no energy bar there is no 'full energy'");
         Assertions.assertEquals(0, c.gainEnergy(20), EPS);
         Assertions.assertEquals(0, c.getCurrentEnergy(), EPS);
     }
@@ -84,15 +86,15 @@ public class EnergyTest {
         CanHit user = withEnergyBar(120);
         StandardEnergyProvider provider = new StandardEnergyProvider();
 
-        EnergyGain normal = provider.onSkillCast(user, new DefaultSkill(1001, 1, 1), Set.of());   // 普攻
-        EnergyGain skill = provider.onSkillCast(user, new DefaultSkill(1001, 2, 1), Set.of());    // 战技
-        EnergyGain ultra = provider.onSkillCast(user, new DefaultSkill(1001, 3, 1), Set.of());    // 终结技
-        EnergyGain followUp = provider.onSkillCast(user, new DefaultSkill(1001, 4, 1), Set.of()); // 追加攻击槽
+        EnergyGain normal = provider.onSkillCast(user, new DefaultSkill(1001, 1, 1), Set.of());   // basic attack
+        EnergyGain skill = provider.onSkillCast(user, new DefaultSkill(1001, 2, 1), Set.of());    // skill
+        EnergyGain ultra = provider.onSkillCast(user, new DefaultSkill(1001, 3, 1), Set.of());    // ultimate
+        EnergyGain followUp = provider.onSkillCast(user, new DefaultSkill(1001, 4, 1), Set.of()); // follow-up attack slot
 
         Assertions.assertEquals(20, normal.amount(), EPS);
         Assertions.assertEquals(30, skill.amount(), EPS);
-        Assertions.assertNull(ultra, "终结技不在 onSkillCast 结算（先清零再回 5，见 onUltCast）");
-        Assertions.assertNull(followUp, "追加攻击本阶段不回能（每段值要先落数据，P3-4/P8-3）");
+        Assertions.assertNull(ultra, "the ultimate is not settled in onSkillCast (clear first, then regain 5, see onUltCast)");
+        Assertions.assertNull(followUp, "follow-up attacks grant no energy at this stage (the per-hit value must land in the data first, P3-4/P8-3)");
         Assertions.assertEquals(5, provider.onUltCast(user, new DefaultSkill(1001, 3, 1)).amount(), EPS);
     }
 
@@ -112,7 +114,7 @@ public class EnergyTest {
     public void providerIsPerEntityAndReplaceable() {
         Character c = withEnergyBar(120);
 
-        Assertions.assertInstanceOf(StandardEnergyProvider.class, c.getEnergyProvider(), "默认就是常规档");
+        Assertions.assertInstanceOf(StandardEnergyProvider.class, c.getEnergyProvider(), "the default is the regular tier");
 
         c.setEnergyProvider(new EnergyProvider() {
             @Override
@@ -124,7 +126,7 @@ public class EnergyTest {
 
         Assertions.assertEquals(7, c.getEnergyProvider()
                 .onSkillCast(c, new DefaultSkill(1001, 1, 1), Set.of()).amount(), EPS,
-                "入账口读的是实体自己的 provider，不是写死的常量");
+                "the credit entry point reads the entity's own provider, not a hardcoded constant");
     }
 
     private static Character withEnergyBar(double maxEnergy) {

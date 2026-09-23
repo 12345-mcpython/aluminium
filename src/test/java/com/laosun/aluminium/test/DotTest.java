@@ -21,10 +21,11 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * P4-5 acceptance: 击破 DOT（先上先结算、按回合开始结算、走乘区但不可暴击）。
+ * P4-5 acceptance: break DOT (first applied first settled, settled at the start of the turn, goes
+ * through the zones but cannot crit).
  *
- * <p>锚点：防 100 的靶子、Lv80 攻击者（防御区 = 1000/1100）、无抗性无增伤
- * → 一发 base=500 的 DOT 结算 500 × 1000/1100 ≈ 454.55。
+ * <p>Anchor: a target with 100 defence, an Lv80 attacker (defence zone = 1000/1100), no resistance
+ * and no DMG boost → one DOT with base=500 settles 500 × 1000/1100 ≈ 454.55.
  */
 public class DotTest {
     private static final double EPS = 1e-6;
@@ -39,13 +40,13 @@ public class DotTest {
         double expected = 500 * 1000.0 / (100 + 1000.0);
         double first = battle.tickDots(dummy);
         Assertions.assertEquals(expected, first, 1e-6);
-        Assertions.assertEquals(1, dummy.getDots().size(), "还剩 1 次");
+        Assertions.assertEquals(1, dummy.getDots().size(), "1 settlement left");
 
         double second = battle.tickDots(dummy);
         Assertions.assertEquals(expected, second, 1e-6);
-        Assertions.assertTrue(dummy.getDots().isEmpty(), "结算完最后一次就移除");
+        Assertions.assertTrue(dummy.getDots().isEmpty(), "it is removed once the last settlement is done");
 
-        Assertions.assertEquals(0, battle.tickDots(dummy), EPS, "没有 DOT 了 → 0");
+        Assertions.assertEquals(0, battle.tickDots(dummy), EPS, "no DOTs left → 0");
         Assertions.assertEquals(dummy.getMaxHp() - 2 * expected, dummy.getCurrentHp(), 1e-6);
     }
 
@@ -60,19 +61,19 @@ public class DotTest {
 
         battle.tickDots(recorder);
 
-        Assertions.assertEquals(List.of(DamageElement.THUNDER, DamageElement.FIRE), seen, "先上先结算");
+        Assertions.assertEquals(List.of(DamageElement.THUNDER, DamageElement.FIRE), seen, "first applied, first settled");
     }
 
     @Test
     public void dotIsBoostedButNeverCrits() {
-        Character source = character("source", 1.0);          // 增伤 +100%
+        Character source = character("source", 1.0);          // DMG boost +100%
         Enemy dummy = dummy(100_000, 100, 100);
         Battle battle = new Battle(List.of(source), List.of(dummy), new Random(0));
         dummy.addDot(new Dot(source, DamageElement.FIRE, 500, 1));
 
         double settled = battle.tickDots(dummy);
 
-        Assertions.assertEquals(500 * 2 * 1000.0 / (100 + 1000.0), settled, 1e-6, "DOT 吃增伤");
+        Assertions.assertEquals(500 * 2 * 1000.0 / (100 + 1000.0), settled, 1e-6, "DOT takes DMG boost");
         Assertions.assertFalse(DamageType.DOT.isCrittable());
         Assertions.assertTrue(DamageType.DOT.isBoostable());
     }
@@ -80,11 +81,11 @@ public class DotTest {
     @Test
     public void breakingWithFireAttachesABurn() {
         Character himeko = character("himeko", 0.0);
-        Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);   // 弱火，韧性 60
+        Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);   // weak to Fire, toughness 60
         Battle battle = new Battle(List.of(himeko), List.of(iceEdge), new Random(0));
 
         battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
-        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // 削空 → 击破
+        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // drains it empty → break
 
         Assertions.assertTrue(iceEdge.isBroken());
         Assertions.assertEquals(1, iceEdge.getDots().size());
@@ -99,7 +100,7 @@ public class DotTest {
     public void breakingWithAFrozenElementAttachesNoDot() {
         Character mar7th = character("mar7th", 0.0);
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
-        iceEdge.setStanceWeak(Set.of(DamageElement.ICE));      // 临时改成弱冰，好让冰属性打出击破
+        iceEdge.setStanceWeak(Set.of(DamageElement.ICE));      // temporarily made Ice-weak, so that the Ice element can break it
         Battle battle = new Battle(List.of(mar7th), List.of(iceEdge), new Random(0));
 
         for (int i = 0; i < 2; i++) {
@@ -108,13 +109,13 @@ public class DotTest {
 
         Assertions.assertTrue(iceEdge.isBroken());
         Assertions.assertEquals(DamageElement.ICE, iceEdge.getBrokenElement());
-        Assertions.assertTrue(iceEdge.getDots().isEmpty(), "冰=冻结，不是 DOT");
+        Assertions.assertTrue(iceEdge.getDots().isEmpty(), "Ice = freeze, not a DOT");
     }
 
     @Test
     public void dotTicksThroughBattleWhenTheEnemyTurnStarts() {
-        Character hero = character("hero", 0.0);                        // 速度 100 → 周期 100
-        Enemy fast = dummy(100_000, 100, 200);                          // 速度 200 → 周期 50，先动
+        Character hero = character("hero", 0.0);                        // speed 100 → period 100
+        Enemy fast = dummy(100_000, 100, 200);                          // speed 200 → period 50, acts first
         Battle battle = new Battle(List.of(hero), List.of(fast), new Random(0));
         fast.addDot(new Dot(hero, DamageElement.FIRE, 500, 2));
 
@@ -123,7 +124,7 @@ public class DotTest {
         battle.beforeMove();
 
         Assertions.assertEquals(100_000 - 500 * 1000.0 / 1100.0, fast.getCurrentHp(), 1e-6,
-                "敌人回合开始时 DOT 自动结算");
+                "the DOT settles automatically at the start of the enemy's turn");
     }
 
     private static Character character(String name, double boost) {
@@ -136,7 +137,7 @@ public class DotTest {
         return Enemy.fromAttributes("dummy", hp, defence, 100, speed);
     }
 
-    /** 记录 onDamage 收到的元素顺序，用来断言"先上先结算"。 */
+    /** Records the order of elements received by onDamage, used to assert "first applied, first settled". */
     private static Enemy recorder(double hp, double defence, double speed, List<DamageElement> seen) {
         AttributeBuilder builder = new AttributeBuilder();
         builder.setBase(AttributeType.HEALTH, hp)

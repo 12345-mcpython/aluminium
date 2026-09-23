@@ -6,14 +6,17 @@ import com.google.gson.annotations.SerializedName;
  * Level-based enemy scaling, deserialized from {@code hard_level_group.json}:
  * {@code {组号: {等级: {attack, defence, health, speed, stance, effect_hit_rate, effect_resistance}}}}.
  *
- * <p>⚠ 前五项是<b>乘区系数</b>（乘在模板基础值上）；后两项是<b>加值</b>——{@code effect_resistance}
- * 与模板的 {@code effect_resistance} <b>相加</b>：冰锋 0.2 + 组1·Lv90 的 0.1 = 0.3（30%），
- * 对上 HSR.md §1.2「90 级 30%~40%」；若当成系数相乘会得到 0.02（错）。
+ * <p>⚠ The first five entries are <b>zone multipliers</b> (multiplied onto the template's base
+ * values); the last two are <b>additive values</b> — {@code effect_resistance} is <b>added</b> to the
+ * template's {@code effect_resistance}: Ice Edge (冰锋) 0.2 + group 1·Lv90's 0.1 = 0.3 (30%), which
+ * matches HSR.md §1.2 "30%~40% at level 90"; if you mistakenly treat it as a multiplier, you get
+ * 0.02 (wrong).
  *
- * <p>⚠ 组号与等级都来自<b>关卡</b>（StageConfig），不是怪自身的 {@code hard_level_group}（那通常是 1）。
+ * <p>⚠ Both the group number (组号) and the level (等级) come from the <b>stage</b> (StageConfig),
+ * not from the monster's own {@code hard_level_group} (which is usually 1).
  *
- * <p>⚠ 字段名必须用 {@code @SerializedName}：JSON 键是 {@code attack} 而不是 {@code attackRatio}，
- * 否则 Gson 会把所有系数读成 0。
+ * <p>⚠ The field names MUST use {@code @SerializedName}: the JSON key is {@code attack} and not
+ * {@code attackRatio}, otherwise Gson reads every multiplier as 0.
  */
 public record HardLevelGroup(double attack,
                              double defence,
