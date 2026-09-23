@@ -33,7 +33,7 @@
            │
            ├─ applyDamage  ← 唯一伤害结算入口
            ├─ SkillExecutor ← 技能展开成 N 段 Damage
-           └─ 事件广播：BattleEvent / MoveEvent / DamageEvent / AttackEvent
+           └─ 事件广播：11 个事件家族，见 §4
 ```
 
 ### 1.1 三条贯穿全局的硬约定
@@ -213,25 +213,66 @@ Damage = skillBaseValue
 
 ---
 
-## 4. 四个事件家族 ✅
+## 4. 事件家族 ✅（P8-6 补齐：4 → 11）
 
 全部挂在 `CanHit` 上，默认实现转发给各自的 `BuffManager`。
 **子类重写时必须调 `super`**，否则自己的 buff 会失效（`CanHit` 的注释专门警告）。
 
-| 事件 | 签名 | 触发时机 |
-|---|---|---|
-| `BattleEvent` | `onBattleStart(Battle)` | `Battle.startBattle()` 遍历 `queue.snapshot()` |
-| `MoveEvent` | `beforeMove(Battle)` / `afterMove(Battle)` | 回合前后 |
-| `DamageEvent` | `onDamage(Battle, Damage)` | `assemble` 第 5 步，**攻守双方各发一次** |
-| `AttackEvent` | `afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage)` | `SkillExecutor` 在一次技能全部段结算完后**广播给全体我方** |
+> ⚠ **buff 要收到事件，必须显式 `implements` 那个事件接口** ——
+> `BuffManager` 是靠 `instanceof` **逐个**转发的，不是"所有 buff 收所有事件"。
+> 这是最容易被漏掉的一环：buff 写了 `onSkillCast` 却没 implements，编译能过（多一个方法），
+> 但**永远不会被调用**。
 
-几个关键语义：
+| 事件 | 签名 | 触发时机 | 投给谁 |
+|---|---|---|---|
+| `BattleEvent` | `onBattleStart(Battle)` | `Battle.startBattle()` | `queue.snapshot()` 全体 |
+| `MoveEvent` | `beforeMove(Battle)` / `afterMove(Battle)` | 回合前后 | 该单位 |
+| `DamageEvent` | `onDamage(Battle, Damage)` | `assemble` 第 5 步，**攻守双方各发一次** | 攻守双方 |
+| `AttackEvent` | `afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage)` | `SkillExecutor` 在一次技能全部段结算完后 | **我方全体** |
+| `SkillCastEvent` | `onSkillCast(battle, user, skill, hitTargets, targets)` | `SkillExecutor`，伤害已展开、能量未结算之间 | **我方全体** |
+| `EnergyEvent` | `onEnergyGain(battle, target, actuallyAdded)` | `Battle.applyEnergyGain`（唯一回能入口） | 相关方 + 我方 |
+| `HpLossEvent` | `onHpLoss(battle, target, before, after, source, amount)` | `Battle.applyDamage` 扣血后 | 相关方 + 我方 |
+| `HealEvent` | `onHeal(battle, healer, target, actuallyHealed)` | `Battle.heal` | 相关方 + 我方 |
+| `KillEvent` | `onKill(battle, attacker, victim)` | `Battle.applyDamage` 目标由生转死 | 相关方 + 我方 |
+| `BreakEvent` | `onBreak(battle, attacker, target, element)` | `Battle.reduceToughness` 韧性归零那一刻 | 相关方 + 我方 |
+| `SkillPointGainedEvent` | `onSkillPointGained(battle, amount)` | 策略真的入账后 → `Battle` 广播 | **只我方** |
+| `SkillPointSpentEvent` | `onSkillPointSpent(battle, amount)` | 策略真的花掉后 → `Battle` 广播 | **只我方** |
+
+**为什么"回合开始"没有单独事件**：`MoveEvent.beforeMove/afterMove` 已经表达它，
+再加一层是重复的抽象（`EventBusTest.turnBoundariesAreStillMoveEvent` 把这条钉住，
+防止以后有人再加一个 `TurnStartEvent`）。
+
+### 4.1 广播口径（统一，别再造第三种写法）
+
+```
+dispatch(consumer, 直接相关方...)
+  ├─ 直接相关方：总是收到（**即使是敌人**）—— 事件描述的是「事实」，与阵营无关；
+  │               精英/Boss 的反击、免疫也要订阅发生在自己身上的事
+  ├─ 我方额外全员收到 —— AttackEvent 已确立的惯例（知更鸟【协奏】/缇宝结界挂在辅助身上）
+  └─ 我方成员去重 —— 若已作为相关方收到，不再收第二遍（否则同一 buff 被调两次、效果翻倍）
+```
+
+例外：**两个战技点事件只投我方** —— 战技点是我方队伍的**资源**，敌方没有份额。
+
+### 4.2 每个事件的口径（坑都在这里）
+
+| 事件 | 关键口径 |
+|---|---|
+| `SkillCastEvent` | ⚠ **非伤害技能也发**（`hitTargets` 为空）。治疗/护盾/纯 buff 技的触发源靠它 —— 布洛妮娅「施放战技时 50% 概率 +1 战技点」如果写成"没打中就不发"就永远收不到。一次施放**只发一次**（群攻打 3 个目标也是 1 次） |
+| `EnergyEvent` | `actuallyAdded` 是**实际入账值**（被上限截断后）。已满 → 0 → **不发**。**没有能量条的角色没有本事件**（走层数资源的 6 个角色，provider 恒返回 null，压根走不到回能口） |
+| `HpLossEvent` | ⚠ `amount` 是**真的掉了多少血**，**不含被护盾吸走的量**。盾没破 → 不发。损血转资源的角色（遐蝶【新蕊】/万敌【血仇】/刃【充能】）靠这条区分"掉血"与"受到伤害" |
+| `HealEvent` | 是**实际回复量**。满血被治疗 → 0 → **不发**。⚠ `CanHit.heal(double)`（原始加血）**不发** —— 它是 `Battle.heal` 与"直接改血量"共用的底层口子 |
+| `KillEvent` | **不看** `countsAsAttack`（与击杀回能同口径）：附加伤害/真伤/DOT 补刀击杀**也发**。目标已死再挨打、无敌期间都不发。⚠ 见 §4.5「被写错的一条验收标准」 |
+| `BreakEvent` | 只在**击破那一刻**发一次 —— 已击破的敌人继续挨打（超击破路径）不会重复发 |
+| `SkillPointGained`/`Spent` | **没花出去就不算消耗**：战技点不足、出手不成立时**不发**（否则米沙/花火那类"每消耗 1 点"的计数器会为没发生的消耗记账）。已满时普攻实际入账 0 → 也不发 |
+
+### 4.3 其余关键语义
 
 - **`DamageEvent` 广播给双方**，但回调签名里**不告诉 buff 它挂在谁身上**。
   因此注入乘区的 buff 必须自己判侧：`Damage.isOnDefenderSide(entity)` / `isOnAttackerSide(entity)`
   （这就是易伤必须判侧、否则持有者自己打人也会被加伤的原因）。
-- **`AttackEvent` 只广播给我方 `battle.characters`**（不含召唤物 ❌ 因为召唤物没进任何列表），
-  这是因为"我方攻击后"的效果（知更鸟【协奏】、缇宝结界）挂在**别人**身上。
+- **`AttackEvent` / `SkillCastEvent` 广播给我方 `battle.characters`**（不含召唤物 ❌ 因为召唤物没进任何列表），
+  这是因为"我方攻击后 / 施放后"的效果（知更鸟【协奏】、缇宝结界）挂在**别人**身上。
 - `hitTargets` 是**实际命中过**的目标（含当场死亡的，按命中顺序去重）；
   `mainTarget` 是调用方选的主目标（AOE 时它不是命中顺序里的第一个）。
 - **"一次攻击行为" vs "多种伤害类型"**（重要区分）：
@@ -248,6 +289,30 @@ Damage = skillBaseValue
     （各自用自己的剩余韧性算超出部分）。
 - 附加伤害/真伤段**不经过 `SkillExecutor`**，所以不会递归触发 `AttackEvent`
   ——这正对上官方定义"不视为造成了 1 次攻击"。
+
+### 4.4 还没做的
+
+- **敌人技能不发 `SkillCastEvent`**：`EnemySkill` 有自己的 `execute`（不走
+  `SkillExecutor`），等 P9-2 把敌人技能接进统一执行器时对齐。
+- **递归安全**靠"不重复触发同一事件"的构造保证（`SkillCastEvent` 只从
+  `SkillExecutor.execute` 发，附加伤害/真伤/DOT/击破都不经过它），
+  ⚠ 但**没有**通用的"事件触发的效果会不会再发同一事件"的防护 ——
+  P8-7 的触发器表落地时要自己保证效果不递归（附加伤害/真伤那条现成的安全边界仍然有效）。
+
+### 4.5 ⚠ 被写错的一条验收标准（原 P8-6 计划）
+
+原计划写"**DOT/附加伤害不发 `KillEvent`**"。**这条是错的**，实测相反：
+
+`Battle.tickDots` 走的是 `Battle.applyDamage(enemy, damage, EnergyGrant.KILL_ONLY)` ——
+与普攻**同一条**结算路径，所以 DOT 打死人**会发** `KillEvent`。
+`KILL_ONLY` 只影响**回能**种类（不给受击方回能），不影响"死亡"这个**事实**。
+
+而且"会发"才是对的：姬子「终结技每消灭 1 敌 +5 能量」那类效果要知道
+"DOT / 附加伤害补刀也算消灭"，这与击杀回能的口径一致（见 §9.2 的两条口径）。
+
+已按**实测行为**写测试（`EventBusTest.dotKillAlsoFiresKillEvent` /
+`additionalDamageKillStillFiresEvent` / `trueDamageKillFiresEvent`），
+并把更正记进 `ROADMAP` P8-6 —— 原计划那句留作对照。
 
 ---
 
@@ -538,8 +603,8 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 
 ```java
 SkillExecutor.setLogNotDispatched(true);   // 排查时打开
-// → [SkillExecutor] 未分派：BPSkill / RESTORE（Natasha，目标 1 个）
-//   → 归属 P6-2 已实现（走 Battle.heal，不经本执行器）
+// → [SkillExecutor] NOT DISPATCHED: BPSkill / RESTORE (Natasha, 1 target(s))
+//   → owned by P6-2 implemented (goes through Battle.heal, not this executor)
 ```
 
 > ⚠ 计划里原本想用 `IO.println` **无条件**打印，实测会刷屏（demo 每回合都在治疗/护盾），
@@ -1317,7 +1382,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 - 属性代数（`base × (1+Σadd) × Π(1+mul) + Σpure`，带来源可撤销）
 - 完整伤害乘区（增伤/易伤/减伤/虚弱/暴击/防御/抗性）+ 唯一结算入口
 - 12 种伤害类型及其"可暴击/吃增伤"规则
-- 四个事件家族（BattleStart / Move / Damage / Attack）
+- 11 个事件家族（BattleStart / Move / Damage / Attack / SkillCast / Energy / HpLoss / Heal / Kill / Break / 战技点增减），见 §4
 - 行动条（绝对时间 + 堆），推条/拉条 API
 - 技能展开：单体/AOE/扩散/弹射 + 每段独立结算
 - 韧性、弱点削韧、击破伤害、击破推条、击破跳回合（**需调用方主动调**）
@@ -1363,7 +1428,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 ## 16. 测试与可验证性
 
-- **46 个测试类 / 381 个用例**（截至 P8-4 重构），全部通过（`.\gradlew.bat test`）。
+- **47 个测试类 / 403 个用例**（截至 P8-6），全部通过（`.\gradlew.bat test`）。
 - 覆盖重心：伤害乘区（`DamageZoneTest` 24 条）、技能展开（`SkillExecutorTest` 13 条）、
   能量（`EnergyTest` 8 + `EnergyBattleTest` 16）、韧性击破（`ToughnessTest` 6 +
   `ToughnessBattleTest` 8 + `BreakDamageTest` 5 + `BreakStateTest` 4 + `DotTest` 6）、
@@ -1378,7 +1443,10 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
   重构引入的通用抽象（`SkillCategoryAndResourceTest` 18：枚举解析的稳健性
   —— 空值/未知值/大小写、`Resource` 的三个边界与不变式；
   `SkillPointPolicyExtensibilityTest` 6：**不改引擎**只换策略就能改
-  增量/上限/开局，并证明阵营判断确实在策略里）。
+  增量/上限/开局，并证明阵营判断确实在策略里）、
+  事件契约（`EventBusTest` 22：8 个新事件的时机/次数/过滤条件，
+  含四条易错边界 —— **非伤害技能也发施放事件**、**被盾全挡不算掉血**、
+  **没花出去不发消耗事件**、**没有能量条就没有能量事件**）。
 - **可复现性**：`Battle` 接受注入的 `java.util.Random`；全仓库无 `Math.random()`。
   > ⚠️ 但 `Relic.createRandomLevelZero` / `MapUtils` 用的是不可播种的 `ThreadLocalRandom`，
   > 所以"同一份遗器"无法跨进程复现。

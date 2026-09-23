@@ -152,6 +152,7 @@
 | 敌人 | 真实面板（模板 × 等级组 × 实例 × 精英组）+ 仇恨选目标 + 会普攻 |
 | 角色 | `CharacterFactory.create(cid, level)` 真实面板（等级缩放/光锥/遗器/行迹/额外加成/元素/命途/仇恨/能量/真实技能） |
 | 其他 | 效果命中与抵抗 / 治疗 / 护盾 / Buff 生命周期 / 附加伤害与真实伤害 / 胜负状态机 |
+| **事件体系** | **11 个事件家族**（P8-6）：技能施放 / 能量 / 掉血 / 治疗 / 击杀 / 击破 / 战技点增减，见 `engine.md` §4 |
 
 ### 🚧 部分完成
 
@@ -160,11 +161,13 @@
 | 技能回能数据化 | `sp_base` 已落库但**不驱动回能**（多段技能是"每段值"，需聚合 `SPHitRatio`） | P3-4 剩余 |
 | 战技点上限/开局可变 | **接口已就位**（换策略构造参数），**没有接线** | 见 `DOC_VS_CODE.md` §F 的 F-1/F-2 |
 | 强化普攻的战技点 | 一刀切 +1：对青雀对、**对波提欧错** | F-3，数据补全 |
+| 敌人技能不发事件 | `EnemySkill` 不走 `SkillExecutor`，故不发 `SkillCastEvent` | P9-2 对齐 |
 
-### ☐ 待办（共 20 项，见 §6–§9）
+### ☐ 待办（共 19 项，见 §6–§9）
 
-**下一项建议：`P8-6` 事件补齐** —— 它是 `P8-7`（触发器表）的唯一前置，而 P8-7 是
-93 个角色机制的**总开关**。`P8-4` 刚做完，`P8-3` 建议并进 P8-7 一起做（见 §6 说明）。
+**下一项建议：`P8-7` 触发器表** —— `P8-6` 已经把它唯一的前置（事件）补齐了。
+P8-7 是 93 个角色机制的**总开关**：做完它，角色机制才开始变成数据，
+而不是往 `Battle` 里加 `switch (cid)`。
 
 ---
 
@@ -255,33 +258,57 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 
 ---
 
-### P8-6 事件补齐（触发器宿主）
+### P8-6 事件补齐（触发器宿主）✅
 
 - **目标**：把 12 类触发源都变成事件，让"角色机制"只订阅事件，不再往 `Battle` 里塞逻辑。
-- **现状**：只有 4 个事件 —— `BattleEvent` / `MoveEvent` / `DamageEvent` / `AttackEvent`。
-- **涉及文件**：新建 `models/event/{SkillCastEvent, EnergyEvent, HpLossEvent, HealEvent, KillEvent, BreakEvent, TurnStartEvent, SkillPointSpentEvent, SkillPointGainedEvent}.java`；
-  `models/CanHit.java`（实现并转发给 `BuffManager`）；`Battle.java`、`models/SkillExecutor.java`（发事件）；新建 `test/EventBusTest.java`
-- **怎么做**：
-    1. 照 `AttackEvent` 的现成模式：接口 + 全部 `default` 空实现 + `CanHit` 转发 `BuffManager` + `Battle` 广播给友方。
-    2. 每个事件必须携带**足够还原事实**的字段：
-        - `SkillCastEvent(battle, user, skill, hitTargets)`（**非伤害技能也要发**）
-        - `EnergyEvent(battle, target, actuallyAdded)`（用 `gainEnergy` 返回的**实际入账值**）
-        - `HpLossEvent(battle, target, before, after, source)`（`after - before` 就是损血量，遐蝶/万敌/刃要）
-        - `HealEvent(battle, healer, target, amount)` / `KillEvent(battle, attacker, target)` /
-          `BreakEvent(battle, attacker, target, element)` / `TurnStartEvent(battle, actor)`
-        - **`SkillPointSpentEvent` / `SkillPointGainedEvent`**（P8-4 复核新增，见下）
-    3. 发送点：`SkillExecutor.execute`（技能）、`Battle.applyEnergyGain`（能量）、
-       `CanHit.takeDamage`/`heal`（损血/治疗，**口径与 `isCountsAsAttack()` 一致**）、
-       `Battle.grantHitAndKillEnergy`（击杀）、`Battle.gainBreakEnergy`（击破）、
-       `Battle.beforeMove`（回合开始）、`StandardSkillPointPolicy`（战技点，或由 `Battle` 在转发时发）
-    4. ⚠ **不要顺手把效果实现也写了** —— 本任务只发事件。
-- **为什么需要 `SkillPointSpentEvent`**：米沙「我方全体每消耗 1 个战技点 → 下次终结技 +1 段、米沙回 2 能量」
-  和花火「我方消耗战技点时额外回 1 点能量」要监听的是"战技点**被消耗**"这件**事** ——
-  这是 `EnergyProvider`/`SkillPointPolicy` 那种"按技能类型查表"的钩子**表达不了**的。
-- **验收**：`EventBusTest`：挂一个测试 buff，断言收到的 `(事件, 角色, 数值)` 序列；
-  DOT/附加伤害**不发** `KillEvent`；无能量条角色**不发** `EnergyEvent`；
-  战技点不足时**不发** `SkillPointSpentEvent`（因为没花出去）。
+- **结果**：事件从 **4 个扩到 11 个**（2026-09-23 完成），新增
+  `SkillCastEvent` / `EnergyEvent` / `HpLossEvent` / `HealEvent` / `KillEvent` / `BreakEvent` /
+  `SkillPointGainedEvent` / `SkillPointSpentEvent`。
+  完整口径见 `engine.md` §4（含**广播口径**与**每个事件的口径**两张表）。
+- **涉及文件**：新建 `models/event/` 下 8 个接口；`models/CanHit.java`（实现并转发给 `BuffManager`）；
+  `models/BuffManager.java`（逐个 `instanceof` 转发）；`Battle.java`（发事件 + 广播）；
+  `models/SkillExecutor.java`（发 `SkillCastEvent`）；`models/skillpoint/StandardSkillPointPolicy.java`
+  （上报实际增减）；新建 `test/EventBusTest.java`（20 条）
+
+**实际落地与原计划的差异**：
+
+1. **`TurnStartEvent` 没做，也没必要做**：回合开始/结束已经由 `MoveEvent.beforeMove/afterMove`
+   表达（`CanHit` 已实现并转发）。再加一层是**重复的抽象** ——
+   已用 `EventBusTest.turnBoundariesAreStillMoveEvent` 钉住，防止以后有人再加。
+2. **战技点用"策略上报"而不是 `Battle` 比前后值**：让 `StandardSkillPointPolicy` 把
+   **实际**增减上报给 `Battle`（`StandardSkillPointPolicy.Listener`）。理由：
+   策略是唯一知道"这次到底涨没涨、涨了多少"的组件（满点时实际入账是 0，不该发事件），
+   而 `Battle` 用"前后值相减"去**猜**会在满点/失败时静默判错。
+   这也保住了 F-8 的结论：**`Battle` 依然不知道战技点的规则**。
+3. **广播口径统一成三条规则**（相关方总是收到含敌人 / 我方额外全员 / 我方去重），
+   避免下一批事件又出现第三种写法；`SkillPoint*` 两个事件是例外（只投我方）。
+4. **`HpLossEvent` 的口径定义为"真的掉了多少血"**，不含被护盾吸走的量。
+   这个选择让"损血转资源"（遐蝶/万敌/刃）与"受到伤害"两个口径分开 ——
+   想要后者请用 `applyDamage` 的返回值。
+5. **敌人技能暂不发 `SkillCastEvent`**：`EnemySkill` 有自己的 `execute`（不走
+   `SkillExecutor`），等 P9-2 接进统一执行器时对齐。已记在 `engine.md` §4.4。
+6. ⚠ **原计划的一条验收标准是错的，已更正**：计划写"DOT/附加伤害**不发** `KillEvent`"，
+   但 `tickDots` 走的是 `Battle.applyDamage(..., KILL_ONLY)` —— 与普攻同一条路径，
+   **会发**。而且"会发"才对：姬子「终结技每消灭 1 敌 +5 能量」需要知道
+   DOT/附加伤害补刀也算消灭（`KILL_ONLY` 只影响回能种类，不影响"死亡"这个事实）。
+   已按**实测行为**写测试，并把更正记进 `engine.md` §4.5。
+
+**变异验证**（3 处，都确认护栏有效）：
+
+| 变异 | 结果 |
+|---|---|
+| 只在打中目标时才发 `SkillCastEvent`（模拟"没打中就不发"） | `nonDamagingSkillStillFiresSkillCast` 红 ❌ |
+| 去掉"真的掉血才发"的门槛 | `fullyShieldedHitFiresNoHpLoss` 红 ❌ |
+| 战技点消耗失败也上报 | `failedSkillSpendFiresNoSkillPointSpent` 红 ❌ |
+
+**验收**：`EventBusTest` **22 条**全绿；全套 47 套 / 403 例全绿；demo 行为不变（10 轮 / 43 次行动）。
 - **依赖**：P1-7（事件模式已成型）
+
+<!-- 以下为原始计划，保留作为对照 -->
+
+- **原始方案**：新建 `models/event/{SkillCastEvent, EnergyEvent, HpLossEvent, HealEvent, KillEvent, BreakEvent, TurnStartEvent}.java`；
+  照 `AttackEvent` 的模式：接口 + 全部 `default` 空实现 + `CanHit` 转发 `BuffManager` + `Battle` 广播给友方。
+  每个事件必须携带**足够还原事实**的字段；`TurnStartEvent` 已被 `MoveEvent` 覆盖（见上）。
 
 ---
 
