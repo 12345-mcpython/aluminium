@@ -7,6 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.energy.EnergyGain;
+import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
+import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -55,6 +57,75 @@ public class Battle {
     private WaveManager waveManager;
 
     public ArrayList<CanHit> addRequestItems = new ArrayList<>();
+
+    /**
+     * 战技点策略（P8-4）：**全队共享**的一个池子，不是每个角色各有一条。
+     *
+     * <p>{@code Battle} 本身**不认识战技点的规则** —— 只持有一个
+     * {@link SkillPointPolicy} 并在"决定出手"时问它一次（见 {@link #useSkill}）。
+     * 为什么这样拆：战技点的规则会长出角色级修正（布洛妮娅「战技 50% 概率 +1」、
+     * 素裳「打击破目标战技 +1」、花火「上限 +2」…），若都往这里加分支，
+     * {@code Battle} 会堆满"因为某个角色"的判断，违反 P8-0 的三分法。
+     * 详见 {@code DOC_VS_CODE.md} §F 的 <b>F-8</b>。
+     *
+     * <p>默认是 {@link StandardSkillPointPolicy}（开局 3 / 上限 5 / 我方普攻 +1 / 战技 -1 /
+     * 其余中性）。要在队伍里换一套规则（例如花火抬高上限）就换掉这个字段 ——
+     * 它是可控的注入点，对调用方是**稳定 API**（读值/加值/花值三个方法不变）。
+     */
+    public SkillPointPolicy skillPointPolicy = new StandardSkillPointPolicy();
+
+    /** 当前战技点（P8-4）。等价于 {@code skillPointPolicy.getValue()}。 */
+    public int getSkillPoints() {
+        return skillPointPolicy.getValue();
+    }
+
+    /** 战技点的常规上限（P8-4）。等价于 {@code skillPointPolicy.getMax()}。 */
+    public int getSkillPointMax() {
+        return skillPointPolicy.getMax();
+    }
+
+    /** 战技点是否够放一次战技（P8-4）。 */
+    public boolean hasSkillPoint() {
+        return skillPointPolicy.canAfford();
+    }
+
+    /**
+     * 直接回复战技点（P8-4），封顶常规上限。
+     *
+     * <p>给"普攻 +1"之外的显式来源用：秘技、遗器（过客 4 件套）、角色机制。
+     *
+     * @param n 要加的点数；{@code <= 0} 时不做任何事
+     */
+    public void gainSkillPoint(int n) {
+        skillPointPolicy.gain(n);
+    }
+
+    /**
+     * 消耗 1 点战技点（P8-4）。
+     *
+     * @return 是否消耗成功；{@code false} 表示点数已为 0（调用方应当阻止这次出手）
+     */
+    public boolean spendSkillPoint() {
+        return skillPointPolicy.spend();
+    }
+
+    /**
+     * 按技能结算战技点（P8-4）。**内部收口点**，供 {@link #useSkill} 与演示里的
+     * 治疗/护盾分支共用 —— 后者自己直接调 {@code Battle.heal/grantShield}，
+     * 绕过了 {@link #useSkill}，所以得显式补这一下，否则"治疗战技不耗点"。
+     *
+     * <p>规则全在策略里（含阵营判断），这里只转发。
+     *
+     * @param skill 要结算的技能
+     * @param user  出手者 —— **必须显式传入**。早先这里从 {@code currentMove} 猜出手者，
+     *              结果在"没有行动者"的场景（直接调用的测试、演示的治疗分支）猜出
+     *              {@code null}，而 {@code null != Camp.PLAYER} 会让策略静默变成空操作 ——
+     *              一个不报错的错误答案。显式传参让这类误用暴露成编译错误。
+     * @return 这次出手是否**可以继续**（战技点足够）；普攻/终结技/追加攻击一律 true
+     */
+    public boolean applySkillPointCost(Skill skill, CanHit user) {
+        return skillPointPolicy.onSkillCast(user, skill);
+    }
 
     public ArrayList<AdvanceRequest> advanceRequests = new ArrayList<>();
 
@@ -430,6 +501,11 @@ public class Battle {
         }
         CanHit user = currentMove.getCanHit();
         if (user.isDeath()) {
+            return false;
+        }
+        // 战技点（P8-4）：规则全在 skillPointPolicy 里（含我方/敌方的阵营判断），
+        // Battle 只问一次"这次出手成不成立" —— 不认识任何角色，见 §F 的 F-8。
+        if (!skillPointPolicy.onSkillCast(user, skill)) {
             return false;
         }
         skillRequest(skill, user, target);

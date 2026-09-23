@@ -1,6 +1,7 @@
 package com.laosun;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
@@ -50,6 +51,13 @@ import java.util.Random;
  * <p>随机数全程走注入的 {@link Random}：固定种子 → 整场可复现。
  */
 public class Main {
+
+    /**
+     * 演示 AI 的战技点储备（P8-4）：点数高过这个值才肯放战技，否则普攻回点。
+     *
+     * <p>这是**演示策略**，不是引擎规则 —— 引擎只提供"够不够"，怎么花由调用方定。
+     */
+    private static final int SKILL_POINT_RESERVE = 1;
 
     public static void main() {
         System.out.println("=".repeat(78));
@@ -145,11 +153,12 @@ public class Main {
         printQueue(battle);
     }
 
-    /** 我方回合：能量满就放大招，否则用战技（非弱点退回普攻）。 */
+    /** 我方回合：能量满就放大招，否则用战技（非弱点 / 没战技点 → 退回普攻）。 */
     private static void characterTurn(Battle battle, Character hero) {
         System.out.println("[我方] " + hero.getName()
                 + "  HP " + fmt(hero.getCurrentHp()) + "/" + fmt(hero.getMaxHp())
-                + "  能量 " + fmt(hero.getCurrentEnergy()) + "/" + fmt(hero.getMaxEnergy()));
+                + "  能量 " + fmt(hero.getCurrentEnergy()) + "/" + fmt(hero.getMaxEnergy())
+                + "  战技点 " + battle.getSkillPoints() + "/" + Constant.SKILL_POINT_MAX);
 
         Enemy target = firstAliveEnemy(battle);
         if (target == null) {
@@ -169,16 +178,23 @@ public class Main {
             return;
         }
 
-        // 战技形状分流（P6-2 / P6-3）：治疗技给自己人回血、护盾技给自己人上盾，
-        // 其余（伤害类）照旧打敌人。
+        // 没战技点就打普攻（P8-4）—— 但治疗/护盾角色的**保命牌**不能因为缺 1 点就丢掉，
+        // 所以先问一次"够不够"，不够就直接挑普攻，不再分派治疗/护盾分支。
+        //
+        // ⚠ 这里留 1 点**储备**：不加这个的话三个角色每次行动都放战技，开局 3 点两下就见底，
+        //    然后只能普攻回点 —— 20 轮里主 C 只放得出一次战技，演示反而看不出战斗长什么样。
+        //    留 1 点让"回点"和"花点"交替发生，这才是战技点该有的节奏。
         Skill skill = hero.getSkills().get(SkillType.SKILL);
-        if (skill != null && skill.getData() != null) {
+        boolean canUseSkill = battle.getSkillPoints() > SKILL_POINT_RESERVE;
+        if (canUseSkill && skill != null && skill.getData() != null) {
             switch (skill.getData().getEffect()) {
                 case RESTORE -> {
+                    battle.applySkillPointCost(skill, hero);     // 治疗战技也不白放（P8-4）
                     healTurn(battle, hero, skill);
                     return;
                 }
                 case DEFENCE -> {
+                    battle.applySkillPointCost(skill, hero);     // 护盾战技同上
                     shieldTurn(battle, hero, skill);
                     return;
                 }
@@ -187,15 +203,15 @@ public class Main {
             }
         }
 
-        boolean weaknessHit = skill != null && skill.getData() != null
+        boolean castSkill = canUseSkill && skill != null && skill.getData() != null
                 && target.isWeakTo(skill.getData().getElement());
-        if (!weaknessHit) {
-            skill = hero.getSkills().get(SkillType.COMMON);      // 非弱点 → 普攻
+        if (!castSkill) {
+            skill = hero.getSkills().get(SkillType.COMMON);      // 非弱点 / 缺战技点 → 普攻
         }
         if (skill == null) {
             return;
         }
-        System.out.println("        → 使用" + (weaknessHit ? "【战技】" : "【普攻】"));
+        System.out.println("        → 使用" + (castSkill ? "【战技】" : "【普攻】"));
         double hpBefore = target.getCurrentHp();
         if (!battle.performAction(skill, List.of(target))) {
             System.out.println("        → 出手失败（死亡 / 被控 / 行动条状态不对）");

@@ -129,7 +129,7 @@
 
 **"角色和怪物什么时候进来"一句话版**：
 
-- **角色**：P1–P7 一律 `Character.fromAttributes` 占位 → **P8 起全部换真实角色**（`CharacterFactory`：面板/元素/命途/能量/真实技能/战技点）。天赋与追加攻击 P8-3，SP P8-4。
+- **角色**：P1–P7 一律 `Character.fromAttributes` 占位 → **P8 起全部换真实角色**（`CharacterFactory`：面板/元素/命途/能量/真实技能/战技点）。SP 已在 P8-4 ✅ 接上；剩下的角色机制入口是天赋与追加攻击 P8-3，其后由 P8-6/P8-7/P8-8 把机制变成数据。
 - **怪物**：**P2 进真实面板数据**（属性/弱点/抗性/等级换算）→ **P5 进"会普攻打人"**（仇恨选目标 + 敌人回合）→ **P9 进全机制**（真实技能表、技能选择 AI、召唤、精英/Boss 换招/反击/控制免疫）。
 - **全机制补完**：七系击破异常、控制状态机、通用 Buff 与刷新规则、速度操纵、终结技插入、Debuff 数据化 → 集中在 **P10**，全部是"把已开口子填满"，无新架构。
 
@@ -177,7 +177,7 @@
 |                       | P8-1 CharacterFactory + 角色字段补全           | ✅   |
 |                       | P8-2 技能装配（真实槽位 → 真实倍率）           | ✅   |
 |                       | P8-3 天赋 + 追加攻击                           | ☐   |
-|                       | P8-4 战技点（SP）                              | ☐   |
+|                       | P8-4 战技点（SP）                              | ✅   |
 |                       | P8-5 真实队伍装配（StageFactory 换真角色）     | ☐   |
 |                       | P8-6 事件补齐（触发器宿主）                    | ☐   |
 |                       | P8-7 触发器表 + 效果词表（角色内容数据化）     | ☐   |
@@ -1901,7 +1901,7 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
 
 ---
 
-### P8-4 战技点（SP）
+### P8-4 战技点（SP）✅
 
 - **目标**：战斗资源"战技点"：开局 3 点、上限 5；普攻 +1、战技 -1、终结技不消耗。
 - **涉及文件**：`Battle.java`、`Constant.java`、新建 `test/SkillPointTest.java`
@@ -1921,6 +1921,92 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
        ```
 - **验收**：`SkillPointTest`：开局 3；普攻 → 4，连放 2 次封顶 5；战技 → 减 1；0 点放战技 → `performAction` 返回 false 且无伤害
 - **依赖**：P8-2（skillType 判定立足点）；零依赖可插队
+
+**实际落地与计划的差异（2026-09-23）**：
+
+1. **收口点放在 `useSkill` 而不是 `performAction`**：`performAction` 只是 `useSkill` 的一层
+   守卫（判 `currentMove` / 死亡 / 控制），把资源结算放在真正的"决定出手"那一层，
+   `performAction` 与 `useSkill` 两个入口就都覆盖到了。
+2. **必须判阵营**：敌人也走同一个 `performAction`（P5-5 的敌方 AI）。
+   不判的话敌人每打一下我方的战技点 +1。⚠ 但敌人默认的 `EnemySkill.getData()` **恒为 null**，
+   拿它测这条是**空转**（去不去掉阵营判断都会绿，靠变异测试才发现）——
+   测试里改成**手工给敌人装一个真实角色普攻**才测得出来。
+3. **`attack_type == null` 必须先判再 switch**：Java 的 `switch` 对 null 字符串抛 NPE，
+   而天赋/追加攻击在数据里就是 null。不判的话 P8-3 一做追加攻击就炸。
+4. **不按计划 `IO.println` 报警**："战技点不足"是调用方的决定，引擎只返回 `false`；
+   调用方拿得到 `false` 与 `getSkillPoints()`。加了日志反而给测试输出添噪，
+   而且 `SkillExecutorDiagnosticTest` 已经证明引擎层日志需要一个开关。
+5. **演示加了 1 点储备**：不加的话三个角色每次都放战技，开局 3 点两下见底，
+   之后只能普攻 —— 20 轮里主 C 只放得出一次战技，演示反而看不出战斗长什么样。
+   这是**演示策略**（`Main.SKILL_POINT_RESERVE`），不是引擎规则。
+6. **没做**（各自归属）：战技点消耗回能（米沙/花火/寒鸦）→ P8-6 的 `SkillCastEvent`；
+   强化战技 / 不消耗战技点 → P8-7 触发器表；上限提升（符玄/花火的上限 7）→ 需要
+   "改队伍级资源上限"的口子，目前是常量。
+
+**与游戏的一致性复核（2026-09-23）**：新增 `SkillPointGameParityTest`（11 条），
+逐条拿规则问引擎。**规则本身没有规格背书** —— 项目的 `HSR.md` 全文**没有战技点这一节**
+（只有 §6.1 一句「笑点：战技点上方计数」），基础值是从机制攻略 + 玩家问答反推的。
+
+一致的：全队共享、基础上限 5、常规开局 3、普攻 +1 / 战技 -1、终结技与追加攻击中性、
+0 点放不出战技、每场战斗重置、被控时不扣点、特殊资源角色照样花点。
+
+**三处已知差距**（**本轮只标记、不改实现** —— 引擎保持通用/可扩展/稳定，不替角色机制背锅。
+权威登记处是 `DOC_VS_CODE.md` §F，断言钉在 `SkillPointGameParityTest`）：
+
+| # | 差距 | 证据 | 归属 |
+|---|---|---|---|
+| `F-1` | **上限不是恒定 5**，引擎无"改队伍级资源上限"的口子 | 花火天赋「上限额外 +2」；`WEAPONS.md` 欢愉光锥「每有 1 名欢愉命途角色 +1，最多 3」；甚至有光锥的条件是「上限 ≥ 6」 | 新口子（P8-7 前后） |
+| `F-2` | **开局不是恒定 3**，遗器套装效果整体没接 | `RELICS.md` 过客 4 件套「战斗开始时立即恢复 1 个战技点」→ 开局 4（两人穿就 5） | P10-3 / 遗器套装 |
+| `F-3` | ⚠ **"普攻 +1"一刀切**，强化普攻有例外 —— **唯一会让引擎算错数值的一条** | `1315_波提欧.md`「强化普攻**无法恢复战技点**」；但 `1201_青雀.md`「施放强化普攻后，恢复 1 个战技点」 | **数据补全**（每技能自带增量字段） |
+
+> ⚠ `F-3` **不能**靠改引擎解决：数据里强化普攻也是 `"Normal"`（无单独类型），
+> 一刀切对青雀**正确**、对波提欧**错误**。改成"强化普攻一律 +0"会把青雀改坏。
+> **动手 P8-3（追加攻击）前最好一起把"技能级战技点增量"字段定下来。**
+
+角色级供点机制（布洛妮娅 50% 概率 +1、素裳打击破目标 +1、青雀争番单场一次 +1、
+寒鸦【承负】每 2 次行动 +1、貊泽/大丽花追加攻击 +1、海瑟音开场结界 +1、
+米沙"每消耗 1 点 → 下次终结技 +1 段"、花火"消耗战技点时回能 + 溢出储存"）
+全部归 **P8-7 触发器表**（`F-4`）。其中米沙/花火要监听"**战技点被消耗**"这**事**本身，
+是 `EnergyProvider` 那种"按技能类型查表"表达不了的，需要新事件
+`SkillPointSpentEvent` / `SkillPointGainedEvent`。
+
+**架构提醒（`F-8`，见 §F）**：~~`useSkill` 现在内联了"阵营判断 + 战技点结算"~~
+→ ✅ **已在重构中解决**（见下）。
+
+### P8-4 重构：战技点从 `Battle` 里抽出去（2026-09-23）✅
+
+**动机**（用户定的原则）：*引擎要稳定、拓展性强，不替角色机制背锅*。
+P8-4 的实现原本把规则内联在 `Battle.useSkill`（阵营判断 + 字符串 `switch`），
+等角色级供点（P8-7）落地就会堆成"因为某个角色"的分支 —— 违反 P8-0 三分法。
+
+**改了什么**：
+
+| 新增 | 作用 |
+|---|---|
+| `enums.SkillCategory` | 数据 `attack_type` 类型化（9 个值含 `UNSPECIFIED`/`UNKNOWN`），消灭裸字符串 `switch` 的静默失配（`F-6`）|
+| `models.Resource` | 通用队伍级资源：有界 + 显式溢出 + 原子消耗。战技点是第一个用户，**P8-8 层数资源直接复用** |
+| `models.skillpoint.SkillPointPolicy` | 策略接口：`onSkillCast` / `getValue` / `getMax` / `gain` / `canAfford` / `spend` |
+| `models.skillpoint.StandardSkillPointPolicy` | 基础规则实现 + `gainForCast` 覆盖点（角色级增量挂这里）|
+| `SkillCategoryAndResourceTest` | 18 条护栏 |
+| `SkillPointPolicyExtensibilityTest` | 6 条：**不改引擎**只换策略即可改增量/上限/开局，并证明阵营判断在策略里 |
+
+**结果**：`Battle` 只剩一层门面（`getSkillPoints` / `getSkillPointMax` / `hasSkillPoint` /
+`gainSkillPoint` / `spendSkillPoint` / `applySkillPointCost`），**不认识任何角色机制**。
+`F-6` / `F-8` 关闭；`F-1` / `F-2` 从"没口子"变成"**有口子、等接线**"。
+
+**重构自身的两个教训（都靠测试抓到，已写进文档）**：
+
+1. `SkillCategory` 第一版只在 javadoc 写了"大小写不敏感"却**没实现**
+   （建表存原值、查表转小写）→ 被 `knownValuesRoundTrip` 抓到。
+   **文档承诺必须有测试兜着。**
+2. `Resource.setMaxOverflow` 第一版只改额度**不重新夹值** → 能造出
+   `max=5, overflow=0, value=15` 的**静默非法状态**。已改成夹取并写死不变式。
+3. 中途让 `applySkillPointCost(skill)` 从 `currentMove` 猜出手者，
+   在"没有行动者"时猜出 `null`，而 `null != Camp.PLAYER` 让策略**静默变空操作**
+   —— 一个不报错的错误答案。已改成**显式传出手者**，误用直接编译失败。
+
+**验证**：`46 套 / 381 例`全绿；demo 行为不变（10 轮 / 43 次行动，我方胜利）；
+`--warning-mode=all` 无警告；对两处不变式各做了一次变异验证（确认护栏有效）。
 
 ---
 
@@ -1996,9 +2082,20 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
 
 ### P8-8 层数资源 Resource（替代能量条）
 
-- **目标**：一个通用 `Resource`，让"层数当能量/层数触发大招"的角色（P3-0 A/B 表）不写专用类。
-- **涉及文件**：新建 `models/Resource.java`、`models/ResourceManager.java`；`CanHit.java`（挂 manager）、
-  `Constant.java`、新建 `test/ResourceTest.java`
+> ✅ **前置已完成（2026-09-23 P8-4 重构）**：`models/Resource.java` **已经存在**，
+> 当时为了战技点抽出来的，**不要**再新建一个同名类。已有能力：
+> `Resource(id, max, initial)`、`gainClamped`（不溢出）/ `gain`（显式溢出、封顶）/
+> `spend`（能扣多少扣多少）/ `spendExactly`（原子消耗）、
+> `setMaxOverflow`、`isFull` / `isCapped` / `missingToMax` / `isEmpty`、
+> `setValue`（原始写入，仍夹取）。不变式 `value ∈ [0, max + maxOverflow]` 由测试钉住。
+> 战技点（`StandardSkillPointPolicy`）是它的第一个用户 —— **P8-8 是第二个**。
+> 本任务**剩下**的是：`scope`（SELF/PARTY）、`ResourceManager`、满层事件、
+> 与 `EnergyProvider` 的桥接。
+
+- **目标**：让"层数当能量/层数触发大招"的角色（P3-0 A/B 表）不写专用类。
+- **涉及文件**：`models/Resource.java`（**已存在，扩展它**）、新建 `models/ResourceManager.java`；
+  `CanHit.java`（挂 manager）、`Constant.java`、扩展 `test/SkillCategoryAndResourceTest.java`
+  （`Resource` 的边界护栏已在那里）或新建 `test/ResourceTest.java`
 - **怎么做**：
     1. `Resource(id, scope, max, initial)`；`ResourceManager.gain/spend/get/isFull`，满了不溢出并发"满"事件
        （`onFull` 效果仍归触发器表，别硬编码）。

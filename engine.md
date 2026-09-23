@@ -874,6 +874,148 @@ no-op，用不用这个 provider 都一样；本 provider 管的是"**有**能�
 `castUltra` 判的是 `currentEnergy >= maxEnergy` —— 对她只能靠外部灌能量模拟。
 按 P8-0 的三分法，这属于"引擎还不具备的能力" → **P8-8 的 `Resource` 抽象**，不在 P8-2 里特判。
 
+### 9.6 战技点（SP）✅（P8-4，2026-09-23）
+
+**全队共享**的一个池子，不是每个角色各有一条。引擎实现的**基础规则**：
+
+| 项 | 引擎值 | 与游戏是否一致 |
+|---|---|---|
+| 上限 | **5**（`Constant.SKILL_POINT_MAX`） | ✅ 基础值 5，但**可被改变**（见下） |
+| 开局 | **3**（`Constant.SKILL_POINT_START`） | ✅ 常规开局 3，但**可被改变**（见下） |
+| 普攻（`Normal`） | **+1** | 🚧 一刀切，强化普攻有例外（见下） |
+| 战技（`BPSkill`） | **-1**，不够则**不能出手** | ✅ |
+| 终结技（`Ultra`） | 中性（不涨不跌） | ✅ |
+| 追加攻击 / 天赋（`attack_type == null`） | 中性 | ✅ |
+| 地图普攻 / 秘技（`MazeNormal` / `Maze`） | 中性 | ✅（地图普攻在战斗外，那时没有战技点） |
+| 每场战斗重置 | 是 | ✅（战技点不跨战斗继承） |
+
+**规则来源**：⚠ 项目的规格 `HSR.md`（`E:\code\blog\hsr\HSR.md`）**没有战技点这一节**——
+全文只有 §6.1 一句「笑点：战技点上方计数」提到它。所以上面这套基础值是从游戏机制与
+角色文档反推的：全队共享与「上限 5 / 普攻 +1」来自机制攻略，开局 3 来自玩家问答
+（「正常情况下开局都是三个战技点的」）。**这条规则没有规格背书，只有交叉印证。**
+
+#### 🚧 与游戏的三处已知差距
+
+> 📋 **这些缺口的权威登记处是 `DOC_VS_CODE.md` §F**（`F-1` 上限可变 / `F-2` 开局可变 /
+> `F-3` 强化普攻 / `F-4` 角色级供点 / `F-5` 敌人绕过 / `F-6` 裸字符串 / `F-7` 语义过窄 /
+> `F-8` 架构提醒）。**本节只记结论，细节一律以 §F 为准** —— 免得两处各写一份然后漂移。
+>
+> 处理原则：**引擎保持通用、可扩展、稳定，不替角色机制背锅**。下列差距**本轮只标记、
+> 不改实现**。`SkillPointGameParityTest` 把每条的**引擎当前行为**钉在断言里。
+
+1. **`F-1` 上限不是恒定 5**。花火天赋「上限额外 +2」、欢愉光锥「每有 1 名欢愉命途角色 +1，
+   最多 3」；甚至有光锥的触发条件是「上限 **≥ 6**」。引擎的 `SKILL_POINT_MAX` 是常量，
+   **没有**"改队伍级资源上限"的口子。
+
+2. **`F-2` 开局不是恒定 3**。`RELICS.md`：过客 4 件套「战斗开始时立即为我方恢复 1 个战技点」
+   → 开局 4（两人穿就 5）。根因是**遗器套装效果整体没接**（`relic_sets.json` 连装载都没装载）。
+
+3. **`F-3` ⚠「普攻 +1」一刀切，强化普攻有例外 —— 这条会让引擎算错**。
+   `1315_波提欧.md`：强化普攻「**无法恢复战技点**」；但 `1201_青雀.md`：
+   「施放强化普攻后，**恢复 1 个战技点**」。数据里强化普攻也是 `"Normal"`
+   （**没有单独类型**，实测 122 条 `Normal` = 93 角色 × 1 + 饮月/镜流/青雀/波提欧的多档），
+   所以引擎一刀切：对青雀**对**、对波提欧**错**。
+   ⚠ **不要改成"强化普攻一律 +0"**（会把青雀改坏）—— 正解是**每个技能自带战技点增量字段**。
+
+角色级供点机制（布洛妮娅 50% 概率 +1、素裳打击破目标 +1、青雀争番单场一次 +1、寒鸦【承负】
+每 2 次行动 +1、貊泽/大丽花追加攻击 +1、海瑟音开场结界 +1、米沙"每消耗 1 点 → 下次终结技
++1 段 + 回 2 能量"、花火"消耗战技点时回能 + 溢出储存"）全都没接 → **`F-4`，归 P8-7 触发器表**。
+其中米沙/花火要监听的是"**战技点被消耗**"这件**事**，是 `EnergyProvider` 那种
+"按技能类型查表"的钩子**表达不了**的 —— 需要新事件 `SkillPointSpentEvent` / `SkillPointGainedEvent`。
+
+#### 收口点与实现细节（P8-4 重构后）
+
+**唯一收口点在 `Battle.useSkill`**，但 `Battle` 只**转发**、不认识规则：
+
+```
+performAction(skill, targets)          ← 我方与敌方 AI 都走这里
+   └─ useSkill(skill, targets)
+        ├─ skillPointPolicy.onSkillCast(user, skill)   ← 规则全在策略里
+        │     └─ false → 出手不成立（不排队 → 没有"没花钱却打出去"）
+        └─ skillRequest(...)
+```
+
+规则本身在 `StandardSkillPointPolicy` 里（`"Normal" → +1` / `"BPSkill" → -1` /
+其余中性，**外加阵营判断**）。`Battle` 侧只留一层门面：`getSkillPoints()` /
+`getSkillPointMax()` / `hasSkillPoint()` / `gainSkillPoint(n)` / `spendSkillPoint()`。
+
+**为什么这样拆**（用户定的原则：*引擎要稳定、拓展性强，不替角色机制背锅*）：
+
+| 关注点 | 归属 | 理由 |
+|---|---|---|
+| 战技点的**基础规则** | `StandardSkillPointPolicy` | 规则会长大，但不该长在 `Battle` 里 |
+| **阵营判断** | 策略（**不是** `Battle`） | 由 `SkillPointPolicyExtensibilityTest` 证明：换成"不判阵营"的策略，敌方普攻就会涨点 —— 说明这个判断真的在策略里 |
+| **上限/开局/增量** | `Resource` + 策略构造参数 | 花火上限 +2、过客 4 件套开局 +1 都有挂靠点，**不需要改引擎** |
+| **角色级供点** | 覆盖 `gainForCast`（将来由 P8-7 效果表驱动） | 子类注入，装配点决定用哪个策略 |
+
+三处**刻意不碰**战技点的入口：
+- `castImmediate` —— 绕过队列的测试/演示入口（按定义就不该有资源成本）；
+- `castUltra` / `requestSkill` —— 终结技本来就不消耗，走 `requestSkill` 直连队列；
+- `EnemySkill.getData()` **恒为 `null`** —— 敌人技能不走角色倍率表，所以敌方行动
+  在策略的 null 保护处就返回了。
+
+> ⚠ **写这条时踩的坑**：`switch (skill.getData().getSkillType())` 对 **`null` 字符串会抛 NPE**
+> —— 而天赋/追加攻击的 `attack_type` 在数据里就是 `null`。现在改成先解析成
+> `SkillCategory`（`null` → `UNSPECIFIED`），**从类型上就不可能再踩**。
+
+> ⚠ **重构时踩的坑（值得记住）**：我一度让 `applySkillPointCost(skill)` 从
+> `currentMove` 猜出手者。在"没有行动者"的场景（直接调用的测试、演示的治疗分支）
+> 它猜出 `null`，而 `null != Camp.PLAYER` 让策略**静默变成空操作** ——
+> 一个**不报错的错误答案**。现在签名是
+> `applySkillPointCost(skill, user)`，**必须显式传出手者**，误用直接编译不过。
+
+> ⚠ **测试陷阱**：拿敌人默认的 `EnemySkill` 去测"敌方不影响战技点"是**空转** ——
+> 它的 `getData()` 恒为 `null`，无论有没有阵营判断都会通过（我第一版就是这么写的，
+> 靠变异测试才发现）。`SkillPointTest.enemyBasicAttackDoesNotFeedThePlayerPool` 因此
+> **手工给敌人装了一个真实角色普攻**，让"阵营判断"成为唯一能挡住它的东西。
+
+**"原子性"**：0 点时策略返回 `false` 且点数**不变**（`Resource.spendExactly` 的语义：
+不够就一点都不扣），`performAction` 因此返回 `false`、**不排队**，所以不会有
+"没花钱却打出去了"。
+
+**阵营判断的边界**：判的是 `Camp.PLAYER`，不是"是不是玩家操控"。将来加**友方召唤物**
+（忆灵属 P9-4）时，它们用 `Normal` 出手**也会给我方加战技点** —— 游戏里忆灵行动同样供点，
+所以这个行为大概正确；要调它**改策略即可**（`SkillPointPolicyExtensibilityTest.
+campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
+
+**不产生能量条的角色照样受约束**：战技点是队伍级资源，与个人的能量条/层数无关 ——
+黄泉（`NoConventionalEnergyProvider`）照样要花战技点放战技，`SkillPointGameParityTest`
+有覆盖。
+
+#### 重构落地的两个通用抽象
+
+**`enums.SkillCategory`** —— 数据里的 `attack_type` 枚举化（`F-6` 已解决）：
+`NORMAL` / `BPSKILL` / `ULTRA` / `MAZE_NORMAL` / `MAZE` / `ASSIST` / `ELATION_DAMAGE` /
+`UNSPECIFIED`（数据里的合法空）/ `UNKNOWN`（引擎不认识的数据）。
+`SkillData.getCategory()` 是入口，**判分支一律用它**。
+- **不抛异常**：数据是外部产物，多一个新类型就炸引擎是稳定性问题 → 降级成 `UNKNOWN`
+  并用 `isKnownValue()` 让调用方决定要不要出声；
+- **大小写不敏感 + 去空白**：建表与查表走同一个 `normalize()`。
+  ⚠ 第一版我只在 javadoc 里写了"大小写不敏感"却没实现（键存原样、查表用小写），
+  被 `knownValuesRoundTrip` 抓到 —— **文档承诺要有测试兜着**；
+- 原先两处裸字符串 `switch`（战技点、回能）都已改用它。
+
+**`models.Resource`** —— 有边界的队伍级数值资源：`max` / `min=0` / `maxOverflow`，
+`gainClamped`（不溢出）/ `gain`（显式溢出、封顶）/ `spend`（能扣多少扣多少）/
+`spendExactly`（不够就一点都不扣）。
+- **溢出默认关闭**（`maxOverflow = 0`）："不小心用 gain 就溢出"是不可能的，
+  要溢出必须显式 `setMaxOverflow`（对应花火"记录溢出最多 10 点"那类机制）；
+- **不变式 `value ∈ [0, max + maxOverflow]` 永远成立**：所以下调额度会把越界存量夹掉。
+  ⚠ 第一版只改额度不夹值，能造出 `max=5, overflow=0, value=15` 的**静默非法状态**，
+  被测试抓到后改成夹取；
+- 战技点是它的第一个用户，P8-8 的层数资源（【残梦】/【飞黄】/【火种】/【追忆】/【新蕊】）
+  是第二个 —— 那正是它被抽出来的理由。
+
+#### 剩余隐患
+
+- **~~`F-6` 裸字符串~~** ✅ 已解决（`SkillCategory`）。
+- **~~`F-8` `useSkill` 机制堆积~~** ✅ 已解决（策略抽出，`Battle` 只转发一次）。
+- **`F-1` / `F-2` / `F-3` / `F-4` / `F-7` 仍然只是"有挂靠点"，没有接**：
+  上限/开局的**接口**已经有了（换策略构造参数即可，见
+  `SkillPointPolicyExtensibilityTest`），但**谁在什么时候改**还没定 ——
+  角色级供点要 P8-7 触发器表，遗器套装要 P10-3，强化普攻的增量要数据补全。
+  **`F-3` 仍是唯一会让引擎算错数值的一条。**
+
 ---
 
 ## 10. 增益与减益（Buff 体系）
@@ -1181,6 +1323,10 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 - 韧性、弱点削韧、击破伤害、击破推条、击破跳回合（**需调用方主动调**）
 - 击破 DOT（火/雷/物理/风，先上先结算，敌人回合开始结算）
 - 能量（字段、回能效率、5 个回能钩子、终结技门槛与清零回能）
+- 战技点（P8-4）：全队共享池，开局 3 / 上限 5，我方普攻 +1 / 战技 -1 / 终结技中性，见 §9.6
+- 通用队伍级资源 `Resource`（有边界的值 + 显式溢出 + 原子消耗；战技点是第一个用户，P8-8 复用）
+- 技能类别枚举 `SkillCategory`（数据 `attack_type` 的类型化，消灭裸字符串 `switch` 的静默失配）
+- 可替换的战技点策略 `SkillPointPolicy`（`Battle` 不认识规则，只转发一次）
 - Buff 生命周期（同类替换、early/late tick、控制阻断、按侧注入）
 - 角色面板（等级缩放 + 光锥 + 遗器 + 行迹 + 额外加成）
 - 敌人面板（模板 × 等级组 × 实例 × 精英组）
@@ -1217,7 +1363,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 ## 16. 测试与可验证性
 
-- **42 个测试类 / 333 个用例**（截至本次清理），全部通过（`.\gradlew.bat test`）。
+- **46 个测试类 / 381 个用例**（截至 P8-4 重构），全部通过（`.\gradlew.bat test`）。
 - 覆盖重心：伤害乘区（`DamageZoneTest` 24 条）、技能展开（`SkillExecutorTest` 13 条）、
   能量（`EnergyTest` 8 + `EnergyBattleTest` 16）、韧性击破（`ToughnessTest` 6 +
   `ToughnessBattleTest` 8 + `BreakDamageTest` 5 + `BreakStateTest` 4 + `DotTest` 6）、
@@ -1225,7 +1371,14 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
   `EnemySkillTest` 5）、行动条（`QueueTest` 4 + `QueueRoundTest` 7 +
   `QueueActionManipulationTest` 8 + `QueueTieBreakTest` 8 + `ExtraTurnTest` 10）、
   关卡波次（`StageFactoryTest` 9 + `StageLazyLoadTest` 2 + `WaveManagerTest` 15）、
-  角色装配（`CharacterFactoryTest` 15 + `SkillSlotMappingTest` 13）。
+  角色装配（`CharacterFactoryTest` 15 + `SkillSlotMappingTest` 13）、
+  战技点（`SkillPointTest` 12：池子边界、真实链路增删、0 点原子性、
+  敌方不送点、`null` / `MazeNormal` 中性；`SkillPointGameParityTest` 12：
+  逐条对照游戏规则，并把三处已知差距固定在注释与断言里）、
+  重构引入的通用抽象（`SkillCategoryAndResourceTest` 18：枚举解析的稳健性
+  —— 空值/未知值/大小写、`Resource` 的三个边界与不变式；
+  `SkillPointPolicyExtensibilityTest` 6：**不改引擎**只换策略就能改
+  增量/上限/开局，并证明阵营判断确实在策略里）。
 - **可复现性**：`Battle` 接受注入的 `java.util.Random`；全仓库无 `Math.random()`。
   > ⚠️ 但 `Relic.createRandomLevelZero` / `MapUtils` 用的是不可播种的 `ThreadLocalRandom`，
   > 所以"同一份遗器"无法跨进程复现。

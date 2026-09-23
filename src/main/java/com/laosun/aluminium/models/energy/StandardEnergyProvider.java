@@ -35,15 +35,14 @@ public class StandardEnergyProvider implements EnergyProvider {
         if (skill == null || skill.getData() == null) {
             return null;
         }
-        // 追加攻击/天赋槽位的攻击类型在数据里是空的（null），不能直接 switch
-        String attackType = skill.getData().getSkillType();
-        if (attackType == null) {
-            return null;
-        }
-        return switch (attackType) {
-            case "Normal" -> EnergyGain.normal(Constant.ENERGY_GAIN_BASIC);
-            case "BPSkill" -> EnergyGain.normal(Constant.ENERGY_GAIN_SKILL);
-            default -> null;    // Ultra 走 onUltCast；Maze / 追加攻击等本阶段不回能
+        // ⚠ 走 SkillCategory 枚举，不要拿裸字符串 switch：数据侧改拼写或新增取值时，
+        //    字符串 switch 会静默失配（落 default 被吞掉，无编译期保护）。
+        //    见 DOC_VS_CODE.md §F 的 F-6。
+        return switch (skill.getData().getCategory()) {
+            case NORMAL -> EnergyGain.normal(Constant.ENERGY_GAIN_BASIC);
+            case BPSKILL -> EnergyGain.normal(Constant.ENERGY_GAIN_SKILL);
+            // Ultra 走 onUltCast；Maze / 追加攻击（UNSPECIFIED）/ 未知取值 本阶段不回能
+            default -> null;
         };
     }
 

@@ -247,6 +247,34 @@ public final class Constant {
     public static final double ENERGY_GAIN_BREAK = 5;
 
     /**
+     * 战技点上限（P8-4）：**全队共享**的一个池子，不是每个角色各有一条。
+     *
+     * <p>数值来自游戏规则而非数据表 —— {@code skills.json} 里**没有**战技点字段，
+     * 实测 638 条技能中普攻 122 条、战技 109 条的 {@code sp_need} **全是 null**
+     * （有值的 99 条全是终结技，那是开大能量门槛，见 §9.4）。
+     * 所以战技点只能来自规则：上限 5、开局 3、普攻 +1、战技 -1。
+     *
+     * <p>⚠ <b>上限不是恒定 5</b>：花火天赋「上限额外 +2」、光锥「每有 1 名欢愉命途角色 +1」，
+     * 甚至有光锥的触发条件是「上限 ≥ 6」。引擎目前**没有**"改队伍级资源上限"的口子 ——
+     * 已登记为 {@code DOC_VS_CODE.md} §F 的 <b>F-1</b>，等 P8-7 前后处理。
+     */
+    public static final int SKILL_POINT_MAX = 5;
+
+    /**
+     * 开局战技点（P8-4）。见 {@link #SKILL_POINT_MAX}。
+     *
+     * <p>⚠ <b>开局也不是恒定 3</b>：{@code RELICS.md} 过客 4 件套「战斗开始时立即为我方
+     * 恢复 1 个战技点」→ 开局 4（两个角色穿就是 5）。根因是**遗器套装效果整体没接**
+     * （{@code relic_sets.json} 连装载都没装载）—— 已登记为 §F 的 <b>F-2</b>。
+     */
+    public static final int SKILL_POINT_START = 3;
+
+    /**
+     * 一次普攻恢复的战技点（P8-4）。见 {@link #SKILL_POINT_MAX}。
+     */
+    public static final int SKILL_POINT_GAIN_BASIC = 1;
+
+    /**
      * 击破基数表：等级 → 基数（P4-3）。**数据文件里是 10 倍值**，用的时候要 {@code /10}
      * （80 级 = 3767.5535 → 376.75535）。
      *
