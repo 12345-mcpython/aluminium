@@ -410,8 +410,8 @@ afterMove()             → 死亡则 clearAll()+移出队列；存活则 setTop
 processSkillRequests() → processAddRequests() → processAdvanceRequests() → removeDeadCombatants()
 ```
 
-三种请求：`SkillRequest`（技能）、`addRequestItems`（新增参战者 🚧 目前是死代码）、
-`AdvanceRequest`（拉条 ⚠️ 目前无生产调用者）。
+三种请求：`SkillRequest`（技能）、`addRequestItems`（新增参战者 —— 由 `WaveManager`
+逐波入场时写入，见 §21）、`AdvanceRequest`（拉条 ⚠️ 目前无生产调用者）。
 
 `castImmediate(skill, user, targets)` 是**绕过队列**直接执行的测试/演示入口。
 
@@ -445,7 +445,7 @@ processSkillRequests() → processAddRequests() → processAdvanceRequests() →
 
 ---
 
-## 7. 技能系统 ✅（数据层完整，槽位映射是占位）
+## 7. 技能系统 ✅（数据层与槽位映射都已实现）
 
 ### 7.1 数据链
 
@@ -1190,10 +1190,10 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 | 项 | 现状 |
 |---|---|
-| 技能槽位 | 六槽全解析成槽位 1（普攻） |
+| 技能槽位 | ✅ P8-2 已接（`Constant.SKILL_SLOT` 六槽，见 §7.2）；剩下的占位是 `Character.fromAttributes(...)` 这个测试入口（写死槽位 1） |
 | 击破 DOT 数值 | `DOT_RATIO=0.5`、`DOT_TURNS=3` 是示例值，base 不含击破特攻与削韧值 |
 | 神君/账账类追加攻击 | 未进入事件体系 |
-| 召唤物 | `Summon` 类存在但**从未被实例化**；`Battle.addRequest` 是死代码；`battle.enemies` 是 `List<Enemy>`，敌方召唤物无处安放 |
+| 召唤物 | `Summon` 类存在但**从未被实例化**；`battle.enemies` 是 `List<Enemy>`，敌方召唤物无处安放（我方入场/波次走的是 `WaveManager` → `Battle.addRequestItems`，那条路是活的） |
 | 控制 | 只有 `StunBuff` 一种 |
 | 治疗 | 只有 `heal()` 方法，无乘区、无调用者 |
 
@@ -1217,20 +1217,29 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 ## 16. 测试与可验证性
 
-- **23 个测试类 / 167 个用例**（截至本次修复），全部通过。
+- **42 个测试类 / 333 个用例**（截至本次清理），全部通过（`.\gradlew.bat test`）。
 - 覆盖重心：伤害乘区（`DamageZoneTest` 24 条）、技能展开（`SkillExecutorTest` 13 条）、
-  能量（`EnergyTest` 8 + `EnergyBattleTest` 11）、韧性击破（`ToughnessTest` 6 + `ToughnessBattleTest` 8 +
-  `BreakDamageTest` 5 + `BreakStateTest` 4 + `DotTest` 6）、怪物数据（`MonsterDataTest` 7 +
-  `EnemyScalerTest` 4 + `EnemyFactoryTest` 5）。
+  能量（`EnergyTest` 8 + `EnergyBattleTest` 16）、韧性击破（`ToughnessTest` 6 +
+  `ToughnessBattleTest` 8 + `BreakDamageTest` 5 + `BreakStateTest` 4 + `DotTest` 6）、
+  怪物数据（`MonsterDataTest` 7 + `EnemyScalerTest` 4 + `EnemyFactoryTest` 5 +
+  `EnemySkillTest` 5）、行动条（`QueueTest` 4 + `QueueRoundTest` 7 +
+  `QueueActionManipulationTest` 8 + `QueueTieBreakTest` 8 + `ExtraTurnTest` 10）、
+  关卡波次（`StageFactoryTest` 9 + `StageLazyLoadTest` 2 + `WaveManagerTest` 15）、
+  角色装配（`CharacterFactoryTest` 15 + `SkillSlotMappingTest` 13）。
 - **可复现性**：`Battle` 接受注入的 `java.util.Random`；全仓库无 `Math.random()`。
-  > ⚠️ 但同速单位的出手顺序不受保证（`Signal.compareTo` 无平局裁决），
-  > 且 `Relic.createRandomLevelZero` / `MapUtils` 用的是不可播种的 `ThreadLocalRandom`。
+  > ⚠️ 但 `Relic.createRandomLevelZero` / `MapUtils` 用的是不可播种的 `ThreadLocalRandom`，
+  > 所以"同一份遗器"无法跨进程复现。
+  > 同速单位的出手顺序**已确定**（E4：`Signal.sequence` 平局裁决，见 §5.4）。
 - **测试盲区**（重要）：
-  - `Battle.startBattle()` **从未被任何测试调用** → 开场事件链零覆盖。
+  - ~~`Battle.startBattle()` 从未被任何测试调用~~ —— **已补**：`BattleResultTest`、
+    `WaveManagerTest`、`SkillSlotMappingTest`、`SpecialEnergyProviderTest`、
+    `UltraThresholdTest`、`SkillExecutorDiagnosticTest` 都走真实 `startBattle()`。
+    仍缺的是**开场事件链本身**的断言（`BattleStartEvent` 的监听者行为没有专门的用例）。
   - `BuffManagerTest` 直接调 `BuffManager`，**绕开 `Battle`** → 真实事件顺序、控制阻断的时序未验证。
-  - `EnergyTest` 用手写 `SkillData` 而非真实 `skills.json` → 测不出数据字段绑定错误。
-  - 无 `AttributeTypeTest`；`CharacterTest` 不覆盖拷贝构造器；
-    没有"过量削韧"与"多段削韧总量"用例（H-3/H-4 修复后才补上）。
+  - `EnergyTest` 用手写 `SkillData` 而非真实 `skills.json` → 测不出数据字段绑定错误
+    （真实数据的绑定由 `EnergyGainDataTest` 的继任者 `SkillSlotMappingTest` /
+    `CharacterFactoryTest` 覆盖）。
+  - 无 `AttributeTypeTest`；`CharacterTest` 不覆盖拷贝构造器。
 
 ---
 
@@ -1319,8 +1328,7 @@ Buff 也拿不到"这一段是用什么槽位打出来的"。
 | §3.1 **额外回合**（不消耗回合数、期间不可插入终结技） | ✅ 已实现（P7-2）：`Battle.grantExtraTurn` / `Queue.grantExtraTurn`；期间 `castUltra` 拦住非本人的终结技。见 §5.6 |
 | §3.2 **弱点击破效率** / **削韧值提高** | ❌ 属性都不存在；超击破公式（§7.3）需要它们 |
 | §3.4 **仇恨系统 / 受击概率** | ✅ 已实现（P5-1/P5-2）：`Path` + `CharacterData.aggro` + `Battle.aggroOf/getAggroTable`。见 §19.1 |
-| §3.4 **嘲讽** | ✅ 已实现（P5-2）：`TauntBuff` 是纯标记，**硬指定目标**（单体 / 扩散中心）而非仇恨加权 —— 与 §3.4 的"按百分比提高仇恨值"写法不同，见 §19.2 与 `DOC_VS_CODE.md` A-1 |
-| §3.4 **嘲讽** | ❌ 未实现。**且规格这里与实际规则不符**：§3.4 写"按百分比提高角色仇恨值"（加权），实际规则是**硬指定目标** —— 嘲讽 buff 被附加后，攻击方（角色或怪物）的**单体攻击**与**扩散攻击的中心**只能选中该个体（双向）。所以嘲讽不是 `aggroOf` 里的乘法，而是目标选择阶段的强制约束；`TauntBuff` 应是**纯标记、无数值**。详见 `DOC_VS_CODE.md` A-1 |
+| §3.4 **嘲讽** | ✅ 已实现（P5-2）：`TauntBuff` 是纯标记，**硬指定目标**（单体 / 扩散中心）而非仇恨加权 —— 与 §3.4 的"按百分比提高仇恨值"写法不同，见 §19.2 与 `DOC_VS_CODE.md` A-1。⚠ 规格与实际规则不符这点记在 `DOC_VS_CODE.md` A-1，这里不重复 |
 | §3.5 **效果命中与抵抗的生效概率公式** | ✅ 已实现（P6-1）：公式与 §3.5 一致，三个因子乘算。顺手修了 `EnemyFactory` 漏写 `effectHitRate` 的问题（之前敌人命中恒 0）。见 §20.1 |
 | §4 **护盾** | ✅ 已实现（P6-3）：`CanHit.shield` 先于 HP 被扣、不叠加。🚧 规格里的"护盾量提高"没有对应属性，护盾量目前就是传入值 |
 | §4 **治疗乘区** | ✅ 已实现（P6-2）：`Battle.calculateHeal/heal`。⚠ 规格的 `(1 - 治疗降低)` 与 `(1 + 受疗加成)` 合并成一个因子（`HEAL_TAKEN_RATIO` 取负即降低），因为属性表里没有单独的"治疗降低" |
@@ -1328,7 +1336,7 @@ Buff 也拿不到"这一段是用什么槽位打出来的"。
 | §6 **欢愉体系**（阿哈速度/笑点/好活当赏/欢愉伤害公式） | ❌ 只有 `DamageType.ELATION` 与 `AttributeType.ELATION_DAMAGE_BOOST` 两个占位；`elation_basic_level_damage.json`（101 条）**从未被加载** |
 | §7 **超击破** | ✅ 已实现（P4-6，2026-09-19）：`SuperBreakBuff` + `BreakDamageCalculator.buildSuperBreak` + `SkillExecutor` 里追加 `SUPER_BREAK` 段。**但**公式里的 `(1 + 削韧值提高)` 与 `(1 + 弱点击破效率提高)` 仍缺（属性不存在），`SUPER_BREAK_BOOST = 0.4` 是示例值 |
 | §8.1 **忆灵伤害 / 欢愉伤害** 作为独立类型 | 类型枚举里有 `MEMORY` / `ELATION`，但无来源 |
-| §附录 5 **特殊免疫判定**（如"记忆"祝福对冻结先查免疫） | ❌ 无免疫机制；`monster_config` 的 `debuff_resistance` 列也从未被读取 |
+| §附录 5 **特殊免疫判定**（如"记忆"祝福对冻结先查免疫） | 🚧 **部分**：`monster_config` 的 `debuff_resistance` **已接**（`EnemyFactory` 落进 `Enemy.debuffResist`，在 §20.1 的效果命中公式里作 `(1 - specific)` 因子，为 0 即完全免疫）。缺的是"祝福/机制级的免疫豁免"那一层 |
 
 ### 18.5 引擎有、但 `HSR.md` 没写的
 
@@ -1601,6 +1609,9 @@ jingYuan.getAggro();       // 75
 注意**行迹是无条件应用的**（`build()` 里调 `SkillPoint.appendTo`），所以面板不等于
 `数据 × 倍率`。这一点很容易误判成"属性索引错位"（P8-1 时我就误诊了一轮）。
 
-🚧 **技能仍是占位**：`create()` 造出来的技能是 `DefaultSkill`（槽位 1），
-真实倍率是 P8-2；天赋/追加攻击是 P8-3。本类**不负责**填技能。
+⚠ `Character.fromAttributes(...)`（测试/占位入口，P8 后新代码禁止使用）造的技能
+是写死的 `DefaultSkill(1001, 1, 1)`——**六个槽位全是槽位 1 的普攻**。这是刻意的：
+它没有 `cid`，查不到真实技能数据；真实角色一律走
+`CharacterFactory.create(cid, level)`（槽位映射见 §7.2）。
+本类**不负责**填技能倍率；天赋之外的追加攻击/召唤物是 P8-3 / P9-4。
 

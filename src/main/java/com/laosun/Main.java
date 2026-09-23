@@ -7,7 +7,6 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Enemy;
 import com.laosun.aluminium.models.EnemyFactory;
@@ -369,39 +368,17 @@ public class Main {
                 .relicSuit(relics)
                 .extraValue(new ExtraBasicPromote(0, 0, 0, 0, 0, 0, 0.12, 0))
                 .build();
-        hero.setMaxEnergy(120);
-        installSkills(hero, 1003);
         return hero;
     }
 
     private static Character march7th() {
         Character hero = Character.builder().cid(1001).level(80).build();
-        hero.setMaxEnergy(120);
-        installSkills(hero, 1001);
         return hero;
     }
 
     private static Character luocha() {
         Character hero = Character.builder().cid(1203).level(80).build();
-        hero.setMaxEnergy(100);
-        installSkills(hero, 1203);
         return hero;
-    }
-
-    /**
-     * 显式装配真实技能槽。
-     *
-     * <p>注意这里**手工按槽位号**建 {@link DefaultSkill}（1=普攻、2=战技、3=终结技、
-     * 4=天赋、6=迷宫攻击、7=秘技）—— 因为 {@code Character.Builder} 现在把 6 个槽位
-     * 全指向槽位 1（P8-2 的占位）。这段装配就是 P8-2 要正式做掉的东西。
-     */
-    private static void installSkills(Character hero, int cid) {
-        hero.setSkill(SkillType.COMMON, new DefaultSkill(cid, 1, 1));
-        hero.setSkill(SkillType.SKILL, new DefaultSkill(cid, 2, 1));
-        hero.setSkill(SkillType.ULTRA, new DefaultSkill(cid, 3, 1));
-        hero.setSkill(SkillType.TALENT, new DefaultSkill(cid, 4, 1));
-        hero.setSkill(SkillType.SUMMON_SKILL, new DefaultSkill(cid, 6, 1));
-        hero.setSkill(SkillType.SUMMON_TALENT, new DefaultSkill(cid, 7, 1));
     }
 
     /** 手工造一件遗器：主词条 + 一条副词条（真实随机生成见 {@code Relic.createRandomLevelZero}）。 */

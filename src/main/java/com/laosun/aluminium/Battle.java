@@ -487,10 +487,6 @@ public class Battle {
         skillRequests.add(new SkillRequest(skill, user, target));
     }
 
-    private void addRequest(CanHit canHit) {
-        addRequestItems.add(canHit);
-    }
-
 
     /**
      * Assembles every damage zone on the given hit, settles it and applies it to the
