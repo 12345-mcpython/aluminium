@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.Skill;
 import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillEffectType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -120,5 +121,20 @@ public class SkillData {
         }
         return new SkillData(skill.maxLevel(), skill.attackType(), skill.paramList(), skill.stanceList(),
                 skill.element(), effect, skill.spNeed(), skill.spBase());
+    }
+
+    /**
+     * 数据里的 {@code attack_type} 解析成的枚举 —— **判分支请用这个**，不要拿
+     * {@link #getSkillType()} 的裸字符串做 {@code switch}/{@code equals}。
+     *
+     * <p>裸字符串的问题：数据侧改拼写或新增类型时**静默失配**（落 {@code default} 被吞掉）。
+     * 走枚举则"数据值 → 引擎语义"只有一处定义（{@link SkillCategory#fromString}），
+     * 新增类型时编译器会逼着每个 {@code switch} 表态。
+     *
+     * @return 永远非 {@code null}；数据为空时是 {@link SkillCategory#UNSPECIFIED}，
+     *         数据取值不认识时是 {@link SkillCategory#UNKNOWN}
+     */
+    public SkillCategory getCategory() {
+        return SkillCategory.fromString(skillType);
     }
 }
