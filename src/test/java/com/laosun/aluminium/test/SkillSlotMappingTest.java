@@ -1,8 +1,14 @@
 package com.laosun.aluminium.test;
 
+import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.DefaultSkill;
+import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.Enemy;
+import com.laosun.aluminium.models.EnemyFactory;
 import com.laosun.aluminium.models.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -10,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * 技能**槽位映射**（P8-2 的核心）：{@code SkillType} → {@code skills.json} 的槽位号。
@@ -151,25 +158,74 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * ⚠ <b>等级还没接进伤害计算</b>：{@code SkillData.getSkills()} 返回的是**整张**逐级参数表，
-     * 而 {@code SkillExecutor} 取的是 {@code params.getFirst()}. 所以无论技能等级是 1 还是 8，
-     * 打出来的都是**第 1 档**倍率。
+     * 技能**等级确实接进了伤害**：{@code SkillExecutor} 用 {@code skill.getLevel() - 1} 取参数行。
      *
-     * <p>这条测试的作用是**记录这个缺口**，而不是断言它正确：
-     * 下面显式断言"整表取第 1 档"（当前行为）与"第 8 档确实是 1.2"（数据正确），
-     * 等 P8-2 把等级接进 {@code SkillExecutor} 之后，把这个测试改成断言等级 8 → 1.2。
+     * <p>⚠ 我先前在这里写过"等级还没接进伤害"——**那是错的**，已更正。
+     * 起因：我构造了一个 8 级技能、却断言 {@code getData().getSkills().getFirst()} 是 1.2，
+     * 而 {@code getSkills()} 返回的是**整张**逐级表，取 {@code getFirst()} 当然还是第 1 档。
+     * 我把自己取错行当成了引擎没取行。
+     *
+     * <p>真实调用链：{@code skill.getLevel()} → {@code index = level - 1} → {@code levels.get(index)}。
+     * 端到端见 {@link #skillLevelScalesActualDamage}。
      */
     @Test
-    void skillLevelIsNotAppliedYet() {
-        Character jingYuan = CharacterFactory.create(1204, 80);
-        List<List<Double>> table = jingYuan.getSkills().get(SkillType.COMMON).getData().getSkills();
+    public void skillLevelSelectsTheParameterRow() {
+        Character hero = CharacterFactory.create(1204, 80);
+        List<List<Double>> table = hero.getSkills().get(SkillType.COMMON).getData().getSkills();
 
         Assertions.assertEquals(0.5, table.getFirst().getFirst(), EPS, "第 1 档 = 0.5");
-        Assertions.assertEquals(1.2, table.get(7).getFirst(), EPS, "第 8 档 = 1.2（数据是对的）");
+        Assertions.assertEquals(1.2, table.get(7).getFirst(), EPS, "第 8 档 = 1.2");
+        Assertions.assertEquals(table.get(7), table.get(8 - 1), "level 8 → index 7");
+    }
 
-        // 当前行为：执行器只看第 1 档
-        List<Double> whatExecutorUses = table.getFirst();
-        Assertions.assertEquals(0.5, whatExecutorUses.getFirst(), EPS,
-                "整表取第 1 档 —— 这就是「等级未接入」的表现（P8-2 待办）");
+    /**
+     * 端到端：同一技能 1 级与 8 级打出的伤害之比 = 倍率之比（1.2 / 0.5 = 2.4）。
+     *
+     * <p>这条把"等级接入"钉死 —— 同时覆盖 {@code SkillExecutor} 的取行、倍率取值与伤害管线。
+     */
+    @Test
+    public void skillLevelScalesActualDamage() {
+        double lv1 = damageOfBasicAttack(1);
+        double lv8 = damageOfBasicAttack(8);
+
+        Assertions.assertEquals(1.2 / 0.5, lv8 / lv1, 1e-6,
+                "8 级 / 1 级的伤害比应等于倍率比 2.4，实际 " + (lv8 / lv1));
+        Assertions.assertTrue(lv1 > 0 && lv8 > lv1, "等级越高伤害越高");
+    }
+
+    /**
+     * 但**装配出来的角色默认是 1 级技能**：{@code Builder} 的 {@code skillLevel} 初值就是 1，
+     * 要升级得调 {@code skillLevel(type)}（+1）或 {@code setSkillLevel(type, level)}。
+     *
+     * <p>这不是缺陷：技能等级属于 P8 的成长系统（行迹/星魂会加等级），
+     * 本项只负责"槽位对、数据对、等级能生效"。
+     */
+    @Test
+    public void factoryCharactersStartAtSkillLevelOne() {
+        Character hero = CharacterFactory.create(1204, 80);
+        for (SkillType type : Constant.SKILL_SLOT.keySet()) {
+            Assertions.assertEquals(1, hero.getSkills().get(type).getLevel(),
+                    type + " 的初始技能等级是 1");
+        }
+
+        // 提升两级后，实际打出的是第 3 档倍率
+        Character leveled = Character.builder().cid(1204).level(80).isPromote()
+                .skillLevel(SkillType.COMMON).skillLevel(SkillType.COMMON).build();
+        Assertions.assertEquals(3, leveled.getSkills().get(SkillType.COMMON).getLevel());
+        Assertions.assertEquals(0.7, leveled.getSkills().get(SkillType.COMMON)
+                .getData().getSkills().get(2).getFirst(), EPS, "3 级 → 第 3 档 = 0.7");
+    }
+
+    /** 用指定技能等级打一发普攻，返回对敌人造成的伤害。 */
+    private static double damageOfBasicAttack(int level) {
+        Character hero = CharacterFactory.create(1204, 80);
+        Enemy enemy = EnemyFactory.create(1002011, 90, 1);
+        enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));
+        enemy.heal(1_000_000);
+
+        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        battle.startBattle();
+        battle.castImmediate(new DefaultSkill(1204, 1, level), hero, List.of(enemy));
+        return 1_000_000 - enemy.getCurrentHp();
     }
 }
