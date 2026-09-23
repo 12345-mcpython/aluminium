@@ -5,6 +5,28 @@
 **核对范围**：`README.md`、`ROADMAP.md`、`engine.md`（本轮新写）、所有 `src/**/*.java` 的注释与 javadoc、
 以及 `src/main/resources/` 下的数据文件与 `code` 的实际行为。
 
+> ⚠ **重要：本文所有"`ROADMAP` 第 N 行"的行号，指的是 v2 版 ROADMAP**
+> （`ROADMAP.md` @ 2026-09-23 重写之前），**存档在 `docs/archive/ROADMAP-v2-历史.md`**。
+> 2026-09-23 的 v3 重写把 ROADMAP 从 2446 行压到 ~350 行，**行号已全部失效** ——
+> 引用行号时请对照存档文件，不要对照当前的 `ROADMAP.md`。
+>
+> 任务编号（`P3-4` / `P4-6` / `P5-2` 等）**仍然有效**：v3 保留了所有待办任务的编号，
+> 已完成任务的完整规格在存档里。
+
+### 对 ROADMAP v3 的核对（2026-09-23，本轮新写）
+
+新写的 `ROADMAP.md` v3 逐条核对过，**未发现与代码/数据不符的断言**。已核实的事实：
+
+| 断言 | 结论 |
+|---|---|
+| `Main` 的入口是 `public static void main()`（无参） | ✅ 相符 |
+| `relic_sets.json` 未装载 | ✅ 相符（`Constant` 里唯一提到它的地方是本轮新加的 javadoc） |
+| `elation_basic_level_damage.json` 从未被加载 | ✅ 相符（`Constant` 里 0 处引用） |
+| `StageFactory.temporaryTeam()` 仍在（P8-5 未做） | ✅ 相符 |
+| `Summon` 全项目没有 `new Summon(...)` | ✅ 相符 |
+| `enemy_skills.json` 只覆盖 5 只怪 | ✅ 相符 |
+| 93 个角色文档 / `aluminium_texts` 路径 | ✅ 相符 |
+
 **方法**：把文档里所有**可验证的断言**（文件名、类名、方法名、字段名、测试用例名、数值、条数、
 行为描述）抽出来逐条对代码/数据核实；再反向扫代码注释里对自身行为的描述是否与实现相符。
 本文只记录**已核实**的不一致，每条给出证据。
