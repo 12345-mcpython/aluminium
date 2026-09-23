@@ -1856,10 +1856,14 @@ P8-3 里的 `switch (cid)` 只是过渡实现。
   恰好 5 个低于上限 / 云璃 120 可放 / 放开即清零 / 常规角色仍需攒满 /
   无能量条永远放不了 / 特殊资源角色攒不起来。
 - **仍未做**（本项剩下的）：
-    - **等级没接进伤害**：`SkillExecutor` 取 `params.getFirst()`，所以技能 1 级与 8 级打的一样
-      （数据是对的，景元普攻第 8 档 = 1.2）。`SkillSlotMappingTest.skillLevelIsNotAppliedYet` 钉住了它。
-    - 槽位 6/7（需要先加 `SkillType` 枚举值）。
-    - `SkillExecutor` 的 non-damaging default 分支提示。
+    - 槽位 6/7（需要先给 `SkillType` 加"地图普攻/秘技"两个枚举值）。
+    - `SkillExecutor` 的 non-damaging default 分支提示（计划第 3 条）。
+- **⚠ 一处自我更正**：我曾把"技能等级没接进伤害"记成缺口，**这是错的**。
+  `SkillExecutor` 一直用 `int index = skill.getLevel() - 1` 取逐级参数表的第 N 行。
+  出错原因很蠢：我构造了 8 级技能，却断言 `getData().getSkills().getFirst()` 是 1.2 ——
+  而 `getSkills()` 返回整张表，`getFirst()` 永远是第 1 档。**把自己取错行当成了引擎没取行。**
+  现已改为端到端断言：8 级 / 1 级的**实际伤害**比 = 2.4（`skillLevelScalesActualDamage`）。
+  真正成立的事实只是"**装配出来的角色默认技能等级为 1**"，那属于 P8 成长系统，不是缺口。
 - **变异验证**：把槽位映射改回恒为 1 → `UltraThresholdTest` 4 红；
   去掉 `CharacterFactory` 的特殊 provider 注入 → `SpecialEnergyProviderTest` 3 红。
 - **依赖**：P8-1、P1-8

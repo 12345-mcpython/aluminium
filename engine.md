@@ -490,10 +490,20 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 ⚠ **槽位 6/7 仍未装配**：`SkillType` 里没有地图普攻/秘技对应的枚举值，
 所以 `SKILL_SLOT` 只有 4 项。要覆盖它们得先加枚举值（见 ROADMAP P8-2）。
 
-⚠ **等级还没接进伤害**：`SkillData.getSkills()` 返回**整张**逐级参数表，
-而 `SkillExecutor` 取的是 `params.getFirst()` —— 所以技能等级 1 与 8 打出的都是**第 1 档**倍率。
-数据是对的（景元普攻第 8 档 = 1.2），只是执行器还没按等级取行。
-`SkillSlotMappingTest.skillLevelIsNotAppliedYet` 记录了这个缺口。
+✅ **技能等级是接进伤害的**：`SkillExecutor` 用 `int index = skill.getLevel() - 1` 取
+`SkillData.getSkills()`（整张逐级表）的第 N 行，所以 8 级打的是第 8 档倍率。
+端到端验证在 `SkillSlotMappingTest.skillLevelScalesActualDamage`：景元普攻
+8 级 / 1 级的伤害比 = `1.2 / 0.5 = 2.4`。
+
+> ⚠ **更正**：我在上一版这里写过"等级还没接进伤害"——**那是错的**。
+> 起因是我构造了 8 级技能却断言 `getData().getSkills().getFirst()` 是 1.2，
+> 而 `getSkills()` 返回整张表，取 `getFirst()` 当然还是第 1 档：
+> **我把"自己取错行"当成了"引擎没取行"。**
+> 教训：别用 `getFirst()` 去验证"某一档次"的东西。
+
+⚠ 注意**装配出来的角色默认技能等级是 1**（`Builder.skillLevel` 初值），
+要更高得调 `skillLevel(type)` 或 `setSkillLevel(type, level)` —— 技能等级属于 P8 的成长系统
+（行迹/星魂加等级），不是本项范围。
 
 `SkillData.init` 在查不到 `cid`/槽位时返回 `EMPTY`（`PHYSICAL` + `ENHANCE` + 空参数）
 → 因为 `ENHANCE` 不是伤害类，技能会**静默零伤害**且 `requestSkill` 仍返回 `true`。这是易踩的坑。
