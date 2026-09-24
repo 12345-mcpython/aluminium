@@ -42,6 +42,17 @@ public class DefaultSkill extends Skill {
     }
 
     @Override
+    public int getCid() {
+        return cid;
+    }
+
+    /** ⚠ Despite the field name, {@code skillId} here is the <b>slot</b> — see the constructor call. */
+    @Override
+    public int getSkillSlot() {
+        return skillId;
+    }
+
+    @Override
     public SkillData getData() {
         String key = cid + "_" + skillId;
         return DATA_CACHE.computeIfAbsent(key, k -> SkillData.init(cid, skillId));

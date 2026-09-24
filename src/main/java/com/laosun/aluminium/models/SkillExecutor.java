@@ -1,6 +1,8 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.beans.SkillEffectSpec;
+import com.laosun.aluminium.data.SkillEffects;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillCategory;
@@ -150,6 +152,144 @@ public final class SkillExecutor {
     }
 
     /**
+     * Runs a non-damaging skill's effect (P10-3) instead of doing nothing.
+     *
+     * <p><b>What this replaced.</b> This method used to not exist: {@code resolveHits} simply returned,
+     * so a heal / shield / buff / control / summon skill was cast, cost its skill point, granted its
+     * energy and changed nothing. The demo's "healing" only worked because {@code Main} had grown a
+     * second, hand-rolled dispatch path of its own — the engine quietly depending on its caller.
+     *
+     * <p><b>Which effects are actually covered.</b> Only {@code Restore} and {@code Defence}, and only
+     * for skills that have an entry in {@code data/skill_effects.json}. The table cannot be derived
+     * from {@code skills.json} alone, so anything missing keeps the old behaviour <i>and</i> keeps the
+     * diagnostic — {@link #logNotDispatched} names the phase that owns it. Treating "no entry" as
+     * "nothing to do" silently is exactly the bug being fixed here, so the distinction is preserved.
+     *
+     * @param battle the running battle
+     * @param skill  the skill being cast (its identity keys the table)
+     * @param user   the caster (the {@code healer_*} scales are theirs)
+     * @param targets who the caller selected
+     * @param effect the parsed effect category, for the diagnostic
+     */
+    private static void dispatchNonDamaging(Battle battle, Skill skill, CanHit user,
+                                            List<? extends CanHit> targets, SkillEffectType effect) {
+        SkillEffectSpec spec = SkillEffects.forSkill(skill);
+        boolean supported = spec != null
+                && ("Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect()))
+                && !isAmbiguous(spec);
+        if (!supported || targets == null || targets.isEmpty()) {
+            logNotDispatched(skill, user, effect, targets);
+            return;
+        }
+        for (CanHit target : targets) {
+            double amount = effectAmount(skill, spec, user, target);
+            if ("Restore".equals(spec.getEffect())) {
+                battle.heal(user, target, amount);
+            } else {
+                battle.grantShield(target, amount);
+            }
+        }
+    }
+
+    /**
+     * Whether an entry mixes several things together so that its parameters cannot be summed.
+     *
+     * <p>⚠ <b>This is an interim guard, not a design.</b> Some heal skills carry more than one effect
+     * in the same parameter row, and the table — which is derived from the description's {@code #N}
+     * placeholders — currently lists them all:
+     *
+     * <pre>
+     * Natasha 1105 skill  params [0.07, 0.048, 2, 70, 48]  →  0% + 3 flat  (the heal)
+     *                                                          1% + 4 flat  (a heal-over-time)
+     * </pre>
+     *
+     * <p>Summing those would heal for the direct amount <i>and</i> the per-turn amount at once — a
+     * number that looks entirely plausible and is wrong. So anything with more than one percentage
+     * term is refused and reported, exactly like an unsupported effect.
+     *
+     * <p>The real fix belongs in the generator: split the description at the clause that introduces
+     * the per-turn part and emit only the <b>immediate</b> terms (with the rest stored separately for
+     * the heal-over-time that does not exist yet). Until then, refusing is the honest answer — a
+     * refused heal is visible, a wrong heal is not.
+     */
+    private static boolean isAmbiguous(SkillEffectSpec spec) {
+        if (spec.getParams() == null) {
+            return true;
+        }
+        int percents = 0;
+        int flats = 0;
+        for (SkillEffectSpec.Param param : spec.getParams()) {
+            if ("percent".equals(param.getKind())) {
+                percents++;
+            } else {
+                flats++;
+            }
+        }
+        return percents != 1 || flats > 1;
+    }
+
+    /**
+     * Sums the terms of an effect: each parameter is either a percentage of {@link #scaleValue} or a
+     * flat addition.
+     *
+     * <p>The row is chosen by the skill's <b>current level</b>, the same rule as damaging skills and
+     * as {@code TriggerInterpreter.multiplierOf} — never hardcoded to max level.
+     *
+     * @throws IllegalStateException when the table names a parameter the skill row does not have,
+     *                               which means the generated table and the data have drifted apart
+     */
+    private static double effectAmount(Skill skill, SkillEffectSpec spec, CanHit user, CanHit target) {
+        List<List<Double>> levels = skill.getData().getSkills();
+        int row = skill.getLevel() - 1;
+        if (row < 0 || row >= levels.size() || spec.getParams() == null) {
+            return 0;
+        }
+        List<Double> params = levels.get(row);
+        double scale = scaleValue(spec.getScale(), user, target);
+        double total = 0;
+        for (SkillEffectSpec.Param param : spec.getParams()) {
+            if (param.getIndex() < 0 || param.getIndex() >= params.size()) {
+                throw new IllegalStateException(
+                        "skill_effects.json for cid " + skill.getCid() + " slot " + skill.getSkillSlot()
+                                + " names parameter " + param.getIndex() + ", but the row has only "
+                                + params.size() + " (source: " + spec.getSource() + ")");
+            }
+            double raw = params.get(param.getIndex());
+            total += "percent".equals(param.getKind()) ? raw * scale : raw;
+        }
+        return total;
+    }
+
+    /**
+     * The value a percentage term scales off.
+     *
+     * <p>{@code healer_*} is the caster's and {@code target_*} the recipient's. That distinction is the
+     * whole reason the table has separate names for it: "of Natasha's Max HP" and "of their respective
+     * Max HP" both read as "Max HP", and getting them backwards heals for a plausible-looking but
+     * wrong number.
+     *
+     * @throws IllegalStateException on a scale this engine does not know, rather than quietly
+     *                               returning 0 — the vocabulary is fixed by the generator, so an
+     *                               unknown value means the engine is behind the data
+     */
+    private static double scaleValue(String scale, CanHit user, CanHit target) {
+        if (scale == null) {
+            return 0;
+        }
+        return switch (scale) {
+            case "healer_max_hp" -> user.getMaxHp();
+            case "target_max_hp" -> target.getMaxHp();
+            case "atk" -> user.getAttribute(AttributeType.ATTACK).get();
+            case "def" -> user.getAttribute(AttributeType.DEFENCE).get();
+            case "target_missing_hp" -> Math.max(0, target.getMaxHp() - target.getCurrentHp());
+            // flat-only effects have nothing to scale off
+            case "base" -> 0;
+            default -> throw new IllegalStateException(
+                    "skill_effects.json uses an unknown scale '" + scale + "'");
+        };
+    }
+
+    /**
      * Expands one skill activation into N hits and settles them (energy is not given here, see
      * {@link #execute}).
      *
@@ -162,11 +302,7 @@ public final class SkillExecutor {
 
         // 1) first decide whether it is a damaging skill: for shield/heal/buff skills the first param is not a damage multiplier
         if (!effect.isDamaging() || targets == null || targets.isEmpty()) {
-            logNotDispatched(skill, user, effect, targets);
-            // A non-damaging skill ends here: **only the energy gain is still given** (see execute);
-            // the effect is implemented by its own phase — heals/shields are Battle.heal / grantShield
-            // (P6-2/P6-3, but with **no automatic dispatch**), buffs are P10-3, control P10-6, summons
-            // P9-4. See engine.md §7.2b
+            dispatchNonDamaging(battle, skill, user, targets, effect);
             return;
         }
 
