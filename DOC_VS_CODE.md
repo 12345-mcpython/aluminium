@@ -725,6 +725,28 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 - **风险**：**中** —— 控制/召唤类继续静默（不产生错值），但
   **治疗/护盾的数值当前是错的**，且"技能放出去没反应"很难被发现
   （这正是 `SkillExecutorDiagnosticTest` 存在的理由）。
+- **进展（2026-09-24，第一版表已导出）**：`generate_data.py` 已新增一段，
+  产出 `data/skill_effects.json`（Restore / Defence 共 **40 条**，其中 **28 条**解析出
+  缩放属性与百分比项）。开发中修掉两个解析错误，都是**看了真实输出才发现**的：
+    1. 属性名词在占位符**后面**（`#1[i]% of Gepard's DEF`），第一版往回找 ⇒ 只解析出 13/40；
+    2. 颜色标记夹在占位符与 `turn` 之间（`#3[i]</unbreak> turn(s)`）⇒ 持续回合被误判成固定值。
+- **✅ 歧义已拆（同日）**：`max_hp` 已按"`of` 与名词之间那段所有格"拆成
+  `healer_max_hp`（15 条）/ `target_max_hp`（2 条：`8001.7`、`8002.7` 的 "their respective Max HP"）。
+  最终分布：`healer_max_hp` 15 / `def` 7 / `atk` 4 / `target_max_hp` 2 / 未解析 12。
+  **`FormulaType` 预言机 8 条全部一致、0 冲突。**
+- **⚠ 预言机当场抓到了我自己的假阳性**：第一版把 "the ally" 也算作"目标"的标记，
+  于是 Natasha 战技那句 "Restores **the ally** for another `#2%` of **Natasha's** Max HP"
+  被误判成 `target_max_hp`，生成器立刻报冲突并**中止**（`1105.2`）。
+  改成只在 `of` 与名词之间找所有格后正确。**这就是坚持"两个来源不一致就中止"的价值** ——
+  它拦住的是一个会静默算错治疗的错，而不是一条格式问题。
+- **还差最后一步才能接线**：`models.SkillData` 目前**不暴露** `cid` / `skillID`
+  （`init(cid, skillID)` 收下了但没留存），而这张表是按 `cid → slot` 索引的。
+  加两个访问器即可，属机械改动；之后 `SkillExecutor` 才能查表分派 RESTORE / DEFENCE。
+- **另注（工具链）**：`E:\code\python` **不是 git 仓库**，本 Java 仓库也不跟踪 `generate_data.py`，
+  所以对生成器的改动**没有任何版本历史**。另外它按 cwd 决定 `out_dir`：
+  从 `E:\code\python` 跑会把产物写进 `E:\code\python\data\`，要从本项目根目录跑才写进
+  `src/main/resources/data/`。`skill_effects.json` 落在被 `.gitignore` 排除的 `data/` 里，
+  提交需要 `git add -f`（同 `monster_attack_modify_ratio.json` 的处理）。
 
 ---
 

@@ -40,24 +40,29 @@ public class SkillExecutorDiagnosticTest {
     }
 
     /**
-     * With the switch turned on, casting a healing skill (Natasha's (娜塔莎) skill = {@code Restore})
-     * prints the undispatched notice and labels its owner as P6-2.
+     * A non-damaging skill that has <b>no entry</b> in {@code skill_effects.json} is still reported.
+     *
+     * <p>P10-3 wired Restore and Defence, so the diagnostic narrowed to the effects that are genuinely
+     * still unimplemented (buff / control / summon). Bronya's (布洛妮娅) skill is a Support skill, so it
+     * exercises that path.
+     *
+     * <p>⚠ This test used to cast Natasha's healing skill and assert the notice, back when healing did
+     * nothing. It was rewritten rather than deleted: the invariant that matters is now "anything the
+     * engine cannot apply must say so", not "healing is broken".
      */
     @Test
-    public void diagnosticReportsNonDamagingSkillsWhenEnabled() {
-        Character natasha = CharacterFactory.create(1105, 80);
-        Battle battle = newBattle(natasha);
+    public void skillsWithoutATableEntryAreStillReported() {
+        Character bronya = CharacterFactory.create(1101, 80);
+        Battle battle = newBattle(bronya);
 
         String out = capture(() -> {
             SkillExecutor.setLogNotDispatched(true);
-            battle.castImmediate(new DefaultSkill(1105, 2, 1), natasha, List.of(natasha));
+            battle.castImmediate(new DefaultSkill(1101, 2, 1), bronya, List.of(bronya));
         });
 
-        Assertions.assertTrue(out.contains("NOT DISPATCHED"), "it should print the undispatched notice; actual output: " + out);
-        Assertions.assertTrue(out.contains("RESTORE"), "it should carry the effect type; actual: " + out);
-        Assertions.assertTrue(out.contains("Natasha"),
-                "it should carry the caster; actual: " + out);
-        Assertions.assertTrue(out.contains("P6-2"), "it should label the owning phase; actual: " + out);
+        Assertions.assertTrue(out.contains("NOT DISPATCHED"), "it should print the notice; actual: " + out);
+        Assertions.assertTrue(out.contains("SUPPORT"), "it should carry the effect type; actual: " + out);
+        Assertions.assertTrue(out.contains("P10-3"), "it should label the owning phase; actual: " + out);
     }
 
     /**
@@ -77,21 +82,34 @@ public class SkillExecutorDiagnosticTest {
     }
 
     /**
-     * A shield skill (March 7th's (三月七) skill = {@code Defence}) goes through the same silent path
-     * and is labelled P10-3.
+     * A {@code Defence} skill with a single percentage term really grants a shield, and is no longer
+     * reported as undispatched.
+     *
+     * <p>Gepard's (杰帕德) ultimate is {@code 1104 slot 3}: {@code scale = def}, one percentage and one
+     * flat term, so it is one of the entries the engine can read unambiguously.
+     *
+     * <p>⚠ March 7th's (三月七) skill is deliberately <b>not</b> used here even though it is the obvious
+     * shield: its row carries two percentage terms (a shield plus something else), so the ambiguity
+     * guard refuses it. That is the guard working as intended, and
+     * {@link #ambiguousHealEntriesAreRefusedRatherThanSummed} covers that behaviour.
+     *
+     * <p>⚠ Formerly {@code shieldSkillIsAlsoReported}, which asserted the opposite — that a shield
+     * skill only printed a notice.
      */
     @Test
-    public void shieldSkillIsAlsoReported() {
-        Character march7th = CharacterFactory.create(1001, 80);
-        Battle battle = newBattle(march7th);
+    public void singleTermShieldSkillsAreDispatchedAndNotReported() {
+        Character gepard = CharacterFactory.create(1104, 80);
+        Battle battle = newBattle(gepard);
+        Assertions.assertEquals(0, gepard.getShield(), EPS, "no shield before the cast");
 
         String out = capture(() -> {
             SkillExecutor.setLogNotDispatched(true);
-            battle.castImmediate(new DefaultSkill(1001, 2, 1), march7th, List.of(march7th));
+            battle.castImmediate(new DefaultSkill(1104, 3, 1), gepard, List.of(gepard));
         });
 
-        Assertions.assertTrue(out.contains("DEFENCE"), "it should report DEFENCE; actual: " + out);
-        Assertions.assertTrue(out.contains("P10-3"), "it should label P10-3; actual: " + out);
+        Assertions.assertFalse(out.contains("NOT DISPATCHED"),
+                "a skill in the table must not be reported as undispatched; actual: " + out);
+        Assertions.assertTrue(gepard.getShield() > 0, "the shield should really be applied");
     }
 
     /**
@@ -114,27 +132,62 @@ public class SkillExecutorDiagnosticTest {
     }
 
     /**
-     * The diagnostic **does not affect behaviour**: a non-damaging skill is still "energy only, no
-     * effect".
+     * A healing skill really heals now, and heals for the <b>right</b> number.
      *
-     * <p>This pins the current real state — turning the log on is not the same as implementing the effect.
+     * <p>⚠ This replaces {@code diagnosticDoesNotChangeBehaviour}, which asserted that turning the log
+     * on did <i>not</i> make healing work. That test existed to stop "added a log" being mistaken for
+     * "implemented the effect"; the effect is implemented now, so it is inverted into a test of the
+     * amount instead of deleted.
+     *
+     * <p>The number is the point. Natasha's ultimate (1105 slot 3) is {@code [0.092, 92]} with
+     * {@code scale = healer_max_hp}, i.e. <b>9.2% of her own Max HP plus a flat 92</b>. An
+     * ATK-based calculation — which is what the demo used to do by hand — or a dropped flat term both
+     * produce a plausible-looking wrong value, and both fail here.
      */
     @Test
-    public void diagnosticDoesNotChangeBehaviour() {
+    public void healingSkillsHealForTheDocumentedAmount() {
         Character natasha = CharacterFactory.create(1105, 80);
         Battle battle = newBattle(natasha);
-        natasha.takeDamage(natasha.getMaxHp() / 2);      // currentHp has no setter, so take damage to create a gap
+        natasha.takeDamage(natasha.getMaxHp() / 2);      // currentHp has no setter, so create a gap
         double hpBefore = natasha.getCurrentHp();
-        double energyBefore = natasha.getCurrentEnergy();
-        Assertions.assertTrue(hpBefore < natasha.getMaxHp(), "HP really did drop, so there is something to heal");
+        double expected = 0.092 * natasha.getMaxHp() + 92;   // level 1 -> param row [0.092, 92]
+        Assertions.assertTrue(hpBefore + expected < natasha.getMaxHp(),
+                "the gap must be bigger than the heal, or the cap hides the amount");
 
-        SkillExecutor.setLogNotDispatched(true);
-        battle.castImmediate(new DefaultSkill(1105, 2, 1), natasha, List.of(natasha));
+        battle.castImmediate(new DefaultSkill(1105, 3, 1), natasha, List.of(natasha));
+
+        Assertions.assertEquals(expected, natasha.getCurrentHp() - hpBefore, 1.0,
+                "9.2% of Natasha's OWN Max HP plus a flat 92; got "
+                        + (natasha.getCurrentHp() - hpBefore) + " for maxHp " + natasha.getMaxHp()
+                        + " and ATK " + natasha.getAttribute(
+                                com.laosun.aluminium.enums.AttributeType.ATTACK).get());
+    }
+
+    /**
+     * A heal whose parameter row mixes the immediate heal with a heal-over-time is <b>refused and
+     * reported</b>, not summed into a wrong number.
+     *
+     * <p>Natasha's skill is {@code [0.07, 0.048, 2, 70, 48]}: index 0/3 are the heal and 1/4 are the
+     * per-turn part. The table lists all four, so until the generator learns to separate them the
+     * engine must decline. This test is the guard that says "silence is not an option" — when the
+     * generator is fixed, this test should be replaced by an amount assertion.
+     */
+    @Test
+    public void ambiguousHealEntriesAreRefusedRatherThanSummed() {
+        Character natasha = CharacterFactory.create(1105, 80);
+        Battle battle = newBattle(natasha);
+        natasha.takeDamage(natasha.getMaxHp() / 2);
+        double hpBefore = natasha.getCurrentHp();
+
+        String out = capture(() -> {
+            SkillExecutor.setLogNotDispatched(true);
+            battle.castImmediate(new DefaultSkill(1105, 2, 1), natasha, List.of(natasha));
+        });
 
         Assertions.assertEquals(hpBefore, natasha.getCurrentHp(), EPS,
-                "the healing skill still has no effect (the effect is another path in P6-2 and does not go through this executor)");
-        Assertions.assertTrue(natasha.getCurrentEnergy() > energyBefore,
-                "but the energy gain is still given (P3-2: skill energy gain is independent of whether there is damage)");
+                "a two-percent entry must not be applied; summing the heal and the regen would look plausible and be wrong");
+        Assertions.assertTrue(out.contains("NOT DISPATCHED"),
+                "and it must say so rather than stay silent; actual: " + out);
     }
 
     // ==================================================================
