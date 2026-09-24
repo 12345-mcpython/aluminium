@@ -18,6 +18,7 @@ import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Skill;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.ai.TargetSelector;
+import com.laosun.aluminium.models.buffs.CounterMechanic;
 import com.laosun.aluminium.models.buffs.SuperBreakBuff;
 
 import java.util.ArrayList;
@@ -93,6 +94,17 @@ public class Main {
             enemy.setMaxEnergy(0);               // monsters have no energy bar: maxEnergy == 0 → every energy gain is a no-op
             printEnemy(enemy);
         }
+        System.out.println();
+
+        // ── P9-5: an enemy that hits back ─────────────────────────────────────
+        // 冰锋 wears a counter, so the demo exercises the mechanic instead of only describing it: hit it
+        // and it answers with 50% of its ATK. That answer is ADDITIONAL damage, so it does not count as an
+        // attack -- the character it lands on gains no energy from it (worth watching in the log below).
+        // Duration 99 because this is a demo, not a balance pass.
+        enemies.getFirst().getBuffManager().addBuff(
+                new CounterMechanic(99, com.laosun.aluminium.enums.DamageElement.ICE, 0.5));
+        System.out.println("[Setup] " + enemies.getFirst().getName()
+                + " wears CounterMechanic: counters 50% of its ATK as additional damage");
         System.out.println();
 
         // ── Battle start ─────────────────────────────────────────────────────
