@@ -9,10 +9,6 @@
                     "kind": "percent"
                 },
                 {
-                    "index": 2,
-                    "kind": "percent"
-                },
-                {
                     "index": 3,
                     "kind": "flat"
                 }
@@ -42,13 +38,8 @@
         },
         "4": {
             "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                }
-            ],
+            "scale": null,
+            "params": [],
             "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
@@ -130,10 +121,6 @@
             "scale": "healer_max_hp",
             "params": [
                 {
-                    "index": 0,
-                    "kind": "flat"
-                },
-                {
                     "index": 1,
                     "kind": "percent"
                 },
@@ -167,7 +154,7 @@
             "effect": "Restore",
             "scale": null,
             "params": [],
-            "turns_param": 0,
+            "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
         }
@@ -203,10 +190,6 @@
             "scale": "atk",
             "params": [
                 {
-                    "index": 0,
-                    "kind": "flat"
-                },
-                {
                     "index": 1,
                     "kind": "percent"
                 },
@@ -226,15 +209,7 @@
             "scale": "healer_max_hp",
             "params": [
                 {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
                     "index": 3,
-                    "kind": "percent"
-                },
-                {
-                    "index": 4,
                     "kind": "percent"
                 }
             ],
@@ -244,16 +219,8 @@
         },
         "4": {
             "effect": "Restore",
-            "scale": "healer_max_hp",
+            "scale": null,
             "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "percent"
-                },
                 {
                     "index": 2,
                     "kind": "percent"
@@ -266,13 +233,8 @@
         "7": {
             "effect": "Defence",
             "scale": null,
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 1,
+            "params": [],
+            "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
         }
@@ -316,7 +278,7 @@
             "effect": "Restore",
             "scale": null,
             "params": [],
-            "turns_param": 0,
+            "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
         },
@@ -357,17 +319,8 @@
         "2": {
             "effect": "Defence",
             "scale": null,
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "percent"
-                }
-            ],
-            "turns_param": 2,
+            "params": [],
+            "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
         },
@@ -400,10 +353,6 @@
                 },
                 {
                     "index": 1,
-                    "kind": "flat"
-                },
-                {
-                    "index": 4,
                     "kind": "flat"
                 }
             ],
@@ -449,22 +398,9 @@
         },
         "7": {
             "effect": "Defence",
-            "scale": "def",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "percent"
-                },
-                {
-                    "index": 2,
-                    "kind": "percent"
-                }
-            ],
-            "turns_param": 3,
+            "scale": null,
+            "params": [],
+            "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
         }
@@ -473,24 +409,7 @@
         "4": {
             "effect": "Defence",
             "scale": null,
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "percent"
-                },
-                {
-                    "index": 2,
-                    "kind": "percent"
-                },
-                {
-                    "index": 3,
-                    "kind": "percent"
-                }
-            ],
+            "params": [],
             "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
@@ -500,12 +419,7 @@
         "2": {
             "effect": "Restore",
             "scale": null,
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "flat"
-                }
-            ],
+            "params": [],
             "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
@@ -513,12 +427,7 @@
         "4": {
             "effect": "Restore",
             "scale": null,
-            "params": [
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
+            "params": [],
             "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
@@ -546,14 +455,6 @@
                 {
                     "index": 1,
                     "kind": "flat"
-                },
-                {
-                    "index": 2,
-                    "kind": "percent"
-                },
-                {
-                    "index": 3,
-                    "kind": "flat"
                 }
             ],
             "turns_param": null,
@@ -571,10 +472,6 @@
                 {
                     "index": 1,
                     "kind": "flat"
-                },
-                {
-                    "index": 2,
-                    "kind": "percent"
                 }
             ],
             "turns_param": 3,
@@ -610,14 +507,6 @@
                 },
                 {
                     "index": 1,
-                    "kind": "flat"
-                },
-                {
-                    "index": 4,
-                    "kind": "flat"
-                },
-                {
-                    "index": 5,
                     "kind": "flat"
                 }
             ],
@@ -665,17 +554,8 @@
         "2": {
             "effect": "Defence",
             "scale": null,
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "percent"
-                }
-            ],
-            "turns_param": 2,
+            "params": [],
+            "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
         },

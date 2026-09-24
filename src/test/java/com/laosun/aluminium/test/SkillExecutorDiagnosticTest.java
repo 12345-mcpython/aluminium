@@ -97,19 +97,19 @@ public class SkillExecutorDiagnosticTest {
      * skill only printed a notice.
      */
     @Test
-    public void singleTermShieldSkillsAreDispatchedAndNotReported() {
-        Character gepard = CharacterFactory.create(1104, 80);
-        Battle battle = newBattle(gepard);
-        Assertions.assertEquals(0, gepard.getShield(), EPS, "no shield before the cast");
+    public void shieldSkillsAreDispatchedAndNotReported() {
+        Character march7th = CharacterFactory.create(1001, 80);
+        Battle battle = newBattle(march7th);
+        Assertions.assertEquals(0, march7th.getShield(), EPS, "no shield before the cast");
 
         String out = capture(() -> {
             SkillExecutor.setLogNotDispatched(true);
-            battle.castImmediate(new DefaultSkill(1104, 3, 1), gepard, List.of(gepard));
+            battle.castImmediate(new DefaultSkill(1001, 2, 1), march7th, List.of(march7th));
         });
 
         Assertions.assertFalse(out.contains("NOT DISPATCHED"),
                 "a skill in the table must not be reported as undispatched; actual: " + out);
-        Assertions.assertTrue(gepard.getShield() > 0, "the shield should really be applied");
+        Assertions.assertTrue(march7th.getShield() > 0, "the shield should really be applied");
     }
 
     /**
@@ -193,26 +193,32 @@ public class SkillExecutorDiagnosticTest {
     }
 
     /**
-     * An entry that still mixes several percentage terms is <b>refused and reported</b> rather than
-     * summed into a wrong number.
+     * An entry the generator could not reduce to an amount is <b>refused and reported</b>, not guessed.
      *
-     * <p>March 7th's (三月七) skill is {@code [0:p, 2:p, 3:f]} after clause-scoping — two separate
-     * percentage terms survive in one sentence, and nothing in the data says which is the shield, so
-     * the engine declines. This is the guard that says "silence is not an option"; when the generator
-     * can separate them this test should become an amount assertion.
+     * <p>The Trailblazer's (开拓者) {@code 8004 slot 2} is categorised {@code Defence}, but its text is
+     * "Increases the Trailblazer's DMG Reduction by {@code #1[i]%} and gains 1 stack of Magma Will, with
+     * a {@code #2[i]%} base chance to Taunt…" — no heal, no shield, and no amount phrase, so the table
+     * carries no parameters for it and the engine declines.
+     *
+     * <p>Assuming "the category says Defence, so there must be a shield in here somewhere" is exactly
+     * what produces a plausible wrong number.
+     *
+     * <p>⚠ This replaced a test that used March 7th's shield as the ambiguous example. Keying the parser
+     * on the game's amount grammar resolved that entry ({@code #3[i]%} there is an HP <i>condition</i>,
+     * not a term of the shield), so March 7th moved into
+     * {@link #shieldSkillsAreDispatchedAndNotReported} and this test needed a genuinely unsupported one.
      */
     @Test
-    public void ambiguousEntriesAreRefusedRatherThanSummed() {
-        Character march7th = CharacterFactory.create(1001, 80);
-        Battle battle = newBattle(march7th);
+    public void entriesWithoutAnAmountPhraseAreRefusedRatherThanGuessed() {
+        Character trailblazer = CharacterFactory.create(8004, 80);
+        Battle battle = newBattle(trailblazer);
 
         String out = capture(() -> {
             SkillExecutor.setLogNotDispatched(true);
-            battle.castImmediate(new DefaultSkill(1001, 2, 1), march7th, List.of(march7th));
+            battle.castImmediate(new DefaultSkill(8004, 2, 1), trailblazer, List.of(trailblazer));
         });
 
-        Assertions.assertEquals(0, march7th.getShield(), EPS,
-                "a two-percent entry must not be applied; summing them would look plausible and be wrong");
+        Assertions.assertEquals(0, trailblazer.getShield(), EPS, "nothing should be applied");
         Assertions.assertTrue(out.contains("NOT DISPATCHED"),
                 "and it must say so rather than stay silent; actual: " + out);
     }
