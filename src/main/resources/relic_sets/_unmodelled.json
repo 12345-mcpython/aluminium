@@ -55,14 +55,9 @@
   ],
   "115": [
     {
-      "require": 2,
-      "ability": "Ability51150",
-      "reason": "\"Increases the DMG dealt by Follow-Up ATK by 20%.\" The follow-up event now exists (FOLLOW_UP), so the remaining blocker is the bonus itself: it is specific to follow-up attacks, and no AttributeType expresses 'damage dealt by follow-up attacks' (ALL_DAMAGE_TYPE_BOOST is every damage type, the element boosts are per element). Adding one is a damage-pipeline change, not a rule."
-    },
-    {
       "require": 4,
       "ability": "Ability51151",
-      "reason": "\"When the wearer uses a Follow-Up ATK, increases the wearer's ATK by 6% for every time the Follow-Up ATK deals DMG. This effect can stack up to 8 time(s) and lasts for 3 turn(s). This effect is removed the next time the wearer uses a Follow-Up ATK.\" The trigger (FOLLOW_UP), the stacking counter and the 3-turn duration are all expressible now; what is missing is the final clause -- 'removed the next time the wearer uses a Follow-Up ATK' needs an explicit 'drop every stack of this buff' op, and the op vocabulary has none (BuffManager.removeOneBuff exists as the API but nothing exposes it to data)."
+      "reason": "\"When the wearer uses a Follow-Up ATK, increases the wearer's ATK by 6% for every time the Follow-Up ATK deals DMG. This effect can stack up to 8 time(s) and lasts for 3 turn(s). This effect is removed the next time the wearer uses a Follow-Up ATK.\" The trigger (FOLLOW_UP), the stacking counter and the 3-turn duration are all expressible now. Two clauses still are not: 'for every time the Follow-Up ATK deals DMG' counts the damage instances of one follow-up, and the engine settles a follow-up as a single additional-damage instance, so it can never reach the documented maximum of 8 stacks -- and 'removed the next time the wearer uses a Follow-Up ATK' needs an explicit 'drop every stack of this buff' op, which the vocabulary does not have (BuffManager.removeOneBuff exists as the API but nothing exposes it to data). Writing it now would silently under-count, which is why it stays registered."
     }
   ],
   "116": [
@@ -179,7 +174,7 @@
     {
       "require": 2,
       "ability": "Ability53151",
-      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" The trigger (FOLLOW_UP, filtered with `actor != self` for 'an ally') and the stacking counter are both expressible now. Still blocking: the per-stack bonus is follow-up-specific (no such attribute -- that is a damage-pipeline change), and the 'when there are 5 stacks, additionally ...' half needs a condition on the wearer's own stack count, which the DSL does not have (it reads hp_percent and hit_count)."
+      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" The trigger (FOLLOW_UP, filtered with `actor != self` for 'an ally'), the stacking counter and the follow-up-only damage boost (FOLLOW_UP_DAMAGE_BOOST, added for set 115) are all expressible now. Still blocking: the 'when there are 5 stacks, additionally ...' half needs a condition on the wearer's own stack count, which the DSL does not have (it reads hp_percent and hit_count only)."
     }
   ],
   "321": [
