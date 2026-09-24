@@ -1,0 +1,15 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "relic set 101 (Passerby of Wandering Cloud), 4-piece ability Ability51011: \"At the start of the battle, immediately regenerates 1 Skill Point.\"",
+      "note": "The description carries no placeholder, so the amount is the literal 1 it states. Modeled as BATTLE_START + GAIN_SKILL_POINT: the rules are the character trigger table's, so the set reuses the existing op instead of getting an execution channel of its own. Ordering: the opening skill points are assigned when the Battle is constructed (StandardSkillPointPolicy's start value), and BATTLE_START is fired later in Battle.startBattle(), so this rule is what turns the opening 3 into 4 -- see RelicAbilityBattleTest.openingSkillPointsIncludeThePasserbyFourPiece."
+    }
+  ]
+}

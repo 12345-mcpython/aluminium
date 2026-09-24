@@ -33,7 +33,9 @@ import java.util.Set;
  *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>✅ wired (0.0–1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
  *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, {@code turns}, optional {@code target}</td>
  *       <td>✅ wired (P10-3) — a negative {@code percent} becomes a {@code DEBUFF}, so a buff and a
- *           debuff on the same attribute coexist</td></tr>
+ *           debuff on the same attribute coexist; for a ratio attribute ({@code CRIT_ATTACK} and
+ *           friends) {@code percent} is the value itself (0.25 = +25 percentage points), because an
+ *           additive percentage would multiply their zero base and change nothing</td></tr>
  *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, {@code turns}</td>
  *       <td>☐ needs a named-buff registry; plain stat buffs are already covered by {@code MODIFY_ATTR}</td></tr>
  *   <tr><td>{@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}</td><td>{@code resource}, {@code amount}</td>
@@ -325,9 +327,25 @@ public final class TriggerInterpreter {
      * which half of the attribute the modifier lands in, so "ATK +50%" and "ATK -30%" can be on the
      * same character at once and be removed independently instead of overwriting each other.
      *
-     * <p>{@code percent} is a decimal ({@code 0.5} = +50%) and becomes an {@code ADD_PERCENT}
-     * modifier, so it sums with the character's other add-percent bonuses (traces, relics, light
-     * cones) rather than multiplying on top of them -- see {@link DoubleValue} for the formula.
+     * <p>{@code percent} is a decimal ({@code 0.5} = +50%).
+     *
+     * <p><b>What the decimal means depends on the attribute kind</b>, and the difference is not
+     * cosmetic either:
+     * <ul>
+     *   <li>For a <b>base</b> attribute ({@code HEALTH / ATTACK / DEFENCE / SPEED}) it is an
+     *       {@code ADD_PERCENT} modifier, so it sums with the character's other add-percent bonuses
+     *       (traces, relics, light cones) rather than multiplying on top of them -- see
+     *       {@link DoubleValue} for the formula.</li>
+     *   <li>For a <b>ratio</b> attribute ({@code CRIT_CHANCE}, {@code CRIT_ATTACK}, the damage
+     *       boosts, {@code BREAKING_EFFECT}, {@code ENERGY_REGENERATION_RATE}, ...) it is the value
+     *       <b>itself</b>: {@code 0.25} on {@code CRIT_ATTACK} means +25 percentage points. This is
+     *       the engine's existing convention for those attributes (see {@code RelicSuit.appendTo}:
+     *       "any other {@code isPercent} attribute is a percentage-point value") and the reason is
+     *       that their whole value is a flat modifier -- the builder writes them with
+     *       {@code AttributeBuilder.addPercentPoint}, so their base is literally 0 and an
+     *       {@code ADD_PERCENT} modifier would multiply zero: the rule would fire, add a modifier and
+     *       change nothing. A silent no-op is the one outcome this op must not have.</li>
+     * </ul>
      *
      * @param effect the effect ({@code attribute} / {@code percent} / {@code turns}, optional
      *               {@code target})
@@ -338,10 +356,31 @@ public final class TriggerInterpreter {
         double percent = effect.getPercent();
         int turns = effect.getTurns();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(percent < 0
-                    ? StatModifierBuff.percentDebuff(attribute, percent, turns)
-                    : StatModifierBuff.percentBuff(attribute, percent, turns));
+            target.getBuffManager().addBuff(statModifier(attribute, percent, turns));
         }
+    }
+
+    /**
+     * The modifier a {@code MODIFY_ATTR} effect produces, as a buff or a debuff according to the sign.
+     *
+     * <p>See {@link #modifyAttr} for why a ratio attribute gets a flat modifier and a base attribute
+     * gets an additive percentage. Splitting it out keeps the "which modifier kind" decision in one
+     * readable place instead of a nested conditional at the call site.
+     *
+     * @param attribute the attribute to touch
+     * @param percent   the magnitude; {@code < 0} produces a debuff
+     * @param turns     how long it lasts (validated to be positive at load time)
+     */
+    private static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns) {
+        boolean debuff = percent < 0;
+        if (attribute.isPercent) {
+            return debuff
+                    ? StatModifierBuff.flatDebuff(attribute, percent, turns)
+                    : StatModifierBuff.flatBuff(attribute, percent, turns);
+        }
+        return debuff
+                ? StatModifierBuff.percentDebuff(attribute, percent, turns)
+                : StatModifierBuff.percentBuff(attribute, percent, turns);
     }
 
     /**

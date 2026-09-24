@@ -1,0 +1,213 @@
+{
+  "103": [
+    {
+      "require": 4,
+      "ability": "Ability51031",
+      "reason": "\"Increases the max DMG that can be absorbed by the Shield created by the wearer by 20%.\" Needs an op that scales every shield the wearer creates; SHIELD only creates one shield with an amount given in the rule, so there is nothing to amplify."
+    }
+  ],
+  "105": [
+    {
+      "require": 4,
+      "ability": "Ability51051",
+      "reason": "\"After the wearer attacks or is hit, their ATK increases by 5% for the rest of the battle. This effect can stack up to 5 time(s).\" Needs three things the engine does not have: the TAKING_HIT event (only 'attacks' is observable), a stacking counter, and a duration with no turn limit (MODIFY_ATTR requires a positive turns value)."
+    }
+  ],
+  "106": [
+    {
+      "require": 2,
+      "ability": "Ability51060",
+      "reason": "\"Reduces DMG taken by 8%.\" Needs a damage-taken reduction that is not an attribute value (MODIFY_ATTR changes an AttributeType, and no attribute expresses 'incoming damage x0.92') plus a duration without a turn limit."
+    },
+    {
+      "require": 4,
+      "ability": "Ability51061",
+      "reason": "\"At the beginning of the turn, if the wearer's HP percentage is equal to or less than 50%, restores HP equal to 8% of their Max HP and regenerates 5 Energy.\" Needs the TURN_START event, a condition on the wearer's HP percentage, and a HEAL whose amount is a fraction of Max HP (HEAL takes a flat amount)."
+    }
+  ],
+  "107": [
+    {
+      "require": 4,
+      "ability": "Ability51071",
+      "reason": "\"Increases DMG by the wearer's Skill by 12%. After unleashing Ultimate, increases the wearer's Fire DMG by 12% for the next attack.\" Needs per-skill-type damage bonuses and a consumable 'next attack' duration (a buff that is removed by the next hit it applies to)."
+    }
+  ],
+  "108": [
+    {
+      "require": 4,
+      "ability": "Ability51081",
+      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" Needs an event for 'the wearer deals damage to an enemy' (HP_LOST is only broadcast when one of our own characters loses HP), a condition on the target's weakness element, and a duration without a turn limit."
+    }
+  ],
+  "112": [
+    {
+      "require": 4,
+      "ability": "Ability51121",
+      "reason": "\"When dealing DMG to debuffed enemy targets, the wearer has their CRIT Rate increased by 10%. And when they deal DMG to Imprisoned enemy targets, their CRIT DMG increases by 20%.\" Needs conditions on the target's states (has any debuff / is Imprisoned), which the condition DSL cannot express."
+    }
+  ],
+  "113": [
+    {
+      "require": 4,
+      "ability": "Ability51131",
+      "reason": "\"When the wearer is hit or has their HP consumed by an ally or themselves, their CRIT Rate increases by 8% for 2 turn(s) and up to 2 stacks.\" Needs the TAKING_HIT event, an event for 'the wearer's HP was consumed by an ally', and a stacking counter."
+    }
+  ],
+  "114": [
+    {
+      "require": 4,
+      "ability": "Ability51141",
+      "reason": "\"When the wearer uses their Ultimate on an ally, SPD for all allies increases by 12% for 1 turn(s). This effect cannot be stacked.\" The trigger exists (ULT_CAST) but the condition 'on an ally' does not: a cast has no single subject in the event contract (SkillExecutor passes target = null and only a hit count), so the rule would also fire for damaging ultimates."
+    }
+  ],
+  "115": [
+    {
+      "require": 2,
+      "ability": "Ability51150",
+      "reason": "\"Increases the DMG dealt by Follow-Up ATK by 20%.\" Needs a follow-up-attack event (ALLY_ATTACK is any attack, so a rule hung on it would also fire for basic attacks, skills and ultimates) and a follow-up-specific damage bonus."
+    },
+    {
+      "require": 4,
+      "ability": "Ability51151",
+      "reason": "\"When the wearer uses a Follow-Up ATK, increases the wearer's ATK by 6% for every time the Follow-Up ATK deals DMG. This effect can stack up to 8 time(s) and lasts for 3 turn(s). This effect is removed the next time the wearer uses a Follow-Up ATK.\" Needs a follow-up-attack event, a stacking counter, and explicit stack removal."
+    }
+  ],
+  "116": [
+    {
+      "require": 4,
+      "ability": "Ability51161",
+      "reason": "\"For every DoT the enemy target is afflicted with, the wearer will ignore 6% of its DEF when dealing DMG to it. This effect is valid for a max of 3 DoTs.\" Needs a count of the target's DoTs and a per-count scaling of the effect."
+    }
+  ],
+  "117": [
+    {
+      "require": 2,
+      "ability": "Ability51170",
+      "reason": "\"Increases DMG dealt to enemies with debuffs by 12%.\" Needs a condition on whether the target carries any debuff."
+    }
+  ],
+  "118": [
+    {
+      "require": 4,
+      "ability": "Ability51181",
+      "reason": "\"When the wearer uses their Ultimate on an ally, all allies' Break Effect increases by 30% for 2 turn(s). This effect cannot be stacked.\" Same missing condition as set 114: 'on an ally' is not observable, because a cast event carries no subject."
+    }
+  ],
+  "119": [
+    {
+      "require": 4,
+      "ability": "Ability51191",
+      "reason": "\"If the wearer's Break Effect is 150% or higher, the Break DMG dealt to the enemy target ignores 10% of their DEF. If the wearer's Break Effect is 250% or higher, the Super Break DMG additionally ignores 15%.\" Needs a condition on one of the wearer's own attribute values and a tiered either/or."
+    }
+  ],
+  "121": [
+    {
+      "require": 4,
+      "ability": "Ability51211",
+      "reason": "\"When using Skill or Ultimate on one ally target, increases the ability target's CRIT DMG by 18%, lasting for 2 turn(s). This effect can stack up to 2 time(s).\" Needs the cast's target (absent from the cast event), a way to buff 'the ability target' rather than the owner or the whole party, and a stacking counter."
+    }
+  ],
+  "122": [
+    {
+      "require": 4,
+      "ability": "Ability51221",
+      "reason": "\"Increases DMG dealt by Skill and Ultimate by 20%. After using Ultimate, additionally increases the DMG dealt by the next Skill by 25%.\" Needs per-skill-type damage bonuses and a consumable 'next Skill' duration."
+    }
+  ],
+  "123": [
+    {
+      "require": 4,
+      "ability": "Ability51231",
+      "reason": "\"While the wearer's memosprite is on the field, increases the wearer's SPD by 6%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by 30%, lasting for 3 turn(s).\" Needs a memosprite presence condition and a memosprite-attack event (summons are P9-4)."
+    }
+  ],
+  "125": [
+    {
+      "require": 4,
+      "ability": "Ability51251",
+      "reason": "\"When the wearer or their memosprite provides healing to ally targets other than themselves, the wearer gains 'Gentle Rain' ... can only trigger once per turn. While the wearer has 'Gentle Rain,' SPD increases by 6% and all allies' CRIT DMG increases by 15% ...\" The trigger and both modifiers are expressible (HEALED with actor == self, extra conditions target != self), but the 'once per turn' limit is not: without it the buff would be re-applied by every heal in the same turn, which is a different mechanic, so this is not authored rather than approximated."
+    }
+  ],
+  "126": [
+    {
+      "require": 4,
+      "ability": "Ability51261",
+      "reason": "\"When the wearer becomes the target of another ally target's ability, gains 1 stack of 'Help,' stacking up to 2 time(s). If there are 2 stack(s) ... when the wearer uses their Ultimate, consumes all 'Help' to increase the wearer's ATK by 48% for 1 turn(s).\" Needs an event for 'the wearer was targeted by an ally ability', a stacking counter, and consuming the stacks as a condition."
+    }
+  ],
+  "127": [
+    {
+      "require": 4,
+      "ability": "Ability51271",
+      "reason": "\"After the wearer uses Basic ATK or Skill, if the wearer's memosprite is on the field, increases Max HP of the wearer and their memosprite by 24%, and increases all allies' DMG dealt by 15%, lasting until after the wearer's next use of Basic ATK or Skill.\" Needs a memosprite presence condition, a party-wide damage-dealt bonus, and an 'until the next use' duration."
+    }
+  ],
+  "128": [
+    {
+      "require": 2,
+      "ability": "Ability51280",
+      "reason": "\"The provided Shield Effect increases by 10%.\" Needs an op that scales every shield the wearer creates (same gap as set 103)."
+    },
+    {
+      "require": 4,
+      "ability": "Ability51281",
+      "reason": "\"Increases the Shield Effect provided by the wearer by 12%. When an ally target holds a Shield provided by the wearer, the ally target's CRIT DMG increases by 15%.\" Needs shield amplification plus a condition on 'this ally currently holds a shield created by the wearer'."
+    }
+  ],
+  "129": [
+    {
+      "require": 4,
+      "ability": "Ability51291",
+      "reason": "\"The Elation DMG dealt by the wearer and their memosprites ignores 10% of targets' DEF. For every 5 accumulated Punchline allies gain, the Elation DMG dealt additionally ignores 1% of targets' DEF, stacking up to 10 time(s).\" Needs an Elation damage channel, a DEF-ignore condition and a stacking counter driven by a resource."
+    }
+  ],
+  "130": [
+    {
+      "require": 4,
+      "ability": "Ability51301",
+      "reason": "\"Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.\" Needs a condition on the wearer's own SPD, a two-threshold either/or, and the Elation system."
+    }
+  ],
+  "131": [
+    {
+      "require": 4,
+      "ability": "Ability51311",
+      "reason": "\"When the wearer enters combat or uses Skill, the DMG dealt by their Skill and Ultimate increases by 18%, stacking up to 3 time(s). At the start of the wearer's turn or after using Ultimate, removes 1 stack(s) of this effect.\" Needs a stacking counter, the TURN_START event for the removal, and a skill-type-specific damage bonus."
+    }
+  ],
+  "132": [
+    {
+      "require": 4,
+      "ability": "Ability51321",
+      "reason": "\"Increases the wearer's CRIT DMG dealt to enemy targets in the DEF reduction state by 28%. After the wearer inflicts the DEF reduction state on an enemy target, all allies gain 'Comburent' for 2 turn(s) ... The DMG dealt by ally targets with 'Comburent' increases by 15% ... can be triggered again after the wearer uses an attack.\" Needs a condition on the target's DEF-reduction state, a named buff with a per-attack refresh rule, and a damage-dealt bonus."
+    }
+  ],
+  "315": [
+    {
+      "require": 2,
+      "ability": "Ability53151",
+      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" Needs a follow-up-attack event, a stacking counter, a per-stack scaling and a threshold bonus."
+    }
+  ],
+  "321": [
+    {
+      "require": 2,
+      "ability": "Ability53211",
+      "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" Needs a party-size condition on the battlefield and a stacking counter."
+    }
+  ],
+  "326": [
+    {
+      "require": 2,
+      "ability": "Ability53261",
+      "reason": "\"When the wearer uses Follow-Up ATK, increases ATK by 24% for 2 turn(s). When an enemy target gets defeated, increases CRIT DMG for all allies by 12% in the current battle. This effect cannot stack.\" The KILL half is expressible, but the Follow-Up ATK half is not (no follow-up event), and 'in the current battle' has no turn limit for MODIFY_ATTR -- the effect as a whole is therefore not authored."
+    }
+  ],
+  "328": [
+    {
+      "require": 2,
+      "ability": "Ability53281",
+      "reason": "\"When entering combat, if the wearer's Max Energy is greater than or equal to 200, for every 1 excess point, increases the wearer's DMG dealt by 0.2%, up to a max increase of 32%.\" Needs a condition on the wearer's Max Energy, an amount that scales with a character value per point, and a cap on the accumulated result."
+    }
+  ]
+}

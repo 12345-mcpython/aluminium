@@ -235,12 +235,19 @@ public class TriggerTableTest {
      *
      * <p>Otherwise a content author would write a rule, see nothing happen, and have no way to tell
      * "my condition is wrong" from "the engine never fires this".
+     *
+     * <p>The example used to be {@code ULT_CAST}; that event now has an emitter
+     * ({@code SkillExecutor.broadcastSkillCast}) and is covered by {@code UltCastTriggerTest}. The two
+     * that remain unwired are {@code TURN_START} and {@code TAKING_HIT}.
      */
     @Test
     public void eventThatIsNotWiredYetIsRejectedWithAReason() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("ULT_CAST", List.of("self"), energy(1)))));
+                () -> new TriggerTable(1, List.of(trigger("TURN_START", List.of("self"), energy(1)))));
         Assertions.assertTrue(e.getMessage().contains("not emitted"), e.getMessage());
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(1, List.of(trigger("TAKING_HIT", List.of("self"), energy(1)))),
+                "TAKING_HIT has no emitter either, so it must be rejected the same way");
     }
 
     /** An unknown condition variable is rejected rather than evaluating to false forever. */
@@ -310,12 +317,40 @@ public class TriggerTableTest {
     }
 
     /**
+     * A <b>ratio</b> attribute ({@code CRIT_ATTACK} and friends) takes {@code percent} as the value
+     * itself, because that is the only reading under which the rule does anything at all.
+     *
+     * <p>Those attributes are written by the builder through {@code addPercentPoint}, i.e. as a flat
+     * modifier on a base of <b>0</b> — so an additive percentage would multiply zero: the op would
+     * fire, install a modifier, and change nothing, which is exactly the kind of silent no-op this
+     * project's guard rails exist to prevent. This is the reading {@code RelicSuit.appendTo} already
+     * uses for the same attributes ("any other {@code isPercent} attribute is a percentage-point
+     * value"), so a relic set rule can say "CRIT DMG +25%" and mean it.
+     */
+    @Test
+    public void modifyAttrOpAddsARatioAttributeRatherThanScalingIt() {
+        Character owner = CharacterFactory.create(NO_TRIGGERS, 80);
+        double before = owner.getAttribute(AttributeType.CRIT_ATTACK).get();
+        Assertions.assertTrue(before > 0, "precondition: the character's CRIT DMG comes from the data");
+
+        fireAttr(null, owner, owner, attrOp(AttributeType.CRIT_ATTACK, 0.25, 2, null));
+
+        Assertions.assertEquals(before + 0.25, owner.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "+25 percentage points of CRIT DMG, not a 25% factor of a zero base");
+        Assertions.assertEquals(1, owner.getAttribute(AttributeType.CRIT_ATTACK)
+                .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF).size());
+
+        fireAttr(null, owner, owner, attrOp(AttributeType.CRIT_ATTACK, -0.1, 2, null));
+        Assertions.assertEquals(before + 0.15, owner.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "a negative ratio change lands in the debuff half, so the two coexist");
+    }
+
+    /**
      * A negative percent becomes a {@code DEBUFF}: it lands on the other half of the attribute, so a
      * debuff does not silently overwrite a buff on the same stat.
      */
     @Test
-    public void negativePercentBecomesADebuff() {
-        Character owner = character("owner");
+    public void negativePercentBecomesADebuff() {        Character owner = character("owner");
 
         fireAttr(null, owner, owner, attrOp(AttributeType.DEFENCE, -0.25, 2, null));
 
