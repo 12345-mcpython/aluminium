@@ -21,7 +21,14 @@ public enum TriggerEvent {
     BATTLE_START("BATTLE_START", true),
     /** ✅ An ally finished an attack. Carries the hit-target count. */
     ALLY_ATTACK("ALLY_ATTACK", true),
-    /** ✅ An ally cast a skill (including non-damaging ones). */
+    /**
+     * ✅ An ally cast a skill, including non-damaging ones — but <b>not</b> their Ultimate.
+     *
+     * <p>⚠ Companion of {@link #ULT_CAST}: the two are mutually exclusive by design. The DSL has no
+     * variable for "which kind of cast this was" (see {@code TriggerTable}'s condition list), so a
+     * rule that means "when the wearer uses their Skill" could not otherwise avoid also firing on the
+     * ultimate. The split is made at the emitter ({@code SkillExecutor.broadcastSkillCast}).
+     */
     SKILL_CAST("SKILL_CAST", true),
     /** ✅ Someone's energy was credited. */
     ENERGY_GAINED("ENERGY_GAINED", true),
@@ -41,8 +48,14 @@ public enum TriggerEvent {
     TURN_START("TURN_START", false),
     /** ☐ The owner took a hit. */
     TAKING_HIT("TAKING_HIT", false),
-    /** ☐ The owner's ultimate was cast. */
-    ULT_CAST("ULT_CAST", false);
+    /**
+     * ✅ An ally cast their Ultimate.
+     *
+     * <p>Fired by {@code SkillExecutor.broadcastSkillCast} when the parsed skill data's
+     * {@code attack_type} is {@code Ultra} — never inferred from a skill's name or slot. Exactly one
+     * of {@link #SKILL_CAST} and this event fires per cast.
+     */
+    ULT_CAST("ULT_CAST", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 

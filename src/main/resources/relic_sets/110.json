@@ -1,0 +1,18 @@
+{
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.25
+        }
+      ],
+      "source": "relic set 110 (Eagle of Twilight Line), 4-piece ability Ability51101: \"After the wearer uses their Ultimate, their action is Advanced Forward by #1[i]%.\" param = [0.25]",
+      "note": "#1[i] -> percent = 0.25. ADVANCE takes the fraction of the target's REMAINING time to act that gets skipped (Queue.advanceActionByPercent), and the target defaults to the owner -- 'their action', not the party's. 'actor == self' keeps the rule to the wearer's own ultimate."
+    }
+  ]
+}
