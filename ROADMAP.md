@@ -4,9 +4,11 @@
 [turnbasedgamedata](https://gitlab.com/Dimbreath/turnbasedgamedata)，经 `E:\code\python\generate_data.py`
 解析到 `src/main/resources/data/`。
 
-**当前状态（2026-09-23）**：46 个测试类 / 381 个用例全绿；demo 跑通一场三对三战斗
+**当前状态（2026-09-23）**：52 个测试类 / 469 个用例全绿；demo 跑通一场三对三战斗
 （10 轮 / 43 次行动，我方胜利）。引擎侧基础机制（伤害流水线、韧性击破、能量、战技点、
-行动条、关卡波次、角色真实面板）已完成；**剩下的全部是"把已有口子填满"或"接数据"**。
+行动条、关卡波次、角色真实面板）已完成；**A 层"角色机制 = 数据"的通路也已打通**
+（事件 → 触发器表 → 解释器，`engine.md` §4.6/§4.7），剩下的全部是
+"把已有口子填满""接数据"或"填内容"。
 
 > **v3 为什么重写**：v2 是"执行清单"（2400 行，每个已完成任务都留着完整规格），
 > 结果**真正待办的事被埋在 2000 行历史里**。v3 只留：**设计原则 + 待办 + 踩坑记录**。
@@ -153,6 +155,10 @@
 | 角色 | `CharacterFactory.create(cid, level)` 真实面板（等级缩放/光锥/遗器/行迹/额外加成/元素/命途/仇恨/能量/真实技能） |
 | 其他 | 效果命中与抵抗 / 治疗 / 护盾 / Buff 生命周期 / 附加伤害与真实伤害 / 胜负状态机 |
 | **事件体系** | **11 个事件家族**（P8-6）：技能施放 / 能量 / 掉血 / 治疗 / 击杀 / 击破 / 战技点增减，见 `engine.md` §4 |
+| **触发器表** | **角色机制 = 数据**（P8-7）：`resources/characters/<cid>.json`，引擎只解释；已跑通缇宝 1403 / 知更鸟 1309 / 克拉拉 1107 / 希儿 1102，见 `engine.md` §4.6 |
+| **层数资源** | **没有能量条也能开大**（P8-8）：`Resource` + `ResourceManager` + `EnergyProvider.canCastUltra` 闸门，见 `engine.md` §23 |
+| **真实队伍** | **关卡用真角色**（P8-5）：`StageFactory.realTeam()` = 景元/希儿/克拉拉/娜塔莎（4 命途），各带本命途 5★ 光锥；占位队已删除 |
+| **天赋与追加攻击** | **天赋 = 数据**（P8-3）：触发器表新增 `DAMAGE` op，倍率取**天赋槽**的 `damage_param`；克拉拉受击反击、希儿击杀再动，见 `engine.md` §4.7 |
 
 ### 🚧 部分完成
 
@@ -163,11 +169,23 @@
 | 强化普攻的战技点 | 一刀切 +1：对青雀对、**对波提欧错** | F-3，数据补全 |
 | 敌人技能不发事件 | `EnemySkill` 不走 `SkillExecutor`，故不发 `SkillCastEvent` | P9-2 对齐 |
 
-### ☐ 待办（共 19 项，见 §6–§9）
+### ☐ 待办（共 14 项，见 §7–§9）
 
-**下一项建议：`P8-7` 触发器表** —— `P8-6` 已经把它唯一的前置（事件）补齐了。
-P8-7 是 93 个角色机制的**总开关**：做完它，角色机制才开始变成数据，
-而不是往 `Battle` 里加 `switch (cid)`。
+**A 层（角色数据化的基础设施）全部完成** ✅ —— P8-6 事件、P8-7 触发器表、P8-8 层数资源、
+P8-5 真实队伍、**P8-3 天赋 + 追加攻击**。
+
+> **P8-3 的教训（值得记）**：它被一个**假前置**卡了很久 ——
+> "数据里没有 `is_follow_up` 字段，所以判断不了哪个技能算追加攻击"。
+> 真相是**不需要那个字段**：追加攻击的 payload 本来就在**天赋槽自己的技能数据**里
+> （元素/削韧/每级倍率齐全），唯一缺的是"**什么时候**放"—— 而那正是触发器表提供的。
+> 结论与数据事实见 `engine.md` §4.7。
+
+**下一项建议：B 层 `P9-1`（敌人机制全量）** —— A 层已经把"内容 = 数据"这条路铺好，
+但它刻意**只对我方开火**（敌人的事件不是我们的内容）。P9 就是把这条通路对称铺到敌人侧。
+
+> A 层剩下的"93 个角色的天赋/行迹/星魂/秘技"是**内容活**，不再是引擎任务：
+> 一次数据化 1–2 个角色（`source`/`note` 标出处），引擎缺能力时才回头补引擎。
+> 目前 93 个里只有 4 个有触发器表。
 
 ---
 
@@ -247,14 +265,18 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 
 ---
 
-## 6. 待办 A 层：角色数据化的基础设施（最高优先）
+## 6. A 层：角色数据化的基础设施 ✅（全部完成）
 
-> **为什么这层最优先**：93 个角色的天赋/行迹/星魂/秘技/追加攻击目前**全是空的**。
-> 引擎能给角色的只有普攻/战技/终结技/能量/战技点 —— 而这层的三项是
-> "让角色机制变成数据"的**唯一通路**。做完这层，才有资格谈"像 HSR"。
+> **为什么这层曾是最优先**：93 个角色的天赋/行迹/星魂/秘技/追加攻击原本**全是空的**。
+> 引擎能给角色的只有普攻/战技/终结技/能量/战技点 —— 而这一层是
+> "让角色机制变成数据"的**唯一通路**。这层做完了，才有资格谈"像 HSR"。
+>
+> 现在通路是通的：`Battle` 发事件 → 角色自带的 JSON 表匹配条件 → 解释器执行引擎已有能力。
+> **接下来缺的不是引擎，是内容**（93 个角色里只有 4 个填了表）。
 
-**本层顺序**：`P8-6`（事件）→ `P8-7`（触发器表）→ `P8-8`（层数资源）。
-`P8-3`（追加攻击）**建议并进 P8-7 做**（理由见该任务）。
+**本层顺序**：`P8-6`（事件）→ `P8-7`（触发器表）→ `P8-8`（层数资源）→ `P8-3`（天赋 + 追加攻击）。
+`P8-3` 原本"建议并进 P8-7 做"，实际做下来确认它对 `P8-7` 的依赖是**真的**
+（只需要补一个 `DAMAGE` op），而它自己那个"数据前置"是**假的**（见该任务）。
 
 ---
 
@@ -312,7 +334,7 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 
 ---
 
-### P8-7 触发器表 + 效果词表（角色内容数据化）
+### P8-7 触发器表 + 效果词表（角色内容数据化）✅
 
 - **目标**：角色机制 = 数据表（`resources/characters/<cid>.json`），引擎只做解释；从此**不写 `XxxTalent.java`**。
 - **涉及文件**：新建 `beans/TriggerSpec.java`、`beans/EffectSpec.java`、`models/TriggerTable.java`（解释器）、
@@ -341,19 +363,63 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
   再补一条"未登记角色 = 空表、战斗不炸"。
 - **依赖**：P8-6、P3-1（能量入账口）
 
+**实际落地（2026-09-23）**：机制说明见 `engine.md` §4.6。四个组件职责分开 ——
+`beans.TriggerSpec`/`EffectSpec`（JSON 形状）、`models.TriggerTable`（编译+校验+匹配，**无副作用**）、
+`models.TriggerInterpreter`（执行，唯一碰引擎状态处）、`data.TriggerTables`（按 cid 懒加载+缓存）。
+与原计划的差异：
+
+1. **`per_target` 开关是计划里没有的，但必须有**。计划把知更鸟的「+2」与缇宝的「+1.5」
+   都写成 `GAIN_ENERGY amount`，但两者**口径不同**：知更鸟是**每次攻击平摊 2**，
+   缇宝是**每命中 1 个目标 1.5**（打 3 个给 4.5）。差别就是一个命中数倍。
+   所以效果带一个**显式**的 `per_target`（默认关）—— 不让解释器"看到攻击事件就自动按
+   命中数放大"，那样知更鸟会被算成 `2 × 命中数`。
+2. **`ALLY_ATTACK` 与 `SKILL_CAST` 在同一处派生**（都从 `SkillExecutor`）。角色文本会区分
+   「施放战技后」与「我方目标攻击后」，而目前引擎的"施放"就是"攻击"，
+   所以同时发两个事件，由数据的 `when` 去区分。
+3. **条件 DSL 的变量是封闭集合**（`self` / `actor` / `hit_count`），写错变量名在**加载时**报错。
+   这样"我的条件写错了"与"引擎压根不发这个事件"能分开诊断 —— 后者也被
+   未接线事件在加载时拒绝并**点名归属阶段**。
+4. **只对我方开火**：带主体的事件走 `fireTriggersForAlly` 做阵营判断 ——
+   敌人挨打不该让我方角色被触发两次，且敌方内容属 P9。
+5. **递归护栏**：触发器效果本身会再发事件（治疗 → 治疗类 buff → …）。引擎不判环，
+   而是限制嵌套深度（`MAX_TRIGGER_DEPTH = 8`）并**响亮报错**，让跑飞的表被抓住而不是挂死战斗。
+6. **六个 op 仍被拒绝**：`GAIN_RESOURCE`/`SPEND_RESOURCE`（缺 `ResourceManager`，属 P8-8）、
+   `MODIFY_ATTR`（要 P10-3 持有并到期 modifier）、`APPLY_BUFF`、`ADD_DAMAGE`/`TRUE_DAMAGE`、
+   `REDUCE_TOUGHNESS` —— 一律在加载时报错点名阶段。**宁可响亮拒绝，也不要静默无效**。
+7. **没有文件 = 空表**（`TriggerTable.EMPTY`，`Character.triggerTable` **永不为 null**）；
+   **文件存在但写错 = 加载即抛**。`TriggerTables.loadCount()` 可观测，测试据此断言缓存生效。
+
+**验收**：`TriggerTableTest`（20 条）+ `TriggerDataBindingTest`（5 条）—— **不写任何 Java 角色类**，
+纯数据跑通两个真实角色：缇宝 1403 与知更鸟 1309；含"未登记角色 = 空表、战斗不炸"。
+
+**变异验证**（4 处，均确认护栏有效）：
+
+| 变异 | 结果 |
+|---|---|
+| 忽略 `per_target`（一律当平摊值） | `tribbieGainsPerTargetHitWhenAnAllyAttacks` 红 ❌ |
+| 条件恒为真（`actor != self` 失效） | 4 条红（两条"自己攻击不触发"、条件判别、`self` 简写）❌ |
+| `CharacterFactory` 不挂表 | 5 条红 ❌ |
+| JSON 键写成 `perTarget`（Gson 静默失配） | `perTargetSurvivesJsonBinding` 红 ❌ |
+
+**全套**：49 套 / 428 例全绿；demo 行为不变（demo 队里没有触发器文件）。
+
 ---
 
-### P8-8 层数资源 Resource（替代能量条）
+### P8-8 层数资源 Resource（替代能量条）✅
 
 > ✅ **前置已完成**：`models/Resource.java` **已经存在**（P8-4 重构时为战技点抽出来的），
 > **不要**再新建同名类。已有：有界值 + `gainClamped`/`gain`（显式溢出）/`spend`/`spendExactly`、
 > `setMaxOverflow`、`isFull`/`isCapped`/`missingToMax`、不变式 `value ∈ [0, max+overflow]`（有测试）。
 > 战技点是它的第一个用户，**本任务是第二个**。
+>
+> ✅ **P8-7 预留、本项已解锁**：`GAIN_RESOURCE` / `SPEND_RESOURCE` 已从
+> `TriggerInterpreter` 的 `PLANNED` 名单挪到 `WIRED` 并实现 —— 触发器的形状没动一行。
 
 - **目标**：让"层数当能量 / 层数触发大招"的角色（飞霄【飞黄】/ 黄泉【残梦】/ 白厄【火种】/
   昔涟【追忆】/ 遐蝶【新蕊】）不写专用类。
 - **涉及文件**：**扩展** `models/Resource.java`、新建 `models/ResourceManager.java`；
-  `CanHit.java`（挂 manager）、`Constant.java`、扩展 `test/SkillCategoryAndResourceTest.java` 或新建 `test/ResourceTest.java`
+  `CanHit.java`（挂 manager）、`Constant.java`、`TriggerInterpreter.java`（解锁两个 op）、
+  扩展 `test/SkillCategoryAndResourceTest.java` 或新建 `test/ResourceTest.java`
 - **怎么做**：
     1. `Resource` 加 `scope`（`SELF` / `PARTY`）；`ResourceManager` 提供 `gain/spend/get/isFull`，
        满了**不溢出**并发"满"事件（`onFull` 效果仍归触发器表，别硬编码）。
@@ -367,25 +433,89 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
   测试替身 provider 让"资源满 → `castUltra` 可用"。
 - **依赖**：P8-6、P8-7
 
+**实际落地（2026-09-23）**：机制说明见 `engine.md` **§23**。三个部件 ——
+`Resource`（P8-4 已存在）+ `ResourceManager`（每个 `CanHit` 一个，**永不为 null**）
++ **`EnergyProvider.canCastUltra(user, cost)` 闸门**。与原计划的差异：
+
+1. ⚠ **闸门必须挂在 `EnergyProvider` 上，而不是"把资源接到 `isEnergyFull()`"**。
+   计划写的是接 `isEnergyFull()`/`castUltra`，但真正卡住层数角色的是
+   `isUltraReady` 开头那句 `!user.hasEnergyBar() → return false` ——
+   而他们的**能量恒为 0**（`NoConventionalEnergyProvider` 全返回 null），所以会被**永久锁死**。
+   现在 `isUltraReady` 委托给 provider 的 `canCastUltra`，默认实现仍是老规则
+   （有能量条 + 够阈值），常规角色行为**一字不变**。
+   ⚠ 传进去的是**阈值**（`ultraEnergyCost`）不是 `maxEnergy` —— 5 个角色的阈值低于上限。
+2. **"满了"信号是上升沿，不是电平**。计划说"满了不溢出并发满事件"，但昔涟的池子 24
+   可以继续**溢出存到 27**（§9.5）：按电平，她到达 24 之后每次溢出入账都会再触发"满了"。
+   现在只在"本次入账让它**从不满变成满**"且**真的入账了**（`gained > 0`）时触发一次。
+3. **`PARTY` scope 被显式拒绝，而不是当成 `SELF`**。共享池需要一个比单个角色活得久的
+   持有者（per-battle 注册表）；挂在每个角色身上会得到**四份各自独立的计数器**，
+   而游戏里只有一个共享池 —— 这种错**运行时不报任何异常**，所以宁可注册时响亮拒绝。
+   `SELF` 已接。
+4. **`SPEND_RESOURCE` 不够时抛异常**，不是静默失败：战技点不够是"玩家按不动按钮"（合法状态），
+   而触发规则的消耗是作者写了就认为层数会在那 —— 静默吃掉会让内容 bug 隐形。
+5. **两处限制写成了测试，不是藏起来**：
+   - 效果 amount 是**字面量、无算术**，所以"给 `lost` 层"表达不出来。测试拆成两半：
+     `hpLossReachesTheOwnersTriggerTable`（接线）与
+     `oneStackPerPointOfLossIsAManagerCall`（1:1 算术，属 manager 层）。
+   - 条件 DSL **不能表达"只有我自己受伤"**：`self` 比的是 **actor**（谁造成事件），
+     而 `HP_LOST` 是**全队事件**（§4.1），规则分不清"我被打"和"队友被打"。
+     对需要全队损血的遐蝶是对的，对个人层数角色是错的 → 需要给 DSL 加 `target` 变量。
+     由 `subjectFilterIsNotExpressibleYet` 钉住。
+
+**变异验证**（3 处，均确认护栏有效）：
+
+| 变异 | 结果 |
+|---|---|
+| `isUltraReady` 改回只看能量 | `resourceFullMakesTheUltimateAvailable` 红 ❌ |
+| "满了"信号改成电平触发 | `stayingAtTheCapDoesNotRefire` 红 ❌ |
+| 放行 `PARTY` scope | `partyScopedResourceIsRefusedUntilItHasARealOwner` 红 ❌ |
+
+**验收**：`ResourceTest` 19 条全绿（含"资源满 → `castUltra` 可用"）；
+全套 **50 套 / 447 例**全绿；demo 行为不变。
+
 ---
 
-### P8-3 天赋 + 追加攻击（建议并进 P8-7）
+### P8-3 天赋 + 追加攻击 ✅
 
-> ⚠ **建议不要单独做**：v2 的原始方案是在 `Battle` 加 `List<TalentTrigger>` +
-> `CharacterFactory` 里 `switch (cid)` 注册 —— 那是**过渡实现**，P8-7 一落地就要返工，
-> 而且正好踩在"引擎不认角色"的红线上。**正路**：P8-6 补 `AttackEvent` 的"攻击后"语义，
-> P8-7 用触发器表表达"受击后追加一段"。
+> ✅ **前置已就位（P8-6/P8-7）**：不需要再往 `Battle` 加 `List<TalentTrigger>`，也不需要在
+> `CharacterFactory` 里 `switch (cid)` —— 那张表已经能表达"受击后追加一段"。
 
-- **前置阻塞**：⚠ **数据里没有 `is_follow_up` 字段**，槽位 4 天赋的 `attack_type` 是 `null`，
-  数据里强化普攻与普通普攻**都是 `"Normal"`**。所以"哪个技能算追加攻击"目前**无从判断**。
-  开工前必须先定来源（翻 `Config/ConfigAbility`，或维护一张手工表）。
-- **代表角色**：克拉拉 1107（受击反击）、希儿 1102（击杀额外回合）。
-- **验收**：`TalentTest`：克拉拉被打 → 追加 1 段（`DamageType.ADDITIONAL` 且 `getCountsAsAttack() == false`，不回能不削韧）；
-  希儿击杀 → 该角色行动条立即提前。
+**计划时的两条"前置"，一条是真的、一条是假的：**
+
+| 原计划 | 实际 |
+|---|---|
+| ⚠ **数据阻塞**：数据里没有 `is_follow_up` 字段，"哪个技能算追加攻击"无从判断 | ❌ **假前置**。不需要那个字段 —— 追加攻击的 payload 就在**天赋槽自己的技能数据**里，缺的只有"什么时候放" |
+| **引擎缺口**：触发器表的 `ADD_DAMAGE` / `TRUE_DAMAGE` / `REDUCE_TOUGHNESS` 在加载时被拒绝 | ✅ **真缺口**。改成一个 `DAMAGE` op 就够（`ADD_DAMAGE`/`TRUE_DAMAGE` 这两个名字是我凭空想的，实际不需要拆成两个） |
+
+- **实际新增的引擎能力**：触发器表 `DAMAGE` op（`skill` 指定槽位、`damage_param` 指定倍率索引、
+  `target` 打谁、可选 `per_target` / `as_attack`），走 `Battle.applyAdditionalDamage`。
+  `REDUCE_TOUGHNESS` **仍然没接**（它要的是"定元素"，与追加攻击无关，留给需要它的角色）。
+- **代表角色（都是纯 JSON，零 Java 角色类）**：
+    - 克拉拉 1107 `因为我们是家人`：`on: HP_LOST` + `when: ["target == self"]`
+      → `DAMAGE`(`TALENT`, `damage_param: 1`, `target: "attacker"`)。
+    - 希儿 1102 `再现`：`on: KILL` + `when: ["actor == self"]` → `EXTRA_TURN`。
+      她的天赋槽是 `Enhance`/stance 0（**不带攻击**），所以不是"打一段"而是"再动一次"。
+
+**变异验证**（3 处，均确认护栏有效）：
+
+| 变异 | 结果 |
+|---|---|
+| JSON 的 `damage_param` 1 → 0 | `theShippedRuleDeclaresTheRightParameterIndex` 红 ❌ |
+| `when` 里 `target == self` → `actor == self` | `claraCountersTheEnemyThatHitHer`、`theShippedRuleRequiresClaraToBeTheVictim`、`theShippedRuleDeclaresTheRightParameterIndex` 红 ❌ |
+| 删掉希儿的 `when`（规则变成无条件） | `seeleDoesNotGetATurnFromATeammatesKill` 红 ❌ |
+
+**验收**：`TalentTest` 11 条全绿（反击打回攻击者 / 倍率取自天赋 `damage_param` /
+`target == self` 与 `actor == self` 不可混用 / 别人挨打不反击 / 击杀再动 / 队友击杀不给回合）；
+全套 **52 套 / 469 例**全绿；demo 行为不变。
+
+> **范围说明**：93 个角色里 21 个的槽位 4 带伤害效果（候选承载者，但**不全是**追加攻击）。
+> 本项只做上面两个代表 —— 剩下的按"一次一个 + `source`/`note` 标出处"推进，
+> 因为 `damage_param` 索引**因技能而异**（姬子 0 / 克拉拉 1 / 貊泽 2 / 大丽花 2），批量猜必错。
+> 完整说明见 `engine.md` §4.7。
 
 ---
 
-### P8-5 真实队伍装配（`StageFactory` 换真角色）
+### P8-5 真实队伍装配（`StageFactory` 换真角色）✅
 
 - **目标**：P7-5 的 `fromAttributes` 临时队换成 4 人真队；光锥/遗器沿用 `Builder` 已有管线。
 - **涉及文件**：`utils/StageFactory.java`、新建 `test/RealTeamTest.java`
@@ -397,6 +527,38 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 - **验收**：`RealTeamTest`：`load(103201)` → `team.size() == 4`、每个 `getElement()` 非 null、
   `Battle` 能完整跑一轮不炸。
 - **依赖**：P8-1、P7-5
+
+**实际落地（2026-09-23）**：
+
+1. ⚠ **光锥必须挂在 `Character.Builder` 上，不能建完再 `setWeapon`**。
+   这是我实现时踩到的：`Calculator` 在 `build()` 里**把它当输入消费**，
+   所以对已建好的角色 `setWeapon(...)` 只改字段、**面板不会重算**（锥装上去了但一点属性都没加，
+   而且运行时不报任何异常）。为此给 `CharacterFactory` 加了带光锥的 `create` 重载
+   （装配点，P8-0 允许），并在 `Character.weapon` 的字段注释里写明这个坑
+   （`setWeapon` 全项目**零调用者**，就是个陷阱）。
+2. **选锥规则：先看稀有度，再按 id 最小**。原本只按 id 最小 → 选中 3★ 新手锥
+   （锋镝/天倾/一场术后对话），对一支 80 级队伍很怪。为此给 `WeaponData` 补了 **`rarity`**
+   字段 —— `weapons.json` 里**一直有**这个字段，只是 bean 没声明，
+   正是本项目反复踩的 **Gson 静默失配**（`ROADMAP` §4.2）。补上后每个角色拿到的是自己的
+   5★ 签名锥：景元「银河铁道之夜」/ 希儿「于夜色中」/ 克拉拉「无可取代的东西」/ 娜塔莎「棺的回响」。
+3. **遗器仍没有**：没有可用的遗器实例数据（`relic_sets.json` 未装载，也没有生成表），
+   所以队伍裸装上场。`Builder` 的遗器管线早就存在，由 `CharacterFactoryTest` 覆盖。
+4. **删掉了 `temporaryTeam()` 与 `temporaryCharacter()`**（连同 `TEMPORARY_MAX_ENERGY`）——
+   并加了一条反射测试断言 `StageFactory` **不再暴露**任何 temporary 方法，
+   免得以后有人把占位队加回来。
+5. 顺带修了 `StageFactoryTest` 里那条"3 个占位角色、速度各不相同"的旧断言
+   （真队是 4 人，速度也各不相同，所以那条**关于行动条的意图**保住了）。
+
+**变异验证**（2 处，均确认护栏有效）：
+
+| 变异 | 结果 |
+|---|---|
+| 选锥时忽略命途 | `everyMemberCarriesAWeaponOfItsOwnPath` 红 ❌ |
+| 建完再 `setWeapon`（面板不重算） | `theWeaponContributesToTheStatSheet` 红 ❌ |
+
+**验收**：`RealTeamTest` 11 条全绿（4 人 / 4 命途 / 元素非 null / 锥的 type 对上命途 /
+锥真的进面板 / 每次调用给新实例 / 默认 `load` 也走真队 / 占位入口已消失）；
+全套 **51 套 / 458 例**全绿；demo 行为不变。
 
 ---
 
@@ -566,8 +728,8 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 
 ## 11. 为什么这样排序
 
-1. **A 层（P8-6/7/8）最优先** —— 它是"93 个角色机制"的**总开关**。在此之前做任何角色内容
-   都是往 `Battle` 里塞 `switch (cid)`，做完还要返工。
+1. **A 层（P8-6/7/8 + P8-3）最优先** —— 它是"93 个角色机制"的**总开关**。在此之前做任何角色内容
+   都是往 `Battle` 里塞 `switch (cid)`，做完还要返工。**已完成** ✅
 2. **B 层（P9）紧随** —— 现在只有 5 只怪有技能、其余全平 A，没有难度曲线。
    `enemy_skills.json` 的自建表**隔离了数据源缺失这个外部风险**（找到源数据只换加载处）。
 3. **C 层（P10）是"填口子"** —— 全部依赖已完成的机制，**不该出现新架构**。

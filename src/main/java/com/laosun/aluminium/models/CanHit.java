@@ -109,6 +109,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
 
     private final BuffManager buffManager;
 
+    /**
+     * The stack resources this combatant owns (P8-8).
+     *
+     * <p>Never {@code null}, like {@code triggerTable}: a character with no stacks simply has an
+     * empty manager, so call sites never null-check. This is what lets "stack instead of an energy
+     * bar" characters (Acheron's 【残梦】, Feixiao's 【飞黄】, Cyrene's 【追忆】…) work without a class
+     * of their own — the resource is data, the trigger table fills it, and the energy provider reads
+     * it to decide whether the ultimate is available.
+     */
+    @Getter
+    private final ResourceManager resources;
+
     // test event behavior
     public Runnable beforeMove = () -> {
     };
@@ -131,6 +143,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
         this.skills = new EnumMap<>(SkillType.class);
         this.buffManager = new BuffManager(this);
+        this.resources = new ResourceManager(this);
     }
 
     /**
@@ -149,6 +162,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
         this.death = false;
         this.buffManager = new BuffManager(this);
+        // Resources are per-battle state, like currentEnergy: the copy starts empty rather than
+        // inheriting the original's stacks.
+        this.resources = new ResourceManager(this);
         // Configuration-like fields must be copied along too; currentEnergy belongs to a new battle
         // instance and deliberately starts at 0
         this.maxEnergy = other.maxEnergy;

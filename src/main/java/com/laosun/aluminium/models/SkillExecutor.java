@@ -3,7 +3,9 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillEffectType;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.buffs.SuperBreakBuff;
 
 import java.util.LinkedHashSet;
@@ -81,6 +83,22 @@ public final class SkillExecutor {
         List<CanHit> chosen = targets == null ? List.of() : List.copyOf(targets);
         for (Character ally : battle.characters) {
             ally.onSkillCast(battle, user, skill, hits, chosen);
+        }
+        // P8-7: the same moment, delivered to the data-driven trigger tables.
+        //
+        // Two events are derived from a cast, because characters distinguish them in their text:
+        //   SKILL_CAST   "when <someone> casts a skill"  -- owner filters with `actor == self`
+        //   ALLY_ATTACK  "after an ally attacks"          -- owner filters with `actor != self`,
+        //                                                     and can count `hit_count`
+        // They fire together here because a cast is the only attack the engine performs today;
+        // if a non-attack cast (a heal, say) ever needs to stay out of ALLY_ATTACK, the split
+        // belongs here.
+        // `actor` = the caster. `target` is left null on purpose: a cast can hit several targets at
+        // once, so there is no single subject to hand over -- rules that care about who was hit use
+        // `hit_count`, and the per-target events (HP_LOST etc.) carry their own subject.
+        battle.fireTriggers(TriggerEvent.SKILL_CAST, user, null, hits.size(), 0);
+        if (!hits.isEmpty()) {
+            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, null, hits.size(), 0);
         }
     }
 

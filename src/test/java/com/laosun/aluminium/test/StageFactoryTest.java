@@ -83,7 +83,7 @@ public class StageFactoryTest {
     public void enemiesMatchTheStageData() {
         assumeStageData();
         StageBean stage = StageFactory.requireStage(103201);
-        Battle battle = StageFactory.load(103201, StageFactory.temporaryTeam(), new Random(1));
+        Battle battle = StageFactory.load(103201, StageFactory.realTeam(), new Random(1));
 
         Assertions.assertEquals(stage.monsterIds(0).size(), battle.enemies.size());
         for (Enemy enemy : battle.enemies) {
@@ -101,8 +101,8 @@ public class StageFactoryTest {
     @Test
     public void fixedSeedMakesTheBattleReproducible() {
         assumeStageData();
-        Battle first = StageFactory.load(103201, StageFactory.temporaryTeam(), new Random(42));
-        Battle second = StageFactory.load(103201, StageFactory.temporaryTeam(), new Random(42));
+        Battle first = StageFactory.load(103201, StageFactory.realTeam(), new Random(42));
+        Battle second = StageFactory.load(103201, StageFactory.realTeam(), new Random(42));
 
         Assertions.assertEquals(describe(first), describe(second),
                 "two assemblies with the same seed should be identical");
@@ -114,7 +114,7 @@ public class StageFactoryTest {
     @Test
     public void theBattleCanRunTurns() {
         assumeStageData();
-        Battle battle = StageFactory.load(103201, StageFactory.temporaryTeam(), new Random(7));
+        Battle battle = StageFactory.load(103201, StageFactory.realTeam(), new Random(7));
 
         for (int i = 0; i < 5 && !battle.isOver(); i++) {
             battle.stepForward();
@@ -138,7 +138,7 @@ public class StageFactoryTest {
         StageBean stage = StageFactory.requireStage(310030);
         Assumptions.assumeTrue(stage.waveCount() >= 2, "310030 should be a multi-wave stage");
 
-        Battle battle = StageFactory.load(310030, StageFactory.temporaryTeam(), new Random(3));
+        Battle battle = StageFactory.load(310030, StageFactory.realTeam(), new Random(3));
         WaveManager waves = battle.getWaveManager();
         Assertions.assertEquals(0, waves.getWaveIndex());
 
@@ -159,22 +159,29 @@ public class StageFactoryTest {
     }
 
     /**
-     * The temporary team: 3 members, all with different speeds (so the action bar is meaningful) and
-     * with an energy bar (otherwise no ultimate can be cast).
+     * The reference team (P8-5): 4 real characters, each with an identity, an energy bar and a light
+     * cone of its own path.
+     *
+     * <p>Replaces the old P7-5 assertion, which checked 3 placeholders with deliberately distinct
+     * speeds. The real roster happens to have distinct speeds too, so the action bar stays meaningful.
      */
     @Test
-    public void temporaryTeamIsUsable() {
-        List<Character> team = StageFactory.temporaryTeam();
+    public void realTeamIsUsable() {
+        List<Character> team = StageFactory.realTeam();
 
-        Assertions.assertEquals(3, team.size());
-        Assertions.assertEquals(3, team.stream()
+        Assertions.assertEquals(4, team.size(), "the reference team is 4 characters");
+        Assertions.assertEquals(4, team.stream()
                         .map(c -> c.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get())
                         .distinct().count(),
-                "the speeds should all differ");
+                "the speeds should all differ, so the action bar is meaningful");
         for (Character c : team) {
             Assertions.assertTrue(c.getMaxHp() > 0);
-            Assertions.assertTrue(c.hasEnergyBar(), c.getName() + " should have an energy bar (otherwise no ultimate can be cast)");
+            Assertions.assertNotNull(c.getElement(), c.getName() + " must have a real element");
+            Assertions.assertNotNull(c.getPath(), c.getName() + " must have a real path");
+            Assertions.assertTrue(c.hasEnergyBar(),
+                    c.getName() + " should have an energy bar (otherwise no ultimate can be cast)");
             Assertions.assertFalse(c.isDeath());
+            Assertions.assertNotNull(c.getWeapon(), c.getName() + " should carry a light cone");
         }
     }
 
@@ -222,7 +229,7 @@ public class StageFactoryTest {
     }
 
     private static Battle battle(int stageId) {
-        return StageFactory.load(stageId, StageFactory.temporaryTeam(), new Random(0));
+        return StageFactory.load(stageId, StageFactory.realTeam(), new Random(0));
     }
 
     /** Flattens a battle's visible state into a string, for comparing whether two assemblies are identical. */

@@ -1,0 +1,13 @@
+[
+  {
+    "on": "KILL",
+    "when": ["actor == self"],
+    "do": [
+      {
+        "op": "EXTRA_TURN"
+      }
+    ],
+    "source": "1102 希儿 talent 再现 (Resurgence)",
+    "note": "Doc: 「消灭敌方目标后，希儿立即获得1个额外回合。」 Modelled with the existing EXTRA_TURN op -- no new engine capability needed, only the KILL event plus the 'actor == self' condition (the killer is me). The talent slot's own data is Enhance/Unknown with stance 0, i.e. it carries no attack, which is exactly why this rule grants a turn instead of dealing damage."
+  }
+]
