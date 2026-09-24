@@ -53,6 +53,8 @@ public class RelicAbilityBattleTest {
     private static final int STREETWISE_BOXING = 105;
     /** "City of Converging Stars" (planar) — 2-piece: on Follow-Up ATK +24% ATK; on a kill +12% CRIT DMG. */
     private static final int CONVERGING_STARS = 326;
+    /** "The Ashblazing Grand Duke" — 2-piece: +20% DMG dealt by Follow-Up ATK. */
+    private static final int ASHBLAZING = 115;
 
     /** Himeko: basic attack / skill / ultimate are all real, damaging skill slots. */
     private static final int HIMEKO = 1003;
@@ -480,6 +482,71 @@ public class RelicAbilityBattleTest {
         Assertions.assertEquals(mateBefore + CONVERGING_CRIT_DMG,
                 mate.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
                 "'for all allies' must reach a team-mate, not just the wearer");
+    }
+
+    // ==================================================================
+    // 7. The follow-up-only damage boost: The Ashblazing Grand Duke (115)
+    // ==================================================================
+
+    /** Ability51150: "Increases the DMG dealt by Follow-Up ATK by 20%." */
+    private static final double ASHBLAZING_BOOST = 0.2;
+
+    /**
+     * Set 115's 2-piece raises <b>follow-up damage and nothing else</b>.
+     *
+     * <p>This is the whole reason {@code FOLLOW_UP_DAMAGE_BOOST} exists as its own attribute: the
+     * all-type boost would also raise basic attacks, skills and ultimates, and the text says Follow-Up
+     * ATK specifically.
+     *
+     * <p>The measurement is a <b>differential between two identically-built battles</b>, one with the set
+     * bonus and one with the buffs cleared, rather than an absolute ratio. A ratio would be wrong here:
+     * the boost zone is additive with the wearer's element and all-type boosts, so "20% more" is 20
+     * percentage points on that sum, not a factor of 1.2 on the final number — the same trap the ATK
+     * buffs above fell into.
+     */
+    @Test
+    public void ashblazingTwoPieceRaisesFollowUpDamageAndLeavesOtherAttacksAlone() {
+        Battle withBoost = newBattle(List.of(wearing(HIMEKO, ASHBLAZING)), true);
+        Battle withoutBoost = newBattle(List.of(wearing(HIMEKO, ASHBLAZING)), true);
+        withoutBoost.characters.getFirst().getBuffManager().clearAll();
+
+        Character himeko = withBoost.characters.getFirst();
+        Assertions.assertEquals(ASHBLAZING_BOOST,
+                himeko.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), TOLERANCE,
+                "the 2-piece rule grants the follow-up-only boost at battle start");
+        Assertions.assertEquals(0,
+                withoutBoost.characters.getFirst()
+                        .getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), TOLERANCE,
+                "and clearing the buffs removes it, so the control battle really is the control");
+
+        // A fixed crit state keeps both battles numerically comparable.
+        for (Battle battle : List.of(withBoost, withoutBoost)) {
+            battle.characters.getFirst().setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
+        }
+
+        double followUpWith = hitFor(withBoost, true);
+        double followUpWithout = hitFor(withoutBoost, true);
+        double normalWith = hitFor(withBoost, false);
+        double normalWithout = hitFor(withoutBoost, false);
+
+        Assertions.assertTrue(followUpWith > followUpWithout,
+                "a follow-up attack must hit harder with the boost: " + followUpWith
+                        + " vs " + followUpWithout);
+        Assertions.assertEquals(normalWith, normalWithout, TOLERANCE,
+                "a basic attack must be completely unaffected: " + normalWith + " vs " + normalWithout);
+    }
+
+    /** Settles one hit and returns how much HP the enemy lost. */
+    private static double hitFor(Battle battle, boolean followUp) {
+        Enemy enemy = battle.enemies.getFirst();
+        Character hero = battle.characters.getFirst();
+        double before = enemy.getCurrentHp();
+        if (followUp) {
+            battle.applyAdditionalDamage(hero, enemy, DamageElement.FIRE, 1000);
+        } else {
+            battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero, List.of(enemy));
+        }
+        return before - enemy.getCurrentHp();
     }
 
     // ==================================================================
