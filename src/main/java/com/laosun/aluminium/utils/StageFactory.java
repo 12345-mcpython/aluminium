@@ -6,6 +6,7 @@ import com.laosun.aluminium.beans.StageBean;
 import com.laosun.aluminium.beans.WeaponData;
 import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.RelicSuit;
 import com.laosun.aluminium.models.WaveManager;
 import com.laosun.aluminium.models.Weapon;
 
@@ -40,8 +41,9 @@ import java.util.Random;
  *
  * <p>⚠ <b>The team is real since P8-5</b>: {@link #load(int)} builds the 4-character team with
  * {@link #realTeam()}, which goes through {@code CharacterFactory} (real stat sheet, path, element,
- * energy cap, real skill slots) and equips each character with a light cone of its own path from
- * {@code weapons.json}. Before P8-5 this method used a placeholder team built from
+ * energy cap, real skill slots), equips each character with a light cone of its own path from
+ * {@code weapons.json}, and — since P10-3 — with a real relic suit whose 4-piece and 2-piece set bonuses
+ * are applied ({@link #referenceRelics()}). Before P8-5 this method used a placeholder team built from
  * {@code Character.fromAttributes}.
  */
 public final class StageFactory {
@@ -59,6 +61,36 @@ public final class StageFactory {
      * The light cone level. Same reasoning as {@link #TEAM_LEVEL}.
      */
     private static final int WEAPON_LEVEL = 80;
+
+    /**
+     * The star rating of the reference team's relics: 5, because that is what the 5-star cavern and planar
+     * sets come in and what a "reference" build means in this game.
+     */
+    private static final int RELIC_STAR = 5;
+
+    /**
+     * The relic level: 15 is the cap, matching {@link #TEAM_LEVEL} and {@link #WEAPON_LEVEL}.
+     */
+    private static final int RELIC_LEVEL = 15;
+
+    /**
+     * The cavern set the reference team wears: 102, <b>Musketeer of Wild Wheat</b>.
+     *
+     * <p>Chosen because both its tiers are plain stats in the data — 2 pieces grant +12% ATK, 4 pieces
+     * another +6% SPD — so the team exercises a real 4-piece bonus end to end instead of a bonus that is
+     * only a named ability the engine cannot run yet (most 4-piece bonuses are exactly that; see
+     * {@code RelicSet.Effect#hasAbility()}).
+     */
+    private static final int CAVERN_SET = 102;
+
+    /**
+     * The planar ornament set: 301, <b>Space Sealing Station</b> (+12% ATK at 2 pieces).
+     *
+     * <p>A character-agnostic choice: the planar sets' second tier is an ability in every case, and of the
+     * stat-only first tiers this one is the general-purpose one. See {@link RelicFactory} for why the
+     * sphere's main attribute is ATK% here rather than an element boost.
+     */
+    private static final int PLANAR_SET = 301;
 
     /**
      * The P8-5 reference team: Jing Yuan / Seele / Clara / Natasha.
@@ -146,7 +178,8 @@ public final class StageFactory {
     }
 
     /**
-     * The **real** 4-character reference team (P8-5), each with a light cone of its own path.
+     * The **real** 4-character reference team (P8-5), each with a light cone of its own path and a real
+     * relic suit.
      *
      * <p>Every member comes from {@link CharacterFactory#create(int, int)}, so it carries a real stat
      * sheet (level scaling, traces), path, element, aggro, energy cap, real skill slots and — since
@@ -158,11 +191,15 @@ public final class StageFactory {
      * non-deterministic pick would make every stage battle irreproducible. ⚠ Only the cone's
      * <b>panel</b> is applied — its passive is not (a weapon passive needs the buff system, P10-3).
      *
-     * <p>⚠ <b>No relics yet</b>: there is no relic-instance data to draw from ({@code relic_sets.json}
-     * is not loaded and there is no generated relic table), so the team fights without them. The
-     * {@code Builder} pipeline for relics already exists and is covered by {@code CharacterFactoryTest}.
+     * <p><b>On the relics (P10-3)</b>: every member wears the same {@link #referenceRelics()} build — four
+     * pieces of Musketeer of Wild Wheat (set 102) plus two pieces of Space Sealing Station (set 301) — so
+     * both a 4-piece and a 2-piece set bonus are live on every sheet. The build is a pure function of the
+     * data ({@link RelicFactory}), with no rolled main attributes and no rolled sub-stats, because a
+     * non-deterministic build would make every stage battle irreproducible in exactly the way the cone
+     * choice above is designed to avoid. ⚠ An <b>ability</b>-type set bonus is still not applied: the
+     * engine has no ability interpreter (see the class docs of {@code RelicSuit}).
      *
-     * @return a fresh team; each call builds new characters, so two calls never share state
+     * @return a fresh team; each call builds new characters and new relics, so two calls never share state
      */
     public static List<Character> realTeam() {
         List<Character> team = new ArrayList<>();
@@ -174,9 +211,23 @@ public final class StageFactory {
             // The path comes straight from the data rather than from a throwaway character just to
             // read it back.
             Path path = Path.fromMt(CharacterFactory.data(cid).mt());
-            team.add(CharacterFactory.create(cid, TEAM_LEVEL, true, samePathWeapon(path)));
+            team.add(CharacterFactory.create(cid, TEAM_LEVEL, true, samePathWeapon(path), referenceRelics()));
         }
         return team;
+    }
+
+    /**
+     * The relic build the reference team wears: a 4-piece cavern set plus a 2-piece planar ornament set,
+     * both at {@link #RELIC_STAR}/{@link #RELIC_LEVEL}, from the real set data.
+     *
+     * <p>Public because "what is the reference team actually wearing" is something a test (or a reader
+     * comparing two runs) should be able to ask without rebuilding it by hand; the sets themselves are
+     * documented on {@link #CAVERN_SET} and {@link #PLANAR_SET}.
+     *
+     * @return a fresh suit on every call, so no two characters share mutable relic state
+     */
+    public static RelicSuit referenceRelics() {
+        return RelicFactory.combinedSuit(RELIC_STAR, RELIC_LEVEL, CAVERN_SET, PLANAR_SET);
     }
 
     /**

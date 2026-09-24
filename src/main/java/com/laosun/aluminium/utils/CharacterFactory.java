@@ -5,6 +5,7 @@ import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.RelicSuit;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
@@ -117,12 +118,35 @@ public final class CharacterFactory {
      * @throws CharacterException if the character does not exist
      */
     public static Character create(int cid, int level, boolean promoted, Weapon weapon) {
+        return create(cid, level, promoted, weapon, null);
+    }
+
+    /**
+     * Builds a real character **with a light cone and a relic suit**.
+     *
+     * <p>Both have to be supplied here rather than assigned afterwards, for the same reason as the cone
+     * above: the stat-sheet pipeline consumes them during {@code Character.Builder#build()}. A suit handed
+     * in here also carries its relic sets, so any 2-piece / 4-piece bonus it satisfies reaches the sheet
+     * (see {@code RelicSuit.appendTo}).
+     *
+     * @param cid       character id
+     * @param level     level (1-80)
+     * @param promoted  whether the character is promoted
+     * @param weapon    the light cone, or {@code null} for none
+     * @param relicSuit the relic suit, or {@code null} for none (the character then wears nothing)
+     * @return the real character
+     * @throws CharacterException if the character does not exist
+     */
+    public static Character create(int cid, int level, boolean promoted, Weapon weapon, RelicSuit relicSuit) {
         Character.Builder builder = Character.builder().cid(cid).level(level);
         if (promoted) {
             builder = builder.isPromote();
         }
         if (weapon != null) {
             builder = builder.weapon(weapon);
+        }
+        if (relicSuit != null) {
+            builder = builder.relicSuit(relicSuit);
         }
         // P8-7: attach the character's data-driven mechanics. This is the **assembly point** -- the
         // one place allowed to go from "which character" to "which rules" (P8-0). Characters with no

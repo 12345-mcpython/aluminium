@@ -1,8 +1,13 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.beans.RelicSet;
+import com.laosun.aluminium.data.RelicSets;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.utils.AttributeBuilder;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import lombok.SneakyThrows;
 
@@ -16,6 +21,20 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  *
  * <p>Manages per-slot storage and provides methods to aggregate all relic attributes
  * into an {@link AttributeBuilder} or a raw value map.
+ *
+ * <p><b>Set bonuses are applied here.</b> On top of the main and sub attributes of the pieces, both
+ * {@link #calcTotalValue(Object2DoubleOpenHashMap)} and {@link #appendTo(AttributeBuilder)} add the effect of
+ * every relic set the character wears enough pieces of: a {@code require == 2} effect needs two relics
+ * sharing a {@link Relic#setId}, a {@code require == 4} effect needs four. The numbers come from
+ * {@link Constant#RELIC_SETS} and each property is resolved with
+ * {@link AttributeType#fromGameProperty(String)} — a property name the engine cannot map throws with the
+ * name instead of being skipped.
+ *
+ * <p>⚠ <b>What is still not applied</b>: many 4-piece bonuses are an <em>ability</em> rather than stats
+ * ("at the start of the battle, immediately regenerates 1 Skill Point"). The engine has no ability
+ * interpreter, so such an effect contributes nothing to a sheet — it is registered, not silently forgotten,
+ * by {@link RelicSet.Effect#hasAbility()} and by {@code RelicSetTest}'s "every effect is either stats or a
+ * named ability" invariant.
  */
 public final class RelicSuit implements Cloneable {
     /**
@@ -77,7 +96,8 @@ public final class RelicSuit implements Cloneable {
     }
 
     /**
-     * Computes the total sum of all main and sub-attribute values across all relics.
+     * Computes the total of everything the suit contributes: the main and sub attributes of every relic
+     * plus the bonuses of every relic set worn in sufficient numbers.
      *
      * @param relicValue the map to accumulate values into (modified in-place)
      */
@@ -106,10 +126,17 @@ public final class RelicSuit implements Cloneable {
                 }
             }
         }
+
+        addSetBonusValues(relicValue);
     }
 
     /**
-     * Aggregates all relic attributes and appends them as modifiers to the builder.
+     * Aggregates all relic attributes and set bonuses and appends them as modifiers to the builder.
+     *
+     * <p>The percent/flat decision is the same for an affix and for a set bonus: a
+     * {@link Constant#PERCENT_TO_BASE} attribute (health/attack/defence/speed percent) is added as a
+     * percentage of its base attribute, any other {@link AttributeType#isPercent} attribute is a
+     * percentage-point value, and everything else is flat.
      *
      * @param attributeBuilder the builder to append modifications to
      */
@@ -117,18 +144,7 @@ public final class RelicSuit implements Cloneable {
         if (total.isEmpty()) return;
 
         Object2DoubleOpenHashMap<AttributeType> aggregate = new Object2DoubleOpenHashMap<>();
-
-        for (Relic relic : total) {
-            if (relic == null) continue;
-            Relic.Attribute main = relic.getMainAttribute();
-            if (main != null) addToAggregate(aggregate, main);
-            List<Relic.Attribute> subs = relic.getSubAttributes();
-            if (subs != null) {
-                for (Relic.Attribute sub : subs) {
-                    if (sub != null) addToAggregate(aggregate, sub);
-                }
-            }
-        }
+        calcTotalValue(aggregate);
 
         for (var entry : aggregate.object2DoubleEntrySet()) {
             AttributeType type = entry.getKey();
@@ -145,20 +161,64 @@ public final class RelicSuit implements Cloneable {
         }
     }
 
-    private void addToAggregate(Object2DoubleOpenHashMap<AttributeType> agg, Relic.Attribute attr) {
-        AttributeType type = attr.type();
-        agg.addTo(type, attr.value());
+    /**
+     * The set bonuses the suit currently satisfies.
+     *
+     * <p>Derived from the equipped pieces on every call (there is no cached state to invalidate when a relic
+     * is swapped). Besides being the implementation of the bonus maths, this is how a caller can ask "which
+     * bonuses are live" — including the ability-only effects listed in
+     * {@link RelicSet.Effect#hasAbility()}, which this class can select but not execute.
+     *
+     * <p>⚠ The order of the returned list is <b>unspecified</b> across different sets (the piece counts come
+     * out of a hash map); within one set the effects keep the data's order, so a 2-piece effect precedes its
+     * 4-piece effect. Callers that need a stable order should not rely on it.
+     *
+     * @return the effects whose {@code require} the worn piece count meets; empty when no set is complete
+     */
+    public List<RelicSet.Effect> activeEffects() {
+        List<RelicSet.Effect> active = new ArrayList<>();
+        for (Int2IntMap.Entry worn : piecesPerSet().int2IntEntrySet()) {
+            for (RelicSet.Effect effect : RelicSets.require(worn.getIntKey()).effects()) {
+                if (worn.getIntValue() >= effect.require()) {
+                    active.add(effect);
+                }
+            }
+        }
+        return active;
     }
 
-    private void appendAttribute(AttributeBuilder attributeBuilder, Relic.Attribute attribute) {
-        AttributeType at = attribute.type();
-        if (PERCENT_TO_BASE.containsKey(at)) {
-            attributeBuilder.addPercent(at, attribute.value(), DoubleValue.Modifier.ModifierSource.RELIC);
-        } else {
-            if (at.isPercent) {
-                attributeBuilder.addPercentPoint(at, attribute.value(), DoubleValue.Modifier.ModifierSource.RELIC);
-            } else {
-                attributeBuilder.addPure(at, attribute.value(), DoubleValue.Modifier.ModifierSource.RELIC);
+    /**
+     * How many pieces of each set are worn, keyed by set id. Relics that belong to no set
+     * ({@link Constant#RELIC_SET_NONE}) are left out: they can never complete a set.
+     */
+    private Int2IntOpenHashMap piecesPerSet() {
+        Int2IntOpenHashMap piecesPerSet = new Int2IntOpenHashMap();
+        for (Relic relic : total) {
+            if (relic == null || relic.setId == Constant.RELIC_SET_NONE) {
+                continue;
+            }
+            piecesPerSet.addTo(relic.setId, 1);
+        }
+        return piecesPerSet;
+    }
+
+    /**
+     * Adds the value of every satisfied set bonus to the map.
+     *
+     * <p>An unknown set id is an error rather than "no bonus": it means the relic was built with an id that
+     * does not exist in the data, and quietly ignoring it would make the character a few percent weaker with
+     * nothing to show for it.
+     */
+    private void addSetBonusValues(Object2DoubleOpenHashMap<AttributeType> relicValue) {
+        for (Int2IntMap.Entry worn : piecesPerSet().int2IntEntrySet()) {
+            RelicSet set = RelicSets.require(worn.getIntKey());
+            for (RelicSet.Effect effect : set.effects()) {
+                if (worn.getIntValue() < effect.require()) {
+                    continue;
+                }
+                for (RelicSet.Property property : effect.properties()) {
+                    relicValue.addTo(AttributeType.fromGameProperty(property.type()), property.value());
+                }
             }
         }
     }
