@@ -10,6 +10,26 @@ import com.laosun.aluminium.models.event.HpLossEvent;
 /**
  * Counter-attack (P9-5): while this is attached, losing HP hits the one who caused it back.
  *
+ * <p>⚠ <b>OPEN DEFECT (measured 2026-09-24): the counter fires far more often than it should when both
+ * sides wear one.</b> One real character (Himeko) basic-attacking one real enemy (Ice Edge), crit
+ * disabled, ratio 0.5, {@code Battle.runCounter}'s nesting guard <i>in place</i>:
+ *
+ * <pre>
+ *   enemy counter only        : hero lost  237.23   enemy lost    260.24
+ *   both sides counter        : hero lost  237.23   enemy lost   5902.69
+ * </pre>
+ *
+ * The hero's loss is identical, so the hero takes exactly one counter — but the enemy loses ~23x more
+ * than the hero's single attack can explain, i.e. <b>this buff's reaction is being invoked repeatedly</b>
+ * on the enemy's side, and the nesting guard does not bound it. The mechanism is not yet understood:
+ * candidates are that {@code Battle.broadcastHpLoss} reaches this buff once per party (making the guard's
+ * depth never exceed the first increment in the way expected) or that the counter's own damage is
+ * broadcast back to the counter's owner.
+ *
+ * <p>Do not build balance or boss content on this buff until that is explained and covered by a test that
+ * fails without the fix. The hero-side behaviour (one counter, and the counter does not feed the one it
+ * hits) is correct and pinned by {@code BossMechanicTest}.
+ *
  * <p><b>Which hook, and why it is not the obvious one.</b> {@code DamageEvent.onDamage} runs
  * <i>before</i> a hit is settled and exists to inject damage zones into that hit — a counter needs the
  * moment <i>after</i> the hit landed, which is {@link HpLossEvent#onHpLoss}. That hook also hands over
