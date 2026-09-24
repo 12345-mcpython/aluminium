@@ -113,9 +113,31 @@ public enum AttributeType {
      * @throws IllegalArgumentException if no match is found
      */
     public static AttributeType fromString(String string) {
-        if (BY_STRING.containsKey(string)) {
-            return BY_STRING.get(string);
+        if (string == null) {
+            throw new IllegalArgumentException("Unknown AttributeType: null");
         }
-        throw new IllegalArgumentException("Unknown AttributeType: " + string);
+        AttributeType type = BY_STRING.get(string.trim().toLowerCase());
+        if (type == null) {
+            throw new IllegalArgumentException("Unknown AttributeType: " + string);
+        }
+        return type;
+    }
+
+    /**
+     * Whether this is one of the four {@code *_PERCENT} variants, which exist only as
+     * {@link com.laosun.aluminium.utils.AttributeBuilder} input keys.
+     *
+     * <p>They are <b>not</b> runtime attributes: the builder folds each one into its base
+     * attribute's modifier list and then stores the variant slot as {@code null}, which is why
+     * {@link com.laosun.aluminium.models.CanHit#getAttribute(AttributeType)} returns {@code null}
+     * for them. So a buff must never target one — it would look like it worked and change nothing.
+     *
+     * <p>Note this is <b>not</b> the same question as {@link #isPercent}: that one is about the
+     * value's units ({@code CRIT_CHANCE} and the damage-boost family are ratios too, and they are
+     * perfectly valid buff targets). Only these four are unusable.
+     */
+    public boolean isPercentVariant() {
+        return this == HEALTH_PERCENT || this == DEFENCE_PERCENT
+                || this == ATTACK_PERCENT || this == SPEED_PERCENT;
     }
 }
