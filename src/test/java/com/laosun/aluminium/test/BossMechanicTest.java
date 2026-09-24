@@ -77,17 +77,12 @@ public class BossMechanicTest {
     /**
      * A mutual pair of counters resolves without blowing up, and the first counter still lands.
      *
-     * <p>⚠ <b>This test is weaker than it looks, and the guard it was written for is unverified.</b>
-     * Removing {@code Battle.runCounter}'s nesting check leaves this test — and the whole class — green, so
-     * something else already bounds the exchange. An attempt to strengthen it into "the attacker loses
-     * exactly one counter's worth" <b>failed</b>, which says the exchange here is <i>not</i> simply one
-     * counter deep; diagnosing that needs a session with more room than this one had, and the honest thing
-     * is to leave a passing test with an accurate description rather than a red one with a guess.
-     *
-     * <p>Open question for whoever picks this up: <b>why</b> does the attacker lose more than one counter's
-     * worth when both sides wear one? Either the chain does nest (and the stop is somewhere unexpected), or
-     * a buff is reacting to an HP loss that is not its owner's. The owner check in
-     * {@code CounterMechanic.onHpLoss} was added while chasing this and did not change the outcome.
+     * <p>⚠ <b>This test does not measure the thing that is wrong.</b> It watches the <i>hero's</i> HP,
+     * which is the same whether or not both sides wear a counter (237.23 in both cases). The defect shows
+     * up on the <b>enemy's</b> side: with both sides wearing a counter the enemy loses ~5902 where the
+     * hero's single attack explains ~260 — i.e. the reaction fires far too often. The measurement and the
+     * open question are written up in {@code CounterMechanic}'s Javadoc; whoever picks this up should
+     * assert on the enemy's HP loss, which is the observable that actually moves.
      */
     @Test
     public void aMutualPairOfCountersResolves() {
