@@ -8,6 +8,7 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
+import com.laosun.aluminium.models.buffs.StatModifierBuff;
 
 import java.util.List;
 import java.util.Locale;
@@ -30,14 +31,16 @@ import java.util.Set;
  *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target}</td><td>✅ wired</td></tr>
  *   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>✅ wired</td></tr>
  *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>✅ wired (0.0–1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
- *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, {@code turns}</td>
- *       <td>☐ needs the buff system (P10-3) to own and expire the modifier</td></tr>
- *   <tr><td>{@code ADD_DAMAGE} / {@code TRUE_DAMAGE}</td><td>{@code amount}, {@code element}</td>
- *       <td>☐ needs an element/damage-source decision (P8-3 for follow-up attacks)</td></tr>
- *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, {@code turns}</td><td>☐ P10-3</td></tr>
+ *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, {@code turns}, optional {@code target}</td>
+ *       <td>✅ wired (P10-3) — a negative {@code percent} becomes a {@code DEBUFF}, so a buff and a
+ *           debuff on the same attribute coexist</td></tr>
+ *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, {@code turns}</td>
+ *       <td>☐ needs a named-buff registry; plain stat buffs are already covered by {@code MODIFY_ATTR}</td></tr>
  *   <tr><td>{@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}</td><td>{@code resource}, {@code amount}</td>
- *       <td>☐ P8-8 (no {@code ResourceManager} yet; {@code Resource} itself already exists)</td></tr>
+ *       <td>✅ wired (P8-8)</td></tr>
  *   <tr><td>{@code REDUCE_TOUGHNESS}</td><td>{@code amount}</td><td>☐ needs an element + enemy target</td></tr>
+ *   <tr><td>{@code DAMAGE}</td><td>{@code skill}, {@code damage_param}, optional {@code target}</td>
+ *       <td>✅ wired (P8-3)</td></tr>
  * </table>
  *
  * <p>Effects run in the order written. Every effect credits the <b>owner</b> (the character whose
@@ -48,14 +51,28 @@ public final class TriggerInterpreter {
     /** Ops that are implemented today. */
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
-            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE");
+            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
      * them here (rather than treating them as typos) lets the error message say <i>why</i>.
      */
     private static final Set<String> PLANNED = Set.of(
-            "MODIFY_ATTR", "APPLY_BUFF", "REDUCE_TOUGHNESS");
+            "APPLY_BUFF", "REDUCE_TOUGHNESS");
+
+    /**
+     * The selectors an effect's {@code target} may name.
+     *
+     * <p>This set exists to close a silent-typo hole: the resolver used to fall back to "the owner"
+     * for anything it did not recognise, so a misspelled {@code target} behaved exactly like
+     * {@code "self"} — a wrong answer that reports nothing. Same reasoning as the condition
+     * variables being a closed set.
+     */
+    private static final Set<String> TARGET_SELECTORS =
+            Set.of("self", "target", "attacker", "all_allies", "party");
+
+    /** The two spellings of "every one of our characters". */
+    private static final Set<String> TARGET_ALL_ALLIES = Set.of("all_allies", "party");
 
     private TriggerInterpreter() {
     }
@@ -70,6 +87,7 @@ public final class TriggerInterpreter {
      */
     public static void validate(EffectSpec effect, TriggerSpec spec) {
         String op = normalizeOp(effect, spec);
+        requireTargetSelector(effect, op, spec);
         if (PLANNED.contains(op)) {
             throw new IllegalArgumentException(
                     "Trigger op '" + op + "' is declared in the roadmap but not wired yet "
@@ -89,6 +107,11 @@ public final class TriggerInterpreter {
             case "DAMAGE" -> {
                 requireSkill(effect, op, spec);
                 requireDamageParam(effect, op, spec);
+            }
+            case "MODIFY_ATTR" -> {
+                requireAttribute(effect, op, spec);
+                requirePercent(effect, op, spec);
+                requireTurns(effect, op, spec);
             }
             default -> {
             }
@@ -133,14 +156,25 @@ public final class TriggerInterpreter {
         switch (op) {
             case "GAIN_ENERGY" -> battle.grantEnergy(resolveTarget(effect, ctx), scaledAmount(effect, ctx));
             case "GAIN_SKILL_POINT" -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
-            case "HEAL" -> battle.heal(null, resolveTarget(effect, ctx), scaledAmount(effect, ctx));
-            case "SHIELD" -> battle.grantShield(resolveTarget(effect, ctx), scaledAmount(effect, ctx));
+            case "HEAL" -> {
+                double amount = scaledAmount(effect, ctx);
+                for (CanHit target : resolveTargets(battle, effect, ctx)) {
+                    battle.heal(null, target, amount);
+                }
+            }
+            case "SHIELD" -> {
+                double amount = scaledAmount(effect, ctx);
+                for (CanHit target : resolveTargets(battle, effect, ctx)) {
+                    battle.grantShield(target, amount);
+                }
+            }
             case "EXTRA_TURN" -> battle.grantExtraTurn(resolveTarget(effect, ctx));
             case "ADVANCE" -> battle.queue.advanceActionByPercent(
                     resolveTarget(effect, ctx), effect.getPercent());
             case "GAIN_RESOURCE" -> gainResource(effect, ctx);
             case "SPEND_RESOURCE" -> spendResource(effect, ctx);
             case "DAMAGE" -> damage(battle, effect, ctx);
+            case "MODIFY_ATTR" -> modifyAttr(battle, effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
@@ -219,10 +253,40 @@ public final class TriggerInterpreter {
     private static CanHit resolveTarget(EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
         return switch (selector) {
+            case "self" -> ctx.owner();
             case "target" -> require(ctx.target(), "target", ctx);
             case "attacker" -> require(ctx.actor(), "attacker", ctx);
-            default -> ctx.owner();
+            default -> throw new IllegalStateException(
+                    "Effect names an unknown target selector '" + selector
+                            + "'; this should have been rejected when the table was loaded");
         };
+    }
+
+    /**
+     * Who an effect applies to, as a list, for the ops that can reach more than one party member.
+     *
+     * <p>{@code "all_allies"} (alias {@code "party"}) is what makes "all allies' ATK +X%" expressible.
+     * It matters more than it looks: most buff talents in this game's data are party-wide, so without
+     * this selector the trigger table would only cover self-buffs. It is resolved against
+     * {@link Battle#characters} and therefore needs a battle, which the single-target selectors do not.
+     *
+     * @param battle the running battle (may be {@code null} only when the selector is single-target)
+     * @param effect the effect
+     * @param ctx    the context
+     * @return the entities the effect applies to (never empty for the single-target selectors)
+     * @throws IllegalStateException when {@code all_allies} is used without a battle
+     */
+    private static List<CanHit> resolveTargets(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        String selector = normalizeTarget(effect);
+        if (TARGET_ALL_ALLIES.contains(selector)) {
+            if (battle == null) {
+                throw new IllegalStateException(
+                        "Effect targets \"" + selector
+                                + "\" but no battle was supplied to take the party from");
+            }
+            return List.copyOf(battle.characters);
+        }
+        return List.of(resolveTarget(effect, ctx));
     }
 
     private static CanHit require(CanHit entity, String what, TriggerContext ctx) {
@@ -246,6 +310,65 @@ public final class TriggerInterpreter {
         return effect.getOp().trim().toUpperCase(Locale.ROOT);
     }
 
+    /**
+     * Settles a {@code MODIFY_ATTR} effect (P10-3): "the target's {@code attribute} changes by
+     * {@code percent} for {@code turns} turns" -- the generic stat buff / debuff.
+     *
+     * <p><b>Why this op matters more than its size suggests.</b> 72 of the 93 characters have a
+     * buff / enhance talent, and before this op the only way to express one was a new Java buff
+     * class per character. With it, "ATK +33% for 2 turns" is data, and the engine gained no
+     * character-specific knowledge at all: it forwards (attribute, value, turns) to
+     * {@link StatModifierBuff}.
+     *
+     * <p><b>The sign decides buff or debuff.</b> {@code percent >= 0} is applied as a
+     * {@code BUFF}, a negative one as a {@code DEBUFF}. The distinction is not cosmetic: it decides
+     * which half of the attribute the modifier lands in, so "ATK +50%" and "ATK -30%" can be on the
+     * same character at once and be removed independently instead of overwriting each other.
+     *
+     * <p>{@code percent} is a decimal ({@code 0.5} = +50%) and becomes an {@code ADD_PERCENT}
+     * modifier, so it sums with the character's other add-percent bonuses (traces, relics, light
+     * cones) rather than multiplying on top of them -- see {@link DoubleValue} for the formula.
+     *
+     * @param effect the effect ({@code attribute} / {@code percent} / {@code turns}, optional
+     *               {@code target})
+     * @param ctx    the context
+     */
+    private static void modifyAttr(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        AttributeType attribute = AttributeType.fromString(effect.getAttribute());
+        double percent = effect.getPercent();
+        int turns = effect.getTurns();
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            target.getBuffManager().addBuff(percent < 0
+                    ? StatModifierBuff.percentDebuff(attribute, percent, turns)
+                    : StatModifierBuff.percentBuff(attribute, percent, turns));
+        }
+    }
+
+    /**
+     * Validates an effect's optional {@code target} selector <b>at load time</b>.
+     *
+     * <p>This closes a silent-typo hole: the resolver used to fall back to "the owner" for anything
+     * it did not recognise, so {@code "target": "atacker"} behaved exactly like {@code "self"} —
+     * the rule fired, nothing was reported, and the character just quietly did the wrong thing. The
+     * condition variables are already a closed set for the same reason; the selector is now too.
+     *
+     * <p>Absent means {@code "self"}, which is the common case and stays implicit so the JSON can
+     * stay terse.
+     */
+    private static void requireTargetSelector(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getTarget() == null || effect.getTarget().isBlank()) {
+            return;
+        }
+        String selector = normalizeTarget(effect);
+        if (!TARGET_SELECTORS.contains(selector)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names an unknown \"target\" selector '" + effect.getTarget()
+                            + "' (known: self / target / attacker / all_allies); it used to fall back "
+                            + "to the owner, which made a typo behave like self "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
     private static void requireAmount(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getAmount() == null) {
             throw new IllegalArgumentException(
@@ -257,6 +380,62 @@ public final class TriggerInterpreter {
         if (effect.getPercent() == null) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"percent\" (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates the {@code attribute} name of a {@code MODIFY_ATTR} effect <b>at load time</b>.
+     *
+     * <p>The "fail at load, not mid-battle" rule (the same one behind the op vocabulary) applies to
+     * arguments too: a misspelled attribute must be reported when the table is read, not when the
+     * character finally takes the action that fires the rule.
+     *
+     * <p>The four builder-only {@code *_PERCENT} variants are rejected here as well, because
+     * {@link com.laosun.aluminium.models.CanHit#getAttribute(AttributeType)} returns {@code null}
+     * for them: targeting one would raise a {@code NullPointerException} in the middle of a battle
+     * instead of "this attribute cannot hold a buff".
+     */
+    private static void requireAttribute(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getAttribute() == null || effect.getAttribute().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires \"attribute\" (e.g. ATTACK / DEFENCE / SPEED / CRIT_ATTACK) "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        AttributeType attribute;
+        try {
+            attribute = AttributeType.fromString(effect.getAttribute());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names an unknown attribute '" + effect.getAttribute()
+                            + "' (source: " + spec.getSource() + ")");
+        }
+        if (attribute.isPercentVariant()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " cannot target '" + effect.getAttribute()
+                            + "': it is a builder-only input key, not a runtime attribute, so a buff "
+                            + "on it would silently do nothing. Name the base attribute and use "
+                            + "\"percent\" instead (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates that a {@code MODIFY_ATTR} effect declares how long the buff lasts.
+     *
+     * <p>There is deliberately no default: an omitted duration would be either "forever" (wrong:
+     * every buff in this game expires) or a number this class invented. Making the author write it
+     * is the same call as {@code damage_param} having no default.
+     */
+    private static void requireTurns(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getTurns() == null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires \"turns\" (how long the modifier lasts); there is no "
+                            + "default (source: " + spec.getSource() + ")");
+        }
+        if (effect.getTurns() <= 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has a non-positive \"turns\" (" + effect.getTurns()
+                            + "); such a buff would expire before it could do anything "
+                            + "(source: " + spec.getSource() + ")");
         }
     }
 

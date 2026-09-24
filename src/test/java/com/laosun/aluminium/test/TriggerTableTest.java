@@ -4,13 +4,16 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Enemy;
 import com.laosun.aluminium.models.EnemyFactory;
+import com.laosun.aluminium.models.TriggerInterpreter;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -292,6 +295,146 @@ public class TriggerTableTest {
     }
 
     // ==================================================================
+    // 4b. MODIFY_ATTR: the generic stat buff (P10-3)
+    // ==================================================================
+
+    /** The op writes a real modifier onto the owner's attribute. */
+    @Test
+    public void modifyAttrOpBuffsTheOwner() {
+        Character owner = character("owner");
+
+        fireAttr(null, owner, owner, attrOp(AttributeType.ATTACK, 0.5, 2, null));
+
+        Assertions.assertEquals(450, owner.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                "ATK 300 with +50% is 450");
+    }
+
+    /**
+     * A negative percent becomes a {@code DEBUFF}: it lands on the other half of the attribute, so a
+     * debuff does not silently overwrite a buff on the same stat.
+     */
+    @Test
+    public void negativePercentBecomesADebuff() {
+        Character owner = character("owner");
+
+        fireAttr(null, owner, owner, attrOp(AttributeType.DEFENCE, -0.25, 2, null));
+
+        Assertions.assertEquals(150, owner.getAttribute(AttributeType.DEFENCE).get(), 1e-9,
+                "DEF 200 with -25% is 150");
+        Assertions.assertEquals(0, owner.getAttribute(AttributeType.DEFENCE)
+                .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF).size());
+        Assertions.assertEquals(1, owner.getAttribute(AttributeType.DEFENCE)
+                .filterBySource(DoubleValue.Modifier.ModifierSource.DEBUFF).size());
+    }
+
+    /** {@code target: "target"} sends the buff to the event's subject instead of the table's owner. */
+    @Test
+    public void modifyAttrOpCanTargetTheEventsSubject() {
+        Character owner = character("owner");
+        Character ally = character("ally");
+
+        fireAttr(null, owner, ally, attrOp(AttributeType.ATTACK, 1.0, 2, "target"));
+
+        Assertions.assertEquals(600, ally.getAttribute(AttributeType.ATTACK).get(), 1e-9);
+        Assertions.assertEquals(300, owner.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                "the owner must be untouched when the effect names the subject");
+    }
+
+    /**
+     * {@code all_allies} is what makes a party-wide buff expressible — and party-wide is the majority
+     * of buff talents in the real data, so this selector decides whether the op is actually useful.
+     */
+    @Test
+    public void modifyAttrOpCanReachTheWholeParty() {
+        Character owner = character("owner");
+        Character allyOne = character("ally1");
+        Character allyTwo = character("ally2");
+        Battle battle = newBattle(List.of(owner, allyOne, allyTwo), 1);
+
+        fireAttr(battle, owner, owner, attrOp(AttributeType.ATTACK, 0.5, 2, "all_allies"));
+
+        for (Character member : List.of(owner, allyOne, allyTwo)) {
+            Assertions.assertEquals(450, member.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                    member.getName() + " should have received the party buff");
+        }
+    }
+
+    /** {@code all_allies} needs a battle to take the party from; without one it must say so. */
+    @Test
+    public void allAlliesWithoutABattleFailsLoudly() {
+        Character owner = character("owner");
+
+        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
+                () -> fireAttr(null, owner, owner, attrOp(AttributeType.ATTACK, 0.5, 2, "all_allies")));
+        // Asserting on "no battle" rather than on "all_allies" is deliberate: the unknown-selector
+        // message also contains "all_allies", so the weaker assertion would pass for the wrong reason.
+        Assertions.assertTrue(e.getMessage().contains("no battle"), e.getMessage());
+    }
+
+    /** A misspelled attribute is a load-time error, not a silently missing buff. */
+    @Test
+    public void modifyAttrOpRejectsAnUnknownAttribute() {
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> table(attrOp("ATTCK", 0.5, 2, null)));
+        Assertions.assertTrue(e.getMessage().contains("ATTCK"), e.getMessage());
+    }
+
+    /**
+     * The four {@code *_PERCENT} variants are builder inputs, not runtime attributes:
+     * {@code getAttribute} returns {@code null} for them, so a buff on one would blow up mid-battle.
+     * It is rejected when the table is read instead.
+     */
+    @Test
+    public void modifyAttrOpRejectsABuilderOnlyPercentAttribute() {
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> table(attrOp("ATTACK_PERCENT", 0.5, 2, null)));
+        Assertions.assertTrue(e.getMessage().contains("ATTACK_PERCENT"), e.getMessage());
+    }
+
+    /** No duration default exists, for the same reason {@code damage_param} has none. */
+    @Test
+    public void modifyAttrOpRequiresTurns() {
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> table(attrOp(AttributeType.ATTACK, 0.5, null, null)));
+        Assertions.assertTrue(e.getMessage().contains("turns"), e.getMessage());
+    }
+
+    /** A zero-turn buff would expire before it could do anything, so it is rejected. */
+    @Test
+    public void modifyAttrOpRejectsNonPositiveTurns() {
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> table(attrOp(AttributeType.ATTACK, 0.5, 0, null)));
+        Assertions.assertTrue(e.getMessage().contains("turns"), e.getMessage());
+    }
+
+    /**
+     * {@code AttributeType.fromString} documents itself as case-insensitive; that used to be false
+     * (the lookup table is lower-cased but the input was not), which only surfaced once data started
+     * naming attributes — every other test here passes {@code ATTACK} and would simply have failed
+     * to load. Mixed case is used here so the normalisation itself is what is under test.
+     */
+    @Test
+    public void modifyAttrOpAcceptsAMixedCaseAttributeName() {
+        Character owner = character("owner");
+
+        fireAttr(null, owner, owner, attrOp("Attack", 0.5, 2, null));
+
+        Assertions.assertEquals(450, owner.getAttribute(AttributeType.ATTACK).get(), 1e-9);
+    }
+
+    /**
+     * A misspelled {@code target} used to fall back to "the owner", so {@code "atacker"} behaved
+     * exactly like {@code "self"} — the rule fired and nothing was reported. Now it is a closed set
+     * like the condition variables.
+     */
+    @Test
+    public void unknownTargetSelectorIsRejected() {
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> table(attrOp(AttributeType.ATTACK, 0.5, 2, "atacker")));
+        Assertions.assertTrue(e.getMessage().contains("atacker"), e.getMessage());
+    }
+
+    // ==================================================================
     // 5. Conditions behave as the data implies
     // ==================================================================
 
@@ -410,6 +553,54 @@ public class TriggerTableTest {
 
     private static EffectSpec energy(double amount) {
         return op("GAIN_ENERGY", amount);
+    }
+
+    // ---- MODIFY_ATTR helpers (P10-3) ----
+
+    /** hp 1000 / def 200 / atk 300 / speed 100 — all different, so a mix-up shows up as a number. */
+    private static Character character(String name) {
+        return Character.fromAttributes(name, 1000, 200, 300, 100);
+    }
+
+    private static EffectSpec attrOp(AttributeType attribute, double percent, Integer turns,
+                                     String target) {
+        return attrOp(attribute.name(), percent, turns, target);
+    }
+
+    /** The name-taking overload exists so the "unknown attribute" tests can pass a literal. */
+    private static EffectSpec attrOp(String attributeName, double percent, Integer turns,
+                                     String target) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "MODIFY_ATTR");
+        set(effect, "attribute", attributeName);
+        set(effect, "percent", percent);
+        set(effect, "turns", turns);
+        set(effect, "target", target);
+        return effect;
+    }
+
+    /** A one-rule table that fires on any skill cast, so the tests exercise load-time validation. */
+    private static TriggerTable table(EffectSpec effect) {
+        TriggerSpec spec = new TriggerSpec();
+        set(spec, "on", "SKILL_CAST");
+        set(spec, "when", List.of());
+        set(spec, "doEffects", List.of(effect));
+        set(spec, "source", "TriggerTableTest");
+        return new TriggerTable(1, List.of(spec));
+    }
+
+    /**
+     * Runs one {@code MODIFY_ATTR} rule.
+     *
+     * <p>{@code battle} may be {@code null} for the single-target selectors: {@code MODIFY_ATTR} only
+     * touches the resolved target's buff manager. {@code all_allies} does need it, and says so — that
+     * is {@link #allAlliesWithoutABattleFailsLoudly}.
+     */
+    private static void fireAttr(Battle battle, Character owner, Character subject, EffectSpec effect) {
+        TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(owner, owner, subject, 0, 0);
+        for (TriggerTable.CompiledRule rule : table(effect).matching(TriggerEvent.SKILL_CAST, ctx)) {
+            TriggerInterpreter.apply(battle, rule, ctx);
+        }
     }
 
     private static EffectSpec op(String name, Double amount) {
