@@ -797,21 +797,30 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 `SkillData.init` 在查不到 `cid`/槽位时返回 `EMPTY`（`PHYSICAL` + `ENHANCE` + 空参数）
 → 因为 `ENHANCE` 不是伤害类，技能会**静默零伤害**且 `requestSkill` 仍返回 `true`。这是易踩的坑。
 
-### 7.2b 非伤害技能：静默不分派 + 可开关诊断 ⚠（P8-2）
+### 7.2b 非伤害技能：分派表 + 可开关诊断 ✅（P8-2 → P10-3）
 
-`SkillExecutor.resolveHits` 在"不是伤害类技能"时**直接 return** —— 也就是说
-治疗 / 护盾 / buff / 控制 / 召唤技能**被施放后什么都不发生**（只有**回能**照给，见 §7.4）。
+**治疗与护盾现在走引擎。** `SkillExecutor.dispatchNonDamaging` 查
+`data/skill_effects.json` 拿到"缩放属性 + 参数下标"，算出数值并调用
+`Battle.heal` / `Battle.grantShield`；调用方只需要**选谁**。
+（这张表怎么来的、为什么必须是一张表：见 `DOC_VS_CODE.md` 的 `F-9`。）
 
-这是**分阶段设计**，不是遗漏：各效果的宿主在别处。
+在此之前 `resolveHits` 对非伤害技能**直接 return** —— 技能放出去、战技点扣了、能量也涨了，
+**唯独没有任何效果**。而 demo 里"治疗能用"是因为 `Main` 自己长出了**第二条手搓路径**
+（`ATK × param[0]`，对 Natasha 是错的）。那条路径已删除。
 
 | 效果类别 | 谁负责 | 现状 |
 |---|---|---|
-| `RESTORE`（治疗） | `Battle.heal`（P6-2） | ✅ 已实现，**但没有任何地方自动分派** —— 要调用方自己调（`Main` 就是这么做的） |
-| `DEFENCE`（护盾） | `Battle.grantShield`（P6-3） | ✅ 已实现，同样靠调用方分派 |
-| `SUPPORT`（增益） | P10-3 Buff 体系 | ❌ |
+| `RESTORE`（治疗） | `SkillExecutor` 查表 → `Battle.heal` | ✅ P10-3，数值由数据决定 |
+| `DEFENCE`（护盾） | `SkillExecutor` 查表 → `Battle.grantShield` | ✅ P10-3 |
+| `SUPPORT`（增益） | P10-3 后半（触发器侧 `MODIFY_ATTR` 已可用） | 🚧 技能侧未接 |
 | `IMPAIR`（控制/减益） | P10-6 | ❌ |
 | `SUMMON`（召唤） | P9-4 | ❌ |
 | `ENHANCE` | 纯被动 | 本就不该作为"行动"施放 |
+
+⚠ **表里没有的条目会被拒绝并报告，而不是当成"没事可做"。** 判据是"游戏陈述效果量的固定语法"
+（`equal to / for / by #N% of <谁的> <属性> [plus #M]`）——找不到它就不导参数，
+因为剩下的（概率增益、伤害分摊、减伤、嘲讽）本来就不是治疗/护盾。
+被拒绝的治疗/护盾是**看得见**的，猜错的数值看不见。
 
 **这个静默很难察觉**：日志上技能"放出去了"、能量也涨了，只是没有任何效果。
 所以加了一个**默认关闭**的诊断开关：
@@ -823,9 +832,14 @@ SkillExecutor.setLogNotDispatched(true);   // 排查时打开
 ```
 
 > ⚠ 计划里原本想用 `IO.println` **无条件**打印，实测会刷屏（demo 每回合都在治疗/护盾），
-> 故改为开关。护栏：`SkillExecutorDiagnosticTest` —— 其中
-> `diagnosticDoesNotChangeBehaviour` 明确断言"**打开日志后治疗仍然不生效**"，
-> 把"加日志 ≠ 实现效果"钉住。
+> 故改为开关。护栏：`SkillExecutorDiagnosticTest`。
+>
+> ⚠ **那三条护栏在 P10-3 被反转了，不是删掉。** 其中一条原本断言
+> "`diagnosticDoesNotChangeBehaviour` —— 打开日志后治疗**仍然不生效**"，
+> 存在意义是防止"加了个 log"冒充"实现了效果"。效果真的实现之后，它被改写成
+> `healingSkillsHealForTheDocumentedAmount`（断言 Natasha 终结技 = 自身生命上限 9.2% + 92），
+> 拒绝类改用它真正还做不了的那一类。**当初把设计意图写进注释，回报就在这里** ——
+> 一眼看得出它该被反转，而不是该被保留。
 
 ### 7.3 技能展开（`SkillExecutor`）✅
 
@@ -1645,7 +1659,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 ## 16. 测试与可验证性
 
-- **53 个测试类 / 494 个用例**（截至 P10-3 前半），全部通过（`.\gradlew.bat test`）。
+- **53 个测试类 / 495 个用例**（截至 P10-3），全部通过（`.\gradlew.bat test`）。
 - 覆盖重心：伤害乘区（`DamageZoneTest` 24 条）、技能展开（`SkillExecutorTest` 13 条）、
   能量（`EnergyTest` 8 + `EnergyBattleTest` 16）、韧性击破（`ToughnessTest` 6 +
   `ToughnessBattleTest` 8 + `BreakDamageTest` 5 + `BreakStateTest` 4 + `DotTest` 6）、

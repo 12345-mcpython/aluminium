@@ -3,6 +3,7 @@ package com.laosun.aluminium;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.*;
 import com.laosun.aluminium.beans.CharacterData;
+import com.laosun.aluminium.data.RelicSets;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <ul>
  *   <li>{@link #RELIC_MAIN_ATTRIBUTES} — main attribute value tables by star level</li>
  *   <li>{@link #RELIC_SUB_ATTRIBUTES} — sub-attribute value tables by star level</li>
+ *   <li>{@link #RELIC_SETS} — relic set definitions (the 2-piece / 4-piece bonus table)</li>
  *   <li>{@link #WEAPONS} — weapon (light cone) data by ID</li>
  *   <li>{@link #CHARACTERS} — character base stats by ID</li>
  *   <li>{@link #SKILL_POINTS} — skill point (trace) tree data by character ID</li>
@@ -41,6 +43,18 @@ public final class Constant {
      * Relic sub-attribute value tables (keyed by star level 2-5).
      */
     public static final RelicSubAttribute RELIC_SUB_ATTRIBUTES;
+    /**
+     * Relic set definitions ({@code relic_sets.json}): set id → {@link RelicSet}, i.e. the 2-piece /
+     * 4-piece bonus table (60 sets / 92 bonuses).
+     *
+     * <p>Loaded through {@link com.laosun.aluminium.data.RelicSets} rather than {@link JSONReader}: the
+     * file's top level is a map keyed by the set id as a string, which the {@code Class}-based overload
+     * cannot express, and — like {@code stage.json} — a <b>missing file yields an empty table instead of
+     * taking down the static initializer</b>. Without it the engine simply cannot apply set bonuses.
+     *
+     * <p>{@link #RELIC_SET_NONE} is the id that means "this relic belongs to no set".
+     */
+    public static final Map<Integer, RelicSet> RELIC_SETS;
     /**
      * Weapon base data indexed by weapon ID.
      */
@@ -192,6 +206,17 @@ public final class Constant {
     );
 
     /**
+     * The {@code setId} of a relic that belongs to no set.
+     *
+     * <p>{@code 0} because that is what {@link com.laosun.aluminium.models.Relic} defaults to for relics
+     * built by hand or from a setting (there is no set id in {@code Setting}), and because the game's own
+     * set ids all start above it. {@link com.laosun.aluminium.models.RelicSuit} skips relics with this id
+     * when it counts pieces — without it, every hand-built relic in the tests would count as one piece of
+     * "set 0" and the lookup would fail.
+     */
+    public static final int RELIC_SET_NONE = 0;
+
+    /**
      * Upper bound of the vulnerability zone (易伤区) multiplier.
      */
     public static final double VULNERABLE_CAP = 3.5;
@@ -282,8 +307,9 @@ public final class Constant {
      *
      * <p>⚠ <b>The start value is not always 3 either</b>: {@code RELICS.md} gives the 4-piece Passerby set
      * "at the start of battle immediately recover 1 skill point for our side" → start at 4 (5 if two
-     * characters wear it). The root cause is that **relic set effects are not wired up at all**
-     * ({@code relic_sets.json} is not even loaded) — registered as <b>F-2</b> in §F.
+     * characters wear it). That bonus is an <b>ability</b> rather than stats — {@link #RELIC_SETS} now
+     * carries it as {@code Ability51011} with an empty property list — and the engine has no ability
+     * interpreter, so it is still not applied: registered as <b>F-2</b> in §F.
      */
     public static final int SKILL_POINT_START = 3;
 
@@ -378,6 +404,10 @@ public final class Constant {
     static {
         RELIC_MAIN_ATTRIBUTES = JSONReader.fromJSON("main_attribute.json", RelicMainAttribute.class);
         RELIC_SUB_ATTRIBUTES = JSONReader.fromJSON("sub_attribute.json", RelicSubAttribute.class);
+        // Relic set bonuses come from a file whose top level is a map (so not JSONReader), and are
+        // leniently loaded (a missing file is an empty table) because the relic affix tables above are
+        // already enough to run a battle -- only the set bonuses would be missing.
+        RELIC_SETS = RelicSets.table();
         WEAPONS = JSONReader.fromJSON("weapons.json", new TypeToken<Map<Integer, WeaponData>>() {
         }.getType());
         CHARACTERS = JSONReader.fromJSON("character_data.json", new TypeToken<Map<Integer, CharacterData>>() {

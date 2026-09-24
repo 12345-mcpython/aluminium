@@ -67,6 +67,15 @@ public class Relic implements Cloneable {
      */
     public int star;
     /**
+     * The relic set this piece belongs to, or {@link Constant#RELIC_SET_NONE} when it belongs to none.
+     *
+     * <p>Only {@link RelicSuit} uses this: it is the key that turns "six relics are equipped" into "four of
+     * them are set 102, so set 102's 4-piece bonus applies". A relic built by hand — {@link #create}, or
+     * {@link #createBySetting} (a {@code Setting} has no set id) — carries no set, which is the honest
+     * answer for a piece whose set nobody stated.
+     */
+    public int setId = Constant.RELIC_SET_NONE;
+    /**
      * Equipment slot this relic occupies.
      */
     public RelicType relicType;
@@ -90,12 +99,32 @@ public class Relic implements Cloneable {
      * @return the constructed relic
      */
     public static Relic create(int level, int star, RelicType relicType, Attribute mainAttribute, List<Attribute> subAttributes) {
+        return create(level, star, relicType, mainAttribute, subAttributes, Constant.RELIC_SET_NONE);
+    }
+
+    /**
+     * Directly constructs a relic that belongs to a set.
+     *
+     * <p>The set id is what {@link RelicSuit} counts in order to decide whether a 2-piece or 4-piece bonus
+     * applies; a relic built without one belongs to no set and contributes only its own affixes.
+     *
+     * @param level         upgrade level
+     * @param star          star rating
+     * @param relicType     equipment slot
+     * @param mainAttribute the main attribute
+     * @param subAttributes the sub-attributes
+     * @param setId         the relic set id, or {@link Constant#RELIC_SET_NONE}
+     * @return the constructed relic
+     */
+    public static Relic create(int level, int star, RelicType relicType, Attribute mainAttribute,
+                               List<Attribute> subAttributes, int setId) {
         Relic relic = new Relic();
         relic.level = level;
         relic.star = star;
         relic.relicType = relicType;
         relic.mainAttribute = mainAttribute;
         relic.subAttributes = subAttributes;
+        relic.setId = setId;
         return relic;
     }
 
@@ -276,6 +305,7 @@ public class Relic implements Cloneable {
         private int level = 0;
         private RelicType type;
         private AttributeType mainAttributeType;
+        private int setId = Constant.RELIC_SET_NONE;
 
         public Builder star(int star) {
             this.star = star;
@@ -289,6 +319,18 @@ public class Relic implements Cloneable {
 
         public Builder type(RelicType type) {
             this.type = type;
+            return this;
+        }
+
+        /**
+         * Declares which relic set the piece belongs to, so that {@link RelicSuit} can count pieces of that
+         * set. Defaults to {@link Constant#RELIC_SET_NONE} ("belongs to no set"), which is what a
+         * hand-built piece is.
+         *
+         * @param setId the set id from {@code relic_sets.json}
+         */
+        public Builder setId(int setId) {
+            this.setId = setId;
             return this;
         }
 
@@ -335,7 +377,7 @@ public class Relic implements Cloneable {
                 subAttrs.add(new Attribute(spec.type, subFinal, spec.promoteLevel));
             }
 
-            return Relic.create(level, star, type, mainAttr, subAttrs);
+            return Relic.create(level, star, type, mainAttr, subAttrs, setId);
         }
 
         private record SubAttributeSpec(AttributeType type, int promoteLevel, int attributeLevel) {
