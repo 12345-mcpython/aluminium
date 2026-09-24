@@ -402,7 +402,15 @@ all_allies       我方全体（别名 party）                ← 「我方全�
 { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.33, "turns": 2 }
 ```
 
-- `percent` 是**小数**（`0.33` = +33%），落成 `ADD_PERCENT` modifier —— 与行迹/遗器/光锥的同类加成**相加**，不是再乘一层。
+- `percent` 是**小数**（`0.33` = +33%）。它的含义**取决于属性种类**，这不是修饰：
+  - **基础属性**（`HEALTH` / `ATTACK` / `DEFENCE` / `SPEED`）落成 `ADD_PERCENT` modifier ——
+    与行迹/遗器/光锥的同类加成**相加**，不是再乘一层；
+  - **比率属性**（`CRIT_CHANCE` / `CRIT_ATTACK` / 各类增伤 / `BREAKING_EFFECT` /
+    `ENERGY_REGENERATION_RATE` …）里，`percent` **就是值本身**（`0.25` = +25 个百分点）。
+    理由：这些属性的值整个是"平铺 modifier"（构造时走 `AttributeBuilder.addPercentPoint`），
+    **base 恒为 0**，所以 `ADD_PERCENT` 只会乘 0 —— 规则照常触发、modifier 也挂上了、
+    数值却一动不动。这正是本项目最不能接受的那种"不报错的空操作"。
+    口径与 `RelicSuit.appendTo` 一致（"其余 `isPercent` 属性按百分点值处理"）。
 - **正负号决定 buff 还是 debuff**：`percent < 0` 走 `DEBUFF` 那一半。这不是修饰 ——
   它决定了 modifier 落在属性的哪一半，所以「攻击力 +50%」和「攻击力 −30%」能同时挂在一个人身上、各自移除，而不是互相顶掉。
 - `turns` **没有默认值**（同 `damage_param` 的理由：引擎不该替内容编一个数）。
@@ -423,17 +431,30 @@ all_allies       我方全体（别名 party）                ← 「我方全�
 
 ```
 SkillExecutor.execute
-  └─ Battle.fireTriggers(SKILL_CAST, caster, hits, 0)      ← 每次施放
-  └─ Battle.fireTriggers(ALLY_ATTACK, caster, hits, 0)     ← 只在命中了目标时
+  └─ Battle.fireTriggers(ULT_CAST, caster, hits, 0)        ← 施放的是终结技时（按解析出的 SkillCategory.ULTRA）
+  └─ Battle.fireTriggers(SKILL_CAST, caster, hits, 0)      ← 其余施放（两者互斥）
+  └─ Battle.fireTriggers(ALLY_ATTACK, caster, hits, 0)     ← 只在命中了目标时（终结技命中同样算）
         └─ 遍历我方每个角色：拿它自己的表
               ├─ 用 (self=它, actor=施放者, target=承受者, hit_count) 匹配规则
               └─ TriggerInterpreter.apply(...) → 真的去 grantEnergy / grantSkillPoint / …
 ```
 
+> ⚠ **`ULT_CAST` 与 `SKILL_CAST` 必须互斥**：条件 DSL 里没有"这次施放是战技还是终结技"这个变量
+> （只有 `actor` / `target` / `hit_count`），所以「当装备者使用战技时」这条规则只可能靠
+> **发出端分开**来避免连带在终结技上触发。判定读的是**解析出的数据**
+> （`skills.json` 的 `attack_type` → `SkillCategory.ULTRA`），不看技能名、不看槽位。
+> 契约由 `UltCastTriggerTest` 钉住（一次终结技恰好一次、其余槽位不触发、`ALLY_ATTACK` 不受影响）。
+
 其余事件的挂点：`BATTLE_START`（`startBattle`，在 `onBattleStart` 之后）、
 `ENERGY_GAINED`（`applyEnergyGain`）、`HP_LOST` / `KILL`（`applyDamage`）、
 `HEALED`（`heal`）、`BREAK`（`reduceToughness`）、
 `SKILL_POINT_GAINED` / `SKILL_POINT_SPENT`（战技点入账/消耗）。
+**仍未接线**：`TURN_START` / `TAKING_HIT`（引用它们的数据在加载时就会被拒）。
+
+**遗器套装规则走的是同一条通道**：`resources/relic_sets/<setId>.json` 与角色文件同形，
+只是按件数阈值分组（`{"4": [ … ]}`），由 `data.RelicTriggerTables` 懒加载，
+在装配点 `CharacterFactory` 并入角色自己的表（`TriggerTable.plus`）。
+表达不了的那部分登记在 `_unmodelled.json`（见 `DOC_VS_CODE.md` `F-10`）。
 
 **只对我方开火**：敌人的事件不是我们的内容（P9 才管怪物），而且"敌人挨打"不该让
 我方角色被触发两次。带主体的事件用 `fireTriggersForAlly` 做这道阵营判断。
@@ -1192,7 +1213,8 @@ no-op，用不用这个 provider 都一样；本 provider 管的是"**有**能�
 
 > 📋 **这些缺口的权威登记处是 `DOC_VS_CODE.md` §F**（`F-1` 上限可变 / `F-2` 开局可变 /
 > `F-3` 强化普攻 / `F-4` 角色级供点 / `F-5` 敌人绕过 / `F-6` 裸字符串 / `F-7` 语义过窄 /
-> `F-8` 架构提醒）。**本节只记结论，细节一律以 §F 为准** —— 免得两处各写一份然后漂移。
+> `F-8` 架构提醒 / `F-9` 技能效果参数布局 / `F-10` 套装 ability 的表达范围）。
+> **本节只记结论，细节一律以 §F 为准** —— 免得两处各写一份然后漂移。
 >
 > 处理原则：**引擎保持通用、可扩展、稳定，不替角色机制背锅**。下列差距**本轮只标记、
 > 不改实现**。`SkillPointGameParityTest` 把每条的**引擎当前行为**钉在断言里。
@@ -1201,11 +1223,16 @@ no-op，用不用这个 provider 都一样；本 provider 管的是"**有**能�
    最多 3」；甚至有光锥的触发条件是「上限 **≥ 6**」。引擎的 `SKILL_POINT_MAX` 是常量，
    **没有**"改队伍级资源上限"的口子。
 
-2. **`F-2` 开局不是恒定 3**。`RELICS.md`：过客 4 件套「战斗开始时立即为我方恢复 1 个战技点」
-   → 开局 4（两人穿就 5）。根因是**那条套装效果属于"具名 ability"**，引擎执行不了 →
-   仍**未解锁**。⚠ 注意进度：`relic_sets.json` **已经装载**、2/4 件套的**数值**效果也**已经生效**
-   （见 `RelicSetTest`）；92 条效果里 57 条是纯数值、**35 条是具名 ability**。
-   所以 F-1 / F-2 / F-7 现在卡的不是"遗器没装载"，而是"**套装 ability 没有执行通道**"。
+2. **`F-2` 开局不是恒定 3** —— **✅ 已解锁（P10-3 后半）**。`RELICS.md`：过客 4 件套
+   「战斗开始时立即为我方恢复 1 个战技点」→ 开局 4（两人穿就 5）。
+   根因曾是"那条套装效果属于**具名 ability**，引擎没有执行通道"；现在通道就是**触发器表**：
+   规则写在 `resources/relic_sets/101.json`（`BATTLE_START` → `GAIN_SKILL_POINT`），
+   在装配点并入角色自己的表。顺序也验证过：开局值在 `Battle` 构造时写入（策略的 start），
+   `BATTLE_START` 由 `startBattle()` 之后才发，所以 +1 不会被覆盖 ——
+   由 `RelicAbilityBattleTest.openingSkillPointsIncludeThePasserbyFourPiece` /
+   `theOpeningValueIsAssignedBeforeBattleStartFires` 两条钉住。
+   ⚠ 剩下的 `F-1`（上限可变）与 `F-7`（`hasSkillPoint` 语义）与套装 ability 无关，
+   仍要等光锥/角色侧的口子；套装 ability 的其余 31 条见 `F-10`。
 
 3. **`F-3` ⚠「普攻 +1」一刀切，强化普攻有例外 —— 这条会让引擎算错**。
    `1315_波提欧.md`：强化普攻「**无法恢复战技点**」；但 `1201_青雀.md`：
@@ -1574,7 +1601,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | `enhanced_skills.json` | **强化形态技能**（10 个角色，基础 id + 1,000,000） | 未加载；这也是 `skills.json` 比早先那份小的原因（强化角色搬了出去） |
 | `global_buffs.json` | 全局辅助技能（仓库技，仅 1407 / 1506） | 未加载；属 P8-0 三分法的"跨系统"类 |
 | `growth.json` | 各晋阶基准面板 + 晋阶消耗（93 角色 / 651 行） | 未加载；**它是 `LevelPromotionCalc` 那份游戏表的原始数据**，见 §12.2 的近似说明 |
-| `relic_sets.json` | 遗器套装效果（60 套 / 92 条） | 未加载；引擎目前只用 `main_attribute`/`sub_attribute` 的**数值**，**套装效果没接**（P10-3） |
+| `relic_sets.json` | 遗器套装效果（60 套 / 92 条） | 已加载（`data.RelicSets`）：2/4 件套的**数值**生效；**具名 ability** 走触发器表（`resources/relic_sets/<setId>.json` + `data.RelicTriggerTables`），其中能表达的已写盘、其余登记在 `_unmodelled.json`（`F-10`） |
 | `materials.json` | 培养材料 | 纯展示 |
 | `recommend.json` | 游戏内置推荐光锥 / 遗器 / 词条 | 纯展示 |
 | `enhanced_hints.json` | 角色加强说明（10 个角色） | 纯展示 |

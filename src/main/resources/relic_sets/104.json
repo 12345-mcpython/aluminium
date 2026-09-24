@@ -1,0 +1,20 @@
+{
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.25,
+          "turns": 2
+        }
+      ],
+      "source": "relic set 104 (Hunter of Glacial Forest), 4-piece ability Ability51041: \"After the wearer uses their Ultimate, their CRIT DMG increases by #1[i]% for #2[i] turn(s).\" param = [0.25, 2]",
+      "note": "#1[i] -> percent = 0.25 (25% CRIT DMG), #2[i] -> turns = 2. 'actor == self' is what makes 'the wearer uses their Ultimate' rather than 'anyone does'. ULT_CAST is fired by SkillExecutor.broadcastSkillCast after the ultimate's damage is settled, so the buff does not retroactively buff the ultimate that granted it -- which matches the wording 'After the wearer uses their Ultimate'."
+    }
+  ]
+}

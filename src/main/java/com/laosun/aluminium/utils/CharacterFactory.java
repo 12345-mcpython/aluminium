@@ -2,13 +2,16 @@ package com.laosun.aluminium.utils;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
+import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.RelicSuit;
+import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 
 import java.util.Set;
 
@@ -151,13 +154,48 @@ public final class CharacterFactory {
         // P8-7: attach the character's data-driven mechanics. This is the **assembly point** -- the
         // one place allowed to go from "which character" to "which rules" (P8-0). Characters with no
         // file get the empty table, which is the normal state for the ones not data-ised yet.
-        builder = builder.triggerTable(TriggerTables.of(cid));
+        // Worn relic sets contribute their own rules on top (see `effectiveTriggerTable`).
+        builder = builder.triggerTable(effectiveTriggerTable(cid, relicSuit));
         Character character = builder.build();
         // stack/special-resource characters: swap out conventional energy gain (otherwise they could fill the bar just by getting hit and fire an ultimate they should not have)
         if (SPECIAL_RESOURCE_CHARACTERS.contains(cid)) {
             character.setEnergyProvider(NO_CONVENTIONAL_ENERGY);
         }
         return character;
+    }
+
+    /**
+     * The character's own trigger rules plus those of every relic set it wears enough pieces of.
+     *
+     * <p>A relic set's rules are the same kind of rule as a character's (same JSON shape, same ops,
+     * same events — see {@link com.laosun.aluminium.data.RelicTriggerTables}), so "which set bonuses
+     * are live" is a table merge rather than a second mechanism. This is the assembly point where the
+     * merge happens: whoever builds the character decides, and the engine never looks a table up by
+     * cid or by set id at battle time (P8-0).
+     *
+     * <p>Composition rules, spelled out because they are the whole content of this method:
+     * <ul>
+     *   <li>No suit / a suit with no set ids → exactly the character's own table, so an unequipped
+     *       character behaves precisely as it did before relic rules existed;</li>
+     *   <li>Per set, the rules of the <b>highest threshold met</b> are used, and those already
+     *       include the lower tiers ({@code RelicTriggerTables.Rules#at});</li>
+     *   <li>A set with no rule file contributes nothing (most sets today — including the reference
+     *       team's build, so no existing battle changes behaviour).</li>
+     * </ul>
+     *
+     * @param cid       the character id
+     * @param relicSuit the worn suit, or {@code null}
+     * @return the effective table; never {@code null}
+     */
+    private static TriggerTable effectiveTriggerTable(int cid, RelicSuit relicSuit) {
+        TriggerTable table = TriggerTables.of(cid);
+        if (relicSuit == null) {
+            return table;
+        }
+        for (Int2IntMap.Entry worn : relicSuit.piecesPerSet().int2IntEntrySet()) {
+            table = table.plus(RelicTriggerTables.of(worn.getIntKey()).at(worn.getIntValue()));
+        }
+        return table;
     }
 
     /**

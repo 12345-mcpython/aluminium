@@ -1,0 +1,20 @@
+{
+  "4": [
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.2,
+          "turns": 1
+        }
+      ],
+      "source": "relic set 109 (Band of Sizzling Thunder), 4-piece ability Ability51091: \"When the wearer uses their Skill, increases the wearer's ATK by #1[i]% for #2[i] turn(s).\" param = [0.2, 1]",
+      "note": "#1[i] -> percent = 0.2 (20% ATK), #2[i] -> turns = 1. 'actor == self' is the 'the wearer uses' half. The other half -- 'their Skill' and NOT their Ultimate -- needs no condition here: ULT_CAST and SKILL_CAST are mutually exclusive at the emitter (SkillExecutor.broadcastSkillCast splits them on the parsed SkillCategory), which is the only place that can tell them apart, because the condition DSL has no variable for the kind of cast. RelicTriggerTableTest.skillCastAndUltCastAreMutuallyExclusive pins that. Timing: the cast event is fired after the skill's damage is settled, so the ATK buff applies from the next settlement on."
+    }
+  ]
+}
