@@ -59,6 +59,8 @@ public class RelicTriggerTableTest {
     private static final int CHAMPION = 105;
     /** City of Converging Stars (planar), whose 2-piece is authorable now that {@code FOLLOW_UP} exists. */
     private static final int CONVERGING_STARS = 326;
+    /** The Ashblazing Grand Duke, whose 2-piece needs the follow-up-only damage boost attribute. */
+    private static final int ASHBLAZING = 115;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -87,7 +89,8 @@ public class RelicTriggerTableTest {
             SIZZLING + "/" + FOUR_PIECE,
             EAGLE + "/" + FOUR_PIECE,
             CHAMPION + "/" + FOUR_PIECE,
-            CONVERGING_STARS + "/" + TWO_PIECE);
+            CONVERGING_STARS + "/" + TWO_PIECE,
+            ASHBLAZING + "/" + TWO_PIECE);
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
@@ -95,7 +98,7 @@ public class RelicTriggerTableTest {
      * <p>35 ability-only bonuses in total, so this number and {@link #AUTHORED}'s size must always sum
      * to it — that sum is the invariant, the individual values are just where the line currently sits.
      */
-    private static final int STILL_REGISTERED = 29;
+    private static final int STILL_REGISTERED = 28;
 
     // ==================================================================
     // 1. The shipped rule files
@@ -440,14 +443,15 @@ public class RelicTriggerTableTest {
     /**
      * A 2-piece ability with no rule file is registered too, so the registry is not a 4-piece-only list.
      *
-     * <p>Seven of the 35 ability-only bonuses sit at the 2-piece tier (every planar ornament set's only
+     * <p>Six of the 35 ability-only bonuses sit at the 2-piece tier (every planar ornament set's only
      * ability is one, and one cavern set has an ability-only 2-piece tier), and missing them would hide
-     * a fifth of the gap. It was eight before 326 (City of Converging Stars) became authorable.
+     * a fifth of the gap. It was eight before 326 (City of Converging Stars) and 115 (The Ashblazing
+     * Grand Duke) became authorable.
      */
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(7, twoPiece,
+        Assertions.assertEquals(6, twoPiece,
                 "the ability-only bonuses at the 2-piece tier that are not expressible yet");
     }
 

@@ -62,6 +62,19 @@ public enum AttributeType {
 
     @SerializedName("all_damage_type_boost") ALL_DAMAGE_TYPE_BOOST("all_damage_type_boost"),
 
+    /**
+     * Damage dealt by <b>follow-up attacks only</b> — i.e. by additional damage
+     * ({@code DamageType.ADDITIONAL}), which is the engine's one representation of a follow-up.
+     *
+     * <p>It sits next to {@link #ALL_DAMAGE_TYPE_BOOST} rather than replacing it: set 115's 2-piece
+     * ("Increases the DMG dealt by Follow-Up ATK by 20%") must boost follow-ups and nothing else, so a
+     * rule that granted the all-type boost instead would silently buff basic attacks, skills and
+     * ultimates too.
+     *
+     * <p>Applied in {@code Battle.assemble}'s DMG-boost zone, gated on the damage type.
+     */
+    @SerializedName("follow_up_damage_boost") FOLLOW_UP_DAMAGE_BOOST("follow_up_damage_boost"),
+
     @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost");
 
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();

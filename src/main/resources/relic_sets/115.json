@@ -1,0 +1,18 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 115 (The Ashblazing Grand Duke), 2-piece ability Ability51150: \"Increases the DMG dealt by Follow-Up ATK by #1[i]%.\" param = [0.2]",
+      "note": "#1[i] -> percent = 0.2. This bonus is unconditional for as long as the set is worn, so it is granted once at BATTLE_START with 'permanent': true ('for the whole battle'). It could not be a stat in the effect's 'properties' list because the generated data leaves that list empty for this ability, so the rule is the only available vehicle -- and it stays data, with no per-set code.\n\nThe attribute is FOLLOW_UP_DAMAGE_BOOST rather than ALL_DAMAGE_TYPE_BOOST on purpose: the text says Follow-Up ATK specifically, and the all-type boost would also raise basic attacks, skills and ultimates. Battle.assemble applies it only when the damage type is ADDITIONAL, which is the engine's one representation of a follow-up attack."
+    }
+  ]
+}

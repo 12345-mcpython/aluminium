@@ -1560,6 +1560,12 @@ public class Battle {
             damage.addBoost(attacker.getAttribute(elementBoost).get());
         }
         damage.addBoost(attacker.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
+        // ...plus the follow-up-only boost, which exists because set 115's 2-piece must raise
+        // follow-up damage without touching any other attack. Gated on the damage type, not on a flag:
+        // additional damage is the engine's one representation of a follow-up attack.
+        if (damage.getType() == DamageType.ADDITIONAL) {
+            damage.addBoost(attacker.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get());
+        }
 
         // 2) Crit zone: only crittable types roll; an effect that already fixed the crit (fixedCrit) is not
         //    overwritten
