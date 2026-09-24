@@ -1296,6 +1296,9 @@ public class Battle {
      */
     private int triggerDepth;
 
+    /** Nesting depth of buff-path reactions; see {@link #runCounter}. Per battle, never static. */
+    private int counterDepth;
+
     /** How deep nested trigger firing may go before the engine gives up (see {@link #triggerDepth}). */
     private static final int MAX_TRIGGER_DEPTH = 8;
 
@@ -1471,6 +1474,36 @@ public class Battle {
     }
 
     /**
+     * Runs a <b>buff-path reaction</b> (today: a counter-attack) that must not nest.
+     *
+     * <p>⚠ Why this exists and why it is not {@code MAX_TRIGGER_DEPTH}: a counter is triggered by HP loss,
+     * and a counter's own damage causes HP loss. Two units wearing a counter would therefore hit each
+     * other forever. The trigger-table version of a counter is stopped loudly by
+     * {@link #fireTriggers}'s depth guard, because it is fired from there — but a buff reacts through
+     * {@code BuffManager.onHpLoss}, which is <b>not</b> on that path, so it needs its own guard.
+     *
+     * <p>Per-battle state, not a static: two battles in the same test must not share a depth counter.
+     * The reaction is <b>skipped</b> rather than reported when it would nest, because "the counter's own
+     * damage does not itself trigger a counter" is the intended rule, not an error.
+     *
+     * @param reaction the reaction to run; must not be {@code null}
+     * @return {@code true} when it ran, {@code false} when it was refused because a reaction was already
+     *         in progress
+     */
+    public boolean runCounter(Runnable reaction) {
+        if (counterDepth > 0) {
+            return false;
+        }
+        counterDepth++;
+        try {
+            reaction.run();
+            return true;
+        } finally {
+            counterDepth--;
+        }
+    }
+
+    /**
      * Additional damage: a panel-type base (ATK / max HP × multiplier) that **goes through the full damage
      * zones** (it takes DMG boost/defence/resistance/vulnerability).
      *
@@ -1483,8 +1516,7 @@ public class Battle {
      * @param base the already-computed base value (e.g. Robin (知更鸟) 120% ATK / Tribbie (缇宝) 12% max HP)
      * @return the settled value of this instance (0 = no damage dealt)
      */
-    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
-        Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
+    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {        Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
         double settled = applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
         // P10-3 tail: this is the engine's one and only notion of a follow-up attack, so the
