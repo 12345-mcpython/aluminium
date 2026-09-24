@@ -1,0 +1,39 @@
+{
+  "4": [
+    {
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "hit_count > 0"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "permanent": true,
+          "max_stacks": 5
+        }
+      ],
+      "source": "relic set 105 (Champion of Streetwise Boxing), 4-piece ability Ability51051: \"After the wearer attacks or is hit, their ATK increases by #1[i]% for the rest of the battle. This effect can stack up to #2[i] time(s).\" param = [0.05, 5]",
+      "note": "#1[i] -> percent = 0.05 (5% ATK), #2[i] -> max_stacks = 5. 'attacks or is hit' is a disjunction of two events, and a trigger rule subscribes to exactly one, so it is written as the two rules below: this one is the 'attacks' half ('actor == self' = the wearer acted; 'hit_count > 0' = the attack connected), the other is the 'is hit' half (target == self on TAKING_HIT). They share the same modifier, which is what keeps the cap at 5 across both halves -- max_stacks groups stacks by (attribute, modifier kind, buff/debuff role), not by rule. 'for the rest of the battle' is 'permanent': true, so the buff is never ticked and its duration is unbounded rather than merely long. Each application adds one stack; once five are attached, further applications change nothing, and each stack is a separate buff instance that expires/removes on its own."
+    },
+    {
+      "on": "TAKING_HIT",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "permanent": true,
+          "max_stacks": 5
+        }
+      ],
+      "source": "relic set 105 (Champion of Streetwise Boxing), 4-piece ability Ability51051: \"After the wearer attacks or is hit, their ATK increases by #1[i]% for the rest of the battle. This effect can stack up to #2[i] time(s).\" param = [0.05, 5]",
+      "note": "The 'is hit' half of the same ability; see the ALLY_ATTACK rule above for the full reading. TAKING_HIT means 'an incoming damage instance landed on me', which is deliberately NOT the same fact as HP_LOST: a hit a shield absorbed entirely still counts here, which is how the in-game set behaves, and HP_LOST keeps its own stricter 'HP was really lost' meaning. 'target == self' is the wearer (the one hit), matching the convention documented in TriggerTable."
+    }
+  ]
+}
