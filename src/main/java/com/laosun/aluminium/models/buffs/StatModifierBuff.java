@@ -36,6 +36,19 @@ import java.util.Locale;
  * tuple still keeps "the same buff cast again" replacing rather than stacking, which
  * {@code BuffManagerTest.sameKindBuffRefreshesInsteadOfStacking} pins.
  *
+ * <p><b>Stacking is opt-in and lives beside that identity, not inside it.</b> An instance built with
+ * {@code maxStacks > 1} reports {@link #isStackable()} {@code true} and a
+ * {@link #stackGroupKey()} equal to the same {@code (attribute, modifierType, sourceRole)} tuple.
+ * {@link BuffManager#addBuff} then keeps the older instances — up to the cap — instead of evicting
+ * them, while {@link #isSameKind} is untouched, so the replace-on-same-kind tests keep meaning what
+ * they always meant. Each stack is an ordinary buff with its own {@code id}, so every stack carries
+ * its own modifier and can be removed on its own; expiry is therefore still exact (the attribute
+ * returns to base because the last modifier with that id is gone, not because something was
+ * recomputed).
+ *
+ * <p><b>"For the rest of the battle" is the {@code permanent} flag</b>, not a large turn count; see
+ * {@link AbstractBuff#isPermanent()}.
+ *
  * <p><b>{@code SPEED} is special</b>: the action queue caches the cycle time
  * ({@code Queue.cycleTime()}), so a speed change must be announced through
  * {@link CanHit#notifySpeedChanged()} or the turn order silently keeps the old speed.
@@ -47,6 +60,7 @@ public class StatModifierBuff extends AbstractBuff {
     private final DoubleValue.Modifier.ModifierType modifierType;
     private final double value;
     private final DoubleValue.Modifier.ModifierSource sourceRole;
+    private final int maxStacks;
 
     /**
      * @param attribute    the attribute to modify (must not be a {@code *_PERCENT} variant)
@@ -65,7 +79,25 @@ public class StatModifierBuff extends AbstractBuff {
                              DoubleValue.Modifier.ModifierSource sourceRole,
                              int duration,
                              boolean early) {
-        super(duration, early);
+        this(attribute, modifierType, value, sourceRole, duration, early, false, 1);
+    }
+
+    /**
+     * The full constructor, used by the factories that expose the new arguments.
+     *
+     * @param permanent  {@code true} = no turn limit ("for the rest of the battle"); the buff is never
+     *                   ticked, so {@code duration} is then only a placeholder
+     * @param maxStacks  how many copies may accumulate; {@code 1} = the classic replace behaviour
+     */
+    private StatModifierBuff(AttributeType attribute,
+                             DoubleValue.Modifier.ModifierType modifierType,
+                             double value,
+                             DoubleValue.Modifier.ModifierSource sourceRole,
+                             int duration,
+                             boolean early,
+                             boolean permanent,
+                             int maxStacks) {
+        super(duration, early, permanent);
         if (attribute == null) {
             throw new IllegalArgumentException("StatModifierBuff needs an attribute");
         }
@@ -77,11 +109,16 @@ public class StatModifierBuff extends AbstractBuff {
         if (modifierType == null) {
             throw new IllegalArgumentException("StatModifierBuff needs a modifier type");
         }
+        if (maxStacks < 1) {
+            throw new IllegalArgumentException(
+                    "StatModifierBuff needs a positive stack cap but got " + maxStacks);
+        }
         this.attribute = attribute;
         this.modifierType = modifierType;
         this.value = value;
         this.sourceRole = sourceRole == null
                 ? DoubleValue.Modifier.ModifierSource.BUFF : sourceRole;
+        this.maxStacks = maxStacks;
     }
 
     // ------------------------------------------------------------------
@@ -124,6 +161,23 @@ public class StatModifierBuff extends AbstractBuff {
      */
     public static StatModifierBuff of(AttributeType attribute, String type, double value,
                                       String source, int duration, boolean early) {
+        return of(attribute, type, value, source, duration, early, false, 1);
+    }
+
+    /**
+     * The full data-driven factory: everything {@link #of} takes plus the two arguments the
+     * stacking / "rest of the battle" primitives need.
+     *
+     * @param permanent {@code true} = "for the rest of the battle": no turn limit at all
+     * @param maxStacks how many copies may accumulate; {@code 1} = the classic replace behaviour
+     * @throws IllegalArgumentException when either name is unknown, {@code maxStacks} is below 1, or
+     *                                  {@code maxStacks > 1} is combined with a non-positive
+     *                                  {@code duration} while not being permanent — a stack that
+     *                                  expires instantly would be a silent no-op
+     */
+    public static StatModifierBuff of(AttributeType attribute, String type, double value,
+                                      String source, int duration, boolean early,
+                                      boolean permanent, int maxStacks) {
         DoubleValue.Modifier.ModifierType modifierType = switch (normalize(type)) {
             case "add_percent" -> DoubleValue.Modifier.ModifierType.ADD_PERCENT;
             case "multiply_percent" -> DoubleValue.Modifier.ModifierType.MULTIPLY_PERCENT;
@@ -137,7 +191,17 @@ public class StatModifierBuff extends AbstractBuff {
             default -> throw new IllegalArgumentException(
                     "Unknown stat modifier source '" + source + "' (buff / debuff)");
         };
-        return new StatModifierBuff(attribute, modifierType, value, role, duration, early);
+        if (maxStacks < 1) {
+            throw new IllegalArgumentException(
+                    "A stackable stat modifier needs a positive stack cap but got " + maxStacks);
+        }
+        if (!permanent && maxStacks > 1 && duration <= 0) {
+            throw new IllegalArgumentException(
+                    "A stackable stat modifier needs a positive duration (or permanent) but got "
+                            + duration + "; such stacks would expire before they could accumulate");
+        }
+        return new StatModifierBuff(attribute, modifierType, value, role, duration, early,
+                permanent, maxStacks);
     }
 
     private static String normalize(String s) {
@@ -160,6 +224,37 @@ public class StatModifierBuff extends AbstractBuff {
 
     public DoubleValue.Modifier.ModifierSource getSourceRole() {
         return sourceRole;
+    }
+
+    /**
+     * How many copies of this modifier may be attached at once.
+     *
+     * <p>{@code 1} — the default, and what every pre-existing factory produces — keeps the
+     * replace-on-same-kind rule; anything above 1 lets {@link BuffManager} accumulate instances up to
+     * this cap.
+     */
+    @Override
+    public int maxStacks() {
+        return maxStacks;
+    }
+
+    @Override
+    public boolean isStackable() {
+        return maxStacks > 1;
+    }
+
+    /**
+     * Two stackable stat buffs are siblings exactly when they touch the same attribute in the same
+     * way — the same tuple {@link #isSameKind} uses, deliberately: "stack with" and "replace" must
+     * agree about what "the same buff" means, or a +ATK% stack could sit next to a +DEF% one and
+     * neither could be reasoned about.
+     */
+    @Override
+    public Object stackGroupKey() {
+        if (!isStackable()) {
+            return null;
+        }
+        return attribute.name() + "|" + modifierType.name() + "|" + sourceRole.name();
     }
 
     /**
@@ -213,6 +308,8 @@ public class StatModifierBuff extends AbstractBuff {
     @Override
     public String toString() {
         return "StatModifierBuff[" + attribute + " " + modifierType + " " + value
-                + " as " + sourceRole + ", " + remainingDuration + "t]";
+                + " as " + sourceRole + ", "
+                + (permanent ? "permanent" : remainingDuration + "t")
+                + (maxStacks > 1 ? ", max " + maxStacks + " stacks" : "") + "]";
     }
 }

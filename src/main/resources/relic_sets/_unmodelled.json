@@ -6,23 +6,16 @@
       "reason": "\"Increases the max DMG that can be absorbed by the Shield created by the wearer by 20%.\" Needs an op that scales every shield the wearer creates; SHIELD only creates one shield with an amount given in the rule, so there is nothing to amplify."
     }
   ],
-  "105": [
-    {
-      "require": 4,
-      "ability": "Ability51051",
-      "reason": "\"After the wearer attacks or is hit, their ATK increases by 5% for the rest of the battle. This effect can stack up to 5 time(s).\" Needs three things the engine does not have: the TAKING_HIT event (only 'attacks' is observable), a stacking counter, and a duration with no turn limit (MODIFY_ATTR requires a positive turns value)."
-    }
-  ],
   "106": [
     {
       "require": 2,
       "ability": "Ability51060",
-      "reason": "\"Reduces DMG taken by 8%.\" Needs a damage-taken reduction that is not an attribute value (MODIFY_ATTR changes an AttributeType, and no attribute expresses 'incoming damage x0.92') plus a duration without a turn limit."
+      "reason": "\"Reduces DMG taken by 8%.\" Needs a damage-taken reduction that is not an attribute value: MODIFY_ATTR changes an AttributeType, and no attribute expresses 'incoming damage x0.92' (the engine's reduction zone belongs to a buff class, not to the data vocabulary). The duration half of the original gap is closed -- `permanent: true` now exists -- so this is the one remaining blocker."
     },
     {
       "require": 4,
       "ability": "Ability51061",
-      "reason": "\"At the beginning of the turn, if the wearer's HP percentage is equal to or less than 50%, restores HP equal to 8% of their Max HP and regenerates 5 Energy.\" Needs the TURN_START event, a condition on the wearer's HP percentage, and a HEAL whose amount is a fraction of Max HP (HEAL takes a flat amount)."
+      "reason": "\"At the beginning of the turn, if the wearer's HP percentage is equal to or less than 50%, restores HP equal to 8% of their Max HP and regenerates 5 Energy.\" Half of it is now expressible (TURN_START is wired, and `hp_percent <= 0.5` exists), but the heal cannot be: HEAL's `amount` is a fixed number, and this one is 8% of the wearer's Max HP. Writing a number here would be wrong for every character, so the ability stays registered."
     }
   ],
   "107": [
@@ -36,7 +29,7 @@
     {
       "require": 4,
       "ability": "Ability51081",
-      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" Needs an event for 'the wearer deals damage to an enemy' (HP_LOST is only broadcast when one of our own characters loses HP), a condition on the target's weakness element, and a duration without a turn limit."
+      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" Needs an event for 'the wearer deals damage to an enemy' (HP_LOST and TAKING_HIT are only broadcast when one of our own characters is hurt), a condition on the target's weakness element, and a way to express a conditional DEF ignore (the target's DEF ignore is not a stat the rule can raise). 'For the rest of the battle' is no longer part of the gap -- `permanent: true` exists."
     }
   ],
   "112": [
@@ -50,7 +43,7 @@
     {
       "require": 4,
       "ability": "Ability51131",
-      "reason": "\"When the wearer is hit or has their HP consumed by an ally or themselves, their CRIT Rate increases by 8% for 2 turn(s) and up to 2 stacks.\" Needs the TAKING_HIT event, an event for 'the wearer's HP was consumed by an ally', and a stacking counter."
+      "reason": "\"When the wearer is hit or has their HP consumed by an ally or themselves, their CRIT Rate increases by 8% for 2 turn(s) and up to 2 stacks.\" The 'is hit' half and the stacking are now expressible (TAKING_HIT + `max_stacks`), but 'has their HP consumed by an ally or themselves' is a second event the engine does not emit (the game's HP-consumption channel, not HP_LOST), and the ability is a disjunction -- authoring only the hit half would under-trigger it."
     }
   ],
   "114": [
@@ -69,7 +62,7 @@
     {
       "require": 4,
       "ability": "Ability51151",
-      "reason": "\"When the wearer uses a Follow-Up ATK, increases the wearer's ATK by 6% for every time the Follow-Up ATK deals DMG. This effect can stack up to 8 time(s) and lasts for 3 turn(s). This effect is removed the next time the wearer uses a Follow-Up ATK.\" Needs a follow-up-attack event, a stacking counter, and explicit stack removal."
+      "reason": "\"When the wearer uses a Follow-Up ATK, increases the wearer's ATK by 6% for every time the Follow-Up ATK deals DMG. This effect can stack up to 8 time(s) and lasts for 3 turn(s). This effect is removed the next time the wearer uses a Follow-Up ATK.\" The stacking counter and the 3-turn duration are now expressible, but the trigger is a Follow-Up ATK (no such event: ALLY_ATTACK is any attack) and the effect needs an explicit 'remove every stack' op, which the op vocabulary does not have."
     }
   ],
   "116": [
@@ -104,7 +97,7 @@
     {
       "require": 4,
       "ability": "Ability51211",
-      "reason": "\"When using Skill or Ultimate on one ally target, increases the ability target's CRIT DMG by 18%, lasting for 2 turn(s). This effect can stack up to 2 time(s).\" Needs the cast's target (absent from the cast event), a way to buff 'the ability target' rather than the owner or the whole party, and a stacking counter."
+      "reason": "\"When using Skill or Ultimate on one ally target, increases the ability target's CRIT DMG by 18%, lasting for 2 turn(s). This effect can stack up to 2 time(s).\" The 2-turn stacks are now expressible, but the cast event still carries no subject (SkillExecutor passes target = null and only a hit count), so neither 'on one ally target' nor 'the ability target' can be identified -- the buff would land on the wearer instead of the ally."
     }
   ],
   "122": [
@@ -132,7 +125,7 @@
     {
       "require": 4,
       "ability": "Ability51261",
-      "reason": "\"When the wearer becomes the target of another ally target's ability, gains 1 stack of 'Help,' stacking up to 2 time(s). If there are 2 stack(s) ... when the wearer uses their Ultimate, consumes all 'Help' to increase the wearer's ATK by 48% for 1 turn(s).\" Needs an event for 'the wearer was targeted by an ally ability', a stacking counter, and consuming the stacks as a condition."
+      "reason": "\"When the wearer becomes the target of another ally target's ability, gains 1 stack of 'Help,' stacking up to 2 time(s). If there are 2 stack(s) ... when the wearer uses their Ultimate, consumes all 'Help' to increase the wearer's ATK by 48% for 1 turn(s).\" The stacking counter and the 'for 1 turn' buff are now expressible, but there is no event for 'the wearer was targeted by an ally's ability' and no condition for 'I have exactly N stacks' (the DSL reads the owner's HP percentage and the hit count, not buff stacks), nor an op that consumes them."
     }
   ],
   "127": [
@@ -172,7 +165,7 @@
     {
       "require": 4,
       "ability": "Ability51311",
-      "reason": "\"When the wearer enters combat or uses Skill, the DMG dealt by their Skill and Ultimate increases by 18%, stacking up to 3 time(s). At the start of the wearer's turn or after using Ultimate, removes 1 stack(s) of this effect.\" Needs a stacking counter, the TURN_START event for the removal, and a skill-type-specific damage bonus."
+      "reason": "\"When the wearer enters combat or uses Skill, the DMG dealt by their Skill and Ultimate increases by 18%, stacking up to 3 time(s). At the start of the wearer's turn or after using Ultimate, removes 1 stack(s) of this effect.\" The stacking, the TURN_START removal trigger and the ULT_CAST one are now expressible, but two terms are not: no attribute expresses 'Skill and Ultimate DMG' specifically (only per-element and all-damage boosts exist), and the vocabulary has no op that removes a stack."
     }
   ],
   "132": [
@@ -186,28 +179,28 @@
     {
       "require": 2,
       "ability": "Ability53151",
-      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" Needs a follow-up-attack event, a stacking counter, a per-stack scaling and a threshold bonus."
+      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" The stacking counter is now expressible, but the trigger is a Follow-Up ATK (no such event), the bonus is follow-up-specific (no such attribute) and the 'at 5 stacks, additionally' half needs a threshold condition on the wearer's own stack count."
     }
   ],
   "321": [
     {
       "require": 2,
       "ability": "Ability53211",
-      "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" Needs a party-size condition on the battlefield and a stacking counter."
+      "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" The stacking counter is now expressible, but there is no condition on the battlefield's party size (and no memosprite), so the number of stacks cannot be derived from anything."
     }
   ],
   "326": [
     {
       "require": 2,
       "ability": "Ability53261",
-      "reason": "\"When the wearer uses Follow-Up ATK, increases ATK by 24% for 2 turn(s). When an enemy target gets defeated, increases CRIT DMG for all allies by 12% in the current battle. This effect cannot stack.\" The KILL half is expressible, but the Follow-Up ATK half is not (no follow-up event), and 'in the current battle' has no turn limit for MODIFY_ATTR -- the effect as a whole is therefore not authored."
+      "reason": "\"When the wearer uses Follow-Up ATK, increases ATK by 24% for 2 turn(s). When an enemy target gets defeated, increases CRIT DMG for all allies by 12% in the current battle. This effect cannot stack.\" The KILL half is expressible -- and so is 'in the current battle' now (`permanent: true`) -- but the Follow-Up ATK half is not (no follow-up event), and half an ability is not the ability, so the whole entry stays registered."
     }
   ],
   "328": [
     {
       "require": 2,
       "ability": "Ability53281",
-      "reason": "\"When entering combat, if the wearer's Max Energy is greater than or equal to 200, for every 1 excess point, increases the wearer's DMG dealt by 0.2%, up to a max increase of 32%.\" Needs a condition on the wearer's Max Energy, an amount that scales with a character value per point, and a cap on the accumulated result."
+      "reason": "\"When entering combat, if the wearer's Max Energy is greater than or equal to 200, for every 1 excess point, increases the wearer's DMG dealt by 0.2%, up to a max increase of 32%.\" Needs a condition on the wearer's Max Energy, an amount that scales with a character value per point, and a cap on the accumulated result -- none of which the DSL or MODIFY_ATTR has."
     }
   ]
 }

@@ -52,9 +52,51 @@ public class EffectSpec {
 
     /**
      * Duration in turns, where the op needs one.
+     *
+     * <p>For {@code MODIFY_ATTR} this is <b>exactly one of</b> this field and {@link #permanent}: a
+     * modifier either lasts N of the owner's turns or lasts until the battle ends ("for the rest of the
+     * battle"), and the interpreter rejects a rule that states neither or both.
      */
     @SerializedName("turns")
     private Integer turns;
+
+    /**
+     * For {@code MODIFY_ATTR}: whether the modifier lasts <b>until the battle ends</b> rather than for a
+     * number of turns.
+     *
+     * <p>Spelled as a flag on purpose. The alternative — a large {@code turns} value — would be a magic
+     * number that the engine still counts down once per turn, so "unbounded" would only mean "longer
+     * than the battle probably lasts". The buff is instead never ticked at all
+     * ({@code AbstractBuff.isPermanent()}), which is what makes the duration exact.
+     *
+     * <p>Absent/{@code false} means "use {@link #turns}"; there is no default duration.
+     */
+    @SerializedName("permanent")
+    private Boolean permanent;
+
+    /**
+     * For {@code MODIFY_ATTR}: how many copies of the modifier may <b>accumulate</b> ("this effect can
+     * stack up to #N time(s)").
+     *
+     * <p>Absent or {@code 1} keeps the engine's historical replace-on-same-kind rule — re-applying the
+     * same attribute modifier refreshes it instead of adding a second one
+     * ({@code BuffManagerTest.sameKindBuffRefreshesInsteadOfStacking}). Above 1 the modifier becomes a
+     * stack: every application adds another instance until the cap is reached, further applications
+     * change nothing, and each stack is removable on its own
+     * ({@code BuffManager.addStackable}).
+     *
+     * <p>{@code "stacks"} is accepted as an alias, because the game text says "stacking up to #N
+     * time(s)" and an author writing the rule reads that word first.
+     */
+    @SerializedName("max_stacks")
+    private Integer maxStacks;
+
+    /**
+     * Alias of {@link #maxStacks}, from the wording of the effect text ("stacking up to N time(s)").
+     * Stating both is rejected at load time rather than silently picking one.
+     */
+    @SerializedName("stacks")
+    private Integer stacks;
 
     /**
      * Resource id for {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} (e.g. {@code "tribbie_charge"}).
@@ -140,4 +182,17 @@ public class EffectSpec {
      */
     @SerializedName("per_target")
     private Boolean perTarget;
+
+    /**
+     * The stack cap, whichever spelling the rule used.
+     *
+     * <p>Read by the interpreter <b>after</b> it has rejected "both spellings stated at once", so the
+     * two can never disagree here. Returns {@code null} when the rule says nothing about stacking,
+     * which is the "replace, do not stack" default.
+     *
+     * @return the declared stack cap, or {@code null}
+     */
+    public Integer stackCap() {
+        return maxStacks != null ? maxStacks : stacks;
+    }
 }

@@ -44,10 +44,35 @@ public enum TriggerEvent {
     SKILL_POINT_SPENT("SKILL_POINT_SPENT", true),
     /** ✅ Skill points were really gained. */
     SKILL_POINT_GAINED("SKILL_POINT_GAINED", true),
-    /** ☐ A turn started. Expressed by {@code MoveEvent} today; declared for completeness. */
-    TURN_START("TURN_START", false),
-    /** ☐ The owner took a hit. */
-    TAKING_HIT("TAKING_HIT", false),
+    /**
+     * ✅ A character's turn began — emitted by {@code Battle.beforeMove}, after the actor's buffs have
+     * been settled and before its {@code MoveEvent.beforeMove} hook.
+     *
+     * <p>⚠ <b>This is a trigger-table event, not a new buff interface.</b> Turn boundaries stay
+     * {@code MoveEvent.beforeMove/afterMove} for buffs — that decision is pinned by
+     * {@code EventBusTest.turnBoundariesAreStillMoveEvent} and nothing here revives it. What
+     * {@code TURN_START} adds is only the ability for <b>data</b> to subscribe to the same moment
+     * ("at the beginning of the turn, if …"), which the buff interfaces cannot express because a JSON
+     * rule is not a Java class.
+     */
+    TURN_START("TURN_START", true),
+    /**
+     * ✅ The owner was hit by an incoming damage instance.
+     *
+     * <p><b>Deliberately not the same fact as {@link #HP_LOST}.</b> {@code HP_LOST} means "HP was
+     * really lost" (a fully shielded hit does not fire it, and neither does a hit on an invulnerable
+     * target); {@code TAKING_HIT} means "an attack landed on me", which is exactly what the relic and
+     * talent texts that say "after the wearer is hit / attacked" mean — those effects accumulate even
+     * when a shield eats the whole hit. Emitting both from the same place with the same gate would
+     * silently make one mean the other, so the two are separate events with separate conditions:
+     * {@code HP_LOST} fires only when {@code hpLoss > 0}, {@code TAKING_HIT} fires once per settled
+     * instance against a live, non-invulnerable target.
+     *
+     * <p>{@code actor} = whoever caused the damage, {@code target} = the one who took it (so "I was
+     * hit" is {@code target == self}, the same convention as {@code HP_LOST}). It follows
+     * {@code HP_LOST}'s broadcast policy, so it is also fired only when the subject is one of ours.
+     */
+    TAKING_HIT("TAKING_HIT", true),
     /**
      * ✅ An ally cast their Ultimate.
      *

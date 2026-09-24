@@ -19,6 +19,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -236,18 +237,45 @@ public class TriggerTableTest {
      * <p>Otherwise a content author would write a rule, see nothing happen, and have no way to tell
      * "my condition is wrong" from "the engine never fires this".
      *
-     * <p>The example used to be {@code ULT_CAST}; that event now has an emitter
-     * ({@code SkillExecutor.broadcastSkillCast}) and is covered by {@code UltCastTriggerTest}. The two
-     * that remain unwired are {@code TURN_START} and {@code TAKING_HIT}.
+     * <p>The example used to be {@code ULT_CAST}, then {@code TURN_START} / {@code TAKING_HIT}; all
+     * three now have emitters, so the event is taken from the enum instead of being hard-coded. The
+     * companion assertion {@link #everyDeclaredTriggerEventIsEmitted()} is what keeps the vocabulary
+     * honest — without it the day every event is wired this test would silently stop covering the
+     * rejection path.
      */
     @Test
     public void eventThatIsNotWiredYetIsRejectedWithAReason() {
+        TriggerEvent unwired = unwiredEvent();
+        if (unwired == null) {
+            return;                                  // guarded by everyDeclaredTriggerEventIsEmitted()
+        }
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("TURN_START", List.of("self"), energy(1)))));
+                () -> new TriggerTable(1, List.of(trigger(unwired.value(), List.of("self"), energy(1)))));
         Assertions.assertTrue(e.getMessage().contains("not emitted"), e.getMessage());
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("TAKING_HIT", List.of("self"), energy(1)))),
-                "TAKING_HIT has no emitter either, so it must be rejected the same way");
+        Assertions.assertTrue(e.getMessage().contains(unwired.value()), e.getMessage());
+    }
+
+    /**
+     * The other half of the guard above: <b>every event the vocabulary declares is emitted</b>.
+     *
+     * <p>The enum is a closed vocabulary content may use, so a declared-but-unemitted event is a trap:
+     * the rule loads nowhere and fails only when an author writes it. Wiring {@code TURN_START} and
+     * {@code TAKING_HIT} made this true for the first time, and this assertion is what keeps it true.
+     */
+    @Test
+    public void everyDeclaredTriggerEventIsEmitted() {
+        List<String> unwired = Arrays.stream(TriggerEvent.values())
+                .filter(event -> !event.isWired())
+                .map(TriggerEvent::value)
+                .toList();
+        Assertions.assertTrue(unwired.isEmpty(),
+                "these events are declared in TriggerEvent but no emitter fires them, so any rule using "
+                        + "them is rejected at load: " + unwired);
+    }
+
+    private static TriggerEvent unwiredEvent() {
+        return Arrays.stream(TriggerEvent.values()).filter(event -> !event.isWired()).findFirst()
+                .orElse(null);
     }
 
     /** An unknown condition variable is rejected rather than evaluating to false forever. */

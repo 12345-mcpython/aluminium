@@ -506,6 +506,26 @@ public class Battle {
         if (actor.isDeath()) {
             return;
         }
+        // P8-7: "the turn began", delivered to the data-driven tables. Deliberately here and not as a
+        // new buff interface: turn boundaries stay `MoveEvent.beforeMove/afterMove` for buffs (see
+        // EventBusTest.turnBoundariesAreStillMoveEvent). What is added is only the *data* subscription
+        // to the same moment -- a JSON rule cannot implement a Java interface, so without this event
+        // "at the beginning of the turn, ..." would have no trigger source at all.
+        //
+        // Position matters twice over:
+        //   * after `getBuffManager().beforeMove()`, so buffs that expire at this turn boundary are
+        //     already gone and a rule cannot read a dead buff's state;
+        //   * before `actor.beforeMove(this)`, i.e. before the actor's own move hook, so a rule that
+        //     heals or buffs has taken effect by the time the character actually moves.
+        // `actor` = the character whose turn it is; `target` is that same character, because for
+        // "the beginning of the wearer's turn" the wearer is both who caused it and who it happens to.
+        // Passing both is what keeps the two natural spellings -- `actor == self` and `target == self`
+        // -- equivalent here, so a rule cannot be silently dead because the author picked the other
+        // one. Every other character still evaluates the event with itself as `self`, so only the
+        // actor's own table can match.
+        //
+        // It fires once per turn, extra turns included -- an extra turn really is one.
+        fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
         actor.beforeMove(this);
     }
 
@@ -676,6 +696,17 @@ public class Battle {
         boolean died = target.takeDamage(settled);
         double hpLoss = hpBefore - target.getCurrentHp();
         double shieldAbsorbed = target.getLastShieldAbsorbed();
+        // P8-7: "I was hit" -- a *different fact* from "I lost HP", and the difference is the whole
+        // point (see TriggerEvent.TAKING_HIT):
+        //   * it fires whenever an incoming damage instance lands, even when a shield absorbs all of
+        //     it (hpLoss == 0) -- which is what "after the wearer is hit / attacked" means in the
+        //     relic and talent texts, and what would otherwise make e.g. set 105 never accumulate
+        //     behind a shielder;
+        //   * it does NOT fire for a target that was already dead or invulnerable, because
+        //     applyDamage returns above in exactly those cases (nothing landed).
+        // The HP_LOST trigger below keeps its own stricter gate (`hpLoss > 0`), so the two events can
+        // never be mistaken for one another.
+        fireTriggersForAlly(TriggerEvent.TAKING_HIT, damage.getAttacker(), target, settled);
         // P8-6: HP loss and being killed are two **facts**, both emitted here. Placed before the energy
         // settlement -- the event means "an HP change happened", independent of the energy rule (who gains how
         // much, whether it counts as an attack).
