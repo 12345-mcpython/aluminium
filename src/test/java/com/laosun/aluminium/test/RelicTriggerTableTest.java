@@ -16,6 +16,7 @@ import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -54,6 +55,8 @@ public class RelicTriggerTableTest {
     private static final int SIZZLING = 109;
     /** "Eagle of Twilight Line" — 4-piece: after the Ultimate, advance forward 25%. */
     private static final int EAGLE = 110;
+    /** "Champion of Streetwise Boxing" — 4-piece: on attacking or being hit, +5% ATK, up to 5 stacks. */
+    private static final int CHAMPION = 105;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -80,7 +83,16 @@ public class RelicTriggerTableTest {
             PASSERBY + "/" + FOUR_PIECE,
             GLACIAL + "/" + FOUR_PIECE,
             SIZZLING + "/" + FOUR_PIECE,
-            EAGLE + "/" + FOUR_PIECE);
+            EAGLE + "/" + FOUR_PIECE,
+            CHAMPION + "/" + FOUR_PIECE);
+
+    /**
+     * How many ability-only bonuses the shipped file still cannot express.
+     *
+     * <p>35 ability-only bonuses in total, so this number and {@link #AUTHORED}'s size must always sum
+     * to it — that sum is the invariant, the individual values are just where the line currently sits.
+     */
+    private static final int STILL_REGISTERED = 30;
 
     // ==================================================================
     // 1. The shipped rule files
@@ -93,6 +105,10 @@ public class RelicTriggerTableTest {
         assertRuleOn(GLACIAL, TriggerEvent.ULT_CAST);
         assertRuleOn(SIZZLING, TriggerEvent.SKILL_CAST);
         assertRuleOn(EAGLE, TriggerEvent.ULT_CAST);
+        // 105 is the one ability whose text is a disjunction ("attacks **or** is hit"), so it needs a
+        // rule on each of the two events; both are really there, or half the ability is missing.
+        assertRuleOn(CHAMPION, TriggerEvent.ALLY_ATTACK);
+        assertRuleOn(CHAMPION, TriggerEvent.TAKING_HIT);
 
         // The provenance rule: a number has to be traceable to its document.
         TriggerTable passerby = RelicTriggerTables.of(PASSERBY).at(FOUR_PIECE);
@@ -232,11 +248,22 @@ public class RelicTriggerTableTest {
         Assertions.assertTrue(unknownEvent.getMessage().contains("NO_SUCH_EVENT"),
                 unknownEvent.getMessage());
 
-        IllegalArgumentException unwired = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> RelicTriggerTables.parse(PASSERBY, Map.of("4", List.of(rule("TURN_START",
-                        gainSkillPoint(1)))), "test-file"));
-        Assertions.assertTrue(unwired.getMessage().contains("not emitted"),
-                "a rule on an event the engine never fires must be rejected at load: " + unwired.getMessage());
+        // The "declared but not emitted yet" guard, for the relic-file path. Every event the enum
+        // declares is wired today (pinned by TriggerTableTest.everyDeclaredTriggerEventIsEmitted), so
+        // the case is skipped rather than asserting a stale event name; the load-time rejection itself
+        // is covered there, where it belongs.
+        TriggerEvent unwiredEvent = Arrays.stream(TriggerEvent.values())
+                .filter(event -> !event.isWired())
+                .findFirst().orElse(null);
+        if (unwiredEvent != null) {
+            IllegalArgumentException unwired = Assertions.assertThrows(IllegalArgumentException.class,
+                    () -> RelicTriggerTables.parse(PASSERBY,
+                            Map.of("4", List.of(rule(unwiredEvent.value(), gainSkillPoint(1)))),
+                            "test-file"));
+            Assertions.assertTrue(unwired.getMessage().contains("not emitted"),
+                    "a rule on an event the engine never fires must be rejected at load: "
+                            + unwired.getMessage());
+        }
     }
 
     // ==================================================================
@@ -296,8 +323,9 @@ public class RelicTriggerTableTest {
      * <b>authored</b> (its set has a rule file with a tier at that piece count) or <b>registered</b> in
      * {@code relic_sets/_unmodelled.json} with the capability it is missing.
      *
-     * <p>The counts are pinned because they <em>are</em> the deliverable: 35 ability-only bonuses, 4
-     * expressible with today's op vocabulary, 31 not. A change on either side must be deliberate.
+     * <p>The counts are pinned because they <em>are</em> the deliverable: 35 ability-only bonuses,
+     * {@code AUTHORED.size()} expressible with today's op vocabulary,
+     * {@link #STILL_REGISTERED} not. A change on either side must be deliberate.
      */
     @Test
     public void everyAbilityOnlyBonusIsEitherAuthoredOrRegistered() {
@@ -337,10 +365,13 @@ public class RelicTriggerTableTest {
         Assertions.assertEquals(35, abilityOnly, "the shipped file's ability-only bonuses");
         Assertions.assertEquals(AUTHORED, authored,
                 "the abilities the op vocabulary can currently express; a new one means a new rule file");
-        Assertions.assertEquals(31, registered.size(),
+        Assertions.assertEquals(STILL_REGISTERED, registered.size(),
                 "the abilities registered as unmodelled; a new one means a new rule file or a new registry "
                         + "entry in the same change");
-        Assertions.assertEquals(31, bothOrNeither.size(), "every registered ability must be a real one");
+        Assertions.assertEquals(STILL_REGISTERED, bothOrNeither.size(),
+                "every registered ability must be a real one");
+        Assertions.assertEquals(35, authored.size() + registered.size(),
+                "35 = authored + registered: the partition is the invariant, not either number alone");
 
         // Every registered entry must carry the reason, or the gap cannot be acted on.
         for (RelicTriggerTables.Unmodelled entry : RelicTriggerTables.unmodelled()) {

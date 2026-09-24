@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A character's compiled trigger table (P8-7): the data form of its mechanics.
@@ -188,20 +189,30 @@ public class TriggerTable {
     //
     // Deliberately small: the goal is that a reader understands a rule without learning a language.
     //
-    //   self              the actor is me (shorthand for "actor == self")
-    //   actor == self     I acted
-    //   actor != self     someone else on my side acted      <- Robin's "after an ally attacks"
-    //   target == self    it happened to me                  <- Clara's "after I am hit"
-    //   target != self    it happened to someone else        <- a healer watching a teammate
-    //   hit_count > 0     the attack connected with at least one target
-    //   hit_count == 2    exact hit count
+    //   self                  the actor is me (shorthand for "actor == self")
+    //   actor == self         I acted
+    //   actor != self         someone else on my side acted      <- Robin's "after an ally attacks"
+    //   target == self        it happened to me                  <- Clara's "after I am hit"
+    //   target != self        it happened to someone else        <- a healer watching a teammate
+    //   hit_count > 0         the attack connected with at least one target
+    //   hit_count == 2        exact hit count
+    //   hp_percent <= 0.5     the owner's own HP is at or below half   <- set 106's "at the beginning
+    //                                                                     of the turn, if the wearer's
+    //                                                                     HP percentage is <= 50%"
     //
     // `actor` is who caused the event; `target` is what it happened to. WATCH OUT: when I am hit,
     // the actor is the attacker, so "I was hit" is `target == self`, NOT `self`.
     //
     // Either side may hold the literal ("0 < hit_count" works too). Unknown variables are rejected
     // at load time rather than silently evaluating to false forever.
+    //
+    // `hp_percent` is read from the OWNER (the character whose table fired), not from the event --
+    // it is a fact about me, which is why no event has to carry it. It is a fraction (0.5 = 50%),
+    // matching the game text's own placeholder (`#1[i]%` with param 0.5).
     // ==================================================================
+
+    /** The numeric variables {@code hp_percent} and {@code hit_count} are the complete, closed set. */
+    private static final Set<String> NUMERIC_VARIABLES = Set.of("hit_count", "hp_percent");
 
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
@@ -254,12 +265,24 @@ public class TriggerTable {
                     "Condition '" + raw + "' has no numeric literal on either side (source: "
                             + spec.getSource() + ")");
         }
-        if (!"hit_count".equals(variable)) {
+        if (!NUMERIC_VARIABLES.contains(variable)) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' compares unknown variable '" + variable
-                            + "'; known numeric variables: hit_count (source: " + spec.getSource() + ")");
+                            + "'; known numeric variables: " + String.join(", ", knownNumericVariables())
+                            + " (source: " + spec.getSource() + ")");
         }
         return new Numeric(variable, operator, literal, literalOnLeft);
+    }
+
+    /**
+     * The known numeric variable names, sorted, for the error message.
+     *
+     * <p>Derived from {@link #NUMERIC_VARIABLES} rather than typed out, so the message cannot drift
+     * away from the set the parser actually accepts — a message that lies about the vocabulary is
+     * worse than no message, because the author trusts it.
+     */
+    private static List<String> knownNumericVariables() {
+        return NUMERIC_VARIABLES.stream().sorted().toList();
     }
 
     /**
@@ -433,7 +456,7 @@ public class TriggerTable {
 
         @Override
         public boolean test(TriggerContext ctx) {
-            double value = "hit_count".equals(variable) ? ctx.hitCount() : Double.NaN;
+            double value = numericValue(ctx);
             double left = literalOnLeft ? literal : value;
             double right = literalOnLeft ? value : literal;
             return switch (operator) {
@@ -443,6 +466,38 @@ public class TriggerTable {
                 case "<=" -> left <= right;
                 default -> false;
             };
+        }
+
+        /**
+         * The variable's current value, or {@code NaN} when it cannot be read.
+         *
+         * <p>{@code NaN} is the honest answer: every comparison against it is {@code false}, so a
+         * condition whose subject does not exist fails the rule instead of accidentally passing it.
+         */
+        private double numericValue(TriggerContext ctx) {
+            return switch (variable) {
+                case "hit_count" -> ctx.hitCount();
+                case "hp_percent" -> hpPercent(ctx.owner());
+                default -> Double.NaN;
+            };
+        }
+
+        /**
+         * The owner's HP as a fraction of its maximum ({@code 0.5} = half HP).
+         *
+         * <p>Read from the <b>owner</b> — "the wearer's HP percentage" is a fact about the character
+         * whose table fired, not about the event, so no event has to carry it. A missing owner or a
+         * maximum of 0 yields {@code NaN}, which fails every comparison rather than reporting "0%".
+         */
+        private static double hpPercent(CanHit owner) {
+            if (owner == null) {
+                return Double.NaN;
+            }
+            double max = owner.getMaxHp();
+            if (max <= 0) {
+                return Double.NaN;
+            }
+            return owner.getCurrentHp() / max;
         }
 
         @Override

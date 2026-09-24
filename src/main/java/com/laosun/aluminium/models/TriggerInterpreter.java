@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -31,11 +32,18 @@ import java.util.Set;
  *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target}</td><td>✅ wired</td></tr>
  *   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>✅ wired</td></tr>
  *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>✅ wired (0.0–1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
- *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, {@code turns}, optional {@code target}</td>
+ *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, <b>exactly one of</b>
+ *       {@code turns} / {@code permanent}, optional {@code target}, {@code max_stacks} (alias
+ *       {@code stacks})</td>
  *       <td>✅ wired (P10-3) — a negative {@code percent} becomes a {@code DEBUFF}, so a buff and a
  *           debuff on the same attribute coexist; for a ratio attribute ({@code CRIT_ATTACK} and
  *           friends) {@code percent} is the value itself (0.25 = +25 percentage points), because an
- *           additive percentage would multiply their zero base and change nothing</td></tr>
+ *           additive percentage would multiply their zero base and change nothing.
+ *           <b>{@code permanent: true}</b> means "until the battle ends": the modifier is never
+ *           ticked, so its duration is unbounded rather than merely long. <b>{@code max_stacks}</b>
+ *           (&gt; 1) makes re-applications <b>accumulate</b> up to that cap instead of replacing the
+ *           previous one; each stack is an ordinary buff instance with its own id, so it can be
+ *           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
  *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, {@code turns}</td>
  *       <td>☐ needs a named-buff registry; plain stat buffs are already covered by {@code MODIFY_ATTR}</td></tr>
  *   <tr><td>{@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}</td><td>{@code resource}, {@code amount}</td>
@@ -100,22 +108,32 @@ public final class TriggerInterpreter {
                     "Unknown trigger op '" + op + "' (source: " + spec.getSource() + ")");
         }
         switch (op) {
-            case "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD" -> requireAmount(effect, op, spec);
-            case "ADVANCE" -> requirePercent(effect, op, spec);
+            case "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD" -> {
+                requireAmount(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "ADVANCE" -> {
+                requirePercent(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
             case "GAIN_RESOURCE", "SPEND_RESOURCE" -> {
                 requireAmount(effect, op, spec);
                 requireResource(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
             }
             case "DAMAGE" -> {
                 requireSkill(effect, op, spec);
                 requireDamageParam(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
             }
             case "MODIFY_ATTR" -> {
                 requireAttribute(effect, op, spec);
                 requirePercent(effect, op, spec);
-                requireTurns(effect, op, spec);
+                requireDuration(effect, op, spec);
+                requireStackCap(effect, op, spec);
             }
             default -> {
+                requireNoStackArguments(effect, op, spec);
             }
         }
     }
@@ -347,18 +365,31 @@ public final class TriggerInterpreter {
      *       change nothing. A silent no-op is the one outcome this op must not have.</li>
      * </ul>
      *
-     * @param effect the effect ({@code attribute} / {@code percent} / {@code turns}, optional
-     *               {@code target})
+     * @param effect the effect ({@code attribute} / {@code percent} / {@code turns} or
+     *               {@code permanent}, optional {@code max_stacks}, {@code target})
      * @param ctx    the context
      */
     private static void modifyAttr(Battle battle, EffectSpec effect, TriggerContext ctx) {
         AttributeType attribute = AttributeType.fromString(effect.getAttribute());
         double percent = effect.getPercent();
-        int turns = effect.getTurns();
+        boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
+        int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+        int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(statModifier(attribute, percent, turns));
+            target.getBuffManager().addBuff(statModifier(attribute, percent, turns, permanent, maxStacks));
         }
     }
+
+    /**
+     * The duration handed to a permanent modifier.
+     *
+     * <p>Deliberately {@code 1} and not a large number: {@link StatModifierBuff} marks the buff
+     * permanent, and {@code BuffManager.processBuffTick} never counts a permanent buff down, so this
+     * value is never read. It exists only because {@code AbstractBuff}'s constructor takes a turn count.
+     * Spelling it as {@code Integer.MAX_VALUE} would suggest the engine relies on a big number, which
+     * is exactly the misconception the flag removes.
+     */
+    private static final int UNBOUNDED_DURATION_PLACEHOLDER = 1;
 
     /**
      * The modifier a {@code MODIFY_ATTR} effect produces, as a buff or a debuff according to the sign.
@@ -367,20 +398,19 @@ public final class TriggerInterpreter {
      * gets an additive percentage. Splitting it out keeps the "which modifier kind" decision in one
      * readable place instead of a nested conditional at the call site.
      *
-     * @param attribute the attribute to touch
-     * @param percent   the magnitude; {@code < 0} produces a debuff
-     * @param turns     how long it lasts (validated to be positive at load time)
+     * @param attribute  the attribute to touch
+     * @param percent    the magnitude; {@code < 0} produces a debuff
+     * @param turns      how long it lasts (validated at load time; ignored when {@code permanent})
+     * @param permanent  {@code true} = "for the rest of the battle", i.e. never ticked
+     * @param maxStacks  how many copies may accumulate; {@code 1} = replace on re-application
      */
-    private static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns) {
+    private static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns,
+                                                 boolean permanent, int maxStacks) {
         boolean debuff = percent < 0;
-        if (attribute.isPercent) {
-            return debuff
-                    ? StatModifierBuff.flatDebuff(attribute, percent, turns)
-                    : StatModifierBuff.flatBuff(attribute, percent, turns);
-        }
-        return debuff
-                ? StatModifierBuff.percentDebuff(attribute, percent, turns)
-                : StatModifierBuff.percentBuff(attribute, percent, turns);
+        // The sign is carried by `percent` itself (a negative value), which is what the original
+        // percentBuff/flatBuff/… factories produced; only the modifier kind depends on the attribute.
+        return StatModifierBuff.of(attribute, attribute.isPercent ? "pure" : "add_percent", percent,
+                debuff ? "debuff" : "buff", turns, false, permanent, maxStacks);
     }
 
     /**
@@ -458,22 +488,92 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Validates that a {@code MODIFY_ATTR} effect declares how long the buff lasts.
+     * Validates that a {@code MODIFY_ATTR} effect declares how long the buff lasts — <b>exactly one</b>
+     * of {@code turns} and {@code permanent}.
      *
-     * <p>There is deliberately no default: an omitted duration would be either "forever" (wrong:
-     * every buff in this game expires) or a number this class invented. Making the author write it
-     * is the same call as {@code damage_param} having no default.
+     * <p>There is deliberately no default: an omitted duration would be either "forever" (wrong: most
+     * buffs in this game expire) or a number this class invented. Making the author write it is the
+     * same call as {@code damage_param} having no default.
+     *
+     * <p>Stating <b>both</b> is rejected for the same reason a typo is: the two answers disagree, and
+     * silently letting one win would produce a rule that does not do what its text says.
      */
-    private static void requireTurns(EffectSpec effect, String op, TriggerSpec spec) {
+    private static void requireDuration(EffectSpec effect, String op, TriggerSpec spec) {
+        boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
+        if (permanent) {
+            if (effect.getTurns() != null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " has both \"turns\" (" + effect.getTurns()
+                                + ") and \"permanent\": true; they are two different durations and only "
+                                + "one may be stated (source: " + spec.getSource() + ")");
+            }
+            return;
+        }
         if (effect.getTurns() == null) {
             throw new IllegalArgumentException(
-                    "Op " + op + " requires \"turns\" (how long the modifier lasts); there is no "
-                            + "default (source: " + spec.getSource() + ")");
+                    "Op " + op + " requires \"turns\" (how long the modifier lasts) or \"permanent\": "
+                            + "true (until the battle ends); there is no default "
+                            + "(source: " + spec.getSource() + ")");
         }
         if (effect.getTurns() <= 0) {
             throw new IllegalArgumentException(
                     "Op " + op + " has a non-positive \"turns\" (" + effect.getTurns()
-                            + "); such a buff would expire before it could do anything "
+                            + "); such a buff would expire before it could do anything. Use "
+                            + "\"permanent\": true for an effect with no turn limit "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates the optional stack cap of a {@code MODIFY_ATTR} effect <b>at load time</b>.
+     *
+     * <p>Same discipline as the rest of the vocabulary ("reject loudly at load, naming the phase"): a
+     * cap of {@code 0} would create a modifier that never applies, a negative one is meaningless, and a
+     * misspelled argument name would otherwise be ignored by Gson and quietly leave the rule
+     * non-stacking — the exact "rule fires, nothing accumulates" symptom the author would never notice.
+     *
+     * <p>Also rejects the two spellings being stated at once, and any use of the argument on an op that
+     * has no stacking concept.
+     */
+    private static void requireStackCap(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getMaxStacks() != null && effect.getStacks() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states both \"max_stacks\" and its alias \"stacks\"; use one "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        Integer cap = effect.stackCap();
+        if (cap == null) {
+            return;
+        }
+        if (cap <= 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has a non-positive stack cap (" + cap
+                            + "); such a modifier would never apply (source: " + spec.getSource() + ")");
+        }
+        if (cap > Constant.MAX_STACKS_LIMIT) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has a stack cap of " + cap + ", above the engine's limit of "
+                            + Constant.MAX_STACKS_LIMIT + " (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Rejects the stacking / "until the battle ends" arguments on ops that do not have those concepts.
+     *
+     * <p>A Gson field is simply {@code null} when the JSON omits it, which means an argument written on
+     * the <b>wrong op</b> is silently ignored — the author sees the rule load and the effect never
+     * stack. That is the same class of silent failure the closed op vocabulary exists to prevent, so the
+     * arguments are checked here rather than being read only by {@code MODIFY_ATTR}.
+     */
+    private static void requireNoStackArguments(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getMaxStacks() != null || effect.getStacks() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " does not support \"max_stacks\"/\"stacks\"; only MODIFY_ATTR "
+                            + "accumulates (source: " + spec.getSource() + ")");
+        }
+        if (Boolean.TRUE.equals(effect.getPermanent())) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " does not support \"permanent\"; only MODIFY_ATTR has a duration "
                             + "(source: " + spec.getSource() + ")");
         }
     }

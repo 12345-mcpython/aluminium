@@ -238,9 +238,13 @@ Damage = skillBaseValue
 | `SkillPointGainedEvent` | `onSkillPointGained(battle, amount)` | 策略真的入账后 → `Battle` 广播 | **只我方** |
 | `SkillPointSpentEvent` | `onSkillPointSpent(battle, amount)` | 策略真的花掉后 → `Battle` 广播 | **只我方** |
 
+**触发器表专用事件（不是新的 buff 接口）**：`TURN_START` / `TAKING_HIT` 只有
+`TriggerEvent` 一侧，**没有**对应的 `XxxEvent` 接口 —— 见 §4.6「`TURN_START` 与 `MoveEvent` 的关系」。
+
 **为什么"回合开始"没有单独事件**：`MoveEvent.beforeMove/afterMove` 已经表达它，
 再加一层是重复的抽象（`EventBusTest.turnBoundariesAreStillMoveEvent` 把这条钉住，
-防止以后有人再加一个 `TurnStartEvent`）。
+防止以后有人再加一个 `TurnStartEvent`）。⚠ 这条**只管 buff 接口**：`TriggerEvent.TURN_START`
+是给**数据**用的（JSON 规则没法 implement 一个 Java 接口），两者不是一回事，见 §4.6。
 
 ### 4.1 广播口径（统一，别再造第三种写法）
 
@@ -265,6 +269,8 @@ dispatch(consumer, 直接相关方...)
 | `KillEvent` | **不看** `countsAsAttack`（与击杀回能同口径）：附加伤害/真伤/DOT 补刀击杀**也发**。目标已死再挨打、无敌期间都不发。⚠ 见 §4.5「被写错的一条验收标准」 |
 | `BreakEvent` | 只在**击破那一刻**发一次 —— 已击破的敌人继续挨打（超击破路径）不会重复发 |
 | `SkillPointGained`/`Spent` | **没花出去就不算消耗**：战技点不足、出手不成立时**不发**（否则米沙/花火那类"每消耗 1 点"的计数器会为没发生的消耗记账）。已满时普攻实际入账 0 → 也不发 |
+| `TriggerEvent.TURN_START`（**无 buff 接口**） | `Battle.beforeMove()`：该单位 buff tick **之后**、`MoveEvent.beforeMove` **之前**。`actor` = 轮到的角色，`target` **也**是它（"回合开始时"的两种写法等价，写哪种都不会哑掉）。**一次回合发一次**（额外回合也算一次）。⚠ 这不是新的 buff 接口 —— 回合边界对 buff 仍然是 `MoveEvent`（见 §4.6） |
+| `TriggerEvent.TAKING_HIT`（**无 buff 接口**） | `Battle.applyDamage`：一次伤害实例**落在活着的、非无敌的目标身上**就发（被盾全额吸收**也算**）。⚠ **与 `HP_LOST` 是两件事**：`HP_LOST` 的口径是"真的掉了血"（`hpLoss > 0` 才发），`TAKING_HIT` 的口径是"挨打了"。遗器/天赋里"受到攻击后"要的是后者 —— 用前者会让带盾角色永远不叠层。`actor` = 伤害来源，`target` = 被打的人（"我被打" = `target == self`），投递口径与 `HP_LOST` 相同（`fireTriggersForAlly`，敌方主体不发） |
 
 ### 4.3 其余关键语义
 
@@ -348,10 +354,22 @@ target == self    这件事发生在我身上   ← 克拉拉「受到攻击后�
 target != self    发生在我方的别人身上
 hit_count > 0     这次攻击打中了至少 1 个目标
 hit_count == 2    精确命中数
+hp_percent <= 0.5 我自己的血量比例（0.5 = 50%）← 风雪交加 4 件套「回合开始时，若生命百分比 ≤ 50%」
 ```
 
-左右可以互换（`0 < hit_count` 也成立）。**变量是封闭集合**：写错变量名
-（例如 `hp < 50`）在**加载时**就报错，而不是永远静默地判定为 false。
+左右可以互换（`0 < hit_count`、`0.5 >= hp_percent` 也成立）。**变量是封闭集合**：写错变量名
+在**加载时**就报错，报错信息会列出**全部**已知变量名（由集合本身排序生成，不是手写的，
+所以加变量时消息不会落后于解析器）。
+
+> ⚠ **`hp_percent` 读的是"主人"（触发规则所属角色）自己的血量**，不是事件里的谁 ——
+> 它是关于"我"的事实，所以没有任何事件需要携带它。空主人 / 最大生命为 0 → `NaN` →
+> 一切比较为 false（不成立就是"不触发"，不是"按 0% 触发"）。
+
+> ⚠ **`actor` 与 `target` 是两件事，混用是最容易犯的错。**
+> `actor` 是"谁干的"，`target` 是"发生在谁身上"。**我被打中时，`actor` 是敌人**，
+> 所以克拉拉的反击必须写 `target == self`；写成 `self`（或 `actor == self`）
+> 是在说"敌人动手时也算我动手"，永远不成立。加载期的变量校验抓不到这个
+> —— 两个名字都合法 —— 只能靠 §4.7 那条"拆掉条件后测试必须变红"来守。
 
 > ⚠ **`actor` 与 `target` 是两件事，混用是最容易犯的错。**
 > `actor` 是"谁干的"，`target` 是"发生在谁身上"。**我被打中时，`actor` 是敌人**，
@@ -370,7 +388,7 @@ hit_count == 2    精确命中数
 | `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持） | ✅ |
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
-| `MODIFY_ATTR` | `attribute` / `percent` / `turns`，可选 `target` | ✅（P10-3） |
+| `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 二选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
 | `APPLY_BUFF` | `buff` / `turns` | ☐ P10-3 |
 | `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
 
@@ -413,9 +431,65 @@ all_allies       我方全体（别名 party）                ← 「我方全�
     口径与 `RelicSuit.appendTo` 一致（"其余 `isPercent` 属性按百分点值处理"）。
 - **正负号决定 buff 还是 debuff**：`percent < 0` 走 `DEBUFF` 那一半。这不是修饰 ——
   它决定了 modifier 落在属性的哪一半，所以「攻击力 +50%」和「攻击力 −30%」能同时挂在一个人身上、各自移除，而不是互相顶掉。
-- `turns` **没有默认值**（同 `damage_param` 的理由：引擎不该替内容编一个数）。
+- **时长必须写且只能写一个**：`turns`（N 个回合）或 `permanent: true`（**整场战斗**）。
+  两个都不写 → 加载时拒绝（同 `damage_param` 的理由：引擎不该替内容编一个数）；
+  两个都写 → 也拒绝（两个答案互相矛盾，让引擎挑一个等于让规则和文本不一致）。
+  ⚠ `turns: 0` 仍是错的，报错会**点名 `permanent`**，因为作者想要的显然就是"没有回合上限"。
 - 四个 `*_PERCENT` 变体**在加载时被拒** —— 它们是 `AttributeBuilder` 的输入键、不是运行时属性
   （`getAttribute` 对它们返回 `null`），挂 buff 会"看起来生效但什么都没变"。
+- `max_stacks`（别名 `stacks`，**两个都写会被拒**）让重复施加**累加**而不是刷新，
+  上限由它给出；不写就是 1，也就是本项目一直以来的"同名 buff 覆盖"。
+  上限为 0/负数、超过 `Constant.MAX_STACKS_LIMIT` 都在加载时被拒。
+  ⚠ 这两个新参数写在 `MODIFY_ATTR` **以外**的 op 上也会被拒 —— Gson 对不认识的字段只会
+  留 `null`，不检查的话"规则照常加载、效果永远不叠"又成了那种不报错的空操作。
+
+#### `permanent` 与 `max_stacks` 的落地形态 ⚠（P10-3 后半）
+
+**"整场战斗"是标志位，不是一个大数字。** `remainingDuration` 是个 `int`，
+`BuffManager.processBuffTick` 每回合减一 —— 写成 `Integer.MAX_VALUE` 只是"很久"，
+而且**仍在倒计时**，总有一天会到期。所以 `AbstractBuff` 多了一个 `permanent` 标志，
+`processBuffTick` 对**永久 buff 整个跳过**：它的时长不会被读，也不会漂移，
+只能被显式移除（驱散 / 死亡 / `clearAll`）。
+
+**叠层是 opt-in 的，而且不碰 `isSameKind`。** 这是本节最容易做错的地方：
+`StatModifierBuff.isSameKind` 的语义是"同名再上一次该不该**覆盖**"，而
+`BuffManagerTest.sameKindBuffRefreshesInsteadOfStacking` /
+`BuffRuleTest.theSameBuffAgainRefreshesInsteadOfStacking` 把"该覆盖"钉住了。
+所以叠层走的是**另一个谓词**：
+
+```java
+isStackable()          // maxStacks > 1 才为 true，默认 false
+stackGroupKey()        // 同一组才能互相叠；(attribute, modifierType, sourceRole) —— 与 isSameKind 同一元组
+```
+
+`BuffManager.addBuff` 对 `isStackable()` 的 buff 走另一条路（`addStackable`）：
+数一下同组已有几层，**到上限就什么也不做**，否则照常挂上去。
+
+- **为什么到上限是"什么都不做"**：另外两种选择都不对 —— "淘汰最旧的一层"是滑动窗口，
+  一个"最多 5 层"的效果永远达不到文本写的最大效果；"刷新已有层的时长"是另一种机制
+  （"再上一次会延长时间"），对"整场战斗"这种没有时长可刷新的情况尤其错。
+- **每一层都是普通 buff 实例**（各有自己的 `id` 和自己的 modifier），所以
+  `removeBuff` / 到期 / `clearAll` 都是**精确地摘掉一层**，属性回到"剩下几层该有的值"，
+  没有残渣 —— 与 `BuffRuleTest.expiryRestoresTheOriginalValueExactly` 同一条口径。
+  `BuffManager.countBuffs` / `removeOneBuff` 是给"现在几层了 / 消耗一层"用的查询口
+  （当前只有测试在用 —— 触发器表还**没有**"消耗一层"的 op，见 `F-10` 的"仍缺什么"），
+  仍然**不发** `getBuffs()`（P1-7 的决定）。
+
+**两个规则写同一件事时叠层是共享的**（105 的"攻击**或**受击"就靠这个）：
+`max_stacks` 按 `stackGroupKey` 分组，与"哪条规则触发的"无关。
+
+#### `TURN_START` 与 `MoveEvent` 的关系 ⚠
+
+`EventBusTest.turnBoundariesAreStillMoveEvent` 钉住的是**"不要再加一个 `TurnStartEvent` 接口"**，
+而 `TriggerEvent.TURN_START` 加的是**数据的订阅能力**，两者不是一回事：
+
+| | buff 接口 | 触发器表事件 |
+|---|---|---|
+| 谁用 | Java 里 `implements MoveEvent` 的 buff | `resources/**/*.json` 里的 `"on": "TURN_START"` |
+| 为什么不能互相替代 | JSON 规则没法 implement 一个 Java 接口 | buff 接口拿不到"某条数据规则" |
+| 挂在哪 | `MoveEvent.beforeMove/afterMove`（不变） | `Battle.beforeMove()` 里 `fireTriggers(TURN_START, actor, actor, 0, 0)` |
+
+所以这次**没有**新增任何 buff 接口，`MoveEvent` 的语义一个字没动。
 
 #### 两个必须区分的口径（本项目实测踩到）
 
@@ -449,7 +523,10 @@ SkillExecutor.execute
 `ENERGY_GAINED`（`applyEnergyGain`）、`HP_LOST` / `KILL`（`applyDamage`）、
 `HEALED`（`heal`）、`BREAK`（`reduceToughness`）、
 `SKILL_POINT_GAINED` / `SKILL_POINT_SPENT`（战技点入账/消耗）。
-**仍未接线**：`TURN_START` / `TAKING_HIT`（引用它们的数据在加载时就会被拒）。
+**事件接线现状**：`TriggerEvent` 里的**每一个**值现在都有发出点（`TURN_START` 与 `TAKING_HIT`
+在 P10-3 后半挂上），由 `TriggerTableTest.everyDeclaredTriggerEventIsEmitted` 钉住 ——
+声明了却没有发出点的事件对作者是个陷阱，加了值而忘了接线必须让测试变红。
+（加载时拒绝未接线事件的通道仍然在，只是当前没有数据能触发它。）
 
 **遗器套装规则走的是同一条通道**：`resources/relic_sets/<setId>.json` 与角色文件同形，
 只是按件数阈值分组（`{"4": [ … ]}`），由 `data.RelicTriggerTables` 懒加载，
@@ -1350,8 +1427,11 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 
 `BuffManager`（每个 `CanHit` 一个）持有 `List<AbstractBuff>`。
 
-- `addBuff(buff)`：先移除**同类**旧 buff（`isSameKind` = `getClass()` 相同）并调其 `removeBuff`，
+- `addBuff(buff)`：普通 buff 先移除**同类**旧 buff（`isSameKind`）并调其 `removeBuff`，
   然后写入持有者（`setOwner`）、加入列表、调 `applyEffect`。
+  ⚠ **叠层 buff（`isStackable()`）走另一条路**（`addStackable`）：不移除同类，
+  而是数够 `maxStacks()` 层就**拒绝新的**，否则再挂一层 —— 默认（不声明上限）行为一个字没变。
+  见 §4.6「`permanent` 与 `max_stacks` 的落地形态」。
 - `removeBuff(buff)`：按**身份**移除（`AbstractBuff` 不重写 `equals`）并调 `removeBuff`。
 - `canAct()`：`blocked` 标志 + 任一 buff 的 `canAct()` 为 false ⇒ 不能行动（控制效果）。
 
@@ -1369,8 +1449,11 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 
 ### 10.3 时长与 tick 时机 ✅
 
-- `AbstractBuff(duration, isEarlyBuff)`：`isEarlyBuff=true` 的在 `beforeMove()` 递减，
+- `AbstractBuff(duration, isEarlyBuff[, permanent])`：`isEarlyBuff=true` 的在 `beforeMove()` 递减，
   `false` 的在 `afterMove()` 递减；每个拥有者回合**恰好 tick 一次**。
+- **`permanent = true` 的 buff 完全不 tick**（`processBuffTick` 直接跳过）：这是"整场战斗"
+  的落地形态 —— 不是"一个很大的回合数"，而是一个**永远不会被读到的**回合数。
+  它只能被显式移除（驱散 / 死亡 / `clearAll`）。
 - 到期在 `processBuffTick` 里用 `removeIf` 移除；若到期的 buff 让 `canAct()` 为 false，
   置 `blocked = true`（"晕眩最后一回合仍然挡住行动"）。
 - ⚠️ `blocked` 只在 `beforeMove()` 开头清零，所以**只对 early buff 生效**：
@@ -1380,6 +1463,7 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 ### 10.4 查询口 ✅
 
 `BuffManager.hasBuff(Class<? extends AbstractBuff>)` —— 按 `getClass()` 精确匹配、`null` 返 false。
+`countBuffs(Class)` / `removeOneBuff(Class)` 是叠层用的两个延伸口（"现在几层" / "消耗一层"）。
 **不提供 `getBuffs()`**：遍历与判定留在 manager 内部，避免外部改列表导致 CME。
 
 ### 10.5 现存 buff 实现
@@ -1387,9 +1471,11 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 | 类 | 类型 | 说明 |
 |---|---|---|
 | `BoostDamageBuff` | 属性型 | `ALL_DAMAGE_TYPE_BOOST` 加 `rate`（平值），用 `id` 精确摘除 |
+| `StatModifierBuff` | 属性型 | **通用**属性 buff/debuff（`MODIFY_ATTR` 的落地形态）：(属性, modifier 种类, 数值, 时长或 `permanent`, 可选 `maxStacks`)。`isSameKind` = (属性, modifier 种类, buff/debuff) 三元组，`stackGroupKey()` 用同一个三元组决定谁能和谁叠 |
 | `VulnerabilityBuff` | 注入型 | 易伤，受击方负面，`ModifierSource.DEBUFF` |
 | `ReductionBuff` | 注入型 | 减伤，受击方增益，`ModifierSource.BUFF` |
 | `StunBuff` | 控制 | early buff，`canAct() == false` |
+| `SpeedBoostBuff` / `SuperBreakBuff` / `TauntBuff` | 属性/注入 | 早于 `StatModifierBuff` 的专用类，见各自 Javadoc |
 | `TestBuff` / `TestBuff1` | 测试替身 | 只打日志 |
 | `WeaknessBuff` | ❌ 不存在 | 只有 `DamageHookTest` 里的内嵌测试替身（攻击方侧负面的代表） |
 
