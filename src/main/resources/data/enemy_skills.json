@@ -15,7 +15,16 @@
         "  multiplier   倍率：伤害 base = 敌人攻击力 x multiplier",
         "  hits         段数（每段独立结算、独立判定暴击）",
         "  damage_type  伤害类型，字符串见 DamageType.fromString（normal / skill / ...）",
+        "  effect       技能形状：SingleAttack / AoEAttack / Blast（见 SkillEffectType.fromString）。",
+        "               省略 = SingleAttack。AoEAttack 打我方全体；Blast 打主目标及其左右相邻。",
+        "               段数落在【每一个】被形状打到的目标上（2 段 AoE 打 3 人 = 每人各 2 段）。",
         "  guessed      true = 倍率是猜的",
+        "",
+        "⚠⚠ hits 是【段数】，不是【目标数】。ROADMAP 的 P9-1 计划里同名字段是「目标数，0=全体」，",
+        "两者【不可】合并：本表这些条目是按段数写的（8013010「连续踏击」hits=2 指同一目标打 2 段）。",
+        "真表落地时若把 hits 改指目标数，现有每只怪的行为都会变而【没有任何测试会红】——",
+        "所以目标数改用 effect 表达（加法式的，默认值等于旧行为），段数语义由",
+        "EnemySkillFullTest 从出货侧钉住。",
         "",
         "倍率取值的依据（只为让数值量级合理，不是复刻）：",
         "  1.0   —— 常规杂兵的单体普攻。",
@@ -33,6 +42,7 @@
             "multiplier": 1.0,
             "hits": 1,
             "damage_type": "normal",
+            "effect": "SingleAttack",
             "guessed": true
         },
         "8013010": {
@@ -42,6 +52,7 @@
             "multiplier": 1.0,
             "hits": 2,
             "damage_type": "normal",
+            "effect": "SingleAttack",
             "guessed": true
         },
         "8032010": {
@@ -51,6 +62,7 @@
             "multiplier": 1.0,
             "hits": 1,
             "damage_type": "normal",
+            "effect": "SingleAttack",
             "guessed": true
         },
         "8002040": {
@@ -60,6 +72,7 @@
             "multiplier": 0.6,
             "hits": 1,
             "damage_type": "normal",
+            "effect": "SingleAttack",
             "guessed": true
         },
         "8001010": {
@@ -69,6 +82,7 @@
             "multiplier": 1.0,
             "hits": 1,
             "damage_type": "normal",
+            "effect": "SingleAttack",
             "guessed": true
         }
     }

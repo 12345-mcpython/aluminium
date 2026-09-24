@@ -86,6 +86,7 @@
 | 击破/能量 | `BREAKING_EFFECT` `ENERGY_REGENERATION_RATE` |
 | 元素增伤（7 个） | `PHYSICAL_` `FIRE_` `ICE_` `THUNDER_` `WIND_` `QUANTUM_` `IMAGINARY_DAMAGE_BOOST` |
 | 通用 | `ALL_DAMAGE_TYPE_BOOST` |
+| 追加攻击专属 | `FOLLOW_UP_DAMAGE_BOOST`（只在 `DamageType.ADDITIONAL` 时进增伤区） |
 | 穿透 | `DAMAGE_PENETRATION`（抗性区用） `DEFENCE_IGNORE`（防御区用） |
 | 欢愉 | `ELATION_DAMAGE_BOOST` ⚠️定义了但全仓库无读取者 |
 
@@ -179,7 +180,10 @@ Damage = skillBaseValue
 
 `Battle.assemble` 固定 5 步：
 
-1. **增伤区**：`getBoostByElement(element)` 拿元素增伤属性 + `ALL_DAMAGE_TYPE_BOOST`。
+1. **增伤区**：`getBoostByElement(element)` 拿元素增伤属性 + `ALL_DAMAGE_TYPE_BOOST`；
+   若 `damage.getType() == ADDITIONAL`（追加攻击）再叠加 `FOLLOW_UP_DAMAGE_BOOST`。
+   ⚠ **"追加攻击专属增伤"必须是一条独立属性**，不能拿 `ALL_DAMAGE_TYPE_BOOST` 顶替 ——
+   后者会把普攻/战技/终结技也一起抬高，而遗器套装 115 的文案只说 Follow-Up ATK。
 2. **暴击区**：仅当 `type.isCrittable() && !damage.isCritFixed()` 时掷骰
    （`critRate > 0 && rng.nextDouble() < critRate`）。**这是全引擎唯一的随机点。**
 3. **防御区**：攻击者等级 / 受击者防御 / 攻击者 `DEFENCE_IGNORE`。
