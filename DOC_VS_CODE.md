@@ -17,12 +17,15 @@
 
 新写的 `ROADMAP.md` v3 逐条核对过，**未发现与代码/数据不符的断言**。已核实的事实：
 
+> ⚠ **这张表是 2026-09-23 的快照，不是现状。** 后续任务已经改掉了下面两行，
+> 已在行内标出；其余各行仍然成立。
+
 | 断言 | 结论 |
 |---|---|
 | `Main` 的入口是 `public static void main()`（无参） | ✅ 相符 |
-| `relic_sets.json` 未装载 | ✅ 相符（`Constant` 里唯一提到它的地方是本轮新加的 javadoc） |
+| `relic_sets.json` 未装载 | ~~✅ 相符~~ → **已变**：现已装载，2/4 件套数值效果生效（见 `F-2` 与本文件 `F-9` 之后的记录） |
 | `elation_basic_level_damage.json` 从未被加载 | ✅ 相符（`Constant` 里 0 处引用） |
-| `StageFactory.temporaryTeam()` 仍在（P8-5 未做） | ✅ 相符 |
+| `StageFactory.temporaryTeam()` 仍在（P8-5 未做） | ~~✅ 相符~~ → **已变**：P8-5 已删除，并有反射测试防止它回来 |
 | `Summon` 全项目没有 `new Summon(...)` | ✅ 相符 |
 | `enemy_skills.json` 只覆盖 5 只怪 | ✅ 相符 |
 | 93 个角色文档 / `aluminium_texts` 路径 | ✅ 相符 |
@@ -580,9 +583,12 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 - **证据**：`RELICS.md` 过客 4 件套「战斗开始时，立即为我方恢复 1 个战技点」
   → 穿它的队伍开局 **4** 点；两个角色穿就是 **5** 点。
   （这条也与"常规开局 3"互为印证：正因为基础是 3，+1 才有意义。）
-- **现状的根因**：**遗器套装效果整体没有实现** —— `relic_sets.json` 连装载都没装载
-  （`Constant` 只装了 `main_attribute.json` / `sub_attribute.json`）。
-- **归属**：P10-3（Buff 体系完善）或遗器套装的独立任务，不是 P8-4 的尾巴。
+- **现状的根因**：**那条套装效果是"具名 ability"，引擎没有执行通道** ——
+  ⚠ 不是"遗器没装载"了：`relic_sets.json` **已装载**、2/4 件套的**数值**效果**已生效**
+  （`RelicSetTest`），`Constant` 也早已装了 `main_attribute.json` / `sub_attribute.json`。
+  92 条效果里 **57 条纯数值 / 35 条具名 ability**，`Effect.hasAbility()` 暴露、测试钉住这个切分。
+- **归属**：给套装 ability 一条执行通道（可复用 P10-3 的 buff 体系 + 触发器表），
+  不是"遗器数据装载"。不是 P8-4 的尾巴。
 - **风险**：低到中（属于"没实现"，不是"算错"）。
 
 ### F-3 ⚠ 「普攻 +1」是一刀切，强化普攻有例外 —— **这条会让引擎算错**
