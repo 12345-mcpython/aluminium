@@ -655,19 +655,43 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 
 ### P9-5 Boss 机制（phase 换招 / 受击反击 / 控制免疫）
 
+> **⚠ 第 3 条（控制免疫）是一条假缺口** —— 它**已经实现并且已经有测试**，不需要再做。
+> 见下面的"核对结果"。本条只保留**真正还没做**的两项。
+
 - **涉及文件**：`models/Enemy.java`、新建 `models/buffs/CounterMechanic.java`、`Main.java`、新建 `test/BossMechanicTest.java`
 - **怎么做**：
     1. `Enemy.phase`：HP 阈值切技能列表（用 `condition` 表达）。
     2. 受击反击：用 `DamageEvent` → 追加一段 `DamageType.ADDITIONAL` + `notCountsAsAttack()`，
        **反击目标 = 该段的 `damage.getAttacker()`**（"施放技能的个体"，不一定等于角色本人）。
-    3. 控制免疫：`Enemy.isImmuneTo(resistKey)` 查 `debuffResist`；奥钦 `STAT_CTRL: 0.5` → P6-1 的
-       `hitChance` 传 `"STAT_CTRL"` 自然半减。⚠ **key 要精确匹配**（冰锋是 `STAT_CTRL_Frozen=1`）。
+       > ⚠ **不是一行代码**：`DamageEvent.onDamage` 是在结算**之前**往这一击里塞乘区用的，
+       > 反击要的是"这一击结算**之后**"的钩子 —— 那是 `HpLossEvent.onHpLoss(..., source, amount)`。
+       > 并且**必须自带递归护栏**：反击本身造成掉血 → 若对方也带反击就会乒乓，
+       > 而这条路径**不经过** `Battle.fireTriggers`，所以 `MAX_TRIGGER_DEPTH` **拦不住它**
+       > （触发器版的反击能拦住，是因为它走 `applyDamage` → `fireTriggers`）。
+    3. ~~控制免疫~~ —— ✅ **已实现，见下。**
     4. ⚠ **阶段推进绝不能用"0 血不死"实现**：`takeDamage` 在 HP≤0 时立刻 `death = true`。
        要锁血就用 `setInvulnerable(true)` 再**显式重置 HP**；否则要么阶段被跳过，要么**鞭尸**。
        多血条同样按"打空一段 → invulnerable → 重置 HP"。
-- **验收**：`BossMechanicTest`：HP 降到 50% 以下换招；受击反击段 `getCountsAsAttack() == false`；
-  冰锋对冻结免疫。
+- **验收**：`BossMechanicTest`：HP 降到 50% 以下换招；受击反击段 `getCountsAsAttack() == false`。
 - **依赖**：P9-2、P1-7、P6-1
+
+**核对结果（2026-09-24）：控制免疫已经是 P6-1 的一部分，不需要新代码。**
+
+`Battle.hitChance(caster, target, baseChance, specificResistKey)` 里已经有这段：
+
+```
+chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 抵抗)
+```
+
+`specificResistKey` 查的就是 `Enemy.debuffResist`，所以冰锋的 `{"STAT_CTRL_Frozen": 1}`
+让 `(1 - 1) = 0` → **完全免疫**，与原文描述逐字一致。**并且已经被测试钉住**
+（`HitResistTest`）：`冰锋.getDebuffResist().get("STAT_CTRL_Frozen") == 1.0`、
+`hitChance(..., "STAT_CTRL_Frozen") == 0`、别的 key 不免疫、
+`tryApplyDebuff(..., "STAT_CTRL_Frozen")` **端到端返回 false**。
+
+> 所以计划里那句"`Enemy.isImmuneTo(resistKey)`"是**不需要的方法名** —— 免疫不需要一个新方法，
+> 它就是"具体抵抗 = 1"这一种情形，走同一条概率公式即可。**加一个 `isImmuneTo` 只会是第二套判据。**
+> （这条与"负数抵抗会被当成 0 而不是增伤"是同一处口径，见 `engine.md` §6。）
 
 ---
 
@@ -687,10 +711,13 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 ### P10-2 控制异常状态机
 
 - **怎么做**：`ControlBuff extends AbstractBuff`（冻结/眩晕 → `canAct() == false`；禁锢/纠缠靠推条）；
-  `BuffManager.hasControl()`；冻结期受伤害 +30%（示例值）；施加方走 P6-1 的 `hitChance` +
-  **先查 `isImmuneTo`**（P9-5）。
-- **验收**：`ControlTest`：冰锋被冻结 → `hitChance == 0`；普通怪 → 跳回合后恢复；禁锢 → 延迟 30%。
-- **依赖**：P6-1、P9-5、P4-4
+  `BuffManager.hasControl()`；冻结期受伤害 +30%（示例值）；施加方走 P6-1 的 `hitChance`，
+  把具体抵抗 key（如 `"STAT_CTRL_Frozen"`）**直接传给 `hitChance` 的第 4 个参数**即可 ——
+  ⚠ **没有也不需要 `isImmuneTo`**（原计划里那句是假缺口，见 P9-5 的核对结果）。
+- **验收**：`ControlTest`：普通怪 → 跳回合后恢复；禁锢 → 延迟 30%。
+  > ⚠ "冰锋被冻结 → `hitChance == 0`" **不再作为本任务的验收项** ——
+  > 它**已经实现且已有测试**（`HitResistTest`），列在这里只会让人以为还要做一遍。
+- **依赖**：P6-1、P4-4
 
 ### P10-3 Buff 体系完善（属性类 + 刷新规则）🚧 前半已落地
 
