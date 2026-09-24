@@ -88,20 +88,53 @@ public final class SkillExecutor {
         }
         // P8-7: the same moment, delivered to the data-driven trigger tables.
         //
-        // Two events are derived from a cast, because characters distinguish them in their text:
-        //   SKILL_CAST   "when <someone> casts a skill"  -- owner filters with `actor == self`
-        //   ALLY_ATTACK  "after an ally attacks"          -- owner filters with `actor != self`,
-        //                                                     and can count `hit_count`
-        // They fire together here because a cast is the only attack the engine performs today;
-        // if a non-attack cast (a heal, say) ever needs to stay out of ALLY_ATTACK, the split
-        // belongs here.
+        // Three events are derived from a cast, because the game's text distinguishes them:
+        //   ULT_CAST     "after the wearer uses their Ultimate"  -- owner filters with `actor == self`
+        //   SKILL_CAST   "when <someone> uses a skill"           -- owner filters with `actor == self`
+        //   ALLY_ATTACK  "after an ally attacks"                 -- owner filters with `actor != self`,
+        //                                                           and can count `hit_count`
+        // "Is this an ultimate" is read from the **parsed skill data** (`SkillCategory.ULTRA`), never
+        // from the skill's name or id: the data is the only place that knows, and a new ultimate must
+        // not need an engine change.
+        //
+        // ULT_CAST and SKILL_CAST are **mutually exclusive**. They have to be: a data rule saying
+        // "when the wearer uses their Skill" must not also fire on the ultimate, and the condition DSL
+        // has no variable for "which kind of cast this was" (it only knows actor / target / hit_count).
+        // So the split is made here, at the one place that knows the cast, rather than in the data.
+        // ALLY_ATTACK is **not** part of that split: an ultimate that lands is still an attack.
+        //
         // `actor` = the caster. `target` is left null on purpose: a cast can hit several targets at
         // once, so there is no single subject to hand over -- rules that care about who was hit use
         // `hit_count`, and the per-target events (HP_LOST etc.) carry their own subject.
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, user, null, hits.size(), 0);
+        boolean ultimate = isUltimate(skill);
+        if (ultimate) {
+            battle.fireTriggers(TriggerEvent.ULT_CAST, user, null, hits.size(), 0);
+        } else {
+            battle.fireTriggers(TriggerEvent.SKILL_CAST, user, null, hits.size(), 0);
+        }
         if (!hits.isEmpty()) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, null, hits.size(), 0);
         }
+    }
+
+    /**
+     * Whether a cast is the caster's Ultimate, read from the parsed skill data.
+     *
+     * <p>The category comes from {@code skills.json}'s {@code attack_type} through
+     * {@link SkillData#getCategory()} / {@link SkillCategory#fromString(String)} — the same single
+     * mapping every other "what kind of skill is this" branch uses (see {@code SkillCategory}'s class
+     * Javadoc for why a bare-string comparison is banned). A skill whose data is missing (an
+     * {@code EnemySkill}, a hand-made placeholder) is **not** an ultimate: those have no data to
+     * testify, and guessing from the slot would make the answer depend on how the skill was built.
+     *
+     * @param skill the skill being cast
+     * @return {@code true} only when the data says {@link SkillCategory#ULTRA}
+     */
+    private static boolean isUltimate(Skill skill) {
+        if (skill == null || skill.getData() == null) {
+            return false;
+        }
+        return skill.getData().getCategory() == SkillCategory.ULTRA;
     }
 
     /**

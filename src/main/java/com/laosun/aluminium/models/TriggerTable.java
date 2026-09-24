@@ -77,6 +77,54 @@ public class TriggerTable {
         return byEvent.isEmpty();
     }
 
+    /**
+     * This table's rules followed by another table's — one table with both sets of mechanics.
+     *
+     * <p><b>Why this exists.</b> A character's effective mechanics are not always in one file: the
+     * character's own {@code resources/characters/<cid>.json} supplies its kit, and every relic set
+     * worn in sufficient numbers supplies its own rules
+     * ({@code resources/relic_sets/<setId>.json}). The assembly point
+     * ({@code CharacterFactory}) needs one table on {@link Character#getTriggerTable()}, and the
+     * alternative — teaching {@code Battle} to consult several tables — would spread the composition
+     * across the hot path instead of doing it once, at build time.
+     *
+     * <p>Order is <b>this table first</b>, then the other's, per event, and it is preserved. Nothing
+     * in the engine depends on it today (effects run in the order written <em>within</em> a rule), but
+     * "the character's own rules come before the equipment's" is the order a reader expects.
+     *
+     * <p>Either side may be {@code null} or empty, in which case the other is returned unchanged — an
+     * unequipped character therefore behaves exactly as it did before relic rules existed.
+     *
+     * @param other the table to append (may be {@code null})
+     * @return the merged table; this instance when {@code other} is null or empty
+     */
+    public TriggerTable plus(TriggerTable other) {
+        if (other == null || other.isEmpty()) {
+            return this;
+        }
+        if (isEmpty()) {
+            return other;
+        }
+        TriggerTable merged = new TriggerTable(cid, List.of());
+        copyRulesInto(merged);
+        other.copyRulesInto(merged);
+        return merged;
+    }
+
+    /**
+     * Copies this table's compiled rules into another table, preserving per-event order.
+     *
+     * <p>Private because {@link #plus} is the only legitimate caller: going through {@code plus} keeps
+     * the "validated rules only" invariant, since a {@link CompiledRule} can only be produced by the
+     * constructor that validates it.
+     */
+    private void copyRulesInto(TriggerTable target) {
+        for (Map.Entry<TriggerEvent, List<CompiledRule>> entry : byEvent.entrySet()) {
+            target.byEvent.computeIfAbsent(entry.getKey(), key -> new ArrayList<>())
+                    .addAll(entry.getValue());
+        }
+    }
+
     /** How many rules subscribe to the given event. */
     public int ruleCount(TriggerEvent event) {
         return byEvent.getOrDefault(event, List.of()).size();

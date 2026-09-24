@@ -564,6 +564,14 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 > 并收掉 `Main` 的两条手搓路径）。`F-9` 同时也是一条**已生效的错值**：
 > demo 里 Natasha 的治疗用错了缩放属性。
 > 触发器侧的 buff 能力（`StatModifierBuff` + `MODIFY_ATTR`）已经不受它影响，可以先用于角色天赋。
+>
+> **又补记（P10-3 后半：套装 ability 有了执行通道）**：新增 **`F-10`**。遗器套装的具名 ability
+> **不需要第二个解释器** —— 它本来就是"当 <事件>，做 <引擎已有的事>"，即触发器表，
+> 所以套装规则与角色规则**同一份 JSON 形状**（`resources/relic_sets/<setId>.json`，
+> 按件数阈值分组），由 `data.RelicTriggerTables` 懒加载、在装配点并入角色自己的表。
+> 35 条纯 ability 里 **4 条**已能用现有 op 词表**精确**表达并写盘，其余 **31 条**逐条登记在
+> `_unmodelled.json`（含缺的能力），由测试钉住"两条路必居其一"。
+> 同时 `F-2` 的引擎侧前置**已经消失**：过客 4 件套开局 +1 已能执行并有用例断言（3 → 4）。
 
 ### F-1 战技点上限不是恒定值，且引擎无"改队伍级资源上限"的口子
 
@@ -589,7 +597,16 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
   92 条效果里 **57 条纯数值 / 35 条具名 ability**，`Effect.hasAbility()` 暴露、测试钉住这个切分。
 - **归属**：给套装 ability 一条执行通道（可复用 P10-3 的 buff 体系 + 触发器表），
   不是"遗器数据装载"。不是 P8-4 的尾巴。
-- **风险**：低到中（属于"没实现"，不是"算错"）。
+- **✅ 进展（P10-3 后半）**：**已解锁**。过客 4 件套写成
+  `resources/relic_sets/101.json` 的一条 `BATTLE_START + GAIN_SKILL_POINT` 规则，
+  与角色规则同一条通道（触发器表），在装配点 `CharacterFactory` 并入角色自己的表。
+  两条断言把它钉住：`RelicAbilityBattleTest.openingSkillPointsIncludeThePasserbyFourPiece`
+  （不穿 = 3 / 一人穿 = 4 / 两人穿 = 5，上限 5）与
+  `theOpeningValueIsAssignedBeforeBattleStartFires`（开局值在 `Battle` 构造时就写好，
+  `BATTLE_START` 由 `startBattle()` 之后才发 —— 顺序反了这条效果就会被覆盖掉，
+  所以顺序本身也是一条断言）。⚠ `F-1`（上限可变）与 `F-7`（`hasSkillPoint` 语义）
+  **不在这条进展里**：它们要的是"改队伍级上限 / 策略"的口子，与套装 ability 无关。
+- **风险**：低到中（属于"没实现"，不是"算错"）。现在只剩"逐条接线"的内容活，见 `F-10`。
 
 ### F-3 ⚠ 「普攻 +1」是一刀切，强化普攻有例外 —— **这条会让引擎算错**
 
@@ -756,6 +773,61 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 
 ---
 
+### F-10 套装具名 ability 只有一部分能用 op 词表表达（P10-3 后半）
+
+- **现状**：`relic_sets.json` 的 92 条效果里，**64 条带具名 ability**（其中 **35 条是纯 ability**、
+  29 条是"数值 + ability"）。纯 ability 的那 35 条里，**4 条**已经能用现有 op 词表**精确**表达
+  并且已经写盘，**31 条**还不能。
+- **执行通道不是新建的**：ability 的文本形状恰好就是触发器表（"当 <事件>，做 <引擎已有的事>"），
+  所以套装规则与角色规则**同一份 JSON 形状**，只是多一层**件数阈值分组**：
+
+  ```json
+  { "4": [ { "on": "BATTLE_START", "do": [ { "op": "GAIN_SKILL_POINT", "amount": 1 } ],
+             "source": "...", "note": "..." } ] }
+  ```
+
+  `TriggerSpec` **没有**为遗器长出新字段（阈值属于分组，不属于规则本身），也没有新增解释器、
+  新增 op、按套装写 Java 类。加载器 `data.RelicTriggerTables`（懒加载 / 缓存 / 缺文件 = 空 /
+  文件坏了就抛）与 `data.TriggerTables` 同形；装配点是 `CharacterFactory`，把"角色自己的表"
+  与"穿够件数的每套的表"合并，`Character.triggerTable` 永远非 null。
+- **已表达（4 条，全部取自 `param`）**：
+  | 套装 | ability | 规则 |
+  |---|---|---|
+  | 101/4 过客 | `Ability51011` | `BATTLE_START` → `GAIN_SKILL_POINT` 1 |
+  | 104/4 猎人 | `Ability51041` | `ULT_CAST` → `MODIFY_ATTR` `CRIT_ATTACK` 0.25 / 2 回合 |
+  | 109/4 乐队 | `Ability51091` | `SKILL_CAST` → `MODIFY_ATTR` `ATTACK` 0.2 / 1 回合 |
+  | 110/4 鹰 | `Ability51101` | `ULT_CAST` → `ADVANCE` 0.25 |
+
+  为了表达 104/109，同时接线了 `ULT_CAST` 事件（`SkillExecutor.broadcastSkillCast`，
+  按**解析出的** `SkillCategory.ULTRA` 判定），并让 `ULT_CAST` 与 `SKILL_CAST` **互斥** ——
+  条件 DSL 里没有"这次施放是战技还是终结技"这个变量，所以"施放战技时"只能靠发出端分开，
+  否则 109 会连带在终结技上触发。`UltCastTriggerTest` 钉住这条契约。
+- **还写不出来的 31 条**：逐条登记在 `resources/relic_sets/_unmodelled.json`（套装 / 件数 /
+  ability 名 / **缺什么能力**），并由
+  `RelicTriggerTableTest.everyAbilityOnlyBonusIsEitherAuthoredOrRegistered` 钉住
+  "**35 条里每一条要么有规则文件、要么在登记表里**" —— 这就是"没写"与"忘了"的分界线。
+  31 条按缺的能力聚类（比逐条更好动手）：
+  1. **事件**：`TURN_START` / `TAKING_HIT` 仍未接线（"回合开始时…"、"被击中时…"）；
+     没有"我方对敌方造成伤害"事件（`HP_LOST` 只在我方掉血时广播）；没有追加攻击事件
+     （`ALLY_ATTACK` 是任意攻击）；施放事件**没有单一 target**，所以"对友方施放终结技/战技"
+     这类条件表达不了（114/118/121）。
+  2. **条件**：目标身上的状态（有 debuff / 被禁锢 / 量子弱点 / 减防 / DoT 层数 / 是否持有
+     "自己给的护盾"）；自身属性阈值（速度 / 击破特攻 / 生命上限 / 能量上限 / 生命百分比）；
+     场上我方人数。
+  3. **持续与计数**：叠层计数（"最多叠 #2 层"）、"整场战斗"（`MODIFY_ATTR` 的 `turns`
+     必须为正，没有无限时长）、"下一次攻击 / 下一次战技"（消耗型）、"每回合只能触发一次"（冷却）。
+  4. **数值模型**：盾量放大（"提高护盾量 #1%"）、按伤害类型或技能类型加伤、
+     触发式无视防御、按资源/层数缩放的效果量。
+- **归属**：**不是"等某个大系统"，而是逐条等具体能力**（事件 / 条件变量 / 计数与消耗型持续 /
+  少数新 op）。每一条都已经带 `reason`，可以按性价比增量接线，不需要一次性补齐。
+  ⚠ **不要用近似值冒充**：登记表的存在就是为了"宁可记着，也不要写一条看起来对、实际错的规则"。
+- **另注（不在本条口径内）**：29 条"数值 + ability"的效果，其**数值**已经生效，
+  但它们的 ability 那一半（多为 2 件套的"条件满足时额外 +X%"）同样没有执行 ——
+  切分仍由 `RelicSetTest.everyEffectIsEitherStatsOrANamedAbility` 记录。
+- **风险**：低（未表达的仍是"没生效"，不是"算错"）。
+
+---
+
 ## 建议的处理顺序
 
 1. **A-1**（P5-2 的 `getBuffs`）：动手 P5 之前必须决定 API 形态 —— 是按类型取实例，还是把嘲讽下沉进 manager。
@@ -771,9 +843,13 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
    与强化普攻的战技点增量是两回事）—— 所以它现在是一条**独立**的数据补全任务。
 7. **~~F-6 / F-8~~** ✅ 已在 2026-09-23 重构中解决
    （`SkillCategory` 类型化 + `SkillPointPolicy` 抽出，各带护栏测试）。
-8. **F-1 / F-2 / F-7**：接口已经就位（`new StandardSkillPointPolicy(max, initial)`），
-   缺的是"**谁在什么时候改**" —— 上限类要等光锥/角色（P8-7），
-   开局类要等遗器套装（P10-3），`F-7` 要等花火落地。三条一起做成本最低。
-9. **F-4**（角色级供点）：**前置已全部就位**（P8-6 事件 + P8-7 `GAIN_SKILL_POINT`），
+8. **`F-1` / `F-7`**：接口已经就位（`new StandardSkillPointPolicy(max, initial)`），
+   缺的是"**谁在什么时候改**" —— 上限类要等光锥/角色（P8-7），`F-7` 要等花火落地。
+   **~~`F-2`~~ 已经解锁**（P10-3 后半：套装 ability 走触发器表，过客 4 件套开局 3 → 4 有用例钉住）。
+9. **`F-4`**（角色级供点）：**前置已全部就位**（P8-6 事件 + P8-7 `GAIN_SKILL_POINT`），
    现在纯粹是"把 10 个角色写成 JSON"的内容活，不再是引擎任务。
-   **F-5**（敌人技能数据）：等 P9-1，不需要现在处理。
+   **`F-5`**（敌人技能数据）：等 P9-1，不需要现在处理。
+10. **`F-10`**（套装 ability）：**通道已经就位**（`resources/relic_sets/<setId>.json` +
+    `data.RelicTriggerTables` + 装配点合并），35 条里 4 条已表达、31 条带原因登记。
+    剩下的是"按缺的能力增量接线"：先做最便宜的一类（例如把 `TURN_START` / `TAKING_HIT`
+    两个事件挂上，一次能解锁 105/106/113/131 里的一部分）。

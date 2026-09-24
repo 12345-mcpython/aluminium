@@ -30,11 +30,16 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  * {@link AttributeType#fromGameProperty(String)} — a property name the engine cannot map throws with the
  * name instead of being skipped.
  *
- * <p>⚠ <b>What is still not applied</b>: many 4-piece bonuses are an <em>ability</em> rather than stats
- * ("at the start of the battle, immediately regenerates 1 Skill Point"). The engine has no ability
- * interpreter, so such an effect contributes nothing to a sheet — it is registered, not silently forgotten,
- * by {@link RelicSet.Effect#hasAbility()} and by {@code RelicSetTest}'s "every effect is either stats or a
- * named ability" invariant.
+ * <p>⚠ <b>What is still not applied</b>: a 4-piece bonus that is an <em>ability</em> rather than stats
+ * ("at the start of the battle, immediately regenerates 1 Skill Point") is not a stat-sheet effect and
+ * this class contributes nothing for it. Such abilities are executed by <b>trigger rules</b>
+ * ({@code resources/relic_sets/<setId>.json}, loaded by
+ * {@link com.laosun.aluminium.data.RelicTriggerTables} and attached at the assembly point), not here —
+ * see that class. An ability whose text the current op vocabulary cannot express is registered as an
+ * explicit gap ({@code relic_sets/_unmodelled.json}, reported as {@code F-10} in {@code DOC_VS_CODE.md})
+ * rather than being silently forgotten; {@link RelicSet.Effect#hasAbility()} and
+ * {@code RelicSetTest}'s "every effect is either stats or a named ability" invariant keep the split
+ * visible.
  */
 public final class RelicSuit implements Cloneable {
     /**
@@ -190,8 +195,18 @@ public final class RelicSuit implements Cloneable {
     /**
      * How many pieces of each set are worn, keyed by set id. Relics that belong to no set
      * ({@link Constant#RELIC_SET_NONE}) are left out: they can never complete a set.
+     *
+     * <p>Public because the count is not only the bonus maths' private business: the assembly point
+     * ({@code CharacterFactory}) asks the same question to decide which relic sets' <b>trigger
+     * rules</b> a character carries ({@code RelicTriggerTables}). Deriving it twice -- once here and
+     * once there -- would be two definitions of "four pieces of a set" that could drift apart.
+     *
+     * <p>A fresh map on every call (there is no cached state to invalidate when a relic is swapped),
+     * so the caller may mutate it freely.
+     *
+     * @return set id → worn piece count; empty for an empty suit
      */
-    private Int2IntOpenHashMap piecesPerSet() {
+    public Int2IntOpenHashMap piecesPerSet() {
         Int2IntOpenHashMap piecesPerSet = new Int2IntOpenHashMap();
         for (Relic relic : total) {
             if (relic == null || relic.setId == Constant.RELIC_SET_NONE) {
