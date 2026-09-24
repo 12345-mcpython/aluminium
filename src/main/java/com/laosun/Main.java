@@ -237,48 +237,44 @@ public class Main {
     }
 
     /**
-     * Healing (P6-2): base amount = ATK × multiplier, then run through "healing boost × incoming healing boost".
+     * Healing: pick who to heal, then let the <b>engine</b> compute and apply it.
      *
-     * <p>The engine only provides {@code Battle.heal(healer, target, base)}; who to pick as the target and which
-     * parameter slot to take the multiplier from (the healing skill's {@code param_list[0][0]}) is the **caller's**
-     * business.
+     * <p>⚠ This method used to do the arithmetic itself — {@code ATK × param_list[0][0]} — and that was
+     * simply wrong for the character it was used on: Natasha's heal scales off her <b>Max HP</b>, and
+     * the flat {@code +70} term was dropped entirely. It also read the parameter slot by hand, which is
+     * exactly the "engine depending on its caller" shape P10-3 set out to remove.
+     *
+     * <p>What is left is the one thing that genuinely belongs to the caller: <b>who</b> to heal. The
+     * amount, the scaling attribute and the target of the effect all come from
+     * {@code data/skill_effects.json} via {@code SkillExecutor}.
      */
     private static void healTurn(Battle battle, Character hero, Skill skill) {
         Character patient = lowestHpRateCharacter(battle);
         if (patient == null) {
             return;
         }
-        double multiplier = skill.getData().getSkills()
-                .get(Math.min(skill.getLevel(), skill.getData().getSkills().size()) - 1).getFirst();
-        double base = hero.getAttribute(AttributeType.ATTACK).get() * multiplier;
-        System.out.println("        → using [Skill: Heal], target " + patient.getName());
         double before = patient.getCurrentHp();
-        double healed = battle.heal(hero, patient, base);
-        System.out.println("        → base heal " + fmt(base) + " → actual restore " + fmt(healed)
-                + ": " + patient.getName() + " HP " + fmt(before) + " → " + fmt(patient.getCurrentHp())
-                + "/" + fmt(patient.getMaxHp()));
-        hero.gainEnergy(com.laosun.aluminium.models.energy.EnergyGain.normal(30));
+        System.out.println("        → using [Skill: Heal], target " + patient.getName());
+        skill.execute(battle, hero, List.of(patient));      // engine computes + applies + grants energy
+        System.out.println("        → " + patient.getName() + " HP " + fmt(before) + " → "
+                + fmt(patient.getCurrentHp()) + "/" + fmt(patient.getMaxHp()));
     }
 
     /**
-     * Shield (P6-3): base amount = DEF × multiplier (March 7th's skill uses {@code param_list[0][0]} as the shield
-     * coefficient).
+     * Shield: pick who to shield, then let the engine compute and apply it.
      *
-     * <p>The engine only provides {@code Battle.grantShield(target, amount)}, the amount is computed by the caller.
+     * <p>Same rewrite as {@link #healTurn} — the {@code DEF × param} arithmetic and the manual energy
+     * grant used to live here. The scaling attribute is data ({@code scale: "def"} for the shields that
+     * are unambiguous), not a convention this method should assume.
      */
     private static void shieldTurn(Battle battle, Character hero, Skill skill) {
         Character ally = lowestHpRateCharacter(battle);
         if (ally == null) {
             return;
         }
-        double multiplier = skill.getData().getSkills()
-                .get(Math.min(skill.getLevel(), skill.getData().getSkills().size()) - 1).getFirst();
-        double base = hero.getAttribute(AttributeType.DEFENCE).get() * multiplier;
         System.out.println("        → using [Skill: Shield], target " + ally.getName());
-        double shield = battle.grantShield(ally, base);
-        System.out.println("        → shield amount " + fmt(shield) + " (base " + fmt(base) + ") → "
-                + ally.getName() + " shield " + fmt(ally.getShield()));
-        hero.gainEnergy(com.laosun.aluminium.models.energy.EnergyGain.normal(30));
+        skill.execute(battle, hero, List.of(ally));
+        System.out.println("        → " + ally.getName() + " shield " + fmt(ally.getShield()));
     }
 
     /**

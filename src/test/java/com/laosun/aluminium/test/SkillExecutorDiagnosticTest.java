@@ -164,28 +164,55 @@ public class SkillExecutorDiagnosticTest {
     }
 
     /**
-     * A heal whose parameter row mixes the immediate heal with a heal-over-time is <b>refused and
-     * reported</b>, not summed into a wrong number.
+     * A heal whose row mixes the immediate heal with a heal-over-time applies <b>only the immediate
+     * part</b>.
      *
      * <p>Natasha's skill is {@code [0.07, 0.048, 2, 70, 48]}: index 0/3 are the heal and 1/4 are the
-     * per-turn part. The table lists all four, so until the generator learns to separate them the
-     * engine must decline. This test is the guard that says "silence is not an option" — when the
-     * generator is fixed, this test should be replaced by an amount assertion.
+     * per-turn part. The generator splits the description at the clause that introduces the per-turn
+     * amount and exports only {@code [0:p, 3:f]}; summing all four would apply the heal <i>and</i> the
+     * regen at once, which looks entirely plausible and is wrong.
      */
     @Test
-    public void ambiguousHealEntriesAreRefusedRatherThanSummed() {
+    public void mixedHealRowsApplyOnlyTheImmediatePart() {
         Character natasha = CharacterFactory.create(1105, 80);
         Battle battle = newBattle(natasha);
         natasha.takeDamage(natasha.getMaxHp() / 2);
         double hpBefore = natasha.getCurrentHp();
+        double expected = 0.07 * natasha.getMaxHp() + 70;    // level 1 -> [0.07, ...] + 70
+        double withRegen = expected + 0.048 * natasha.getMaxHp() + 48;
+        Assertions.assertTrue(hpBefore + withRegen < natasha.getMaxHp(),
+                "the gap must be bigger than even the regen-included amount, or the cap hides the difference");
+
+        battle.castImmediate(new DefaultSkill(1105, 2, 1), natasha, List.of(natasha));
+
+        double healed = natasha.getCurrentHp() - hpBefore;
+        Assertions.assertEquals(expected, healed, 1.0,
+                "only the immediate heal (7% of Max HP + 70); got " + healed);
+        Assertions.assertTrue(healed < withRegen - 1.0,
+                "the per-turn part must NOT be included; healing " + healed + " would mean it was summed in");
+    }
+
+    /**
+     * An entry that still mixes several percentage terms is <b>refused and reported</b> rather than
+     * summed into a wrong number.
+     *
+     * <p>March 7th's (三月七) skill is {@code [0:p, 2:p, 3:f]} after clause-scoping — two separate
+     * percentage terms survive in one sentence, and nothing in the data says which is the shield, so
+     * the engine declines. This is the guard that says "silence is not an option"; when the generator
+     * can separate them this test should become an amount assertion.
+     */
+    @Test
+    public void ambiguousEntriesAreRefusedRatherThanSummed() {
+        Character march7th = CharacterFactory.create(1001, 80);
+        Battle battle = newBattle(march7th);
 
         String out = capture(() -> {
             SkillExecutor.setLogNotDispatched(true);
-            battle.castImmediate(new DefaultSkill(1105, 2, 1), natasha, List.of(natasha));
+            battle.castImmediate(new DefaultSkill(1001, 2, 1), march7th, List.of(march7th));
         });
 
-        Assertions.assertEquals(hpBefore, natasha.getCurrentHp(), EPS,
-                "a two-percent entry must not be applied; summing the heal and the regen would look plausible and be wrong");
+        Assertions.assertEquals(0, march7th.getShield(), EPS,
+                "a two-percent entry must not be applied; summing them would look plausible and be wrong");
         Assertions.assertTrue(out.contains("NOT DISPATCHED"),
                 "and it must say so rather than stay silent; actual: " + out);
     }

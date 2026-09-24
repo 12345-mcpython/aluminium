@@ -81,19 +81,11 @@
                     "kind": "percent"
                 },
                 {
-                    "index": 1,
-                    "kind": "percent"
-                },
-                {
                     "index": 3,
-                    "kind": "flat"
-                },
-                {
-                    "index": 4,
                     "kind": "flat"
                 }
             ],
-            "turns_param": 2,
+            "turns_param": null,
             "formula": "HealByHealerMaxHP",
             "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
         },
@@ -120,14 +112,6 @@
             "effect": "Restore",
             "scale": "healer_max_hp",
             "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                },
                 {
                     "index": 3,
                     "kind": "percent"
@@ -173,14 +157,6 @@
                 {
                     "index": 2,
                     "kind": "flat"
-                },
-                {
-                    "index": 3,
-                    "kind": "percent"
-                },
-                {
-                    "index": 4,
-                    "kind": "flat"
                 }
             ],
             "turns_param": 0,
@@ -216,13 +192,9 @@
                 {
                     "index": 1,
                     "kind": "flat"
-                },
-                {
-                    "index": 2,
-                    "kind": "percent"
                 }
             ],
-            "turns_param": 3,
+            "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
         },
@@ -317,14 +289,6 @@
                 {
                     "index": 1,
                     "kind": "flat"
-                },
-                {
-                    "index": 2,
-                    "kind": "percent"
-                },
-                {
-                    "index": 3,
-                    "kind": "flat"
                 }
             ],
             "turns_param": null,
@@ -344,7 +308,7 @@
                     "kind": "flat"
                 }
             ],
-            "turns_param": 2,
+            "turns_param": null,
             "formula": "HealByHealerMaxHP",
             "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
         },
@@ -366,18 +330,6 @@
                 },
                 {
                     "index": 1,
-                    "kind": "flat"
-                },
-                {
-                    "index": 2,
-                    "kind": "percent"
-                },
-                {
-                    "index": 3,
-                    "kind": "flat"
-                },
-                {
-                    "index": 4,
                     "kind": "flat"
                 }
             ],
@@ -451,14 +403,6 @@
                     "kind": "flat"
                 },
                 {
-                    "index": 2,
-                    "kind": "percent"
-                },
-                {
-                    "index": 3,
-                    "kind": "flat"
-                },
-                {
                     "index": 4,
                     "kind": "flat"
                 }
@@ -472,27 +416,15 @@
             "scale": "healer_max_hp",
             "params": [
                 {
-                    "index": 1,
-                    "kind": "flat"
-                },
-                {
                     "index": 2,
                     "kind": "percent"
                 },
                 {
                     "index": 4,
                     "kind": "flat"
-                },
-                {
-                    "index": 5,
-                    "kind": "percent"
-                },
-                {
-                    "index": 6,
-                    "kind": "flat"
                 }
             ],
-            "turns_param": 0,
+            "turns_param": null,
             "formula": null,
             "source": "SkillDesc 占位符"
         }
@@ -509,10 +441,6 @@
                 {
                     "index": 1,
                     "kind": "flat"
-                },
-                {
-                    "index": 3,
-                    "kind": "percent"
                 }
             ],
             "turns_param": 2,
@@ -586,10 +514,6 @@
             "effect": "Restore",
             "scale": null,
             "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
                 {
                     "index": 1,
                     "kind": "flat"
@@ -670,10 +594,6 @@
                 {
                     "index": 1,
                     "kind": "flat"
-                },
-                {
-                    "index": 3,
-                    "kind": "percent"
                 }
             ],
             "turns_param": 2,
@@ -691,10 +611,6 @@
                 {
                     "index": 1,
                     "kind": "flat"
-                },
-                {
-                    "index": 3,
-                    "kind": "percent"
                 },
                 {
                     "index": 4,
