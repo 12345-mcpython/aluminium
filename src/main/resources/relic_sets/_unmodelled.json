@@ -57,12 +57,12 @@
     {
       "require": 2,
       "ability": "Ability51150",
-      "reason": "\"Increases the DMG dealt by Follow-Up ATK by 20%.\" Needs a follow-up-attack event (ALLY_ATTACK is any attack, so a rule hung on it would also fire for basic attacks, skills and ultimates) and a follow-up-specific damage bonus."
+      "reason": "\"Increases the DMG dealt by Follow-Up ATK by 20%.\" The follow-up event now exists (FOLLOW_UP), so the remaining blocker is the bonus itself: it is specific to follow-up attacks, and no AttributeType expresses 'damage dealt by follow-up attacks' (ALL_DAMAGE_TYPE_BOOST is every damage type, the element boosts are per element). Adding one is a damage-pipeline change, not a rule."
     },
     {
       "require": 4,
       "ability": "Ability51151",
-      "reason": "\"When the wearer uses a Follow-Up ATK, increases the wearer's ATK by 6% for every time the Follow-Up ATK deals DMG. This effect can stack up to 8 time(s) and lasts for 3 turn(s). This effect is removed the next time the wearer uses a Follow-Up ATK.\" The stacking counter and the 3-turn duration are now expressible, but the trigger is a Follow-Up ATK (no such event: ALLY_ATTACK is any attack) and the effect needs an explicit 'remove every stack' op, which the op vocabulary does not have."
+      "reason": "\"When the wearer uses a Follow-Up ATK, increases the wearer's ATK by 6% for every time the Follow-Up ATK deals DMG. This effect can stack up to 8 time(s) and lasts for 3 turn(s). This effect is removed the next time the wearer uses a Follow-Up ATK.\" The trigger (FOLLOW_UP), the stacking counter and the 3-turn duration are all expressible now; what is missing is the final clause -- 'removed the next time the wearer uses a Follow-Up ATK' needs an explicit 'drop every stack of this buff' op, and the op vocabulary has none (BuffManager.removeOneBuff exists as the API but nothing exposes it to data)."
     }
   ],
   "116": [
@@ -179,7 +179,7 @@
     {
       "require": 2,
       "ability": "Ability53151",
-      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" The stacking counter is now expressible, but the trigger is a Follow-Up ATK (no such event), the bonus is follow-up-specific (no such attribute) and the 'at 5 stacks, additionally' half needs a threshold condition on the wearer's own stack count."
+      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" The trigger (FOLLOW_UP, filtered with `actor != self` for 'an ally') and the stacking counter are both expressible now. Still blocking: the per-stack bonus is follow-up-specific (no such attribute -- that is a damage-pipeline change), and the 'when there are 5 stacks, additionally ...' half needs a condition on the wearer's own stack count, which the DSL does not have (it reads hp_percent and hit_count)."
     }
   ],
   "321": [
@@ -187,13 +187,6 @@
       "require": 2,
       "ability": "Ability53211",
       "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" The stacking counter is now expressible, but there is no condition on the battlefield's party size (and no memosprite), so the number of stacks cannot be derived from anything."
-    }
-  ],
-  "326": [
-    {
-      "require": 2,
-      "ability": "Ability53261",
-      "reason": "\"When the wearer uses Follow-Up ATK, increases ATK by 24% for 2 turn(s). When an enemy target gets defeated, increases CRIT DMG for all allies by 12% in the current battle. This effect cannot stack.\" The KILL half is expressible -- and so is 'in the current battle' now (`permanent: true`) -- but the Follow-Up ATK half is not (no follow-up event), and half an ability is not the ability, so the whole entry stays registered."
     }
   ],
   "328": [
