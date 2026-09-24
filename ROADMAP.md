@@ -589,7 +589,7 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
     3. `Constant.ENEMY_SKILLS` 的 key 用 monster **template_id**，`EnemyFactory` 按 `cfg.templateId()` 查。
 - **验收**：`EnemySkillDataTest`：条目数、倍率、削韧值与表一致；无条目的怪走兜底普攻。
 
-### P9-2 `EnemySkill` 全效果
+### P9-2 `EnemySkill` 全效果 🚧 形状分派已落地
 
 - **目标**：`EnemySkill` 从 bean 构造，按 effect 复用伤害分派（AOE/BLAST/SINGLE），不再硬编码 ×1.0 单目标。
 - **涉及文件**：`models/EnemySkill.java`、`utils/EnemyFactory.java`、新建 `test/EnemySkillFullTest.java`
@@ -601,6 +601,34 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
     3. `EnemyFactory.create` 挂上 `Constant.ENEMY_SKILLS.get(templateId)` 的全部条目；无表 → 兜底普攻（P5-3 保留）。
 - **验收**：`EnemySkillFullTest`：冰锋战技打 3 人 → 每敌 `attack × 倍率 × 防区`；按 bean 削韧。
 - **依赖**：P9-1、P5-3、P1-8
+
+**实际落地（形状分派，2026-09-24）**：
+
+数据侧新增 `effect` 字段（`SingleAttack` / `AoEAttack` / `Blast`，省略 = `SingleAttack`），
+`EnemySkill` 按形状决定**打到谁**：`AoEAttack` 打我方全体、`Blast` 打主目标及左右相邻
+（**到边界就截断，不回绕**），段数落在**每一个**被打到的目标上。5 条现有条目显式标 `SingleAttack`，
+所以行为与之前逐位相同。`EnemySkillFullTest` 6 条覆盖：默认单目标 / AOE 打全体 / Blast 打相邻 /
+**边界不回绕** / 段数落在每个目标上 / 死者不再挨打。
+
+**变异验证**：把 Blast 的相邻改成取模回绕 → `blastOnTheEdgeCharacterDoesNotWrapAround` 红 ❌。
+
+> ⚠ **一处"两个来源用同一字段名"的陷阱（已写进数据文件的注释）**：
+> `enemy_skills.json` 的 `hits` 是**段数**（8013010「连续踏击」= 同一目标 2 段），
+> 而 P9-1 的计划里同名字段是**目标数（0=全体）**。两者**不可**合并 ——
+> 真表落地时若把 `hits` 改指目标数，现有每只怪的行为都会变而**没有任何测试会红**。
+> 所以目标数改用 `effect` 表达（加法式、默认值等于旧行为），段数语义由
+> `EnemySkillFullTest` 从出货侧钉住。
+
+**仍未做**：
+1. **敌人技能仍不发事件**。`EnemySkill.execute` 走的是 `Battle.applyDamage`，不发
+   `SkillCastEvent`（F-5 与 §3 的"🚧 部分完成"都记着）。⚠ 但**不能简单补一个发射**：
+   条件 DSL 只有 `actor ==/!= self`、**没有阵营变量**，所以一旦让敌人的施放也发
+   `SKILL_CAST`，「当我方施放技能时」这类规则会连带在敌人身上触发 —— 需要先给 DSL 一个
+   阵营条件，或改用"以我为承受者"的事件（`TAKING_HIT` 已经在做这件事）。
+2. `EnemySkill` **仍不持有 bean**、`getData()` 仍为 `null`（F-5）；目标是复用
+   `SkillExecutor` 的伤害分派而不是自成一摊，等上面那条一起做。
+3. 敌人技能**不削韧**：角色没有韧性条，这一条对"敌人打我们"本来就不适用；
+   真正的削韧方向是反过来（我们打敌人的韧性，已经在用）。
 
 ### P9-3 敌方 AI 技能选择器
 
