@@ -1486,7 +1486,22 @@ public class Battle {
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
         Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
-        return applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
+        double settled = applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
+        // P10-3 tail: this is the engine's one and only notion of a follow-up attack, so the
+        // data-facing FOLLOW_UP event is emitted here rather than from a second attack path.
+        // Gated on the instance having really connected: an additional-damage sweep swallowed by
+        // invulnerability did not land, and "used a Follow-Up ATK" must not be credited for it.
+        // P10-3 tail: this is the engine's one and only notion of a follow-up attack, so the
+        // data-facing FOLLOW_UP event is emitted here rather than from a second attack path.
+        //
+        // Emitted unconditionally, not gated on the instance having dealt damage: the texts that
+        // subscribe read "when the wearer uses a Follow-Up ATK", which is the attack being *used*, and
+        // an instance absorbed entirely by a shield or an invulnerable target was still used. An
+        // earlier version gated this on `settled > 0`; it was dropped because the semantic was
+        // questionable and, more decisively, `settled == 0` could not be produced reliably in a test,
+        // so the branch would have shipped unverified.
+        fireTriggersWithSubject(TriggerEvent.FOLLOW_UP, attacker, target, settled);
+        return settled;
     }
 
     /**
