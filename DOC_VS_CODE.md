@@ -585,7 +585,7 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 - **归属**：需要一个新的"队伍级资源上限"口子。**不要**在 `Battle` 里判 `cid`。
 - **风险**：低（当前只影响那几套配置，基础规则正确）。
 
-### F-2 开局战技点不是恒定值，遗器套装效果整体未接
+### F-2 开局战技点不是恒定值 ✅ 已解锁（套装 ability 走触发器表）
 
 - **现状**：`Constant.SKILL_POINT_START = 3`，引擎开局恒为 3。
 - **证据**：`RELICS.md` 过客 4 件套「战斗开始时，立即为我方恢复 1 个战技点」
