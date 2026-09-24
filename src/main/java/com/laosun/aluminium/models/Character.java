@@ -65,11 +65,31 @@ public class Character extends CanHit {
     private int cid;
 
     /**
+     * This character's mechanics, as data (P8-7).
+     *
+     * <p>Never {@code null}: an unregistered character holds {@link TriggerTable#EMPTY}. That way
+     * the interpreter treats "no mechanics" as a no-op instead of every call site null-checking, and
+     * "not registered yet" stays an ordinary state rather than an error.
+     */
+    private TriggerTable triggerTable = TriggerTable.EMPTY;
+
+    /**
      * The relic suit equipped on this character.
      */
     private RelicSuit relicSuit;
     /**
      * The weapon (light cone) equipped on this character.
+     *
+     * <p>⚠ <b>Set this through the builder, not through {@code setWeapon}.</b> The stat-sheet
+     * pipeline consumes the weapon while {@code Builder#build()} runs (the calculator takes it as an
+     * input), so assigning it to an <b>already-built</b> character changes this field but leaves the
+     * sheet stale — the cone would appear equipped while contributing nothing. Use
+     * {@code Character.builder().weapon(...)} or
+     * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int, boolean, Weapon)}.
+     *
+     * <p>The Lombok setter stays only because the field is exposed through {@code @Setter}; it has no
+     * caller in the project, and this note is the guard rail (the mistake is invisible at runtime,
+     * so it cannot be left to "someone will notice").
      */
     private Weapon weapon;
 
@@ -205,6 +225,12 @@ public class Character extends CanHit {
          */
         private Path path;
 
+        /**
+         * The character's trigger table (P8-7); defaults to the empty table, which means
+         * "no mechanics registered" -- an ordinary state, not an error.
+         */
+        private TriggerTable triggerTable = TriggerTable.EMPTY;
+
         private final EnumMap<SkillType, Integer> skillLevel = new EnumMap<>(SkillType.class);
 
         private final EnumMap<SkillType, Skill> customSkills = new EnumMap<>(SkillType.class);
@@ -294,6 +320,20 @@ public class Character extends CanHit {
         }
 
         /**
+         * Attaches the character's trigger table (P8-7).
+         *
+         * <p>This is the assembly point for character mechanics: whoever builds the character (the
+         * factories, or a test) decides which table it gets. The engine never looks a table up by
+         * cid -- which is what keeps `Battle` free of character branches.
+         *
+         * @param triggerTable the table; {@code null} becomes the empty table
+         */
+        public Builder triggerTable(TriggerTable triggerTable) {
+            this.triggerTable = triggerTable == null ? TriggerTable.EMPTY : triggerTable;
+            return this;
+        }
+
+        /**
          * Builds the character with all accumulated configuration.
          *
          * @return the fully computed character
@@ -340,6 +380,10 @@ public class Character extends CanHit {
             // back to 100** — 1407 遐蝶 is the only null in the whole data set, and a fallback would conjure
             // an energy bar for her out of thin air (P3-0 table A).
             character.setMaxEnergy(characterData.maxEnergy() != null ? characterData.maxEnergy() : 0);
+            // P8-7: the character's mechanics as data. Always non-null -- an unregistered character
+            // has the empty table, which is normal (the trigger interpreter treats it as a no-op and
+            // Battle never has to null-check).
+            character.setTriggerTable(triggerTable);
             return character;
         }
 

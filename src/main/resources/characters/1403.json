@@ -1,0 +1,29 @@
+[
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 30
+      }
+    ],
+    "source": "1403 缇宝 trace 1403103 「岔路旁的小石子？」",
+    "note": "Doc text: 「战斗开始时，缇宝恢复30点能量。我方其他目标攻击后，每击中1个目标使缇宝恢复1.50点能量。」 Base value 30, E0."
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "actor != self",
+      "hit_count > 0"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 1.5,
+        "per_target": true
+      }
+    ],
+    "source": "1403 缇宝 trace 1403103 「岔路旁的小石子？」",
+    "note": "1.50 energy PER TARGET HIT, hence per_target:true -- the same attack hitting 3 enemies grants 4.5. 'actor != self' encodes 「我方其他目标」."
+  }
+]

@@ -1,9 +1,11 @@
 package com.laosun.aluminium;
 
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.energy.EnergyGain;
@@ -100,10 +102,20 @@ public class Battle {
      * <p>For explicit sources other than "basic attack +1": techniques, relics (the 4-piece 过客 set),
      * character mechanics.
      *
+     * <p>This is also the **single place** the {@code SKILL_POINT_GAINED} trigger fires from,
+     * whichever way the points were added: the standard policy reports its own in-cast gains to the
+     * listener, and this method reports through the same listener for direct calls. Firing in both
+     * places independently would make a single gain trigger twice.
+     *
      * @param n the number of points to add; does nothing when {@code <= 0}
      */
     public void gainSkillPoint(int n) {
+        int before = skillPointPolicy.getValue();
         skillPointPolicy.gain(n);
+        int gained = skillPointPolicy.getValue() - before;
+        if (gained > 0) {
+            fireTriggers(TriggerEvent.SKILL_POINT_GAINED, null, null, 0, gained);
+        }
     }
 
     /**
@@ -196,6 +208,7 @@ public class Battle {
                 @Override
                 public void onSpent(int amount) {
                     broadcastSkillPointSpent(amount);
+                    fireTriggers(TriggerEvent.SKILL_POINT_SPENT, null, null, 0, amount);
                 }
             });
         }
@@ -265,11 +278,18 @@ public class Battle {
      * "consume the threshold" and "zero out" is ever needed, changing this place and {@link #castUltra} is enough.
      */
     public boolean isUltraReady(CanHit user) {
-        if (user == null || !user.hasEnergyBar()) {
-            return false;                       // no energy bar (e.g. Castorice (遐蝶) 1407) can never cast
+        if (user == null) {
+            return false;
         }
-        double threshold = ultraEnergyCost(user);
-        return user.getCurrentEnergy() >= threshold;
+        // P8-8: the gate is the provider's to decide, not "energy is full". Characters who build a
+        // stack resource instead of energy (Acheron 【残梦】/ Feixiao 【飞黄】/ Cyrene 【追忆】…) become
+        // ready when their resource fills, and their energy stays at 0 by design -- so the old
+        // "must have an energy bar" test would lock them out forever.
+        //
+        // `hasEnergyBar()` is therefore NOT checked here: the default implementation inside
+        // EnergyProvider still applies exactly that rule (plus the threshold), so conventional
+        // characters behave as before, while a stack provider may ignore energy entirely.
+        return user.getEnergyProvider().canCastUltra(user, ultraEnergyCost(user));
     }
 
     /**
@@ -324,6 +344,10 @@ public class Battle {
         for (Signal signal : queue.snapshot()) {
             signal.getCanHit().onBattleStart(this);
         }
+        // P8-7: after the opening hooks, let every combatant's trigger table see BATTLE_START.
+        // Deliberately after `onBattleStart` so an opening buff is already in place when a trigger
+        // reads its own state (e.g. "restore 30 energy at the start of battle").
+        fireTriggers(TriggerEvent.BATTLE_START);
         processRequests();
         checkResult();
     }
@@ -657,9 +681,13 @@ public class Battle {
         // much, whether it counts as an attack).
         if (hpLoss > 0) {
             broadcastHpLoss(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
+            // `actor` = whoever dealt the damage, `target` = the one who lost HP (i.e. the victim).
+            // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
+            fireTriggersForAlly(TriggerEvent.HP_LOST, damage.getAttacker(), target, hpLoss);
         }
         if (died) {
             broadcastKill(damage.getAttacker(), target);
+            fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0);
         }
         grantHitAndKillEnergy(target, damage, died, grant);     // P3-2: hit energy gain / kill energy gain
         // The return value = the damage this hit **actually had effect** with = shield-absorbed + HP really lost.
@@ -688,6 +716,8 @@ public class Battle {
         // P8-6: only emit when the amount actually credited > 0 -- "blocked by the cap" should not count as gaining energy
         if (added > 0) {
             broadcastEnergyGain(target, added);
+            // P8-7: let the data-driven tables see it too (e.g. "when I gain energy, ...").
+            fireTriggersForAlly(TriggerEvent.ENERGY_GAINED, target, target, added);
         }
         return added;
     }
@@ -806,6 +836,7 @@ public class Battle {
         // reaches this line a second time).
         // Placed before damage/delay/DOT/energy: listeners want the moment of "just got broken".
         broadcastBreak(attacker, enemy, element);
+        fireTriggersWithSubject(TriggerEvent.BREAK, attacker, enemy, 0);
         // The break damage is settled right here, so the settled value must be carried out -- it belongs to
         // **this attack**, and dropping it would make AttackEvent.totalDamage miss a whole break chain.
         // KILL_ONLY: the break is extra damage derived from the main instance, so the victim gains no energy
@@ -1069,6 +1100,7 @@ public class Battle {
         // P8-6: only emit when HP was really restored (healing at full HP is 0 and is not a heal event)
         if (healed > 0) {
             broadcastHeal(healer, target, healed);
+            fireTriggersForAlly(TriggerEvent.HEALED, healer, target, healed);
         }
         return healed;
     }
@@ -1213,6 +1245,114 @@ public class Battle {
         for (Character ally : characters) {
             ally.onSkillPointSpent(this, amount);
         }
+    }
+
+    // ==================================================================
+    // P8-7 trigger tables
+    //
+    // The engine fires a named event and each character's data-driven table decides whether to
+    // react. Nothing here knows which character it is looking at -- that is the whole point of the
+    // trigger table (P8-0 three-way split).
+    // ==================================================================
+
+    /**
+     * Depth of nested trigger firing, used only for diagnostics.
+     *
+     * <p>The recursion guard matters because a trigger may itself produce an event that triggers
+     * more tables (heal -> heal buff -> ...). The engine does **not** try to be clever about
+     * cycles; it caps the nesting and reports loudly, so a runaway table is caught rather than
+     * hanging the battle.
+     */
+    private int triggerDepth;
+
+    /** How deep nested trigger firing may go before the engine gives up (see {@link #triggerDepth}). */
+    private static final int MAX_TRIGGER_DEPTH = 8;
+
+    /**
+     * Fires a trigger event with neither actor nor subject (BATTLE_START and similar).
+     *
+     * @param event the event
+     * @return how many rules fired in total
+     */
+    public int fireTriggers(TriggerEvent event) {
+        return fireTriggers(event, null, null, 0, 0);
+    }
+
+    /**
+     * Fires a trigger event to the tables of our characters.
+     *
+     * <p>Every character on our side evaluates the event with itself as {@code self}. Two separate
+     * facts are handed over because characters need both and they are not the same thing:
+     * <ul>
+     *   <li>{@code actor} — who <b>caused</b> the event. "After an ally attacks" is
+     *       {@code actor != self}.</li>
+     *   <li>{@code target} — what it <b>happened to</b>. "After I am hit" is {@code target == self};
+     *       note the actor there is the attacker, not me.</li>
+     * </ul>
+     * Enemies have no tables, so nothing is fired for them.
+     *
+     * @param event    the event that happened
+     * @param actor    who caused it, or {@code null}
+     * @param target   the event's subject, or {@code null}
+     * @param hitCount how many targets an attack connected with (0 when not applicable)
+     * @param amount   the event's magnitude where it has one
+     * @return how many rules fired in total
+     */
+    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount) {
+        if (triggerDepth >= MAX_TRIGGER_DEPTH) {
+            throw new IllegalStateException(
+                    "Trigger recursion exceeded " + MAX_TRIGGER_DEPTH + " levels while firing "
+                            + event.value() + "; a trigger table is probably reacting to its own effect");
+        }
+        triggerDepth++;
+        try {
+            int fired = 0;
+            for (Character ally : characters) {
+                if (ally == null || ally.isDeath()) {
+                    continue;
+                }
+                TriggerTable table = ally.getTriggerTable();
+                if (table == null || table.isEmpty()) {
+                    continue;
+                }
+                fired += TriggerInterpreter.fire(this, table, event,
+                        new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount));
+            }
+            return fired;
+        } finally {
+            triggerDepth--;
+        }
+    }
+
+    /**
+     * Fires an event whose subject is one of our characters (the one who lost HP, was healed, ...).
+     *
+     * <p>The side check is deliberate: an enemy taking damage should not make our characters react,
+     * and enemy events are not ours to data-ise yet (P9 owns monsters).
+     *
+     * @param event  the event
+     * @param actor  who caused it (may be {@code null})
+     * @param target the subject; the call is skipped entirely when this is not one of ours
+     * @return how many rules fired in total
+     */
+    public int fireTriggersForAlly(TriggerEvent event, CanHit actor, CanHit target, double amount) {
+        if (target == null || target.getCamp() != Camp.PLAYER) {
+            return 0;
+        }
+        return fireTriggers(event, actor, target, 0, amount);
+    }
+
+    /**
+     * Fires a trigger event whose subject may be on either side (used where the subject itself is the
+     * point, e.g. an enemy being broken).
+     *
+     * @param event   the event
+     * @param actor   who caused it
+     * @param subject what it happened to
+     * @param amount  the event's magnitude, if any
+     */
+    public int fireTriggersWithSubject(TriggerEvent event, CanHit actor, CanHit subject, double amount) {
+        return fireTriggers(event, actor, subject, 0, amount);
     }
 
     /**

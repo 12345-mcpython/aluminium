@@ -314,6 +314,189 @@ dispatch(consumer, 直接相关方...)
 `additionalDamageKillStillFiresEvent` / `trueDamageKillFiresEvent`），
 并把更正记进 `ROADMAP` P8-6 —— 原计划那句留作对照。
 
+### 4.6 触发器表：角色机制变成数据 ✅（P8-7）
+
+上一节的 11 个事件是**宿主**；这一节是**住在里面的东西**。
+
+角色机制不再写 `XxxTalent.java`，而是一张 JSON 表（`resources/characters/<cid>.json`），
+引擎只做解释：
+
+```
+{ "on": "ALLY_ATTACK",                       ← 订阅哪个事件（TriggerEvent）
+  "when": ["actor != self", "hit_count > 0"], ← 条件（全部成立才触发）
+  "do": [ { "op": "GAIN_ENERGY", "amount": 1.5, "per_target": true } ],
+  "source": "1403 缇宝 trace 1403103",         ← 出处（引擎不读，给人看）
+  "note": "…" }                                ← 为什么是这个数
+```
+
+**四个组件**（职责刻意分开）：
+
+| 类 | 职责 |
+|---|---|
+| `beans.TriggerSpec` / `beans.EffectSpec` | JSON 形状（纯数据，无逻辑） |
+| `models.TriggerTable` | 编译 + 校验 + **匹配**（无副作用，可单测） |
+| `models.TriggerInterpreter` | **执行**效果（唯一碰引擎状态的地方） |
+| `data.TriggerTables` | 按 cid 懒加载 + 缓存 + 容忍"没有文件" |
+
+#### 条件 DSL（故意做小）
+
+```
+self              施放者是"我"（等价于 actor == self）
+actor == self     施放者是我
+actor != self     我方的**别人**动了   ← 知更鸟「我方目标攻击后」
+target == self    这件事发生在我身上   ← 克拉拉「受到攻击后」
+target != self    发生在我方的别人身上
+hit_count > 0     这次攻击打中了至少 1 个目标
+hit_count == 2    精确命中数
+```
+
+左右可以互换（`0 < hit_count` 也成立）。**变量是封闭集合**：写错变量名
+（例如 `hp < 50`）在**加载时**就报错，而不是永远静默地判定为 false。
+
+> ⚠ **`actor` 与 `target` 是两件事，混用是最容易犯的错。**
+> `actor` 是"谁干的"，`target` 是"发生在谁身上"。**我被打中时，`actor` 是敌人**，
+> 所以克拉拉的反击必须写 `target == self`；写成 `self`（或 `actor == self`）
+> 是在说"敌人动手时也算我动手"，永远不成立。加载期的变量校验抓不到这个
+> —— 两个名字都合法 —— 只能靠 §4.7 那条"拆掉条件后测试必须变红"来守。
+
+#### 效果 op 词表（只做引擎已有的能力）
+
+| op | 参数 | 状态 |
+|---|---|---|
+| `GAIN_ENERGY` | `amount`，可选 `per_target` | ✅ |
+| `GAIN_SKILL_POINT` | `amount` | ✅ |
+| `HEAL` / `SHIELD` | `amount`，可选 `target` | ✅ |
+| `EXTRA_TURN` | 可选 `target` | ✅ |
+| `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持） | ✅ |
+| `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
+| `DAMAGE` | `skill` / `damage_param`，可选 `target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
+| `MODIFY_ATTR` | `attribute` / `percent` / `turns` | ☐ 要等 P10-3 的 buff 系统来持有并到期该 modifier |
+| `APPLY_BUFF` | `buff` / `turns` | ☐ P10-3 |
+| `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
+
+> ⚠ **未接线的 op 是在加载时"响亮地"拒绝的**，报错里点名它归哪个阶段。
+> 否则内容作者写了规则、看不到任何反应，却分不清"我的条件写错了"和"引擎压根不发这个事件"。
+
+#### 两个必须区分的口径（本项目实测踩到）
+
+| 角色 | 文本 | 建模 |
+|---|---|---|
+| 知更鸟 1309 天赋 | 「我方目标攻击敌方目标后，额外为自身恢复 **2** 点能量」 | **每次攻击平摊 2 点**，与命中数无关 |
+| 缇宝 1403 行迹 `1403103` | 「我方其他目标攻击后，**每击中 1 个目标**使缇宝恢复 **1.50** 点能量」 | **每命中 1 个目标 1.5 点** ⇒ 打 3 个给 4.5 |
+
+差别就是命中数倍。所以效果有一个**显式**的 `per_target` 开关（默认关）——
+不让解释器"看到攻击事件就自动按命中数放大"，那样写 `2` 的知更鸟会被算成 `2 × 命中数`。
+
+#### 一轮触发是怎么走的
+
+```
+SkillExecutor.execute
+  └─ Battle.fireTriggers(SKILL_CAST, caster, hits, 0)      ← 每次施放
+  └─ Battle.fireTriggers(ALLY_ATTACK, caster, hits, 0)     ← 只在命中了目标时
+        └─ 遍历我方每个角色：拿它自己的表
+              ├─ 用 (self=它, actor=施放者, target=承受者, hit_count) 匹配规则
+              └─ TriggerInterpreter.apply(...) → 真的去 grantEnergy / grantSkillPoint / …
+```
+
+其余事件的挂点：`BATTLE_START`（`startBattle`，在 `onBattleStart` 之后）、
+`ENERGY_GAINED`（`applyEnergyGain`）、`HP_LOST` / `KILL`（`applyDamage`）、
+`HEALED`（`heal`）、`BREAK`（`reduceToughness`）、
+`SKILL_POINT_GAINED` / `SKILL_POINT_SPENT`（战技点入账/消耗）。
+
+**只对我方开火**：敌人的事件不是我们的内容（P9 才管怪物），而且"敌人挨打"不该让
+我方角色被触发两次。带主体的事件用 `fireTriggersForAlly` 做这道阵营判断。
+
+**递归护栏**：触发器产生的效果本身可能再发事件（治疗 → 治疗类 buff → …）。
+引擎不试图聪明地判环，而是**限制嵌套深度**（`MAX_TRIGGER_DEPTH = 8`）并**响亮报错**，
+让跑飞的表被抓住，而不是把战斗挂死。
+
+#### 加载与"没登记"的语义
+
+- **没有文件 = 空表**（`TriggerTable.EMPTY`），这是**正常状态**不是错误 —— 93 个角色
+  目前只数据化了 4 个（缇宝 1403 / 知更鸟 1309 / 克拉拉 1107 / 希儿 1102）。
+  `Character.triggerTable` **永不为 null**，所以调用点不用判空。
+- **文件存在但写得不对 = 抛异常**（未知事件 / 未接线事件 / 条件写错 / op 不存在 /
+  缺必填参数），在**加载那一刻**就炸，而不是等战斗打到一半。
+- **懒加载 + 缓存**：按 cid 首次访问才读 classpath，负结果也缓存。
+  `TriggerTables.loadCount()` 是可观测的，测试据此断言"第二次不再读盘"。
+- 装配点是 `CharacterFactory.create`（P8-0 允许出现 `cid` 的地方之一）。
+
+#### 与 `EnergyProvider` / `SkillPointPolicy` 的分工
+
+| 机制长什么样 | 用什么 | 为什么 |
+|---|---|---|
+| "我放战技时回 30 能量"（**按技能类型查表**就能表达） | `EnergyProvider` | 每人一份、每次施放问一次，最省 |
+| "队友攻击后我回 2 能量"（**要监听别人的事件**） | 触发器表 | provider 的钩子是"自己施放"的，看不到别人的行为 |
+| "X 事件后做一件引擎已有的事"（跨事件、带条件） | 触发器表 | 这就是它的定义 |
+
+> 判定口径（P8-0）：**"在某事件后，做一件引擎已有能力的事" ⇒ 数据（触发器）**；
+> **"需要引擎还不具备的能力" ⇒ 先补引擎**。触发器表**不是**第二套引擎 ——
+> 它的 op 词表严格限制在引擎已有操作上。
+
+### 4.7 天赋与追加攻击：payload 就在天赋槽里 ✅（P8-3）
+
+这一节原本被一个**假前置**卡了很久，结论值得原样记下来。
+
+**假前置**：追加攻击看起来缺一个字段 —— 数据里没有 `is_follow_up`，
+`Config/ConfigAbility` 里也没有类似标记（全库只有 2 个 GridFight 文件含 `FollowUp`），
+槽位 4 的 `attack_type` 还是 `null`。于是"哪个技能算追加攻击"似乎无从判断，
+一度准备手工维护一张表。
+
+**真相**：**不需要那个字段**。追加攻击的 payload 本来就在
+**天赋槽（4）自己的技能数据**里 —— 元素、削韧、每级 `params` 一应俱全，
+唯一缺的是"**什么时候**放"。而"什么时候"正是触发器表提供的东西。
+所以 P8-3 没有新增分类能力，只是给触发器表补了 `DAMAGE` 这一个 op：
+
+| 字段 | 作用 |
+|---|---|
+| `skill` | 从哪个槽取这次攻击（`TALENT` / `BASIC` / …），元素与削韧跟着走 |
+| `damage_param` | 用 `params` 行里的**第几个**数当倍率 |
+| `target` | 打谁（`attacker` = 打回打我的人） |
+| `per_target` / `as_attack` | 见下 |
+
+> ⚠ **`damage_param` 索引是每个技能自己的，绝对不能猜。**
+> 实测：姬子 1003 是 `0`，克拉拉 1107 是 `1`，貊泽 1223 是 `2`，大丽花 1321 是 `2`。
+> 写错索引**不会报错**（只要还在行内就仍是合法 double），只会打出一个借来的数，
+> 所以 `TalentTest.theShippedRuleDeclaresTheRightParameterIndex` 专门断言
+> "出货的这条规则声明的就是 `1`"。
+
+倍率按**技能当前等级**取（`multiplierOf` 用 `skill.getLevel()` 选行），不是硬编码满级。
+文档里的 160% / 140% 都是 **10 级**值，与 `params[x][9]` 对得上（两处独立核对过）。
+
+**结算口径**：走 `Battle.applyAdditionalDamage` → `DamageType.ADDITIONAL` ——
+**计入击杀归属**（所以希儿能靠它拿到额外回合），但**不算"1 次攻击"**：
+目标不回能、不削韧、不发攻击类事件。`as_attack` 字段收下了但**暂时不改变这条路径**
+（引擎目前只有一种附加伤害结算），留作将来"某些追加攻击确实算一次攻击"的开关。
+
+> ⚠ **反噬**：附加伤害造成掉血 → 再次发 `HP_LOST`。两个互相反击的角色会乒乓到
+> `Battle.MAX_TRIGGER_DEPTH` 然后**抛异常**——响亮地失败，不是把战斗挂死。
+
+**两个样本（都是纯 JSON，零 Java 角色类）**：
+
+| 角色 | 规则 | 说明 |
+|---|---|---|
+| 克拉拉 1107 `因为我们是家人` | `on: HP_LOST` + `when: ["target == self"]` → `DAMAGE`(`TALENT`, `damage_param: 1`, `target: "attacker"`) | "**我**是挨打的那个" → 打回去 |
+| 希儿 1102 `再现` | `on: KILL` + `when: ["actor == self"]` → `EXTRA_TURN` | "**我**是击杀者" → 立即再动 |
+
+希儿为什么不是 `DAMAGE`：她的天赋槽是 `Enhance` / stance 0，**本身不带攻击**，
+所以"消灭敌方目标后立即获得 1 个额外回合"只能落到 `EXTRA_TURN`。
+这也正好说明槽位 4 的 `attack_type == null` **不是数据缺失** —— 被动本来就不是一次挥击。
+
+**范围**：93 个角色里 **21 个**的槽位 4 带伤害效果（候选承载者，但**不全是**追加攻击），
+其余 72 个是 buff / 强化。P8-3 只数据化上面这两个代表，剩下的按
+"一次一个 + `source` / `note` 标出处"推进，不批量猜。
+
+**变异验证**（3 处，均确认护栏有效）：
+
+| 变异 | 结果 |
+|---|---|
+| JSON 的 `damage_param` 1 → 0 | `theShippedRuleDeclaresTheRightParameterIndex` 红 ❌ |
+| `when` 里 `target == self` → `actor == self`（把"谁干的"当成"发生在谁身上"） | `claraCountersTheEnemyThatHitHer`、`theShippedRuleRequiresClaraToBeTheVictim`、`theShippedRuleDeclaresTheRightParameterIndex` 红 ❌ |
+| 删掉希儿的 `when`（规则变成无条件） | `seeleDoesNotGetATurnFromATeammatesKill` 红 ❌ |
+
+> 第三条是 P8-3 里最值钱的一次验证：`EXTRA_TURN` 本身工作正常，
+> 只有"条件确实在承重"被证明了，这条规则才算真的对。
+
 ---
 
 ## 5. 行动条（`Queue` / `Signal`）✅
@@ -1383,6 +1566,8 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 - 完整伤害乘区（增伤/易伤/减伤/虚弱/暴击/防御/抗性）+ 唯一结算入口
 - 12 种伤害类型及其"可暴击/吃增伤"规则
 - 11 个事件家族（BattleStart / Move / Damage / Attack / SkillCast / Energy / HpLoss / Heal / Kill / Break / 战技点增减），见 §4
+- 触发器表：角色机制 = 数据（`resources/characters/<cid>.json`），引擎只解释，见 §4.6
+- 层数资源：`Resource` + `ResourceManager` + `EnergyProvider.canCastUltra` 闸门 —— 没有能量条的角色也能开大，见 §23
 - 行动条（绝对时间 + 堆），推条/拉条 API
 - 技能展开：单体/AOE/扩散/弹射 + 每段独立结算
 - 韧性、弱点削韧、击破伤害、击破推条、击破跳回合（**需调用方主动调**）
@@ -1428,7 +1613,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 ## 16. 测试与可验证性
 
-- **47 个测试类 / 403 个用例**（截至 P8-6），全部通过（`.\gradlew.bat test`）。
+- **52 个测试类 / 469 个用例**（截至 P8-3），全部通过（`.\gradlew.bat test`）。
 - 覆盖重心：伤害乘区（`DamageZoneTest` 24 条）、技能展开（`SkillExecutorTest` 13 条）、
   能量（`EnergyTest` 8 + `EnergyBattleTest` 16）、韧性击破（`ToughnessTest` 6 +
   `ToughnessBattleTest` 8 + `BreakDamageTest` 5 + `BreakStateTest` 4 + `DotTest` 6）、
@@ -1446,7 +1631,18 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
   增量/上限/开局，并证明阵营判断确实在策略里）、
   事件契约（`EventBusTest` 22：8 个新事件的时机/次数/过滤条件，
   含四条易错边界 —— **非伤害技能也发施放事件**、**被盾全挡不算掉血**、
-  **没花出去不发消耗事件**、**没有能量条就没有能量事件**）。
+  **没花出去不发消耗事件**、**没有能量条就没有能量事件**）、
+  触发器表（`TriggerTableTest` 20 + `TriggerDataBindingTest` 5：两个真实角色**纯数据**跑通
+  —— 缇宝「开局 +30、每命中 1 目标 +1.5」与知更鸟「队友每次攻击 +2」；
+  并钉住 `per_target` 的"每命中"与知更鸟的"每次攻击"这两种口径不能混）、
+  层数资源（`ResourceTest` 19：manager 增删 / `PARTY` 被拒 / "满了"是**上升沿** /
+  溢出上限 / `HP_LOST` 真实链路 / 两个 op / **资源满 → 开大可用**）、
+  真实队伍（`RealTeamTest` 11：4 人 4 命途 / 元素非 null / 锥的 `type` 对上命途 /
+  锥**真的进面板** / 每次调用给新实例 / `WeaponData.rarity` 绑定没静默失守 / 占位入口已消失）、
+  天赋与追加攻击（`TalentTest` 11：克拉拉受击反击打回**攻击者** / 倍率取自天赋槽的
+  `damage_param` / **`target == self` 与 `actor == self` 不可混用** / 别人挨打她不动 /
+  希儿击杀后额外回合、**队友击杀不给回合**；另钉住两条数据事实 ——
+  "文档百分比 = 10 级值"与"倍率索引因技能而异"）。
 - **可复现性**：`Battle` 接受注入的 `java.util.Random`；全仓库无 `Math.random()`。
   > ⚠️ 但 `Relic.createRandomLevelZero` / `MapUtils` 用的是不可播种的 `ThreadLocalRandom`，
   > 所以"同一份遗器"无法跨进程复现。
@@ -1787,10 +1983,23 @@ Battle battle = StageFactory.load(103201, team, rng); // 自带队伍（P8-5 换
 `EnemyFactory.create(id, level, hardLevelGroup)`，所以同一个怪在不同关卡里不一样强，
 调用方不需要传任何系数。
 
-⚠ **队伍是临时的**：P7-5 时还没有 `CharacterFactory`（P8-1 已提供），所以默认队伍来自
-`StageFactory.temporaryTeam()` —— 3 个 `fromAttributes` 占位角色（速度 100 / 134 / 90，
-带 120 能量上限，否则永远放不出终结技）。它**不是角色**：没有光锥、遗器、真实技能与命途。
-生命周期到 P8-5 为止，那时换成 `CharacterFactory` 造的 4 人真队。
+✅ **队伍是真的**（P8-5 起）：默认队伍来自 `StageFactory.realTeam()` ——
+4 个 `CharacterFactory` 造的真角色（景元 1204 / 希儿 1102 / 克拉拉 1107 / 娜塔莎 1105，
+覆盖 4 个不同命途），每人带一条**本命途**的光锥。
+
+选锥规则是"**稀有度最高，同稀有度取 id 最小**"：只看 id 会选中 3★ 新手锥，对 80 级队伍很怪。
+⚠ 只吃光锥的**面板**，它的被动不生效（那要 P10-3 的 buff 系统）。
+⚠ **没有遗器**：没有可用的遗器实例数据，所以队伍裸装上场。
+
+> ⚠ **光锥必须在 `Character.Builder` 上装，不能建完再 `setWeapon`**：
+> `Calculator` 在 `build()` 里把光锥当**输入**消费，所以对已建好的角色 `setWeapon(...)`
+> 只改字段、**面板不重算** —— 锥"装上了"却一点属性都没加，而且**运行时不报任何异常**。
+> 用 `CharacterFactory.create(cid, level, promoted, weapon)`（装配点）。
+> `Character.weapon` 的字段注释里也写了这条，因为 `setWeapon` 全项目零调用者、纯属陷阱。
+
+（历史：P7-5 时还没有 `CharacterFactory`，默认队曾是 `temporaryTeam()` 的 3 个
+`fromAttributes` 占位角色 —— 没有元素/命途/光锥/真实技能。该入口已在 P8-5 删除，
+并有测试断言 `StageFactory` 不再暴露任何 temporary 方法。）
 
 ---
 
@@ -1834,5 +2043,96 @@ jingYuan.getAggro();       // 75
 是写死的 `DefaultSkill(1001, 1, 1)`——**六个槽位全是槽位 1 的普攻**。这是刻意的：
 它没有 `cid`，查不到真实技能数据；真实角色一律走
 `CharacterFactory.create(cid, level)`（槽位映射见 §7.2）。
-本类**不负责**填技能倍率；天赋之外的追加攻击/召唤物是 P8-3 / P9-4。
+本类**不负责**填技能倍率；天赋触发的追加攻击走 §4.7 的触发器表，
+召唤物与敌人侧的追加攻击归 P9-4。
+
+---
+
+## 23. 层数资源：角色没有能量条怎么办 ✅（P8-8）
+
+> 放在文末而不是插在 §9 能量系统之后：本文的 §6–§22 被多处交叉引用（约 25 处），
+> 插一节会让后面每个编号和引用全部移位。编号连续不是重点，**引用能对上才是**。
+
+游戏里有一类角色**不攒能量，攒层数**（飞霄【飞黄】/ 黄泉【残梦】/ 白厄【火种】/
+昔涟【追忆】/ 遐蝶【新蕊】）。他们的终结技不是"能量满了"，而是"**层数到了**"。
+本节的机制让这类角色**不需要专用类**。
+
+### 23.1 三个部件
+
+| 部件 | 作用 |
+|---|---|
+| `models.Resource` | 一个**有界**的计数器：`max` / `min=0` / `maxOverflow`；`gainClamped`（不溢出）/ `gain`（显式溢出）/ `spend`（能扣多少扣多少）/ `spendExactly`（不够就一点都不扣） |
+| `models.ResourceManager` | 一个单位**拥有**的全部资源，按 id 索引。挂在 `CanHit.resources` 上（**永不为 null**） |
+| `EnergyProvider.canCastUltra(user, cost)` | **开大闸门**：默认还是"能量够不够"，层数角色换成"层数满没满" |
+
+`Resource` 在 P8-4 就被抽出来了（战技点是它的第一个用户）；P8-8 补的是
+**每个单位一个 manager**、**"满了"信号**、两个触发器 op、以及**闸门挂钩**。
+
+### 23.2 闸门为什么要挂在 `EnergyProvider` 上
+
+⚠ 这是本项最关键的一处。改之前 `Battle.isUltraReady` 是：
+
+```java
+if (user == null || !user.hasEnergyBar()) return false;      // 没有能量条 ⇒ 永远放不出
+return user.getCurrentEnergy() >= ultraEnergyCost(user);
+```
+
+而层数角色的**能量恒为 0**（`NoConventionalEnergyProvider` 五个钩子全返回 null）——
+所以旧逻辑会把他们**永久锁死**。现在：
+
+```java
+return user.getEnergyProvider().canCastUltra(user, ultraEnergyCost(user));
+```
+
+默认实现里**仍然是**老规则（有能量条 + 够阈值），所以常规角色行为**一字不变**；
+层数角色换成自己的 provider，读自己的资源。`Battle` 依旧不认识任何角色（P8-0）。
+
+> ⚠ 闸门拿到的是**阈值**而不是"满不满"：5 个角色的开大阈值低于上限
+> （云璃 120/240、银枝 90/180、绯英 240/480、飞霄 6/12、昔涟 12/24，见 §9.4），
+> 所以传进去的是 `ultraEnergyCost(user)` 的结果，而不是 `maxEnergy`。
+
+### 23.3 "满了"信号：**上升沿**，不是电平
+
+`Resource.setOnBecameFull` 只在"**这次入账让它从不满变成满**"时触发一次。两个条件都要满足：
+
+- 之前**不满**、现在**满** —— 所以"已经满了还继续加"不会重复触发；
+- 这次**真的入账了**（`gained > 0`）—— 被完全截掉的入账不是"到达上限"，而是"早就在那、什么也没发生"。
+
+为什么不能用电平：昔涟的池子是 24、**可以继续溢出存到 27**（§9.5）。若按电平，
+她到达 24 之后的每一次溢出入账都会再触发一次"满了"，而"到达上限"只发生了一次。
+
+### 23.4 溢出与 `scope`
+
+- **溢出默认关**：`maxOverflow = 0` 时 `gain` 与 `gainClamped` 完全等价。
+  要溢出必须**显式** `setMaxOverflow`（昔涟 24 → 27）。
+- **不变式** `value ∈ [0, max + maxOverflow]` **永远成立**：下调额度会把越界存量夹掉。
+- `ResourceScope.SELF`（每人一份）**已接**；`ResourceScope.PARTY`（全队共享）**被显式拒绝** ——
+  共享池需要一个比单个角色活得久的持有者（per-battle 注册表），挂在每个角色身上会得到
+  **四份各自独立的计数器**，而游戏里只有**一个共享池**。这种错**运行时不报任何异常**，
+  所以宁可在注册时就响亮拒绝。
+
+### 23.5 三个来源
+
+| 来源 | 怎么走 |
+|---|---|
+| 事件触发获得 | 触发器 op `GAIN_RESOURCE`（`resource` + `amount`，可用 `per_target`） |
+| 主动消耗 | 触发器 op `SPEND_RESOURCE` |
+| 损血 / 治疗转化 | 触发器订阅 `HP_LOST` / `HEALED` 事件 |
+
+> ⚠ **`SPEND_RESOURCE` 不够时会抛异常**，不静默失败。理由：战技点不够是"玩家按不动按钮"
+> （合法状态），而触发规则里的消耗是**作者写了就认为层数会在那** —— 静默吃掉会让内容 bug 隐形。
+
+### 23.6 两处已知限制（都写成了测试，不是藏起来）
+
+1. **效果的 amount 是字面量，没有算术**。所以"每损失 1 点生命 +1 层"这种**按事件数量缩放**
+   的规则目前表达不出来：触发器能可靠表达的是"**发生了一次**损血 → 给 1 层"，
+   而"给 `lost` 层"需要在 effects 里做算术。
+   测试因此拆成两半：`ResourceTest.hpLossReachesTheOwnersTriggerTable`（接线对不对）
+   与 `oneStackPerPointOfLossIsAManagerCall`（1:1 的算术本身，属 manager 层）。
+2. **条件 DSL 不能表达"只有我自己受伤"**。`self` 比的是 **actor**（谁造成事件）与表的持有者，
+   而 `HP_LOST` 是**全队事件**（受击者 + 每个我方成员都会收到，见 §4.1），
+   所以规则分不清"我被打"和"队友被打" —— 这对需要全队损血的遐蝶是对的，
+   对个人层数角色是错的。要修得给条件 DSL 加一个 `target`（事件主体）变量。
+   现状由 `ResourceTest.subjectFilterIsNotExpressibleYet` 钉住。
+
 

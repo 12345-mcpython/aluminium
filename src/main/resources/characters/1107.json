@@ -1,0 +1,19 @@
+[
+  {
+    "on": "HP_LOST",
+    "when": [
+      "target == self"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "skill": "TALENT",
+        "damage_param": 1,
+        "as_attack": false,
+        "target": "attacker"
+      }
+    ],
+    "source": "1107 克拉拉 talent 因为我们是家人 (Svarog's counter)",
+    "note": "Doc: 「攻击克拉拉的敌方目标会被史瓦罗标上【反击标记】，并遭到史瓦罗的反击，对其造成等同于克拉拉160%攻击力的物理属性伤害。」 The talent data carries the attack itself (单体攻击 / Physical / 削韧 30, params [1, 0.8, 0.1] -> [1, 2, 0.1]); the multiplier sits at index 1 (NOT 0 like basic attacks). 160% is the level-10 value: params[1][9] = 1.6, verified. Because the engine reads the row for the skill's own level, a level-1 talent correctly yields 80%. 'target == self' means 'the HP loss happened to me'; the actor is the enemy that hit her, which the effect's target:'attacker' sends the counter back to."
+  }
+]
