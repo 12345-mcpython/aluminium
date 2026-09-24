@@ -1,0 +1,17 @@
+[
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "actor != self",
+      "hit_count > 0"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 2
+      }
+    ],
+    "source": "1309 知更鸟 talent (skill 130904) / character doc line 147",
+    "note": "Doc text: 「…且我方目标攻击敌方目标后，知更鸟额外为自身恢复2点能量。」 A FLAT 2 per attack (no per_target), unlike Tribbie's per-hit 1.5. 'actor != self' encodes 「我方目标」, i.e. allies but not Robin herself. E0 value."
+  }
+]

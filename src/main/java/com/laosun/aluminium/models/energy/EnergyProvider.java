@@ -26,6 +26,32 @@ import java.util.Set;
 public interface EnergyProvider {
 
     /**
+     * Whether this unit's ultimate is available right now.
+     *
+     * <p>This is the <b>gate</b> for casting, and it exists because "energy is full" is not the only
+     * way to earn an ultimate. Characters who build stacks instead of energy (P8-8: Acheron's
+     * 【残梦】, Feixiao's 【飞黄】, Cyrene's 【追忆】…) become ready when their **resource** is full, so
+     * gating on {@code currentEnergy >= maxEnergy} would lock them out forever — their energy stays
+     * at 0 by design.
+     *
+     * <p>Keeping the decision here rather than in {@code Battle} means the engine still does not know
+     * which character it is looking at: the stack characters get a provider that reads their resource,
+     * and the assembly point is the only place that knows the difference (P8-0).
+     *
+     * <p>The default is the conventional rule. Note it is <b>not</b> {@code isEnergyFull()} on
+     * {@code CanHit}: the threshold can be lower than the cap ({@link
+     * com.laosun.aluminium.models.SkillData#getSpNeed()}), which is why the caller passes the cost in.
+     *
+     * @param user      the unit asking
+     * @param energyCost the energy threshold currently in force (the data's {@code spNeed} when it has
+     *                   one, otherwise the unit's cap)
+     * @return whether the ultimate may be cast
+     */
+    default boolean canCastUltra(CanHit user, double energyCost) {
+        return user != null && user.hasEnergyBar() && user.getCurrentEnergy() >= energyCost;
+    }
+
+    /**
      * When a skill is cast (basic attack / skill / any other non-ultimate slot).
      *
      * @param user       the caster

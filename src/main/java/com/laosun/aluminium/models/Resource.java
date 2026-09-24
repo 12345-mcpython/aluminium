@@ -1,5 +1,7 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.enums.ResourceScope;
+
 /**
  * A **team-level** numeric resource: it has a current value, a maximum capacity, and an optional
  * maximum overflow allowance.
@@ -41,6 +43,11 @@ public class Resource {
     private final String id;
 
     /**
+     * Who this resource belongs to (P8-8). See {@link ResourceScope}.
+     */
+    private final ResourceScope scope;
+
+    /**
      * The normal cap. {@link #getValue()} only exceeds it while in an overflow state.
      */
     private final int max;
@@ -53,25 +60,60 @@ public class Resource {
     private int maxOverflow;
 
     /**
-     * @param id       resource identifier
-     * @param max      normal cap
-     * @param initial  initial value (clamped to {@code [0, max]})
+     * Notified when the resource goes from "not full" to "full" (the rising edge only).
+     *
+     * <p><b>Why an edge rather than a level.</b> Feixiao's 【飞黄】 is spent the moment it reaches its
+     * threshold, so a level signal would still fire once in practice — but Cyrene sits at her cap for
+     * many gains in a row (pool 24, and she can keep collecting into overflow up to 27). A level
+     * signal would fire on every one of those extra gains, which is not what "reached the cap" means.
+     * The rising edge fires exactly once per arrival.
+     *
+     * <p>The listener takes the resource so it can read the id and the value; it is deliberately not
+     * given the battle (the engine has no business knowing what a listener does with it).
+     */
+    private java.util.function.Consumer<Resource> onBecameFull = r -> {
+    };
+
+    /**
+     * @param id      resource identifier
+     * @param max     normal cap
+     * @param initial initial value (clamped to {@code [0, max]})
      * @throws IllegalArgumentException {@code id} is blank, or {@code max < 0}
      */
     public Resource(String id, int max, int initial) {
+        this(id, ResourceScope.SELF, max, initial);
+    }
+
+    /**
+     * @param id      resource identifier
+     * @param scope   who the resource belongs to
+     * @param max     normal cap
+     * @param initial initial value (clamped to {@code [0, max]})
+     * @throws IllegalArgumentException {@code id} is blank, {@code scope} is null, or {@code max < 0}
+     */
+    public Resource(String id, ResourceScope scope, int max, int initial) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Resource id must not be blank");
+        }
+        if (scope == null) {
+            throw new IllegalArgumentException("Resource scope must not be null (id=" + id + ")");
         }
         if (max < 0) {
             throw new IllegalArgumentException("Resource max must be >= 0, got " + max);
         }
         this.id = id;
+        this.scope = scope;
         this.max = max;
         this.value = clamp(initial);
     }
 
     public String getId() {
         return id;
+    }
+
+    /** Who this resource belongs to (P8-8). */
+    public ResourceScope getScope() {
+        return scope;
     }
 
     public int getValue() {
@@ -125,9 +167,12 @@ public class Resource {
         if (delta <= 0) {
             return 0;
         }
+        boolean wasFull = isFull();
         int before = value;
         value = Math.min(max, value + delta);
-        return value - before;
+        int gained = value - before;
+        fireIfJustBecameFull(wasFull, gained);
+        return gained;
     }
 
     /**
@@ -143,9 +188,12 @@ public class Resource {
         if (delta <= 0) {
             return 0;
         }
+        boolean wasFull = isFull();
         int before = value;
         value = Math.min(absoluteMax(), value + delta);
-        return value - before;
+        int gained = value - before;
+        fireIfJustBecameFull(wasFull, gained);
+        return gained;
     }
 
     /**
@@ -228,6 +276,33 @@ public class Resource {
 
     private int absoluteMax() {
         return max + maxOverflow;
+    }
+
+    /**
+     * Registers the "became full" listener (see the field docs for why it is edge-triggered).
+     *
+     * @param listener the listener; {@code null} removes it
+     */
+    public void setOnBecameFull(java.util.function.Consumer<Resource> listener) {
+        this.onBecameFull = listener == null ? r -> {
+        } : listener;
+    }
+
+    /**
+     * Fires the "became full" signal when this gain is the one that arrived at the cap.
+     *
+     * <p>Two conditions, both required:
+     * <ul>
+     *   <li>it was <b>not</b> full before and is full now — the rising edge, so sitting at the cap
+     *       across several gains (or gaining into overflow) does not re-fire;</li>
+     *   <li>something was <b>actually credited</b> ({@code gained > 0}) — a gain that was entirely
+     *       clamped away is not "arriving at the cap", it is "already there and nothing happened".</li>
+     * </ul>
+     */
+    private void fireIfJustBecameFull(boolean wasFull, int gained) {
+        if (!wasFull && gained > 0 && isFull()) {
+            onBecameFull.accept(this);
+        }
     }
 
     private int clamp(int raw) {

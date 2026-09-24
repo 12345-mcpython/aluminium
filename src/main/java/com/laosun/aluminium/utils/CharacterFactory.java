@@ -2,8 +2,10 @@ package com.laosun.aluminium.utils;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
+import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
 
@@ -96,10 +98,36 @@ public final class CharacterFactory {
      * @throws CharacterException if the character does not exist
      */
     public static Character create(int cid, int level, boolean promoted) {
+        return create(cid, level, promoted, null);
+    }
+
+    /**
+     * Builds a real character **with a light cone**.
+     *
+     * <p>The cone has to be supplied here rather than assigned afterwards: the stat-sheet pipeline
+     * consumes it during {@code Character.Builder#build()} (the calculator takes the weapon as an
+     * input), so {@code character.setWeapon(...)} on an already-built character would change the
+     * field but **not the sheet**.
+     *
+     * @param cid      character id
+     * @param level    level (1-80)
+     * @param promoted whether the character is promoted
+     * @param weapon   the light cone, or {@code null} for none
+     * @return the real character
+     * @throws CharacterException if the character does not exist
+     */
+    public static Character create(int cid, int level, boolean promoted, Weapon weapon) {
         Character.Builder builder = Character.builder().cid(cid).level(level);
         if (promoted) {
             builder = builder.isPromote();
         }
+        if (weapon != null) {
+            builder = builder.weapon(weapon);
+        }
+        // P8-7: attach the character's data-driven mechanics. This is the **assembly point** -- the
+        // one place allowed to go from "which character" to "which rules" (P8-0). Characters with no
+        // file get the empty table, which is the normal state for the ones not data-ised yet.
+        builder = builder.triggerTable(TriggerTables.of(cid));
         Character character = builder.build();
         // stack/special-resource characters: swap out conventional energy gain (otherwise they could fill the bar just by getting hit and fire an ultimate they should not have)
         if (SPECIAL_RESOURCE_CHARACTERS.contains(cid)) {
