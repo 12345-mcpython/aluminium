@@ -96,6 +96,76 @@ public enum AttributeType {
         return BOOST_DAMAGE_MAPPING.get(elementType);
     }
 
+    /**
+     * The game's own property vocabulary ({@code relic_sets.json}'s {@code properties[].type},
+     * {@code RelicMainAffixConfig.Property}, {@code RelicSubAffixConfig.Property}, …) mapped to the
+     * attribute it modifies.
+     *
+     * <p><b>Where this table comes from — it is not invented here.</b> The generator that produces
+     * {@code main_attribute.json} / {@code sub_attribute.json} / {@code relic_sets.json} keeps one
+     * {@code inner_outer_mapping} dictionary for exactly this translation; that dictionary is why the
+     * generated affix files are keyed by {@code attack_percent} / {@code crit_chance} instead of by
+     * {@code AttackAddedRatio} / {@code CriticalChanceBase}. Relic sets are the one place where the raw
+     * game token survives into the JSON (the generator takes the property name straight out of the
+     * obfuscated {@code PropertyList} entries and cannot pass it through the dictionary), so the engine
+     * has to carry the same dictionary itself. Every value here is that generator table, verbatim.
+     *
+     * <p>Deliberately <b>not</b> derived from {@link #attributeString}: a name that merely "looks like" an
+     * attribute (say {@code AttackAddedRatio} → {@code ATTACK}) is wrong — it means {@code attack_percent},
+     * not flat attack — and silently mis-mapping one property is worse than failing.
+     */
+    private static final Map<String, AttributeType> BY_GAME_PROPERTY = Map.ofEntries(
+            Map.entry("HPDelta", HEALTH),
+            Map.entry("AttackDelta", ATTACK),
+            Map.entry("DefenceDelta", DEFENCE),
+            Map.entry("SpeedDelta", SPEED),
+            Map.entry("BaseSpeed", SPEED),
+            Map.entry("HPAddedRatio", HEALTH_PERCENT),
+            Map.entry("AttackAddedRatio", ATTACK_PERCENT),
+            Map.entry("DefenceAddedRatio", DEFENCE_PERCENT),
+            Map.entry("SpeedAddedRatio", SPEED_PERCENT),
+            Map.entry("CriticalChanceBase", CRIT_CHANCE),
+            Map.entry("CriticalDamageBase", CRIT_ATTACK),
+            Map.entry("StatusProbabilityBase", EFFECT_HIT_RATE),
+            Map.entry("StatusResistanceBase", EFFECT_RESISTANCE),
+            Map.entry("BreakDamageAddedRatioBase", BREAKING_EFFECT),
+            Map.entry("SPRatioBase", ENERGY_REGENERATION_RATE),
+            Map.entry("HealRatioBase", OUTGOING_HEALING_BOOST),
+            Map.entry("HealTakenRatio", HEAL_TAKEN_RATIO),
+            Map.entry("PhysicalAddedRatio", PHYSICAL_DAMAGE_BOOST),
+            Map.entry("FireAddedRatio", FIRE_DAMAGE_BOOST),
+            Map.entry("IceAddedRatio", ICE_DAMAGE_BOOST),
+            Map.entry("ThunderAddedRatio", THUNDER_DAMAGE_BOOST),
+            Map.entry("WindAddedRatio", WIND_DAMAGE_BOOST),
+            Map.entry("QuantumAddedRatio", QUANTUM_DAMAGE_BOOST),
+            Map.entry("ImaginaryAddedRatio", IMAGINARY_DAMAGE_BOOST),
+            Map.entry("AllDamageTypeAddedRatio", ALL_DAMAGE_TYPE_BOOST),
+            Map.entry("ElationDamageAddedRatioBase", ELATION_DAMAGE_BOOST)
+    );
+
+    /**
+     * Resolves a game property name (e.g. {@code AttackAddedRatio}) to its attribute.
+     *
+     * <p><b>Fails loudly on purpose.</b> A property the engine cannot map used to mean "this set bonus is
+     * quietly dropped", which is invisible: the only symptom is a character being a few percent weaker
+     * than the game. Throwing with the offending name turns that into a bug report.
+     *
+     * @param gameProperty the property name exactly as the game data spells it (e.g. {@code CriticalChanceBase})
+     * @return the attribute that property modifies
+     * @throws IllegalArgumentException when the name is null or is not in the game vocabulary
+     */
+    public static AttributeType fromGameProperty(String gameProperty) {
+        if (gameProperty == null) {
+            throw new IllegalArgumentException("Unknown game property name: null");
+        }
+        AttributeType type = BY_GAME_PROPERTY.get(gameProperty.trim());
+        if (type == null) {
+            throw new IllegalArgumentException("Unknown game property name: '" + gameProperty
+                    + "' — add it to AttributeType.BY_GAME_PROPERTY instead of skipping it");
+        }
+        return type;
+    }
+
     AttributeType(String string) {
         this(string, true);
     }
