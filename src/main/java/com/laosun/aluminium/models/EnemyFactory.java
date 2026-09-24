@@ -7,6 +7,7 @@ import com.laosun.aluminium.beans.MonsterConfig;
 import com.laosun.aluminium.beans.MonsterTemplate;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.utils.AttributeBuilder;
 
@@ -113,7 +114,10 @@ public final class EnemyFactory {
                 : DamageType.fromString(data.damageType());
         double multiplier = data == null ? 1.0 : data.multiplier();
         int hits = data == null ? 1 : data.hits();
-        enemy.setSkill(SkillType.COMMON, new EnemySkill(element, multiplier, hits, type));
+        SkillEffectType effect = data == null || data.effect() == null
+                ? SkillEffectType.SINGLE_ATTACK
+                : SkillEffectType.fromString(data.effect());
+        enemy.setSkill(SkillType.COMMON, new EnemySkill(element, multiplier, hits, type, effect));
     }
 
     private static String displayName(MonsterConfig config, int monsterId) {

@@ -18,9 +18,20 @@ import com.laosun.aluminium.enums.DamageElement;
  * @param element    damage element; {@code null} = use the monster's own {@code stance_type} (the
  *                   template's toughness attribute)
  * @param multiplier multiplier: {@code base = enemy attack × multiplier}
- * @param hits       number of hits (each hit settles independently and rolls crit independently)
+ * @param hits       number of <b>segments</b> (each settles independently and rolls crit
+ *                   independently). ⚠ See the note below — this is <b>not</b> a target count.
  * @param damageType damage type string (see {@code DamageType.fromString}); {@code null} = normal
+ * @param effect     skill shape ({@code SingleAttack} / {@code AoEAttack} / {@code Blast}, parsed by
+ *                   {@code SkillEffectType.fromString}); {@code null} = single target
  * @param guessed    whether the multiplier is a guessed value
+ *
+ * <p>⚠ <b>{@code hits} means segments here, not targets.</b> {@code ROADMAP}'s P9-1 plan describes a
+ * future enemy skill table whose {@code hits} field means "how many targets, 0 = all". The two must
+ * not be merged silently: the shipped entries were written as segments (8013010 "Trampling Stomp" has
+ * {@code hits: 2} and means two segments on one target), so reusing the name for a target count when
+ * the real table lands would change every existing enemy's behaviour without a single test failing.
+ * Target count is expressed by {@link #effect()} instead, which is additive and defaults to today's
+ * behaviour.
  */
 public record EnemySkillData(int id,
                              Translate name,
@@ -28,5 +39,6 @@ public record EnemySkillData(int id,
                              double multiplier,
                              int hits,
                              @SerializedName("damage_type") String damageType,
+                             String effect,
                              boolean guessed) {
 }
