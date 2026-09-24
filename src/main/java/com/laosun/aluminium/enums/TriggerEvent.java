@@ -80,7 +80,31 @@ public enum TriggerEvent {
      * {@code attack_type} is {@code Ultra} — never inferred from a skill's name or slot. Exactly one
      * of {@link #SKILL_CAST} and this event fires per cast.
      */
-    ULT_CAST("ULT_CAST", true);
+    ULT_CAST("ULT_CAST", true),
+    /**
+     * ✅ A follow-up attack was used: an <b>additional-damage</b> instance settled through
+     * {@code Battle.applyAdditionalDamage}, with the attacker as {@code actor} and the victim as
+     * {@code target}.
+     *
+     * <p><b>Why it needs its own event rather than {@link #ALLY_ATTACK}.</b> The relic and talent
+     * texts that say "when the wearer uses a Follow-Up ATK" mean that category specifically;
+     * {@code ALLY_ATTACK} fires for every attack, so a rule hung on it would also fire for basic
+     * attacks, skills and ultimates — a silent over-trigger, not a near miss.
+     *
+     * <p><b>What counts as one.</b> The engine has exactly one notion of an attack that "does not
+     * count as dealing 1 attack": {@code DamageType.ADDITIONAL}, which is what a talent-driven
+     * follow-up (Clara's counter, the P8-3 shape) is settled as. So this fires from that single
+     * settlement point, and nothing else in the engine fires it.
+     *
+     * <p>It is emitted for every such instance <b>whether or not it dealt damage</b>: the texts that
+     * subscribe say "when the wearer uses a Follow-Up ATK", which is the attack being <i>used</i>, and
+     * one absorbed entirely by a shield or an invulnerable target was still used.
+     *
+     * <p>⚠ Note the recursion this creates — a rule that answers {@code FOLLOW_UP} with the
+     * {@code DAMAGE} op is a follow-up responding to a follow-up; {@code Battle.MAX_TRIGGER_DEPTH}
+     * stops that loudly instead of letting it run away.
+     */
+    FOLLOW_UP("FOLLOW_UP", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 
