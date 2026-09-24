@@ -217,6 +217,16 @@ public final class Constant {
     public static final int RELIC_SET_NONE = 0;
 
     /**
+     * How many times one stackable modifier may accumulate before further applications are dropped.
+     *
+     * <p>This is the cap of the <b>primitive</b>, not of any particular effect: a rule that wants a
+     * smaller cap states it (the trigger table's {@code max_stacks}), and a rule that omits the
+     * argument gets exactly one stack, i.e. the historical replace-on-same-kind behaviour. The bound
+     * exists so that a typo cannot grow the buff list without limit.
+     */
+    public static final int MAX_STACKS_LIMIT = 999;
+
+    /**
      * Upper bound of the vulnerability zone (易伤区) multiplier.
      */
     public static final double VULNERABLE_CAP = 3.5;

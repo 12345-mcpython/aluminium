@@ -3,10 +3,12 @@ package com.laosun.aluminium.test;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Enemy;
 import com.laosun.aluminium.models.EnemyFactory;
@@ -24,8 +26,8 @@ import java.util.Random;
  * Relic set abilities, end to end: a set whose bonus is an <em>ability</em> rather than stats now
  * actually does something in a battle.
  *
- * <p>These four sets are the ones the current op vocabulary can express exactly (see
- * {@code RelicTriggerTableTest} for the other 31, which are registered as gaps instead of being
+ * <p>These sets are the ones the current op vocabulary can express exactly (see
+ * {@code RelicTriggerTableTest} for the rest, which are registered as gaps instead of being
  * approximated). Each is asserted through a real battle, because that is the point: the rules live in
  * {@code resources/relic_sets/<setId>.json} and are attached by {@code CharacterFactory}, so a test
  * that only read the JSON would prove nothing about whether the engine executes it.
@@ -47,6 +49,8 @@ public class RelicAbilityBattleTest {
     private static final int SIZZLING_THUNDER = 109;
     /** "Eagle of Twilight Line" — 4-piece: after the Ultimate, advance forward 25%. */
     private static final int TWILIGHT_EAGLE = 110;
+    /** "Champion of Streetwise Boxing" — 4-piece: +5% ATK per attack taken/given, up to 5 stacks. */
+    private static final int STREETWISE_BOXING = 105;
 
     /** Himeko: basic attack / skill / ultimate are all real, damaging skill slots. */
     private static final int HIMEKO = 1003;
@@ -71,6 +75,9 @@ public class RelicAbilityBattleTest {
     private static final double GLACIAL_CRIT_DMG = 0.25;
     private static final double SIZZLING_ATTACK = 0.2;
     private static final double EAGLE_ADVANCE = 0.25;
+    /** Ability51051: +5% ATK per application, at most 5 applications. */
+    private static final double STREETWISE_ATTACK_PER_STACK = 0.05;
+    private static final int STREETWISE_MAX_STACKS = 5;
 
     private static final double TOLERANCE = 1e-9;
 
@@ -228,6 +235,147 @@ public class RelicAbilityBattleTest {
         Assertions.assertTrue(castUltimate(partialBattle, control));
         Assertions.assertEquals(controlBefore, timeRemaining(partialBattle, control), 1e-6,
                 "three pieces must not grant the 4-piece ability");
+    }
+
+    // ==================================================================
+    // 3. The stackable / unbounded ability (set 105)
+    // ==================================================================
+
+    /**
+     * Ability51051, the "attacks or is hit" ability: each application adds one stack of +5% ATK, and the
+     * sixth application changes nothing.
+     *
+     * <p>This is the end-to-end claim for the stacking primitive and for the {@code TAKING_HIT} event at
+     * once. Two things are asserted separately because they fail differently:
+     * <ul>
+     *   <li><b>The two halves of the disjunction share one cap.</b> Four attacks plus three hits is
+     *       seven applications of a 5-stack ability, so the total must be exactly 5 — which is only true
+     *       if {@code ALLY_ATTACK} and {@code TAKING_HIT} accumulate into the <b>same</b> stack group.
+     *       (With one counter per rule the total would be 8, and the test would still pass a naive
+     *       "did anything accumulate?" check.)</li>
+     *   <li><b>The "is hit" half is {@code TAKING_HIT}, not {@code HP_LOST}.</b> The hits taken here are
+     *       <b>fully absorbed by a shield</b>, so no HP is lost: had the rule been hung on
+     *       {@code HP_LOST} instead, the stack count would stop at 4. That is the exact scenario the
+     *       distinction exists for.</li>
+     *   <li><b>The stacks actually reach the attribute.</b> Each one is checked to be an
+     *       {@code ADD_PERCENT} of 0.05 — the kind a <b>base</b> attribute needs, because ATK is
+     *       {@code base × (1 + sum of percentages)}: the total is deliberately <em>not</em> asserted as a
+     *       ratio of the character's ATK, since the character carries several other sources of the same
+     *       percentage (traces, relics, and this set's own 2-piece stat bonus).</li>
+     * </ul>
+     */
+    @Test
+    public void streetwiseBoxingStacksOnAttackAndOnBeingHitUpToItsCap() {
+        Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
+        Character hero = battle.characters.getFirst();
+        int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
+        double attackWithoutStacks = hero.getAttribute(AttributeType.ATTACK).get();
+
+        // Six of the wearer's own attacks: the sixth application is already past the cap.
+        for (int i = 0; i < 6; i++) {
+            battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
+                    List.of(battle.enemies.getFirst()));
+        }
+        Assertions.assertEquals(baseBuffs + STREETWISE_MAX_STACKS,
+                buffsOn(hero, AttributeType.ATTACK).size(),
+                "six attacks stop at the 5-stack cap from Ability51051's own text");
+        assertEachStackIsStreetwise(hero);
+        Assertions.assertTrue(hero.getAttribute(AttributeType.ATTACK).get() > attackWithoutStacks,
+                "the stacks must reach the attribute");
+
+        // Three hits taken, all of them swallowed by a shield: the cap is already reached, so these add
+        // nothing — and they prove the "is hit" half is wired, because HP_LOST never fires here.
+        battle.grantShield(hero, 10_000_000);
+        double hpBefore = hero.getCurrentHp();
+        for (int i = 0; i < 3; i++) {
+            battle.applyDamage(hero, new Damage(battle.enemies.getFirst(), hero,
+                    DamageElement.PHYSICAL, 1_000));
+        }
+        Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE,
+                "precondition: the shield absorbed every hit, so no HP was lost");
+        Assertions.assertEquals(baseBuffs + STREETWISE_MAX_STACKS,
+                buffsOn(hero, AttributeType.ATTACK).size(),
+                "TAKING_HIT must add stacks to the SAME counter as ALLY_ATTACK, and the shared cap is 5");
+        assertEachStackIsStreetwise(hero);
+    }
+
+    /**
+     * The "is hit" half on its own: a shielded hit is still a hit, so it adds a stack.
+     *
+     * <p>Split from the test above because that one is already at the cap when the hits land. Here the
+     * shield guarantees {@code HP_LOST} does not fire, so a rule hung on it would leave the count at zero
+     * — which is exactly the regression this pins.
+     */
+    @Test
+    public void streetwiseBoxingStacksOnAShieldedHitAsWell() {
+        Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
+        Character hero = battle.characters.getFirst();
+        int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
+
+        battle.grantShield(hero, 10_000_000);
+        double hpBefore = hero.getCurrentHp();
+        battle.applyDamage(hero, new Damage(battle.enemies.getFirst(), hero,
+                DamageElement.PHYSICAL, 1_000));
+
+        Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE,
+                "precondition: the shield ate the whole hit");
+        Assertions.assertEquals(baseBuffs + 1, buffsOn(hero, AttributeType.ATTACK).size(),
+                "a hit the shield absorbed is still 'being hit', so the set must gain a stack");
+    }
+
+    /** Every installed stack carries the modifier the ability states, of the kind a base attribute needs. */
+    private static void assertEachStackIsStreetwise(Character hero) {
+        for (DoubleValue.Modifier modifier : buffsOn(hero, AttributeType.ATTACK)) {
+            Assertions.assertEquals(STREETWISE_ATTACK_PER_STACK, modifier.getValue(), TOLERANCE);
+            Assertions.assertEquals(DoubleValue.Modifier.ModifierType.ADD_PERCENT,
+                    modifier.getModifierType(),
+                    "ATK is a base attribute, so each stack is an additive percentage");
+        }
+    }
+
+    /**
+     * "For the rest of the battle": the stacks survive every turn boundary.
+     *
+     * <p>The observable is the stack count after several full turns — a turn-limited modifier would
+     * have expired (and the count dropped) long before the loop ends.
+     */
+    @Test
+    public void streetwiseBoxingStacksLastForTheRestOfTheBattle() {
+        Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
+        Character hero = battle.characters.getFirst();
+        int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
+
+        battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
+                List.of(battle.enemies.getFirst()));
+        Assertions.assertEquals(baseBuffs + 1, buffsOn(hero, AttributeType.ATTACK).size());
+
+        for (int turn = 0; turn < 10; turn++) {
+            battle.stepForward();
+            if (battle.currentMove == null) {
+                break;
+            }
+            battle.beforeMove();
+            battle.afterMove();
+        }
+
+        Assertions.assertEquals(baseBuffs + 1, buffsOn(hero, AttributeType.ATTACK).size(),
+                "a 'permanent' modifier has no turn limit, so no number of turns may remove it");
+        assertEachStackIsStreetwise(hero);
+    }
+
+    /** Three pieces must not grant the 4-piece ability. */
+    @Test
+    public void streetwiseBoxingNeedsAllFourPieces() {
+        Battle battle = newBattle(List.of(partial(HIMEKO, STREETWISE_BOXING)), true);
+        Character hero = battle.characters.getFirst();
+        double baseAttack = hero.getAttribute(AttributeType.ATTACK).get();
+
+        battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
+                List.of(battle.enemies.getFirst()));
+
+        Assertions.assertTrue(buffsOn(hero, AttributeType.ATTACK).isEmpty(),
+                "three pieces is one short of the 4-piece bonus");
+        Assertions.assertEquals(baseAttack, hero.getAttribute(AttributeType.ATTACK).get(), TOLERANCE);
     }
 
     // ==================================================================
