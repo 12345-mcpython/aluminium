@@ -548,8 +548,11 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
    字段 —— `weapons.json` 里**一直有**这个字段，只是 bean 没声明，
    正是本项目反复踩的 **Gson 静默失配**（`ROADMAP` §4.2）。补上后每个角色拿到的是自己的
    5★ 签名锥：景元「银河铁道之夜」/ 希儿「于夜色中」/ 克拉拉「无可取代的东西」/ 娜塔莎「棺的回响」。
-3. **遗器仍没有**：没有可用的遗器实例数据（`relic_sets.json` 未装载，也没有生成表），
+3. **遗器当时没有**（**已解决**，见下）：当时没有可用的遗器实例数据（`relic_sets.json` 未装载），
    所以队伍裸装上场。`Builder` 的遗器管线早就存在，由 `CharacterFactoryTest` 覆盖。
+   > **后续**：`relic_sets.json` 已装载、2/4 件套效果已生效、`RelicFactory` 提供
+   > **确定性**遗器（旧的 `createRandomLevelZero` 用 `ThreadLocalRandom`，两次运行面板不同），
+   > `StageFactory.realTeam()` 已穿上「4 件套 + 2 件位面」。见 `RelicSetTest`。
 4. **删掉了 `temporaryTeam()` 与 `temporaryCharacter()`**（连同 `TEMPORARY_MAX_ENERGY`）——
    并加了一条反射测试断言 `StageFactory` **不再暴露**任何 temporary 方法，
    免得以后有人把占位队加回来。
@@ -724,7 +727,11 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 **剩下的原计划项（本次没做）**：
 
 - **光锥 / 遗器数值被动**（P8-5 遗留）用 `StatModifierBuff` 表达 —— 通用类已经有了，缺的是接线。
-- **遗器套装效果**：`relic_sets.json` **连装载都没装载**，F-1 / F-2 / F-7 都在等它。
+- **遗器套装效果**：✅ **已落地**（`relic_sets.json` 装载 + 2/4 件套生效 + `RelicFactory` 确定性遗器
+  + `realTeam()` 实装）。⚠ 但**92 条套装效果里有 35 条是"具名 ability"**，引擎执行不了，
+  只有 57 条是纯数值 —— 这 35 条由 `Effect.hasAbility()` 暴露、并由测试钉住 57/35 这个切分，
+  不允许它悄悄变大。F-1 / F-2 / F-7 要的正是那 35 条里的个别效果（如过客 4 件套 +1 战技点），
+  所以它们**仍未解锁**，只是从"整块没装载"变成了"装载了，差执行 ability"。
 - **"同 class 不同来源取绝对值大者"**：⚠ **本次刻意没做**。那是 ROADMAP 自己标的
   `TODO data` 近似，而"再上一遍同类 buff"该刷新、叠加还是取大，属于**数据问题**；
   在拿到实测依据之前发明一条规则，会静默改掉现有行为。当前口径是
