@@ -370,12 +370,44 @@ hit_count == 2    精确命中数
 | `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持） | ✅ |
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
-| `MODIFY_ATTR` | `attribute` / `percent` / `turns` | ☐ 要等 P10-3 的 buff 系统来持有并到期该 modifier |
+| `MODIFY_ATTR` | `attribute` / `percent` / `turns`，可选 `target` | ✅（P10-3） |
 | `APPLY_BUFF` | `buff` / `turns` | ☐ P10-3 |
 | `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
 
 > ⚠ **未接线的 op 是在加载时"响亮地"拒绝的**，报错里点名它归哪个阶段。
 > 否则内容作者写了规则、看不到任何反应，却分不清"我的条件写错了"和"引擎压根不发这个事件"。
+
+#### `target` 选择器（同样是封闭集合）
+
+```
+不写              默认 = 触发器的主人自己（最常见，所以允许省略）
+self             同上，写出来更明确
+target           这件事的承受者（掉血的/被治疗的那个人）  ← 给队友上 buff
+attacker         这件事的起因（打我的人）               ← 反击
+all_allies       我方全体（别名 party）                ← 「我方全体攻击力 +X%」
+```
+
+> ⚠ **`target` 曾经写错就等于 `self`**：解析器对不认识的取值一律**回退到"主人"**，
+> 于是 `"atacker"` 和 `"self"` 行为完全一样 —— 规则照常触发、什么都不报，只是默默地改错了人。
+> 现在它和条件变量一样是**封闭集合**，加载时就拒绝（`unknownTargetSelectorIsRejected`）。
+
+`all_allies` 是 P10-3 补的，理由很实际：**真实数据里"我方全体 +X%"占 buff 天赋的多数**，
+没有它，触发器表只能表达自身 buff。
+
+#### `MODIFY_ATTR`：通用属性 buff / debuff ✅（P10-3）
+
+93 个角色里 **72 个**的天赋槽是 buff / 强化。这个 op 的存在就是为了让它们**不必各自写一个 Java 类**：
+
+```json
+{ "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.33, "turns": 2 }
+```
+
+- `percent` 是**小数**（`0.33` = +33%），落成 `ADD_PERCENT` modifier —— 与行迹/遗器/光锥的同类加成**相加**，不是再乘一层。
+- **正负号决定 buff 还是 debuff**：`percent < 0` 走 `DEBUFF` 那一半。这不是修饰 ——
+  它决定了 modifier 落在属性的哪一半，所以「攻击力 +50%」和「攻击力 −30%」能同时挂在一个人身上、各自移除，而不是互相顶掉。
+- `turns` **没有默认值**（同 `damage_param` 的理由：引擎不该替内容编一个数）。
+- 四个 `*_PERCENT` 变体**在加载时被拒** —— 它们是 `AttributeBuilder` 的输入键、不是运行时属性
+  （`getAttribute` 对它们返回 `null`），挂 buff 会"看起来生效但什么都没变"。
 
 #### 两个必须区分的口径（本项目实测踩到）
 
@@ -1613,7 +1645,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 ## 16. 测试与可验证性
 
-- **52 个测试类 / 469 个用例**（截至 P8-3），全部通过（`.\gradlew.bat test`）。
+- **53 个测试类 / 494 个用例**（截至 P10-3 前半），全部通过（`.\gradlew.bat test`）。
 - 覆盖重心：伤害乘区（`DamageZoneTest` 24 条）、技能展开（`SkillExecutorTest` 13 条）、
   能量（`EnergyTest` 8 + `EnergyBattleTest` 16）、韧性击破（`ToughnessTest` 6 +
   `ToughnessBattleTest` 8 + `BreakDamageTest` 5 + `BreakStateTest` 4 + `DotTest` 6）、
@@ -1642,7 +1674,10 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
   天赋与追加攻击（`TalentTest` 11：克拉拉受击反击打回**攻击者** / 倍率取自天赋槽的
   `damage_param` / **`target == self` 与 `actor == self` 不可混用** / 别人挨打她不动 /
   希儿击杀后额外回合、**队友击杀不给回合**；另钉住两条数据事实 ——
-  "文档百分比 = 10 级值"与"倍率索引因技能而异"）。
+  "文档百分比 = 10 级值"与"倍率索引因技能而异"）、
+  通用属性 buff（`BuffRuleTest` 14：百分比/固定值的算术次序 / **不同属性与不同 modifier 类型互不顶掉** /
+  **buff 与 debuff 在同一属性上共存** / 到期精确还原 / 同类再上只刷新不叠加 /
+  移除按 modifier id 精确 / **只有 SPEED 变化才通知行动条** / 非法输入在构造时就炸）。
 - **可复现性**：`Battle` 接受注入的 `java.util.Random`；全仓库无 `Math.random()`。
   > ⚠️ 但 `Relic.createRandomLevelZero` / `MapUtils` 用的是不可播种的 `ThreadLocalRandom`，
   > 所以"同一份遗器"无法跨进程复现。
