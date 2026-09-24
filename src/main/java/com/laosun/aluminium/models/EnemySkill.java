@@ -5,7 +5,9 @@ import com.laosun.aluminium.beans.EnemySkillData;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillEffectType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,12 +38,23 @@ public class EnemySkill extends Skill {
     private final double multiplier;
     private final int hits;
     private final DamageType type;
+    private final SkillEffectType effect;
 
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type) {
+        this(element, multiplier, hits, type, SkillEffectType.SINGLE_ATTACK);
+    }
+
+    /**
+     * @param effect the skill's shape; {@code null} = single target, which is what every pre-P9-2
+     *               entry relied on, so the default keeps them bit-for-bit unchanged
+     */
+    public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
+                      SkillEffectType effect) {
         this.element = element == null ? DamageElement.PHYSICAL : element;
         this.multiplier = multiplier;
         this.hits = Math.max(1, hits);
         this.type = type == null ? DamageType.NORMAL : type;
+        this.effect = effect == null ? SkillEffectType.SINGLE_ATTACK : effect;
     }
 
     public DamageElement getElement() {
@@ -73,15 +86,20 @@ public class EnemySkill extends Skill {
     }
 
     /**
-     * Hits the primary target {@link #hits} times in a row.
+     * Applies the skill to whoever its shape says it reaches: the primary target ({@code SingleAttack}),
+     * everyone on our side ({@code AoEAttack}), or the primary target plus its neighbours
+     * ({@code Blast}). {@link #hits} segments land on <b>each</b> of them, each settling independently
+     * (so each rolls crit on its own).
      *
-     * <p>It only hits the "primary target": a multi-hit enemy skill here means "multiple hits on the
-     * same target", with no splash/AOE (that would need dispatch by skill shape, left for when the
-     * real skill table is wired up in P9-2).
+     * <p>P9-2: before this, every enemy skill hit the primary target — a multi-target enemy skill in the
+     * data had no way to reach a second character, so an AoE would silently under-hit. The dispatch
+     * mirrors {@code SkillExecutor}'s character-skill shapes so the two sides read the same way, without
+     * sharing code: enemies do not reduce toughness and do not expand parameters, which is why
+     * {@link #execute} stays custom (see the class Javadoc).
      *
      * @param battle the battle in progress
      * @param user   the applier (an enemy)
-     * @param target the target list chosen by the caller (only the first is used)
+     * @param target the list chosen by the caller (only the first is used, as the main target)
      */
     @Override
     public void execute(Battle battle, CanHit user, List<? extends CanHit> target) {
@@ -92,6 +110,44 @@ public class EnemySkill extends Skill {
         if (victim == null || victim.isDeath()) {
             return;
         }
+        for (CanHit struck : struckBy(victim, battle)) {
+            strike(battle, user, struck);
+        }
+    }
+
+    /** Who this skill reaches, given the caller's main target. */
+    private List<CanHit> struckBy(CanHit mainTarget, Battle battle) {
+        // ⚠ Deliberately NOT filtered to the living here. A dead character is simply struck for zero
+        // segments by strike()'s own isDeath() check, which is the one guard that matters -- and it is
+        // the one a test can reach. An earlier version filtered here too, and mutation testing showed
+        // the outer filter changed no observable outcome (removing it left every test green), i.e. it
+        // was an untestable second guard for the same fact. One guard, exercised.
+        List<Character> team = battle.characters.stream()
+                .filter(member -> member != null)
+                .toList();
+        return switch (effect) {
+            case AOE_ATTACK -> List.copyOf(team);
+            case BLAST -> {
+                int center = team.indexOf(mainTarget);
+                if (center < 0) {
+                    yield List.of(mainTarget);       // not one of ours: fall back to the single target
+                }
+                List<CanHit> reached = new ArrayList<>();
+                reached.add(team.get(center));
+                if (center > 0) {
+                    reached.add(team.get(center - 1));
+                }
+                if (center < team.size() - 1) {
+                    reached.add(team.get(center + 1));
+                }
+                yield reached;
+            }
+            default -> List.of(mainTarget);
+        };
+    }
+
+    /** Lands {@link #hits} segments on one character. */
+    private void strike(Battle battle, CanHit user, CanHit victim) {
         double base = user.getAttribute(AttributeType.ATTACK).get() * multiplier;
         for (int i = 0; i < hits; i++) {
             if (victim.isDeath()) {
