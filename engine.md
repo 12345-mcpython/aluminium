@@ -519,6 +519,28 @@ SkillExecutor.execute
 > （`skills.json` 的 `attack_type` → `SkillCategory.ULTRA`），不看技能名、不看槽位。
 > 契约由 `UltCastTriggerTest` 钉住（一次终结技恰好一次、其余槽位不触发、`ALLY_ATTACK` 不受影响）。
 
+#### `FOLLOW_UP`：追加攻击是**独立事件**，不是"一种攻击"
+
+```
+Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结算点（P8-3 那条路）
+  └─ Battle.fireTriggersWithSubject(FOLLOW_UP, 攻击者, 承受者, 已结算量)
+        └─ actor = 打出追加攻击的人，target = 挨打的人
+```
+
+> ⚠ **不能用 `ALLY_ATTACK` 代替**：那条对**任何**攻击都发（普攻／战技／终结技），
+> 挂在它上面的「当装备者使用追加攻击时」会连带触发——是**静默多触发**，不是差一点。
+>
+> **口径**：引擎对"不算一次攻击的攻击"只有一个表示——`DamageType.ADDITIONAL`
+> （天赋驱动的追加攻击，如克拉拉的反击，就是这么结算的），所以这个事件只从那一处发出。
+>
+> **不设"是否打出了伤害"的门槛**：文案说的是"**使用**了追加攻击"，被盾全挡、
+> 或打在无敌目标上的那一次**依然是用过了**。所以每次结算都发。
+> （曾经加过 `settled > 0` 的门槛，后来删掉：语义本就可疑，而且**测试无法稳定造出
+> `settled == 0`**，那个分支会以"没被验证过"的状态上线。）
+>
+> ⚠ 由此产生的**递归**：用 `DAMAGE` op 回应 `FOLLOW_UP` 就是"追加攻击回应追加攻击"，
+> 由 `MAX_TRIGGER_DEPTH` 抛异常收住（同 §4.7 反击的乒乓）。
+
 其余事件的挂点：`BATTLE_START`（`startBattle`，在 `onBattleStart` 之后）、
 `ENERGY_GAINED`（`applyEnergyGain`）、`HP_LOST` / `KILL`（`applyDamage`）、
 `HEALED`（`heal`）、`BREAK`（`reduceToughness`）、

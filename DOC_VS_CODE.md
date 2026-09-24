@@ -584,6 +584,16 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 > 了这些新能力的一部分，但各自还被**别的**项卡死（见 `F-10` 的"仍缺什么"），
 > 所以**没有**为了凑数写近似规则。
 
+> **又补记（P10-3 后半之三：`FOLLOW_UP` 接线）**：**`F-10` 从 5/30 推进到 6/29**。
+> 上面那 7 条里，**326/2 已经整条解锁**：它的"追加攻击后攻击力 +24%"和"击杀后我方全体
+> 暴击伤害 +12%（本场战斗）"两个半边现在都能精确表达，所以 `326.json` 已写盘、并从登记表移除。
+> 新增的是一条**通用**能力：`FOLLOW_UP` 事件（在 `Battle.applyAdditionalDamage` 发出，
+> 那是全引擎唯一的追加伤害结算点），**不是**复用 `ALLY_ATTACK`——后者对任何攻击都发，
+> 挂上去会连带触发。
+> ⚠ 剩下那 6 条**没有**因此变少卡点，反而更清楚了：**115/2 与 315/2 现在只差
+> "追加攻击专属增伤"这一条属性**（那是伤害管线的改动），**115/4** 还差一个"清空本 buff
+> 全部层数"的 op，其余各自的阻塞项见 `_unmodelled.json`。
+
 ### F-1 战技点上限不是恒定值，且引擎无"改队伍级资源上限"的口子
 
 - **现状**：`Constant.SKILL_POINT_MAX = 5` 是常量，`gainSkillPoint` 直接对它封顶。
@@ -787,8 +797,8 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 ### F-10 套装具名 ability 只有一部分能用 op 词表表达（P10-3 后半）
 
 - **现状**：`relic_sets.json` 的 92 条效果里，**64 条带具名 ability**（其中 **35 条是纯 ability**、
-  29 条是"数值 + ability"）。纯 ability 的那 35 条里，**5 条**已经能用现有 op 词表**精确**表达
-  并且已经写盘，**30 条**还不能。
+  29 条是"数值 + ability"）。纯 ability 的那 35 条里，**6 条**已经能用现有 op 词表**精确**表达
+  并且已经写盘，**29 条**还不能。
 - **执行通道不是新建的**：ability 的文本形状恰好就是触发器表（"当 <事件>，做 <引擎已有的事>"），
   所以套装规则与角色规则**同一份 JSON 形状**，只是多一层**件数阈值分组**：
 
@@ -829,16 +839,18 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 
   顺带落地的第三条原语是条件变量 **`hp_percent`**（自己的血量比例），
   它是 106/4「回合开始时，若生命百分比 ≤ 50%」的前置；106/4 本身**仍未表达**，见下。
-- **还写不出来的 30 条**：逐条登记在 `resources/relic_sets/_unmodelled.json`（套装 / 件数 /
+- **还写不出来的 29 条**：逐条登记在 `resources/relic_sets/_unmodelled.json`（套装 / 件数 /
   ability 名 / **缺什么能力**），并由
   `RelicTriggerTableTest.everyAbilityOnlyBonusIsEitherAuthoredOrRegistered` 钉住
-  "**35 条里每一条要么有规则文件、要么在登记表里**"（35 = 5 + 30）—— 这就是"没写"与"忘了"的分界线。
-  30 条按缺的能力聚类（比逐条更好动手）：
-  1. **事件**：没有"我方对敌方造成伤害"事件（`HP_LOST` 只在我方掉血时广播）；没有追加攻击事件
-     （`ALLY_ATTACK` 是任意攻击）；没有"我方对友方施放"事件（施放事件**没有单一 target**，
+  "**35 条里每一条要么有规则文件、要么在登记表里**"（35 = 6 + 29）—— 这就是"没写"与"忘了"的分界线。
+  29 条按缺的能力聚类（比逐条更好动手）：
+  1. **事件**：没有"我方对敌方造成伤害"事件（`HP_LOST` 只在我方掉血时广播）；
+     ✅ **追加攻击事件本次已接线**（`FOLLOW_UP`，从 `Battle.applyAdditionalDamage` 发出）——
+     原本卡在这条上的 326/2 已整条解锁；
+     没有"我方对友方施放"事件（施放事件**没有单一 target**，
      所以"对友方施放终结技/战技"这类条件表达不了，114/118/121）；
      没有"盟友消耗了装备者生命"事件（113）。
-     ✅ `TURN_START` / `TAKING_HIT` 本次已接线；`TriggerEvent` 里已无未接线项。
+     ✅ `TURN_START` / `TAKING_HIT` 已接线；`TriggerEvent` 里已无未接线项。
   2. **条件**：目标身上的状态（有 debuff / 被禁锢 / 量子弱点 / 减防 / DoT 层数 / 是否持有
      "自己给的护盾"）；自身**其它**属性的阈值（速度 / 击破特攻 / 生命上限 / 能量上限）——
      ✅ 生命百分比本次已加（`hp_percent`），它解锁的是"条件"这一半，不是整条规则；

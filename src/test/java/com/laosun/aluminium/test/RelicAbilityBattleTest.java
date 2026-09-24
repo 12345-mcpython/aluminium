@@ -51,6 +51,8 @@ public class RelicAbilityBattleTest {
     private static final int TWILIGHT_EAGLE = 110;
     /** "Champion of Streetwise Boxing" — 4-piece: +5% ATK per attack taken/given, up to 5 stacks. */
     private static final int STREETWISE_BOXING = 105;
+    /** "City of Converging Stars" (planar) — 2-piece: on Follow-Up ATK +24% ATK; on a kill +12% CRIT DMG. */
+    private static final int CONVERGING_STARS = 326;
 
     /** Himeko: basic attack / skill / ultimate are all real, damaging skill slots. */
     private static final int HIMEKO = 1003;
@@ -376,6 +378,108 @@ public class RelicAbilityBattleTest {
         Assertions.assertTrue(buffsOn(hero, AttributeType.ATTACK).isEmpty(),
                 "three pieces is one short of the 4-piece bonus");
         Assertions.assertEquals(baseAttack, hero.getAttribute(AttributeType.ATTACK).get(), TOLERANCE);
+    }
+
+    // ==================================================================
+    // 6. FOLLOW_UP: City of Converging Stars (326)
+    // ==================================================================
+
+    /** Ability53261: on Follow-Up ATK, +24% ATK for 2 turns; on a kill, +12% CRIT DMG for all allies. */
+    private static final double CONVERGING_ATTACK = 0.24;
+    private static final double CONVERGING_CRIT_DMG = 0.12;
+
+    /**
+     * The wearer's own follow-up attack raises their ATK by the authored amount.
+     *
+     * <p>This is the end-to-end proof that {@code FOLLOW_UP} has a real emitter: the event is fired from
+     * {@code Battle.applyAdditionalDamage}, the rule lives in {@code resources/relic_sets/326.json}, and
+     * neither half is visible unless both work. Asserting on the resulting <b>attribute value</b> rather
+     * than on "a modifier exists" is deliberate — a rule that fired but applied nothing would pass the
+     * weaker check.
+     */
+    @Test
+    public void cityOfConvergingStarsBuffsAttackOnTheWearersFollowUp() {
+        Character himeko = wearing(HIMEKO, CONVERGING_STARS);
+        Battle battle = newBattle(List.of(himeko), true);
+        double before = himeko.getAttribute(AttributeType.ATTACK).get();
+
+        battle.applyAdditionalDamage(himeko, battle.enemies.getFirst(), DamageElement.FIRE, 100);
+
+        List<DoubleValue.Modifier> buffs = buffsOn(himeko, AttributeType.ATTACK);
+        Assertions.assertEquals(1, buffs.size(),
+                "Ability53261 must install exactly one ATK buff when the wearer uses a Follow-Up ATK");
+        Assertions.assertEquals(CONVERGING_ATTACK, buffs.getFirst().getValue(), TOLERANCE, "param #1 is 0.24");
+        Assertions.assertEquals(DoubleValue.Modifier.ModifierType.ADD_PERCENT,
+                buffs.getFirst().getModifierType(),
+                "ATK is a base attribute, so the buff is an additive percentage, not a flat value");
+        Assertions.assertTrue(himeko.getAttribute(AttributeType.ATTACK).get() > before,
+                "the buff must actually raise the attribute");
+    }
+
+    /**
+     * A follow-up attack is not just "an attack": a plain basic attack must leave the bonus alone.
+     *
+     * <p>This is why {@code FOLLOW_UP} exists instead of reusing {@code ALLY_ATTACK} — a rule hung on
+     * the latter would fire here too, which the set's text does not allow.
+     */
+    @Test
+    public void aBasicAttackDoesNotCountAsAFollowUp() {
+        Character himeko = wearing(HIMEKO, CONVERGING_STARS);
+        Battle battle = newBattle(List.of(himeko), true);
+        double before = himeko.getAttribute(AttributeType.ATTACK).get();
+
+        battle.castImmediate(himeko.getSkills().get(SkillType.COMMON), himeko,
+                List.of(battle.enemies.getFirst()));
+
+        Assertions.assertEquals(before, himeko.getAttribute(AttributeType.ATTACK).get(), TOLERANCE,
+                "only an additional-damage instance is a follow-up attack; a basic attack is not");
+    }
+
+    /**
+     * "This effect cannot stack" is honoured: a second follow-up refreshes rather than accumulating.
+     *
+     * <p>Worth asserting because the stacking primitive added for set 105 could easily have been applied
+     * here by reflex. A stackable reading would give +48% ATK and two modifiers.
+     */
+    @Test
+    public void theFollowUpAttackBonusDoesNotStack() {
+        Character himeko = wearing(HIMEKO, CONVERGING_STARS);
+        Battle battle = newBattle(List.of(himeko), true);
+        double base = himeko.getAttribute(AttributeType.ATTACK).get();
+
+        battle.applyAdditionalDamage(himeko, battle.enemies.getFirst(), DamageElement.FIRE, 100);
+        double afterFirst = himeko.getAttribute(AttributeType.ATTACK).get();
+        battle.applyAdditionalDamage(himeko, battle.enemies.getFirst(), DamageElement.FIRE, 100);
+
+        List<DoubleValue.Modifier> buffs = buffsOn(himeko, AttributeType.ATTACK);
+        Assertions.assertEquals(1, buffs.size(),
+                "two follow-ups must leave one modifier, not two");
+        Assertions.assertEquals(CONVERGING_ATTACK, buffs.getFirst().getValue(), TOLERANCE,
+                "the second follow-up refreshes the same bonus instead of adding another");
+        Assertions.assertEquals(afterFirst, himeko.getAttribute(AttributeType.ATTACK).get(), TOLERANCE,
+                "so the value after the second follow-up is the same as after the first, not higher");
+        Assertions.assertTrue(afterFirst > base, "and it really did move off the base value");
+    }
+
+    @Test
+    public void cityOfConvergingStarsGivesTheWholeTeamCritDamageOnAKill() {
+        Character himeko = wearing(HIMEKO, CONVERGING_STARS);
+        Character mate = plain(HIMEKO);
+        Battle battle = newBattle(List.of(himeko, mate), true);
+        Enemy enemy = battle.enemies.getFirst();
+        double wearerBefore = himeko.getAttribute(AttributeType.CRIT_ATTACK).get();
+        double mateBefore = mate.getAttribute(AttributeType.CRIT_ATTACK).get();
+
+        // One instance big enough to kill: the KILL event fires from applyDamage's settlement.
+        battle.applyAdditionalDamage(himeko, enemy, DamageElement.FIRE, ENEMY_HP * 2);
+        Assertions.assertTrue(enemy.isDeath(), "the enemy really did die, so KILL fired");
+
+        Assertions.assertEquals(wearerBefore + CONVERGING_CRIT_DMG,
+                himeko.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "CRIT DMG is a ratio attribute, so the value is the bonus itself (12 percentage points)");
+        Assertions.assertEquals(mateBefore + CONVERGING_CRIT_DMG,
+                mate.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "'for all allies' must reach a team-mate, not just the wearer");
     }
 
     // ==================================================================
