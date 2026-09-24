@@ -594,6 +594,16 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 > "追加攻击专属增伤"这一条属性**（那是伤害管线的改动），**115/4** 还差一个"清空本 buff
 > 全部层数"的 op，其余各自的阻塞项见 `_unmodelled.json`。
 
+> **又补记（P10-3 后半之四：`FOLLOW_UP_DAMAGE_BOOST`）**：**`F-10` 从 6/29 推进到 7/28**。
+> 上一条补记里说"115/2 与 315/2 只差一条属性"——这条属性**加了**：
+> `AttributeType.FOLLOW_UP_DAMAGE_BOOST`，在 `Battle.assemble` 的增伤区里**按伤害类型**应用
+> （只有 `DamageType.ADDITIONAL` 吃到）。**115/2 因此整条解锁**（`115.json` 已写盘）。
+> ⚠ 但它**没有**解锁 315/2：那条还需要"自身层数达到 5"的条件；也**没有**解锁 115/4：
+> 它还差"**每次造成伤害**都叠一层"的计数（引擎把一次追加攻击结算成**一个**实例，
+> 永远到不了文案写的 8 层）——所以 115/4 现在写明是**两条**子句都缺，写下去会静默少算。
+> 顺便验证了这次管线改动是**纯增量**：把类型门槛去掉只让"D 只影响追加攻击"那条断言变红，
+> 伤害管线的既有测试（`DamagePipelineTest` / `DamageZoneTest`）**一条都没坏**。
+
 ### F-1 战技点上限不是恒定值，且引擎无"改队伍级资源上限"的口子
 
 - **现状**：`Constant.SKILL_POINT_MAX = 5` 是常量，`gainSkillPoint` 直接对它封顶。
@@ -797,8 +807,8 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 ### F-10 套装具名 ability 只有一部分能用 op 词表表达（P10-3 后半）
 
 - **现状**：`relic_sets.json` 的 92 条效果里，**64 条带具名 ability**（其中 **35 条是纯 ability**、
-  29 条是"数值 + ability"）。纯 ability 的那 35 条里，**6 条**已经能用现有 op 词表**精确**表达
-  并且已经写盘，**29 条**还不能。
+  29 条是"数值 + ability"）。纯 ability 的那 35 条里，**7 条**已经能用现有 op 词表**精确**表达
+  并且已经写盘，**28 条**还不能。
 - **执行通道不是新建的**：ability 的文本形状恰好就是触发器表（"当 <事件>，做 <引擎已有的事>"），
   所以套装规则与角色规则**同一份 JSON 形状**，只是多一层**件数阈值分组**：
 
@@ -839,11 +849,11 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 
   顺带落地的第三条原语是条件变量 **`hp_percent`**（自己的血量比例），
   它是 106/4「回合开始时，若生命百分比 ≤ 50%」的前置；106/4 本身**仍未表达**，见下。
-- **还写不出来的 29 条**：逐条登记在 `resources/relic_sets/_unmodelled.json`（套装 / 件数 /
+- **还写不出来的 28 条**：逐条登记在 `resources/relic_sets/_unmodelled.json`（套装 / 件数 /
   ability 名 / **缺什么能力**），并由
   `RelicTriggerTableTest.everyAbilityOnlyBonusIsEitherAuthoredOrRegistered` 钉住
-  "**35 条里每一条要么有规则文件、要么在登记表里**"（35 = 6 + 29）—— 这就是"没写"与"忘了"的分界线。
-  29 条按缺的能力聚类（比逐条更好动手）：
+  "**35 条里每一条要么有规则文件、要么在登记表里**"（35 = 7 + 28）—— 这就是"没写"与"忘了"的分界线。
+  28 条按缺的能力聚类（比逐条更好动手）：
   1. **事件**：没有"我方对敌方造成伤害"事件（`HP_LOST` 只在我方掉血时广播）；
      ✅ **追加攻击事件本次已接线**（`FOLLOW_UP`，从 `Battle.applyAdditionalDamage` 发出）——
      原本卡在这条上的 326/2 已整条解锁；
@@ -897,12 +907,15 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
    现在纯粹是"把 10 个角色写成 JSON"的内容活，不再是引擎任务。
    **`F-5`**（敌人技能数据）：等 P9-1，不需要现在处理。
 10. **`F-10`**（套装 ability）：**通道已经就位**（`resources/relic_sets/<setId>.json` +
-    `data.RelicTriggerTables` + 装配点合并），35 条里 **5 条**已表达、**30 条**带原因登记。
-    ✅ 首批三条通用能力已经落地（`max_stacks` / `permanent` 叠层与无上限时长、
-    `TURN_START` + `TAKING_HIT` 接线、`hp_percent` 条件变量），效果是 **105/4 被精确表达**。
-    ⚠ 实测结论：这三条只解锁了 105/4 **一条**；另外 6 条（113/115/121/126/131/326）
-    都用上了其中的一部分，但各自还被**别的**项卡住（见 `F-10` 的"仍缺什么"），
-    按"不许近似"的口径只能继续登记。
+    `data.RelicTriggerTables` + 装配点合并），35 条里 **7 条**已表达、**28 条**带原因登记。
+    ✅ 三条通用能力 + 两个事件已经落地（`max_stacks` / `permanent` 叠层与无上限时长、
+    `TURN_START` + `TAKING_HIT` + `FOLLOW_UP` 接线、`hp_percent` 条件变量、
+    `FOLLOW_UP_DAMAGE_BOOST` 属性），精确表达出来的有 **105/4、326/2、115/2** 三条
+    （另有 104/4、109/4、110/4、101/4 是更早落的）。
+    ⚠ 实测结论：这些能力**不是**一次解锁一批，而是**逐条**——每加一条能力，
+    `35` 的分配才挪一格（4/31 → 5/30 → 6/29 → 7/28）。剩下的条目里，
+    有些用掉了新能力的一部分却仍被**别的**子句卡住（如 115/4 还缺"每次造成伤害"的计数，
+    引擎把一次追加攻击结算成一个实例，永远到不了文案的 8 层），按"不许近似"的口径继续登记。
     下一步性价比最高的是**数值模型**那一类（HEAL 取最大生命百分比 → 106/4；
     按技能类型加伤 → 107/115/122/131 的一部分），以及**追加攻击事件**
     （一次覆盖 115 的两条 + 315/326）。
