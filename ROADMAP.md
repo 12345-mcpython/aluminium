@@ -660,7 +660,11 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 
 - **涉及文件**：`models/Enemy.java`、新建 `models/buffs/CounterMechanic.java`、`Main.java`、新建 `test/BossMechanicTest.java`
 - **怎么做**：
-    1. `Enemy.phase`：HP 阈值切技能列表（用 `condition` 表达）。
+    1. ~~`Enemy.phase`：HP 阈值切技能列表~~ —— ✅ **已落地**（`Enemy.setPhaseSkill` / `activeSkill`，
+       `EnemyPhaseTest` 5 条）。**注意实现方式**：`activeSkill()` **每次读当前血量**，
+       所以**不需要任何状态机** —— 没有要翻的标志位、没有要调度的转换。
+       这正是为了绕开第 4 条那个陷阱（"把血条锁在 1"）。⚠ 它**只覆盖阈值换招**；
+       **多血条**仍需要锁血 + 显式重置，那一项**未做**，单独登记。
     2. 受击反击：用 `DamageEvent` → 追加一段 `DamageType.ADDITIONAL` + `notCountsAsAttack()`，
        **反击目标 = 该段的 `damage.getAttacker()`**（"施放技能的个体"，不一定等于角色本人）。
        > ⚠ **不是一行代码**：`DamageEvent.onDamage` 是在结算**之前**往这一击里塞乘区用的，
