@@ -560,8 +560,18 @@ public class Battle {
     }
 
     /**
-     * Weakness break's attached damage over time (P4-5): only Fire/Lightning/Physical/Wind have it
-     * (Ice = Frozen, Quantum = Entanglement, Imaginary = Imprisonment; P10-1 unified it into a table).
+     * Weakness break's attached damage over time (P4-5): only Fire/Lightning/Physical/Wind have it.
+     * Ice = Frozen, Quantum = Entanglement, Imaginary = Imprisonment — those three carry <b>no effect at
+     * all</b> today, they are not merely "a different DOT".
+     *
+     * <p>⚠ <b>There is no table here yet.</b> This reads {@code Constant.DOT_ELEMENTS} (a set) plus the two
+     * scalars {@code DOT_RATIO} / {@code DOT_TURNS}, so all four DOT elements share one ratio and one
+     * duration. An earlier revision of this comment said "P10-1 unified it into a table", which was wrong
+     * and actively misleading: <b>P10-1 is still open</b>, and a reader who believed that sentence would
+     * skip the task. What it should become is a per-element record (dot ratio, dot turns, delay percent,
+     * control type) looked up here, with the three control elements filled in together with P10-2's control
+     * state machine — until then the honest state is "four elements share two constants, three have
+     * nothing".
      *
      * @param attacker the breaker (the DOT's source, and the damage's attacker)
      * @param enemy    the target that was broken
