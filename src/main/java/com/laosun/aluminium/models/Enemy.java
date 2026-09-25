@@ -99,6 +99,63 @@ public class Enemy extends CanHit {
      */
     private final List<Dot> dots = new ArrayList<>();
 
+    /**
+     * Phase table (P9-5): a skill that becomes the active one once the enemy is at or below an HP ratio,
+     * kept in <b>ascending</b> threshold order.
+     *
+     * <p>{@link #activeSkill()} reads the current HP every time it is asked, so a phase change needs no
+     * bookkeeping at all — no flag to flip, no transition to schedule. That is deliberate: the alternative
+     * ("hold the HP bar at 1 and advance the phase when it would have died") is the approach the roadmap
+     * warns about, because {@code CanHit.takeDamage} sets {@code death = true} the moment HP reaches 0, so
+     * a locked bar either skips the phase or lets the enemy be hit after it is already down. A
+     * <b>multi-HP-bar</b> boss does need locking, and the safe way is {@code setInvulnerable(true)}
+     * followed by an explicit HP reset — that is not implemented here and stays registered as its own item.
+     */
+    private final List<PhaseSkill> phases = new ArrayList<>();
+
+    /** One phase: at or below {@code hpRatio} of max HP, {@code skill} is what this enemy acts with. */
+    public record PhaseSkill(double hpRatio, Skill skill) {
+    }
+
+    /**
+     * Registers a phase. Thresholds are kept sorted, so they may be added in any order.
+     *
+     * @param hpRatio the HP ratio (0.5 = half) at or below which {@code skill} takes over
+     * @param skill   the skill to act with from that point on
+     */
+    public void setPhaseSkill(double hpRatio, Skill skill) {
+        if (skill == null) {
+            return;
+        }
+        phases.add(new PhaseSkill(hpRatio, skill));
+        phases.sort(java.util.Comparator.comparingDouble(PhaseSkill::hpRatio));
+    }
+
+    /** How many phases are registered (0 = no phase behaviour, which is every enemy today). */
+    public int phaseCount() {
+        return phases.size();
+    }
+
+    /**
+     * The skill to act with <b>right now</b>, or {@code null} when no phase applies.
+     *
+     * <p>The <b>lowest</b> registered threshold the enemy is at or below wins, which is what makes the list
+     * ascending: the first match is the tightest one, so a boss at 20% uses its 20% phase and not its 80%
+     * one. {@code null} means "no phase behaviour applies" and the caller should use the enemy's ordinary
+     * {@code COMMON} skill — returning {@code null} rather than that skill keeps this class from having to
+     * know which slot the fallback lives in.
+     */
+    public Skill activeSkill() {
+        double maxHp = getMaxHp();
+        double ratio = maxHp <= 0 ? 1.0 : getCurrentHp() / maxHp;
+        for (PhaseSkill phase : phases) {
+            if (ratio <= phase.hpRatio()) {
+                return phase.skill();
+            }
+        }
+        return null;
+    }
+
     public Enemy(String name, Camp camp, DoubleValue[] attributes) {
         super(name, camp, attributes);
     }
