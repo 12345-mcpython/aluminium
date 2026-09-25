@@ -1482,6 +1482,10 @@ public class Battle {
      * {@link #fireTriggers}'s depth guard, because it is fired from there — but a buff reacts through
      * {@code BuffManager.onHpLoss}, which is <b>not</b> on that path, so it needs its own guard.
      *
+     * <p><b>Verified load-bearing</b> by `BossMechanicTest.aCounterAnsweringACounterIsRefused`, which
+     * watches the wearer's victim: removing the check lets the answering counter land and turns it red.
+     * (An earlier test watched the other side and could not tell the difference — see that test's Javadoc.)
+     *
      * <p>Per-battle state, not a static: two battles in the same test must not share a depth counter.
      * The reaction is <b>skipped</b> rather than reported when it would nest, because "the counter's own
      * damage does not itself trigger a counter" is the intended rule, not an error.

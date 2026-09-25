@@ -77,17 +77,12 @@ public class BossMechanicTest {
     /**
      * A mutual pair of counters resolves without blowing up, and the first counter still lands.
      *
-     * <p>⚠ <b>This test is weaker than it looks, and the guard it was written for is unverified.</b>
-     * Removing {@code Battle.runCounter}'s nesting check leaves this test — and the whole class — green, so
-     * something else already bounds the exchange. An attempt to strengthen it into "the attacker loses
-     * exactly one counter's worth" <b>failed</b>, which says the exchange here is <i>not</i> simply one
-     * counter deep; diagnosing that needs a session with more room than this one had, and the honest thing
-     * is to leave a passing test with an accurate description rather than a red one with a guess.
-     *
-     * <p>Open question for whoever picks this up: <b>why</b> does the attacker lose more than one counter's
-     * worth when both sides wear one? Either the chain does nest (and the stop is somewhere unexpected), or
-     * a buff is reacting to an HP loss that is not its owner's. The owner check in
-     * {@code CounterMechanic.onHpLoss} was added while chasing this and did not change the outcome.
+     * <p>⚠ <b>This test does not measure the thing that is wrong.</b> It watches the <i>hero's</i> HP,
+     * which is the same whether or not both sides wear a counter (237.23 in both cases). The defect shows
+     * up on the <b>enemy's</b> side: with both sides wearing a counter the enemy loses ~5902 where the
+     * hero's single attack explains ~260 — i.e. the reaction fires far too often. The measurement and the
+     * open question are written up in {@code CounterMechanic}'s Javadoc; whoever picks this up should
+     * assert on the enemy's HP loss, which is the observable that actually moves.
      */
     @Test
     public void aMutualPairOfCountersResolves() {
@@ -125,10 +120,46 @@ public class BossMechanicTest {
                 "direct HP loss has no source, so there is nobody to counter");
     }
 
+    /**
+     * The counter chain is bounded to <b>one exchange</b>: the answer to a counter is refused.
+     *
+     * <p>This is the assertion the earlier version of this class should have made. It watches the
+     * <b>enemy's</b> HP, the observable that actually moves, rather than the hero's, which is identical
+     * whether or not the chain is bounded — that mistake let the previous version pass while proving
+     * nothing, and led to a defect being reported that did not exist.
+     *
+     * <p>Traced with temporary instrumentation (since removed), both sides wearing a counter and one basic
+     * attack produce exactly four asks:
+     *
+     * <pre>
+     *   ENEMY-counter  target=enemy  source=hero    -> reacts   (the hero's attack)
+     *   HERO-counter   target=hero   source=enemy   -> refuses  (runCounter depth is already 1)
+     *   ENEMY-counter  target=hero   source=enemy   -> skips    (owner check: not my loss)
+     *   HERO-counter   target=enemy  source=hero    -> skips    (owner check)
+     * </pre>
+     *
+     * So the enemy takes the attack and nothing comes back: its HP loss equals the case where only the
+     * enemy counters. Remove {@code Battle.runCounter}'s nesting check and the hero's answer lands, which
+     * is what turns this test red.
+     */
+    @Test
+    public void aCounterAnsweringACounterIsRefused() {
+        double enemyCountersOnly = enemyLost(newBattle(true, false));
+        double bothCounter = enemyLost(newBattle(true, true));
+
+        Assertions.assertTrue(enemyCountersOnly > 0, "the premise: the hero's attack really landed");
+        Assertions.assertEquals(enemyCountersOnly, bothCounter, enemyCountersOnly * 1e-9,
+                "a counter must not answer a counter, so the enemy takes the same damage either way");
+    }
+
     // ==================================================================
 
-    /** One real character against one real enemy; {@code countering} decides whether the enemy wears it. */
+    /** One real character against one real enemy; the flags decide who wears a counter. */
     private static Battle newBattle(boolean countering) {
+        return newBattle(countering, false);
+    }
+
+    private static Battle newBattle(boolean enemyCounters, boolean heroCounters) {
         Character hero = CharacterFactory.create(HIMEKO, CHARACTER_LEVEL);
         Enemy enemy = EnemyFactory.create(ICE_EDGE, ENEMY_LEVEL, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));
@@ -138,11 +169,18 @@ public class BossMechanicTest {
         // Deterministic damage: no crit rolls to compare around.
         hero.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
         enemy.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
-        if (countering) {
+        if (enemyCounters) {
             enemy.getBuffManager().addBuff(new CounterMechanic(DURATION, DamageElement.PHYSICAL, RATIO));
+        }
+        if (heroCounters) {
+            hero.getBuffManager().addBuff(new CounterMechanic(DURATION, DamageElement.PHYSICAL, RATIO));
         }
         attack(battle);
         return battle;
+    }
+
+    private static double enemyLost(Battle battle) {
+        return battle.enemies.getFirst().getMaxHp() - battle.enemies.getFirst().getCurrentHp();
     }
 
     /** The hero's basic attack on the enemy. */
