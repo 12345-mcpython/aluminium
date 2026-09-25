@@ -322,7 +322,12 @@ public class Main {
 
         // P5-4: pick the target randomly weighted by aggro (Preservation 150 is easier to hit than the regular 100)
         CanHit target = TargetSelector.select(battle, candidates, TargetSelector.Intent.SINGLE, battle.getRng());
-        Skill attack = enemy.getSkills().get(SkillType.COMMON);
+        // P9-5: a boss may swap its skill at an HP threshold; null means it has no phase behaviour and the
+        // ordinary skill applies (which is every enemy in this demo).
+        Skill attack = enemy.activeSkill();
+        if (attack == null) {
+            attack = enemy.getSkills().get(SkillType.COMMON);
+        }
         if (target == null || attack == null) {
             System.out.println("        → no targetable target or skill");
             return;
