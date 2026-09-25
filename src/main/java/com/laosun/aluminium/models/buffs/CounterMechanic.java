@@ -10,6 +10,18 @@ import com.laosun.aluminium.models.event.HpLossEvent;
 /**
  * Counter-attack (P9-5): while this is attached, losing HP hits the one who caused it back.
  *
+ * <p><b>Retraction (2026-09-24).</b> A previous revision of this Javadoc carried an "OPEN DEFECT" claiming
+ * the reaction fired far too often when both sides wore one, based on a measurement showing an enemy lose
+ * 5902 where one attack explained 260. <b>There was no defect: that measurement was taken after an extra
+ * attack</b>, so it quietly included a second exchange. Re-measured with a trace, both sides wearing a
+ * counter and exactly one attack produce one bounded exchange — the enemy takes the attack (260.24), the
+ * hero takes the counter (237.23), and the answering counter is refused.
+ *
+ * <p>The lesson outlives the retraction: the test that "failed to verify the guard" watched the
+ * <b>hero's</b> HP, which is identical whether or not the chain is bounded, so it could not see the
+ * difference. What moves is the <b>other side's</b> HP. When one side of a comparison refuses to move,
+ * suspect the choice of observable before concluding the engine is wrong.
+ *
  * <p><b>Which hook, and why it is not the obvious one.</b> {@code DamageEvent.onDamage} runs
  * <i>before</i> a hit is settled and exists to inject damage zones into that hit — a counter needs the
  * moment <i>after</i> the hit landed, which is {@link HpLossEvent#onHpLoss}. That hook also hands over
