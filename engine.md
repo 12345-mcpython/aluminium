@@ -1851,8 +1851,10 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 > 整个测试套件拖下水（护栏见 `StageLazyLoadTest`）。
 
 `JSONReader.fromJSON` 用 UTF-8 + try-with-resources 读 classpath `/data/`。
-> ⚠️ 它的 javadoc 说"资源缺失返回 null"，实际是 `Objects.requireNonNull` **抛 NPE**；
-> 在 `Constant` 静态块里会变成 `ExceptionInInitializerError`，此后该 JVM 内每次访问 `Constant` 都失败。
+> 两种"数据不可用"都在**检测处**报同一个 `IllegalStateException`，并带上文件路径：
+> 文件**缺失**，以及文件存在但解析成 `null`（空文件 / 字面 `null`）—— 后者原先会变成
+> `Constant.WEAPONS = frozen(null)`，在很远的某行 NPE，或表现得像"这张表本来就是空的"（M-17）。
+> 空表仍然合法（`{ }` → 空 map，不是 `null`）。
 > 而且 `src/main/resources/data/` 被 `.gitignore` 排除，**新克隆的仓库必须先生成数据**，否则所有测试全红。
 
 ---
