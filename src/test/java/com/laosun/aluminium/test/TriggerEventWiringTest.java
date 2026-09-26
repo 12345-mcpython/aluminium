@@ -223,7 +223,7 @@ public class TriggerEventWiringTest {
         Character hero = character(watchTable());
         Character teammate = plain(HIMEKO);
         Battle battle = battle(hero, teammate);
-        Enemy enemy = battle.enemies.getFirst();
+        Enemy enemy = battle.enemyUnits().getFirst();
 
         battle.applyDamage(enemy, damage(hero, enemy, 5_000));
 

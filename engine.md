@@ -27,7 +27,7 @@
                                               │
 数值层   AttributeBuilder ──▶ DoubleValue[]（按 AttributeType.ordinal() 索引）
                                               │
-实体层   CanHit（抽象基类）├── Character   ├── Enemy   └── Summon ❌未被实例化
+实体层   CanHit（抽象基类）├── Character   ├── Enemy   └── Summon ⚠类存在、敌方阵营收得下，但内容侧还没创建（P9-4）
                                               │
 战斗层   Battle ── Queue（行动条）──▶ 回合推进
            │
@@ -838,6 +838,15 @@ processSkillRequests() → processAddRequests() → processAdvanceRequests() →
 - `removeDeadCombatants()` 把死者移出 `Queue`，并清空其 buff（`clearAll()`）。
 - **死者仍留在 `battle.characters` / `battle.enemies` 列表里** → 所有需要"活人"的地方必须自己判
   `isDeath()`；`Battle.targetableEnemies()` 是"谁可以被选为目标"的**唯一出口**。
+
+> ⚠ **`Battle.enemies` 是"敌方阵营"，不是"怪物列表"**（L-8）。类型是 `List<CanHit>`，因为敌方阵营
+> 除了怪还可以有召唤物（P9-4）；`Battle.enemyUnits()` 才是"其中的 `Enemy`"。这条分工是有意的：
+> **"在那一侧"和"是只怪"是两个问题**，需要怪物机制（韧性 / 弱点 / 分元素抗性 / 阶段表）的代码
+> 必须显式走 `enemyUnits()`，而不是假设每一格都是怪 —— 所以放宽之后**没有任何地方静默跳过召唤物**。
+> `targetableEnemies()` 同样返回 `CanHit`（否则放宽在"谁会被打到"这一步就白费了），
+> 胜负判定 `enemies.stream().allMatch(isDeath)` 也是**整阵营**（场上还有召唤物就不算赢）。
+> 回归：`EnemyCampSummonTest` 4 条 —— 阵营收得下非怪、引擎目标表包含它、**打死所有怪但召唤物还站着不算赢**、
+> 它在行动条上有自己的 Signal。变异：把胜负判定改成 `enemyUnits()`、或把目标表限回 `Enemy`，各红一条。
 - `isInvulnerable()`（转阶段无敌）与死亡正交：无敌目标**仍然可被选中**（AOE 会"打中"它、伤害为 0），
   但 `applyDamage` 不结算。
 
@@ -1864,7 +1873,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | 技能槽位 | ✅ P8-2 已接（`Constant.SKILL_SLOT` 六槽，见 §7.2）；剩下的占位是 `Character.fromAttributes(...)` 这个测试入口（写死槽位 1） |
 | 击破 DOT 数值 | `DOT_RATIO=0.5`、`DOT_TURNS=3` 是示例值，base 不含击破特攻与削韧值 |
 | 神君/账账类追加攻击 | 未进入事件体系 |
-| 召唤物 | `Summon` 类存在但**从未被实例化**；`battle.enemies` 是 `List<Enemy>`，敌方召唤物无处安放（我方入场/波次走的是 `WaveManager` → `Battle.addRequestItems`，那条路是活的） |
+| 召唤物 | `Summon` 类存在；**敌方阵营现在收得下它**（L-8：`battle.enemies` 是 `List<CanHit>`，`enemyUnits()` 才是"其中的怪"）—— 但内容侧仍未创建任何召唤物，`SkillEffectType.SUMMON` 也没分派（P9-4）。我方入场/波次走 `WaveManager` → `Battle.addRequestItems`，那条路是活的 |
 | 控制 | 只有 `StunBuff` 一种 |
 | 治疗 | 只有 `heal()` 方法，无乘区、无调用者 |
 

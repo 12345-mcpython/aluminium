@@ -46,7 +46,46 @@ public class Battle {
 
     public List<Character> characters;
 
-    public List<Enemy> enemies;
+    /**
+     * The <b>enemy camp's roster</b> — every combatant fighting against us, in battlefield order.
+     *
+     * <p>⚠ <b>Deliberately {@code CanHit}, not {@code Enemy}</b> (L-8). It used to be
+     * {@code List<Enemy>}, which made an enemy-side {@link com.laosun.aluminium.models.Summon}
+     * <b>structurally impossible to place</b>: the action bar accepts any {@code CanHit}
+     * ({@code Queue.addCombatants} takes {@code List<? extends CanHit>}), and camp-agnostic code
+     * ({@code TargetSelector}, {@code opposingCamp}) was already written against {@code CanHit},
+     * but the roster it had to be registered in only admitted monsters. Widening it here is what
+     * makes P9-4 possible at all.
+     *
+     * <p>Code that needs <b>monster</b> mechanics (toughness, weakness, per-element debuff
+     * resistance, phase tables) must ask for them explicitly through {@link #enemyUnits()} rather
+     * than assuming every entry is one — that is the whole point of the split, and it is why a
+     * summon is not silently skipped anywhere: the places that genuinely only work on monsters now
+     * say so.
+     *
+     * <p>Mutable on purpose: {@code WaveManager} appends each new wave's monsters to it.
+     */
+    public List<CanHit> enemies;
+
+    /**
+     * The {@link Enemy} entries of {@link #enemies}, in the same order — the monsters, without any
+     * summon that may be sharing the camp.
+     *
+     * <p>Exists so that "the enemy side" and "the monsters on the enemy side" are two named things
+     * instead of one type that has to mean both. A fresh list: the caller may remove from it freely.
+     *
+     * @return a fresh list of the enemy camp's monsters (including dead ones — filter with
+     *         {@code !isDeath()} if that is what you mean)
+     */
+    public List<Enemy> enemyUnits() {
+        List<Enemy> monsters = new ArrayList<>();
+        for (CanHit unit : enemies) {
+            if (unit instanceof Enemy enemy) {
+                monsters.add(enemy);
+            }
+        }
+        return monsters;
+    }
 
     public Signal currentMove;
 
@@ -165,13 +204,20 @@ public class Battle {
     public record SkillRequest(Skill skill, CanHit object, List<? extends CanHit> target) {
     }
 
-    public Battle(List<Character> characterQueue, List<Enemy> enemyQueue) {
+    public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue) {
         this(characterQueue, enemyQueue, new Random());
     }
 
-    public Battle(List<Character> characterQueue, List<Enemy> enemyQueue, Random rng) {
+    /**
+     * @param characterQueue our side (characters; a player-side summon is added to the action bar directly)
+     * @param enemyQueue     the enemy camp — monsters, and any summon fighting alongside them. Taken as
+     *                       {@code ? extends CanHit} so that a caller's {@code List<Enemy>} still fits
+     *                       (L-8). Copied, so the battle owns its roster and a later
+     *                       {@code WaveManager} append does not write through to the caller's list.
+     */
+    public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng) {
         characters = characterQueue;
-        enemies = enemyQueue;
+        enemies = new ArrayList<>(enemyQueue);
         this.rng = rng;
         queue = new Queue();
         queue.addCombatants(characterQueue);
@@ -183,7 +229,7 @@ public class Battle {
         for (Character c : characterQueue) {
             c.setSpeedChangeListener(this::onSpeedChanged);
         }
-        for (Enemy e : enemyQueue) {
+        for (CanHit e : enemyQueue) {
             e.setSpeedChangeListener(this::onSpeedChanged);
         }
         listenToSkillPointChanges();
@@ -1653,17 +1699,21 @@ public class Battle {
     }
 
     /**
-     * Enemies that may be selected as attack targets (= alive), in battlefield order.
+     * The enemy camp's units that may be selected as attack targets (= alive), in battlefield order.
      *
      * <p>Single source of truth for "who can be hit": {@link SkillExecutor} uses it today,
      * the target selector (P5-4) and wave handling (P7-4) must use the same judgement so
      * that no caller ever picks a corpse (that is where corpse-hitting comes from).
      *
-     * @return a fresh list of alive enemies
+     * <p>Returns {@code CanHit}, not {@code Enemy} (L-8): an enemy-side summon is a legitimate
+     * target, and narrowing here would have made the roster widening pointless — the target list is
+     * where the widening has to be visible.
+     *
+     * @return a fresh list of the camp's alive units
      */
-    public List<Enemy> targetableEnemies() {
-        List<Enemy> targets = new ArrayList<>();
-        for (Enemy enemy : enemies) {
+    public List<CanHit> targetableEnemies() {
+        List<CanHit> targets = new ArrayList<>();
+        for (CanHit enemy : enemies) {
             if (!enemy.isDeath()) {
                 targets.add(enemy);
             }
@@ -1778,7 +1828,7 @@ public class Battle {
         for (Character c : characters) {
             System.out.printf("%s: %.0f / %.0f%n", c.getName(), c.getCurrentHp(), c.getMaxHp());
         }
-        for (Enemy e : enemies) {
+        for (CanHit e : enemies) {
             System.out.printf("%s: %.0f / %.0f%n", e.getName(), e.getCurrentHp(), e.getMaxHp());
         }
         System.out.println("================");
