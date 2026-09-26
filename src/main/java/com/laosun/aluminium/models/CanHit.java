@@ -360,13 +360,33 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return the **actually credited amount** (after being truncated by the cap, not the theoretical gain)
      */
     public double gainEnergy(EnergyGain gain) {
-        if (gain == null || gain.amount() <= 0 || !hasEnergyBar()) {
+        if (gain == null || !hasEnergyBar()) {
+            return 0;
+        }
+        // A non-positive base is not a gain. ⚠ This guard deliberately keeps its original `<= 0` shape: it
+        // is NOT where NaN is refused -- `NaN <= 0` is false, so a NaN amount walks past it. That is caught
+        // one step down at the product, which is written the way it is for exactly that reason. (Measured
+        // while mutating: rewriting this line as `!(amount > 0)` changes no test's outcome, so it would have
+        // been a redundant condition carried for appearances.)
+        if (gain.amount() <= 0) {
             return 0;
         }
         double efficiency = gain.affectedByEfficiency()
                 ? 1 + getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get()
                 : 1;
-        double added = Math.min(maxEnergy - currentEnergy, gain.amount() * efficiency);
+        double proposed = gain.amount() * efficiency;
+        // Same reasoning for the efficiency attribute (a NaN there poisons the product), plus a NEGATIVE
+        // efficiency -- `ENERGY_REGENERATION_RATE <= -1` gives efficiency <= 0 -- which turned this "gain"
+        // into a subtraction. A gain that takes energy away is indistinguishable from a bug, so it is
+        // refused rather than clamped to something plausible.
+        if (!(proposed > 0)) {
+            return 0;
+        }
+        // `maxEnergy - currentEnergy` is negative when the bar already sits above its cap (the public
+        // setCurrentEnergy is a raw write, the same "unprotected" style as Resource.setValue), and
+        // `Math.min(negative, gain)` then LOWERED the energy by the whole over-cap amount. Take 0 instead:
+        // capping an over-cap value is a separate operation, not something a gain should do on the way past.
+        double added = Math.min(Math.max(0, maxEnergy - currentEnergy), proposed);
         currentEnergy += added;
         return added;
     }
