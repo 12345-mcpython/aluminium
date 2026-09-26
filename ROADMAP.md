@@ -97,7 +97,7 @@
 | `utils.CharacterFactory` | `create(cid, level)`（真实角色）/ `usesSpecialResource(cid)` / `exists` |
 | `models.EnemyFactory` | `create(monsterId, level, hardLevelGroup)` |
 | `utils.StageFactory` | `load(stageId)` |
-| `Constant` | `CHARACTERS` / `WEAPONS` / `SKILLS` / `SKILL_POINTS` / `MONSTERS` / `SKILL_SLOT` / `stages()`（懒加载） |
+| `Constant` | `CHARACTERS` / `WEAPONS` / `SKILLS` / `SKILL_TRACES` / `MONSTERS` / `SKILL_SLOT` / `stages()`（懒加载） |
 
 ### 2.2 数据文件速查
 
@@ -1078,7 +1078,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 
 | # | 位置 | 问题 |
 |---|---|---|
-| H-1 | `Constant.java` | ✅ **已修（2026-09-27）**：加载期用递归助手 `frozen(...)` 把**容器**冻结（`Collections.unmodifiableMap/List` + `LinkedHashMap`/`ArrayList` 保序，**不用 `Map.copyOf` 因为它不保序**）。原文成立：`public static final` 只锁引用，Gson 交回的是可变 `LinkedHashMap`，**嵌套层也一样**（`SKILLS.get(cid)` 是 map、`SKILL_POINTS.get(cid)` 是 list）→ 任何调用方一次 `clear()`/`put()` 就静默污染同 JVM 后续所有消费者。**先核过：全仓无人写这些表**（顶层与嵌套都没有），所以改完不破坏任何调用点。<br>**包了 8 个**：`WEAPONS`/`CHARACTERS`/`SKILL_POINTS`/`SKILLS`/`MONSTER_TEMPLATES`/`HARD_LEVEL_GROUPS`/`BREAKING_RATE`/`ENEMY_SKILLS`；**3 个本来就不变**（`RELIC_SETS` 走 `RelicSets.index` 的 `Map.copyOf`、`MONSTER_CONFIGS`、`ENEMY_SKILLS`）—— 其中 `RELIC_SETS` 我先包了一次，**被 `RelicSetTest` 的 identity 断言（"读一次并缓存"）抓住**，退回不包。<br>⚠ **范围是容器、不是 bean**：bean 里的字段/内部 map 仍可变 —— `RelicMainAttribute.getAttributeByStar` 那两处仍是 **N-11**。<br>**验收**：`ConstantImmutabilityTest` 3 条（顶层 7 张表 + 嵌套 map/list + 读取仍正常）；变异（摘掉一张表的包装 / 助手不递归）**各红一条、零连带**；全套 69 suites / 630 tests 绿；demo 不变；套件耗时仍 3s（加载期一次拷贝，看不出来）。<br>⚠ **踩坑记录**：这条测试的**第一版在失败时是有破坏性的** —— 它用 `clear()`/`put()` 去试，守卫一旦缺失就**真的把 `SKILL_POINTS` 清空**，连带毒死 9 个无关用例（10 红里 9 个是连带）。已改成"成功时也是 no-op"的写法（map 用 `remove(不存在的键)`、list 用 `set(越界下标, …)`），变异才变成干净的各红一条 |
+| H-1 | `Constant.java` | ✅ **已修（2026-09-27）**：加载期用递归助手 `frozen(...)` 把**容器**冻结（`Collections.unmodifiableMap/List` + `LinkedHashMap`/`ArrayList` 保序，**不用 `Map.copyOf` 因为它不保序**）。原文成立：`public static final` 只锁引用，Gson 交回的是可变 `LinkedHashMap`，**嵌套层也一样**（`SKILLS.get(cid)` 是 map、`SKILL_TRACES.get(cid)` 是 list）→ 任何调用方一次 `clear()`/`put()` 就静默污染同 JVM 后续所有消费者。**先核过：全仓无人写这些表**（顶层与嵌套都没有），所以改完不破坏任何调用点。<br>**包了 8 个**：`WEAPONS`/`CHARACTERS`/`SKILL_TRACES`/`SKILLS`/`MONSTER_TEMPLATES`/`HARD_LEVEL_GROUPS`/`BREAKING_RATE`/`ENEMY_SKILLS`；**3 个本来就不变**（`RELIC_SETS` 走 `RelicSets.index` 的 `Map.copyOf`、`MONSTER_CONFIGS`、`ENEMY_SKILLS`）—— 其中 `RELIC_SETS` 我先包了一次，**被 `RelicSetTest` 的 identity 断言（"读一次并缓存"）抓住**，退回不包。<br>⚠ **范围是容器、不是 bean**：bean 里的字段/内部 map 仍可变 —— `RelicMainAttribute.getAttributeByStar` 那两处仍是 **N-11**。<br>**验收**：`ConstantImmutabilityTest` 3 条（顶层 7 张表 + 嵌套 map/list + 读取仍正常）；变异（摘掉一张表的包装 / 助手不递归）**各红一条、零连带**；全套 69 suites / 630 tests 绿；demo 不变；套件耗时仍 3s（加载期一次拷贝，看不出来）。<br>⚠ **踩坑记录**：这条测试的**第一版在失败时是有破坏性的** —— 它用 `clear()`/`put()` 去试，守卫一旦缺失就**真的把 `SKILL_TRACES` 清空**，连带毒死 9 个无关用例（10 红里 9 个是连带）。已改成"成功时也是 no-op"的写法（map 用 `remove(不存在的键)`、list 用 `set(越界下标, …)`），变异才变成干净的各红一条 |
 | H-2 | `Character.java:280-295` | `character_data.json` 的 `max_energy` **从未接进角色** → 数据造的角色 `hasEnergyBar()==false`，回能/大招恒失效（93 个角色的这一列是惰性的）。⚠ 接线时 1407 遐蝶的 `null` 是**设计**（无常规能量条），别 auto-unbox 成兜底数值 |
 | H-6 | `CanHit.java` | ✅ **已修（2026-09-27）**：拷贝构造器现在**逐个 `DoubleValue.clone()`** 深拷属性表（`DoubleValue.clone()` 本来就是真深拷贝，之前只 clone 了数组）。原文的后果成立：buff 会**就地**改 `DoubleValue`（`BoostDamageBuff.applyEffect` 调 `addModifier`），所以挂在副本上的 buff 会出现在**原体**面板上 —— 实测复现。`Character(Character)` 走 `super(other)`，因此一并修好。⚠ **原文说"没拷 `invulnerable`"是误读**：那一块是显式的"不该拷"清单（`death`/`currentEnergy`/`resources` 都归零，因为副本是新战斗的参与者而非战况快照），`invulnerable` 属同一类战斗状态 —— 已**显式赋值 + 写明理由**，不是补拷。回归 `CombatantCopyTest` 3 条（行为 + 对象身份 + 新战斗状态约定）；变异回浅拷贝 → 前两条红、约定那条仍绿。见 §12 顶部的"只做过抽查"警告
 | H-9 | `Battle.startBattle()` | 从未被任何测试调用（曾 23 个测试类 0 次）→ **开场事件链零覆盖**，而"战斗开始回能"是一整类角色机制。建议补 `BattleStartTest` |
@@ -1133,7 +1133,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | L-15 | `Relic.java:174-183` | `checkLegal` 校验用的主词条等级与实际造词条用的 `level` **不是同一个** → JSON 里的主词条等级是死数据；子词条上界报错消息把违规值插进 "between 0 and N"；接受负 `attributeLevel` |
 | L-16 | `Relic.java:92,124,329` | `getSubAttributes()` 的**可变性随工厂而变**（别名调用方 list / `ArrayList` / `Stream.toList()`）→ 同一 API 有时 `add` 成功、有时抛 `UnsupportedOperationException` |
 | L-17 | `Relic.java:329` | `Relic.Builder` 不执行 `createRandomLevelZero` 的任何不变量：允许重复副词条、副词条等于主词条、不校验上界与 `star` |
-| L-18 | `SkillPoint.java:31` | 静态缓存持有**公共可变字段 + 公共可变 `children`** 的节点，同 cid 共享；javadoc 写 "per character" 其实 "per cid, process-wide"。`Character` 还无条件套用**整棵**行迹树，没有解锁门槛 |
+| L-18 | `models/skill/SkillTrace.java:32` | 静态缓存持有**公共可变字段 + 公共可变 `children`** 的节点，同 cid 共享；javadoc 写 "per character" 其实 "per cid, process-wide"。`Character` 还无条件套用**整棵**行迹树，没有解锁门槛 |
 | L-19 | `ExtraBasicPromote.java:29` | 平属性用 `addPure`（百分比**之后**），javadoc 却说"加到基础属性"，而光锥用 `addBase`（**之前**）→ 同样 +500 HP，行迹的不会随 HP% 放大 |
 | L-20 | `ExtraBasicPromote.java:14` | 分量顺序 `(health, defence, attack, speed, …)` 与其它模型 `(health, attack, defence)` 不同 → 位置构造会**静默交换 ATK/DEF** |
 | L-21 | `SkillAttackType.java:6` | 枚举 `SINGLE/THREE/ALL` **全仓库零引用**，且值与 `skills.json` 的 `attack_type` 完全对不上 |
