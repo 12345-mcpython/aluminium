@@ -14,6 +14,7 @@ import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.RelicSuit;
 import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -58,6 +59,8 @@ public class RelicAbilityBattleTest {
 
     /** 「星如我见的领航员」 — 4-piece: a Skill/Ultimate DMG stack counter that grows and shrinks. */
     private static final int NAVIGATOR = 131;
+    /** 「戍卫风雪的铁卫」 — 2-piece: reduces the damage the wearer takes (a damage-taken zone). */
+    private static final int GUARD_OF_SNOW = 106;
 
     /** Himeko: basic attack / skill / ultimate are all real, damaging skill slots. */
     private static final int HIMEKO = 1003;
@@ -630,6 +633,49 @@ public class RelicAbilityBattleTest {
     }
 
     // ==================================================================
+    // 106 「戍卫风雪的铁卫」: a damage-taken zone the data could not reach
+    // ==================================================================
+
+    /** The 2-piece's number (param #1[i] = 0.08). */
+    private static final double SNOW_REDUCTION = 0.08;
+
+    /**
+     * 「受到的伤害降低 8%」 — and the measurement is deliberately taken twice <b>on the same wearer in the
+     * same battle</b>: once with the buff the rule installed and once after removing it.
+     *
+     * <p>Comparing "a character wearing the set" against "a character wearing nothing" would have been
+     * meaningless here, because the relics themselves carry main and sub stats (DEF, HP) — the damage would
+     * differ for reasons that have nothing to do with the 8%. Removing one buff leaves everything else
+     * identical, so the ratio is the set's rule and nothing else. `TOLERANCE` is the same 1e-9 the other
+     * cases use.
+     */
+    @Test
+    public void guardOfSnowReducesTheDamageTheWearerTakes() {
+        Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
+        Character hero = battle.characters.getFirst();
+        Assertions.assertTrue(hero.getBuffManager().hasBuff(ReductionBuff.class),
+                "the 2-piece is attached at battle start (BATTLE_START -> MODIFY_DAMAGE_TAKEN, negative)");
+
+        double withReduction = smallHitOn(battle, hero);
+        Assertions.assertTrue(hero.getBuffManager().removeOneBuff(ReductionBuff.class),
+                "precondition: the buff is there to take off");
+        double without = smallHitOn(battle, hero);
+
+        Assertions.assertEquals(without * (1 - SNOW_REDUCTION), withReduction, TOLERANCE,
+                "8% less, in the multiplicative reduction zone");
+    }
+
+    /** It is the <b>2-piece</b> tier, so three pieces are already enough — and none of them is not. */
+    @Test
+    public void guardOfSnowIsATwoPieceAbility() {
+        Battle threePieces = newBattle(List.of(partial(HIMEKO, GUARD_OF_SNOW)), true);
+        Assertions.assertTrue(threePieces.characters.getFirst().getBuffManager().hasBuff(ReductionBuff.class));
+
+        Battle none = newBattle(List.of(plain(HIMEKO)), true);
+        Assertions.assertFalse(none.characters.getFirst().getBuffManager().hasBuff(ReductionBuff.class));
+    }
+
+    // ==================================================================
     // Helpers
     // ==================================================================
 
@@ -667,6 +713,18 @@ public class RelicAbilityBattleTest {
             battle.startBattle();
         }
         return battle;
+    }
+
+    /**
+     * Settles one small hit on {@code victim} and returns the HP it lost.
+     *
+     * <p>Small on purpose: a level-80 character's bar is a few thousand points, and {@code takeDamage} clamps
+     * at zero, so a big hit would report the bar's remainder instead of the hit.
+     */
+    private static double smallHitOn(Battle battle, Character victim) {
+        double before = victim.getCurrentHp();
+        battle.applyDamage(victim, new Damage(battle.enemyUnits().getFirst(), victim, DamageElement.ICE, 100));
+        return before - victim.getCurrentHp();
     }
 
     /** Casts the character's ultimate for real (through {@code Battle.castUltra}, energy gate included). */

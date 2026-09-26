@@ -24,7 +24,22 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
     private final double ratio;
 
     public ReductionBuff(int duration, double ratio) {
-        super(duration, false);
+        this(duration, ratio, false);
+    }
+
+    /**
+     * @param permanent {@code true} = the reduction lasts until the battle ends and is never counted down
+     *                  ({@link AbstractBuff#isPermanent()}); {@code duration} is then a placeholder. This is
+     *                  what a relic set's "Reduces DMG taken by 8%" needs: a passive with no turn count
+     * @throws IllegalArgumentException when {@code ratio} is not positive (see {@link VulnerabilityBuff})
+     */
+    public ReductionBuff(int duration, double ratio, boolean permanent) {
+        super(duration, false, permanent);
+        if (!(ratio > 0)) {
+            throw new IllegalArgumentException(
+                    "ReductionBuff needs a positive ratio, got " + ratio
+                            + " (an increase in damage taken is VulnerabilityBuff)");
+        }
         this.ratio = ratio;
     }
 

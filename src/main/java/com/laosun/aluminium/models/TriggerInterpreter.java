@@ -9,8 +9,10 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
+import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
+import com.laosun.aluminium.models.buff.VulnerabilityBuff;
 import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.List;
@@ -46,6 +48,11 @@ import java.util.Set;
  *           (&gt; 1) makes re-applications <b>accumulate</b> up to that cap instead of replacing the
  *           previous one; each stack is an ordinary buff instance with its own id, so it can be
  *           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
+ *   <tr><td>{@code MODIFY_DAMAGE_TAKEN}</td><td>{@code percent}, <b>exactly one of</b> {@code turns} /
+ *       {@code permanent}, optional {@code target}</td>
+ *       <td>✅ wired — the sign decides the zone: {@code percent > 0} is 「受到的伤害提高」 (vulnerability,
+ *           a debuff on the defender), {@code percent < 0} is 「受到的伤害降低」 (reduction, a buff on the
+ *           defender). Neither is an attribute, which is why {@code MODIFY_ATTR} cannot express them</td></tr>
  *   <tr><td>{@code REMOVE_STACK}</td><td>{@code attribute}, {@code amount}, optional {@code target}</td>
  *       <td>✅ wired — takes up to {@code amount} stacks of that attribute's modifier off the target
  *           (「每回合移除 1 层」); removing nothing is not an error, because the rule fires every turn
@@ -72,7 +79,8 @@ public final class TriggerInterpreter {
      */
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
-            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK");
+            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
+            "MODIFY_DAMAGE_TAKEN");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -85,7 +93,8 @@ public final class TriggerInterpreter {
      * The ops that grant something with a duration, and therefore accept {@code permanent: true}
      * ("for the rest of the battle"). See {@link #requireNoStackArguments}.
      */
-    private static final Set<String> OPS_WITH_DURATION = Set.of("MODIFY_ATTR", "APPLY_BUFF");
+    private static final Set<String> OPS_WITH_DURATION =
+            Set.of("MODIFY_ATTR", "APPLY_BUFF", "MODIFY_DAMAGE_TAKEN");
 
     /**
      * The selectors an effect's {@code target} may name.
@@ -159,6 +168,12 @@ public final class TriggerInterpreter {
             case "REMOVE_STACK" -> {
                 requireAttribute(effect, op, spec);
                 requirePositiveAmount(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "MODIFY_DAMAGE_TAKEN" -> {
+                requirePercent(effect, op, spec);
+                requireNonZeroPercent(effect, op, spec);
+                requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             default -> requireNoStackArguments(effect, op, spec);
@@ -237,6 +252,7 @@ public final class TriggerInterpreter {
             case "MODIFY_ATTR" -> modifyAttr(battle, effect, ctx);
             case "APPLY_BUFF" -> applyState(battle, effect, ctx);
             case "REMOVE_STACK" -> removeStacks(battle, effect, ctx);
+            case "MODIFY_DAMAGE_TAKEN" -> modifyDamageTaken(battle, effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
@@ -477,6 +493,36 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * Settles a {@code MODIFY_DAMAGE_TAKEN} effect: 「受到的伤害提高 X%」（易伤）/「受到的伤害降低 X%」（减伤）.
+     *
+     * <p><b>Why it is not {@code MODIFY_ATTR}.</b> Both are zones, not attributes: neither 「incoming damage
+     * ×1.12」 nor 「×0.92」 exists as an {@code AttributeType}, and the engine's two zone buffs
+     * ({@link VulnerabilityBuff} / {@link ReductionBuff}) inject into the settlement of every hit instead of
+     * holding state — which is also why relic set 106's 2-piece ("Reduces DMG taken by 8%", a passive with no
+     * turn count) sat in {@code _unmodelled.json} until this op existed.
+     *
+     * <p><b>The sign picks the zone</b>, the same convention {@code MODIFY_ATTR} uses for buff/debuff: a
+     * positive percent is vulnerability on the defender (a debuff), a negative one is reduction (a buff).
+     * One op rather than two, because the data spells them as one family and the two are mutually exclusive
+     * readings of one number — a content author writing {@code -0.08} means 减伤, and both buffs enforce
+     * their own sign so a mistake cannot end up as the other zone.
+     *
+     * @param effect the effect ({@code percent}, exactly one of {@code turns} / {@code permanent}, optional
+     *               {@code target})
+     * @param ctx    the context
+     */
+    private static void modifyDamageTaken(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        double percent = effect.getPercent();
+        boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
+        int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            target.getBuffManager().addBuff(percent > 0
+                    ? new VulnerabilityBuff(turns, percent, permanent)
+                    : new ReductionBuff(turns, -percent, permanent));
+        }
+    }
+
+    /**
      * The duration handed to a permanent modifier.
      *
      * <p>Deliberately {@code 1} and not a large number: {@link StatModifierBuff} marks the buff
@@ -563,6 +609,23 @@ public final class TriggerInterpreter {
         if (effect.getPercent() == null) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"percent\" (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates that a percentage is present and <b>does something</b>.
+     *
+     * <p>For {@code MODIFY_DAMAGE_TAKEN} zero is the trap: it would attach a buff that multiplies nothing,
+     * so the rule would load, fire and be invisible. The sign is meaningful (positive = vulnerability,
+     * negative = reduction), so only zero is refused.
+     */
+    private static void requireNonZeroPercent(EffectSpec effect, String op, TriggerSpec spec) {
+        requirePercent(effect, op, spec);
+        if (effect.getPercent() == 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has \"percent\": 0, which would attach a buff that changes nothing; the "
+                            + "magnitude is the point (positive = 受到的伤害提高, negative = 受到的伤害降低) "
+                            + "(source: " + spec.getSource() + ")");
         }
     }
 
