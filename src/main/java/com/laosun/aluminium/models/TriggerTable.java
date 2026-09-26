@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import lombok.Getter;
 
@@ -309,6 +310,8 @@ public class TriggerTable {
     //   target_debuff_count >= 3  the event's subject carries 3 debuffs <- Silver Wolf's "if the enemy has
     //                                                                      >= 3 debuffs, the RES shred is
     //                                                                      reduced further"
+    //   self_attr:SPEED >= 145    one of MY OWN attribute values      <- the planar ornament 2-pieces'
+    //                                                                     "当装备者的速度大于等于145时" shape
     //   self has_state 协奏   I am in the named state 协奏             <- Robin's 即兴装饰 "处于【协奏】状态时"
     //   target has_state 触电 it happened to someone in that state     <- Kafka's "触电状态下的敌方目标"
     //
@@ -321,19 +324,39 @@ public class TriggerTable {
     // `hp_percent` is read from the OWNER (the character whose table fired), not from the event --
     // it is a fact about me, which is why no event has to carry it. It is a fraction (0.5 = 50%),
     // matching the game text's own placeholder (`#1[i]%` with param 0.5).
+    //
+    // `self_attr:<ATTRIBUTE>` is the same idea, generalised: any attribute in AttributeType, read off the
+    // owner. ⚠ The literal is in the ATTRIBUTE'S OWN UNITS, which differ by kind: flat attributes are
+    // absolute (SPEED >= 145) while every ratio attribute is a fraction (CRIT_CHANCE >= 0.7, i.e. 70%,
+    // BREAKING_EFFECT >= 1.5, i.e. 150%). Writing the percentage as 70 would compile, load, and simply never
+    // fire -- see SelfAttributeConditionTest, which pins both scales.
     // ==================================================================
 
     /**
      * The numeric variables {@code hit_count}, {@code hp_percent} and {@code target_debuff_count} are the
-     * complete, closed set.
+     * complete, closed set of <b>plain</b> names.
      *
      * <p>Each reads from a different place, which is why the names say so: {@code hit_count} comes from the
      * event, {@code hp_percent} from the rule's owner (a fact about me), and {@code target_debuff_count} from
      * the event's <b>subject</b> (「目标身上有几个负面效果」 — the count that matters is the one on the unit the
      * rule is talking about, not on me).
+     *
+     * <p>{@code self_attr:<ATTRIBUTE>} is the one <b>parameterised</b> member and is deliberately not listed
+     * here: its second half is not a fixed name but a member of {@link AttributeType}, validated separately
+     * (and rejected there for the four {@code *_PERCENT} builder keys, whose runtime slot is null).
      */
     private static final Set<String> NUMERIC_VARIABLES =
             Set.of("hit_count", "hp_percent", "target_debuff_count");
+
+    /**
+     * The prefix of the one parameterised numeric variable: {@code self_attr:SPEED}.
+     *
+     * <p>Why the subject is fixed at {@code self} and not a general {@code <subject>_attr:<TYPE>}: every
+     * attribute threshold in the shipped data is about the wearer (「装备者的速度/暴击率/击破特攻/生命上限…」),
+     * and an axis with one used value is an axis nobody has tested. Adding {@code target_attr:} later is a
+     * few lines in the same place once some content actually needs it.
+     */
+    private static final String SELF_ATTR_PREFIX = "self_attr:";
 
     /**
      * The keyword of the named-state condition, and the parties it may ask about.
@@ -407,13 +430,63 @@ public class TriggerTable {
                     "Condition '" + raw + "' has no numeric literal on either side (source: "
                             + spec.getSource() + ")");
         }
-        if (!NUMERIC_VARIABLES.contains(variable)) {
+        if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' compares unknown variable '" + variable
                             + "'; known numeric variables: " + String.join(", ", knownNumericVariables())
-                            + " (source: " + spec.getSource() + ")");
+                            + ", plus \"self_attr:<ATTRIBUTE>\" for one of my own attribute values, e.g. "
+                            + "\"self_attr:SPEED >= 145\" (source: " + spec.getSource() + ")");
         }
-        return new Numeric(variable, operator, literal, literalOnLeft);
+        return new Numeric(variable, selfAttributeOf(variable, raw, spec), operator, literal, literalOnLeft);
+    }
+
+    /**
+     * The attribute behind a {@code self_attr:<ATTRIBUTE>} variable, or {@code null} for a plain name.
+     *
+     * <p>Two load-time rejections, both of them things that would otherwise look like a working rule:
+     * <ul>
+     *   <li>an attribute name that is not in {@link AttributeType} — a typo would compare against nothing
+     *       and the rule would simply never fire;</li>
+     *   <li>one of the four {@code *_PERCENT} builder keys ({@link AttributeType#isPercentVariant()}). They
+     *       are inputs to {@code AttributeBuilder}, not runtime attributes: the builder folds them into
+     *       their base attribute and stores the slot as {@code null}, so reading one would NPE at fire time
+     *       — during a battle, in the middle of a damage calculation. The author means {@code
+     *       HEALTH_PERCENT}'s <em>base</em> here, so say which one they want instead.</li>
+     * </ul>
+     *
+     * @param variable the already-normalised variable token
+     * @param raw      the original condition text, for the error messages
+     * @param spec     the owning rule, for the source
+     * @return the attribute, or {@code null} when the variable is a plain numeric name
+     */
+    private static AttributeType selfAttributeOf(String variable, String raw, TriggerSpec spec) {
+        if (!variable.startsWith(SELF_ATTR_PREFIX)) {
+            return null;
+        }
+        String name = variable.substring(SELF_ATTR_PREFIX.length()).trim();
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' writes \"" + SELF_ATTR_PREFIX + "\" with no attribute after it; "
+                            + "give one, e.g. \"self_attr:SPEED >= 145\" (source: " + spec.getSource() + ")");
+        }
+        AttributeType type;
+        try {
+            type = AttributeType.fromString(name);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' reads unknown attribute '" + name + "'; use a name from "
+                            + "AttributeType, e.g. SPEED / ATTACK / CRIT_CHANCE / BREAKING_EFFECT "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (type.isPercentVariant()) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' reads '" + name + "', which is one of the four *_PERCENT "
+                            + "AttributeBuilder input keys: the builder folds it into its base attribute and "
+                            + "leaves the runtime slot null, so this could only ever fail at fire time. Read "
+                            + "the base attribute instead (" + type.attributeString.replace("_percent", "")
+                            + ") (source: " + spec.getSource() + ")");
+        }
+        return type;
     }
 
     /**
@@ -680,17 +753,24 @@ public class TriggerTable {
     }
 
     /**
-     * Numeric comparison such as {@code hit_count > 0}.
+     * Numeric comparison such as {@code hit_count > 0} or {@code self_attr:SPEED >= 145}.
      */
     private static final class Numeric implements Condition {
 
         private final String variable;
+        /**
+         * The attribute a {@code self_attr:<ATTRIBUTE>} variable reads, or {@code null} for a plain name
+         * (in which case {@link #variable} selects one of {@link #NUMERIC_VARIABLES}).
+         */
+        private final AttributeType attribute;
         private final String operator;
         private final double literal;
         private final boolean literalOnLeft;
 
-        Numeric(String variable, String operator, double literal, boolean literalOnLeft) {
+        Numeric(String variable, AttributeType attribute, String operator, double literal,
+                boolean literalOnLeft) {
             this.variable = variable;
+            this.attribute = attribute;
             this.operator = operator;
             this.literal = literal;
             this.literalOnLeft = literalOnLeft;
@@ -714,15 +794,35 @@ public class TriggerTable {
          * The variable's current value, or {@code NaN} when it cannot be read.
          *
          * <p>{@code NaN} is the honest answer: every comparison against it is {@code false}, so a
-         * condition whose subject does not exist fails the rule instead of accidentally passing it.
+         * condition whose subject does not exist fails the rule instead of accidentally passing it. That
+         * also covers a {@code null} attribute slot, which should not happen for the four rejected
+         * {@code *_PERCENT} keys but must not become an NPE inside a battle if it ever does.
          */
         private double numericValue(TriggerContext ctx) {
+            if (attribute != null) {
+                return ownerAttribute(ctx.owner(), attribute);
+            }
             return switch (variable) {
                 case "hit_count" -> ctx.hitCount();
                 case "hp_percent" -> hpPercent(ctx.owner());
                 case "target_debuff_count" -> ctx.target() == null ? Double.NaN : ctx.target().getBuffManager().debuffCount();
                 default -> Double.NaN;
             };
+        }
+
+        /**
+         * One of the owner's attribute values, in that attribute's <b>own units</b>.
+         *
+         * <p>This is the same number every other consumer sees ({@code DoubleValue.get()}): flat attributes
+         * are absolute and ratio attributes are fractions. Go through {@code getAttribute} and not through
+         * any builder-side view, because those are the units the damage pipeline reads.
+         */
+        private static double ownerAttribute(CanHit owner, AttributeType attribute) {
+            if (owner == null) {
+                return Double.NaN;
+            }
+            DoubleValue value = owner.getAttribute(attribute);
+            return value == null ? Double.NaN : value.get();
         }
 
         /**

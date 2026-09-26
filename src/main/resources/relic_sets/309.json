@@ -1,0 +1,26 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:CRIT_CHANCE >= 0.7"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 309 (繁星竞技场 / Celestial Differentiator), 2-piece: \"Increases the wearer's CRIT Rate by #1[i]%. When the wearer's current CRIT Rate is equal to or higher than #2[i]%, increases the DMG dealt by Basic ATK and Skill by #3[i]%.\" param = [0.08, 0.7, 0.2]",
+      "note": "Two effects, not one, because \"Basic ATK and Skill\" is a disjunction over CAST CATEGORY and the engine models the two scopes as separate attributes (BASIC_ATTACK_DAMAGE_BOOST / SKILL_DAMAGE_BOOST). A single ALL_DAMAGE_TYPE_BOOST would silently buff ultimates and follow-ups too -- an over-trigger, not a near miss. ⚠ The threshold is a FRACTION: `self_attr:CRIT_CHANCE >= 0.7` means 70%, because every ratio attribute reads as a fraction (the same number `Battle.assemble` compares against `rng.nextDouble()`). Writing `>= 70` would load, look right, and never fire -- the 100x trap this project has hit before (ROADMAP L-9); SelfAttributeConditionTest pins both scales. ⚠ The wearer's own +8% from this set is already in the sheet before BATTLE_START fires (the `properties` stat is applied at construction), so \"current CRIT Rate\" includes it, as the text intends. ⚠ Same BATTLE_START approximation as sets 301/307 for the word \"current\"."
+    }
+  ]
+}
