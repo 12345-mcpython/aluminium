@@ -76,6 +76,24 @@ public class RelicTriggerTableTest {
      */
     private static final int GUARD_OF_SNOW = 106;
 
+    // The seven MIXED (stat + ability) planar 2-pieces authored on 2026-09-27, when `self_attr` and
+    // ADVANCE made their conditional sentence expressible. Before that they were not in this test's
+    // world at all -- see MIXED_STAT_AND_ABILITY.
+    /** 太空封印站: 攻击力 +12%; SPD >= 120 -> 攻击力额外 +12%. */
+    private static final int SPACE_SEALING_STATION = 301;
+    /** 不老者的仙舟: 生命上限 +12%; SPD >= 120 -> 我方全体攻击力 +8%. */
+    private static final int FLEET_OF_THE_AGELESS = 302;
+    /** 筑城者的贝洛伯格: 防御力 +15%; 效果命中 >= 50% -> 防御力额外 +15%. */
+    private static final int BELOBOG = 304;
+    /** 停转的萨尔索图: 暴击率 +8%; 当前暴击率 >= 50% -> 终结技与追加攻击伤害 +15%. */
+    private static final int INERT_SALSOTTO = 306;
+    /** 盗贼公国塔利亚: 击破特攻 +16%; SPD >= 145 -> 击破特攻额外 +20%. */
+    private static final int TALIA = 307;
+    /** 生命的翁瓦克: 能量恢复效率 +5%; SPD >= 120 -> 进入战斗时行动提前 40%. */
+    private static final int SPRIGHTLY_VONWACQ = 308;
+    /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 70% -> 普攻与战技伤害 +20%. */
+    private static final int CELESTIAL_DIFFERENTIATOR = 309;
+
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
 
@@ -96,6 +114,9 @@ public class RelicTriggerTableTest {
      *
      * <p>Pinned because it is the deliverable, not because the engine depends on the number: a new
      * rule file (or a lost one) must show up here and in {@code _unmodelled.json} in the same change.
+     *
+     * <p>Spans <b>both</b> kinds of ability-bearing effect: the pure ones ({@code properties} empty) and the
+     * mixed ones ({@code properties} plus an ability).
      */
     private static final Set<String> AUTHORED = Set.of(
             PASSERBY + "/" + FOUR_PIECE,
@@ -107,19 +128,55 @@ public class RelicTriggerTableTest {
             ASHBLAZING + "/" + TWO_PIECE,
             NAVIGATOR + "/" + FOUR_PIECE,
             GUARD_OF_SNOW + "/" + TWO_PIECE,
-            GUARD_OF_SNOW + "/" + FOUR_PIECE);
+            GUARD_OF_SNOW + "/" + FOUR_PIECE,
+            // The mixed (stat + ability) effects authored on 2026-09-27 with `self_attr` / `ADVANCE`:
+            // seven planar 2-pieces whose conditional sentence had no spelling before.
+            SPACE_SEALING_STATION + "/" + TWO_PIECE,
+            FLEET_OF_THE_AGELESS + "/" + TWO_PIECE,
+            BELOBOG + "/" + TWO_PIECE,
+            INERT_SALSOTTO + "/" + TWO_PIECE,
+            TALIA + "/" + TWO_PIECE,
+            SPRIGHTLY_VONWACQ + "/" + TWO_PIECE,
+            CELESTIAL_DIFFERENTIATOR + "/" + TWO_PIECE);
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
      *
-     * <p>35 ability-only bonuses in total, so this number and {@link #AUTHORED}'s size must always sum
-     * to it — that sum is the invariant, the individual values are just where the line currently sits.
-     * It went 28 → <b>27</b> on 2026-09-27 (set 131, once {@code REMOVE_STACK} existed), then to <b>26</b>
-     * (set 106's 2-piece, once {@code MODIFY_DAMAGE_TAKEN} existed), and then to <b>25</b> when the same
-     * set's 4-piece became authorable — a percentage-of-Max-HP heal, which the scaled {@code HEAL} spelling
-     * made expressible.
+     * <p>The invariant is {@code PURE + MIXED = AUTHORED.size() + STILL_REGISTERED}; the individual values
+     * are just where the line currently sits. It went 28 → <b>27</b> on 2026-09-27 (set 131, once
+     * {@code REMOVE_STACK} existed), then to <b>26</b> (set 106's 2-piece, once
+     * {@code MODIFY_DAMAGE_TAKEN} existed), then to <b>25</b> when the same set's 4-piece became
+     * authorable — and then to <b>47</b> when the MIXED effects joined the partition (see
+     * {@link #MIXED_STAT_AND_ABILITY}); those 22 mixed entries are not a regression, they are the half of
+     * the data this test could not see before (ROADMAP M-25).
      */
-    private static final int STILL_REGISTERED = 25;
+    private static final int STILL_REGISTERED = 47;
+
+    /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
+    private static final int PURE_ABILITY_ONLY = 35;
+
+    /**
+     * Stat + ability bonuses: an unconditional {@code properties} stat <b>plus</b> an ability.
+     *
+     * <p>⚠ <b>This half was invisible until 2026-09-27</b> (ROADMAP M-25). The partition below used to skip
+     * every effect with a non-empty {@code properties}, so the common planar-ornament shape
+     * (「攻击力提高 12%。当速度 ≥ 120 时，攻击力额外提高 12%」) had its first clause applied by
+     * {@code RelicSuit} and its second clause <b>silently dropped</b>, with no registry entry to say so —
+     * "no rule file written" and "somebody forgot" looked exactly alike for that shape. Pinned as its own
+     * denominator so the next data update that adds one shows up here.
+     */
+    private static final int MIXED_STAT_AND_ABILITY = 29;
+
+    /**
+     * How many registered abilities the vocabulary <b>could</b> express today.
+     *
+     * <p>The registry's {@code reason} is prose, and prose cannot be checked — except for this one bit, which
+     * the authors are asked to spell as a leading {@code "Writable now:"}. Pinning the count keeps the
+     * backlog honest in both directions: writing one of these files must lower it deliberately, and a new
+     * entry cannot quietly claim to be blocked when the capability exists.
+     */
+    private static final String WRITABLE_PREFIX = "Writable now:";
+    private static final int WRITABLE_NOW = 7;
 
     // ==================================================================
     // 1. The shipped rule files
@@ -346,16 +403,23 @@ public class RelicTriggerTableTest {
     // ==================================================================
 
     /**
-     * <b>The registry guard.</b> Every ability-only relic bonus in the shipped file is either
+     * <b>The registry guard.</b> Every ability-bearing relic bonus in the shipped file is either
      * <b>authored</b> (its set has a rule file with a tier at that piece count) or <b>registered</b> in
      * {@code relic_sets/_unmodelled.json} with the capability it is missing.
      *
-     * <p>The counts are pinned because they <em>are</em> the deliverable: 35 ability-only bonuses,
+     * <p>The counts are pinned because they <em>are</em> the deliverable:
+     * {@link #PURE_ABILITY_ONLY} + {@link #MIXED_STAT_AND_ABILITY} effects,
      * {@code AUTHORED.size()} expressible with today's op vocabulary,
      * {@link #STILL_REGISTERED} not. A change on either side must be deliberate.
+     *
+     * <p>⚠ <b>Both kinds are walked, and that is the point of the 2026-09-27 revision.</b> The loop used to
+     * {@code continue} on any effect with a non-empty {@code properties}, which silently excluded 29
+     * "stat + ability" effects — the majority shape for planar ornaments, whose conditional half was being
+     * dropped without a registry entry (ROADMAP M-25). The classification is now explicit and both
+     * denominators are asserted, so an effect cannot escape the partition by acquiring a stat.
      */
     @Test
-    public void everyAbilityOnlyBonusIsEitherAuthoredOrRegistered() {
+    public void everyAbilityBearingBonusIsEitherAuthoredOrRegistered() {
         Set<String> authored = new LinkedHashSet<>();
         Set<String> registered = new LinkedHashSet<>();
         for (RelicTriggerTables.Unmodelled entry : RelicTriggerTables.unmodelled()) {
@@ -363,16 +427,21 @@ public class RelicTriggerTableTest {
         }
 
         Set<String> bothOrNeither = new LinkedHashSet<>();
-        int abilityOnly = 0;
+        int pure = 0;
+        int mixed = 0;
         for (RelicSet set : Constant.RELIC_SETS.values()) {
             for (RelicSet.Effect effect : set.effects()) {
-                if (!effect.properties().isEmpty()) {
+                if (!effect.hasAbility()) {
+                    Assertions.assertFalse(effect.properties().isEmpty(),
+                            "set " + set.setId() + "'s " + effect.require() + "-piece bonus has neither "
+                                    + "stats nor an ability: nothing would ever apply it");
                     continue;
                 }
-                Assertions.assertTrue(effect.hasAbility(),
-                        "set " + set.setId() + "'s " + effect.require() + "-piece bonus has neither stats "
-                                + "nor an ability: nothing would ever apply it");
-                abilityOnly++;
+                if (effect.properties().isEmpty()) {
+                    pure++;
+                } else {
+                    mixed++;
+                }
                 String key = set.setId() + "/" + effect.require();
                 boolean hasRules = RelicTriggerTables.of(set.setId()).thresholds().contains(effect.require());
                 if (hasRules) {
@@ -389,7 +458,8 @@ public class RelicTriggerTableTest {
             }
         }
 
-        Assertions.assertEquals(35, abilityOnly, "the shipped file's ability-only bonuses");
+        Assertions.assertEquals(PURE_ABILITY_ONLY, pure, "the shipped file's pure ability-only bonuses");
+        Assertions.assertEquals(MIXED_STAT_AND_ABILITY, mixed, "the shipped file's stat + ability bonuses");
         Assertions.assertEquals(AUTHORED, authored,
                 "the abilities the op vocabulary can currently express; a new one means a new rule file");
         Assertions.assertEquals(STILL_REGISTERED, registered.size(),
@@ -397,13 +467,38 @@ public class RelicTriggerTableTest {
                         + "entry in the same change");
         Assertions.assertEquals(STILL_REGISTERED, bothOrNeither.size(),
                 "every registered ability must be a real one");
-        Assertions.assertEquals(35, authored.size() + registered.size(),
-                "35 = authored + registered: the partition is the invariant, not either number alone");
+        Assertions.assertEquals(PURE_ABILITY_ONLY + MIXED_STAT_AND_ABILITY,
+                authored.size() + registered.size(),
+                "the partition is the invariant, not either number alone: pure + mixed = authored + registered");
 
         // Every registered entry must carry the reason, or the gap cannot be acted on.
         for (RelicTriggerTables.Unmodelled entry : RelicTriggerTables.unmodelled()) {
             Assertions.assertFalse(entry.reason().isBlank(),
                     "set " + entry.setId() + " ability " + entry.ability() + " is registered without a reason");
+        }
+    }
+
+    /**
+     * The registered abilities the vocabulary could express <b>today</b> are labelled and counted.
+     *
+     * <p>A registry entry whose missing capability has since been built is the one way this file rots: the
+     * engine gains an op, and 44 entries keep saying "needs an op". So the authors spell those as a leading
+     * {@code "Writable now:"} and the count is pinned — writing one of them has to lower the number on
+     * purpose, and an <em>unblocked</em> ability cannot hide inside a reason nobody re-reads.
+     */
+    @Test
+    public void theWritableBacklogIsLabelledAndCounted() {
+        List<RelicTriggerTables.Unmodelled> writable = RelicTriggerTables.unmodelled().stream()
+                .filter(entry -> entry.reason().startsWith(WRITABLE_PREFIX))
+                .toList();
+
+        Assertions.assertEquals(WRITABLE_NOW, writable.size(),
+                "the registered abilities the current vocabulary can already express: "
+                        + writable.stream().map(e -> e.setId() + "/" + e.require()).toList());
+        for (RelicTriggerTables.Unmodelled entry : writable) {
+            Assertions.assertFalse(
+                    RelicTriggerTables.of(entry.setId()).thresholds().contains(entry.require()),
+                    "set " + entry.setId() + "/" + entry.require() + " is labelled writable but has a rule file");
         }
     }
 
@@ -439,13 +534,17 @@ public class RelicTriggerTableTest {
      * <p>Guards the other direction from the partition test: a stale registry entry for an ability that
      * has since been authored (or that never existed) would make the partition look healthy while
      * hiding a gap.
+     *
+     * <p>⚠ Walks <b>every</b> ability-bearing effect, not just the pure ones — otherwise the 22 registered
+     * mixed entries would all look stale, which is how this case failed the first time the M-25 entries
+     * landed (it had the same {@code properties().isEmpty()} filter the partition test used to have).
      */
     @Test
     public void theRegistryNamesRealAbilities() {
         Set<String> realAbilities = new LinkedHashSet<>();
         for (RelicSet set : Constant.RELIC_SETS.values()) {
             for (RelicSet.Effect effect : set.effects()) {
-                if (effect.properties().isEmpty() && effect.hasAbility()) {
+                if (effect.hasAbility()) {
                     realAbilities.add(set.setId() + "|" + effect.require() + "|" + effect.ability());
                 }
             }
@@ -457,24 +556,24 @@ public class RelicTriggerTableTest {
             Assertions.assertTrue(
                     realAbilities.contains(entry.setId() + "|" + entry.require() + "|" + entry.ability()),
                     "the registry lists " + entry.setId() + "/" + entry.require() + " " + entry.ability()
-                            + ", which is not an ability-only bonus in relic_sets.json");
+                            + ", which is not an ability-bearing bonus in relic_sets.json");
         }
     }
 
     /**
      * A 2-piece ability with no rule file is registered too, so the registry is not a 4-piece-only list.
      *
-     * <p>Six of the 35 ability-only bonuses sit at the 2-piece tier (every planar ornament set's only
-     * ability is one, and two cavern sets have an ability-only 2-piece tier), and missing them would hide
-     * a fifth of the gap. It was eight before 326 (City of Converging Stars) and 115 (The Ashblazing
-     * Grand Duke) became authorable, and <b>five</b> since 2026-09-27, when 106 (Guard of Wuthering Snow)
-     * joined them — its 2-piece needed a damage-taken zone, which {@code MODIFY_DAMAGE_TAKEN} provided.
+     * <p>Every planar ornament set's ability sits at the 2-piece tier, and that is where most of the mixed
+     * (stat + ability) shape lives, so missing that tier would hide most of the gap. It was eight before 326
+     * (City of Converging Stars) and 115 (The Ashblazing Grand Duke) became authorable, <b>five</b> since
+     * 2026-09-27 (set 106 joined them), and <b>22</b> once the 17 mixed 2-piece abilities that no longer
+     * count as invisible were registered (M-25).
      */
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(5, twoPiece,
-                "the ability-only bonuses at the 2-piece tier that are not expressible yet");
+        Assertions.assertEquals(22, twoPiece,
+                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet");
     }
 
     // ==================================================================

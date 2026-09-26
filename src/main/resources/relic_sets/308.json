@@ -1,0 +1,18 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 120"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.4
+        }
+      ],
+      "source": "relic set 308 (生命的翁瓦克 / Sprightly Vonwacq), 2-piece: \"Increases the wearer's Energy Regeneration Rate by #1[i]%. When the wearer's SPD is equal to or higher than #2[i], immediately advances the wearer's action forward by #3[i]% when entering battle.\" param = [0.05, 120, 0.4]",
+      "note": "Only the conditional sentence; \"Energy Regeneration Rate +5%\" is the effect's `properties` stat (SPRatioBase 0.05). ⚠ The event is BATTLE_START and not TURN_START on purpose: the text says \"when entering battle\", and this is the only rule where the wording and the once-at-battle-start timing agree exactly -- the other planar 2-pieces say \"when the wearer's SPD is >= N\" (continuous) and are approximated by the same event. ADVANCE defaults to the rule's owner, and the action bar already exists by the time BATTLE_START fires (the queue is built in Battle's constructor), so the pull is real rather than a no-op."
+    }
+  ]
+}

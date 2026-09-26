@@ -1,0 +1,26 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:CRIT_CHANCE >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.15,
+          "permanent": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.15,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 306 (停转的萨尔索图 / Inert Salsotto), 2-piece: \"Increases the wearer's CRIT Rate by #1[i]%. When the wearer's current CRIT Rate is equal to or higher than #2[i]%, increases the DMG dealt by the wearer's Ultimate and Follow-Up ATK by #3[i]%.\" param = [0.08, 0.5, 0.15]",
+      "note": "Two effects because \"Ultimate and Follow-Up ATK\" names two scopes the engine models separately: ULTIMATE_DAMAGE_BOOST is picked by the cast's category (`Damage.getCastCategory()`), FOLLOW_UP_DAMAGE_BOOST by the damage type (`DamageType.ADDITIONAL`). One all-type boost would buff basic attacks and skills as well -- an over-trigger, not a near miss. ⚠ Threshold as a fraction (0.5 = 50%), see set 304's note. ⚠ The wearer's own +8% CRIT Rate from this set is already in the sheet before BATTLE_START fires, so \"current CRIT Rate\" includes it, as the text intends."
+    }
+  ]
+}
