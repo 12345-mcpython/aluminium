@@ -326,6 +326,6 @@ public class SkillPointTest {
     }
 
     private static Enemy firstEnemy(Battle battle) {
-        return battle.enemies.getFirst();
+        return battle.enemyUnits().getFirst();
     }
 }

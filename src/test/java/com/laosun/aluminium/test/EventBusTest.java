@@ -684,7 +684,7 @@ public class EventBusTest {
     }
 
     private static Enemy firstEnemy(Battle battle) {
-        return battle.enemies.getFirst();
+        return battle.enemyUnits().getFirst();
     }
 
     private static boolean actWithRealTurn(Battle battle, CanHit actor,

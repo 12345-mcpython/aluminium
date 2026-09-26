@@ -439,9 +439,21 @@ public class Main {
     // Utilities
     // ==================================================================
 
+    /**
+     * The first living <b>monster</b> on the enemy side.
+     *
+     * <p>⚠ The enemy camp can also hold a summon (L-8), and this picks around it on purpose: the demo's
+     * skill heuristic asks {@code isWeakTo(...)}, which is a monster-only question, so it may only run
+     * against a monster. Filtering here is the explicit form of "this rule needs an Enemy" — the
+     * alternative (assuming every entry is one) is exactly what the roster widening removed.
+     */
     private static Enemy firstAliveEnemy(Battle battle) {
-        List<Enemy> alive = battle.targetableEnemies();
-        return alive.isEmpty() ? null : alive.getFirst();
+        for (CanHit unit : battle.targetableEnemies()) {
+            if (unit instanceof Enemy enemy) {
+                return enemy;
+            }
+        }
+        return null;
     }
 
     /** The living character with the lowest HP ratio (the simplified target-picking strategy for healing/shielding). */
