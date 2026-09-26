@@ -88,7 +88,7 @@ public class ConstantImmutabilityTest {
     @Test
     public void theTablesStillReadNormally() {
         Assertions.assertFalse(Constant.SKILLS.isEmpty(), "skills.json loaded");
-        Assertions.assertFalse(Constant.SKILL_TRACES.isEmpty(), "point.json loaded");
+        Assertions.assertFalse(Constant.SKILL_TRACES.isEmpty(), "skill_traces.json loaded");
         Assertions.assertFalse(Constant.WEAPONS.isEmpty(), "weapons.json loaded");
         Assertions.assertFalse(Constant.HARD_LEVEL_GROUPS.isEmpty(), "hard_level_group.json loaded");
 
