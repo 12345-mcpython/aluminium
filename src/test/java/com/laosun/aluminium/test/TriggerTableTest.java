@@ -198,21 +198,25 @@ public class TriggerTableTest {
     // ==================================================================
 
     /**
-     * The trigger fires on the cast event rather than on "the battle exists".
+     * The trigger fires on the event that happened rather than on "the battle exists".
      *
-     * <p>Robin has no battle-start rule, so the count of fired rules at battle start is 0 while a
-     * basic attack yields 2 -- her own cast plus the ally-standing-by case. Pinning the counts means a
-     * future change that fires events at the wrong moment breaks a test instead of silently
-     * double-charging energy.
+     * <p>⚠ The expected numbers moved on 2026-09-27: this test used to assert that Robin had <b>no</b>
+     * battle-start rule, because her file held only her talent. Her two 行迹 traces now live in the
+     * same file (华彩花腔 → {@code BATTLE_START}, 模进乐段 → {@code SKILL_CAST}), so the counts are
+     * per-event again — which is the actual claim being pinned: an event fires the rules that named
+     * <i>that</i> event and no others.
      */
     @Test
-    public void battleStartFiresNoRulesForRobinAndACastFiresTwo() {
+    public void battleStartAndACastFireDifferentRules() {
         Character robin = CharacterFactory.create(ROBIN, 80);
         Character himeko = CharacterFactory.create(NO_TRIGGERS, 80);
         Battle battle = newBattle(List.of(robin, himeko), 1);
 
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.BATTLE_START),
-                "Robin has no BATTLE_START rule");
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.BATTLE_START),
+                "only her 华彩花腔 trace listens to BATTLE_START");
+
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.BASIC_ATTACK, robin, null, 1, 0),
+                "nothing in her file listens to BASIC_ATTACK: 普攻 is not 战技");
 
         int fired = battle.fireTriggers(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0);
         Assertions.assertEquals(1, fired, "only Robin's table has an ALLY_ATTACK rule");
