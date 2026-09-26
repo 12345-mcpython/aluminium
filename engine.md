@@ -27,7 +27,7 @@
                                               │
 数值层   AttributeBuilder ──▶ DoubleValue[]（按 AttributeType.ordinal() 索引）
                                               │
-实体层   CanHit（抽象基类）├── Character   ├── Enemy   └── Summon ⚠类存在、敌方阵营收得下，但内容侧还没创建（P9-4）
+实体层   CanHit（抽象基类）├── Character   ├── Enemy   └── Summon ⚠敌方阵营已可创建（P9-4，见 §24）；我方召唤物与忆灵仍未做
                                               │
 战斗层   Battle ── Queue（行动条）──▶ 回合推进
            │
@@ -294,7 +294,8 @@ dispatch(consumer, 直接相关方...)
 - **`DamageEvent` 广播给双方**，但回调签名里**不告诉 buff 它挂在谁身上**。
   因此注入乘区的 buff 必须自己判侧：`Damage.isOnDefenderSide(entity)` / `isOnAttackerSide(entity)`
   （这就是易伤必须判侧、否则持有者自己打人也会被加伤的原因）。
-- **`AttackEvent` / `SkillCastEvent` 广播给我方 `battle.characters`**（不含召唤物 ❌ 因为召唤物没进任何列表），
+- **`AttackEvent` / `SkillCastEvent` 广播给我方 `battle.characters`**（只遍历 `characters`，所以**我方召唤物收不到** ——
+  我方名单仍是 `List<Character>`，见 §24 末的"还没做"），
   这是因为"我方攻击后 / 施放后"的效果（知更鸟【协奏】、缇宝结界）挂在**别人**身上。
 - `hitTargets` 是**实际命中过**的目标（含当场死亡的，按命中顺序去重）；
   `mainTarget` 是调用方选的主目标（AOE 时它不是命中顺序里的第一个）。
@@ -931,6 +932,15 @@ processSkillRequests() → processAddRequests() → processAdvanceRequests() →
 - `removeDeadCombatants()` 把死者移出 `Queue`，并清空其 buff（`clearAll()`）。
 - **死者仍留在 `battle.characters` / `battle.enemies` 列表里** → 所有需要"活人"的地方必须自己判
   `isDeath()`；`Battle.targetableEnemies()` 是"谁可以被选为目标"的**唯一出口**。
+- ⚠ **`perish()` 是"没被打就退场"**（P9-4 加的，唯一调用者是召唤物随主人一起消失）：它只翻 `death`，
+  **不碰 HP**。为什么要单独一个方法：**"它走了"和"它被打到 0 血"是两件事**，
+  后来问"它伤得多重"的内容不该被告知后者（`SummonTest.theMasterFallingTakesItsSummonWithIt` 钉住 HP 不变）。
+  > 🔴 **一条被变异测试纠正的错判**：我最初写的是"走 `takeDamage` 会发 `HpLoss`/`Kill`，
+  > 所以会为没人杀死的单位付钱" —— **这是错的**。`CanHit.takeDamage` **自己一个事件都不发**；
+  > `HpLoss`/`Kill` 是 `Battle.applyDamage`（唯一结算入口）发的。把 `perish()` 换成
+  > `takeDamage(maxHp)` 的变异体**全绿**，就是这个错判的证据。真正让"随主人消失不付钱"成立的，
+  > 是这次清扫**跑在结算入口之外**；`perish()` 负责的只是"别谎报它受了伤"。
+  它**不负责**把人从 `enemies` 或行动条上摘掉 —— 那是 `removeDeadCombatants()` 的活，两件事在同一个地方发生。
 
 > ⚠ **`Battle.enemies` 是"敌方阵营"，不是"怪物列表"**（L-8）。类型是 `List<CanHit>`，因为敌方阵营
 > 除了怪还可以有召唤物（P9-4）；`Battle.enemyUnits()` 才是"其中的 `Enemy`"。这条分工是有意的：
@@ -1053,7 +1063,7 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 | `DEFENCE`（护盾） | `SkillExecutor` 查表 → `Battle.grantShield` | ✅ P10-3 |
 | `SUPPORT`（增益） | P10-3 后半（触发器侧 `MODIFY_ATTR` 已可用） | 🚧 技能侧未接 |
 | `IMPAIR`（控制/减益） | P10-6 | ❌ |
-| `SUMMON`（召唤） | P9-4 | ❌ |
+| `SUMMON`（召唤） | P9-4 | 🚧 **能力有了、数据没有**：`Battle.summon` 已能把召唤物放上场（§24），但"这次施放召谁"在数据里没有一列，所以技能侧仍未分派 |
 | `ENHANCE` | 纯被动 | 本就不该作为"行动"施放 |
 
 ⚠ **表里没有的条目会被拒绝并报告，而不是当成"没事可做"。** 判据是"游戏陈述效果量的固定语法"
@@ -1852,8 +1862,12 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
    （444 条 ≠1）在 `Constant.normalizeMonsterConfigs` 装载时合并；其余缺失系数按 1.0 补。
 
 `EnemyFactory` 还会设：`level`（进防御区与击破基数）、`damageResist`（抗性区）、
-`stanceWeak`/`stance`/`maxStance`/`stanceCount`/`stanceType`。
+`stanceWeak`/`stance`/`maxStance`/`stanceCount`/`stanceType`、`summonIds`（召唤名单，P9-4 见 §24）。
 > ⚠️ 漏了 `effectHitRate`（见 §11）。
+
+**同一份数据的第二个出口（P9-4）**：`EnemyFactory.resolve(...)` 是"查配置 / 查模板 / 查等级组 / 缩放"
+这四步，`SummonFactory.create(...)` 复用它但只填面板与技能 —— 召唤物不是 `Enemy`，装不下
+抗性 / 弱点 / 韧性 / 阶段表。两个工厂共用同一半，是为了让缩放规则不可能出现第二份（见 §24.1）。
 
 数据规模实测：`monster_config` 2649 条、模板 2649 个 id 全覆盖、
 `breaking_rate` 与 `hard_level_group` 等级集合完全一致（1–100 与 120）。
@@ -1990,7 +2004,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | 技能槽位 | ✅ P8-2 已接（`Constant.SKILL_SLOT` 六槽，见 §7.2）；剩下的占位是 `Character.fromAttributes(...)` 这个测试入口（写死槽位 1） |
 | 击破 DOT 数值 | `DOT_RATIO=0.5`、`DOT_TURNS=3` 是示例值，base 不含击破特攻与削韧值 |
 | 神君/账账类追加攻击 | 未进入事件体系 |
-| 召唤物 | `Summon` 类存在；**敌方阵营现在收得下它**（L-8：`battle.enemies` 是 `List<CanHit>`，`enemyUnits()` 才是"其中的怪"）—— 但内容侧仍未创建任何召唤物，`SkillEffectType.SUMMON` 也没分派（P9-4）。我方入场/波次走 `WaveManager` → `Battle.addRequestItems`，那条路是活的 |
+| 召唤物 | **敌方阵营已能创建**（P9-4，§24）：`summon_id` 名单 → `SummonFactory` → `Battle.summon`，主人倒下带走它。⚠ 仍缺：我方召唤物（`characters` 是 `List<Character>`）、忆灵、技能侧 `SkillEffectType.SUMMON` 分派（数据里没有"召谁"那一列） |
 | 控制 | 只有 `StunBuff` 一种 |
 | 治疗 | 只有 `heal()` 方法，无乘区、无调用者 |
 
@@ -2157,7 +2171,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | §3.5 **效果命中与抵抗的生效概率公式** | ✅ 已实现（P6-1）：公式与 §3.5 一致，三个因子乘算。顺手修了 `EnemyFactory` 漏写 `effectHitRate` 的问题（之前敌人命中恒 0）。见 §20.1 |
 | §4 **护盾** | ✅ 已实现（P6-3）：`CanHit.shield` 先于 HP 被扣、不叠加。🚧 规格里的"护盾量提高"没有对应属性，护盾量目前就是传入值 |
 | §4 **治疗乘区** | ✅ 已实现（P6-2）：`Battle.calculateHeal/heal`。⚠ 规格的 `(1 - 治疗降低)` 与 `(1 + 受疗加成)` 合并成一个因子（`HEAL_TAKEN_RATIO` 取负即降低），因为属性表里没有单独的"治疗降低" |
-| §5 **忆灵系统**（独立单位/面板快照/连携攻击） | ❌ `Summon` 类从未被实例化 |
+| §5 **忆灵系统**（独立单位/面板快照/连携攻击） | 🚧 **敌方阵营的通用召唤物已做**（P9-4，§24：`Battle.summon` + `SummonFactory` + 主人倒下带走它）。忆灵本身仍未做：它是我方单位（`characters` 收不下）、要面板快照、要有连携攻击 |
 | §6 **欢愉体系**（阿哈速度/笑点/好活当赏/欢愉伤害公式） | ❌ 只有 `DamageType.ELATION` 与 `AttributeType.ELATION_DAMAGE_BOOST` 两个占位；`elation_basic_level_damage.json`（101 条）**从未被加载** |
 | §7 **超击破** | ✅ 已实现（P4-6，2026-09-19）：`SuperBreakBuff` + `BreakDamageCalculator.buildSuperBreak` + `SkillExecutor` 里追加 `SUPER_BREAK` 段。**但**公式里的 `(1 + 削韧值提高)` 与 `(1 + 弱点击破效率提高)` 仍缺（属性不存在），`SUPER_BREAK_BOOST = 0.4` 是示例值 |
 | §8.1 **忆灵伤害 / 欢愉伤害** 作为独立类型 | 类型枚举里有 `MEMORY` / `ELATION`，但无来源 |
@@ -2452,7 +2466,7 @@ jingYuan.getAggro();       // 75
 它没有 `cid`，查不到真实技能数据；真实角色一律走
 `CharacterFactory.create(cid, level)`（槽位映射见 §7.2）。
 本类**不负责**填技能倍率；天赋触发的追加攻击走 §4.7 的触发器表，
-召唤物与敌人侧的追加攻击归 P9-4。
+敌方阵营的召唤物归 P9-4（§24，已落地），敌人侧的追加攻击仍在 P9。
 
 ---
 
@@ -2542,5 +2556,85 @@ return user.getEnergyProvider().canCastUltra(user, ultraEnergyCost(user));
    所以规则分不清"我被打"和"队友被打" —— 这对需要全队损血的遐蝶是对的，
    对个人层数角色是错的。要修得给条件 DSL 加一个 `target`（事件主体）变量。
    现状由 `ResourceTest.subjectFilterIsNotExpressibleYet` 钉住。
+
+---
+
+## 24. 召唤物：敌方阵营 ✅（P9-4，2026-09-27）
+
+> **这一节只讲"敌方阵营的召唤物"**：把 `monster_config.json` 的 `summon_id` 变成一个真的站在场上、
+> 能被打、会死的单位。**我方召唤物与忆灵仍未做**，原因见本节末。
+
+### 24.1 三段接线
+
+```
+数据   monster_config.json 的 summon_id（列表）──Constant.normalizeMonsterConfigs──▶ 只保留正数
+              │
+装配   EnemyFactory.resolve ──┬─▶ EnemyFactory.create    → Enemy（+ 韧性/弱点/抗性/阶段表 + 名单）
+                              └─▶ SummonFactory.create    → Summon（只有面板 + 技能）
+              │
+上场   Battle.summon(master, summonId, hardLevelGroup)
+              │        ├─ enemies.add
+              │        ├─ addRequestItems.add  ← 与波次同一扇门：从"当前"行动值起算，不重开一轮
+              │        └─ setSpeedChangeListener ← 构造期只给开场名单接了，后到的单位要自己接
+              │
+退场   Battle.removeDeadCombatants()：perishOrphanedSummons() → 死者移出 Queue → checkResult()
+```
+
+- **名单是数据，不是触发器**。`summon_id` 只回答"这只怪能召唤谁"，**不回答"什么时候召"**；
+  什么时候由调用方决定（`Battle.summon`）。这与 `Enemy.phases` 是同一个分工：
+  "多强"和"放哪个技能"分开写。692/2649 只怪有非空名单（1450 条引用、556 个不同怪），
+  例如银鬃尉官 1003010 → 银鬃近卫 1002040 ×2。名单**保留顺序与重复**（它是名单不是集合）。
+- ⚠ **`[0]` 是"没有"，而且真的在数据里**（405301004 的名单就是 `[0]`）。
+  把 0 交给工厂会去查怪物 0 然后报错；而"跳过查不到的 id"更坏 —— 它会让一条数据错误
+  与"这只怪没有召唤物"长得一模一样。所以约定在**装载期**（`normalizeMonsterConfigs`）一次性执行，
+  `SummonTest.theZeroEntryMeansNoSummonAndIsDroppedAtLoad` 钉住选了哪个约定。
+- **面板走同一条缩放链**。`EnemyFactory.resolve` 是共享的那一半（查配置 / 查模板 / 查等级组 / 缩放），
+  `SummonFactory` 复用它，所以召唤物的 HP/ATK/DEF/SPD 与"同 id 的怪"逐位相同
+  （`theSummonScalesByTheSameRulesAsAMonsterWithThatId`）—— 两条路各抄一份缩放规则是这类代码
+  最典型的腐烂方式。
+- **它是 `Summon`，不是 `Enemy`**，所以**没有**怪物专属机制：无韧性条（不可击破）、无弱点表、
+  无分元素抗性、无具体负面抵抗、无阶段表。这正是 L-8 的分工（见 §6.2 的注）：需要这些机制的代码
+  显式走 `enemyUnits()`，因此放宽之后**没有任何地方静默跳过召唤物**。
+
+### 24.2 生命周期：召唤物活不过主人
+
+- `Summon.master` 是指向主人的**单向**指针，理由是可从召唤物自己回答"我属于谁"，不需要一张要保持同步的注册表。
+- `perishOrphanedSummons()` 跑在 `removeDeadCombatants()` **最前面**，所以紧接着的清扫会在同一趟里
+  把它移出行动条 —— 它停止行动、不再被选为目标、不再算"还活着"（`checkResult` 因此能看到 WIN），
+  全程走 `isDeath()` 这一条既有通道，**不引入第二种"还在不在"的判据**。
+- **主人死是唯一信号**：判的是 `master.isDeath()`，不是"主人不在 `enemies` 里" ——
+  因为死者本来就会留在名单里（§6.2），`isDeath()` 是引擎里每条移除路径都会置的那一个事实。
+- 退场**不是击杀**：这次清扫跑在 `Battle.applyDamage`（唯一结算入口）**之外**，而 `HpLoss`/`Kill`
+  只在那个入口里发 —— 否则每一个"消灭敌人"的天赋都会为一个**没人杀死的**单位付钱。
+  这也是 `perish()` 与 `takeDamage` 唯一真正可区分的地方：**HP**（见 §6.2 那条被打错的红字）。
+
+### 24.3 三处刻意留下的边界
+
+1. **只有敌方阵营的主人能召唤**，我方主人**响亮拒绝**（`IllegalArgumentException`，消息里点名
+   `List<Character>` 放不下 `Summon`）。为什么不"先塞进 `enemies` 凑合"：那样我方的召唤物
+   会**被我们自己的攻击打中**、并在胜负判定里**算成敌人** —— 一个不会报错的错误答案。
+   要做友方召唤物，得先把 `battle.characters` 放宽（L-8 的友方那一半）。
+2. **等级组是参数，不是推断的**。怪物自己的 `hard_level_group` 几乎总是 1，真正决定难度的是关卡，
+   所以没有可推断的来源；猜一个（见 ROADMAP §5 教训 3：猜出来的 `null` 让策略静默变空操作）
+   比要求调用方传一个参数坏得多。等级取自主人（它是这一场战斗的等级，主人身上就有）。
+3. **`SkillEffectType.SUMMON` 仍未分派**（§7.2b 的表里还是 ❌）：数据里没有"这次召唤召谁"这一列，
+   所以"敌方技能召唤"还差内容，而不是差能力 —— 能力就是 `Battle.summon`。
+   忆灵（我方、面板快照、连携攻击）同样未做，见 §18.4。
+
+**验收**：`SummonTest` **18 条** —— 名单随数据落到主人身上（顺序 + 重复）、无名单为空、
+`[0]` 在装载期被丢掉、面板与同 id 的怪逐位相同、自带名字与技能、每次调用给独立实例、
+战斗中入场（阵营 + 行动条 + 当前时钟 + 引擎目标表包含它 + **速度变化仍会重排**）、被打死只减自己、
+主人倒下带走它（含"还没入场就被带走"、**且它的 HP 一点没掉**）、
+**随主人消失不付击杀奖励**（与"真杀死会付钱"对照），以及四种拒绝（我方主人 / 已死主人 / 未知 id / null 主人）。
+
+**变异验证（10 处）**：去掉 `[0]` 过滤 → 只红 `theZeroEntryMeansNoSummonAndIsDroppedAtLoad`；
+名单去重 / 不落名单 → 各红 `theRosterTravelsFromTheDataOntoTheMaster`；
+摘掉清扫调用 / 把清扫挪到队列清扫**之后** → 分别红"主人倒下"那条（2 条 / 3 条不等）；
+摘掉我方阵营判断 / 已死主人判断 / null 主人判断 / 速度监听接线 → 各红对应一条。
+⚠ **唯一没被抓住的是"把 `perish()` 换成 `takeDamage(maxHp)`"**，而那暴露了我一个**错判**
+（见 §6.2 的红字）：`CanHit.takeDamage` 不发事件。补上"HP 不变"这条断言后该变异体才变红 ——
+所以 `theMasterFallingTakesItsSummonWithIt` 里那句 HP 断言不是装饰，它是这个方法存在的理由。
+
+全套 **87 套 / 780 例全绿**；demo `victory (10 rounds / 43 actions)` 与 `mechanics` demo 输出不变。
 
 

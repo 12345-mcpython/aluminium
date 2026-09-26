@@ -345,13 +345,41 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
+     * Marks this combatant as <b>defeated without being hurt</b> (P9-4), i.e. it leaves the fight while
+     * keeping its HP.
+     *
+     * <p><b>What this is for.</b> A summon leaves with its master, and it did not take damage on the way
+     * out. So {@link #currentHp} is deliberately left alone: "it left" and "it was beaten to 0 HP" are two
+     * different facts, and content that later asks "how hurt is it" must not be told the second one. The
+     * pinned consequence is that a summon which perishes keeps its HP, asserted by
+     * {@code SummonTest.theMasterFallingTakesItsSummonWithIt}.
+     *
+     * <p>⚠ <b>No kill reward is paid, but not for the reason it first looks like.</b> This method fires no
+     * events, and neither does {@link #takeDamage(double)} — the {@code HpLoss} / {@code Kill} events are
+     * emitted by {@code Battle.applyDamage}, the pipeline's single settlement entry point. So the thing
+     * that actually keeps a vanishing minion from paying out 「每消灭 1 敌 +5 能量」 is that the callers of
+     * this method run <b>outside that entry point</b> (the orphan sweep in
+     * {@code Battle.removeDeadCombatants}). A future caller that wants a death to pay out must go through
+     * {@code Battle.applyDamage} and settle real damage; calling this instead is the way to say "it left,
+     * nobody killed it".
+     *
+     * <p>What the callers must still do, because this method cannot: take the unit out of the roster
+     * ({@code Battle.enemies}) and off the action bar. {@link #isDeath()} alone does not remove anybody —
+     * see {@code Battle.removeDeadCombatants}, the one place both happen together.
+     *
+     * <p>Idempotent; a combatant that is already dead stays dead (and keeps the HP it had).
+     */
+    public void perish() {
+        death = true;
+    }
+
+    /**
      * Restores HP to this entity, capped at max HP.
      * Has no effect on dead entities.
      *
      * @param amount the amount to heal
      */
-    public void heal(double amount) {
-        if (death || amount <= 0) {
+    public void heal(double amount) {        if (death || amount <= 0) {
             return;
         }
         currentHp = Math.min(currentHp + amount, getMaxHp());

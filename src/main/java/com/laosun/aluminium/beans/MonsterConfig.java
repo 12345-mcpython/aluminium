@@ -23,7 +23,24 @@ import java.util.Map;
  * {@code Constant}, so a loaded instance is never {@code null}.
  *
  * <p>Mechanic fields: {@code debuff_resistance} is wired up in P6-1 (example: Ice Edge (冰锋)
- * {@code {"STAT_CTRL_Frozen": 1}} = fully immune to Frozen); {@code summon_id} is left for P9-4.
+ * {@code {"STAT_CTRL_Frozen": 1}} = fully immune to Frozen). {@code summon_id} (P9-4) is the monster's
+ * <b>summon roster</b> — see the note below.
+ *
+ * <p><b>The summon roster</b> ({@code summon_id} → {@link #summonIds()}): the ids of the monsters this one
+ * may bring onto the field, in the order the data lists them. It is a <b>roster, not a trigger</b>: it says
+ * "this monster's summons are 银鬃近卫 ×2" and deliberately says nothing about <em>when</em> they appear.
+ * When stays a decision for the caller ({@code Battle.summon}), the same way {@link #hpRatio} and the phase
+ * table keep "how strong" separate from "which skill". 692 of the 2649 monsters have a non-empty roster
+ * (1450 references to 556 distinct monsters); 银鬃尉官 1003010 → 1002040 ×2 is a typical one.
+ *
+ * <p>⚠ <b>A {@code 0} entry means "no summon", and it is really in the data</b> — one monster (405301004)
+ * carries exactly {@code [0]}. Feeding that id to the factory would look up monster 0 and fail loudly, which
+ * is at least visible; adding a "just skip unknown ids" fallback would instead turn it into a silently
+ * absent summon. {@code Constant.normalizeMonsterConfigs} therefore drops non-positive entries once, at
+ * load time, and {@code SummonTest} pins the counting convention.
+ *
+ * <p>Never {@code null} once loaded (the normaliser also replaces a missing field with an empty list), so
+ * consumers may iterate it directly.
  */
 public record MonsterConfig(Translate name,
                             @SerializedName("template_id") int templateId,
@@ -36,5 +53,6 @@ public record MonsterConfig(Translate name,
                             @SerializedName("speed_modify_ratio") Double speedRatio,
                             @SerializedName("stance_modify_ratio") Double stanceRatio,
                             @SerializedName("damage_resistance") Map<DamageElement, Double> damageResistance,
-                            @SerializedName("debuff_resistance") Map<String, Double> debuffResistance) {
+                            @SerializedName("debuff_resistance") Map<String, Double> debuffResistance,
+                            @SerializedName("summon_id") List<Integer> summonIds) {
 }
