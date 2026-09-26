@@ -1033,8 +1033,9 @@ SkillExecutor.setLogNotDispatched(true);   // 排查时打开
 breakEnemy(element)                                    标记击破状态
 setBrokenRemainTurns(2)                                击破持续 2 回合
 applyDamage(BreakDamageCalculator.build(...))          击破伤害
-delayMovePercent(enemy, 0.25)                          推条 25% 周期
-attachBreakDot(attacker, enemy, element)               挂 DOT（仅火/雷/物理/风）
+delayMovePercent(enemy, BREAK_DELAY_RATIO)             推条 25% 周期（固定部分）
+attachBreakDot(attacker, enemy, element)               挂 DOT（仅 hasDot() 的元素）
+attachBreakControl(enemy, element)                     控制状态 + 元素额外推条（§8.6）
 gainBreakEnergy(attacker, enemy)                       击破回能
 ```
 
@@ -1093,7 +1094,51 @@ Damage(type = BREAK)   → 走完整装配，但 BoostArea/CritArea 自动跳过
 - 🚧 `DOT_RATIO = 0.5` 与 `DOT_TURNS = 3` 是**示例值**（代码注释标了 `TODO data`），
   两个都还没有真实数据来源。
 
-### 8.6 超击破 ✅（P4-6，2026-09-19 实现）
+### 8.6 击破控制状态（P10-2）✅ 数值仍是示例值
+
+冰 / 量子 / 虚数击破不留 DOT，而留一个**控制状态**。表在 `Constant.CONTROL_EFFECTS`
+（`ControlEffect(resistKey, turns, blocksAct, slowPercent)`），由 `BreakEffect.control` 按键引用。
+
+**⚠ 计划里"冻结期受伤害 +30%"是错的，数据说的相反。** 词条原文（六条独立来源，冰系全部一致）：
+
+```
+"冻结状态下，敌方目标不能行动同时每回合开始时受到等同于<施法者>#4%攻击力的冰属性伤害"
+   —— 深寒徘徊者 / 永冬灾影 / 三月七 / 杰帕德 / 镜流
+"禁锢状态下，敌方目标行动延后#2%，速度降低#4%"                        —— 瓦尔特
+"「纠缠」会使敌人行动延后，并在敌人下次行动时对其造成额外的量子属性伤害"   —— 明写「弱点击破」量子
+```
+
+所以冻结是**每回合冰伤**（一个 DOT），不是"受伤加成"；禁锢/纠缠是**推条 + 减速**，而且**仍然能行动**。
+
+| 元素 | 不能行动 | 减速 | 额外推条 |
+|---|---|---|---|
+| 冰 → 冻结 | **是** | 否 | 是（+50%） |
+| 量子 → 纠缠 | 否 | 是（−20%） | 是（+20%） |
+| 虚数 → 禁锢 | 否 | 是（−20%） | 是（+20%） |
+
+**没有新的 buff 类 —— 控制是组合出来的**（P8-0 的规矩）：
+
+| 部分 | 用哪个现成原语 |
+|---|---|
+| `blocksAct` | `StunBuff`（`canAct() == false`，早就在） |
+| `slowPercent` | `StatModifierBuff.percentDebuff(SPEED, …)` |
+| 推条 | `Battle.delayMovePercent`（**瞬时**推，不是 buff） |
+| `resistKey` | `Battle.hitChance` 的第 4 个参数（**只给技能施加那条路**） |
+
+- ⚠ **击破不走抵抗判定。** 破韧是"韧性条空了"，不是被抵抗的 debuff —— 若让 `STAT_CTRL_*` 取消一次击破，
+  弱点击破会**静默什么都不发生**。冰锋本身就带 `STAT_CTRL_Frozen = 1`，
+  `ControlTest.anIceBreakFreezesEvenAMonsterThatIsImmuneToFreezeSkills` 钉住"照样冻结"。
+- ⚠ **顺序是契约：先加状态、最后推条。** 速度变化会**重排**行动条（`Signal.refreshSpeed` 按已走进度
+  重算 `nextActionTime`），所以"先推条、后减速"会把额外推条重算掉。实测：推条在前时，量子击破的
+  行动值变化**加不加额外推条都是 28.409**（完全不可观测）；推条在后才是 `≥ 42.61`（固定 25% + 20% 的下限，
+  实际因重排略大）。一次性推条必须是对行动条的**最后一次写入**。
+- 🚧 **冻结/纠缠的伤害段有意没做**：词条说冻结每回合受冰伤、纠缠下次行动受量子伤（两者都是 DOT），
+  但**没有来源给出"击破施加"的比例**。留在 `BreakEffect.dotRatio = 0`，
+  `BreakEffectTableTest` 会因为有人乱填而变红；真要填时 `attachBreakDot` 一行都不用改。
+- 🚧 示例值 + `TODO data`：三个 `turns`（都取 1）、三个额外推条（0.5 / 0.2 / 0.2）、两个减速（0.2）。
+  数据里没有击破控制表（`breaking_rate.json` 是"等级→击破基数"），词条正文只给机制、不给击破数值。
+
+### 8.7 超击破 ✅（P4-6，2026-09-19 实现）
 
 触发标记：`models/buffs/SuperBreakBuff`（挂在**攻击方**身上，**纯标记、没有数值**）。
 一旦有它，攻击已击破的敌人时，"打不进韧性条的那部分削韧值"会转化成一段

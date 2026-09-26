@@ -160,6 +160,7 @@
 | **真实队伍** | **关卡用真角色**（P8-5）：`StageFactory.realTeam()` = 景元/希儿/克拉拉/娜塔莎（4 命途），各带本命途 5★ 光锥；占位队已删除 |
 | **天赋与追加攻击** | **天赋 = 数据**（P8-3）：触发器表新增 `DAMAGE` op，倍率取**天赋槽**的 `damage_param`；克拉拉受击反击、希儿击杀再动，见 `engine.md` §4.7 |
 | **DOT 并入 buff 体系** | **DOT 不再是第二套机制**（P10-0）：`DotBuff extends AbstractBuff`，删掉 `models/Dot` / `Enemy.dots` / `tickDots(Enemy)`；角色与敌人走同一条 DOT 路径，demo 数值逐位不变，见 `engine.md` §8.5 |
+| **击破控制状态** | **控制 = 数据组合，不是新类**（P10-2）：`ControlEffect` 表 + `StunBuff`/`StatModifierBuff`/`delayMovePercent` 三个现成原语；冰=锁行动、量子/虚数=减速+推条；**冻结"+30% 受伤"被数据推翻**（原文是每回合冰伤），见 `engine.md` §8.6 |
 
 ### 🚧 部分完成
 
@@ -172,7 +173,7 @@
 | 敌人技能不发事件 | `EnemySkill` 不走 `SkillExecutor`，故不发 `SkillCastEvent` | P9-2 对齐 |
 | **非伤害技能不分派** | `SkillExecutor.resolveHits` 遇到非伤害技能**静默 return**：治疗/护盾/增益/控制/召唤技能施放后**无任何效果**（只有回能照给）；`Main` 用第二条手搓路径补了治疗/护盾 | **P10-3 前半**：op 侧已通，技能侧待参数表 |
 
-### ☐ 待办（共 14 项，`P10-3` 进行中，见 §7–§9）
+### ☐ 待办（共 13 项，`P10-3` 进行中，见 §7–§9）
 
 **A 层（角色数据化的基础设施）全部完成** ✅ —— P8-6 事件、P8-7 触发器表、P8-8 层数资源、
 P8-5 真实队伍、**P8-3 天赋 + 追加攻击**。
@@ -732,28 +733,79 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
   `Set`/`Map`，顺序取决于 identity hash，**跨进程不稳定** —— 所以 demo 输出目前**不能用来做逐行回归**。
   这正是上面第 4 条验收要绕道"同代码跑两次"来证明的原因。要做逐行回归得先让它排序（归 P11-1）。
 
-### P10-1 七系击破异常全量 🚧 表已落地（`a1e36f3`）
+### P10-1 七系击破异常全量 ✅（表 + 七系数值；三个控制系的机制在 P10-2）
 
-- **现状**：`Constant.BREAK_EFFECTS`（`record BreakEffect(dotRatio, dotTurns, control)`）**已存在**，
-  四个 DOT 系（火/雷/物理/风）走它，`Constant.DOT_ELEMENTS` 由它**派生**、不再手写，
-  挂 DOT 的代码已改为**查表**（数值与改表前逐位一致，`BreakEffectTableTest` 钉住）。
-  **还差的**：冰（冻结）/量子（纠缠）/虚数（禁锢）三个控制系的**数值**（推条 %、控制时长、受击加伤）
-  —— 它们只有在 P10-2 的状态机存在之后才有意义，所以归到 P10-2 一起填。
-- **怎么做**：给三个控制元素填 `BreakEffect` 的数值；击破推条统一 = 固定 25% + `delayPercent`。
-  比例先示例值 + `TODO data`。
-- **验收**：`BreakEffectAllTest`：冰击破 → 无 DOT、推条 25%+50%；量子 → DOT + 推条 25%+20%；物理 → 仅 DOT（回归 P4-5）。
-- **依赖**：P4-5、P4-4、**P10-2**（三个控制系的值随状态机一起填）
+- **现状**：`Constant.BREAK_EFFECTS`（`record BreakEffect(dotRatio, dotTurns, delayPercent, control)`）
+  描述全部七系；四个 DOT 系（火/雷/物理/风）走它且**逐位不变**，`Constant.DOT_ELEMENTS` 由它**派生**
+  （不再手写，所以"哪些系有 DOT"不可能与表不一致），挂 DOT 的代码**查表**。
+  三个控制系也进了表：额外推条 + 一个 `CONTROL_EFFECTS` 的键。
+- **怎么做**：见上；击破推条统一 = 固定 25% + `delayPercent`（`Battle.attachBreakControl`）。
+- **验收**：`BreakEffectTableTest` 5 条：每个元素都有条目；四个 DOT 系 = 有 DOT + 无控制 + 无额外推条；
+  三个控制系 = 有控制 + 有额外推条（**当前无 DOT**，见下）；控制键必须能解析且只有冻结锁行动；
+  `DOT_ELEMENTS` 与表一致。回归 P4-5 由 `DotTest` + `ControlTest.aPhysicalBreakStillOnlyBurns` 覆盖。
+- ⚠ **原验收里"量子 → DOT"这一条没有实现，是有意的。** 词条确实说纠缠会在敌人下次行动时造成量子伤害
+  （即一个 DOT），但**没有给"击破施加"的比例**；填一个示例值会让它看起来像数据。留 `dotRatio = 0`
+  并把 TODO 写在 P10-2；真要填时 `attachBreakDot` 一行都不用改。
+- **依赖**：P4-5、P4-4、P10-2 ✅
 
-### P10-2 控制异常状态机
+### P10-2 控制异常状态机 ✅（2026-09-26 完成，一个数字仍是 TODO）
 
-- **怎么做**：`ControlBuff extends AbstractBuff`（冻结/眩晕 → `canAct() == false`；禁锢/纠缠靠推条）；
-  `BuffManager.hasControl()`；冻结期受伤害 +30%（示例值）；施加方走 P6-1 的 `hitChance`，
-  把具体抵抗 key（如 `"STAT_CTRL_Frozen"`）**直接传给 `hitChance` 的第 4 个参数**即可 ——
-  ⚠ **没有也不需要 `isImmuneTo`**（原计划里那句是假缺口，见 P9-5 的核对结果）。
-- **验收**：`ControlTest`：普通怪 → 跳回合后恢复；禁锢 → 延迟 30%。
-  > ⚠ "冰锋被冻结 → `hitChance == 0`" **不再作为本任务的验收项** ——
-  > 它**已经实现且已有测试**（`HitResistTest`），列在这里只会让人以为还要做一遍。
-- **依赖**：P6-1、P4-4
+> **计划里两句话被数据推翻了，动手前改了。** 原计划写"`ControlBuff extends AbstractBuff` +
+> 冻结期受伤害 +30%（示例值）"。去查数据时发现：
+> 1. **`StunBuff` 早就是控制 buff**（`canAct() == false`，有 `BuffManagerTest` /
+>    `SkillPointGameParityTest` 钉着），而且 `tryApplyDebuff` + `hitChance(caster, target, base,
+>    "STAT_CTRL_Frozen")` **已经端到端可用**（`HitResistTest`）—— 也就是说"建一个控制类"和
+>    "施加方走命中/抵抗"这两条**本来就不需要做**，写在这里只会让人以为还要做一遍（同 P9-5 的
+>    `isImmuneTo` 假缺口）。
+> 2. **"+30% 受伤害"没有任何数据支持。** 词条原文相反且一致（六条独立来源）：冻结是
+>    `"冻结状态下，敌方目标不能行动同时每回合开始时受到等同于<施法者>#4%攻击力的冰属性伤害"`
+>    （深寒徘徊者 / 永冬灾影 / 三月七 / 杰帕德 / 镜流）；禁锢是
+>    `"禁锢状态下，敌方目标行动延后#2%，速度降低#4%"`（瓦尔特）；纠缠是
+>    `"「纠缠」会使敌人行动延后，并在敌人下次行动时对其造成额外的量子属性伤害"`
+>    （原文就写的是「弱点击破」量子）。**冻结的伤害是"每回合冰伤"，不是"受伤加成"。**
+
+- **为什么没有新建 `ControlBuff`**：三个状态只差几个数字和一个布尔，而引擎已有的原语正好一一对应，
+  所以控制是**组合**出来的（P8-0 的规矩，同 `StatModifierBuff` 之于所有属性 buff）：
+  `blocksAct` → `StunBuff`（已存在）；`slowPercent` → `StatModifierBuff.percentDebuff(SPEED, …)`（已存在）；
+  推条 → `delayMovePercent`（已存在，是瞬时推、不是 buff）；`resistKey` → `hitChance` 的第 4 个参数
+  （只给"技能施加"那条路用）。
+- **落地**：`Constant.ControlEffect(resistKey, turns, blocksAct, slowPercent)` + `CONTROL_EFFECTS`
+  （`FROZEN` / `ENTANGLED` / `IMPRISONED`）；`BreakEffect` 加 `delayPercent` 与 `control`
+  （四个 DOT 系填 `0` / `null`，所以它们**逐位不变**）；`Battle.attachBreakControl` 在击破链里接线。
+- ⚠ **击破不走抵抗判定**：破韧是"韧性条空了"，不是被抵抗的 debuff —— 让 `STAT_CTRL_*` 取消一次击破，
+  会让弱点击破**静默什么都不发生**。`ControlTest.anIceBreakFreezesEvenAMonsterThatIsImmuneToFreezeSkills`
+  钉住这条（冰锋本身就带 `STAT_CTRL_Frozen = 1`）。
+- ⚠ **顺序是契约（实测得出，不是洁癖）**：**先加状态、最后推条**。速度变化会**重排**行动
+  （`Signal.refreshSpeed` 按已走进度重算 `nextActionTime`），所以先推条再减速，那 20% 额外推条会被
+  重算掉 —— 实测"推条在前"时，量子击破的行动值变化**加不加额外推条都是 28.409**，完全不可观测。
+  一次性推条必须是对行动条的**最后一次写入**。
+- **验收**：`ControlTest` 5 条（冻结=锁行动+25%+50%推条且不减速；量子/纠缠与虚数/禁锢=减速 20%+
+  推条且**仍能行动**；物理回归=只挂 DOT、不减速、推条恰为固定 25%；冰锋带 100% 冻结抵抗仍被击破冻结）；
+  `BreakEffectTableTest` 5 条（含"控制键必须能解析"与"只有冻结锁行动"）。全套 **64 suites / 608 tests / 0 failures**。
+  demo `Main`：唯一变化是 `[Break IMAGINARY]` 的次元扑满在行动条上被推后并减速（23 行行动条），
+  **伤害/HP/击杀/结局逐行不变**（仍 `victory (10 rounds / 43 actions)`）。
+- **变异验证（4 处，均确认护栏有效）**：
+  1. 摘掉 `attachBreakControl` 调用 → 4 条控制用例红、物理回归**仍绿**（区分度正确）；
+  2. 无视 `hasControl()` 让每个元素都吃冻结 → `aPhysicalBreakStillOnlyBurns` 红；
+  3. 把推条挪到加状态**之前** → 量子/禁锢两条红，实测值 `28.409` vs 下限 `42.61`
+     （正好等于"没有额外推条"的那个数，即顺序论证本身被验证）；
+  4. 让击破也吃 `debuffResist` → 两条冻结用例红。
+- 🚧 **仍是 TODO data（示例值）**：`CONTROL_EFFECTS` 的三个 `turns`（都取 1）、三个额外推条
+  （`FREEZE_EXTRA_DELAY = 0.5` / `ENTANGLE_EXTRA_DELAY = 0.2` / `IMPRISON_EXTRA_DELAY = 0.2`）、
+  以及两个减速比例（0.2）。数据里**没有**击破控制表（`breaking_rate.json` 是"等级→击破基数"），
+  词条正文只给机制、不给击破用的数值。
+- 🚧 **有意留下的口子：冻结/纠缠的伤害段没做。** 词条说冻结每回合受冰伤、纠缠下次行动受量子伤 ——
+  两个都是 DOT，而 `BreakEffect.dotRatio` 正是它的字段；但**没有任何来源给出"击破施加"的那个比例**，
+  所以宁可留 `0` 并在这里记着，也不填一个看起来像数据的数
+  （`BreakEffectTableTest` 会因为有人乱填而变红）。要做的话就是给冰/量子填 `dotRatio`/`dotTurns`，
+  `attachBreakDot` **不需要改一行**。
+- **依赖**：P6-1、P4-4、P10-1
+
+### P10-2 旧计划原文（保留，供对照）
+
+- ~~**怎么做**：`ControlBuff extends AbstractBuff`；`BuffManager.hasControl()`；冻结期受伤害 +30%（示例值）~~
+  —— 前两条**不需要**（已存在/无调用者，照项目纪律不造没有调用者的 API），第三条**与数据相反**。
+- ~~**验收**：普通怪 → 跳回合后恢复；禁锢 → 延迟 30%~~ —— "跳回合后恢复"由 `StunBuff` 已有的用例覆盖。
 
 ### P10-3 Buff 体系完善（属性类 + 刷新规则）🚧 前半已落地
 
