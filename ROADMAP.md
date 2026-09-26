@@ -189,9 +189,11 @@ P8-5 真实队伍、**P8-3 天赋 + 追加攻击**。
 2026-09-26 逐条核对 §8 的待办后发现**四条过时的状态描述**（P10-3 说"卡在参数表上"、P10-4 说"公开 API 还没上移"、
 P10-1 说"缺三个控制系"、P10-6 说"几率取 `param_list` 第 3 项"），已全部按代码与数据更正。核对后的真实缺口：
 
-1. **数据补全**（`generate_data.py`，注意该脚本**不在版本控制内**）：
-   `skill_effects.json` 里 14/40 条 `params` 为空；`BUFF`/`CONTROL`/`SUMMON` 技能没有"施加什么"的表；
-   `enemy_skills.json` 的倍率仍是猜的（这是 P9-1/P9-3 的阻塞点）。
+1. **数据补全**（`generate_data.py`）：`skill_effects.json` 里 14/40 条 `params` 为空；
+   `BUFF`/`CONTROL`/`SUMMON` 技能没有"施加什么"的表；`enemy_skills.json` 的倍率仍是猜的
+   （这是 P9-1/P9-3 的阻塞点）。
+   ⚠ **动它之前先看 `DOC_VS_CODE.md` F-9 的工具链注**：脚本的版本控制在 **GitHub gist** 上，
+   但 **gist 落后于本地副本** —— `skill_effects.json` 那段只在本地，改了没人知道。
 2. **引擎侧仅剩的几处**：P10-4 的拉条 API 二选一、P10-5 的验收补齐、光锥数值被动接线、
    P11-1 的 `Main` 拆分（`main()` 目前**无参**，`gradle run` 进不去）。
 3. **`Main` 的定位**：它现在是"demo 的 AI + 打印"，不该再承担引擎算不出来的东西 —— 这条已经做到了。
