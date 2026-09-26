@@ -17,7 +17,7 @@ import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillData;
+import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
 import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;

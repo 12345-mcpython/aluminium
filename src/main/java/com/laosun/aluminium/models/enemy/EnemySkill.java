@@ -9,10 +9,12 @@ import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillData;
+import com.laosun.aluminium.data.SkillData;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Enemy skill (P5-3): data-driven from {@code enemy_skills.json}, not hard-coded.
@@ -38,8 +40,11 @@ import java.util.List;
  */
 public class EnemySkill extends Skill {
 
+    @Getter
     private final DamageElement element;
+    @Getter
     private final double multiplier;
+    @Getter
     private final int hits;
     private final DamageType type;
     private final SkillEffectType effect;
@@ -59,18 +64,6 @@ public class EnemySkill extends Skill {
         this.hits = Math.max(1, hits);
         this.type = type == null ? DamageType.NORMAL : type;
         this.effect = effect == null ? SkillEffectType.SINGLE_ATTACK : effect;
-    }
-
-    public DamageElement getElement() {
-        return element;
-    }
-
-    public double getMultiplier() {
-        return multiplier;
-    }
-
-    public int getHits() {
-        return hits;
     }
 
     @Override
@@ -129,7 +122,7 @@ public class EnemySkill extends Skill {
         // the outer filter changed no observable outcome (removing it left every test green), i.e. it
         // was an untestable second guard for the same fact. One guard, exercised.
         List<Character> team = battle.characters.stream()
-                .filter(member -> member != null)
+                .filter(Objects::nonNull)
                 .toList();
         return switch (effect) {
             case AOE_ATTACK -> List.copyOf(team);

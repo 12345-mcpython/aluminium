@@ -273,7 +273,7 @@ public class WaveManagerTest {
      */
     @Test
     public void battlesWithoutWavesBehaveAsBefore() {
-        Battle battle = new Battle(List.of(character("hero", 100)),
+        Battle battle = new Battle(List.of(character()),
                 List.of(EnemyFactory.create(1002011, 90, 1)), new Random(0));
 
         Assertions.assertNull(battle.getWaveManager());
@@ -316,7 +316,7 @@ public class WaveManagerTest {
     /** Builds a battle with "an empty enemy team + a wave manager" (P7-4's standard usage). */
     private static Battle waveBattle(int stageId) {
         StageBean stage = stage(stageId);
-        Battle battle = new Battle(List.of(character("hero", 100)), new ArrayList<>(), new Random(0));
+        Battle battle = new Battle(List.of(character()), new ArrayList<>(), new Random(0));
         new WaveManager(battle, stage);
         return battle;
     }
@@ -339,8 +339,8 @@ public class WaveManagerTest {
         return wave;
     }
 
-    private static Character character(String name, int speed) {
-        return Character.fromAttributes(name, 10_000, 100, 100, speed);
+    private static Character character() {
+        return Character.fromAttributes("hero", 10_000, 100, 100, 100);
     }
 
     private static com.laosun.aluminium.models.Signal signalOf(Battle battle, Enemy enemy) {
