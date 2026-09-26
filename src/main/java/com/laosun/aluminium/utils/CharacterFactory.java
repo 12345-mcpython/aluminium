@@ -2,6 +2,7 @@ package com.laosun.aluminium.utils;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
+import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.exceptions.CharacterException;
@@ -213,11 +214,46 @@ public final class CharacterFactory {
      */
     private static TriggerTable effectiveTriggerTable(int cid, RelicSuit relicSuit) {
         TriggerTable table = TriggerTables.of(cid);
-        if (relicSuit == null) {
-            return table;
+        if (relicSuit != null) {
+            for (Int2IntMap.Entry worn : relicSuit.piecesPerSet().int2IntEntrySet()) {
+                table = table.plus(RelicTriggerTables.of(worn.getIntKey()).at(worn.getIntValue()));
+            }
         }
-        for (Int2IntMap.Entry worn : relicSuit.piecesPerSet().int2IntEntrySet()) {
-            table = table.plus(RelicTriggerTables.of(worn.getIntKey()).at(worn.getIntValue()));
+        // ONE exit point, so the check below cannot be skipped by a branch. It was written at both returns
+        // first, and mutation testing showed the no-suit branch was then covered by nothing: a test that
+        // exercises one path has to be exercising the only path.
+        return requireSummonable(cid, table);
+    }
+
+    /**
+     * Refuses a merged table whose {@code SUMMON} rules this character could never satisfy (P9-4).
+     *
+     * <p><b>Why the check lives here.</b> 「进入战斗时召唤忆灵」 is only meaningful for a character with a
+     * memosprite spec ({@code resources/memosprites/<cid>.json}), and a rule file cannot know its own cid:
+     * {@link TriggerTable} is compiled from the file alone, and a <b>relic</b> rule is shared by every wearer.
+     * The assembly point is the first place that knows both the character and the full set of rules it ends up
+     * with, so it is the only place this can be caught at build time instead of in the middle of a battle.
+     *
+     * <p>The failure mode being prevented: the op would load, fire, and only then throw from inside
+     * {@code SummonFactory} — during {@code startBattle}, with a message about a missing file arriving long
+     * after the rule was written. Here the same message arrives when the character is built.
+     *
+     * <p><b>Public on purpose.</b> It is the one entry point for "is this character's rule set satisfiable",
+     * and a test cannot otherwise reach it: the alternative would be shipping a character file that uses
+     * {@code SUMMON} without a spec, which is precisely the broken state this refuses.
+     *
+     * @param cid   the character the table was merged for
+     * @param table the effective (already merged) table
+     * @return the same table, for chaining
+     * @throws CharacterException when the table uses {@code SUMMON} and the character has no memosprite spec
+     */
+    public static TriggerTable requireSummonable(int cid, TriggerTable table) {
+        if (table.usesOp("SUMMON") && !Memosprites.exists(cid)) {
+            throw new CharacterException(
+                    "Character " + cid + " has a rule that uses the SUMMON op, but no memosprite spec: add "
+                            + "resources/" + Memosprites.DIR + "/" + cid + ".json (or drop the rule). A "
+                            + "relic-set rule may be the source -- those are shared by every wearer, so this "
+                            + "can only be checked here, at assembly.");
         }
         return table;
     }

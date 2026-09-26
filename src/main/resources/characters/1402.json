@@ -1,0 +1,15 @@
+[
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "SUMMON"
+      }
+    ],
+    "source": "1402 阿格莱雅 终结技: 「召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入【至高之姿】状态并使自身立即行动。」",
+    "note": "Only the summoning clause. 「若衣匠已在场，则使其生命值回复至上限」 is the refresh that SUMMON deliberately does NOT model -- a second firing keeps the memosprite already out and leaves its HP alone, which is registered as the next step. Everything else the ultimate says (【至高之姿】, the 100-speed countdown, the self-destruct, the SPD-boost stacks) is not authored. `actor == self` is 「阿格莱雅」: it is HER ultimate, and without it the rule would also fire for a teammate's. 衣匠's panel (35% of her SPD, 66% of her Max HP + 720) is in resources/memosprites/1402.json."
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "SUMMON"
+      }
+    ],
+    "source": "1413 长夜月 天赋: 「进入战斗时召唤忆灵「长夜」。」",
+    "note": "The summoning clause only; 「长夜」's panel is derived from her in resources/memosprites/1413.json, and everything else her talent says (the CRIT DMG on HP loss, 【忆质】) is not authored yet. No `target`: a memosprite belongs to its summoner, so there is nothing to point at -- SUMMON refuses one rather than ignoring it. Firing this twice keeps the memosprite already out (the op is idempotent per summoner), which is what 「若已在场…」 implies; the refresh variant is not modelled. A character with a SUMMON rule but no memosprite spec is refused when the character is built (CharacterFactory), not mid-battle."
+  }
+]
