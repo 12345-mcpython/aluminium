@@ -3,11 +3,13 @@ package com.laosun;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Enemy;
 import com.laosun.aluminium.models.EnemyFactory;
@@ -16,6 +18,7 @@ import com.laosun.aluminium.models.Relic;
 import com.laosun.aluminium.models.RelicSuit;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Skill;
+import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.ai.TargetSelector;
 import com.laosun.aluminium.models.buffs.CounterMechanic;
@@ -64,7 +67,32 @@ public class Main {
      */
     private static final int SKILL_POINT_RESERVE = 1;
 
-    public static void main() {
+    /**
+     * Entry point.
+     *
+     * <p><b>Why an argument.</b> There are two demos and they answer different questions: the battle demo
+     * ("what does a whole fight look like") and the mechanics demo ("do the pieces this project just built
+     * actually work when you drive them"). Running both by default would bury the second in the first's
+     * ~280 lines. With no argument the battle demo runs, so {@code gradlew run} keeps producing exactly
+     * what it always did.
+     *
+     * <p>Usage: {@code gradlew run --args="mechanics"} (or {@code battle}, or {@code all}).
+     */
+    public static void main(String[] args) {
+        String which = args.length == 0 ? "battle" : args[0].toLowerCase();
+        switch (which) {
+            case "battle" -> battleDemo();
+            case "mechanics" -> mechanicsDemo();
+            case "all" -> {
+                battleDemo();
+                mechanicsDemo();
+            }
+            default -> System.out.println("unknown demo '" + args[0]
+                    + "'; use 'battle' (default), 'mechanics' or 'all'");
+        }
+    }
+
+    private static void battleDemo() {
         System.out.println("=".repeat(78));
         System.out.println(" aluminium battle demo: Himeko (姬子) / March 7th (三月七) / Luocha (罗刹)  vs  Ice Edge (冰锋) + Junior Staff·Field Agent (基层员工·外勤) + Warp Trotter (次元扑满)");
         System.out.println("=".repeat(78));
@@ -139,6 +167,197 @@ public class Main {
         });
         System.out.println("=".repeat(78));
         battle.printHp();
+    }
+
+    // ==================================================================
+    // Mechanics demo: the pieces built most recently, driven for real
+    // ==================================================================
+
+    /**
+     * A short demo whose job is to <b>show the mechanics this project just built actually running</b>,
+     * rather than to look like a fair fight. Three scenes:
+     *
+     * <ol>
+     *   <li><b>Break control states</b> (P10-1/P10-2) — 冰 = the victim cannot act, 量子/虚数 = it acts but
+     *       slower and later. Prints the speed and action-value change for each, because those are the
+     *       observables the mechanics are made of.</li>
+     *   <li><b>A DOT on our own character</b> (P10-0) — the engine settles it at the start of that
+     *       character's turn and expires it after N turns, exactly as it does for a monster. Before the
+     *       migration this was impossible: {@code tickDots} took an {@code Enemy}.</li>
+     *   <li><b>An enemy-side summon</b> (L-8) — the camp holds a non-monster, our side can hit it, and the
+     *       battle is not won while it stands.</li>
+     * </ol>
+     *
+     * <p>⚠ Deliberate demo affordances, each labelled in the output: the enemy's weakness set is rewritten
+     * so that all three control elements can break one target, {@code recoverFromBroken()} is called between
+     * elements so each can be shown from a clean state, and the control states are cleared between them.
+     * A real fight has none of that; the battle demo is the one that plays fair.
+     */
+    private static void mechanicsDemo() {
+        System.out.println("=".repeat(78));
+        System.out.println(" aluminium mechanics demo: the pieces built most recently, driven for real");
+        System.out.println("          run with --args=\"battle\" for the whole-fight demo instead");
+        System.out.println("=".repeat(78));
+        System.out.println();
+
+        breakControlScene();
+        dotOnOurCharacterScene();
+        enemyCampSummonScene();
+
+        System.out.println("=".repeat(78));
+        System.out.println(" All three scenes ran without the engine refusing anything.");
+        System.out.println(" What pins each one is a test, not this printout:");
+        System.out.println("   control states      ControlTest + BreakEffectTableTest");
+        System.out.println("   DOT as a buff       DotTest (incl. a DOT on a character)");
+        System.out.println("   summon in the camp  EnemyCampSummonTest");
+        System.out.println("   delay survives slow QueueActionManipulationTest.aDelaySurvivesASpeedChange");
+        System.out.println("=".repeat(78));
+    }
+
+    /** Scene 1: one enemy broken three ways, printing what each element actually does. */
+    private static void breakControlScene() {
+        System.out.println("[1] Break control states — 冰 锁行动 / 量子·虚数 减速 + 推条");
+        Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
+        Enemy enemy = EnemyFactory.create(8002040, 90, 1);          // 次元扑满
+        // Demo affordance #1: make one target weak to all three control elements so each can be shown.
+        enemy.setStanceWeak(java.util.Set.of(DamageElement.ICE, DamageElement.QUANTUM,
+                DamageElement.IMAGINARY));
+        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(7));
+        System.out.println("    target " + enemy.getName() + "  speed " + fmt(speedOf(enemy))
+                + "  weakness rewritten to " + enemy.getStanceWeak() + " (demo affordance)");
+
+        for (DamageElement element : List.of(DamageElement.ICE, DamageElement.QUANTUM,
+                DamageElement.IMAGINARY)) {
+            // Demo affordance #2/#3: clear the previous state and re-fill the toughness bar, so this element
+            // starts from the same place the last one did.
+            enemy.recoverFromBroken();
+            enemy.getBuffManager().clearAll();
+
+            double speedBefore = speedOf(enemy);
+            double avBefore = timeRemaining(battle, enemy);
+            Constant.BreakEffect effect = Constant.BREAK_EFFECTS.get(element);
+
+            battle.reduceToughness(hero, enemy, element, 9_999);
+
+            System.out.println("    " + element + " break → control=" + effect.control()
+                    + "  canAct=" + enemy.getBuffManager().canAct()
+                    + "  speed " + fmt(speedBefore) + " → " + fmt(speedOf(enemy))
+                    + "  action value +" + fmt(timeRemaining(battle, enemy) - avBefore)
+                    + "  (fixed " + pct(Constant.BREAK_DELAY_RATIO)
+                    + " + element's own " + pct(effect.delayPercent()) + ")"
+                    + "  attached: " + describeControl(enemy));
+        }
+        System.out.println("    → only 冰 stopped the victim acting; all three pushed the bar further than the"
+                + " fixed quarter alone, which is the element's own delay from Constant.BREAK_EFFECTS");
+        System.out.println();
+    }
+
+    /** Scene 2: a DOT on our own character, settled by the engine at the start of its turn. */
+    private static void dotOnOurCharacterScene() {
+        System.out.println("[2] A DOT on OUR character — the burn a boss puts on us (P10-0)");
+        Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 200);   // fast: acts first
+        Enemy boss = EnemyFactory.create(1002011, 90, 1);
+        Battle battle = new Battle(List.of(hero), List.of(boss), new Random(7));
+
+        hero.getBuffManager().addBuff(new DotBuff(boss, DamageElement.FIRE, 400, 2));
+        System.out.println("    " + boss.getName() + " applies burn to " + hero.getName()
+                + ": DOT×" + hero.getBuffManager().countBuffs(DotBuff.class)
+                + ", 2 settlements, base 400");
+
+        int heroTurns = 0;
+        while (!battle.isOver() && heroTurns < 4) {
+            battle.stepForward();
+            Signal current = battle.queue.getCurrentActor();
+            if (current == null) {
+                break;
+            }
+            boolean isHero = current.getCanHit() == hero;
+            double before = hero.getCurrentHp();
+            battle.beforeMove();                    // ← the engine settles DOTs here, before the buff tick
+            if (isHero) {
+                heroTurns++;
+                System.out.println("    turn " + heroTurns + ": HP " + fmt(before) + " → "
+                        + fmt(hero.getCurrentHp()) + "  (burn settled; DOT×"
+                        + hero.getBuffManager().countBuffs(DotBuff.class) + " left)");
+            }
+            battle.afterMove();
+            if (isHero && hero.getBuffManager().allBuffsOf(DotBuff.class).isEmpty()) {
+                System.out.println("    → gone after its 2 settlements; the next turn is clean, HP "
+                        + fmt(hero.getCurrentHp()));
+                break;
+            }
+        }
+        System.out.println();
+    }
+
+    /** Scene 3: the enemy camp holds a summon — targetable, and counted for the outcome. */
+    private static void enemyCampSummonScene() {
+        System.out.println("[3] A summon on the ENEMY side — the camp no longer only accepts monsters (L-8)");
+        Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
+        Enemy monster = EnemyFactory.create(1002011, 90, 1);
+        Summon minion = new Summon("冰锋的随从", com.laosun.aluminium.enums.Camp.ENEMY,
+                new com.laosun.aluminium.utils.AttributeBuilder()
+                        .setBase(AttributeType.HEALTH, 2_000)
+                        .setBase(AttributeType.DEFENCE, 100)
+                        .setBase(AttributeType.ATTACK, 100)
+                        .setBase(AttributeType.SPEED, 100)
+                        .build());
+        Battle battle = new Battle(List.of(hero), List.of(monster, minion), new Random(7));
+        battle.startBattle();
+
+        System.out.println("    camp holds " + battle.enemies.size() + " unit(s): "
+                + battle.enemies.stream().map(CanHit::getName).toList());
+        System.out.println("    of which monsters: " + battle.enemyUnits().size()
+                + "  (enemyUnits() — 'on that side' and 'is a monster' are two questions)");
+        System.out.println("    our target list: " + battle.targetableEnemies().size()
+                + " unit(s), so an AOE reaches the summon without anyone naming it");
+
+        double minionBefore = minion.getCurrentHp();
+        battle.castImmediate(new DefaultSkill(1001, 3, 1), hero, List.of(monster));   // AOE
+        System.out.println("    hero's AOE (aimed at the monster) → summon HP " + fmt(minionBefore)
+                + " → " + fmt(minion.getCurrentHp()));
+
+        monster.takeDamage(9_999_999);
+        battle.processRequests();
+        System.out.println("    every monster down → status " + battle.getStatus()
+                + " (the summon still stands, so this is NOT a win)");
+        minion.takeDamage(9_999_999);
+        battle.processRequests();
+        System.out.println("    summon down too → status " + battle.getStatus());
+        System.out.println();
+    }
+
+    /** Remaining action value before the target acts — the observable every action-bar mechanic moves. */
+    private static double timeRemaining(Battle battle, CanHit target) {
+        for (Signal signal : battle.queue.snapshot()) {
+            if (signal.getCanHit() == target) {
+                return battle.queue.getTimeRemaining(signal);
+            }
+        }
+        return 0;
+    }
+
+    /** Which control buffs the target is wearing, as text (the demo prints rather than asserts). */
+    private static String describeControl(Enemy enemy) {
+        List<String> parts = new ArrayList<>();
+        if (enemy.getBuffManager().hasBuff(com.laosun.aluminium.models.buffs.StunBuff.class)) {
+            parts.add("StunBuff (cannot act)");
+        }
+        int slows = enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buffs.StatModifierBuff.class);
+        if (slows > 0) {
+            parts.add("StatModifierBuff ×" + slows + " (slow)");
+        }
+        return parts.isEmpty() ? "no control state" : String.join(" + ", parts);
+    }
+
+    /** Speed as the engine reads it (there is no {@code getSpeed()} — it is an attribute slot). */
+    private static double speedOf(CanHit unit) {
+        return unit.getAttribute(AttributeType.SPEED).get();
+    }
+
+    /** "25%" — keeps the output readable for the ratio constants. */
+    private static String pct(double ratio) {
+        return Math.round(ratio * 100) + "%";
     }
 
     // ==================================================================
