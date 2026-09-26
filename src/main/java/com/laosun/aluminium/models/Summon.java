@@ -13,8 +13,9 @@ import lombok.ToString;
  *
  * <p><b>Where they come from.</b> {@code SummonFactory} builds one from the same monster data
  * ({@code monster_config.json}) an {@link com.laosun.aluminium.models.enemy.Enemy} is built from, and
- * {@code Battle.summon(master, summonId, group)} is what puts it on the field. The roster of "which
- * monsters may be summoned" lives on the master
+ * {@code Battle.summon(master, summonId, group)} is what puts it on the field — into <b>the master's own
+ * camp</b>: an enemy's minion joins {@code Battle.enemies}, ours joins {@code Battle.allies}. The roster of
+ * "which monsters may be summoned" lives on the master
  * ({@link com.laosun.aluminium.models.enemy.Enemy#getSummonIds()}).
  *
  * <p><b>What a summon is not (yet).</b> It is a {@code CanHit}, not an {@code Enemy}, so it has a stat
@@ -24,10 +25,10 @@ import lombok.ToString;
  * {@code Battle.enemyUnits()} is "the monsters in it" — and it is why those mechanics say
  * {@code instanceof Enemy} at their call sites instead of assuming every enemy-camp unit has them.
  *
- * <p>🚧 <b>Still open</b> (P9-4 remainder, all of it content rather than capability): memosprites (忆灵) as
- * a player-side summon kind with a stat snapshot of their summoner, joint attacks, and whatever decides
- * <em>when</em> a roster entry is used (an enemy skill's {@code SUMMON} effect needs a "what to summon"
- * column that this data does not have — see {@code SkillEffectType.SUMMON}).
+ * <p>🚧 <b>Still open</b> (the P9-4 remainder, all of it content or mechanism rather than placement):
+ * memosprites (忆灵) as they are actually described — a stat <b>snapshot</b> of the summoner and joint
+ * attacks — and whatever decides <em>when</em> a roster entry is used, since an enemy skill's {@code SUMMON}
+ * effect needs a "what to summon" column this data does not have (see {@code SkillEffectType.SUMMON}).
  */
 @Getter
 @Setter

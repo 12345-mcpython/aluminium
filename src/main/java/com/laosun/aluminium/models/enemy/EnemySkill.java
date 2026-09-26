@@ -121,7 +121,10 @@ public class EnemySkill extends Skill {
         // the one a test can reach. An earlier version filtered here too, and mutation testing showed
         // the outer filter changed no observable outcome (removing it left every test green), i.e. it
         // was an untestable second guard for the same fact. One guard, exercised.
-        List<Character> team = battle.characters.stream()
+        // ⚠ The camp, not `characters` (the friendly half of L-8): an enemy AOE has to reach a player-side
+        // summon too. Reading `characters` here would miss it silently -- the summon would stand in the
+        // middle of the blast untouched, and nothing would report it.
+        List<CanHit> team = battle.allies.stream()
                 .filter(Objects::nonNull)
                 .toList();
         return switch (effect) {

@@ -57,6 +57,39 @@ public class Battle {
     public List<Character> characters;
 
     /**
+     * The <b>player camp's roster</b> — every combatant fighting for us, in battlefield order: our
+     * characters plus any friendly {@link Summon} (a memosprite, 景元's 【神君】, …).
+     *
+     * <p><b>Why this exists next to {@link #characters} rather than replacing it</b> (the friendly half of
+     * L-8). The enemy side already has this split — {@link #enemies} is the camp and {@link #enemyUnits()}
+     * is the monsters in it — so that things which genuinely only work on monsters say so. Our side had no
+     * such split, and the consequence was harder than a missing convenience: <b>a player-side summon could
+     * not be placed anywhere at all</b>, because the only roster we had was typed {@code List<Character>}.
+     *
+     * <p>The tempting fix was to widen {@code characters} and add a {@code characterUnits()} view (that is
+     * the symmetric option, and it would have made the compiler find every stale call site). It was not
+     * taken because {@code characters} is read in <b>179 places</b> — nearly all of them meaning "our
+     * characters" (their skills, energy, relic rules) rather than "our camp" — and a rename of that size
+     * costs a great deal of churn for no behaviour. So the camp got its own name instead, and the sites
+     * that mean <em>the camp</em> were moved onto it one by one.
+     *
+     * <p>⚠ <b>Which question a call site is asking, and the cost of getting it wrong.</b> "Who is on our
+     * side" must read {@code allies}; "which of them are characters" must read {@code characters}. A camp
+     * site left on {@code characters} does not fail loudly — it silently ignores friendly summons, so an
+     * enemy AOE would miss one and a party-wide buff would skip it. The compiler cannot catch that here, so
+     * it is pinned by {@code PlayerSideSummonTest}, which exercises each camp-level site with a summon on the
+     * field. The sites that deliberately stay on {@code characters} are the ones that need something only a
+     * {@code Character} has: {@code attachBattleSkills} (map skills), {@code fireTriggers} (trigger tables)
+     * and the two skill-point broadcasts.
+     *
+     * <p>It starts as a copy of the constructor's character list, so it holds <b>the same instances</b> —
+     * this is a second view of one roster, not a second roster. Dead members stay in it, like every other
+     * roster in the engine ({@code enemies} / {@code characters}): "is it alive" is asked with
+     * {@code isDeath()}.
+     */
+    public List<CanHit> allies;
+
+    /**
      * The <b>enemy camp's roster</b> — every combatant fighting against us, in battlefield order.
      *
      * <p>⚠ <b>Deliberately {@code CanHit}, not {@code Enemy}</b> (L-8). It used to be
@@ -237,6 +270,9 @@ public class Battle {
      */
     public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng) {
         characters = characterQueue;
+        // The camp view of our side: the same instances, one more list. A friendly summon is appended here
+        // (and only here) by summon(...), so `characters` stays exactly "our characters".
+        allies = new ArrayList<>(characterQueue);
         enemies = new ArrayList<>(enemyQueue);
         this.rng = rng;
         queue = new Queue();
@@ -489,7 +525,10 @@ public class Battle {
         }
         // P7-4: there are waves not yet entered → an empty enemy team only means "this wave has not entered", so no win.
         boolean pendingWaves = waveManager != null && waveManager.hasPendingWaves();
-        if (characters.stream().allMatch(CanHit::isDeath)) {
+        // Both sides are judged by their CAMP, not by their "real units" list (L-8 on the enemy side, its
+        // friendly half here). Today the two readings coincide for our side anyway: a summon perishes with
+        // its master, so "every character is down" and "the whole camp is down" are the same state.
+        if (allies.stream().allMatch(CanHit::isDeath)) {
             status = Status.LOSE;                    // our side being wiped out is a real loss, with or without pending waves
         } else if (enemies.stream().allMatch(CanHit::isDeath) && !pendingWaves) {
             status = Status.WIN;
@@ -1312,13 +1351,13 @@ public class Battle {
      * ({@link com.laosun.aluminium.enums.Camp#NEUTRAL}), the semantics of this method need to be redefined.
      *
      * @param self the querier
-     * @return the list of the opposing camp (it is {@code characters} / {@code enemies} itself, not a copy)
+     * @return the list of the opposing camp (it is {@code allies} / {@code enemies} itself, not a copy)
      */
     public List<? extends CanHit> getOpponents(CanHit self) {
         if (self == null || self.getCamp() == null) {
             return List.of();
         }
-        return self.getCamp() == com.laosun.aluminium.enums.Camp.PLAYER ? enemies : characters;
+        return self.getCamp() == com.laosun.aluminium.enums.Camp.PLAYER ? enemies : allies;
     }
 
     /**
@@ -1372,7 +1411,7 @@ public class Battle {
                 consumer.accept(target);
             }
         }
-        for (Character ally : characters) {
+        for (CanHit ally : allies) {
             if (notified.add(ally)) {
                 consumer.accept(ally);
             }
@@ -1417,9 +1456,14 @@ public class Battle {
     /**
      * Skill points credited (P8-6). Only delivered to our side -- skill points are a **resource of our team**
      * and the enemy has no share.
+     *
+     * <p>"Our team" is the camp ({@code allies}), but only a {@link Character} has anything to do with skill
+     * points, so this is one of the few places that could equally read {@code characters}: a friendly summon
+     * has no trigger table and no skill point hooks of its own. It reads the camp for consistency with the
+     * event policy -- and because a future summon that does care should not have to be remembered here.
      */
     private void broadcastSkillPointGained(int amount) {
-        for (Character ally : characters) {
+        for (CanHit ally : allies) {
             ally.onSkillPointGained(this, amount);
         }
     }
@@ -1428,7 +1472,7 @@ public class Battle {
      * Skill points spent (P8-6). Only delivered to our side, same as {@link #broadcastSkillPointGained}.
      */
     private void broadcastSkillPointSpent(int amount) {
-        for (Character ally : characters) {
+        for (CanHit ally : allies) {
             ally.onSkillPointSpent(this, amount);
         }
     }
@@ -1919,18 +1963,29 @@ public class Battle {
      * vanishing minion from paying out every on-kill talent in the game is that this sweep runs
      * <b>outside</b> that entry point. See {@link CanHit#perish()}.
      *
-     * <p>The orphan is deliberately <b>left in {@code enemies}</b>, like any other corpse — the roster
-     * records who was in the fight, and "is it alive" is asked through {@code isDeath()}
-     * ({@code targetableEnemies} / {@code aliveEnemies} / {@code checkResult} all do exactly that). A
-     * master who is merely absent from that roster does <b>not</b> orphan anything: death is the signal,
-     * because it is the one thing every removal path in the engine sets.
+     * <p>The orphan is deliberately <b>left in its camp roster</b> ({@code enemies} or {@code allies}), like
+     * any other corpse — the roster records who was in the fight, and "is it alive" is asked through
+     * {@code isDeath()} ({@code targetableEnemies} / {@code aliveEnemies} / {@code checkResult} all do
+     * exactly that). A master who is merely absent from that roster does <b>not</b> orphan anything: death is
+     * the signal, because it is the one thing every removal path in the engine sets.
+     *
+     * <p>⚠ <b>Both camps are swept.</b> A summon can now be ours as well as theirs (the friendly half of
+     * L-8), and a sweep that only walked {@code enemies} would leave a player-side minion standing after its
+     * master fell — still acting, still targetable, and still counted as a survivor by {@link #checkResult}.
      */
     private void perishOrphanedSummons() {
+        for (CanHit unit : allies) {
+            perishIfOrphaned(unit);
+        }
         for (CanHit unit : enemies) {
-            if (unit instanceof Summon summon && !summon.isDeath()
-                    && summon.getMaster() != null && summon.getMaster().isDeath()) {
-                summon.perish();
-            }
+            perishIfOrphaned(unit);
+        }
+    }
+
+    private static void perishIfOrphaned(CanHit unit) {
+        if (unit instanceof Summon summon && !summon.isDeath()
+                && summon.getMaster() != null && summon.getMaster().isDeath()) {
+            summon.perish();
         }
     }
 
@@ -1948,19 +2003,21 @@ public class Battle {
      * silently-empty skill point policy (see ROADMAP §5 lesson 3) — a wrong answer with nothing to see is
      * worse than a required argument.
      *
-     * <p><b>Only an enemy-camp master, for now.</b> Our own roster is {@code List<Character>}
-     * ({@link #characters}), which cannot hold a {@link Summon}, so a player-side summon has nowhere to be
-     * placed — the friendly half of L-8 was never done. That is refused <b>loudly</b> rather than filed
-     * under {@code enemies}: putting our own summon there would make it a legal target for our own attacks
-     * and would count it as an enemy for the victory check, a wrong answer that nothing would report.
-     * Memosprites (忆灵) need that roster widened first; see the P9-4 remainder.
+     * <p><b>Both camps can summon</b> (the friendly half of L-8 landed on 2026-09-27). The summon joins the
+     * master's own camp: an enemy's minion goes into {@link #enemies}, ours into {@link #allies}, so our side
+     * is targetable by the enemy as a whole and our own summon is <b>not</b> a legal target for our attacks
+     * (our attacks look at {@code enemies}). The camp is taken from the master rather than passed in — a
+     * summon that fights for the other side than its summoner is not a thing the text ever asks for.
+     *
+     * <p>⚠ {@code Camp.NEUTRAL} is refused rather than guessed at: it has no roster of its own, and picking
+     * one for it would silently make a neutral unit either our ally or our enemy.
      *
      * @param master         the unit calling the summon; supplies the camp, and the level
      * @param summonId       the summon's own monster id (a key of {@code monster_config.json})
      * @param hardLevelGroup the stage's hard level group
-     * @return the summon, already in the camp roster and queued to enter the action bar
-     * @throws IllegalArgumentException if the master is null or already down, if the master is not on the
-     *                                  enemy camp, or if the summon id / level group is unknown
+     * @return the summon, already in its camp's roster and queued to enter the action bar
+     * @throws IllegalArgumentException if the master is null, already down, or on a camp with no roster, or
+     *                                  if the summon id / level group is unknown
      */
     public Summon summon(CanHit master, int summonId, int hardLevelGroup) {
         if (master == null) {
@@ -1972,18 +2029,16 @@ public class Battle {
                             + "would enter already orphaned, and the very next removeDeadCombatants would "
                             + "take it straight back out, so the call could never do anything");
         }
-        if (master.getCamp() != Camp.ENEMY) {
+        if (master.getCamp() != Camp.ENEMY && master.getCamp() != Camp.PLAYER) {
             throw new IllegalArgumentException(
-                    "Only an enemy-camp master can summon for now (master " + master.getName() + " is "
-                            + master.getCamp() + ", summon " + summonId + "): our side's roster is "
-                            + "List<Character>, which cannot hold a Summon, so a player-side summon has "
-                            + "nowhere to be placed -- that roster has to be widened first (the friendly "
-                            + "half of L-8). Filing it under `enemies` instead would make our own summon "
-                            + "attackable by us and count it as an enemy for the victory check");
+                    "A summon must join a camp that has a roster (master " + master.getName() + " is "
+                            + master.getCamp() + ", summon " + summonId + "): CAMP.NEUTRAL has none, and "
+                            + "putting it in either list would silently decide who it fights for");
         }
+        List<CanHit> camp = master.getCamp() == Camp.PLAYER ? allies : enemies;
         Summon summon = SummonFactory.create(summonId, master.getLevel(), hardLevelGroup, master.getCamp());
         summon.setMaster(master);
-        enemies.add(summon);
+        camp.add(summon);
         addRequestItems.add(summon);                 // processRequests pushes it into the action bar
         // The constructor wires the speed listener for the opening roster only; a unit admitted later
         // needs it too, otherwise a speed buff on it would never reorder the action bar.
@@ -2002,7 +2057,7 @@ public class Battle {
 
     public void printHp() {
         System.out.println("=== HP Status ===");
-        for (Character c : characters) {
+        for (CanHit c : allies) {
             System.out.printf("%s: %.0f / %.0f%n", c.getName(), c.getCurrentHp(), c.getMaxHp());
         }
         for (CanHit e : enemies) {

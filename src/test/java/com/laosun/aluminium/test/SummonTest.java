@@ -352,24 +352,28 @@ public class SummonTest {
     // ==================================================================
 
     /**
-     * Our side cannot summon yet, and the refusal says why.
+     * The camp comes from the master: the same call puts an enemy's minion in {@code enemies} and ours in
+     * {@code allies}.
      *
-     * <p>Our roster is {@code List<Character>}, so a player-side {@link Summon} has nowhere to be placed —
-     * the friendly half of L-8 was never done. Filing it under {@code enemies} instead would make our own
-     * summon attackable by us and count it as an enemy for the victory check: a wrong answer that nothing
-     * would report. A loud refusal is the project's rule for this shape (the P8-8 {@code PARTY} scope is
-     * refused the same way).
+     * <p>⚠ This case replaces one that asserted a player-side master was <b>refused</b>. That was true until
+     * the friendly half of L-8 landed; the refusal existed because our only roster was
+     * {@code List<Character>} and a {@link Summon} had nowhere to go. Now there is {@code allies}, so the
+     * contract is the routing rather than the refusal, and the friendly path itself (targeting, party buffs,
+     * outcome, lifecycle) is pinned in {@code PlayerSideSummonTest}.
      */
     @Test
-    public void aPlayerSideMasterIsRefusedWithAReason() {
-        Battle battle = new Battle(List.of(hero()), List.of(master()), new Random(0));
+    public void theCampComesFromTheMaster() {
+        Character hero = hero();
+        Battle battle = new Battle(List.of(hero), List.of(master()), new Random(0));
 
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> battle.summon(battle.characters.getFirst(), MINION, GROUP));
+        Summon ours = battle.summon(hero, MINION, GROUP);
+        Summon theirs = battle.summon(battle.enemyUnits().getFirst(), MINION, GROUP);
 
-        Assertions.assertTrue(refused.getMessage().contains("enemy-camp"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("List<Character>"), refused.getMessage());
-        Assertions.assertEquals(1, battle.enemies.size(), "and nothing was quietly filed under enemies");
+        Assertions.assertTrue(battle.allies.contains(ours), "a player-side master's summon is on our side");
+        Assertions.assertFalse(battle.characters.contains(ours),
+                "but it is not one of our characters -- the camp and the subset are two questions");
+        Assertions.assertTrue(battle.enemies.contains(theirs), "and an enemy's minion joins the enemy camp");
+        Assertions.assertFalse(battle.allies.contains(theirs));
     }
 
     /** A dead master cannot summon: the call could never do anything, so it says so instead. */
