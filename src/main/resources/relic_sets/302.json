@@ -1,0 +1,21 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 120"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "relic set 302 (不老者的仙舟 / Fleet of the Ageless), 2-piece: \"Increases the wearer's Max HP by #1[i]%. When the wearer's SPD is equal to or higher than #2[i], increases all allies' ATK by #3[i]%.\" param = [0.12, 120, 0.08]",
+      "note": "Only the conditional sentence is here; the wearer's \"Max HP +12%\" is the effect's `properties` stat (HPAddedRatio 0.12), applied by RelicSuit -- writing it again would double it. ⚠ `target: all_allies` is what makes this the WHOLE party and not just the wearer: the wearer's own SPD is the gate, but the bonus lands on everyone, and getting that wrong would be invisible in a solo test. ⚠ Same BATTLE_START approximation as sets 301/307/309 (\"when the wearer's SPD is >= 120\" is continuous in the text)."
+    }
+  ]
+}
