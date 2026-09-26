@@ -149,10 +149,26 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.camp = other.camp;
         this.level = other.level;
         this.skills = new EnumMap<>(other.skills);
-        this.attributes = other.attributes.clone();
+        // ⚠ Deep-clone the attribute sheet (H-6). `other.attributes.clone()` clones the ARRAY and
+        // nothing else, so every DoubleValue inside stayed the same object as the original's -- and
+        // buffs mutate those objects in place (BoostDamageBuff.applyEffect calls addModifier on the
+        // target's value), so a buff on one combatant showed up on the other's panel. DoubleValue.clone()
+        // is a true deep copy; null slots (the percentage placeholders) stay null, exactly like the
+        // original array.
+        DoubleValue[] clonedAttributes = new DoubleValue[other.attributes.length];
+        for (int i = 0; i < clonedAttributes.length; i++) {
+            DoubleValue source = other.attributes[i];
+            clonedAttributes[i] = source == null ? null : source.clone();
+        }
+        this.attributes = clonedAttributes;
         // don't need to clone
         this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
         this.death = false;
+        // Battle state, like `death` / `currentEnergy` / `resources`: a copy is a fresh participant, not
+        // a snapshot of a fight in progress, so it starts vulnerable (invulnerable is what a boss turns on
+        // to lock its HP bar mid-phase). Named explicitly because the old review read the omission as a
+        // forgotten copy -- it is a decision, and this is where the decision lives.
+        this.invulnerable = false;
         this.buffManager = new BuffManager(this);
         // Resources are per-battle state, like currentEnergy: the copy starts empty rather than
         // inheriting the original's stacks.

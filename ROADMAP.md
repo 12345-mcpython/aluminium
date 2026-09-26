@@ -1080,7 +1080,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 |---|---|---|
 | H-1 | `Constant.java:185-208` | 八个数据表里**七个**是可变全局状态（`public static final` 只锁引用不锁内容，嵌套层同样裸奔）→ 任何调用方 `clear()`/`put()` 会静默影响同 JVM 后续所有消费者。建议每层 `Map.copyOf`/`List.copyOf`，或字段改 private + 暴露只读视图 |
 | H-2 | `Character.java:280-295` | `character_data.json` 的 `max_energy` **从未接进角色** → 数据造的角色 `hasEnergyBar()==false`，回能/大招恒失效（93 个角色的这一列是惰性的）。⚠ 接线时 1407 遐蝶的 `null` 是**设计**（无常规能量条），别 auto-unbox 成兜底数值 |
-| H-6 | `CanHit.java:127-135` | 拷贝构造器只 `attributes.clone()`，**元素仍共享 `DoubleValue`** → 副本与模板共享面板，挂 buff 改到原体。`Character` 的拷贝构造器也漏了属性数组，且没拷 `invulnerable`。当前无调用者，P7-4 波次第一个会踩 |
+| H-6 | `CanHit.java` | ✅ **已修（2026-09-27）**：拷贝构造器现在**逐个 `DoubleValue.clone()`** 深拷属性表（`DoubleValue.clone()` 本来就是真深拷贝，之前只 clone 了数组）。原文的后果成立：buff 会**就地**改 `DoubleValue`（`BoostDamageBuff.applyEffect` 调 `addModifier`），所以挂在副本上的 buff 会出现在**原体**面板上 —— 实测复现。`Character(Character)` 走 `super(other)`，因此一并修好。⚠ **原文说"没拷 `invulnerable`"是误读**：那一块是显式的"不该拷"清单（`death`/`currentEnergy`/`resources` 都归零，因为副本是新战斗的参与者而非战况快照），`invulnerable` 属同一类战斗状态 —— 已**显式赋值 + 写明理由**，不是补拷。回归 `CombatantCopyTest` 3 条（行为 + 对象身份 + 新战斗状态约定）；变异回浅拷贝 → 前两条红、约定那条仍绿。见 §12 顶部的"只做过抽查"警告
 | H-9 | `Battle.startBattle()` | 从未被任何测试调用（曾 23 个测试类 0 次）→ **开场事件链零覆盖**，而"战斗开始回能"是一整类角色机制。建议补 `BattleStartTest` |
 
 （H-3 削韧按段翻倍 / H-4 击破用标称值 / H-5 大招清零顺序 / H-7 `hasBuff` / H-8 同速无裁决 —— **均已修**，不再列。）
