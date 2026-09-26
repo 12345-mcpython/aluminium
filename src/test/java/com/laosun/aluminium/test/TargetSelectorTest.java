@@ -138,8 +138,7 @@ public class TargetSelectorTest {
         victim.setMaxEnergy(120);                             // with no energy bar, energy gain is a no-op (maxEnergy == 0)
         Battle battle = new Battle(List.of(victim), List.of(iceEdge), new Random(0));
 
-        Assertions.assertTrue(iceEdge.getSkills().get(SkillType.COMMON) instanceof EnemySkill,
-                "the EnemySkill is properly installed on the enemy");
+        Assertions.assertInstanceOf(EnemySkill.class, iceEdge.getSkills().get(SkillType.COMMON), "the EnemySkill is properly installed on the enemy");
 
         battle.stepForward();                                 // Ice Edge SPD 132 > 100, it acts first
         CanHit actor = battle.queue.getCurrentActor().getCanHit();

@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models.skill;
+package com.laosun.aluminium.data;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.Skill;

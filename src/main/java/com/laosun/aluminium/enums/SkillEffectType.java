@@ -1,7 +1,7 @@
 package com.laosun.aluminium.enums;
 
 import com.google.gson.annotations.SerializedName;
-import com.laosun.aluminium.models.skill.SkillData;
+import com.laosun.aluminium.data.SkillData;
 import lombok.Getter;
 
 import java.util.HashMap;

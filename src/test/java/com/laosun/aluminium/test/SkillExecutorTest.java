@@ -9,7 +9,7 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillData;
+import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.tests.TestSkillGroup1;
 import org.junit.jupiter.api.Assertions;

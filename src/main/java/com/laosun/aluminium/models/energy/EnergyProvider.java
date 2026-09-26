@@ -3,7 +3,7 @@ package com.laosun.aluminium.models.energy;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillData;
+import com.laosun.aluminium.data.SkillData;
 
 import java.util.Set;
 

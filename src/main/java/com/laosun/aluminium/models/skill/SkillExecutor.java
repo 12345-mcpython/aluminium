@@ -2,6 +2,7 @@ package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.SkillEffectSpec;
+import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.data.SkillEffects;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
