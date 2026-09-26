@@ -9,6 +9,8 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.utils.JSONReader;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -585,28 +587,37 @@ public final class Constant {
         // Relic set bonuses come from a file whose top level is a map (so not JSONReader), and are
         // leniently loaded (a missing file is an empty table) because the relic affix tables above are
         // already enough to run a battle -- only the set bonuses would be missing.
+        // Already immutable: RelicSets.index ends in Map.copyOf, and RelicSetTest pins the identity of
+        // this table ("read once and cached"), so wrapping it here would both be redundant and break that.
         RELIC_SETS = RelicSets.table();
-        WEAPONS = JSONReader.fromJSON("weapons.json", new TypeToken<Map<Integer, WeaponData>>() {
-        }.getType());
-        CHARACTERS = JSONReader.fromJSON("character_data.json", new TypeToken<Map<Integer, CharacterData>>() {
-        }.getType());
-        SKILL_POINTS = JSONReader.fromJSON("point.json", new TypeToken<Map<Integer, List<SkillPoint>>>() {
-        }.getType());
-        SKILLS = JSONReader.fromJSON("skills.json", new TypeToken<Map<Integer, Map<Integer, Skill>>>() {
-        }.getType());
-        MONSTER_TEMPLATES = JSONReader.fromJSON("monster_template_config.json",
+        // ⚠ Every table below is `frozen(...)` (H-1). `public static final` locks the reference, not the
+        // contents, and Gson hands back mutable LinkedHashMaps whose nesting is mutable too
+        // (`SKILLS.get(cid)` is another map, `SKILL_POINTS.get(cid)` a list). One `clear()` or `put()` from
+        // any caller -- a test, a future UI, a plugin -- would have silently changed what every later
+        // consumer in the same JVM sees. The tables NOT wrapped here were already immutable at load:
+        // RELIC_SETS (RelicSets.index ends in Map.copyOf), MONSTER_CONFIGS (normalizeMonsterConfigs ends in
+        // Map.copyOf) and ENEMY_SKILLS (Map.copyOf).
+        WEAPONS = frozen(JSONReader.fromJSON("weapons.json", new TypeToken<Map<Integer, WeaponData>>() {
+        }.getType()));
+        CHARACTERS = frozen(JSONReader.fromJSON("character_data.json", new TypeToken<Map<Integer, CharacterData>>() {
+        }.getType()));
+        SKILL_POINTS = frozen(JSONReader.fromJSON("point.json", new TypeToken<Map<Integer, List<SkillPoint>>>() {
+        }.getType()));
+        SKILLS = frozen(JSONReader.fromJSON("skills.json", new TypeToken<Map<Integer, Map<Integer, Skill>>>() {
+        }.getType()));
+        MONSTER_TEMPLATES = frozen(JSONReader.fromJSON("monster_template_config.json",
                 new TypeToken<Map<Integer, MonsterTemplate>>() {
-                }.getType());
-        HARD_LEVEL_GROUPS = JSONReader.fromJSON("hard_level_group.json",
+                }.getType()));
+        HARD_LEVEL_GROUPS = frozen(JSONReader.fromJSON("hard_level_group.json",
                 new TypeToken<Map<Integer, Map<Integer, HardLevelGroup>>>() {
-                }.getType());
+                }.getType()));
         MONSTER_CONFIGS = normalizeMonsterConfigs(
                 JSONReader.fromJSON("monster_config.json", new TypeToken<Map<Integer, MonsterConfig>>() {
                 }.getType()),
                 JSONReader.fromJSON("monster_attack_modify_ratio.json", new TypeToken<Map<Integer, Double>>() {
                 }.getType()));
-        BREAKING_RATE = JSONReader.fromJSON("breaking_rate.json", new TypeToken<Map<Integer, Double>>() {
-        }.getType());
+        BREAKING_RATE = frozen(JSONReader.fromJSON("breaking_rate.json", new TypeToken<Map<Integer, Double>>() {
+        }.getType()));
         // The top level of enemy_skills.json is { "_comment": [...], "skills": {monster id: {...}} };
         // use an inline record to take only skills (Gson ignores the undeclared _comment).
         EnemySkillsFile enemySkills = JSONReader.fromJSON("enemy_skills.json", EnemySkillsFile.class);
@@ -631,6 +642,48 @@ public final class Constant {
      *   {@code damage_resistance} → empty map.</li>
      * </ul>
      */
+    /**
+     * Freezes a loaded table so that no caller can mutate shared engine data (H-1).
+     *
+     * <p><b>Why this exists.</b> {@code public static final} locks the <i>reference</i>, not the contents:
+     * every table in the static block used to be a mutable {@code LinkedHashMap} straight out of Gson, and
+     * the nesting was mutable as well — {@code SKILLS.get(cid)} is another map, {@code SKILL_POINTS.get(cid)}
+     * a list. One {@code Constant.SKILLS.clear()} from anywhere (a test, a future UI, a plugin) would have
+     * silently changed what every later consumer <b>in the same JVM</b> sees, with no compile error and no
+     * failing test.
+     *
+     * <p><b>Scope: containers, not beans.</b> Maps and lists are copied and wrapped; the beans inside are
+     * returned unchanged, because they <i>are</i> the data and nothing mutates them. That is the honest
+     * boundary of this fix — it stops "somebody emptied a table", not "somebody reassigned a field of a
+     * bean". (The two exposed bean-internal maps, {@code RelicMainAttribute.getAttributeByStar} and its
+     * {@code RelicSubAttribute} twin, therefore stay mutable and are still registered as N-11.)
+     *
+     * <p><b>Order is preserved</b>: {@link LinkedHashMap} and {@link ArrayList} rather than
+     * {@code Map.copyOf}/{@code List.copyOf}, whose iteration order is unspecified. Several of these tables
+     * are read in file order.
+     *
+     * <p>Costs one extra container copy per table at startup (the beans are shared, not duplicated), which
+     * is why it is applied at load time rather than by returning a defensive copy on every read.
+     *
+     * @param table a map, a list, or anything else
+     * @param <T>   the declared type of the table
+     * @return an unmodifiable deep copy of the containers, or the value itself when it is not a container
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> T frozen(T table) {
+        if (table instanceof Map<?, ?> map) {
+            Map<Object, Object> copy = new LinkedHashMap<>();
+            map.forEach((key, value) -> copy.put(key, frozen(value)));
+            return (T) Collections.unmodifiableMap(copy);
+        }
+        if (table instanceof List<?> list) {
+            List<Object> copy = new ArrayList<>(list.size());
+            list.forEach(item -> copy.add(frozen(item)));
+            return (T) Collections.unmodifiableList(copy);
+        }
+        return table;
+    }
+
     private static Map<Integer, MonsterConfig> normalizeMonsterConfigs(Map<Integer, MonsterConfig> raw,
                                                                        Map<Integer, Double> attackRatios) {
         Map<Integer, Double> patches = attackRatios == null ? Map.of() : attackRatios;
