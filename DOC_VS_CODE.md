@@ -454,7 +454,8 @@ public static class TestSkill1 extends Skill {
 
 > HSR.md §2 只写"**基础倍率由等级与击破特攻决定**（查数值表）"，逐元素倍率还没拿到
 
-**实际**：`Battle.attachBreakDot` 算的是 `breakBaseOf(attacker) * Constant.DOT_RATIO`，
+**实际**：`Battle.attachBreakDot` 算的是 `breakBaseOf(attacker) * BreakEffect.dotRatio()`
+（P10-0/P10-1 之后走 `Constant.BREAK_EFFECTS` 查表，四个 DOT 系的 `dotRatio()` 当前都填 `DOT_RATIO`），
 **既没有击破特攻、也没有削韧值**。javadoc 引用"由等级与击破特攻决定"会让人以为击破特攻已经进去了
 （其实没有），而它后面又说"逐元素倍率还没拿到"，两句话指向不同的缺口。
 

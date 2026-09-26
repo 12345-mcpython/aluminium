@@ -387,6 +387,40 @@ public class BuffManager {
         return null;
     }
 
+    /**
+     * <b>A snapshot</b> of every buff of the given class, in <b>attachment order</b> (oldest first).
+     *
+     * <p><b>Why a snapshot and not the list.</b> The P1-7 decision is that {@code getBuffs()} does not
+     * exist, because a caller holding the live list can mutate it (or trip over a
+     * {@code ConcurrentModificationException}). A fresh copy keeps that guarantee — the caller may
+     * remove or add buffs while iterating without disturbing the manager — while still answering the
+     * one question {@link #findBuff(Class)} cannot: "all of them, in what order".
+     *
+     * <p>That question is why this exists at all. {@code Battle.tickDots(CanHit)} has to settle every
+     * DOT on a unit, and the engine's documented rule is <b>"first applied, first settled"</b>
+     * (HSR.md §7) — so order is part of the contract, not an implementation detail, and it is the
+     * order {@code buffs} already keeps.
+     *
+     * <p>Matching is by exact class, the same convention as {@link #hasBuff(Class)} / {@link
+     * #countBuffs(Class)} / {@link #findBuff(Class)} (a subclass does not count as its parent).
+     *
+     * @param kind the buff type to collect
+     * @param <T>  the buff type
+     * @return a new list of the attached instances, oldest first; empty for {@code null}
+     */
+    public <T extends AbstractBuff> List<T> allBuffsOf(Class<T> kind) {
+        if (kind == null) {
+            return List.of();
+        }
+        List<T> found = new ArrayList<>();
+        for (AbstractBuff buff : buffs) {
+            if (buff.getClass() == kind) {
+                found.add(kind.cast(buff));
+            }
+        }
+        return found;
+    }
+
     public void clearAll() {
         for (AbstractBuff buff : buffs) {
             buff.removeBuff(instance);

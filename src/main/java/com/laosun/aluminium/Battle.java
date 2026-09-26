@@ -8,6 +8,7 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.buffs.DotBuff;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
 import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;
@@ -496,12 +497,20 @@ public class Battle {
             return;
         }
         CanHit actor = currentMove.getCanHit();
-        if (actor instanceof Enemy enemy) {
-            tickDots(enemy);                         // P4-5: settle damage over time first when the enemy's turn starts
-            if (enemy.isDeath()) {
-                return;
-            }
+        // P4-5: damage over time is settled at the start of the turn -- of **any** unit, not only an
+        // enemy. The `instanceof Enemy` guard that used to stand here was the visible edge of the old
+        // design (a DOT could only exist on an Enemy); now that a DOT is an ordinary buff there is
+        // nothing enemy-shaped left to test for. The guard is also what kept "the boss burns us"
+        // inexpressible, so removing it is the point of the migration, not a side effect.
+        tickDots(actor);
+        if (actor.isDeath()) {
+            return;
         }
+        // Order matters: settlement above runs *before* this tick, so a DOT created with N turns
+        // settles N times -- on the turn it is attached through its Nth turn -- and only then does the
+        // early tick count it down and, at zero, remove it. Swapping the two gives N-1 settlements, and
+        // for a 1-turn DOT it burns for nothing. `DotBuff` is an early buff precisely so this line is
+        // what counts it down.
         actor.getBuffManager().beforeMove();
         if (actor.isDeath()) {
             return;
@@ -530,31 +539,37 @@ public class Battle {
     }
 
     /**
-     * Settle the damage over time on one enemy (P4-5): **first applied, first settled** (in application order).
+     * Settle the damage over time on one unit (P4-5): **first applied, first settled** (in application order).
      *
      * <p>DOT goes through the full damage zones (it takes DMG boost and defence/resistance; vulnerability/reduction
      * are injected by the {@code onDamage} hook), but it cannot crit -- expressed by {@link DamageType#DOT}'s
      * {@code crittable=false}.
      *
-     * @param enemy the target
+     * <p><b>It settles; it does not consume a turn.</b> The DOT is an ordinary {@code DotBuff} now, so its
+     * duration is counted down by the buff manager's early tick -- the very next statement in
+     * {@link #beforeMove()}. Doing both here would burn two turns per settlement. The reason the damage
+     * cannot simply move into the buff is the reverse: {@code AbstractBuff.tickEffect} gets no
+     * {@code Battle}, and settling damage needs the zone set.
+     *
+     * @param target the unit carrying the DOTs (may be a character -- a boss burning us is the same path)
      * @return the total damage settled this time (the sum of all DOTs)
      */
-    public double tickDots(Enemy enemy) {
-        if (enemy == null || enemy.isDeath()) {
+    public double tickDots(CanHit target) {
+        if (target == null || target.isDeath()) {
             return 0;
         }
         double total = 0;
-        for (Dot dot : new ArrayList<>(enemy.getDots())) {       // snapshot iteration: settlement may remove entries
-            if (enemy.isDeath()) {
+        // A snapshot, so a DOT kill that removes or attaches buffs mid-loop cannot disturb the
+        // iteration. Attaching one here also does not settle it this turn -- it is not in the
+        // snapshot -- which is the old "attached this turn, burns from the next one" behaviour.
+        for (DotBuff dot : target.getBuffManager().allBuffsOf(DotBuff.class)) {
+            if (target.isDeath()) {
                 break;                                           // killed by a DOT → the rest is not settled
             }
-            Damage damage = new Damage(dot.getSource(), enemy, dot.getElement(),
+            Damage damage = new Damage(dot.getSource(), target, dot.getElement(),
                     DamageType.DOT, dot.getBaseDamage());
             // KILL_ONLY: a DOT is not "one attack action", so the victim gains no energy; but a DOT kill is still credited to the applier
-            total += applyDamage(enemy, damage, EnergyGrant.KILL_ONLY);
-            if (dot.tick()) {
-                enemy.removeDot(dot);
-            }
+            total += applyDamage(target, damage, EnergyGrant.KILL_ONLY);
         }
         return total;
     }
@@ -564,14 +579,16 @@ public class Battle {
      * Ice = Frozen, Quantum = Entanglement, Imaginary = Imprisonment — those three carry <b>no effect at
      * all</b> today, they are not merely "a different DOT".
      *
-     * <p>⚠ <b>There is no table here yet.</b> This reads {@code Constant.DOT_ELEMENTS} (a set) plus the two
-     * scalars {@code DOT_RATIO} / {@code DOT_TURNS}, so all four DOT elements share one ratio and one
-     * duration. An earlier revision of this comment said "P10-1 unified it into a table", which was wrong
-     * and actively misleading: <b>P10-1 is still open</b>, and a reader who believed that sentence would
-     * skip the task. What it should become is a per-element record (dot ratio, dot turns, delay percent,
-     * control type) looked up here, with the three control elements filled in together with P10-2's control
-     * state machine — until then the honest state is "four elements share two constants, three have
-     * nothing".
+     * <p>The per-element numbers come from {@code Constant.BREAK_EFFECTS} (the P10-1 table: dot ratio,
+     * dot turns, control type), which replaced the old "one ratio and one duration for all four
+     * elements" pair of scalars. That table also names the control type of the other three elements,
+     * but naming it is where it stops: {@code P10-2}'s control state machine does not exist yet, so
+     * {@code hasDot()} is false for them and this method returns above. The honest state is "the four
+     * DOT elements are data now; the three control elements are labelled but inert".
+     *
+     * <p>The DOT is attached as an ordinary {@code DotBuff}, so nothing here decides how it is stored,
+     * counted down or removed — that is the buff system's job, and it is what lets the same burn land
+     * on a character as on an enemy.
      *
      * @param attacker the breaker (the DOT's source, and the damage's attacker)
      * @param enemy    the target that was broken
@@ -582,7 +599,7 @@ public class Battle {
         if (effect == null || !effect.hasDot()) {
             return;
         }
-        enemy.addDot(new Dot(attacker, element,
+        enemy.getBuffManager().addBuff(new DotBuff(attacker, element,
                 BreakDamageCalculator.breakBaseOf(attacker) * effect.dotRatio(), effect.dotTurns()));
     }
 
