@@ -87,7 +87,7 @@ public class CharacterFactoryTest {
      * <p>⚠ My first version asserted attack / defence directly as {@code data × multiplier} and
      * **missed the traces**; the failure values 894.136 / 545.7375 looked like "attribute array
      * index misalignment", which sent me down a wrong diagnosis for one round.
-     * Here it was changed to explicitly include the traces via {@code SkillPoint.sumAttributes} —
+     * Here it was changed to explicitly include the traces via {@code SkillTrace.sumAttributes} —
      * the test explains that 28% / 12.5% by itself.
      */
     @Test
