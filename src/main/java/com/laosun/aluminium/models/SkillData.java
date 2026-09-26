@@ -40,7 +40,7 @@ public class SkillData {
      * in the loaded data set.
      */
     private static final SkillData EMPTY = new SkillData(0, "", EMPTY_PARAMS, EMPTY_STANCE,
-            DamageElement.PHYSICAL, SkillEffectType.ENHANCE, null, null);
+            DamageElement.PHYSICAL, SkillEffectType.ENHANCE, null, null, null);
 
     /**
      * Maximum possible skill level (length of {@link #skills}).
@@ -100,6 +100,26 @@ public class SkillData {
     private final Double spBase;
 
     /**
+     * The skill's Chinese description ({@code skill_introduction.chinese}), tags and all — or
+     * {@code null} when the data has none.
+     *
+     * <p><b>Why a description is a first-class field.</b> The data states some numbers <b>only in
+     * prose</b>: which {@code param_list} slot holds a debuff's base chance is written as
+     * "有#4%的基础概率" and nowhere else. The generator already relies on this ({@code skill_effects.json}
+     * records {@code source: "SkillDesc 占位符"}), so the engine reading it too is not a hack — it is
+     * the only way to answer the question at all. Kept raw rather than pre-parsed so that each
+     * question (chance now, magnitudes later) can be answered without regenerating the data.
+     */
+    private final String description;
+
+    /** A {@code #N[...]} placeholder in a description; {@code N} is 1-based onto {@code param_list}. */
+    private static final java.util.regex.Pattern PLACEHOLDER =
+            java.util.regex.Pattern.compile("#(\\d+)\\[[^\\]]*\\]");
+    /** Markup that may sit between a placeholder and the words after it. */
+    private static final java.util.regex.Pattern MARKUP =
+            java.util.regex.Pattern.compile("<[^>]*>|\\\\n");
+
+    /**
      * Resolves the skill data of a character skill from the global data set.
      *
      * @param cid     character id (key of {@code skills.json})
@@ -127,7 +147,74 @@ public class SkillData {
                     "Unknown skill_effect: " + skill.skillEffect() + " (cid=" + cid + ", skillID=" + skillID + ")");
         }
         return new SkillData(skill.maxLevel(), skill.attackType(), skill.paramList(), skill.stanceList(),
-                skill.element(), effect, skill.spNeed(), skill.spBase());
+                skill.element(), effect, skill.spNeed(), skill.spBase(),
+                skill.skillIntroduction() == null ? null : skill.skillIntroduction().chinese());
+    }
+
+    /**
+     * The debuff's base chance, read out of the description, or {@code null} when the skill states none.
+     *
+     * <h2>Which parameter it is (P10-6)</h2>
+     * ⚠ <b>Not a fixed slot.</b> The plan for this task said "the chance is the 3rd {@code param_list}
+     * entry"; measured against the real data that is wrong for <b>every</b> skill examined, and wrong
+     * in the worst way — for Himeko's technique (1003/7) index 3 holds {@code 15}, so the "chance"
+     * would be 1500%, clamped to 1.0 by {@link com.laosun.aluminium.Battle#hitChance}, i.e. "always lands" and nothing
+     * would look broken.
+     *
+     * <p>The description <b>says</b> which index it is: the placeholder that directly precedes the
+     * words 基础概率 / 固定概率. Five measured anchors:
+     *
+     * <table border="1">
+     *   <caption>skill, the text, and where the number really lives</caption>
+     *   <tr><th>skill</th><th>text</th><th>param index</th><th>value</th></tr>
+     *   <tr><td>1003/7 姬子 不完全燃烧</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
+     *   <tr><td>1004/7 瓦尔特 画地为牢</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
+     *   <tr><td>1108/7 桑博 你最闪亮</td><td>{@code 有#2%<u>固定概率</u>} (no 的)</td><td><b>1</b></td><td>1.0</td></tr>
+     *   <tr><td>1006/4 银狼 等待程序响应…</td><td>{@code 有#4%的<u>基础概率</u>}</td><td><b>3</b></td><td>0.6</td></tr>
+     *   <tr><td>1307/4 黑天鹅 无端命运的机杼</td><td>{@code 有#2%的<u>基础概率</u>}</td><td><b>1</b></td><td>0.5</td></tr>
+     * </table>
+     *
+     * <p>So the rule is textual, and the two wordings are <b>not</b> interchangeable in game terms:
+     * 基础概率 is scaled by the caster's effect hit rate and reduced by the target's resistance
+     * (what {@link com.laosun.aluminium.Battle#hitChance} computes), while 固定概率 is applied as-is. Both are returned
+     * here, because both are "the chance this skill states"; a caller that feeds a 固定概率 through
+     * {@code hitChance} will over-apply it. Distinguishing them is left to whoever builds the
+     * Impair dispatch — the data needed to know <i>which</i> debuff is applied is still missing
+     * (see ROADMAP P10-6), so an API for it here would have no caller.
+     *
+     * <p>Matching stops at the first hit, which is what the data needs: when a description names the
+     * chance twice (黑天鹅 1307/4) both spellings point at the same placeholder.
+     *
+     * @return the chance ({@code param_list} of level 1), or {@code null} when the description states
+     *         no chance at all — which is a real answer, not a failure: 14 of the 28 {@code Impair}
+     *         skills (e.g. 1315/2 波提欧's 【绝命对峙】) apply their effect unconditionally
+     */
+    public Double debuffChance() {
+        if (description == null || skills.isEmpty()) {
+            return null;
+        }
+        java.util.regex.Matcher matcher = PLACEHOLDER.matcher(description);
+        while (matcher.find()) {
+            int end = Math.min(description.length(), matcher.end() + 60);
+            String after = MARKUP.matcher(description.substring(matcher.end(), end)).replaceAll("");
+            int i = 0;
+            // java.lang.Character spelled out: this package has a Character class of its own (the combatant).
+            while (i < after.length()
+                    && (after.charAt(i) == '%' || java.lang.Character.isWhitespace(after.charAt(i)))) {
+                i++;
+            }
+            if (i < after.length() && after.charAt(i) == '的') {
+                i++;                                     // 1003/7 writes "的<u>基础概率</u>", 1108/7 does not
+            }
+            String tail = after.substring(i);
+            if (!tail.startsWith("基础概率") && !tail.startsWith("固定概率")) {
+                continue;
+            }
+            int index = Integer.parseInt(matcher.group(1)) - 1;   // placeholders are 1-based
+            List<Double> level1 = skills.getFirst();
+            return index >= 0 && index < level1.size() ? level1.get(index) : null;
+        }
+        return null;
     }
 
     /**
