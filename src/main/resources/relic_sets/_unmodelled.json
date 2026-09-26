@@ -120,14 +120,14 @@
     {
       "require": 4,
       "ability": "Ability51231",
-      "reason": "\"While the wearer's memosprite is on the field, increases the wearer's SPD by 6%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by 30%, lasting for 3 turn(s).\" Needs a memosprite presence condition and a memosprite-attack event. ⚠ The unit itself can be placed now -- `resources/memosprites/<cid>.json` derives a memosprite's panel from its summoner and `Battle.summonMemosprite` puts it on the field (engine.md 24.5). What is missing is the CONDITION ('do I have one out') and an event for 'the memosprite attacked'."
+      "reason": "\"While the wearer's memosprite is on the field, increases the wearer's SPD by 6%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by 30%, lasting for 3 turn(s).\" The first clause is now a rule (`self_summon_count >= 1`, with the 'while' technique set 318's file documents), and the second clause's two units are expressible as two rules (self + `target: \"summon\"`). What still blocks the ability is that there is no event for 'the memosprite attacked': `ALLY_ATTACK` would fire for every ally's attack, so a rule hung on it would also fire when the wearer herself attacks -- an over-trigger, not a near miss."
     }
   ],
   "124": [
     {
       "require": 4,
       "ability": "Ability51241",
-      "reason": "\"Decreases the wearer's SPD by 8%. Before entering combat, if the wearer's SPD is lower than 95/110, increases the wearer's CRIT Rate by 36%/50%. This effect also applies to the wearer's memosprite.\" The SPD decrease is the `properties` stat (SpeedAddedRatio -0.08) and the threshold became expressible on 2026-09-27 (`self_attr:SPEED < 95`), but the last sentence is a memosprite clause: the ability is a disjunction over both units, so authoring only the wearer's half would under-trigger it. (The 95/110 pair is not an extra gap -- an upper bound makes the tiers exclusive, see set 311.)"
+      "reason": "Writable now: \"Decreases the wearer's SPD by 8%. Before entering combat, if the wearer's SPD is lower than 95/110, increases the wearer's CRIT Rate by 36%/50%. This effect also applies to the wearer's memosprite.\" Every clause has a spelling as of 2026-09-27: the SPD decrease is the `properties` stat (SpeedAddedRatio -0.08); the threshold is `self_attr:SPEED < 95` (and `< 110` with `>= 95` for the lower tier, since an upper bound makes the tiers exclusive); and the memosprite clause is a SECOND rule with `target: \"summon\"` gated on `self_summon_count >= 1` -- which is exactly how 「装备者及其忆灵」 is written. Four rules in total (two tiers x two units), mechanical to write."
     }
   ],
   "125": [
@@ -148,7 +148,7 @@
     {
       "require": 4,
       "ability": "Ability51271",
-      "reason": "\"After the wearer uses Basic ATK or Skill, if the wearer's memosprite is on the field, increases Max HP of the wearer and their memosprite by 24%, and increases all allies' DMG dealt by 15%, lasting until after the wearer's next use of Basic ATK or Skill.\" Needs a memosprite presence condition, a party-wide damage-dealt bonus, and an 'until the next use' duration."
+      "reason": "\"After the wearer uses Basic ATK or Skill, if the wearer's memosprite is on the field, increases Max HP of the wearer and their memosprite by 24%, and increases all allies' DMG dealt by 15%, lasting until after the wearer's next use of Basic ATK or Skill.\" The presence condition and the memosprite half are both expressible now, and so is the party-wide damage bonus (ALL_DAMAGE_TYPE_BOOST). What blocks it is the duration: 'until after the wearer's next use of Basic ATK or Skill' is a buff consumed by the wearer's own next action, the same gap as set 107."
     }
   ],
   "128": [
@@ -254,32 +254,25 @@
       "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
     }
   ],
-  "318": [
-    {
-      "require": 2,
-      "ability": "Ability53181",
-      "reason": "\"Increases the wearer's CRIT DMG by 16%. When the wearer has a summon on the field, increases the wearer's CRIT DMG by an extra 16%.\" The CRIT DMG is the `properties` stat (CriticalDamageBase 0.16). What is missing is a condition on 'I have a summon on the field'. ⚠ Placement is no longer the blocker: our side's camp holds a summon (L-8's friendly half) and a memosprite's panel is derived from its summoner (`resources/memosprites/<cid>.json`, engine.md 24.5). A presence condition is what remains, and it would cover every entry in this family at once."
-    }
-  ],
   "319": [
     {
       "require": 2,
       "ability": "Ability53191",
-      "reason": "\"Increases the wearer's Max HP by 12%. When the wearer's Max HP is equal to or higher than 5000, increases the CRIT DMG of the wearer and their memosprite by 28%.\" The Max HP is the `properties` stat (HPAddedRatio 0.12) and the threshold became expressible on 2026-09-27 (`self_attr:HEALTH >= 5000` -- a base attribute, so the literal is absolute). What blocks it is the memosprite clause: the ability is a disjunction over both units, so the wearer's half alone would under-trigger it."
+      "reason": "Writable now: \"Increases the wearer's Max HP by 12%. When the wearer's Max HP is equal to or higher than 5000, increases the CRIT DMG of the wearer and their memosprite by 28%.\" All three clauses have a spelling: the Max HP is the `properties` stat (HPAddedRatio 0.12); the threshold is `self_attr:HEALTH >= 5000` (a base attribute, so the literal is absolute); and 「装备者及其忆灵」 is TWO rules -- one on the wearer, one with `target: \"summon\"` gated on `self_summon_count >= 1`."
     }
   ],
   "320": [
     {
       "require": 2,
       "ability": "Ability53201",
-      "reason": "\"Increases the wearer's SPD by 6%. When the wearer's SPD is equal to or higher than 135/180, increases the healing done by the wearer and their memosprite by 12%/20%.\" The SPD is the `properties` stat (SpeedAddedRatio 0.06) and the threshold became expressible on 2026-09-27 (`self_attr:SPEED`), and a healing boost attribute exists (OUTGOING_HEALING_BOOST). What blocks it is the memosprite clause. (The 135/180 pair is not an extra gap -- an upper bound makes the tiers exclusive, see set 311.)"
+      "reason": "Writable now: \"Increases the wearer's SPD by 6%. When the wearer's SPD is equal to or higher than 135/180, increases the healing done by the wearer and their memosprite by 12%/20%.\" The SPD is the `properties` stat (SpeedAddedRatio 0.06); the thresholds are `self_attr:SPEED` with an upper bound for the lower tier; the healing boost attribute exists (OUTGOING_HEALING_BOOST); and the memosprite half is a second rule with `target: \"summon\"` gated on `self_summon_count >= 1`. Four rules total (two tiers x two units)."
     }
   ],
   "321": [
     {
       "require": 2,
       "ability": "Ability53211",
-      "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" The stacking counter is now expressible, but there is no condition on the battlefield's party size (and no memosprite), so the number of stacks cannot be derived from anything."
+      "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" The stacking counter and the memosprite half are both expressible now (`target: \"summon\"` + `self_summon_count >= 1`), but there is still no condition on the battlefield's PARTY SIZE, so the number of stacks cannot be derived from anything. (That is a different question from `self_summon_count`: it counts our whole side, not the owner's summons.)"
     }
   ],
   "322": [
@@ -293,7 +286,7 @@
     {
       "require": 2,
       "ability": "Ability53231",
-      "reason": "\"Increases the wearer's CRIT Rate by 8%. While the wearer's memosprite is on the field, increases all allies' SPD by 12%. This effect cannot be stacked.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08) and the party-wide SPD boost is expressible. What blocks it is the memosprite presence condition (see set 318 -- the unit can be placed, the condition does not exist yet)."
+      "reason": "\"Increases the wearer's CRIT Rate by 8%. While the wearer's memosprite is on the field, increases all allies' SPD by 12%. This effect cannot be stacked.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08), the presence condition exists (`self_summon_count >= 1`, see set 318's file for the technique), and the party-wide SPD boost is expressible. What blocks it is the DURATION of a 'while' clause that affects OTHER units: the technique that works for 318 (re-evaluate at the wearer's own turn start for one turn) is faithful only while the wearer is acting, and a speed buff that comes and goes per turn would make the action bar oscillate. It needs a buff whose lifetime is tied to a condition, not a snapshot."
     }
   ],
   "324": [

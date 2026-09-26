@@ -298,6 +298,47 @@ public class TriggerTableTest {
                 () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of("nonsense"), energy(1)))));
     }
 
+    /**
+     * Numeric equality parses — {@code hit_count == 2} has been in the DSL's documentation since its first
+     * version and was rejected as "compares two variables" until 2026-09-27.
+     *
+     * <p>Found by writing a condition that needed {@code == 0}: {@code ==} and {@code !=} went straight to the
+     * <b>identity</b> branch (which is about {@code actor == self}), so anything without {@code self} on one
+     * side was refused — including the examples in the comment above the parser. The two readings are now kept
+     * apart by whether either side <em>is</em> {@code self}, and this case pins both.
+     */
+    @Test
+    public void numericEqualityAndInequalityParse() {
+        TriggerTable exact = new TriggerTable(1, List.of(
+                trigger("ALLY_ATTACK", List.of("hit_count == 2"), energy(1))));
+        TriggerTable notExact = new TriggerTable(1, List.of(
+                trigger("ALLY_ATTACK", List.of("hit_count != 2"), energy(1))));
+        Character owner = character("owner");
+        Battle battle = newBattle(List.of(owner), 1);
+
+        owner.setTriggerTable(exact);
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 2, 0),
+                "an exact hit count now parses as a number");
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 3, 0),
+                "…and really compares it");
+
+        owner.setTriggerTable(notExact);
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 2, 0));
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 3, 0));
+
+        // The identity reading is untouched: `self` is still an identity, not a number …
+        TriggerTable selfIdentity = new TriggerTable(1, List.of(
+                trigger("ALLY_ATTACK", List.of("actor == self"), energy(1))));
+        owner.setTriggerTable(selfIdentity);
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
+
+        // … and two *names* still get the clearer message rather than "no numeric literal".
+        IllegalArgumentException twoVariables = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(1, List.of(
+                        trigger("ALLY_ATTACK", List.of("actor == target"), energy(1)))));
+        Assertions.assertTrue(twoVariables.getMessage().contains("two variables"), twoVariables.getMessage());
+    }
+
     /** An unknown op is rejected. */
     @Test
     public void unknownOpIsRejected() {

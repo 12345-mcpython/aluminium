@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -312,6 +313,8 @@ public class TriggerTable {
     //                                                                      reduced further"
     //   self_attr:SPEED >= 145    one of MY OWN attribute values      <- the planar ornament 2-pieces'
     //                                                                     "当装备者的速度大于等于145时" shape
+    //   self_summon_count >= 1    I have a summon of my own on the field <- the memosprite family's
+    //                                                                     "忆灵在场时" / "存在装备者召唤的目标时"
     //   self has_state 协奏   I am in the named state 协奏             <- Robin's 即兴装饰 "处于【协奏】状态时"
     //   target has_state 触电 it happened to someone in that state     <- Kafka's "触电状态下的敌方目标"
     //
@@ -333,20 +336,26 @@ public class TriggerTable {
     // ==================================================================
 
     /**
-     * The numeric variables {@code hit_count}, {@code hp_percent} and {@code target_debuff_count} are the
-     * complete, closed set of <b>plain</b> names.
+     * The numeric variables {@code hit_count}, {@code hp_percent}, {@code target_debuff_count} and
+     * {@code self_summon_count} are the complete, closed set of <b>plain</b> names.
      *
      * <p>Each reads from a different place, which is why the names say so: {@code hit_count} comes from the
      * event, {@code hp_percent} from the rule's owner (a fact about me), and {@code target_debuff_count} from
      * the event's <b>subject</b> (「目标身上有几个负面效果」 — the count that matters is the one on the unit the
      * rule is talking about, not on me).
      *
+     * <p>{@code self_summon_count} is the one that reads the <b>field</b> rather than the event or the owner:
+     * how many living summons are out whose master is this rule's owner. It is spelled {@code self_}…
+     * although {@code hp_percent} does not bother, because a bare {@code summon_count} would read like "how
+     * many summons are on the battlefield" — a different question with a different answer, and one nobody has
+     * asked for yet.
+     *
      * <p>{@code self_attr:<ATTRIBUTE>} is the one <b>parameterised</b> member and is deliberately not listed
      * here: its second half is not a fixed name but a member of {@link AttributeType}, validated separately
      * (and rejected there for the four {@code *_PERCENT} builder keys, whose runtime slot is null).
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("hit_count", "hp_percent", "target_debuff_count");
+            Set.of("hit_count", "hp_percent", "target_debuff_count", "self_summon_count");
 
     /**
      * The prefix of the one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -401,18 +410,21 @@ public class TriggerTable {
 
         if ("==".equals(operator) || "!=".equals(operator)) {
             boolean negated = "!=".equals(operator);
-            String other;
-            if ("self".equals(left)) {
-                other = right;
-            } else if ("self".equals(right)) {
-                other = left;
-            } else {
+            if ("self".equals(left) || "self".equals(right)) {
+                String other = "self".equals(left) ? right : left;
+                String variable = requireIdentityVariable(other, raw, spec);
+                return new Equality(variable, "self", negated);
+            }
+            // Neither side is "self", so this is not an identity comparison — it is a numeric one, and
+            // `hit_count == 2` has been in this DSL's documentation since its first version while the parser
+            // reported it as "compares two variables" (found 2026-09-27 by a test that needed `== 0`). Fall
+            // through to the numeric path; a comparison between two *names* still gets the clearer message.
+            if (!isNumeric(left) && !isNumeric(right)) {
                 throw new IllegalArgumentException(
                         "Condition '" + raw + "' compares two variables; only comparisons against "
-                                + "\"self\" are supported (source: " + spec.getSource() + ")");
+                                + "\"self\", or against a numeric literal (e.g. \"hit_count == 2\"), are "
+                                + "supported (source: " + spec.getSource() + ")");
             }
-            String variable = requireIdentityVariable(other, raw, spec);
-            return new Equality(variable, "self", negated);
         }
 
         // Numeric comparison against a literal.
@@ -629,6 +641,15 @@ public class TriggerTable {
      * easiest mistake here: "after an ally attacks" is {@code actor != self}, while "after I am hit"
      * is {@code target == self} — and when I am hit, the actor is the <b>attacker</b>, not me.
      *
+     * <p><b>{@code battle}, and why a context carries one.</b> Some questions are about the
+     * <b>field</b> rather than about the event: 「忆灵在场时」 ("while my memosprite is out") asks what
+     * units exist, and 「我方全体」 has to name them as effect targets. No event can carry that, because
+     * it is not a fact about what just happened — it is a fact about the battlefield, and the battlefield
+     * is {@link Battle}. It is here for exactly those two questions and nothing else: a condition must
+     * not use it to reach into engine state (that is what ops are for). A context built by hand without a
+     * battle (as several tests do) makes any such condition <b>fail</b>, the same way a missing party
+     * does — never silently pass.
+     *
      * @param owner    the character this table belongs to ("self")
      * @param actor    who caused the event (may be {@code null})
      * @param target   the event's subject (may be {@code null})
@@ -636,20 +657,26 @@ public class TriggerTable {
      * @param amount   the event's magnitude where it has one (energy credited, damage dealt, ...)
      * @param damage   the instance being settled, for the one event that has one
      *                 ({@link TriggerEvent#DEALING_DAMAGE}); {@code null} everywhere else
+     * @param battle   the battle in progress, for questions about the field (may be {@code null} in a
+     *                 hand-built context, which makes those conditions fail rather than guess)
      */
     public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
-                                 Damage damage) {
+                                 Damage damage, Battle battle) {
 
         /**
          * The context of an event that carries no damage instance — i.e. every event but
          * {@link TriggerEvent#DEALING_DAMAGE}.
+         *
+         * <p>Leaves {@code battle} null; use the seven-argument constructor when a condition may ask
+         * about the field. Hand-built contexts are for unit tests of the condition vocabulary, where
+         * "there is no battlefield" is the honest answer and a field question therefore fails.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount) {
-            this(owner, actor, target, hitCount, amount, null);
+            this(owner, actor, target, hitCount, amount, null, null);
         }
 
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0, null);
+            return new TriggerContext(owner, actor, null, 0, 0, null, null);
         }
     }
 
@@ -786,6 +813,11 @@ public class TriggerTable {
                 case ">=" -> left >= right;
                 case "<" -> left < right;
                 case "<=" -> left <= right;
+                // Equality on numbers, which the DSL has always documented (`hit_count == 2`) and only
+                // started accepting on 2026-09-27 -- see parseCondition. NaN compares false against
+                // everything, which is the "cannot read it, so the condition fails" rule.
+                case "==" -> left == right;
+                case "!=" -> left != right;
                 default -> false;
             };
         }
@@ -806,8 +838,25 @@ public class TriggerTable {
                 case "hit_count" -> ctx.hitCount();
                 case "hp_percent" -> hpPercent(ctx.owner());
                 case "target_debuff_count" -> ctx.target() == null ? Double.NaN : ctx.target().getBuffManager().debuffCount();
+                case "self_summon_count" -> summonCount(ctx);
                 default -> Double.NaN;
             };
+        }
+
+        /**
+         * How many living summons the owner has on the field.
+         *
+         * <p>Read from the battlefield, so a context with no battle answers {@code NaN} — the same "cannot
+         * read it, therefore the condition fails" rule the other variables follow, and never a silent
+         * "0 summons". ⚠ That matters more here than elsewhere: a rule gated on 「忆灵在场时」 would be
+         * <em>silently disabled</em> if a missing battlefield read as "none out", which is a wrong answer
+         * with no symptom.
+         */
+        private static double summonCount(TriggerContext ctx) {
+            if (ctx.battle() == null || ctx.owner() == null) {
+                return Double.NaN;
+            }
+            return ctx.battle().summonCountOf(ctx.owner());
         }
 
         /**
