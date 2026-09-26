@@ -682,6 +682,12 @@ Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结�
 反过来，如果把进度记成百分比，速度一变就没法同时处理"分母换了"和"分子要缩放"两件事，
 首轮系数会被算成 `nextActionTime / cycleTime() = 1.5`，clamp 之后变成"立刻行动"。
 
+> ⚠ **`progress` 只有下界、没有上界**（L-26 修的）。被**推条**过的单位 `remaining > 旧预约长度`，
+> 也就是它合法地**离行动点超过一整轮**；此时把 `progress` 上钳到 1，等于把推条**截断成恰好一轮**。
+> 踩到的样子：量子/虚数击破是"推条 + 减速"，减速触发重排时推条被吃掉 ——
+> 实测**加不加那 20% 额外推条都是 28.409**，完全不可观测。
+> 现在 `progress = max(0, remaining / 旧预约长度)`：下界保留（预约不能为负），上界去掉。
+
 ### 5.2 行动条操纵
 
 | 方法 | 语义 |
@@ -690,6 +696,13 @@ Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结�
 | `advanceAction(target, amount)` | 拉条：`nextActionTime = max(elapsed, nextActionTime - amount)` |
 | `advanceActionByPercent(target, pct)` | 按剩余时间百分比提前（`p ∈ [0,1]`），**两侧都 clamp** |
 | `resetSignal(signal)` | 重置到 `elapsed + cycleTime()` |
+
+> ⚠ **推条/拉条必须同时写两个账本**（L-26）。`remaining` 与 `nextActionTime` 是同一个状态的两种记法
+> （§5.1），而 `delayAction`/`advanceAction` 以前**只写后者** —— 于是下一次 `refreshSpeed`
+> 拿**陈旧的** `remaining` 重算，把推条整个丢掉。两个方法现在都调
+> `Signal.setRemaining(elapsed, nextActionTime - elapsed)`（那个方法本来就是为"调用方不必自己保证同步"存在的）。
+> 回归由 `QueueActionManipulationTest.aDelaySurvivesASpeedChange` 钉住（两半**各自**都能让它变红：
+> 恢复上钳 → 两个单位都回到 187.5；去掉账本同步 → 同样两个都回到 187.5）。
 
 `Battle` 侧对应 `delayMovePercent(target, percent)`（周期 × percent）与
 `advanceRequest(target, rate)`（排队后由 `processRequests` 处理）。
@@ -1752,15 +1765,19 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 ### 14.1 生成器产出 vs 引擎实际加载
 
-`generate_data.py` 现在产出 **27 个文件**，引擎只用到其中 **11 个**
+`generate_data.py` 现在产出 **28 个文件**（27 个 JSON + `text_ids.txt`），引擎用到其中 **12 个**
 （另外还读 2 个非 generator 产出的文件）。差额登记如下 —— 免得再出现
 "文档说没有、其实文件早就在"的偏差（本仓库此前那份 9/1 的快照就少了 11 个文件、
 `character_data.json` 也没有 `rarity`）。
 
-**A. generator 产出且引擎已加载（11）**
+> ⚠ 计数在 2026-09-26 重新数过：`skill_effects.json`（P10-3 的技能效果参数表，引擎通过
+> `SkillEffects` 读取）是后来加的，所以"产出 27 / 引擎 11"这两个数字各 +1。
+
+**A. generator 产出且引擎已加载（12）**
 
 `main_attribute` · `sub_attribute` · `weapons` · `character_data` · `point` · `skills` ·
-`monster_template_config` · `hard_level_group` · `monster_config` · `breaking_rate` · `stage`
+`skill_effects` · `monster_template_config` · `hard_level_group` · `monster_config` ·
+`breaking_rate` · `stage`
 
 **B. 非 generator 产出但引擎已加载（2）**
 
@@ -1769,7 +1786,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | `monster_attack_modify_ratio` | 仓库内的补丁文件（人工维护），由 `normalizeMonsterConfigs` 合并 |
 | `enemy_skills` | 仓库内手写技能表（P5-3） |
 
-**C. generator 产出但引擎完全不读（12）** —— 都是"为后续阶段准备 / 喂给文档导出脚本"的：
+**C. generator 产出但引擎完全不读（16）** —— 都是"为后续阶段准备 / 喂给文档导出脚本"的：
 
 | 文件 | 大概内容 | 为什么没读 |
 |---|---|---|
@@ -1796,11 +1813,13 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | `pending_text_ids.txt` | 翻译待查清单（`export_glossary.py` 一类脚本用） |
 | `skill_segments.json` / `skill_segments.csv` | 技能分段数据，`export_skill_segments.py` 为文档生成 |
 
-> 账目（已用脚本核对）：generator 产出 **27** 个 = **A 11 个已加载** + **C 16 个未加载**。
-> B（`monster_attack_modify_ratio`、`enemy_skills`）与 D（4 个辅助文件）都**不在**这 27 个里。
+> 账目（2026-09-26 用脚本重新核对）：generator 产出 **28** 个 = **A 12 个已加载** + **C 16 个未加载**。
+> B（`monster_attack_modify_ratio`、`enemy_skills`）与 D（4 个辅助文件）都**不在**这 28 个里。
 > C 那张表按"用途"合行写了，所以行数（14）少于文件数（16）——
 > `challenge_*` 3 个、`eidolons`+`enhanced_ranks` 2 个都是各占一行。
 > 要查"引擎读哪些"，看 A/B 两组即可。
+> （P10-3 之前这组数字是 27 = 11 + 16；`skill_effects.json` 加进来后各 +1。
+> C 组表头原先写"（12）"与正文的 16 自相矛盾，已一并修正。）
 
 > **`stage.json`（9 MB / 约 2.9 万条关卡）是懒加载的**，走 `Constant.stages()`（P7-4）：
 > 它是最大的数据表，而多数测试与 demo 根本不碰关卡，塞进静态块等于每次 `Constant`
