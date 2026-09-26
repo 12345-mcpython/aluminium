@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A character's compiled trigger table (P8-7): the data form of its mechanics.
@@ -260,6 +262,8 @@ public class TriggerTable {
     //   hp_percent <= 0.5     the owner's own HP is at or below half   <- set 106's "at the beginning
     //                                                                     of the turn, if the wearer's
     //                                                                     HP percentage is <= 50%"
+    //   self has_state 协奏   I am in the named state 协奏             <- Robin's 即兴装饰 "处于【协奏】状态时"
+    //   target has_state 触电 it happened to someone in that state     <- Kafka's "触电状态下的敌方目标"
     //
     // `actor` is who caused the event; `target` is what it happened to. WATCH OUT: when I am hit,
     // the actor is the attacker, so "I was hit" is `target == self`, NOT `self`.
@@ -277,11 +281,32 @@ public class TriggerTable {
      */
     private static final Set<String> NUMERIC_VARIABLES = Set.of("hit_count", "hp_percent");
 
+    /**
+     * The keyword of the named-state condition, and the parties it may ask about.
+     *
+     * <p>The keyword has to stand alone (a state whose name contains {@code has_state} must not be
+     * mistaken for the operator), hence the lookarounds rather than a plain {@code contains}.
+     */
+    private static final Pattern HAS_STATE =
+            Pattern.compile("(?<![\\w])has_state(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    private static final Set<String> STATE_SUBJECTS = Set.of("self", "actor", "target");
+
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException("Empty trigger condition (source: " + spec.getSource() + ")");
         }
         String text = raw.trim();
+
+        // `has_state`: "<who> has_state <name>". Checked before the operator branch because this shape has
+        // no symbol operator at all -- without it, "self has_state 协奏" would be reported as an unknown
+        // shorthand, which sends the author looking in the wrong place.
+        Matcher hasState = HAS_STATE.matcher(text);
+        if (hasState.find()) {
+            String subject = normalize(text.substring(0, hasState.start()));
+            String state = text.substring(hasState.end()).trim();
+            return new HasState(requireStateSubject(subject, raw, spec), state, raw, spec);
+        }
 
         if (!containsOperator(text)) {
             if ("self".equals(normalize(text))) {
@@ -367,6 +392,28 @@ public class TriggerTable {
                             + "target (what it happened to) (source: " + spec.getSource() + ")");
         }
         return token;
+    }
+
+    /**
+     * Checks that a {@code has_state} condition asks about a party the DSL knows.
+     *
+     * <p>{@code self} is allowed here (unlike in an identity comparison, where it would be the pointless
+     * "self == self"): "which state am I in" is the most common question the condition exists for.
+     *
+     * @param subject the party token (already lower-cased)
+     * @param raw     the original condition text, for the error message
+     * @param spec    the owning rule, for the source
+     * @return the party token
+     */
+    private static String requireStateSubject(String subject, String raw, TriggerSpec spec) {
+        if (!STATE_SUBJECTS.contains(subject)) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' asks whether '" + subject + "' is in a named state, but the "
+                            + "parties are " + String.join(", ", STATE_SUBJECTS.stream().sorted().toList())
+                            + " (self = the character whose table fired, actor = who caused the event, "
+                            + "target = what it happened to) (source: " + spec.getSource() + ")");
+        }
+        return subject;
     }
 
     private static boolean containsOperator(String text) {
@@ -480,6 +527,53 @@ public class TriggerTable {
          * The original text, for error messages and debugging.
          */
         String source();
+    }
+
+    /**
+     * Named-state test: {@code self has_state 协奏} / {@code target has_state 触电}.
+     *
+     * <p>Reads the state off the party named on the left through
+     * {@link com.laosun.aluminium.models.buff.BuffManager#hasState(String)}, so "the target is shocked" and
+     * "I am in 【转魄】" are the same mechanism — an ordinary buff that happens to be a
+     * {@link com.laosun.aluminium.models.buff.StateBuff}. The state name is <b>not</b> lower-cased: it is
+     * data, spelled by the rule file, and the two sides must agree exactly.
+     *
+     * <p>A party that does not exist for this event ({@code target} on an event with no subject)
+     * <b>fails</b> the condition, exactly like {@link Equality} and {@link Numeric}: "the rule matched" must
+     * never be the accidental outcome of a missing party.
+     */
+    private static final class HasState implements Condition {
+
+        private final String subject;
+        private final String state;
+        private final String raw;
+
+        HasState(String subject, String state, String raw, TriggerSpec spec) {
+            if (state.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' names no state after \"has_state\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            this.subject = subject;
+            this.state = state;
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+            return who != null && who.getBuffManager().hasState(state);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
     }
 
     /**

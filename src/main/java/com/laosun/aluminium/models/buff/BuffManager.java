@@ -384,6 +384,33 @@ public class BuffManager {
     }
 
     /**
+     * Whether a <b>named</b> state (【协奏】/【转魄】/【增幅】…) is currently attached.
+     *
+     * <p>Same family as {@link #hasBuff(Class)}, with one difference that is the whole point of states:
+     * the caller keys by the state's <b>name</b>, not by its class. A state is data ({@link StateBuff}
+     * carries a name from the rule file), so a rule that says 「处于【协奏】状态时」 has no class to name.
+     *
+     * <p>Traversal goes through {@link #allBuffsOf(Class)}, i.e. the same snapshot copy as every other
+     * read here (M-12), so a state that removes or attaches another state while being queried cannot
+     * disturb the iteration.
+     *
+     * @param state the state name as the data spells it (trimmed; blank or {@code null} = never present)
+     * @return {@code true} = a {@link StateBuff} with that name is on us
+     */
+    public boolean hasState(String state) {
+        if (state == null || state.isBlank()) {
+            return false;
+        }
+        String wanted = state.trim();
+        for (StateBuff buff : allBuffsOf(StateBuff.class)) {
+            if (wanted.equals(buff.getState())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Takes the first buff of that type on us, or {@code null} if there is none (needed since P5-2:
      * the target selector must obtain **the taunter itself**, merely knowing "whether there is one"
      * is not enough).
