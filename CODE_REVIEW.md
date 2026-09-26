@@ -351,10 +351,11 @@ list.sort(Comparator.comparingDouble(Signal::getNextActionTime));   // 稳定排
 | L-23 | `Camp`/`Summon` | `getCamp()` 全仓库无调用者 → `CanHit.camp` 只写不读、`Camp.NEUTRAL` 未用，与 `Camp` 的 javadoc 矛盾；`new Summon` 全仓库零处，其 javadoc 承诺的"继承召唤者属性"没有任何实现 |
 | L-24 | `beans/Skill.java:11,15` | `skillID` 解析了但从不读取（槽位 id 来自外层 map 键，无人校验两者一致）；`StanceList` 无 `@SerializedName`，靠 record 分量名匹配（今天 702/702 都对，但改名会静默读 0 → 削韧恒 0） |
 | L-25 | `SkillEffectType.java:88,97` | `getCategory()` 无调用者；每个常量上的 `@SerializedName` **从不生效**（`beans.Skill` 把 `skill_effect` 留作 `String`，`init` 走 `fromString`）；`BY_STRING` 是可变的 static `HashMap`（可 `Map.copyOf`） |
+| L-26 | `Queue.java:539`、`Signal.java:142` | `delayAction` 只加 `nextActionTime`，**不同步 `Signal.remaining`**；而任何速度变化都走 `refreshSpeed`，它按**陈旧的** `remaining` 算进度并**覆盖** `nextActionTime` → 一次已经生效的推条会被静默丢掉；`clamp(progress, 0, 1)` 还会把"已经推过一整个周期"的单位拉回恰好一个周期。**实测证据**：量子击破在"先推条、后减速"的顺序下，行动值变化**加不加那 20% 额外推条都是 28.409**（推条被完全抹掉），改成"先减速、后推条"才是 `≥ 42.61`。P10-2 因此把一次性推条安排为对行动条的**最后一次写入**；队列自身这处不一致**未修**（见 `engine.md` §8.6） |
 | N-1 | `DefaultSkill.java:16,10` | `static ConcurrentMap` 缓存把可变对象当共享单例（`computeIfAbsent` 只保证创建一次，不保护 value）；`SkillData.init` 会在 `computeIfAbsent` **内部抛异常** → 一个 getter 在战斗时抛错且每次调用都重抛；`:10` 的 TODO 说该删除这个类，而它是唯一的 `Skill` 生产实现 |
 | N-2 | `Benchmark.java:38` | 读的 `dump_data.json` 仓库里不存在；`data == null` 的兜底永远走不到（见 M-17 先抛 NPE）；`main()` 是包私有、`gradle run` 进不去；`:91-92` 的结果被丢弃 |
 | N-3 | `CanHit.java:99-104` | 同时有 `Runnable` **字段** `beforeMove`/`afterMove`/`onBattleStart` 与**同名方法**。Java 合法但极易读错（`Main.java:137` 正是这种用法）；更危险的是直接调 `MoveEvent.beforeMove(battle)` 会**静默跳过 buff tick**。建议改 `setBeforeMoveHook(Runnable)` |
-| N-4 | `Enemy`/`Summon` | 无拷贝构造器：`new Enemy(...)` 走 `CanHit(CanHit)` 会**丢掉** `damageResist`/`stanceWeak`/`stance`/`broken`/`dots` 全部子类字段（`Character` 就正确重写了）。当前无调用者，但"多波次刷同一种怪"很容易用到 |
+| N-4 | `Enemy`/`Summon` | 无拷贝构造器：`new Enemy(...)` 走 `CanHit(CanHit)` 会**丢掉** `damageResist`/`stanceWeak`/`stance`/`broken` 全部子类字段（`Character` 就正确重写了）。当前无调用者，但"多波次刷同一种怪"很容易用到。（原文还列了 `dots` —— P10-0 已把它迁进 buff 体系，那个字段不存在了） |
 | N-5 | `RelicSuit.java:153` | `appendAttribute` 是死方法，与它逐行相同的代码被内联在 `appendTo`；同一段"按属性类型分发"逻辑在 `RelicSuit`/`Weapon`/`SkillPoint` **三处复制**。建议下沉成 `AttributeBuilder.add(type, value, source)`（顺带消掉 M-19 那个 4 处重复的守卫） |
 | N-6 | `models/Buff.java:3` | 接口上留着裸 `// TODO` 与重构便签；`Buff.setSource/getSource` 全仓库无人调用（持有者经构造器传），`AbstractBuff.source` 恒 null → 接口契约实际未实现 |
 | N-7 | `BreakDamageCalculator.java:21` | javadoc 例子"30 点普攻 × 2.5 击破加成 = 112.5"在仓库里**无法复现**（没有任何 2.5 系数，测试直接传 112.5 字面量），会误导读者以为调用方要预乘 |
