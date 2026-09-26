@@ -25,10 +25,7 @@ import java.util.function.Consumer;
  */
 public class ResourceManager {
 
-    /**
-     * -- GETTER --
-     *  The combatant these resources belong to.
-     */
+    /** The combatant these resources belong to. */
     @Getter
     private final CanHit owner;
 
