@@ -2046,6 +2046,64 @@ public class Battle {
         return summon;
     }
 
+    /**
+     * Brings a character's <b>memosprite</b> (忆灵) onto the field, with a panel derived from that character.
+     *
+     * <p>This is the character-side sibling of {@link #summon(CanHit, int, int)}: the monster path takes an
+     * id from a roster, this one takes nothing but the summoner and reads
+     * {@code resources/memosprites/<cid>.json} for how the panel is inherited. It always joins
+     * {@link #allies}, because a memosprite fights for whoever summoned it and its summoner is one of ours.
+     *
+     * <p><b>Idempotent per summoner.</b> If that character already has a living memosprite on the field,
+     * nothing happens and the existing one is returned. The documents actually say "if it is already present,
+     * restore it to full HP" (阿格莱雅's 「若衣匠已在场，则使其生命值回复至上限」), and that refresh is <b>not</b>
+     * modelled here: doing nothing is at least never a wrong <em>state</em>, whereas a second copy of the same
+     * memosprite would be one — two units, one of which the player cannot see. The refresh is registered as
+     * the next step rather than approximated.
+     *
+     * @param master the summoning character
+     * @return the memosprite (newly placed, or the one already standing), already in the camp roster and
+     *         queued to enter the action bar
+     * @throws IllegalArgumentException if the master is null, already down, or has no memosprite spec
+     */
+    public Summon summonMemosprite(Character master) {
+        if (master == null) {
+            throw new IllegalArgumentException("A memosprite needs a summoner");
+        }
+        if (master.isDeath()) {
+            throw new IllegalArgumentException(
+                    "A dead character cannot summon a memosprite (" + master.getName() + "): it would enter "
+                            + "already orphaned, and the very next removeDeadCombatants would take it "
+                            + "straight back out");
+        }
+        Summon existing = memospriteOf(master);
+        if (existing != null) {
+            return existing;
+        }
+        Summon memosprite = SummonFactory.memosprite(master);
+        memosprite.setMaster(master);
+        allies.add(memosprite);
+        addRequestItems.add(memosprite);
+        memosprite.setSpeedChangeListener(this::onSpeedChanged);
+        return memosprite;
+    }
+
+    /**
+     * The master's living memosprite on the field, or {@code null}.
+     *
+     * <p>Found by walking {@link #allies} for a summon whose master is this character — the master link is
+     * the only place that relation lives, so this is the one query that can answer it. Dead memsprites stay
+     * in the roster like every other corpse, hence the {@code isDeath()} filter.
+     */
+    public Summon memospriteOf(CanHit master) {
+        for (CanHit unit : allies) {
+            if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
+                return summon;
+            }
+        }
+        return null;
+    }
+
     public List<Signal> getQueueSnapshot() {
         return queue.snapshot();
     }
