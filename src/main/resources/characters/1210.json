@@ -1,0 +1,28 @@
+[
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 0.25
+      }
+    ],
+    "source": "1210 桂乃芬 trace 1210102 投狭",
+    "note": "Doc text: 「战斗开始时，桂乃芬的行动提前25%。」 Same shape as Robin's 华彩花腔: BATTLE_START fires after the action bar was initialized in the constructor, and ADVANCE skips a fraction of the target's REMAINING wait, defaulting to the rule's owner -- so this pulls her forward and moves nobody else. E0 value (params [0.25])."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "when": [
+      "actor == self",
+      "target has_state 灼烧"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.2
+      }
+    ],
+    "source": "1210 桂乃芬 trace 1210103 逾锋",
+    "note": "Doc text: 「对陷入灼烧状态的敌方目标造成的伤害提高20%。」 Three things make this exact, and each of them is a deliberate choice: 'actor == self' because the text is about HER damage (without it an ally's hit on the same burning target would be boosted too); 'target has_state 灼烧' resolves to a Fire DoT -- 灼烧 is not a StateBuff but a DotBuff element, which is how the engine has modelled a burn since P10-0; and BOOST_DAMAGE changes the instance being settled, so nothing is attached to anybody, nothing has to be removed, and a hit against a target that is not burning gets nothing. E0 value (params [0.2])."
+  }
+]
