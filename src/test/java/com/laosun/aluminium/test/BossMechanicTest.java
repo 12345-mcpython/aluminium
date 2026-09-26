@@ -99,7 +99,7 @@ public class BossMechanicTest {
     @Test
     public void aDeadWearerDoesNotCounter() {
         Battle battle = newBattle(false);
-        Enemy enemy = battle.enemies.getFirst();
+        Enemy enemy = battle.enemyUnits().getFirst();
         enemy.getBuffManager().addBuff(new CounterMechanic(DURATION, DamageElement.PHYSICAL, RATIO));
         enemy.takeDamage(enemy.getMaxHp() * 2);
         Assertions.assertTrue(enemy.isDeath(), "the premise: the wearer is dead");
@@ -114,7 +114,7 @@ public class BossMechanicTest {
     @Test
     public void anAttributelessLossDoesNotThrow() {
         Battle battle = newBattle(true);
-        Enemy enemy = battle.enemies.getFirst();
+        Enemy enemy = battle.enemyUnits().getFirst();
 
         Assertions.assertDoesNotThrow(() -> enemy.takeDamage(100),
                 "direct HP loss has no source, so there is nobody to counter");
@@ -180,13 +180,13 @@ public class BossMechanicTest {
     }
 
     private static double enemyLost(Battle battle) {
-        return battle.enemies.getFirst().getMaxHp() - battle.enemies.getFirst().getCurrentHp();
+        return battle.enemyUnits().getFirst().getMaxHp() - battle.enemyUnits().getFirst().getCurrentHp();
     }
 
     /** The hero's basic attack on the enemy. */
     private static void attack(Battle battle) {
         battle.castImmediate(battle.characters.getFirst().getSkills().get(SkillType.COMMON),
-                battle.characters.getFirst(), List.of(battle.enemies.getFirst()));
+                battle.characters.getFirst(), List.of(battle.enemyUnits().getFirst()));
     }
 
     private static double heroHp(Battle battle) {

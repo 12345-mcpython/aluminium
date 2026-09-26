@@ -197,7 +197,7 @@ public class RelicAbilityBattleTest {
         Character skillUser = onSkill.characters.getFirst();
         double skillBefore = skillUser.getAttribute(AttributeType.ATTACK).get();
         onSkill.castImmediate(skillUser.getSkills().get(SkillType.SKILL), skillUser,
-                List.of(onSkill.enemies.getFirst()));
+                List.of(onSkill.enemyUnits().getFirst()));
 
         List<DoubleValue.Modifier> buffs = buffsOn(skillUser, AttributeType.ATTACK);
         Assertions.assertEquals(1, buffs.size(),
@@ -278,7 +278,7 @@ public class RelicAbilityBattleTest {
         // Six of the wearer's own attacks: the sixth application is already past the cap.
         for (int i = 0; i < 6; i++) {
             battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
-                    List.of(battle.enemies.getFirst()));
+                    List.of(battle.enemyUnits().getFirst()));
         }
         Assertions.assertEquals(baseBuffs + STREETWISE_MAX_STACKS,
                 buffsOn(hero, AttributeType.ATTACK).size(),
@@ -292,7 +292,7 @@ public class RelicAbilityBattleTest {
         battle.grantShield(hero, 10_000_000);
         double hpBefore = hero.getCurrentHp();
         for (int i = 0; i < 3; i++) {
-            battle.applyDamage(hero, new Damage(battle.enemies.getFirst(), hero,
+            battle.applyDamage(hero, new Damage(battle.enemyUnits().getFirst(), hero,
                     DamageElement.PHYSICAL, 1_000));
         }
         Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE,
@@ -318,7 +318,7 @@ public class RelicAbilityBattleTest {
 
         battle.grantShield(hero, 10_000_000);
         double hpBefore = hero.getCurrentHp();
-        battle.applyDamage(hero, new Damage(battle.enemies.getFirst(), hero,
+        battle.applyDamage(hero, new Damage(battle.enemyUnits().getFirst(), hero,
                 DamageElement.PHYSICAL, 1_000));
 
         Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE,
@@ -350,7 +350,7 @@ public class RelicAbilityBattleTest {
         int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
 
         battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemyUnits().getFirst()));
         Assertions.assertEquals(baseBuffs + 1, buffsOn(hero, AttributeType.ATTACK).size());
 
         for (int turn = 0; turn < 10; turn++) {
@@ -375,7 +375,7 @@ public class RelicAbilityBattleTest {
         double baseAttack = hero.getAttribute(AttributeType.ATTACK).get();
 
         battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemyUnits().getFirst()));
 
         Assertions.assertTrue(buffsOn(hero, AttributeType.ATTACK).isEmpty(),
                 "three pieces is one short of the 4-piece bonus");
@@ -405,7 +405,7 @@ public class RelicAbilityBattleTest {
         Battle battle = newBattle(List.of(himeko), true);
         double before = himeko.getAttribute(AttributeType.ATTACK).get();
 
-        battle.applyAdditionalDamage(himeko, battle.enemies.getFirst(), DamageElement.FIRE, 100);
+        battle.applyAdditionalDamage(himeko, battle.enemyUnits().getFirst(), DamageElement.FIRE, 100);
 
         List<DoubleValue.Modifier> buffs = buffsOn(himeko, AttributeType.ATTACK);
         Assertions.assertEquals(1, buffs.size(),
@@ -431,7 +431,7 @@ public class RelicAbilityBattleTest {
         double before = himeko.getAttribute(AttributeType.ATTACK).get();
 
         battle.castImmediate(himeko.getSkills().get(SkillType.COMMON), himeko,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemyUnits().getFirst()));
 
         Assertions.assertEquals(before, himeko.getAttribute(AttributeType.ATTACK).get(), TOLERANCE,
                 "only an additional-damage instance is a follow-up attack; a basic attack is not");
@@ -449,9 +449,9 @@ public class RelicAbilityBattleTest {
         Battle battle = newBattle(List.of(himeko), true);
         double base = himeko.getAttribute(AttributeType.ATTACK).get();
 
-        battle.applyAdditionalDamage(himeko, battle.enemies.getFirst(), DamageElement.FIRE, 100);
+        battle.applyAdditionalDamage(himeko, battle.enemyUnits().getFirst(), DamageElement.FIRE, 100);
         double afterFirst = himeko.getAttribute(AttributeType.ATTACK).get();
-        battle.applyAdditionalDamage(himeko, battle.enemies.getFirst(), DamageElement.FIRE, 100);
+        battle.applyAdditionalDamage(himeko, battle.enemyUnits().getFirst(), DamageElement.FIRE, 100);
 
         List<DoubleValue.Modifier> buffs = buffsOn(himeko, AttributeType.ATTACK);
         Assertions.assertEquals(1, buffs.size(),
@@ -468,7 +468,7 @@ public class RelicAbilityBattleTest {
         Character himeko = wearing(HIMEKO, CONVERGING_STARS);
         Character mate = plain(HIMEKO);
         Battle battle = newBattle(List.of(himeko, mate), true);
-        Enemy enemy = battle.enemies.getFirst();
+        Enemy enemy = battle.enemyUnits().getFirst();
         double wearerBefore = himeko.getAttribute(AttributeType.CRIT_ATTACK).get();
         double mateBefore = mate.getAttribute(AttributeType.CRIT_ATTACK).get();
 
@@ -538,7 +538,7 @@ public class RelicAbilityBattleTest {
 
     /** Settles one hit and returns how much HP the enemy lost. */
     private static double hitFor(Battle battle, boolean followUp) {
-        Enemy enemy = battle.enemies.getFirst();
+        Enemy enemy = battle.enemyUnits().getFirst();
         Character hero = battle.characters.getFirst();
         double before = enemy.getCurrentHp();
         if (followUp) {
@@ -592,7 +592,7 @@ public class RelicAbilityBattleTest {
     /** Casts the character's ultimate for real (through {@code Battle.castUltra}, energy gate included). */
     private static boolean castUltimate(Battle battle, Character hero) {
         hero.setCurrentEnergy(hero.getMaxEnergy());
-        return battle.castUltra(hero, List.of(battle.enemies.getFirst()));
+        return battle.castUltra(hero, List.of(battle.enemyUnits().getFirst()));
     }
 
     /** The modifiers a buff has installed on one attribute, in application order. */

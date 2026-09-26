@@ -68,8 +68,8 @@ public class StageFactoryTest {
 
         Assertions.assertTrue(high.level() > low.level(), "the two chosen stages should have different levels");
 
-        Enemy lowEnemy = battle(103201).enemies.getFirst();
-        Enemy highEnemy = battle(103203).enemies.getFirst();
+        Enemy lowEnemy = battle(103201).enemyUnits().getFirst();
+        Enemy highEnemy = battle(103203).enemyUnits().getFirst();
 
         Assertions.assertTrue(highEnemy.getMaxHp() > lowEnemy.getMaxHp(),
                 "a monster in a higher-level stage should have more HP (low: " + lowEnemy.getMaxHp()
@@ -86,7 +86,7 @@ public class StageFactoryTest {
         Battle battle = StageFactory.load(103201, StageFactory.realTeam(), new Random(1));
 
         Assertions.assertEquals(stage.monsterIds(0).size(), battle.enemies.size());
-        for (Enemy enemy : battle.enemies) {
+        for (Enemy enemy : battle.enemyUnits()) {
             Assertions.assertFalse(enemy.isDeath());
             Assertions.assertTrue(enemy.getMaxHp() > 0);
             Assertions.assertEquals(stage.level(), enemy.getLevel(),
@@ -142,7 +142,7 @@ public class StageFactoryTest {
         WaveManager waves = battle.getWaveManager();
         Assertions.assertEquals(0, waves.getWaveIndex());
 
-        for (Enemy enemy : battle.enemies) {
+        for (Enemy enemy : battle.enemyUnits()) {
             enemy.takeDamage(999_999_999);
         }
         battle.processRequests();
@@ -245,7 +245,7 @@ public class StageFactoryTest {
                     .append(" speed=").append(signal.getSpeed())
                     .append('\n');
         }
-        for (Enemy enemy : battle.enemies) {
+        for (Enemy enemy : battle.enemyUnits()) {
             text.append(enemy.getName()).append(" hp=").append(enemy.getMaxHp()).append('\n');
         }
         return text.toString();

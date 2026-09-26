@@ -369,13 +369,13 @@ public final class SkillExecutor {
 
             case AOE_ATTACK -> {
                 double stance = data.getStanceList().all();
-                for (Enemy target : battle.targetableEnemies()) {
+                for (CanHit target : battle.targetableEnemies()) {
                     totalDamage += hit(battle, data, user, element, base, target, hitTargets, stance);
                 }
             }
 
             case BLAST -> {
-                List<Enemy> alive = battle.targetableEnemies();
+                List<CanHit> alive = battle.targetableEnemies();
                 int center = alive.indexOf(mainTarget);      // position order = battle.enemies order
                 double centreStance = data.getStanceList().single();
                 double neighbourStance = data.getStanceList().spread();
@@ -402,7 +402,7 @@ public final class SkillExecutor {
                 for (int i = 0; i < hits; i++) {
                     // re-fetch the living targets for each hit: if one is killed mid-way, switch
                     // target instead of wasting hits on a corpse
-                    List<Enemy> alive = battle.targetableEnemies();
+                    List<CanHit> alive = battle.targetableEnemies();
                     if (alive.isEmpty()) {
                         break;                                     // all dead → the remaining hits are forfeited
                     }

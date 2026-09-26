@@ -514,7 +514,7 @@ public class ResourceTest {
     }
 
     private static Enemy firstEnemy(Battle battle) {
-        return battle.enemies.getFirst();
+        return battle.enemyUnits().getFirst();
     }
 
     // --- tiny builders so a rule can be written readably in one line -------------------------

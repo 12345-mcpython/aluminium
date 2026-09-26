@@ -162,6 +162,7 @@
 | **DOT 并入 buff 体系** | **DOT 不再是第二套机制**（P10-0）：`DotBuff extends AbstractBuff`，删掉 `models/Dot` / `Enemy.dots` / `tickDots(Enemy)`；角色与敌人走同一条 DOT 路径，demo 数值逐位不变，见 `engine.md` §8.5 |
 | **击破控制状态** | **控制 = 数据组合，不是新类**（P10-2）：`ControlEffect` 表 + `StunBuff`/`StatModifierBuff`/`delayMovePercent` 三个现成原语；冰=锁行动、量子/虚数=减速+推条；**冻结"+30% 受伤"被数据推翻**（原文是每回合冰伤），见 `engine.md` §8.6 |
 | **推条不再被速度变化吃掉** | **L-26 已修**：`delayAction`/`advanceAction` 同步 `Signal.remaining`，`refreshSpeed` 去掉进度**上**钳（被推条的单位合法地超过一整轮）。之前量子/虚数击破的"减速+推条"里推条完全不可观测（28.409 加不加都一样）；现在 `QueueActionManipulationTest.aDelaySurvivesASpeedChange` 钉住，**两半各自都能让它变红**，见 `engine.md` §5.1/§5.2 |
+| **敌方阵营不再只收怪** | **L-8 一半已修**：`Battle.enemies` = `List<CanHit>`（构造器拷贝，不再别名调用方 list），`enemyUnits()` 才是其中的 `Enemy`；`targetableEnemies()`/`aliveEnemies()` 一并放宽，胜负判定按**整阵营**。敌方召唤物从"类型上无处安放"变成"收得下"，`EnemyCampSummonTest` 4 条钉住，见 `engine.md` §7 |
 | **技能几率可读** | **描述文本自己说了下标**（P10-6）：`SkillData.debuffChance()` 按"紧挨着 基础概率/固定概率 的占位符"定位，5 个真实样本标定（0.6 / 0.5 是关键），28 条 `Impair` 全覆盖 —— 计划里"取 `param_list` 第 3 项"会读出 15（秒数）并夹成"必定命中" |
 
 ### 🚧 部分完成
@@ -648,6 +649,12 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 - **依赖**：P9-2、P5-5
 
 ### P9-4 召唤物（`summon_id` 机制）
+
+- **⚠ 结构障碍已清除（2026-09-26，L-8）**：`Battle.enemies` 曾是 `List<Enemy>`，敌方召唤物**无处安放**。
+  现在是 `List<CanHit>`，`enemyUnits()` 才是"其中的怪"；引擎的目标表与胜负判定都按**整阵营**走。
+  能力回归：`EnemyCampSummonTest` 4 条（含"打死所有怪但召唤物还站着不算赢"）。
+  **剩下的都是内容活**：谁来创建召唤物（`monster_config.summon_id` / `SkillEffectType.SUMMON`）、
+  面板快照、连携攻击、我方召唤物入场。
 
 - **目标**：`monster_config.summon_id` 生效：敌人技能召唤实体入战，实体可受击、会死亡移除。
 - **涉及文件**：`models/Summon.java`（现有骨架，**全项目没有 `new Summon(...)`**）、新建 `utils/SummonFactory.java`、

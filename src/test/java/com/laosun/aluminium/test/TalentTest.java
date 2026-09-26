@@ -344,7 +344,7 @@ public class TalentTest {
     }
 
     private static Enemy firstEnemy(Battle battle) {
-        return battle.enemies.getFirst();
+        return battle.enemyUnits().getFirst();
     }
 
     /** Advances until {@code actor}'s turn, then has it use {@code skill} on {@code targets}. */
