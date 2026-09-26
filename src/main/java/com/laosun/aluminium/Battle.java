@@ -9,6 +9,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buffs.DotBuff;
+import com.laosun.aluminium.models.buffs.StatModifierBuff;
+import com.laosun.aluminium.models.buffs.StunBuff;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
 import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;
@@ -603,6 +605,69 @@ public class Battle {
                 BreakDamageCalculator.breakBaseOf(attacker) * effect.dotRatio(), effect.dotTurns()));
     }
 
+    /**
+     * The control part of a weakness break (P10-2): the element's own extra action delay, plus the control
+     * state itself.
+     *
+     * <p><b>What the three non-damaging elements do, and how that was decided.</b> The plan said "冻结期受
+     * 伤害 +30% 施加控制" — a guess. The encyclopedia text was probed instead, and it says something else,
+     * consistently across every source that describes the states:
+     * <ul>
+     *   <li>冻结 — {@code "冻结状态下，敌方目标不能行动同时每回合开始时受到等同于<施法者>#4%攻击力的冰属性伤害"}
+     *       (深寒徘徊者 / 永冬灾影 / 三月七 / 杰帕德 / 镜流, six independent entries). The damage is <b>ice
+     *       damage over time</b>, not a "taken +30%" multiplier — which is why it is <b>not</b> implemented
+     *       here: it is a DOT whose ratio is not in the data, and {@code BreakEffect.dotRatio} is that field.
+     *       See the TODO in P10-2 rather than a number invented here.</li>
+     *   <li>禁锢 — {@code "禁锢状态下，敌方目标行动延后#2%，速度降低#4%"} (瓦尔特).</li>
+     *   <li>纠缠 — {@code "「纠缠」会使敌人行动延后，并在敌人下次行动时对其造成额外的量子属性伤害"}
+     *       (explicitly about 弱点击破 with Quantum). The delayed damage is again a DOT, left to the same
+     *       TODO.</li>
+     * </ul>
+     * So all three are <b>行动延后</b>, and the difference is 冻结 = cannot act (here: {@code StunBuff})
+     * versus 禁锢/纠缠 = acts but slower (here: a {@code SPEED} debuff). Both are existing primitives —
+     * which is the point of a control being data and not a class.
+     *
+     * <p><b>No effect-hit roll, and no {@code resistKey} lookup, on this path.</b> A break is not a resisted
+     * debuff: it happens because the toughness bar emptied. {@code ControlEffect.resistKey} is for the
+     * <i>skill</i>-applied case, which goes through {@link #tryApplyDebuff}, and letting a monster's
+     * {@code STAT_CTRL_*} resistance cancel a break would make a weakness break silently do nothing.
+     *
+     * @param enemy   the enemy that was just broken
+     * @param element the break element
+     */
+    private void attachBreakControl(Enemy enemy, DamageElement element) {
+        Constant.BreakEffect breakEffect = Constant.BREAK_EFFECTS.get(element);
+        if (breakEffect == null) {
+            return;
+        }
+        // Order: the state first, the one-off push last.
+        //
+        // This is not cosmetic. A speed change *reschedules* the pending action -- Signal.refreshSpeed
+        // recomputes nextActionTime from the progress the unit already made -- so a push applied before the
+        // slow is recomputed away, and a 20% extra delay becomes unobservable. (Measured, not assumed: with
+        // the push first, the observed action-value change for a Quantum break was identical with and without
+        // the extra delay.) A one-off push must therefore be the LAST write to the action bar, so that
+        // nothing after it can recompute it.
+        Constant.ControlEffect control = breakEffect.controlEffect();
+        if (control != null) {
+            if (control.blocksAct()) {
+                enemy.getBuffManager().addBuff(new StunBuff(control.turns()));
+            }
+            if (control.slowPercent() > 0) {
+                // percentDebuff takes the negative value itself, so the call site reads "SPEED -20%".
+                enemy.getBuffManager().addBuff(StatModifierBuff.percentDebuff(
+                        AttributeType.SPEED, -control.slowPercent(), control.turns()));
+            }
+        }
+        if (breakEffect.delayPercent() > 0) {
+            // An instant push, not a buff: 禁锢/纠缠's "行动延后" is a one-off on the action bar, so it must
+            // not expire with the state (a state that lasts 1 turn leaving a delay that outlives it is the
+            // data's own behaviour). Kept outside the control block so that an element may carry extra
+            // delay without a state, and so the four DOT elements (delayPercent = 0) are untouched.
+            delayMovePercent(enemy, breakEffect.delayPercent());
+        }
+    }
+
     public boolean performAction(Skill skill, List<? extends CanHit> targets) {
         if (currentMove == null || skill == null || targets == null) {
             return false;
@@ -905,6 +970,7 @@ public class Battle {
                 BreakDamageCalculator.build(attacker, enemy, element, consumed), EnergyGrant.KILL_ONLY); // P4-3
         delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // P4-4 action delay
         attachBreakDot(attacker, enemy, element);                                                  // P4-5 DOT
+        attachBreakControl(enemy, element);                                                        // P10-2 control state
         gainBreakEnergy(attacker, enemy);            // P3-3
         return new StanceResult(consumed, overkill, breakDamage, true);
     }

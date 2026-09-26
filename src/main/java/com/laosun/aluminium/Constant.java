@@ -376,44 +376,149 @@ public final class Constant {
     public static final int DOT_TURNS = 3;
 
     /**
-     * One element's weakness-break effect (P10-1).
+     * One element's weakness-break effect (P10-1 structure, P10-2 control).
      *
-     * <p>⚠ <b>Structure only — the numbers are not filled in.</b> The four damaging elements reuse
-     * {@link #DOT_RATIO} / {@link #DOT_TURNS} so this table reproduces the previous behaviour exactly, and
-     * the three control elements carry {@code dotRatio == 0} with the control's name recorded but no
-     * behaviour: their real parameters belong with P10-2's control state machine, and inventing numbers for
-     * them here would be exactly the "example value that looks like data" this project keeps refusing.
+     * <p>⚠ <b>Still structure over data.</b> The four damaging elements reuse {@link #DOT_RATIO} /
+     * {@link #DOT_TURNS} so this table reproduces the pre-table behaviour exactly, and the numbers of the
+     * three control elements are <b>example values marked {@code TODO data}</b> — see
+     * {@link #CONTROL_EFFECTS}. What is real here is the <b>shape</b>: every element now says what it does
+     * (a DOT, an extra delay, a control state, or none of those) in one place, instead of the call site
+     * testing set membership and then reaching for loose scalars.
      *
-     * @param dotRatio per-tick DOT damage as a fraction of the break base value (0 = no DOT)
-     * @param dotTurns how many ticks it lasts (0 = no DOT)
-     * @param control  the control effect's name for the three non-damaging elements
-     *                 ({@code "FROZEN"} / {@code "ENTANGLED"} / {@code "IMPRISONED"}), {@code null} when the
-     *                 element has no control part. A string rather than an enum on purpose: P10-2 will
-     *                 introduce the real type, and a half-built enum here would have to be migrated twice.
+     * @param dotRatio     per-tick DOT damage as a fraction of the break base value (0 = no DOT)
+     * @param dotTurns     how many ticks it lasts (0 = no DOT)
+     * @param delayPercent extra action delay on top of the fixed {@link #BREAK_DELAY_RATIO}
+     *                     (0 = the plain 25% only)
+     * @param control      the key of a {@link #CONTROL_EFFECTS} entry, or {@code null} when the element has
+     *                     no control part. A string rather than an enum on purpose: the key is also what the
+     *                     data's own {@code STAT_*} resistance vocabulary is keyed by.
      */
-    public record BreakEffect(double dotRatio, int dotTurns, String control) {
+    public record BreakEffect(double dotRatio, int dotTurns, double delayPercent, String control) {
         /** Whether this element attaches a damage-over-time when it breaks. */
         public boolean hasDot() {
             return dotRatio > 0 && dotTurns > 0;
         }
+
+        /** Whether this element leaves a control state behind. */
+        public boolean hasControl() {
+            return control != null;
+        }
+
+        /**
+         * The control state this element leaves behind, or {@code null}.
+         *
+         * @throws IllegalStateException when {@link #control} names an entry that is not in
+         *         {@link #CONTROL_EFFECTS} — a typo must not degrade into "no control at all"
+         */
+        public ControlEffect controlEffect() {
+            if (control == null) {
+                return null;
+            }
+            ControlEffect effect = CONTROL_EFFECTS.get(control);
+            if (effect == null) {
+                throw new IllegalStateException(
+                        "break effect names the control state '" + control
+                                + "' but CONTROL_EFFECTS has no such entry");
+            }
+            return effect;
+        }
     }
+
+    /**
+     * A control state (P10-2): what sits on the victim while a break's control lasts.
+     *
+     * <p><b>Why this is a table and not a class per state.</b> The three states differ only in numbers and
+     * in one boolean, and the engine already has a primitive for each part — so a control is
+     * <b>composed</b> from them rather than given a class of its own (the P8-0 rule, and the same reason
+     * {@code StatModifierBuff} covers every "attribute X becomes X ⊕ v" buff):
+     *
+     * <table border="1">
+     *   <caption>which existing primitive implements which part</caption>
+     *   <tr><th>part</th><th>primitive</th></tr>
+     *   <tr><td>{@link #blocksAct}</td><td>{@code StunBuff} ({@code canAct() == false})</td></tr>
+     *   <tr><td>{@link #slowPercent}</td><td>{@code StatModifierBuff.percentDebuff(SPEED, …)}</td></tr>
+     *   <tr><td>the delay</td><td>{@code Battle.delayMovePercent} — not a buff, it is an instant push</td></tr>
+     *   <tr><td>{@link #resistKey}</td><td>{@code Battle.hitChance}'s 4th argument (skill-applied only)</td></tr>
+     * </table>
+     *
+     * <p><b>{@link #resistKey} is deliberately not consulted when a <i>break</i> applies the control.</b>
+     * A weakness break is not a resisted debuff: it happens because the toughness bar emptied, and no
+     * monster's {@code STAT_CTRL_*} resistance may cancel it. The key is here because the whole point of
+     * the table is that the same state can also be applied by a skill, and that path goes through
+     * {@code Battle.tryApplyDebuff(…, resistKey)} — where the resistance really does apply.
+     *
+     * @param resistKey   the data's specific-resistance key for this state (what a <i>skill</i> must beat)
+     * @param turns       how many of the victim's turns it lasts
+     * @param blocksAct   {@code true} = the victim cannot act at all; {@code false} = it acts, just slower
+     *                    or later (this is the difference between 冻结 and 禁锢/纠缠)
+     * @param slowPercent SPEED reduction as a decimal (0.2 = −20%), 0 = no slow
+     */
+    public record ControlEffect(String resistKey, int turns, boolean blocksAct, double slowPercent) {
+    }
+
+    /**
+     * The control states a break can leave behind (P10-2), keyed by the name {@link BreakEffect#control}
+     * uses.
+     *
+     * <p>⚠ <b>Every number here is an example value, {@code TODO data}.</b> The data was probed and it does
+     * <b>not</b> contain a break-control table: {@code breaking_rate.json} is level → break base value, and
+     * the only descriptions of these states live in the encyclopedia text, which states the mechanics but
+     * not the numbers. What the text <i>did</i> settle is the mechanics, and two of them contradicted the
+     * plan (recorded in {@code ROADMAP.md} P10-2):
+     * <ul>
+     *   <li>冻结 = <b>不能行动</b>（+ 每回合冰属性伤害）—— the plan said "冻结期受伤害 +30%",
+     *       which nothing in the data supports;</li>
+     *   <li>禁锢 / 纠缠 = <b>行动延后 + 速度降低</b>, and the victim still acts.</li>
+     * </ul>
+     *
+     * <p>{@code turns} is 1 for all three because none of the sources states a break-applied duration, and
+     * 1 is the value that makes the state last exactly the victim's next turn — the smallest thing that is
+     * observably a control. Do not read it as data.
+     */
+    public static final Map<String, ControlEffect> CONTROL_EFFECTS = Map.of(
+            "FROZEN", new ControlEffect("STAT_CTRL_Frozen", 1, true, 0.0),
+            "ENTANGLED", new ControlEffect("STAT_Entangle", 1, false, 0.2),
+            "IMPRISONED", new ControlEffect("STAT_Confine", 1, false, 0.2));
+
+    /**
+     * Extra action delay of a Freeze break, on top of {@link #BREAK_DELAY_RATIO} (**example value,
+     * TODO data**). The encyclopedia text says a 冻结 "行动延后" but gives no break-applied number.
+     */
+    public static final double FREEZE_EXTRA_DELAY = 0.5;
+
+    /**
+     * Extra action delay of an Entanglement break (**example value, TODO data**).
+     */
+    public static final double ENTANGLE_EXTRA_DELAY = 0.2;
+
+    /**
+     * Extra action delay of an Imprisonment break (**example value, TODO data**).
+     */
+    public static final double IMPRISON_EXTRA_DELAY = 0.2;
 
     /**
      * The seven weakness-break effects, by element — the single place the break behaviour is described.
      *
      * <p>Before this, {@code Battle.attachBreakDot} tested membership in a set and then used two loose
-     * scalars, so nothing said what Ice / Quantum / Imaginary do (nothing, as it happens) and a reader of
-     * the call site could believe the three were merely "a different DOT".
+     * scalars, so nothing said what Ice / Quantum / Imaginary do and a reader of the call site could
+     * believe the three were merely "a different DOT". They are not: they carry a <b>control state</b>
+     * ({@link #CONTROL_EFFECTS}) and an extra delay instead.
+     *
+     * <p>The four damaging elements keep {@code delayPercent = 0} and {@code control = null}, which is what
+     * makes this table reproduce their pre-table behaviour exactly.
      */
     public static final java.util.Map<DamageElement, BreakEffect> BREAK_EFFECTS =
             java.util.Map.ofEntries(
-                    java.util.Map.entry(DamageElement.FIRE, new BreakEffect(DOT_RATIO, DOT_TURNS, null)),
-                    java.util.Map.entry(DamageElement.THUNDER, new BreakEffect(DOT_RATIO, DOT_TURNS, null)),
-                    java.util.Map.entry(DamageElement.PHYSICAL, new BreakEffect(DOT_RATIO, DOT_TURNS, null)),
-                    java.util.Map.entry(DamageElement.WIND, new BreakEffect(DOT_RATIO, DOT_TURNS, null)),
-                    java.util.Map.entry(DamageElement.ICE, new BreakEffect(0, 0, "FROZEN")),
-                    java.util.Map.entry(DamageElement.QUANTUM, new BreakEffect(0, 0, "ENTANGLED")),
-                    java.util.Map.entry(DamageElement.IMAGINARY, new BreakEffect(0, 0, "IMPRISONED")));
+                    java.util.Map.entry(DamageElement.FIRE, new BreakEffect(DOT_RATIO, DOT_TURNS, 0, null)),
+                    java.util.Map.entry(DamageElement.THUNDER, new BreakEffect(DOT_RATIO, DOT_TURNS, 0, null)),
+                    java.util.Map.entry(DamageElement.PHYSICAL, new BreakEffect(DOT_RATIO, DOT_TURNS, 0, null)),
+                    java.util.Map.entry(DamageElement.WIND, new BreakEffect(DOT_RATIO, DOT_TURNS, 0, null)),
+                    java.util.Map.entry(DamageElement.ICE,
+                            new BreakEffect(0, 0, FREEZE_EXTRA_DELAY, "FROZEN")),
+                    java.util.Map.entry(DamageElement.QUANTUM,
+                            new BreakEffect(0, 0, ENTANGLE_EXTRA_DELAY, "ENTANGLED")),
+                    java.util.Map.entry(DamageElement.IMAGINARY,
+                            new BreakEffect(0, 0, IMPRISON_EXTRA_DELAY, "IMPRISONED")));
 
     /**
      * Break elements that carry a damage-over-time effect: fire = burn, lightning = shock, physical = bleed,
