@@ -75,7 +75,35 @@ public enum AttributeType {
      */
     @SerializedName("follow_up_damage_boost") FOLLOW_UP_DAMAGE_BOOST("follow_up_damage_boost"),
 
-    @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost");
+    @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost"),
+
+    /**
+     * Damage dealt by <b>basic attacks</b> only (「普攻造成的伤害提高 X%」) — the basic-attack sibling of
+     * {@link #FOLLOW_UP_DAMAGE_BOOST}.
+     *
+     * <p><b>Why a scoped attribute has to exist at all.</b> A basic attack and a skill are both
+     * {@code DamageType.NORMAL}, so the damage <i>type</i> cannot tell them apart — which is why set 108's
+     * "the DMG dealt by their Skill and Ultimate increases by 18%" had no way to be expressed. What can tell
+     * them apart is the category of the cast that produced the instance
+     * ({@code Damage.getCastCategory()}), and {@code Battle.assemble} reads it to pick one of these.
+     *
+     * <p>⚠ <b>Appended at the end of the enum on purpose.</b> {@code CanHit} indexes its attribute array by
+     * {@link #ordinal()}, so inserting these next to {@link #FOLLOW_UP_DAMAGE_BOOST} would renumber every
+     * constant after it — a silent, whole-engine shift. New constants go at the bottom.
+     */
+    @SerializedName("basic_attack_damage_boost") BASIC_ATTACK_DAMAGE_BOOST("basic_attack_damage_boost"),
+
+    /**
+     * Damage dealt by <b>skills</b> only (「战技造成的伤害提高 X%」). See
+     * {@link #BASIC_ATTACK_DAMAGE_BOOST} for why the scope needs its own attribute.
+     */
+    @SerializedName("skill_damage_boost") SKILL_DAMAGE_BOOST("skill_damage_boost"),
+
+    /**
+     * Damage dealt by <b>ultimates</b> only (「终结技造成的伤害提高 X%」). See
+     * {@link #BASIC_ATTACK_DAMAGE_BOOST} for why the scope needs its own attribute.
+     */
+    @SerializedName("ultimate_damage_boost") ULTIMATE_DAMAGE_BOOST("ultimate_damage_boost");
 
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
 

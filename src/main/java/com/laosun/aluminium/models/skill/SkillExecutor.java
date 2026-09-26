@@ -6,6 +6,7 @@ import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.data.SkillEffects;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -461,8 +462,12 @@ public final class SkillExecutor {
             return 0;
         }
         hitTargets.add(target);                      // the fact of hitting (including targets that die afterwards) — "each time 1 target is attacked"
-        // the 4-arg constructor → DamageType.NORMAL; after P8-2 wires up real slots, map by basic attack / skill / ultimate
-        Damage damage = new Damage(user, target, element, base);
+        // The cast's own category rides along (P10-4): it is what `Battle.assemble` reads to apply a scoped
+        // DMG boost ("普攻/战技/终结技造成的伤害提高 X%"), which the damage *type* cannot express -- every
+        // in-battle cast produces DamageType.NORMAL. `data` is null for a hand-made or placeholder skill, and
+        // then the instance has no scoped boost rather than a guessed one.
+        Damage damage = new Damage(user, target, element, DamageType.NORMAL, base,
+                data == null ? SkillCategory.UNSPECIFIED : data.getCategory());
         double settled = battle.applyDamage(target, damage);
         settled += applyStanceDamage(battle, user, element, damage, target, stanceDamage);
         return settled;
