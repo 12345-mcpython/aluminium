@@ -64,7 +64,7 @@ public class SkillExecutorTest {
     /** Fabricated data (this character has no Blast / Bounce). */
     private static Skill fakeSkill(SkillEffectType effect, List<Double> params) {
         SkillData data = new SkillData(1, "Fake", List.of(params), new StanceList(0, 0, 0),
-                DamageElement.ICE, effect, null, 30.0);
+                DamageElement.ICE, effect, null, 30.0, null);
         return new Skill() {
             @Override
             public int getLevel() {

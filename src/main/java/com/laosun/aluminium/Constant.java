@@ -474,11 +474,20 @@ public final class Constant {
      * <p>{@code turns} is 1 for all three because none of the sources states a break-applied duration, and
      * 1 is the value that makes the state last exactly the victim's next turn — the smallest thing that is
      * observably a control. Do not read it as data.
+     *
+     * <p><b>One number did turn out to be traceable after all</b> (P10-6, reading the descriptions):
+     * 瓦尔特's 画地为牢 (1004/7) writes {@code 禁锢状态下，敌方目标行动延后#2%，速度降低#3%} with
+     * {@code param_list = [1, 0.2, 0.1, 15, 0.5]} — i.e. 行动延后 20%, 速度降低 10%. The delay matches
+     * {@link #IMPRISON_EXTRA_DELAY} by coincidence (it was a guess), and {@code slowPercent} for
+     * {@code IMPRISONED} was guessed as 0.2 and is <b>corrected to 0.1</b> from that text. The same
+     * caveat as 冻结 applies: that is a <i>technique</i>-applied 禁锢, not a break-applied one, and no
+     * source gives the latter — so this is the closest available evidence, not a verified break value.
+     * {@code ENTANGLED}'s 0.2 has no source at all and stays a plain guess.
      */
     public static final Map<String, ControlEffect> CONTROL_EFFECTS = Map.of(
             "FROZEN", new ControlEffect("STAT_CTRL_Frozen", 1, true, 0.0),
             "ENTANGLED", new ControlEffect("STAT_Entangle", 1, false, 0.2),
-            "IMPRISONED", new ControlEffect("STAT_Confine", 1, false, 0.2));
+            "IMPRISONED", new ControlEffect("STAT_Confine", 1, false, 0.1));
 
     /**
      * Extra action delay of a Freeze break, on top of {@link #BREAK_DELAY_RATIO} (**example value,
