@@ -309,11 +309,17 @@ public class TriggerTableTest {
     /**
      * An op whose prerequisite phase has not landed is rejected <b>with the phase named</b>, so the
      * author learns what to wait for instead of debugging a rule that can never work.
+     *
+     * <p>⚠ The example moved on 2026-09-27: it used to be {@code APPLY_BUFF}, which is now wired (it puts
+     * the target into a named state — see {@code TriggerStateTest}). {@code REDUCE_TOUGHNESS} is the one
+     * left, and it is spelled out here rather than derived from the interpreter's private set, because this
+     * test is about the <i>message</i>.
      */
     @Test
     public void plannedButUnwiredOpIsRejectedWithThePhaseNamed() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of(), op("APPLY_BUFF", 1.0)))));
+                () -> new TriggerTable(1, List.of(
+                        trigger("ALLY_ATTACK", List.of(), op("REDUCE_TOUGHNESS", 1.0)))));
         Assertions.assertTrue(e.getMessage().contains("roadmap"), e.getMessage());
     }
 
