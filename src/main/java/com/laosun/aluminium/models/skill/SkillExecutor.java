@@ -90,7 +90,7 @@ public final class SkillExecutor {
                                            Set<CanHit> hitTargets, List<? extends CanHit> targets) {
         List<CanHit> hits = List.copyOf(hitTargets);
         List<CanHit> chosen = targets == null ? List.of() : List.copyOf(targets);
-        for (com.laosun.aluminium.models.Character ally : battle.characters) {
+        for (CanHit ally : battle.allies) {
             ally.onSkillCast(battle, user, skill, hits, chosen);
         }
         // P8-7: the same moment, delivered to the data-driven trigger tables.
@@ -437,7 +437,7 @@ public final class SkillExecutor {
             return;                                  // not a single hit landed → does not count as an attack
         }
         List<CanHit> targets = List.copyOf(hitTargets);
-        for (Character ally : battle.characters) {
+        for (CanHit ally : battle.allies) {
             ally.afterAttack(battle, attacker, mainTarget, targets, totalDamage);
         }
     }
