@@ -143,7 +143,29 @@ public final class CharacterFactory {
      * @throws CharacterException if the character does not exist
      */
     public static Character create(int cid, int level, boolean promoted, Weapon weapon, RelicSuit relicSuit) {
-        Character.Builder builder = Character.builder().cid(cid).level(level);
+        return create(cid, level, promoted, weapon, relicSuit, 0);
+    }
+
+    /**
+     * The full entry point: the same character, with a number of active Eidolon ranks (星魂).
+     *
+     * <p><b>Why the rank is a parameter here rather than a lookup.</b> This method is the assembly point — the
+     * one place allowed to go from "which character" to "which rules" (P8-0) — and "which Eidolons are active" is
+     * part of that question. The engine never resolves it from the cid, and a rule that belongs to an Eidolon
+     * carries {@code min_eidolon} so the gate lives in the same file as the mechanic.
+     *
+     * @param eidolonRank how many ranks are active, {@code 0}–{@code Constant.EIDOLON_MAX_RANK} ({@code 0} = none)
+     * @throws IllegalArgumentException when the rank is outside that range — a wrong rank is a content mistake,
+     *                                  and silently clamping it would make an Eidolon quietly not exist
+     */
+    public static Character create(int cid, int level, boolean promoted, Weapon weapon, RelicSuit relicSuit,
+                                   int eidolonRank) {
+        if (eidolonRank < 0 || eidolonRank > Constant.EIDOLON_MAX_RANK) {
+            throw new IllegalArgumentException(
+                    "eidolonRank must be 0-" + Constant.EIDOLON_MAX_RANK + " (0 = no Eidolons), got "
+                            + eidolonRank);
+        }
+        Character.Builder builder = Character.builder().cid(cid).level(level).eidolonRank(eidolonRank);
         if (promoted) {
             builder = builder.isPromote();
         }
