@@ -384,7 +384,13 @@ target != self    发生在我方的别人身上
 hit_count > 0     这次攻击打中了至少 1 个目标
 hit_count == 2    精确命中数
 hp_percent <= 0.5 我自己的血量比例（0.5 = 50%）← 风雪交加 4 件套「回合开始时，若生命百分比 ≤ 50%」
+self has_state 协奏   我处于具名状态【协奏】      ← 知更鸟「处于【协奏】状态时」
+target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡「触电状态下的敌方目标」
 ```
+
+`has_state` 左边可以是 `self` / `actor` / `target`（和身份比较不同，`self` 在这里**是**一个有意义的问题），
+右边是**状态名**：原样匹配、不做大小写折叠（名字是数据，两边的拼写必须一致）。主体不存在时
+（比如无主体的事件问 `target`）**条件不成立**，与身份/数值条件同一条规矩。
 
 左右可以互换（`0 < hit_count`、`0.5 >= hp_percent` 也成立）。**变量是封闭集合**：写错变量名
 在**加载时**就报错，报错信息会列出**全部**已知变量名（由集合本身排序生成，不是手写的，
@@ -393,12 +399,6 @@ hp_percent <= 0.5 我自己的血量比例（0.5 = 50%）← 风雪交加 4 件�
 > ⚠ **`hp_percent` 读的是"主人"（触发规则所属角色）自己的血量**，不是事件里的谁 ——
 > 它是关于"我"的事实，所以没有任何事件需要携带它。空主人 / 最大生命为 0 → `NaN` →
 > 一切比较为 false（不成立就是"不触发"，不是"按 0% 触发"）。
-
-> ⚠ **`actor` 与 `target` 是两件事，混用是最容易犯的错。**
-> `actor` 是"谁干的"，`target` 是"发生在谁身上"。**我被打中时，`actor` 是敌人**，
-> 所以克拉拉的反击必须写 `target == self`；写成 `self`（或 `actor == self`）
-> 是在说"敌人动手时也算我动手"，永远不成立。加载期的变量校验抓不到这个
-> —— 两个名字都合法 —— 只能靠 §4.7 那条"拆掉条件后测试必须变红"来守。
 
 > ⚠ **`actor` 与 `target` 是两件事，混用是最容易犯的错。**
 > `actor` 是"谁干的"，`target` 是"发生在谁身上"。**我被打中时，`actor` 是敌人**，
@@ -418,7 +418,7 @@ hp_percent <= 0.5 我自己的血量比例（0.5 = 50%）← 风雪交加 4 件�
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
 | `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 二选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
-| `APPLY_BUFF` | `buff` / `turns` | ☐ P10-3 |
+| `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 具名状态（见下） |
 | `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
 
 > ⚠ **未接线的 op 是在加载时"响亮地"拒绝的**，报错里点名它归哪个阶段。
@@ -469,8 +469,39 @@ all_allies       我方全体（别名 party）                ← 「我方全�
 - `max_stacks`（别名 `stacks`，**两个都写会被拒**）让重复施加**累加**而不是刷新，
   上限由它给出；不写就是 1，也就是本项目一直以来的"同名 buff 覆盖"。
   上限为 0/负数、超过 `Constant.MAX_STACKS_LIMIT` 都在加载时被拒。
-  ⚠ 这两个新参数写在 `MODIFY_ATTR` **以外**的 op 上也会被拒 —— Gson 对不认识的字段只会
+  ⚠ `max_stacks` 写在 `MODIFY_ATTR` **以外**的 op 上会被拒 —— Gson 对不认识的字段只会
   留 `null`，不检查的话"规则照常加载、效果永远不叠"又成了那种不报错的空操作。
+  （`permanent` 不在这条里：它是**时长**，所以 `APPLY_BUFF` 也接受它 —— 见下一节。）
+
+#### `APPLY_BUFF`：具名状态 ✅
+
+游戏文本里到处是「处于【协奏】状态时」「【转魄】状态下」「触电状态下的敌方目标」，而条件 DSL 之前
+**问不出任何状态** —— 一个本可以纯数据的机制被迫要为每个角色写一个 Java 类。现在两半都齐了：
+
+```json
+{ "on": "SKILL_CAST", "when": ["actor == self"],
+  "do": [ { "op": "APPLY_BUFF", "buff": "增幅", "turns": 2 } ] }          ← 施加状态
+
+{ "on": "ALLY_ATTACK", "when": ["self has_state 增幅"],
+  "do": [ { "op": "MODIFY_ATTR", "attribute": "DAMAGE_PENETRATION", "percent": 0.2, "turns": 2 } ] }
+```
+
+- **状态不是新东西，就是一个"带名字的普通 buff"**（`StateBuff`）—— 正是 DOT 迁移那条教训
+  （DOT 变成普通 buff 之后就白拿了时长 / 叠层 / 驱散 / `hasBuff` 可见性）。所以状态也有回合数、
+  也是 `clearAll` 能清的、也走同一套刷新规则。
+- **它自己不做事**：`applyEffect` / `removeBuff` 是空的。"状态是什么"和"状态改什么"分开写，
+  于是一个状态能驱动多条效果、多条规则能读同一个状态，而状态本身什么都不需要知道。
+- **身份是名字，不是类**：`StateBuff.isSameKind` 比的是**状态名**。默认那套"同类即同名"
+  （`getClass()` 比较，见 L-14）会让施加【协奏】把【转魄】**顶掉** —— 同一个角色的两个无关状态，
+  其中一个静默消失。同名再上仍是**刷新**（引擎一贯的规则）。
+- **时长晚 tick**（`afterMove`）：一个"持续 2 回合"的状态在自己这一回合被施加后，不该在**同一回合**
+  的开头就被减一。
+- `permanent: true` 对状态是**真用法**：镜流的【转魄】就是整场战斗。
+- **尚未覆盖**：`has_state` 现在只认 `StateBuff` 的名字。「触电」这种**由 DOT 表达**的状态、
+  「冻结 / 纠缠 / 禁锢」这种**控制**状态，要等 DOT / 控制那两件把各自的查询接进同一个条件变量
+  —— **JSON 写法不变**，所以到时候数据不用改。
+- 契约：`TriggerStateTest` 11 条。变异 → `target` 读成主人 / 身份退回按类比较 / 条件不看名字 /
+  `permanent` 当成普通状态 / 缺主体反而通过，分别红 **1 / 1 / 2 / 1 / 1**。
 
 #### `permanent` 与 `max_stacks` 的落地形态 ⚠（P10-3 后半）
 
@@ -1636,6 +1667,7 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 | `StunBuff` | 控制 | early buff，`canAct() == false` |
 | `DotBuff` | **生命周期型** | 击破 DOT（P4-5 / P10-0）：只持 `{元素, 每次基础伤害}` + 继承的时长，**不含伤害逻辑** —— 伤害由 `Battle.tickDots` 结算（`tickEffect` 拿不到 `Battle`）。early buff；`canAct()` 恒 `true`（否则燃烧结束时会把主人多冻一回合）；`isSameKind` 恒 `false`（实例身份，见 `engine.md` §8.5）；构造器校验四项输入：来源/元素非 null、`turns >= 1`、`baseDamage` 有限且 `>= 0`（L-12） |
 | `SpeedBoostBuff` / `SuperBreakBuff` / `TauntBuff` | 属性/注入 | 早于 `StatModifierBuff` 的专用类，见各自 Javadoc |
+| `StateBuff` | **生命周期型** | 具名状态（`APPLY_BUFF` 的落地形态）：只持一个**名字** + 继承的时长，`applyEffect` / `removeBuff` 为空 —— 状态是"关于这个单位的事实"，改什么由 `has_state` 条件 + 别的 op 表达（见 §4.6）。`canAct()` 恒 `true`（否则状态一到期就把主人冻一回合）；`isSameKind` **按名字**比（按类比会让【协奏】顶掉【转魄】，见 L-14）；时长**晚 tick**；构造器校验名字非空、`turns >= 1` |
 | `TestBuff` / `TestBuff1` | 测试替身 | 只打日志 |
 | `WeaknessBuff` | ❌ 不存在 | 只有 `DamageHookTest` 里的内嵌测试替身（攻击方侧负面的代表） |
 
