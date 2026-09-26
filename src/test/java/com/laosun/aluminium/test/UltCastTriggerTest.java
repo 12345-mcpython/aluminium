@@ -37,10 +37,16 @@ import java.util.Random;
  * count is a pure count of "which rules ran, how many times" — which is exactly what a contract test
  * needs, and it works without touching the engine's internals.
  *
- * <p>The mutual exclusivity of {@code ULT_CAST} and {@code SKILL_CAST} is pinned here rather than
- * only in the relic tests, because it is an engine-level contract: the condition DSL has no variable
- * for "which kind of cast this was" (see {@code TriggerTable}), so "when the wearer uses their Skill"
- * can only avoid also firing on the ultimate if the two events cannot both fire.
+ * <p>The mutual exclusivity of the cast events is pinned here rather than only in the relic tests,
+ * because it is an engine-level contract: the condition DSL has no variable for "which kind of cast
+ * this was" (see {@code TriggerTable}), so "when the wearer uses their Skill" can only avoid also
+ * firing on the ultimate -- or on a basic attack -- if the events cannot both fire.
+ *
+ * <p><b>2026-09-27: the split is three-way, not two-way.</b> {@code SKILL_CAST} used to mean "any cast
+ * that is not an ultimate", so 普攻 fired it too, and shipped content that says 「施放战技时」 (relic set
+ * 109's ATK buff, Robin's 模进乐段) silently fired on basic attacks. {@code BASIC_ATTACK} now carries
+ * the basic attack, a map attack / technique / talent fires none of the three, and
+ * {@code ALLY_ATTACK} is unchanged (every attack that lands, ultimate included).
  */
 public class UltCastTriggerTest {
 
@@ -56,10 +62,18 @@ public class UltCastTriggerTest {
      */
     private static final double ENEMY_HP = 1_000_000;
 
-    /** The skill-point fingerprint of each event, all different so one number identifies the event. */
+    /**
+     * The skill-point fingerprint of each event, all different so one number identifies the event.
+     *
+     * <p>⚠ Kept small on purpose: the pool <b>caps at 5</b> ({@code Constant.SKILL_POINT_MAX}), so a
+     * combination whose sum exceeds 5 saturates and can no longer tell "one rule fired" from "two".
+     * That is why these are 1/2/3/4 and not, say, 1/2/4/8 — a lesson learned the hard way (8 + 4
+     * reported 5).
+     */
     private static final int ULT_CAST_POINTS = 1;
     private static final int SKILL_CAST_POINTS = 2;
-    private static final int ALLY_ATTACK_POINTS = 4;
+    private static final int BASIC_ATTACK_POINTS = 4;
+    private static final int ALLY_ATTACK_POINTS = 3;
 
     // ==================================================================
     // 1. The wiring itself
@@ -111,8 +125,8 @@ public class UltCastTriggerTest {
     // ==================================================================
 
     /**
-     * An ultimate is {@code ULT_CAST} and <b>not</b> {@code SKILL_CAST}; every other cast is
-     * {@code SKILL_CAST} and not {@code ULT_CAST}.
+     * An ultimate is {@code ULT_CAST} and <b>not</b> {@code SKILL_CAST}; a Skill is {@code SKILL_CAST}
+     * and not {@code ULT_CAST} (the basic-attack half of the split is pinned below).
      *
      * <p>Both rules are in one table with different fingerprints (1 vs 2 points), so a single point
      * count decides which one ran: 1 means only the ultimate rule, 2 means only the skill rule.
@@ -135,6 +149,83 @@ public class UltCastTriggerTest {
         cast(battle, hero, SkillType.SKILL);
         Assertions.assertEquals(SKILL_CAST_POINTS, battle.getSkillPoints(),
                 "a skill must fire ONLY the SKILL_CAST rule");
+    }
+
+    /**
+     * A basic attack is {@code BASIC_ATTACK} and <b>not</b> {@code SKILL_CAST}.
+     *
+     * <p>This pins the over-trigger that had shipped rather than a behaviour that was already right:
+     * {@code SKILL_CAST} used to mean "any cast that is not an ultimate", so relic set 109
+     * (「施放战技时攻击力提高20%」) was handing out its ATK buff on 普攻 as well — and the note inside
+     * that file claimed the emitter's split already covered it. The fingerprints (2 vs 4) say which
+     * rule ran without touching the engine's internals.
+     */
+    @Test
+    public void basicAttackFiresBasicAttackAndNotSkillCast() {
+        Battle battle = battleWith(
+                rule("SKILL_CAST", null, gainSkillPoint(SKILL_CAST_POINTS)),
+                rule("BASIC_ATTACK", null, gainSkillPoint(BASIC_ATTACK_POINTS)));
+        drainSkillPoints(battle);
+
+        cast(battle, battle.characters.getFirst(), SkillType.COMMON);
+        Assertions.assertEquals(BASIC_ATTACK_POINTS, battle.getSkillPoints(),
+                "a basic attack must fire ONLY the BASIC_ATTACK rule: " + SKILL_CAST_POINTS
+                        + " would mean SKILL_CAST fired for 普攻");
+    }
+
+    /** A basic attack is still an attack: {@code ALLY_ATTACK} keeps firing for it. */
+    @Test
+    public void basicAttackStillFiresAllyAttack() {
+        Battle battle = battleWith(
+                rule("SKILL_CAST", null, gainSkillPoint(SKILL_CAST_POINTS)),
+                rule("ALLY_ATTACK", List.of("actor == self", "hit_count > 0"), gainSkillPoint(ALLY_ATTACK_POINTS)));
+        drainSkillPoints(battle);
+
+        cast(battle, battle.characters.getFirst(), SkillType.COMMON);
+        Assertions.assertEquals(ALLY_ATTACK_POINTS, battle.getSkillPoints(),
+                "a basic attack that lands is an attack; " + (ALLY_ATTACK_POINTS + SKILL_CAST_POINTS)
+                        + " would mean SKILL_CAST fired too");
+    }
+
+    /**
+     * The other direction: a Skill is {@code SKILL_CAST} and not {@code BASIC_ATTACK}.
+     */
+    @Test
+    public void skillCastFiresSkillCastAndNotBasicAttack() {
+        Battle battle = battleWith(
+                rule("SKILL_CAST", null, gainSkillPoint(SKILL_CAST_POINTS)),
+                rule("BASIC_ATTACK", null, gainSkillPoint(BASIC_ATTACK_POINTS)));
+        drainSkillPoints(battle);
+
+        cast(battle, battle.characters.getFirst(), SkillType.SKILL);
+        Assertions.assertEquals(SKILL_CAST_POINTS, battle.getSkillPoints(),
+                "a Skill is not a basic attack: " + BASIC_ATTACK_POINTS + " would mean BASIC_ATTACK fired");
+    }
+
+    /**
+     * A map basic attack and a talent are not in-battle casts, so they fire none of the three.
+     *
+     * <p>This is the half of the old behaviour that was <b>removed</b> rather than split: those
+     * categories used to fall into {@code SKILL_CAST} (the {@code else} branch). A rule that needs one
+     * of them must ask for its own event, which is a loud load-time failure until it exists — better
+     * than a rule that fires on something the text never mentioned.
+     */
+    @Test
+    public void aMapAttackAndATalentFireNoCastEvent() {
+        Battle battle = battleWith(
+                rule("ULT_CAST", null, gainSkillPoint(ULT_CAST_POINTS)),
+                rule("SKILL_CAST", null, gainSkillPoint(SKILL_CAST_POINTS)),
+                rule("BASIC_ATTACK", null, gainSkillPoint(BASIC_ATTACK_POINTS)));
+        Character hero = battle.characters.getFirst();
+
+        drainSkillPoints(battle);
+        cast(battle, hero, SkillType.MAZE);
+        Assertions.assertEquals(0, battle.getSkillPoints(), "the overworld attack is not an in-battle cast");
+
+        drainSkillPoints(battle);
+        cast(battle, hero, SkillType.TALENT);
+        Assertions.assertEquals(0, battle.getSkillPoints(),
+                "a talent's attack_type is empty in the data, so there is nothing that says it is a Skill");
     }
 
     /**

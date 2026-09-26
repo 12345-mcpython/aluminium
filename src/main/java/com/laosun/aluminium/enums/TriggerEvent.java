@@ -26,14 +26,31 @@ public enum TriggerEvent {
      */
     ALLY_ATTACK("ALLY_ATTACK", true),
     /**
-     * ✅ An ally cast a skill, including non-damaging ones — but <b>not</b> their Ultimate.
+     * ✅ An ally cast their <b>Skill</b> (the data's {@code BPSkill}) — including non-damaging ones.
      *
-     * <p>⚠ Companion of {@link #ULT_CAST}: the two are mutually exclusive by design. The DSL has no
-     * variable for "which kind of cast this was" (see {@code TriggerTable}'s condition list), so a
-     * rule that means "when the wearer uses their Skill" could not otherwise avoid also firing on the
-     * ultimate. The split is made at the emitter ({@code SkillExecutor.broadcastSkillCast}).
+     * <p>⚠ <b>Narrowed on 2026-09-27.</b> This used to fire for <b>every</b> cast that was not an
+     * ultimate, which silently included basic attacks, techniques, map attacks and talents — so
+     * "when the wearer uses their Skill" content (relic set 109's ATK buff, Robin's 模进乐段) also
+     * fired on 普攻. That is the failure this vocabulary is shaped to prevent: an over-trigger is a
+     * wrong number with no error attached. The three in-battle casts now have three events
+     * ({@link #BASIC_ATTACK} / this / {@link #ULT_CAST}), split at the emitter from the parsed
+     * {@code SkillCategory}, because the condition DSL has no variable for the kind of cast.
      */
     SKILL_CAST("SKILL_CAST", true),
+    /**
+     * ✅ An ally used their <b>basic attack</b> (the data's {@code Normal} — which also covers enhanced
+     * basic attacks, since the data spells both of them {@code Normal}).
+     *
+     * <p>This is the event for "施放普攻后 / after the wearer uses their Basic ATK". It is deliberately
+     * separate from {@link #ALLY_ATTACK}, which fires for <b>any</b> attack that lands (basic attack,
+     * skill, ultimate, follow-up) and is what "after an ally attacks" content wants.
+     *
+     * <p>⚠ Not fired for the <b>map</b> basic attack ({@code MazeNormal}): that hit happens outside
+     * battle, and "after the wearer uses their basic attack" is about a battle turn. Nor for techniques,
+     * assists, elation damage or talents — none of those is an in-battle cast, and inventing an event
+     * for them is how this split got lost the first time.
+     */
+    BASIC_ATTACK("BASIC_ATTACK", true),
     /**
      * ✅ Someone's energy was credited.
      */

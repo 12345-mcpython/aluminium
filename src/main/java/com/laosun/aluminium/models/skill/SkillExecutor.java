@@ -95,52 +95,53 @@ public final class SkillExecutor {
         // P8-7: the same moment, delivered to the data-driven trigger tables.
         //
         // Three events are derived from a cast, because the game's text distinguishes them:
-        //   ULT_CAST     "after the wearer uses their Ultimate"  -- owner filters with `actor == self`
-        //   SKILL_CAST   "when <someone> uses a skill"           -- owner filters with `actor == self`
-        //   ALLY_ATTACK  "after an ally attacks"                 -- owner filters with `actor != self`,
-        //                                                           and can count `hit_count`
-        // "Is this an ultimate" is read from the **parsed skill data** (`SkillCategory.ULTRA`), never
-        // from the skill's name or id: the data is the only place that knows, and a new ultimate must
-        // not need an engine change.
+        //   ULT_CAST      "after the wearer uses their Ultimate"   -- owner filters with `actor == self`
+        //   SKILL_CAST    "when <someone> uses their Skill"        -- owner filters with `actor == self`
+        //   BASIC_ATTACK  "after the wearer uses their Basic ATK"  -- owner filters with `actor == self`
+        //   ALLY_ATTACK   "after an ally attacks"                  -- owner filters with `actor != self`,
+        //                                                             and can count `hit_count`
+        // "Which kind of cast is this" is read from the **parsed skill data** (`SkillCategory` from
+        // `skills.json`'s attack_type), never from a skill's name or slot: the data is the only place
+        // that knows, and a new skill must not need an engine change.
         //
-        // ULT_CAST and SKILL_CAST are **mutually exclusive**. They have to be: a data rule saying
-        // "when the wearer uses their Skill" must not also fire on the ultimate, and the condition DSL
-        // has no variable for "which kind of cast this was" (it only knows actor / target / hit_count).
-        // So the split is made here, at the one place that knows the cast, rather than in the data.
-        // ALLY_ATTACK is **not** part of that split: an ultimate that lands is still an attack.
+        // The split has to be made here rather than in the data, because the condition DSL has no
+        // variable for the kind of cast (it knows actor / target / hit_count only). ⚠ It is also the
+        // bug that this switch exists to close (2026-09-27): before it, SKILL_CAST meant "any cast that
+        // is not an ultimate", so "when the wearer uses their Skill" rules -- relic set 109's ATK buff,
+        // Robin's 模进乐段 -- also fired on basic attacks. An over-trigger is a wrong number with no
+        // error attached, which is exactly what this project treats as the worst failure mode.
+        //
+        // Everything else (technique, map basic attack, assist, elation damage, talents with an empty
+        // attack_type) fires none of the three: those are not an in-battle cast. A rule that needs one
+        // of them must ask for its own event, and until it exists that is a loud load-time failure
+        // rather than a rule that quietly never runs.
+        //
+        // ALLY_ATTACK is **not** part of the split: any attack that lands is still an attack, ultimate
+        // included.
+        //
+        // The buff-level broadcast above is deliberately *not* narrowed the same way: it hands the
+        // listener the Skill object, so a buff reads the category itself when it cares (SkillCastEvent).
         //
         // `actor` = the caster. `target` is left null on purpose: a cast can hit several targets at
         // once, so there is no single subject to hand over -- rules that care about who was hit use
         // `hit_count`, and the per-target events (HP_LOST etc.) carry their own subject.
-        boolean ultimate = isUltimate(skill);
-        if (ultimate) {
-            battle.fireTriggers(TriggerEvent.ULT_CAST, user, null, hits.size(), 0);
-        } else {
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, user, null, hits.size(), 0);
+        // A skill with no data (an EnemySkill, a hand-made placeholder constructed by a test) has no
+        // attack_type to testify and is treated as UNSPECIFIED: it fires none of the three events.
+        // Guessing from the slot instead would make the answer depend on how the skill was built.
+        SkillCategory category = skill == null || skill.getData() == null
+                ? SkillCategory.UNSPECIFIED
+                : skill.getData().getCategory();
+        switch (category) {
+            case ULTRA -> battle.fireTriggers(TriggerEvent.ULT_CAST, user, null, hits.size(), 0);
+            case BPSKILL -> battle.fireTriggers(TriggerEvent.SKILL_CAST, user, null, hits.size(), 0);
+            case NORMAL -> battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, null, hits.size(), 0);
+            default -> {
+                // not an in-battle cast: see above
+            }
         }
         if (!hits.isEmpty()) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, null, hits.size(), 0);
         }
-    }
-
-    /**
-     * Whether a cast is the caster's Ultimate, read from the parsed skill data.
-     *
-     * <p>The category comes from {@code skills.json}'s {@code attack_type} through
-     * {@link SkillData#getCategory()} / {@link SkillCategory#fromString(String)} — the same single
-     * mapping every other "what kind of skill is this" branch uses (see {@code SkillCategory}'s class
-     * Javadoc for why a bare-string comparison is banned). A skill whose data is missing (an
-     * {@code EnemySkill}, a hand-made placeholder) is **not** an ultimate: those have no data to
-     * testify, and guessing from the slot would make the answer depend on how the skill was built.
-     *
-     * @param skill the skill being cast
-     * @return {@code true} only when the data says {@link SkillCategory#ULTRA}
-     */
-    private static boolean isUltimate(Skill skill) {
-        if (skill == null || skill.getData() == null) {
-            return false;
-        }
-        return skill.getData().getCategory() == SkillCategory.ULTRA;
     }
 
     /**
