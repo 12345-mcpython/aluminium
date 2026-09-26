@@ -8,11 +8,6 @@
   ],
   "106": [
     {
-      "require": 2,
-      "ability": "Ability51060",
-      "reason": "\"Reduces DMG taken by 8%.\" Needs a damage-taken reduction that is not an attribute value: MODIFY_ATTR changes an AttributeType, and no attribute expresses 'incoming damage x0.92' (the engine's reduction zone belongs to a buff class, not to the data vocabulary). The duration half of the original gap is closed -- `permanent: true` now exists -- so this is the one remaining blocker."
-    },
-    {
       "require": 4,
       "ability": "Ability51061",
       "reason": "\"At the beginning of the turn, if the wearer's HP percentage is equal to or less than 50%, restores HP equal to 8% of their Max HP and regenerates 5 Energy.\" Half of it is now expressible (TURN_START is wired, and `hp_percent <= 0.5` exists), but the heal cannot be: HEAL's `amount` is a fixed number, and this one is 8% of the wearer's Max HP. Writing a number here would be wrong for every character, so the ability stays registered."
@@ -22,7 +17,7 @@
     {
       "require": 4,
       "ability": "Ability51071",
-      "reason": "\"Increases DMG by the wearer's Skill by 12%. After unleashing Ultimate, increases the wearer's Fire DMG by 12% for the next attack.\" Needs per-skill-type damage bonuses and a consumable 'next attack' duration (a buff that is removed by the next hit it applies to)."
+      "reason": "\"Increases DMG by the wearer's Skill by 12%. After unleashing Ultimate, increases the wearer's Fire DMG by 12% for the next attack.\" The first clause is expressible since 2026-09-27 (SKILL_DAMAGE_BOOST, added with the other attack-type boosts; see engine.md §18.2). What still blocks the ability is the second clause's duration: 'for the next attack' is a buff that is consumed by the next hit it applies to, and the vocabulary has no 'remove this buff when it is used' mechanic."
     }
   ],
   "108": [

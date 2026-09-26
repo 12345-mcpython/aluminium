@@ -1,0 +1,16 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.08,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 106 (戍卫风雪的铁卫 / Guard of Wuthering Snow), 2-piece: \"Reduces DMG taken by #1[i]%.\" param = [0.08]",
+      "note": "A passive with no turn count, so 'permanent: true' rather than a long duration -- and no 'target', which means the wearer, i.e. who the piece is worn by. The negative percent is what makes this 减伤 rather than 易伤: the sign picks the zone (the buff class also refuses the other sign, so a mistake cannot silently become the other zone). ⚠ This is not MODIFY_ATTR: 'incoming damage x0.92' is a damage zone, not an AttributeType, which is exactly why this set sat in _unmodelled.json until MODIFY_DAMAGE_TAKEN existed."
+    }
+  ]
+}

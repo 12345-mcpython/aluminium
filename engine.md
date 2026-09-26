@@ -151,8 +151,8 @@ Damage = skillBaseValue
 | 区 | 计算 | 钳制 | 谁提供 |
 |---|---|---|---|
 | `BoostArea` | `1 + Σ` | 无上限 | 攻击方面板（元素增伤 + 全增伤） |
-| `VulnerableArea` | `1 + Σ` | **≤ 3.5** | 受击方负面（`DamageEvent` 注入） |
-| `ReductionArea` | `Π(1-r)` | **≥ 0.01**，入参 clamp [0,1] | 受击方增益 |
+| `VulnerableArea` | `1 + Σ` | **≤ 3.5** | 受击方负面（`DamageEvent` 注入；数据侧由 `MODIFY_DAMAGE_TAKEN` 的**正数**创建） |
+| `ReductionArea` | `Π(1-r)` | **≥ 0.01**，入参 clamp [0,1] | 受击方增益（数据侧由 `MODIFY_DAMAGE_TAKEN` 的**负数**创建） |
 | `WeaknessArea` | `1 - Σ` | **≥ 0.2** | 攻击方负面 |
 | `CritArea` | 暴击则 `1+暴伤` | ≥ 1.0 | `Battle` 掷骰后写入 |
 | `DefenceArea` | 见下 | ≤ 1.0 | 攻击者等级 + 受击者防御 |
@@ -423,6 +423,7 @@ target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡�
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
 | `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 二选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
+| `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
 | `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 具名状态（见下） |
 | `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
@@ -1670,8 +1671,8 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 |---|---|---|
 | `BoostDamageBuff` | 属性型 | `ALL_DAMAGE_TYPE_BOOST` 加 `rate`（平值），用 `id` 精确摘除 |
 | `StatModifierBuff` | 属性型 | **通用**属性 buff/debuff（`MODIFY_ATTR` 的落地形态）：(属性, modifier 种类, 数值, 时长或 `permanent`, 可选 `maxStacks`)。`isSameKind` = (属性, modifier 种类, buff/debuff) 三元组，`stackGroupKey()` 用同一个三元组决定谁能和谁叠 |
-| `VulnerabilityBuff` | 注入型 | 易伤，受击方负面，`ModifierSource.DEBUFF` |
-| `ReductionBuff` | 注入型 | 减伤，受击方增益，`ModifierSource.BUFF` |
+| `VulnerabilityBuff` | 注入型 | 易伤，受击方负面，`ModifierSource.DEBUFF`；数据侧由 `MODIFY_DAMAGE_TAKEN` 正数创建；三参构造 `(duration, ratio, permanent)` 支持"整场战斗"，且构造器拒绝非正 ratio（"负的易伤"是减伤，另一个类） |
+| `ReductionBuff` | 注入型 | 减伤，受击方增益，`ModifierSource.BUFF`；数据侧由 `MODIFY_DAMAGE_TAKEN` 负数创建，同样支持 `permanent` 与正 ratio 校验 |
 | `StunBuff` | 控制 | early buff，`canAct() == false` |
 | `DotBuff` | **生命周期型** | 击破 DOT（P4-5 / P10-0）：只持 `{元素, 每次基础伤害}` + 继承的时长，**不含伤害逻辑** —— 伤害由 `Battle.tickDots` 结算（`tickEffect` 拿不到 `Battle`）。early buff；`canAct()` 恒 `true`（否则燃烧结束时会把主人多冻一回合）；`isSameKind` 恒 `false`（实例身份，见 `engine.md` §8.5）；构造器校验四项输入：来源/元素非 null、`turns >= 1`、`baseDamage` 有限且 `>= 0`（L-12） |
 | `SpeedBoostBuff` / `SuperBreakBuff` / `TauntBuff` | 属性/注入 | 早于 `StatModifierBuff` 的专用类，见各自 Javadoc |

@@ -69,6 +69,12 @@ public class RelicTriggerTableTest {
      * half). Before either, the ability could only have been modelled by dropping part of its text.
      */
     private static final int NAVIGATOR = 131;
+    /**
+     * 「戍卫风雪的铁卫」 — its 2-piece ("Reduces DMG taken by 8%") needed a damage-taken zone the data could
+     * not reach; authored on 2026-09-27 once {@code MODIFY_DAMAGE_TAKEN} existed. Its 4-piece stays
+     * registered: it heals a <b>percentage of Max HP</b>, which {@code HEAL}'s fixed amount cannot express.
+     */
+    private static final int GUARD_OF_SNOW = 106;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -99,17 +105,18 @@ public class RelicTriggerTableTest {
             CHAMPION + "/" + FOUR_PIECE,
             CONVERGING_STARS + "/" + TWO_PIECE,
             ASHBLAZING + "/" + TWO_PIECE,
-            NAVIGATOR + "/" + FOUR_PIECE);
+            NAVIGATOR + "/" + FOUR_PIECE,
+            GUARD_OF_SNOW + "/" + TWO_PIECE);
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
      *
      * <p>35 ability-only bonuses in total, so this number and {@link #AUTHORED}'s size must always sum
      * to it — that sum is the invariant, the individual values are just where the line currently sits.
-     * It went 28 → <b>27</b> on 2026-09-27, when set 131 moved to the authored side (see
-     * {@link #NAVIGATOR}).
+     * It went 28 → <b>27</b> on 2026-09-27 (set 131, once {@code REMOVE_STACK} existed) and then to
+     * <b>26</b> the same day (set 106's 2-piece, once {@code MODIFY_DAMAGE_TAKEN} existed).
      */
-    private static final int STILL_REGISTERED = 27;
+    private static final int STILL_REGISTERED = 26;
 
     // ==================================================================
     // 1. The shipped rule files
@@ -455,14 +462,15 @@ public class RelicTriggerTableTest {
      * A 2-piece ability with no rule file is registered too, so the registry is not a 4-piece-only list.
      *
      * <p>Six of the 35 ability-only bonuses sit at the 2-piece tier (every planar ornament set's only
-     * ability is one, and one cavern set has an ability-only 2-piece tier), and missing them would hide
+     * ability is one, and two cavern sets have an ability-only 2-piece tier), and missing them would hide
      * a fifth of the gap. It was eight before 326 (City of Converging Stars) and 115 (The Ashblazing
-     * Grand Duke) became authorable.
+     * Grand Duke) became authorable, and <b>five</b> since 2026-09-27, when 106 (Guard of Wuthering Snow)
+     * joined them — its 2-piece needed a damage-taken zone, which {@code MODIFY_DAMAGE_TAKEN} provided.
      */
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(6, twoPiece,
+        Assertions.assertEquals(5, twoPiece,
                 "the ability-only bonuses at the 2-piece tier that are not expressible yet");
     }
 
