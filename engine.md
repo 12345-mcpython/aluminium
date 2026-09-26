@@ -427,7 +427,7 @@ JSON 写法不变。
 |---|---|---|
 | `GAIN_ENERGY` | `amount`，可选 `per_target` | ✅ |
 | `GAIN_SKILL_POINT` | `amount` | ✅ |
-| `HEAL` / `SHIELD` | `amount`，可选 `target` | ✅ |
+| `HEAL` / `SHIELD` | `amount`，可选 `target` —— **或** `scale` + `percent`（按某项生命上限的比例，见下） | ✅ |
 | `EXTRA_TURN` | 可选 `target` | ✅ |
 | `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持） | ✅ |
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |

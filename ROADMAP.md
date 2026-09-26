@@ -161,6 +161,7 @@
 | **天赋与追加攻击** | **天赋 = 数据**（P8-3）：触发器表新增 `DAMAGE` op，倍率取**天赋槽**的 `damage_param`；克拉拉受击反击、希儿击杀再动，见 `engine.md` §4.7 |
 | **攻击类型增伤** | **普攻/战技/终结技各自增伤**（2026-09-27）：三条新属性加算进同一个增伤区，按 `Damage.getCastCategory()` 选 —— `Damage` 现在显式携带施放类别，因为普攻与战技都是 `DamageType.NORMAL`，靠 type 分不开。同日接上 `REMOVE_STACK`（取回叠层）后，**遗器套装 131「星如我见的领航员」已整条建模**（`relic_sets/131.json`，从未建模登记里移出：28→27），见 `engine.md` §18.2 |
 | **易伤 / 减伤** | **受到的伤害提高/降低 = 数据**（2026-09-27）：`MODIFY_DAMAGE_TAKEN`，**正负号决定哪个乘区**（正=易伤、负=减伤），两个 buff 类各自拒绝错号。此前 `MODIFY_ATTR` 够不着它们 —— 它们是乘区不是属性。遗器套装 106「戍卫风雪的铁卫」2 件套因此可建模（未建模 27→26） |
+| **按血条缩放的治疗/护盾** | **「恢复等同于生命上限 X%」= 数据**（2026-09-27）：`HEAL` / `SHIELD` 支持 `scale` + `percent`，两种写法封闭 —— `target_max_hp`（**受治疗者**自己的血条）与 `owner_max_hp`（**规则持有者**的血条，即 `skill_effects.json` 里的 `healer_max_hp`）。量在**目标循环里逐人算**（我方全体回 8% 是每人各自的 8%，不是一个数）。遗器套装 106 的 4 件套因此可建模（未建模 26→25） |
 | **伤害实例条件** | **「对处于 X 状态的目标造成的伤害提高」= 数据**（2026-09-27）：新增结算**前**事件 `DEALING_DAMAGE`（唯一携带 `Damage` 的事件）+ `BOOST_DAMAGE`（只改这一次，不挂 buff、不漏到下一击）；`has_state` 同时认下**四种 DoT 状态名**（灼烧/触电/裂伤/风化 = `DotBuff(element)`，不是 `StateBuff`）。这一条家族是普查里最大的（约 60 个行迹节点），此前完全无法表达 |
 | **DOT 并入 buff 体系** | **DOT 不再是第二套机制**（P10-0）：`DotBuff extends AbstractBuff`，删掉 `models/Dot` / `Enemy.dots` / `tickDots(Enemy)`；角色与敌人走同一条 DOT 路径，demo 数值逐位不变，见 `engine.md` §8.5 |
 | **击破控制状态** | **控制 = 数据组合，不是新类**（P10-2）：`ControlEffect` 表 + `StunBuff`/`StatModifierBuff`/`delayMovePercent` 三个现成原语；冰=锁行动、量子/虚数=减速+推条；**冻结"+30% 受伤"被数据推翻**（原文是每回合冰伤），见 `engine.md` §8.6 |

@@ -15,7 +15,7 @@ import lombok.ToString;
  * {@code ROADMAP.md} P8-7 for the planned ones.
  *
  * <p>Which fields an op reads depends on the op (for example {@code GAIN_ENERGY} uses
- * {@link #amount} while {@code APPLY_BUFF} would use {@link #buffId}); unused fields stay
+ * {@link #amount} while {@code APPLY_BUFF} uses {@link #buff}); unused fields stay
  * {@code null} in the JSON. The interpreter validates the required ones and reports the trigger's
  * origin when something is missing.
  */
@@ -35,6 +35,24 @@ public class EffectSpec {
      */
     @SerializedName("amount")
     private Double amount;
+
+    /**
+     * What a {@code HEAL} / {@code SHIELD} amount is a <b>percentage of</b>, instead of a flat number.
+     *
+     * <p>The game states most heals and shields as a share of somebody's Max HP (「回复等同于 X% 生命上限的生命值」),
+     * and the skill-side loader already carries that idea in {@code skill_effects.json}'s {@code scale} field.
+     * Two spellings, and the set is closed:
+     * <ul>
+     *   <li>{@code "target_max_hp"} — a share of the <b>receiving</b> unit's Max HP (relic set 106's 4-piece:
+     *       "restores HP equal to 8% of their Max HP");</li>
+     *   <li>{@code "owner_max_hp"} — a share of the <b>rule owner's</b> Max HP, i.e. the healer's
+     *       ({@code skill_effects.json} spells this one {@code healer_max_hp}).</li>
+     * </ul>
+     * Stated <b>instead of</b> {@link #amount}, and it requires {@link #percent}: a scale without a magnitude
+     * would say "some share of a Max HP", which is not a number.
+     */
+    @SerializedName("scale")
+    private String scale;
 
     /**
      * Attribute name for {@code MODIFY_ATTR}, matching {@code AttributeType} (e.g. {@code "ATTACK"}).
