@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.StageBean;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Enemy;
+import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.WaveManager;
 import com.laosun.aluminium.utils.StageFactory;
 import org.junit.jupiter.api.Assertions;

@@ -79,6 +79,10 @@ public final class Queue {
      *
      * <p>{@code null} = no extra turn. Identity is compared with {@code ==}; {@code CanHit}
      * does not override equals.
+     * -- GETTER --
+     * Whether an extra turn is currently scheduled; if so, returns that actor (P7-2).
+     * <p>
+     * if there is none.
      */
     private CanHit extraTurnActor;
     /**
@@ -307,6 +311,9 @@ public final class Queue {
             return moveExtraTurn();
         }
         Signal next = heap.peek();
+        if (next == null) {
+            throw new RuntimeException("Queue next shouldn't be null!");
+        }
         double timePassed = Math.max(0, next.getNextActionTime() - elapsed);
         elapsed = Math.max(elapsed, next.getNextActionTime());   // the clock never goes backwards
         // P7 fix E2: record this clock advance on everyone's "cycle progress" ledger, so that a
@@ -444,14 +451,6 @@ public final class Queue {
     }
 
     /**
-     * Whether an extra turn is currently scheduled; if so, returns that actor (P7-2).
-     * {@code null} if there is none.
-     */
-    public CanHit getExtraTurnActor() {
-        return extraTurnActor;
-    }
-
-    /**
      * Resets the **current actor's** action cycle (see {@link #move()}): its next action is
      * one full cycle from now, and it is re-inserted into the heap.
      *
@@ -483,7 +482,7 @@ public final class Queue {
     }
 
     public boolean resetSignal(Signal signal) {
-        if(signal == null || !heap.contains(signal)) {
+        if (signal == null || !heap.contains(signal)) {
             return false;
         }
         heap.remove(signal);

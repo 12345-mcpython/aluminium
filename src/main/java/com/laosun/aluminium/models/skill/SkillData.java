@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.Skill;
@@ -112,10 +112,14 @@ public class SkillData {
      */
     private final String description;
 
-    /** A {@code #N[...]} placeholder in a description; {@code N} is 1-based onto {@code param_list}. */
+    /**
+     * A {@code #N[...]} placeholder in a description; {@code N} is 1-based onto {@code param_list}.
+     */
     private static final java.util.regex.Pattern PLACEHOLDER =
             java.util.regex.Pattern.compile("#(\\d+)\\[[^\\]]*\\]");
-    /** Markup that may sit between a placeholder and the words after it. */
+    /**
+     * Markup that may sit between a placeholder and the words after it.
+     */
     private static final java.util.regex.Pattern MARKUP =
             java.util.regex.Pattern.compile("<[^>]*>|\\\\n");
 
@@ -186,8 +190,8 @@ public class SkillData {
      * chance twice (黑天鹅 1307/4) both spellings point at the same placeholder.
      *
      * @return the chance ({@code param_list} of level 1), or {@code null} when the description states
-     *         no chance at all — which is a real answer, not a failure: 14 of the 28 {@code Impair}
-     *         skills (e.g. 1315/2 波提欧's 【绝命对峙】) apply their effect unconditionally
+     * no chance at all — which is a real answer, not a failure: 14 of the 28 {@code Impair}
+     * skills (e.g. 1315/2 波提欧's 【绝命对峙】) apply their effect unconditionally
      */
     public Double debuffChance() {
         if (description == null || skills.isEmpty()) {
@@ -228,7 +232,7 @@ public class SkillData {
      * {@code switch} to take a position.
      *
      * @return never {@code null}; {@link SkillCategory#UNSPECIFIED} when the data is empty, and
-     *         {@link SkillCategory#UNKNOWN} when the data value is not recognized
+     * {@link SkillCategory#UNKNOWN} when the data value is not recognized
      */
     public SkillCategory getCategory() {
         return SkillCategory.fromString(skillType);

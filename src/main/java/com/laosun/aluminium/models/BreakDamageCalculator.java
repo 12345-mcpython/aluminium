@@ -1,9 +1,11 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.models.enemy.Enemy;
 
 /**
  * Weakness break damage (P4-3).
@@ -112,10 +114,10 @@ public final class BreakDamageCalculator {
      * The effect is the same: neither grants energy gain to the target being hit, and both credit
      * kills to the attacker (the kill side does not look at this flag).
      *
-     * @param attacker          the caster (level decides the break base, attributes decide break effect)
-     * @param enemy             the target (should be in the broken state)
-     * @param element           the element of this segment
-     * @param superBreakStance  the portion of toughness reduction exceeding the remaining toughness
+     * @param attacker         the caster (level decides the break base, attributes decide break effect)
+     * @param enemy            the target (should be in the broken state)
+     * @param element          the element of this segment
+     * @param superBreakStance the portion of toughness reduction exceeding the remaining toughness
      * @return a {@link DamageType#SUPER_BREAK} damage with base already folded
      * @throws IllegalArgumentException no break base for that level (missing data, fail fast)
      */

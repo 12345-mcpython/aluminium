@@ -1,7 +1,9 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.buff;
+
+import com.laosun.aluminium.models.CanHit;
 
 /**
- * Contract of a buff / debuff: {@link com.laosun.aluminium.models.BuffManager} is only responsible
+ * Contract of a buff / debuff: {@link BuffManager} is only responsible
  * for **managing** it (attach / remove / decrement each turn), **changing attributes is the buff's
  * own job** — {@link #applyEffect} attaches the modifier, {@link #removeBuff} takes it off.
  *
@@ -18,6 +20,7 @@ package com.laosun.aluminium.models;
  */
 public interface Buff {
     CanHit getSource();
+
     void setSource(CanHit source);
 
     // true can continue move

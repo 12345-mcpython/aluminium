@@ -5,8 +5,8 @@ import com.laosun.aluminium.beans.EliteGroup;
 import com.laosun.aluminium.beans.HardLevelGroup;
 import com.laosun.aluminium.beans.MonsterConfig;
 import com.laosun.aluminium.beans.MonsterTemplate;
-import com.laosun.aluminium.models.EnemyScaler;
-import com.laosun.aluminium.models.EnemyStats;
+import com.laosun.aluminium.models.enemy.EnemyScaler;
+import com.laosun.aluminium.models.enemy.EnemyStats;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

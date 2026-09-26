@@ -174,7 +174,9 @@ public final class RelicFactory {
         return suit;
     }
 
-    /** Whether a slot of the suit is already taken. See {@link #combinedSuit}. */
+    /**
+     * Whether a slot of the suit is already taken. See {@link #combinedSuit}.
+     */
     private static boolean alreadyWearing(RelicSuit suit, RelicType slot) {
         return switch (slot) {
             case HEAD -> suit.head != null;
@@ -221,12 +223,16 @@ public final class RelicFactory {
                 + (available == null ? "nothing" : available.keySet()) + ")");
     }
 
-    /** The set's English name, for error messages; the id is used when the data has no name. */
+    /**
+     * The set's English name, for error messages; the id is used when the data has no name.
+     */
     private static String nameOf(RelicSet set) {
         return set.name() == null || set.name().english() == null ? "set " + set.setId() : set.name().english();
     }
 
-    /** The part names a set actually has, for error messages. */
+    /**
+     * The part names a set actually has, for error messages.
+     */
     private static String partTypes(RelicSet set) {
         StringJoiner joiner = new StringJoiner(", ");
         for (RelicSet.Part part : set.parts()) {

@@ -1,6 +1,7 @@
 package com.laosun.aluminium.enums;
 
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.models.skill.SkillData;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -21,7 +22,7 @@ import java.util.Map;
  * run side effects (healing, shielding, debuffs, summons...) and therefore must not
  * be fed into the damage pipeline.
  *
- * @see com.laosun.aluminium.models.SkillData#getEffect()
+ * @see SkillData#getEffect()
  */
 public enum SkillEffectType {
     /**
@@ -112,7 +113,7 @@ public enum SkillEffectType {
      *
      * @param string the raw value of the {@code skill_effect} field
      * @return the matching enumeration value, or {@code null} if the string is
-     *         {@code null} or unknown
+     * {@code null} or unknown
      */
     public static SkillEffectType fromString(String string) {
         if (string == null) {

@@ -24,7 +24,9 @@ import java.util.List;
 @Getter
 public class SkillEffectSpec {
 
-    /** {@code "Restore"} or {@code "Defence"} — the same vocabulary as {@code skill_effect}. */
+    /**
+     * {@code "Restore"} or {@code "Defence"} — the same vocabulary as {@code skill_effect}.
+     */
     @SerializedName("effect")
     private String effect;
 
@@ -39,31 +41,45 @@ public class SkillEffectSpec {
     @SerializedName("scale")
     private String scale;
 
-    /** Which parameter row entries to sum, and whether each is a percentage or a flat amount. */
+    /**
+     * Which parameter row entries to sum, and whether each is a percentage or a flat amount.
+     */
     @SerializedName("params")
     private List<Param> params;
 
-    /** The parameter holding the duration, for effects that persist; {@code null} when there is none. */
+    /**
+     * The parameter holding the duration, for effects that persist; {@code null} when there is none.
+     */
     @SerializedName("turns_param")
     private Integer turnsParam;
 
-    /** The authoritative {@code ConfigAbility} formula this entry was cross-checked against. */
+    /**
+     * The authoritative {@code ConfigAbility} formula this entry was cross-checked against.
+     */
     @SerializedName("formula")
     private String formula;
 
-    /** Human-readable provenance. The engine never reads it. */
+    /**
+     * Human-readable provenance. The engine never reads it.
+     */
     @SerializedName("source")
     private String source;
 
-    /** One term of the effect: {@code raw = params[index]}, then either scaled or added flat. */
+    /**
+     * One term of the effect: {@code raw = params[index]}, then either scaled or added flat.
+     */
     @Getter
     public static class Param {
 
-        /** Index into the skill's parameter row (already 0-based: the description writes {@code #1}). */
+        /**
+         * Index into the skill's parameter row (already 0-based: the description writes {@code #1}).
+         */
         @SerializedName("index")
         private int index;
 
-        /** {@code "percent"} (multiply by the scale) or {@code "flat"} (add as-is). */
+        /**
+         * {@code "percent"} (multiply by the scale) or {@code "flat"} (add as-is).
+         */
         @SerializedName("kind")
         private String kind;
     }

@@ -1,7 +1,8 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.utils.AttributeBuilder;
 
 import java.util.*;
@@ -24,11 +25,11 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  *   <li>{@link #printTree(List)} — prints the tree structure for debugging</li>
  * </ul>
  */
-public final class SkillPoint {
+public final class SkillTrace {
     /**
      * Cache of built skill trees, keyed by character ID.
      */
-    private static final Map<Integer, List<SkillPoint>> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<Integer, List<SkillTrace>> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * Unique point ID within the character's tree.
@@ -49,13 +50,13 @@ public final class SkillPoint {
     /**
      * Child nodes in the tree.
      */
-    public List<SkillPoint> children;
+    public List<SkillTrace> children;
     /**
      * Parent node, or null if this is a root.
      */
-    public SkillPoint parent;
+    public SkillTrace parent;
 
-    public SkillPoint() {
+    public SkillTrace() {
         this.children = new ArrayList<>();
     }
 
@@ -69,20 +70,20 @@ public final class SkillPoint {
      * @param cid the character ID
      * @return the list of root skill points, or an empty list if none found
      */
-    public static List<SkillPoint> init(int cid) {
+    public static List<SkillTrace> init(int cid) {
         return CACHE.computeIfAbsent(cid, unused -> buildTree(cid));
     }
 
-    private static List<SkillPoint> buildTree(int cid) {
+    private static List<SkillTrace> buildTree(int cid) {
         List<com.laosun.aluminium.beans.SkillPoint> beanList = Constant.SKILL_POINTS.get(cid);
         if (beanList == null || beanList.isEmpty()) {
             return java.util.Collections.emptyList();
         }
 
-        java.util.Map<Integer, SkillPoint> nodeMap = new java.util.HashMap<>();
+        java.util.Map<Integer, SkillTrace> nodeMap = new java.util.HashMap<>();
 
         for (com.laosun.aluminium.beans.SkillPoint bean : beanList) {
-            SkillPoint node = new SkillPoint();
+            SkillTrace node = new SkillTrace();
             node.pointId = bean.pointId();
             node.pointType = bean.pointType();
             node.attribute = bean.attribute();
@@ -93,14 +94,14 @@ public final class SkillPoint {
 
         for (com.laosun.aluminium.beans.SkillPoint bean : beanList) {
             int pointId = bean.pointId();
-            SkillPoint node = nodeMap.get(pointId);
+            SkillTrace node = nodeMap.get(pointId);
             List<Integer> preIds = bean.prePoint();
 
             if (preIds == null || preIds.isEmpty()) {
                 node.root = true;
             } else {
                 int parentId = preIds.getFirst();
-                SkillPoint parent = nodeMap.get(parentId);
+                SkillTrace parent = nodeMap.get(parentId);
                 if (parent != null) {
                     parent.children.add(node);
                     node.parent = parent;
@@ -111,8 +112,8 @@ public final class SkillPoint {
             }
         }
 
-        java.util.List<SkillPoint> roots = new java.util.ArrayList<>();
-        for (SkillPoint node : nodeMap.values()) {
+        java.util.List<SkillTrace> roots = new java.util.ArrayList<>();
+        for (SkillTrace node : nodeMap.values()) {
             if (node.root) {
                 roots.add(node);
             }
@@ -125,7 +126,7 @@ public final class SkillPoint {
      *
      * @param roots the root nodes to print
      */
-    public static void printTree(List<SkillPoint> roots) {
+    public static void printTree(List<SkillTrace> roots) {
         if (roots == null || roots.isEmpty()) {
             System.out.println("(NO SKILL POINTS)");
             return;
@@ -142,16 +143,16 @@ public final class SkillPoint {
      * @param roots the root nodes to traverse
      * @return a map from attribute type to total bonus value
      */
-    public static Map<AttributeType, Double> sumAttributes(List<SkillPoint> roots) {
+    public static Map<AttributeType, Double> sumAttributes(List<SkillTrace> roots) {
         Map<AttributeType, Double> total = new HashMap<>();
         if (roots == null || roots.isEmpty()) {
             return total;
         }
 
-        Deque<SkillPoint> stack = new ArrayDeque<>(roots);
+        Deque<SkillTrace> stack = new ArrayDeque<>(roots);
 
         while (!stack.isEmpty()) {
-            SkillPoint node = stack.pop();
+            SkillTrace node = stack.pop();
             if (node.attribute != null) {
                 AttributeType type = node.attribute.name();
                 double value = node.attribute.value();
@@ -170,7 +171,7 @@ public final class SkillPoint {
      * @param roots   the root nodes to traverse
      * @param builder the attribute builder to append to
      */
-    public static void appendTo(List<SkillPoint> roots, AttributeBuilder builder) {
+    public static void appendTo(List<SkillTrace> roots, AttributeBuilder builder) {
         Map<AttributeType, Double> total = sumAttributes(roots);
         for (Map.Entry<AttributeType, Double> entry : total.entrySet()) {
             if (PERCENT_TO_BASE.containsKey(entry.getKey())) {
@@ -212,7 +213,7 @@ public final class SkillPoint {
 
         if (children != null && !children.isEmpty()) {
             for (int i = 0; i < children.size(); i++) {
-                SkillPoint child = children.get(i);
+                SkillTrace child = children.get(i);
                 boolean lastChild = (i == children.size() - 1);
                 sb.append(child.toTreeString(prefix + (isTail ? "    " : "│   "), lastChild));
             }

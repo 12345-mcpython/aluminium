@@ -1,17 +1,11 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.event.AttackEvent;
-import com.laosun.aluminium.models.event.BreakEvent;
-import com.laosun.aluminium.models.event.DamageEvent;
-import com.laosun.aluminium.models.event.EnergyEvent;
-import com.laosun.aluminium.models.event.HealEvent;
-import com.laosun.aluminium.models.event.HpLossEvent;
-import com.laosun.aluminium.models.event.KillEvent;
-import com.laosun.aluminium.models.event.SkillCastEvent;
-import com.laosun.aluminium.models.event.SkillPointGainedEvent;
-import com.laosun.aluminium.models.event.SkillPointSpentEvent;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.event.*;
+import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -309,7 +303,7 @@ public class BuffManager {
      */
     public void onSkillPointGained(Battle battle, int amount) {
         for (AbstractBuff buff : List.copyOf(buffs)) {
-            if (buff instanceof SkillPointGainedEvent event) {
+            if (buff instanceof SkillPointEvent event) {
                 event.onSkillPointGained(battle, amount);
             }
         }
@@ -322,7 +316,7 @@ public class BuffManager {
      */
     public void onSkillPointSpent(Battle battle, int amount) {
         for (AbstractBuff buff : List.copyOf(buffs)) {
-            if (buff instanceof SkillPointSpentEvent event) {
+            if (buff instanceof SkillPointEvent event) {
                 event.onSkillPointSpent(battle, amount);
             }
         }

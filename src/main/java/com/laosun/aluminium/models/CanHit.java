@@ -5,21 +5,13 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.event.AttackEvent;
-import com.laosun.aluminium.models.event.BattleEvent;
-import com.laosun.aluminium.models.event.BreakEvent;
-import com.laosun.aluminium.models.event.DamageEvent;
-import com.laosun.aluminium.models.event.EnergyEvent;
-import com.laosun.aluminium.models.event.HealEvent;
-import com.laosun.aluminium.models.event.HpLossEvent;
-import com.laosun.aluminium.models.event.KillEvent;
-import com.laosun.aluminium.models.event.MoveEvent;
-import com.laosun.aluminium.models.event.SkillCastEvent;
-import com.laosun.aluminium.models.event.SkillPointGainedEvent;
-import com.laosun.aluminium.models.event.SkillPointSpentEvent;
+import com.laosun.aluminium.models.buff.BuffManager;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.event.*;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
+import com.laosun.aluminium.models.skill.Skill;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -39,7 +31,7 @@ import java.util.function.Consumer;
 @ToString
 public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, AttackEvent,
         SkillCastEvent, EnergyEvent, HpLossEvent, HealEvent, KillEvent, BreakEvent,
-        SkillPointGainedEvent, SkillPointSpentEvent {
+        SkillPointEvent {
     /**
      * The display name of this entity.
      */

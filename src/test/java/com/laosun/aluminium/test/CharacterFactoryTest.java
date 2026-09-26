@@ -6,7 +6,9 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.SkillPoint;
+import com.laosun.aluminium.models.skill.SkillTrace;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import org.junit.jupiter.api.Assertions;
@@ -93,7 +95,7 @@ public class CharacterFactoryTest {
         CharacterData data = CharacterFactory.data(1204);
         Character jingYuan = CharacterFactory.create(1204, 80);
         double rate = LevelPromotionCalc.calcCharacterRate(80, true);
-        Map<AttributeType, Double> traces = SkillPoint.sumAttributes(SkillPoint.init(1204));
+        Map<AttributeType, Double> traces = SkillTrace.sumAttributes(SkillTrace.init(1204));
 
         double traceAttack = traces.getOrDefault(AttributeType.ATTACK_PERCENT, 0.0);
         double traceDefence = traces.getOrDefault(AttributeType.DEFENCE_PERCENT, 0.0);
@@ -343,8 +345,8 @@ public class CharacterFactoryTest {
     public void factoryCharactersCanJoinABattle() {
         Character jingYuan = CharacterFactory.create(1204, 80);
         Character seele = CharacterFactory.create(1102, 80);
-        com.laosun.aluminium.models.Enemy enemy =
-                com.laosun.aluminium.models.EnemyFactory.create(1002011, 90, 1);
+        Enemy enemy =
+                EnemyFactory.create(1002011, 90, 1);
 
         com.laosun.aluminium.Battle battle = new com.laosun.aluminium.Battle(
                 java.util.List.of(jingYuan, seele), java.util.List.of(enemy), new java.util.Random(0));

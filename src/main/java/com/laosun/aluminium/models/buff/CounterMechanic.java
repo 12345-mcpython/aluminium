@@ -1,9 +1,8 @@
-package com.laosun.aluminium.models.buffs;
+package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.event.HpLossEvent;
 
@@ -46,7 +45,9 @@ public class CounterMechanic extends AbstractBuff implements HpLossEvent {
 
     private final DamageElement element;
 
-    /** Fraction of the <b>wearer's ATK</b> that the counter deals. */
+    /**
+     * Fraction of the <b>wearer's ATK</b> that the counter deals.
+     */
     private final double ratio;
 
     /**

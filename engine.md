@@ -100,7 +100,7 @@
 
 > **`CanHit.getAttribute(HEALTH_PERCENT)` 永远返回 `null`** —— 想读生命值请读 `HEALTH`。
 
-超过 0 个调用方踩这个坑，是因为 `RelicSuit`/`Weapon`/`SkillPoint` 三处都各自先判了
+超过 0 个调用方踩这个坑，是因为 `RelicSuit`/`Weapon`/`SkillTrace` 三处都各自先判了
 `PERCENT_TO_BASE.containsKey(...)`（这个守卫被复制了 3~4 次，是重构点）。
 
 ### 2.4 属性数组 ✅
@@ -239,8 +239,12 @@ Damage = skillBaseValue
 | `HealEvent` | `onHeal(battle, healer, target, actuallyHealed)` | `Battle.heal` | 相关方 + 我方 |
 | `KillEvent` | `onKill(battle, attacker, victim)` | `Battle.applyDamage` 目标由生转死 | 相关方 + 我方 |
 | `BreakEvent` | `onBreak(battle, attacker, target, element)` | `Battle.reduceToughness` 韧性归零那一刻 | 相关方 + 我方 |
-| `SkillPointGainedEvent` | `onSkillPointGained(battle, amount)` | 策略真的入账后 → `Battle` 广播 | **只我方** |
-| `SkillPointSpentEvent` | `onSkillPointSpent(battle, amount)` | 策略真的花掉后 → `Battle` 广播 | **只我方** |
+| `SkillPointEvent` | `onSkillPointGained(battle, amount)` / `onSkillPointSpent(battle, amount)` | 策略真的入账 / 真的花掉后 → `Battle` 广播 | **只我方** |
+
+> 战技点增减共用一个接口 `SkillPointEvent`，两个方法都是 **`default` 空实现** ——
+> 所以只想关心"被消耗"的 buff 只覆盖 `onSkillPointSpent` 就行，不必被迫实现另一个
+> （原来它是 `SkillPointGainedEvent` / `SkillPointSpentEvent` **两个接口**，2026-09-26 合并，
+> 粒度靠 `default` 保住）。
 
 **触发器表专用事件（不是新的 buff 接口）**：`TURN_START` / `TAKING_HIT` 只有
 `TriggerEvent` 一侧，**没有**对应的 `XxxEvent` 接口 —— 见 §4.6「`TURN_START` 与 `MoveEvent` 的关系」。
@@ -1435,7 +1439,7 @@ no-op，用不用这个 provider 都一样；本 provider 管的是"**有**能�
 每 2 次行动 +1、貊泽/大丽花追加攻击 +1、海瑟音开场结界 +1、米沙"每消耗 1 点 → 下次终结技
 +1 段 + 回 2 能量"、花火"消耗战技点时回能 + 溢出储存"）全都没接 → **`F-4`，归 P8-7 触发器表**。
 其中米沙/花火要监听的是"**战技点被消耗**"这件**事**，是 `EnergyProvider` 那种
-"按技能类型查表"的钩子**表达不了**的 —— 需要新事件 `SkillPointSpentEvent` / `SkillPointGainedEvent`。
+"按技能类型查表"的钩子**表达不了**的 —— 需要新事件 `SkillPointEvent`（`onSkillPointSpent` / `onSkillPointGained`）。
 
 #### 收口点与实现细节（P8-4 重构后）
 
@@ -1700,7 +1704,7 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 - ⚠️ `addToSuit` 替换同槽位时**不移除旧的**，`total` 只增不减 → `addMore(bodyA, bodyB)` 会把
   两件身甲都算进面板；`clone()` 只从 6 个槽位重建，因此克隆件与原件可能不一致。
 
-### 12.5 行迹（`SkillPoint`）✅
+### 12.5 行迹（`SkillTrace`）✅
 
 `point.json[cid]` 是带 `pre_point` 的节点列表，`SkillPoint.init(cid)` 按 `pre_point.getFirst()`
 连成树（无前置 = 根），`sumAttributes` DFS 汇总，`appendTo` 追加为 `SKILL_POINT` 来源的修正。

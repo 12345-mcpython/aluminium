@@ -9,7 +9,7 @@ package com.laosun.aluminium.models.energy;
  * energy, e.g. Firefly's 「restores a fixed amount of energy equal to 60% of her own max energy」),
  * so the two cases are modelled explicitly instead of being conflated into one number.
  *
- * @param amount                base energy before {@code (1 + energy regeneration rate)}
+ * @param amount               base energy before {@code (1 + energy regeneration rate)}
  * @param affectedByEfficiency {@code true} = goes through the energy-regeneration formula,
  *                             {@code false} = credited as a fixed value
  */

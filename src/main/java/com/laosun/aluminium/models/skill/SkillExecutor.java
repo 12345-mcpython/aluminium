@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.SkillEffectSpec;
@@ -8,7 +8,12 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.buffs.SuperBreakBuff;
+import com.laosun.aluminium.models.BreakDamageCalculator;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.buff.SuperBreakBuff;
+import com.laosun.aluminium.models.enemy.Enemy;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -83,7 +88,7 @@ public final class SkillExecutor {
                                            Set<CanHit> hitTargets, List<? extends CanHit> targets) {
         List<CanHit> hits = List.copyOf(hitTargets);
         List<CanHit> chosen = targets == null ? List.of() : List.copyOf(targets);
-        for (Character ally : battle.characters) {
+        for (com.laosun.aluminium.models.Character ally : battle.characters) {
             ally.onSkillCast(battle, user, skill, hits, chosen);
         }
         // P8-7: the same moment, delivered to the data-driven trigger tables.
@@ -165,7 +170,7 @@ public final class SkillExecutor {
      * seeing "the cast succeeded but had no effect" does not leave you without a lead.
      */
     private static void logNotDispatched(Skill skill, CanHit user, SkillEffectType effect,
-                                        List<? extends CanHit> targets) {
+                                         List<? extends CanHit> targets) {
         if (!logNotDispatched) {
             return;
         }
@@ -198,11 +203,11 @@ public final class SkillExecutor {
      * diagnostic — {@link #logNotDispatched} names the phase that owns it. Treating "no entry" as
      * "nothing to do" silently is exactly the bug being fixed here, so the distinction is preserved.
      *
-     * @param battle the running battle
-     * @param skill  the skill being cast (its identity keys the table)
-     * @param user   the caster (the {@code healer_*} scales are theirs)
+     * @param battle  the running battle
+     * @param skill   the skill being cast (its identity keys the table)
+     * @param user    the caster (the {@code healer_*} scales are theirs)
      * @param targets who the caller selected
-     * @param effect the parsed effect category, for the diagnostic
+     * @param effect  the parsed effect category, for the diagnostic
      */
     private static void dispatchNonDamaging(Battle battle, Skill skill, CanHit user,
                                             List<? extends CanHit> targets, SkillEffectType effect) {
@@ -424,7 +429,7 @@ public final class SkillExecutor {
      * Additional damage / true damage does not go through here, so it does not recurse.
      */
     private static void broadcastAfterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
-                                            Set<CanHit> hitTargets, double totalDamage) {
+                                             Set<CanHit> hitTargets, double totalDamage) {
         if (hitTargets.isEmpty()) {
             return;                                  // not a single hit landed → does not count as an attack
         }
@@ -473,13 +478,13 @@ public final class SkillExecutor {
      *
      * @param stanceDamage the points this hit actually reduces (0 = this shape does not reduce toughness)
      * @return the damage **additionally** settled by this hit (break damage + super break damage;
-     *         0 = neither). They are settled inside {@code Battle.reduceToughness} / in
-     *         {@link #applySuperBreak}, so they must be accumulated via the return value into this
-     *         attack's total — otherwise {@code AttackEvent.totalDamage} would miss the entire break
-     *         chain.
-     *         <p>Both of these are **derived hits** (already marked {@code notCountsAsAttack()}): they
-     *         do not grant energy to the defender (one attack action grants energy only once, handled
-     *         by the main hit), but a kill still grants energy to the attacker
+     * 0 = neither). They are settled inside {@code Battle.reduceToughness} / in
+     * {@link #applySuperBreak}, so they must be accumulated via the return value into this
+     * attack's total — otherwise {@code AttackEvent.totalDamage} would miss the entire break
+     * chain.
+     * <p>Both of these are **derived hits** (already marked {@code notCountsAsAttack()}): they
+     * do not grant energy to the defender (one attack action grants energy only once, handled
+     * by the main hit), but a kill still grants energy to the attacker
      */
     private static double applyStanceDamage(Battle battle, CanHit user, DamageElement element,
                                             Damage damage, CanHit target, double stanceDamage) {

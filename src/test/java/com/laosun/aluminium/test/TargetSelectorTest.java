@@ -6,11 +6,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Enemy;
-import com.laosun.aluminium.models.EnemyFactory;
-import com.laosun.aluminium.models.EnemySkill;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.ai.TargetSelector;
-import com.laosun.aluminium.models.buffs.TauntBuff;
+import com.laosun.aluminium.models.buff.TauntBuff;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

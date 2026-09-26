@@ -1,7 +1,6 @@
-package com.laosun.aluminium.models.buffs;
+package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import lombok.Getter;
 
@@ -36,7 +35,7 @@ import lombok.Getter;
  * would leak {@code Battle} into every buff), the split is:
  * <ul>
  *   <li><b>lifecycle</b> (duration, expiry, dispel) = this buff, driven by {@link
- *       com.laosun.aluminium.models.BuffManager};</li>
+ *       BuffManager};</li>
  *   <li><b>settlement</b> (the damage itself, which needs the full zone set) = {@code
  *       Battle.tickDots(CanHit)}, which queries this class through {@code BuffManager.allBuffsOf}.</li>
  * </ul>
@@ -105,12 +104,16 @@ public class DotBuff extends AbstractBuff {
         return true;
     }
 
-    /** Nothing to attach: a DOT changes no attribute, it only deals damage when it settles. */
+    /**
+     * Nothing to attach: a DOT changes no attribute, it only deals damage when it settles.
+     */
     @Override
     public void applyEffect(CanHit target) {
     }
 
-    /** Nothing to take off, for the same reason as {@link #applyEffect}. */
+    /**
+     * Nothing to take off, for the same reason as {@link #applyEffect}.
+     */
     @Override
     public void removeBuff(CanHit target) {
     }

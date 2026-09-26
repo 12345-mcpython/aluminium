@@ -1,6 +1,7 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.models.CanHit;
 
 import java.util.List;
 

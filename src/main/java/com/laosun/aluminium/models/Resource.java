@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.enums.ResourceScope;
+import lombok.Getter;
 
 /**
  * A **team-level** numeric resource: it has a current value, a maximum capacity, and an optional
@@ -40,23 +41,30 @@ public class Resource {
      * Resource identifier (e.g. {@code "skill_point"}), used for logging and for the future
      * ResourceManager registry.
      */
+    @Getter
     private final String id;
 
     /**
      * Who this resource belongs to (P8-8). See {@link ResourceScope}.
+     * -- GETTER --
+     * Who this resource belongs to (P8-8).
      */
+    @Getter
     private final ResourceScope scope;
 
     /**
      * The normal cap. {@link #getValue()} only exceeds it while in an overflow state.
      */
+    @Getter
     private final int max;
 
+    @Getter
     private int value;
 
     /**
      * Maximum overflow amount (default 0 = overflow not allowed). See point 2 of the class docs.
      */
+    @Getter
     private int maxOverflow;
 
     /**
@@ -105,27 +113,6 @@ public class Resource {
         this.scope = scope;
         this.max = max;
         this.value = clamp(initial);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    /** Who this resource belongs to (P8-8). */
-    public ResourceScope getScope() {
-        return scope;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public int getMax() {
-        return max;
-    }
-
-    public int getMaxOverflow() {
-        return maxOverflow;
     }
 
     /**
@@ -200,7 +187,7 @@ public class Resource {
      * Spends a value, never dropping below 0, returning the amount **actually spent**.
      *
      * @return the amount actually spent; 0 when the resource is empty (the caller should use this to
-     *         decide that "this spend did not succeed")
+     * decide that "this spend did not succeed")
      */
     public int spend(int delta) {
         if (delta <= 0) {
@@ -220,7 +207,7 @@ public class Resource {
      * can", which suits things like DOT damage.
      *
      * @return whether the spend succeeded (false and the value unchanged when the resource is
-     *         insufficient)
+     * insufficient)
      */
     public boolean spendExactly(int delta) {
         if (delta <= 0) {
@@ -306,7 +293,7 @@ public class Resource {
     }
 
     private int clamp(int raw) {
-        return Math.max(0, Math.min(absoluteMax(), raw));
+        return Math.clamp(raw, 0, absoluteMax());
     }
 
     @Override

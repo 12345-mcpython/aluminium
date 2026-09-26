@@ -1,7 +1,7 @@
 package com.laosun.aluminium.models.skillpoint;
 
 import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Skill;
+import com.laosun.aluminium.models.skill.Skill;
 
 /**
  * The **policy** for skill points (战技点, SP): it pulls "should it be spent, how much, and how does it grow" out of
@@ -50,14 +50,18 @@ public interface SkillPointPolicy {
      * @param skill the skill to cast (not {@code null}; its {@code getData()} may be {@code null},
      *              for example an enemy's {@code EnemySkill})
      * @return whether this action **may continue**; {@code false} means there are not enough resources and the
-     *         caller must abandon this action
+     * caller must abandon this action
      */
     boolean onSkillCast(CanHit user, Skill skill);
 
-    /** The current value. */
+    /**
+     * The current value.
+     */
     int getValue();
 
-    /** The regular maximum. */
+    /**
+     * The regular maximum.
+     */
     int getMax();
 
     /**
@@ -67,7 +71,9 @@ public interface SkillPointPolicy {
      */
     int gain(int delta);
 
-    /** Whether there is enough for one spend ({@code > 0}). */
+    /**
+     * Whether there is enough for one spend ({@code > 0}).
+     */
     boolean canAfford();
 
     /**

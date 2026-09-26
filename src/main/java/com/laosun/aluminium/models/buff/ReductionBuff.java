@@ -1,7 +1,6 @@
-package com.laosun.aluminium.models.buffs;
+package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource;

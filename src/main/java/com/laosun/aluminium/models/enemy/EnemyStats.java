@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.enemy;
 
 /**
  * The final stat sheet of one enemy instance (the output of {@code EnemyScaler}).

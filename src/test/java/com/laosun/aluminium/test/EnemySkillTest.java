@@ -8,9 +8,9 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.Enemy;
-import com.laosun.aluminium.models.EnemyFactory;
-import com.laosun.aluminium.models.EnemySkill;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.enemy.EnemySkill;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

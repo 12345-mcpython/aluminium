@@ -42,7 +42,9 @@ public final class RelicSets {
 
     private static final String RESOURCE = "/data/relic_sets.json";
 
-    /** The file is {@code {"<set id>": {...set...}}}. */
+    /**
+     * The file is {@code {"<set id>": {...set...}}}.
+     */
     private static final Type SHAPE = new TypeToken<Map<String, RelicSet>>() {
     }.getType();
 
@@ -95,7 +97,9 @@ public final class RelicSets {
         return set;
     }
 
-    /** How many times the resource was actually read — lets a test assert "read once". */
+    /**
+     * How many times the resource was actually read — lets a test assert "read once".
+     */
     public static int loadCount() {
         return LOAD_COUNT.get();
     }
@@ -167,11 +171,11 @@ public final class RelicSets {
         List<RelicSet.Part> parts = set.parts() == null ? List.of() : List.copyOf(set.parts());
         List<RelicSet.Effect> effects = set.effects() == null ? List.of()
                 : set.effects().stream().map(effect -> new RelicSet.Effect(
-                        effect.require(),
-                        effect.desc(),
-                        effect.param() == null ? List.of() : List.copyOf(effect.param()),
-                        effect.properties() == null ? List.of() : List.copyOf(effect.properties()),
-                        effect.ability())).toList();
+                effect.require(),
+                effect.desc(),
+                effect.param() == null ? List.of() : List.copyOf(effect.param()),
+                effect.properties() == null ? List.of() : List.copyOf(effect.properties()),
+                effect.ability())).toList();
         return new RelicSet(set.setId(), set.name(), set.releaseVersion(), parts, effects, set.isPlanar());
     }
 }

@@ -9,6 +9,7 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.RelicSuit;
 import com.laosun.aluminium.models.WaveManager;
 import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ import java.util.Random;
  *
  * <p>Difficulty comes from the stage itself: {@code StageBean}'s {@code hardLevelGroup} +
  * {@code level} are fed straight to
- * {@link com.laosun.aluminium.models.EnemyFactory#create(int, int, int)}, so "the same monster is
+ * {@link EnemyFactory#create(int, int, int)}, so "the same monster is
  * not equally strong in different stages" is decided by the data and the caller does not need to
  * pass any multiplier.
  *
@@ -243,7 +244,7 @@ public final class StageFactory {
      *
      * @param path the character's path
      * @return the cone, or {@code null} when no weapon of that path exists (the caller then leaves the
-     *         character unequipped rather than failing — a weapon is not required to fight)
+     * character unequipped rather than failing — a weapon is not required to fight)
      */
     static Weapon samePathWeapon(Path path) {
         if (path == null || path == Path.OTHER) {
