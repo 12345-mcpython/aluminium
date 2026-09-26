@@ -1,0 +1,20 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 145"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.2,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 307 (盗贼公国塔利亚 / Talia - Kingdom of Banditry), 2-piece: \"Increases the wearer's Break Effect by #1[i]%. When the wearer's SPD is equal to or higher than #2[i], increases the wearer's Break Effect by an extra #3[i]%.\" param = [0.16, 145, 0.2]",
+      "note": "Same shape as set 301: the unconditional \"Break Effect +16%\" is a `properties` stat (BreakDamageAddedRatioBase 0.16) and only the SPD-gated extra is a rule. ⚠ The attribute is spelled BREAKING_EFFECT -- that is AttributeType's name for 击破特攻 (its data property is `BreakDamageAddedRatioBase`); `breaking_effect` also resolves, since the lookup is case-insensitive, but the enum name is what the other rule files use. ⚠ The same BATTLE_START approximation as set 301: \"when the wearer's SPD is >= 145\" is continuous in the text, evaluated once here (no attribute-changed event exists, and a per-turn re-application would stack)."
+    }
+  ]
+}

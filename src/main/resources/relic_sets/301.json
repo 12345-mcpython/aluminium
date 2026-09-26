@@ -1,0 +1,20 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 120"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.12,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 301 (太空封印站 / Space Sealing Station), 2-piece: \"Increases the wearer's ATK by #1[i]%. When the wearer's SPD is equal to or higher than #2[i], the wearer's ATK increases by an extra #3[i]%.\" param = [0.12, 120, 0.12]",
+      "note": "⚠ Only the SECOND sentence is here. The first (\"ATK +12%\") is an unconditional stat and is already applied by RelicSuit from the effect's `properties` (AttackAddedRatio 0.12) -- writing it here as well would double it. This is the shape of every planar-ornament 2-piece: a stat, then a conditional extra, and only the conditional half is a rule. `self_attr:SPEED` reads the wearer's built sheet, which already includes every other equipped piece, so the threshold is judged against the real number. ⚠ APPROXIMATION: the text says \"when the wearer's SPD is >= 120\", i.e. continuously, whereas this is evaluated once at BATTLE_START. The engine has no \"an attribute changed\" event, and re-applying on TURN_START would STACK a permanent modifier every turn. Since SPD at battle start is what decides these ornament thresholds in practice, one evaluation is the honest choice; it is recorded here rather than left implicit."
+    }
+  ]
+}
