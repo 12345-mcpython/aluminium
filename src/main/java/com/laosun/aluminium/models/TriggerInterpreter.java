@@ -10,6 +10,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
+import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.List;
@@ -45,8 +46,11 @@ import java.util.Set;
  *           (&gt; 1) makes re-applications <b>accumulate</b> up to that cap instead of replacing the
  *           previous one; each stack is an ordinary buff instance with its own id, so it can be
  *           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
- *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, {@code turns}</td>
- *       <td>☐ needs a named-buff registry; plain stat buffs are already covered by {@code MODIFY_ATTR}</td></tr>
+ *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, <b>exactly one of</b> {@code turns} / {@code permanent},
+ *       optional {@code target}</td>
+ *       <td>✅ wired — puts the target into a <b>named state</b> ({@code StateBuff}, e.g. 【协奏】/【转魄】/
+ *           【触电】). What the state <i>does</i> is separate effects conditioned on {@code has_state}, which
+ *           keeps "what the state is" apart from "what it changes"; plain stat buffs stay {@code MODIFY_ATTR}</td></tr>
  *   <tr><td>{@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}</td><td>{@code resource}, {@code amount}</td>
  *       <td>✅ wired (P8-8)</td></tr>
  *   <tr><td>{@code REDUCE_TOUGHNESS}</td><td>{@code amount}</td><td>☐ needs an element + enemy target</td></tr>
@@ -64,14 +68,20 @@ public final class TriggerInterpreter {
      */
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
-            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR");
+            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
      * them here (rather than treating them as typos) lets the error message say <i>why</i>.
      */
     private static final Set<String> PLANNED = Set.of(
-            "APPLY_BUFF", "REDUCE_TOUGHNESS");
+            "REDUCE_TOUGHNESS");
+
+    /**
+     * The ops that grant something with a duration, and therefore accept {@code permanent: true}
+     * ("for the rest of the battle"). See {@link #requireNoStackArguments}.
+     */
+    private static final Set<String> OPS_WITH_DURATION = Set.of("MODIFY_ATTR", "APPLY_BUFF");
 
     /**
      * The selectors an effect's {@code target} may name.
@@ -136,6 +146,11 @@ public final class TriggerInterpreter {
                 requirePercent(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireStackCap(effect, op, spec);
+            }
+            case "APPLY_BUFF" -> {
+                requireBuff(effect, op, spec);
+                requireDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
             }
             default -> requireNoStackArguments(effect, op, spec);
         }
@@ -211,6 +226,7 @@ public final class TriggerInterpreter {
             case "SPEND_RESOURCE" -> spendResource(effect, ctx);
             case "DAMAGE" -> damage(battle, effect, ctx);
             case "MODIFY_ATTR" -> modifyAttr(battle, effect, ctx);
+            case "APPLY_BUFF" -> applyState(battle, effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
@@ -397,6 +413,35 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * Settles an {@code APPLY_BUFF} effect: the target enters a <b>named state</b> for a duration.
+     *
+     * <p><b>Why a state and not a stat buff.</b> The rule texts say 「处于【协奏】状态时」/「【转魄】状态下」/
+     * 「触电状态下的敌方目标」 — a <i>fact about the unit</i> that other rules read. {@code MODIFY_ATTR}
+     * already covers "the target's ATTACK changes"; this op covers "the target is now in a state", and the
+     * two compose: the state is applied here, and whatever it changes is a separate effect conditioned on
+     * {@code self has_state …} / {@code target has_state …}. Keeping them apart means one state can drive
+     * several effects (and several rules can read the same state) without the state itself knowing anything.
+     *
+     * <p>The state is an ordinary {@link StateBuff}, so it gets the whole buff lifecycle for free:
+     * duration counted down on the owner's turns, refresh on re-application, removal by
+     * {@code BuffManager.clearAll()}, and visibility to {@code hasBuff}-style queries. Applying a
+     * <b>different</b> state does not evict this one — {@code StateBuff.isSameKind} compares names, not
+     * classes.
+     *
+     * @param effect the effect ({@code buff}, exactly one of {@code turns} / {@code permanent}, optional
+     *               {@code target})
+     * @param ctx    the context
+     */
+    private static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
+        int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+        String state = effect.getBuff().trim();
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            target.getBuffManager().addBuff(new StateBuff(state, turns, permanent));
+        }
+    }
+
+    /**
      * The duration handed to a permanent modifier.
      *
      * <p>Deliberately {@code 1} and not a large number: {@link StatModifierBuff} marks the buff
@@ -504,6 +549,21 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * Validates that an {@code APPLY_BUFF} effect names the state it applies <b>at load time</b>.
+     *
+     * <p>Same discipline as {@link #requireAttribute}: a missing {@code buff} would otherwise reach
+     * {@code StateBuff}, whose constructor rejects it — but that would be a mid-battle exception in the
+     * middle of a turn, instead of "this rule file is wrong" while it is being read.
+     */
+    private static void requireBuff(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getBuff() == null || effect.getBuff().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires \"buff\" (the state name as the rule text spells it, e.g. "
+                            + "\"协奏\") (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
      * Validates that a {@code MODIFY_ATTR} effect declares how long the buff lasts — <b>exactly one</b>
      * of {@code turns} and {@code permanent}.
      *
@@ -527,7 +587,7 @@ public final class TriggerInterpreter {
         }
         if (effect.getTurns() == null) {
             throw new IllegalArgumentException(
-                    "Op " + op + " requires \"turns\" (how long the modifier lasts) or \"permanent\": "
+                    "Op " + op + " requires \"turns\" (how long the buff lasts) or \"permanent\": "
                             + "true (until the battle ends); there is no default "
                             + "(source: " + spec.getSource() + ")");
         }
@@ -580,6 +640,13 @@ public final class TriggerInterpreter {
      * the <b>wrong op</b> is silently ignored — the author sees the rule load and the effect never
      * stack. That is the same class of silent failure the closed op vocabulary exists to prevent, so the
      * arguments are checked here rather than being read only by {@code MODIFY_ATTR}.
+     *
+     * <p>⚠ The two arguments do <b>not</b> belong to the same set of ops, which is why they are checked
+     * separately. {@code permanent} is a <i>duration</i>, and both buff-granting ops have one:
+     * {@code MODIFY_ATTR} grants a modifier and {@code APPLY_BUFF} grants a state, and 「直到战斗结束」 is a
+     * real duration for a state (镜流's 【转魄】 lasts the whole battle). {@code max_stacks} is a
+     * <i>modifier</i> concept and stays exclusive to {@code MODIFY_ATTR}: two states of the same name refresh
+     * each other rather than accumulating.
      */
     private static void requireNoStackArguments(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getMaxStacks() != null || effect.getStacks() != null) {
@@ -587,10 +654,11 @@ public final class TriggerInterpreter {
                     "Op " + op + " does not support \"max_stacks\"/\"stacks\"; only MODIFY_ATTR "
                             + "accumulates (source: " + spec.getSource() + ")");
         }
-        if (Boolean.TRUE.equals(effect.getPermanent())) {
+        if (Boolean.TRUE.equals(effect.getPermanent()) && !OPS_WITH_DURATION.contains(op)) {
             throw new IllegalArgumentException(
-                    "Op " + op + " does not support \"permanent\"; only MODIFY_ATTR has a duration "
-                            + "(source: " + spec.getSource() + ")");
+                    "Op " + op + " does not support \"permanent\"; only "
+                            + String.join(" / ", OPS_WITH_DURATION.stream().sorted().toList())
+                            + " has a duration (source: " + spec.getSource() + ")");
         }
     }
 
