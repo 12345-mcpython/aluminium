@@ -513,19 +513,26 @@ stackGroupKey()        // 同一组才能互相叠；(attribute, modifierType, s
 
 ```
 SkillExecutor.execute
-  └─ Battle.fireTriggers(ULT_CAST, caster, hits, 0)        ← 施放的是终结技时（按解析出的 SkillCategory.ULTRA）
-  └─ Battle.fireTriggers(SKILL_CAST, caster, hits, 0)      ← 其余施放（两者互斥）
+  └─ Battle.fireTriggers(ULT_CAST, caster, hits, 0)        ← 施放的是终结技（解析出的 SkillCategory.ULTRA）
+  └─ Battle.fireTriggers(SKILL_CAST, caster, hits, 0)      ← 施放的是战技（BPSkill）
+  └─ Battle.fireTriggers(BASIC_ATTACK, caster, hits, 0)    ← 施放的是普攻（Normal）
   └─ Battle.fireTriggers(ALLY_ATTACK, caster, hits, 0)     ← 只在命中了目标时（终结技命中同样算）
         └─ 遍历我方每个角色：拿它自己的表
               ├─ 用 (self=它, actor=施放者, target=承受者, hit_count) 匹配规则
               └─ TriggerInterpreter.apply(...) → 真的去 grantEnergy / grantSkillPoint / …
 ```
 
-> ⚠ **`ULT_CAST` 与 `SKILL_CAST` 必须互斥**：条件 DSL 里没有"这次施放是战技还是终结技"这个变量
+> ⚠ **三个"施放"事件互斥，且"其余"什么都不发**：条件 DSL 里没有"这次施放是普攻/战技/终结技"这个变量
 > （只有 `actor` / `target` / `hit_count`），所以「当装备者使用战技时」这条规则只可能靠
-> **发出端分开**来避免连带在终结技上触发。判定读的是**解析出的数据**
-> （`skills.json` 的 `attack_type` → `SkillCategory.ULTRA`），不看技能名、不看槽位。
-> 契约由 `UltCastTriggerTest` 钉住（一次终结技恰好一次、其余槽位不触发、`ALLY_ATTACK` 不受影响）。
+> **发出端分开**来避免连带在普攻或终结技上触发。判定读的是**解析出的数据**
+> （`skills.json` 的 `attack_type` → `SkillCategory`），不看技能名、不看槽位。
+> 秘技 / 地图普攻 / 助战 / 天赋**三者都不发** —— 它们不是"战斗内施放"。
+> 契约由 `UltCastTriggerTest` 钉住（一次终结技恰好一次、战技只发战技、普攻只发普攻、
+> 地图普攻与天赋一个都不发、`ALLY_ATTACK` 不受影响）。
+>
+> ⚠ **2026-09-27 之前这里只有两路**（"终结技 vs 其余"），于是 `SKILL_CAST` 连**普攻**一起收：
+> 遗器套装 109「施放战技时攻击力提高 20%」和知更鸟的 `模进乐段` 都在普攻上白给了一次。
+> 是"把知更鸟做完整"时发现的（`ROBIN` 那条规则本该只在战技上触发），见 `ROADMAP` §12 M-24。
 
 #### `FOLLOW_UP`：追加攻击是**独立事件**，不是"一种攻击"
 
@@ -575,6 +582,11 @@ Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结�
 - **没有文件 = 空表**（`TriggerTable.EMPTY`），这是**正常状态**不是错误 —— 93 个角色
   目前只数据化了 4 个（缇宝 1403 / 知更鸟 1309 / 克拉拉 1107 / 希儿 1102）。
   `Character.triggerTable` **永不为 null**，所以调用点不用判空。
+- **一个角色的文件里可以放多条规则**：知更鸟 1309 是第一个**把行迹（额外能力）也数据化**的 ——
+  天赋 `ALLY_ATTACK`（队友攻击 +2 能量）+ 行迹 `华彩花腔`（`BATTLE_START` → `ADVANCE` 25%）
+  + 行迹 `模进乐段`（`SKILL_CAST` → `GAIN_ENERGY` 5），三条**触发时机各不相同**的规则共处一张表，
+  而且**全程零引擎改动**。这就是"同一角色多机制"的组合测试（`RobinTraceTest` 5 条），
+  也是"角色机制 = 数据"这个说法第一次被一个**完整**角色验证。
 - **文件存在但写得不对 = 抛异常**（未知事件 / 未接线事件 / 条件写错 / op 不存在 /
   缺必填参数），在**加载那一刻**就炸，而不是等战斗打到一半。
 - **懒加载 + 缓存**：按 cid 首次访问才读 classpath，负结果也缓存。
@@ -631,12 +643,14 @@ Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结�
 > ⚠ **反噬**：附加伤害造成掉血 → 再次发 `HP_LOST`。两个互相反击的角色会乒乓到
 > `Battle.MAX_TRIGGER_DEPTH` 然后**抛异常**——响亮地失败，不是把战斗挂死。
 
-**两个样本（都是纯 JSON，零 Java 角色类）**：
+**几个样本（都是纯 JSON，零 Java 角色类）**：
 
 | 角色 | 规则 | 说明 |
 |---|---|---|
 | 克拉拉 1107 `因为我们是家人` | `on: HP_LOST` + `when: ["target == self"]` → `DAMAGE`(`TALENT`, `damage_param: 1`, `target: "attacker"`) | "**我**是挨打的那个" → 打回去 |
 | 希儿 1102 `再现` | `on: KILL` + `when: ["actor == self"]` → `EXTRA_TURN` | "**我**是击杀者" → 立即再动 |
+| 知更鸟 1309 `模进乐段`（行迹） | `on: SKILL_CAST` + `when: ["actor == self"]` → `GAIN_ENERGY` 5 | 是**自己的**战技：`SKILL_CAST` 广播给我方，靠条件收窄 |
+| 知更鸟 1309 `华彩花腔`（行迹） | `on: BATTLE_START` → `ADVANCE` 25% | 没有 actor/subject 的事件照样能用：效果默认作用于**规则持有者** |
 
 希儿为什么不是 `DAMAGE`：她的天赋槽是 `Enhance` / stance 0，**本身不带攻击**，
 所以"消灭敌方目标后立即获得 1 个额外回合"只能落到 `EXTRA_TURN`。
