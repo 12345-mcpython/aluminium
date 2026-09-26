@@ -189,6 +189,9 @@ Damage = skillBaseValue
    后者会把普攻/战技/终结技也一起抬高，而遗器套装 115 的文案只说 Follow-Up ATK。
    ⚠ 同理，**"普攻增伤"也必须是独立属性**：普攻与战技都是 `DamageType.NORMAL`，靠 `type` 分不开，
    只能靠 `Damage` 上那个显式的施放类别。三条属性都加算进**同一个** `BoostArea`，即 `1 + Σ(…)`。
+   ⚠ 最后，**按目标状态条件化的增伤**（「对处于 X 状态的目标造成的伤害提高 Y%」）走的是另一条路：
+   `assemble` 在这里发 `DEALING_DAMAGE`，把待结算的实例交给规则，`BOOST_DAMAGE` 直接往这次的
+   `BoostArea` 里加一项 —— 实例本身就是"状态"，所以没有 buff 要挂、没有东西要清、也不会漏到下一次。
 2. **暴击区**：仅当 `type.isCrittable() && !damage.isCritFixed()` 时掷骰
    （`critRate > 0 && rng.nextDouble() < critRate`）。**这是全引擎唯一的随机点。**
 3. **防御区**：攻击者等级 / 受击者防御 / 攻击者 `DEFENCE_IGNORE`。
@@ -284,6 +287,7 @@ dispatch(consumer, 直接相关方...)
 | `SkillPointGained`/`Spent` | **没花出去就不算消耗**：战技点不足、出手不成立时**不发**（否则米沙/花火那类"每消耗 1 点"的计数器会为没发生的消耗记账）。已满时普攻实际入账 0 → 也不发 |
 | `TriggerEvent.TURN_START`（**无 buff 接口**） | `Battle.beforeMove()`：该单位 buff tick **之后**、`MoveEvent.beforeMove` **之前**。`actor` = 轮到的角色，`target` **也**是它（"回合开始时"的两种写法等价，写哪种都不会哑掉）。**一次回合发一次**（额外回合也算一次）。⚠ 这不是新的 buff 接口 —— 回合边界对 buff 仍然是 `MoveEvent`（见 §4.6） |
 | `TriggerEvent.TAKING_HIT`（**无 buff 接口**） | `Battle.applyDamage`：一次伤害实例**落在活着的、非无敌的目标身上**就发（被盾全额吸收**也算**）。⚠ **与 `HP_LOST` 是两件事**：`HP_LOST` 的口径是"真的掉了血"（`hpLoss > 0` 才发），`TAKING_HIT` 的口径是"挨打了"。遗器/天赋里"受到攻击后"要的是后者 —— 用前者会让带盾角色永远不叠层。`actor` = 伤害来源，`target` = 被打的人（"我被打" = `target == self`），投递口径与 `HP_LOST` 相同（`fireTriggersForAlly`，敌方主体不发） |
+| `TriggerEvent.DEALING_DAMAGE`（**无 buff 接口**） | `Battle.assemble`：一次伤害实例**结算之前**就发，所以规则还来得及改这次伤害 —— 事件把待结算的实例交出来（`TriggerContext.damage()`），`BOOST_DAMAGE` 改的就是它。`actor` = 打人的一方，`target` = 将要挨打的一方（与 `TAKING_HIT` 同口径、从另一侧看）。⚠ **这是唯一携带 `Damage` 的事件**，也是「对处于 X 状态的目标造成的伤害提高 Y%」唯一可能的落点：`ALLY_ATTACK` 在结算**之后**才发，那时数字已经定了。DOT 跳伤 / 击破 / 附加伤害实例**也发**（它们同样是伤害），"只要攻击"由条件自己收窄 |
 
 ### 4.3 其余关键语义
 
@@ -393,6 +397,12 @@ self has_state 协奏   我处于具名状态【协奏】      ← 知更鸟「�
 target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡「触电状态下的敌方目标」
 ```
 
+`has_state` 也认**四种 DoT 状态名**：灼烧 = Fire DoT、触电 = Thunder、裂伤 = Physical、风化 = Wind。
+它们不是 `StateBuff`，而是 `DotBuff(element)` —— 引擎从 P10-0 起就是这么表示的，这里只是把两种拼写对上
+（`BuffManager.hasState` 是唯一知道"两个名字是同一件事"的地方）。⚠ **控制状态（冻结 / 纠缠 / 禁锢）还没有**：
+P10-2 把它们建模成"控制 buff + 推条"的**组合**，"这个单位是否被冻结"需要单独定义，不能靠猜；加进来时
+JSON 写法不变。
+
 `has_state` 左边可以是 `self` / `actor` / `target`（和身份比较不同，`self` 在这里**是**一个有意义的问题），
 右边是**状态名**：原样匹配、不做大小写折叠（名字是数据，两边的拼写必须一致）。主体不存在时
 （比如无主体的事件问 `target`）**条件不成立**，与身份/数值条件同一条规矩。
@@ -424,6 +434,7 @@ target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡�
 | `DAMAGE` | `skill` / `damage_param`，可选 `target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
 | `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 二选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
 | `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
+| `BOOST_DAMAGE` | `percent`（只能挂在 `DEALING_DAMAGE` 上） | ✅ 改**正在结算的那一次**伤害：不改属性、不挂 buff、不会漏到下一次。是「对处于 X 状态的目标造成的伤害提高 Y%」的实现 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
 | `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 具名状态（见下） |
 | `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
