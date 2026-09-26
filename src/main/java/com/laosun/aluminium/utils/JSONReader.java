@@ -18,6 +18,10 @@ import java.nio.charset.StandardCharsets;
  * so right after a {@code git clone} none of these files exist and they must first be produced with the
  * generator script in the README. When a file is missing, this class throws {@link IllegalStateException}
  * carrying the file name and generation guidance — see {@link #fromJSON(String, Type)}.
+ *
+ * <p>The same is true for the other way data can be unusable: a file that exists but parses to
+ * {@code null} (zero bytes, or a literal {@code null}). It is reported at the same place, with the same
+ * file name, rather than being returned as a {@code null} table for the caller to trip over later.
  */
 public final class JSONReader {
     private static final Gson GSON = new Gson();
@@ -35,8 +39,8 @@ public final class JSONReader {
      * @param type     the target Gson type token
      * @param <T>      the expected return type
      * @return the deserialized object
-     * @throws IllegalStateException the resource does not exist (usually the data has not been generated
-     *                               yet, see the class javadoc)
+     * @throws IllegalStateException the resource does not exist, or parses to {@code null} (usually the
+     *                               data has not been generated yet, see the class javadoc)
      */
     @SneakyThrows
     public static <T> T fromJSON(String jsonName, Type type) {
@@ -54,7 +58,19 @@ public final class JSONReader {
                     .formatted(resourcePath, DATA_DIR));
         }
         try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            return GSON.fromJson(reader, type);
+            T parsed = GSON.fromJson(reader, type);
+            if (parsed == null) {
+                // M-17: the same "the environment is not prepared" case as a missing file, one step
+                // later. Gson returns null for a zero-byte file or a literal `null`, and handing that
+                // back would put a null *table* into Constant (WEAPONS = frozen(null)) — it then blows
+                // up as an NPE on some unrelated line, or, worse, behaves like a silently empty table.
+                // A file that merely has no rows is unaffected: `{ }` parses to an empty map, not null.
+                throw new IllegalStateException("""
+                        数据文件 %s 解析结果为 null（文件是空的，或内容就是字面 null）
+                        通常是上一次生成数据被中断留下的空文件，请按 README 的 generator 一节重新生成。"""
+                        .formatted(resourcePath));
+            }
+            return parsed;
         }
     }
 }
