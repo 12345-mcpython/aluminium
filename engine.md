@@ -350,6 +350,7 @@ dispatch(consumer, 直接相关方...)
   "do": [ { "op": "GAIN_ENERGY", "amount": 1.5, "per_target": true } ],
   "cooldown": 1,                               ← 可选：隔几个"自己的回合"才能再触发
   "once_per_battle": true,                     ← 可选：一场战斗只触发一次（与 cooldown 二选一）
+  "chance": 0.35,                              ← 可选：「有 35% 的固定概率…」；掷骰用战斗注入的 Random
   "source": "1403 缇宝 trace 1403103",         ← 出处（引擎不读，给人看）
   "note": "…" }                                ← 为什么是这个数
 ```
@@ -393,6 +394,7 @@ target != self    发生在我方的别人身上
 hit_count > 0     这次攻击打中了至少 1 个目标
 hit_count == 2    精确命中数
 hp_percent <= 0.5 我自己的血量比例（0.5 = 50%）← 风雪交加 4 件套「回合开始时，若生命百分比 ≤ 50%」
+target_debuff_count >= 3  事件的承受者身上有 3 个负面  ← 银狼「若目标的负面效果数量 ≥ 3，则减抗额外降低」
 self has_state 协奏   我处于具名状态【协奏】      ← 知更鸟「处于【协奏】状态时」
 target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡「触电状态下的敌方目标」
 ```
@@ -436,6 +438,7 @@ JSON 写法不变。
 | `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
 | `BOOST_DAMAGE` | `percent`（只能挂在 `DEALING_DAMAGE` 上） | ✅ 改**正在结算的那一次**伤害：不改属性、不挂 buff、不会漏到下一次。是「对处于 X 状态的目标造成的伤害提高 Y%」的实现 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
+| `DISPEL` | `amount`，可选 `target` | ✅ 移除最多 `amount` 个**负面效果**（「解除 N 个负面效果」），**最新的先走**；"什么算负面"由每个 buff 类自己回答（`AbstractBuff.isDebuff()`，见 §10.4） |
 | `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 具名状态（见下） |
 | `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
 
@@ -1674,6 +1677,10 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 `BuffManager.hasBuff(Class<? extends AbstractBuff>)` —— 按 `getClass()` 精确匹配、`null` 返 false。
 `countBuffs(Class)` / `removeOneBuff(Class)` / `removeStacks(AttributeType, int)` 是叠层用的三个延伸口
 （"现在几层" / "消耗一层" / "按属性取回最多 N 层，**最新的先走**"）。
+`debuffCount()` / `removeDebuffs(int)` 是"负面效果"的两个口 —— 它们问的是每个 buff 类的
+**`isDebuff()`**：DOT、控制、易伤、嘲讽、以及**符号为负**的属性修正算负面；减伤、加速、具名状态不算
+（状态的立场属于施加它的那条规则，所以它答 `false`，将来由 `APPLY_BUFF` 带立场）。默认 `false` 是**安全方向**
+（新 buff 类不会被 `DISPEL` 误删），五个 debuff 类的答案在 `DebuffTest` 里列成一张表。
 **不提供 `getBuffs()`**：遍历与判定留在 manager 内部，避免外部改列表导致 CME。
 
 ### 10.5 现存 buff 实现

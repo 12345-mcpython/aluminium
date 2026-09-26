@@ -54,6 +54,9 @@ import java.util.Set;
  *       <td>✅ wired — changes <b>the instance being settled</b> when the rule fires on
  *           {@code DEALING_DAMAGE} (「对处于 X 状态的目标造成的伤害提高 Y%」). No duration, no target and no
  *           buff: the instance is the state, so nothing persists and nothing can leak into the next hit</td></tr>
+ *   <tr><td>{@code DISPEL}</td><td>{@code amount}, optional {@code target}</td>
+ *       <td>✅ wired — removes up to {@code amount} <b>negative effects</b> (「解除 N 个负面效果」), newest
+ *           first. What counts as negative is {@code AbstractBuff.isDebuff()}, decided per buff class</td></tr>
  *   <tr><td>{@code MODIFY_DAMAGE_TAKEN}</td><td>{@code percent}, <b>exactly one of</b> {@code turns} /
  *       {@code permanent}, optional {@code target}</td>
  *       <td>✅ wired — the sign decides the zone: {@code percent > 0} is 「受到的伤害提高」 (vulnerability,
@@ -86,7 +89,7 @@ public final class TriggerInterpreter {
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
-            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE");
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -193,6 +196,11 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
             }
+            case "DISPEL" -> {
+                requirePositiveAmount(effect, op, spec);
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
             default -> requireNoStackArguments(effect, op, spec);
         }
     }
@@ -234,6 +242,11 @@ public final class TriggerInterpreter {
             if (owner != null && !owner.isTriggerReady(rule.key())) {
                 continue;
             }
+            // A rule-level probability (「有 35% 的固定概率…」). A failed roll costs nothing: no cooldown is
+            // started and no once-per-battle flag is set, because nothing happened.
+            if (rule.chance() < 1 && !battle.rollChance(rule.chance())) {
+                continue;
+            }
             apply(battle, rule, ctx);
             if (owner != null) {
                 owner.startTriggerCooldown(rule.key(), rule.cooldownTurns(), rule.oncePerBattle());
@@ -269,6 +282,7 @@ public final class TriggerInterpreter {
             case "REMOVE_STACK" -> removeStacks(battle, effect, ctx);
             case "MODIFY_DAMAGE_TAKEN" -> modifyDamageTaken(battle, effect, ctx);
             case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
+            case "DISPEL" -> dispel(battle, effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
@@ -643,6 +657,28 @@ public final class TriggerInterpreter {
             default -> throw new IllegalStateException(
                     "Scale '" + scale + "' passed validation but has no implementation");
         };
+    }
+
+    /**
+     * Settles a {@code DISPEL} effect: removes up to {@code amount} <b>negative effects</b> from the target —
+     * 「解除 N 个负面效果」.
+     *
+     * <p>What counts as negative is {@code AbstractBuff.isDebuff()}, i.e. a decision taken per buff class rather
+     * than a guess made here: a DOT, a control, 易伤, 嘲讽 and a stat <i>debuff</i> are negative; 减伤, a speed
+     * boost and a named state are not. That is why this op needs no filter of its own — and why it cannot be
+     * tricked into removing a shield.
+     *
+     * <p>Nothing to dispel is <b>not</b> an error, for the same reason as {@code REMOVE_STACK}: the shape
+     * 「受到攻击时，解除自身 1 个负面效果」 fires on every hit, including the ones where nothing is on you.
+     *
+     * @param effect the effect ({@code amount}, optional {@code target})
+     * @param ctx    the context
+     */
+    private static void dispel(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        int amount = (int) Math.round(effect.getAmount());
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            target.getBuffManager().removeDebuffs(amount);
+        }
     }
 
     /**

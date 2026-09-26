@@ -164,6 +164,52 @@ public class BuffManager {
         return false;
     }
 
+    /**
+     * Removes up to {@code count} <b>debuffs</b> ("解除 N 个负面效果"), newest first.
+     *
+     * <p>The "which one comes off" choice is the same LIFO order {@link #removeStack} and
+     * {@link #removeOneBuff(Class)} use, and it is a <b>decision</b>: the game's texts do not say, and picking
+     * deterministically is what makes a dispel testable at all. The order is stated here so that a reader — or a
+     * future "remove the oldest instead" — has one place to change.
+     *
+     * <p>Nothing to dispel is <b>not</b> an error (the return value reports what happened): 「受到攻击时解除自身
+     * 1 个负面效果」 fires on every hit, including the ones where there is nothing negative on you.
+     *
+     * @param count how many to remove at most (non-positive removes nothing)
+     * @return how many were actually removed
+     */
+    public int removeDebuffs(int count) {
+        if (count <= 0) {
+            return 0;
+        }
+        // Snapshot + newest-first, for the reasons in the class javadoc (M-12) and above.
+        List<AbstractBuff> snapshot = List.copyOf(buffs);
+        int removed = 0;
+        for (int i = snapshot.size() - 1; i >= 0 && removed < count; i--) {
+            AbstractBuff buff = snapshot.get(i);
+            if (buff.isDebuff()) {
+                removeBuff(buff);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
+    /**
+     * How many negative effects are attached — 「目标身上有几个负面效果」, which several rules condition on.
+     *
+     * @return the debuff count (never negative)
+     */
+    public int debuffCount() {
+        int count = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff.isDebuff()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public void removeBuff(AbstractBuff buff) {
         if (buff == null || !buffs.remove(buff)) return;
         buff.removeBuff(instance);

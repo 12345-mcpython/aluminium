@@ -132,6 +132,14 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
+     * A DOT is a 持续伤害类负面状态 — a negative effect that 「解除 1 个负面效果」 may remove.
+     */
+    @Override
+    public boolean isDebuff() {
+        return true;
+    }
+
+    /**
      * Nothing to attach: a DOT changes no attribute, it only deals damage when it settles.
      */
     @Override

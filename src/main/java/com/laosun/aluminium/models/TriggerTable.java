@@ -190,7 +190,28 @@ public class TriggerTable {
         }
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateCooldown(spec),
-                Boolean.TRUE.equals(spec.getOncePerBattle())));
+                Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec)));
+    }
+
+    /**
+     * Validates a rule's probability and returns it as a fraction of 1 ({@code 1.0} = always).
+     *
+     * <p>Validated at load time for the same reason as the cooldown: {@code chance: 0} would load and never fire,
+     * and a value above 1 reads like a percentage when the field is a fraction — the two mistakes look like a
+     * working rule from the outside.
+     */
+    private static double validateChance(TriggerSpec spec) {
+        Double chance = spec.getChance();
+        if (chance == null) {
+            return 1.0;
+        }
+        if (!(chance > 0) || chance > 1) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"chance\": " + chance + ", but a probability is a fraction of 1 "
+                            + "(0.35 = 35%); omit the field entirely for \"always\" "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return chance;
     }
 
     /**
@@ -262,6 +283,9 @@ public class TriggerTable {
     //   hp_percent <= 0.5     the owner's own HP is at or below half   <- set 106's "at the beginning
     //                                                                     of the turn, if the wearer's
     //                                                                     HP percentage is <= 50%"
+    //   target_debuff_count >= 3  the event's subject carries 3 debuffs <- Silver Wolf's "if the enemy has
+    //                                                                      >= 3 debuffs, the RES shred is
+    //                                                                      reduced further"
     //   self has_state 协奏   I am in the named state 协奏             <- Robin's 即兴装饰 "处于【协奏】状态时"
     //   target has_state 触电 it happened to someone in that state     <- Kafka's "触电状态下的敌方目标"
     //
@@ -277,9 +301,16 @@ public class TriggerTable {
     // ==================================================================
 
     /**
-     * The numeric variables {@code hp_percent} and {@code hit_count} are the complete, closed set.
+     * The numeric variables {@code hit_count}, {@code hp_percent} and {@code target_debuff_count} are the
+     * complete, closed set.
+     *
+     * <p>Each reads from a different place, which is why the names say so: {@code hit_count} comes from the
+     * event, {@code hp_percent} from the rule's owner (a fact about me), and {@code target_debuff_count} from
+     * the event's <b>subject</b> (「目标身上有几个负面效果」 — the count that matters is the one on the unit the
+     * rule is talking about, not on me).
      */
-    private static final Set<String> NUMERIC_VARIABLES = Set.of("hit_count", "hp_percent");
+    private static final Set<String> NUMERIC_VARIABLES =
+            Set.of("hit_count", "hp_percent", "target_debuff_count");
 
     /**
      * The keyword of the named-state condition, and the parties it may ask about.
@@ -464,10 +495,11 @@ public class TriggerTable {
      * @param key           stable identity for the per-combatant firing limits (source + position)
      * @param cooldownTurns the owner's turns between two firings ({@code 0} = unlimited)
      * @param oncePerBattle {@code true} = at most one firing per battle
+     * @param chance        the probability of firing at all, as a fraction of 1 ({@code 1.0} = always)
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key,
-                               int cooldownTurns, boolean oncePerBattle) {
+                               int cooldownTurns, boolean oncePerBattle, double chance) {
 
         /**
          * Whether this rule limits how often it may fire at all.
@@ -664,6 +696,7 @@ public class TriggerTable {
             return switch (variable) {
                 case "hit_count" -> ctx.hitCount();
                 case "hp_percent" -> hpPercent(ctx.owner());
+                case "target_debuff_count" -> ctx.target() == null ? Double.NaN : ctx.target().getBuffManager().debuffCount();
                 default -> Double.NaN;
             };
         }
