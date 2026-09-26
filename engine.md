@@ -306,9 +306,8 @@ dispatch(consumer, 直接相关方...)
 - **`DamageEvent` 广播给双方**，但回调签名里**不告诉 buff 它挂在谁身上**。
   因此注入乘区的 buff 必须自己判侧：`Damage.isOnDefenderSide(entity)` / `isOnAttackerSide(entity)`
   （这就是易伤必须判侧、否则持有者自己打人也会被加伤的原因）。
-- **`AttackEvent` / `SkillCastEvent` 广播给我方 `battle.characters`**（只遍历 `characters`，所以**我方召唤物收不到** ——
-  我方名单仍是 `List<Character>`，见 §24 末的"还没做"），
-  这是因为"我方攻击后 / 施放后"的效果（知更鸟【协奏】、缇宝结界）挂在**别人**身上。
+- **`AttackEvent` / `SkillCastEvent` 广播给我方阵营 `battle.allies`**（我方召唤物也收得到，因为它就是
+  `CanHit`；见 §24.4），这是因为"我方攻击后 / 施放后"的效果（知更鸟【协奏】、缇宝结界）挂在**别人**身上。
 - `hitTargets` 是**实际命中过**的目标（含当场死亡的，按命中顺序去重）；
   `mainTarget` 是调用方选的主目标（AOE 时它不是命中顺序里的第一个）。
 - **"一次攻击行为" vs "多种伤害类型"**（重要区分）：
@@ -2058,7 +2057,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | 技能槽位 | ✅ P8-2 已接（`Constant.SKILL_SLOT` 六槽，见 §7.2）；剩下的占位是 `Character.fromAttributes(...)` 这个测试入口（写死槽位 1） |
 | 击破 DOT 数值 | `DOT_RATIO=0.5`、`DOT_TURNS=3` 是示例值，base 不含击破特攻与削韧值 |
 | 神君/账账类追加攻击 | 未进入事件体系 |
-| 召唤物 | **敌方阵营已能创建**（P9-4，§24）：`summon_id` 名单 → `SummonFactory` → `Battle.summon`，主人倒下带走它。⚠ 仍缺：我方召唤物（`characters` 是 `List<Character>`）、忆灵、技能侧 `SkillEffectType.SUMMON` 分派（数据里没有"召谁"那一列） |
+| 召唤物 | **两个阵营都能创建**（P9-4 + L-8 友方那一半，§24）：`summon_id` 名单 → `SummonFactory` → `Battle.summon`，主人倒下带走它；我方召唤物进 `allies`（阵营），`characters` 是它的子集视图。⚠ 仍缺：**忆灵**本身的机制（面板快照 / 连携攻击）、技能侧 `SkillEffectType.SUMMON` 分派（数据里没有"召谁"那一列） |
 | 控制 | 只有 `StunBuff` 一种 |
 | 治疗 | 只有 `heal()` 方法，无乘区、无调用者 |
 
@@ -2225,7 +2224,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | §3.5 **效果命中与抵抗的生效概率公式** | ✅ 已实现（P6-1）：公式与 §3.5 一致，三个因子乘算。顺手修了 `EnemyFactory` 漏写 `effectHitRate` 的问题（之前敌人命中恒 0）。见 §20.1 |
 | §4 **护盾** | ✅ 已实现（P6-3）：`CanHit.shield` 先于 HP 被扣、不叠加。🚧 规格里的"护盾量提高"没有对应属性，护盾量目前就是传入值 |
 | §4 **治疗乘区** | ✅ 已实现（P6-2）：`Battle.calculateHeal/heal`。⚠ 规格的 `(1 - 治疗降低)` 与 `(1 + 受疗加成)` 合并成一个因子（`HEAL_TAKEN_RATIO` 取负即降低），因为属性表里没有单独的"治疗降低" |
-| §5 **忆灵系统**（独立单位/面板快照/连携攻击） | 🚧 **敌方阵营的通用召唤物已做**（P9-4，§24：`Battle.summon` + `SummonFactory` + 主人倒下带走它）。忆灵本身仍未做：它是我方单位（`characters` 收不下）、要面板快照、要有连携攻击 |
+| §5 **忆灵系统**（独立单位/面板快照/连携攻击） | 🚧 **通用召唤物两个阵营都能做了**（P9-4 + §24.4：`Battle.summon` + `SummonFactory` + 主人倒下带走它 + 我方进 `allies`）。忆灵本身仍未做：它**有地方放了**，但缺"面板快照自召唤者"与"连携攻击"这两条机制 |
 | §6 **欢愉体系**（阿哈速度/笑点/好活当赏/欢愉伤害公式） | ❌ 只有 `DamageType.ELATION` 与 `AttributeType.ELATION_DAMAGE_BOOST` 两个占位；`elation_basic_level_damage.json`（101 条）**从未被加载** |
 | §7 **超击破** | ✅ 已实现（P4-6，2026-09-19）：`SuperBreakBuff` + `BreakDamageCalculator.buildSuperBreak` + `SkillExecutor` 里追加 `SUPER_BREAK` 段。**但**公式里的 `(1 + 削韧值提高)` 与 `(1 + 弱点击破效率提高)` 仍缺（属性不存在），`SUPER_BREAK_BOOST = 0.4` 是示例值 |
 | §8.1 **忆灵伤害 / 欢愉伤害** 作为独立类型 | 类型枚举里有 `MEMORY` / `ELATION`，但无来源 |
@@ -2664,22 +2663,26 @@ return user.getEnergyProvider().canCastUltra(user, ultraEnergyCost(user));
 
 ### 24.3 三处刻意留下的边界
 
-1. **只有敌方阵营的主人能召唤**，我方主人**响亮拒绝**（`IllegalArgumentException`，消息里点名
-   `List<Character>` 放不下 `Summon`）。为什么不"先塞进 `enemies` 凑合"：那样我方的召唤物
-   会**被我们自己的攻击打中**、并在胜负判定里**算成敌人** —— 一个不会报错的错误答案。
-   要做友方召唤物，得先把 `battle.characters` 放宽（L-8 的友方那一半）。
+1. **两个阵营都能召唤了**（2026-09-27 补齐友方那一半）：召唤物加入**主人自己的阵营** —— 敌方的进
+   `enemies`，我方的进 `allies`。于是「我们打谁」看 `enemies`（我方召唤物**不是**我方的合法目标），
+   而「敌方打谁」看 `allies`（会被打、也吃我方全体增益）。`Camp.NEUTRAL` **响亮拒绝**：它没有自己的
+   名单，替它挑一个等于悄悄替它决定了立场。
+   > 这条原先写的是"只做敌方阵营，我方主人响亮拒绝"，理由是当时我们唯一的名单是 `List<Character>`、
+   > 放不下 `Summon`。现在有了 `allies`（§6.2 的 L-8 友方那一半），剩下的拒绝对象只有"没有名单的阵营"。
 2. **等级组是参数，不是推断的**。怪物自己的 `hard_level_group` 几乎总是 1，真正决定难度的是关卡，
    所以没有可推断的来源；猜一个（见 ROADMAP §5 教训 3：猜出来的 `null` 让策略静默变空操作）
    比要求调用方传一个参数坏得多。等级取自主人（它是这一场战斗的等级，主人身上就有）。
 3. **`SkillEffectType.SUMMON` 仍未分派**（§7.2b 的表里还是 ❌）：数据里没有"这次召唤召谁"这一列，
    所以"敌方技能召唤"还差内容，而不是差能力 —— 能力就是 `Battle.summon`。
-   忆灵（我方、面板快照、连携攻击）同样未做，见 §18.4。
+   **忆灵仍未做**：它现在有地方放了（`allies`），但还缺"自己的面板快照自召唤者"和"连携攻击"，
+   见 §18.4。
 
 **验收**：`SummonTest` **18 条** —— 名单随数据落到主人身上（顺序 + 重复）、无名单为空、
 `[0]` 在装载期被丢掉、面板与同 id 的怪逐位相同、自带名字与技能、每次调用给独立实例、
 战斗中入场（阵营 + 行动条 + 当前时钟 + 引擎目标表包含它 + **速度变化仍会重排**）、被打死只减自己、
 主人倒下带走它（含"还没入场就被带走"、**且它的 HP 一点没掉**）、
-**随主人消失不付击杀奖励**（与"真杀死会付钱"对照），以及四种拒绝（我方主人 / 已死主人 / 未知 id / null 主人）。
+**随主人消失不付击杀奖励**（与"真杀死会付钱"对照）、**阵营取自主人**（同一调用分别落进两个名单），
+以及三种拒绝（已死主人 / 未知 id / null 主人）。友方一侧另见 §24.4。
 
 **变异验证（10 处）**：去掉 `[0]` 过滤 → 只红 `theZeroEntryMeansNoSummonAndIsDroppedAtLoad`；
 名单去重 / 不落名单 → 各红 `theRosterTravelsFromTheDataOntoTheMaster`；
@@ -2690,5 +2693,45 @@ return user.getEnergyProvider().canCastUltra(user, ultraEnergyCost(user));
 所以 `theMasterFallingTakesItsSummonWithIt` 里那句 HP 断言不是装饰，它是这个方法存在的理由。
 
 全套 **87 套 / 780 例全绿**；demo `victory (10 rounds / 43 actions)` 与 `mechanics` demo 输出不变。
+
+### 24.4 我方阵营：`allies` 与 `characters` ✅（2026-09-27，L-8 的友方那一半）
+
+```
+Battle.allies      = 我方**阵营**（List<CanHit>）：我们的角色 + 我方召唤物
+Battle.characters  = 我们的**角色**（List<Character>）：allies 的子集视图
+Battle.enemies     = 敌方**阵营**（List<CanHit>）
+Battle.enemyUnits()= 其中的**怪**（List<Enemy>）
+```
+
+⚠ 命名不对称是**故意的**：敌方那侧是 `enemies`（阵营）/ `enemyUnits()`（子集），我方这侧却是
+`characters`（子集）/ `allies`（阵营），因为 `characters` 被读 **179 处**、其中绝大多数问的是
+"我们的角色"（技能 / 能量 / 遗器规则）。把它改名放宽成阵营、再加一个子集视图（与敌方完全对称的那条路）
+能让**编译器**替我们找出每一处旧假设，代价是 179 处改动换零行为变化 —— 所以这里选了"给阵营一个新名字"，
+把真正的**阵营级**读取点逐个搬过去。
+
+> 🔴 **这个选择的代价必须说清楚，并且用测试补上**：写在 `characters` 上的阵营级读取点**不会编译失败**，
+> 它会**静默忽略我方召唤物** —— 敌方 AOE 打不到它、我方全体增益漏掉它、胜负判定看不见它。
+> 所以每一个阵营级读取点都在 `PlayerSideSummonTest` 里有**对应的一条**（阵营划分 / 我方不能打它 /
+> 它有自己的行动条 / 敌方看得到它 / 敌方 AOE 打得到它 / `all_allies` 增益给到它 / 事件广播给到它 /
+> 主人倒下带走它 / 全灭判负 / 它不挡胜利 / 中立阵营被拒），**这组用例就是编译器欠下的那部分类型安全**。
+> 以后新增阵营级读取点，应该往这个类里加一条。
+
+**刻意留在 `characters` 上的三处**（它们要的是"角色才有"的东西，不是"我方"）：
+`attachBattleSkills`（地图技能，`Summon` 没有）、`fireTriggers`（只有 `Character` 带触发器表）、
+以及技能点事件的两条广播（`Summon` 既不持有战技点也没有表；读阵营只是为了与"我方全员"的口径一致）。
+
+**同一批改动里换掉的其它阵营级读取点**：`checkResult`（全灭判定）、`getOpponents`
+（敌方 AI / 选目标的入口）、`EnemySkill.struckBy`（敌方 AOE / 扩散扫我方）、
+`SkillExecutor` 的两条广播（`SkillCastEvent` / `AttackEvent` 的"我方全员"）、
+`TriggerInterpreter` 的 `all_allies` 目标解析、`Battle.printHp`（显示）、
+以及 `perishOrphanedSummons`（**两个阵营都要扫** —— 只扫 `enemies` 会让我方小怪在主人死后继续站着）。
+
+**验收**：`PlayerSideSummonTest` **12 条**（上面清单里的每一条）。
+**变异验证（7 处）**：把 `getOpponents` / `EnemySkill.struckBy` / `all_allies` 解析 / `dispatch` /
+`SkillExecutor` 的技能广播 / `checkResult` 各自改回 `characters`，以及让清扫**只扫敌方** ——
+各红对应一条；全套 90 套 / 818 例全绿；demo 全文对比 281 行逐行一致（只有 3 行 `Resist {...}`
+的 Set 顺序是既有不稳定），说明"场上没有召唤物时 `allies` 与 `characters` 完全等价"。
+⚠ `checkResult` 那条**必须用无主的召唤物**才能区分两种读法（有主的会在主人倒下时一起消失），
+第一版用了有主的、变异不红 —— 这与 `perish()` 那次是同一类教训：**能区分的行为才算断言**。
 
 

@@ -381,7 +381,9 @@ public final class TriggerInterpreter {
      * <p>{@code "all_allies"} (alias {@code "party"}) is what makes "all allies' ATK +X%" expressible.
      * It matters more than it looks: most buff talents in this game's data are party-wide, so without
      * this selector the trigger table would only cover self-buffs. It is resolved against
-     * {@link Battle#characters} and therefore needs a battle, which the single-target selectors do not.
+     * {@link Battle#allies} — the camp, <b>not</b> {@code characters} — so a player-side summon counts as
+     * 「我方」 and receives the party buff too; and it therefore needs a battle, which the single-target
+     * selectors do not.
      *
      * @param battle the running battle (may be {@code null} only when the selector is single-target)
      * @param effect the effect
@@ -397,7 +399,7 @@ public final class TriggerInterpreter {
                         "Effect targets \"" + selector
                                 + "\" but no battle was supplied to take the party from");
             }
-            return List.copyOf(battle.characters);
+            return List.copyOf(battle.allies);
         }
         return List.of(resolveTarget(effect, ctx));
     }
