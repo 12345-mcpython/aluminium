@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * <p><b>Every operation here is chosen to be harmless if the guard is missing.</b> The first version of
  * this test used {@code clear()} and {@code put(...)}, and when it was mutated back to a writable table it
- * actually <b>emptied {@code SKILL_POINTS} for the whole JVM</b> — nine unrelated tests failed in suites
+ * actually <b>emptied {@code SKILL_TRACES} for the whole JVM</b> — nine unrelated tests failed in suites
  * that had nothing to do with this one, and the run was unreadable. A test whose failure damages shared
  * state makes every mutation check a lottery, so the operations are now:
  * <ul>
@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * <p>The tests are split because the fix has two layers, and a regression in either would otherwise hide
  * behind the other: wrapping the top level but forgetting to recurse leaves the nested containers writable,
- * which is exactly the case {@code SKILLS.get(cid)} and {@code SKILL_POINTS.get(cid)} are.
+ * which is exactly the case {@code SKILLS.get(cid)} and {@code SKILL_TRACES.get(cid)} are.
  */
 public class ConstantImmutabilityTest {
 
@@ -62,7 +62,7 @@ public class ConstantImmutabilityTest {
 
     /**
      * The nested containers are frozen as well — this is the half the concrete examples in H-1 were about
-     * ({@code SKILLS[1001]} was a mutable map, {@code SKILL_POINTS[1001]} a mutable list).
+     * ({@code SKILLS[1001]} was a mutable map, {@code SKILL_TRACES[1001]} a mutable list).
      */
     @Test
     public void theNestedContainersRejectMutationToo() {
@@ -71,8 +71,8 @@ public class ConstantImmutabilityTest {
         Assertions.assertThrows(UnsupportedOperationException.class, () -> slots.remove(ABSENT_KEY),
                 "a character's skill slots are a nested map and must be read-only as well");
 
-        Integer pointCid = Constant.SKILL_POINTS.keySet().iterator().next();
-        List<?> points = Constant.SKILL_POINTS.get(pointCid);
+        Integer pointCid = Constant.SKILL_TRACES.keySet().iterator().next();
+        List<?> points = Constant.SKILL_TRACES.get(pointCid);
         Assertions.assertThrows(UnsupportedOperationException.class, () -> points.set(999_999, null),
                 "a character's trace nodes are a nested list");
 
@@ -88,14 +88,14 @@ public class ConstantImmutabilityTest {
     @Test
     public void theTablesStillReadNormally() {
         Assertions.assertFalse(Constant.SKILLS.isEmpty(), "skills.json loaded");
-        Assertions.assertFalse(Constant.SKILL_POINTS.isEmpty(), "point.json loaded");
+        Assertions.assertFalse(Constant.SKILL_TRACES.isEmpty(), "point.json loaded");
         Assertions.assertFalse(Constant.WEAPONS.isEmpty(), "weapons.json loaded");
         Assertions.assertFalse(Constant.HARD_LEVEL_GROUPS.isEmpty(), "hard_level_group.json loaded");
 
         Integer cid = Constant.SKILLS.keySet().iterator().next();
         Assertions.assertFalse(Constant.SKILLS.get(cid).isEmpty(),
                 "and the nested map still serves its entries");
-        Integer pointCid = Constant.SKILL_POINTS.keySet().iterator().next();
-        Assertions.assertFalse(Constant.SKILL_POINTS.get(pointCid).isEmpty());
+        Integer pointCid = Constant.SKILL_TRACES.keySet().iterator().next();
+        Assertions.assertFalse(Constant.SKILL_TRACES.get(pointCid).isEmpty());
     }
 }

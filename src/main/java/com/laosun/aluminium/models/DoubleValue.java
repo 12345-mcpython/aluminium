@@ -440,9 +440,9 @@ public final class DoubleValue implements Cloneable {
              */
             WEAPON,
             /**
-             * Skill point (trace) bonus.
+             * Skill trace (行迹) bonus.
              */
-            SKILL_POINT,
+            SKILL_TRACE,
             /**
              * Extra basic promotion bonus.
              */

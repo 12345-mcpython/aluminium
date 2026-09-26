@@ -10,16 +10,16 @@ import java.util.*;
 import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 
 /**
- * A node in a character's skill point (trace) tree.
+ * A node in a character's skill trace tree (行迹点).
  *
- * <p>Each skill point may grant an attribute bonus. The tree is built from raw
- * {@link com.laosun.aluminium.beans.SkillPoint} beans with parent-child relationships
- * determined by {@code prePoint} references. The tree is constructed once per character
+ * <p>Each trace node may grant an attribute bonus. The tree is built from raw
+ * {@link com.laosun.aluminium.beans.SkillTraceData} beans with parent-child relationships
+ * determined by {@code prevTrace} references. The tree is constructed once per character
  * and cached for subsequent use.
  *
  * <p>Supported operations:
  * <ul>
- *   <li>{@link #init(int)} — builds (or returns cached) the skill tree for a character</li>
+ *   <li>{@link #init(int)} — builds (or returns cached) the trace tree for a character</li>
  *   <li>{@link #sumAttributes(List)} — DFS-sums all attribute bonuses in the tree</li>
  *   <li>{@link #appendTo(List, AttributeBuilder)} — applies summed bonuses as modifiers</li>
  *   <li>{@link #printTree(List)} — prints the tree structure for debugging</li>
@@ -27,22 +27,22 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  */
 public final class SkillTrace {
     /**
-     * Cache of built skill trees, keyed by character ID.
+     * Cache of built trace trees, keyed by character ID.
      */
     private static final Map<Integer, List<SkillTrace>> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
-     * Unique point ID within the character's tree.
+     * Unique trace ID within the character's tree.
      */
-    public int pointId;
+    public int traceId;
     /**
      * Type string (e.g. "atk", "hp", "def").
      */
-    public String pointType;
+    public String traceType;
     /**
      * Optional attribute bonus granted by this node.
      */
-    public com.laosun.aluminium.beans.SkillPoint.Attribute attribute;
+    public com.laosun.aluminium.beans.SkillTraceData.Attribute attribute;
     /**
      * Whether this node is a root (has no parent).
      */
@@ -61,41 +61,41 @@ public final class SkillTrace {
     }
 
     /**
-     * Builds (or returns from cache) the skill tree for a character.
+     * Builds (or returns from cache) the trace tree for a character.
      *
      * <p>The tree is constructed from the raw bean data loaded in
-     * {@link Constant#SKILL_POINTS}. Nodes with no prerequisites become roots.
+     * {@link Constant#SKILL_TRACES}. Nodes with no prerequisites become roots.
      * Results are cached per character ID since the tree never changes.
      *
      * @param cid the character ID
-     * @return the list of root skill points, or an empty list if none found
+     * @return the list of root trace nodes, or an empty list if none found
      */
     public static List<SkillTrace> init(int cid) {
         return CACHE.computeIfAbsent(cid, unused -> buildTree(cid));
     }
 
     private static List<SkillTrace> buildTree(int cid) {
-        List<com.laosun.aluminium.beans.SkillPoint> beanList = Constant.SKILL_POINTS.get(cid);
+        List<com.laosun.aluminium.beans.SkillTraceData> beanList = Constant.SKILL_TRACES.get(cid);
         if (beanList == null || beanList.isEmpty()) {
             return java.util.Collections.emptyList();
         }
 
         java.util.Map<Integer, SkillTrace> nodeMap = new java.util.HashMap<>();
 
-        for (com.laosun.aluminium.beans.SkillPoint bean : beanList) {
+        for (com.laosun.aluminium.beans.SkillTraceData bean : beanList) {
             SkillTrace node = new SkillTrace();
-            node.pointId = bean.pointId();
-            node.pointType = bean.pointType();
+            node.traceId = bean.traceId();
+            node.traceType = bean.traceType();
             node.attribute = bean.attribute();
             node.root = false;
             node.parent = null;
-            nodeMap.put(node.pointId, node);
+            nodeMap.put(node.traceId, node);
         }
 
-        for (com.laosun.aluminium.beans.SkillPoint bean : beanList) {
-            int pointId = bean.pointId();
-            SkillTrace node = nodeMap.get(pointId);
-            List<Integer> preIds = bean.prePoint();
+        for (com.laosun.aluminium.beans.SkillTraceData bean : beanList) {
+            int traceId = bean.traceId();
+            SkillTrace node = nodeMap.get(traceId);
+            List<Integer> preIds = bean.prevTrace();
 
             if (preIds == null || preIds.isEmpty()) {
                 node.root = true;
@@ -122,13 +122,13 @@ public final class SkillTrace {
     }
 
     /**
-     * Prints the skill tree to stdout.
+     * Prints the trace tree to stdout.
      *
      * @param roots the root nodes to print
      */
     public static void printTree(List<SkillTrace> roots) {
         if (roots == null || roots.isEmpty()) {
-            System.out.println("(NO SKILL POINTS)");
+            System.out.println("(NO TRACES)");
             return;
         }
         for (int i = 0; i < roots.size(); i++) {
@@ -138,7 +138,7 @@ public final class SkillTrace {
     }
 
     /**
-     * Sums all attribute bonuses across the entire skill tree (DFS traversal).
+     * Sums all attribute bonuses across the entire trace tree (DFS traversal).
      *
      * @param roots the root nodes to traverse
      * @return a map from attribute type to total bonus value
@@ -166,7 +166,7 @@ public final class SkillTrace {
     }
 
     /**
-     * Sums all skill point attributes and appends them as modifiers to the builder.
+     * Sums all trace attributes and appends them as modifiers to the builder.
      *
      * @param roots   the root nodes to traverse
      * @param builder the attribute builder to append to
@@ -175,12 +175,12 @@ public final class SkillTrace {
         Map<AttributeType, Double> total = sumAttributes(roots);
         for (Map.Entry<AttributeType, Double> entry : total.entrySet()) {
             if (PERCENT_TO_BASE.containsKey(entry.getKey())) {
-                builder.addPercent(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_POINT);
+                builder.addPercent(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_TRACE);
             } else {
                 if (entry.getKey().isPercent) {
-                    builder.addPercentPoint(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_POINT);
+                    builder.addPercentPoint(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_TRACE);
                 } else {
-                    builder.addPure(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_POINT);
+                    builder.addPure(entry.getKey(), entry.getValue(), DoubleValue.Modifier.ModifierSource.SKILL_TRACE);
                 }
             }
         }
@@ -188,9 +188,9 @@ public final class SkillTrace {
 
     @Override
     public String toString() {
-        Integer parentId = (parent != null) ? parent.pointId : null;
-        return String.format("SkillPoint{id=%d, type='%s', attr=%s, root=%s, parentId=%s, childrenCount=%d}",
-                pointId, pointType, attribute, root, parentId, children != null ? children.size() : 0);
+        Integer parentId = (parent != null) ? parent.traceId : null;
+        return String.format("SkillTrace{id=%d, type='%s', attr=%s, root=%s, parentId=%s, childrenCount=%d}",
+                traceId, traceType, attribute, root, parentId, children != null ? children.size() : 0);
     }
 
     /**
@@ -206,8 +206,8 @@ public final class SkillTrace {
         StringBuilder sb = new StringBuilder();
         sb.append(prefix)
                 .append(isTail ? "|___" : "|---")
-                .append("[").append(pointId).append("]")
-                .append(" (").append(pointType).append(")")
+                .append("[").append(traceId).append("]")
+                .append(" (").append(traceType).append(")")
                 .append(root ? " [ROOT]" : "")
                 .append("\n");
 

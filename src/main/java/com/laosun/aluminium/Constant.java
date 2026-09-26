@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   <li>{@link #RELIC_SETS} — relic set definitions (the 2-piece / 4-piece bonus table)</li>
  *   <li>{@link #WEAPONS} — weapon (light cone) data by ID</li>
  *   <li>{@link #CHARACTERS} — character base stats by ID</li>
- *   <li>{@link #SKILL_POINTS} — skill point (trace) tree data by character ID</li>
+ *   <li>{@link #SKILL_TRACES} — trace tree data (行迹) by character ID</li>
  * </ul>
  *
  * <p>{@link #PERCENT_TO_BASE} maps percentage-type attributes to their corresponding
@@ -67,7 +67,7 @@ public final class Constant {
     /**
      * Skill point tree data indexed by character ID.
      */
-    public static final Map<Integer, List<SkillPoint>> SKILL_POINTS;
+    public static final Map<Integer, List<SkillTraceData>> SKILL_TRACES;
 
     public static final Map<Integer, Map<Integer, Skill>> SKILLS;
 
@@ -592,7 +592,7 @@ public final class Constant {
         RELIC_SETS = RelicSets.table();
         // ⚠ Every table below is `frozen(...)` (H-1). `public static final` locks the reference, not the
         // contents, and Gson hands back mutable LinkedHashMaps whose nesting is mutable too
-        // (`SKILLS.get(cid)` is another map, `SKILL_POINTS.get(cid)` a list). One `clear()` or `put()` from
+        // (`SKILLS.get(cid)` is another map, `SKILL_TRACES.get(cid)` a list). One `clear()` or `put()` from
         // any caller -- a test, a future UI, a plugin -- would have silently changed what every later
         // consumer in the same JVM sees. The tables NOT wrapped here were already immutable at load:
         // RELIC_SETS (RelicSets.index ends in Map.copyOf), MONSTER_CONFIGS (normalizeMonsterConfigs ends in
@@ -601,7 +601,7 @@ public final class Constant {
         }.getType()));
         CHARACTERS = frozen(JSONReader.fromJSON("character_data.json", new TypeToken<Map<Integer, CharacterData>>() {
         }.getType()));
-        SKILL_POINTS = frozen(JSONReader.fromJSON("point.json", new TypeToken<Map<Integer, List<SkillPoint>>>() {
+        SKILL_TRACES = frozen(JSONReader.fromJSON("point.json", new TypeToken<Map<Integer, List<SkillTraceData>>>() {
         }.getType()));
         SKILLS = frozen(JSONReader.fromJSON("skills.json", new TypeToken<Map<Integer, Map<Integer, Skill>>>() {
         }.getType()));
@@ -647,7 +647,7 @@ public final class Constant {
      *
      * <p><b>Why this exists.</b> {@code public static final} locks the <i>reference</i>, not the contents:
      * every table in the static block used to be a mutable {@code LinkedHashMap} straight out of Gson, and
-     * the nesting was mutable as well — {@code SKILLS.get(cid)} is another map, {@code SKILL_POINTS.get(cid)}
+     * the nesting was mutable as well — {@code SKILLS.get(cid)} is another map, {@code SKILL_TRACES.get(cid)}
      * a list. One {@code Constant.SKILLS.clear()} from anywhere (a test, a future UI, a plugin) would have
      * silently changed what every later consumer <b>in the same JVM</b> sees, with no compile error and no
      * failing test.
