@@ -37,9 +37,7 @@ public class Benchmark {
         long start = System.nanoTime();
         Map<Integer, List<Suit>> data = JSONReader.fromJSON("dump_data.json", new TypeToken<Map<Integer, List<Suit>>>() {
         }.getType());
-        if (data == null) {
-            System.exit(1);
-        }
+        // No null check: JSONReader either returns a value or throws with the file name (M-17).
         for (int i = 0; i < roundSingle; i++) {
             processData(data);
         }
