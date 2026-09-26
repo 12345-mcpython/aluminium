@@ -10,6 +10,7 @@ import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Owns a unit's buffs: attach / remove / tick, and dispatch the event callbacks to them.
@@ -449,8 +450,38 @@ public class BuffManager {
                 return true;
             }
         }
+        // Engine states: the four names below are not StateBuff names — they are the DoT elements, which the
+        // engine has represented as an ordinary DotBuff since P10-0. Resolving them here is what makes
+        // 「对处于灼烧状态的目标造成的伤害提高」 (and 「触电状态下的敌方目标被消灭时」) expressible without
+        // inventing a second fact for "this unit is burning".
+        //
+        // ⚠ Controls (冻结 / 纠缠 / 禁锢) are deliberately NOT in this table yet: P10-2 models them as a
+        // combination of a control buff and an action delay, so "is this unit frozen" needs its own definition
+        // rather than a guess that would half-work. Adding them later changes no JSON.
+        DamageElement dotElement = DOT_STATES.get(wanted);
+        if (dotElement == null) {
+            return false;
+        }
+        for (DotBuff dot : allBuffsOf(DotBuff.class)) {
+            if (dot.getElement() == dotElement) {
+                return true;
+            }
+        }
         return false;
     }
+
+    /**
+     * The game's own names for the four damage-over-time states, and the buff fact behind each.
+     *
+     * <p>Kept here rather than in a data file because it is a <b>translation</b>, not a table of numbers: the
+     * rule texts say 「灼烧」/「触电」/「裂伤」/「风化」 and the engine says {@code DotBuff(element)}. It is the
+     * only place that knows the two spellings are the same thing.
+     */
+    private static final Map<String, DamageElement> DOT_STATES = Map.of(
+            "灼烧", DamageElement.FIRE,
+            "触电", DamageElement.THUNDER,
+            "裂伤", DamageElement.PHYSICAL,
+            "风化", DamageElement.WIND);
 
     /**
      * Takes the first buff of that type on us, or {@code null} if there is none (needed since P5-2:

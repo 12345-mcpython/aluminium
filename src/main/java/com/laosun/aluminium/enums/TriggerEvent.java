@@ -109,6 +109,23 @@ public enum TriggerEvent {
      */
     TAKING_HIT("TAKING_HIT", true),
     /**
+     * ✅ A damage instance is <b>about to be settled</b>: fired from {@code Battle.assemble} before the zones
+     * are evaluated, so a rule can still change <i>this</i> instance.
+     *
+     * <p><b>Why a pre-settlement event had to exist.</b> {@link #ALLY_ATTACK} fires <i>after</i> the whole
+     * attack has been settled — correct for "after an ally attacks", useless for
+     * 「对处于 X 状态的目标造成的伤害提高 Y%」, because by then the number is final and all a rule could do is
+     * describe it. This event hands over the pending instance ({@code TriggerContext.damage()}), and
+     * {@code BOOST_DAMAGE} is what changes it — <b>for that one instance only</b>, since the instance itself is
+     * the state: there is no buff to attach, nothing to clean up, and nothing that can leak into the next hit.
+     *
+     * <p>{@code actor} = who deals the damage, {@code target} = who is about to take it (the same convention as
+     * {@link #TAKING_HIT}, from the other side). It fires for <b>every</b> instance the engine settles — DOT
+     * ticks, break and additional damage included — because those are damage too; a rule that means "attacks
+     * only" says so with its own conditions.
+     */
+    DEALING_DAMAGE("DEALING_DAMAGE", true),
+    /**
      * ✅ An ally cast their Ultimate.
      *
      * <p>Fired by {@code SkillExecutor.broadcastSkillCast} when the parsed skill data's

@@ -24,7 +24,7 @@
     {
       "require": 4,
       "ability": "Ability51081",
-      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" Needs an event for 'the wearer deals damage to an enemy' (HP_LOST and TAKING_HIT are only broadcast when one of our own characters is hurt), a condition on the target's weakness element, and a way to express a conditional DEF ignore (the target's DEF ignore is not a stat the rule can raise). 'For the rest of the battle' is no longer part of the gap -- `permanent: true` exists."
+      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" The event it needed exists since 2026-09-27 (DEALING_DAMAGE hands the pending instance over before settlement), so the first clause could be conditioned on 'the wearer deals damage'. Two things still block the ability: the second clause needs a condition on the target's weakness element (the DSL can ask about states, not about weaknesses), and 'ignores 10% DEF' is the defence zone, not the DMG-boost zone -- BOOST_DAMAGE cannot express it and the target's DEF ignore is not a stat the rule can raise. 'For the rest of the battle' is no longer part of the gap (`permanent: true` exists)."
     }
   ],
   "112": [

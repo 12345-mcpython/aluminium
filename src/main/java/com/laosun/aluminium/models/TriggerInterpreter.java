@@ -48,6 +48,10 @@ import java.util.Set;
  *           (&gt; 1) makes re-applications <b>accumulate</b> up to that cap instead of replacing the
  *           previous one; each stack is an ordinary buff instance with its own id, so it can be
  *           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
+ *   <tr><td>{@code BOOST_DAMAGE}</td><td>{@code percent}</td>
+ *       <td>✅ wired — changes <b>the instance being settled</b> when the rule fires on
+ *           {@code DEALING_DAMAGE} (「对处于 X 状态的目标造成的伤害提高 Y%」). No duration, no target and no
+ *           buff: the instance is the state, so nothing persists and nothing can leak into the next hit</td></tr>
  *   <tr><td>{@code MODIFY_DAMAGE_TAKEN}</td><td>{@code percent}, <b>exactly one of</b> {@code turns} /
  *       {@code permanent}, optional {@code target}</td>
  *       <td>✅ wired — the sign decides the zone: {@code percent > 0} is 「受到的伤害提高」 (vulnerability,
@@ -80,7 +84,7 @@ public final class TriggerInterpreter {
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
-            "MODIFY_DAMAGE_TAKEN");
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -176,6 +180,13 @@ public final class TriggerInterpreter {
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
+            case "BOOST_DAMAGE" -> {
+                requirePercent(effect, op, spec);
+                requireNonZeroPercent(effect, op, spec);
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
+            }
             default -> requireNoStackArguments(effect, op, spec);
         }
     }
@@ -253,6 +264,7 @@ public final class TriggerInterpreter {
             case "APPLY_BUFF" -> applyState(battle, effect, ctx);
             case "REMOVE_STACK" -> removeStacks(battle, effect, ctx);
             case "MODIFY_DAMAGE_TAKEN" -> modifyDamageTaken(battle, effect, ctx);
+            case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
@@ -523,6 +535,33 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * Settles a {@code BOOST_DAMAGE} effect: raises (or lowers) <b>the damage instance being settled</b>.
+     *
+     * <p>This is the op behind 「对处于 X 状态的目标造成的伤害提高 Y%」, and it exists because that sentence is
+     * not a buff: it applies to the hits that happen to satisfy a condition, so the natural home for the state
+     * is the hit itself. The rule fires on {@link TriggerEvent#DEALING_DAMAGE}, the engine hands the pending
+     * instance over in the context, and this adds one modifier to its DMG-boost zone — after which the instance
+     * is settled as usual. Nothing is attached to anybody, so nothing has to be removed, and a second hit is
+     * unaffected unless its own firing says otherwise.
+     *
+     * <p>A negative {@code percent} is legal and means "this instance deals less" (the zone is {@code 1 + Σ},
+     * and {@code assemble} floors the result at 1 anyway).
+     *
+     * @param effect the effect ({@code percent})
+     * @param ctx    the context, which must carry the instance (guaranteed by the load-time event check)
+     */
+    private static void boostDamage(EffectSpec effect, TriggerContext ctx) {
+        Damage damage = ctx.damage();
+        if (damage == null) {
+            // Unreachable through a validated table (requireEvent pins the event), but `apply` is public and a
+            // hand-built context can still lack an instance: better a loud error than a silent no-op.
+            throw new IllegalStateException(
+                    "Op BOOST_DAMAGE needs the damage instance being settled, but this context carries none");
+        }
+        damage.addBoost(effect.getPercent());
+    }
+
+    /**
      * The duration handed to a permanent modifier.
      *
      * <p>Deliberately {@code 1} and not a large number: {@link StatModifierBuff} marks the buff
@@ -609,6 +648,38 @@ public final class TriggerInterpreter {
         if (effect.getPercent() == null) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"percent\" (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates that an effect does <b>not</b> claim a duration.
+     *
+     * <p>Used by the ops whose effect is over the moment it is applied ({@code BOOST_DAMAGE} changes one damage
+     * instance). A {@code turns} written there would be silently ignored by Gson and by the interpreter — the
+     * author would see a rule that loads and behaves as if the field were not there.
+     */
+    private static void requireNoDuration(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getTurns() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has no duration (it acts on a single moment), but states \"turns\": "
+                            + effect.getTurns() + " (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates that an effect is only used on the event that can carry what it needs.
+     *
+     * <p>The "fail at load, not mid-battle" rule again: {@code BOOST_DAMAGE} changes the damage instance being
+     * settled, and only {@link TriggerEvent#DEALING_DAMAGE} hands one over. A rule on any other event would
+     * load, fire, and have nothing to change — so it is refused while the file is read.
+     */
+    private static void requireEvent(TriggerSpec spec, String op, TriggerEvent expected) {
+        TriggerEvent actual = TriggerEvent.fromString(spec.getOn());
+        if (actual != expected) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " only means something on " + expected.value() + ", because it changes the "
+                            + "damage instance being settled; this rule is on " + spec.getOn()
+                            + " (source: " + spec.getSource() + ")");
         }
     }
 
