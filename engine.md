@@ -65,7 +65,7 @@
 | `MULTIPLY_PERCENT` | 各自乘一个 `(1+pct)` | `Modifier.multiplyPercent(...)` |
 | `PURE_VALUE` | 最后加的平值 | `Modifier.pure(value, source, roleId)` |
 
-每个修正都带 `source`（`ModifierSource`：`BASE`/`RELIC`/`WEAPON`/`SKILL_POINT`/`EXTRA`/`BUFF`/`DEBUFF`/`UNKNOWN`）
+每个修正都带 `source`（`ModifierSource`：`BASE`/`RELIC`/`WEAPON`/`SKILL_TRACE`/`EXTRA`/`BUFF`/`DEBUFF`/`UNKNOWN`）
 与 `roleId`（来源实体的唯一 id），因此可以**按来源撤销**：`filterBySource(source)` 返回快照，
 `removeModifier(modifier)` 三个列表都扫（用非短路的 `|=`），不会撤错也不会 `ConcurrentModificationException`。
 
@@ -1629,7 +1629,7 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
   × 等级/突破缩放（LevelPromotionCalc）
   + 光锥基础值（Weapon，已按光锥等级缩放）
   + 遗器主副词条（RelicSuit）
-  + 行迹（SkillPoint 树，point.json）
+  + 行迹（SkillTrace 树，skill_traces.json）
   + 额外加成（ExtraBasicPromote）
   + 基础双爆（character_data 的 crit_chance / crit_attack）
   → AttributeBuilder.build() → DoubleValue[]
@@ -1706,8 +1706,8 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 
 ### 12.5 行迹（`SkillTrace`）✅
 
-`point.json[cid]` 是带 `pre_point` 的节点列表，`SkillPoint.init(cid)` 按 `pre_point.getFirst()`
-连成树（无前置 = 根），`sumAttributes` DFS 汇总，`appendTo` 追加为 `SKILL_POINT` 来源的修正。
+`skill_traces.json[cid]` 是带 `prev_trace` 的节点列表，`SkillTrace.init(cid)` 按 `prev_trace.getFirst()`
+连成树（无前置 = 根），`sumAttributes` DFS 汇总，`appendTo` 追加为 `SKILL_TRACE` 来源的修正。
 > ⚠️ 缓存是**进程级、按 cid**（不是按角色），且节点字段是 public 可变的。
 > 另外 `Builder.build()` 无条件套用**整棵**树，没有解锁门槛。
 
@@ -1766,15 +1766,19 @@ EnemyFactory.create(monsterId, level, hardLevelGroup)
 
 | 表 | 文件 | 可变性 |
 |---|---|---|
-| `RELIC_MAIN_ATTRIBUTES` / `RELIC_SUB_ATTRIBUTES` | `main_attribute.json` / `sub_attribute.json` | ⚠️ 可变（含嵌套 map） |
-| `WEAPONS` | `weapons.json` | ⚠️ 可变 |
-| `CHARACTERS` | `character_data.json` | ⚠️ 可变 |
-| `SKILL_POINTS` | `point.json` | ⚠️ 可变 |
-| `SKILLS` | `skills.json` | ⚠️ 可变（含嵌套） |
-| `MONSTER_TEMPLATES` | `monster_template_config.json` | ⚠️ 可变 |
-| `HARD_LEVEL_GROUPS` | `hard_level_group.json` | ⚠️ 可变（含嵌套） |
-| `MONSTER_CONFIGS` | `monster_config.json` + 补丁 `monster_attack_modify_ratio.json` | ✅ `Map.copyOf`（唯一不可变的） |
-| `BREAKING_RATE` | `breaking_rate.json` | ⚠️ 可变 |
+| `RELIC_MAIN_ATTRIBUTES` / `RELIC_SUB_ATTRIBUTES` | `main_attribute.json` / `sub_attribute.json` | ⚠️ **bean**（不是表）：`frozen()` 只认 Map/List，会原样放行；其内部 map 仍可变 → **N-11** |
+| `WEAPONS` | `weapons.json` | ✅ 容器 `frozen(...)`（H-1） |
+| `CHARACTERS` | `character_data.json` | ✅ 容器 `frozen(...)`（H-1） |
+| `SKILL_TRACES` | `skill_traces.json` | ✅ 容器 `frozen(...)`（H-1，含嵌套 `List`） |
+| `SKILLS` | `skills.json` | ✅ 容器 `frozen(...)`（H-1，含嵌套 `Map`） |
+| `MONSTER_TEMPLATES` | `monster_template_config.json` | ✅ 容器 `frozen(...)`（H-1） |
+| `HARD_LEVEL_GROUPS` | `hard_level_group.json` | ✅ 容器 `frozen(...)`（H-1，含嵌套 `Map`） |
+| `MONSTER_CONFIGS` | `monster_config.json` + 补丁 `monster_attack_modify_ratio.json` | ✅ `Map.copyOf`（本来就不变） |
+| `BREAKING_RATE` | `breaking_rate.json` | ✅ 容器 `frozen(...)`（H-1） |
+
+> H-1 的边界是**容器、不是 bean**：表本身再也不能被 `clear()`/`put()`，但表里的 bean 字段仍可写。
+> 上表那两行 `RELIC_*` 是唯一还暴露可变内部 map 的地方（`RelicMainAttribute.getAttributeByStar` 与其
+> `RelicSubAttribute` 孪生，见 ROADMAP §12 N-11）。
 
 懒加载（不占静态块）：`Constant.stages()` ← `stage.json`（见下）。
 B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SKILLS` / 合并进 `MONSTER_CONFIGS`）。
@@ -2334,7 +2338,7 @@ jingYuan.getAggro();       // 75
 速度  99                                      （不吃等级缩放）
 ```
 
-注意**行迹是无条件应用的**（`build()` 里调 `SkillPoint.appendTo`），所以面板不等于
+注意**行迹是无条件应用的**（`build()` 里调 `SkillTrace.appendTo`），所以面板不等于
 `数据 × 倍率`。这一点很容易误判成"属性索引错位"（P8-1 时我就误诊了一轮）。
 
 ⚠ `Character.fromAttributes(...)`（测试/占位入口，P8 后新代码禁止使用）造的技能

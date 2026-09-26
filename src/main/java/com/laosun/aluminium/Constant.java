@@ -601,7 +601,7 @@ public final class Constant {
         }.getType()));
         CHARACTERS = frozen(JSONReader.fromJSON("character_data.json", new TypeToken<Map<Integer, CharacterData>>() {
         }.getType()));
-        SKILL_TRACES = frozen(JSONReader.fromJSON("point.json", new TypeToken<Map<Integer, List<SkillTraceData>>>() {
+        SKILL_TRACES = frozen(JSONReader.fromJSON("skill_traces.json", new TypeToken<Map<Integer, List<SkillTraceData>>>() {
         }.getType()));
         SKILLS = frozen(JSONReader.fromJSON("skills.json", new TypeToken<Map<Integer, Map<Integer, Skill>>>() {
         }.getType()));

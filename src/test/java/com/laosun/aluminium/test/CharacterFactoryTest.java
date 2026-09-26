@@ -74,7 +74,7 @@ public class CharacterFactoryTest {
 
     /**
      * Panel scaling check: {@code final panel = data base value × calcCharacterRate(80, true)},
-     * **then plus the trace bonuses from {@code point.json}** (the latter applied unconditionally in
+     * **then plus the trace bonuses from {@code skill_traces.json}** (the latter applied unconditionally in
      * {@code build()}).
      *
      * <pre>
