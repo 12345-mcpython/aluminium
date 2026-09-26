@@ -120,7 +120,7 @@
     {
       "require": 4,
       "ability": "Ability51231",
-      "reason": "\"While the wearer's memosprite is on the field, increases the wearer's SPD by 6%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by 30%, lasting for 3 turn(s).\" Needs a memosprite presence condition and a memosprite-attack event. (The enemy-side half of summons landed in P9-4; a memosprite is OUR side's, which needs Battle.characters widened from List<Character> -- the friendly half of L-8.)"
+      "reason": "\"While the wearer's memosprite is on the field, increases the wearer's SPD by 6%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by 30%, lasting for 3 turn(s).\" Needs a memosprite presence condition and a memosprite-attack event. ⚠ The unit itself can be placed now -- `resources/memosprites/<cid>.json` derives a memosprite's panel from its summoner and `Battle.summonMemosprite` puts it on the field (engine.md 24.5). What is missing is the CONDITION ('do I have one out') and an event for 'the memosprite attacked'."
     }
   ],
   "124": [
@@ -258,7 +258,7 @@
     {
       "require": 2,
       "ability": "Ability53181",
-      "reason": "\"Increases the wearer's CRIT DMG by 16%. When the wearer has a summon on the field, increases the wearer's CRIT DMG by an extra 16%.\" The CRIT DMG is the `properties` stat (CriticalDamageBase 0.16). What is missing is a condition on 'I have a summon on the field'. ⚠ This is OUR side's summons: P9-4 gave the engine enemy-camp summons, but a player-side Summon has nowhere to be placed yet (Battle.characters is List<Character> -- the friendly half of L-8), so this entry waits on that, not on a condition."
+      "reason": "\"Increases the wearer's CRIT DMG by 16%. When the wearer has a summon on the field, increases the wearer's CRIT DMG by an extra 16%.\" The CRIT DMG is the `properties` stat (CriticalDamageBase 0.16). What is missing is a condition on 'I have a summon on the field'. ⚠ Placement is no longer the blocker: our side's camp holds a summon (L-8's friendly half) and a memosprite's panel is derived from its summoner (`resources/memosprites/<cid>.json`, engine.md 24.5). A presence condition is what remains, and it would cover every entry in this family at once."
     }
   ],
   "319": [
@@ -293,7 +293,7 @@
     {
       "require": 2,
       "ability": "Ability53231",
-      "reason": "\"Increases the wearer's CRIT Rate by 8%. While the wearer's memosprite is on the field, increases all allies' SPD by 12%. This effect cannot be stacked.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08) and the party-wide SPD boost is expressible. What blocks it is the memosprite presence condition (our side's summons -- see set 318)."
+      "reason": "\"Increases the wearer's CRIT Rate by 8%. While the wearer's memosprite is on the field, increases all allies' SPD by 12%. This effect cannot be stacked.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08) and the party-wide SPD boost is expressible. What blocks it is the memosprite presence condition (see set 318 -- the unit can be placed, the condition does not exist yet)."
     }
   ],
   "324": [

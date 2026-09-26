@@ -1,0 +1,16 @@
+{
+  "name": "衣匠",
+  "source": "1402 阿格莱雅 忆灵天赋: 「忆灵衣匠初始拥有等同于阿格莱雅#1[i]%速度的速度以及等同于阿格莱雅#2[i]%生命上限+#3[i]的生命上限。」 param = [0.35, 0.66, 720]",
+  "note": "The panel is stated against the summoner, which is why this file is named after 阿格莱雅 rather than after 衣匠: the two percentages mean 'of HER sheet', and a file named after the memosprite would have to repeat the owner's name and could then disagree with it. ⚠ HEALTH is 0.66 x max HP PLUS 720 -- a share alone would be wrong at every level, because the game's own number has a flat term (the same shape as the Light Cone and trace bonuses). ⚠ Nothing else is inherited: ATTACK / DEFENCE and the resistances stay at the builder's 0, because no document states them and this data set has no memosprite stat table. The consequences are known and registered (ROADMAP): a memosprite takes the full hit, and its own damage is the engine's floor until 忆灵技 damage scaling exists.",
+  "panel": [
+    {
+      "attribute": "HEALTH",
+      "percent": 0.66,
+      "flat": 720
+    },
+    {
+      "attribute": "SPEED",
+      "percent": 0.35
+    }
+  ]
+}
