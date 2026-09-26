@@ -44,21 +44,21 @@ none of those exist will it prompt for the path (and then store it next to the s
 > script's own directory, which meant regenerating from the repo root silently refreshed a *different*
 > copy and left the committed-under-gitignore data stale.
 
-The current script emits **27 files** — including `eidolons.json`, `relic_sets.json`, `growth.json`,
-`materials.json`, `recommend.json`, `enhanced_skills.json`, `global_buffs.json` and
-`property_names.json`. The Java engine only reads 11 of them; `engine.md` §14.1 registers which are
-loaded and which are generated-but-unused.
+The current script emits **28 files** — including `eidolons.json`, `relic_sets.json`, `growth.json`,
+`materials.json`, `recommend.json`, `enhanced_skills.json`, `global_buffs.json`,
+`skill_effects.json` and `property_names.json`. The Java engine reads 12 of the generated files
+(plus 2 hand-maintained ones); `engine.md` §14.1 registers which are loaded and which are
+generated-but-unused.
+
+> ⚠️ The gist linked above is **behind the local copy**: the `skill_effects.json` export
+> (the per-skill scale/parameter table the engine reads through `SkillEffects`) exists only in the
+> local `E:\code\python\generate_data.py` and has no published history. See `DOC_VS_CODE.md` F-9's
+> tooling note before assuming the gist is current.
 
 > **This step is required before anything can run.** Most game data is not committed:
 > `src/main/resources/data/` is listed in `.gitignore`, and only two files there are tracked —
 > the patch file `monster_attack_modify_ratio.json` and the hand-written `enemy_skills.json`.
-> A fresh `git clone` therefore has none of the **27 generated data files**
-> (`skills.json`, `monster_config.json`, `stage.json`, …), and **every test fails**.
-
-> **This step is required before anything can run.** Most game data is not committed:
-> `src/main/resources/data/` is listed in `.gitignore`, and only two files there are tracked —
-> the patch file `monster_attack_modify_ratio.json` and the hand-written `enemy_skills.json`.
-> A fresh `git clone` therefore has none of the **27 generated data files**
+> A fresh `git clone` therefore has none of the **28 generated data files**
 > (`skills.json`, `monster_config.json`, `stage.json`, …), and **every test fails**.
 
 ### What a missing data file looks like

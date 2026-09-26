@@ -47,26 +47,30 @@ import java.util.Set;
  * the element that breaks — no character of that element needs to exist for Ice/Quantum/Imaginary to be
  * testable.
  *
- * <p><b>Why the push is asserted to the digit for 冻结, against a measured baseline for 禁锢, and not at
- * all for 纠缠.</b> A speed change <i>reschedules</i> the pending action ({@code Signal.refreshSpeed}
- * recomputes {@code nextActionTime} from the progress the unit has already made), and the reschedule is
- * larger the bigger the slow is. On this fixture, measured:
+ * <p><b>Why the push is asserted to the digit for 冻结 and not at all for 纠缠/禁锢.</b> A speed change
+ * <i>reschedules</i> the pending action ({@code Signal.refreshSpeed} recomputes {@code nextActionTime} from
+ * the progress the unit has already made), and the reschedule is larger the bigger the slow is — so for the
+ * two states that slow, the movement of the action bar mixes two effects and no threshold can separate them.
+ * On this fixture, measured (after the L-26 fix; the numbers were smaller before it, which is what exposed
+ * that fix):
  *
  * <table border="1">
  *   <caption>action-value movement of the same break, by how much it slows</caption>
  *   <tr><th>case</th><th>movement</th><th>assertable?</th></tr>
- *   <tr><td>plain break, no slow, no extra delay</td><td>18.94 (exactly 25%)</td><td>yes — the regression test pins it</td></tr>
- *   <tr><td>冻结, no slow, +50% delay</td><td>56.82</td><td>yes — nothing recomputes</td></tr>
- *   <tr><td>禁锢, 10% slow, without the extra delay</td><td>12.63</td><td>yes — below the 18.94 baseline</td></tr>
- *   <tr><td>禁锢, 10% slow, with the +20% delay</td><td>29.46</td><td>yes — above it</td></tr>
- *   <tr><td>纠缠, 20% slow, without the extra delay</td><td>28.41</td><td><b>no — already above the baseline</b></td></tr>
- *   <tr><td>纠缠, 20% slow, with the +20% delay</td><td>47.35</td><td>no — indistinguishable in kind</td></tr>
+ *   <tr><td>plain break, no slow, no extra delay</td><td>18.94 (exactly 25%)</td><td>yes — this test's regression case pins it</td></tr>
+ *   <tr><td>冻结, no slow, +50% delay</td><td>56.82</td><td><b>yes, to the digit</b> — nothing recomputes</td></tr>
+ *   <tr><td>禁锢, 10% slow, without the extra delay</td><td>33.67</td><td>no — already above 18.94</td></tr>
+ *   <tr><td>禁锢, 10% slow, with the +20% delay</td><td>50.51</td><td>no — indistinguishable in kind</td></tr>
+ *   <tr><td>纠缠, 20% slow, without the extra delay</td><td>52.08</td><td>no — already above 18.94</td></tr>
+ *   <tr><td>纠缠, 20% slow, with the +20% delay</td><td>71.02</td><td>no — indistinguishable in kind</td></tr>
  * </table>
  *
- * <p>So for 纠缠 a delay assertion could not fail, and one was removed rather than kept as decoration.
- * That is a real limitation of the engine's delay/slow composition (the same family as CODE_REVIEW L-26),
- * not of the table: what proves the element's extra delay is read at all is 冻结's exact figure plus
- * {@code BreakEffectTableTest} requiring {@code delayPercent > 0} of every control element.
+ * <p>So an action-bar delay assertion for 纠缠/禁锢 could not fail, and both were removed rather than kept
+ * as decoration. Nothing is left unpinned by that, because the three links are covered where they can be
+ * isolated: the <b>table</b> by {@code BreakEffectTableTest} ({@code delayPercent > 0} for every control
+ * element), the <b>one call site</b> that reads it by 冻结 below (exact), and the <b>mechanism</b> — a push
+ * surviving a speed change — by {@code QueueActionManipulationTest.aDelaySurvivesASpeedChange}, which is
+ * where it can be observed alone.
  */
 public class ControlTest {
     private static final double EPS = 1e-6;
@@ -100,29 +104,27 @@ public class ControlTest {
                 "纠缠 acts, just later and slower -- it must NOT be an act lock");
         Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("ENTANGLED").slowPercent()),
                 f.speed(), EPS, "纠缠 = 速度降低");
-        // ⚠ The push is NOT asserted here, deliberately -- see the class javadoc. A 20% slow reschedules the
-        // action by more than a plain break pushes, so with or without the element's extra delay the movement
-        // clears every threshold this test could name: it would be an assertion that cannot fail. 禁锢 below
-        // is assertable only because its 10% slow is small enough that the reschedule alone stays below the
-        // plain-break baseline. What pins the extra delay being read out of the table is 冻结's exact figure.
+        // ⚠ The push is NOT asserted here, deliberately -- see the class javadoc's measured table. A 20%
+        // slow reschedules the action by more than the push, so with or without the element's extra delay
+        // the movement clears every threshold this test could name: an assertion that cannot fail. The push
+        // being read out of the table is pinned by 冻结's exact figure, and the mechanism by
+        // QueueActionManipulationTest.aDelaySurvivesASpeedChange.
     }
 
     @Test
     public void anImaginaryBreakSlowsAndDelaysButStillLetsTheVictimAct() {
         Fixture f = fixture(DamageElement.IMAGINARY);
         double speedBefore = f.speed();
-        double delayBefore = timeRemaining(f.battle, f.enemy);
 
         f.breakWith(DamageElement.IMAGINARY);
 
         Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "禁锢 is not an act lock");
         Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("IMPRISONED").slowPercent()),
                 f.speed(), EPS, "禁锢 = 速度降低");
-        Assertions.assertTrue(timeRemaining(f.battle, f.enemy) - delayBefore
-                        > f.plainBreakPush(speedBefore),
-                "禁锢 = 行动延后: must move the bar strictly further than a plain break would; got "
-                        + (timeRemaining(f.battle, f.enemy) - delayBefore) + " against a plain-break push of "
-                        + f.plainBreakPush(speedBefore));
+        // Same as 纠缠 above: no push assertion, and for the same measured reason -- at a 10% slow the
+        // reschedule alone already moves the bar 33.67 against a plain break's 18.94. (Before the L-26 fix
+        // it was 12.63, *below* the baseline, so this case used to be assertable; the fix removed that
+        // accidental discrimination by no longer truncating the reschedule.)
     }
 
     /**
@@ -185,15 +187,6 @@ public class ControlTest {
         /** One action period in action-value units: the same {@code 10000 / speed} the delay is computed from. */
         double period() {
             return 10_000.0 / speed();
-        }
-
-        /**
-         * How far a <b>plain</b> break pushes this same enemy back: {@code BREAK_DELAY_RATIO} of one action
-         * period at its pre-break speed. {@code aPhysicalBreakStillOnlyBurns} measures exactly this value
-         * against this same fixture, so it is a measured baseline rather than a formula invented here.
-         */
-        double plainBreakPush(double speedBefore) {
-            return 10_000.0 / speedBefore * Constant.BREAK_DELAY_RATIO;
         }
     }
 
