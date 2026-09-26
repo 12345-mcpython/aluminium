@@ -25,13 +25,13 @@ import com.laosun.aluminium.enums.DamageElement;
  *                   {@code SkillEffectType.fromString}); {@code null} = single target
  * @param guessed    whether the multiplier is a guessed value
  *
- * <p>⚠ <b>{@code hits} means segments here, not targets.</b> {@code ROADMAP}'s P9-1 plan describes a
- * future enemy skill table whose {@code hits} field means "how many targets, 0 = all". The two must
- * not be merged silently: the shipped entries were written as segments (8013010 "Trampling Stomp" has
- * {@code hits: 2} and means two segments on one target), so reusing the name for a target count when
- * the real table lands would change every existing enemy's behaviour without a single test failing.
- * Target count is expressed by {@link #effect()} instead, which is additive and defaults to today's
- * behaviour.
+ *                   <p>⚠ <b>{@code hits} means segments here, not targets.</b> {@code ROADMAP}'s P9-1 plan describes a
+ *                   future enemy skill table whose {@code hits} field means "how many targets, 0 = all". The two must
+ *                   not be merged silently: the shipped entries were written as segments (8013010 "Trampling Stomp" has
+ *                   {@code hits: 2} and means two segments on one target), so reusing the name for a target count when
+ *                   the real table lands would change every existing enemy's behaviour without a single test failing.
+ *                   Target count is expressed by {@link #effect()} instead, which is additive and defaults to today's
+ *                   behaviour.
  */
 public record EnemySkillData(int id,
                              Translate name,

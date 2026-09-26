@@ -27,25 +27,45 @@ import java.util.Map;
  */
 @Getter
 public enum Path {
-    /** Preservation: aggro 150. */
+    /**
+     * Preservation: aggro 150.
+     */
     PRESERVATION("protection", 150),
-    /** Destruction: aggro 125. */
+    /**
+     * Destruction: aggro 125.
+     */
     DESTRUCTION("destruction", 125),
-    /** Hunt: aggro 75 (lower than the standard tier). */
+    /**
+     * Hunt: aggro 75 (lower than the standard tier).
+     */
     HUNT("single", 75),
-    /** Erudition: aggro 75. */
+    /**
+     * Erudition: aggro 75.
+     */
     ERUDITION("all", 75),
-    /** Harmony: aggro 100. */
+    /**
+     * Harmony: aggro 100.
+     */
     HARMONY("help", 100),
-    /** Nihility: aggro 100. */
+    /**
+     * Nihility: aggro 100.
+     */
     NIHILITY("debuff", 100),
-    /** Abundance: aggro 100. */
+    /**
+     * Abundance: aggro 100.
+     */
     ABUNDANCE("healing", 100),
-    /** Elation: aggro 100. */
+    /**
+     * Elation: aggro 100.
+     */
     ELATION("elation", 100),
-    /** Remembrance: aggro 100. */
+    /**
+     * Remembrance: aggro 100.
+     */
     REMEMBRANCE("memory", 100),
-    /** Fallback for an unknown / missing Path: aggro 100. */
+    /**
+     * Fallback for an unknown / missing Path: aggro 100.
+     */
     OTHER("", 100);
 
     private static final Map<String, Path> BY_MT = Map.ofEntries(

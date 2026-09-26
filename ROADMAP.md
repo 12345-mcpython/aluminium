@@ -305,9 +305,11 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 - **目标**：把 12 类触发源都变成事件，让"角色机制"只订阅事件，不再往 `Battle` 里塞逻辑。
 - **结果**：事件从 **4 个扩到 11 个**（2026-09-23 完成），新增
   `SkillCastEvent` / `EnergyEvent` / `HpLossEvent` / `HealEvent` / `KillEvent` / `BreakEvent` /
-  `SkillPointGainedEvent` / `SkillPointSpentEvent`。
+  `SkillPointEvent`（战技点增减：2026-09-26 由 `SkillPointGainedEvent` + `SkillPointSpentEvent`
+  合并成一个接口，两个方法都是 `default`，粒度不变）。
   完整口径见 `engine.md` §4（含**广播口径**与**每个事件的口径**两张表）。
-- **涉及文件**：新建 `models/event/` 下 8 个接口；`models/CanHit.java`（实现并转发给 `BuffManager`）；
+- **涉及文件**：新建 `models/event/` 下 8 个接口（战技点那两个后来合并成 `SkillPointEvent`，现为 7 个）；
+  `models/CanHit.java`（实现并转发给 `BuffManager`）；
   `models/BuffManager.java`（逐个 `instanceof` 转发）；`Battle.java`（发事件 + 广播）；
   `models/SkillExecutor.java`（发 `SkillCastEvent`）；`models/skillpoint/StandardSkillPointPolicy.java`
   （上报实际增减）；新建 `test/EventBusTest.java`（20 条）
@@ -1150,7 +1152,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | N-2 | `Benchmark.java:38` | 读的 `dump_data.json` 仓库里不存在；兜底分支走不到；`main()` 包私有；结果被丢弃 |
 | N-3 | `CanHit.java:99-104` | 同时有 `Runnable` **字段**与**同名方法**（`beforeMove`/`afterMove`/`onBattleStart`）→ 直接调 `MoveEvent.beforeMove(battle)` 会**静默跳过 buff tick**。建议 `setBeforeMoveHook(Runnable)` |
 | N-4 | `Enemy`/`Summon` | 无拷贝构造器：`new Enemy(...)` 走 `CanHit(CanHit)` 会丢掉 `damageResist`/`stanceWeak`/`stance`/`broken` 全部子类字段（`Character` 就正确重写了） |
-| N-5 | `RelicSuit.java:153` | `appendAttribute` 是死方法，逐行相同的代码内联在 `appendTo`；"按属性类型分发"逻辑在 `RelicSuit`/`Weapon`/`SkillPoint` **三处复制**。建议下沉 `AttributeBuilder.add(type, value, source)`（顺带消掉 M-19 那 4 处重复守卫） |
+| N-5 | `RelicSuit.java:153` | `appendAttribute` 是死方法，逐行相同的代码内联在 `appendTo`；"按属性类型分发"逻辑在 `RelicSuit`/`Weapon`/`SkillTrace` **三处复制**。建议下沉 `AttributeBuilder.add(type, value, source)`（顺带消掉 M-19 那 4 处重复守卫） |
 | N-6 | `models/Buff.java:3` | 接口上留着裸 `// TODO`；`Buff.setSource/getSource` 全仓库无人调用，`AbstractBuff.source` 恒 null → **接口契约实际未实现**（`DotBuff` 用了 `setSource`，所以只剩 getter 侧无人读） |
 | N-7 | `BreakDamageCalculator.java:21` | javadoc 例子"30 点普攻 × 2.5 击破加成 = 112.5"在仓库里无法复现，会误导读者以为调用方要预乘 |
 | N-8 | `Queue.java:269,299,324` | 在 for-each 遍历 `heap` 的同时改键再 `rebuildHeap()` 清空同一个 heap —— **只因为每个分支立刻 `return` 才安全** |

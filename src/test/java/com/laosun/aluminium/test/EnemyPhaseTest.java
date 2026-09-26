@@ -4,8 +4,9 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Enemy;
-import com.laosun.aluminium.models.EnemySkill;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemySkill;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ public class EnemyPhaseTest {
 
     /** Ice Edge's real template, but with a small HP pool so a percentage is easy to set up. */
     private static Enemy enemy() {
-        Enemy enemy = com.laosun.aluminium.models.EnemyFactory.create(1002011, 90, 1);
+        Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(MAX_HP));
         enemy.heal(MAX_HP);
         return enemy;

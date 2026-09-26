@@ -101,7 +101,9 @@ public final class TriggerTables {
         return resourceFor(cid) != null;
     }
 
-    /** How many times a trigger file has been read from the classpath. See {@link #loadCount}. */
+    /**
+     * How many times a trigger file has been read from the classpath. See {@link #loadCount}.
+     */
     public static int loadCount() {
         synchronized (CACHE) {
             return loadCount;

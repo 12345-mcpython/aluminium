@@ -9,7 +9,6 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.utils.JSONReader;
 
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -394,12 +393,16 @@ public final class Constant {
      *                     data's own {@code STAT_*} resistance vocabulary is keyed by.
      */
     public record BreakEffect(double dotRatio, int dotTurns, double delayPercent, String control) {
-        /** Whether this element attaches a damage-over-time when it breaks. */
+        /**
+         * Whether this element attaches a damage-over-time when it breaks.
+         */
         public boolean hasDot() {
             return dotRatio > 0 && dotTurns > 0;
         }
 
-        /** Whether this element leaves a control state behind. */
+        /**
+         * Whether this element leaves a control state behind.
+         */
         public boolean hasControl() {
             return control != null;
         }
@@ -408,7 +411,7 @@ public final class Constant {
          * The control state this element leaves behind, or {@code null}.
          *
          * @throws IllegalStateException when {@link #control} names an entry that is not in
-         *         {@link #CONTROL_EFFECTS} — a typo must not degrade into "no control at all"
+         *                               {@link #CONTROL_EFFECTS} — a typo must not degrade into "no control at all"
          */
         public ControlEffect controlEffect() {
             if (control == null) {
@@ -629,7 +632,7 @@ public final class Constant {
      * </ul>
      */
     private static Map<Integer, MonsterConfig> normalizeMonsterConfigs(Map<Integer, MonsterConfig> raw,
-                                                                      Map<Integer, Double> attackRatios) {
+                                                                       Map<Integer, Double> attackRatios) {
         Map<Integer, Double> patches = attackRatios == null ? Map.of() : attackRatios;
         Map<Integer, MonsterConfig> normalized = new LinkedHashMap<>();
         raw.forEach((id, config) -> normalized.put(id, new MonsterConfig(

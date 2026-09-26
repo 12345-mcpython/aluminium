@@ -67,7 +67,9 @@ public final class CharacterFactory {
             1506    // Silver Wolf LV.999 (银狼LV.999): the Elation (欢愉) system
     );
 
-    /** The "not credited" provider shared by the characters above (stateless, so shareable). */
+    /**
+     * The "not credited" provider shared by the characters above (stateless, so shareable).
+     */
     private static final EnergyProvider NO_CONVENTIONAL_ENERGY = new NoConventionalEnergyProvider();
 
     private CharacterFactory() {

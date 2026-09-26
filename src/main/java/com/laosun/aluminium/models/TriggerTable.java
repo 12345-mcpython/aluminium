@@ -73,7 +73,9 @@ public class TriggerTable {
         this(0, specs);
     }
 
-    /** Whether this table has no rules at all. */
+    /**
+     * Whether this table has no rules at all.
+     */
     public boolean isEmpty() {
         return byEvent.isEmpty();
     }
@@ -126,7 +128,9 @@ public class TriggerTable {
         }
     }
 
-    /** How many rules subscribe to the given event. */
+    /**
+     * How many rules subscribe to the given event.
+     */
     public int ruleCount(TriggerEvent event) {
         return byEvent.getOrDefault(event, List.of()).size();
     }
@@ -211,7 +215,9 @@ public class TriggerTable {
     // matching the game text's own placeholder (`#1[i]%` with param 0.5).
     // ==================================================================
 
-    /** The numeric variables {@code hp_percent} and {@code hit_count} are the complete, closed set. */
+    /**
+     * The numeric variables {@code hp_percent} and {@code hit_count} are the complete, closed set.
+     */
     private static final Set<String> NUMERIC_VARIABLES = Set.of("hit_count", "hp_percent");
 
     private static Condition parseCondition(String raw, TriggerSpec spec) {
@@ -394,10 +400,14 @@ public class TriggerTable {
      */
     public interface Condition {
 
-        /** Evaluates the condition. */
+        /**
+         * Evaluates the condition.
+         */
         boolean test(TriggerContext ctx);
 
-        /** The original text, for error messages and debugging. */
+        /**
+         * The original text, for error messages and debugging.
+         */
         String source();
     }
 

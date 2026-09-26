@@ -4,7 +4,6 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.ResourceScope;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -12,13 +11,14 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Enemy;
-import com.laosun.aluminium.models.EnemyFactory;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Resource;
 import com.laosun.aluminium.models.ResourceManager;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -447,13 +447,13 @@ public class ResourceTest {
 
         // No conventional energy from any source.
         @Override
-        public EnergyGain onSkillCast(CanHit user, com.laosun.aluminium.models.Skill skill,
+        public EnergyGain onSkillCast(CanHit user, Skill skill,
                                      java.util.Set<? extends CanHit> hitTargets) {
             return null;
         }
 
         @Override
-        public EnergyGain onUltCast(CanHit user, com.laosun.aluminium.models.Skill skill) {
+        public EnergyGain onUltCast(CanHit user, Skill skill) {
             return null;
         }
 

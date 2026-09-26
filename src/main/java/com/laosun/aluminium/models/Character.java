@@ -8,6 +8,9 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.exceptions.CharacterException;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.skill.SkillTrace;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import com.laosun.aluminium.utils.CharacterDataProvider;
 import com.laosun.aluminium.utils.ConstantCharacterDataProvider;
@@ -343,7 +346,7 @@ public class Character extends CanHit {
             CharacterData characterData = validateAndGet(cid);
             double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
             AttributeBuilder calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
-            SkillPoint.appendTo(SkillPoint.init(cid), calcData);
+            SkillTrace.appendTo(SkillTrace.init(cid), calcData);
             Character character = new Character(characterData.name(), calcData.build());
             character.relicSuit = relicSuit;
             character.weapon = weapon;

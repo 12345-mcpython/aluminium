@@ -61,7 +61,9 @@ import java.util.TreeMap;
  */
 public final class RelicTriggerTables {
 
-    /** Directory holding the per-set files, relative to the classpath. */
+    /**
+     * Directory holding the per-set files, relative to the classpath.
+     */
     private static final String DIR = "relic_sets";
 
     /**
@@ -74,24 +76,36 @@ public final class RelicTriggerTables {
      */
     public static final String UNMODELLED_RESOURCE = "/" + DIR + "/_unmodelled.json";
 
-    /** One set file is {@code {"<piece count>": [ ...rules... ]}}. */
+    /**
+     * One set file is {@code {"<piece count>": [ ...rules... ]}}.
+     */
     private static final Type FILE_SHAPE = new TypeToken<Map<String, List<TriggerSpec>>>() {
     }.getType();
 
-    /** The registry is {@code {"<set id>": [ {require, ability, reason} ]}}. */
+    /**
+     * The registry is {@code {"<set id>": [ {require, ability, reason} ]}}.
+     */
     private static final Type UNMODELLED_SHAPE = new TypeToken<Map<String, List<Unmodelled>>>() {
     }.getType();
 
-    /** Cached because a set asked for twice must not hit the classpath twice. */
+    /**
+     * Cached because a set asked for twice must not hit the classpath twice.
+     */
     private static final Map<Integer, Rules> CACHE = new HashMap<>();
 
-    /** Gson instance for this loader (stateless and cheap; see {@link TriggerTables}). */
+    /**
+     * Gson instance for this loader (stateless and cheap; see {@link TriggerTables}).
+     */
     private static final Gson GSON = new Gson();
 
-    /** How many times a set file has actually been read (not merely asked for). */
+    /**
+     * How many times a set file has actually been read (not merely asked for).
+     */
     private static int loadCount;
 
-    /** The parsed {@code _unmodelled.json}, read once. */
+    /**
+     * The parsed {@code _unmodelled.json}, read once.
+     */
     private static volatile List<Unmodelled> unmodelled;
 
     private RelicTriggerTables() {
@@ -100,8 +114,8 @@ public final class RelicTriggerTables {
     /**
      * The trigger rules of one relic set, by threshold.
      *
-     * @param setId        the set id the rules were written for
-     * @param byThreshold  threshold → the <b>cumulative</b> table for wearing at least that many pieces
+     * @param setId       the set id the rules were written for
+     * @param byThreshold threshold → the <b>cumulative</b> table for wearing at least that many pieces
      */
     public record Rules(int setId, NavigableMap<Integer, TriggerTable> byThreshold) {
 
@@ -110,19 +124,23 @@ public final class RelicTriggerTables {
          *
          * @param wornPieces how many pieces of the set are worn
          * @return the cumulative table for the highest threshold that is met, or
-         *         {@link TriggerTable#EMPTY} when no threshold is met (including an empty rule set)
+         * {@link TriggerTable#EMPTY} when no threshold is met (including an empty rule set)
          */
         public TriggerTable at(int wornPieces) {
             Map.Entry<Integer, TriggerTable> met = byThreshold.floorEntry(wornPieces);
             return met == null ? TriggerTable.EMPTY : met.getValue();
         }
 
-        /** Whether no rules were written for this set. */
+        /**
+         * Whether no rules were written for this set.
+         */
         public boolean isEmpty() {
             return byThreshold.isEmpty();
         }
 
-        /** The thresholds the set's file declares, in ascending order. */
+        /**
+         * The thresholds the set's file declares, in ascending order.
+         */
         public Set<Integer> thresholds() {
             return byThreshold.keySet();
         }
@@ -169,7 +187,9 @@ public final class RelicTriggerTables {
         return RelicTriggerTables.class.getResource(pathFor(setId)) != null;
     }
 
-    /** How many times a set file has been read from the classpath. */
+    /**
+     * How many times a set file has been read from the classpath.
+     */
     public static int loadCount() {
         synchronized (CACHE) {
             return loadCount;

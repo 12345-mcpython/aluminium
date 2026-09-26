@@ -2,7 +2,8 @@ package com.laosun.aluminium.models.energy;
 
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.Skill;
+import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.skill.SkillData;
 
 import java.util.Set;
 
@@ -40,9 +41,9 @@ public interface EnergyProvider {
      *
      * <p>The default is the conventional rule. Note it is <b>not</b> {@code isEnergyFull()} on
      * {@code CanHit}: the threshold can be lower than the cap ({@link
-     * com.laosun.aluminium.models.SkillData#getSpNeed()}), which is why the caller passes the cost in.
+     * SkillData#getSpNeed()}), which is why the caller passes the cost in.
      *
-     * @param user      the unit asking
+     * @param user       the unit asking
      * @param energyCost the energy threshold currently in force (the data's {@code spNeed} when it has
      *                   one, otherwise the unit's cap)
      * @return whether the ultimate may be cast
