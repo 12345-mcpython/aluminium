@@ -81,6 +81,18 @@ public class StateBuff extends AbstractBuff {
     }
 
     /**
+     * A named state is <b>not</b> classified as a debuff, and that is a decision rather than an oversight: its
+     * side is decided by the rule that applied it ({@code APPLY_BUFF} carries a name and a duration, not a sign),
+     * and 【协奏】 and 【失重】 are opposite kinds of thing under one mechanism. The safe direction is "not a
+     * debuff" — a state is never removed by 解除负面效果 by accident — and when content needs a dispellable
+     * state, {@code APPLY_BUFF} gains the side instead of this class guessing.
+     */
+    @Override
+    public boolean isDebuff() {
+        return false;
+    }
+
+    /**
      * Nothing to attach: a state changes no attribute (see the class javadoc).
      */
     @Override

@@ -80,6 +80,27 @@ public abstract class AbstractBuff implements Buff {
     @Override
     public abstract boolean canAct();
 
+    /**
+     * Whether this buff is a <b>negative effect</b> (负面效果) — the thing 「解除 N 个负面效果」 removes and
+     * 「目标身上有几个负面」 counts.
+     *
+     * <p><b>Where the classification lives, and why not abstract.</b> The default is {@code false}, and the
+     * debuffs override it: the five of them are pinned together in {@code DebuffTest}'s table, so the set is
+     * decided in one readable place instead of being implied by whichever classes happen to override a method.
+     * The trade is deliberate — a new buff class starts as "not a debuff", which is the safe direction (it can
+     * never be dispelled by accident), and it gets classified on purpose when its content arrives, exactly like
+     * a relic ability is either authored or registered.
+     *
+     * <p>It answers a <b>game-semantics</b> question rather than a mechanical one, which is why a few answers
+     * look surprising until you read the text: 「减伤」 is a <i>positive</i> effect even though it sits on the
+     * defender ({@link ReductionBuff}), 「受到伤害提高」 is negative ({@link VulnerabilityBuff}), and a
+     * {@link StatModifierBuff} answers by its {@code sourceRole} — the same sign that decided whether it landed
+     * in the buff or the debuff half of the attribute.
+     */
+    public boolean isDebuff() {
+        return false;
+    }
+
     @Override
     public abstract void applyEffect(CanHit target);
 

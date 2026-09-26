@@ -285,6 +285,17 @@ public class StatModifierBuff extends AbstractBuff {
         return true;
     }
 
+    /**
+     * A stat modifier is a negative effect exactly when it landed in the <b>debuff</b> half of the attribute —
+     * the same {@code sourceRole} that {@code TriggerInterpreter} decided from the sign of {@code percent}. So
+     * 「攻击力 −30%」 is a debuff 解除 can remove, while 「攻击力 +50%」 is not, without either of them needing a
+     * separate flag.
+     */
+    @Override
+    public boolean isDebuff() {
+        return sourceRole == DoubleValue.Modifier.ModifierSource.DEBUFF;
+    }
+
     @Override
     public void applyEffect(CanHit target) {
         DoubleValue attributeValue = target.getAttribute(attribute);
