@@ -1,0 +1,15 @@
+{
+  "name": "长夜",
+  "source": "1413 长夜月 天赋: 「进入战斗时召唤忆灵「长夜」。忆灵「长夜」初始拥有#1[i]点速度，生命上限为长夜月的#2[i]%。」 param = [160, 0.5]",
+  "note": "The mirror image of 阿格莱雅's 衣匠: here SPEED is a FLAT number (160, nothing to do with the summoner's speed) while HEALTH is a share of hers. One entry shape covers both spellings -- `flat` only, `percent` only, or both -- which is why the spec is a list of derivations rather than two named fields. ⚠ Note the text gives no ATTACK/DEFENCE for 「长夜」 either; see 1402's note for what that means and where it is registered.",
+  "panel": [
+    {
+      "attribute": "HEALTH",
+      "percent": 0.5
+    },
+    {
+      "attribute": "SPEED",
+      "flat": 160
+    }
+  ]
+}
