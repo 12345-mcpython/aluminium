@@ -1599,7 +1599,7 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 | `VulnerabilityBuff` | 注入型 | 易伤，受击方负面，`ModifierSource.DEBUFF` |
 | `ReductionBuff` | 注入型 | 减伤，受击方增益，`ModifierSource.BUFF` |
 | `StunBuff` | 控制 | early buff，`canAct() == false` |
-| `DotBuff` | **生命周期型** | 击破 DOT（P4-5 / P10-0）：只持 `{元素, 每次基础伤害}` + 继承的时长，**不含伤害逻辑** —— 伤害由 `Battle.tickDots` 结算（`tickEffect` 拿不到 `Battle`）。early buff；`canAct()` 恒 `true`（否则燃烧结束时会把主人多冻一回合）；`isSameKind` 恒 `false`（实例身份，见 `engine.md` §8.5） |
+| `DotBuff` | **生命周期型** | 击破 DOT（P4-5 / P10-0）：只持 `{元素, 每次基础伤害}` + 继承的时长，**不含伤害逻辑** —— 伤害由 `Battle.tickDots` 结算（`tickEffect` 拿不到 `Battle`）。early buff；`canAct()` 恒 `true`（否则燃烧结束时会把主人多冻一回合）；`isSameKind` 恒 `false`（实例身份，见 `engine.md` §8.5）；构造器校验四项输入：来源/元素非 null、`turns >= 1`、`baseDamage` 有限且 `>= 0`（L-12） |
 | `SpeedBoostBuff` / `SuperBreakBuff` / `TauntBuff` | 属性/注入 | 早于 `StatModifierBuff` 的专用类，见各自 Javadoc |
 | `TestBuff` / `TestBuff1` | 测试替身 | 只打日志 |
 | `WeaknessBuff` | ❌ 不存在 | 只有 `DamageHookTest` 里的内嵌测试替身（攻击方侧负面的代表） |
