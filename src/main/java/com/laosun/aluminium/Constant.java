@@ -376,13 +376,56 @@ public final class Constant {
     public static final int DOT_TURNS = 3;
 
     /**
+     * One element's weakness-break effect (P10-1).
+     *
+     * <p>⚠ <b>Structure only — the numbers are not filled in.</b> The four damaging elements reuse
+     * {@link #DOT_RATIO} / {@link #DOT_TURNS} so this table reproduces the previous behaviour exactly, and
+     * the three control elements carry {@code dotRatio == 0} with the control's name recorded but no
+     * behaviour: their real parameters belong with P10-2's control state machine, and inventing numbers for
+     * them here would be exactly the "example value that looks like data" this project keeps refusing.
+     *
+     * @param dotRatio per-tick DOT damage as a fraction of the break base value (0 = no DOT)
+     * @param dotTurns how many ticks it lasts (0 = no DOT)
+     * @param control  the control effect's name for the three non-damaging elements
+     *                 ({@code "FROZEN"} / {@code "ENTANGLED"} / {@code "IMPRISONED"}), {@code null} when the
+     *                 element has no control part. A string rather than an enum on purpose: P10-2 will
+     *                 introduce the real type, and a half-built enum here would have to be migrated twice.
+     */
+    public record BreakEffect(double dotRatio, int dotTurns, String control) {
+        /** Whether this element attaches a damage-over-time when it breaks. */
+        public boolean hasDot() {
+            return dotRatio > 0 && dotTurns > 0;
+        }
+    }
+
+    /**
+     * The seven weakness-break effects, by element — the single place the break behaviour is described.
+     *
+     * <p>Before this, {@code Battle.attachBreakDot} tested membership in a set and then used two loose
+     * scalars, so nothing said what Ice / Quantum / Imaginary do (nothing, as it happens) and a reader of
+     * the call site could believe the three were merely "a different DOT".
+     */
+    public static final java.util.Map<DamageElement, BreakEffect> BREAK_EFFECTS =
+            java.util.Map.ofEntries(
+                    java.util.Map.entry(DamageElement.FIRE, new BreakEffect(DOT_RATIO, DOT_TURNS, null)),
+                    java.util.Map.entry(DamageElement.THUNDER, new BreakEffect(DOT_RATIO, DOT_TURNS, null)),
+                    java.util.Map.entry(DamageElement.PHYSICAL, new BreakEffect(DOT_RATIO, DOT_TURNS, null)),
+                    java.util.Map.entry(DamageElement.WIND, new BreakEffect(DOT_RATIO, DOT_TURNS, null)),
+                    java.util.Map.entry(DamageElement.ICE, new BreakEffect(0, 0, "FROZEN")),
+                    java.util.Map.entry(DamageElement.QUANTUM, new BreakEffect(0, 0, "ENTANGLED")),
+                    java.util.Map.entry(DamageElement.IMAGINARY, new BreakEffect(0, 0, "IMPRISONED")));
+
+    /**
      * Break elements that carry a damage-over-time effect: fire = burn, lightning = shock, physical = bleed,
      * wind = wind shear (GLOSSARY_EXTRA 10000012).
-     * Ice = freeze, quantum = entanglement, imaginary = imprisonment, which are control-type break effects →
-     * to be consolidated into a table in P10-1.
+     *
+     * <p><b>Derived from {@link #BREAK_EFFECTS}</b> rather than listed a second time, so "which elements
+     * have a DOT" cannot disagree with the effect table.
      */
-    public static final Set<DamageElement> DOT_ELEMENTS =
-            EnumSet.of(DamageElement.FIRE, DamageElement.THUNDER, DamageElement.PHYSICAL, DamageElement.WIND);
+    public static final Set<DamageElement> DOT_ELEMENTS = BREAK_EFFECTS.entrySet().stream()
+            .filter(entry -> entry.getValue().hasDot())
+            .map(java.util.Map.Entry::getKey)
+            .collect(java.util.stream.Collectors.toUnmodifiableSet());
 
     /**
      * Action value of one round (P7-1): **100** for every round after that.
