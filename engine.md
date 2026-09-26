@@ -313,7 +313,7 @@ dispatch(consumer, 直接相关方...)
 
 原计划写"**DOT/附加伤害不发 `KillEvent`**"。**这条是错的**，实测相反：
 
-`Battle.tickDots` 走的是 `Battle.applyDamage(enemy, damage, EnergyGrant.KILL_ONLY)` ——
+`Battle.tickDots` 走的是 `Battle.applyDamage(target, damage, EnergyGrant.KILL_ONLY)` ——
 与普攻**同一条**结算路径，所以 DOT 打死人**会发** `KillEvent`。
 `KILL_ONLY` 只影响**回能**种类（不给受击方回能），不影响"死亡"这个**事实**。
 
@@ -798,7 +798,7 @@ startBattle()           → 给每个单位发 onBattleStart，然后 processReq
   ↓
 stepForward()           → queue.move()，currentMove = queue.getCurrentActor()
   ↓
-beforeMove()            → [敌人] tickDots(enemy) → buffManager.beforeMove() → actor.beforeMove(this)
+beforeMove()            → tickDots(actor) → buffManager.beforeMove() → actor.beforeMove(this)
   ↓
 performAction(skill, targets) / useSkill(...) / castImmediate(...) / castUltra(...)
   ↓                     （技能进队列，processRequests() 时统一结算）
@@ -1059,17 +1059,37 @@ Damage(type = BREAK)   → 走完整装配，但 BoostArea/CritArea 自动跳过
 
 ### 8.5 持续伤害 DOT ✅
 
-`models/Dot` = `{来源, 元素, 每次基础伤害, 剩余结算次数}`，挂在 `Enemy.dots`（**List 不是 Set**，
-因为规则是"先上先结算"）。
+`models/buffs/DotBuff` = `{来源, 元素, 每次基础伤害}` + 继承来的 `duration`，**就是一个普通 buff**，
+挂在 `BuffManager` 里（与其它 buff 同一条 `List`，**List 不是 Set**，因为规则是"先上先结算"）。
 
-- **挂载条件**：击破元素 ∈ `Constant.DOT_ELEMENTS = {FIRE, THUNDER, PHYSICAL, WIND}`；
+> **它曾经是 `models/Dot` + `Enemy.dots` + `Battle.tickDots(Enemy)` 的独立模型，已迁进 buff 体系。**
+> 那不是风格问题：`tickDots` 收 `Enemy`、列表挂在 `Enemy` 上，使得"**boss 给我们挂燃烧**"
+> 在类型上就**无法表达**（而 HSR 里这是常态）。迁移后角色与敌人走同一条 DOT 路径，
+> 并且顺带拿到了驱散、`hasBuff` 查询、统一的刷新/叠层规则。
+
+- **挂载条件**：击破元素 ∈ `Constant.BREAK_EFFECTS` 中 `hasDot()` 为真的那些，即
+  `{FIRE, THUNDER, PHYSICAL, WIND}`（`Constant.DOT_ELEMENTS` 由该表派生，不再手写）；
   冰（冻结）/量子（纠缠）/虚数（禁锢）属控制类，不挂 DOT（P10-1 统一）。
-- **每次结算伤害** = `击破基数 × Constant.DOT_RATIO(0.5)`
+- **每次结算伤害** = `击破基数 × BreakEffect.dotRatio()`（当前四个元素共用 `DOT_RATIO = 0.5`）
   —— 注意这个 base **既不含击破特攻、也不含削韧值**（公式里那个 `削韧值` 因子在这里没有出现，
   只有击破基数本身）。物理裂伤在游戏里还按目标生命上限算，这里也统一成了同一个式子。
-- **结算时机**：敌人**回合开始时**（`Battle.beforeMove` 里 `tickDots(enemy)`），
-  按施加顺序逐个结算；被 DOT 打死则剩下的不再结算（不鞭尸）。
+- **结算 / 生命周期是两件事，分在两个对象里**（这是迁移的核心设计）：
+  - **生命周期**（时长、到期、驱散）= `DotBuff` 自己，由 `BuffManager` 驱动。
+    `DotBuff` 是 **early buff**（`super(turns, true)`），所以倒计时发生在 `beforeMove` ——
+    这正是"持续伤害"的含义，late buff 会整体错开一回合。
+  - **结算**（伤害本身，需要完整装配区）= `Battle.tickDots(CanHit)`，它通过
+    `BuffManager.allBuffsOf(DotBuff.class)` 查询后逐个造 `Damage`。
+    **为什么伤害不写进 `tickEffect`**：`AbstractBuff.tickEffect(CanHit)` 拿不到 `Battle`，
+    为一个 buff 去加宽这个签名会把 `Battle` 泄漏给所有 buff。
+- **结算时机**：**任意单位**回合开始时（`Battle.beforeMove` 里的 `tickDots(actor)`），
+  按施加顺序（`allBuffsOf` 按挂载顺序返回快照）逐个结算；被 DOT 打死则剩下的不再结算（不鞭尸）。
+- ⚠️ **`beforeMove` 里两行的顺序是契约**：先结算、后倒计时，所以 N 回合的 DOT 恰好结算 N 次；
+  写反就变成 N-1 次，而对 1 回合的 DOT 则是"倒计时到 0 先被移除、一个伤害都没打出来"。
+  `DotTest.aOneTurnDotStillSettlesBeforeItExpires` 就是钉这个边界的（2 回合以上两种顺序看不出差别）。
 - DOT 伤害通过 `Damage(type = DOT)` 走完整装配 → 吃增伤、吃防御/抗性/易伤，**不可暴击**。
+- **叠层**：`DotBuff.isSameKind` 恒为 `false` —— DOT 的身份是**实例**而不是**种类**。
+  默认的 buff 规则是"同名再挂 = 刷新"，套在这里会让第二次击破**顶掉**第一层燃烧并丢掉剩余结算；
+  引擎的 DOT 规则一直是"先上先结算、同元素多份并存"。若将来内容需要"再击破刷新燃烧"，改这一个方法即可。
 - 🚧 `DOT_RATIO = 0.5` 与 `DOT_TURNS = 3` 是**示例值**（代码注释标了 `TODO data`），
   两个都还没有真实数据来源。
 
@@ -1501,6 +1521,7 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 | `VulnerabilityBuff` | 注入型 | 易伤，受击方负面，`ModifierSource.DEBUFF` |
 | `ReductionBuff` | 注入型 | 减伤，受击方增益，`ModifierSource.BUFF` |
 | `StunBuff` | 控制 | early buff，`canAct() == false` |
+| `DotBuff` | **生命周期型** | 击破 DOT（P4-5 / P10-0）：只持 `{元素, 每次基础伤害}` + 继承的时长，**不含伤害逻辑** —— 伤害由 `Battle.tickDots` 结算（`tickEffect` 拿不到 `Battle`）。early buff；`canAct()` 恒 `true`（否则燃烧结束时会把主人多冻一回合）；`isSameKind` 恒 `false`（实例身份，见 `engine.md` §8.5） |
 | `SpeedBoostBuff` / `SuperBreakBuff` / `TauntBuff` | 属性/注入 | 早于 `StatModifierBuff` 的专用类，见各自 Javadoc |
 | `TestBuff` / `TestBuff1` | 测试替身 | 只打日志 |
 | `WeaknessBuff` | ❌ 不存在 | 只有 `DamageHookTest` 里的内嵌测试替身（攻击方侧负面的代表） |
@@ -1891,7 +1912,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | §3.4 基础仇恨 存护 150 / 毁灭 125 / 其他 100 | ❌ 未实现（`Path` 枚举都没有），数值待 P5-1 落地 |
 | §4 `治疗量 = 基础 × (1 + Σ治疗加成) × (1 - Σ治疗降低)` | `AttributeType` 有 `OUTGOING_HEALING_BOOST` / `HEAL_TAKEN_RATIO`，但**无公式无调用者** |
 | §附录 3 扩散/弹射有伤害分裂比 | `stance_list` 的 `spread` / 弹射按段分摊（削韧侧已做） |
-| §附录 4 持续伤害"先上先结算" | `Enemy.dots` 用 `List`，`tickDots` 按插入顺序迭代 |
+| §附录 4 持续伤害"先上先结算" | `DotBuff` 挂在 `BuffManager.buffs`（`List`），`allBuffsOf` 按挂载顺序返回快照，`tickDots` 据此迭代 |
 
 ### 18.2 规格要求"加算进同一区"，引擎的容器结构支持，但**攻击类型增伤还没做** ⚠️
 

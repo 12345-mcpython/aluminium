@@ -159,6 +159,7 @@
 | **层数资源** | **没有能量条也能开大**（P8-8）：`Resource` + `ResourceManager` + `EnergyProvider.canCastUltra` 闸门，见 `engine.md` §23 |
 | **真实队伍** | **关卡用真角色**（P8-5）：`StageFactory.realTeam()` = 景元/希儿/克拉拉/娜塔莎（4 命途），各带本命途 5★ 光锥；占位队已删除 |
 | **天赋与追加攻击** | **天赋 = 数据**（P8-3）：触发器表新增 `DAMAGE` op，倍率取**天赋槽**的 `damage_param`；克拉拉受击反击、希儿击杀再动，见 `engine.md` §4.7 |
+| **DOT 并入 buff 体系** | **DOT 不再是第二套机制**（P10-0）：`DotBuff extends AbstractBuff`，删掉 `models/Dot` / `Enemy.dots` / `tickDots(Enemy)`；角色与敌人走同一条 DOT 路径，demo 数值逐位不变，见 `engine.md` §8.5 |
 
 ### 🚧 部分完成
 
@@ -703,14 +704,45 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 
 > 原则一条：**任何任务做到一半发现需要新架构，说明它跑偏了，回退并拆小。**
 
-### P10-1 七系击破异常全量
+### P10-0 DOT 并入 buff 体系 ✅（2026-09-26 完成）
 
-- **现状**：只做了 4 系 DOT（火/雷/物理/风）。缺冰（冻结）、量子（纠缠）、虚数（禁锢）。
-- **怎么做**：`Constant` 加 `record BreakEffect(dotRatio, dotTurns, delayPercent, control)` +
-  `Map<DamageElement, BreakEffect> BREAK_EFFECTS`；P4-5 的挂 DOT 代码改为**查表**；
-  击破推条统一 = 固定 25% + `delayPercent`。比例先示例值 + `TODO data`。
+> **起点是一个提问**："DOT 不应该是 buff 吗？" —— **是**。核对代码后确认它当时是一套**并行机制**：
+> `models/Dot` + `Enemy.dots` + `Battle.tickDots(Enemy)`，与 buff 逐行对应（存储 / 时长 / 倒计时 / 到期），
+> 正是 §1.2 三分法要消灭的"第二套机制"。
+
+- **尖锐的缺陷（不只是风格）**：`tickDots` 收 `Enemy`、DOT 列表挂在 `Enemy` 上，
+  所以"**boss 给我们挂燃烧**"在类型上**无法表达** —— 而这是 HSR 的常态。
+  同时丢掉了驱散、`hasBuff` 查询、统一的刷新/叠层规则、以及 buff 机制对它的可见性。
+- **怎么做**：`models/buffs/DotBuff extends AbstractBuff`（early buff，`super(turns, true)`），
+  只持有**生命周期**；伤害仍由 `Battle.tickDots(CanHit)` 结算（`tickEffect` 拿不到 `Battle`，
+  为一个 buff 加宽签名会把 `Battle` 泄漏给所有 buff）。
+  新增 `BuffManager.allBuffsOf(Class)`（**快照**，按挂载顺序）供结算查询；
+  删掉 `models/Dot`、`Enemy.dots/addDot/removeDot`、`tickDots` 的 `Enemy` 形参。
+- **顺序是契约**：`beforeMove` 里**先结算、后倒计时**（`tickDots(actor)` → `buffManager.beforeMove()`），
+  所以 N 回合的 DOT 恰好结算 N 次，与旧 `Dot.tick()` 的次数一致。
+- **验收**：`DotTest` 9 条（原 6 条 + 新增 3 条）；全套 **63 suites / 601 tests / 0 failures**；
+  demo `Main` 输出与迁移前**逐行对比零差异**（唯一 6 行差异是 `Set` 打印顺序，实测**同一份代码跑两次也会变**，
+  是 `Main` 既有的不确定性，与本次改动无关）。
+- **变异验证（4 处，均确认护栏有效）**：
+  1. 恢复 `beforeMove` 里的 `instanceof Enemy` 守卫 → `aCharacterCanCarryADot` 红（角色 DOT 变哑）；
+  2. 把 `beforeMove` 两行写反 → `aOneTurnDotStillSettlesBeforeItExpires` 红（1 回合 DOT 一个伤害都打不出）；
+  3. `DotBuff.isSameKind` 改回默认（同类即顶替）→ `theSameElementStacksInsteadOfRefreshing` + `dotsSettleInApplicationOrder` 红；
+  4. `allBuffsOf` 改成倒序 → `dotsSettleInApplicationOrder` 红。
+- **顺带发现（未修，属演示层）**：`Main` 打印 `Weakness [...]` / `Resist {...}` 时直接 `toString` 了
+  `Set`/`Map`，顺序取决于 identity hash，**跨进程不稳定** —— 所以 demo 输出目前**不能用来做逐行回归**。
+  这正是上面第 4 条验收要绕道"同代码跑两次"来证明的原因。要做逐行回归得先让它排序（归 P11-1）。
+
+### P10-1 七系击破异常全量 🚧 表已落地（`a1e36f3`）
+
+- **现状**：`Constant.BREAK_EFFECTS`（`record BreakEffect(dotRatio, dotTurns, control)`）**已存在**，
+  四个 DOT 系（火/雷/物理/风）走它，`Constant.DOT_ELEMENTS` 由它**派生**、不再手写，
+  挂 DOT 的代码已改为**查表**（数值与改表前逐位一致，`BreakEffectTableTest` 钉住）。
+  **还差的**：冰（冻结）/量子（纠缠）/虚数（禁锢）三个控制系的**数值**（推条 %、控制时长、受击加伤）
+  —— 它们只有在 P10-2 的状态机存在之后才有意义，所以归到 P10-2 一起填。
+- **怎么做**：给三个控制元素填 `BreakEffect` 的数值；击破推条统一 = 固定 25% + `delayPercent`。
+  比例先示例值 + `TODO data`。
 - **验收**：`BreakEffectAllTest`：冰击破 → 无 DOT、推条 25%+50%；量子 → DOT + 推条 25%+20%；物理 → 仅 DOT（回归 P4-5）。
-- **依赖**：P4-5、P4-4
+- **依赖**：P4-5、P4-4、**P10-2**（三个控制系的值随状态机一起填）
 
 ### P10-2 控制异常状态机
 
