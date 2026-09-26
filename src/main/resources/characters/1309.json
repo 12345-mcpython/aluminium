@@ -13,5 +13,30 @@
     ],
     "source": "1309 知更鸟 talent (skill 130904) / character doc line 147",
     "note": "Doc text: 「…且我方目标攻击敌方目标后，知更鸟额外为自身恢复2点能量。」 A FLAT 2 per attack (no per_target), unlike Tribbie's per-hit 1.5. 'actor != self' encodes 「我方目标」, i.e. allies but not Robin herself. E0 value."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 0.25
+      }
+    ],
+    "source": "1309 知更鸟 trace 华彩花腔",
+    "note": "Doc text: 「战斗开始时，自身行动提前25%。」 Nothing new is needed for this one: BATTLE_START fires from startBattle() AFTER the queue was initialized in the constructor (so the action bar already holds everyone and there is a wait to shorten), and ADVANCE skips a fraction of the target's REMAINING wait, defaulting to the rule's owner -- so this pulls Robin forward and leaves the other three alone. E0 value (params [0.25]); the test compares her against the same character with an emptied table, because 'a quarter of the remaining wait' is not the same number as 'a quarter of the round'."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 5
+      }
+    ],
+    "source": "1309 知更鸟 trace 模进乐段",
+    "note": "Doc text: 「施放战技时额外恢复5点能量。」 SKILL_CAST is broadcast to the whole side (SkillExecutor.broadcastSkillCast, actor = the caster), which is what makes the condition load-bearing rather than decorative: without `actor == self`, every ally's skill would pay Robin 5 energy too. The doc sentence names no subject other than the character herself, the same reading as the other two traces -- and the split from ULT_CAST is already made at the emitter, so her ultimate does not double-dip here. E0 value (params [5])."
   }
 ]

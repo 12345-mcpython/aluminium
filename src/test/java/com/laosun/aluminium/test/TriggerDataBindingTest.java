@@ -32,9 +32,17 @@ public class TriggerDataBindingTest {
 
         TriggerTable robin = TriggerTables.of(ROBIN);
         Assertions.assertFalse(robin.isEmpty(), "1309's table must not be empty");
-        Assertions.assertEquals(0, robin.ruleCount(TriggerEvent.BATTLE_START),
-                "Robin's talent has no battle-start rule");
+        // Robin is the first character whose 行迹 extra abilities are data too, so her table now holds
+        // three rules: the talent (ALLY_ATTACK) and two traces (BATTLE_START, SKILL_CAST). The counts
+        // are asserted per event rather than as a total, so a rule that lands on the wrong event is
+        // still caught.
+        Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.BATTLE_START),
+                "华彩花腔: 战斗开始时自身行动提前25%");
+        Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.SKILL_CAST),
+                "模进乐段: 施放战技时额外恢复5点能量");
         Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.ALLY_ATTACK));
+        Assertions.assertEquals(0, robin.ruleCount(TriggerEvent.BASIC_ATTACK),
+                "nothing in her file listens to 普攻 -- 施放战技时 is the Skill slot");
     }
 
     /**
