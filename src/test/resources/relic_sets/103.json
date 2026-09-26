@@ -1,0 +1,14 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "SUMMON"
+        }
+      ],
+      "source": "TEST FIXTURE (src/test/resources) -- not shipped content",
+      "note": "A deliberately INCONSISTENT pair, for CharacterFactory.requireSummonable: this rule summons a memosprite for whoever wears the set, and the wearer in the test (姬子 1003) has no memosprite spec. It is a RELIC rule rather than a character rule on purpose -- that is the harder half of the check, since a relic rule is shared by every wearer and its cid is unknown until assembly. ⚠ Set 103's 2-piece is stats-only (DefenceAddedRatio, no named ability), so this file cannot disturb RelicTriggerTableTest's partition: that test only looks at effects that carry an ability. A character-rule fixture would have been worse: SkillSlotMappingTest and UltraThresholdTest build EVERY character, so a fixture for any cid that exists in the data breaks those sweeps (tried it)."
+    }
+  ]
+}

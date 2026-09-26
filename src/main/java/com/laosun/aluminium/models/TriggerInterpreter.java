@@ -74,6 +74,12 @@ import java.util.Set;
  *   <tr><td>{@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}</td><td>{@code resource}, {@code amount}</td>
  *       <td>✅ wired (P8-8)</td></tr>
  *   <tr><td>{@code REDUCE_TOUGHNESS}</td><td>{@code amount}</td><td>☐ needs an element + enemy target</td></tr>
+ *   <tr><td>{@code SUMMON}</td><td><b>no arguments</b></td>
+ *       <td>✅ wired — brings the <b>rule owner's own memosprite</b> (忆灵) onto the field
+ *           ({@code Battle.summonMemosprite}). No {@code target}: a memosprite belongs to its summoner and
+ *           fights for that camp, so there is nothing to point at. Idempotent — 「若已在场，则使其生命值
+ *           回复至上限」 is what the texts say and the refresh is <b>not</b> modelled, so a second firing
+ *           keeps the one already out rather than making a second copy</td></tr>
  *   <tr><td>{@code DAMAGE}</td><td>{@code skill}, {@code damage_param}, optional {@code target}</td>
  *       <td>✅ wired (P8-3)</td></tr>
  * </table>
@@ -89,7 +95,7 @@ public final class TriggerInterpreter {
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
-            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL");
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -201,6 +207,15 @@ public final class TriggerInterpreter {
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
+            case "SUMMON" -> {
+                // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
+                // (name, panel derivation) lives in resources/memosprites/<cid>.json. A `target` here would
+                // be silently ignored, which is the class of mistake the closed selector set exists to
+                // prevent -- so it is refused rather than dropped.
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                requireNoTarget(effect, op, spec);
+            }
             default -> requireNoStackArguments(effect, op, spec);
         }
     }
@@ -288,6 +303,7 @@ public final class TriggerInterpreter {
             case "MODIFY_DAMAGE_TAKEN" -> modifyDamageTaken(battle, effect, ctx);
             case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
             case "DISPEL" -> dispel(battle, effect, ctx);
+            case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
@@ -433,6 +449,23 @@ public final class TriggerInterpreter {
                             + "every time)");
         }
         return summon;
+    }
+
+    /**
+     * The rule's owner, as the {@code Character} a memosprite spec is keyed by.
+     *
+     * <p>Why this can be a cast rather than a check worth worrying about: trigger tables only ever live on
+     * characters ({@code Battle.fireTriggers} walks {@code battle.characters}), so anything else here means
+     * the engine grew a second kind of table owner and this op needs a story for it. That is worth an
+     * exception rather than a silent skip — {@code SUMMON} would otherwise simply do nothing.
+     */
+    private static Character requireCharacterOwner(EffectSpec effect, TriggerContext ctx) {
+        if (ctx.owner() instanceof Character character) {
+            return character;
+        }
+        throw new IllegalStateException(
+                "Op SUMMON needs its rule owner to be a character (the memosprite spec is keyed by cid), but "
+                        + "this rule's owner is " + (ctx.owner() == null ? "nobody" : ctx.owner().getClass().getSimpleName()));
     }
 
     private static CanHit require(CanHit entity, String what, TriggerContext ctx) {        if (entity == null) {
@@ -832,6 +865,27 @@ public final class TriggerInterpreter {
             throw new IllegalArgumentException(
                     "Op " + op + " has no duration (it acts on a single moment), but states \"turns\": "
                             + effect.getTurns() + " (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates that an effect is <b>not</b> given a {@code target}.
+     *
+     * <p>Used by ops that act on a unit no selector could name — {@code SUMMON} brings out the rule owner's
+     * own memosprite, so a {@code target} there would be read by Gson, validated by
+     * {@link #requireTargetSelector} (it is a real selector) and then <b>ignored</b>: the author would get a
+     * rule that loads, fires and does something other than what the file says.
+     *
+     * <p>⚠ The same hole exists for the ops that credit the owner by definition ({@code GAIN_ENERGY},
+     * {@code GAIN_SKILL_POINT}, {@code BOOST_DAMAGE}, …): they ignore a stray {@code target} today. No shipped
+     * rule does that (checked 2026-09-27), so it is latent rather than live, and it is registered rather than
+     * fixed here because widening the guard would change the accepted vocabulary of seven ops at once.
+     */
+    private static void requireNoTarget(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getTarget() != null && !effect.getTarget().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " does not take a \"target\" (it acts on the rule's own owner), but states "
+                            + "\"target\": \"" + effect.getTarget() + "\" (source: " + spec.getSource() + ")");
         }
     }
 

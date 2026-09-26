@@ -142,6 +142,30 @@ public class TriggerTable {
     }
 
     /**
+     * Whether any rule in this table uses the given op (case-insensitively, as the JSON spells it).
+     *
+     * <p>Exists for checks that need to know <b>whether a table uses a capability at all</b> without caring
+     * which rule does. Its one caller is the assembly point: a {@code SUMMON} rule is only meaningful for a
+     * character that has a memosprite spec, and that question can only be asked once the character's own rules
+     * and its equipment's have been merged (see {@code CharacterFactory}).
+     *
+     * @param op the op name as written in the JSON (e.g. {@code "SUMMON"})
+     * @return {@code true} when at least one effect in the table names that op
+     */
+    public boolean usesOp(String op) {
+        for (List<CompiledRule> rules : byEvent.values()) {
+            for (CompiledRule rule : rules) {
+                for (EffectSpec effect : rule.effects()) {
+                    if (effect.getOp() != null && effect.getOp().trim().equalsIgnoreCase(op)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * All rules matching an event and a given context.
      *
      * @param event the fired event
