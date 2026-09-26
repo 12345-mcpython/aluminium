@@ -46,8 +46,6 @@ public class Resource {
 
     /**
      * Who this resource belongs to (P8-8). See {@link ResourceScope}.
-     * -- GETTER --
-     * Who this resource belongs to (P8-8).
      */
     @Getter
     private final ResourceScope scope;
@@ -262,7 +260,12 @@ public class Resource {
     }
 
     private int absoluteMax() {
-        return max + maxOverflow;
+        // Saturating. Both inputs are non-negative (`max` is checked in the constructor, `maxOverflow` is
+        // clamped at 0 by setMaxOverflow), but their sum can still overflow an int -- and a NEGATIVE cap
+        // would make clamp() throw (Math.clamp requires min <= max) instead of clamping, turning a
+        // nonsensical configuration into an exception from an unrelated call. Saturating keeps clamp()
+        // total, which is what the "value ∈ [0, max + maxOverflow] always holds" invariant needs.
+        return (int) Math.min(Integer.MAX_VALUE, (long) max + maxOverflow);
     }
 
     /**

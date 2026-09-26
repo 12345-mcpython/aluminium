@@ -40,11 +40,6 @@ public class WaveManager {
     /**
      * Which wave has been entered already (starting from 0). {@code -1} = not even one wave
      * has been entered.
-     * -- GETTER --
-     *  Which wave has been entered already (starting from 0). Returns
-     *  when not even
-     *  one wave has been entered.
-
      */
     @Getter
     private int waveIndex = -1;

@@ -23,14 +23,6 @@ public abstract class AbstractBuff implements Buff {
      * buff disappears only when it is removed explicitly (dispel / death / {@code clearAll}).
      *
      * <p>Default {@code false}: every existing buff keeps its turn count and keeps expiring.
-     * -- GETTER --
-     *  Whether this buff is exempt from the per-turn duration countdown ("for the rest of the battle").
-     *  <p>Read by
-     * : a permanent buff is not ticked and not
-     *  removed, so its
-     *  stays whatever it was created with. That is the concrete
-     *  meaning of "unbounded duration" in this engine — not a large number.
-
      */
     @Getter
     protected final boolean permanent;

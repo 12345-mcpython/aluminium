@@ -101,8 +101,6 @@ public class Battle {
     /**
      * The current battle status (P7-3). It starts as {@link Status#NOT_STARTED}, and {@link #startBattle()}
      * turns it into {@link Status#RUNNING}.
-     * -- GETTER --
-     * The current battle status (P7-3).
      */
     @Getter
     private Status status = Status.NOT_STARTED;
@@ -112,13 +110,6 @@ public class Battle {
      *
      * <p>Its only reason to exist is to let {@link #checkResult()} know whether "the enemy team is empty"
      * means **won** or **this wave has not entered yet**.
-     * -- SETTER --
-     * Register the wave manager (P7-4). Called by the
-     * constructor; business code does not
-     * call it by hand.
-     * -- GETTER --
-     * The current wave manager (P7-4);
-     * for a non-wave battle.
      */
     @Getter
     @Setter

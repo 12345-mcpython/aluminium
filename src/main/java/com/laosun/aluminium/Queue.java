@@ -67,9 +67,6 @@ public final class Queue {
     private double elapsed;
     /**
      * The combatant currently at their action point (set by move(), cleared by setTopZero()).
-     * -- GETTER --
-     * Returns the Signal that is currently at its action point (set by move()).
-     * Null if no one is currently acting.
      */
     private Signal currentActor;
     /**
@@ -79,10 +76,6 @@ public final class Queue {
      *
      * <p>{@code null} = no extra turn. Identity is compared with {@code ==}; {@code CanHit}
      * does not override equals.
-     * -- GETTER --
-     * Whether an extra turn is currently scheduled; if so, returns that actor (P7-2).
-     * <p>
-     * if there is none.
      */
     private CanHit extraTurnActor;
     /**
@@ -297,6 +290,11 @@ public final class Queue {
      */
     public double move() {
         if (heap.isEmpty()) {
+            // The single "nobody can act" exit. `peek()` further down therefore cannot be null: nothing
+            // between here and there removes from the heap (`applyPendingRestore` only re-times a signal,
+            // and the extra-turn branch returns). A guard was added there once, throwing
+            // RuntimeException("Queue next shouldn't be null!"); it was unreachable, and an unreachable
+            // guard cannot be tested -- so it is gone rather than kept as decoration.
             currentActor = null;
             return 0;
         }
@@ -311,9 +309,6 @@ public final class Queue {
             return moveExtraTurn();
         }
         Signal next = heap.peek();
-        if (next == null) {
-            throw new RuntimeException("Queue next shouldn't be null!");
-        }
         double timePassed = Math.max(0, next.getNextActionTime() - elapsed);
         elapsed = Math.max(elapsed, next.getNextActionTime());   // the clock never goes backwards
         // P7 fix E2: record this clock advance on everyone's "cycle progress" ledger, so that a
