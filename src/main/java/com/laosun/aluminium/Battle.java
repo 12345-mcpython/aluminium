@@ -1491,6 +1491,23 @@ public class Battle {
      * @return how many rules fired in total
      */
     public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount) {
+        return fireTriggers(event, actor, target, hitCount, amount, null);
+    }
+
+    /**
+     * The same, for the one event that carries a <b>pending damage instance</b>
+     * ({@link TriggerEvent#DEALING_DAMAGE}), so a rule can still change it.
+     *
+     * <p><b>Private on purpose.</b> The pipeline's guardrail
+     * ({@code DamagePipelineTest.settlementHasExactlyOnePublicEntryPoint}) says the public API may contain
+     * exactly one method taking a {@code Damage} — {@code applyDamage} — so that "the same hit assembled twice"
+     * stays structurally impossible. This is the internal carrier for that context, not a second way in.
+     *
+     * @param damage the instance being settled, or {@code null} for every other event (which is what the
+     *               five-argument overload passes)
+     */
+    private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                             Damage damage) {
         if (triggerDepth >= MAX_TRIGGER_DEPTH) {
             throw new IllegalStateException(
                     "Trigger recursion exceeded " + MAX_TRIGGER_DEPTH + " levels while firing "
@@ -1508,7 +1525,7 @@ public class Battle {
                     continue;
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
-                        new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount));
+                        new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage));
             }
             return fired;
         } finally {
@@ -1786,6 +1803,16 @@ public class Battle {
         if (scopeBoost != null) {
             damage.addBoost(attacker.getAttribute(scopeBoost).get());
         }
+
+        // Damage-instance conditions (P10-5): 「对处于 X 状态的目标造成的伤害提高 Y%」. Fired *before* the zones
+        // are read, because afterwards the number is final and all a rule could do is describe it. `target` is
+        // the one about to take the damage; a rule that changes this instance uses BOOST_DAMAGE, which mutates
+        // the instance itself -- the instance is the state, so there is no buff to attach, nothing to clean up,
+        // and nothing that can leak into the next hit.
+        //
+        // It fires for every instance the engine settles, DOT ticks and break damage included: those are damage
+        // too, and a rule that means "attacks only" says so with its own conditions.
+        fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage);
 
         // 2) Crit zone: only crittable types roll; an effect that already fixed the crit (fixedCrit) is not
         //    overwritten
