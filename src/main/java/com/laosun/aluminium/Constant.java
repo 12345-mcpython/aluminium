@@ -330,6 +330,16 @@ public final class Constant {
     public static final int SKILL_POINT_GAIN_BASIC = 1;
 
     /**
+     * How many Eidolon ranks (星魂) a character can have. {@code 0} means "none active"; the data carries
+     * exactly the ranks {@code 1}…{@code 6} for every character in {@code character_data.json}.
+     *
+     * <p>It is a constant here because it is the bound the <b>assembly point</b> validates against
+     * ({@code CharacterFactory.create}) and the bound a trigger rule's {@code min_eidolon} is checked against at
+     * load time — two places that must agree, which is exactly the kind of number that must not be typed twice.
+     */
+    public static final int EIDOLON_MAX_RANK = 6;
+
+    /**
      * Weakness break base value table: level → base value (P4-3). **The values in the data file are scaled
      * by 10×**, so use them with {@code /10} (level 80 = 3767.5535 → 376.75535).
      *

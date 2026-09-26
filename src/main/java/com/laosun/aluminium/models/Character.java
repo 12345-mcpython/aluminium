@@ -127,6 +127,20 @@ public class Character extends CanHit {
      */
     private DamageElement element;
 
+    /**
+     * How many Eidolon ranks (星魂) are active on this character: {@code 0}–{@code Constant.EIDOLON_MAX_RANK}.
+     *
+     * <p><b>It is a construction-time property, like the relic suit.</b> The assembly point decides which ranks
+     * are active and hands the number over; a trigger rule that belongs to an Eidolon says so with
+     * {@code min_eidolon}, and the interpreter compares the two. So the engine never looks an Eidolon up by cid
+     * — the mechanics stay in {@code resources/characters/<cid>.json}, the same as talents and traces.
+     *
+     * <p>Which is also why {@code eidolons.json} is <b>reference material</b> rather than a loaded table: its
+     * names, descriptions and parameters are what a rule's {@code source} and {@code note} cite, exactly like the
+     * trace text, and nothing in the engine needs to read it at battle time.
+     */
+    private int eidolonRank;
+
     protected Character(Translate name, DoubleValue[] attributes) {
         super(name.english(), Camp.PLAYER, attributes);
     }
@@ -145,6 +159,9 @@ public class Character extends CanHit {
         this.aggro = other.aggro;
         this.element = other.element;
         this.cid = other.cid;
+        // Configuration, not battle state: a copy is the same character, so it keeps its Eidolon ranks (the
+        // `CanHit` copy constructor deliberately resets the per-battle things, and this is not one of them).
+        this.eidolonRank = other.eidolonRank;
     }
 
     /**
@@ -217,6 +234,7 @@ public class Character extends CanHit {
     public static class Builder {
         private int cid;
         private int level = 1;
+        private int eidolonRank;
         private RelicSuit relicSuit = new RelicSuit();
         private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
         private boolean isPromote = false;
@@ -337,6 +355,18 @@ public class Character extends CanHit {
         }
 
         /**
+         * How many Eidolon ranks are active, {@code 0}–{@code Constant.EIDOLON_MAX_RANK}.
+         *
+         * <p>Not validated here: {@code CharacterFactory.create} is the assembly point and refuses a rank
+         * outside the range, so a hand-built character through this builder is the only way to set a nonsense
+         * value — and that is a test's business rather than the engine's.
+         */
+        public Builder eidolonRank(int rank) {
+            this.eidolonRank = rank;
+            return this;
+        }
+
+        /**
          * Builds the character with all accumulated configuration.
          *
          * @return the fully computed character
@@ -387,6 +417,7 @@ public class Character extends CanHit {
             // has the empty table, which is normal (the trigger interpreter treats it as a no-op and
             // Battle never has to null-check).
             character.setTriggerTable(triggerTable);
+            character.setEidolonRank(eidolonRank);
             return character;
         }
 
