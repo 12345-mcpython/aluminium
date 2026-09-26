@@ -163,6 +163,7 @@
 | **击破控制状态** | **控制 = 数据组合，不是新类**（P10-2）：`ControlEffect` 表 + `StunBuff`/`StatModifierBuff`/`delayMovePercent` 三个现成原语；冰=锁行动、量子/虚数=减速+推条；**冻结"+30% 受伤"被数据推翻**（原文是每回合冰伤），见 `engine.md` §8.6 |
 | **推条不再被速度变化吃掉** | **L-26 已修**：`delayAction`/`advanceAction` 同步 `Signal.remaining`，`refreshSpeed` 去掉进度**上**钳（被推条的单位合法地超过一整轮）。之前量子/虚数击破的"减速+推条"里推条完全不可观测（28.409 加不加都一样）；现在 `QueueActionManipulationTest.aDelaySurvivesASpeedChange` 钉住，**两半各自都能让它变红**，见 `engine.md` §5.1/§5.2 |
 | **敌方阵营不再只收怪** | **L-8 一半已修**：`Battle.enemies` = `List<CanHit>`（构造器拷贝，不再别名调用方 list），`enemyUnits()` 才是其中的 `Enemy`；`targetableEnemies()`/`aliveEnemies()` 一并放宽，胜负判定按**整阵营**。敌方召唤物从"类型上无处安放"变成"收得下"，`EnemyCampSummonTest` 4 条钉住，见 `engine.md` §7 |
+| **机制演示** | **把新做出来的东西真打一遍**（P11-1 入口那半）：`gradlew run --args="mechanics"` 三幕 —— 击破三系控制状态（冰锁行动 / 量子·虚数减速+推条，打印速度与行动值变化）、**DOT 挂在我方角色身上**由引擎结算并到期、**敌方阵营里的召唤物**（可被 AOE 打到、且它站着就不算赢）。默认无参跑的原战斗 demo 输出逐字不变；`DemoSmokeTest` 4 条钉住"都还跑得起来"。顺带删掉 `StunBuff.removeBuff` 里那行 `IO.println`（引擎往 stdout 打印，会插进调用方输出中间） |
 | **技能几率可读** | **描述文本自己说了下标**（P10-6）：`SkillData.debuffChance()` 按"紧挨着 基础概率/固定概率 的占位符"定位，5 个真实样本标定（0.6 / 0.5 是关键），28 条 `Impair` 全覆盖 —— 计划里"取 `param_list` 第 3 项"会读出 15（秒数）并夹成"必定命中" |
 
 ### 🚧 部分完成
@@ -993,12 +994,24 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 
 ## 9. 待办 D 层：演示与收尾
 
-### P11-1 `Main` 修复 + demo 包拆分
+### P11-1 `Main` 修复 + demo 包拆分 🚧 入口那一半已完成
 
-- **目标**：`Main` 变成 `public static void main(String[] args)` 入口，逻辑拆进 `demo/`。
-- **怎么做**：属性预览搬 `demo/CharacterDemo`；战斗搬 `demo/BattleDemo`；`Main.main` 只留调用。
+- ✅ **入口已修（2026-09-26）**：`Main` 现在是 `public static void main(String[] args)`，按参数选 demo
+  （`battle`（默认）/ `mechanics` / `all`）。**默认无参跑的还是原来那个战斗 demo，输出逐字不变** ——
+  所以 `gradlew run` 的既有行为、以及"demo 是回归锚点"这件事都没被打破。
+- ⚠ **更正一条不准的旧注记**：本节原来写"当前 `main()` 无参数 → `gradle run` 进不去"。
+  **实测不是**：`Main` 之前确实只有无参 `public static void main()`，而 `gradlew run` 一直正常跑出战斗 demo ——
+  JDK 25 的 *flexible main method* 认无参 `main()`，`application.mainClass = 'com.laosun.Main'` 照样启动。
+  所以"加 `String[] args`"的动机是**为了能选 demo**，不是修一个跑不起来的东西。
+- ☐ **仍未做**：逻辑搬进 `demo/` 包（`demo/BattleDemo` / `demo/MechanicsDemo` / `demo/CharacterDemo`），
+  `Main` 只剩入口调用。`Main` 现在约 640 行、含两个 demo + 一套回合驱动，确实该拆。
+- **验收**：`.\gradlew.bat run` 能跑（✅ 已有 `DemoSmokeTest` 4 条钉住"两个 demo + 默认路径 + 未知参数都不抛"）；
+  `Main` 只剩入口调用（☐）。
+- **注**：`DemoSmokeTest` 只钉"还跑得起来"，**不**钉 demo 打印的任何数字 —— 那些是各单元测试的活，
+  用抓 stdout 再断言一遍会是同一批结论的弱副本。
 - **验收**：`.\gradlew.bat run` 能跑；`Main` 只剩入口调用。
-- **注**：当前 `main()` **无参数**（`Main.java` 用的是无参 `public static void main()`）。
+- ~~**注**：当前 `main()` **无参数**（`Main.java` 用的是无参 `public static void main()`）。~~
+  ⚠ **这条注记已被实测推翻，见本节开头**：无参 `main()` 在 JDK 25 上是能启动的，`gradlew run` 一直好使。
 
 ### P11-2 真实内容演示（冰锋战）
 
