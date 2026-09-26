@@ -16,6 +16,25 @@ import com.laosun.aluminium.models.event.SkillPointSpentEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Owns a unit's buffs: attach / remove / tick, and dispatch the event callbacks to them.
+ *
+ * <p><b>Every traversal of {@link #buffs} goes over {@link List#copyOf} — keep it that way (M-12).</b>
+ * The dispatch methods call <i>into</i> buff code, and attaching a buff from a reaction is ordinary
+ * content, not an error: additional damage applies vulnerability, a counter attaches a marker, a
+ * damage reaction boosts its owner (that last one is a literal test case). Iterating the live list made
+ * every one of those a {@link java.util.ConcurrentModificationException} thrown from inside damage
+ * settlement — the hardest place to diagnose — or, where the list happened to tolerate it, a silently
+ * skipped buff. {@code processBuffTick} had the same hole through {@code removeIf}, whose predicate
+ * calls {@code tickEffect} / {@code removeBuff}.
+ *
+ * <p>The cost is a small copy per traversal (a unit carries a handful of buffs); the alternative is a
+ * crash in the middle of a turn. The read-only queries ({@code hasBuff} / {@code countBuffs} /
+ * {@code findBuff} / {@code allBuffsOf}) copy for the same reason: one rule with no exceptions is what
+ * stops a later edit from re-opening the hole in just one of them.
+ *
+ * <p>{@code buffs} is never handed out (P1-7), so this class is also the only place that can get it wrong.
+ */
 public class BuffManager {
     private CanHit instance;
     private final List<AbstractBuff> buffs = new ArrayList<>();
@@ -118,7 +137,7 @@ public class BuffManager {
             return 0;
         }
         int count = 0;
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff.getClass() == kind) {
                 count++;
             }
@@ -158,7 +177,7 @@ public class BuffManager {
         if (blocked) {
             return false;
         }
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (!buff.canAct()) {
                 return false;
             }
@@ -186,7 +205,7 @@ public class BuffManager {
      * Called by {@link CanHit#onDamage(Battle, Damage)} before {@code Damage.toValue()}.
      */
     public void onDamage(Battle battle, Damage damage) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof DamageEvent event) {
                 event.onDamage(battle, damage);
             }
@@ -199,7 +218,7 @@ public class BuffManager {
      */
     public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
                             List<? extends CanHit> hitTargets, double totalDamage) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof AttackEvent event) {
                 event.afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage);
             }
@@ -214,7 +233,7 @@ public class BuffManager {
      */
     public void onSkillCast(Battle battle, CanHit user, Skill skill,
                             List<? extends CanHit> hitTargets, List<? extends CanHit> targets) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof SkillCastEvent event) {
                 event.onSkillCast(battle, user, skill, hitTargets, targets);
             }
@@ -227,7 +246,7 @@ public class BuffManager {
      * Called by {@link CanHit#onEnergyGain(Battle, CanHit, double)}.
      */
     public void onEnergyGain(Battle battle, CanHit target, double actuallyAdded) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof EnergyEvent event) {
                 event.onEnergyGain(battle, target, actuallyAdded);
             }
@@ -241,7 +260,7 @@ public class BuffManager {
      */
     public void onHpLoss(Battle battle, CanHit target, double before, double after,
                          CanHit source, double amount) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof HpLossEvent event) {
                 event.onHpLoss(battle, target, before, after, source, amount);
             }
@@ -253,7 +272,7 @@ public class BuffManager {
      * {@link CanHit#onHeal(Battle, CanHit, CanHit, double)}.
      */
     public void onHeal(Battle battle, CanHit healer, CanHit target, double actuallyHealed) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof HealEvent event) {
                 event.onHeal(battle, healer, target, actuallyHealed);
             }
@@ -265,7 +284,7 @@ public class BuffManager {
      * Called by {@link CanHit#onKill(Battle, CanHit, CanHit)}.
      */
     public void onKill(Battle battle, CanHit attacker, CanHit victim) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof KillEvent event) {
                 event.onKill(battle, attacker, victim);
             }
@@ -277,7 +296,7 @@ public class BuffManager {
      * Called by {@link CanHit#onBreak(Battle, CanHit, CanHit, DamageElement)}.
      */
     public void onBreak(Battle battle, CanHit attacker, CanHit target, DamageElement element) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof BreakEvent event) {
                 event.onBreak(battle, attacker, target, element);
             }
@@ -289,7 +308,7 @@ public class BuffManager {
      * Called by {@link CanHit#onSkillPointGained(Battle, int)}.
      */
     public void onSkillPointGained(Battle battle, int amount) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof SkillPointGainedEvent event) {
                 event.onSkillPointGained(battle, amount);
             }
@@ -302,7 +321,7 @@ public class BuffManager {
      * Called by {@link CanHit#onSkillPointSpent(Battle, int)}.
      */
     public void onSkillPointSpent(Battle battle, int amount) {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof SkillPointSpentEvent event) {
                 event.onSkillPointSpent(battle, amount);
             }
@@ -310,27 +329,36 @@ public class BuffManager {
     }
 
     private void processBuffTick(boolean early) {
-        buffs.removeIf(buff -> {
+        // ⚠ Iterated over a snapshot, not with `removeIf` (M-12). `tickEffect` and `removeBuff` are buff
+        // code: a buff may attach or remove another buff while it ticks, and `removeIf` walks the live list
+        // -- a ConcurrentModificationException raised from the middle of a turn boundary, or a silently
+        // skipped buff. Removal is stated explicitly here instead, which is the same thing `removeIf` did.
+        // ⚠ Iterated over a snapshot, not with `removeIf` (M-12). `tickEffect` and `removeBuff` are buff
+        // code: a buff may attach or remove another buff while it ticks, and `removeIf` walks the live list
+        // -- a ConcurrentModificationException raised from the middle of a turn boundary, or a silently
+        // skipped buff. Removal is stated explicitly here instead, which is the same thing `removeIf` did.
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff.isPermanent()) {
                 // "For the rest of the battle": no turn limit, so it is never counted down and never
                 // expires. Skipping the tick (rather than using a huge duration) is what makes the
                 // duration exact instead of merely long; the buff leaves only via an explicit removal.
-                return false;
+                continue;
             }
             if (buff.isEarlyBuff != early) {
-                return false;
+                continue;
             }
             boolean couldAct = buff.canAct();
             buff.tickEffect(instance);
             if (buff.duration() <= 0) {
+                // `remove` by identity: AbstractBuff does not override equals, and a buff that already
+                // removed itself during the tick simply is not there any more.
+                buffs.remove(buff);
                 buff.removeBuff(instance);
                 if (!couldAct) {
                     blocked = true;
                 }
-                return true;
             }
-            return false;
-        });
+        }
     }
 
     /**
@@ -353,7 +381,7 @@ public class BuffManager {
         if (kind == null) {
             return false;
         }
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff.getClass() == kind) {
                 return true;
             }
@@ -379,7 +407,7 @@ public class BuffManager {
         if (kind == null) {
             return null;
         }
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff.getClass() == kind) {
                 return kind.cast(buff);
             }
@@ -413,7 +441,7 @@ public class BuffManager {
             return List.of();
         }
         List<T> found = new ArrayList<>();
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff.getClass() == kind) {
                 found.add(kind.cast(buff));
             }
@@ -422,10 +450,14 @@ public class BuffManager {
     }
 
     public void clearAll() {
-        for (AbstractBuff buff : buffs) {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
             buff.removeBuff(instance);
         }
         buffs.clear();
+        // M-5: also drop the `blocked` flag. It is set when a control buff expires on the very turn it was
+        // blocking, so clearing every buff without clearing it leaves a unit that can never act again --
+        // and dispelling it is exactly what a caller would try next.
+        blocked = false;
     }
 
     public boolean isEmpty() {

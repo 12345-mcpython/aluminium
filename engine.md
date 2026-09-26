@@ -1567,8 +1567,15 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 - **`permanent = true` 的 buff 完全不 tick**（`processBuffTick` 直接跳过）：这是"整场战斗"
   的落地形态 —— 不是"一个很大的回合数"，而是一个**永远不会被读到的**回合数。
   它只能被显式移除（驱散 / 死亡 / `clearAll`）。
-- 到期在 `processBuffTick` 里用 `removeIf` 移除；若到期的 buff 让 `canAct()` 为 false，
+- 到期在 `processBuffTick` 里移除；若到期的 buff 让 `canAct()` 为 false，
   置 `blocked = true`（"晕眩最后一回合仍然挡住行动"）。
+- ⚠ **`BuffManager` 里每一次遍历 `buffs` 都走 `List.copyOf`**（M-12，2026-09-26 修）：
+  派发方法会**调进 buff 代码**，而"受击时给自己/对手挂一个 buff"是正常内容（附加伤害上易伤、
+  反击挂标记…），遍历活列表会让它在**伤害结算内部**抛 `ConcurrentModificationException`，
+  或者静默跳过某个 buff。`processBuffTick` 原来的 `removeIf` 有同一个洞（谓词里调 `tickEffect`）。
+  规则写在 `BuffManager` 的类 javadoc 里 —— 改回活列表就会重新打开这个洞。
+- ⚠ `clearAll()` 会连 `blocked` 一起清（M-5）：否则"控制 buff 在它挡人的那回合到期"之后，
+  即使把所有 buff 清空，`canAct()` 仍是 false，**驱散也救不回来**。
 - ⚠️ `blocked` 只在 `beforeMove()` 开头清零，所以**只对 early buff 生效**：
   后置控制 buff 在 `afterMove()` 到期时，它的最后一回合挡不住。`StunBuff` 恰好是 early 所以看不出来。
 - ⚠️ `clearAll()`（死亡时调用）不重置 `blocked`，清空后仍可能 `canAct() == false` 直到下次 `beforeMove()`。

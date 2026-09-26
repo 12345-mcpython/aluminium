@@ -1065,6 +1065,12 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 > 取舍标准：**"已修清单"会腐烂，"未修清单"是待办** —— 所以只留开着的。
 >
 > ⚠ 编号沿用原文件的 `H-*` / `M-*` / `L-*` / `N-*` / `F-*`，旧文档里的交叉引用仍然对得上。
+>
+> 🔴 **本表只做过抽查，不是逐条核过代码的。** 迁移时我照抄了原文件自己的 ✅ 标记，**没有对代码**，
+> 结果第一次抽查就抓到 **3 条早就修好的**（`M-1` `setTopZero` 认 `currentActor`、`M-2`
+> `advanceActionByPercent` 有 clamp —— P7 的 E1/E3 修的；`L-6` `removeCombatant` 清 `currentActor`）。
+> **动手前先看代码，别信这张表。**（2026-09-26 核实为**仍开着**的：M-5、M-6、M-11、M-12、L-3、L-4、
+> L-7、L-12、H-1、N-3；同日已修：M-5、M-12。）
 
 ### 12.1 High（未修）
 
@@ -1081,18 +1087,18 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 
 | # | 位置 | 问题 |
 |---|---|---|
-| M-1 | `Queue.java:226` | `setTopZero()` 重置**堆顶**而非 `currentActor`（字段存在却没用）→ 一旦在 `move()`→`afterMove()` 窗口内动了键就错（拉条者落到 `elapsed` 之下会让行动者**连动两次**） |
-| M-2 | `Queue.java:328` | `advanceActionByPercent` **缺 clamp**：实测 102961 组里 **8814 组**结果严格小于 `elapsed`（差 ~5e-13）→ 全局时钟倒走。`advanceAction` 有 clamp，这个没有 |
+| M-1 | `Queue.java:226` | ✅ **早就修了**（P7 的 E1）：`setTopZero()` 现在重置 `currentActor`（`Signal acting = currentActor`），不是堆顶。⚠ 迁移这张表时照抄了旧状态，见本节开头的警告 |
+| M-2 | `Queue.java:328` | ✅ **早就修了**（P7 的 E3）：`advanceActionByPercent` 现在有 `Math.max(elapsed, …)`，与 `advanceAction` 一致。原文说实测 102961 组里 8814 组结果小于 `elapsed` —— 那是修之前的事。⚠ 我迁移这张表时照抄了旧状态，见本节开头的警告 |
 | M-3 | `AttributeBuilder.java:124` | `build()` **直接交出内部 `DoubleValue`**（未 clone），且 `getOrCreate` 用 `computeIfAbsent` 缓存 → 同一 builder 两次 `build()` 拿到同一批对象（与 H-6 同族，builder 侧） |
 | M-4 | `EnemyFactory.java:59` | 只灌 5 个属性，**漏了 `EFFECT_HIT_RATE`**（`EnemyScaler` 已算出）→ 敌人命中率恒 0，那是个"看着被用了其实没有"的死输出 |
-| M-5 | `BuffManager.java:109` | `clearAll()` **不重置 `blocked`** → 控制 buff 在 tick 里到期置位后，清空列表 `canAct()` 仍 false 直到下次 `beforeMove()` |
+| M-5 | `BuffManager.java` | ✅ **已修（2026-09-26）**：`clearAll()` 现在也清 `blocked`。原文：不重置 `blocked` → 控制 buff 在 tick 里到期置位后，清空列表 `canAct()` 仍 false 直到下次 `beforeMove()`，**驱散也救不回来**。回归 `BuffManagerTest.clearAllAlsoClearsTheBlockedFlag`（原 `clearAllRemovesEverything` 抓不到，因为它那个眩晕从没被 tick 过） |
 | M-6 | `BuffManager.java:54` | `blocked` **只对 early buff 生效**（`beforeMove` 先清标志再 tick）→ 后置控制 buff 的"最后一回合"什么都挡不住。"晕眩最后一回合是否还挡"取决于 tick 时序而非语义 |
 | M-7 | `Character.java:84,91` | 两个 `fromAttributes` 工厂各自残留 null：`(Translate,…)` 版 `skillLevel` 为 null、`(String,…)` 版 `relicSuit`/`weapon` 为 null → 相应 getter/setter 直接 NPE |
 | M-8 | `Character.java:235` | `build()` 把可变 `relicSuit`/`weapon`/`skillLevel` **直接交给角色**（无防御拷贝）→ 同一 builder 造的两个角色共享一套遗器与一个 map |
 | M-9 | `Weapon.java:71` | **光锥永远取叠影 1 的被动**（`weaponSkillData.getFirst()`），而表按叠影档位索引 → 23042 永远 +18% 速度，拿不到 +21%…+30%。另外 `getFirst()` 对空列表抛 `NoSuchElementException` |
 | M-10 | `RelicSuit.java:55` | `addToSuit` 覆盖槽位字段但 **`total.add(relic)` 不移除旧的** → 两件身甲一起算进面板（白送一件）；`clone()` 与原件因此**可以不一致** |
 | M-11 | `CanHit.java:242` | `gainEnergy` 可能返回**负值**把能量减下去（`ENERGY_REGENERATION_RATE <= -1`，或经 `setCurrentEnergy` 造成 current>max）；`NaN` 时守卫拦不住 → `isEnergyFull()` 从此恒 false（大招再也放不出） |
-| M-12 | `BuffManager.java:70,82` | `onDamage`/`afterAttack` **遍历活列表**，而这两个回调恰恰是"buff 再挂 buff"的地方 → CME 或静默跳过；`processBuffTick` 的 `removeIf` 里调 `tickEffect` 同理 |
+| M-12 | `BuffManager.java` | ✅ **已修（2026-09-26）**：**每一次遍历 `buffs` 都走 `List.copyOf`**（16 处），`processBuffTick` 从 `removeIf` 改成显式快照循环 + 显式移除。原文：`onDamage`/`afterAttack` 遍历活列表，而回调恰恰是"buff 再挂 buff"的地方 → **CME 或静默跳过**。**实测复现**：一个受击时给自己挂 buff 的反应，`applyDamage` 直接抛 `ConcurrentModificationException`（在伤害结算内部，最难查的位置）。回归两条：`aBuffMayAttachAnotherBuffWhileReactingToDamage` / `WhileTicking`（后者走 `removeIf` 那条路）。代价是每次遍历一次小拷贝（一个单位几个 buff），换来"没有例外可被后人改回去"——规则写在 `BuffManager` 的类 javadoc 里。变异：两处各自改回活列表，**各红一条** |
 | M-13 | `AbstractBuff.java:52` 等 6 处 | 主代码留着 `IO.println`，其中 `decreaseDuration` 那条**每次 buff tick 都打**。`slf4j`+`log4j` 已配好却**主代码 0 处使用**。~~`StunBuff.removeBuff` 那行已删（2026-09-26，它会插进调用方输出）~~ |
 | M-14 | `SkillData.java:41,82` | **未知 `cid`/`skillId` 静默返回"假的非伤害技能"**（`EMPTY` = PHYSICAL + ENHANCE + 空参数）→ 打错/未实现的 id 与被动无法区分：0 伤害、无报错、照样回能。建议 fail fast |
 | M-15 | `SkillData.java:20,56` | javadoc 称 immutable，但 `skills` 及其内层 list 是 Gson 造的**可变** `ArrayList`；而 `DefaultSkill.DATA_CACHE` 把同一实例共享给所有实体/战斗 → 一次改动污染全进程 |
@@ -1114,7 +1120,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | L-3 | `Signal.java:59` | `refreshSpeed()` 跳过构造器有的 `speed > 0` 校验 → 0/负速 debuff 让该单位**永远不再行动**而不是 fail fast；javadoc 大喊要调用它却没人调 |
 | L-4 | `Signal.java:23,81` | `Cloneable` + `clone()` 无人使用，克隆会产生**同一 `CanHit` 的第二个 Signal** → 潜在"一个单位一回合动两次" |
 | L-5 | `Queue.java:47` | 类级 `@Getter` 暴露 **`getHeap()`（活的内部 `PriorityQueue`）**，调用方可破坏排序不变量；`resetSignal`/`getCombatant`/`rebuildHeap` 无调用者 |
-| L-6 | `Queue.java:175` | `removeCombatant` **不清 `currentActor`** → 移除死亡行动者后 `getCurrentActor()` 仍返回死人，直到下次 `move()`；与 `Battle.currentMove` 可能不一致 |
+| L-6 | `Queue.java:175` | ✅ **早就修了**：`removeCombatant` 现在会清 `currentActor`。⚠ 迁移这张表时照抄了旧状态 |
 | L-7 | `Battle.java`（`tickDots`/`beforeMove`） | 无敌目标的 DOT **照样消耗结算次数**却零伤害 → 转阶段无敌的 Boss 白吃 DOT。⚠ P10-0 后修法变了：现在是"跳过 `beforeMove` 里那步倒计时" |
 | L-9 | `DoubleValue.java:310-335` | 六个 `Modifier.*PercentNumber` 工厂 + `Modifier.pure(double)` **零调用者**，而它们除以 100、旁边的 `addPercent` 不除 → 典型 100× 陷阱。建议删或改名 `fromWholePercent` |
 | L-10 | `BreakDamageCalculator.java:41` | `/10.0`、`/100.0` 写死；`/10` 这个数据约定在类 javadoc、`Constant.BREAKING_RATE` javadoc、两个测试里各复述一遍 |
