@@ -4,7 +4,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Resource;
-import com.laosun.aluminium.models.Skill;
+import com.laosun.aluminium.models.skill.Skill;
 
 /**
  * Standard skill point (SP) policy (P8-4): start at 3, cap 5, **our side's** basic attack +1,
@@ -88,10 +88,14 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
      * (see F-8 in §F).
      */
     public interface Listener {
-        /** Actually credited {@code amount} points ({@code > 0}). */
+        /**
+         * Actually credited {@code amount} points ({@code > 0}).
+         */
         void onGained(int amount);
 
-        /** Actually spent {@code amount} points ({@code > 0}). */
+        /**
+         * Actually spent {@code amount} points ({@code > 0}).
+         */
         void onSpent(int amount);
     }
 

@@ -1,11 +1,10 @@
-package com.laosun.aluminium.models.buffs;
+package com.laosun.aluminium.models.buff;
 
-import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 
-public class TestBuff extends AbstractBuff {
-    public TestBuff(int duration) {
-        super(duration, false);
+public class TestBuff1 extends AbstractBuff {
+    public TestBuff1(int duration) {
+        super(duration, true);
     }
 
     @Override
@@ -15,17 +14,17 @@ public class TestBuff extends AbstractBuff {
 
     @Override
     public void applyEffect(CanHit target) {
-        IO.println("TestBuff: applyEffect");
+        IO.println("TestBuff1: applyEffect");
     }
 
     @Override
     public void removeBuff(CanHit target) {
-        IO.println("TestBuff: removeBuff");
+        IO.println("TestBuff1: removeBuff");
     }
 
     @Override
     public void tickEffect(CanHit target) {
-        IO.println("TestBuff: tickEffect");
+        IO.println("TestBuff1: tickEffect");
         decreaseDuration();
     }
 }

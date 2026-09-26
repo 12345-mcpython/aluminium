@@ -9,7 +9,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
-import com.laosun.aluminium.models.buffs.StatModifierBuff;
+import com.laosun.aluminium.models.buff.StatModifierBuff;
+import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.List;
 import java.util.Locale;
@@ -58,7 +59,9 @@ import java.util.Set;
  */
 public final class TriggerInterpreter {
 
-    /** Ops that are implemented today. */
+    /**
+     * Ops that are implemented today.
+     */
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR");
@@ -81,7 +84,9 @@ public final class TriggerInterpreter {
     private static final Set<String> TARGET_SELECTORS =
             Set.of("self", "target", "attacker", "all_allies", "party");
 
-    /** The two spellings of "every one of our characters". */
+    /**
+     * The two spellings of "every one of our characters".
+     */
     private static final Set<String> TARGET_ALL_ALLIES = Set.of("all_allies", "party");
 
     private TriggerInterpreter() {
@@ -398,11 +403,11 @@ public final class TriggerInterpreter {
      * gets an additive percentage. Splitting it out keeps the "which modifier kind" decision in one
      * readable place instead of a nested conditional at the call site.
      *
-     * @param attribute  the attribute to touch
-     * @param percent    the magnitude; {@code < 0} produces a debuff
-     * @param turns      how long it lasts (validated at load time; ignored when {@code permanent})
-     * @param permanent  {@code true} = "for the rest of the battle", i.e. never ticked
-     * @param maxStacks  how many copies may accumulate; {@code 1} = replace on re-application
+     * @param attribute the attribute to touch
+     * @param percent   the magnitude; {@code < 0} produces a debuff
+     * @param turns     how long it lasts (validated at load time; ignored when {@code permanent})
+     * @param permanent {@code true} = "for the rest of the battle", i.e. never ticked
+     * @param maxStacks how many copies may accumulate; {@code 1} = replace on re-application
      */
     private static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns,
                                                  boolean permanent, int maxStacks) {

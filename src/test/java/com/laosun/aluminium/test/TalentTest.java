@@ -8,9 +8,11 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Enemy;
-import com.laosun.aluminium.models.EnemyFactory;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -293,7 +295,7 @@ public class TalentTest {
 
     /** One parameter of a talent's row for a given skill level. */
     private static double talentRow(int cid, int paramIndex, int level) {
-        var skill = new com.laosun.aluminium.models.DefaultSkill(cid, 4, level);
+        var skill = new DefaultSkill(cid, 4, level);
         return skill.getData().getSkills().get(level - 1).get(paramIndex);
     }
 
@@ -349,7 +351,7 @@ public class TalentTest {
 
     /** Advances until {@code actor}'s turn, then has it use {@code skill} on {@code targets}. */
     private static boolean actOnOwnTurn(Battle battle, CanHit actor,
-                                        java.util.function.Supplier<com.laosun.aluminium.models.Skill> skill,
+                                        java.util.function.Supplier<Skill> skill,
                                         List<? extends CanHit> targets) {
         for (int i = 0; i < 40; i++) {
             battle.stepForward();

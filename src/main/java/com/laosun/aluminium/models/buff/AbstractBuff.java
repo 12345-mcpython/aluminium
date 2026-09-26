@@ -1,5 +1,7 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.buff;
 
+import com.laosun.aluminium.models.CanHit;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,7 +23,16 @@ public abstract class AbstractBuff implements Buff {
      * buff disappears only when it is removed explicitly (dispel / death / {@code clearAll}).
      *
      * <p>Default {@code false}: every existing buff keeps its turn count and keeps expiring.
+     * -- GETTER --
+     *  Whether this buff is exempt from the per-turn duration countdown ("for the rest of the battle").
+     *  <p>Read by
+     * : a permanent buff is not ticked and not
+     *  removed, so its
+     *  stays whatever it was created with. That is the concrete
+     *  meaning of "unbounded duration" in this engine — not a large number.
+
      */
+    @Getter
     protected final boolean permanent;
 
     /**
@@ -48,26 +59,15 @@ public abstract class AbstractBuff implements Buff {
     }
 
     /**
-     * @param duration  turns until expiry; ignored when {@code permanent} is {@code true}
+     * @param duration    turns until expiry; ignored when {@code permanent} is {@code true}
      * @param isEarlyBuff {@code true} = tick on {@code beforeMove}, {@code false} = on {@code afterMove}
-     * @param permanent {@code true} = the buff has no turn limit and is never ticked
+     * @param permanent   {@code true} = the buff has no turn limit and is never ticked
      */
     public AbstractBuff(int duration, boolean isEarlyBuff, boolean permanent) {
         this.remainingDuration = duration;
         this.isEarlyBuff = isEarlyBuff;
         this.permanent = permanent;
         this.id = ID_GENERATOR.getAndIncrement();
-    }
-
-    /**
-     * Whether this buff is exempt from the per-turn duration countdown ("for the rest of the battle").
-     *
-     * <p>Read by {@link BuffManager#processBuffTick(boolean)}: a permanent buff is not ticked and not
-     * removed, so its {@link #duration()} stays whatever it was created with. That is the concrete
-     * meaning of "unbounded duration" in this engine — not a large number.
-     */
-    public boolean isPermanent() {
-        return permanent;
     }
 
     @Override

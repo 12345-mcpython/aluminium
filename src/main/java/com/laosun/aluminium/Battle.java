@@ -8,12 +8,21 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.buffs.DotBuff;
-import com.laosun.aluminium.models.buffs.StatModifierBuff;
-import com.laosun.aluminium.models.buffs.StunBuff;
+import com.laosun.aluminium.models.ai.TargetSelector;
+import com.laosun.aluminium.models.buff.AbstractBuff;
+import com.laosun.aluminium.models.buff.DotBuff;
+import com.laosun.aluminium.models.buff.StatModifierBuff;
+import com.laosun.aluminium.models.buff.StunBuff;
+import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.energy.EnergyGain;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.skill.SkillData;
+import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
 import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,7 +84,7 @@ public class Battle {
      * instead of one type that has to mean both. A fresh list: the caller may remove from it freely.
      *
      * @return a fresh list of the enemy camp's monsters (including dead ones — filter with
-     *         {@code !isDeath()} if that is what you mean)
+     * {@code !isDeath()} if that is what you mean)
      */
     public List<Enemy> enemyUnits() {
         List<Enemy> monsters = new ArrayList<>();
@@ -92,7 +101,10 @@ public class Battle {
     /**
      * The current battle status (P7-3). It starts as {@link Status#NOT_STARTED}, and {@link #startBattle()}
      * turns it into {@link Status#RUNNING}.
+     * -- GETTER --
+     * The current battle status (P7-3).
      */
+    @Getter
     private Status status = Status.NOT_STARTED;
 
     /**
@@ -100,7 +112,16 @@ public class Battle {
      *
      * <p>Its only reason to exist is to let {@link #checkResult()} know whether "the enemy team is empty"
      * means **won** or **this wave has not entered yet**.
+     * -- SETTER --
+     * Register the wave manager (P7-4). Called by the
+     * constructor; business code does not
+     * call it by hand.
+     * -- GETTER --
+     * The current wave manager (P7-4);
+     * for a non-wave battle.
      */
+    @Getter
+    @Setter
     private WaveManager waveManager;
 
     public ArrayList<CanHit> addRequestItems = new ArrayList<>();
@@ -123,17 +144,23 @@ public class Battle {
      */
     public SkillPointPolicy skillPointPolicy = new StandardSkillPointPolicy();
 
-    /** Current skill points (P8-4). Equivalent to {@code skillPointPolicy.getValue()}. */
+    /**
+     * Current skill points (P8-4). Equivalent to {@code skillPointPolicy.getValue()}.
+     */
     public int getSkillPoints() {
         return skillPointPolicy.getValue();
     }
 
-    /** The regular skill point cap (P8-4). Equivalent to {@code skillPointPolicy.getMax()}. */
+    /**
+     * The regular skill point cap (P8-4). Equivalent to {@code skillPointPolicy.getMax()}.
+     */
     public int getSkillPointMax() {
         return skillPointPolicy.getMax();
     }
 
-    /** Whether there are enough skill points to cast one skill (P8-4). */
+    /**
+     * Whether there are enough skill points to cast one skill (P8-4).
+     */
     public boolean hasSkillPoint() {
         return skillPointPolicy.canAfford();
     }
@@ -196,6 +223,7 @@ public class Battle {
      * Injected random source (crit rolls / target selection); a fixed seed makes a
      * whole battle reproducible.
      */
+    @Getter
     private final Random rng;
 
     public record AdvanceRequest(CanHit object, double rate) {
@@ -280,10 +308,6 @@ public class Battle {
         currentMove = queue.getCurrentActor();       // the re-sort may have changed who is next
     }
 
-    public Random getRng() {
-        return rng;
-    }
-
     public void castImmediate(Skill skill, CanHit user, List<? extends CanHit> targets) {
         if (skill == null || user == null || targets == null) return;
         if (user.isDeath()) return;
@@ -308,12 +332,13 @@ public class Battle {
 
     // After releasing ultra skill must call processRequests()!
     // NO BEFAN YOY DID IT
+
     /**
      * Whether this unit can cast its ultimate right now (P3-4 follow-up): **reaching the "ult threshold" is
      * enough, it does not have to be filled to the maximum**.
      *
      * <p>The threshold comes from the skill data's {@code spNeed} (tbgd {@code AvatarSkillConfig.SPNeed},
-     * see {@link com.laosun.aluminium.models.SkillData#getSpNeed()}).
+     * see {@link SkillData#getSpNeed()}).
      * 5 of the 93 characters have a threshold **below** the maximum -- Yunli (云璃) 120/240,
      * Argenti (银枝) 90/180, 绯英 240/480, Feixiao (飞霄) 6/12, Cyrene (昔涟) 12/24. When the data is missing
      * it falls back to "fill {@code maxEnergy}" (the old behaviour).
@@ -444,13 +469,6 @@ public class Battle {
     }
 
     /**
-     * The current battle status (P7-3).
-     */
-    public Status getStatus() {
-        return status;
-    }
-
-    /**
      * Whether the battle is already over (won or lost).
      */
     public boolean isOver() {
@@ -485,21 +503,6 @@ public class Battle {
             status = Status.WIN;
         }
         return status;
-    }
-
-    /**
-     * Register the wave manager (P7-4). Called by the {@link WaveManager} constructor; business code does not
-     * call it by hand.
-     */
-    public void setWaveManager(WaveManager waveManager) {
-        this.waveManager = waveManager;
-    }
-
-    /**
-     * The current wave manager (P7-4); {@code null} for a non-wave battle.
-     */
-    public WaveManager getWaveManager() {
-        return waveManager;
     }
 
     /**
@@ -964,7 +967,7 @@ public class Battle {
      *                     "points"; **not** a fixed per-instance value -- for bounces {@link SkillExecutor}
      *                     spreads the total evenly over each instance)
      * @return the toughness reduction result of this instance (how much was actually reduced / how much
-     *         exceeded / whether a break was triggered)
+     * exceeded / whether a break was triggered)
      */
     public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
         if (attacker == null || enemy == null || stanceDamage <= 0) {
@@ -1184,9 +1187,9 @@ public class Battle {
      *
      * <p>Rolls with the **injected {@link #rng}**: the same seed → the same battle is reproducible.
      *
-     * @param caster           the applier (reads its effect hit rate)
-     * @param target           the victim (reads its effect resistance / specific resistance)
-     * @param baseChance       the base chance on the skill panel (0.8 = 80%)
+     * @param caster            the applier (reads its effect hit rate)
+     * @param target            the victim (reads its effect resistance / specific resistance)
+     * @param baseChance        the base chance on the skill panel (0.8 = 80%)
      * @param specificResistKey the key of the specific debuff resistance (a {@code STAT_*} string from the data), {@code null} = not looked up
      * @return {@code true} = it hit, so the buff may be applied
      */
@@ -1200,14 +1203,14 @@ public class Battle {
      * <p>This is the unified entry point for "a skill applying a debuff" -- do not call {@code addBuff}
      * directly inside a skill, otherwise effect hit rate and resistance are bypassed.
      *
-     * @param caster           the applier
-     * @param target           the target
-     * @param buff             the buff to apply
-     * @param baseChance       the base chance
+     * @param caster            the applier
+     * @param target            the target
+     * @param buff              the buff to apply
+     * @param baseChance        the base chance
      * @param specificResistKey the specific resistance key (may be {@code null})
      * @return {@code true} = it was applied
      */
-    public boolean tryApplyDebuff(CanHit caster, CanHit target, com.laosun.aluminium.models.AbstractBuff buff,
+    public boolean tryApplyDebuff(CanHit caster, CanHit target, AbstractBuff buff,
                                   double baseChance, String specificResistKey) {
         if (caster == null || target == null || buff == null || target.isDeath()) {
             return false;
@@ -1239,7 +1242,7 @@ public class Battle {
      * @param target     the one being healed
      * @param baseAmount the base healing amount (skill multiplier × attribute + flat value, computed by the caller)
      * @return the final healing amount (may be negative -- when healing reduction > 100%; a caller treating it
-     *         as 0 will be blocked by heal)
+     * as 0 will be blocked by heal)
      */
     public double calculateHeal(CanHit healer, CanHit target, double baseAmount) {
         if (target == null) {
@@ -1256,7 +1259,7 @@ public class Battle {
      * ({@code CanHit.heal} caps it itself and does nothing for the dead).
      *
      * @return the **HP actually restored** (after truncation by the cap; 0 when the target is dead or the
-     *         healing amount ≤ 0)
+     * healing amount ≤ 0)
      */
     public double heal(CanHit healer, CanHit target, double baseAmount) {
         if (target == null || target.isDeath()) {
@@ -1377,27 +1380,37 @@ public class Battle {
         }
     }
 
-    /** Energy credited (P8-6). */
+    /**
+     * Energy credited (P8-6).
+     */
     private void broadcastEnergyGain(CanHit target, double added) {
         dispatch(t -> t.onEnergyGain(this, target, added), target);
     }
 
-    /** HP loss (P8-6). {@code source} is this hit's attacker and may be {@code null}. */
+    /**
+     * HP loss (P8-6). {@code source} is this hit's attacker and may be {@code null}.
+     */
     private void broadcastHpLoss(CanHit target, double before, double after, CanHit source, double amount) {
         dispatch(t -> t.onHpLoss(this, target, before, after, source, amount), target, source);
     }
 
-    /** Kill (P8-6). */
+    /**
+     * Kill (P8-6).
+     */
     private void broadcastKill(CanHit attacker, CanHit victim) {
         dispatch(t -> t.onKill(this, attacker, victim), victim, attacker);
     }
 
-    /** Heal (P8-6). */
+    /**
+     * Heal (P8-6).
+     */
     private void broadcastHeal(CanHit healer, CanHit target, double healed) {
         dispatch(t -> t.onHeal(this, healer, target, healed), target, healer);
     }
 
-    /** Weakness break (P8-6). */
+    /**
+     * Weakness break (P8-6).
+     */
     private void broadcastBreak(CanHit attacker, CanHit target, DamageElement element) {
         dispatch(t -> t.onBreak(this, attacker, target, element), target, attacker);
     }
@@ -1412,7 +1425,9 @@ public class Battle {
         }
     }
 
-    /** Skill points spent (P8-6). Only delivered to our side, same as {@link #broadcastSkillPointGained}. */
+    /**
+     * Skill points spent (P8-6). Only delivered to our side, same as {@link #broadcastSkillPointGained}.
+     */
     private void broadcastSkillPointSpent(int amount) {
         for (Character ally : characters) {
             ally.onSkillPointSpent(this, amount);
@@ -1437,10 +1452,14 @@ public class Battle {
      */
     private int triggerDepth;
 
-    /** Nesting depth of buff-path reactions; see {@link #runCounter}. Per battle, never static. */
+    /**
+     * Nesting depth of buff-path reactions; see {@link #runCounter}. Per battle, never static.
+     */
     private int counterDepth;
 
-    /** How deep nested trigger firing may go before the engine gives up (see {@link #triggerDepth}). */
+    /**
+     * How deep nested trigger firing may go before the engine gives up (see {@link #triggerDepth}).
+     */
     private static final int MAX_TRIGGER_DEPTH = 8;
 
     /**
@@ -1606,11 +1625,17 @@ public class Battle {
      * {@code Battle.applyDamage}).
      */
     private enum EnergyGrant {
-        /** Main instance: both hit energy gain and kill energy gain are settled (the damage instance of a skill a character casts). */
+        /**
+         * Main instance: both hit energy gain and kill energy gain are settled (the damage instance of a skill a character casts).
+         */
         ALL,
-        /** Derived instance: only kill energy gain is settled (break / super break / DOT / additional damage / true damage). */
+        /**
+         * Derived instance: only kill energy gain is settled (break / super break / DOT / additional damage / true damage).
+         */
         KILL_ONLY,
-        /** Nothing is settled (reserved). */
+        /**
+         * Nothing is settled (reserved).
+         */
         NONE
     }
 
@@ -1633,7 +1658,7 @@ public class Battle {
      *
      * @param reaction the reaction to run; must not be {@code null}
      * @return {@code true} when it ran, {@code false} when it was refused because a reaction was already
-     *         in progress
+     * in progress
      */
     public boolean runCounter(Runnable reaction) {
         if (counterDepth > 0) {
@@ -1661,7 +1686,8 @@ public class Battle {
      * @param base the already-computed base value (e.g. Robin (知更鸟) 120% ATK / Tribbie (缇宝) 12% max HP)
      * @return the settled value of this instance (0 = no damage dealt)
      */
-    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {        Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
+    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
+        Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
         double settled = applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
         // P10-3 tail: this is the engine's one and only notion of a follow-up attack, so the

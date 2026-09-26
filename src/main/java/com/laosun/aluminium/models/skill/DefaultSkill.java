@@ -1,6 +1,7 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.models.CanHit;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +47,9 @@ public class DefaultSkill extends Skill {
         return cid;
     }
 
-    /** ⚠ Despite the field name, {@code skillId} here is the <b>slot</b> — see the constructor call. */
+    /**
+     * ⚠ Despite the field name, {@code skillId} here is the <b>slot</b> — see the constructor call.
+     */
     @Override
     public int getSkillSlot() {
         return skillId;

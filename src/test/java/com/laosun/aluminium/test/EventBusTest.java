@@ -3,32 +3,23 @@ package com.laosun.aluminium.test;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.AbstractBuff;
+import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.buffs.DotBuff;
-import com.laosun.aluminium.models.Enemy;
-import com.laosun.aluminium.models.EnemyFactory;
-import com.laosun.aluminium.models.Skill;
-import com.laosun.aluminium.models.event.BreakEvent;
-import com.laosun.aluminium.models.event.EnergyEvent;
-import com.laosun.aluminium.models.event.HealEvent;
-import com.laosun.aluminium.models.event.HpLossEvent;
-import com.laosun.aluminium.models.event.KillEvent;
-import com.laosun.aluminium.models.event.SkillCastEvent;
-import com.laosun.aluminium.models.event.SkillPointGainedEvent;
-import com.laosun.aluminium.models.event.SkillPointSpentEvent;
+import com.laosun.aluminium.models.buff.DotBuff;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.event.*;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -122,7 +113,7 @@ public class EventBusTest {
         Character hero = battle.characters.getFirst();
         Probe probe = attachProbe(hero);
 
-        Skill aoe = new com.laosun.aluminium.models.DefaultSkill(1003, 3, 1);   // Himeko's ultimate: AoE
+        Skill aoe = new DefaultSkill(1003, 3, 1);   // Himeko's ultimate: AoE
         castNow(battle, hero, aoe, List.of(firstEnemy(battle)));
 
         Assertions.assertEquals(1, probe.count(SKILL_CAST), "an AoE hitting 3 targets still emits only 1 cast event");
@@ -376,7 +367,7 @@ public class EventBusTest {
     // 6. Skill points: emitted only when really spent/gained
     // ==================================================================
 
-    /** Basic attack → skill point +1 → emit `SkillPointGainedEvent`. */
+    /** Basic attack → skill point +1 → emit `SkillPointEvent.onSkillPointGained`. */
     @Test
     public void skillPointGainFiresEvent() {
         Battle battle = newBattle();
@@ -392,7 +383,7 @@ public class EventBusTest {
         Assertions.assertEquals(1, last.amount(), EPS);
     }
 
-    /** Skill → skill point -1 → emit `SkillPointSpentEvent`. */
+    /** Skill → skill point -1 → emit `SkillPointEvent.onSkillPointSpent`. */
     @Test
     public void skillPointSpendFiresEvent() {
         Battle battle = newBattle();
@@ -557,7 +548,7 @@ public class EventBusTest {
      */
     private static final class Probe extends AbstractBuff
             implements SkillCastEvent, EnergyEvent, HpLossEvent, HealEvent,
-            KillEvent, BreakEvent, SkillPointGainedEvent, SkillPointSpentEvent {
+            KillEvent, BreakEvent, SkillPointEvent {
         private final List<Event> events = new ArrayList<>();
 
         Probe() {

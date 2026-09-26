@@ -17,9 +17,13 @@ import java.util.Map;
  * for the events that actually fire today.
  */
 public enum TriggerEvent {
-    /** ✅ {@code Battle.startBattle()} -- once for every combatant. */
+    /**
+     * ✅ {@code Battle.startBattle()} -- once for every combatant.
+     */
     BATTLE_START("BATTLE_START", true),
-    /** ✅ An ally finished an attack. Carries the hit-target count. */
+    /**
+     * ✅ An ally finished an attack. Carries the hit-target count.
+     */
     ALLY_ATTACK("ALLY_ATTACK", true),
     /**
      * ✅ An ally cast a skill, including non-damaging ones — but <b>not</b> their Ultimate.
@@ -30,19 +34,33 @@ public enum TriggerEvent {
      * ultimate. The split is made at the emitter ({@code SkillExecutor.broadcastSkillCast}).
      */
     SKILL_CAST("SKILL_CAST", true),
-    /** ✅ Someone's energy was credited. */
+    /**
+     * ✅ Someone's energy was credited.
+     */
     ENERGY_GAINED("ENERGY_GAINED", true),
-    /** ✅ Someone really lost HP (shield absorption does not count). */
+    /**
+     * ✅ Someone really lost HP (shield absorption does not count).
+     */
     HP_LOST("HP_LOST", true),
-    /** ✅ Someone was really healed. */
+    /**
+     * ✅ Someone was really healed.
+     */
     HEALED("HEALED", true),
-    /** ✅ Someone was killed. */
+    /**
+     * ✅ Someone was killed.
+     */
     KILL("KILL", true),
-    /** ✅ An enemy was weakness-broken. */
+    /**
+     * ✅ An enemy was weakness-broken.
+     */
     BREAK("BREAK", true),
-    /** ✅ Skill points were really spent. */
+    /**
+     * ✅ Skill points were really spent.
+     */
     SKILL_POINT_SPENT("SKILL_POINT_SPENT", true),
-    /** ✅ Skill points were really gained. */
+    /**
+     * ✅ Skill points were really gained.
+     */
     SKILL_POINT_GAINED("SKILL_POINT_GAINED", true),
     /**
      * ✅ A character's turn began — emitted by {@code Battle.beforeMove}, after the actor's buffs have
@@ -122,7 +140,9 @@ public enum TriggerEvent {
         this.wired = wired;
     }
 
-    /** The string used in the JSON {@code "on"} field. */
+    /**
+     * The string used in the JSON {@code "on"} field.
+     */
     public String value() {
         return name;
     }

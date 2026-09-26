@@ -3,7 +3,7 @@ package com.laosun.aluminium.data;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.SkillEffectSpec;
-import com.laosun.aluminium.models.Skill;
+import com.laosun.aluminium.models.skill.Skill;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,7 +30,8 @@ public final class SkillEffects {
     private static final String RESOURCE = "/data/skill_effects.json";
 
     private static final Type SHAPE =
-            new TypeToken<Map<String, Map<String, SkillEffectSpec>>>() { }.getType();
+            new TypeToken<Map<String, Map<String, SkillEffectSpec>>>() {
+            }.getType();
 
     private static volatile Map<String, Map<String, SkillEffectSpec>> table;
     private static final AtomicInteger LOAD_COUNT = new AtomicInteger();
@@ -56,7 +57,9 @@ public final class SkillEffects {
         return slots == null ? null : slots.get(String.valueOf(skill.getSkillSlot()));
     }
 
-    /** How many times the resource was actually read — lets a test assert "loaded once". */
+    /**
+     * How many times the resource was actually read — lets a test assert "loaded once".
+     */
     public static int loadCount() {
         return LOAD_COUNT.get();
     }

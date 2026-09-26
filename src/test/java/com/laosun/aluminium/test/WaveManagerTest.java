@@ -4,8 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.StageBean;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Enemy;
+import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.WaveManager;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -273,7 +274,7 @@ public class WaveManagerTest {
     @Test
     public void battlesWithoutWavesBehaveAsBefore() {
         Battle battle = new Battle(List.of(character("hero", 100)),
-                List.of(com.laosun.aluminium.models.EnemyFactory.create(1002011, 90, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 90, 1)), new Random(0));
 
         Assertions.assertNull(battle.getWaveManager());
         battle.startBattle();

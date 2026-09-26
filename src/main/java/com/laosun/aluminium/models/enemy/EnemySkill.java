@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.enemy;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EnemySkillData;
@@ -6,6 +6,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillEffectType;
+import com.laosun.aluminium.models.*;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.skill.SkillData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,7 +119,9 @@ public class EnemySkill extends Skill {
         }
     }
 
-    /** Who this skill reaches, given the caller's main target. */
+    /**
+     * Who this skill reaches, given the caller's main target.
+     */
     private List<CanHit> struckBy(CanHit mainTarget, Battle battle) {
         // ⚠ Deliberately NOT filtered to the living here. A dead character is simply struck for zero
         // segments by strike()'s own isDeath() check, which is the one guard that matters -- and it is
@@ -146,7 +152,9 @@ public class EnemySkill extends Skill {
         };
     }
 
-    /** Lands {@link #hits} segments on one character. */
+    /**
+     * Lands {@link #hits} segments on one character.
+     */
     private void strike(Battle battle, CanHit user, CanHit victim) {
         double base = user.getAttribute(AttributeType.ATTACK).get() * multiplier;
         for (int i = 0; i < hits; i++) {

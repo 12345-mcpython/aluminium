@@ -1,7 +1,6 @@
-package com.laosun.aluminium.models.buffs;
+package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.DoubleValue;
 
