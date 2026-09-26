@@ -7,7 +7,7 @@
 > **规范文档**：游戏机制的权威公式在 `HSR.md`（"崩坏：星穹铁道 战斗机制总结（全版本 · AI 实现版）"，
 > 以 4.4.0 数据为准）。本文与它的差异集中在 §18，**不重复它的内容**。
 > 该文件目前**不在仓库里**（只存在于作者本机 `E:\code\blog\hsr\`），
-> 要长期依赖它需要入库或把关键结论内联进 ROADMAP —— 见 `DOC_VS_CODE.md` C-3。
+> 要长期依赖它需要入库或把关键结论内联进 ROADMAP。（原 `DOC_VS_CODE.md` C-3 已随该文档删除。）
 
 阅读约定：
 
@@ -557,7 +557,7 @@ Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结�
 **遗器套装规则走的是同一条通道**：`resources/relic_sets/<setId>.json` 与角色文件同形，
 只是按件数阈值分组（`{"4": [ … ]}`），由 `data.RelicTriggerTables` 懒加载，
 在装配点 `CharacterFactory` 并入角色自己的表（`TriggerTable.plus`）。
-表达不了的那部分登记在 `_unmodelled.json`（见 `DOC_VS_CODE.md` `F-10`）。
+表达不了的那部分登记在 `_unmodelled.json`（见 `ROADMAP.md` §12.5 `F-10`）。
 
 **只对我方开火**：敌人的事件不是我们的内容（P9 才管怪物），而且"敌人挨打"不该让
 我方角色被触发两次。带主体的事件用 `fireTriggersForAlly` 做这道阵营判断。
@@ -948,7 +948,7 @@ skills.json[cid][槽位] ──Gson──▶ beans.Skill（record）
 **治疗与护盾现在走引擎。** `SkillExecutor.dispatchNonDamaging` 查
 `data/skill_effects.json` 拿到"缩放属性 + 参数下标"，算出数值并调用
 `Battle.heal` / `Battle.grantShield`；调用方只需要**选谁**。
-（这张表怎么来的、为什么必须是一张表：见 `DOC_VS_CODE.md` 的 `F-9`。）
+（这张表怎么来的、为什么必须是一张表：见 `ROADMAP.md` §12.5 的 `F-9`。）
 
 在此之前 `resolveHits` 对非伤害技能**直接 return** —— 技能放出去、战技点扣了、能量也涨了，
 **唯独没有任何效果**。而 demo 里"治疗能用"是因为 `Main` 自己长出了**第二条手搓路径**
@@ -1401,10 +1401,10 @@ no-op，用不用这个 provider 都一样；本 provider 管的是"**有**能�
 
 #### 🚧 与游戏的三处已知差距
 
-> 📋 **这些缺口的权威登记处是 `DOC_VS_CODE.md` §F**（`F-1` 上限可变 / `F-2` 开局可变 /
-> `F-3` 强化普攻 / `F-4` 角色级供点 / `F-5` 敌人绕过 / `F-6` 裸字符串 / `F-7` 语义过窄 /
-> `F-8` 架构提醒 / `F-9` 技能效果参数布局 / `F-10` 套装 ability 的表达范围）。
-> **本节只记结论，细节一律以 §F 为准** —— 免得两处各写一份然后漂移。
+> 📋 **这些缺口的权威登记处是 `ROADMAP.md` §12.5**（`F-1` 上限可变 / `F-3` 强化普攻 /
+> `F-4` 角色级供点 / `F-5` 敌人绕过 / `F-7` 语义过窄 / `F-9` 技能效果参数布局 / `F-10` 套装 ability 的表达范围；
+> `F-2`/`F-6`/`F-8` 已解决）。**本节只记结论，细节一律以 §12.5 为准** —— 免得两处各写一份然后漂移。
+> （原登记处 `DOC_VS_CODE.md` §F 已于 2026-09-26 删除并入 ROADMAP §12。）
 >
 > 处理原则：**引擎保持通用、可扩展、稳定，不替角色机制背锅**。下列差距**本轮只标记、
 > 不改实现**。`SkillPointGameParityTest` 把每条的**引擎当前行为**钉在断言里。
@@ -1567,8 +1567,15 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 - **`permanent = true` 的 buff 完全不 tick**（`processBuffTick` 直接跳过）：这是"整场战斗"
   的落地形态 —— 不是"一个很大的回合数"，而是一个**永远不会被读到的**回合数。
   它只能被显式移除（驱散 / 死亡 / `clearAll`）。
-- 到期在 `processBuffTick` 里用 `removeIf` 移除；若到期的 buff 让 `canAct()` 为 false，
+- 到期在 `processBuffTick` 里移除；若到期的 buff 让 `canAct()` 为 false，
   置 `blocked = true`（"晕眩最后一回合仍然挡住行动"）。
+- ⚠ **`BuffManager` 里每一次遍历 `buffs` 都走 `List.copyOf`**（M-12，2026-09-26 修）：
+  派发方法会**调进 buff 代码**，而"受击时给自己/对手挂一个 buff"是正常内容（附加伤害上易伤、
+  反击挂标记…），遍历活列表会让它在**伤害结算内部**抛 `ConcurrentModificationException`，
+  或者静默跳过某个 buff。`processBuffTick` 原来的 `removeIf` 有同一个洞（谓词里调 `tickEffect`）。
+  规则写在 `BuffManager` 的类 javadoc 里 —— 改回活列表就会重新打开这个洞。
+- ⚠ `clearAll()` 会连 `blocked` 一起清（M-5）：否则"控制 buff 在它挡人的那回合到期"之后，
+  即使把所有 buff 清空，`canAct()` 仍是 false，**驱散也救不回来**。
 - ⚠️ `blocked` 只在 `beforeMove()` 开头清零，所以**只对 early buff 生效**：
   后置控制 buff 在 `afterMove()` 到期时，它的最后一回合挡不住。`StunBuff` 恰好是 early 所以看不出来。
 - ⚠️ `clearAll()`（死亡时调用）不重置 `blocked`，清空后仍可能 `canAct() == false` 直到下次 `beforeMove()`。
@@ -2032,7 +2039,7 @@ Buff 也拿不到"这一段是用什么槽位打出来的"。
 | §3.1 **额外回合**（不消耗回合数、期间不可插入终结技） | ✅ 已实现（P7-2）：`Battle.grantExtraTurn` / `Queue.grantExtraTurn`；期间 `castUltra` 拦住非本人的终结技。见 §5.6 |
 | §3.2 **弱点击破效率** / **削韧值提高** | ❌ 属性都不存在；超击破公式（§7.3）需要它们 |
 | §3.4 **仇恨系统 / 受击概率** | ✅ 已实现（P5-1/P5-2）：`Path` + `CharacterData.aggro` + `Battle.aggroOf/getAggroTable`。见 §19.1 |
-| §3.4 **嘲讽** | ✅ 已实现（P5-2）：`TauntBuff` 是纯标记，**硬指定目标**（单体 / 扩散中心）而非仇恨加权 —— 与 §3.4 的"按百分比提高仇恨值"写法不同，见 §19.2 与 `DOC_VS_CODE.md` A-1。⚠ 规格与实际规则不符这点记在 `DOC_VS_CODE.md` A-1，这里不重复 |
+| §3.4 **嘲讽** | ✅ 已实现（P5-2）：`TauntBuff` 是纯标记，**硬指定目标**（单体 / 扩散中心）而非仇恨加权 —— 与 §3.4 的"按百分比提高仇恨值"写法不同，见 §19.2。⚠ 规格与实际规则不符这点记在这里，不再重复 |
 | §3.5 **效果命中与抵抗的生效概率公式** | ✅ 已实现（P6-1）：公式与 §3.5 一致，三个因子乘算。顺手修了 `EnemyFactory` 漏写 `effectHitRate` 的问题（之前敌人命中恒 0）。见 §20.1 |
 | §4 **护盾** | ✅ 已实现（P6-3）：`CanHit.shield` 先于 HP 被扣、不叠加。🚧 规格里的"护盾量提高"没有对应属性，护盾量目前就是传入值 |
 | §4 **治疗乘区** | ✅ 已实现（P6-2）：`Battle.calculateHeal/heal`。⚠ 规格的 `(1 - 治疗降低)` 与 `(1 + 受疗加成)` 合并成一个因子（`HEAL_TAKEN_RATIO` 取负即降低），因为属性表里没有单独的"治疗降低" |
