@@ -797,10 +797,15 @@ Objects.requireNonNull(JSONReader.class.getResourceAsStream(resourcePath))   // 
 - **还差最后一步才能接线**：`models.SkillData` 目前**不暴露** `cid` / `skillID`
   （`init(cid, skillID)` 收下了但没留存），而这张表是按 `cid → slot` 索引的。
   加两个访问器即可，属机械改动；之后 `SkillExecutor` 才能查表分派 RESTORE / DEFENCE。
-- **另注（工具链）**：`E:\code\python` **不是 git 仓库**，本 Java 仓库也不跟踪 `generate_data.py`，
-  所以对生成器的改动**没有任何版本历史**。另外它按 cwd 决定 `out_dir`：
-  从 `E:\code\python` 跑会把产物写进 `E:\code\python\data\`，要从本项目根目录跑才写进
-  `src/main/resources/data/`。`skill_effects.json` 落在被 `.gitignore` 排除的 `data/` 里，
+- **另注（工具链，2026-09-26 更正）**：`generate_data.py` **有版本控制，但在 GitHub gist 上**
+  （`README.md` 的 generator 一节有链接），`E:\code\python` 不是它的 git checkout，本 Java 仓库也不跟踪它。
+  ⚠ **而且 gist 落后于本地副本**：实测抓取 gist 原文对比，gist 里**没有** `skill_effects.json`
+  那一段（连 `import re` 都没有），而本地那份有 —— 也就是说 **F-9 这张参数表的生成代码
+  目前只存在于本地磁盘，任何地方都没有历史**。它对生成器的改动属"改了没人知道"的那一类，
+  要动它之前先把本地版推回 gist。（原文写"没有任何版本历史"，对这一段仍然成立。）
+  它按 cwd 决定 `out_dir`：从 `E:\code\python` 跑会把产物写进 `E:\code\python\data\`，
+  要从本项目根目录跑才写进 `src/main/resources/data/`（`README.md` 有完整说明）。
+  `skill_effects.json` 落在被 `.gitignore` 排除的 `data/` 里，
   提交需要 `git add -f`（同 `monster_attack_modify_ratio.json` 的处理）。
 
 ---
