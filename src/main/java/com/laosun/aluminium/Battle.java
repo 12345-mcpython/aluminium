@@ -578,11 +578,12 @@ public class Battle {
      * @param element  the break element
      */
     private void attachBreakDot(CanHit attacker, Enemy enemy, DamageElement element) {
-        if (!Constant.DOT_ELEMENTS.contains(element)) {
+        Constant.BreakEffect effect = Constant.BREAK_EFFECTS.get(element);
+        if (effect == null || !effect.hasDot()) {
             return;
         }
         enemy.addDot(new Dot(attacker, element,
-                BreakDamageCalculator.breakBaseOf(attacker) * Constant.DOT_RATIO, Constant.DOT_TURNS));
+                BreakDamageCalculator.breakBaseOf(attacker) * effect.dotRatio(), effect.dotTurns()));
     }
 
     public boolean performAction(Skill skill, List<? extends CanHit> targets) {
