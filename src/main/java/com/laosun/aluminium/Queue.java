@@ -543,6 +543,7 @@ public final class Queue {
         for (Signal s : heap) {
             if (s.getCanHit() == target) {
                 s.setNextActionTime(s.getNextActionTime() + delay);
+                s.setRemaining(elapsed, s.getNextActionTime() - elapsed);
                 rebuildHeap();
                 return true;
             }
@@ -573,6 +574,8 @@ public final class Queue {
         for (Signal s : heap) {
             if (s.getCanHit() == target) {
                 s.setNextActionTime(Math.max(elapsed, s.getNextActionTime() - advance));
+                // Same ledger sync as delayAction (L-26): the pull must survive a later speed change too.
+                s.setRemaining(elapsed, s.getNextActionTime() - elapsed);
                 rebuildHeap();
                 return true;
             }

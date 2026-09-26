@@ -116,7 +116,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * Recomputes the action time immediately after a speed change (P7 fix E2).
      *
      * <pre>
-     *   progress  = clamp(remaining / old booking length, 0, 1)   // the old booking length includes the first-round factor
+     *   progress  = max(remaining / old booking length, 0)   // the old booking length includes the first-round factor
      *   newLength = new cycle × (first round ? 1.5 : 1)
      *   remaining = progress × newLength
      *   next      = elapsed + remaining
@@ -129,7 +129,10 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      *   <li>about to act (progress = 1) → {@code remaining} is still the full round length, i.e.
      *       <b>the booking length is not discounted</b>: a speed boost does not let someone "skip ahead out of
      *       thin air", it only shortens the wait proportionally;</li>
-     *   <li>speed change halfway through → the remaining wait is scaled in proportion to the old and new cycles.</li>
+     *   <li>speed change halfway through → the remaining wait is scaled in proportion to the old and new cycles;</li>
+     *   <li><b>pushed back beyond one booking (progress &gt; 1)</b> → the excess is preserved rather than capped
+     *       (L-26). Deliberately <b>not</b> clamped from above: a delayed unit really is more than a round away,
+     *       and clamping truncated every push to one full round.</li>
      * </ul>
      *
      * <p>⚠ The denominator must be "**the length this booking originally had**" ({@link #nextCycleLength()},
@@ -141,7 +144,12 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     public void refreshSpeed(double elapsed) {
         double oldLength = nextCycleLength();
-        double progress = oldLength > 0 ? Math.clamp(remaining / oldLength, 0, 1) : 0;
+        // ⚠ No UPPER clamp (L-26). A unit that has been pushed back by an action delay is legitimately
+        // MORE than one booking away, i.e. `remaining > oldLength`; capping the progress at 1 then
+        // rewrote it to exactly one full booking, silently truncating the push. That is why a slowed,
+        // delayed unit used to be indistinguishable from a merely slowed one.
+        // The lower clamp stays — the booking must never go negative.
+        double progress = oldLength > 0 ? Math.max(0, remaining / oldLength) : 0;
         refreshSpeed();                              // update speed first, then compute the new cycle
         double newLength = nextCycleLength();
         remaining = progress * newLength;

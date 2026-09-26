@@ -682,6 +682,12 @@ Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结�
 反过来，如果把进度记成百分比，速度一变就没法同时处理"分母换了"和"分子要缩放"两件事，
 首轮系数会被算成 `nextActionTime / cycleTime() = 1.5`，clamp 之后变成"立刻行动"。
 
+> ⚠ **`progress` 只有下界、没有上界**（L-26 修的）。被**推条**过的单位 `remaining > 旧预约长度`，
+> 也就是它合法地**离行动点超过一整轮**；此时把 `progress` 上钳到 1，等于把推条**截断成恰好一轮**。
+> 踩到的样子：量子/虚数击破是"推条 + 减速"，减速触发重排时推条被吃掉 ——
+> 实测**加不加那 20% 额外推条都是 28.409**，完全不可观测。
+> 现在 `progress = max(0, remaining / 旧预约长度)`：下界保留（预约不能为负），上界去掉。
+
 ### 5.2 行动条操纵
 
 | 方法 | 语义 |
@@ -690,6 +696,13 @@ Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结�
 | `advanceAction(target, amount)` | 拉条：`nextActionTime = max(elapsed, nextActionTime - amount)` |
 | `advanceActionByPercent(target, pct)` | 按剩余时间百分比提前（`p ∈ [0,1]`），**两侧都 clamp** |
 | `resetSignal(signal)` | 重置到 `elapsed + cycleTime()` |
+
+> ⚠ **推条/拉条必须同时写两个账本**（L-26）。`remaining` 与 `nextActionTime` 是同一个状态的两种记法
+> （§5.1），而 `delayAction`/`advanceAction` 以前**只写后者** —— 于是下一次 `refreshSpeed`
+> 拿**陈旧的** `remaining` 重算，把推条整个丢掉。两个方法现在都调
+> `Signal.setRemaining(elapsed, nextActionTime - elapsed)`（那个方法本来就是为"调用方不必自己保证同步"存在的）。
+> 回归由 `QueueActionManipulationTest.aDelaySurvivesASpeedChange` 钉住（两半**各自**都能让它变红：
+> 恢复上钳 → 两个单位都回到 187.5；去掉账本同步 → 同样两个都回到 187.5）。
 
 `Battle` 侧对应 `delayMovePercent(target, percent)`（周期 × percent）与
 `advanceRequest(target, rate)`（排队后由 `processRequests` 处理）。

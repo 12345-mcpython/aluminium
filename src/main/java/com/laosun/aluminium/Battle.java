@@ -642,12 +642,13 @@ public class Battle {
         }
         // Order: the state first, the one-off push last.
         //
-        // This is not cosmetic. A speed change *reschedules* the pending action -- Signal.refreshSpeed
-        // recomputes nextActionTime from the progress the unit already made -- so a push applied before the
-        // slow is recomputed away, and a 20% extra delay becomes unobservable. (Measured, not assumed: with
-        // the push first, the observed action-value change for a Quantum break was identical with and without
-        // the extra delay.) A one-off push must therefore be the LAST write to the action bar, so that
-        // nothing after it can recompute it.
+        // ⚠ This order used to be load-bearing and no longer is -- recorded because the comment here
+        // claimed the opposite and would otherwise outlive its reason. Before the L-26 fix, a push applied
+        // *before* the slow was recomputed away by the reschedule, so the element's extra delay became
+        // unobservable (measured: 28.409 with and without it). L-26 fixed the loss at its source -- the
+        // ledgers are synchronised and the progress is no longer capped from above -- so a push now
+        // survives a speed change either way. The order is kept because "apply the state, then the
+        // one-off push" is the order the data describes it in, not because correctness depends on it.
         Constant.ControlEffect control = breakEffect.controlEffect();
         if (control != null) {
             if (control.blocksAct()) {
