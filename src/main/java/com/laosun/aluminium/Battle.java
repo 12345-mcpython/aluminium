@@ -1591,7 +1591,7 @@ public class Battle {
                     continue;
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
-                        new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage));
+                        new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this));
             }
             return fired;
         } finally {
@@ -2102,6 +2102,64 @@ public class Battle {
             }
         }
         return null;
+    }
+
+    /**
+     * The first living summon this unit owns, looking in <b>its own camp</b>, or {@code null}.
+     *
+     * <p>What {@code TriggerInterpreter}'s {@code "summon"} target selector resolves to. The difference from
+     * {@link #memospriteOf(CanHit)} is the point: that one is about memsprites on <em>our</em> side (what
+     * {@link #summonMemosprite(Character)} manages), while this one answers "which unit did <b>this</b> unit
+     * summon" for either camp — an enemy boss's minion is a summon too, and 「装备者及其忆灵」 and a monster's
+     * own text are the same shape.
+     *
+     * @param master the summoner (may be {@code null}, which owns nothing)
+     * @return the first living summon whose master is {@code master}, in roster order, or {@code null}
+     */
+    public Summon summonOf(CanHit master) {
+        if (master == null) {
+            return null;
+        }
+        for (CanHit unit : campOf(master)) {
+            if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
+                return summon;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * How many living summons this unit owns — what {@code self_summon_count} evaluates.
+     *
+     * <p>Counted over the whole roster rather than stopping at the first match, so a unit with several
+     * summons is counted correctly: nothing has more than one yet, but 知更鸟·晴歌's 晴空乐手 is a trio, and a
+     * query that stopped looking would silently cap it at one.
+     *
+     * @param master the summoner (may be {@code null}, which owns none)
+     * @return the number of living summons whose master is {@code master}
+     */
+    public int summonCountOf(CanHit master) {
+        if (master == null) {
+            return 0;
+        }
+        int count = 0;
+        for (CanHit unit : campOf(master)) {
+            if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * The roster a unit belongs to, by camp.
+     *
+     * <p>An unknown camp falls back to the enemy roster, which is where anything on the battlefield that is
+     * not one of ours lives — {@code Camp.NEUTRAL} has no roster of its own, which is exactly why
+     * {@link #summon} refuses to create such a unit rather than picking one for it.
+     */
+    private List<CanHit> campOf(CanHit unit) {
+        return unit.getCamp() == Camp.PLAYER ? allies : enemies;
     }
 
     public List<Signal> getQueueSnapshot() {
