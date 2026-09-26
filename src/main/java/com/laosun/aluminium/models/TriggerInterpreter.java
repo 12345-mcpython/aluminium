@@ -168,10 +168,23 @@ public final class TriggerInterpreter {
             return 0;
         }
         List<CompiledRule> rules = table.matching(event, ctx);
+        CanHit owner = ctx.owner();
+        int fired = 0;
         for (CompiledRule rule : rules) {
+            // Firing limits (cooldown / once per battle). Checked *after* matching and before applying,
+            // because the limit is about how often the rule may run, not about whether it fits the event:
+            // `matching` stays a pure predicate, which is what `TriggerTable.ruleCount` and the
+            // data-binding tests read.
+            if (owner != null && !owner.isTriggerReady(rule.key())) {
+                continue;
+            }
             apply(battle, rule, ctx);
+            if (owner != null) {
+                owner.startTriggerCooldown(rule.key(), rule.cooldownTurns(), rule.oncePerBattle());
+            }
+            fired++;
         }
-        return rules.size();
+        return fired;
     }
 
     private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {

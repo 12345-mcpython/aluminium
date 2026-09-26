@@ -46,6 +46,28 @@ public class TriggerSpec {
     private List<EffectSpec> doEffects;
 
     /**
+     * How many of the <b>owner's own turns</b> must pass between two firings — the game's
+     * 「该效果每回合只能触发1次」 is {@code 1}. Absent = no limit.
+     *
+     * <p>Counted in the owner's turns, not in events: the counter is decremented when the turn of the
+     * character whose table this is begins. That is why a rule reacting to other people's actions still
+     * means "once per <i>my</i> turn" — the limit belongs to the rule's owner, not to whoever happened
+     * to trigger it. A value below 1 is rejected at load time.
+     */
+    @SerializedName("cooldown")
+    private Integer cooldown;
+
+    /**
+     * {@code true} = the rule fires at most once per battle (「单场战斗中只能触发1次」).
+     *
+     * <p>Deliberately not the same field as {@link #cooldown}: a cooldown comes back after a few turns,
+     * this never does. Stating both at once is refused at load time — the author has to mean one of
+     * them, and "once per battle, but also every 2 turns" has no reading that is not a mistake.
+     */
+    @SerializedName("once_per_battle")
+    private Boolean oncePerBattle;
+
+    /**
      * Where the rule came from (trace id, talent name, character-doc reference).
      *
      * <p>Not used by the engine at all: it exists so that anyone reading the JSON -- or a failing
