@@ -85,9 +85,36 @@ public class DotBuff extends AbstractBuff {
      * @param element    the DoT element
      * @param baseDamage base damage per settlement (has not been through the zones yet)
      * @param turns      how many turns it burns for, i.e. how many settlements it gets
+     * @throws IllegalArgumentException any of the four is missing or outside its legal range. All four
+     *                                  come from data ({@code Battle.attachBreakDot} takes the element
+     *                                  and the turn count from {@code Constant.BREAK_EFFECTS}), and each
+     *                                  one has a wrong answer behind it that is otherwise <b>silent</b>:
+     *                                  {@code turns <= 0} still settles once (the manager expires it
+     *                                  only after {@code Battle.tickDots} ran), a negative
+     *                                  {@code baseDamage} is swallowed by {@code Battle.assemble}'s
+     *                                  {@code Math.max(1, …)} floor into a <b>silent 1 damage per
+     *                                  turn</b>, NaN/infinity poisons every later zone,
+     *                                  a null element is only caught at settlement time by
+     *                                  {@code Damage}, and a null source is caught nowhere at all.
      */
     public DotBuff(CanHit source, DamageElement element, double baseDamage, int turns) {
         super(turns, true);
+        if (source == null) {
+            throw new IllegalArgumentException("DotBuff needs a source: the applier is who a DOT kill is credited to");
+        }
+        if (element == null) {
+            throw new IllegalArgumentException("DotBuff needs an element: it decides which RES zone applies");
+        }
+        if (turns < 1) {
+            throw new IllegalArgumentException(
+                    "DotBuff turns must be >= 1, got " + turns + " (0 would still settle once)");
+        }
+        // `!(baseDamage >= 0)` rather than `baseDamage < 0` on purpose: it also rejects NaN.
+        if (!(baseDamage >= 0) || !Double.isFinite(baseDamage)) {
+            throw new IllegalArgumentException(
+                    "DotBuff baseDamage must be finite and >= 0, got " + baseDamage
+                            + " (a negative value would settle a silent 1 damage per turn)");
+        }
         this.element = element;
         this.baseDamage = baseDamage;
         setSource(source);
