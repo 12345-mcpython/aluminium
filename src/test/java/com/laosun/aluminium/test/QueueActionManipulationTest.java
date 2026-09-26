@@ -283,6 +283,50 @@ public class QueueActionManipulationTest {
 
     // ==================================================================
 
+    /**
+     * L-26: a pending push must survive a speed change.
+     *
+     * <p>{@code remaining} and {@code nextActionTime} are two ledgers of one state, and
+     * {@code delayAction} only ever wrote the second one — so the next {@code refreshSpeed} recomputed
+     * the booking from the **stale** {@code remaining} and threw the push away. Measured before the
+     * fix: a Quantum break's extra delay had literally no observable effect (28.409 with and without
+     * it), which is how this was found.
+     *
+     * <p>Both units take the **same** speed change, so nothing but the push can separate them — which
+     * makes this test fail unless <b>both</b> halves are fixed:
+     * <ol>
+     *   <li>{@code delayAction} synchronises {@code remaining} (otherwise the push is already lost
+     *       from the ledger);</li>
+     *   <li>{@code refreshSpeed} stops clamping progress at 1 (a pushed unit is legitimately
+     *       <b>more than one cycle</b> away; capping it there silently truncates the push to a full
+     *       round, which is exactly what made the two bookings equal).</li>
+     * </ol>
+     */
+    @Test
+    public void aDelaySurvivesASpeedChange() {
+        Character a = character("A", 100);
+        Character b = character("B", 100);
+        Queue q = new Queue(List.of(a, b));              // 150 each; the tie is broken by scheduling sequence
+
+        q.delayAction(b, 50);                            // b → 200
+        Assertions.assertEquals(200, signalOf(q, b).getNextActionTime(), EPS,
+                "precondition: the push landed on the action time");
+
+        slowDown(q, a);                                  // the same change on both, so only the push matters
+        slowDown(q, b);
+
+        Assertions.assertTrue(signalOf(q, b).getNextActionTime() > signalOf(q, a).getNextActionTime(),
+                "the push must survive the speed change, but both were re-booked to "
+                        + signalOf(q, a).getNextActionTime() + " — the delay was discarded");
+        Assertions.assertSame(a, q.peekNext(), "so A still acts first");
+    }
+
+    /** Applies a real speed change the way the engine does: rewrite the attribute, then reschedule. */
+    private static void slowDown(Queue q, Character target) {
+        target.setAttribute(AttributeType.SPEED, new DoubleValue(80));
+        q.refreshSpeed(target);
+    }
+
     private static Character character(String name, int speed) {
         return Character.fromAttributes(name, 10_000, 100, 100, speed);
     }
