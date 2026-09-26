@@ -2,6 +2,9 @@ package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.StageBean;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import lombok.Getter;
 
 import java.util.List;
 
@@ -37,7 +40,13 @@ public class WaveManager {
     /**
      * Which wave has been entered already (starting from 0). {@code -1} = not even one wave
      * has been entered.
+     * -- GETTER --
+     *  Which wave has been entered already (starting from 0). Returns
+     *  when not even
+     *  one wave has been entered.
+
      */
+    @Getter
     private int waveIndex = -1;
 
     /**
@@ -97,14 +106,6 @@ public class WaveManager {
      */
     public boolean hasPendingWaves() {
         return hasNextWave();
-    }
-
-    /**
-     * Which wave has been entered already (starting from 0). Returns {@code -1} when not even
-     * one wave has been entered.
-     */
-    public int getWaveIndex() {
-        return waveIndex;
     }
 
     /**

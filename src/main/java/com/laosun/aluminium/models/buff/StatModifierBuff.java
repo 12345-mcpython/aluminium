@@ -1,7 +1,6 @@
-package com.laosun.aluminium.models.buffs;
+package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.DoubleValue;
 
@@ -85,9 +84,9 @@ public class StatModifierBuff extends AbstractBuff {
     /**
      * The full constructor, used by the factories that expose the new arguments.
      *
-     * @param permanent  {@code true} = no turn limit ("for the rest of the battle"); the buff is never
-     *                   ticked, so {@code duration} is then only a placeholder
-     * @param maxStacks  how many copies may accumulate; {@code 1} = the classic replace behaviour
+     * @param permanent {@code true} = no turn limit ("for the rest of the battle"); the buff is never
+     *                  ticked, so {@code duration} is then only a placeholder
+     * @param maxStacks how many copies may accumulate; {@code 1} = the classic replace behaviour
      */
     private StatModifierBuff(AttributeType attribute,
                              DoubleValue.Modifier.ModifierType modifierType,
@@ -126,25 +125,33 @@ public class StatModifierBuff extends AbstractBuff {
     // remember which modifier type means "percent".
     // ------------------------------------------------------------------
 
-    /** "ATK +50%" — additive percentage, i.e. {@code pct = 0.5}. */
+    /**
+     * "ATK +50%" — additive percentage, i.e. {@code pct = 0.5}.
+     */
     public static StatModifierBuff percentBuff(AttributeType attribute, double pct, int duration) {
         return new StatModifierBuff(attribute, DoubleValue.Modifier.ModifierType.ADD_PERCENT,
                 pct, DoubleValue.Modifier.ModifierSource.BUFF, duration, false);
     }
 
-    /** "ATK −30%" — additive percentage with a negative value. */
+    /**
+     * "ATK −30%" — additive percentage with a negative value.
+     */
     public static StatModifierBuff percentDebuff(AttributeType attribute, double pct, int duration) {
         return new StatModifierBuff(attribute, DoubleValue.Modifier.ModifierType.ADD_PERCENT,
                 pct, DoubleValue.Modifier.ModifierSource.DEBUFF, duration, false);
     }
 
-    /** "SPD +36" — a flat amount, added after all percentage maths. */
+    /**
+     * "SPD +36" — a flat amount, added after all percentage maths.
+     */
     public static StatModifierBuff flatBuff(AttributeType attribute, double amount, int duration) {
         return new StatModifierBuff(attribute, DoubleValue.Modifier.ModifierType.PURE_VALUE,
                 amount, DoubleValue.Modifier.ModifierSource.BUFF, duration, false);
     }
 
-    /** "SPD −20" — a flat negative amount. */
+    /**
+     * "SPD −20" — a flat negative amount.
+     */
     public static StatModifierBuff flatDebuff(AttributeType attribute, double amount, int duration) {
         return new StatModifierBuff(attribute, DoubleValue.Modifier.ModifierType.PURE_VALUE,
                 amount, DoubleValue.Modifier.ModifierSource.DEBUFF, duration, false);

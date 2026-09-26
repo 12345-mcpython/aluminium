@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.enemy;
 
 import com.laosun.aluminium.beans.EliteGroup;
 import com.laosun.aluminium.beans.HardLevelGroup;

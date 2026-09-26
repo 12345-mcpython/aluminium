@@ -36,7 +36,9 @@ public enum ResourceScope {
         this.wired = wired;
     }
 
-    /** The string used in data files. */
+    /**
+     * The string used in data files.
+     */
     public String value() {
         return value;
     }

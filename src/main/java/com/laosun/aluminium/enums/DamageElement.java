@@ -1,6 +1,7 @@
 package com.laosun.aluminium.enums;
 
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.models.skill.SkillData;
 import lombok.Getter;
 
 import java.util.Locale;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  * {@link com.laosun.aluminium.models.Damage Damage} combat objects carry an element,
  * and a skill that deals damage must never fall back to {@code null}.
  *
- * @see com.laosun.aluminium.models.SkillData#getElement()
+ * @see SkillData#getElement()
  */
 public enum DamageElement {
     /**
@@ -97,7 +98,7 @@ public enum DamageElement {
      *
      * @param sp the raw element value, e.g. from the {@code element} field of a skill
      * @return the matching element, or {@code null} for {@code "Unknown"} /
-     *         unparsable values (non-damaging skills)
+     * unparsable values (non-damaging skills)
      */
     public static DamageElement fromString(String sp) {
         return sp == null ? null : BY_LOWER_NAME.get(sp.strip().toLowerCase(Locale.ROOT));

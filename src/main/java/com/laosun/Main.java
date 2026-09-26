@@ -8,22 +8,22 @@ import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DefaultSkill;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Enemy;
-import com.laosun.aluminium.models.EnemyFactory;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.ExtraBasicPromote;
 import com.laosun.aluminium.models.Relic;
 import com.laosun.aluminium.models.RelicSuit;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.Skill;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.ai.TargetSelector;
-import com.laosun.aluminium.models.buffs.CounterMechanic;
-import com.laosun.aluminium.models.buffs.DotBuff;
-import com.laosun.aluminium.models.buffs.SuperBreakBuff;
+import com.laosun.aluminium.models.buff.CounterMechanic;
+import com.laosun.aluminium.models.buff.DotBuff;
+import com.laosun.aluminium.models.buff.SuperBreakBuff;
+import com.laosun.aluminium.models.enemy.EnemySkill;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,7 +161,8 @@ public class Main {
         // P7-3: win/lose comes from the Battle state machine, the demo does not count the living itself
         System.out.println(switch (battle.getStatus()) {
             case WIN -> " Battle over: victory (" + battle.getRound() + " rounds / " + actions + " actions)";
-            case LOSE -> " Battle over: our team wiped out (" + battle.getRound() + " rounds / " + actions + " actions)";
+            case LOSE ->
+                    " Battle over: our team wiped out (" + battle.getRound() + " rounds / " + actions + " actions)";
             default -> " Action limit reached, battle not over (enemies left "
                     + battle.targetableEnemies().size() + ")";
         });
@@ -214,7 +215,9 @@ public class Main {
         System.out.println("=".repeat(78));
     }
 
-    /** Scene 1: one enemy broken three ways, printing what each element actually does. */
+    /**
+     * Scene 1: one enemy broken three ways, printing what each element actually does.
+     */
     private static void breakControlScene() {
         System.out.println("[1] Break control states — 冰 锁行动 / 量子·虚数 减速 + 推条");
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
@@ -252,7 +255,9 @@ public class Main {
         System.out.println();
     }
 
-    /** Scene 2: a DOT on our own character, settled by the engine at the start of its turn. */
+    /**
+     * Scene 2: a DOT on our own character, settled by the engine at the start of its turn.
+     */
     private static void dotOnOurCharacterScene() {
         System.out.println("[2] A DOT on OUR character — the burn a boss puts on us (P10-0)");
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 200);   // fast: acts first
@@ -290,7 +295,9 @@ public class Main {
         System.out.println();
     }
 
-    /** Scene 3: the enemy camp holds a summon — targetable, and counted for the outcome. */
+    /**
+     * Scene 3: the enemy camp holds a summon — targetable, and counted for the outcome.
+     */
     private static void enemyCampSummonScene() {
         System.out.println("[3] A summon on the ENEMY side — the camp no longer only accepts monsters (L-8)");
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
@@ -327,7 +334,9 @@ public class Main {
         System.out.println();
     }
 
-    /** Remaining action value before the target acts — the observable every action-bar mechanic moves. */
+    /**
+     * Remaining action value before the target acts — the observable every action-bar mechanic moves.
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {
@@ -337,25 +346,31 @@ public class Main {
         return 0;
     }
 
-    /** Which control buffs the target is wearing, as text (the demo prints rather than asserts). */
+    /**
+     * Which control buffs the target is wearing, as text (the demo prints rather than asserts).
+     */
     private static String describeControl(Enemy enemy) {
         List<String> parts = new ArrayList<>();
-        if (enemy.getBuffManager().hasBuff(com.laosun.aluminium.models.buffs.StunBuff.class)) {
+        if (enemy.getBuffManager().hasBuff(com.laosun.aluminium.models.buff.StunBuff.class)) {
             parts.add("StunBuff (cannot act)");
         }
-        int slows = enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buffs.StatModifierBuff.class);
+        int slows = enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buff.StatModifierBuff.class);
         if (slows > 0) {
             parts.add("StatModifierBuff ×" + slows + " (slow)");
         }
         return parts.isEmpty() ? "no control state" : String.join(" + ", parts);
     }
 
-    /** Speed as the engine reads it (there is no {@code getSpeed()} — it is an attribute slot). */
+    /**
+     * Speed as the engine reads it (there is no {@code getSpeed()} — it is an attribute slot).
+     */
     private static double speedOf(CanHit unit) {
         return unit.getAttribute(AttributeType.SPEED).get();
     }
 
-    /** "25%" — keeps the output readable for the ratio constants. */
+    /**
+     * "25%" — keeps the output readable for the ratio constants.
+     */
     private static String pct(double ratio) {
         return Math.round(ratio * 100) + "%";
     }
@@ -393,7 +408,9 @@ public class Main {
         printQueue(battle);
     }
 
-    /** Our turn: cast the ultimate when energy is full, otherwise use the skill (not a weakness / no SP → fall back to the basic attack). */
+    /**
+     * Our turn: cast the ultimate when energy is full, otherwise use the skill (not a weakness / no SP → fall back to the basic attack).
+     */
     private static void characterTurn(Battle battle, Character hero) {
         System.out.println("[Ally] " + hero.getName()
                 + "  HP " + fmt(hero.getCurrentHp()) + "/" + fmt(hero.getMaxHp())
@@ -513,7 +530,7 @@ public class Main {
      * Enemy turn (P5-5): the **engine's own AI**, no longer hitting people by hand.
      *
      * <p>Flow: broken → skip; otherwise use {@link TargetSelector} to pick a living target on our side weighted by
-     * aggro, then act with the enemy's own {@link com.laosun.aluminium.models.EnemySkill}
+     * aggro, then act with the enemy's own {@link EnemySkill}
      * (the skills come from {@code enemy_skills.json}, and the multipliers are guessed, see the note in that file).
      */
     private static void enemyTurn(Battle battle, Enemy enemy) {
@@ -584,7 +601,7 @@ public class Main {
                 + ", toughness " + fmt(target.getStance()) + "/" + fmt(target.getMaxStance())
                 + (target.isBroken() ? " [Break " + target.getBrokenElement() + "]" : "")
                 + (target.getBuffManager().countBuffs(DotBuff.class) == 0
-                        ? "" : "  DOT×" + target.getBuffManager().countBuffs(DotBuff.class)));
+                ? "" : "  DOT×" + target.getBuffManager().countBuffs(DotBuff.class)));
         if (target.isDeath()) {
             System.out.println("        → " + target.getName() + " defeated");
         }
@@ -626,27 +643,26 @@ public class Main {
                 relic(RelicType.BALL, AttributeType.FIRE_DAMAGE_BOOST, 0.4, AttributeType.CRIT_CHANCE, 0.1),
                 relic(RelicType.LINE, AttributeType.ATTACK_PERCENT, 0.6, AttributeType.CRIT_ATTACK, 0.2));
 
-        Character hero = Character.builder()
+        return Character.builder()
                 .cid(1003)
                 .level(80)
                 .weapon(Weapon.build(23001, 80))
                 .relicSuit(relics)
                 .extraValue(new ExtraBasicPromote(0, 0, 0, 0, 0, 0, 0.12, 0))
                 .build();
-        return hero;
     }
 
     private static Character march7th() {
-        Character hero = Character.builder().cid(1001).level(80).build();
-        return hero;
+        return Character.builder().cid(1001).level(80).build();
     }
 
     private static Character luocha() {
-        Character hero = Character.builder().cid(1203).level(80).build();
-        return hero;
+        return Character.builder().cid(1203).level(80).build();
     }
 
-    /** Hand-build a relic: one main affix + one sub affix (real random generation is in {@code Relic.createRandomLevelZero}). */
+    /**
+     * Hand-build a relic: one main affix + one sub affix (real random generation is in {@code Relic.createRandomLevelZero}).
+     */
     private static Relic relic(RelicType type, AttributeType main, double mainValue,
                                AttributeType sub, double subValue) {
         return Relic.create(15, 5, type,
@@ -675,7 +691,9 @@ public class Main {
         return null;
     }
 
-    /** The living character with the lowest HP ratio (the simplified target-picking strategy for healing/shielding). */
+    /**
+     * The living character with the lowest HP ratio (the simplified target-picking strategy for healing/shielding).
+     */
     private static Character lowestHpRateCharacter(Battle battle) {
         Character worst = null;
         double worstRate = Double.MAX_VALUE;

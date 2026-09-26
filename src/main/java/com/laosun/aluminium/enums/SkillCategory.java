@@ -33,19 +33,33 @@ import java.util.Map;
  * {@code Assist} 3.
  */
 public enum SkillCategory {
-    /** In-battle basic attack (data {@code "Normal"}). */
+    /**
+     * In-battle basic attack (data {@code "Normal"}).
+     */
     NORMAL("Normal"),
-    /** Skill (data {@code "BPSkill"}). */
+    /**
+     * Skill (data {@code "BPSkill"}).
+     */
     BPSKILL("BPSkill"),
-    /** Ultimate (data {@code "Ultra"}). */
+    /**
+     * Ultimate (data {@code "Ultra"}).
+     */
     ULTRA("Ultra"),
-    /** Map basic attack (data {@code "MazeNormal"}): the hit used **outside battle**. */
+    /**
+     * Map basic attack (data {@code "MazeNormal"}): the hit used **outside battle**.
+     */
     MAZE_NORMAL("MazeNormal"),
-    /** Technique (data {@code "Maze"}): cast actively outside battle. */
+    /**
+     * Technique (data {@code "Maze"}): cast actively outside battle.
+     */
     MAZE("Maze"),
-    /** Assist skill (data {@code "Assist"}, 3 measured). */
+    /**
+     * Assist skill (data {@code "Assist"}, 3 measured).
+     */
     ASSIST("Assist"),
-    /** Elation damage skill (data {@code "ElationDamage"}, 9 measured, P10 Elation system). */
+    /**
+     * Elation damage skill (data {@code "ElationDamage"}, 9 measured, P10 Elation system).
+     */
     ELATION_DAMAGE("ElationDamage"),
     /**
      * {@code attack_type} is empty in the data — 94 measured, all of them **talents and follow-up attacks**

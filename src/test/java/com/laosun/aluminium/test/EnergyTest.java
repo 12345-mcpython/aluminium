@@ -6,11 +6,12 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DefaultSkill;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
+import com.laosun.aluminium.models.skill.Skill;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -118,7 +119,7 @@ public class EnergyTest {
 
         c.setEnergyProvider(new EnergyProvider() {
             @Override
-            public EnergyGain onSkillCast(CanHit user, com.laosun.aluminium.models.Skill skill,
+            public EnergyGain onSkillCast(CanHit user, Skill skill,
                                           Set<? extends CanHit> hitTargets) {
                 return EnergyGain.normal(7);
             }

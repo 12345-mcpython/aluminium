@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.enums.ResourceScope;
+import lombok.Getter;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -24,6 +25,11 @@ import java.util.function.Consumer;
  */
 public class ResourceManager {
 
+    /**
+     * -- GETTER --
+     *  The combatant these resources belong to.
+     */
+    @Getter
     private final CanHit owner;
 
     /**
@@ -37,11 +43,6 @@ public class ResourceManager {
      */
     public ResourceManager(CanHit owner) {
         this.owner = owner;
-    }
-
-    /** The combatant these resources belong to. */
-    public CanHit getOwner() {
-        return owner;
     }
 
     /**
@@ -82,22 +83,30 @@ public class ResourceManager {
         return register(new Resource(id, ResourceScope.SELF, max, initial));
     }
 
-    /** The resource with this id, or {@code null}. */
+    /**
+     * The resource with this id, or {@code null}.
+     */
     public Resource get(String id) {
         return resources.get(id);
     }
 
-    /** Whether a resource with this id is registered. */
+    /**
+     * Whether a resource with this id is registered.
+     */
     public boolean has(String id) {
         return resources.containsKey(id);
     }
 
-    /** All registered resources, in registration order. */
+    /**
+     * All registered resources, in registration order.
+     */
     public Collection<Resource> all() {
         return java.util.Collections.unmodifiableCollection(resources.values());
     }
 
-    /** How many resources are registered. */
+    /**
+     * How many resources are registered.
+     */
     public int size() {
         return resources.size();
     }
@@ -138,13 +147,17 @@ public class ResourceManager {
         return resource != null && resource.spendExactly(delta);
     }
 
-    /** Current value of a resource (0 when it does not exist). */
+    /**
+     * Current value of a resource (0 when it does not exist).
+     */
     public int value(String id) {
         Resource resource = resources.get(id);
         return resource == null ? 0 : resource.getValue();
     }
 
-    /** Whether a resource exists and has reached its normal cap. */
+    /**
+     * Whether a resource exists and has reached its normal cap.
+     */
     public boolean isFull(String id) {
         Resource resource = resources.get(id);
         return resource != null && resource.isFull();

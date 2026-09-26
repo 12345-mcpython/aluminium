@@ -2,7 +2,7 @@ package com.laosun.aluminium.models.ai;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.buffs.TauntBuff;
+import com.laosun.aluminium.models.buff.TauntBuff;
 
 import java.util.List;
 import java.util.Random;
@@ -36,13 +36,21 @@ public final class TargetSelector {
      * The "intent" of this attack — decides whether taunt constrains target selection.
      */
     public enum Intent {
-        /** Single-target attack: constrained by taunt. */
+        /**
+         * Single-target attack: constrained by taunt.
+         */
         SINGLE,
-        /** Blast attack (center + adjacent): the **center** is constrained by taunt. */
+        /**
+         * Blast attack (center + adjacent): the **center** is constrained by taunt.
+         */
         BLAST,
-        /** AOE: hits everyone, not constrained by taunt. */
+        /**
+         * AOE: hits everyone, not constrained by taunt.
+         */
         AOE,
-        /** Bounce/random: each hit is random on its own, not constrained by taunt. */
+        /**
+         * Bounce/random: each hit is random on its own, not constrained by taunt.
+         */
         RANDOM
     }
 

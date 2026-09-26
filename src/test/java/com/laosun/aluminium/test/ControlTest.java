@@ -6,12 +6,12 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Enemy;
-import com.laosun.aluminium.models.EnemyFactory;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.buffs.DotBuff;
-import com.laosun.aluminium.models.buffs.StatModifierBuff;
-import com.laosun.aluminium.models.buffs.StunBuff;
+import com.laosun.aluminium.models.buff.DotBuff;
+import com.laosun.aluminium.models.buff.StatModifierBuff;
+import com.laosun.aluminium.models.buff.StunBuff;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

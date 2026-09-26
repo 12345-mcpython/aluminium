@@ -1,7 +1,10 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.enemy;
 
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import lombok.Getter;
 import lombok.Setter;
@@ -107,7 +110,9 @@ public class Enemy extends CanHit {
      */
     private final List<PhaseSkill> phases = new ArrayList<>();
 
-    /** One phase: at or below {@code hpRatio} of max HP, {@code skill} is what this enemy acts with. */
+    /**
+     * One phase: at or below {@code hpRatio} of max HP, {@code skill} is what this enemy acts with.
+     */
     public record PhaseSkill(double hpRatio, Skill skill) {
     }
 
@@ -125,7 +130,9 @@ public class Enemy extends CanHit {
         phases.sort(java.util.Comparator.comparingDouble(PhaseSkill::hpRatio));
     }
 
-    /** How many phases are registered (0 = no phase behaviour, which is every enemy today). */
+    /**
+     * How many phases are registered (0 = no phase behaviour, which is every enemy today).
+     */
     public int phaseCount() {
         return phases.size();
     }
@@ -211,7 +218,7 @@ public class Enemy extends CanHit {
      * @param amount toughness reduction points (the skill's {@code stance_list} value ×
      *               weakness / non-weakness coefficient)
      * @return the points actually deducted from the toughness bar (0 = nothing shaved off:
-     *         already broken / non-positive / bar already empty)
+     * already broken / non-positive / bar already empty)
      */
     public double reduceStance(double amount) {
         if (broken || amount <= 0 || stance <= 0) {

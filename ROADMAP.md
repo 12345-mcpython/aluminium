@@ -305,9 +305,11 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 - **目标**：把 12 类触发源都变成事件，让"角色机制"只订阅事件，不再往 `Battle` 里塞逻辑。
 - **结果**：事件从 **4 个扩到 11 个**（2026-09-23 完成），新增
   `SkillCastEvent` / `EnergyEvent` / `HpLossEvent` / `HealEvent` / `KillEvent` / `BreakEvent` /
-  `SkillPointGainedEvent` / `SkillPointSpentEvent`。
+  `SkillPointEvent`（战技点增减：2026-09-26 由 `SkillPointGainedEvent` + `SkillPointSpentEvent`
+  合并成一个接口，两个方法都是 `default`，粒度不变）。
   完整口径见 `engine.md` §4（含**广播口径**与**每个事件的口径**两张表）。
-- **涉及文件**：新建 `models/event/` 下 8 个接口；`models/CanHit.java`（实现并转发给 `BuffManager`）；
+- **涉及文件**：新建 `models/event/` 下 8 个接口（战技点那两个后来合并成 `SkillPointEvent`，现为 7 个）；
+  `models/CanHit.java`（实现并转发给 `BuffManager`）；
   `models/BuffManager.java`（逐个 `instanceof` 转发）；`Battle.java`（发事件 + 广播）；
   `models/SkillExecutor.java`（发 `SkillCastEvent`）；`models/skillpoint/StandardSkillPointPolicy.java`
   （上报实际增减）；新建 `test/EventBusTest.java`（20 条）
@@ -1078,7 +1080,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 |---|---|---|
 | H-1 | `Constant.java:185-208` | 八个数据表里**七个**是可变全局状态（`public static final` 只锁引用不锁内容，嵌套层同样裸奔）→ 任何调用方 `clear()`/`put()` 会静默影响同 JVM 后续所有消费者。建议每层 `Map.copyOf`/`List.copyOf`，或字段改 private + 暴露只读视图 |
 | H-2 | `Character.java:280-295` | `character_data.json` 的 `max_energy` **从未接进角色** → 数据造的角色 `hasEnergyBar()==false`，回能/大招恒失效（93 个角色的这一列是惰性的）。⚠ 接线时 1407 遐蝶的 `null` 是**设计**（无常规能量条），别 auto-unbox 成兜底数值 |
-| H-6 | `CanHit.java:127-135` | 拷贝构造器只 `attributes.clone()`，**元素仍共享 `DoubleValue`** → 副本与模板共享面板，挂 buff 改到原体。`Character` 的拷贝构造器也漏了属性数组，且没拷 `invulnerable`。当前无调用者，P7-4 波次第一个会踩 |
+| H-6 | `CanHit.java` | ✅ **已修（2026-09-27）**：拷贝构造器现在**逐个 `DoubleValue.clone()`** 深拷属性表（`DoubleValue.clone()` 本来就是真深拷贝，之前只 clone 了数组）。原文的后果成立：buff 会**就地**改 `DoubleValue`（`BoostDamageBuff.applyEffect` 调 `addModifier`），所以挂在副本上的 buff 会出现在**原体**面板上 —— 实测复现。`Character(Character)` 走 `super(other)`，因此一并修好。⚠ **原文说"没拷 `invulnerable`"是误读**：那一块是显式的"不该拷"清单（`death`/`currentEnergy`/`resources` 都归零，因为副本是新战斗的参与者而非战况快照），`invulnerable` 属同一类战斗状态 —— 已**显式赋值 + 写明理由**，不是补拷。回归 `CombatantCopyTest` 3 条（行为 + 对象身份 + 新战斗状态约定）；变异回浅拷贝 → 前两条红、约定那条仍绿。见 §12 顶部的"只做过抽查"警告
 | H-9 | `Battle.startBattle()` | 从未被任何测试调用（曾 23 个测试类 0 次）→ **开场事件链零覆盖**，而"战斗开始回能"是一整类角色机制。建议补 `BattleStartTest` |
 
 （H-3 削韧按段翻倍 / H-4 击破用标称值 / H-5 大招清零顺序 / H-7 `hasBuff` / H-8 同速无裁决 —— **均已修**，不再列。）
@@ -1150,7 +1152,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | N-2 | `Benchmark.java:38` | 读的 `dump_data.json` 仓库里不存在；兜底分支走不到；`main()` 包私有；结果被丢弃 |
 | N-3 | `CanHit.java:99-104` | 同时有 `Runnable` **字段**与**同名方法**（`beforeMove`/`afterMove`/`onBattleStart`）→ 直接调 `MoveEvent.beforeMove(battle)` 会**静默跳过 buff tick**。建议 `setBeforeMoveHook(Runnable)` |
 | N-4 | `Enemy`/`Summon` | 无拷贝构造器：`new Enemy(...)` 走 `CanHit(CanHit)` 会丢掉 `damageResist`/`stanceWeak`/`stance`/`broken` 全部子类字段（`Character` 就正确重写了） |
-| N-5 | `RelicSuit.java:153` | `appendAttribute` 是死方法，逐行相同的代码内联在 `appendTo`；"按属性类型分发"逻辑在 `RelicSuit`/`Weapon`/`SkillPoint` **三处复制**。建议下沉 `AttributeBuilder.add(type, value, source)`（顺带消掉 M-19 那 4 处重复守卫） |
+| N-5 | `RelicSuit.java:153` | `appendAttribute` 是死方法，逐行相同的代码内联在 `appendTo`；"按属性类型分发"逻辑在 `RelicSuit`/`Weapon`/`SkillTrace` **三处复制**。建议下沉 `AttributeBuilder.add(type, value, source)`（顺带消掉 M-19 那 4 处重复守卫） |
 | N-6 | `models/Buff.java:3` | 接口上留着裸 `// TODO`；`Buff.setSource/getSource` 全仓库无人调用，`AbstractBuff.source` 恒 null → **接口契约实际未实现**（`DotBuff` 用了 `setSource`，所以只剩 getter 侧无人读） |
 | N-7 | `BreakDamageCalculator.java:21` | javadoc 例子"30 点普攻 × 2.5 击破加成 = 112.5"在仓库里无法复现，会误导读者以为调用方要预乘 |
 | N-8 | `Queue.java:269,299,324` | 在 for-each 遍历 `heap` 的同时改键再 `rebuildHeap()` 清空同一个 heap —— **只因为每个分支立刻 `return` 才安全** |

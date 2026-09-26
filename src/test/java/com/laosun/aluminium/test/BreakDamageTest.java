@@ -9,7 +9,7 @@ import com.laosun.aluminium.models.BreakDamageCalculator;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Enemy;
+import com.laosun.aluminium.models.enemy.Enemy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

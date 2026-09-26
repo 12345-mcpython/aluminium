@@ -54,6 +54,10 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * number, it only changes {@link #nextActionTime}: counting those as "re-scheduling" would produce the
      * counter-intuitive result that "whoever was just pulled forward gets the initiative".
      * So when A is pulled to the same instant as B, B still acts first (B was scheduled earlier).
+     * -- GETTER --
+     *  The scheduling sequence number (the smaller it is, the earlier the combatant acts). Only for tests and
+     *  debugging assertions about the order of equal action values.
+
      */
     private long sequence;
     /**
@@ -82,11 +86,17 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * <p>First-round invariant: {@code nextActionTime - elapsed == remaining} holds when
      * {@code markFirstRound()} is called (both are {@code 1.5 × cycleTime()}), and keeps holding from then on —
      * this is exactly what the E2 fix has to preserve.
+     * -- GETTER --
+     *  How much action value is left until the next action point (speed-independent).
+
      */
     private double remaining = 0;
     /**
      * Whether this signal has not yet finished its first-round scheduling (P7-1): the first-round booking is
      * multiplied by ×1.5.
+     * -- GETTER --
+     *  Whether this signal has not yet finished its first-round scheduling (P7-1).
+
      */
     private boolean firstRound = false;
 
@@ -197,20 +207,6 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * Whether this signal has not yet finished its first-round scheduling (P7-1).
-     */
-    public boolean isFirstRound() {
-        return firstRound;
-    }
-
-    /**
-     * How much action value is left until the next action point (speed-independent).
-     */
-    public double getRemaining() {
-        return remaining;
-    }
-
-    /**
      * Directly sets "how much action value is left until the action point" and synchronises
      * {@link #nextActionTime} (P7-2).
      *
@@ -269,14 +265,6 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     public void markScheduled() {
         this.sequence = SEQUENCE_GENERATOR.getAndIncrement();
-    }
-
-    /**
-     * The scheduling sequence number (the smaller it is, the earlier the combatant acts). Only for tests and
-     * debugging assertions about the order of equal action values.
-     */
-    public long getSequence() {
-        return sequence;
     }
 
     /**

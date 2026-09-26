@@ -1,7 +1,7 @@
 package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Enemy;
+import com.laosun.aluminium.models.enemy.Enemy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
