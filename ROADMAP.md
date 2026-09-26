@@ -171,7 +171,7 @@
 | 项 | 现状 | 归属 |
 |---|---|---|
 | 技能回能数据化 | `sp_base` 已落库但**不驱动回能**（多段技能是"每段值"，需聚合 `SPHitRatio`） | P3-4 剩余 |
-| 战技点**上限**可变（F-1） | **接口已就位**（换策略构造参数），**没有接线** | 见 `DOC_VS_CODE.md` §F 的 F-1 |
+| 战技点**上限**可变（F-1） | **接口已就位**（换策略构造参数），**没有接线** | 见 §12.5 的 F-1 |
 | 开局战技点可变（F-2） | ✅ **已接线**：过客 4 件套开局 **3 → 4**（套装 ability 走触发器表，有用例钉住） | — |
 | 强化普攻的战技点 | 一刀切 +1：对青雀对、**对波提欧错** | F-3，数据补全 |
 | 敌人技能不发事件 | `EnemySkill` 不走 `SkillExecutor`，故不发 `SkillCastEvent` | P9-2 对齐 |
@@ -195,10 +195,12 @@ P10-1 说"缺三个控制系"、P10-6 说"几率取 `param_list` 第 3 项"）�
 1. **数据补全**（`generate_data.py`）：`skill_effects.json` 里 14/40 条 `params` 为空；
    `BUFF`/`CONTROL`/`SUMMON` 技能没有"施加什么"的表；`enemy_skills.json` 的倍率仍是猜的
    （这是 P9-1/P9-3 的阻塞点）。
-   ⚠ **动它之前先看 `DOC_VS_CODE.md` F-9 的工具链注**：脚本的版本控制在 **GitHub gist** 上，
-   但 **gist 落后于本地副本** —— `skill_effects.json` 那段只在本地，改了没人知道。
+   ⚠ **动它之前先确认版本**：脚本的版本控制在 **GitHub gist** 上（README 有链接），
+   但 **gist 落后于本地副本** —— `skill_effects.json` 那段只在本地、任何地方都没有历史，
+   改了没人知道。先推回 gist 再改。
 2. **引擎侧仅剩的几处**：P10-4 的拉条 API 二选一、P10-5 的验收补齐、光锥数值被动接线、
-   P11-1 的 `Main` 拆分（`main()` 目前**无参**，`gradle run` 进不去）。
+   P11-1 的 `Main` 拆分（⚠ 更正：`Main` 现在已有 `main(String[] args)`，且原无参版在 JDK 25 上
+   本来就能启动 —— 见 P11-1）。
 3. **`Main` 的定位**：它现在是"demo 的 AI + 打印"，不该再承担引擎算不出来的东西 —— 这条已经做到了。
 
 > A 层剩下的"93 个角色的天赋/行迹/星魂/秘技"是**内容活**，不再是引擎任务：
@@ -1055,13 +1057,138 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 
 ---
 
+## 12. 遗留缺陷登记（原 `CODE_REVIEW.md` + `DOC_VS_CODE.md` 并入，2026-09-26）
+
+> **那两个文件已删除**（`CODE_REVIEW.md` 402 行 / `DOC_VS_CODE.md` 927 行）。理由：它们是一次性分析快照，
+> 且腐烂得厉害 —— 同一轮里我就修正了其中 **4 条状态描述、2 处行号**，还发现一条注记与实测相反。
+> **未修条目全部迁到这里；已修条目丢掉**（全文在删除前的提交里：`git log --diff-filter=D --name-only`）。
+> 取舍标准：**"已修清单"会腐烂，"未修清单"是待办** —— 所以只留开着的。
+>
+> ⚠ 编号沿用原文件的 `H-*` / `M-*` / `L-*` / `N-*` / `F-*`，旧文档里的交叉引用仍然对得上。
+
+### 12.1 High（未修）
+
+| # | 位置 | 问题 |
+|---|---|---|
+| H-1 | `Constant.java:185-208` | 八个数据表里**七个**是可变全局状态（`public static final` 只锁引用不锁内容，嵌套层同样裸奔）→ 任何调用方 `clear()`/`put()` 会静默影响同 JVM 后续所有消费者。建议每层 `Map.copyOf`/`List.copyOf`，或字段改 private + 暴露只读视图 |
+| H-2 | `Character.java:280-295` | `character_data.json` 的 `max_energy` **从未接进角色** → 数据造的角色 `hasEnergyBar()==false`，回能/大招恒失效（93 个角色的这一列是惰性的）。⚠ 接线时 1407 遐蝶的 `null` 是**设计**（无常规能量条），别 auto-unbox 成兜底数值 |
+| H-6 | `CanHit.java:127-135` | 拷贝构造器只 `attributes.clone()`，**元素仍共享 `DoubleValue`** → 副本与模板共享面板，挂 buff 改到原体。`Character` 的拷贝构造器也漏了属性数组，且没拷 `invulnerable`。当前无调用者，P7-4 波次第一个会踩 |
+| H-9 | `Battle.startBattle()` | 从未被任何测试调用（曾 23 个测试类 0 次）→ **开场事件链零覆盖**，而"战斗开始回能"是一整类角色机制。建议补 `BattleStartTest` |
+
+（H-3 削韧按段翻倍 / H-4 击破用标称值 / H-5 大招清零顺序 / H-7 `hasBuff` / H-8 同速无裁决 —— **均已修**，不再列。）
+
+### 12.2 Medium（未修）
+
+| # | 位置 | 问题 |
+|---|---|---|
+| M-1 | `Queue.java:226` | `setTopZero()` 重置**堆顶**而非 `currentActor`（字段存在却没用）→ 一旦在 `move()`→`afterMove()` 窗口内动了键就错（拉条者落到 `elapsed` 之下会让行动者**连动两次**） |
+| M-2 | `Queue.java:328` | `advanceActionByPercent` **缺 clamp**：实测 102961 组里 **8814 组**结果严格小于 `elapsed`（差 ~5e-13）→ 全局时钟倒走。`advanceAction` 有 clamp，这个没有 |
+| M-3 | `AttributeBuilder.java:124` | `build()` **直接交出内部 `DoubleValue`**（未 clone），且 `getOrCreate` 用 `computeIfAbsent` 缓存 → 同一 builder 两次 `build()` 拿到同一批对象（与 H-6 同族，builder 侧） |
+| M-4 | `EnemyFactory.java:59` | 只灌 5 个属性，**漏了 `EFFECT_HIT_RATE`**（`EnemyScaler` 已算出）→ 敌人命中率恒 0，那是个"看着被用了其实没有"的死输出 |
+| M-5 | `BuffManager.java:109` | `clearAll()` **不重置 `blocked`** → 控制 buff 在 tick 里到期置位后，清空列表 `canAct()` 仍 false 直到下次 `beforeMove()` |
+| M-6 | `BuffManager.java:54` | `blocked` **只对 early buff 生效**（`beforeMove` 先清标志再 tick）→ 后置控制 buff 的"最后一回合"什么都挡不住。"晕眩最后一回合是否还挡"取决于 tick 时序而非语义 |
+| M-7 | `Character.java:84,91` | 两个 `fromAttributes` 工厂各自残留 null：`(Translate,…)` 版 `skillLevel` 为 null、`(String,…)` 版 `relicSuit`/`weapon` 为 null → 相应 getter/setter 直接 NPE |
+| M-8 | `Character.java:235` | `build()` 把可变 `relicSuit`/`weapon`/`skillLevel` **直接交给角色**（无防御拷贝）→ 同一 builder 造的两个角色共享一套遗器与一个 map |
+| M-9 | `Weapon.java:71` | **光锥永远取叠影 1 的被动**（`weaponSkillData.getFirst()`），而表按叠影档位索引 → 23042 永远 +18% 速度，拿不到 +21%…+30%。另外 `getFirst()` 对空列表抛 `NoSuchElementException` |
+| M-10 | `RelicSuit.java:55` | `addToSuit` 覆盖槽位字段但 **`total.add(relic)` 不移除旧的** → 两件身甲一起算进面板（白送一件）；`clone()` 与原件因此**可以不一致** |
+| M-11 | `CanHit.java:242` | `gainEnergy` 可能返回**负值**把能量减下去（`ENERGY_REGENERATION_RATE <= -1`，或经 `setCurrentEnergy` 造成 current>max）；`NaN` 时守卫拦不住 → `isEnergyFull()` 从此恒 false（大招再也放不出） |
+| M-12 | `BuffManager.java:70,82` | `onDamage`/`afterAttack` **遍历活列表**，而这两个回调恰恰是"buff 再挂 buff"的地方 → CME 或静默跳过；`processBuffTick` 的 `removeIf` 里调 `tickEffect` 同理 |
+| M-13 | `AbstractBuff.java:52` 等 6 处 | 主代码留着 `IO.println`，其中 `decreaseDuration` 那条**每次 buff tick 都打**。`slf4j`+`log4j` 已配好却**主代码 0 处使用**。~~`StunBuff.removeBuff` 那行已删（2026-09-26，它会插进调用方输出）~~ |
+| M-14 | `SkillData.java:41,82` | **未知 `cid`/`skillId` 静默返回"假的非伤害技能"**（`EMPTY` = PHYSICAL + ENHANCE + 空参数）→ 打错/未实现的 id 与被动无法区分：0 伤害、无报错、照样回能。建议 fail fast |
+| M-15 | `SkillData.java:20,56` | javadoc 称 immutable，但 `skills` 及其内层 list 是 Gson 造的**可变** `ArrayList`；而 `DefaultSkill.DATA_CACHE` 把同一实例共享给所有实体/战斗 → 一次改动污染全进程 |
+| M-16 | `Character.java:104,243` | 六个技能槽**全解析成槽位 1（普攻）** → 演示里的伤害数值全是错的（P8-2 已修槽位映射；本条的**剩余风险**是 `SkillData.EMPTY` 的静默零伤害会把将来的 bug 伪装成"设计如此"） |
+| M-17 | `JSONReader.java:25` | javadoc 写"缺失返回 null"，实际 `requireNonNull` **抛 NPE** → 在 `Constant` 静态块里变成 `ExceptionInInitializerError`，此后该 JVM 内每次访问都 `NoClassDefFoundError`（不可恢复）。`Benchmark` 的 `data == null` 分支因此永远走不到 |
+| M-18 | `MonsterDataTest.java:56` | `everyModifyRatioIsPresentAfterNormalisation` **不可能失败**：`normalizeMonsterConfigs` 总会用 `orOne` 补 1.0，它断言的是归一化自己的后置条件 |
+| M-19 | `AttributeBuilder.java:95` | `addPercentPoint` javadoc 说"不应用于 percent 类型"，实现却走 `addPure`（会把 percent 重定向成平值）→ 加 0.3 点血而不是 30%。今天安全**只因为** 4 个调用点各自抄了一遍守卫。建议该方法直接拒绝 percent |
+| M-20 | `MapUtils.java:48` | `getRandomList` 用 `distinct().limit(n)` 拒绝采样：`sampleSize` 接近 `list.size()` 时期望工作量 `n·H(n)` 且尾部无界；`sampleSize < 0` 静默返回空表；null 给的是裸 NPE 而非 javadoc 承诺的 `IllegalArgumentException` |
+| M-21 | `EliteGroup.java:17` | record **没有 `@SerializedName`**，而它自己的 javadoc 就在警告这个坑。用 tbgd 的 `{"HPRatio":…}` 会让除一个字段外全读成 0.0、血量乘 0 且无校验。当前只被 `EnemyScaler` 用到，所以不炸 |
+| M-22 | `SkillData.java:47` | `maxLevel` **从未被读取**，而 `SkillExecutor` 在 `level-1` 越界时**静默 return** → 0 级或超上限技能零伤害无报错。存在的校验字段是死的 |
+| M-23 | `TestSkillGroup1.java:15` | 测试脚手架放在 `src/main`：静态初始化硬编码 cid/槽位、绕过缓存、仅仅加载该类就强制全量数据加载；注释描述的技能与实际槽位（AoEAttack）不符 |
+
+### 12.3 Low / Nit（未修）
+
+| # | 位置 | 问题 |
+|---|---|---|
+| L-1 | `AttributeType.java:115` | ~~`fromString` 大小写不敏感~~ ✅ **已修（P10-3 前半）**，本条只留两个未使用 import |
+| L-2 | `Signal.java:67`/`Queue.java:50`/`Battle.java:388` | `10000` 行动周期常量三处硬编码（`Queue` 有自己的 `ACTION_THRESHOLD`），违反"数值一律进 `Constant`" |
+| L-3 | `Signal.java:59` | `refreshSpeed()` 跳过构造器有的 `speed > 0` 校验 → 0/负速 debuff 让该单位**永远不再行动**而不是 fail fast；javadoc 大喊要调用它却没人调 |
+| L-4 | `Signal.java:23,81` | `Cloneable` + `clone()` 无人使用，克隆会产生**同一 `CanHit` 的第二个 Signal** → 潜在"一个单位一回合动两次" |
+| L-5 | `Queue.java:47` | 类级 `@Getter` 暴露 **`getHeap()`（活的内部 `PriorityQueue`）**，调用方可破坏排序不变量；`resetSignal`/`getCombatant`/`rebuildHeap` 无调用者 |
+| L-6 | `Queue.java:175` | `removeCombatant` **不清 `currentActor`** → 移除死亡行动者后 `getCurrentActor()` 仍返回死人，直到下次 `move()`；与 `Battle.currentMove` 可能不一致 |
+| L-7 | `Battle.java`（`tickDots`/`beforeMove`） | 无敌目标的 DOT **照样消耗结算次数**却零伤害 → 转阶段无敌的 Boss 白吃 DOT。⚠ P10-0 后修法变了：现在是"跳过 `beforeMove` 里那步倒计时" |
+| L-9 | `DoubleValue.java:310-335` | 六个 `Modifier.*PercentNumber` 工厂 + `Modifier.pure(double)` **零调用者**，而它们除以 100、旁边的 `addPercent` 不除 → 典型 100× 陷阱。建议删或改名 `fromWholePercent` |
+| L-10 | `BreakDamageCalculator.java:41` | `/10.0`、`/100.0` 写死；`/10` 这个数据约定在类 javadoc、`Constant.BREAKING_RATE` javadoc、两个测试里各复述一遍 |
+| L-11 | `AttributeBuilder.java:43` | `setBase`/`addBase` **不做** `PERCENT_TO_BASE` 重定向，而 `build()` 又把 percent 槽位置 null → `setBase(HEALTH_PERCENT, …)` 静默消失 |
+| L-12 | `DotBuff.java:89` | 构造器不校验：`turns <= 0` 会"第一次结算就过期"（⚠ 迁移后更隐蔽：结算在倒计时**之前**，所以 0 回合 DOT 仍打**一次**伤害），任意元素都收，负 `baseDamage` 静默无伤害 |
+| L-13 | `EnemyScaler.java:52` | `scale` 对 template/config/group 无 null 检查，缺 id 直接 NPE 且不说是哪个 id |
+| L-14 | `AbstractBuff.java:47` | `isSameKind` 用 `getClass()` 比较 → **任何子类/匿名子类永远不与父类同类** → 同类替换失效、无限叠加。建议改成 buff 自报的 `kind()` 键 |
+| L-15 | `Relic.java:174-183` | `checkLegal` 校验用的主词条等级与实际造词条用的 `level` **不是同一个** → JSON 里的主词条等级是死数据；子词条上界报错消息把违规值插进 "between 0 and N"；接受负 `attributeLevel` |
+| L-16 | `Relic.java:92,124,329` | `getSubAttributes()` 的**可变性随工厂而变**（别名调用方 list / `ArrayList` / `Stream.toList()`）→ 同一 API 有时 `add` 成功、有时抛 `UnsupportedOperationException` |
+| L-17 | `Relic.java:329` | `Relic.Builder` 不执行 `createRandomLevelZero` 的任何不变量：允许重复副词条、副词条等于主词条、不校验上界与 `star` |
+| L-18 | `SkillPoint.java:31` | 静态缓存持有**公共可变字段 + 公共可变 `children`** 的节点，同 cid 共享；javadoc 写 "per character" 其实 "per cid, process-wide"。`Character` 还无条件套用**整棵**行迹树，没有解锁门槛 |
+| L-19 | `ExtraBasicPromote.java:29` | 平属性用 `addPure`（百分比**之后**），javadoc 却说"加到基础属性"，而光锥用 `addBase`（**之前**）→ 同样 +500 HP，行迹的不会随 HP% 放大 |
+| L-20 | `ExtraBasicPromote.java:14` | 分量顺序 `(health, defence, attack, speed, …)` 与其它模型 `(health, attack, defence)` 不同 → 位置构造会**静默交换 ATK/DEF** |
+| L-21 | `SkillAttackType.java:6` | 枚举 `SINGLE/THREE/ALL` **全仓库零引用**，且值与 `skills.json` 的 `attack_type` 完全对不上 |
+| L-22 | `Relic.java:114`、`MapUtils.java:28,53` | `star <= 2` 把**合法的 2★** 拒了；随机数走 `ThreadLocalRandom`（不可播种）**违反"随机数一律走注入 `Random`"** |
+| L-23 | `Camp`/`Summon` | `getCamp()` 曾全仓库无调用者、`Camp.NEUTRAL` 未用。（L-8 之后召唤物已可入场，但**内容侧仍不创建它** —— 见 P9-4；`getCamp()` 现在有实际读处） |
+| L-24 | `beans/Skill.java:11,15` | `skillID` 解析了但从不读取（槽位 id 来自外层 map 键，无人校验一致）；`StanceList` 无 `@SerializedName`，改名会静默读 0 → 削韧恒 0 |
+| L-25 | `SkillEffectType.java:88,97` | `getCategory()` 无调用者；每个常量上的 `@SerializedName` **从不生效**；`BY_STRING` 是可变的 static `HashMap` |
+
+（L-8 敌方阵型 / L-26 推条账本 —— **已修**，不再列。）
+
+### 12.4 Nit（未修）
+
+| # | 位置 | 问题 |
+|---|---|---|
+| N-1 | `DefaultSkill.java:16,10` | `static ConcurrentMap` 把可变对象当共享单例；`SkillData.init` 会在 `computeIfAbsent` **内部抛异常** → 一个 getter 在战斗时抛错且每次重抛；`:10` 的 TODO 说该删这个类，而它是唯一的 `Skill` 生产实现 |
+| N-2 | `Benchmark.java:38` | 读的 `dump_data.json` 仓库里不存在；兜底分支走不到；`main()` 包私有；结果被丢弃 |
+| N-3 | `CanHit.java:99-104` | 同时有 `Runnable` **字段**与**同名方法**（`beforeMove`/`afterMove`/`onBattleStart`）→ 直接调 `MoveEvent.beforeMove(battle)` 会**静默跳过 buff tick**。建议 `setBeforeMoveHook(Runnable)` |
+| N-4 | `Enemy`/`Summon` | 无拷贝构造器：`new Enemy(...)` 走 `CanHit(CanHit)` 会丢掉 `damageResist`/`stanceWeak`/`stance`/`broken` 全部子类字段（`Character` 就正确重写了） |
+| N-5 | `RelicSuit.java:153` | `appendAttribute` 是死方法，逐行相同的代码内联在 `appendTo`；"按属性类型分发"逻辑在 `RelicSuit`/`Weapon`/`SkillPoint` **三处复制**。建议下沉 `AttributeBuilder.add(type, value, source)`（顺带消掉 M-19 那 4 处重复守卫） |
+| N-6 | `models/Buff.java:3` | 接口上留着裸 `// TODO`；`Buff.setSource/getSource` 全仓库无人调用，`AbstractBuff.source` 恒 null → **接口契约实际未实现**（`DotBuff` 用了 `setSource`，所以只剩 getter 侧无人读） |
+| N-7 | `BreakDamageCalculator.java:21` | javadoc 例子"30 点普攻 × 2.5 击破加成 = 112.5"在仓库里无法复现，会误导读者以为调用方要预乘 |
+| N-8 | `Queue.java:269,299,324` | 在 for-each 遍历 `heap` 的同时改键再 `rebuildHeap()` 清空同一个 heap —— **只因为每个分支立刻 `return` 才安全** |
+| N-9 | `QueueTest.java:17,42` | 对没有 `equals` 的 `Character` 用 `assertEquals` 其实是身份断言；`:18,29` 的 `50` 从私有常量推出 |
+| N-10 | `SkillData.java:4,97` | 在声明了 `models.Skill` 的包里 import `beans.Skill` 易混；`@AllArgsConstructor` 里两个 `List` 参数调换顺序能静默编译并错绑 |
+| N-11 | `RelicMainAttribute`/`RelicSubAttribute` | 同一个"非法 star"错误两处抛不同异常类型；`getAttributeByStar` 返回可变 map（与 H-1 同类） |
+| N-12 | `LevelPromotionCalc.java:23,44` | 边界行为无文档：`level == 80` 的 clamp 让突破/未突破相等；光锥倍率从 20 级 3.85 **降到** 21 级突破后 3.60（反直觉到该写注释）。未发现 off-by-one |
+
+### 12.5 引擎能力缺口（原 `DOC_VS_CODE` §F，只列还开着的）
+
+| # | 缺口 | 说明 |
+|---|---|---|
+| F-1 | **战技点上限不是恒定值，且引擎没有"改队伍级资源上限"的口子** | 接口已就位（换策略构造参数），**没有接线**；受影响的套装效果落在 `_unmodelled.json` 里 |
+| F-3 | ⚠ **「普攻 +1」是一刀切，强化普攻有例外** | 对青雀对、**对波提欧错** —— 这是登记表里**唯一一条让引擎算错数**的项，属**数据补全** |
+| F-4 | 角色 / 光锥 / 遗器级的**供点机制全部未接** | 与 F-1 同族 |
+| F-5 | `EnemySkill.getData()` 恒为 `null` | 敌方行动绕过 `SkillExecutor`，不发 `SkillCastEvent`。⚠ 另外：条件 DSL **没有"阵营"变量**，所以"敌人施放技能"目前**无法表达**（这是设计口子，不是补一行） |
+| F-7 | `hasSkillPoint()` 语义过窄 | 只看"够不够这一次" |
+| F-9 | 技能效果参数表 | ✅ 表已存在（`skill_effects.json`，40 条 / 26 条可用）；**仍缺**：14 条 `params` 为空、`BUFF`/`CONTROL`/`SUMMON` 技能没有"施加什么"的表、`IMPAIR` 分支缺"哪个 debuff" |
+| F-10 | 套装具名 ability 只有一部分能表达 | 92 条效果里 35 条是纯 ability：**精确表达了 4 条、登记了 31 条**（`_unmodelled.json`，每条写明缺哪种能力），由 `RelicTriggerTableTest` 钉住 35 = 4 + 31 |
+
+（F-2 开局战技点 / F-6 `applySkillPointCost` 裸字符串 / F-8 战技点策略与机制挤在 `useBattle` —— **均已解决**。）
+
+### 12.6 待核实项（原 `CODE_REVIEW` §4，只列还没结论的）
+
+| # | 事项 |
+|---|---|
+| V-1b | `params.get(1)` 在**小数段数**技能上的语义（瓦尔特的 0.65、桑博的 0.28、景元的 0.33…）：当前 `(int)(double)` 会算出 **0 段**（技能完全不出手）。今天无害（`DefaultSkill` 只解析槽位 1，这些技能都在别的槽位），**但接真实槽位前必须搞清这个字段的语义** |
+| V-2 | `StandardEnergyProvider` 读的 `attack_type` 是否真能拿到值：现有测试**手写 `SkillData`**，走不到真实字段绑定 → 测试绿不能证明真实路径正确。建议补"从 `Constant.SKILLS` 取真实普攻/战技 → 断言 20/30" |
+| V-6 | 击破 DOT 缺 `(1 + 击破特攻)`：`attachBreakDot` 用 `breakBaseOf × BreakEffect.dotRatio()`，不含击破特攻。若 BE 应参与，`DotTest` 的锁死值也要改 |
+| V-9 | `Character.Builder.build` **无条件套用整棵行迹树**（无解锁门槛）是否是有意的 L80 全解锁简化 |
+| V-10 | `speedRatio`/`stanceRatio` 在全部 2649 条怪里**恒为 1.0** → `EnemyScaler` 这两条乘法路径永远没有真实数据覆盖（可能是导出问题） |
+| V-12 | `getActionLength` 混用"当前 speed"与"旧 speed 算出的 `nextActionTime`"，中周期变速时语义未定义（该值目前只用于显示） |
+
+---
+
 ## 附：文档分工
 
 | 文档 | 说什么 |
 |---|---|
-| **本文 `ROADMAP.md`** | **还要做什么**（设计原则 + 待办 + 踩坑） |
+| **本文 `ROADMAP.md`** | **还要做什么**（设计原则 + 待办 + 踩坑）+ **§12 遗留缺陷登记**（原 `CODE_REVIEW` / `DOC_VS_CODE` §F 并入） |
 | **`engine.md`** | **现在是什么**（引擎说明书，逐机制给出实现位置） |
-| `DOC_VS_CODE.md` | **文档与代码不一致** + §F 引擎能力缺口登记（F-1…F-8） |
-| `CODE_REVIEW.md` | 历史上的代码审查问题与修复记录 |
 | `README.md` | 怎么跑起来 |
-| `docs/archive/ROADMAP-v2-历史.md` | v2 全文：已完成任务的完整规格与当时的实测数字 |
+| `docs/archive/ROADMAP-v2-历史.md` | v2 全文：已完成任务的完整规格与当时的实测数字（**纯历史**；旧 `DOC_VS_CODE` 里"某行号指向 v2"的说法随它一起删了） |
+
+> 2026-09-26 删掉了 `CODE_REVIEW.md` 与 `DOC_VS_CODE.md`：两者都是一次性分析快照，且已多处腐烂
+> （同一轮里修正了 4 条状态 + 2 处行号 + 1 条与实测相反的注记）。**未修条目已全部并入本文 §12**，
+> 已修条目不保留 —— 已修清单会腐烂，未修清单才是待办。
