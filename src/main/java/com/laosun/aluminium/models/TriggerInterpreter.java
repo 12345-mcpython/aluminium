@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
      * variables being a closed set.
      */
     private static final Set<String> TARGET_SELECTORS =
-            Set.of("self", "target", "attacker", "all_allies", "party");
+            Set.of("self", "target", "attacker", "all_allies", "party", "summon");
 
     /**
      * The two spellings of "every one of our characters".
@@ -356,6 +356,11 @@ public final class TriggerInterpreter {
      *       what an ally-affecting rule needs;</li>
      *   <li>{@code "attacker"} — who caused the event, which is what a counter needs
      *       ("I was hit, so I hit the one who hit me").</li>
+     *   <li>{@code "summon"} — <b>the owner's own summon</b> ({@link Battle#summonOf}). This one reads the
+     *       field rather than the event, because 「装备者及其忆灵」 ("the wearer and their memosprite") names a
+     *       unit that no event carries: the ability affects both, and only one of them acted. It is why a
+     *       partner condition {@code self_summon_count >= 1} usually sits next to it — without one, the rule
+     *       would fail (loudly) whenever nothing is out.</li>
      * </ul>
      *
      * @param effect the effect
@@ -369,6 +374,7 @@ public final class TriggerInterpreter {
             case "self" -> ctx.owner();
             case "target" -> require(ctx.target(), "target", ctx);
             case "attacker" -> require(ctx.actor(), "attacker", ctx);
+            case "summon" -> requireSummon(ctx);
             default -> throw new IllegalStateException(
                     "Effect names an unknown target selector '" + selector
                             + "'; this should have been rejected when the table was loaded");
@@ -404,8 +410,32 @@ public final class TriggerInterpreter {
         return List.of(resolveTarget(effect, ctx));
     }
 
-    private static CanHit require(CanHit entity, String what, TriggerContext ctx) {
-        if (entity == null) {
+    /**
+     * The owner's summon, for the {@code "summon"} selector.
+     *
+     * <p>A missing summon is an {@link IllegalStateException} rather than a quiet no-op, and the message says
+     * what to do about it: an author who writes 「装备者及其忆灵」 without a {@code self_summon_count >= 1}
+     * condition has a rule that fires exactly when the unit it names is not there. Silence would be a wrong
+     * state; the loud version is a one-line fix in the rule file.
+     */
+    private static CanHit requireSummon(TriggerContext ctx) {
+        if (ctx.battle() == null || ctx.owner() == null) {
+            throw new IllegalStateException(
+                    "Effect targets \"summon\" but this rule was evaluated without a battlefield, so the "
+                            + "owner's summon cannot be identified");
+        }
+        CanHit summon = ctx.battle().summonOf(ctx.owner());
+        if (summon == null) {
+            throw new IllegalStateException(
+                    "Effect targets \"summon\" but " + ctx.owner().getName() + " has no summon on the field; "
+                            + "gate the rule with `self_summon_count >= 1` so it only fires when there is one "
+                            + "(the summon perishes with its master, so a stale rule would otherwise fire "
+                            + "every time)");
+        }
+        return summon;
+    }
+
+    private static CanHit require(CanHit entity, String what, TriggerContext ctx) {        if (entity == null) {
             throw new IllegalStateException(
                     "Effect targets \"" + what + "\" but this event has no such party");
         }

@@ -93,6 +93,8 @@ public class RelicTriggerTableTest {
     private static final int SPRIGHTLY_VONWACQ = 308;
     /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 70% -> 普攻与战技伤害 +20%. */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
+    /** 奇想蕉乐园: 暴击伤害 +16%; 有召唤物在场 -> 暴击伤害额外 +32% (the first user of `self_summon_count`). */
+    private static final int BANANA_PARADISE = 318;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -137,7 +139,10 @@ public class RelicTriggerTableTest {
             INERT_SALSOTTO + "/" + TWO_PIECE,
             TALIA + "/" + TWO_PIECE,
             SPRIGHTLY_VONWACQ + "/" + TWO_PIECE,
-            CELESTIAL_DIFFERENTIATOR + "/" + TWO_PIECE);
+            CELESTIAL_DIFFERENTIATOR + "/" + TWO_PIECE,
+            // Authored on 2026-09-27 once a rule could ask "do I have a summon out?"
+            // (`self_summon_count`, and `target: "summon"` to address it).
+            BANANA_PARADISE + "/" + TWO_PIECE);
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
@@ -150,7 +155,7 @@ public class RelicTriggerTableTest {
      * {@link #MIXED_STAT_AND_ABILITY}); those 22 mixed entries are not a regression, they are the half of
      * the data this test could not see before (ROADMAP M-25).
      */
-    private static final int STILL_REGISTERED = 47;
+    private static final int STILL_REGISTERED = 46;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
@@ -176,7 +181,7 @@ public class RelicTriggerTableTest {
      * entry cannot quietly claim to be blocked when the capability exists.
      */
     private static final String WRITABLE_PREFIX = "Writable now:";
-    private static final int WRITABLE_NOW = 7;
+    private static final int WRITABLE_NOW = 10;
 
     // ==================================================================
     // 1. The shipped rule files
@@ -572,7 +577,7 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(22, twoPiece,
+        Assertions.assertEquals(21, twoPiece,
                 "the ability-bearing bonuses at the 2-piece tier that are not expressible yet");
     }
 
