@@ -58,9 +58,10 @@ public class TriggerTable {
         if (specs == null) {
             return;
         }
-        for (TriggerSpec spec : specs) {
+        for (int index = 0; index < specs.size(); index++) {
+            TriggerSpec spec = specs.get(index);
             TriggerEvent event = resolveEvent(spec);
-            for (CompiledRule rule : compile(spec, event)) {
+            for (CompiledRule rule : compile(spec, event, index)) {
                 byEvent.computeIfAbsent(event, k -> new ArrayList<>()).add(rule);
             }
         }
@@ -170,7 +171,7 @@ public class TriggerTable {
         return event;
     }
 
-    private static List<CompiledRule> compile(TriggerSpec spec, TriggerEvent event) {
+    private static List<CompiledRule> compile(TriggerSpec spec, TriggerEvent event, int index) {
         List<Condition> conditions = new ArrayList<>();
         if (spec.getWhen() != null) {
             for (String raw : spec.getWhen()) {
@@ -185,7 +186,63 @@ public class TriggerTable {
         for (EffectSpec effect : effects) {
             TriggerInterpreter.validate(effect, spec);
         }
-        return List.of(new CompiledRule(event, conditions, effects, spec.getSource()));
+        return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
+                ruleKey(spec, index), validateCooldown(spec),
+                Boolean.TRUE.equals(spec.getOncePerBattle())));
+    }
+
+    /**
+     * A rule's stable identity, used by the per-combatant firing limits
+     * ({@code CanHit.isTriggerReady} / {@code startTriggerCooldown}).
+     *
+     * <p><b>Why the source is not enough on its own.</b> A file may ship several rules that share one
+     * provenance string — {@code characters/1403.json} has exactly that, because its two rules come from
+     * the same trace (「岔路旁的小石子？」 states both the battle-start energy and the per-target
+     * energy). Keyed by source alone, a cooldown on one of them would silently block the other: a wrong
+     * answer with nothing to see. The index within the file makes the key unique per rule and still
+     * readable in a test or a debugger.
+     *
+     * <p>Stable across battles by construction: the table is compiled once and cached per cid, and the
+     * counters live on the combatant, not here.
+     *
+     * @param spec  the raw rule
+     * @param index its position in the file
+     * @return the key, e.g. {@code "1403 缇宝 trace 1403103#1"}
+     */
+    private static String ruleKey(TriggerSpec spec, int index) {
+        return (spec.getSource() == null ? "rule" : spec.getSource()) + "#" + index;
+    }
+
+    /**
+     * Validates a rule's firing limit at load time and returns its cooldown in the owner's turns.
+     *
+     * <p>The whole point of validating here is the same as for events and ops: a limit that cannot mean
+     * anything must fail loudly while the file is read, not quietly behave like "no limit". {@code 0} is
+     * exactly that trap — it reads like "no cooldown", which is already spelled by omitting the field.
+     *
+     * @param spec the raw rule
+     * @return the cooldown in turns, or {@code 0} when the rule is unlimited
+     * @throws IllegalArgumentException when the cooldown is below 1, or both limits are stated
+     */
+    private static int validateCooldown(TriggerSpec spec) {
+        boolean oncePerBattle = Boolean.TRUE.equals(spec.getOncePerBattle());
+        Integer cooldown = spec.getCooldown();
+        if (cooldown != null && oncePerBattle) {
+            throw new IllegalArgumentException(
+                    "Trigger rule states both `cooldown` and `once_per_battle`, which are two different "
+                            + "limits (one comes back, the other never does) -- keep one "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (cooldown == null) {
+            return 0;
+        }
+        if (cooldown < 1) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has cooldown " + cooldown + ", but a cooldown is counted in whole turns "
+                            + "and must be >= 1; omit the field entirely for \"no limit\" "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return cooldown;
     }
 
     // ==================================================================
@@ -351,15 +408,29 @@ public class TriggerTable {
     }
 
     /**
-     * A validated rule: the event it listens for, its conditions and its effects.
+     * A validated rule: the event it listens for, its conditions, its effects, and how often it may fire.
      *
-     * @param event      the subscribed event
-     * @param conditions all must hold
-     * @param effects    run in order
-     * @param source     where the rule came from, propagated into error messages
+     * @param event         the subscribed event
+     * @param conditions    all must hold
+     * @param effects       run in order
+     * @param source        where the rule came from, propagated into error messages
+     * @param key           stable identity for the per-combatant firing limits (source + position)
+     * @param cooldownTurns the owner's turns between two firings ({@code 0} = unlimited)
+     * @param oncePerBattle {@code true} = at most one firing per battle
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
-                               List<EffectSpec> effects, String source) {
+                               List<EffectSpec> effects, String source, String key,
+                               int cooldownTurns, boolean oncePerBattle) {
+
+        /**
+         * Whether this rule limits how often it may fire at all.
+         *
+         * <p>An unlimited rule never touches the owner's limit counters, so adding this vocabulary
+         * cannot change the behaviour of any rule that does not use it.
+         */
+        public boolean isLimited() {
+            return cooldownTurns > 0 || oncePerBattle;
+        }
 
         boolean matches(TriggerContext ctx) {
             for (Condition condition : conditions) {
