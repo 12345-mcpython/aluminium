@@ -12,12 +12,17 @@ import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
 import com.laosun.aluminium.models.skill.Skill;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -112,6 +117,28 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     @Getter
     private final ResourceManager resources;
+
+    /**
+     * Per-rule firing limits ("cooldown" / "once per battle"), keyed by {@code CompiledRule.key()}.
+     *
+     * <p><b>Why the counters live on the combatant and not on the rule.</b> A trigger table is compiled
+     * once and <b>cached per cid</b>, and a relic set's rules are merged into the same table instance for
+     * every character wearing it — so a mutable field on a rule would be shared by every wearer, in every
+     * battle, for the life of the JVM. That is the leak this project keeps refusing to ship (see the
+     * static caches registered as N-1). A combatant owns its own counters, and
+     * {@link #onBattleStart(Battle)} clears them.
+     *
+     * <p>Deliberately without a getter: the maps are mutable, and they are reachable only through the
+     * four methods below, so nothing can tick or clear somebody else's limits by accident — the same
+     * reasoning that made {@code Queue}'s exposed live heap a registered defect (L-5).
+     */
+    @Getter(AccessLevel.NONE)
+    private final Map<String, Integer> triggerCooldowns = new HashMap<>();
+    /**
+     * The rules that have used up a {@code once_per_battle} limit; they never fire again this battle.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Set<String> triggerSpentOnce = new HashSet<>();
 
     // test event behavior
     public Runnable beforeMove = () -> {
@@ -413,7 +440,64 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
 
     @Override
     public void onBattleStart(Battle battle) {
+        // Firing limits are battle state, like `invulnerable`: a second battle must not inherit the first
+        // one's cooldowns. Without this, a `once_per_battle` rule would stay dead for the rest of the
+        // JVM's life the moment one battle ended -- a mechanic that silently disappears.
+        resetTriggerLimits();
         onBattleStart.run();
+    }
+
+    /**
+     * Whether a limited rule may fire right now.
+     *
+     * <p>Unlimited rules are never recorded, so they always answer {@code true}: adding this vocabulary
+     * cannot change any rule that does not use it.
+     *
+     * @param key the rule's stable key ({@code CompiledRule.key()})
+     * @return {@code false} while the rule is on cooldown or has spent a once-per-battle limit
+     */
+    public boolean isTriggerReady(String key) {
+        return !triggerSpentOnce.contains(key) && triggerCooldowns.getOrDefault(key, 0) <= 0;
+    }
+
+    /**
+     * Records that a rule fired, which starts its limit.
+     *
+     * @param key           the rule's stable key
+     * @param cooldownTurns the owner's turns before it may fire again ({@code 0} = no cooldown)
+     * @param oncePerBattle {@code true} = it may never fire again in this battle
+     */
+    public void startTriggerCooldown(String key, int cooldownTurns, boolean oncePerBattle) {
+        if (oncePerBattle) {
+            triggerSpentOnce.add(key);
+            return;
+        }
+        if (cooldownTurns > 0) {
+            triggerCooldowns.put(key, cooldownTurns);
+        }
+    }
+
+    /**
+     * Counts one of <b>this combatant's</b> turns off every cooldown.
+     *
+     * <p>Called by {@code Battle.beforeMove} for the unit whose turn is beginning, just before the
+     * {@code TURN_START} rules fire — so {@code cooldown: 1} means "at most once per own turn", and a
+     * rule that fires on that turn's own event is not immediately blocked again.
+     */
+    public void tickTriggerCooldowns() {
+        if (triggerCooldowns.isEmpty()) {
+            return;
+        }
+        triggerCooldowns.replaceAll((key, turns) -> turns - 1);
+        triggerCooldowns.values().removeIf(turns -> turns <= 0);
+    }
+
+    /**
+     * Clears every firing limit, so that a battle starts with all rules ready.
+     */
+    public void resetTriggerLimits() {
+        triggerCooldowns.clear();
+        triggerSpentOnce.clear();
     }
 
     /**

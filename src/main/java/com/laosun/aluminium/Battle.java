@@ -576,6 +576,13 @@ public class Battle {
         // actor's own table can match.
         //
         // It fires once per turn, extra turns included -- an extra turn really is one.
+        //
+        // Firing limits ("cooldown" / "once per battle") are counted down here, for the unit whose turn
+        // is beginning and *before* the rules below get their chance: `cooldown: 1` therefore means "at
+        // most once per own turn". It is **this actor's** counters, not the event actor's, because a
+        // limit belongs to the rule's owner -- a rule of mine that fires on somebody else's attack still
+        // comes back on MY turn (TriggerLimitTest.otherPeoplesTurnsDoNotCountTheCooldownDown).
+        actor.tickTriggerCooldowns();
         fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
         actor.beforeMove(this);
     }
