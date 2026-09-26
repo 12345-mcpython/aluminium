@@ -423,6 +423,7 @@ target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡�
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
 | `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 二选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
+| `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
 | `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 具名状态（见下） |
 | `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
 
@@ -536,8 +537,9 @@ stackGroupKey()        // 同一组才能互相叠；(attribute, modifierType, s
 - **每一层都是普通 buff 实例**（各有自己的 `id` 和自己的 modifier），所以
   `removeBuff` / 到期 / `clearAll` 都是**精确地摘掉一层**，属性回到"剩下几层该有的值"，
   没有残渣 —— 与 `BuffRuleTest.expiryRestoresTheOriginalValueExactly` 同一条口径。
-  `BuffManager.countBuffs` / `removeOneBuff` 是给"现在几层了 / 消耗一层"用的查询口
-  （当前只有测试在用 —— 触发器表还**没有**"消耗一层"的 op，见 `F-10` 的"仍缺什么"），
+  `BuffManager.countBuffs` / `removeOneBuff` / `removeStacks` 是给"现在几层了 / 消耗一层 / 按属性取回最多 N 层"
+  用的查询口。触发器侧对应 `REMOVE_STACK`（2026-09-27 接线，第一个用户是遗器套装 131「星如我见的领航员」：
+  「每次战技 +1 层，回合开始或终结技后移除 1 层」——在它之前，叠层只能长不能消，这条文案只能建模一半）。
   仍然**不发** `getBuffs()`（P1-7 的决定）。
 
 **两个规则写同一件事时叠层是共享的**（105 的"攻击**或**受击"就靠这个）：
@@ -1658,7 +1660,8 @@ campJudgementBelongsToThePolicyNotTheBattle` 演示了这一点）。
 ### 10.4 查询口 ✅
 
 `BuffManager.hasBuff(Class<? extends AbstractBuff>)` —— 按 `getClass()` 精确匹配、`null` 返 false。
-`countBuffs(Class)` / `removeOneBuff(Class)` 是叠层用的两个延伸口（"现在几层" / "消耗一层"）。
+`countBuffs(Class)` / `removeOneBuff(Class)` / `removeStacks(AttributeType, int)` 是叠层用的三个延伸口
+（"现在几层" / "消耗一层" / "按属性取回最多 N 层，**最新的先走**"）。
 **不提供 `getBuffs()`**：遍历与判定留在 manager 内部，避免外部改列表导致 CME。
 
 ### 10.5 现存 buff 实现

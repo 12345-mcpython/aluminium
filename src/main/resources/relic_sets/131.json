@@ -1,0 +1,89 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.18,
+          "permanent": true,
+          "max_stacks": 3
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.18,
+          "permanent": true,
+          "max_stacks": 3
+        }
+      ],
+      "source": "relic set 131 (星如我见的领航员 / As Navigator Isee Sees It), 4-piece ability Ability51311: \"When the wearer enters combat or uses Skill, the DMG dealt by their Skill and Ultimate increases by #1[i]%, stacking up to #2[i] time(s). At the start of the wearer's turn or after using Ultimate, removes #3[i] stack(s) of this effect.\" param = [0.18, 3, 1]",
+      "note": "The 「进入战斗时」 half. Two effects, because the text names two scopes and the engine has one attribute per scope since 2026-09-27 (SKILL_DAMAGE_BOOST / ULTIMATE_DAMAGE_BOOST); each carries its own 3-stack counter, since a stack belongs to one attribute. 'permanent: true' is the right duration rather than a turn count: the stacks are taken off by the two rules below, and a turn-limited stack would expire by itself, which the text does not say. This set is also what forced REMOVE_STACK to exist -- MODIFY_ATTR could grow a stack but nothing could take one back, so the ability could previously only be modelled by dropping half of its text."
+    },
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.18,
+          "permanent": true,
+          "max_stacks": 3
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.18,
+          "permanent": true,
+          "max_stacks": 3
+        }
+      ],
+      "source": "relic set 131 (星如我见的领航员), 4-piece ability Ability51311 — the 「或施放战技时」 half",
+      "note": "'actor == self' is 'the wearer uses'. Note SKILL_CAST now means the Skill slot *only* (narrowed 2026-09-27, M-24): before that fix this rule also fired on 普攻, so the counter would have grown on every basic attack too and never matched the text."
+    },
+    {
+      "on": "TURN_START",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1
+        }
+      ],
+      "source": "relic set 131 (星如我见的领航员), 4-piece ability Ability51311 — the 「回合开始时…移除1层」 half",
+      "note": "Two effects, because the two scopes are two independent counters. Removing when there is nothing to remove is a no-op by design (BuffManager.removeStacks), which is what makes 'every turn' safe: the instruction fires whether or not a stack is up. ⚠ Ordering matters and is in our favour: TURN_START is delivered before that turn's Skill is cast, so a turn in which the wearer uses their Skill is a net zero (one stack off, one on) -- which is exactly how the set is supposed to behave."
+    },
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1
+        }
+      ],
+      "source": "relic set 131 (星如我见的领航员), 4-piece ability Ability51311 — the 「或施放终结技后…移除1层」 half",
+      "note": "ULT_CAST and SKILL_CAST are mutually exclusive at the emitter, so the two '+' rules and the two '-' rules can never both fire for one action."
+    }
+  ]
+}

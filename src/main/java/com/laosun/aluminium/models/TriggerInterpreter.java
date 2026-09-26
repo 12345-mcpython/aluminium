@@ -46,6 +46,10 @@ import java.util.Set;
  *           (&gt; 1) makes re-applications <b>accumulate</b> up to that cap instead of replacing the
  *           previous one; each stack is an ordinary buff instance with its own id, so it can be
  *           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
+ *   <tr><td>{@code REMOVE_STACK}</td><td>{@code attribute}, {@code amount}, optional {@code target}</td>
+ *       <td>✅ wired — takes up to {@code amount} stacks of that attribute's modifier off the target
+ *           (「每回合移除 1 层」); removing nothing is not an error, because the rule fires every turn
+ *           anyway</td></tr>
  *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, <b>exactly one of</b> {@code turns} / {@code permanent},
  *       optional {@code target}</td>
  *       <td>✅ wired — puts the target into a <b>named state</b> ({@code StateBuff}, e.g. 【协奏】/【转魄】/
@@ -68,7 +72,7 @@ public final class TriggerInterpreter {
      */
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
-            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF");
+            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -152,6 +156,11 @@ public final class TriggerInterpreter {
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
+            case "REMOVE_STACK" -> {
+                requireAttribute(effect, op, spec);
+                requirePositiveAmount(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
             default -> requireNoStackArguments(effect, op, spec);
         }
     }
@@ -227,6 +236,7 @@ public final class TriggerInterpreter {
             case "DAMAGE" -> damage(battle, effect, ctx);
             case "MODIFY_ATTR" -> modifyAttr(battle, effect, ctx);
             case "APPLY_BUFF" -> applyState(battle, effect, ctx);
+            case "REMOVE_STACK" -> removeStacks(battle, effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
@@ -442,6 +452,31 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * Settles a {@code REMOVE_STACK} effect: takes up to {@code amount} stacks of one attribute's modifier
+     * off the target — the "removes 1 stack(s) of this effect" half of effects like relic set 131's.
+     *
+     * <p>The stack is the engine's existing stackable modifier ({@code MODIFY_ATTR} with {@code max_stacks}),
+     * so nothing new is being modelled: what was missing was only that <b>data</b> could take one back. Until
+     * this op existed a stack could grow and never shrink, which meant such a text could only be modelled by
+     * dropping half of it.
+     *
+     * <p><b>Removing nothing is not an error</b>, which is where this differs from {@code SPEND_RESOURCE}:
+     * there the author wrote a rule expecting the resource to be there, while here the rule is of the shape
+     * "at the start of the wearer's turn, removes 1 stack" and fires on every turn, including the ones where
+     * the counter is already at zero. Making that an exception would break the common case.
+     *
+     * @param effect the effect ({@code attribute}, {@code amount}, optional {@code target})
+     * @param ctx    the context
+     */
+    private static void removeStacks(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        AttributeType attribute = AttributeType.fromString(effect.getAttribute());
+        int amount = (int) Math.round(effect.getAmount());
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            target.getBuffManager().removeStacks(attribute, amount);
+        }
+    }
+
+    /**
      * The duration handed to a permanent modifier.
      *
      * <p>Deliberately {@code 1} and not a large number: {@link StatModifierBuff} marks the buff
@@ -503,6 +538,24 @@ public final class TriggerInterpreter {
         if (effect.getAmount() == null) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"amount\" (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates that an amount is present <b>and positive</b>.
+     *
+     * <p>Used by the ops where zero is not a legal no-op but a silent bug: {@code REMOVE_STACK amount: 0}
+     * (or a negative) would load happily and remove nothing, which is the "the rule fires and nothing
+     * happens" symptom this project keeps closing. Ops where a zero amount is meaningful on purpose (a
+     * {@code HEAL 0} a content author might use as a placeholder) keep using {@link #requireAmount}.
+     */
+    private static void requirePositiveAmount(EffectSpec effect, String op, TriggerSpec spec) {
+        requireAmount(effect, op, spec);
+        if (effect.getAmount() <= 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " needs a positive \"amount\" but has " + effect.getAmount()
+                            + "; a removal of 0 would load and silently do nothing "
+                            + "(source: " + spec.getSource() + ")");
         }
     }
 
