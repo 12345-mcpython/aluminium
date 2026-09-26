@@ -1,0 +1,20 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:EFFECT_HIT_RATE >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.15,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 304 (筑城者的贝洛伯格 / Belobog of the Architects), 2-piece: \"Increases the wearer's DEF by #1[i]%. When the wearer's Effect Hit Rate is equal to or higher than #2[i]%, increases the wearer's DEF by an extra #3[i]%.\" param = [0.15, 0.5, 0.15]",
+      "note": "Only the conditional sentence; \"DEF +15%\" is the effect's `properties` stat (DefenceAddedRatio 0.15). ⚠ The threshold is 50% written as a FRACTION: `self_attr:EFFECT_HIT_RATE >= 0.5`. Effect Hit Rate is a ratio attribute, so it reads as a fraction everywhere (the same number `Battle.hitChance` multiplies with) -- `>= 50` would load and never fire. This is the case that made the unit rule explicit in engine.md 4.6. ⚠ Same BATTLE_START approximation as sets 301/302/307/309."
+    }
+  ]
+}

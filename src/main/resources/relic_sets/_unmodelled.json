@@ -1,4 +1,11 @@
 {
+  "102": [
+    {
+      "require": 4,
+      "ability": "Ability51021",
+      "reason": "Writable now: \"Increases the wearer's SPD by 6%, and the DMG dealt by Basic ATK increases by 12%.\" Both halves are unconditional, so nothing here needs an event or a condition -- the SPD is the effect's `properties` stat (SpeedAddedRatio 0.06) and the Basic ATK half is a BATTLE_START rule granting BASIC_ATTACK_DAMAGE_BOOST with `permanent: true`. ⚠ Listed here because the effect is MIXED (`properties` plus an ability) and the partition test only used to look at effects with no `properties` at all; see M-25 in ROADMAP 12.2. Marked writable rather than blocked so the backlog can be sized: 'Writable now:' entries need a rule file, not an engine change."
+    }
+  ],
   "103": [
     {
       "require": 4,
@@ -20,11 +27,18 @@
       "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" The event it needed exists since 2026-09-27 (DEALING_DAMAGE hands the pending instance over before settlement), so the first clause could be conditioned on 'the wearer deals damage'. Two things still block the ability: the second clause needs a condition on the target's weakness element (the DSL can ask about states, not about weaknesses), and 'ignores 10% DEF' is the defence zone, not the DMG-boost zone -- BOOST_DAMAGE cannot express it and the target's DEF ignore is not a stat the rule can raise. 'For the rest of the battle' is no longer part of the gap (`permanent: true` exists)."
     }
   ],
+  "111": [
+    {
+      "require": 4,
+      "ability": "Ability51111",
+      "reason": "Writable now: \"Increases the wearer's Break Effect by 16%. After the wearer inflicts Weakness Break on an enemy target, regenerates 8 Energy.\" The Break Effect is the `properties` stat (BreakDamageAddedRatioBase 0.16), and the second half is `on: BREAK` + `when: [\"actor == self\"]` + GAIN_ENERGY 8 -- BREAK fires with the breaker as `actor` (it is what set 106's and 131's rules already rely on). Listed rather than authored only because it arrived with the mixed-effect census (M-25)."
+    }
+  ],
   "112": [
     {
       "require": 4,
       "ability": "Ability51121",
-      "reason": "\"When dealing DMG to debuffed enemy targets, the wearer has their CRIT Rate increased by 10%. And when they deal DMG to Imprisoned enemy targets, their CRIT DMG increases by 20%.\" Needs conditions on the target's states (has any debuff / is Imprisoned), which the condition DSL cannot express."
+      "reason": "\"When dealing DMG to debuffed enemy targets, the wearer has their CRIT Rate increased by 10%. And when they deal DMG to Imprisoned enemy targets, their CRIT DMG increases by 20%.\" The FIRST clause became expressible on 2026-09-27 (`target_debuff_count >= 1` on DEALING_DAMAGE, with MODIFY_ATTR for the CRIT Rate), and the ability is a disjunction: authoring only that half would under-trigger it. What still blocks the second clause is that 'is Imprisoned' is a control state, and P10-2 models controls as a COMPOSITION (StunBuff + a speed debuff + an action delay) with no named carrier, so there is nothing for `has_state` to ask about yet."
     }
   ],
   "113": [
@@ -52,14 +66,19 @@
     {
       "require": 4,
       "ability": "Ability51161",
-      "reason": "\"For every DoT the enemy target is afflicted with, the wearer will ignore 6% of its DEF when dealing DMG to it. This effect is valid for a max of 3 DoTs.\" Needs a count of the target's DoTs and a per-count scaling of the effect."
+      "reason": "\"For every DoT the enemy target is afflicted with, the wearer will ignore 6% of its DEF when dealing DMG to it. This effect is valid for a max of 3 DoTs.\" Needs a count of the target's DoTs, a per-count scaling of the effect, and a DEF-ignore op (see set 108)."
     }
   ],
   "117": [
     {
       "require": 2,
       "ability": "Ability51170",
-      "reason": "\"Increases DMG dealt to enemies with debuffs by 12%.\" Needs a condition on whether the target carries any debuff."
+      "reason": "Writable now: \"Increases DMG dealt to enemies with debuffs by 12%.\" The condition it needed arrived on 2026-09-27: `on: DEALING_DAMAGE`, `when: [\"target_debuff_count >= 1\"]` (DEALING_DAMAGE fires before the zones are read and hands the pending instance over), `do: BOOST_DAMAGE 0.12`. ⚠ This reason used to say the condition did not exist -- it did, from the day target_debuff_count was added, and nothing re-read this file. Listed rather than authored because it arrived with the mixed-effect census (M-25) and needs its own content pass."
+    },
+    {
+      "require": 4,
+      "ability": "Ability51171",
+      "reason": "\"Increases the wearer's CRIT Rate by 4%, and increases the wearer's CRIT DMG against enemy targets afflicted with at least 2/4 debuffs by 8%/12%. After the wearer inflicts a debuff on an enemy target, the above effect increases by 100% for 1 turn(s).\" The debuff COUNT is expressible (`target_debuff_count`), but CRIT DMG is read by the crit zone, not by the DMG-boost zone -- BOOST_DAMAGE cannot raise it for one instance, and a MODIFY_ATTR buff granted on DEALING_DAMAGE would persist past the hit it was meant for. The third clause adds a 'this effect x2 for N turns' layer on top. (The CRIT Rate in this effect is the `properties` stat, CriticalChanceBase 0.04.)"
     }
   ],
   "118": [
@@ -73,7 +92,14 @@
     {
       "require": 4,
       "ability": "Ability51191",
-      "reason": "\"If the wearer's Break Effect is 150% or higher, the Break DMG dealt to the enemy target ignores 10% of their DEF. If the wearer's Break Effect is 250% or higher, the Super Break DMG additionally ignores 15%.\" Needs a condition on one of the wearer's own attribute values and a tiered either/or."
+      "reason": "\"If the wearer's Break Effect is 150% or higher, the Break DMG dealt to the enemy target ignores 10% of their DEF. If the wearer's Break Effect is 250% or higher, the Super Break DMG additionally ignores 15%.\" The attribute threshold it needed arrived on 2026-09-27 (`self_attr:BREAKING_EFFECT >= 1.5`), and the two thresholds are NOT an extra gap (an upper bound makes the tiers exclusive -- see set 311). What blocks it: 'ignores DEF' is the defence zone and needs its own op (see set 108), and both clauses apply to Break / Super Break DMG only, which the DSL cannot name."
+    }
+  ],
+  "120": [
+    {
+      "require": 4,
+      "ability": "Ability51201",
+      "reason": "Writable now: \"Increases the wearer's CRIT Rate by 6%. When the wearer uses a Follow-Up ATK, increases the DMG dealt by their Ultimate by 12% for 1 turn(s).\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.06); the second half is `on: FOLLOW_UP` + MODIFY_ATTR ULTIMATE_DAMAGE_BOOST 0.12 for 1 turn -- the trigger and the scoped attribute both exist (FOLLOW_UP since 2026-09-27, ULTIMATE_DAMAGE_BOOST with the other attack-type boosts). Listed rather than authored only because it arrived with the mixed-effect census (M-25)."
     }
   ],
   "121": [
@@ -94,7 +120,14 @@
     {
       "require": 4,
       "ability": "Ability51231",
-      "reason": "\"While the wearer's memosprite is on the field, increases the wearer's SPD by 6%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by 30%, lasting for 3 turn(s).\" Needs a memosprite presence condition and a memosprite-attack event (summons are P9-4)."
+      "reason": "\"While the wearer's memosprite is on the field, increases the wearer's SPD by 6%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by 30%, lasting for 3 turn(s).\" Needs a memosprite presence condition and a memosprite-attack event. (The enemy-side half of summons landed in P9-4; a memosprite is OUR side's, which needs Battle.characters widened from List<Character> -- the friendly half of L-8.)"
+    }
+  ],
+  "124": [
+    {
+      "require": 4,
+      "ability": "Ability51241",
+      "reason": "\"Decreases the wearer's SPD by 8%. Before entering combat, if the wearer's SPD is lower than 95/110, increases the wearer's CRIT Rate by 36%/50%. This effect also applies to the wearer's memosprite.\" The SPD decrease is the `properties` stat (SpeedAddedRatio -0.08) and the threshold became expressible on 2026-09-27 (`self_attr:SPEED < 95`), but the last sentence is a memosprite clause: the ability is a disjunction over both units, so authoring only the wearer's half would under-trigger it. (The 95/110 pair is not an extra gap -- an upper bound makes the tiers exclusive, see set 311.)"
     }
   ],
   "125": [
@@ -108,7 +141,7 @@
     {
       "require": 4,
       "ability": "Ability51261",
-      "reason": "\"When the wearer becomes the target of another ally target's ability, gains 1 stack of 'Help,' stacking up to 2 time(s). If there are 2 stack(s) ... when the wearer uses their Ultimate, consumes all 'Help' to increase the wearer's ATK by 48% for 1 turn(s).\" The stacking counter and the 'for 1 turn' buff are now expressible, but there is no event for 'the wearer was targeted by an ally's ability' and no condition for 'I have exactly N stacks' (the DSL reads the owner's HP percentage and the hit count, not buff stacks), nor an op that consumes them."
+      "reason": "\"When the wearer becomes the target of another ally target's ability, gains 1 stack of 'Help,' stacking up to 2 time(s). If there are 2 stack(s) ... when the wearer uses their Ultimate, consumes all 'Help' to increase the wearer's ATK by 48% for 1 turn(s).\" The stacking counter and the 'for 1 turn' buff are now expressible, but there is no event for 'the wearer was targeted by an ally's ability' and no condition for 'I have exactly N stacks' (the DSL reads the owner's HP percentage, attribute values and the hit count, not buff stacks), nor an op that consumes them."
     }
   ],
   "127": [
@@ -134,14 +167,14 @@
     {
       "require": 4,
       "ability": "Ability51291",
-      "reason": "\"The Elation DMG dealt by the wearer and their memosprites ignores 10% of targets' DEF. For every 5 accumulated Punchline allies gain, the Elation DMG dealt additionally ignores 1% of targets' DEF, stacking up to 10 time(s).\" Needs an Elation damage channel, a DEF-ignore condition and a stacking counter driven by a resource."
+      "reason": "\"The Elation DMG dealt by the wearer and their memosprites ignores 10% of targets' DEF. For every 5 accumulated Punchline allies gain, the Elation DMG dealt additionally ignores 1% of targets' DEF, stacking up to 10 time(s).\" Needs an Elation damage channel, a DEF-ignore op (see set 108) and a stacking counter driven by a resource."
     }
   ],
   "130": [
     {
       "require": 4,
       "ability": "Ability51301",
-      "reason": "\"Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.\" Needs a condition on the wearer's own SPD, a two-threshold either/or, and the Elation system."
+      "reason": "\"Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.\" The SPD threshold arrived on 2026-09-27 (`self_attr:SPEED`), and the 'first time each battle' limit is expressible (`once_per_battle`). What still blocks it is the Elation system in the second sentence. (The 120/160 pair is not a gap -- an upper bound makes the tiers exclusive, see set 311.)"
     }
   ],
   "132": [
@@ -151,11 +184,95 @@
       "reason": "\"Increases the wearer's CRIT DMG dealt to enemy targets in the DEF reduction state by 28%. After the wearer inflicts the DEF reduction state on an enemy target, all allies gain 'Comburent' for 2 turn(s) ... The DMG dealt by ally targets with 'Comburent' increases by 15% ... can be triggered again after the wearer uses an attack.\" Needs a condition on the target's DEF-reduction state, a named buff with a per-attack refresh rule, and a damage-dealt bonus."
     }
   ],
+  "303": [
+    {
+      "require": 2,
+      "ability": "Ability53031",
+      "reason": "\"Increases the wearer's Effect Hit Rate by 10%. Meanwhile, increases the wearer's ATK by an amount equal to 25% of their current Effect Hit Rate, up to a max of 25%.\" The Effect Hit Rate is the `properties` stat (StatusProbabilityBase 0.1). What is missing is an amount that SCALES with one of my own attribute values and is CAPPED -- MODIFY_ATTR's amount is a literal with no arithmetic, and the DSL cannot express 'my ATK += 0.25 x my Effect Hit Rate, at most 25%'. (`self_attr` can now READ the value for a threshold, which is half of this and not enough.)"
+    }
+  ],
+  "305": [
+    {
+      "require": 2,
+      "ability": "Ability53051",
+      "reason": "\"Increases the wearer's CRIT DMG by 16%. When the wearer's CRIT DMG is equal to or higher than 120%, the wearer's CRIT Rate increases by 32% after entering battle, until after the wearer's first attack.\" The CRIT DMG is the `properties` stat (CriticalDamageBase 0.16) and the threshold became expressible on 2026-09-27 (`self_attr:CRIT_ATTACK >= 1.2`). What blocks it is the duration: 'until after the wearer's first attack' is a buff consumed by the next attack, and the vocabulary has no 'remove this buff when it is used' mechanic (the same gap as set 107's 4-piece)."
+    }
+  ],
+  "310": [
+    {
+      "require": 2,
+      "ability": "Ability53101",
+      "reason": "Writable now: \"Increases the wearer's Effect RES by 10%. When the wearer's Effect RES is equal to or higher than 50%, increases all allies' CRIT DMG by 10%.\" The Effect RES is the `properties` stat (StatusResistanceBase 0.1); the second half is `self_attr:EFFECT_RESISTANCE >= 0.5` (added 2026-09-27 -- a ratio attribute, so the threshold is a fraction) with `target: all_allies` and MODIFY_ATTR CRIT_ATTACK. Listed rather than authored only because it arrived with the mixed-effect census (M-25)."
+    }
+  ],
+  "311": [
+    {
+      "require": 2,
+      "ability": "Ability53111",
+      "reason": "Writable now: \"Increases the wearer's ATK by 12%. When the wearer's SPD is equal to or higher than 135/160, increases the DMG dealt by the wearer by 12%/18%.\" The ATK is the `properties` stat (AttackAddedRatio 0.12) and the SPD threshold arrived on 2026-09-27 (`self_attr:SPEED`). ⚠ The two thresholds are NOT a gap -- and this sentence is worth keeping, because six other entries used to claim they were (all corrected the same day). A tier is written as TWO rules made MUTUALLY EXCLUSIVE by an upper bound: `when: [\"self_attr:SPEED >= 160\"]` -> ALL_DAMAGE_TYPE_BOOST 0.18, plus `when: [\"self_attr:SPEED >= 135\", \"self_attr:SPEED < 160\"]` -> 0.12. Both `permanent`, so exactly one fires at any speed; the DSL's conditions are already AND-ed, so no new vocabulary is needed."
+    }
+  ],
+  "312": [
+    {
+      "require": 2,
+      "ability": "Ability53121",
+      "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. Increases the DMG dealt by other allies with the same Type as the wearer by 10%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the PARTY's composition -- 'another ally whose Type (element) matches mine' needs the rule to see its teammates, which the condition DSL cannot do (it looks at the owner, the actor and the event's subject only)."
+    }
+  ],
+  "313": [
+    {
+      "require": 2,
+      "ability": "Ability53131",
+      "reason": "Writable now: \"Increases the wearer's CRIT Rate by 4%. When an enemy target is defeated, the wearer's CRIT DMG increases by 20%, stacking up to 5 time(s).\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.04); the second half is `on: KILL` + MODIFY_ATTR CRIT_ATTACK 0.2 with `max_stacks: 5` -- the KILL event and the stack cap both exist. ⚠ One judgement call before writing it: the text says 'an enemy target is defeated', not 'defeated BY the wearer', so the rule takes no `actor == self` condition; that reading should be confirmed against a second source first."
+    }
+  ],
+  "314": [
+    {
+      "require": 2,
+      "ability": "Ability53141",
+      "reason": "\"Increases the wearer's ATK by 12%. Upon entering battle, if at least 1 other ally is of the same Path as the wearer, the wearer's CRIT Rate increases by 12%.\" The ATK is the `properties` stat (AttackAddedRatio 0.12). What is missing is a condition on the PARTY's composition -- 'another ally of my Path' needs the rule to see its teammates (same gap as set 312)."
+    }
+  ],
   "315": [
     {
       "require": 2,
       "ability": "Ability53151",
-      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" The trigger (FOLLOW_UP, filtered with `actor != self` for 'an ally'), the stacking counter and the follow-up-only damage boost (FOLLOW_UP_DAMAGE_BOOST, added for set 115) are all expressible now. Still blocking: the 'when there are 5 stacks, additionally ...' half needs a condition on the wearer's own stack count, which the DSL does not have (it reads hp_percent and hit_count only)."
+      "reason": "\"When an ally character uses a Follow-Up ATK, the wearer gains 1 stack of 'Merit,' stacking up to 5 time(s). Each stack ... increases the DMG dealt by the wearer's Follow-Up ATKs by 5%. When there are 5 stacks, additionally increases the wearer's CRIT DMG by 25%.\" The trigger (FOLLOW_UP, filtered with `actor != self` for 'an ally'), the stacking counter and the follow-up-only damage boost (FOLLOW_UP_DAMAGE_BOOST, added for set 115) are all expressible now. Still blocking: the 'when there are 5 stacks, additionally ...' half needs a condition on the wearer's own STACK COUNT, which the DSL does not have -- `self_attr` reads attribute values, and a stack is a modifier on an attribute, not an attribute."
+    }
+  ],
+  "316": [
+    {
+      "require": 2,
+      "ability": "Ability53161",
+      "reason": "\"Increases the wearer's SPD by 6%. When the wearer hits an enemy target that has Fire Weakness, the wearer's Break Effect increases by 20% for 2 turn(s).\" The SPD is the `properties` stat (SpeedAddedRatio 0.06). What is missing is a condition on the TARGET's weakness element: the DSL can ask about named states and about the target's debuff count, but a weakness is a property of the enemy (`Enemy.isWeakTo(element)`), and no condition variable exposes it."
+    }
+  ],
+  "317": [
+    {
+      "require": 2,
+      "ability": "Ability53171",
+      "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
+    }
+  ],
+  "318": [
+    {
+      "require": 2,
+      "ability": "Ability53181",
+      "reason": "\"Increases the wearer's CRIT DMG by 16%. When the wearer has a summon on the field, increases the wearer's CRIT DMG by an extra 16%.\" The CRIT DMG is the `properties` stat (CriticalDamageBase 0.16). What is missing is a condition on 'I have a summon on the field'. ⚠ This is OUR side's summons: P9-4 gave the engine enemy-camp summons, but a player-side Summon has nowhere to be placed yet (Battle.characters is List<Character> -- the friendly half of L-8), so this entry waits on that, not on a condition."
+    }
+  ],
+  "319": [
+    {
+      "require": 2,
+      "ability": "Ability53191",
+      "reason": "\"Increases the wearer's Max HP by 12%. When the wearer's Max HP is equal to or higher than 5000, increases the CRIT DMG of the wearer and their memosprite by 28%.\" The Max HP is the `properties` stat (HPAddedRatio 0.12) and the threshold became expressible on 2026-09-27 (`self_attr:HEALTH >= 5000` -- a base attribute, so the literal is absolute). What blocks it is the memosprite clause: the ability is a disjunction over both units, so the wearer's half alone would under-trigger it."
+    }
+  ],
+  "320": [
+    {
+      "require": 2,
+      "ability": "Ability53201",
+      "reason": "\"Increases the wearer's SPD by 6%. When the wearer's SPD is equal to or higher than 135/180, increases the healing done by the wearer and their memosprite by 12%/20%.\" The SPD is the `properties` stat (SpeedAddedRatio 0.06) and the threshold became expressible on 2026-09-27 (`self_attr:SPEED`), and a healing boost attribute exists (OUTGOING_HEALING_BOOST). What blocks it is the memosprite clause. (The 135/180 pair is not an extra gap -- an upper bound makes the tiers exclusive, see set 311.)"
     }
   ],
   "321": [
@@ -165,11 +282,46 @@
       "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" The stacking counter is now expressible, but there is no condition on the battlefield's party size (and no memosprite), so the number of stacks cannot be derived from anything."
     }
   ],
+  "322": [
+    {
+      "require": 2,
+      "ability": "Ability53221",
+      "reason": "\"Increases the wearer's ATK by 12%. When the wearer's ATK is equal to or higher than 2400/3600, increases the DoT dealt by the wearer by an extra 12%/24%.\" The ATK is the `properties` stat (AttackAddedRatio 0.12) and the threshold became expressible on 2026-09-27 (`self_attr:ATTACK`, a base attribute so the literal is absolute). What blocks it is that no attribute raises DoT damage alone -- the boost family has all-type, per-element and per-cast-category members, but no DoT-only one. (The 2400/3600 pair is not an extra gap -- an upper bound makes the tiers exclusive, see set 311.)"
+    }
+  ],
+  "323": [
+    {
+      "require": 2,
+      "ability": "Ability53231",
+      "reason": "\"Increases the wearer's CRIT Rate by 8%. While the wearer's memosprite is on the field, increases all allies' SPD by 12%. This effect cannot be stacked.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08) and the party-wide SPD boost is expressible. What blocks it is the memosprite presence condition (our side's summons -- see set 318)."
+    }
+  ],
+  "324": [
+    {
+      "require": 2,
+      "ability": "Ability53241",
+      "reason": "\"Increases the wearer's CRIT DMG by 16%. If the wearer consumes 4 or more Skill Points in a single turn, increases the wearer's CRIT DMG by an extra 16% for 3 turn(s).\" The CRIT DMG is the `properties` stat (CriticalDamageBase 0.16), and SKILL_POINT_SPENT exists as an event. What is missing is a count WITHIN one turn: a rule cannot accumulate 'skill points spent since this turn began' and compare it to 4, because the effect vocabulary has no accumulator and the firing limits are per-rule cooldowns, not per-turn tallies."
+    }
+  ],
+  "325": [
+    {
+      "require": 2,
+      "ability": "Ability53251",
+      "reason": "\"Increases the wearer's Elation by 8%. When the wearer's Elation reaches 30%/60% for the first time in battle, increases the wearer's CRIT DMG by 15%/30%.\" The Elation is the `properties` stat (ElationDamageAddedRatioBase 0.08), and the 'first time in battle' limit is expressible (`once_per_battle`). What blocks it is the Elation system itself: 欢愉度 is a resource the engine does not model (engine.md 18.4), so there is nothing for the threshold to read. (The two thresholds are not an extra gap -- an upper bound makes the tiers exclusive, see set 311.)"
+    }
+  ],
+  "327": [
+    {
+      "require": 2,
+      "ability": "Ability53271",
+      "reason": "\"Increases the wearer's CRIT Rate by 8%. Upon entering battle, if the wearer and another ally are both Trailblazer-path characters, increases the wearer's CRIT DMG by 24%.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08). What is missing is a condition on the PARTY's composition -- 'another ally of the Trailblazer Path' needs the rule to see its teammates (same gap as sets 312 and 314)."
+    }
+  ],
   "328": [
     {
       "require": 2,
       "ability": "Ability53281",
-      "reason": "\"When entering combat, if the wearer's Max Energy is greater than or equal to 200, for every 1 excess point, increases the wearer's DMG dealt by 0.2%, up to a max increase of 32%.\" Needs a condition on the wearer's Max Energy, an amount that scales with a character value per point, and a cap on the accumulated result -- none of which the DSL or MODIFY_ATTR has."
+      "reason": "\"When entering combat, if the wearer's Max Energy is greater than or equal to 200, for every 1 excess point, increases the wearer's DMG dealt by 0.2%, up to a max increase of 32%.\" The Max Energy threshold arrived on 2026-09-27 (`self_attr:MAX_ENERGY >= 200`). What still blocks it is the per-point scaling with a cap: the amount must be '0.2% x (my Max Energy - 200), at most 32%', and MODIFY_ATTR takes a literal amount with no arithmetic (and the rule itself cannot compute a cap)."
     }
   ]
 }
