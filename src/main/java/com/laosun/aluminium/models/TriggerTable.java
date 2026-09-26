@@ -505,11 +505,22 @@ public class TriggerTable {
      * @param target   the event's subject (may be {@code null})
      * @param hitCount how many targets an attack connected with (0 for non-attack events)
      * @param amount   the event's magnitude where it has one (energy credited, damage dealt, ...)
+     * @param damage   the instance being settled, for the one event that has one
+     *                 ({@link TriggerEvent#DEALING_DAMAGE}); {@code null} everywhere else
      */
-    public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount) {
+    public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
+                                 Damage damage) {
+
+        /**
+         * The context of an event that carries no damage instance — i.e. every event but
+         * {@link TriggerEvent#DEALING_DAMAGE}.
+         */
+        public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount) {
+            this(owner, actor, target, hitCount, amount, null);
+        }
 
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0);
+            return new TriggerContext(owner, actor, null, 0, 0, null);
         }
     }
 
