@@ -137,9 +137,7 @@ public final class TriggerInterpreter {
                 requireDuration(effect, op, spec);
                 requireStackCap(effect, op, spec);
             }
-            default -> {
-                requireNoStackArguments(effect, op, spec);
-            }
+            default -> requireNoStackArguments(effect, op, spec);
         }
     }
 
