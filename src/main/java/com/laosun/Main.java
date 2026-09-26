@@ -19,6 +19,7 @@ import com.laosun.aluminium.models.Skill;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.ai.TargetSelector;
 import com.laosun.aluminium.models.buffs.CounterMechanic;
+import com.laosun.aluminium.models.buffs.DotBuff;
 import com.laosun.aluminium.models.buffs.SuperBreakBuff;
 
 import java.util.ArrayList;
@@ -363,7 +364,8 @@ public class Main {
                 + " HP " + fmt(target.getCurrentHp()) + "/" + fmt(target.getMaxHp())
                 + ", toughness " + fmt(target.getStance()) + "/" + fmt(target.getMaxStance())
                 + (target.isBroken() ? " [Break " + target.getBrokenElement() + "]" : "")
-                + (target.getDots().isEmpty() ? "" : "  DOT×" + target.getDots().size()));
+                + (target.getBuffManager().countBuffs(DotBuff.class) == 0
+                        ? "" : "  DOT×" + target.getBuffManager().countBuffs(DotBuff.class)));
         if (target.isDeath()) {
             System.out.println("        → " + target.getName() + " defeated");
         }

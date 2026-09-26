@@ -421,6 +421,14 @@ public final class Constant {
      *
      * <p><b>Derived from {@link #BREAK_EFFECTS}</b> rather than listed a second time, so "which elements
      * have a DOT" cannot disagree with the effect table.
+     *
+     * <p>⚠ <b>No engine code reads this any more.</b> {@code Battle.attachBreakDot} asks
+     * {@link BreakEffect#hasDot()} of the element's own entry, which is the single judgement point —
+     * and since this set is derived from that same table, the two can never disagree. It survives as a
+     * convenience for callers that want the list (tests do: {@code BreakEffectTableTest}); do not
+     * reintroduce it as a decision input at a call site, or the "one judgement point" property is lost
+     * again. (P10-0 note: the DOT itself is an ordinary {@code DotBuff} in the buff system now, so
+     * "which elements get one" is the only thing this constant is about.)
      */
     public static final Set<DamageElement> DOT_ELEMENTS = BREAK_EFFECTS.entrySet().stream()
             .filter(entry -> entry.getValue().hasDot())

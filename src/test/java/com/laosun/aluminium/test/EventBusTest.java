@@ -9,7 +9,7 @@ import com.laosun.aluminium.models.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Dot;
+import com.laosun.aluminium.models.buffs.DotBuff;
 import com.laosun.aluminium.models.Enemy;
 import com.laosun.aluminium.models.EnemyFactory;
 import com.laosun.aluminium.models.Skill;
@@ -333,7 +333,7 @@ public class EventBusTest {
         Probe probe = attachProbe(enemy);
 
         enemy.takeDamage(enemy.getCurrentHp() - 1);      // leave 1 HP
-        enemy.addDot(new Dot(hero, DamageElement.FIRE, 9999, 3));
+        enemy.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 9999, 3));
 
         battle.tickDots(enemy);
 
