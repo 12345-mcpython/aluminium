@@ -149,6 +149,33 @@ public enum SkillCategory {
     }
 
     /**
+     * The <b>scoped damage-boost</b> attribute this kind of cast feeds, or {@code null} when the category is
+     * not an in-battle cast.
+     *
+     * <p>This is the mapping behind 「普攻/战技/终结技造成的伤害提高 X%」: the damage instance carries the
+     * category of the cast that produced it, and {@code Battle.assemble} asks here which attribute to add to
+     * the DMG-boost zone. It lives in this enum because this is already the single place that turns a data
+     * {@code attack_type} into engine semantics — and because the {@code switch} forces a new category to
+     * take a stand instead of silently falling through.
+     *
+     * <p>{@code null} for everything else, deliberately: a technique or map attack happens outside battle, a
+     * talent/follow-up has an empty {@code attack_type} (and follow-up damage has its own
+     * {@link AttributeType#FOLLOW_UP_DAMAGE_BOOST}, gated on the damage type instead), and an assist or
+     * elation instance is not one of the three casts the game's text names. Returning a boost for those
+     * would be exactly the silent over-application this project keeps hunting.
+     *
+     * @return the attribute to read off the attacker, or {@code null} for "no scoped boost"
+     */
+    public AttributeType damageBoost() {
+        return switch (this) {
+            case NORMAL -> AttributeType.BASIC_ATTACK_DAMAGE_BOOST;
+            case BPSKILL -> AttributeType.SKILL_DAMAGE_BOOST;
+            case ULTRA -> AttributeType.ULTIMATE_DAMAGE_BOOST;
+            default -> null;
+        };
+    }
+
+    /**
      * Parses a string from the data into the enum, **case-insensitively** and trimming whitespace.
      *
      * <p>Parsing rules:

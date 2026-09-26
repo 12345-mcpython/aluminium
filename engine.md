@@ -87,6 +87,7 @@
 | 元素增伤（7 个） | `PHYSICAL_` `FIRE_` `ICE_` `THUNDER_` `WIND_` `QUANTUM_` `IMAGINARY_DAMAGE_BOOST` |
 | 通用 | `ALL_DAMAGE_TYPE_BOOST` |
 | 追加攻击专属 | `FOLLOW_UP_DAMAGE_BOOST`（只在 `DamageType.ADDITIONAL` 时进增伤区） |
+| 攻击类型专属（3 个） | `BASIC_ATTACK_` / `SKILL_` / `ULTIMATE_DAMAGE_BOOST`（按 `Damage.getCastCategory()` 进增伤区，见 §18.2） |
 | 穿透 | `DAMAGE_PENETRATION`（抗性区用） `DEFENCE_IGNORE`（防御区用） |
 | 欢愉 | `ELATION_DAMAGE_BOOST` ⚠️定义了但全仓库无读取者 |
 
@@ -181,9 +182,13 @@ Damage = skillBaseValue
 `Battle.assemble` 固定 5 步：
 
 1. **增伤区**：`getBoostByElement(element)` 拿元素增伤属性 + `ALL_DAMAGE_TYPE_BOOST`；
-   若 `damage.getType() == ADDITIONAL`（追加攻击）再叠加 `FOLLOW_UP_DAMAGE_BOOST`。
+   若 `damage.getType() == ADDITIONAL`（追加攻击）再叠加 `FOLLOW_UP_DAMAGE_BOOST`；
+   若这段伤害来自一次战斗内施放，再按 `damage.getCastCategory()` 叠加
+   `BASIC_ATTACK_` / `SKILL_` / `ULTIMATE_DAMAGE_BOOST`（「普攻/战技/终结技造成的伤害提高」，§18.2）。
    ⚠ **"追加攻击专属增伤"必须是一条独立属性**，不能拿 `ALL_DAMAGE_TYPE_BOOST` 顶替 ——
    后者会把普攻/战技/终结技也一起抬高，而遗器套装 115 的文案只说 Follow-Up ATK。
+   ⚠ 同理，**"普攻增伤"也必须是独立属性**：普攻与战技都是 `DamageType.NORMAL`，靠 `type` 分不开，
+   只能靠 `Damage` 上那个显式的施放类别。三条属性都加算进**同一个** `BoostArea`，即 `1 + Σ(…)`。
 2. **暴击区**：仅当 `type.isCrittable() && !damage.isCritFixed()` 时掷骰
    （`critRate > 0 && rng.nextDouble() < critRate`）。**这是全引擎唯一的随机点。**
 3. **防御区**：攻击者等级 / 受击者防御 / 攻击者 `DEFENCE_IGNORE`。
@@ -2071,7 +2076,7 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | §附录 3 扩散/弹射有伤害分裂比 | `stance_list` 的 `spread` / 弹射按段分摊（削韧侧已做） |
 | §附录 4 持续伤害"先上先结算" | `DotBuff` 挂在 `BuffManager.buffs`（`List`），`allBuffsOf` 按挂载顺序返回快照，`tickDots` 据此迭代 |
 
-### 18.2 规格要求"加算进同一区"，引擎的容器结构支持，但**攻击类型增伤还没做** ⚠️
+### 18.2 攻击类型增伤 ✅（2026-09-27）
 
 `HSR.md` §2.2 的两条括号里各有**两个来源**：
 
@@ -2082,20 +2087,24 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 **引擎现状（按字段核实）**：
 
-- **伤害类型增伤/易伤**：✅ 有。`Battle.assemble` 按元素拿 `FIRE_DAMAGE_BOOST` 一类的属性 +
+- **伤害类型增伤**：✅ `Battle.assemble` 按元素拿 `FIRE_DAMAGE_BOOST` 一类的属性 +
   `ALL_DAMAGE_TYPE_BOOST`，一起 `addBoost` 进**同一个** `BoostArea`，符合 `1 + Σ(…)`。
-- **攻击类型增伤/易伤**（"战技增伤/终结技增伤/追加攻击增伤"）：❌ **完全没有**。
-  全仓库 grep `skill_type` / `ATTACK_TYPE` / `bySkillType` **零命中** ——
-  既没有对应属性，也没有"按技能类型过滤"的机制。
+- **攻击类型增伤**（「普攻 / 战技 / 终结技造成的伤害提高」）：✅ **已做**。
+  三条属性 `BASIC_ATTACK_` / `SKILL_` / `ULTIMATE_DAMAGE_BOOST` 加算进**同一个**增伤区；
+  选哪一条由 `Damage.getCastCategory()` 决定 —— 这个事实**必须显式携带**，因为普攻与战技都是
+  `DamageType.NORMAL`，`type` 根本分不开。（上一版这一节把 `DamageType` 写成
+  "NORMAL/SKILL/ULTRA/…"，正是这处混淆的痕迹：`DamageType` 说的是**伤害种类**，不是施放类别。）
+- **攻击类型易伤**（「受到战技伤害提高」）：❌ 仍没有 —— 易伤区还没有"按施放类别过滤"的那一路。
+- **追加攻击**：✅ 走 `FOLLOW_UP_DAMAGE_BOOST`，**按伤害类型**（`DamageType.ADDITIONAL`）判，
+  不是按施放类别；所以"由普攻触发的追加攻击"拿的是追加攻击增伤，不会顺带拿普攻增伤。
 
-所以 ROADMAP 里"这类效果**直接往 `BoostArea` 灌**（Buff 侧按 skill_type 过滤）"这句话，
-前半句（灌进同一个区）是对的、容器结构支持，**后半句（按 skill_type 过滤）目前没有任何实现**：
-`Damage` 上除了 `type`（`DamageType`：NORMAL/SKILL/ULTRA/…）之外没有"攻击类型"标签，
-Buff 也拿不到"这一段是用什么槽位打出来的"。
+**落地口径（故意的保守）**：只有**施放本身那一段**伤害携带施放类别；击破 / 超击破 / DOT /
+附加伤害 / 真实伤害一律 `UNSPECIFIED`。否则「战技造成的伤害提高」会悄悄变成"战技引起的击破伤害
+也提高" —— 要那种口径得单独拍板，不能当作接线的副作用。
 
-要落地这条，至少需要：① `Damage` 带上技能槽位/攻击类型；② Buff 的 `onDamage`
-能读到它（目前 `DamageEvent.onDamage(Battle, Damage)` 只有这两个参数，读得到）；
-③ 一套"这个 buff 只对某类攻击生效"的过滤规则。这属于 P8-2/P8-7 的范围。
+**变异验证**：`SkillExecutor` 不透传类别 → 3 红；映射写错 → 3 红；三条属性全指向同一条 → 4 红
+（含"不能碰战技"那条，也就是"作用域"这个性质本身）；`assemble` 不读类别 → 3 红。
+契约：`DamageScopeBoostTest` 8 条。
 
 ### 18.3 实现方式不同，需要注意口径
 
