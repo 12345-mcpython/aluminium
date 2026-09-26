@@ -14,6 +14,7 @@ import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.StunBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
@@ -1893,12 +1894,101 @@ public class Battle {
     }
 
     private void removeDeadCombatants() {
+        perishOrphanedSummons();                     // P9-4: a summon goes when its master does
         for (Signal signal : queue.snapshot()) {
             if (signal.getCanHit().isDeath()) {
                 queue.removeCombatant(signal.getCanHit());
             }
         }
         checkResult();                               // P7-3: decide the outcome right after clearing the corpses
+    }
+
+    /**
+     * Defeats every summon whose master is already down (P9-4).
+     *
+     * <p>This runs at the top of {@link #removeDeadCombatants}, so the sweep right after it takes the
+     * orphan off the action bar in the same pass — the summon stops acting, stops being targetable, and
+     * stops counting as a survivor for {@link #checkResult}, all through the ordinary
+     * {@link CanHit#isDeath()} channel rather than a second notion of "no longer here".
+     *
+     * <p><b>Why {@code perish} and not a {@code takeDamage} call.</b> The minion left, it was not beaten
+     * down: {@code perish} keeps its HP, so nothing downstream is told "it was hurt". Where the
+     * reward-free property actually comes from is worth stating precisely, because it is easy to get
+     * backwards — {@code CanHit.takeDamage} fires <b>no</b> events either; {@code HpLoss}/{@code Kill} are
+     * emitted by {@link #applyDamage}, the pipeline's single settlement entry point. So what keeps a
+     * vanishing minion from paying out every on-kill talent in the game is that this sweep runs
+     * <b>outside</b> that entry point. See {@link CanHit#perish()}.
+     *
+     * <p>The orphan is deliberately <b>left in {@code enemies}</b>, like any other corpse — the roster
+     * records who was in the fight, and "is it alive" is asked through {@code isDeath()}
+     * ({@code targetableEnemies} / {@code aliveEnemies} / {@code checkResult} all do exactly that). A
+     * master who is merely absent from that roster does <b>not</b> orphan anything: death is the signal,
+     * because it is the one thing every removal path in the engine sets.
+     */
+    private void perishOrphanedSummons() {
+        for (CanHit unit : enemies) {
+            if (unit instanceof Summon summon && !summon.isDeath()
+                    && summon.getMaster() != null && summon.getMaster().isDeath()) {
+                summon.perish();
+            }
+        }
+    }
+
+    /**
+     * Brings a summon onto the field (P9-4).
+     *
+     * <p>The summon comes from real monster data ({@code SummonFactory}, keyed by {@code monster_config.json}
+     * — so {@code monster_config.json}'s {@code summon_id} roster on the master tells you the candidates and
+     * this call picks one). It joins the master's camp and enters the action bar through the same door a
+     * wave does, so it acts from the <b>current</b> action value rather than restarting a round.
+     *
+     * <p><b>What is deliberately explicit.</b> The level group is a parameter, not something inferred: a
+     * monster's own {@code hard_level_group} is almost always 1 and the <em>stage</em> is what decides
+     * difficulty, so there is nothing here to guess it from. Guessing is how the project once got a
+     * silently-empty skill point policy (see ROADMAP §5 lesson 3) — a wrong answer with nothing to see is
+     * worse than a required argument.
+     *
+     * <p><b>Only an enemy-camp master, for now.</b> Our own roster is {@code List<Character>}
+     * ({@link #characters}), which cannot hold a {@link Summon}, so a player-side summon has nowhere to be
+     * placed — the friendly half of L-8 was never done. That is refused <b>loudly</b> rather than filed
+     * under {@code enemies}: putting our own summon there would make it a legal target for our own attacks
+     * and would count it as an enemy for the victory check, a wrong answer that nothing would report.
+     * Memosprites (忆灵) need that roster widened first; see the P9-4 remainder.
+     *
+     * @param master         the unit calling the summon; supplies the camp, and the level
+     * @param summonId       the summon's own monster id (a key of {@code monster_config.json})
+     * @param hardLevelGroup the stage's hard level group
+     * @return the summon, already in the camp roster and queued to enter the action bar
+     * @throws IllegalArgumentException if the master is null or already down, if the master is not on the
+     *                                  enemy camp, or if the summon id / level group is unknown
+     */
+    public Summon summon(CanHit master, int summonId, int hardLevelGroup) {
+        if (master == null) {
+            throw new IllegalArgumentException("A summon (" + summonId + ") needs a master to belong to");
+        }
+        if (master.isDeath()) {
+            throw new IllegalArgumentException(
+                    "A dead master cannot summon (" + master.getName() + " -> " + summonId + "): the summon "
+                            + "would enter already orphaned, and the very next removeDeadCombatants would "
+                            + "take it straight back out, so the call could never do anything");
+        }
+        if (master.getCamp() != Camp.ENEMY) {
+            throw new IllegalArgumentException(
+                    "Only an enemy-camp master can summon for now (master " + master.getName() + " is "
+                            + master.getCamp() + ", summon " + summonId + "): our side's roster is "
+                            + "List<Character>, which cannot hold a Summon, so a player-side summon has "
+                            + "nowhere to be placed -- that roster has to be widened first (the friendly "
+                            + "half of L-8). Filing it under `enemies` instead would make our own summon "
+                            + "attackable by us and count it as an enemy for the victory check");
+        }
+        Summon summon = SummonFactory.create(summonId, master.getLevel(), hardLevelGroup, master.getCamp());
+        summon.setMaster(master);
+        enemies.add(summon);
+        addRequestItems.add(summon);                 // processRequests pushes it into the action bar
+        // The constructor wires the speed listener for the opening roster only; a unit admitted later
+        // needs it too, otherwise a speed buff on it would never reorder the action bar.
+        summon.setSpeedChangeListener(this::onSpeedChanged);
+        return summon;
     }
 
     public List<Signal> getQueueSnapshot() {

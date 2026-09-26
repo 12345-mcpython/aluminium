@@ -81,6 +81,17 @@ public class Enemy extends CanHit {
     private DamageElement stanceType;
 
     /**
+     * This monster's summon roster (P9-4): the monster ids it may bring onto the field, straight from
+     * {@code monster_config.json}'s {@code summon_id} (non-positive entries already dropped at load).
+     *
+     * <p>An empty roster is the norm (1957 of 2649 monsters) and means "this monster summons nothing".
+     * Keeping the roster on the instance rather than looking the config up again at summon time means the
+     * <b>caller</b> can decide when, without also having to know which table the data came from — the same
+     * split as {@link #phases} (data here, timing in the caller).
+     */
+    private List<Integer> summonIds = List.of();
+
+    /**
      * Whether it is in the broken state (judged in P4-2, recovered in P4-4).
      */
     private boolean broken;

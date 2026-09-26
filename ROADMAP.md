@@ -4,9 +4,10 @@
 [turnbasedgamedata](https://gitlab.com/Dimbreath/turnbasedgamedata)，经 `E:\code\python\generate_data.py`
 解析到 `src/main/resources/data/`。
 
-**当前状态（2026-09-23）**：53 个测试类 / 494 个用例全绿；demo 跑通一场三对三战斗
-（10 轮 / 43 次行动，我方胜利）。引擎侧基础机制（伤害流水线、韧性击破、能量、战技点、
-行动条、关卡波次、角色真实面板）已完成；**A 层"角色机制 = 数据"的通路也已打通**
+**当前状态（2026-09-27）**：**87 个测试类 / 780 个用例全绿**；demo 跑通一场三对三战斗
+（10 轮 / 43 次行动，我方胜利），`run --args="mechanics"` 三幕演示不变。
+引擎侧基础机制（伤害流水线、韧性击破、能量、战技点、
+行动条、关卡波次、角色真实面板、敌方召唤物）已完成；**A 层"角色机制 = 数据"的通路也已打通**
 （事件 → 触发器表 → 解释器，`engine.md` §4.6/§4.7），剩下的全部是
 "把已有口子填满""接数据"或"填内容"。**当前在做的就是"填口子"：`P10-3` 前半已落地**。
 
@@ -103,7 +104,7 @@
 
 | 文件 | 内容 | 已确认锚点 |
 |---|---|---|
-| `monster_config.json` | 怪物实例：`monster_id → {name, template_id, elite_group, hard_level_group, stance_weak, *modify_ratio, damage_resistance, debuff_resistance, summon_id}` | **1002011 冰锋**：弱 `[Fire, Thunder]`，抗 5 项 0.2，`STAT_CTRL_Frozen=1` |
+| `monster_config.json` | 怪物实例：`monster_id → {name, template_id, elite_group, hard_level_group, stance_weak, *modify_ratio, damage_resistance, debuff_resistance, summon_id}` | **1002011 冰锋**：弱 `[Fire, Thunder]`，抗 5 项 0.2，`STAT_CTRL_Frozen=1`；**1003010 银鬃尉官**：`summon_id = [1002040, 1002040]`（692/2649 只怪有非空召唤名单） |
 | `monster_template_config.json` | 模板基础属性 | **1002011**：atk 18 / def 210 / hp 69.75 / spd 100 / stance 60 / 效果抵抗 0.2 |
 | `hard_level_group.json` | `{组: {等级: {attack, defence, health, speed, stance, effect_hit_rate, effect_resistance}}}` | 组1 Lv90 `{36.821384, 5.238095, 236.53471, 1.32, 1, 0.32, 0.1}` |
 | `breaking_rate.json` | 等级 → 击破基数（**原始 10 倍值**） | Lv80 = 3767.5535 → 公式里 `/10` |
@@ -164,6 +165,7 @@
 | **按血条缩放的治疗/护盾** | **「恢复等同于生命上限 X%」= 数据**（2026-09-27）：`HEAL` / `SHIELD` 支持 `scale` + `percent`，两种写法封闭 —— `target_max_hp`（**受治疗者**自己的血条）与 `owner_max_hp`（**规则持有者**的血条，即 `skill_effects.json` 里的 `healer_max_hp`）。量在**目标循环里逐人算**（我方全体回 8% 是每人各自的 8%，不是一个数）。遗器套装 106 的 4 件套因此可建模（未建模 26→25） |
 | **负面效果** | **「解除 N 个负面效果」+「有 X% 固定概率」= 数据**（2026-09-27）：新增 `DISPEL`（最新的先走，取不到不算错）、条件变量 `target_debuff_count`、规则字段 `chance`（掷骰用战斗注入的 `Random`；**掷骰失败不消耗冷却**）。"什么算负面"由每个 buff 类回答（`AbstractBuff.isDebuff()`，默认 false 是安全方向），五个 debuff 类的答案在 `DebuffTest` 里列表钉住。克拉拉 1107 的 家人 行迹（「受到攻击时 35% 固定概率解除自身 1 个负面效果」）是第一个用户 |
 | **星魂** | **星魂机制 = 数据 + 一道门槛**（2026-09-27）：`CharacterFactory.create(..., eidolonRank)` 由装配点决定生效等级（0–6，越界直接抛），规则字段 `min_eidolon: N` 让"这条属于星魂"写在**机制旁边**；引擎依旧不认识星魂，`eidolons.json` 只作溯源材料（规则 `source` 引用它）。第一个用户是**布洛妮娅星魂 1**（50% 概率 +1 战技点、1 回合冷却）—— 即 `F-4` 里挂了很久的那条，见 `engine.md` §9 |
+| **敌方召唤物** | **召唤物能真的上场了**（2026-09-27，P9-4）：`monster_config.summon_id`（**692/2649 只怪有非空名单**）→ `Enemy.summonIds` → `SummonFactory`（复用 `EnemyFactory.resolve` 的缩放链）→ `Battle.summon(master, summonId, group)`；**主人倒下带走它**。⚠ 两处别记反：①退场**不付击杀奖励**，原因是这次清扫跑在 `Battle.applyDamage`（唯一结算入口）**之外** —— 不是"`takeDamage` 会发事件"（它一个都不发，这正是一条被变异测试纠正的错判，见 `engine.md` §6.2）；②`CanHit.perish()` 只负责"别谎报它受了伤"（**HP 不变**）。只做**敌方**阵营：我方主人被**响亮拒绝**（`battle.characters` 是 `List<Character>`，塞进 `enemies` 会让我方召唤物被自己人打、还按敌人算胜负）。`SummonTest` 18 条，见 `engine.md` §24 |
 | **伤害实例条件** | **「对处于 X 状态的目标造成的伤害提高」= 数据**（2026-09-27）：新增结算**前**事件 `DEALING_DAMAGE`（唯一携带 `Damage` 的事件）+ `BOOST_DAMAGE`（只改这一次，不挂 buff、不漏到下一击）；`has_state` 同时认下**四种 DoT 状态名**（灼烧/触电/裂伤/风化 = `DotBuff(element)`，不是 `StateBuff`）。这一条家族是普查里最大的（约 60 个行迹节点），此前完全无法表达 |
 | **DOT 并入 buff 体系** | **DOT 不再是第二套机制**（P10-0）：`DotBuff extends AbstractBuff`，删掉 `models/Dot` / `Enemy.dots` / `tickDots(Enemy)`；角色与敌人走同一条 DOT 路径，demo 数值逐位不变，见 `engine.md` §8.5 |
 | **击破控制状态** | **控制 = 数据组合，不是新类**（P10-2）：`ControlEffect` 表 + `StunBuff`/`StatModifierBuff`/`delayMovePercent` 三个现成原语；冰=锁行动、量子/虚数=减速+推条；**冻结"+30% 受伤"被数据推翻**（原文是每回合冰伤），见 `engine.md` §8.6 |
@@ -181,7 +183,7 @@
 | 开局战技点可变（F-2） | ✅ **已接线**：过客 4 件套开局 **3 → 4**（套装 ability 走触发器表，有用例钉住） | — |
 | 强化普攻的战技点 | 一刀切 +1：对青雀对、**对波提欧错** | F-3，数据补全 |
 | 敌人技能不发事件 | `EnemySkill` 不走 `SkillExecutor`，故不发 `SkillCastEvent` | P9-2 对齐 |
-| **非伤害技能分派** | ✅ **已修**（P10-3 引擎侧）：`resolveHits` 不再静默 return，`dispatchNonDamaging` 按 `skill_effects.json` 分派 `Restore`/`Defence`（26/40 条可用），`Main` 的手搓算术已收回引擎 | **P10-3 引擎侧完成**；`BUFF`/`CONTROL`/`SUMMON` 与另外 14 条缺数据 |
+| **非伤害技能分派** | ✅ **已修**（P10-3 引擎侧）：`resolveHits` 不再静默 return，`dispatchNonDamaging` 按 `skill_effects.json` 分派 `Restore`/`Defence`（26/40 条可用），`Main` 的手搓算术已收回引擎。`SUMMON` **能力侧已补**（P9-4：`Battle.summon`），仍缺"这次召唤召谁"的数据列；`BUFF`/`CONTROL` 与另外 14 条缺数据 | **P10-3 引擎侧完成** |
 
 ### ☐ 待办（见 §7–§9；`P10-3` 引擎侧已完成、`P10-6` 前半完成）
 
@@ -229,6 +231,7 @@ P10-1 说"缺三个控制系"、P10-6 说"几率取 `param_list` 第 3 项"）�
 | 6 | **精英组有两张表** | 普通关卡 `EliteGroup`；无限波次用 `InfiniteEliteGroup`（绝境王虫 ×6.2）。用错血量差几倍；两者都来自**波组** | 本数据暂无 `elite_group.json`，缺省 1 |
 | 7 | **敌人技能数据源缺失** | tbgd **没下发**怪物技能表（`skills.json` 只有角色） | `enemy_skills.json` 自建隔离；目前只覆盖 5 只演示怪、**倍率是猜的**（每条标 `guessed=true`） |
 | 8 | **`stage.json` 9 MB / 2.9 万条** | 塞进静态块等于每次 `Constant` 初始化多付 ~35 MB 堆 + 72 ms | 懒加载 `Constant.stages()`，**缺失时返回空表而不抛异常** |
+| 9 | **`summon_id` 里的 `0` 是"没有召唤物"，不是怪物 0** | 该列是列表（1957 只怪是 `[]`，692 只有内容），但 405301004 的列表恰好是 `[0]` | 装载期（`normalizeMonsterConfigs`）只保留正数；**不要**改成"跳过查不到的 id"——那会让数据错误与"没有召唤物"长得一样。`SummonTest` 钉住 |
 
 > ⚠ `monster_attack_modify_ratio.json` 在 `.gitignore` 排除的 `data/` 里，但**已 `git add -f`**
 > （否则新克隆缺文件、`MonsterDataTest` 直接红）。
@@ -659,25 +662,44 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
   `condition "hp<0.5"` 满血时选不到。
 - **依赖**：P9-2、P5-5
 
-### P9-4 召唤物（`summon_id` 机制）
+### P9-4 召唤物（`summon_id` 机制）✅ 敌方阵营已落地（2026-09-27）
 
-- **⚠ 结构障碍已清除（2026-09-26，L-8）**：`Battle.enemies` 曾是 `List<Enemy>`，敌方召唤物**无处安放**。
-  现在是 `List<CanHit>`，`enemyUnits()` 才是"其中的怪"；引擎的目标表与胜负判定都按**整阵营**走。
-  能力回归：`EnemyCampSummonTest` 4 条（含"打死所有怪但召唤物还站着不算赢"）。
-  **剩下的都是内容活**：谁来创建召唤物（`monster_config.summon_id` / `SkillEffectType.SUMMON`）、
-  面板快照、连携攻击、我方召唤物入场。
+> **⚠ 结构障碍已清除（2026-09-26，L-8）**：`Battle.enemies` 曾是 `List<Enemy>`，敌方召唤物**无处安放**。
+> 现在是 `List<CanHit>`，`enemyUnits()` 才是"其中的怪"；引擎的目标表与胜负判定都按**整阵营**走。
+> 能力回归：`EnemyCampSummonTest` 4 条（含"打死所有怪但召唤物还站着不算赢"）。
 
-- **目标**：`monster_config.summon_id` 生效：敌人技能召唤实体入战，实体可受击、会死亡移除。
-- **涉及文件**：`models/Summon.java`（现有骨架，**全项目没有 `new Summon(...)`**）、新建 `utils/SummonFactory.java`、
-  `Battle.java`、`models/Enemy.java`、新建 `test/SummonTest.java`
-- **怎么做**：
-    1. `SummonFactory.create(summonId, level)`：召唤物同样有 `monster_config` entry →
-       `EnemyFactory.create` + `setSummon(true)`。
-    2. `Battle.summon(boss, summonId)`：进 `enemies` + 走 `addRequestItems` 进场（复用 P7-4 的路，那条**是活的**）。
-    3. 本体重伤 → 召唤物同判移除（`removeDeadCombatants` 清理）。
-- **验收**：`SummonTest`：触发后 `enemies.size()` 增加；召唤物被打死 → 数量回落；本体死 → 全清。
-- **依赖**：P9-2、P5-5、P7-4
-- **注**：**忆灵**（角色专属召唤、面板快照、`DamageType.MEMORY`）是远期，本任务只做通用怪物召唤。
+**落地（2026-09-27）**：机制说明见 `engine.md` **§24**。数据侧 `summon_id` 这一列终于被解析
+（此前 `MonsterConfig` 里根本没有这个字段）。四处与原计划的差异：
+
+1. **新增了 `CanHit.perish()`**，计划里没有。计划写"本体重伤 → 召唤物同判移除"，但**没有"移除"
+   这个操作**：`death` 只在 `takeDamage` 里置位。直接调 `takeDamage` 会发 `HpLoss`/`Kill` ——
+   于是每一个「消灭敌人」天赋都会为一个**没人杀死的**单位付钱。`perish()` 只翻标志位，
+   所以 `SummonTest.aSummonLeavingWithItsMasterIsNotAKill` 与"真杀死会付钱"成对存在。
+2. **`SummonFactory` 放在 `models/enemy/` 而不是 `utils/`**（计划写的是 `utils`）：它要用
+   `EnemyFactory` 的包私有 `resolve` / `statSheet` / `enemySkillFor`，搬到 `utils` 就得抄一份 ——
+   那正是两份缩放规则开始分叉的方式。为此把 `EnemyFactory.create` 的"查配置/查模板/查等级组/缩放"
+   抽成了 `EnemyFactory.resolve`。
+3. **`[0]` 这个数据陷阱**（计划里没有）：405301004 的 `summon_id` 就是 `[0]`，而 0 不是怪物 id。
+   约定在**装载期**一次性执行（只留正数），理由见 §4.1 陷阱 9。
+4. **我方主人的召唤被响亮拒绝**，而不是"先塞进 enemies 凑合"。计划里"我方召唤物入场"被列在
+   "剩下的都是内容活"里，但它其实是**类型问题**：`battle.characters` 是 `List<Character>`，
+   放不下 `Summon`（L-8 只做了敌方那一半）。塞进 `enemies` 会让我方召唤物**被我们自己的攻击打中**
+   且在胜负判定里**算成敌人** —— 一个不报错的错误答案。
+
+**还不做的**（都记在 `engine.md` §24.3）：
+- **忆灵**（我方、独立单位、面板快照、连携攻击）—— 要先放宽 `battle.characters`，属远期。
+- **技能侧 `SkillEffectType.SUMMON` 分派** —— 数据里没有"这次施放召谁"那一列，缺的是**内容**不是能力
+  （能力就是 `Battle.summon`）。
+- **谁来触发召唤** —— 名单只回答"能召谁"，不回答"什么时候召"；调用方（将来的敌方技能 / 阶段表 /
+  敌方 AI）负责。这条与原计划一致。
+
+- ~~**目标**：`monster_config.summon_id` 生效：敌人技能召唤实体入战，实体可受击、会死亡移除。~~
+- ~~**涉及文件**：`models/Summon.java`、新建 `utils/SummonFactory.java`、`Battle.java`、`models/Enemy.java`、新建 `test/SummonTest.java`~~
+- ~~**怎么做**：`SummonFactory.create(summonId, level)`；`Battle.summon(boss, summonId)`；本体重伤 → 召唤物同判移除~~
+- ~~**验收**：`SummonTest`：触发后 `enemies.size()` 增加；召唤物被打死 → 数量回落；本体死 → 全清~~
+  —— **实际验收 18 条**（口径更正：死者**留在 `enemies` 里**是引擎既有约定，"数量回落"看的是
+  活人数而不是列表长度，见 `engine.md` §6.2）
+- **依赖**：P9-2、P5-5、P7-4 ✅
 
 ### P9-5 Boss 机制（phase 换招 / 受击反击 / 控制免疫）
 
@@ -1085,7 +1107,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | # | 位置 | 问题 |
 |---|---|---|
 | H-1 | `Constant.java` | ✅ **已修（2026-09-27）**：加载期用递归助手 `frozen(...)` 把**容器**冻结（`Collections.unmodifiableMap/List` + `LinkedHashMap`/`ArrayList` 保序，**不用 `Map.copyOf` 因为它不保序**）。原文成立：`public static final` 只锁引用，Gson 交回的是可变 `LinkedHashMap`，**嵌套层也一样**（`SKILLS.get(cid)` 是 map、`SKILL_TRACES.get(cid)` 是 list）→ 任何调用方一次 `clear()`/`put()` 就静默污染同 JVM 后续所有消费者。**先核过：全仓无人写这些表**（顶层与嵌套都没有），所以改完不破坏任何调用点。<br>**包了 8 个**：`WEAPONS`/`CHARACTERS`/`SKILL_TRACES`/`SKILLS`/`MONSTER_TEMPLATES`/`HARD_LEVEL_GROUPS`/`BREAKING_RATE`/`ENEMY_SKILLS`；**3 个本来就不变**（`RELIC_SETS` 走 `RelicSets.index` 的 `Map.copyOf`、`MONSTER_CONFIGS`、`ENEMY_SKILLS`）—— 其中 `RELIC_SETS` 我先包了一次，**被 `RelicSetTest` 的 identity 断言（"读一次并缓存"）抓住**，退回不包。<br>⚠ **范围是容器、不是 bean**：bean 里的字段/内部 map 仍可变 —— `RelicMainAttribute.getAttributeByStar` 那两处仍是 **N-11**。<br>**验收**：`ConstantImmutabilityTest` 3 条（顶层 7 张表 + 嵌套 map/list + 读取仍正常）；变异（摘掉一张表的包装 / 助手不递归）**各红一条、零连带**；全套 69 suites / 630 tests 绿；demo 不变；套件耗时仍 3s（加载期一次拷贝，看不出来）。<br>⚠ **踩坑记录**：这条测试的**第一版在失败时是有破坏性的** —— 它用 `clear()`/`put()` 去试，守卫一旦缺失就**真的把 `SKILL_TRACES` 清空**，连带毒死 9 个无关用例（10 红里 9 个是连带）。已改成"成功时也是 no-op"的写法（map 用 `remove(不存在的键)`、list 用 `set(越界下标, …)`），变异才变成干净的各红一条 |
-| H-2 | `Character.java:280-295` | `character_data.json` 的 `max_energy` **从未接进角色** → 数据造的角色 `hasEnergyBar()==false`，回能/大招恒失效（93 个角色的这一列是惰性的）。⚠ 接线时 1407 遐蝶的 `null` 是**设计**（无常规能量条），别 auto-unbox 成兜底数值 |
+| H-2 | `Character.java:280-295` | ✅ **早就修了**（P8-1）：`Character.Builder.build` 现在读 `character_data.json` 的 `max_energy`（`Character.java` 里那行带 P8-1 注释，并写明 **null 必须保持 0 = 没有能量条**，因为 1407 遐蝶的 null 是**设计**而不是缺数据 —— 兜底成 100 会凭空给她造一根能量条）。⚠ 我迁移这张表时照抄了旧状态，见本节开头的警告 |
 | H-6 | `CanHit.java` | ✅ **已修（2026-09-27）**：拷贝构造器现在**逐个 `DoubleValue.clone()`** 深拷属性表（`DoubleValue.clone()` 本来就是真深拷贝，之前只 clone 了数组）。原文的后果成立：buff 会**就地**改 `DoubleValue`（`BoostDamageBuff.applyEffect` 调 `addModifier`），所以挂在副本上的 buff 会出现在**原体**面板上 —— 实测复现。`Character(Character)` 走 `super(other)`，因此一并修好。⚠ **原文说"没拷 `invulnerable`"是误读**：那一块是显式的"不该拷"清单（`death`/`currentEnergy`/`resources` 都归零，因为副本是新战斗的参与者而非战况快照），`invulnerable` 属同一类战斗状态 —— 已**显式赋值 + 写明理由**，不是补拷。回归 `CombatantCopyTest` 3 条（行为 + 对象身份 + 新战斗状态约定）；变异回浅拷贝 → 前两条红、约定那条仍绿。见 §12 顶部的"只做过抽查"警告
 | H-9 | `Battle.startBattle()` | 从未被任何测试调用（曾 23 个测试类 0 次）→ **开场事件链零覆盖**，而"战斗开始回能"是一整类角色机制。建议补 `BattleStartTest` |
 
@@ -1145,7 +1167,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | L-20 | `ExtraBasicPromote.java:14` | 分量顺序 `(health, defence, attack, speed, …)` 与其它模型 `(health, attack, defence)` 不同 → 位置构造会**静默交换 ATK/DEF** |
 | L-21 | `SkillAttackType.java:6` | 枚举 `SINGLE/THREE/ALL` **全仓库零引用**，且值与 `skills.json` 的 `attack_type` 完全对不上 |
 | L-22 | `Relic.java:114`、`MapUtils.java:28,53` | `star <= 2` 把**合法的 2★** 拒了；随机数走 `ThreadLocalRandom`（不可播种）**违反"随机数一律走注入 `Random`"** |
-| L-23 | `Camp`/`Summon` | `getCamp()` 曾全仓库无调用者、`Camp.NEUTRAL` 未用。（L-8 之后召唤物已可入场，但**内容侧仍不创建它** —— 见 P9-4；`getCamp()` 现在有实际读处） |
+| L-23 | `Camp`/`Summon` | `getCamp()` 曾全仓库无调用者、`Camp.NEUTRAL` 未用。（L-8 之后召唤物已可入场，P9-4 之后**内容侧真会创建它了** —— `Battle.summon` + `SummonFactory`；`Battle.summon` 的阵营判断就靠 `master.getCamp()`。`Camp.NEUTRAL` **仍未用**） |
 | L-24 | `beans/Skill.java:11,15` | `skillID` 解析了但从不读取（槽位 id 来自外层 map 键，无人校验一致）；`StanceList` 无 `@SerializedName`，改名会静默读 0 → 削韧恒 0 |
 | L-25 | `SkillEffectType.java:88,97` | `getCategory()` 无调用者；每个常量上的 `@SerializedName` **从不生效**；`BY_STRING` 是可变的 static `HashMap` |
 
@@ -1158,7 +1180,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | N-1 | `DefaultSkill.java:16,10` | `static ConcurrentMap` 把可变对象当共享单例；`SkillData.init` 会在 `computeIfAbsent` **内部抛异常** → 一个 getter 在战斗时抛错且每次重抛；`:10` 的 TODO 说该删这个类，而它是唯一的 `Skill` 生产实现 |
 | N-2 | `Benchmark.java:38` | 读的 `dump_data.json` 仓库里不存在；兜底分支走不到；`main()` 包私有；结果被丢弃 |
 | N-3 | `CanHit.java:99-104` | 同时有 `Runnable` **字段**与**同名方法**（`beforeMove`/`afterMove`/`onBattleStart`）→ 直接调 `MoveEvent.beforeMove(battle)` 会**静默跳过 buff tick**。建议 `setBeforeMoveHook(Runnable)` |
-| N-4 | `Enemy`/`Summon` | 无拷贝构造器：`new Enemy(...)` 走 `CanHit(CanHit)` 会丢掉 `damageResist`/`stanceWeak`/`stance`/`broken` 全部子类字段（`Character` 就正确重写了） |
+| N-4 | `Enemy`/`Summon` | 无拷贝构造器：`new Enemy(...)` 走 `CanHit(CanHit)` 会丢掉 `damageResist`/`stanceWeak`/`stance`/`broken` 全部子类字段（`Character` 就正确重写了）。P9-4 之后丢的还多一个 `summonIds`（召唤名单），`Summon` 则会丢 `master` —— 后者尤其危险：**丢了 master 的召唤物再也不会随主人退场** |
 | N-5 | `RelicSuit.java:153` | `appendAttribute` 是死方法，逐行相同的代码内联在 `appendTo`；"按属性类型分发"逻辑在 `RelicSuit`/`Weapon`/`SkillTrace` **三处复制**。建议下沉 `AttributeBuilder.add(type, value, source)`（顺带消掉 M-19 那 4 处重复守卫） |
 | N-6 | `models/Buff.java:3` | 接口上留着裸 `// TODO`；`Buff.setSource/getSource` 全仓库无人调用，`AbstractBuff.source` 恒 null → **接口契约实际未实现**（`DotBuff` 用了 `setSource`，所以只剩 getter 侧无人读） |
 | N-7 | `BreakDamageCalculator.java:21` | javadoc 例子"30 点普攻 × 2.5 击破加成 = 112.5"在仓库里无法复现，会误导读者以为调用方要预乘 |

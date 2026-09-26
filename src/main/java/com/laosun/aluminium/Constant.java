@@ -710,8 +710,31 @@ public final class Constant {
                 orOne(config.speedRatio()),
                 orOne(config.stanceRatio()),
                 config.damageResistance() == null ? Map.of() : Map.copyOf(config.damageResistance()),
-                config.debuffResistance() == null ? Map.of() : Map.copyOf(config.debuffResistance()))));
+                config.debuffResistance() == null ? Map.of() : Map.copyOf(config.debuffResistance()),
+                // P9-4: the summon roster. `summon_id` is spelled as a list even when a monster has none
+                // (`[]` for 1957 of them) and occasionally as `[0]` for "none" (one monster, 405301004), so
+                // non-positive entries are dropped here -- once, at load time -- rather than at every read.
+                // Deliberately NOT tolerant of unknown ids as well: a roster entry that names no monster is
+                // a data error, and dropping it would turn a broken summon into an absent one (see
+                // MonsterConfig#summonIds).
+                filterPositive(config.summonIds()))));
         return Map.copyOf(normalized);
+    }
+
+    /**
+     * The positive entries of a summon roster, in order; missing field = empty roster.
+     */
+    private static List<Integer> filterPositive(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        List<Integer> kept = new ArrayList<>(ids.size());
+        for (Integer id : ids) {
+            if (id != null && id > 0) {
+                kept.add(id);
+            }
+        }
+        return List.copyOf(kept);
     }
 
     /**
