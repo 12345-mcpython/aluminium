@@ -1,0 +1,21 @@
+{
+  "2": [
+    {
+      "on": "TURN_START",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.32,
+          "turns": 1
+        }
+      ],
+      "source": "relic set 318 (奇想蕉乐园 / Banana Paradise of the Envious), 2-piece: \"Increases the wearer's CRIT DMG by #1[i]%. When the wearer has a summon on the field, increases the wearer's CRIT DMG by an extra #2[i]%.\" param = [0.16, 0.32]",
+      "note": "Only the conditional sentence; the unconditional \"CRIT DMG +16%\" is the effect's `properties` stat (CriticalDamageBase 0.16). ⚠ The extra is 0.32, not 0.16 -- param #2, and the two happen to differ (the registered reason said 16% until this file was written; the parameters are the source, not my reading of the sentence). ⚠ WHY NOT `permanent`: 「当存在装备者召唤的目标时」 is a WHILE condition, and a permanent buff would stay up after the summon died -- a wrong state that nothing reports. It is therefore re-evaluated at each of the wearer's own turn starts and lasts one turn, which is exactly when CRIT DMG matters (the wearer's own attacks): the buff lapses at the next turn boundary if the summon is gone. ⚠ The approximation that remains: a summon that dies mid-turn keeps the buff until that turn ends. `actor == self` is 「装备者」 -- the condition is about the wearer's own summon, not a teammate's."
+    }
+  ]
+}
