@@ -155,7 +155,7 @@
 | 角色 | `CharacterFactory.create(cid, level)` 真实面板（等级缩放/光锥/遗器/行迹/额外加成/元素/命途/仇恨/能量/真实技能） |
 | 其他 | 效果命中与抵抗 / 治疗 / 护盾 / Buff 生命周期 / 附加伤害与真实伤害 / 胜负状态机 |
 | **事件体系** | **11 个事件家族**（P8-6）：技能施放 / 能量 / 掉血 / 治疗 / 击杀 / 击破 / 战技点增减，见 `engine.md` §4 |
-| **触发器表** | **角色机制 = 数据**（P8-7）：`resources/characters/<cid>.json`，引擎只解释；已跑通缇宝 1403 / 知更鸟 1309 / 克拉拉 1107 / 希儿 1102，见 `engine.md` §4.6 |
+| **触发器表** | **角色机制 = 数据**（P8-7）：`resources/characters/<cid>.json`，引擎只解释；已跑通缇宝 1403 / 知更鸟 1309 / 克拉拉 1107 / 希儿 1102，见 `engine.md` §4.6。**知更鸟 1309 是第一个把行迹（额外能力）也数据化的**：天赋 + 2 条行迹共处一张表，**零引擎改动**（`RobinTraceTest`，含"做她时发现 M-24"） |
 | **层数资源** | **没有能量条也能开大**（P8-8）：`Resource` + `ResourceManager` + `EnergyProvider.canCastUltra` 闸门，见 `engine.md` §23 |
 | **真实队伍** | **关卡用真角色**（P8-5）：`StageFactory.realTeam()` = 景元/希儿/克拉拉/娜塔莎（4 命途），各带本命途 5★ 光锥；占位队已删除 |
 | **天赋与追加攻击** | **天赋 = 数据**（P8-3）：触发器表新增 `DAMAGE` op，倍率取**天赋槽**的 `damage_param`；克拉拉受击反击、希儿击杀再动，见 `engine.md` §4.7 |
@@ -1112,6 +1112,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | M-21 | `EliteGroup.java:17` | record **没有 `@SerializedName`**，而它自己的 javadoc 就在警告这个坑。用 tbgd 的 `{"HPRatio":…}` 会让除一个字段外全读成 0.0、血量乘 0 且无校验。当前只被 `EnemyScaler` 用到，所以不炸 |
 | M-22 | `SkillData.java:47` | `maxLevel` **从未被读取**，而 `SkillExecutor` 在 `level-1` 越界时**静默 return** → 0 级或超上限技能零伤害无报错。存在的校验字段是死的 |
 | M-23 | `TestSkillGroup1.java:15` | 测试脚手架放在 `src/main`：静态初始化硬编码 cid/槽位、绕过缓存、仅仅加载该类就强制全量数据加载；注释描述的技能与实际槽位（AoEAttack）不符 |
+| M-24 | `SkillExecutor.java` | ✅ **已修（2026-09-27）**：`SKILL_CAST` 原来表示"**除终结技以外的一切施放**"（发出端只有两路），所以**普攻也触发它** —— 遗器套装 109「施放战技时攻击力提高 20%」（`relic_sets/109.json`，注释里还写着"发出端已经分开了"，实际没有）与知更鸟的 `模进乐段`（+5 能量）都在普攻上白给一次。**发现方式**：把知更鸟做完整时，"她自己的普攻不该给她这 5 点"这条断言直接红了（`RobinTraceTest.herOwnBasicAttackIsNotASkillCast`）—— 不是读代码读出来的。<br>**修法**：发出端**三路分流**。新增 `TriggerEvent.BASIC_ATTACK`（数据 `Normal`，**含强化普攻**，因为数据里两者都写 `Normal`）；`SKILL_CAST` 收窄为 `BPSkill`；秘技 / 地图普攻 / 助战 / 欢愉伤害 / 天赋（`attack_type` 为空）**一个都不发** —— 它们不是"战斗内施放"，需要就得自己申请事件，在那之前是**加载期响亮报错**而不是静默不触发。判定仍在发出端、读**解析出的 `SkillCategory`**，因为条件 DSL 没有"这次施放是什么"这个变量（和当年分 `ULT_CAST`/`SKILL_CAST` 同一个理由）。`ALLY_ATTACK` 不动：命中即算，终结技也算。数据为空的技能（`EnemySkill`、测试手搓的占位）按 `UNSPECIFIED` 处理、三个都不发，保住了原 `isUltimate` 助手"没数据就不能作证"的规矩。<br>**验收**：`UltCastTriggerTest` +3 条（普攻只发 `BASIC_ATTACK`；普攻仍发 `ALLY_ATTACK`；战技不发 `BASIC_ATTACK`）+1 条（地图普攻与天赋一个都不发）；`RobinTraceTest` 端到端 1 条。**变异**（把 `NORMAL` 改回走 `SKILL_CAST`）→ **4 条各自独立变红**（含既有的 `TriggerTableTest.robinDoesNotTriggerOnHerOwnAttack`），说明覆盖不靠同一条断言。两条既有测试因为"描述的是 Robin 只有天赋时的表"而必须更新（`TriggerDataBindingTest` / `TriggerTableTest`），现在都按**事件**断言条数。<br>⚠ **顺带学到的坑**：这类测试的"战技点指纹"必须让**总和不超过上限 5**（`Constant.SKILL_POINT_MAX`），否则饱和后分不清"触发 1 条"与"触发 2 条"—— 我第一版用 8+4，报了 5 |
 
 ### 12.3 Low / Nit（未修）
 
