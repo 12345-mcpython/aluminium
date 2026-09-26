@@ -156,13 +156,6 @@
       "reason": "\"Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.\" Needs a condition on the wearer's own SPD, a two-threshold either/or, and the Elation system."
     }
   ],
-  "131": [
-    {
-      "require": 4,
-      "ability": "Ability51311",
-      "reason": "\"When the wearer enters combat or uses Skill, the DMG dealt by their Skill and Ultimate increases by 18%, stacking up to 3 time(s). At the start of the wearer's turn or after using Ultimate, removes 1 stack(s) of this effect.\" The stacking, the TURN_START removal trigger, the ULT_CAST one and -- since 2026-09-27 -- 'Skill and Ultimate DMG' are all expressible now (SKILL_DAMAGE_BOOST / ULTIMATE_DAMAGE_BOOST, which add into the same boost zone; see engine.md §18.2). Exactly one term still blocks it: the vocabulary has no op that REMOVES a stack ('removes 1 stack(s) of this effect'), so the set cannot be modelled without dropping half of its text."
-    }
-  ],
   "132": [
     {
       "require": 4,

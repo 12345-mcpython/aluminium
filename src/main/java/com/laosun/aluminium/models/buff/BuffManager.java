@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Damage;
@@ -165,6 +166,47 @@ public class BuffManager {
     public void removeBuff(AbstractBuff buff) {
         if (buff == null || !buffs.remove(buff)) return;
         buff.removeBuff(instance);
+    }
+
+    /**
+     * Removes up to {@code count} {@link StatModifierBuff} instances on one attribute, <b>newest first</b>.
+     *
+     * <p><b>Why this exists.</b> "…stacking up to 3 time(s). At the start of the wearer's turn or after using
+     * Ultimate, removes 1 stack(s) of this effect" (relic set 131 「星如我见的领航员」) is a shape that appears
+     * in many texts, and the engine already models the stacking half ({@code MODIFY_ATTR} with
+     * {@code max_stacks}). What was missing is the way back: a stack could grow but never shrink, so such an
+     * effect could only be modelled by dropping half of its text. The data side of that is the trigger op
+     * {@code REMOVE_STACK}; this is the primitive under it.
+     *
+     * <p>Order matches {@link #removeOneBuff(Class)}: the stack added <b>most recently</b> goes first, which
+     * is what a counter does — and with equal-valued stacks the choice is invisible anyway.
+     *
+     * <p>Nothing to remove is <b>not</b> an error (the return value reports what happened): a rule that says
+     * "at the start of the wearer's turn, removes 1 stack" fires on every turn, including the ones where the
+     * count is already zero.
+     *
+     * <p>Removal goes through {@link #removeBuff(AbstractBuff)}, so the attribute returns to exactly the value
+     * the remaining stacks add up to — the modifier is dropped by id and nothing is recomputed.
+     *
+     * @param attribute the attribute whose modifier stacks to remove
+     * @param count     how many to remove at most (non-positive removes nothing)
+     * @return how many were actually removed
+     */
+    public int removeStacks(AttributeType attribute, int count) {
+        if (attribute == null || count <= 0) {
+            return 0;
+        }
+        // Snapshot + newest-first, for the reasons in the class javadoc (M-12) and above.
+        List<AbstractBuff> snapshot = List.copyOf(buffs);
+        int removed = 0;
+        for (int i = snapshot.size() - 1; i >= 0 && removed < count; i--) {
+            AbstractBuff buff = snapshot.get(i);
+            if (buff instanceof StatModifierBuff modifier && modifier.getAttribute() == attribute) {
+                removeBuff(buff);
+                removed++;
+            }
+        }
+        return removed;
     }
 
     public boolean canAct() {

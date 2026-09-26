@@ -56,6 +56,9 @@ public class RelicAbilityBattleTest {
     /** "The Ashblazing Grand Duke" — 2-piece: +20% DMG dealt by Follow-Up ATK. */
     private static final int ASHBLAZING = 115;
 
+    /** 「星如我见的领航员」 — 4-piece: a Skill/Ultimate DMG stack counter that grows and shrinks. */
+    private static final int NAVIGATOR = 131;
+
     /** Himeko: basic attack / skill / ultimate are all real, damaging skill slots. */
     private static final int HIMEKO = 1003;
     private static final int ICE_EDGE = 1002011;
@@ -550,6 +553,83 @@ public class RelicAbilityBattleTest {
     }
 
     // ==================================================================
+    // 131 「星如我见的领航员」: the stack counter that also comes back down
+    // ==================================================================
+
+    /** One stack of the set's boost (param #1[i] = 0.18). */
+    private static final double NAVIGATOR_BOOST = 0.18;
+    /** The text's cap (param #2[i] = 3). */
+    private static final int NAVIGATOR_MAX_STACKS = 3;
+
+    /**
+     * The whole 4-piece ability, in one battle: enter → 1 stack; turn start → 1 off; Skill → 1 on, up to 3;
+     * turn start → 1 off again.
+     *
+     * <p><b>Why this is the interesting one.</b> Every other set ability the engine has is monotonic — a buff
+     * that appears, or a counter that only grows. This one says "…stacking up to 3 time(s) … removes 1
+     * stack(s)", so it needed an op that takes a stack <b>back</b> ({@code REMOVE_STACK}); before that it
+     * could only have been modelled by dropping the second half of the text, which is why it sat in
+     * {@code _unmodelled.json}. Both directions are asserted here, and through a real battle, so the claim
+     * "the set works" is about the engine executing the file rather than about the file existing.
+     */
+    @Test
+    public void navigatorStacksGrowOnSkillAndShrinkAtTheWearersTurnStart() {
+        Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
+        Character hero = battle.characters.getFirst();
+
+        Assertions.assertEquals(1, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
+                "entering combat grants one stack of the Skill DMG boost");
+        Assertions.assertEquals(1, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size(),
+                "and one of the Ultimate DMG boost -- the text names both scopes");
+        Assertions.assertEquals(NAVIGATOR_BOOST, hero.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get(),
+                TOLERANCE, "one stack is 18%");
+
+        takeTurnOf(battle, hero);
+        Assertions.assertEquals(0, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
+                "the start of the wearer's turn removes one -- which is exactly the stack entering combat gave");
+
+        for (int cast = 0; cast < NAVIGATOR_MAX_STACKS + 1; cast++) {
+            castSkill(battle, hero);
+        }
+        Assertions.assertEquals(NAVIGATOR_MAX_STACKS, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
+                "each Skill grants one, up to the cap of 3 -- the fourth changes nothing");
+        Assertions.assertEquals(NAVIGATOR_MAX_STACKS * NAVIGATOR_BOOST,
+                hero.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get(), TOLERANCE,
+                "and the scoped boost adds up stack by stack (one attribute per stack, removed by id)");
+
+        takeTurnOf(battle, hero);
+        Assertions.assertEquals(NAVIGATOR_MAX_STACKS - 1, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
+                "one comes off per turn start, so the counter never just sits at the cap");
+    }
+
+    /** 「或施放终结技后，移除1层」 — the other half of the removal clause. */
+    @Test
+    public void navigatorLosesAStackAfterTheWearersUltimate() {
+        Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
+        Character hero = battle.characters.getFirst();
+
+        castSkill(battle, hero);
+        Assertions.assertEquals(2, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size(),
+                "precondition: one stack from entering combat, one from the Skill");
+
+        Assertions.assertTrue(castUltimate(battle, hero));
+        Assertions.assertEquals(1, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size(),
+                "after the wearer's Ultimate, one stack of each scope comes off");
+        Assertions.assertEquals(1, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
+                "the Skill scope loses one too -- the text does not distinguish them");
+    }
+
+    /** Three pieces must not grant the 4-piece ability (the same guard the other sets have). */
+    @Test
+    public void navigatorNeedsAllFourPieces() {
+        Battle battle = newBattle(List.of(partial(HIMEKO, NAVIGATOR)), true);
+        Character hero = battle.characters.getFirst();
+
+        Assertions.assertEquals(0, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size());
+        Assertions.assertEquals(0, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size());
+    }
+
+    // ==================================================================
     // Helpers
     // ==================================================================
 
@@ -593,6 +673,36 @@ public class RelicAbilityBattleTest {
     private static boolean castUltimate(Battle battle, Character hero) {
         hero.setCurrentEnergy(hero.getMaxEnergy());
         return battle.castUltra(hero, List.of(battle.enemyUnits().getFirst()));
+    }
+
+    /** Casts the character's Skill (through the action-bar-free entry point, so no turn is needed). */
+    private static void castSkill(Battle battle, Character hero) {
+        battle.castImmediate(hero.getSkills().get(SkillType.SKILL), hero,
+                List.of(battle.enemyUnits().getFirst()));
+    }
+
+    /**
+     * Runs turns until {@code who} acts, then settles that turn start and end.
+     *
+     * <p>A turn has to be finished for the next one to begin, and it is the start that the set's removal
+     * clause hangs on — so "the wearer's turn" has to be driven, not simulated by calling the trigger.
+     */
+    private static void takeTurnOf(Battle battle, Character who) {
+        for (int guard = 0; guard < 40; guard++) {
+            battle.stepForward();
+            if (battle.isOver()) {
+                throw new AssertionError("the battle ended before the requested unit acted");
+            }
+            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
+            if (mine) {
+                battle.beforeMove();
+            }
+            battle.afterMove();
+            if (mine) {
+                return;
+            }
+        }
+        throw new AssertionError("no turn for the requested unit within 40 steps");
     }
 
     /** The modifiers a buff has installed on one attribute, in application order. */

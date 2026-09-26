@@ -61,6 +61,14 @@ public class RelicTriggerTableTest {
     private static final int CONVERGING_STARS = 326;
     /** The Ashblazing Grand Duke, whose 2-piece needs the follow-up-only damage boost attribute. */
     private static final int ASHBLAZING = 115;
+    /**
+     * 「星如我见的领航员」 — 4-piece: a Skill/Ultimate DMG boost that stacks to 3 and loses one per turn.
+     *
+     * <p>Authored on 2026-09-27, the day two engine changes made it expressible at all: three scoped
+     * DMG-boost attributes (which scope the +18%) and the {@code REMOVE_STACK} op (the "removes 1 stack"
+     * half). Before either, the ability could only have been modelled by dropping part of its text.
+     */
+    private static final int NAVIGATOR = 131;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -90,15 +98,18 @@ public class RelicTriggerTableTest {
             EAGLE + "/" + FOUR_PIECE,
             CHAMPION + "/" + FOUR_PIECE,
             CONVERGING_STARS + "/" + TWO_PIECE,
-            ASHBLAZING + "/" + TWO_PIECE);
+            ASHBLAZING + "/" + TWO_PIECE,
+            NAVIGATOR + "/" + FOUR_PIECE);
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
      *
      * <p>35 ability-only bonuses in total, so this number and {@link #AUTHORED}'s size must always sum
      * to it — that sum is the invariant, the individual values are just where the line currently sits.
+     * It went 28 → <b>27</b> on 2026-09-27, when set 131 moved to the authored side (see
+     * {@link #NAVIGATOR}).
      */
-    private static final int STILL_REGISTERED = 28;
+    private static final int STILL_REGISTERED = 27;
 
     // ==================================================================
     // 1. The shipped rule files
