@@ -58,10 +58,23 @@ public class SelfAttributeConditionTest {
     // The planar 2-pieces authored with this vocabulary. None of them had a rule file before.
     /** 太空封印站: 攻击力 +12%; SPD >= 120 -> 攻击力额外 +12%. */
     private static final int SPACE_SEALING_STATION = 301;
+    /** 不老者的仙舟: 生命上限 +12%; SPD >= 120 -> 我方全体攻击力 +8%. */
+    private static final int FLEET_OF_THE_AGELESS = 302;
+    /** 筑城者的贝洛伯格: 防御力 +15%; 效果命中 >= 50% -> 防御力额外 +15%. */
+    private static final int BELOBOG = 304;
+    /** 停转的萨尔索图: 暴击率 +8%; 当前暴击率 >= 50% -> 终结技与追加攻击伤害 +15%. */
+    private static final int INERT_SALSOTTO = 306;
     /** 盗贼公国塔利亚: 击破特攻 +16%; SPD >= 145 -> 击破特攻额外 +20%. */
     private static final int TALIA = 307;
+    /** 生命的翁瓦克: 能量恢复效率 +5%; SPD >= 120 -> 进入战斗时行动提前 40%. */
+    private static final int SPRIGHTLY_VONWACQ = 308;
     /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 70% -> 普攻与战技伤害 +20%. */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
+
+    /** All seven, for the cases that make a claim about the whole authored batch. */
+    private static final List<Integer> AUTHORED_PLANAR_TWO_PIECES = List.of(
+            SPACE_SEALING_STATION, FLEET_OF_THE_AGELESS, BELOBOG, INERT_SALSOTTO, TALIA,
+            SPRIGHTLY_VONWACQ, CELESTIAL_DIFFERENTIATOR);
 
     // ==================================================================
     // 1. The value is read, and it is the owner's
@@ -220,9 +233,32 @@ public class SelfAttributeConditionTest {
     @Test
     public void theAuthoredPlanarTwoPiecesStateTheThresholdsFromTheirTexts() {
         assertSingleThreshold(SPACE_SEALING_STATION, "self_attr:speed >= 120.0", AttributeType.SPEED, 200);
+        assertSingleThreshold(FLEET_OF_THE_AGELESS, "self_attr:speed >= 120.0", AttributeType.SPEED, 200);
+        assertSingleThreshold(BELOBOG, "self_attr:effect_hit_rate >= 0.5",
+                AttributeType.EFFECT_HIT_RATE, 0.6);
+        assertSingleThreshold(INERT_SALSOTTO, "self_attr:crit_chance >= 0.5",
+                AttributeType.CRIT_CHANCE, 0.6);
         assertSingleThreshold(TALIA, "self_attr:speed >= 145.0", AttributeType.SPEED, 200);
+        assertSingleThreshold(SPRIGHTLY_VONWACQ, "self_attr:speed >= 120.0", AttributeType.SPEED, 200);
         assertSingleThreshold(CELESTIAL_DIFFERENTIATOR, "self_attr:crit_chance >= 0.7",
                 AttributeType.CRIT_CHANCE, 0.8);
+    }
+
+    /**
+     * Set 302's bonus lands on the <b>whole party</b> — the wearer's speed gates it, everyone gets it.
+     *
+     * <p>The mistake this rules out is a missing {@code target: "all_allies"}: the rule would still fire on
+     * the wearer's speed and still grant +8% ATK, so a solo test would pass while the ability quietly buffed
+     * one character instead of four.
+     */
+    @Test
+    public void theFleetOfTheAgelessBonusGoesToTheWholeParty() {
+        EffectSpec effect = soleEffect(FLEET_OF_THE_AGELESS, AttributeType.SPEED, 200);
+
+        Assertions.assertEquals("all_allies", effect.getTarget(),
+                "the text says 我方全体, so the selector has to say so too");
+        Assertions.assertEquals("ATTACK", effect.getAttribute());
+        Assertions.assertEquals(0.08, effect.getPercent(), EPS, "param #3 is 0.08");
     }
 
     /** Set 301's conditional extra is `+12% ATK, for the rest of the battle` — the file's own numbers. */
@@ -265,12 +301,12 @@ public class SelfAttributeConditionTest {
      *
      * <p>These sets' first sentence ("ATK +12%") is a plain stat that {@code RelicSuit} already applies from
      * the effect's {@code properties}. Writing it as a rule as well would grant it twice, and the symptom
-     * would be "slightly more attack than the game gives" — a wrong number with nothing to see. So the file
+     * would be "slightly more attack than the game gives" — a wrong number with nothing to see. So each file
      * carries exactly one rule, on one event: the conditional half.
      */
     @Test
     public void theUnconditionalHalfIsLeftToTheStatProperties() {
-        for (int setId : List.of(SPACE_SEALING_STATION, TALIA, CELESTIAL_DIFFERENTIATOR)) {
+        for (int setId : AUTHORED_PLANAR_TWO_PIECES) {
             RelicSet.Effect effect = Constant.RELIC_SETS.get(setId).effects().getFirst();
             Assertions.assertFalse(effect.properties().isEmpty(),
                     "set " + setId + "'s unconditional half is a `properties` stat, applied by RelicSuit");
@@ -280,6 +316,27 @@ public class SelfAttributeConditionTest {
             Assertions.assertEquals(1, RelicTriggerTables.of(setId).at(2).ruleCount(TriggerEvent.BATTLE_START),
                     "set " + setId + " contributes exactly the conditional half, as one rule");
         }
+    }
+
+    /**
+     * Set 308's action advance really moves the wearer's first turn.
+     *
+     * <p>{@code ADVANCE} pulls a unit forward by a fraction of the action value it still has to run, and the
+     * question this case settles is whether that means anything at {@code BATTLE_START} — the action bar is
+     * built in {@code Battle}'s constructor, so by the time the event fires there is a real "time remaining"
+     * to take 40% of, and the wearer's first turn must come measurably earlier than an identical character
+     * without the set.
+     */
+    @Test
+    public void theVonwacqAdvancePullsTheWearersFirstTurnForward() {
+        Character withSet = CharacterFactory.create(OWNER, LEVEL, true, null,
+                RelicFactory.suit(SPRIGHTLY_VONWACQ, 5, 15));
+        withSet.setAttribute(AttributeType.SPEED, new DoubleValue(130));
+        Character without = newOwner(130);
+
+        Assertions.assertTrue(nextActionTime(withSet) < nextActionTime(without),
+                "the wearer must act sooner: set " + nextActionTime(withSet)
+                        + " vs no set " + nextActionTime(without));
     }
 
     /**
@@ -424,6 +481,17 @@ public class SelfAttributeConditionTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setAttribute(attribute, new DoubleValue(value));
         return owner;
+    }
+
+    /** When the given unit's next turn comes, in the battle's action-value clock. */
+    private static double nextActionTime(Character unit) {
+        Battle battle = new Battle(List.of(unit), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        return battle.queue.snapshot().stream()
+                .filter(signal -> signal.getCanHit() == unit)
+                .findFirst()
+                .orElseThrow()
+                .getNextActionTime();
     }
 
     private static TriggerTable.TriggerContext context(Character owner) {
