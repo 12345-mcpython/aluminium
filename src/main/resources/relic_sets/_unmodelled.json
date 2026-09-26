@@ -6,13 +6,6 @@
       "reason": "\"Increases the max DMG that can be absorbed by the Shield created by the wearer by 20%.\" Needs an op that scales every shield the wearer creates; SHIELD only creates one shield with an amount given in the rule, so there is nothing to amplify."
     }
   ],
-  "106": [
-    {
-      "require": 4,
-      "ability": "Ability51061",
-      "reason": "\"At the beginning of the turn, if the wearer's HP percentage is equal to or less than 50%, restores HP equal to 8% of their Max HP and regenerates 5 Energy.\" Half of it is now expressible (TURN_START is wired, and `hp_percent <= 0.5` exists), but the heal cannot be: HEAL's `amount` is a fixed number, and this one is 8% of the wearer's Max HP. Writing a number here would be wrong for every character, so the ability stays registered."
-    }
-  ],
   "107": [
     {
       "require": 4,

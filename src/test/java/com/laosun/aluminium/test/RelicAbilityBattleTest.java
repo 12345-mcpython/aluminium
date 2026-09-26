@@ -675,6 +675,44 @@ public class RelicAbilityBattleTest {
         Assertions.assertFalse(none.characters.getFirst().getBuffManager().hasBuff(ReductionBuff.class));
     }
 
+    /**
+     * The 4-piece: at the start of the wearer's turn, below half health, heal 8% of Max HP and give 5 Energy.
+     *
+     * <p>The heal is the interesting half in engine terms: 8% of Max HP is a different number for every
+     * character and level, so it is written as {@code scale: target_max_hp} rather than as a number — which is
+     * why this ability was registered as unmodellable until that spelling existed.
+     */
+    @Test
+    public void guardOfSnowFourPieceHealsAndGrantsEnergyBelowHalfHealth() {
+        Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
+        Character hero = battle.characters.getFirst();
+        double maxHp = hero.getMaxHp();
+        hero.takeDamage(maxHp * 0.6);                     // down to 40%: below the threshold
+        double hpBefore = hero.getCurrentHp();
+        double energyBefore = hero.getCurrentEnergy();
+
+        takeTurnOf(battle, hero);
+
+        Assertions.assertEquals(hpBefore + maxHp * 0.08, hero.getCurrentHp(), TOLERANCE,
+                "8% of the wearer's own Max HP, not a number from the file");
+        Assertions.assertEquals(energyBefore + 5, hero.getCurrentEnergy(), TOLERANCE, "and the text's 5 Energy");
+    }
+
+    /** Above the threshold the same turn start does nothing at all. */
+    @Test
+    public void guardOfSnowFourPieceDoesNothingAboveHalfHealth() {
+        Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
+        Character hero = battle.characters.getFirst();
+        hero.takeDamage(hero.getMaxHp() * 0.2);           // 80%: above the threshold
+        double hpBefore = hero.getCurrentHp();
+        double energyBefore = hero.getCurrentEnergy();
+
+        takeTurnOf(battle, hero);
+
+        Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE, "「若生命百分比 ≤ 50%」");
+        Assertions.assertEquals(energyBefore, hero.getCurrentEnergy(), TOLERANCE);
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
