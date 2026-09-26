@@ -40,6 +40,15 @@ public class TauntBuff extends AbstractBuff {
         return true;
     }
 
+    /**
+     * 嘲讽 is a negative effect <b>on its bearer</b>: it forces that unit's targeting, which is why it is applied
+     * to enemies and counts as a debuff rather than as a buff the wearer gives itself.
+     */
+    @Override
+    public boolean isDebuff() {
+        return true;
+    }
+
     @Override
     public void applyEffect(CanHit target) {
         // a pure marker: it changes no attributes

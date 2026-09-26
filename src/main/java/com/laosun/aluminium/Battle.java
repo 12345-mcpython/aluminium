@@ -1461,6 +1461,27 @@ public class Battle {
     private static final int MAX_TRIGGER_DEPTH = 8;
 
     /**
+     * Rolls a rule-level probability (「有 35% 的固定概率…」) against the battle's own random source.
+     *
+     * <p>Deliberately not a fresh {@link Random}: every draw in this engine goes through the injected generator,
+     * so a battle built from a seed is reproducible and a test can hand in its own generator to make a coin flip
+     * deterministic.
+     *
+     * @param chance a fraction of 1 (at or above 1 always passes, <b>without</b> consuming a draw; 0 or less
+     *               never passes)
+     * @return whether the roll passed
+     */
+    public boolean rollChance(double chance) {
+        if (chance >= 1) {
+            return true;
+        }
+        if (!(chance > 0)) {
+            return false;
+        }
+        return rng.nextDouble() < chance;
+    }
+
+    /**
      * Fires a trigger event with neither actor nor subject (BATTLE_START and similar).
      *
      * @param event the event

@@ -68,6 +68,20 @@ public class TriggerSpec {
     private Boolean oncePerBattle;
 
     /**
+     * A fixed probability that the rule fires at all — 「有 X% 的固定概率…」 ({@code 0.35} = 35%). Absent = always.
+     *
+     * <p>Rolled against the battle's <b>injected</b> random source (never a fresh one), so a seeded battle stays
+     * reproducible and a test can make the flip deterministic. A failed roll <b>costs nothing</b>: neither a
+     * cooldown nor a once-per-battle flag is started, because nothing happened.
+     *
+     * <p>A fraction of 1, and it must be strictly positive: {@code chance: 1} is legal and simply means "always"
+     * (it does not even consume a draw), while {@code chance: 0} would be a rule that can never do anything —
+     * a mistake, not a way to spell "off".
+     */
+    @SerializedName("chance")
+    private Double chance;
+
+    /**
      * Where the rule came from (trace id, talent name, character-doc reference).
      *
      * <p>Not used by the engine at all: it exists so that anyone reading the JSON -- or a failing
