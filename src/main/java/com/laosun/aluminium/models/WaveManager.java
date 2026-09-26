@@ -128,9 +128,10 @@ public class WaveManager {
     }
 
     /**
-     * The enemies of the current wave that are still alive.
+     * The current wave's units that are still alive — the enemy camp's, so a summon fighting
+     * alongside the monsters counts as "not cleared" too (L-8).
      */
-    public List<Enemy> aliveEnemies() {
+    public List<CanHit> aliveEnemies() {
         return battle.enemies.stream().filter(e -> !e.isDeath()).toList();
     }
 

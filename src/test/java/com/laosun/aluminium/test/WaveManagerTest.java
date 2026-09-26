@@ -183,7 +183,7 @@ public class WaveManagerTest {
         battle.processRequests();
 
         // Kill the whole wave
-        for (Enemy enemy : battle.enemies) {
+        for (Enemy enemy : battle.enemyUnits()) {
             enemy.takeDamage(999_999_999);
         }
         battle.processRequests();
@@ -204,7 +204,7 @@ public class WaveManagerTest {
         waves.nextWave();
         battle.processRequests();
 
-        for (Enemy enemy : battle.enemies) {
+        for (Enemy enemy : battle.enemyUnits()) {
             enemy.takeDamage(999_999_999);
         }
         battle.processRequests();
@@ -258,7 +258,7 @@ public class WaveManagerTest {
         waves.nextWave();
         battle.processRequests();
 
-        for (Enemy enemy : battle.enemies) {
+        for (Enemy enemy : battle.enemyUnits()) {
             double remaining = battle.queue.getTimeRemaining(signalOf(battle, enemy));
             Assertions.assertTrue(remaining > 0 && remaining < Double.MAX_VALUE,
                     "a new monster's remaining action value is positive and finite");
