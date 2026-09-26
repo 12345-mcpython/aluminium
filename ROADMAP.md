@@ -159,6 +159,7 @@
 | **层数资源** | **没有能量条也能开大**（P8-8）：`Resource` + `ResourceManager` + `EnergyProvider.canCastUltra` 闸门，见 `engine.md` §23 |
 | **真实队伍** | **关卡用真角色**（P8-5）：`StageFactory.realTeam()` = 景元/希儿/克拉拉/娜塔莎（4 命途），各带本命途 5★ 光锥；占位队已删除 |
 | **天赋与追加攻击** | **天赋 = 数据**（P8-3）：触发器表新增 `DAMAGE` op，倍率取**天赋槽**的 `damage_param`；克拉拉受击反击、希儿击杀再动，见 `engine.md` §4.7 |
+| **攻击类型增伤** | **普攻/战技/终结技各自增伤**（2026-09-27）：三条新属性加算进同一个增伤区，按 `Damage.getCastCategory()` 选 —— `Damage` 现在显式携带施放类别，因为普攻与战技都是 `DamageType.NORMAL`，靠 type 分不开。遗器套装 131「战技与终结技增伤」因此只剩"移除一层"这一个缺口，见 `engine.md` §18.2 |
 | **DOT 并入 buff 体系** | **DOT 不再是第二套机制**（P10-0）：`DotBuff extends AbstractBuff`，删掉 `models/Dot` / `Enemy.dots` / `tickDots(Enemy)`；角色与敌人走同一条 DOT 路径，demo 数值逐位不变，见 `engine.md` §8.5 |
 | **击破控制状态** | **控制 = 数据组合，不是新类**（P10-2）：`ControlEffect` 表 + `StunBuff`/`StatModifierBuff`/`delayMovePercent` 三个现成原语；冰=锁行动、量子/虚数=减速+推条；**冻结"+30% 受伤"被数据推翻**（原文是每回合冰伤），见 `engine.md` §8.6 |
 | **推条不再被速度变化吃掉** | **L-26 已修**：`delayAction`/`advanceAction` 同步 `Signal.remaining`，`refreshSpeed` 去掉进度**上**钳（被推条的单位合法地超过一整轮）。之前量子/虚数击破的"减速+推条"里推条完全不可观测（28.409 加不加都一样）；现在 `QueueActionManipulationTest.aDelaySurvivesASpeedChange` 钉住，**两半各自都能让它变红**，见 `engine.md` §5.1/§5.2 |

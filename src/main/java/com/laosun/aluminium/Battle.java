@@ -1772,6 +1772,21 @@ public class Battle {
             damage.addBoost(attacker.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get());
         }
 
+        // Scoped boosts (P10-4): 「普攻 / 战技 / 终结技造成的伤害提高 X%」. These cannot be gated on the damage
+        // *type* the way the follow-up boost above is -- a basic attack and a skill are both
+        // DamageType.NORMAL -- so they are gated on the category of the cast that produced this instance,
+        // which SkillExecutor threads through (`Damage.getCastCategory()`).
+        //
+        // Deliberately conservative about *which* instance carries the category: only the cast's own damage
+        // does. Break / super break / DOT / additional instances stay UNSPECIFIED, so "the Skill's DMG" does
+        // not silently grow to mean "the break damage that Skill caused" -- if content ever needs that, it is
+        // a decision to take on purpose, not a side effect of this wiring. (A follow-up therefore collects
+        // FOLLOW_UP_DAMAGE_BOOST and never one of these, which is what the texts mean by 追加攻击.)
+        AttributeType scopeBoost = damage.getCastCategory().damageBoost();
+        if (scopeBoost != null) {
+            damage.addBoost(attacker.getAttribute(scopeBoost).get());
+        }
+
         // 2) Crit zone: only crittable types roll; an effect that already fixed the crit (fixedCrit) is not
         //    overwritten
         if (damage.getType().isCrittable() && !damage.isCritFixed()) {

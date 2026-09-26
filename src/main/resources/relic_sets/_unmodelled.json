@@ -160,7 +160,7 @@
     {
       "require": 4,
       "ability": "Ability51311",
-      "reason": "\"When the wearer enters combat or uses Skill, the DMG dealt by their Skill and Ultimate increases by 18%, stacking up to 3 time(s). At the start of the wearer's turn or after using Ultimate, removes 1 stack(s) of this effect.\" The stacking, the TURN_START removal trigger and the ULT_CAST one are now expressible, but two terms are not: no attribute expresses 'Skill and Ultimate DMG' specifically (only per-element and all-damage boosts exist), and the vocabulary has no op that removes a stack."
+      "reason": "\"When the wearer enters combat or uses Skill, the DMG dealt by their Skill and Ultimate increases by 18%, stacking up to 3 time(s). At the start of the wearer's turn or after using Ultimate, removes 1 stack(s) of this effect.\" The stacking, the TURN_START removal trigger, the ULT_CAST one and -- since 2026-09-27 -- 'Skill and Ultimate DMG' are all expressible now (SKILL_DAMAGE_BOOST / ULTIMATE_DAMAGE_BOOST, which add into the same boost zone; see engine.md §18.2). Exactly one term still blocks it: the vocabulary has no op that REMOVES a stack ('removes 1 stack(s) of this effect'), so the set cannot be modelled without dropping half of its text."
     }
   ],
   "132": [

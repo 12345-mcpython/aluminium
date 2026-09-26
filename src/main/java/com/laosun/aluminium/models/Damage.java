@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.models.DoubleValue.Modifier;
 import com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource;
 import lombok.AccessLevel;
@@ -66,6 +67,16 @@ public class Damage {
     private final double skillBaseValue;
 
     /**
+     * Which kind of cast produced this instance — the fact behind 「普攻/战技/终结技造成的伤害提高 X%」.
+     *
+     * <p>It cannot be derived from {@link #type}: a basic attack and a skill are both
+     * {@code DamageType.NORMAL}, so "which scope does this instance belong to" has to be carried. Never
+     * {@code null} — "not an in-battle cast" is {@link SkillCategory#UNSPECIFIED}, so no caller null-checks
+     * and {@code assemble}'s lookup is a plain switch.
+     */
+    private final SkillCategory castCategory;
+
+    /**
      * Zone container: lazily filled, holds only the zones that were actually used
      * (a zone that never entered the list is equivalent to 1.0). Zones are pure
      * multipliers, so the iteration order does not matter.
@@ -117,11 +128,30 @@ public class Damage {
     }
 
     public Damage(CanHit attacker, CanHit defender, DamageElement element, DamageType type, double skillBaseValue) {
+        this(attacker, defender, element, type, skillBaseValue, SkillCategory.UNSPECIFIED);
+    }
+
+    /**
+     * The full constructor: the same instance, plus which kind of cast produced it.
+     *
+     * <p>The category is what makes a <b>scoped</b> DMG boost possible — "普攻造成的伤害提高 X%" must not
+     * reach a skill, and the damage type cannot tell the two apart. Instances that are not an in-battle cast
+     * (break, super break, DOT, additional/follow-up, true damage, a technique used outside battle) leave it
+     * {@link SkillCategory#UNSPECIFIED}; follow-up damage has its own
+     * {@code AttributeType.FOLLOW_UP_DAMAGE_BOOST}, gated on the damage type, so it must not also collect a
+     * scoped cast boost.
+     *
+     * @param castCategory the category of the producing cast, or {@code null} for "not a cast" (normalised
+     *                     to {@link SkillCategory#UNSPECIFIED}, so the field is never null)
+     */
+    public Damage(CanHit attacker, CanHit defender, DamageElement element, DamageType type,
+                  double skillBaseValue, SkillCategory castCategory) {
         this.attacker = attacker;
         this.defender = defender;
         this.element = Objects.requireNonNull(element);
         this.type = Objects.requireNonNull(type);
         this.skillBaseValue = skillBaseValue;
+        this.castCategory = castCategory == null ? SkillCategory.UNSPECIFIED : castCategory;
     }
 
     /**
