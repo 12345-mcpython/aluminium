@@ -166,29 +166,21 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * ⚠ <b>Not implemented</b>: characters / light cones / relics can all modify skill points — the
-     * engine has only one party-wide {@code gainSkillPoint}, with no hook at all for "correct the
-     * gain / cap by source".
+     * The two skill-point facts that are <b>still</b> constants: the party-level cap, and the basic attack's own
+     * gain.
      *
-     * <p>Evidence (all from this project's own data documents):
-     * <ul>
-     *   <li>{@code 1101_布洛妮娅.md}: when casting a skill, 50% chance to restore 1 skill point (1-turn cooldown);
-     *   <li>{@code 1201_青雀.md}: 争番 (Fight For All) "when casting a skill, restore 1 skill point; can only trigger once per battle";
-     *   <li>{@code 1215_寒鸦.md}: after casting 2 basic attacks / skills / ultimates on a
-     *       【承负】 target, restore 1 point for our side;
-     *   <li>{@code 1223_貊泽.md}: after casting the talent's follow-up attack, restore 1 skill point (can trigger again after 1 turn);
-     *   <li>{@code 1206_素裳.md}: after casting a skill on a target in the broken state, restore 1 skill point;
-     *   <li>{@code 1312_米沙.md}: every time our whole side spends 1 skill point → Misha's next
-     *       ultimate gains +1 segment, and Misha regains 2 energy
-     *       (this one additionally has to listen for the act of "spending a skill point" itself).
-     * </ul>
+     * <p>⚠ This test used to be called {@code characterAndGearSkillPointModifiersAreNotImplemented} and listed six
+     * characters as evidence. <b>One of them is implemented now</b>: 布洛妮娅's Eidolon 1 (「施放战技时，有 50% 的固定概率
+     * 恢复 1 个战技点，该效果有 1 回合的触发冷却」) is authored in {@code characters/1101.json} as
+     * {@code chance} + {@code cooldown} + {@code min_eidolon}, and pinned by {@code BronyaEidolonTest}. The other
+     * five still have no data, but they now have a <b>shape</b> — a rule on the trigger table that grants a point
+     * — so what is missing for them is their own numbers rather than engine machinery.
      *
-     * <p>Ownership: P8-7 trigger table ({@code GAIN_SKILL_POINT} / per-character gain correction) +
-     * a needed opening to "change the party-level resource cap". **This probe pins down "not done
-     * yet"**, so that the current state is not misread as "skill points are already complete".
+     * <p>What is left here is the narrower claim this test actually asserts: no character can change the
+     * party-level <b>cap</b>, and the basic attack's own gain stays {@code Constant.SKILL_POINT_GAIN_BASIC}.
      */
     @Test
-    public void characterAndGearSkillPointModifiersAreNotImplemented() {
+    public void theCapAndTheBasicAttackGainAreStillConstants() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
 
         // The cap is always the constant: Sparkle's talent +2 and the Elation light cone's +1~3

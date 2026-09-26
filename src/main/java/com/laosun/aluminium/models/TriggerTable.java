@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -190,7 +191,29 @@ public class TriggerTable {
         }
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateCooldown(spec),
-                Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec)));
+                Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
+                validateMinEidolon(spec)));
+    }
+
+    /**
+     * Validates an Eidolon gate and returns the rank it needs ({@code 0} = ungated).
+     *
+     * <p>Validated at load time, like the other limits: {@code min_eidolon: 0} reads like "no Eidolon needed"
+     * (which is spelled by omitting the field) and a rank above {@code Constant.EIDOLON_MAX_RANK} can never be
+     * reached, so the rule would be silently dead — the failure mode this vocabulary exists to prevent.
+     */
+    private static int validateMinEidolon(TriggerSpec spec) {
+        Integer rank = spec.getMinEidolon();
+        if (rank == null) {
+            return 0;
+        }
+        if (rank < 1 || rank > Constant.EIDOLON_MAX_RANK) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"min_eidolon\": " + rank + ", but Eidolon ranks are 1-"
+                            + Constant.EIDOLON_MAX_RANK + "; omit the field entirely for a rule that needs none "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return rank;
     }
 
     /**
@@ -496,10 +519,11 @@ public class TriggerTable {
      * @param cooldownTurns the owner's turns between two firings ({@code 0} = unlimited)
      * @param oncePerBattle {@code true} = at most one firing per battle
      * @param chance        the probability of firing at all, as a fraction of 1 ({@code 1.0} = always)
+     * @param minEidolon    the Eidolon rank the owner needs ({@code 0} = ungated)
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key,
-                               int cooldownTurns, boolean oncePerBattle, double chance) {
+                               int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon) {
 
         /**
          * Whether this rule limits how often it may fire at all.

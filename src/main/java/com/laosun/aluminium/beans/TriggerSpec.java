@@ -82,6 +82,18 @@ public class TriggerSpec {
     private Double chance;
 
     /**
+     * The Eidolon rank (星魂) this rule needs: 「星魂 N 解锁」. Absent = the rule is not gated.
+     *
+     * <p>An Eidolon's <b>mechanic</b> is written like every other one — as a rule in
+     * {@code resources/characters/<cid>.json} — and this field is the whole of what makes it an Eidolon: the
+     * interpreter compares it with the rank the assembly point handed to the character. So the engine still knows
+     * nothing about Eidolons beyond a number, and {@code eidolons.json}'s names and descriptions stay reference
+     * material for the rule's {@code source}.
+     */
+    @SerializedName("min_eidolon")
+    private Integer minEidolon;
+
+    /**
      * Where the rule came from (trace id, talent name, character-doc reference).
      *
      * <p>Not used by the engine at all: it exists so that anyone reading the JSON -- or a failing

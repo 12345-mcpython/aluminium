@@ -1,0 +1,33 @@
+[
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DEFENCE",
+        "percent": 0.2,
+        "turns": 2,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1101 布洛妮娅 trace 阵地: 「战斗开始时，我方全体的防御力提高#2[i]%，持续#1[i]回合。」 param = [2, 0.2]",
+    "note": "The trace's own numbers, and the reading order is worth checking rather than trusting: param[0] = 2 is the turn count and param[1] = 0.2 the DEF share, while the text names them the other way round (#2[i]% then #1[i] turns). 'target: all_allies' is 「我方全体」 — without it the effect would default to the rule's owner and buff only Bronya. Same shape as the Passerby 4-piece and 知更鸟's 军势: a battle-start party buff."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "min_eidolon": 1,
+    "chance": 0.5,
+    "cooldown": 1,
+    "do": [
+      {
+        "op": "GAIN_SKILL_POINT",
+        "amount": 1
+      }
+    ],
+    "source": "1101 布洛妮娅 星魂 1 养精蓄锐: 「施放战技时，有#1[i]%固定概率恢复1个战技点，该效果有1回合的触发冷却。」 param = [0.5]",
+    "note": "Three of the vocabularies added on 2026-09-27 meet in one sentence: min_eidolon (it IS an Eidolon, so the rank gate sits next to the mechanic rather than in a loader), chance (50%, rolled against the battle's injected generator) and cooldown ('1 回合的触发冷却' = at most once per own turn). 'actor == self' is 「施放战技时」: the cast has to be hers. This is the case engine.md §9 and SkillPointGameParityTest had registered as 'not implemented' since long before the trigger table existed — the missing part was never one hook but these three."
+  }
+]

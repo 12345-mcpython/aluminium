@@ -242,6 +242,11 @@ public final class TriggerInterpreter {
             if (owner != null && !owner.isTriggerReady(rule.key())) {
                 continue;
             }
+            // An Eidolon gate (「星魂 N 解锁」): the rank is a construction-time property of the rule's owner, so
+            // the rule itself is the only place that has to know it is an Eidolon.
+            if (rule.minEidolon() > 0 && eidolonRankOf(owner) < rule.minEidolon()) {
+                continue;
+            }
             // A rule-level probability (「有 35% 的固定概率…」). A failed roll costs nothing: no cooldown is
             // started and no once-per-battle flag is set, because nothing happened.
             if (rule.chance() < 1 && !battle.rollChance(rule.chance())) {
@@ -550,6 +555,18 @@ public final class TriggerInterpreter {
                     ? new VulnerabilityBuff(turns, percent, permanent)
                     : new ReductionBuff(turns, -percent, permanent));
         }
+    }
+
+    /**
+     * The owner's Eidolon rank, or {@code 0} when the owner is not a character.
+     *
+     * <p>Trigger tables only ever belong to characters ({@code Battle.fireTriggers} walks
+     * {@code battle.characters} and enemies have none), so the branch is about the type system rather than about
+     * a real case — but a hand-built context can carry anything, and "0 ranks" is the answer that never unlocks
+     * an Eidolon by accident.
+     */
+    private static int eidolonRankOf(CanHit owner) {
+        return owner instanceof Character character ? character.getEidolonRank() : 0;
     }
 
     /**
