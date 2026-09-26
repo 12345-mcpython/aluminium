@@ -179,7 +179,7 @@ public class EnergyBattleTest {
         Enemy victim = dummy(100);
         victim.setMaxEnergy(100);
         Battle battle = newBattle(hero, victim);
-        victim.addDot(new com.laosun.aluminium.models.Dot(hero, DamageElement.FIRE, 10_000, 1));
+        victim.getBuffManager().addBuff(new com.laosun.aluminium.models.buffs.DotBuff(hero, DamageElement.FIRE, 10_000, 1));
 
         battle.tickDots(victim);
 
@@ -246,7 +246,7 @@ public class EnergyBattleTest {
         Enemy victim = dummy(100_000);
         victim.setMaxEnergy(120);
         Battle battle = newBattle(hero, victim);
-        victim.addDot(new com.laosun.aluminium.models.Dot(hero, DamageElement.FIRE, 50, 1));
+        victim.getBuffManager().addBuff(new com.laosun.aluminium.models.buffs.DotBuff(hero, DamageElement.FIRE, 50, 1));
 
         battle.tickDots(victim);
 

@@ -94,12 +94,6 @@ public class Enemy extends CanHit {
     private int brokenRemainTurns;
 
     /**
-     * The damage-over-time effects on it (P4-5). **Settled in application order**
-     * (HSR.md §7 "first applied, first settled"), which is why this is a List and not a Set.
-     */
-    private final List<Dot> dots = new ArrayList<>();
-
-    /**
      * Phase table (P9-5): a skill that becomes the active one once the enemy is at or below an HP ratio,
      * kept in <b>ascending</b> threshold order.
      *
@@ -256,27 +250,5 @@ public class Enemy extends CanHit {
         brokenElement = null;
         brokenRemainTurns = 0;
         stance = maxStance;
-    }
-
-    /**
-     * Attach one damage-over-time effect (P4-5). The same element can stack multiple copies
-     * ("first applied, first settled"; no same-type refresh).
-     *
-     * @param dot the damage-over-time effect
-     */
-    public void addDot(Dot dot) {
-        if (dot != null) {
-            dots.add(dot);
-        }
-    }
-
-    /**
-     * Remove one damage-over-time effect (called by {@code Battle.tickDots} after its last
-     * settlement).
-     *
-     * @param dot the damage-over-time effect
-     */
-    public void removeDot(Dot dot) {
-        dots.remove(dot);
     }
 }
