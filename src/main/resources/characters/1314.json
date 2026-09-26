@@ -1,0 +1,19 @@
+[
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "min_eidolon": 4,
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DEFENCE_IGNORE",
+        "percent": 0.12,
+        "turns": 3
+      }
+    ],
+    "source": "1314 翡翠 星魂 4 真诚？唯凭认沽: 「施放终结技时，使翡翠造成的伤害无视敌方目标#1[i]%的防御力，持续#2[i]回合。」 param = [0.12, 3]",
+    "note": "The wearer's damage ignores 12% of the target's DEF for 3 turns, so the effect belongs to HER, not to the target -- hence no `target` selector (absent means self, and 使翡翠造成的伤害 is a fact about the damage she deals). DEFENCE_IGNORE is a ratio attribute, so MODIFY_ATTR adds a flat 0.12 there (0.12 means 12%), and Battle.assemble hands the attacker's total to the defence zone. ⚠ This is the FIRST user of that attribute in the whole shipped content: it was read by the pipeline and its arithmetic was tested, but no rule file had ever granted it, so the path 'rule -> attribute -> defence zone' had never run end to end. That is what DefenceIgnoreTest now covers. It is also the second Eidolon-gated rule (after Bronya's), which is why min_eidolon: 4 sits next to the mechanic."
+  }
+]

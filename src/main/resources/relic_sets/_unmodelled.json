@@ -24,7 +24,7 @@
     {
       "require": 4,
       "ability": "Ability51081",
-      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" The event it needed exists since 2026-09-27 (DEALING_DAMAGE hands the pending instance over before settlement), so the first clause could be conditioned on 'the wearer deals damage'. Two things still block the ability: the second clause needs a condition on the target's weakness element (the DSL can ask about states, not about weaknesses), and 'ignores 10% DEF' is the defence zone, not the DMG-boost zone -- BOOST_DAMAGE cannot express it and the target's DEF ignore is not a stat the rule can raise. 'For the rest of the battle' is no longer part of the gap (`permanent: true` exists)."
+      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" The event it needed exists since 2026-09-27 (DEALING_DAMAGE hands the pending instance over before settlement), so the first clause could be conditioned on 'the wearer deals damage'. ⚠ 'ignores 10% DEF' is NOT the blocker: the defence zone reads the attacker's DEFENCE_IGNORE attribute, so MODIFY_ATTR reaches it (see set 119's note and engine.md 3.2). What blocks the ability is that it is a DISJUNCTION -- the second clause needs a condition on the target's weakness element, which the DSL cannot ask about (it reads states, counts and attribute values, not weaknesses), so authoring only the first clause would under-trigger it. The instance-scoped form (ignore DEF for THIS hit) would also be the more faithful reading of 'when the wearer deals DMG', and that does not exist."
     }
   ],
   "111": [
@@ -66,7 +66,7 @@
     {
       "require": 4,
       "ability": "Ability51161",
-      "reason": "\"For every DoT the enemy target is afflicted with, the wearer will ignore 6% of its DEF when dealing DMG to it. This effect is valid for a max of 3 DoTs.\" Needs a count of the target's DoTs, a per-count scaling of the effect, and a DEF-ignore op (see set 108)."
+      "reason": "\"For every DoT the enemy target is afflicted with, the wearer will ignore 6% of its DEF when dealing DMG to it. This effect is valid for a max of 3 DoTs.\" Needs a count of the target's DoTs and a per-count scaling of the effect (the amount must be '6% x count, at most 3', and MODIFY_ATTR takes a literal). ⚠ The DEF-ignore itself is not a gap: DEFENCE_IGNORE is an attribute the defence zone already reads (engine.md 3.2)."
     }
   ],
   "117": [
@@ -92,7 +92,7 @@
     {
       "require": 4,
       "ability": "Ability51191",
-      "reason": "\"If the wearer's Break Effect is 150% or higher, the Break DMG dealt to the enemy target ignores 10% of their DEF. If the wearer's Break Effect is 250% or higher, the Super Break DMG additionally ignores 15%.\" The attribute threshold it needed arrived on 2026-09-27 (`self_attr:BREAKING_EFFECT >= 1.5`), and the two thresholds are NOT an extra gap (an upper bound makes the tiers exclusive -- see set 311). What blocks it: 'ignores DEF' is the defence zone and needs its own op (see set 108), and both clauses apply to Break / Super Break DMG only, which the DSL cannot name."
+      "reason": "\"If the wearer's Break Effect is 150% or higher, the Break DMG dealt to the enemy target ignores 10% of their DEF. If the wearer's Break Effect is 250% or higher, the Super Break DMG additionally ignores 15%.\" The attribute threshold it needed arrived on 2026-09-27 (`self_attr:BREAKING_EFFECT >= 1.5`), and the two thresholds are NOT an extra gap (an upper bound makes the tiers exclusive -- see set 311). What blocks it: it applies to Break / Super Break DMG only, which the DSL cannot name, and it is scoped to THIS hit rather than to a window of turns -- a MODIFY_ATTR buff (which is how 翡翠's Eidolon 4 grants DEF ignore) would also raise the wearer's other damage in those turns. So it needs an instance-scoped ignore plus a condition on the pending instance's damage type."
     }
   ],
   "120": [
@@ -167,7 +167,7 @@
     {
       "require": 4,
       "ability": "Ability51291",
-      "reason": "\"The Elation DMG dealt by the wearer and their memosprites ignores 10% of targets' DEF. For every 5 accumulated Punchline allies gain, the Elation DMG dealt additionally ignores 1% of targets' DEF, stacking up to 10 time(s).\" Needs an Elation damage channel, a DEF-ignore op (see set 108) and a stacking counter driven by a resource."
+      "reason": "\"The Elation DMG dealt by the wearer and their memosprites ignores 10% of targets' DEF. For every 5 accumulated Punchline allies gain, the Elation DMG dealt additionally ignores 1% of targets' DEF, stacking up to 10 time(s).\" Needs an Elation damage channel (engine.md 18.4), a stacking counter driven by a resource, and an instance-scoped ignore (⚠ the DEF-ignore STAT itself is not a gap -- see set 116)."
     }
   ],
   "130": [
