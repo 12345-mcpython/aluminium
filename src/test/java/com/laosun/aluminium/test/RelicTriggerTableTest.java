@@ -106,17 +106,20 @@ public class RelicTriggerTableTest {
             CONVERGING_STARS + "/" + TWO_PIECE,
             ASHBLAZING + "/" + TWO_PIECE,
             NAVIGATOR + "/" + FOUR_PIECE,
-            GUARD_OF_SNOW + "/" + TWO_PIECE);
+            GUARD_OF_SNOW + "/" + TWO_PIECE,
+            GUARD_OF_SNOW + "/" + FOUR_PIECE);
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
      *
      * <p>35 ability-only bonuses in total, so this number and {@link #AUTHORED}'s size must always sum
      * to it — that sum is the invariant, the individual values are just where the line currently sits.
-     * It went 28 → <b>27</b> on 2026-09-27 (set 131, once {@code REMOVE_STACK} existed) and then to
-     * <b>26</b> the same day (set 106's 2-piece, once {@code MODIFY_DAMAGE_TAKEN} existed).
+     * It went 28 → <b>27</b> on 2026-09-27 (set 131, once {@code REMOVE_STACK} existed), then to <b>26</b>
+     * (set 106's 2-piece, once {@code MODIFY_DAMAGE_TAKEN} existed), and then to <b>25</b> when the same
+     * set's 4-piece became authorable — a percentage-of-Max-HP heal, which the scaled {@code HEAL} spelling
+     * made expressible.
      */
-    private static final int STILL_REGISTERED = 26;
+    private static final int STILL_REGISTERED = 25;
 
     // ==================================================================
     // 1. The shipped rule files

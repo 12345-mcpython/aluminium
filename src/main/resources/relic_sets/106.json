@@ -12,5 +12,27 @@
       "source": "relic set 106 (戍卫风雪的铁卫 / Guard of Wuthering Snow), 2-piece: \"Reduces DMG taken by #1[i]%.\" param = [0.08]",
       "note": "A passive with no turn count, so 'permanent: true' rather than a long duration -- and no 'target', which means the wearer, i.e. who the piece is worn by. The negative percent is what makes this 减伤 rather than 易伤: the sign picks the zone (the buff class also refuses the other sign, so a mistake cannot silently become the other zone). ⚠ This is not MODIFY_ATTR: 'incoming damage x0.92' is a damage zone, not an AttributeType, which is exactly why this set sat in _unmodelled.json until MODIFY_DAMAGE_TAKEN existed."
     }
+  ],
+  "4": [
+    {
+      "on": "TURN_START",
+      "when": [
+        "actor == self",
+        "hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 0.08
+        },
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 5
+        }
+      ],
+      "source": "relic set 106 (戍卫风雪的铁卫 / Guard of Wuthering Snow), 4-piece: \"At the beginning of the turn, if the wearer's HP percentage is equal to or less than #1[i]%, restores HP equal to #2[i]% of their Max HP and regenerates #3[i] Energy.\" param = [0.5, 0.08, 5]",
+      "note": "「回合开始时，若生命百分比 ≤ 50%」. TURN_START fires for the unit whose turn is beginning, but every character evaluates the event with itself as `self`, so `actor == self` is what keeps this to the WEARER's own turn -- without it the rule would fire on anybody's turn and heal its owner then. `hp_percent` reads the rule's owner, which is the wearer, so the condition needs nothing else. ⚠ The heal is `scale: target_max_hp`, not a flat number: 8% of a level-80 bar is a different number for every character (and for every level), so a number in this file would be wrong for all of them — which is why this half of the ability stayed registered until the scaled spelling existed. The 5 Energy is flat, as the text says. There is no refinement level on a relic, so these are the only values."
+    }
   ]
 }

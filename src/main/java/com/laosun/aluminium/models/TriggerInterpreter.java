@@ -32,8 +32,10 @@ import java.util.Set;
  *   <tr><th>op</th><th>arguments</th><th>status</th></tr>
  *   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>✅ wired</td></tr>
  *   <tr><td>{@code GAIN_SKILL_POINT}</td><td>{@code amount}</td><td>✅ wired</td></tr>
- *   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target}</td><td>✅ wired</td></tr>
- *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target}</td><td>✅ wired</td></tr>
+ *   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target} — <b>or</b> {@code scale} +
+ *       {@code percent} (a share of a Max HP)</td><td>✅ wired</td></tr>
+ *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target} — <b>or</b> {@code scale} +
+ *       {@code percent}</td><td>✅ wired</td></tr>
  *   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>✅ wired</td></tr>
  *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>✅ wired (0.0–1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
  *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, <b>exactly one of</b>
@@ -140,8 +142,12 @@ public final class TriggerInterpreter {
                     "Unknown trigger op '" + op + "' (source: " + spec.getSource() + ")");
         }
         switch (op) {
-            case "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD" -> {
+            case "GAIN_ENERGY", "GAIN_SKILL_POINT" -> {
                 requireAmount(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "HEAL", "SHIELD" -> {
+                requireAmountOrScale(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             case "ADVANCE" -> {
@@ -243,15 +249,13 @@ public final class TriggerInterpreter {
             case "GAIN_ENERGY" -> battle.grantEnergy(resolveTarget(effect, ctx), scaledAmount(effect, ctx));
             case "GAIN_SKILL_POINT" -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
             case "HEAL" -> {
-                double amount = scaledAmount(effect, ctx);
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
-                    battle.heal(null, target, amount);
+                    battle.heal(null, target, grantAmount(effect, target, ctx));
                 }
             }
             case "SHIELD" -> {
-                double amount = scaledAmount(effect, ctx);
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
-                    battle.grantShield(target, amount);
+                    battle.grantShield(target, grantAmount(effect, target, ctx));
                 }
             }
             case "EXTRA_TURN" -> battle.grantExtraTurn(resolveTarget(effect, ctx));
@@ -559,6 +563,86 @@ public final class TriggerInterpreter {
                     "Op BOOST_DAMAGE needs the damage instance being settled, but this context carries none");
         }
         damage.addBoost(effect.getPercent());
+    }
+
+    /**
+     * The things a scaled {@code HEAL} / {@code SHIELD} amount may be a percentage of. Closed on purpose, like
+     * every other vocabulary here: a typo has to be rejected at load time, and the two spellings are the ones
+     * the content actually uses (see {@link EffectSpec#getScale()}).
+     */
+    private static final Set<String> SCALES = Set.of("target_max_hp", "owner_max_hp");
+
+    /**
+     * Validates the magnitude of a {@code HEAL} / {@code SHIELD} effect: either a flat {@code amount}, or
+     * {@code scale} + {@code percent}.
+     *
+     * <p>Both spellings of each mistake are refused, because both would otherwise be silently ignored by Gson:
+     * an {@code amount} together with a {@code scale} (which wins?), a {@code scale} without a
+     * {@code percent} ("some share of a Max HP"), a {@code percent} without a {@code scale} (a percentage of
+     * what?), and a {@code scale} together with {@code per_target} (a share of a Max HP is already per unit).
+     */
+    private static void requireAmountOrScale(EffectSpec effect, String op, TriggerSpec spec) {
+        String scale = effect.getScale() == null ? null : effect.getScale().trim();
+        if (scale == null || scale.isEmpty()) {
+            // A percentage without a scale is refused *before* the missing amount, because the author clearly
+            // meant the scaled spelling: "requires amount" alone would send them looking in the wrong place.
+            if (effect.getPercent() != null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " has \"percent\" but no \"scale\": a flat heal or shield states "
+                                + "\"amount\" instead, and a scaled one states \"scale\" + \"percent\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            requireAmount(effect, op, spec);
+            return;
+        }
+        if (effect.getAmount() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states both \"amount\" and \"scale\": a heal or shield is either a flat "
+                            + "number or a share of a Max HP, not both (source: " + spec.getSource() + ")");
+        }
+        if (!SCALES.contains(scale)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has unknown \"scale\": '" + effect.getScale() + "'; known scales are "
+                            + String.join(", ", SCALES.stream().sorted().toList())
+                            + " (source: " + spec.getSource() + ")");
+        }
+        requirePercent(effect, op, spec);
+        if (effect.getPerTarget() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " cannot combine \"scale\" with \"per_target\": the scale is already a share "
+                            + "of one unit's Max HP (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * The magnitude of a {@code HEAL} / {@code SHIELD} for one target: the flat {@code amount}, or a share of a
+     * Max HP.
+     *
+     * <p>Computed <b>per target</b> because {@code target_max_hp} differs from one recipient to the next: a
+     * party-wide heal that restores 8% of each ally's own Max HP cannot be one number.
+     *
+     * @param effect the effect (already validated)
+     * @param target the unit about to receive the heal or shield
+     * @param ctx    the context ({@code owner_max_hp} reads the rule owner, i.e. the healer)
+     */
+    private static double grantAmount(EffectSpec effect, CanHit target, TriggerContext ctx) {
+        String scale = effect.getScale();
+        if (scale == null || scale.isBlank()) {
+            return scaledAmount(effect, ctx);
+        }
+        double share = effect.getPercent();
+        return switch (scale.trim()) {
+            case "target_max_hp" -> target.getMaxHp() * share;
+            case "owner_max_hp" -> {
+                if (ctx.owner() == null) {
+                    throw new IllegalStateException(
+                            "Op uses scale \"owner_max_hp\" but the context has no owner to read it from");
+                }
+                yield ctx.owner().getMaxHp() * share;
+            }
+            default -> throw new IllegalStateException(
+                    "Scale '" + scale + "' passed validation but has no implementation");
+        };
     }
 
     /**
