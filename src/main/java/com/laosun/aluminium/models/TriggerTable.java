@@ -121,6 +121,81 @@ public class TriggerTable {
                 byEvent.computeIfAbsent(event, k -> new ArrayList<>()).add(rule);
             }
         }
+        // Cross-rule checks last: `MODIFY_RULE` points at another rule in this same file, so the reference can only
+        // be resolved once every rule has been compiled (see validateAmendments).
+        validateAmendments();
+    }
+
+    /**
+     * Checks every {@code MODIFY_RULE} reference: the named rule must exist <b>in this file</b>, ids must be unique,
+     * and the named rule must actually state the number being raised.
+     *
+     * <p><b>Why the shape check is not optional.</b> 「增加1次」 has nothing to increase on a rule that states no
+     * {@code per_turn} (and {@code 0 + 1 = 1} would silently <i>impose</i> a one-per-turn cap where there was none),
+     * and 「基础概率提高15%」 has nothing to raise on a rule whose effects state no {@code base_chance}. Both would
+     * load, fire, and change a number nobody asked about — the failure mode this vocabulary exists to prevent.
+     */
+    private void validateAmendments() {
+        Map<String, CompiledRule> byId = new HashMap<>();
+        for (List<CompiledRule> rules : byEvent.values()) {
+            for (CompiledRule rule : rules) {
+                if (rule.id().isEmpty()) {
+                    continue;
+                }
+                CompiledRule clash = byId.putIfAbsent(rule.id(), rule);
+                if (clash != null) {
+                    throw new IllegalArgumentException(
+                            "Two rules in one file share the id \"" + rule.id() + "\", so a MODIFY_RULE "
+                                    + "reference to it would be ambiguous (source: " + rule.source() + ")");
+                }
+            }
+        }
+        for (List<CompiledRule> rules : byEvent.values()) {
+            for (CompiledRule rule : rules) {
+                for (EffectSpec effect : rule.effects()) {
+                    if (!"MODIFY_RULE".equalsIgnoreCase(
+                            effect.getOp() == null ? "" : effect.getOp().trim())) {
+                        continue;
+                    }
+                    requireAmendable(rule, effect, byId);
+                }
+            }
+        }
+    }
+
+    /**
+     * One {@code MODIFY_RULE} effect against its target: the id resolves, and the target states the number.
+     *
+     * @param amender the rule carrying the effect
+     * @param effect  the {@code MODIFY_RULE} effect (its fields were already validated by the interpreter)
+     * @param byId    every named rule in this file
+     */
+    private static void requireAmendable(CompiledRule amender, EffectSpec effect, Map<String, CompiledRule> byId) {
+        String target = effect.getRule() == null ? "" : effect.getRule().trim();
+        CompiledRule named = byId.get(target);
+        if (named == null) {
+            throw new IllegalArgumentException(
+                    "MODIFY_RULE names the rule \"" + target + "\", which is not in this file; a reference only "
+                            + "resolves inside the same table (known ids: "
+                            + (byId.isEmpty() ? "none -- no rule here states an \"id\"" : String.join(", ",
+                            byId.keySet().stream().sorted().toList())) + ") (source: " + amender.source() + ")");
+        }
+        if (effect.getAmount() != null) {
+            if (named.perTurn() < 1) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE raises the per-turn limit of rule \"" + target + "\", but that rule states no "
+                                + "\"per_turn\"; adding a limit to an unlimited rule would silently restrict it "
+                                + "(source: " + amender.source() + ")");
+            }
+            return;
+        }
+        boolean statesAChance = named.effects().stream().anyMatch(e -> e.getBaseChance() != null);
+        if (!statesAChance) {
+            throw new IllegalArgumentException(
+                    "MODIFY_RULE raises the base chance of rule \"" + target + "\", but none of that rule's effects "
+                            + "states a \"base_chance\"; an unstated chance is 100% and has no number to raise "
+                            + "(source: " + amender.source() + ")");
+        }
     }
 
     /**
@@ -333,9 +408,21 @@ public class TriggerTable {
             TriggerInterpreter.validate(effect, spec);
         }
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
-                ruleKey(spec, index), validateCooldown(spec),
+                ruleKey(spec, index), validateId(spec), validateCooldown(spec),
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
                 validateMinEidolon(spec), validatePerTurn(spec)));
+    }
+
+    /**
+     * A rule's optional <b>name</b>, trimmed, or {@code ""} when it states none.
+     *
+     * <p>Only a name that is present is meaningful: an unnamed rule can still be referred to by nothing, which is the
+     * ordinary case and the reason this is not an error. ⚠ The name is scoped to its file (uniqueness and
+     * resolvability are checked in {@link #validateAmendments()}).
+     */
+    private static String validateId(TriggerSpec spec) {
+        String id = spec.getId();
+        return id == null ? "" : id.trim();
     }
 
     /**
@@ -1062,13 +1149,15 @@ public class TriggerTable {
      * @param effects       run in order
      * @param source        where the rule came from, propagated into error messages
      * @param key           stable identity for the per-combatant firing limits (source + position)
+     * @param id            the rule's optional name ({@code ""} when it states none), the handle a
+     *                      {@code MODIFY_RULE} effect points at
      * @param cooldownTurns the owner's turns between two firings ({@code 0} = unlimited)
      * @param oncePerBattle {@code true} = at most one firing per battle
      * @param chance        the probability of firing at all, as a fraction of 1 ({@code 1.0} = always)
      * @param minEidolon    the Eidolon rank the owner needs ({@code 0} = ungated)
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
-                               List<EffectSpec> effects, String source, String key,
+                               List<EffectSpec> effects, String source, String key, String id,
                                int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
                                int perTurn) {
 

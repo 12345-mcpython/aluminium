@@ -263,13 +263,17 @@ public class March7thKitTest {
     /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
-     * <p><b>Seven</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
+     * <p><b>Nine</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
      * Every missing one would be a wrong number or a wrong trigger if it were spelled with the vocabulary that exists
-     * today: 星魂 4 needs a way to raise another rule's limit plus a DEF-derived damage addend, 行迹「冰咒」 needs a way
-     * to raise an existing rule's base chance, and 星魂 6 needs the shield's provider to be askable <i>per ally</i>.
-     * ⚠ 星魂 1 used to be on that list ("needs a per-cast count of the victims a state actually landed on") and came
-     * off it on 2026-09-28, when {@code "scale": "cast_applied:冻结"} existed — which is why her ultimate now has two
-     * rules instead of one.
+     * today: 星魂 4's <i>second</i> sentence needs a damage addend derived from an attribute (「提高数值等同于三月七防御力
+     * 的30%」 — {@code BOOST_DAMAGE} takes a percentage of the instance, not "X = 30% of my DEF"), and 星魂 6 needs the
+     * shield's provider to be askable <i>per ally</i>. Her 战技's soft taunt is a data gap (the document states no
+     * magnitude), and 星魂 3/5 are skill levels (M-32).
+     *
+     * <p>⚠ Two clauses came off that list and each is worth a line: 星魂 1 (2026-09-28) needed a per-cast count of the
+     * victims a state actually landed on ({@code "scale": "cast_applied:冻结"}), and 星魂 4's first sentence plus
+     * 行迹「冰咒」 (same day) needed a way to raise another rule's own number ({@code MODIFY_RULE}, which is what put two
+     * more rules on her BATTLE_START).
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
@@ -280,8 +284,9 @@ public class March7thKitTest {
         Assertions.assertEquals(2, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
                 "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule) and 星魂 1's "
                         + "energy per landed freeze");
-        Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
-                "星魂 2's battle-start shield for the most hurt ally");
+        Assertions.assertEquals(3, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
+                "星魂 2's battle-start shield for the most hurt ally, plus the two amendments: 星魂 4 raising the "
+                        + "talent's per-turn cap and 行迹「冰咒」 raising the ultimate's base chance");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
                 "and nothing of hers reacts to kills");
     }

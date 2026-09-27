@@ -335,6 +335,24 @@ public class EffectSpec {
     private Boolean asAttack;
 
     /**
+     * The <b>id of another rule</b> this effect amends — read only by {@code MODIFY_RULE}
+     * (「天赋的反击效果每回合可触发的次数增加1次」 / 「施放终结技时，冻结敌方目标的基础概率提高15%」).
+     *
+     * <p><b>Why a rule needs a name at all.</b> These sentences do not create anything: they raise a number that
+     * <b>already exists</b> on another rule in the same file ("that counter", "that freeze"). Writing a second rule
+     * with the raised number instead is a wrong answer that looks right — a second {@code per_turn: 3} rule would
+     * <i>add</i> firings (2 + 3 = 5 per turn) rather than raise the cap to 3, and a second {@code base_chance: 0.65}
+     * rule would roll twice (1 − 0.5 × 0.35 = 82.5% instead of 65%). So the target is named, and the reference is
+     * checked at load time (it must exist in the same file, and must actually state the number being raised).
+     *
+     * <p>⚠ The name is scoped to <b>one file</b>: ids are unique per table, and a reference that does not resolve
+     * inside the same table is refused. That is deliberate — a relic rule shared by every wearer has no way to know
+     * which character's rules it is being merged with, so "amend somebody else's rule" is not expressible by accident.
+     */
+    @SerializedName("rule")
+    private String rule;
+
+    /**
      * Whether {@link #amount} is <b>per target hit</b> rather than a flat total.
      *
      * <p>This distinction is not cosmetic — the game states both forms and they differ:
