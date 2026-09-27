@@ -412,14 +412,62 @@ public class BuffManager {
     }
 
     private void processBuffTick(boolean early) {
-        // ⚠ Iterated over a snapshot, not with `removeIf` (M-12). `tickEffect` and `removeBuff` are buff
-        // code: a buff may attach or remove another buff while it ticks, and `removeIf` walks the live list
-        // -- a ConcurrentModificationException raised from the middle of a turn boundary, or a silently
-        // skipped buff. Removal is stated explicitly here instead, which is the same thing `removeIf` did.
-        // ⚠ Iterated over a snapshot, not with `removeIf` (M-12). `tickEffect` and `removeBuff` are buff
-        // code: a buff may attach or remove another buff while it ticks, and `removeIf` walks the live list
-        // -- a ConcurrentModificationException raised from the middle of a turn boundary, or a silently
-        // skipped buff. Removal is stated explicitly here instead, which is the same thing `removeIf` did.
+        tickBuff(instance, early);
+    }
+
+    /**
+     * Spends the duration of the buffs on this unit whose <b>clock</b> belongs to {@code clockOwner} (M-42 ④).
+     *
+     * <p>Called by {@code Battle} at somebody else's turn boundary, for every other unit on the field: 星期日's
+     * 【蒙福者】 lives on the ally and is spent by <b>his</b> turns. Our own boundary is skipped — that one has
+     * already gone through {@link #beforeMove()} / {@link #afterMove()}.
+     *
+     * @param clockOwner the unit whose turn boundary this is
+     * @param early      {@code true} = the "before the move" half, {@code false} = the "after the move" half
+     */
+    public void tickForeign(CanHit clockOwner, boolean early) {
+        if (clockOwner == null || clockOwner == instance) {
+            return;
+        }
+        tickBuff(clockOwner, early);
+    }
+
+    /**
+     * Removes every buff on this unit whose clock belongs to {@code clockOwner} — the anchor's death (M-42 ③).
+     *
+     * <p>⚠ Without this, an anchored buff is a <b>leak</b>: its clock was somebody else's turns, and that somebody
+     * will never take another one. 星期日's 【蒙福者】 says it outright (「当星期日陷入无法战斗状态时，【蒙福者】效果
+     * 也会被解除」), and the generic reason is stronger than the sentence — "spend it on my turns" is meaningless
+     * once I am gone.
+     *
+     * @param clockOwner the unit that just died
+     * @return how many buffs were removed
+     */
+    public int removeBuffsAnchoredTo(CanHit clockOwner) {
+        if (clockOwner == null) {
+            return 0;
+        }
+        int removed = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff.ticksOn(clockOwner) && clockOwner != instance) {
+                if (buffs.remove(buff)) {
+                    buff.removeBuff(instance);
+                    removed++;
+                }
+            }
+        }
+        return removed;
+    }
+
+    /**
+     * The tick itself, for the buffs on this manager whose clock is {@code clockOwner}.
+     *
+     * <p>⚠ Iterated over a snapshot, not with {@code removeIf} (M-12). {@code tickEffect} and {@code removeBuff}
+     * are buff code: a buff may attach or remove another buff while it ticks, and {@code removeIf} walks the live
+     * list — a {@code ConcurrentModificationException} raised from the middle of a turn boundary, or a silently
+     * skipped buff. Removal is stated explicitly here instead, which is the same thing {@code removeIf} did.
+     */
+    private void tickBuff(CanHit clockOwner, boolean early) {
         for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff.isPermanent()) {
                 // "For the rest of the battle": no turn limit, so it is never counted down and never
@@ -428,6 +476,9 @@ public class BuffManager {
                 continue;
             }
             if (buff.isEarlyBuff != early) {
+                continue;
+            }
+            if (!buff.ticksOn(clockOwner)) {
                 continue;
             }
             boolean couldAct = buff.canAct();
