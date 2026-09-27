@@ -37,19 +37,28 @@ import java.util.List;
  * @param note   free-form note for the next reader (may be absent)
  * @param panel  one entry per attribute this memosprite takes from its summoner
  * @param attack the memosprite's own attack, or {@code null} when no document states one (P9-4 忆灵)
+ * @param aggro  the servant's 仇恨 weight, or {@code null} to leave the engine's regular tier (100). Every
+ *               document that describes a servant states one (「ServantID 11413 · 仇恨: 125」), so {@code null}
+ *               means "no document says", not "it is an ordinary unit"
  */
 public record MemospriteSpec(@SerializedName("name") String name,
                              @SerializedName("source") String source,
                              @SerializedName("note") String note,
                              @SerializedName("panel") List<Panel> panel,
-                             @SerializedName("attack") Attack attack) {
+                             @SerializedName("attack") Attack attack,
+                             @SerializedName("aggro") Double aggro) {
 
     /**
      * A spec with a panel and <b>no attack</b> — the ordinary case, since a document states an attack for
      * only some memosprites.
      */
     public MemospriteSpec(String name, String source, String note, List<Panel> panel) {
-        this(name, source, note, panel, null);
+        this(name, source, note, panel, null, null);
+    }
+
+    /** The same, with an attack and no aggro — the shape most specs have. */
+    public MemospriteSpec(String name, String source, String note, List<Panel> panel, Attack attack) {
+        this(name, source, note, panel, attack, null);
     }
 
     /**

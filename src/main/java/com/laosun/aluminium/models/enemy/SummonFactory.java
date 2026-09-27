@@ -163,6 +163,12 @@ public final class SummonFactory {
         }
         Summon summon = new Summon(spec.name(), Camp.PLAYER, panel.build());
         summon.setLevel(master.getLevel());
+        if (spec.aggro() != null) {
+            // The servant's own 仇恨 (「ServantID 11413 · 仇恨: 125」). Only stated when a document states it:
+            // Battle.aggroOf answers its regular tier for anything left at 0, which is a different claim from
+            // "the document says 100".
+            summon.setAggro((int) Math.round(spec.aggro()));
+        }
         if (spec.attack() != null) {
             summon.setSkill(SkillType.COMMON, attackOf(spec));
         }

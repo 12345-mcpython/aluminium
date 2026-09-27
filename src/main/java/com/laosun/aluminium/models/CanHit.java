@@ -57,6 +57,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     @Setter
     private int level = 80;
 
+    /**
+     * This unit's aggro weight, or {@code 0} for "not stated — use the regular tier" ({@link Battle#aggroOf}).
+     *
+     * <p>A {@link Character}'s own aggro comes from the character data (with the path as its fallback); this field
+     * is what a unit with <b>no</b> character data can state instead. Its first user is a memosprite: the documents
+     * give servants a line of their own — 「ServantID 11413 · 仇恨: 125」 — and before this {@code aggroOf} answered the
+     * 100 fallback for every summon, so an enemy picked its target as if the memosprite were an ordinary character
+     * while the game makes it 25% more attractive.
+     */
+    @Setter
+    private int aggro;
+
     @Setter
     private EnumMap<SkillType, Skill> skills;
     /**

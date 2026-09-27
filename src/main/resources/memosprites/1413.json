@@ -1,7 +1,8 @@
 {
   "name": "长夜",
   "source": "1413 长夜月 · panel ← 天赋 skill 141304 「进入战斗时召唤忆灵「长夜」。忆灵「长夜」初始拥有#4[i]点速度，生命上限为长夜月的#5[i]%。」 param_list 各等级均为 #4=160 / #5=0.5 · attack ← 忆灵技能1「追忆，蹁跹，如雨」 效果=单体攻击 元素=冰 「对敌方单体造成等同于「长夜」50%生命上限的冰属性伤害」",
-  "note": "The mirror image of 阿格莱雅's 衣匠: here SPEED is a FLAT number (160, nothing to do with the summoner's speed) while HEALTH is a share of hers. One entry shape covers both spellings -- `flat` only, `percent` only, or both -- which is why the spec is a list of derivations rather than two named fields. ⚠ The text gives no ATTACK/DEFENCE for 「长夜」 either, which is exactly why its attack scales off HEALTH: 50% of a number the panel does state, not a guess at one it does not. ⚠ The quoted 50% is the 忆灵技能1 row the prose is written at (Lv6); the full table is 0.25 (Lv1) → 0.70 (Lv10), and a memosprite skill has no level table in the generated data -- see ROADMAP §12.5 F-10.",
+  "note": "「ServantID 11413 · 仇恨: 125」 -- the servant block states an aggro weight of its own, and that is what `aggro` carries (before this, every summon sat at the engine's 100 fallback). The mirror image of 阿格莱雅's 衣匠: here SPEED is a FLAT number (160, nothing to do with the summoner's speed) while HEALTH is a share of hers. One entry shape covers both spellings -- `flat` only, `percent` only, or both -- which is why the spec is a list of derivations rather than two named fields. ⚠ The text gives no ATTACK/DEFENCE for 「长夜」 either, which is exactly why its attack scales off HEALTH: 50% of a number the panel does state, not a guess at one it does not. ⚠ The quoted 50% is the 忆灵技能1 row the prose is written at (Lv6); the full table is 0.25 (Lv1) → 0.70 (Lv10), and a memosprite skill has no level table in the generated data -- see ROADMAP §12.5 F-10.",
+  "aggro": 125,
   "panel": [
     {
       "attribute": "HEALTH",

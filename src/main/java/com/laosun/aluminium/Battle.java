@@ -1187,7 +1187,13 @@ public class Battle {
             }
             return character.getPath().getAggro();
         }
-        return 100;                                  // enemies / summons: no path, so give the regular tier
+        // A unit with no character data can still state its own weight (CanHit.aggro): every servant document
+        // gives a 仇恨 line (11413 / 11402 are both 125), and without this every summon sat at the 100 fallback
+        // -- a target the enemy treated as an ordinary character while the game makes it 25% more attractive.
+        if (entity.getAggro() > 0) {
+            return entity.getAggro();
+        }
+        return 100;                                  // enemies / summons with nothing stated: the regular tier
     }
 
     /**
