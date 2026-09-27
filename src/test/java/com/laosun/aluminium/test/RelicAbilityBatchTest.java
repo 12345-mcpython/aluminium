@@ -79,6 +79,8 @@ public class RelicAbilityBatchTest {
     private static final int ULT_SLOT = 3;
     /** 生命的翁法罗斯: the derived-value set (its bonus is a function of Max Energy). */
     private static final int AMPHOREUS = 328;
+    /** 出云显世与高天神国: the party-composition set (its CRIT Rate needs a teammate on the same Path). */
+    private static final int IZUMO = 314;
 
     // ==================================================================
     // 102 — 普攻伤害 +10%
@@ -492,6 +494,41 @@ public class RelicAbilityBatchTest {
         for (com.laosun.aluminium.models.buff.StatModifierBuff buff
                 : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class)) {
             if (buff.getAttribute() == AttributeType.ALL_DAMAGE_TYPE_BOOST) {
+                return buff.getValue();
+            }
+        }
+        return 0;
+    }
+
+    // ==================================================================
+    // 314 — the party-composition condition
+    // ==================================================================
+
+    /**
+     * 314 出云显世与高天神国: the CRIT Rate arrives only when a teammate walks the wearer's Path.
+     *
+     * <p>⚠ The value is read off the <b>modifier the rule granted</b>, not off the resolved attribute: the wearer is
+     * built with a relic suit, whose random sub-stats may carry CRIT Rate of their own (relic sub-stats become
+     * attributes at build time, so a `StatModifierBuff` on that attribute can only have come from a rule).
+     */
+    @Test
+    public void theIzumoCritRateNeedsATeammateOnTheSamePath() {
+        Assertions.assertEquals(0.12, grantedCritRateWith(1013), 1e-6,
+                "黑塔 is 智识, like the wearer: 「若至少存在一名与装备者命途相同的队友」");
+        Assertions.assertEquals(0, grantedCritRateWith(1210), 1e-6,
+                "桂乃芬 is 虚无: the condition does not hold, so nothing is granted");
+    }
+
+    /** The CRIT Rate modifier the suit granted, or 0 when it granted none. */
+    private static double grantedCritRateWith(int allyCid) {
+        Character wearer = wearing(IZUMO);
+        Character ally = CharacterFactory.create(allyCid, LEVEL);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+
+        for (com.laosun.aluminium.models.buff.StatModifierBuff buff
+                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class)) {
+            if (buff.getAttribute() == AttributeType.CRIT_CHANCE) {
                 return buff.getValue();
             }
         }

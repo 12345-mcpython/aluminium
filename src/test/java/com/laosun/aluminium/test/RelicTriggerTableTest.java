@@ -205,7 +205,10 @@ public class RelicTriggerTableTest {
             "121/4",
             // Authored on 2026-09-27 once a derived value could read MAX ENERGY
             // (`self_max_energy`, both as a condition and as a scale).
-            "328/2");
+            "328/2",
+            // Authored once a condition could ask about the PARTY, not just the owner
+            // or the event (`self has_same_path_ally`).
+            "314/2");
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
@@ -219,7 +222,7 @@ public class RelicTriggerTableTest {
      * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}).
      */
-    private static final int STILL_REGISTERED = 28;
+    private static final int STILL_REGISTERED = 27;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
@@ -643,7 +646,7 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(14, twoPiece,
+        Assertions.assertEquals(13, twoPiece,
                 "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (20 until the "
                         + "2-pieces of sets 117 and 310 were authored on 2026-09-28)");
     }
