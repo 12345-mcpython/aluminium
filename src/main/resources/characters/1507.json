@@ -1,0 +1,17 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "TAUNT",
+        "turns": 1,
+        "target": "target"
+      }
+    ],
+    "source": "1507 千冶•刃 战技: 「对指定敌方单体造成等同于千冶•刃50%生命上限的火属性伤害，并使目标陷入嘲讽状态，持续1回合。」",
+    "note": "The taunt clause only: the damage half is the Skill's own and the engine executes it generically from `skills.json`, so a rule that repeated it would deal it twice. ⚠ `target` here is an ENEMY — the unit this cast was AIMED at (M-35) — and that is what the sentence does: it puts 嘲讽 on the enemy it hit, which forces that enemy's single-target attacks to pick 千冶·刃 (`TauntBuff`'s hard constraint at target-selection). ⚠ `turns: 1` is 「持续1回合」. ⚠ Her 强化普攻 carries the same clause (100% 生命上限 伤害 + 嘲讽 1 回合) and is NOT written: the enhanced basic attack needs the 【无量忿怒】 state machine (a countdown unit, a replaced basic attack, immunity), which is registered. ⚠ 云璃's ultimate puts the same buff on EVERY enemy (「使敌方全体陷入嘲讽状态」) — one rule with `target: \"all_allies\"`? No: the enemies, and our rules have no enemy-side group selector yet; registered."
+  }
+]

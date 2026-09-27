@@ -14,6 +14,7 @@ import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
+import com.laosun.aluminium.models.buff.TauntBuff;
 import com.laosun.aluminium.models.buff.VulnerabilityBuff;
 import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.Skill;
@@ -105,7 +106,7 @@ public final class TriggerInterpreter {
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
-            "REMOVE_STATE");
+            "REMOVE_STATE", "TAUNT");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -254,6 +255,23 @@ public final class TriggerInterpreter {
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
+            case "TAUNT" -> {
+                // 「使目标陷入嘲讽状态，持续N回合」: the engine's TauntBuff is a pure marker with a hard
+                // target-selection constraint, so all this op needs is the duration. No `permanent` / `until`: a
+                // marker with no turn count would never come off, and no document writes it that way.
+                Integer turns = effect.getTurns();
+                if (turns == null || turns <= 0) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " requires a positive \"turns\" (how long the taunt lasts); the documents "
+                                    + "write 「使目标陷入嘲讽状态，持续1回合」 (source: " + spec.getSource() + ")");
+                }
+                if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " takes a turn count and nothing else; \"permanent\" / \"until\" would be "
+                                    + "a taunt that never ends (source: " + spec.getSource() + ")");
+                }
+                requireNoStackArguments(effect, op, spec);
+            }
             case "REMOVE_STATE" -> {
                 // `buff` is the state's name — the same spelling `has_state` reads and `APPLY_BUFF` writes, so the
                 // three are one vocabulary. ⚠ No count: 「解除…状态」 takes the state off, it does not take N of
@@ -394,6 +412,7 @@ public final class TriggerInterpreter {
             case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "REMOVE_STATE" -> removeState(effect, ctx);
+            case "TAUNT" -> taunt(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1247,6 +1266,22 @@ public final class TriggerInterpreter {
      * The op that <i>applies</i> a state to a unit that does not exist is loud ({@code "target": "summon"}); this one
      * has no such unit to miss.
      */
+    /**
+     * {@code TAUNT}: puts the engine's {@link TauntBuff} on every resolved target — 「使目标陷入嘲讽状态，持续1回合」.
+     *
+     * <p>The buff is a pure marker, and the constraint it carries is a <b>hard one</b> implemented at target
+     * selection (`TargetSelector`): as long as it is attached to a living unit, single-target attacks and the centre
+     * of a blast attack can only pick that unit. ⚠ That is the 「嘲讽」 the corpus asks for (云璃's ultimate puts it
+     * on every enemy, 千冶·刃's skill on one) and it is deliberately NOT the same thing as 「被敌方攻击的概率提高」
+     * (三月七/杰帕德/玲可), which is a soft weight — that sentence carries <b>no number</b> in any document, so it is
+     * registered as a data gap rather than guessed at here.
+     */
+    private static void taunt(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            target.getBuffManager().addBuff(new TauntBuff(effect.getTurns()));
+        }
+    }
+
     private static void removeState(EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(ctx.battle(), effect, ctx)) {
             target.getBuffManager().removeState(effect.getBuff());
