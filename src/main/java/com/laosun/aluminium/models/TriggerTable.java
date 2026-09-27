@@ -382,8 +382,8 @@ public class TriggerTable {
      * (and rejected there for the four {@code *_PERCENT} builder keys, whose runtime slot is null).
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("hit_count", "hp_percent", "target_debuff_count", "self_summon_count", "target_summon_count",
-                    "self_max_energy");
+            Set.of("hit_count", "hp_percent", "target_hp_percent", "target_debuff_count", "self_summon_count",
+                    "target_summon_count", "self_max_energy");
 
     /**
      * The prefix of the one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -1333,6 +1333,9 @@ public class TriggerTable {
                 case "hit_count" -> ctx.hitCount();
                 case "hp_percent" -> hpPercent(ctx.owner());
                 case "target_debuff_count" -> ctx.target() == null ? Double.NaN : ctx.target().getBuffManager().debuffCount();
+                // 「若该目标当前生命值百分比大于等于 30%」 -- the OTHER unit's HP, which `hp_percent` cannot ask
+                // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
+                case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());
                 case "self_summon_count" -> summonCount(ctx.owner(), ctx);
                 // 「若目标拥有召唤物」 — the same question about the OTHER unit. It is a separate name rather
                 // than a subject prefix because the two are asked in the same sentence often (relic 127 asks
