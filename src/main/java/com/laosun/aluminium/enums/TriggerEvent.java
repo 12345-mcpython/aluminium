@@ -156,7 +156,29 @@ public enum TriggerEvent {
      * {@code DAMAGE} op is a follow-up responding to a follow-up; {@code Battle.MAX_TRIGGER_DEPTH}
      * stops that loudly instead of letting it run away.
      */
-    FOLLOW_UP("FOLLOW_UP", true);
+    FOLLOW_UP("FOLLOW_UP", true),
+    /**
+     * ✅ A <b>summon</b> finished an attack (2026-09-28, P9-4 忆灵): fired by {@code EnemySkill.execute}
+     * after every segment of its attack has been settled, with the summon as {@code actor} and the
+     * hit-target count riding along like {@link #ALLY_ATTACK}'s.
+     *
+     * <p><b>Why its own event rather than widening {@link #ALLY_ATTACK}.</b> "An ally attacked" is what
+     * three shipped rules mean today ({@code characters/1309.json}, {@code characters/1403.json}'s
+     * 「我方其他目标攻击后」, relic set 105's {@code actor == self}), and whether a memosprite counts as
+     * one of those 「目标」 is <b>not</b> something the documents settle here. Widening the event would
+     * have silently changed what those three rules fire on — an over-trigger is a wrong number with no
+     * error attached — so the distinction is drawn at the emitter instead, exactly as
+     * {@link #SKILL_CAST} / {@link #BASIC_ATTACK} / {@link #ULT_CAST} are.
+     *
+     * <p><b>It is fired for a summon of either camp</b> (a boss's minion attacks too); which summons a
+     * rule cares about is its own question, and the condition for it is {@code actor == summon} (the
+     * rule owner's own summon) — see {@code engine.md} §4.6. Without that condition a rule would also
+     * fire when a <em>teammate's</em> summon attacks, which is the same over-trigger in another coat.
+     *
+     * <p>An attack that connected with nothing does not fire it, and neither does a summon with no
+     * attack of its own: this is "an attack happened", not "a unit was on the field".
+     */
+    SUMMON_ATTACK("SUMMON_ATTACK", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 

@@ -327,6 +327,8 @@ public class TriggerTable {
     //   actor != self         someone else on my side acted      <- Robin's "after an ally attacks"
     //   target == self        it happened to me                  <- Clara's "after I am hit"
     //   target != self        it happened to someone else        <- a healer watching a teammate
+    //   actor == summon       MY OWN summon acted                <- relic 123's 「装备者的忆灵攻击时」
+    //   target == summon      it happened to my own summon       <- 「装备者的忆灵受到攻击后」
     //   hit_count > 0         the attack connected with at least one target
     //   hit_count == 2        exact hit count
     //   hp_percent <= 0.5     the owner's own HP is at or below half   <- set 106's "at the beginning
@@ -434,10 +436,15 @@ public class TriggerTable {
 
         if ("==".equals(operator) || "!=".equals(operator)) {
             boolean negated = "!=".equals(operator);
-            if ("self".equals(left) || "self".equals(right)) {
-                String other = "self".equals(left) ? right : left;
+            // An identity comparison: one side names a PARTY (`self` = the rule's owner, `summon` = a summon
+            // of the owner) and the other names WHICH party (`actor` / `target`). Written symmetrically, so
+            // `summon == actor` reads the same as `actor == summon`.
+            String term = IDENTITY_TERMS.contains(left) ? left
+                    : IDENTITY_TERMS.contains(right) ? right : null;
+            if (term != null) {
+                String other = term.equals(left) ? right : left;
                 String variable = requireIdentityVariable(other, raw, spec);
-                return new Equality(variable, "self", negated);
+                return new Equality(variable, term, negated);
             }
             // Neither side is "self", so this is not an identity comparison — it is a numeric one, and
             // `hit_count == 2` has been in this DSL's documentation since its first version while the parser
@@ -445,8 +452,9 @@ public class TriggerTable {
             // through to the numeric path; a comparison between two *names* still gets the clearer message.
             if (!isNumeric(left) && !isNumeric(right)) {
                 throw new IllegalArgumentException(
-                        "Condition '" + raw + "' compares two variables; only comparisons against "
-                                + "\"self\", or against a numeric literal (e.g. \"hit_count == 2\"), are "
+                        "Condition '" + raw + "' compares two variables; only comparisons against a party ("
+                                + String.join(", ", IDENTITY_TERMS.stream().sorted().toList())
+                                + "), or against a numeric literal (e.g. \"hit_count == 2\"), are "
                                 + "supported (source: " + spec.getSource() + ")");
             }
         }
@@ -537,6 +545,23 @@ public class TriggerTable {
     }
 
     /**
+     * The two variables an identity comparison can ask about: who caused the event, and what it happened to.
+     */
+    private static final Set<String> IDENTITY_VARIABLES = Set.of("actor", "target");
+
+    /**
+     * The two parties an identity comparison can compare against: the rule's own character, and the summons
+     * that character owns.
+     *
+     * <p>Deliberately not the whole target-selector vocabulary. The other selectors are either not a single
+     * unit ({@code all_allies} / {@code party}) or would make the comparison vacuous ({@code attacker} can only
+     * be the actor, and {@code target == target} is a tautology because the event already says who it happened
+     * to) — and a spelling that can never mean anything is exactly what this DSL refuses at load time rather
+     * than letting an author write it and wonder.
+     */
+    private static final Set<String> IDENTITY_TERMS = Set.of("self", "summon");
+
+    /**
      * Checks that an identity comparison names a variable the DSL knows.
      *
      * <p>The set is closed on purpose: a typo such as {@code actor == sself} must fail at load time
@@ -548,11 +573,15 @@ public class TriggerTable {
      * @return the variable name
      */
     private static String requireIdentityVariable(String token, String raw, TriggerSpec spec) {
-        if (!"actor".equals(token) && !"target".equals(token)) {
+        if (!IDENTITY_VARIABLES.contains(token)) {
             throw new IllegalArgumentException(
-                    "Condition '" + raw + "' compares \"self\" with an unknown variable '" + token
-                            + "'; identity variables are actor (who caused the event) and "
-                            + "target (what it happened to) (source: " + spec.getSource() + ")");
+                    "Condition '" + raw + "' compares a known party with '" + token
+                            + "', which is neither an identity variable ("
+                            + String.join(", ", IDENTITY_VARIABLES.stream().sorted().toList())
+                            + ": who caused the event / what it happened to) nor an identity term ("
+                            + String.join(", ", IDENTITY_TERMS.stream().sorted().toList())
+                            + ": the rule's owner / a summon of the rule's owner) (source: "
+                            + spec.getSource() + ")");
         }
         return token;
     }
@@ -768,14 +797,18 @@ public class TriggerTable {
     }
 
     /**
-     * Identity comparison: {@code actor == self} / {@code actor != self} / {@code target == self} / …
+     * Identity comparison: {@code actor == self} / {@code actor != self} / {@code target == self} /
+     * {@code actor == summon} / …
      *
-     * <p>{@code actor} is who caused the event, {@code target} is what it happened to. See
-     * {@link TriggerContext}.
+     * <p>{@code actor} is who caused the event, {@code target} is what it happened to; {@code self} is the
+     * rule's owner and {@code summon} is one of that owner's summons. See {@link TriggerContext}.
      */
     private static final class Equality implements Condition {
 
         private final String variable;
+        /**
+         * {@code self} or {@code summon} — which party the variable is compared against.
+         */
         private final String otherToken;
         private final boolean negated;
 
@@ -792,9 +825,21 @@ public class TriggerTable {
                 case "target" -> ctx.target();
                 default -> null;
             };
-            CanHit right = "self".equals(otherToken) ? ctx.owner() : null;
-            boolean equal = subject == right;
-            return negated != equal;
+            if (!"summon".equals(otherToken)) {
+                boolean equal = subject == ctx.owner();
+                return negated != equal;
+            }
+            // "…is one of my summons" is read off the FIELD, so a context with no battle cannot answer it and
+            // the condition fails — for BOTH polarities. That is the same rule `self_summon_count` follows
+            // (NaN compares false against everything), and it matters more here: answering "no battlefield,
+            // therefore not my summon" would make `actor != summon` silently TRUE for every event, i.e. a rule
+            // that says "anyone but my summon attacked" would fire on everything. A wrong answer with no
+            // symptom is what this convention exists to prevent.
+            if (ctx.battle() == null || ctx.owner() == null) {
+                return false;
+            }
+            boolean own = ctx.battle().summonsOf(ctx.owner()).contains(subject);
+            return negated != own;
         }
 
         @Override

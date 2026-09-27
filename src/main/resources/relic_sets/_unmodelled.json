@@ -116,13 +116,6 @@
       "reason": "Writable now: \"Increases DMG dealt by Skill and Ultimate by 20%. After using Ultimate, additionally increases the DMG dealt by the next Skill by 25%.\" Three rules: SKILL_DAMAGE_BOOST and ULTIMATE_DAMAGE_BOOST are two constant effects, and the second sentence is `on: ULT_CAST` + `when: [\"actor == self\"]` -> MODIFY_ATTR SKILL_DAMAGE_BOOST 0.25 with `\"until\": \"next_skill\"` (the lifetime that ends a buff when its owner casts a Skill, added 2026-09-27)."
     }
   ],
-  "123": [
-    {
-      "require": 4,
-      "ability": "Ability51231",
-      "reason": "\"While the wearer's memosprite is on the field, increases the wearer's SPD by 6%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by 30%, lasting for 3 turn(s).\" The first clause is now a rule (`self_summon_count >= 1`, with the 'while' technique set 318's file documents), and the second clause's two units are expressible as two rules (self + `target: \"summon\"`). What still blocks the ability is that there is no event for 'the memosprite attacked': `ALLY_ATTACK` would fire for every ally's attack, so a rule hung on it would also fire when the wearer herself attacks -- an over-trigger, not a near miss. (⚠ Re-checked 2026-09-28, after a memosprite's attack started announcing itself to our side -- `Battle.fireAfterAttack`, see engine.md §24.8 and ROADMAP M-30: the missing piece is NOT a notification but a CONDITION, 'the attacker is my memosprite'. `ALLY_ATTACK` fires for any teammate's attack, so it stays an over-trigger. A condition on the actor is an addition to the condition DSL, not a one-line wiring.)"
-    }
-  ],
   "124": [
     {
       "require": 4,
