@@ -427,6 +427,7 @@ hp_percent <= 0.5 我自己的血量比例（0.5 = 50%）← 风雪交加 4 件�
 target_debuff_count >= 3  事件的承受者身上有 3 个负面  ← 银狼「若目标的负面效果数量 ≥ 3，则减抗额外降低」
 self_attr:SPEED >= 145    **我自己**的某个属性值      ← 位面饰品 2 件套的那一大类「当装备者的速度 ≥ 145 时」
 self_summon_count >= 1    我自己有召唤物在场        ← 忆灵那一类「装备者的忆灵在场时」「当存在装备者召唤的目标时」
+self_max_energy >= 200    **我自己**的能量上限        ← 生命的翁法罗斯 328「若装备者能量上限大于等于 200 点…」（⚠ 它不是属性）
 target_summon_count >= 1  **这件事的承受者**有召唤物在场  ← 星期日战技「若目标拥有召唤物，则造成的伤害提高额外提高…」
 self has_state 协奏   我处于具名状态【协奏】      ← 知更鸟「处于【协奏】状态时」
 target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡「触电状态下的敌方目标」
@@ -532,7 +533,7 @@ JSON 写法不变。
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `damage_level`、`target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
 | `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、`max_stacks`（别名 `stacks`）、**`scale`**（派生值，见下）、**`ticks_on`**（按谁的回合扣时长，见下） | ✅（P10-3） |
-| ↳ **派生值** `scale: "self_attr:<属性>"` | `percent` × **规则主人**那条属性的当前值 + 可选 `amount`（P11-2，M-42） | ✅ 首个用户**大丽花行迹「又一场葬礼」**「使其他角色的击破特攻提高，提高数值等同于 **24% 大丽花的击破特攻 + 50%**」。⚠ 结果是**绝对值**（即使目标是基础属性）—— 文档给的是"数值"，不是"目标基数的百分比"；⚠ 触发时**算一次就冻结**（引擎既有的快照口径 §24.5），所以 `amount` 是那个常数项；⚠ 没有 `scale` 却写了 `amount` **装载期拒绝**（以前是**静默忽略**）。⚠ 前缀与条件 DSL 的 `self_attr:` 共用一处定义（`TriggerTable.SELF_ATTR_PREFIX`），免得两种拼写各自漂移 |
+| ↳ **派生值** `scale: "self_attr:<属性>"` 或 `"self_max_energy"` | `percent` × **规则主人**那条属性的当前值（或**能量上限**）+ 可选 `amount`（P11-2，M-42；`self_max_energy` 见下） | ✅ 首个用户**大丽花行迹「又一场葬礼」**「使其他角色的击破特攻提高，提高数值等同于 **24% 大丽花的击破特攻 + 50%**」。⚠ 结果是**绝对值**（即使目标是基础属性）—— 文档给的是"数值"，不是"目标基数的百分比"；⚠ 触发时**算一次就冻结**（引擎既有的快照口径 §24.5），所以 `amount` 是那个常数项；⚠ 没有 `scale` 却写了 `amount` **装载期拒绝**（以前是**静默忽略**）。⚠ 前缀与条件 DSL 的 `self_attr:` 共用一处定义（`TriggerTable.SELF_ATTR_PREFIX`），免得两种拼写各自漂移 |
 | `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
 | `BOOST_DAMAGE` | `percent`（只能挂在 `DEALING_DAMAGE` 上） | ✅ 改**正在结算的那一次**伤害：不改属性、不挂 buff、不会漏到下一次。是「对处于 X 状态的目标造成的伤害提高 Y%」的实现 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
