@@ -17,6 +17,7 @@
     "element": "Ice",
     "base": "HEALTH",
     "percent": 0.5,
-    "shape": "SingleAttack"
+    "shape": "SingleAttack",
+    "stance": 30
   }
 }

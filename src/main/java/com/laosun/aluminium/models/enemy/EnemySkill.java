@@ -60,6 +60,14 @@ public class EnemySkill extends Skill {
      */
     @Getter
     private final AttributeType baseAttribute;
+    /**
+     * Toughness this attack removes per hit, or {@code 0} for "does not touch the bar".
+     *
+     * <p>Enemies never had a value here (they do not attack a toughness bar), so 0 is the default and their
+     * behaviour is unchanged. A memosprite's attack does: the documents state 「破韧值 单体 30」 beside its damage.
+     */
+    @Getter
+    private final double stanceDamage;
 
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type) {
         this(element, multiplier, hits, type, SkillEffectType.SINGLE_ATTACK);
@@ -71,7 +79,7 @@ public class EnemySkill extends Skill {
      */
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
                       SkillEffectType effect) {
-        this(element, multiplier, hits, type, effect, AttributeType.ATTACK);
+        this(element, multiplier, hits, type, effect, AttributeType.ATTACK, 0);
     }
 
     /**
@@ -83,12 +91,22 @@ public class EnemySkill extends Skill {
      */
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
                       SkillEffectType effect, AttributeType baseAttribute) {
+        this(element, multiplier, hits, type, effect, baseAttribute, 0);
+    }
+
+    /**
+     * @param stanceDamage toughness removed per hit; {@code 0} or less leaves the bar alone, which is what an
+     *                     enemy's attack has always meant
+     */
+    public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
+                      SkillEffectType effect, AttributeType baseAttribute, double stanceDamage) {
         this.element = element == null ? DamageElement.PHYSICAL : element;
         this.multiplier = multiplier;
         this.hits = Math.max(1, hits);
         this.type = type == null ? DamageType.NORMAL : type;
         this.effect = effect == null ? SkillEffectType.SINGLE_ATTACK : effect;
         this.baseAttribute = baseAttribute == null ? AttributeType.ATTACK : baseAttribute;
+        this.stanceDamage = stanceDamage;
     }
 
     @Override
@@ -219,6 +237,12 @@ public class EnemySkill extends Skill {
                 break;                               // once killed mid-way, stop hitting (no overkill on a corpse)
             }
             total += battle.applyDamage(victim, new Damage(user, victim, element, type, base));
+            // After the damage, like SkillExecutor.hit does: the bar comes off a hit that landed, and a break it
+            // causes is settled by Battle.reduceToughness itself. Only a real toughness bar takes one -- an attack
+            // on a character has none, which is why the enemy path has always carried 0 here.
+            if (stanceDamage > 0 && victim instanceof Enemy enemy) {
+                battle.reduceToughness(user, enemy, element, stanceDamage);
+            }
         }
         return total;
     }
