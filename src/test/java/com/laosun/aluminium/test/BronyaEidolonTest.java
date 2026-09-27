@@ -97,8 +97,57 @@ public class BronyaEidolonTest {
     }
 
     // ==================================================================
+    // 星魂 6: the Skill's damage boost lasts one turn longer
+    // ==================================================================
+
+    /**
+     * 「战技对指定我方目标造成的伤害提高效果的持续时间增加1回合」 — and nothing else.
+     *
+     * <p>⚠ The other half of the assertion is the point: her 「作战再部署」 trace buff (+20% DEFENCE, 2 turns, applied
+     * at {@code BATTLE_START}) is <b>also</b> hers and can still be ticking when she casts her Skill. An
+     * {@code EXTEND_BUFF} that meant "lengthen everything I applied" would silently add a turn to it as well — which
+     * is why the op requires the buff to be named (by state or by attribute).
+     */
+    @Test
+    public void herSixthEidolonLengthensTheSkillDamageBoostAndNothingElse() {
+        Battle battle = battleWith(6, 0.0);
+        Character bronya = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+        drainSkillPoints(battle);
+
+        castSkillOn(battle, bronya, ally);
+
+        Assertions.assertEquals(2, durationsOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST).getFirst(), 0.0,
+                "1 turn from the Skill + 1 from 星魂 6");
+        Assertions.assertEquals(2, durationsOf(bronya, AttributeType.DEFENCE).getFirst(), 0.0,
+                "the DEFENCE trace is hers too, and its own duration is untouched");
+    }
+
+    /** Below rank 6 the boost is the Skill's own one turn — the Eidolon gate, not a shorter extension. */
+    @Test
+    public void theSixthEidolonsExtensionIsGatedOnItsRank() {
+        Battle battle = battleWith(5, 0.0);
+        Character bronya = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+        drainSkillPoints(battle);
+
+        castSkillOn(battle, bronya, ally);
+
+        Assertions.assertEquals(1, durationsOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST).getFirst(), 0.0,
+                "at 星魂 5 the boost still lasts exactly its own 1 turn");
+    }
+
+    // ==================================================================
     // Helpers
     // ==================================================================
+
+    /** The remaining durations of a unit's timed stat modifiers on one attribute. */
+    private static List<Integer> durationsOf(Character who, AttributeType attribute) {
+        return who.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class).stream()
+                .filter(buff -> buff.getAttribute() == attribute)
+                .map(com.laosun.aluminium.models.buff.StatModifierBuff::duration)
+                .toList();
+    }
 
     private static int skillPointsFromOneSkillCast(int rank, double roll) {
         Battle battle = battleWith(rank, roll);
@@ -106,6 +155,11 @@ public class BronyaEidolonTest {
         drainSkillPoints(battle);
         castSkill(battle, bronya);
         return battle.getSkillPoints();
+    }
+
+    /** The Skill aimed at one ally -- what 「战技对指定我方目标」 means (the sentence under test is about an ally). */
+    private static void castSkillOn(Battle battle, Character hero, Character ally) {
+        battle.castImmediate(hero.getSkills().get(SkillType.SKILL), hero, List.of(ally));
     }
 
     private static void castSkill(Battle battle, Character hero) {

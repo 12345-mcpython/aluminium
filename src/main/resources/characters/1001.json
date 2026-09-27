@@ -86,5 +86,21 @@
     "min_eidolon": 2,
     "source": "1001 三月七 星魂 2 记忆中的它 (Avatar_March7th_Rank02): 「进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+320的护盾，持续3回合。」 param = [0.24, 3, 320]",
     "note": "The shield's numbers are the Skill's shape at a different scale (`scale: owner_def` + a constant `amount` + `turns`) -- what this rule needed was the <b>selector</b>: 「当前生命值百分比**最低**的我方目标」, which is a place an effect reaches and not a condition (conditions filter rules, not the units an effect lands on). ⚠ It is `lowest_hp_ally` = the lowest HP **percentage**, and at BATTLE_START everybody is at 100%, so this rule always fires on a <b>tie</b>: the engine's stated tie-break is the earliest unit in the party order, which is why the choice is deterministic instead of luck. ⚠ `turns: 3` is honoured (a timed `ShieldBuff`, counted in the shielded ally's own turns). ⚠ The prose says 「24% 防御力 + 320」 and the shield is applied at the start of the battle, so 三月七's DEFENCE at that moment is what it reads -- she is built before the battle starts, so that is her resolved panel (light cone and relics included) ✓. ⚠ NOT authored from this Eidolon: nothing -- it is the second of her clauses to be complete. 星魂 1/4/6 and 行迹「加护」/「冰咒」 remain registered, together with the reasons (see the talent's and the ultimate's notes)."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "EXTEND_BUFF",
+        "buff": "护盾",
+        "turns": 1,
+        "target": "target"
+      }
+    ],
+    "source": "1001 三月七 行迹 加护 (1001102): 「战技提供的护盾持续时间增加1回合。」",
+    "note": "「战技**提供的**护盾持续时间增加1回合」: the rule states the duration and names the buff by its <b>origin</b> -- `buff: 护盾` plus the engine's own \"who applied it\" filter, which is what 「战技提供的」 says. It fires on the same cast as the Skill, and it sits <b>after</b> the shield rule in this file, which is what makes the shield already be there when it runs (effects of one event run in order; only *conditions* are all evaluated up front -- see ControlTest.aRuleCanGateOnTheFrozenState). ⚠ The +1 is deliberately NOT folded into the Skill's `turns: 3`: that would erase this trace's own line from the data and make the Skill state a duration that is not its own (and a trace could one day be gated on its own). ⚠ It lengthens exactly one buff: 三月七's timed buffs on that ally are the shield (fresh, because the Skill's own rule just re-applied it); anything else of hers carries a different name and is not touched."
   }
 ]

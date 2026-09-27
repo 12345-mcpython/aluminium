@@ -142,6 +142,59 @@ final class TriggerSpecs {
         return effect;
     }
 
+    /** {@code MODIFY_DAMAGE_TAKEN} with a turn count (positive = 易伤, negative = 减伤). */
+    static EffectSpec modifyDamageTaken(double percent, int turns) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "MODIFY_DAMAGE_TAKEN");
+        set(effect, "percent", percent);
+        set(effect, "turns", turns);
+        set(effect, "target", "target");
+        return effect;
+    }
+
+    /**
+     * {@code APPLY_BUFF}: a named state.
+     *
+     * @param state     the state's name as the documents spell it (协奏)
+     * @param turns     how many turns it lasts, or {@code null} for a permanent one
+     * @param permanent {@code true} for 「整场战斗」, or {@code null}
+     */
+    static EffectSpec applyBuff(String state, Integer turns, Boolean permanent) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "APPLY_BUFF");
+        set(effect, "buff", state);
+        set(effect, "turns", turns);
+        set(effect, "permanent", permanent);
+        set(effect, "target", "target");
+        return effect;
+    }
+
+    /** {@code TAUNT} for a number of turns. */
+    static EffectSpec taunt(int turns) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "TAUNT");
+        set(effect, "turns", turns);
+        set(effect, "target", "target");
+        return effect;
+    }
+
+    /**
+     * An {@code EXTEND_BUFF} effect: 「…的持续时间增加 N 回合」.
+     *
+     * @param buff      the state's name (or 护盾) the rule lengthens, or {@code null} when filtering by attribute
+     * @param attribute the attribute a modifier sits on, or {@code null} when filtering by name
+     * @param turns     how many turns to add, or {@code null} to leave the field out
+     */
+    static EffectSpec extendBuff(String buff, String attribute, Integer turns) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "EXTEND_BUFF");
+        set(effect, "buff", buff);
+        set(effect, "attribute", attribute);
+        set(effect, "turns", turns);
+        set(effect, "target", "target");
+        return effect;
+    }
+
     /**
      * An {@code APPLY_DOT} effect: 「使目标陷入…状态，每回合造成…伤害，持续 N 回合」.
      *

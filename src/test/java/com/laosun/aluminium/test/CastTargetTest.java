@@ -155,8 +155,9 @@ public class CastTargetTest {
         TriggerTable.TriggerContext aimed =
                 new TriggerTable.TriggerContext(bronya, bronya, ally, 0, 0, null, battle);
         List<TriggerTable.CompiledRule> onAlly = rulesFor(table, aimed);
-        Assertions.assertEquals(3, onAlly.size(),
-                "her Eidolon 1 rule matches a skill cast too; the two below are the skill's own sentences");
+        Assertions.assertEquals(4, onAlly.size(),
+                "her Eidolon 1 rule matches a skill cast too, and so does 星魂 6 (which lengthens the boost below); "
+                        + "the two below are the skill's own sentences");
         EffectSpec advance = ruleWithCondition(onAlly, "target != self").effects().getFirst();
         Assertions.assertEquals("ADVANCE", advance.getOp());
         Assertions.assertEquals(1.0, advance.getPercent(), EPS, "on the aimed ally, not on herself");
@@ -173,9 +174,9 @@ public class CastTargetTest {
 
         TriggerTable.TriggerContext self =
                 new TriggerTable.TriggerContext(bronya, bronya, bronya, 0, 0, null, battle);
-        Assertions.assertEquals(2, rulesFor(table, self).size(),
-                "aimed at herself the advance rule drops out (Eidolon 1 still matches): the gate is a condition, "
-                        + "not a branch");
+        Assertions.assertEquals(3, rulesFor(table, self).size(),
+                "aimed at herself the advance rule drops out (Eidolon 1 and 星魂 6 still match): the gate is a "
+                        + "condition, not a branch");
     }
 
     // ==================================================================
