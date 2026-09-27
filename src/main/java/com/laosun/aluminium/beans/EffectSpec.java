@@ -383,6 +383,19 @@ public class EffectSpec {
     private Double baseChance;
 
     /**
+     * The <b>damage element</b> of the per-turn damage this effect attaches — {@code "Ice"} / {@code "Fire"} / …
+     * (the {@code DamageElement} spelling, the same one {@code memosprites/<cid>.json}'s {@code attack.element}
+     * uses). Read by {@code APPLY_DOT}, and by {@code APPLY_CONTROL} for the state's own per-turn damage.
+     *
+     * <p>⚠ Only the <b>element</b> is named in English; the <i>state</i> a DOT represents is spelled in Chinese
+     * (灼烧 / 触电 / 裂伤 / 风化) because that is what the documents and the {@code has_state} condition use — the
+     * engine's one translation between the two is {@code BuffManager.DOT_STATES}, deliberately the only place that
+     * knows they are the same thing.
+     */
+    @SerializedName("element")
+    private String element;
+
+    /**
      * The stack cap, whichever spelling the rule used.
      *
      * <p>Read by the interpreter <b>after</b> it has rejected "both spellings stated at once", so the

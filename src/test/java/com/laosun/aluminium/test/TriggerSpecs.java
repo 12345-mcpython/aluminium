@@ -143,6 +143,32 @@ final class TriggerSpecs {
     }
 
     /**
+     * An {@code APPLY_DOT} effect: 「使目标陷入…状态，每回合造成…伤害，持续 N 回合」.
+     *
+     * @param element  the {@code DamageElement} spelling ({@code "Fire"} → 灼烧), or {@code null} to leave it out
+     * @param amount   a flat per-turn amount, or the constant term of a derived one, or {@code null}
+     * @param scale    {@code "self_attr:<ATTRIBUTE>"} for a value derived from the rule owner, or {@code null}
+     * @param percent  the share of that attribute, or {@code null}
+     * @param turns    how many of the victim's turns it lasts, or {@code null} to leave the field out
+     * @param chance   the base chance (基础概率), or {@code null} for one that always lands
+     */
+    static EffectSpec dot(String element, Double amount, String scale, Double percent, Integer turns,
+                          Double chance) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "APPLY_DOT");
+        set(effect, "element", element);
+        set(effect, "amount", amount);
+        set(effect, "scale", scale);
+        set(effect, "percent", percent);
+        set(effect, "turns", turns);
+        set(effect, "baseChance", chance);
+        // Defaulted to the event's subject, because that is what every DOT case means: the difference between
+        // `self` (the engine's default when no target is stated) and `target` is invisible in a one-unit test.
+        set(effect, "target", "target");
+        return effect;
+    }
+
+    /**
      * An {@code APPLY_CONTROL} effect: 「有 X% 基础概率使目标陷入…状态，持续 N 回合」.
      *
      * @param control the state's name as the documents spell it (冻结 / 纠缠 / 禁锢)
