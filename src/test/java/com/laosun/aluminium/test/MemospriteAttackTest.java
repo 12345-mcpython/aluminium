@@ -1,7 +1,9 @@
 package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.MemospriteSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
@@ -12,6 +14,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.EnemySkill;
@@ -21,6 +25,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -193,6 +198,105 @@ public class MemospriteAttackTest {
     }
 
     // ==================================================================
+    // 2b. The attack is announced — once, and to the right owner (M-30)
+    // ==================================================================
+
+    /**
+     * An {@code "until": "next_attack"} buff <b>on the memosprite</b> ends when the memosprite attacks.
+     *
+     * <p>Written as a rule, because that is how such a buff ever gets onto a summon: 「装备者及其忆灵」 is two
+     * rules, the second one {@code target: "summon"}. Before the engine announced a summon's attack, this buff
+     * was never consumed — it stayed for the rest of the battle, silently.
+     */
+    @Test
+    public void theMemospriteOwnUntilBuffEndsWhenItAttacks() {
+        Battle battle = battleWithUntilBuffsOn(true, false);
+        Summon evey = battle.memospriteOf(battle.characters.getFirst());
+
+        Assertions.assertEquals(0.3, critDamageOf(evey), EPS, "precondition: the rule put the buff on it");
+
+        takeItsTurn(battle, evey, List.of(battle.enemyUnits().getFirst()));
+
+        Assertions.assertEquals(0, critDamageOf(evey), EPS,
+                "「持续到下次攻击后结束」 on the summon means the summon's own attack, and that has happened");
+    }
+
+    /**
+     * …and the <b>summoner's</b> own {@code until} buff is <b>not</b> consumed by the memosprite's attack.
+     *
+     * <p>This is the owner test doing its job on a new path. A memosprite's attack is a real attack by a unit of
+     * ours, so the whole side hears about it; but 「直到装备者下次攻击」 is about the <em>wearer</em> attacking,
+     * and a summon swinging is not its master swinging. Without the owner test, the announcement added for the
+     * memosprite would silently eat its summoner's buff.
+     */
+    @Test
+    public void theSummonersOwnUntilBuffSurvivesTheMemospriteAttack() {
+        Battle battle = battleWithUntilBuffsOn(false, true);
+        Character summoner = battle.characters.getFirst();
+        Summon evey = battle.memospriteOf(summoner);
+        double summonerBefore = critDamageOf(summoner);
+
+        takeItsTurn(battle, evey, List.of(battle.enemyUnits().getFirst()));
+
+        Assertions.assertEquals(0.3, summonerBefore - bareCritDamage(), EPS,
+                "precondition: the rule put the buff on the summoner");
+        Assertions.assertEquals(summonerBefore, critDamageOf(summoner), EPS,
+                "a summon's attack is not its summoner's attack");
+    }
+
+    /**
+     * An enemy's attack is announced to our side too, and <b>nothing of ours reacts</b>: every listener is
+     * keyed to its own owner.
+     *
+     * <p>Pinned because the announcement is broadcast to the whole side whatever the attacker's camp — which is
+     * what lets a future "when I am attacked" buff exist — and this is the case that says that widening did not
+     * quietly start consuming our buffs. Driven through the enemy's own skill, which is the path in question.
+     */
+    @Test
+    public void anEnemyAttackConsumesNothingOnOurSide() {
+        Battle battle = battleWithUntilBuffsOn(true, true);
+        Character summoner = battle.characters.getFirst();
+        Summon evey = battle.memospriteOf(summoner);
+        Enemy monster = battle.enemyUnits().getFirst();
+
+        monster.getSkills().get(SkillType.COMMON).execute(battle, monster, List.of(summoner));
+        battle.processRequests();
+
+        Assertions.assertTrue(summoner.getCurrentHp() < summoner.getMaxHp(),
+                "precondition: the monster's attack really landed");
+        Assertions.assertEquals(0.3, critDamageOf(evey), EPS, "the summon's buff is untouched");
+        Assertions.assertEquals(bareCritDamage() + 0.3, critDamageOf(summoner), EPS,
+                "and so is the summoner's");
+    }
+
+    /**
+     * The announcement says <b>which targets</b> the attack connected with and <b>how much</b> it settled, once.
+     *
+     * <p>Every shipped listener answers a question about itself ("is this my attack?" / "does this end my
+     * buff?"), so the payload is only visible from outside — via a listener that records instead of reacting.
+     * Without this case, the targets a summon's attack reports would be asserted nowhere, and "one attack, one
+     * announcement" would too: firing it per segment would still consume the buff exactly once.
+     */
+    @Test
+    public void theAnnouncementCarriesTheTargetsAndTheTotal() {
+        Character summoner = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy first = monster();
+        Enemy second = otherMonster();
+        Battle battle = battleWith(summoner, List.of(first, second), 7);
+        Summon evey = place(battle, summoner, attackSpec("Ice", "HEALTH", 0.3, 1, "AoEAttack"));
+        AttackRecorder recorder = new AttackRecorder();
+        summoner.getBuffManager().addBuff(recorder);
+
+        Cast cast = takeItsTurn(battle, evey, List.of(first, second));
+
+        Assertions.assertEquals(1, recorder.calls, "one attack, one announcement — not one per target or segment");
+        Assertions.assertEquals(List.of(first, second), recorder.targets,
+                "the targets it actually connected with, in hit order");
+        Assertions.assertEquals(cast.dealt(), recorder.total, EPS,
+                "and the sum the instances settled");
+    }
+
+    // ==================================================================
     // 3. Refusals
     // ==================================================================
 
@@ -245,6 +349,48 @@ public class MemospriteAttackTest {
     }
 
     /**
+     * A listener that records what an attack announcement carried.
+     *
+     * <p>A buff, because that is the only way the engine delivers
+     * {@link com.laosun.aluminium.models.event.AttackEvent}; everything here is a no-op except the recording, so
+     * attaching it cannot change the battle.
+     */
+    private static final class AttackRecorder extends AbstractBuff {
+        private List<CanHit> targets = List.of();
+        private double total;
+        private int calls;
+
+        private AttackRecorder() {
+            super(99, false);                        // long enough not to tick away during the case
+        }
+
+        @Override
+        public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
+                                List<? extends CanHit> hitTargets, double totalDamage) {
+            calls++;
+            targets = List.copyOf(hitTargets);
+            total = totalDamage;
+        }
+
+        @Override
+        public boolean canAct() {
+            return true;
+        }
+
+        @Override
+        public void applyEffect(CanHit target) {
+        }
+
+        @Override
+        public void removeBuff(CanHit target) {
+        }
+
+        @Override
+        public void tickEffect(CanHit target) {
+        }
+    }
+
+    /**
      * Advances to the summon's turn, casts its attack, and reports both sides' loss across <b>the cast alone</b>
      * (measured around the cast, not around the loop, so who acted before it cannot affect the result).
      */
@@ -287,6 +433,49 @@ public class MemospriteAttackTest {
         Battle battle = new Battle(List.of(summoner), List.copyOf(enemies), new Random(seed));
         battle.startBattle();
         return battle;
+    }
+
+    /**
+     * 长夜月 with a hand-built table: summon 「长夜」 at battle start, then hang an
+     * {@code "until": "next_attack"} CRIT DMG buff on the memosprite and/or on herself.
+     *
+     * <p>A hand-built table rather than a file: a character fixture under {@code src/test/resources} would be
+     * picked up by the suites that sweep every character, and the point here is one rule, not a character.
+     * {@code MODIFY_ATTR} on a ratio attribute is in percentage points, so the buff is {@code +0.3} = +30%.
+     */
+    private static Battle battleWithUntilBuffsOn(boolean onMemosprite, boolean onSummoner) {
+        List<TriggerSpec> rules = new ArrayList<>();
+        rules.add(TriggerSpecs.rule("BATTLE_START", null, summon()));
+        if (onMemosprite) {
+            rules.add(TriggerSpecs.rule("BATTLE_START", null, untilCritDamage("summon")));
+        }
+        if (onSummoner) {
+            rules.add(TriggerSpecs.rule("BATTLE_START", null, untilCritDamage("self")));
+        }
+        Character summoner = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
+        summoner.setTriggerTable(new TriggerTable(CASTORICE_LIKE, rules));
+        return battleWith(summoner, List.of(monster()), 7);
+    }
+
+    private static EffectSpec summon() {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "SUMMON");
+        return effect;
+    }
+
+    private static EffectSpec untilCritDamage(String target) {
+        EffectSpec effect = TriggerSpecs.modifyAttr("CRIT_ATTACK", 0.3, null, null, null, null, target);
+        TriggerSpecs.set(effect, "until", "next_attack");
+        return effect;
+    }
+
+    /** The memosprite's/character's own CRIT DMG (spelled {@code CRIT_ATTACK} here) — 0 on a memosprite. */
+    private static double critDamageOf(CanHit unit) {
+        return unit.getAttribute(AttributeType.CRIT_ATTACK).get();
+    }
+
+    private static double bareCritDamage() {
+        return CharacterFactory.create(CASTORICE_LIKE, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
     }
 
     /** Puts a fixture memosprite on the field exactly the way {@code Battle.summonMemosprite} does. */

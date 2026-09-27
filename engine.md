@@ -252,7 +252,7 @@ Damage = skillBaseValue
 | `BattleEvent` | `onBattleStart(Battle)` | `Battle.startBattle()` | `queue.snapshot()` 全体 |
 | `MoveEvent` | `beforeMove(Battle)` / `afterMove(Battle)` | 回合前后 | 该单位 |
 | `DamageEvent` | `onDamage(Battle, Damage)` | `assemble` 第 5 步，**攻守双方各发一次** | 攻守双方 |
-| `AttackEvent` | `afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage)` | `SkillExecutor` 在一次技能全部段结算完后 | **我方全体** |
+| `AttackEvent` | `afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage)` | `Battle.fireAfterAttack`：一次技能全部段结算完后（`SkillExecutor`），或一次召唤物攻击全部段结算完后（`EnemySkill`，P9-4 忆灵） | **我方全体** |
 | `SkillCastEvent` | `onSkillCast(battle, user, skill, hitTargets, targets)` | `SkillExecutor`，伤害已展开、能量未结算之间 | **我方全体** |
 | `EnergyEvent` | `onEnergyGain(battle, target, actuallyAdded)` | `Battle.applyEnergyGain`（唯一回能入口） | 相关方 + 我方 |
 | `HpLossEvent` | `onHpLoss(battle, target, before, after, source, amount)` | `Battle.applyDamage` 扣血后 | 相关方 + 我方 |
@@ -308,11 +308,15 @@ dispatch(consumer, 直接相关方...)
   （这就是易伤必须判侧、否则持有者自己打人也会被加伤的原因）。
 - **`AttackEvent` / `SkillCastEvent` 广播给我方阵营 `battle.allies`**（我方召唤物也收得到，因为它就是
   `CanHit`；见 §24.4），这是因为"我方攻击后 / 施放后"的效果（知更鸟【协奏】、缇宝结界）挂在**别人**身上。
+  ⚠ **`AttackEvent` 不管攻击者是谁都投给我方**（P9-4 忆灵之后由 `Battle.fireAfterAttack` 统一发）：听众
+  各自带着自己的问题来（`AbstractBuff.afterAttack` 判的就是 `attacker == owner`），所以敌人的攻击投过来
+  也没人会动它，而"挨打时触发"这类 buff 将来有地方可写。**谁在意是听众的事，有没有发生是引擎的事。**
 - `hitTargets` 是**实际命中过**的目标（含当场死亡的，按命中顺序去重）；
   `mainTarget` 是调用方选的主目标（AOE 时它不是命中顺序里的第一个）。
 - **"一次攻击行为" vs "多种伤害类型"**（重要区分）：
   - 引擎的计数单位是**行为**，不是伤害类型：`SkillExecutor.execute` 每次施放只调
-    **一次** `grantSkillEnergy`、只广播**一次** `AttackEvent`；
+    **一次** `grantSkillEnergy`、只广播**一次** `AttackEvent`（召唤物那边同理：`EnemySkill.execute` 把它
+    所有段结算完，只发一次）；
   - 一次攻击行为里可以包含多种伤害类型（技能伤害 + 击破伤害 + 超击破伤害 + DOT…），
     它们都属于同一次攻击 —— **不要把某个伤害类型当成一次攻击行为**；
   - `totalDamage` 因此是**整条攻击链之和**：技能段 + 击破伤害 + 超击破伤害都计入
@@ -322,13 +326,19 @@ dispatch(consumer, 直接相关方...)
     但**击杀时仍给攻击者回能**（见 §9.2 的两条口径）。
   - **多目标时逐目标触发**：AOE/扩散/弹射对每个受击目标各自结算，超击破也**每目标各产生一发**
     （各自用自己的剩余韧性算超出部分）。
-- 附加伤害/真伤段**不经过 `SkillExecutor`**，所以不会递归触发 `AttackEvent`
-  ——这正对上官方定义"不视为造成了 1 次攻击"。
+  - **一发未命中就不算攻击**：`Battle.fireAfterAttack` 在"一个目标都没打到"时直接返回，所以对着空场
+    挥一下不会吃掉 `until: next_attack` 的 buff（`BuffLifetimeTest` 钉住）。
+- 附加伤害/真伤段**不经过 `SkillExecutor`、也不发 `AttackEvent`**，所以不会递归触发
+  ——这正对上官方定义"不视为造成了 1 次攻击"。⚠ 代价是**追击攻击不会消耗 `until`**（少消耗，登记 M-27）；
+  这不是遗漏而是 `AttackEvent` 契约的一部分：听众**允许**用伤害回应一次攻击（第三方协同就是这么落的），
+  派生伤害再宣布一次"发生了一次攻击"就会一直递归到 `MAX_TRIGGER_DEPTH` 抛错。
 
 ### 4.4 还没做的
 
 - **敌人技能不发 `SkillCastEvent`**：`EnemySkill` 有自己的 `execute`（不走
-  `SkillExecutor`），等 P9-2 把敌人技能接进统一执行器时对齐。
+  `SkillExecutor`），等 P9-2 把敌人技能接进统一执行器时对齐。⚠ **`AttackEvent` 则是发的**（2026-09-28）：
+  它对所有攻击都成立，所以 `EnemySkill.execute` 结算完自己调 `Battle.fireAfterAttack` ——
+  忆灵的攻击因此会被我方听到，见 §24.8。
 - **递归安全**靠"不重复触发同一事件"的构造保证（`SkillCastEvent` 只从
   `SkillExecutor.execute` 发，附加伤害/真伤/DOT/击破都不经过它），
   ⚠ 但**没有**通用的"事件触发的效果会不会再发同一事件"的防护 ——
@@ -519,8 +529,12 @@ JSON 写法不变。
   直接拆箱会在**战斗中途**抛 NPE。
 - **判定的是"主人"**：引擎把"发生了一次攻击"广播给我方**全员**（知更鸟/缇宝那类第三方机制就靠它），
   所以没有主人判定的话，**谁先出手就会吃掉别人的**"下次攻击"buff。
-- ⚠ **追击攻击不消耗它**：追击不走 `SkillExecutor` 的攻击路径，而 buff 侧的"发生了一次攻击"通知来自那里。
-  这是一处**已知的少消耗**（buff 会多留一会儿），登记在 ROADMAP 里而不是假装没有。
+- **召唤物的攻击算它自己的一次攻击**（§24.8）：挂在**忆灵**身上的 `until: next_attack` 会被它自己的攻击吃掉，
+  而**召唤者**身上的不会被吃 —— 同一个 `attacker == owner` 判定，两边都成立。
+- **一发未命中不算攻击**：`Battle.fireAfterAttack` 在"一个目标都没打到"时提前返回。
+- ⚠ **追击攻击不消耗它**：`AttackEvent` 的契约是"只宣布引擎从头到尾驱动的一次攻击"，派生伤害（附加/真伤/DOT/击破）
+  故意排除在外 —— 这条边界同时是**递归安全**的保证（听众允许用伤害回应攻击）。代价就是这处**已知的少消耗**
+  （buff 会多留一会儿），登记为 ROADMAP M-27，而不是把事件接到派生伤害上去。
 
 #### `target` 选择器（同样是封闭集合）
 
@@ -2845,7 +2859,7 @@ Battle.enemyUnits()= 其中的**怪**（List<Enemy>）
 2. ~~**在场条件**「忆灵在场时」~~ ✅ **已做**（§24.6）：`self_summon_count >= 1` 问得出、
    `"target": "summon"` 指得到，「装备者及其忆灵」的标准写法是两条规则。这一族里
    **318 已整条写掉**、**124/319/320 变成可写**（登记为 `Writable now:`），
-   剩下 123/127/321/323 各自卡在别处（忆灵攻击事件 / "until the next use" 时长 / 队伍人数 / "while" 时长）；
+   剩下 123/127/321/323 各自卡在别处（"攻击者是**我的**忆灵"这个**条件** / "until the next use" 时长 / 队伍人数 / "while" 时长）；
 3. **ATTACK / DEFENCE / 抗性**：没有任何文档给出这些数，本数据也没有忆灵面板表 → 保持 0，
    后果是"忆灵吃满伤害"（见 ROADMAP 的登记）。**这正是 §24.8 让攻击按 `HEALTH` 缩放的理由**：
    50% 乘一个面板**确实给了**的数，而不是猜一个面板没给的；
@@ -2952,6 +2966,12 @@ servant 技能 id **一个都没有**（逐个搜过 `skills` / `monster_config`
   `ClassCastException`。scene 3 的敌方召唤物只是**没轮到它**才没暴露。
 - 伤害在**每次结算时**读属性（`strike` 里现读），所以中途落在忆灵身上的 buff 会反映；
   面板决定它**初始**是多少，不决定它一直是多少。
+- **它这一次攻击会被告知给我方**（M-30 的另一半）：`EnemySkill.execute` 把全部段结算完之后调
+  `Battle.fireAfterAttack` —— 与角色技能走**同一个出口**（原先那段广播是 `SkillExecutor` 的私有方法，
+  现在搬到 `Battle` 上，因为"一次攻击结束了"这件事对两者都成立）。后果是**挂在忆灵自己身上的
+  `until` buff 会被它自己的攻击吃掉**（此前谁都不发这个通知，buff 就一直在），而**召唤者身上的不会被吃**
+  —— 听众各自判 `attacker == owner`，忆灵挥一下不是它的召唤者在挥。⚠ 敌人的攻击同样投给我方
+  （攻击者是谁都投），我们这边没人会动它，那是听众自己的判定。
 - **装载期拒绝**（`Memosprites.validateAttack`）：元素拼错、`base` 面板**根本没给**（面板 entry 是**替换**
   不是叠加 → 值是 0，攻击照打、日志照印、每一下都是 0 —— 最该在装载期拦的就是这条）、`base` 写成
   `*_PERCENT`（builder 专用键，运行时槽是 null）、`percent` 非正、`hits` < 1、`shape` 不是伤害类。
@@ -2964,13 +2984,19 @@ servant 技能 id **一个都没有**（逐个搜过 `skills` / `monster_config`
 **单一数值、无等级**。还有**"指令忆灵行动"**：长夜月终结技那句「使忆灵「长夜」对敌方全体造成 200% 生命上限」
 是**她**指挥忆灵打的，不是忆灵自己的回合 —— 两者不是一个功能。
 
-**验收**：`MemospriteAttackTest` **9 条** —— 出货那条攻击的四个数字（元素/份额/基数/段数）与"基数不是
+**验收**：`MemospriteAttackTest` **13 条** —— 出货那条攻击的四个数字（元素/份额/基数/段数）与"基数不是
 召唤者的"对照、`baseAttribute` 真的是 `HEALTH`、没写攻击的 spec 就**不装**技能（引擎不编一个文档没有的
 ATK 兜底）、伤害落在怪物身上且我方**一点不掉**、伤害与**自己的**生命上限**成正比**（两套只差面板份额的
 spec、同一随机种子 → 比值恰好 2，这样就不必在测试里重算乘区）、`hits` 逐段（3×20% == 1×60%，把暴击钉成 0
-让总数精确）、AOE 打到**每一只**怪、8 条装载期拒绝、spec 接缝也校验、纯面板 spec 仍合法。
-**变异验证（5 处）**：基数改回 `ATTACK` / 选边改回 `allies` / 不装技能 / 去掉"面板有没有这条属性"检查 /
-去掉接缝校验 —— 各红对应条目，且**全部**还原（逐次 SHA-256 核对）。
+让总数精确）、AOE 打到**每一只**怪、8 条装载期拒绝、spec 接缝也校验、纯面板 spec 仍合法；
+**外加攻击通知那 4 条**：忆灵自己的 `until` buff 被它自己的攻击吃掉、**召唤者的不会**、
+敌人的攻击投过来我方什么都不掉、以及用测试内记录器钉住"**一次攻击只发一次**、带的是**实际命中的目标**与
+**结算总和**"（载荷没有出厂听众，只能从外面看）。
+**变异验证（6 处）**：忆灵攻击不发通知 / 载荷只带主目标 / 结算总额不累加 / 命中目标不记录 /
+`AbstractBuff` 去掉 `attacker == owner`（红 3 条，含原有的"队友攻击不消耗"）/ `Battle.fireAfterAttack`
+去掉"一个都没打到就不算攻击"的守卫 —— 各红对应条目，且**全部**还原（逐次 SHA-256 核对）。
+（攻击本身另有一套 5 处变异：基数改回 `ATTACK` / 选边改回 `allies` / 不装技能 /
+去掉"面板有没有这条属性"检查 / 去掉接缝校验。）
 
 整套 **95 套 / 871 例全绿**；整场战斗 demo 全输出与上一提交逐行一致（仅 3 行 `Resist {}` 的 Set 顺序不同，
 是老问题）；`mechanics` demo 加 **scene 4**：1413 长夜月按**自己的规则**召唤「长夜」、面板按 50% 生命上限
