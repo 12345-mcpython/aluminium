@@ -8,5 +8,25 @@
     ],
     "source": "1413 长夜月 天赋: 「进入战斗时召唤忆灵「长夜」。」",
     "note": "The summoning clause only; 「长夜」's panel is derived from her in resources/memosprites/1413.json, and everything else her talent says (the CRIT DMG on HP loss, 【忆质】) is not authored yet. No `target`: a memosprite belongs to its summoner, so there is nothing to point at -- SUMMON refuses one rather than ignoring it. Firing this twice keeps the memosprite already out (the op is idempotent per summoner), which is what 「若已在场…」 implies; the refresh variant is not modelled. A character with a SUMMON rule but no memosprite spec is refused when the character is built (CharacterFactory), not mid-battle."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "SUMMON"
+      },
+      {
+        "op": "COMMAND_SUMMON",
+        "skill": "ULTRA",
+        "damage_param": 0,
+        "damage_level": 10,
+        "attribute": "HEALTH"
+      }
+    ],
+    "source": "1413 长夜月 终结技 晚安，全世界无眠 (skill 141303, Ultimate/AoEAttack/Ice): 「召唤忆灵「长夜」，随后使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害，并使长夜月进入【至暗之谜】状态，期间敌方全体受到的伤害提高#4[i]%，长夜月和忆灵「长夜」造成的伤害提高#3[i]%，且免疫控制类负面状态。」 param Lv10 = [2, 2, 0.6, 0.3]",
+    "note": "Two effects, in the order the text writes them: 召唤忆灵 then 使忆灵…造成伤害. ⚠ The three numbers of that attack are NOT written here -- `skill: \"ULTRA\"` + `damage_param: 0` reads the multiplier out of 141303's own parameter row and the element (Ice) and shape (AoEAttack) come from the same skill data. ⚠ `damage_param` is a 0-based array index while the document writes its placeholders 1-based: the Max HP share is `#1[i]`, so the column is 0. Writing 1 reads `#2[i]` -- the 【至暗之谜】 charge count, which is 2 at EVERY level and happens to equal 2.0 at Lv10 -- so a wrong index would look right until the level moved (that is what the level-ratio case in SummonCommandTest caught). ⚠ `damage_level: 10` is likewise required, not decoration: a character's skills are all at level 1 in this engine, so the skill's own level would read the Lv1 row (1.0) while the text quotes the Lv10 row (2.0) -- half the damage, with nothing to report. The multiplier is 2.5 at the skill's cap (Lv15). Only `attribute: HEALTH` is stated, because that is the one thing the row does not say: 「等同于**忆灵**的生命上限」, not 长夜月's ATK. A first draft of this op carried its own element/shape/percent fields and would have been a second copy of data that already exists. ⚠ `actor == self` is not decoration: ULT_CAST is delivered to every character's table, so without it a teammate's ultimate would command HER memosprite. ⚠ The summon acts without spending its turn -- this is an extra attack, like a follow-up, and 「长夜」's own turn still uses its own skill (50% of its Max HP, single target). ⚠ Not authored from the ultimate: 【至暗之谜】 (a state with charges, an enemy vulnerability of 30%, a 60% damage boost for both units, crowd-control immunity) -- that is a state machine with its own resource, registered rather than approximated. Also not modelled: the 90 toughness reduction the ultimate's 全体 attack carries (M-29)."
   }
 ]
