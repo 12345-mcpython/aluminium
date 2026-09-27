@@ -1,0 +1,74 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 135",
+        "self_attr:SPEED < 180"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.12,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 320 (渊思寂虑的巨树 / Giant Tree of Rapt Brooding), 2-piece: 「使装备者的速度提高#1[i]%。当装备者的速度大于等于#2[i]/#3[i]时，使装备者及其忆灵的治疗量提高#4[i]%/#5[i]%。」 param = [0.06, 135, 180, 0.12, 0.2]",
+      "note": "The lower healing tier on the WEARER, with an upper bound because the two thresholds are nested (at 200 speed 「>= 135」 and 「>= 180」 both hold). The SPD 6% is the `properties` stat (SpeedAddedRatio 0.06). ⚠ 「治疗量提高」 is `OUTGOING_HEALING_BOOST` -- the healing the wearer does, not the healing she receives (that is a different attribute, and the text's 「治疗量」 is about what the unit produces)."
+    },
+    {
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon",
+        "self_attr:SPEED >= 135",
+        "self_attr:SPEED < 180"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "relic set 320 (渊思巨虑的巨树 / Giant Tree of Rapt Brooding), 2-piece: 「该效果同时对装备者的忆灵生效。」 param = [0.06, 135, 180, 0.12, 0.2]",
+      "note": "「及其忆灵」 on arrival, the convention 124/319/320 established (set 124's file has the full reasoning). ⚠ The threshold is the WEARER's speed (`self_attr` reads the rule's owner); the memosprite does not have to be fast enough itself."
+    },
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 180"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.2,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 320 (渊思寂虑的巨树 / Giant Tree of Rapt Brooding), 2-piece: 「当装备者的速度大于等于#3[i]时，使装备者及其忆灵的治疗量提高#5[i]%。」 param = [0.06, 135, 180, 0.12, 0.2]",
+      "note": "The upper tier on the wearer: the widest threshold stands alone."
+    },
+    {
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon",
+        "self_attr:SPEED >= 180"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "relic set 320 (渊思寂虑的巨树 / Giant Tree of Rapt Brooding), 2-piece: 「该效果同时对装备者的忆灵生效。」 param = [0.06, 135, 180, 0.12, 0.2]",
+      "note": "The upper tier's arrival rule, matching the one above."
+    }
+  ]
+}
