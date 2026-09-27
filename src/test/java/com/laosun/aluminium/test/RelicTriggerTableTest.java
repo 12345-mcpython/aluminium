@@ -97,6 +97,8 @@ public class RelicTriggerTableTest {
     private static final int STELLAR_DIFFERENTIATOR = 305;
     /** 奇想蕉乐园: 暴击伤害 +16%; 有召唤物在场 -> 暴击伤害额外 +32% (the first user of `self_summon_count`). */
     private static final int BANANA_PARADISE = 318;
+    /** 凯歌祝捷的英豪: 攻击力 +12%; 忆灵在场 -> 速度 +6%, 忆灵攻击时 -> 双方暴击伤害 +30% 2 回合. */
+    private static final int HERO_OF_TRIUMPHANT_SONG = 123;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -146,7 +148,10 @@ public class RelicTriggerTableTest {
             // (`self_summon_count`, and `target: "summon"` to address it).
             BANANA_PARADISE + "/" + TWO_PIECE,
             // Authored once a buff could end on an EVENT instead of a turn boundary (`"until"`).
-            STELLAR_DIFFERENTIATOR + "/" + TWO_PIECE);
+            STELLAR_DIFFERENTIATOR + "/" + TWO_PIECE,
+            // Authored once "the attacker is MY summon" became expressible (`actor == summon`) and a summon's
+            // attack became an event the data can subscribe to (`SUMMON_ATTACK`).
+            HERO_OF_TRIUMPHANT_SONG + "/" + FOUR_PIECE);
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
@@ -157,9 +162,10 @@ public class RelicTriggerTableTest {
      * {@code MODIFY_DAMAGE_TAKEN} existed), then to <b>25</b> when the same set's 4-piece became
      * authorable — and then to <b>47</b> when the MIXED effects joined the partition (see
      * {@link #MIXED_STAT_AND_ABILITY}); those 22 mixed entries are not a regression, they are the half of
-     * the data this test could not see before (ROADMAP M-25).
+     * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
+     * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}).
      */
-    private static final int STILL_REGISTERED = 45;
+    private static final int STILL_REGISTERED = 44;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;

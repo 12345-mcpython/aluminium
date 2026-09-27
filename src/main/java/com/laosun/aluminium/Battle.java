@@ -2143,6 +2143,31 @@ public class Battle {
     }
 
     /**
+     * Every living summon this unit owns, looking in <b>its own camp</b>, in roster order.
+     *
+     * <p>The one place the predicate "is this unit mine" is written: {@link #summonOf} takes the first,
+     * {@link #summonCountOf} counts them, and the {@code actor == summon} / {@code target == summon} conditions
+     * ask whether an event's subject is among them. Three loops with the same test is how three answers to
+     * "which units are mine" start to differ — and a unit with several summons (知更鸟·晴歌's 晴空乐手 is a
+     * trio) is exactly where a stop-at-the-first version would silently cap the answer at one.
+     *
+     * @param master the summoner (may be {@code null}, which owns nothing)
+     * @return the living summons whose master is {@code master} (a fresh list, never {@code null})
+     */
+    public List<Summon> summonsOf(CanHit master) {
+        if (master == null) {
+            return List.of();
+        }
+        List<Summon> owned = new ArrayList<>();
+        for (CanHit unit : campOf(master)) {
+            if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
+                owned.add(summon);
+            }
+        }
+        return List.copyOf(owned);
+    }
+
+    /**
      * The first living summon this unit owns, looking in <b>its own camp</b>, or {@code null}.
      *
      * <p>What {@code TriggerInterpreter}'s {@code "summon"} target selector resolves to. The difference from
@@ -2155,15 +2180,8 @@ public class Battle {
      * @return the first living summon whose master is {@code master}, in roster order, or {@code null}
      */
     public Summon summonOf(CanHit master) {
-        if (master == null) {
-            return null;
-        }
-        for (CanHit unit : campOf(master)) {
-            if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
-                return summon;
-            }
-        }
-        return null;
+        List<Summon> owned = summonsOf(master);
+        return owned.isEmpty() ? null : owned.getFirst();
     }
 
     /**
@@ -2177,16 +2195,7 @@ public class Battle {
      * @return the number of living summons whose master is {@code master}
      */
     public int summonCountOf(CanHit master) {
-        if (master == null) {
-            return 0;
-        }
-        int count = 0;
-        for (CanHit unit : campOf(master)) {
-            if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
-                count++;
-            }
-        }
-        return count;
+        return summonsOf(master).size();
     }
 
     /**

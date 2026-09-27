@@ -6,6 +6,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillEffectType;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
@@ -141,6 +142,14 @@ public class EnemySkill extends Skill {
         // memosprite's attack told nobody, so a buff on the memosprite itself
         // ({@code "target": "summon"} + {@code "until": "next_attack"}) was never consumed and simply stayed.
         battle.fireAfterAttack(user, victim, hitTargets, total);
+        // …and the data-facing half of the same fact: a rule can subscribe to "a summon attacked"
+        // (TriggerEvent.SUMMON_ATTACK), which is what 「装备者的忆灵攻击时」 needs. Fired for a summon of
+        // either camp -- it is delivered to every character's table, so `actor == summon` is what narrows it
+        // to the rule owner's own. Not raised when nothing was hit: "an attack happened" is not "a unit
+        // existed".
+        if (!hitTargets.isEmpty()) {
+            battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, user, null, hitTargets.size(), 0);
+        }
     }
 
     /**
