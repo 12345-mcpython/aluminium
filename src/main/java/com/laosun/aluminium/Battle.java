@@ -1870,7 +1870,7 @@ public class Battle {
             damage.addBoost(attacker.getAttribute(scopeBoost).get());
         }
 
-        // Damage-instance conditions (P10-5): 「对处于 X 状态的目标造成的伤害提高 Y%」. Fired *before* the zones
+        // Damage-instance conditions (ROADMAP §3「伤害实例条件」): 「对处于 X 状态的目标造成的伤害提高 Y%」. Fired *before* the zones
         // are read, because afterwards the number is final and all a rule could do is describe it. `target` is
         // the one about to take the damage; a rule that changes this instance uses BOOST_DAMAGE, which mutates
         // the instance itself -- the instance is the state, so there is no buff to attach, nothing to clean up,
