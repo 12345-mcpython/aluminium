@@ -212,24 +212,27 @@ public class HimekoChargeTest {
     /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
-     * <p>Three clauses exist and each is pinned above; the counts here are what says nothing else was written. The
-     * two missing ones would both be a wrong number if they were spelled with the vocabulary that exists: the
-     * ultimate's 「每消灭1个敌方目标额外恢复5点能量」 and 星魂 4's 「施放战技对敌方目标造成弱点击破时，姬子额外获得1点
-     * 充能」 both need to know <em>which ability caused the event</em>, and neither KILL nor BREAK carries that — the
-     * closest spelling, {@code actor == self}, also pays for a break by her basic attack or by this follow-up
-     * (registered as {@code M-45}, the same axis her ultimate's per-kill energy needs).
+     * <p>Four clauses exist and each is pinned above; the counts here are what says nothing else was written. The one
+     * missing clause would be a wrong number if it were spelled with the vocabulary that exists: the ultimate's
+     * 「每消灭1个敌方目标额外恢复5点能量」 needs to know the kill came from <b>that</b> ultimate — and while the
+     * attribution now exists ({@code from_skill}, added for 星魂 4 on 2026-09-28), what is still unresolved is a
+     * <b>data</b> question: the engine's own rule already credits 5 energy to the killer, and the sentence says
+     * 「**额外**恢复5点」 — whether those are the same 5 has to be settled against the game's numbers, because guessing
+     * it is a silent ±5 energy (registered as {@code M-45}).
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
         TriggerTable table = TriggerTables.of(HIMEKO);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "「战斗开始时获得1点充能」");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BREAK), "「当有敌方目标的弱点被击破时」");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
+                "「当有敌方目标的弱点被击破时」 (anybody's break) and 星魂 4's 「施放战技…造成弱点击破时」");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "「当我方目标施放攻击后」");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.ULT_CAST), "her ultimate is the engine's ordinary path");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.KILL),
-                "「每消灭1个敌方目标额外恢复5点能量」 needs per-ability attribution (M-45)");
+                "「每消灭1个敌方目标额外恢复5点能量」 is registered: the attribution exists now, the ±5 energy data "
+                        + "question does not (M-45)");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "星魂 4's extra charge needs 「this break came from my Skill」");
+                "星魂 4's charge rides on BREAK with `from_skill SKILL`, not on a cast event of its own");
         Assertions.assertEquals(1, table.resources().size(), "and she declares exactly one resource");
         Assertions.assertEquals(CHARGE, table.referencedResources().iterator().next(),
                 "every resource a rule names is the one she declares -- checked when she is built");

@@ -4,6 +4,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
@@ -1112,7 +1113,9 @@ public class Battle {
         }
         if (died) {
             broadcastKill(damage.getAttacker(), target);
-            fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0);
+            // The causing instance's cast category rides along: 「每消灭1个敌方目标」-style rules have to be able to
+            // ask WHICH skill produced the kill (see the `from_skill` condition), and the instance already knows.
+            fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0, damage.getCastCategory());
         }
         grantHitAndKillEnergy(target, damage, died, grant);     // P3-2: hit energy gain / kill energy gain
         // The return value = the damage this hit **actually had effect** with = shield-absorbed + HP really lost.
@@ -1221,6 +1224,28 @@ public class Battle {
      * exceeded / whether a break was triggered)
      */
     public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
+        // No causing cast known (a test, a demo, an enemy skill that builds its damage inline): the break still
+        // happens, it just cannot say which skill produced it -- so `from_skill` conditions do not match it.
+        return reduceToughness(attacker, enemy, element, stanceDamage, null);
+    }
+
+    /**
+     * The same, stating the <b>cast</b> whose instance this toughness reduction belongs to.
+     *
+     * <p>It matters for one sentence family: 「施放战技…造成弱点击破时」 (1003 姬子 星魂 4) asks not "was something
+     * broken" but "did <b>my Skill</b> break it", and the cast category is the only thing that answers it. A break left
+     * by a talent's follow-up attack carries {@code UNSPECIFIED} (it is not an active cast) and is therefore correctly
+     * <b>not</b> a 「施放战技」 break.
+     *
+     * @param attacker     the attacker
+     * @param enemy        the target being hit
+     * @param element      the element of this instance
+     * @param stanceDamage the toughness reduction points
+     * @param fromCast     the category of the cast this reduction belongs to, or {@code null}
+     * @return the toughness reduction result
+     */
+    public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage,
+                                        SkillCategory fromCast) {
         if (attacker == null || enemy == null || stanceDamage <= 0) {
             return StanceResult.NONE;
         }
@@ -1261,7 +1286,7 @@ public class Battle {
         // reaches this line a second time).
         // Placed before damage/delay/DOT/energy: listeners want the moment of "just got broken".
         broadcastBreak(attacker, enemy, element);
-        fireTriggersWithSubject(TriggerEvent.BREAK, attacker, enemy, 0);
+        fireTriggersWithSubject(TriggerEvent.BREAK, attacker, enemy, 0, fromCast);
         // The break damage is settled right here, so the settled value must be carried out -- it belongs to
         // **this attack**, and dropping it would make AttackEvent.totalDamage miss a whole break chain.
         // KILL_ONLY: the break is extra damage derived from the main instance, so the victim gains no energy
@@ -1839,9 +1864,23 @@ public class Battle {
      *
      * @param damage the instance being settled, or {@code null} for every other event (which is what the
      *               five-argument overload passes)
+     * @param fromCast the cast category that produced the event's instance, or {@code null} when nothing can name one
      */
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage) {
+        return fireTriggers(event, actor, target, hitCount, amount, damage, null);
+    }
+
+    /**
+     * The full form: the same, plus <b>which cast</b> produced the event's instance.
+     *
+     * <p>Kept separate from {@code damage} because the two answer different questions and are populated by different
+     * events: {@code damage} is the instance itself (only {@code DEALING_DAMAGE} has one, because only there can a rule
+     * still change it), while {@code fromCast} is the {@link SkillCategory} of the cast that built it — which a kill and
+     * a weakness break can also name, and which is what 「施放战技…造成弱点击破时」 asks about.
+     */
+    private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                             Damage damage, SkillCategory fromCast) {
         if (triggerDepth >= MAX_TRIGGER_DEPTH) {
             throw new IllegalStateException(
                     "Trigger recursion exceeded " + MAX_TRIGGER_DEPTH + " levels while firing "
@@ -1859,7 +1898,8 @@ public class Battle {
                     continue;
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
-                        new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this));
+                        new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
+                                fromCast));
             }
             return fired;
         } finally {
@@ -1896,6 +1936,28 @@ public class Battle {
      */
     public int fireTriggersWithSubject(TriggerEvent event, CanHit actor, CanHit subject, double amount) {
         return fireTriggers(event, actor, subject, 0, amount);
+    }
+
+    /**
+     * The same, stating the <b>cast that produced the event's instance</b>.
+     *
+     * <p>Only some events can name one — a kill and a weakness break happen while an instance is being settled, and the
+     * instance knows the {@link com.laosun.aluminium.enums.SkillCategory} of the cast that built it. That is what lets
+     * a rule say 「**施放战技**对敌方目标造成弱点击破时」 instead of "somebody broke something".
+     *
+     * <p>⚠ It carries the <b>category</b> rather than the instance: the settlement entry point is the only public API
+     * that takes a {@code Damage} ({@code DamagePipelineTest.settlementHasExactlyOnePublicEntryPoint}), and an event
+     * does not need the instance's numbers — only which slot produced it.
+     *
+     * @param event    the event
+     * @param actor    who caused it
+     * @param subject  what it happened to
+     * @param amount   the event's magnitude, if any
+     * @param fromCast the cast category that produced it, or {@code null}
+     */
+    private int fireTriggersWithSubject(TriggerEvent event, CanHit actor, CanHit subject, double amount,
+                                        SkillCategory fromCast) {
+        return fireTriggers(event, actor, subject, 0, amount, null, fromCast);
     }
 
     /**
