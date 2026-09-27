@@ -77,6 +77,8 @@ public class RelicAbilityBatchTest {
     private static final int SACERDOS = 121;
     private static final int SKILL_SLOT = 2;
     private static final int ULT_SLOT = 3;
+    /** 生命的翁法罗斯: the derived-value set (its bonus is a function of Max Energy). */
+    private static final int AMPHOREUS = 328;
 
     // ==================================================================
     // 102 — 普攻伤害 +10%
@@ -455,6 +457,45 @@ public class RelicAbilityBatchTest {
         battle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), wearer, List.of(ally));
         Assertions.assertEquals(0.36, boostOf(ally, AttributeType.CRIT_ATTACK) - before, 1e-6,
                 "「最多叠加#3[i]层」 -- two casts, two stacks (the engine's default would have REPLACED the first)");
+    }
+
+    // ==================================================================
+    // 328 — a derived value read off MAX ENERGY, with a cap
+    // ==================================================================
+
+    /**
+     * 328 生命的翁法罗斯: 「能量上限 ≥ 200 点，每超过 1 点使造成的伤害提高 0.2%，最多提高 32%」.
+     *
+     * <p>Three points on the curve, which is what the sentence actually says: below the threshold <b>nothing</b>,
+     * 40 points over it <b>0.08</b>, and past 360 the <b>32% cap</b>. ⚠ The value is read off the modifier the rule
+     * grants rather than off the resolved attribute: the wearer is built <b>with</b> a relic suit, so its random
+     * sub-stats may already carry a damage boost of their own (the trap that made an earlier case read 0.444 instead
+     * of 0.12).
+     */
+    @Test
+    public void theAmphoreusBoostGrowsWithMaxEnergyAndStopsAtItsCap() {
+        Assertions.assertEquals(0.002 * (240 - 200), grantedDamageBoost(240), 1e-6,
+                "240 energy is 40 points over the threshold: 0.2% x 40 = 8%");
+        Assertions.assertEquals(0.32, grantedDamageBoost(400), 1e-6,
+                "「最多提高#3[i]%」 -- past 360 the cap holds, and the lower tier is excluded by its own upper bound");
+        Assertions.assertEquals(0, grantedDamageBoost(150), 1e-6,
+                "below the threshold nothing is granted at all (and 0.002 x 150 - 0.4 would have been negative)");
+    }
+
+    /** The modifier the rule granted on 全部伤害提高, or 0 when it granted none. */
+    private static double grantedDamageBoost(double maxEnergy) {
+        Character wearer = wearing(AMPHOREUS);
+        wearer.setMaxEnergy(maxEnergy);
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+
+        for (com.laosun.aluminium.models.buff.StatModifierBuff buff
+                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class)) {
+            if (buff.getAttribute() == AttributeType.ALL_DAMAGE_TYPE_BOOST) {
+                return buff.getValue();
+            }
+        }
+        return 0;
     }
 
     // ==================================================================

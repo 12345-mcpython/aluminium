@@ -381,7 +381,8 @@ public class TriggerTable {
      * (and rejected there for the four {@code *_PERCENT} builder keys, whose runtime slot is null).
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("hit_count", "hp_percent", "target_debuff_count", "self_summon_count", "target_summon_count");
+            Set.of("hit_count", "hp_percent", "target_debuff_count", "self_summon_count", "target_summon_count",
+                    "self_max_energy");
 
     /**
      * The prefix of the one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -1185,6 +1186,9 @@ public class TriggerTable {
                 // than a subject prefix because the two are asked in the same sentence often (relic 127 asks
                 // about the wearer, 星期日's Skill asks about the ally it was cast on).
                 case "target_summon_count" -> summonCount(ctx.target(), ctx);
+                // 「若装备者的能量上限大于等于…」 -- not an attribute (`CanHit.getMaxEnergy()` is a field, and the
+                // attribute table has no slot for it), which is exactly why it needed a variable of its own.
+                case "self_max_energy" -> ctx.owner() == null ? Double.NaN : ctx.owner().getMaxEnergy();
                 default -> Double.NaN;
             };
         }
