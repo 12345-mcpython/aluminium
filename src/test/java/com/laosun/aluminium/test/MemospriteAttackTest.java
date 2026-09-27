@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * A memosprite's <b>attack</b>: its damage is a share of an attribute of its own, not of its summoner (P9-4 忆灵).
@@ -294,6 +295,53 @@ public class MemospriteAttackTest {
                 "the targets it actually connected with, in hit order");
         Assertions.assertEquals(cast.dealt(), recorder.total, EPS,
                 "and the sum the instances settled");
+    }
+
+    // ==================================================================
+    // 2c. The attack pushes the toughness bar (M-29's 破韧 half)
+    // ==================================================================
+
+    /**
+     * A memosprite's attack removes the toughness its document states — 「破韧值 单体 30」.
+     *
+     * <p>Two affordances, both stated rather than hidden: the target's weakness set is rewritten to include the
+     * attack's element (toughness only comes off a weakness, which is the engine's own rule and the demo's scene 1
+     * does the same thing), and the monster's bar is 60, so 30 cannot break it and the delta is exact.
+     */
+    @Test
+    public void theAttackRemovesTheToughnessItsDocumentStates() {
+        Character summoner = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
+        Enemy target = monster();
+        target.setStanceWeak(Set.of(DamageElement.ICE));
+        Battle battle = new Battle(List.of(summoner), List.of(target), new Random(11));
+        battle.startBattle();
+        Summon evey = battle.memospriteOf(summoner);
+        double before = target.getStance();
+
+        takeItsTurn(battle, evey, List.of(target));
+
+        Assertions.assertEquals(before - 30, target.getStance(), EPS,
+                "「破韧值 单体 30」 is a number beside the damage numbers, not something to infer");
+    }
+
+    /**
+     * An attack that states no toughness leaves the bar alone.
+     *
+     * <p>The fixture's spec has no {@code stance}, which is what every enemy attack means too (they do not attack a
+     * toughness bar) — so 0 is the default and the enemy path is unchanged.
+     */
+    @Test
+    public void anAttackWithoutAStatedToughnessLeavesTheBarAlone() {
+        Character summoner = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy target = monster();
+        target.setStanceWeak(Set.of(DamageElement.ICE));
+        Battle battle = battleWith(summoner, List.of(target), 7);
+        Summon evey = place(battle, summoner, attackSpec("Ice", "HEALTH", 0.3, 1, "SingleAttack"));
+        double before = target.getStance();
+
+        takeItsTurn(battle, evey, List.of(target));
+
+        Assertions.assertEquals(before, target.getStance(), EPS, "no stance stated, no toughness removed");
     }
 
     // ==================================================================

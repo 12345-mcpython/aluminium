@@ -197,6 +197,7 @@ public final class SummonFactory {
                 attack.hits() == null ? 1 : attack.hits(),
                 DamageType.NORMAL,
                 SkillEffectType.fromString(attack.shape()),
-                AttributeType.fromString(attack.base()));
+                AttributeType.fromString(attack.base()),
+                attack.stance() == null ? 0 : attack.stance());
     }
 }

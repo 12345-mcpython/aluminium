@@ -107,6 +107,12 @@ public record MemospriteSpec(@SerializedName("name") String name,
                          @SerializedName("base") String base,
                          @SerializedName("percent") Double percent,
                          @SerializedName("hits") Integer hits,
-                         @SerializedName("shape") String shape) {
+                         @SerializedName("shape") String shape,
+                         @SerializedName("stance") Double stance) {
+
+        /** The same without a toughness value -- an attack that does not touch the bar, the default. */
+        public Attack(String element, String base, Double percent, Integer hits, String shape) {
+            this(element, base, percent, hits, shape, null);
+        }
     }
 }
