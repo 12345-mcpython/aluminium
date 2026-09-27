@@ -220,6 +220,19 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         return source;
     }
 
+    /**
+     * Which <b>rule</b> created this buff, by its {@code id}, or {@code ""} when the rule states none.
+     *
+     * <p><b>Why the source is not enough.</b> 「战技提供的护盾」 (1001 三月七 星魂 6) names the <i>ability</i>, not just
+     * the person: 三月七 has two shields of her own (her Skill's and 星魂 2's at battle start), so "a shield from
+     * 三月七" would heal an ally the star level does not mean to heal — a wrong number with nothing to report. The rule
+     * id is the one handle that tells them apart, and it is stamped where every buff already gets its source
+     * ({@code TriggerInterpreter.withSource}).
+     */
+    @Getter
+    @Setter
+    protected String ruleId = "";
+
     @Override
     public int duration() {
         return remainingDuration;
