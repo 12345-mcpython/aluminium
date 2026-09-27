@@ -5,6 +5,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import lombok.Getter;
 
@@ -427,6 +428,12 @@ public class TriggerTable {
     private static final Pattern SAME_PATH_ALLY =
             Pattern.compile("(?<![\\w])has_same_path_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * The {@code has_weakness} keyword: "&lt;who&gt; is weak to this element".
+     */
+    private static final Pattern HAS_WEAKNESS =
+            Pattern.compile("(?<![\\w])has_weakness(?![\\w])", Pattern.CASE_INSENSITIVE);
+
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException("Empty trigger condition (source: " + spec.getSource() + ")");
@@ -464,6 +471,15 @@ public class TriggerTable {
             String state = text.substring(hasState.end()).trim();
             return new HasState(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw,
                     spec);
+        }
+
+        // `has_weakness`: "<who> has_weakness Fire" — the target's weakness ELEMENT, which nothing else can ask.
+        Matcher hasWeakness = HAS_WEAKNESS.matcher(text);
+        if (hasWeakness.find()) {
+            String subject = normalize(text.substring(0, hasWeakness.start()));
+            String element = text.substring(hasWeakness.end()).trim();
+            return new HasWeakness(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
+                    requireElement(element, raw, spec), raw, spec);
         }
 
         // `self has_same_path_ally` — a party question with no argument, checked with the other predicates.
@@ -942,6 +958,73 @@ public class TriggerTable {
         public String source() {
             return raw;
         }
+    }
+
+    /**
+     * Weakness test: {@code target has_weakness Fire} — 「命中具有火属性弱点的敌人时」 (relic set 316).
+     *
+     * <p><b>Why it needs a word of its own.</b> A weakness is a property of the <b>enemy</b>
+     * ({@link com.laosun.aluminium.models.enemy.Enemy#isWeakTo}), not a buff and not an attribute: no existing
+     * condition can ask about it, and the sentences that need it are otherwise pure data
+     * (「命中具有 X 属性弱点的敌人时，装备者的击破特攻提高 20%，持续 2 回合」).
+     *
+     * <p>⚠ Only an {@link com.laosun.aluminium.models.enemy.Enemy} answers: a character (or a summon) has no weakness
+     * bar, so the condition is <b>false</b> for one — the "cannot read it, therefore it fails" rule the whole family
+     * follows, rather than "no weakness means no weakness to Fire".
+     */
+    private static final class HasWeakness implements Condition, PartyCondition {
+
+        private final String subject;
+        private final DamageElement element;
+        private final String raw;
+
+        HasWeakness(String subject, DamageElement element, String raw, TriggerSpec spec) {
+            this.subject = subject;
+            this.element = element;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return partyOf(ctx) instanceof com.laosun.aluminium.models.enemy.Enemy enemy
+                    && enemy.isWeakTo(element);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * The element a {@code has_weakness} condition names, checked against the closed enum.
+     *
+     * <p>Both spellings the data uses are accepted ({@code Fire} and {@code FIRE}); anything else is refused while the
+     * file is read, because a misspelled element would make the condition silently false on every enemy — 「命中具有
+     * 火属性弱点的敌人时」 would simply never fire, with nothing to see.
+     */
+    private static DamageElement requireElement(String name, String raw, TriggerSpec spec) {
+        DamageElement element = DamageElement.fromString(name);
+        if (element == null && name != null) {
+            element = DamageElement.fromString(name.trim().toUpperCase(java.util.Locale.ROOT));
+        }
+        if (element == null) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' names an unknown element '" + name + "'; write one of "
+                            + java.util.Arrays.toString(DamageElement.values())
+                            + " (source: " + spec.getSource() + ")");
+        }
+        return element;
     }
 
     /**
