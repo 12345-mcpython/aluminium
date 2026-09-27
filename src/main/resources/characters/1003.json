@@ -33,6 +33,23 @@
       "note": "No condition: BREAK is fired with the broken enemy as the event's subject and is only ever emitted for an enemy (Battle.reduceStance → enemy.breakEnemy), so 「敌方目标的弱点被击破」 is what the event already is. ⚠ Deliberately NOT gated on `actor == self`: the text pays for a break by anyone (which is also why the rule lives on her own table and nobody else's). Set 111's 「装备者击破敌方目标弱点后」 is the same event read the other way, with `actor == self` -- both spellings are pinned by their own tests. ⚠ This is the only rule of hers that can push 充能 to 3 without her acting: an ally's break charges her follow-up."
     },
     {
+      "on": "BREAK",
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        }
+      ],
+      "min_eidolon": 4,
+      "source": "1003 姬子 星魂 4 坚守的心 (Avatar_Himeko_Rank04) 第二句: 「施放<u>战技</u>对敌方目标造成弱点击破时，姬子额外获得1点充能。」",
+      "note": "「**施放战技**对敌方目标造成弱点击破时」 — two conditions, and both are load-bearing: `actor == self` says the break was hers (the talent rule above pays for anybody's break, which is what ITS sentence says), and `from_skill SKILL` says the instance that broke the toughness came from her **战技** — not from her 普攻, not from her 天赋's follow-up attack. ⚠ Without the second one, `actor == self` would also pay when her follow-up (a rule-driven `DAMAGE` with `skill: \"TALENT\"`, which carries `SkillCategory.UNSPECIFIED`) leaves the break — a wrong +1 充能 with nothing to report. The attribution comes from the instance itself (`Damage.getCastCategory()`, read by the `from_skill` condition against `SkillCategory.of(SkillType.SKILL)` = `BPSKILL`), which `Battle.reduceToughness` now carries into the BREAK event. ⚠ `min_eidolon: 4` is the gate; ⚠ the cap 「上限3点」 is the resource declaration's, so this rule can push her to the cap and no further. ⚠ NOT authored from this 星魂: the first sentence 「施放战技对敌方目标造成弱点击破时,姬子额外获得1点充能」 is THIS rule (the 星魂 has two sentences and the other one is registered with the ultimate's, see the talent rule's note) — the remaining registered clauses are the ultimate's 「每消灭1个敌方目标额外恢复姬子5点能量」 (the attribution now exists; what is unresolved is whether the engine's own 5-energy kill credit IS the text's 「额外」 5 — a data question, ±5 energy if guessed wrong)."
+    },
+    {
       "on": "ALLY_ATTACK",
       "when": [
         "self_resource:充能 >= 3"

@@ -516,7 +516,9 @@ public final class SkillExecutor {
         if (stanceDamage <= 0 || !damage.isCountsAsAttack() || !(target instanceof Enemy enemy)) {
             return 0;                                // additional damage / true damage does not reduce toughness
         }
-        Battle.StanceResult stance = battle.reduceToughness(user, enemy, element, stanceDamage);
+        // The instance is passed on: a weakness break caused by THIS cast has to be attributable to it
+        // (「施放战技…造成弱点击破时」), and damage is the only thing carrying the cast's category.
+        Battle.StanceResult stance = battle.reduceToughness(user, enemy, element, stanceDamage, damage.getCastCategory());
         return stance.breakDamage() + applySuperBreak(battle, user, enemy, element, stance.superBreakStance());
     }
 
