@@ -381,7 +381,7 @@ public class TriggerTable {
      * (and rejected there for the four {@code *_PERCENT} builder keys, whose runtime slot is null).
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("hit_count", "hp_percent", "target_debuff_count", "self_summon_count");
+            Set.of("hit_count", "hp_percent", "target_debuff_count", "self_summon_count", "target_summon_count");
 
     /**
      * The prefix of the one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -404,11 +404,39 @@ public class TriggerTable {
 
     private static final Set<String> STATE_SUBJECTS = Set.of("self", "actor", "target");
 
+    /**
+     * The {@code has_path} keyword, read exactly like {@link #HAS_STATE}.
+     */
+    private static final Pattern HAS_PATH =
+            Pattern.compile("(?<![\\w])has_path(?![\\w])", Pattern.CASE_INSENSITIVE);
+
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException("Empty trigger condition (source: " + spec.getSource() + ")");
         }
         String text = raw.trim();
+
+        // `!` negates the condition that follows it. The list of conditions is an AND, so without this the DSL
+        // can only say "the target is on some Path" and never 「对「同谐」命途的角色…无法触发」 (星期日's Skill, the
+        // first user) — and writing that as nine positive rules is the shape this prefix exists to avoid.
+        if (text.startsWith("!")) {
+            String inner = text.substring(1).trim();
+            if (inner.isEmpty() || inner.startsWith("!")) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' is not a negation of anything: write \"!\" followed by one "
+                                + "condition, e.g. \"!target has_path 同谐\" (source: " + spec.getSource() + ")");
+            }
+            Condition negated = parseCondition(inner, spec);
+            if (!(negated instanceof PartyCondition party)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' negates a condition that does not read a party "
+                                + "(self / actor / target); only those can be negated, because for a number "
+                                + "\"cannot read it\" and \"is zero\" are different facts. Write the opposite "
+                                + "comparison instead, e.g. \"self_summon_count == 0\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new Negated(party, raw);
+        }
 
         // `has_state`: "<who> has_state <name>". Checked before the operator branch because this shape has
         // no symbol operator at all -- without it, "self has_state 协奏" would be reported as an unknown
@@ -418,6 +446,15 @@ public class TriggerTable {
             String subject = normalize(text.substring(0, hasState.start()));
             String state = text.substring(hasState.end()).trim();
             return new HasState(requireStateSubject(subject, raw, spec), state, raw, spec);
+        }
+
+        // `has_path`: "<who> has_path 同谐" — the same shape, and for the same reason checked here first.
+        Matcher hasPath = HAS_PATH.matcher(text);
+        if (hasPath.find()) {
+            String subject = normalize(text.substring(0, hasPath.start()));
+            String name = text.substring(hasPath.end()).trim();
+            return new HasPath(requireStateSubject(subject, raw, spec),
+                    requirePath(name, raw, spec), raw, spec);
         }
 
         if (!containsOperator(text)) {
@@ -608,6 +645,26 @@ public class TriggerTable {
         return subject;
     }
 
+    /**
+     * The Path a {@code has_path} condition names, checked against the closed vocabulary of the nine.
+     *
+     * <p>Unlike {@code Path.fromName} — which degrades an unknown name to {@link
+     * com.laosun.aluminium.enums.Path#OTHER} because data may legitimately carry a Path this build does not know —
+     * a <b>rule file</b> may not: {@code target has_path 同谐} with a typo would silently become "the target is on
+     * some other Path", and for 星期日's sentence that means the exception fires on exactly the units it was
+     * written to exclude. So the name is refused while the file is read.
+     */
+    private static com.laosun.aluminium.enums.Path requirePath(String name, String raw, TriggerSpec spec) {
+        com.laosun.aluminium.enums.Path path = com.laosun.aluminium.enums.Path.fromNameOrNull(name);
+        if (path == null) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' has unknown \"has_path\" name '" + name + "'; the Paths are "
+                            + String.join(", ", com.laosun.aluminium.enums.Path.names().stream().sorted().toList())
+                            + " (source: " + spec.getSource() + ")");
+        }
+        return path;
+    }
+
     private static boolean containsOperator(String text) {
         return text.contains("==") || text.contains("!=")
                 || text.contains(">=") || text.contains("<=")
@@ -750,6 +807,113 @@ public class TriggerTable {
     }
 
     /**
+     * A condition that asks a question <b>about a party</b> ({@code self} / {@code actor} / {@code target}), and
+     * whose answer is therefore "no" when that party does not exist for this event.
+     *
+     * <p>It exists so that {@code !} cannot invert "cannot read it" into "matches": {@link Negated} asks this
+     * interface for the party first and fails the condition when there is none, which is the same guarantee the
+     * positive spelling gives (a rule must never match because a party was missing).
+     */
+    private interface PartyCondition extends Condition {
+        /**
+         * The party this condition reads, or {@code null} when it does not exist for this event.
+         */
+        CanHit partyOf(TriggerContext ctx);
+    }
+
+    /**
+     * {@code !<condition>} — the condition fails exactly when the one after it passes.
+     *
+     * <p><b>Why a prefix and not a "not equal" spelling per family.</b> Every family would otherwise need its own
+     * negation ({@code has_state} / {@code has_path} / the numeric comparisons), and the ones that already have
+     * one ({@code actor != self}) would have two ways to say it. One prefix covers the ones that need it, and it
+     * is read <b>before</b> anything else, so {@code !target has_path 同谐} cannot be confused with the {@code !=}
+     * operator.
+     *
+     * <p>⚠ <b>Only party-reading conditions may be negated</b> (see {@link PartyCondition}), and the check is done
+     * while the file is read. Two reasons, both about silence:
+     * <ul>
+     *   <li>"the party does not exist" must stay a <b>failure</b> in both polarities — for the numeric variables
+     *       that fact is {@code NaN}, and {@code !(NaN > 0)} is <b>true</b>, i.e. negating a number would turn
+     *       "cannot read it" into "matches";</li>
+     *   <li>numbers already have the opposite spelling ({@code self_summon_count == 0}), so refusing the
+     *       ambiguous one points the author at the better form instead of guessing.</li>
+     * </ul>
+     * The inner condition is compiled by the same {@code parseCondition}, so a negated typo is still refused with
+     * the message that names the typo (not "unknown condition").
+     */
+    private static final class Negated implements Condition {
+
+        private final Condition inner;
+        private final PartyCondition party;
+        private final String raw;
+
+        Negated(PartyCondition inner, String raw) {
+            this.inner = inner;
+            this.party = inner;
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return party.partyOf(ctx) != null && !inner.test(ctx);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * Path test: {@code target has_path 同谐} / {@code self has_path 存护}.
+     *
+     * <p><b>Why the condition DSL needs it.</b> 星期日's Skill says 「当星期日对「同谐」命途的角色施放该技能时，
+     * <b>无法触发</b>立即行动效果」 — an exception keyed on the target's <b>Path</b>, which no other condition can
+     * ask about. The Path is already engine knowledge ({@code Character.getPath()}, the aggro tier), so this is a
+     * vocabulary addition, not new data.
+     *
+     * <p>Read off the party named on the left, and <b>only</b> a character has one: a summon (or an enemy with no
+     * character data) answers "no", which is the "cannot read it, therefore the condition fails" rule
+     * {@link HasState} follows. ⚠ A Path the build does not recognise is {@link
+     * com.laosun.aluminium.enums.Path#OTHER} — that is <b>not</b> equal to any of the nine, so a rule asking for
+     * 同谐 does not accidentally match it.
+     */
+    private static final class HasPath implements Condition, PartyCondition {
+
+        private final String subject;
+        private final com.laosun.aluminium.enums.Path path;
+        private final String raw;
+
+        HasPath(String subject, com.laosun.aluminium.enums.Path path, String raw, TriggerSpec spec) {
+            this.subject = subject;
+            this.path = path;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            return who instanceof Character character && character.getPath() == path;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
      * Named-state test: {@code self has_state 协奏} / {@code target has_state 触电}.
      *
      * <p>Reads the state off the party named on the left through
@@ -762,7 +926,7 @@ public class TriggerTable {
      * <b>fails</b> the condition, exactly like {@link Equality} and {@link Numeric}: "the rule matched" must
      * never be the accidental outcome of a missing party.
      */
-    private static final class HasState implements Condition {
+    private static final class HasState implements Condition, PartyCondition {
 
         private final String subject;
         private final String state;
@@ -780,13 +944,18 @@ public class TriggerTable {
         }
 
         @Override
-        public boolean test(TriggerContext ctx) {
-            CanHit who = switch (subject) {
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
                 case "self" -> ctx.owner();
                 case "actor" -> ctx.actor();
                 case "target" -> ctx.target();
                 default -> null;
             };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
             return who != null && who.getBuffManager().hasState(state);
         }
 
@@ -907,25 +1076,29 @@ public class TriggerTable {
                 case "hit_count" -> ctx.hitCount();
                 case "hp_percent" -> hpPercent(ctx.owner());
                 case "target_debuff_count" -> ctx.target() == null ? Double.NaN : ctx.target().getBuffManager().debuffCount();
-                case "self_summon_count" -> summonCount(ctx);
+                case "self_summon_count" -> summonCount(ctx.owner(), ctx);
+                // 「若目标拥有召唤物」 — the same question about the OTHER unit. It is a separate name rather
+                // than a subject prefix because the two are asked in the same sentence often (relic 127 asks
+                // about the wearer, 星期日's Skill asks about the ally it was cast on).
+                case "target_summon_count" -> summonCount(ctx.target(), ctx);
                 default -> Double.NaN;
             };
         }
 
         /**
-         * How many living summons the owner has on the field.
+         * How many living summons one unit has on the field.
          *
-         * <p>Read from the battlefield, so a context with no battle answers {@code NaN} — the same "cannot
-         * read it, therefore the condition fails" rule the other variables follow, and never a silent
-         * "0 summons". ⚠ That matters more here than elsewhere: a rule gated on 「忆灵在场时」 would be
-         * <em>silently disabled</em> if a missing battlefield read as "none out", which is a wrong answer
-         * with no symptom.
+         * <p>Read from the battlefield, so a context with no battle — or a unit that does not exist for this
+         * event — answers {@code NaN}: the same "cannot read it, therefore the condition fails" rule the other
+         * variables follow, and never a silent "0 summons". ⚠ That matters more here than elsewhere: a rule
+         * gated on 「忆灵在场时」 would be <em>silently disabled</em> if a missing battlefield read as "none
+         * out", which is a wrong answer with no symptom.
          */
-        private static double summonCount(TriggerContext ctx) {
-            if (ctx.battle() == null || ctx.owner() == null) {
+        private static double summonCount(CanHit who, TriggerContext ctx) {
+            if (ctx.battle() == null || who == null) {
                 return Double.NaN;
             }
-            return ctx.battle().summonCountOf(ctx.owner());
+            return ctx.battle().summonCountOf(who);
         }
 
         /**

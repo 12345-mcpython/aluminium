@@ -80,6 +80,24 @@ public enum Path {
             Map.entry("memory", REMEMBRANCE));
 
     /**
+     * The nine Paths by their <b>Chinese</b> name — the spelling a rule file writes
+     * ({@code target has_path 同谐}).
+     *
+     * <p>Kept here rather than in the condition DSL for the same reason {@link #BY_MT} is: "a Path name means
+     * this Path" is one fact, and the aggro table and the DSL must not be able to disagree about it.
+     */
+    private static final Map<String, Path> BY_NAME = Map.ofEntries(
+            Map.entry("存护", PRESERVATION),
+            Map.entry("毁灭", DESTRUCTION),
+            Map.entry("巡猎", HUNT),
+            Map.entry("智识", ERUDITION),
+            Map.entry("同谐", HARMONY),
+            Map.entry("虚无", NIHILITY),
+            Map.entry("丰饶", ABUNDANCE),
+            Map.entry("欢愉", ELATION),
+            Map.entry("记忆", REMEMBRANCE));
+
+    /**
      * The raw Path string on the data side (the {@code mt} of {@code character_data.json}).
      */
     private final String mt;
@@ -111,17 +129,30 @@ public enum Path {
      * @return the Path (never {@code null})
      */
     public static Path fromName(String name) {
-        return switch (name == null ? "" : name) {
-            case "存护" -> PRESERVATION;
-            case "毁灭" -> DESTRUCTION;
-            case "巡猎" -> HUNT;
-            case "智识" -> ERUDITION;
-            case "同谐" -> HARMONY;
-            case "虚无" -> NIHILITY;
-            case "丰饶" -> ABUNDANCE;
-            case "欢愉" -> ELATION;
-            case "记忆" -> REMEMBRANCE;
-            default -> OTHER;
-        };
+        Path path = fromNameOrNull(name);
+        return path == null ? OTHER : path;
+    }
+
+    /**
+     * The same lookup, but an unknown name answers {@code null} instead of {@link #OTHER}.
+     *
+     * <p>Both answers are needed and they are not interchangeable. {@link #fromName} is for data that may
+     * legitimately carry a Path this build does not know (it must degrade to the 100 aggro tier rather than
+     * blow up). A <b>rule file</b> is different: {@code target has_path 同谐} with a typo would otherwise
+     * become "the target is on some other Path", i.e. a condition that quietly means something else — so the
+     * condition DSL refuses it at load time, and it needs a lookup that can say "not a Path".
+     *
+     * @param name the Chinese Path name
+     * @return the Path, or {@code null} when the name is not one of the nine
+     */
+    public static Path fromNameOrNull(String name) {
+        return name == null ? null : BY_NAME.get(name);
+    }
+
+    /**
+     * The Chinese names of the nine Paths, for error messages that list the vocabulary.
+     */
+    public static java.util.Set<String> names() {
+        return BY_NAME.keySet();
     }
 }

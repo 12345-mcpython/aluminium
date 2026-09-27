@@ -65,6 +65,11 @@ public class SummonConditionTest {
     private static final int OWNER = 1413;
     /** 阿格莱雅 — the second memosprite owner, for "a teammate's summon does not count". */
     private static final int TEAMMATE = 1402;
+    /**
+     * 姬子 — a plain character with no memosprite spec at all, i.e. the "owns nothing" side of
+     * {@code target_summon_count}.
+     */
+    private static final int PLAIN = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final int OTHER_MONSTER = 8002040;
@@ -191,6 +196,72 @@ public class SummonConditionTest {
         Assertions.assertFalse(compiledCondition(battle, "actor == summon", mine).test(noBattle));
         Assertions.assertFalse(compiledCondition(battle, "actor != summon", owner).test(noBattle),
                 "not 'therefore everything else counts'");
+    }
+
+    // ==================================================================
+    // 1b. `target_summon_count` — the same question about the other unit (M-41)
+    // ==================================================================
+
+    /**
+     * {@code target_summon_count} counts the <b>subject's</b> summons, where {@code self_summon_count} counts the
+     * owner's — the two are one word apart and both are read from the field.
+     *
+     * <p>Its first user is 星期日's Skill: 「若目标拥有召唤物，则造成的伤害提高效果额外提高…」, i.e. a question about
+     * the ally the skill was cast on, not about the caster. The two rules are put on <b>one</b> table and the event
+     * carries an ally who owns no summon while the owner owns one: exactly one of them may fire, which is the only
+     * arrangement that tells the two variables apart.
+     */
+    @Test
+    public void theTargetSummonCountAsksAboutTheSubject() {
+        Character owner = characterWith(
+                rule("SUMMON_ATTACK", List.of("self_summon_count >= 1")),
+                rule("SUMMON_ATTACK", List.of("target_summon_count >= 1")));
+        Character ally = CharacterFactory.create(PLAIN, LEVEL);
+        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), new Random(0));
+        battle.summonMemosprite(owner);
+        battle.processRequests();
+
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0),
+                "my own summon is out; the ALLY has none -- so only one of the two questions answers yes");
+    }
+
+    /** …and when the subject does own one, the answer flips. */
+    @Test
+    public void theTargetSideReadsTheFieldToo() {
+        Character owner = characterWith(
+                rule("SUMMON_ATTACK", List.of("self_summon_count >= 1")),
+                rule("SUMMON_ATTACK", List.of("target_summon_count >= 1")));
+        Character ally = CharacterFactory.create(TEAMMATE, LEVEL);
+        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), new Random(0));
+        battle.summonMemosprite(ally);
+        battle.processRequests();
+
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0),
+                "the ALLY's memosprite is what this counts, and the owner still has none");
+    }
+
+    /**
+     * With no subject at all the variable is unreadable, and <b>every</b> comparison fails.
+     *
+     * <p>Pinned because {@code == 0} is the tempting way to write "the target has no summon", and it would be
+     * silently true for every event without a target — a rule that fires on the wrong events with no symptom.
+     * The same table carries both polarities, and the event with a real (summon-less) subject is the contrast that
+     * shows the {@code == 0} rule works when there is something to read.
+     */
+    @Test
+    public void anUnreadableTargetSummonCountFailsBothWays() {
+        Character owner = characterWith(
+                rule("SUMMON_ATTACK", List.of("target_summon_count == 0")),
+                rule("SUMMON_ATTACK", List.of("target_summon_count >= 1")));
+        Character ally = CharacterFactory.create(PLAIN, LEVEL);
+        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), new Random(0));
+        battle.summonMemosprite(owner);
+        battle.processRequests();
+
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0),
+                "contrast: an ally with no summon really is 'zero'");
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, owner, null, 1, 0),
+                "…but an event with no subject is not zero either: 'cannot read it' is a third fact");
     }
 
     // ==================================================================
