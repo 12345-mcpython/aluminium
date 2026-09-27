@@ -1,0 +1,20 @@
+{
+  "4": [
+    {
+      "on": "FOLLOW_UP",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.36,
+          "turns": 1
+        }
+      ],
+      "source": "relic set 120 (风举云飞的勇烈 / The Wind-Soaring Valorous), 4-piece: 「使装备者的暴击率提高#1[i]%，装备者施放追加攻击时，使终结技造成的伤害提高#2[i]%，持续#3[i]回合。」 param = [0.06, 0.36, 1]",
+      "note": "Only the Follow-Up half: 「暴击率提高#1[i]%」 is the `properties` stat (CriticalChanceBase 0.06). ⚠ The share is **0.36**, and the registered reason said 12% -- the fifth entry in the 2026-09-28 content pass whose figure came from a sentence rather than from `param` (the others: 102, 111, 310, 313). ⚠ `turns: 1` is param #3, and it IS a turn count here (「持续#3[i]回合」) unlike sets 107/122/305 where the text names an event. ⚠ `FOLLOW_UP` rather than `ALLY_ATTACK`: FOLLOW_UP fires for the additional-damage instances that are this engine's notion of a follow-up attack, and `actor == self` is 「装备者施放追加攻击时」 (without it any ally's follow-up would raise the wearer's ultimate damage)."
+    }
+  ]
+}
