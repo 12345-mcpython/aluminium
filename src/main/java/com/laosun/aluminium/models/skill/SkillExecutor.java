@@ -250,7 +250,9 @@ public final class SkillExecutor {
             if ("Restore".equals(spec.getEffect())) {
                 battle.heal(user, target, amount);
             } else {
-                battle.grantShield(target, amount);
+                // `user` is the provider, so a Shield skill is boosted by ITS owner's 「提供的护盾量提高」 — the same
+                // rule the SHIELD op follows (see Battle.grantShield).
+                battle.grantShield(user, target, amount);
             }
         }
     }

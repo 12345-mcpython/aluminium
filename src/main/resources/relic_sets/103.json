@@ -1,0 +1,17 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SHIELD_BOOST",
+          "percent": 0.2,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 103 (净庭教宗的圣骑士 / Knight of Purity Palace), 4-piece: 「使装备者提供的护盾量提高#1[i]%。」 param = [0.2]",
+      "note": "「装备者**提供的**护盾量」 is the wearer's OWN shields, so this is a permanent boost on the wearer, read at grant time by Battle.boostedShield — from the GRANTER, never from the receiver. ⚠ Without `target`, MODIFY_ATTR defaults to 自身 (the wearer), which is what the sentence means; `all_allies` here would strengthen shields the wearer never made. ⚠ It only says 护盾量, so heals are untouched: OUTGOING_HEALING_BOOST is a separate attribute on purpose. ⚠ The 2-piece of this set is a `properties` stat (防御力+15%), so it is data rather than a rule and is correctly absent from this file."
+    }
+  ]
+}

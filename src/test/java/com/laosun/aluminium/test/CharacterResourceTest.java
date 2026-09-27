@@ -41,7 +41,7 @@ import java.util.Set;
  * </ol>
  *
  * <p>The fixtures under {@code src/test/resources/characters/} are the loader's own fixtures — the same trick
- * {@code relic_sets/103.json} uses for relic rules — so the shapes are exercised through {@link TriggerTables}
+ * {@code relic_sets/108.json} uses for relic rules — so the shapes are exercised through {@link TriggerTables}
  * rather than by calling Gson directly.
  */
 public class CharacterResourceTest {
