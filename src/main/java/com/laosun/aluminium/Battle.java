@@ -706,6 +706,10 @@ public class Battle {
         // for a 1-turn DOT it burns for nothing. `DotBuff` is an early buff precisely so this line is
         // what counts it down.
         actor.getBuffManager().beforeMove();
+        // M-42 ④: and the buffs on the rest of the field whose clock is this unit's (「星期日自身每回合开始时
+        // 【蒙福者】状态持续回合减1」). Swept here rather than inside the manager, because "whose turns count it"
+        // is a fact about the battle's turn boundary, not about the unit that happens to carry the buff.
+        tickForeignBuffs(actor, true);
         if (actor.isDeath()) {
             return;
         }
@@ -917,8 +921,26 @@ public class Battle {
         if (!actor.isDeath()) {
             actor.afterMove(this);
             actor.getBuffManager().afterMove();
+            tickForeignBuffs(actor, false);
         }
         processRequests();
+    }
+
+    /**
+     * Spends the duration of every buff on the field whose clock belongs to {@code clockOwner} (M-42 ④).
+     *
+     * <p>Iterates the <b>camp</b>, so a buff anchored to one of our characters is found wherever it sits — the
+     * point of the feature is that it sits on somebody else.
+     *
+     * @param clockOwner the unit whose turn boundary this is
+     * @param early      {@code true} = before the move, {@code false} = after it
+     */
+    private void tickForeignBuffs(CanHit clockOwner, boolean early) {
+        for (CanHit ally : allies) {
+            if (ally != null && ally != clockOwner) {
+                ally.getBuffManager().tickForeign(clockOwner, early);
+            }
+        }
     }
 
     public void processRequests() {
@@ -2121,7 +2143,33 @@ public class Battle {
                 queue.removeCombatant(signal.getCanHit());
             }
         }
+        releaseBuffsAnchoredToTheDead();             // M-42 ③: a buff spent by MY turns has no clock left
         checkResult();                               // P7-3: decide the outcome right after clearing the corpses
+    }
+
+    /**
+     * Takes off every buff whose duration was being spent by a unit that is now dead (M-42 ③).
+     *
+     * <p><b>Why this has to exist.</b> A buff can state that its clock is somebody else's turns
+     * ({@code AbstractBuff.ticksOn}, 「星期日自身每回合开始时【蒙福者】状态持续回合减1」). If that somebody dies, the
+     * clock never comes again — the buff would sit on its carrier for the rest of the battle, which is not "a long
+     * duration" but a different mechanic. 星期日's sentence says it outright (「当星期日陷入无法战斗状态时，
+     * 【蒙福者】效果也会被解除」); this is the generic version of it.
+     *
+     * <p>Swept from here rather than from the dying unit's own table because {@code fireTriggers} <b>skips dead
+     * units</b>: the unit that needs to react is gone before it could, and the buffs live on other units anyway.
+     */
+    private void releaseBuffsAnchoredToTheDead() {
+        for (CanHit ally : allies) {
+            if (ally == null || ally.isDeath()) {
+                continue;
+            }
+            for (CanHit other : allies) {
+                if (other != null && other != ally && other.isDeath()) {
+                    ally.getBuffManager().removeBuffsAnchoredTo(other);
+                }
+            }
+        }
     }
 
     /**

@@ -238,6 +238,23 @@ public class EffectSpec {
     private String buff;
 
     /**
+     * Whose <b>turns</b> spend this buff's duration: {@code "self"} = the <b>rule owner's</b> (M-42 ④). Absent =
+     * the unit that receives the buff.
+     *
+     * <p><b>Why it has to be statable.</b> 星期日's 【蒙福者】 is granted to an ally and says 「星期日自身每回合开始时
+     * 【蒙福者】状态持续回合减1」 — the state sits on the ally while its clock is <b>his</b>. Left to itself the engine
+     * counts a buff down on the turns of whoever carries it, so the same sentence would last a different number of
+     * turns in every fight, with nothing to report.
+     *
+     * <p>⚠ One value only, and it is the one a document asked for: {@code "self"}. The default (the carrier) is
+     * spelled by saying nothing — an axis with one used value is an axis nobody has tested (the same call as
+     * {@code self_attr:} having no {@code target_attr:} twin). ⚠ The anchor's <b>death</b> removes these buffs
+     * ({@code Battle.releaseBuffsAnchoredToTheDead}): a clock that will never come again is a leak, not a duration.
+     */
+    @SerializedName("ticks_on")
+    private String ticksOn;
+
+    /**
      * Who the effect applies to: {@code "self"} (the default -- the character whose table fired),
      * {@code "target"} (the subject of the event: whoever lost HP, was healed, was hit, ...), or
      * {@code "attacker"} (whoever <b>caused</b> the event).

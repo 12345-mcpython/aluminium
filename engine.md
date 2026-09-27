@@ -531,14 +531,14 @@ JSON 写法不变。
 | `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持），可选 `target`（**可以是群体**：`all_allies` / `other_allies` / `target_and_summon` 会逐个推） | ✅ |
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `damage_level`、`target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
-| `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、`max_stacks`（别名 `stacks`）、**`scale`**（派生值，见下） | ✅（P10-3） |
+| `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、`max_stacks`（别名 `stacks`）、**`scale`**（派生值，见下）、**`ticks_on`**（按谁的回合扣时长，见下） | ✅（P10-3） |
 | ↳ **派生值** `scale: "self_attr:<属性>"` | `percent` × **规则主人**那条属性的当前值 + 可选 `amount`（P11-2，M-42） | ✅ 首个用户**大丽花行迹「又一场葬礼」**「使其他角色的击破特攻提高，提高数值等同于 **24% 大丽花的击破特攻 + 50%**」。⚠ 结果是**绝对值**（即使目标是基础属性）—— 文档给的是"数值"，不是"目标基数的百分比"；⚠ 触发时**算一次就冻结**（引擎既有的快照口径 §24.5），所以 `amount` 是那个常数项；⚠ 没有 `scale` 却写了 `amount` **装载期拒绝**（以前是**静默忽略**）。⚠ 前缀与条件 DSL 的 `self_attr:` 共用一处定义（`TriggerTable.SELF_ATTR_PREFIX`），免得两种拼写各自漂移 |
 | `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
 | `BOOST_DAMAGE` | `percent`（只能挂在 `DEALING_DAMAGE` 上） | ✅ 改**正在结算的那一次**伤害：不改属性、不挂 buff、不会漏到下一次。是「对处于 X 状态的目标造成的伤害提高 Y%」的实现 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
 | `DISPEL` | `amount`，可选 `target` | ✅ 移除最多 `amount` 个**负面效果**（「解除 N 个负面效果」），**最新的先走**；"什么算负面"由每个 buff 类自己回答（`AbstractBuff.isDebuff()`，见 §10.4） |
 | `REMOVE_STATE` | `buff`（**状态名**），可选 `target` | ✅ **把具名状态整个拿掉**（2026-09-27，M-42 ②）：与 `APPLY_BUFF` / `has_state` **同一套名字**，「触电」这类 DoT 拼写也认（`BuffManager.removeState` 与 `hasState` 走同一张表，一侧改名两侧一起改）。⚠ 不在场**不是错误**（「只对最新目标生效」这类规则每次施放都跑，多数时候没什么可拿的）；⚠ **不收 `amount`** —— 「解除…状态」是拿掉整个状态，不是拿掉 N 个，写了会装载期报错。首个读者是**星期日终结技的【蒙福者】**「仅对…**最新的**施放目标生效」，但那条内容还差"按谁的回合计时"（M-42 ④），所以这个 op 目前是**已验证的能力、暂无出货规则** |
-| `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target` | ✅ 具名状态（见下） |
+| `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、**`ticks_on`**（见下） | ✅ 具名状态（见下） |
 | `SUMMON` | **无参数**（连 `target` 都不收） | ✅ 把**规则主人自己的忆灵**带上场（§24.5/§24.6）。没有 `target` 是因为忆灵属于召唤者、替它那一方打，没有可指的对象 —— 而多写一个 `target` 会被**拒绝**而不是被忽略。**按召唤者幂等**：再触发一次保留已在场的那一个（「若已在场，则使其生命值回复至上限」的刷新**没有**建模，无操作是诚实替身）。⚠ 用了这个 op 却没有忆灵文件的角色在**装配时**就被拒（`CharacterFactory`），不是战斗中途 |
 | `COMMAND_SUMMON` | `skill` / `damage_param` / `attribute`，可选 `damage_level`（**不收** `target`） | ✅ **指令忆灵立刻打一次**（§24.10，2026-09-28）：倍率 / 元素 / 形状 / **削韧**全部来自规则**指名的那条技能**（主人自己的），基数属性来自 `attribute`（读的是**召唤物**的），攻击者也是召唤物。首个用户 **1413 长夜月终结技**「随后使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害」 |
 | `DELEGATE_DAMAGE` | `skill`（只能挂在 `CAST_SETUP` 上） | ✅ **这次施放的伤害不由我来打**（§24.10，M-40，2026-09-27）：`skill` 指名**正在施放的那个槽位**（条件 DSL 没有"哪个槽位"这个变量，所以这个比对**就是**那道闸），命中则这次施放不展开伤害、也不削韧 —— 两件事一起移交给真正交付它的规则（长夜月那条在 `ULT_CAST` 上用 `COMMAND_SUMMON` 交付）。⚠ op 同时核对"这次施放确实是规则主人的"（`CAST_SETUP` 投给每张表），报错直接告诉作者加 `actor == self` |
@@ -583,13 +583,28 @@ JSON 写法不变。
   所以 `until` 收**列表**，**任一到就结束**。只写一个事件是"没报错的错误时长"（辅助战技不会结束它），
   而写成两条 buff 更糟：同 kind 同 target 会**互相替换**，最后只有后一条活着。⚠ 列表里**每一个名字都会被校验**，
   第二个名字写错不会因为"控制流没走到"而混过去。
-- ⚠ **创造它的那次事件不消耗它**：`SkillExecutor.execute` 先结算落地攻击
-  （`resolveHits` → `Battle.fireAfterAttack`）与 buff 级施放通知（`broadcastSkillCast`），**之后**才发施放触发事件
-  （`BASIC_ATTACK` / `SKILL_CAST` / `ULT_CAST`），所以「施放普攻后…持续至下次施放普攻后」是**整整一个间隔**，
-  而不是刚给上就被这次施放收走。
+- ⚠ **创造它的那次事件不消耗它**：`SkillExecutor.execute` 先结算落地攻击（`resolveHits` → `Battle.fireAfterAttack`）与
+  buff 级施放通知（`broadcastSkillCast`），**之后**才发施放触发事件（`BASIC_ATTACK` / `SKILL_CAST` / `ULT_CAST`），
+  所以「施放普攻后…持续至下次施放普攻后」是**整整一个间隔**，而不是刚给上就被这次施放收走。
 - ⚠ **追击攻击不消耗它**：`AttackEvent` 的契约是"只宣布引擎从头到尾驱动的一次攻击"，派生伤害（附加/真伤/DOT/击破）
   故意排除在外 —— 这条边界同时是**递归安全**的保证（听众允许用伤害回应攻击）。代价就是这处**已知的少消耗**
   （buff 会多留一会儿），登记为 ROADMAP M-27，而不是把事件接到派生伤害上去。
+
+#### 谁的回合扣这个时长：`ticks_on: "self"`（M-42 ④）
+
+`turns` 说的是"几个回合"，但**谁的**回合？默认是**携带它的那个单位**（引擎一贯的口径），而
+星期日终结技的【蒙福者】偏偏相反：「使**目标及其召唤物**成为【蒙福者】…**星期日自身**每回合开始时【蒙福者】
+状态持续回合减1，共持续#3[i]回合」。状态挂在队友身上，时钟却是**他的** —— 按默认口径会变成"队友的三个回合"，
+在每一场战斗里都是不同的回合数，而且没有任何迹象。
+
+- 写法：在创建 buff 的那条效果上写 `"ticks_on": "self"`（`self` = **规则主人**）；**不写就是默认**（携带者自己的回合）。
+- 实现：`AbstractBuff.ticksOn(unit)` 回答"这条 buff 的时长是不是被这个单位的回合扣"，`Battle` 在**每个单位的回合边界**
+  顺带扫一遍场上**其他**单位的 buff 管理器（`BuffManager.tickForeign`）—— 时钟是"战斗中谁在行动"，不是"buff 挂在谁身上"。
+- ⚠ **锚点死亡 ⇒ 把 buff 拿掉**（M-42 ③）：时钟再也不会来了，留着它就不是"时长长"而是**泄漏**（星期日的原文也这么说：
+  「当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除」）。⚠ 这件事**不能**写成他表上的一条规则：`fireTriggers`
+  **会跳过已阵亡单位**，需要反应的那个单位在轮到它之前就已经没了 —— 所以它是引擎侧的清理
+  （`Battle.releaseBuffsAnchoredToTheDead`）。
+- ⚠ `permanent: true` + `ticks_on` 是**装载期拒绝**：从不被扣的 buff 声明时钟是自相矛盾。
 
 #### `target` 选择器（同样是封闭集合）
 
