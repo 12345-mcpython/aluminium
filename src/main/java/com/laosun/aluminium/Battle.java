@@ -1492,21 +1492,64 @@ public class Battle {
      * Because {@link CanHit#takeDamage} is "deduct shield first, then HP", "not dying before the shield breaks"
      * holds automatically.
      *
-     * <p>🚧 The shield-boost entries (shield amount boost / shield gained boost) **have no corresponding
-     * attribute yet** (there is none in {@code AttributeType}), so for now the shield amount is just the value
-     * passed in -- add them when a real effect references them.
+     * <p>⚠ This overload states <b>no provider</b>, so no shield boost applies: it is the raw entry point the fixtures
+     * and demos use, and the units that call it are stating "this shield came from nowhere in particular". Content
+     * goes through {@link #grantShield(CanHit, CanHit, double)} — which is what makes 「装备者提供的护盾量提高 X%」 mean
+     * the <i>giver's</i> shield and not everybody's ({@link #boostedShield}).
      *
      * @param target the one gaining the shield (no effect if already dead)
      * @param amount the shield amount (≤ 0 is treated as clearing the shield)
      * @return the shield value actually set
      */
     public double grantShield(CanHit target, double amount) {
+        return grantShield(null, target, amount);
+    }
+
+    /**
+     * Gain a shield, <b>as created by {@code provider}</b>.
+     *
+     * <p>The provider is not decoration: {@code provider}'s {@link AttributeType#SHIELD_BOOST} multiplies the amount,
+     * which is the engine's answer to 「使装备者提供的护盾量提高 20%」 (遗器 103 / 128, 一件光锥). A {@code null} provider
+     * means "unknown giver" and applies no boost — the safe direction, since a boost that cannot be attributed would
+     * silently strengthen every shield in the fight.
+     *
+     * @param provider who is granting it ({@code null} = unknown, so unboosted)
+     * @param target   the one gaining the shield (no effect if already dead)
+     * @param amount   the shield amount before the provider's boost (≤ 0 is treated as clearing the shield)
+     * @return the shield value actually set
+     */
+    public double grantShield(CanHit provider, CanHit target, double amount) {
         if (target == null || target.isDeath()) {
             return 0;
         }
-        double value = Math.max(0, amount);
+        double value = boostedShield(provider, amount);
         target.setShield(value);
         return value;
+    }
+
+    /**
+     * The shield amount a given provider's shield is actually worth: {@code amount × (1 + 提供的护盾量提高)}.
+     *
+     * <p><b>One formula, two paths.</b> A {@code SHIELD} effect reaches the field either as a raw grant (no
+     * {@code turns}) or through a {@link com.laosun.aluminium.models.buff.ShieldBuff} (timed), and 「提供的护盾量」 has to
+     * mean the same number in both — otherwise a shield would be worth 120 for three turns and 100 forever after the
+     * duration came off, which is exactly the class of silent discrepancy this project keeps hunting. The buff
+     * snapshots this value when it is constructed; the raw path calls it here.
+     *
+     * <p>⚠ The boost is read <b>once, at grant time</b>, and frozen into the shield (the same convention
+     * {@code MODIFY_ATTR}'s derived values use): a shield already standing does not grow when its giver is
+     * strengthened later.
+     *
+     * @param provider whose boost applies ({@code null} = none)
+     * @param amount   the requested amount
+     * @return the amount after the boost, never negative
+     */
+    public static double boostedShield(CanHit provider, double amount) {
+        double base = Math.max(0, amount);
+        if (provider == null) {
+            return base;
+        }
+        return base * (1 + provider.getAttribute(AttributeType.SHIELD_BOOST).get());
     }
 
     /**

@@ -123,6 +123,10 @@ public class RelicTriggerTableTest {
     private static final int SCHOLAR = 122;
     /** 折断的龙骨: 效果抵抗 +10%; 效果抵抗 ≥ 30% 时我方全体暴击伤害 +10%. */
     private static final int BROKEN_KEEL = 310;
+    /** 净庭教宗的圣骑士: 防御力 +15%; 使装备者**提供的**护盾量提高 20%. */
+    private static final int KNIGHT_OF_PURITY = 103;
+    /** 自匿星芒的隐士: 提供的护盾量提高 10%; 再 +12%，且我方目标持有装备者提供的护盾时暴击伤害 +15%(M-53). */
+    private static final int RECLUSE = 128;
 
     /**
      * A set with a registered ability and <b>no</b> rule file — used by the "nothing to merge" case, which must
@@ -220,7 +224,14 @@ public class RelicTriggerTableTest {
             "316/2",
             // Authored once a damage category could be named as an ATTRIBUTE
             // (`DOT_DAMAGE_BOOST`, the sibling of the follow-up one).
-            "322/2");
+            "322/2",
+            // Authored on 2026-09-28, the day a shield could remember WHO created it: 「提供的护盾量提高 X%」 is the
+            // giver's own number (`AttributeType.SHIELD_BOOST`, read by `Battle.boostedShield` from the provider).
+            // ⚠ Set 128's 4-piece ships one of its two sentences: the other one asks, per ally, whether the shield
+            // that ally holds is the wearer's, and a whole-rule condition cannot say that (M-53).
+            "103/4",
+            "128/2",
+            "128/4");
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
@@ -232,9 +243,10 @@ public class RelicTriggerTableTest {
      * authorable — and then to <b>47</b> when the MIXED effects joined the partition (see
      * {@link #MIXED_STAT_AND_ABILITY}); those 22 mixed entries are not a regression, they are the half of
      * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
-     * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}).
+     * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
+     * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 25;
+    private static final int STILL_REGISTERED = 22;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
@@ -653,14 +665,15 @@ public class RelicTriggerTableTest {
      * (stat + ability) shape lives, so missing that tier would hide most of the gap. It was eight before 326
      * (City of Converging Stars) and 115 (The Ashblazing Grand Duke) became authorable, <b>five</b> since
      * 2026-09-27 (set 106 joined them), and <b>22</b> once the 17 mixed 2-piece abilities that no longer
-     * count as invisible were registered (M-25).
+     * count as invisible were registered (M-25). It is <b>11</b> since 2026-09-28, when 128's 2-piece
+     * (「提供的护盾量提高10%」) became authorable with the shield-amount boost.
      */
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(11, twoPiece,
-                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (20 until the "
-                        + "2-pieces of sets 117 and 310 were authored on 2026-09-28)");
+        Assertions.assertEquals(10, twoPiece,
+                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (11 until set "
+                        + "128's 2-piece was authored on 2026-09-28)");
     }
 
     // ==================================================================

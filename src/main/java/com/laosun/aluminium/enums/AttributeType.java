@@ -114,7 +114,29 @@ public enum AttributeType {
      * {@link #FOLLOW_UP_DAMAGE_BOOST} -- a DoT instance is {@code DamageType.DOT}, which the boost zone does
      * <b>not</b> skip (only break / super break / true damage are skipped), so the attribute reaches the instance.
      */
-    @SerializedName("dot_damage_boost") DOT_DAMAGE_BOOST("dot_damage_boost");
+    @SerializedName("dot_damage_boost") DOT_DAMAGE_BOOST("dot_damage_boost"),
+
+    /**
+     * 「使装备者<b>提供的护盾量</b>提高 X%」 — the shield the <b>provider</b> creates absorbs more.
+     *
+     * <p><b>Whose attribute it is.</b> Unlike every other boost in this enum, it is not read from the dealer or the
+     * victim but from the unit <i>granting</i> the shield: 「装备者提供的」 names the giver, and the same shield given
+     * by somebody else is unaffected. That is why {@code Battle.grantShield} takes a provider and why the number is
+     * snapshotted into the shield at grant time — a shield already standing does not grow when the giver later picks
+     * up a boost.
+     *
+     * <p><b>Why it needed its own constant instead of reusing {@code MODIFY_ATTR} on an existing one.</b> There is no
+     * other attribute that means "how much shield I make": {@code OUTGOING_HEALING_BOOST} is its healing twin, and
+     * folding the two together would make 「提供的护盾量提高」 silently also strengthen heals.
+     *
+     * <p>Readers: 遗器 103 净庭教宗的圣骑士 4 件套 (20%), 遗器 128 自匿星芒的隐士 2 件套 (10%) 与 4 件套 (12%), and a
+     * light cone (12/15/18/21/24%). All four say 「提供的护盾量」 — the provider's side, never the receiver's; the
+     * receiver-side spelling ("shield gained") has no reader in the corpus and is deliberately not modelled.
+     *
+     * <p>⚠ <b>Appended, never inserted</b>: {@link #ordinal()} indexes every unit's attribute array (see the warning
+     * above {@link #BASIC_ATTACK_DAMAGE_BOOST}).
+     */
+    @SerializedName("shield_boost") SHIELD_BOOST("shield_boost");
 
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
 
