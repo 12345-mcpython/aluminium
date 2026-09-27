@@ -37,6 +37,43 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     protected final boolean permanent;
 
     /**
+     * Whose <b>turn boundaries</b> count this buff's duration down; {@code null} = the unit that carries it
+     * (M-42 ④).
+     *
+     * <p><b>Why the clock is not always the carrier.</b> 星期日's 【蒙福者】 says 「星期日自身每回合开始时
+     * 【蒙福者】状态持续回合减1」 — the state sits on the ally, but its duration is spent by <b>his</b> turns.
+     * Modelling that as an ordinary timed buff on the ally would count it down on the <i>ally's</i> turns: a
+     * different number of turns in every real fight, with nothing to see. So the anchor is stated, and
+     * {@code Battle} sweeps the other units for buffs anchored to whoever is taking their turn.
+     *
+     * <p>⚠ {@code null} is the default and must stay the ordinary case: every existing buff ticks on its carrier.
+     * ⚠ An anchored buff outlives its carrier's usefulness if the anchor dies, so the anchor's death removes it
+     * ({@code Battle.removeDeadCombatants} → {@link BuffManager#removeBuffsAnchoredTo(CanHit)}); without that a
+     * buff whose clock never comes again would sit there for the rest of the battle.
+     */
+    private CanHit tickOwner;
+
+    /**
+     * Whether {@code who}'s turn boundary ticks this buff.
+     *
+     * @param who the unit whose turn is beginning or ending
+     * @return {@code true} = this buff's duration is spent by that unit's turns
+     */
+    public boolean ticksOn(CanHit who) {
+        CanHit clock = tickOwner == null ? owner : tickOwner;
+        return clock != null && clock == who;
+    }
+
+    /**
+     * Anchors this buff's duration to {@code clockOwner}'s turns instead of its carrier's.
+     *
+     * @param clockOwner the unit whose turns count it down
+     */
+    public void setTickOwner(CanHit clockOwner) {
+        this.tickOwner = clockOwner;
+    }
+
+    /**
      * Who this buff is currently attached to (written by {@link BuffManager#addBuff(AbstractBuff)} at
      * attach time).
      *

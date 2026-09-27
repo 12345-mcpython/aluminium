@@ -6,8 +6,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -56,6 +58,11 @@ public class SundaySkillTest {
     private static final int MONSTER = 1002011;
     /** His Skill's slot in {@code skills.json}. */
     private static final int SKILL_SLOT = 2;
+    /** His ultimate's slot. */
+    private static final int ULTIMATE_SLOT = 3;
+    /** 姬子's CRIT DMG with no buffs — she is the fixture the derived value is measured against. */
+    private static final double HARMONY_BARE_CRIT_DMG =
+            CharacterFactory.create(ERUDITION_ALLY, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
 
     // ==================================================================
     // 1. 「指定我方单体及其召唤物立即行动」
@@ -143,6 +150,82 @@ public class SundaySkillTest {
     }
 
     // ==================================================================
+    // 2b. The 【蒙福者】 kit: his ultimate's clause and the state it makes
+    // ==================================================================
+
+    /** The state and the CRIT DMG it carries land on the ally and its summon — and only on the newest target. */
+    @Test
+    public void theUltimateBlessesTheTargetAndItsSummon() {
+        Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
+        Character sunday = battle.characters.getFirst();
+        Character first = battle.characters.get(1);
+
+        Assertions.assertTrue(first.getBuffManager().hasState("蒙福者"), "「使目标及其召唤物成为【蒙福者】」");
+        Assertions.assertEquals(0.12 * critDamageOf(sunday) + 0.08, critDamageOf(first) - HARMONY_BARE_CRIT_DMG, EPS,
+                "「提高数值等同于星期日#2%暴击伤害+#4%」 -- his own number, not the target's");
+
+        // …and casting it on somebody new takes it off the previous holder: 「仅对…最新的施放目标生效」.
+        Character second = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
+        Battle next = new Battle(List.of(sunday, first, second), List.of(dummy()), new Random(0));
+        next.startBattle();
+        next.stepForward();
+        next.beforeMove();
+        next.afterMove();                                  // Sunday's turn comes first (96 speed vs 112)
+        Assertions.assertTrue(first.getBuffManager().hasState("蒙福者"), "precondition: still on the first ally");
+
+        castUltimate(next, sunday, second);
+
+        Assertions.assertFalse(first.getBuffManager().hasState("蒙福者"),
+                "「仅对…最新的施放目标生效」 -- the removal is what says that, there is no holder flag");
+        Assertions.assertTrue(second.getBuffManager().hasState("蒙福者"));
+    }
+
+    /** His death takes the state off the ally: 「当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除」. */
+    @Test
+    public void hisDeathTakesTheStateOff() {
+        Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
+        Character sunday = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+        Assertions.assertTrue(ally.getBuffManager().hasState("蒙福者"), "precondition");
+
+        sunday.takeDamage(9_999_999);
+        battle.processRequests();
+
+        Assertions.assertTrue(sunday.isDeath(), "precondition: he is down");
+        Assertions.assertFalse(ally.getBuffManager().hasState("蒙福者"),
+                "the state's clock was HIS turns -- once he is gone there is no clock, so it goes with him");
+    }
+
+    /** The state's duration is spent by <b>his</b> turns, not by the ally's. */
+    @Test
+    public void theStateIsSpentByHisTurns() {
+        Battle battle = ultimateBattle(ERUDITION_ALLY, null);
+        Character sunday = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+
+        takeTurn(battle, ally);
+        Assertions.assertEquals(3, blessingDuration(ally), "her turn does not spend it");
+
+        takeTurn(battle, sunday);
+        Assertions.assertEquals(2, blessingDuration(ally), "his does");
+    }
+
+    /** Casting the Skill on the 【蒙福者】 gives the skill point back -- the sentence's last clause. */
+    @Test
+    public void theSkillRefundsItsPointOnTheBlessed() {
+        Battle battle = ultimateBattle(ERUDITION_ALLY, null);
+        Character sunday = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+        Assertions.assertTrue(ally.getBuffManager().hasState("蒙福者"), "precondition: he is the blessed one");
+        drainSkillPoints(battle);
+
+        cast(battle, sunday, ally);
+
+        Assertions.assertEquals(1, battle.getSkillPoints(),
+                "「对【蒙福者】施放战技后恢复1个战技点」 -- the point the skill cost came back");
+    }
+
+    // ==================================================================
     // 3. The file
     // ==================================================================
 
@@ -157,10 +240,10 @@ public class SundaySkillTest {
     public void theAuthoredSkillIsThreeClauses() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
 
-        Assertions.assertEquals(3, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
-                "advance (unless 同谐) + share without a summon + share with one");
-        Assertions.assertEquals(0, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
-                "his ultimate's 【蒙福者】 kit is not authored yet (M-42)");
+        Assertions.assertEquals(4, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
+                "advance (unless 同谐) + share without a summon + share with one + the 【蒙福者】 refund");
+        Assertions.assertEquals(1, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
+                "the 【蒙福者】 clause; the energy restore is still registered with M-42");
     }
 
     // ==================================================================
@@ -200,6 +283,65 @@ public class SundaySkillTest {
             }
         }
         return Double.NaN;
+    }
+
+    /**
+     * A battle where Sunday has already cast his ultimate at {@code allyCid}.
+     *
+     * <p>⚠ The ally is made <b>faster</b> than him, deliberately: the case below has to observe "her turn, and his
+     * turn has not happened yet", and Sunday's own speed ties with 姬子's — a tie is an arbitrary order, so the
+     * window could contain his turn and the measurement would read two ticks as one (it did: 2 instead of 3).
+     */
+    private static Battle ultimateBattle(int allyCid, Character ignored) {
+        Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
+        Character ally = CharacterFactory.create(allyCid, LEVEL);
+        ally.setAttribute(AttributeType.SPEED, new DoubleValue(150));
+        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        castUltimate(battle, sunday, ally);
+        return battle;
+    }
+
+    private static void castUltimate(Battle battle, Character sunday, Character ally) {
+        battle.castImmediate(new DefaultSkill(SUNDAY, ULTIMATE_SLOT, 1), sunday, List.of(ally));
+    }
+
+    /** The CRIT DMG of the 【蒙福者】 state's modifier, or {@code -1} when it is not attached. */
+    private static int blessingDuration(CanHit who) {
+        for (StatModifierBuff buff : who.getBuffManager().allBuffsOf(StatModifierBuff.class)) {
+            if (buff.getAttribute() == AttributeType.CRIT_ATTACK) {
+                return buff.duration();
+            }
+        }
+        return -1;
+    }
+
+    private static double critDamageOf(CanHit who) {
+        return who.getAttribute(AttributeType.CRIT_ATTACK).get();
+    }
+
+    private static void drainSkillPoints(Battle battle) {
+        while (battle.spendSkillPoint()) {
+            // drain to zero
+        }
+    }
+
+    /** Runs the queue up to {@code who}'s turn and settles both boundaries of it. */
+    private static void takeTurn(Battle battle, Character who) {
+        for (int guard = 0; guard < 60; guard++) {
+            battle.stepForward();
+            if (battle.isOver()) {
+                throw new AssertionError("the battle ended before the requested unit acted");
+            }
+            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
+            if (mine) {
+                battle.beforeMove();
+                battle.afterMove();
+                return;
+            }
+            battle.afterMove();
+        }
+        throw new AssertionError("no turn for the requested unit within 60 steps");
     }
 
     private static Enemy dummy() {

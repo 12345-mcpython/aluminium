@@ -219,11 +219,13 @@ public final class TriggerInterpreter {
                 requireDerivedScale(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireStackCap(effect, op, spec);
+                requireTickOwner(effect, op, spec);
             }
             case "APPLY_BUFF" -> {
                 requireBuff(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
+                requireTickOwner(effect, op, spec);
             }
             case "REMOVE_STACK" -> {
                 requireAttribute(effect, op, spec);
@@ -769,8 +771,9 @@ public final class TriggerInterpreter {
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(
-                    withLifetime(statModifier(attribute, magnitude, turns, permanent, maxStacks, derived), effect));
+            target.getBuffManager().addBuff(withTickOwner(
+                    withLifetime(statModifier(attribute, magnitude, turns, permanent, maxStacks, derived), effect),
+                    effect, ctx));
         }
     }
 
@@ -875,6 +878,44 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * Anchors a fresh buff's duration to the rule owner's turns when the rule asks for it ({@code "ticks_on":
+     * "self"}, M-42 ④), and leaves it on its carrier otherwise.
+     *
+     * <p>Separate from {@link #withLifetime} because the two say different things about time: {@code until} names the
+     * <b>event</b> that ends a buff, this names <b>whose turn boundary</b> spends it. A rule may state either, and
+     * the state names are the same ones the rest of the op vocabulary uses ({@code "self"} = the rule owner).
+     */
+    private static AbstractBuff withTickOwner(AbstractBuff buff, EffectSpec effect, TriggerContext ctx) {
+        if (effect.getTicksOn() != null) {
+            buff.setTickOwner(ctx.owner());
+        }
+        return buff;
+    }
+
+    /**
+     * Validates {@code "ticks_on"} at load time: one value, spelled exactly, and only on ops that create a timed
+     * buff — the same "fail while the file is read" discipline as every other argument.
+     */
+    private static void requireTickOwner(EffectSpec effect, String op, TriggerSpec spec) {
+        String ticksOn = effect.getTicksOn();
+        if (ticksOn == null || ticksOn.isBlank()) {
+            return;
+        }
+        if (!"self".equals(ticksOn.trim())) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has \"ticks_on\": \"" + ticksOn + "\", which is not a spelling it knows; the "
+                            + "only other clock a document has asked for is the RULE OWNER's, written "
+                            + "\"ticks_on\": \"self\" (say nothing for the ordinary case: the unit that carries "
+                            + "the buff) (source: " + spec.getSource() + ")");
+        }
+        if (Boolean.TRUE.equals(effect.getPermanent())) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " is \"permanent\": true, so nothing counts it down and \"ticks_on\": \"self\" "
+                            + "would be ignored (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
      * The lifetimes a validated effect names; <b>empty</b> when it names none.
      *
      * <p>Every name has already been checked against {@link #LIFETIMES} at load time, so anything else here is an
@@ -932,7 +973,8 @@ public final class TriggerInterpreter {
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         String state = effect.getBuff().trim();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(withLifetime(new StateBuff(state, turns, permanent), effect));
+            target.getBuffManager().addBuff(
+                    withTickOwner(withLifetime(new StateBuff(state, turns, permanent), effect), effect, ctx));
         }
     }
 
