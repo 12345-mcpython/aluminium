@@ -160,6 +160,110 @@ public class Battle {
     private final List<CanHit> justSummoned = new ArrayList<>();
 
     /**
+     * The cast being resolved right now, or {@code null} outside a cast (P11-1, M-40) — what
+     * {@link TriggerEvent#CAST_SETUP} hands to the trigger tables.
+     *
+     * <p><b>Why the battle holds it rather than the trigger context.</b> "A cast is in progress" is a fact about
+     * the battle, not about one event: the rules that read it fire <i>during</i> the cast and the decision has to
+     * survive back to {@code SkillExecutor}, which is what skips the damage. Putting it here also keeps
+     * {@code TriggerContext} (a record with a construction site per event) unchanged, and {@code ctx.battle()} is
+     * already in every context.
+     *
+     * <p>Nesting is modelled with a link to the enclosing cast ({@link PendingCast#outer()}): an inner cast
+     * restores the outer one when it ends, so a rule that somehow casts during a cast cannot corrupt it.
+     */
+    private PendingCast pendingCast;
+
+    /**
+     * One cast in flight: who is casting, which slot, and whether its damage has been handed to somebody else.
+     *
+     * <p>Mutable on purpose, and it is the <b>only</b> thing the rules may change about a cast today (see
+     * {@link TriggerEvent#CAST_SETUP}): the alternative — a rule that describes the swing after the fact — cannot
+     * undo a damage instance that has already been settled.
+     */
+    public static final class PendingCast {
+
+        private final CanHit caster;
+        private final int slot;
+        private final PendingCast outer;
+        private boolean damageDelegated;
+
+        private PendingCast(CanHit caster, int slot, PendingCast outer) {
+            this.caster = caster;
+            this.slot = slot;
+            this.outer = outer;
+        }
+
+        /**
+         * Who is casting.
+         */
+        public CanHit caster() {
+            return caster;
+        }
+
+        /**
+         * The skill slot being cast (1 = 基本攻击, 2 = 战技, 3 = 终结技, …, the numbering {@code skills.json}
+         * itself uses — see {@link Skill#getSkillSlot()}).
+         */
+        public int slot() {
+            return slot;
+        }
+
+        /**
+         * The cast this one is nested inside, or {@code null}.
+         */
+        public PendingCast outer() {
+            return outer;
+        }
+
+        /**
+         * Whether this cast's own damage has been delegated — i.e. {@code SkillExecutor} must not expand it and
+         * must not remove this skill's toughness either: both belong to whoever delivers the swing.
+         */
+        public boolean damageDelegated() {
+            return damageDelegated;
+        }
+
+        /**
+         * Hands this cast's damage over. Called by the {@code DELEGATE_DAMAGE} op, which is the only caller and
+         * checks that the cast really is the rule owner's own and really is the slot the rule names.
+         */
+        public void delegateDamage() {
+            this.damageDelegated = true;
+        }
+    }
+
+    /**
+     * Starts a cast and returns its token; {@link #endCast(PendingCast)} must be called in a {@code finally}.
+     *
+     * @param skill the skill being cast
+     * @param caster who casts it
+     * @return the token identifying this cast
+     */
+    public PendingCast beginCast(Skill skill, CanHit caster) {
+        pendingCast = new PendingCast(caster, skill == null ? 0 : skill.getSkillSlot(), pendingCast);
+        return pendingCast;
+    }
+
+    /**
+     * Ends the cast started by {@link #beginCast}, restoring the enclosing one (if any).
+     *
+     * @param cast the token {@link #beginCast} returned
+     */
+    public void endCast(PendingCast cast) {
+        if (pendingCast == cast) {
+            pendingCast = cast == null ? null : cast.outer();
+        }
+    }
+
+    /**
+     * The cast being resolved right now, or {@code null} when nothing is being cast.
+     */
+    public PendingCast currentCast() {
+        return pendingCast;
+    }
+
+    /**
      * Skill points (战技点) policy (P8-4): **one pool shared by the whole team**, not one track per character.
      *
      * <p>{@code Battle} itself **does not know the skill point rules** -- it only holds a

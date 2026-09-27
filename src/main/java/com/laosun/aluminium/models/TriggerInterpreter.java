@@ -104,7 +104,7 @@ public final class TriggerInterpreter {
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
-            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON");
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -247,6 +247,16 @@ public final class TriggerInterpreter {
                 // pointing this op at `self` or at a teammate would deal the summon's damage to our own side.
                 requireNoTarget(effect, op, spec);
             }
+            case "DELEGATE_DAMAGE" -> {
+                // Only the slot being cast is named. Everything else about the swing -- who delivers it and with
+                // what numbers -- belongs to the rule that DOES deliver it (for 长夜月, the COMMAND_SUMMON on
+                // ULT_CAST below); this op only says "not by me".
+                requireSkill(effect, op, spec);
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                requireNoTarget(effect, op, spec);
+                requireEvent(spec, op, TriggerEvent.CAST_SETUP);
+            }
             default -> requireNoStackArguments(effect, op, spec);
         }
     }
@@ -341,10 +351,59 @@ public final class TriggerInterpreter {
             case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
-        case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
+            case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
+            case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
+    }
+
+    /**
+     * {@code DELEGATE_DAMAGE} (P11-1, M-40): the cast in progress must not deal its own damage.
+     *
+     * <p>This is the one op that fires <b>before</b> a swing exists, and it can only touch the cast that is in
+     * progress — so all three of its checks are about "is this rule talking about the swing it thinks it is":
+     * <ul>
+     *   <li>the cast must be the <b>rule owner's own</b>. {@code CAST_SETUP} is delivered to every ally's table,
+     *       so a rule that forgot {@code actor == self} would otherwise hand away <i>somebody else's</i> damage —
+     *       an over-trigger that no later observation could distinguish from the intended one;</li>
+     *   <li>the named {@code skill} must be the slot being cast. Without this the rule would delegate every cast
+     *       the owner makes (the condition DSL has no variable for "which slot", so this comparison <i>is</i> the
+     *       gate); naming a different slot is a rule that loads, fires, and silently does nothing;</li>
+     *   <li>a cast must exist at all. Load-time validation already pins the op to
+     *       {@link TriggerEvent#CAST_SETUP}, so a missing token here would be an <b>engine</b> fault, not a
+     *       content one — and it is reported as such rather than as a quiet no-op.</li>
+     * </ul>
+     */
+    private static void delegateDamage(EffectSpec effect, TriggerContext ctx) {
+        Battle battle = ctx.battle();
+        Battle.PendingCast cast = battle == null ? null : battle.currentCast();
+        if (cast == null) {
+            throw new IllegalStateException(
+                    "DELEGATE_DAMAGE ran with no cast in progress; CAST_SETUP is fired by SkillExecutor.execute "
+                            + "with a cast token, so this is an engine fault rather than a content error");
+        }
+        Character owner = requireCharacterOwner(effect, ctx);
+        if (cast.caster() != owner) {
+            throw new IllegalStateException(
+                    "DELEGATE_DAMAGE names the rule owner's own cast, but the cast in progress belongs to "
+                            + cast.caster().getName() + ": CAST_SETUP reaches every character's table, so the rule "
+                            + "needs `actor == self` (rule owner: " + owner.getName() + ")");
+        }
+        SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+        Integer slotNumber = Constant.SKILL_SLOT.get(slot);
+        if (slotNumber == null) {
+            throw new IllegalStateException(
+                    "DELEGATE_DAMAGE names " + slot + ", which is not one of the character's castable slots ("
+                            + Constant.SKILL_SLOT.keySet() + ")");
+        }
+        if (cast.slot() != slotNumber) {
+            throw new IllegalStateException(
+                    "DELEGATE_DAMAGE names " + slot + " (slot " + slotNumber + ") but the cast in progress is slot "
+                            + cast.slot() + "; a rule can only hand over the swing that is actually happening "
+                            + "(rule owner: " + owner.getName() + ")");
+        }
+        cast.delegateDamage();
     }
 
     /**
@@ -532,7 +591,15 @@ public final class TriggerInterpreter {
                 1,                                   // one segment: 长夜月's ultimate is 「单目标段数: 1」 in its own split
                 DamageType.NORMAL,                   // a real attack by the summon, not 附加伤害
                 skill.getData().getEffect(),         // the shape the skill itself declares (AoEAttack)
-                AttributeType.fromString(effect.getAttribute()));
+                AttributeType.fromString(effect.getAttribute()),
+                // ⚠ The toughness too, and for the same reason as the element and the shape: it is written down
+                // once, in this skill's own `stance_list` (141303: `single 0 / all 90`), and the commanded swing
+                // is that skill's damage. ⚠ It has to be here rather than "the caster's cast already removed it":
+                // when a cast is DELEGATED (`DELEGATE_DAMAGE`, M-40) the executor expands no damage of its own, so
+                // the stance would otherwise be dropped on the floor — exactly one of the two must carry it, and
+                // this is the one that actually swings. `stanceFor(true)` is the skill's main-target column: for
+                // an AOE that is `all` (per victim, matching the caster-side path), for BLAST `single`.
+                skill.getData().stanceFor(true));
         attack.execute(battle, summon, victims);
     }
 
@@ -1081,12 +1148,20 @@ public final class TriggerInterpreter {
      * settled, and only {@link TriggerEvent#DEALING_DAMAGE} hands one over. A rule on any other event would
      * load, fire, and have nothing to change — so it is refused while the file is read.
      */
+    /**
+     * Validates that an op is on the one event that hands it what it acts on.
+     *
+     * <p>The "fail at load, not mid-battle" rule again: {@code BOOST_DAMAGE} changes the damage instance being
+     * settled and only {@link TriggerEvent#DEALING_DAMAGE} hands one over; {@code DELEGATE_DAMAGE} changes the cast
+     * being set up and only {@link TriggerEvent#CAST_SETUP} hands one over. A rule on any other event would load,
+     * fire, and have nothing to change — so it is refused while the file is read.
+     */
     private static void requireEvent(TriggerSpec spec, String op, TriggerEvent expected) {
         TriggerEvent actual = TriggerEvent.fromString(spec.getOn());
         if (actual != expected) {
             throw new IllegalArgumentException(
-                    "Op " + op + " only means something on " + expected.value() + ", because it changes the "
-                            + "damage instance being settled; this rule is on " + spec.getOn()
+                    "Op " + op + " only means something on " + expected.value() + ": that is the event that hands "
+                            + "over what it changes. This rule is on " + spec.getOn()
                             + " (source: " + spec.getSource() + ")");
         }
     }

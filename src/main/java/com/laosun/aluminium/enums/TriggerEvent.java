@@ -197,7 +197,33 @@ public enum TriggerEvent {
      * second summoning while one is already out fires nothing — which is exactly what 「若衣匠已在场，则…」
      * clauses need.
      */
-    SUMMONED("SUMMONED", true);
+    SUMMONED("SUMMONED", true),
+    /**
+     * ✅ A cast is <b>about to resolve</b>: fired by {@code SkillExecutor.execute} after the caster is known and
+     * <b>before any damage is expanded</b>, so a rule can still change what this cast does (P11-1, M-40).
+     *
+     * <p><b>Why a pre-cast event exists at all.</b> Every other cast event ({@link #BASIC_ATTACK},
+     * {@link #SKILL_CAST}, {@link #ULT_CAST}, {@link #ALLY_ATTACK}) fires <i>after</i> the damage has been
+     * settled — correct for "after the wearer uses their Skill", useless for a rule that has to change the swing
+     * itself. {@link #DEALING_DAMAGE} covers "change this damage instance"; this covers "this cast's damage is not
+     * mine to deal", which is a fact about the <b>cast</b> and has to be known before the instance exists.
+     *
+     * <p><b>The first user.</b> 长夜月's ultimate: 141303's own generated damage rows would swing at <b>her</b>
+     * attack as the base, while the document says the damage is the memosprite's (「使忆灵「长夜」对敌方全体造成
+     * 等同于「长夜」#1[i]%生命上限的冰属性伤害」) — and the rule that delivers it as the memosprite's runs on
+     * {@link #ULT_CAST}, i.e. too late to stop the first swing. Measured before this existed: 8818.5 from her own
+     * rows plus the commanded hit, where the document describes one damage instance.
+     *
+     * <p>{@code actor} = the caster, {@code target} = {@code null} (nothing has been aimed at yet in the sense the
+     * later events mean: the caster's selection is not re-published here, and a rule that wanted it would be
+     * asking about {@link #SKILL_CAST}). The cast in progress is reachable through
+     * {@code Battle.currentCast()}; the only op that reads it today is {@code DELEGATE_DAMAGE}.
+     *
+     * <p>⚠ Fired for <b>every</b> cast our side makes, including non-damaging ones and the enemy-side attacks that
+     * have no table: a rule must narrow itself with {@code actor == self} (or the op refuses the cast that is not
+     * its owner's, see {@code DELEGATE_DAMAGE}).
+     */
+    CAST_SETUP("CAST_SETUP", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 
