@@ -414,6 +414,12 @@ public class TriggerTable {
     private static final Pattern HAS_PATH =
             Pattern.compile("(?<![\\w])has_path(?![\\w])", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * The {@code is_ally} keyword: "&lt;who&gt; is on OUR side" — read exactly like the other two predicates.
+     */
+    private static final Pattern IS_ALLY =
+            Pattern.compile("(?<![\\w])is_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
+
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException("Empty trigger condition (source: " + spec.getSource() + ")");
@@ -451,6 +457,20 @@ public class TriggerTable {
             String state = text.substring(hasState.end()).trim();
             return new HasState(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw,
                     spec);
+        }
+
+        // `is_ally`: "<who> is_ally" — no argument at all, so it is checked before the operator branch too.
+        Matcher isAlly = IS_ALLY.matcher(text);
+        if (isAlly.find()) {
+            String subject = normalize(text.substring(0, isAlly.start()));
+            String trailing = text.substring(isAlly.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"is_ally\": it takes no argument "
+                                + "(write \"target is_ally\", or \"!target is_ally\" for the opposite) "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new IsAlly(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw, spec);
         }
 
         // `has_path`: "<who> has_path 同谐" — the same shape, and for the same reason checked here first.
@@ -895,6 +915,52 @@ public class TriggerTable {
         @Override
         public boolean test(TriggerContext ctx) {
             return party.partyOf(ctx) != null && !inner.test(ctx);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * Side test: {@code target is_ally} — "the unit this cast was aimed at is on our side".
+     *
+     * <p><b>Why the DSL needs it.</b> Three shipped relic abilities say 「对<b>己方角色</b>施放终结技/战技时」 (sets 114,
+     * 118, 121). Since M-35 a cast event carries the unit it <b>aimed at</b> ({@code ctx.target()}), which is what
+     * 「对…施放」 names — but the event says nothing about that unit's <b>side</b>, and a damaging ultimate aimed at an
+     * enemy carries a target too. Without this predicate the rule would fire on every cast of that slot: an
+     * over-trigger with nothing to report.
+     *
+     * <p>The side is taken from the battlefield ({@code battle.allies}, the same roster {@code all_allies} reads), so
+     * a context with no battle answers "no" — the "cannot read it, therefore the condition fails" rule every
+     * field-reading condition follows. ⚠ It is a {@link PartyCondition}, so {@code !target is_ally} means the
+     * opposite <b>and</b> still fails when there is no target at all (a missing party must never become a match).
+     */
+    private static final class IsAlly implements Condition, PartyCondition {
+
+        private final String subject;
+        private final String raw;
+
+        IsAlly(String subject, String raw, TriggerSpec spec) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            return who != null && ctx.battle() != null && ctx.battle().allies.contains(who);
         }
 
         @Override
