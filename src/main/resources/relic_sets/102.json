@@ -1,0 +1,17 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.1,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 102 (野穗伴行的快枪手 / Musketeer of Wild Wheat), 4-piece: 「使装备者的速度提高#1[i]%，普攻造成的伤害提高#2[i]%。」 param = [0.06, 0.1]",
+      "note": "Only the Basic ATK half: 「速度提高#1[i]%」 is the effect's `properties` stat (SpeedAddedRatio 0.06) and is applied by the data path, not here. ⚠ The share is 0.10 -- the registered reason had 12%, read off the English sentence; param #2 is 0.1. ⚠ `permanent: true` because the sentence states no duration, and `BATTLE_START` is the same approximation sets 301/302/304/306/307/309 use for a 'while' clause (evaluated once, when it cannot yet have changed)."
+    }
+  ]
+}

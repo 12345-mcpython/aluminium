@@ -1,0 +1,18 @@
+{
+  "4": [
+    {
+      "on": "BREAK",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 3
+        }
+      ],
+      "source": "relic set 111 (流星追迹的怪盗 / Thief of Shooting Meteor), 4-piece: 「使装备者的击破特攻提高#1[i]%。当装备者击破敌方目标弱点后，恢复#2[i]点能量。」 param = [0.16, 3]",
+      "note": "Only the energy half: 「击破特攻提高#1[i]%」 is the `properties` stat (BreakDamageAddedRatioBase 0.16). ⚠ The amount is 3 -- the registered reason had 8, which no parameter supports (param #2 is 3). ⚠ `actor == self` is 「装备者击破」: BREAK fires with the breaker as `actor`, so without the condition any ally's break would pay the wearer. Set 106's and 131's rules rely on the same convention."
+    }
+  ]
+}

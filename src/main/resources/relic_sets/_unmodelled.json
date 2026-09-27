@@ -1,11 +1,4 @@
 {
-  "102": [
-    {
-      "require": 4,
-      "ability": "Ability51021",
-      "reason": "Writable now: \"Increases the wearer's SPD by 6%, and the DMG dealt by Basic ATK increases by 12%.\" Both halves are unconditional, so nothing here needs an event or a condition -- the SPD is the effect's `properties` stat (SpeedAddedRatio 0.06) and the Basic ATK half is a BATTLE_START rule granting BASIC_ATTACK_DAMAGE_BOOST with `permanent: true`. ⚠ Listed here because the effect is MIXED (`properties` plus an ability) and the partition test only used to look at effects with no `properties` at all; see M-25 in ROADMAP 12.2. Marked writable rather than blocked so the backlog can be sized: 'Writable now:' entries need a rule file, not an engine change."
-    }
-  ],
   "103": [
     {
       "require": 4,
@@ -25,13 +18,6 @@
       "require": 4,
       "ability": "Ability51081",
       "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" The event it needed exists since 2026-09-27 (DEALING_DAMAGE hands the pending instance over before settlement), so the first clause could be conditioned on 'the wearer deals damage'. ⚠ 'ignores 10% DEF' is NOT the blocker: the defence zone reads the attacker's DEFENCE_IGNORE attribute, so MODIFY_ATTR reaches it (see set 119's note and engine.md 3.2). What blocks the ability is that it is a DISJUNCTION -- the second clause needs a condition on the target's weakness element, which the DSL cannot ask about (it reads states, counts and attribute values, not weaknesses), so authoring only the first clause would under-trigger it. The instance-scoped form (ignore DEF for THIS hit) would also be the more faithful reading of 'when the wearer deals DMG', and that does not exist."
-    }
-  ],
-  "111": [
-    {
-      "require": 4,
-      "ability": "Ability51111",
-      "reason": "Writable now: \"Increases the wearer's Break Effect by 16%. After the wearer inflicts Weakness Break on an enemy target, regenerates 8 Energy.\" The Break Effect is the `properties` stat (BreakDamageAddedRatioBase 0.16), and the second half is `on: BREAK` + `when: [\"actor == self\"]` + GAIN_ENERGY 8 -- BREAK fires with the breaker as `actor` (it is what set 106's and 131's rules already rely on). Listed rather than authored only because it arrived with the mixed-effect census (M-25)."
     }
   ],
   "112": [
@@ -71,11 +57,6 @@
   ],
   "117": [
     {
-      "require": 2,
-      "ability": "Ability51170",
-      "reason": "Writable now: \"Increases DMG dealt to enemies with debuffs by 12%.\" The condition it needed arrived on 2026-09-27: `on: DEALING_DAMAGE`, `when: [\"target_debuff_count >= 1\"]` (DEALING_DAMAGE fires before the zones are read and hands the pending instance over), `do: BOOST_DAMAGE 0.12`. ⚠ This reason used to say the condition did not exist -- it did, from the day target_debuff_count was added, and nothing re-read this file. Listed rather than authored because it arrived with the mixed-effect census (M-25) and needs its own content pass."
-    },
-    {
       "require": 4,
       "ability": "Ability51171",
       "reason": "\"Increases the wearer's CRIT Rate by 4%, and increases the wearer's CRIT DMG against enemy targets afflicted with at least 2/4 debuffs by 8%/12%. After the wearer inflicts a debuff on an enemy target, the above effect increases by 100% for 1 turn(s).\" The debuff COUNT is expressible (`target_debuff_count`), but CRIT DMG is read by the crit zone, not by the DMG-boost zone -- BOOST_DAMAGE cannot raise it for one instance, and a MODIFY_ATTR buff granted on DEALING_DAMAGE would persist past the hit it was meant for. The third clause adds a 'this effect x2 for N turns' layer on top. (The CRIT Rate in this effect is the `properties` stat, CriticalChanceBase 0.04.)"
@@ -107,13 +88,6 @@
       "require": 4,
       "ability": "Ability51211",
       "reason": "\"When using Skill or Ultimate on one ally target, increases the ability target's CRIT DMG by 18%, lasting for 2 turn(s). This effect can stack up to 2 time(s).\" The 2-turn stacks are now expressible, but the cast event still carries no subject (SkillExecutor passes target = null and only a hit count), so neither 'on one ally target' nor 'the ability target' can be identified -- the buff would land on the wearer instead of the ally."
-    }
-  ],
-  "122": [
-    {
-      "require": 4,
-      "ability": "Ability51221",
-      "reason": "Writable now: \"Increases DMG dealt by Skill and Ultimate by 20%. After using Ultimate, additionally increases the DMG dealt by the next Skill by 25%.\" Three rules: SKILL_DAMAGE_BOOST and ULTIMATE_DAMAGE_BOOST are two constant effects, and the second sentence is `on: ULT_CAST` + `when: [\"actor == self\"]` -> MODIFY_ATTR SKILL_DAMAGE_BOOST 0.25 with `\"until\": \"next_skill\"` (the lifetime that ends a buff when its owner casts a Skill, added 2026-09-27)."
     }
   ],
   "124": [
@@ -184,13 +158,6 @@
       "reason": "\"Increases the wearer's Effect Hit Rate by 10%. Meanwhile, increases the wearer's ATK by an amount equal to 25% of their current Effect Hit Rate, up to a max of 25%.\" The Effect Hit Rate is the `properties` stat (StatusProbabilityBase 0.1). What is missing is an amount that SCALES with one of my own attribute values and is CAPPED -- MODIFY_ATTR's amount is a literal with no arithmetic, and the DSL cannot express 'my ATK += 0.25 x my Effect Hit Rate, at most 25%'. (`self_attr` can now READ the value for a threshold, which is half of this and not enough.)"
     }
   ],
-  "310": [
-    {
-      "require": 2,
-      "ability": "Ability53101",
-      "reason": "Writable now: \"Increases the wearer's Effect RES by 10%. When the wearer's Effect RES is equal to or higher than 50%, increases all allies' CRIT DMG by 10%.\" The Effect RES is the `properties` stat (StatusResistanceBase 0.1); the second half is `self_attr:EFFECT_RESISTANCE >= 0.5` (added 2026-09-27 -- a ratio attribute, so the threshold is a fraction) with `target: all_allies` and MODIFY_ATTR CRIT_ATTACK. Listed rather than authored only because it arrived with the mixed-effect census (M-25)."
-    }
-  ],
   "311": [
     {
       "require": 2,
@@ -209,7 +176,7 @@
     {
       "require": 2,
       "ability": "Ability53131",
-      "reason": "Writable now: \"Increases the wearer's CRIT Rate by 4%. When an enemy target is defeated, the wearer's CRIT DMG increases by 20%, stacking up to 5 time(s).\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.04); the second half is `on: KILL` + MODIFY_ATTR CRIT_ATTACK 0.2 with `max_stacks: 5` -- the KILL event and the stack cap both exist. ⚠ One judgement call before writing it: the text says 'an enemy target is defeated', not 'defeated BY the wearer', so the rule takes no `actor == self` condition; that reading should be confirmed against a second source first."
+      "reason": "\"Increases the wearer's CRIT Rate by #3[i]% (para 0.04, the `properties` stat CriticalChanceBase 0.04). When an enemy target is defeated, the wearer's CRIT DMG increases by #1[i]%, stacking up to #2[i] time(s).\" ⚠ **Two reasons it is still unwritten, and the first is why it was re-checked on 2026-09-28.** ① The event cannot say whose death it was: KILL fires for ANY death with the victim as `target`, and 「敌方目标被消灭」 means an ENEMY died -- but the condition DSL has no camp variable (F-5), so a rule written today would also fire when one of OUR units dies. ② The numbers in this reason used to be 20% and 5; the effect's param is [0.04, 10, 0.04], i.e. **4% per stack, up to 10** -- the same 'read the English sentence instead of the parameters' error the 2026-09-28 content pass found in four other entries (102/111/310 and this one)."
     }
   ],
   "314": [

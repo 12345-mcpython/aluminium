@@ -1,0 +1,210 @@
+package com.laosun.aluminium.test;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.utils.RelicFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Random;
+
+/**
+ * The 2026-09-28 content pass over the {@code Writable now:} backlog — five relic abilities whose every clause
+ * already had a spelling, written out.
+ *
+ * <p><b>Why a content pass needs tests at all.</b> Each of these was "already expressible", which is exactly the
+ * kind of change that can be wrong in ways nothing reports: the wrong attribute, the wrong tier, a number read
+ * from the wrong row, or a stacking default that silently replaces instead of adding. Four of the five registered
+ * reasons carried a figure that <b>no parameter supports</b> — 102's Basic-ATK share (12% vs param 0.1), 111's
+ * energy (8 vs param 3), 310's threshold (50% vs param 0.3) and 313's per-stack CRIT DMG (which is why 313 is
+ * still not authored) — so every number below is asserted against the file that was written, not against prose.
+ *
+ * <p>313 (无主荒星茨冈尼亚) stayed registered, and its reason was rewritten: 「当敌方目标被消灭时」 needs "the one
+ * who died is an ENEMY", and {@code KILL} fires for any death with the victim as {@code target} — the condition
+ * DSL has no camp variable (F-5). A wrong number and a missing spelling in one entry.
+ */
+public class RelicAbilityBatchTest {
+    private static final double EPS = 1e-6;
+
+    /** 姬子 — carries no rule file of her own, so only the set's rules are in play. */
+    private static final int WEARER = 1003;
+    /**
+     * The "someone else" in the cases that need a second character. Deliberately the SAME rule-less character as
+     * {@link #WEARER} rather than a colourful one: 桂乃芬 (1210) was the first draft and her own trace is
+     * 「对陷入灼烧状态的敌方目标造成的伤害提高20%」 -- which is exactly the debuff the Pioneer case applies, so she
+     * boosted her own hit by 20% and the case measured her rule instead of the set's.
+     */
+    private static final int ALLY = WEARER;
+    private static final int LEVEL = 80;
+    private static final int STAR = 5;
+    private static final int RELIC_LEVEL = 15;
+    private static final int MONSTER = 1002011;
+
+    private static final int MUSKETEER = 102;
+    private static final int THIEF = 111;
+    private static final int PIONEER = 117;
+    private static final int SCHOLAR = 122;
+    private static final int BROKEN_KEEL = 310;
+
+    // ==================================================================
+    // 102 — 普攻伤害 +10%
+    // ==================================================================
+
+    /** The Basic ATK half is a rule; the SPD half is the data path's `properties` stat (and is not repeated). */
+    @Test
+    public void theMusketeerBoostsBasicAttacksAndNotSkills() {
+        Character wearer = wearing(MUSKETEER);
+        new Battle(List.of(wearer), List.of(dummy()), new Random(0)).startBattle();
+
+        Assertions.assertEquals(0.1, boostOf(wearer, AttributeType.BASIC_ATTACK_DAMAGE_BOOST), EPS,
+                "param #2 is 0.1 -- the registered reason's 12% came from the English sentence");
+        Assertions.assertEquals(0, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS,
+                "「普攻造成的伤害」 is one scope, not every cast");
+    }
+
+    // ==================================================================
+    // 111 — 击破弱点后回能
+    // ==================================================================
+
+    /** Only the wearer's own break pays, and the amount is the parameter's 3. */
+    @Test
+    public void theThiefRegainsEnergyOnItsOwnBreak() {
+        Character wearer = wearing(THIEF);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        double before = wearer.getCurrentEnergy();
+
+        battle.fireTriggers(TriggerEvent.BREAK, ally, dummy(), 0, 0);
+        Assertions.assertEquals(before, wearer.getCurrentEnergy(), EPS,
+                "「装备者击破」: a teammate's break is not hers");
+
+        battle.fireTriggers(TriggerEvent.BREAK, wearer, dummy(), 0, 0);
+        Assertions.assertEquals(before + 3, wearer.getCurrentEnergy(), EPS,
+                "param #2 is 3 -- the registered reason's 8 has no parameter behind it");
+    }
+
+    // ==================================================================
+    // 117 — 对受负面状态影响的敌人增伤
+    // ==================================================================
+
+    /**
+     * The boost is 12%, it reaches the instance being settled, and it is <b>hers</b>.
+     *
+     * <p>Measured against an identical monster without a debuff: the two settle through the same zones, so the
+     * ratio is the boost itself. Crit is pinned to 0 so the ratio is exact.
+     */
+    @Test
+    public void thePioneerBoostsHerDamageAgainstDebuffedEnemies() {
+        Character wearer = wearing(PIONEER);
+        wearer.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        ally.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
+        Enemy debuffed = dummy();
+        Enemy clean = dummy();
+        Battle battle = new Battle(List.of(wearer, ally), List.of(debuffed, clean), new Random(0));
+        battle.startBattle();
+        debuffed.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(
+                wearer, DamageElement.FIRE, 1, 2));      // any debuff: the count is what the text asks for
+
+        double onDebuffed = hit(battle, wearer, debuffed);
+        double onClean = hit(battle, wearer, clean);
+
+        Assertions.assertTrue(onClean > 0, "precondition: the clean hit landed");
+        Assertions.assertEquals(0.12, onDebuffed / onClean - 1, 1e-6,
+                "param #1 is 0.12 and it applies to the instance being settled");
+
+        // 「装备者造成的伤害」: the wearer's rule must not boost a teammate's hit on the same enemy.
+        double allyOnDebuffed = hit(battle, ally, debuffed);
+        double allyOnClean = hit(battle, ally, clean);
+        Assertions.assertEquals(allyOnClean, allyOnDebuffed, EPS,
+                "a rule on the wearer's table is not a rule on everyone's damage");
+    }
+
+    // ==================================================================
+    // 122 — 战技/终结技增伤，终结技后下一次战技额外 +25%
+    // ==================================================================
+
+    /**
+     * The two scoped boosts are permanent, and the extra 25% <b>adds</b> to the 20% rather than replacing it.
+     *
+     * <p>This is the case that would have shipped a silent 10-point error: 「额外提高」 means on top, while the
+     * default stack cap is 1 and two modifiers on one attribute then replace each other — so the file states
+     * {@code max_stacks: 2}.
+     */
+    @Test
+    public void theScholarAddsItsExtraSkillDamageOnTop() {
+        Character wearer = wearing(SCHOLAR);
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+
+        Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS, "param #1");
+        Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS, "param #1");
+
+        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, null, 0, 0);
+
+        Assertions.assertEquals(0.45, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS,
+                "0.20 + 0.25: 「额外提高」 adds, which is what max_stacks: 2 is for");
+    }
+
+    // ==================================================================
+    // 310 — 效果抵抗 ≥ 30% 时我方全体暴击伤害 +10%
+    // ==================================================================
+
+    /** The threshold is 30%, it is a fraction, and it reaches the whole side. */
+    @Test
+    public void theBrokenKeelAppliesAboveItsThreshold() {
+        Assertions.assertEquals(0.1,
+                brokenKeelCritDamageAt(0.35) - bareCritDamage(), EPS,
+                "param #2 is 0.3 -- the registered reason said 50%, which no parameter supports");
+        Assertions.assertEquals(0,
+                brokenKeelCritDamageAt(0.25) - bareCritDamage(), EPS,
+                "below it nothing is granted");
+    }
+
+    // ==================================================================
+    // Fixture
+    // ==================================================================
+
+    private static Character wearing(int setId) {
+        return CharacterFactory.create(WEARER, LEVEL, true, null,
+                RelicFactory.suit(setId, STAR, RELIC_LEVEL));
+    }
+
+    /** The wearer at a stated Effect RES, with the set on: her CRIT DMG (the party buff lands on her too). */
+    private static double brokenKeelCritDamageAt(double effectRes) {
+        Character wearer = wearing(BROKEN_KEEL);
+        wearer.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(effectRes));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        return wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+    }
+
+    private static double bareCritDamage() {
+        return CharacterFactory.create(WEARER, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
+    }
+
+    /** One settled hit with no crit and no weakness games, so two runs differ only by the rule under test. */
+    private static double hit(Battle battle, Character attacker, Enemy target) {
+        return battle.applyDamage(target,
+                new Damage(attacker, target, DamageElement.PHYSICAL, DamageType.NORMAL, 1_000));
+    }
+
+    private static double boostOf(Character character, AttributeType attribute) {
+        return character.getAttribute(attribute).get();
+    }
+
+    private static Enemy dummy() {
+        return EnemyFactory.create(MONSTER, 90, 1);
+    }
+}

@@ -1,0 +1,21 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:EFFECT_RESISTANCE >= 0.3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "relic set 310 (折断的龙骨 / Broken Keel), 2-piece: 「使装备者的效果抵抗提高#1[i]%。当装备者的效果抵抗大于等于#2[i]%时，我方全体暴击伤害提高#3[i]%。」 param = [0.1, 0.3, 0.1]",
+      "note": "Only the conditional sentence: 「效果抵抗提高#1[i]%」 is the `properties` stat (StatusResistanceBase 0.1). ⚠ The threshold is 0.3 (30%), not the 50% the registered reason carried -- param #2 is 0.3. It is a RATIO attribute, so the literal is a fraction (engine.md 4.6): `>= 0.3`, never `>= 30`. ⚠ `target: all_allies` is 「我方全体」 and reads the camp, so the wearer is buffed too (and a player-side summon counts as one of us, the same reading set 302's file documents). ⚠ `BATTLE_START` + `permanent` is the standing approximation for a 'while' clause that cannot be re-checked cheaply -- the same one sets 301/302/304/306/307/309/102 use, and the reason sets 124 and 318 have for doing it differently (a turn-start re-evaluation) is that their clause gates something that must LAPSE when the condition stops holding."
+    }
+  ]
+}
