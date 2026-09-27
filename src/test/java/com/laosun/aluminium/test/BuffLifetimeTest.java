@@ -7,6 +7,7 @@ import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
@@ -107,6 +108,27 @@ public class BuffLifetimeTest {
 
         Assertions.assertEquals(0.5, critRateBonus(owner), EPS,
                 "it ends when its owner attacks, and nothing has attacked");
+    }
+
+    /**
+     * An attack that <b>connects with nothing</b> is not an attack: the buff survives it.
+     *
+     * <p>「持续到施放首次攻击后结束」 is about an attack that happened, and the engine says an attack happened only
+     * when at least one target was hit ({@code Battle.fireAfterAttack}'s first guard). Casting at a battlefield
+     * with nothing left alive is the reachable way to swing and hit nothing — and the tempting implementation,
+     * broadcasting "an attack happened" whenever a skill was cast, would burn the buff on the whiff.
+     */
+    @Test
+    public void anAttackThatHitsNothingDoesNotConsumeIt() {
+        Battle battle = battleWithBuff("next_attack");
+        Character owner = battle.characters.getFirst();
+        battle.enemyUnits().getFirst().takeDamage(9_999_999);
+        battle.processRequests();
+
+        attack(battle, owner, 1, battle.enemyUnits().getFirst());   // slot 1 at the battlefield's dead enemy
+
+        Assertions.assertEquals(0.5, critRateBonus(owner), EPS,
+                "not one hit landed, so nothing attacked");
     }
 
     /** The three spellings are three different events. */
@@ -274,6 +296,14 @@ public class BuffLifetimeTest {
     /** The owner casts its slot-{@code slotNo} skill at the monster — a real cast through the executor. */
     private static void attack(Battle battle, Character actor, int slotNo) {
         battle.castImmediate(new DefaultSkill(OWNER, slotNo, 1), actor, List.of(monster()));
+    }
+
+    /**
+     * The same cast, but aimed at a <b>given</b> unit — the caller's list is the main target, so aiming at the
+     * battlefield's own (dead) enemy is how a swing can hit nothing at all.
+     */
+    private static void attack(Battle battle, Character actor, int slotNo, CanHit target) {
+        battle.castImmediate(new DefaultSkill(OWNER, slotNo, 1), actor, List.of(target));
     }
 
     private static Character wearer(double critDamage) {

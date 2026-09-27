@@ -1174,8 +1174,12 @@ public final class TriggerInterpreter {
      *
      * <p>Per the official definition, such a hit is settled as {@code ADDITIONAL} damage: it counts
      * toward the attacker's kill credit but "does not count as dealing 1 attack", so the target gains
-     * no on-hit energy and no attack-level event fires. {@code as_attack} is accepted for future
-     * use but does not change that yet — the engine has one settlement path for supplementary hits.
+     * no on-hit energy and no toughness is reduced. It is a {@code FOLLOW_UP} for the trigger tables
+     * (that is the event the texts about 追加攻击 subscribe to) while the attack-level notification
+     * {@code AttackEvent} is deliberately not raised for it, so it does not consume an
+     * {@code "until": "next_attack"} buff — a derived hit is part of somebody else's attack, and letting it
+     * announce one would recurse (see {@code AttackEvent} and M-27). {@code as_attack} is accepted for
+     * future use but does not change that yet — the engine has one settlement path for supplementary hits.
      *
      * <p>⚠ Consequence worth knowing: the hit causes HP loss, which fires {@code HP_LOST} again. Two
      * characters who both counter each other therefore ping-pong until

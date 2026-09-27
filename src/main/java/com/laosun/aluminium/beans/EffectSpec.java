@@ -134,15 +134,19 @@ public class EffectSpec {
      * to see. So the lifetime names the <b>event</b> that ends it, and the set is closed:
      * <ul>
      *   <li>{@code "next_attack"} — after the owner finishes an attack that landed (basic attack, Skill or
-     *       Ultimate; relic set 305's 「持续到施放首次攻击后结束」 and set 107's 「for the next attack」);</li>
+     *       Ultimate; relic set 305's 「持续到施放首次攻击后结束」 and set 107's 「for the next attack」). A
+     *       <b>summon's</b> attack ends a buff on the <b>summon</b> the same way (P9-4 忆灵), and it does not
+     *       end its summoner's: the notification asks {@code attacker == owner};</li>
      *   <li>{@code "next_skill"} — after the owner casts a Skill (set 122's 「the next Skill」);</li>
      *   <li>{@code "next_ultimate"} — after the owner casts an Ultimate.</li>
      * </ul>
      *
      * <p>⚠ Exactly one of {@code turns} / {@code permanent} / {@code until} may be stated; the interpreter
-     * refuses two rather than picking one. ⚠ A <b>follow-up attack does not consume</b> it: follow-ups are
-     * settled outside {@code SkillExecutor}'s attack path, which is where the buff-side "an attack
-     * happened" notification comes from. That is registered rather than approximated.
+     * refuses two rather than picking one. ⚠ An attack that <b>hits nothing</b> does not consume it either: the
+     * engine announces an attack only once a target has been hit. ⚠ A <b>follow-up attack does not consume</b>
+     * it: derived hits (additional damage, true damage, DOT, break) are deliberately kept out of the
+     * attack-level notification, which is what stops "additional damage kills → additional damage" from
+     * recursing — registered as M-27 rather than worked around.
      */
     @SerializedName("until")
     private String until;

@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -1628,6 +1629,43 @@ public class Battle {
      */
     public int fireTriggersWithSubject(TriggerEvent event, CanHit actor, CanHit subject, double amount) {
         return fireTriggers(event, actor, subject, 0, amount);
+    }
+
+    /**
+     * Tells our side that one <b>attack</b> has finished — {@link com.laosun.aluminium.models.event.AttackEvent},
+     * fired <b>once per attack</b>, after every instance of it has been settled.
+     *
+     * <p><b>Which attacks fire it.</b> A character's skill activation ({@code SkillExecutor}) and, since
+     * P9-4 忆灵, a summon's own attack ({@code EnemySkill.execute}) — both are attacks the engine drives from
+     * beginning to end. Derived hits still never fire it: additional damage, true damage, DOT ticks and break
+     * damage go straight through {@link #applyDamage} and are <em>part of</em> somebody else's attack. That
+     * exclusion is not an oversight, it is what makes the notification safe to hand to arbitrary listeners:
+     * listeners are allowed to answer an attack by dealing damage (that is how a third-party kit lands), so a
+     * derived hit that fired the event again would recurse until {@code MAX_TRIGGER_DEPTH} threw. A follow-up
+     * attack therefore does <b>not</b> consume an {@code "until": "next_attack"} buff — see M-27, which records
+     * that accepted under-consumption rather than hiding it.
+     *
+     * <p><b>Why it is broadcast to {@link #allies} whatever the attacker's camp.</b> The listeners are buffs on
+     * our characters, and every one of them answers with its own question ("is this <em>my</em> attack?" —
+     * {@code AbstractBuff.afterAttack} compares {@code attacker == owner}). So an enemy's attack can be
+     * delivered here without any of them acting on it, and a future listener that <em>wants</em> to react to
+     * being attacked has somewhere to do it. Deciding "who cares" is the listener's job; deciding "an attack
+     * happened" is this method's.
+     *
+     * @param attacker    who attacked (may be either camp, or a summon)
+     * @param mainTarget  the target the attacker selected (with an AOE it may not be the first hit)
+     * @param hitTargets  the targets it actually connected with, in hit order (deduped by the caller)
+     * @param totalDamage the sum of the settled values of its instances
+     */
+    public void fireAfterAttack(CanHit attacker, CanHit mainTarget,
+                                Collection<? extends CanHit> hitTargets, double totalDamage) {
+        if (attacker == null || hitTargets == null || hitTargets.isEmpty()) {
+            return;                                  // not a single hit landed → it does not count as an attack
+        }
+        List<CanHit> targets = List.copyOf(hitTargets);
+        for (CanHit ally : allies) {
+            ally.afterAttack(this, attacker, mainTarget, targets, totalDamage);
+        }
     }
 
     /**
