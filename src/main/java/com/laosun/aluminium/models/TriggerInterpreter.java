@@ -12,6 +12,7 @@ import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.ReductionBuff;
+import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.buff.TauntBuff;
@@ -219,6 +220,21 @@ public final class TriggerInterpreter {
             case "HEAL", "SHIELD" -> {
                 requireAmountOrScale(effect, op, spec, SCALES, "Max HP");
                 requireNoStackArguments(effect, op, spec);
+                if ("HEAL".equals(op)) {
+                    // Healing has no duration -- HP comes back and stays back. Before this, `turns` on a HEAL
+                    // was accepted and silently dropped, which is the class of mistake this project refuses
+                    // (the same reason the six "owner-only" ops refuse a `target`): say it is a mistake rather
+                    // than let the author believe the healing lasts.
+                    requireNoDuration(effect, op, spec);
+                } else if (effect.getTurns() != null && effect.getTurns() <= 0) {
+                    // A timed shield with a non-positive duration would be a shield that expires before it can
+                    // be used -- "no shield" written as a mechanic. Omitting `turns` is how "no limit" is spelled.
+                    throw new IllegalArgumentException(
+                            "Op " + op + " needs a positive \"turns\" when it states one (how many of the "
+                                    + "shielded unit's turns the shield lasts), but has " + effect.getTurns()
+                                    + "; omit the field for a shield that is only removed by being used up "
+                                    + "(source: " + spec.getSource() + ")");
+                }
             }
             case "ADVANCE" -> {
                 requirePercent(effect, op, spec);
@@ -368,11 +384,11 @@ public final class TriggerInterpreter {
         CanHit owner = ctx.owner();
         int fired = 0;
         for (CompiledRule rule : rules) {
-            // Firing limits (cooldown / once per battle). Checked *after* matching and before applying,
-            // because the limit is about how often the rule may run, not about whether it fits the event:
-            // `matching` stays a pure predicate, which is what `TriggerTable.ruleCount` and the
+            // Firing limits (cooldown / once per battle / per-turn count). Checked *after* matching and before
+            // applying, because the limit is about how often the rule may run, not about whether it fits the
+            // event: `matching` stays a pure predicate, which is what `TriggerTable.ruleCount` and the
             // data-binding tests read.
-            if (owner != null && !owner.isTriggerReady(rule.key())) {
+            if (owner != null && !owner.isTriggerReady(rule.key(), rule.perTurn())) {
                 continue;
             }
             // An Eidolon gate (「星魂 N 解锁」): the rank is a construction-time property of the rule's owner, so
@@ -387,7 +403,8 @@ public final class TriggerInterpreter {
             }
             apply(battle, rule, ctx);
             if (owner != null) {
-                owner.startTriggerCooldown(rule.key(), rule.cooldownTurns(), rule.oncePerBattle());
+                owner.startTriggerCooldown(rule.key(), rule.cooldownTurns(), rule.oncePerBattle(),
+                        rule.perTurn());
             }
             fired++;
         }
@@ -406,7 +423,15 @@ public final class TriggerInterpreter {
             }
             case "SHIELD" -> {
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
-                    battle.grantShield(target, grantAmount(effect, target, ctx));
+                    double amount = grantAmount(effect, target, ctx);
+                    // 「持续N回合」 is a *timed* shield: the ShieldBuff installs the value and takes it off
+                    // again, so the number and its lifetime stay one fact. Without `turns` the shield is the
+                    // raw grant it has always been (it comes off only when it is used up).
+                    if (effect.getTurns() == null) {
+                        battle.grantShield(target, amount);
+                    } else if (target != null && !target.isDeath()) {
+                        target.getBuffManager().addBuff(new ShieldBuff(ctx.owner(), amount, effect.getTurns()));
+                    }
                 }
             }
             case "EXTRA_TURN" -> battle.grantExtraTurn(resolveTarget(effect, ctx));
@@ -1476,6 +1501,14 @@ public final class TriggerInterpreter {
             throw new IllegalArgumentException(
                     "Op " + op + " has no duration (it acts on a single moment), but states \"turns\": "
                             + effect.getTurns() + " (source: " + spec.getSource() + ")");
+        }
+        if (Boolean.TRUE.equals(effect.getPermanent())) {
+            // The same hole as `turns`, one field over: `permanent` would be read, validated, and then ignored,
+            // so the author would believe a permanent effect was installed. Only ops that create a buff may say
+            // it, and those do not come through here.
+            throw new IllegalArgumentException(
+                    "Op " + op + " creates no buff, so \"permanent\" has nothing to keep alive; it acts on a "
+                            + "single moment (source: " + spec.getSource() + ")");
         }
         if (eventBound(effect)) {
             throw new IllegalArgumentException(

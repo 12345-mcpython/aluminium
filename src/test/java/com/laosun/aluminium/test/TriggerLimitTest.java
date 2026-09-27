@@ -16,14 +16,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Firing limits on a trigger rule: {@code cooldown} (in the owner's own turns) and
- * {@code once_per_battle}.
+ * Firing limits on a trigger rule: {@code cooldown} (in the owner's own turns), {@code per_turn} (a count
+ * within one of them) and {@code once_per_battle}.
  *
  * <p><b>Why this vocabulary exists.</b> The game's rule text is full of 「该效果每回合只能触发1次」 /
- * 「该效果有1回合的触发冷却」 / 「单场战斗中只能触发1次」 — a per-rule limit is the difference between
- * "Misha's counter counts attacks" and "Misha's counter counts attacks once per turn". Without it a
- * data author has to choose between over-triggering and not modelling the mechanic at all, and the
- * over-triggering version is a wrong number with nothing to see.
+ * 「该效果有1回合的触发冷却」 / 「单场战斗中只能触发1次」 / 「该效果每回合可触发<b>2</b>次」 — a per-rule limit is the
+ * difference between "Misha's counter counts attacks" and "Misha's counter counts attacks once per turn".
+ * Without it a data author has to choose between over-triggering and not modelling the mechanic at all, and the
+ * over-triggering version is a wrong number with nothing to see. ⚠ The last form is why {@code per_turn} is a
+ * <b>count</b> and not a flag: 三月七's 天赋 counter is 「每回合可触发2次」, and {@code cooldown: 1} can only ever
+ * say "once".
  *
  * <p><b>Where the state lives, and why that is the whole design.</b> A trigger table is compiled once
  * and <b>cached per cid</b>, and relic rules are merged into the same table for every character wearing
@@ -37,7 +39,7 @@ import java.util.Random;
  * caps at 5, so no test below lets the fingerprint exceed it).
  */
 public class TriggerLimitTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one in the battle. */
+    /** 姬子: her own table is replaced by the rule under test, so nothing else is ever in play. */
     private static final int OWNER = 1003;
     /** Tingyun: likewise, and used as the "somebody else acted" actor in the two-character cases. */
     private static final int ALLY = 1202;
@@ -111,7 +113,78 @@ public class TriggerLimitTest {
     }
 
     // ==================================================================
-    // 3. Limits are per rule, and only where stated
+    // 3. Per-turn count, counted in the owner's turns like the cooldown
+    // ==================================================================
+
+    /** 「该效果每回合可触发2次」: the third firing in one turn is refused, the first two are not. */
+    @Test
+    public void perTurnTwoLetsTheRuleFireTwiceInOneTurn() {
+        Battle battle = battleWith(perTurn(2));
+        Character owner = battle.characters.getFirst();
+
+        Assertions.assertEquals(1, fire(battle, owner), "the first firing is allowed");
+        Assertions.assertEquals(1, fire(battle, owner), "and the second");
+        Assertions.assertEquals(0, fire(battle, owner), "the third is refused: 每回合可触发2次");
+        Assertions.assertEquals(2, battle.getSkillPoints(), "exactly two firings paid out");
+    }
+
+    /** The count comes back on the owner's own turn — the same moment a cooldown is decremented. */
+    @Test
+    public void theTurnLimitComesBackOnTheOwnersOwnTurn() {
+        Battle battle = battleWith(perTurn(2));
+        Character owner = battle.characters.getFirst();
+        Assertions.assertEquals(1, fire(battle, owner));
+        Assertions.assertEquals(1, fire(battle, owner));
+        Assertions.assertEquals(0, fire(battle, owner), "precondition: the two uses are spent");
+
+        takeTurn(battle, owner);
+
+        Assertions.assertEquals(1, fire(battle, owner), "a fresh turn, a fresh count");
+        Assertions.assertEquals(1, fire(battle, owner));
+        Assertions.assertEquals(0, fire(battle, owner), "and again exactly two");
+    }
+
+    /**
+     * Somebody else's turn does not hand the count back.
+     *
+     * <p>The mirror of {@link #otherPeoplesTurnsDoNotCountTheCooldownDown}, and the reason both limits are
+     * counted on the <b>owner</b>: 「每回合」 belongs to the character whose rule it is, not to whoever happened to
+     * set the event off.
+     */
+    @Test
+    public void otherPeoplesTurnsDoNotClearTheTurnLimit() {
+        Battle battle = withAlly(perTurn(1));
+        Character owner = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+
+        Assertions.assertEquals(1, fire(battle, ally), "the ally's action fires it once");
+        takeTurn(battle, ally);
+        Assertions.assertEquals(0, fire(battle, ally),
+                "the ally having a turn must not hand back the owner's per-turn count");
+
+        takeTurn(battle, owner);
+        Assertions.assertEquals(1, fire(battle, ally), "the owner's own turn does");
+    }
+
+    /**
+     * A per-turn cap and a once-per-battle cap are <b>cumulative</b> — unlike {@code cooldown}, which is
+     * refused next to {@code per_turn} because the two would each have to start counting at a different firing.
+     */
+    @Test
+    public void aTurnLimitAndAOncePerBattleLimitCombine() {
+        TriggerSpec spec = perTurn(3);
+        TriggerSpecs.set(spec, "oncePerBattle", true);
+        Battle battle = battleWith(spec);
+        Character owner = battle.characters.getFirst();
+
+        Assertions.assertEquals(1, fire(battle, owner));
+        Assertions.assertEquals(0, fire(battle, owner), "the battle limit is the tighter one here");
+        takeTurn(battle, owner);
+        Assertions.assertEquals(0, fire(battle, owner), "and no turn brings it back");
+    }
+
+    // ==================================================================
+    // 4. Limits are per rule, and only where stated
     // ==================================================================
 
     /** A limit must not leak onto the other rules of the same table. */
@@ -147,7 +220,7 @@ public class TriggerLimitTest {
     }
 
     // ==================================================================
-    // 4. The counters belong to a combatant, not to the table
+    // 5. The counters belong to a combatant, not to the table
     // ==================================================================
 
     @Test
@@ -165,7 +238,7 @@ public class TriggerLimitTest {
     }
 
     // ==================================================================
-    // 5. Fail fast: a limit that cannot mean anything is rejected at load
+    // 6. Fail fast: a limit that cannot mean anything is rejected at load
     // ==================================================================
 
     @Test
@@ -188,6 +261,33 @@ public class TriggerLimitTest {
                 "the message must name the rule's source: " + both.getMessage());
     }
 
+    /** {@code per_turn: 0} reads like "no per-turn limit", which is spelled by omitting the field. */
+    @Test
+    public void aTurnLimitBelowOneIsRejectedAtLoadTime() {
+        IllegalArgumentException zero = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER, List.of(perTurn(0))));
+        Assertions.assertTrue(zero.getMessage().contains("per_turn"), zero.getMessage());
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER, List.of(perTurn(-2))), "and a negative count is not a count");
+    }
+
+    /**
+     * A per-turn cap next to a cooldown is refused: once {@code per_turn > 1} the two limits would each have to
+     * start counting at a different firing, and {@code cooldown: 1} is already the {@code per_turn: 1} case of
+     * the same limit — so the pair is never the only way to say something.
+     */
+    @Test
+    public void aTurnLimitNextToACooldownIsRejectedAtLoadTime() {
+        TriggerSpec spec = perTurn(2);
+        TriggerSpecs.set(spec, "cooldown", 1);
+
+        IllegalArgumentException both = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER, List.of(spec)));
+        Assertions.assertTrue(both.getMessage().contains("per_turn"), both.getMessage());
+        Assertions.assertTrue(both.getMessage().contains("cooldown"), both.getMessage());
+    }
+
     // ==================================================================
     // 6. The JSON spelling (a snake_case mistake would bind to null silently)
     // ==================================================================
@@ -205,6 +305,12 @@ public class TriggerLimitTest {
                 TriggerSpec.class);
         Assertions.assertEquals(Boolean.TRUE, once.getOncePerBattle(), "the field is spelled `once_per_battle`");
         Assertions.assertNull(once.getCooldown());
+
+        TriggerSpec perTurn = new Gson().fromJson(
+                "{\"on\":\"ALLY_ATTACK\",\"per_turn\":2,\"do\":[{\"op\":\"GAIN_ENERGY\",\"amount\":1}]}",
+                TriggerSpec.class);
+        Assertions.assertEquals(2, perTurn.getPerTurn(), "the field is spelled `per_turn`");
+        Assertions.assertNull(perTurn.getCooldown());
     }
 
     // ==================================================================
@@ -221,6 +327,17 @@ public class TriggerLimitTest {
         TriggerSpec spec = TriggerSpecs.rule("ALLY_ATTACK", null, gain(1));
         TriggerSpecs.set(spec, "cooldown", cooldown);
         TriggerSpecs.set(spec, "oncePerBattle", oncePerBattle);
+        return spec;
+    }
+
+    /**
+     * The same rule with a per-turn count: 「该效果每回合可触发 N 次」.
+     *
+     * @param perTurn how many firings one of the owner's turns allows
+     */
+    private static TriggerSpec perTurn(Integer perTurn) {
+        TriggerSpec spec = TriggerSpecs.rule("ALLY_ATTACK", null, gain(1));
+        TriggerSpecs.set(spec, "perTurn", perTurn);
         return spec;
     }
 
@@ -270,31 +387,13 @@ public class TriggerLimitTest {
     }
 
     /**
-     * Runs turns until {@code who} is the actor, then settles that turn's start — the moment a cooldown
-     * is counted down — and finishes the turn.
+     * Runs turns until {@code who} is the actor, then settles that turn's start — the moment a cooldown is
+     * counted down and a per-turn counter is cleared — and finishes the turn.
      *
-     * <p>A turn has to be <b>finished</b> for the next one to begin: {@code stepForward()} only moves the
-     * clock and hands over the current actor, and it is {@code Queue.setTopZero()} inside
-     * {@code Battle.afterMove()} that sends the finished unit to the back of the bar. Stepping twice
-     * without finishing a turn keeps returning the same actor, which is exactly how the first version of
-     * this helper failed ("no turn for the requested unit").
+     * <p>Delegates to {@link TestTurns} so the shield suite measures the same moment the same way.
      */
     private static void takeTurn(Battle battle, Character who) {
-        for (int guard = 0; guard < 40; guard++) {
-            battle.stepForward();
-            if (battle.isOver()) {
-                throw new AssertionError("the battle ended before the requested unit acted");
-            }
-            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
-            if (mine) {
-                battle.beforeMove();
-            }
-            battle.afterMove();
-            if (mine) {
-                return;
-            }
-        }
-        throw new AssertionError("no turn for the requested unit within 40 steps");
+        TestTurns.take(battle, who);
     }
 
     private static void drainSkillPoints(Battle battle) {

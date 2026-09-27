@@ -5,6 +5,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.BuffManager;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.event.*;
@@ -146,6 +147,16 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     @Getter(AccessLevel.NONE)
     private final Map<String, Integer> triggerCooldowns = new HashMap<>();
+    /**
+     * How many times each per-turn-limited rule has fired <b>in the current turn</b> ({@code per_turn}).
+     *
+     * <p>Kept next to the cooldowns because it is the same kind of fact (battle state, per combatant, keyed by
+     * the rule) and because both are cleared at the same moment: the start of this combatant's own turn. A
+     * counter stored on the rule would be shared by every wearer of a relic set and by every battle in the JVM
+     * — the reason the cooldowns live here in the first place.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Map<String, Integer> triggerTurnUses = new HashMap<>();
     /**
      * The rules that have used up a {@code once_per_battle} limit; they never fire again this battle.
      */
@@ -304,9 +315,63 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *
      * <p>The shield is **drained before HP** ({@link #takeDamage(double)}), and it **does not stack**:
      * a new shield has {@code Battle.grantShield} overwrite the old value outright, with no addition.
+     *
+     * <p>⚠ Read it through {@link #getShield()}; write it through {@link #setShield(double)} (a raw write that
+     * installs nothing) or {@link #installShield(double, AbstractBuff)} (a timed shield that takes itself off
+     * again — see {@link com.laosun.aluminium.models.buff.ShieldBuff}).
      */
-    @Setter
     private double shield = 0;
+
+    /**
+     * Which buff installed the shield currently up, or {@code null} when nobody owns it (a raw grant, or none).
+     *
+     * <p>A new shield overwrites the old one, and the old shield's buff expires later — at which moment
+     * "clear the shield" would be wrong: the shield standing there is somebody else's. The value alone cannot
+     * tell the two apart (two shields of the same size look identical), so the installer is remembered.
+     *
+     * @see #installShield(double, AbstractBuff)
+     * @see #removeShieldFrom(AbstractBuff)
+     */
+    private AbstractBuff shieldInstaller;
+
+    /**
+     * A raw shield write, which <b>clears the ownership</b>: "somebody set the number directly" is not a timed
+     * shield, so no buff may take it off again.
+     */
+    public void setShield(double value) {
+        this.shield = value;
+        this.shieldInstaller = null;
+    }
+
+    /**
+     * Installs a shield and records the buff that must take it off again.
+     *
+     * @param value     the shield amount
+     * @param installer the timed shield that installed it
+     */
+    public void installShield(double value, AbstractBuff installer) {
+        this.shield = value;
+        this.shieldInstaller = installer;
+    }
+
+    /**
+     * Takes the shield off <b>only if</b> {@code installer} is the buff that put it up.
+     *
+     * <p>This is the whole reason the installer is remembered: when a second shield overwrites the first, the
+     * first one's buff is removed <b>before</b> the new shield is installed, and it must not clear a shield it
+     * never gave. A drained shield ({@code 0}) is not touched either — there is nothing to take off.
+     *
+     * @param installer the buff that is expiring
+     * @return whether this call took the shield off
+     */
+    public boolean removeShieldFrom(AbstractBuff installer) {
+        if (shieldInstaller != installer) {
+            return false;
+        }
+        this.shield = 0;
+        this.shieldInstaller = null;
+        return true;
+    }
 
     /**
      * How much of the last {@link #takeDamage(double)} was blocked by the shield (P6-3).
@@ -493,11 +558,17 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * <p>Unlimited rules are never recorded, so they always answer {@code true}: adding this vocabulary
      * cannot change any rule that does not use it.
      *
-     * @param key the rule's stable key ({@code CompiledRule.key()})
-     * @return {@code false} while the rule is on cooldown or has spent a once-per-battle limit
+     * @param key     the rule's stable key ({@code CompiledRule.key()})
+     * @param perTurn how many times the rule may fire in one of <b>this combatant's</b> turns
+     *                ({@code 0} = no per-turn cap)
+     * @return {@code false} while the rule is on cooldown, has spent a once-per-battle limit, or has already
+     *         fired {@code perTurn} times this turn
      */
-    public boolean isTriggerReady(String key) {
-        return !triggerSpentOnce.contains(key) && triggerCooldowns.getOrDefault(key, 0) <= 0;
+    public boolean isTriggerReady(String key, int perTurn) {
+        if (triggerSpentOnce.contains(key) || triggerCooldowns.getOrDefault(key, 0) > 0) {
+            return false;
+        }
+        return perTurn <= 0 || triggerTurnUses.getOrDefault(key, 0) < perTurn;
     }
 
     /**
@@ -506,8 +577,13 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param key           the rule's stable key
      * @param cooldownTurns the owner's turns before it may fire again ({@code 0} = no cooldown)
      * @param oncePerBattle {@code true} = it may never fire again in this battle
+     * @param perTurn       how many times it may fire in one of the owner's turns ({@code 0} = no cap); the
+     *                      use is counted here, which is what makes {@code per_turn} work at all
      */
-    public void startTriggerCooldown(String key, int cooldownTurns, boolean oncePerBattle) {
+    public void startTriggerCooldown(String key, int cooldownTurns, boolean oncePerBattle, int perTurn) {
+        if (perTurn > 0) {
+            triggerTurnUses.merge(key, 1, Integer::sum);
+        }
         if (oncePerBattle) {
             triggerSpentOnce.add(key);
             return;
@@ -518,13 +594,16 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Counts one of <b>this combatant's</b> turns off every cooldown.
+     * Counts one of <b>this combatant's</b> turns off every cooldown, and clears every per-turn counter.
      *
      * <p>Called by {@code Battle.beforeMove} for the unit whose turn is beginning, just before the
      * {@code TURN_START} rules fire — so {@code cooldown: 1} means "at most once per own turn", and a
-     * rule that fires on that turn's own event is not immediately blocked again.
+     * rule that fires on that turn's own event is not immediately blocked again. ⚠ The per-turn counters are
+     * cleared in the same breath, and for the same reason: 「每回合可触发 N 次」 counts <b>my</b> turns, so a rule
+     * reacting to other people's actions gets its N back when my own turn comes round.
      */
     public void tickTriggerCooldowns() {
+        triggerTurnUses.clear();
         if (triggerCooldowns.isEmpty()) {
             return;
         }
@@ -538,6 +617,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     public void resetTriggerLimits() {
         triggerCooldowns.clear();
         triggerSpentOnce.clear();
+        triggerTurnUses.clear();
     }
 
     /**

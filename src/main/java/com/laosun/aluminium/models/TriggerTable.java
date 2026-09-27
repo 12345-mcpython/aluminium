@@ -335,7 +335,7 @@ public class TriggerTable {
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateCooldown(spec),
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
-                validateMinEidolon(spec)));
+                validateMinEidolon(spec), validatePerTurn(spec)));
     }
 
     /**
@@ -432,6 +432,42 @@ public class TriggerTable {
                             + "(source: " + spec.getSource() + ")");
         }
         return cooldown;
+    }
+
+    /**
+     * Validates a per-turn cap (「该效果每回合可触发 N 次」) and returns it ({@code 0} = no cap).
+     *
+     * <p>Two load-time rejections, both of them things that would otherwise read as a working rule:
+     * <ul>
+     *   <li>{@code per_turn: 0} (or negative) — it reads like "no per-turn limit", which is already spelled by
+     *       omitting the field, and a cap of 0 would be a rule that can never fire at all;</li>
+     *   <li>{@code per_turn} together with {@code cooldown} — "at most N per turn, and at least M turns apart"
+     *       has two readings that disagree once {@code N > 1} (does the cooldown start on the first firing or
+     *       the last?), and the engine would have to pick one silently. {@code cooldown: 1} is exactly the
+     *       {@code N = 1} case of this field, so the pair is never the only way to write something.</li>
+     * </ul>
+     * {@code once_per_battle} <b>may</b> be combined with it: the two are cumulative ("twice per turn, and only
+     * once in the whole battle"), which is a reading that cannot be misread.
+     */
+    private static int validatePerTurn(TriggerSpec spec) {
+        Integer perTurn = spec.getPerTurn();
+        if (perTurn == null) {
+            return 0;
+        }
+        if (perTurn < 1) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has per_turn " + perTurn + ", but a per-turn limit is a count of firings "
+                            + "and must be >= 1; omit the field entirely for \"no per-turn limit\" "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (spec.getCooldown() != null) {
+            throw new IllegalArgumentException(
+                    "Trigger rule states both `per_turn` and `cooldown`. `cooldown: 1` is the per_turn: 1 case "
+                            + "of the same limit, and for any larger per_turn the two limits would each have to "
+                            + "start counting at a different firing -- pick the one the text actually states "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return perTurn;
     }
 
     // ==================================================================
@@ -576,6 +612,13 @@ public class TriggerTable {
     private static final Pattern HAS_WEAKNESS =
             Pattern.compile("(?<![\\w])has_weakness(?![\\w])", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * The {@code has_shield} keyword: "&lt;who&gt; currently holds a shield" — read exactly like the other
+     * argument-less predicates.
+     */
+    private static final Pattern HAS_SHIELD =
+            Pattern.compile("(?<![\\w])has_shield(?![\\w])", Pattern.CASE_INSENSITIVE);
+
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException("Empty trigger condition (source: " + spec.getSource() + ")");
@@ -659,6 +702,21 @@ public class TriggerTable {
             String name = text.substring(hasPath.end()).trim();
             return new HasPath(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
                     requirePath(name, raw, spec), raw, spec);
+        }
+
+        // `has_shield`: "<who> has_shield" — argument-less like `is_ally`.
+        Matcher hasShield = HAS_SHIELD.matcher(text);
+        if (hasShield.find()) {
+            String subject = normalize(text.substring(0, hasShield.start()));
+            String trailing = text.substring(hasShield.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"has_shield\": it takes no argument "
+                                + "(write \"target has_shield\", or \"!target has_shield\" for the opposite) "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new HasShield(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw,
+                    spec);
         }
 
         if (!containsOperator(text)) {
@@ -999,7 +1057,8 @@ public class TriggerTable {
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key,
-                               int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon) {
+                               int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
+                               int perTurn) {
 
         /**
          * Whether this rule limits how often it may fire at all.
@@ -1008,7 +1067,7 @@ public class TriggerTable {
          * cannot change the behaviour of any rule that does not use it.
          */
         public boolean isLimited() {
-            return cooldownTurns > 0 || oncePerBattle;
+            return cooldownTurns > 0 || oncePerBattle || perTurn > 0;
         }
 
         boolean matches(TriggerContext ctx) {
@@ -1300,6 +1359,57 @@ public class TriggerTable {
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
             return who != null && ctx.battle() != null && ctx.battle().allies.contains(who);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * Shield test: {@code target has_shield} / {@code self has_shield}.
+     *
+     * <p><b>Why the condition DSL needs it.</b> 三月七's Talent is 「当<b>持有护盾的</b>我方目标受到敌方目标攻击后，三月七
+     * 立即向攻击者发起反击」 — the trigger is about a shielded ally, and the engine's shield is a plain number on
+     * the combatant ({@code CanHit.getShield()}) that no condition could ask about. 13 of the 97 character documents
+     * say 「持盾时」 somewhere (符玄 / 砂金 / 杰帕德 and the shield family), which makes it the second-largest hole
+     * after the resource count.
+     *
+     * <p>⚠ <b>"Has a shield" means the value is above 0</b>, not "a shield was granted at some point": a shield
+     * that has been used up is gone, and a clause gated on 「持有护盾的」 must stop matching then. That is also why
+     * it reads the <b>live</b> value rather than asking the buff manager for a {@code ShieldBuff} — the two agree
+     * while a timed shield is up (the buff installs it), and the value is the one the damage path actually drains.
+     *
+     * <p>⚠ The engine cannot yet answer 「这面盾是不是<b>我</b>给的」 — the shield remembers its installing buff and
+     * that buff remembers its caster ({@code ShieldBuff.getSource()} / {@code CanHit.installShield}), but no
+     * condition exposes the caster. Registered as a gap instead of guessed at: 星魂 6's 「在<b>战技提供的</b>护盾保护下」
+     * and 遗器 103/110/120's 「装备者提供的护盾量」 both need it.
+     */
+    private static final class HasShield implements Condition, PartyCondition {
+
+        private final String subject;
+        private final String raw;
+
+        HasShield(String subject, String raw, TriggerSpec spec) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            return who != null && who.getShield() > 0;
         }
 
         @Override
