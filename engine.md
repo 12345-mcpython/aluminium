@@ -290,6 +290,7 @@ dispatch(consumer, 直接相关方...)
 
 | 事件 | 关键口径 |
 |---|---|
+| `TriggerEvent.BATTLE_START`（**无 buff 接口**） | `Battle.startBattle()`，在开场钩子 `onBattleStart` **之后**、`processRequests` 之前，投给**每个角色自己的表**。⚠ **它不带 `actor`、也不带 `target`** —— 所以在那里写 `"when": ["actor == self"]` 的规则**永远不会触发**（2026-09-27 手写时踩过，现在装载期直接拒绝这种拼写）。"我自己的战斗开始"**不需要条件**：被触发的表本身就是主人的。⚠ 别被"每个战斗单位各发一次"误导：那是**投递**口径，不是 `context` 口径 |
 | `SkillCastEvent` | ⚠ **非伤害技能也发**（`hitTargets` 为空）。治疗/护盾/纯 buff 技的触发源靠它 —— 布洛妮娅「施放战技时 50% 概率 +1 战技点」如果写成"没打中就不发"就永远收不到。一次施放**只发一次**（群攻打 3 个目标也是 1 次） |
 | `TriggerEvent.SKILL_CAST` / `BASIC_ATTACK` / `ULT_CAST`（**无 buff 接口**） | `actor` = 施放者，**`target` = 这次施放「瞄准」的那个单位**（调用方选的**主目标**，补于 2026-09-28 / M-35）。⚠ 它**不是**"效果打到的所有人"：群体技能打到好几个，这里只有第一个，覆盖面仍然由 `hit_count` 回答 —— 「指定我方单体」（布洛妮娅/停云/星期日的战技）靠它才写得出来。⚠ `ALLY_ATTACK` **刻意不带**这个目标：它是我方发起的攻击，瞄的永远是对面阵营，而我们的规则没有"某个敌人"这种选择器，传了也没有读者。⚠ 改动前已核：**没有任何已出货规则**把施放类事件和 `target` 条件配在一起，所以补上它没有改变任何现有规则的行为（全套测试确认） |
 | `EnergyEvent` | `actuallyAdded` 是**实际入账值**（被上限截断后）。已满 → 0 → **不发**。**没有能量条的角色没有本事件**（走层数资源的 6 个角色，provider 恒返回 null，压根走不到回能口） |
@@ -433,6 +434,7 @@ target has_path 同谐  这件事的承受者**命途**是「同谐」 ← 星�
 !target has_path 同谐 **取反**：上面那条不成立时成立  ← 「无法触发」那半句的唯一写法（条件表是**与**关系）
 ```
 
+> 🧭 **条件读的"主体"必须真在这件事里**（2026-09-27 补）：`actor` / `target` 只有当事件**带**它们时才有值，而在 `BATTLE_START` 上两个都是 `null` —— 所以在那里写 `actor == self`（或 `target == …`、`actor has_state X`）是**永不触发**的规则，装载期现在直接拒绝，报错会说明"这张表本身就是主人的，不需要条件"。⚠ 同族的坑：`self` 永远存在（主人总是有），所以 `self` 一律允许。
 > 🧭 **`has_path` 与 `!` 前缀（2026-09-27 补，M-41）**：`has_path` 与 `has_state` **同形**（左边是
 > `self`/`actor`/`target`），命途本身就是引擎已有的知识（`Character.getPath()`，仇恨分层那一列），
 > 名字用**中文**（与状态名一致），**不在九个之内就在装载期拒绝** —— 注意这与 `Path.fromName` 的
@@ -456,7 +458,7 @@ target has_path 同谐  这件事的承受者**命途**是「同谐」 ← 星�
 > 否则"没有战场 → 不是我的召唤物"会让 `actor != summon` 对**每一个**事件都为真 ——
 > 一条"除了我的忆灵谁攻击都算"的规则会在所有事情上触发，且没有任何迹象。
 
-> 🌐 **`self_summon_count` 读的是战场，不是事件。** 它是"**规则主人自己**有几个活着的召唤物在场"，
+> ⚠ **`self_summon_count` 读的是战场，不是事件。** 它是"**规则主人自己**有几个活着的召唤物在场"，
 > 因此 `TriggerContext` 现在携带 `Battle`（见该 record 的 javadoc）—— 有些问题是关于**战场**的
 > （谁在场 / 「我方全体」是谁），事件根本携带不了。⚠ 手搓的 context（不少测试这么用）没有战场，
 > 这类条件于是**不成立**：**"读不到"绝不能退化成"0 个"**，否则一条「忆灵在场时」的规则会被静默禁用。
@@ -529,7 +531,8 @@ JSON 写法不变。
 | `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持），可选 `target`（**可以是群体**：`all_allies` / `other_allies` / `target_and_summon` 会逐个推） | ✅ |
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `damage_level`、`target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
-| `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
+| `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、`max_stacks`（别名 `stacks`）、**`scale`**（派生值，见下） | ✅（P10-3） |
+| ↳ **派生值** `scale: "self_attr:<属性>"` | `percent` × **规则主人**那条属性的当前值 + 可选 `amount`（P11-2，M-42） | ✅ 首个用户**大丽花行迹「又一场葬礼」**「使其他角色的击破特攻提高，提高数值等同于 **24% 大丽花的击破特攻 + 50%**」。⚠ 结果是**绝对值**（即使目标是基础属性）—— 文档给的是"数值"，不是"目标基数的百分比"；⚠ 触发时**算一次就冻结**（引擎既有的快照口径 §24.5），所以 `amount` 是那个常数项；⚠ 没有 `scale` 却写了 `amount` **装载期拒绝**（以前是**静默忽略**）。⚠ 前缀与条件 DSL 的 `self_attr:` 共用一处定义（`TriggerTable.SELF_ATTR_PREFIX`），免得两种拼写各自漂移 |
 | `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
 | `BOOST_DAMAGE` | `percent`（只能挂在 `DEALING_DAMAGE` 上） | ✅ 改**正在结算的那一次**伤害：不改属性、不挂 buff、不会漏到下一次。是「对处于 X 状态的目标造成的伤害提高 Y%」的实现 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |

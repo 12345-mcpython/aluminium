@@ -59,6 +59,21 @@ public class EffectSpec {
      * </ul>
      * Stated <b>instead of</b> {@link #amount}, and it requires {@link #percent}: a scale without a magnitude
      * would say "some share of a Max HP", which is not a number.
+     *
+     * <p>⚠ <b>{@code MODIFY_ATTR} has a third spelling</b> (P11-2, M-42): {@code "self_attr:<ATTRIBUTE>"} — the
+     * modifier's value is then <b>derived</b> from one of the <b>rule owner's</b> attributes
+     * ({@code "scale": "self_attr:BREAKING_EFFECT"} + {@code percent} + optional {@code amount}), i.e.
+     * 「提高数值等同于大丽花 <b>#1% 的击破特攻 + #3%</b>」. It is the same prefix the condition DSL uses for "my
+     * own attribute" ({@code TriggerTable.SELF_ATTR_PREFIX}), deliberately: one reads it as a threshold, the other
+     * as a magnitude, and both mean the rule owner. Two things follow from "the number was computed":
+     * <ul>
+     *   <li>the result is an <b>absolute</b> value in the target attribute's own units — even on a base
+     *       attribute, where a literal {@code percent} would otherwise mean "a share of the target's base";</li>
+     *   <li>it is computed once, when the rule fires, and then frozen inside an ordinary modifier (the engine's
+     *       existing snapshot convention, §24.5), which is why {@link #amount} is the flat <b>addend</b> here and
+     *       not a second magnitude.</li>
+     * </ul>
+     * An {@code amount} on {@code MODIFY_ATTR} <b>without</b> a scale is refused rather than ignored.
      */
     @SerializedName("scale")
     private String scale;
