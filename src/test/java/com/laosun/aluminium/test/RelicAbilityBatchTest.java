@@ -83,6 +83,8 @@ public class RelicAbilityBatchTest {
     private static final int IZUMO = 314;
     /** 盗贼公国塔利亚: the weakness-gated set (its Break Effect needs a fire-weak enemy). */
     private static final int BANDITRY = 316;
+    /** 逐火者的航迹: the damage-category set (its boost touches DoT only). */
+    private static final int REVELRY = 322;
 
     // ==================================================================
     // 102 — 普攻伤害 +10%
@@ -571,6 +573,42 @@ public class RelicAbilityBatchTest {
         battle.castImmediate(new DefaultSkill(WEARER, 1, 1), wearer, List.of(target));
 
         return boostOf(wearer, AttributeType.BREAKING_EFFECT) - before;
+    }
+
+    // ==================================================================
+    // 322 — a damage-CATEGORY boost (DoT only)
+    // ==================================================================
+
+    /**
+     * 322 逐火者的航迹: the DoT-only boost appears once ATK passes 2400, again at 3600, and not below.
+     *
+     * <p>⚠ What this case does <b>not</b> prove: that the attribute reaches a DoT instance's damage. That is the
+     * branch in {@code Battle}'s assembly (gated on {@code DamageType.DOT}); the value here is read off the granted
+     * modifier, which is the half this fixture can see. The damage-level check is still owed -- see the note in the
+     * commit that authored this file.
+     */
+    @Test
+    public void theRevelryDotBoostAppearsAtItsThresholds() {
+        Assertions.assertEquals(0.12, dotBoostAtAttack(2500), 1e-6, "「大于等于 2400 时…提高 12%」");
+        Assertions.assertEquals(0.24, dotBoostAtAttack(4000), 1e-6,
+                "「大于等于 3600 时…提高 24%」 -- the lower tier is excluded by its own upper bound");
+        Assertions.assertEquals(0, dotBoostAtAttack(2000), 1e-6, "below 2400 nothing is granted");
+    }
+
+    /** The DoT-boost modifier the suit granted to a wearer with this ATK, or 0 when it granted none. */
+    private static double dotBoostAtAttack(double attack) {
+        Character wearer = wearing(REVELRY);
+        wearer.setAttribute(AttributeType.ATTACK, new DoubleValue(attack));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+
+        for (com.laosun.aluminium.models.buff.StatModifierBuff buff
+                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class)) {
+            if (buff.getAttribute() == AttributeType.DOT_DAMAGE_BOOST) {
+                return buff.getValue();
+            }
+        }
+        return 0;
     }
 
     // ==================================================================

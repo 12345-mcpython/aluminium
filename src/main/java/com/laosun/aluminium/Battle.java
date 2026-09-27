@@ -2053,6 +2053,13 @@ public class Battle {
         if (damage.getType() == DamageType.ADDITIONAL) {
             damage.addBoost(attacker.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get());
         }
+        // ...and the same shape for damage over time (322's 「使装备者造成的持续伤害额外提高 X%」): gated on the
+        // damage TYPE, because that is what the sentence names. ⚠ DoT is NOT one of the types the boost zone skips
+        // (break / super break / true damage are), so this reaches the tick -- checked before writing it, since an
+        // attribute nothing reads would look exactly like a working rule.
+        if (damage.getType() == DamageType.DOT) {
+            damage.addBoost(attacker.getAttribute(AttributeType.DOT_DAMAGE_BOOST).get());
+        }
 
         // Scoped boosts (P10-4): 「普攻 / 战技 / 终结技造成的伤害提高 X%」. These cannot be gated on the damage
         // *type* the way the follow-up boost above is -- a basic attack and a skill are both
