@@ -40,6 +40,23 @@ public class TriggerSpec {
     private List<String> when;
 
     /**
+     * An optional <b>name for this rule</b>, so that another rule can raise one of its numbers
+     * ({@code MODIFY_RULE}'s {@code "rule"} field).
+     *
+     * <p><b>Why it exists.</b> A 星魂 or 行迹 can say 「天赋的反击效果每回合可触发的次数<b>增加1次</b>」 or
+     * 「冻结敌方目标的基础概率<b>提高15%</b>」 — sentences that modify a number that already exists on another rule
+     * in the same file. Without a name there is nothing to point at, and the two ways to fake it are both wrong: a
+     * second rule with the raised number <i>adds</i> firings (a {@code per_turn: 3} rule next to the {@code per_turn: 2}
+     * one = five per turn) and a second chance rule <i>rolls twice</i> (1 − 0.5 × 0.35 = 82.5% instead of 65%).
+     *
+     * <p>⚠ Names are unique <b>per file</b> (two rules with one id are refused at load, since a reference would be
+     * ambiguous) and a reference must resolve inside the same file — a relic rule is shared by every wearer and has
+     * no way to know whose table it lands in.
+     */
+    @SerializedName("id")
+    private String id;
+
+    /**
      * The effects to run, in order.
      */
     @SerializedName("do")

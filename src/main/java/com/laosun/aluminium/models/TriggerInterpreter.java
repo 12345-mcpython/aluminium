@@ -113,7 +113,8 @@ public final class TriggerInterpreter {
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
-            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF");
+            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
+            "MODIFY_RULE");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -417,6 +418,41 @@ public final class TriggerInterpreter {
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
+            case "MODIFY_RULE" -> {
+                // 「天赋的反击效果每回合可触发的次数增加1次」 / 「施放终结技时，冻结敌方目标的基础概率提高15%」: a passive
+                // that RAISES a number on another rule in the same file. Which number is decided by which field is
+                // stated -- an `amount` is a count of firings, a `percent` is a probability -- and the shape of the
+                // named rule is checked by the table (TriggerTable.validateAmendments), which is the only place that
+                // can see the whole file.
+                requireRuleReference(effect, op, spec);
+                if (effect.getAmount() != null) {
+                    double amount = effect.getAmount();
+                    if (amount < 1 || amount != Math.floor(amount)) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " raises a rule's per-turn limit, so \"amount\" is a count of firings: "
+                                        + "a whole number >= 1, got " + amount + " (a probability is a \"percent\", "
+                                        + "which is a different number on a different rule) "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                    rejectAmendmentExtras(effect, op, spec, "amount");
+                } else {
+                    requirePercent(effect, op, spec);
+                    if (effect.getPercent() <= 0 || effect.getPercent() > 1) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " raises a rule's base chance, so \"percent\" is a fraction of 1 in "
+                                        + "(0, 1]: 0.15 = 「提高15%」, got " + effect.getPercent()
+                                        + " (source: " + spec.getSource() + ")");
+                    }
+                    rejectAmendmentExtras(effect, op, spec, "percent");
+                }
+                if (TriggerEvent.fromString(spec.getOn()) != TriggerEvent.BATTLE_START) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " amends a rule for the whole battle, so it only makes sense on "
+                                    + "BATTLE_START (a bonus granted mid-battle would have to be taken back when "
+                                    + "whatever granted it ended, and nothing does that); this rule fires on "
+                                    + spec.getOn() + " (source: " + spec.getSource() + ")");
+                }
+            }
             case "SUMMON" -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
                 // (name, panel derivation) lives in resources/memosprites/<cid>.json. A `target` here would
@@ -462,7 +498,10 @@ public final class TriggerInterpreter {
      */
     public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
         for (EffectSpec effect : rule.effects()) {
-            applyOne(battle, effect, ctx);
+            // The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance, and the only
+            // op that consumes that amendment (APPLY_CONTROL) has to know which rule it is running inside. Passing it
+            // down beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.
+            applyOne(battle, rule.id(), effect, ctx);
         }
     }
 
@@ -487,7 +526,8 @@ public final class TriggerInterpreter {
             // applying, because the limit is about how often the rule may run, not about whether it fits the
             // event: `matching` stays a pure predicate, which is what `TriggerTable.ruleCount` and the
             // data-binding tests read.
-            if (owner != null && !owner.isTriggerReady(rule.key(), rule.perTurn())) {
+            if (owner != null && !owner.isTriggerReady(rule.key(),
+                    rule.perTurn() + owner.rulePerTurnBonus(rule.id()))) {
                 continue;
             }
             // An Eidolon gate (「星魂 N 解锁」): the rank is a construction-time property of the rule's owner, so
@@ -502,15 +542,24 @@ public final class TriggerInterpreter {
             }
             apply(battle, rule, ctx);
             if (owner != null) {
+                // ⚠ The count recorded is the SAME number the check above used: recording the stated per_turn while
+                // checking the amended one would make an amended rule fire forever (its counter would never reach the
+                // raised cap). One expression, read twice -- see `amendedPerTurn`.
                 owner.startTriggerCooldown(rule.key(), rule.cooldownTurns(), rule.oncePerBattle(),
-                        rule.perTurn());
+                        rule.perTurn() + owner.rulePerTurnBonus(rule.id()));
             }
             fired++;
         }
         return fired;
     }
 
-    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    /**
+     * Runs one effect of a rule.
+     *
+     * @param ruleId the id of the rule this effect belongs to ({@code ""} when it states none) — the handle a
+     *               {@code MODIFY_RULE} amendment is filed under, read by {@code APPLY_CONTROL}
+     */
+    private static void applyOne(Battle battle, String ruleId, EffectSpec effect, TriggerContext ctx) {
         String op = normalizeOp(effect, null);
         switch (op) {
             case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);
@@ -561,10 +610,11 @@ public final class TriggerInterpreter {
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "REMOVE_STATE" -> removeState(effect, ctx);
             case "TAUNT" -> taunt(battle, effect, ctx);
-            case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
+            case "APPLY_CONTROL" -> applyControl(battle, ruleId, effect, ctx);
             case "APPLY_DOT" -> applyDot(battle, effect, ctx);
             case "EXTEND_BUFF" -> extendBuff(battle, effect, ctx);
             case "RESIST_DEBUFF" -> resistDebuff(battle, effect, ctx);
+            case "MODIFY_RULE" -> modifyRule(effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1548,7 +1598,7 @@ public final class TriggerInterpreter {
      * is registered rather than folded in here as a field nobody else can use. What this op attaches is the state
      * itself, so 「不能行动」 is complete.
      */
-    private static void applyControl(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    private static void applyControl(Battle battle, String ruleId, EffectSpec effect, TriggerContext ctx) {
         Constant.ControlEffect control = Constant.CONTROL_STATES.get(effect.getControl().trim());
         if (control == null) {
             // Load-time validation already refused this; reaching here means the table changed under a compiled
@@ -1562,6 +1612,12 @@ public final class TriggerInterpreter {
         // state's own resistance. Attaching it directly would have made every 「免疫控制类负面状态」 clause silently
         // ineffective against exactly the controls the documents write without a number.
         double baseChance = effect.getBaseChance() == null ? 1.0 : effect.getBaseChance();
+        // …plus whatever a 行迹 / 星魂 raised it by (「冻结敌方目标的基础概率提高15%」), filed on this combatant under
+        // THIS rule's id. Read here rather than written into the effect: rules are compiled once and cached per cid,
+        // so the stated 0.5 stays the file's number and the amendment is a fact about this battle.
+        if (ctx.owner() != null) {
+            baseChance += ctx.owner().ruleBaseChanceBonus(ruleId);
+        }
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
                 continue;
@@ -1665,6 +1721,42 @@ public final class TriggerInterpreter {
             target.getBuffManager().extendBuffsFrom(ctx.owner(), effect.getBuff(),
                     effect.getAttribute() == null ? null : AttributeType.fromString(effect.getAttribute()),
                     effect.getTurns());
+        }
+    }
+
+    /**
+     * {@code MODIFY_RULE}: 「天赋的反击效果每回合可触发的次数增加1次」 / 「冻结敌方目标的基础概率提高15%」 — a passive that
+     * <b>raises a number on another rule of the same file</b>.
+     *
+     * <p><b>Why it is not a second rule.</b> Both sentences modify something that already exists, and the honest
+     * spellings are impossible without saying so: a second {@code per_turn: 3} rule <i>adds</i> firings (the engine
+     * would fire 2 + 3 = 5 times a turn rather than raising the cap to 3), and a second {@code base_chance: 0.65}
+     * rule would roll <b>twice</b> (1 − 0.5 × 0.35 = 82.5% instead of 65%). Both are numbers that look right from the
+     * outside and are wrong in play — the failure mode this project refuses.
+     *
+     * <p><b>Where the raised number lives.</b> On the <b>combatant</b>, not on the rule: a table is compiled once per
+     * cid and a relic's rules are shared by every wearer, so an amendment written onto the rule would leak into every
+     * battle in the JVM (the same reasoning as the firing limits in {@code CanHit}). The two consumers are
+     * {@code TriggerInterpreter.fire} (per-turn cap) and {@link #applyControl} (base chance) — both read the amendment
+     * only when the rule they are running carries the id it was filed under.
+     *
+     * <p>⚠ Which number moves is decided by <b>which field is stated</b>: {@code amount} raises a count, {@code
+     * percent} raises a probability. The load-time validator refuses both-at-once, neither, an out-of-range value, a
+     * non-integer count, any other field, a non-{@code BATTLE_START} event, an unknown rule id, and a named rule that
+     * does not state the number being raised.
+     */
+    private static void modifyRule(EffectSpec effect, TriggerContext ctx) {
+        CanHit owner = ctx.owner();
+        if (owner == null) {
+            throw new IllegalStateException(
+                    "MODIFY_RULE ran without a rule owner, so there is no combatant to file the amendment under; this "
+                            + "is an engine fault (the op is validated onto BATTLE_START, which always has one)");
+        }
+        String target = effect.getRule().trim();
+        if (effect.getAmount() != null) {
+            owner.addRulePerTurnBonus(target, (int) Math.round(effect.getAmount()));
+        } else {
+            owner.addRuleBaseChanceBonus(target, effect.getPercent());
         }
     }
 
@@ -2466,6 +2558,46 @@ public final class TriggerInterpreter {
                     "Op " + op + " adds turns to a buff that already exists and states nothing else: the buff it "
                             + "lengthens keeps its own numbers (no amount / scale / percent / element / control / "
                             + "base_chance / skill) (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates {@code MODIFY_RULE}'s target: the rule being raised, named by its {@code id} — resolved against the
+     * <b>whole file</b> by {@code TriggerTable.validateAmendments}, which is the only place that can see it.
+     */
+    private static void requireRuleReference(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getRule() == null || effect.getRule().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " needs \"rule\": the id of the rule whose number it raises (that rule states "
+                            + "\"id\": \"…\"), because otherwise there is nothing to point at "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Refuses every field a {@code MODIFY_RULE} effect does not read, naming the one it does.
+     *
+     * <p>The two spellings are closed on purpose: an {@code amount} raises a per-turn <b>count</b> and a
+     * {@code percent} raises a <b>probability</b>, so stating both (or neither) would leave the reader to guess which
+     * number on the named rule moves — the exact ambiguity this op exists to remove.
+     *
+     * @param kept the field that selected the amendment ({@code "amount"} or {@code "percent"})
+     */
+    private static void rejectAmendmentExtras(EffectSpec effect, String op, TriggerSpec spec, String kept) {
+        boolean bothOrNeither = "amount".equals(kept) ? effect.getPercent() != null : effect.getAmount() != null;
+        if (bothOrNeither || effect.getScale() != null || effect.getTurns() != null
+                || effect.getPermanent() != null || effect.getUntil() != null
+                || effect.getAttribute() != null || effect.getBuff() != null || effect.getSkill() != null
+                || effect.getTarget() != null || effect.getResource() != null
+                || effect.getDamageParam() != null || effect.getDamageLevel() != null
+                || effect.getElement() != null || effect.getControl() != null
+                || effect.getBaseChance() != null || effect.getKind() != null
+                || effect.getStacks() != null || effect.getTicksOn() != null
+                || effect.getAsAttack() != null || effect.getPerTarget() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " raises exactly one number on the rule it names: either \"amount\" (how many more "
+                            + "times per turn) or \"percent\" (how much more likely), and it reads no other field "
+                            + "(source: " + spec.getSource() + ")");
         }
     }
 

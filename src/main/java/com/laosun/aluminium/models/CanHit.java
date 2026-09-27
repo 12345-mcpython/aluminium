@@ -163,6 +163,24 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     @Getter(AccessLevel.NONE)
     private final Set<String> triggerSpentOnce = new HashSet<>();
 
+    /**
+     * Per-battle <b>amendments to another rule's own numbers</b>, keyed by that rule's {@code id}
+     * (「天赋的反击效果每回合可触发的次数增加1次」 / 「冻结敌方目标的基础概率提高15%」).
+     *
+     * <p><b>Why the numbers live here and not on the rule.</b> Exactly like the firing limits above: a trigger table
+     * is compiled once and cached per cid, and a relic set's rules are merged into the same instance for every wearer,
+     * so writing a raised {@code per_turn} onto the rule would leak it into every battle in the JVM. The amendment is
+     * a fact about <b>this combatant in this battle</b> ("I have 星魂 4 active"), so it is stored next to the counters
+     * and reset with them.
+     *
+     * <p>⚠ Two fields, not one: the two sentences raise two different things, and a single "delta" would make it
+     * impossible to say which. A rule can carry both (nothing in the corpus does).
+     */
+    @Getter(AccessLevel.NONE)
+    private final Map<String, Integer> rulePerTurnBonus = new HashMap<>();
+    @Getter(AccessLevel.NONE)
+    private final Map<String, Double> ruleBaseChanceBonus = new HashMap<>();
+
     // test event behavior
     public Runnable beforeMove = () -> {
     };
@@ -618,6 +636,57 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         triggerCooldowns.clear();
         triggerSpentOnce.clear();
         triggerTurnUses.clear();
+        rulePerTurnBonus.clear();
+        ruleBaseChanceBonus.clear();
+    }
+
+    /**
+     * Raises the per-turn limit of the rule named {@code ruleId} by {@code delta} for this battle.
+     *
+     * <p>Called by the {@code MODIFY_RULE} op, whose validation already checked that the named rule exists in the same
+     * file and really states a {@code per_turn}.
+     *
+     * @param ruleId the target rule's {@code id}
+     * @param delta  how many extra firings per turn (a positive whole number)
+     */
+    public void addRulePerTurnBonus(String ruleId, int delta) {
+        if (ruleId == null || ruleId.isBlank()) {
+            return;
+        }
+        rulePerTurnBonus.merge(ruleId.trim(), delta, Integer::sum);
+    }
+
+    /**
+     * Raises the base chance of the rule named {@code ruleId} by {@code delta} for this battle.
+     *
+     * @param ruleId the target rule's {@code id}
+     * @param delta  the extra probability, as a fraction of 1 ({@code 0.15} = 「提高15%」)
+     */
+    public void addRuleBaseChanceBonus(String ruleId, double delta) {
+        if (ruleId == null || ruleId.isBlank()) {
+            return;
+        }
+        ruleBaseChanceBonus.merge(ruleId.trim(), delta, Double::sum);
+    }
+
+    /**
+     * How many extra firings per turn the rule named {@code ruleId} has this battle ({@code 0} = none).
+     *
+     * @param ruleId the rule's {@code id} ({@code ""} for an unnamed rule, which can never be amended)
+     * @return the amendment, or {@code 0}
+     */
+    public int rulePerTurnBonus(String ruleId) {
+        return ruleId == null || ruleId.isBlank() ? 0 : rulePerTurnBonus.getOrDefault(ruleId.trim(), 0);
+    }
+
+    /**
+     * How much extra base chance the rule named {@code ruleId} has this battle ({@code 0} = none).
+     *
+     * @param ruleId the rule's {@code id}
+     * @return the amendment, or {@code 0}
+     */
+    public double ruleBaseChanceBonus(String ruleId) {
+        return ruleId == null || ruleId.isBlank() ? 0 : ruleBaseChanceBonus.getOrDefault(ruleId.trim(), 0.0);
     }
 
     /**

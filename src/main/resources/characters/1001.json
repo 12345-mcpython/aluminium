@@ -34,6 +34,7 @@
   },
   {
     "on": "TAKING_HIT",
+    "id": "counter",
     "when": [
       "target has_shield",
       "!actor is_ally"
@@ -53,6 +54,7 @@
   },
   {
     "on": "ULT_CAST",
+    "id": "ultimate_freeze",
     "when": [
       "actor == self"
     ],
@@ -118,5 +120,30 @@
     "min_eidolon": 1,
     "source": "1001 三月七 星魂 1 记忆中的你 (Avatar_March7th_Rank01): 「终结技每冻结1个目标，为三月七恢复6点能量。」 param = [6]",
     "note": "「终结技**每冻结1个目标**，为三月七恢复6点能量」 -- the count is how many targets this ultimate's freeze <b>actually landed on</b>, which is the one thing only the engine knows: her 终结技 rolls 50% per target, so against three enemies the answer can be 0, 1, 2 or 3. `scale: cast_applied:冻结` reads exactly that (Battle.recordCastApplied, filled by APPLY_CONTROL only when the roll passed) and `percent: 6` is the energy per landed application -- the same `percent × source` arithmetic 星期日's `target_max_energy` uses. ⚠ It is NOT `per_target: true`: that multiplies by the number of targets the ultimate <b>aimed at</b> (always 3 here), so a fully resisted ultimate would still pay 18 energy -- a wrong number with nothing to report. ⚠ This rule must come <b>after</b> the freeze rule above it: the effects of one event run in order, and this one reads what that one has landed so far (the same ordering fact the 加护 trace records; CastAppliedCountTest pins the shipped file, so a reorder goes red). ⚠ Not counted: a freeze left by an Ice <b>break</b> during the ultimate. The counter counts applications that went through the resist pipeline (Battle.tryApplyDebuff), while a break-attached control deliberately bypasses resistance, and 「每冻结1个目标」 is about the state this ability applies -- paying for break-freezes as well would be the aggressive reading of a sentence that does not distinguish them. ⚠ No `target`: 「为三月七恢复」 is the rule's owner, which is GAIN_ENERGY's default. ⚠ `min_eidolon: 1` is the gate: at 星魂 0 the freeze still happens and no energy is paid, and CastAppliedCountTest measures both halves of that contrast."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_RULE",
+        "rule": "counter",
+        "amount": 1
+      }
+    ],
+    "min_eidolon": 4,
+    "source": "1001 三月七 星魂 4 不愿再失去 (Avatar_March7th_Rank04) 第一句: 「天赋的<u>反击</u>效果每回合可触发的次数增加1次。」 param = [1, 0.3]",
+    "note": "「天赋的反击效果每回合可触发的次数**增加1次**」 -- the counter's `per_turn` goes from 2 to 3, and this is the sentence that says why `MODIFY_RULE` exists instead of \"just write another rule\": a second rule with `per_turn: 3` would <b>add</b> firings (the engine would fire 2 + 3 = 5 times a turn) and look perfectly reasonable in the file. `rule: \"counter\"` names the talent rule above by its `id`, `amount: 1` is how many extra firings per turn (a count -- a probability would be `percent`), and the engine files the amendment on <b>三月七 herself for this battle</b> (rules are compiled once per cid and cached, so writing 3 onto the rule would leak into every battle in the JVM). ⚠ `BATTLE_START` + `min_eidolon: 4` is the shape of a 星魂: unconditional for the whole fight, so the amendment never has to be taken back. ⚠ Load-time checks make the wrong shapes loud: an unknown id, a target rule that states no `per_turn` (nothing to raise -- and 0 + 1 would silently IMPOSE a one-per-turn cap), both `amount` and `percent`, or any other field. ⚠ The stated `per_turn: 2` stays in the talent rule: the file's own number and the raise are two facts, and folding them into one would erase this 星魂's line (the same reason 加护 does not touch the Skill's `turns: 3`). ⚠ NOT authored from this 星魂 (registered): the second sentence 「使反击造成的伤害值提高，提高数值等同于三月七防御力的30%」 -- it raises the counter's damage by a value <b>derived from an attribute</b>, and `BOOST_DAMAGE` takes a percentage of the instance's damage, not an addend computed from somebody's DEFENCE; the engine has no \"+X damage, where X = 30% of my DEF\" spelling yet, so writing 30% as a damage boost would be a different (and much larger) number."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_RULE",
+        "rule": "ultimate_freeze",
+        "percent": 0.15
+      }
+    ],
+    "source": "1001 三月七 行迹 冰咒 (1001103): 「施放终结技时，冻结敌方目标的<u>基础概率</u>提高15%。」",
+    "note": "「施放终结技时，冻结敌方目标的**基础概率**提高15%」 -- the freeze rule above states `base_chance: 0.5` and this raises it to **0.65**. `percent: 0.15` is how much more likely (a fraction of 1 -- a count would be `amount`), and the raise is filed on 三月七 for the battle, so the stated 0.5 in her file stays exactly the number the document gives. ⚠ Why not a second freeze rule with `base_chance: 0.65`: it would <b>roll twice</b> -- 1 − 0.5 × 0.35 = 82.5% instead of 65% -- and it would also apply the freeze's per-turn damage twice, with nothing anywhere reporting a problem. ⚠ Why `BATTLE_START`: the sentence's condition (「施放终结技时」) is already the event the raised rule fires on, and the trace is a passive -- there is no state to end, so an amendment made once for the battle is the whole mechanic. ⚠ Only `APPLY_CONTROL` reads a base-chance amendment today (it is the only op with a roll whose chance the documents raise), and `RuleAmendmentTest`'s boundary case pins 0.65 exactly: a roll of 0.6 lands and 0.7 does not."
   }
 ]
