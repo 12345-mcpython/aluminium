@@ -102,5 +102,21 @@
     ],
     "source": "1001 三月七 行迹 加护 (1001102): 「战技提供的护盾持续时间增加1回合。」",
     "note": "「战技**提供的**护盾持续时间增加1回合」: the rule states the duration and names the buff by its <b>origin</b> -- `buff: 护盾` plus the engine's own \"who applied it\" filter, which is what 「战技提供的」 says. It fires on the same cast as the Skill, and it sits <b>after</b> the shield rule in this file, which is what makes the shield already be there when it runs (effects of one event run in order; only *conditions* are all evaluated up front -- see ControlTest.aRuleCanGateOnTheFrozenState). ⚠ The +1 is deliberately NOT folded into the Skill's `turns: 3`: that would erase this trace's own line from the data and make the Skill state a duration that is not its own (and a trace could one day be gated on its own). ⚠ It lengthens exactly one buff: 三月七's timed buffs on that ally are the shield (fresh, because the Skill's own rule just re-applied it); anything else of hers carries a different name and is not touched."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "scale": "cast_applied:冻结",
+        "percent": 6
+      }
+    ],
+    "min_eidolon": 1,
+    "source": "1001 三月七 星魂 1 记忆中的你 (Avatar_March7th_Rank01): 「终结技每冻结1个目标，为三月七恢复6点能量。」 param = [6]",
+    "note": "「终结技**每冻结1个目标**，为三月七恢复6点能量」 -- the count is how many targets this ultimate's freeze <b>actually landed on</b>, which is the one thing only the engine knows: her 终结技 rolls 50% per target, so against three enemies the answer can be 0, 1, 2 or 3. `scale: cast_applied:冻结` reads exactly that (Battle.recordCastApplied, filled by APPLY_CONTROL only when the roll passed) and `percent: 6` is the energy per landed application -- the same `percent × source` arithmetic 星期日's `target_max_energy` uses. ⚠ It is NOT `per_target: true`: that multiplies by the number of targets the ultimate <b>aimed at</b> (always 3 here), so a fully resisted ultimate would still pay 18 energy -- a wrong number with nothing to report. ⚠ This rule must come <b>after</b> the freeze rule above it: the effects of one event run in order, and this one reads what that one has landed so far (the same ordering fact the 加护 trace records; CastAppliedCountTest pins the shipped file, so a reorder goes red). ⚠ Not counted: a freeze left by an Ice <b>break</b> during the ultimate. The counter counts applications that went through the resist pipeline (Battle.tryApplyDebuff), while a break-attached control deliberately bypasses resistance, and 「每冻结1个目标」 is about the state this ability applies -- paying for break-freezes as well would be the aggressive reading of a sentence that does not distinguish them. ⚠ No `target`: 「为三月七恢复」 is the rule's owner, which is GAIN_ENERGY's default. ⚠ `min_eidolon: 1` is the gate: at 星魂 0 the freeze still happens and no energy is paid, and CastAppliedCountTest measures both halves of that contrast."
   }
 ]

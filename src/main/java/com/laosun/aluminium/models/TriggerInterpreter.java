@@ -640,6 +640,14 @@ public final class TriggerInterpreter {
             battle.grantEnergy(target, scaledAmount(effect, ctx));
             return;
         }
+        String scale = effect.getScale().trim();
+        if (scale.startsWith(TriggerTable.CAST_APPLIED_PREFIX)) {
+            // 「每冻结1个目标，恢复6点能量」: percent is the amount PER landed application, so the count multiplies it.
+            // The count is the cast's own outcome (Battle.recordCastApplied), never the number of targets aimed at.
+            String state = scale.substring(TriggerTable.CAST_APPLIED_PREFIX.length()).trim();
+            battle.grantEnergy(target, effect.getPercent() * battle.castAppliedCount(state));
+            return;
+        }
         double maxEnergy = target.getMaxEnergy();
         if (maxEnergy <= 0) {
             throw new IllegalStateException(
@@ -1365,11 +1373,14 @@ public final class TriggerInterpreter {
                             + "the share is OF, so the share itself is missing "
                             + "(source: " + spec.getSource() + ")");
         }
-        if (!scales.contains(scale)) {
+        if (!scales.contains(scale) && !scale.startsWith(TriggerTable.CAST_APPLIED_PREFIX)) {
             throw new IllegalArgumentException(
                     "Op " + op + " has unknown \"scale\": '" + effect.getScale() + "'; known scales for this op "
                             + "are " + String.join(", ", scales.stream().sorted().toList())
                             + " (source: " + spec.getSource() + ")");
+        }
+        if (scale.startsWith(TriggerTable.CAST_APPLIED_PREFIX)) {
+            requireCastAppliedScale(effect, op, spec, scale);
         }
         requirePercent(effect, op, spec);
         if (effect.getPerTarget() != null) {
@@ -1378,6 +1389,53 @@ public final class TriggerInterpreter {
                             + "of one unit's " + what + " (source: " + spec.getSource() + ")");
         }
     }
+
+    /**
+     * Validates {@code "scale": "cast_applied:&lt;状态名&gt;"} — a per-<b>landed</b>-application multiplier.
+     *
+     * <p>Two things are checked, and both are mistakes that would otherwise be silent:
+     * <ul>
+     *   <li><b>the state name is one the engine rolls for</b> ({@link BuffManager#isRolledStateName}): 冻结 / 纠缠 /
+     *       禁锢 and the four DOT states. A typo would make the counter answer 0 forever — a rule that pays nothing,
+     *       with nothing to report;</li>
+     *   <li><b>the rule fires on a cast</b>. The record only exists while a cast's own events are being delivered
+     *       ({@code Battle.beginCast} … {@code endCastOutcome}); on {@code TAKING_HIT}, {@code TURN_START} or
+     *       {@code KILL} it would read the <i>previous</i> cast's numbers or 0 — the kind of stale value this project
+     *       refuses to leave implicit. The four cast events are the ones {@code SkillExecutor} fires inside that
+     *       window.</li>
+     * </ul>
+     */
+    private static void requireCastAppliedScale(EffectSpec effect, String op, TriggerSpec spec, String scale) {
+        String state = scale.substring(TriggerTable.CAST_APPLIED_PREFIX.length()).trim();
+        if (!BuffManager.isRolledStateName(state)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " counts applications of '" + state + "', which is not a state this engine rolls "
+                            + "for; known names are the control states (" + String.join(" / ",
+                            Constant.CONTROL_STATES.keySet().stream().sorted().toList())
+                            + ") and the DOT states (灼烧 / 触电 / 裂伤 / 风化), spelled as the documents spell them "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+        if (event == null || !CAST_EVENTS.contains(event)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " reads \"scale\": \"" + scale + "\" — the number of targets THIS CAST applied the "
+                            + "state to — but the rule fires on " + spec.getOn() + ", outside the window in which that "
+                            + "count exists (it is cleared once the cast's own events have been delivered). Cast "
+                            + "events: " + CAST_EVENTS.stream().map(Enum::name).sorted()
+                            .collect(java.util.stream.Collectors.joining(", "))
+                            + " (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * The events during which a cast's landed-application counts are readable.
+     *
+     * <p>Not "every event a cast can cause": {@code CAST_SETUP} fires <b>before</b> anything has landed (so it reads
+     * 0 by construction) and the other three are the delivered cast events. Keeping the list here, next to the
+     * validation that uses it, is what makes the window one fact instead of a comment.
+     */
+    private static final Set<TriggerEvent> CAST_EVENTS = Set.of(
+            TriggerEvent.CAST_SETUP, TriggerEvent.BASIC_ATTACK, TriggerEvent.SKILL_CAST, TriggerEvent.ULT_CAST);
 
     /**
      * The magnitude of a {@code HEAL} / {@code SHIELD} for one target: the flat {@code amount}, or a share of a
@@ -1516,7 +1574,11 @@ public final class TriggerInterpreter {
                     : new ControlBuff(control, effect.getTurns(), DamageElement.fromString(effect.getElement()),
                             dotMagnitude(effect, ctx));
             applied.setSource(ctx.owner());
-            battle.tryApplyDebuff(ctx.owner(), target, applied, baseChance, control.resistKey());
+            // ⚠ The roll's RESULT is recorded as well as used: 「每冻结1个目标」 counts the targets this cast really
+            // froze, so a resisted application must not be counted (see Battle.recordCastApplied).
+            if (battle.tryApplyDebuff(ctx.owner(), target, applied, baseChance, control.resistKey())) {
+                battle.recordCastApplied(control.name());
+            }
         }
     }
 
@@ -1554,7 +1616,11 @@ public final class TriggerInterpreter {
                 continue;
             }
             DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns());
-            battle.tryApplyDebuff(ctx.owner(), target, dot, baseChance, null);
+            if (battle.tryApplyDebuff(ctx.owner(), target, dot, baseChance, null)) {
+                // The DOT's state name is the document's name for the element (灼烧), from the one table that maps
+                // them — the same spelling 「每使1个目标陷入灼烧」 would count with.
+                battle.recordCastApplied(BuffManager.dotStateName(element));
+            }
         }
     }
 
