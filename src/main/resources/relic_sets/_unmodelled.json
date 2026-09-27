@@ -27,13 +27,6 @@
       "reason": "\"When the wearer is hit or has their HP consumed by an ally or themselves, their CRIT Rate increases by 8% for 2 turn(s) and up to 2 stacks.\" The 'is hit' half and the stacking are now expressible (TAKING_HIT + `max_stacks`), but 'has their HP consumed by an ally or themselves' is a second event the engine does not emit (the game's HP-consumption channel, not HP_LOST), and the ability is a disjunction -- authoring only the hit half would under-trigger it."
     }
   ],
-  "114": [
-    {
-      "require": 4,
-      "ability": "Ability51141",
-      "reason": "\"When the wearer uses their Ultimate on an ally, SPD for all allies increases by 12% for 1 turn(s). This effect cannot be stacked.\" The trigger exists (ULT_CAST) but the condition 'on an ally' does not: a cast has no single subject in the event contract (SkillExecutor passes target = null and only a hit count), so the rule would also fire for damaging ultimates."
-    }
-  ],
   "115": [
     {
       "require": 4,
@@ -55,25 +48,11 @@
       "reason": "\"Increases the wearer's CRIT Rate by 4%, and increases the wearer's CRIT DMG against enemy targets afflicted with at least 2/4 debuffs by 8%/12%. After the wearer inflicts a debuff on an enemy target, the above effect increases by 100% for 1 turn(s).\" The debuff COUNT is expressible (`target_debuff_count`), but CRIT DMG is read by the crit zone, not by the DMG-boost zone -- BOOST_DAMAGE cannot raise it for one instance, and a MODIFY_ATTR buff granted on DEALING_DAMAGE would persist past the hit it was meant for. The third clause adds a 'this effect x2 for N turns' layer on top. (The CRIT Rate in this effect is the `properties` stat, CriticalChanceBase 0.04.)"
     }
   ],
-  "118": [
-    {
-      "require": 4,
-      "ability": "Ability51181",
-      "reason": "\"When the wearer uses their Ultimate on an ally, all allies' Break Effect increases by 30% for 2 turn(s). This effect cannot be stacked.\" Same missing condition as set 114: 'on an ally' is not observable, because a cast event carries no subject."
-    }
-  ],
   "119": [
     {
       "require": 4,
       "ability": "Ability51191",
       "reason": "\"If the wearer's Break Effect is 150% or higher, the Break DMG dealt to the enemy target ignores 10% of their DEF. If the wearer's Break Effect is 250% or higher, the Super Break DMG additionally ignores 15%.\" The attribute threshold it needed arrived on 2026-09-27 (`self_attr:BREAKING_EFFECT >= 1.5`), and the two thresholds are NOT an extra gap (an upper bound makes the tiers exclusive -- see set 311). What blocks it: it applies to Break / Super Break DMG only, which the DSL cannot name, and it is scoped to THIS hit rather than to a window of turns -- a MODIFY_ATTR buff (which is how 翡翠's Eidolon 4 grants DEF ignore) would also raise the wearer's other damage in those turns. So it needs an instance-scoped ignore plus a condition on the pending instance's damage type."
-    }
-  ],
-  "121": [
-    {
-      "require": 4,
-      "ability": "Ability51211",
-      "reason": "\"When using Skill or Ultimate on one ally target, increases the ability target's CRIT DMG by 18%, lasting for 2 turn(s). This effect can stack up to 2 time(s).\" The 2-turn stacks are now expressible, but the cast event still carries no subject (SkillExecutor passes target = null and only a hit count), so neither 'on one ally target' nor 'the ability target' can be identified -- the buff would land on the wearer instead of the ally."
     }
   ],
   "125": [

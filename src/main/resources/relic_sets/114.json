@@ -1,0 +1,22 @@
+{
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.12,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "relic set 114 (骇域漫游的信使 / Messenger Traversing Hackerspace), 4-piece: 「对己方角色施放终结技时，我方全体速度提高#1[i]%，持续#2[i]回合。该效果不可叠加。」 param = [0.12, 1]",
+      "note": "「对**己方角色**施放终结技时」 is `target is_ally`: since M-35 a cast event carries the unit it AIMED at, and `is_ally` is what says that unit is on our side -- a damaging ultimate aimed at an enemy carries a target too, so without the side test the rule would fire on every ultimate. ⚠ `actor == self` keeps it to the WEARER's cast (`ULT_CAST` reaches every character's table). ⚠ 「持续1回合」 is a real turn count here (not `permanent`), and 「不可叠加」 is the engine's default for `MODIFY_ATTR` (same kind + same target refreshes instead of stacking), so it is written by saying nothing. ⚠ SPEED is a base attribute, so a literal `percent` is a share of the target's base speed (12% of 100 = +12), which is what 「速度提高 12%」 means."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "relic set 118 (机心戏梦的钟表匠 / Watchmaker, Master of Dream Machinations), 4-piece: 「对己方角色施放终结技时，我方全体击破特攻提高#1[i]%，持续#2[i]回合。该效果不可叠加。」 param = [0.3, 2]",
+      "note": "The sibling of set 114's rule: same trigger, same 「对己方角色」 reading (`target is_ally`), a different stat. ⚠ `BREAKING_EFFECT` is a ratio attribute, so the literal 0.3 is an absolute +30% (its unit is 1.0 = 100%), unlike the base attribute in set 114."
+    }
+  ]
+}
