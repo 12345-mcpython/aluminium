@@ -1,0 +1,18 @@
+[
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "BREAKING_EFFECT",
+        "scale": "self_attr:BREAKING_EFFECT",
+        "percent": 0.24,
+        "amount": 0.5,
+        "turns": 1,
+        "target": "other_allies"
+      }
+    ],
+    "source": "1321 大丽花 行迹 又一场葬礼: 「进入战斗时，使其他角色的击破特攻提高，提高数值等同于#1[i]%大丽花的击破特攻+#3[i]%，持续#2[i]回合。」 param = [0.24, 1, 0.5, 3] → #1 = 0.24, #2 = 1 回合, #3 = 0.5",
+    "note": "The party's Break Effect = **24% of her own** Break Effect **+ 50%** (0.5 in ratio units, 1.0 = 100%), for 1 turn. ⚠ The derived value is the reason `MODIFY_ATTR` grew a `scale` (P11-2, M-42): `percent` alone can only be a literal, and writing a number here would be wrong the moment her own Break Effect is not 0. ⚠ `scale: \"self_attr:BREAKING_EFFECT\"` is read off the **rule owner** (the same spelling the condition DSL uses), and it is read **when the rule fires**, then frozen — so a later change to her Break Effect does not retro-rewrite the buff. ⚠ **No `when` at all**, and that is not laziness: `BATTLE_START` is fired to every character's own table with **no actor and no target**, so `actor == self` there would be a rule that can never fire (the loader now refuses that spelling outright). The table *is* hers, so 「她的战斗开始时」 needs no condition. ⚠ `target: \"other_allies\"` is 「**其他**角色」: her own Break Effect is not touched (and note the derived value already counts hers, so granting it to herself would be a different sentence). ⚠ NOT authored: the second sentence 「当大丽花受到队友提供的治疗效果或护盾时，再次触发该效果，持续#4[i]回合，单个回合内不可重复触发」 — the healing half is expressible (HEALED + `actor != self`), the **shield** half is not (the engine has no \"a shield was granted\" event), and a half-authored retrigger would fire on heals alone; registered as M-43."
+  }
+]

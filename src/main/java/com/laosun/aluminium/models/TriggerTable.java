@@ -390,8 +390,12 @@ public class TriggerTable {
      * attribute threshold in the shipped data is about the wearer (「装备者的速度/暴击率/击破特攻/生命上限…」),
      * and an axis with one used value is an axis nobody has tested. Adding {@code target_attr:} later is a
      * few lines in the same place once some content actually needs it.
+     *
+     * <p>⚠ Package-private rather than private because {@code TriggerInterpreter} spells the <b>same</b> prefix for
+     * an effect's {@code "scale"} (「提高数值等同于<我自己的属性>的 X%」, M-42): the condition's "read my attribute"
+     * and the effect's "derive from my attribute" are one concept, and two literals would be able to drift.
      */
-    private static final String SELF_ATTR_PREFIX = "self_attr:";
+    static final String SELF_ATTR_PREFIX = "self_attr:";
 
     /**
      * The keyword of the named-state condition, and the parties it may ask about.
@@ -445,7 +449,8 @@ public class TriggerTable {
         if (hasState.find()) {
             String subject = normalize(text.substring(0, hasState.start()));
             String state = text.substring(hasState.end()).trim();
-            return new HasState(requireStateSubject(subject, raw, spec), state, raw, spec);
+            return new HasState(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw,
+                    spec);
         }
 
         // `has_path`: "<who> has_path 同谐" — the same shape, and for the same reason checked here first.
@@ -453,7 +458,7 @@ public class TriggerTable {
         if (hasPath.find()) {
             String subject = normalize(text.substring(0, hasPath.start()));
             String name = text.substring(hasPath.end()).trim();
-            return new HasPath(requireStateSubject(subject, raw, spec),
+            return new HasPath(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
                     requirePath(name, raw, spec), raw, spec);
         }
 
@@ -481,6 +486,7 @@ public class TriggerTable {
             if (term != null) {
                 String other = term.equals(left) ? right : left;
                 String variable = requireIdentityVariable(other, raw, spec);
+                requireCarriedParty(variable, raw, spec);
                 return new Equality(variable, term, negated);
             }
             // Neither side is "self", so this is not an identity comparison — it is a numeric one, and
@@ -663,6 +669,38 @@ public class TriggerTable {
                             + " (source: " + spec.getSource() + ")");
         }
         return path;
+    }
+
+    /**
+     * Refuses a condition that reads a party the event <b>never carries</b>.
+     *
+     * <p>{@link TriggerEvent#BATTLE_START} is fired once, to every character's table, with <b>no</b> actor and no
+     * target ({@code Battle.startBattle} → {@code fireTriggers(TriggerEvent.BATTLE_START)}). A rule written there
+     * as {@code "when": ["actor == self"]} therefore <b>can never fire</b> — and it looks completely reasonable,
+     * which is exactly the failure mode this DSL refuses everywhere else: a rule that loads, is filed under the
+     * right event, and silently does nothing. (Written by hand first, caught by the rule failing to grant anything,
+     * 2026-09-27.) On this event "my own table" is already the unit of delivery — the table <i>is</i> the owner's —
+     * so the condition was never needed.
+     *
+     * <p>{@code self} is always carried (the owner exists for every event) and is therefore always allowed.
+     *
+     * @param party the party token (already validated as a known one)
+     * @param raw   the original condition text, for the message
+     * @param spec  the owning rule, for the source and the event
+     * @return the party token
+     */
+    private static String requireCarriedParty(String party, String raw, TriggerSpec spec) {
+        if ("self".equals(party)) {
+            return party;
+        }
+        if (TriggerEvent.fromString(spec.getOn()) == TriggerEvent.BATTLE_START) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' asks about '" + party + "', but " + TriggerEvent.BATTLE_START.value()
+                            + " carries no actor and no target, so the rule could never fire. This event is delivered "
+                            + "to every character's own table, so \"my own battle start\" needs no condition at all "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return party;
     }
 
     private static boolean containsOperator(String text) {

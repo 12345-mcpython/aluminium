@@ -215,6 +215,7 @@ public final class TriggerInterpreter {
             case "MODIFY_ATTR" -> {
                 requireAttribute(effect, op, spec);
                 requirePercent(effect, op, spec);
+                requireDerivedScale(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireStackCap(effect, op, spec);
             }
@@ -742,14 +743,84 @@ public final class TriggerInterpreter {
      */
     private static void modifyAttr(Battle battle, EffectSpec effect, TriggerContext ctx) {
         AttributeType attribute = AttributeType.fromString(effect.getAttribute());
-        double percent = effect.getPercent();
+        // P11-2 (M-42): a **derived** magnitude — 「提高数值等同于<某人的属性>的 X% + Y%」. It is computed once,
+        // when the rule fires, and it is an ABSOLUTE number in the target attribute's units: the documents that
+        // need this state a value ("equal to 12% of Sunday's CRIT DMG plus 8%"), not a share of the target's base.
+        // ⚠ Which is why it does not go through `statModifier`'s usual base-attribute convention (`add_percent`).
+        boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
+        double magnitude = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             target.getBuffManager().addBuff(
-                    withLifetime(statModifier(attribute, percent, turns, permanent, maxStacks), effect));
+                    withLifetime(statModifier(attribute, magnitude, turns, permanent, maxStacks, derived), effect));
         }
+    }
+
+    /**
+     * The magnitude of a derived {@code MODIFY_ATTR}: {@code percent × <the rule owner's attribute> + amount}.
+     *
+     * <p>The first user is 大丽花's trace 「又一场葬礼」: 「进入战斗时，使其他角色的击破特攻提高，提高数值等同于 #1% 大丽花的
+     * 击破特攻 + #3%」 — a percentage of her own Break Effect plus a flat part, granted to the rest of the party.
+     *
+     * <p>⚠ <b>Read at fire time, then frozen.</b> The value is taken from the owner's <b>resolved</b> attribute (so it
+     * includes whatever buffs are on them at that moment) and stored in an ordinary modifier, so a later change to
+     * the owner's attribute does not retroactively rewrite it. That is the engine's existing snapshot convention
+     * (§24.5: a memosprite's panel is derived once, at summon time) and it is also what "提高数值等同于" means in
+     * the documents — a number that was computed, then held for the duration.
+     *
+     * <p>⚠ A missing attribute slot is a loud failure rather than {@code 0}: the alternative is a buff that grants
+     * nothing, which is a wrong number with no symptom.
+     */
+    private static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
+        AttributeType source = scaleAttribute(effect, effect.getOp(), null);
+        Character owner = requireCharacterOwner(effect, ctx);
+        DoubleValue value = owner.getAttribute(source);
+        if (value == null) {
+            throw new IllegalStateException(
+                    "MODIFY_ATTR derives its value from " + source + ", which " + owner.getName()
+                            + " has no resolved value for; the rule's \"scale\" cannot be read");
+        }
+        return effect.getPercent() * value.get() + (effect.getAmount() == null ? 0 : effect.getAmount());
+    }
+
+    /**
+     * The attribute a {@code "scale": "self_attr:<ATTRIBUTE>"} names.
+     *
+     * <p>Deliberately the same spelling as the condition DSL's variable ({@code self_attr:SPEED} —
+     * {@code TriggerTable.SELF_ATTR_PREFIX}, shared so the two cannot drift): one says "my Speed matters", the
+     * other says "the number is a share of my Speed", and both read the <b>rule owner</b>.
+     *
+     * @param effect the effect
+     * @param op     the op, for the error message
+     * @param spec   the rule, for the source ({@code null} when called at fire time, where the loader's message
+     *               already did its job)
+     * @return the attribute named by the scale
+     */
+    private static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
+        String raw = effect.getScale() == null ? "" : effect.getScale().trim();
+        String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
+        if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has \"scale\": \"" + effect.getScale() + "\", which is not a spelling this op "
+                            + "knows; a derived modifier names one of the RULE OWNER's attributes, e.g. "
+                            + "\"scale\": \"" + TriggerTable.SELF_ATTR_PREFIX + "BREAKING_EFFECT\"" + origin);
+        }
+        String name = raw.substring(TriggerTable.SELF_ATTR_PREFIX.length()).trim();
+        AttributeType attribute;
+        try {
+            attribute = AttributeType.fromString(name);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " derives its value from \"" + name + "\", which is not an attribute" + origin);
+        }
+        if (attribute.isPercentVariant()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " derives its value from '" + name + "', which is a builder-only input key "
+                            + "rather than a runtime attribute (name the base attribute)" + origin);
+        }
+        return attribute;
     }
 
     /**
@@ -1071,11 +1142,57 @@ public final class TriggerInterpreter {
      */
     private static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns,
                                                  boolean permanent, int maxStacks) {
+        return statModifier(attribute, percent, turns, permanent, maxStacks, false);
+    }
+
+    /**
+     * The same, for a magnitude that is already an <b>absolute</b> number in the attribute's own units.
+     *
+     * <p>See {@link #modifyAttr} for why a literal on a ratio attribute gets a flat modifier and a literal on a
+     * base attribute gets an additive percentage — and why a <b>derived</b> magnitude ({@code scale}) is flat even
+     * on a base attribute: 「提高数值等同于 X」 states a value, so treating it as "X% of the target's base" would
+     * multiply the derived number by the target's own stat.
+     */
+    private static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns,
+                                                 boolean permanent, int maxStacks, boolean absolute) {
         boolean debuff = percent < 0;
         // The sign is carried by `percent` itself (a negative value), which is what the original
         // percentBuff/flatBuff/… factories produced; only the modifier kind depends on the attribute.
-        return StatModifierBuff.of(attribute, attribute.isPercent ? "pure" : "add_percent", percent,
+        return StatModifierBuff.of(attribute, absolute || attribute.isPercent ? "pure" : "add_percent", percent,
                 debuff ? "debuff" : "buff", turns, false, permanent, maxStacks);
+    }
+
+    /**
+     * Validates the optional {@code scale} of a {@code MODIFY_ATTR}, and the flat {@code amount} that comes with it.
+     *
+     * <p>Two silent holes are closed here, both of the "the rule loads and does something other than what the file
+     * says" kind:
+     * <ul>
+     *   <li>a {@code scale} this op cannot read (a {@code HEAL}/{@code SHIELD} scale such as {@code target_max_hp},
+     *       or a typo) would otherwise be ignored, and the modifier would use {@code percent} as a literal — a
+     *       number that has nothing to do with the sentence;</li>
+     *   <li>an {@code amount} <b>without</b> a scale. It used to be ignored outright (nothing on this op read it),
+     *       and it is exactly what an author writes for "plus a flat part"; now that it means that, the case it
+     *       cannot mean is refused instead of being dropped.</li>
+     * </ul>
+     */
+    private static void requireDerivedScale(EffectSpec effect, String op, TriggerSpec spec) {
+        boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
+        if (!derived) {
+            if (effect.getAmount() != null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states \"amount\" without a \"scale\": a plain modifier's magnitude is "
+                                + "\"percent\", so the amount would be ignored. Either say what it is a share of "
+                                + "(\"scale\": \"" + TriggerTable.SELF_ATTR_PREFIX + "BREAKING_EFFECT\" plus "
+                                + "\"percent\") or write the number into \"percent\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return;
+        }
+        // The spelling and the attribute; also re-checks `percent`, because a scale with no magnitude is not a
+        // number ("some share of my Speed" says nothing about how much).
+        scaleAttribute(effect, op, spec);
+        requirePercent(effect, op, spec);
     }
 
     /**

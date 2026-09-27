@@ -18,7 +18,14 @@ import java.util.Map;
  */
 public enum TriggerEvent {
     /**
-     * ✅ {@code Battle.startBattle()} -- once for every combatant.
+     * ✅ {@code Battle.startBattle()} — delivered once to <b>every character's own table</b>, after the opening
+     * hooks and before {@code processRequests}.
+     *
+     * <p>⚠ <b>It carries no {@code actor} and no {@code target}.</b> This used to read "once for every combatant",
+     * which is true about the <i>delivery</i> and misleading about the <i>context</i>: a rule written here as
+     * {@code "when": ["actor == self"]} can never fire, and it looks entirely reasonable (hand-written that way on
+     * 2026-09-27, and the loader now refuses the spelling). "My own battle start" needs no condition because the
+     * table being fired <b>is</b> the owner's.
      */
     BATTLE_START("BATTLE_START", true),
     /**
