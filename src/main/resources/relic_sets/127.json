@@ -11,25 +11,25 @@
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
           "percent": 0.24,
-          "until": "next_attack"
+          "until": ["next_attack", "next_skill"]
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
           "percent": 0.24,
-          "until": "next_attack",
+          "until": ["next_attack", "next_skill"],
           "target": "summon"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.15,
-          "until": "next_attack",
+          "until": ["next_attack", "next_skill"],
           "target": "all_allies"
         }
       ],
       "source": "relic set 127 (再创天地的救世主 / Hero of the Shattered World), 4-piece: 「装备者施放普攻或战技后，若装备者的忆灵在场，使装备者及其忆灵生命上限提高#1[i]%，我方全体造成的伤害提高#2[i]%，持续至装备者下次施放普攻或战技后。」 param = [0.24, 0.15]",
-      "note": "The Basic-ATK half of the disjunction, as three effects in one rule (the wearer's Max HP, the memosprite's, and the party's damage). ⚠ `self_summon_count >= 1` is 「若装备者的忆灵在场」 AND it is what makes the `target: \"summon\"` effect legal: that selector fails loudly when nothing is out, so the condition is load-bearing rather than decorative. ⚠ The duration is the sentence's own problem: 「持续至装备者下次施放普攻或战技后」 is a DISJUNCTION of two events, and `until` names exactly one. This uses `next_attack`, which ends on a damaging Skill (an attack) but NOT on a support Skill -- a narrow, registered approximation (M-38); the alternative would be two buffs with two lifetimes, which the stacking rules make worse (they would replace each other). ⚠ 「我方全体造成的伤害」 is ALL_DAMAGE_TYPE_BOOST on `all_allies`, which reads the camp, so the memosprite gets it too (and it is not double-granted: the memosprite's own Max HP effect above is a different attribute)."
+      "note": "The Basic-ATK half of the disjunction, as three effects in one rule (the wearer's Max HP, the memosprite's, and the party's damage). ⚠ `self_summon_count >= 1` is 「若装备者的忆灵在场」 AND it is what makes the `target: \"summon\"` effect legal: that selector fails loudly when nothing is out, so the condition is load-bearing rather than decorative. ⚠ The duration names BOTH events -- 「持续至装备者下次施放普攻或战技后」 is a disjunction, and `until` takes a list, so the buff ends at the first of the two (M-38, closed 2026-09-28: the earlier single-name version let a support Skill leave it standing). ⚠ 「我方全体造成的伤害」 is ALL_DAMAGE_TYPE_BOOST on `all_allies`, which reads the camp, so the memosprite gets it too (and it is not double-granted: the memosprite's own Max HP effect above is a different attribute)."
     },
     {
       "on": "SKILL_CAST",
@@ -42,25 +42,25 @@
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
           "percent": 0.24,
-          "until": "next_attack"
+          "until": ["next_attack", "next_skill"]
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
           "percent": 0.24,
-          "until": "next_attack",
+          "until": ["next_attack", "next_skill"],
           "target": "summon"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.15,
-          "until": "next_attack",
+          "until": ["next_attack", "next_skill"],
           "target": "all_allies"
         }
       ],
       "source": "relic set 127 (再创天地的救世主 / Hero of the Shattered World), 4-piece: 「装备者施放普攻或战技后，若装备者的忆灵在场，…持续至装备者下次施放普攻或战技后。」 param = [0.24, 0.15]",
-      "note": "The Skill half, identical in effects to the Basic-ATK one: 「普攻或战技」 is a disjunction over two CASTS, and the engine splits those two at the emitter (BASIC_ATTACK / SKILL_CAST), so it takes two rules. Both carry `actor == self` because both events reach every character's table. Two rules is not duplication to be factored out: the trigger is the whole point of the pair."
+      "note": "The Skill half, identical in effects to the Basic-ATK one: 「普攻或战技」 is a disjunction over two CASTS, and the engine splits those two at the emitter (BASIC_ATTACK / SKILL_CAST), so granting it takes two rules while ENDING it takes one list. Both carry `actor == self` because both events reach every character's table. ⚠ The cast that grants the buff does not consume it: `SkillExecutor.execute` settles the landed attack (`resolveHits` → `fireAfterAttack`) and the buff-level cast notification (`broadcastSkillCast`) BEFORE it delivers these trigger events, so 「施放战技后…持续至下次施放…后」 lasts a whole interval instead of being granted and taken away by the same cast."
     }
   ]
 }

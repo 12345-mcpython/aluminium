@@ -513,7 +513,7 @@ public class MemospriteAttackTest {
 
     private static EffectSpec untilCritDamage(String target) {
         EffectSpec effect = TriggerSpecs.modifyAttr("CRIT_ATTACK", 0.3, null, null, null, null, target);
-        TriggerSpecs.set(effect, "until", "next_attack");
+        TriggerSpecs.set(effect, "until", List.of("next_attack"));
         return effect;
     }
 

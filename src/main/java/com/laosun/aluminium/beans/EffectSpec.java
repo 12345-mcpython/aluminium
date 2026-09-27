@@ -1,9 +1,18 @@
 package com.laosun.aluminium.beans;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * One effect inside a trigger (P8-7): "do this".
@@ -146,15 +155,66 @@ public class EffectSpec {
      *   <li>{@code "next_ultimate"} — after the owner casts an Ultimate.</li>
      * </ul>
      *
+     * <p><b>Several events may be named at once</b> — a list, and the buff ends at the <b>first</b> of them. The
+     * game states durations as disjunctions ("持续至装备者下次施放<b>普攻或战技</b>后", relic set 127), and naming
+     * only one of the two would be a wrong duration with nothing to see; two separate buffs would instead
+     * <b>replace each other</b> (same kind, same target) and leave only the last one up. {@code "until"} is
+     * therefore either one name or a list of them, and the set of names stays closed:
+     * {@code ["until": "next_attack"]} and {@code ["until": ["next_attack", "next_skill"]]} are both a single
+     * duration, not a fallback chain.
+     *
      * <p>⚠ Exactly one of {@code turns} / {@code permanent} / {@code until} may be stated; the interpreter
      * refuses two rather than picking one. ⚠ An attack that <b>hits nothing</b> does not consume it either: the
      * engine announces an attack only once a target has been hit. ⚠ A <b>follow-up attack does not consume</b>
      * it: derived hits (additional damage, true damage, DOT, break) are deliberately kept out of the
      * attack-level notification, which is what stops "additional damage kills → additional damage" from
      * recursing — registered as M-27 rather than worked around.
+     *
+     * <p>⚠ The event that <b>created</b> the buff does not consume it: the engine settles the landed attack
+     * ({@code Battle.fireAfterAttack}) and the buff-level cast notification before it delivers the cast trigger
+     * events that can create the buff, so 「施放普攻后…持续至下次施放普攻后」 lasts for a whole turn rather than
+     * being granted and immediately taken away.
      */
     @SerializedName("until")
-    private String until;
+    @JsonAdapter(UntilNames.class)
+    private List<String> until;
+
+    /**
+     * Reads {@code "until"} written either as one lifetime name or as a list of them.
+     *
+     * <p>Two shapes for one field, because both are natural to write and neither is wrong: a rule with a single
+     * ending event says {@code "until": "next_attack"}, while a rule whose text is a disjunction says
+     * {@code "until": ["next_attack", "next_skill"]}. Leaving the field a {@code String} would make the second
+     * shape a parse failure of the whole file; a {@code String} that the interpreter split on commas would make
+     * a typo ({@code "next_attak"}) into two lifetimes or none.
+     *
+     * <p>A {@link JsonDeserializer} rather than a {@code TypeAdapter}, because only reading has to bend — nothing
+     * writes these files back.
+     */
+    static class UntilNames implements JsonDeserializer<List<String>> {
+        @Override
+        public List<String> deserialize(JsonElement json, Type type, JsonDeserializationContext context) {
+            if (json == null || json.isJsonNull()) {
+                return null;
+            }
+            if (json.isJsonPrimitive()) {
+                return List.of(json.getAsString());
+            }
+            if (json.isJsonArray()) {
+                List<String> names = new ArrayList<>();
+                for (JsonElement element : json.getAsJsonArray()) {
+                    if (!element.isJsonPrimitive()) {
+                        throw new JsonParseException(
+                                "\"until\" must name lifetimes, but one entry is " + element);
+                    }
+                    names.add(element.getAsString());
+                }
+                return names;
+            }
+            throw new JsonParseException("\"until\" must be a lifetime name or a list of them, e.g. "
+                    + "\"next_attack\" or [\"next_attack\", \"next_skill\"], but is " + json);
+        }
+    }
 
     /**
      * Buff kind for {@code APPLY_BUFF}.

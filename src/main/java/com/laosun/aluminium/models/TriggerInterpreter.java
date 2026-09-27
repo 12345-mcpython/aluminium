@@ -19,6 +19,7 @@ import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -670,35 +671,51 @@ public final class TriggerInterpreter {
     }
 
     private static boolean eventBound(EffectSpec effect) {
-        return effect.getUntil() != null && !effect.getUntil().isBlank();
+        return effect.getUntil() != null && !effect.getUntil().isEmpty();
     }
 
     /**
-     * Attaches the rule's {@code "until": …} to a buff it just created (see {@link EffectSpec#getUntil()}).
+     * Attaches the {@code "until": …} a rule names to a buff it just created (see {@link EffectSpec#getUntil()}).
      *
      * <p>A no-op when the effect states no lifetime, so every buff that does not ask for one behaves exactly
-     * as before — the field's default is {@code Lifetime.NONE}.
+     * as before — the field's default is an <b>empty</b> set of ending events.
      */
     private static AbstractBuff withLifetime(AbstractBuff buff, EffectSpec effect) {
-        buff.setLifetime(lifetimeOf(effect));
+        buff.setLifetimes(lifetimesOf(effect));
         return buff;
     }
 
     /**
-     * The lifetime a validated effect names, or {@link AbstractBuff.Lifetime#NONE}.
+     * The lifetimes a validated effect names; <b>empty</b> when it names none.
+     *
+     * <p>Every name has already been checked against {@link #LIFETIMES} at load time, so anything else here is an
+     * engine-side inconsistency rather than a content error — hence {@link IllegalStateException}, exactly as
+     * before. A rule may name several (「普攻<b>或</b>战技」): they are collected into one set, and the buff ends at
+     * the first of them.
      */
-    private static AbstractBuff.Lifetime lifetimeOf(EffectSpec effect) {
-        String until = effect.getUntil();
-        if (until == null || until.isBlank()) {
-            return AbstractBuff.Lifetime.NONE;
+    private static Set<AbstractBuff.Lifetime> lifetimesOf(EffectSpec effect) {
+        List<String> until = effect.getUntil();
+        if (until == null || until.isEmpty()) {
+            return Set.of();
         }
-        return switch (until.trim().toLowerCase(Locale.ROOT)) {
-            case "next_attack" -> AbstractBuff.Lifetime.NEXT_ATTACK;
-            case "next_skill" -> AbstractBuff.Lifetime.NEXT_SKILL;
-            case "next_ultimate" -> AbstractBuff.Lifetime.NEXT_ULTIMATE;
-            default -> throw new IllegalStateException(
-                    "Lifetime '" + until + "' passed validation but has no implementation");
-        };
+        Set<AbstractBuff.Lifetime> lifetimes = EnumSet.noneOf(AbstractBuff.Lifetime.class);
+        for (String name : until) {
+            lifetimes.add(switch (name.trim().toLowerCase(Locale.ROOT)) {
+                case "next_attack" -> AbstractBuff.Lifetime.NEXT_ATTACK;
+                case "next_skill" -> AbstractBuff.Lifetime.NEXT_SKILL;
+                case "next_ultimate" -> AbstractBuff.Lifetime.NEXT_ULTIMATE;
+                default -> throw new IllegalStateException(
+                        "Lifetime '" + name + "' passed validation but has no implementation");
+            });
+        }
+        return lifetimes;
+    }
+
+    /**
+     * The lifetimes a rule states, spelled the way the file writes them, for error messages.
+     */
+    private static String spellUntil(EffectSpec effect) {
+        return effect.getUntil().stream().map(name -> "\"" + name + "\"").toList().toString();
     }
 
     /**
@@ -1029,10 +1046,10 @@ public final class TriggerInterpreter {
                     "Op " + op + " has no duration (it acts on a single moment), but states \"turns\": "
                             + effect.getTurns() + " (source: " + spec.getSource() + ")");
         }
-        if (effect.getUntil() != null && !effect.getUntil().isBlank()) {
+        if (eventBound(effect)) {
             throw new IllegalArgumentException(
                     "Op " + op + " creates no buff, so it has nothing an \"until\" could end; it states "
-                            + "\"until\": \"" + effect.getUntil() + "\" (source: " + spec.getSource() + ")");
+                            + "\"until\": " + spellUntil(effect) + " (source: " + spec.getSource() + ")");
         }
     }
 
@@ -1156,8 +1173,7 @@ public final class TriggerInterpreter {
      */
     private static void requireDuration(EffectSpec effect, String op, TriggerSpec spec) {
         boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
-        String until = effect.getUntil() == null ? null : effect.getUntil().trim();
-        boolean hasUntil = until != null && !until.isEmpty();
+        boolean hasUntil = eventBound(effect);
         if (permanent && effect.getTurns() != null) {
             throw new IllegalArgumentException(
                     "Op " + op + " has both \"turns\" (" + effect.getTurns()
@@ -1166,17 +1182,23 @@ public final class TriggerInterpreter {
         }
         if (hasUntil && (effect.getTurns() != null || permanent)) {
             throw new IllegalArgumentException(
-                    "Op " + op + " states \"until\": \"" + effect.getUntil() + "\" together with "
+                    "Op " + op + " states \"until\": " + spellUntil(effect) + " together with "
                             + (permanent ? "\"permanent\": true" : "\"turns\": " + effect.getTurns())
                             + "; \"until\" IS the duration (the buff ends when its owner does that), so the "
                             + "other one has to go (source: " + spec.getSource() + ")");
         }
         if (hasUntil) {
-            if (!LIFETIMES.contains(until.toLowerCase(Locale.ROOT))) {
-                throw new IllegalArgumentException(
-                        "Op " + op + " has unknown \"until\": '" + effect.getUntil() + "'; known lifetimes "
-                                + "are " + String.join(", ", LIFETIMES.stream().sorted().toList())
-                                + " (source: " + spec.getSource() + ")");
+            // Every name is checked, not just the first: 「普攻或战技」 written as a list must not let a typo in
+            // the second entry load (the buff would then end on one event while the file claims two).
+            for (String name : effect.getUntil()) {
+                String normalized = name.trim().toLowerCase(Locale.ROOT);
+                if (!LIFETIMES.contains(normalized)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " has unknown \"until\": '" + name + "' in " + spellUntil(effect)
+                                    + "; known lifetimes are "
+                                    + String.join(", ", LIFETIMES.stream().sorted().toList())
+                                    + " (source: " + spec.getSource() + ")");
+                }
             }
             return;
         }

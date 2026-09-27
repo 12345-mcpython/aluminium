@@ -153,6 +153,56 @@ public class BuffLifetimeTest {
     }
 
     // ==================================================================
+    // 1b. Several events at once: 「普攻或战技」
+    // ==================================================================
+
+    /**
+     * 「持续至装备者下次施放普攻<b>或</b>战技后」 — a duration that names two events ends at the <b>first</b> of them.
+     *
+     * <p>Relic set 127's sentence is a disjunction, and it is the case that tells a list of lifetimes apart from
+     * both wrong shapes: a single {@code next_attack} would ignore a Skill that attacks nothing (the case below,
+     * which the existing whiff rule pins from the other side), and one buff per event would make the two
+     * <b>replace</b> each other — same kind, same target — so only the later one would ever be up.
+     */
+    @Test
+    public void aDisjunctionEndsAtTheFirstOfItsEvents() {
+        // The half a lone `next_attack` cannot express: a cast that landed nothing still ends it.
+        Battle bySkill = battleWithBuff(List.of("next_attack", "next_skill"));
+        Character skilled = bySkill.characters.getFirst();
+        bySkill.enemyUnits().getFirst().takeDamage(9_999_999);
+        bySkill.processRequests();
+
+        attack(bySkill, skilled, 2, bySkill.enemyUnits().getFirst());   // a Skill, aimed at the dead enemy
+        Assertions.assertEquals(0, critRateBonus(skilled), EPS,
+                "the cast is the event, whether or not it connected");
+
+        // The other member, on its own: a basic attack ends it just as well.
+        Battle byAttack = battleWithBuff(List.of("next_attack", "next_skill"));
+        Character attacker = byAttack.characters.getFirst();
+
+        attack(byAttack, attacker, 1);
+        Assertions.assertEquals(0, critRateBonus(attacker), EPS,
+                "「普攻或战技」: either one is enough");
+    }
+
+    /**
+     * A second lifetime does not make the buff outlive its owner's death of a whiff: an attack that hits nothing
+     * is still not an attack ({@code next_attack}), and it is not a Skill cast either when it is a basic attack.
+     */
+    @Test
+    public void aWhiffedBasicAttackStillDoesNotConsumeTheDisjunction() {
+        Battle battle = battleWithBuff(List.of("next_attack", "next_skill"));
+        Character owner = battle.characters.getFirst();
+        battle.enemyUnits().getFirst().takeDamage(9_999_999);
+        battle.processRequests();
+
+        attack(battle, owner, 1, battle.enemyUnits().getFirst());
+
+        Assertions.assertEquals(0.5, critRateBonus(owner), EPS,
+                "no hit landed and no Skill was cast, so neither named event happened");
+    }
+
+    // ==================================================================
     // 2. Load-time validation
     // ==================================================================
 
@@ -165,6 +215,23 @@ public class BuffLifetimeTest {
         Assertions.assertTrue(unknown.getMessage().contains("next_atack"), unknown.getMessage());
         Assertions.assertTrue(unknown.getMessage().contains("next_attack"),
                 "the message must list the vocabulary: " + unknown.getMessage());
+    }
+
+    /**
+     * Every entry of a list is checked, not just the first.
+     *
+     * <p>Pinned because the tempting implementation — validate the first name, trust the rest — loads a rule whose
+     * file claims two events while the buff only ends on one: a wrong duration with nothing to see.
+     */
+    @Test
+    public void anUnknownLifetimeInsideAListIsRejected() {
+        List<String> mistyped = new java.util.ArrayList<>(List.of("next_attack"));
+        mistyped.add("next_atack");
+
+        IllegalArgumentException unknown = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER, List.of(rule(mistyped))));
+
+        Assertions.assertTrue(unknown.getMessage().contains("next_atack"), unknown.getMessage());
     }
 
     /** Stating a lifetime <i>and</i> a turn count is two disagreements, so it is refused. */
@@ -185,7 +252,7 @@ public class BuffLifetimeTest {
         EffectSpec boost = new EffectSpec();
         TriggerSpecs.set(boost, "op", "BOOST_DAMAGE");
         TriggerSpecs.set(boost, "percent", 0.1);
-        TriggerSpecs.set(boost, "until", "next_attack");
+        TriggerSpecs.set(boost, "until", List.of("next_attack"));
 
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new TriggerTable(OWNER, List.of(
@@ -248,7 +315,7 @@ public class BuffLifetimeTest {
         EffectSpec effect = rules.getFirst().effects().getFirst();
         Assertions.assertEquals("CRIT_CHANCE", effect.getAttribute());
         Assertions.assertEquals(0.6, effect.getPercent(), EPS, "param #3 is 0.6");
-        Assertions.assertEquals("next_attack", effect.getUntil(),
+        Assertions.assertEquals(List.of("next_attack"), effect.getUntil(),
                 "a lifetime, not a turn count: turns would expire on the wrong boundary");
         Assertions.assertNull(effect.getTurns(), "and the two are mutually exclusive");
     }
@@ -262,7 +329,16 @@ public class BuffLifetimeTest {
         return battleWithBuff(until, 1);
     }
 
+    /** The same, for a duration that names several events ("普攻<b>或</b>战技"). */
+    private static Battle battleWithBuff(List<String> until) {
+        return battleWithBuff(until, 1);
+    }
+
     private static Battle battleWithBuff(String until, int teamSize) {
+        return battleWithBuff(List.of(until), teamSize);
+    }
+
+    private static Battle battleWithBuff(List<String> until, int teamSize) {
         List<Character> team = new java.util.ArrayList<>();
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule(until))));
@@ -275,6 +351,10 @@ public class BuffLifetimeTest {
         return battle;
     }
 
+    private static TriggerSpec rule(List<String> until) {
+        return TriggerSpecs.rule("BATTLE_START", null, effect(until));
+    }
+
     private static TriggerSpec rule(String until) {
         return TriggerSpecs.rule("BATTLE_START", null, effect(until));
     }
@@ -285,6 +365,10 @@ public class BuffLifetimeTest {
     }
 
     private static EffectSpec effect(String until) {
+        return effect(List.of(until));
+    }
+
+    private static EffectSpec effect(List<String> until) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
         TriggerSpecs.set(effect, "attribute", "CRIT_CHANCE");
