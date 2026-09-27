@@ -501,7 +501,7 @@ public final class TriggerInterpreter {
             // The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance, and the only
             // op that consumes that amendment (APPLY_CONTROL) has to know which rule it is running inside. Passing it
             // down beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.
-            applyOne(battle, rule.id(), effect, ctx);
+            applyOne(battle, effect, ctx);
         }
     }
 
@@ -540,7 +540,7 @@ public final class TriggerInterpreter {
             if (rule.chance() < 1 && !battle.rollChance(rule.chance())) {
                 continue;
             }
-            apply(battle, rule, ctx);
+            apply(battle, rule, ctx.withRule(rule.id()));
             if (owner != null) {
                 // ⚠ The count recorded is the SAME number the check above used: recording the stated per_turn while
                 // checking the amended one would make an amended rule fire forever (its counter would never reach the
@@ -559,7 +559,7 @@ public final class TriggerInterpreter {
      * @param ruleId the id of the rule this effect belongs to ({@code ""} when it states none) — the handle a
      *               {@code MODIFY_RULE} amendment is filed under, read by {@code APPLY_CONTROL}
      */
-    private static void applyOne(Battle battle, String ruleId, EffectSpec effect, TriggerContext ctx) {
+    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String op = normalizeOp(effect, null);
         switch (op) {
             case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);
@@ -578,9 +578,10 @@ public final class TriggerInterpreter {
                     // ⚠ Both arms name the provider (`ctx.owner()`): 「装备者提供的护盾量提高 X%」 is about the
                     // *giver's* shields, so a grant with no provider would silently ignore the set bonus.
                     if (effect.getTurns() == null) {
-                        battle.grantShield(ctx.owner(), target, amount);
+                        battle.grantShield(ctx.owner(), target, amount, ctx.ruleId());
                     } else if (target != null && !target.isDeath()) {
-                        target.getBuffManager().addBuff(new ShieldBuff(ctx.owner(), amount, effect.getTurns()));
+                        target.getBuffManager().addBuff(
+                                withSource(new ShieldBuff(ctx.owner(), amount, effect.getTurns()), ctx));
                     }
                 }
             }
@@ -610,7 +611,7 @@ public final class TriggerInterpreter {
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "REMOVE_STATE" -> removeState(effect, ctx);
             case "TAUNT" -> taunt(battle, effect, ctx);
-            case "APPLY_CONTROL" -> applyControl(battle, ruleId, effect, ctx);
+            case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
             case "APPLY_DOT" -> applyDot(battle, effect, ctx);
             case "EXTEND_BUFF" -> extendBuff(battle, effect, ctx);
             case "RESIST_DEBUFF" -> resistDebuff(battle, effect, ctx);
@@ -1598,7 +1599,7 @@ public final class TriggerInterpreter {
      * is registered rather than folded in here as a field nobody else can use. What this op attaches is the state
      * itself, so 「不能行动」 is complete.
      */
-    private static void applyControl(Battle battle, String ruleId, EffectSpec effect, TriggerContext ctx) {
+    private static void applyControl(Battle battle, EffectSpec effect, TriggerContext ctx) {
         Constant.ControlEffect control = Constant.CONTROL_STATES.get(effect.getControl().trim());
         if (control == null) {
             // Load-time validation already refused this; reaching here means the table changed under a compiled
@@ -1616,7 +1617,7 @@ public final class TriggerInterpreter {
         // THIS rule's id. Read here rather than written into the effect: rules are compiled once and cached per cid,
         // so the stated 0.5 stays the file's number and the amendment is a fact about this battle.
         if (ctx.owner() != null) {
-            baseChance += ctx.owner().ruleBaseChanceBonus(ruleId);
+            baseChance += ctx.owner().ruleBaseChanceBonus(ctx.ruleId());
         }
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
@@ -1804,6 +1805,9 @@ public final class TriggerInterpreter {
      */
     private static AbstractBuff withSource(AbstractBuff buff, TriggerContext ctx) {
         buff.setSource(ctx.owner());
+        // …and WHICH RULE created it, so a condition can ask 「战技提供的护盾」 rather than 「三月七给的盾」 (see
+        // AbstractBuff.ruleId). Stamped here, at the one place every buff-creating op already passes through.
+        buff.setRuleId(ctx.ruleId());
         return buff;
     }
 

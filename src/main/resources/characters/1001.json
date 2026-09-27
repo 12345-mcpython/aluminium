@@ -1,6 +1,7 @@
 [
   {
     "on": "SKILL_CAST",
+    "id": "skill_shield",
     "when": [
       "actor == self"
     ],
@@ -145,5 +146,23 @@
     ],
     "source": "1001 三月七 行迹 冰咒 (1001103): 「施放终结技时，冻结敌方目标的<u>基础概率</u>提高15%。」",
     "note": "「施放终结技时，冻结敌方目标的**基础概率**提高15%」 -- the freeze rule above states `base_chance: 0.5` and this raises it to **0.65**. `percent: 0.15` is how much more likely (a fraction of 1 -- a count would be `amount`), and the raise is filed on 三月七 for the battle, so the stated 0.5 in her file stays exactly the number the document gives. ⚠ Why not a second freeze rule with `base_chance: 0.65`: it would <b>roll twice</b> -- 1 − 0.5 × 0.35 = 82.5% instead of 65% -- and it would also apply the freeze's per-turn damage twice, with nothing anywhere reporting a problem. ⚠ Why `BATTLE_START`: the sentence's condition (「施放终结技时」) is already the event the raised rule fires on, and the trace is a passive -- there is no state to end, so an amendment made once for the battle is the whole mechanic. ⚠ Only `APPLY_CONTROL` reads a base-chance amendment today (it is the only op with a roll whose chance the documents raise), and `RuleAmendmentTest`'s boundary case pins 0.65 exactly: a roll of 0.6 lands and 0.7 does not."
+  },
+  {
+    "on": "TURN_START",
+    "when": [
+      "target has_shield from_rule skill_shield"
+    ],
+    "do": [
+      {
+        "op": "HEAL",
+        "scale": "target_max_hp",
+        "percent": 0.04,
+        "amount": 106,
+        "target": "target"
+      }
+    ],
+    "min_eidolon": 6,
+    "source": "1001 三月七 星魂 6 就这样，一直… (Avatar_March7th_Rank06): 「在<u>战技提供的</u>护盾保护下的我方目标，每回合开始时回复等同于各自4%生命上限+106的生命值。」 param = [0.04, 106]",
+    "note": "Two clauses, and the first one is the whole reason this rule needed a new condition: 「在**战技提供的**护盾保护下的」 names the <b>ability</b>, not just the giver. ⚠ 三月七 has two shields of her own -- her Skill's (`id: \"skill_shield\"`, above) and 星魂 2's at battle start -- so a condition that only asked 「有盾」 or even 「我给的盾」 would heal an ally through the 星魂 2 shield as well, for the three turns it lasts: a wrong number with nothing to report. `has_shield from_rule skill_shield` reads exactly that rule's shield (`CanHit.getShieldRuleId()`, stamped on every buff a rule creates), and the negative case is pinned by `ShieldOriginConditionTest`: an ally holding only the battle-start shield is <b>not</b> healed. ⚠ 「各自4%生命上限」 is `scale: target_max_hp` + `percent: 0.04` -- a share of the RECIPIENT's own maximum, computed per target (that is what the scale family does; `owner_max_hp` would read 三月七's). The flat `+ 106` rides in `amount`, the 「share plus a constant」 shape the Skill's shield already uses. ⚠ The trigger 「每回合开始时」 is `TURN_START`, whose event carries the unit whose turn is beginning as BOTH `actor` and `target` -- so the rule fires once per ally per round, with `target` being the one to heal. ⚠ A turn start belongs to whoever's turn it is, so an enemy's turn start delivers the same event with `target` = that enemy: the condition is false for it (our shields are never on enemies), which is why no side filter is needed. ⚠ `min_eidolon: 6` is the gate. ⚠ This is the LAST clause of hers that today's vocabulary can carry completely: what remains registered is 星魂 3/5 (skill levels, `M-32`) and 战技's soft taunt (the document states no magnitude)."
   }
 ]

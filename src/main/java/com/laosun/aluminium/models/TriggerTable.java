@@ -161,7 +161,42 @@ public class TriggerTable {
                     }
                     requireAmendable(rule, effect, byId);
                 }
+                // `has_shield from_rule <id>`: same kind of reference, so the same pass resolves it. It must name a
+                // rule in this file AND that rule must actually create a shield — otherwise the condition can never
+                // hold, which is the silent failure this vocabulary keeps refusing.
+                for (Condition condition : rule.conditions()) {
+                    if (condition instanceof HasShield shield && !shield.ruleId.isEmpty()) {
+                        requireShieldSource(rule, shield, byId);
+                    }
+                }
             }
+        }
+    }
+
+    /**
+     * Checks {@code has_shield from_rule <id>}: the id resolves, and the rule it names really creates a shield.
+     *
+     * @param holder the rule carrying the condition
+     * @param shield the condition (its {@code ruleId} is the reference)
+     * @param byId   every named rule in this file
+     */
+    private static void requireShieldSource(CompiledRule holder, HasShield shield, Map<String, CompiledRule> byId) {
+        CompiledRule named = byId.get(shield.ruleId);
+        if (named == null) {
+            throw new IllegalArgumentException(
+                    "Condition '" + shield.raw + "' asks for a shield from the rule \"" + shield.ruleId
+                            + "\", which is not in this file; a reference only resolves inside the same table "
+                            + "(known ids: " + (byId.isEmpty() ? "none -- no rule here states an \"id\""
+                            : String.join(", ", byId.keySet().stream().sorted().toList())) + ") (source: "
+                            + holder.source() + ")");
+        }
+        boolean makesAShield = named.effects().stream().anyMatch(
+                effect -> "SHIELD".equalsIgnoreCase(effect.getOp() == null ? "" : effect.getOp().trim()));
+        if (!makesAShield) {
+            throw new IllegalArgumentException(
+                    "Condition '" + shield.raw + "' asks for a shield from the rule \"" + shield.ruleId
+                            + "\", but that rule states no SHIELD effect, so the condition could never hold "
+                            + "(source: " + holder.source() + ")");
         }
     }
 
@@ -721,6 +756,12 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])has_shield(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The {@code from_rule} qualifier of {@code has_shield}: the shield was created by the rule with this id.
+     */
+    private static final Pattern FROM_RULE =
+            Pattern.compile("(?<![\\w])from_rule(?![\\w])\\s*", Pattern.CASE_INSENSITIVE);
+
+    /**
      * The {@code from_skill} keyword: "the instance that caused this event came from this slot"
      * (「施放<b>战技</b>对敌方目标造成弱点击破时」).
      */
@@ -824,19 +865,31 @@ public class TriggerTable {
                     requirePath(name, raw, spec), raw, spec);
         }
 
-        // `has_shield`: "<who> has_shield" — argument-less like `is_ally`.
+        // `has_shield`: "<who> has_shield" — argument-less like `is_ally` — or "<who> has_shield from_rule <id>",
+        // which asks about the shield's ORIGIN rather than its existence (「战技提供的护盾」, 1001 星魂 6).
         Matcher hasShield = HAS_SHIELD.matcher(text);
         if (hasShield.find()) {
             String subject = normalize(text.substring(0, hasShield.start()));
             String trailing = text.substring(hasShield.end()).trim();
+            String ruleId = "";
             if (!trailing.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "Condition '" + raw + "' writes something after \"has_shield\": it takes no argument "
-                                + "(write \"target has_shield\", or \"!target has_shield\" for the opposite) "
-                                + "(source: " + spec.getSource() + ")");
+                Matcher fromRule = FROM_RULE.matcher(trailing);
+                if (!fromRule.lookingAt()) {
+                    throw new IllegalArgumentException(
+                            "Condition '" + raw + "' writes something after \"has_shield\": it takes no argument, or "
+                                    + "\"from_rule <id>\" to ask which rule created the shield "
+                                    + "(source: " + spec.getSource() + ")");
+                }
+                ruleId = trailing.substring(fromRule.end()).trim();
+                if (ruleId.isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "Condition '" + raw + "' says \"from_rule\" but names no rule; give the id of the rule "
+                                    + "that creates the shield (that rule states \"id\": \"…\") "
+                                    + "(source: " + spec.getSource() + ")");
+                }
             }
-            return new HasShield(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw,
-                    spec);
+            return new HasShield(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
+                    ruleId, raw, spec);
         }
 
         // `from_skill COMMON|SKILL|ULTRA|TALENT`: the causing instance's cast category. No subject: the "who" is
@@ -1258,16 +1311,39 @@ public class TriggerTable {
      *                 name one ({@link TriggerEvent#BREAK} / {@link TriggerEvent#KILL} / {@link
      *                 TriggerEvent#DEALING_DAMAGE}); {@code null} = "no cast caused it", which is what a break from a
      *                 rule-driven toughness reduction honestly is
+     * @param ruleId   the {@code id} of the rule being applied ({@code ""} when it states none), written per <b>rule</b>
+     *                 by the interpreter. It is what lets a buff remember which rule created it
+     *                 ({@code AbstractBuff.getRuleId()}), which is how 「**战技提供的**护盾」 is asked about
      */
     public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
-                                 Damage damage, Battle battle, SkillCategory fromCast) {
+                                 Damage damage, Battle battle, SkillCategory fromCast, String ruleId) {
+
+        /**
+         * The same context for an event that carries no cast category — i.e. the common case.
+         */
+        public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
+                              Damage damage, Battle battle, SkillCategory fromCast) {
+            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "");
+        }
+
+        /**
+         * The same context, as the rule under it: the one caller that knows which rule is firing.
+         *
+         * <p><b>Why a copy rather than a mutable field.</b> A rule can fire inside another rule's effect (a counter
+         * that strikes back), so "the rule being applied" is a per-firing fact, exactly like the rest of the context
+         * — a shared mutable field would report the inner rule to the outer one's remaining effects.
+         */
+        public TriggerContext withRule(String id) {
+            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
+                    id == null ? "" : id);
+        }
 
         /**
          * The same context for an event that carries no cast category — i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle) {
-            this(owner, actor, target, hitCount, amount, damage, battle, null);
+            this(owner, actor, target, hitCount, amount, damage, battle, null, "");
         }
 
         /**
@@ -1283,7 +1359,7 @@ public class TriggerTable {
         }
 
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0, null, null);
+            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "");
         }
     }
 
@@ -1538,17 +1614,19 @@ public class TriggerTable {
      * it reads the <b>live</b> value rather than asking the buff manager for a {@code ShieldBuff} — the two agree
      * while a timed shield is up (the buff installs it), and the value is the one the damage path actually drains.
      *
-     * <p>⚠ The engine cannot yet answer 「这面盾是不是<b>我</b>给的」 — the shield remembers its installing buff and
-     * that buff remembers its caster ({@code ShieldBuff.getSource()} / {@code CanHit.installShield}), but no
-     * condition exposes the caster. Registered as a gap instead of guessed at: 星魂 6's 「在<b>战技提供的</b>护盾保护下」
-     * and 遗器 103/110/120's 「装备者提供的护盾量」 both need it.
+     * <p>⚠ <b>The origin is askable too</b> ({@code has_shield from_rule <id>}, 2026-09-28): 「战技提供的护盾」 names the
+     * ability, not just the giver, and 三月七 has two shields of her own — so the shield records the rule that created it
+     * ({@code CanHit.getShieldRuleId()}) and this condition can require it. ⚠ A raw grant states no rule, so a
+     * {@code from_rule} question correctly answers "no" for it.
      */
     private static final class HasShield implements Condition, PartyCondition {
         private final String subject;
+        private final String ruleId;
         private final String raw;
 
-        HasShield(String subject, String raw, TriggerSpec spec) {
+        HasShield(String subject, String ruleId, String raw, TriggerSpec spec) {
             this.subject = subject;
+            this.ruleId = ruleId == null ? "" : ruleId;
             this.raw = raw;
         }
 
@@ -1565,7 +1643,12 @@ public class TriggerTable {
         @Override
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
-            return who != null && who.getShield() > 0;
+            if (who == null || who.getShield() <= 0) {
+                return false;
+            }
+            // No qualifier: any living shield counts. With one: the shield must have come from THAT rule, which is
+            // what makes 「战技提供的」 different from 「三月七给的」 (see CanHit.getShieldRuleId).
+            return ruleId.isEmpty() || ruleId.equals(who.getShieldRuleId());
         }
 
         @Override

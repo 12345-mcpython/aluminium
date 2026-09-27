@@ -1603,11 +1603,28 @@ public class Battle {
      * @return the shield value actually set
      */
     public double grantShield(CanHit provider, CanHit target, double amount) {
+        return grantShield(provider, target, amount, "");
+    }
+
+    /**
+     * The same, also recording <b>which rule</b> created the shield.
+     *
+     * <p>The rule id is what tells two shields from one giver apart: 「战技提供的护盾」 (1001 三月七 星魂 6) must not
+     * answer for the shield her 星魂 2 gives at battle start. A grant that names no rule states {@code ""}, and a
+     * condition asking for a named rule then correctly answers "no".
+     *
+     * @param provider who is granting it ({@code null} = unknown, so unboosted)
+     * @param target   the one gaining the shield (no effect if already dead)
+     * @param amount   the shield amount before the provider's boost (≤ 0 is treated as clearing the shield)
+     * @param ruleId   the id of the rule granting it ({@code ""} = unnamed)
+     * @return the shield value actually set
+     */
+    public double grantShield(CanHit provider, CanHit target, double amount, String ruleId) {
         if (target == null || target.isDeath()) {
             return 0;
         }
         double value = boostedShield(provider, amount);
-        target.setShield(value);
+        target.setShield(value, provider, ruleId);
         return value;
     }
 
