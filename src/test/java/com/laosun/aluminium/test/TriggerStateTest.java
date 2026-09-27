@@ -204,6 +204,96 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
+    // 4. `has_path` and the `!` prefix (M-41)
+    // ==================================================================
+
+    /**
+     * {@code has_path} reads the Path off the named party — 姬子 is 智识 (Erudition) and 停云 is 同谐 (Harmony).
+     *
+     * <p>Same shape as {@code has_state}: the left side names a party, so "the target is on this Path" and
+     * "I am on this Path" are the same mechanism. The Path itself is engine knowledge already
+     * ({@code Character.getPath()} — the aggro tier), so nothing about it is new data.
+     */
+    @Test
+    public void hasPathReadsTheNamedPartysPath() {
+        Battle battle = withAlly(
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 同谐"), gain(1)),
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 智识"), gain(2)));
+        Character owner = battle.characters.getFirst();
+        Character harmony = battle.characters.get(1);
+        drainSkillPoints(battle);
+
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0),
+                "停云 is 同谐: only the first rule matches");
+        Assertions.assertEquals(1, battle.getSkillPoints(), "and it is the one that granted a point");
+    }
+
+    /** A near miss is refused where the file is read, and the message lists the vocabulary. */
+    @Test
+    public void anUnknownPathNameIsRefused() {
+        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER,
+                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 同谐谐"), gain(1)))));
+
+        Assertions.assertTrue(rejected.getMessage().contains("同谐谐"), rejected.getMessage());
+        Assertions.assertTrue(rejected.getMessage().contains("同谐"), rejected.getMessage());
+    }
+
+    /**
+     * {@code !} inverts the condition — the exception 星期日's Skill is written as.
+     *
+     * <p>Both directions in one case, because "it fires for the other Path" and "it does not fire for 同谐" are
+     * two different claims and a wrong implementation can satisfy either alone.
+     */
+    @Test
+    public void negationInvertsTheCondition() {
+        Battle battle = withAlly(
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path 同谐"), gain(1)));
+        Character owner = battle.characters.getFirst();
+        Character harmony = battle.characters.get(1);
+        drainSkillPoints(battle);
+
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0),
+                "the target IS 同谐, so the negated condition fails");
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
+                "姬子 is 智识, so it holds");
+    }
+
+    /**
+     * ⚠ A negated condition still <b>fails</b> when its party does not exist.
+     *
+     * <p>This is the trap the prefix could have walked into: the positive spelling guarantees "a missing party is
+     * never the accidental reason a rule matched" (a missing party reads as {@code false}), and a naive
+     * {@code !inner.test(ctx)} would invert exactly that into {@code true}. {@code Negated} asks the inner
+     * condition for its party first, and this case is what pins it.
+     */
+    @Test
+    public void negatedConditionStillFailsWhenThePartyIsMissing() {
+        Battle battle = battleWith(
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path 同谐"), gain(1)));
+        Character owner = battle.characters.getFirst();
+        drainSkillPoints(battle);
+
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
+                "there is no target for this event: the negation must not turn that into a match");
+    }
+
+    /**
+     * ⚠ Only a party-reading condition may be negated, and the message says what to write instead.
+     *
+     * <p>For a number, "cannot read it" and "is zero" are different facts ({@code NaN} comparisons are all false,
+     * so {@code !(NaN > 0)} is <b>true</b>), and the DSL already has the honest spelling for the second one.
+     */
+    @Test
+    public void negatingANumberIsRefused() {
+        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER,
+                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("!self_summon_count >= 1"), gain(1)))));
+
+        Assertions.assertTrue(rejected.getMessage().contains("self_summon_count == 0"), rejected.getMessage());
+    }
+
+    // ==================================================================
     // Helpers
     // ==================================================================
 
