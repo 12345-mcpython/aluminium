@@ -307,6 +307,56 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
+    // 3c. `is_ally` — which SIDE the unit the event names is on
+    // ==================================================================
+
+    /**
+     * {@code target is_ally} is true for one of ours and false for an enemy.
+     *
+     * <p>The condition exists for 「对<b>己方角色</b>施放终结技时」 (relic sets 114/118/121): a cast event carries the
+     * unit it AIMED at, and a damaging cast aimed at an enemy carries one too — so without the side test the rule
+     * would fire on every cast of that slot.
+     */
+    @Test
+    public void isAllyReadsTheUnitsSide() {
+        Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target is_ally"), gain(1)));
+        Character owner = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+        Enemy enemy = dummy();
+        drainSkillPoints(battle);
+
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0),
+                "a teammate is on our side");
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0),
+                "…and an enemy target is not: the rule must not fire on a cast aimed at the other side");
+    }
+
+    /** {@code !target is_ally} is the opposite, and — like every negated party condition — fails with no target. */
+    @Test
+    public void isAllyNegatedIsTheOtherSide() {
+        Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("!target is_ally"), gain(1)));
+        Character owner = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+        Enemy enemy = dummy();
+        drainSkillPoints(battle);
+
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0));
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0));
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
+                "no target at all is not \"the other side\" either");
+    }
+
+    /** It takes no argument, so anything after the keyword is refused while the file is read. */
+    @Test
+    public void isAllyTakesNoArgument() {
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER,
+                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target is_ally 我方"), gain(1)))));
+
+        Assertions.assertTrue(refused.getMessage().contains("is_ally"), refused.getMessage());
+    }
+
+    // ==================================================================
     // 4. `has_path` and the `!` prefix (M-41)
     // ==================================================================
 

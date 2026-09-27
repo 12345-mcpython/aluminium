@@ -71,6 +71,12 @@ public class RelicAbilityBatchTest {
     private static final int POET = 124;
     private static final int SERENE_DEMESNE = 319;
     private static final int RAPT_BROODING = 320;
+    /** 「对己方角色施放」 family, authored 2026-09-27 with the `is_ally` condition. */
+    private static final int MESSENGER = 114;
+    private static final int WATCHMAKER = 118;
+    private static final int SACERDOS = 121;
+    private static final int SKILL_SLOT = 2;
+    private static final int ULT_SLOT = 3;
 
     // ==================================================================
     // 102 — 普攻伤害 +10%
@@ -378,6 +384,77 @@ public class RelicAbilityBatchTest {
                 "the upper tier on the wearer, with no lower tier added on top");
         Assertions.assertEquals(0.2, boostOf(evey, AttributeType.OUTGOING_HEALING_BOOST), 1e-6,
                 "and on the memosprite");
+    }
+
+    // ==================================================================
+    // 114 / 118 / 121 — 「对己方角色施放」 (`target is_ally`, 2026-09-27)
+    // ==================================================================
+
+    /**
+     * 114 骇域漫游的信使: the wearer's Ultimate <b>on an ally</b> speeds the whole side up — and aimed at an enemy it
+     * does nothing at all.
+     *
+     * <p>⚠ Both halves in one case on purpose: the contrast is the whole reason the condition exists (`actor == self`
+     * alone would fire for a damaging ultimate too), and a test that only checked the ally half would pass for a rule
+     * that never looks at the target.
+     */
+    @Test
+    public void theMessengerUltimateHastesThePartyOnlyWhenItTargetsAnAlly() {
+        Character wearer = wearing(MESSENGER);
+        Character ally = CharacterFactory.create(1210, LEVEL);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        double speedBefore = boostOf(ally, AttributeType.SPEED);
+
+        battle.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), wearer, List.of(ally));
+
+        Assertions.assertEquals(speedBefore * 0.12, boostOf(ally, AttributeType.SPEED) - speedBefore, 1e-6,
+                "「我方全体速度提高#1[i]%」 -- #1 = 0.12, a share of the target's base speed");
+
+        Battle aimedAtEnemy = new Battle(List.of(wearing(MESSENGER), CharacterFactory.create(1210, LEVEL)),
+                List.of(dummy()), new Random(0));
+        aimedAtEnemy.startBattle();
+        Character second = aimedAtEnemy.characters.get(1);
+        double secondBefore = boostOf(second, AttributeType.SPEED);
+
+        aimedAtEnemy.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), aimedAtEnemy.characters.getFirst(),
+                List.of(aimedAtEnemy.enemyUnits().getFirst()));
+
+        Assertions.assertEquals(secondBefore, boostOf(second, AttributeType.SPEED), 1e-6,
+                "aimed at an ENEMY: 「对己方角色」 does not hold, so nothing is granted");
+    }
+
+    /** 118 梦游者钟表匠: the same trigger, a ratio attribute (+30% Break Effect, 2 turns). */
+    @Test
+    public void theWatchmakerUltimateRaisesThePartysBreakEffect() {
+        Character wearer = wearing(WATCHMAKER);
+        Character ally = CharacterFactory.create(1210, LEVEL);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        double before = boostOf(ally, AttributeType.BREAKING_EFFECT);
+
+        battle.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), wearer, List.of(ally));
+
+        Assertions.assertEquals(0.3, boostOf(ally, AttributeType.BREAKING_EFFECT) - before, 1e-6,
+                "「击破特攻提高#1[i]%」 -- a ratio attribute, so 0.3 is an absolute +30%");
+    }
+
+    /** 121 祭司的旧日祭礼: the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states. */
+    @Test
+    public void theSacerdosSkillBuffsTheAimedAllyAndStacksTwice() {
+        Character wearer = wearing(SACERDOS);
+        Character ally = CharacterFactory.create(1210, LEVEL);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        double before = boostOf(ally, AttributeType.CRIT_ATTACK);
+
+        battle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), wearer, List.of(ally));
+        Assertions.assertEquals(0.18, boostOf(ally, AttributeType.CRIT_ATTACK) - before, 1e-6,
+                "「使该目标暴击伤害提高#1[i]%」 -- #1 = 0.18, on the unit the cast was AIMED at");
+
+        battle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), wearer, List.of(ally));
+        Assertions.assertEquals(0.36, boostOf(ally, AttributeType.CRIT_ATTACK) - before, 1e-6,
+                "「最多叠加#3[i]层」 -- two casts, two stacks (the engine's default would have REPLACED the first)");
     }
 
     // ==================================================================
