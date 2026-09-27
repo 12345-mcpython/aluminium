@@ -242,18 +242,37 @@ public class March7thKitTest {
     }
 
     /**
+     * 行迹「加护」: 「战技提供的护盾持续时间增加1回合」.
+     *
+     * <p>⚠ The +1 is a <b>separate rule</b> from the Skill's shield, and it has to run after it in the same event —
+     * which it does, because effects of one event run in order (only *conditions* are all evaluated up front). The
+     * two numbers therefore stay in two rules, and the trace can be gated on its own one day.
+     */
+    @Test
+    public void theGraceTraceLengthensTheShieldHerSkillJustApplied() {
+        Fixture f = new Fixture();
+        f.shieldTheAlly();
+
+        com.laosun.aluminium.models.buff.ShieldBuff shield =
+                f.ally.getBuffManager().findBuff(com.laosun.aluminium.models.buff.ShieldBuff.class);
+
+        Assertions.assertEquals(4, shield.duration(),
+                "3 turns from the Skill + 1 from 加护 -- 「战技提供的护盾持续时间增加1回合」");
+    }
+
+    /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
-     * <p>Five clauses exist and each is pinned above; the counts here are what says nothing else was written. Every
+     * <p>Six clauses exist and each is pinned above; the counts here are what says nothing else was written. Every
      * missing one would be a wrong number or a wrong trigger if it were spelled with the vocabulary that exists
      * today: 星魂 1 needs a per-cast count of the victims a state actually landed on, 星魂 4 needs a way to raise
      * another rule's limit plus a DEF-derived damage addend, 行迹「冰咒」 needs a way to raise an existing rule's
-     * base chance, and 加护 / 星魂 6 need the shield's provider.
+     * base chance, and 星魂 6 needs the shield's provider to be askable.
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
-        Assertions.assertEquals(2, TriggerTables.of(MARCH).ruleCount(TriggerEvent.SKILL_CAST),
-                "the shield and the cleanse trace -- and nothing else on her Skill");
+        Assertions.assertEquals(3, TriggerTables.of(MARCH).ruleCount(TriggerEvent.SKILL_CAST),
+                "the shield, the cleanse trace and 加护 (the shield's +1 turn) -- and nothing else on her Skill");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TAKING_HIT),
                 "the Talent's counter");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),

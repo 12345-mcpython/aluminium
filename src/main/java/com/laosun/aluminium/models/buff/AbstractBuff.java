@@ -299,4 +299,23 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     protected void decreaseDuration() {
         remainingDuration--;
     }
+
+    /**
+     * Adds turns to this buff's remaining duration — 「…的持续时间<b>增加1回合</b>」.
+     *
+     * <p><b>Why this is on the base class.</b> Every timed buff already has a duration, and a whole family of
+     * trace/Eidolon sentences lengthens one that is <b>already up</b> rather than creating a new one (10 of the 97
+     * documents say 「持续时间增加」 or 「持续时间延长」). Without it, such a sentence has to be folded into the numbers
+     * of the ability it lengthens — which hides the trace's own line and quietly changes the base ability's stated
+     * value.
+     *
+     * <p>⚠ A <b>permanent</b> buff has no countdown to lengthen, so nothing happens to one: {@code permanent} means
+     * "never ticked", and adding turns would be a number nobody ever reads. The caller
+     * ({@code BuffManager.extendBuffsFrom}) filters those out; this method only does the arithmetic.
+     *
+     * @param turns how many turns to add (positive; the op that calls this validates that)
+     */
+    public void extendDuration(int turns) {
+        remainingDuration += turns;
+    }
 }
