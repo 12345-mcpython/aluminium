@@ -140,6 +140,15 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
+     * 持续伤害类: 「抵抗持续伤害类负面状态的概率提高50%」 (1008 坚韧) is an answer about this family — and because it is
+     * the <b>element</b> that makes a DOT a DOT, a fifth element would be covered the day it exists.
+     */
+    @Override
+    public com.laosun.aluminium.enums.DebuffClass debuffClass() {
+        return com.laosun.aluminium.enums.DebuffClass.DOT;
+    }
+
+    /**
      * Nothing to attach: a DOT changes no attribute, it only deals damage when it settles.
      */
     @Override

@@ -249,6 +249,22 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         return false;
     }
 
+    /**
+     * Which <b>class</b> of negative state this buff is, or {@code null} when it belongs to none.
+     *
+     * <p>It exists for the two sentences that protect against a whole family — 「抵抗<b>控制类</b>负面状态的概率提高35%」
+     * (克拉拉 守护) and 「免疫<b>控制类</b>负面状态」 (长夜月's 忆灵「长夜」) — and the point is that a <b>new</b> state of
+     * that family is covered the day it is written, instead of falling outside a hand-kept list of resistance keys.
+     * Like {@link #isDebuff()}, the answer comes from the buff class itself, which is the only place that knows.
+     *
+     * <p>⚠ The default is {@code null}, which is the safe direction: an unclassified state is <b>not</b> blocked by a
+     * class resistance, so this vocabulary cannot silently make content immune to something its text never mentions.
+     * A buff that IS in a class says so where it is defined ({@link ControlBuff}, {@link DotBuff}).
+     */
+    public com.laosun.aluminium.enums.DebuffClass debuffClass() {
+        return null;
+    }
+
     @Override
     public abstract void applyEffect(CanHit target);
 
