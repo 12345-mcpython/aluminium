@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models.buff;
 
+import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 
 /**
@@ -43,7 +44,9 @@ public class ShieldBuff extends AbstractBuff {
     /**
      * @param source the unit whose effect granted the shield ({@code null} = unknown), which is who
      *               「装备者提供的护盾」 would name — see {@link #getSource()}
-     * @param amount the shield value (already scaled and resolved by the caller)
+     * @param amount the shield value <b>before</b> the provider's 「提供的护盾量提高」 (already scaled and resolved by
+     *               the caller); the boost is applied here, once, so that this buff's {@link #getAmount()} is the same
+     *               number {@code Battle.grantShield} would install on the untimed path
      * @param turns  how many of the <b>carrier's</b> turns it lasts; must be positive
      */
     public ShieldBuff(CanHit source, double amount, int turns) {
@@ -51,11 +54,17 @@ public class ShieldBuff extends AbstractBuff {
         // StatModifierBuff uses, so "3 turns" means the same thing here as it does for 「攻击力提高，持续3回合」.
         super(turns, false);
         setSource(source);
-        this.amount = amount;
+        // ⚠ The boost is read HERE rather than inside applyEffect: applyEffect only receives the carrier, and the
+        // number has to be frozen at grant time anyway (see Battle.boostedShield).
+        this.amount = Battle.boostedShield(source, amount);
     }
 
     /**
-     * The shield value this buff installed.
+     * The shield value this buff installed, <b>after</b> the provider's boost.
+     *
+     * <p>⚠ Read it as "what the carrier's shield is worth", not as "what the rule asked for": 遗器 103 的 20% makes a
+     * 「57% 防御力 + 760」 shield worth 1.2× that, and a test that compared this to the rule's own arithmetic would be
+     * measuring the wrong thing (the rule's numbers are pinned by the shield's own tests).
      */
     public double getAmount() {
         return amount;

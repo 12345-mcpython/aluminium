@@ -1,0 +1,32 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SHIELD_BOOST",
+          "percent": 0.1,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 128 (自匿星芒的隐士 / Self-Enshrouded Recluse), 2-piece: 「提供的护盾量提高#1[i]%。」 param = [0.1]",
+      "note": "The 2-piece states no owner (「提供的」 rather than 「装备者提供的」), and the only unit a wearable set can be talking about is its own wearer — the same reading set 103's 4-piece needs, minus the words. ⚠ Two permanent boosts of the same attribute from one character add (0.1 + 0.12 = 0.22 when both pieces are worn), because MODIFY_ATTR's percentage modifiers sum; that is the intended arithmetic for two statements about one quantity."
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SHIELD_BOOST",
+          "percent": 0.22,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 128 (自匿星芒的隐士 / Self-Enshrouded Recluse), 4-piece: 「使装备者提供的护盾量提高#1[i]%（12%），」 ON TOP OF the 2-piece's 10% -- param = [0.12, 0.15]",
+      "note": "⚠ Why the number is 0.22 and not the sentence's 12%. The two tiers of this set state the SAME quantity, and this engine treats two of one unit's rules that touch one attribute as a REFRESH, not an addition (`StatModifierBuff` identity is (attribute, type, side), the long-standing 'the same buff again replaces the old one' rule). Writing 0.12 here would therefore leave a four-piece wearer with 12% instead of 22% -- silently, since both rules fire and nothing reports a clash. The two ways out were `max_stacks` (a cap shared with every other source of the stat, so a light cone's 「提供的护盾量提高」 would later be dropped as a third stack) and stating the accumulated total, which is exact at both piece counts: 2 pieces -> 10% (only the 2-piece rule exists), 4 pieces -> 22% (the 4-piece rule fires after the cumulative 2-piece one and replaces it). ⚠ The deeper question -- two statements about one stat from DIFFERENT sources (a light cone, a teammate's buff) also refreshing -- is registered as M-54 rather than fixed here. ⚠ SECOND sentence of the same 4-piece is NOT here either: 「我方目标持有装备者提供的护盾时，暴击伤害提高#2[i]%（15%）。」 asks, for EACH ally, whether the shield that ally is holding was created by the wearer. The condition DSL gates a whole rule, so `target: all_allies` + a condition would either buff every ally or none -- a per-target condition is a different capability, registered as M-53."
+    }
+  ]
+}

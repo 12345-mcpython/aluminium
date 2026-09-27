@@ -526,8 +526,10 @@ public final class TriggerInterpreter {
                     // 「持续N回合」 is a *timed* shield: the ShieldBuff installs the value and takes it off
                     // again, so the number and its lifetime stay one fact. Without `turns` the shield is the
                     // raw grant it has always been (it comes off only when it is used up).
+                    // ⚠ Both arms name the provider (`ctx.owner()`): 「装备者提供的护盾量提高 X%」 is about the
+                    // *giver's* shields, so a grant with no provider would silently ignore the set bonus.
                     if (effect.getTurns() == null) {
-                        battle.grantShield(target, amount);
+                        battle.grantShield(ctx.owner(), target, amount);
                     } else if (target != null && !target.isDeath()) {
                         target.getBuffManager().addBuff(new ShieldBuff(ctx.owner(), amount, effect.getTurns()));
                     }

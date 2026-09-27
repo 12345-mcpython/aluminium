@@ -39,6 +39,13 @@ import java.util.Random;
  * <p>⚠ The roll lives in {@code Battle.tryApplyDebuff} and happens <b>even when a rule states no probability</b>: an
  * unstated chance is a 100% <i>base</i> chance, and without that rule every 「免疫控制类负面状态」 clause would have been
  * silently ineffective against exactly the controls the documents write without a number.
+ *
+ * <p>⚠ <b>What the corpus says about the class itself</b> (measured 2026-09-28): 「控制类负面状态」 is defined
+ * <b>in the documents</b>, 28 times, always as the same twelve names (冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，
+ * 恐惧，行动锁定，幸福傀儡，怨火灼身). That is why this is a <i>class</i> and not a list of resistance keys — the list is
+ * the game's, it is long, and it grows with the next character. It is also why 嘲讽 is <b>not</b> covered (it is in
+ * none of the twelve) and why the class protects against exactly what the engine can apply today (three of the
+ * twelve; the rest are registered).
  */
 public class DebuffResistTest {
     private static final double EPS = 1e-9;
@@ -190,11 +197,15 @@ public class DebuffResistTest {
     }
 
     /**
-     * A state that is in no class is not covered by any class resistance — the safe default.
+     * A state that is in no class is not covered by any class resistance — and that is the documents' own answer
+     * here, not a placeholder.
      *
-     * <p>⚠ The taunt is the live example, and it is a <b>registered gap</b> rather than an answer: 「嘲讽」 is a control
-     * in the game's own vocabulary, but this engine has not decided which family it belongs to, so 免疫控制类 does not
-     * stop it yet. Guessing would be worse than saying so.
+     * <p>⚠ <b>Measured (2026-09-28).</b> 「控制类负面状态」 is <b>defined by the corpus itself</b>, 28 times, always
+     * the same twelve names: 「冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身」. 嘲讽 is
+     * <b>not</b> one of them, so leaving {@code TauntBuff} outside the control class matches the game's own list
+     * rather than dodging a decision. ⚠ The other side of that measurement is a registered gap: of those twelve
+     * states the engine implements three (冻结 / 纠缠 / 禁锢, the break trio), so a 「免疫控制类」 clause protects
+     * against everything the engine can currently apply and nothing more — see ROADMAP's register.
      */
     @Test
     public void aClassImmunityDoesNotCoverAStateInNoClass() {
@@ -203,7 +214,8 @@ public class DebuffResistTest {
         f.fire();
 
         Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(TauntBuff.class),
-                "the taunt is in no class yet, so 「免疫控制类」 leaves it alone (registered in ROADMAP)");
+                "嘲讽 is in no class, so 「免疫控制类」 leaves it alone — the documents' 12-name list does not "
+                        + "include it (ROADMAP register)");
     }
 
     // ==================================================================
