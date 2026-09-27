@@ -109,14 +109,27 @@ public class TriggerScaledHealTest {
     // 2. Fail fast at load time
     // ==================================================================
 
+    /**
+     * {@code scale} + {@code amount} is NOT a conflict: the amount is the flat addend.
+     *
+     * <p>⚠ This case used to assert the opposite ("either a flat number or a share, not both"), and 1001 三月七's
+     * Skill is why it changed: 「抵消等同于三月七 57% 防御力 + 760 伤害的护盾」 is a share <b>plus</b> a constant, which
+     * the loader refused outright. Nothing shipped stated both (the refusal made that impossible), so allowing it
+     * moved no existing content. What IS still refused is a {@code scale} with an {@code amount} and no
+     * {@code percent} -- the scale names what the share is OF, so a missing share is a missing number.
+     */
     @Test
-    public void anAmountAndAScaleTogetherAreRejected() {
-        EffectSpec effect = healOp("target_max_hp", 0.08);
-        TriggerSpecs.set(effect, "amount", 100.0);
+    public void aScaleWithAnAmountIsASharePlusAConstant() {
+        EffectSpec both = healOp("target_max_hp", 0.08);
+        TriggerSpecs.set(both, "amount", 100.0);
+        Assertions.assertDoesNotThrow(() -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, both))),
+                "0.08 x Max HP + 100 is a magnitude, not a disagreement");
+
+        EffectSpec noPercent = healOp("target_max_hp", null);
+        TriggerSpecs.set(noPercent, "amount", 100.0);
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
-        Assertions.assertTrue(e.getMessage().contains("amount"), e.getMessage());
-        Assertions.assertTrue(e.getMessage().contains("scale"), e.getMessage());
+                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, noPercent))));
+        Assertions.assertTrue(e.getMessage().contains("percent"), e.getMessage());
     }
 
     @Test

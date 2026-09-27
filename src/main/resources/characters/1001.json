@@ -6,6 +6,24 @@
     ],
     "do": [
       {
+        "op": "SHIELD",
+        "scale": "owner_def",
+        "percent": 0.57,
+        "amount": 760,
+        "turns": 3,
+        "target": "target"
+      }
+    ],
+    "source": "1001 三月七 战技 可爱即是正义 (100102, BPSkill/Defence): 「为指定我方单体提供能够抵消等同于三月七#1[i]%防御力+#4[i]伤害的护盾，持续#2[i]回合。」 param Lv10 = [0.57, 3, 0.3, 760, 5] → #1 = 0.57, #2 = 3, #4 = 760",
+    "note": "The shield: 「抵消等同于三月七 **57% 防御力 + 760** 伤害的护盾，持续 3 回合」。 ⚠ `scale: owner_def` + `amount` is the 「share plus a constant」 shape (added 2026-09-27 for this sentence): `percent` of the **rule owner's** DEFENCE plus the flat 760, computed when the rule fires and then held by the shield. The engine stores one shield value and a new shield **overwrites** it instead of stacking, which is what 「提供…护盾」 means. ⚠ The numbers are the **Lv10** row the prose quotes -- the engine's characters are all at skill level 1, so reading 「the skill's own level」 would give 0.38 + 190: the same 「which row」 question `damage_level` answers where an op reads a table, registered with M-32. ⚠ NOT written from this Skill: the taunt clause 「若该目标当前生命值百分比大于等于 30%，被敌方攻击的概率大幅提高」 -- it needs a condition on the ALLY's HP (`target_hp_percent`; `hp_percent` reads the OWNER) and an op that applies a taunt (the `TauntBuff` class exists, nothing applies it). And the trace 「加护」 (+1 turn) rides on the shield being there at all."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
         "op": "DISPEL",
         "amount": 1,
         "target": "target"

@@ -59,6 +59,27 @@ public class March7thKitTest {
     }
 
     /**
+     * 战技: the shield absorbs 「等同于三月七 <b>57% 防御力 + 760</b>」 — a share of HER DEFENCE plus a constant.
+     *
+     * <p>⚠ Asserted exactly, off her own DEFENCE as the engine resolves it: that is the whole point of
+     * {@code scale: "owner_def"} -- a literal would be wrong for every build and every skill level.
+     */
+    @Test
+    public void herSkillShieldsTheAimedAllyFromHerOwnDefence() {
+        Character march = CharacterFactory.create(MARCH, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Battle battle = new Battle(List.of(march, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        double expected = 0.57 * march.getAttribute(com.laosun.aluminium.enums.AttributeType.DEFENCE).get() + 760;
+
+        battle.castImmediate(new DefaultSkill(MARCH, SKILL_SLOT, 1), march, List.of(ally));
+
+        Assertions.assertEquals(expected, ally.getShield(), EPS,
+                "「抵消等同于三月七 57% 防御力 + 760 伤害的护盾」 -- the ally's shield, scaled off HER Defence");
+        Assertions.assertEquals(0, march.getShield(), EPS, "and not on herself: 「指定我方单体」 is the ally");
+    }
+
+    /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
      * <p>A file that shipped the shield as a literal, or the counter without its 「每回合可触发2次」, would look
@@ -66,8 +87,8 @@ public class March7thKitTest {
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
-        Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.SKILL_CAST),
-                "the cleanse trace, and nothing else on her Skill");
+        Assertions.assertEquals(2, TriggerTables.of(MARCH).ruleCount(TriggerEvent.SKILL_CAST),
+                "the shield and the cleanse trace -- and nothing else on her Skill");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
                 "the freeze needs a control state the engine does not model yet");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TAKING_HIT),
