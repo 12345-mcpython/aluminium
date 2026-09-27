@@ -283,7 +283,7 @@ P10-1 说"缺三个控制系"、P10-6 说"几率取 `param_list` 第 3 项"）�
   **跑闸门之前先 `git status` 确认工作区干净**（或者先 `git stash`），否则 `git checkout HEAD~1 -- src/main/...`
   取旧版本、`git checkout HEAD -- src/main/...` 还原时会把**未提交的 src/main 改动一并丢掉**（未跟踪的新文件能幸存，
   这正是两次都能靠重放补丁找回的原因）。⚠ 更隐蔽的一种：工作区与 HEAD 相同时跑闸门**比的是自己**，看着像通过 ——
-  真正的对照必须让"before"来自 `HEAD~1`。"shot
+  真正的对照必须让"before"来自 `HEAD~1`。"
   闸门要回到旧版本跑对照，用的是 `git checkout <旧提交> -- src/main/java src/main/resources`，
   跑完再用 `git checkout HEAD -- 同样的路径` 还原 —— 如果改动**还没提交**，第二次 checkout 恢复的是
   **旧版本**，本轮工作当场消失（这次丢了 5 个文件的改动）。补救：Java 侧用锚点脚本重放（每个锚点
