@@ -6,6 +6,7 @@ import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
@@ -17,6 +18,7 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.SummonFactory;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,7 +36,7 @@ import java.util.Random;
  * <p><b>Where each number comes from, because that is the whole design.</b>
  * <ul>
  *   <li>the <b>multiplier</b> (2.0 at Lv10), the <b>element</b> (Ice) and the <b>shape</b> (AoEAttack) are read
- *       from the named skill's own data — {@code skill: "ULTRA"} + {@code damage_param: 1} — so they cannot
+ *       from the named skill's own data — {@code skill: "ULTRA"} + {@code damage_param: 0} — so they cannot
  *       drift from {@code skills.json};</li>
  *   <li>⚠ the <b>row</b> has to be stated ({@code damage_level: 10}) because a character's skills are all at
  *       level 1 in this engine while the document quotes the Lv10 row. Reading "the skill's level" would deal
@@ -42,7 +44,11 @@ import java.util.Random;
  *       three levels of the same skill;</li>
  *   <li>the <b>base attribute</b> is the one thing the skill's row does not say: 「等同于<b>忆灵</b>的生命上限」,
  *       not 长夜月's attack — so the rule states it, and the case that doubles the summon's Max HP (and then the
- *       owner's) is what tells the two apart.</li>
+ *       owner's) is what tells the two apart;</li>
+ *   <li>the <b>toughness</b> (90) is the same kind of fact and is therefore <b>not</b> a field of this op either:
+ *       it is 141303's own {@code stance_list}, and the engine's ordinary damage path removes it during the cast.
+ *       ⚠ Measured through a real cast, because the cases here fire {@code ULT_CAST} by hand and that path removes
+ *       no toughness — a hand-fired event would "show" a gap that does not exist.</li>
  * </ul>
  *
  * <p><b>Whose action it is.</b> The owner's: the summon swings without spending its turn, exactly like a
@@ -433,6 +439,39 @@ public class SummonCommandTest {
 
     private static Enemy dummy() {
         return EnemyFactory.create(MONSTER, 90, 1);
+    }
+
+    /**
+     * Casting the ultimate removes the toughness <b>its own skill states</b> — the commanded attack carries no
+     * stance of its own, and needs none.
+     *
+     * <p>141303's {@code stance_list} is {@code single 0 / all 90}, so one real cast takes a 90-point bar to 0. The
+     * reduction comes from the engine's ordinary damaging path, not from the command: a commanded attack is an
+     * {@code EnemySkill} assembled from the named skill's element, shape and multiplier, and the toughness is the
+     * same kind of fact — read from the single place it is written down, which is that skill's own data. ⚠ Which is
+     * also why {@code COMMAND_SUMMON} must <b>not</b> grow a stance argument: the ultimate's cast and the
+     * memosprite's hit are one damage instance in the documents, and stating the 90 twice would remove it twice.
+     *
+     * <p>Driven through the real cast ({@code Battle.castImmediate}) rather than by firing {@code ULT_CAST} by hand,
+     * which is what the other cases here do: the trigger path is precisely <b>not</b> where the toughness comes
+     * from, so a hand-fired event would measure 0 and "prove" a gap that does not exist.
+     */
+    @Test
+    public void castingTheUltimateRemovesTheToughnessItsOwnSkillStates() {
+        Enemy enemy = otherDummy();                                   // its template bar is exactly the skill's `all`
+        enemy.setStanceWeak(java.util.Set.of(DamageElement.ICE));     // its element must be a weakness to move
+        // A bar WIDER than 90, so the number removed is observable rather than hidden by the cap: the template's own
+        // 90-point bar would read 0 for "90 removed" and for "180 removed" alike, which would let a second helping
+        // of toughness pass this case unnoticed.
+        enemy.setMaxStance(300);
+        enemy.setStance(300);
+        Character owner = CharacterFactory.create(OWNER, LEVEL);
+        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+
+        battle.castImmediate(new DefaultSkill(OWNER, 3, 1), owner, List.of(enemy));
+
+        Assertions.assertEquals(210, enemy.getStance(), EPS,
+                "「使忆灵「长夜」对敌方全体造成…冰属性伤害」-- exactly the 90 of 141303's own stance_list, once");
     }
 
     private static Enemy otherDummy() {

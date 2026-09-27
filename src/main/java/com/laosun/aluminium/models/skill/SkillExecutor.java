@@ -384,7 +384,7 @@ public final class SkillExecutor {
                             data.getStanceList().single());
 
             case AOE_ATTACK -> {
-                double stance = data.getStanceList().all();
+                double stance = stanceValue(data, true);
                 for (CanHit target : battle.targetableEnemies()) {
                     totalDamage += hit(battle, data, user, element, base, target, hitTargets, stance);
                 }
@@ -393,8 +393,8 @@ public final class SkillExecutor {
             case BLAST -> {
                 List<CanHit> alive = battle.targetableEnemies();
                 int center = alive.indexOf(mainTarget);      // position order = battle.enemies order
-                double centreStance = data.getStanceList().single();
-                double neighbourStance = data.getStanceList().spread();
+                double centreStance = stanceValue(data, true);
+                double neighbourStance = stanceValue(data, false);
                 if (center < 0) {
                     totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, centreStance);
                 } else {
@@ -524,6 +524,17 @@ public final class SkillExecutor {
     /**
      * The toughness-reduction points of **one hit** of this skill on one target (excluding the bounce's
      * per-hit spreading, which is done in the {@code BOUNCE} branch).
+     */
+    /**
+     * The toughness one hit of this skill removes — the <b>single</b> place that maps an attack shape onto
+     * {@code StanceList}'s three columns.
+     *
+     * <p>⚠ It used to be three places: AOE and BLAST read {@code getStanceList()} themselves while only BOUNCE
+     * went through here, which left this method's {@code AOE_ATTACK} arm <b>unreachable</b> — a mutant that zeroed
+     * this arm survived the whole suite (2026-09-27), which is what a dead branch looks like. One authority means
+     * "which column applies to this shape" is answered once, and a new shape cannot quietly pick a different one.
+     *
+     * <p>{@code mainTarget} is what separates BLAST's centre ({@code single}) from its neighbours ({@code spread}).
      */
     private static double stanceValue(SkillData data, boolean mainTarget) {
         // note: StanceList lives in beans.Skill (same simple name as models.Skill but a different
