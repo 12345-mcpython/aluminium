@@ -139,8 +139,14 @@ public class RelicTriggerTableTest {
 
     /** A character with its own trigger file, used to prove the merge keeps both sides. */
     private static final int TRIBBIE = 1403;
-    /** A character with no trigger file: the merge must still yield the set's rules. */
-    private static final int HIMEKO = 1003;
+    /**
+     * An ordinary character with <b>no trigger rules of their own</b>, so every rule the tests below see comes
+     * from the relic set: the merge must still yield the set's rules, and the counts must be the set's alone.
+     *
+     * <p>⚠ Looked up rather than named since 2026-09-27: it was 姬子 (1003) until her kit was authored, which put
+     * a {@code BATTLE_START} rule of her own into the counts pinned below. See {@link TestCharacters}.
+     */
+    private static final int NO_RULES = TestCharacters.withoutTriggerFile();
 
     private static final int STAR = 5;
     private static final int LEVEL = 15;
@@ -275,7 +281,7 @@ public class RelicTriggerTableTest {
         // The provenance rule: a number has to be traceable to its document.
         TriggerTable passerby = RelicTriggerTables.of(PASSERBY).at(FOUR_PIECE);
         var rule = passerby.matching(TriggerEvent.BATTLE_START,
-                new TriggerTable.TriggerContext(CharacterFactory.create(HIMEKO, 80), null, null, 0, 0))
+                new TriggerTable.TriggerContext(CharacterFactory.create(NO_RULES, 80), null, null, 0, 0))
                 .getFirst();
         Assertions.assertTrue(rule.source().contains("101") && rule.source().contains("Ability51011"),
                 "the source must name the set and the ability it came from: " + rule.source());
@@ -435,22 +441,22 @@ public class RelicTriggerTableTest {
     /** Four pieces of the set put its rules on the character; fewer pieces do not. */
     @Test
     public void theCharacterCarriesTheSetRulesOnlyWhenEnoughPiecesAreWorn() {
-        Character fourPieces = CharacterFactory.create(HIMEKO, 80, true, null,
+        Character fourPieces = CharacterFactory.create(NO_RULES, 80, true, null,
                 RelicFactory.suit(PASSERBY, STAR, LEVEL));
 
         Assertions.assertNotNull(fourPieces.getTriggerTable(), "the trigger table is never null");
         Assertions.assertEquals(1, fourPieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
                 "four pieces of set 101 must bring its battle-start rule");
 
-        Character threePieces = CharacterFactory.create(HIMEKO, 80, true, null,
+        Character threePieces = CharacterFactory.create(NO_RULES, 80, true, null,
                 partialSuit(PASSERBY, RelicType.HEAD, RelicType.HAND, RelicType.BODY));
         Assertions.assertEquals(0, threePieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
                 "three pieces is one short of the 4-piece bonus");
 
-        Character unequipped = CharacterFactory.create(HIMEKO, 80);
+        Character unequipped = CharacterFactory.create(NO_RULES, 80);
         Assertions.assertEquals(0, unequipped.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
                 "a character without relics behaves exactly as before relic rules existed");
-        Assertions.assertSame(TriggerTables.of(HIMEKO), unequipped.getTriggerTable(),
+        Assertions.assertSame(TriggerTables.of(NO_RULES), unequipped.getTriggerTable(),
                 "…which is literally its own (empty) table, not a merged copy");
     }
 
@@ -469,10 +475,10 @@ public class RelicTriggerTableTest {
     /** A set with no rule file contributes nothing, even at four pieces. */
     @Test
     public void aSetWithoutRulesContributesNothing() {
-        Character wearer = CharacterFactory.create(HIMEKO, 80, true, null,
+        Character wearer = CharacterFactory.create(NO_RULES, 80, true, null,
                 RelicFactory.suit(NO_RULE_SET, STAR, LEVEL));
 
-        Assertions.assertSame(TriggerTables.of(HIMEKO), wearer.getTriggerTable(),
+        Assertions.assertSame(TriggerTables.of(NO_RULES), wearer.getTriggerTable(),
                 "set " + NO_RULE_SET + " has no rule file, so the character's table is untouched (no empty "
                         + "merge copy) -- which is why this case must name a set that is still unwritten: it "
                         + "was 102 until set 102 was authored on 2026-09-28");
@@ -663,7 +669,7 @@ public class RelicTriggerTableTest {
 
     /** The single effect of the rule a set files under a threshold for an event. */
     private static EffectSpec firstEffect(int setId, TriggerEvent event) {
-        Character owner = CharacterFactory.create(HIMEKO, 80);
+        Character owner = CharacterFactory.create(NO_RULES, 80);
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(setId).at(FOUR_PIECE)
                 .matching(event, new TriggerTable.TriggerContext(owner, owner, null, 0, 0));
         Assertions.assertEquals(1, rules.size(),

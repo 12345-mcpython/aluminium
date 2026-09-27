@@ -383,6 +383,36 @@ dispatch(consumer, 直接相关方...)
   "note": "…" }                                ← 为什么是这个数
 ```
 
+#### 文件形状：规则数组 或 `{ resources, rules }` ✅（2026-09-27）
+
+一个角色的文件是**两种形状之一**：
+
+```
+[ { "on": "BREAK", … } ]                    ← 只有规则：13 个既有文件都是这个形状，仍然合法
+{ "resources": [ { "id": "充能", "max": 3 } ],
+  "rules":     [ { "on": "BREAK", … } ] }   ← 声明了资源的角色必须用对象形状
+```
+
+- **为什么要有声明。** `ResourceManager.gain` 对**没登记过的 id** 返回 0（"什么都没加"），`value` 也返回 0
+  （"空的"）—— 所以没有声明时，一条 `GAIN_RESOURCE` 规则会照常触发、**什么都不做**，一条
+  `self_resource:充能 >= 3` 条件会读到 0（"没到上限"）。两个都是**没有症状的错数字**，正是本项目最不能接受的那种。
+  声明就是「上限3点」这个**数字**被写下来的地方（`ResourceSpec`：`id` / `max`（必填）/ 可选 `initial` / `source` / `note`）。
+- **它是配置，不是数值**：运行时的值在**战斗单位**身上（`CanHit.getResources()`，P8-8 的 `ResourceManager`），
+  开局取 `initial`、逐场独立，与 `currentEnergy` 同一口径。所以「战斗开始时获得1点充能」写成 `BATTLE_START` 规则，
+  而不是写成 `initial: 1` —— 那句话留在能被文本对照的地方。
+- **注册点在唯一的装配点**（`CharacterFactory.create`）：按声明 `register(id, max, initial)`；
+  `requireReadableResources` 还会拿**合并后**的整张表核对**每条规则引用到的资源名**，没声明就**在装配期**抛错
+  （`CharacterException`，消息里说清该往 `resources/characters/<cid>.json` 里加什么）。与 `SUMMON` 的检查同一个位置、
+  同一个理由：规则文件不知道自己的 cid，而**遗器规则**是所有穿戴者共用的，只有装配点同时知道这两件事。
+- ⚠ **两种形状的 key 都是封闭的，往下也封闭**：顶层只认 `resources` / `rules`（写成 `"trigger"` → 装载期拒绝），
+  声明里只认 `ResourceSpec` 自己的字段（写成 `"intial": 1` → 装载期拒绝）。Gson 对不认识的 key 是**静默丢弃**，
+  而被丢掉的 `intial` 会被读成「从 0 开始」。
+- ⚠ Gson 构造 record 时会**包一层**异常（`Failed to invoke constructor …` 且不带原因），所以 `TriggerTables`
+  报的是 **cause 链里最具体的那条消息** —— 否则一条内容错误会退化成"构造函数调用失败"，作者只能猜。
+- 契约：`CharacterResourceTest` **19 条**（两种形状 / 五种非法声明 / 注册 / 装配期拒绝 / 合并必须保留声明）。
+  **变异 4 处各自独立变红**：读不到的资源返回 **0**、合并只看 `isEmpty()`、不收集**条件**里的资源名、
+  不拆 Gson 的包装异常 —— 四处都是"少了一行、规则照常跑"的形状。
+
 #### 限额：`cooldown` / `once_per_battle` ✅
 
 游戏文本里满是「该效果**每回合**只能触发1次」「该效果有1回合的触发**冷却**」「**单场战斗**中只能触发1次」
@@ -429,6 +459,7 @@ target_debuff_count >= 3  事件的承受者身上有 3 个负面  ← 银狼「
 self_attr:SPEED >= 145    **我自己**的某个属性值      ← 位面饰品 2 件套的那一大类「当装备者的速度 ≥ 145 时」
 self_summon_count >= 1    我自己有召唤物在场        ← 忆灵那一类「装备者的忆灵在场时」「当存在装备者召唤的目标时」
 self_max_energy >= 200    **我自己**的能量上限        ← 生命的翁法罗斯 328「若装备者能量上限大于等于 200 点…」（⚠ 它不是属性）
+self_resource:充能 >= 3   **我自己**某个**已声明资源**的层数  ← 姬子天赋「若姬子的**充能**达到上限（3点）…并消耗全部充能」（⚠ 声明见 §4.6 的文件形状；读**没声明**的资源一律 `NaN`，不是 0）
 self has_same_path_ally  **我方还有别人跟我同命途**    ← 出云显世与高天神国 314「若至少存在一名与装备者命途相同的队友」
 target_summon_count >= 1  **这件事的承受者**有召唤物在场  ← 星期日战技「若目标拥有召唤物，则造成的伤害提高额外提高…」
 self has_state 协奏   我处于具名状态【协奏】      ← 知更鸟「处于【协奏】状态时」
@@ -459,6 +490,17 @@ target has_weakness Fire  **这件事承受者**弱该元素   ← 遗器 316「
 > ⚠ **数值比较支持 `> >= < <= == !=`**（`==`/`!=` 是 2026-09-27 补的：此前 `==` 一律走**身份**分支，
 > 于是文档里写了很久的 `hit_count == 2` **根本解析不了**，会被报成"比较了两个变量"；现在按"
 > 有一边是 `self` 吗"区分两种读法，两边都是名字时仍然给那条更清楚的报错）。
+
+> 🎒 **`self_resource:<NAME>` 是第二条"读我自己"的参数化变量**（2026-09-27，语料缺口里最大的一条）：
+> 层数/充能既不是属性（`self_attr:` 够不着）、不是能量（`self_max_energy` 够不着）、也不是状态
+> （`has_state` 够不着），它是 `ResourceManager` 上的一个数。97 份角色文档里 **41 份**拿某个层数当门槛
+> （「获得充能，上限3点」「若【残梦】达到 9 层」…），而**写入**层的 op 从 P8-8 就在了，缺的一直是**读**。
+> ⚠ 三条口径：**主体只能是 `self`**（和 `self_attr:` 一样，条件读的是规则主人，不是事件的施放者 —— 否则
+> 别人动一下就会按**别人**的层数决定我的机制）；**读没声明过的资源回答 `NaN` 而不是 0**（"读不到 → 条件不成立"
+> 与 `self_summon_count` 同一条规矩：`ResourceManager.value` 对未知 id 回答 0，而"悄悄按 0 判"正是要避免的
+> 错答案）；**名字里不能有空格**（条件是按运算符切开再 trim 的，`self_resource:我 的资源` 会被读成「我」）。
+> 首个用户**姬子 1003 天赋「乘胜追击」**：`self_resource:充能 >= 3` 是「若姬子的充能达到上限」，
+> 随后的 `SPEND_RESOURCE amount: 3` 就是「消耗**全部**充能」—— 不是近似：规则只在**上限**处跑，而上限**就是** 3。
 
 > 🧩 **身份比较的两套词汇**（2026-09-28 补的 `summon`）：左边是哪一方（`actor` / `target`），
 > 右边是**谁**参与比较 —— 目前只有 `self`（规则主人）和 `summon`（**规则主人自己的**召唤物，两边写法等价：
@@ -540,8 +582,8 @@ JSON 写法不变。
 | `HEAL` / `SHIELD` | `amount`，可选 `target` —— **或** `scale` + `percent`（+ 可选 `amount` 作**常数项**） | ✅ `scale` 有 `target_max_hp` / `owner_max_hp` / **`owner_def`**（按**规则主人**的防御力，2026-09-27 为三月七的护盾而加：「57% 防御力 **+ 760**」）。⚠ `amount` 与 `scale` 同时出现**不再是冲突**：它是那个**常数项**（旧策略拒绝两者同写，所以放开它**不改动任何既有内容**）；仍拒的是「有 scale 有 amount 却没有 percent」——scale 只说明份额*是什么的* |
 | `EXTRA_TURN` | 可选 `target` | ✅ |
 | `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持），可选 `target`（**可以是群体**：`all_allies` / `other_allies` / `target_and_summon` 会逐个推） | ✅ |
-| `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
-| `DAMAGE` | `skill` / `damage_param`，可选 `damage_level`、`target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
+| `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8）⚠ 2026-09-27 起，`resource` 指的名字**必须**在角色文件的 `resources` 块里声明过（见 §4.6 的文件形状）：没声明时 `gain` 记 0、`value` 读 0，规则会**照常触发却什么都不发生**，所以装配期直接拒绝。`SPEND_RESOURCE` 从不存在的资源/不够扣时**响亮报错**（不是静默少扣） |
+| `DAMAGE` | `skill` / `damage_param`，可选 `damage_level`、`target`（**可以是群体**：`all_enemies` 会**逐个**结算一次实例）、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
 | `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、`max_stacks`（别名 `stacks`）、**`scale`**（派生值，见下）、**`ticks_on`**（按谁的回合扣时长，见下） | ✅（P10-3） |
 | ↳ **派生值** `scale: "self_attr:<属性>"` 或 `"self_max_energy"` | `percent` × **规则主人**那条属性的当前值（或**能量上限**）+ 可选 `amount`（P11-2，M-42；`self_max_energy` 见下） | ✅ 首个用户**大丽花行迹「又一场葬礼」**「使其他角色的击破特攻提高，提高数值等同于 **24% 大丽花的击破特攻 + 50%**」。⚠ 结果是**绝对值**（即使目标是基础属性）—— 文档给的是"数值"，不是"目标基数的百分比"；⚠ 触发时**算一次就冻结**（引擎既有的快照口径 §24.5），所以 `amount` 是那个常数项；⚠ 没有 `scale` 却写了 `amount` **装载期拒绝**（以前是**静默忽略**）。⚠ 前缀与条件 DSL 的 `self_attr:` 共用一处定义（`TriggerTable.SELF_ATTR_PREFIX`），免得两种拼写各自漂移 |
 | `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
@@ -629,7 +671,19 @@ all_allies       我方全体（别名 party）                ← 「我方全�
 other_allies     **除规则主人以外**的我方              ← 知更鸟「使**除自身以外的队友**立即行动」
 summon           主人自己的召唤物（忆灵）               ← 「装备者**及其忆灵**」的后半，§24.6
 target_and_summon **这次施放瞄准的那个单位**及其召唤物   ← 星期日战技「指定我方单体**及其召唤物**立即行动」
+all_enemies      **对面全体**（读的是**对方阵营**）      ← 姬子天赋「对**敌方全体**目标造成等同于姬子140%攻击力的火属性伤害」
 ```
+
+> ⚔️ **`all_enemies` 是第一个"落到对面群体"的选择器**（2026-09-27）：此前**所有**群体选择器读的都是
+> `battle.allies`（`all_allies` / `party` / `other_allies`），于是「敌方全体」这类句子**没有写法** ——
+> 只能一个一个打，而那是另一种机制。首批读者：姬子天赋的追加攻击，以及云璃终结技的「使**敌方全体**陷入嘲讽状态」。
+> 它经 `Battle.getOpponents` 求值，所以「敌方」= **与规则主人对立的那个阵营**（对我方角色就是 `enemies`，
+> 对敌方单位就是 `allies` —— 同一条规则两种视角都读得对）。⚠ 它**不**过滤阵亡（与 `all_allies` 同一口径：
+> 选择器回答"那个阵营里有谁"，能不能作用由 op 决定，`DAMAGE` 自己会跳过尸体）。⚠ 它是**列表**：
+> 写在只解析一个目标的 op 上（`EXTRA_TURN` / `GAIN_ENERGY`…）会在触发时**响亮拒绝**。
+> 契约：`AllEnemiesTargetTest` **4 条**（每个敌人都吃到同一份实例 / 我方一点没碰 / 没有战场时响亮报错 /
+> 单体 op 拒绝群体选择器）+ `HimekoChargeTest` 里那条真实的追加攻击。**变异**：改读 `battle.allies` →
+> **3 条红、跨 2 个 suite**。
 
 > ⚠ **`other_allies` 为什么不能省**（2026-09-28 补）：`all_allies` 是"我方**全体**"，**包含规则主人自己** ——
 > 302 不老者的仙舟的「我方全体攻击力提高」必须给自己也加上，那是有用例钉住的；而「除自身以外」既不是它，

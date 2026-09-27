@@ -3,6 +3,7 @@ package com.laosun.aluminium.models;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
@@ -11,6 +12,7 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,6 +50,29 @@ public class TriggerTable {
      */
     private final Map<TriggerEvent, List<CompiledRule>> byEvent = new HashMap<>();
 
+    /**
+     * The resources this character <b>declares</b> (P8-8): 「充能，上限3点」 written down once, where the
+     * character is built. Empty for a character with no stacks — the ordinary state, and the reason
+     * {@link #isEmpty()} keeps meaning "no rules".
+     *
+     * <p>⚠ They are carried by the table rather than by a separate loader because they live in the character's
+     * own file, next to the rules that read them, and the loader therefore has them in hand already. Registering
+     * them onto the combatant is the assembly point's job ({@code CharacterFactory}), like every other
+     * "which character is this" decision.
+     */
+    private final List<ResourceSpec> resources;
+
+    /**
+     * Every resource name this table's rules <b>read</b> — from a {@code self_resource:<NAME>} condition or
+     * from a {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} effect.
+     *
+     * <p>Exists so the assembly point can refuse a rule that names a resource its character never declares.
+     * Failing there (when the character is built) rather than at fire time is the whole point: an undeclared
+     * resource answers {@code 0} to every read and swallows every gain, so the rule would otherwise be a
+     * silent no-op — see {@link #resources}.
+     */
+    private final Set<String> referencedResources = new HashSet<>();
+
     @Getter
     private final int cid;
 
@@ -60,7 +85,31 @@ public class TriggerTable {
      *                                  an unknown op or a missing required argument
      */
     public TriggerTable(int cid, List<TriggerSpec> specs) {
+        this(cid, specs, List.of());
+    }
+
+    /**
+     * The same, with the character's resource declarations (P8-8).
+     *
+     * @param cid       the owning character id (informational; the engine never branches on it)
+     * @param specs     the raw rules, may be {@code null}
+     * @param resources the declared resources, may be {@code null} (= none)
+     * @throws IllegalArgumentException on an unknown event, an unwired event, an unknown condition,
+     *                                  an unknown op or a missing required argument
+     */
+    public TriggerTable(int cid, List<TriggerSpec> specs, List<ResourceSpec> resources) {
         this.cid = cid;
+        this.resources = resources == null ? List.of() : List.copyOf(resources);
+        Set<String> declaredIds = new HashSet<>();
+        for (ResourceSpec declared : this.resources) {
+            // Two declarations of one name: the second would silently win (ResourceManager.register replaces),
+            // so the cap a rule is gated on could be the one that was overwritten.
+            if (!declaredIds.add(declared.id())) {
+                throw new IllegalArgumentException(
+                        "Resource \"" + declared.id() + "\" is declared twice (cid " + cid
+                                + "); the later declaration would silently replace the earlier one");
+            }
+        }
         if (specs == null) {
             return;
         }
@@ -68,6 +117,7 @@ public class TriggerTable {
             TriggerSpec spec = specs.get(index);
             TriggerEvent event = resolveEvent(spec);
             for (CompiledRule rule : compile(spec, event, index)) {
+                collectReferencedResources(rule);
                 byEvent.computeIfAbsent(event, k -> new ArrayList<>()).add(rule);
             }
         }
@@ -103,22 +153,88 @@ public class TriggerTable {
      * "the character's own rules come before the equipment's" is the order a reader expects.
      *
      * <p>Either side may be {@code null} or empty, in which case the other is returned unchanged — an
-     * unequipped character therefore behaves exactly as it did before relic rules existed.
+     * unequipped character therefore behaves exactly as it did before relic rules existed. ⚠ "Empty" here
+     * means <b>no rules and no declarations</b>: a table that declares a resource but has no rules of its own
+     * is not nothing, and returning the other side for it would drop the declarations (and with them every
+     * {@code self_resource:} read in the merged table).
+     *
+     * <p><b>Resource declarations.</b> The character's own file is the only place they can come from today
+     * (a relic set's file is a bare array — see {@code TriggerTables}), so the merge carries whichever side
+     * has them and <b>refuses</b> a merge of two declaring tables rather than picking one: "the rules of two
+     * different resources are now one table" has no reading that is obviously right, and a wrong pick would
+     * leave a rule reading a cap that was never registered.
      *
      * @param other the table to append (may be {@code null})
-     * @return the merged table; this instance when {@code other} is null or empty
+     * @return the merged table; this instance when {@code other} is null or carries nothing
      */
     public TriggerTable plus(TriggerTable other) {
-        if (other == null || other.isEmpty()) {
+        if (other == null || other.hasNothing()) {
             return this;
         }
-        if (isEmpty()) {
+        if (hasNothing()) {
             return other;
         }
-        TriggerTable merged = new TriggerTable(cid, List.of());
+        if (!resources.isEmpty() && !other.resources.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Cannot merge two trigger tables that both declare resources (cid " + cid + "): "
+                            + "declarations come from the character's own file, and a merge of two sets of "
+                            + "them has no defined owner");
+        }
+        TriggerTable merged = new TriggerTable(cid, List.of(),
+                resources.isEmpty() ? other.resources : resources);
         copyRulesInto(merged);
         other.copyRulesInto(merged);
+        merged.referencedResources.addAll(referencedResources);
+        merged.referencedResources.addAll(other.referencedResources);
         return merged;
+    }
+
+    /**
+     * Whether this table carries nothing at all — no rules and no resource declarations.
+     *
+     * <p>Distinct from {@link #isEmpty()} on purpose: that one answers "no rules", which is what the fire path
+     * and the diagnostics want, while a merge has to treat declarations as content too.
+     */
+    private boolean hasNothing() {
+        return isEmpty() && resources.isEmpty();
+    }
+
+    /**
+     * The resources this character declares, in file order.
+     */
+    public List<ResourceSpec> resources() {
+        return resources;
+    }
+
+    /**
+     * Every resource name the table's rules read — see {@link #referencedResources}.
+     */
+    public Set<String> referencedResources() {
+        return Set.copyOf(referencedResources);
+    }
+
+    /**
+     * Records what one compiled rule reads, so the assembly point can check it against the declarations.
+     *
+     * <p>Read off the <b>compiled</b> rule rather than off the raw text: {@link Numeric} keeps the resource
+     * name it parsed, so the check cannot drift from the parse (a name the parser refused is not "referenced",
+     * it is an error, and a name it accepted is exactly the one the battle will read).
+     */
+    private void collectReferencedResources(CompiledRule rule) {
+        for (Condition condition : rule.conditions()) {
+            if (condition instanceof Numeric numeric && numeric.resource != null) {
+                referencedResources.add(numeric.resource);
+            }
+        }
+        for (EffectSpec effect : rule.effects()) {
+            if (effect.getOp() == null || effect.getResource() == null) {
+                continue;
+            }
+            String op = effect.getOp().trim().toUpperCase(Locale.ROOT);
+            if (RESOURCE_OPS.contains(op)) {
+                referencedResources.add(effect.getResource().trim());
+            }
+        }
     }
 
     /**
@@ -377,16 +493,16 @@ public class TriggerTable {
      * many summons are on the battlefield" — a different question with a different answer, and one nobody has
      * asked for yet.
      *
-     * <p>{@code self_attr:<ATTRIBUTE>} is the one <b>parameterised</b> member and is deliberately not listed
-     * here: its second half is not a fixed name but a member of {@link AttributeType}, validated separately
-     * (and rejected there for the four {@code *_PERCENT} builder keys, whose runtime slot is null).
+     * <p>⚠ {@code self_attr:<ATTRIBUTE>} and {@code self_resource:<NAME>} are the two parameterised
+     * members: neither is listed above, and both are validated separately — the first against
+     * {@link AttributeType}, the second for shape here and for existence where the character is assembled.
      */
     private static final Set<String> NUMERIC_VARIABLES =
             Set.of("hit_count", "hp_percent", "target_hp_percent", "target_debuff_count", "self_summon_count",
                     "target_summon_count", "self_max_energy");
 
     /**
-     * The prefix of the one parameterised numeric variable: {@code self_attr:SPEED}.
+     * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
      *
      * <p>Why the subject is fixed at {@code self} and not a general {@code <subject>_attr:<TYPE>}: every
      * attribute threshold in the shipped data is about the wearer (「装备者的速度/暴击率/击破特攻/生命上限…」),
@@ -398,6 +514,32 @@ public class TriggerTable {
      * and the effect's "derive from my attribute" are one concept, and two literals would be able to drift.
      */
     static final String SELF_ATTR_PREFIX = "self_attr:";
+
+    /**
+     * The prefix of the other parameterised numeric variable: {@code self_resource:充能} — 「我的【充能】现在
+     * 有几层」.
+     *
+     * <p><b>Why it had to exist.</b> A stack/charge resource is not an attribute (so {@code self_attr} cannot
+     * read it), not energy (so {@code self_max_energy} cannot), and not a state (so {@code has_state} cannot):
+     * it is a number that lives on the combatant's {@code ResourceManager}. 41 of the 97 character documents
+     * gate something on 「充能达到上限」 / 「层数 ≥ N」, which is the largest single hole in the corpus — the ops
+     * to <b>write</b> such a resource have existed since P8-8, and nothing could read one back.
+     *
+     * <p>⚠ Reading an <b>undeclared</b> resource answers {@code NaN}, never {@code 0} — "cannot read it, so the
+     * condition fails", the same rule {@code self_summon_count} follows. {@code ResourceManager.value} answers
+     * {@code 0} for an id nobody registered, and a rule silently gated on 「0」 is exactly the wrong answer with
+     * no symptom this project refuses. (In a shipped character that state is impossible: the assembly point
+     * refuses a rule that reads a resource its character never declares.)
+     */
+    private static final String SELF_RESOURCE_PREFIX = "self_resource:";
+
+    /**
+     * The ops whose {@code "resource"} argument names a resource the character must declare.
+     *
+     * <p>Used only to collect {@link #referencedResources}; the ops themselves were validated long before this
+     * (they refuse a blank {@code "resource"} at load time).
+     */
+    private static final Set<String> RESOURCE_OPS = Set.of("GAIN_RESOURCE", "SPEND_RESOURCE");
 
     /**
      * The keyword of the named-state condition, and the parties it may ask about.
@@ -574,14 +716,18 @@ public class TriggerTable {
                     "Condition '" + raw + "' has no numeric literal on either side (source: "
                             + spec.getSource() + ")");
         }
-        if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)) {
+        if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)
+                && !variable.startsWith(SELF_RESOURCE_PREFIX)) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' compares unknown variable '" + variable
                             + "'; known numeric variables: " + String.join(", ", knownNumericVariables())
                             + ", plus \"self_attr:<ATTRIBUTE>\" for one of my own attribute values, e.g. "
-                            + "\"self_attr:SPEED >= 145\" (source: " + spec.getSource() + ")");
+                            + "\"self_attr:SPEED >= 145\", and \"self_resource:<NAME>\" for how much of one "
+                            + "of MY declared resources I hold, e.g. \"self_resource:充能 >= 3\" "
+                            + "(source: " + spec.getSource() + ")");
         }
-        return new Numeric(variable, selfAttributeOf(variable, raw, spec), operator, literal, literalOnLeft);
+        return new Numeric(variable, selfAttributeOf(variable, raw, spec),
+                selfResourceOf(variable, raw, spec), operator, literal, literalOnLeft);
     }
 
     /**
@@ -631,6 +777,46 @@ public class TriggerTable {
                             + ") (source: " + spec.getSource() + ")");
         }
         return type;
+    }
+
+    /**
+     * The resource behind a {@code self_resource:<NAME>} variable, or {@code null} for anything else.
+     *
+     * <p>Only the <b>shape</b> is checked here; whether the character declares that resource is checked where
+     * the character is assembled, because a rule file cannot know its own cid and a <b>relic</b> rule is shared
+     * by every wearer (the same reason {@code SUMMON} is checked there). Two shapes are refused outright:
+     * <ul>
+     *   <li>nothing after the prefix — a variable that reads no resource at all;</li>
+     *   <li>a name containing whitespace, which the DSL cannot even preserve: the condition is split on the
+     *       operator and both halves trimmed, so {@code self_resource:我的 资源 >= 3} would silently read
+     *       「我的」. A declaration refuses such a name for the same reason ({@code ResourceSpec}).</li>
+     * </ul>
+     *
+     * @param variable the already-normalised variable token
+     * @param raw      the original condition text, for the error messages
+     * @param spec     the owning rule, for the source
+     * @return the resource name, or {@code null} when the variable is not a resource read
+     */
+    private static String selfResourceOf(String variable, String raw, TriggerSpec spec) {
+        if (!variable.startsWith(SELF_RESOURCE_PREFIX)) {
+            return null;
+        }
+        String name = variable.substring(SELF_RESOURCE_PREFIX.length()).trim();
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' writes \"" + SELF_RESOURCE_PREFIX + "\" with no resource after "
+                            + "it; give one of the resources the character declares, e.g. "
+                            + "\"self_resource:充能 >= 3\" (source: " + spec.getSource() + ")");
+        }
+        // ⚠ Spelled `java.lang.Character`: this package has its own `Character`, and the unqualified name
+        // would be the combatant rather than the code-point test.
+        if (name.chars().anyMatch(c -> java.lang.Character.isWhitespace(c))) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' reads the resource \"" + name + "\", which contains whitespace; "
+                            + "a condition is split on its operator and trimmed, so a name with a space in it "
+                            + "cannot be read back (source: " + spec.getSource() + ")");
+        }
+        return name;
     }
 
     /**
@@ -1285,14 +1471,22 @@ public class TriggerTable {
          * (in which case {@link #variable} selects one of {@link #NUMERIC_VARIABLES}).
          */
         private final AttributeType attribute;
+        /**
+         * The resource a {@code self_resource:<NAME>} variable reads, or {@code null} for everything else.
+         *
+         * <p>Package-visible to the enclosing table, which collects the names into
+         * {@link TriggerTable#referencedResources} for the assembly-point check.
+         */
+        private final String resource;
         private final String operator;
         private final double literal;
         private final boolean literalOnLeft;
 
-        Numeric(String variable, AttributeType attribute, String operator, double literal,
+        Numeric(String variable, AttributeType attribute, String resource, String operator, double literal,
                 boolean literalOnLeft) {
             this.variable = variable;
             this.attribute = attribute;
+            this.resource = resource;
             this.operator = operator;
             this.literal = literal;
             this.literalOnLeft = literalOnLeft;
@@ -1329,6 +1523,9 @@ public class TriggerTable {
             if (attribute != null) {
                 return ownerAttribute(ctx.owner(), attribute);
             }
+            if (resource != null) {
+                return resourceValue(ctx.owner(), resource);
+            }
             return switch (variable) {
                 case "hit_count" -> ctx.hitCount();
                 case "hp_percent" -> hpPercent(ctx.owner());
@@ -1362,6 +1559,24 @@ public class TriggerTable {
                 return Double.NaN;
             }
             return ctx.battle().summonCountOf(who);
+        }
+
+        /**
+         * How much of one of the owner's declared resources it currently holds.
+         *
+         * <p>⚠ {@code NaN} when the owner does not exist <b>or does not declare that resource</b>. That second
+         * case cannot happen for a shipped character — the assembly point refuses a rule that reads an
+         * undeclared resource — but a hand-built context (a test, or a table compiled on its own, as several
+         * tests do) can reach it, and {@code ResourceManager.value} would answer {@code 0} for it. A rule
+         * silently gated on a resource nobody registered is the wrong answer with no symptom this whole
+         * vocabulary is built to avoid, so it fails the condition instead. The same rule every other
+         * unreadable variable follows.
+         */
+        private static double resourceValue(CanHit owner, String resource) {
+            if (owner == null || !owner.getResources().has(resource)) {
+                return Double.NaN;
+            }
+            return owner.getResources().value(resource);
         }
 
         /**
