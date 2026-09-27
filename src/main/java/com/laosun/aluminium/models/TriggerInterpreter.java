@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE");
+            "MODIFY_RULE", "ADD_DAMAGE");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -453,6 +453,12 @@ public final class TriggerInterpreter {
                                     + spec.getOn() + " (source: " + spec.getSource() + ")");
                 }
             }
+            case "ADD_DAMAGE" -> {
+                requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
+                scaleAttribute(effect, op, spec);
+                requirePercent(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
             case "SUMMON" -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
                 // (name, panel derivation) lives in resources/memosprites/<cid>.json. A `target` here would
@@ -608,6 +614,7 @@ public final class TriggerInterpreter {
             case "REMOVE_STACK" -> removeStacks(battle, effect, ctx);
             case "MODIFY_DAMAGE_TAKEN" -> modifyDamageTaken(battle, effect, ctx);
             case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
+            case "ADD_DAMAGE" -> addDamageFlat(effect, ctx);
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "REMOVE_STATE" -> removeState(effect, ctx);
             case "TAUNT" -> taunt(battle, effect, ctx);
@@ -1357,6 +1364,15 @@ public final class TriggerInterpreter {
      * @param effect the effect ({@code percent})
      * @param ctx    the context, which must carry the instance (guaranteed by the load-time event check)
      */
+    private static void addDamageFlat(EffectSpec effect, TriggerContext ctx) {
+        Damage damage = ctx.damage();
+        if (damage == null) {
+            throw new IllegalStateException(
+                    "Op ADD_DAMAGE needs the damage instance being settled, but this context carries none");
+        }
+        damage.addFlat(derivedMagnitude(effect, ctx));
+    }
+
     private static void boostDamage(EffectSpec effect, TriggerContext ctx) {
         Damage damage = ctx.damage();
         if (damage == null) {
