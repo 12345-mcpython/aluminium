@@ -74,6 +74,12 @@
     ],
     "do": [
       {
+        "op": "GAIN_ENERGY",
+        "scale": "target_max_energy",
+        "percent": 0.2,
+        "target": "target"
+      },
+      {
         "op": "REMOVE_STATE",
         "buff": "蒙福者",
         "target": "all_allies"
@@ -97,6 +103,6 @@
       }
     ],
     "source": "1313 星期日 终结技 轻与伤痕的赞颂 (skill 131303, Ultra/Support): 「…并使目标及其召唤物成为【蒙福者】，【蒙福者】的暴击伤害提高，提高数值等同于星期日#2[i]%暴击伤害+#4[i]%。星期日自身每回合开始时【蒙福者】状态持续回合减1，共持续#3[i]回合。且仅对除星期日自身外终结技最新的施放目标生效。当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除。」 param Lv1 = [0.2, 0.12, 3, 0.08] → #2 = 0.12, #3 = 3 回合, #4 = 0.08",
-    "note": "Three effects, in the order the sentence needs them. ⚠ **`REMOVE_STATE` first** is 「仅对…**最新的**施放目标生效」: the state goes off everybody, then onto the new pair -- there is no \"only one holder\" flag, the removal IS that clause. ⚠ **`target != self`** is 「除星期日自身外」: casting it on himself leaves the previous holder alone rather than clearing and re-granting nothing. ⚠ **`ticks_on: \"self\"` on both buffs** is 「星期日自身每回合开始时…持续回合减1」: the state sits on the ally and is spent by HIS turns (M-42 ④) -- without it the same sentence would last three of the ALLY's turns, which is a different number in every fight. ⚠ **「当星期日陷入无法战斗状态时…解除」 needs no rule**: an anchored buff whose clock will never come again is a leak, so the engine takes it off when the anchor dies (`Battle.releaseBuffsAnchoredToTheDead`, M-42 ③) -- and it COULD not be a rule on him, because `fireTriggers` skips dead units. ⚠ The CRIT DMG is **derived** from his own (`scale: \"self_attr:CRIT_ATTACK\"`, 12% of it + 8 percentage points, M-42 ①), read when the rule fires and then frozen. ⚠ NOT authored: 「恢复等同于#1[f1]%能量上限的能量」 -- giving energy as a share of the target's MAX ENERGY has no spelling yet (GAIN_ENERGY takes a literal), registered with M-42."
+    "note": "Three effects, in the order the sentence needs them. ⚠ **`REMOVE_STATE` first** is 「仅对…**最新的**施放目标生效」: the state goes off everybody, then onto the new pair -- there is no \"only one holder\" flag, the removal IS that clause. ⚠ **`target != self`** is 「除星期日自身外」: casting it on himself leaves the previous holder alone rather than clearing and re-granting nothing. ⚠ **`ticks_on: \"self\"` on both buffs** is 「星期日自身每回合开始时…持续回合减1」: the state sits on the ally and is spent by HIS turns (M-42 ④) -- without it the same sentence would last three of the ALLY's turns, which is a different number in every fight. ⚠ **「当星期日陷入无法战斗状态时…解除」 needs no rule**: an anchored buff whose clock will never come again is a leak, so the engine takes it off when the anchor dies (`Battle.releaseBuffsAnchoredToTheDead`, M-42 ③) -- and it COULD not be a rule on him, because `fireTriggers` skips dead units. ⚠ The CRIT DMG is **derived** from his own (`scale: \"self_attr:CRIT_ATTACK\"`, 12% of it + 8 percentage points, M-42 ①), read when the rule fires and then frozen. ⚠ The first effect is 「恢复等同于#1[f1]%**能量上限**的能量」: `scale: 「target_max_energy」` reads 20% of the ALLY's maximum (his own 130 is irrelevant), which is why it could not be a literal -- the maximum is per character (姬子 120 / 星期日 130 / 翡翠 140). ⚠ It targets `target` (the character), not the pair: the sentence says 「指定我方单体**角色**」, and a memosprite has no energy bar -- asking for a share of one is a loud failure, not a grant of 0."
   }
 ]

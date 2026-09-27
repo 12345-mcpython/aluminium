@@ -191,12 +191,16 @@ public final class TriggerInterpreter {
                     "Unknown trigger op '" + op + "' (source: " + spec.getSource() + ")");
         }
         switch (op) {
-            case "GAIN_ENERGY", "GAIN_SKILL_POINT" -> {
+            case "GAIN_ENERGY" -> {
+                requireAmountOrScale(effect, op, spec, ENERGY_SCALES, "max energy");
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "GAIN_SKILL_POINT" -> {
                 requireAmount(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             case "HEAL", "SHIELD" -> {
-                requireAmountOrScale(effect, op, spec);
+                requireAmountOrScale(effect, op, spec, SCALES, "Max HP");
                 requireNoStackArguments(effect, op, spec);
             }
             case "ADVANCE" -> {
@@ -359,7 +363,7 @@ public final class TriggerInterpreter {
     private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String op = normalizeOp(effect, null);
         switch (op) {
-            case "GAIN_ENERGY" -> battle.grantEnergy(resolveTarget(effect, ctx), scaledAmount(effect, ctx));
+            case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);
             case "GAIN_SKILL_POINT" -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
             case "HEAL" -> {
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
@@ -452,6 +456,28 @@ public final class TriggerInterpreter {
      * @param effect the effect ({@code resource} + {@code amount})
      * @param ctx    the context
      */
+    /**
+     * {@code GAIN_ENERGY}: a flat amount, or a share of the receiving unit's <b>maximum energy</b>.
+     *
+     * <p>⚠ A unit with <b>no energy bar</b> (the six that run on a stack resource instead) has a maximum of 0, and
+     * a share of nothing is not a number — that is a loud failure rather than a silent grant of 0, the same call the
+     * scale family makes everywhere else.
+     */
+    private static void gainEnergy(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        CanHit target = resolveTarget(effect, ctx);
+        if (effect.getScale() == null || effect.getScale().isBlank()) {
+            battle.grantEnergy(target, scaledAmount(effect, ctx));
+            return;
+        }
+        double maxEnergy = target.getMaxEnergy();
+        if (maxEnergy <= 0) {
+            throw new IllegalStateException(
+                    "GAIN_ENERGY scales off " + target.getName() + "'s maximum energy, but that unit has no energy "
+                            + "bar (its maximum is 0); a share of it is not a number");
+        }
+        battle.grantEnergy(target, effect.getPercent() * maxEnergy);
+    }
+
     private static void gainResource(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = resolveTarget(effect, ctx);
         holder.getResources().gain(effect.getResource(), (int) Math.round(scaledAmount(effect, ctx)));
@@ -1080,6 +1106,15 @@ public final class TriggerInterpreter {
     private static final Set<String> SCALES = Set.of("target_max_hp", "owner_max_hp");
 
     /**
+     * The one scale {@code GAIN_ENERGY} accepts: a share of the <b>receiving</b> unit's maximum energy.
+     *
+     * <p>「为指定我方单体角色恢复等同于 #1[f1]% 能量上限的能量」 (星期日's ultimate). It cannot be a flat number,
+     * because the maximum is per character (姬子 120 / 星期日 130 / 翡翠 140) — writing 20 would be wrong for all of
+     * them, and it would look right for whichever one the author happened to check.
+     */
+    private static final Set<String> ENERGY_SCALES = Set.of("target_max_energy");
+
+    /**
      * Validates the magnitude of a {@code HEAL} / {@code SHIELD} effect: either a flat {@code amount}, or
      * {@code scale} + {@code percent}.
      *
@@ -1088,15 +1123,16 @@ public final class TriggerInterpreter {
      * {@code percent} ("some share of a Max HP"), a {@code percent} without a {@code scale} (a percentage of
      * what?), and a {@code scale} together with {@code per_target} (a share of a Max HP is already per unit).
      */
-    private static void requireAmountOrScale(EffectSpec effect, String op, TriggerSpec spec) {
+    private static void requireAmountOrScale(EffectSpec effect, String op, TriggerSpec spec,
+                                             Set<String> scales, String what) {
         String scale = effect.getScale() == null ? null : effect.getScale().trim();
         if (scale == null || scale.isEmpty()) {
             // A percentage without a scale is refused *before* the missing amount, because the author clearly
             // meant the scaled spelling: "requires amount" alone would send them looking in the wrong place.
             if (effect.getPercent() != null) {
                 throw new IllegalArgumentException(
-                        "Op " + op + " has \"percent\" but no \"scale\": a flat heal or shield states "
-                                + "\"amount\" instead, and a scaled one states \"scale\" + \"percent\" "
+                        "Op " + op + " has \"percent\" but no \"scale\": the flat spelling states "
+                                + "\"amount\" instead, and the scaled one states \"scale\" + \"percent\" "
                                 + "(source: " + spec.getSource() + ")");
             }
             requireAmount(effect, op, spec);
@@ -1104,20 +1140,20 @@ public final class TriggerInterpreter {
         }
         if (effect.getAmount() != null) {
             throw new IllegalArgumentException(
-                    "Op " + op + " states both \"amount\" and \"scale\": a heal or shield is either a flat "
-                            + "number or a share of a Max HP, not both (source: " + spec.getSource() + ")");
+                    "Op " + op + " states both \"amount\" and \"scale\": it is either a flat number or a share "
+                            + "of a " + what + ", not both (source: " + spec.getSource() + ")");
         }
-        if (!SCALES.contains(scale)) {
+        if (!scales.contains(scale)) {
             throw new IllegalArgumentException(
-                    "Op " + op + " has unknown \"scale\": '" + effect.getScale() + "'; known scales are "
-                            + String.join(", ", SCALES.stream().sorted().toList())
+                    "Op " + op + " has unknown \"scale\": '" + effect.getScale() + "'; known scales for this op "
+                            + "are " + String.join(", ", scales.stream().sorted().toList())
                             + " (source: " + spec.getSource() + ")");
         }
         requirePercent(effect, op, spec);
         if (effect.getPerTarget() != null) {
             throw new IllegalArgumentException(
                     "Op " + op + " cannot combine \"scale\" with \"per_target\": the scale is already a share "
-                            + "of one unit's Max HP (source: " + spec.getSource() + ")");
+                            + "of one unit's " + what + " (source: " + spec.getSource() + ")");
         }
     }
 
