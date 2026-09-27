@@ -9,9 +9,9 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
-import com.laosun.aluminium.models.buff.StunBuff;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -83,8 +83,10 @@ public class ControlTest {
 
         f.breakWith(DamageElement.ICE);
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasBuff(StunBuff.class),
+        Assertions.assertTrue(f.enemy.getBuffManager().hasBuff(ControlBuff.class),
                 "冻结 must attach an act lock");
+        Assertions.assertEquals("冻结", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
+                "and the state carries the NAME the documents use, which is what 「冻结状态」 is asked with");
         Assertions.assertFalse(f.enemy.getBuffManager().canAct(),
                 "冻结 = 不能行动; this is the same predicate performAction refuses on");
         Assertions.assertEquals(speedBefore, f.speed(), EPS, "冻结 does not slow -- 禁锢/纠缠 do");
@@ -144,7 +146,7 @@ public class ControlTest {
 
         Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(DotBuff.class), "still burns");
         Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "a burn does not control");
-        Assertions.assertFalse(f.enemy.getBuffManager().hasBuff(StunBuff.class));
+        Assertions.assertFalse(f.enemy.getBuffManager().hasBuff(ControlBuff.class));
         Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(StatModifierBuff.class),
                 "a burn must not slow: the slow belongs to the control states only");
         Assertions.assertEquals(speedBefore, f.speed(), EPS);
@@ -171,6 +173,251 @@ public class ControlTest {
 
         Assertions.assertFalse(f.enemy.getBuffManager().canAct(),
                 "a break is not a resisted debuff: 100% skill resistance must not cancel it");
+    }
+
+    // ==================================================================
+    // A control applied by a SKILL: op APPLY_CONTROL
+    // ==================================================================
+
+    /**
+     * 「有 50% 基础概率使敌方目标陷入冻结状态，持续1回合」: the state lands, the victim cannot act, and the name is
+     * readable — which is what makes 「冻结状态」 askable at all.
+     */
+    @Test
+    public void aSkillAppliedFreezeStopsTheVictimActingAndCarriesItsName() {
+        Applied f = new Applied(control(1.0));
+        f.fire();
+
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"),
+                "the applied state answers has_state under the name the documents use");
+        Assertions.assertFalse(f.enemy.getBuffManager().canAct(), "冻结 = 不能行动");
+        Assertions.assertEquals("冻结", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName());
+    }
+
+    /**
+     * A base chance is a <b>base</b> chance: it goes through 效果命中 and 效果抵抗, per target.
+     *
+     * <p>Driven from the two ends of the pipeline rather than from a lucky seed: with the applier's 效果命中 at
+     * +100% a 50% base chance becomes certain, and with the victim's 效果抵抗 at 100% it becomes impossible. A
+     * rule-level {@code chance} could do neither (it is one fixed roll for the whole rule), which is why the
+     * vocabulary needed this field rather than reusing that one.
+     */
+    @Test
+    public void theBaseChanceRunsThroughTheEffectHitAndResistPipeline() {
+        Applied lands = new Applied(control(1.0));
+        lands.hero.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));
+        lands.fire();
+        Assertions.assertTrue(lands.enemy.getBuffManager().hasState("冻结"),
+                "50% base × (1 + 100% effect hit) = 100%, so it always lands");
+
+        Applied resisted = new Applied(control(1.0));
+        resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
+        resisted.fire();
+        Assertions.assertFalse(resisted.enemy.getBuffManager().hasState("冻结"),
+                "and 100% effect resistance takes it to 0, whatever the base chance was");
+    }
+
+    /**
+     * A monster's own resistance to <b>this</b> state ({@code STAT_CTRL_Frozen}) is part of the same roll.
+     *
+     * <p>⚠ The fixture for this case is 冰锋 (1002011), whose data really does carry
+     * {@code STAT_CTRL_Frozen = 1.0} — it cannot be frozen by a skill at all. That is why every other case above
+     * uses 1003010 (no specific resistances): a "the state lands" assertion on a monster that is immune to it would
+     * have been a test of the data, not of the pipeline.
+     */
+    @Test
+    public void aMonstersSpecificFreezeResistanceIsObeyedOnTheSkillPath() {
+        Applied f = new Applied(EnemyFactory.create(1002011, 90, 1), control(1.0));
+        f.hero.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));   // otherwise certain
+
+        f.fire();
+
+        Assertions.assertEquals(java.util.Map.of("STAT_CTRL_Frozen", 1.0), f.enemy.getDebuffResist(),
+                "precondition: this monster's data is what makes it unfreezable");
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("冻结"),
+                "STAT_CTRL_Frozen = 1 means this monster cannot be frozen by a skill -- which is exactly what "
+                        + "ControlEffect.resistKey is for (and what a BREAK deliberately ignores)");
+    }
+
+    /**
+     * ⚠ <b>A break-frozen unit and a skill-frozen unit are the same state.</b>
+     *
+     * <p>This is the property that made the migration worth doing: before {@code ControlBuff}, a break produced an
+     * unnamed {@code StunBuff}, so 「冻结状态」 answered <b>false</b> for a unit that was, to the game and to the
+     * player, frozen — a condition that would have silently missed half the cases it exists for.
+     */
+    @Test
+    public void aBreakFreezeAndASkillFreezeAreTheSameState() {
+        Fixture broken = fixture(DamageElement.ICE);
+        broken.breakWith(DamageElement.ICE);
+
+        Applied applied = new Applied(control(1.0));
+        applied.fire();
+
+        Assertions.assertTrue(broken.enemy.getBuffManager().hasState("冻结"), "the break's state has the name");
+        Assertions.assertTrue(applied.enemy.getBuffManager().hasState("冻结"), "and so does the skill's");
+        Assertions.assertEquals(broken.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
+                applied.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
+                "one state, one name, whichever path applied it");
+    }
+
+    /**
+     * A gated rule can therefore ask the question: {@code target has_state 冻结}.
+     *
+     * <p>⚠ The gate is on a <b>later event</b>, and that is not a stylistic choice: {@code TriggerInterpreter.fire}
+     * matches <b>every</b> rule of one event against the context <i>before</i> any of them runs ({@code matching}
+     * is a pure predicate), so a rule cannot see a state an earlier rule of the same event applied. Content that
+     * wants both writes two rules on two events — which is what the game's sentences do too (the freeze is on the
+     * cast, the bonus is on the damage).
+     */
+    @Test
+    public void aRuleCanGateOnTheFrozenState() {
+        Applied f = new Applied(control(1.0),
+                TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state 冻结"),
+                        TriggerSpecs.gainEnergy(1)));
+
+        Assertions.assertEquals(1, f.fire(), "the freeze lands");
+        Assertions.assertEquals(1, f.fire(com.laosun.aluminium.enums.TriggerEvent.BASIC_ATTACK),
+                "and a later event's rule sees 「冻结状态」 on the victim");
+
+        Applied resisted = new Applied(control(1.0),
+                TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state 冻结"),
+                        TriggerSpecs.gainEnergy(1)));
+        resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
+
+        Assertions.assertEquals(1, resisted.fire(), "here the control rule runs but lands nothing");
+        Assertions.assertEquals(0, resisted.fire(com.laosun.aluminium.enums.TriggerEvent.BASIC_ATTACK),
+                "so the gated rule is refused -- the gate is the only thing that changed");
+    }
+
+    /** The parts of a state come off together: 纠缠's slow goes when the state is removed by name. */
+    @Test
+    public void removingTheNamedStateTakesItsSlowWithIt() {
+        Applied f = new Applied(control("纠缠", null));
+        double before = f.enemy.getAttribute(AttributeType.SPEED).get();
+
+        f.fire();
+        Assertions.assertTrue(f.enemy.getAttribute(AttributeType.SPEED).get() < before, "纠缠 slows");
+
+        Assertions.assertEquals(1, f.enemy.getBuffManager().removeState("纠缠"), "the state is taken off by name");
+        Assertions.assertEquals(before, f.enemy.getAttribute(AttributeType.SPEED).get(), EPS,
+                "and the slow it attached goes with it -- one buff, so the parts cannot come apart");
+    }
+
+    /** A control is a negative effect, so 「解除 N 个负面效果」 reaches it. */
+    @Test
+    public void aControlIsADebuffAndCanBeDispelled() {
+        Applied f = new Applied(control(1.0));
+        f.fire();
+        Assertions.assertEquals(1, f.enemy.getBuffManager().debuffCount(), "the control counts as a debuff");
+
+        f.enemy.getBuffManager().removeDebuffs(1);
+
+        Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "dispelling it gives the turn back");
+    }
+
+    // ==================================================================
+    // Fail fast: what a control rule may not say
+    // ==================================================================
+
+    /**
+     * The load-time rejections, driven through {@code new TriggerTable(...)}.
+     *
+     * <p>⚠ {@code TriggerSpecs.rule(...)} only builds the bean — validation happens when a table compiles the rule,
+     * which is why these cases must go through the table. A test that asserted on the bean alone would pass no
+     * matter what the loader did.
+     */
+    @Test
+    public void anUnknownControlNameIsRejectedAtLoadTime() {
+        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.applyControl("冰冻", 1, null, "target")));
+
+        Assertions.assertTrue(rejected.getMessage().contains("冰冻"), rejected.getMessage());
+        Assertions.assertTrue(rejected.getMessage().contains("冻结"), "the message lists the known states");
+    }
+
+    @Test
+    public void aControlWithoutATurnCountIsRejected() {
+        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.applyControl("冻结", null, null, "target")));
+
+        Assertions.assertTrue(rejected.getMessage().contains("turns"), rejected.getMessage());
+    }
+
+    @Test
+    public void aBaseChanceOutsideZeroToOneIsRejected() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.applyControl("冻结", 1, 1.5, "target")), "a fraction of 1");
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.applyControl("冻结", 1, 0.0, "target")),
+                "0 would read like 「never」, which is spelled by not writing the rule");
+    }
+
+    /** An op that reads none of the magnitude fields refuses them rather than pretending (M-26's rule). */
+    @Test
+    public void theMagnitudeFieldsAreRejectedOnAControl() {
+        com.laosun.aluminium.beans.EffectSpec effect = TriggerSpecs.applyControl("冻结", 1, null, "target");
+        TriggerSpecs.set(effect, "amount", 100.0);
+
+        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(effect));
+        Assertions.assertTrue(rejected.getMessage().contains("amount"), rejected.getMessage());
+    }
+
+    /** Compiles one {@code APPLY_CONTROL} effect into a table, which is where its validation runs. */
+    private static com.laosun.aluminium.models.TriggerTable tableOf(
+            com.laosun.aluminium.beans.EffectSpec effect) {
+        return new com.laosun.aluminium.models.TriggerTable(0,
+                java.util.List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect)));
+    }
+
+    /**
+     * One battle for the skill-applied cases: a hero with the rules under test and one enemy.
+     *
+     * <p>The hero is a placeholder character (no data file), so nothing but the rules built here is in play, and
+     * the enemy is 冰锋 — the same fixture the break cases use, so the two paths are compared on one enemy.
+     */
+    private static final class Applied {
+        private final Character hero;
+        private final Enemy enemy;
+        private final Battle battle;
+
+        private Applied(com.laosun.aluminium.beans.TriggerSpec... rules) {
+            this(EnemyFactory.create(1003010, 90, 1), rules);
+        }
+
+        private Applied(Enemy enemy, com.laosun.aluminium.beans.TriggerSpec... rules) {
+            this.hero = Character.fromAttributes("caster", 10_000, 100, 100, 100);
+            this.enemy = enemy;
+            // ⚠ The fixture STATES the two sides of the probability pipeline instead of inheriting them: every
+            // monster carries some 效果抵抗 (1003010 has 30%), so "a base chance of 1 lands" is only true once
+            // this is zero. The cases that want the resistance to bite set it back (see the two resistance
+            // tests); the ones that want a certain landing rely on this line.
+            enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
+            this.hero.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(0,
+                    java.util.List.of(rules)));
+            this.battle = new Battle(java.util.List.of(hero), java.util.List.of(enemy), new Random(0));
+            battle.startBattle();
+        }
+
+        /** Fires the rule with this enemy as the event's subject; returns how many rules ran. */
+        private int fire() {
+            return fire(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK);
+        }
+
+        /** The same for any event (some cases need a second event to observe what the first one applied). */
+        private int fire(com.laosun.aluminium.enums.TriggerEvent event) {
+            return battle.fireTriggers(event, hero, enemy, 1, 0);
+        }
+    }
+
+    /** A rule that freezes the event's subject with the given base chance ({@code null} = always). */
+    private static com.laosun.aluminium.beans.TriggerSpec control(Double baseChance) {
+        return control("冻结", baseChance);
+    }
+
+    private static com.laosun.aluminium.beans.TriggerSpec control(String name, Double baseChance) {
+        return TriggerSpecs.rule("ALLY_ATTACK", null, TriggerSpecs.applyControl(name, 1, baseChance, "target"));
     }
 
     /** One enemy made weak to exactly one element, in a battle with a hero who does the breaking. */

@@ -352,6 +352,37 @@ public class EffectSpec {
     private Boolean perTarget;
 
     /**
+     * The <b>control state</b> this effect applies — the name the documents and the {@code has_state} condition
+     * use (冻结 / 纠缠 / 禁锢). Only {@code APPLY_CONTROL} reads it; the closed set is
+     * {@code Constant.CONTROL_STATES}, and a name that is not in it is refused at load time.
+     *
+     * <p>What the state <i>does</i> (whether it blocks acting, how far it slows) is the engine's table, not the
+     * rule's: a rule says 「陷入冻结状态」, and 冻结 is one thing. What the rule states is how long it lasts
+     * ({@link #turns}) and how likely it is ({@link #baseChance}).
+     */
+    @SerializedName("control")
+    private String control;
+
+    /**
+     * The <b>base chance</b> (基础概率) that this effect lands, per target — 「有 50% 基础概率陷入冻结状态」 is
+     * {@code 0.5}. Absent = it always lands.
+     *
+     * <p>⚠ <b>Not the same thing as the rule's {@code chance}</b>, which is why the two are spelled with
+     * different words:
+     * <ul>
+     *   <li>a rule's {@code chance} is a <b>fixed</b> probability (固定概率) for the whole rule: one roll per
+     *       firing, and nothing in the battle can change it;</li>
+     *   <li>this is a <b>base</b> chance per target, which the engine runs through the real pipeline
+     *       ({@code Battle.hitChance}: base × (1 + the applier's 效果命中) × (1 − the victim's 效果抵抗) ×
+     *       (1 − its specific resistance for this state)). 「50% 基础概率」 is 50% <i>before</i> those, exactly
+     *       as the text means it, and the roll happens once per victim — three enemies can see three different
+     *       outcomes, which a rule-level roll could never express.</li>
+     * </ul>
+     */
+    @SerializedName("base_chance")
+    private Double baseChance;
+
+    /**
      * The stack cap, whichever spelling the rule used.
      *
      * <p>Read by the interpreter <b>after</b> it has rejected "both spellings stated at once", so the

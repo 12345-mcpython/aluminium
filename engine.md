@@ -474,7 +474,7 @@ self_resource:充能 >= 3   **我自己**某个**已声明资源**的层数  ←
 self has_same_path_ally  **我方还有别人跟我同命途**    ← 出云显世与高天神国 314「若至少存在一名与装备者命途相同的队友」
 target_summon_count >= 1  **这件事的承受者**有召唤物在场  ← 星期日战技「若目标拥有召唤物，则造成的伤害提高额外提高…」
 self has_state 协奏   我处于具名状态【协奏】      ← 知更鸟「处于【协奏】状态时」
-target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡「触电状态下的敌方目标」
+target has_state 触电 这件事的承受者处于【触电】  ← 卡芙卡「触电状态下的敌方目标」（⚠ 认四种 DOT 与三种**控制**：冻结/纠缠/禁锢也可问，见 §8.6）
 target has_path 同谐  这件事的承受者**命途**是「同谐」 ← 星期日战技「对「同谐」命途的角色施放时无法触发立即行动」
 target is_ally      这次施放瞄准的单位**在我方**    ← 遗器 114/118/121「对**己方角色**施放终结技/战技时」（`!target is_ally` 是反面；⚠ 事件不说那个单位的阵营，而打敌人的终结技同样带 target）
 target has_weakness Fire  **这件事承受者**弱该元素   ← 遗器 316「命中具有**火属性弱点**的敌方目标时」（⚠ 只有 `Enemy` 有弱点条，角色/召唤物一律为假）
@@ -618,6 +618,7 @@ JSON 写法不变。
 | `BOOST_DAMAGE` | `percent`（只能挂在 `DEALING_DAMAGE` 上） | ✅ 改**正在结算的那一次**伤害：不改属性、不挂 buff、不会漏到下一次。是「对处于 X 状态的目标造成的伤害提高 Y%」的实现 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
 | `DISPEL` | `amount`，可选 `target` | ✅ 移除最多 `amount` 个**负面效果**（「解除 N 个负面效果」），**最新的先走**；"什么算负面"由每个 buff 类自己回答（`AbstractBuff.isDebuff()`，见 §10.4） |
+| `APPLY_CONTROL` | `control`（**封闭集合**：冻结/纠缠/禁锢）+ `turns`（必填、正数）+ 可选 `base_chance`（基础概率，**按目标**掷、走效果命中/抵抗），可选 `target` | ✅（2026-09-27）「有 50% 基础概率使敌方目标陷入冻结状态，持续 1 回合」。⚠ 状态**做什么**是引擎的表（`Constant.CONTROL_STATES`），规则只说哪个/多久/多可能；⚠ 写错名字装载期拒绝并列出已知三种；⚠ `amount`/`scale`/`percent`/`attribute`/`buff` 一律**拒绝**（这个 op 一个都不读）；⚠ 它**不是**规则级的 `chance`（那是整条规则一次的固定概率）。见 §8.6 |
 | `REMOVE_STATE` | `buff`（**状态名**），可选 `target` | ✅ **把具名状态整个拿掉**（2026-09-27，M-42 ②）：与 `APPLY_BUFF` / `has_state` **同一套名字**，「触电」这类 DoT 拼写也认（`BuffManager.removeState` 与 `hasState` 走同一张表，一侧改名两侧一起改）。⚠ 不在场**不是错误**（「只对最新目标生效」这类规则每次施放都跑，多数时候没什么可拿的）；⚠ **不收 `amount`** —— 「解除…状态」是拿掉整个状态，不是拿掉 N 个，写了会装载期报错。首个读者是**星期日终结技的【蒙福者】**「仅对…**最新的**施放目标生效」，但那条内容还差"按谁的回合计时"（M-42 ④），所以这个 op 目前是**已验证的能力、暂无出货规则** |
 | `TAUNT` | `turns`（必填、正数），可选 `target` | ✅ **使目标陷入嘲讽状态**（2026-09-27）：挂的是引擎早就有的 `TauntBuff`（**纯标记**，硬约束在**选目标阶段**：只要它还挂在活着的单位身上，单体攻击与扩散中心**只能选它**）。⚠ 与「被敌方攻击的概率提高」（**软**权重，且**文档里没有任何数字**）**不是一回事**，后者登记为数据缺口。首个用户 **1507 千冶·刃战技**「使目标陷入嘲讽状态，持续1回合」；⚠ 云璃终结技的「**敌方全体**陷入嘲讽」还缺一个**敌方群体选择器**（现有群体选择器都读我方阵营） |
 | `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、**`ticks_on`**（见下） | ✅ 具名状态（见下） |
@@ -1513,10 +1514,11 @@ Damage(type = BREAK)   → 走完整装配，但 BoostArea/CritArea 自动跳过
 - 🚧 `DOT_RATIO = 0.5` 与 `DOT_TURNS = 3` 是**示例值**（代码注释标了 `TODO data`），
   两个都还没有真实数据来源。
 
-### 8.6 击破控制状态（P10-2）✅ 数值仍是示例值
+### 8.6 控制状态（P10-2 击破施加；2026-09-27 起也由技能施加）✅ 数值仍是示例值
 
 冰 / 量子 / 虚数击破不留 DOT，而留一个**控制状态**。表在 `Constant.CONTROL_EFFECTS`
-（`ControlEffect(resistKey, turns, blocksAct, slowPercent)`），由 `BreakEffect.control` 按键引用。
+（`ControlEffect(key, name, resistKey, turns, blocksAct, slowPercent)`），由 `BreakEffect.control` 按键引用；
+同名索引 `Constant.CONTROL_STATES` 按**文档用的中文名**（冻结/纠缠/禁锢）取，规则与 `has_state` 走这一个。
 
 **⚠ 计划里"冻结期受伤害 +30%"是错的，数据说的相反。** 词条原文（六条独立来源，冰系全部一致）：
 
@@ -1535,14 +1537,22 @@ Damage(type = BREAK)   → 走完整装配，但 BoostArea/CritArea 自动跳过
 | 量子 → 纠缠 | 否 | 是（−20%） | 是（+20%） |
 | 虚数 → 禁锢 | 否 | 是（−20%） | 是（+20%） |
 
-**没有新的 buff 类 —— 控制是组合出来的**（P8-0 的规矩）：
+**控制是一个 `ControlBuff`**（2026-09-27 起；在那之前它是"`StunBuff`，可能再加一个减速"，写在
+`Battle.attachBreakControl` 里）。给类而不是继续组合的理由只有两条，但都致命：
 
-| 部分 | 用哪个现成原语 |
+- **它得有名字。** 组合出来的状态没有名字，于是「冻结状态」**问不出来** —— `has_state` 看不见它、
+  条件 DSL 无法据此 gate，而**击破冻住的单位会答 `false`**（一个条件在它最该成立的一半场合失效，且没有任何症状）。
+- **两条路必须是同一个状态。** 击破能施加控制、而技能不能（技能要的是同一套组合**再加一次抗性判定**），
+  两边各写一遍组合，迟早会漂 —— 现在 `APPLY_CONTROL` 与击破各建一个 `ControlBuff`，名字/部件/移除全一致。
+
+| 部分 | 怎么实现 |
 |---|---|
-| `blocksAct` | `StunBuff`（`canAct() == false`，早就在） |
-| `slowPercent` | `StatModifierBuff.percentDebuff(SPEED, …)` |
-| 推条 | `Battle.delayMovePercent`（**瞬时**推，不是 buff） |
-| `resistKey` | `Battle.hitChance` 的第 4 个参数（**只给技能施加那条路**） |
+| 名字 | `ControlBuff.getName()`（冻结/纠缠/禁锢），`BuffManager.hasState` / `removeState` 认它 |
+| `blocksAct` | 同一个 buff 的 `canAct() == false`（`StunBuff` 仍是"纯不能行动"的原语，`BuffManagerTest` 等在用） |
+| `slowPercent` | 由 `ControlBuff` 自己挂一个 `StatModifierBuff.percentDebuff(SPEED, …)` 并在 `removeBuff` 里摘掉 |
+| 每回合伤害 | `ControlBuff` 可带一个 `DotBuff`（同一个 `removeBuff` 摘掉）—— ⚠ 目前**只有击破那条路没用**，见下 |
+| 推条 | `Battle.delayMovePercent`（**瞬时**推，不是 buff，故意不属于这个状态） |
+| `resistKey` | `Battle.tryApplyDebuff`（**只给技能施加那条路**） |
 
 - ⚠ **击破不走抵抗判定。** 破韧是"韧性条空了"，不是被抵抗的 debuff —— 若让 `STAT_CTRL_*` 取消一次击破，
   弱点击破会**静默什么都不发生**。冰锋本身就带 `STAT_CTRL_Frozen = 1`，
@@ -1556,6 +1566,28 @@ Damage(type = BREAK)   → 走完整装配，但 BoostArea/CritArea 自动跳过
   `BreakEffectTableTest` 会因为有人乱填而变红；真要填时 `attachBreakDot` 一行都不用改。
 - 🚧 示例值 + `TODO data`：三个 `turns`（都取 1）、三个额外推条（0.5 / 0.2 / 0.2）、两个减速（0.2）。
   数据里没有击破控制表（`breaking_rate.json` 是"等级→击破基数"），词条正文只给机制、不给击破数值。
+
+#### 技能施加控制：op `APPLY_CONTROL` ✅（2026-09-27）
+
+```json
+{ "op": "APPLY_CONTROL", "control": "冻结", "turns": 1, "base_chance": 0.5, "target": "all_enemies" }
+```
+
+- `control` 走**封闭集合**（`Constant.CONTROL_STATES`），写错名字装载期拒绝并列出已知的三种：
+  控制是"一个东西"，规则只说**哪一个**、**多久**、**多可能**，不说它做什么。
+- `turns` **必填**（「持续1回合」）：没有回合数的控制就是**永久锁**，而它读起来像一条正常规则 —— 正是这套词汇
+  最不能接受的形状。
+- `base_chance` 是**基础概率**（基础概率 ≠ 规则级 `chance` 的固定概率，所以两个字段用了两个词）：
+  它按**每个目标**掷，并且走真管线（`Battle.hitChance`：基础 × (1+施加者效果命中) × (1−受击者效果抵抗) ×
+  (1−它对该状态的专属抗性)）。⚠ 规则级 `chance` 是**整条规则一次**的骰子，永远表达不出"三个敌人各 50%"。
+- ⚠ 首个用户 **1001 三月七终结技**「受到攻击的敌方目标有 50% 基础概率陷入冻结状态，持续 1 回合」。
+  契约：`ControlTest` 16 条（击破三元素 + 12 条技能施加：落点/名字/管线两端/专属抗性/与击破同状态/
+  gate/按名字移除带走减速/可被驱散/四种装载期拒绝）。**变异**：`hasState` 不认控制名 **4 红**、
+  忽略 `base_chance`（不掷骰）**3 红**、控制不带走减速 **1 红**、不校验状态名 **1 红**、
+  内容里把 `冻结` 写成 `纠缠` **1 红**。
+- 🚧 **状态自己的"每回合伤害"还没接**：`ControlBuff` 已经能带一个 `DotBuff`（一起挂、一起摘），
+  但**没有 op 去造它** —— 见 `ROADMAP` 的 `M-48`（`APPLY_DOT`），首个读者就是三月七那句话的后半段
+  （「每回合开始时受到等同于三月七 60% 攻击力的冰属性附加伤害」，参数 `#4 = 0.6`）。
 
 ### 8.7 超击破 ✅（P4-6，2026-09-19 实现）
 

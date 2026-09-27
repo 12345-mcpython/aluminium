@@ -143,6 +143,25 @@ final class TriggerSpecs {
     }
 
     /**
+     * An {@code APPLY_CONTROL} effect: 「有 X% 基础概率使目标陷入…状态，持续 N 回合」.
+     *
+     * @param control the state's name as the documents spell it (冻结 / 纠缠 / 禁锢)
+     * @param turns   how many of the victim's turns it lasts, or {@code null} to leave the field out (which the
+     *                loader refuses — a control with no duration would never end)
+     * @param chance  the base chance (基础概率), or {@code null} for a state that always lands
+     * @param target  the optional target selector, or {@code null}
+     */
+    static EffectSpec applyControl(String control, Integer turns, Double chance, String target) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "APPLY_CONTROL");
+        set(effect, "control", control);
+        set(effect, "turns", turns);
+        set(effect, "baseChance", chance);
+        set(effect, "target", target);
+        return effect;
+    }
+
+    /**
      * A {@code DAMAGE} effect: the numbers come out of the named skill's own parameter row.
      *
      * @param skill  the skill slot ({@code "TALENT"}, {@code "ULTRA"}, …)

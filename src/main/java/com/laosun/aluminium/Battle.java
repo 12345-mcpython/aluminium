@@ -10,9 +10,9 @@ import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.ai.TargetSelector;
 import com.laosun.aluminium.models.buff.AbstractBuff;
+import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
-import com.laosun.aluminium.models.buff.StunBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.energy.EnergyGain;
@@ -826,9 +826,10 @@ public class Battle {
      *       (explicitly about 弱点击破 with Quantum). The delayed damage is again a DOT, left to the same
      *       TODO.</li>
      * </ul>
-     * So all three are <b>行动延后</b>, and the difference is 冻结 = cannot act (here: {@code StunBuff})
-     * versus 禁锢/纠缠 = acts but slower (here: a {@code SPEED} debuff). Both are existing primitives —
-     * which is the point of a control being data and not a class.
+     * So all three are <b>行动延后</b>, and the difference is 冻结 = cannot act versus 禁锢/纠缠 = acts but slower
+     * (a {@code SPEED} debuff). Both are existing primitives, and since 2026-09-27 they are the two parts of
+     * {@code ControlBuff} — which is what gives a control its <b>name</b>, so 「冻结状态」 can be asked about no
+     * matter which path applied it.
      *
      * <p><b>No effect-hit roll, and no {@code resistKey} lookup, on this path.</b> A break is not a resisted
      * debuff: it happens because the toughness bar emptied. {@code ControlEffect.resistKey} is for the
@@ -854,14 +855,11 @@ public class Battle {
         // one-off push" is the order the data describes it in, not because correctness depends on it.
         Constant.ControlEffect control = breakEffect.controlEffect();
         if (control != null) {
-            if (control.blocksAct()) {
-                enemy.getBuffManager().addBuff(new StunBuff(control.turns()));
-            }
-            if (control.slowPercent() > 0) {
-                // percentDebuff takes the negative value itself, so the call site reads "SPEED -20%".
-                enemy.getBuffManager().addBuff(StatModifierBuff.percentDebuff(
-                        AttributeType.SPEED, -control.slowPercent(), control.turns()));
-            }
+            // One buff, three parts (2026-09-27): before this, the composition was written out here as "a
+            // StunBuff, plus a SPEED debuff if the element slows" -- which left the state with no name, so
+            // nothing could ask 「冻结状态」 about a break-frozen unit, and an ability-applied control (which
+            // needs exactly the same composition plus a resistance roll) had no shared place to live.
+            enemy.getBuffManager().addBuff(new ControlBuff(control, control.turns()));
         }
         if (breakEffect.delayPercent() > 0) {
             // An instant push, not a buff: 禁锢/纠缠's "行动延后" is a one-off on the action bar, so it must

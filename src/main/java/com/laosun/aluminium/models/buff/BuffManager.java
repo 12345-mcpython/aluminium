@@ -547,14 +547,20 @@ public class BuffManager {
                 return true;
             }
         }
-        // Engine states: the four names below are not StateBuff names — they are the DoT elements, which the
-        // engine has represented as an ordinary DotBuff since P10-0. Resolving them here is what makes
-        // 「对处于灼烧状态的目标造成的伤害提高」 (and 「触电状态下的敌方目标被消灭时」) expressible without
-        // inventing a second fact for "this unit is burning".
+        // Engine states: the names below are not StateBuff names -- they are states the engine represents with
+        // a buff of its own. Resolving them here is what makes 「对处于灼烧状态的目标造成的伤害提高」 and
+        // 「冻结状态下的敌方目标」 expressible without inventing a second fact for "this unit is burning/frozen".
         //
-        // ⚠ Controls (冻结 / 纠缠 / 禁锢) are deliberately NOT in this table yet: P10-2 models them as a
-        // combination of a control buff and an action delay, so "is this unit frozen" needs its own definition
-        // rather than a guess that would half-work. Adding them later changes no JSON.
+        // ⚠ Controls joined this table on 2026-09-27, when ControlBuff gave them a name. Before that the comment
+        // here said they were "deliberately NOT in this table yet ... adding them later changes no JSON" -- and
+        // that is exactly what happened: the break path and a skill-applied control now produce the SAME buff, so
+        // 「冻结」 answers the same thing whichever one froze the unit (a break-frozen enemy used to have no name
+        // at all, so a rule gated on 「冻结状态」 would have silently missed it).
+        for (ControlBuff control : allBuffsOf(ControlBuff.class)) {
+            if (wanted.equals(control.getName())) {
+                return true;
+            }
+        }
         DamageElement dotElement = DOT_STATES.get(wanted);
         if (dotElement == null) {
             return false;
@@ -591,6 +597,14 @@ public class BuffManager {
         for (StateBuff buff : allBuffsOf(StateBuff.class)) {
             if (wanted.equals(buff.getState())) {
                 removeBuff(buff);
+                removed++;
+            }
+        }
+        // Controls, like hasState: removing 「冻结」 takes the whole state off (its act lock, its slow and its
+        // per-turn damage -- they are one ControlBuff, so they cannot come apart here).
+        for (ControlBuff control : allBuffsOf(ControlBuff.class)) {
+            if (wanted.equals(control.getName())) {
+                removeBuff(control);
                 removed++;
             }
         }

@@ -450,10 +450,10 @@ public final class Constant {
      * <table border="1">
      *   <caption>which existing primitive implements which part</caption>
      *   <tr><th>part</th><th>primitive</th></tr>
-     *   <tr><td>{@link #blocksAct}</td><td>{@code StunBuff} ({@code canAct() == false})</td></tr>
-     *   <tr><td>{@link #slowPercent}</td><td>{@code StatModifierBuff.percentDebuff(SPEED, …)}</td></tr>
+     *   <tr><td>{@link #blocksAct}</td><td>the act lock inside {@code ControlBuff} ({@code canAct() == false})</td></tr>
+     *   <tr><td>{@link #slowPercent}</td><td>{@code StatModifierBuff.percentDebuff(SPEED, …)}, owned by {@code ControlBuff}</td></tr>
      *   <tr><td>the delay</td><td>{@code Battle.delayMovePercent} — not a buff, it is an instant push</td></tr>
-     *   <tr><td>{@link #resistKey}</td><td>{@code Battle.hitChance}'s 4th argument (skill-applied only)</td></tr>
+     *   <tr><td>{@link #resistKey}</td><td>{@code Battle.tryApplyDebuff}'s last argument (skill-applied only)</td></tr>
      * </table>
      *
      * <p><b>{@link #resistKey} is deliberately not consulted when a <i>break</i> applies the control.</b>
@@ -462,13 +462,23 @@ public final class Constant {
      * the table is that the same state can also be applied by a skill, and that path goes through
      * {@code Battle.tryApplyDebuff(…, resistKey)} — where the resistance really does apply.
      *
+     * <p>⚠ <b>The state is applied as one {@code ControlBuff}, for both paths</b> (2026-09-27). Before that,
+     * only a break could produce a control and it was composed inline as "a {@code StunBuff} plus maybe a
+     * speed debuff" — so "is this unit frozen" had no answer the condition DSL could read, and the two paths
+     * (break and skill) would have drifted the moment a skill applied one. Now the composition lives in
+     * {@code ControlBuff}, which also carries {@link #name} — the spelling the documents and `has_state` use.
+     *
+     * @param key         the English key {@link BreakEffect#control} uses ({@code "FROZEN"})
+     * @param name        the state's NAME as the documents spell it (冻结) — what a rule's {@code control}
+     *                    argument and the {@code has_state} condition use
      * @param resistKey   the data's specific-resistance key for this state (what a <i>skill</i> must beat)
      * @param turns       how many of the victim's turns it lasts
      * @param blocksAct   {@code true} = the victim cannot act at all; {@code false} = it acts, just slower
      *                    or later (this is the difference between 冻结 and 禁锢/纠缠)
      * @param slowPercent SPEED reduction as a decimal (0.2 = −20%), 0 = no slow
      */
-    public record ControlEffect(String resistKey, int turns, boolean blocksAct, double slowPercent) {
+    public record ControlEffect(String key, String name, String resistKey, int turns, boolean blocksAct,
+                                double slowPercent) {
     }
 
     /**
@@ -500,9 +510,22 @@ public final class Constant {
      * {@code ENTANGLED}'s 0.2 has no source at all and stays a plain guess.
      */
     public static final Map<String, ControlEffect> CONTROL_EFFECTS = Map.of(
-            "FROZEN", new ControlEffect("STAT_CTRL_Frozen", 1, true, 0.0),
-            "ENTANGLED", new ControlEffect("STAT_Entangle", 1, false, 0.2),
-            "IMPRISONED", new ControlEffect("STAT_Confine", 1, false, 0.1));
+            "FROZEN", new ControlEffect("FROZEN", "冻结", "STAT_CTRL_Frozen", 1, true, 0.0),
+            "ENTANGLED", new ControlEffect("ENTANGLED", "纠缠", "STAT_Entangle", 1, false, 0.2),
+            "IMPRISONED", new ControlEffect("IMPRISONED", "禁锢", "STAT_Confine", 1, false, 0.1));
+
+    /**
+     * The same three states, keyed by the <b>name the documents spell</b> (冻结 / 纠缠 / 禁锢).
+     *
+     * <p><b>Why a second index instead of a second table.</b> The two spellings are needed in different places and
+     * must not be maintained twice: {@link BreakEffect#control} names an <i>engine key</i> (the element table is
+     * engine data), while a rule's {@code "control"} argument and the {@code has_state} condition use the
+     * <b>name the game text uses</b> — the same convention every other state name follows (协奏 / 触电 / 灼烧).
+     * A typo in either place is refused at load time ({@code APPLY_CONTROL} resolves the name through this map),
+     * which is why the two must agree exactly.
+     */
+    public static final Map<String, ControlEffect> CONTROL_STATES = CONTROL_EFFECTS.values().stream()
+            .collect(java.util.stream.Collectors.toUnmodifiableMap(ControlEffect::name, effect -> effect));
 
     /**
      * Extra action delay of a Freeze break, on top of {@link #BREAK_DELAY_RATIO} (**example value,
