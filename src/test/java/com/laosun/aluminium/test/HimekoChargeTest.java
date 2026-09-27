@@ -228,9 +228,9 @@ public class HimekoChargeTest {
                 "「当有敌方目标的弱点被击破时」 (anybody's break) and 星魂 4's 「施放战技…造成弱点击破时」");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "「当我方目标施放攻击后」");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.ULT_CAST), "her ultimate is the engine's ordinary path");
-        Assertions.assertEquals(0, table.ruleCount(TriggerEvent.KILL),
-                "「每消灭1个敌方目标额外恢复5点能量」 is registered: the attribution exists now, the ±5 energy data "
-                        + "question does not (M-45)");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL),
+                "「每消灭1个敌方目标额外恢复姬子5点能量」 -- shipped on 2026-09-28 once 「额外」 was read against the "
+                        + "engine's general kill credit (HimekoKillEnergyTest)");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.SKILL_CAST),
                 "星魂 4's charge rides on BREAK with `from_skill SKILL`, not on a cast event of its own");
         Assertions.assertEquals(1, table.resources().size(), "and she declares exactly one resource");
