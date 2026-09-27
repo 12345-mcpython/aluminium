@@ -1,0 +1,21 @@
+{
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "when": [
+        "actor == self",
+        "target has_weakness Fire"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.2,
+          "turns": 2
+        }
+      ],
+      "source": "relic set 316 (盗贼公国塔利亚 / Talia - Kingdom of Banditry), 2-piece: 「使装备者的速度提高#1[i]%。当装备者命中具有火属性弱点的敌方目标时，使装备者的击破特攻提高#2[i]%，持续#3[i]回合。」 param = [0.06, 0.2, 2]",
+      "note": "The conditional half only: 「使装备者的速度提高 6%」 is a plain stat and is already carried by the ability's `properties` (SpeedAddedRatio 0.06), which the suit applies when it is built -- writing it here too would grant it twice. ⚠ 「命中具有**火属性弱点**的敌方目标时」 is `target has_weakness Fire` on DEALING_DAMAGE: that event hands over each pending instance with `actor` = who deals it and `target` = who takes it, which is exactly 「装备者命中」. ⚠ `target` is an ENEMY here, and a weakness is a property only an enemy has (`Enemy.isWeakTo`) -- 316's text says 「敌方目标」 and the event's subject is that enemy. ⚠ The buff lands on the WEARER (no `target:` on the effect), which is what 「使**装备者**的击破特攻提高」 says; several hits in one turn simply refresh it, since nothing in the sentence limits how often it may trigger."
+    }
+  ]
+}
