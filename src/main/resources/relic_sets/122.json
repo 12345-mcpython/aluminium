@@ -1,0 +1,40 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 122 (识海迷坠的学者 / Scholar Lost in Erudition), 4-piece: 「战技和终结技造成的伤害提高#1[i]%，施放终结技后，下一次施放战技时造成的伤害额外提高#2[i]%。」 param = [0.2, 0.25]",
+      "note": "The first sentence, which is unconditional: two scoped boosts, both `permanent` because no duration is stated. ⚠ The two scopes are separate attributes (SKILL_DAMAGE_BOOST / ULTIMATE_DAMAGE_BOOST), not one 'DMG' -- the cast's own category rides on the damage instance, which is why a scoped boost can exist at all (see AttributeType's note on BASIC_ATTACK_DAMAGE_BOOST)."
+    },
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.25,
+          "max_stacks": 2,
+          "until": "next_skill"
+        }
+      ],
+      "source": "relic set 122 (识海迷坠的学者 / Scholar Lost in Erudition), 4-piece: 「施放终结技后，下一次施放战技时造成的伤害额外提高#2[i]%。」 param = [0.2, 0.25]",
+      "note": "The second sentence: 「下一次施放战技时」 is an EVENT, not a number of turns, so it is `\"until\": \"next_skill\"` -- written as `turns: 1` it would expire on a turn boundary instead, and survive a turn in which no Skill was cast. ⚠ `max_stacks: 2` is NOT decoration, and leaving it out would be a silent 10-point error: 「额外提高」 means the +25% is ON TOP of the +20% above, but the default cap is 1 and two modifiers on the same attribute then REPLACE each other (the trap ROADMAP records for 波提欧 16% + 阮·梅 20% = 20%). With the cap at 2 the two coexist and add to 0.45 for the next Skill. ⚠ The lifetime is keyed to the OWNER, which here is exactly right: 「施放终结技后」 is her own ultimate, and the buff must end when SHE next casts a Skill (a teammate's Skill is not 「下一次施放战技」), while the permanent +20% above is a separate buff and survives."
+    }
+  ]
+}
