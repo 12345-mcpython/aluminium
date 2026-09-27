@@ -205,9 +205,56 @@ public class MemospriteTest {
     }
 
     // ==================================================================
-    // 3. Refusals
+    // 2b. Aggro: the servant''s own 仇恨 line
     // ==================================================================
 
+    /**
+     * A memosprite is 25% more attractive to the enemy than an ordinary unit, because the document says so.
+     *
+     * <p>「ServantID 11413 · 仇恨: 125」 is a line the servant block states for itself; without it every summon sat at
+     * {@code Battle.aggroOf}''s 100 fallback, i.e. an enemy picked its target as if the memosprite were just
+     * another character. Asserted against a unit that states nothing, so the two numbers mean something.
+     */
+    @Test
+    public void theMemospriteCarriesTheAggroItsDocumentStates() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Battle battle = new Battle(List.of(aglaea), List.of(monster()), new Random(0));
+        Summon tailor = battle.summonMemosprite(aglaea);
+
+        Assertions.assertEquals(125, battle.aggroOf(tailor), EPS, "「仇恨: 125」");
+        Assertions.assertEquals(100, battle.aggroOf(battle.enemies.getFirst()), EPS,
+                "and a unit that states nothing still gets the regular tier");
+    }
+
+    /** A spec that states no aggro leaves the engine''s fallback alone -- which is not the same claim as 100. */
+    @Test
+    public void aSpecWithoutAggroKeepsTheFallback() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Battle battle = new Battle(List.of(aglaea), List.of(monster()), new Random(0));
+        Summon plain = SummonFactory.memosprite(aglaea, new MemospriteSpec("spy", "test", null, List.of(
+                new MemospriteSpec.Panel("HEALTH", null, 1_000.0),
+                new MemospriteSpec.Panel("SPEED", null, 100.0))));
+        plain.setMaster(aglaea);
+        battle.allies.add(plain);
+
+        Assertions.assertEquals(100, battle.aggroOf(plain), EPS);
+    }
+
+    /** A weight of zero or less is refused at load time: it would take the memosprite out of the aggro table. */
+    @Test
+    public void aNonPositiveAggroIsRejected() {
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> Memosprites.validate(new MemospriteSpec("spy", "test", null, List.of(
+                        new MemospriteSpec.Panel("HEALTH", null, 1_000.0),
+                        new MemospriteSpec.Panel("SPEED", null, 100.0)), null, 0.0), "test"));
+
+        Assertions.assertTrue(refused.getMessage().contains("aggro"), refused.getMessage());
+        Assertions.assertTrue(refused.getMessage().contains("never target"), refused.getMessage());
+    }
+
+    // ==================================================================
+    // 3. Refusals
+    // ==================================================================
     /** A character with no memosprite is refused <b>loudly</b>, naming the file to write. */
     @Test
     public void aCharacterWithNoMemospriteIsRefusedWithThePathToWrite() {
