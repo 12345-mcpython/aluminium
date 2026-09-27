@@ -180,6 +180,28 @@ public class SundaySkillTest {
         Assertions.assertTrue(second.getBuffManager().hasState("蒙福者"));
     }
 
+    /**
+     * 「恢复等同于#1[f1]%能量上限的能量」: 20% of the <b>ally's</b> maximum energy, not a flat number.
+     *
+     * <p>⚠ Measured with the clamp spelled out: the grant is the stated share, capped by the bar. The maximum
+     * differs per character (120/130/140 across the roster), so a flat number would be wrong for all of them — which
+     * is the whole reason the scale exists.
+     */
+    @Test
+    public void theUltimateRestoresAShareOfTheAllysMaxEnergy() {
+        Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
+        Character ally = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
+        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        double before = ally.getCurrentEnergy();
+        double max = ally.getMaxEnergy();
+
+        castUltimate(battle, sunday, ally);
+
+        Assertions.assertEquals(Math.min(0.2 * max, max - before), ally.getCurrentEnergy() - before, EPS,
+                "20% of HER maximum (" + max + "), not of his, and not a literal");
+    }
+
     /** His death takes the state off the ally: 「当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除」. */
     @Test
     public void hisDeathTakesTheStateOff() {
