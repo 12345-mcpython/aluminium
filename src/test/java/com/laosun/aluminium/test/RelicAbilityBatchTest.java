@@ -1,6 +1,8 @@
 package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
@@ -11,6 +13,7 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -271,6 +274,17 @@ public class RelicAbilityBatchTest {
                 "「及其忆灵」: the memosprite carries its own copy of the Max HP buff");
         Assertions.assertEquals(allyBoost + 0.15, boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST), EPS,
                 "「我方全体造成的伤害提高 15%」 reaches a teammate too");
+
+        // M-38: the file states the sentence's disjunction as ONE duration with two ends. Asserted on the shipped
+        // 4-piece rather than on a hand-made rule, because the shape of the JSON is half of what this guarantees.
+        List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(SHATTERED_WORLD).at(4)
+                .matching(TriggerEvent.SKILL_CAST,
+                        new TriggerTable.TriggerContext(wearer, wearer, null, 0, 0, null, battle));
+        Assertions.assertEquals(1, rules.size());
+        for (EffectSpec effect : rules.getFirst().effects()) {
+            Assertions.assertEquals(List.of("next_attack", "next_skill"), effect.getUntil(),
+                    "「持续至装备者下次施放普攻或战技后」 -- a list, so a support Skill ends it too");
+        }
     }
 
     // ==================================================================

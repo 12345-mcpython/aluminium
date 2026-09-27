@@ -9,7 +9,10 @@ import com.laosun.aluminium.models.skill.Skill;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent {
@@ -78,14 +81,10 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * can carry one by setting the field, rather than each class growing its own copy of "remove myself when
      * the owner attacks".
      *
-     * <p>⚠ The default is {@link Lifetime#NONE}: every existing buff keeps expiring exactly as it did, and a
+     * <p>⚠ The default is an <b>empty set</b>: every existing buff keeps expiring exactly as it did, and a
      * buff only behaves differently when a rule says {@code "until": …}.
      */
     public enum Lifetime {
-        /**
-         * No event-based end: the buff lives by {@code remainingDuration} or {@code permanent}.
-         */
-        NONE,
         /**
          * Ends after its owner finishes an attack that landed — a basic attack, a Skill or an Ultimate.
          */
@@ -101,12 +100,28 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     }
 
     /**
-     * The event that ends this buff, or {@link Lifetime#NONE}. Written by whoever creates the buff (the
-     * trigger interpreter, from the rule's {@code "until": …}).
+     * The events that end this buff; <b>empty</b> means "no event-based end". Written by whoever creates the
+     * buff (the trigger interpreter, from the rule's {@code "until": …}).
+     *
+     * <p><b>Why a set.</b> The game states durations as disjunctions — 「持续至装备者下次施放普攻<b>或</b>战技后」
+     * (relic set 127) — and the buff ends at the <b>first</b> of the named events: a duration is one fact, however
+     * many events can end it. The alternative shapes are both wrong, and both look like they work: naming one of
+     * the two events makes a 战技 silently not end a buff that its text says it ends, and creating two buffs (one
+     * per event) makes them <b>replace each other</b> on the same kind + target, so only the later one is ever up.
      */
-    @Setter
     @Getter
-    protected Lifetime lifetime = Lifetime.NONE;
+    protected Set<Lifetime> lifetimes = EnumSet.noneOf(Lifetime.class);
+
+    /**
+     * Replaces the ending events with the ones a rule named; an empty collection means "no event-based end",
+     * which is what a buff that states no {@code "until"} gets.
+     */
+    public void setLifetimes(Collection<Lifetime> lifetimes) {
+        this.lifetimes.clear();
+        if (lifetimes != null) {
+            this.lifetimes.addAll(lifetimes);
+        }
+    }
 
     /**
      * Ends this buff when its <b>owner</b> finishes an attack.
@@ -118,16 +133,17 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     @Override
     public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
                             List<? extends CanHit> hitTargets, double totalDamage) {
-        if (lifetime == Lifetime.NEXT_ATTACK && attacker != null && attacker == owner) {
+        if (lifetimes.contains(Lifetime.NEXT_ATTACK) && attacker != null && attacker == owner) {
             endNow();
         }
     }
 
     /**
-     * Ends this buff when its <b>owner</b> casts the kind of skill its lifetime names.
+     * Ends this buff when its <b>owner</b> casts the kind of skill one of its lifetimes names.
      *
      * <p>Which cast this is comes from the parsed skill data ({@code SkillCategory}), the same source the
-     * trigger emitters use — never from a skill's name or slot.
+     * trigger emitters use — never from a skill's name or slot. The notification arrives <b>before</b> the cast
+     * trigger events, so a buff that a rule grants on this very cast is not ended by it.
      */
     @Override
     public void onSkillCast(Battle battle, CanHit user, Skill skill,
@@ -138,8 +154,8 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         SkillCategory category = skill == null || skill.getData() == null
                 ? null
                 : skill.getData().getCategory();
-        if ((lifetime == Lifetime.NEXT_SKILL && category == SkillCategory.BPSKILL)
-                || (lifetime == Lifetime.NEXT_ULTIMATE && category == SkillCategory.ULTRA)) {
+        if ((lifetimes.contains(Lifetime.NEXT_SKILL) && category == SkillCategory.BPSKILL)
+                || (lifetimes.contains(Lifetime.NEXT_ULTIMATE) && category == SkillCategory.ULTRA)) {
             endNow();
         }
     }
