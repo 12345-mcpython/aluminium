@@ -170,6 +170,15 @@ public class March7thKitTest {
         Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」");
         Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp(),
                 "and the first sentence of the ultimate is the engine's own AoE path, not a rule");
+
+        // The second half of that sentence, and the reason it is one rule: 「冻结状态下…每回合开始时受到等同于
+        // 三月七60%攻击力的冰属性附加伤害」.
+        com.laosun.aluminium.models.buff.DotBuff ice = enemy.getBuffManager()
+                .findBuff(com.laosun.aluminium.models.buff.DotBuff.class);
+        Assertions.assertNotNull(ice, "the frozen enemy carries the state's per-turn damage");
+        Assertions.assertEquals(0.6 * march.getAttribute(AttributeType.ATTACK).get(), ice.getBaseDamage(), EPS,
+                "60% of HER attack, read when the freeze landed");
+        Assertions.assertEquals(DamageElement.ICE, ice.getElement());
     }
 
     /**

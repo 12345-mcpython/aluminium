@@ -5,6 +5,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
@@ -204,6 +205,154 @@ public class DotTest {
         Assertions.assertEquals(10_000 - 500 * 1000.0 / 1100.0, hero.getCurrentHp(), 1e-6,
                 "a DOT on a character settles at the start of that character's turn");
         Assertions.assertEquals(1, hero.getBuffManager().countBuffs(DotBuff.class), "1 settlement left");
+    }
+
+    // ==================================================================
+    // A DOT attached by a RULE: op APPLY_DOT
+    // ==================================================================
+
+    /**
+     * 「使目标陷入灼烧状态，每回合造成 500 点伤害」: the rule attaches a real DOT, and the {@code has_state}
+     * name follows from the element (Fire → 灼烧) with no second field.
+     *
+     * <p>Before this op only a weakness break could attach a DOT ({@code attachBreakDot}), so the whole
+     * 「使目标陷入灼烧/触电/裂伤/风化状态」 family — 11 of the 97 documents — had no spelling.
+     */
+    @Test
+    public void aRuleCanAttachABurn() {
+        Fixture f = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, null));
+
+        Assertions.assertEquals(1, f.fire(), "the rule fires");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"),
+                "Fire + DotBuff IS 灼烧: the engine's one translation is BuffManager.DOT_STATES");
+        Assertions.assertEquals(500, f.dot().getBaseDamage(), EPS, "the flat amount the rule stated");
+
+        double expected = 500 * 1000.0 / (100 + 1000.0);
+        Assertions.assertEquals(expected, f.battle.tickDots(f.enemy), 1e-6, "and it settles like any DOT");
+    }
+
+    /**
+     * 「每回合造成等同于三月七60%攻击力的冰属性伤害」: the magnitude is a share of the <b>rule owner's</b>
+     * attribute, read once when the DOT lands and frozen into it.
+     *
+     * <p>⚠ Frozen, not live: raising her attack afterwards must not change damage that is already burning. That is
+     * the same snapshot rule the other derived values follow, and it is asserted here because the alternative
+     * (holding a reference to her panel) would look identical in a one-turn test.
+     */
+    @Test
+    public void theDotMagnitudeCanBeDerivedFromTheAppliersAttribute() {
+        Fixture f = new Fixture(TriggerSpecs.dot("Ice", null, "self_attr:ATTACK", 0.6, 2, null));
+        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+
+        f.fire();
+
+        Assertions.assertEquals(1200, f.dot().getBaseDamage(), EPS,
+                "60% of the applier's 2000 ATTACK, computed when it landed");
+
+        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(4000));
+        Assertions.assertEquals(1200, f.dot().getBaseDamage(), EPS,
+                "and frozen: a later change to her panel cannot change a DOT that is already burning");
+    }
+
+    /** A flat constant may sit on top of the derived share — 「等同于 60% 攻击力 + 50」. */
+    @Test
+    public void aDerivedMagnitudeMayCarryAConstant() {
+        Fixture f = new Fixture(TriggerSpecs.dot("Ice", 50.0, "self_attr:ATTACK", 0.6, 2, null));
+        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+
+        f.fire();
+
+        Assertions.assertEquals(1250, f.dot().getBaseDamage(), EPS, "0.6 × 2000 + 50");
+    }
+
+    /**
+     * A DOT may state a <b>base chance</b>, and it is the same per-target pipeline a control uses.
+     *
+     * <p>「有一定基础概率使目标陷入灼烧状态」 is common in the documents, so the field is read here too —
+     * and when the roll fails, nothing is attached (not a DOT with 0 turns, which would still settle nothing but
+     * would show up in 「有几个负面效果」).
+     */
+    @Test
+    public void aDotWithABaseChanceIsRolledThroughTheEffectHitPipeline() {
+        Fixture resisted = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, 1.0));
+        resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
+        resisted.fire();
+        Assertions.assertEquals(0, resisted.enemy.getBuffManager().countBuffs(DotBuff.class),
+                "100% effect resistance: 「陷入灼烧状态」 did not happen, so there is no DOT at all");
+
+        Fixture lands = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, 1.0));
+        lands.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
+        lands.fire();
+        Assertions.assertEquals(1, lands.enemy.getBuffManager().countBuffs(DotBuff.class),
+                "and with no resistance, a base chance of 1 always lands");
+    }
+
+    // ==================================================================
+    // Fail fast: what a DOT rule may not say
+    // ==================================================================
+
+    @Test
+    public void aDotWithoutAnElementOrATurnsCountIsRejected() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.dot(null, 500.0, null, null, 2, null)), "no element");
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.dot("Fire", 500.0, null, null, null, null)), "no turns");
+    }
+
+    /** An unknown element would attach nothing at all, so it is refused where the file is read. */
+    @Test
+    public void anUnknownElementIsRejectedAtLoadTime() {
+        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.dot("Burning", 500.0, null, null, 2, null)));
+
+        Assertions.assertTrue(rejected.getMessage().contains("Burning"), rejected.getMessage());
+    }
+
+    /** A DOT has to know how much each turn takes: neither an amount nor a scale+percent means 0 damage forever. */
+    @Test
+    public void aDotWithoutAMagnitudeIsRejected() {
+        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.dot("Fire", null, null, null, 2, null)));
+
+        Assertions.assertTrue(rejected.getMessage().contains("magnitude"), rejected.getMessage());
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tableOf(TriggerSpecs.dot("Fire", null, null, 0.6, 2, null)),
+                "a percent with no scale is a share of nothing");
+    }
+
+    /** One battle with a rule under test, one enemy, and a way to read the DOT it attached. */
+    private static final class Fixture {
+        private final Character hero;
+        private final Enemy enemy;
+        private final Battle battle;
+
+        private Fixture(com.laosun.aluminium.beans.EffectSpec effect) {
+            this.hero = character("applier", 0.0);
+            this.enemy = dummy(100_000, 100, 100);
+            this.hero.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(0,
+                    List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
+            this.battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+            battle.startBattle();
+        }
+
+        private int fire() {
+            return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 1, 0);
+        }
+
+        /** The DOT the rule attached, failing loudly when there is none. */
+        private DotBuff dot() {
+            DotBuff found = enemy.getBuffManager().findBuff(DotBuff.class);
+            Assertions.assertNotNull(found, "the rule was expected to attach a DOT");
+            return found;
+        }
+    }
+
+    /** Compiles one effect into a table, which is where its validation runs. */
+    private static com.laosun.aluminium.models.TriggerTable tableOf(
+            com.laosun.aluminium.beans.EffectSpec effect) {
+        return new com.laosun.aluminium.models.TriggerTable(0,
+                List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect)));
     }
 
     private static Character character(String name, double boost) {
