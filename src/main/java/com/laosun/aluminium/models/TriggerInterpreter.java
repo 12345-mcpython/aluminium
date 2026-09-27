@@ -819,8 +819,13 @@ public final class TriggerInterpreter {
      * nothing, which is a wrong number with no symptom.
      */
     private static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
-        AttributeType source = scaleAttribute(effect, effect.getOp(), null);
         Character owner = requireCharacterOwner(effect, ctx);
+        if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
+            // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
+            // table has no slot for (see the `self_max_energy` condition variable).
+            return effect.getPercent() * owner.getMaxEnergy() + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
+        AttributeType source = scaleAttribute(effect, effect.getOp(), null);
         DoubleValue value = owner.getAttribute(source);
         if (value == null) {
             throw new IllegalStateException(
@@ -846,6 +851,9 @@ public final class TriggerInterpreter {
     private static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
+        if (SELF_MAX_ENERGY.equals(raw)) {
+            return null;                      // handled by derivedMagnitude; not an AttributeType
+        }
         if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
             throw new IllegalArgumentException(
                     "Op " + op + " has \"scale\": \"" + effect.getScale() + "\", which is not a spelling this op "
@@ -1115,6 +1123,13 @@ public final class TriggerInterpreter {
     private static final Set<String> ENERGY_SCALES = Set.of("target_max_energy");
 
     /**
+     * The one derived scale that is not an attribute: {@code MODIFY_ATTR}'s magnitude may be a share of the rule
+     * owner's <b>maximum energy</b> (relic set 328's 「每超过 1 点」). Same spelling family as the condition variable
+     * above, and deliberately not an {@code AttributeType}.
+     */
+    private static final String SELF_MAX_ENERGY = "self_max_energy";
+
+    /**
      * Validates the magnitude of a {@code HEAL} / {@code SHIELD} effect: either a flat {@code amount}, or
      * {@code scale} + {@code percent}.
      *
@@ -1298,8 +1313,8 @@ public final class TriggerInterpreter {
             }
             return;
         }
-        // The spelling and the attribute; also re-checks `percent`, because a scale with no magnitude is not a
-        // number ("some share of my Speed" says nothing about how much).
+        // The spelling and (for the attribute family) the name; also re-checks `percent`, because a scale with no
+        // magnitude is not a number ("some share of my Speed" says nothing about how much).
         scaleAttribute(effect, op, spec);
         requirePercent(effect, op, spec);
     }

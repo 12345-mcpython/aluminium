@@ -1,0 +1,39 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_max_energy >= 200",
+        "self_max_energy < 360"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.002,
+          "amount": -0.4,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 328 (生命的翁法罗斯 / Amphoreus, the Eternal Land), 2-piece: 「进入战斗时，若装备者能量上限大于等于#1[i]点，每超过1点使装备者造成的伤害提高#2[f1]%，最多提高#3[i]%。」 param = [200, 0.0019999999, 0.32] → #1 = 200, #2 = 0.002, #3 = 0.32",
+      "note": "The uncapped tier: **0.2% per point of Max Energy above 200**, written as a DERIVED value -- `0.002 x self_max_energy - 0.4` (the `-0.4` is `0.002 x 200`, i.e. the threshold pulled inside the arithmetic). ⚠ Why arithmetic at all: 「每超过 1 点…提高」 is a function of a stat the rule cannot know, so a literal would be wrong for every character -- and the three shipped energies (姬子 120 / 星期日 130 / 翡翠 140) are all BELOW the threshold, so a wrong literal would never show up on the characters one happens to test. ⚠ `self_max_energy` is not an `AttributeType` (`CanHit.getMaxEnergy()` is a field), which is why it is its own scale and its own condition variable -- the earlier registered reason for this ability claimed `self_attr:MAX_ENERGY` worked, and the loader refused it. ⚠ At exactly 200 the granted modifier is 0, which is what the sentence's 「每超过1点」 means there; the engine has no spelling for \"grant nothing\" and a 0 modifier is inert."
+    },
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_max_energy >= 360"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 328 (生命的翁法罗斯 / Amphoreus, the Eternal Land), 2-piece: 「…每超过1点使装备者造成的伤害提高#2[f1]%，最多提高#3[i]%。」 param = [200, 0.0019999999, 0.32] → the cap is 0.32",
+      "note": "The capped tier: a flat 32%. ⚠ 360 is arithmetic, not a number from the document: `0.002 x (x - 200) >= 0.32` ⟺ `x >= 360`, so the cap starts to bite exactly there and the two rules are disjoint. ⚠ That is the documented technique for two-tier thresholds (engine.md 4.6: the lower tier carries the upper bound) rather than two overlapping rules -- which would grant a 400-energy wearer both 0.4 and 0.32, and since the engine's same-kind rule REPLACES rather than adds, which one won would depend on rule order."
+    }
+  ]
+}
