@@ -3,6 +3,7 @@ package com.laosun.aluminium.test;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Named states: the {@code APPLY_BUFF} op and the {@code has_state} condition.
@@ -425,6 +427,44 @@ public class TriggerStateTest {
                         TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_same_path_ally"), gain(1)))));
 
         Assertions.assertTrue(refused.getMessage().contains("has_same_path_ally"), refused.getMessage());
+    }
+
+    // ==================================================================
+    // 3e. `has_weakness` — a property only an ENEMY has
+    // ==================================================================
+
+    /**
+     * {@code target has_weakness Fire} reads the enemy's weakness bar — the condition 遗器 316 needed.
+     *
+     * <p>⚠ A character has no weakness bar, so the condition is <b>false</b> for one rather than "not weak to Fire":
+     * the family's rule is "cannot read it, therefore it fails".
+     */
+    @Test
+    public void hasWeaknessReadsTheEnemysBar() {
+        Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_weakness Fire"), gain(1)));
+        Character owner = battle.characters.getFirst();
+        Enemy weak = dummy();
+        weak.setStanceWeak(Set.of(DamageElement.FIRE));
+        Enemy resistant = dummy();
+        drainSkillPoints(battle);
+
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, weak, 1, 0),
+                "a fire-weak enemy");
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, resistant, 1, 0),
+                "an enemy with no fire weakness");
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
+                "a character has no weakness bar at all");
+    }
+
+    /** A misspelled element is refused while the file is read, and the message lists the vocabulary. */
+    @Test
+    public void anUnknownWeaknessElementIsRefused() {
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER,
+                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_weakness Fyre"), gain(1)))));
+
+        Assertions.assertTrue(refused.getMessage().contains("Fyre"), refused.getMessage());
+        Assertions.assertTrue(refused.getMessage().contains("FIRE"), refused.getMessage());
     }
 
     // ==================================================================

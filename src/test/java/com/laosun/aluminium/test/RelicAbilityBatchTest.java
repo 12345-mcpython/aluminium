@@ -81,6 +81,8 @@ public class RelicAbilityBatchTest {
     private static final int AMPHOREUS = 328;
     /** 出云显世与高天神国: the party-composition set (its CRIT Rate needs a teammate on the same Path). */
     private static final int IZUMO = 314;
+    /** 盗贼公国塔利亚: the weakness-gated set (its Break Effect needs a fire-weak enemy). */
+    private static final int BANDITRY = 316;
 
     // ==================================================================
     // 102 — 普攻伤害 +10%
@@ -533,6 +535,42 @@ public class RelicAbilityBatchTest {
             }
         }
         return 0;
+    }
+
+    // ==================================================================
+    // 316 — a weakness-gated buff
+    // ==================================================================
+
+    /**
+     * 316 盗贼公国塔利亚: hitting a <b>fire-weak</b> enemy raises the wearer's Break Effect; anyone else does not.
+     *
+     * <p>⚠ Both sides in one case: the condition is the whole rule, and a rule that ignored the weakness would pass a
+     * test that only checked the fire-weak enemy.
+     */
+    @Test
+    public void theBanditryBreakEffectNeedsAFireWeakEnemy() {
+        Assertions.assertEquals(0.2, breakEffectAfterHit(true), 1e-6,
+                "「命中具有火属性弱点的敌方目标时」 -- +20% for 2 turns");
+        Assertions.assertEquals(0, breakEffectAfterHit(false), 1e-6,
+                "the same hit on an enemy without that weakness grants nothing");
+    }
+
+    /** The wearer's Break Effect after it deals one instance of damage to an enemy (weak to fire or not). */
+    private static double breakEffectAfterHit(boolean fireWeak) {
+        Character wearer = wearing(BANDITRY);
+        Enemy target = dummy();
+        // The fixture monster is naturally fire-weak, so the negative case has to take that away.
+        target.setStanceWeak(java.util.Set.of());
+        if (fireWeak) {
+            target.setStanceWeak(java.util.Set.of(DamageElement.FIRE));
+        }
+        Battle battle = new Battle(List.of(wearer), List.of(target), new Random(0));
+        battle.startBattle();
+        double before = boostOf(wearer, AttributeType.BREAKING_EFFECT);
+
+        battle.castImmediate(new DefaultSkill(WEARER, 1, 1), wearer, List.of(target));
+
+        return boostOf(wearer, AttributeType.BREAKING_EFFECT) - before;
     }
 
     // ==================================================================
