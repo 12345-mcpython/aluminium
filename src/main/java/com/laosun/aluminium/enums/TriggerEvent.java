@@ -178,7 +178,26 @@ public enum TriggerEvent {
      * <p>An attack that connected with nothing does not fire it, and neither does a summon with no
      * attack of its own: this is "an attack happened", not "a unit was on the field".
      */
-    SUMMON_ATTACK("SUMMON_ATTACK", true);
+    SUMMON_ATTACK("SUMMON_ATTACK", true),
+    /**
+     * ✅ A <b>summon entered the field</b> (2026-09-28, P9-4 忆灵): fired by {@code Battle.processRequests} for
+     * everything {@code Battle.summon} / {@code Battle.summonMemosprite} placed, with the summoned unit as
+     * {@code actor}.
+     *
+     * <p><b>Why it is fired at the settle point and not inside the summon call.</b> A summon enters the action
+     * bar through {@code addRequestItems}, which {@code processRequests} drains — so during the call itself the
+     * unit is on the roster but <b>not yet scheduled</b>. A rule that answers 「被召唤时」 almost always wants to
+     * touch its action value ({@code ADVANCE}, i.e. 「使自身立即行动」), and an advance against a unit with no
+     * signal is silently lost. ⚠ That is also why this cannot simply be fired from
+     * {@code processAddRequests}: that queue is shared with <b>wave</b> entries, and a wave arriving is not a
+     * summon.
+     *
+     * <p>Fired for a summon of either camp; {@code actor == summon} is what narrows it to the rule owner's own
+     * (the same condition {@link #SUMMON_ATTACK} uses). Note that {@code SUMMON} is idempotent per summoner, so a
+     * second summoning while one is already out fires nothing — which is exactly what 「若衣匠已在场，则…」
+     * clauses need.
+     */
+    SUMMONED("SUMMONED", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 
