@@ -129,7 +129,8 @@ public final class TriggerInterpreter {
      * variables being a closed set.
      */
     private static final Set<String> TARGET_SELECTORS =
-            Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon");
+            Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
+                    "target_and_summon");
 
     /**
      * The two spellings of "every one of our characters".
@@ -144,6 +145,26 @@ public final class TriggerInterpreter {
      * say it either — conditions filter <b>rules</b>, not the units an effect reaches.
      */
     private static final String TARGET_OTHER_ALLIES = "other_allies";
+
+    /**
+     * "The unit this cast <b>aimed at</b>, and <b>its</b> summon" — 「指定我方单体<b>及其召唤物</b>」.
+     *
+     * <p>Its first user is 星期日's Skill (131302): 「使指定我方单体角色<b>及其召唤物</b>立即行动」. It is a
+     * <b>pair</b> and it is not the same pair as any existing selector:
+     * <ul>
+     *   <li>{@code target} advances the chosen ally but not its summon;</li>
+     *   <li>{@code summon} is the <b>rule owner's</b> summon — the wrong unit entirely (星期日's own 忆灵 is not
+     *       what his Skill advances);</li>
+     *   <li>two effects cannot express it either, because the second one would have to name "the summon of the
+     *       unit the first one resolved", and a selector cannot refer to another effect's result.</li>
+     * </ul>
+     *
+     * <p>⚠ A chosen unit <b>without</b> a summon is just that unit, not an error: 「及其召唤物」 only has something
+     * to add when there is one, and 星期日's Skill is cast on ordinary allies all the time. ⚠ Only the summon
+     * <b>that is out</b> counts ({@code Battle.summonsOf} skips the dead ones), which is why this selector needs a
+     * battle like the other group selectors.
+     */
+    private static final String TARGET_AND_SUMMON = "target_and_summon";
 
     private TriggerInterpreter() {
     }
@@ -489,8 +510,8 @@ public final class TriggerInterpreter {
             case "attacker" -> require(ctx.actor(), "attacker", ctx);
             case "summon" -> requireSummon(ctx);
             default -> throw new IllegalStateException(
-                    "Effect names an unknown target selector '" + selector
-                            + "'; this should have been rejected when the table was loaded");
+                    "Effect names the target selector '" + selector + "', which can reach several units: it needs "
+                            + "an op that takes a list, not one that resolves a single target");
         };
     }
 
@@ -528,6 +549,20 @@ public final class TriggerInterpreter {
                 party.add(ally);
             }
             return List.copyOf(party);
+        }
+        if (TARGET_AND_SUMMON.equals(selector)) {
+            if (battle == null) {
+                throw new IllegalStateException(
+                        "Effect targets \"" + TARGET_AND_SUMMON
+                                + "\" but no battle was supplied to look for that unit's summon");
+            }
+            CanHit chosen = require(ctx.target(), TARGET_AND_SUMMON, ctx);
+            List<CanHit> pair = new ArrayList<>();
+            pair.add(chosen);
+            // `summonsOf` is the one predicate for "the summons this unit owns" (it already drops the dead ones),
+            // so "及其召唤物" means the same thing here as it does for the `summon` selector.
+            pair.addAll(battle.summonsOf(chosen));
+            return List.copyOf(pair);
         }
         return List.of(resolveTarget(effect, ctx));
     }

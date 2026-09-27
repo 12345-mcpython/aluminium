@@ -44,6 +44,9 @@ import java.util.Random;
 public class OtherAlliesTargetTest {
     private static final double EPS = 1e-6;
 
+    /** The pair selector this class also covers; spelled once so a rename cannot half-apply. */
+    private static final String TARGET_AND_SUMMON = "target_and_summon";
+
     /** 姬子 — no shipped rule file, so the table under test is the only one in play. */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
@@ -161,6 +164,99 @@ public class OtherAlliesTargetTest {
         Assertions.assertEquals("ADVANCE", effects.getFirst().getOp());
         Assertions.assertEquals(1.0, effects.getFirst().getPercent(), EPS, "all of the remaining wait");
         Assertions.assertEquals("other_allies", effects.getFirst().getTarget());
+    }
+
+    // ==================================================================
+    // 4. The pair: 「指定我方单体及其召唤物」
+    // ==================================================================
+
+    /**
+     * {@code target_and_summon} is the chosen unit <b>and its</b> summon — not the rule owner's.
+     *
+     * <p>This is the case that separates it from every neighbouring word: {@code target} alone would leave the
+     * summon standing, and {@code summon} is the <b>rule owner's</b> — so the fixture gives <b>both</b> units a
+     * summon and asserts that only one of the two moves.
+     */
+    @Test
+    public void thePairIsTheChosenUnitAndItsOwnSummon() {
+        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), new Random(0));
+        Character owner = battle.characters.getFirst();
+        Character chosen = battle.characters.get(1);
+        battle.startBattle();
+        Summon ownersSummon = battle.summon(owner, MONSTER, 1);
+        Summon chosenSummon = battle.summon(chosen, MONSTER, 1);
+        battle.processRequests();
+        double ownerBefore = timeRemaining(battle, owner);
+
+        // The ULT_CAST event carries the unit the cast was AIMED AT (M-35), which is what "指定" means.
+        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, chosen, 0, 0);
+
+        Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS, "「指定我方单体」acts now");
+        Assertions.assertEquals(0, timeRemaining(battle, chosenSummon), EPS, "「及其召唤物」 acts with it");
+        Assertions.assertTrue(timeRemaining(battle, ownersSummon) > 0,
+                "…but the RULE OWNER's summon is untouched: that would be the `summon` selector, a different unit");
+        Assertions.assertEquals(ownerBefore, timeRemaining(battle, owner), EPS,
+                "and the owner itself is not part of the pair either");
+    }
+
+    /**
+     * A chosen unit with no summon is just that unit — no error, nothing invented.
+     *
+     * <p>「及其召唤物」 only has something to add when there is one, and this Skill is cast on ordinary allies all
+     * the time (that is most of the cast).
+     */
+    @Test
+    public void aChosenUnitWithoutASummonIsJustTheUnit() {
+        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), new Random(0));
+        Character owner = battle.characters.getFirst();
+        Character chosen = battle.characters.get(1);
+        battle.startBattle();
+
+        int fired = battle.fireTriggers(TriggerEvent.ULT_CAST, owner, chosen, 0, 0);
+
+        Assertions.assertEquals(1, fired, "the rule fires; having no summon is not a failure");
+        Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS, "the chosen unit acts now");
+    }
+
+    /** Only the summon <b>that is out</b> counts: a dead one is not part of the pair. */
+    @Test
+    public void aDeadSummonIsNotPartOfThePair() {
+        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), new Random(0));
+        Character owner = battle.characters.getFirst();
+        Character chosen = battle.characters.get(1);
+        battle.startBattle();
+        Summon chosenSummon = battle.summon(chosen, MONSTER, 1);
+        battle.processRequests();
+        chosenSummon.takeDamage(9_999_999);
+        battle.processRequests();
+
+        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, chosen, 0, 0);
+
+        Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS,
+                "「及其召唤物」 means the one that is on the field -- a corpse is not advanced");
+    }
+
+    /**
+     * The pair is a <b>list</b>, so an op that resolves exactly one target refuses it loudly.
+     *
+     * <p>Pinned because the tempting implementation — let the singular resolver return the chosen unit and ignore
+     * the summon — would silently drop half of 「及其召唤物」.
+     */
+    @Test
+    public void aSingleTargetOpRefusesThePair() {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "EXTRA_TURN");
+        TriggerSpecs.set(effect, "target", TARGET_AND_SUMMON);
+        Character owner = CharacterFactory.create(OWNER, LEVEL);
+        owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ULT_CAST", null, effect))));
+        Battle battle = new Battle(List.of(owner, CharacterFactory.create(1210, LEVEL)), List.of(dummy()),
+                new Random(0));
+        battle.startBattle();
+
+        IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
+                () -> battle.fireTriggers(TriggerEvent.ULT_CAST, owner, owner, 0, 0));
+
+        Assertions.assertTrue(refused.getMessage().contains(TARGET_AND_SUMMON), refused.getMessage());
     }
 
     // ==================================================================

@@ -513,7 +513,7 @@ JSON 写法不变。
 | `GAIN_SKILL_POINT` | `amount` | ✅ |
 | `HEAL` / `SHIELD` | `amount`，可选 `target` —— **或** `scale` + `percent`（按某项生命上限的比例，见下） | ✅ |
 | `EXTRA_TURN` | 可选 `target` | ✅ |
-| `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持），可选 `target`（**可以是群体**：`all_allies` / `other_allies` 会逐个推） | ✅ |
+| `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持），可选 `target`（**可以是群体**：`all_allies` / `other_allies` / `target_and_summon` 会逐个推） | ✅ |
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `damage_level`、`target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
 | `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
@@ -584,6 +584,7 @@ attacker         这件事的起因（打我的人）               ← 反击
 all_allies       我方全体（别名 party）                ← 「我方全体攻击力 +X%」
 other_allies     **除规则主人以外**的我方              ← 知更鸟「使**除自身以外的队友**立即行动」
 summon           主人自己的召唤物（忆灵）               ← 「装备者**及其忆灵**」的后半，§24.6
+target_and_summon **这次施放瞄准的那个单位**及其召唤物   ← 星期日战技「指定我方单体**及其召唤物**立即行动」
 ```
 
 > ⚠ **`other_allies` 为什么不能省**（2026-09-28 补）：`all_allies` 是"我方**全体**"，**包含规则主人自己** ——
@@ -595,6 +596,14 @@ summon           主人自己的召唤物（忆灵）               ← 「装�
 > ⚠ **`summon` 找不到召唤物时是响亮报错**，而不是回退到主人：写「装备者及其忆灵」却忘了
 > `self_summon_count >= 1` 的作者会得到一条**指出该加哪个条件**的报错；
 > 静默回退则会给**错的单位**上 buff。
+>
+> ⚠ **`target_and_summon` 为什么不是 `target` + `summon` 两条效果**（2026-09-27 补，M-37）：它要的是
+> **被指定那个队友的**召唤物，而 `summon` 是**规则主人自己**的 —— 星期日战技推的是队友的忆灵，不是他的。
+> 第二条效果也没有办法引用"第一条效果解析出来的那个单位"，所以这只能是**一个**选择器。
+> 三处口径：被指定的单位**没有召唤物时就是它自己**（不是错误，这类技能大多数施放都是这种）；
+> **只算场上的那个**（`Battle.summonsOf` 已滤掉阵亡）；因此它需要 `battle`，与 `all_allies` / `other_allies` 同类。
+> ⚠ 它是**列表**：把它写在只解析一个目标的 op 上（`HEAL` / `EXTRA_TURN` / `GAIN_ENERGY`…）会在触发时
+> **响亮拒绝**（报错说"这个选择器能落到多个单位"），而不是悄悄只作用于本人 —— 后者会丢掉「及其召唤物」的一半。
 > ⚠ **`target` 曾经写错就等于 `self`**：解析器对不认识的取值一律**回退到"主人"**，
 > 于是 `"atacker"` 和 `"self"` 行为完全一样 —— 规则照常触发、什么都不报，只是默默地改错了人。
 > 现在它和条件变量一样是**封闭集合**，加载时就拒绝（`unknownTargetSelectorIsRejected`）。
