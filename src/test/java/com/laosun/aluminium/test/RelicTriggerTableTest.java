@@ -196,7 +196,13 @@ public class RelicTriggerTableTest {
             BROKEN_KEEL + "/" + TWO_PIECE,
             // Authored once "the attacker is MY summon" became expressible (`actor == summon`) and a summon's
             // attack became an event the data can subscribe to (`SUMMON_ATTACK`).
-            HERO_OF_TRIUMPHANT_SONG + "/" + FOUR_PIECE);
+            HERO_OF_TRIUMPHANT_SONG + "/" + FOUR_PIECE,
+            // Authored on 2026-09-27 once a cast event could say WHICH SIDE the unit it aimed at is on
+            // (`target is_ally`): 「对己方角色施放终结技/战技时」 (sets 114, 118, 121) fired on every cast
+            // without it, because a damaging ultimate aimed at an enemy carries a target too.
+            "114/4",
+            "118/4",
+            "121/4");
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
@@ -210,7 +216,7 @@ public class RelicTriggerTableTest {
      * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}).
      */
-    private static final int STILL_REGISTERED = 32;
+    private static final int STILL_REGISTERED = 29;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
