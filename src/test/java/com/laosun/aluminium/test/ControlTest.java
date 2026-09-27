@@ -317,6 +317,49 @@ public class ControlTest {
     }
 
     // ==================================================================
+    // The state's own per-turn damage rides with the state
+    // ==================================================================
+
+    /**
+     * 「冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加伤害」: the payload is attached with the
+     * state, and it is <b>frozen with it</b> — a resisted freeze deals no ice damage either, which is why this is
+     * one effect and not two.
+     */
+    @Test
+    public void theStateCarriesItsOwnPerTurnDamage() {
+        Applied f = new Applied(controlWithDamage(1.0));
+        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+
+        f.fire();
+
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"), "the state landed");
+        DotBuff dot = f.enemy.getBuffManager().findBuff(DotBuff.class);
+        Assertions.assertNotNull(dot, "and so did its per-turn damage");
+        Assertions.assertEquals(DamageElement.ICE, dot.getElement());
+        Assertions.assertEquals(1200, dot.getBaseDamage(), EPS, "60% of her 2000 ATTACK, read when it landed");
+
+        Applied resisted = new Applied(controlWithDamage(1.0));
+        resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
+        resisted.fire();
+        Assertions.assertEquals(0, resisted.enemy.getBuffManager().countBuffs(DotBuff.class),
+                "a resisted freeze attaches no damage: the payload is part of the state, not a second effect");
+    }
+
+    /** Taking the state off takes its damage with it — otherwise the ice would keep burning after 「解除冻结」. */
+    @Test
+    public void theStatesDamageComesOffWithIt() {
+        Applied f = new Applied(controlWithDamage(1.0));
+        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+        f.fire();
+        Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(DotBuff.class), "precondition");
+
+        f.enemy.getBuffManager().removeState("冻结");
+
+        Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(DotBuff.class),
+                "one buff owns the state and its payload, so 「解除」 cannot leave half of it behind");
+    }
+
+    // ==================================================================
     // Fail fast: what a control rule may not say
     // ==================================================================
 
@@ -418,6 +461,21 @@ public class ControlTest {
 
     private static com.laosun.aluminium.beans.TriggerSpec control(String name, Double baseChance) {
         return TriggerSpecs.rule("ALLY_ATTACK", null, TriggerSpecs.applyControl(name, 1, baseChance, "target"));
+    }
+
+    /**
+     * 三月七's shape: the freeze plus its own per-turn ice damage (60% of the applier's ATTACK).
+     *
+     * <p>⚠ The payload is stated on the <b>same</b> effect, which is what makes it land only when the freeze does
+     * (see {@link #theStateCarriesItsOwnPerTurnDamage}).
+     */
+    private static com.laosun.aluminium.beans.TriggerSpec controlWithDamage(Double baseChance) {
+        com.laosun.aluminium.beans.EffectSpec effect =
+                TriggerSpecs.applyControl("冻结", 1, baseChance, "target");
+        TriggerSpecs.set(effect, "element", "Ice");
+        TriggerSpecs.set(effect, "scale", "self_attr:ATTACK");
+        TriggerSpecs.set(effect, "percent", 0.6);
+        return TriggerSpecs.rule("ALLY_ATTACK", null, effect);
     }
 
     /** One enemy made weak to exactly one element, in a battle with a hero who does the breaking. */

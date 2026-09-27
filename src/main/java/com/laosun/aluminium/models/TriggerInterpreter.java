@@ -5,6 +5,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -12,6 +13,7 @@ import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.ControlBuff;
+import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
@@ -108,7 +110,7 @@ public final class TriggerInterpreter {
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
-            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL");
+            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -321,7 +323,8 @@ public final class TriggerInterpreter {
             }
             case "APPLY_CONTROL" -> {
                 // 「有 50% 基础概率使敌方目标陷入冻结状态，持续 1 回合」: a named control state, a duration, and
-                // (optionally) a base chance that goes through 效果命中 / 效果抵抗.
+                // (optionally) a base chance that goes through 效果命中 / 效果抵抗. The effect may also carry the
+                // state's OWN per-turn damage (`element` + a magnitude), which lands with the state.
                 requireControl(effect, op, spec);
                 requirePositiveTurns(effect, op, spec);
                 requireBaseChance(effect, op, spec);
@@ -331,7 +334,24 @@ public final class TriggerInterpreter {
                             "Op " + op + " states a number of turns and nothing else; \"permanent\" / \"until\" "
                                     + "would be a control that never ends (source: " + spec.getSource() + ")");
                 }
-                requireNoMagnitudeArguments(effect, op, spec);
+                requireStateDamage(effect, op, spec);
+            }
+            case "APPLY_DOT" -> {
+                // 「使目标陷入灼烧状态，每回合造成等同于…的伤害」: a damage-over-time attached by a rule. The
+                // element is the engine's own spelling (Fire → 灼烧), the magnitude is either flat or derived
+                // from the RULE OWNER's attribute, and it is frozen into the buff when it lands.
+                requireElement(effect, op, spec);
+                requireDotMagnitude(effect, op, spec);
+                requirePositiveTurns(effect, op, spec);
+                requireBaseChance(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states a number of turns and nothing else; \"permanent\" / \"until\" "
+                                    + "would be a damage-over-time that never ends (source: " + spec.getSource()
+                                    + ")");
+                }
+                requireNoMalformedArguments(effect, op, spec);
             }
             case "SUMMON" -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
@@ -476,6 +496,7 @@ public final class TriggerInterpreter {
             case "REMOVE_STATE" -> removeState(effect, ctx);
             case "TAUNT" -> taunt(battle, effect, ctx);
             case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
+            case "APPLY_DOT" -> applyDot(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1390,7 +1411,13 @@ public final class TriggerInterpreter {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            ControlBuff applied = new ControlBuff(control, effect.getTurns());
+            // The state's own per-turn damage (「冻结状态下…每回合开始时受到…冰属性附加伤害」) rides WITH the
+            // state: attached in ControlBuff.applyEffect, taken off in its removeBuff, and only ever created on
+            // the units the roll let through. ⚠ The magnitude is read here, once, and frozen into the DOT.
+            ControlBuff applied = effect.getElement() == null || effect.getElement().isBlank()
+                    ? new ControlBuff(control, effect.getTurns())
+                    : new ControlBuff(control, effect.getTurns(), DamageElement.fromString(effect.getElement()),
+                            dotMagnitude(effect, ctx));
             applied.setSource(ctx.owner());
             if (effect.getBaseChance() == null) {
                 target.getBuffManager().addBuff(applied);
@@ -1398,6 +1425,60 @@ public final class TriggerInterpreter {
                 battle.tryApplyDebuff(ctx.owner(), target, applied, effect.getBaseChance(), control.resistKey());
             }
         }
+    }
+
+    /**
+     * {@code APPLY_DOT}: 「使目标陷入灼烧状态，每回合造成等同于…#1[i]%攻击力的火属性伤害」 — a damage-over-time
+     * attached by a <b>rule</b>.
+     *
+     * <p>Before this op only a weakness break could attach one ({@code Battle.attachBreakDot}), so the whole
+     * 「使目标陷入灼烧/触电/裂伤/风化状态」 family (11 of the 97 documents) had no spelling — and 三月七's frozen
+     * enemies took no 「每回合冰属性附加伤害」.
+     *
+     * <p><b>What the rule states.</b> The element (which picks the RES zone and doubles as the state's identity:
+     * Fire is 灼烧), the magnitude (flat, or a share of one of the <b>rule owner's</b> attributes) and the turns.
+     * The damage is computed <b>once, when it lands</b>, and frozen into the buff — 「等同于三月七60%攻击力」
+     * means her attack at that moment, not a live link to her panel (the same snapshot rule every derived value
+     * follows).
+     *
+     * <p>A {@code base_chance} rolls per target through the same pipeline as a control ({@link Battle#tryApplyDebuff}),
+     * with no specific-resistance key: the data's {@code STAT_*} resistances are per <i>state</i>, and a DOT's
+     * state is its element — which the four-element family has no key for. (That is a fact about the data, not a
+     * shortcut: adding one later is passing a key here.)
+     */
+    private static void applyDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        DamageElement element = DamageElement.fromString(effect.getElement());
+        if (element == null) {
+            throw new IllegalStateException(
+                    "APPLY_DOT ran with element '" + effect.getElement() + "'; the loader validates it against "
+                            + "DamageElement, so this is an engine fault");
+        }
+        double damage = dotMagnitude(effect, ctx);
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target == null || target.isDeath()) {
+                continue;
+            }
+            DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns());
+            if (effect.getBaseChance() == null) {
+                target.getBuffManager().addBuff(dot);
+            } else {
+                battle.tryApplyDebuff(ctx.owner(), target, dot, effect.getBaseChance(), null);
+            }
+        }
+    }
+
+    /**
+     * How much damage one tick of a rule's DOT deals: the flat {@code amount}, or {@code percent} × one of the
+     * rule owner's own attributes (+ the optional constant {@code amount}).
+     *
+     * <p>Shared by {@code APPLY_DOT} and by {@code APPLY_CONTROL}'s per-turn payload, so the two cannot drift —
+     * and both read the <b>rule owner</b>, never the victim.
+     */
+    private static double dotMagnitude(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getScale() == null) {
+            return effect.getAmount();
+        }
+        return derivedMagnitude(effect, ctx);
     }
 
     private static void removeState(EffectSpec effect, TriggerContext ctx) {
@@ -1990,6 +2071,110 @@ public final class TriggerInterpreter {
                     "Op " + op + " takes a control state, its turns and an optional base chance; it has no "
                             + "\"amount\" / \"scale\" / \"percent\" / \"attribute\" / \"buff\" "
                             + "(source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates a state's own per-turn damage ({@code element} + a magnitude) or its absence, on
+     * {@code APPLY_CONTROL}.
+     *
+     * <p>Two shapes are refused rather than resolved:
+     * <ul>
+     *   <li>a magnitude with <b>no element</b> — a number nothing can attach as damage (the author probably meant
+     *       a bare {@code APPLY_DOT}, which is a different op);</li>
+     *   <li>an element with <b>no magnitude</b> — a DOT that would settle 0 damage every turn, which reads as a
+     *       working rule and does nothing.</li>
+     * </ul>
+     * Everything else ({@code attribute} / {@code buff}) is refused too: this op reads neither (M-26's rule).
+     */
+    private static void requireStateDamage(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getAttribute() != null || effect.getBuff() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " takes a control state, its turns, an optional base chance and an optional "
+                            + "per-turn damage ({element} + amount/scale/percent); it has no \"attribute\" / "
+                            + "\"buff\" (source: " + spec.getSource() + ")");
+        }
+        boolean anyMagnitude = effect.getAmount() != null || effect.getScale() != null
+                || effect.getPercent() != null;
+        if (effect.getElement() == null || effect.getElement().isBlank()) {
+            if (anyMagnitude) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states a magnitude (amount/scale/percent) but no \"element\": there is "
+                                + "nothing to attach that damage to. A state that deals no damage states neither; "
+                                + "a damage-over-time with no control is a separate op, APPLY_DOT "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return;
+        }
+        requireElement(effect, op, spec);
+        requireDotMagnitude(effect, op, spec);
+    }
+
+    /**
+     * Validates the element of a per-turn damage: one of {@code DamageElement}'s spellings.
+     *
+     * <p>An unknown name would otherwise become a DOT that applies to nothing — {@code DamageElement.fromString}
+     * answers {@code null} for "Unknown" and for typos alike, so the check has to be here.
+     */
+    private static void requireElement(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getElement() == null || effect.getElement().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires \"element\" (which damage element the per-turn damage deals, e.g. "
+                            + "\"Ice\" / \"Fire\" / \"Quantum\") (source: " + spec.getSource() + ")");
+        }
+        if (DamageElement.fromString(effect.getElement()) == null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names element '" + effect.getElement() + "', which is not a DamageElement "
+                            + "spelling (e.g. Ice / Fire / Wind / Thunder / Physical / Quantum / Imaginary); an "
+                            + "unknown element would attach nothing (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates how much damage each of the victim's turns takes: a flat {@code amount}, or a derived value
+     * ({@code scale} + {@code percent}, optionally plus {@code amount} as a constant term), or neither-and-both
+     * is refused.
+     *
+     * <p>⚠ Derived from the <b>rule owner</b> ({@code self_attr:<ATTRIBUTE>} / {@code self_max_energy}) and
+     * computed when the effect lands, then frozen into the DOT — the same 「触发时算一次」 semantics the other
+     * derived values follow (a later buff on the applier must not change damage that is already burning).
+     */
+    private static void requireDotMagnitude(EffectSpec effect, String op, TriggerSpec spec) {
+        boolean derived = effect.getScale() != null;
+        if (!derived) {
+            if (effect.getAmount() == null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " requires a magnitude for its per-turn damage: either \"amount\" (a flat "
+                                + "number) or \"scale\" + \"percent\" (a share of one of the rule owner's own "
+                                + "attributes, e.g. \"self_attr:ATTACK\" with 0.6) "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            if (effect.getPercent() != null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states \"percent\" without \"scale\": a percent is a share of *something*, "
+                                + "and the something is the scale (source: " + spec.getSource() + ")");
+            }
+            return;
+        }
+        // The spelling, and (for the attribute family) the name: `scaleAttribute` is the one reader of that
+        // vocabulary, shared with MODIFY_ATTR's derived value so the two cannot drift.
+        scaleAttribute(effect, op, spec);
+        requirePercent(effect, op, spec);
+    }
+
+    /**
+     * Refuses the arguments {@code APPLY_DOT} has no use for ({@code attribute} / {@code buff} / {@code skill} /
+     * {@code damage_param}).
+     *
+     * <p>Same reasoning as {@code requireNoTarget} / {@code requireNoStackArguments}: a field the interpreter never
+     * reads is a rule that says one thing and does another (M-26).
+     */
+    private static void requireNoMalformedArguments(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getAttribute() != null || effect.getBuff() != null || effect.getSkill() != null
+                || effect.getDamageParam() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " takes an element, a magnitude and a duration; it has no \"attribute\" / "
+                            + "\"buff\" / \"skill\" / \"damage_param\" (source: " + spec.getSource() + ")");
         }
     }
 
