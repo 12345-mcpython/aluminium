@@ -4,6 +4,9 @@ import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
@@ -101,7 +104,8 @@ public final class SummonFactory {
      * leaves.
      *
      * @param master the summoning character (a {@link Character}: the spec is keyed by its cid)
-     * @return the memosprite, with a panel derived from {@code master} and no skill installed yet
+     * @return the memosprite, with a panel derived from {@code master} and, when the spec states one, its
+     *         attack installed
      * @throws IllegalArgumentException when the character has no memosprite spec — a loud failure naming the
      *                                  file to write, rather than an unnamed 0-HP unit
      */
@@ -129,7 +133,7 @@ public final class SummonFactory {
      *
      * @param master the summoning character, whose resolved sheet the panel is derived from
      * @param spec   the validated spec
-     * @return the memosprite, with no skill installed yet
+     * @return the memosprite, with its attack installed when the spec states one
      */
     public static Summon memosprite(Character master, MemospriteSpec spec) {
         if (master == null) {
@@ -138,6 +142,10 @@ public final class SummonFactory {
         if (spec == null) {
             throw new IllegalArgumentException("A memosprite needs a spec");
         }
+        // Validated here too, not only on the load path: this overload is the seam a test uses, and a bad
+        // spec handed to it must fail the same way a bad file does -- otherwise the checks in
+        // Memosprites.validate could be bypassed by the one caller that is easiest to get wrong.
+        Memosprites.validate(spec, "SummonFactory.memosprite(master, spec)");
         AttributeBuilder panel = new AttributeBuilder();
         for (MemospriteSpec.Panel entry : spec.panel()) {
             AttributeType attribute = AttributeType.fromString(entry.attribute());
@@ -155,6 +163,34 @@ public final class SummonFactory {
         }
         Summon summon = new Summon(spec.name(), Camp.PLAYER, panel.build());
         summon.setLevel(master.getLevel());
+        if (spec.attack() != null) {
+            summon.setSkill(SkillType.COMMON, attackOf(spec));
+        }
         return summon;
+    }
+
+    /**
+     * Compiles the spec's {@code attack} block into the skill the memosprite acts with (P9-4 忆灵).
+     *
+     * <p>⚠ The spec was validated immediately above, so an unknown element / base / shape cannot reach this
+     * point; the lookups are the plain {@code fromString} ones rather than a second set of checks, because
+     * two copies of a rule is how the copies start to differ. (They would not agree on the failure mode
+     * either: {@code DamageElement.fromString} and {@code SkillEffectType.fromString} answer {@code null} for
+     * an unknown name, which the {@code EnemySkill} constructor turns into its documented default, while
+     * {@code AttributeType.fromString} throws.)
+     *
+     * <p>The damage base is {@code base × percent} of the <b>memosprite's own</b> attribute, read fresh on
+     * every hit (see {@code EnemySkill.strike}), so a buff that lands on the memosprite mid-battle is
+     * reflected — the panel decides what it starts with, not what it is worth.
+     */
+    private static EnemySkill attackOf(MemospriteSpec spec) {
+        MemospriteSpec.Attack attack = spec.attack();
+        return new EnemySkill(
+                DamageElement.fromString(attack.element()),
+                attack.percent(),
+                attack.hits() == null ? 1 : attack.hits(),
+                DamageType.NORMAL,
+                SkillEffectType.fromString(attack.shape()),
+                AttributeType.fromString(attack.base()));
     }
 }

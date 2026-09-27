@@ -14,7 +14,6 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Enemy skill (P5-3): data-driven from {@code enemy_skills.json}, not hard-coded.
@@ -29,12 +28,17 @@ import java.util.Objects;
  * <p>Each hit goes through {@link Battle#applyDamage} independently: **each hit rolls crit and
  * settles on its own** (consistent with character skills).
  *
+ * <p>P9-4 忆灵: the class also serves memosprites. Their damage is written in the documents the same way
+ * an enemy's is (one number times one of the caster's attributes) — 「对敌方单体造成等同于「长夜」50%生命上限的
+ * 冰属性伤害」 — so the only thing that had to change was naming the attribute ({@link #getBaseAttribute()})
+ * and taking the target side from the caster's camp rather than assuming "the enemy is casting".
+ *
  * <p>⚠ For the origin of the multipliers see {@link EnemySkillData}: the data source has no enemy
  * skill table, so these values are guesses.
  *
  * @param element    damage element (already resolved at construction time from the data / the
  *                   monster's {@code stance_type}, never null)
- * @param multiplier multiplier (damage base = attack × multiplier)
+ * @param multiplier multiplier (damage base = {@code baseAttribute} × multiplier)
  * @param hits       number of hits (at least 1)
  * @param type       damage type
  */
@@ -48,6 +52,11 @@ public class EnemySkill extends Skill {
     private final int hits;
     private final DamageType type;
     private final SkillEffectType effect;
+    /**
+     * Which of the user's attributes the multiplier applies to ({@link #getBaseAttribute()}).
+     */
+    @Getter
+    private final AttributeType baseAttribute;
 
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type) {
         this(element, multiplier, hits, type, SkillEffectType.SINGLE_ATTACK);
@@ -59,11 +68,24 @@ public class EnemySkill extends Skill {
      */
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
                       SkillEffectType effect) {
+        this(element, multiplier, hits, type, effect, AttributeType.ATTACK);
+    }
+
+    /**
+     * @param baseAttribute which of the user's attributes the multiplier applies to; {@code null} =
+     *                      {@link AttributeType#ATTACK}, which is what every enemy entry means
+     *                      (their damage is written as a share of their ATK), so the default keeps
+     *                      them bit-for-bit unchanged. A memosprite's damage is written instead as
+     *                      「等同于忆灵 X% 生命上限」 — the same class, told which number to read.
+     */
+    public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
+                      SkillEffectType effect, AttributeType baseAttribute) {
         this.element = element == null ? DamageElement.PHYSICAL : element;
         this.multiplier = multiplier;
         this.hits = Math.max(1, hits);
         this.type = type == null ? DamageType.NORMAL : type;
         this.effect = effect == null ? SkillEffectType.SINGLE_ATTACK : effect;
+        this.baseAttribute = baseAttribute == null ? AttributeType.ATTACK : baseAttribute;
     }
 
     @Override
@@ -84,7 +106,7 @@ public class EnemySkill extends Skill {
 
     /**
      * Applies the skill to whoever its shape says it reaches: the primary target ({@code SingleAttack}),
-     * everyone on our side ({@code AoEAttack}), or the primary target plus its neighbours
+     * the user's whole opposing camp ({@code AoEAttack}), or the primary target plus its neighbours
      * ({@code Blast}). {@link #hits} segments land on <b>each</b> of them, each settling independently
      * (so each rolls crit on its own).
      *
@@ -95,7 +117,7 @@ public class EnemySkill extends Skill {
      * {@link #execute} stays custom (see the class Javadoc).
      *
      * @param battle the battle in progress
-     * @param user   the applier (an enemy)
+     * @param user   the applier (an enemy, or a memosprite)
      * @param target the list chosen by the caller (only the first is used, as the main target)
      */
     @Override
@@ -107,7 +129,7 @@ public class EnemySkill extends Skill {
         if (victim == null || victim.isDeath()) {
             return;
         }
-        for (CanHit struck : struckBy(victim, battle)) {
+        for (CanHit struck : struckBy(victim, user, battle)) {
             strike(battle, user, struck);
         }
     }
@@ -115,18 +137,22 @@ public class EnemySkill extends Skill {
     /**
      * Who this skill reaches, given the caller's main target.
      */
-    private List<CanHit> struckBy(CanHit mainTarget, Battle battle) {
+    private List<CanHit> struckBy(CanHit mainTarget, CanHit user, Battle battle) {
         // ⚠ Deliberately NOT filtered to the living here. A dead character is simply struck for zero
         // segments by strike()'s own isDeath() check, which is the one guard that matters -- and it is
         // the one a test can reach. An earlier version filtered here too, and mutation testing showed
         // the outer filter changed no observable outcome (removing it left every test green), i.e. it
         // was an untestable second guard for the same fact. One guard, exercised.
-        // ⚠ The camp, not `characters` (the friendly half of L-8): an enemy AOE has to reach a player-side
-        // summon too. Reading `characters` here would miss it silently -- the summon would stand in the
-        // middle of the blast untouched, and nothing would report it.
-        List<CanHit> team = battle.allies.stream()
-                .filter(Objects::nonNull)
-                .toList();
+        // ⚠ The OPPOSING CAMP of the user, not `battle.allies` (the friendly half of L-8). An enemy AOE
+        // has to reach a player-side summon too, and (P9-4 忆灵) a memosprite's AOE has to reach the enemy
+        // camp. Hard-coding `allies` made every AOE one-sided: it read right while only enemies cast
+        // this skill, and silently hit nothing the moment our own summon did.
+        List<CanHit> team = new ArrayList<>();
+        for (CanHit unit : battle.getOpponents(user)) {
+            if (unit != null) {
+                team.add(unit);
+            }
+        }
         return switch (effect) {
             case AOE_ATTACK -> List.copyOf(team);
             case BLAST -> {
@@ -150,9 +176,14 @@ public class EnemySkill extends Skill {
 
     /**
      * Lands {@link #hits} segments on one character.
+     *
+     * <p><b>Which number the multiplier applies to</b> is {@link #baseAttribute}: an enemy's attack scales off
+     * its ATK (the historical behaviour, and the default), while a memosprite's damage is written as
+     * 「等同于忆灵 X% <b>生命上限</b>」 — so the same class serves both by naming the attribute instead of
+     * assuming ATK. Only this one line ever cared which it was.
      */
     private void strike(Battle battle, CanHit user, CanHit victim) {
-        double base = user.getAttribute(AttributeType.ATTACK).get() * multiplier;
+        double base = user.getAttribute(baseAttribute).get() * multiplier;
         for (int i = 0; i < hits; i++) {
             if (victim.isDeath()) {
                 break;                               // once killed mid-way, stop hitting (no overkill on a corpse)

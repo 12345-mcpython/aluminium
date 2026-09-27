@@ -36,11 +36,21 @@ import java.util.List;
  *               parameter list, so a number can be traced back
  * @param note   free-form note for the next reader (may be absent)
  * @param panel  one entry per attribute this memosprite takes from its summoner
+ * @param attack the memosprite's own attack, or {@code null} when no document states one (P9-4 忆灵)
  */
 public record MemospriteSpec(@SerializedName("name") String name,
                              @SerializedName("source") String source,
                              @SerializedName("note") String note,
-                             @SerializedName("panel") List<Panel> panel) {
+                             @SerializedName("panel") List<Panel> panel,
+                             @SerializedName("attack") Attack attack) {
+
+    /**
+     * A spec with a panel and <b>no attack</b> — the ordinary case, since a document states an attack for
+     * only some memosprites.
+     */
+    public MemospriteSpec(String name, String source, String note, List<Panel> panel) {
+        this(name, source, note, panel, null);
+    }
 
     /**
      * One attribute of the panel, expressed against the summoner: {@code value = percent × summoner + flat}.
@@ -57,5 +67,37 @@ public record MemospriteSpec(@SerializedName("name") String name,
     public record Panel(@SerializedName("attribute") String attribute,
                         @SerializedName("percent") Double percent,
                         @SerializedName("flat") Double flat) {
+    }
+
+    /**
+     * What the memosprite does when it gets a turn: {@code base × percent}, {@code hits} times, in
+     * {@code shape}.
+     *
+     * <p><b>Why this lives here and not in a rule file.</b> A memosprite's attack is not a trigger — nothing
+     * in the battle fires it, a turn does — so it is not a {@code TriggerSpec}. It also cannot live on the
+     * summoning character, because the numbers are stated against the <em>memosprite</em>: 长夜月's 「长夜」
+     * hits for 「等同于「长夜」200%生命上限」, which is the memosprite's own Max HP, not the summoner's.
+     * Reading it off the summoner would produce a number 2× too large (the panel gives 长夜 half of 长夜月's
+     * HP) — a wrong number that looks plausible, which is the worst kind.
+     *
+     * <p>⚠ {@code base} names an attribute of the <b>memosprite</b>. Where a document instead scales off the
+     * <em>summoner</em> (景元's 「神君」 hits for 「等同于景元攻击力66%」), the panel carries the share and the
+     * attack then scales off the memosprite's own ATTACK: the same number, stated the same way every other
+     * inherited attribute is, and consistent with the panel's snapshot semantics.
+     *
+     * @param element the {@link com.laosun.aluminium.enums.DamageElement} spelling, as the data files write
+     *                it ({@code "Ice"})
+     * @param base    the {@link com.laosun.aluminium.enums.AttributeType} name the share applies to, which
+     *                must be an attribute the panel actually gives this memosprite ({@code "HEALTH"})
+     * @param percent the share of that attribute per hit ({@code 2.0} = 200%)
+     * @param hits    how many segments land on each target, or {@code null} for one
+     * @param shape   the {@link com.laosun.aluminium.enums.SkillEffectType} spelling ({@code "AoEAttack"}),
+     *                or {@code null} for a single target
+     */
+    public record Attack(@SerializedName("element") String element,
+                         @SerializedName("base") String base,
+                         @SerializedName("percent") Double percent,
+                         @SerializedName("hits") Integer hits,
+                         @SerializedName("shape") String shape) {
     }
 }

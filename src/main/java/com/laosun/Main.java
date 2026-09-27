@@ -2,6 +2,8 @@ package com.laosun;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.beans.MemospriteSpec;
+import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.RelicType;
@@ -24,6 +26,7 @@ import com.laosun.aluminium.models.buff.CounterMechanic;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.SuperBreakBuff;
 import com.laosun.aluminium.models.enemy.EnemySkill;
+import com.laosun.aluminium.utils.CharacterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +54,9 @@ import java.util.Random;
  *   <li>Stages/waves (P7-4/P7-5 are implemented, see {@code StageFactory}) — here 3 fixed enemies are hand-built,
  *       because the point is to display the "weakness / resistance / toughness / skill multiplier" data item by item,
  *       and walking wave by wave would only make that harder to read;</li>
- *   <li>Memosprites (P9), the Elation system (P10) — the engine does not have them yet.</li>
+ *   <li>Memosprites (P9-4) are shown in the <b>mechanics</b> demo (<code>--args="mechanics"</code>, scene 4),
+ *       not in this whole-fight one: this battle is three fixed hand-built enemies with a fixed roster, and
+ *       the point is to display the data item by item. The Elation system (P10) is still missing.</li>
  * </ul>
  *
  * <p>The random numbers all come from the injected {@link Random}: a fixed seed → the whole battle is reproducible.
@@ -176,7 +181,7 @@ public class Main {
 
     /**
      * A short demo whose job is to <b>show the mechanics this project just built actually running</b>,
-     * rather than to look like a fair fight. Three scenes:
+     * rather than to look like a fair fight. Four scenes:
      *
      * <ol>
      *   <li><b>Break control states</b> (P10-1/P10-2) — 冰 = the victim cannot act, 量子/虚数 = it acts but
@@ -187,6 +192,8 @@ public class Main {
      *       migration this was impossible: {@code tickDots} took an {@code Enemy}.</li>
      *   <li><b>An enemy-side summon</b> (L-8) — the camp holds a non-monster, our side can hit it, and the
      *       battle is not won while it stands.</li>
+     *   <li><b>A memosprite of our own</b> (P9-4 忆灵) — summoned by its character's own rule, panelled from the
+     *       summoner's resolved sheet, and then taking a turn whose damage is a share of <em>its</em> Max HP.</li>
      * </ol>
      *
      * <p>⚠ Deliberate demo affordances, each labelled in the output: the enemy's weakness set is rewritten
@@ -204,13 +211,15 @@ public class Main {
         breakControlScene();
         dotOnOurCharacterScene();
         enemyCampSummonScene();
+        memospriteScene();
 
         System.out.println("=".repeat(78));
-        System.out.println(" All three scenes ran without the engine refusing anything.");
+        System.out.println(" All four scenes ran without the engine refusing anything.");
         System.out.println(" What pins each one is a test, not this printout:");
         System.out.println("   control states      ControlTest + BreakEffectTableTest");
         System.out.println("   DOT as a buff       DotTest (incl. a DOT on a character)");
         System.out.println("   summon in the camp  EnemyCampSummonTest");
+        System.out.println("   memosprite attack   MemospriteAttackTest");
         System.out.println("   delay survives slow QueueActionManipulationTest.aDelaySurvivesASpeedChange");
         System.out.println("=".repeat(78));
     }
@@ -375,6 +384,65 @@ public class Main {
         return Math.round(ratio * 100) + "%";
     }
 
+    /**
+     * Scene 4: one of OUR summons — a memosprite, whose panel is <b>derived from its summoner</b> and which
+     * then takes its own turn (P9-4 忆灵).
+     *
+     * <p>Nothing is fabricated here: 长夜月's own rule file summons 「长夜」 at battle start
+     * ({@code BATTLE_START → SUMMON}), the panel comes from {@code memosprites/1413.json} and the attack is
+     * the memosprite's own 忆灵技能1. The scene prints the derivation itself (share × the summoner's resolved
+     * value) because "the panel is a function of the summoner" is the whole mechanic.
+     */
+    private static void memospriteScene() {
+        System.out.println("[4] A memosprite of OUR side — its panel is a function of its summoner (P9-4)");
+        Character summoner = CharacterFactory.create(1413, 80);
+        Enemy monster = EnemyFactory.create(1002011, 90, 1);
+        Battle battle = new Battle(List.of(summoner), List.of(monster), new Random(7));
+        battle.startBattle();                        // the character's own rule summons it, not this demo
+
+        Summon evey = battle.memospriteOf(summoner);
+        if (evey == null) {
+            System.out.println("    → no memosprite: " + summoner.getName() + "'s rule did not summon one");
+            return;
+        }
+        System.out.println("    " + summoner.getName() + " summoned " + evey.getName()
+                + " at battle start (its own BATTLE_START rule); it stands in our camp ("
+                + battle.allies.size() + " unit(s), " + battle.enemyUnits().size() + " monster(s) across the way)");
+
+        MemospriteSpec spec = Memosprites.of(summoner.getCid());
+        for (MemospriteSpec.Panel entry : spec.panel()) {
+            AttributeType attribute = AttributeType.fromString(entry.attribute());
+            StringBuilder formula = new StringBuilder();
+            if (entry.percent() != null) {
+                formula.append(pct(entry.percent())).append(" × ")
+                        .append(fmt(summoner.getAttribute(attribute).get())).append(" (summoner)");
+            }
+            if (entry.flat() != null) {
+                formula.append(formula.isEmpty() ? "" : " + ").append(fmt(entry.flat())).append(" flat");
+            }
+            System.out.println("    " + attribute.name() + " = " + formula
+                    + "  → " + fmt(evey.getAttribute(attribute).get()));
+        }
+        MemospriteSpec.Attack attack = spec.attack();
+        System.out.println("    attack: " + attack.shape() + " " + attack.element() + " = "
+                + pct(attack.percent()) + " of its own " + attack.base()
+                + " — no ATK anywhere, because the text gives 「长夜」 no ATK to use");
+
+        // Who acts first is the action bar's answer, not an assumption: step until the next actor is the
+        // memosprite, then let it take that turn. (Bounded, so a scene can never hang the demo.)
+        for (int skipped = 0; skipped < 10 && !battle.isOver(); skipped++) {
+            List<Signal> upcoming = battle.getQueueSnapshot();
+            if (!upcoming.isEmpty() && upcoming.getFirst().getCanHit() == evey) {
+                break;
+            }
+            step(battle);
+        }
+        if (!battle.isOver()) {
+            step(battle);                            // the memosprite's own turn
+        }
+        System.out.println();
+    }
+
     // ==================================================================
     // One turn
     // ==================================================================
@@ -397,8 +465,14 @@ public class Main {
         }
 
         // 2) Cast
+        // ⚠ Three actor kinds, not two (P9-4 忆灵): a Summon can be the current actor -- an enemy's minion (L-8) or
+        // one of our memosprites. Before this branch existed the `else` cast it to Character, so the first
+        // summon to reach its own turn in this demo would have died with a ClassCastException rather than
+        // doing something visible.
         if (actor instanceof Enemy enemy) {
             enemyTurn(battle, enemy);
+        } else if (actor instanceof Summon summon) {
+            summonTurn(battle, summon);
         } else {
             characterTurn(battle, (Character) actor);
         }
@@ -587,6 +661,70 @@ public class Main {
         if (target.isDeath()) {
             System.out.println("        → " + target.getName() + " defeated, removed from the action bar");
         }
+    }
+
+    /**
+     * A summon's turn — an enemy's minion, or one of our memosprites (P9-4 忆灵).
+     *
+     * <p><b>What this method is, and is not.</b> The engine has no opinion about who drives a summon: the
+     * action bar schedules it like any other unit and {@code Battle.performAction} casts whatever skill it
+     * was given. This is the demo's policy, written down in one place — attack the opposing camp with the
+     * {@code COMMON} skill, main target picked by the same aggro-weighted selector the enemies use. A real
+     * client would pick differently (忆灵技能1 says 「优先攻击长夜月上次攻击的敌方目标」 — see ROADMAP §12.5);
+     * the point here is that a summon <b>acts</b>, and that its damage is not a character's.
+     *
+     * <p>Which side it hits comes from {@code battle.getOpponents(summon)}, never from a hard-coded camp: an
+     * enemy minion hits our team, a memosprite hits the monsters, and the same method serves both.
+     */
+    private static void summonTurn(Battle battle, Summon summon) {
+        CanHit master = summon.getMaster();
+        System.out.println("[Summon] " + summon.getName()
+                + "  HP " + fmt(summon.getCurrentHp()) + "/" + fmt(summon.getMaxHp())
+                + "  (summoned by " + (master == null ? "nobody" : master.getName()) + ")");
+
+        Skill attack = summon.getSkills().get(SkillType.COMMON);
+        if (attack == null) {
+            System.out.println("        → no attack of its own, nothing to do");
+            return;
+        }
+        // The damage base is worth printing for a memosprite: its damage is written as a share of an
+        // attribute of *its own* (「等同于「长夜」50%生命上限」), which is the whole reason this class takes
+        // the attribute as a parameter instead of assuming ATK.
+        if (attack instanceof EnemySkill direct) {
+            System.out.println("        → damage base " + pct(direct.getMultiplier()) + " of its own "
+                    + direct.getBaseAttribute().name() + " ("
+                    + fmt(summon.getAttribute(direct.getBaseAttribute()).get()) + ") × "
+                    + direct.getHits() + " hit(s), " + direct.getElement());
+        }
+
+        List<CanHit> candidates = new ArrayList<>();
+        for (CanHit unit : battle.getOpponents(summon)) {
+            if (!unit.isDeath()) {
+                candidates.add(unit);
+            }
+        }
+        if (candidates.isEmpty()) {
+            System.out.println("        → no targetable target");
+            return;
+        }
+        CanHit target = TargetSelector.select(battle, candidates, TargetSelector.Intent.SINGLE, battle.getRng());
+        if (target == null) {
+            System.out.println("        → no targetable target");
+            return;
+        }
+        // Summed over the whole opposing camp rather than read off the main target: a shape may reach more
+        // than one unit, and reporting only the primary would understate an AOE to the point of being wrong.
+        double before = candidates.stream().mapToDouble(CanHit::getCurrentHp).sum();
+        if (!battle.performAction(attack, List.of(target))) {
+            System.out.println("        → action failed");
+            return;
+        }
+        battle.processRequests();
+        double after = candidates.stream().mapToDouble(CanHit::getCurrentHp).sum();
+        System.out.println("        → " + summon.getName() + " deals " + fmt(before - after) + " across "
+                + candidates.size() + " target(s), main target " + target.getName()
+                + " HP " + fmt(target.getCurrentHp()) + "/" + fmt(target.getMaxHp())
+                + (target.isDeath() ? " — defeated" : ""));
     }
 
     // ==================================================================
