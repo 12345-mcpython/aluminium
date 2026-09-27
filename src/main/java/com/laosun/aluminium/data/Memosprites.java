@@ -142,6 +142,7 @@ public final class Memosprites {
         requirePresent(seen, AttributeType.HEALTH, spec, source);
         requirePresent(seen, AttributeType.SPEED, spec, source);
         validateAttack(spec, seen, source);
+        validateAggro(spec, source);
         return spec;
     }
 
@@ -159,6 +160,23 @@ public final class Memosprites {
      *       {@code EnemySkill} would happily run it as a single-target hit.</li>
      * </ul>
      */
+    /**
+     * Checks the optional {@code aggro} (2026-09-28). Only one rejection, but it is the one that would be
+     * invisible: a weight of zero or less would give the memosprite a zero share of the aggro table, i.e. the
+     * enemy would simply never pick it -- which looks like "the enemy prefers other targets" rather than like a
+     * data error. (Leaving the field out is the honest way to say "no document states one"; the engine then
+     * answers its regular tier, 100.)
+     */
+    private static void validateAggro(MemospriteSpec spec, String source) {
+        if (spec.aggro() != null && (!isFinite(spec.aggro()) || spec.aggro() <= 0)) {
+            throw new IllegalArgumentException(
+                    "Memosprite '" + spec.name() + "' gives \"aggro\": " + spec.aggro()
+                            + ", but an aggro weight must be positive -- 0 or less takes it out of the aggro table "
+                            + "entirely, so an enemy would never target it (leave the field out to mean the "
+                            + "engine's regular tier) (" + source + ")");
+        }
+    }
+
     private static void validateAttack(MemospriteSpec spec, Set<AttributeType> panel, String source) {
         MemospriteSpec.Attack attack = spec.attack();
         if (attack == null) {
