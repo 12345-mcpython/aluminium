@@ -56,6 +56,11 @@ public class EffectSpec {
 
     /**
      * Attribute name for {@code MODIFY_ATTR}, matching {@code AttributeType} (e.g. {@code "ATTACK"}).
+     *
+     * <p>For {@code COMMAND_SUMMON} it names the attribute the commanded attack scales off <b>on the
+     * summon</b> ({@code "HEALTH"} = 「等同于忆灵 X% 生命上限」), which is the same question
+     * {@code MODIFY_ATTR} asks of the unit it modifies: "which attribute is in play here". The multiplier
+     * itself comes from the named {@code skill}'s parameter row, not from this file.
      */
     @SerializedName("attribute")
     private String attribute;
@@ -198,6 +203,25 @@ public class EffectSpec {
      */
     @SerializedName("damage_param")
     private Integer damageParam;
+
+    /**
+     * Which <b>level row</b> of the skill's parameter table the multiplier is read from; absent means the
+     * skill's own level ({@code Skill.getLevel()}).
+     *
+     * <p>⚠ This exists because a character's skills are all at <b>level 1</b> in this engine
+     * ({@code Character.Builder} initialises every slot to 1 and nothing raises it), while the documents quote
+     * their figures at <em>whatever level that skill's prose happens to be written at</em> — 长夜月's ultimate
+     * quotes 200% (the Lv10 row) and its 忆灵技1 quotes 50% (the Lv6 row). Reading "the skill's level" therefore
+     * silently produces a different number from the text: her ultimate would deal 100% of the memosprite's Max HP
+     * instead of 200%, with nothing to report. A rule that means the number the document states says which row
+     * it read, exactly as it says which column ({@link #damageParam}).
+     *
+     * <p>{@code damage_param} picks the <b>column</b>, this picks the <b>row</b> — both are needed, and a level
+     * outside the table is refused loudly when the effect fires (the rule does not know its owner's cid at load
+     * time, so that is the earliest point at which the table is in hand).
+     */
+    @SerializedName("damage_level")
+    private Integer damageLevel;
 
     /**
      * Whether a {@code DAMAGE} effect <b>counts as an attack</b>.

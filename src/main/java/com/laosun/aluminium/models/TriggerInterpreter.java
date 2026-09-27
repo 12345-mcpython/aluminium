@@ -5,6 +5,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
@@ -14,8 +15,10 @@ import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.buff.VulnerabilityBuff;
+import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.Skill;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -100,7 +103,7 @@ public final class TriggerInterpreter {
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
-            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON");
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -221,6 +224,19 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
                 requireNoTarget(effect, op, spec);
             }
+            case "COMMAND_SUMMON" -> {
+                // The numbers are the NAMED SKILL's, not this file's: 长夜月's ultimate is skill 141303, whose
+                // parameter row says 2.0 at Lv10 and whose effect says AoEAttack / Ice. Stating them again here
+                // would be a second copy that drifts (and would lose the per-level table -- see M-28).
+                requireSkill(effect, op, spec);
+                requireDamageParam(effect, op, spec);
+                requireAttribute(effect, op, spec);
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                // The victims come from the SKILL's shape (the summon's opposing camp), not from a selector:
+                // pointing this op at `self` or at a teammate would deal the summon's damage to our own side.
+                requireNoTarget(effect, op, spec);
+            }
             default -> requireNoStackArguments(effect, op, spec);
         }
     }
@@ -309,6 +325,7 @@ public final class TriggerInterpreter {
             case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
+        case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
         }
@@ -429,6 +446,69 @@ public final class TriggerInterpreter {
             return List.copyOf(battle.allies);
         }
         return List.of(resolveTarget(effect, ctx));
+    }
+
+    /**
+     * {@code COMMAND_SUMMON}: the owner's summon performs <b>one attack, right now</b>, with the numbers of the
+     * skill the rule names — 「召唤忆灵「长夜」，随后使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害」.
+     *
+     * <p><b>Where every number comes from.</b> The rule names a {@code skill} + {@code damage_param} of the
+     * <b>owner's</b> skills — her ultimate, whose row says 2.0 at Lv10 and 2.5 at Lv15 — and the element (Ice) and
+     * the shape (AoEAttack) come from that same skill data. Only the <b>base attribute</b> ({@code HEALTH}) is
+     * stated here, because that is the one thing the row does not say: 「等同于<b>忆灵</b>的生命上限」, not 长夜月's
+     * attack. A first draft of this op carried its own {@code element} / {@code shape} / {@code percent} fields
+     * and would have been a second copy of data that already exists, one that also loses the per-level table.
+     *
+     * <p>⚠ The skill is the owner's and the <b>attacker is the summon</b> — a first draft looked the skill up on
+     * the summon and failed with "长夜 has no ULTRA skill", which is exactly right: the numbers are hers, the
+     * swing is its.
+     *
+     * <p><b>Whose action it is.</b> The owner's: the summon acts without spending its turn, exactly like a
+     * follow-up, and its own turn (with its own skill) is untouched. The damage is settled with the
+     * <b>summon</b> as the attacker, so everything downstream is the summon's — its attribute is what the share
+     * reads, kill credit is the summon's, and the attack announces itself to our side like any other attack by
+     * it ({@code Battle.fireAfterAttack} + {@code TriggerEvent.SUMMON_ATTACK}, both reached through
+     * {@link EnemySkill#execute}).
+     *
+     * <p>⚠ Reusing {@link EnemySkill} is the point: it already owns the shape dispatch (single / AOE / blast),
+     * per-segment settlement and those two announcements. What it does not do is choose targets, which is the one
+     * thing this method adds — and it must filter to the <b>living</b>, because {@code EnemySkill} takes the
+     * first entry of the list it is handed as the main target.
+     */
+    private static void commandSummon(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        CanHit summon = requireSummon(ctx);
+        Character owner = requireCharacterOwner(effect, ctx);
+        SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+        // The skill is the OWNER's: it is her ultimate whose parameter row carries the numbers. The summon is
+        // only the one that swings.
+        Skill skill = owner.getSkills().get(slot);
+        if (skill == null || skill.getData() == null) {
+            throw new IllegalStateException(
+                    owner.getName() + " has no " + slot + " skill, so a COMMAND_SUMMON effect has nothing to "
+                            + "read: the rule names the skill whose numbers the commanded attack uses");
+        }
+        if (!skill.getData().getEffect().isDamaging()) {
+            throw new IllegalStateException(
+                    "COMMAND_SUMMON effect points at " + slot + ", whose effect is "
+                            + skill.getData().getEffect() + " rather than a damaging one");
+        }
+        List<CanHit> victims = new ArrayList<>();
+        for (CanHit unit : battle.getOpponents(summon)) {
+            if (unit != null && !unit.isDeath()) {
+                victims.add(unit);
+            }
+        }
+        if (victims.isEmpty()) {
+            return;                                  // nothing left to hit: an empty battlefield, not a bad rule
+        }
+        EnemySkill attack = new EnemySkill(
+                skill.getData().getElement(),
+                multiplierOf(skill, effect),
+                1,                                   // one segment: 长夜月's ultimate is 「单目标段数: 1」 in its own split
+                DamageType.NORMAL,                   // a real attack by the summon, not 附加伤害
+                skill.getData().getEffect(),         // the shape the skill itself declares (AoEAttack)
+                AttributeType.fromString(effect.getAttribute()));
+        attack.execute(battle, summon, victims);
     }
 
     /**
@@ -988,7 +1068,8 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Validates the {@code attribute} name of a {@code MODIFY_ATTR} effect <b>at load time</b>.
+     * Validates the {@code attribute} name of a {@code MODIFY_ATTR} / {@code COMMAND_SUMMON} effect
+     * <b>at load time</b>.
      *
      * <p>The "fail at load, not mid-battle" rule (the same one behind the op vocabulary) applies to
      * arguments too: a misspelled attribute must be reported when the table is read, not when the
@@ -1015,10 +1096,10 @@ public final class TriggerInterpreter {
         }
         if (attribute.isPercentVariant()) {
             throw new IllegalArgumentException(
-                    "Op " + op + " cannot target '" + effect.getAttribute()
-                            + "': it is a builder-only input key, not a runtime attribute, so a buff "
-                            + "on it would silently do nothing. Name the base attribute and use "
-                            + "\"percent\" instead (source: " + spec.getSource() + ")");
+                    "Op " + op + " cannot use '" + effect.getAttribute()
+                            + "': it is a builder-only input key, not a runtime attribute, so reading it "
+                            + "mid-battle would fail (or silently do nothing). Name the base attribute "
+                            + "(source: " + spec.getSource() + ")");
         }
     }
 
@@ -1206,7 +1287,7 @@ public final class TriggerInterpreter {
                     "DAMAGE effect points at " + slot + ", whose effect is "
                             + skill.getData().getEffect() + " rather than a damaging one");
         }
-        double multiplier = multiplierOf(skill, effect.getDamageParam());
+        double multiplier = multiplierOf(skill, effect);
         double base = attacker.getAttribute(AttributeType.ATTACK).get() * multiplier;
         battle.applyAdditionalDamage(attacker, victim, skill.getData().getElement(), base);
     }
@@ -1214,20 +1295,28 @@ public final class TriggerInterpreter {
     /**
      * Reads the damage multiplier out of the skill's per-level parameter row.
      *
-     * @param skill the skill
-     * @param index which parameter holds the multiplier (see {@link EffectSpec#getDamageParam()})
-     * @return the multiplier for this skill's current level
-     * @throws IllegalStateException when the level or the index falls outside the data
+     * <p>The <b>row</b> is {@link EffectSpec#getDamageLevel()} when the rule states one, and the skill's own
+     * level otherwise; the <b>column</b> is {@link EffectSpec#getDamageParam()}. Both are stated by the author
+     * where the document's figure depends on them — see {@code damage_level}'s javadoc for why the engine's
+     * default (level 1) is not the same thing as "the number in the text".
+     *
+     * @param skill  the skill
+     * @param effect the effect naming the column (and optionally the row)
+     * @return the multiplier for that row
+     * @throws IllegalStateException when the row or the column falls outside the data
      */
-    private static double multiplierOf(Skill skill, int index) {
+    private static double multiplierOf(Skill skill, EffectSpec effect) {
         var levels = skill.getData().getSkills();
-        int row = skill.getLevel() - 1;
+        int level = effect.getDamageLevel() == null ? skill.getLevel() : effect.getDamageLevel();
+        int row = level - 1;
         if (row < 0 || row >= levels.size()) {
             throw new IllegalStateException(
-                    "Skill level " + skill.getLevel() + " is outside the parameter table (rows="
-                            + levels.size() + ")");
+                    "damage_level " + level + " is outside " + skill.getData().getSkillType()
+                            + "'s parameter table (rows=" + levels.size()
+                            + "); the rule states a row the skill's data does not have");
         }
         var params = levels.get(row);
+        int index = effect.getDamageParam();
         if (index >= params.size()) {
             throw new IllegalStateException(
                     "damage_param " + index + " is outside this skill's parameter row (size="
@@ -1268,6 +1357,14 @@ public final class TriggerInterpreter {
         if (effect.getDamageParam() < 0) {
             throw new IllegalArgumentException(
                     "Op " + op + " has a negative \"damage_param\" (source: " + spec.getSource() + ")");
+        }
+        // The row, when stated, must be a real 1-based level. Whether the skill's data actually HAS that many
+        // rows is checked when the effect fires: a rule does not know its owner's cid while it is being read.
+        if (effect.getDamageLevel() != null && effect.getDamageLevel() < 1) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has \"damage_level\": " + effect.getDamageLevel()
+                            + "; levels are 1-based, and 0 or below would read a row that cannot exist "
+                            + "(source: " + spec.getSource() + ")");
         }
     }
 }
