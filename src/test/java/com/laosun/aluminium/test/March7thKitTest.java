@@ -263,11 +263,13 @@ public class March7thKitTest {
     /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
-     * <p>Six clauses exist and each is pinned above; the counts here are what says nothing else was written. Every
-     * missing one would be a wrong number or a wrong trigger if it were spelled with the vocabulary that exists
-     * today: 星魂 1 needs a per-cast count of the victims a state actually landed on, 星魂 4 needs a way to raise
-     * another rule's limit plus a DEF-derived damage addend, 行迹「冰咒」 needs a way to raise an existing rule's
-     * base chance, and 星魂 6 needs the shield's provider to be askable.
+     * <p><b>Seven</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
+     * Every missing one would be a wrong number or a wrong trigger if it were spelled with the vocabulary that exists
+     * today: 星魂 4 needs a way to raise another rule's limit plus a DEF-derived damage addend, 行迹「冰咒」 needs a way
+     * to raise an existing rule's base chance, and 星魂 6 needs the shield's provider to be askable <i>per ally</i>.
+     * ⚠ 星魂 1 used to be on that list ("needs a per-cast count of the victims a state actually landed on") and came
+     * off it on 2026-09-28, when {@code "scale": "cast_applied:冻结"} existed — which is why her ultimate now has two
+     * rules instead of one.
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
@@ -275,8 +277,9 @@ public class March7thKitTest {
                 "the shield, the cleanse trace and 加护 (the shield's +1 turn) -- and nothing else on her Skill");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TAKING_HIT),
                 "the Talent's counter");
-        Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
-                "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule)");
+        Assertions.assertEquals(2, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
+                "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule) and 星魂 1's "
+                        + "energy per landed freeze");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
                 "星魂 2's battle-start shield for the most hurt ally");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),

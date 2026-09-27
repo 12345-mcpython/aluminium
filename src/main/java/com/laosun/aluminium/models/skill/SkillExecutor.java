@@ -91,8 +91,14 @@ public final class SkillExecutor {
         // ⚠ A delegated cast fires it with an EMPTY hit set, and that is the point: the swing happens later, as
         // whatever the rules deliver it with (for 长夜月's ultimate, `COMMAND_SUMMON` on this very event). So a
         // delegated cast is "no damage of mine", never "no cast happened".
-        broadcastSkillCast(battle, user, skill, hitTargets, targets);
-        battle.grantSkillEnergy(user, skill, hitTargets);
+        try {
+            broadcastSkillCast(battle, user, skill, hitTargets, targets);
+            battle.grantSkillEnergy(user, skill, hitTargets);
+        } finally {
+            // The cast's own events have been delivered, so its "what did it actually apply" record goes away: a
+            // rule firing later must not read this cast's counts as if they were its own (see Battle.endCastOutcome).
+            battle.endCastOutcome();
+        }
     }
 
     /**

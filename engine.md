@@ -74,7 +74,7 @@
 - `zero()` / `one()` 每次返回新实例，不是共享单例。
 - 批量装配用的 `*NoCompute` 方法不会立即结算，必须由 `AttributeBuilder.build()` 统一调 `commit()` → `compute()`。
 
-### 2.2 属性清单（`enums/AttributeType.java`，共 27 个值）✅
+### 2.2 属性清单（`enums/AttributeType.java`，共 33 个值）✅
 
 | 分类 | 属性 |
 |---|---|
@@ -83,13 +83,19 @@
 | 双爆 | `CRIT_CHANCE` `CRIT_ATTACK` |
 | 命中/抵抗 | `EFFECT_HIT_RATE` `EFFECT_RESISTANCE` ⚠️ |
 | 治疗 | `OUTGOING_HEALING_BOOST` `HEAL_TAKEN_RATIO` ❌未使用 |
+| 护盾（2026-09-28） | `SHIELD_BOOST`（「装备者**提供的**护盾量提高 X%」，**从给盾者**读，见 §20.3） |
 | 击破/能量 | `BREAKING_EFFECT` `ENERGY_REGENERATION_RATE` |
 | 元素增伤（7 个） | `PHYSICAL_` `FIRE_` `ICE_` `THUNDER_` `WIND_` `QUANTUM_` `IMAGINARY_DAMAGE_BOOST` |
 | 通用 | `ALL_DAMAGE_TYPE_BOOST` |
 | 追加攻击专属 | `FOLLOW_UP_DAMAGE_BOOST`（只在 `DamageType.ADDITIONAL` 时进增伤区） |
 | 攻击类型专属（3 个） | `BASIC_ATTACK_` / `SKILL_` / `ULTIMATE_DAMAGE_BOOST`（按 `Damage.getCastCategory()` 进增伤区，见 §18.2） |
+| 持续伤害专属 | `DOT_DAMAGE_BOOST`（只在 `DamageType.DOT` 时进增伤区） |
 | 穿透 | `DAMAGE_PENETRATION`（抗性区用） `DEFENCE_IGNORE`（防御区用） |
 | 欢愉 | `ELATION_DAMAGE_BOOST` ⚠️定义了但全仓库无读取者 |
+
+> ⚠ **新属性一律追加在枚举末尾**：`CanHit` 的属性数组按 `ordinal()` 索引，插在中间会**静默**重排
+> 每一个后随属性（`AttributeBuilder` 有守卫，但读的人不会知道）。`SHIELD_BOOST`、`DOT_DAMAGE_BOOST`、
+> 三个攻击类型专属都是这么加的。
 
 ### 2.3 百分比重定向 ✅
 
@@ -607,7 +613,7 @@ JSON 写法不变。
 |---|---|---|
 | `GAIN_ENERGY` | `amount` 或 **`scale` + `percent`**（`target_max_energy` = 按**目标能量上限**的百分比，M-44），可选 `per_target` | ✅ |
 | `GAIN_SKILL_POINT` | `amount` | ✅ |
-| `HEAL` / `SHIELD` | `amount`，可选 `target` —— **或** `scale` + `percent`（+ 可选 `amount` 作**常数项**）；`SHIELD` 还可选 `turns`（**有时长的盾**） | ✅ `scale` 有 `target_max_hp` / `owner_max_hp` / **`owner_def`**（按**规则主人**的防御力，2026-09-27 为三月七的护盾而加：「57% 防御力 **+ 760**」）。⚠ `amount` 与 `scale` 同时出现**不再是冲突**：它是那个**常数项**（旧策略拒绝两者同写，所以放开它**不改动任何既有内容**）；仍拒的是「有 scale 有 amount 却没有 percent」——scale 只说明份额*是什么的*。⚠ `SHIELD` 的 `turns` 从 2026-09-27 起**真的生效**（`ShieldBuff`，按**被保护者自己的**回合扣；在这之前它被静默丢掉，盾永不掉 —— 见上面的 `has_shield` 那段）；`HEAL` 写 `turns` / `permanent` 是**装载期拒绝**（治疗没有时长） |
+| `HEAL` / `SHIELD` | `amount`，可选 `target` —— **或** `scale` + `percent`（+ 可选 `amount` 作**常数项**）；`SHIELD` 还可选 `turns`（**有时长的盾**） | ✅ `scale` 有 `target_max_hp` / `owner_max_hp` / **`owner_def`**（按**规则主人**的防御力，2026-09-27 为三月七的护盾而加：「57% 防御力 **+ 760**」）。⚠ `amount` 与 `scale` 同时出现**不再是冲突**：它是那个**常数项**（旧策略拒绝两者同写，所以放开它**不改动任何既有内容**）；仍拒的是「有 scale 有 amount 却没有 percent」——scale 只说明份额*是什么的*。⚠ `SHIELD` 的 `turns` 从 2026-09-27 起**真的生效**（`ShieldBuff`，按**被保护者自己的**回合扣；在这之前它被静默丢掉，盾永不掉 —— 见上面的 `has_shield` 那段）；`HEAL` 写 `turns` / `permanent` 是**装载期拒绝**（治疗没有时长）。⚠ 2026-09-28 起护盾量还要乘**给盾者的** `SHIELD_BOOST`（「装备者提供的护盾量提高 X%」），两条路同一个公式，见 §20.3 |
 | `EXTRA_TURN` | 可选 `target` | ✅ |
 | `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持），可选 `target`（**可以是群体**：`all_allies` / `other_allies` / `target_and_summon` 会逐个推） | ✅ |
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8）⚠ 2026-09-27 起，`resource` 指的名字**必须**在角色文件的 `resources` 块里声明过（见 §4.6 的文件形状）：没声明时 `gain` 记 0、`value` 读 0，规则会**照常触发却什么都不发生**，所以装配期直接拒绝。`SPEND_RESOURCE` 从不存在的资源/不够扣时**响亮报错**（不是静默少扣） |
@@ -2762,7 +2768,33 @@ Damage(type = damage_type, element)               // 走 Battle.applyDamage 统�
 
 - `CanHit.shield`（当前护盾）+ `CanHit.takeDamage` **先扣盾再扣血**：
   盾吸收 `min(shield, damage)`，剩下的才进 HP。所以"**盾破前不死**"是自动成立的。
-- **不叠加**：`Battle.grantShield(target, amount)` 直接**覆盖**当前值（≤0 视为清盾）。
+- **不叠加**：`Battle.grantShield(provider, target, amount)` 直接**覆盖**当前值（≤0 视为清盾）。
+- ✅ **「使装备者提供的护盾量提高 X%」= `AttributeType.SHIELD_BOOST`（2026-09-28）**，四个读者：遗器 **103**
+  净庭教宗的圣骑士 4 件套（20%）、遗器 **128** 自匿星芒的隐士 2 件套（10%）与 4 件套（12%）、一件光锥
+  （12/15/18/21/24%）。它们此前都躺在 `_unmodelled.json` 里，理由一模一样：*"需要一个把装备者造的每一面盾放大的东西"*。
+  - ⚠ **这不是 op，是一个属性**：文档写的是「装备者**提供的**护盾量」，指明的是**给盾的人**，所以这个数属于
+    造盾的那一方、并且随盾走 —— 与「受到伤害提高」（挂在承受者身上）方向**相反**，这也是它必须与
+    `OUTGOING_HEALING_BOOST`（治疗的孪生兄弟）分开的原因：合成一个会让「提供的护盾量提高」顺手强化治疗。
+  - **在授予那一刻算一次就冻结**（与 `MODIFY_ATTR` 的派生值同一条口径）：已经立着的盾不会因为给盾的人后来变强而变大。
+  - ⚠ **两条路必须是同一个数**：`SHIELD` op 有"裸授予"（没写 `turns`）与"有时长的盾"（`ShieldBuff`）两个形态。
+    `Battle.boostedShield(provider, amount)` 是**唯一**的公式，`ShieldBuff` 在**构造时**用它、裸授予在
+    `grantShield` 里用它 —— 否则三月七那面「持续3回合」的盾会是"3 回合 120、之后永远 100"。
+  - ⚠ **技能面板那条路也要盖章**：护盾还能由**技能数据**装（`SkillExecutor` 的非伤害分支读 `Defence` 效果的参数，
+    三月七 100102 就是一条「38% 防御力 + 190」）。那一路同样以**施法者**为提供者 —— 否则数据驱动的护盾技能
+    会是全场唯一吃不到「提供的护盾量提高」的盾。
+  - ⚠ **两参重载 = "来源不明 → 不放"**（`grantShield(target, amount)`）：夹具与示例用它，既有的数字一字不变；
+    一个无法归属到给盾者的加成若照放，会把全场每一面盾都悄悄加强。
+  - ⚠ 比例属性在 `MODIFY_ATTR` 里落地的是**纯值（pure）**修饰符而不是 `ADD_PERCENT`
+    （`statModifier`: `attribute.isPercent ? "pure" : "add_percent"`）—— 因为"零基数的百分比"还是零。实测踩到过：
+    用 `addPercent` 写这条用例时两笔加成"互相抵消"成 100，换成 `pure` 才是 122。
+  - 契约：`ShieldBoostTest` **11 条**（倍率 / **给盾者的**属性而不是承受者的 / 来源不明不放 / 两笔相加 /
+    0 与清盾 / 两条路同一个数 / 技能面板那条路 / 103 与 128 的出货内容 / 套装加成不外溢）。
+    **变异**（实测，每次都跑完 1147 条）：整个加成去掉 → **5 红**；加成改从**承受者**读 → **4 红**；
+    只有裸授予吃加成（`ShieldBuff` 不盖）→ **1 红**；`SHIELD` op 不传提供者 → **1 红**；
+    `SkillExecutor` 不传提供者 → **1 红**（第一轮是 **0 红** —— 说明那条路当时没人测，见下）。
+  - 🚧 **仍缺两件**（都登记着）：① 「我方目标持有**装备者提供的**护盾时…」这种**逐目标**的条件（`M-53`）；
+    ② 「同一单位的两条规则改同一个属性时是**刷新**而不是相加」（`M-54`，实测 0.4 与 0.15 两条规则给同一个队友
+    → 结果是 **0.15** 而不是 0.55）—— 128 的 4 件套因此把 12% 写成"累计 22%"，理由在那个文件的 note 里。
 - `CanHit.lastShieldAbsorbed`：上一次 `takeDamage` 被盾吸走的量。
   ⚠ 它在 `takeDamage` 里**必须在任何 `return` 之前赋值** —— 盾把伤害全吃掉时会提前 return，
   漏掉就会让调用方读到上一次的陈旧值（实测过一次：返回伤害正好翻倍）。
@@ -2771,8 +2803,7 @@ Damage(type = damage_type, element)               // 走 Battle.applyDamage 统�
   （否则 `AttackEvent.totalDamage` 与"本次攻击总伤害 × %"这类效果会失真）。
   ⚠ 恒等式：`乘区后的伤害 == shieldAbsorbed + hpLoss`（盾先吃、吃完才扣血），
   所以**不能**把"乘区后的伤害"与盾吸收量相加（会正好翻倍）。
-- 🚧 **没有"护盾量提高"属性**（`AttributeType` 里没有），所以护盾量就是传入值 ——
-  与"治疗降低"同类的缺口，等有真实效果引用时再加。
+- ✅ **"护盾量提高"属性已经存在**（`AttributeType.SHIELD_BOOST`，2026-09-28）—— 见上面那一段。
 
 ---
 
