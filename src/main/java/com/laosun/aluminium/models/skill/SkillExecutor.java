@@ -123,9 +123,13 @@ public final class SkillExecutor {
         // The buff-level broadcast above is deliberately *not* narrowed the same way: it hands the
         // listener the Skill object, so a buff reads the category itself when it cares (SkillCastEvent).
         //
-        // `actor` = the caster. `target` is left null on purpose: a cast can hit several targets at
-        // once, so there is no single subject to hand over -- rules that care about who was hit use
-        // `hit_count`, and the per-target events (HP_LOST etc.) carry their own subject.
+        // `actor` = the caster. `target` = the unit the caller AIMED AT -- its main target, i.e. `targets`'s
+        // first entry, which for a support cast is the ally chosen. ⚠ It is NOT "everything the effect
+        // reached": an AOE reaches several units and only the first of them is named here, so a rule that
+        // cares about coverage still counts `hit_count`, and the per-target events (HP_LOST etc.) carry their
+        // own subject. The distinction is what 「使指定我方单体…」 needs (2026-09-28, M-35): before this the
+        // field was null for every cast, and "the ally I chose" was unexpressible.
+        CanHit aimed = chosen.isEmpty() ? null : chosen.getFirst();
         // A skill with no data (an EnemySkill, a hand-made placeholder constructed by a test) has no
         // attack_type to testify and is treated as UNSPECIFIED: it fires none of the three events.
         // Guessing from the slot instead would make the answer depend on how the skill was built.
@@ -133,14 +137,18 @@ public final class SkillExecutor {
                 ? SkillCategory.UNSPECIFIED
                 : skill.getData().getCategory();
         switch (category) {
-            case ULTRA -> battle.fireTriggers(TriggerEvent.ULT_CAST, user, null, hits.size(), 0);
-            case BPSKILL -> battle.fireTriggers(TriggerEvent.SKILL_CAST, user, null, hits.size(), 0);
-            case NORMAL -> battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, null, hits.size(), 0);
+            case ULTRA -> battle.fireTriggers(TriggerEvent.ULT_CAST, user, aimed, hits.size(), 0);
+            case BPSKILL -> battle.fireTriggers(TriggerEvent.SKILL_CAST, user, aimed, hits.size(), 0);
+            case NORMAL -> battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, aimed, hits.size(), 0);
             default -> {
                 // not an in-battle cast: see above
             }
         }
         if (!hits.isEmpty()) {
+            // ⚠ Deliberately NOT handed the aim, unlike the three cast events above: ALLY_ATTACK fires for one of
+            // OUR attacks, so the unit it was aimed at is always on the other side -- no rule of ours could ask
+            // about it (`target == self` would be permanently false, and there is no selector for "an enemy").
+            // Passing it would be information with no reader, which is the shape this project keeps refusing.
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, null, hits.size(), 0);
         }
     }
