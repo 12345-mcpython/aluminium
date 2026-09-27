@@ -582,10 +582,10 @@ public class RelicAbilityBatchTest {
     /**
      * 322 逐火者的航迹: the DoT-only boost appears once ATK passes 2400, again at 3600, and not below.
      *
-     * <p>⚠ What this case does <b>not</b> prove: that the attribute reaches a DoT instance's damage. That is the
-     * branch in {@code Battle}'s assembly (gated on {@code DamageType.DOT}); the value here is read off the granted
-     * modifier, which is the half this fixture can see. The damage-level check is still owed -- see the note in the
-     * commit that authored this file.
+     * <p>⚠ This case reads the granted <b>modifier</b>; that the attribute actually reaches a DoT instance's damage is
+     * the branch in {@code Battle}'s assembly, and it is pinned separately by
+     * {@link #theDotBoostReachesTheDamageInstance()} -- an attribute nothing reads would look exactly like a working
+     * rule, so both halves are checked.
      */
     @Test
     public void theRevelryDotBoostAppearsAtItsThresholds() {
@@ -593,6 +593,48 @@ public class RelicAbilityBatchTest {
         Assertions.assertEquals(0.24, dotBoostAtAttack(4000), 1e-6,
                 "「大于等于 3600 时…提高 24%」 -- the lower tier is excluded by its own upper bound");
         Assertions.assertEquals(0, dotBoostAtAttack(2000), 1e-6, "below 2400 nothing is granted");
+    }
+
+    /**
+     * …and the attribute really reaches the tick: the <b>same</b> DoT hits harder once the wearer holds the boost.
+     *
+     * <p>⚠ This is the half that would silently not work. `DOT_DAMAGE_BOOST` is read by a branch in {@code Battle}'s
+     * boost assembly, and an attribute that nothing reads looks exactly like a working rule from the outside -- so the
+     * pair of cases is the point, not either one.
+     *
+     * <p>The two runs differ in <b>one</b> fact (the wearer's ATK, 2000 vs 2500, which is what gates the tier), and
+     * the DoT's own base is the buff's, not the wearer's, so the only thing that can move the number is the boost.
+     */
+    @Test
+    public void theDotBoostReachesTheDamageInstance() {
+        double plain = firstDotDamage(2000);
+        double boosted = firstDotDamage(2500);
+
+        Assertions.assertTrue(plain > 0, "precondition: the DoT tick dealt damage (" + plain + ")");
+        Assertions.assertTrue(boosted > plain,
+                "「使装备者造成的持续伤害额外提高 12%」 must reach the tick (" + boosted + " vs " + plain + ")");
+    }
+
+    /** How much HP one DoT tick takes off the enemy, with the wearer at this ATK. */
+    private static double firstDotDamage(double attack) {
+        Character wearer = wearing(REVELRY);
+        wearer.setAttribute(AttributeType.ATTACK, new DoubleValue(attack));
+        Enemy enemy = dummy();
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        battle.startBattle();
+        enemy.getBuffManager().addBuff(
+                new com.laosun.aluminium.models.buff.DotBuff(wearer, DamageElement.FIRE, 100, 3));
+        double before = enemy.getCurrentHp();
+
+        for (int guard = 0; guard < 40; guard++) {
+            battle.stepForward();
+            if (battle.queue.getCurrentActor().getCanHit() == enemy) {
+                battle.beforeMove();                  // where the DoT ticks (Battle.tickDots)
+                break;
+            }
+            battle.afterMove();
+        }
+        return before - enemy.getCurrentHp();
     }
 
     /** The DoT-boost modifier the suit granted to a wearer with this ATK, or 0 when it granted none. */
