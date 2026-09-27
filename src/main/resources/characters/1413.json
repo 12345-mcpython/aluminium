@@ -10,6 +10,21 @@
     "note": "The summoning clause only; 「长夜」's panel is derived from her in resources/memosprites/1413.json, and everything else her talent says (the CRIT DMG on HP loss, 【忆质】) is not authored yet. No `target`: a memosprite belongs to its summoner, so there is nothing to point at -- SUMMON refuses one rather than ignoring it. Firing this twice keeps the memosprite already out (the op is idempotent per summoner), which is what 「若已在场…」 implies; the refresh variant is not modelled. A character with a SUMMON rule but no memosprite spec is refused when the character is built (CharacterFactory), not mid-battle."
   },
   {
+    "on": "SUMMONED",
+    "when": [
+      "actor == summon"
+    ],
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 1.0,
+        "target": "summon"
+      }
+    ],
+    "source": "1413 长夜月 忆灵技能3 与夜，形影，不离: 「被召唤时，使自身立即行动。」",
+    "note": "The memosprite's own skill, expressed as a rule on its summoner -- which is where the engine's tables live. ⚠ `actor == summon` is required: SUMMONED is delivered to every character's table, so without it a teammate's memosprite entering would also advance HERS. ⚠ `percent: 1.0` skips all of the target's REMAINING time to act, so the memosprite acts immediately -- that is what 立即行动 means, and 0.5 would be 行动提前 50%. ⚠ The event is fired AFTER the unit is in the action bar (Battle.fireSummoned, drained by processRequests): an ADVANCE against a unit that has no signal yet is silently lost, and this rule is exactly the kind that would expose it."
+  },
+  {
     "on": "ULT_CAST",
     "when": [
       "actor == self"

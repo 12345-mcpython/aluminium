@@ -153,6 +153,13 @@ public class Battle {
     public ArrayList<CanHit> addRequestItems = new ArrayList<>();
 
     /**
+     * Summons placed since the last settle, so {@link TriggerEvent#SUMMONED} can be fired once they are in the
+     * action bar (see {@link #fireSummoned}). Separate from {@link #addRequestItems} on purpose: that queue is
+     * shared with wave entries, and a wave arriving is not a summon.
+     */
+    private final List<CanHit> justSummoned = new ArrayList<>();
+
+    /**
      * Skill points (战技点) policy (P8-4): **one pool shared by the whole team**, not one track per character.
      *
      * <p>{@code Battle} itself **does not know the skill point rules** -- it only holds a
@@ -813,8 +820,30 @@ public class Battle {
     public void processRequests() {
         processSkillRequests();
         processAddRequests();
+        // The newly placed summons are on the roster AND in the action bar by now, which is what a rule
+        // answering 「被召唤时」 needs before it can touch their action value -- see TriggerEvent.SUMMONED.
+        fireSummoned();
         processAdvanceRequests();
         removeDeadCombatants();
+    }
+
+    /**
+     * Fires {@link TriggerEvent#SUMMONED} for everything summoned since the last settle, once each.
+     *
+     * <p>The list is drained <b>before</b> the events are fired: a rule that answers 「被召唤时」 by summoning
+     * something else must not make this loop chase its own tail (that recursion is bounded by
+     * {@code MAX_TRIGGER_DEPTH}, but there is no reason to build it), and the new arrival is picked up by the
+     * next settle like any other.
+     */
+    private void fireSummoned() {
+        if (justSummoned.isEmpty()) {
+            return;
+        }
+        List<CanHit> arrived = List.copyOf(justSummoned);
+        justSummoned.clear();
+        for (CanHit summon : arrived) {
+            fireTriggers(TriggerEvent.SUMMONED, summon, null, 0, 0);
+        }
     }
 
     private void processSkillRequests() {
@@ -2078,6 +2107,7 @@ public class Battle {
         summon.setMaster(master);
         camp.add(summon);
         addRequestItems.add(summon);                 // processRequests pushes it into the action bar
+        justSummoned.add(summon);                    // ...and then fires SUMMONED, with it already scheduled
         // The constructor wires the speed listener for the opening roster only; a unit admitted later
         // needs it too, otherwise a speed buff on it would never reorder the action bar.
         summon.setSpeedChangeListener(this::onSpeedChanged);
@@ -2122,6 +2152,7 @@ public class Battle {
         memosprite.setMaster(master);
         allies.add(memosprite);
         addRequestItems.add(memosprite);
+        justSummoned.add(memosprite);                // see the note in summon(...): SUMMONED fires after scheduling
         memosprite.setSpeedChangeListener(this::onSpeedChanged);
         return memosprite;
     }
