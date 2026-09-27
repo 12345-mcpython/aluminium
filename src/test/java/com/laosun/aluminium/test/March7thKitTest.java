@@ -289,6 +289,8 @@ public class March7thKitTest {
                         + "talent's per-turn cap and 行迹「冰咒」 raising the ultimate's base chance");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
                 "and nothing of hers reacts to kills");
+        Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TURN_START),
+                "星魂 6's heal, which fires once per shielded ally's own turn start");
     }
 
     // ==================================================================

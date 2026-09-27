@@ -353,16 +353,49 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private AbstractBuff shieldInstaller;
 
     /**
+     * Who provided the shield currently up, and <b>which rule</b> created it, or {@code null} / {@code ""}.
+     *
+     * <p><b>Why the shield has to remember this.</b> Two sentences ask about the shield's origin, not its existence:
+     * 「在**战技提供的**护盾保护下的我方目标…」 (1001 三月七 星魂 6) and 「我方目标持有**装备者提供的**护盾时…」 (遗器 128's
+     * 4-piece). Neither can be answered from the number — 三月七's Skill shield and her 星魂 2 shield are both hers — so
+     * the pair is recorded when the shield is installed and read by the {@code has_shield from_rule …} condition.
+     *
+     * <p>⚠ A raw {@link #setShield(double)} says "somebody set the number directly", so it clears both: a shield with
+     * no stated origin must not answer "yes" to a question about one.
+     */
+    private CanHit shieldProvider;
+    private String shieldRuleId = "";
+
+    /**
      * A raw shield write, which <b>clears the ownership</b>: "somebody set the number directly" is not a timed
      * shield, so no buff may take it off again.
      */
     public void setShield(double value) {
         this.shield = value;
         this.shieldInstaller = null;
+        this.shieldProvider = null;
+        this.shieldRuleId = "";
+    }
+
+    /**
+     * Records a shield together with where it came from (the raw-grant path, whose shield no buff owns).
+     *
+     * @param value    the shield amount
+     * @param provider who granted it ({@code null} = unknown)
+     * @param ruleId   the id of the rule that granted it ({@code ""} = unnamed)
+     */
+    public void setShield(double value, CanHit provider, String ruleId) {
+        this.shield = value;
+        this.shieldInstaller = null;
+        this.shieldProvider = provider;
+        this.shieldRuleId = ruleId == null ? "" : ruleId;
     }
 
     /**
      * Installs a shield and records the buff that must take it off again.
+     *
+     * <p>It also records the buff's own origin ({@code getSource()} / {@code getRuleId()}), so a timed shield answers
+     * the same question a raw grant does.
      *
      * @param value     the shield amount
      * @param installer the timed shield that installed it
@@ -370,6 +403,22 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     public void installShield(double value, AbstractBuff installer) {
         this.shield = value;
         this.shieldInstaller = installer;
+        this.shieldProvider = installer == null ? null : installer.getSource();
+        this.shieldRuleId = installer == null || installer.getRuleId() == null ? "" : installer.getRuleId();
+    }
+
+    /**
+     * Who provided the shield currently up, or {@code null} (a raw number, no shield, or an anonymous giver).
+     */
+    public CanHit getShieldProvider() {
+        return shieldProvider;
+    }
+
+    /**
+     * The {@code id} of the rule that created the shield currently up ({@code ""} when it names none).
+     */
+    public String getShieldRuleId() {
+        return shieldRuleId;
     }
 
     /**
@@ -388,6 +437,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         }
         this.shield = 0;
         this.shieldInstaller = null;
+        this.shieldProvider = null;
+        this.shieldRuleId = "";
         return true;
     }
 
