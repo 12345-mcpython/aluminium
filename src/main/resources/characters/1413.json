@@ -39,6 +39,23 @@
     "note": "The memosprite's own skill, expressed as a rule on its summoner -- which is where the engine's tables live. ⚠ `actor == summon` is required: SUMMONED is delivered to every character's table, so without it a teammate's memosprite entering would also advance HERS. ⚠ `percent: 1.0` skips all of the target's REMAINING time to act, so the memosprite acts immediately -- that is what 立即行动 means, and 0.5 would be 行动提前 50%. ⚠ The event is fired AFTER the unit is in the action bar (Battle.fireSummoned, drained by processRequests): an ADVANCE against a unit that has no signal yet is silently lost, and this rule is exactly the kind that would expose it."
   },
   {
+    "on": "SUMMONED",
+    "when": [
+      "actor == summon"
+    ],
+    "do": [
+      {
+        "op": "RESIST_DEBUFF",
+        "kind": "control",
+        "percent": 1.0,
+        "permanent": true,
+        "target": "summon"
+      }
+    ],
+    "source": "1413 长夜月 忆灵技能2 孤独，浮游，漆黑 (效果ID 10000011): 「「长夜」免疫控制类负面状态，被攻击的概率提高。」",
+    "note": "「免疫控制类负面状态」 and 克拉拉's 「抵抗控制类负面状态的概率提高35%」 are ONE mechanic at different strengths: percent 1.0 leaves nothing of the chance, so this is the same op and the same buff class as the 35% trace -- there is no second 'immunity' vocabulary to keep in sync. ⚠ The immunity is 长夜's own, so the effect targets the MEMOSPRITE ('target': 'summon'), not her summoner: a control aimed at 「长夜」 asks its own BuffManager, and 长夜月 standing next to it is unaffected by this rule. ⚠ Granted on SUMMONED rather than at BATTLE_START even though both would work: the summon's existence at BATTLE_START depends on the table order of two rules in one event, and 「在场时」 is exactly the lifetime this event already marks. ⚠ 'actor == summon' is required -- SUMMONED reaches every character's table, so without it a teammate's memosprite entering would make HERS immune. ⚠ 'permanent': true, because 「免疫…」 here states no duration and the memosprite is immune for as long as it is on the field (leaving the field removes it with the unit). ⚠ The 「被攻击的概率提高」 half of the same sentence is already carried by the memosprite spec's `aggro` (125, from the ServantID block), and 「「长夜」在场时…伤害提高50%」 is registered rather than approximated."
+  },
+  {
     "on": "ULT_CAST",
     "when": [
       "actor == self"

@@ -1413,7 +1413,13 @@ public class Battle {
         if (caster == null || target == null || buff == null || target.isDeath()) {
             return false;
         }
-        if (!rollDebuff(caster, target, baseChance, specificResistKey)) {
+        // Class resistance (「抵抗控制类负面状态的概率提高35%」 / 「免疫控制类负面状态」): the family the state belongs to
+        // is a property of the state itself (`AbstractBuff.debuffClass`), so a control written tomorrow is covered by
+        // a resistance written today. ⚠ Multiplied rather than folded into `specific`: 「概率提高35%」 means 35% of the
+        // chances that would have landed do not, and 1.0 is immunity either way.
+        double classResist = target.getBuffManager().debuffResistOf(buff.debuffClass());
+        double chance = hitChance(caster, target, baseChance, specificResistKey) * (1 - classResist);
+        if (!(rng.nextDouble() < Math.clamp(chance, 0, 1))) {
             return false;
         }
         target.getBuffManager().addBuff(buff);

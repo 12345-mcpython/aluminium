@@ -105,6 +105,12 @@ public class TauntOpTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        // ⚠ TAUNT goes through the resist pipeline now (an unstated probability is a 100% BASE chance, not "bypasses
+        // 效果抵抗"), so the fixture states the other side of that roll: 冰锋's own 30% 效果抵抗 would otherwise make
+        // every case here a coin flip. The pipeline itself is pinned by DebuffResistTest.
+        enemy.setAttribute(com.laosun.aluminium.enums.AttributeType.EFFECT_RESISTANCE,
+                new com.laosun.aluminium.models.DoubleValue(0));
+        return enemy;
     }
 }
