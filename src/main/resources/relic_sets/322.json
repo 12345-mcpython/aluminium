@@ -1,0 +1,37 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:ATTACK >= 2400",
+        "self_attr:ATTACK < 3600"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.12,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 322 (逐火者的航迹 / Revelry by the Sea), 2-piece: 「使装备者的攻击力提高#1[i]%。当装备者的攻击力大于等于#2[i]/#3[i]时，使装备者造成的持续伤害额外提高#4[i]%/#5[i]%。」 param = [0.12, 2400, 3600, 0.12, 0.24]",
+      "note": "The lower tier: DoT damage +12% while ATK is between 2400 and 3600. ⚠ 「使装备者的攻击力提高 12%」 is the ability's `properties` (AttackAddedRatio) and is applied when the suit is built -- it is NOT written here. ⚠ `self_attr:ATTACK` is a base attribute, so the thresholds are absolute numbers (2400/3600), not fractions. ⚠ The upper bound is what keeps the tiers exclusive: without `< 3600` a 4000-ATK wearer would match both rules, and since the two effects are the same kind on the same attribute the engine would REPLACE one with the other, so which value survived would depend on rule order."
+    },
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:ATTACK >= 3600"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 322 (逐火者的航迹 / Revelry by the Sea), 2-piece: 「当装备者的攻击力大于等于#2[i]/#3[i]时，使装备者造成的持续伤害额外提高#4[i]%/#5[i]%。」 param = [0.12, 2400, 3600, 0.12, 0.24] → the top tier grants 0.24",
+      "note": "The upper tier: DoT damage +24%. ⚠ `DOT_DAMAGE_BOOST` is a new attribute (2026-09-27) and is collected by the damage TYPE in `Battle`'s boost assembly, next to `FOLLOW_UP_DAMAGE_BOOST` -- the sentence names a damage category, and the engine already had exactly this shape for the follow-up family."
+    }
+  ]
+}

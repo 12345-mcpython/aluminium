@@ -144,13 +144,6 @@
       "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" The stacking counter and the memosprite half are both expressible now (`target: \"summon\"` + `self_summon_count >= 1`), but there is still no condition on the battlefield's PARTY SIZE, so the number of stacks cannot be derived from anything. (That is a different question from `self_summon_count`: it counts our whole side, not the owner's summons.)"
     }
   ],
-  "322": [
-    {
-      "require": 2,
-      "ability": "Ability53221",
-      "reason": "\"Increases the wearer's ATK by 12% (that half is the `properties` stat, AttackAddedRatio 0.12). When the wearer's ATK is equal to or higher than 2400/3600, increases the DoT dealt by the wearer by an extra 12%/24%.\" param = [0.12, 2400, 3600, 0.12, 0.24] -> #2 = 2400, #3 = 3600, #4 = 0.12, #5 = 0.24. ⚠ **Re-checked on 2026-09-27, and the two thresholds are NOT a gap**: `self_attr:ATTACK` is a base attribute so the literals are absolute, and the tiers are made exclusive by an upper bound (engine.md 4.6: the lower tier carries `< 3600`). So the timing and the conditions are ready. **What is still missing is one attribute and one branch, and the plan is now verified rather than guessed**: ① `AttributeType` needs a `dot_damage_boost` member, next to the family that already exists for other scopes (`follow_up_damage_boost`, `basic_attack_damage_boost`, `skill_damage_boost`, `ultimate_damage_boost`); ② `Battle`'s boost assembly needs the matching branch -- it already has exactly this shape for the follow-up family (`if (damage.getType() == DamageType.ADDITIONAL) damage.addBoost(...FOLLOW_UP_DAMAGE_BOOST)`), and DoT instances are NOT among the types `BoostArea.applies()` skips (only break / super break / true damage are), so a DoT boost reaches them. ⚠ Both halves have to land together: the attribute alone would be a stat nothing reads, and the branch alone would have no name to read."
-    }
-  ],
   "323": [
     {
       "require": 2,
