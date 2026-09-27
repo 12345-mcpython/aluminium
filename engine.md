@@ -491,17 +491,36 @@ JSON 写法不变。
 | `ADVANCE` | `percent`（0.0–1.0，跳过目标**剩余**行动时间的比例；负值不支持） | ✅ |
 | `GAIN_RESOURCE` / `SPEND_RESOURCE` | `resource` / `amount` | ✅（P8-8） |
 | `DAMAGE` | `skill` / `damage_param`，可选 `target`、`per_target`、`as_attack` | ✅（P8-3，见 §4.7） |
-| `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 二选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
-| `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
+| `MODIFY_ATTR` | `attribute` / `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target`、`max_stacks`（别名 `stacks`） | ✅（P10-3） |
+| `MODIFY_DAMAGE_TAKEN` | `percent` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target` | ✅ 正数 = 易伤、负数 = 减伤（两个**乘区**都不是属性，所以 `MODIFY_ATTR` 够不着） |
 | `BOOST_DAMAGE` | `percent`（只能挂在 `DEALING_DAMAGE` 上） | ✅ 改**正在结算的那一次**伤害：不改属性、不挂 buff、不会漏到下一次。是「对处于 X 状态的目标造成的伤害提高 Y%」的实现 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
 | `DISPEL` | `amount`，可选 `target` | ✅ 移除最多 `amount` 个**负面效果**（「解除 N 个负面效果」），**最新的先走**；"什么算负面"由每个 buff 类自己回答（`AbstractBuff.isDebuff()`，见 §10.4） |
-| `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 二选一**，可选 `target` | ✅ 具名状态（见下） |
+| `APPLY_BUFF` | `buff` / **`turns` 与 `permanent` 与 `until` 三选一**，可选 `target` | ✅ 具名状态（见下） |
 | `SUMMON` | **无参数**（连 `target` 都不收） | ✅ 把**规则主人自己的忆灵**带上场（§24.5/§24.6）。没有 `target` 是因为忆灵属于召唤者、替它那一方打，没有可指的对象 —— 而多写一个 `target` 会被**拒绝**而不是被忽略。**按召唤者幂等**：再触发一次保留已在场的那一个（「若已在场，则使其生命值回复至上限」的刷新**没有**建模，无操作是诚实替身）。⚠ 用了这个 op 却没有忆灵文件的角色在**装配时**就被拒（`CharacterFactory`），不是战斗中途 |
 | `REDUCE_TOUGHNESS` | `amount` | ☐ 要定元素与敌方目标 |
 
 > ⚠ **未接线的 op 是在加载时"响亮地"拒绝的**，报错里点名它归哪个阶段。
 > 否则内容作者写了规则、看不到任何反应，却分不清"我的条件写错了"和"引擎压根不发这个事件"。
+
+#### 三种时长：`turns` / `permanent` / `until`（三选一）
+
+| 写法 | 含义 | 谁在用 |
+|---|---|---|
+| `turns: N` | N 个**自己的回合**（早/晚 tick 由 buff 自己决定） | 绝大多数 buff |
+| `permanent: true` | 到战斗结束（**从不 tick**） | 风雪交加 4 件套、命运 109… |
+| `until: "next_attack"` / `"next_skill"` / `"next_ultimate"` | 到**主人做出那件事**（自己攻击 / 施放战技 / 施放终结技） | **星体差分机 305**「持续到施放首次攻击后结束」 |
+
+- **为什么必须有第三种**：「持续到施放首次攻击后结束」不是回合数。写成 `turns: 1` 会在**错的回合边界**到期
+  （而且"这一回合没打人"也照样掉），写成 `permanent: true` 则**整场都在** —— 两个都是"没人报错的错误数字"。
+- **`until` 修饰的 buff 同样"从不 tick"**：`permanent` 这个标志**机制上就是"不 tick"**
+  （`AbstractBuff.isPermanent()`），事件绑定的 buff 正需要它活下去 —— 否则它会在第一次 `afterMove` 掉掉。
+  `TriggerInterpreter.unticked()` 就是这件事的唯一判据，顺带挡住了另一个坑：`until` 会让 `turns` 为 null，
+  直接拆箱会在**战斗中途**抛 NPE。
+- **判定的是"主人"**：引擎把"发生了一次攻击"广播给我方**全员**（知更鸟/缇宝那类第三方机制就靠它），
+  所以没有主人判定的话，**谁先出手就会吃掉别人的**"下次攻击"buff。
+- ⚠ **追击攻击不消耗它**：追击不走 `SkillExecutor` 的攻击路径，而 buff 侧的"发生了一次攻击"通知来自那里。
+  这是一处**已知的少消耗**（buff 会多留一会儿），登记在 ROADMAP 里而不是假装没有。
 
 #### `target` 选择器（同样是封闭集合）
 

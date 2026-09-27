@@ -1,0 +1,20 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:CRIT_ATTACK >= 1.2"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.6,
+          "until": "next_attack"
+        }
+      ],
+      "source": "relic set 305 (星体差分机 / Celestial Differentiator), 2-piece: \"Increases the wearer's CRIT DMG by #1[i]%. When the wearer's CRIT DMG is equal to or higher than #2[i]%, the wearer's CRIT Rate increases by #3[i]% after entering battle, until after the wearer's first attack.\" param = [0.16, 1.2, 0.6]",
+      "note": "Only the conditional sentence; the unconditional \"CRIT DMG +16%\" is the effect's `properties` stat (CriticalDamageBase 0.16). ⚠ \"until\": \"next_attack\" is the point of this file: it is a LIFETIME, not a turn count -- the text says 持续到施放首次攻击后结束, and `turns: 1` would expire on the wrong boundary (and keep the buff through a turn in which nothing was attacked) while `permanent: true` would leave it up for the rest of the battle. ⚠ The threshold is a FRACTION (`1.2` = 120%), like every ratio attribute. ⚠ 「首次攻击」 is handled by the rule firing once (BATTLE_START fires once); the lifetime handles the consumption. ⚠ A follow-up attack does NOT consume it -- follow-ups are settled outside the path that notifies buffs -- which is registered rather than approximated. ⚠ The extra is 0.6 (param #3), read from the parameters rather than from my memory of the sentence: an earlier draft of this file said 0.32, which is set 318's number."
+    }
+  ]
+}

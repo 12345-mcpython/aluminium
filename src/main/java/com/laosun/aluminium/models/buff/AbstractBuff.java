@@ -1,12 +1,18 @@
 package com.laosun.aluminium.models.buff;
 
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.event.AttackEvent;
+import com.laosun.aluminium.models.event.SkillCastEvent;
+import com.laosun.aluminium.models.skill.Skill;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class AbstractBuff implements Buff {
+public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent {
     protected CanHit source;
     protected int remainingDuration;
     protected final int id;
@@ -60,6 +66,95 @@ public abstract class AbstractBuff implements Buff {
         this.isEarlyBuff = isEarlyBuff;
         this.permanent = permanent;
         this.id = ID_GENERATOR.getAndIncrement();
+    }
+
+    /**
+     * What ends this buff, when it is not a number of turns: 「持续到施放首次攻击后结束」 and friends.
+     *
+     * <p><b>Why this is on the base class.</b> A lifetime is a property of "how long does this last", which
+     * every buff already has an opinion about ({@code remainingDuration} / {@code permanent}) — and the three
+     * buff classes a rule can create ({@code StatModifierBuff}, {@code StateBuff}, and the damage-taken pair)
+     * all need the same answer. Putting it here means the behaviour is implemented once and any future buff
+     * can carry one by setting the field, rather than each class growing its own copy of "remove myself when
+     * the owner attacks".
+     *
+     * <p>⚠ The default is {@link Lifetime#NONE}: every existing buff keeps expiring exactly as it did, and a
+     * buff only behaves differently when a rule says {@code "until": …}.
+     */
+    public enum Lifetime {
+        /**
+         * No event-based end: the buff lives by {@code remainingDuration} or {@code permanent}.
+         */
+        NONE,
+        /**
+         * Ends after its owner finishes an attack that landed — a basic attack, a Skill or an Ultimate.
+         */
+        NEXT_ATTACK,
+        /**
+         * Ends after its owner casts a Skill.
+         */
+        NEXT_SKILL,
+        /**
+         * Ends after its owner casts an Ultimate.
+         */
+        NEXT_ULTIMATE
+    }
+
+    /**
+     * The event that ends this buff, or {@link Lifetime#NONE}. Written by whoever creates the buff (the
+     * trigger interpreter, from the rule's {@code "until": …}).
+     */
+    @Setter
+    @Getter
+    protected Lifetime lifetime = Lifetime.NONE;
+
+    /**
+     * Ends this buff when its <b>owner</b> finishes an attack.
+     *
+     * <p>The owner test is what keeps it to the right unit: the engine broadcasts "an attack happened" to
+     * every member of our side ({@code AttackEvent} is how Robin's and Tribbie's third-party kits hear about
+     * it), so without it a teammate's attack would consume somebody else's "for the next attack" buff.
+     */
+    @Override
+    public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
+                            List<? extends CanHit> hitTargets, double totalDamage) {
+        if (lifetime == Lifetime.NEXT_ATTACK && attacker != null && attacker == owner) {
+            endNow();
+        }
+    }
+
+    /**
+     * Ends this buff when its <b>owner</b> casts the kind of skill its lifetime names.
+     *
+     * <p>Which cast this is comes from the parsed skill data ({@code SkillCategory}), the same source the
+     * trigger emitters use — never from a skill's name or slot.
+     */
+    @Override
+    public void onSkillCast(Battle battle, CanHit user, Skill skill,
+                            List<? extends CanHit> hitTargets, List<? extends CanHit> targets) {
+        if (user == null || user != owner) {
+            return;
+        }
+        SkillCategory category = skill == null || skill.getData() == null
+                ? null
+                : skill.getData().getCategory();
+        if ((lifetime == Lifetime.NEXT_SKILL && category == SkillCategory.BPSKILL)
+                || (lifetime == Lifetime.NEXT_ULTIMATE && category == SkillCategory.ULTRA)) {
+            endNow();
+        }
+    }
+
+    /**
+     * Takes this buff off its owner through the owner's manager, so the modifier is dropped by id exactly the
+     * way an expiry does it.
+     *
+     * <p>Safe to call while the manager is iterating its buffs: every traversal goes through
+     * {@code List.copyOf} (M-12), which is what makes "a buff that removes itself on an event" possible at all.
+     */
+    private void endNow() {
+        if (owner != null) {
+            owner.getBuffManager().removeBuff(this);
+        }
     }
 
     @Override
