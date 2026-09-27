@@ -71,11 +71,26 @@ public final class SkillExecutor {
      */
     public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets) {
         Set<CanHit> hitTargets = new LinkedHashSet<>();   // targets actually hit (including those that died on the spot)
-        resolveHits(battle, skill, user, targets, hitTargets);
+        // P11-1 (M-40): the **pre-cast hook**, and the only moment at which a rule can still change what this cast
+        // does. It fires before the damage is expanded because "this cast's damage is not mine to deal" is a fact
+        // about the CAST: a rule that learns it afterwards (on ULT_CAST, say) can no longer stop the swing.
+        Battle.PendingCast cast = battle.beginCast(skill, user);
+        try {
+            battle.fireTriggers(TriggerEvent.CAST_SETUP, user, null, 0, 0);
+            if (!cast.damageDelegated()) {
+                resolveHits(battle, skill, user, targets, hitTargets);
+            }
+        } finally {
+            battle.endCast(cast);
+        }
         // P8-6: the skill **cast** event — placed between "damage has been expanded" and "energy has
         // been settled", so a listener gets both "what was cast" and "who was actually hit".
         // **Non-damaging skills fire it too** (hitTargets empty), which is exactly the trigger source
         // for effects like "restore skill points after casting a skill".
+        //
+        // ⚠ A delegated cast fires it with an EMPTY hit set, and that is the point: the swing happens later, as
+        // whatever the rules deliver it with (for 长夜月's ultimate, `COMMAND_SUMMON` on this very event). So a
+        // delegated cast is "no damage of mine", never "no cast happened".
         broadcastSkillCast(battle, user, skill, hitTargets, targets);
         battle.grantSkillEnergy(user, skill, hitTargets);
     }
@@ -384,7 +399,7 @@ public final class SkillExecutor {
                             data.getStanceList().single());
 
             case AOE_ATTACK -> {
-                double stance = stanceValue(data, true);
+                double stance = data.stanceFor(true);
                 for (CanHit target : battle.targetableEnemies()) {
                     totalDamage += hit(battle, data, user, element, base, target, hitTargets, stance);
                 }
@@ -393,8 +408,8 @@ public final class SkillExecutor {
             case BLAST -> {
                 List<CanHit> alive = battle.targetableEnemies();
                 int center = alive.indexOf(mainTarget);      // position order = battle.enemies order
-                double centreStance = stanceValue(data, true);
-                double neighbourStance = stanceValue(data, false);
+                double centreStance = data.stanceFor(true);
+                double neighbourStance = data.stanceFor(false);
                 if (center < 0) {
                     totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, centreStance);
                 } else {
@@ -414,7 +429,7 @@ public final class SkillExecutor {
                 int hits = params.size() > 1 ? (int) (double) params.get(1) : 1;   // hit count defaults to 1
                 // H-3: for a bounce, `single` is the **total toughness reduction of the whole skill**,
                 // so it MUST be spread evenly over the hits; otherwise more hits means more reduction
-                double perHitStance = stanceValue(data, true) / Math.max(1, hits);
+                double perHitStance = data.stanceFor(true) / Math.max(1, hits);
                 for (int i = 0; i < hits; i++) {
                     // re-fetch the living targets for each hit: if one is killed mid-way, switch
                     // target instead of wasting hits on a corpse
@@ -519,31 +534,5 @@ public final class SkillExecutor {
         }
         Damage superBreak = BreakDamageCalculator.buildSuperBreak(user, enemy, element, superBreakStance);
         return battle.applyDamage(enemy, superBreak);
-    }
-
-    /**
-     * The toughness-reduction points of **one hit** of this skill on one target (excluding the bounce's
-     * per-hit spreading, which is done in the {@code BOUNCE} branch).
-     */
-    /**
-     * The toughness one hit of this skill removes — the <b>single</b> place that maps an attack shape onto
-     * {@code StanceList}'s three columns.
-     *
-     * <p>⚠ It used to be three places: AOE and BLAST read {@code getStanceList()} themselves while only BOUNCE
-     * went through here, which left this method's {@code AOE_ATTACK} arm <b>unreachable</b> — a mutant that zeroed
-     * this arm survived the whole suite (2026-09-27), which is what a dead branch looks like. One authority means
-     * "which column applies to this shape" is answered once, and a new shape cannot quietly pick a different one.
-     *
-     * <p>{@code mainTarget} is what separates BLAST's centre ({@code single}) from its neighbours ({@code spread}).
-     */
-    private static double stanceValue(SkillData data, boolean mainTarget) {
-        // note: StanceList lives in beans.Skill (same simple name as models.Skill but a different
-        // package), so the fully-qualified name is used here
-        com.laosun.aluminium.beans.Skill.StanceList stance = data.getStanceList();
-        return switch (data.getEffect()) {
-            case AOE_ATTACK -> stance.all();
-            case BLAST -> mainTarget ? stance.single() : stance.spread();
-            default -> stance.single();
-        };
     }
 }
