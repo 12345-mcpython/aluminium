@@ -47,7 +47,22 @@
       ],
       "min_eidolon": 4,
       "source": "1003 姬子 星魂 4 坚守的心 (Avatar_Himeko_Rank04) 第二句: 「施放<u>战技</u>对敌方目标造成弱点击破时，姬子额外获得1点充能。」",
-      "note": "「**施放战技**对敌方目标造成弱点击破时」 — two conditions, and both are load-bearing: `actor == self` says the break was hers (the talent rule above pays for anybody's break, which is what ITS sentence says), and `from_skill SKILL` says the instance that broke the toughness came from her **战技** — not from her 普攻, not from her 天赋's follow-up attack. ⚠ Without the second one, `actor == self` would also pay when her follow-up (a rule-driven `DAMAGE` with `skill: \"TALENT\"`, which carries `SkillCategory.UNSPECIFIED`) leaves the break — a wrong +1 充能 with nothing to report. The attribution comes from the instance itself (`Damage.getCastCategory()`, read by the `from_skill` condition against `SkillCategory.of(SkillType.SKILL)` = `BPSKILL`), which `Battle.reduceToughness` now carries into the BREAK event. ⚠ `min_eidolon: 4` is the gate; ⚠ the cap 「上限3点」 is the resource declaration's, so this rule can push her to the cap and no further. ⚠ NOT authored from this 星魂: the first sentence 「施放战技对敌方目标造成弱点击破时,姬子额外获得1点充能」 is THIS rule (the 星魂 has two sentences and the other one is registered with the ultimate's, see the talent rule's note) — the remaining registered clauses are the ultimate's 「每消灭1个敌方目标额外恢复姬子5点能量」 (the attribution now exists; what is unresolved is whether the engine's own 5-energy kill credit IS the text's 「额外」 5 — a data question, ±5 energy if guessed wrong)."
+      "note": "「**施放战技**对敌方目标造成弱点击破时」 — two conditions, and both are load-bearing: `actor == self` says the break was hers (the talent rule above pays for anybody's break, which is what ITS sentence says), and `from_skill SKILL` says the instance that broke the toughness came from her **战技** — not from her 普攻, not from her 天赋's follow-up attack. ⚠ Without the second one, `actor == self` would also pay when her follow-up (a rule-driven `DAMAGE` with `skill: \"TALENT\"`, which carries `SkillCategory.UNSPECIFIED`) leaves the break — a wrong +1 充能 with nothing to report. The attribution comes from the instance itself (`Damage.getCastCategory()`, read by the `from_skill` condition against `SkillCategory.of(SkillType.SKILL)` = `BPSKILL`), which `Battle.reduceToughness` now carries into the BREAK event. ⚠ `min_eidolon: 4` is the gate; ⚠ the cap 「上限3点」 is the resource declaration's, so this rule can push her to the cap and no further. ⚠ This 星魂's other sentence is the ultimate's per-kill energy rule below."
+    },
+    {
+      "on": "KILL",
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 5
+        }
+      ],
+      "source": "1003 姬子 终结技 留待残烬 (100303, AoEAttack/Ultra) 第二句: 「每消灭1个敌方目标额外恢复姬子5点能量。」 param Lv10 = [1.38, 5] → #2 = 5",
+      "note": "「每消灭1个敌方目标**额外**恢复姬子5点能量」 — 「额外」 is why this is a rule at all, and the reading is not a guess: ① the skill's own `param_list` Lv10 is `[1.38, 5]`, i.e. the document states this 5; ② the engine's **general** kill credit (`Constant.ENERGY_GAIN_KILL`, `StandardEnergyProvider.onKill`) is folded into the attack's own energy (`Battle.grantHitAndKillEnergy`: one attack grants energy once), so it is not this sentence's 5; ③ the text says 「**额外**恢复」. Measured 2026-09-28 (`HimekoKillEnergyTest`): a 1-HP enemy killed by her ultimate pays **10** against **5** for the same cast that does not kill — the difference is exactly this rule — and a kill caused by an ally pays her **0**. ⚠ `from_skill ULTRA` keeps it to kills **her ultimate** caused: `actor == self` alone would also pay for a kill from her 普攻/战技/天赋 follow-up, and the sentence names the ultimate. ⚠ No `target`: 「为姬子恢复」 is GAIN_ENERGY's default. ⚠ No `min_eidolon`: this is the ultimate's own sentence (base kit), unlike 星魂 4 above. ⚠ `KILL` carries the killer as `actor`, the victim as the subject, and the causing instance's cast category."
     },
     {
       "on": "ALLY_ATTACK",
