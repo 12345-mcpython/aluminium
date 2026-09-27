@@ -1,5 +1,20 @@
 [
   {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 1.0,
+        "target": "other_allies"
+      }
+    ],
+    "source": "1309 知更鸟 终结技 (skill 130903, Ultra/Support) 第一句: 「知更鸟进入【协奏】状态，使除自身以外的队友立即行动。」 param Lv10 = [0.228, 90, 200, 1.2, 1, 1.5]",
+    "note": "Only the first sentence. ⚠ `other_allies` is the whole reason that word exists: 「除自身以外」 is not `all_allies` (302 不老者的仙舟's 「我方全体」 does include the wearer, and that is pinned), and no condition can say it -- conditions filter rules, not the units an effect reaches. ⚠ `actor == self` is load-bearing: ULT_CAST reaches every character's table. ⚠ `percent: 1.0` = 立即行动 (all of the remaining wait). ⚠ NOT authored from the same ultimate: 【协奏】 itself -- a party ATK boost of #1% of her ATK plus #3 (Lv10: 22.8% + 200), an additional-damage rider per ally attack (#4 with fixed crit #5/#6), crowd-control immunity, no turn of her own while it lasts, and a countdown on the action sequence (#2 = its speed) that ends the state and makes her act. That is a state machine with its own timeline, registered rather than approximated."
+  },
+  {
     "on": "ALLY_ATTACK",
     "when": [
       "actor != self",

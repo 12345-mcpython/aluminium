@@ -128,12 +128,21 @@ public final class TriggerInterpreter {
      * variables being a closed set.
      */
     private static final Set<String> TARGET_SELECTORS =
-            Set.of("self", "target", "attacker", "all_allies", "party", "summon");
+            Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon");
 
     /**
      * The two spellings of "every one of our characters".
      */
     private static final Set<String> TARGET_ALL_ALLIES = Set.of("all_allies", "party");
+
+    /**
+     * "Our side except the rule's owner" — 「除自身以外」.
+     *
+     * <p>Its first user is 知更鸟's ultimate: 「使<b>除自身以外的队友</b>立即行动」. {@code all_allies} cannot say it
+     * (302 不老者的仙舟's 「我方全体攻击力提高」 includes the wearer, and that is pinned), and a condition cannot
+     * say it either — conditions filter <b>rules</b>, not the units an effect reaches.
+     */
+    private static final String TARGET_OTHER_ALLIES = "other_allies";
 
     private TriggerInterpreter() {
     }
@@ -313,8 +322,14 @@ public final class TriggerInterpreter {
                 }
             }
             case "EXTRA_TURN" -> battle.grantExtraTurn(resolveTarget(effect, ctx));
-            case "ADVANCE" -> battle.queue.advanceActionByPercent(
-                    resolveTarget(effect, ctx), effect.getPercent());
+            case "ADVANCE" -> {
+                // One target or a group: 「使该目标立即行动」 and 「使除自身以外的队友立即行动」 are the same op, and
+                // the list resolver is what tells them apart (it is the one HEAL/SHIELD already use for "our
+                // side"). Advancing several units is what the group selectors were resolved for.
+                for (CanHit target : resolveTargets(battle, effect, ctx)) {
+                    battle.queue.advanceActionByPercent(target, effect.getPercent());
+                }
+            }
             case "GAIN_RESOURCE" -> gainResource(effect, ctx);
             case "SPEND_RESOURCE" -> spendResource(effect, ctx);
             case "DAMAGE" -> damage(battle, effect, ctx);
@@ -437,13 +452,22 @@ public final class TriggerInterpreter {
      */
     private static List<CanHit> resolveTargets(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
-        if (TARGET_ALL_ALLIES.contains(selector)) {
+        if (TARGET_ALL_ALLIES.contains(selector) || TARGET_OTHER_ALLIES.equals(selector)) {
             if (battle == null) {
                 throw new IllegalStateException(
                         "Effect targets \"" + selector
                                 + "\" but no battle was supplied to take the party from");
             }
-            return List.copyOf(battle.allies);
+            List<CanHit> party = new ArrayList<>();
+            for (CanHit ally : battle.allies) {
+                // `other_allies` is the same camp minus the rule's owner (「除自身以外」); the order is the
+                // roster's either way, so a group effect reaches units in a stable order.
+                if (TARGET_OTHER_ALLIES.equals(selector) && ally == ctx.owner()) {
+                    continue;
+                }
+                party.add(ally);
+            }
+            return List.copyOf(party);
         }
         return List.of(resolveTarget(effect, ctx));
     }
