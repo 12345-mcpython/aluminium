@@ -123,6 +123,31 @@ public class EffectSpec {
     private String resource;
 
     /**
+     * For {@code MODIFY_ATTR} / {@code APPLY_BUFF} / {@code MODIFY_DAMAGE_TAKEN}: the buff ends when its
+     * <b>owner does something</b>, instead of after a number of turns (「持续到施放首次攻击后结束」).
+     *
+     * <p><b>Why a lifetime and not a turn count.</b> The texts that need this say things like "for the
+     * next attack" / "the next Skill" / "until after the wearer's first attack" — none of which is a
+     * number of turns. Writing them as {@code turns: 1} would expire the buff on the wrong turn boundary
+     * (and keep it through a turn in which nothing was attacked), and writing them as
+     * {@code permanent: true} would leave it up for the rest of the battle: a wrong number with nothing
+     * to see. So the lifetime names the <b>event</b> that ends it, and the set is closed:
+     * <ul>
+     *   <li>{@code "next_attack"} — after the owner finishes an attack that landed (basic attack, Skill or
+     *       Ultimate; relic set 305's 「持续到施放首次攻击后结束」 and set 107's 「for the next attack」);</li>
+     *   <li>{@code "next_skill"} — after the owner casts a Skill (set 122's 「the next Skill」);</li>
+     *   <li>{@code "next_ultimate"} — after the owner casts an Ultimate.</li>
+     * </ul>
+     *
+     * <p>⚠ Exactly one of {@code turns} / {@code permanent} / {@code until} may be stated; the interpreter
+     * refuses two rather than picking one. ⚠ A <b>follow-up attack does not consume</b> it: follow-ups are
+     * settled outside {@code SkillExecutor}'s attack path, which is where the buff-side "an attack
+     * happened" notification comes from. That is registered rather than approximated.
+     */
+    @SerializedName("until")
+    private String until;
+
+    /**
      * Buff kind for {@code APPLY_BUFF}.
      */
     @SerializedName("buff")

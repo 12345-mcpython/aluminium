@@ -9,6 +9,7 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
+import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
@@ -39,14 +40,18 @@ import java.util.Set;
  *   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>✅ wired</td></tr>
  *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>✅ wired (0.0–1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
  *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, <b>exactly one of</b>
- *       {@code turns} / {@code permanent}, optional {@code target}, {@code max_stacks} (alias
+ *       {@code turns} / {@code permanent} / {@code until}, optional {@code target}, {@code max_stacks} (alias
  *       {@code stacks})</td>
  *       <td>✅ wired (P10-3) — a negative {@code percent} becomes a {@code DEBUFF}, so a buff and a
  *           debuff on the same attribute coexist; for a ratio attribute ({@code CRIT_ATTACK} and
  *           friends) {@code percent} is the value itself (0.25 = +25 percentage points), because an
  *           additive percentage would multiply their zero base and change nothing.
  *           <b>{@code permanent: true}</b> means "until the battle ends": the modifier is never
- *           ticked, so its duration is unbounded rather than merely long. <b>{@code max_stacks}</b>
+ *           ticked, so its duration is unbounded rather than merely long. <b>{@code until}</b> is the
+ *           third duration and the one the texts keep asking for — 「持续到施放首次攻击后结束」 is not a
+ *           number of turns; it ends the buff when its <b>owner</b> attacks / casts a Skill / casts an
+ *           Ultimate ({@code AbstractBuff.Lifetime}), and such a buff is likewise never ticked.
+ *           <b>{@code max_stacks}</b>
  *           (&gt; 1) makes re-applications <b>accumulate</b> up to that cap instead of replacing the
  *           previous one; each stack is an ordinary buff instance with its own id, so it can be
  *           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
@@ -58,7 +63,7 @@ import java.util.Set;
  *       <td>✅ wired — removes up to {@code amount} <b>negative effects</b> (「解除 N 个负面效果」), newest
  *           first. What counts as negative is {@code AbstractBuff.isDebuff()}, decided per buff class</td></tr>
  *   <tr><td>{@code MODIFY_DAMAGE_TAKEN}</td><td>{@code percent}, <b>exactly one of</b> {@code turns} /
- *       {@code permanent}, optional {@code target}</td>
+ *       {@code permanent} / {@code until}, optional {@code target}</td>
  *       <td>✅ wired — the sign decides the zone: {@code percent > 0} is 「受到的伤害提高」 (vulnerability,
  *           a debuff on the defender), {@code percent < 0} is 「受到的伤害降低」 (reduction, a buff on the
  *           defender). Neither is an attribute, which is why {@code MODIFY_ATTR} cannot express them</td></tr>
@@ -66,8 +71,8 @@ import java.util.Set;
  *       <td>✅ wired — takes up to {@code amount} stacks of that attribute's modifier off the target
  *           (「每回合移除 1 层」); removing nothing is not an error, because the rule fires every turn
  *           anyway</td></tr>
- *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, <b>exactly one of</b> {@code turns} / {@code permanent},
- *       optional {@code target}</td>
+ *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, <b>exactly one of</b> {@code turns} /
+ *       {@code permanent} / {@code until}, optional {@code target}</td>
  *       <td>✅ wired — puts the target into a <b>named state</b> ({@code StateBuff}, e.g. 【协奏】/【转魄】/
  *           【触电】). What the state <i>does</i> is separate effects conditioned on {@code has_state}, which
  *           keeps "what the state is" apart from "what it changes"; plain stat buffs stay {@code MODIFY_ATTR}</td></tr>
@@ -468,7 +473,8 @@ public final class TriggerInterpreter {
                         + "this rule's owner is " + (ctx.owner() == null ? "nobody" : ctx.owner().getClass().getSimpleName()));
     }
 
-    private static CanHit require(CanHit entity, String what, TriggerContext ctx) {        if (entity == null) {
+    private static CanHit require(CanHit entity, String what, TriggerContext ctx) {
+        if (entity == null) {
             throw new IllegalStateException(
                     "Effect targets \"" + what + "\" but this event has no such party");
         }
@@ -530,12 +536,65 @@ public final class TriggerInterpreter {
     private static void modifyAttr(Battle battle, EffectSpec effect, TriggerContext ctx) {
         AttributeType attribute = AttributeType.fromString(effect.getAttribute());
         double percent = effect.getPercent();
-        boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
+        boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(statModifier(attribute, percent, turns, permanent, maxStacks));
+            target.getBuffManager().addBuff(
+                    withLifetime(statModifier(attribute, percent, turns, permanent, maxStacks), effect));
         }
+    }
+
+    /**
+     * Whether the buff this effect creates must <b>not be ticked</b>: either it has no turn limit at all
+     * ({@code permanent: true}) or its end is an event ({@code until}), which no turn boundary can bring
+     * forward.
+     *
+     * <p><b>Why an event-bound buff counts as "permanent".</b> That flag means "never ticked"
+     * ({@link AbstractBuff#isPermanent()}), which is exactly right here: a buff that ends 持续到施放首次攻击
+     * must survive any number of turn boundaries, and giving it a placeholder turn count instead would make it
+     * expire on the first {@code afterMove} — a wrong answer that looks like a working rule. The flag's name
+     * reads as "for the rest of the battle" in the JSON (where it is what authors write), but mechanically it
+     * is "no turn limit", and an event ends this one.
+     *
+     * <p>⚠ Also the reason this helper exists: {@code until} leaves {@code turns} null, and reading
+     * {@code getTurns()} into an {@code int} would throw at fire time — inside a battle, where the project
+     * puts nothing.
+     */
+    private static boolean unticked(EffectSpec effect) {
+        return Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect);
+    }
+
+    private static boolean eventBound(EffectSpec effect) {
+        return effect.getUntil() != null && !effect.getUntil().isBlank();
+    }
+
+    /**
+     * Attaches the rule's {@code "until": …} to a buff it just created (see {@link EffectSpec#getUntil()}).
+     *
+     * <p>A no-op when the effect states no lifetime, so every buff that does not ask for one behaves exactly
+     * as before — the field's default is {@code Lifetime.NONE}.
+     */
+    private static AbstractBuff withLifetime(AbstractBuff buff, EffectSpec effect) {
+        buff.setLifetime(lifetimeOf(effect));
+        return buff;
+    }
+
+    /**
+     * The lifetime a validated effect names, or {@link AbstractBuff.Lifetime#NONE}.
+     */
+    private static AbstractBuff.Lifetime lifetimeOf(EffectSpec effect) {
+        String until = effect.getUntil();
+        if (until == null || until.isBlank()) {
+            return AbstractBuff.Lifetime.NONE;
+        }
+        return switch (until.trim().toLowerCase(Locale.ROOT)) {
+            case "next_attack" -> AbstractBuff.Lifetime.NEXT_ATTACK;
+            case "next_skill" -> AbstractBuff.Lifetime.NEXT_SKILL;
+            case "next_ultimate" -> AbstractBuff.Lifetime.NEXT_ULTIMATE;
+            default -> throw new IllegalStateException(
+                    "Lifetime '" + until + "' passed validation but has no implementation");
+        };
     }
 
     /**
@@ -559,11 +618,11 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      */
     private static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
+        boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         String state = effect.getBuff().trim();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(new StateBuff(state, turns, permanent));
+            target.getBuffManager().addBuff(withLifetime(new StateBuff(state, turns, permanent), effect));
         }
     }
 
@@ -613,12 +672,12 @@ public final class TriggerInterpreter {
      */
     private static void modifyDamageTaken(Battle battle, EffectSpec effect, TriggerContext ctx) {
         double percent = effect.getPercent();
-        boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
+        boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(percent > 0
+            target.getBuffManager().addBuff(withLifetime(percent > 0
                     ? new VulnerabilityBuff(turns, percent, permanent)
-                    : new ReductionBuff(turns, -percent, permanent));
+                    : new ReductionBuff(turns, -percent, permanent), effect));
         }
     }
 
@@ -866,6 +925,11 @@ public final class TriggerInterpreter {
                     "Op " + op + " has no duration (it acts on a single moment), but states \"turns\": "
                             + effect.getTurns() + " (source: " + spec.getSource() + ")");
         }
+        if (effect.getUntil() != null && !effect.getUntil().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " creates no buff, so it has nothing an \"until\" could end; it states "
+                            + "\"until\": \"" + effect.getUntil() + "\" (source: " + spec.getSource() + ")");
+        }
     }
 
     /**
@@ -974,32 +1038,51 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Validates that a {@code MODIFY_ATTR} effect declares how long the buff lasts — <b>exactly one</b>
-     * of {@code turns} and {@code permanent}.
+     * Validates how long the buff lasts — <b>exactly one</b> of {@code turns}, {@code permanent: true} and
+     * {@code until}.
      *
      * <p>There is deliberately no default: an omitted duration would be either "forever" (wrong: most
      * buffs in this game expire) or a number this class invented. Making the author write it is the
      * same call as {@code damage_param} having no default.
      *
-     * <p>Stating <b>both</b> is rejected for the same reason a typo is: the two answers disagree, and
-     * silently letting one win would produce a rule that does not do what its text says.
+     * <p>Stating <b>two</b> is rejected for the same reason a typo is: the answers disagree, and
+     * silently letting one win would produce a rule that does not do what its text says. That includes
+     * {@code until} + {@code turns} — the one expires on an event, the other on a turn boundary.
      */
     private static void requireDuration(EffectSpec effect, String op, TriggerSpec spec) {
         boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
-        if (permanent) {
-            if (effect.getTurns() != null) {
+        String until = effect.getUntil() == null ? null : effect.getUntil().trim();
+        boolean hasUntil = until != null && !until.isEmpty();
+        if (permanent && effect.getTurns() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has both \"turns\" (" + effect.getTurns()
+                            + ") and \"permanent\": true; they are two different durations and only "
+                            + "one may be stated (source: " + spec.getSource() + ")");
+        }
+        if (hasUntil && (effect.getTurns() != null || permanent)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"until\": \"" + effect.getUntil() + "\" together with "
+                            + (permanent ? "\"permanent\": true" : "\"turns\": " + effect.getTurns())
+                            + "; \"until\" IS the duration (the buff ends when its owner does that), so the "
+                            + "other one has to go (source: " + spec.getSource() + ")");
+        }
+        if (hasUntil) {
+            if (!LIFETIMES.contains(until.toLowerCase(Locale.ROOT))) {
                 throw new IllegalArgumentException(
-                        "Op " + op + " has both \"turns\" (" + effect.getTurns()
-                                + ") and \"permanent\": true; they are two different durations and only "
-                                + "one may be stated (source: " + spec.getSource() + ")");
+                        "Op " + op + " has unknown \"until\": '" + effect.getUntil() + "'; known lifetimes "
+                                + "are " + String.join(", ", LIFETIMES.stream().sorted().toList())
+                                + " (source: " + spec.getSource() + ")");
             }
+            return;
+        }
+        if (permanent) {
             return;
         }
         if (effect.getTurns() == null) {
             throw new IllegalArgumentException(
-                    "Op " + op + " requires \"turns\" (how long the buff lasts) or \"permanent\": "
-                            + "true (until the battle ends); there is no default "
-                            + "(source: " + spec.getSource() + ")");
+                    "Op " + op + " requires \"turns\" (how long the buff lasts), \"permanent\": true (until "
+                            + "the battle ends) or \"until\" (until its owner attacks, e.g. "
+                            + "\"next_attack\"); there is no default (source: " + spec.getSource() + ")");
         }
         if (effect.getTurns() <= 0) {
             throw new IllegalArgumentException(
@@ -1009,6 +1092,13 @@ public final class TriggerInterpreter {
                             + "(source: " + spec.getSource() + ")");
         }
     }
+
+    /**
+     * The lifetimes {@code "until"} accepts. Closed on purpose, like every other vocabulary here: an author
+     * writing {@code "next_atack"} must hear about it while the file is read, not by watching a buff that
+     * quietly never expires.
+     */
+    private static final Set<String> LIFETIMES = Set.of("next_attack", "next_skill", "next_ultimate");
 
     /**
      * Validates the optional stack cap of a {@code MODIFY_ATTR} effect <b>at load time</b>.
