@@ -1,0 +1,74 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 95",
+        "self_attr:SPEED < 110"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.2,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 124 (哀歌覆国的诗人 / Poet of Mourning Collapse), 4-piece: 「使装备者的速度降低#6[i]%。进入战斗前，若装备者的速度小于#2[i]/#3[i]，使装备者的暴击率提高#4[i]%/#5[i]%。该效果同时对装备者的忆灵生效。」 param = [-0.08, 110, 95, 0.2, 0.32, 0.08]",
+      "note": "The lower bonus (「小于 110」) on the WEARER. ⚠ The two thresholds are both UPPER bounds and therefore nested -- 90 speed satisfies 「< 110」 AND 「< 95」 -- so the lower tier excludes the higher one with `>= 95`. ⚠ Honest note, corrected after a mutation that could not catch it: with the default `max_stacks: 1` the higher tier would REPLACE the lower one anyway (whichever rule comes last wins), so the exclusion is not what stops them adding -- it is what makes the answer independent of the ORDER the two rules happen to sit in the file. (Set 311 has the mirror image: there the thresholds are lower bounds, so the bound goes on the other side.) The SPD decrease 8% is the `properties` stat (SpeedAddedRatio -0.08)."
+    },
+    {
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon",
+        "self_attr:SPEED >= 95",
+        "self_attr:SPEED < 110"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "relic set 124 (哀歌覆国的诗人 / Poet of Mourning Collapse), 4-piece: 「该效果同时对装备者的忆灵生效。」 param = [-0.08, 110, 95, 0.2, 0.32, 0.08]",
+      "note": "「该效果同时对装备者的忆灵生效」, applied when the memosprite ARRIVES -- the convention this set (with 319 and 320) established on 2026-09-28. ⚠ Why not one rule that targets both: an effect naming `target: \"summon\"` fails LOUDLY when nothing is out, and at BATTLE_START there may be nothing out (1402's 衣匠 only appears when she casts, 1413's only from her own start-of-battle rule). Folding the two timings into one rule would either throw for half the cast or need the selector to go silent, which is the property that protects 「装备者及其忆灵」 authors from forgetting `self_summon_count >= 1`. ⚠ And 「pre-battle effect, mid-fight arrival」 is not a contradiction: the sentence says the effect applies to 「装备者的忆灵」, not to 「the memosprite present at the start」 -- so the arriving unit is granted it, exactly as the wearer was."
+    },
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED < 95"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.32,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 124 (哀歌覆国的诗人 / Poet of Mourning Collapse), 4-piece: 「若装备者的速度小于#3[i]，使装备者的暴击率提高#5[i]%。」 param = [-0.08, 110, 95, 0.2, 0.32, 0.08]",
+      "note": "The higher bonus (「小于 95」) on the wearer: the widest threshold of the pair, so it stands alone -- no lower bound is needed because there is nothing below it."
+    },
+    {
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon",
+        "self_attr:SPEED < 95"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "relic set 124 (哀歌覆国的诗人 / Poet of Mourning Collapse), 4-piece: 「该效果同时对装备者的忆灵生效。」 param = [-0.08, 110, 95, 0.2, 0.32, 0.08]",
+      "note": "The higher tier's arrival rule, matching the one above."
+    }
+  ]
+}

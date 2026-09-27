@@ -1,0 +1,38 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:HEALTH >= 5000"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.28,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 319 (谧宁拾骨地 / Bone Collection's Serene Demesne), 2-piece: 「使装备者的生命上限提高#1[i]%。当装备者的生命上限大于等于#2[i]点时，使装备者及其忆灵的暴击伤害提高#3[i]%。」 param = [0.12, 5000, 0.28]",
+      "note": "The wearer's half. ⚠ HEALTH is a BASE attribute, so the literal is absolute (`>= 5000`), unlike the ratio attributes where it would be a fraction -- the unit trap engine.md 4.6 records. 「生命上限提高#1[i]%」 is the `properties` stat (HPAddedRatio 0.12). ⚠ `BATTLE_START` + `permanent` is the standing approximation for the 'while' clause (the same one 301/302/304/306/307/309/310/311 use): the threshold is read once, when it is the least likely to have moved."
+    },
+    {
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon",
+        "self_attr:HEALTH >= 5000"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "relic set 319 (谧宁拾骨地 / Bone Collection's Serene Demesne), 2-piece: 「使装备者及其忆灵的暴击伤害提高#3[i]%。」 param = [0.12, 5000, 0.28]",
+      "note": "「及其忆灵」, applied when the memosprite arrives -- the convention 124/319/320 established on 2026-09-28 (see set 124's file for why the two timings cannot be one rule: `target: \"summon\"` fails loudly when nothing is out, and at BATTLE_START there may be nothing out). ⚠ The threshold here is still the WEARER's Max HP: `self_attr` reads the rule's owner, and 「当装备者的生命上限大于等于 5000 点时」 is about her, not about the memosprite."
+    }
+  ]
+}

@@ -76,13 +76,6 @@
       "reason": "\"When using Skill or Ultimate on one ally target, increases the ability target's CRIT DMG by 18%, lasting for 2 turn(s). This effect can stack up to 2 time(s).\" The 2-turn stacks are now expressible, but the cast event still carries no subject (SkillExecutor passes target = null and only a hit count), so neither 'on one ally target' nor 'the ability target' can be identified -- the buff would land on the wearer instead of the ally."
     }
   ],
-  "124": [
-    {
-      "require": 4,
-      "ability": "Ability51241",
-      "reason": "\"Decreases the wearer's SPD by 8%. Before entering combat, if the wearer's SPD is lower than 95/110, increases the wearer's CRIT Rate by 36%/50%. This effect also applies to the wearer's memosprite.\" Every clause has a spelling as of 2026-09-27: the SPD decrease is the `properties` stat (SpeedAddedRatio -0.08); the threshold is `self_attr:SPEED < 95` (and `< 110` with `>= 95` for the lower tier, since an upper bound makes the tiers exclusive); and the memosprite clause is a SECOND rule with `target: \"summon\"` gated on `self_summon_count >= 1` -- which is exactly how 「装备者及其忆灵」 is written. ⚠ NOT writable as it stands, and the reason is structural rather than a missing word: the memosprite half needs `target: \"summon\"`, and at BATTLE_START the memosprite may not exist yet -- that selector fails LOUDLY when nothing is out, so the rule would throw for every character whose kit summons later. Covering both timings takes a second rule per tier on SUMMONED, and whether a pre-battle effect should apply to a memosprite summoned mid-fight at all is a decision, not a spelling. Registered as M-39."
-    }
-  ],
   "125": [
     {
       "require": 4,
@@ -177,20 +170,6 @@
       "require": 2,
       "ability": "Ability53171",
       "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
-    }
-  ],
-  "319": [
-    {
-      "require": 2,
-      "ability": "Ability53191",
-      "reason": "\"Increases the wearer's Max HP by 12%. When the wearer's Max HP is equal to or higher than 5000, increases the CRIT DMG of the wearer and their memosprite by 28%.\" All three clauses have a spelling: the Max HP is the `properties` stat (HPAddedRatio 0.12); the threshold is `self_attr:HEALTH >= 5000` (a base attribute, so the literal is absolute); and 「装备者及其忆灵」 is TWO rules -- one on the wearer, one with `target: \"summon\"`, which cannot be filed at BATTLE_START because the memosprite may not exist yet (M-39)."
-    }
-  ],
-  "320": [
-    {
-      "require": 2,
-      "ability": "Ability53201",
-      "reason": "\"Increases the wearer's SPD by 6%. When the wearer's SPD is equal to or higher than 135/180, increases the healing done by the wearer and their memosprite by 12%/20%.\" The SPD is the `properties` stat (SpeedAddedRatio 0.06); the thresholds are `self_attr:SPEED` with an upper bound for the lower tier; the healing boost attribute exists (OUTGOING_HEALING_BOOST); and the memosprite half is a second rule with `target: \"summon\"`, which cannot be filed at BATTLE_START because the memosprite may not exist yet (M-39)."
     }
   ],
   "321": [
