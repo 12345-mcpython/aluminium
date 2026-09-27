@@ -103,7 +103,18 @@ public enum AttributeType {
      * Damage dealt by <b>ultimates</b> only (「终结技造成的伤害提高 X%」). See
      * {@link #BASIC_ATTACK_DAMAGE_BOOST} for why the scope needs its own attribute.
      */
-    @SerializedName("ultimate_damage_boost") ULTIMATE_DAMAGE_BOOST("ultimate_damage_boost");
+    @SerializedName("ultimate_damage_boost") ULTIMATE_DAMAGE_BOOST("ultimate_damage_boost"),
+    /**
+     * Damage-over-time only (322 逐火者的航迹, 「使装备者造成的**持续伤害**额外提高 X%」).
+     *
+     * <p>⚠ <b>Appended, never inserted</b>: {@link #ordinal()} is part of the persisted attribute order (see the
+     * warning above {@link #BASIC_ATTACK_DAMAGE_BOOST}), so a new scope goes at the end.
+     *
+     * <p>It is picked by the damage <b>type</b> in {@code Battle}'s assembly, exactly like
+     * {@link #FOLLOW_UP_DAMAGE_BOOST} -- a DoT instance is {@code DamageType.DOT}, which the boost zone does
+     * <b>not</b> skip (only break / super break / true damage are skipped), so the attribute reaches the instance.
+     */
+    @SerializedName("dot_damage_boost") DOT_DAMAGE_BOOST("dot_damage_boost");
 
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
 
