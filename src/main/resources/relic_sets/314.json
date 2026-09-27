@@ -1,0 +1,20 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self has_same_path_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 314 (出云显世与高天神国 / Izumo Gensei and Takama Divine Realm), 2-piece: 「使装备者的攻击力提高#1[i]%。进入战斗时，若至少存在一名与装备者命途相同的队友，装备者的暴击率提高#2[i]%。」 param = [0.12, 0.12]",
+      "note": "The conditional half only: 「使装备者的攻击力提高 12%」 is a plain stat and is already carried by the ability's `properties` (AttackAddedRatio 0.12), which the suit applies when it is built -- writing it here as well would grant it twice. ⚠ 「若至少存在一名与装备者**命途相同**的队友」 is `self has_same_path_ally`: the rule cannot name a Path, because the relic can be worn by anybody, so it compares the wearer's own Path against the rest of the side. ⚠ `permanent: true` is 「进入战斗时」 with no duration stated -- a battle-start grant that nothing counts down."
+    }
+  ]
+}

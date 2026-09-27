@@ -421,6 +421,12 @@ public class TriggerTable {
     private static final Pattern IS_ALLY =
             Pattern.compile("(?<![\\w])is_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * The {@code has_same_path_ally} keyword: "somebody else on my side walks my Path".
+     */
+    private static final Pattern SAME_PATH_ALLY =
+            Pattern.compile("(?<![\\w])has_same_path_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
+
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException("Empty trigger condition (source: " + spec.getSource() + ")");
@@ -458,6 +464,20 @@ public class TriggerTable {
             String state = text.substring(hasState.end()).trim();
             return new HasState(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw,
                     spec);
+        }
+
+        // `self has_same_path_ally` — a party question with no argument, checked with the other predicates.
+        Matcher samePath = SAME_PATH_ALLY.matcher(text);
+        if (samePath.find()) {
+            String subject = normalize(text.substring(0, samePath.start()));
+            String trailing = text.substring(samePath.end()).trim();
+            if (!"self".equals(subject) || !trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' must be written \"self has_same_path_ally\": the question is about "
+                                + "MY OWN side (which teammates share my Path), so it has no other subject and no "
+                                + "argument (source: " + spec.getSource() + ")");
+            }
+            return new HasSamePathAlly(raw, spec);
         }
 
         // `is_ally`: "<who> is_ally" — no argument at all, so it is checked before the operator branch too.
@@ -916,6 +936,55 @@ public class TriggerTable {
         @Override
         public boolean test(TriggerContext ctx) {
             return party.partyOf(ctx) != null && !inner.test(ctx);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * Party-composition test: {@code self has_same_path_ally} — 「若至少存在一名与装备者命途相同的队友」.
+     *
+     * <p><b>Why it reads the field.</b> A relic can be worn by anybody, so 「与装备者命途相同」 cannot be written as
+     * a Path name: the rule has to compare whoever is wearing it against the rest of the side. That is a fact about
+     * the battlefield, like {@code self_summon_count} — and it is the first condition whose answer depends on the
+     * <b>party</b> rather than on the owner, the event or the subject.
+     *
+     * <p>⚠ Three things it deliberately does not count: a <b>dead</b> ally (a corpse is not somebody on the field —
+     * the same reading {@code Battle.summonsOf} uses), the wearer itself, and a Path the engine cannot name
+     * ({@link com.laosun.aluminium.enums.Path#OTHER}): two units whose data carries an unknown Path are not "the same
+     * Path", they are both unknown, and matching them would be a coincidence dressed as a rule.
+     */
+    private static final class HasSamePathAlly implements Condition, PartyCondition {
+
+        private final String raw;
+
+        HasSamePathAlly(String raw, TriggerSpec spec) {
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return ctx.owner();
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            if (ctx.battle() == null || !(ctx.owner() instanceof Character me)) {
+                return false;
+            }
+            com.laosun.aluminium.enums.Path mine = me.getPath();
+            if (mine == com.laosun.aluminium.enums.Path.OTHER) {
+                return false;
+            }
+            for (CanHit ally : ctx.battle().allies) {
+                if (ally != me && !ally.isDeath() && ally instanceof Character other && other.getPath() == mine) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override

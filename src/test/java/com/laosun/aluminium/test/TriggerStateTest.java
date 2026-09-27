@@ -357,6 +357,77 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
+    // 3d. `has_same_path_ally` — a question about the PARTY
+    // ==================================================================
+
+    /**
+     * {@code self has_same_path_ally} is true when another <b>living</b> ally walks the wearer's Path.
+     *
+     * <p>Its first user is 遗器 314's 「若至少存在一名与装备者命途相同的队友」 — the rule cannot name a Path, because
+     * the relic can be worn by anybody, so it has to compare the wearer against the rest of the side. That makes it the
+     * first condition whose answer depends on the <b>party</b> rather than on the owner or the event.
+     */
+    @Test
+    public void hasSamePathAllyReadsTheParty() {
+        Battle same = withAllyOf(1013, pathRule(gain(1)));
+        drainSkillPoints(same);
+        Assertions.assertEquals(1, same.fireTriggers(TriggerEvent.ALLY_ATTACK, same.characters.getFirst(), null, 1, 0),
+                "黑塔 is 智识, like 姬子");
+
+        Battle other = withAllyOf(1210, pathRule(gain(1)));
+        drainSkillPoints(other);
+        Assertions.assertEquals(0,
+                other.fireTriggers(TriggerEvent.ALLY_ATTACK, other.characters.getFirst(), null, 1, 0),
+                "桂乃芬 is 虚无: 「命途相同」 does not hold");
+
+        Battle alone = battleWith(pathRule(gain(1)));
+        drainSkillPoints(alone);
+        Assertions.assertEquals(0, alone.fireTriggers(TriggerEvent.ALLY_ATTACK, alone.characters.getFirst(), null, 1, 0),
+                "nobody else on the field is not 「至少存在一名队友」");
+    }
+
+    /** A <b>dead</b> teammate is not somebody on the field — the same reading `summonsOf` uses. */
+    @Test
+    public void aDeadSamePathAllyDoesNotCount() {
+        Battle battle = withAllyOf(1013, pathRule(gain(1)));
+        Character owner = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+        drainSkillPoints(battle);
+        ally.takeDamage(9_999_999);
+        battle.processRequests();
+
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
+                "a corpse is not 「与装备者命途相同的队友」");
+    }
+
+    /** {@code !self has_same_path_ally} is the opposite (and still needs a party to look at). */
+    @Test
+    public void hasSamePathAllyCanBeNegated() {
+        Battle battle = withAllyOf(1210, pathRule(gain(1)));
+        Character owner = battle.characters.getFirst();
+        drainSkillPoints(battle);
+
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
+                "precondition: no teammate shares the Path, so the positive spelling is silent");
+
+        Battle negated = withAllyOf(1210,
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("!self has_same_path_ally"), gain(1)));
+        drainSkillPoints(negated);
+        Assertions.assertEquals(1,
+                negated.fireTriggers(TriggerEvent.ALLY_ATTACK, negated.characters.getFirst(), null, 1, 0));
+    }
+
+    /** The question is about MY side, so no other subject (and no argument) is accepted. */
+    @Test
+    public void hasSamePathAllyTakesNoOtherSubject() {
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER, List.of(
+                        TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_same_path_ally"), gain(1)))));
+
+        Assertions.assertTrue(refused.getMessage().contains("has_same_path_ally"), refused.getMessage());
+    }
+
+    // ==================================================================
     // 4. `has_path` and the `!` prefix (M-41)
     // ==================================================================
 
@@ -489,6 +560,19 @@ public class TriggerStateTest {
         Battle battle = new Battle(List.of(ownerWith(specs)), List.of(dummy()), new Random(0));
         battle.startBattle();
         return battle;
+    }
+
+    /** The same, but with a chosen ally — the Path comparison needs control over who is beside the owner. */
+    private static Battle withAllyOf(int allyCid, TriggerSpec... specs) {
+        Battle battle = new Battle(List.of(ownerWith(specs), CharacterFactory.create(allyCid, LEVEL)),
+                List.of(dummy()), new Random(0));
+        battle.startBattle();
+        return battle;
+    }
+
+    /** A rule that fires when the party contains somebody on the wearer's Path. */
+    private static TriggerSpec pathRule(EffectSpec effect) {
+        return TriggerSpecs.rule("ALLY_ATTACK", List.of("self has_same_path_ally"), effect);
     }
 
     private static Battle withAlly(TriggerSpec... specs) {
