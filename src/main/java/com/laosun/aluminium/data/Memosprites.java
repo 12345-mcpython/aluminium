@@ -3,6 +3,8 @@ package com.laosun.aluminium.data;
 import com.google.gson.Gson;
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.SkillEffectType;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -107,7 +109,8 @@ public final class Memosprites {
      * with no name is unnamed in every log; a panel that states neither a share nor a flat value describes
      * nothing; a typo in an attribute name silently produces a 0; a duplicate attribute makes "which wins"
      * an accident of iteration order; and a missing {@code HEALTH} or {@code SPEED} produces a unit that
-     * dies to a tick or that the action bar refuses to schedule.
+     * dies to a tick or that the action bar refuses to schedule. The optional {@code attack} block is
+     * checked separately by {@link #validateAttack}, which is where the "invisible zero" lives.
      *
      * @param spec   the parsed spec (may be {@code null}, which is not an error — it means "no file")
      * @param source a label for error messages (normally the resource path)
@@ -138,7 +141,80 @@ public final class Memosprites {
         }
         requirePresent(seen, AttributeType.HEALTH, spec, source);
         requirePresent(seen, AttributeType.SPEED, spec, source);
+        validateAttack(spec, seen, source);
         return spec;
+    }
+
+    /**
+     * Checks the optional {@code attack} block (P9-4 忆灵). Every rejection is a wrong attack that would
+     * otherwise only show up as a number in a battle log:
+     *
+     * <ul>
+     *   <li>an unknown element — a typo would silently fall back to physical damage;</li>
+     *   <li>a {@code base} the panel does not state — the value is 0 (a panel entry <b>replaces</b> the
+     *       attribute, nothing is inherited), so the memosprite would hit for exactly 0. This is the one
+     *       that is invisible: the attack fires, the log line prints, and the number is zero;</li>
+     *   <li>a {@code base} that is a builder-only {@code *_PERCENT} key — the runtime slot is null;</li>
+     *   <li>a {@code shape} that does not deal damage — "an attack that heals" is a different feature, and
+     *       {@code EnemySkill} would happily run it as a single-target hit.</li>
+     * </ul>
+     */
+    private static void validateAttack(MemospriteSpec spec, Set<AttributeType> panel, String source) {
+        MemospriteSpec.Attack attack = spec.attack();
+        if (attack == null) {
+            return;                                  // no attack stated: an ordinary state (see the record)
+        }
+        if (DamageElement.fromString(attack.element()) == null) {
+            throw new IllegalArgumentException(
+                    "Memosprite '" + spec.name() + "' attack names element '" + attack.element()
+                            + "'; use a DamageElement spelling, e.g. Ice / Fire / Quantum (" + source + ")");
+        }
+        if (attack.base() == null || attack.base().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Memosprite '" + spec.name() + "' attack has no \"base\": there is no attribute to scale "
+                            + "off, so the hit would deal 0 (" + source + ")");
+        }
+        AttributeType base;
+        try {
+            base = AttributeType.fromString(attack.base());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Memosprite '" + spec.name() + "' attack scales off unknown attribute '" + attack.base()
+                            + "'; use a name from AttributeType, e.g. HEALTH / ATTACK (" + source + ")");
+        }
+        if (base.isPercentVariant()) {
+            throw new IllegalArgumentException(
+                    "Memosprite '" + spec.name() + "' attack scales off '" + attack.base() + "', which is a "
+                            + "builder-only input key: the runtime slot is null, so the hit would fail or "
+                            + "deal 0. Name the base attribute instead (" + source + ")");
+        }
+        if (!panel.contains(base)) {
+            throw new IllegalArgumentException(
+                    "Memosprite '" + spec.name() + "' attack scales off " + base.name() + ", but its panel "
+                            + "never states " + base.name() + " — a panel entry replaces the attribute, so "
+                            + "this memosprite's " + base.name() + " is 0 and every hit would deal 0. State "
+                            + base.name() + " in the panel, or scale off one it does state (" + source + ")");
+        }
+        if (!positive(attack.percent())) {
+            throw new IllegalArgumentException(
+                    "Memosprite '" + spec.name() + "' attack gives \"percent\": " + attack.percent()
+                            + ", but a share of its own " + base.name() + " must be a positive number "
+                            + "(2.0 = 200%) (" + source + ")");
+        }
+        if (attack.hits() != null && attack.hits() < 1) {
+            throw new IllegalArgumentException(
+                    "Memosprite '" + spec.name() + "' attack has \"hits\": " + attack.hits()
+                            + ", but a hit count below 1 means the attack never lands (" + source + ")");
+        }
+        if (attack.shape() != null) {
+            SkillEffectType shape = SkillEffectType.fromString(attack.shape());
+            if (shape == null || !shape.isDamaging()) {
+                throw new IllegalArgumentException(
+                        "Memosprite '" + spec.name() + "' attack has shape '" + attack.shape()
+                                + "', which does not deal damage; use a damaging SkillEffectType, e.g. "
+                                + "SingleAttack / AoEAttack / Blast (" + source + ")");
+            }
+        }
     }
 
     private static AttributeType requireAttribute(MemospriteSpec.Panel entry, MemospriteSpec spec,
