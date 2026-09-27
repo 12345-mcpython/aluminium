@@ -1,5 +1,41 @@
 [
   {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self",
+      "self_summon_count >= 1"
+    ],
+    "do": [
+      {
+        "op": "HEAL",
+        "scale": "target_max_hp",
+        "percent": 0.5,
+        "target": "summon"
+      }
+    ],
+    "source": "1402 阿格莱雅 战技 高举吧，升华的名讳 (skill 140202, BPSkill/Summon) 第一句: 「为衣匠回复等同于其#1[i]%生命上限的生命值。」 param Lv10 = [0.5, 0, 5]",
+    "note": "The 「衣匠已在场」 half: restore 50% of its Max HP. ⚠ That 0.5 is written here because HEAL's `scale` + `percent` take a literal and do not read a skill's parameter table. It is the Lv10 row the prose quotes (Lv1 would be 0.25) -- the same 「which row」 question `damage_level` answers for the ops that DO read a table, so it is registered with M-32. ⚠ `target: \"summon\"` fails loudly when there is no memosprite, which is why this rule needs `self_summon_count >= 1`; the next rule uses `== 0`, so the two halves are mutually exclusive by construction rather than by watching whether the summon actually happened (SUMMON is idempotent, so that is not observable afterwards)."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self",
+      "self_summon_count == 0"
+    ],
+    "do": [
+      {
+        "op": "SUMMON"
+      },
+      {
+        "op": "ADVANCE",
+        "percent": 1.0,
+        "target": "self"
+      }
+    ],
+    "source": "1402 阿格莱雅 战技 高举吧，升华的名讳 (skill 140202, BPSkill/Summon) 第二句: 「若衣匠不在场，则召唤忆灵衣匠，并使自身立即行动。」",
+    "note": "The 「衣匠不在场」 half: summon, and make HER take action immediately. ⚠ 「并使自身立即行动」 hangs off the 「若…则召唤」 branch (the 并 continues the summoning clause), so it lives in THIS rule and not in the one above -- putting it in both would advance her even when the memosprite was already out, which the text does not say. ⚠ `self_summon_count == 0` is the rare reverse spelling of that condition: it means \"I have no summon out\", NOT \"there is no battlefield\" -- a context without a battle makes these conditions fail outright (engine.md 4.6), so it cannot fire by accident."
+  },
+  {
     "on": "ULT_CAST",
     "when": [
       "actor == self"
@@ -7,9 +43,20 @@
     "do": [
       {
         "op": "SUMMON"
+      },
+      {
+        "op": "HEAL",
+        "scale": "target_max_hp",
+        "percent": 1.0,
+        "target": "summon"
+      },
+      {
+        "op": "ADVANCE",
+        "percent": 1.0,
+        "target": "self"
       }
     ],
-    "source": "1402 阿格莱雅 终结技: 「召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入【至高之姿】状态并使自身立即行动。」",
-    "note": "Only the summoning clause. 「若衣匠已在场，则使其生命值回复至上限」 is the refresh that SUMMON deliberately does NOT model -- a second firing keeps the memosprite already out and leaves its HP alone, which is registered as the next step. Everything else the ultimate says (【至高之姿】, the 100-speed countdown, the self-destruct, the SPD-boost stacks) is not authored. `actor == self` is 「阿格莱雅」: it is HER ultimate, and without it the rule would also fire for a teammate's. 衣匠's panel (35% of her SPD, 66% of her Max HP + 720) is in resources/memosprites/1402.json."
+    "source": "1402 阿格莱雅 终结技 残梦，由始至终 (skill 140203, Ultra/Enhance): 「召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入【至高之姿】状态并使自身立即行动。」 param Lv10 = [0.15, 0, 0, 100, 0, 0]",
+    "note": "Three things, in the order the text writes them: summon, restore, advance herself. ⚠ 「若衣匠已在场，则使其生命值回复至上限」 needs NO branch: SUMMON is idempotent per summoner (already out => nothing happens), and the HEAL that follows is a full-HP heal on a fresh one (clamped by its Max HP, i.e. no change) -- the two cases are observably identical, so one rule covers both. ⚠ 「回复至上限」 is written as 「heal by 100% of its Max HP」: Battle.heal clamps current HP at the maximum, so the two are the same result rather than an approximation. ⚠ The ORDER is not decoration: `target: \"summon\"` in the HEAL and the ADVANCE fails loudly when nothing is out, so SUMMON has to come first -- and there is a test for that. ⚠ NOT authored: 【至高之姿】 (SPD +15% per stack, the basic attack replaced by 【孤锋千吻】 with the Skill disabled, control immunity for the memosprite, and a 100-speed countdown on the action sequence that makes 衣匠 self-destruct and ends the state) -- a state machine with its own timeline, registered rather than approximated. ⚠ Also un-authored: 衣匠's OWN attack. Its 忆灵技能1 is a Blast for 「110% 攻击力」 of 雷, but no document gives 衣匠 an ATK (the panel states only HP and SPD), and scaling it off 阿格莱雅's ATK would be a guess -- so it is not written, and the loader would refuse it anyway (Memosprites.validateAttack rejects a base the panel never states)."
   }
 ]
