@@ -29,5 +29,43 @@
     ],
     "source": "1101 布洛妮娅 星魂 1 养精蓄锐: 「施放战技时，有#1[i]%固定概率恢复1个战技点，该效果有1回合的触发冷却。」 param = [0.5]",
     "note": "Three of the vocabularies added on 2026-09-27 meet in one sentence: min_eidolon (it IS an Eidolon, so the rank gate sits next to the mechanic rather than in a loader), chance (50%, rolled against the battle's injected generator) and cooldown ('1 回合的触发冷却' = at most once per own turn). 'actor == self' is 「施放战技时」: the cast has to be hers. This is the case engine.md §9 and SkillPointGameParityTest had registered as 'not implemented' since long before the trigger table existed — the missing part was never one hook but these three."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self",
+      "target != self"
+    ],
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 1.0,
+        "target": "target"
+      }
+    ],
+    "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support) 第二句: 「并使该目标立即行动…当对自身施放该技能时，无法触发立即行动效果。」",
+    "note": "「使该目标立即行动」 -- `target` is the unit this cast was AIMED at, which is what M-35 added to the cast events (before it, `ctx.target()` was null for every cast and this sentence was unexpressible). ⚠ The second half of the sentence is the condition: 「当对自身施放该技能时，无法触发立即行动效果」 is exactly `target != self`, and it is why this is a SEPARATE rule from the dispel/damage one below -- casting it on herself still dispels and still grants the damage boost, it just does not give her a second action."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "DISPEL",
+        "amount": 1,
+        "target": "target"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent": 0.66,
+        "turns": 1,
+        "target": "target"
+      }
+    ],
+    "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support): 「解除指定我方单体的1个负面效果，并使该目标立即行动，造成的伤害提高#1[i]%，持续#3[i]回合。」 param Lv10 = [0.66, 0, 1, 1]",
+    "note": "「解除指定我方单体的1个负面效果」 + 「造成的伤害提高 66%，持续 1 回合」, both on the aimed ally (`target: \"target\"`). ⚠ 0.66 is written here because MODIFY_ATTR takes a literal; it is the Lv10 row the prose quotes (Lv1 = 0.33, Lv15 = 0.825) -- the same 「which row」 question `damage_level` answers for the ops that read a table (M-32). ⚠ `DISPEL` on a target with nothing to remove is not an error (the op's contract: 「取不到不算错」). ⚠ No condition on the aimed unit beyond `actor == self`, because this half applies in BOTH cases -- only the immediate action is barred for a self-cast, which is why that one is gated `target != self`."
   }
 ]
