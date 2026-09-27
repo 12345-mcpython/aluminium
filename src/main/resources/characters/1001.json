@@ -1,0 +1,17 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "DISPEL",
+        "amount": 1,
+        "target": "target"
+      }
+    ],
+    "source": "1001 三月七 行迹 纯洁 (1001101): 「施放战技时，解除指定我方单体的1个负面效果。」",
+    "note": "Her kit is a wall of shields, and this is the one clause of it that today's vocabulary can carry completely. ⚠ `target` is the ally the Skill was AIMED at (M-35), which is what 「指定我方单体」 names; her Skill is a `Defence` skill, so it fires SKILL_CAST with no hit targets and this rule is the whole of its effect today. ⚠ `DISPEL` reaches **negative** buffs only, which is exactly what 「解除…1 个负面效果」 says (the five debuff classes answer `isDebuff()` in one table -- DebuffTest). ⚠ THIS IS THE ONLY RULE OF HERS, and the rest is registered rather than approximated -- each blocked clause and the capability it needs: ① 战技的护盾「抵消等同于**三月七 57% 防御力 + 760** 伤害，持续 3 回合」 -- SHIELD's `scale` reads a MAX HP (`target_max_hp` / `owner_max_hp`) and refuses `scale` together with a flat `amount`, so a DEF-derived shield with a flat addend has no spelling yet (the same shape `MODIFY_ATTR`'s derived value needed, one step further); ② 战技的嘲讽「若该目标当前生命值百分比大于等于 30%，被敌方攻击的概率大幅提高」 -- the engine HAS a TauntBuff and `hp_percent` reads the OWNER's HP, but there is no op that applies a taunt and no `target_hp_percent` condition to gate it on the ALLY's HP; ③ 终结技的冻结「有 50% 基础概率陷入冻结状态，持续 1 回合…每回合开始时受到等同于三月七 60% 攻击力的冰属性附加伤害」 -- 冻结 is a control state the engine deliberately does not model yet (P10-2 composes controls out of a StunBuff plus a speed debuff plus an action delay), so there is nothing for a rule to apply or to ask about; ④ 天赋「当**持有护盾的**我方目标受到敌方目标攻击后…立即向攻击者发起反击…每回合可触发 2 次」 -- needs (a) a condition for `target` holding a shield (the engine has the ShieldBuff class, the DSL has no word for it), and (b) a per-TURN trigger limit of N times, which the firing limits (`cooldownTurns` / `oncePerBattle`) do not express -- a counter without the limit would fire on every hit of a three-hit attack; ⑤ 行迹「加护」 (护盾 +1 回合) rides on ①, 星魂 1/2/4/6 ride on ③/①, and 星魂 3/5 are the skill-level gap already registered (M-32). ⚠ The 秘技 (100107) is a MAP attack -- the engine has no in-battle event for techniques, so it is out of scope rather than blocked."
+  }
+]
