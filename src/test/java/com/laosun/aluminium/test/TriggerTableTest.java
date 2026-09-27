@@ -41,8 +41,24 @@ public class TriggerTableTest {
     private static final int TRIBBIE = 1403;
     private static final int ROBIN = 1309;
 
-    /** Himeko: an ordinary character with no trigger file, used as the "unregistered" control. */
-    private static final int NO_TRIGGERS = 1003;
+    /**
+     * An ordinary character with <b>no trigger file</b>, used as the "unregistered" control.
+     *
+     * <p>⚠ Looked up rather than named since 2026-09-27: this was 姬子 (1003) until her own kit was authored, and
+     * the control having acquired rules broke three of the claims below. See {@link TestCharacters}.
+     */
+    private static final int NO_TRIGGERS = TestCharacters.withoutTriggerFile();
+
+    /**
+     * An ally whose ultimate connects with <b>every</b> enemy — the driver for the 「per target hit」 pair.
+     *
+     * <p>Named rather than looked up, because the property being asked for is a fact about one character's
+     * <b>skill data</b> (1003's ultimate is 全体攻击, 60 toughness, Fire), not about the engine. ⚠ She has a rule
+     * file of her own since 2026-09-27, and that is deliberately acceptable here: the number each test measures is
+     * <em>Tribbie's</em> or <em>Robin's</em> energy, which only their own tables can credit, and none of her rules
+     * grants energy to anybody ({@code resources/characters/1003.json}).
+     */
+    private static final int AOE_ALLY = 1003;
     private static final int ICE_EDGE = 1002011;
 
     // ==================================================================
@@ -70,11 +86,11 @@ public class TriggerTableTest {
     @Test
     public void tribbieGainsPerTargetHitWhenAnAllyAttacks() {
         Character tribbie = CharacterFactory.create(TRIBBIE, 80);
-        Character himeko = CharacterFactory.create(NO_TRIGGERS, 80);
-        Battle battle = newBattle(List.of(tribbie, himeko), 3);
+        Character attacker = CharacterFactory.create(AOE_ALLY, 80);
+        Battle battle = newBattle(List.of(tribbie, attacker), 3);
 
         double before = tribbie.getCurrentEnergy();
-        attackAllEnemies(battle, himeko);
+        attackAllEnemies(battle, attacker);
         double gained = tribbie.getCurrentEnergy() - before;
 
         assertEnergyEquals(gained, 1.5 * 3, "1.5 per target x 3 targets");
@@ -103,11 +119,11 @@ public class TriggerTableTest {
     @Test
     public void robinGainsTwoEnergyPerAllyAttackNotPerTarget() {
         Character robin = CharacterFactory.create(ROBIN, 80);
-        Character himeko = CharacterFactory.create(NO_TRIGGERS, 80);
-        Battle battle = newBattle(List.of(robin, himeko), 3);
+        Character attacker = CharacterFactory.create(AOE_ALLY, 80);
+        Battle battle = newBattle(List.of(robin, attacker), 3);
 
         double before = robin.getCurrentEnergy();
-        attackAllEnemies(battle, himeko);
+        attackAllEnemies(battle, attacker);
         double gained = robin.getCurrentEnergy() - before;
 
         assertEnergyEquals(gained, 2, "flat 2 per attack, even when 3 targets were hit");

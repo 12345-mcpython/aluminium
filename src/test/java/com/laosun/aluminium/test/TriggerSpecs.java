@@ -105,6 +105,47 @@ final class TriggerSpecs {
     }
 
     /**
+     * A {@code GAIN_RESOURCE} effect (credited to the owner unless {@code target} says otherwise).
+     *
+     * @param resource the resource id, as the character declares it
+     * @param amount   how much to add
+     */
+    static EffectSpec gainResource(String resource, int amount) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "GAIN_RESOURCE");
+        set(effect, "resource", resource);
+        set(effect, "amount", (double) amount);
+        return effect;
+    }
+
+    /** A {@code SPEND_RESOURCE} effect. */
+    static EffectSpec spendResource(String resource, int amount) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "SPEND_RESOURCE");
+        set(effect, "resource", resource);
+        set(effect, "amount", (double) amount);
+        return effect;
+    }
+
+    /**
+     * A {@code DAMAGE} effect: the numbers come out of the named skill's own parameter row.
+     *
+     * @param skill  the skill slot ({@code "TALENT"}, {@code "ULTRA"}, …)
+     * @param param  the 0-based column of the row
+     * @param level  the 1-based row, or {@code null} for the skill's own level
+     * @param target the optional target selector, or {@code null}
+     */
+    static EffectSpec damage(String skill, int param, Integer level, String target) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "DAMAGE");
+        set(effect, "skill", skill);
+        set(effect, "damageParam", param);
+        set(effect, "damageLevel", level);
+        set(effect, "target", target);
+        return effect;
+    }
+
+    /**
      * Sets a private field on one of the trigger beans.
      *
      * @throws IllegalStateException when the field does not exist — a renamed field must fail here,

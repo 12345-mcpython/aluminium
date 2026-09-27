@@ -1,0 +1,23 @@
+{
+  "resources": [
+    {
+      "id": "充能",
+      "max": 3,
+      "source": "CharacterResourceTest fixture -- the object form, which is what a character that declares a resource looks like",
+      "note": "Every key a declaration may carry is present here on purpose: the loader refuses a key Gson would drop, so a fixture that used only id/max would leave source/note untested."
+    }
+  ],
+  "rules": [
+    {
+      "on": "BREAK",
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        }
+      ],
+      "source": "CharacterResourceTest fixture 9001: one rule, so the file exercises both halves of the object form"
+    }
+  ]
+}

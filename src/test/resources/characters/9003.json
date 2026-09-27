@@ -1,0 +1,26 @@
+{
+  "trigger": [
+    {
+      "on": "BREAK",
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        }
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "on": "BREAK",
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}

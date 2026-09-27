@@ -2,6 +2,7 @@ package com.laosun.aluminium.utils;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
+import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
@@ -180,8 +181,16 @@ public final class CharacterFactory {
         // one place allowed to go from "which character" to "which rules" (P8-0). Characters with no
         // file get the empty table, which is the normal state for the ones not data-ised yet.
         // Worn relic sets contribute their own rules on top (see `effectiveTriggerTable`).
-        builder = builder.triggerTable(effectiveTriggerTable(cid, relicSuit));
+        TriggerTable table = effectiveTriggerTable(cid, relicSuit);
+        builder = builder.triggerTable(table);
         Character character = builder.build();
+        // P8-8: the resources this character declares (「充能，上限3点」). Registered **after** the build
+        // because the manager belongs to the combatant, and from the declaration rather than from the JSON
+        // directly, so the cap a rule is gated on is the same number that was registered -- there is one
+        // reader of the declaration (`requireReadableResources`), not two.
+        for (ResourceSpec spec : table.resources()) {
+            character.getResources().register(spec.id(), spec.max(), spec.initial());
+        }
         // stack/special-resource characters: swap out conventional energy gain (otherwise they could fill the bar just by getting hit and fire an ultimate they should not have)
         if (SPECIAL_RESOURCE_CHARACTERS.contains(cid)) {
             character.setEnergyProvider(NO_CONVENTIONAL_ENERGY);
@@ -219,10 +228,51 @@ public final class CharacterFactory {
                 table = table.plus(RelicTriggerTables.of(worn.getIntKey()).at(worn.getIntValue()));
             }
         }
-        // ONE exit point, so the check below cannot be skipped by a branch. It was written at both returns
+        // ONE exit point, so the checks below cannot be skipped by a branch. It was written at both returns
         // first, and mutation testing showed the no-suit branch was then covered by nothing: a test that
         // exercises one path has to be exercising the only path.
-        return requireSummonable(cid, table);
+        return requireReadableResources(cid, requireSummonable(cid, table));
+    }
+
+    /**
+     * Refuses a merged table that reads a resource this character never declares (P8-8).
+     *
+     * <p><b>Why the check lives here</b>, exactly like {@link #requireSummonable}: {@code self_resource:<NAME>}
+     * is read from the combatant's own {@code ResourceManager}, and a rule file cannot know its own cid — while a
+     * <b>relic</b> rule is shared by every wearer. The assembly point is the first place that knows both the
+     * character and the full set of rules it ends up with.
+     *
+     * <p><b>The failure being prevented.</b> An undeclared resource is not an error at any layer below:
+     * {@code ResourceManager.gain} answers {@code 0} ("nothing credited") and {@code value} answers {@code 0}
+     * ("empty"). So a rule that grants 「充能」 would fire and grant nothing, and a rule gated on
+     * {@code self_resource:充能 >= 3} would compile, load, and never fire — the wrong answer with no symptom that
+     * this project refuses. Checked at build time so the message arrives while the character is being created,
+     * naming the resource and the file to declare it in, rather than never arriving at all.
+     *
+     * <p><b>Public on purpose</b> (same reason as {@code requireSummonable}): it is the one entry point for
+     * "is this character's rule set satisfiable", and a test cannot otherwise reach it without shipping a
+     * broken character file.
+     *
+     * @param cid   the character the table was merged for
+     * @param table the effective (already merged) table
+     * @return the same table, for chaining
+     * @throws CharacterException when a rule reads or writes a resource that is not declared
+     */
+    public static TriggerTable requireReadableResources(int cid, TriggerTable table) {
+        for (String referenced : table.referencedResources().stream().sorted().toList()) {
+            boolean declared = table.resources().stream().anyMatch(spec -> spec.id().equals(referenced));
+            if (!declared) {
+                throw new CharacterException(
+                        "Character " + cid + " has a rule that uses the resource \"" + referenced
+                                + "\", which the character does not declare. Add it to the \"resources\" block "
+                                + "of resources/characters/" + cid + ".json (e.g. { \"id\": \"" + referenced
+                                + "\", \"max\": 3 }) — without a declaration every gain of it is silently "
+                                + "credited as 0 and every read of it is 0, so the rule would do nothing and "
+                                + "report nothing. ⚠ A relic-set rule may be the source: those are shared by "
+                                + "every wearer, so this can only be checked here, at assembly.");
+            }
+        }
+        return table;
     }
 
     /**

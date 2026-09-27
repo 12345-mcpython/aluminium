@@ -1,0 +1,13 @@
+[
+  {
+    "on": "BREAK",
+    "do": [
+      {
+        "op": "GAIN_RESOURCE",
+        "resource": "充能",
+        "amount": 1
+      }
+    ],
+    "source": "CharacterResourceTest fixture 9006: the bare-array form -- the shape every file written before resources existed uses, and still the right one for a character with nothing but rules"
+  }
+]
