@@ -204,14 +204,51 @@ public class March7thKitTest {
     }
 
     /**
+     * 星魂 2「记忆中的它」: 「进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+320的护盾，
+     * 持续3回合」.
+     *
+     * <p>⚠ What this needed was the <b>selector</b> (`lowest_hp_ally`), not a new op: the shield's numbers are the
+     * Skill's shape (`scale: owner_def` + a constant + a duration) and the gate is the ordinary Eidolon rank.
+     *
+     * <p>⚠ And it always fires on a <b>tie</b>: at battle start everybody is at 100%, so "the lowest percentage" is
+     * the whole party. The engine's tie-break is the earliest unit in the party order, which is what makes it
+     * deterministic — hence the assertion on the FIRST ally rather than on "somebody".
+     */
+    @Test
+    public void herSecondEidolonShieldsTheMostHurtAllyAtBattleStart() {
+        Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Battle battle = new Battle(List.of(march, ally), List.of(dummy()), new Random(0));
+
+        battle.startBattle();
+
+        double expected = 0.24 * march.getAttribute(AttributeType.DEFENCE).get() + 320;
+        Assertions.assertEquals(expected, march.getShield(), EPS,
+                "the first unit in the party order takes it, because everybody is at 100% at battle start");
+        Assertions.assertEquals(0, ally.getShield(), EPS, "and only one unit is 「最低的」");
+        Assertions.assertEquals(MARCH, ((Character) battle.allies.getFirst()).getCid(),
+                "precondition: she is first in the party order");
+    }
+
+    /** Below rank 2 the rule is not there at all — the Eidolon gate, not a weaker shield. */
+    @Test
+    public void theSecondEidolonsShieldDoesNotExistBelowItsRank() {
+        Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 1);
+        Battle battle = new Battle(List.of(march), List.of(dummy()), new Random(0));
+
+        battle.startBattle();
+
+        Assertions.assertEquals(0, march.getShield(), EPS, "星魂 1 does not grant it");
+    }
+
+    /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
-     * <p>Four clauses exist and each is pinned above; the counts here are what says nothing else was written. Every
+     * <p>Five clauses exist and each is pinned above; the counts here are what says nothing else was written. Every
      * missing one would be a wrong number or a wrong trigger if it were spelled with the vocabulary that exists
-     * today: the freeze's <b>per-turn ice damage</b> needs an op that attaches a damage-over-time, 星魂 1 needs a
-     * per-cast count of the victims a state actually landed on, 星魂 2 needs a "lowest HP% ally" selector,
-     * 星魂 4 needs a way to raise another rule's limit plus a DEF-derived damage addend, 行迹「冰咒」 needs a way to
-     * raise an existing rule's base chance, and 加护 / 星魂 6 need the shield's provider.
+     * today: 星魂 1 needs a per-cast count of the victims a state actually landed on, 星魂 4 needs a way to raise
+     * another rule's limit plus a DEF-derived damage addend, 行迹「冰咒」 needs a way to raise an existing rule's
+     * base chance, and 加护 / 星魂 6 need the shield's provider.
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
@@ -221,8 +258,8 @@ public class March7thKitTest {
                 "the Talent's counter");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
                 "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule)");
-        Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
-                "星魂 2's battle-start shield needs a 「生命值百分比最低的队友」 selector");
+        Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
+                "星魂 2's battle-start shield for the most hurt ally");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
                 "and nothing of hers reacts to kills");
     }

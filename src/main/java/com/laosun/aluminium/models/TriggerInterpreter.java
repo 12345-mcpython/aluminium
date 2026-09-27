@@ -136,7 +136,7 @@ public final class TriggerInterpreter {
      */
     private static final Set<String> TARGET_SELECTORS =
             Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
-                    "target_and_summon", "all_enemies");
+                    "target_and_summon", "all_enemies", "lowest_hp_ally");
 
     /**
      * The two spellings of "every one of our characters".
@@ -187,6 +187,28 @@ public final class TriggerInterpreter {
      * the list resolver and not the single-target one.
      */
     private static final String TARGET_ALL_ENEMIES = "all_enemies";
+
+    /**
+     * "The ally with the lowest HP <b>percentage</b>" — 「当前<b>生命值百分比</b>最低的我方目标」.
+     *
+     * <p>Its first user is 三月七's 星魂 2 (「进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+
+     * 320的护盾」), and 藿藿's 【禳命】 / 灵砂's 【浮元】 heal the same unit. Before it, "the most hurt one" could
+     * only be picked by a <b>condition</b> — which filters <em>rules</em>, not the units an effect reaches — so the
+     * sentence had no spelling at all.
+     *
+     * <p>⚠ <b>Percentage, not absolute HP</b>, and the difference is real: with allies at 100/1000 and 900/10000,
+     * the second has fewer HP <i>points</i> (900) but the first has the lower <i>share</i> (10% vs 9%) — the two
+     * questions have different answers, and the documents spell them differently (「生命值百分比最低」 vs 灵砂's
+     * 「生命值最低」). Only the percentage spelling is built, because that is the one three of the four readers use;
+     * the absolute variant is registered with its reader (灵砂 1222) rather than guessed at now.
+     *
+     * <p>⚠ <b>Ties go to the earliest unit in the party order</b>, which is what makes the answer deterministic —
+     * and at {@code BATTLE_START} everybody is at 100%, so every 星魂-2-style rule hits a tie and the choice has to
+     * be stated rather than left to the iteration order of a map. The dead are skipped (a corpse has no share to
+     * speak of), and an empty camp resolves to <b>no target</b> rather than an error, like the other group
+     * selectors.
+     */
+    private static final String TARGET_LOWEST_HP_ALLY = "lowest_hp_ally";
 
     private TriggerInterpreter() {
     }
@@ -697,6 +719,27 @@ public final class TriggerInterpreter {
                 party.add(ally);
             }
             return List.copyOf(party);
+        }
+        if (TARGET_LOWEST_HP_ALLY.equals(selector)) {
+            if (battle == null) {
+                throw new IllegalStateException(
+                        "Effect targets \"" + TARGET_LOWEST_HP_ALLY
+                                + "\" but no battle was supplied to read the party's health from");
+            }
+            CanHit lowest = null;
+            double lowestShare = Double.MAX_VALUE;
+            for (CanHit ally : battle.allies) {
+                if (ally == null || ally.isDeath() || !(ally.getMaxHp() > 0)) {
+                    continue;                       // a corpse, or a unit with no health bar, has no share
+                }
+                double share = ally.getCurrentHp() / ally.getMaxHp();
+                // Strictly less than: a tie keeps the EARLIER unit, so the answer is the party order's, not luck.
+                if (share < lowestShare) {
+                    lowestShare = share;
+                    lowest = ally;
+                }
+            }
+            return lowest == null ? List.of() : List.of(lowest);
         }
         if (TARGET_ALL_ENEMIES.equals(selector)) {
             if (battle == null) {
