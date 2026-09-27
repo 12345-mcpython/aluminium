@@ -60,6 +60,11 @@ public class EffectSpec {
      * Stated <b>instead of</b> {@link #amount}, and it requires {@link #percent}: a scale without a magnitude
      * would say "some share of a Max HP", which is not a number.
      *
+     * <p>⚠ <b>{@code GAIN_ENERGY} names one more</b> (M-44): {@code "target_max_energy"} — 「恢复等同于 #1% <b>能量
+     * 上限</b>的能量」 (星期日's ultimate). It is the same idea as the Max-HP ones (a share of a per-character maximum
+     * that the rule cannot know), and it exists because the maximum is per character: 姬子 120 / 星期日 130 / 翡翠 140,
+     * so any flat number would be wrong for every one of them.
+     *
      * <p>⚠ <b>{@code MODIFY_ATTR} has a third spelling</b> (P11-2, M-42): {@code "self_attr:<ATTRIBUTE>"} — the
      * modifier's value is then <b>derived</b> from one of the <b>rule owner's</b> attributes
      * ({@code "scale": "self_attr:BREAKING_EFFECT"} + {@code percent} + optional {@code amount}), i.e.

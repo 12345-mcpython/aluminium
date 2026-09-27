@@ -524,7 +524,7 @@ JSON 写法不变。
 
 | op | 参数 | 状态 |
 |---|---|---|
-| `GAIN_ENERGY` | `amount`，可选 `per_target` | ✅ |
+| `GAIN_ENERGY` | `amount` 或 **`scale` + `percent`**（`target_max_energy` = 按**目标能量上限**的百分比，M-44），可选 `per_target` | ✅ |
 | `GAIN_SKILL_POINT` | `amount` | ✅ |
 | `HEAL` / `SHIELD` | `amount`，可选 `target` —— **或** `scale` + `percent`（按某项生命上限的比例，见下） | ✅ |
 | `EXTRA_TURN` | 可选 `target` | ✅ |
