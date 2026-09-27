@@ -28,6 +28,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -234,6 +235,62 @@ public class Battle {
     }
 
     /**
+     * How many targets the <b>cast being delivered right now</b> has actually applied each named state to
+     * (「终结技每冻结1个目标，为三月七恢复6点能量」).
+     *
+     * <p><b>Why the engine has to count it.</b> The number is not the number of targets <i>aimed at</i> — that one is
+     * the event's hit count, which {@code per_target} already multiplies by. It is the number the <b>roll let
+     * through</b>, and only {@code Battle.tryApplyDebuff} knows it: with a 50% base chance against three enemies the
+     * answer can be 0, 1, 2 or 3, and a rule that guessed "3" would pay three times what the text says.
+     *
+     * <p><b>Why it lives on the battle and not on the cast token.</b> The cast window is <i>closed</i> before the cast
+     * events are delivered ({@code SkillExecutor.execute} calls {@code endCast} in a {@code finally}, and only then
+     * broadcasts {@code ULT_CAST}) — which is precisely when a rule gets to read this. So the record outlives the
+     * token and is cleared at the end of the delivery instead.
+     *
+     * <p>⚠ <b>Cleared twice on purpose</b>: at {@link #beginCast} (so a new cast never sees the previous one's
+     * numbers) and after the cast's own events have been delivered ({@link #endCastOutcome}). A rule firing outside
+     * that window reads 0 — and content cannot get there by accident: the loader refuses
+     * {@code "scale": "cast_applied:…"} on any event that is not a cast (see {@code TriggerInterpreter}).
+     */
+    private final Map<String, Integer> castApplied = new HashMap<>();
+
+    /**
+     * Records one <b>landed</b> application of a named state during the current cast.
+     *
+     * <p>Called by the ops that roll for a state ({@code APPLY_CONTROL}, {@code APPLY_DOT}) and only when the roll
+     * passed — a resisted application is not an application, which is the whole reason this counter exists.
+     *
+     * @param stateName the state's name as the documents spell it (冻结 / 灼烧 / …)
+     */
+    public void recordCastApplied(String stateName) {
+        if (stateName == null || stateName.isBlank()) {
+            return;
+        }
+        castApplied.merge(stateName, 1, Integer::sum);
+    }
+
+    /**
+     * How many targets the current cast has applied {@code stateName} to ({@code 0} outside a cast's own events).
+     *
+     * @param stateName the state's name (冻结 / 灼烧 / …)
+     * @return the landed count for this cast
+     */
+    public int castAppliedCount(String stateName) {
+        return stateName == null ? 0 : castApplied.getOrDefault(stateName, 0);
+    }
+
+    /**
+     * Forgets the current cast's landed applications, once its events have been delivered.
+     *
+     * <p>Called from {@code SkillExecutor.execute}'s {@code finally} so that nothing firing later — an ally's attack,
+     * a hit taken next turn — can read a stale count.
+     */
+    public void endCastOutcome() {
+        castApplied.clear();
+    }
+
+    /**
      * Starts a cast and returns its token; {@link #endCast(PendingCast)} must be called in a {@code finally}.
      *
      * @param skill the skill being cast
@@ -241,6 +298,8 @@ public class Battle {
      * @return the token identifying this cast
      */
     public PendingCast beginCast(Skill skill, CanHit caster) {
+        // A new cast's outcome starts empty: see `castApplied`.
+        castApplied.clear();
         pendingCast = new PendingCast(caster, skill == null ? 0 : skill.getSkillSlot(), pendingCast);
         return pendingCast;
     }

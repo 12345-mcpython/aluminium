@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.CanHit;
@@ -335,6 +336,40 @@ public class BuffManager {
             }
         }
         return null;
+    }
+
+    /**
+     * The same lookup, for callers outside this class.
+     *
+     * <p><b>Who needs it.</b> The trigger interpreter records what a cast actually applied
+     * ({@code Battle.recordCastApplied}) when it attaches a DOT, and a rule that counts those applications
+     * (「每使1个目标陷入灼烧」) has to spell the name the documents use. Both sides therefore ask this one table rather
+     * than keeping a second element→name map that could drift from it.
+     *
+     * @param element the DOT's element, or {@code null}
+     * @return 灼烧 / 触电 / 裂伤 / 风化, or {@code null}
+     */
+    public static String dotStateName(DamageElement element) {
+        return stateNameOf(element);
+    }
+
+    /**
+     * Whether {@code stateName} is a name the engine's state tables know as a <b>rolled</b> state.
+     *
+     * <p>Used to validate {@code "scale": "cast_applied:<状态名>"} at load time: the closed set is the control states
+     * (冻结 / 纠缠 / 禁锢) and the four DOT states (灼烧 / 触电 / 裂伤 / 风化) — the states that reach the field
+     * through {@code Battle.tryApplyDebuff}, which is what the counter counts. ⚠ 嘲讽 is deliberately absent: no
+     * document counts taunts, and whether the marker belongs to the control class is still an open decision (see
+     * ROADMAP).
+     *
+     * @param stateName the name to check (a document spelling)
+     * @return {@code true} when it names a state this engine rolls for
+     */
+    public static boolean isRolledStateName(String stateName) {
+        if (stateName == null || stateName.isBlank()) {
+            return false;
+        }
+        return Constant.CONTROL_STATES.containsKey(stateName) || DOT_STATES.containsKey(stateName);
     }
 
     /**

@@ -552,6 +552,18 @@ public class TriggerTable {
     static final String SELF_ATTR_PREFIX = "self_attr:";
 
     /**
+     * The effect-side spelling for "how many targets <b>this cast really applied</b> that state to"
+     * (「终结技每冻结1个目标，为三月七恢复6点能量」) — {@code "scale": "cast_applied:冻结"}.
+     *
+     * <p>It sits beside {@link #SELF_ATTR_PREFIX} for the same reason that one exists: the content, the interpreter's
+     * resolver and the loader's validator all have to spell one prefix, and a second literal would be able to drift
+     * from this one. ⚠ Unlike {@code self_attr:} this is <b>not</b> a condition variable — a condition asks whether
+     * something is true about a unit, while this is a derived <i>magnitude</i> (a count) used by an amount, and only
+     * inside a cast's own events (the loader refuses it elsewhere).
+     */
+    static final String CAST_APPLIED_PREFIX = "cast_applied:";
+
+    /**
      * The prefix of the other parameterised numeric variable: {@code self_resource:充能} — 「我的【充能】现在
      * 有几层」.
      *
