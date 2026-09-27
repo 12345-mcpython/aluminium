@@ -99,6 +99,22 @@ public class RelicTriggerTableTest {
     private static final int BANANA_PARADISE = 318;
     /** 凯歌祝捷的英豪: 攻击力 +12%; 忆灵在场 -> 速度 +6%, 忆灵攻击时 -> 双方暴击伤害 +30% 2 回合. */
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
+    /** 野穗伴行的快枪手: 速度 +6%; 普攻伤害 +10%. */
+    private static final int MUSKETEER = 102;
+    /** 流星追迹的怪盗: 击破特攻 +16%; 击破弱点后回 3 点能量. */
+    private static final int THIEF = 111;
+    /** 死水深潜的先驱: 对受负面状态影响的敌人造成的伤害 +12%. */
+    private static final int PIONEER = 117;
+    /** 识海迷坠的学者: 战技与终结技伤害 +20%; 终结技后下一次战技 +25%. */
+    private static final int SCHOLAR = 122;
+    /** 折断的龙骨: 效果抵抗 +10%; 效果抵抗 ≥ 30% 时我方全体暴击伤害 +10%. */
+    private static final int BROKEN_KEEL = 310;
+
+    /**
+     * A set with a registered ability and <b>no</b> rule file — used by the "nothing to merge" case, which must
+     * therefore pick a set that is still unwritten (102 was that set until it was authored on 2026-09-28).
+     */
+    private static final int NO_RULE_SET = 125;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -149,6 +165,14 @@ public class RelicTriggerTableTest {
             BANANA_PARADISE + "/" + TWO_PIECE,
             // Authored once a buff could end on an EVENT instead of a turn boundary (`"until"`).
             STELLAR_DIFFERENTIATOR + "/" + TWO_PIECE,
+            // Authored on 2026-09-28 in the content pass over the `Writable now:` backlog: the five whose
+            // every clause already had a spelling, with the numbers read from `param` (four of the registered
+            // reasons carried a figure read off the English sentence instead — see each file's note).
+            MUSKETEER + "/" + FOUR_PIECE,
+            THIEF + "/" + FOUR_PIECE,
+            PIONEER + "/" + TWO_PIECE,
+            SCHOLAR + "/" + FOUR_PIECE,
+            BROKEN_KEEL + "/" + TWO_PIECE,
             // Authored once "the attacker is MY summon" became expressible (`actor == summon`) and a summon's
             // attack became an event the data can subscribe to (`SUMMON_ATTACK`).
             HERO_OF_TRIUMPHANT_SONG + "/" + FOUR_PIECE);
@@ -165,7 +189,7 @@ public class RelicTriggerTableTest {
      * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}).
      */
-    private static final int STILL_REGISTERED = 44;
+    private static final int STILL_REGISTERED = 39;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
@@ -191,7 +215,7 @@ public class RelicTriggerTableTest {
      * entry cannot quietly claim to be blocked when the capability exists.
      */
     private static final String WRITABLE_PREFIX = "Writable now:";
-    private static final int WRITABLE_NOW = 13;
+    private static final int WRITABLE_NOW = 7;
 
     // ==================================================================
     // 1. The shipped rule files
@@ -406,11 +430,13 @@ public class RelicTriggerTableTest {
     /** A set with no rule file contributes nothing, even at four pieces. */
     @Test
     public void aSetWithoutRulesContributesNothing() {
-        Character musketeer = CharacterFactory.create(HIMEKO, 80, true, null,
-                RelicFactory.suit(102, STAR, LEVEL));
+        Character wearer = CharacterFactory.create(HIMEKO, 80, true, null,
+                RelicFactory.suit(NO_RULE_SET, STAR, LEVEL));
 
-        Assertions.assertSame(TriggerTables.of(HIMEKO), musketeer.getTriggerTable(),
-                "set 102 has no rule file, so the character's table is untouched (no empty merge copy)");
+        Assertions.assertSame(TriggerTables.of(HIMEKO), wearer.getTriggerTable(),
+                "set " + NO_RULE_SET + " has no rule file, so the character's table is untouched (no empty "
+                        + "merge copy) -- which is why this case must name a set that is still unwritten: it "
+                        + "was 102 until set 102 was authored on 2026-09-28");
     }
 
     // ==================================================================
@@ -587,8 +613,9 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(20, twoPiece,
-                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet");
+        Assertions.assertEquals(18, twoPiece,
+                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (20 until the "
+                        + "2-pieces of sets 117 and 310 were authored on 2026-09-28)");
     }
 
     // ==================================================================

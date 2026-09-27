@@ -1,0 +1,19 @@
+{
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.12
+        }
+      ],
+      "source": "relic set 117 (死水深潜的先驱 / Pioneer Diver of Dead Waters), 2-piece: 「对受负面状态影响的敌人造成的伤害提高#1[i]%。」 param = [0.12]",
+      "note": "The whole 2-piece (its `properties` is empty, so there is nothing for the data path to apply). ⚠ `DEALING_DAMAGE` fires **before** the zones are read and hands the pending instance over, so `BOOST_DAMAGE` changes that one instance; a rule hung on `ALLY_ATTACK` would be too late, the number being final by then. ⚠ `actor == self` is 「装备者造成的伤害」: DEALING_DAMAGE is delivered to every character's table for every instance, so without it the wearer would boost a teammate's hit on the same debuffed enemy -- the same reading 桂乃芬's trace (characters/1210.json) uses. ⚠ `target_debuff_count` counts what the VICTIM carries, which is what 「受负面状态影响的敌人」 says."
+    }
+  ]
+}
