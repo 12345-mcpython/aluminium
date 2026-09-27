@@ -357,15 +357,25 @@ public class Main {
 
     /**
      * Which control buffs the target is wearing, as text (the demo prints rather than asserts).
+     *
+     * <p>Since 2026-09-27 the state itself is one {@code ControlBuff} that knows its own name (冻结 / 纠缠 / 禁锢),
+     * so the printout reads the name instead of inferring "a StunBuff means frozen" — the same change that lets a
+     * rule ask 「冻结状态」 about a unit a <i>skill</i> froze rather than only a break.
      */
     private static String describeControl(Enemy enemy) {
         List<String> parts = new ArrayList<>();
-        if (enemy.getBuffManager().hasBuff(com.laosun.aluminium.models.buff.StunBuff.class)) {
-            parts.add("StunBuff (cannot act)");
+        for (com.laosun.aluminium.models.buff.ControlBuff control
+                : enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.ControlBuff.class)) {
+            parts.add("ControlBuff " + control.getName()
+                    + (control.canAct() ? " (acts, slower)" : " (cannot act)"));
         }
-        int slows = enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buff.StatModifierBuff.class);
-        if (slows > 0) {
-            parts.add("StatModifierBuff ×" + slows + " (slow)");
+        // The slow a non-blocking control attaches is part of that state now, so counting every
+        // StatModifierBuff would print the same fact twice; only a slow with no control beside it is worth naming.
+        if (parts.isEmpty()) {
+            int slows = enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buff.StatModifierBuff.class);
+            if (slows > 0) {
+                parts.add("StatModifierBuff ×" + slows + " (slow)");
+            }
         }
         return parts.isEmpty() ? "no control state" : String.join(" + ", parts);
     }
