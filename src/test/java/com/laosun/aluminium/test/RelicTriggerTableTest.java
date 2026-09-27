@@ -99,6 +99,12 @@ public class RelicTriggerTableTest {
     private static final int BANANA_PARADISE = 318;
     /** 凯歌祝捷的英豪: 攻击力 +12%; 忆灵在场 -> 速度 +6%, 忆灵攻击时 -> 双方暴击伤害 +30% 2 回合. */
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
+    /** 哀歌覆国的诗人: 速度 -8%; 战斗前速度 <110/<95 -> 暴击率 +20%/+32%，忆灵同享. */
+    private static final int POET = 124;
+    /** 谧宁拾骨地: 生命上限 +12%; 生命上限 ≥ 5000 -> 装备者及忆灵暴击伤害 +28%. */
+    private static final int SERENE_DEMESNE = 319;
+    /** 渊思寂虑的巨树: 速度 +6%; 速度 ≥135/180 -> 装备者及忆灵治疗量 +12%/20%. */
+    private static final int RAPT_BROODING = 320;
     /** 熔岩锻铸的火匠: 战技伤害 +12%; 终结技后下一次攻击的火伤 +12%. */
     private static final int FIRESMITH = 107;
     /** 风举云飞的勇烈: 暴击率 +6%; 追加攻击后终结技伤害 +36% 1 回合. */
@@ -176,6 +182,9 @@ public class RelicTriggerTableTest {
             // Authored on 2026-09-28 in the content pass over the `Writable now:` backlog: the five whose
             // every clause already had a spelling, with the numbers read from `param` (four of the registered
             // reasons carried a figure read off the English sentence instead — see each file's note).
+            POET + "/" + FOUR_PIECE,
+            SERENE_DEMESNE + "/" + TWO_PIECE,
+            RAPT_BROODING + "/" + TWO_PIECE,
             FIRESMITH + "/" + FOUR_PIECE,
             VALOROUS + "/" + FOUR_PIECE,
             SHATTERED_WORLD + "/" + FOUR_PIECE,
@@ -201,7 +210,7 @@ public class RelicTriggerTableTest {
      * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}).
      */
-    private static final int STILL_REGISTERED = 35;
+    private static final int STILL_REGISTERED = 32;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
@@ -625,7 +634,7 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(17, twoPiece,
+        Assertions.assertEquals(15, twoPiece,
                 "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (20 until the "
                         + "2-pieces of sets 117 and 310 were authored on 2026-09-28)");
     }

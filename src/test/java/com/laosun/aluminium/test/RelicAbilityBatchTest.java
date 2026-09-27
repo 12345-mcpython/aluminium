@@ -5,6 +5,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
@@ -64,6 +65,9 @@ public class RelicAbilityBatchTest {
     private static final int VALOROUS = 120;
     private static final int GLAMOTH = 311;
     private static final int SHATTERED_WORLD = 127;
+    private static final int POET = 124;
+    private static final int SERENE_DEMESNE = 319;
+    private static final int RAPT_BROODING = 320;
 
     // ==================================================================
     // 102 — 普攻伤害 +10%
@@ -251,7 +255,11 @@ public class RelicAbilityBatchTest {
 
         // A fixture memosprite rather than SummonFactory.memosprite(master): the wearer is deliberately the
         // rule-less character, and summoning 1413's or 1402's would drag their own rules into the measurement.
-        Summon evey = fixtureMemosprite(battle, wearer);
+        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
+        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
+        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
+        Summon evey = battle.summon(wearer, MONSTER, 1);
+        battle.processRequests();                                // where SUMMONED is fired, by design
         battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, null, 0, 0);
 
         double bareHp = CharacterFactory.create(WEARER, LEVEL).getMaxHp();
@@ -263,6 +271,99 @@ public class RelicAbilityBatchTest {
                 "「及其忆灵」: the memosprite carries its own copy of the Max HP buff");
         Assertions.assertEquals(allyBoost + 0.15, boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST), EPS,
                 "「我方全体造成的伤害提高 15%」 reaches a teammate too");
+    }
+
+    // ==================================================================
+    // 124 / 319 / 320 -- 「装备者及其忆灵」 reaches a LATE arrival (M-39)
+    // ==================================================================
+
+    /**
+     * The memosprite half of a pre-battle effect lands when the memosprite arrives.
+     *
+     * <p>This is the decision M-39 needed: `target: "summon"` cannot be filed at BATTLE_START (nothing may be
+     * out, and the selector fails loudly rather than silently missing), so each tier carries a second rule on
+     * SUMMONED. Both halves are asserted: the wearer gets hers at the start, the memosprite gets hers when it
+     * appears — including for a wearer whose kit summons it mid-fight, which is the case the single BATTLE_START
+     * rule could not serve at all.
+     */
+    @Test
+    public void aPreBattleMemospriteEffectLandsOnArrival() {
+        Character wearer = wearing(SERENE_DEMESNE);               // 谧宁拾骨地: HP >= 5000 -> CRIT DMG +28%
+        wearer.setAttribute(AttributeType.HEALTH, new DoubleValue(6_000));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        double wearerBoost = boostOf(wearer, AttributeType.CRIT_ATTACK);
+
+        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
+        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
+        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
+        Summon evey = battle.summon(wearer, MONSTER, 1);
+        battle.processRequests();                                // where SUMMONED is fired, by design
+
+        Assertions.assertTrue(wearerBoost > bareCritDamage(), "the wearer was granted hers at the start");
+        Assertions.assertEquals(0.28, boostOf(evey, AttributeType.CRIT_ATTACK), EPS,
+                "and the memosprite gets the same 28% when it arrives -- not at battle start, when it was not "
+                        + "there yet. (Asserted as the raw value, not against the wearer's total: hers includes "
+                        + "the base 0.5 CRIT DMG every character has, and the memosprite's panel gives it none.)");
+    }
+
+    /** Below the threshold nothing is granted, to either unit. */
+    @Test
+    public void aPreBattleMemospriteEffectRespectsItsThreshold() {
+        Character wearer = wearing(SERENE_DEMESNE);
+        wearer.setAttribute(AttributeType.HEALTH, new DoubleValue(4_000));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+
+        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
+        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
+        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
+        Summon evey = battle.summon(wearer, MONSTER, 1);
+        battle.processRequests();                                // where SUMMONED is fired, by design
+
+        Assertions.assertEquals(0, boostOf(evey, AttributeType.CRIT_ATTACK), EPS,
+                "4000 is below 「大于等于 5000 点」 -- and HEALTH is a base attribute, so the literal is absolute");
+    }
+
+    /** The nested tiers hold on both halves: 90 speed grants 32%, not 20% + 32%. */
+    @Test
+    public void thePoetsNestedTiersHoldOnBothHalves() {
+        Character wearer = wearing(POET);                        // 哀歌覆国的诗人: SPD < 110 / < 95
+        wearer.setAttribute(AttributeType.SPEED, new DoubleValue(90));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
+        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
+        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
+        Summon evey = battle.summon(wearer, MONSTER, 1);
+        battle.processRequests();                                // where SUMMONED is fired, by design
+
+        // Measured on the memosprite: its panel states HEALTH and SPEED only, so its CRIT Rate IS the buff
+        // (0.32). The wearer's own value is unusable as an absolute -- the relic's random sub-stats carry
+        // CRIT Rate of their own, which is how the first draft read 0.69394.
+        Assertions.assertEquals(0.32, boostOf(evey, AttributeType.CRIT_CHANCE), 1e-6,
+                "「小于 95」 alone: without the upper tier's exclusion this would be 0.52");
+        Assertions.assertTrue(boostOf(wearer, AttributeType.CRIT_CHANCE) > bareCritRate(),
+                "and the wearer was granted hers at the start");
+    }
+
+    /** The healing tiers reach the memosprite too, through OUTGOING_HEALING_BOOST. */
+    @Test
+    public void theGiantTreesHealingTiersReachTheMemosprite() {
+        Character wearer = wearing(RAPT_BROODING);               // 渊思寂虑的巨树: SPD >= 135 / >= 180
+        wearer.setAttribute(AttributeType.SPEED, new DoubleValue(190));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
+        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
+        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
+        Summon evey = battle.summon(wearer, MONSTER, 1);
+        battle.processRequests();                                // where SUMMONED is fired, by design
+
+        Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.OUTGOING_HEALING_BOOST), 1e-6,
+                "the upper tier on the wearer, with no lower tier added on top");
+        Assertions.assertEquals(0.2, boostOf(evey, AttributeType.OUTGOING_HEALING_BOOST), 1e-6,
+                "and on the memosprite");
     }
 
     // ==================================================================
@@ -304,6 +405,10 @@ public class RelicAbilityBatchTest {
         return wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
     }
 
+    private static double bareCritRate() {
+        return CharacterFactory.create(WEARER, LEVEL).getAttribute(AttributeType.CRIT_CHANCE).get();
+    }
+
     private static double bareCritDamage() {
         return CharacterFactory.create(WEARER, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
     }
@@ -314,8 +419,8 @@ public class RelicAbilityBatchTest {
                 new Damage(attacker, target, DamageElement.PHYSICAL, DamageType.NORMAL, 1_000));
     }
 
-    private static double boostOf(Character character, AttributeType attribute) {
-        return character.getAttribute(attribute).get();
+    private static double boostOf(CanHit unit, AttributeType attribute) {
+        return unit.getAttribute(attribute).get();
     }
 
     private static Enemy dummy() {
