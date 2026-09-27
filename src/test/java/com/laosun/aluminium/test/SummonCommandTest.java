@@ -442,19 +442,21 @@ public class SummonCommandTest {
     }
 
     /**
-     * Casting the ultimate removes the toughness <b>its own skill states</b> — the commanded attack carries no
-     * stance of its own, and needs none.
+     * Casting the ultimate removes the toughness <b>its own skill states</b> — and after M-40 it is the
+     * <b>commanded</b> attack that removes it.
      *
-     * <p>141303's {@code stance_list} is {@code single 0 / all 90}, so one real cast takes a 90-point bar to 0. The
-     * reduction comes from the engine's ordinary damaging path, not from the command: a commanded attack is an
-     * {@code EnemySkill} assembled from the named skill's element, shape and multiplier, and the toughness is the
-     * same kind of fact — read from the single place it is written down, which is that skill's own data. ⚠ Which is
-     * also why {@code COMMAND_SUMMON} must <b>not</b> grow a stance argument: the ultimate's cast and the
-     * memosprite's hit are one damage instance in the documents, and stating the 90 twice would remove it twice.
+     * <p>141303's {@code stance_list} is {@code single 0 / all 90}, so one real cast takes a 90-point bar to 0; the
+     * bar is widened to 300 here so that "90 removed" and "180 removed" cannot read the same. ⚠ The 90 travels with
+     * the <b>swing</b>: since her cast delegates its own damage ({@code DELEGATE_DAMAGE} on {@code CAST_SETUP}),
+     * the executor expands no damage and removes no toughness of its own, so this op reads the column off the
+     * named skill and hands it to the {@code EnemySkill} the memosprite swings with. That is the same "one source"
+     * rule the element, the shape and the multiplier already follow — which is also why the op still takes no
+     * stance <b>argument</b>: writing the 90 in the rule would be a second copy of the number, and getting it
+     * wrong would be a second helping of toughness.
      *
      * <p>Driven through the real cast ({@code Battle.castImmediate}) rather than by firing {@code ULT_CAST} by hand,
-     * which is what the other cases here do: the trigger path is precisely <b>not</b> where the toughness comes
-     * from, so a hand-fired event would measure 0 and "prove" a gap that does not exist.
+     * which is what the other cases here do: the cast is what runs {@code CAST_SETUP} and therefore what makes the
+     * delegation happen at all.
      */
     @Test
     public void castingTheUltimateRemovesTheToughnessItsOwnSkillStates() {

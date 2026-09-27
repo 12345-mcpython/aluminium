@@ -237,4 +237,30 @@ public class SkillData {
     public SkillCategory getCategory() {
         return SkillCategory.fromString(skillType);
     }
+
+    /**
+     * The toughness <b>one hit</b> of this skill removes — the single place that maps an attack shape onto
+     * {@link Skill.StanceList}'s three columns ({@code single} / {@code all} / {@code spread}).
+     *
+     * <p><b>Why it lives here rather than in the executor.</b> Two callers need the same answer and must not
+     * drift: {@code SkillExecutor} (a skill's own cast) and the trigger interpreter's {@code COMMAND_SUMMON}
+     * (a <b>commanded</b> attack, which is the same swing delivered by a summon). ⚠ It used to be split three
+     * ways — AOE and BLAST read {@code getStanceList()} themselves while only BOUNCE went through a helper — and
+     * a mutant that zeroed the helper's AOE arm survived the whole suite (2026-09-27), which is what a dead
+     * branch looks like from the outside.
+     *
+     * <p>{@code mainTarget} is what separates BLAST's centre ({@code single}) from its neighbours ({@code spread}).
+     * A skill with no stance data ({@code StanceList(0, 0, 0)}) answers {@code 0} everywhere, which is the
+     * documented "this skill removes no toughness".
+     *
+     * @param mainTarget whether the hit is on the skill's main target (only BLAST distinguishes)
+     * @return the toughness to remove per hit
+     */
+    public double stanceFor(boolean mainTarget) {
+        return switch (getEffect()) {
+            case AOE_ATTACK -> getStanceList().all();
+            case BLAST -> mainTarget ? getStanceList().single() : getStanceList().spread();
+            default -> getStanceList().single();
+        };
+    }
 }
