@@ -116,6 +116,39 @@ public enum SkillCategory {
     }
 
     /**
+     * The category a <b>rule</b> means when it names a slot ({@link SkillType}).
+     *
+     * <p><b>Why two vocabularies, and why this table is needed.</b> The data labels each skill with an
+     * {@code attack_type} ({@code Normal} / {@code BPSkill} / {@code Ultra} / empty for talents and follow-ups) and
+     * that is what rides along on a {@code Damage} instance; content names a slot the way the engine's own
+     * {@code "skill"} field does ({@code COMMON} / {@code SKILL} / {@code ULTRA} / {@code TALENT}). A sentence like
+     * 「**施放战技**对敌方目标造成弱点击破时」 compares the two, so the translation lives here, once — a second copy
+     * at the call site would be free to disagree with this one.
+     *
+     * <p>⚠ {@code TALENT} maps to {@link #UNSPECIFIED}, and that is the point rather than a gap: a talent or a
+     * follow-up attack carries no attack type in the data because it is <b>not an active cast</b>, so
+     * 「施放战技…造成弱点击破」 must <b>not</b> match a break caused by 姬子's own follow-up.
+     *
+     * @param slot the slot a rule named, or {@code null}
+     * @return the category a damage instance from that slot carries ({@code null} in → {@code null} out)
+     */
+    public static SkillCategory of(SkillType slot) {
+        if (slot == null) {
+            return null;
+        }
+        return switch (slot) {
+            case COMMON -> NORMAL;
+            case SKILL -> BPSKILL;
+            case ULTRA -> ULTRA;
+            case TALENT -> UNSPECIFIED;
+            // Out-of-battle slots (秘技/地图普攻) never produce an in-battle damage instance, so a rule that names
+            // one is asking about an event that cannot happen -- `TriggerTable` refuses those names rather than
+            // mapping them, so reaching here is an engine fault.
+            default -> null;
+        };
+    }
+
+    /**
      * Whether this value is a stand-in for {@code null} — i.e. the data **simply has no** attack type.
      *
      * <p>Used for branches like "talents/follow-up attacks": they are a legitimate empty, not a data error.

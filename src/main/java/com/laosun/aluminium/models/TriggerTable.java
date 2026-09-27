@@ -7,6 +7,8 @@ import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.SkillCategory;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import lombok.Getter;
 
@@ -718,6 +720,25 @@ public class TriggerTable {
     private static final Pattern HAS_SHIELD =
             Pattern.compile("(?<![\\w])has_shield(?![\\w])", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * The {@code from_skill} keyword: "the instance that caused this event came from this slot"
+     * (「施放<b>战技</b>对敌方目标造成弱点击破时」).
+     */
+    private static final Pattern FROM_SKILL =
+            Pattern.compile("(?<![\\w])from_skill(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * The events whose {@code TriggerContext} carries the <b>causing damage instance</b>, and therefore the only ones
+     * on which {@code from_skill} can ever be true.
+     *
+     * <p>⚠ Checked at load time, because the alternative is the failure mode this project keeps refusing: a rule that
+     * loads, fires on every matching event, and silently never matches its condition. A kill and a weakness break both
+     * happen while an instance is being settled ({@code Battle.applyDamage} / {@code Battle.reduceToughness}), and
+     * {@code DEALING_DAMAGE} is the instance's own event.
+     */
+    private static final Set<TriggerEvent> DAMAGE_CARRYING_EVENTS =
+            Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL);
+
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException("Empty trigger condition (source: " + spec.getSource() + ")");
@@ -816,6 +837,29 @@ public class TriggerTable {
             }
             return new HasShield(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw,
                     spec);
+        }
+
+        // `from_skill COMMON|SKILL|ULTRA|TALENT`: the causing instance's cast category. No subject: the "who" is
+        // already a separate condition (`actor == self`), and the sentence never names a second unit.
+        Matcher fromSkill = FROM_SKILL.matcher(text);
+        if (fromSkill.find()) {
+            String before = normalize(text.substring(0, fromSkill.start()));
+            String slot = text.substring(fromSkill.end()).trim();
+            if (!before.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something before \"from_skill\": the keyword takes no "
+                                + "subject -- who caused it is its own condition, so write for example "
+                                + "\"actor == self\" and \"from_skill SKILL\" (source: " + spec.getSource() + ")");
+            }
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks which slot caused the event, but " + spec.getOn()
+                                + " carries no causing damage instance, so the condition could never hold; it works on "
+                                + String.join(" / ", DAMAGE_CARRYING_EVENTS.stream().map(Enum::name).sorted().toList())
+                                + " (source: " + spec.getSource() + ")");
+            }
+            return new FromSkill(requireInBattleSlot(slot, raw, spec), raw, spec);
         }
 
         if (!containsOperator(text)) {
@@ -1210,9 +1254,21 @@ public class TriggerTable {
      *                 ({@link TriggerEvent#DEALING_DAMAGE}); {@code null} everywhere else
      * @param battle   the battle in progress, for questions about the field (may be {@code null} in a
      *                 hand-built context, which makes those conditions fail rather than guess)
+     * @param fromCast the {@link SkillCategory} of the cast that produced this event's instance, when the event can
+     *                 name one ({@link TriggerEvent#BREAK} / {@link TriggerEvent#KILL} / {@link
+     *                 TriggerEvent#DEALING_DAMAGE}); {@code null} = "no cast caused it", which is what a break from a
+     *                 rule-driven toughness reduction honestly is
      */
     public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
-                                 Damage damage, Battle battle) {
+                                 Damage damage, Battle battle, SkillCategory fromCast) {
+
+        /**
+         * The same context for an event that carries no cast category — i.e. the common case.
+         */
+        public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
+                              Damage damage, Battle battle) {
+            this(owner, actor, target, hitCount, amount, damage, battle, null);
+        }
 
         /**
          * The context of an event that carries no damage instance — i.e. every event but
@@ -1488,7 +1544,6 @@ public class TriggerTable {
      * and 遗器 103/110/120's 「装备者提供的护盾量」 both need it.
      */
     private static final class HasShield implements Condition, PartyCondition {
-
         private final String subject;
         private final String raw;
 
@@ -1517,6 +1572,78 @@ public class TriggerTable {
         public String source() {
             return raw;
         }
+    }
+
+    /**
+     * {@code from_skill COMMON|SKILL|ULTRA|TALENT} — the instance that caused this event came from that slot.
+     *
+     * <p><b>Why the DSL needs it.</b> 1003 姬子's 星魂 4 says 「**施放战技**对敌方目标造成弱点击破时，姬子额外获得1点充能」 and
+     * her ultimate pays per kill 「**每消灭1个**敌方目标」. {@code BREAK} and {@code KILL} already carry <b>who</b> caused
+     * them ({@code actor}), but not <b>which ability</b>: without this term `actor == self` on a break would also pay for
+     * a break left by her basic attack or by her talent's follow-up, which the text excludes — a wrong number with
+     * nothing to report.
+     *
+     * <p>⚠ <b>No subject.</b> "Who did it" is its own condition ({@code actor == self}), so writing one here would be a
+     * second way to say the same thing.
+     *
+     * <p>⚠ A break/kill with no causing instance (a rule that reduces toughness directly, an enemy skill that builds
+     * its damage inline) answers <b>false</b>: the event happened, but nothing can say which skill produced it.
+     */
+    private static final class FromSkill implements Condition {
+
+        private final SkillType slot;
+        private final String raw;
+
+        FromSkill(SkillType slot, String raw, TriggerSpec spec) {
+            this.slot = slot;
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            SkillCategory wanted = SkillCategory.of(slot);
+            return ctx.fromCast() != null && ctx.fromCast() == wanted;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * Reads the slot {@code from_skill} names, refusing anything that is not an <b>in-battle</b> cast.
+     *
+     * <p>Closed set, like every other vocabulary here: a typo would make the condition never true, and 秘技/地图普攻
+     * ({@code MAZE} / {@code TECHNIQUE}) never produce an in-battle damage instance at all — so they are refused with
+     * the list instead of silently never matching.
+     */
+    private static SkillType requireInBattleSlot(String name, String raw, TriggerSpec spec) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' has no slot after \"from_skill\": it needs one of "
+                            + inBattleSlots() + " (source: " + spec.getSource() + ")");
+        }
+        SkillType slot;
+        try {
+            slot = SkillType.valueOf(name.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException unknown) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' names the unknown skill slot '" + name + "'; known slots are "
+                            + inBattleSlots() + " (source: " + spec.getSource() + ")");
+        }
+        if (SkillCategory.of(slot) == null) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' names the slot " + slot + ", which is not an in-battle cast "
+                            + "(秘技 / 地图普攻 produce no in-battle damage instance), so the condition could never "
+                            + "hold; use one of " + inBattleSlots() + " (source: " + spec.getSource() + ")");
+        }
+        return slot;
+    }
+
+    private static String inBattleSlots() {
+        return String.join(" / ", List.of(SkillType.COMMON.name(), SkillType.SKILL.name(),
+                SkillType.ULTRA.name(), SkillType.TALENT.name()));
     }
 
     /**
