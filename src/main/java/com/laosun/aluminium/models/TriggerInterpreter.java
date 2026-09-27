@@ -132,7 +132,7 @@ public final class TriggerInterpreter {
      */
     private static final Set<String> TARGET_SELECTORS =
             Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
-                    "target_and_summon");
+                    "target_and_summon", "all_enemies");
 
     /**
      * The two spellings of "every one of our characters".
@@ -167,6 +167,22 @@ public final class TriggerInterpreter {
      * battle like the other group selectors.
      */
     private static final String TARGET_AND_SUMMON = "target_and_summon";
+
+    /**
+     * "The whole of the <b>other</b> side" — 「对敌方全体」.
+     *
+     * <p>Its first user is 姬子's Talent (「对敌方全体目标造成等同于姬子140%攻击力的火属性伤害」). Every other
+     * group selector reads {@link Battle#allies}, so "all enemies" had no spelling at all: the only way to reach
+     * the other camp was {@code target}, one unit at a time, which is not what 「全体」 says.
+     *
+     * <p>Read through {@link Battle#getOpponents}, so 「敌方」 means "the camp opposing the rule's owner" rather
+     * than "the {@code enemies} list" — the same answer for every character (they are all on our side), and the
+     * honest one if a rule ever belongs to an enemy. ⚠ The dead are <b>not</b> filtered here: like
+     * {@code all_allies}, the selector answers "who is on that side", and the op decides what it can do with
+     * them ({@code DAMAGE} skips a dead victim on its own). It needs a battle, which is why it is resolved in
+     * the list resolver and not the single-target one.
+     */
+    private static final String TARGET_ALL_ENEMIES = "all_enemies";
 
     private TriggerInterpreter() {
     }
@@ -404,7 +420,13 @@ public final class TriggerInterpreter {
             }
             case "GAIN_RESOURCE" -> gainResource(effect, ctx);
             case "SPEND_RESOURCE" -> spendResource(effect, ctx);
-            case "DAMAGE" -> damage(battle, effect, ctx);
+            case "DAMAGE" -> {
+                // A list, like HEAL/SHIELD: 「对敌方全体」 is one effect that reaches several units, and the
+                // engine settles one instance per victim (that is what a group attack is here).
+                for (CanHit victim : resolveTargets(battle, effect, ctx)) {
+                    damage(battle, effect, ctx, victim);
+                }
+            }
             case "MODIFY_ATTR" -> modifyAttr(battle, effect, ctx);
             case "APPLY_BUFF" -> applyState(battle, effect, ctx);
             case "REMOVE_STACK" -> removeStacks(battle, effect, ctx);
@@ -613,6 +635,17 @@ public final class TriggerInterpreter {
                 party.add(ally);
             }
             return List.copyOf(party);
+        }
+        if (TARGET_ALL_ENEMIES.equals(selector)) {
+            if (battle == null) {
+                throw new IllegalStateException(
+                        "Effect targets \"" + TARGET_ALL_ENEMIES
+                                + "\" but no battle was supplied to take the opposing camp from");
+            }
+            // `getOpponents` is the one predicate for "the other side" (it also answers correctly for an enemy
+            // owner), and it does not filter the dead -- the op does, because only the op knows whether a dead
+            // unit is something it can act on.
+            return List.copyOf(battle.getOpponents(ctx.owner()));
         }
         if (TARGET_AND_SUMMON.equals(selector)) {
             if (battle == null) {
@@ -1393,8 +1426,8 @@ public final class TriggerInterpreter {
         if (!TARGET_SELECTORS.contains(selector)) {
             throw new IllegalArgumentException(
                     "Op " + op + " names an unknown \"target\" selector '" + effect.getTarget()
-                            + "' (known: self / target / attacker / all_allies); it used to fall back "
-                            + "to the owner, which made a typo behave like self "
+                            + "' (known: " + String.join(" / ", TARGET_SELECTORS.stream().sorted().toList())
+                            + "); it used to fall back to the owner, which made a typo behave like self "
                             + "(source: " + spec.getSource() + ")");
         }
     }
@@ -1722,9 +1755,15 @@ public final class TriggerInterpreter {
      * @param effect the effect ({@code skill}, {@code damage_param}, optional {@code target})
      * @param ctx    the context
      */
-    private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    /**
+     * {@code DAMAGE}: one extra damage instance, settled with the numbers of one of the owner's own skills.
+     *
+     * <p>The victim is handed in by the caller ({@link #applyOne} walks the resolved list), because the same
+     * effect may reach a whole side: 「对敌方全体」 settles one instance per victim, and every number is read
+     * from the skill's parameter row exactly as before.
+     */
+    private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim) {
         CanHit attacker = ctx.owner();
-        CanHit victim = resolveTarget(effect, ctx);
         if (victim == null || victim.isDeath()) {
             return;
         }

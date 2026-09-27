@@ -1,17 +1,23 @@
 package com.laosun.aluminium.data;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.models.TriggerTable;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Loads character trigger tables from {@code resources/characters/<cid>.json} (P8-7).
@@ -36,6 +42,28 @@ import java.util.Map;
  * error</b>: it yields {@link TriggerTable#EMPTY}, matching "unregistered = empty table". A file
  * that exists but is <b>invalid</b> is a different matter and throws, so a typo cannot pass
  * unnoticed.
+ *
+ * <h2>Two shapes, one of them the rule list</h2>
+ * A file is either a bare <b>array</b> of rules — what every file written before resources existed
+ * looks like, and still exactly what a character with nothing but rules needs — or an <b>object</b>
+ * with a {@code rules} array plus the character's {@code resources} declarations (P8-8):
+ *
+ * <pre>
+ * [ { "on": "SKILL_CAST", ... } ]                     // rules only
+ * { "resources": [ { "id": "充能", "max": 3 } ],
+ *   "rules":     [ { "on": "BREAK", ... } ] }         // a character with a resource
+ * </pre>
+ *
+ * <p><b>Why the array stays.</b> Wrapping thirteen shipped files in an object that adds nothing to
+ * them would be churn with a real cost (every one of those files carries a long {@code note} block,
+ * so a reformat is a diff nobody can read) and no benefit: the rule list is the whole content of a
+ * file that has nothing else to declare. A file that <b>does</b> declare resources must use the
+ * object form, because the declarations and the rules that read them belong in one place — the
+ * resource name is spelled in both.
+ *
+ * <p>An object with no {@code rules} is <b>refused</b> rather than read as "no rules": the shape
+ * exists to hold both halves, and a misspelled key ({@code "trigger"}) would otherwise produce a
+ * character that silently does nothing. For the same reason an unknown key is refused.
  */
 public final class TriggerTables {
 
@@ -60,6 +88,39 @@ public final class TriggerTables {
      * {@code /characters/}. Gson is stateless and cheap to construct.
      */
     private static final Gson GSON = new Gson();
+
+    /**
+     * The two list types this loader reads. Hoisted out of the parse so the two shapes share them.
+     */
+    private static final Type SPEC_LIST = new TypeToken<List<TriggerSpec>>() {
+    }.getType();
+
+    private static final Type RESOURCE_LIST = new TypeToken<List<ResourceSpec>>() {
+    }.getType();
+
+    /**
+     * The keys the object form may carry. Anything else is refused — see the class docs.
+     */
+    private static final Set<String> OBJECT_KEYS = Set.of("resources", "rules");
+
+    /**
+     * The keys one resource declaration may carry.
+     *
+     * <p>Read off {@link ResourceSpec}'s own record components rather than typed out again: the two lists are
+     * the same list, and a hand-written copy would refuse a valid file the day a field is added (loud, but
+     * wrong) — or, worse, accept one Gson will drop.
+     */
+    private static final Set<String> RESOURCE_KEYS = resourceKeys();
+
+    private static Set<String> resourceKeys() {
+        Set<String> keys = new java.util.TreeSet<>();
+        for (java.lang.reflect.RecordComponent component : ResourceSpec.class.getRecordComponents()) {
+            com.google.gson.annotations.SerializedName name =
+                    component.getAnnotation(com.google.gson.annotations.SerializedName.class);
+            keys.add(name == null ? component.getName() : name.value());
+        }
+        return Set.copyOf(keys);
+    }
 
     /**
      * How many times a file has actually been read (not merely asked for).
@@ -134,23 +195,106 @@ public final class TriggerTables {
                 loadCount++;
             }
             List<TriggerSpec> specs;
+            List<ResourceSpec> resources = List.of();
             try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                specs = GSON.fromJson(reader, new TypeToken<List<TriggerSpec>>() {
-                }.getType());
+                JsonElement root = JsonParser.parseReader(reader);
+                if (root.isJsonArray()) {
+                    specs = GSON.fromJson(root, SPEC_LIST);
+                } else if (root.isJsonObject()) {
+                    JsonObject object = root.getAsJsonObject();
+                    for (String key : object.keySet()) {
+                        if (!OBJECT_KEYS.contains(key)) {
+                            throw new IllegalArgumentException(
+                                    "unknown key \"" + key + "\"; this file is either a bare array of "
+                                            + "rules or an object with " + OBJECT_KEYS.stream().sorted()
+                                            .toList());
+                        }
+                    }
+                    JsonElement rules = object.get("rules");
+                    if (rules == null || rules.isJsonNull()) {
+                        throw new IllegalArgumentException(
+                                "the object form needs a \"rules\" array; only a bare array may omit it "
+                                        + "(a character with nothing but rules uses the array form)");
+                    }
+                    specs = GSON.fromJson(rules, SPEC_LIST);
+                    JsonElement declared = object.get("resources");
+                    if (declared != null && !declared.isJsonNull()) {
+                        // Checked on the raw JSON, before Gson sees it: Gson drops a key it does not know, so
+                        // a misspelled "intial": 1 would be read as "starts at 0" -- a wrong number with
+                        // nothing to report, which is the failure this whole class guards against. (The
+                        // required "max" already catches "mx"; this catches the rest.)
+                        requireKnownKeys(declared, RESOURCE_KEYS, "resource declaration");
+                        // Gson builds records through their canonical constructor, so ResourceSpec's own
+                        // validation runs on this path too (pinned by CharacterResourceTest).
+                        resources = GSON.fromJson(declared, RESOURCE_LIST);
+                    }
+                } else {
+                    throw new IllegalArgumentException(
+                            "the file must be a JSON array of rules or an object with \"rules\"");
+                }
             }
             // Construction validates every rule (unknown event, unwired event, malformed condition,
             // unknown op); a bad file therefore fails here rather than at battle time.
-            return new TriggerTable(cid, specs);
+            return new TriggerTable(cid, specs, resources);
         } catch (java.io.IOException e) {
             throw new IllegalStateException("Failed to read trigger table for cid " + cid, e);
         } catch (RuntimeException e) {
             throw new IllegalStateException(
-                    "Invalid trigger table for cid " + cid + " (" + path + "): " + e.getMessage(), e);
+                    "Invalid trigger table for cid " + cid + " (" + path + "): " + reasonOf(e), e);
         }
+    }
+
+    /**
+     * The most specific message in an exception's cause chain.
+     *
+     * <p>Needed because Gson <b>wraps</b> a failure inside a value object's constructor:
+     * {@code ResourceSpec}'s own rejection of 「max: 0」 arrives as
+     * {@code RuntimeException("Failed to invoke constructor ... with args [充能, 0, null, null, null]")}, and its
+     * cause — the sentence that says <em>why</em> — is the only useful part. Reporting the wrapper alone would
+     * turn a precise content error into "something went wrong with a constructor", which is the kind of message
+     * that makes an author guess.
+     *
+     * <p>Both messages are kept when they differ: the wrapper names what was being built, the cause says what was
+     * wrong with it.
+     */
+    private static String reasonOf(Throwable e) {
+        StringBuilder reason = new StringBuilder(String.valueOf(e.getMessage()));
+        Throwable cause = e.getCause();
+        while (cause != null && cause != cause.getCause()) {
+            reason.append(" -- caused by: ").append(cause.getMessage());
+            cause = cause.getCause();
+        }
+        return reason.toString();
     }
 
     private static String resourceFor(int cid) {
         String path = "/" + DIR + "/" + cid + ".json";
         return TriggerTables.class.getResource(path) == null ? null : path;
+    }
+
+    /**
+     * Refuses a key Gson would silently drop.
+     *
+     * <p>{@code value} is either one object (the file) or an array of them (the resource declarations); an
+     * array may be empty, and anything else is not a shape this file understands.
+     */
+    private static void requireKnownKeys(JsonElement value, Set<String> known, String what) {
+        if (value.isJsonArray()) {
+            for (JsonElement element : value.getAsJsonArray()) {
+                requireKnownKeys(element, known, what);
+            }
+            return;
+        }
+        if (!value.isJsonObject()) {
+            throw new IllegalArgumentException(what + " must be a JSON object, not " + value.getClass()
+                    .getSimpleName());
+        }
+        for (String key : value.getAsJsonObject().keySet()) {
+            if (!known.contains(key)) {
+                throw new IllegalArgumentException(
+                        "unknown key \"" + key + "\" in a " + what + "; known: "
+                                + known.stream().sorted().toList());
+            }
+        }
     }
 }
