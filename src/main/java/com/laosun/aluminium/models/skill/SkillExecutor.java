@@ -423,23 +423,10 @@ public final class SkillExecutor {
             }
         }
 
-        broadcastAfterAttack(battle, user, mainTarget, hitTargets, totalDamage);
-    }
-
-    /**
-     * Fires {@link com.laosun.aluminium.models.event.AttackEvent} on every ally (this is how Robin's
-     * (知更鸟) / Tribbie's (缇宝) "after one of our attacks" effects carried on themselves receive it).
-     * Additional damage / true damage does not go through here, so it does not recurse.
-     */
-    private static void broadcastAfterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
-                                             Set<CanHit> hitTargets, double totalDamage) {
-        if (hitTargets.isEmpty()) {
-            return;                                  // not a single hit landed → does not count as an attack
-        }
-        List<CanHit> targets = List.copyOf(hitTargets);
-        for (CanHit ally : battle.allies) {
-            ally.afterAttack(battle, attacker, mainTarget, targets, totalDamage);
-        }
+        // The attack-level event (P8-6). Single implementation lives on Battle, because a summon's attack
+        // (EnemySkill) is an attack too and must raise the same notification -- see Battle.fireAfterAttack for
+        // which attacks qualify and why derived hits deliberately do not.
+        battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage);
     }
 
     /**

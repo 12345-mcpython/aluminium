@@ -13,7 +13,9 @@ import com.laosun.aluminium.data.SkillData;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Enemy skill (P5-3): data-driven from {@code enemy_skills.json}, not hard-coded.
@@ -129,20 +131,27 @@ public class EnemySkill extends Skill {
         if (victim == null || victim.isDeath()) {
             return;
         }
+        Set<CanHit> hitTargets = new LinkedHashSet<>();
+        double total = 0;
         for (CanHit struck : struckBy(victim, user, battle)) {
-            strike(battle, user, struck);
+            total += strike(battle, user, struck, hitTargets);
         }
+        // P9-4 忆灵 / M-30: a summon's attack is an attack, so our side hears about it exactly once, after
+        // every segment has been settled -- the same notification a character's skill raises. Before this, a
+        // memosprite's attack told nobody, so a buff on the memosprite itself
+        // ({@code "target": "summon"} + {@code "until": "next_attack"}) was never consumed and simply stayed.
+        battle.fireAfterAttack(user, victim, hitTargets, total);
     }
 
     /**
      * Who this skill reaches, given the caller's main target.
      */
     private List<CanHit> struckBy(CanHit mainTarget, CanHit user, Battle battle) {
-        // ⚠ Deliberately NOT filtered to the living here. A dead character is simply struck for zero
-        // segments by strike()'s own isDeath() check, which is the one guard that matters -- and it is
-        // the one a test can reach. An earlier version filtered here too, and mutation testing showed
-        // the outer filter changed no observable outcome (removing it left every test green), i.e. it
-        // was an untestable second guard for the same fact. One guard, exercised.
+        // ⚠ Deliberately NOT filtered to the living here. A dead unit settles nothing and is not recorded as
+        // hit, because strike() answers both questions itself (it returns 0 without touching hitTargets) --
+        // and that is the one guard a test can reach. An earlier version filtered here too, and mutation
+        // testing showed the outer filter changed no observable outcome (removing it left every test green),
+        // i.e. it was an untestable second guard for the same fact. One guard, exercised.
         // ⚠ The OPPOSING CAMP of the user, not `battle.allies` (the friendly half of L-8). An enemy AOE
         // has to reach a player-side summon too, and (P9-4 忆灵) a memosprite's AOE has to reach the enemy
         // camp. Hard-coding `allies` made every AOE one-sided: it read right while only enemies cast
@@ -175,20 +184,33 @@ public class EnemySkill extends Skill {
     }
 
     /**
-     * Lands {@link #hits} segments on one character.
+     * Lands {@link #hits} segments on one character, recording what it reached and returning what it settled.
      *
      * <p><b>Which number the multiplier applies to</b> is {@link #baseAttribute}: an enemy's attack scales off
      * its ATK (the historical behaviour, and the default), while a memosprite's damage is written as
      * 「等同于忆灵 X% <b>生命上限</b>」 — so the same class serves both by naming the attribute instead of
      * assuming ATK. Only this one line ever cared which it was.
+     *
+     * <p>A target already down is not recorded and settles nothing: "the targets this attack connected with"
+     * follows the same convention {@code SkillExecutor.hit} uses (a target that dies <em>during</em> the attack
+     * still counts — it was hit).
+     *
+     * @param hitTargets collects the targets this segment reached, in hit order
+     * @return the sum of the settled values of this target's segments
      */
-    private void strike(Battle battle, CanHit user, CanHit victim) {
+    private double strike(Battle battle, CanHit user, CanHit victim, Set<CanHit> hitTargets) {
+        if (victim == null || victim.isDeath()) {
+            return 0;
+        }
+        hitTargets.add(victim);
         double base = user.getAttribute(baseAttribute).get() * multiplier;
+        double total = 0;
         for (int i = 0; i < hits; i++) {
             if (victim.isDeath()) {
                 break;                               // once killed mid-way, stop hitting (no overkill on a corpse)
             }
-            battle.applyDamage(victim, new Damage(user, victim, element, type, base));
+            total += battle.applyDamage(victim, new Damage(user, victim, element, type, base));
         }
+        return total;
     }
 }
