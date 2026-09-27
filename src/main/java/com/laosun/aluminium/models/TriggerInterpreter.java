@@ -1111,7 +1111,7 @@ public final class TriggerInterpreter {
      * every other vocabulary here: a typo has to be rejected at load time, and the two spellings are the ones
      * the content actually uses (see {@link EffectSpec#getScale()}).
      */
-    private static final Set<String> SCALES = Set.of("target_max_hp", "owner_max_hp");
+    private static final Set<String> SCALES = Set.of("target_max_hp", "owner_max_hp", "owner_def");
 
     /**
      * The one scale {@code GAIN_ENERGY} accepts: a share of the <b>receiving</b> unit's maximum energy.
@@ -1153,10 +1153,14 @@ public final class TriggerInterpreter {
             requireAmount(effect, op, spec);
             return;
         }
-        if (effect.getAmount() != null) {
+        // ⚠ `amount` together with a `scale` is the shape 「等同于 X% 防御力 + 760」: the scale is the share OF
+        // something, and the amount is the flat addend. It used to be refused here ("which one wins?"), which is why
+        // no shipped rule states both -- so allowing it now changes no existing content.
+        if (effect.getAmount() != null && effect.getPercent() == null) {
             throw new IllegalArgumentException(
-                    "Op " + op + " states both \"amount\" and \"scale\": it is either a flat number or a share "
-                            + "of a " + what + ", not both (source: " + spec.getSource() + ")");
+                    "Op " + op + " states \"scale\" together with \"amount\" but no \"percent\": the scale says what "
+                            + "the share is OF, so the share itself is missing "
+                            + "(source: " + spec.getSource() + ")");
         }
         if (!scales.contains(scale)) {
             throw new IllegalArgumentException(
@@ -1189,18 +1193,34 @@ public final class TriggerInterpreter {
             return scaledAmount(effect, ctx);
         }
         double share = effect.getPercent();
+        double flat = effect.getAmount() == null ? 0 : effect.getAmount();
         return switch (scale.trim()) {
-            case "target_max_hp" -> target.getMaxHp() * share;
-            case "owner_max_hp" -> {
-                if (ctx.owner() == null) {
-                    throw new IllegalStateException(
-                            "Op uses scale \"owner_max_hp\" but the context has no owner to read it from");
-                }
-                yield ctx.owner().getMaxHp() * share;
-            }
+            case "target_max_hp" -> target.getMaxHp() * share + flat;
+            case "owner_max_hp" -> ownerAttributeOf(ctx, "owner_max_hp", AttributeType.HEALTH) * share + flat;
+            // 三月七 100102: a shield of 「57% 防御力 + 760」 -- a share of the maker's DEFENCE plus a constant.
+            case "owner_def" -> ownerAttributeOf(ctx, "owner_def", AttributeType.DEFENCE) * share + flat;
             default -> throw new IllegalStateException(
                     "Scale '" + scale + "' passed validation but has no implementation");
         };
+    }
+
+    /**
+     * One attribute of the rule owner, for the {@code owner_*} scales of a heal or shield.
+     *
+     * <p>⚠ A missing owner, or an owner without that attribute, is a loud failure rather than 0: a shield of
+     * 「some share of nothing」 would be a wrong number with no symptom.
+     */
+    private static double ownerAttributeOf(TriggerContext ctx, String scale, AttributeType attribute) {
+        if (ctx.owner() == null) {
+            throw new IllegalStateException(
+                    "Op uses scale '" + scale + "' but the context has no owner to read it from");
+        }
+        DoubleValue value = ctx.owner().getAttribute(attribute);
+        if (value == null) {
+            throw new IllegalStateException(
+                    "Op uses scale '" + scale + "' but " + ctx.owner().getName() + " has no " + attribute);
+        }
+        return value.get();
     }
 
     /**
