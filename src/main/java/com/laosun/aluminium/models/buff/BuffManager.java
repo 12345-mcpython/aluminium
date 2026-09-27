@@ -216,6 +216,102 @@ public class BuffManager {
     }
 
     /**
+     * Adds turns to every <b>timed</b> buff on this unit that {@code source} applied <b>and that the rule named</b>,
+     * and reports how many.
+     *
+     * <p><b>Why the two filters.</b> Every sentence in this family identifies the buff by its <b>origin</b> —
+     * 「<b>战技提供的</b>护盾持续时间增加1回合」 (三月七 加护) — and then by <b>what it is</b>: 「战技对指定我方目标造成的
+     * <b>伤害提高效果</b>的持续时间增加1回合」 (布洛妮娅 星魂 6), 「<b>天赋使敌方目标陷入的</b>风化状态的持续时间延长1回合」
+     * (桑博), 「对于已拥有【<b>生息</b>】的我方目标…延长1回合」 (白露). The origin is exact ({@code AbstractBuff.source});
+     * the "what" is a <b>name</b> in the same vocabulary the condition DSL already reads — a {@code StateBuff}'s own
+     * name, a DOT's element name (灼烧), a control's name (冻结), or {@link #SHIELD_STATE} for a shield — or, when
+     * the sentence names no state at all but an <i>effect</i> (「伤害提高效果」), the <b>attribute</b> the modifier sits
+     * on.
+     *
+     * <p>⚠ <b>Both filters are required</b>, and "everything of mine on that unit" is deliberately not a spelling:
+     * 布洛妮娅's DEFENCE trace buff from {@code BATTLE_START} can still be ticking when she casts her Skill, and a
+     * filter that said "all of mine" would silently lengthen that too — a wrong number with nothing to report,
+     * which is exactly what the name/attribute axis exists to prevent.
+     *
+     * <p>⚠ <b>Permanent buffs are skipped</b> ({@code permanent} means "never ticked", so there is no countdown to
+     * lengthen), and so are event-bound ones, which the interpreter builds as permanent. Nothing to lengthen is
+     * <b>not</b> an error — the common shape fires on the same cast that applied the buff, and "it is not there"
+     * is an ordinary empty case, the same reading {@code DISPEL} has.
+     *
+     * <p>⚠ Iterating over a snapshot (M-12), like every other traversal here.
+     *
+     * @param source    who must have applied the buff (usually the rule's owner)
+     * @param stateName a state's name (or {@link #SHIELD_STATE}), or {@code null} when the filter is by attribute
+     * @param attribute the attribute the modifier sits on, or {@code null} when the filter is by name
+     * @param turns     how many turns to add
+     * @return how many buffs were lengthened ({@code 0} when none matched)
+     */
+    public int extendBuffsFrom(CanHit source, String stateName, AttributeType attribute, int turns) {
+        if (source == null || turns <= 0 || (stateName == null && attribute == null)) {
+            return 0;
+        }
+        int extended = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff.isPermanent() || buff.getSource() != source || !isNamed(buff, stateName, attribute)) {
+                continue;
+            }
+            buff.extendDuration(turns);
+            extended++;
+        }
+        return extended;
+    }
+
+    /**
+     * The name a rule uses for a shield ({@code "buff": "护盾"}).
+     *
+     * <p>It is <b>not</b> part of {@link #hasState}'s vocabulary, deliberately: a shield is a <i>scalar</i> on the
+     * combatant, and a raw grant ({@code Battle.grantShield}) leaves no buff behind — so 「有盾」 and
+     * 「处于护盾状态」 would answer differently in exactly the case where the difference is invisible. The name
+     * lives here, where it means "the timed shield buff", and the condition DSL keeps its own spelling
+     * ({@code has_shield}).
+     */
+    public static final String SHIELD_STATE = "护盾";
+
+    /**
+     * Whether one buff is the one a rule named — by state name (or 护盾), or by the attribute a modifier sits on.
+     *
+     * <p>The name vocabulary is the same one the documents and {@code has_state} use, and the translation from a
+     * DOT's element to its name ({@code FIRE} → 灼烧) is {@link #DOT_STATES}, reversed here so the two directions
+     * cannot drift.
+     */
+    private static boolean isNamed(AbstractBuff buff, String stateName, AttributeType attribute) {
+        if (attribute != null) {
+            return buff instanceof StatModifierBuff modifier && modifier.getAttribute() == attribute;
+        }
+        if (buff instanceof ShieldBuff) {
+            return SHIELD_STATE.equals(stateName);
+        }
+        if (buff instanceof ControlBuff control) {
+            return stateName.equals(control.getName());
+        }
+        if (buff instanceof DotBuff dot) {
+            return stateName.equals(stateNameOf(dot.getElement()));
+        }
+        if (buff instanceof StateBuff state) {
+            return stateName.equals(state.getState());
+        }
+        return false;
+    }
+
+    /**
+     * The document's name for a DOT's element ({@code FIRE} → 灼烧), or {@code null} for an element no document
+     * names as a state.
+     */
+    private static String stateNameOf(DamageElement element) {
+        for (Map.Entry<String, DamageElement> entry : DOT_STATES.entrySet()) {
+            if (entry.getValue() == element) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Removes up to {@code count} {@link StatModifierBuff} instances on one attribute, <b>newest first</b>.
      *
      * <p><b>Why this exists.</b> "…stacking up to 3 time(s). At the start of the wearer's turn or after using

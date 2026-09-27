@@ -12,6 +12,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
 import com.laosun.aluminium.models.buff.AbstractBuff;
+import com.laosun.aluminium.models.buff.BuffManager;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.ReductionBuff;
@@ -110,7 +111,7 @@ public final class TriggerInterpreter {
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
-            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT");
+            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -375,6 +376,20 @@ public final class TriggerInterpreter {
                 }
                 requireNoMalformedArguments(effect, op, spec);
             }
+            case "EXTEND_BUFF" -> {
+                // 「…的持续时间增加1回合」: lengthen the buffs THIS owner already applied to the target, named by
+                // their state (「战技提供的护盾」/「天赋使敌方目标陷入的风化状态」) or by the attribute a modifier
+                // sits on (「伤害提高效果」). Nothing else is stated.
+                requirePositiveTurns(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " adds turns to a buff that already exists; \"permanent\" / \"until\" "
+                                    + "describe how a NEW buff ends and are not read here "
+                                    + "(source: " + spec.getSource() + ")");
+                }
+                requireExtendFilter(effect, op, spec);
+            }
             case "SUMMON" -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
                 // (name, panel derivation) lives in resources/memosprites/<cid>.json. A `target` here would
@@ -519,6 +534,7 @@ public final class TriggerInterpreter {
             case "TAUNT" -> taunt(battle, effect, ctx);
             case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
             case "APPLY_DOT" -> applyDot(battle, effect, ctx);
+            case "EXTEND_BUFF" -> extendBuff(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -954,9 +970,9 @@ public final class TriggerInterpreter {
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(withTickOwner(
+            target.getBuffManager().addBuff(withSource(withTickOwner(
                     withLifetime(statModifier(attribute, magnitude, turns, permanent, maxStacks, derived), effect),
-                    effect, ctx));
+                    effect, ctx), ctx));
         }
     }
 
@@ -1164,8 +1180,8 @@ public final class TriggerInterpreter {
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         String state = effect.getBuff().trim();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(
-                    withTickOwner(withLifetime(new StateBuff(state, turns, permanent), effect), effect, ctx));
+            target.getBuffManager().addBuff(withSource(withTickOwner(
+                    withLifetime(new StateBuff(state, turns, permanent), effect), effect, ctx), ctx));
         }
     }
 
@@ -1218,9 +1234,9 @@ public final class TriggerInterpreter {
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(withLifetime(percent > 0
+            target.getBuffManager().addBuff(withSource(withLifetime(percent > 0
                     ? new VulnerabilityBuff(turns, percent, permanent)
-                    : new ReductionBuff(turns, -percent, permanent), effect));
+                    : new ReductionBuff(turns, -percent, permanent), effect), ctx));
         }
     }
 
@@ -1416,7 +1432,7 @@ public final class TriggerInterpreter {
      */
     private static void taunt(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(new TauntBuff(effect.getTurns()));
+            target.getBuffManager().addBuff(withSource(new TauntBuff(effect.getTurns()), ctx));
         }
     }
 
@@ -1522,6 +1538,50 @@ public final class TriggerInterpreter {
             return effect.getAmount();
         }
         return derivedMagnitude(effect, ctx);
+    }
+
+    /**
+     * {@code EXTEND_BUFF}: 「…的持续时间增加1回合」 — lengthen the buffs the rule's <b>owner</b> has already put on
+     * each resolved target.
+     *
+     * <p><b>Why the op names no buff.</b> Every sentence in this family identifies it by its origin instead:
+     * 「<b>战技提供的</b>护盾持续时间增加1回合」 (三月七 加护), 「<b>战技对指定我方目标造成的</b>伤害提高效果的持续时间增加1回合」
+     * (布洛妮娅), 「<b>天赋使敌方目标陷入的</b>风化状态的持续时间延长1回合」 (桑博), 「对于<b>已拥有</b>【生息】的我方目标…延长1回合」
+     * (白露). The engine already records that fact — {@code AbstractBuff.source}, the applier — and the filter is
+     * exact, so the author states the duration and nothing else. 10 of the 97 documents use one of the two
+     * phrasings.
+     *
+     * <p>⚠ <b>Folding the +1 into the ability it lengthens is the wrong fix</b>, and this op exists so that it is
+     * not tempting: the trace's own line would vanish from the data, and the base ability would state a duration
+     * that is not its own. The two numbers belong to two rules because they are two sentences (and a trace could
+     * one day be gated on its own).
+     *
+     * <p>Nothing to lengthen is <b>not</b> an error: the rule fires whenever its event happens (usually the same
+     * cast that applied the buff), and "the target carries nothing of mine" is an ordinary empty case.
+     */
+    private static void extendBuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target == null || target.isDeath()) {
+                continue;
+            }
+            target.getBuffManager().extendBuffsFrom(ctx.owner(), effect.getBuff(),
+                    effect.getAttribute() == null ? null : AttributeType.fromString(effect.getAttribute()),
+                    effect.getTurns());
+        }
+    }
+
+    /**
+     * Stamps a freshly built buff with <b>who applied it</b> ({@code AbstractBuff.source}).
+     *
+     * <p><b>Why every path does this now.</b> The source used to be set only where a constructor demanded it
+     * ({@code DotBuff} needs it for kill credit, {@code ShieldBuff}/{@code ControlBuff} take it), so a
+     * {@code StateBuff} or a stat modifier could be anonymous. {@code EXTEND_BUFF} filters by origin — 「战技提供的护盾」
+     * means "the one <i>I</i> gave" — and an anonymous buff would make that filter silently extend nothing at all.
+     * Recorded here once, for every op that creates a buff, rather than in each of them.
+     */
+    private static AbstractBuff withSource(AbstractBuff buff, TriggerContext ctx) {
+        buff.setSource(ctx.owner());
+        return buff;
     }
 
     private static void removeState(EffectSpec effect, TriggerContext ctx) {
@@ -2218,6 +2278,63 @@ public final class TriggerInterpreter {
             throw new IllegalArgumentException(
                     "Op " + op + " takes an element, a magnitude and a duration; it has no \"attribute\" / "
                             + "\"buff\" / \"skill\" / \"damage_param\" (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates the <b>one</b> filter {@code EXTEND_BUFF} needs: {@code "buff"} (a state's name, or 护盾) or
+     * {@code "attribute"} (the attribute a modifier sits on).
+     *
+     * <p>⚠ <b>Exactly one, and it is required.</b> Without a filter the op would mean "lengthen everything I have on
+     * that unit", and that is a wrong number waiting to happen: 布洛妮娅's DEFENCE trace buff from {@code BATTLE_START}
+     * is still ticking when she casts her Skill, so her 星魂 6 would silently lengthen that one too. Stating both is
+     * refused for the same reason — there is no reading in which a buff is named by a state <i>and</i> an attribute.
+     *
+     * <p>The <b>name</b> is checked against the closed spellings the engine knows (the four DOT names, the three
+     * control names, 护盾) and otherwise accepted as a {@code StateBuff} name — which is free-form by design, exactly
+     * like {@code has_state}'s argument. The <b>attribute</b> is a name from {@code AttributeType}.
+     */
+    private static void requireExtendFilter(EffectSpec effect, String op, TriggerSpec spec) {
+        boolean byName = effect.getBuff() != null && !effect.getBuff().isBlank();
+        boolean byAttribute = effect.getAttribute() != null && !effect.getAttribute().isBlank();
+        if (byName && byAttribute) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states both \"buff\" and \"attribute\"; a buff is named one way or the other "
+                            + "(a state's name, or the attribute a modifier sits on) -- keep one "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (!byName && !byAttribute) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " needs the buff it lengthens: \"buff\" (a state's name such as 灼烧 / 冻结 / "
+                            + "\"" + BuffManager.SHIELD_STATE + "\", or any named state) or \"attribute\" (e.g. "
+                            + "ALL_DAMAGE_TYPE_BOOST for a 「伤害提高效果」). Without one it would mean \"everything "
+                            + "I have on that unit\", which would lengthen buffs the sentence never mentions "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (byAttribute) {
+            AttributeType attribute;
+            try {
+                attribute = AttributeType.fromString(effect.getAttribute());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " names unknown attribute '" + effect.getAttribute()
+                                + "'; use a name from AttributeType, e.g. ALL_DAMAGE_TYPE_BOOST / ATTACK "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            if (attribute.isPercentVariant()) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " names '" + effect.getAttribute() + "', one of the four *_PERCENT "
+                                + "AttributeBuilder input keys; a modifier is never stored on one of those, so "
+                                + "nothing could ever match " + "(source: " + spec.getSource() + ")");
+            }
+        }
+        if (effect.getAmount() != null || effect.getScale() != null || effect.getPercent() != null
+                || effect.getSkill() != null || effect.getDamageParam() != null
+                || effect.getElement() != null || effect.getControl() != null || effect.getBaseChance() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " adds turns to a buff that already exists and states nothing else: the buff it "
+                            + "lengthens keeps its own numbers (no amount / scale / percent / element / control / "
+                            + "base_chance / skill) (source: " + spec.getSource() + ")");
         }
     }
 

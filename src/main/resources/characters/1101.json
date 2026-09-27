@@ -67,5 +67,22 @@
     ],
     "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support): 「解除指定我方单体的1个负面效果，并使该目标立即行动，造成的伤害提高#1[i]%，持续#3[i]回合。」 param Lv10 = [0.66, 0, 1, 1]",
     "note": "「解除指定我方单体的1个负面效果」 + 「造成的伤害提高 66%，持续 1 回合」, both on the aimed ally (`target: \"target\"`). ⚠ 0.66 is written here because MODIFY_ATTR takes a literal; it is the Lv10 row the prose quotes (Lv1 = 0.33, Lv15 = 0.825) -- the same 「which row」 question `damage_level` answers for the ops that read a table (M-32). ⚠ `DISPEL` on a target with nothing to remove is not an error (the op's contract: 「取不到不算错」). ⚠ No condition on the aimed unit beyond `actor == self`, because this half applies in BOTH cases -- only the immediate action is barred for a self-cast, which is why that one is gated `target != self`."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "EXTEND_BUFF",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "turns": 1,
+        "target": "target"
+      }
+    ],
+    "min_eidolon": 6,
+    "source": "1101 布洛妮娅 星魂 6 气贯长虹 (Avatar_Bronya_Rank06): 「战技对指定我方目标造成的伤害提高效果的持续时间增加1回合。」 param = [1]",
+    "note": "「战技对指定我方目标造成的**伤害提高效果**的持续时间增加1回合」: the sentence names an <b>effect</b> rather than a state, and the engine's handle for it is the attribute the modifier sits on (`ALL_DAMAGE_TYPE_BOOST`) -- which is the Skill rule's own `MODIFY_ATTR` in the rule above. ⚠ `min_eidolon: 6` is the whole of what makes this an Eidolon (the engine knows nothing else about 星魂). ⚠ Why the filter is stated rather than \"lengthen everything I applied\": her 「作战再部署」 trace gives the whole party +20% DEFENCE for 2 turns at BATTLE_START, and that buff can still be ticking when she casts her Skill -- a filter that said \"all of mine\" would silently add a turn to it as well. That is the case the attribute/name axis exists to prevent (`ExtendBuffTest.itDoesNotLengthenTheOwnersOtherBuffs`). ⚠ NOT authored from this Eidolon: nothing else -- it is a one-sentence Eidolon."
   }
 ]
