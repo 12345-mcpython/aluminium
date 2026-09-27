@@ -216,6 +216,32 @@ public class BuffManager {
     }
 
     /**
+     * How much this unit resists one <b>class</b> of negative state (「抵抗控制类负面状态的概率提高35%」).
+     *
+     * <p>The sum of every {@link ClassResistBuff} of that class, clamped to 1: two sources <b>add</b>, because they
+     * are two boosts to one probability rather than two independent rolls. {@code 1.0} means immunity — the same
+     * mechanism at its limit, which is how 「免疫控制类负面状态」 and 「抵抗…的概率提高35%」 end up sharing one vocabulary.
+     *
+     * <p>⚠ A {@code null} class (a state nobody classified) answers {@code 0}: it is not protected by any class
+     * resistance, which is the safe direction for content.
+     *
+     * @param kind the family being applied, or {@code null}
+     * @return the resistance fraction in {@code [0, 1]}
+     */
+    public double debuffResistOf(com.laosun.aluminium.enums.DebuffClass kind) {
+        if (kind == null) {
+            return 0;
+        }
+        double total = 0;
+        for (ClassResistBuff resist : allBuffsOf(ClassResistBuff.class)) {
+            if (resist.getKind() == kind) {
+                total += resist.getPercent();
+            }
+        }
+        return Math.min(1, total);
+    }
+
+    /**
      * Adds turns to every <b>timed</b> buff on this unit that {@code source} applied <b>and that the rule named</b>,
      * and reports how many.
      *

@@ -1,13 +1,18 @@
 package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.DebuffClass;
+import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.buff.ControlBuff;
+import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.SummonFactory;
@@ -253,6 +258,62 @@ public class MemospriteTest {
     }
 
     // ==================================================================
+    // 2c. 忆灵技能 2: 「长夜」免疫控制类负面状态
+    // ==================================================================
+
+    /**
+     * 「「长夜」免疫控制类负面状态」 — the <b>summon</b> is immune, and the summoner is not.
+     *
+     * <p><b>Why the pair of assertions.</b> "The control did not land" is also what a broken pipeline looks like, so
+     * the same call is made against 长夜月 herself: it lands there. The difference is the only thing that can be the
+     * immunity, and the immunity is a buff on the unit the document names.
+     *
+     * <p>⚠ Note which unit carries it. The rule is written on 长夜月's table (the engine's tables live on characters)
+     * but its effect targets {@code summon}, because 「长夜」 is the one the sentence protects — a control aimed at her
+     * while 「长夜」 stands beside her is unaffected.
+     */
+    @Test
+    public void theMemospriteIsImmuneToControlsAndItsSummonerIsNot() {
+        Character evernight = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
+        Battle battle = new Battle(List.of(evernight), List.of(monster()), fixed(0.0));
+        battle.startBattle();
+        Summon evey = battle.memospriteOf(evernight);
+        Assertions.assertNotNull(evey, "precondition: her 天赋 summons 「长夜」 at BATTLE_START");
+        // The immunity is what is being measured, so the ordinary resistance is zeroed out on both sides.
+        evey.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
+        evernight.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
+        CanHit caster = battle.enemies.getFirst();
+
+        boolean landedOnEvey = battle.tryApplyDebuff(caster, evey, frozen(), 1.0, null);
+        boolean landedOnEvernight = battle.tryApplyDebuff(caster, evernight, frozen(), 1.0, null);
+
+        Assertions.assertFalse(landedOnEvey, "「长夜」免疫控制类负面状态");
+        Assertions.assertFalse(evey.getBuffManager().hasState("冻结"));
+        Assertions.assertTrue(evey.getBuffManager().canAct(), "and it keeps its turns");
+        Assertions.assertTrue(landedOnEvernight,
+                "the same control, the same roll, lands on her -- so the refusal above is the immunity and not a "
+                        + "control path that quietly stopped working");
+    }
+
+    /** The class is 控制类: 「长夜」's immunity must not make it immune to a burn (持续伤害类). */
+    @Test
+    public void theMemospriteIsStillBurnable() {
+        Character evernight = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
+        Battle battle = new Battle(List.of(evernight), List.of(monster()), fixed(0.0));
+        battle.startBattle();
+        Summon evey = battle.memospriteOf(evernight);
+        evey.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
+
+        boolean landed = battle.tryApplyDebuff(battle.enemies.getFirst(), evey,
+                new DotBuff(evey, com.laosun.aluminium.enums.DamageElement.FIRE, 100, 2), 1.0, null);
+
+        Assertions.assertTrue(landed, "免疫控制类 says nothing about 持续伤害类");
+        Assertions.assertEquals(1, evey.getBuffManager().countBuffs(DotBuff.class));
+        Assertions.assertEquals(0, evey.getBuffManager().debuffResistOf(DebuffClass.DOT), EPS,
+                "…and the resistance it carries is a 控制类 one, read back off the unit this time");
+    }
+
+    // ==================================================================
     // 3. Refusals
     // ==================================================================
     /** A character with no memosprite is refused <b>loudly</b>, naming the file to write. */
@@ -390,5 +451,20 @@ public class MemospriteTest {
 
     private static Enemy monster() {
         return EnemyFactory.create(MONSTER, 90, 1);
+    }
+
+    /** A generator that always answers the same value, so a probability becomes an assertion. */
+    private static Random fixed(double value) {
+        return new Random() {
+            @Override
+            public double nextDouble() {
+                return value;
+            }
+        };
+    }
+
+    /** 冻结 from the game's own control table — the state 「长夜」 is immune to. */
+    private static ControlBuff frozen() {
+        return new ControlBuff(Constant.CONTROL_EFFECTS.get("FROZEN"), 2);
     }
 }

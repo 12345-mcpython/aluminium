@@ -7,12 +7,14 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.DebuffClass;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.BuffManager;
+import com.laosun.aluminium.models.buff.ClassResistBuff;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.ReductionBuff;
@@ -111,7 +113,7 @@ public final class TriggerInterpreter {
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
-            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF");
+            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -125,7 +127,7 @@ public final class TriggerInterpreter {
      * ("for the rest of the battle"). See {@link #requireNoStackArguments}.
      */
     private static final Set<String> OPS_WITH_DURATION =
-            Set.of("MODIFY_ATTR", "APPLY_BUFF", "MODIFY_DAMAGE_TAKEN");
+            Set.of("MODIFY_ATTR", "APPLY_BUFF", "MODIFY_DAMAGE_TAKEN", "RESIST_DEBUFF");
 
     /**
      * The selectors an effect's {@code target} may name.
@@ -390,6 +392,31 @@ public final class TriggerInterpreter {
                 }
                 requireExtendFilter(effect, op, spec);
             }
+            case "RESIST_DEBUFF" -> {
+                // 「抵抗控制类负面状态的概率提高35%」 / 「免疫控制类负面状态」: a class resistance the CARRIER holds, so
+                // it is a buff on the target (timed, or permanent for a 行迹).
+                requireDebuffClass(effect, op, spec);
+                requirePercent(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                requireDuration(effect, op, spec);
+                requireTickOwner(effect, op, spec);
+                if (effect.getAmount() != null || effect.getScale() != null || effect.getAttribute() != null
+                        || effect.getBuff() != null || effect.getSkill() != null
+                        || effect.getDamageParam() != null || effect.getElement() != null
+                        || effect.getControl() != null || effect.getBaseChance() != null) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " takes a class (\"kind\") and a \"percent\", plus how long it lasts; it "
+                                    + "has no amount / scale / attribute / buff / skill / element / control / "
+                                    + "base_chance (source: " + spec.getSource() + ")");
+                }
+                if (effect.getPercent() <= 0 || effect.getPercent() > 1) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " has \"percent\": " + effect.getPercent() + ", but a class resistance is "
+                                    + "a fraction of 1 in (0, 1] (0.35 = 「抵抗…的概率提高35%」, 1.0 = 「免疫」); a "
+                                    + "resistance of 0 is a rule that provably does nothing "
+                                    + "(source: " + spec.getSource() + ")");
+                }
+            }
             case "SUMMON" -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
                 // (name, panel derivation) lives in resources/memosprites/<cid>.json. A `target` here would
@@ -535,6 +562,7 @@ public final class TriggerInterpreter {
             case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
             case "APPLY_DOT" -> applyDot(battle, effect, ctx);
             case "EXTEND_BUFF" -> extendBuff(battle, effect, ctx);
+            case "RESIST_DEBUFF" -> resistDebuff(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1432,7 +1460,10 @@ public final class TriggerInterpreter {
      */
     private static void taunt(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(withSource(new TauntBuff(effect.getTurns()), ctx));
+            // ⚠ Through the resist pipeline like every other negative state: 「使目标陷入嘲讽状态」 states no
+            // probability, which means a 100% BASE chance — the game still runs it through 效果命中 / 效果抵抗. Writing
+            // the marker directly made the engine's taunt unconditionally certain, which no document says.
+            battle.tryApplyDebuff(ctx.owner(), target, withSource(new TauntBuff(effect.getTurns()), ctx), 1.0, null);
         }
     }
 
@@ -1466,6 +1497,11 @@ public final class TriggerInterpreter {
                     "APPLY_CONTROL ran with the unknown state '" + effect.getControl() + "'; the loader validates "
                             + "against Constant.CONTROL_STATES, so this is an engine fault");
         }
+        // ⚠ ALWAYS through the resist pipeline, even with no `base_chance` stated: 「使目标陷入冻结状态」 with no
+        // probability in the text is a 100% BASE chance, which the game still runs through 效果命中 / 效果抵抗 / the
+        // state's own resistance. Attaching it directly would have made every 「免疫控制类负面状态」 clause silently
+        // ineffective against exactly the controls the documents write without a number.
+        double baseChance = effect.getBaseChance() == null ? 1.0 : effect.getBaseChance();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
                 continue;
@@ -1478,11 +1514,7 @@ public final class TriggerInterpreter {
                     : new ControlBuff(control, effect.getTurns(), DamageElement.fromString(effect.getElement()),
                             dotMagnitude(effect, ctx));
             applied.setSource(ctx.owner());
-            if (effect.getBaseChance() == null) {
-                target.getBuffManager().addBuff(applied);
-            } else {
-                battle.tryApplyDebuff(ctx.owner(), target, applied, effect.getBaseChance(), control.resistKey());
-            }
+            battle.tryApplyDebuff(ctx.owner(), target, applied, baseChance, control.resistKey());
         }
     }
 
@@ -1513,16 +1545,14 @@ public final class TriggerInterpreter {
                             + "DamageElement, so this is an engine fault");
         }
         double damage = dotMagnitude(effect, ctx);
+        // ⚠ The same "always roll" rule as a control: an unstated chance is 100% BASE chance, not "bypasses 效果抵抗".
+        double baseChance = effect.getBaseChance() == null ? 1.0 : effect.getBaseChance();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
                 continue;
             }
             DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns());
-            if (effect.getBaseChance() == null) {
-                target.getBuffManager().addBuff(dot);
-            } else {
-                battle.tryApplyDebuff(ctx.owner(), target, dot, effect.getBaseChance(), null);
-            }
+            battle.tryApplyDebuff(ctx.owner(), target, dot, baseChance, null);
         }
     }
 
@@ -1567,6 +1597,39 @@ public final class TriggerInterpreter {
             target.getBuffManager().extendBuffsFrom(ctx.owner(), effect.getBuff(),
                     effect.getAttribute() == null ? null : AttributeType.fromString(effect.getAttribute()),
                     effect.getTurns());
+        }
+    }
+
+    /**
+     * {@code RESIST_DEBUFF}: 「抵抗<b>控制类</b>负面状态的概率提高35%」 / 「免疫<b>控制类</b>负面状态」 — the resolved targets
+     * become harder to control (or burn), for the stated duration or for the whole battle.
+     *
+     * <p><b>Why it is a buff on the carrier.</b> 克拉拉's 守护 is a permanent trace, while 银狼LV.999's 【防火墻】 lasts
+     * one turn; a buff covers both, expires by itself, and can be removed by name like any other state.
+     *
+     * <p>⚠ <b>What it does NOT do</b> is touch a specific state: the check lives in
+     * {@link Battle#tryApplyDebuff}, which asks the victim for its resistance to the <b>class</b> the incoming state
+     * declares ({@code AbstractBuff.debuffClass()}). So a control written tomorrow is covered by a resistance written
+     * today — the property that makes 「免疫控制类负面状态」 mean the whole family rather than a list of keys.
+     *
+     * <p>⚠ {@code percent: 1} is immunity in this vocabulary, and that is deliberate: 「免疫控制类负面状态」 and
+     * 「抵抗控制类负面状态的概率提高35%」 are the same mechanic at different strengths, and two spellings for one mechanic
+     * is what the closed vocabularies exist to avoid.
+     */
+    private static void resistDebuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        DebuffClass kind = DebuffClass.fromString(effect.getKind());
+        if (kind == null) {
+            throw new IllegalStateException(
+                    "RESIST_DEBUFF ran with kind '" + effect.getKind() + "'; the loader validates it against "
+                            + "DebuffClass (" + String.join(" / ", DebuffClass.names())
+                            + "), so this is an engine fault");
+        }
+        boolean permanent = unticked(effect);
+        int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            target.getBuffManager().addBuff(withSource(
+                    withTickOwner(withLifetime(new ClassResistBuff(kind, effect.getPercent(), turns, permanent),
+                            effect), effect, ctx), ctx));
         }
     }
 
@@ -2335,6 +2398,28 @@ public final class TriggerInterpreter {
                     "Op " + op + " adds turns to a buff that already exists and states nothing else: the buff it "
                             + "lengthens keeps its own numbers (no amount / scale / percent / element / control / "
                             + "base_chance / skill) (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates {@code RESIST_DEBUFF}'s {@code "kind"}: one of the classes the documents name
+     * ({@code DebuffClass}), refused at load time with the list in the message.
+     *
+     * <p>Same reasoning as every other closed vocabulary here: a misspelled class would attach a resistance to a family
+     * that no state belongs to — a rule that loads, fires, and does nothing, with nothing to report.
+     */
+    private static void requireDebuffClass(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getKind() == null || effect.getKind().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires \"kind\" (which class of negative state it resists; known: "
+                            + String.join(" / ", DebuffClass.names()) + ") (source: " + spec.getSource() + ")");
+        }
+        if (DebuffClass.fromString(effect.getKind()) == null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names the class '" + effect.getKind() + "', which the documents do not: known "
+                            + "classes are " + String.join(" / ", DebuffClass.names())
+                            + " (「控制类」 and 「持续伤害类」); a resistance to a family nobody belongs to would do "
+                            + "nothing (source: " + spec.getSource() + ")");
         }
     }
 

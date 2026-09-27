@@ -125,6 +125,15 @@ public class ControlBuff extends AbstractBuff {
         return true;
     }
 
+    /**
+     * 控制类: 「抵抗控制类负面状态的概率提高35%」 and 「免疫控制类负面状态」 are answers about <b>this</b> family, so a
+     * control state written later is covered by them without anyone updating a list of keys.
+     */
+    @Override
+    public com.laosun.aluminium.enums.DebuffClass debuffClass() {
+        return com.laosun.aluminium.enums.DebuffClass.CONTROL;
+    }
+
     @Override
     public void applyEffect(CanHit target) {
         if (control.slowPercent() > 0) {

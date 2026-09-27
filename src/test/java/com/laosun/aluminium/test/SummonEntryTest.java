@@ -132,7 +132,15 @@ public class SummonEntryTest {
     // 2. The shipped content: 忆灵技能3
     // ==================================================================
 
-    /** The authored rule is an arrival rule for the owner's own summon, advancing it all the way. */
+    /**
+     * The authored rule is an arrival rule for the owner's own summon, advancing it all the way.
+     *
+     * <p>⚠ Her file answers 被召唤时 <b>twice</b> now, and both rules are 「被召唤时」 sentences from the document:
+     * 忆灵技能3 「被召唤时，使自身立即行动」 (the ADVANCE pinned here) and 忆灵技能2 「「长夜」免疫控制类负面状态」
+     * (granted to the memosprite as it arrives — see {@code MemospriteTest}). So the shape assertions select the
+     * ADVANCE rule by its op instead of taking the first one, which is what keeps this case about <b>this</b>
+     * sentence rather than about file order.
+     */
     @Test
     public void theAuthoredRuleStatesItsShape() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -141,10 +149,14 @@ public class SummonEntryTest {
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(OWNER).matching(TriggerEvent.SUMMONED,
                 new TriggerTable.TriggerContext(owner, battle.summonMemosprite(owner), null, 0, 0, null, battle));
 
-        Assertions.assertEquals(1, rules.size(), "忆灵技能3 is one rule");
-        Assertions.assertEquals(List.of("actor == summon"), rules.getFirst().conditions().stream()
+        Assertions.assertEquals(2, rules.size(), "忆灵技能3 and 忆灵技能2 both answer 被召唤时");
+        TriggerTable.CompiledRule arrival = rules.stream()
+                .filter(rule -> "ADVANCE".equals(rule.effects().getFirst().getOp()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("忆灵技能3's 立即行动 rule is gone: " + rules));
+        Assertions.assertEquals(List.of("actor == summon"), arrival.conditions().stream()
                 .map(TriggerTable.Condition::source).toList());
-        EffectSpec effect = rules.getFirst().effects().getFirst();
+        EffectSpec effect = arrival.effects().getFirst();
         Assertions.assertEquals("ADVANCE", effect.getOp());
         Assertions.assertEquals(1.0, effect.getPercent(), EPS, "all of its remaining time: 立即行动");
         Assertions.assertEquals("summon", effect.getTarget(), "「使自身」 is the memosprite");

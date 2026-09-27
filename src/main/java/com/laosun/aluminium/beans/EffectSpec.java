@@ -396,6 +396,17 @@ public class EffectSpec {
     private String element;
 
     /**
+     * The <b>class</b> of negative state an effect is about — {@code "control"} (控制类) or {@code "dot"} (持续伤害类).
+     * Read by {@code RESIST_DEBUFF}, whose sentence is about a whole family rather than one named state
+     * (「抵抗<b>控制类</b>负面状态的概率提高35%」).
+     *
+     * <p>The closed set is {@code DebuffClass}, and it is deliberately small: it holds the two classes the documents
+     * name, and it grows when a third is quoted rather than when someone imagines one.
+     */
+    @SerializedName("kind")
+    private String kind;
+
+    /**
      * The stack cap, whichever spelling the rule used.
      *
      * <p>Read by the interpreter <b>after</b> it has rejected "both spellings stated at once", so the
