@@ -8,9 +8,14 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.beans.MemospriteSpec;
+import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -55,6 +60,10 @@ public class RelicAbilityBatchTest {
     private static final int PIONEER = 117;
     private static final int SCHOLAR = 122;
     private static final int BROKEN_KEEL = 310;
+    private static final int FIRESMITH = 107;
+    private static final int VALOROUS = 120;
+    private static final int GLAMOTH = 311;
+    private static final int SHATTERED_WORLD = 127;
 
     // ==================================================================
     // 102 — 普攻伤害 +10%
@@ -173,8 +182,113 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
+    // 107, 120, 311, 127 -- the second pass over the backlog
+    // ==================================================================
+
+    /** The Skill boost is permanent, and the fire boost is consumed by the next attack. */
+    @Test
+    public void theFiresmithBoostsTheNextAttackAfterItsUltimate() {
+        Character wearer = wearing(FIRESMITH);
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        Assertions.assertEquals(0.12, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS, "param #1");
+
+        // Measured as a delta: the relic's random sub-stats can carry FIRE_DAMAGE_BOOST themselves, which is
+        // how the first draft of this case came out at 0.444.
+        double before = boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST);
+        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, null, 0, 0);
+        Assertions.assertEquals(before + 0.12, boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST), EPS, "param #2");
+
+        battle.castImmediate(new DefaultSkill(WEARER, 1, 1), wearer, List.of(battle.enemyUnits().getFirst()));
+        Assertions.assertEquals(before, boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST), EPS,
+                "「下一次攻击」: the attack has happened, so the boost is gone");
+    }
+
+    /** Only the wearer's own follow-up grants it, and the share is the parameter's 36%. */
+    @Test
+    public void theValorousBoostsUltimateDamageAfterItsOwnFollowUp() {
+        Character wearer = wearing(VALOROUS);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+
+        battle.fireTriggers(TriggerEvent.FOLLOW_UP, ally, dummy(), 0, 0);
+        Assertions.assertEquals(0, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS,
+                "「装备者施放追加攻击时」: a teammate's follow-up is not hers");
+
+        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, dummy(), 0, 0);
+        Assertions.assertEquals(0.36, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS,
+                "param #2 is 0.36 -- the registered reason said 12%");
+    }
+
+    /** The two nested thresholds must not both apply: 160 speed grants 18%, not 12% + 18%. */
+    @Test
+    public void theGlamothTiersAreExclusive() {
+        Assertions.assertEquals(0, damageBoostAtSpeed(130), EPS, "below the first threshold");
+        Assertions.assertEquals(0.12, damageBoostAtSpeed(135), EPS, "param #4");
+        Assertions.assertEquals(0.18, damageBoostAtSpeed(160), EPS,
+                "param #5 alone -- without the lower tier''s upper bound this would be 0.30");
+    }
+
+    /**
+     * Three effects on one trigger, and the summon condition is what keeps the third reachable.
+     *
+     * <p>Without the memosprite the rule must do <b>nothing</b>, not throw: the effect that names
+     * {@code target: "summon"} fails loudly when nothing is out, so 「若装备者的忆灵在场」 is load-bearing.
+     */
+    @Test
+    public void theShatteredWorldNeedsItsMemospriteAndThenBoostsBoth() {
+        Character wearer = wearing(SHATTERED_WORLD);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        double wearerHp = wearer.getMaxHp();
+        double allyBoost = boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST);
+
+        Assertions.assertDoesNotThrow(() -> battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, null, 0, 0),
+                "no memosprite out: the condition keeps the summon-targeted effect from being reached");
+        Assertions.assertEquals(wearerHp, wearer.getMaxHp(), EPS, "…so nothing was granted");
+
+        // A fixture memosprite rather than SummonFactory.memosprite(master): the wearer is deliberately the
+        // rule-less character, and summoning 1413's or 1402's would drag their own rules into the measurement.
+        Summon evey = fixtureMemosprite(battle, wearer);
+        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, null, 0, 0);
+
+        double bareHp = CharacterFactory.create(WEARER, LEVEL).getMaxHp();
+        Assertions.assertEquals(0.24 * bareHp, wearer.getMaxHp() - wearerHp, 0.5,
+                "「装备者…生命上限提高 24%」 -- asserted as the DELTA, because a percentage modifier on a base "
+                        + "attribute adds 24% of the character's base Max HP while the relic's own sub-stats "
+                        + "already carry their own HP%");
+        Assertions.assertTrue(evey.getBuffManager().countBuffs(StatModifierBuff.class) > 0,
+                "「及其忆灵」: the memosprite carries its own copy of the Max HP buff");
+        Assertions.assertEquals(allyBoost + 0.15, boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST), EPS,
+                "「我方全体造成的伤害提高 15%」 reaches a teammate too");
+    }
+
+    // ==================================================================
     // Fixture
     // ==================================================================
+
+    /** A minimal memosprite for a master whose own file has none, placed the way summonMemosprite does. */
+    private static Summon fixtureMemosprite(Battle battle, Character master) {
+        Summon summon = SummonFactory.memosprite(master, new MemospriteSpec("fixture", "RelicAbilityBatchTest", null,
+                List.of(new MemospriteSpec.Panel("HEALTH", 0.5, null),
+                        new MemospriteSpec.Panel("SPEED", null, 999.0))));
+        summon.setMaster(master);
+        battle.allies.add(summon);
+        battle.addRequestItems.add(summon);
+        battle.processRequests();
+        return summon;
+    }
+
+    /** The wearer at a stated speed, with set 311 on: the scoped boost it grants. */
+    private static double damageBoostAtSpeed(double speed) {
+        Character wearer = wearing(GLAMOTH);
+        wearer.setAttribute(AttributeType.SPEED, new DoubleValue(speed));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        return boostOf(wearer, AttributeType.ALL_DAMAGE_TYPE_BOOST);
+    }
 
     private static Character wearing(int setId) {
         return CharacterFactory.create(WEARER, LEVEL, true, null,

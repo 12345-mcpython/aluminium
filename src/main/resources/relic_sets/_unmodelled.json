@@ -6,13 +6,6 @@
       "reason": "\"Increases the max DMG that can be absorbed by the Shield created by the wearer by 20%.\" Needs an op that scales every shield the wearer creates; SHIELD only creates one shield with an amount given in the rule, so there is nothing to amplify."
     }
   ],
-  "107": [
-    {
-      "require": 4,
-      "ability": "Ability51071",
-      "reason": "Writable now: \"Increases DMG by the wearer's Skill by 12%. After unleashing Ultimate, increases the wearer's Fire DMG by 12% for the next attack.\" Both clauses have a spelling as of 2026-09-27: the first is SKILL_DAMAGE_BOOST, and the second is a second rule -- `on: ULT_CAST` + `when: [\"actor == self\"]` -> MODIFY_ATTR FIRE_DAMAGE_BOOST 0.12 with `\"until\": \"next_attack\"`, which is the lifetime that ends a buff when its owner attacks (see set 305's file for the first user). ⚠ This reason said the vocabulary had no such mechanic until the lifetime landed."
-    }
-  ],
   "108": [
     {
       "require": 4,
@@ -76,13 +69,6 @@
       "reason": "\"If the wearer's Break Effect is 150% or higher, the Break DMG dealt to the enemy target ignores 10% of their DEF. If the wearer's Break Effect is 250% or higher, the Super Break DMG additionally ignores 15%.\" The attribute threshold it needed arrived on 2026-09-27 (`self_attr:BREAKING_EFFECT >= 1.5`), and the two thresholds are NOT an extra gap (an upper bound makes the tiers exclusive -- see set 311). What blocks it: it applies to Break / Super Break DMG only, which the DSL cannot name, and it is scoped to THIS hit rather than to a window of turns -- a MODIFY_ATTR buff (which is how 翡翠's Eidolon 4 grants DEF ignore) would also raise the wearer's other damage in those turns. So it needs an instance-scoped ignore plus a condition on the pending instance's damage type."
     }
   ],
-  "120": [
-    {
-      "require": 4,
-      "ability": "Ability51201",
-      "reason": "Writable now: \"Increases the wearer's CRIT Rate by 6%. When the wearer uses a Follow-Up ATK, increases the DMG dealt by their Ultimate by 12% for 1 turn(s).\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.06); the second half is `on: FOLLOW_UP` + MODIFY_ATTR ULTIMATE_DAMAGE_BOOST 0.12 for 1 turn -- the trigger and the scoped attribute both exist (FOLLOW_UP since 2026-09-27, ULTIMATE_DAMAGE_BOOST with the other attack-type boosts). Listed rather than authored only because it arrived with the mixed-effect census (M-25)."
-    }
-  ],
   "121": [
     {
       "require": 4,
@@ -94,7 +80,7 @@
     {
       "require": 4,
       "ability": "Ability51241",
-      "reason": "Writable now: \"Decreases the wearer's SPD by 8%. Before entering combat, if the wearer's SPD is lower than 95/110, increases the wearer's CRIT Rate by 36%/50%. This effect also applies to the wearer's memosprite.\" Every clause has a spelling as of 2026-09-27: the SPD decrease is the `properties` stat (SpeedAddedRatio -0.08); the threshold is `self_attr:SPEED < 95` (and `< 110` with `>= 95` for the lower tier, since an upper bound makes the tiers exclusive); and the memosprite clause is a SECOND rule with `target: \"summon\"` gated on `self_summon_count >= 1` -- which is exactly how 「装备者及其忆灵」 is written. Four rules in total (two tiers x two units), mechanical to write."
+      "reason": "\"Decreases the wearer's SPD by 8%. Before entering combat, if the wearer's SPD is lower than 95/110, increases the wearer's CRIT Rate by 36%/50%. This effect also applies to the wearer's memosprite.\" Every clause has a spelling as of 2026-09-27: the SPD decrease is the `properties` stat (SpeedAddedRatio -0.08); the threshold is `self_attr:SPEED < 95` (and `< 110` with `>= 95` for the lower tier, since an upper bound makes the tiers exclusive); and the memosprite clause is a SECOND rule with `target: \"summon\"` gated on `self_summon_count >= 1` -- which is exactly how 「装备者及其忆灵」 is written. ⚠ NOT writable as it stands, and the reason is structural rather than a missing word: the memosprite half needs `target: \"summon\"`, and at BATTLE_START the memosprite may not exist yet -- that selector fails LOUDLY when nothing is out, so the rule would throw for every character whose kit summons later. Covering both timings takes a second rule per tier on SUMMONED, and whether a pre-battle effect should apply to a memosprite summoned mid-fight at all is a decision, not a spelling. Registered as M-39."
     }
   ],
   "125": [
@@ -109,13 +95,6 @@
       "require": 4,
       "ability": "Ability51261",
       "reason": "\"When the wearer becomes the target of another ally target's ability, gains 1 stack of 'Help,' stacking up to 2 time(s). If there are 2 stack(s) ... when the wearer uses their Ultimate, consumes all 'Help' to increase the wearer's ATK by 48% for 1 turn(s).\" The stacking counter and the 'for 1 turn' buff are now expressible, but there is no event for 'the wearer was targeted by an ally's ability' and no condition for 'I have exactly N stacks' (the DSL reads the owner's HP percentage, attribute values and the hit count, not buff stacks), nor an op that consumes them."
-    }
-  ],
-  "127": [
-    {
-      "require": 4,
-      "ability": "Ability51271",
-      "reason": "Writable now: \"After the wearer uses Basic ATK or Skill, if the wearer's memosprite is on the field, increases Max HP of the wearer and their memosprite by 24%, and increases all allies' DMG dealt by 15%, lasting until after the wearer's next use of Basic ATK or Skill.\" Every clause has a spelling: the trigger is a disjunction over two casts (two rules, `BASIC_ATTACK` and `SKILL_CAST`, each with `actor == self`); the presence condition is `self_summon_count >= 1`; the two Max HP halves are two more rules (`self` and `target: \"summon\"`); the party-wide bonus is ALL_DAMAGE_TYPE_BOOST on `all_allies`; and the duration is `\"until\": \"next_attack\"` on every one of them. Six rules in total, mechanical to write."
     }
   ],
   "128": [
@@ -156,13 +135,6 @@
       "require": 2,
       "ability": "Ability53031",
       "reason": "\"Increases the wearer's Effect Hit Rate by 10%. Meanwhile, increases the wearer's ATK by an amount equal to 25% of their current Effect Hit Rate, up to a max of 25%.\" The Effect Hit Rate is the `properties` stat (StatusProbabilityBase 0.1). What is missing is an amount that SCALES with one of my own attribute values and is CAPPED -- MODIFY_ATTR's amount is a literal with no arithmetic, and the DSL cannot express 'my ATK += 0.25 x my Effect Hit Rate, at most 25%'. (`self_attr` can now READ the value for a threshold, which is half of this and not enough.)"
-    }
-  ],
-  "311": [
-    {
-      "require": 2,
-      "ability": "Ability53111",
-      "reason": "Writable now: \"Increases the wearer's ATK by 12%. When the wearer's SPD is equal to or higher than 135/160, increases the DMG dealt by the wearer by 12%/18%.\" The ATK is the `properties` stat (AttackAddedRatio 0.12) and the SPD threshold arrived on 2026-09-27 (`self_attr:SPEED`). ⚠ The two thresholds are NOT a gap -- and this sentence is worth keeping, because six other entries used to claim they were (all corrected the same day). A tier is written as TWO rules made MUTUALLY EXCLUSIVE by an upper bound: `when: [\"self_attr:SPEED >= 160\"]` -> ALL_DAMAGE_TYPE_BOOST 0.18, plus `when: [\"self_attr:SPEED >= 135\", \"self_attr:SPEED < 160\"]` -> 0.12. Both `permanent`, so exactly one fires at any speed; the DSL's conditions are already AND-ed, so no new vocabulary is needed."
     }
   ],
   "312": [
@@ -211,14 +183,14 @@
     {
       "require": 2,
       "ability": "Ability53191",
-      "reason": "Writable now: \"Increases the wearer's Max HP by 12%. When the wearer's Max HP is equal to or higher than 5000, increases the CRIT DMG of the wearer and their memosprite by 28%.\" All three clauses have a spelling: the Max HP is the `properties` stat (HPAddedRatio 0.12); the threshold is `self_attr:HEALTH >= 5000` (a base attribute, so the literal is absolute); and 「装备者及其忆灵」 is TWO rules -- one on the wearer, one with `target: \"summon\"` gated on `self_summon_count >= 1`."
+      "reason": "\"Increases the wearer's Max HP by 12%. When the wearer's Max HP is equal to or higher than 5000, increases the CRIT DMG of the wearer and their memosprite by 28%.\" All three clauses have a spelling: the Max HP is the `properties` stat (HPAddedRatio 0.12); the threshold is `self_attr:HEALTH >= 5000` (a base attribute, so the literal is absolute); and 「装备者及其忆灵」 is TWO rules -- one on the wearer, one with `target: \"summon\"`, which cannot be filed at BATTLE_START because the memosprite may not exist yet (M-39)."
     }
   ],
   "320": [
     {
       "require": 2,
       "ability": "Ability53201",
-      "reason": "Writable now: \"Increases the wearer's SPD by 6%. When the wearer's SPD is equal to or higher than 135/180, increases the healing done by the wearer and their memosprite by 12%/20%.\" The SPD is the `properties` stat (SpeedAddedRatio 0.06); the thresholds are `self_attr:SPEED` with an upper bound for the lower tier; the healing boost attribute exists (OUTGOING_HEALING_BOOST); and the memosprite half is a second rule with `target: \"summon\"` gated on `self_summon_count >= 1`. Four rules total (two tiers x two units)."
+      "reason": "\"Increases the wearer's SPD by 6%. When the wearer's SPD is equal to or higher than 135/180, increases the healing done by the wearer and their memosprite by 12%/20%.\" The SPD is the `properties` stat (SpeedAddedRatio 0.06); the thresholds are `self_attr:SPEED` with an upper bound for the lower tier; the healing boost attribute exists (OUTGOING_HEALING_BOOST); and the memosprite half is a second rule with `target: \"summon\"`, which cannot be filed at BATTLE_START because the memosprite may not exist yet (M-39)."
     }
   ],
   "321": [
