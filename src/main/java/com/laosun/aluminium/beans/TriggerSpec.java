@@ -58,6 +58,26 @@ public class TriggerSpec {
     private Integer cooldown;
 
     /**
+     * How many times this rule may fire in <b>one of its owner's turns</b> — 「该效果<b>每回合</b>可触发
+     * <b>2</b> 次」 is {@code per_turn: 2}. Absent = no per-turn cap.
+     *
+     * <p><b>Why {@code cooldown} is not enough.</b> {@code cooldown: 1} says "at most once per own turn", which
+     * is the {@code N = 1} case of this field and nothing more: 「每回合可触发2次」 needs a <b>count</b> within one
+     * turn, and before this field the only choices were to fire on every event (a wrong number with nothing to
+     * see) or not to write the mechanic at all. 10 of the 97 character documents state such a limit.
+     *
+     * <p>⚠ Counted in the <b>owner's</b> turns, exactly like {@link #cooldown}: a rule that reacts to other
+     * people's actions still means "twice per <i>my</i> turn", and the counter is cleared where the cooldown is
+     * decremented ({@code CanHit.tickTriggerCooldowns}, at the start of the owner's own turn).
+     *
+     * <p>May be combined with {@code once_per_battle} (a per-turn cap and a per-battle cap are cumulative) but
+     * <b>not</b> with {@code cooldown}: "at most 2 per turn, but only every other turn" has two readings that
+     * disagree, so the pair is refused at load time rather than silently resolved one way.
+     */
+    @SerializedName("per_turn")
+    private Integer perTurn;
+
+    /**
      * {@code true} = the rule fires at most once per battle (「单场战斗中只能触发1次」).
      *
      * <p>Deliberately not the same field as {@link #cooldown}: a cooldown comes back after a few turns,

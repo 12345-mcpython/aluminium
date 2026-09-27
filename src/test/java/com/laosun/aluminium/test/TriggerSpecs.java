@@ -105,6 +105,21 @@ final class TriggerSpecs {
     }
 
     /**
+     * A {@code SHIELD} effect with a flat amount.
+     *
+     * @param turns how many of the shielded unit's turns it lasts, or {@code null} for a shield that is only
+     *              removed by being used up
+     */
+    static EffectSpec shield(double amount, Integer turns, String target) {
+        EffectSpec effect = new EffectSpec();
+        set(effect, "op", "SHIELD");
+        set(effect, "amount", amount);
+        set(effect, "turns", turns);
+        set(effect, "target", target);
+        return effect;
+    }
+
+    /**
      * A {@code GAIN_RESOURCE} effect (credited to the owner unless {@code target} says otherwise).
      *
      * @param resource the resource id, as the character declares it
