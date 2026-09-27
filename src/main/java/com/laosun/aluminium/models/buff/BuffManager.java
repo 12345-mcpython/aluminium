@@ -517,6 +517,46 @@ public class BuffManager {
     }
 
     /**
+     * Removes every buff that {@link #hasState(String)} would report for that name — the other half of the pair.
+     *
+     * <p><b>Why a "remove the named state" primitive.</b> 「仅对…<b>最新的</b>施放目标生效」 is a very common sentence
+     * (星期日's 【蒙福者】), and the engine had no way to say "take that state off the others": {@link #removeDebuffs}
+     * only reaches <b>negative</b> buffs, and a named state is usually a positive one. Resolving the name here also
+     * means the DoT spellings behave the same on this side as they do on the {@code has_state} side (removing 「触电」
+     * takes the thunder DoT off), which is the "one name, one meaning" rule that method documents.
+     *
+     * <p>The traversal and the removal both go through the snapshot copy (M-12), exactly like {@link #removeDebuffs},
+     * so a buff that reacts to being removed cannot disturb the iteration.
+     *
+     * @param state the state name as the data spells it (trimmed; blank or {@code null} = nothing to do)
+     * @return how many buffs were removed; {@code 0} is the normal answer for "it was not there", not an error
+     */
+    public int removeState(String state) {
+        if (state == null || state.isBlank()) {
+            return 0;
+        }
+        String wanted = state.trim();
+        int removed = 0;
+        for (StateBuff buff : allBuffsOf(StateBuff.class)) {
+            if (wanted.equals(buff.getState())) {
+                removeBuff(buff);
+                removed++;
+            }
+        }
+        DamageElement dotElement = DOT_STATES.get(wanted);
+        if (dotElement == null) {
+            return removed;
+        }
+        for (DotBuff dot : allBuffsOf(DotBuff.class)) {
+            if (dot.getElement() == dotElement) {
+                removeBuff(dot);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
+    /**
      * The game's own names for the four damage-over-time states, and the buff fact behind each.
      *
      * <p>Kept here rather than in a data file because it is a <b>translation</b>, not a table of numbers: the

@@ -104,7 +104,8 @@ public final class TriggerInterpreter {
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
-            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE");
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
+            "REMOVE_STATE");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -247,6 +248,20 @@ public final class TriggerInterpreter {
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
+            case "REMOVE_STATE" -> {
+                // `buff` is the state's name — the same spelling `has_state` reads and `APPLY_BUFF` writes, so the
+                // three are one vocabulary. ⚠ No count: 「解除…状态」 takes the state off, it does not take N of
+                // them, and an `amount` here would be silently ignored (which is what this op exists to avoid).
+                requireBuff(effect, op, spec);
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                if (effect.getAmount() != null) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " takes the named state off entirely and has no \"amount\" (it states "
+                                    + effect.getAmount() + "); write one effect per state to remove "
+                                    + "(source: " + spec.getSource() + ")");
+                }
+            }
             case "SUMMON" -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
                 // (name, panel derivation) lives in resources/memosprites/<cid>.json. A `target` here would
@@ -372,6 +387,7 @@ public final class TriggerInterpreter {
             case "MODIFY_DAMAGE_TAKEN" -> modifyDamageTaken(battle, effect, ctx);
             case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
             case "DISPEL" -> dispel(battle, effect, ctx);
+            case "REMOVE_STATE" -> removeState(effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1109,6 +1125,21 @@ public final class TriggerInterpreter {
      * @param effect the effect ({@code amount}, optional {@code target})
      * @param ctx    the context
      */
+    /**
+     * {@code REMOVE_STATE}: takes the named state off every resolved target — the "only the newest one holds it"
+     * half of 星期日's 【蒙福者】.
+     *
+     * <p>⚠ Removing a state that is not there is <b>not</b> an error: an "only the latest target" rule runs on every
+     * cast, and most of those casts find the state on somebody (or nobody) whose removal is simply nothing to do.
+     * The op that <i>applies</i> a state to a unit that does not exist is loud ({@code "target": "summon"}); this one
+     * has no such unit to miss.
+     */
+    private static void removeState(EffectSpec effect, TriggerContext ctx) {
+        for (CanHit target : resolveTargets(ctx.battle(), effect, ctx)) {
+            target.getBuffManager().removeState(effect.getBuff());
+        }
+    }
+
     private static void dispel(Battle battle, EffectSpec effect, TriggerContext ctx) {
         int amount = (int) Math.round(effect.getAmount());
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
