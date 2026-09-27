@@ -2225,6 +2225,11 @@ public class Battle {
         CanHit attacker = damage.getAttacker();
         CanHit defender = damage.getDefender();
 
+        // 0) The base layer lives in Damage.toValue(): the skill multiplier plus any absolute addend
+        //    («提高数值等同于三月七防御力的30%», ROADMAP M-55), added BEFORE every zone below so it crits and is
+        //    boosted exactly like the multiplier. ⚠ Deliberately not a percentage in the boost zone: that would only
+        //    equal the sentence when the base happened to equal the attribute. See Damage#addFlat.
+
         // 1) DMG boost zone: element boost + all-type boost (break/super break/true damage are skipped
         //    automatically by BoostArea.applies())
         AttributeType elementBoost = AttributeType.getBoostByElement(damage.getElement());

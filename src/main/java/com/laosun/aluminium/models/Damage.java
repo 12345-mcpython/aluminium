@@ -274,6 +274,32 @@ public class Damage {
     }
 
     /**
+     * A flat amount added to this instance's <b>base</b> — 「伤害值提高，提高数值等同于三月七防御力的 30%」.
+     *
+     * <p><b>Why it is not {@link #addBoost}.</b> The boost zone is multiplicative ({@code 1 + Σ}) and therefore
+     * expresses "this hit deals X% more"; the documents also state an <b>absolute</b> increase (「提高数值等同于
+     * &lt;某属性&gt; 的 Y%」, 12 of the 97 character files), and folding that number into a percentage zone is only
+     * equal to the sentence when the instance's base happens to equal the attribute — otherwise it is a different
+     * number that looks right.
+     *
+     * <p><b>Where it enters.</b> The <b>base layer</b>: {@code Battle.assemble} adds it before the first zone, so the
+     * addition takes crit / DMG boost / defence / resistance exactly like the skill multiplier does. That is the
+     * documented decision (ROADMAP M-55, {@code engine.md} 乘区表) rather than an accident: 「伤害<b>值</b>提高」 names a
+     * value, and a value that did not crit would be a different mechanic from the one the text describes.
+     *
+     * @param value the amount to add (may be negative, and the assembled total is still floored at 1)
+     */
+    public void addFlat(double value) {
+        this.flatAddend += value;
+    }
+
+    /**
+     * The absolute amount this instance carries on top of its skill multiplier ({@code 0} = none).
+     */
+    @Getter
+    private double flatAddend = 0;
+
+    /**
      * Vulnerability zone: additive; the cap is applied uniformly when the multiplier is read.
      */
     public Damage addVulnerable(double pct) {
@@ -380,10 +406,14 @@ public class Damage {
      * @return the final value of this hit
      */
     public double toValue() {
+        // The base layer = the skill multiplier plus any absolute addend («提高数值等同于…的 Y%», M-55), so the
+        // addition is multiplied by every zone below exactly like the multiplier is. ⚠ A true-damage instance skips
+        // the zones, and it takes the addend the same way — a value is a value.
+        double base = skillBaseValue + flatAddend;
         if (trueDamage && Constant.TRUE_DMG_SKIP_ZONES) {
-            return skillBaseValue;
+            return base;
         }
-        double value = skillBaseValue;
+        double value = base;
         for (Area area : damageArea) {
             if (area.applies(type)) {
                 value *= area.getRate();
