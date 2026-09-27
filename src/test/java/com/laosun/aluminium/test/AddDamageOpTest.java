@@ -28,6 +28,14 @@ public class AddDamageOpTest {
     private static final int OWNER = 1001;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
+    /**
+     * The instance base every case uses.
+     *
+     * <p>⚠ Deliberately NOT 100: with a base of 100, "+X" and "+X%" are the same number, so the trap this op
+     * exists to avoid would be invisible to the tests (measured: a mutation that spelled the addend as a boost of
+     * {@code value / 100} kept every case green). Any base other than 100 separates them.
+     */
+    private static final double BASE = 400;
 
     /** The addend is 30% of the owner's DEFENCE, added to the settled instance. */
     @Test
@@ -41,7 +49,7 @@ public class AddDamageOpTest {
         double addend = 0.30 * f.owner.getAttribute(AttributeType.DEFENCE).get();
         // ⚠ Compared as a RATIO: the addend goes through the same zones the base does, so the settled ratio is what
         // proves where it entered (an absolute growth would depend on the zone factors of this particular fight).
-        Assertions.assertEquals((100 + addend) / 100, withOp / plain, 0.02,
+        Assertions.assertEquals((BASE + addend) / BASE, withOp / plain, 0.02,
                 "the settled damage equals a base of 「100 + 30% 防御力」 run through the same zones");
     }
 
@@ -54,9 +62,9 @@ public class AddDamageOpTest {
 
         double asValue = f.damageTaken(armed(0.30));
         double addend = 0.30 * f.owner.getAttribute(AttributeType.DEFENCE).get();
-        Assertions.assertEquals(plain * (100 + addend) / 100, asValue, Math.max(0.5, plain * 0.02));
+        Assertions.assertEquals(plain * (BASE + addend) / BASE, asValue, Math.max(0.5, plain * 0.02));
         Assertions.assertNotEquals(plain * 1.30, asValue,
-                "「提高数值等同于 30% 防御力」 is not 「造成的伤害提高 30%」 -- a base of " + plain
+                "「提高数值等同于 30% 防御力」 is not 「造成的伤害提高 30%」 -- a base of " + BASE + " against a settled " + plain
                         + " against an addend of " + addend);
     }
 
@@ -118,7 +126,7 @@ public class AddDamageOpTest {
             enemy.heal(enemy.getMaxHp());
             double before = enemy.getCurrentHp();
             battle.applyDamage(enemy, new Damage(owner, enemy, com.laosun.aluminium.enums.DamageElement.FIRE,
-                    com.laosun.aluminium.enums.DamageType.NORMAL, 100,
+                    com.laosun.aluminium.enums.DamageType.NORMAL, BASE,
                     com.laosun.aluminium.enums.SkillCategory.ULTRA));
             return before - enemy.getCurrentHp();
         }
