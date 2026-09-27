@@ -1,0 +1,44 @@
+{
+  "4": [
+    {
+      "on": "TURN_START",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.06,
+          "turns": 1
+        }
+      ],
+      "source": "relic set 123 (凯歌祝捷的英豪 / Hero of Triumphant Song), 4-piece: \"While the wearer's memosprite is on the field, increases the wearer's SPD by #1[i]%. When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by #2[i]%, lasting for #3[i] turn(s).\" param = [0.06, 0.3, 2]",
+      "note": "First clause. ⚠ 「装备者的忆灵在场时」 is a WHILE condition, so it is re-evaluated at each of the wearer's own turn starts and lasts one turn rather than being `permanent` -- a permanent buff would stay up after the memosprite died, which is a wrong state nothing reports. Same technique as set 318's file (which is where it is documented in full); `actor == self` is what keeps it to the wearer's own turn, since TURN_START reaches every character's table. ⚠ Same approximation as 318: a memosprite that dies mid-turn keeps the buff until that turn ends."
+    },
+    {
+      "on": "SUMMON_ATTACK",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "turns": 2
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "summon"
+        }
+      ],
+      "source": "relic set 123 (凯歌祝捷的英豪 / Hero of Triumphant Song), 4-piece: \"When the wearer's memosprite attacks, increases the wearer's and memosprite's CRIT DMG by #2[i]%, lasting for #3[i] turn(s).\" param = [0.06, 0.3, 2]",
+      "note": "Second clause, both halves in one rule because they fire on the same event: 「装备者」 is `self` and 「忆灵」 is `target: \"summon\"` -- the same two-rule shape every 「装备者及其忆灵」 text uses, except that both effects can sit in one rule when the trigger is the same. ⚠ `actor == summon` is not decoration: SUMMON_ATTACK is delivered to every character's table, so without it the wearer would also gain the buff when a TEAMMATE's memosprite attacked (an over-trigger -- a wrong number with nothing to report). ⚠ The duration is `2`, from param #3. The registered reason in _unmodelled.json said \"3 turn(s)\" -- a number read off the English sentence rather than the parameters, and the third time in this project that reading prose instead of `param` produced a wrong figure (see sets 305 and 318). ⚠ 「攻击时」 is modelled as the engine's SUMMON_ATTACK event, which is fired once per attack after every segment has settled; had it been hung on `DEALING_DAMAGE` (also expressible, since `actor == summon` works there too) it would fire once per damage INSTANCE and on DOT/break instances attributed to the summon as well."
+    }
+  ]
+}
