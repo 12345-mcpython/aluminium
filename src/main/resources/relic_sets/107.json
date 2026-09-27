@@ -1,0 +1,33 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.12,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 107 (熔岩锻铸的火匠 / Firesmith of Lava-Forging), 4-piece: 「使装备者战技造成的伤害提高#1[i]%，并使施放终结技后的下一次攻击造成的火属性伤害提高#2[i]%。」 param = [0.12, 0.12]",
+      "note": "The first sentence: a scoped boost on Skill damage, unconditional and with no duration stated, so `permanent`. (The whole 4-piece is ability-only -- its `properties` is empty, so nothing here is duplicated from the data path.)"
+    },
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FIRE_DAMAGE_BOOST",
+          "percent": 0.12,
+          "until": "next_attack"
+        }
+      ],
+      "source": "relic set 107 (熔岩锻铸的火匠 / Firesmith of Lava-Forging), 4-piece: 「并使施放终结技后的下一次攻击造成的火属性伤害提高#2[i]%。」 param = [0.12, 0.12]",
+      "note": "The second sentence: 「施放终结技后的<b>下一次攻击</b>」 is an EVENT, not a turn count, so it is `\"until\": \"next_attack\"` -- `turns: 1` would expire on a turn boundary and also survive a turn in which nothing was attacked. ⚠ The scope is the wearer's FIRE damage, not all damage: `FIRE_DAMAGE_BOOST`, so the buff is consumed by the next attack even if that attack is not fire (which is what the sentence says: it is the NEXT attack's fire damage that is raised, not the next fire attack's)."
+    }
+  ]
+}

@@ -99,6 +99,14 @@ public class RelicTriggerTableTest {
     private static final int BANANA_PARADISE = 318;
     /** 凯歌祝捷的英豪: 攻击力 +12%; 忆灵在场 -> 速度 +6%, 忆灵攻击时 -> 双方暴击伤害 +30% 2 回合. */
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
+    /** 熔岩锻铸的火匠: 战技伤害 +12%; 终结技后下一次攻击的火伤 +12%. */
+    private static final int FIRESMITH = 107;
+    /** 风举云飞的勇烈: 暴击率 +6%; 追加攻击后终结技伤害 +36% 1 回合. */
+    private static final int VALOROUS = 120;
+    /** 再创天地的救世主: 普攻/战技后忆灵在场 -> 装备者与忆灵生命上限 +24%、我方全体伤害 +15%. */
+    private static final int SHATTERED_WORLD = 127;
+    /** 苍穹战线格拉默: 攻击力 +12%; 速度 ≥ 135/160 -> 造成的伤害 +12%/18%. */
+    private static final int GLAMOTH = 311;
     /** 野穗伴行的快枪手: 速度 +6%; 普攻伤害 +10%. */
     private static final int MUSKETEER = 102;
     /** 流星追迹的怪盗: 击破特攻 +16%; 击破弱点后回 3 点能量. */
@@ -168,6 +176,10 @@ public class RelicTriggerTableTest {
             // Authored on 2026-09-28 in the content pass over the `Writable now:` backlog: the five whose
             // every clause already had a spelling, with the numbers read from `param` (four of the registered
             // reasons carried a figure read off the English sentence instead — see each file's note).
+            FIRESMITH + "/" + FOUR_PIECE,
+            VALOROUS + "/" + FOUR_PIECE,
+            SHATTERED_WORLD + "/" + FOUR_PIECE,
+            GLAMOTH + "/" + TWO_PIECE,
             MUSKETEER + "/" + FOUR_PIECE,
             THIEF + "/" + FOUR_PIECE,
             PIONEER + "/" + TWO_PIECE,
@@ -189,7 +201,7 @@ public class RelicTriggerTableTest {
      * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}).
      */
-    private static final int STILL_REGISTERED = 39;
+    private static final int STILL_REGISTERED = 35;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
@@ -215,7 +227,7 @@ public class RelicTriggerTableTest {
      * entry cannot quietly claim to be blocked when the capability exists.
      */
     private static final String WRITABLE_PREFIX = "Writable now:";
-    private static final int WRITABLE_NOW = 7;
+    private static final int WRITABLE_NOW = 0;
 
     // ==================================================================
     // 1. The shipped rule files
@@ -613,7 +625,7 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(18, twoPiece,
+        Assertions.assertEquals(17, twoPiece,
                 "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (20 until the "
                         + "2-pieces of sets 117 and 310 were authored on 2026-09-28)");
     }

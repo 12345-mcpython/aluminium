@@ -1,0 +1,37 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 135",
+        "self_attr:SPEED < 160"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 311 (苍穹战线格拉默 / Glamoth's Iron Cavalry Regiment), 2-piece: 「使装备者的攻击力提高#1[i]%。当装备者的速度大于等于#2[i]/#3[i]时，使装备者造成的伤害提高#4[i]%/#5[i]%。」 param = [0.12, 135, 160, 0.12, 0.18]",
+      "note": "The lower tier: 「速度大于等于 135」 with an UPPER bound, because the two thresholds are nested rather than exclusive -- at 170 speed BOTH 「>= 135」 and 「>= 160」 hold. ⚠ Honest note, corrected after a mutation that could not catch it: with the default `max_stacks: 1` the second rule's modifier would REPLACE the first anyway (last one wins), so the bound is not the only thing standing between the wearer and 0.30 -- it is what makes 「the tiers are alternatives」 visible in the file, and it is what would keep them apart if the cap were ever raised. ⚠ This is the reverse of the nesting set 124 has (there the thresholds are both *upper*, so the lower tier needs the upper bound on the other side). The ATK 12% is the `properties` stat (AttackAddedRatio 0.12). ⚠ `BATTLE_START` + `permanent` is the standing approximation for a 'while' clause -- the same one sets 301/302/304/306/307/309/310 use."
+    },
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self_attr:SPEED >= 160"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.18,
+          "permanent": true
+        }
+      ],
+      "source": "relic set 311 (苍穹战线格拉默 / Glamoth's Iron Cavalry Regiment), 2-piece: 「当装备者的速度大于等于#3[i]时，使装备者造成的伤害提高#5[i]%。」 param = [0.12, 135, 160, 0.12, 0.18]",
+      "note": "The upper tier: no upper bound needed here -- the higher threshold is the widest one, so it stands alone. 「造成的伤害」 is unscoped, hence ALL_DAMAGE_TYPE_BOOST rather than one of the cast-scoped boosts."
+    }
+  ]
+}
