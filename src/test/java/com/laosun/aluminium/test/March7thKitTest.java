@@ -2,11 +2,14 @@ package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -39,6 +42,8 @@ public class March7thKitTest {
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
+    /** An ordinary monster with no specific resistances (1002011 is immune to 冻结 — see the freeze cases). */
+    private static final int ORDINARY_MONSTER = 1003010;
     private static final int SKILL_SLOT = 2;
 
     /**
@@ -138,13 +143,66 @@ public class March7thKitTest {
     }
 
     /**
+     * 终结技「冰刻箭雨之时」: 「受到攻击的敌方目标有50%基础概率陷入冻结状态，持续1回合」.
+     *
+     * <p>⚠ The ultimate's <b>damage</b> needs no rule (the engine's ordinary AoE path reads 100103's own row), so
+     * what is asserted here is the state: the victim cannot act, and 「冻结状态」 is readable by the condition DSL.
+     *
+     * <p>⚠ The fixture is 1003010, not the 冰锋 the other cases use: 冰锋's data carries
+     * {@code STAT_CTRL_Frozen = 1.0} — it cannot be frozen by a skill at all (which the next test pins). Both
+     * sides of the probability pipeline are stated here (her 效果命中, the victim's 效果抵抗) so that "50% base"
+     * is not a coin flip in a test.
+     */
+    @Test
+    public void herUltimateFreezesWhoeverItHits() {
+        Character march = CharacterFactory.create(MARCH, LEVEL);
+        march.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));
+        Enemy enemy = EnemyFactory.create(ORDINARY_MONSTER, 90, 1);
+        enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
+        Battle battle = new Battle(List.of(march), List.of(enemy), new Random(0));
+        battle.startBattle();
+
+        battle.castImmediate(march.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), march,
+                List.of(enemy));
+
+        Assertions.assertTrue(enemy.getBuffManager().hasState("冻结"),
+                "「有50%基础概率陷入冻结状态」 -- with 效果命中 +100% and no resistance, this is the certain case");
+        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」");
+        Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp(),
+                "and the first sentence of the ultimate is the engine's own AoE path, not a rule");
+    }
+
+    /**
+     * The other side of the same roll, and a fact about the <b>data</b> rather than about the fixture: 冰锋
+     * (1002011) is immune to freeze ({@code STAT_CTRL_Frozen = 1.0}), so even a certain base chance cannot land.
+     */
+    @Test
+    public void herUltimateCannotFreezeAMonsterThatIsImmuneToIt() {
+        Character march = CharacterFactory.create(MARCH, LEVEL);
+        march.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(10.0));
+        Enemy immune = dummy();
+        Battle battle = new Battle(List.of(march), List.of(immune), new Random(0));
+        battle.startBattle();
+
+        battle.castImmediate(march.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), march,
+                List.of(immune));
+
+        Assertions.assertEquals(java.util.Map.of("STAT_CTRL_Frozen", 1.0), immune.getDebuffResist(),
+                "precondition: this monster's data is what makes it unfreezable");
+        Assertions.assertFalse(immune.getBuffManager().hasState("冻结"),
+                "no amount of 效果命中 beats a specific immunity -- which is why the case above needs a "
+                        + "different enemy rather than a bigger number");
+    }
+
+    /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
-     * <p>Three clauses exist and each is pinned above; the counts here are what says nothing else was written. Every
+     * <p>Four clauses exist and each is pinned above; the counts here are what says nothing else was written. Every
      * missing one would be a wrong number or a wrong trigger if it were spelled with the vocabulary that exists
-     * today: the freeze needs a control state (the engine composes controls out of three primitives but does not
-     * model 「冻结」 itself), 星魂 2 needs a "lowest HP% ally" selector, 星魂 4 needs a way to raise another rule's
-     * limit and a DEF-derived damage addend, and 加护 / 星魂 6 need the shield's provider.
+     * today: the freeze's <b>per-turn ice damage</b> needs an op that attaches a damage-over-time, 星魂 1 needs a
+     * per-cast count of the victims a state actually landed on, 星魂 2 needs a "lowest HP% ally" selector,
+     * 星魂 4 needs a way to raise another rule's limit plus a DEF-derived damage addend, 行迹「冰咒」 needs a way to
+     * raise an existing rule's base chance, and 加护 / 星魂 6 need the shield's provider.
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
@@ -152,8 +210,8 @@ public class March7thKitTest {
                 "the shield and the cleanse trace -- and nothing else on her Skill");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TAKING_HIT),
                 "the Talent's counter");
-        Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
-                "the freeze needs a control state the engine does not model yet");
+        Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
+                "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule)");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
                 "星魂 2's battle-start shield needs a 「生命值百分比最低的队友」 selector");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),

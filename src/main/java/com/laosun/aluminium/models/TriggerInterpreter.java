@@ -11,6 +11,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
 import com.laosun.aluminium.models.TriggerTable.TriggerContext;
 import com.laosun.aluminium.models.buff.AbstractBuff;
+import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
@@ -107,7 +108,7 @@ public final class TriggerInterpreter {
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
-            "REMOVE_STATE", "TAUNT");
+            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -318,6 +319,20 @@ public final class TriggerInterpreter {
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
+            case "APPLY_CONTROL" -> {
+                // 「有 50% 基础概率使敌方目标陷入冻结状态，持续 1 回合」: a named control state, a duration, and
+                // (optionally) a base chance that goes through 效果命中 / 效果抵抗.
+                requireControl(effect, op, spec);
+                requirePositiveTurns(effect, op, spec);
+                requireBaseChance(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states a number of turns and nothing else; \"permanent\" / \"until\" "
+                                    + "would be a control that never ends (source: " + spec.getSource() + ")");
+                }
+                requireNoMagnitudeArguments(effect, op, spec);
+            }
             case "SUMMON" -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
                 // (name, panel derivation) lives in resources/memosprites/<cid>.json. A `target` here would
@@ -460,6 +475,7 @@ public final class TriggerInterpreter {
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "REMOVE_STATE" -> removeState(effect, ctx);
             case "TAUNT" -> taunt(battle, effect, ctx);
+            case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1340,6 +1356,50 @@ public final class TriggerInterpreter {
         }
     }
 
+    /**
+     * {@code APPLY_CONTROL}: 「有 50% 基础概率使敌方目标陷入冻结状态，持续1回合」 — a named control state with a
+     * duration, and (optionally) a <b>base chance</b> that runs through the real 效果命中 / 效果抵抗 pipeline.
+     *
+     * <p><b>What the state does is the engine's business, not the rule's.</b> 冻结 blocks acting; 纠缠 and 禁锢
+     * slow instead — those three facts live in {@code Constant.CONTROL_STATES} (one entry per state, with the
+     * resistance key the roll needs), and the rule states only <i>which</i> state, for how long, and how likely.
+     * A rule cannot say 「冻结但随便」, and a misspelled state is refused at load time rather than attaching
+     * nothing.
+     *
+     * <p><b>Why the roll is per target.</b> A base chance is rolled for each victim — three enemies can see three
+     * different outcomes, which is what 「每个目标各有 50% 概率」 means and what the rule-level {@code chance}
+     * (one roll per firing) could not express. It goes through {@link Battle#tryApplyDebuff}, the same entry point
+     * the enemy-side debuff path uses, so the applier's 效果命中, the victim's 效果抵抗 and its per-state
+     * resistance ({@code STAT_CTRL_Frozen} — the reason {@code ControlEffect.resistKey} exists) all apply.
+     *
+     * <p>⚠ The control's <b>per-turn damage</b> (「冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加
+     * 伤害」) is <b>not</b> written by this op yet: it needs an "attach a damage-over-time" op of its own, and that
+     * is registered rather than folded in here as a field nobody else can use. What this op attaches is the state
+     * itself, so 「不能行动」 is complete.
+     */
+    private static void applyControl(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        Constant.ControlEffect control = Constant.CONTROL_STATES.get(effect.getControl().trim());
+        if (control == null) {
+            // Load-time validation already refused this; reaching here means the table changed under a compiled
+            // rule, which is an engine fault rather than a content one.
+            throw new IllegalStateException(
+                    "APPLY_CONTROL ran with the unknown state '" + effect.getControl() + "'; the loader validates "
+                            + "against Constant.CONTROL_STATES, so this is an engine fault");
+        }
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target == null || target.isDeath()) {
+                continue;
+            }
+            ControlBuff applied = new ControlBuff(control, effect.getTurns());
+            applied.setSource(ctx.owner());
+            if (effect.getBaseChance() == null) {
+                target.getBuffManager().addBuff(applied);
+            } else {
+                battle.tryApplyDebuff(ctx.owner(), target, applied, effect.getBaseChance(), control.resistKey());
+            }
+        }
+    }
+
     private static void removeState(EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(ctx.battle(), effect, ctx)) {
             target.getBuffManager().removeState(effect.getBuff());
@@ -1847,6 +1907,90 @@ public final class TriggerInterpreter {
                             + params.size() + ")");
         }
         return params.get(index);
+    }
+
+    /**
+     * Validates the state an {@code APPLY_CONTROL} names, at load time, against the engine's closed table.
+     *
+     * <p>A control is a <b>known state</b>, not a free-form name: 冻结 is one thing (it blocks acting), and a rule
+     * that misspelled it would attach nothing at all — the same silent-failure shape the target-selector and
+     * condition-variable closed sets exist to close. The message lists the names so the author has the fix in hand.
+     */
+    private static void requireControl(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getControl() == null || effect.getControl().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires \"control\" (which state to apply; known: "
+                            + String.join(" / ", Constant.CONTROL_STATES.keySet().stream().sorted().toList())
+                            + ") (source: " + spec.getSource() + ")");
+        }
+        if (!Constant.CONTROL_STATES.containsKey(effect.getControl().trim())) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names the control state '" + effect.getControl() + "', which the engine does "
+                            + "not know (known: "
+                            + String.join(" / ", Constant.CONTROL_STATES.keySet().stream().sorted().toList())
+                            + "); a misspelled state would attach nothing at all "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates the duration of an {@code APPLY_CONTROL} (required and positive).
+     *
+     * <p>Required rather than defaulted: 「陷入冻结状态」 with no turn count would be a <b>permanent</b> lock —
+     * a wrong mechanic that reads like a working rule, which is the one thing this vocabulary refuses. The
+     * documents always state it (「持续1回合」).
+     */
+    private static void requirePositiveTurns(EffectSpec effect, String op, TriggerSpec spec) {
+        Integer turns = effect.getTurns();
+        if (turns == null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires \"turns\" (how many of the victim's turns the state lasts, e.g. "
+                            + "\"持续1回合\"); without it the control would never end "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (turns <= 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"turns\": " + turns + ", but a control has to last at least one of "
+                            + "the victim's turns (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates {@code base_chance} (基础概率) when stated: a fraction of 1, and above 0.
+     *
+     * <p>Absent means "always lands", which is how a rule with no roll is written — so {@code 0} is a mistake
+     * rather than a way to spell "never" (a state that can never land is not a mechanic), and {@code 1} is legal
+     * and simply means the pipeline still runs (effect hit rate can never make it <i>more</i> than certain).
+     */
+    private static void requireBaseChance(EffectSpec effect, String op, TriggerSpec spec) {
+        Double chance = effect.getBaseChance();
+        if (chance == null) {
+            return;
+        }
+        if (!(chance > 0) || chance > 1) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has \"base_chance\": " + chance + ", but a base chance is a fraction of 1 "
+                            + "(0.5 = 「50% 基础概率」); omit the field entirely for a state that always lands "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Refuses the magnitude family ({@code amount} / {@code scale} / {@code percent} / {@code attribute} /
+     * {@code buff}) on an op that has no use for any of them.
+     *
+     * <p>Same reasoning as {@code requireNoTarget} and {@code requireNoStackArguments}: a field the interpreter
+     * never reads is a rule that says one thing and does another (M-26). The message names the field, because
+     * "which of my six fields was ignored" is otherwise a guessing game.
+     */
+    private static void requireNoMagnitudeArguments(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getAmount() != null || effect.getScale() != null || effect.getPercent() != null
+                || effect.getAttribute() != null || effect.getBuff() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " takes a control state, its turns and an optional base chance; it has no "
+                            + "\"amount\" / \"scale\" / \"percent\" / \"attribute\" / \"buff\" "
+                            + "(source: " + spec.getSource() + ")");
+        }
     }
 
     private static void requireResource(EffectSpec effect, String op, TriggerSpec spec) {
