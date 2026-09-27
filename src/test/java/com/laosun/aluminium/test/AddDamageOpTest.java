@@ -73,6 +73,26 @@ public class AddDamageOpTest {
                 () -> table(TriggerSpecs.rule("DEALING_DAMAGE", null, noScale)), "a derived value needs its scale");
     }
 
+    /** The shipped sentence: her 星魂 4 states the addend on the counter's own damage instance. */
+    @Test
+    public void theShippedEidolonStatesTheAddend() {
+        Character owner = CharacterFactory.create(OWNER, LEVEL, true, null, null, 4);
+        var rules = com.laosun.aluminium.data.TriggerTables.of(OWNER)
+                .matching(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE,
+                        new TriggerTable.TriggerContext(owner, owner, null, 0, 0, null, null,
+                                com.laosun.aluminium.enums.SkillCategory.UNSPECIFIED))
+                .stream()
+                .filter(rule -> rule.minEidolon() == 4)
+                .toList();
+        Assertions.assertEquals(1, rules.size(), "星魂 4's damage sentence is gone from characters/1001.json");
+        Assertions.assertEquals(List.of("actor == self", "from_skill TALENT"),
+                rules.getFirst().conditions().stream().map(TriggerTable.Condition::source).toList());
+        var effect = rules.getFirst().effects().getFirst();
+        Assertions.assertEquals("ADD_DAMAGE", effect.getOp());
+        Assertions.assertEquals("self_attr:DEFENCE", effect.getScale());
+        Assertions.assertEquals(0.3, effect.getPercent(), 1e-9);
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================

@@ -133,7 +133,24 @@
     ],
     "min_eidolon": 4,
     "source": "1001 三月七 星魂 4 不愿再失去 (Avatar_March7th_Rank04) 第一句: 「天赋的<u>反击</u>效果每回合可触发的次数增加1次。」 param = [1, 0.3]",
-    "note": "「天赋的反击效果每回合可触发的次数**增加1次**」 -- the counter's `per_turn` goes from 2 to 3, and this is the sentence that says why `MODIFY_RULE` exists instead of \"just write another rule\": a second rule with `per_turn: 3` would <b>add</b> firings (the engine would fire 2 + 3 = 5 times a turn) and look perfectly reasonable in the file. `rule: \"counter\"` names the talent rule above by its `id`, `amount: 1` is how many extra firings per turn (a count -- a probability would be `percent`), and the engine files the amendment on <b>三月七 herself for this battle</b> (rules are compiled once per cid and cached, so writing 3 onto the rule would leak into every battle in the JVM). ⚠ `BATTLE_START` + `min_eidolon: 4` is the shape of a 星魂: unconditional for the whole fight, so the amendment never has to be taken back. ⚠ Load-time checks make the wrong shapes loud: an unknown id, a target rule that states no `per_turn` (nothing to raise -- and 0 + 1 would silently IMPOSE a one-per-turn cap), both `amount` and `percent`, or any other field. ⚠ The stated `per_turn: 2` stays in the talent rule: the file's own number and the raise are two facts, and folding them into one would erase this 星魂's line (the same reason 加护 does not touch the Skill's `turns: 3`). ⚠ NOT authored from this 星魂 (registered): the second sentence 「使反击造成的伤害值提高，提高数值等同于三月七防御力的30%」 -- it raises the counter's damage by a value <b>derived from an attribute</b>, and `BOOST_DAMAGE` takes a percentage of the instance's damage, not an addend computed from somebody's DEFENCE; the engine has no \"+X damage, where X = 30% of my DEF\" spelling yet, so writing 30% as a damage boost would be a different (and much larger) number."
+    "note": "「天赋的反击效果每回合可触发的次数**增加1次**」 -- the counter's `per_turn` goes from 2 to 3, and this is the sentence that says why `MODIFY_RULE` exists instead of \"just write another rule\": a second rule with `per_turn: 3` would <b>add</b> firings (the engine would fire 2 + 3 = 5 times a turn) and look perfectly reasonable in the file. `rule: \"counter\"` names the talent rule above by its `id`, `amount: 1` is how many extra firings per turn (a count -- a probability would be `percent`), and the engine files the amendment on <b>三月七 herself for this battle</b> (rules are compiled once per cid and cached, so writing 3 onto the rule would leak into every battle in the JVM). ⚠ `BATTLE_START` + `min_eidolon: 4` is the shape of a 星魂: unconditional for the whole fight, so the amendment never has to be taken back. ⚠ Load-time checks make the wrong shapes loud: an unknown id, a target rule that states no `per_turn` (nothing to raise -- and 0 + 1 would silently IMPOSE a one-per-turn cap), both `amount` and `percent`, or any other field. ⚠ The stated `per_turn: 2` stays in the talent rule: the file's own number and the raise are two facts, and folding them into one would erase this 星魂's line (the same reason 加护 does not touch the Skill's `turns: 3`). ⚠ NOT authored from this 星魂 (registered): the second sentence 「使反击造成的伤害值提高，提高数值等同于三月七防御力的30%」 -- it raises the counter's damage by a value <b>derived from an attribute</b>, and `BOOST_DAMAGE` takes a percentage of the instance's damage, not an addend computed from somebody's DEFENCE; the engine has no \"+X damage, where X = 30% of my DEF\" spelling yet, so writing 30% as a damage boost would be a different (and much larger) number. ⚠ 2026-09-28: the SECOND sentence is now written -- it is the `DEALING_DAMAGE` rule right below this one, and the two together make this 星魂 complete."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "when": [
+      "actor == self",
+      "from_skill TALENT"
+    ],
+    "do": [
+      {
+        "op": "ADD_DAMAGE",
+        "scale": "self_attr:DEFENCE",
+        "percent": 0.3
+      }
+    ],
+    "min_eidolon": 4,
+    "source": "1001 三月七 星魂 4 不愿再失去 (Avatar_March7th_Rank04) 第二句: 「使<u>反击</u>造成的伤害值提高，提高数值等同于三月七防御力的<strong>30%</strong>。」 param = [1, 0.3]",
+    "note": "「使**反击**造成的伤害值提高，提高数值等同于三月七**防御力的30%**」 -- 这是**一个数值**，不是\"伤害提高百分之多少\"：`ADD_DAMAGE` 把它加到这次实例的**基数层**（`Damage.addFlat`，见 `engine.md` 乘区表），所以它和「100% 攻击力」那个倍率一样吃增伤/暴击/防御/抗性；写成 `BOOST_DAMAGE`（增伤区 `1 + Σ`）只有在这段伤害的基数恰好等于防御力时才相等 —— 一个看起来像做完了的错数字，`AddDamageOpTest` 专门钉住了这一对不相等。⚠ `scale: self_attr:DEFENCE` 的算术与 `MODIFY_ATTR` 的派生值**共用一处**（`derivedMagnitude`：`percent × 规则主人的属性 + amount`），读的是**触发那一刻**她的防御力（引擎既有的快照口径）。⚠ 两条条件都承重：`actor == self` 排除别人打的伤害，**`from_skill TALENT`** 排除她自己的普攻/战技/终结技 —— 只有天赋的反击是 `TALENT` 槽位（这是上一轮 `from_skill` 能力的第二个读者）。⚠ `min_eidolon: 4` 与上面那条 `MODIFY_RULE` 同属星魂 4：两句都出货之后，这个星魂**完整**了。"
   },
   {
     "on": "BATTLE_START",
