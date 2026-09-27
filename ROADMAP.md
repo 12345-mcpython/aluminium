@@ -277,6 +277,12 @@ P10-1 说"缺三个控制系"、P10-6 说"几率取 `param_list` 第 3 项"）�
 - `pwsh` 渲染中文正常；Windows PowerShell 5.1 会糊成乱码，**一律用 `pwsh`**。
 - PowerShell 的 `>` 重定向会写成 UTF-16（会把 Java 文件写坏）；用
   `[System.IO.File]::WriteAllText(..., UTF8Encoding($false))` 或 fs 工具。
+- ⚠ **演示 diff 闸门的"还原"步骤会抹掉未提交的改动，先提交再跑闸门**（2026-09-27 实测丢过一轮）：
+  闸门要回到旧版本跑对照，用的是 `git checkout <旧提交> -- src/main/java src/main/resources`，
+  跑完再用 `git checkout HEAD -- 同样的路径` 还原 —— 如果改动**还没提交**，第二次 checkout 恢复的是
+  **旧版本**，本轮工作当场消失（这次丢了 5 个文件的改动）。补救：Java 侧用锚点脚本重放（每个锚点
+  断言 `count == 1` 才动笔），然后**拿丢失前的 SHA-256 对齐**（`TriggerInterpreter`/`SkillExecutor`/
+  `Battle` 三个文件逐字节吻合 = 之前那轮变体验证依然有效）。规矩：**先 commit，再跑闸门**。
 
 ### 4.4 数据探测（别用 `ConvertFrom-Json` 读 1.5 MB 的 `skills.json`）
 
