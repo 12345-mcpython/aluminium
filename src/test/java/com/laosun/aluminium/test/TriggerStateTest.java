@@ -6,6 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -204,6 +206,107 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
+    // 3b. `REMOVE_STATE` — the other half of the state pair (M-42 ②)
+    // ==================================================================
+
+    /**
+     * The state comes off, and the removal is the same vocabulary as the test: `APPLY_BUFF` writes the name,
+     * `has_state` reads it, `REMOVE_STATE` takes it away.
+     */
+    @Test
+    public void removeStateTakesTheNamedStateOff() {
+        // Two different events so the two halves can be observed separately; on one event the table would apply and
+        // remove the state within the same fire, which would prove nothing about either.
+        Battle battle = battleWith(
+                stateOp("ALLY_ATTACK", "蒙福者", 3, null),
+                removeStateOn("SKILL_CAST", "蒙福者"));
+        Character owner = battle.characters.getFirst();
+
+        Assertions.assertEquals(1, fire(battle, owner), "the state was applied");
+        Assertions.assertTrue(owner.getBuffManager().hasState("蒙福者"), "precondition: it is on");
+        Assertions.assertEquals(1, fire(battle, owner, TriggerEvent.SKILL_CAST), "and then removed");
+        Assertions.assertFalse(owner.getBuffManager().hasState("蒙福者"), "「解除…状态」");
+    }
+
+    /**
+     * Only the named state goes: other states on the same unit are untouched.
+     *
+     * <p>Pinned because the cheap implementation — "remove the first buff that is a StateBuff" — would pass the case
+     * above and take somebody else's state off, which is a wrong state with nothing to report (the L-14 family).
+     */
+    @Test
+    public void removeStateLeavesOtherStatesAlone() {
+        Battle battle = battleWith(
+                stateOp("ALLY_ATTACK", "协奏", 3, null),
+                stateOp("ALLY_ATTACK", "转魄", 3, null),
+                removeStateOn("SKILL_CAST", "协奏"));
+        Character owner = battle.characters.getFirst();
+
+        fire(battle, owner);
+        fire(battle, owner, TriggerEvent.SKILL_CAST);
+
+        Assertions.assertFalse(owner.getBuffManager().hasState("协奏"), "the named one is gone");
+        Assertions.assertTrue(owner.getBuffManager().hasState("转魄"), "the other one is not");
+    }
+
+    /**
+     * The four DoT spellings resolve the same way here as they do in {@code has_state}.
+     *
+     * <p>「触电」 is not a {@code StateBuff} — the engine has represented the four damage-over-time states as an
+     * ordinary {@code DotBuff(element)} since P10-0, and {@code BuffManager} is the one place that knows the two
+     * spellings are the same fact. Removing is the side where forgetting that would be invisible: the state would
+     * simply stay on, and the rule would look like it ran.
+     */
+    @Test
+    public void removeStateUnderstandsTheDotSpelling() {
+        Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "触电"));
+        Character owner = battle.characters.getFirst();
+        owner.getBuffManager().addBuff(new DotBuff(owner, DamageElement.THUNDER, 100, 2));
+        Assertions.assertTrue(owner.getBuffManager().hasState("触电"), "precondition: the thunder DoT is on");
+
+        fire(battle, owner);
+
+        Assertions.assertFalse(owner.getBuffManager().hasState("触电"),
+                "「解除…状态」 works on the DoT names too -- one name, one meaning");
+    }
+
+    /** Removing a state that is not there is nothing to do, not a failure. */
+    @Test
+    public void removingAStateThatIsNotThereIsQuiet() {
+        Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "蒙福者"));
+        Character owner = battle.characters.getFirst();
+
+        Assertions.assertEquals(1, fire(battle, owner), "the rule runs; there was simply nothing to take off");
+        Assertions.assertFalse(owner.getBuffManager().hasState("蒙福者"));
+    }
+
+    /** The op takes the state off entirely, so a count is refused rather than silently ignored. */
+    @Test
+    public void removeStateRefusesAnAmount() {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "REMOVE_STATE");
+        TriggerSpecs.set(effect, "buff", "蒙福者");
+        TriggerSpecs.set(effect, "amount", 1.0);
+
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
+
+        Assertions.assertTrue(refused.getMessage().contains("amount"), refused.getMessage());
+    }
+
+    /** …and the name is required, like every other op that names something. */
+    @Test
+    public void removeStateRequiresTheStateName() {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "REMOVE_STATE");
+
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
+
+        Assertions.assertTrue(refused.getMessage().contains("buff"), refused.getMessage());
+    }
+
+    // ==================================================================
     // 4. `has_path` and the `!` prefix (M-41)
     // ==================================================================
 
@@ -307,6 +410,14 @@ public class TriggerStateTest {
         return TriggerSpecs.rule(event, null, effect);
     }
 
+    /** A rule that takes the named state off the resolved targets (default: the owner). */
+    private static TriggerSpec removeStateOn(String event, String name) {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "REMOVE_STATE");
+        TriggerSpecs.set(effect, "buff", name);
+        return TriggerSpecs.rule(event, null, effect);
+    }
+
     private static EffectSpec gain(double amount) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "GAIN_SKILL_POINT");
@@ -345,7 +456,11 @@ public class TriggerStateTest {
 
     /** Fires the event with the owner as actor and returns how many rules really ran. */
     private static int fire(Battle battle, Character actor) {
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0);
+        return fire(battle, actor, TriggerEvent.ALLY_ATTACK);
+    }
+
+    private static int fire(Battle battle, Character actor, TriggerEvent event) {
+        return battle.fireTriggers(event, actor, null, 1, 0);
     }
 
     /**
