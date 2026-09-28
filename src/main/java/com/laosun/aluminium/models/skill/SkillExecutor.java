@@ -304,15 +304,16 @@ public final class SkillExecutor {
      * Sums the terms of an effect: each parameter is either a percentage of {@link #scaleValue} or a
      * flat addition.
      *
-     * <p>The row is chosen by the skill's <b>current level</b>, the same rule as damaging skills and
-     * as {@code TriggerInterpreter.multiplierOf} — never hardcoded to max level.
+     * <p>The row is chosen by the skill's <b>current level</b> — its own level from the character file plus this
+     * battle's raises ({@code CanHit.skillLevel}, M-32) — never hardcoded to max level, and the same resolver the
+     * damaging path and {@code TriggerInterpreter.multiplierOf} use.
      *
      * @throws IllegalStateException when the table names a parameter the skill row does not have,
      *                               which means the generated table and the data have drifted apart
      */
     private static double effectAmount(Skill skill, SkillEffectSpec spec, CanHit user, CanHit target) {
         List<List<Double>> levels = skill.getData().getSkills();
-        int row = skill.getLevel() - 1;
+        int row = user.skillLevel(skill) - 1;
         if (row < 0 || row >= levels.size() || spec.getParams() == null) {
             return 0;
         }
@@ -388,7 +389,7 @@ public final class SkillExecutor {
 
         // 3) then take the multiplier: empty params really do exist (cid 1001 slot 6 has param_list = [[]])
         List<List<Double>> levels = data.getSkills();
-        int index = skill.getLevel() - 1;
+        int index = user.skillLevel(skill) - 1;
         if (index < 0 || index >= levels.size()) {
             return;
         }

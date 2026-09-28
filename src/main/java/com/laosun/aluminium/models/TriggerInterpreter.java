@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -418,6 +418,21 @@ public final class TriggerInterpreter {
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
+            case "RAISE_SKILL_LEVEL" -> {
+                // 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5 and the same sentence in most kits): the level a skill is
+                // READ at is character data plus this battle's raises (M-32), and one op is what raises it -- never a
+                // second copy of the rule at another level, which would double a cast like `per_turn` doubling does.
+                requireSkill(effect, op, spec);
+                requireEvent(spec, op, TriggerEvent.BATTLE_START);
+                double amount = effect.getAmount() == null ? 0 : effect.getAmount();
+                if (amount < 1 || amount != Math.floor(amount)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " raises a skill's level, so \"amount\" is a count of levels: a whole number "
+                                    + ">= 1, got " + (effect.getAmount() == null ? "nothing" : amount)
+                                    + " (source: " + spec.getSource() + ")");
+                }
+                rejectSkillLevelExtras(effect, op, spec);
+            }
             case "MODIFY_RULE" -> {
                 // 「天赋的反击效果每回合可触发的次数增加1次」 / 「施放终结技时，冻结敌方目标的基础概率提高15%」: a passive
                 // that RAISES a number on another rule in the same file. Which number is decided by which field is
@@ -635,6 +650,7 @@ public final class TriggerInterpreter {
             case "EXTEND_BUFF" -> extendBuff(battle, effect, ctx);
             case "RESIST_DEBUFF" -> resistDebuff(battle, effect, ctx);
             case "MODIFY_RULE" -> modifyRule(effect, ctx);
+            case "RAISE_SKILL_LEVEL" -> raiseSkillLevel(effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -948,7 +964,9 @@ public final class TriggerInterpreter {
         }
         EnemySkill attack = new EnemySkill(
                 skill.getData().getElement(),
-                multiplierOf(skill, effect),
+                // ⚠ `owner`, not the summon: the skill and its parameter row are the OWNER's (see above), so its
+                // level — and any 「终结技等级+1」 this battle has raised — is the owner's too.
+                multiplierOf(skill, effect, owner),
                 1,                                   // one segment: 长夜月's ultimate is 「单目标段数: 1」 in its own split
                 DamageType.NORMAL,                   // a real attack by the summon, not 附加伤害
                 skill.getData().getEffect(),         // the shape the skill itself declares (AoEAttack)
@@ -1774,6 +1792,32 @@ public final class TriggerInterpreter {
      * non-integer count, any other field, a non-{@code BATTLE_START} event, an unknown rule id, and a named rule that
      * does not state the number being raised.
      */
+    /**
+     * {@code RAISE_SKILL_LEVEL}: 「战技等级+1」「终结技等级+1」 (M-32) — this battle reads one skill slot one level higher.
+     *
+     * <p><b>Why an op and not a rule field.</b> The level is not a property of this rule: it changes what <b>another</b>
+     * ability reads out of its parameter table (the skill's own execution in {@code SkillExecutor}, a rule-driven
+     * {@code DAMAGE}, and a {@code COMMAND_SUMMON} swing). All three go through the one resolver
+     * {@link CanHit#skillLevel}, which is the only place the base level and the raises are added together.
+     *
+     * <p>⚠ <b>Per battle, not per character</b> (see {@code CanHit.skillLevelBonus}): the same {@code Character} can be
+     * put into a second battle by a stage, so writing the raised level onto the skill would stack once per battle and
+     * never come off — the same leak the {@code MODIFY_RULE} amendments were moved off the rule for.
+     *
+     * <p>⚠ <b>{@code BATTLE_START} only</b>, like {@code MODIFY_RULE}: a level raise is a passive fact of the loadout,
+     * and a raise applied mid-battle would have to be taken back at a point nobody states.
+     */
+    private static void raiseSkillLevel(EffectSpec effect, TriggerContext ctx) {
+        CanHit owner = ctx.owner();
+        if (owner == null) {
+            throw new IllegalStateException(
+                    "RAISE_SKILL_LEVEL ran without a rule owner, so there is no combatant whose skill to raise; this "
+                            + "is an engine fault (the op is validated onto BATTLE_START, which always has one)");
+        }
+        owner.raiseSkillLevel(SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT)),
+                (int) Math.round(effect.getAmount()));
+    }
+
     private static void modifyRule(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
         if (owner == null) {
@@ -2310,7 +2354,7 @@ public final class TriggerInterpreter {
                     "DAMAGE effect points at " + slot + ", whose effect is "
                             + skill.getData().getEffect() + " rather than a damaging one");
         }
-        double multiplier = multiplierOf(skill, effect);
+        double multiplier = multiplierOf(skill, effect, attacker);
         double base = attacker.getAttribute(AttributeType.ATTACK).get() * multiplier;
         battle.applyAdditionalDamage(attacker, victim, skill.getData().getElement(), base);
     }
@@ -2328,9 +2372,9 @@ public final class TriggerInterpreter {
      * @return the multiplier for that row
      * @throws IllegalStateException when the row or the column falls outside the data
      */
-    private static double multiplierOf(Skill skill, EffectSpec effect) {
+    private static double multiplierOf(Skill skill, EffectSpec effect, CanHit attacker) {
         var levels = skill.getData().getSkills();
-        int level = effect.getDamageLevel() == null ? skill.getLevel() : effect.getDamageLevel();
+        int level = effect.getDamageLevel() == null ? attacker.skillLevel(skill) : effect.getDamageLevel();
         int row = level - 1;
         if (row < 0 || row >= levels.size()) {
             throw new IllegalStateException(
@@ -2615,6 +2659,33 @@ public final class TriggerInterpreter {
      *
      * @param kept the field that selected the amendment ({@code "amount"} or {@code "percent"})
      */
+    /**
+     * Refuses every field a {@code RAISE_SKILL_LEVEL} effect does not read.
+     *
+     * <p>⚠ It cannot reuse {@link #rejectAmendmentExtras}: that one forbids {@code skill} outright (a
+     * {@code MODIFY_RULE} names a <b>rule</b>, never a slot), and this op's whole meaning is <b>which</b> slot is
+     * raised. Written out rather than parameterised because the two lists really are different statements — the
+     * shared-looking version made the op refuse the field it needs (measured: five cases went red with
+     * "raises exactly one number on the rule it names").
+     */
+    private static void rejectSkillLevelExtras(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getPercent() != null || effect.getScale() != null || effect.getTurns() != null
+                || effect.getPermanent() != null || effect.getUntil() != null
+                || effect.getAttribute() != null || effect.getBuff() != null
+                || effect.getTarget() != null || effect.getResource() != null
+                || effect.getDamageParam() != null || effect.getDamageLevel() != null
+                || effect.getElement() != null || effect.getControl() != null
+                || effect.getBaseChance() != null || effect.getKind() != null
+                || effect.getStacks() != null || effect.getTicksOn() != null
+                || effect.getAsAttack() != null || effect.getPerTarget() != null
+                || effect.getRule() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " raises one skill slot's level and states nothing else: \"skill\" (which slot) "
+                            + "and \"amount\" (how many levels), and it reads no other field "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
     private static void rejectAmendmentExtras(EffectSpec effect, String op, TriggerSpec spec, String kept) {
         boolean bothOrNeither = "amount".equals(kept) ? effect.getPercent() != null : effect.getAmount() != null;
         if (bothOrNeither || effect.getScale() != null || effect.getTurns() != null
