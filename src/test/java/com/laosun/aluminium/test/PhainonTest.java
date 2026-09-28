@@ -1,0 +1,84 @@
+package com.laosun.aluminium.test;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.utils.CharacterFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Random;
+
+/**
+ * 1408 Phainon, from his own file (2026-09-29, round 222): the 【火种】 resource his transformation kit still lets us declare.
+ */
+public class PhainonTest {
+    private static final int PHAINON = 1408;
+    private static final int ALLY = 1002;
+    private static final int LEVEL = 80;
+    private static final int MONSTER = 1002011;
+
+    /** \u26a0 Two Coreflame per Skill, and the document's cap of 12 enforced by exceeding it. */
+    @Test
+    public void theSkillFeedsCoreflameUpToTwelve() {
+        Character phainon = CharacterFactory.create(PHAINON, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(phainon, ally), List.of(enemy), fixed());
+        battle.startBattle();
+
+        Assertions.assertEquals(0, coreflameOf(phainon), "the document states no initial value, so it starts at 0");
+        battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
+        Assertions.assertEquals(2, coreflameOf(phainon),
+                "\u300c\u83b7\u5f972\u70b9\u3010\u706b\u79cd\u3011\u300d");
+
+        for (int i = 0; i < 9; i++) {
+            battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
+        }
+        Assertions.assertEquals(12, coreflameOf(phainon),
+                "\u300c\u3010\u706b\u79cd\u3011\u8fbe\u523012\u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u300d -- ten casts must still read twelve");
+    }
+
+    /** \u26a0 The technique restores the TEAM's energy (not hers) and grants one Skill Point. */
+    @Test
+    public void theTechniqueFeedsTheTeamButNotHerself() {
+        Character phainon = CharacterFactory.create(PHAINON, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(phainon, ally), List.of(enemy), fixed());
+        battle.markTechniqueUsed(phainon);
+        battle.startBattle();
+        int points = battle.getSkillPoints();
+
+        // A grant cannot be clamped upward, so the claim is an equality -- and it is about the TEAM, not about her.
+        double allyBefore = ally.getCurrentEnergy();
+        double herBefore = phainon.getCurrentEnergy();
+
+        battle.fireTriggers(TriggerEvent.BATTLE_START, phainon, ally, 0, 0);
+
+        Assertions.assertEquals(25.0, ally.getCurrentEnergy() - allyBefore, 1e-6,
+                "\u300c\u4e3a\u6211\u65b9\u961f\u53cb\u6062\u590d25\u70b9\u80fd\u91cf\u300d");
+        Assertions.assertEquals(0.0, phainon.getCurrentEnergy() - herBefore, 1e-6,
+                "the target is `other_allies`: the energy goes to the TEAM, not to her");
+        Assertions.assertEquals(Math.min(points + 1, battle.getSkillPointMax()), battle.getSkillPoints(),
+                "\u300c\u83b7\u5f971\u4e2a\u6218\u6280\u70b9\u300d (clamped by the pool's ceiling)");
+    }
+
+    /** The declared resource's value, read through the combatant's own manager. */
+    private static int coreflameOf(Character unit) {
+        return unit.getResources().get("\u706b\u79cd").getValue();
+    }
+
+    private static Random fixed() {
+        return new Random() {
+            @Override
+            public double nextDouble() {
+                return 0.0;
+            }
+        };
+    }
+}
