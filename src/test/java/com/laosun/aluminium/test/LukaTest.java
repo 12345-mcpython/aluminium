@@ -92,7 +92,7 @@ public class LukaTest {
         TriggerTable table = TriggerTables.of(LUKA);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the starting layer + the level convention");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK), "one layer rule per cast category");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "行迹 动能过载's REMOVE_BUFF");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the trace's REMOVE_BUFF and the Skill's 裂伤 DOT");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST));
     }
 
