@@ -5,6 +5,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Countdown;
 import com.laosun.aluminium.models.Signal;
@@ -56,6 +57,33 @@ public class CountdownTest {
                         + "(before " + before + ", after " + f.hero.getAttribute(AttributeType.ATTACK).get() + ")");
     }
 
+    /**
+     * ⚠ `actor == countdown` means <b>my</b> countdown, not "a countdown": another unit's clock must not answer her
+     * rule (2026-09-28).
+     */
+    @Test
+    public void somebodyElsesCountdownIsNotMine() {
+        Fixture f = new Fixture(markerOnCountdownTurn("actor == countdown"));
+        Character other = CharacterFactory.create(ALLY, LEVEL);
+        CharacterFactory.create(MARCH, LEVEL);
+        Countdown mine = f.battle.startCountdown(f.hero, "我的倒计时", 90);
+        Countdown theirs = f.battle.startCountdown(other, "别人的倒计时", 90);
+
+        Assertions.assertTrue(f.battle.countdownsOf(f.hero).contains(mine));
+        Assertions.assertFalse(f.battle.countdownsOf(f.hero).contains(theirs),
+                "the owner link is what tells them apart");
+
+        double before = f.hero.getAttribute(AttributeType.ATTACK).get();
+        f.battle.currentMove = f.signalFor(theirs);
+        f.battle.beforeMove();
+        Assertions.assertEquals(before, f.hero.getAttribute(AttributeType.ATTACK).get(), 1e-6,
+                "somebody else's countdown does not fire her rule");
+
+        f.battle.currentMove = f.signalFor(mine);
+        f.battle.beforeMove();
+        Assertions.assertTrue(f.hero.getAttribute(AttributeType.ATTACK).get() > before, "…and hers does");
+    }
+
     /** ⚠ It is not a party member: 「我方全体」 must not see it, or every group sentence would include a clock. */
     @Test
     public void itIsNotInTheParty() {
@@ -97,6 +125,13 @@ public class CountdownTest {
         private final Character hero;
         private final Battle battle;
 
+        private Signal signalFor(CanHit unit) {
+            return battle.queue.snapshot().stream()
+                    .filter(signal -> signal.getCanHit() == unit)
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("no signal for that unit"));
+        }
+
         private Fixture(TriggerSpec rule) {
             hero = CharacterFactory.create(MARCH, LEVEL);
             hero.setTriggerTable(new TriggerTable(MARCH, rule == null ? List.of() : List.of(rule)));
@@ -108,13 +143,18 @@ public class CountdownTest {
 
     /** A rule that fires on a countdown's turn and leaves a visible mark. */
     private static TriggerSpec markerOnCountdownTurn() {
+        return markerOnCountdownTurn(null);
+    }
+
+    private static TriggerSpec markerOnCountdownTurn(String condition) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
         TriggerSpecs.set(effect, "attribute", "ATTACK");
         TriggerSpecs.set(effect, "percent", 0.5);
         TriggerSpecs.set(effect, "turns", 3);
         TriggerSpecs.set(effect, "target", "self");
-        return TriggerSpecs.rule(TriggerEvent.COUNTDOWN_TURN.value(), null, effect);
+        return TriggerSpecs.rule(TriggerEvent.COUNTDOWN_TURN.value(),
+                condition == null ? null : List.of(condition), effect);
     }
 
     private static TriggerSpec countdown(Double speed, Double amount) {

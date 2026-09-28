@@ -1099,7 +1099,7 @@ public class TriggerTable {
      * to) — and a spelling that can never mean anything is exactly what this DSL refuses at load time rather
      * than letting an author write it and wonder.
      */
-    private static final Set<String> IDENTITY_TERMS = Set.of("self", "summon");
+    private static final Set<String> IDENTITY_TERMS = Set.of("self", "summon", "countdown");
 
     /**
      * Checks that an identity comparison names a variable the DSL knows.
@@ -1858,9 +1858,19 @@ public class TriggerTable {
                 case "target" -> ctx.target();
                 default -> null;
             };
-            if (!"summon".equals(otherToken)) {
+            if (!"summon".equals(otherToken) && !"countdown".equals(otherToken)) {
                 boolean equal = subject == ctx.owner();
                 return negated != equal;
+            }
+            // ⚠ Both remaining terms are read off the FIELD, so a context with no battle cannot answer them and the
+            // condition fails for BOTH polarities -- the same convention `summon` follows (answering "no battlefield,
+            // therefore not mine" would make `actor != countdown` silently true everywhere; see the note below).
+            if (ctx.battle() == null || ctx.owner() == null) {
+                return false;
+            }
+            if ("countdown".equals(otherToken)) {
+                boolean own = ctx.battle().countdownsOf(ctx.owner()).contains(subject);
+                return negated != own;
             }
             // "…is one of my summons" is read off the FIELD, so a context with no battle cannot answer it and
             // the condition fails — for BOTH polarities. That is the same rule `self_summon_count` follows

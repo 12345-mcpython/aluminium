@@ -1850,7 +1850,7 @@ public final class TriggerInterpreter {
         String name = effect.getBuff() == null || effect.getBuff().isBlank()
                 ? (ctx.owner() == null ? "countdown" : ctx.owner().getName() + " 倒计时")
                 : effect.getBuff().trim();
-        battle.startCountdown(name, effect.getSpeed());
+        battle.startCountdown(ctx.owner(), name, effect.getSpeed());
     }
 
     /**
