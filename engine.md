@@ -698,6 +698,12 @@ JSON 写法不变。
 > ⇒ 现在**"每次施放一次"且"带目标"**的事件存在了 ✓（`ALLY_ATTACK` ✓），代价是那条注释被如实改写 ✓。
 > **测试**：`KafkaTest`（她的天赋已迁到该事件 ✓，端到端验证追加伤害与触电 ✓）、`HanyaBurdenTest`（标记的**主体**修正为"另一个队友" ✓）；**变异**（实测）：把 `aimed` 改回 `null` ⇒ **1 红**（`KafkaTest.anAllysBasicAttackTriggersHerFollowUp` ✓）。
 
+> ⚠ **2026-09-29（第 156 轮）`cap_scale`/`cap_percent` 仍只有 `APPLY_DOT` 会读** ✗（用 `MODIFY_ATTR` 写它会被装载器拒绝，原话就是 *only APPLY_DOT reads today*）。
+> 尝试过放行给 `MODIFY_ATTR` 并复用 DOT 的 `applyDerivedCeiling`，**已回滚** ✗，原因值得记住：
+> `applyDerivedCeiling` 解出的 ceiling 是**绝对值**（如「停云当前攻击力的 25%」✓），而 `MODIFY_ATTR` 的 `percent` 是**份额**（目标攻击力的 50%）⇒ `min(份额, 绝对值)` **单位不同** ✗，上限形同虚设（我的断言就是这么失败的 ✗）。
+> **正确形状**：**逐目标**把上限换算成份额（`ceiling / 目标该属性值`）再 min ✓，而不是在得到份额后直接 min ✗。
+> **读者**：`1202` 停云战技「攻击力提高 50%，**最高不超过停云当前攻击力的 25%**」✓；语料里「最高不超过 / 至多不超过 / 上限为」共 **14 个文件** ✓。
+
 | `ADD_STACK` | `buff`（计数器名字）+ `max_stacks`（可选，默认 1）+ `turns` / `permanent` + `target` | ✅（2026-09-28）「每当我方目标…施放 **2** 次…后，立即为我方恢复 1 个战技点」（1215 寒鸦）——「累计几次」此前**完全无法表达**（引擎能堆叠、能 `REMOVE_STACK`，但**没有东西能读计数**）。载体是 `StackBuff`：有名字、有寿命、**不挂任何属性**（计数器不该改面板），`isStackable()` 恒真且按名字分组 —— ⚠ 第一版忘了报 `maxStacks()`，于是第二次标记被 `addStackable` 按默认上限 1 丢掉，**计数永远是 1**。**读取侧**：条件 `self_stacks:<名字>` / `target_stacks:<名字>`（两个拼写，主体在名字里，与 `hp_percent`/`target_hp_percent` 同族）；**装载期**要求该名字在本文件里真被某个造名字的 op 创建过（`ADD_STACK`/`APPLY_BUFF`/`MODIFY_ATTR`/`RESIST_DEBUFF`/`SHIELD`），否则是永不成立的条件。⚠ `REMOVE_STATE <名字>` 是**清空**整个计数器（不是减一层），这正是「触发 2 次后自动解除」要的。**测试** `StackCounterTest` 3 条。**变异**（实测）：标记不落地 **2 红**；条件改回一次性求值 **1 红** |
 | `ADD_DAMAGE` | `scale`（`self_attr:<属性>` 或 `self_max_energy`）+ `percent`（可选 `amount` 作常数项）；**只能挂在 `DEALING_DAMAGE` 上** | ✅（2026-09-28）「伤害值提高，提高数值等同于<某属性>的 Y%」。⚠ 它是 `BOOST_DAMAGE` 的**绝对值**兄弟：`BOOST_DAMAGE` 往**增伤区**加百分比（`1 + Σ`，是**乘法**），这个把 `percent × 规则主人的属性` 加进实例的**基数层**（`Damage.addFlat` / `toValue`）—— 于是它和技能倍率一样吃增伤/暴击/防御/抗性。⚠ 把这类句子写成 `BOOST_DAMAGE` 只有当"这段伤害的基数恰好等于那条属性"时才相等，是"看起来像做完了"的错数字（`AddDamageOpTest` 用**基数 400** 钉住这一对不相等；基数取 100 时两者数学上相同，测不出来 —— 变异 m2 第一轮 0 红就是这么来的）。⚠ 算术与 `MODIFY_ATTR` 的派生值**共用一处**（`derivedMagnitude` = `percent × 主人的属性 + amount`），校验也共用（`scaleAttribute`：只认 `self_attr:`，写错属性名装载期报错）。首个用户 **1001 星魂 4 第二句**（`actor == self` + `from_skill TALENT` 只圈住她的反击）。⚠ **`HEAL` 侧的对称件仍缺**（读者 1222/1301 的角色文件都还没写）→ 登记，不造没有读者的能力 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
