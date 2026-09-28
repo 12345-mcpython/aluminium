@@ -62,6 +62,13 @@ public class HertaTheTest {
         // ADD_STACK makes a stack, not a named state: it is read with stacksOf, the same API 8003's Magma Will uses.
         Assertions.assertEquals(1, herta.getBuffManager().stacksOf("\u7075\u611f"),
                 "\u300c\u83b7\u5f971\u5c42\u3010\u7075\u611f\u3011\u300d");
+
+        // \u26a0 The document's cap: five more ultimates must stop at 4, not keep counting (this is what makes the cap testable at all).
+        for (int i = 0; i < 5; i++) {
+            battle.fireTriggers(TriggerEvent.ULT_CAST, herta, herta, 0, 0);
+        }
+        Assertions.assertEquals(4, herta.getBuffManager().stacksOf("\u7075\u611f"),
+                "\u300c\u3010\u7075\u611f\u3011\u6700\u591a\u6301\u67094\u5c42\u300d");
     }
 
     /** Census: the technique, the ultimate and the convention. */
