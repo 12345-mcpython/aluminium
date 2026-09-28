@@ -2198,7 +2198,26 @@ public class Battle {
      * @return the settled value of this instance (0 = no damage dealt)
      */
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
+        return applyAdditionalDamage(attacker, target, element, base, null, null);
+    }
+
+    /**
+     * The same, for an instance whose crit is <b>stated rather than rolled</b> (「该伤害暴击率固定为100%，暴击伤害固定为150%」).
+     *
+     * <p>⚠ The numbers ride into the {@link Damage} here instead of being applied by the caller: this is the engine's
+     * one additional-damage entry point (`DamagePipelineTest` pins the single-settlement invariant), so an extra
+     * overload is the honest place for them — a second public way to build and settle an instance is exactly what
+     * that invariant exists to prevent.
+     *
+     * @param fixedCritRate   {@code 1.0} for "always crits, no roll" ({@code null} = roll normally)
+     * @param fixedCritDamage the crit damage to use ({@code 1.5} = 150%; {@code null} with a rate is refused at load)
+     */
+    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
+                                        Double fixedCritRate, Double fixedCritDamage) {
         Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
+        if (fixedCritRate != null) {
+            extra.fixedCrit(true, fixedCritDamage);
+        }
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
         double settled = applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
         // P10-3 tail: this is the engine's one and only notion of a follow-up attack, so the
