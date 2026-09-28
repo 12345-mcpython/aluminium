@@ -229,7 +229,8 @@ public final class TriggerInterpreter {
         // ⚠ A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
         // kind of mistake this interpreter's closed sets exist to prevent.
         if ((effect.getCapScale() != null || effect.getCapPercent() != null)
-                && !"APPLY_DOT".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())) {
+                && !"APPLY_DOT".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())
+                && !"MODIFY_ATTR".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())) {
             throw new IllegalArgumentException(
                     "Op " + effect.getOp() + " states a derived ceiling (\"cap_scale\"/\"cap_percent\"), which only "
                             + "APPLY_DOT reads today (source: " + spec.getSource() + ")");
@@ -292,6 +293,13 @@ public final class TriggerInterpreter {
             case "MODIFY_ATTR" -> {
                 requireAttribute(effect, op, spec);
                 requirePercent(effect, op, spec);
+                // ? A derived ceiling on a modifier (2026-09-29): both fields, or neither.
+                if ((effect.getCapScale() != null || effect.getCapPercent() != null)
+                        && (effect.getCapScale() == null || effect.getCapPercent() == null)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states a derived ceiling, which needs BOTH \"cap_scale\" and \"cap_percent\" "
+                                    + "(source: " + spec.getSource() + ")");
+                }
                 requireDerivedScale(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireStackCap(effect, op, spec);
@@ -1315,8 +1323,22 @@ public final class TriggerInterpreter {
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            // ? A stated ceiling, in the target's own unit (2026-09-29). The two forms differ:
+            //   * a DERIVED magnitude is already absolute, so the ceiling is compared directly;
+            //   * a SHARE scales off the target's BASE value, so the ceiling is divided by that base first
+            //     -- comparing a share with an absolute number (the first attempt) compares nothing.
+            double applied = magnitude;
+            if (derived) {
+                applied = applyDerivedCeiling(effect, ctx, applied);
+            } else if (effect.getCapScale() != null || effect.getCapPercent() != null) {
+                double ceiling = resolveScale(effect.getCapScale(), effect.getCapPercent(), ctx);
+                double base = target.getAttribute(attribute).baseValue();
+                if (base > 0) {
+                    applied = Math.min(applied, ceiling / base);
+                }
+            }
             AbstractBuff buff = withSource(withTickOwner(
-                    withLifetime(statModifier(attribute, magnitude, turns, permanent, maxStacks, derived), effect),
+                    withLifetime(statModifier(attribute, applied, turns, permanent, maxStacks, derived), effect),
                     effect, ctx), ctx);
             // 「处于【协奏】状态时，我方全体攻击力提高…」 (2026-09-28): the boost lasts as long as the STATE, and the state ends
             // when a countdown's turn arrives -- a lifetime no `turns` can state. Naming the modifier is what lets
