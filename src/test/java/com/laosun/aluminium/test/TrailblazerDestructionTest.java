@@ -51,7 +51,8 @@ public class TrailblazerDestructionTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(TB);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BREAK), "the ATK stack");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique heal (round 178) and the level convention");
     }
 
     private static Random fixed() {

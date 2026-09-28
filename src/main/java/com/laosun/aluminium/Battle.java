@@ -169,6 +169,15 @@ public class Battle {
      * shared with wave entries, and a wave arriving is not a summon.
      */
     private final List<CanHit> justSummoned = new ArrayList<>();
+    /**
+     * Units whose technique was used before this battle (2026-09-29).
+     *
+     * <p>A technique happens OUTSIDE the battle, so the engine cannot observe it; the caller says so with {@link #markTechniqueUsed}, and
+     * {@link #startBattle()} turns that into a plain {@code StateBuff} named 「秘技」 so content can ask for it with the vocabulary it already has
+     * (`self has_state 秘技`). 68 documents contain a 「使用秘技后」 clause and 29 a 「下一次战斗开始时」 one, so this is the gate they were all
+     * waiting for.
+     */
+    private final List<CanHit> techniqueUsers = new ArrayList<>();
 
     /**
      * The cast being resolved right now, or {@code null} outside a cast (P11-1, M-40) — what
@@ -624,6 +633,7 @@ public class Battle {
     public void startBattle() {
         status = Status.RUNNING;
         attachBattleSkills();
+        applyTechniqueStates();   // ? before every BATTLE_START rule, so `self has_state 秘技` already answers
         for (Signal signal : queue.snapshot()) {
             signal.getCanHit().onBattleStart(this);
         }
@@ -2823,4 +2833,22 @@ public class Battle {
         }
         System.out.println("================");
     }
+
+    /** Records that this unit used its technique before the battle (2026-09-29). Call before {@link #startBattle()}. */
+    public void markTechniqueUsed(CanHit unit) {
+        if (unit != null && !techniqueUsers.contains(unit)) {
+            techniqueUsers.add(unit);
+        }
+    }
+
+    /** Gives every unit whose technique was used a permanent 「秘技」 state, before anything reads BATTLE_START (2026-09-29). */
+    private void applyTechniqueStates() {
+        for (CanHit unit : techniqueUsers) {
+            if (unit == null || unit.isDeath()) {
+                continue;
+            }
+            unit.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("\u79d8\u6280", 1, true));
+        }
+    }
+
 }
