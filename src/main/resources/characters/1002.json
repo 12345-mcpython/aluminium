@@ -46,5 +46,23 @@
     ],
     "source": "1002 丹恒 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 260%、终结技 400%、天赋 +36% 穿透）",
     "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 他的战技/终结技/秘技的登记见天赋那条的 note ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "technique_opening_attack",
+    "when": [
+      "self has_state 秘技"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.4,
+        "turns": 3,
+        "target": "self"
+      }
+    ],
+    "source": "1002 丹恒 秘技 破敌锋芒 (100207, Maze/Enhance): 「使用秘技后，下一次战斗开始时丹恒攻击力提高40%，持续3回合。」",
+    "note": "「**使用秘技后**，下一次战斗开始时丹恒**攻击力提高 40%**，持续 **3 回合**」—— ① **门槛**用 `self has_state 秘技` ✓（第 178 轮：`Battle.markTechniqueUsed(unit)` 在开战前登记 ✓，`startBattle()` 在**任何 `BATTLE_START` 规则之前**加一个 `StateBuff(\"秘技\")` ✓ ⇒ 内容无需学新词 ✓）；② 加成用 `MODIFY_ATTR ATTACK percent 0.4 turns 3` ✓（\"下一次战斗开始时\"= `BATTLE_START` ✓、\"持续 3 回合\" ✓）。⚠ 本条自第 153 轮起登记为\"缺秘技门槛\" ✗，第 178 轮补上能力后被**回收** ✓。"
   }
 ]
