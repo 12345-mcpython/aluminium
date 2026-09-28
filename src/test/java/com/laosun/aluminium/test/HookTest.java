@@ -50,7 +50,8 @@ public class HookTest {
         var table = TriggerTables.of(HOOK);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the burn");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the trace that follows the ultimate");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "E6's bonus against a burning target");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
+                "E6's bonus against a burning target and the talent's guarded extra instance");
         Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the level convention plus E2/E3/E5");
     }

@@ -892,6 +892,17 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])from_skill(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The bare keyword {@code damage_is_attack}: "the instance being settled counts as an attack".
+     *
+     * <p><b>Why this exists</b> (2026-09-28): additional damage is settled as a real instance with
+     * {@code notCountsAsAttack()} set (see {@code Battle.applyAdditionalDamage}), and it fires {@code DEALING_DAMAGE} like any
+     * other instance — so a rule that reacts to "my attack hit a burning target" would react to its own additional damage,
+     * forever. {@code !} cannot express the guard (negation is only for party conditions), so the guard is stated positively:
+     * this is true exactly when the instance is an ordinary attack, and false for additional damage.
+     */
+    static final String DAMAGE_IS_ATTACK = "damage_is_attack";
+
+    /**
      * The events whose {@code TriggerContext} carries the <b>causing cast</b>, and therefore the only ones on which
      * {@code from_skill} can ever be true.
      *
@@ -1018,6 +1029,18 @@ public class TriggerTable {
 
         // `from_skill COMMON|SKILL|ULTRA|TALENT`: the causing instance's cast category. No subject: the "who" is
         // already a separate condition (`actor == self`), and the sentence never names a second unit.
+        // `damage_is_attack`: a bare keyword, no subject and no value. Kept positive on purpose -- see DAMAGE_IS_ATTACK.
+        if (text.trim().equalsIgnoreCase(DAMAGE_IS_ATTACK)) {
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks whether the instance is an attack, but " + spec.getOn()
+                                + " carries no damage instance; it belongs on an event that settles one "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new DamageIsAttack(raw);
+        }
+
         Matcher fromSkill = FROM_SKILL.matcher(text);
         if (fromSkill.find()) {
             String before = normalize(text.substring(0, fromSkill.start()));
@@ -1888,6 +1911,30 @@ public class TriggerTable {
      * <p>⚠ A break/kill with no causing instance (a rule that reduces toughness directly, an enemy skill that builds
      * its damage inline) answers <b>false</b>: the event happened, but nothing can say which skill produced it.
      */
+    /**
+     * {@code damage_is_attack} ? "the instance being settled counts as an attack" (2026-09-28).
+     *
+     * <p>Additional damage is an instance too, and it is deliberately marked {@code notCountsAsAttack()}, so this is the one
+     * question that tells the two apart where it matters: a rule that would otherwise react to its own extra instance.
+     */
+    private static final class DamageIsAttack implements Condition {
+        private final String raw;
+
+        DamageIsAttack(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.damage() != null && !ctx.damage().isCountsAsAttack();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     private static final class FromSkill implements Condition {
 
         private final SkillType slot;
