@@ -1686,7 +1686,7 @@ public final class TriggerInterpreter {
      * every other vocabulary here: a typo has to be rejected at load time, and the two spellings are the ones
      * the content actually uses (see {@link EffectSpec#getScale()}).
      */
-    private static final Set<String> SCALES = Set.of("target_max_hp", "owner_max_hp", "owner_def");
+    private static final Set<String> SCALES = Set.of("target_max_hp", "owner_max_hp", "owner_def", "owner_attack");
 
     /**
      * The one scale {@code GAIN_ENERGY} accepts: a share of the <b>receiving</b> unit's maximum energy.
@@ -1824,6 +1824,9 @@ public final class TriggerInterpreter {
             case "owner_max_hp" -> ownerAttributeOf(ctx, "owner_max_hp", AttributeType.HEALTH) * share + flat;
             // 三月七 100102: a shield of 「57% 防御力 + 760」 -- a share of the maker's DEFENCE plus a constant.
             case "owner_def" -> ownerAttributeOf(ctx, "owner_def", AttributeType.DEFENCE) * share + flat;
+            // ? 1414's shield is 「20.00% 攻击力 + 400」 (2026-09-29): the same derived shape, off ATTACK. Seven documents state
+            // an ATK-scaled shield or heal and the vocabulary had no name for it.
+            case "owner_attack" -> ownerAttributeOf(ctx, "owner_attack", AttributeType.ATTACK) * share + flat;
             default -> throw new IllegalStateException(
                     "Scale '" + scale + "' passed validation but has no implementation");
         };
