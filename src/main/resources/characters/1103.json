@@ -145,5 +145,48 @@
     "min_eidolon": 5,
     "source": "1103 希露瓦 星魂 5 贝洛伯格最强音！ (Avatar_Serval_00_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'110303': 2, '110304': 2}",
     "note": "星魂 5's two raises. ⚠ The TALENT half is stated even though this file's talent clause is registered: it is a fact about the loadout, and the day that clause is written the level is already right — the same reasoning 1215's base-level rule gives. ⚠ **Not written yet in this file** (each with its blocker, all in ROADMAP): 天赋「施放攻击后，对**所有触电状态下的**敌方目标造成等同于希露瓦 72% 攻击力的雷属性附加伤害」(a rule's effect reaches what a *selector* names, so 「all shocked enemies」 cannot be filtered per target — `M-53`); 战技的相邻目标触电判定 (the skill's own hit list is not addressable); 星魂 1「普攻对指定敌方目标的 1 个随机相邻目标造成…60%」(no adjacent selector); 星魂 2「每触发 1 次天赋的附加伤害，希露瓦恢复 4 点能量」(rides on the talent); 星魂 4「施放终结技时，有 100% 基础概率使**非触电状态下的**敌方目标…」(the negation is per target, `M-53` again)."
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "skill": "TALENT",
+        "damage_param": 0,
+        "target": "all_enemies",
+        "target_when": [
+          "target has_state 触电"
+        ],
+        "element": "Thunder"
+      }
+    ],
+    "source": "1103 希露瓦 天赋 燃情和弦 (110304, Enhance): 「施放攻击后，对所有触电状态下的敌方目标造成等同于希露瓦72%攻击力的雷属性附加伤害。」 数据行 Lv10 = [0.72]",
+    "note": "「施放攻击后，对**所有触电状态下的**敌方目标造成等同于希露瓦 72% 攻击力的雷属性附加伤害」 — the sentence `M-53` existed for. ⚠ `target_when: [\"target has_state 触电\"]` is the new vocabulary: the selector says **which units** (`all_enemies`) and the filter says **which of them qualify**, tested one candidate at a time with `target` bound to that candidate. Writing it the old way — a rule condition `target has_state 触电` with `target: all_enemies` — would have damaged the unshocked enemies too, which is a wrong number with no symptom. ⚠ The magnitude is her **talent** row (110304: Lv1 0.36, Lv10 0.72), read through `damage_param: 0`; the level 口径 rule below raises TALENT, so the engine reads the Lv10 row the document quotes. ⚠ `actor == self` is 「施放攻击后」 with 希露瓦 as the subject (ALLY_ATTACK is broadcast to the whole side). ⚠ It fires on her own follow-ups too (a `FOLLOW_UP` is an attack she cast), which the document's 「施放攻击后」 also covers."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_DOT",
+        "element": "Thunder",
+        "scale": "self_attr:ATTACK",
+        "percent": 1.04,
+        "turns": 2,
+        "base_chance": 1.0,
+        "target": "all_enemies",
+        "target_when": [
+          "!target has_state 触电"
+        ]
+      }
+    ],
+    "min_eidolon": 4,
+    "source": "1103 希露瓦 星魂 4 制造噪音吧！ (Avatar_Serval_00_Rank04): 「施放终结技时，有100%基础概率使非触电状态下的敌方目标状态陷入与战技相同的触电状态。」 param = [1]",
+    "note": "「施放终结技时，有 100% 基础概率使**非触电状态下的**敌方目标陷入与战技相同的触电状态」. ⚠ The negation lives in the filter (`!target has_state 触电`), which is the same per-target machinery as the talent above — and the `!` prefix is the DSL's only negation, so this is also why identity negation is spelled `!=`. ⚠ `base_chance: 1` is 「100% 基础概率」 stated rather than assumed: an unstated chance in this engine is also 100% *base*, but the document names the number and a reader should see it. ⚠ 「与战技相同的触电状态」 ties the eidolon to the Skill's own row, so the numbers here are the same three (#3/#4/#5 = 0.8/2/1.04) — stated rather than referenced, because a rule cannot read another rule's fields (that is what `MODIFY_RULE` is for, and it amends rather than copies)."
   }
 ]
