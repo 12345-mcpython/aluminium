@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -313,6 +313,15 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "MODIFY_DAMAGE_TAKEN" -> {
+                requirePercent(effect, op, spec);
+                requireNonZeroPercent(effect, op, spec);
+                requireDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "BOOST_TOUGHNESS" -> {
+                // 「使本次攻击的削韧值提高100%」 / 「前2段攻击…削韧值提高50%」: a multiplier on the toughness reduction this
+                // instance will cause. ⚠ Read at ONE place (SkillExecutor.applyStanceDamage), never inside
+                // Battle.reduceToughness -- that method is also called by enemy skills and by the demo script.
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireDuration(effect, op, spec);
@@ -766,6 +775,7 @@ public final class TriggerInterpreter {
             case "RAISE_SKILL_LEVEL" -> raiseSkillLevel(effect, ctx);
             case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
             case "ADD_STACK" -> addStack(battle, effect, ctx);
+            case "BOOST_TOUGHNESS" -> boostToughness(battle, effect, ctx);
             case "APPLY_REGEN" -> applyRegen(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
@@ -1973,6 +1983,28 @@ public final class TriggerInterpreter {
      * <p>⚠ Its name is required, and not for bookkeeping: 「施放战技产生的持续回复效果延长1回合」 (1105 行迹 调理) and any
      * removal by name reach it through that string, exactly as a 遗器 set's temporary buff does.
      */
+    /**
+     * {@code BOOST_TOUGHNESS}: 「使本次攻击的**削韧值**提高 100%」 — a timed multiplier on the reduction the target's
+     * attacks will cause.
+     *
+     * <p>⚠ The documents say 「本次攻击」, and the engine's nearest honest spelling is a one-turn buff on the attacker: the
+     * reduction happens inside the settlement of the attack, there is no "this instance only" lifetime for a buff, and a
+     * bearer who attacks twice in one turn would have both boosted. That nuance is stated rather than hidden — the
+     * alternative (a field on the damage instance) would need the reduction to be part of the instance, which is exactly
+     * what the engine's split (damage first, then a second number) avoids.
+     */
+    private static void boostToughness(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target == null) {
+                continue;
+            }
+            AbstractBuff boost = withSource(withLifetime(
+                    new com.laosun.aluminium.models.buff.ToughnessBoostBuff(effect.getPercent(), effect.getTurns()),
+                    effect), ctx);
+            target.getBuffManager().addBuff(boost);
+        }
+    }
+
     private static void applyRegen(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String name = effect.getBuff() == null ? "" : effect.getBuff().trim();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {

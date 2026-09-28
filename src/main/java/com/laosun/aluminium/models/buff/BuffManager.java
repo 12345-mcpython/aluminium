@@ -786,6 +786,23 @@ public class BuffManager {
     }
 
     /**
+     * The attacker's total toughness-reduction bonus (「削韧值提高 X%」), summed over the boosts it carries.
+     *
+     * <p>Read at exactly one place, {@code SkillExecutor.applyStanceDamage}, where a nominal reduction becomes a settled
+     * one. ⚠ Summed rather than taken as the largest: two sentences that both say 「提高」 stack on each other, which is
+     * why {@code ToughnessBoostBuff.isSameKind} says two of them are never "the same buff".
+     */
+    public double toughnessBoost() {
+        double total = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff instanceof com.laosun.aluminium.models.buff.ToughnessBoostBuff boost) {
+                total += boost.getPercent();
+            }
+        }
+        return total;
+    }
+
+    /**
      * How many buffs on this unit carry the given <b>name</b> — 「已经累计了几次」 (2026-09-28).
      *
      * <p>⚠ A counter is <b>several buffs with one name</b>, not one buff with a count field: that is the engine's
