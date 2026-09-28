@@ -68,6 +68,8 @@ public class KafkaTest {
 
         Assertions.assertTrue(afterAlly < before,
                 "the ally's basic attack lands and Kafka's follow-up adds to it: " + before + " -> " + afterAlly);
+        Assertions.assertTrue(enemy.getBuffManager().hasState("触电"),
+                "\u300c\u5e76\u6709100%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u53d7\u5230\u653b\u51fb\u7684\u654c\u65b9\u76ee\u6807\u9677\u5165\u4e0e\u7ec8\u7ed3\u6280\u76f8\u540c\u7684\u89e6\u7535\u72b6\u6001\u300d \u2014 the follow-up really fired");
     }
 
     /** \u26a0 Her OWN basic attack must not grant the follow-up: observable is the Shock it would apply. */
