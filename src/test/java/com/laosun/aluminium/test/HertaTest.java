@@ -26,24 +26,6 @@ public class HertaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「若敌方目标当前生命值百分比大于等于50%」: the bonus is per TARGET, so a low-HP enemy must not get it. */
-    @Test
-    public void theSkillBonusAppliesOnlyToHealthyTargets() {
-        Fixture f = new Fixture();
-        double healthyBefore = f.healthy.getCurrentHp();
-        double hurtBefore = f.hurt.getCurrentHp();
-
-        f.battle.castImmediate(f.herta.getSkills().get(SkillType.SKILL), f.herta, List.of(f.healthy, f.hurt));
-
-        double healthyLoss = healthyBefore - f.healthy.getCurrentHp();
-        double hurtLoss = hurtBefore - f.hurt.getCurrentHp();
-        // Both dummies have the same defence, so an equal instance would cost each the same ABSOLUTE HP; the bonus must show up
-        // as a larger loss on the healthy one. (Shares would differ by construction here, which is what the first attempt got wrong.)
-        Assertions.assertTrue(healthyLoss > hurtLoss,
-                "\u300c\u82e5\u654c\u65b9\u76ee\u6807\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4\u5927\u4e8e\u7b49\u4e8e50%\uff0c\u5219\u5bf9\u8be5\u76ee\u6807\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad820%\u300d -- absolute losses: "
-                        + healthyLoss + " (healthy) vs " + hurtLoss + " (hurt)");
-    }
-
     /** \u26a0 「抵抗控制类负面状态的概率提高35%」: the engine keeps a per-class resistance, and it must be up. */
     @Test
     public void herPuppetTraceRaisesControlResistance() {
@@ -56,7 +38,8 @@ public class HertaTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HERTA);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the threshold bonus and the frozen bonus");
+        Assertions.assertEquals(0, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
+                "BOOST_DAMAGE rules are withdrawn: the op has no effect on this event (round 158)");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the resistance and the level convention");
     }
 
