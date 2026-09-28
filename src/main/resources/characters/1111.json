@@ -23,7 +23,7 @@
       }
     ],
     "source": "1111 卢卡 终结技 制胜一击 (111103, Ultra/SingleAttack): 「获得2层【斗志】，并有100%的基础概率使指定敌方单体受到的伤害提高20.00%，持续3回合，随后对该目标造成等同于卢卡330%攻击力的物理属性伤害。」 param = [2, 1, 0.2, 3, 3.3]",
-    "note": "Three things happen in one sentence: 「获得 **2 层**【斗志】」（`ADD_STACK`, capped at the 4 the talent states）、「有 **100% 的基础概率**使指定敌方单体受到的伤害提高 20.00%，持续 3 回合」（`MODIFY_DAMAGE_TAKEN` with `base_chance` — ⚠ **not** \"always\": a base chance is the number **before** effect resistance, so it goes through the same resist pipeline a DOT does）、以及 330% 物理伤害（引擎自己的技能行）。 ⚠ The two effects are ordered by the file: the layer is granted first, matching the sentence. ⚠ 星魂 1/2/3/6 also raise 【斗志】(「最多持有 4 层」→ 6), which is a cap change this file cannot yet express — see the registrations at the end."
+    "note": "Three things happen in one sentence: 「获得 **2 层**【斗志】」（`ADD_STACK`, capped at the 4 the talent states）、「有 **100% 的基础概率**使指定敌方单体受到的伤害提高 20.00%，持续 3 回合」（`MODIFY_DAMAGE_TAKEN` with `base_chance` — ⚠ **not** \"always\": a base chance is the number **before** effect resistance, so it goes through the same resist pipeline a DOT does）、以及 330% 物理伤害（引擎自己的技能行）。 ⚠ The two effects are ordered by the file: the layer is granted first, matching the sentence. ⚠ 星魂 1/2/3/6 also raise 【斗志】(「最多持有 4 层」→ 6), which is a cap change this file cannot yet express — see the registrations at the end. ⚠ **实测纠正（2026-09-28）**：「获得 **2 层**【斗志】」这半句**写不出** —— `ADD_STACK` 的 `amount` **不是**\"一次加几层\"：实测每次触发**只加 1 层**（用例先写成 1+2=3、读到 2；六次施放停在 4 ⇒ **上限是真的**）。⇒ 登记：需要一个\"一次给 N 层\"的拼写（当前 `amount` 对 `ADD_STACK` 无意义）。"
   },
   {
     "on": "BATTLE_START",
