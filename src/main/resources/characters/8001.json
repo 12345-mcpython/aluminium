@@ -1,0 +1,50 @@
+[
+  {
+    "on": "BREAK",
+    "id": "talent_atk_on_break",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.2,
+        "max_stacks": 2,
+        "buff": "牵制盗垒",
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "8001 开拓者•毁灭 天赋 牵制盗垒 (800104, Enhance): 「每次击破敌方目标的弱点后，攻击力提高20%，该效果最多叠加2层。」",
+    "note": "「每次**击破**敌方目标的弱点后，攻击力提高 **20%**，该效果最多叠加 **2 层**」—— ① 事件用 **`BREAK`** ✓（`Battle` 以\"攻击者\"为 actor、\"被破韧的敌人\"为 target 发射 ✓）；② 叠加形状与已出货的 **1302** 相同 ✓：`MODIFY_ATTR` + **`max_stacks`** + `buff` 名 ⇒ 引擎把每层份额各自累加 ✓；③ **`actor == self` 不是我加的保险** ✓ —— 英文原文写的是 *\"Each time **this character** inflicts Weakness Break\"* ✓，所以\"只有他自己击破才加\"就是文档自己的意思 ✓。⚠ 文档没有给到期条件（\"最多叠加 2 层\" ✓，没说回合数 ✓）⇒ `permanent: true` ✓（层数由上限管住 ✓）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "level_convention",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "8001 开拓者•毁灭 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 125%、终结技 450%/270%+162%、天赋 每层 +20% 最多 2 层）",
+    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① 终结技「**在两种攻击模式中选择其一**」✗ —— 需要\"**二选一**\"的双形态 （引擎有 `REPLACE_SKILL` ✓ 与强化攻击数据 ✓，但\"由玩家选择分支\"不是数据能表达的 ✗）；② 秘技「立即为我方全体回复等同于**各自生命上限 15%** 的生命值」✗ —— 形状其实**可写** ✓（`HEAL` + `scale: target_max_hp` + `percent: 0.15` + `target: all_allies` ✓，\"各自生命上限\"正是 `target_max_hp` ✓），**缺的只是\"用过秘技\"这个门槛** ✗；③ 战技与终结技的**伤害**不写规则 ✓（由技能数据结算 ✓，含扩散两侧的第二个倍率 ✓，第 169 轮已修 ✓）；④ 星魂未读 ✗。"
+  }
+]
