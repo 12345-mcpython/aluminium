@@ -1,0 +1,112 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_talisman",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "DISPEL",
+        "amount": 1,
+        "target": "target"
+      }
+    ],
+    "source": "1217 藿藿 战技 灵符•保命护身 (121702, BPSkill/Restore): 「解除指定我方单体的1个负面效果，立即为指定我方单体回复等同于藿藿21.00%生命上限+560的生命值，同时为其相邻目标回复等同于藿藿16.80%生命上限+448的生命值。」",
+    "note": "「**解除指定我方单体的 1 个负面效果**」 — the cleanse half; the heal half is the engine's own `Restore` skill path (the row carries 21% max HP + 560). ⚠ `target` is the ally the Skill was aimed at (M-35), which is what 「指定我方单体」 names. ⚠ **Registered**: 「同时为其**相邻目标**回复…」 — the engine has no position axis, so \"adjacent\" cannot be said (the selector gap in GAPS #7)."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "禳命",
+        "turns": 2,
+        "ticks_on": "self",
+        "target": "self"
+      }
+    ],
+    "source": "1217 藿藿 天赋 凭附•气通天真 (121704, Enhance/Restore) 强化前: 「施放战技后藿藿获得【禳命】，持续2回合，藿藿每回合开始时持续回合数减1。」",
+    "note": "「施放战技后藿藿获得【禳命】，持续 2 回合，**藿藿每回合开始时**持续回合数减 1」 — the state sits on her and runs on **her own** clock (`ticks_on: \"self\"`), which is the same field 8006's 【伴舞】 and 星期日's 【蒙福者】 use. ⚠ **Registered**: the 「**强化后**」 variant (3 turns, and the healing sentence itself changes) — a talent upgrade this engine has no way to select: it is not an eidolon (so `min_eidolon` is the wrong gate) and no trace spellings exist for it. Shipping the base version and registering the upgrade is the honest split; picking one and pretending it is both would apply a 3-turn state to every battle."
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_tail",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.4,
+        "turns": 2,
+        "target": "other_allies"
+      }
+    ],
+    "source": "1217 藿藿 终结技 尾巴•遣神役鬼 (121703, Ultra/Support): 「为除自身以外的队友恢复等同于各自20.00%能量上限的能量，同时使其攻击力提高40.00%，持续2回合。」 ⚠ 只写「攻击力提高40%持续2回合」那一半（回能那半见登记）。",
+    "note": "「为**除自身以外**的队友恢复等同于**各自** 20.00% **能量上限**的能量，同时使其攻击力提高 40.00%，持续 2 回合」 — three spellings the engine already has: `other_allies` (「除自身以外的队友」), a **per-target** share of max energy (`GAIN_ENERGY` with `percent`, added for 星期日's ultimate), and a party-wide `MODIFY_ATTR` with a turn count. ⚠ 「**各自**」 is why the energy is a share of each recipient's own maximum rather than of hers — targeting that reads the *owner's* maximum would be a plausible-looking wrong number. ⚠ **2026-09-28 登记（精确卡点）**：「为**除自身以外**的队友恢复等同于**各自** 20.00% **能量上限**的能量」这一半**没有写**：`GAIN_ENERGY` 一旦带 `scale`（「各自能量上限的百分比」）就只能结算**一个**单位 —— 装载期明确拒绝 `scale` 与 `per_target` 并用（理由：\"scale 本身就是某个单位能量上限的份额\"）⇒「一次给**多名**队友回能」需要的是一条**接受列表的** `GAIN_ENERGY` 形态（本 op 没有；`MODIFY_ATTR` 有，所以攻击力那一半照写）。⚠ 这是**能力缺口**而不是拼写问题：`per_target` 的语义已经是\"每个候选各自算份额\"，缺的是让单目标 op 也能遍历候选。"
+  },
+  {
+    "on": "TURN_START",
+    "when": [
+      "self has_state 禳命"
+    ],
+    "do": [
+      {
+        "op": "HEAL",
+        "scale": "owner_max_hp",
+        "percent": 0.045,
+        "amount": 120,
+        "target": "target"
+      },
+      {
+        "op": "DISPEL",
+        "amount": 1,
+        "target": "target"
+      },
+      {
+        "op": "HEAL",
+        "scale": "owner_max_hp",
+        "percent": 0.045,
+        "amount": 120,
+        "target": "all_allies",
+        "target_when": [
+          "target_hp_percent <= 0.5"
+        ]
+      }
+    ],
+    "source": "1217 藿藿 天赋 凭附•气通天真的触发部分: 「当藿藿拥有【禳命】时，我方目标回合开始…时回复自身等同于藿藿4.50%生命上限+120的生命值，同时对每个当前生命值百分比小于等于50%的我方目标各产生1次回复效果。触发【禳命】为我方目标提供治疗时，解除该目标1个负面效果。」",
+    "note": "The trigger half of the talent. ⚠ 「藿藿拥有【禳命】时」 is `self has_state 禳命`: the **rule owner** carries the state while the event belongs to whoever's turn starts (that is what `self` means in this DSL, and it is the same shape 1001's counter-shield heal uses). ⚠ The heal's magnitude is 「等同于**藿藿** 4.50% 生命上限 + 120」 = `scale: owner_max_hp` — the rule owner's, not the recipient's, and the constant rides along in `amount`. ⚠ The third effect is 「对每个当前生命值百分比 ≤ 50% 的我方目标**各产生 1 次**」: `target_when` evaluates the filter per candidate, so `target_hp_percent` reads each candidate's own health. ⚠ It may heal the same unit twice (once as 「自身」, once if it is also ≤ 50%) — that is what 「各产生 1 次」 says. ⚠ **Registered**: the same trigger on 「**或施放终结技时**」 — the unit casting the ultimate is the event's *actor*, and `attacker` (the only selector that could name a caster) is defined for damage segments, so attaching a heal to whoever cast an ultimate is a spelling this engine does not have; and the 「强化后」 healing sentence (see the state rule)."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1217 藿藿 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 50%生命上限、战技 21.00%+560、终结技 20%能量/40%攻击力、天赋 4.50%+120 都是该行）",
+    "note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** Skill heal (a `Restore` skill reads its row). ⚠ **Not classified yet**: 秘技 (a map mechanic plus a battle-start clause not yet read), and 星魂 1–6."
+  }
+]
