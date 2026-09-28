@@ -198,9 +198,11 @@ return copy;
      * <p>⚠ Only {@code APPLY_DOT} reads these today, and every other op <b>refuses</b> them rather than ignoring them: a field
      * that is silently dropped is the class of mistake this project keeps closing.
      */
+    @SerializedName("cap_scale")
     private String capScale;
 
     /** The ceiling's share, used with {@link #capScale} (both are required together). */
+    @SerializedName("cap_percent")
     private Double capPercent;
 
     /**
@@ -211,8 +213,10 @@ return copy;
      * `Constant.SKILLS` -- the "slot" wording in {@code DefaultSkill}'s javadoc is about that class's own callers, not about
      * what the loader accepts.
      */
+    @SerializedName("skill_id")
     private Integer skillId;
 
+    @SerializedName("damage_type")
     private String damageType;
 
     /**
