@@ -840,6 +840,12 @@ JSON 写法不变。
 > `HP_LOST` 以 `(attacker, target, hpLoss)` 发射 ✓ ⇒ `ctx.amount` = 损失量 ✓，故 **损失前** = `(当前 + 损失) / 上限` ✓（不需新数据 ✓）。「降到 50% 或以下」因此写成 `target_hp_percent <= 0.5` **且** `target_hp_percent_before > 0.5` ✓。
 > ⚠ 变量名集是**闭集** ✓：新增一个名字会被 `UnitDisciplineTest` 的量纲守卫拦下 ✓，直到守卫的清单同步 ✓（这是设计意图 ✓）。
 
+> ✅ **2026-09-29（第 186 轮）`DAMAGE` 的字面倍率形态** ✓**：
+> * 旧词汇：**必须**指定技能槽位 + `damage_param` ✗ ⇒ 倍率只能取自**技能数据行** ✗，而「造成等同于 X% 攻击力的伤害」在天赋追加/星魂/秘技里到处都是 ✓（实测：天赋类 **53 份** ✓、星魂类 **15 份** ✓）。
+> * 现在：可只写 `scale: self_attr:ATTACK` + `percent` + `element` ✓（因为**无技能可借元素**，校验器**强制要求** `element` ✓）；基数由**伤害专用**的 `literalBase` 计算 ✓。
+> * ⚠ **关键区别（实测）**：字面路径**不能**用 `derivedMagnitude` ✗ —— 它解析的是**基础属性** ✓（对 `MODIFY_ATTR` 而言是对的 ✓：百分比加成叠在基础值上 ✓），而**伤害实例用的是结算后的值** ✓。实测：等级钉到 Lv10 后，按行实例 674.365 ✓ 而字面 0.8 只有 385.35 = 0.8 × **481.7**（基础值 ✗）。
+> * **出货读者**：1206 素裳的秘技（80% 攻击力全体物理伤害 ✓，门槛用第 178 轮的状态 ✓）；**测试**：两条字面规则（0.8 / 0.4 ✓）必须差**恰好两倍** ✓，并有无门槛的对照 ✓；**变异**（实测）：让 `literalBase` 忽略 `percent` ⇒ **1 红** ✓。
+
 | `ADD_STACK` | `buff`（计数器名字）+ `max_stacks`（可选，默认 1）+ `turns` / `permanent` + `target` | ✅（2026-09-28）「每当我方目标…施放 **2** 次…后，立即为我方恢复 1 个战技点」（1215 寒鸦）——「累计几次」此前**完全无法表达**（引擎能堆叠、能 `REMOVE_STACK`，但**没有东西能读计数**）。载体是 `StackBuff`：有名字、有寿命、**不挂任何属性**（计数器不该改面板），`isStackable()` 恒真且按名字分组 —— ⚠ 第一版忘了报 `maxStacks()`，于是第二次标记被 `addStackable` 按默认上限 1 丢掉，**计数永远是 1**。**读取侧**：条件 `self_stacks:<名字>` / `target_stacks:<名字>`（两个拼写，主体在名字里，与 `hp_percent`/`target_hp_percent` 同族）；**装载期**要求该名字在本文件里真被某个造名字的 op 创建过（`ADD_STACK`/`APPLY_BUFF`/`MODIFY_ATTR`/`RESIST_DEBUFF`/`SHIELD`），否则是永不成立的条件。⚠ `REMOVE_STATE <名字>` 是**清空**整个计数器（不是减一层），这正是「触发 2 次后自动解除」要的。**测试** `StackCounterTest` 3 条。**变异**（实测）：标记不落地 **2 红**；条件改回一次性求值 **1 红** |
 | `ADD_DAMAGE` | `scale`（`self_attr:<属性>` 或 `self_max_energy`）+ `percent`（可选 `amount` 作常数项）；**只能挂在 `DEALING_DAMAGE` 上** | ✅（2026-09-28）「伤害值提高，提高数值等同于<某属性>的 Y%」。⚠ 它是 `BOOST_DAMAGE` 的**绝对值**兄弟：`BOOST_DAMAGE` 往**增伤区**加百分比（`1 + Σ`，是**乘法**），这个把 `percent × 规则主人的属性` 加进实例的**基数层**（`Damage.addFlat` / `toValue`）—— 于是它和技能倍率一样吃增伤/暴击/防御/抗性。⚠ 把这类句子写成 `BOOST_DAMAGE` 只有当"这段伤害的基数恰好等于那条属性"时才相等，是"看起来像做完了"的错数字（`AddDamageOpTest` 用**基数 400** 钉住这一对不相等；基数取 100 时两者数学上相同，测不出来 —— 变异 m2 第一轮 0 红就是这么来的）。⚠ 算术与 `MODIFY_ATTR` 的派生值**共用一处**（`derivedMagnitude` = `percent × 主人的属性 + amount`），校验也共用（`scaleAttribute`：只认 `self_attr:`，写错属性名装载期报错）。首个用户 **1001 星魂 4 第二句**（`actor == self` + `from_skill TALENT` 只圈住她的反击）。⚠ **`HEAL` 侧的对称件仍缺**（读者 1222/1301 的角色文件都还没写）→ 登记，不造没有读者的能力 |
 | `REMOVE_STACK` | `attribute` / `amount`，可选 `target` | ✅ 按属性取回最多 `amount` 层叠层（「每回合移除 1 层」；`amount` 必须为正，取不到不算错） |
