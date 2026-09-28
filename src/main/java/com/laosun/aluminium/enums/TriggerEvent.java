@@ -71,6 +71,31 @@ public enum TriggerEvent {
      */
     HEALED("HEALED", true),
     /**
+     * ✅ A <b>shield was granted</b> to one of our characters (2026-09-28, M-43).
+     *
+     * <p>{@code actor} = <b>who provided it</b>, {@code target} = who received it — the same convention
+     * {@link #HEALED} uses, so 「受到<b>队友提供的</b>治疗效果或护盾时」 is
+     * {@code target == self} + {@code actor is_ally} + {@code actor != self} with no new vocabulary at all.
+     *
+     * <p><b>Why it had to exist.</b> The engine had {@code HEALED} but no "a shield was given" event — shields
+     * were only an <i>op</i> ({@code SHIELD}). 大丽花's trace 「当大丽花受到队友提供的治疗效果<b>或护盾</b>时…」
+     * subscribes to both, so writing only the healing half would leave the trace silent exactly when the shield
+     * half applies: an effect that is too weak, with nothing anywhere reporting a problem.
+     *
+     * <p>⚠ <b>Fired from two places, deliberately.</b> A shield reaches the field either as a raw grant
+     * ({@code Battle.grantShield}, no {@code turns}) or through a
+     * {@link com.laosun.aluminium.models.buff.ShieldBuff} (timed). The buff is applied by the buff manager, which
+     * has no {@code Battle} handle, so the interpreter fires this from the timed arm itself — the two paths
+     * disagree about who owns the lifetime, not about the fact being announced.
+     *
+     * <p>⚠ <b>Only a grant that leaves a shield standing fires it</b> ({@code value > 0}), the same way
+     * {@link #HEALED} only fires when HP was really restored. A grant of {@code ≤ 0} is the engine's spelling of
+     * "clear the shield" and is not a grant. And a raw grant states <b>no provider</b>, so {@code actor} is
+     * {@code null} and {@code actor is_ally} is false — the safe direction: a shield nobody is credited with must
+     * not answer a question about who provided it.
+     */
+    SHIELD_GRANTED("SHIELD_GRANTED", true),
+    /**
      * ✅ Someone was killed.
      */
     KILL("KILL", true),

@@ -1625,6 +1625,14 @@ public class Battle {
         }
         double value = boostedShield(provider, amount);
         target.setShield(value, provider, ruleId);
+        // P12 (M-43): "a shield was granted" is its own fact, so 「受到队友提供的…护盾时」 can subscribe to it.
+        // ⚠ Only a grant that leaves a shield standing (a grant of ≤ 0 is how this API spells "clear it"), and the
+        // actor is the provider -- null for the raw overload, which then correctly fails `actor is_ally`.
+        // ⚠ The TIMED path (`SHIELD` with `turns`) does not come through here: its shield is installed by a
+        // ShieldBuff, which has no Battle handle, so the interpreter announces that one itself.
+        if (value > 0) {
+            fireTriggersForAlly(TriggerEvent.SHIELD_GRANTED, provider, target, value);
+        }
         return value;
     }
 

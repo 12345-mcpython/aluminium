@@ -572,7 +572,13 @@ public final class TriggerInterpreter {
             case "GAIN_SKILL_POINT" -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
             case "HEAL" -> {
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
-                    battle.heal(null, target, grantAmount(effect, target, ctx));
+                    // ⚠ The healer is the RULE OWNER, not `null` (changed 2026-09-28 with M-43). A `HEAL` effect is
+                    // the owner healing somebody, and `HEALED`'s `actor` is what 「受到<b>队友提供的</b>治疗」 reads; with
+                    // `null` there was no way to ask who healed, so that half of 大丽花's trace could not be written.
+                    // ⚠ Measured before the change: no shipped content subscribes to `HEALED` at all, and no shipped
+                    // content grants `OUTGOING_HEALING_BOOST`, so this changes no number today -- it only makes the
+                    // attribution true (and a rule-driven heal now reads the owner's healing boost, as a skill's does).
+                    battle.heal(ctx.owner(), target, grantAmount(effect, target, ctx));
                 }
             }
             case "SHIELD" -> {
@@ -588,6 +594,12 @@ public final class TriggerInterpreter {
                     } else if (target != null && !target.isDeath()) {
                         target.getBuffManager().addBuff(
                                 withSource(new ShieldBuff(ctx.owner(), amount, effect.getTurns()), ctx));
+                        // P12 (M-43): the timed path installs its shield through a buff, which has no Battle handle,
+                        // so this is the only place that can announce it. Fired AFTER the buff is on, so a rule that
+                        // answers 「获得护盾时」 sees the shield it is reacting to.
+                        if (amount > 0) {
+                            battle.fireTriggersForAlly(TriggerEvent.SHIELD_GRANTED, ctx.owner(), target, amount);
+                        }
                     }
                 }
             }
