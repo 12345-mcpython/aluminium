@@ -129,6 +129,17 @@ public final class DoubleValue implements Cloneable {
     }
 
     /**
+     * The value a percentage share scales off (2026-09-29).
+     *
+     * <p>Added for the capped-modifier path: 「提高50%，最高不超过X的25%」 is a share against a ceiling in absolute units, so the
+     * ceiling has to be divided by THIS number and not by {@link #get()} — the total includes modifiers, and dividing by the
+     * total would tighten the cap whenever the target is already buffed.
+     */
+    public double baseValue() {
+        return baseValue;
+    }
+
+    /**
      * Adds a modifier and recomputes the final value immediately.
      *
      * @param modifier the modifier to add
