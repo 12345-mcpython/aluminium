@@ -76,7 +76,9 @@ public class EffectSpec {
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         copy.effectMaxStacks = this.effectMaxStacks;
 copy.damageType = this.damageType;
-        return copy;
+                copy.capScale = this.capScale;
+        copy.capPercent = this.capPercent;
+return copy;
     }
 
 
@@ -184,6 +186,22 @@ copy.damageType = this.damageType;
      * and the trap it has to avoid is on the other side of the same word: {@code BREAKING_EFFECT} is "how hard <b>I</b> break",
      * this is "how hard break damage hurts <b>me</b>". Spell it with {@code DamageType}'s own names; a typo is refused loudly.
      */
+    /**
+     * A derived <b>ceiling</b> on this effect's magnitude: {@code cap_scale} + {@code cap_percent} (2026-09-28).
+     *
+     * <p>「受到等同于自身 24.00% 生命上限的…持续伤害，<b>最多不超过卢卡攻击力的 338%</b>」 (1111 卢卡 战技) is a
+     * {@code min_of_two}: the magnitude is the smaller of two derived values. Spell it as the primary value plus a ceiling --
+     * {@code scale}/{@code percent} for the first, {@code cap_scale}/{@code cap_percent} for the second -- and the engine takes
+     * the minimum.
+     *
+     * <p>⚠ Only {@code APPLY_DOT} reads these today, and every other op <b>refuses</b> them rather than ignoring them: a field
+     * that is silently dropped is the class of mistake this project keeps closing.
+     */
+    private String capScale;
+
+    /** The ceiling's share, used with {@link #capScale} (both are required together). */
+    private Double capPercent;
+
     private String damageType;
 
     /**
