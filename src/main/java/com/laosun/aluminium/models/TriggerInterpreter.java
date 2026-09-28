@@ -278,6 +278,7 @@ public final class TriggerInterpreter {
                 requireSkill(effect, op, spec);
                 requireDamageParam(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
+                requireFixedCrit(effect, op, spec);
             }
             case "MODIFY_ATTR" -> {
                 requireAttribute(effect, op, spec);
@@ -1845,6 +1846,7 @@ public final class TriggerInterpreter {
                 || effect.getKind() != null || effect.getStacks() != null
                 || effect.getDamageParam() != null || effect.getDamageLevel() != null
                 || effect.getAsAttack() != null || effect.getPerTarget() != null
+                || effect.getCritRate() != null || effect.getCritDamage() != null
                 || effect.getRule() != null || effect.getSkill() != null
                 || effect.getResource() != null || effect.getAmount() != null
                 || effect.getPermanent() != null || effect.getUntil() != null
@@ -2405,7 +2407,8 @@ public final class TriggerInterpreter {
         }
         double multiplier = multiplierOf(skill, effect, attacker);
         double base = attacker.getAttribute(AttributeType.ATTACK).get() * multiplier;
-        battle.applyAdditionalDamage(attacker, victim, skill.getData().getElement(), base);
+        battle.applyAdditionalDamage(attacker, victim, skill.getData().getElement(), base,
+                effect.getCritRate(), effect.getCritDamage());
     }
 
     /**
@@ -2727,6 +2730,7 @@ public final class TriggerInterpreter {
                 || effect.getBaseChance() != null || effect.getKind() != null
                 || effect.getStacks() != null || effect.getTicksOn() != null
                 || effect.getAsAttack() != null || effect.getPerTarget() != null
+                || effect.getCritRate() != null || effect.getCritDamage() != null
                 || effect.getRule() != null) {
             throw new IllegalArgumentException(
                     "Op " + op + " raises one skill slot's level and states nothing else: \"skill\" (which slot) "
@@ -2745,7 +2749,8 @@ public final class TriggerInterpreter {
                 || effect.getElement() != null || effect.getControl() != null
                 || effect.getBaseChance() != null || effect.getKind() != null
                 || effect.getStacks() != null || effect.getTicksOn() != null
-                || effect.getAsAttack() != null || effect.getPerTarget() != null) {
+                || effect.getAsAttack() != null || effect.getPerTarget() != null
+                || effect.getCritRate() != null || effect.getCritDamage() != null) {
             throw new IllegalArgumentException(
                     "Op " + op + " raises exactly one number on the rule it names: either \"amount\" (how many more "
                             + "times per turn) or \"percent\" (how much more likely), and it reads no other field "
@@ -2794,6 +2799,36 @@ public final class TriggerInterpreter {
             throw new IllegalArgumentException(
                     "Op " + op + " names an unknown skill slot '" + effect.getSkill()
                             + "' (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates a <b>stated crit</b> on a damage instance: {@code crit_rate: 1} plus {@code crit_damage: X}.
+     *
+     * <p>⚠ {@code 1.0} is the only legal rate (see {@link EffectSpec#getCritRate()}): "always crits" is a different fact
+     * from the {@code CRIT_CHANCE} attribute, and any other number would be a third mechanic with no reader. The pair
+     * is also both-or-neither: a crit damage without a rate says which number to use for a roll nobody described.
+     */
+    private static void requireFixedCrit(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getCritRate() == null && effect.getCritDamage() == null) {
+            return;
+        }
+        if (effect.getCritRate() == null || effect.getCritDamage() == null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states half a fixed crit: \"crit_rate\" (100%) and \"crit_damage\" (e.g. 1.5 for "
+                            + "150%) go together, because neither number is usable without the other "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (effect.getCritRate() != 1.0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has \"crit_rate\": " + effect.getCritRate() + ", but only 1.0 is a spelling this "
+                            + "engine has: a probabilistic crit rate is the CRIT_CHANCE attribute, and \"fixed\" "
+                            + "means the roll does not happen at all (source: " + spec.getSource() + ")");
+        }
+        if (effect.getCritDamage() <= 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " has \"crit_damage\": " + effect.getCritDamage() + ", which is not a crit damage "
+                            + "(1.5 = 150%) (source: " + spec.getSource() + ")");
         }
     }
 
