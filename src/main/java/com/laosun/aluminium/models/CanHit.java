@@ -181,6 +181,23 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     @Getter(AccessLevel.NONE)
     private final Map<String, Double> ruleBaseChanceBonus = new HashMap<>();
 
+    /**
+     * Per-battle <b>skill level raises</b> (M-32), keyed by slot: 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5, and the
+     * same sentence in most characters' kits).
+     *
+     * <p><b>Why the raise lives here and not on the {@code Skill}.</b> The same reasoning as the rule amendments
+     * above: a skill instance belongs to a {@code Character} that a stage can put into more than one battle, so
+     * writing a raised level onto it would stack once per battle and never come off. The raise is a fact about
+     * <b>this combatant in this battle</b> ("my 星魂 3 is active"), so it sits next to the firing counters and is
+     * cleared with them.
+     *
+     * <p>The <b>base</b> level is the other half, and it is character data, not battle state: it comes from the
+     * file's optional {@code "skill_levels"} (see {@code CharacterFactory}), because the document's figure is quoted
+     * at a particular level.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Map<SkillType, Integer> skillLevelBonus = new HashMap<>();
+
     // test event behavior
     public Runnable beforeMove = () -> {
     };
@@ -689,6 +706,62 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         triggerTurnUses.clear();
         rulePerTurnBonus.clear();
         ruleBaseChanceBonus.clear();
+        skillLevelBonus.clear();
+    }
+
+    /**
+     * Raises one of this combatant's skill slots by {@code delta} for this battle (M-32).
+     *
+     * <p>Called by the {@code RAISE_SKILL_LEVEL} op, whose load-time validation already checked that the slot is a
+     * real {@code SkillType} and that the amount is a positive whole number.
+     *
+     * @param slot  which skill (the same spelling the other ops use for {@code "skill"})
+     * @param delta how many levels (a positive whole number)
+     */
+    public void raiseSkillLevel(SkillType slot, int delta) {
+        if (slot == null || delta == 0) {
+            return;
+        }
+        skillLevelBonus.merge(slot, delta, Integer::sum);
+    }
+
+    /**
+     * <b>The</b> level a skill is read at: its own level plus this battle's raises.
+     *
+     * <p>⚠ <b>One resolver on purpose.</b> Three call sites read a parameter row from a level ({@code SkillExecutor}
+     * twice — damaging skills and generated effect tables — and {@code TriggerInterpreter.multiplierOf} for a
+     * rule-driven {@code DAMAGE}), and they must never disagree: a skill whose damage came from level 11 while its
+     * generated effect read level 10 would be a number nobody could explain from the file.
+     *
+     * @param skill the skill instance (its {@code getLevel()} is the base from the character file)
+     * @return the level to index the parameter table with
+     */
+    public int skillLevel(Skill skill) {
+        if (skill == null) {
+            return 1;
+        }
+        // ⚠ Which slot this skill is cannot be read off the skill: `getSkillSlot()` is the data's **int** index and
+        // `getData().getSkillType()` is a **String** (the data's spelling, e.g. "BPSkill"). The first version of this
+        // line passed the int into `Map<SkillType, Integer>.getOrDefault` — which compiles (the int boxes to Object)
+        // and always misses — so the raise was filed and never read, with every test still green on the map's own
+        // getter. The character's own map is the honest answer: the raise is keyed the way the skills are stored.
+        SkillType slot = null;
+        if (this instanceof Character character) {
+            for (var entry : character.getSkills().entrySet()) {
+                if (entry.getValue() == skill) {
+                    slot = entry.getKey();
+                    break;
+                }
+            }
+        }
+        return skill.getLevel() + (slot == null ? 0 : skillLevelBonus.getOrDefault(slot, 0));
+    }
+
+    /**
+     * How many levels this battle has raised the given slot by ({@code 0} = none).
+     */
+    public int skillLevelBonus(SkillType slot) {
+        return slot == null ? 0 : skillLevelBonus.getOrDefault(slot, 0);
     }
 
     /**
