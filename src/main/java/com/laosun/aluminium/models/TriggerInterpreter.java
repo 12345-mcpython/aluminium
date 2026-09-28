@@ -293,6 +293,13 @@ public final class TriggerInterpreter {
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 requireTickOwner(effect, op, spec);
+                // 「有 100% 的基础概率使敌方…陷入【通解】状态」 (2026-09-28): a state may be ROLLED, like a DOT or a control.
+                // ⚠ Unstated = applied directly, which keeps every existing file's behaviour exactly as it was.
+                if (effect.getBaseChance() != null && (effect.getBaseChance() <= 0 || effect.getBaseChance() > 1)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " has \"base_chance\": " + effect.getBaseChance() + ", but a base chance is a "
+                                    + "fraction of 1 in (0, 1]: 0.8 = 「80% 的基础概率」 (source: " + spec.getSource() + ")");
+                }
             }
             case "REMOVE_STACK" -> {
                 // ⚠ `attribute` OR `buff` (a name), exactly one -- the same "name or attribute" filter `EXTEND_BUFF`
@@ -1477,7 +1484,9 @@ public final class TriggerInterpreter {
             if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
                 buff.setSuspendsTurns(true);
             }
-            target.getBuffManager().addBuff(buff);
+            // 「有 100% 的基础概率使敌方…陷入【通解】状态」: when the rule states one, the state is ROLLED (effect resistance
+            // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
+            applyRolledState(battle, target, buff, effect, ctx);
         }
     }
 
@@ -1790,6 +1799,29 @@ public final class TriggerInterpreter {
      * (三月七/杰帕德/玲可), which is a soft weight — that sentence carries <b>no number</b> in any document, so it is
      * registered as a data gap rather than guessed at here.
      */
+    /**
+     * {@code APPLY_BUFF}'s roll, when the rule states one: 「有 100% 的基础概率使敌方每个单体目标陷入【通解】状态」 (1106 佩拉).
+     *
+     * <p>It goes through the <b>same</b> entry point {@code APPLY_DOT} and {@code APPLY_CONTROL} use, so a rolled state meets
+     * effect resistance exactly as they do — ⚠ which is the reason this exists at all: applying the state unconditionally
+     * would drop 「基础概率」, and that is a different mechanic rather than a smaller number (100% base chance is still
+     * resistible).
+     *
+     * <p>⚠ A plain {@link com.laosun.aluminium.models.buff.StateBuff} reports {@code isDebuff() == false} and carries no
+     * {@code debuffClass}, so it meets <b>no class resistance</b> — correct for a state no document calls control or DOT,
+     * and the honest limit of what this spelling can say.
+     *
+     * @return {@code true} when the state was attached (or when the rule stated no chance at all)
+     */
+    private static boolean applyRolledState(Battle battle, CanHit target, AbstractBuff state, EffectSpec effect,
+                                            TriggerContext ctx) {
+        if (effect.getBaseChance() == null) {
+            target.getBuffManager().addBuff(state);
+            return true;
+        }
+        return battle.tryApplyDebuff(ctx.owner(), target, state, effect.getBaseChance(), null);
+    }
+
     /**
      * {@code REMOVE_BUFF}: 「解除指定敌方单体的 1 个增益效果」 — takes up to {@code amount} positive, temporary buffs off
      * each resolved target.

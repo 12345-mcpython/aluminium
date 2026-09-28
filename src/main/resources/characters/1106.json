@@ -85,5 +85,34 @@
     ],
     "source": "1106 佩拉 战技 低温妨害 (110602, BPSkill/SingleAttack): 「解除指定敌方单体的1个增益效果，同时造成等同于佩拉210%攻击力的冰属性伤害。」",
     "note": "「**解除指定敌方单体的 1 个增益效果**，同时造成…伤害」 — the 210% damage is the engine's own skill path, so this rule is the whole of the dispel half. ⚠ `REMOVE_BUFF` is the **mirror** of `DISPEL`, and the direction is why it is a separate op: `DISPEL` is defined as \"negative effects on the carrier\" (cleansing our own side), while this strips an **enemy's** benefits. Both rest on the same per-class decision (`isDebuff()`), so neither can be tricked into removing the wrong half. ⚠ **Permanent buffs are skipped** (`BuffManager.removeBuffs`): a relic bonus or a trace is not a 「增益效果」 in the sense these sentences use — nobody's skill dispels a loadout — and stripping one would be a wrong number with no symptom. ⚠ `target` is the enemy the Skill was aimed at (M-35), which is what 「指定敌方单体」 names."
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_zone_suppression",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "通解",
+        "base_chance": 1.0,
+        "turns": 2,
+        "target": "all_enemies"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DEFENCE",
+        "percent": -0.4,
+        "turns": 2,
+        "buff": "通解",
+        "target": "all_enemies",
+        "target_when": [
+          "target has_state 通解"
+        ]
+      }
+    ],
+    "source": "1106 佩拉 终结技 领域压制 (110603, Ultra/AoEAttack): 「有100%的基础概率使敌方每个单体目标陷入【通解】状态，同时对敌方全体造成等同于佩拉100%攻击力的冰属性伤害。【通解】状态下，敌方目标防御力降低40%，持续2回合。」",
+    "note": "「**有 100% 的基础概率**使敌方每个单体目标陷入【通解】状态…【通解】状态下，敌方目标**防御力降低 40%**，持续 2 回合」. ⚠ The state carries `base_chance: 1.0`, and that is **not** the same as \"apply unconditionally\": it goes through the same `tryApplyDebuff` path `APPLY_DOT`/`APPLY_CONTROL` use, so **effect resistance still applies** — 「基础概率」 means the chance before resistance, and it is exactly why this spelling was added (语料 **69 处 / 24 文件**，已出货角色里就有 6 位). ⚠ The defence reduction then uses `target_when: [\"target has_state 通解\"]`: it must land only on the enemies that actually **got** the state, since the roll above can fail on one of them. ⚠ That filter is evaluated **after** the state effect ran (effects of one rule run in order), which is exactly what makes it work here — the opposite of the trap 1211's file records, where a filter that asks for the state to be ABSENT must run first. ⚠ A plain `StateBuff` reports `isDebuff() == false` and carries no `debuffClass`, so 【通解】 meets **no class resistance** — correct for a state no document calls a control or a DOT, and the honest limit of this spelling."
   }
 ]
