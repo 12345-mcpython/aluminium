@@ -745,6 +745,24 @@ public class BuffManager {
      * @param state the state name as the data spells it (trimmed; blank or {@code null} = nothing to do)
      * @return how many buffs were removed; {@code 0} is the normal answer for "it was not there", not an error
      */
+    /**
+     * Whether any buff on this unit carries {@code suspendsTurns} — 「不会进入自己的回合」 (see
+     * {@link AbstractBuff#isSuspendsTurns()}).
+     *
+     * <p>Asked by {@code Battle.beforeMove}, which is the only place a turn can be let pass without the unit.
+     */
+    public boolean suspendsTurns() {
+        // ⚠ Scanned over StateBuff, which is the only carrier today: `APPLY_BUFF` is the one op that sets the flag
+        // (「不会进入自己的回合」 rides on a state). A future carrier has to be added here **and** to the op that sets the
+        // flag -- the flag itself lives on AbstractBuff so that is a one-line change rather than a redesign.
+        for (StateBuff state : allBuffsOf(StateBuff.class)) {
+            if (state.isSuspendsTurns()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int removeState(String state) {
         if (state == null || state.isBlank()) {
             return 0;
