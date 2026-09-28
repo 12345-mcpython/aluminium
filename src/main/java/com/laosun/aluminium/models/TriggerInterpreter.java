@@ -416,7 +416,9 @@ public final class TriggerInterpreter {
                 requireDotMagnitude(effect, op, spec);
                 requirePositiveTurns(effect, op, spec);
                 requireBaseChance(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
+                // ⚠ `max_stacks` IS allowed here (「最多叠加 N 层」, 2026-09-28): the general stack-family refusal would
+                // reject it, so the ceiling is validated on its own -- a positive count, nothing else from that family.
+                requireDotStackCap(effect, op, spec);
                 if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " states a number of turns and nothing else; \"permanent\" / \"until\" "
@@ -1881,6 +1883,24 @@ public final class TriggerInterpreter {
         }
     }
 
+    /** The authored DOT layer ceiling, or {@code 0} when the rule states none. */
+    private static int dotStackCap(EffectSpec effect) {
+        return effect.stackCap() == null ? 0 : effect.stackCap();
+    }
+
+    /** 「最多叠加 N 层」: the only stack-family field a DOT may state, and it must be a real ceiling. */
+    private static void requireDotStackCap(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.stackCap() == null) {
+            return;
+        }
+        if (effect.stackCap() <= 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"max_stacks\": " + effect.stackCap()
+                            + ", but a layer ceiling is a positive count (say nothing for an uncapped DOT) (source: "
+                            + spec.getSource() + ")");
+        }
+    }
+
     private static void taunt(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             // ⚠ Through the resist pipeline like every other negative state: 「使目标陷入嘲讽状态」 states no
@@ -1984,7 +2004,7 @@ public final class TriggerInterpreter {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns());
+            DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns(), dotStackCap(effect));
             if (battle.tryApplyDebuff(ctx.owner(), target, dot, baseChance, null)) {
                 // The DOT's state name is the document's name for the element (灼烧), from the one table that maps
                 // them — the same spelling 「每使1个目标陷入灼烧」 would count with.
