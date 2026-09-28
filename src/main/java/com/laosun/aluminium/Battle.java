@@ -852,7 +852,14 @@ public class Battle {
         // A snapshot, so a DOT kill that removes or attaches buffs mid-loop cannot disturb the
         // iteration. Attaching one here also does not settle it this turn -- it is not in the
         // snapshot -- which is the old "attached this turn, burns from the next one" behaviour.
+        // ⚠ The layer ceiling is applied per DOCUMENT STATE (an element IS a state here), and the total is
+        // order-independent: the first `cap` layers of a state pay, the rest are inert.
+        java.util.Map<DamageElement, Integer> paidPerState = new java.util.HashMap<>();
         for (DotBuff dot : target.getBuffManager().allBuffsOf(DotBuff.class)) {
+            int paidLayers = paidPerState.merge(dot.getElement(), 1, Integer::sum);
+            if (dot.getMaxStacks() > 0 && paidLayers > dot.getMaxStacks()) {
+                continue;                                        // 「最多叠加 N 层」: this layer adds no damage
+            }
             if (target.isDeath()) {
                 break;                                           // killed by a DOT → the rest is not settled
             }

@@ -97,8 +97,23 @@ public class DotBuff extends AbstractBuff {
      *                                  a null element is only caught at settlement time by
      *                                  {@code Damage}, and a null source is caught nowhere at all.
      */
+    /**
+     * The layer ceiling this application was authored with, or {@code 0} for "no ceiling" (2026-09-28).
+     *
+     * <p>「风化状态<b>最多叠加 5 层</b>」: applications may exceed it (a DOT is never evicted -- {@link #isSameKind} says
+     * so), but at most this many of them may <b>deal damage</b>. ⚠ {@code Battle.tickDots} applies it per element, i.e.
+     * per DOCUMENT STATE (two 风化 applications are the same state; 风化 and 灼烧 are not).
+     */
+    private final int maxStacks;
+
     public DotBuff(CanHit source, DamageElement element, double baseDamage, int turns) {
+        this(source, element, baseDamage, turns, 0);
+    }
+
+    /** @param maxStacks the layer ceiling (0 = none); see {@link #getMaxStacks()} */
+    public DotBuff(CanHit source, DamageElement element, double baseDamage, int turns, int maxStacks) {
         super(turns, true);
+        this.maxStacks = maxStacks;
         if (source == null) {
             throw new IllegalArgumentException("DotBuff needs a source: the applier is who a DOT kill is credited to");
         }
@@ -180,6 +195,11 @@ public class DotBuff extends AbstractBuff {
      * @param other the buff being attached
      * @return {@code false}, so {@code BuffManager.addBuff} appends instead of replacing
      */
+    /** The authored layer ceiling ({@code 0} = uncapped); read by {@code Battle.tickDots}. */
+    public int getMaxStacks() {
+        return maxStacks;
+    }
+
     @Override
     public boolean isSameKind(AbstractBuff other) {
         return false;
