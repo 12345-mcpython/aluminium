@@ -152,6 +152,33 @@ public class TriggerTable {
                 }
             }
         }
+        // Named counters (`ADD_STACK`) and the `*_stacks:<name>` conditions that read them: a name nobody creates
+        // would be a condition that can never hold -- the silent failure this vocabulary refuses.
+        Set<String> createdNames = new java.util.HashSet<>();
+        Set<String> readNames = new java.util.HashSet<>();
+        for (List<CompiledRule> rules : byEvent.values()) {
+            for (CompiledRule rule : rules) {
+                for (EffectSpec effect : rule.effects()) {
+                    if (effect.getBuff() != null && !effect.getBuff().isBlank() && isNameCreating(effect.getOp())) {
+                        createdNames.add(effect.getBuff().trim());
+                    }
+                }
+                for (Condition condition : rule.conditions()) {
+                    if (condition instanceof Numeric numeric && numeric.stacksName != null) {
+                        readNames.add(numeric.stacksName);
+                    }
+                }
+            }
+        }
+        for (String read : readNames) {
+            if (!createdNames.contains(read)) {
+                throw new IllegalArgumentException(
+                        "A condition reads the counter \"" + read + "\", which no effect in this file creates; an "
+                                + "ADD_STACK effect with \"buff\": \"" + read + "\" is what marks it, and a counter "
+                                + "nobody marks can never reach its threshold (counters this file creates: "
+                                + createdNames.stream().sorted().toList() + ")");
+            }
+        }
         for (List<CompiledRule> rules : byEvent.values()) {
             for (CompiledRule rule : rules) {
                 for (EffectSpec effect : rule.effects()) {
@@ -207,6 +234,22 @@ public class TriggerTable {
      * @param effect  the {@code MODIFY_RULE} effect (its fields were already validated by the interpreter)
      * @param byId    every named rule in this file
      */
+    /**
+     * Whether an op may <b>create the name</b> a {@code *_stacks:<name>} condition reads.
+     *
+     * <p>Deliberately a small closed set: the ops that put a name on a buff. A typo in a {@code REMOVE_STATE} does not
+     * create anything, so it cannot make a counter readable (that would be a removal with no counter to remove).
+     */
+    private static boolean isNameCreating(String op) {
+        if (op == null) {
+            return false;
+        }
+        return switch (op.trim().toUpperCase(java.util.Locale.ROOT)) {
+            case "ADD_STACK", "APPLY_BUFF", "MODIFY_ATTR", "RESIST_DEBUFF", "SHIELD" -> true;
+            default -> false;
+        };
+    }
+
     private static void requireAmendable(CompiledRule amender, EffectSpec effect, Map<String, CompiledRule> byId) {
         String target = effect.getRule() == null ? "" : effect.getRule().trim();
         CompiledRule named = byId.get(target);
@@ -401,6 +444,19 @@ public class TriggerTable {
      * @param ctx   the context the conditions are evaluated against
      * @return the matching rules, in table order; never {@code null}
      */
+    /**
+     * The compiled rules of one event, <b>without</b> evaluating their conditions — the list
+     * {@link TriggerInterpreter#fire} walks when it wants to check each rule's conditions as it reaches it.
+     *
+     * <p>⚠ Why the interpreter does not simply use {@link #matching}: conditions evaluated all at once cannot see what
+     * an <b>earlier rule of the same event</b> just did (a counter marked on this very attack, for instance), and
+     * 「每 2 次…后」 is exactly that shape. `matching` stays the pure predicate it always was — the data-binding tests
+     * and {@code ruleCount} read it — and this accessor is what lets firing differ.
+     */
+    public List<CompiledRule> rulesFor(TriggerEvent event) {
+        return byEvent.getOrDefault(event, List.of());
+    }
+
     public List<CompiledRule> matching(TriggerEvent event, TriggerContext ctx) {
         List<CompiledRule> rules = byEvent.get(event);
         if (rules == null) {
@@ -971,17 +1027,21 @@ public class TriggerTable {
                             + spec.getSource() + ")");
         }
         if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)
-                && !variable.startsWith(SELF_RESOURCE_PREFIX)) {
+                && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
+                && !variable.startsWith(TARGET_STACKS_PREFIX)) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' compares unknown variable '" + variable
                             + "'; known numeric variables: " + String.join(", ", knownNumericVariables())
                             + ", plus \"self_attr:<ATTRIBUTE>\" for one of my own attribute values, e.g. "
-                            + "\"self_attr:SPEED >= 145\", and \"self_resource:<NAME>\" for how much of one "
-                            + "of MY declared resources I hold, e.g. \"self_resource:充能 >= 3\" "
+                            + "\"self_attr:SPEED >= 145\", \"self_resource:<NAME>\" for how much of one "
+                            + "of MY declared resources I hold, e.g. \"self_resource:充能 >= 3\", and "
+                            + "\"self_stacks:<NAME>\" / \"target_stacks:<NAME>\" for how many times a named "
+                            + "counter has been marked, e.g. \"target_stacks:承负 >= 2\" "
                             + "(source: " + spec.getSource() + ")");
         }
         return new Numeric(variable, selfAttributeOf(variable, raw, spec),
-                selfResourceOf(variable, raw, spec), operator, literal, literalOnLeft);
+                selfResourceOf(variable, raw, spec), stacksNameOf(variable, raw, spec),
+                variable.startsWith(TARGET_STACKS_PREFIX), operator, literal, literalOnLeft);
     }
 
     /**
@@ -1051,6 +1111,36 @@ public class TriggerTable {
      * @param spec     the owning rule, for the source
      * @return the resource name, or {@code null} when the variable is not a resource read
      */
+    /** The two spellings that read a named counter ({@code ADD_STACK}); the subject is the prefix. */
+    private static final String SELF_STACKS_PREFIX = "self_stacks:";
+    private static final String TARGET_STACKS_PREFIX = "target_stacks:";
+
+    /**
+     * The counter a {@code self_stacks:<NAME>} / {@code target_stacks:<NAME>} variable reads, or {@code null}.
+     *
+     * <p>⚠ Two spellings rather than one plus a subject, following the house convention ({@code hp_percent} vs
+     * {@code target_hp_percent}, {@code self_summon_count} vs {@code target_summon_count}): the subject is part of the
+     * name, so a rule cannot read "somebody's count" without saying whose.
+     */
+    private static String stacksNameOf(String variable, String raw, TriggerSpec spec) {
+        String prefix;
+        if (variable.startsWith(SELF_STACKS_PREFIX)) {
+            prefix = SELF_STACKS_PREFIX;
+        } else if (variable.startsWith(TARGET_STACKS_PREFIX)) {
+            prefix = TARGET_STACKS_PREFIX;
+        } else {
+            return null;
+        }
+        String name = variable.substring(prefix.length()).trim();
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' writes \"" + prefix + "\" with no counter name after it; give the name "
+                            + "an ADD_STACK effect created, e.g. \"" + prefix + "承负 >= 2\" "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return name;
+    }
+
     private static String selfResourceOf(String variable, String raw, TriggerSpec spec) {
         if (!variable.startsWith(SELF_RESOURCE_PREFIX)) {
             return null;
@@ -1909,15 +1999,21 @@ public class TriggerTable {
          * {@link TriggerTable#referencedResources} for the assembly-point check.
          */
         private final String resource;
+        /** The named counter a {@code *_stacks:<NAME>} variable reads, or {@code null}. */
+        private final String stacksName;
+        /** Whether that counter is read off the event's <b>target</b> rather than the rule's owner. */
+        private final boolean stacksOnTarget;
         private final String operator;
         private final double literal;
         private final boolean literalOnLeft;
 
-        Numeric(String variable, AttributeType attribute, String resource, String operator, double literal,
-                boolean literalOnLeft) {
+        Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
+                String operator, double literal, boolean literalOnLeft) {
             this.variable = variable;
             this.attribute = attribute;
             this.resource = resource;
+            this.stacksName = stacksName;
+            this.stacksOnTarget = stacksOnTarget;
             this.operator = operator;
             this.literal = literal;
             this.literalOnLeft = literalOnLeft;
@@ -1956,6 +2052,13 @@ public class TriggerTable {
             }
             if (resource != null) {
                 return resourceValue(ctx.owner(), resource);
+            }
+            if (stacksName != null) {
+                // 「每当我方目标对【承负】状态下的敌方目标施放 2 次…」 reads the counter on the ENEMY (target), while a
+                // counter of "how many refunds so far" would be read on the owner -- hence the two spellings. An
+                // unreadable subject gives NaN, like every other variable that needs one.
+                CanHit holder = stacksOnTarget ? ctx.target() : ctx.owner();
+                return holder == null ? Double.NaN : holder.getBuffManager().stacksOf(stacksName);
             }
             return switch (variable) {
                 case "hit_count" -> ctx.hitCount();
