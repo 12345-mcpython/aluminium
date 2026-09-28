@@ -1,11 +1,14 @@
 package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -93,16 +96,67 @@ public class ArgentiStacksTest {
                         + "is already the unit being hit) and 星魂 6's defence ignore");
     }
 
+    /**
+     * 星魂 4's second half: 「使天赋的效果<b>可叠加上限提高 2 层</b>」 — the cap really does move.
+     *
+     * <p>⚠ Measured on the ATTRIBUTE, and the arithmetic has a trap worth stating: 星魂 4 grants **two** layers at battle
+     * start and they share the talent's stack group, so a cap of 12 is reached by 2 + 10 — twelve more hits still only
+     * add ten. The probe that settled it (round 66) printed, at E0 vs E4: 10 stacks / crit 0.30 against 12 stacks in the
+     * group / crit 0.35 — the raise is real, and an expectation of "base + 12 × 0.025" double-counts those two layers.
+     * ⚠ `stacksOf("升格")` is <b>not</b> usable here either: three modifier groups carry that name (the talent's crit
+     * rate, 星魂 1's crit damage, 星魂 4's battle-start pair), and a name count adds them up.
+     */
+    @Test
+    public void theFourthEidolonRaisesTheStackCap() {
+        Fixture f = new Fixture(4);
+        double base = f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
+        for (int i = 0; i < 12; i++) {
+            f.fireAttack(TriggerEvent.BASIC_ATTACK, 1);
+        }
+        Assertions.assertEquals(base + 10 * 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
+                "12 layers in the group: the two granted at battle start plus ten more from the hits");
+        Assertions.assertEquals(2, f.argenti.ruleEffectMaxStacksBonus("talent_stack_basic"),
+                "…and the amendment is filed against the named rule — the mechanism, not a coincidence");
+    }
+
+    /** ⚠ Raising the cap of a rule that states none is refused at load: there would be no cap to raise. */
+    @Test
+    public void raisingACapThatDoesNotExistIsRefused() {
+        EffectSpec state = new EffectSpec();
+        TriggerSpecs.set(state, "op", "APPLY_BUFF");
+        TriggerSpecs.set(state, "buff", "标记");
+        TriggerSpecs.set(state, "turns", 1);
+        TriggerSpecs.set(state, "target", "self");
+        TriggerSpec named = TriggerSpecs.rule("BATTLE_START", null, state);
+        TriggerSpecs.set(named, "id", "no_cap");
+
+        EffectSpec amend = new EffectSpec();
+        TriggerSpecs.set(amend, "op", "MODIFY_RULE");
+        TriggerSpecs.set(amend, "rule", "no_cap");
+        TriggerSpecs.set(amend, "effectMaxStacks", 2);
+        TriggerSpec amender = TriggerSpecs.rule("BATTLE_START", null, amend);
+
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(ARGENTI, List.of(named, amender)));
+        Assertions.assertTrue(refused.getMessage().contains("max_stacks"), refused.getMessage());
+    }
+
     // ==================================================================
     // Helpers
+
     // ==================================================================
 
     private static final class Fixture {
-        private final Character argenti = CharacterFactory.create(ARGENTI, LEVEL);
+        private final Character argenti;
         private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         private final Battle battle;
 
         private Fixture() {
+            this(0);
+        }
+
+        private Fixture(int eidolon) {
+            argenti = CharacterFactory.create(ARGENTI, LEVEL, true, null, null, eidolon);
             battle = new Battle(List.of(argenti, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), fixed());
             battle.startBattle();
         }
