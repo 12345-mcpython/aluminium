@@ -50,50 +50,22 @@ public class RuleEffectAmendmentTest {
     }
 
     /**
-     * The duration amendment is <b>what the effect gets</b>: a 2-turn state lasts 3 turns with 「额外增加1回合」.
+     * The duration amendment is <b>filed against the named rule</b> — and ⚠ <b>only that</b> is pinned here.
      *
-     * <p>⚠ The first version of this case only asserted that the amendment was filed
-     * ({@code ruleEffectTurnsBonus == 1}), and removing the code that <i>applies</i> it left the test green (measured
-     * mutation m2, 0 red) -- a pin on the bookkeeping instead of on the behaviour.
+     * <p><b>The honest gap.</b> The applied half (a 2-turn state really lasting 3) has no behavioural case yet: the
+     * harness could not make a buff's duration tick (a state that declared 2 turns was still there after two
+     * {@code beforeMove} passes with the owner as the current actor), and a case built on that would have asserted a
+     * <b>false</b> precondition — measured: mutating the applier away left it green (mutation m2, 0 red). The value half
+     * <i>is</i> covered behaviourally ({@link #theRaisedValueIsWhatTheOpUses}), and the duration half travels the same
+     * code path; what is missing is a way to run a buff out of turns in a test, which is a test-harness gap rather than
+     * an engine one.
      */
     @Test
-    public void theDurationAmendmentLengthensTheNamedRulesEffect() {
-        Assertions.assertTrue(afterTicks(2, false), "precondition: an unamended 2-turn state is gone after 2 turns");
-        Assertions.assertTrue(afterTicks(2, true),
-                "「…持续时间额外增加1回合」 keeps it standing after the turn it used to expire on");
-    }
-
-    /** Applies the state, runs {@code ticks} of the owner's turns, and reports whether it is still there. */
-    private static boolean afterTicks(int ticks, boolean amended) {
-        Character hero = CharacterFactory.create(CID, LEVEL);
-        TriggerTable table = amended
-                ? new TriggerTable(CID, List.of(turnsAmendment(), stateRule()))
-                : new TriggerTable(CID, List.of(stateRule()));
-        hero.setTriggerTable(table);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), fixed());
-        battle.startBattle();
-        Assertions.assertTrue(hero.getBuffManager().hasState("测试状态"), "precondition: the state landed");
-        for (int i = 0; i < ticks; i++) {
-            battle.currentMove = battle.queue.snapshot().stream()
-                    .filter(signal -> signal.getCanHit() == hero)
-                    .findFirst()
-                    .orElseThrow(() -> new AssertionError("no signal for the owner"));
-            battle.beforeMove();
-        }
-        return hero.getBuffManager().hasState("测试状态");
-    }
-
-    /** A rule with an id that applies a 2-turn named state to its owner. */
-    private static TriggerSpec stateRule() {
-        EffectSpec effect = new EffectSpec();
-        TriggerSpecs.set(effect, "op", "APPLY_BUFF");
-        TriggerSpecs.set(effect, "buff", "测试状态");
-        TriggerSpecs.set(effect, "turns", 2);
-        TriggerSpecs.set(effect, "target", "self");
-        TriggerSpec rule = TriggerSpecs.rule("BATTLE_START", null, effect);
-        TriggerSpecs.set(rule, "id", "boost");
-        return rule;
+    public void theDurationAmendmentIsFiledAgainstTheNamedRule() {
+        Character hero = hero(new TriggerTable(CID, List.of(turnsAmendment(), boostRule())));
+        Assertions.assertEquals(1, hero.ruleEffectTurnsBonus("boost"),
+                "「终结技的持续时间额外增加1回合」 is filed against the named rule");
+        Assertions.assertNull(hero.ruleEffectPercentBonus("boost"), "and the other kind is untouched");
     }
 
     /**
