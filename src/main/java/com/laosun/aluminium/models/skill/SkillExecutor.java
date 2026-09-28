@@ -399,13 +399,16 @@ public final class SkillExecutor {
         if (params == null || params.isEmpty()) {
             return;
         }
-        double base = user.getAttribute(AttributeType.ATTACK).get() * params.getFirst();
+        // ? The description names the base (2026-09-29): 「防御力」 -> DEF, 「生命上限」 -> Max HP, otherwise ATK. 18 documents scale a DAMAGE clause
+        // off Max HP and 3 off DEF, and multiplying ATTACK for those dealt the wrong damage.
+        AttributeType baseAttribute = data.damageBaseAttribute();
+        double base = user.getAttribute(baseAttribute).get() * params.getFirst();
         // ? A blast states TWO multipliers: the centre and the neighbours (2026-09-29). 1008's ultimate row is
         // `[1.92, 0.96]`..`[3.2, 1.6]` — the second exactly half the first, matching 「320%…and 160% to enemies adjacent to it」.
         // Until this, the centre value was applied to the neighbours too, i.e. double the documented damage on every
         // blast skill in the corpus.
         double neighbourBase = params.size() > 1
-                ? user.getAttribute(AttributeType.ATTACK).get() * params.get(1)
+                ? user.getAttribute(baseAttribute).get() * params.get(1)
                 : base;
         CanHit mainTarget = targets.getFirst();
 
@@ -450,7 +453,7 @@ public final class SkillExecutor {
                 Double bounceShare = data.bounceDamageShare();
                 double bounceBase = bounceShare == null
                         ? base
-                        : user.getAttribute(AttributeType.ATTACK).get() * bounceShare;
+                        : user.getAttribute(baseAttribute).get() * bounceShare;
                 Integer additional = data.bounceAdditionalHits(bounceShare);
                 int hits = (additional == null ? 0 : additional) + 1;   // 「额外造成 N 次」: the total is N + 1
                 // H-3: for a bounce, `single` is the **total toughness reduction of the whole skill**,
