@@ -124,6 +124,18 @@ public enum TriggerEvent {
      */
     TURN_START("TURN_START", true),
     /**
+     * ✅ A unit's turn ended (2026-09-28).
+     *
+     * <p>「每次我方目标**回合结束时**，移除驭空 1 层【鸣弦号令】」（1207 驭空）needed this moment, and nothing else could stand
+     * in for it: the *next* unit's {@code TURN_START} is a different fact (the last turn of a fight has no next unit), and
+     * a buff's duration tick is not an event at all.
+     *
+     * <p>Fired after the actor's own {@code afterMove} hook and the late buff tick — i.e. once the turn is really over, so
+     * a rule on it sees the state the turn ended in. {@code actor} and {@code target} are both the unit whose turn it was,
+     * the same convention {@code TURN_START} uses.
+     */
+    TURN_END("TURN_END", true),
+    /**
      * ✅ The owner was hit by an incoming damage instance.
      *
      * <p><b>Deliberately not the same fact as {@link #HP_LOST}.</b> {@code HP_LOST} means "HP was

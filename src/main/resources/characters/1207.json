@@ -1,0 +1,254 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_command",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "鸣弦号令",
+        "max_stacks": 2,
+        "permanent": true,
+        "target": "self"
+      },
+      {
+        "op": "ADD_STACK",
+        "buff": "鸣弦号令",
+        "max_stacks": 2,
+        "permanent": true,
+        "target": "self"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.8,
+        "buff": "鸣弦号令增益",
+        "permanent": true,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1207 驭空 战技 天阙鸣弦 (120702, BPSkill/Support): 「获得2层【鸣弦号令】，最多持有不超过2层。当驭空持有【鸣弦号令】时，我方全体攻击力提高80%…」 param Lv10 = [2, 0.8] → #1 = 2 层、#2 = 0.8",
+    "note": "「获得 **2 层**【鸣弦号令】，最多持有不超过 2 层。当驭空持有【鸣弦号令】时，我方全体攻击力提高 80%」. ⚠ Two `ADD_STACK` effects, because **one layer is one buff** (that is the engine's stacking) — the same shape 1302 星魂 4 uses for 「获得 2 层」. ⚠ The party boost carries `buff: 鸣弦号令` so it is removed **with the state**, by name, in the turn-end rules below; a boost with no name would stay up forever once the layers ran out. ⚠ `permanent: true` is not \"forever\": it means no turn count, and the end is stated by those rules — the honest spelling of a duration decided by a *counter* rather than by turns. ⚠ **2026-09-28 实测修正**：全队增益**不能**与层同名 —— `stacksOf(<名字>)` 数的是**所有**带该名字的 buff，于是\"2 层 + 1 个增益\"会读成 **3 层**，而 `REMOVE_STACK buff 鸣弦号令` 更可能**吃掉那个增益**而不是一层。现在层叫【鸣弦号令】、增益叫【鸣弦号令增益】，两者各自按名移除。"
+  },
+  {
+    "on": "TURN_END",
+    "when": [
+      "actor is_ally",
+      "self_stacks:鸣弦号令 >= 1"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 2
+      }
+    ],
+    "source": "1207 驭空 行迹 气壮 (1207103): 「持有【鸣弦号令】时，每当我方目标行动后，驭空将额外恢复2点能量。」",
+    "note": "「**持有【鸣弦号令】时**，每当我方目标行动后，驭空将额外恢复 2 点能量」. ⚠ 「行动后」 is read as that unit's turn **end** (`TURN_END`), which is the moment this engine has: `ALLY_ATTACK` would miss an ally who buffed or healed instead of attacking, and 「行动」 covers both. ⚠ This rule sits **before** the two removal rules below on purpose: 「持有…时」 is about the state *during* the action, and rules of one event are evaluated in file order (so this one sees the pre-removal count). ⚠ `actor is_ally` is 「我方目标」: an enemy's turn end grants nothing."
+  },
+  {
+    "on": "TURN_END",
+    "when": [
+      "actor is_ally",
+      "target != self"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STACK",
+        "buff": "鸣弦号令",
+        "amount": 1,
+        "target": "self"
+      }
+    ],
+    "source": "1207 驭空 战技: 「…且每次我方目标回合结束时，移除驭空1层【鸣弦号令】。驭空施放战技获得【鸣弦号令】的回合，不会移除【鸣弦号令】。」",
+    "note": "「每次我方目标**回合结束时**，移除驭空 **1 层**【鸣弦号令】」. ⚠ `REMOVE_STACK` with `buff` (a **name**) is the vocabulary added for this sentence (2026-09-28): the attribute form cannot address a named stack, and `REMOVE_STATE <name>` takes *all* the layers off. `EXTEND_BUFF` already took \"a name or an attribute\", so the two are now symmetric. ⚠ `target != self` is 「**驭空施放战技获得【鸣弦号令】的回合，不会移除**【鸣弦号令】」 — the removals happen on the **other** allies' turn ends, which is exactly the turn she would otherwise lose a layer on. ⚠ Removing nothing is not an error: this fires on every ally's turn end, including the ones with no layer left."
+  },
+  {
+    "on": "TURN_END",
+    "when": [
+      "actor is_ally",
+      "self_stacks:鸣弦号令 <= 0"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STATE",
+        "buff": "鸣弦号令增益",
+        "target": "all_allies"
+      }
+    ],
+    "source": "1207 驭空 战技: 「当驭空持有【鸣弦号令】时，我方全体攻击力提高80%…」（层数归零时的收尾，由上一句的移除推出）",
+    "note": "The cleanup the previous rule implies: 「当驭空**持有**【鸣弦号令】时」 the party has +80% ATK, so when the last layer goes the boost must come off — and one `REMOVE_STATE 鸣弦号令` on `all_allies` takes it off **everyone**, because the modifier carries that name (see the Skill's rule). ⚠ It must be a **separate rule after** the removal: conditions are evaluated when a rule is reached, so this one reads the count *after* the decrement — which is exactly the ordering the round-54 change (per-rule condition evaluation) made possible. ⚠ Target `all_allies`, not `self`: the STATE lives on 驭空 while the named boost sits on every ally (the same trap 1309's 【协奏】 taught). ⚠ **2026-09-28 实测修正**：全队增益**不能**与层同名 —— `stacksOf(<名字>)` 数的是**所有**带该名字的 buff，于是\"2 层 + 1 个增益\"会读成 **3 层**，而 `REMOVE_STACK buff 鸣弦号令` 更可能**吃掉那个增益**而不是一层。现在层叫【鸣弦号令】、增益叫【鸣弦号令增益】，两者各自按名移除。"
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "鸣弦号令",
+        "max_stacks": 2,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "min_eidolon": 6,
+    "source": "1207 驭空 星魂 6 弦栝如雷，铣珧激荡 (Avatar_Yukong_Rank06): 「驭空施放终结技时，立即先获得1层【鸣弦号令】。」 param = [1]",
+    "note": "「驭空**施放终结技时，立即先**获得 1 层【鸣弦号令】」 — 「立即先」 is why this rule is filed **before** the ultimate's own buffs below: the next rule's condition asks whether she holds a layer, and file order is evaluation order. ⚠ One `ADD_STACK` is one layer (the cap of 2 still applies, so a sixth-eidolon ultimate while already holding two changes nothing, which is what 「最多持有不超过2层」 says)."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self",
+      "self_stacks:鸣弦号令 >= 1"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "CRIT_CHANCE",
+        "percent": 0.28,
+        "buff": "鸣弦号令增益",
+        "permanent": true,
+        "target": "all_allies"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "CRIT_ATTACK",
+        "percent": 0.65,
+        "buff": "鸣弦号令增益",
+        "permanent": true,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1207 驭空 终结技 贯云饮羽 (120703, Ultra/SingleAttack): 「施放终结技时，若驭空持有【鸣弦号令】，则额外使我方全体暴击率提高28.00%，暴击伤害提高65%。…」 param Lv10 = [3.8, 0.28, 0.65] → #2 = 0.28、#3 = 0.65",
+    "note": "「施放终结技时，**若驭空持有【鸣弦号令】**，则额外使我方全体暴击率提高 28.00%，暴击伤害提高 65%」. ⚠ The gate is `self_stacks:鸣弦号令 >= 1` — the condition vocabulary can read a named counter, so no new spelling was needed. ⚠ Both buffs carry `buff: 鸣弦号令`, so they leave with the layers (the same cleanup rule above). ⚠ The 380% damage (#1) is the engine's own skill path, not a rule."
+  },
+  {
+    "on": "BASIC_ATTACK",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "skill": "TALENT",
+        "damage_param": 0,
+        "element": "Imaginary",
+        "target": "target"
+      }
+    ],
+    "cooldown": 1,
+    "source": "1207 驭空 天赋 箭彻七札 (120704, Enhance): 「施放普攻可额外造成等同于驭空80%攻击力的虚数属性伤害，并使本次攻击的削韧值提高100%，该效果在1回合后可再次触发。」 param Lv10 = [0.8, 1, 1] → #1 = 0.8",
+    "note": "「施放普攻可额外造成等同于驭空 80% 攻击力的虚数属性伤害…该效果在 **1 回合后可再次触发**」. ⚠ `damage_param: 0` reads her **talent** row's first parameter (Lv10 = 0.8) — the level convention below raises TALENT so that is the row read. ⚠ `element: Imaginary` is stated because an `Enhance` skill has no element of its own to lend (the same rule 1103's talent needed). ⚠ `cooldown: 1` is 「1 回合后可再次触发」 read at the engine's grain: a cooldown counts *her own* turns, so 1 means \"at most once per own turn\". ⚠ **Registered, not written**: 「并使本次攻击的**削韧值提高 100%**」 — nothing in the engine can raise the toughness reduction of an instance (it is read from the skill's own data); that is the same missing piece as 1214/1317's toughness clauses."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "when": [
+      "actor == self",
+      "self_stacks:鸣弦号令 >= 1"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.3
+      }
+    ],
+    "min_eidolon": 4,
+    "source": "1207 驭空 星魂 4 百里闻风，九曲响镝 (Avatar_Yukong_Rank04): 「持有【鸣弦号令】时，驭空造成的伤害提高30%。」 param = [0.3]",
+    "note": "「**持有**【鸣弦号令】时，驭空造成的伤害提高 30%」 — the same counter condition as the ultimate's, read on the instance being settled (`BOOST_DAMAGE`), which is what a \"while holding\" damage bonus means. ⚠ `actor == self` keeps it to **her** damage. ⚠ `min_eidolon: 4` is the gate."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "IMAGINARY_DAMAGE_BOOST",
+        "percent": 0.12,
+        "permanent": true,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1207 驭空 行迹 迟彝 (1207102): 「驭空在场时，我方全体造成的虚数属性伤害提高12%。」",
+    "note": "「**驭空在场时**，我方全体造成的**虚数属性伤害**提高 12%」 — the element-specific boost is an attribute the engine already has (`IMAGINARY_DAMAGE_BOOST`), and 「在场时」 is a loadout fact with no duration, so it is filed at battle start. ⚠ It is not in 星魂 4's or 1302's family: an *element* boost, not a damage-taken/dealt instance bonus."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "SPEED",
+        "percent": 0.1,
+        "turns": 2,
+        "target": "all_allies"
+      }
+    ],
+    "min_eidolon": 1,
+    "source": "1207 驭空 星魂 1 天舶飞将，枕弧待战 (Avatar_Yukong_Rank01): 「进入战斗时，我方全体速度提高10%，持续2回合。」 param = [0.1, 2]",
+    "note": "「进入战斗时，我方全体速度提高 10%，持续 2 回合」 — a party-wide timed modifier at battle start. ⚠ 「持续2回合」 is counted in each carrier's own turns, which is the engine's convention for a timed buff and the only reading that makes a party-wide duration well defined."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      }
+    ],
+    "source": "1207 驭空 技能表的**等级口径**: 文档引用的是 Lv10 行（120701 = 1.4、120702 = [2, 0.8]、120703 = [3.8, 0.28, 0.65]、120704 = [0.8, 1, 1]）",
+    "note": "The file stating which level its numbers come from (M-32). ⚠ TALENT matters **twice** here: her Skill's own 380%/普攻 rows are the engine's execution, and her talent's row is what the additional-damage rule reads through `damage_param` — without this it would deal the Lv1 0.4. ⚠ The buff percentages above are stated literally in rules, so they are unaffected. ⚠ **Registered, not written**: 行迹 襄尺 「被施加负面效果时可抵抗1次负面效果，该效果在2回合后可再次触发」 (a *count* of resisted instances, not a probability, and the retrigger is a cooldown on the resist itself — the engine's `RESIST_DEBUFF` is a percentage over a window, so writing it would change the mechanic), and 星魂 2 「当我方任意单体当前能量值等于其能量上限时…施放终结技后重置该效果触发次数」 (no \"energy became full\" event, and the reset is a per-unit trigger count)."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 1
+      }
+    ],
+    "min_eidolon": 3,
+    "source": "1207 驭空 星魂 3 危弓未辍，执射不宁 (Avatar_Yukong_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'120702': 2, '120701': 1}",
+    "note": "星魂 3's two raises (M-32), composing with the base-level rule by addition."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 2
+      }
+    ],
+    "min_eidolon": 5,
+    "source": "1207 驭空 星魂 5 井仪贯侯，疾羽参连 (Avatar_Yukong_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'120703': 2, '120704': 2}",
+    "note": "星魂 5's two raises. ⚠ The TALENT half moves the row her additional-damage rule reads, so it is not bookkeeping here."
+  }
+]

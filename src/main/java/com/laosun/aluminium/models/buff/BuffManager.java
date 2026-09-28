@@ -752,6 +752,40 @@ public class BuffManager {
      * <p>Asked by {@code Battle.beforeMove}, which is the only place a turn can be let pass without the unit.
      */
     /**
+     * Takes up to {@code max} layers off the buffs carrying one <b>name</b> — the named twin of
+     * {@link #removeStacks(AttributeType, int)} (2026-09-28).
+     *
+     * <p>「每次我方目标回合结束时，移除驭空 1 层【鸣弦号令】」 is why: 【鸣弦号令】 is a <b>stackable named modifier</b>, and
+     * neither existing spelling could take one layer off it — {@code REMOVE_STATE <name>} removes the named buffs
+     * <i>entirely</i> (by design: a state is on or off), and {@code REMOVE_STACK} works by <b>attribute</b>. The name
+     * filter is the same one {@code stacksOf} and {@code extendBuffsFrom} use, so 「按名字」 means one thing in this class.
+     *
+     * <p>⚠ Removing nothing is not an error, for the same reason {@code REMOVE_STACK} gives: the sentence is "at the end
+     * of every ally's turn, remove 1 layer", and it fires on turns where there is none left.
+     *
+     * @param name the name as the data spells it ({@code null}/blank = nothing)
+     * @param max  how many layers to take off at most
+     * @return how many were actually removed
+     */
+    public int removeNamedStacks(String name, int max) {
+        if (name == null || name.isBlank() || max <= 0) {
+            return 0;
+        }
+        String wanted = name.trim();
+        int removed = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (removed >= max) {
+                break;
+            }
+            if (wanted.equals(buff.getBuffName())) {
+                removeBuff(buff);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
+    /**
      * How many buffs on this unit carry the given <b>name</b> — 「已经累计了几次」 (2026-09-28).
      *
      * <p>⚠ A counter is <b>several buffs with one name</b>, not one buff with a count field: that is the engine's

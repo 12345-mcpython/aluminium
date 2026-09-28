@@ -295,7 +295,20 @@ public final class TriggerInterpreter {
                 requireTickOwner(effect, op, spec);
             }
             case "REMOVE_STACK" -> {
-                requireAttribute(effect, op, spec);
+                // ⚠ `attribute` OR `buff` (a name), exactly one -- the same "name or attribute" filter `EXTEND_BUFF`
+                // takes, added 2026-09-28 for 【鸣弦号令】: 「移除驭空 1 层【鸣弦号令】」 is about a *named* stackable
+                // modifier, which the attribute form cannot address (and REMOVE_STATE takes all of them off).
+                boolean byName = effect.getBuff() != null && !effect.getBuff().isBlank();
+                boolean byAttribute = effect.getAttribute() != null && !effect.getAttribute().isBlank();
+                if (byName == byAttribute) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " takes layers off a stackable buff and must say WHICH one: either "
+                                    + "\"attribute\": \"ATTACK\" or \"buff\": \"<name>\", exactly one (source: "
+                                    + spec.getSource() + ")");
+                }
+                if (byAttribute) {
+                    requireAttribute(effect, op, spec);
+                }
                 requirePositiveAmount(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
@@ -1460,10 +1473,15 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      */
     private static void removeStacks(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        AttributeType attribute = AttributeType.fromString(effect.getAttribute());
         int amount = (int) Math.round(effect.getAmount());
+        boolean byName = effect.getBuff() != null && !effect.getBuff().isBlank();
+        AttributeType attribute = byName ? null : AttributeType.fromString(effect.getAttribute());
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().removeStacks(attribute, amount);
+            if (byName) {
+                target.getBuffManager().removeNamedStacks(effect.getBuff(), amount);
+            } else {
+                target.getBuffManager().removeStacks(attribute, amount);
+            }
         }
     }
 
