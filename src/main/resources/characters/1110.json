@@ -1,0 +1,111 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_survival_response",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "求生反应",
+        "turns": 2,
+        "target": "target"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "HEALTH",
+        "scale": "self_attr:HEALTH",
+        "percent": 0.075,
+        "amount": 200,
+        "turns": 2,
+        "target": "target"
+      }
+    ],
+    "source": "1110 玲可 战技 盐渍野营罐头 (111002, BPSkill/Restore): 「为指定我方单体附上【求生反应】，提高等同于玲可7.50%生命上限+200的生命上限，若该目标为「毁灭」或「存护」命途，被敌方攻击的概率大幅提高，【求生反应】持续2回合。使该目标回复等同于玲可12.00%生命上限+320的生命值。」",
+    "note": "「为指定我方单体附上【求生反应】，提高等同于玲可 7.50% 生命上限 + 200 的生命上限，持续 2 回合」—— 份额加常数形态（scale + percent + amount）。⚠ 玲可的生命上限是规则主人的（owner_max_hp），不是受治者的。⚠ 12% 那半治疗由引擎自己的 Restore 技能行负责。⚠ **登记**：若该目标为毁灭或存护命途、被敌方攻击的概率大幅提高 —— 软嘲讽，文档通篇没有数值（与 1001 三月七同族），属于缺数据而非缺能力。 ⚠ **2026-09-28 拆分**：本句拆成**两个效果** —— APPLY_BUFF 求生反应 造出**文档点名的那个状态**，MODIFY_ATTR self_attr:HEALTH 才是数值那半。原因：MODIFY_ATTR 自带的 \buff 只是**显示名**，has_state(求生反应) 查不到它（第 119 轮实测），而「若该目标持有【求生反应】」那条过滤器必须查得到。 ⚠ **2026-09-28 登记**：「若该目标持有【求生反应】，则持续治疗效果**额外**回复 4.50%生命上限+120」本轮**未出货**。实测：状态确实挂上了（has_state 求生反应 为真 ✓），但**带 \target_when 的那份再生没有触发**（队友身上只有 1 份 RegenBuff ✗）⇒ 下一轮先读一处：\target_when 在 APPLY_REGEN 上是何时求值（怀疑与状态在同一次施放里刚挂上有关，或该 op 的过滤器主体拼写不同）。"
+  },
+  {
+    "on": "SKILL_CAST",
+    "id": "talent_regen_after_skill",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_REGEN",
+        "scale": "owner_max_hp",
+        "percent": 0.036,
+        "amount": 96,
+        "turns": 2,
+        "target": "target",
+        "buff": "持续治疗"
+      }
+    ],
+    "source": "1110 玲可 天赋 户外生存经验 (111004, Enhance/Restore): 「施放战技或终结技时，使我方目标获得2回合的持续治疗效果，目标每回合开始时回复等同于玲可3.60%生命上限+96的生命值。」",
+    "note": "「施放战技或终结技时，使我方目标获得 2 回合的持续治疗」—— 一半挂在 SKILL_CAST（本条），另一半挂在 ULT_CAST（另一条规则）。⚠ 治疗量是玲可的生命上限（owner_max_hp）加常数 96。⚠ 用 APPLY_REGEN 而不是从 TURN_START 写治疗：再生由引擎在早结算里跳，turns 2 就真的跳两次。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_first_aid",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "DISPEL",
+        "amount": 1,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1110 玲可 终结技 雪原急救方案 (111003, Ultra/Restore): 「解除我方全体的1个负面效果，立即为我方全体回复等同于玲可13.50%生命上限+360的生命值。」",
+    "note": "「解除我方全体的 1 个负面效果」—— 净化那半；全体治疗由引擎自己的 Restore 行负责。⚠ target 用 all_allies 因为「我方全体」这么说。⚠ 什么算负面效果是按 buff 类决定的（isDebuff），所以它不可能被诱骗去移除护盾。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "talent_regen_after_ult",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_REGEN",
+        "scale": "owner_max_hp",
+        "percent": 0.036,
+        "amount": 96,
+        "turns": 2,
+        "target": "all_allies",
+        "buff": "持续治疗"
+      }
+    ],
+    "source": "1110 玲可 天赋: 「施放战技或终结技时，使我方目标获得2回合的持续治疗效果…若该目标持有【求生反应】，则持续治疗效果额外回复…」",
+    "note": "天赋的 ULT_CAST 那一半。⚠ 一条规则里两个效果，第二个带过滤器：持有【求生反应】的队友拿到额外那份，没有的拿不到。⚠ 两份都以各自载体的回合为钟走 2 回合。 ⚠ **2026-09-28 登记**：「若该目标持有【求生反应】，则持续治疗效果**额外**回复 4.50%生命上限+120」本轮**未出货**。实测：状态确实挂上了（has_state 求生反应 为真 ✓），但**带 \target_when 的那份再生没有触发**（队友身上只有 1 份 RegenBuff ✗）⇒ 下一轮先读一处：\target_when 在 APPLY_REGEN 上是何时求值（怀疑与状态在同一次施放里刚挂上有关，或该 op 的过滤器主体拼写不同）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1110 玲可 技能表的等级口径: 文档引用的是 Lv10 行",
+    "note": "本文件说明自己的数字来自哪一行（M-32）：她的战技与终结技是 Restore 技能，引擎会读这些行。⚠ **尚未分类**：秘技、三条行迹与星魂 1 到 6 都还没逐句读。"
+  }
+]
