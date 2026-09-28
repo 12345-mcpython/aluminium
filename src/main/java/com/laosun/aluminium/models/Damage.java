@@ -127,6 +127,24 @@ public class Damage {
         return entity != null && entity == attacker;
     }
 
+    /**
+     * The <b>toughness reduction this instance intends</b>, recorded by {@code SkillExecutor} before the instance is
+     * settled (2026-09-28).
+     *
+     * <p>「对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次超击破伤害」（1321 大丽花）needs a number
+     * no rule could otherwise reach: the reduction is computed beside the damage and only {@code applyStanceDamage} ever
+     * sees it. It travels on the instance for the same reason {@code addFlat} and {@code fixedCrit} do — the instance is
+     * what a {@code DEALING_DAMAGE} rule is handed, and the settlement is still in progress.
+     */
+    @lombok.Getter
+    private double stance;
+
+    /** Records the intended toughness reduction (fluent, like the other instance mutators). */
+    public Damage setStance(double value) {
+        this.stance = value;
+        return this;
+    }
+
     public Damage(CanHit attacker, CanHit defender, DamageElement element, DamageType type, double skillBaseValue) {
         this(attacker, defender, element, type, skillBaseValue, SkillCategory.UNSPECIFIED);
     }

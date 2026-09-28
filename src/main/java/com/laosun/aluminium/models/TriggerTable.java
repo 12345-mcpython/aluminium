@@ -529,6 +529,17 @@ public class TriggerTable {
         }
         for (EffectSpec effect : effects) {
             TriggerInterpreter.validate(effect, spec);
+            // ⚠ The "which events can carry this op" checks live HERE, not in the interpreter's validation switch: that
+            // switch sees one effect at a time and knows no event, while every rule here is compiled with its own.
+            // `SUPER_BREAK` reads 「本次伤害的削韧值」 off the settled instance, so DEALING_DAMAGE is the only moment it can
+            // be attached to (the same rule ADD_DAMAGE follows, which the interpreter could enforce because it already
+            // knew the event).
+            if (effect.getOp() != null && "SUPER_BREAK".equalsIgnoreCase(effect.getOp().trim())
+                    && event != TriggerEvent.DEALING_DAMAGE) {
+                throw new IllegalArgumentException(
+                        "Op SUPER_BREAK reads the instance being settled (「本次伤害的削韧值」), so it can only be attached "
+                                + "to DEALING_DAMAGE, not " + event.value() + " (source: " + spec.getSource() + ")");
+            }
         }
         // 「对所有<b>触电状态下的</b>敌方目标…」 (M-53): each effect may name conditions its TARGETS must satisfy. Parsed
         // here, with the rule's own event, so `from_skill` and friends mean the same thing inside a filter.

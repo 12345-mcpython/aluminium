@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -316,6 +316,13 @@ public final class TriggerInterpreter {
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "SUPER_BREAK" -> {
+                // 「会将本次伤害的削韧值转化为1次200%的超击破伤害」: needs the instance (`ctx.damage()`) for the same reason
+                // ADD_DAMAGE does, plus a percentage of that instance's toughness reduction.
+                requirePercent(effect, op, spec);
+                requireNonZeroPercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             case "BOOST_TOUGHNESS" -> {
@@ -776,6 +783,7 @@ public final class TriggerInterpreter {
             case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
             case "ADD_STACK" -> addStack(battle, effect, ctx);
             case "BOOST_TOUGHNESS" -> boostToughness(battle, effect, ctx);
+            case "SUPER_BREAK" -> superBreak(battle, effect, ctx);
             case "APPLY_REGEN" -> applyRegen(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
@@ -1993,6 +2001,29 @@ public final class TriggerInterpreter {
      * alternative (a field on the damage instance) would need the reduction to be part of the instance, which is exactly
      * what the engine's split (damage first, then a second number) avoids.
      */
+    /**
+     * {@code SUPER_BREAK}: 「对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的**削韧值**转化为 1 次 X% 的超击破伤害」
+     * (1321 大丽花 / 8006 开拓者).
+     *
+     * <p>⚠ The magnitude is the <b>instance's intended toughness reduction</b> ({@code ctx.damage().getStance()}), not its
+     * damage — the two differ by an order of magnitude, so reaching for the wrong one would still look plausible. It is
+     * settled as one {@link DamageType#SUPER_BREAK} instance, taking the zones and resistance of the element the
+     * triggering attack used.
+     */
+    private static void superBreak(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        Damage source = ctx.damage();
+        if (source == null || source.getStance() <= 0) {
+            return;                                   // nothing to convert: an instance that reduces no toughness
+        }
+        double converted = source.getStance() * effect.getPercent();
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target == null || target.isDeath()) {
+                continue;
+            }
+            battle.applyAdditionalDamage(ctx.owner(), target, source.getElement(), converted);
+        }
+    }
+
     private static void boostToughness(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             if (target == null) {

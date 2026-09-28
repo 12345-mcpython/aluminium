@@ -349,6 +349,9 @@ public class BuffManager {
      * @param element the DOT's element, or {@code null}
      * @return 灼烧 / 触电 / 裂伤 / 风化, or {@code null}
      */
+    /** The document's name for 「韧性被削减至 0」 (see {@link #hasState}). */
+    public static final String BROKEN_STATE = "弱点击破";
+
     public static String dotStateName(DamageElement element) {
         return stateNameOf(element);
     }
@@ -717,6 +720,12 @@ public class BuffManager {
             if (wanted.equals(control.getName())) {
                 return true;
             }
+        }
+        // 「弱点击破状态」 (2026-09-28, corpus 58 hits / 15 files): the state a unit is in while its toughness bar is
+        // empty. It is a fact about the ENEMY rather than a buff anyone applied, so it belongs in this engine-state table
+        // -- the same reason 「灼烧」 and 「冻结」 are resolved here.
+        if (BROKEN_STATE.equals(wanted)) {
+            return instance instanceof com.laosun.aluminium.models.enemy.Enemy enemy && enemy.isBroken();
         }
         DamageElement dotElement = DOT_STATES.get(wanted);
         if (dotElement == null) {
