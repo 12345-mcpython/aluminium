@@ -313,6 +313,8 @@ dispatch(consumer, 直接相关方...)
 | `TriggerEvent.CAST_SETUP`（**无 buff 接口**，2026-09-27 补） | `SkillExecutor.execute`：**伤害展开之前**，`actor` = 施放者，`target` = `null`，正在进行的这次施放可从 `Battle.currentCast()` 拿到。⚠ **为什么要有"施放之前"这个事件**：其余施放事件（`BASIC_ATTACK`/`SKILL_CAST`/`ULT_CAST`/`ALLY_ATTACK`）都在伤害结算**之后**才发 —— 那对"施放后"是对的，对"改变这次挥击本身"就太晚了。`DEALING_DAMAGE` 管"改这一次伤害实例"，这个事件管"**这次施放的伤害不该由我来打**"，而后者是**施放**的属性、必须在实例存在之前就知道。首个用户：长夜月终结技（她自己的 `damage_list` 会以**她的攻击力**为基数挥一次，而文档说这段伤害是忆灵的；交付它的规则挂在 `ULT_CAST` 上，来不及拦住第一次挥击）→ `DELEGATE_DAMAGE`（§24.10）。⚠ 我方**每一次**施放都会发（含非伤害技能），规则必须自己用 `actor == self` 收窄，op 也会核对 |
 
 - ⚠ **新加的 `EffectSpec` 字段必须带 `@SerializedName`**（2026-09-28，1309 那轮）：`speed` / `crit_rate` / `crit_damage` / `suspends_turns` 四个字段是照着 Java 字段名直接加的，**Gson 读不到 JSON 里的 snake_case** —— 而**单元测试全部通过**，因为它们用 `TriggerSpecs.set` 直接写字段；是**内容级**测试（`RobinConcertoTest`）把洞抓出来的：状态在了、`suspends_turns` 却是 false。**规矩**：`EffectSpec` 加字段时第一件事是写 `@SerializedName("<snake_case>")`，并且**至少有一条从文件读的用例**。
+- ⚠ **harness：晚结算 buff 的"外来钟"在 `afterMove` 里跑**（2026-09-28，第二次）：`APPLY_BUFF` 造的是**晚结算** buff，而「（施放者的）每回合开始时持续回合数减 1」是 `tickForeignBuffs(actor, false)` 在 `Battle.afterMove` 里交付的。只调 `beforeMove()`、或只手发一个 `TURN_START`，**永远不会**让这种 buff 过期（第 58 轮是同一类：`StateBuff` 的**寿命**也在 `afterMove` 走）。**规矩**：凡是要验证"持续 N 回合，到期没了"的用例，必须跑**完整一回合**（`beforeMove()` + `afterMove()`）。
+
 ### 4.3 其余关键语义
 
 - **`DamageEvent` 广播给双方**，但回调签名里**不告诉 buff 它挂在谁身上**。
