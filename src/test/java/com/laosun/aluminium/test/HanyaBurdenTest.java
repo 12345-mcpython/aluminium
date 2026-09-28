@@ -88,12 +88,14 @@ public class HanyaBurdenTest {
 
     private static final class Fixture {
         private final Character hanya = CharacterFactory.create(HANYA, LEVEL, true, null, null, 0);
+        /** The 「队友」 the marks are about: an ally OTHER than the carrier, hence a field of its own. */
+        private final Character ally = CharacterFactory.create(ALLY, LEVEL);
         private final Enemy first = EnemyFactory.create(MONSTER, 90, 1);
         private final Enemy second = EnemyFactory.create(MONSTER, 90, 1);
         private final Battle battle;
 
         private Fixture() {
-            battle = new Battle(List.of(hanya, CharacterFactory.create(ALLY, LEVEL)),
+            battle = new Battle(List.of(hanya, ally),
                     List.of(first, second), fixed());
             battle.startBattle();
         }
@@ -108,7 +110,7 @@ public class HanyaBurdenTest {
 
         /** One attack by 寒鸦 herself (「我方目标」 includes her), stating the cast category the event now carries. */
         private void allyAttacks(Enemy target, com.laosun.aluminium.enums.SkillCategory category, int hits) {
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hanya, target, hits, 0, category);
+            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, target, hits, 0, category);
         }
     }
 

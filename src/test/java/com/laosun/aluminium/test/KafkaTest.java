@@ -46,7 +46,8 @@ public class KafkaTest {
         var table = TriggerTables.of(KAFKA);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the Shock plus its immediate tick");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the talent follow-up");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+                "the talent follow-up (moved to the once-per-cast event, which now carries the aim)");
     }
 
     /** \u26a0 An ALLY's basic attack makes Kafka strike again; her own must not. */
