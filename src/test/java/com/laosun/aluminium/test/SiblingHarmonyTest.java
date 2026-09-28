@@ -36,8 +36,10 @@ public class SiblingHarmonyTest {
 
         Assertions.assertTrue(ally.getBuffManager().hasState("\u4f34\u821e"),
                 "\u300c\u4e3a\u6211\u65b9\u5168\u4f53\u9644\u4e0a\u3010\u4f34\u821e\u3011\u6548\u679c\u300d");
-        Assertions.assertTrue(ally.getAttribute(AttributeType.BREAKING_EFFECT).get() > before,
-                "\u300c\u51fb\u7834\u7279\u653b\u63d0\u9ad830%\u300d: before " + before + ", after " + ally.getAttribute(AttributeType.BREAKING_EFFECT).get());
+        // Measured: BREAKING_EFFECT is a FRACTION attribute whose base is 0, and the engine lands this modifier as an absolute 0.3 — i.e. exactly the
+        // document's 30%. Asserting a share of the base (the first attempt) expected 0 and compared nothing.
+        Assertions.assertEquals(0.3, ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-9,
+                "\u300c\u51fb\u7834\u7279\u653b\u63d0\u9ad830%\u300d: gain " + (ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before));
     }
 
     /** \u26a0 The technique's own +30% for two turns, gated on the marker, with the control. */
