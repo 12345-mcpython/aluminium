@@ -114,6 +114,209 @@
       }
     ],
     "source": "1215 寒鸦 天赋 罚恶 (skill 121504) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（「造成的伤害提高30%」按该行读）",
-    "note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again. ⚠ **还没有写的（逐条登记，不是近似）**：战技「对指定敌方单体造成 240% 攻击力物理伤害，并使其陷入【承负】状态…每当我方目标对【承负】状态下的敌方目标施放 2 次普攻/战技/终结技后，立即为我方恢复 1 个战技点；【承负】仅对最新被施加的目标生效，并会在触发 2 次战技点恢复效果后自动解除」、天赋「我方目标对陷入【承负】状态下的敌方目标施放普攻/战技/终结技时，造成的伤害提高 30%，持续 2 回合」、以及行迹 录事/幽府/还阳 三条（都挂在「战技点恢复效果被触发」这个事件上）、星魂 4「终结技的持续时间额外增加 1 回合」、星魂 6「天赋的伤害提高效果额外提高 10%」。⚠ **两个共享的卡点**：① **带阈值的计数器** —— 「每 2 次…后恢复 1 点」与「触发 2 次后自动解除」需要一个能按状态累计、并在达到 N 时触发的机制（引擎有堆叠与 `REMOVE_STACK`，但**没有\"当某状态的计数达到 N 时\"这个条件或 op**），它一次性挡住战技、天赋、三条行迹；② **抬高另一条规则效果的数值/时长** —— 星魂 4 要改终结技效果的 `turns`、星魂 6 要把天赋的 30% 改成 40%，而 `MODIFY_RULE` 只抬 `per_turn` 次数与 `base_chance` 概率（MODIFY_RULE 那一轮的边界），把 0.1 再写一条规则会**互相覆盖**（同类修饰是刷新而不是叠加）。两者都在 `ROADMAP` 里登记了读者与做法。 ⚠ **2026-09-28 动手后把卡点收窄了一层**：计数器（`ADD_STACK` + `*_stacks:<名字>`）已经落地，「每 2 次…后」与「触发 2 次后自动解除」**已经能写**；真正拦住的是一件更小的事 —— **`ALLY_ATTACK` 不携带\"是哪条技能施放的\"**（`from_skill` 只允许挂在 `DEALING_DAMAGE`/`BREAK`/`KILL` 上，因为只有它们手里有那个伤害实例，装载期就会拒绝），于是「施放**2 次普攻/战技/终结技**」里的三个槽位**过滤不了**；改用 `DEALING_DAMAGE` 计数又会按**命中次数**而不是**施放次数**算（多段攻击一次施放会记好几层，这是一个**没有任何症状**的提前返还）。修法很小：让 `ALLY_ATTACK` 在发出时带上施放类别（`SkillExecutor` 那一刻本来就知道），`from_skill` 就也能挂在这条事件上 —— 那之后这整族（战技的状态与返还、天赋、三条行迹）可以一次写完。"
+    "note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self",
+      "target != self"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STATE",
+        "buff": "承负",
+        "target": "all_enemies"
+      },
+      {
+        "op": "REMOVE_STATE",
+        "buff": "承负次数",
+        "target": "all_enemies"
+      },
+      {
+        "op": "REMOVE_STATE",
+        "buff": "承负返还",
+        "target": "all_enemies"
+      },
+      {
+        "op": "APPLY_BUFF",
+        "buff": "承负",
+        "permanent": true,
+        "target": "target"
+      }
+    ],
+    "source": "1215 寒鸦 战技 生灭系缚 (skill 121502) 第二句: 「…并使其陷入【承负】状态…【承负】仅对最新被施加的目标生效，并会在触发2次战技点恢复效果后自动解除。」（伤害是引擎自己的技能路径，不需要规则）",
+    "note": "The 【承负】 half of her Skill (the 240% damage is the engine's own path). ⚠ The three REMOVE_STATE effects are 「仅对最新被施加的目标生效」: the state goes off everybody, then onto the new target -- there is no \"only one holder\" flag, the removal IS that clause (星期日's 【蒙福者】 reads the same way). ⚠ The two counters are cleared with it so a new target starts both at zero; their meaning is in the notes below. ⚠ `permanent: true` is not \"forever\": 承负 has no turn count (its end is 「触发 2 次战技点恢复效果后」, a threshold), so stating `turns` would be a different duration in every fight -- the removal rule below is the honest spelling."
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "target has_state 承负",
+      "actor is_ally",
+      "from_skill COMMON"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "承负次数",
+        "max_stacks": 2,
+        "permanent": true,
+        "target": "target"
+      }
+    ],
+    "source": "1215 寒鸦 战技: 「每当我方目标对【承负】状态下的敌方目标施放2次普攻、战技、终结技后…」 之一（普攻）",
+    "note": "One of THREE mark rules, one per qualifying cast slot. ⚠ Three rules rather than one because the condition DSL has no OR and `from_skill` states a single slot -- and that is the point: an attack matches exactly one of them, so each qualifying attack adds exactly ONE mark. ⚠ `追加攻击` and DoT instances carry no cast slot, so they match none of the three -- which is what 「普攻、战技、终结技」 excludes. ⚠ `max_stacks: 2` caps the counter at the threshold (see the rule that answers it)."
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "target has_state 承负",
+      "actor is_ally",
+      "from_skill SKILL"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "承负次数",
+        "max_stacks": 2,
+        "permanent": true,
+        "target": "target"
+      }
+    ],
+    "source": "1215 寒鸦 战技: 「…2次普攻、战技、终结技后…」 之二（战技）",
+    "note": "The 战技 half of the same sentence -- see the 普攻 rule above for why the three are three."
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "target has_state 承负",
+      "actor is_ally",
+      "from_skill ULTRA"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "承负次数",
+        "max_stacks": 2,
+        "permanent": true,
+        "target": "target"
+      }
+    ],
+    "source": "1215 寒鸦 战技: 「…2次普攻、战技、终结技后…」 之三（终结技）",
+    "note": "The 终结技 half of the same sentence -- see the 普攻 rule above for why the three are three."
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "target_stacks:承负次数 >= 2"
+    ],
+    "do": [
+      {
+        "op": "GAIN_SKILL_POINT",
+        "amount": 1.0
+      },
+      {
+        "op": "ADD_STACK",
+        "buff": "承负返还",
+        "max_stacks": 2,
+        "permanent": true,
+        "target": "target"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.1,
+        "turns": 1,
+        "target": "attacker"
+      },
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 2.0
+      },
+      {
+        "op": "REMOVE_STATE",
+        "buff": "承负次数",
+        "target": "target"
+      },
+      {
+        "op": "REMOVE_STATE",
+        "buff": "承负",
+        "target": "target"
+      }
+    ],
+    "source": "1215 寒鸦 战技: 「…立即为我方恢复1个战技点…并在触发2次战技点恢复效果后自动解除。」 + 行迹 录事「触发【承负】战技点回复效果的我方单位攻击力提高10%，持续1回合」 + 行迹 还阳「当【承负】战技点恢复效果被触发时，自身恢复2点能量」",
+    "note": "The threshold: at two marks the party gets a skill point (「立即为我方恢复1个战技点」), the third mark clears the whole state (「触发 2 次…后自动解除」 is the SECOND counter -- see below), and the two traces that hang off \"the refund was triggered\" ride in the same rule. ⚠ Why the traces are effects here rather than rules of their own: 「触发…时」 is this moment, and the engine has no event for \"a skill point was refunded\" -- adding one would be a capability for a single reader, while these three consequences are unconditional at that moment. ⚠ 还阳 heals HER energy (`GAIN_ENERGY` with no target = the rule owner) while 录事 boosts the ALLY that triggered it (`target: actor`). ⚠ Order matters inside the rule: the 承负返还 counter increments before the removals, and the removal of 承负次数 resets the two-mark threshold. ⚠ This rule is LAST among the ALLY_ATTACK ones on purpose: rules of one event are evaluated in file order, so the marks land before the threshold is read."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "when": [
+      "target has_state 承负",
+      "actor is_ally",
+      "from_skill COMMON"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent": 0.3,
+        "turns": 2,
+        "target": "attacker"
+      }
+    ],
+    "source": "1215 寒鸦 天赋 罚恶 (skill 121504): 「我方目标对陷入【承负】状态下的敌方目标施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合。」 之一（普攻）",
+    "note": "「我方目标对陷入【承负】…施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合」 -- the boost is granted to the ATTACKER (`target: actor`) and lasts 2 of their turns, so it is an ordinary modifier, not a one-instance `BOOST_DAMAGE`. ⚠ It fires on the instance that satisfies the condition, which is why the sentence says 「施放…时」: the zone is assembled after the trigger, so this very hit is boosted too. ⚠ Three rules again (one per slot), matching one apiece. ⚠ `actor is_ally` is 「我方目标」: 寒鸦 herself counts (she is one of ours), an enemy attack does not."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "when": [
+      "target has_state 承负",
+      "actor is_ally",
+      "from_skill SKILL"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent": 0.3,
+        "turns": 2,
+        "target": "attacker"
+      }
+    ],
+    "source": "1215 寒鸦 天赋 罚恶: 「…普攻、战技、终结技…」 之二（战技）",
+    "note": "The 战技 half of her talent -- see the 普攻 rule above."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "when": [
+      "target has_state 承负",
+      "actor is_ally",
+      "from_skill ULTRA"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent": 0.3,
+        "turns": 2,
+        "target": "attacker"
+      }
+    ],
+    "source": "1215 寒鸦 天赋 罚恶: 「…普攻、战技、终结技…」 之三（终结技）",
+    "note": "The 终结技 half of her talent -- see the 普攻 rule above."
+  },
+  {
+    "on": "KILL",
+    "when": [
+      "target has_state 承负",
+      "target_stacks:承负返还 <= 1"
+    ],
+    "do": [
+      {
+        "op": "GAIN_SKILL_POINT",
+        "amount": 1.0
+      }
+    ],
+    "source": "1215 寒鸦 行迹 幽府: 「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的触发次数小于等于1，则额外回复1点战技点。」",
+    "note": "「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的**触发次数小于等于1**，则额外回复1点战技点」. ⚠ `target has_state 承负` reads the VICTIM (KILL's subject is the one who died), which is what 「持有【承负】的敌方目标」 names. ⚠ The condition is the SECOND counter: 承负次数 is reset at every refund (it is the \"2 次\" threshold), so it cannot count refunds -- 承负返还 is incremented by the refund rule and never cleared, which is exactly 「触发次数」. ⚠ `<= 1` rather than a threshold: the sentence is a ceiling, not a target."
   }
 ]
