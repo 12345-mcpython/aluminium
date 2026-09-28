@@ -137,11 +137,17 @@
         "damage_param": 0,
         "element": "Imaginary",
         "target": "target"
+      },
+      {
+        "op": "BOOST_TOUGHNESS",
+        "percent": 1.0,
+        "turns": 1,
+        "target": "self"
       }
     ],
     "cooldown": 1,
-    "source": "1207 驭空 天赋 箭彻七札 (120704, Enhance): 「施放普攻可额外造成等同于驭空80%攻击力的虚数属性伤害，并使本次攻击的削韧值提高100%，该效果在1回合后可再次触发。」 param Lv10 = [0.8, 1, 1] → #1 = 0.8",
-    "note": "「施放普攻可额外造成等同于驭空 80% 攻击力的虚数属性伤害…该效果在 **1 回合后可再次触发**」. ⚠ `damage_param: 0` reads her **talent** row's first parameter (Lv10 = 0.8) — the level convention below raises TALENT so that is the row read. ⚠ `element: Imaginary` is stated because an `Enhance` skill has no element of its own to lend (the same rule 1103's talent needed). ⚠ `cooldown: 1` is 「1 回合后可再次触发」 read at the engine's grain: a cooldown counts *her own* turns, so 1 means \"at most once per own turn\". ⚠ **Registered, not written**: 「并使本次攻击的**削韧值提高 100%**」 — nothing in the engine can raise the toughness reduction of an instance (it is read from the skill's own data); that is the same missing piece as 1214/1317's toughness clauses."
+    "source": "1207 驭空 天赋 箭彻七札 (120704, Enhance): 「施放普攻可额外造成等同于驭空80%攻击力的虚数属性伤害，并使本次攻击的削韧值提高100%，该效果在1回合后可再次触发。」 用 BOOST_TOUGHNESS 写「削韧值提高100%」(#2 = 1) param Lv10 = [0.8, 1, 1] → #1 = 0.8",
+    "note": "「施放普攻可额外造成等同于驭空 80% 攻击力的虚数属性伤害…该效果在 **1 回合后可再次触发**」. ⚠ `damage_param: 0` reads her **talent** row's first parameter (Lv10 = 0.8) — the level convention below raises TALENT so that is the row read. ⚠ `element: Imaginary` is stated because an `Enhance` skill has no element of its own to lend (the same rule 1103's talent needed). ⚠ `cooldown: 1` is 「1 回合后可再次触发」 read at the engine's grain: a cooldown counts *her own* turns, so 1 means \"at most once per own turn\". ⚠ **Registered, not written**: 「并使本次攻击的**削韧值提高 100%**」 — nothing in the engine can raise the toughness reduction of an instance (it is read from the skill's own data); that is the same missing piece as 1214/1317's toughness clauses. ⚠ **2026-09-28 补齐**：第三句「并使本次攻击的**削韧值提高 100%**」（数据行 #2 = 1）用 `BOOST_TOUGHNESS` 写出来了 —— 它挂在**同一事件的第二条规则**上（`DEALING_DAMAGE` + `from_skill COMMON`），因为削韧发生在实例结算里、而 `DEALING_DAMAGE` 在结算**之前**发出（次序从代码读出：`CAST_SETUP` → `applyDamage` → `applyStanceDamage`）。⚠ 「本次攻击」的honest拼法是**一回合的增益**：buff 没有\"只此一次\"的寿命，所以同回合内的第二次攻击也会吃到 —— 这一点写在规则注释里而不是藏起来。"
   },
   {
     "on": "DEALING_DAMAGE",
