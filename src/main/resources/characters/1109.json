@@ -160,5 +160,39 @@
     ],
     "source": "1109 虎克 天赋 哈！火上浇油 (110904, Enhance): 「攻击处于灼烧状态的敌方目标时，追加1次等同于虎克100%攻击力的火属性附加伤害，并额外恢复5点能量。」",
     "note": "「攻击处于**灼烧**状态的敌方目标时，**追加 1 次**等同于虎克 **100% 攻击力**的火属性**附加伤害**，并**额外恢复 5 点能量**」—— ① 触发条件 = `DEALING_DAMAGE` + `target has_state 灼烧`；② 额外实例用 `DAMAGE`（引擎的 `applyAdditionalDamage`：`DamageType.ADDITIONAL` + `notCountsAsAttack` + 受害者不给能量 ✓），倍率取自**技能参数行**（他普攻那一行正是 100% 攻击力 ✓，与文档数字一致 ⇒ 不必另造倍率 ✓）；③ 回能用 `GAIN_ENERGY` ✓。⚠ **护栏 `damage_is_attack` 不可省**：额外那次本身也是一次 `DEALING_DAMAGE` ⇒ 没有护栏时本规则会**自我触发**直到撞上引擎的递归上限 ✗。因为 `!` 取反只允许作用于队伍类条件（源码原话：only those can be negated），护栏只能**正向**写：这次伤害\"算不算一次攻击\" ✓ —— 附加伤害实例带 `notCountsAsAttack` ⇒ 该条件为假 ⇒ 链条到此为止 ✓。 ⚠ DAMAGE **必须**给 damage_param（倍率在技能参数行里的下标，无默认值 ✓）：他普攻那一行只有一项（100% 攻击力）⇒ 下标 0 ✓。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "trace_childlike",
+    "when": [
+      "actor == self",
+      "target has_state 灼烧",
+      "damage_is_attack"
+    ],
+    "do": [
+      {
+        "op": "HEAL",
+        "scale": "owner_max_hp",
+        "percent": 0.05,
+        "target": "self"
+      }
+    ],
+    "source": "1109 虎克 行迹 童真 (1109101): 「触发天赋时，回复等同于虎克生命上限5%的生命值。」",
+    "note": "「**触发天赋时**，回复等同于虎克生命上限 **5%** 的生命值」—— 天赋的触发条件就是「攻击处于灼烧状态的敌方目标时」 ✓，所以本条挂**同一个事件 + 同一组条件** ✓，而不是另找\"天赋触发过\"的标记（引擎没有这种标记 ✗，而这两者在这个句子里是等价的 ✓）。⚠ **护栏同样必须带上**（`damage_is_attack`）：否则天赋追加的那次附加伤害会**再触发一次本行迹** ⇒ 每次攻击回两次血 ✗。⚠ 治疗量是**虎克自己**的生命上限（`scale: owner_max_hp` ✓，与 `HEAL`/`SHIELD` 共用的词表一致 ✓）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "trace_innocence",
+    "do": [
+      {
+        "op": "RESIST_DEBUFF",
+        "percent": 0.35,
+        "permanent": true,
+        "target": "self",
+        "kind": "control"
+      }
+    ],
+    "source": "1109 虎克 行迹 无邪 (1109102): 「抵抗控制类负面状态的概率提高35%。」",
+    "note": "「抵抗**控制类**负面状态的概率提高 35%」—— 引擎把\"按**类**抵抗\"建模成自己的 `ClassResistBuff`（`BuffManager.debuffResistOf(DebuffClass)` ✓），而控制类正是 `DebuffClass.CONTROL` ✓（冻结/纠缠/禁锢等 ✓），所以用 `RESIST_DEBUFF` + `debuff_class` ✓，而不是去改通用的效果抵抗 ✗（后者对所有负面效果生效，会**过度** ✗）。⚠ `permanent: true`：行迹是常驻的 ✓（不是\"持续 N 回合\" ✗）。 ⚠ 字段名是 kind 且取值**小写**（control / dot）—— 装载器原话：Op RESIST_DEBUFF requires kind (which class of negative state it resists; known: control / dot) ✓。"
   }
 ]
