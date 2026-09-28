@@ -37,7 +37,8 @@ public class JiaoqiuTest {
 
         Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("\u70ec\u7168") : enemy.getBuffManager().stacksOf("\u70ec\u7168"),
                 "\u300c\u3010\u70ec\u7168\u3011\u6700\u591a\u53e0\u52a05\u5c42\u300d -- seven applications must still read five");
-        // \u26a0 The Burn equivalence is NOT asserted here: measured, `hasState("\u707c\u70e7")` is false even though `BuffManager.DOT_STATES` maps FIRE -> \u707c\u70e7
+        Assertions.assertTrue(enemy.getBuffManager().hasState("灼烧"),
+                "\u300c\u4e5f\u4f1a\u88ab\u89c6\u4e3a\u540c\u65f6\u9677\u5165\u4e86\u707c\u70e7\u72b6\u6001\u300d -- a Fire DotBuff IS \u707c\u70e7 by the engine's own translation");
         // and this rule applies a Fire DoT. Registered as an open question rather than asserted falsely or deleted silently.
     }
 
@@ -68,7 +69,7 @@ public class JiaoqiuTest {
         return new Random() {
             @Override
             public double nextDouble() {
-                return 1.0;
+                return 0.0;   // a debuff lands when nextDouble() < chance; 1.0 would RESIST every one (round 202)
             }
         };
     }
