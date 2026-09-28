@@ -31,7 +31,8 @@
       }
     ],
     "source": "1215 寒鸦 终结技 十王敕令，遍土遵行 (skill 121503, Ultra/Enhance): 「使指定我方单体速度提高，提高数值等同于寒鸦速度的20.00%，并使该目标攻击力提高60%，持续2回合。」 param Lv10 → #1 = 0.2（寒鸦速度的份额）, #2 = 0.6, #3 = 2 回合",
-    "note": "One sentence, three effects, and the third is the interesting one. ⚠ The SPD boost is a <b>derived</b> magnitude (`scale: self_attr:SPEED`, read off 寒鸦 — 「等同于寒鸦速度的20%」 — and frozen when she casts), while the ATK boost is a plain 60%; both are ordinary modifiers, both carry `buff: 敕令` so that 星魂 4's 「终结技的持续时间额外增加1回合」 has a name to reach. ⚠ The <b>marker state</b> 「敕令」 is not decoration either: 星魂 1 says 「持有<b>终结技效果</b>的我方目标消灭敌方目标时，寒鸦行动提前15%」, and \"carries my ultimate's effect\" is only readable if the effect is also a <b>state</b> — a named modifier is invisible to `has_state` (which reads states, controls and DoTs). The marker shares the modifiers' `turns`, so the three end together. ⚠ `target != self` is 「指定我方单体」: a self-cast is not a target she may buff, and `ULT_CAST` reaches her own table too."
+    "note": "One sentence, three effects, and the third is the interesting one. ⚠ The SPD boost is a <b>derived</b> magnitude (`scale: self_attr:SPEED`, read off 寒鸦 — 「等同于寒鸦速度的20%」 — and frozen when she casts), while the ATK boost is a plain 60%; both are ordinary modifiers, both carry `buff: 敕令` so that 星魂 4's 「终结技的持续时间额外增加1回合」 has a name to reach. ⚠ The <b>marker state</b> 「敕令」 is not decoration either: 星魂 1 says 「持有<b>终结技效果</b>的我方目标消灭敌方目标时，寒鸦行动提前15%」, and \"carries my ultimate's effect\" is only readable if the effect is also a <b>state</b> — a named modifier is invisible to `has_state` (which reads states, controls and DoTs). The marker shares the modifiers' `turns`, so the three end together. ⚠ `target != self` is 「指定我方单体」: a self-cast is not a target she may buff, and `ULT_CAST` reaches her own table too.",
+    "id": "ult_blessing"
   },
   {
     "on": "KILL",
@@ -264,7 +265,8 @@
       }
     ],
     "source": "1215 寒鸦 天赋 罚恶 (skill 121504): 「我方目标对陷入【承负】状态下的敌方目标施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合。」 之一（普攻）",
-    "note": "「我方目标对陷入【承负】…施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合」 -- the boost is granted to the ATTACKER (`target: actor`) and lasts 2 of their turns, so it is an ordinary modifier, not a one-instance `BOOST_DAMAGE`. ⚠ It fires on the instance that satisfies the condition, which is why the sentence says 「施放…时」: the zone is assembled after the trigger, so this very hit is boosted too. ⚠ Three rules again (one per slot), matching one apiece. ⚠ `actor is_ally` is 「我方目标」: 寒鸦 herself counts (she is one of ours), an enemy attack does not."
+    "note": "「我方目标对陷入【承负】…施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合」 -- the boost is granted to the ATTACKER (`target: actor`) and lasts 2 of their turns, so it is an ordinary modifier, not a one-instance `BOOST_DAMAGE`. ⚠ It fires on the instance that satisfies the condition, which is why the sentence says 「施放…时」: the zone is assembled after the trigger, so this very hit is boosted too. ⚠ Three rules again (one per slot), matching one apiece. ⚠ `actor is_ally` is 「我方目标」: 寒鸦 herself counts (she is one of ours), an enemy attack does not.",
+    "id": "talent_common"
   },
   {
     "on": "DEALING_DAMAGE",
@@ -283,7 +285,8 @@
       }
     ],
     "source": "1215 寒鸦 天赋 罚恶: 「…普攻、战技、终结技…」 之二（战技）",
-    "note": "The 战技 half of her talent -- see the 普攻 rule above."
+    "note": "The 战技 half of her talent -- see the 普攻 rule above.",
+    "id": "talent_skill"
   },
   {
     "on": "DEALING_DAMAGE",
@@ -302,7 +305,8 @@
       }
     ],
     "source": "1215 寒鸦 天赋 罚恶: 「…普攻、战技、终结技…」 之三（终结技）",
-    "note": "The 终结技 half of her talent -- see the 普攻 rule above."
+    "note": "The 终结技 half of her talent -- see the 普攻 rule above.",
+    "id": "talent_ultra"
   },
   {
     "on": "KILL",
@@ -318,5 +322,43 @@
     ],
     "source": "1215 寒鸦 行迹 幽府: 「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的触发次数小于等于1，则额外回复1点战技点。」",
     "note": "「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的**触发次数小于等于1**，则额外回复1点战技点」. ⚠ `target has_state 承负` reads the VICTIM (KILL's subject is the one who died), which is what 「持有【承负】的敌方目标」 names. ⚠ The condition is the SECOND counter: 承负次数 is reset at every refund (it is the \"2 次\" threshold), so it cannot count refunds -- 承负返还 is incremented by the refund rule and never cleared, which is exactly 「触发次数」. ⚠ `<= 1` rather than a threshold: the sentence is a ceiling, not a target."
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon4_duration",
+    "min_eidolon": 4,
+    "do": [
+      {
+        "op": "MODIFY_RULE",
+        "rule": "ult_blessing",
+        "effect_turns": 1
+      }
+    ],
+    "source": "1215 寒鸦 星魂 4 四谛 (Avatar_Hanya_Rank04): 「终结技的持续时间额外增加1回合。」 param = [1]",
+    "note": "「终结技的**持续时间**额外增加1回合」. ⚠ This is `MODIFY_RULE`'s **third form** (2026-09-28): an amendment to the named rule's own effect values, not to how often it runs. ⚠ Why it may not be written as a second rule with longer `turns`: the ultimate's two modifiers and its marker state are re-applied on every cast, and a same-kind modifier **refreshes instead of stacking** -- the second one would *replace* the first, leaving the duration at the base 2. Raising the value in place is the only spelling that gets 3. ⚠ `effect_turns: 1` lands on every effect of `ult_blessing` that states a `turns` (both modifiers and the 敕令 marker), so all three end together as they did before."
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon6_talent",
+    "min_eidolon": 6,
+    "do": [
+      {
+        "op": "MODIFY_RULE",
+        "rule": "talent_common",
+        "effect_percent": 0.1
+      },
+      {
+        "op": "MODIFY_RULE",
+        "rule": "talent_skill",
+        "effect_percent": 0.1
+      },
+      {
+        "op": "MODIFY_RULE",
+        "rule": "talent_ultra",
+        "effect_percent": 0.1
+      }
+    ],
+    "source": "1215 寒鸦 星魂 6 六正 (Avatar_Hanya_Rank06): 「天赋的伤害提高效果额外提高10%。」 param = [0.1]",
+    "note": "「天赋的伤害提高效果额外提高10%」 (30% -> 40%). ⚠ Three amendments for one sentence, because the talent is three rules -- one per cast slot (see their notes); 「天赋的伤害提高效果」 names all of it, so all three are raised. ⚠ Written as an amendment rather than as a second, bigger rule: the three rules grant a `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST`, and a fourth rule granting 0.1 would **replace** the 0.3 currently on the attacker instead of adding to it (same-kind modifiers refresh) -- the number would come out 0.1, and nothing would look broken."
   }
 ]

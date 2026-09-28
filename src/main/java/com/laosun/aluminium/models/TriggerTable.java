@@ -269,6 +269,26 @@ public class TriggerTable {
             }
             return;
         }
+        if (effect.getEffectTurns() != null) {
+            boolean statesTurns = named.effects().stream().anyMatch(e -> e.getTurns() != null);
+            if (!statesTurns) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE raises the duration of rule \"" + target + "\", but none of that rule's effects "
+                                + "states a \"turns\"; an effect with no duration (a `permanent` one, or an instant "
+                                + "one) has no number to raise (source: " + amender.source() + ")");
+            }
+            return;
+        }
+        if (effect.getEffectPercent() != null) {
+            boolean statesPercent = named.effects().stream().anyMatch(e -> e.getPercent() != null);
+            if (!statesPercent) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE raises the value of rule \"" + target + "\", but none of that rule's effects "
+                                + "states a \"percent\"; there is no number to raise (source: "
+                                + amender.source() + ")");
+            }
+            return;
+        }
         boolean statesAChance = named.effects().stream().anyMatch(e -> e.getBaseChance() != null);
         if (!statesAChance) {
             throw new IllegalArgumentException(
