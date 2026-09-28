@@ -58,5 +58,23 @@
     "per_turn": 1,
     "source": "1321 大丽花 行迹 又一场葬礼 第二句: 「当大丽花受到队友提供的治疗效果或护盾时，再次触发该效果，持续#4[i]回合，单个回合内不可重复触发。」 param = [0.24, 1, 0.5, 3] → #4 = 3 回合",
     "note": "The **shield** half of the same sentence: 「…或**护盾**时」. `SHIELD_GRANTED` is the event this round added (M-43) -- the engine had `HEALED` but shields were only an op, so this half could not be written at all. ⚠ The event's `actor` is the **provider** (same convention as `HEALED`), which is why 「队友提供的」 is `actor is_ally` + `actor != self` again: a shield she grants HERSELF must not count as a teammate's. ⚠ A **raw** grant (no `turns`, i.e. `Battle.grantShield` with no provider) states `actor = null`, so this rule correctly stays silent -- a shield nobody is credited with must not answer “who provided it”. ⚠ Fired for the TIMED path too (the interpreter announces it after the `ShieldBuff` is on), which is the path 三月七's Skill and 星魂 2 shields take. ⚠ The effect is the same one, granted for 3 turns: see the rule above for why 「再次触发该效果」 needs no new op. 「当大丽花受到队友提供的治疗效果或护盾时，再次触发该效果，持续#4[i]回合，单个回合内不可重复触发」 — the healing half is expressible (HEALED + `actor != self`), the **shield** half is not (the engine has no \"a shield was granted\" event), and a half-authored retrigger would fire on heals alone; registered as M-43."
+  },
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_domain",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "BOOST_TOUGHNESS",
+        "percent": 0.5,
+        "turns": 3,
+        "ticks_on": "self",
+        "target": "all_allies"
+      }
+    ],
+    "source": "1321 大丽花 战技 舔舐…背叛伸出火舌: 「开启结界，持续3回合，大丽花回合开始时持续回合数减1。…结界持续期间，我方全体的弱点击破效率提高50%…」",
+    "note": "「结界持续期间，我方全体的**弱点击破效率**提高 50%」. ⚠ 「弱点击破效率」 and the engine's `BOOST_TOUGHNESS` are the same quantity — the multiplier on the toughness reduction an instance causes — so this is its first shipped reader besides 1207's talent. ⚠ `ticks_on: \"self\"` is 「**大丽花**回合开始时持续回合数减1」 (the caster's clock, as 8006's 【伴舞】 and 星期日's 【蒙福者】 use). ⚠ **Registered, not written**: the 结界 itself (「开启结界」 — a *field* with its own lifetime and membership, which the engine does not have: every effect here reaches units through a selector, and a domain is a place, not a list), and the second half of the same sentence 「敌方目标**未处于弱点击破状态**时承受的削韧值也能够转化为超击破伤害」 — the condition half is now expressible (`!target has_state 弱点击破`), but the sentence states **no percentage** for that conversion, and her talent's 倍率 (which the 星魂 1 text refers to) is not in this file yet. A conversion with a guessed multiplier would be a wrong number with no symptom."
   }
 ]
