@@ -63,8 +63,14 @@ public class SkillExecutorTest {
 
     /** Fabricated data (this character has no Blast / Bounce). */
     private static Skill fakeSkill(SkillEffectType effect, List<Double> params) {
+        // ? The Bounce path reads its numbers from the DESCRIPTION (round 170): the share is the `%`-referenced parameter
+        // and the hit count is the ADDITIONAL count (「额外造成 N 次」), so the fixture states both. params[1] is therefore the
+        // additional count, not the total — the call sites below say 2 to mean three hits.
+        String description = params.size() > 1
+                ? "Deals DMG equal to #1[i]% of ATK to one enemy and additionally deals #2[i] instances of DMG."
+                : "Deals DMG equal to #1[i]% of ATK to one enemy.";
         SkillData data = new SkillData(1, "Fake", List.of(params), new StanceList(0, 0, 0),
-                DamageElement.ICE, effect, null, 30.0, null);
+                DamageElement.ICE, effect, null, 30.0, description);   // description is the 9th component (Lombok field order)
         return new Skill() {
             @Override
             public int getLevel() {
@@ -175,7 +181,7 @@ public class SkillExecutorTest {
         Enemy second = enemy("e2");
         Enemy third = enemy("e3");
         Battle battle = battle(attacker, List.of(first, second, third));
-        Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(0.5, 3.0));
+        Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(0.5, 2.0));   // 2 additional = 3 hits
 
         battle.castImmediate(bounce, attacker, List.of(first));
 
@@ -232,7 +238,7 @@ public class SkillExecutorTest {
         Enemy fragile = enemy("e1", 100);        // 100 per hit → dies in one hit
         Enemy tough = enemy("e2");
         Battle battle = battle(attacker, List.of(fragile, tough));
-        Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(1.0, 3.0));
+        Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(1.0, 2.0));   // 2 additional = 3 hits
 
         battle.castImmediate(bounce, attacker, List.of(fragile));
 
@@ -246,7 +252,7 @@ public class SkillExecutorTest {
         Character attacker = attacker();
         Enemy fragile = enemy("e1", 100);
         Battle battle = battle(attacker, List.of(fragile));
-        Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(1.0, 3.0));
+        Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(1.0, 2.0));   // 2 additional = 3 hits
 
         battle.castImmediate(bounce, attacker, List.of(fragile));
 
