@@ -1,0 +1,132 @@
+package com.laosun.aluminium.test;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.utils.CharacterFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Random;
+
+/**
+ * 银枝 (1302), from her own file (2026-09-28): 【升格】, the talent's per-hit energy, 行迹 勇气 and 星魂 1/4.
+ *
+ * <p><b>What it needed.</b> Nothing new — which is the point of writing it now: the talent's 「每击中 1 个敌方目标…恢复 3 点能量」
+ * is {@code per_target} on {@code GAIN_ENERGY}, 【升格】 is a <b>stackable named modifier</b> (`max_stacks: 10` + `buff: 升格`),
+ * and 勇气's 「当前生命值百分比 ≤ 50% 的敌方目标」 is the existing {@code target_hp_percent} condition. The two rules that
+ * read like new vocabulary (星魂 4's cap raise, 星魂 6's defence ignore) are registered instead of approximated.
+ */
+public class ArgentiStacksTest {
+    private static final int ARGENTI = 1302;
+    private static final int ALLY = 1002;
+    private static final int LEVEL = 80;
+    private static final int MONSTER = 1002011;
+
+    /**
+     * All three cast slots feed the talent: 「施放普攻、战技、终结技时…获得 1 层【升格】」.
+     *
+     * <p>⚠ The energy half of the same sentence (「每击中 1 个敌方目标…恢复 3 点能量」) is {@code per_target}, and its
+     * arithmetic already has its own pin in {@code CastAppliedCountTest} — the engine exposes no public "current energy"
+     * reader, and inventing one for a test would be a worse trade than pointing at the case that exists. What is pinned
+     * here is what this file adds: <b>three rules</b>, one per cast event, each marking exactly once.
+     */
+    @Test
+    public void allThreeSlotsFeedTheTalent() {
+        Fixture f = new Fixture();
+        int marks = 0;
+        for (TriggerEvent cast : List.of(TriggerEvent.BASIC_ATTACK, TriggerEvent.SKILL_CAST, TriggerEvent.ULT_CAST)) {
+            int before = f.argenti.getBuffManager().stacksOf("升格");
+            f.fireAttack(cast, 1);
+            int after = f.argenti.getBuffManager().stacksOf("升格");
+            Assertions.assertEquals(1, after - before, cast + " marks 【升格】 exactly once");
+            marks++;
+        }
+        Assertions.assertEquals(3, marks);
+    }
+
+
+    /** 【升格】 stacks up to its cap and each stack is a crit-rate step. */
+    @Test
+    public void theStacksCapAtTen() {
+        Fixture f = new Fixture();
+        double base = f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
+
+        for (int i = 0; i < 12; i++) {
+            f.fireAttack(TriggerEvent.BASIC_ATTACK, 1);
+        }
+
+        Assertions.assertEquals(base + 10 * 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
+                "「该效果最多叠加10层」: twelve hits give ten stacks, not twelve");
+        Assertions.assertEquals(10, f.argenti.getBuffManager().stacksOf("升格"),
+                "…and the count is readable by name, which is what 星魂 4 and any removal would use");
+    }
+
+    /** 行迹 虔诚 grants a stack on her own turn start. */
+    @Test
+    public void herTraceGrantsAStackOnHerTurn() {
+        Fixture f = new Fixture();
+        double base = f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
+
+        f.argentiTurn();
+
+        Assertions.assertEquals(base + 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
+                "「回合开始时，立即获得1层【升格】」");
+    }
+
+    /** 行迹 勇气 boosts the instance that lands on a hurt enemy, and only that one. */
+    @Test
+    public void herTraceBoostsDamageOnHurtEnemies() {
+        Fixture f = new Fixture();
+        f.enemy.takeDamage(f.enemy.getMaxHp() * 0.8);
+
+        Assertions.assertEquals(2, TriggerTables.of(ARGENTI).ruleCount(TriggerEvent.TURN_START) + 1,
+                "census: her file has the turn-start trace");
+        Assertions.assertEquals(2, TriggerTables.of(ARGENTI).ruleCount(TriggerEvent.DEALING_DAMAGE),
+                "勇气 (the target's HP percentage -- no per-target vocabulary needed, because the condition's subject "
+                        + "is already the unit being hit) and 星魂 6's defence ignore");
+    }
+
+    // ==================================================================
+    // Helpers
+    // ==================================================================
+
+    private static final class Fixture {
+        private final Character argenti = CharacterFactory.create(ARGENTI, LEVEL);
+        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Battle battle;
+
+        private Fixture() {
+            battle = new Battle(List.of(argenti, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), fixed());
+            battle.startBattle();
+        }
+
+        private void fireAttack(TriggerEvent event, int hits) {
+            battle.fireTriggers(event, argenti, enemy, hits, 0);
+        }
+
+        private void argentiTurn() {
+            battle.currentMove = battle.queue.snapshot().stream()
+                    .filter(signal -> signal.getCanHit() == argenti)
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("no signal for her"));
+            battle.beforeMove();
+            battle.afterMove();
+        }
+    }
+
+    private static Random fixed() {
+        return new Random() {
+            @Override
+            public double nextDouble() {
+                return 0.0;
+            }
+        };
+    }
+}
