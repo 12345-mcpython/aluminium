@@ -1,0 +1,46 @@
+[
+  {
+    "on": "ULT_CAST",
+    "id": "ult_present",
+    "when": ["actor == self"],
+    "do": [
+      {
+        "op": "MODIFY_DAMAGE_TAKEN",
+        "percent": 0.3,
+        "damage_type": "DOT",
+        "base_chance": 1.0,
+        "turns": 2,
+        "target": "all_enemies"
+      }
+    ],
+    "source": "1108 桑博 终结技 惊喜礼盒 (110803, Ultra/AoEAttack): 「对敌方全体造成等同于桑博160%攻击力的风属性伤害，同时有100%的基础概率使被攻击的敌方目标受到的持续伤害提高30%，持续2回合。」 param = [1.6, 1, 0.3]",
+    "note": "「同时有 **100% 的基础概率**使被攻击的敌方目标**受到的持续伤害**提高 30%，持续 2 回合」 — the 160% AoE damage is the engine's own skill path; this rule is the debuff half. ⚠ Three spellings carry it, and each is load-bearing: `damage_type: \"DOT\"` (the taken-side zone is scoped to damage-over-time; `Battle.tickDots` settles those as `DamageType.DOT`, which is why this is expressible at all), `base_chance: 1.0` (⚠ **not** the same as \"always\": a base chance is the number **before** effect resistance, so the zone goes through the same resist pipeline a DOT or a state does — attaching it unconditionally would turn 「基础概率」 into \"always\"), and `turns: 2` (the duration the sentence states). ⚠ The trap on the other side of the same words: `DOT_DAMAGE_BOOST` is \"how hard **my** DOTs hit\", while 「受到的持续伤害提高」 is \"how hard DOTs hurt **me**\" — two sides, and only the second belongs on the victim."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1108 桑博 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 56%、终结技 160%、天赋 52% 都是该行）",
+    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: 战技「弹射」 (a bounce — **no rule is needed**: the engine's own BOUNCE shape runs the 56% ×(1+4) hits, which is exactly why nothing is written for it), 天赋「桑博击中敌方目标后有 65% 的基础概率使目标陷入**风化**状态，持续 3 回合。风化状态下每回合开始时受到等同于桑博 52% 攻击力的风属性持续伤害。**风化状态最多叠加 5 层。**」 (the DOT itself is `APPLY_DOT` with `base_chance: 0.65` + `element: Wind` + `turns: 3` — all of which exist — but the clause is registered **whole** because of 「最多叠加 5 层」: `DotBuff.isSameKind` is `false`, so a second application **stacks without limit** today, and shipping the DOT while dropping its cap would be a wrong number that only shows up in long fights, not a missing one), and 行迹/星魂 1–6 (not yet read clause by clause)."
+  }
+]

@@ -320,6 +320,8 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "MODIFY_DAMAGE_TAKEN" -> {
+                // 「有 100% 的基础概率使…受到的持续伤害提高」: an optional roll (see requireBaseChance).
+                requireBaseChance(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireDuration(effect, op, spec);
@@ -1500,7 +1502,7 @@ public final class TriggerInterpreter {
             }
             // 「有 100% 的基础概率使敌方…陷入【通解】状态」: when the rule states one, the state is ROLLED (effect resistance
             // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
-            applyRolledState(battle, target, buff, effect, ctx);
+            attachRolled(battle, target, buff, effect, ctx);
         }
     }
 
@@ -1560,9 +1562,12 @@ public final class TriggerInterpreter {
         // 「受到的**击破伤害**提高」: an optional damage-type scope, spelled with the enum's own names (2026-09-28).
         com.laosun.aluminium.enums.DamageType scope = parseDamageType(effect, "MODIFY_DAMAGE_TAKEN", null);
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(withSource(withLifetime(percent > 0
+            AbstractBuff zone = withSource(withLifetime(percent > 0
                     ? new VulnerabilityBuff(turns, percent, permanent, scope)
-                    : new ReductionBuff(turns, -percent, permanent, scope), effect), ctx));
+                    : new ReductionBuff(turns, -percent, permanent, scope), effect), ctx);
+            // 「有 100% 的基础概率使…受到的持续伤害提高 30%」 (1108 桑波): a zone may be ROLLED, through the same
+            // resist pipeline APPLY_BUFF/APPLY_DOT use. ⚠ Unstated = attached directly, so no existing file changes.
+            attachRolled(battle, target, zone, effect, ctx);
         }
     }
 
@@ -1829,13 +1834,13 @@ public final class TriggerInterpreter {
      *
      * @return {@code true} when the state was attached (or when the rule stated no chance at all)
      */
-    private static boolean applyRolledState(Battle battle, CanHit target, AbstractBuff state, EffectSpec effect,
+    private static boolean attachRolled(Battle battle, CanHit target, AbstractBuff buff, EffectSpec effect,
                                             TriggerContext ctx) {
         if (effect.getBaseChance() == null) {
-            target.getBuffManager().addBuff(state);
+            target.getBuffManager().addBuff(buff);
             return true;
         }
-        return battle.tryApplyDebuff(ctx.owner(), target, state, effect.getBaseChance(), null);
+        return battle.tryApplyDebuff(ctx.owner(), target, buff, effect.getBaseChance(), null);
     }
 
     /**
