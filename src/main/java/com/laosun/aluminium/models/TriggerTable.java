@@ -534,6 +534,20 @@ public class TriggerTable {
             // `SUPER_BREAK` reads 「本次伤害的削韧值」 off the settled instance, so DEALING_DAMAGE is the only moment it can
             // be attached to (the same rule ADD_DAMAGE follows, which the interpreter could enforce because it already
             // knew the event).
+            // ⚠ A `damage_type` is validated HERE, where the rule's own source is available and the failure is loud at load
+            // time: a misspelling that silently meant "all damage types" would be a wrong number with no symptom.
+            if (effect.getDamageType() != null && !effect.getDamageType().isBlank()) {
+                try {
+                    com.laosun.aluminium.enums.DamageType.valueOf(
+                            effect.getDamageType().trim().toUpperCase(java.util.Locale.ROOT));
+                } catch (IllegalArgumentException unknown) {
+                    throw new IllegalArgumentException(
+                            "this rule names the damage type '" + effect.getDamageType()
+                                    + "', which is not one the engine settles; known: "
+                                    + java.util.Arrays.toString(com.laosun.aluminium.enums.DamageType.values())
+                                    + " (source: " + spec.getSource() + ")");
+                }
+            }
             if (effect.getOp() != null && "SUPER_BREAK".equalsIgnoreCase(effect.getOp().trim())
                     && event != TriggerEvent.DEALING_DAMAGE) {
                 throw new IllegalArgumentException(

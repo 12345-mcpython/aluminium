@@ -11,10 +11,18 @@
         "buff": "酩酊",
         "turns": 2,
         "target": "all_enemies"
+      },
+      {
+        "op": "MODIFY_DAMAGE_TAKEN",
+        "percent": 0.12,
+        "damage_type": "BREAK",
+        "turns": 2,
+        "buff": "酩酊",
+        "target": "all_enemies"
       }
     ],
     "source": "1301 加拉赫 终结技 香槟仪礼 (130103, 全体攻击/Fire): 「使敌方全体陷入【酩酊】状态，持续2回合，同时对敌方全体造成等同于加拉赫150%攻击力的火属性伤害…」",
-    "note": "「使敌方全体陷入【酩酊】状态，持续 2 回合」 — the state half of the ultimate; the 150% AoE damage is the engine's own skill path. ⚠ No `base_chance`: the sentence states none, and for an `APPLY_BUFF` state that means applied directly (the convention every file in this repo follows — `APPLY_DOT`/`APPLY_CONTROL` instead default to a 100% *base* chance, which is the documented difference). ⚠ 【酩酊】 is a plain named state, so nothing about it is judged by `isDebuff()` — the clauses that read it are registered below, because they need vocabulary this engine does not have yet."
+    "note": "「使敌方全体陷入【酩酊】状态，持续 2 回合」 — the state half of the ultimate; the 150% AoE damage is the engine's own skill path. ⚠ No `base_chance`: the sentence states none, and for an `APPLY_BUFF` state that means applied directly (the convention every file in this repo follows — `APPLY_DOT`/`APPLY_CONTROL` instead default to a 100% *base* chance, which is the documented difference). ⚠ 【酩酊】 is a plain named state, so nothing about it is judged by `isDebuff()` — the clauses that read it are registered below, because they need vocabulary this engine does not have yet. ⚠ **2026-09-28 补齐**：同句前一半「【酩酊】使目标**受到的击破伤害**提高 12%」也已写出 —— 用 `MODIFY_DAMAGE_TAKEN` 的新可选字段 `damage_type: \"BREAK\"`（**承受侧**，按伤害类型限定）。⚠ 它的过滤器 `target has_state 酩酊` 必须排在状态**之后**求值（同一规则内效果按顺序执行），这与 1211 里\"必须先于施加\"的情形正好相反。⚠ 另一侧的同名陷阱：`BREAKING_EFFECT` 是\"**我**打得有多疼\"，与本条\"击破伤害打**我**有多疼\"不是一回事。"
   },
   {
     "on": "BATTLE_START",
@@ -24,10 +32,18 @@
         "buff": "酩酊",
         "turns": 2,
         "target": "all_enemies"
+      },
+      {
+        "op": "MODIFY_DAMAGE_TAKEN",
+        "percent": 0.12,
+        "damage_type": "BREAK",
+        "turns": 2,
+        "buff": "酩酊",
+        "target": "all_enemies"
       }
     ],
     "source": "1301 加拉赫 秘技 亲启佳酿: 「…与处于特殊领域内的敌人进入战斗后，使敌方全体陷入【酩酊】状态，持续2回合，并对敌方全体造成等同于加拉赫50%攻击力的火属性伤害。」",
-    "note": "The 秘技's **in-battle half**: 「进入战斗后使敌方全体陷入【酩酊】状态，持续 2 回合」 is a `BATTLE_START` fact, which is exactly how this engine models 「进入战斗后」. ⚠ The 50% AoE damage that follows in the same sentence is **not** written: the technique's damage is a separate mechanic with its own place in the pre-battle flow, and the engine settles battle-start effects without an instance. ⚠ The 20-second special field the sentence opens with is a map mechanic, out of in-battle scope."
+    "note": "The 秘技's **in-battle half**: 「进入战斗后使敌方全体陷入【酩酊】状态，持续 2 回合」 is a `BATTLE_START` fact, which is exactly how this engine models 「进入战斗后」. ⚠ The 50% AoE damage that follows in the same sentence is **not** written: the technique's damage is a separate mechanic with its own place in the pre-battle flow, and the engine settles battle-start effects without an instance. ⚠ The 20-second special field the sentence opens with is a map mechanic, out of in-battle scope. ⚠ **2026-09-28 补齐**：同句前一半「【酩酊】使目标**受到的击破伤害**提高 12%」也已写出 —— 用 `MODIFY_DAMAGE_TAKEN` 的新可选字段 `damage_type: \"BREAK\"`（**承受侧**，按伤害类型限定）。⚠ 它的过滤器 `target has_state 酩酊` 必须排在状态**之后**求值（同一规则内效果按顺序执行），这与 1211 里\"必须先于施加\"的情形正好相反。⚠ 另一侧的同名陷阱：`BREAKING_EFFECT` 是\"**我**打得有多疼\"，与本条\"击破伤害打**我**有多疼\"不是一回事。"
   },
   {
     "on": "ULT_CAST",

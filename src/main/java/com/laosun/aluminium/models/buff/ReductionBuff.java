@@ -21,6 +21,10 @@ import com.laosun.aluminium.models.event.DamageEvent;
  * holder's **own output** by 0.7.
  */
 public class ReductionBuff extends AbstractBuff implements DamageEvent {
+
+    /** The one damage type this reduction is about, or {@code null} for every type (see {@link VulnerabilityBuff}). */
+    private final com.laosun.aluminium.enums.DamageType scope;
+
     private final double ratio;
 
     public ReductionBuff(int duration, double ratio) {
@@ -34,6 +38,15 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
      * @throws IllegalArgumentException when {@code ratio} is not positive (see {@link VulnerabilityBuff})
      */
     public ReductionBuff(int duration, double ratio, boolean permanent) {
+        this(duration, ratio, permanent, null);
+    }
+
+    /**
+     * @param scope the only damage type this reduction applies to ({@code null} = all of them)
+     * @throws IllegalArgumentException when {@code ratio} is not positive (see {@link VulnerabilityBuff})
+     */
+    public ReductionBuff(int duration, double ratio, boolean permanent,
+                         com.laosun.aluminium.enums.DamageType scope) {
         super(duration, false, permanent);
         if (!(ratio > 0)) {
             throw new IllegalArgumentException(
@@ -41,6 +54,7 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
                             + " (an increase in damage taken is VulnerabilityBuff)");
         }
         this.ratio = ratio;
+        this.scope = scope;
     }
 
     @Override
