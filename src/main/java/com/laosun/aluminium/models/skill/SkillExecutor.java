@@ -407,12 +407,12 @@ public final class SkillExecutor {
         switch (effect) {
             case SINGLE_ATTACK, MAZE_ATTACK ->
                     totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets,
-                            data.getStanceList().single());
+                            data.getStanceList().single(), skill.getSkillSlot());
 
             case AOE_ATTACK -> {
                 double stance = data.stanceFor(true);
                 for (CanHit target : battle.targetableEnemies()) {
-                    totalDamage += hit(battle, data, user, element, base, target, hitTargets, stance);
+                    totalDamage += hit(battle, data, user, element, base, target, hitTargets, stance, skill.getSkillSlot());
                 }
             }
 
@@ -422,16 +422,16 @@ public final class SkillExecutor {
                 double centreStance = data.stanceFor(true);
                 double neighbourStance = data.stanceFor(false);
                 if (center < 0) {
-                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, centreStance);
+                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, centreStance, skill.getSkillSlot());
                 } else {
-                    totalDamage += hit(battle, data, user, element, base, alive.get(center), hitTargets, centreStance);
+                    totalDamage += hit(battle, data, user, element, base, alive.get(center), hitTargets, centreStance, skill.getSkillSlot());
                     if (center > 0) {
                         totalDamage += hit(battle, data, user, element, base, alive.get(center - 1),
-                                hitTargets, neighbourStance);
+                                hitTargets, neighbourStance, skill.getSkillSlot());
                     }
                     if (center < alive.size() - 1) {
                         totalDamage += hit(battle, data, user, element, base, alive.get(center + 1),
-                                hitTargets, neighbourStance);
+                                hitTargets, neighbourStance, skill.getSkillSlot());
                     }
                 }
             }
@@ -449,7 +449,7 @@ public final class SkillExecutor {
                         break;                                     // all dead → the remaining hits are forfeited
                     }
                     totalDamage += hit(battle, data, user, element, base,
-                            alive.get(battle.getRng().nextInt(alive.size())), hitTargets, perHitStance);
+                            alive.get(battle.getRng().nextInt(alive.size())), hitTargets, perHitStance, skill.getSkillSlot());
                 }
             }
 
@@ -478,7 +478,7 @@ public final class SkillExecutor {
      * @return the settled damage of this hit (0 if the target was dead / invulnerable)
      */
     private static double hit(Battle battle, SkillData data, CanHit user, DamageElement element, double base,
-                              CanHit target, Set<CanHit> hitTargets, double stanceDamage) {
+                              CanHit target, Set<CanHit> hitTargets, double stanceDamage, int skillKey) {
         if (target == null || target.isDeath()) {
             return 0;
         }
@@ -489,6 +489,9 @@ public final class SkillExecutor {
         // then the instance has no scoped boost rather than a guessed one.
         Damage damage = new Damage(user, target, element, DamageType.NORMAL, base,
                 data == null ? SkillCategory.UNSPECIFIED : data.getCategory());
+        // ? Which skill caused it (2026-09-28): DEALING_DAMAGE is where a target-bearing clause can ask, and this is the
+        // only place that knows -- the caller holds the Skill, the instance carries the answer.
+        damage.setSkillKey(skillKey);
         // ⚠ The intended toughness reduction rides on the instance (2026-09-28): a `DEALING_DAMAGE` rule is handed this
         // damage, and 「本次伤害的**削韧值**」 has to be readable there -- 1321/8006's super-break clauses are exactly that.
         // ⚠ Set BEFORE the settlement below: `DEALING_DAMAGE` is fired from inside `battle.applyDamage`.

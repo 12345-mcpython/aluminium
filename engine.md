@@ -317,7 +317,12 @@ dispatch(consumer, 直接相关方...)
 
 - ⚠ **量出来的字段语义：`ADD_STACK` 的 `amount` 不是层数**（2026-09-28，第 94 轮）：给 1111 卢卡写「获得 2 层【斗志】」时，用例断言"1+2=3"、实测读到 **2**；六次施放停在 **4**（上限生效）⇒ **每次触发只加 1 层**，`amount` 对该 op 无意义。**规矩**：op 的字段含义要**用行为测出来**再写进内容；`REMOVE_STACK` 的 `amount` 是"移除几层"，与 `ADD_STACK` **同名不同义**。
 
-### 4.3 其余关键语义
+#> **2026-09-28（第 119–120 轮，写 1110 玲可时实测）三个 op 事实**：
+> 1. **`scale` 的词表按 op 而不同** —— `MODIFY_ATTR` 只认 `self_attr:<ATTRIBUTE>`（且指**规则主人**的属性，例如 `self_attr:HEALTH` 表示"玲可的生命上限"）；而 `APPLY_REGEN` 只认 **`owner_def` / `owner_max_hp` / `target_max_hp`** —— 把 `owner_max_hp` 写给 `MODIFY_ATTR`、或把 `self_attr:HEALTH` 写给 `APPLY_REGEN`，装载器都会当场拒绝。
+> 2. **`APPLY_REGEN` 必须给 `buff`**（规则文本里点名的那个状态名）；**两份叠加的再生必须起不同的名字**，否则后一份会把前一份顶掉，「额外回复」就退化成「替换回复」（1110 用的是 `持续治疗` 与 `持续治疗·额外`）。
+> 3. **`MODIFY_ATTR` 的 `buff` 只是显示名，不是状态**：`has_state("求生反应")` 查不到它 ⇒ 「附上【X】，且提高…」这类句子要写成 **两个效果**（`APPLY_BUFF` 造状态 + `MODIFY_ATTR` 给数值），1110 的战技就是这么写的。
+
+## 4.3 其余关键语义
 
 - **`DamageEvent` 广播给双方**，但回调签名里**不告诉 buff 它挂在谁身上**。
   因此注入乘区的 buff 必须自己判侧：`Damage.isOnDefenderSide(entity)` / `isOnAttackerSide(entity)`

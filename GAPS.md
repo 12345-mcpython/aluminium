@@ -17,6 +17,9 @@
 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
+> **2026-09-28 第十二条更新（1110 玲可出货 + 一条新登记）**：她出货了 27/97。写她时实测到三条 op 事实（已写进 `engine.md`）：**`scale` 词表按 op 而不同**、**`APPLY_REGEN` 必须给 `buff` 且叠加的两份要异名**、**`MODIFY_ATTR` 的 `buff` 只是显示名**（造状态必须用 `APPLY_BUFF`）。⚠ 新登记一条：**带 `target_when` 的 `APPLY_REGEN` 没有触发**（状态为真 ✓、队友只有 1 份 RegenBuff ✗）⇒ 下一轮先读 `target_when` 在该 op 上的求值时机。
+
+
 > **2026-09-28 第十一条更新（登记一条新前置）**：1301 强化普攻自带的减攻需要一个**同时带目标与技能键**的事件，而 `ALLY_ATTACK` 刻意不带目标。**精确改动清单**：`Damage` 加 `skillKey`（照 `stance`）+ `SkillExecutor.hit(...)` 多收一个键（**7 个调用点全在同一方法内**）+ `Battle.applyDamage` 的 `DEALING_DAMAGE` 改用 7 参重载并传 `damage.getSkillKey()`。做完即可让该句出货，并打开"强化普攻命中后…"这一大类。⚠ 本轮**只登记**（不边猜边改）。
 
 
