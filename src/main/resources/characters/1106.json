@@ -68,6 +68,22 @@
       }
     ],
     "source": "1106 佩拉 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 210%、终结技 100% 都是该行）",
-    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of her document, with the blocker each one hits: 战技「**解除指定敌方单体的 1 个增益效果**，同时造成…伤害」 (the engine's `DISPEL` reaches **negative** buffs on our own side — cleansing an *enemy* means removing a **positive** buff, and there is no op for that direction; a real reader for a future \"remove a buff from the enemy\" op), 终结技「有 **100% 的基础概率**使敌方每个单体目标陷入【通解】状态…【通解】状态下，敌方目标防御力降低 40%，持续 2 回合」 (a *state* with a base chance: `APPLY_DOT` and `APPLY_CONTROL` roll one, `APPLY_BUFF` does not — and applying it unconditionally would drop 「基础概率」, which is a different mechanic rather than a smaller number), 行迹 追歼「施放战技**解除增益效果时**，下一次攻击造成的伤害提高 20%」(rides on the 战技), and 星魂 1–6 / the 秘技 (not yet read clause by clause)."
+    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of her document, with the blocker each one hits: ⚠ **2026-09-28 补齐**：战技的「解除指定敌方单体的 1 个增益效果」已用 `REMOVE_BUFF` 写出（见本文件最后一条规则）；剩下的登记是终结技【通解】（一个**带基础概率的状态**）、行迹 追歼 与 星魂 1–6。"
+  },
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_dispel_buff",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_BUFF",
+        "amount": 1,
+        "target": "target"
+      }
+    ],
+    "source": "1106 佩拉 战技 低温妨害 (110602, BPSkill/SingleAttack): 「解除指定敌方单体的1个增益效果，同时造成等同于佩拉210%攻击力的冰属性伤害。」",
+    "note": "「**解除指定敌方单体的 1 个增益效果**，同时造成…伤害」 — the 210% damage is the engine's own skill path, so this rule is the whole of the dispel half. ⚠ `REMOVE_BUFF` is the **mirror** of `DISPEL`, and the direction is why it is a separate op: `DISPEL` is defined as \"negative effects on the carrier\" (cleansing our own side), while this strips an **enemy's** benefits. Both rest on the same per-class decision (`isDebuff()`), so neither can be tricked into removing the wrong half. ⚠ **Permanent buffs are skipped** (`BuffManager.removeBuffs`): a relic bonus or a trace is not a 「增益效果」 in the sense these sentences use — nobody's skill dispels a loadout — and stripping one would be a wrong number with no symptom. ⚠ `target` is the enemy the Skill was aimed at (M-35), which is what 「指定敌方单体」 names."
   }
 ]
