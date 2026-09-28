@@ -71,6 +71,13 @@ public class GallagherTest {
         Assertions.assertNotSame(before, after,
                 "「并将下一次普攻强化为【酒花奔涌】」 — the file's skill_id mapped and the slot was swapped");
         Assertions.assertEquals(130108, after.getSkillSlot(), "…for the enhanced attack's own data row");
+        // ⚠ The other half of the clause, with the RIGHT harness: this attack (which uses the enhanced skill, as the
+        // two assertions above show) is followed by the engine's own "an attack has finished" broadcast, and THAT is what
+        // consumes `until: "next_attack"`. ⚠ A first version drove the attack with `castImmediate` and never fired the
+        // broadcast, so it saw the swap still in place and blamed the engine — the harness was wrong, not the semantics.
+        f.battle.fireAfterAttack(f.gallagher, f.enemy, List.of(f.enemy), 1.0);
+        Assertions.assertSame(before, f.gallagher.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON),
+                "「下一次普攻」: the swap ends once that attack has finished, so the original is back");
     }
 
     // ==================================================================
