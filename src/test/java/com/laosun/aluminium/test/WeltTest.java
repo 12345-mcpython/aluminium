@@ -59,4 +59,17 @@ public class WeltTest {
             battle.startBattle();
         }
     }
+
+    /** \u26a0 Bounce: his skill's own damage must land at all (it computed zero hits before the round-170 fix). */
+    @Test
+    public void hisSkillActuallyDealsDamage() {
+        Fixture f = new Fixture();
+        double before = f.enemy.getCurrentHp();
+
+        f.battle.castImmediate(f.welt.getSkills().get(SkillType.SKILL), f.welt, List.of(f.enemy));
+
+        double loss = before - f.enemy.getCurrentHp();
+        Assertions.assertTrue(loss > 0,
+                "\u300c\u5bf9\u6307\u5b9a\u654c\u65b9\u5355\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u7ef4\u5c14\u7279#1[i]%\u653b\u51fb\u529b\u7684\u865a\u6570\u4f24\u5bb3\uff0c\u5e76\u989d\u5916\u9020\u6210 2 \u6b21\u4f24\u5bb3\u300d \u2014 the skill must land: loss " + loss);
+    }
 }

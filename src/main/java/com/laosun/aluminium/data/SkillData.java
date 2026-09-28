@@ -263,4 +263,51 @@ public class SkillData {
             default -> getStanceList().single();
         };
     }
+
+    /**
+     * A Bounce skill's damage share, taken from the description (2026-09-29).
+     *
+     * <p>Bounce rows do not agree on layout: 1009 is `[0.25]` (its 「额外造成4次」 is prose only), 1108 is `[4, 0.28]` (count first) and 1004 is
+     * `[0.36, 0.65, 0.1, 2]` (count last). The only reliable map is the description: the share is the parameter a `#N[i]` placeholder
+     * references immediately before a `%`, read the same way {@link #debuffChance()} reads its own.
+     *
+     * @return the level-1 share, or {@code null} when the description does not state one
+     */
+    public Double bounceDamageShare() {
+        if (description == null || skills.isEmpty()) {
+            return null;
+        }
+        java.util.regex.Matcher matcher = PLACEHOLDER.matcher(description);
+        while (matcher.find()) {
+            int end = Math.min(description.length(), matcher.end() + 12);
+            String after = MARKUP.matcher(description.substring(matcher.end(), end)).replaceAll("");
+            if (!after.startsWith("%")) {
+                continue;
+            }
+            int index = Integer.parseInt(matcher.group(1)) - 1;   // placeholders are 1-based
+            List<Double> level1 = skills.getFirst();
+            return index >= 0 && index < level1.size() ? level1.get(index) : null;
+        }
+        return null;
+    }
+
+    /**
+     * The number of ADDITIONAL hits a Bounce skill's description states: the integer parameter that is not the damage share
+     * (2026-09-29). 1004's `2` and 1108's `4` are such numbers; 1009 states its count in prose, so this returns {@code null} for it.
+     */
+    public Integer bounceAdditionalHits(Double damageShare) {
+        if (skills.isEmpty()) {
+            return null;
+        }
+        for (Double value : skills.getFirst()) {
+            if (value == null || value.equals(damageShare)) {
+                continue;
+            }
+            double raw = value;
+            if (raw >= 1 && raw == Math.rint(raw)) {
+                return (int) raw;
+            }
+        }
+        return null;
+    }
 }

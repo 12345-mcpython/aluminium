@@ -444,7 +444,15 @@ public final class SkillExecutor {
             }
 
             case BOUNCE -> {
-                int hits = params.size() > 1 ? (int) (double) params.get(1) : 1;   // hit count defaults to 1
+                // ? Bounce rows disagree on layout (measured 2026-09-29): 1009 `[0.25]` (count in prose), 1108 `[4, 0.28]`
+                // (count first), 1004 `[0.36, 0.65, 0.1, 2]` (count last). Reading a fixed index made shipped Welt compute
+                // `(int) 0.65` = 0 hits, i.e. no damage at all — so both numbers now come from the description's placeholders.
+                Double bounceShare = data.bounceDamageShare();
+                double bounceBase = bounceShare == null
+                        ? base
+                        : user.getAttribute(AttributeType.ATTACK).get() * bounceShare;
+                Integer additional = data.bounceAdditionalHits(bounceShare);
+                int hits = (additional == null ? 0 : additional) + 1;   // 「额外造成 N 次」: the total is N + 1
                 // H-3: for a bounce, `single` is the **total toughness reduction of the whole skill**,
                 // so it MUST be spread evenly over the hits; otherwise more hits means more reduction
                 double perHitStance = data.stanceFor(true) / Math.max(1, hits);
@@ -455,7 +463,7 @@ public final class SkillExecutor {
                     if (alive.isEmpty()) {
                         break;                                     // all dead → the remaining hits are forfeited
                     }
-                    totalDamage += hit(battle, data, user, element, base,
+                    totalDamage += hit(battle, data, user, element, bounceBase,
                             alive.get(battle.getRng().nextInt(alive.size())), hitTargets, perHitStance, skill.getSkillSlot());
                 }
             }
