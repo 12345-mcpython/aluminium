@@ -289,7 +289,16 @@ public final class TriggerInterpreter {
                 // (`scale` + `percent`, plus `element` because no skill lends one). 「造成等同于素裳80%攻击力的伤害」 in a technique, a
                 // talent's follow-up or an eidolon has no row to name — 53 and 15 documents state such a ratio.
                 if (effect.getSkill() == null || effect.getSkill().isBlank()) {
-                    requireDerivedScale(effect, op, spec);
+                    // ? A literal ratio is scaled either by a derived attribute (`self_attr:ATTACK`) or by a Max HP share (`owner_max_hp` /
+                    // `target_max_hp`, added 2026-09-29 for 「造成等同于X%生命上限的伤害」 -- 16 documents). `requireDerivedScale` stays strict because
+                    // MODIFY_ATTR shares it and a modifier must not name a Max HP.
+                    String literalScale = effect.getScale() == null ? "" : effect.getScale().trim();
+                    boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
+                    if (maxHpShare) {
+                        requirePercent(effect, op, spec);
+                    } else {
+                        requireDerivedScale(effect, op, spec);
+                    }
                     requireElement(effect, op, spec);
                 } else {
                     requireSkill(effect, op, spec);
@@ -2984,15 +2993,31 @@ public final class TriggerInterpreter {
      * on the base) and the WRONG one for damage. Measured: a row-based instance at her Lv10 COMMON row dealt 674.365 while a literal 0.8 dealt 385.35 = 0.8 x
      * 481.7 — the base ATK rather than the settled one. A damage instance uses the settled value, so this path reads it directly.
      */
-    private static double literalBase(CanHit attacker, EffectSpec effect) {
+    private static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect) {
         String scale = effect.getScale() == null ? "" : effect.getScale().trim();
-        AttributeType attribute = scaleAttribute(effect, "DAMAGE", null);
-        if (attribute == null) {
-            throw new IllegalStateException("a literal-ratio DAMAGE needs a derived scale like self_attr:ATTACK, got '" + scale
-                    + "'; see the rule that states it");
-        }
         double share = effect.getPercent() == null ? 0.0 : effect.getPercent();
         double flat = effect.getAmount() == null ? 0.0 : effect.getAmount();
+        // ? A Max HP share (2026-09-29): 「造成等同于X%生命上限的伤害」 -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
+        // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
+        switch (scale) {
+            case "owner_max_hp" -> {
+                return attacker.getMaxHp() * share + flat;
+            }
+            case "target_max_hp" -> {
+                if (victim == null) {
+                    throw new IllegalStateException("a literal-ratio DAMAGE scaled by target_max_hp has no victim to read it from");
+                }
+                return victim.getMaxHp() * share + flat;
+            }
+            default -> {
+                // fall through to the attribute family below
+            }
+        }
+        AttributeType attribute = scaleAttribute(effect, "DAMAGE", null);
+        if (attribute == null) {
+            throw new IllegalStateException("a literal-ratio DAMAGE needs a derived scale like self_attr:ATTACK or a Max HP share like owner_max_hp, got '"
+                    + scale + "'; see the rule that states it");
+        }
         return attacker.getAttribute(attribute).get() * share + flat;
     }
 
@@ -3027,7 +3052,7 @@ public final class TriggerInterpreter {
                             + "to lend)");
         }
           double base = skill == null
-                  ? literalBase(attacker, effect)     // ? a literal ratio, scaled off the SETTLED attribute (2026-09-29)
+                  ? literalBase(attacker, victim, effect)   // ? a literal ratio, off the SETTLED attribute or a Max HP (2026-09-29)
                   : attacker.getAttribute(AttributeType.ATTACK).get() * multiplierOf(skill, effect, attacker);
           battle.applyAdditionalDamage(attacker, victim, skill == null
                           ? DamageElement.fromString(effect.getElement().trim())

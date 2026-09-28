@@ -114,5 +114,23 @@
     "min_eidolon": 2,
     "source": "1105 娜塔莎 星魂 2 临床研学 (Avatar_Natasha_00_Rank02): 「施放终结技时，对当前生命值百分比小于等于30%的我方目标附加1回合的持续治疗效果，目标回合开始时为其回复等同于娜塔莎6%生命上限+160的生命值。」 param = [0.3, 1, 0.06, 160]",
     "note": "「施放终结技时，对**生命百分比 ≤ 30% 的**我方目标附加 1 回合的持续治疗效果，目标回合开始时为其回复等同于娜塔莎 6% 生命上限 + 160 的生命值」. ⚠ Two per-target pieces now carry it: `target_when: [\"target_hp_percent <= 0.3\"]` picks the allies who qualify (a rule condition could only have asked about the one ally the ultimate was aimed at), and `turns: 1` is the 「1 回合」 — with `APPLY_REGEN` settling before the duration is counted down, one turn really is one tick. ⚠ It is a **shorter, weaker** regeneration than her Skill's (0.06 + 160 against 0.072 + 192) and it refreshes rather than stacks, which is what 「附加 1 回合的持续治疗效果」 means when the Skill's is already up."
+  },
+  {
+    "on": "BASIC_ATTACK",
+    "id": "trace_max_hp_additional_damage",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "scale": "owner_max_hp",
+        "percent": 0.4,
+        "element": "Physical",
+        "target": "target"
+      }
+    ],
+    "source": "1105 娜塔莎 行迹（额外能力）: 「施放普攻时，额外造成等同于娜塔莎生命上限40%的物理属性伤害。」",
+    "note": "「**施放普攻时，额外造成**等同于娜塔莎**生命上限 40%** 的物理属性伤害」—— ① 触发用 **`BASIC_ATTACK`** ✓（\"施放普攻\" ✓，目标是那名敌人 ✓ = `target` ✓）；② 「额外造成」正是 `DAMAGE` 的语义 ✓（引擎的**附加伤害**入口 ✓：`DamageType.ADDITIONAL` ✓、**不计为一次攻击** ✓ ⇒ 不会自我触发 ✓）；③ 倍率用**字面形态** + **`scale: owner_max_hp`** ✓ —— 即\"**娜塔莎自己的生命上限**\" ✓；该刻度是**第 189 轮新加**的 ✓（原本字面形态只认 `self_attr:<属性>` ✗，读不了生命上限 ✓；实测这类句子共 **16 份**文档 ✓）。⚠ 与她的**治疗**区分 ✓：技能自带的治疗由**数据表**负责 ✓（第 165 轮实测 ✓），本条是**规则自己**造成的伤害 ✓ ⇒ 不重复 ✗。"
   }
 ]
