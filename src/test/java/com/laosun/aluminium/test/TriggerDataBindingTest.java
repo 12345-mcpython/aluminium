@@ -27,7 +27,8 @@ public class TriggerDataBindingTest {
 
         TriggerTable tribbie = TriggerTables.of(TRIBBIE);
         Assertions.assertFalse(tribbie.isEmpty(), "1403's table must not be empty");
-        Assertions.assertEquals(1, tribbie.ruleCount(TriggerEvent.BATTLE_START));
+        Assertions.assertEquals(3, tribbie.ruleCount(TriggerEvent.BATTLE_START),
+                "the 30-energy trace, the technique's Numinosity and the level convention");
         Assertions.assertEquals(1, tribbie.ruleCount(TriggerEvent.ALLY_ATTACK));
 
         TriggerTable robin = TriggerTables.of(ROBIN);
