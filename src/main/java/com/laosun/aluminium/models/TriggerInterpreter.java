@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -340,6 +340,13 @@ public final class TriggerInterpreter {
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
+            }
+            case "REMOVE_BUFF" -> {
+                // 「解除指定敌方单体的1个增益效果」: the mirror of DISPEL -- that one cleans OUR side's debuffs, this one
+                // strips the TARGET's benefits. Permanent buffs are skipped (see BuffManager.removeBuffs): nobody's skill
+                // dispels a loadout.
+                requirePositiveAmount(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
             }
             case "DISPEL" -> {
                 requirePositiveAmount(effect, op, spec);
@@ -772,6 +779,7 @@ public final class TriggerInterpreter {
             case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
             case "ADD_DAMAGE" -> addDamageFlat(effect, ctx);
             case "DISPEL" -> dispel(battle, effect, ctx);
+            case "REMOVE_BUFF" -> removeBuffs(battle, effect, ctx);
             case "REMOVE_STATE" -> removeState(effect, ctx);
             case "TAUNT" -> taunt(battle, effect, ctx);
             case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
@@ -1782,6 +1790,23 @@ public final class TriggerInterpreter {
      * (三月七/杰帕德/玲可), which is a soft weight — that sentence carries <b>no number</b> in any document, so it is
      * registered as a data gap rather than guessed at here.
      */
+    /**
+     * {@code REMOVE_BUFF}: 「解除指定敌方单体的 1 个增益效果」 — takes up to {@code amount} positive, temporary buffs off
+     * each resolved target.
+     *
+     * <p>⚠ Its direction is what makes it a separate op rather than a flag on {@code DISPEL}: that one is defined as
+     * "negative effects on the carrier", and the two sentences mean opposite things about the same word (「解除」). Keeping
+     * them apart is also what lets each one be validated and tested on its own.
+     */
+    private static void removeBuffs(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        int amount = (int) Math.round(effect.getAmount());
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target != null) {
+                target.getBuffManager().removeBuffs(amount);
+            }
+        }
+    }
+
     private static void taunt(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             // ⚠ Through the resist pipeline like every other negative state: 「使目标陷入嘲讽状态」 states no
