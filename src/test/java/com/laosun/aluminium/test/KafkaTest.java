@@ -46,6 +46,40 @@ public class KafkaTest {
         var table = TriggerTables.of(KAFKA);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the Shock plus its immediate tick");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the talent follow-up");
+    }
+
+    /** \u26a0 An ALLY's basic attack makes Kafka strike again; her own must not. */
+    @Test
+    public void anAllysBasicAttackTriggersHerFollowUp() {
+        Character kafka = CharacterFactory.create(KAFKA, LEVEL);
+        Character ally = CharacterFactory.create(1002, LEVEL);
+        Enemy enemy = Enemy.fromAttributes("Test Dummy", 200000, 100, 100, 90);
+        Battle battle = new Battle(List.of(kafka, ally), List.of(enemy), new Random() {
+            @Override
+            public double nextDouble() {
+                return 0.0;
+            }
+        });
+        battle.startBattle();
+        double before = enemy.getCurrentHp();
+        battle.castImmediate(ally.getSkills().get(SkillType.COMMON), ally, List.of(enemy));
+        double afterAlly = enemy.getCurrentHp();
+
+        Assertions.assertTrue(afterAlly < before,
+                "the ally's basic attack lands and Kafka's follow-up adds to it: " + before + " -> " + afterAlly);
+    }
+
+    /** \u26a0 Her OWN basic attack must not grant the follow-up: observable is the Shock it would apply. */
+    @Test
+    public void herOwnBasicAttackDoesNotTriggerTheFollowUp() {
+        Fixture f = new Fixture();
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("触电"), "precondition: no Shock");
+
+        f.battle.castImmediate(f.kafka.getSkills().get(SkillType.COMMON), f.kafka, List.of(f.enemy));
+
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("触电"),
+                "\u300c\u5f53\u5361\u8299\u5361\u7684**\u961f\u53cb**\u5bf9\u654c\u65b9\u76ee\u6807\u65bd\u653e\u666e\u653b\u540e\u300d -- HER OWN attack is not an ally's, so no follow-up and no Shock");
     }
 
     private static final class Fixture {
