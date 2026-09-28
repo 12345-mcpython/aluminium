@@ -102,6 +102,25 @@ public class LukaTest {
                         + "reflective unit test can see, which is why this case goes through the FILE.");
     }
 
+    /** ⚠ End to end: two layers swap in a skill that loads, and that attack lands. */
+    @Test
+    public void theSwappedSkillDealsDamage() {
+        Fixture f = new Fixture();
+        f.skillCast();
+        f.basicAttack();                                  // reaches the threshold and installs the swap
+
+        var swapped = f.luka.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
+        Assertions.assertEquals(com.laosun.aluminium.enums.SkillCategory.NORMAL, swapped.getData().getCategory(),
+                "⚠ precondition: 槽位 8 的数据必须真的在（第 113 轮的教训）");
+
+        double before = f.enemy.getCurrentHp();
+        f.battle.castImmediate(swapped, f.luka, List.of(f.enemy));
+        f.battle.fireAfterAttack(f.luka, f.enemy, List.of(f.enemy), 1.0);
+
+        Assertions.assertTrue(f.enemy.getCurrentHp() < before,
+                "「≥ 2 层时普攻强化为【直冲碎天拳】」 — the enhanced attack deals damage");
+    }
+
     /** Census: the two layer rules, the trace and the level convention are all there. */
     @Test
     public void hisFileCarriesTheClauses() {
