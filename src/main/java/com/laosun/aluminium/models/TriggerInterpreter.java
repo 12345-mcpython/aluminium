@@ -2431,14 +2431,22 @@ public final class TriggerInterpreter {
             throw new IllegalStateException(
                     attacker.getName() + " has no " + slot + " skill to fire a DAMAGE effect from");
         }
-        if (!skill.getData().getEffect().isDamaging()) {
+        // ⚠ A *rider* may legitimately read a row out of a skill that deals no damage of its own: 知更鸟's 【协奏】
+        // adds 「1 次等同于其自身 120% 攻击力的物理属性附加伤害」 and that 120% lives in her ultimate's own parameter row,
+        // while the ultimate itself is a Support skill. So a non-damaging slot is accepted **when the rule states the
+        // element** -- that is the part the skill could not have supplied, and without it the instance would be
+        // element-less, which is the silent hole this check was written for.
+        boolean statesElement = effect.getElement() != null && !effect.getElement().isBlank();
+        if (!skill.getData().getEffect().isDamaging() && !statesElement) {
             throw new IllegalStateException(
                     "DAMAGE effect points at " + slot + ", whose effect is "
-                            + skill.getData().getEffect() + " rather than a damaging one");
+                            + skill.getData().getEffect() + " rather than a damaging one; a rule that reads a number "
+                            + "out of such a skill must state the \"element\" itself (the skill does not have one "
+                            + "to lend)");
         }
         double multiplier = multiplierOf(skill, effect, attacker);
         double base = attacker.getAttribute(AttributeType.ATTACK).get() * multiplier;
-        battle.applyAdditionalDamage(attacker, victim, skill.getData().getElement(), base,
+        battle.applyAdditionalDamage(attacker, victim, elementOf(effect, skill), base,
                 effect.getCritRate(), effect.getCritDamage());
     }
 
@@ -2455,6 +2463,22 @@ public final class TriggerInterpreter {
      * @return the multiplier for that row
      * @throws IllegalStateException when the row or the column falls outside the data
      */
+    /**
+     * The element of a rule-driven damage instance: the rule's own {@code element} when it states one, otherwise the
+     * skill's (2026-09-28).
+     *
+     * <p>⚠ The rule's own spelling had to exist for 知更鸟's 【协奏】 rider: the number comes from her ultimate's row,
+     * but her ultimate is a Support skill with <b>no element</b>, while the text says the damage is Physical. Reading
+     * the skill's element there would have produced an element-less instance — and one that silently takes no element
+     * bonus or resistance.
+     */
+    private static DamageElement elementOf(EffectSpec effect, Skill skill) {
+        if (effect.getElement() != null && !effect.getElement().isBlank()) {
+            return DamageElement.fromString(effect.getElement().trim());
+        }
+        return skill.getData().getElement();
+    }
+
     private static double multiplierOf(Skill skill, EffectSpec effect, CanHit attacker) {
         var levels = skill.getData().getSkills();
         int level = effect.getDamageLevel() == null ? attacker.skillLevel(skill) : effect.getDamageLevel();
