@@ -1939,7 +1939,24 @@ public class Battle {
      * @return how many rules fired in total
      */
     public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount) {
-        return fireTriggers(event, actor, target, hitCount, amount, null);
+        // ⚠ Both nulls spelled out: with a 6-arg (..., Damage) and a 6-arg (..., SkillCategory) overload, a single bare
+        // null is ambiguous (measured: the compiler refused it).
+        return fireTriggers(event, actor, target, hitCount, amount, null, null);
+    }
+
+    /**
+     * The same, stating <b>which cast</b> produced the event — the form {@code ALLY_ATTACK} uses.
+     *
+     * <p>「每当我方目标…施放 <b>2 次普攻、战技、终结技</b>后」（1215 寒鸦）has to tell the three slots apart, and an attack
+     * event is the only place that count can be taken <b>once per cast</b>: counting on {@code DEALING_DAMAGE} would
+     * count <i>hits</i> instead (a multi-hit skill would mark several times for one cast — a wrong number with no
+     * symptom).
+     *
+     * @param fromCast the category of the cast that produced this attack ({@code null} = nothing can name one)
+     */
+    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                            SkillCategory fromCast) {
+        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast);
     }
 
     /**
