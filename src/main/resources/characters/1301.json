@@ -127,5 +127,24 @@
     ],
     "source": "1301 加拉赫 天赋 鏖战正酣 (130104, Enhance/Restore): 「【酩酊】使目标受到的击破伤害提高12.00%。陷入【酩酊】状态的目标每次受到我方角色攻击后，会回复攻击者640点生命值。」",
     "note": "「陷入【酩酊】状态的目标**每次受到我方角色攻击后**，会回复**攻击者** 640 点生命值」 — `ALLY_ATTACK` is 「我方角色攻击后」 (once per attack, not per hit) and `target: \"attacker\"` is 「攻击者」: ⚠ **`attacker` is a legal selector** and always was (`TriggerInterpreter.TARGET_SELECTORS`) — the earlier registration in this file claimed no spelling names the attacker for a heal, which was a **wrong assumption read off `TargetSelector.java`** (the selector table lives in the interpreter, and that class is a different thing). Corrections of exactly this kind are why the ledger is re-verified against the source rather than trusted. ⚠ The heal carries no `scale`: 「640 点」 is a flat number in the row, not a share of anything. ⚠ The other half of the same talent sentence — 「【酩酊】使目标**受到的击破伤害**提高 12%」 — stays registered: it is a **taken-side** vulnerability scoped to break damage (`BREAKING_EFFECT` is the dealer side, the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」)."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "enhanced_attack_down",
+    "when": [
+      "actor == self",
+      "from_skill_id == 8"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": -0.15,
+        "turns": 2,
+        "target": "target"
+      }
+    ],
+    "source": "1301 加拉赫 强化普攻 酒花奔涌 (130108 的技能描述): 「对指定敌方单体造成等同于加拉赫250%攻击力的火属性伤害。并使目标攻击力降低15.00%，持续2回合。」",
+    "note": "「并使目标攻击力降低 15.00%，持续 2 回合」—— 这句必须挂在 DEALING_DAMAGE 上：ALLY_ATTACK 刻意不带被瞄准的单位（执行时会报 Effect targets target but this event has no such party），而 DEALING_DAMAGE 既有目标、现在也带技能键（Damage.skillKey）。⚠ from_skill_id 的取值是装载键（强化普攻 = 槽位 8），不是数据行 130108。 ⚠ 条件里不写 target == target（装载器会拒绝：它只支持与队伍或数值字面量的比较）；目标由效果自己的 target 选择器决定。"
   }
 ]

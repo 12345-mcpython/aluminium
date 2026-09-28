@@ -2482,7 +2482,8 @@ public class Battle {
         //
         // It fires for every instance the engine settles, DOT ticks and break damage included: those are damage
         // too, and a rule that means "attacks only" says so with its own conditions.
-        fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage);
+        fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage, null,
+                damage.getSkillKey());
 
         // 2) Crit zone: only crittable types roll; an effect that already fixed the crit (fixedCrit) is not
         //    overwritten

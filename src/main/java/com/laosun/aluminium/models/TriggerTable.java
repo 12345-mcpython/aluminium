@@ -1551,7 +1551,7 @@ public class TriggerTable {
          */
         public TriggerContext withTargetFilter(List<Condition> filter) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    filter == null ? List.of() : filter, 0);
+                    filter == null ? List.of() : filter, skillId);
         }
 
         /**

@@ -139,6 +139,24 @@ public class Damage {
     @lombok.Getter
     private double stance;
 
+    /**
+     * The skill key (the loader's slot) of the cast that produced this instance (2026-09-28).
+     *
+     * <p>Why it rides on the instance: {@code DEALING_DAMAGE} is the only event that has BOTH a target and, with this, the
+     * skill -- which is what 「强化普攻命中后使目标…」 needs, because {@code ALLY_ATTACK} deliberately carries no aim.
+     */
+    private int skillKey;
+
+    /** @see #skillKey */
+    public int getSkillKey() {
+        return skillKey;
+    }
+
+    /** @see #skillKey */
+    public void setSkillKey(int skillKey) {
+        this.skillKey = skillKey;
+    }
+
     /** Records the intended toughness reduction (fluent, like the other instance mutators). */
     public Damage setStance(double value) {
         this.stance = value;
