@@ -3,9 +3,9 @@
 > 本文件是**当前**的缺口清单：只列**今天仍然受阻**的东西，并给每条标注【读者（已量）】【前置】【为什么没做】。
 > 历史流水与逐轮记录仍在 `ROADMAP.md`（432 行，含已完成项）；`engine.md` 是能力的**语汇手册**。
 
-## 一、已实现的能力（33 个 op + 条件/选择器）
+## 一、已实现的能力（op **34** 个 —— 实测：调度表里独立的 `case` 臂；另有**条件/选择器/寿命**一批）
 
-- **op 33 个**（`TriggerInterpreter` 的 dispatch 表为准）：伤害与结算（`DAMAGE`/`ADD_DAMAGE`/`BOOST_DAMAGE`/`MODIFY_DAMAGE_TAKEN`/
+- **op 34 个**（实测）（`TriggerInterpreter` 的 dispatch 表为准）：伤害与结算（`DAMAGE`/`ADD_DAMAGE`/`BOOST_DAMAGE`/`MODIFY_DAMAGE_TAKEN`/
   `SUPER_BREAK`/`DELEGATE_DAMAGE`）、削韧（`BOOST_TOUGHNESS`）、状态（`APPLY_BUFF`/`APPLY_DOT`/`APPLY_CONTROL`/`APPLY_REGEN`/
   `REMOVE_STATE`/`REMOVE_BUFF`/`DISPEL`/`EXTEND_BUFF`/`TAUNT`/`RESIST_DEBUFF`）、层数与资源（`ADD_STACK`/`REMOVE_STACK`/
   `GAIN_ENERGY`/`GAIN_SKILL_POINT`/`GAIN_RESOURCE`/`SPEND_RESOURCE`）、防护与治疗（`SHIELD`/`HEAL`）、行动（`ADVANCE`）、

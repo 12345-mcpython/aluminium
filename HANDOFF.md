@@ -52,7 +52,7 @@
 
 ## 五、验证现状（第 104 轮实测，共 412 个提交）
 
-- 全量测试：**1299 条全绿**。
+- 全量测试：**全绿**（截至本轮 157 个测试类；每次跑 `--rerun-tasks --console=plain --quiet`，失败数由打印而不是记忆决定）
 - 演示闸门（提交后跑，`git checkout HEAD~N -- src/main/...` 对比后 `git checkout HEAD --` 复原）：
   **`run` 282/282 行 · `run --args="mechanics"` 46/46 行**，差异仅 `Weakness […]`/`Resist {…}` 的**集合顺序**（不稳定输出）。
 - 账本/文档表格：**0 处列数不一致**。
