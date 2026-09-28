@@ -407,6 +407,7 @@ public class EffectSpec {
      * (90, the same 90 that appears on a stat sheet), and folding it into a percentage field would make the reader
      * guess the base it is a percentage <i>of</i>.
      */
+    @SerializedName("speed")
     private Double speed;
 
     /**
@@ -417,14 +418,17 @@ public class EffectSpec {
      * \u300c\u56fa\u5b9a\u4e3a\u300d -- the outcome is not rolled at all (`Damage.fixedCrit`). A "fixed 50%" would be a third thing
      * nobody can read, so the loader refuses it by name.
      */
+    @SerializedName("suspends_turns")
     private Boolean suspendsTurns;
 
+    @SerializedName("crit_rate")
     private Double critRate;
 
     /**
      * \u300c\u66b4\u51fb\u4f24\u5bb3\u56fa\u5b9a\u4e3a 150%\u300d -- the crit damage a {@code fixed_crit} instance uses instead of the
      * attacker's own crit damage stat (1.5 = 150%). Stated together with {@link #critRate}, never alone.
      */
+    @SerializedName("crit_damage")
     private Double critDamage;
 
     /**
