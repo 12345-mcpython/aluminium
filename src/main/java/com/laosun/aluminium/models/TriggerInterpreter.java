@@ -402,13 +402,16 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireTickOwner(effect, op, spec);
+                // `buff` is READ (2026-09-28): the name the resistance carries, so 「处于【协奏】状态时免疫控制类」
+                // can be taken off together with the state it belongs to (see `named`). It used to be refused here.
                 if (effect.getAmount() != null || effect.getScale() != null || effect.getAttribute() != null
-                        || effect.getBuff() != null || effect.getSkill() != null
+                        || effect.getSkill() != null
                         || effect.getDamageParam() != null || effect.getElement() != null
                         || effect.getControl() != null || effect.getBaseChance() != null) {
                     throw new IllegalArgumentException(
-                            "Op " + op + " takes a class (\"kind\") and a \"percent\", plus how long it lasts; it "
-                                    + "has no amount / scale / attribute / buff / skill / element / control / "
+                            "Op " + op + " takes a class (\"kind\") and a \"percent\", plus how long it lasts "
+                                    + "(and an optional \"buff\" name so a state's own effect can be removed with "
+                                    + "the state); it has no amount / scale / attribute / skill / element / control / "
                                     + "base_chance (source: " + spec.getSource() + ")");
                 }
                 if (effect.getPercent() <= 0 || effect.getPercent() > 1) {
@@ -1108,9 +1111,17 @@ public final class TriggerInterpreter {
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(withSource(withTickOwner(
+            AbstractBuff buff = withSource(withTickOwner(
                     withLifetime(statModifier(attribute, magnitude, turns, permanent, maxStacks, derived), effect),
-                    effect, ctx), ctx));
+                    effect, ctx), ctx);
+            // 「处于【协奏】状态时，我方全体攻击力提高…」 (2026-09-28): the boost lasts as long as the STATE, and the state ends
+            // when a countdown's turn arrives -- a lifetime no `turns` can state. Naming the modifier is what lets
+            // `REMOVE_STATE <the same name>` take it off; ⚠ without a name the modifier is skipped by that loop, i.e.
+            // unnamed boosts keep exactly the lifetime they always had.
+            if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
+                buff.setBuffName(effect.getBuff().trim());
+            }
+            target.getBuffManager().addBuff(buff);
         }
     }
 
@@ -1911,10 +1922,24 @@ public final class TriggerInterpreter {
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(withSource(
-                    withTickOwner(withLifetime(new ClassResistBuff(kind, effect.getPercent(), turns, permanent),
-                            effect), effect, ctx), ctx));
+            AbstractBuff resist = withSource(withTickOwner(withLifetime(
+                    new ClassResistBuff(kind, effect.getPercent(), turns, permanent), effect), effect, ctx), ctx);
+            // the name is optional and only content that asks for it gets it (see `named`)
+            target.getBuffManager().addBuff(named(resist, effect));
         }
+    }
+
+    /**
+     * Gives a freshly built buff the <b>name the data stated</b> ({@code "buff": "协奏"}), when it states one.
+     *
+     * <p>⚠ Unnamed is the normal case and stays exactly as it was: {@code BuffManager.removeState} skips modifiers and
+     * resistances with no name, so only the content that asks for a name gets the "removable by that name" lifetime.
+     */
+    private static <T extends AbstractBuff> T named(T buff, EffectSpec effect) {
+        if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
+            buff.setBuffName(effect.getBuff().trim());
+        }
+        return buff;
     }
 
     /**

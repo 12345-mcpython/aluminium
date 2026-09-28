@@ -233,6 +233,23 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     @Setter
     protected String ruleId = "";
 
+    /**
+     * The <b>name the data gave this buff</b> — 「协奏」 for a modifier that is an effect <i>of</i> the 【协奏】 state
+     * (2026-09-28).
+     *
+     * <p><b>Why a name is needed at all.</b> A modifier's lifetime can follow a state instead of a turn count
+     * (「处于【协奏】状态时，我方全体攻击力提高…」 lasts until the state ends, and the state ends when a countdown's turn
+     * arrives). Removal by name existed only for <b>states</b> ({@code BuffManager.removeState}), so such a modifier
+     * could only be written as {@code permanent} — a buff that never comes off, which is a wrong number with no
+     * symptom. Naming it lets {@code removeState} reach it.
+     *
+     * <p>⚠ Empty ({@code ""}) means <b>unnamed</b>, and the removal loop skips it: every modifier that does not state a
+     * name keeps exactly the lifetime it had before this field existed.
+     */
+    @Getter
+    @Setter
+    protected String buffName = "";
+
     @Override
     public int duration() {
         return remainingDuration;

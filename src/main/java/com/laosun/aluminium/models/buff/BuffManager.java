@@ -765,6 +765,16 @@ public class BuffManager {
                 removed++;
             }
         }
+
+        // Named MODIFIERS (2026-09-28): a stat boost that is an effect *of* a state carries the state's own name, so
+        // 「退出【协奏】状态」 takes both off with one statement. ⚠ Unnamed modifiers are skipped, which is what keeps
+        // this loop from touching anything that existed before the field did.
+        for (StatModifierBuff modifier : allBuffsOf(StatModifierBuff.class)) {
+            if (wanted.equals(modifier.getBuffName())) {
+                removeBuff(modifier);
+                removed++;
+            }
+        }
         DamageElement dotElement = DOT_STATES.get(wanted);
         if (dotElement == null) {
             return removed;
