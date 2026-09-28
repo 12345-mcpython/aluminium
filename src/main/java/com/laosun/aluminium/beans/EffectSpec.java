@@ -206,12 +206,13 @@ return copy;
     private Double capPercent;
 
     /**
-     * A <b>data row id</b> for a skill, used by {@code REPLACE_SKILL} (2026-09-28).
+     * A skill <b>loader key</b> for a skill, used by {@code REPLACE_SKILL} (2026-09-28).
      *
-     * <p>「将下一次普攻强化为【酒花奔涌】」 (1301 加拉赫): the enhanced attack is its own row (130108 for him) and belongs to no
-     * {@code SkillType} slot, so it has to be named by row id. ⚠ `SkillData.init(cid, skillID)` resolves ids against
-     * `Constant.SKILLS` -- the "slot" wording in {@code DefaultSkill}'s javadoc is about that class's own callers, not about
-     * what the loader accepts.
+     * <p>⚠ <b>The key is a SLOT, not a data row</b> (measured 2026-09-28): {@code data/skills.json} nests
+     * {@code Map<cid, Map<key, Skill>>} with keys 1,2,3,4,6,7,8 — slot 8 is the enhanced basic attack
+     * (1301【酒花奔涌】, 1111【直冲碎天拳】). A DATA ROW id loads nothing, which installs a no-op skill
+     * that still passes every identity assertion; {@code EnhancedSkillDataProbeTest} guards both sides.
+     * ⚠ The data row's last digit happens to equal the slot (130108 → 8) — a coincidence of the data, not a rule.
      */
     @SerializedName("skill_id")
     private Integer skillId;

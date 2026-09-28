@@ -102,12 +102,55 @@ public class LukaTest {
                         + "reflective unit test can see, which is why this case goes through the FILE.");
     }
 
+    /** ⚠ End to end: two layers swap in a skill that loads, and that attack lands. */
+    @Test
+    public void theSwappedSkillDealsDamage() {
+        Fixture f = new Fixture();
+        f.skillCast();
+        f.basicAttack();                                  // reaches the threshold and installs the swap
+
+        var swapped = f.luka.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
+        Assertions.assertEquals(com.laosun.aluminium.enums.SkillCategory.NORMAL, swapped.getData().getCategory(),
+                "⚠ precondition: 槽位 8 的数据必须真的在（第 113 轮的教训）");
+
+        double before = f.enemy.getCurrentHp();
+        f.battle.castImmediate(swapped, f.luka, List.of(f.enemy));
+        f.battle.fireAfterAttack(f.luka, f.enemy, List.of(f.enemy), 1.0);
+
+        Assertions.assertTrue(f.enemy.getCurrentHp() < before,
+                "「≥ 2 层时普攻强化为【直冲碎天拳】」 — the enhanced attack deals damage");
+    }
+
+    /**
+     * ⚠ Precondition FIRST and DEEP: the swap is installed by the attack that reaches the threshold, the swapped skill must
+     * LOAD real data, and only then is the 2-layer cost expected.
+     */
+    @Test
+    public void theEnhancedAttackPaysTwoLayers() {
+        Fixture f = new Fixture();
+        f.skillCast();                                   // 战技: applies 裂伤 and adds a layer (battle start gave one)
+        Assertions.assertEquals(2, f.luka.getBuffManager().stacksOf("斗志"), "precondition: two layers");
+
+        f.basicAttack();                                 // ordinary attack: +1 layer, and it INSTALLS the swap
+        var swapped = f.luka.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
+        Assertions.assertEquals(com.laosun.aluminium.enums.SkillCategory.NORMAL, swapped.getData().getCategory(),
+                "⚠ deep precondition: the swapped skill LOADS (a data-row id would have been EMPTY, and every identity "
+                        + "assertion would still pass — the trap that cost rounds 99–114)");
+        int before = f.luka.getBuffManager().stacksOf("斗志");
+
+        f.basicAttack();                                 // the enhanced row: +1 from the layer rule, −2 from the cost clause
+
+        Assertions.assertEquals(before + 1 - 2, f.luka.getBuffManager().stacksOf("斗志"),
+                "「强化普攻消耗 2 层【斗志】」 — keyed on `from_skill_id == 111108`, because the ordinary and the "
+                        + "enhanced basic attack are both `Normal` casts");
+    }
+
     /** Census: the two layer rules, the trace and the level convention are all there. */
     @Test
     public void hisFileCarriesTheClauses() {
         TriggerTable table = TriggerTables.of(LUKA);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the starting layer + the level convention");
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "one layer rule per cast category + the ⚠2-layer enhancement (whose file position is what makes the threshold reachable on the same attack)");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the trace's REMOVE_BUFF and the Skill's 裂伤 DOT");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST));
