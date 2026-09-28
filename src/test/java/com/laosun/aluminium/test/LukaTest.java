@@ -67,6 +67,25 @@ public class LukaTest {
                 "「有100%的基础概率使指定敌方单体受到的伤害提高20.00%」 -- the zone is up (an easy draw)");
     }
 
+    /** ⚠ One layer per relevant cast, and `from_skill` is what keeps the ultimate off the 普攻/战技 rules. */
+    @Test
+    public void eachCastCategoryAddsExactlyOneLayer() {
+        Fixture f = new Fixture();
+        int start = f.luka.getBuffManager().stacksOf("斗志");
+
+        f.basicAttack();
+        Assertions.assertEquals(start + 1, f.luka.getBuffManager().stacksOf("斗志"),
+                "「施放普攻【直冲拳】…后，获得1层【斗志】」");
+
+        f.skillCast();
+        Assertions.assertEquals(start + 2, f.luka.getBuffManager().stacksOf("斗志"), "…and the Skill adds one too");
+
+        f.ultimate();
+        Assertions.assertEquals(start + 3, f.luka.getBuffManager().stacksOf("斗志"),
+                "⚠ exactly one: without `from_skill` the 普攻 and 战技 rules would fire on the ultimate as well, "
+                        + "because all three are 「attack」 events");
+    }
+
     /** Census: the two layer rules, the trace and the level convention are all there. */
     @Test
     public void hisFileCarriesTheClauses() {
@@ -93,6 +112,14 @@ public class LukaTest {
 
         private void ultimate() {
             battle.castImmediate(luka.getSkills().get(SkillType.ULTRA), luka, List.of(enemy));
+        }
+
+        private void basicAttack() {
+            battle.castImmediate(luka.getSkills().get(SkillType.COMMON), luka, List.of(enemy));
+        }
+
+        private void skillCast() {
+            battle.castImmediate(luka.getSkills().get(SkillType.SKILL), luka, List.of(enemy));
         }
     }
 

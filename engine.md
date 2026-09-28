@@ -315,6 +315,8 @@ dispatch(consumer, 直接相关方...)
 - ⚠ **新加的 `EffectSpec` 字段必须带 `@SerializedName`**（2026-09-28，1309 那轮）：`speed` / `crit_rate` / `crit_damage` / `suspends_turns` 四个字段是照着 Java 字段名直接加的，**Gson 读不到 JSON 里的 snake_case** —— 而**单元测试全部通过**，因为它们用 `TriggerSpecs.set` 直接写字段；是**内容级**测试（`RobinConcertoTest`）把洞抓出来的：状态在了、`suspends_turns` 却是 false。**规矩**：`EffectSpec` 加字段时第一件事是写 `@SerializedName("<snake_case>")`，并且**至少有一条从文件读的用例**。
 - ⚠ **harness：晚结算 buff 的"外来钟"在 `afterMove` 里跑**（2026-09-28，第二次）：`APPLY_BUFF` 造的是**晚结算** buff，而「（施放者的）每回合开始时持续回合数减 1」是 `tickForeignBuffs(actor, false)` 在 `Battle.afterMove` 里交付的。只调 `beforeMove()`、或只手发一个 `TURN_START`，**永远不会**让这种 buff 过期（第 58 轮是同一类：`StateBuff` 的**寿命**也在 `afterMove` 走）。**规矩**：凡是要验证"持续 N 回合，到期没了"的用例，必须跑**完整一回合**（`beforeMove()` + `afterMove()`）。
 
+- ⚠ **量出来的字段语义：`ADD_STACK` 的 `amount` 不是层数**（2026-09-28，第 94 轮）：给 1111 卢卡写「获得 2 层【斗志】」时，用例断言"1+2=3"、实测读到 **2**；六次施放停在 **4**（上限生效）⇒ **每次触发只加 1 层**，`amount` 对该 op 无意义。**规矩**：op 的字段含义要**用行为测出来**再写进内容；`REMOVE_STACK` 的 `amount` 是"移除几层"，与 `ADD_STACK` **同名不同义**。
+
 ### 4.3 其余关键语义
 
 - **`DamageEvent` 广播给双方**，但回调签名里**不告诉 buff 它挂在谁身上**。
