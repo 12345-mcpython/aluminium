@@ -76,8 +76,8 @@ public class GepardKitTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the freeze with its payload");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TURN_START), "the trace, refreshed each turn");
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention plus the four eidolon rules (E1/E3/E4/E5)");
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the four eidolon rules (E1/E3/E4/E5) and the technique shield (round 180)");
     }
 
     // ==================================================================
