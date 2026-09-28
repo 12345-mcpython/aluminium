@@ -63,6 +63,26 @@
   },
   {
     "on": "ALLY_ATTACK",
+    "id": "talent_enhance_basic",
+    "when": [
+      "actor == self",
+      "self_stacks:斗志 >= 2"
+    ],
+    "do": [
+      {
+        "op": "REPLACE_SKILL",
+        "skill": "COMMON",
+        "skill_id": 111108,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "once_per_battle": true,
+    "source": "1111 卢卡 天赋 火花四溅: 「…当持有的【斗志】大于等于2层时，普攻【直冲拳】强化为【直冲碎天拳】。」 强化普攻 = 数据行 111108（Normal/SingleAttack，Lv10 [0.28, 1.12] = 3 段 20% + 1 段 80%）。",
+    "note": "「当持有的【斗志】**大于等于 2 层**时，普攻【直冲拳】**强化**为【直冲碎天拳】」 — the swap is `REPLACE_SKILL`（行 **111108**），条件是 `self_stacks:斗志 >= 2`；⚠ `once_per_battle` 是必要的：重复应用会**叠多个 `SkillSwapBuff`**（每个都把上一个的替换当成\"原技能\"捕获），而这句话只要求\"满足条件时换上\"一次。⚠ **顺序依赖**：这条规则排在 `talent_after_basic`（加层）**之后**，所以第 1 次普攻加完层时条件已成立、当次即可换上（文件内的规则顺序就是执行顺序）。⚠ **登记未写**：同句的「强化普攻**消耗 2 层**【斗志】」需要\"**强化**技能被使用过\"这个可观测 —— 普攻与强化普攻都是 `Normal` 类施放，没有事件能区分二者（`REMOVE_STACK` 本身能移除层数，缺的是触发点）；以及「强化普攻击中裂伤目标后，使其裂伤立即产生 1 次相当于原伤害 85% 的伤害」（需要一个\"让 DOT 立即结算一次\"的能力）。"
+  },
+  {
+    "on": "ALLY_ATTACK",
     "id": "talent_after_skill",
     "when": [
       "actor == self",

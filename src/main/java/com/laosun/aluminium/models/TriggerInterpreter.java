@@ -128,7 +128,7 @@ public final class TriggerInterpreter {
      * ("for the rest of the battle"). See {@link #requireNoStackArguments}.
      */
     private static final Set<String> OPS_WITH_DURATION =
-            Set.of("MODIFY_ATTR", "APPLY_BUFF", "MODIFY_DAMAGE_TAKEN", "RESIST_DEBUFF");
+            Set.of("MODIFY_ATTR", "APPLY_BUFF", "MODIFY_DAMAGE_TAKEN", "RESIST_DEBUFF", "REPLACE_SKILL");
 
     /**
      * The selectors an effect's {@code target} may name.
