@@ -102,12 +102,32 @@ public class LukaTest {
                         + "reflective unit test can see, which is why this case goes through the FILE.");
     }
 
+    /** ⚠ 「≥ 2 层时，普攻强化为【直冲碎天拳】」: the threshold is met by the attack's own layer rule. */
+    @Test
+    public void twoLayersEnhanceTheBasicAttack() {
+        Fixture f = new Fixture();
+        com.laosun.aluminium.models.skill.Skill before =
+                f.luka.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
+        Assertions.assertEquals(1, f.luka.getBuffManager().stacksOf("斗志"), "precondition: one layer at battle start");
+
+        f.basicAttack();
+
+        Assertions.assertEquals(2, f.luka.getBuffManager().stacksOf("斗志"), "the attack added the second layer");
+        com.laosun.aluminium.models.skill.Skill after =
+                f.luka.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
+        Assertions.assertNotSame(before, after,
+                "⚠ the enhancement rule sits AFTER the layer rule in the file, so the threshold is already met when it "
+                        + "is reached: rules of one event run in file order and each condition is evaluated as its rule is reached");
+        Assertions.assertEquals(111108, after.getSkillSlot(), "…and the slot holds the enhanced attack's own data row");
+    }
+
     /** Census: the two layer rules, the trace and the level convention are all there. */
     @Test
     public void hisFileCarriesTheClauses() {
         TriggerTable table = TriggerTables.of(LUKA);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the starting layer + the level convention");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK), "one layer rule per cast category");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+                "one layer rule per cast category + the ⚠2-layer enhancement (whose file position is what makes the threshold reachable on the same attack)");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the trace's REMOVE_BUFF and the Skill's 裂伤 DOT");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST));
     }
