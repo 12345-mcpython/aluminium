@@ -58,7 +58,8 @@ public class DanHengTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DANHENG);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the talent");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique opening ATK (round 179) and the level convention");
     }
 
     private static final class Fixture {
