@@ -1,0 +1,68 @@
+[
+  {
+    "on": "ULT_CAST",
+    "id": "ult_rebirth",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_DAMAGE_TAKEN",
+        "percent": -0.1,
+        "turns": 2,
+        "buff": "生息",
+        "target": "all_allies",
+        "target_when": [
+          "!target has_state 生息"
+        ]
+      },
+      {
+        "op": "APPLY_BUFF",
+        "buff": "生息",
+        "turns": 2,
+        "target": "all_allies",
+        "target_when": [
+          "!target has_state 生息"
+        ]
+      },
+      {
+        "op": "EXTEND_BUFF",
+        "buff": "生息",
+        "turns": 1,
+        "target": "all_allies",
+        "target_when": [
+          "target has_state 生息"
+        ]
+      }
+    ],
+    "source": "1211 白露 终结技 匏蛟跃渊先雷音 (120703?, Ultra/Restore): 「对于没有【生息】的我方目标，白露使其附上【生息】，对于已拥有【生息】的我方目标，白露使其已有的【生息】持续时间延长1回合。【生息】可持续2回合，该效果不可叠加。」 + 行迹 鳞渊福泽 (1211103)：「拥有【生息】的角色受到的伤害降低10%。」",
+    "note": "The two branches of ONE sentence, which is what `target_when` was built for: 「对于**没有**【生息】的…附上【生息】，对于**已拥有**【生息】的…延长 1 回合」 — the selector says which units (`all_allies`) and each effect's filter says which of them qualify, so the two halves cannot collide. ⚠ 行迹 鳞渊福泽 rides along with the same state (`buff: 生息`, `turns: 2`): 「拥有【生息】的角色受到的伤害降低 10%」 lasts exactly as long as 生息 does, and naming the modifier after the state is what makes 「附上/延长」 move both together — ⚠ so it is applied only in the *fresh* branch, which is the same lifetime the extension maintains. ⚠ 「该效果**不可叠加**」 is why this is `APPLY_BUFF` in one branch and `EXTEND_BUFF` in the other rather than a second application: a second application would refresh, and refreshing a 2-turn state is exactly what 「延长」 is not. ⚠ The immediate heal 「立即为我方全体回复等同于白露13.50%生命上限+360的生命值」 is **not** written: her ultimate is a `Restore` skill, so the engine's own skill path heals from the row (the lesson 1105's file records). ⚠ **实测抓到的顺序坑**：这条减伤必须排在 `APPLY_BUFF 生息` **之前** —— 同一规则的效果**按顺序执行**，而它的过滤条件是 「没有【生息】的目标」；排在后面时，轮到它时状态**刚被自己加上**，条件永远为假、减伤永远不生效（用例 `BailuRegenTest.theTraceReducesDamageTakenForTheBearers` 抓住的）。这也正是\"逐目标条件\"与\"逐条规则条件\"在**同一事件内求值时机**上的差别：前者在效果执行时才逐候选求值。"
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1211 白露 技能表的**等级口径**: 文档引用的是 Lv10 行（战技 11.70%/312、终结技 13.50%/360、天赋 5.40%/144 都是该行）",
+    "note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing (her Skill and ultimate are `Restore` skills whose rows it reads): without it those heals would use the Lv1 rows. The rule above states its own magnitude (a 10% reduction and a 2-turn state) and is unaffected. ⚠ **Not classified yet in this file** — the rest of her document, each with its blocker: 战技「然后白露**随机**为我方单体进行 2 次治疗，每提供 1 次治疗，下一次治疗回复的生命值会降低 15%」 (a random target sequence with a decaying multiplier — no vocabulary for either half), 天赋「拥有【生息】的我方目标，在受到攻击后会回复…**该效果可以触发 2 次**」 (the heal itself is expressible, but the *count* is not: without it the heal would fire on every hit, which is a wrong number rather than a missing one — so the clause is registered whole), 天赋「当白露的队友受到**致命攻击**时…不会陷入无法战斗状态…单场战斗中可以触发 1 次」 (death prevention), 行迹 持明龙脉「【生息】效果的触发次数增加 1 次」 (rides on that count), and 星魂 1–6 / the 秘技 (not yet read clause by clause)."
+  }
+]
