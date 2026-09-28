@@ -1,0 +1,119 @@
+[
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self",
+      "target != self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "SPEED",
+        "scale": "self_attr:SPEED",
+        "percent": 0.2,
+        "buff": "敕令",
+        "turns": 2,
+        "target": "target"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.6,
+        "buff": "敕令",
+        "turns": 2,
+        "target": "target"
+      },
+      {
+        "op": "APPLY_BUFF",
+        "buff": "敕令",
+        "turns": 2,
+        "target": "target"
+      }
+    ],
+    "source": "1215 寒鸦 终结技 十王敕令，遍土遵行 (skill 121503, Ultra/Enhance): 「使指定我方单体速度提高，提高数值等同于寒鸦速度的20.00%，并使该目标攻击力提高60%，持续2回合。」 param Lv10 → #1 = 0.2（寒鸦速度的份额）, #2 = 0.6, #3 = 2 回合",
+    "note": "One sentence, three effects, and the third is the interesting one. ⚠ The SPD boost is a <b>derived</b> magnitude (`scale: self_attr:SPEED`, read off 寒鸦 — 「等同于寒鸦速度的20%」 — and frozen when she casts), while the ATK boost is a plain 60%; both are ordinary modifiers, both carry `buff: 敕令` so that 星魂 4's 「终结技的持续时间额外增加1回合」 has a name to reach. ⚠ The <b>marker state</b> 「敕令」 is not decoration either: 星魂 1 says 「持有<b>终结技效果</b>的我方目标消灭敌方目标时，寒鸦行动提前15%」, and \"carries my ultimate's effect\" is only readable if the effect is also a <b>state</b> — a named modifier is invisible to `has_state` (which reads states, controls and DoTs). The marker shares the modifiers' `turns`, so the three end together. ⚠ `target != self` is 「指定我方单体」: a self-cast is not a target she may buff, and `ULT_CAST` reaches her own table too."
+  },
+  {
+    "on": "KILL",
+    "when": [
+      "actor has_state 敕令"
+    ],
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 0.15,
+        "target": "self"
+      }
+    ],
+    "min_eidolon": 1,
+    "per_turn": 1,
+    "source": "1215 寒鸦 星魂 1 一心 (Avatar_Hanya_Rank01): 「持有终结技效果的我方目标消灭敌方目标时，寒鸦行动提前15%，该效果每回合只能触发1次。」 param = [0.15, 1]",
+    "note": "⚠ `actor has_state 敕令` is the whole clause: `KILL`'s `actor` is the <b>killer</b>, so this asks \"does the one who got the kill carry my ultimate's effect\" — which is what 「持有终结技效果的我方目标消灭敌方目标时」 says, rather than \"I got a kill\" (`actor == self`, a different sentence). That works only because the ultimate also plants a marker <b>state</b> (see its note). ⚠ `target: self` is 寒鸦: 「**寒鸦**行动提前15%」 — the one who acted early is her, not the killer. ⚠ `per_turn: 1` is 「该效果每回合只能触发1次」 (counted in her own turns, like every `per_turn`). ⚠ `min_eidolon: 1` is the gate."
+  },
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "SPEED",
+        "percent": 0.2,
+        "turns": 1,
+        "target": "self"
+      }
+    ],
+    "min_eidolon": 2,
+    "source": "1215 寒鸦 星魂 2 二观 (Avatar_Hanya_Rank02): 「施放战技后，速度提高20%，持续1回合。」 param = [0.2, 1]",
+    "note": "「施放**战技**后，速度提高20%，持续1回合」. ⚠ `SKILL_CAST` (not `ALLY_ATTACK`, not `BASIC_ATTACK`): the sentence names the Skill slot, and the emitter already splits the three in-battle casts, so this cannot fire on 普攻 or 终结技. ⚠ `actor == self` is load-bearing: SKILL_CAST is broadcast to the whole side. ⚠ The target is 寒鸦 herself — 「速度提高」 with no other subject in the sentence. ⚠ `min_eidolon: 2` is the gate."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 1
+      }
+    ],
+    "min_eidolon": 3,
+    "source": "1215 寒鸦 星魂 3 三尘 (Avatar_Hanya_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'121502': 2, '121501': 1}",
+    "note": "「**战技**等级+2，最多不超过15级；**普攻**等级+1，最多不超过10级」 — two slots in one sentence, so two effects in one rule (M-32: the level a skill is read at is content, and the raise is a fact of the loadout, which is why it is a `BATTLE_START` amendment rather than a battle event). ⚠ The caps are her parameter tables' own sizes (SKILL 15 rows, COMMON 10 rows), so a raise past them fails loudly at fire time instead of reading a row that does not exist — a `cap` field would be a second place to state the same limit. ⚠ `min_eidolon: 3` is the gate."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 2
+      }
+    ],
+    "min_eidolon": 5,
+    "source": "1215 寒鸦 星魂 5 五阴 (Avatar_Hanya_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'121503': 2, '121504': 2}",
+    "note": "「**终结技**等级+2，最多不超过15级；**天赋**等级+2，最多不超过15级」 — the same shape as 星魂 3, for the other two slots. ⚠ It matters to this file in a concrete way: raising ULTRA raises the row her ultimate's numbers are read from, and raising TALENT raises the row her (still registered) talent boost would read. ⚠ Caps = the tables' own sizes, as above. ⚠ `min_eidolon: 5` is the gate."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1215 寒鸦 天赋 罚恶 (skill 121504) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（「造成的伤害提高30%」按该行读）",
+    "note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again. ⚠ **还没有写的（逐条登记，不是近似）**：战技「对指定敌方单体造成 240% 攻击力物理伤害，并使其陷入【承负】状态…每当我方目标对【承负】状态下的敌方目标施放 2 次普攻/战技/终结技后，立即为我方恢复 1 个战技点；【承负】仅对最新被施加的目标生效，并会在触发 2 次战技点恢复效果后自动解除」、天赋「我方目标对陷入【承负】状态下的敌方目标施放普攻/战技/终结技时，造成的伤害提高 30%，持续 2 回合」、以及行迹 录事/幽府/还阳 三条（都挂在「战技点恢复效果被触发」这个事件上）、星魂 4「终结技的持续时间额外增加 1 回合」、星魂 6「天赋的伤害提高效果额外提高 10%」。⚠ **两个共享的卡点**：① **带阈值的计数器** —— 「每 2 次…后恢复 1 点」与「触发 2 次后自动解除」需要一个能按状态累计、并在达到 N 时触发的机制（引擎有堆叠与 `REMOVE_STACK`，但**没有\"当某状态的计数达到 N 时\"这个条件或 op**），它一次性挡住战技、天赋、三条行迹；② **抬高另一条规则效果的数值/时长** —— 星魂 4 要改终结技效果的 `turns`、星魂 6 要把天赋的 30% 改成 40%，而 `MODIFY_RULE` 只抬 `per_turn` 次数与 `base_chance` 概率（MODIFY_RULE 那一轮的边界），把 0.1 再写一条规则会**互相覆盖**（同类修饰是刷新而不是叠加）。两者都在 `ROADMAP` 里登记了读者与做法。"
+  }
+]
