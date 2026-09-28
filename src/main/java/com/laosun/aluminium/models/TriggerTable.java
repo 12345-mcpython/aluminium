@@ -782,7 +782,7 @@ public class TriggerTable {
      */
     private static final Set<String> NUMERIC_VARIABLES =
             Set.of("hit_count", "hp_percent", "target_hp_percent", "target_debuff_count", "self_summon_count",
-                    "target_summon_count", "self_max_energy");
+                    "target_summon_count", "self_max_energy", "from_skill_id");
 
     /**
      * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -1489,14 +1489,14 @@ public class TriggerTable {
      */
     public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                                  Damage damage, Battle battle, SkillCategory fromCast, String ruleId,
-                                 List<Condition> targetFilter) {
+                                 List<Condition> targetFilter, int skillId) {
 
         /**
          * The same context for an event that carries no cast category — i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle, SkillCategory fromCast) {
-            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of());
+            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0);
         }
 
         /**
@@ -1508,7 +1508,19 @@ public class TriggerTable {
          */
         public TriggerContext withRule(String id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
-                    id == null ? "" : id, targetFilter);
+                    id == null ? "" : id, targetFilter, skillId);
+        }
+        /**
+         * The same context, saying <b>which data row</b> of a skill produced this event (2026-09-28).
+         *
+         * <p>⚠ It is the row, not the slot: `Skill.getSkillSlot()` is what the data tables are indexed by, so an enhanced
+         * attack (a row of its own, e.g. 1111's 【直冲碎天拳】 = 111108) is distinguishable from the ordinary basic attack it
+         * replaces — which is exactly what 「**强化普攻**命中…」 asks. A shared mutable field would leak between nested
+         * firings, so this is a copy like {@link #withRule(String)}.
+         */
+        public TriggerContext withSkillId(int id) {
+            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
+                    targetFilter, id);
         }
 
         /**
@@ -1516,7 +1528,7 @@ public class TriggerTable {
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle) {
-            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of());
+            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of(), 0);
         }
 
         /**
@@ -1539,7 +1551,7 @@ public class TriggerTable {
          */
         public TriggerContext withTargetFilter(List<Condition> filter) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    filter == null ? List.of() : filter);
+                    filter == null ? List.of() : filter, 0);
         }
 
         /**
@@ -1549,7 +1561,7 @@ public class TriggerTable {
          */
         public TriggerContext withSubject(CanHit candidate) {
             return new TriggerContext(owner, actor, candidate, hitCount, amount, damage, battle, fromCast, ruleId,
-                    List.of());
+                    List.of(), 0);
         }
 
         /** Whether {@code candidate} passes the per-target conditions (an empty filter admits everything). */
@@ -1563,7 +1575,7 @@ public class TriggerTable {
         }
 
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of());
+            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0);
         }
     }
 
@@ -2176,6 +2188,9 @@ public class TriggerTable {
             }
             return switch (variable) {
                 case "hit_count" -> ctx.hitCount();
+                // 「强化普攻命中…」: the DATA ROW of the skill that produced this event (0 = the event named none, which
+                // makes the comparison false rather than accidentally true for the row 0 that no skill has).
+                case "from_skill_id" -> ctx.skillId();
                 case "hp_percent" -> hpPercent(ctx.owner());
                 case "target_debuff_count" -> ctx.target() == null ? Double.NaN : ctx.target().getBuffManager().debuffCount();
                 // 「若该目标当前生命值百分比大于等于 30%」 -- the OTHER unit's HP, which `hp_percent` cannot ask

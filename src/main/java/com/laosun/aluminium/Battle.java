@@ -2071,6 +2071,22 @@ public class Battle {
      */
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast) {
+        return fireTriggers(event, actor, target, hitCount, amount, damage, fromCast, 0);
+    }
+
+    /**
+     * The same, naming the <b>data row</b> of the skill that produced the event (2026-09-28).
+     *
+     * <p>⚠ The row, not the slot: an enhanced attack is a row of its own, so 「**强化普攻**命中…」 and 「强化普攻消耗 2 层」 can be
+     * told apart from the ordinary basic attack they replace. Events that no skill produced (a DOT tick, a break) leave it 0.
+     */
+    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                            SkillCategory fromCast, int skillId) {
+        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId);
+    }
+
+    private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                             Damage damage, SkillCategory fromCast, int skillId) {
         if (triggerDepth >= MAX_TRIGGER_DEPTH) {
             throw new IllegalStateException(
                     "Trigger recursion exceeded " + MAX_TRIGGER_DEPTH + " levels while firing "
@@ -2089,7 +2105,7 @@ public class Battle {
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
                         new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
-                                fromCast));
+                                fromCast).withSkillId(skillId));
             }
             return fired;
         } finally {
