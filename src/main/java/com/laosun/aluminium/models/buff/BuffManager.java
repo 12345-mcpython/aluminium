@@ -751,6 +751,32 @@ public class BuffManager {
      *
      * <p>Asked by {@code Battle.beforeMove}, which is the only place a turn can be let pass without the unit.
      */
+    /**
+     * How many buffs on this unit carry the given <b>name</b> — 「已经累计了几次」 (2026-09-28).
+     *
+     * <p>⚠ A counter is <b>several buffs with one name</b>, not one buff with a count field: that is the engine's
+     * existing stacking ( {@code BuffManagerTest} pins "same kind refreshes, opt-in stacking accumulates"), and it is
+     * what makes {@code REMOVE_STACK} (take one off) and {@code REMOVE_STATE <name>} (clear the lot) both work on a
+     * counter without either op learning anything new.
+     *
+     * @param name the name as the data spells it ({@code null}/blank = 0)
+     * @return how many named buffs are carried
+     */
+    public int stacksOf(String name) {
+        if (name == null || name.isBlank()) {
+            return 0;
+        }
+        String wanted = name.trim();
+        int count = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (wanted.equals(buff.getBuffName()) || (buff instanceof StackBuff stack
+                    && wanted.equals(stack.getBuffName()))) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public boolean suspendsTurns() {
         // ⚠ Over the manager's own list, NOT `allBuffsOf`/`instanceof`: that helper compares classes exactly
         // (`buff.getClass() == kind`), and a modifier may be a *subclass* of StatModifierBuff -- a per-class scan
