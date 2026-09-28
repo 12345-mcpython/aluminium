@@ -2,7 +2,9 @@
   {
     "on": "SKILL_CAST",
     "id": "skill_daunting_smite",
-    "when": ["actor == self"],
+    "when": [
+      "actor == self"
+    ],
     "do": [
       {
         "op": "APPLY_CONTROL",
@@ -21,7 +23,9 @@
   {
     "on": "ULT_CAST",
     "id": "ult_enduring_bulwark",
-    "when": ["actor == self"],
+    "when": [
+      "actor == self"
+    ],
     "do": [
       {
         "op": "SHIELD",
@@ -38,7 +42,9 @@
   {
     "on": "TURN_START",
     "id": "trace_battle_will",
-    "when": ["actor == self"],
+    "when": [
+      "actor == self"
+    ],
     "do": [
       {
         "op": "MODIFY_ATTR",
@@ -55,12 +61,96 @@
   {
     "on": "BATTLE_START",
     "do": [
-      {"op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9},
-      {"op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9},
-      {"op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9},
-      {"op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9}
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
     ],
     "source": "1104 杰帕德 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（战技 200% + 冻结 65% + 附加 60%、终结技 45%防御力+600）",
     "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **尚未分类（逐条登记）**：① 天赋「受到致命攻击时不会陷入无法战斗状态，并立即回复等同于自身生命上限50%的生命值。该效果单场战斗中只能触发1次」—— 缺**致命一击**这个可观测（`DEALING_DAMAGE` 只能看到「造成伤害」，看不到「这一击本来会致死」 ✗）；② 秘技「下一次战斗开始时为我方全体提供 24%防御力+150 的护盾，持续 2 回合」—— 缺**「用过秘技」**这个门槛（`BATTLE_START` 无条件写出就会**永远**给盾 ✗ 那是近似，故不写）；③ 星魂 1「施放战技时冻结的基础概率提高 35%」⇒ 已确认写法为 `MODIFY_RULE rule skill_daunting_smite percent 0.35` + 星魂门槛（门槛字段待读，下一轮照 1001 的写法补 ✓）；④ 星魂 2「冻结解除后目标速度降低 20%」—— 缺**控制解除**这个可观测；⑤ 星魂 3/5（技能等级 +2/+1）⇒ `RAISE_SKILL_LEVEL` + 星魂门槛即可；⑥ 星魂 4「杰帕德在场时我方全体效果抵抗提高 20%」⇒ `MODIFY_ATTR EFFECT_RESISTANCE percent 0.2 target all_allies` + 门槛；⑦ 星魂 6「触发天赋时立即行动，且回复量额外增加 50% 生命上限」—— 依赖 ①；⑧ 行迹「刚正：被敌方攻击的概率提高」—— 软嘲讽，**文档无任何数值**（与 1001 同族）；⑨ 行迹的静态数值（冰属性伤害提高 3.2%/4.8%/6.4%、效果抵抗 4%/6%/8%、防御力 5%/7.5%）—— 引擎有对应属性名，但本文件未写（待确认项目对「永久被动数值」的统一写法后一次补上，避免各角色各写一套 ✗）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon1_freeze_chance",
+    "min_eidolon": 1,
+    "do": [
+      {
+        "op": "MODIFY_RULE",
+        "rule": "skill_daunting_smite",
+        "percent": 0.35
+      }
+    ],
+    "source": "1104 杰帕德 星魂 1 恪尽职守: 「施放战技时，使受到攻击的敌方目标陷入冻结状态的基础概率提高35%。」",
+    "note": "「施放战技时…冻结的基础概率**提高 35%**」—— 写法照已出货的 1001：`MODIFY_RULE` 指向**那条规则**（`rule`）+ `percent`；这是\"修改一条已存在规则上的数字\"的既有原语 ✓，而不是重写一遍战技。门槛用规则级字段 `min_eidolon` ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon3_levels",
+    "min_eidolon": 3,
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 2
+      }
+    ],
+    "source": "1104 杰帕德 星魂 3 永不陷落: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」",
+    "note": "「终结技等级 +2；天赋等级 +2」—— 与等级口径那条叠加（口径先把四项抬到 Lv10/Lv15 的引用行，这里再 +2，上限由引擎的技能等级上限管 ✓）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon4_party_resistance",
+    "min_eidolon": 4,
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "EFFECT_RESISTANCE",
+        "percent": 0.2,
+        "target": "all_allies",
+        "permanent": true
+      }
+    ],
+    "source": "1104 杰帕德 星魂 4 精诚所至: 「杰帕德在场时，我方全体的效果抵抗提高20%。」",
+    "note": "「杰帕德**在场时**，我方全体的效果抵抗提高 20%」—— `BATTLE_START` + `all_allies` + 永久修饰。⚠「在场」在这里等价于\"他还没倒下\"：本引擎的规则主人倒下后其规则不再触发 ✓，但**已经挂上的修饰**不会随他倒下而消失 ✗（登记为语义差）。 ⚠ 时长写 permanent: true：「在场时」意味着只要他在就一直生效（而不是 N 回合）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon5_levels",
+    "min_eidolon": 5,
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 1
+      }
+    ],
+    "source": "1104 杰帕德 星魂 5 拳似寒铁: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」",
+    "note": "「战技等级 +2；普攻等级 +1」—— 同星魂 3。"
   }
 ]
