@@ -45,13 +45,60 @@
         "op": "DAMAGE",
         "skill": "TALENT",
         "damage_param": 0,
-        "damage_level": 10,
         "target": "attacker"
       }
     ],
     "per_turn": 2,
     "source": "1001 三月七 天赋 少女的特权 (100104, 单体攻击/Ice): 「当持有护盾的我方目标受到敌方目标攻击后，三月七立即向攻击者发起反击，对其造成等同于三月七100%攻击力的冰属性伤害，该效果每回合可触发2次。」 param Lv10 = [1, 2] → #1 = 1（伤害倍率），#2 = 2（每回合可触发次数）",
     "note": "Every clause of this sentence is carried by one piece of vocabulary, and each piece is the one that makes a *different* wrong reading impossible. ① 「受到…攻击后」 is `TAKING_HIT`, not `HP_LOST`: TAKING_HIT fires whenever an incoming damage instance lands, **including when the shield absorbs all of it** (hpLoss == 0), and this talent is precisely about a shielded ally -- gating it on HP loss would have skipped the case it exists for. ② 「持有护盾的我方目标」 is `target has_shield`, read from the alive shield value (a shield that has been used up no longer qualifies). ⚠ 「我方」 is not a condition: TAKING_HIT is only ever delivered for a subject on our side (Battle.fireTriggersForAlly), which is why the event is the right one for this sentence and `HP_LOST` (either side) would not be. ③ 「受到**敌方目标**攻击」 is `!actor is_ally` -- the event's `actor` is the attacker, and without the condition a friendly-fire instance would be countered as well. ④ 「向攻击者发起反击」 is `target: \"attacker\"`. ⑤ 「每回合可触发2次」 is `per_turn: 2` (param #2), counted in **三月七's own** turns, exactly like `cooldown`: without it the counter would fire on every hit of a three-hit attack -- a wrong number with nothing to report. ⚠ It is the first user of both `has_shield` and `per_turn`. ⑥ The numbers are not written here: `skill: \"TALENT\"` + `damage_param: 0` + `damage_level: 10` reads 1 (100% ATK, the Lv10 row the prose quotes) and the Ice element and single-target shape come from 100104's own data. ⚠ `damage_level: 10` is required, not decoration: every skill in this engine is level 1, so the skill's own level would read 0.5 (50%) -- half the damage, with nothing to report (M-32). ⚠ 「反击也属于追加攻击」 holds automatically: `DAMAGE` settles through `Battle.applyAdditionalDamage`, the engine's one notion of a follow-up attack, which is also what emits FOLLOW_UP. ⚠ NOT authored: 星魂 4 raises this cap to 3 and adds 30% of her DEFENCE to the counter's damage -- a second rule with `per_turn: 3` would *add* firings rather than raise this rule's cap (there is no \"modify another rule's limit\" mechanism), and the damage addend is a derived flat value no op can express; 星魂 1 (energy per frozen target) and 行迹「冰咒」 (+15% freeze chance) need the freeze control state; 星魂 2 needs a 「生命值百分比最低的队友」 selector; 星魂 6 and 行迹「加护」 need the shield's provider / a way to lengthen a shield that is already up."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1001 三月七 天赋 少女的特权 (100104) 的**等级口径**（不是一句技能文本，而是「这条文档引的是哪一行」）: 她的天赋在文档里按 Lv10 引用（param Lv10 = [1, 2]），所以本场把 TALENT 读在第 10 行",
+    "note": "This is the file stating **which level its own numbers were quoted at** (M-32), and it replaces the `damage_level: 10` that the counter rule used to carry. ⚠ Why a rule and not a rule field: `damage_level` answers 「read THIS row」 for one effect, while a level is a fact about the skill — every effect that reads her talent must see the same one, and a raise from a 星魂 has to compose with it (`CanHit.skillLevel` = base + this battle's raises, one resolver for all three read sites). ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is spelled as +9. ⚠ It is unconditional (no `min_eidolon`, no `when`): it is not a mechanic, it is the level the document was written at. ⚠ Unconditional rules like this one and the 星魂 rules BELOW it sum: at 星魂 5 the talent is 10 + 2 = **12**, which is what the game's own 「天赋等级+2」 means — and her talent's parameter table has 15 rows, so 12 is a row that exists (a raise past the table fails loudly at fire time rather than reading nothing)."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 1
+      }
+    ],
+    "min_eidolon": 3,
+    "source": "1001 三月七 星魂 3 记忆中的一切 (Avatar_March7th_Rank03): 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'100103': 2, '100101': 1}",
+    "note": "「**终结技**等级+2，最多不超过15级；**普攻**等级+1，最多不超过10级」 — two slots in one sentence, hence two effects in one rule (both are the same kind of fact, so splitting them would invent two rules where the document has one sentence). ⚠ The caps 「最多不超过15级」/「最多不超过10级」 are **not** expressed, and that is deliberate rather than forgotten: they are the same numbers as her parameter tables' sizes measured above (ULTRA 15 rows, COMMON 10 rows — the data's own cap), so a raise that would exceed them hits the engine's row-out-of-range failure LOUDLY instead of silently reading a row that does not exist. A `cap` field on the op would be a second place to state the same limit. ⚠ `min_eidolon: 3` is the gate: without it her ultimate would be +2 from the start. ⚠ It composes with the base rule above by addition (they are different slots, and TALENT is not raised here)."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 2
+      }
+    ],
+    "min_eidolon": 5,
+    "source": "1001 三月七 星魂 5 不想再忘却 (Avatar_March7th_Rank05): 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'100102': 2, '100104': 2}",
+    "note": "「**战技**等级+2，最多不超过15级；**天赋**等级+2，最多不超过15级」 — and this is the sentence that makes the whole model worth having: her talent is raised here (+2) **on top of** the base level the first rule states (10), so at 星魂 5 her counter reads row **12** instead of row 10 — a different, larger number that the engine could not express at all before M-32 (it was pinned by `damage_level: 10`, one fixed row). ⚠ The caps are the tables' own sizes again (SKILL 15 rows, TALENT 15 rows) — see the rule above. ⚠ `min_eidolon: 5` is the gate. ⚠ Both effects are in one rule because the document's sentence is one sentence; the fields are per-effect, so two rules would be two load-time-validated shapes for one fact."
   },
   {
     "on": "ULT_CAST",
