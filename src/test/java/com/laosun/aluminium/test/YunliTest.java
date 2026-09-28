@@ -40,15 +40,17 @@ public class YunliTest {
                 "\u300c\u6062\u590d\u7b49\u540c\u4e8e\u4e91\u748330.00%\u653b\u51fb\u529b+200\u7684\u751f\u547d\u503c\u300d: expected " + expected);
     }
 
-    /** \u26a0 The counter reaches the ATTACKER and nobody else: two enemies make that checkable. */
+    /** \u26a0 The counter reaches the ATTACKER and nobody else, and its 120% is pinned against a hand-built 240% reference. */
     @Test
     public void theCounterHitsTheAttackerOnly() {
+        double shipped = counterLoss(true);
+        double reference = counterLoss(false);
+
         Character yunli = CharacterFactory.create(YUNLI, LEVEL);
         Enemy attacker = EnemyFactory.create(MONSTER, 90, 1);
         Enemy bystander = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(yunli), List.of(attacker, bystander), fixed());
         battle.startBattle();
-        double attackerBefore = attacker.getCurrentHp();
         double bystanderBefore = bystander.getCurrentHp();
         double energyBefore = yunli.getCurrentEnergy();
 
@@ -56,10 +58,34 @@ public class YunliTest {
 
         Assertions.assertEquals(15.0, yunli.getCurrentEnergy() - energyBefore, 1e-6,
                 "\u300c\u989d\u5916\u6062\u590d15\u70b9\u80fd\u91cf\u300d");
-        Assertions.assertTrue(attackerBefore - attacker.getCurrentHp() > 0,
-                "\u300c\u7acb\u5373\u5411\u653b\u51fb\u8005\u53d1\u8d77\u53cd\u51fb\u300d -- the ATTACKER takes it");
         Assertions.assertEquals(bystanderBefore, bystander.getCurrentHp(), 1e-9,
                 "and a bystander does not: `target: attacker` is what makes this exact");
+        Assertions.assertTrue(reference > 0, "the reference must land at all");
+        Assertions.assertEquals(0.5, shipped / reference, 0.05,
+                "120% against a hand-built 240% reference: " + shipped + " vs " + reference
+                        + " -- the ratio is what pins the MAGNITUDE (a surviving mutation proved a bare \"> 0\" did not)");
+    }
+
+    /** The damage the counter deals to the attacker: the shipped file, or a hand-built 240% reference rule. */
+    private static double counterLoss(boolean shipped) {
+        Character yunli = CharacterFactory.create(YUNLI, LEVEL);
+        if (!shipped) {
+            com.laosun.aluminium.beans.EffectSpec effect = new com.laosun.aluminium.beans.EffectSpec();
+            TriggerSpecs.set(effect, "op", "DAMAGE");
+            TriggerSpecs.set(effect, "scale", "self_attr:ATTACK");
+            TriggerSpecs.set(effect, "percent", 2.4);
+            TriggerSpecs.set(effect, "element", "Physical");
+            TriggerSpecs.set(effect, "target", "attacker");
+            yunli.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(YUNLI, List.of(TriggerSpecs.rule(
+                    TriggerEvent.TAKING_HIT.name(), List.of("target == self"), effect))));
+        }
+        Enemy attacker = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy bystander = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(yunli), List.of(attacker, bystander), fixed());
+        battle.startBattle();
+        double before = attacker.getCurrentHp();
+        battle.fireTriggers(TriggerEvent.TAKING_HIT, attacker, yunli, 0, 100);
+        return before - attacker.getCurrentHp();
     }
 
     private static Random fixed() {
