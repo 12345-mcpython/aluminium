@@ -8,6 +8,18 @@
     }
   ],
   "rules": [
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1003 姬子 天赋 乘胜追击 (100304) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（row Lv10 = [1.4, 3]，即「140%攻击力」）",
+    "note": "This is the file stating **which level its own numbers were quoted at** (M-32), replacing the `damage_level: 10` that the follow-up rule used to carry. ⚠ The two are not the same statement: `damage_level` pins ONE effect to a row, while a level is a fact about the skill — every effect that reads it sees the same level, and a 星魂's raise composes with it instead of being ignored. ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is +9. ⚠ It is unconditional and is not a mechanic (no `min_eidolon`, no `when`). ⚠ Her talent's table has 15 rows, so a later raise stays inside it; a raise past the table fails loudly at fire time instead of reading nothing."
+  },
     {
       "on": "BATTLE_START",
       "do": [
@@ -74,7 +86,6 @@
           "op": "DAMAGE",
           "skill": "TALENT",
           "damage_param": 0,
-          "damage_level": 10,
           "target": "all_enemies"
         },
         {

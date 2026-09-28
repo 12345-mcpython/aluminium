@@ -3,6 +3,18 @@
     "on": "BATTLE_START",
     "do": [
       {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      }
+    ],
+    "source": "1413 长夜月 终结技 (skill 141303) 的**等级口径**: 她的终结技在文档里按 Lv10 引用（#1[i]% 长夜生命上限的冰属性伤害按 Lv10 行读）",
+    "note": "The file stating **which level its numbers were quoted at** (M-32), replacing the `damage_level: 10` that her ultimate's damage rule used to carry. ⚠ A level is a fact about the skill (every effect reads it, and a 星魂's raise composes with it), while `damage_level` pins one effect to one row — the difference only shows once something raises a level, which is exactly what the 星魂 sentences do. ⚠ Base 1 in the engine, so 「quoted at Lv10」 is +9. ⚠ Unconditional, and not a mechanic. ⚠ Her ultimate's parameter table has 15 rows, so a later raise stays inside it; going past the table fails loudly at fire time."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
         "op": "SUMMON"
       }
     ],
@@ -68,8 +80,7 @@
         "op": "COMMAND_SUMMON",
         "skill": "ULTRA",
         "damage_param": 0,
-        "damage_level": 10,
-        "attribute": "HEALTH"
+                "attribute": "HEALTH"
       }
     ],
     "source": "1413 长夜月 终结技 晚安，全世界无眠 (skill 141303, Ultimate/AoEAttack/Ice): 「召唤忆灵「长夜」，随后使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害，并使长夜月进入【至暗之谜】状态，期间敌方全体受到的伤害提高#4[i]%，长夜月和忆灵「长夜」造成的伤害提高#3[i]%，且免疫控制类负面状态。」 param Lv10 = [2, 2, 0.6, 0.3]",

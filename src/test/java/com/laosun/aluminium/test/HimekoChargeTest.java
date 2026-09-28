@@ -223,7 +223,11 @@ public class HimekoChargeTest {
     @Test
     public void theRestOfHerKitIsNotAuthored() {
         TriggerTable table = TriggerTables.of(HIMEKO);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "「战斗开始时获得1点充能」");
+        // ⚠ 2 since M-32: 「战斗开始时获得1点充能」 and the rule that states which level her talent's numbers were
+        // quoted at (「quoted at Lv10」 as a TALENT +9 raise) — before that the level lived in a `damage_level` field
+        // on the follow-up's damage effect.
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
+                "「战斗开始时获得1点充能」 and the talent's level statement");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
                 "「当有敌方目标的弱点被击破时」 (anybody's break) and 星魂 4's 「施放战技…造成弱点击破时」");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "「当我方目标施放攻击后」");
