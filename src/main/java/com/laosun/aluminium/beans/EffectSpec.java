@@ -78,6 +78,7 @@ public class EffectSpec {
 copy.damageType = this.damageType;
                 copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
+        copy.skillId = this.skillId;
 return copy;
     }
 
@@ -201,6 +202,16 @@ return copy;
 
     /** The ceiling's share, used with {@link #capScale} (both are required together). */
     private Double capPercent;
+
+    /**
+     * A <b>data row id</b> for a skill, used by {@code REPLACE_SKILL} (2026-09-28).
+     *
+     * <p>「将下一次普攻强化为【酒花奔涌】」 (1301 加拉赫): the enhanced attack is its own row (130108 for him) and belongs to no
+     * {@code SkillType} slot, so it has to be named by row id. ⚠ `SkillData.init(cid, skillID)` resolves ids against
+     * `Constant.SKILLS` -- the "slot" wording in {@code DefaultSkill}'s javadoc is about that class's own callers, not about
+     * what the loader accepts.
+     */
+    private Integer skillId;
 
     private String damageType;
 

@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -358,6 +358,17 @@ public final class TriggerInterpreter {
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
+            }
+            case "REPLACE_SKILL" -> {
+                // 「将下一次普攻强化为【酒花奔涌】」: which slot, which data row, and how long the swap lasts.
+                requireSkill(effect, op, spec);
+                if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " needs \"skill_id\": the data row of the replacement skill (an enhanced attack is "
+                                    + "its own row and belongs to no slot) (source: " + spec.getSource() + ")");
+                }
+                requireDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
             }
             case "REMOVE_BUFF" -> {
                 // 「解除指定敌方单体的1个增益效果」: the mirror of DISPEL -- that one cleans OUR side's debuffs, this one
@@ -809,6 +820,7 @@ public final class TriggerInterpreter {
             case "ADD_DAMAGE" -> addDamageFlat(effect, ctx);
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "REMOVE_BUFF" -> removeBuffs(battle, effect, ctx);
+            case "REPLACE_SKILL" -> replaceSkill(battle, effect, ctx);
             case "REMOVE_STATE" -> removeState(effect, ctx);
             case "TAUNT" -> taunt(battle, effect, ctx);
             case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
@@ -1916,6 +1928,39 @@ public final class TriggerInterpreter {
                     "Op " + op + " states \"max_stacks\": " + effect.stackCap()
                             + ", but a layer ceiling is a positive count (say nothing for an uncapped DOT) (source: "
                             + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * {@code REPLACE_SKILL}: swaps one of the rule owner's skill slots for a data row, for the effect's lifetime.
+     *
+     * <p>The swap rides on {@link com.laosun.aluminium.models.buff.SkillSwapBuff}, which installs the replacement when it lands
+     * and puts the original back when it leaves — so `turns`, `permanent` and `until` (「下一次普攻」) are the lifetime
+     * machinery this engine already has, not a second one.
+     *
+     * <p>⚠ The replacement is built ONCE per rule firing and shared by every resolved target: it is a skill, not state, and
+     * the buff restores whatever each target had in that slot.
+     */
+    private static void replaceSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        Character owner = requireCharacterOwner(effect, ctx);
+        SkillType slot;
+        try {
+            slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException unknown) {
+            throw new IllegalStateException(
+                    "REPLACE_SKILL names the slot '" + effect.getSkill() + "', which is not one this engine knows; known: "
+                            + java.util.Arrays.toString(SkillType.values()));
+        }
+        // The replacement keeps the level the slot is currently at (the flow raises slot levels, and an enhanced attack
+        // shares its slot's level rather than inventing one).
+        Skill current = owner.getSkills().get(slot);
+        int level = current == null ? 1 : Math.max(1, current.getLevel());
+        Skill replacement = new com.laosun.aluminium.models.skill.DefaultSkill(owner.getCid(), effect.getSkillId(), level);
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target instanceof Character character) {
+                character.getBuffManager().addBuff(withSource(withLifetime(
+                        new com.laosun.aluminium.models.buff.SkillSwapBuff(slot, replacement), effect), ctx));
+            }
         }
     }
 
