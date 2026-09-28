@@ -1,0 +1,50 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "id": "talent_wind_pen",
+    "when": [
+      "actor is_ally",
+      "target == self"
+    ],
+    "cooldown": 2,
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DAMAGE_PENETRATION",
+        "percent": 0.36,
+        "until": "next_attack",
+        "target": "self"
+      }
+    ],
+    "source": "1002 丹恒 天赋 寸长寸强 (100204, Enhance): 「当丹恒成为我方技能的施放目标时，下一次攻击的风属性抗性穿透提高36%。该效果在2回合后可再次触发。」",
+    "note": "「当丹恒**成为我方技能的施放目标**时，**下一次攻击**的风属性**抗性穿透**提高 **36%**；该效果在 **2 回合后可再次触发**」—— ① 事件用 `SKILL_CAST` ✓：它是**带被瞄准单位**的施放事件 ✓（`aimed` ✓），所以 `target == self` 正好是\"被瞄准的是我\" ✓；② 「我方技能」= `actor is_ally` ✓；③ 「风属性抗性穿透」对应引擎的 **`DAMAGE_PENETRATION`** ✓（术语表释义是\"造成伤害时**无视**敌方目标一部分对应伤害属性的**抗性值**\" ✓，正是 `Damage` 的 penetration 区 ✓）；④ 「下一次攻击」用既有的 **`until: next_attack`** 时长 ✓（不是 N 回合 ✗）；⑤ 「2 回合后可再次触发」用规则级 **`cooldown: 2`** ✓。⚠ **登记**：战技「**触发暴击时**有 100% 基础概率使目标速度降低 12%」（缺\"本次伤害暴击了\"的可观测 ✗，且 `MODIFY_ATTR` 上没有 `base_chance` ✗）；终结技「当目标**处于减速状态**时伤害倍率提高 120%」（缺\"减速\"这个**可问状态** ✗ —— 速度降低目前只是属性修正 ✓）；秘技「下一次战斗开始时攻击力提高 40%，持续 3 回合」（缺\"用过秘技\"的门槛 ✗）；以及行迹与星魂（未读 ✗）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "level_convention",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1002 丹恒 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 260%、终结技 400%、天赋 +36% 穿透）",
+    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 他的战技/终结技/秘技的登记见天赋那条的 note ✓。"
+  }
+]
