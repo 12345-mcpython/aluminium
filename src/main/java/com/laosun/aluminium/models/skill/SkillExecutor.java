@@ -170,7 +170,9 @@ public final class SkillExecutor {
             // OUR attacks, so the unit it was aimed at is always on the other side -- no rule of ours could ask
             // about it (`target == self` would be permanently false, and there is no selector for "an enemy").
             // Passing it would be information with no reader, which is the shape this project keeps refusing.
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, null, hits.size(), 0);
+            // ⚠ category rides along (2026-09-28): 「施放 2 次普攻/战技/终结技」 must tell the three slots apart, and this
+            // is the one event that fires once per CAST (DEALING_DAMAGE would count hits).
+            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, null, hits.size(), 0, category);
         }
     }
 
