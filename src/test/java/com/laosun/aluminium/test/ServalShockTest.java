@@ -118,8 +118,10 @@ public class ServalShockTest {
                 "the shock (the blast's damage is the engine's own path)");
         Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "星魂 6's conditional boost");
-        Assertions.assertEquals(0, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ALLY_ATTACK),
-                "her talent's 「对所有触电状态下的敌方目标」 is registered, not approximated");
+        Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ALLY_ATTACK),
+                "her talent's rider -- written since 2026-09-28 because 	arget_when can finally say 「对所有触电状态下的敌方目标」");
+        Assertions.assertEquals(2, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ULT_CAST),
+                "the shock extension and 星魂 4's spread to the unshocked ones");
     }
 
     // ==================================================================

@@ -561,16 +561,21 @@ public final class TriggerInterpreter {
      * @param ctx    the context the rule was matched with
      */
     public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
+        int effectIndex = 0;
         for (EffectSpec effect : rule.effects()) {
+            final int thisEffect = effectIndex++;
             // 「终结技的持续时间额外增加 1 回合」/「天赋的伤害提高效果额外提高 10%」 (2026-09-28): an amendment to the
             // named rule's own effect values. ⚠ A COPY, not a mutation: the compiled EffectSpec is shared by every
             // battle, so adjusting it in place would leak the amendment (and, in the test suite, into other tests).
             // The fast path returns the same instance, so the 57 places that read `percent`/`turns` stay untouched.
             effect = amendedEffect(effect, ctx);
+            // M-53: this effect's per-target conditions. The ops below take `effectCtx`, whose filter `resolveTargets`
+            // applies -- so the whole vocabulary cost four lines in the loop and one branch in the resolver.
+            TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect));
             // The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance, and the only
             // op that consumes that amendment (APPLY_CONTROL) has to know which rule it is running inside. Passing it
             // down beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.
-            applyOne(battle, effect, ctx);
+            applyOne(battle, effect, effectCtx);
         }
     }
 
@@ -929,6 +934,20 @@ public final class TriggerInterpreter {
      * @throws IllegalStateException when {@code all_allies} is used without a battle
      */
     private static List<CanHit> resolveTargets(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        List<CanHit> resolved = resolveTargetsUnfiltered(battle, effect, ctx);
+        if (ctx.targetFilter().isEmpty()) {
+            return resolved;
+        }
+        List<CanHit> filtered = new ArrayList<>();
+        for (CanHit candidate : resolved) {
+            if (candidate != null && ctx.passesTargetFilter(candidate)) {
+                filtered.add(candidate);
+            }
+        }
+        return List.copyOf(filtered);
+    }
+
+    private static List<CanHit> resolveTargetsUnfiltered(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
         if (TARGET_ALL_ALLIES.contains(selector) || TARGET_OTHER_ALLIES.equals(selector)) {
             if (battle == null) {
