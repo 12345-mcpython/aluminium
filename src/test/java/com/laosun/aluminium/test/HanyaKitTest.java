@@ -75,6 +75,24 @@ public class HanyaKitTest {
                 "「该效果每回合只能触发1次」: per_turn: 1");
     }
 
+    /**
+     * ⚠ The other half of 星魂 1: a kill by somebody <b>without</b> her ultimate's effect does not advance her.
+     *
+     * <p>This case exists because the gate `actor has_state 敕令` was <b>not covered</b> by the positive test alone —
+     * removing the condition left every assertion green (measured mutation m1, 0 red), which is exactly the
+     * "a test that cannot fail" shape this project keeps hunting.
+     */
+    @Test
+    public void aKillBySomebodyWithoutHerUltimateDoesNothing() {
+        Fixture f = new Fixture(1);
+        double before = remainingWait(f, f.hanya);
+
+        f.allyKills();
+
+        Assertions.assertEquals(before, remainingWait(f, f.hanya), 1.0,
+                "the ally never received 敕令, so 「持有终结技效果的我方目标消灭敌方目标时」 does not apply");
+    }
+
     /** 星魂 2: her own Skill raises her speed for a turn. */
     @Test
     public void herSecondEidolonSpeedsHerUpAfterASkill() {
