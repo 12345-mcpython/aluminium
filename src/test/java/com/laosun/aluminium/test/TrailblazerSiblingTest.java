@@ -67,6 +67,25 @@ public class TrailblazerSiblingTest {
                 "\u300c\u56de\u590d\u7b49\u540c\u4e8e\u5404\u81ea\u751f\u547d\u4e0a\u965015%\u7684\u751f\u547d\u503c\u300d");
     }
 
+
+    /** \u26a0 The control: without the marker the same battle heals nobody — this is what makes the gate testable. */
+    @Test
+    public void withoutTheTechniqueNobodyIsHealed() {
+        Character tb = CharacterFactory.create(TB2, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
+        battle.applyDamage(ally, new com.laosun.aluminium.models.Damage(enemy, ally,
+                com.laosun.aluminium.enums.DamageElement.PHYSICAL,
+                com.laosun.aluminium.enums.DamageType.NORMAL, ally.getMaxHp() * 0.5));
+        double hurt = ally.getCurrentHp();
+
+        battle.startBattle();
+
+        Assertions.assertEquals(hurt, ally.getCurrentHp(), 1e-9,
+                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so no heal");
+    }
+
     /** Census: the talent, the technique heal and the level convention. */
     @Test
     public void hisFileCarriesTheClauses() {
