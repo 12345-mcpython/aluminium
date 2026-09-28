@@ -2,7 +2,9 @@
   {
     "on": "ULT_CAST",
     "id": "ult_present",
-    "when": ["actor == self"],
+    "when": [
+      "actor == self"
+    ],
     "do": [
       {
         "op": "MODIFY_DAMAGE_TAKEN",
@@ -41,6 +43,27 @@
       }
     ],
     "source": "1108 桑博 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 56%、终结技 160%、天赋 52% 都是该行）",
-    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: 战技「弹射」 (a bounce — **no rule is needed**: the engine's own BOUNCE shape runs the 56% ×(1+4) hits, which is exactly why nothing is written for it), 天赋「桑博击中敌方目标后有 65% 的基础概率使目标陷入**风化**状态，持续 3 回合。风化状态下每回合开始时受到等同于桑博 52% 攻击力的风属性持续伤害。**风化状态最多叠加 5 层。**」 (the DOT itself is `APPLY_DOT` with `base_chance: 0.65` + `element: Wind` + `turns: 3` — all of which exist — but the clause is registered **whole** because of 「最多叠加 5 层」: `DotBuff.isSameKind` is `false`, so a second application **stacks without limit** today, and shipping the DOT while dropping its cap would be a wrong number that only shows up in long fights, not a missing one), and 行迹/星魂 1–6 (not yet read clause by clause)."
+    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **战技「弹射」无需规则**：引擎自带的 BOUNCE 形态就跑 56% ×（1+4）次，这正是\"能为则不写\"的例子。 ⚠ **2026-09-28 补齐**：天赋的「风化」已写出（见本文件最后一条规则）—— 此前整句登记，是因为「最多叠加 5 层」当时无处可写（DOT 会无限叠加），而只写 DOT、丢掉上限就是\"长线战斗里才显形的错数字\"；上限落地后这句就能完整表达了。 ⚠ **仍登记**：1307 那句\"超出上限的层数在结算后移除\"（只对一个状态陈述过，推广是推测）、以及行迹/星魂 1–6（尚未逐句读）。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "talent_windtorn",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_DOT",
+        "element": "Wind",
+        "base_chance": 0.65,
+        "scale": "self_attr:ATTACK",
+        "percent": 0.52,
+        "turns": 3,
+        "max_stacks": 5,
+        "target": "target"
+      }
+    ],
+    "source": "1108 桑博 天赋 撕风的匕首 (110804, Enhance): 「桑博击中敌方目标后有65%的基础概率使目标陷入风化状态，持续3回合。风化状态下，敌方目标每回合开始时受到等同于桑博52%攻击力的风属性持续伤害。风化状态最多叠加5层。」",
+    "note": "「击中敌方目标后有 **65% 的基础概率**使目标陷入**风化**状态，持续 3 回合；风化状态下每回合开始时受到等同于桑博 **52% 攻击力**的风属性持续伤害；风化状态**最多叠加 5 层**」 — four numbers from her row, each on its own spelling: `base_chance: 0.65` (a roll, so it meets effect resistance — a DOT the documents call 「陷入」 with a base chance is NOT \"always\"), `element: Wind` (which IS the state: the engine's DOT states are per element, so 风化 and 灼烧 are different states and two 风化 applications are the same one), `scale: self_attr:ATTACK` + `percent` (the per-turn damage is a share of **his** attack, frozen when it lands), and `max_stacks: 5` (the ceiling, new on 2026-09-28). ⚠ 「每回合开始时」 needs no rule of its own: `Battle.tickDots` settles every DOT on a unit during the early tick, before 回合开始 events fire. ⚠ **What the ceiling does and does not do**: applications past five still attach (a DOT is never evicted) but they deal **no damage** — that is exactly what 「最多叠加 5 层」 asserts. 1307 Black Swan's sentence 「层数达到上限后可继续叠加，产生伤害后移除超出上限的层数」 states more (the excess layers are removed after the damage), but it is stated for ONE state, so generalising it would be an inference and it stays registered."
   }
 ]
