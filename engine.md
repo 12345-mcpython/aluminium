@@ -1151,8 +1151,38 @@ Battle.applyAdditionalDamage          ← 全引擎**唯一**的追加伤害结�
 
 其余事件的挂点：`BATTLE_START`（`startBattle`，在 `onBattleStart` 之后）、
 `ENERGY_GAINED`（`applyEnergyGain`）、`HP_LOST` / `KILL`（`applyDamage`）、
-`HEALED`（`heal`）、`BREAK`（`reduceToughness`）、
+`HEALED`（`heal`）、`SHIELD_GRANTED`（`Battle.grantShield` **与**解释器的 `SHIELD` 分支，见下）、
+`BREAK`（`reduceToughness`）、
 `SKILL_POINT_GAINED` / `SKILL_POINT_SPENT`（战技点入账/消耗）。
+
+#### `SHIELD_GRANTED`：**"盾被给上了"是独立事件**（2026-09-28，M-43）
+
+```
+Battle.grantShield(provider, target, amount, ruleId)     ← 裸授予（没有 turns 的盾）
+  └─ value > 0 时 fireTriggersForAlly(SHIELD_GRANTED, provider, target, value)
+
+TriggerInterpreter 的 SHIELD 分支（有 turns → ShieldBuff）  ← ⚠ 第二条路径
+  └─ addBuff 之后 amount > 0 时 fireTriggersForAlly(SHIELD_GRANTED, ctx.owner(), target, amount)
+```
+
+- `actor` = **给予者**、`target` = 被给盾的人 —— 与 `HEALED` 同约定，于是
+  「受到**队友提供的**治疗效果或护盾时」（1321 大丽花 行迹 `1321101`）不需要任何新词：
+  `target == self` + `actor is_ally` + `actor != self`（⚠ `is_ally` 只回答"在我方"，**她自己也在我方**，
+  所以「队友」必须再加一条 `actor != self`；`!` 不能否定身份比较，`!=` 才是这个 DSL 的写法）。
+- ⚠ **两条路径都要发，这是本事件唯一的不对称**：有时长的盾不是经 `grantShield` 落的，而是
+  `ShieldBuff` 交给 buff 管理器落的，而 buff 管理器**没有 `Battle` 句柄** —— 所以解释器自己发那一次。
+  只做一边的后果是"半数盾隐形"：三月七的战技盾（有时长）正是最需要被看见的那一类。
+- ⚠ **只有真的立起一面盾才发**（`value > 0` / `amount > 0`）：`≤ 0` 是这套 API 表示"**清掉**护盾"的写法，
+  不是授予 —— 与 `HEALED`"真的回了血才发"同口径。
+- ⚠ **裸授予没有给予者**（`actor = null`），所以 `actor is_ally` 为假：一个没人认领的盾不该回答来源问题。
+- ⚠ **顺带修实的一处归因**：`HEAL` op 原先调用 `Battle.heal(null, …)`，于是**没有任何规则驱动的治疗有提供者**
+  —— 「队友提供的治疗」那一半同样写不出来。现在传 `ctx.owner()`。改动前已量过影响面：
+  **没有出货内容订阅 `HEALED`**、**没有出货内容授予 `OUTGOING_HEALING_BOOST`**（§2 标"未使用"），
+  所以没有任何数字变化，只是归因变成真的。
+- 契约：`ShieldGrantedEventTest` **8 条**（队友给盾 / **有时长的盾** / 她给自己的盾不算 / 裸授予不算 /
+  `0` 不是授予 / 一回合一次 / 治疗半边：自愈不算、队友治疗算 / 出货文件结构钉住）。
+  **变异**（实测，跑完 1197+ 条）：裸授予路径静默 → **2 红**；有时长路径静默 → **1 红**；
+  `0` 也当授予 → **1 红**；内容去掉 `actor != self` → **1 红**。
 **事件接线现状**：`TriggerEvent` 里的**每一个**值现在都有发出点（`TURN_START` 与 `TAKING_HIT`
 在 P10-3 后半挂上），由 `TriggerTableTest.everyDeclaredTriggerEventIsEmitted` 钉住 ——
 声明了却没有发出点的事件对作者是个陷阱，加了值而忘了接线必须让测试变红。
