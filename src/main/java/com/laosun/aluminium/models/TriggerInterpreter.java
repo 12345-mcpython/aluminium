@@ -459,6 +459,7 @@ public final class TriggerInterpreter {
                 // named rule is checked by the table (TriggerTable.validateAmendments), which is the only place that
                 // can see the whole file.
                 requireRuleReference(effect, op, spec);
+                requireOneAmendment(effect, op, spec);
                 if (effect.getAmount() != null) {
                     double amount = effect.getAmount();
                     if (amount < 1 || amount != Math.floor(amount)) {
@@ -469,6 +470,21 @@ public final class TriggerInterpreter {
                                         + "(source: " + spec.getSource() + ")");
                     }
                     rejectAmendmentExtras(effect, op, spec, "amount");
+                } else if (effect.getEffectTurns() != null) {
+                    if (effect.getEffectTurns() == 0) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " raises a rule's effect duration, so \"effect_turns\" must be a whole "
+                                        + "number of turns other than 0, got " + effect.getEffectTurns()
+                                        + " (source: " + spec.getSource() + ")");
+                    }
+                    rejectAmendmentExtras(effect, op, spec, "effect_turns");
+                } else if (effect.getEffectPercent() != null) {
+                    if (effect.getEffectPercent() == 0) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " raises a rule's effect value, so \"effect_percent\" must not be 0 "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                    rejectAmendmentExtras(effect, op, spec, "effect_percent");
                 } else {
                     requirePercent(effect, op, spec);
                     if (effect.getPercent() <= 0 || effect.getPercent() > 1) {
@@ -538,6 +554,11 @@ public final class TriggerInterpreter {
      */
     public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
         for (EffectSpec effect : rule.effects()) {
+            // 「终结技的持续时间额外增加 1 回合」/「天赋的伤害提高效果额外提高 10%」 (2026-09-28): an amendment to the
+            // named rule's own effect values. ⚠ A COPY, not a mutation: the compiled EffectSpec is shared by every
+            // battle, so adjusting it in place would leak the amendment (and, in the test suite, into other tests).
+            // The fast path returns the same instance, so the 57 places that read `percent`/`turns` stay untouched.
+            effect = amendedEffect(effect, ctx);
             // The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance, and the only
             // op that consumes that amendment (APPLY_CONTROL) has to know which rule it is running inside. Passing it
             // down beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.
@@ -607,6 +628,34 @@ public final class TriggerInterpreter {
      * @param ruleId the id of the rule this effect belongs to ({@code ""} when it states none) — the handle a
      *               {@code MODIFY_RULE} amendment is filed under, read by {@code APPLY_CONTROL}
      */
+    /**
+     * The effect as this firing must see it: the compiled one, or a copy with the named rule's value/duration
+     * amendments applied ({@code MODIFY_RULE} with {@code effect_percent} / {@code effect_turns}).
+     *
+     * <p>Returning the <b>same instance</b> when there is no amendment is what keeps this out of the hot path, and it
+     * is also why the amendments are not applied at load time: a rule's amendments are facts about <i>this</i>
+     * combatant in <i>this</i> battle (an Eidolon is one), while the compiled effect belongs to all of them.
+     */
+    private static EffectSpec amendedEffect(EffectSpec effect, TriggerContext ctx) {
+        CanHit owner = ctx.owner();
+        if (owner == null || ctx.ruleId() == null) {
+            return effect;
+        }
+        Double percentDelta = owner.ruleEffectPercentBonus(ctx.ruleId());
+        Integer turnsDelta = owner.ruleEffectTurnsBonus(ctx.ruleId());
+        if (percentDelta == null && turnsDelta == null) {
+            return effect;
+        }
+        EffectSpec amended = effect;
+        if (percentDelta != null) {
+            amended = amended.withPercent(percentDelta);
+        }
+        if (turnsDelta != null) {
+            amended = amended.withTurns(turnsDelta);
+        }
+        return amended;
+    }
+
     private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String op = normalizeOp(effect, null);
         switch (op) {
@@ -1929,6 +1978,28 @@ public final class TriggerInterpreter {
                 (int) Math.round(effect.getAmount()));
     }
 
+    /**
+     * Exactly <b>one</b> amendment per {@code MODIFY_RULE}: a firing count, a probability, a value or a duration.
+     *
+     * <p>⚠ Stated rather than inferred: two at once would make "which number did the author mean" a guess, and the
+     * guess would be a silent one (the extra field would simply be ignored).
+     */
+    private static void requireOneAmendment(EffectSpec effect, String op, TriggerSpec spec) {
+        int stated = 0;
+        for (Object candidate : new Object[] {effect.getAmount(), effect.getBaseChance(), effect.getPercent(),
+                effect.getEffectPercent(), effect.getEffectTurns()}) {
+            if (candidate != null) {
+                stated++;
+            }
+        }
+        if (stated != 1) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " must state exactly ONE amendment -- \"amount\" (firings per turn), \"base_chance\" "
+                            + "(probability), \"effect_percent\" (raise a value) or \"effect_turns\" (raise a "
+                            + "duration) -- but " + stated + " were stated (source: " + spec.getSource() + ")");
+        }
+    }
+
     private static void modifyRule(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
         if (owner == null) {
@@ -1939,6 +2010,14 @@ public final class TriggerInterpreter {
         String target = effect.getRule().trim();
         if (effect.getAmount() != null) {
             owner.addRulePerTurnBonus(target, (int) Math.round(effect.getAmount()));
+        } else if (effect.getEffectTurns() != null) {
+            // 「终结技的持续时间额外增加 1 回合」: the rule's own effect durations, raised where they are read
+            // (see amendedEffect). ⚠ Not an extra rule with a longer `turns`: the two modifiers of one skill are the
+            // same kind, so a second one would REPLACE the first rather than stack.
+            owner.amendRuleEffectTurns(target, (int) Math.round(effect.getEffectTurns()));
+        } else if (effect.getEffectPercent() != null) {
+            // 「天赋的伤害提高效果额外提高 10%」: 30% -> 40%, the same rule, raised in place.
+            owner.amendRuleEffectPercent(target, effect.getEffectPercent());
         } else {
             owner.addRuleBaseChanceBonus(target, effect.getPercent());
         }
@@ -2791,6 +2870,24 @@ public final class TriggerInterpreter {
      * Validates {@code MODIFY_RULE}'s target: the rule being raised, named by its {@code id} — resolved against the
      * <b>whole file</b> by {@code TriggerTable.validateAmendments}, which is the only place that can see it.
      */
+    /** Applies one value/duration amendment to the rule it names. */
+    private static void amendRuleEffect(EffectSpec effect, TriggerContext ctx) {
+        CanHit owner = ctx.owner();
+        if (owner == null) {
+            return;
+        }
+        String ruleId = effect.getRule() == null ? null : effect.getRule().trim();
+        if (ruleId == null || ruleId.isEmpty()) {
+            return;
+        }
+        if (effect.getEffectTurns() != null) {
+            owner.amendRuleEffectTurns(ruleId, (int) Math.round(effect.getEffectTurns()));
+        }
+        if (effect.getEffectPercent() != null) {
+            owner.amendRuleEffectPercent(ruleId, effect.getEffectPercent());
+        }
+    }
+
     private static void requireRuleReference(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getRule() == null || effect.getRule().isBlank()) {
             throw new IllegalArgumentException(

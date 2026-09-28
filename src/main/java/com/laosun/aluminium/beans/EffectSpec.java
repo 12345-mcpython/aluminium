@@ -34,6 +34,69 @@ import java.util.List;
 public class EffectSpec {
 
     /**
+     * A <b>deep-enough copy</b>: every field is carried over, so a caller can adjust one of them without touching the
+     * compiled rule that the whole battle (and every other battle) shares (2026-09-28).
+     *
+     * <p>⚠ <b>Every field must be listed here.</b> A field added to this bean and forgotten in this method would be
+     * silently dropped for exactly the firings that amend something -- a wrong number with no symptom. The guard is
+     * {@code RuleEffectAmendmentTest.theCopyCarriesEveryField}, which compares all getters by reflection.
+     */
+    public EffectSpec copy() {
+        EffectSpec copy = new EffectSpec();
+        copy.op = this.op;
+        copy.amount = this.amount;
+        copy.scale = this.scale;
+        copy.attribute = this.attribute;
+        copy.percent = this.percent;
+        copy.turns = this.turns;
+        copy.permanent = this.permanent;
+        copy.maxStacks = this.maxStacks;
+        copy.stacks = this.stacks;
+        copy.resource = this.resource;
+        copy.until = this.until;
+        copy.buff = this.buff;
+        copy.ticksOn = this.ticksOn;
+        copy.target = this.target;
+        copy.skill = this.skill;
+        copy.damageParam = this.damageParam;
+        copy.damageLevel = this.damageLevel;
+        copy.asAttack = this.asAttack;
+        copy.rule = this.rule;
+        copy.perTarget = this.perTarget;
+        copy.control = this.control;
+        copy.baseChance = this.baseChance;
+        copy.speed = this.speed;
+        copy.suspendsTurns = this.suspendsTurns;
+        copy.critRate = this.critRate;
+        copy.critDamage = this.critDamage;
+        copy.element = this.element;
+        copy.kind = this.kind;
+        copy.effectPercent = this.effectPercent;
+        copy.effectTurns = this.effectTurns;
+        return copy;
+    }
+
+
+    /** The same, with the value every {@code percent} read is raised by (see {@code MODIFY_RULE}). */
+    public EffectSpec withPercent(Double delta) {
+        EffectSpec copy = copy();
+        if (copy.percent != null && delta != null) {
+            copy.percent = copy.percent + delta;
+        }
+        return copy;
+    }
+
+    /** The same, with the duration every {@code turns} read is raised by (see {@code MODIFY_RULE}). */
+    public EffectSpec withTurns(Integer delta) {
+        EffectSpec copy = copy();
+        if (copy.turns != null && delta != null) {
+            copy.turns = copy.turns + delta;
+        }
+        return copy;
+    }
+
+
+    /**
      * The operation name, e.g. {@code "GAIN_ENERGY"}.
      */
     @SerializedName("op")
@@ -454,6 +517,18 @@ public class EffectSpec {
      */
     @SerializedName("kind")
     private String kind;
+    /**
+     * {@code MODIFY_RULE}: raise every {@code percent} read of the named rule's effects by this much
+     * (「天赋的伤害提高效果额外提高 10%」，1215 星魂 6).
+     */
+    @SerializedName("effect_percent")
+    private Double effectPercent;
+    /**
+     * {@code MODIFY_RULE}: raise every {@code turns} read of the named rule's effects by this many turns
+     * (「终结技的持续时间额外增加 1 回合」，1215 星魂 4).
+     */
+    @SerializedName("effect_turns")
+    private Integer effectTurns;
 
     /**
      * The stack cap, whichever spelling the rule used.

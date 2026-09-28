@@ -180,6 +180,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private final Map<String, Integer> rulePerTurnBonus = new HashMap<>();
     @Getter(AccessLevel.NONE)
     private final Map<String, Double> ruleBaseChanceBonus = new HashMap<>();
+    /**
+     * 「终结技的持续时间额外增加 1 回合」/「天赋的伤害提高效果额外提高 10%」: amendments to a named rule's own
+     * <b>effect values</b> (2026-09-28).
+     *
+     * <p>⚠ Kept separate from {@link #rulePerTurnBonus} / {@link #ruleBaseChanceBonus} because those two change how
+     * <i>often</i> a rule runs, while these change what it <i>does</i> — and unlike a second rule with a bigger number
+     * (which would <b>replace</b> the first, since same-kind modifiers refresh rather than stack), these raise the one
+     * that is already there.
+     */
+    private final Map<String, Double> ruleEffectPercentBonus = new HashMap<>();
+    /** The duration half of the same idea: 「持续时间额外增加 N 回合」. */
+    private final Map<String, Integer> ruleEffectTurnsBonus = new HashMap<>();
 
     /**
      * Per-battle <b>skill level raises</b> (M-32), keyed by slot: 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5, and the
@@ -706,6 +718,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         triggerTurnUses.clear();
         rulePerTurnBonus.clear();
         ruleBaseChanceBonus.clear();
+        ruleEffectPercentBonus.clear();
+        ruleEffectTurnsBonus.clear();
         skillLevelBonus.clear();
     }
 
@@ -809,6 +823,30 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param ruleId the rule's {@code id}
      * @return the amendment, or {@code 0}
      */
+    /** Adds {@code delta} to every {@code percent} read of the named rule's effects. */
+    public void amendRuleEffectPercent(String ruleId, double delta) {
+        if (ruleId != null && !ruleId.isBlank()) {
+            ruleEffectPercentBonus.merge(ruleId.trim(), delta, Double::sum);
+        }
+    }
+
+    /** Adds {@code delta} to every {@code turns} read of the named rule's effects. */
+    public void amendRuleEffectTurns(String ruleId, int delta) {
+        if (ruleId != null && !ruleId.isBlank()) {
+            ruleEffectTurnsBonus.merge(ruleId.trim(), delta, Integer::sum);
+        }
+    }
+
+    /** The value amendment for a rule, or {@code null} when nothing raised it. */
+    public Double ruleEffectPercentBonus(String ruleId) {
+        return ruleId == null || ruleId.isBlank() ? null : ruleEffectPercentBonus.get(ruleId.trim());
+    }
+
+    /** The duration amendment for a rule, or {@code null} when nothing raised it. */
+    public Integer ruleEffectTurnsBonus(String ruleId) {
+        return ruleId == null || ruleId.isBlank() ? null : ruleEffectTurnsBonus.get(ruleId.trim());
+    }
+
     public double ruleBaseChanceBonus(String ruleId) {
         return ruleId == null || ruleId.isBlank() ? 0 : ruleBaseChanceBonus.getOrDefault(ruleId.trim(), 0.0);
     }
