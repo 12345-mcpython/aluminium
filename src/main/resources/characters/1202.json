@@ -1,0 +1,103 @@
+[
+  {
+    "on": "ULT_CAST",
+    "id": "ult_energy_and_boost",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 50,
+        "target": "target"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent": 0.5,
+        "turns": 2,
+        "target": "target"
+      }
+    ],
+    "source": "1202 停云 终结技 庆云光覆仪祷 (120203, Ultra/Support): 「为指定我方单体恢复50点能量，同时使目标造成的伤害提高50%，持续2回合。」",
+    "note": "「为指定我方单体**恢复 50 点能量**，同时使目标**造成的伤害提高 50%**，持续 2 回合」—— 两个效果都用既有 op：`GAIN_ENERGY amount 50` ✓（**固定值** ✓，不是按能量上限的份额 ✓）与 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST percent 0.5` ✓（\"造成的伤害提高\"是一个**属性修正** ✓，不是 `BOOST_DAMAGE` ✗ —— 后者只改**正在结算的那一次** ✗，与\"持续 2 回合\"不符 ✓）。"
+  },
+  {
+    "on": "SKILL_CAST",
+    "id": "trace_speed_on_skill",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "SPEED",
+        "percent": 0.2,
+        "turns": 1,
+        "target": "self"
+      }
+    ],
+    "source": "1202 停云 行迹 驻晴 (1202101): 「施放战技时，停云自身速度提高20%，持续1回合。」",
+    "note": "「施放战技时，停云**自身速度提高 20%**，持续 1 回合」—— `SKILL_CAST` + `MODIFY_ATTR SPEED` 落在 `self` ✓。⚠ 与战技那条**同事件**：按文件顺序，本条在战技效果**之后**执行 ✓（两者互不影响 ✓）。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "trace_basic_attack_boost",
+    "when": [
+      "actor == self",
+      "from_skill COMMON"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.4
+      }
+    ],
+    "source": "1202 停云 行迹 止厄 (1202102): 「普攻造成的伤害提高40%。」",
+    "note": "「**普攻**造成的伤害提高 40%」—— `DEALING_DAMAGE` + **`from_skill COMMON`** + `BOOST_DAMAGE percent 0.4` ✓。⚠ 本条此前**根本写不了** ✗：`from_skill` 在 `DEALING_DAMAGE` 上永远不匹配（该事件不带施放类别 ✗），直到第 151 轮修好发射处 ✓ —— 这条行迹正是那次修复的**新读者** ✓。"
+  },
+  {
+    "on": "TURN_START",
+    "id": "trace_energy_at_turn_start",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 5,
+        "target": "self"
+      }
+    ],
+    "source": "1202 停云 行迹 亨通 (1202103): 「停云的回合开始时，自身立即恢复5点能量。」",
+    "note": "「停云的**回合开始时**，自身立即恢复 5 点能量」—— `TURN_START` + `GAIN_ENERGY amount 5 target self` ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "level_convention",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1202 停云 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 +50%/上限 25%、终结技 50 能量/+50% 伤害、天赋 60%）",
+    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 秘技（「使用秘技后立即为自身恢复50点能量」）缺**门槛** ✗；天赋与战技的\"附加伤害由**受赐福队友**打出\"两条见战技那条的登记 ✓；星魂未读 ✗。 ⚠ **2026-09-29：战技的【赐福】本轮未出货** ✗ —— 它需要\"有上限的属性修正\"（「攻击力提高50%，**最高不超过停云当前攻击力的25%**」），而引擎今天只有 `APPLY_DOT` 会读 `cap_scale`/`cap_percent` ✗。我试着把它放给 `MODIFY_ATTR` 并直接复用 DOT 的 clamp，结果让上限断言失败 ✗：**单位不同** —— `MODIFY_ATTR` 的 `percent` 是**份额**（目标攻击力的 50%），而 ceiling 解析出的是**绝对值**（停云攻击力的 25%），`min(份额, 绝对值)` 毫无意义。⇒ 正确的做法是**逐目标**把上限换算成份额（`cap绝对值 / 目标该属性值`），而不是在得到份额后直接 min ✗；该能力已登记为待做 ✓（读者：本句 + 语料里「最高不超过/至多不超过/上限为」**14 个文件** ✓）。"
+  }
+]
