@@ -795,6 +795,39 @@ public class BuffManager {
     }
 
     /**
+     * Removes up to {@code max} <b>positive, temporary</b> buffs — 「解除敌方 N 个增益效果」 (2026-09-28).
+     *
+     * <p>It is the mirror of the {@code DISPEL} op, and the direction is the whole point: that one cleans <i>our own</i>
+     * side of negative effects, while this one strips an <b>enemy's</b> benefits. The filter is a decision taken per buff
+     * class ({@code isDebuff()}), the same one {@code DISPEL} relies on, so neither can be tricked into removing the wrong
+     * half.
+     *
+     * <p>⚠ <b>Permanent buffs are skipped on purpose.</b> A relic's bonus or a trace is not a 「增益效果」 in the sense the
+     * sentences use — nobody's skill dispels a loadout — and removing one would be a wrong number with no symptom.
+     *
+     * <p>Removing nothing is not an error (the rule fires on every cast, and most casts find nothing to strip).
+     *
+     * @param max how many to remove at most
+     * @return how many were actually removed
+     */
+    public int removeBuffs(int max) {
+        if (max <= 0) {
+            return 0;
+        }
+        int removed = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (removed >= max) {
+                break;
+            }
+            if (!buff.isDebuff() && !buff.isPermanent()) {
+                removeBuff(buff);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
+    /**
      * The attacker's total toughness-reduction bonus (「削韧值提高 X%」), summed over the boosts it carries.
      *
      * <p>Read at exactly one place, {@code SkillExecutor.applyStanceDamage}, where a nominal reduction becomes a settled

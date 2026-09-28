@@ -58,6 +58,28 @@ public class PelaDebuffTest {
                 "census: her file has the 秘策 rule and the level-convention rule");
     }
 
+    /**
+     * ⚠ The direction is the whole point: her Skill strips an enemy's <b>benefit</b> (a timed shield) and leaves the
+     * <b>negative</b> effects it carries alone.
+     */
+    @Test
+    public void herSkillStripsABenefitAndNotADebuff() {
+        Fixture f = new Fixture();
+        f.enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("测试增益", 2));
+        f.enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(f.pela,
+                com.laosun.aluminium.enums.DamageElement.FIRE, 10, 2));
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("测试增益"), "precondition: the enemy has a shield");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"), "precondition: and a DOT");
+
+        f.battle.castImmediate(f.pela.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), f.pela,
+                List.of(f.enemy));
+
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("测试增益"),
+                "「解除指定敌方单体的1个增益效果」 -- the shield went");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"),
+                "⚠ …and the DOT stayed: REMOVE_BUFF is the mirror of DISPEL, not a second DISPEL");
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
