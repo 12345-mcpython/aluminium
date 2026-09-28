@@ -250,6 +250,18 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     @Setter
     protected String buffName = "";
 
+    /**
+     * Whether carrying this buff means <b>the unit does not take its own turns</b> (2026-09-28).
+     *
+     * <p>知更鸟's 【协奏】: 「【协奏】状态结束前<b>不会进入自己的回合</b>且无法行动」 — while the state lasts she is not in the
+     * order at all, and the countdown acts in her place. That is <b>not</b> what a control does: {@code ControlBuff}
+     * stops a unit from <i>acting</i> but still lets its turn arrive (and its DOTs tick), while this flag makes the
+     * turn itself pass without the unit. Conflating the two would silently change every 「被冻结仍会掉血」 reading.
+     */
+    @Getter
+    @Setter
+    protected boolean suspendsTurns = false;
+
     @Override
     public int duration() {
         return remainingDuration;
