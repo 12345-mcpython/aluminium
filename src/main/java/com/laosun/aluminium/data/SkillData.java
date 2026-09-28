@@ -310,4 +310,23 @@ public class SkillData {
         }
         return null;
     }
+
+    /**
+     * Which of the caster's attributes a damage clause scales off (2026-09-29).
+     *
+     * <p>The description names it: 「等同于砂金100%防御力」 is DEF, 「等同于风堇50%生命上限」 is Max HP, and everything else is ATK. 18 documents scale a damage
+     * clause off Max HP and 3 off DEF, while the executor used to multiply {@code ATTACK} unconditionally — so those skills dealt the wrong damage.
+     */
+    public com.laosun.aluminium.enums.AttributeType damageBaseAttribute() {
+        if (description != null) {
+            String text = MARKUP.matcher(description).replaceAll("");
+            if (text.contains("\u9632\u5fa1\u529b")) {
+                return com.laosun.aluminium.enums.AttributeType.DEFENCE;
+            }
+            if (text.contains("\u751f\u547d\u4e0a\u9650")) {
+                return com.laosun.aluminium.enums.AttributeType.HEALTH;
+            }
+        }
+        return com.laosun.aluminium.enums.AttributeType.ATTACK;
+    }
 }
