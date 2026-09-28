@@ -226,6 +226,15 @@ public final class TriggerInterpreter {
      *                                  required argument
      */
     public static void validate(EffectSpec effect, TriggerSpec spec) {
+        // ⚠ A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
+        // kind of mistake this interpreter's closed sets exist to prevent.
+        if ((effect.getCapScale() != null || effect.getCapPercent() != null)
+                && !"APPLY_DOT".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())) {
+            throw new IllegalArgumentException(
+                    "Op " + effect.getOp() + " states a derived ceiling (\"cap_scale\"/\"cap_percent\"), which only "
+                            + "APPLY_DOT reads today (source: " + spec.getSource() + ")");
+        }
+
         String op = normalizeOp(effect, spec);
         requireTargetSelector(effect, op, spec);
         if (PLANNED.contains(op)) {
@@ -414,6 +423,15 @@ public final class TriggerInterpreter {
                 // from the RULE OWNER's attribute, and it is frozen into the buff when it lands.
                 requireElement(effect, op, spec);
                 requireDotMagnitude(effect, op, spec);
+        // 「最多不超过卢卡攻击力的 338%」: a derived ceiling -- the magnitude is the SMALLER of the two values.
+        if (effect.getCapScale() != null || effect.getCapPercent() != null) {
+            if (effect.getCapScale() == null || effect.getCapPercent() == null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states a derived ceiling, which needs BOTH \"cap_scale\" (whose attribute) and "
+                                + "\"cap_percent\" (that attribute's share) (source: " + spec.getSource() + ")");
+            }
+        }
+
                 requirePositiveTurns(effect, op, spec);
                 requireBaseChance(effect, op, spec);
                 // ⚠ `max_stacks` IS allowed here (「最多叠加 N 层」, 2026-09-28): the general stack-family refusal would
@@ -2021,10 +2039,63 @@ public final class TriggerInterpreter {
      * and both read the <b>rule owner</b>, never the victim.
      */
     private static double dotMagnitude(EffectSpec effect, TriggerContext ctx) {
+        double magnitude;
         if (effect.getScale() == null) {
-            return effect.getAmount();
+            magnitude = effect.getAmount();
+        } else if ("target_max_hp".equals(effect.getScale().trim())) {
+            // ⚠ The victim's own maximum: 「受到等同于**自身** 24.00% 生命上限的…持续伤害」 (1111 卢卡). Every other scale here
+            // is the rule OWNER's, which is why this spelling had to be added -- and it is read when the buff LANDS, so a
+            // later change to the victim's Max HP does not move a DOT that is already ticking (the DOT's own convention).
+            CanHit victim = ctx.target();
+            if (victim == null) {
+                throw new IllegalStateException(
+                        "APPLY_DOT scales off the target's Max HP (\"scale\": \"target_max_hp\"), but this event carries no target");
+            }
+            magnitude = victim.getMaxHp() * effect.getPercent();
+        } else {
+            magnitude = derivedMagnitude(effect, ctx);
         }
-        return derivedMagnitude(effect, ctx);
+        return applyDerivedCeiling(effect, ctx, magnitude);
+    }
+
+    /**
+     * 「最多不超过卢卡攻击力的 338%」: when a rule states a derived ceiling, the magnitude is the SMALLER of the two.
+     *
+     * <p>⚠ It is a ceiling, not a floor and not a replacement: a small victim keeps its small share, and only a value that
+     * would exceed the ceiling is brought down to it.
+     */
+    private static double applyDerivedCeiling(EffectSpec effect, TriggerContext ctx, double magnitude) {
+        if (effect.getCapScale() == null) {
+            return magnitude;
+        }
+        double ceiling = resolveScale(effect.getCapScale(), effect.getCapPercent(), ctx);
+        return Math.min(magnitude, ceiling);
+    }
+
+    /** Resolves one {@code scale} + {@code percent} pair into a number (owner attributes, the owner's Max HP/energy, or the target's Max HP). */
+    private static double resolveScale(String scale, double percent, TriggerContext ctx) {
+        String key = scale == null ? "" : scale.trim();
+        if ("target_max_hp".equals(key)) {
+            CanHit victim = ctx.target();
+            if (victim == null) {
+                throw new IllegalStateException(
+                        "a ceiling scales off the target's Max HP, but this event carries no target");
+            }
+            return victim.getMaxHp() * percent;
+        }
+        Character owner = requireCharacterOwner(null, ctx);
+        if ("self_max_energy".equals(key) || "owner_max_energy".equals(key)) {
+            return percent * owner.getMaxEnergy();
+        }
+        AttributeType attribute = key.startsWith("self_attr:")
+                ? AttributeType.fromString(key.substring("self_attr:".length()))
+                : AttributeType.fromString(key);
+        DoubleValue value = owner.getAttribute(attribute);
+        if (value == null) {
+            throw new IllegalStateException(
+                    "a ceiling scales off " + attribute + ", which " + owner.getName() + " has no resolved value for");
+        }
+        return percent * value.get();
     }
 
     /**
@@ -3056,6 +3127,13 @@ public final class TriggerInterpreter {
         }
         // The spelling, and (for the attribute family) the name: `scaleAttribute` is the one reader of that
         // vocabulary, shared with MODIFY_ATTR's derived value so the two cannot drift.
+        // ⚠ 「等同于**自身** 24.00% 生命上限」 (1111 卢卡): the VICTIM's own maximum is the one scale
+        // outside the owner's attributes a DOT may name (2026-09-28). Accepted HERE rather than by widening
+        // scaleAttribute, whose other reader (MODIFY_ATTR) must keep refusing it.
+        if ("target_max_hp".equals(effect.getScale().trim())) {
+            requirePercent(effect, op, spec);
+            return;
+        }
         scaleAttribute(effect, op, spec);
         requirePercent(effect, op, spec);
     }

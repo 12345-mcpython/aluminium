@@ -122,6 +122,28 @@
       }
     ],
     "source": "1111 卢卡 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 120%、终结技 330%、强化普攻 20%/80% 都是该行）",
-    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: 战技「有 100% 的基础概率使目标陷入**裂伤**状态，持续 3 回合。裂伤状态下…受到等同于**自身 24.00% 生命上限**的物理属性持续伤害，**最多不超过卢卡攻击力的 338%**」 (the DOT itself is `APPLY_DOT` with `base_chance` + `scale` — but the ceiling is a **second derived value**, so it is the `min_of_two` gap: shipping the DOT without it would over-damage exactly the high-HP targets it is built for), 天赋「当持有的【斗志】≥ 2 层时，普攻强化为【直冲碎天拳】」与「强化普攻击中裂伤目标后，使其裂伤立即产生 1 次相当于原伤害 85% 的伤害」 (a skill replacement, plus 「make a DOT tick now」 — two separate gaps), 秘技「进入战斗后对敌方**随机单体**造成 50% 攻击力的伤害…并使其陷入裂伤…」（a random single target + the same capped DOT）, and 星魂 1–6 (not yet read clause by clause; the ones that raise 【斗志】's cap belong to the same cap-change family the ultimate's note mentions)."
+    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: ⚠ **2026-09-28 补齐**：战技的裂伤已写出（见本文件最后一条规则）—— 它此前整句登记，因为「自身 24% 生命上限」需要**目标侧份额**、而「最多不超过 338%」是 **min_of_two**（两个派生值取小）。两者都已落地。 ⚠ **仍登记**：天赋的强化普攻替换与\"裂伤立即结算\"、秘技的随机单体、星魂 1–6。"
+  },
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_lacerate",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_DOT",
+        "element": "Physical",
+        "base_chance": 1.0,
+        "scale": "target_max_hp",
+        "percent": 0.24,
+        "cap_scale": "self_attr:ATTACK",
+        "cap_percent": 3.38,
+        "turns": 3,
+        "target": "target"
+      }
+    ],
+    "source": "1111 卢卡 战技 裂伤拳 (111102, BPSkill/SingleAttack): 「对指定敌方单体造成等同于卢卡120%攻击力的物理属性伤害，随后有100%的基础概率使目标陷入裂伤状态，持续3回合。裂伤状态下，敌方目标每回合开始时受到等同于自身24.00%生命上限的物理属性持续伤害，最多不超过卢卡攻击力的338%。」",
+    "note": "「随后有 **100% 的基础概率**使目标陷入**裂伤**状态，持续 3 回合；裂伤状态下…受到等同于**自身 24.00% 生命上限**的物理属性持续伤害，**最多不超过卢卡攻击力的 338%**」 — the 120% damage is the engine's own skill path. ⚠ Three spellings, each load-bearing: `base_chance: 1.0` (a roll, so it meets effect resistance), `scale: target_max_hp` (⚠ 「**自身**」 is the VICTIM's maximum, and every other DOT scale in this engine is the rule OWNER's — this spelling was added for this sentence; it is read when the DOT LANDS, so a later change to the victim's Max HP does not move a DOT that is already ticking), and `cap_scale`/`cap_percent` (⚠ 「最多不超过…338%」 is a **min of two derived values**: the engine takes the smaller, so a low-HP victim keeps its small share and only an excessive one is brought down. Shipping the DOT without the ceiling would over-damage exactly the high-HP targets it is built for — a wrong number that only shows up against bosses, which is why this clause stayed registered until the ceiling existed)."
   }
 ]
