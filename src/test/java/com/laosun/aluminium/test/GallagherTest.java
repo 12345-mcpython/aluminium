@@ -60,6 +60,25 @@ public class GallagherTest {
     // Helpers
     // ==================================================================
 
+    /** ⚠ End to end: the swapped slot-8 skill loads REAL data, so the enhanced attack actually lands. */
+    @Test
+    public void theShippedSwapDealsDamage() {
+        Fixture f = new Fixture();
+        f.battle.castImmediate(f.gallagher.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                f.gallagher, List.of(f.enemy));
+
+        var enhanced = f.gallagher.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
+        Assertions.assertEquals(com.laosun.aluminium.enums.SkillCategory.NORMAL, enhanced.getData().getCategory(),
+                "⚠ precondition (the round-113 lesson): the swapped skill must LOAD, not merely carry the right slot number");
+
+        double before = f.enemy.getCurrentHp();
+        f.battle.castImmediate(enhanced, f.gallagher, List.of(f.enemy));
+        f.battle.fireAfterAttack(f.gallagher, f.enemy, List.of(f.enemy), 1.0);
+
+        Assertions.assertTrue(f.enemy.getCurrentHp() < before,
+                "「将下一次普攻强化为【酒花奔涌】」 — the enhanced basic attack is a real attack");
+    }
+
     private static final class Fixture {
         private final Character gallagher;
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
