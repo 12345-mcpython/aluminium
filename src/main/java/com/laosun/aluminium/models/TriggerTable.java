@@ -781,7 +781,7 @@ public class TriggerTable {
      * {@link AttributeType}, the second for shape here and for existence where the character is assembled.
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("hit_count", "hp_percent", "target_hp_percent", "target_debuff_count", "self_summon_count",
+            Set.of("hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
                     "target_summon_count", "self_max_energy", "from_skill_id");
 
     /**
@@ -2306,6 +2306,11 @@ public class TriggerTable {
                 // 「若该目标当前生命值百分比大于等于 30%」 -- the OTHER unit's HP, which `hp_percent` cannot ask
                 // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
                 case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());
+                // ? The same fraction BEFORE this event's loss (2026-09-29): 「降到50%或以下」 is a CROSSING, not "is below half", and the
+                // difference is firing once versus firing on every later hit. HP_LOST carries the loss in `amount`, so before = (current + amount) / max.
+                case "target_hp_percent_before" -> ctx.target() == null || ctx.target().getMaxHp() <= 0
+                        ? Double.NaN
+                        : Math.min(1.0, (ctx.target().getCurrentHp() + ctx.amount()) / ctx.target().getMaxHp());
                 case "self_summon_count" -> summonCount(ctx.owner(), ctx);
                 // 「若目标拥有召唤物」 — the same question about the OTHER unit. It is a separate name rather
                 // than a subject prefix because the two are asked in the same sentence often (relic 127 asks
