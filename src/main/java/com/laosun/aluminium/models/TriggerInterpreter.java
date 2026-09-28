@@ -297,7 +297,7 @@ public final class TriggerInterpreter {
                     if (maxHpShare) {
                         requirePercent(effect, op, spec);
                     } else {
-                        requireDerivedScale(effect, op, spec);
+                        requireDerivedScale(effect, op, spec, false);
                     }
                     requireElement(effect, op, spec);
                 } else {
@@ -309,7 +309,19 @@ public final class TriggerInterpreter {
             }
             case "MODIFY_ATTR" -> {
                 requireAttribute(effect, op, spec);
-                requirePercent(effect, op, spec);
+                // ? A FLAT boost as well as a share (2026-09-29). 「速度提高50点」 states points, not a percentage; 17 documents do this (7 for SPD alone).
+                // The rule is "exactly one": a DERIVED modifier reads `percent x attribute + amount`, while a plain one is either a share or a flat value,
+                // and writing both there would silently let one win.
+                boolean derivedModifier = effect.getScale() != null && !effect.getScale().isBlank();
+                if (derivedModifier) {
+                    requirePercent(effect, op, spec);
+                } else if ((effect.getPercent() == null) == (effect.getAmount() == null)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " needs exactly one of \"percent\" (a share) or \"amount\" (a flat value) unless it also states a \"scale\", in which "
+                                    + "case both are read as percent x scale + amount; it states "
+                                    + (effect.getPercent() == null && effect.getAmount() == null ? "neither" : "both")
+                                    + " (source: " + spec.getSource() + ")");
+                }
                 // ? A derived ceiling on a modifier (2026-09-29): both fields, or neither.
                 if ((effect.getCapScale() != null || effect.getCapPercent() != null)
                         && (effect.getCapScale() == null || effect.getCapPercent() == null)) {
@@ -317,7 +329,7 @@ public final class TriggerInterpreter {
                             "Op " + op + " states a derived ceiling, which needs BOTH \"cap_scale\" and \"cap_percent\" "
                                     + "(source: " + spec.getSource() + ")");
                 }
-                requireDerivedScale(effect, op, spec);
+               requireDerivedScale(effect, op, spec, true);
                 requireDuration(effect, op, spec);
                 requireStackCap(effect, op, spec);
                 requireTickOwner(effect, op, spec);
@@ -1334,8 +1346,14 @@ public final class TriggerInterpreter {
         // when the rule fires, and it is an ABSOLUTE number in the target attribute's units: the documents that
         // need this state a value ("equal to 12% of Sunday's CRIT DMG plus 8%"), not a share of the target's base.
         // ⚠ Which is why it does not go through `statModifier`'s usual base-attribute convention (`add_percent`).
-        boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
-        double magnitude = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();
+        // ? A flat `amount` is ABSOLUTE too (2026-09-29): measured, `amount: 50` on SPEED produced +5500, i.e. 50 x the target's base speed, because a
+        // plain modifier is fed to `statModifier` as an `add_percent` fraction. The same reasoning the derived case already follows applies here.
+        boolean derived = (effect.getScale() != null && !effect.getScale().isBlank()) || effect.getPercent() == null;
+        // ? A plain modifier is a share OR a flat value (2026-09-29): `amount` alone means "raise the attribute by this many points", which the
+        // validator enforces as exactly one of the two.
+        double magnitude = effect.getPercent() != null
+                ? (derived ? derivedMagnitude(effect, ctx) : effect.getPercent())
+                : effect.getAmount();
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
@@ -2604,10 +2622,10 @@ public final class TriggerInterpreter {
      *       cannot mean is refused instead of being dropped.</li>
      * </ul>
      */
-    private static void requireDerivedScale(EffectSpec effect, String op, TriggerSpec spec) {
+    private static void requireDerivedScale(EffectSpec effect, String op, TriggerSpec spec, boolean allowFlat) {
         boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
         if (!derived) {
-            if (effect.getAmount() != null) {
+            if (effect.getAmount() != null && !allowFlat) {
                 throw new IllegalArgumentException(
                         "Op " + op + " states \"amount\" without a \"scale\": a plain modifier's magnitude is "
                                 + "\"percent\", so the amount would be ignored. Either say what it is a share of "
