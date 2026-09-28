@@ -410,6 +410,22 @@ public class EffectSpec {
     private Double speed;
 
     /**
+     * \u300c\u8be5\u4f24\u5bb3\u66b4\u51fb\u7387\u56fa\u5b9a\u4e3a 100%\u300d -- a damage instance that does not roll to crit (M-55 姊妹).
+     *
+     * <p>⚠ Only {@code 1.0} is a legal value, and that is the vocabulary being closed rather than lazy: a
+     * <b>probabilistic</b> crit rate is the {@code CRIT_CHANCE} attribute and always has been, while this field says
+     * \u300c\u56fa\u5b9a\u4e3a\u300d -- the outcome is not rolled at all (`Damage.fixedCrit`). A "fixed 50%" would be a third thing
+     * nobody can read, so the loader refuses it by name.
+     */
+    private Double critRate;
+
+    /**
+     * \u300c\u66b4\u51fb\u4f24\u5bb3\u56fa\u5b9a\u4e3a 150%\u300d -- the crit damage a {@code fixed_crit} instance uses instead of the
+     * attacker's own crit damage stat (1.5 = 150%). Stated together with {@link #critRate}, never alone.
+     */
+    private Double critDamage;
+
+    /**
      * The <b>damage element</b> of the per-turn damage this effect attaches — {@code "Ice"} / {@code "Fire"} / …
      * (the {@code DamageElement} spelling, the same one {@code memosprites/<cid>.json}'s {@code attack.element}
      * uses). Read by {@code APPLY_DOT}, and by {@code APPLY_CONTROL} for the state's own per-turn damage.
