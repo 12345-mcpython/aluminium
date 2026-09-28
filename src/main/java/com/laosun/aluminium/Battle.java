@@ -844,6 +844,44 @@ public class Battle {
      * @param target the unit carrying the DOTs (may be a character -- a boss burning us is the same path)
      * @return the total damage settled this time (the sum of all DOTs)
      */
+    /**
+     * Settles <b>one extra instance</b> of a damage-over-time state on a unit, right now, at {@code percent} of what that
+     * state is currently dealing (2026-09-28).
+     *
+     * <p>「使其当前承受的裂伤状态<b>立即产生 1 次</b>相当于原伤害 85% 的伤害」 (1111 卢卡 天赋). It mirrors
+     * {@link #tickDots(CanHit)} — same source, element and {@link DamageType#DOT}, same {@code EnergyGrant.KILL_ONLY} — so
+     * this is "the state ticked once more", not a new kind of damage. ⚠ The duration is <b>not</b> touched: the sentence
+     * asks for one extra instance of damage, not for the state to age.
+     *
+     * <p>⚠ The layer ceiling is honoured while summing (the same per-state grouping {@code tickDots} uses): a capped DOT
+     * ticks its <b>capped</b> total, because 「当前承受的…伤害」 is what it is dealing now.
+     *
+     * @param target  the unit carrying the state
+     * @param element the element whose state is to tick (an element IS a state in this engine)
+     * @param percent the share of that state's current damage (0.85 = 「85%」)
+     * @return the damage actually settled
+     */
+    public double tickDotStateNow(CanHit target, DamageElement element, double percent) {
+        if (target == null || target.isDeath() || element == null) {
+            return 0;
+        }
+        double total = 0;
+        Map<DamageElement, Integer> paidPerState = new HashMap<>();
+        for (DotBuff dot : target.getBuffManager().allBuffsOf(DotBuff.class)) {
+            int paid = paidPerState.merge(dot.getElement(), 1, Integer::sum);
+            if (dot.getElement() != element) {
+                continue;                                        // only the named state ticks
+            }
+            if (dot.getMaxStacks() > 0 && paid > dot.getMaxStacks()) {
+                continue;                                        // 「最多叠加 N 层」: this layer adds no damage
+            }
+            Damage damage = new Damage(dot.getSource(), target, dot.getElement(), DamageType.DOT,
+                    dot.getBaseDamage() * percent);
+            total += applyDamage(target, damage, EnergyGrant.KILL_ONLY);
+        }
+        return total;
+    }
+
     public double tickDots(CanHit target) {
         if (target == null || target.isDeath()) {
             return 0;
