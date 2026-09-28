@@ -1,0 +1,73 @@
+[
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "actor == self",
+      "target_debuff_count >= 1"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 10
+      }
+    ],
+    "source": "1106 佩拉 天赋 数据采集 (110604, Enhance): 「施放攻击后若敌方目标处于负面效果状态，则佩拉额外恢复10.00点能量。该效果每次攻击只能触发1次。」",
+    "note": "「施放攻击后**若敌方目标处于负面效果状态**，则佩拉额外恢复 10 点能量」. ⚠ The condition is `target_debuff_count >= 1` — the numeric variable that reads how many negative buffs the **event's target** carries; this file is its first shipped reader. ⚠ 「该效果**每次攻击只能触发 1 次**」 needs no field: `ALLY_ATTACK` fires once per attack (not once per hit), so the limit is the event's own grain — stating `per_turn: 1` on top would be a *different* rule (it would also cap it across several attacks in one turn, which the sentence does not say)."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "when": [
+      "actor == self",
+      "target_debuff_count >= 1"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.2
+      }
+    ],
+    "source": "1106 佩拉 行迹 痛击 (1106101): 「对处于负面效果的敌方目标造成的伤害提高20%。」",
+    "note": "「对处于**负面效果**的敌方目标造成的伤害提高 20%」 — the same condition as the talent, read on the instance being settled (`BOOST_DAMAGE` is instance-only, which is what a damage-dealt conditional means). ⚠ `target_debuff_count` counts the debuffs on the unit being hit, so 「处于负面效果」 cannot be confused with a debuff on somebody else. ⚠ `actor == self` keeps it to her damage."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "EFFECT_HIT_RATE",
+        "percent": 0.1,
+        "permanent": true,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1106 佩拉 行迹 秘策 (1106102): 「佩拉在场时，我方全体的效果命中提高10%。」",
+    "note": "「**佩拉在场时**，我方全体的**效果命中**提高 10%」 — an existing attribute (`EFFECT_HIT_RATE`), a party-wide target, and 「在场时」 is a loadout fact with no duration (`permanent: true`, not because it is forever but because no turn count is stated)."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1106 佩拉 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 210%、终结技 100% 都是该行）",
+    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of her document, with the blocker each one hits: 战技「**解除指定敌方单体的 1 个增益效果**，同时造成…伤害」 (the engine's `DISPEL` reaches **negative** buffs on our own side — cleansing an *enemy* means removing a **positive** buff, and there is no op for that direction; a real reader for a future \"remove a buff from the enemy\" op), 终结技「有 **100% 的基础概率**使敌方每个单体目标陷入【通解】状态…【通解】状态下，敌方目标防御力降低 40%，持续 2 回合」 (a *state* with a base chance: `APPLY_DOT` and `APPLY_CONTROL` roll one, `APPLY_BUFF` does not — and applying it unconditionally would drop 「基础概率」, which is a different mechanic rather than a smaller number), 行迹 追歼「施放战技**解除增益效果时**，下一次攻击造成的伤害提高 20%」(rides on the 战技), and 星魂 1–6 / the 秘技 (not yet read clause by clause)."
+  }
+]
