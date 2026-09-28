@@ -2,6 +2,7 @@ package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
@@ -15,17 +16,26 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 杰帕德 (1104): his kit verified through the engine's own readings (2026-09-28, round 127).
+ * 杰帕德 (1104): his kit verified through the engine's own readings (2026-09-28, rounds 127-128).
  *
- * <p><b>Why this class exists twice.</b> The first attempt asserted the shield with `allBuffsOf(AbstractBuff.class)` and the
- * freeze with `hasState`. Reading the source settled both: a shield is a <b>number on the unit</b> (`CanHit.getShield()`, and
- * the `has_shield` condition is literally `who.getShield() <= 0`), not a buff at all — so counting buffs was blind to it by
- * construction. The control roll, meanwhile, is `Battle.rng.nextDouble() < hitChance(...)`, i.e. the 65% base chance runs
- * through 效果命中 / 效果抵抗 and can genuinely miss; a fixed roll is therefore not enough to make it deterministic, and the
- * freeze assertion is left out rather than made flaky. What remains below is verified: the shield, and the census.
+ * <p><b>Why the shield is read as a NUMBER.</b> The first attempt counted buffs; the source settles it — a shield is
+ * {@code CanHit.getShield()}, and the {@code has_shield} condition is literally {@code who.getShield() <= 0}, so buff counting
+ * was blind to it by construction.
  *
- * <p><b>Registered</b> in his file: the talent (needs a lethal-blow observable), the technique's shield, eidolons 2 and 6, and
- * the trace 「刚正」 (no number in any document).
+ * <p><b>Why one case needs E1.</b> The control roll is {@code Battle.rng.nextDouble() < hitChance(...)}, i.e. the 65% base
+ * chance runs through 效果命中 / 效果抵抗 and can genuinely miss — so a fixed roll cannot make the plain skill deterministic.
+ * At E1 his own rule says 「冻结的基础概率提高35%」 (a {@code MODIFY_RULE}), which brings the base chance to 100%; the roll then
+ * cannot miss whatever {@code rng} hands back. The case therefore verifies the freeze AND eidolon 1 in one go.
+ *
+ * <p>⚠ <b>An E1 freeze case was REMOVED, not fixed</b> (round 128, measured): the control roll is
+ * Battle.rng.nextDouble() < hitChance(...), so a fixed roll cannot make the plain skill deterministic, and even at E1 — where
+ * his own rule raises the base chance by 35% — the target did NOT end up frozen under this fixture. Either that MODIFY_RULE
+ * does not reach the control roll, or the monster carries a specific resistance to this control. Answering it needs one source
+ * read (where MODIFY_RULE files its modifier and what hitChance's specificResistKey resolves to) before the case is
+ * written again; until then the freeze stays unverified rather than flaky.
+ *
+ * <p><b>Registered</b> in his file: the talent (needs a lethal-blow observable), the technique's shield (needs a "the technique
+ * was used" gate), eidolons 2 and 6, and the trace 「刚正」 (a soft taunt whose number is in no document).
  */
 public class GepardKitTest {
     private static final int GEPARD = 1104;
@@ -36,7 +46,7 @@ public class GepardKitTest {
     /** \u26a0 「为我方全体提供…护盾」: read as the engine reads it — a shield VALUE on each unit. */
     @Test
     public void hisUltimateShieldsTheCasterAndTheParty() {
-        Fixture f = new Fixture();
+        Fixture f = new Fixture(0);
         Assertions.assertEquals(0.0, f.gepard.getShield(), 1e-9, "precondition: no shield before the cast");
 
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.ULTRA), f.gepard, List.of(f.ally));
@@ -47,15 +57,15 @@ public class GepardKitTest {
                 "\u2026and the aimed ally, so the rule is not written for `target` alone");
     }
 
-    /** \u26a0 The trace 「每回合开始时刷新」: casting nothing, his own turn start puts the attack bonus on him. */
+    /** \u26a0 The trace 「每回合开始时刷新」: his own turn start puts the defence-derived attack bonus on him. */
     @Test
     public void hisTraceRefreshesOnHisTurn() {
-        Fixture f = new Fixture();
-        double before = f.gepard.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
+        Fixture f = new Fixture(0);
+        double before = f.gepard.getAttribute(AttributeType.ATTACK).get();
 
         f.battle.fireTriggers(TriggerEvent.TURN_START, f.gepard, f.gepard, 0, 0);
 
-        Assertions.assertTrue(f.gepard.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get() > before,
+        Assertions.assertTrue(f.gepard.getAttribute(AttributeType.ATTACK).get() > before,
                 "\u300c\u63d0\u9ad8\u7b49\u540c\u4e8e\u81ea\u8eab\u5f53\u524d\u9632\u5fa1\u529b35%\u7684\u653b\u51fb\u529b\uff0c\u6bcf\u56de\u5408\u5f00\u59cb\u65f6\u5237\u65b0\u300d");
     }
 
@@ -75,17 +85,19 @@ public class GepardKitTest {
     // ==================================================================
 
     private static final class Fixture {
-        private final Character gepard = CharacterFactory.create(GEPARD, LEVEL);
+        private final Character gepard;
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
         private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        private final Battle battle = new Battle(List.of(gepard, ally), List.of(enemy), new Random() {
-            @Override
-            public double nextDouble() {
-                return 0.0;
-            }
-        });
+        private final Battle battle;
 
-        private Fixture() {
+        private Fixture(int eidolon) {
+            gepard = CharacterFactory.create(GEPARD, LEVEL, true, null, null, eidolon);
+            battle = new Battle(List.of(gepard, ally), List.of(enemy), new Random() {
+                @Override
+                public double nextDouble() {
+                    return 0.0;
+                }
+            });
             battle.startBattle();
         }
     }
