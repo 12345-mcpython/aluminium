@@ -13,6 +13,50 @@
       }
     ],
     "source": "1321 大丽花 行迹 又一场葬礼: 「进入战斗时，使其他角色的击破特攻提高，提高数值等同于#1[i]%大丽花的击破特攻+#3[i]%，持续#2[i]回合。」 param = [0.24, 1, 0.5, 3] → #1 = 0.24, #2 = 1 回合, #3 = 0.5",
-    "note": "The party's Break Effect = **24% of her own** Break Effect **+ 50%** (0.5 in ratio units, 1.0 = 100%), for 1 turn. ⚠ The derived value is the reason `MODIFY_ATTR` grew a `scale` (P11-2, M-42): `percent` alone can only be a literal, and writing a number here would be wrong the moment her own Break Effect is not 0. ⚠ `scale: \"self_attr:BREAKING_EFFECT\"` is read off the **rule owner** (the same spelling the condition DSL uses), and it is read **when the rule fires**, then frozen — so a later change to her Break Effect does not retro-rewrite the buff. ⚠ **No `when` at all**, and that is not laziness: `BATTLE_START` is fired to every character's own table with **no actor and no target**, so `actor == self` there would be a rule that can never fire (the loader now refuses that spelling outright). The table *is* hers, so 「她的战斗开始时」 needs no condition. ⚠ `target: \"other_allies\"` is 「**其他**角色」: her own Break Effect is not touched (and note the derived value already counts hers, so granting it to herself would be a different sentence). ⚠ NOT authored: the second sentence 「当大丽花受到队友提供的治疗效果或护盾时，再次触发该效果，持续#4[i]回合，单个回合内不可重复触发」 — the healing half is expressible (HEALED + `actor != self`), the **shield** half is not (the engine has no \"a shield was granted\" event), and a half-authored retrigger would fire on heals alone; registered as M-43."
+    "note": "The party's Break Effect = **24% of her own** Break Effect **+ 50%** (0.5 in ratio units, 1.0 = 100%), for 1 turn. ⚠ The derived value is the reason `MODIFY_ATTR` grew a `scale` (P11-2, M-42): `percent` alone can only be a literal, and writing a number here would be wrong the moment her own Break Effect is not 0. ⚠ `scale: \"self_attr:BREAKING_EFFECT\"` is read off the **rule owner** (the same spelling the condition DSL uses), and it is read **when the rule fires**, then frozen — so a later change to her Break Effect does not retro-rewrite the buff. ⚠ **No `when` at all**, and that is not laziness: `BATTLE_START` is fired to every character's own table with **no actor and no target**, so `actor == self` there would be a rule that can never fire (the loader now refuses that spelling outright). The table *is* hers, so 「她的战斗开始时」 needs no condition. ⚠ `target: \"other_allies\"` is 「**其他**角色」: her own Break Effect is not touched (and note the derived value already counts hers, so granting it to herself would be a different sentence). ⚠ The trace's SECOND sentence is the two rules below (they were registered as M-43 until 2026-09-28)."
+  },
+  {
+    "on": "HEALED",
+    "when": [
+      "target == self",
+      "actor is_ally",
+      "actor != self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "BREAKING_EFFECT",
+        "scale": "self_attr:BREAKING_EFFECT",
+        "percent": 0.24,
+        "amount": 0.5,
+        "turns": 3,
+        "target": "other_allies"
+      }
+    ],
+    "per_turn": 1,
+    "source": "1321 大丽花 行迹 又一场葬礼 第二句: 「当大丽花受到队友提供的治疗效果或护盾时，再次触发该效果，持续#4[i]回合，单个回合内不可重复触发。」 param = [0.24, 1, 0.5, 3] → #4 = 3 回合",
+    "note": "「当大丽花受到**队友提供的治疗**效果…时，**再次触发该效果**，持续**3**回合，单个回合内不可重复触发」 -- one of the two halves the trace needs (the shield half is the rule below; shipping only one would make the trace fire on heals OR shields instead of both). ⚠ **「该效果」 was read before building anything**: the effect being re-triggered is the sentence above's -- 「使其他角色的击破特攻提高，提高数值等同于 24% 大丽花的击破特攻 + 0.5」 -- so this is that SAME effect granted again, only with `turns: 3` instead of 1. That is why the engine needs **no “re-run another rule” op** here (a `RETRIGGER_RULE` was planned and is now explicitly unnecessary for this reader): re-granting the buff with a longer duration is what 「再次触发…持续3回合」 describes, and since the engine refreshes same-kind modifiers rather than stacking, the result is one buff on each other ally, not two. ⚠ `actor is_ally` + `actor != self` is 「**队友**提供的」: `is_ally` alone would also accept a heal she gave HERSELF (`is_ally` answers “on our side”, and she is), which is a different sentence -- `!=` is the DSL's spelling for it (`!` cannot negate an identity comparison; the loader says so). ⚠ `target == self` is 「大丽花受到」: `HEALED` is delivered to every one of our tables, so without it the rule would fire when a teammate is healed. ⚠ `per_turn: 1` is 「单个回合内不可重复触发」 (the engine counts the OWNER's turns). ⚠ The healer attribution this depends on was fixed in the same round: a `HEAL` effect used to call `Battle.heal(null, …)`, so no rule-driven heal had a provider at all; it now passes the rule owner (measured: nothing shipped read `HEALED`'s actor before, and no shipped content grants `OUTGOING_HEALING_BOOST`, so no number moved)."
+  },
+  {
+    "on": "SHIELD_GRANTED",
+    "when": [
+      "target == self",
+      "actor is_ally",
+      "actor != self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "BREAKING_EFFECT",
+        "scale": "self_attr:BREAKING_EFFECT",
+        "percent": 0.24,
+        "amount": 0.5,
+        "turns": 3,
+        "target": "other_allies"
+      }
+    ],
+    "per_turn": 1,
+    "source": "1321 大丽花 行迹 又一场葬礼 第二句: 「当大丽花受到队友提供的治疗效果或护盾时，再次触发该效果，持续#4[i]回合，单个回合内不可重复触发。」 param = [0.24, 1, 0.5, 3] → #4 = 3 回合",
+    "note": "The **shield** half of the same sentence: 「…或**护盾**时」. `SHIELD_GRANTED` is the event this round added (M-43) -- the engine had `HEALED` but shields were only an op, so this half could not be written at all. ⚠ The event's `actor` is the **provider** (same convention as `HEALED`), which is why 「队友提供的」 is `actor is_ally` + `actor != self` again: a shield she grants HERSELF must not count as a teammate's. ⚠ A **raw** grant (no `turns`, i.e. `Battle.grantShield` with no provider) states `actor = null`, so this rule correctly stays silent -- a shield nobody is credited with must not answer “who provided it”. ⚠ Fired for the TIMED path too (the interpreter announces it after the `ShieldBuff` is on), which is the path 三月七's Skill and 星魂 2 shields take. ⚠ The effect is the same one, granted for 3 turns: see the rule above for why 「再次触发该效果」 needs no new op. 「当大丽花受到队友提供的治疗效果或护盾时，再次触发该效果，持续#4[i]回合，单个回合内不可重复触发」 — the healing half is expressible (HEALED + `actor != self`), the **shield** half is not (the engine has no \"a shield was granted\" event), and a half-authored retrigger would fire on heals alone; registered as M-43."
   }
 ]
