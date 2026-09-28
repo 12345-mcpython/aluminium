@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -432,6 +432,11 @@ public final class TriggerInterpreter {
                 }
                 rejectCountdownExtras(effect, op, spec);
             }
+            case "ADD_STACK" -> {
+                // 「每当我方目标…施放2次…后」 / 「触发2次后自动解除」: a counter, which is a named stack buff (see StackBuff).
+                requireBuff(effect, op, spec);
+                requireDuration(effect, op, spec);
+            }
             case "RAISE_SKILL_LEVEL" -> {
                 // 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5 and the same sentence in most kits): the level a skill is
                 // READ at is character data plus this battle's raises (M-32), and one op is what raises it -- never a
@@ -553,10 +558,18 @@ public final class TriggerInterpreter {
         if (table == null || table.isEmpty()) {
             return 0;
         }
-        List<CompiledRule> rules = table.matching(event, ctx);
+        // ⚠ Per rule, not up front (2026-09-28): see TriggerTable.rulesFor. A condition that reads what an earlier
+        // rule of the SAME event just changed (a counter marked on this attack, say) has to be evaluated when its own
+        // rule is reached, or it can never be true.
+        List<CompiledRule> rules = table.rulesFor(event);
         CanHit owner = ctx.owner();
         int fired = 0;
         for (CompiledRule rule : rules) {
+            // ⚠ The conditions are checked HERE, per rule, because rulesFor no longer filters (2026-09-28). Harmless
+            // to re-check: matches is the same pure predicate matching used.
+            if (!rule.matches(ctx)) {
+                continue;
+            }
             // Firing limits (cooldown / once per battle / per-turn count). Checked *after* matching and before
             // applying, because the limit is about how often the rule may run, not about whether it fits the
             // event: `matching` stays a pure predicate, which is what `TriggerTable.ruleCount` and the
@@ -666,6 +679,7 @@ public final class TriggerInterpreter {
             case "MODIFY_RULE" -> modifyRule(effect, ctx);
             case "RAISE_SKILL_LEVEL" -> raiseSkillLevel(effect, ctx);
             case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
+            case "ADD_STACK" -> addStack(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1846,6 +1860,35 @@ public final class TriggerInterpreter {
      * <p>⚠ The name comes from the rule's own {@code buff} when it states one (it is what the log shows, and nothing
      * reads it back, so it needs no id).
      */
+    /**
+     * {@code ADD_STACK}: 「每当我方目标对【承负】状态下的敌方目标施放 2 次普攻/战技/终结技后…」 (2026-09-28) — one more mark on a
+     * named counter.
+     *
+     * <p><b>Why an op and not a modifier.</b> A counter must not touch the panel: a {@code MODIFY_ATTR} with a zero
+     * magnitude would be a lie about what the buff is, and picking some attribute to hang it on would be worse. So the
+     * carrier is {@link com.laosun.aluminium.models.buff.StackBuff}: a buff with a name, a lifetime and no effect.
+     *
+     * <p>⚠ <b>Capped by {@code max_stacks}</b> (default 1, i.e. a plain flag): 「2 次」 is a threshold the content reads
+     * with {@code target_stacks:<name> >= 2}, and without a cap a stray extra event would push the count past it and
+     * the rule that resets it would fire twice in a row.
+     */
+    private static void addStack(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        int cap = effect.stackCap() == null ? 1 : effect.stackCap();
+        String name = effect.getBuff().trim();
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target.getBuffManager().stacksOf(name) >= cap) {
+                continue;                       // 「2 次」 is a threshold, not an invitation to keep counting
+            }
+            boolean permanent = unticked(effect);
+            AbstractBuff stack = new com.laosun.aluminium.models.buff.StackBuff(
+                    name, permanent ? 1 : effect.getTurns(), permanent, cap);
+            stack = withLifetime(stack, effect);
+            stack = withTickOwner(stack, effect, ctx);
+            stack = withSource(stack, ctx);
+            target.getBuffManager().addBuff(stack);
+        }
+    }
+
     private static void startCountdown(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String name = effect.getBuff() == null || effect.getBuff().isBlank()
                 ? (ctx.owner() == null ? "countdown" : ctx.owner().getName() + " 倒计时")
