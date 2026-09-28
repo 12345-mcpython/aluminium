@@ -117,6 +117,30 @@ public class NatashaHealTest {
         Assertions.assertEquals(afterFourth, f.ally.getCurrentHp(), 1.0, "…and then it is over");
     }
 
+    /**
+     * ⚠ A second cast <b>restarts</b> the regeneration instead of piling another one on: one tick's worth, not two.
+     *
+     * <p>This case exists because the first version of the suite did not cover refresh at all — flipping
+     * {@code RegenBuff.isSameKind} to {@code false} (i.e. letting them stack) left every assertion green (measured
+     * mutation m2, 0 red). 「同时目标每回合开始时为其回复…」 describes one regeneration that a new cast restarts.
+     */
+    @Test
+    public void aSecondCastRefreshesTheRegeneration() {
+        Fixture f = new Fixture();
+        // ⚠ A deep gap on purpose: at 50% the two casts’ instant heals already fill the ally, the cap clamps both
+        // expectations to max HP, and a STACKED pair would have passed this case too (measured: mutation m2 stayed 0 red).
+        f.ally.takeDamage(f.ally.getMaxHp() * 0.9);
+        double perTick = (0.072 * f.natasha.getMaxHp() + 192) * 1.1;
+
+        f.castSkillOn(f.ally);
+        f.castSkillOn(f.ally);
+
+        double before = f.ally.getCurrentHp();
+        f.allyTurn();
+        Assertions.assertEquals(Math.min(f.ally.getMaxHp(), before + perTick), f.ally.getCurrentHp(), 1.0,
+                "two casts, one regeneration: a stacked pair would settle twice in the same turn");
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
