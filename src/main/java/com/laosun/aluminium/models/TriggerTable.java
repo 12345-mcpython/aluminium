@@ -860,6 +860,16 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])is_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The {@code is_other_ally} keyword (2026-09-28): "<b>that unit is on our side and is not me</b>".
+     *
+     * <p>⚠ Why it exists: the corpus says 「卡芙卡的**队友**对敌方目标施放普攻后…」 in 16 files, and neither existing spelling fits —
+     * {@code actor is_ally} counts the owner herself (she is in {@code battle.allies}), while {@code !actor == self} is refused
+     * because negation only applies to party conditions and an equality is not one.
+     */
+    private static final Pattern IS_OTHER_ALLY =
+            Pattern.compile("(?<![\\w])is_other_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
      * The {@code has_same_path_ally} keyword: "somebody else on my side walks my Path".
      */
     private static final Pattern SAME_PATH_ALLY =
@@ -978,6 +988,19 @@ public class TriggerTable {
         }
 
         // `is_ally`: "<who> is_ally" — no argument at all, so it is checked before the operator branch too.
+        // `is_other_ally`: "<who> is_other_ally" -- same shape as `is_ally`, one clause stricter.
+        Matcher isOtherAlly = IS_OTHER_ALLY.matcher(text);
+        if (isOtherAlly.find()) {
+            String subject = normalize(text.substring(0, isOtherAlly.start()));
+            String trailing = text.substring(isOtherAlly.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"is_other_ally\": it takes no argument "
+                                + "(write \"actor is_other_ally\") (source: " + spec.getSource() + ")");
+            }
+            return new IsOtherAlly(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw);
+        }
+
         Matcher isAlly = IS_ALLY.matcher(text);
         if (isAlly.find()) {
             String subject = normalize(text.substring(0, isAlly.start()));
@@ -1807,6 +1830,46 @@ public class TriggerTable {
      * field-reading condition follows. ⚠ It is a {@link PartyCondition}, so {@code !target is_ally} means the
      * opposite <b>and</b> still fails when there is no target at all (a missing party must never become a match).
      */
+    /**
+     * {@code <who> is_other_ally} ? the unit is on our side <b>and is not the rule's owner</b> (2026-09-28).
+     *
+     * <p>The "other" half is the whole point: {@code is_ally} already answers "on our side", and the owner satisfies it. A rule
+     * that means 「my ALLY did something」 must exclude its own actions, or the follow-up it grants would trigger itself.
+     */
+    private static final class IsOtherAlly implements Condition, PartyCondition {
+        private final String subject;
+        private final String raw;
+
+        IsOtherAlly(String subject, String raw) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            if (who == null || who == ctx.owner() || ctx.battle() == null) {
+                return false;
+            }
+            return ctx.battle().allies.contains(who);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     private static final class IsAlly implements Condition, PartyCondition {
 
         private final String subject;
