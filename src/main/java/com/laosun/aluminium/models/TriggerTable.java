@@ -825,16 +825,17 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])from_skill(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
-     * The events whose {@code TriggerContext} carries the <b>causing damage instance</b>, and therefore the only ones
-     * on which {@code from_skill} can ever be true.
+     * The events whose {@code TriggerContext} carries the <b>causing cast</b>, and therefore the only ones on which
+     * {@code from_skill} can ever be true.
      *
      * <p>⚠ Checked at load time, because the alternative is the failure mode this project keeps refusing: a rule that
      * loads, fires on every matching event, and silently never matches its condition. A kill and a weakness break both
-     * happen while an instance is being settled ({@code Battle.applyDamage} / {@code Battle.reduceToughness}), and
-     * {@code DEALING_DAMAGE} is the instance's own event.
+     * happen while an instance is being settled ({@code Battle.applyDamage} / {@code Battle.reduceToughness}),
+     * {@code DEALING_DAMAGE} is the instance's own event, and {@code ALLY_ATTACK} carries the cast's category since
+     * 2026-09-28 (it is the one event that fires <b>once per cast</b>, which is what 「施放 2 次普攻/战技/终结技」 counts).
      */
     private static final Set<TriggerEvent> DAMAGE_CARRYING_EVENTS =
-            Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL);
+            Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK);
 
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
