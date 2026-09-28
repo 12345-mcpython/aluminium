@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -358,6 +358,13 @@ public final class TriggerInterpreter {
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
+            }
+            case "TICK_DOT" -> {
+                // 「使其当前承受的裂伤状态立即产生 1 次相当于原伤害 85% 的伤害」: which state, and what share of it.
+                requireElement(effect, op, spec);
+                requirePercent(effect, op, spec);
+                requireNonZeroPercent(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
             }
             case "REPLACE_SKILL" -> {
                 // 「将下一次普攻强化为【酒花奔涌】」: which slot, which data row, and how long the swap lasts.
@@ -821,6 +828,7 @@ public final class TriggerInterpreter {
             case "DISPEL" -> dispel(battle, effect, ctx);
             case "REMOVE_BUFF" -> removeBuffs(battle, effect, ctx);
             case "REPLACE_SKILL" -> replaceSkill(battle, effect, ctx);
+            case "TICK_DOT" -> tickDot(battle, effect, ctx);
             case "REMOVE_STATE" -> removeState(effect, ctx);
             case "TAUNT" -> taunt(battle, effect, ctx);
             case "APPLY_CONTROL" -> applyControl(battle, effect, ctx);
@@ -1960,6 +1968,17 @@ public final class TriggerInterpreter {
             if (target instanceof Character character) {
                 character.getBuffManager().addBuff(withSource(withLifetime(
                         new com.laosun.aluminium.models.buff.SkillSwapBuff(slot, replacement), effect), ctx));
+            }
+        }
+    }
+
+    /** {@code TICK_DOT}: 「立即产生 1 次…伤害」 — one extra instance of the named state, at the stated share. */
+    private static void tickDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        DamageElement element = DamageElement.fromString(effect.getElement());
+        double percent = effect.getPercent();
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target != null && !target.isDeath()) {
+                battle.tickDotStateNow(target, element, percent);
             }
         }
     }
