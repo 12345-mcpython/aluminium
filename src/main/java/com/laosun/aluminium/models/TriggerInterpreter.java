@@ -486,6 +486,13 @@ public final class TriggerInterpreter {
                                         + " (source: " + spec.getSource() + ")");
                     }
                     rejectAmendmentExtras(effect, op, spec, "effect_turns");
+                } else if (effect.getEffectMaxStacks() != null) {
+                    if (effect.getEffectMaxStacks() == 0) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " raises a rule's stack cap, so \"effect_max_stacks\" must not be 0 "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                    rejectAmendmentExtras(effect, op, spec, "effect_max_stacks");
                 } else if (effect.getEffectPercent() != null) {
                     if (effect.getEffectPercent() == 0) {
                         throw new IllegalArgumentException(
@@ -656,7 +663,8 @@ public final class TriggerInterpreter {
         }
         Double percentDelta = owner.ruleEffectPercentBonus(ctx.ruleId());
         Integer turnsDelta = owner.ruleEffectTurnsBonus(ctx.ruleId());
-        if (percentDelta == null && turnsDelta == null) {
+        Integer stacksDelta = owner.ruleEffectMaxStacksBonus(ctx.ruleId());
+        if (percentDelta == null && turnsDelta == null && stacksDelta == null) {
             return effect;
         }
         EffectSpec amended = effect;
@@ -665,6 +673,9 @@ public final class TriggerInterpreter {
         }
         if (turnsDelta != null) {
             amended = amended.withTurns(turnsDelta);
+        }
+        if (stacksDelta != null) {
+            amended = amended.withMaxStacks(stacksDelta);
         }
         return amended;
     }
@@ -2039,7 +2050,7 @@ public final class TriggerInterpreter {
     private static void requireOneAmendment(EffectSpec effect, String op, TriggerSpec spec) {
         int stated = 0;
         for (Object candidate : new Object[] {effect.getAmount(), effect.getBaseChance(), effect.getPercent(),
-                effect.getEffectPercent(), effect.getEffectTurns()}) {
+                effect.getEffectPercent(), effect.getEffectTurns(), effect.getEffectMaxStacks()}) {
             if (candidate != null) {
                 stated++;
             }
@@ -2067,6 +2078,10 @@ public final class TriggerInterpreter {
             // (see amendedEffect). ⚠ Not an extra rule with a longer `turns`: the two modifiers of one skill are the
             // same kind, so a second one would REPLACE the first rather than stack.
             owner.amendRuleEffectTurns(target, (int) Math.round(effect.getEffectTurns()));
+        } else if (effect.getEffectMaxStacks() != null) {
+            // 「使天赋的效果可叠加上限提高 2 层」: a CAP, not a value -- and it must be in place before any stack is
+            // attached, which it is: an amendment is filed at battle start and the stacks come from later firings.
+            owner.amendRuleEffectMaxStacks(target, (int) Math.round(effect.getEffectMaxStacks()));
         } else if (effect.getEffectPercent() != null) {
             // 「天赋的伤害提高效果额外提高 10%」: 30% -> 40%, the same rule, raised in place.
             owner.amendRuleEffectPercent(target, effect.getEffectPercent());

@@ -269,6 +269,16 @@ public class TriggerTable {
             }
             return;
         }
+        if (effect.getEffectMaxStacks() != null) {
+            boolean statesCap = named.effects().stream().anyMatch(e -> e.getMaxStacks() != null);
+            if (!statesCap) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE raises the stack cap of rule \"" + target + "\", but none of that rule's "
+                                + "effects states a \"max_stacks\"; there is no cap to raise (source: "
+                                + amender.source() + ")");
+            }
+            return;
+        }
         if (effect.getEffectTurns() != null) {
             boolean statesTurns = named.effects().stream().anyMatch(e -> e.getTurns() != null);
             if (!statesTurns) {
