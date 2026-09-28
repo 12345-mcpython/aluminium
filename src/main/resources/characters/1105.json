@@ -1,0 +1,69 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "DISPEL",
+        "amount": 1,
+        "target": "target"
+      }
+    ],
+    "source": "1105 娜塔莎 战技 爱，救护与抉择 (110502, BPSkill/Restore): 「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 param Lv10 = [0.105, 0.072, 2, 280, 192] → #1 = 0.105, #4 = 280；行迹 舒缓 (1105101)：「施放战技时，解除指定我方单体的1个负面效果」",
+    "note": "The trace that rides on the same cast. ⚠ The Skill's own heal 「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 is **NOT** written here: her Skill is a `Restore` skill, so the engine's skill pipeline already heals from the row (110502, Lv10 #1/#4), exactly as a damage skill already deals its damage. ⚠ The first version of this file DID write it as a rule and the suite caught the double heal (measured 671.9 = the engine's 174.3 x 1.1 plus the rule's 480): a rule is for what the row does not already do. ⚠ `DISPEL` is that kind of clause (行迹 舒缓 「施放战技时，解除指定我方单体的1个负面效果」) and it reaches negative buffs only, which is exactly what the sentence says. ⚠ NOT written: the regeneration 「同时目标每回合开始时为其回复等同于娜塔莎7.20%生命上限+192的生命值，持续2回合」 -- a heal over time has no spelling yet (the engine has the damage twin, `APPLY_DOT`, and no healing one), and the ordering makes it fiddly rather than trivial: buffs are ticked *before* `TURN_START`, so a `turns: 2` state is already gone by the second turn's event and a naive rule gives one tick where the document says two. Registered rather than shipping one tick, and rather than writing `turns: 3` to make the count come out right while misstating the duration."
+  },
+  {
+    "on": "TAKING_HIT",
+    "when": [
+      "hp_percent <= 0.3",
+      "!actor is_ally"
+    ],
+    "do": [
+      {
+        "op": "HEAL",
+        "scale": "owner_max_hp",
+        "percent": 0.15,
+        "amount": 400,
+        "target": "self"
+      }
+    ],
+    "min_eidolon": 1,
+    "once_per_battle": true,
+    "source": "1105 娜塔莎 星魂 1 遍识药理 (Avatar_Natasha_00_Rank01): 「受到攻击后，若当前生命值百分比小于等于30%，对自身施放1次治疗，回复等同于自身15%生命上限+400的生命值。该效果单场战斗中只能触发1次。」 param = [0.3, 0.15, 400]",
+    "note": "「**受到攻击后**，若当前生命值百分比 ≤ 30%，对自身施放 1 次治疗（15% 生命上限 + 400），该效果单场战斗中只能触发 1 次」. ⚠ The gate is two conditions and two rule fields: `self hp_percent <= 0.3` is 「当前生命值百分比」 (hers, at that moment), `once_per_battle: true` is 「单场战斗中只能触发1次」 — the engine counts that per rule, which is what the sentence means. ⚠ `target: self` is 「对**自身**施放」 (the healer here is the healed). ⚠ `min_eidolon: 1` is the gate. ⚠ It is deliberately not `cooldown`-based: 「单场战斗」 is the whole battle, not a turn count."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "OUTGOING_HEALING_BOOST",
+        "percent": 0.1,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1105 娜塔莎 行迹 医者 (1105102): 「娜塔莎提供的治疗量提高10%。」",
+    "note": "「娜塔莎**提供的治疗量**提高 10%」 — the outgoing side of healing, which is a different attribute from anything on the healed unit: `Battle.heal` reads `OUTGOING_HEALING_BOOST` **from the healer** while it computes the amount. ⚠ This is the first shipped content that grants it: the attribute and the read both existed (P2) but nothing had a sentence to spend them on, which is the shape this project refuses to guess at. ⚠ `permanent: true` because a 行迹 is a loadout fact with no duration."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 1
+      }
+    ],
+    "min_eidolon": 3,
+    "source": "1105 娜塔莎 星魂 3 对症下药 (Avatar_Natasha_00_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'110502': 2, '110501': 1}",
+    "note": "The level raise (M-32). ⚠ Stated for completeness as a loadout fact: nothing in this file reads a skill row today — the two heals and the boost state their own magnitudes (the Lv10 rows quoted above) — so this rule moves the engine's own skill execution, not these rules. The caps (15 / 10) are the parameter tables' own sizes, so an over-raise fails loudly instead of reading a row that does not exist (see 1001/1215 for the same convention). ⚠ **Not classified yet in this file**: 星魂 4/5/6 and the 行迹 that ride on the regeneration (调理 「施放战技产生的持续回复效果延长1回合」、星魂 2 「对生命百分比 ≤ 30% 的我方目标附加 1 回合的持续治疗效果」), plus 天赋 生机焕发 「为当前生命值百分比 ≤ 30% 的我方目标提供治疗时，娜塔莎的治疗量提高 50%，该效果对持续治疗效果也会生效」 — the last one needs the same missing piece as everything else here: a hook **before** a heal is computed (the engine has `HEALED`, which fires *after* the HP was restored, and `MODIFY_ATTR` cannot reach an instance that is already being settled). All four are registered in ROADMAP with their readers."
+  }
+]
