@@ -400,6 +400,13 @@ public final class SkillExecutor {
             return;
         }
         double base = user.getAttribute(AttributeType.ATTACK).get() * params.getFirst();
+        // ? A blast states TWO multipliers: the centre and the neighbours (2026-09-29). 1008's ultimate row is
+        // `[1.92, 0.96]`..`[3.2, 1.6]` — the second exactly half the first, matching 「320%…and 160% to enemies adjacent to it」.
+        // Until this, the centre value was applied to the neighbours too, i.e. double the documented damage on every
+        // blast skill in the corpus.
+        double neighbourBase = params.size() > 1
+                ? user.getAttribute(AttributeType.ATTACK).get() * params.get(1)
+                : base;
         CanHit mainTarget = targets.getFirst();
 
         double totalDamage = 0;
@@ -426,11 +433,11 @@ public final class SkillExecutor {
                 } else {
                     totalDamage += hit(battle, data, user, element, base, alive.get(center), hitTargets, centreStance, skill.getSkillSlot());
                     if (center > 0) {
-                        totalDamage += hit(battle, data, user, element, base, alive.get(center - 1),
+                        totalDamage += hit(battle, data, user, element, neighbourBase, alive.get(center - 1),
                                 hitTargets, neighbourStance, skill.getSkillSlot());
                     }
                     if (center < alive.size() - 1) {
-                        totalDamage += hit(battle, data, user, element, base, alive.get(center + 1),
+                        totalDamage += hit(battle, data, user, element, neighbourBase, alive.get(center + 1),
                                 hitTargets, neighbourStance, skill.getSkillSlot());
                     }
                 }
