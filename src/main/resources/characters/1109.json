@@ -2,7 +2,9 @@
   {
     "on": "SKILL_CAST",
     "id": "skill_burn",
-    "when": ["actor == self"],
+    "when": [
+      "actor == self"
+    ],
     "do": [
       {
         "op": "APPLY_DOT",
@@ -20,10 +22,26 @@
   {
     "on": "BATTLE_START",
     "do": [
-      {"op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9},
-      {"op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9},
-      {"op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9},
-      {"op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9}
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
     ],
     "source": "1109 虎克 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（战技 240% + 灼烧 65%、终结技 400%、天赋 100%+5 点能量）",
     "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **尚未分类（逐条登记）**：① 天赋「攻击处于**灼烧**状态的敌方目标时，追加 1 次等同于虎克 100% 攻击力的火属性**附加伤害**，并额外恢复 5 点能量」—— 触发条件与回能都已具备（`DEALING_DAMAGE` + `target has_state 灼烧` + `GAIN_ENERGY`），唯一缺的是「**追加 1 次附加伤害**」的那个 op 名（引擎里附加伤害是 `DamageType.ADDITIONAL` ✓，但 op 表里对应的拼写我这一轮没能在源码中定位到，**不确定就不写** ✓）；② 终结技「施放终结技后，**下一次施放的战技得到强化**，强化后的战技能够同时对指定敌方单体及其**相邻目标**造成伤害」—— 缺两样：**强化战技的装载键**（强化战技是独立的数据行，如 110908，而装载器要的是**槽位** ✓，需要先读出它的槽位 ✓）与**相邻选择器**（引擎没有「位置轴」，已登记为缺口 ✓）；③ 秘技「立即攻击敌人，进入战斗后对敌方**随机单体**造成 50% 攻击力的火属性伤害，同时有 100% 基础概率使敌方**每个**单体陷入灼烧，持续 3 回合」—— 缺**「用过秘技」的门槛**（无条件写出就会永远施加 ✗）与**随机单体**选择器 ✓；④ 行迹与星魂：本轮**未读**（我的切片只取到 `## 技能` 段 ✓，下一轮补读后再写 ✓）。"
