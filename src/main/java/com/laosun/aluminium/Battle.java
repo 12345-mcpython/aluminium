@@ -1618,7 +1618,16 @@ public class Battle {
      * @return the countdown, for tests and logs
      */
     public Countdown startCountdown(String name, double speed) {
-        Countdown countdown = new Countdown(name, speed);
+        return startCountdown(null, name, speed);
+    }
+
+    /**
+     * The same, recording <b>who placed it</b> — the handle {@code actor == countdown} resolves through.
+     *
+     * @param owner who placed it ({@code null} = unattributed, and then no rule's {@code countdown} term matches it)
+     */
+    public Countdown startCountdown(CanHit owner, String name, double speed) {
+        Countdown countdown = new Countdown(owner, name, speed);
         countdowns.add(countdown);
         queue.addCombatant(countdown);
         return countdown;
@@ -1627,6 +1636,17 @@ public class Battle {
     /** The countdown units placed so far (M-49), in the order they were started. */
     public List<Countdown> countdowns() {
         return java.util.Collections.unmodifiableList(countdowns);
+    }
+
+    /** The countdowns a given unit placed — the list {@code actor == countdown} reads (mirrors {@code summonsOf}). */
+    public List<Countdown> countdownsOf(CanHit owner) {
+        List<Countdown> mine = new ArrayList<>();
+        for (Countdown countdown : countdowns) {
+            if (countdown.getOwner() == owner) {
+                mine.add(countdown);
+            }
+        }
+        return mine;
     }
 
     public double grantShield(CanHit target, double amount) {

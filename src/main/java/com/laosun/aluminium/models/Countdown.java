@@ -38,8 +38,27 @@ public class Countdown extends CanHit {
      * @param speed the fixed speed that decides when its turn comes (90 for 知更鸟's 【协奏】)
      */
     public Countdown(String name, double speed) {
-        super(name, Camp.PLAYER, blankSheet(speed));
+        this(null, name, speed);
     }
+
+    /**
+     * @param owner who placed it ({@code null} = a hand-built one) — the link {@code actor == countdown} reads, so a
+     *              rule can tell <b>its own</b> countdown from somebody else's (2026-09-28)
+     */
+    public Countdown(CanHit owner, String name, double speed) {
+        super(name, Camp.PLAYER, blankSheet(speed));
+        this.owner = owner;
+    }
+
+    /**
+     * Who placed this countdown, or {@code null} for a hand-built one.
+     *
+     * <p>⚠ The link exists for the same reason {@code Summon.master} does: 「倒计时回合开始时<b>知更鸟</b>退出【协奏】」
+     * is about <i>her</i> countdown, and without the link a rule can only narrow by something else (the state, in her
+     * file's first version) — which is the same answer only while one countdown exists in the fight.
+     */
+    @lombok.Getter
+    private final CanHit owner;
 
     /** A sheet with just the speed (and a harmless HEALTH of 1) — see the class comment for why nothing else. */
     private static com.laosun.aluminium.models.DoubleValue[] blankSheet(double speed) {
