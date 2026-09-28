@@ -222,6 +222,10 @@ public class SkillExecutorDiagnosticTest {
     @Test
     public void entriesWithoutAnAmountPhraseAreRefusedRatherThanGuessed() {
         Character trailblazer = CharacterFactory.create(8004, 80);
+        // ? Drop the character file's rules for this cast (2026-09-29): 8004 now ships its talent, which — per the document — shields the party
+        // whenever he uses Basic ATK, Skill or Ultimate. That is a real rule, not a guess; this test is about the SKILL TABLE declining an entry
+        // that has no amount phrase, so the table path is isolated the same way round 155 isolated an op from the file path.
+        trailblazer.setTriggerTable(null);
         Battle battle = newBattle(trailblazer);
 
         String out = capture(() -> {
