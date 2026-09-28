@@ -1,0 +1,89 @@
+[
+  {
+    "on": "ULT_CAST",
+    "id": "ult_tipsy",
+    "when": ["actor == self"],
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "酩酊",
+        "turns": 2,
+        "target": "all_enemies"
+      }
+    ],
+    "source": "1301 加拉赫 终结技 香槟仪礼 (130103, 全体攻击/Fire): 「使敌方全体陷入【酩酊】状态，持续2回合，同时对敌方全体造成等同于加拉赫150%攻击力的火属性伤害…」",
+    "note": "「使敌方全体陷入【酩酊】状态，持续 2 回合」 — the state half of the ultimate; the 150% AoE damage is the engine's own skill path. ⚠ No `base_chance`: the sentence states none, and for an `APPLY_BUFF` state that means applied directly (the convention every file in this repo follows — `APPLY_DOT`/`APPLY_CONTROL` instead default to a 100% *base* chance, which is the documented difference). ⚠ 【酩酊】 is a plain named state, so nothing about it is judged by `isDebuff()` — the clauses that read it are registered below, because they need vocabulary this engine does not have yet."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "酩酊",
+        "turns": 2,
+        "target": "all_enemies"
+      }
+    ],
+    "source": "1301 加拉赫 秘技 亲启佳酿: 「…与处于特殊领域内的敌人进入战斗后，使敌方全体陷入【酩酊】状态，持续2回合，并对敌方全体造成等同于加拉赫50%攻击力的火属性伤害。」",
+    "note": "The 秘技's **in-battle half**: 「进入战斗后使敌方全体陷入【酩酊】状态，持续 2 回合」 is a `BATTLE_START` fact, which is exactly how this engine models 「进入战斗后」. ⚠ The 50% AoE damage that follows in the same sentence is **not** written: the technique's damage is a separate mechanic with its own place in the pre-battle flow, and the engine settles battle-start effects without an instance. ⚠ The 20-second special field the sentence opens with is a map mechanic, out of in-battle scope."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": ["actor == self"],
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 1.0,
+        "target": "self"
+      }
+    ],
+    "source": "1301 加拉赫 行迹 天然酵母 (1301102): 「施放终结技后，立刻使自己行动提前100%。」",
+    "note": "「施放终结技后，**立刻**使自己**行动提前 100%**」 — `ADVANCE` with `percent: 1.0` is that quantity (100% of an action), and 「自己」 is the rule's owner. ⚠ It sits on the same event as the 酩酊 rule above; both are unconditional, so their order does not matter (the ordering trap in 1211's file is about a filter that reads the state another effect of the same rule has just applied — there is none here)."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 20
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "EFFECT_RESISTANCE",
+        "percent": 0.5,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "min_eidolon": 1,
+    "source": "1301 加拉赫 星魂 1 盐与犬 (Avatar_Gallagher_Rank01): 「加拉赫进入战斗后会恢复20点能量，效果抵抗提高50%。」 param = [20, 0.5]",
+    "note": "星魂 1's two halves: 「进入战斗后恢复 20 点能量」 and 「效果抵抗提高 50%」 — the first is `GAIN_ENERGY` at battle start, the second the existing `EFFECT_RESISTANCE` attribute with no stated duration (「进入战斗后」 = a loadout fact ⇒ `permanent: true`). ⚠ Both numbers come from the eidolon's own row ([20, 0.5]), which is why the data is read rather than the prose alone."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1301 加拉赫 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、终结技 150%、强化普攻 250%、战技 1600 点都是该行）",
+    "note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing and damage (his Skill is a `Restore` skill and his ultimate an AoE, both read from rows). ⚠ **Not classified yet** — the rest of his document, each with its blocker: 终结技「并将**下一次普攻强化**为【酒花奔涌】」 (a skill *replacement* — 「强化普攻」 is a different skill object, and the engine has no vocabulary for \"the next basic attack becomes X\"), 天赋「【酩酊】使目标**受到的击破伤害**提高 12.00%」 (a **taken-side** vulnerability scoped to one damage type: `BREAKING_EFFECT` is the dealer side and there is no \"break damage taken\" spelling — the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」), 天赋「陷入【酩酊】状态的目标每次受到我方角色攻击后，会回复**攻击者** 640 点生命值」 (the heal's target is the **attacker**, and while the event knows that unit, no `target` spelling names it for a heal — ⚠ the repair is small: the same selector vocabulary the damage side already has), 行迹 崭新配方「使自身提供的治疗量提高，提高数值等同于**击破特攻的 50%**，**最多使提供的治疗量提高 75%**」 (the derived half is expressible with `scale: self_attr:BREAKING_EFFECT`, but the **cap** is not: shipping without it would over-heal exactly in the break-effect builds this trace is for — the clamp gap is registered), 行迹 敬请干杯 (rides on 酒花奔涌), and 星魂 2–6 (not yet read clause by clause)."
+  }
+]

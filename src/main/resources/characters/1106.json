@@ -68,7 +68,7 @@
       }
     ],
     "source": "1106 佩拉 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 210%、终结技 100% 都是该行）",
-    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of her document, with the blocker each one hits: ⚠ **2026-09-28 补齐**：战技的「解除指定敌方单体的 1 个增益效果」已用 `REMOVE_BUFF` 写出（见本文件最后一条规则）；剩下的登记是终结技【通解】（一个**带基础概率的状态**）、行迹 追歼 与 星魂 1–6。"
+    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of her document, with the blocker each one hits: ⚠ **2026-09-28 补齐**：战技的「解除指定敌方单体的 1 个增益效果」已用 `REMOVE_BUFF` 写出（见本文件最后一条规则）；⚠ **2026-09-28 补齐**：终结技【通解】已写出（状态掷基础概率 + 该状态下的防御力降低，见 `ult_zone_suppression`）；剩下的登记是 行迹 追歼 与 星魂 1–6。"
   },
   {
     "on": "SKILL_CAST",
