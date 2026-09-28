@@ -27,6 +27,22 @@ public class TingyunTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
+    /** \u26a0 「使其攻击力提高50%，最高不超过停云当前攻击力的25%」: the gain must respect the ceiling. */
+    @Test
+    public void herSkillBlessesWithACappedGain() {
+        Fixture f = new Fixture();
+        double before = f.ally.getAttribute(AttributeType.ATTACK).get();
+
+        f.battle.castImmediate(f.tingyun.getSkills().get(SkillType.SKILL), f.tingyun, List.of(f.ally));
+
+        double after = f.ally.getAttribute(AttributeType.ATTACK).get();
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("赐福"), "\u300c\u4e3a\u6307\u5b9a\u6211\u65b9\u5355\u4f53\u63d0\u4f9b\u3010\u8d50\u798f\u3011\u300d");
+        Assertions.assertTrue(after > before, "\u300c\u4f7f\u5176\u653b\u51fb\u529b\u63d0\u9ad850%\u300d: " + before + " -> " + after);
+        double ceiling = f.tingyun.getAttribute(AttributeType.ATTACK).get() * 0.25;
+        Assertions.assertTrue(after - before <= ceiling + 1e-6,
+                "\u300c\u6700\u9ad8\u4e0d\u8d85\u8fc7\u505c\u4e91\u5f53\u524d\u653b\u51fb\u529b\u768425%\u300d -- gain " + (after - before) + " vs ceiling " + ceiling);
+    }
+
     /** \u26a0 The ultimate grants energy AND a two-turn damage boost to the chosen ally. */
     @Test
     public void herUltimateGrantsEnergyAndABoost() {
@@ -46,7 +62,7 @@ public class TingyunTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(TINGYUN);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the trace's speed (Benediction is registered, not written)");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the Benediction and the trace's speed");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the grant and the boost");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the basic-attack bonus trace");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TURN_START), "the energy trace");
