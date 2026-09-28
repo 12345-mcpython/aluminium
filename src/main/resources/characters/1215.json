@@ -153,7 +153,7 @@
     "on": "ALLY_ATTACK",
     "when": [
       "target has_state 承负",
-      "actor is_ally",
+      "actor is_other_ally",
       "from_skill COMMON"
     ],
     "do": [
@@ -166,13 +166,13 @@
       }
     ],
     "source": "1215 寒鸦 战技: 「每当我方目标对【承负】状态下的敌方目标施放2次普攻、战技、终结技后…」 之一（普攻）",
-    "note": "One of THREE mark rules, one per qualifying cast slot. ⚠ Three rules rather than one because the condition DSL has no OR and `from_skill` states a single slot -- and that is the point: an attack matches exactly one of them, so each qualifying attack adds exactly ONE mark. ⚠ `追加攻击` and DoT instances carry no cast slot, so they match none of the three -- which is what 「普攻、战技、终结技」 excludes. ⚠ `max_stacks: 2` caps the counter at the threshold (see the rule that answers it)."
+    "note": "One of THREE mark rules, one per qualifying cast slot. ⚠ Three rules rather than one because the condition DSL has no OR and `from_skill` states a single slot -- and that is the point: an attack matches exactly one of them, so each qualifying attack adds exactly ONE mark. ⚠ `追加攻击` and DoT instances carry no cast slot, so they match none of the three -- which is what 「普攻、战技、终结技」 excludes. ⚠ `max_stacks: 2` caps the counter at the threshold (see the rule that answers it). ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
   },
   {
     "on": "ALLY_ATTACK",
     "when": [
       "target has_state 承负",
-      "actor is_ally",
+      "actor is_other_ally",
       "from_skill SKILL"
     ],
     "do": [
@@ -185,13 +185,13 @@
       }
     ],
     "source": "1215 寒鸦 战技: 「…2次普攻、战技、终结技后…」 之二（战技）",
-    "note": "The 战技 half of the same sentence -- see the 普攻 rule above for why the three are three."
+    "note": "The 战技 half of the same sentence -- see the 普攻 rule above for why the three are three. ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
   },
   {
     "on": "ALLY_ATTACK",
     "when": [
       "target has_state 承负",
-      "actor is_ally",
+      "actor is_other_ally",
       "from_skill ULTRA"
     ],
     "do": [
@@ -204,7 +204,7 @@
       }
     ],
     "source": "1215 寒鸦 战技: 「…2次普攻、战技、终结技后…」 之三（终结技）",
-    "note": "The 终结技 half of the same sentence -- see the 普攻 rule above for why the three are three."
+    "note": "The 终结技 half of the same sentence -- see the 普攻 rule above for why the three are three. ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
   },
   {
     "on": "ALLY_ATTACK",

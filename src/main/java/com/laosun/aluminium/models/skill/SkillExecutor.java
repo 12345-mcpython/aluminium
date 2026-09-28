@@ -172,7 +172,7 @@ public final class SkillExecutor {
             // Passing it would be information with no reader, which is the shape this project keeps refusing.
             // ⚠ category rides along (2026-09-28): 「施放 2 次普攻/战技/终结技」 must tell the three slots apart, and this
             // is the one event that fires once per CAST (DEALING_DAMAGE would count hits).
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, null, hits.size(), 0, category, skill.getSkillSlot());
+            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot());
         }
     }
 
