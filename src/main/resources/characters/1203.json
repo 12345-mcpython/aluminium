@@ -1,0 +1,48 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_abyss_flower",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "白花之刻",
+        "amount": 1,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1203 罗刹 战技 白花的祈望 (120302, BPSkill/Restore): 「施放战技后立即为指定我方单体回复等同于罗刹60%攻击力+800的生命值，并使罗刹获得1层【白花之刻】。」",
+    "note": "「并使罗刹获得 **1 层**【白花之刻】」—— 用 `ADD_STACK` 记账在自己身上 ✓（层的名字就是文档点名的那个 ✓）。⚠ 60%攻击力+800 那半治疗由引擎自己的 `Restore` 技能行负责 ✓（不重复写一遍 ✗）。⚠ 本条与下一条是**同一句话的两半**：层数在这里涨，结界在达到 2 层时展开（后者登记中 ✗）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "level_convention",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1203 罗刹 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 60%+800、终结技 200%、天赋 18%+240）",
+    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 终结技「**解除敌方全体 1 个增益效果**」、天赋「【白花之刻】达到 2 层时消耗全部并**展开结界**…」与秘技、行迹、星魂 —— 均**尚未分类**，逐条登记 ✓。"
+  }
+]
