@@ -752,11 +752,11 @@ public class BuffManager {
      * <p>Asked by {@code Battle.beforeMove}, which is the only place a turn can be let pass without the unit.
      */
     public boolean suspendsTurns() {
-        // ⚠ Scanned over StateBuff, which is the only carrier today: `APPLY_BUFF` is the one op that sets the flag
-        // (「不会进入自己的回合」 rides on a state). A future carrier has to be added here **and** to the op that sets the
-        // flag -- the flag itself lives on AbstractBuff so that is a one-line change rather than a redesign.
-        for (StateBuff state : allBuffsOf(StateBuff.class)) {
-            if (state.isSuspendsTurns()) {
+        // ⚠ Over the manager's own list, NOT `allBuffsOf`/`instanceof`: that helper compares classes exactly
+        // (`buff.getClass() == kind`), and a modifier may be a *subclass* of StatModifierBuff -- a per-class scan
+        // silently found nothing (measured: the party ATK boost survived 「退出【协奏】状态」 for exactly this reason).
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff.isSuspendsTurns()) {
                 return true;
             }
         }
@@ -784,12 +784,13 @@ public class BuffManager {
             }
         }
 
-        // Named MODIFIERS (2026-09-28): a stat boost that is an effect *of* a state carries the state's own name, so
-        // 「退出【协奏】状态」 takes both off with one statement. ⚠ Unnamed modifiers are skipped, which is what keeps
-        // this loop from touching anything that existed before the field did.
-        for (StatModifierBuff modifier : allBuffsOf(StatModifierBuff.class)) {
-            if (wanted.equals(modifier.getBuffName())) {
-                removeBuff(modifier);
+        // Named buffs (2026-09-28): an effect *of* a state carries the state's own name, so 「退出【协奏】状态」 takes the
+        // state, its stat boost and its immunity off with one statement. ⚠ Unnamed buffs are skipped, which is what
+        // keeps this loop from touching anything that existed before the field did. ⚠ Over the manager's own list
+        // rather than `allBuffsOf`: that helper compares classes exactly, and a modifier may be a subclass.
+        for (AbstractBuff named : List.copyOf(buffs)) {
+            if (!named.getBuffName().isEmpty() && wanted.equals(named.getBuffName())) {
+                removeBuff(named);
                 removed++;
             }
         }

@@ -53,5 +53,95 @@
     ],
     "source": "1309 知更鸟 trace 模进乐段",
     "note": "Doc text: 「施放战技时额外恢复5点能量。」 SKILL_CAST is broadcast to the whole side (SkillExecutor.broadcastSkillCast, actor = the caster), which is what makes the condition load-bearing rather than decorative: without `actor == self`, every ally's skill would pay Robin 5 energy too. The doc sentence names no subject other than the character herself, the same reading as the other two traces -- and the split from ULT_CAST is already made at the emitter, so her ultimate does not double-dip here. E0 value (params [5])."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "协奏",
+        "permanent": true,
+        "suspends_turns": true,
+        "target": "self"
+      },
+      {
+        "op": "START_COUNTDOWN",
+        "buff": "协奏倒计时",
+        "speed": 90
+      }
+    ],
+    "source": "1309 知更鸟 终结技 千音迭奏，群星赋格 (skill 130903) ①「知更鸟进入【协奏】状态」+ ⑥「行动序列上出现【协奏】倒计时…倒计时固定拥有 90 点速度」 param Lv10 = [0.228, 90, 200, 1.2, 1, 1.5] → #2 = 90",
+    "note": "Two of the seven clauses, together because they are the two halves of <b>one timeline</b>: the state begins here and ends at the countdown's turn (the last rule below), which is why its duration cannot be a `turns` count -- the countdown is a real unit on the action order (M-49), so advances, delays and breaks move it exactly as they move everybody else. ⚠ `suspendsTurns: true` is clause ⑦ 「【协奏】状态结束前<b>不会进入自己的回合</b>且无法行动」 riding on the state: she is not in the order while it lasts, and the countdown acts in her place. ⚠ Deliberately not a control -- a control would still let her turns arrive (and her DOTs tick); see `AbstractBuff.isSuspendsTurns()`. ⚠ `permanent: true` is not forever: it means no turn count, and the end is stated by the countdown rule, which is the honest spelling of a duration decided by the action bar. ⚠ `speed: 90` is #2 of this skill's own row."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "scale": "self_attr:ATTACK",
+        "percent": 0.228,
+        "amount": 200,
+        "buff": "协奏",
+        "permanent": true,
+        "target": "all_allies"
+      },
+      {
+        "op": "RESIST_DEBUFF",
+        "kind": "control",
+        "percent": 1.0,
+        "buff": "协奏",
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1309 知更鸟 终结技 ③「处于【协奏】状态时，我方全体攻击力提高，提高数值等同于知更鸟攻击力的 22.80%+200 点」+ ⑤「处于【协奏】状态时，知更鸟免疫控制类负面状态」 param Lv10 = [0.228, 90, 200, 1.2, 1, 1.5] → #1 = 0.228, #3 = 200",
+    "note": "Clauses ③ and ⑤, the two effects that last <b>as long as the state does</b>. ⚠ Both carry `buff: 协奏` (2026-09-28), which is what makes that duration expressible at all: removal by name used to reach only <b>states</b>, so a modifier like this could only be written `permanent` -- a boost that never comes off, i.e. a wrong number with no symptom. Naming it means the countdown-turn rule's single `REMOVE_STATE 协奏` takes the state, the ATK boost AND the immunity off together. ⚠ ③ is a <b>derived</b> magnitude (22.8% of <i>her</i> ATK plus the flat 200), read when she casts and then frozen. ⚠ `all_allies` includes her (「我方全体」 says so); ② 「除自身以外」 is the ADVANCE rule above, a different sentence with a different selector. ⚠ `percent: 1.0` on the resistance is <b>immunity</b> -- the same mechanic at full strength."
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "actor != self",
+      "hit_count > 0",
+      "self has_state 协奏"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "skill": "ULTRA",
+        "damage_param": 3,
+        "crit_rate": 1.0,
+        "crit_damage": 1.5,
+        "target": "target",
+        "element": "PHYSICAL"
+      }
+    ],
+    "source": "1309 知更鸟 终结技 ④「处于【协奏】状态时…我方目标每次施放攻击后，知更鸟会额外造成1次等同于其自身 120% 攻击力的物理属性附加伤害，该伤害暴击率固定为 100%，暴击伤害固定为 150%。」 param Lv10 = [0.228, 90, 200, 1.2, 1, 1.5] → #4 = 1.2（倍率）、#5 = 1（固定暴击率）、#6 = 1.5（固定暴伤）",
+    "note": "Clause ④, the rider that makes 【协奏】 a damage window. ⚠ Three numbers, all from the skill's own row: the multiplier is <b>#4</b> (`damageParam: 3`, 1.2 = 120%), and the crit comes from <b>#5/#6</b> -- `critRate: 1` (fixed 100%, i.e. no roll) plus `critDamage: 1.5`. ⚠ The physical element and the single-target shape come from 130903's own data. ⚠ `self has_state 协奏` is what makes it 「处于【协奏】状态时…」; ⚠ `actor != self` + `hit_count > 0` mirror her talent's own reading of 「我方目标…攻击敌方目标后」 -- and since ⑦ keeps her out of the order, her own attack cannot arrive while this is live anyway. ⚠ `target: target` is the unit the triggering attack hit (「额外造成1次」 is the same victim). ⚠ Crit damage is stated the way the panel states it (1.5 = 150%), so the settled multiplier is ×2.5."
+  },
+  {
+    "on": "COUNTDOWN_TURN",
+    "when": [
+      "self has_state 协奏"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STATE",
+        "buff": "协奏",
+        "target": "all_allies"
+      },
+      {
+        "op": "EXTRA_TURN",
+        "target": "self"
+      }
+    ],
+    "source": "1309 知更鸟 终结技 ⑥「…倒计时回合开始时知更鸟退出【协奏】状态并立即行动」",
+    "note": "Clause ⑥, the end of the timeline: 「倒计时回合开始时知更鸟退出【协奏】状态<b>并立即行动</b>」. ⚠ <b>One</b> `REMOVE_STATE 协奏` ends the whole thing, because the state and both of its effects carry that same name (see the ③⑤ rule above) -- including the `suspendsTurns` flag, which rides on the state itself, so her turns come back with no second switch to remember. ⚠ Its target is `all_allies`, not `self`, and that is the whole point: the STATE lives on her while its named effects sit on <b>every</b> ally, so removing it from her alone would leave the party ATK boost behind forever (measured: the first version did exactly that, and the test that caught it is `RobinConcertoTest.theCountdownTurnEndsEverythingAtOnce`). ⚠ `EXTRA_TURN` is 「立即行动」, granted after the removal so she really takes the turn the state was holding back. ⚠ `self has_state 协奏` on the rule is the gate: 「…知更鸟退出」 (her own state ends) and it keeps this rule from answering <b>somebody else's</b> countdown. ⚠ The honest limitation: the engine has no `countdown == mine` identity term, so the narrowing is by state rather than by unit -- with one countdown in the fight (today's content) they are the same thing, and a second countdown-owner would need that term."
   }
 ]

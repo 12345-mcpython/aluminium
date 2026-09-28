@@ -40,7 +40,9 @@ public class TriggerDataBindingTest {
                 "华彩花腔: 战斗开始时自身行动提前25%");
         Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.SKILL_CAST),
                 "模进乐段: 施放战技时额外恢复5点能量");
-        Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.ALLY_ATTACK));
+        // ⚠ 2 since 2026-09-28: the talent's 「额外为自身恢复2点能量」 and 【协奏】's additional-damage rider
+        // (「我方目标每次施放攻击后…额外造成1次」), which is gated on `self has_state 协奏`.
+        Assertions.assertEquals(2, robin.ruleCount(TriggerEvent.ALLY_ATTACK));
         Assertions.assertEquals(0, robin.ruleCount(TriggerEvent.BASIC_ATTACK),
                 "nothing in her file listens to 普攻 -- 施放战技时 is the Skill slot");
     }
