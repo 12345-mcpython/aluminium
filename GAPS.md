@@ -3,9 +3,9 @@
 > 本文件是**当前**的缺口清单：只列**今天仍然受阻**的东西，并给每条标注【读者（已量）】【前置】【为什么没做】。
 > 历史流水与逐轮记录仍在 `ROADMAP.md`（432 行，含已完成项）；`engine.md` 是能力的**语汇手册**。
 
-## 一、已实现的能力（33 个 op + 条件/选择器）
+## 一、已实现的能力（op **34** 个 —— 实测：调度表里独立的 `case` 臂；另有**条件/选择器/寿命**一批）
 
-- **op 33 个**（`TriggerInterpreter` 的 dispatch 表为准）：伤害与结算（`DAMAGE`/`ADD_DAMAGE`/`BOOST_DAMAGE`/`MODIFY_DAMAGE_TAKEN`/
+- **op 34 个**（实测）（`TriggerInterpreter` 的 dispatch 表为准）：伤害与结算（`DAMAGE`/`ADD_DAMAGE`/`BOOST_DAMAGE`/`MODIFY_DAMAGE_TAKEN`/
   `SUPER_BREAK`/`DELEGATE_DAMAGE`）、削韧（`BOOST_TOUGHNESS`）、状态（`APPLY_BUFF`/`APPLY_DOT`/`APPLY_CONTROL`/`APPLY_REGEN`/
   `REMOVE_STATE`/`REMOVE_BUFF`/`DISPEL`/`EXTEND_BUFF`/`TAUNT`/`RESIST_DEBUFF`）、层数与资源（`ADD_STACK`/`REMOVE_STACK`/
   `GAIN_ENERGY`/`GAIN_SKILL_POINT`/`GAIN_RESOURCE`/`SPEND_RESOURCE`）、防护与治疗（`SHIELD`/`HEAL`）、行动（`ADVANCE`）、
@@ -16,6 +16,9 @@
   选择器 10 个（含 **`attacker`**，第 88 轮才发现它一直是合法的）。
 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
+
+> **2026-09-28 第七条更新**：第 17 条补记 —— 1111 卢卡的**阈值版**强化（「≥2 层时普攻强化为【直冲碎天拳】」，行 111108）也已出货，配 `once_per_battle`（重复应用会叠多个 `SkillSwapBuff`）。⚠ 两处**如实记录**：① 「≥2 层」这个条件在当前事件集下**冗余**（删掉它变异 **0 红**，因为同事件的加层规则已先给到 2 层）—— 保留它以免偏离文档，但它真正"起作用"要等到有了"**使用前判断**"或"消耗层数"的机制；② 「强化普攻消耗 2 层【斗志】」**仍登记**：普攻与强化普攻都是 `Normal` 类施放，没有事件能区分"用的是哪一个"，所以缺的不是"移除层数"（`REMOVE_STACK` 已能做）而是**触发点**。
+
 
 > **2026-09-28 第六条更新**：第 17 条（**技能替换**）**已做** —— `REPLACE_SKILL` + `SkillSwapBuff`（换技能由**带寿命的 buff** 承载 ⇒ `until: next_attack` 免费复用），读者 1301 加拉赫 已出货。⚠ 并更正第 98 轮的判断：**按数据行 id 载入技能一直可行**（`SkillData.init(cid, skillID)` 就是按 `Constant.SKILLS` 查表），当时是被 `DefaultSkill` 的过时注释误导。⚠ **另一条如实记录**：我曾担心"新字段没写 `@SerializedName` 会被静默忽略"——实测表明这在本仓库**不可能**：装载期**拒绝未知键**（把注解删掉的变异会让 **10 个文件装载失败**），所以 1301 的两次试写是**响亮失败**而不是悄悄少一个字段。已把该注解纪律写进 `engine.md`。
 
