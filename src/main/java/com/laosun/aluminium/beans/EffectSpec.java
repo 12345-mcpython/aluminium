@@ -74,6 +74,7 @@ public class EffectSpec {
         copy.effectPercent = this.effectPercent;
         copy.effectTurns = this.effectTurns;
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
+        copy.effectMaxStacks = this.effectMaxStacks;
         return copy;
     }
 
@@ -83,6 +84,15 @@ public class EffectSpec {
         EffectSpec copy = copy();
         if (copy.percent != null && delta != null) {
             copy.percent = copy.percent + delta;
+        }
+        return copy;
+    }
+
+    /** The same, with every {@code max_stacks} read raised by {@code delta} (see {@code MODIFY_RULE}). */
+    public EffectSpec withMaxStacks(int delta) {
+        EffectSpec copy = copy();
+        if (copy.maxStacks != null) {
+            copy.maxStacks = copy.maxStacks + delta;
         }
         return copy;
     }
@@ -541,6 +551,15 @@ public class EffectSpec {
      */
     @SerializedName("target_when")
     private List<String> targetWhen;
+    /**
+     * {@code MODIFY_RULE}: raise the <b>stack cap</b> of the named rule's effects by this many layers
+     * (「天赋的效果可叠加上限提高 2 层」，1302 星魂 4).
+     *
+     * <p>⚠ A cap is not a value: the difference only shows when the content *would* have exceeded the old limit, which is
+     * why filing two extra stacks instead would be wrong (they cannot exceed 10).
+     */
+    @SerializedName("effect_max_stacks")
+    private Integer effectMaxStacks;
 
     /**
      * The stack cap, whichever spelling the rule used.

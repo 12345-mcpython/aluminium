@@ -22,7 +22,8 @@
       }
     ],
     "source": "1302 银枝 天赋 崇高的客体 (130204, Enhance): 「施放普攻、战技、终结技时，每击中1个敌方目标，为银枝恢复3点能量并获得1层【升格】，使银枝暴击率提高2.50%，该效果最多叠加10层。」 数据行 Lv10 = [3, 0.025, 10] → #1 = 3 能量、#2 = 0.025、#3 = 10 层",
-    "note": "The talent, on the 普攻 half of its three slots. ⚠ `per_target: true` is 「**每击中 1 个**敌方目标…恢复 3 点能量」 — the energy multiplies by the event's hit count, which is exactly what that field is for (and the count is the attack's, not one instance's). ⚠ 【升格】 is spelled as a **stackable named modifier** rather than a separate counter plus a buff: `max_stacks: 10` on the crit-rate modifier gives 「最多叠加10层」 for free, and `buff: 升格` gives the name every other clause needs — `self_stacks:升格` (星魂 4 reads it? see below) and any removal by name. One mechanism, not two. ⚠ The value is her talent row's #2 (Lv10 = 0.025), not a literal somebody typed."
+    "note": "The talent, on the 普攻 half of its three slots. ⚠ `per_target: true` is 「**每击中 1 个**敌方目标…恢复 3 点能量」 — the energy multiplies by the event's hit count, which is exactly what that field is for (and the count is the attack's, not one instance's). ⚠ 【升格】 is spelled as a **stackable named modifier** rather than a separate counter plus a buff: `max_stacks: 10` on the crit-rate modifier gives 「最多叠加10层」 for free, and `buff: 升格` gives the name every other clause needs — `self_stacks:升格` (星魂 4 reads it? see below) and any removal by name. One mechanism, not two. ⚠ The value is her talent row's #2 (Lv10 = 0.025), not a literal somebody typed.",
+    "id": "talent_stack_basic"
   },
   {
     "on": "SKILL_CAST",
@@ -47,7 +48,8 @@
       }
     ],
     "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之二（战技）",
-    "note": "The 战技 third of the same sentence — three rules because 「普攻、战技、终结技」 are three cast events, and a rule fires on one. ⚠ They cannot be one rule: [the DSL has no OR], and the events themselves are split at the emitter (see 1215's shock marks for the same shape)."
+    "note": "The 战技 third of the same sentence — three rules because 「普攻、战技、终结技」 are three cast events, and a rule fires on one. ⚠ They cannot be one rule: [the DSL has no OR], and the events themselves are split at the emitter (see 1215's shock marks for the same shape).",
+    "id": "talent_stack_skill"
   },
   {
     "on": "ULT_CAST",
@@ -72,7 +74,8 @@
       }
     ],
     "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之三（终结技）",
-    "note": "The 终结技 third — see the 普攻 rule for why there are three. ⚠ It fires for the **强化终结技** as well (both are the Ultra slot, 130203 and 130214), which is what 「终结技」 means."
+    "note": "The 终结技 third — see the 普攻 rule for why there are three. ⚠ It fires for the **强化终结技** as well (both are the Ultra slot, 130203 and 130214), which is what 「终结技」 means.",
+    "id": "talent_stack_ultra"
   },
   {
     "on": "TURN_START",
@@ -145,11 +148,26 @@
         "buff": "升格",
         "permanent": true,
         "target": "self"
+      },
+      {
+        "op": "MODIFY_RULE",
+        "rule": "talent_stack_basic",
+        "effect_max_stacks": 2
+      },
+      {
+        "op": "MODIFY_RULE",
+        "rule": "talent_stack_skill",
+        "effect_max_stacks": 2
+      },
+      {
+        "op": "MODIFY_RULE",
+        "rule": "talent_stack_ultra",
+        "effect_max_stacks": 2
       }
     ],
     "min_eidolon": 4,
-    "source": "1302 银枝 星魂 4 号角的奉献 (Avatar_Argenti_00_Rank04): 「战斗开始时，获得2层【升格】，并使天赋的效果可叠加上限提高2层。」 param = [2, 2]",
-    "note": "「**战斗开始时，获得 2 层**【升格】」 — two effects because one stack is one buff: stating the same modifier twice at battle start attaches two of them, which is what 「2 层」 means and is the same shape 遗器's stacking bonuses use. ⚠ **Registered, not written**: the second half 「使天赋的效果**可叠加上限提高 2 层**」 would raise a `max_stacks` field on another rule's effect, which is `MODIFY_RULE`'s family but a **fourth** form (it raises a count of firings, a probability, a value and a duration today — not a cap). Filing it as two extra stacks instead would be wrong in the one case that matters: they must be able to exceed 10."
+    "source": "1302 银枝 星魂 4 号角的奉献 (Avatar_Argenti_00_Rank04): 「战斗开始时，获得2层【升格】，并使天赋的效果可叠加上限提高2层。」 param = [2, 2] + 后半「并使天赋的效果可叠加上限提高2层」（用 `effect_max_stacks: 2` 抬三条天赋规则的上限）",
+    "note": "「**战斗开始时，获得 2 层**【升格】」 — two effects because one stack is one buff: stating the same modifier twice at battle start attaches two of them, which is what 「2 层」 means and is the same shape 遗器's stacking bonuses use. ⚠ **Registered, not written**: the second half 「使天赋的效果**可叠加上限提高 2 层**」 would raise a `max_stacks` field on another rule's effect, which is `MODIFY_RULE`'s family but a **fourth** form (it raises a count of firings, a probability, a value and a duration today — not a cap). Filing it as two extra stacks instead would be wrong in the one case that matters: they must be able to exceed 10. ⚠ **2026-09-28 补齐**：后半「使天赋的效果**可叠加上限提高 2 层**」现在写出来了 —— `MODIFY_RULE` 的**第四形态**（`effect_max_stacks: 2`），三条天赋规则各抬一次（一条规则抬一条规则）。⚠ 写成\"再补两层\"是**错的**：它必须能**超过 10 层**，而补两层仍受 10 层上限约束。⚠ 修正案在战斗开始时就登记，而层数是之后一次次命中才叠上去的，所以新上限**来得及**生效（`max_stacks` 是 buff 实例上的值，事后抬没用）。"
   },
   {
     "on": "BATTLE_START",

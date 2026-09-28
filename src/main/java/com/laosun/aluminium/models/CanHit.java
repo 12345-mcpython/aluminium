@@ -192,6 +192,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private final Map<String, Double> ruleEffectPercentBonus = new HashMap<>();
     /** The duration half of the same idea: 「持续时间额外增加 N 回合」. */
     private final Map<String, Integer> ruleEffectTurnsBonus = new HashMap<>();
+    /** The cap half: 「可叠加上限提高 N 层」 — filed at battle start, so it is in place before any stack is attached. */
+    private final Map<String, Integer> ruleEffectMaxStacksBonus = new HashMap<>();
 
     /**
      * Per-battle <b>skill level raises</b> (M-32), keyed by slot: 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5, and the
@@ -720,6 +722,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         ruleBaseChanceBonus.clear();
         ruleEffectPercentBonus.clear();
         ruleEffectTurnsBonus.clear();
+        ruleEffectMaxStacksBonus.clear();
         skillLevelBonus.clear();
     }
 
@@ -835,6 +838,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         if (ruleId != null && !ruleId.isBlank()) {
             ruleEffectTurnsBonus.merge(ruleId.trim(), delta, Integer::sum);
         }
+    }
+
+    /** Adds {@code delta} layers to the stack cap of every {@code max_stacks} read of the named rule's effects. */
+    public void amendRuleEffectMaxStacks(String ruleId, int delta) {
+        if (ruleId != null && !ruleId.isBlank()) {
+            ruleEffectMaxStacksBonus.merge(ruleId.trim(), delta, Integer::sum);
+        }
+    }
+
+    /** The cap amendment for a rule, or {@code null} when nothing raised it. */
+    public Integer ruleEffectMaxStacksBonus(String ruleId) {
+        return ruleId == null || ruleId.isBlank() ? null : ruleEffectMaxStacksBonus.get(ruleId.trim());
     }
 
     /** The value amendment for a rule, or {@code null} when nothing raised it. */
