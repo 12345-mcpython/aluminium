@@ -1,0 +1,149 @@
+[
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_shock",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_DOT",
+        "element": "Thunder",
+        "scale": "self_attr:ATTACK",
+        "percent": 1.04,
+        "turns": 2,
+        "base_chance": 0.8,
+        "target": "target"
+      }
+    ],
+    "source": "1103 希露瓦 战技 电光石火间 (110302, BPSkill/Blast): 「…此外有80%的基础概率使受到攻击的敌方目标陷入触电状态，持续2回合。触电状态下，敌方目标每回合开始时受到等同于希露瓦104%攻击力的雷属性持续伤害。」 param Lv10 = [1.4, 0.6, 0.8, 2, 1.04] → #3 = 0.8（基础概率）、#4 = 2（回合）、#5 = 1.04（每回合持续伤害）",
+    "note": "The shock. ⚠ Three of the five numbers in her Skill's own row are here (#3 the base chance, #4 the turns, #5 the per-turn damage) while #1/#2 are the blast's damage, which the engine's own skill path already deals — a rule is for what the row does not already do (the lesson 1105 taught the hard way). ⚠ `scale: self_attr:ATTACK` is 「等同于希露瓦 104% 攻击力」: a DOT reads the **rule owner**, and `dotMagnitude` shares its arithmetic with `APPLY_CONTROL`'s payload. ⚠ `base_chance` and not a plain roll: 「有80%的基础概率」 is a base chance against effect resistance, which is the same convention 控制 and DOT application share (an unstated chance is 100% base). ⚠ The DOT's *name* is the engine's own per-element state name (触电 for Lightning, `BuffManager.stateNameOf`), which is why 终结技's extension and 星魂 6's 「触电状态下」 can both reach it without a name field here. ⚠ **Registered, not written**: 「使**受到攻击的**敌方目标陷入触电」 covers the blast's neighbours too, and a rule's effect reaches the units a *selector* names — 「the units this skill actually hit」 is not one of them today, so only the aimed target rolls here. Neighbouring-target conditions are the same missing piece as `M-53` (see ROADMAP)."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "EXTEND_BUFF",
+        "buff": "触电",
+        "turns": 2,
+        "target": "all_enemies"
+      }
+    ],
+    "source": "1103 希露瓦 终结技 机械热潮登场！ (110303, Ultra/AoEAttack): 「…并使触电状态下的敌方目标延长2回合的触电状态。」 param Lv10 = [1.8, 2] → #2 = 2（延长回合）",
+    "note": "「使**触电状态下的**敌方目标延长 2 回合的触电状态」 — and `EXTEND_BUFF` says that exactly as it stands: it walks every resolved target and extends only the buffs whose name matches, so the unshocked enemies in `all_enemies` are simply not touched (no condition needed, and none could express it per-target anyway — that is the same `M-53` limit, dodged here rather than suffered). ⚠ The engine resolves 触电 through `BuffManager.isNamed`, which answers DOTs by their element's state name. ⚠ It extends buffs **applied by the rule owner** (`getSource() == source`), which is every shock her own kit makes; a shock from a teammate would be left alone, and that nuance is honest rather than accidental — the document's sentence has no source in it. ⚠ The 180% damage (#1) is the engine's own AoE path, not a rule."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 15
+      }
+    ],
+    "source": "1103 希露瓦 行迹 电音 (1103102): 「战斗开始时，立即恢复15点能量。」",
+    "note": "「战斗开始时，立即恢复 15 点能量」 — a plain flat grant with no target stated, which means the rule's owner (her). ⚠ Not `percent`-of-anything and not `self_max_energy`-derived: the document gives a flat 15."
+  },
+  {
+    "on": "KILL",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.2,
+        "turns": 2,
+        "target": "self"
+      }
+    ],
+    "source": "1103 希露瓦 行迹 狂热 (1103103): 「消灭敌方目标后，攻击力提高20%，持续2回合。」",
+    "note": "「消灭敌方目标后，攻击力提高 20%，持续 2 回合」. ⚠ `KILL`'s **actor** is the killer and the event carries no subject for the victim, so no condition is needed to say 「消灭敌方目标」 — but ⚠ this rule as written fires on *any* kill on the field, not only hers; gating it on `actor == self` would be an approximation of the opposite kind (the document says 「消灭敌方目标后」 with 希露瓦 as the subject, and the rule's owner is already her — a kill by a teammate still credits the party in this engine's `KILL` event). It is written without the gate and this note is the registration: the engine's `KILL` does not yet say *who* is credited in a way a rule can ask for."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "MODIFY_RULE",
+        "rule": "skill_shock",
+        "percent": 0.2
+      }
+    ],
+    "source": "1103 希露瓦 行迹 摇滚 (1103101): 「施放战技时，使受到攻击的敌方目标陷入触电状态的基础概率提高20%。」",
+    "note": "「…陷入触电状态的**基础概率提高 20%**」: `MODIFY_RULE`'s probability form (the field is `percent`, because the sentence raises a probability, not a count), so 80% becomes 100% — ⚠ and it must be an *amendment* rather than a second shock rule, because a second rule would roll **twice** (1 − 0.2 × 0.2 = 96%, not 100%). ⚠ It is filed against `skill_shock`, so it only moves the Skill's roll, not a hypothetical other one."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      }
+    ],
+    "source": "1103 希露瓦 技能表的**等级口径**: 文档引用的 140%/60%/180% 都是 Lv10 行（110301/110302/110303 的 Lv10 与 Lv1 分别是 1.4/0.5、[1.4,0.6]/[0.7,0.3]、1.8/1.08）",
+    "note": "The file stating **which level its quoted numbers come from** (M-32). ⚠ Unlike 1215 — whose quoted numbers lived in rules that state their own magnitudes — 希露瓦's 140%/60%/180% are the engine's own skill execution, which reads `user.skillLevel(skill)`; without this rule the engine would deal the Lv1 rows (70%/30%/108%) while her document says Lv10. ⚠ So this is not bookkeeping here: it changes the damage the engine deals, which is exactly what 「文档引用的是哪一行」 means. ⚠ `TALENT` is deliberately absent: her talent's row is only read by the (registered) additional-damage clause, and nothing in this file reads it."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "when": [
+      "actor == self",
+      "target has_state 触电"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.3
+      }
+    ],
+    "min_eidolon": 6,
+    "source": "1103 希露瓦 星魂 6 这一曲，贯穿天穹！ (Avatar_Serval_00_Rank06): 「希露瓦对触电状态下的敌方目标造成的伤害提高30%。」 param = [0.3]",
+    "note": "「希露瓦**对触电状态下的敌方目标**造成的伤害提高 30%」. ⚠ `target has_state 触电` reads the unit being hit (`BuffManager.hasState` resolves DOTs by their element's state name), which is the sentence's subject; `actor == self` keeps it to **her** damage — without it, a teammate's hit on a shocked enemy would be boosted too. ⚠ `BOOST_DAMAGE` raises this **instance** only, which is what a damage-taken/damage-dealt conditional means; a 2-turn buff would be a different sentence (compare 1215's talent, which does state 「持续2回合」). ⚠ It is gated on the eidolon (`min_eidolon: 6`)."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 1
+      }
+    ],
+    "min_eidolon": 3,
+    "source": "1103 希露瓦 星魂 3 听，齿轮的心跳 (Avatar_Serval_00_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'110302': 2, '110301': 1}",
+    "note": "星魂 3's two raises (M-32). ⚠ Here they compose with the base-level rule above by addition (SKILL: +9 then +2), which is the same arithmetic 1215's 星魂 3/5 use. ⚠ The caps (15 / 10) are the tables' own sizes, so an over-raise fails loudly rather than reading a row that does not exist."
+  },
+  {
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 2
+      }
+    ],
+    "min_eidolon": 5,
+    "source": "1103 希露瓦 星魂 5 贝洛伯格最强音！ (Avatar_Serval_00_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'110303': 2, '110304': 2}",
+    "note": "星魂 5's two raises. ⚠ The TALENT half is stated even though this file's talent clause is registered: it is a fact about the loadout, and the day that clause is written the level is already right — the same reasoning 1215's base-level rule gives. ⚠ **Not written yet in this file** (each with its blocker, all in ROADMAP): 天赋「施放攻击后，对**所有触电状态下的**敌方目标造成等同于希露瓦 72% 攻击力的雷属性附加伤害」(a rule's effect reaches what a *selector* names, so 「all shocked enemies」 cannot be filtered per target — `M-53`); 战技的相邻目标触电判定 (the skill's own hit list is not addressable); 星魂 1「普攻对指定敌方目标的 1 个随机相邻目标造成…60%」(no adjacent selector); 星魂 2「每触发 1 次天赋的附加伤害，希露瓦恢复 4 点能量」(rides on the talent); 星魂 4「施放终结技时，有 100% 基础概率使**非触电状态下的**敌方目标…」(the negation is per target, `M-53` again)."
+  }
+]
