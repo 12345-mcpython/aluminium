@@ -120,6 +120,37 @@ public class SkillLevelTest {
                 "the same object reused: cleared, then raised again by its own BATTLE_START rule — 9, not 18");
     }
 
+    /**
+     * ⚠ <b>The third read site</b>: a skill whose amount comes from the <b>generated effect table</b>
+     * ({@code skill_effects.json} + {@code SkillExecutor.effectAmount}), not from its damaging path.
+     *
+     * <p>Mutation m3 (that call site going back to the raw level) was the one mutation this file did not catch: every
+     * other case measures damage. 1105 is the clean subject — it has a {@code healer_max_hp}-scaled heal in its
+     * generated table and <b>no character file</b>, so no rule of its own can overwrite what is being measured.
+     */
+    @Test
+    public void aGeneratedEffectReadsTheRaise() {
+        double base = generatedHeal(0);
+        double raised = generatedHeal(RAISE);
+
+        Assertions.assertTrue(base > 0, "precondition: 1105's Skill really heals through the generated table");
+        Assertions.assertTrue(raised > base,
+                "the generated effect reads the raised row too (base " + base + " vs raised " + raised + ")");
+    }
+
+    /** 1105's Skill, cast on a hurt ally, measured as the HP restored. */
+    private static double generatedHeal(int raiseBy) {
+        Character healer = CharacterFactory.create(1105, LEVEL);
+        Character ally = CharacterFactory.create(1002, LEVEL);
+        healer.setTriggerTable(new TriggerTable(1105, raiseBy > 0 ? List.of(raise(SkillType.SKILL, raiseBy)) : List.of()));
+        Battle battle = new Battle(List.of(healer, ally), List.of(enemy()), fixed());
+        battle.startBattle();
+        ally.takeDamage(ally.getMaxHp() * 0.5);
+        double before = ally.getCurrentHp();
+        battle.castImmediate(healer.getSkills().get(SkillType.SKILL), healer, List.of(ally));
+        return ally.getCurrentHp() - before;
+    }
+
     /** The shape is refused at load: no slot, an unknown slot, a zero or fractional amount, a wrong event. */
     @Test
     public void theShapeIsRefusedAtLoad() {
