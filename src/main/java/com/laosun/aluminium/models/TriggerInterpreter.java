@@ -1329,8 +1329,14 @@ public final class TriggerInterpreter {
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         String state = effect.getBuff().trim();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().addBuff(withSource(withTickOwner(
-                    withLifetime(new StateBuff(state, turns, permanent), effect), effect, ctx), ctx));
+            AbstractBuff buff = withSource(withTickOwner(
+                    withLifetime(new StateBuff(state, turns, permanent), effect), effect, ctx), ctx);
+            // 「不会进入自己的回合」 rides on the state itself: a turn is not something a state could give back
+            // later, so the flag and the state share one lifetime by construction.
+            if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
+                buff.setSuspendsTurns(true);
+            }
+            target.getBuffManager().addBuff(buff);
         }
     }
 

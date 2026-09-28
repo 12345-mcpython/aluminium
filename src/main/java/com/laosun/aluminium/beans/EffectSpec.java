@@ -417,6 +417,8 @@ public class EffectSpec {
      * \u300c\u56fa\u5b9a\u4e3a\u300d -- the outcome is not rolled at all (`Damage.fixedCrit`). A "fixed 50%" would be a third thing
      * nobody can read, so the loader refuses it by name.
      */
+    private Boolean suspendsTurns;
+
     private Double critRate;
 
     /**

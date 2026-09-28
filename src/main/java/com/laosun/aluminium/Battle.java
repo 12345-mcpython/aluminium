@@ -760,6 +760,12 @@ public class Battle {
             return;
         }
         CanHit actor = currentMove.getCanHit();
+        // 「【协奏】状态结束前不会进入自己的回合且无法行动」 (M-49 的一环): a suspended unit's turn passes *without it* -- no DOT
+        // tick, no TURN_START, no own hooks. ⚠ Deliberately not a control: a control still lets the turn arrive (and
+        // the DOTs tick), which is a different sentence; see AbstractBuff#suspendsTurns.
+        if (actor.getBuffManager().suspendsTurns()) {
+            return;
+        }
         // P4-5: damage over time is settled at the start of the turn -- of **any** unit, not only an
         // enemy. The `instanceof Enemy` guard that used to stand here was the visible edge of the old
         // design (a DOT could only exist on an Enemy); now that a DOT is an ordinary buff there is
