@@ -9,10 +9,19 @@
         "op": "DISPEL",
         "amount": 1,
         "target": "target"
+      },
+      {
+        "op": "APPLY_REGEN",
+        "scale": "owner_max_hp",
+        "percent": 0.072,
+        "amount": 192,
+        "turns": 2,
+        "buff": "持续治疗",
+        "target": "target"
       }
     ],
-    "source": "1105 娜塔莎 战技 爱，救护与抉择 (110502, BPSkill/Restore): 「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 param Lv10 = [0.105, 0.072, 2, 280, 192] → #1 = 0.105, #4 = 280；行迹 舒缓 (1105101)：「施放战技时，解除指定我方单体的1个负面效果」",
-    "note": "The trace that rides on the same cast. ⚠ The Skill's own heal 「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 is **NOT** written here: her Skill is a `Restore` skill, so the engine's skill pipeline already heals from the row (110502, Lv10 #1/#4), exactly as a damage skill already deals its damage. ⚠ The first version of this file DID write it as a rule and the suite caught the double heal (measured 671.9 = the engine's 174.3 x 1.1 plus the rule's 480): a rule is for what the row does not already do. ⚠ `DISPEL` is that kind of clause (行迹 舒缓 「施放战技时，解除指定我方单体的1个负面效果」) and it reaches negative buffs only, which is exactly what the sentence says. ⚠ NOT written: the regeneration 「同时目标每回合开始时为其回复等同于娜塔莎7.20%生命上限+192的生命值，持续2回合」 -- a heal over time has no spelling yet (the engine has the damage twin, `APPLY_DOT`, and no healing one), and the ordering makes it fiddly rather than trivial: buffs are ticked *before* `TURN_START`, so a `turns: 2` state is already gone by the second turn's event and a naive rule gives one tick where the document says two. Registered rather than shipping one tick, and rather than writing `turns: 3` to make the count come out right while misstating the duration."
+    "source": "1105 娜塔莎 战技 爱，救护与抉择 (110502, BPSkill/Restore): 「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 param Lv10 = [0.105, 0.072, 2, 280, 192] → #1 = 0.105, #4 = 280；行迹 舒缓 (1105101)：「施放战技时，解除指定我方单体的1个负面效果」；战技第二句：「同时目标每回合开始时为其回复等同于娜塔莎7.20%生命上限+192的生命值，持续2回合」 param Lv10 = [0.105, 0.072, 2, 280, 192] → #2 = 0.072、#5 = 192、#3 = 2",
+    "note": "The trace that rides on the same cast. ⚠ The Skill's own heal 「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 is **NOT** written here: her Skill is a `Restore` skill, so the engine's skill pipeline already heals from the row (110502, Lv10 #1/#4), exactly as a damage skill already deals its damage. ⚠ The first version of this file DID write it as a rule and the suite caught the double heal (measured 671.9 = the engine's 174.3 x 1.1 plus the rule's 480): a rule is for what the row does not already do. ⚠ `DISPEL` is that kind of clause (行迹 舒缓 「施放战技时，解除指定我方单体的1个负面效果」) and it reaches negative buffs only, which is exactly what the sentence says. The regeneration 「同时目标每回合开始时为其回复等同于娜塔莎7.20%生命上限+192的生命值，持续2回合」 (Skill row Lv10 #2 = 0.072, #5 = 192, #3 = 2 turns). ⚠ It is a **buff**, not a `TURN_START` rule, and that is the whole difficulty: the duration is counted down by the buff manager's *early* tick, which runs after the settle pass and before `TURN_START`, so a `turns: 2` **state** read from `TURN_START` is already gone on the second turn (one tick where the document says two). `APPLY_REGEN` settles in `Battle.tickRegens`, beside the DOT pass, so a `turns: 2` regeneration really settles twice. ⚠ `buff: 持续治疗` is required, and not for bookkeeping: 行迹 调理 「施放战技产生的持续回复效果延长1回合」 reaches it by that name (see the next rule). ⚠ The amount is derived from **her** max HP when the rule fires and then frozen, exactly like the shield and the heal; `Battle.heal` still reads her `OUTGOING_HEALING_BOOST`, which is why the trace below multiplies it."
   },
   {
     "on": "TAKING_HIT",
@@ -65,5 +74,22 @@
     "min_eidolon": 3,
     "source": "1105 娜塔莎 星魂 3 对症下药 (Avatar_Natasha_00_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'110502': 2, '110501': 1}",
     "note": "The level raise (M-32). ⚠ Stated for completeness as a loadout fact: nothing in this file reads a skill row today — the two heals and the boost state their own magnitudes (the Lv10 rows quoted above) — so this rule moves the engine's own skill execution, not these rules. The caps (15 / 10) are the parameter tables' own sizes, so an over-raise fails loudly instead of reading a row that does not exist (see 1001/1215 for the same convention). ⚠ **Not classified yet in this file**: 星魂 4/5/6 and the 行迹 that ride on the regeneration (调理 「施放战技产生的持续回复效果延长1回合」、星魂 2 「对生命百分比 ≤ 30% 的我方目标附加 1 回合的持续治疗效果」), plus 天赋 生机焕发 「为当前生命值百分比 ≤ 30% 的我方目标提供治疗时，娜塔莎的治疗量提高 50%，该效果对持续治疗效果也会生效」 — the last one needs the same missing piece as everything else here: a hook **before** a heal is computed (the engine has `HEALED`, which fires *after* the HP was restored, and `MODIFY_ATTR` cannot reach an instance that is already being settled). All four are registered in ROADMAP with their readers."
+  },
+  {
+    "on": "SKILL_CAST",
+    "id": "trace_conditioning",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "EXTEND_BUFF",
+        "buff": "持续治疗",
+        "turns": 1,
+        "target": "target"
+      }
+    ],
+    "source": "1105 娜塔莎 行迹 调理 (1105103): 「施放战技产生的持续回复效果延长1回合。」",
+    "note": "「施放战技**产生的**持续回复效果延长1回合」: `EXTEND_BUFF` by the buff's name, which is the same mechanic as 1001's 加护 (「战技提供的护盾持续时间增加1回合」). ⚠ It is a separate rule that sits **after** the Skill's own rule, so the regeneration is already attached when it runs: rules of one event run in file order, and only their *conditions* are evaluated together. ⚠ The +1 is deliberately not folded into the Skill's `turns: 2`: that would erase this trace's line from the data and make the Skill state a duration that is not its own."
   }
 ]

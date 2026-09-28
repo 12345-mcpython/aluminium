@@ -82,19 +82,39 @@ public class NatashaHealTest {
                 "「娜塔莎提供的治疗量提高10%」 -- the first shipped content to grant this attribute");
     }
 
-    /** ⚠ The registered half stays registered: two casts do not leave a regeneration behind. */
+    /**
+     * The regeneration settles on each of the carrier's turns, and then stops (2026-09-28).
+     *
+     * <p>⚠ This is the case that used to be impossible to write at all: 「同时目标每回合开始时为其回复…持续2回合」 cannot be a
+     * {@code TURN_START} rule, because buffs are counted down by the early tick that runs <b>before</b> that event — a
+     * {@code turns: 2} state would heal once where the document says twice. `APPLY_REGEN` settles beside the DOT pass,
+     * which runs before the countdown, so two turns really are two heals (three here: 行迹 调理 adds a turn).
+     */
     @Test
-    public void theRegenerationIsNotApproximated() {
+    public void theRegenerationTicksOnEachOfTheCarriersTurns() {
         Fixture f = new Fixture();
         f.ally.takeDamage(f.ally.getMaxHp() * 0.5);
         f.castSkillOn(f.ally);
+        double perTick = (0.072 * f.natasha.getMaxHp() + 192) * 1.1;    // Lv10 row #2/#5, plus 行迹 医者
         double afterCast = f.ally.getCurrentHp();
 
         f.allyTurn();
+        Assertions.assertEquals(Math.min(f.ally.getMaxHp(), afterCast + perTick), f.ally.getCurrentHp(), 1.0,
+                "first turn start: 「目标每回合开始时为其回复…」");
 
-        Assertions.assertEquals(afterCast, f.ally.getCurrentHp(), 1.0,
-                "「同时目标每回合开始时为其回复…持续2回合」 is registered, not written: nothing may tick a heal yet, "
-                        + "and one tick of two would be a wrong number rather than a missing one");
+        double afterFirst = f.ally.getCurrentHp();
+        f.allyTurn();
+        Assertions.assertEquals(Math.min(f.ally.getMaxHp(), afterFirst + perTick), f.ally.getCurrentHp(), 1.0,
+                "second turn start: a `turns: 2` regeneration settles twice, which is the whole point of settling before "
+                        + "the duration is counted down");
+
+        double afterThird = f.ally.getCurrentHp();
+        f.allyTurn();
+        Assertions.assertEquals(Math.min(f.ally.getMaxHp(), afterThird + perTick), f.ally.getCurrentHp(), 1.0,
+                "…and a third time, because 行迹 调理 lengthens it by one turn");
+        double afterFourth = f.ally.getCurrentHp();
+        f.allyTurn();
+        Assertions.assertEquals(afterFourth, f.ally.getCurrentHp(), 1.0, "…and then it is over");
     }
 
     // ==================================================================

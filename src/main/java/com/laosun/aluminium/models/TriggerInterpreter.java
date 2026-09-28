@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -432,6 +432,14 @@ public final class TriggerInterpreter {
                 }
                 rejectCountdownExtras(effect, op, spec);
             }
+            case "APPLY_REGEN" -> {
+                // 「每回合开始时为其回复等同于…生命上限的 X% + N，持续 M 回合」: the healing twin of APPLY_DOT.
+                // Its magnitude is a HEAL amount, so it takes the heal/shield scale vocabulary (SCALES), NOT the
+                // self_attr: one the MODIFY_ATTR family uses -- 「等同于她生命上限的 7.2%」 is owner_max_hp.
+                requireAmountOrScale(effect, op, spec, SCALES, "Max HP");
+                requireDuration(effect, op, spec);
+                requireBuff(effect, op, spec);
+            }
             case "ADD_STACK" -> {
                 // 「每当我方目标…施放2次…后」 / 「触发2次后自动解除」: a counter, which is a named stack buff (see StackBuff).
                 requireBuff(effect, op, spec);
@@ -729,6 +737,7 @@ public final class TriggerInterpreter {
             case "RAISE_SKILL_LEVEL" -> raiseSkillLevel(effect, ctx);
             case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
             case "ADD_STACK" -> addStack(battle, effect, ctx);
+            case "APPLY_REGEN" -> applyRegen(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1909,6 +1918,30 @@ public final class TriggerInterpreter {
      * <p>⚠ The name comes from the rule's own {@code buff} when it states one (it is what the log shows, and nothing
      * reads it back, so it needs no id).
      */
+    /**
+     * {@code APPLY_REGEN}: attaches a {@link com.laosun.aluminium.models.buff.RegenBuff}, whose amount is derived once
+     * (the applier's panel) and settled on each of the carrier's turns by {@code Battle.tickRegens}.
+     *
+     * <p>⚠ Its name is required, and not for bookkeeping: 「施放战技产生的持续回复效果延长1回合」 (1105 行迹 调理) and any
+     * removal by name reach it through that string, exactly as a 遗器 set's temporary buff does.
+     */
+    private static void applyRegen(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        String name = effect.getBuff() == null ? "" : effect.getBuff().trim();
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            if (target == null || target.isDeath()) {
+                continue;
+            }
+            // ⚠ grantAmount, not derivedMagnitude: the regeneration's magnitude is a HEAL amount, so it shares the
+            // heal/shield scale vocabulary and is worked out per carrier (a 	arget_max_hp regeneration is a different
+            // number for each one). The value is derived once, here, and frozen in the buff.
+            double amount = grantAmount(effect, target, ctx);
+            AbstractBuff regen = withSource(withLifetime(
+                    new com.laosun.aluminium.models.buff.RegenBuff(ctx.owner(), name, amount, effect.getTurns()),
+                    effect), ctx);
+            target.getBuffManager().addBuff(regen);
+        }
+    }
+
     /**
      * {@code ADD_STACK}: 「每当我方目标对【承负】状态下的敌方目标施放 2 次普攻/战技/终结技后…」 (2026-09-28) — one more mark on a
      * named counter.
