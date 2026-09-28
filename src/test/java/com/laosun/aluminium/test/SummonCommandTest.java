@@ -313,8 +313,18 @@ public class SummonCommandTest {
         Assertions.assertEquals("ULTRA", command.getSkill());
         Assertions.assertEquals(0, command.getDamageParam(),
                 "column 0 is `#1[i]`, the Max HP share (the placeholders are 1-based, the column is not)");
-        Assertions.assertEquals(10, command.getDamageLevel(),
-                "the row the prose quotes: 2.0 at Lv10, not 1.0 at the level the character's skills are at");
+        Assertions.assertNull(command.getDamageLevel(),
+                "⚠ no `damage_level` any more (M-32): the row is not pinned per effect but stated as the skill's own "
+                        + "level, so a 星魂's 「终结技等级+2」 composes with it instead of being ignored");
+        // …and the file really does state that level, as a BATTLE_START raise of the ULTRA slot (10 - 1).
+        TriggerTable table = TriggerTables.of(OWNER);
+        Assertions.assertTrue(table.matching(TriggerEvent.BATTLE_START,
+                        new TriggerTable.TriggerContext(owner, owner, null, 0, 0, null, battle)).stream()
+                        .flatMap(rule -> rule.effects().stream())
+                        .anyMatch(effect -> "RAISE_SKILL_LEVEL".equals(effect.getOp())
+                                && "ULTRA".equals(effect.getSkill())
+                                && effect.getAmount() != null && effect.getAmount() == 9.0),
+                "her file states 「quoted at Lv10」 as a ULTRA +9 battle-start raise");
         Assertions.assertEquals("HEALTH", command.getAttribute());
         Assertions.assertNull(command.getPercent(), "the multiplier is the skill's, not a second copy here");
         Assertions.assertNull(command.getTarget(), "the victims come from the skill's shape");

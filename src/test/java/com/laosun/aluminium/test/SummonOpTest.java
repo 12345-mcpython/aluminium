@@ -79,8 +79,11 @@ public class SummonOpTest {
 
     /** The op is the only thing her file says so far, and the loader reads exactly it. */
     @Test
-    public void herFileContainsJustTheSummoningClause() {
-        Assertions.assertEquals(1, TriggerTables.of(CASTORICE_LIKE).ruleCount(TriggerEvent.BATTLE_START));
+    public void herFileContainsTheSummoningClauseAndHerLevel() {
+        // ⚠ 2 since M-32: the summoning clause and the rule that states which level her ultimate's numbers were
+        // quoted at (「quoted at Lv10」 as an ULTRA +9 raise). Before that, the level lived in a `damage_level` field
+        // on the damage effect, so the file had one battle-start rule.
+        Assertions.assertEquals(2, TriggerTables.of(CASTORICE_LIKE).ruleCount(TriggerEvent.BATTLE_START));
         Assertions.assertFalse(TriggerTables.of(CASTORICE_LIKE).isEmpty());
     }
 
