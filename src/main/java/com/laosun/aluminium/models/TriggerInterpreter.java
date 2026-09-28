@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -418,6 +418,16 @@ public final class TriggerInterpreter {
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
+            case "START_COUNTDOWN" -> {
+                // 「行动序列上出现【协奏】倒计时…倒计时固定拥有 90 点速度」 (M-49): a unit whose only job is to have a turn.
+                if (effect.getSpeed() == null || effect.getSpeed() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " needs a positive \"speed\": the countdown's turn is decided by it, and a "
+                                    + "countdown that never acts is a duration that never ends "
+                                    + "(source: " + spec.getSource() + ")");
+                }
+                rejectCountdownExtras(effect, op, spec);
+            }
             case "RAISE_SKILL_LEVEL" -> {
                 // 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5 and the same sentence in most kits): the level a skill is
                 // READ at is character data plus this battle's raises (M-32), and one op is what raises it -- never a
@@ -651,6 +661,7 @@ public final class TriggerInterpreter {
             case "RESIST_DEBUFF" -> resistDebuff(battle, effect, ctx);
             case "MODIFY_RULE" -> modifyRule(effect, ctx);
             case "RAISE_SKILL_LEVEL" -> raiseSkillLevel(effect, ctx);
+            case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
@@ -1807,6 +1818,44 @@ public final class TriggerInterpreter {
      * <p>⚠ <b>{@code BATTLE_START} only</b>, like {@code MODIFY_RULE}: a level raise is a passive fact of the loadout,
      * and a raise applied mid-battle would have to be taken back at a point nobody states.
      */
+    /**
+     * {@code START_COUNTDOWN}: 「行动序列上出现【协奏】倒计时…倒计时固定拥有 90 点速度」 (M-49).
+     *
+     * <p>Its turn is announced as {@link TriggerEvent#COUNTDOWN_TURN}, and the content answers with vocabulary it
+     * already has (`REMOVE_STATE` + `EXTRA_TURN self` for 「退出【协奏】状态并立即行动」) — so this op does one thing only,
+     * which is what keeps the countdown reusable for every other 倒计时 sentence in the corpus.
+     *
+     * <p>⚠ The name comes from the rule's own {@code buff} when it states one (it is what the log shows, and nothing
+     * reads it back, so it needs no id).
+     */
+    private static void startCountdown(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        String name = effect.getBuff() == null || effect.getBuff().isBlank()
+                ? (ctx.owner() == null ? "countdown" : ctx.owner().getName() + " 倒计时")
+                : effect.getBuff().trim();
+        battle.startCountdown(name, effect.getSpeed());
+    }
+
+    /**
+     * Refuses every field a {@code START_COUNTDOWN} effect does not read.
+     */
+    private static void rejectCountdownExtras(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getPercent() != null || effect.getScale() != null || effect.getTurns() != null
+                || effect.getAttribute() != null || effect.getElement() != null
+                || effect.getControl() != null || effect.getBaseChance() != null
+                || effect.getKind() != null || effect.getStacks() != null
+                || effect.getDamageParam() != null || effect.getDamageLevel() != null
+                || effect.getAsAttack() != null || effect.getPerTarget() != null
+                || effect.getRule() != null || effect.getSkill() != null
+                || effect.getResource() != null || effect.getAmount() != null
+                || effect.getPermanent() != null || effect.getUntil() != null
+                || effect.getTicksOn() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " places one countdown and states nothing else: \"speed\" (its fixed speed) and "
+                            + "optionally \"buff\" (the name it shows in logs) "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
     private static void raiseSkillLevel(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
         if (owner == null) {

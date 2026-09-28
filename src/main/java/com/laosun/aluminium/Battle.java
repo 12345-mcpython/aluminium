@@ -155,6 +155,15 @@ public class Battle {
     public ArrayList<CanHit> addRequestItems = new ArrayList<>();
 
     /**
+     * The countdown units this battle has placed on the action order (M-49).
+     *
+     * <p>Kept in their own list, and ⚠ <b>not</b> in {@link #allies}: a countdown belongs to our camp (our rules react
+     * to its turn) but it is not a party member — were it in the roster, 「我方全体」 would buff it, `lowest_hp_ally`
+     * could pick it, and it would be a legal target for every ally-directed effect. See {@link Countdown}.
+     */
+    private final List<Countdown> countdowns = new ArrayList<>();
+
+    /**
      * Summons placed since the last settle, so {@link TriggerEvent#SUMMONED} can be fired once they are in the
      * action bar (see {@link #fireSummoned}). Separate from {@link #addRequestItems} on purpose: that queue is
      * shared with wave entries, and a wave arriving is not a summon.
@@ -800,6 +809,12 @@ public class Battle {
         // comes back on MY turn (TriggerLimitTest.otherPeoplesTurnsDoNotCountTheCooldownDown).
         actor.tickTriggerCooldowns();
         fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
+        // P12 (M-49): a countdown exists to HAVE a turn -- this is the moment its reader waits for
+        // (「倒计时回合开始时知更鸟退出【协奏】状态并立即行动」). The countdown has no table of its own, and our
+        // characters' tables are what subscribe, so the ordinary ally broadcaster is the right one.
+        if (actor instanceof Countdown countdown) {
+            fireTriggersForAlly(TriggerEvent.COUNTDOWN_TURN, countdown, countdown, 0);
+        }
         actor.beforeMove(this);
     }
 
@@ -1585,6 +1600,29 @@ public class Battle {
      * @param amount the shield amount (≤ 0 is treated as clearing the shield)
      * @return the shield value actually set
      */
+    /**
+     * Places a <b>countdown</b> on the action order (M-49): a unit that only exists to have a turn at a fixed speed.
+     *
+     * <p>Called by the {@code START_COUNTDOWN} op. The unit is scheduled by the same queue as everybody else, so every
+     * mechanic that already moves the action order (advance, delay, weakness break) moves it too — for free and by
+     * construction, which is exactly why 「直到倒计时回合」 cannot be spelled as a `turns` count.
+     *
+     * @param name  what it is called in logs
+     * @param speed its fixed speed (90 for 知更鸟's 【协奏】)
+     * @return the countdown, for tests and logs
+     */
+    public Countdown startCountdown(String name, double speed) {
+        Countdown countdown = new Countdown(name, speed);
+        countdowns.add(countdown);
+        queue.addCombatant(countdown);
+        return countdown;
+    }
+
+    /** The countdown units placed so far (M-49), in the order they were started. */
+    public List<Countdown> countdowns() {
+        return java.util.Collections.unmodifiableList(countdowns);
+    }
+
     public double grantShield(CanHit target, double amount) {
         return grantShield(null, target, amount);
     }

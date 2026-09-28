@@ -255,7 +255,21 @@ public enum TriggerEvent {
      * have no table: a rule must narrow itself with {@code actor == self} (or the op refuses the cast that is not
      * its owner's, see {@code DELEGATE_DAMAGE}).
      */
-    CAST_SETUP("CAST_SETUP", true);
+    CAST_SETUP("CAST_SETUP", true),
+    /**
+     * ✅ A <b>countdown</b> unit's turn began (2026-09-28, M-49): fired from {@code Battle.beforeMove} with the
+     * countdown as {@code actor} (and as the subject), so a rule can answer 「倒计时回合开始时…」.
+     *
+     * <p><b>Why the moment needs an event at all.</b> 知更鸟's 【协奏】 lasts "until its countdown's turn arrives", which is a fact about
+     * the <b>action order</b> rather than about anybody's turn count — so the state cannot be given a `turns` and the
+     * arrival has to be announced. The countdown is an ordinary {@link com.laosun.aluminium.models.Countdown} scheduled
+     * by the queue, which is what makes advances/breaks move it for free.
+     *
+     * <p>⚠ <b>{@code actor} is the countdown, not the character whose state it ends.</b> The rule that reacts is
+     * written on the character and reads its own state (「退出【协奏】」是 `REMOVE_STATE` 加 `EXTRA_TURN self`), so the actor is only ever used
+     * to recognise the moment — and a rule that wants "my own countdown" says so by naming it in its own table.
+     */
+    COUNTDOWN_TURN("COUNTDOWN_TURN", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 

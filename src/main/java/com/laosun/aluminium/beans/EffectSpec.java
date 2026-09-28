@@ -401,6 +401,15 @@ public class EffectSpec {
     private Double baseChance;
 
     /**
+     * 「固定拥有 90 点速度」 -- the speed a {@code START_COUNTDOWN} countdown runs at (M-49).
+     *
+     * <p>⚠ Its own field rather than a reused {@code percent}: a speed is an absolute number in the speed stat's units
+     * (90, the same 90 that appears on a stat sheet), and folding it into a percentage field would make the reader
+     * guess the base it is a percentage <i>of</i>.
+     */
+    private Double speed;
+
+    /**
      * The <b>damage element</b> of the per-turn damage this effect attaches — {@code "Ice"} / {@code "Fire"} / …
      * (the {@code DamageElement} spelling, the same one {@code memosprites/<cid>.json}'s {@code attack.element}
      * uses). Read by {@code APPLY_DOT}, and by {@code APPLY_CONTROL} for the state's own per-turn damage.
