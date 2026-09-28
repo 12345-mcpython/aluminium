@@ -44,6 +44,29 @@ public class TrailblazerHarmonyTest {
                 "「持有【伴舞】的我方目标击破特攻提高30%」");
     }
 
+    /**
+     * ⚠ The duration runs on HER clock: her turn shortens it, an ally's does not.
+     *
+     * <p>「为我方全体附上【伴舞】效果，持续3回合，**开拓者每回合开始时**持续回合数减1」 — the state sits on every ally
+     * while the clock belongs to the caster, which is what {@code "ticks_on": "self"} states (the same field 星期日's
+     * 【蒙福者】 uses). The harness detail that made this case fail twice is in {@link Fixture#fullTurnOf}.
+     */
+    @Test
+    public void theDurationTicksOnHerOwnTurns() {
+        Fixture f = new Fixture();
+        f.castUltimate();
+
+        f.fullTurnOf(f.ally);
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("伴舞"),
+                "an ally's turn does not shorten it: 「**开拓者**每回合开始时」");
+
+        f.fullTurnOf(f.harmony);
+        f.fullTurnOf(f.harmony);
+        f.fullTurnOf(f.harmony);
+        Assertions.assertFalse(f.ally.getBuffManager().hasState("伴舞"),
+                "three of HER turns run the 3-turn state out, even on the allies carrying copies");
+    }
+
     /** The talent pays energy on any break, and 星魂 4 passes her break effect to the others. */
     @Test
     public void herTalentAndFourthEidolonAreAsStated() {
@@ -94,18 +117,20 @@ public class TrailblazerHarmonyTest {
         }
 
         /**
-         * One unit's turn start, <b>run through the engine</b> rather than fired by hand.
+         * One unit's <b>whole turn</b>, run through the engine rather than fired by hand.
          *
-         * ⚠ Firing {@code TURN_START} alone does not run the foreign-buff tick (「开拓者每回合开始时持续回合数减1」 is
-         * {@code tickForeignBuffs}, which lives in {@code Battle.beforeMove}) -- the first version of this case did exactly
-         * that and saw the state survive three of her turns.
+         * <p>⚠ Both halves are needed, and that is the whole lesson of this case: a `TURN_START` fired by hand does not run
+         * the foreign-buff tick at all, and driving only `beforeMove()` does not run it for a <b>late</b> buff either —
+         * `APPLY_BUFF` creates a late one, and 「开拓者每回合开始时持续回合数减1」 is delivered by
+         * `tickForeignBuffs(actor, false)` inside `afterMove`. Two earlier versions of this case failed on exactly that.
          */
-        private void turnStartOf(Character unit) {
+        private void fullTurnOf(Character unit) {
             battle.currentMove = battle.queue.snapshot().stream()
                     .filter(signal -> signal.getCanHit() == unit)
                     .findFirst()
                     .orElseThrow(() -> new AssertionError("no signal for that unit"));
             battle.beforeMove();
+            battle.afterMove();
         }
     }
 
