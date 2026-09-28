@@ -1543,10 +1543,12 @@ public final class TriggerInterpreter {
         double percent = effect.getPercent();
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+        // 「受到的**击破伤害**提高」: an optional damage-type scope, spelled with the enum's own names (2026-09-28).
+        com.laosun.aluminium.enums.DamageType scope = parseDamageType(effect, "MODIFY_DAMAGE_TAKEN", null);
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             target.getBuffManager().addBuff(withSource(withLifetime(percent > 0
-                    ? new VulnerabilityBuff(turns, percent, permanent)
-                    : new ReductionBuff(turns, -percent, permanent), effect), ctx));
+                    ? new VulnerabilityBuff(turns, percent, permanent, scope)
+                    : new ReductionBuff(turns, -percent, permanent, scope), effect), ctx));
         }
     }
 
@@ -1836,6 +1838,27 @@ public final class TriggerInterpreter {
             if (target != null) {
                 target.getBuffManager().removeBuffs(amount);
             }
+        }
+    }
+
+    /**
+     * Reads an optional {@code damage_type} and turns it into the engine's own spelling.
+     *
+     * <p>⚠ A misspelling that silently meant "all damage types" would be a wrong number with no symptom — the same hole the
+     * closed-set checks elsewhere in this interpreter exist to close, so the error names every legal value.
+     */
+    private static com.laosun.aluminium.enums.DamageType parseDamageType(EffectSpec effect, String op, TriggerSpec spec) {
+        String raw = effect.getDamageType();
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        try {
+            return com.laosun.aluminium.enums.DamageType.valueOf(raw.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException unknown) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names the damage type '" + raw + "', which is not one this engine settles; known: "
+                            + java.util.Arrays.toString(com.laosun.aluminium.enums.DamageType.values())
+                            + (spec == null ? "" : " (source: " + spec.getSource() + ")"));
         }
     }
 

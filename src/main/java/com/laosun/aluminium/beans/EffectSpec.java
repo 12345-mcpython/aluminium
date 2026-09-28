@@ -75,6 +75,7 @@ public class EffectSpec {
         copy.effectTurns = this.effectTurns;
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         copy.effectMaxStacks = this.effectMaxStacks;
+copy.damageType = this.damageType;
         return copy;
     }
 
@@ -175,6 +176,15 @@ public class EffectSpec {
      */
     @SerializedName("percent")
     private Double percent;
+
+    /**
+     * Which <b>kind</b> of incoming damage this modifier is about, or {@code null} for "all damage" (2026-09-28).
+     *
+     * <p>「【酩酊】使目标受到的<b>击破伤害</b>提高 12.00%」 (1301 Gallagher's talent) names one of the kinds the engine settles,
+     * and the trap it has to avoid is on the other side of the same word: {@code BREAKING_EFFECT} is "how hard <b>I</b> break",
+     * this is "how hard break damage hurts <b>me</b>". Spell it with {@code DamageType}'s own names; a typo is refused loudly.
+     */
+    private String damageType;
 
     /**
      * Duration in turns, where the op needs one.
