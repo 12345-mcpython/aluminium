@@ -135,5 +135,30 @@
     ],
     "source": "1109 虎克 星魂 5 好事留名鼹鼠党: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」",
     "note": "「终结技等级 +2；天赋等级 +2」—— 同星魂 3 的做法 ✓。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "talent_followup_against_burning",
+    "when": [
+      "actor == self",
+      "target has_state 灼烧",
+      "damage_is_attack"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "skill": "COMMON",
+        "element": "Fire",
+        "target": "target",
+        "damage_param": 0
+      },
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 5,
+        "target": "self"
+      }
+    ],
+    "source": "1109 虎克 天赋 哈！火上浇油 (110904, Enhance): 「攻击处于灼烧状态的敌方目标时，追加1次等同于虎克100%攻击力的火属性附加伤害，并额外恢复5点能量。」",
+    "note": "「攻击处于**灼烧**状态的敌方目标时，**追加 1 次**等同于虎克 **100% 攻击力**的火属性**附加伤害**，并**额外恢复 5 点能量**」—— ① 触发条件 = `DEALING_DAMAGE` + `target has_state 灼烧`；② 额外实例用 `DAMAGE`（引擎的 `applyAdditionalDamage`：`DamageType.ADDITIONAL` + `notCountsAsAttack` + 受害者不给能量 ✓），倍率取自**技能参数行**（他普攻那一行正是 100% 攻击力 ✓，与文档数字一致 ⇒ 不必另造倍率 ✓）；③ 回能用 `GAIN_ENERGY` ✓。⚠ **护栏 `damage_is_attack` 不可省**：额外那次本身也是一次 `DEALING_DAMAGE` ⇒ 没有护栏时本规则会**自我触发**直到撞上引擎的递归上限 ✗。因为 `!` 取反只允许作用于队伍类条件（源码原话：only those can be negated），护栏只能**正向**写：这次伤害\"算不算一次攻击\" ✓ —— 附加伤害实例带 `notCountsAsAttack` ⇒ 该条件为假 ⇒ 链条到此为止 ✓。 ⚠ DAMAGE **必须**给 damage_param（倍率在技能参数行里的下标，无默认值 ✓）：他普攻那一行只有一项（100% 攻击力）⇒ 下标 0 ✓。"
   }
 ]
