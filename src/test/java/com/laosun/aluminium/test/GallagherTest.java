@@ -56,6 +56,23 @@ public class GallagherTest {
                 "「效果抵抗提高50%」 -- 星魂 1 adds it");
     }
 
+    /** ⚠ The shipped clause really swaps the slot, and ending the swap puts the original back. */
+    @Test
+    public void theShippedSwapReplacesAndRestores() {
+        Fixture f = new Fixture();
+        com.laosun.aluminium.models.skill.Skill before =
+                f.gallagher.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
+
+        f.battle.castImmediate(f.gallagher.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                f.gallagher, List.of(f.enemy));
+
+        com.laosun.aluminium.models.skill.Skill after =
+                f.gallagher.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
+        Assertions.assertNotSame(before, after,
+                "「并将下一次普攻强化为【酒花奔涌】」 — the file's skill_id mapped and the slot was swapped");
+        Assertions.assertEquals(130108, after.getSkillSlot(), "…for the enhanced attack's own data row");
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
