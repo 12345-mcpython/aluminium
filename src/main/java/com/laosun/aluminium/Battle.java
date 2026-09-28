@@ -1037,6 +1037,9 @@ public class Battle {
             actor.afterMove(this);
             actor.getBuffManager().afterMove();
             tickForeignBuffs(actor, false);
+            // 「回合结束时」 (2026-09-28): the turn is over HERE -- after the actor's own hook and the late tick, so a rule
+            // sees the state the turn ended in.
+            fireTriggers(TriggerEvent.TURN_END, actor, actor, 0, 0);
         }
         processRequests();
     }
