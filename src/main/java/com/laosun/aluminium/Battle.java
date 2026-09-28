@@ -772,6 +772,10 @@ public class Battle {
         // nothing enemy-shaped left to test for. The guard is also what kept "the boss burns us"
         // inexpressible, so removing it is the point of the migration, not a side effect.
         tickDots(actor);
+        // ⚠ Immediately after the DOT pass and before the early duration tick (2026-09-28): a regeneration settles N
+        // times for a `turns: N` buff for exactly the reason the comment below gives for a DOT -- and a `TURN_START`
+        // rule could not do it, because that event fires after the tick that removes the buff.
+        tickRegens(actor);
         if (actor.isDeath()) {
             return;
         }
@@ -856,6 +860,38 @@ public class Battle {
                     DamageType.DOT, dot.getBaseDamage());
             // KILL_ONLY: a DOT is not "one attack action", so the victim gains no energy; but a DOT kill is still credited to the applier
             total += applyDamage(target, damage, EnergyGrant.KILL_ONLY);
+        }
+        return total;
+    }
+
+    /**
+     * Settle every <b>heal over time</b> on one unit (2026-09-28): the twin of {@link #tickDots(CanHit)}, and placed
+     * right beside it so the two cannot drift apart.
+     *
+     * <p>「目标每回合开始时为其回复等同于娜塔莎 7.20% 生命上限 + 192 的生命值，持续 2 回合」 needs this rather than a
+     * {@code TURN_START} rule: buffs are counted down by the early tick, which happens <b>after</b> this pass and
+     * <b>before</b> {@code TURN_START}, so a {@code turns: 2} regeneration settles twice here while a {@code turns: 2}
+     * state read from {@code TURN_START} would heal once.
+     *
+     * <p>⚠ The amount was derived when the rule fired (「等同于娜塔莎生命上限的…」 is a share of the applier's panel) and
+     * is frozen here; the applier is still carried, because {@code Battle.heal} reads their
+     * {@code OUTGOING_HEALING_BOOST}.
+     *
+     * @param target the unit carrying the regenerations
+     * @return the total restored this time
+     */
+    public double tickRegens(CanHit target) {
+        if (target == null || target.isDeath()) {
+            return 0;
+        }
+        double total = 0;
+        // A snapshot, for the same reason the DOT pass takes one: a heal that triggers something cannot disturb it.
+        for (com.laosun.aluminium.models.buff.RegenBuff regen
+                : target.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.RegenBuff.class)) {
+            if (target.isDeath()) {
+                break;
+            }
+            total += heal(regen.getSource(), target, regen.getBaseHeal());
         }
         return total;
     }
