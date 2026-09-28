@@ -86,6 +86,22 @@ public class LukaTest {
                         + "because all three are 「attack」 events");
     }
 
+    /** ⚠ Content-level: the SHIPPED Skill's ceiling must really be there — an unmapped key is silently ignored. */
+    @Test
+    public void theShippedSkillCarriesItsCeiling() {
+        Fixture f = new Fixture();
+        double attack = f.luka.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
+
+        f.skillCast();
+
+        var dots = f.enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.DotBuff.class);
+        Assertions.assertEquals(1, dots.size(), "「使目标陷入裂伤状态」");
+        Assertions.assertEquals(attack * 3.38, dots.get(0).getBaseDamage(), 1e-3,
+                "⚠ the shipped `cap_scale`/`cap_percent` mapped: the per-turn damage is the owner's attack × 3.38. An "
+                        + "unmapped key would leave the DOT uncapped and read 24% of the victim's Max HP instead — a hole no "
+                        + "reflective unit test can see, which is why this case goes through the FILE.");
+    }
+
     /** Census: the two layer rules, the trace and the level convention are all there. */
     @Test
     public void hisFileCarriesTheClauses() {
