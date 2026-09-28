@@ -44,7 +44,8 @@ public class SushangTest {
         var table = TriggerTables.of(SUSHANG);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BREAK), "the talent");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK), "the chance half and the guaranteed half");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique damage (round 186) and the level convention");
     }
 
     private static final class Fixture {

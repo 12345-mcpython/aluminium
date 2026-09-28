@@ -285,8 +285,16 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "DAMAGE" -> {
-                requireSkill(effect, op, spec);
-                requireDamageParam(effect, op, spec);
+                // ? Two ways to state the multiplier (2026-09-29): a SKILL ROW (`skill` + `damage_param`) or a LITERAL ratio
+                // (`scale` + `percent`, plus `element` because no skill lends one). 「造成等同于素裳80%攻击力的伤害」 in a technique, a
+                // talent's follow-up or an eidolon has no row to name — 53 and 15 documents state such a ratio.
+                if (effect.getSkill() == null || effect.getSkill().isBlank()) {
+                    requireDerivedScale(effect, op, spec);
+                    requireElement(effect, op, spec);
+                } else {
+                    requireSkill(effect, op, spec);
+                    requireDamageParam(effect, op, spec);
+                }
                 requireNoStackArguments(effect, op, spec);
                 requireFixedCrit(effect, op, spec);
             }
@@ -2969,14 +2977,37 @@ public final class TriggerInterpreter {
      * effect may reach a whole side: 「对敌方全体」 settles one instance per victim, and every number is read
      * from the skill's parameter row exactly as before.
      */
+    /**
+     * The base of a literal-ratio damage instance (2026-09-29).
+     *
+     * <p>Deliberately NOT `derivedMagnitude`: that reader resolves the BASE attribute, which is the right convention for `MODIFY_ATTR` (percent modifiers stack
+     * on the base) and the WRONG one for damage. Measured: a row-based instance at her Lv10 COMMON row dealt 674.365 while a literal 0.8 dealt 385.35 = 0.8 x
+     * 481.7 — the base ATK rather than the settled one. A damage instance uses the settled value, so this path reads it directly.
+     */
+    private static double literalBase(CanHit attacker, EffectSpec effect) {
+        String scale = effect.getScale() == null ? "" : effect.getScale().trim();
+        AttributeType attribute = scaleAttribute(effect, "DAMAGE", null);
+        if (attribute == null) {
+            throw new IllegalStateException("a literal-ratio DAMAGE needs a derived scale like self_attr:ATTACK, got '" + scale
+                    + "'; see the rule that states it");
+        }
+        double share = effect.getPercent() == null ? 0.0 : effect.getPercent();
+        double flat = effect.getAmount() == null ? 0.0 : effect.getAmount();
+        return attacker.getAttribute(attribute).get() * share + flat;
+    }
+
     private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim) {
         CanHit attacker = ctx.owner();
         if (victim == null || victim.isDeath()) {
             return;
         }
-        SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
-        Skill skill = attacker.getSkills().get(slot);
-        if (skill == null || skill.getData() == null) {
+        // ? A literal ratio states no skill at all (2026-09-29): 「造成等同于素裳80%攻击力的伤害」. The slot lookup is skipped, the multiplier comes
+        // from `derivedMagnitude`, and `element` is required by the validator because there is no skill row to lend one.
+        boolean literalRatio = effect.getSkill() == null || effect.getSkill().isBlank();
+        SkillType slot = literalRatio ? null
+                : SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+        Skill skill = literalRatio ? null : attacker.getSkills().get(slot);
+        if (!literalRatio && (skill == null || skill.getData() == null)) {
             throw new IllegalStateException(
                     attacker.getName() + " has no " + slot + " skill to fire a DAMAGE effect from");
         }
@@ -2986,17 +3017,22 @@ public final class TriggerInterpreter {
         // element** -- that is the part the skill could not have supplied, and without it the instance would be
         // element-less, which is the silent hole this check was written for.
         boolean statesElement = effect.getElement() != null && !effect.getElement().isBlank();
-        if (!skill.getData().getEffect().isDamaging() && !statesElement) {
+        // ? Skipped for a literal ratio (2026-09-29): there is no slot to inspect, and the validator REQUIRES `element` for that form,
+        // which is exactly the element-less instance this check was written to catch.
+        if (!literalRatio && !skill.getData().getEffect().isDamaging() && !statesElement) {
             throw new IllegalStateException(
                     "DAMAGE effect points at " + slot + ", whose effect is "
                             + skill.getData().getEffect() + " rather than a damaging one; a rule that reads a number "
                             + "out of such a skill must state the \"element\" itself (the skill does not have one "
                             + "to lend)");
         }
-        double multiplier = multiplierOf(skill, effect, attacker);
-        double base = attacker.getAttribute(AttributeType.ATTACK).get() * multiplier;
-        battle.applyAdditionalDamage(attacker, victim, elementOf(effect, skill), base,
-                effect.getCritRate(), effect.getCritDamage());
+          double base = skill == null
+                  ? literalBase(attacker, effect)     // ? a literal ratio, scaled off the SETTLED attribute (2026-09-29)
+                  : attacker.getAttribute(AttributeType.ATTACK).get() * multiplierOf(skill, effect, attacker);
+          battle.applyAdditionalDamage(attacker, victim, skill == null
+                          ? DamageElement.fromString(effect.getElement().trim())
+                          : elementOf(effect, skill), base,
+                  effect.getCritRate(), effect.getCritDamage());
     }
 
     /**
