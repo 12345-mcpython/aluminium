@@ -489,6 +489,10 @@ public final class SkillExecutor {
         // then the instance has no scoped boost rather than a guessed one.
         Damage damage = new Damage(user, target, element, DamageType.NORMAL, base,
                 data == null ? SkillCategory.UNSPECIFIED : data.getCategory());
+        // ⚠ The intended toughness reduction rides on the instance (2026-09-28): a `DEALING_DAMAGE` rule is handed this
+        // damage, and 「本次伤害的**削韧值**」 has to be readable there -- 1321/8006's super-break clauses are exactly that.
+        // ⚠ Set BEFORE the settlement below: `DEALING_DAMAGE` is fired from inside `battle.applyDamage`.
+        damage.setStance(stanceDamage);
         double settled = battle.applyDamage(target, damage);
         settled += applyStanceDamage(battle, user, element, damage, target, stanceDamage);
         return settled;
