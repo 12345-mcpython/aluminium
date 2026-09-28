@@ -263,17 +263,16 @@ public class March7thKitTest {
     /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
-     * <p><b>Nine</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
-     * Every missing one would be a wrong number or a wrong trigger if it were spelled with the vocabulary that exists
-     * today: 星魂 4's <i>second</i> sentence needs a damage addend derived from an attribute (「提高数值等同于三月七防御力
-     * 的30%」 — {@code BOOST_DAMAGE} takes a percentage of the instance, not "X = 30% of my DEF"), and 星魂 6 needs the
-     * shield's provider to be askable <i>per ally</i>. Her 战技's soft taunt is a data gap (the document states no
-     * magnitude), and 星魂 3/5 are skill levels (M-32).
+     * <p><b>Eleven</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
+     * Her 战技's soft taunt is a data gap (the document states no magnitude), and the only thing left off this list
+     * would be a wrong number if it were spelled with the vocabulary that exists today.
      *
-     * <p>⚠ Two clauses came off that list and each is worth a line: 星魂 1 (2026-09-28) needed a per-cast count of the
-     * victims a state actually landed on ({@code "scale": "cast_applied:冻结"}), and 星魂 4's first sentence plus
-     * 行迹「冰咒」 (same day) needed a way to raise another rule's own number ({@code MODIFY_RULE}, which is what put two
-     * more rules on her BATTLE_START).
+     * <p>⚠ Three clauses came off that list and each is worth a line: 星魂 1 (2026-09-28) needed a per-cast count of the
+     * victims a state actually landed on ({@code "scale": "cast_applied:冻结"}); 星魂 4's first sentence plus
+     * 行迹「冰咒」 (same day) needed a way to raise another rule's own number ({@code MODIFY_RULE}); 星魂 4's second
+     * sentence needed an absolute damage addend derived from an attribute ({@code ADD_DAMAGE}); and 星魂 6 needed a
+     * shield whose <i>origin</i> can be asked ({@code has_shield from_rule}). 星魂 3/5 came off with {@code M-32}: a
+     * skill level is now content data (a {@code RAISE_SKILL_LEVEL} rule) rather than a fixed {@code damage_level}.
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
@@ -284,9 +283,10 @@ public class March7thKitTest {
         Assertions.assertEquals(2, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
                 "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule) and 星魂 1's "
                         + "energy per landed freeze");
-        Assertions.assertEquals(3, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
-                "星魂 2's battle-start shield for the most hurt ally, plus the two amendments: 星魂 4 raising the "
-                        + "talent's per-turn cap and 行迹「冰咒」 raising the ultimate's base chance");
+        Assertions.assertEquals(6, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
+                "星魂 2's battle-start shield; the two amendments (星魂 4 raising the talent's per-turn cap, 行迹「冰咒」 "
+                        + "raising the ultimate's base chance); and 星魂 3's and 星魂 5's skill levels plus the talent's "
+                        + "base level (three rules, M-32)");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
                 "and nothing of hers reacts to kills");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TURN_START),
