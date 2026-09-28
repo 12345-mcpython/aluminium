@@ -50,6 +50,8 @@ public class HuohuoTest {
         Fixture f = new Fixture();
         double allyBefore = f.ally.getAttribute(AttributeType.ATTACK).get();
         double herBefore = f.huohuo.getAttribute(AttributeType.ATTACK).get();
+        double allyEnergyBefore = f.ally.getCurrentEnergy();
+        double herEnergyBefore = f.huohuo.getCurrentEnergy();
 
         f.ultimate();
 
@@ -57,6 +59,10 @@ public class HuohuoTest {
                 "「使其攻击力提高40.00%」 -- an ally is boosted");
         Assertions.assertEquals(herBefore, f.huohuo.getAttribute(AttributeType.ATTACK).get(), 1e-6,
                 "⚠ 「**除自身以外**的队友」: she is not (boosting everyone would be the plausible-looking wrong reading)");
+        Assertions.assertTrue(f.ally.getCurrentEnergy() > allyEnergyBefore,
+                "「为除自身以外的队友恢复等同于**各自**20.00%能量上限的能量」 -- a share of the ALLY's own maximum");
+        Assertions.assertEquals(herEnergyBefore, f.huohuo.getCurrentEnergy(), 1e-6,
+                "⚠ …and her own bar is untouched: 「除自身以外」 governs both halves");
     }
 
     /** The talent's trigger is gated on HER state, and both of its halves are on the rule. */
