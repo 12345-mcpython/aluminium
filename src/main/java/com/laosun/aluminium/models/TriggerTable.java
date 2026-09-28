@@ -520,10 +520,22 @@ public class TriggerTable {
         for (EffectSpec effect : effects) {
             TriggerInterpreter.validate(effect, spec);
         }
+        // 「对所有<b>触电状态下的</b>敌方目标…」 (M-53): each effect may name conditions its TARGETS must satisfy. Parsed
+        // here, with the rule's own event, so `from_skill` and friends mean the same thing inside a filter.
+        List<List<Condition>> targetFilters = new ArrayList<>();
+        for (EffectSpec effect : effects) {
+            List<Condition> filter = new ArrayList<>();
+            if (effect.getTargetWhen() != null) {
+                for (String raw : effect.getTargetWhen()) {
+                    filter.add(parseCondition(raw, spec));
+                }
+            }
+            targetFilters.add(List.copyOf(filter));
+        }
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateId(spec), validateCooldown(spec),
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
-                validateMinEidolon(spec), validatePerTurn(spec)));
+                validateMinEidolon(spec), validatePerTurn(spec), List.copyOf(targetFilters)));
     }
 
     /**
@@ -1367,7 +1379,21 @@ public class TriggerTable {
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
                                int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
-                               int perTurn) {
+                               int perTurn, List<List<Condition>> effectTargetFilters) {
+
+        /**
+         * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.
+         *
+         * <p>Parsed at load time — a misspelled condition is refused rather than ignored — and kept <b>per effect</b>,
+         * because two effects of one rule may filter differently.
+         */
+        public List<Condition> targetFilterAt(int index) {
+            if (effectTargetFilters == null || index < 0 || index >= effectTargetFilters.size()) {
+                return List.of();
+            }
+            List<Condition> filter = effectTargetFilters.get(index);
+            return filter == null ? List.of() : filter;
+        }
 
         /**
          * Whether this rule limits how often it may fire at all.
@@ -1427,14 +1453,15 @@ public class TriggerTable {
      *                 ({@code AbstractBuff.getRuleId()}), which is how 「**战技提供的**护盾」 is asked about
      */
     public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
-                                 Damage damage, Battle battle, SkillCategory fromCast, String ruleId) {
+                                 Damage damage, Battle battle, SkillCategory fromCast, String ruleId,
+                                 List<Condition> targetFilter) {
 
         /**
          * The same context for an event that carries no cast category — i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle, SkillCategory fromCast) {
-            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "");
+            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of());
         }
 
         /**
@@ -1446,7 +1473,7 @@ public class TriggerTable {
          */
         public TriggerContext withRule(String id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
-                    id == null ? "" : id);
+                    id == null ? "" : id, targetFilter);
         }
 
         /**
@@ -1454,7 +1481,7 @@ public class TriggerTable {
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle) {
-            this(owner, actor, target, hitCount, amount, damage, battle, null, "");
+            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of());
         }
 
         /**
@@ -1469,8 +1496,39 @@ public class TriggerTable {
             this(owner, actor, target, hitCount, amount, null, null);
         }
 
+        /**
+         * The same context with this firing's <b>per-target filter</b> (an effect's {@code target_when}).
+         *
+         * <p>Set by the interpreter once per effect and read only by {@code resolveTargets} — that being the single
+         * place that decides which units an effect reaches, no op had to learn this vocabulary.
+         */
+        public TriggerContext withTargetFilter(List<Condition> filter) {
+            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
+                    filter == null ? List.of() : filter);
+        }
+
+        /**
+         * The same context with a different subject and <b>no filter</b>: the context a per-target condition is tested
+         * in (its {@code target} is the candidate). ⚠ The filter is dropped deliberately — asking a candidate about the
+         * filter that is asking about it would recurse.
+         */
+        public TriggerContext withSubject(CanHit candidate) {
+            return new TriggerContext(owner, actor, candidate, hitCount, amount, damage, battle, fromCast, ruleId,
+                    List.of());
+        }
+
+        /** Whether {@code candidate} passes the per-target conditions (an empty filter admits everything). */
+        public boolean passesTargetFilter(CanHit candidate) {
+            for (Condition condition : targetFilter) {
+                if (!condition.test(withSubject(candidate))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "");
+            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of());
         }
     }
 

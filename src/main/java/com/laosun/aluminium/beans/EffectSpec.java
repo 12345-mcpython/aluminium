@@ -73,6 +73,7 @@ public class EffectSpec {
         copy.kind = this.kind;
         copy.effectPercent = this.effectPercent;
         copy.effectTurns = this.effectTurns;
+        copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         return copy;
     }
 
@@ -529,6 +530,17 @@ public class EffectSpec {
      */
     @SerializedName("effect_turns")
     private Integer effectTurns;
+    /**
+     * <b>Per-target conditions</b> (2026-09-28, M-53): the effect reaches only the units that satisfy these, tested one
+     * candidate at a time with {@code target} bound to that candidate.
+     *
+     * <p>「对所有<b>触电状态下的</b>敌方目标造成…附加伤害」 (1103's talent) is the sentence that needed it: a rule's own
+     * conditions filter the <b>rule</b>, so 「all shocked enemies」 could only be spelled "the enemy I hit was shocked"
+     * (which then also hit the unshocked ones) or not at all. The selector says <i>which units</i>; this says <i>which
+     * of them qualify</i>.
+     */
+    @SerializedName("target_when")
+    private List<String> targetWhen;
 
     /**
      * The stack cap, whichever spelling the rule used.

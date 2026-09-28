@@ -91,5 +91,28 @@
     ],
     "source": "1105 娜塔莎 行迹 调理 (1105103): 「施放战技产生的持续回复效果延长1回合。」",
     "note": "「施放战技**产生的**持续回复效果延长1回合」: `EXTEND_BUFF` by the buff's name, which is the same mechanic as 1001's 加护 (「战技提供的护盾持续时间增加1回合」). ⚠ It is a separate rule that sits **after** the Skill's own rule, so the regeneration is already attached when it runs: rules of one event run in file order, and only their *conditions* are evaluated together. ⚠ The +1 is deliberately not folded into the Skill's `turns: 2`: that would erase this trace's line from the data and make the Skill state a duration that is not its own."
+  },
+  {
+    "on": "ULT_CAST",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "APPLY_REGEN",
+        "scale": "owner_max_hp",
+        "percent": 0.06,
+        "amount": 160,
+        "turns": 1,
+        "buff": "持续治疗",
+        "target": "all_allies",
+        "target_when": [
+          "target_hp_percent <= 0.3"
+        ]
+      }
+    ],
+    "min_eidolon": 2,
+    "source": "1105 娜塔莎 星魂 2 临床研学 (Avatar_Natasha_00_Rank02): 「施放终结技时，对当前生命值百分比小于等于30%的我方目标附加1回合的持续治疗效果，目标回合开始时为其回复等同于娜塔莎6%生命上限+160的生命值。」 param = [0.3, 1, 0.06, 160]",
+    "note": "「施放终结技时，对**生命百分比 ≤ 30% 的**我方目标附加 1 回合的持续治疗效果，目标回合开始时为其回复等同于娜塔莎 6% 生命上限 + 160 的生命值」. ⚠ Two per-target pieces now carry it: `target_when: [\"target_hp_percent <= 0.3\"]` picks the allies who qualify (a rule condition could only have asked about the one ally the ultimate was aimed at), and `turns: 1` is the 「1 回合」 — with `APPLY_REGEN` settling before the duration is counted down, one turn really is one tick. ⚠ It is a **shorter, weaker** regeneration than her Skill's (0.06 + 160 against 0.072 + 192) and it refreshes rather than stacks, which is what 「附加 1 回合的持续治疗效果」 means when the Skill's is already up."
   }
 ]
