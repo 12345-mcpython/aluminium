@@ -40,6 +40,12 @@
     ],
     "do": [
       {
+        "op": "GAIN_ENERGY",
+        "scale": "target_max_energy",
+        "percent": 0.2,
+        "target": "other_allies"
+      },
+      {
         "op": "MODIFY_ATTR",
         "attribute": "ATTACK",
         "percent": 0.4,
@@ -47,8 +53,8 @@
         "target": "other_allies"
       }
     ],
-    "source": "1217 藿藿 终结技 尾巴•遣神役鬼 (121703, Ultra/Support): 「为除自身以外的队友恢复等同于各自20.00%能量上限的能量，同时使其攻击力提高40.00%，持续2回合。」 ⚠ 只写「攻击力提高40%持续2回合」那一半（回能那半见登记）。",
-    "note": "「为**除自身以外**的队友恢复等同于**各自** 20.00% **能量上限**的能量，同时使其攻击力提高 40.00%，持续 2 回合」 — three spellings the engine already has: `other_allies` (「除自身以外的队友」), a **per-target** share of max energy (`GAIN_ENERGY` with `percent`, added for 星期日's ultimate), and a party-wide `MODIFY_ATTR` with a turn count. ⚠ 「**各自**」 is why the energy is a share of each recipient's own maximum rather than of hers — targeting that reads the *owner's* maximum would be a plausible-looking wrong number. ⚠ **2026-09-28 登记（精确卡点）**：「为**除自身以外**的队友恢复等同于**各自** 20.00% **能量上限**的能量」这一半**没有写**：`GAIN_ENERGY` 一旦带 `scale`（「各自能量上限的百分比」）就只能结算**一个**单位 —— 装载期明确拒绝 `scale` 与 `per_target` 并用（理由：\"scale 本身就是某个单位能量上限的份额\"）⇒「一次给**多名**队友回能」需要的是一条**接受列表的** `GAIN_ENERGY` 形态（本 op 没有；`MODIFY_ATTR` 有，所以攻击力那一半照写）。⚠ 这是**能力缺口**而不是拼写问题：`per_target` 的语义已经是\"每个候选各自算份额\"，缺的是让单目标 op 也能遍历候选。"
+    "source": "1217 藿藿 终结技 尾巴•遣神役鬼 (121703, Ultra/Support): 「为除自身以外的队友恢复等同于各自20.00%能量上限的能量，同时使其攻击力提高40.00%，持续2回合。」",
+    "note": "「为**除自身以外**的队友恢复等同于**各自** 20.00% **能量上限**的能量，同时使其攻击力提高 40.00%，持续 2 回合」 — three spellings the engine already has: `other_allies` (「除自身以外的队友」), a **per-target** share of max energy (`GAIN_ENERGY` with `percent`, added for 星期日's ultimate), and a party-wide `MODIFY_ATTR` with a turn count. ⚠ 「**各自**」 is why the energy is a share of each recipient's own maximum rather than of hers — targeting that reads the *owner's* maximum would be a plausible-looking wrong number. ⚠ **2026-09-28 补齐**：回能那一半也已写出 —— `GAIN_ENERGY` 现在会遍历 `resolveTargets` 的每个候选，每人拿**各自**能量上限的 20%（这正是「各自」的意思；此前它只解析一个目标，所以被迫登记）。"
   },
   {
     "on": "TURN_START",

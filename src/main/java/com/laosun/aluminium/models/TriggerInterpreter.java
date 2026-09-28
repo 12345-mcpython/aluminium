@@ -869,8 +869,22 @@ public final class TriggerInterpreter {
      * a share of nothing is not a number — that is a loud failure rather than a silent grant of 0, the same call the
      * scale family makes everywhere else.
      */
+    /**
+     * {@code GAIN_ENERGY}: 「恢复 N 点能量」 / 「恢复等同于各自 X% 能量上限的能量」.
+     *
+     * <p>⚠ It resolves a <b>list</b> (2026-09-28): the sentences that pay a group say 「为除自身以外的<b>队友</b>恢复等同于
+     * <b>各自</b> 20% 能量上限的能量」 (1217 藿藿), i.e. every recipient gets a share of <b>its own</b> maximum. Resolving one
+     * target made the party-wide reading impossible, and the fix cannot be "pay the resolved unit N times": the amount
+     * differs per recipient, so the resolution — not the amount — had to become a list.
+     */
     private static void gainEnergy(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        CanHit target = resolveTarget(effect, ctx);
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            gainEnergyFor(battle, effect, ctx, target);
+        }
+    }
+
+    /** The amount one recipient gets: a flat sum, a share of ITS OWN maximum, or a per-landing count. */
+    private static void gainEnergyFor(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit target) {
         if (effect.getScale() == null || effect.getScale().isBlank()) {
             battle.grantEnergy(target, scaledAmount(effect, ctx));
             return;
