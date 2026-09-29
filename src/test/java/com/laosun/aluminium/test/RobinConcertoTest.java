@@ -1,11 +1,11 @@
 package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Countdown;
-import com.laosun.aluminium.models.buff.ClassResistBuff;
+import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -16,116 +16,81 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 知更鸟's ultimate 【协奏】, all seven clauses, from her <b>own file</b> (2026-09-28).
+ * 「处于【协奏】状态时，知更鸟免疫控制类负面状态」 — the immunity, asserted BOTH ways.
  *
- * <p><b>What it took.</b> Each clause waited for a named capability: the state and its timeline for the
- * <b>countdown unit</b> ({@code START_COUNTDOWN} / {@code COUNTDOWN_TURN}, M-49), 「不会进入自己的回合」 for
- * {@code suspends_turns}, the ATK boost and the immunity for <b>named modifiers</b> (so they can end with the state),
- * and the additional damage's 「暴击率固定为100%」 for the {@code crit_rate}/{@code crit_damage} spelling.
+ * <p>The clause has been shipped since 2026-09-28, together with ③'s party ATK boost, in one ULT_CAST rule that carries
+ * the name 协奏; this class pins what nothing else did: the same control that lands after the countdown cannot land while
+ * the state lasts, because the immunity ends with the state rather than with a turn count. It also records that ULT_CAST
+ * arrives at the tables exactly once per cast.
  *
- * <p><b>What is pinned here.</b> That one cast really opens the whole thing — state, countdown at #2's speed, party
- * boost, immunity — and that the countdown's turn closes <b>all of it at once</b> (state, boost and immunity come off
- * together, which is the point of naming them after the state).
+ * <p>\u26a0 <b>How this class was born.</b> I first wrote a second copy of ③⑤ and measured a party ATK gain of
+ * 475.0818748 where 0.228 x the pre-cast ATK + 200 is 386.8744908 -- and misread that as an engine bug. The duplicate
+ * was the cause: the first rule computes 386.8744908 (her ATK then reads 1206.499) and the second recomputes
+ * 475.0818748 from that boosted value, replacing the first because both carry the same name. The instrument was too
+ * coarse to see it (the counter counts EVENTS, not rules), and the probe that would have shown the existing rule printed
+ * into a report I read truncated. See GAPS and HANDOFF's discipline 31.
  */
 public class RobinConcertoTest {
     private static final int ROBIN = 1309;
-    private static final int ALLY = 1002;
+    private static final int ALLY = 1210;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** One cast opens the state, the countdown, the party boost and the immunity. */
     @Test
-    public void herUltimateOpensTheWholeConcerto() {
-        Fixture f = new Fixture();
-        double allyAttackBefore = f.attack(f.ally);
+    public void herConcertoMakesHerControlImmuneUntilTheCountdown() {
+        Character robin = CharacterFactory.create(ROBIN, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Character injector = Character.fromAttributes("injector", 10_000, 100, 100, 100);
+        injector.setTriggerTable(new TriggerTable(9999, List.of(TriggerSpecs.rule(
+                TriggerEvent.TURN_START.name(), List.of(), control()))));
+        Character counter = Character.fromAttributes("counter", 10_000, 100, 100, 100);
+        counter.setTriggerTable(new TriggerTable(9998, List.of(TriggerSpecs.rule(
+                TriggerEvent.ULT_CAST.name(), List.of(), stack()))));
+        Battle battle = new Battle(List.of(robin, ally, injector, counter), List.of(dummy()), fixed());
 
-        f.castUltimate();
+        battle.startBattle();
+        battle.castImmediate(robin.getSkills().get(SkillType.ULTRA), robin, List.of(dummy()));
 
-        Assertions.assertTrue(f.robin.getBuffManager().hasState("协奏"), "① 进入【协奏】状态");
-        Assertions.assertTrue(f.robin.getBuffManager().suspendsTurns(), "⑦ 不会进入自己的回合（挂在状态上）");
-        Assertions.assertEquals(1, f.battle.countdowns().size(), "⑥ 行动序列上出现倒计时");
-        Countdown countdown = f.battle.countdowns().getFirst();
-        Assertions.assertEquals(90, countdown.getAttribute(AttributeType.SPEED).get(), 1e-6,
-                "…固定拥有 90 点速度（技能自己的 #2）");
-        Assertions.assertTrue(f.attack(f.ally) > allyAttackBefore,
-                "③ 我方全体攻击力提高（22.8% 她的攻击力 + 200）：队友也吃到了");
-        Assertions.assertFalse(f.robin.getBuffManager().allBuffsOf(ClassResistBuff.class).isEmpty(),
-                "⑤ 处于【协奏】状态时免疫控制类负面状态");
+        Assertions.assertEquals(1, counter.getBuffManager().stacksOf("\u8ba1\u6570"),
+                "ULT_CAST arrives at the tables once per cast (an event count -- it does NOT count the rules that match)");
+        battle.fireTriggers(TriggerEvent.TURN_START, injector, robin, 0, 0);
+        Assertions.assertFalse(robin.getBuffManager().hasState("\u51bb\u7ed3"),
+                "\u300c\u5904\u4e8e\u3010\u534f\u594f\u3011\u72b6\u6001\u65f6\uff0c\u77e5\u66f4\u9e1f\u514d\u75ab\u63a7\u5236\u7c7b\u8d1f\u9762\u72b6\u6001\u300d");
+
+        battle.fireTriggers(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(robin).getFirst(), robin, 0, 0);
+
+        battle.fireTriggers(TriggerEvent.TURN_START, injector, robin, 0, 0);
+        Assertions.assertTrue(robin.getBuffManager().hasState("\u51bb\u7ed3"),
+                "the immunity is named after the state, so the countdown takes it off -- the same control now lands");
     }
 
-    /** ④ an ally's attack draws her extra hit — and nothing happens once the state is gone. */
-    @Test
-    public void anAllysAttackDrawsTheExtraDamage() {
-        Fixture f = new Fixture();
-        f.castUltimate();
-        double before = f.enemy.getCurrentHp();
-
-        f.allyAttacks();
-
-        Assertions.assertTrue(f.enemy.getCurrentHp() < before,
-                "④ 我方目标每次施放攻击后，她额外造成 1 次附加伤害（120% 攻击力，固定暴击）");
-
-        double after = f.enemy.getCurrentHp();
-        f.endConcerto();
-        f.allyAttacks();
-        Assertions.assertEquals(after, f.enemy.getCurrentHp(), 1e-6,
-                "…and 「处于【协奏】状态时」 is load-bearing: without the state there is no rider");
+    /** A 100% base chance control aimed at the event's target (the immunity under test is on the target). */
+    private static EffectSpec control() {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "APPLY_CONTROL");
+        TriggerSpecs.set(effect, "control", "\u51bb\u7ed3");
+        TriggerSpecs.set(effect, "turns", 1);
+        TriggerSpecs.set(effect, "baseChance", 1.0);
+        TriggerSpecs.set(effect, "target", "target");
+        return effect;
     }
 
-    /** ⑥ the countdown's turn ends the state <b>and</b> everything that was named after it, at once. */
-    @Test
-    public void theCountdownTurnEndsEverythingAtOnce() {
-        Fixture f = new Fixture();
-        f.castUltimate();
-        double boosted = f.attack(f.ally);
-
-        f.battle.fireTriggers(TriggerEvent.COUNTDOWN_TURN, f.battle.countdowns().getFirst(),
-                f.battle.countdowns().getFirst(), 0, 0);
-
-        Assertions.assertFalse(f.robin.getBuffManager().hasState("协奏"), "知更鸟退出【协奏】状态");
-        Assertions.assertFalse(f.robin.getBuffManager().suspendsTurns(), "…so her turns come back");
-        Assertions.assertTrue(f.attack(f.ally) < boosted,
-                "…and the party ATK boost came off with it, because it carried the state's own name (before that "
-                        + "spelling existed it could only have been permanent)");
+    /** Counts how many times the event arrives. */
+    private static EffectSpec stack() {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "ADD_STACK");
+        TriggerSpecs.set(effect, "buff", "\u8ba1\u6570");
+        TriggerSpecs.set(effect, "maxStacks", 99);
+        TriggerSpecs.set(effect, "permanent", true);
+        TriggerSpecs.set(effect, "target", "self");
+        return effect;
     }
 
-    // ==================================================================
-    // Helpers
-    // ==================================================================
-
-    private static final class Fixture {
-        private final Character robin = CharacterFactory.create(ROBIN, LEVEL);
-        private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        private final Battle battle;
-
-        private Fixture() {
-            // ⚠ No `setTriggerTable` here on purpose: `CharacterFactory.create` already attaches the table her FILE
-            // declares, and overwriting it with an empty one is what made the first version of this test fail with
-            // "the state is not there" (the rules under test were never loaded).
-            battle = new Battle(List.of(robin, ally), List.of(enemy), fixed());
-            battle.startBattle();
-        }
-
-        private void castUltimate() {
-            battle.castImmediate(robin.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), robin,
-                    List.of(ally));
-        }
-
-        private void allyAttacks() {
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0);
-        }
-
-        /** Takes the state off without going through the countdown (the "no state, no rider" control). */
-        private void endConcerto() {
-            robin.getBuffManager().removeState("协奏");
-        }
-
-        private double attack(Character unit) {
-            return unit.getAttribute(AttributeType.ATTACK).get();
-        }
+    private static Enemy dummy() {
+        return EnemyFactory.create(MONSTER, 90, 1);
     }
 
+    /** Rolls low enough that a control that is not resisted always lands. */
     private static Random fixed() {
         return new Random() {
             @Override
