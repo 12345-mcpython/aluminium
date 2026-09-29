@@ -74,4 +74,9 @@ public class ConeBatchTest {
         battle.fireTriggers(TriggerEvent.KILL, unit, null, 0, 0);
         return unit.getAttribute(AttributeType.SPEED).get() - before;
     }
+
+
+
+
+
 }
