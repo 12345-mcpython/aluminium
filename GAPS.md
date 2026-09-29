@@ -1332,6 +1332,43 @@
 > * ⭐ **下一步** ✓：剩下的"不吻合"逐条分类 ✓：① 数值来自**行迹** ✓（`skill_traces.json` ✓）或**星魂** ✓（`eidolons.json` ✓）或**光锥/遗器** ✓ ⇒ **换数据源** ✓；② 数值来自**另一个技能**（如强化普攻 ✓）⇒ 补 `source` 里的 id ✓；③ **确系抄错** ✗ ⇒ **改进货** ✓。⚠ 而 **134 条未认定** 里绝大多数是**星魂/行迹**来源 ✓（`source` 写的是 `Avatar_…_Rank0N` ✓、`(1001101)` 之类 ✓）⇒ **应改为对 `eidolons.json` / `skill_traces.json` 取证** ✓，这正是"按数据源分流"的第一步 ✓。
 
 
+> **2026-09-29 更新（aggro 回收之七十九：按数据源分流后重审 —— 通过 86 / 不吻合 93 / 未认定 102）**：
+> * ⭐ **本轮把认定器扩成四源** ✓：**技能** ✓（`source` 里的 6 位 id ✓，并按**规则事件 ↔ `attack_type`** 过滤 ✓）、**行迹** ✓（`(7 位 id)` ✓ ⇒ `skill_traces.json` 该条自己的 `param` ✓）、**星魂** ✓（`Avatar_…_Rank0N` ✓ ⇒ `eidolons.json` 该角色该档的窗口 ✓）、**遗器** ✓（`遗器 <setId>` ✓ ⇒ `relic_sets.json` 该套的块 ✓）⇒ **每条数值落到"它自己那一行"** ✓。
+> * ✅ **逐源结果** ✓：skill 通过 44 / 不吻合 88；trace 通过 26 / 不吻合 3；eidolon 通过 16 / 不吻合 2；relic 通过 0 / 不吻合 0。
+> * ✅ **未认定从 134 降到 102** ✓（星魂/行迹分流生效 ✓）；**不吻合 93** ✓ 逐条如下（每条都写明"用了哪个源的哪一行" ✓）：
+>   * ⚠ `1001 skill_shield · skill 100102 (Frigid Cold Arrow) · values [0.57, 760, 3] · pool has ['0.5', '0.6', '0.7', '0.8', '0.9', '1', '1.1', '1.2', '1.3', '1.4']`
+>   * ⚠ `1001 skill_soft_aggro · skill 100102 (Frigid Cold Arrow) · values [5, 3] · pool has ['0.5', '0.6', '0.7', '0.8', '0.9', '1', '1.1', '1.2', '1.3', '1.4']`
+>   * ⚠ `1002 talent_wind_pen · skill 100204 (Sawblade Tuning) · values [0.36] · pool has ['0.5', '0.6', '0.7', '0.8', '0.9', '1', '1.1', '1.2', '1.3', '1.4']`
+>   * ⚠ `1002 technique_opening_attack · skill 100207 (Superiority of Reach) · values [0.4, 3] · pool has ['0.18', '0.198', '0.216', '0.234', '0.252', '0.27', '0.2925', '0.315', '0.337`
+>   * ⚠ `1009 ult_flat_speed_for_all_allies · skill 100903 (Astrometry) · values [50, 2] · pool has ['0.07', '0.077', '0.084', '0.091', '0.098', '0.105', '0.11375', '0.1225', '0.13125'`
+>   * ⚠ `1013 skill_bonus_on_healthy_targets · skill 101302 (It's Magic, I Added Some Magic) · values [0.2] · pool has ['1.2', '1.28', '1.36', '1.44', '1.52', '1.6', '1.7', '1.8', '1.9`
+>   * ⚠ `1103 skill_shock · skill 110302 (Galvanic Chords) · values [1.04, 2, 0.8] · pool has ['0.36', '0.396', '0.432', '0.468', '0.504', '0.54', '0.585', '0.63', '0.675', '0.72', '0.`
+>   * ⚠ `1103 None · skill 110303 (Attack) · values [2] · pool has []`
+>   * ⚠ `1104 ult_enduring_bulwark · skill 110403 (Unyielding Will) · values [0.45, 600, 3] · pool has ['0.25', '0.275', '0.3', '0.325', '0.35', '0.375', '0.40625', '0.4375', '0.46875'`
+>   * ⚠ `1104 technique_opening_shield · skill 110407 (Behind the Kindness) · values [0.24, 150, 2] · pool has ['0.5', '0.6', '0.7', '0.8', '0.9', '1', '1.1', '1.2', '1.3', '1.4']`
+>   * ⚠ `1105 None · skill 110502 (Gift of Rebirth) · values [1] · pool has ['0.092', '0.09775', '0.1035', '0.10925', '0.115', '0.1196', '0.1242', '0.1288', '0.1334', '0.138', '0.1426'`
+>   * ⚠ `1106 ult_zone_suppression · skill 110603 (I Want to Help) · values [-0.4, 2] · pool has ['0.5', '0.6', '0.7', '0.8', '0.9', '1', '1.1', '1.2', '1.3', '1.4']`
+>   * ⚠ `1107 technique_taunt_aggro · skill 110707 (Dazzling Blades) · values [5, 2] · pool has ['0.5', '0.6', '0.7', '0.8', '0.9', '1', '1.1', '1.2', '1.3', '1.4']`
+>   * ⚠ `1108 ult_present · skill 110803 (Windtorn Dagger) · values [0.3, 2, 1.0] · pool has ['0.2', '0.22', '0.24', '0.26', '0.28', '0.31', '0.35', '0.4', '0.46', '0.52', '0.546', '0.`
+>   * ⚠ `1108 talent_windtorn · skill 110804 (Attack) · values [0.52, 3, 0.65] · pool has []`
+>   * ⚠ `1109 skill_burn · skill 110902 (Boom! Here Comes the Fire!) · values [0.65, 2, 1.0] · pool has ['2.4', '2.56', '2.72', '2.88', '3.04', '3.2', '3.4', '3.6', '3.8', '4', '4.16',`
+>   * ⚠ `1110 skill_survival_response · skill 111002 (Applies \) · values [2] · pool has ['0.09', '0.095625', '0.10125', '0.106875', '0.1125', '0.117', '0.1215', '0.126', '0.1305', '0.`
+>   * ⚠ `1110 skill_survival_response · skill 111002 (Applies \) · values [0.075, 200, 2] · pool has ['0.09', '0.095625', '0.10125', '0.106875', '0.1125', '0.117', '0.1215', '0.126', '`
+>   * ⚠ `1110 ult_first_aid · skill 111003 (Outdoor Survival Experience) · values [1] · pool has ['0.024', '0.0255', '0.026999999', '0.0285', '0.03', '0.0312', '0.031875', '0.0324', '0`
+>   * ⚠ `1111 ult_coup · skill 111103 (Receives #5[i] stack(s) of \) · values [2] · pool has ['0.68', '0.697', '0.714', '0.731', '0.748', '0.765', '0.78625', '0.8075', '0.82875', '0.85`
+>   * ⚠ `1111 talent_start · skill 111104 (After Luka uses his Basic ATK \) · values [1] · pool has []`
+>   * ⚠ `1201 skill_damage_up_stacks · skill 120102 (A Quartet? Woo-hoo!) · values [0.28, 1] · pool has ['1.2', '1.28', '1.36', '1.44', '1.52', '1.6', '1.7', '1.8', '1.9', '2', '2.08',`
+>   * ⚠ `1202 skill_benediction · skill 120202 (Thorns of the Abyss) · values [3] · pool has ['0.5', '0.6', '0.7', '0.8', '0.9', '1', '1.1', '1.2', '1.3', '1.4']`
+>   * ⚠ `1202 ult_energy_and_boost · skill 120203 (Violet Sparknado) · values [0.5, 2] · pool has ['0.3', '0.33', '0.36', '0.39', '0.42', '0.45', '0.4875', '0.525', '0.5625', '0.6', '0`
+>   * ⚠ `1203 skill_trigger_on_crossing · skill 120302 (Death Wish) · values [0.6, 800] · pool has ['1', '1.2', '1.28', '1.36', '1.44', '1.52', '1.6', '1.7', '1.8', '1.9', '2', '2.08',`
+>   * ⚠ `1206 talent_speed_on_break · skill 120604 (Attack) · values [0.2, 2] · pool has []`
+>   * ⚠ `1207 None · skill 120703 (If \) · values [0.28] · pool has ['0.25', '0.3', '0.35', '0.4', '0.45', '0.5', '0.55', '0.6', '0.65', '0.7']`
+>   * ⚠ `1208 talent_misfortune_avoidance · skill 120804 (Attack) · values [-0.18] · pool has []`
+>   * ⚠ `1208 skill_knowledge_state_and_modifiers · skill 120802 (Woes of Many Morphed to One) · values [3] · pool has ['0.6', '0.64', '0.68', '0.72', '0.76', '0.8', '0.85', '0.9', '0.`
+>   * ⚠ `1208 skill_knowledge_state_and_modifiers · skill 120802 (Woes of Many Morphed to One) · values [0.06, 3] · pool has ['0.6', '0.64', '0.68', '0.72', '0.76', '0.8', '0.85', '0.9`
+> * ⭐ **下一步** ✓：剩下的不吻合逐条定案 ✓ —— 三种可能：① **源选错** ✓（例如数值其实来自**光锥**或**另一档星魂** ✓）⇒ 补锚点 ✓；② **数值其实来自正文** ✗ ⇒ **改进货** ✓；③ **引擎里该条款本就综合了多行** ✓ ⇒ 在 `note` 里写明"综合" ✓。⚠ 目标不是"让数字变好看"✗，而是**每条都有可复查的出处** ✓。
+
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
