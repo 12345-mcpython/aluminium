@@ -1,0 +1,157 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "landau_aggro_up",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "AGGRO_ADDED_RATIO",
+          "percent": 1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice): 「使装备者受到攻击的概率提高」（数据 factor = 2 ⇒ +100%）",
+      "note": "「使装备者**受到攻击的概率提高**」—— ⭐ **散文没给数字** ✓（\"提高\" ✓），而 `weapons.json` 的 `skill_value[0]` **是 2** ✓（五档全同 ✓）⇒ 「文档没给数值」**不等于**「数据里没有」 ✓（纪律 29 ✓）。① 引擎算的是 `base × (1 + ratio)` ✓ ⇒ **×2 ⇒ `percent: 1`** ✓（+100% ✓）；② `permanent` ✓（文档没给时长 ✓）；⚠ **同一族的另两把**：**制胜的瞬间 (23005)** 与 **落日时起舞 (23030)** 的数据里也都是 **2** ✓⇒ 「提高」与「**大幅**提高」在数据里**同为 ×2** ✓ —— 这条对照值得记住 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "landau_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.16,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice), rank 1: 「同时受到的伤害降低16.0%」",
+      "note": "「同时**受到的伤害降低 16.0%**」—— ① 幅度来自 `skill_value[1]` 第 1 档 ✓（`0.16` ✓，与文档的 16/18/20/22/24% 逐档吻合 ✓）；② `MODIFY_DAMAGE_TAKEN percent: -0.16` ✓（**减伤**方向 ✓）；⚠ **判据的缺口（登记）** ✗：本文件对**减伤**只做**存在性**断言 ✓（`ReductionBuff` 计数 ✓），**幅度**没有被数值判据钉住 ✓ ⇒ 下一步：用**敌人攻击**测一次伤害比 ✓（`0.84` ✓；生成器要**固定为不暴击** ✓，见第 25/270 轮的配方 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "landau_aggro_up",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "AGGRO_ADDED_RATIO",
+          "percent": 1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice): 「使装备者受到攻击的概率提高」（数据 factor = 2 ⇒ +100%）",
+      "note": "「使装备者**受到攻击的概率提高**」—— ⭐ **散文没给数字** ✓（\"提高\" ✓），而 `weapons.json` 的 `skill_value[0]` **是 2** ✓（五档全同 ✓）⇒ 「文档没给数值」**不等于**「数据里没有」 ✓（纪律 29 ✓）。① 引擎算的是 `base × (1 + ratio)` ✓ ⇒ **×2 ⇒ `percent: 1`** ✓（+100% ✓）；② `permanent` ✓（文档没给时长 ✓）；⚠ **同一族的另两把**：**制胜的瞬间 (23005)** 与 **落日时起舞 (23030)** 的数据里也都是 **2** ✓⇒ 「提高」与「**大幅**提高」在数据里**同为 ×2** ✓ —— 这条对照值得记住 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "landau_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice), rank 2: 「同时受到的伤害降低18.0%」",
+      "note": "「同时**受到的伤害降低 18.0%**」—— ① 幅度来自 `skill_value[1]` 第 2 档 ✓（`0.18` ✓，与文档的 16/18/20/22/24% 逐档吻合 ✓）；② `MODIFY_DAMAGE_TAKEN percent: -0.18` ✓（**减伤**方向 ✓）；⚠ **判据的缺口（登记）** ✗：本文件对**减伤**只做**存在性**断言 ✓（`ReductionBuff` 计数 ✓），**幅度**没有被数值判据钉住 ✓ ⇒ 下一步：用**敌人攻击**测一次伤害比 ✓（`0.84` ✓；生成器要**固定为不暴击** ✓，见第 25/270 轮的配方 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "landau_aggro_up",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "AGGRO_ADDED_RATIO",
+          "percent": 1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice): 「使装备者受到攻击的概率提高」（数据 factor = 2 ⇒ +100%）",
+      "note": "「使装备者**受到攻击的概率提高**」—— ⭐ **散文没给数字** ✓（\"提高\" ✓），而 `weapons.json` 的 `skill_value[0]` **是 2** ✓（五档全同 ✓）⇒ 「文档没给数值」**不等于**「数据里没有」 ✓（纪律 29 ✓）。① 引擎算的是 `base × (1 + ratio)` ✓ ⇒ **×2 ⇒ `percent: 1`** ✓（+100% ✓）；② `permanent` ✓（文档没给时长 ✓）；⚠ **同一族的另两把**：**制胜的瞬间 (23005)** 与 **落日时起舞 (23030)** 的数据里也都是 **2** ✓⇒ 「提高」与「**大幅**提高」在数据里**同为 ×2** ✓ —— 这条对照值得记住 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "landau_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice), rank 3: 「同时受到的伤害降低20.0%」",
+      "note": "「同时**受到的伤害降低 20.0%**」—— ① 幅度来自 `skill_value[1]` 第 3 档 ✓（`0.2` ✓，与文档的 16/18/20/22/24% 逐档吻合 ✓）；② `MODIFY_DAMAGE_TAKEN percent: -0.2` ✓（**减伤**方向 ✓）；⚠ **判据的缺口（登记）** ✗：本文件对**减伤**只做**存在性**断言 ✓（`ReductionBuff` 计数 ✓），**幅度**没有被数值判据钉住 ✓ ⇒ 下一步：用**敌人攻击**测一次伤害比 ✓（`0.84` ✓；生成器要**固定为不暴击** ✓，见第 25/270 轮的配方 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "landau_aggro_up",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "AGGRO_ADDED_RATIO",
+          "percent": 1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice): 「使装备者受到攻击的概率提高」（数据 factor = 2 ⇒ +100%）",
+      "note": "「使装备者**受到攻击的概率提高**」—— ⭐ **散文没给数字** ✓（\"提高\" ✓），而 `weapons.json` 的 `skill_value[0]` **是 2** ✓（五档全同 ✓）⇒ 「文档没给数值」**不等于**「数据里没有」 ✓（纪律 29 ✓）。① 引擎算的是 `base × (1 + ratio)` ✓ ⇒ **×2 ⇒ `percent: 1`** ✓（+100% ✓）；② `permanent` ✓（文档没给时长 ✓）；⚠ **同一族的另两把**：**制胜的瞬间 (23005)** 与 **落日时起舞 (23030)** 的数据里也都是 **2** ✓⇒ 「提高」与「**大幅**提高」在数据里**同为 ×2** ✓ —— 这条对照值得记住 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "landau_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.22,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice), rank 4: 「同时受到的伤害降低22.0%」",
+      "note": "「同时**受到的伤害降低 22.0%**」—— ① 幅度来自 `skill_value[1]` 第 4 档 ✓（`0.22` ✓，与文档的 16/18/20/22/24% 逐档吻合 ✓）；② `MODIFY_DAMAGE_TAKEN percent: -0.22` ✓（**减伤**方向 ✓）；⚠ **判据的缺口（登记）** ✗：本文件对**减伤**只做**存在性**断言 ✓（`ReductionBuff` 计数 ✓），**幅度**没有被数值判据钉住 ✓ ⇒ 下一步：用**敌人攻击**测一次伤害比 ✓（`0.84` ✓；生成器要**固定为不暴击** ✓，见第 25/270 轮的配方 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "landau_aggro_up",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "AGGRO_ADDED_RATIO",
+          "percent": 1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice): 「使装备者受到攻击的概率提高」（数据 factor = 2 ⇒ +100%）",
+      "note": "「使装备者**受到攻击的概率提高**」—— ⭐ **散文没给数字** ✓（\"提高\" ✓），而 `weapons.json` 的 `skill_value[0]` **是 2** ✓（五档全同 ✓）⇒ 「文档没给数值」**不等于**「数据里没有」 ✓（纪律 29 ✓）。① 引擎算的是 `base × (1 + ratio)` ✓ ⇒ **×2 ⇒ `percent: 1`** ✓（+100% ✓）；② `permanent` ✓（文档没给时长 ✓）；⚠ **同一族的另两把**：**制胜的瞬间 (23005)** 与 **落日时起舞 (23030)** 的数据里也都是 **2** ✓⇒ 「提高」与「**大幅**提高」在数据里**同为 ×2** ✓ —— 这条对照值得记住 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "landau_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21009 (Landau's Choice), rank 5: 「同时受到的伤害降低24.0%」",
+      "note": "「同时**受到的伤害降低 24.0%**」—— ① 幅度来自 `skill_value[1]` 第 5 档 ✓（`0.24` ✓，与文档的 16/18/20/22/24% 逐档吻合 ✓）；② `MODIFY_DAMAGE_TAKEN percent: -0.24` ✓（**减伤**方向 ✓）；⚠ **判据的缺口（登记）** ✗：本文件对**减伤**只做**存在性**断言 ✓（`ReductionBuff` 计数 ✓），**幅度**没有被数值判据钉住 ✓ ⇒ 下一步：用**敌人攻击**测一次伤害比 ✓（`0.84` ✓；生成器要**固定为不暴击** ✓，见第 25/270 轮的配方 ✓）。"
+    }
+  ]
+}
