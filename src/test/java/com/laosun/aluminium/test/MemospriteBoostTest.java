@@ -4,6 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -53,5 +54,52 @@ public class MemospriteBoostTest {
         Battle battle = new Battle(List.of(master), List.of(enemy), new Random(0));
         battle.startBattle();
         return master.getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get();
+    }
+
+    /**
+     * The gate itself, judged through damage: a memosprite's own attack must be larger while its master wears rank 5 (48%) than
+     * rank 1 (24%).
+     *
+     * <p>⚠ Two ranks rather than "with and without the light cone": a weapon contributes base stats, and the memosprite's damage
+     * scales off its own Max HP (inherited from the master), so a with/without comparison would mix the boost with a stat change.
+     * Rank does not move a weapon's stats, so it isolates the boost.
+     */
+    @Test
+    public void theMemospriteHitsHarderAtRankFive() {
+        double one = memospriteDamage(1);
+        double five = memospriteDamage(5);
+        Assertions.assertTrue(one > 0, "precondition: the memosprite landed a hit: " + one);
+        double ratio = five / one;
+        // Measured band: the boosts are 24% and 48%, and the boost zone already holds other contributions, so the observable
+        // ratio compresses below 1.48/1.24. A missing gate gives exactly 1.0, well outside this band (that is the mutation).
+        Assertions.assertTrue(ratio > 1.10 && ratio < 1.25,
+                "rank 5 boosts 48% against rank 1's 24%: " + one + " vs " + five + " -> " + ratio);
+    }
+
+    /** One hit by the memosprite, against a victim that cannot die, at the given rank. */
+    private static double memospriteDamage(int rank) {
+        Character master = CharacterFactory.create(SUMMONER, LEVEL, true, Weapon.build(WEAPON_ID, LEVEL, false, rank));
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(900000));
+        enemy.heal(900000);
+        Random noCrit = new Random(0) {
+            @Override
+            public double nextDouble() {
+                return 0.99;
+            }
+        };
+        Battle battle = new Battle(List.of(master), List.of(enemy), noCrit);
+        battle.startBattle();
+        Summon memosprite = battle.summonMemosprite(master);
+        Assertions.assertNotNull(memosprite, "precondition: the 忆灵 is out");
+        double before = enemy.getCurrentHp();
+        // ⚠ COMMON, not SKILL: a memosprite's stated attack is installed in its COMMON slot (MemospriteAttackTest:78).
+        battle.castImmediate(memosprite.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON), memosprite,
+                List.of(enemy));
+        double dealt = before - enemy.getCurrentHp();
+        Assertions.assertFalse(enemy.isDeath(), "the judged hit must not kill the victim");
+        Assertions.assertTrue(dealt > 0 && dealt < 0.4 * before,
+                "a real measurement, not the whole bar: " + dealt + " of " + before);
+        return dealt;
     }
 }

@@ -2498,9 +2498,13 @@ public class Battle {
         // rather than on the damage's type or cast category: a memosprite's skill is an ordinary NORMAL damage like any other.
         // ⚠ `instanceof Summon` would be an approximation -- the documents distinguish 忆灵 from ordinary 召唤物 -- so the test
         // is the precise one: the attacker IS the unit that its master's memospriteOf returns.
+        // ⚠ Read from the MASTER, not from the attacker: a memosprite's panel inherits only the attributes its spec NAMES
+        // (`SummonFactory` snapshots them at summon time, and MemospriteSpec says nothing else is inherited), so an attribute a
+        // light cone grants to the wearer is invisible on the memosprite itself. 「装备者的忆灵造成的伤害」 is a boost the WEARER
+        // owns and that applies to damage its memosprite deals.
         if (attacker instanceof Summon summon && summon.getMaster() != null
                 && attacker == memospriteOf(summon.getMaster())) {
-            damage.addBoost(attacker.getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get());
+            damage.addBoost(summon.getMaster().getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get());
         }
 
         // Scoped boosts (P10-4): 「普攻 / 战技 / 终结技造成的伤害提高 X%」. These cannot be gated on the damage
