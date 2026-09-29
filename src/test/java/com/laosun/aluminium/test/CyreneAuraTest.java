@@ -13,7 +13,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 昔涟's aura: 「昔涟在场时，我方全体目标造成的伤害提高20.00%」.
+ * 1415 昔涟's aura: 「昔涟在场时，我方全体目标造成的伤害提高20.00%」 -- carried by the rule the file ALREADY had,
+ * `talent_party_damage` (round 71 added a byte-identical duplicate, which round 73 removed after the mutation failed to move
+ * anything: the original kept supplying 0.2 whatever the duplicate said).
+ *
+ * <p>\u26a0 Mutating THAT rule is what must turn this red -- a mutation of a duplicate cannot, which is exactly how the
+ * duplicate was found.
  *
  * <p>Judged on a TEAMMATE (the point of 「我方全体」) and as a DIFFERENCE against the same teammate without her -- so the assertion is
  * about the scope reaching someone else, not about an absolute number a baseline could satisfy anyway.
