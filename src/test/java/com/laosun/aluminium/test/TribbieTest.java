@@ -54,7 +54,8 @@ public class TribbieTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(TRIBBIE);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the follow-up trigger");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
+                "the follow-up trigger, and (2026-09-29) the zone's 「敌方目标受到的伤害提高30%」" + " with `ticks_on: self` for the zone's own clock");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "Numinosity");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.FOLLOW_UP), "the damage boost");
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
