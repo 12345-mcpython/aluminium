@@ -88,9 +88,10 @@ public class ContentDuplicateGuardTest {
             return;
         }
         if (element.isJsonArray()) {
-            int index = 0;
+            // \u26a0 NOT the index: appending "#0", "#1", ... made every rule's scope unique, so no duplicate could ever collide
+            // and the guard passed with a byte-identical copy in the file. Position is not meaning.
             for (JsonElement child : element.getAsJsonArray()) {
-                collect(child, scope + "#" + index++, out);
+                collect(child, scope, out);
             }
             return;
         }
