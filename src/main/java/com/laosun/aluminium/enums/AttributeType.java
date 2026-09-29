@@ -160,7 +160,27 @@ public enum AttributeType {
      * <p>⚠ <b>Appended, never inserted</b>: {@link #ordinal()} indexes every unit's attribute array (see the warning
      * above {@link #BASIC_ATTACK_DAMAGE_BOOST}).
      */
-    @SerializedName("aggro_added_ratio") AGGRO_ADDED_RATIO("aggro_added_ratio");
+    @SerializedName("aggro_added_ratio") AGGRO_ADDED_RATIO("aggro_added_ratio"),
+
+    /**
+     * 「使敌方全体<b>全属性抗性降低</b> X%」 — the victim-side reduction of its own resistance, applied in the
+     * damage pipeline beside penetration.
+     *
+     * <p><b>Why it is not {@link #DAMAGE_PENETRATION}.</b> Both lower the effective resistance, but the
+     * difference shows below zero: penetration is the attacker's side and cannot "ignore" resistance the victim
+     * does not have, while a reduction can drive the victim's resistance negative and the engine's own formula
+     * already treats that as fully effective ({@code ResistArea.rate()}: {@code 1 - clamp(RES - pen, -1, 0.9)},
+     * i.e. 0.1 to 2.0). Folding the two together would make 「抗性降低」 stop at zero and hand every attacker
+     * penetration instead.
+     *
+     * <p><b>Readers — measured, not assumed (2026-09-29).</b> Nineteen corpus documents say
+     * 「全属性抗性降低」; the engine-side ones are 1004, 1006, 1203, 1218, 1304, 1308, 1321, 1405, 1407, 1410,
+     * 1504 and 1507 (plus 1222/1505, which have no engine file, and the 光锥/词条 documents). Before this constant
+     * existed, <b>no</b> shipped file mentioned any resistance-reduction spelling at all.
+     *
+     * <p>⚠ <b>Appended, never inserted</b>: {@link #ordinal()} indexes every unit's attribute array.
+     */
+    @SerializedName("resistance_reduction") RESISTANCE_REDUCTION("resistance_reduction");
 
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
 

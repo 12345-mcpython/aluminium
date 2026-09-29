@@ -2539,6 +2539,11 @@ public class Battle {
         double rawResist = defender instanceof Enemy enemy
                 ? enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)
                 : 0.0;
+        // 「使敌方全体全属性抗性降低 X%」 (2026-09-29): the victim's side of the same zone, subtracted BEFORE
+        // penetration is applied -- see RESISTANCE_REDUCTION for why it is not folded into the attacker's
+        // penetration. Done here rather than inside `ResistArea` so that class's clamp (which exists for
+        // penetration) cannot swallow a reduction: negative resistance is meant to be fully effective.
+        rawResist -= defender.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
         damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
 
         // 5) Hook: entity-level DamageEvent (HSR.md §2.2: weakness = attacker's debuff, vulnerability = victim's

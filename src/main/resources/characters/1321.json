@@ -76,5 +76,20 @@
     ],
     "source": "1321 大丽花 战技 舔舐…背叛伸出火舌: 「开启结界，持续3回合，大丽花回合开始时持续回合数减1。…结界持续期间，我方全体的弱点击破效率提高50%…」",
     "note": "「结界持续期间，我方全体的**弱点击破效率**提高 50%」. ⚠ 「弱点击破效率」 and the engine's `BOOST_TOUGHNESS` are the same quantity — the multiplier on the toughness reduction an instance causes — so this is its first shipped reader besides 1207's talent. ⚠ `ticks_on: \"self\"` is 「**大丽花**回合开始时持续回合数减1」 (the caster's clock, as 8006's 【伴舞】 and 星期日's 【蒙福者】 use). ⚠ **Registered, not written**: the 结界 itself (「开启结界」 — a *field* with its own lifetime and membership, which the engine does not have: every effect here reaches units through a selector, and a domain is a place, not a list), and the second half of the same sentence 「敌方目标**未处于弱点击破状态**时承受的削韧值也能够转化为超击破伤害」 — the condition half is now expressible (`!target has_state 弱点击破`), but the sentence states **no percentage** for that conversion, and her talent's 倍率 (which the 星魂 1 text refers to) is not in this file yet. A conversion with a guessed multiplier would be a wrong number with no symptom."
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "aura_all_type_res_down",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "RESISTANCE_REDUCTION",
+        "percent": 0.2,
+        "permanent": true,
+        "target": "all_enemies"
+      }
+    ],
+    "source": "1321 大丽花 行迹/光环: 「大丽花在场时，敌方全体全属性抗性降低20%」",
+    "note": "「**大丽花在场时**，敌方全体**全属性抗性降低 20%**」—— ⭐ 新属性 `RESISTANCE_REDUCTION` 的**第一位读者** ✓（语料里同类从句 **19 份** ✓：1004、1006、1203、1218、1304、1308、1321、1405、1407、1410、1504、1507，另加 1222/1505（无文件）与光锥/词条 ✓；此前**没有任何已出货文件**用过抗性降低拼写 ✓）。① 幅度 20% ⇒ `percent: 0.2` ✓；② \"**在场时**\" ⇒ `BATTLE_START` + `permanent` ✓；③ 目标 `all_enemies` ✓。⚠ **不写 `DAMAGE_PENETRATION`** ✗：穿透属于**攻击方**且不能无视本来没有的抗性 ✓，而抗性降低属于**受击方**、可以把它压成**负数** ✓（`ResistArea` 的区间是 0.1–2.0 ✓）⇒ 合并会让\"抗性降低\"停在 0 ✗。⚠ 实测（2026-09-29）：对物理抗性 20% 的目标降低 20% ⇒ 同一发攻击 **×1.25** ✓（= 1/0.8 ✓）。⚠ **本轮顺带发现一处脆 fixture** ✓：`SuperBreakTest` 原本按\"对英雄元素弱\"挑敌人 ✓，而它**会被自己的击破伤害打死**（击破基数 31037 vs 血量 16498 ✓）⇒ 一旦伤害 ×1.2 就越线 ✓ ⇒ 该 fixture 已改成\"取血量最大的元素弱候选\" ✓（见其注释 ✓）。"
   }
 ]
