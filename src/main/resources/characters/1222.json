@@ -1,0 +1,48 @@
+[
+  {
+    "on": "BATTLE_START",
+    "id": "level_convention",
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 9
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 9
+      }
+    ],
+    "source": "1222 灵砂 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（战技 Lv10 = [0.8, 0.14, 420, 0.2]）",
+    "note": "与本项目其它角色文件一致：把技能等级抬到文档所引用的那一档，使数据行的数值与正文一致。"
+  },
+  {
+    "on": "SKILL_CAST",
+    "id": "skill_party_heal",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "HEAL",
+        "scale": "owner_attack",
+        "percent": 0.14,
+        "amount": 420,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1222 灵砂 战技 识烟飞彩 / Smoke and Splendor: 「同时为我方全体回复等同于灵砂14.00%攻击力+420的生命值」（Lv10 行 [0.8, 0.14, 420, 0.2] 的第 2、3 项）",
+    "note": "「同时为**我方全体回复**等同于灵砂 **14.00% 攻击力 + 420** 的生命值」—— ① `HEAL` + **`scale: \"owner_attack\"`** ✓ + `percent: 0.14` ✓ + `amount: 420` ✓（形状与 1001 的 `SHIELD`、1105 的 `APPLY_REGEN` 同族 ✓）；② 数值取自**她自己的数据行**（Lv10 `[0.8, 0.14, 420, 0.2]` 的第 2、3 项 ✓）—— 不是从正文的\"14.00%\"抄的 ✓（纪律：数据优先 ✓）；③ 作用域 **`all_allies`** ✓（\"我方全体\" ✓）；⚠ ④ **登记（同句第三个从句）**：「使【**浮元**】行动提前 20%」✗ —— 浮元是她的召唤物 ✓，而引擎**没有她的忆灵/召唤物面板** ✗ ⇒ `ADVANCE` **没有可指名的单位** ✗ ⇒ **登记而不近似** ✓；⚠ ⑤ **登记**：她的**其它**技能/天赋/终结技/星魂**尚未编写** ✓（本文件只发这一条已核实的从句 ✓）。"
+  }
+]
