@@ -550,6 +550,18 @@
 > * ⚠ **仍登记的一处差异**：行迹「加护」让战技护盾 +1 回合（`EXTEND_BUFF`），游戏里软仇恨挂在护盾上因而**跟着变长** ✓，而本实现里它是**独立的 3 回合**修饰 ⇒ 加护**只延长护盾、不延长它** ✗（幅度与门槛都是精确的 ✓，只有这个交互不同 ✓）。
 > * ⚠ **教训（已写进 HANDOFF）**：**"文档没给数值" ≠ "数据里没有"** ✓ —— 一条从句要登记成数据缺口前，必须先去上游找：`ExcelOutput` 的 `param_list`（有没有**没被正文引用的槽位**）与 `Config/ConfigAbility`（**写了哪个 property、被什么谓词分档**）✓。
 
+> **2026-09-29 更新（aggro 回收之一：1104 出货 + 语料规模更正）**：
+> * ✅ **1104 杰帕德 行迹「刚正」出货** ✓：`trace_steadfast_aggro` = `BATTLE_START` + `permanent` + `MODIFY_ATTR AGGRO_ADDED_RATIO percent 3 target self` ✓。数值来源：`ExcelOutput/AvatarSkillTreeConfig.json` 的 `PointID 1104101`（`AbilityName Avatar_Gepard_SkillTree01`）带 `ParamList = [{"Value": 3}]` ✓，该能力挂**全局** modifier `M_SkillTree_AggroUp`（`StackProperty` 写 `AggroAddedRatio` = **+参数** ✓）⇒ 权重 **×(1+3) = ×4** ✓。**交叉印证**：同一张表 `1104103`「战意」的 `[0.35]` 与文档渲染的 **35%** 吻合 ✓。`characters/1104.json` 里 ⑧ 那条"软嘲讽，文档无任何数值（与 1001 同族）"已**就地更正** ✓，`GepardKitTest` 的普查计数与行为用例同步 ✓，**变异**（3 → 2）实测 **1 红** ✓。
+> * ✅ **语料规模实测更正**：这句在**7 份**文档里（1001、1104、1110、1205、1209、1507、WEAPONS.md）✓ —— `engine.md` 里此前写的"20 条"是 **TextMap 条目数**，已改 ✓。
+> * ⚠ **遗器侧无此读者** ✓：41 份 `relic_sets/*.json` **0 处**、生成表 `data/relic_sets.json` **0 处** ✓；`AggroAddedRatio` **不在任何遗器/光锥 Excel 表里**（含首次探针跳过的 53MB `SpecialAvatarRelicMainValue.json` ✓）⇒ `AttributeType.BY_GAME_PROPERTY` **不加条目** ✓（那张表是生成器词典的原样副本，没有证据不能加 ✓）。
+> * ⚠ **光锥是内容类缺口，不是能力缺口** ✓：`EquipmentSkillConfig.json` 有 **845 行**、每行带 `ParamList` 与 `AbilityName` ✓（`EquipmentConfig` 169 行、`SkillID` 指向它 ✓）⇒ 数值在上游 ✓，但引擎**没有光锥效果通路**（遗器有 `relic_sets/` 内容目录 + 装载器 ✓，光锥目前只是数值条 ✗）⇒ 要回收 WEAPONS.md 的「沉酣」「时光如梭」得先建**光锥效果内容类**（内容目录 + 装载器 + 触发挂接）⇒ 按内容类缺口登记 ✓。
+> * ⚠ **仍在登记的四位读者（各缺什么已写明）** ✓：
+>   * **1110 玲可**（战技与终结技的 buff 都带 `MDF_AggroUp` 开关 + `AggroAddedRatio` ✓）—— 缺**命途条件**（「若该目标为**毁灭**或**存护**命途」✗ 引擎没有"目标命途"条件变量 ✗），且 `MDF_AggroUp` 绑定的**参数下标**尚未解析 ✗；
+>   * **1205 刃**（战技「提升自身的受击概率」✓）—— 能力文件尚未定位（`*Blade*` 只匹配到 **1507** 的 `Avatar_MortenaxBlade_00_Ability.json` ✗）⇒ 先定位文件再取参数；
+>   * **1209 彦卿**（「处于【智剑连心】时受到攻击的概率**降低**」✗）—— 缺**自身状态条件** ✗ 与数值；`M_SkillTree_AggroDown` 在数据里存在但**没有任何 Avatar 文件引用它** ✗ ⇒ 挂载点待找；
+>   * **1507 千冶•刃**（「**结界持续期间**，被敌方攻击的概率提高」✗）—— 缺**结界**（语料第一大缺口）✗ 与数值。
+> * ⚠ **本轮不动引擎** ✓（`AGGRO_ADDED_RATIO` 已够用 ✓），只出货内容 + 更正文档 ✓。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
