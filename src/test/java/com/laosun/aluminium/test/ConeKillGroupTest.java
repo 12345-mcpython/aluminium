@@ -31,8 +31,8 @@ public class ConeKillGroupTest {
         Battle battle = battle(unit, enemy);
         double baseAttack = unit.getAttribute(AttributeType.ATTACK).baseValue();
         double attackBefore = unit.getAttribute(AttributeType.ATTACK).get();
-        double critBefore = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
         battle.startBattle();
+        double critBefore = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
         Assertions.assertEquals(0.16 * baseAttack, unit.getAttribute(AttributeType.ATTACK).get() - attackBefore, 1e-3,
                 "attack at battle start");
         battle.currentMove = new Signal(unit);
