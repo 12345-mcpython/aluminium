@@ -781,7 +781,7 @@ public class TriggerTable {
      * {@link AttributeType}, the second for shape here and for existence where the character is assembled.
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
+            Set.of("enemy_count", "hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
                     "target_summon_count", "self_max_energy", "from_skill_id");
 
     /**
@@ -2321,6 +2321,9 @@ public class TriggerTable {
                 // than a subject prefix because the two are asked in the same sentence often (relic 127 asks
                 // about the wearer, 星期日's Skill asks about the ally it was cast on).
                 case "target_summon_count" -> summonCount(ctx.target(), ctx);
+                // 「场上敌方目标数量」 -- a count of the OTHER camp as a whole, which no subject prefix fits: `self_*` and
+                // `target_*` are both about one unit. Its reader is 1413 长夜月's talent, whose thresholds are 4+/3/2/1 enemies.
+                case "enemy_count" -> enemyCount(ctx);
                 // 「若装备者的能量上限大于等于…」 -- not an attribute (`CanHit.getMaxEnergy()` is a field, and the
                 // attribute table has no slot for it), which is exactly why it needed a variable of its own.
                 case "self_max_energy" -> ctx.owner() == null ? Double.NaN : ctx.owner().getMaxEnergy();
@@ -2342,6 +2345,20 @@ public class TriggerTable {
                 return Double.NaN;
             }
             return ctx.battle().summonCountOf(who);
+        }
+
+        /**
+         * How many living enemies are on the field -- 「场上敌方目标数量」.
+         *
+         * <p>⚠ {@code NaN} when there is no battlefield, exactly like {@link #summonCount}: a rule gated on a count that cannot
+         * be read must FAIL rather than read as zero, because "no enemies" and "cannot tell" are different answers and the
+         * second one has no symptom. The dead are skipped, which is what 「场上」 means.
+         */
+        private static double enemyCount(TriggerContext ctx) {
+            if (ctx.battle() == null || ctx.battle().enemyUnits() == null) {
+                return Double.NaN;
+            }
+            return ctx.battle().enemyUnits().stream().filter(enemy -> !enemy.isDeath()).count();
         }
 
         /**
