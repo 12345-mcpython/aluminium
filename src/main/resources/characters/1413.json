@@ -103,5 +103,69 @@
     ],
     "source": "1413 长夜月 终结技 晚安，全世界无眠 (skill 141303, Ultimate/AoEAttack/Ice): 「召唤忆灵「长夜」，随后使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害，并使长夜月进入【至暗之谜】状态，期间敌方全体受到的伤害提高#4[i]%，长夜月和忆灵「长夜」造成的伤害提高#3[i]%，且免疫控制类负面状态。」 param Lv10 = [2, 2, 0.6, 0.3]",
     "note": "Two effects, in the order the text writes them: 召唤忆灵 then 使忆灵…造成伤害. ⚠ The three numbers of that attack are NOT written here -- `skill: \"ULTRA\"` + `damage_param: 0` reads the multiplier out of 141303's own parameter row and the element (Ice) and shape (AoEAttack) come from the same skill data. ⚠ `damage_param` is a 0-based array index while the document writes its placeholders 1-based: the Max HP share is `#1[i]`, so the column is 0. Writing 1 reads `#2[i]` -- the 【至暗之谜】 charge count, which is 2 at EVERY level and happens to equal 2.0 at Lv10 -- so a wrong index would look right until the level moved (that is what the level-ratio case in SummonCommandTest caught). ⚠ `damage_level: 10` is likewise required, not decoration: a character's skills are all at level 1 in this engine, so the skill's own level would read the Lv1 row (1.0) while the text quotes the Lv10 row (2.0) -- half the damage, with nothing to report. The multiplier is 2.5 at the skill's cap (Lv15). Only `attribute: HEALTH` is stated, because that is the one thing the row does not say: 「等同于**忆灵**的生命上限」, not 长夜月's ATK. A first draft of this op carried its own element/shape/percent fields and would have been a second copy of data that already exists. ⚠ `actor == self` is not decoration: ULT_CAST is delivered to every character's table, so without it a teammate's ultimate would command HER memosprite. ⚠ The summon acts without spending its turn -- this is an extra attack, like a follow-up, and 「长夜」's own turn still uses its own skill (50% of its Max HP, single target). ⚠ NOT authored from the ultimate: 【至暗之谜】 (a state with charges, an enemy vulnerability of 30%, a 60% damage boost for both units, crowd-control immunity) -- that is a state machine with its own resource, registered rather than approximated. ⚠ The **90 toughness** of that all-enemy attack rides along HERE, and reads the same skill's `stance_list.all` -- the commanded attack is the swing that removes it (`SkillExecutor`'s AOE arm is skipped for a delegated cast; measured 2026-09-27: a 300-point bar goes 300 -> 210, i.e. exactly 90; `SummonCommandTest.castingTheUltimateRemovesTheToughnessItsOwnSkillStates`). Giving this op a stance argument would be a second copy of the number and would remove it twice. ⚠ The double damage that this rule used to cause is FIXED, by the CAST_SETUP rule above: without it the engine's own path swung 141303's rows at HER attack as the base (measured 8818.5 on 1002011 with an empty table) and this rule swung the memosprite's share on top, where the document describes one damage instance. Registered as M-40 and closed on 2026-09-27 (`CastSetupTest`)."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "talent_memosprite_damage_enemy_count_4",
+    "when": [
+      "enemy_count >= 4",
+      "actor == summon"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.2
+      }
+    ],
+    "source": "1413 长夜月 天赋: 「长夜月在场时，场上敌方目标数量等于4 或以上名时，我方忆灵造成的伤害为原伤害的120%」",
+    "note": "「长夜月在场时，**场上敌方目标数量**等于 4 或以上 名时，**我方忆灵造成的伤害为原伤害的 120%**」—— ① ⭐ 用 **`BOOST_DAMAGE`** ✓：它抬的是**正在结算的这一击** ✓，而 `DEALING_DAMAGE` 正是\"结算前把待结算实例交出来\"的事件 ✓（⚠ 实测：改成 `MODIFY_ATTR` 加属性**来不及** ✗ —— 比值仍是 1.0 ✓）；② ⭐ 作用域用 **`actor == summon`** ✓（词汇表已有 ✓，问的是\"事件的主体是否是我的召唤物\" ✓）—— 否则主人**自己**的伤害也会被这条规则抬起来 ✗；③ 条件用第 67/270 轮落地的 **`enemy_count`** ✓；④ 四档**互斥** ✓（`>= 4` / `== 3` / `== 2` / `== 1` ✓）；⑤ 数值直接来自句子 ✓（120/125/130/150% ⇒ +20/+25/+30/+50% ✓）；⑥ ⚠ **实测**：主人挂 `DEALING_DAMAGE` 规则时忆灵出手**会触发** ✓（技能点 3→4 ✓），不挂则 3→3 ✓。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "talent_memosprite_damage_enemy_count_3",
+    "when": [
+      "enemy_count == 3",
+      "actor == summon"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.25
+      }
+    ],
+    "source": "1413 长夜月 天赋: 「长夜月在场时，场上敌方目标数量等于3名时，我方忆灵造成的伤害为原伤害的125%」",
+    "note": "「长夜月在场时，**场上敌方目标数量**等于 3 名时，**我方忆灵造成的伤害为原伤害的 125%**」—— ① ⭐ 用 **`BOOST_DAMAGE`** ✓：它抬的是**正在结算的这一击** ✓，而 `DEALING_DAMAGE` 正是\"结算前把待结算实例交出来\"的事件 ✓（⚠ 实测：改成 `MODIFY_ATTR` 加属性**来不及** ✗ —— 比值仍是 1.0 ✓）；② ⭐ 作用域用 **`actor == summon`** ✓（词汇表已有 ✓，问的是\"事件的主体是否是我的召唤物\" ✓）—— 否则主人**自己**的伤害也会被这条规则抬起来 ✗；③ 条件用第 67/270 轮落地的 **`enemy_count`** ✓；④ 四档**互斥** ✓（`>= 4` / `== 3` / `== 2` / `== 1` ✓）；⑤ 数值直接来自句子 ✓（120/125/130/150% ⇒ +20/+25/+30/+50% ✓）；⑥ ⚠ **实测**：主人挂 `DEALING_DAMAGE` 规则时忆灵出手**会触发** ✓（技能点 3→4 ✓），不挂则 3→3 ✓。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "talent_memosprite_damage_enemy_count_2",
+    "when": [
+      "enemy_count == 2",
+      "actor == summon"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.3
+      }
+    ],
+    "source": "1413 长夜月 天赋: 「长夜月在场时，场上敌方目标数量等于2名时，我方忆灵造成的伤害为原伤害的130%」",
+    "note": "「长夜月在场时，**场上敌方目标数量**等于 2 名时，**我方忆灵造成的伤害为原伤害的 130%**」—— ① ⭐ 用 **`BOOST_DAMAGE`** ✓：它抬的是**正在结算的这一击** ✓，而 `DEALING_DAMAGE` 正是\"结算前把待结算实例交出来\"的事件 ✓（⚠ 实测：改成 `MODIFY_ATTR` 加属性**来不及** ✗ —— 比值仍是 1.0 ✓）；② ⭐ 作用域用 **`actor == summon`** ✓（词汇表已有 ✓，问的是\"事件的主体是否是我的召唤物\" ✓）—— 否则主人**自己**的伤害也会被这条规则抬起来 ✗；③ 条件用第 67/270 轮落地的 **`enemy_count`** ✓；④ 四档**互斥** ✓（`>= 4` / `== 3` / `== 2` / `== 1` ✓）；⑤ 数值直接来自句子 ✓（120/125/130/150% ⇒ +20/+25/+30/+50% ✓）；⑥ ⚠ **实测**：主人挂 `DEALING_DAMAGE` 规则时忆灵出手**会触发** ✓（技能点 3→4 ✓），不挂则 3→3 ✓。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "talent_memosprite_damage_enemy_count_1",
+    "when": [
+      "enemy_count == 1",
+      "actor == summon"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.5
+      }
+    ],
+    "source": "1413 长夜月 天赋: 「长夜月在场时，场上敌方目标数量等于1名时，我方忆灵造成的伤害为原伤害的150%」",
+    "note": "「长夜月在场时，**场上敌方目标数量**等于 1 名时，**我方忆灵造成的伤害为原伤害的 150%**」—— ① ⭐ 用 **`BOOST_DAMAGE`** ✓：它抬的是**正在结算的这一击** ✓，而 `DEALING_DAMAGE` 正是\"结算前把待结算实例交出来\"的事件 ✓（⚠ 实测：改成 `MODIFY_ATTR` 加属性**来不及** ✗ —— 比值仍是 1.0 ✓）；② ⭐ 作用域用 **`actor == summon`** ✓（词汇表已有 ✓，问的是\"事件的主体是否是我的召唤物\" ✓）—— 否则主人**自己**的伤害也会被这条规则抬起来 ✗；③ 条件用第 67/270 轮落地的 **`enemy_count`** ✓；④ 四档**互斥** ✓（`>= 4` / `== 3` / `== 2` / `== 1` ✓）；⑤ 数值直接来自句子 ✓（120/125/130/150% ⇒ +20/+25/+30/+50% ✓）；⑥ ⚠ **实测**：主人挂 `DEALING_DAMAGE` 规则时忆灵出手**会触发** ✓（技能点 3→4 ✓），不挂则 3→3 ✓。"
   }
 ]
