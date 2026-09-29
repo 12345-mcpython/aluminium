@@ -27,6 +27,11 @@ public class Weapon implements Cloneable {
     /**
      * Display name (bilingual).
      */
+    /**
+     * The light cone's id, which names its rule file under {@code resources/light_cones/} (2026-09-29).
+     * It was already in hand at construction and simply not kept.
+     */
+    private int wid;
     private Translate name;
     /**
      * Skill description text.
@@ -73,7 +78,7 @@ public class Weapon implements Cloneable {
         }
 
         double rate = LevelPromotionCalc.calcWeaponRate(level, isPromote);
-        return new Weapon(wp.name(), "", wp.health() * rate,
+        return new Weapon(wid, wp.name(), "", wp.health() * rate,
                 wp.attack() * rate,
                 wp.defence() * rate,
                 wp.type(), weaponAttribute);
