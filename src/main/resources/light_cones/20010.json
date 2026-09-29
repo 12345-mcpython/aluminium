@@ -1,0 +1,82 @@
+{
+  "1": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20010_heal_on_ult",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.18,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20010 戍御: 使装备者施放终结技时，回复等同于自身生命上限#1[i]%的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。 ⚠ 治疗量 = **自身生命上限 × 份额** ✓（`scale: owner_max_hp` ✓，引擎已有的缩放 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20010_heal_on_ult",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.21,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20010 戍御: 使装备者施放终结技时，回复等同于自身生命上限#1[i]%的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。 ⚠ 治疗量 = **自身生命上限 × 份额** ✓（`scale: owner_max_hp` ✓，引擎已有的缩放 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20010_heal_on_ult",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.24,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20010 戍御: 使装备者施放终结技时，回复等同于自身生命上限#1[i]%的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。 ⚠ 治疗量 = **自身生命上限 × 份额** ✓（`scale: owner_max_hp` ✓，引擎已有的缩放 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20010_heal_on_ult",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.27,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20010 戍御: 使装备者施放终结技时，回复等同于自身生命上限#1[i]%的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。 ⚠ 治疗量 = **自身生命上限 × 份额** ✓（`scale: owner_max_hp` ✓，引擎已有的缩放 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20010_heal_on_ult",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20010 戍御: 使装备者施放终结技时，回复等同于自身生命上限#1[i]%的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。 ⚠ 治疗量 = **自身生命上限 × 份额** ✓（`scale: owner_max_hp` ✓，引擎已有的缩放 ✓）。"
+    }
+  ]
+}
