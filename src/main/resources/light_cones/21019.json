@@ -1,0 +1,162 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21019_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 使装备者攻击力提高#1[i]%，当装备者消灭敌方目标后，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone21019_crit_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 「消灭敌方目标后，暴击率提高#2%，持续#3回合」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21019_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 使装备者攻击力提高#1[i]%，当装备者消灭敌方目标后，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone21019_crit_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.15,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 「消灭敌方目标后，暴击率提高#2%，持续#3回合」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21019_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 使装备者攻击力提高#1[i]%，当装备者消灭敌方目标后，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone21019_crit_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.18,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 「消灭敌方目标后，暴击率提高#2%，持续#3回合」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21019_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 使装备者攻击力提高#1[i]%，当装备者消灭敌方目标后，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone21019_crit_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.21,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 「消灭敌方目标后，暴击率提高#2%，持续#3回合」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21019_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 使装备者攻击力提高#1[i]%，当装备者消灭敌方目标后，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone21019_crit_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.24,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21019 在蓝天下: 「消灭敌方目标后，暴击率提高#2%，持续#3回合」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
+    }
+  ]
+}
