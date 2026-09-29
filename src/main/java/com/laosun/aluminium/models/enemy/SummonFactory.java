@@ -123,6 +123,20 @@ public final class SummonFactory {
         return memosprite(master, spec);
     }
 
+    public static Summon servant(Character master) {
+        if (master == null) {
+            throw new IllegalArgumentException("A memosprite needs a summoner");
+        }
+        MemospriteSpec spec = Memosprites.of(master.getCid(), Memosprites.SERVANT_DIR);
+        if (spec == null) {
+            throw new IllegalArgumentException(
+                    "Character " + master.getName() + " (" + master.getCid() + ") has no memosprite spec: "
+                            + "add resources/" + Memosprites.DIR + "/" + master.getCid() + ".json describing "
+                            + "its name and how its panel derives from the summoner");
+        }
+        return servant(master, spec);
+    }
+
     /**
      * Builds a memosprite from an already-loaded spec.
      *
@@ -175,6 +189,46 @@ public final class SummonFactory {
         return summon;
     }
 
+    public static Summon servant(Character master, MemospriteSpec spec) {
+        if (master == null) {
+            throw new IllegalArgumentException("A memosprite needs a summoner");
+        }
+        if (spec == null) {
+            throw new IllegalArgumentException("A memosprite needs a spec");
+        }
+        // Validated here too, not only on the load path: this overload is the seam a test uses, and a bad
+        // spec handed to it must fail the same way a bad file does -- otherwise the checks in
+        // Memosprites.validate could be bypassed by the one caller that is easiest to get wrong.
+        Memosprites.validate(spec, "SummonFactory.servant(master, spec)");
+        AttributeBuilder panel = new AttributeBuilder();
+        for (MemospriteSpec.Panel entry : spec.panel()) {
+            AttributeType attribute = AttributeType.fromString(entry.attribute());
+            double share = entry.percent() == null ? 0 : entry.percent();
+            double flat = entry.flat() == null ? 0 : entry.flat();
+            double value = share * master.getAttribute(attribute).get() + flat;
+            // The builder's own convention for the two kinds of attribute (see AttributeBuilder): a base
+            // attribute is set outright, and a ratio attribute -- whose base is literally 0 -- is given a
+            // percentage-point modifier, which is exactly `ModifyAttr`'s rule for the same situation.
+            if (attribute.isPercent) {
+                panel.addPercentPoint(attribute, value, DoubleValue.Modifier.ModifierSource.BASE);
+            } else {
+                panel.setBase(attribute, value);
+            }
+        }
+        Summon summon = new Summon(spec.name(), Camp.PLAYER, panel.build());
+        summon.setLevel(master.getLevel());
+        if (spec.aggro() != null) {
+            // The servant's own 仇恨 (「ServantID 11413 · 仇恨: 125」). Only stated when a document states it:
+            // Battle.aggroOf answers its regular tier for anything left at 0, which is a different claim from
+            // "the document says 100".
+            summon.setAggro((int) Math.round(spec.aggro()));
+        }
+        if (spec.attack() != null) {
+            summon.setSkill(SkillType.COMMON, attackOf(spec, DamageType.NORMAL));
+        }
+        return summon;
+    }
+
     /**
      * Compiles the spec's {@code attack} block into the skill the memosprite acts with (P9-4 忆灵).
      *
@@ -189,16 +243,21 @@ public final class SummonFactory {
      * every hit (see {@code EnemySkill.strike}), so a buff that lands on the memosprite mid-battle is
      * reflected — the panel decides what it starts with, not what it is worth.
      */
+    /** A memosprite's attack is memory damage; the two-argument form is what a servant uses. */
     private static EnemySkill attackOf(MemospriteSpec spec) {
+        return attackOf(spec, DamageType.MEMORY);
+    }
+
+    private static EnemySkill attackOf(MemospriteSpec spec, DamageType type) {
         MemospriteSpec.Attack attack = spec.attack();
         return new EnemySkill(
                 DamageElement.fromString(attack.element()),
                 attack.percent(),
                 attack.hits() == null ? 1 : attack.hits(),
-                // ⚠ `DamageType.MEMORY` is 忆灵伤害 (GLOSSARY.md), and a memosprite's own skill is exactly that -- not NORMAL.
+                // ⚠ `type` is 忆灵伤害 (GLOSSARY.md), and a memosprite's own skill is exactly that -- not NORMAL.
                 // The type has been declared since the table was written (its javadoc notes only some constants are in use);
                 // labelling it here is what lets a rule scope a bonus to memosprite damage, and it is the game's own word.
-                DamageType.MEMORY,
+                type,
                 SkillEffectType.fromString(attack.shape()),
                 AttributeType.fromString(attack.base()),
                 attack.stance() == null ? 0 : attack.stance());
