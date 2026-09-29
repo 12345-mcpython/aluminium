@@ -1226,8 +1226,13 @@ public class TriggerTable {
      * @return the resource name, or {@code null} when the variable is not a resource read
      */
     /** The two spellings that read a named counter ({@code ADD_STACK}); the subject is the prefix. */
-    private static final String SELF_STACKS_PREFIX = "self_stacks:";
-    private static final String TARGET_STACKS_PREFIX = "target_stacks:";
+    /**
+     * The two counter spellings, shared with the interpreter's {@code scale} family (2026-09-29): a condition says
+     * "I have 3 layers", and a scale says "the number is a share of how many layers I have" -- one wording, and making
+     * them public is what keeps the two from drifting (the same reason {@link #SELF_ATTR_PREFIX} is not private).
+     */
+    public static final String SELF_STACKS_PREFIX = "self_stacks:";
+    public static final String TARGET_STACKS_PREFIX = "target_stacks:";
 
     /**
      * The counter a {@code self_stacks:<NAME>} / {@code target_stacks:<NAME>} variable reads, or {@code null}.
