@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_1",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20006 (Data Bank), rank 1: 「终结技造成的伤害提高28%」",
+      "note": "「使装备者**终结技造成的伤害提高 28%**」—— ① 用引擎**已有的作用域加伤属性** `ULTIMATE_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 1 档剩余槽 = `0.28` ✓（与文档 28/35/42/49/56% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_2",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.35,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20006 (Data Bank), rank 2: 「终结技造成的伤害提高35%」",
+      "note": "「使装备者**终结技造成的伤害提高 35%**」—— ① 用引擎**已有的作用域加伤属性** `ULTIMATE_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 2 档剩余槽 = `0.35` ✓（与文档 28/35/42/49/56% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_3",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20006 (Data Bank), rank 3: 「终结技造成的伤害提高42%」",
+      "note": "「使装备者**终结技造成的伤害提高 42%**」—— ① 用引擎**已有的作用域加伤属性** `ULTIMATE_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 3 档剩余槽 = `0.42` ✓（与文档 28/35/42/49/56% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_4",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.49,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20006 (Data Bank), rank 4: 「终结技造成的伤害提高49%」",
+      "note": "「使装备者**终结技造成的伤害提高 49%**」—— ① 用引擎**已有的作用域加伤属性** `ULTIMATE_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 4 档剩余槽 = `0.49` ✓（与文档 28/35/42/49/56% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_5",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.56,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20006 (Data Bank), rank 5: 「终结技造成的伤害提高56%」",
+      "note": "「使装备者**终结技造成的伤害提高 56%**」—— ① 用引擎**已有的作用域加伤属性** `ULTIMATE_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 5 档剩余槽 = `0.56` ✓（与文档 28/35/42/49/56% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ]
+}
