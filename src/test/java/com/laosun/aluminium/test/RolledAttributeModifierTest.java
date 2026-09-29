@@ -87,9 +87,9 @@ public class RolledAttributeModifierTest {
     /** Two technique clauses that roll a base chance before lowering a FLAT attribute. */
     @Test
     public void twoTechniquesLowerAnEnemyAttributeThroughTheRoll() {
-        Assertions.assertEquals(0.8, appliedRatio(1106, AttributeType.DEFENCE), 1e-6,
+        Assertions.assertEquals(0.8, appliedRatio(1106, AttributeType.DEFENCE, false), 1e-6,
                 "\u300c\u6709100%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u654c\u65b9\u6bcf\u4e2a\u5355\u4f53\u76ee\u6807\u9632\u5fa1\u529b\u964d\u4f4e20%\u300d");
-        Assertions.assertEquals(0.75, appliedRatio(1217, AttributeType.ATTACK), 1e-6,
+        Assertions.assertEquals(0.75, appliedRatio(1217, AttributeType.ATTACK, false), 1e-6,
                 "\u300c\u6709100%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u654c\u65b9\u6bcf\u4e2a\u5355\u4f53\u76ee\u6807\u653b\u51fb\u529b\u964d\u4f4e25%\u300d");
     }
 
@@ -102,7 +102,7 @@ public class RolledAttributeModifierTest {
      * and uses the first one the clause reaches, and fails loudly if there is none (a fixture that silently finds no
      * victim would make the assertion below meaningless).
      */
-    private static double appliedRatio(int cid, AttributeType attribute) {
+    private static double appliedRatio(int cid, AttributeType attribute, boolean fireSkillCast) {
         Character owner = CharacterFactory.create(cid, LEVEL);
         Character partner = CharacterFactory.create(ALLY, LEVEL);
         for (int id = 1002010; id < 1002100; id++) {
@@ -112,9 +112,23 @@ public class RolledAttributeModifierTest {
             } catch (RuntimeException ignored) {
                 continue;                                  // not in the data
             }
-            Battle battle = new Battle(List.of(owner, partner), List.of(candidate), new Random(0));
+            // ⚠ A generator fixed at 0.0, not `new Random(0)`: its first draw is ~0.7244, so a 75% base chance passes
+            // only barely and any victim-side resistance (specific or effect) turns the roll into a failure.
+            Battle battle = new Battle(List.of(owner, partner), List.of(candidate), new Random() {
+                @Override
+                public double nextDouble() {
+                    return 0.0;
+                }
+            });
             battle.markTechniqueUsed(owner);
             battle.startBattle();
+            // ⚠ The cast event is opt-in: the techniques hang on BATTLE_START while 1004's slow hangs on SKILL_CAST, and
+            // firing SKILL_CAST for everyone broke 1217 -- her own Skill rule dispels a negative effect from its target
+            // and removed the reduction the technique had just applied. It is fired directly rather than casting the
+            // skill, because a bounce cast would deal damage and could kill the monster under inspection.
+            if (fireSkillCast) {
+                battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, candidate, 0, 0);
+            }
             double ratio = candidate.getAttribute(attribute).get()
                     / candidate.getAttribute(attribute).baseValue();
             if (ratio < 1.0) {
@@ -122,5 +136,11 @@ public class RolledAttributeModifierTest {
             }
         }
         throw new AssertionError("no monster in the probed range takes the " + attribute + " reduction");
+    }
+    /** 1004's Skill: 75% base chance, 10% slow, two turns -- the sixth stale registration refuted. */
+    @Test
+    public void weltsSkillSlowsTheTargetThroughItsBaseChance() {
+        Assertions.assertEquals(0.9, appliedRatio(1004, AttributeType.SPEED, true), 1e-6,
+                "\u300c\u653b\u51fb\u547d\u4e2d\u65f6\u670975%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u53d7\u5230\u653b\u51fb\u7684\u654c\u65b9\u76ee\u6807\u901f\u5ea6\u964d\u4f4e10%\u300d");
     }
 }
