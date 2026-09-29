@@ -1003,6 +1003,9 @@ public class BuffManager {
         for (AbstractBuff buff : List.copyOf(buffs)) {
             buff.removeBuff(instance);
         }
+        System.out.println("[clear] clearAll is dropping " + buffs.size() + " buffs: "
+                + buffs.stream().map(b -> b.getClass().getSimpleName() + "/" + b.getBuffName())
+                        .collect(java.util.stream.Collectors.joining(", ")));
         buffs.clear();
         // M-5: also drop the `blocked` flag. It is set when a control buff expires on the very turn it was
         // blocking, so clearing every buff without clearing it leaves a unit that can never act again --

@@ -691,6 +691,10 @@ public final class TriggerInterpreter {
         int effectIndex = 0;
         for (EffectSpec effect : rule.effects()) {
             final int thisEffect = effectIndex++;
+            if (ctx.target() != null) {
+                System.out.println("[loop] effect#" + thisEffect + " op=" + effect.getOp() + " stacks="
+                        + ctx.target().getBuffManager().stacksOf("\u70ec\u714e"));
+            }
             // 「终结技的持续时间额外增加 1 回合」/「天赋的伤害提高效果额外提高 10%」 (2026-09-28): an amendment to the
             // named rule's own effect values. ⚠ A COPY, not a mutation: the compiled EffectSpec is shared by every
             // battle, so adjusting it in place would leak the amendment (and, in the test suite, into other tests).
@@ -1701,7 +1705,12 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      */
     private static void modifyDamageTaken(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        double percent = effect.getPercent();
+        // ⚠ A DERIVED magnitude, not `percent` (2026-09-29): 「1 层时使敌人受到的伤害提高 15.00%，此后每叠加 1 层提高
+        // 5.00%」 (1218 椒丘) is `amount + percent x layers`, so a zone reads its own value the same way a MODIFY_ATTR
+        // does. Before this, a `scale` on MODIFY_DAMAGE_TAKEN loaded fine and was silently IGNORED -- worse than refusing
+        // it. A plain zone (no scale) still takes `percent` exactly as before.
+        boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
+        double percent = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         // 「受到的**击破伤害**提高」: an optional damage-type scope, spelled with the enum's own names (2026-09-28).

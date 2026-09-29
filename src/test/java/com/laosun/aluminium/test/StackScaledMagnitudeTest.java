@@ -1,12 +1,10 @@
 package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.buff.StackBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -17,55 +15,89 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A magnitude that scales with a counter: {@code scale: target_stacks:<NAME>} (and its {@code self_stacks:} twin).
+ * 1218's two per-layer clauses: 「每层【烬煨】使目标的全属性抗性降低3%」 and
+ * 「1层时使敌人受到的伤害提高15.00%，此后每叠加1层提高5.00%」.
  *
- * <p>Read at fire time from the <b>counter</b>, not from a field: the engine's counters are "several buffs with one name"
- * ({@code BuffManager.stacksOf}), so the test builds them directly -- three named stacks must make the value three times
- * the per-layer one, which is what separates a scale from a second copy of the first application.
- *
- * <p>⚠ The counter is built by the test on purpose. 1218's talent, whose ADD_STACK should have produced it, leaves no
- * stack at all (measured 2026-09-29: its DOT lands, stacksOf stays 0), so the per-layer clause that motivated this
- * capability is registered against that separate defect rather than shipped on top of it.
+ * <p>The counter's name is a literal copied from the data file by the script that wrote this test. It is deliberately NOT
+ * an escape: a hand-typed escape once named a different character and read as "the engine loses the counter" for three
+ * rounds (the document's name is 烬煨, and the mistyped one differed in its second character).
  */
 public class StackScaledMagnitudeTest {
-    private static final int ALLY = 1210;
+    private static final int JIAOQIU = 1218;
+    private static final int ATTACKER = 1210;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final double EPS = 1e-9;
-    private static final String COUNTER = "\u6d4b\u8bd5\u5c42";
+    private static final String COUNTER = "烬煨";
 
     @Test
-    public void theMagnitudeIsThePerLayerValueTimesTheCount() {
-        Assertions.assertEquals(0.03, landed(1), EPS, "one layer is the per-layer value itself");
-        Assertions.assertEquals(0.09, landed(3), EPS,
-                "three layers are three times it, not the same value applied three times");
+    public void theResistanceReductionIsThreePercentPerStack() {
+        Assertions.assertEquals(0.03, resistanceAfter(1), EPS, "one stack is 3%");
+        Assertions.assertEquals(0.09, resistanceAfter(3), EPS, "three stacks are 9%, not 3% applied three times");
     }
 
-    /** Applies a counter-scaled 3%-per-layer reduction with the given number of stacks on the victim. */
-    private static double landed(int stacks) {
-        Character owner = CharacterFactory.create(ALLY, LEVEL);
-        owner.setTriggerTable(new TriggerTable(9994, List.of(TriggerSpecs.rule(
-                TriggerEvent.TURN_START.name(), List.of(), perLayer()))));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+    /**
+     * The vulnerability zone, judged on what is robust.
+     *
+     * <p>⚠ Why not the exact formula: the three measurements fire a different NUMBER of events (one layer marks one stack
+     * with one event, three layers mark three), so the shared generator sits at a different point when the damage is
+     * settled and the crit roll can differ. The exact curve is therefore pinned by construction (`amount: 0.1` +
+     * `percent: 0.05` per layer, recorded in the rule's note), and this test pins the direction and the magnitude:
+     * the damage rises with layers, and one layer's damage over the unmarked baseline is the document's ~15% plus the
+     * per-layer resistance reduction's ~3%. Halving `amount` lands near 1.08 and fails; dropping the zone lands at 1.0.
+     */
+    @Test
+    public void theVulnerabilityRisesWithTheLayers() {
+        double none = damageAfter(0);
+        double one = damageAfter(1);
+        double three = damageAfter(3);
+        Assertions.assertTrue(one > none && three > one,
+                "the damage taken rises with the layers: " + none + " -> " + one + " -> " + three);
+        double ratio = one / none;
+        Assertions.assertTrue(ratio > 1.10 && ratio < 1.30,
+                "one layer is the document's 15% plus the per-layer resistance reduction, not 1.0 or 1.08: " + ratio);
+    }
+
+    private static double resistanceAfter(int stacks) {
+        Fixture f = fixture();
+        mark(f, stacks);
+        return f.enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+    }
+
+    private static double damageAfter(int stacks) {
+        Fixture f = fixture();
+        mark(f, stacks);
+        double before = f.enemy.getCurrentHp();
+        f.battle.castImmediate(f.attacker.getSkills().get(SkillType.COMMON), f.attacker, List.of(f.enemy));
+        return before - f.enemy.getCurrentHp();
+    }
+
+    private static void mark(Fixture f, int stacks) {
         for (int i = 0; i < stacks; i++) {
-            enemy.getBuffManager().addBuff(new StackBuff(COUNTER, 2, false, 5));
+            f.battle.fireTriggers(TriggerEvent.ALLY_ATTACK, f.jiaoqiu, f.enemy, 1, 1000);
         }
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
-        battle.startBattle();
-
-        battle.fireTriggers(TriggerEvent.TURN_START, owner, enemy, 0, 0);
-
-        return enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+        Assertions.assertEquals(stacks, f.enemy.getBuffManager().stacksOf(COUNTER),
+                "precondition: the talent marked exactly " + stacks + " stack(s)");
     }
 
-    private static EffectSpec perLayer() {
-        EffectSpec effect = new EffectSpec();
-        TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
-        TriggerSpecs.set(effect, "attribute", AttributeType.RESISTANCE_REDUCTION.attributeString);
-        TriggerSpecs.set(effect, "scale", "target_stacks:" + COUNTER);
-        TriggerSpecs.set(effect, "percent", 0.03);
-        TriggerSpecs.set(effect, "turns", 2);
-        TriggerSpecs.set(effect, "target", "target");
-        return effect;
+    private static Fixture fixture() {
+        Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);
+        Character attacker = CharacterFactory.create(ATTACKER, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        // A generator that never crits (0.99 is above any crit chance) and never misses a base-chance roll: without it
+        // the three measurements sit at different points in the shared stream, the crit flips, and the damage ratio
+        // reflects the roll rather than the zone (measured: d1/d0 read 1.378 instead of ~1.19).
+        Random noCrit = new Random(0) {
+            @Override
+            public double nextDouble() {
+                return 0.99;
+            }
+        };
+        Battle battle = new Battle(List.of(jiaoqiu, attacker), List.of(enemy), noCrit);
+        battle.startBattle();
+        return new Fixture(jiaoqiu, attacker, enemy, battle);
+    }
+
+    private record Fixture(Character jiaoqiu, Character attacker, Enemy enemy, Battle battle) {
     }
 }
