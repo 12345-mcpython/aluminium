@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "flower_memosprite_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "MEMOSPRITE_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21057 (花儿不会忘记), rank 1: 「装备者忆灵造成的暴击伤害额外提高24%」",
+      "note": "「**装备者忆灵**造成的暴击伤害额外提高 24%」—— ① 新属性 **`MEMOSPRITE_DAMAGE_BOOST`** ✓（`FOLLOW_UP`/`BASIC_ATTACK` 的第三个兄弟 ✓）；② 门控用 **`attacker == memospriteOf(summon.getMaster())`** ✓ —— ⚠ **不用 `instanceof Summon`** ✗：文档区分**忆灵**与**召唤物** ✓，宽松的判定会把召唤物的伤害也抬起来 ✓；③ 幅度 **0.24** 取自 `weapons.json` 第 1 档的**剩余槽** ✓（逐档 24/30/36/42/48% ✓，与文档 24/30/36/42/48% 一致 ✓）；⚠ ④ **同句的另一半不写** ✓：「暴击伤害提高 24%」**已在 `ability_property` 里** ✓ ⇒ 再写一遍会重复计算 ✗（第 46/270 轮实测为 2 倍 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "flower_memosprite_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "MEMOSPRITE_DAMAGE_BOOST",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21057 (花儿不会忘记), rank 2: 「装备者忆灵造成的暴击伤害额外提高30%」",
+      "note": "「**装备者忆灵**造成的暴击伤害额外提高 30%」—— ① 新属性 **`MEMOSPRITE_DAMAGE_BOOST`** ✓（`FOLLOW_UP`/`BASIC_ATTACK` 的第三个兄弟 ✓）；② 门控用 **`attacker == memospriteOf(summon.getMaster())`** ✓ —— ⚠ **不用 `instanceof Summon`** ✗：文档区分**忆灵**与**召唤物** ✓，宽松的判定会把召唤物的伤害也抬起来 ✓；③ 幅度 **0.3** 取自 `weapons.json` 第 2 档的**剩余槽** ✓（逐档 24/30/36/42/48% ✓，与文档 24/30/36/42/48% 一致 ✓）；⚠ ④ **同句的另一半不写** ✓：「暴击伤害提高 24%」**已在 `ability_property` 里** ✓ ⇒ 再写一遍会重复计算 ✗（第 46/270 轮实测为 2 倍 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "flower_memosprite_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "MEMOSPRITE_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21057 (花儿不会忘记), rank 3: 「装备者忆灵造成的暴击伤害额外提高36%」",
+      "note": "「**装备者忆灵**造成的暴击伤害额外提高 36%」—— ① 新属性 **`MEMOSPRITE_DAMAGE_BOOST`** ✓（`FOLLOW_UP`/`BASIC_ATTACK` 的第三个兄弟 ✓）；② 门控用 **`attacker == memospriteOf(summon.getMaster())`** ✓ —— ⚠ **不用 `instanceof Summon`** ✗：文档区分**忆灵**与**召唤物** ✓，宽松的判定会把召唤物的伤害也抬起来 ✓；③ 幅度 **0.36** 取自 `weapons.json` 第 3 档的**剩余槽** ✓（逐档 24/30/36/42/48% ✓，与文档 24/30/36/42/48% 一致 ✓）；⚠ ④ **同句的另一半不写** ✓：「暴击伤害提高 24%」**已在 `ability_property` 里** ✓ ⇒ 再写一遍会重复计算 ✗（第 46/270 轮实测为 2 倍 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "flower_memosprite_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "MEMOSPRITE_DAMAGE_BOOST",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21057 (花儿不会忘记), rank 4: 「装备者忆灵造成的暴击伤害额外提高42%」",
+      "note": "「**装备者忆灵**造成的暴击伤害额外提高 42%」—— ① 新属性 **`MEMOSPRITE_DAMAGE_BOOST`** ✓（`FOLLOW_UP`/`BASIC_ATTACK` 的第三个兄弟 ✓）；② 门控用 **`attacker == memospriteOf(summon.getMaster())`** ✓ —— ⚠ **不用 `instanceof Summon`** ✗：文档区分**忆灵**与**召唤物** ✓，宽松的判定会把召唤物的伤害也抬起来 ✓；③ 幅度 **0.42** 取自 `weapons.json` 第 4 档的**剩余槽** ✓（逐档 24/30/36/42/48% ✓，与文档 24/30/36/42/48% 一致 ✓）；⚠ ④ **同句的另一半不写** ✓：「暴击伤害提高 24%」**已在 `ability_property` 里** ✓ ⇒ 再写一遍会重复计算 ✗（第 46/270 轮实测为 2 倍 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "flower_memosprite_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "MEMOSPRITE_DAMAGE_BOOST",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21057 (花儿不会忘记), rank 5: 「装备者忆灵造成的暴击伤害额外提高48%」",
+      "note": "「**装备者忆灵**造成的暴击伤害额外提高 48%」—— ① 新属性 **`MEMOSPRITE_DAMAGE_BOOST`** ✓（`FOLLOW_UP`/`BASIC_ATTACK` 的第三个兄弟 ✓）；② 门控用 **`attacker == memospriteOf(summon.getMaster())`** ✓ —— ⚠ **不用 `instanceof Summon`** ✗：文档区分**忆灵**与**召唤物** ✓，宽松的判定会把召唤物的伤害也抬起来 ✓；③ 幅度 **0.48** 取自 `weapons.json` 第 5 档的**剩余槽** ✓（逐档 24/30/36/42/48% ✓，与文档 24/30/36/42/48% 一致 ✓）；⚠ ④ **同句的另一半不写** ✓：「暴击伤害提高 24%」**已在 `ability_property` 里** ✓ ⇒ 再写一遍会重复计算 ✗（第 46/270 轮实测为 2 倍 ✓）。"
+    }
+  ]
+}
