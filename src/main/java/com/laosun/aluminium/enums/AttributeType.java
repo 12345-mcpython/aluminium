@@ -74,6 +74,15 @@ public enum AttributeType {
      * <p>Applied in {@code Battle.assemble}'s DMG-boost zone, gated on the damage type.
      */
     @SerializedName("follow_up_damage_boost") FOLLOW_UP_DAMAGE_BOOST("follow_up_damage_boost"),
+    /**
+     * Damage dealt by a <b>memosprite</b> (忆灵) only -- the third sibling of
+     * {@link #FOLLOW_UP_DAMAGE_BOOST} and {@link #BASIC_ATTACK_DAMAGE_BOOST}, for 「装备者忆灵造成的暴击伤害额外提高 X%」.
+     *
+     * <p>⚠ Gated in {@code Battle.assemble} on `attacker == memospriteOf(summon.getMaster())`, NOT on {@code instanceof Summon}:
+     * the documents distinguish 忆灵 from ordinary 召唤物, and the loose test would raise a summon's damage under a sentence that
+     * never mentions it.
+     */
+    @SerializedName("memosprite_damage_boost") MEMOSPRITE_DAMAGE_BOOST("memosprite_damage_boost"),
 
     @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost"),
 
