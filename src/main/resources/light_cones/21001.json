@@ -1,0 +1,192 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_per_debuff",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1",
+        "target_debuff_count < 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.12,
+          "per_stack": "target_debuff_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_at_cap",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.36,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜（上限分支）: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_per_debuff",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1",
+        "target_debuff_count < 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.15,
+          "per_stack": "target_debuff_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_at_cap",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.45,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜（上限分支）: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_per_debuff",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1",
+        "target_debuff_count < 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.18,
+          "per_stack": "target_debuff_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_at_cap",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.54,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜（上限分支）: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_per_debuff",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1",
+        "target_debuff_count < 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.21,
+          "per_stack": "target_debuff_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_at_cap",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.63,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜（上限分支）: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_per_debuff",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1",
+        "target_debuff_count < 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24,
+          "per_stack": "target_debuff_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21001_at_cap",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.72,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21001 晚安与睡颜（上限分支）: 敌方目标每承受1个负面效果，装备者对其造成的伤害提高#1[i]%，最多叠加#2[i]层。该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⭐ `per_stack` 可以写 **`target_debuff_count`** ✓（第 173/270 轮的引擎分支 ✓）；⚠ **\"每层 X + 最多 N 层\"用两条规则表达** ✓（低于上限按计数 ✓、达到上限取 `X×N` ✓）。"
+    }
+  ]
+}
