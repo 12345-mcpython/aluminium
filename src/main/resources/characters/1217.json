@@ -114,5 +114,24 @@
     ],
     "source": "1217 藿藿 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 50%生命上限、战技 21.00%+560、终结技 20%能量/40%攻击力、天赋 4.50%+120 都是该行）",
     "note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** Skill heal (a `Restore` skill reads its row). ⚠ **Not classified yet**: 秘技 (a map mechanic plus a battle-start clause not yet read), and 星魂 1–6."
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "technique_attack_down",
+    "when": [
+      "self has_state 秘技"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": -0.25,
+        "base_chance": 1.0,
+        "turns": 2,
+        "target": "all_enemies"
+      }
+    ],
+    "source": "1217 藿藿 秘技 凶煞•劾压鬼物: 「…有100%的基础概率使敌方每个单体目标攻击力降低25%，持续2回合」（param = [1, 0.25, 2, 10] ⇒ 100% / 25% / 2 回合）",
+    "note": "「有 **100%** 的<u>基础概率</u>使敌方每个单体目标**攻击力降低 25%**，持续 **2 回合**」—— ① 秘技的入场半句 ⇒ `self has_state 秘技` ✓；② 参数行 **`[1, 0.25, 2, 10]`** 逐项吻合 ✓（100% / 25% / 2 回合 ✓）；③ `ATTACK` 同为**平值属性** ⇒ `percent: -0.25` = 基数的 −25% ✓（与 1106 的 `DEFENCE: -0.2` 同约定 ✓）；④ `base_chance: 1.0` ✓（走命中/抵抗管线 ✓）。"
   }
 ]
