@@ -32,6 +32,16 @@ public class TriggerSpec {
     private String on;
 
     /**
+     * Extra events this rule also listens to (一条规则听多个事件), e.g. 「施放战技和终结技时」.
+     *
+     * <p>⚠ The primary {@link #on} stays REQUIRED even when this is present, on purpose: four separate places parse it with
+     * {@code TriggerEvent.fromString(spec.getOn())} to validate which event a clause may hang on, and leaving them alone is what makes this addition
+     * behaviour-preserving for every rule that ships today.
+     */
+    @SerializedName("on_any")
+    private java.util.List<String> onAny;
+
+    /**
      * Conditions that must all hold, in the small DSL understood by
      * {@link com.laosun.aluminium.models.TriggerTable}. An empty or absent list means
      * "always".
