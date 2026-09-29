@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20004_ehr",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.2,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20004 幽邃: 战斗开始时，使装备者的效果命中提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，持续<unbreak>#2[i]</unbreak>回合。",
+      "note": "「**战斗开始时**，使装备者的**效果命中提高 #1%**，持续 **#2 回合**」—— ① 触发 **`BATTLE_START`** ✓、作用域 **`self`** ✓（\"装备者\" ✓）、时长取 **#2** ✓；② ⭐ **数值取自数据** ✓：`weapons.json` 的 **`weapon_skill_data`**（**叠影 1–5 各一行** ✓），本档 = 第 1 级 ⇒ `skill_value = [0.2, 3.0]` ✓ （**不是从正文抄** ✗ —— 第 122/270 轮确认这张表**一直在仓库里** ✓）；③ ⚠ **效果命中是比率型属性** ✓ ⇒ `percent` 以**绝对加值**落地 ✓（第 97/270 轮实测 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20004_ehr",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.25,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20004 幽邃: 战斗开始时，使装备者的效果命中提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，持续<unbreak>#2[i]</unbreak>回合。",
+      "note": "「**战斗开始时**，使装备者的**效果命中提高 #1%**，持续 **#2 回合**」—— ① 触发 **`BATTLE_START`** ✓、作用域 **`self`** ✓（\"装备者\" ✓）、时长取 **#2** ✓；② ⭐ **数值取自数据** ✓：`weapons.json` 的 **`weapon_skill_data`**（**叠影 1–5 各一行** ✓），本档 = 第 2 级 ⇒ `skill_value = [0.25, 3.0]` ✓ （**不是从正文抄** ✗ —— 第 122/270 轮确认这张表**一直在仓库里** ✓）；③ ⚠ **效果命中是比率型属性** ✓ ⇒ `percent` 以**绝对加值**落地 ✓（第 97/270 轮实测 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20004_ehr",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.3,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20004 幽邃: 战斗开始时，使装备者的效果命中提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，持续<unbreak>#2[i]</unbreak>回合。",
+      "note": "「**战斗开始时**，使装备者的**效果命中提高 #1%**，持续 **#2 回合**」—— ① 触发 **`BATTLE_START`** ✓、作用域 **`self`** ✓（\"装备者\" ✓）、时长取 **#2** ✓；② ⭐ **数值取自数据** ✓：`weapons.json` 的 **`weapon_skill_data`**（**叠影 1–5 各一行** ✓），本档 = 第 3 级 ⇒ `skill_value = [0.3, 3.0]` ✓ （**不是从正文抄** ✗ —— 第 122/270 轮确认这张表**一直在仓库里** ✓）；③ ⚠ **效果命中是比率型属性** ✓ ⇒ `percent` 以**绝对加值**落地 ✓（第 97/270 轮实测 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20004_ehr",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.35,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20004 幽邃: 战斗开始时，使装备者的效果命中提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，持续<unbreak>#2[i]</unbreak>回合。",
+      "note": "「**战斗开始时**，使装备者的**效果命中提高 #1%**，持续 **#2 回合**」—— ① 触发 **`BATTLE_START`** ✓、作用域 **`self`** ✓（\"装备者\" ✓）、时长取 **#2** ✓；② ⭐ **数值取自数据** ✓：`weapons.json` 的 **`weapon_skill_data`**（**叠影 1–5 各一行** ✓），本档 = 第 4 级 ⇒ `skill_value = [0.35, 3.0]` ✓ （**不是从正文抄** ✗ —— 第 122/270 轮确认这张表**一直在仓库里** ✓）；③ ⚠ **效果命中是比率型属性** ✓ ⇒ `percent` 以**绝对加值**落地 ✓（第 97/270 轮实测 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20004_ehr",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.4,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20004 幽邃: 战斗开始时，使装备者的效果命中提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，持续<unbreak>#2[i]</unbreak>回合。",
+      "note": "「**战斗开始时**，使装备者的**效果命中提高 #1%**，持续 **#2 回合**」—— ① 触发 **`BATTLE_START`** ✓、作用域 **`self`** ✓（\"装备者\" ✓）、时长取 **#2** ✓；② ⭐ **数值取自数据** ✓：`weapons.json` 的 **`weapon_skill_data`**（**叠影 1–5 各一行** ✓），本档 = 第 5 级 ⇒ `skill_value = [0.4, 3.0]` ✓ （**不是从正文抄** ✗ —— 第 122/270 轮确认这张表**一直在仓库里** ✓）；③ ⚠ **效果命中是比率型属性** ✓ ⇒ `percent` 以**绝对加值**落地 ✓（第 97/270 轮实测 ✓）。"
+    }
+  ]
+}
