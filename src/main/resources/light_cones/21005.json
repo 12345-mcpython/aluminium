@@ -1,0 +1,61 @@
+{
+  "rules": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "moles_stack_on_basic_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "淘气值",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21005 (The Moles Welcome You): 「装备者施放普攻、战技或终结技攻击敌方目标后，分别获取一层【淘气值】」",
+      "note": "「装备者**施放普攻、战技或终结技**攻击敌方目标后，分别获取**一层【淘气值】**」—— ① ⭐ **本条不含任何随等阶变化的数值** ✓ ⇒ 在\"按等阶选行\"落地之前**可以如实出货** ✓（等阶轴的上游数据已定位 ✓：`EquipmentSkillConfig` 的 `SkillID + Level` ✓）；② 三种攻击各一条 ✓（`BASIC_ATTACK`/`SKILL_CAST`/`ULT_CAST` + `actor == self` ✓），`max_stacks: 3` ✓（上限来自同句第二半的\"最多叠加 3 层\"✓ —— hmm：⚠ 见下）；③ ⚠ **登记（同句第二半）**：「**每层使装备者的攻击力提高 X%**」✗ —— 数值**随等阶变化** ✗（第 41/270 轮的扫描口径未能可靠提取五档 ✓）⇒ **登记而非猜** ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "moles_stack_on_skill_cast",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "淘气值",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21005 (The Moles Welcome You): 「装备者施放普攻、战技或终结技攻击敌方目标后，分别获取一层【淘气值】」",
+      "note": "「装备者**施放普攻、战技或终结技**攻击敌方目标后，分别获取**一层【淘气值】**」—— ① ⭐ **本条不含任何随等阶变化的数值** ✓ ⇒ 在\"按等阶选行\"落地之前**可以如实出货** ✓（等阶轴的上游数据已定位 ✓：`EquipmentSkillConfig` 的 `SkillID + Level` ✓）；② 三种攻击各一条 ✓（`BASIC_ATTACK`/`SKILL_CAST`/`ULT_CAST` + `actor == self` ✓），`max_stacks: 3` ✓（上限来自同句第二半的\"最多叠加 3 层\"✓ —— hmm：⚠ 见下）；③ ⚠ **登记（同句第二半）**：「**每层使装备者的攻击力提高 X%**」✗ —— 数值**随等阶变化** ✗（第 41/270 轮的扫描口径未能可靠提取五档 ✓）⇒ **登记而非猜** ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "moles_stack_on_ult_cast",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "淘气值",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21005 (The Moles Welcome You): 「装备者施放普攻、战技或终结技攻击敌方目标后，分别获取一层【淘气值】」",
+      "note": "「装备者**施放普攻、战技或终结技**攻击敌方目标后，分别获取**一层【淘气值】**」—— ① ⭐ **本条不含任何随等阶变化的数值** ✓ ⇒ 在\"按等阶选行\"落地之前**可以如实出货** ✓（等阶轴的上游数据已定位 ✓：`EquipmentSkillConfig` 的 `SkillID + Level` ✓）；② 三种攻击各一条 ✓（`BASIC_ATTACK`/`SKILL_CAST`/`ULT_CAST` + `actor == self` ✓），`max_stacks: 3` ✓（上限来自同句第二半的\"最多叠加 3 层\"✓ —— hmm：⚠ 见下）；③ ⚠ **登记（同句第二半）**：「**每层使装备者的攻击力提高 X%**」✗ —— 数值**随等阶变化** ✗（第 41/270 轮的扫描口径未能可靠提取五档 ✓）⇒ **登记而非猜** ✓。"
+    }
+  ]
+}

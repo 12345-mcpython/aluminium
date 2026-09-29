@@ -175,7 +175,7 @@ public class Character extends CanHit {
     public static Character fromAttributes(Translate name, DoubleValue[] attributes) {
         Character c = new Character(name, attributes);
         c.relicSuit = new RelicSuit();
-        c.weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
+        c.weapon = new Weapon(0, new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
         return c;
     }
 
@@ -236,7 +236,7 @@ public class Character extends CanHit {
         private int level = 1;
         private int eidolonRank;
         private RelicSuit relicSuit = new RelicSuit();
-        private Weapon weapon = new Weapon(new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
+        private Weapon weapon = new Weapon(0, new Translate("EMPTY", "EMPTY"), "", 0, 0, 0, null, List.of());
         private boolean isPromote = false;
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
         private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
