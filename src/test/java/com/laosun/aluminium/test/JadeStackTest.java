@@ -45,6 +45,17 @@ public class JadeStackTest {
                 "fifteen more layers are 15 x 2.40%");
     }
 
+    @Test
+    public void eachLayerAddsHalfAPercentAttack() {
+        Fixture one = fixture(false);
+        Fixture sixteen = fixture(true);
+        double base = one.jade.getAttribute(AttributeType.ATTACK).baseValue();
+        double delta = sixteen.jade.getAttribute(AttributeType.ATTACK).get()
+                - one.jade.getAttribute(AttributeType.ATTACK).get();
+        Assertions.assertEquals(0.075 * base, delta, base * 1e-6,
+                "fifteen more layers are 15 x 0.50% of the base");
+    }
+
     private static int layers(boolean technique) {
         Fixture f = fixture(technique);
         return f.jade.getBuffManager().stacksOf(COUNTER);
