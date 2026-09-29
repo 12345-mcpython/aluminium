@@ -60,4 +60,31 @@ public class LightConeChannelTest {
 
     private record Fixture(Character character, Enemy enemy, Battle battle) {
     }
+
+    /**
+     * The per-layer attack bonus is per RANK: the document states 12/15/18/21/24%, and weapons.json carries exactly those
+     * five values, so rank 5 must raise the attack twice as much as rank 1 per layer.
+     */
+    @Test
+    public void thePerLayerAttackBonusFollowsTheRank() {
+        double one = attackDelta(1);
+        double five = attackDelta(5);
+        Assertions.assertTrue(one > 0 && five > one,
+                "rank 5 states more than rank 1: " + one + " vs " + five);
+        Assertions.assertEquals(0.12, five - one, 1e-9,
+                "the two ranks are 24% and 12% of the base, so one layer differs by 12% of it");
+    }
+
+    /** The wearer's ATTACK over its own base after one layer, at the given rank. */
+    private static double attackDelta(int rank) {
+        Character character = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(WEAPON_ID, LEVEL, false, rank));
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(character), List.of(enemy), new Random(0));
+        battle.startBattle();
+        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, character, enemy, 1, 0);
+        Assertions.assertEquals(1, character.getBuffManager().stacksOf(COUNTER), "precondition: one layer");
+        double base = character.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).baseValue();
+        double value = character.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
+        return (value - base) / base;
+    }
 }

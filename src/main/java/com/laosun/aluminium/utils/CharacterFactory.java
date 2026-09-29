@@ -186,7 +186,7 @@ public final class CharacterFactory {
         // A light cone's own abilities are rules of the same kind (see WeaponTriggerTables), so they merge here, at the
         // same assembly point as a relic set's -- one line, because the create method already receives the Weapon.
         if (weapon != null && WeaponTriggerTables.has(weapon.getWid())) {
-            table = table.plus(WeaponTriggerTables.of(weapon.getWid()));
+            table = table.plus(WeaponTriggerTables.of(weapon.getWid(), weapon.getRank()));
         }
         builder = builder.triggerTable(table);
         Character character = builder.build();
