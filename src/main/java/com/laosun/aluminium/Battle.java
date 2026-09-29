@@ -1647,6 +1647,9 @@ public class Battle {
             return false;
         }
         target.getBuffManager().addBuff(buff);
+        // ⭐ The one chokepoint every landed debuff passes through (2026-09-29): tell the tables, with the applier as actor.
+        fireTriggers(TriggerEvent.DEBUFF_APPLIED, caster, target, 0, 0);
+
         return true;
     }
 
