@@ -22,10 +22,12 @@ import java.util.Random;
  * `max_stacks`), a rolled taken-side zone (`MODIFY_DAMAGE_TAKEN` + `base_chance`), and `REMOVE_BUFF` (the mirror of
  * `DISPEL`). The 330% ultimate damage and the Skill's damage are the engine's own skill rows.
  *
- * <p>⚠ <b>One measured correction</b>, and it is why these assertions look the way they do: `ADD_STACK`'s `amount` does
- * <b>not</b> mean "this many layers at once" — one firing adds exactly <b>one</b> layer, whatever `amount` says (the first
- * version of this file asserted 3 after one ultimate and read 2). So 「获得2层【斗志】」 cannot be said today, and his file
- * registers it rather than pretending; the cap is still real and is what the six-cast case below measures.
+ * <p>⚠ <b>A measured correction, since closed (2026-09-29).</b> This class used to record that `ADD_STACK`'s `amount`
+ * did <b>not</b> mean "this many layers at once" — one firing added exactly <b>one</b> layer whatever `amount` said — so
+ * 「获得2层【斗志】」 could not be said and his file registered it rather than pretending. `ADD_STACK` now attaches
+ * `amount` layers (stopping at `max_stacks`), which is what the 「获得 N 层」 family states: his own file already says
+ * `amount: 2` on the ultimate, and 1314 翡翠 states 5, 15, 1 and 3. So one ultimate is +2 layers, and the cap is still
+ * real and is what the six-cast case below measures.
  */
 public class LukaTest {
     private static final int LUKA = 1111;
@@ -33,7 +35,7 @@ public class LukaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** 「战斗开始时，卢卡持有1层【斗志】」, and each ultimate adds one more. */
+    /** 「战斗开始时，卢卡持有1层【斗志】」, and each ultimate adds the two his document states. */
     @Test
     public void theLayersStartAtOneAndGrow() {
         Fixture f = new Fixture();
@@ -41,8 +43,8 @@ public class LukaTest {
 
         f.ultimate();
 
-        Assertions.assertEquals(2, f.luka.getBuffManager().stacksOf("斗志"),
-                "⚠ one firing = one layer: `amount` is not a layer count (see the class note and his file's registration)");
+        Assertions.assertEquals(3, f.luka.getBuffManager().stacksOf("斗志"),
+                "\u300c\u65bd\u653e\u7ec8\u7ed3\u6280\u65f6\u83b7\u5f972\u5c42\u3010\u6597\u5fd7\u3011\u300d -- one from the battle start plus two from the ultimate");
     }
 
     /** ⚠ 「最多可持有 4 层」 holds no matter how often it is applied. */
