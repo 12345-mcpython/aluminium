@@ -37,6 +37,12 @@ public final class Memosprites {
     public static final String DIR = "memosprites";
 
     /**
+     * The directory a general SERVANT's panel lives in (「侍从」, not 「忆灵」): the same panel vocabulary -- shares and flats of the
+     * OWNER's sheet -- as a different category, and (slice 2) a different damage type.
+     */
+    public static final String SERVANT_DIR = "servants";
+
+    /**
      * Cached because an owner asked for twice must not hit the classpath twice.
      */
     private static final Map<Integer, MemospriteSpec> CACHE = new HashMap<>();
@@ -66,6 +72,18 @@ public final class Memosprites {
      * @throws IllegalStateException when a file exists but cannot be parsed into a valid spec
      */
     public static MemospriteSpec of(int ownerCid) {
+        synchronized (CACHE) {
+            if (CACHE.containsKey(ownerCid)) {
+                return CACHE.get(ownerCid);
+            }
+            MemospriteSpec loaded = load(ownerCid);
+            CACHE.put(ownerCid, loaded);
+            return loaded;
+        }
+    }
+
+    /** The same lookup against a named directory (「侍从」 vs 「忆灵」). */
+    public static MemospriteSpec of(int ownerCid, String dir) {
         synchronized (CACHE) {
             if (CACHE.containsKey(ownerCid)) {
                 return CACHE.get(ownerCid);
@@ -345,6 +363,12 @@ public final class Memosprites {
 
     private static String resourceFor(int ownerCid) {
         String path = "/" + DIR + "/" + ownerCid + ".json";
+        return Memosprites.class.getResource(path) == null ? null : path;
+    }
+
+    /** The same path rule for a named directory. */
+    private static String resourceFor(int ownerCid, String dir) {
+        String path = "/" + dir + "/" + ownerCid + ".json";
         return Memosprites.class.getResource(path) == null ? null : path;
     }
 
