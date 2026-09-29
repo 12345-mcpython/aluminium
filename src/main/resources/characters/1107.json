@@ -61,5 +61,23 @@
     ],
     "source": "1107 克拉拉 秘技 胜利的小小代价 (110707, Maze/Attack): 「立即攻击敌人，进入战斗后克拉拉受到敌方攻击的概率提高，持续2回合。」参数（全部等级）Lv1 = [2, 5] ⇒ 2 = 持续回合（正文点名）、5 = 未被正文引用的参数（软仇恨比率）",
     "note": "「立即攻击敌人，**进入战斗后**克拉拉**受到敌方攻击的概率提高**，持续 **2 回合**」—— 数值在**未被正文引用的那个参数**里 ✓：① 该秘技的参数表是 `[2, 5]` ✓，正文只点名「持续 **2** 回合」✓ ⇒ 剩下的 **5** 就是比率 ✓（与 1001 战技\"5 个参数、正文只用 4 个\"**同一条方法** ✓）；② 上游 `Config/ConfigAbility/Avatar/Avatar_Klara_00_Ability.json` 里 `MAvatar_Klara_00_MazeSkill_AggroUP` （`MazeSkill` = 秘技 ✓）的 `OnStack` 写属性 **`AggroAddedRatio`** ✓，挂载点由 **`ByIsMazeSkillAffectCurrentWave` + 「第一波」** 守卫 ✓ —— 正是\"**进入战斗后**\"这一句 ✓；③ 门槛用**已有**的 `self has_state 秘技` ✓（`Battle.markTechniqueUsed` 在 `startBattle()` 之前把\"用过秘技\"变成状态 ✓，1104 的秘技盾就是这个写法 ✓）；④ 时长 `turns: 2` 就是正文点名的 2 回合 ✓。⚠ `percent: 5` 是引擎单位下的比率（比率属性按分数写 ✓）⇒ 权重 **×(1+5) = ×6** ✓，持续 2 回合 ✓。⚠ **登记（一个反向案例：数据有、正文没有 ✗）**：她的**终结技** modifier `MAvatar_Klara_00_Ultra_WarriorMode` **也**写 `AggroAddedRatio` ✓（另有 `MAvatar_Klara_00_Rank06_Passive` 也写 ✓），但她文档的终结技正文**根本不提概率** ✗ ⇒ 不写进内容 ✓（否则就是给正文没有的效果编内容 ✗），只在此登记 ✓。⚠ 秘技的\"立即攻击敌人\"那一半由地图攻击结算 ✓，规则只写\"进入战斗后\"的那一半 ✓。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "eidolon2_attack_after_ult",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.3,
+        "turns": 2,
+        "target": "self"
+      }
+    ],
+    "source": "1107 星魂 2 紧紧的拥抱: 「施放终结技后攻击力提高#1[i]%，持续2回合」（param = [0.3, 2]）",
+    "note": "「**施放终结技后**，**攻击力提高 #1%**，持续 **2 回合**」—— ① 触发 **`ULT_CAST`** ✓、作用域 **`self`** ✓、时长 **2 回合** ✓；② ⭐ **数值经数据核实** ✓：`data/eidolons.json` 的 **1107 → rank \"2\"** 行自带 `param = [0.3, 2]` ✓（不是从散文里抄 ✗）；③ ⚠ **攻击力是平值型** ✓ ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，基准取**规则生效后** ✓，第 133/270 轮 ✓）；④ ⚠ **星魂内容按\"已激活\"写成普通规则** ✓（先例：1013 的 `eidolon4_*` ✓、1222 的星魂 2 ✓）。"
   }
 ]
