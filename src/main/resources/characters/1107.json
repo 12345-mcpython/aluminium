@@ -43,5 +43,23 @@
     ],
     "source": "1107 克拉拉 trace 守护 (1107102): 「抵抗控制类负面状态的概率提高35%。」",
     "note": "「永久」 is the shape every 行迹 has: the trace is unconditional, so this is applied once at BATTLE_START and never ticked ('permanent': true means the duration is not even counted). ⚠ The document states the class itself -- 「控制类负面状态：冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身」 -- which is why the op names a CLASS and not twelve keys: a control written tomorrow is covered by this rule without an edit, and the engine never has to keep a list in sync with the game's patch notes. ⚠ No 'target': 自身 is the rule's owner. ⚠ This is the RESIST direction, not immunity -- 35% of the controls that would have landed do not, and the roll itself is in Battle.tryApplyDebuff (the op installs the number, it does not decide anything by itself)."
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "technique_taunt_aggro",
+    "when": [
+      "self has_state 秘技"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "AGGRO_ADDED_RATIO",
+        "percent": 5,
+        "turns": 2,
+        "target": "self"
+      }
+    ],
+    "source": "1107 克拉拉 秘技 胜利的小小代价 (110707, Maze/Attack): 「立即攻击敌人，进入战斗后克拉拉受到敌方攻击的概率提高，持续2回合。」参数（全部等级）Lv1 = [2, 5] ⇒ 2 = 持续回合（正文点名）、5 = 未被正文引用的参数（软仇恨比率）",
+    "note": "「立即攻击敌人，**进入战斗后**克拉拉**受到敌方攻击的概率提高**，持续 **2 回合**」—— 数值在**未被正文引用的那个参数**里 ✓：① 该秘技的参数表是 `[2, 5]` ✓，正文只点名「持续 **2** 回合」✓ ⇒ 剩下的 **5** 就是比率 ✓（与 1001 战技\"5 个参数、正文只用 4 个\"**同一条方法** ✓）；② 上游 `Config/ConfigAbility/Avatar/Avatar_Klara_00_Ability.json` 里 `MAvatar_Klara_00_MazeSkill_AggroUP` （`MazeSkill` = 秘技 ✓）的 `OnStack` 写属性 **`AggroAddedRatio`** ✓，挂载点由 **`ByIsMazeSkillAffectCurrentWave` + 「第一波」** 守卫 ✓ —— 正是\"**进入战斗后**\"这一句 ✓；③ 门槛用**已有**的 `self has_state 秘技` ✓（`Battle.markTechniqueUsed` 在 `startBattle()` 之前把\"用过秘技\"变成状态 ✓，1104 的秘技盾就是这个写法 ✓）；④ 时长 `turns: 2` 就是正文点名的 2 回合 ✓。⚠ `percent: 5` 是引擎单位下的比率（比率属性按分数写 ✓）⇒ 权重 **×(1+5) = ×6** ✓，持续 2 回合 ✓。⚠ **登记（一个反向案例：数据有、正文没有 ✗）**：她的**终结技** modifier `MAvatar_Klara_00_Ultra_WarriorMode` **也**写 `AggroAddedRatio` ✓（另有 `MAvatar_Klara_00_Rank06_Passive` 也写 ✓），但她文档的终结技正文**根本不提概率** ✗ ⇒ 不写进内容 ✓（否则就是给正文没有的效果编内容 ✗），只在此登记 ✓。⚠ 秘技的\"立即攻击敌人\"那一半由地图攻击结算 ✓，规则只写\"进入战斗后\"的那一半 ✓。"
   }
 ]
