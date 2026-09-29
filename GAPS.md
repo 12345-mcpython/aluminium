@@ -1254,6 +1254,52 @@
 > * ⭐ **下一步** ✓：把**技能名 → `skill_id` → Lv10 行**这条链写成**逐条**检查 ✓（`source` 里有技能名 ✓，数据里有 `name.chinese` / `name.english` ✓），对**全部 281 条数值型效果**跑一遍 ✓ ⇒ **逐条**得出"强核实 / 待查" ✓，而不再报一个没有区分力的百分比 ✓。
 
 
+> **2026-09-29 更新（aggro 回收之七十七：逐条取证 —— 技能名/id → `skill_id` → 只看它自己的 Lv10 行）**：
+> * ⭐ **方法（把之七十六写下的设计做出来）** ✓：建立**技能索引** ✓（`skill_id` → 中英文名 ✓、`attack_type` ✓、**解析后的 `param_list` 行** ✓）；对每条数值型效果，**从它自己的 `source` 里认定技能** ✓ —— ⚠ 本项目 `source` 的约定里**普遍带技能 id** ✓（`(141303, Ultimate/AoEAttack/Ice)` ✓、`(100104)` ✓、`(141501, Normal/SingleAttack)` ✓）⇒ **有 id 就用 id** ✓（**归属零猜测** ✓）；没有 id 时**用中文名匹配索引** ✓；两者都不行 ⇒ 记为 **"技能未认定"** ✗，**不猜** ✓。**然后只看那一个技能的 Lv10 行（第 10 行）与 Lv1 行** ✓。
+> * ✅ **逐条结果（本次运行）** ✓：数值型效果共 **281** 条 —— **技能已认定且行内吻合 78 条** ✓、**技能已认定但行内不吻合 74 条** ⚠、**技能未认定 129 条** ⚠。
+>   * ⚠ **不吻合**：`1001 skill_shield · skill 100102 (Frigid Cold Arrow) · values [0.57, 760, 3] · Lv10 [1.4] Lv1 [0.5]`
+>   * ⚠ **不吻合**：`1002 talent_wind_pen · skill 100204 (Sawblade Tuning) · values [0.36] · Lv10 [1.4] Lv1 [0.5]`
+>   * ⚠ **不吻合**：`1009 ult_flat_speed_for_all_allies · skill 100903 (Astrometry) · values [50, 2] · Lv10 [0.14, 5, 3] Lv1 [0.07, 5, 3]`
+>   * ⚠ **不吻合**：`1013 skill_bonus_on_healthy_targets · skill 101302 (It's Magic, I Added Some Magic) · values [0.2] · Lv10 [2] Lv1 [1.2]`
+>   * ⚠ **不吻合**：`1103 None · skill 110303 (Attack) · values [2] · Lv10 [] Lv1 []`
+>   * ⚠ **不吻合**：`1104 ult_enduring_bulwark · skill 110403 (Unyielding Will) · values [0.45, 600, 3] · Lv10 [0.5] Lv1 [0.25]`
+>   * ⚠ **不吻合**：`1104 technique_opening_shield · skill 110407 (Behind the Kindness) · values [0.24, 150, 2] · Lv10 [1.4] Lv1 [0.5]`
+>   * ⚠ **不吻合**：`1106 ult_zone_suppression · skill 110603 (I Want to Help) · values [-0.4, 2] · Lv10 [1.4] Lv1 [0.5]`
+>   * ⚠ **不吻合**：`1108 talent_windtorn · skill 110804 (Attack) · values [0.52, 3, 0.65] · Lv10 [] Lv1 []`
+>   * ⚠ **不吻合**：`1110 skill_survival_response · skill 111002 (Applies \) · values [2] · Lv10 [1, 0.135, 360] Lv1 [1, 0.09, 90]`
+>   * ⚠ **不吻合**：`1110 skill_survival_response · skill 111002 (Applies \) · values [0.075, 200, 2] · Lv10 [1, 0.135, 360] Lv1 [1, 0.09, 90]`
+>   * ⚠ **不吻合**：`1111 ult_coup · skill 111103 (Receives #5[i] stack(s) of \) · values [2] · Lv10 [1, 0.85] Lv1 [1, 0.68]`
+>   * ⚠ **不吻合**：`1111 talent_start · skill 111104 (After Luka uses his Basic ATK \) · values [1] · Lv10 [] Lv1 []`
+>   * ⚠ **不吻合**：`1202 skill_benediction · skill 120202 (Thorns of the Abyss) · values [3] · Lv10 [1.4] Lv1 [0.5]`
+>   * ⚠ **不吻合**：`1202 ult_energy_and_boost · skill 120203 (Violet Sparknado) · values [0.5, 2] · Lv10 [0.6] Lv1 [0.3]`
+>   * ⚠ **不吻合**：`1203 skill_trigger_on_crossing · skill 120302 (Death Wish) · values [0.6, 800] · Lv10 [2, 1] Lv1 [1.2, 1]`
+>   * ⚠ **不吻合**：`1206 talent_speed_on_break · skill 120604 (Attack) · values [0.2, 2] · Lv10 [] Lv1 []`
+>   * ⚠ **不吻合**：`1207 None · skill 120703 (If \) · values [0.28] · Lv10 [0.7] Lv1 [0.25]`
+>   * ⚠ **不吻合**：`1207 None · skill 120703 (If \) · values [0.65] · Lv10 [0.7] Lv1 [0.25]`
+>   * ⚠ **不吻合**：`1208 talent_misfortune_avoidance · skill 120804 (Attack) · values [-0.18] · Lv10 [] Lv1 []`
+>   * ⚠ **不吻合**：`1208 skill_knowledge_state_and_modifiers · skill 120802 (Woes of Many Morphed to One) · values [3] · Lv10 [1] Lv1 [0.6]`
+>   * ⚠ **不吻合**：`1208 skill_knowledge_state_and_modifiers · skill 120802 (Woes of Many Morphed to One) · values [0.06, 3] · Lv10 [1] Lv1 [0.6]`
+>   * ⚠ **不吻合**：`1208 skill_knowledge_state_and_modifiers · skill 120802 (Woes of Many Morphed to One) · values [0.12, 3] · Lv10 [1] Lv1 [0.6]`
+>   * ⚠ **不吻合**：`1211 ult_rebirth · skill 120703 (If \) · values [1] · Lv10 [0.7] Lv1 [0.25]`
+>   * ⚠ **不吻合**：`1212 talent_transmigration_at_two_stacks · skill 121204 (Attack) · values [1.0] · Lv10 [] Lv1 []`
+>   * ⚠ **未认定**：`1001 None · 1001 三月七 行迹 纯洁 (1001101): 「施放战技时，解除指定我方单体的1个负面效果。」`
+>   * ⚠ **未认定**：`1001 None · 1001 三月七 星魂 2 记忆中的它 (Avatar_March7th_Rank02): 「进入战斗时，为当前生命值百`
+>   * ⚠ **未认定**：`1001 None · 1001 三月七 行迹 加护 (1001102): 「战技提供的护盾持续时间增加1回合。」`
+>   * ⚠ **未认定**：`1001 None · 1001 三月七 星魂 4 不愿再失去 (Avatar_March7th_Rank04) 第二句: 「使<u>反击</u`
+>   * ⚠ **未认定**：`1001 None · 1001 三月七 星魂 6 就这样，一直… (Avatar_March7th_Rank06): 「在<u>战技提供的</`
+>   * ⚠ **未认定**：`1002 trace_low_hp_aggro_down · 1002 行迹 潜龙 (1002101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param`
+>   * ⚠ **未认定**：`1004 skill_speed_down · 1004 瓦尔特 战技 虚空断界: 「…攻击命中时有75%的基础概率使受到攻击的敌方目标速度降低10%，持续2回合。」（`
+>   * ⚠ **未认定**：`1005 trace_shock_lasts_one_more_turn · 1005 卡芙卡 行迹: 「…使触电状态的持续时间增加1回合」`
+>   * ⚠ **未认定**：`1006 skill_all_type_res_down · 1006 银狼 战技 是否允许更改？ (强化前): 「…有100%的基础概率额外使该目标的全属性抗性降低10.00%，持`
+>   * ⚠ **未认定**：`1008 trace_survival_heal · 1008 阿兰 行迹 苏生 (1008101): 「消灭敌方目标时，若当前生命值百分比小于等于30%，则立即回复等同于自`
+>   * ⚠ **未认定**：`1008 trace_endurance_dot_resist · 1008 阿兰 行迹 坚忍 (1008102): 「抵抗持续伤害类负面状态的概率提高50%。」`
+>   * ⚠ **未认定**：`1013 trace_puppet_control_resist · 1013 黑塔 行迹 人偶 (1013102): 「抵抗控制类负面状态的概率提高35%。」`
+>   * ⚠ **未认定**：`1013 trace_ice_against_frozen · 1013 黑塔 行迹 冰结 (1013103): 「施放终结技时，对冻结状态下的敌人造成的伤害提高20%。」`
+>   * ⚠ **未认定**：`1101 None · 1101 布洛妮娅 trace 阵地: 「战斗开始时，我方全体的防御力提高#2[i]%，持续#1[i]回合。」 para`
+>   * ⚠ **未认定**：`1101 None · 1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support) 第二句: 「并使该`
+> * ⭐ **下一步** ✓：**"不吻合"与"未认定"逐条查** ✓ —— 不吻合的三种可能各不相同 ✓：① 规则的数值本就不来自该技能的 `param_list`（**行迹/星魂/光锥/遗器** ✓ ⇒ 应换用对应的数据源 ✓）；② 我从正文抄错了 ✗ ⇒ **改进货** ✓；③ 我认定的技能错了 ✗ ⇒ 归属要重认 ✓。⚠ 未认定的多半是 `source` 只写了角色名与从句 ✓ ⇒ 补上技能名/id 即可 ✓（**同时改善 `source` 的可核查性** ✓）。
+
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
