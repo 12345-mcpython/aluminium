@@ -2542,9 +2542,9 @@ public class Battle {
         // 2) Crit zone: only crittable types roll; an effect that already fixed the crit (fixedCrit) is not
         //    overwritten
         if (damage.getType().isCrittable() && !damage.isCritFixed()) {
-            double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get();
+            double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get() + damage.getExtraCritChance();
             boolean isCrit = critRate > 0 && rng.nextDouble() < critRate;
-            damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get());
+            damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get() + damage.getExtraCritDamage());
         }
 
         // 3) Defence zone: attacker level / victim defence / attacker defence ignore

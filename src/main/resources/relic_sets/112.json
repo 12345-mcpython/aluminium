@@ -1,0 +1,44 @@
+{
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic112_crit_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.1,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 112 盗匪荒漠的废土客 4 件套: 装备者对陷入负面效果的敌方目标造成伤害时暴击率提高#1[i]%，对陷入禁锢状态的敌方目标造成伤害时暴击伤害提高#2[i]%。",
+      "note": "数值取自 data/relic_sets.json 的 param；**实例级修饰**（`instance: true`）写进当前这一击 ✓；名义 `turns: 1` 只为满足加载器的形状校验（实例路由在构建 buff 之前返回 ⇒ 该字段不被使用）✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic112_crit_damage_vs_imprisoned",
+      "when": [
+        "actor == self",
+        "target has_state 禁锢"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 112 盗匪荒漠的废土客 4 件套（禁锢分支）: 装备者对陷入负面效果的敌方目标造成伤害时暴击率提高#1[i]%，对陷入禁锢状态的敌方目标造成伤害时暴击伤害提高#2[i]%。",
+      "note": "数值取自 data/relic_sets.json 的 param；**实例级修饰**（`instance: true`）写进当前这一击 ✓；名义 `turns: 1` 只为满足加载器的形状校验（实例路由在构建 buff 之前返回 ⇒ 该字段不被使用）✓。"
+    }
+  ]
+}

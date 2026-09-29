@@ -408,6 +408,34 @@ public class Damage {
     /** Extra DEF-ignore carried by THIS hit, added by a rule firing on {@code DEALING_DAMAGE} (2026-09-29). */
     private double extraDefenceIgnore = 0;
 
+    /** Extra CRIT CHANCE carried by THIS hit, added by a rule on {@code DEALING_DAMAGE} (2026-09-29). */
+    private double extraCritChance = 0;
+
+    /** Extra CRIT DAMAGE carried by THIS hit, same route. */
+    private double extraCritDamage = 0;
+
+    /** 「对陷入负面效果的敌方目标造成伤害时暴击率提高 X%」 is a property of the hit, not of the wearer. */
+    public Damage addCritChance(double value) {
+        this.extraCritChance += value;
+        return this;
+    }
+
+    /** 「对陷入禁锢状态的敌方目标造成伤害时暴击伤害提高 X%」. */
+    public Damage addCritDamage(double value) {
+        this.extraCritDamage += value;
+        return this;
+    }
+
+    /** The crit chance this hit adds beyond the attacker's attribute, as a fraction. */
+    public double getExtraCritChance() {
+        return this.extraCritChance;
+    }
+
+    /** The crit damage this hit adds beyond the attacker's attribute, as a fraction. */
+    public double getExtraCritDamage() {
+        return this.extraCritDamage;
+    }
+
     /**
      * Adds to the DEF-ignore this instance carries: 「对<某类目标>造成伤害时无视其 X% 防御力」 is a property of this hit,
      * not of the wearer. `Battle` fires `DEALING_DAMAGE` before it settles the defence zone, so this is read in time.
