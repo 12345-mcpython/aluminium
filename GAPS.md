@@ -2259,6 +2259,29 @@
 >   —— 只需把**同类实例槽位**扩到 `CRIT_CHANCE` / `CRIT_ATTACK`；⚠ **暴击判定在 2547，同样晚于触发**，同一条路可行。
 > * ⭐ **纪律（新增）**：**改写 `if` 条件要么整行替换、要么在 `if (` 之后插入**；⚠ **不要**对行尾做"削字符再拼"（括号配平不是文本操作）。
 > 
+
+> **2026-09-29 更新（aggro 回收之一百四十七：实例槽位扩到暴击 —— 引擎已通、内容待收，第九次"凭记忆写 API"）**：
+> 
+> * ⭐⭐ **能力扩展已完成并且主代码编译通过**（本轮实测）：实例级修饰现在支持 **`DEFENCE_IGNORE` / `CRIT_CHANCE` / `CRIT_ATTACK`**。
+>   * **依据（读源码）**：`Battle` 暴击区 **2544–2547**（`critRate` 取自身属性、`damage.crit(isCrit, CRIT_ATTACK)`）
+>     => **触发（2539）早于判定（2545）**，故规则加到**实例自己的**暴击率/暴击伤害上会被读到；
+>   * **实现（两处整行替换）**：
+>     `double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get() + damage.getExtraCritChance();`
+>     `damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get() + damage.getExtraCritDamage());`
+>     以及 `Damage.addCritChance/addCritDamage/getExtraCritChance/getExtraCritDamage` 与 `modifyAttr` 实例分支的两支。
+> * ⚠ **为什么本轮没落地**：唯一剩下的拦路者是**测试文件** —— 我在构造"禁锢/负面效果"时**臆造了 `StateBuff` 的构造签名** ✗
+>   （`compileTestJava` 失败）=> 按纪律**整体 `git checkout` 回退**，树干净、全量绿。
+>   * ⚠⚠ **这是第 9 次"凭记忆写 API"**（前 8 次：`WeaponFactory.equip`、`TriggerEvent` 包名、`getRelicManager().equip`、`getEnemies()`、
+>     不存在的光锥 id、`perTurn` 字段名、`Damage` 构造、`flat`/`amount` 字段）。
+>   * ⭐ **硬规则（再次强化）**：**动测试之前，先在既有测试里 grep 出"给敌人挂状态"的现成写法**（例如已有测试如何加 debuff / 禁锢），
+>     **照抄**；⚠ 本轮的教训是"引擎侧已经读源码了，测试侧却没有"。
+> * ⭐ **两条同族纪律（本轮新增，已入档）**：**行内结构化改动一律"整行替换"** ——
+>   ① 接在 `;` 之后 ⇒ "不是语句"；② 正则内插进了 `AttributeType.CRIT_ATTACK` 内部 ⇒ 类型错；③ 削行尾括号 ⇒ `if` 提前闭合。
+>   **绝不做"拼接/正则内插/削字符"，只做整行替换。**
+> * **下一轮（一次即可收口）**：① grep 既有测试里"挂状态/负面效果"的写法 ⇒ 照抄；② 重放引擎两处整行替换 + `Damage` 四个方法 + 路由两支；
+>   ③ 出货 **`relic_sets/112.json`**（两半：`target_debuff_count >= 1` ⇒ 暴击率 10%、`target has_state 禁锢` ⇒ 暴击伤害 20%）；
+>   ④ 判据 + 两条变异；⑤ 普查同步（登记表 **16 -> 15**）。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
