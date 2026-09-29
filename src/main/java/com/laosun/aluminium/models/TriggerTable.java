@@ -122,6 +122,25 @@ public class TriggerTable {
                 collectReferencedResources(rule);
                 byEvent.computeIfAbsent(event, k -> new ArrayList<>()).add(rule);
             }
+            // 「施放战技和终结技时」: the SAME compiled rules under extra events (一条规则听多个事件).
+            // ⚠ Compiled once, not per event: a second compilation would mint a second rule with the same id, which validateAmendments rightly
+            // refuses as ambiguous. The primary `on` is still the one every validator reads, so this only ADDS firings.
+            if (spec.getOnAny() != null) {
+                for (String extra : spec.getOnAny()) {
+                    TriggerEvent other = TriggerEvent.fromString(extra);
+                    if (other == null) {
+                        throw new IllegalArgumentException(
+                                "Unknown trigger event '" + extra + "' in on_any (source: " + spec.getSource() + ")");
+                    }
+                    if (other == event) {
+                        throw new IllegalArgumentException(
+                                "on_any repeats the primary event '" + extra + "' (source: " + spec.getSource()
+                                        + "); it would double-fire in one trigger");
+                    }
+                    byEvent.computeIfAbsent(other, k -> new ArrayList<>())
+                            .addAll(byEvent.getOrDefault(event, new ArrayList<>()));
+                }
+            }
         }
         // Cross-rule checks last: `MODIFY_RULE` points at another rule in this same file, so the reference can only
         // be resolved once every rule has been compiled (see validateAmendments).
@@ -145,6 +164,11 @@ public class TriggerTable {
                     continue;
                 }
                 CompiledRule clash = byId.putIfAbsent(rule.id(), rule);
+                if (clash == rule) {
+                    // The same rule object under a second event (`on_any`): one rule, two triggers, so a MODIFY_RULE
+                    // reference to that id is not ambiguous at all.
+                    continue;
+                }
                 if (clash != null) {
                     throw new IllegalArgumentException(
                             "Two rules in one file share the id \"" + rule.id() + "\", so a MODIFY_RULE "
