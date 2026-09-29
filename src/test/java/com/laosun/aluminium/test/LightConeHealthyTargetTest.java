@@ -85,7 +85,14 @@ public class LightConeHealthyTargetTest {
                         + rankOne + " vs " + rankFive);
     }
 
-    /** The wearer's skill damage against a target already brought below half health. */
+    /**
+     * The wearer's skill damage against a target brought below the threshold -- and NOT killed by it.
+     *
+     * <p>⚠ The precondition is the point: an earlier version picked a target small enough to overkill, so the "damage" it
+     * measured was the target's remaining HP and both ranks agreed no matter what the boost said (the round-34/39 fault).
+     * Here the wearer's hit must leave the target alive with at least 60% of its pre-hit HP intact, or the case refuses to
+     * judge at all.
+     */
     private static double damageAgainstWoundedTarget(int rank) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(WEAPON_ID, LEVEL, false, rank));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -95,7 +102,7 @@ public class LightConeHealthyTargetTest {
                 return 0.99;
             }
         };
-        int monster = woundableMonster(ally, noCrit);
+        int monster = woundableMonster(ally, wearer, noCrit);
         Enemy enemy = EnemyFactory.create(monster, 90, 1);
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), noCrit);
         battle.startBattle();
@@ -105,20 +112,33 @@ public class LightConeHealthyTargetTest {
         }
         double before = enemy.getCurrentHp();
         battle.castImmediate(wearer.getSkills().get(SkillType.SKILL), wearer, List.of(enemy));
-        return before - enemy.getCurrentHp();
+        double dealt = before - enemy.getCurrentHp();
+        Assertions.assertFalse(enemy.isDeath(),
+                "the judged hit must not kill the target either (monster " + monster + ")");
+        Assertions.assertTrue(dealt < 0.4 * before,
+                "and it must be a real measurement, not the whole remaining bar: dealt " + dealt + " of " + before);
+        return dealt;
     }
 
-    /** A monster that an ally's skill can bring below half health without killing. */
-    private static int woundableMonster(Character ally, Random noCrit) {
-        for (int id = 1002010; id < 1002120; id++) {
+    /**
+     * A monster an ally can wound below the threshold, that then survives the WEARER's skill with room to spare -- both
+     * conditions are checked here, because only together do they make the negative judgement mean anything.
+     */
+    private static int woundableMonster(Character ally, Character wearer, Random noCrit) {
+        for (int id = 1002010; id < 1002200; id++) {
             try {
                 Enemy probe = EnemyFactory.create(id, 90, 1);
-                Battle battle = new Battle(List.of(ally), List.of(probe), noCrit);
+                Battle battle = new Battle(List.of(ally, wearer), List.of(probe), noCrit);
                 battle.startBattle();
-                for (int hit = 0; hit < 12 && !probe.isDeath() && probe.getCurrentHp() / probe.getMaxHp() >= 0.5; hit++) {
+                for (int hit = 0; hit < 60 && !probe.isDeath() && probe.getCurrentHp() / probe.getMaxHp() >= 0.5; hit++) {
                     battle.castImmediate(ally.getSkills().get(SkillType.SKILL), ally, List.of(probe));
                 }
-                if (!probe.isDeath() && probe.getCurrentHp() / probe.getMaxHp() < 0.5) {
+                if (probe.isDeath() || probe.getCurrentHp() / probe.getMaxHp() >= 0.5) {
+                    continue;
+                }
+                double before = probe.getCurrentHp();
+                battle.castImmediate(wearer.getSkills().get(SkillType.SKILL), wearer, List.of(probe));
+                if (!probe.isDeath() && (before - probe.getCurrentHp()) < 0.4 * before) {
                     return id;
                 }
             } catch (RuntimeException ignored) {
