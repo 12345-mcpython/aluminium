@@ -1,11 +1,4 @@
 {
-  "108": [
-    {
-      "require": 4,
-      "ability": "Ability51081",
-      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" The event it needed exists since 2026-09-27 (DEALING_DAMAGE hands the pending instance over before settlement), so the first clause could be conditioned on 'the wearer deals damage'. ⚠ 'ignores 10% DEF' is NOT the blocker: the defence zone reads the attacker's DEFENCE_IGNORE attribute, so MODIFY_ATTR reaches it (see set 119's note and engine.md 3.2). What blocks the ability is that it is a DISJUNCTION -- the second clause needs a condition on the target's weakness element, which the DSL cannot ask about (it reads states, counts and attribute values, not weaknesses), so authoring only the first clause would under-trigger it. The instance-scoped form (ignore DEF for THIS hit) would also be the more faithful reading of 'when the wearer deals DMG', and that does not exist."
-    }
-  ],
   "112": [
     {
       "require": 4,
@@ -151,6 +144,13 @@
       "require": 2,
       "ability": "Ability53271",
       "reason": "\"Increases the wearer's CRIT Rate by 8%. Upon entering battle, if the wearer and another ally are both Trailblazer-path characters, increases the wearer's CRIT DMG by 24%.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08). What is missing is a condition on the PARTY's composition -- 'another ally of the Trailblazer Path' needs the rule to see its teammates (same gap as sets 312 and 314)."
+    }
+  ],
+  "108": [
+    {
+      "require": 4,
+      "ability": "Ability51081",
+      "reason": "\"When the wearer deals DMG to the target enemy, ignores 10% DEF. If the target enemy has Quantum Weakness, the wearer additionally ignores 10% DEF.\" ⚠ RE-CHECKED 2026-09-29: the original blocker (\"the DSL cannot ask about weaknesses\") is STALE -- TriggerTable parses `has_weakness` (line 967) and HasWeakness.test is `enemy.isWeakTo(element)`, so both halves ARE expressible. What blocks the ship is now something else: a rule file written for this set was NOT SEEN by the loader (the partition test still reported \"written with no rule file\"), so the path/name/mapping RelicTriggerTables looks for has to be read before the rules can land."
     }
   ]
 }
