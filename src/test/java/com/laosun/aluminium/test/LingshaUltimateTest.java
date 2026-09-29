@@ -30,7 +30,7 @@ public class LingshaUltimateTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final int OTHER_MONSTER = 1002012;
-    private static final String STATE = "\u9189\u9189";
+    private static final String STATE = "醇醉";
 
     @Test
     public void theUltimateHealsThePartyForHerOwnNumbers() {
