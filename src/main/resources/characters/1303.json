@@ -99,5 +99,29 @@
     ],
     "source": "1303 阮•梅 星魂 1 神经仿绣图: 「终结技展开结界期间，我方全体造成伤害时无视目标20%的防御力」",
     "note": "「终结技展开**结界期间**，我方全体造成伤害时**无视目标 20% 的防御力**」—— ① 「无视…防御」= **`DEFENCE_IGNORE`** ✓（防御区读**攻击方**的该属性 ✓）；② ⚠ 「**结界期间**」在引擎里**不是一个状态** ✗ ⇒ 本条**镜像结界的寿命** ✓：与 `ult_zone_all_type_res_pen` **同一个事件** ✓、**同一个 `ticks_on: \"self\"`** ✓、**同样 `turns: 2`** ✓（第 28/270 轮的镜像 idiom ✓）；③ 门槛 `min_eidolon: 1` ✓。⚠ 具名 `结界` ✓ 与结界**同名** ✓ ⇒ 若将来用 `REMOVE_STATE 结界` 收尾 ✓，两条**一起**走 ✓。⚠ **登记**：星魂 6「终结技展开的结界**持续时间延长 1 回合**」✗ —— 形状**可写** ✓（`EXTEND_BUFF` ✓），但它的**判据**要求驱动回合 ✓ ⇒ 与\"时钟\"一并处理 ✓（下一轮 ✓）。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "eidolon6_extends_the_zone",
+    "min_eidolon": 6,
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "EXTEND_BUFF",
+        "attribute": "DAMAGE_PENETRATION",
+        "turns": 1,
+        "target": "all_allies"
+      },
+      {
+        "op": "EXTEND_BUFF",
+        "attribute": "DEFENCE_IGNORE",
+        "turns": 1,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1303 阮•梅 星魂 6 半脱纱巾落团扇: 「终结技展开的结界持续时间延长1回合」",
+    "note": "「终结技展开的结界**持续时间延长 1 回合**」—— ① ⚠ `EXTEND_BUFF` 的命名**二选一** ✓：给 `buff`（状态名）**或**给 `attribute`（修饰所在的属性 ✓），**不能同时** ✓（装载期原文 \"a buff is named one way or the other\" ✓）；② 本结界的**两条具名修饰**都是属性修饰 ✓ ⇒ 按**属性**点名 ✓ ⇒ **两个** `EXTEND_BUFF` ✓（`DAMAGE_PENETRATION` ✓ 与 `DEFENCE_IGNORE` ✓）；③ 排在结界之后 ✓、门槛 `min_eidolon: 6` ✓。⭐ **判据** ✓：**完整回合**（`beforeMove()` + `afterMove()` ✓ —— 递减分早晚两遍 ✓，属性修饰是**晚**的那遍 ✓）⇒ `turns: 2` 两个完整回合**到期** ✓；**有星魂 6（+1）⇒ 同样两回合后仍在** ✓。"
   }
 ]
