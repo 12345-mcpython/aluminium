@@ -2780,6 +2780,25 @@ public class Battle {
         return memosprite;
     }
 
+    public Summon summonServant(Character master) {
+        if (master == null) {
+            throw new IllegalArgumentException("A servant needs a summoner");
+        }
+        if (master.isDeath()) {
+            throw new IllegalArgumentException(
+                    "A dead character cannot summon a servant (" + master.getName() + "): it would enter "
+                            + "already orphaned, and the very next removeDeadCombatants would take it "
+                            + "straight back out");
+        }
+        Summon servant = SummonFactory.servant(master);
+        servant.setMaster(master);
+        allies.add(servant);
+        addRequestItems.add(servant);
+        justSummoned.add(servant);                // see the note in summon(...): SUMMONED fires after scheduling
+        servant.setSpeedChangeListener(this::onSpeedChanged);
+        return servant;
+    }
+
     /**
      * The master's living memosprite on the field, or {@code null}.
      *
