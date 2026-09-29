@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20016_crit_low_hp",
+      "when": [
+        "hp_percent <= 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于#1[i]%时，暴击率提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20016_crit_low_hp",
+      "when": [
+        "hp_percent <= 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于#1[i]%时，暴击率提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20016_crit_low_hp",
+      "when": [
+        "hp_percent <= 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于#1[i]%时，暴击率提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20016_crit_low_hp",
+      "when": [
+        "hp_percent <= 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.21,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于#1[i]%时，暴击率提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20016_crit_low_hp",
+      "when": [
+        "hp_percent <= 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于#1[i]%时，暴击率提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ]
+}
