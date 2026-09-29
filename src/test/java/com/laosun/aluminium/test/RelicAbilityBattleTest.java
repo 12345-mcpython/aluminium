@@ -815,4 +815,6 @@ public class RelicAbilityBattleTest {
         }
         throw new IllegalStateException(unit.getName() + " is not on the action bar");
     }
+
+    /** 繁星璀璨的天才 (Genius of Brilliant Stars), 4-piece: 「造成伤害时无视10%防御；若目标有量子弱点则额外无视10%」. */
 }
