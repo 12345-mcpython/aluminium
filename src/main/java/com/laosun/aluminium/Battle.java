@@ -2494,6 +2494,15 @@ public class Battle {
             damage.addBoost(attacker.getAttribute(AttributeType.DOT_DAMAGE_BOOST).get());
         }
 
+        // ...and a memosprite-only sibling (「装备者忆灵造成的暴击伤害额外提高 X%」, light cone 21057). Gated on WHO is attacking
+        // rather than on the damage's type or cast category: a memosprite's skill is an ordinary NORMAL damage like any other.
+        // ⚠ `instanceof Summon` would be an approximation -- the documents distinguish 忆灵 from ordinary 召唤物 -- so the test
+        // is the precise one: the attacker IS the unit that its master's memospriteOf returns.
+        if (attacker instanceof Summon summon && summon.getMaster() != null
+                && attacker == memospriteOf(summon.getMaster())) {
+            damage.addBoost(attacker.getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get());
+        }
+
         // Scoped boosts (P10-4): 「普攻 / 战技 / 终结技造成的伤害提高 X%」. These cannot be gated on the damage
         // *type* the way the follow-up boost above is -- a basic attack and a skill are both
         // DamageType.NORMAL -- so they are gated on the category of the cast that produced this instance,
