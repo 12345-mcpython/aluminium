@@ -1,0 +1,162 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_1",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 1: 「战技和追加攻击造成的伤害提高24%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 24%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 1 档剩余槽 = `0.24` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_follow_up_damage_boost_1",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 1: 「战技和追加攻击造成的伤害提高24%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 24%**」—— ① 用引擎**已有的作用域加伤属性** `FOLLOW_UP_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 1 档剩余槽 = `0.24` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_2",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 2: 「战技和追加攻击造成的伤害提高28%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 28%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 2 档剩余槽 = `0.28` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_follow_up_damage_boost_2",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 2: 「战技和追加攻击造成的伤害提高28%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 28%**」—— ① 用引擎**已有的作用域加伤属性** `FOLLOW_UP_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 2 档剩余槽 = `0.28` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_3",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 3: 「战技和追加攻击造成的伤害提高32%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 32%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 3 档剩余槽 = `0.32` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_follow_up_damage_boost_3",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 3: 「战技和追加攻击造成的伤害提高32%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 32%**」—— ① 用引擎**已有的作用域加伤属性** `FOLLOW_UP_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 3 档剩余槽 = `0.32` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_4",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 4: 「战技和追加攻击造成的伤害提高36%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 36%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 4 档剩余槽 = `0.36` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_follow_up_damage_boost_4",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 4: 「战技和追加攻击造成的伤害提高36%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 36%**」—— ① 用引擎**已有的作用域加伤属性** `FOLLOW_UP_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 4 档剩余槽 = `0.36` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_5",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 5: 「战技和追加攻击造成的伤害提高40%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 40%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 5 档剩余槽 = `0.4` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_follow_up_damage_boost_5",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21062 (See You at the End), rank 5: 「战技和追加攻击造成的伤害提高40%」",
+      "note": "「使装备者**战技和追加攻击造成的伤害提高 40%**」—— ① 用引擎**已有的作用域加伤属性** `FOLLOW_UP_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 5 档剩余槽 = `0.4` ✓（与文档 24/28/32/36/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ]
+}
