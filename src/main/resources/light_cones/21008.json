@@ -1,0 +1,122 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21008_ehr_and_dot",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21008_ehr_and_dot",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.25,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21008_ehr_and_dot",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21008_ehr_and_dot",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.35,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21008_ehr_and_dot",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ]
+}
