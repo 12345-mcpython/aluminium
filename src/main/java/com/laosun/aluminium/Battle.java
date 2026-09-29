@@ -1492,6 +1492,31 @@ public class Battle {
     /**
      * A unit's current aggro value (P5-1/P5-2): it decides the probability of the enemy selecting it.
      *
+     * <p>This is the stated weight of {@link #baseAggroOf} with the unit's {@link AttributeType#AGGRO_ADDED_RATIO}
+     * applied — 「受到攻击的概率大幅提高」 is a <b>soft</b> modifier on the same weighted draw, which is why it is an
+     * attribute and not a {@code TauntBuff} (a taunt is the hard "can only be selected", and
+     * {@link TargetSelector} is where that lives).
+     *
+     * @param entity the unit to query
+     * @return the aggro value (&gt; 0)
+     */
+    public double aggroOf(CanHit entity) {
+        double base = baseAggroOf(entity);
+        DoubleValue added = entity.getAttribute(AttributeType.AGGRO_ADDED_RATIO);
+        if (added == null) {
+            return base;
+        }
+        double multiplier = 1 + added.get();
+        // 「受到攻击的概率大幅提高」 scales the weight; it never removes the unit from the draw. A stated change of
+        // -100% or worse would make the multiplier zero or negative, i.e. take a living unit out of the aggro table --
+        // the exact thing Memosprites.validateAggro refuses for a stated weight (a zero share is a wrong number with
+        // nothing to report) -- so the stated weight is kept instead of silently deleting the target.
+        return multiplier <= 0 ? base : base * multiplier;
+    }
+
+    /**
+     * The stated aggro weight, before any {@link AttributeType#AGGRO_ADDED_RATIO} is applied.
+     *
      * <p>Priority: the {@code aggro} in the character data (it is the game multiplier itself: Preservation
      * 150 / Destruction 125 / others 100 / Hunt·Erudition 75) → when there is no data, fall back to the path's
      * default tier → non-characters (enemies/summons) get 100.
@@ -1503,7 +1528,7 @@ public class Battle {
      * @param entity the unit to query
      * @return the aggro value (&gt; 0)
      */
-    public double aggroOf(CanHit entity) {
+    private double baseAggroOf(CanHit entity) {
         if (entity instanceof Character character) {
             if (character.getAggro() > 0) {
                 return character.getAggro();

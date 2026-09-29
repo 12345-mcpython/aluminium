@@ -136,7 +136,31 @@ public enum AttributeType {
      * <p>⚠ <b>Appended, never inserted</b>: {@link #ordinal()} indexes every unit's attribute array (see the warning
      * above {@link #BASIC_ATTACK_DAMAGE_BOOST}).
      */
-    @SerializedName("shield_boost") SHIELD_BOOST("shield_boost");
+    @SerializedName("shield_boost") SHIELD_BOOST("shield_boost"),
+
+    /**
+     * 「受到攻击的概率大幅提高」 — the <b>soft</b> aggro weight, as a ratio added to the unit's own weight.
+     *
+     * <p><b>Why it is not {@code TauntBuff}.</b> A taunt is a hard constraint: while it is up, a single-target attack
+     * can only pick the taunter. This is the other kind of thing — the same weighted draw, with this unit's weight
+     * raised. Writing a taunt for 「概率大幅提高」 would replace a soft weight with a hard lock, i.e. a different
+     * mechanic rather than a different number, which is why 三月七's Skill's third sentence stayed registered for so
+     * long instead of being approximated.
+     *
+     * <p><b>Where the magnitude comes from — it is in the data, not invented.</b> The sentence states no number, but
+     * 100102's {@code param_list} has <b>five</b> slots per level and the prose names only four
+     * (#1 = DEF share 0.57, #2 = 3 turns, #3 = the 30% gate, #4 = the flat 760); the fifth is a constant <b>5</b>.
+     * The game's own ability config for that Skill settles what it is: the shield modifier is attached with the
+     * property <b>{@code AggroAddedRatio}</b> on the shield's owner, gated on {@code ByCompareHPRatio} against
+     * param #3, where the {@code SuccessTaskList} (HP% ≥ 30%) carries that fifth value dynamically while the
+     * {@code FailedTaskList} (HP% < 30%) pins it to <b>0</b> — the sentence's gate and its magnitude, one per branch.
+     * {@code AggroAddedRatio} is a <i>ratio</i>, so 5 reads as ×(1 + 5) = ×6 on the unit's weight
+     * ({@code Battle.aggroOf}), which is what 「大幅提高」 means.
+     *
+     * <p>⚠ <b>Appended, never inserted</b>: {@link #ordinal()} indexes every unit's attribute array (see the warning
+     * above {@link #BASIC_ATTACK_DAMAGE_BOOST}).
+     */
+    @SerializedName("aggro_added_ratio") AGGRO_ADDED_RATIO("aggro_added_ratio");
 
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
 

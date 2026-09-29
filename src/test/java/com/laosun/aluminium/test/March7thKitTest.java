@@ -263,9 +263,15 @@ public class March7thKitTest {
     /**
      * The rest of her kit is <b>registered, not approximated</b>.
      *
-     * <p><b>Eleven</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
-     * Her 战技's soft taunt is a data gap (the document states no magnitude), and the only thing left off this list
-     * would be a wrong number if it were spelled with the vocabulary that exists today.
+     * <p><b>Twelve</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
+     *
+     * <p>⚠ <b>Her 战技's soft taunt is no longer on the registered list</b> (2026-09-29): it was never a missing number.
+     * The sentence states no magnitude, but the skill's {@code param_list} has five slots per level and the prose
+     * references four, so the fifth (a constant 5) is the ratio; the game's own ability config attaches its shield
+     * modifier with the property {@code AggroAddedRatio} and gates it on the HP% the prose does name, pinning that
+     * value to 0 on the below-30% branch. It is written as {@code AGGRO_ADDED_RATIO} -- a SOFT weight -- and never as
+     * {@code TAUNT}, which is the hard "can only be selected" and would be a different mechanic rather than a
+     * different number. See {@code SoftAggroWeightTest} and the rule's note in {@code characters/1001.json}.
      *
      * <p>⚠ Three clauses came off that list and each is worth a line: 星魂 1 (2026-09-28) needed a per-cast count of the
      * victims a state actually landed on ({@code "scale": "cast_applied:冻结"}); 星魂 4's first sentence plus
@@ -276,8 +282,9 @@ public class March7thKitTest {
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
-        Assertions.assertEquals(3, TriggerTables.of(MARCH).ruleCount(TriggerEvent.SKILL_CAST),
-                "the shield, the cleanse trace and 加护 (the shield's +1 turn) -- and nothing else on her Skill");
+        Assertions.assertEquals(4, TriggerTables.of(MARCH).ruleCount(TriggerEvent.SKILL_CAST),
+                "the shield, the soft aggro weight (AGGRO_ADDED_RATIO, added 2026-09-29), the cleanse trace and 加护 "
+                        + "(the shield's +1 turn) -- and nothing else on her Skill");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TAKING_HIT),
                 "the Talent's counter");
         Assertions.assertEquals(2, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
