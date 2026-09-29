@@ -58,7 +58,7 @@
       "do": [
         {
           "op": "HEAL",
-          "scale": "owner_max_hp",
+          "scale": "target_max_hp",
           "percent": 0.025,
           "target": "all_allies"
         }
@@ -92,7 +92,7 @@
       "do": [
         {
           "op": "HEAL",
-          "scale": "owner_max_hp",
+          "scale": "target_max_hp",
           "percent": 0.03,
           "target": "all_allies"
         }
@@ -126,7 +126,7 @@
       "do": [
         {
           "op": "HEAL",
-          "scale": "owner_max_hp",
+          "scale": "target_max_hp",
           "percent": 0.035,
           "target": "all_allies"
         }
@@ -160,7 +160,7 @@
       "do": [
         {
           "op": "HEAL",
-          "scale": "owner_max_hp",
+          "scale": "target_max_hp",
           "percent": 0.04,
           "target": "all_allies"
         }
