@@ -221,3 +221,13 @@
 84. **"无主语前缀"是遗器数据的常态** —— 从句正则必须把「(使)装备者(的)」写成可选。
 85. **字段与语义的三个坑**：`ADD_STACK` 必须写明寿命；`MODIFY_DAMAGE_TAKEN` **带符号**（负值 = 减伤）；`per_turn` 是下划线拼写。
 86. **遗器普查的规程** —— 键插在 `AUTHORED` 自己的 `Set.of` 字面量里；`STILL_REGISTERED` 与 2 件套计数由登记表重算；不变量 `PURE + MIXED = AUTHORED + STILL_REGISTERED`。
+
+
+## 第 87–92 条（2026-09-29，第 152–174 轮）
+
+87. **写内容文件前先查它是否已存在** —— 存在就必须**合并**（第 166/270 轮覆盖了已出货的 `117.json`，整套遗器测试类因此报 `ExceptionInInitializerError`）。
+88. **回退只用 `git checkout`，不要 `os.remove` 跟踪文件** —— 手动删除会把已出货文件删成 `D` 状态。
+89. **改 `Set.of(...)` 字面量前先按行去重** —— 重复元素让 `Set.of` 在**类初始化**时抛错，表现成整类 `NoClassDefFoundError`。
+90. **行内结构化改动一律"整行替换"** —— 不接在 `;` 之后、不正则内插、不削行尾括号。
+91. **写测试前先 grep 一个同类测试并照抄 import**；**断言助手不要起 JUnit 已有的名字**（`Weapon`/`Constant` 包名、`ControlEffect` 是 record、`assertEquals` 重名，四次白耗）。
+92. **看测试里的打印就读 JUnit XML 的 `system-out`** —— Gradle 控制台吞 stdout；第 173/270 轮靠它一次定案（`ControlBuff` 在 `debuffCount()` 里计 **2** 个减益）。
