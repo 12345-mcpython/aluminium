@@ -58,5 +58,24 @@
     ],
     "source": "1402 阿格莱雅 终结技 残梦，由始至终 (skill 140203, Ultra/Enhance): 「召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入【至高之姿】状态并使自身立即行动。」 param Lv10 = [0.15, 0, 0, 100, 0, 0]",
     "note": "Three things, in the order the text writes them: summon, restore, advance herself. ⚠ 「若衣匠已在场，则使其生命值回复至上限」 needs NO branch: SUMMON is idempotent per summoner (already out => nothing happens), and the HEAL that follows is a full-HP heal on a fresh one (clamped by its Max HP, i.e. no change) -- the two cases are observably identical, so one rule covers both. ⚠ 「回复至上限」 is written as 「heal by 100% of its Max HP」: Battle.heal clamps current HP at the maximum, so the two are the same result rather than an approximation. ⚠ The ORDER is not decoration: `target: \"summon\"` in the HEAL and the ADVANCE fails loudly when nothing is out, so SUMMON has to come first -- and there is a test for that. ⚠ NOT authored: 【至高之姿】 (SPD +15% per stack, the basic attack replaced by 【孤锋千吻】 with the Skill disabled, control immunity for the memosprite, and a 100-speed countdown on the action sequence that makes 衣匠 self-destruct and ends the state) -- a state machine with its own timeline, registered rather than approximated. ⚠ Also un-authored: 衣匠's OWN attack. Its 忆灵技能1 is a Blast for 「110% 攻击力」 of 雷, but no document gives 衣匠 an ATK (the panel states only HP and SPD), and scaling it off 阿格莱雅's ATK would be a guess -- so it is not written, and the loader would refuse it anyway (Memosprites.validateAttack rejects a base the panel never states)."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "talent_fissure_thread_bonus",
+    "when": [
+      "actor == self",
+      "self_summon_count >= 1",
+      "target has_state 间隙织线"
+    ],
+    "do": [
+      {
+        "op": "ADD_DAMAGE",
+        "scale": "self_attr:ATTACK",
+        "percent": 0.3,
+        "element": "Thunder"
+      }
+    ],
+    "source": "1402 阿格莱雅 天赋: 「衣匠在场时…攻击处于【间隙织线】状态下的敌人后，额外造成等同于阿格莱雅攻击力30%的雷属性附加伤害」",
+    "note": "「**衣匠在场时**…攻击处于**【间隙织线】**状态下的敌人后，**额外造成等同于阿格莱雅攻击力 30% 的雷属性附加伤害**」—— ① `ADD_DAMAGE` ✓ + `scale: self_attr:ATTACK` ✓（形状照抄 **1001 星魂 4** ✓，它的注记写明这条落在**基数层** ✓ ⇒ 吃增伤/暴击/防御/抗性 ✓ = 正是\"额外附加伤害\"的意思 ✓）；② 「衣匠在场时」用 **`self_summon_count >= 1`** ✓（她开局就召唤衣匠 ✓）；③ 「处于【间隙织线】状态下」用 **`target has_state 间隙织线`** ✓（状态名**抄自文档** ✓）；④ 属性写 **`element: Thunder`** ✓（句子明写雷属性 ✓）。"
   }
 ]
