@@ -1405,8 +1405,52 @@ public final class TriggerInterpreter {
      * <p>⚠ A missing attribute slot is a loud failure rather than {@code 0}: the alternative is a buff that grants
      * nothing, which is a wrong number with no symptom.
      */
+    /**
+     * The magnitude of a counter-scaled modifier: {@code percent × how many layers this unit carries}.
+     *
+     * <p>Spelled with the condition DSL's own two prefixes -- {@code self_stacks:<NAME>} reads the rule owner's counter
+     * and {@code target_stacks:<NAME>} the event target's -- so "I have N layers" and "the number is N layers' worth"
+     * are the same vocabulary. Read <b>at fire time</b> and then held, like every other derived magnitude; a rule that
+     * wants the value to track a changing count must therefore be re-asserted when the count changes (the same-named
+     * modifier replaces, so the newest application wins).
+     *
+     * <p>⚠ Returns {@code null} for any other scale, so the caller falls through to the attribute/HP families.
+     * ⚠ A name nothing ever marks reads 0, which is a real answer ("no layers") and not an error; the loader's own
+     * declared-counter check is what keeps a typo from looking like a zero.
+     */
+    private static Double stackScale(String key, double percent, TriggerContext ctx) {
+        if (key == null) {
+            return null;
+        }
+        String trimmed = key.trim();
+        boolean owner;
+        String name;
+        if (trimmed.startsWith(TriggerTable.SELF_STACKS_PREFIX)) {
+            owner = true;
+            name = trimmed.substring(TriggerTable.SELF_STACKS_PREFIX.length()).trim();
+        } else if (trimmed.startsWith(TriggerTable.TARGET_STACKS_PREFIX)) {
+            owner = false;
+            name = trimmed.substring(TriggerTable.TARGET_STACKS_PREFIX.length()).trim();
+        } else {
+            return null;
+        }
+        if (name.isEmpty()) {
+            throw new IllegalStateException("a counter scale names no counter: " + key);
+        }
+        CanHit holder = owner ? ctx.owner() : ctx.target();
+        if (holder == null) {
+            throw new IllegalStateException(
+                    "the scale \"" + key + "\" reads the event target's counter, but this event carries no target");
+        }
+        return percent * holder.getBuffManager().stacksOf(name);
+    }
+
     private static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
         Character owner = requireCharacterOwner(effect, ctx);
+        Double fromStacks = stackScale(effect.getScale(), effect.getPercent(), ctx);
+        if (fromStacks != null) {
+            return fromStacks + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
@@ -2210,6 +2254,10 @@ public final class TriggerInterpreter {
     /** Resolves one {@code scale} + {@code percent} pair into a number (owner attributes, the owner's Max HP/energy, or the target's Max HP). */
     private static double resolveScale(String scale, double percent, TriggerContext ctx) {
         String key = scale == null ? "" : scale.trim();
+        Double fromStacks = stackScale(key, percent, ctx);
+        if (fromStacks != null) {
+            return fromStacks;
+        }
         if ("target_max_hp".equals(key)) {
             CanHit victim = ctx.target();
             if (victim == null) {
@@ -2644,6 +2692,19 @@ public final class TriggerInterpreter {
                                 + "\"percent\") or write the number into \"percent\" "
                                 + "(source: " + spec.getSource() + ")");
             }
+            return;
+        }
+        // A counter scale names a counter, not an attribute: check the shape and stop there.
+        String scale = effect.getScale().trim();
+        if (scale.startsWith(TriggerTable.SELF_STACKS_PREFIX)
+                || scale.startsWith(TriggerTable.TARGET_STACKS_PREFIX)) {
+            String name = scale.substring(scale.indexOf(':') + 1).trim();
+            if (name.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " scales off a counter but names none: \"" + scale + "\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            requirePercent(effect, op, spec);
             return;
         }
         // The spelling and (for the attribute family) the name; also re-checks `percent`, because a scale with no
