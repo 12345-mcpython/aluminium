@@ -1373,7 +1373,12 @@ public final class TriggerInterpreter {
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
-        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+        java.util.List<CanHit> resolvedTargets = resolveTargets(battle, effect, ctx);
+        System.out.println("[attr] selector=" + normalizeTarget(effect) + " owner="
+                + (ctx.owner() == null ? "null" : ctx.owner().getName()) + " resolved=" + resolvedTargets.size()
+                + " first=" + (resolvedTargets.isEmpty() || resolvedTargets.get(0) == null ? "null"
+                        : resolvedTargets.get(0).getName() + "/" + resolvedTargets.get(0).getClass().getSimpleName()));
+        for (CanHit target : resolvedTargets) {
             // ? A stated ceiling, in the target's own unit (2026-09-29). The two forms differ:
             //   * a DERIVED magnitude is already absolute, so the ceiling is compared directly;
             //   * a SHARE scales off the target's BASE value, so the ceiling is divided by that base first
