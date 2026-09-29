@@ -54,8 +54,9 @@ public class PelaDebuffTest {
         Fixture f = new Fixture();
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.EFFECT_HIT_RATE).get() > 0,
                 "「佩拉在场时，我方全体的效果命中提高10%」");
-        Assertions.assertEquals(1, TriggerTables.of(PELA).ruleCount(TriggerEvent.BATTLE_START) - 1,
-                "census: her file has the 秘策 rule and the level-convention rule");
+        Assertions.assertEquals(2, TriggerTables.of(PELA).ruleCount(TriggerEvent.BATTLE_START) - 1,
+                "census: the 秘策 rule, the level-convention rule, and (2026-09-29) the technique's "
+                        + "「防御力降低20%」 which rolls a base chance");
     }
 
     /**
