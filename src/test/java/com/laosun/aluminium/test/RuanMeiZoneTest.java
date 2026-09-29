@@ -4,6 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -40,6 +41,31 @@ public class RuanMeiZoneTest {
         Assertions.assertEquals(0.2, afterUlt(1, AttributeType.DEFENCE_IGNORE), EPS,
                 "\u7ed3\u754c\u671f\u95f4\uff0c\u6211\u65b9\u5168\u4f53\u9020\u6210\u4f24\u5bb3\u65f6\u65e0\u89c6\u76ee\u6807\u768420%\u7684\u9632\u5fa1\u529b");
         Assertions.assertEquals(0.0, afterUlt(0, AttributeType.DEFENCE_IGNORE), EPS, "rank 0 states nothing");
+    }
+
+    /**
+     * The zone's own clock, which the document gives her: 「自身每回合开始时结界持续回合数减1」.
+     *
+     * <p>⚠ A WHOLE turn is `beforeMove()` AND `afterMove()`: the countdown is split into an early pass (beforeMove) and a
+     * late pass (afterMove) by `if (buff.isEarlyBuff != early) continue;`, and a stat modifier is a LATE buff. Driving only
+     * beforeMove leaves the zone standing forever.
+     */
+    @Test
+    public void theZoneExpiresOnHerSecondWholeTurn() {
+        Assertions.assertEquals(0.25, penetrationAfterHerTurns(1), EPS, "still up after one turn of hers");
+        Assertions.assertEquals(0.0, penetrationAfterHerTurns(2), EPS,
+                "\u81ea\u8eab\u6bcf\u56de\u5408\u5f00\u59cb\u65f6\u7ed3\u754c\u6301\u7eed\u56de\u5408\u6570\u51cf1 -- so two turns end it");
+    }
+
+    private static double penetrationAfterHerTurns(int turns) {
+        Fixture f = fixture(0);
+        f.battle.castImmediate(f.ruanMei.getSkills().get(SkillType.ULTRA), f.ruanMei, List.of(f.enemy));
+        for (int i = 0; i < turns; i++) {
+            f.battle.currentMove = new Signal(f.ruanMei);
+            f.battle.beforeMove();
+            f.battle.afterMove();
+        }
+        return read(f.ally, AttributeType.DAMAGE_PENETRATION);
     }
 
     private static double afterUlt(int rank, AttributeType attribute) {
