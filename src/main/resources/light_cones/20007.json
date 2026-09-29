@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "KILL",
+      "id": "cone20007_attack_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.24,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "KILL",
+      "id": "cone20007_attack_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.3,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "KILL",
+      "id": "cone20007_attack_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.36,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "KILL",
+      "id": "cone20007_attack_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.42,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "KILL",
+      "id": "cone20007_attack_on_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.48,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+    }
+  ]
+}
