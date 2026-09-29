@@ -1,6 +1,7 @@
 package com.laosun.aluminium.data;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.models.TriggerTable;
 
@@ -43,25 +44,49 @@ public final class WeaponTriggerTables {
      * The light cone's rules, or an empty table when it has none -- "no file" is the ordinary case, not an error, which is
      * the same reading {@code RelicTriggerTables} takes for a set with no rules.
      */
-    public static synchronized TriggerTable of(int weaponId) {
-        TriggerTable cached = CACHE.get(weaponId);
+    public static synchronized TriggerTable of(int weaponId, int rank) {
+        int key = weaponId * 10 + Math.max(1, Math.min(9, rank));
+        TriggerTable cached = CACHE.get(key);
         if (cached != null) {
             return cached;
         }
-        TriggerTable table = new TriggerTable(weaponId, read(weaponId));
-        CACHE.put(weaponId, table);
+        TriggerTable table = new TriggerTable(weaponId, read(weaponId, rank));
+        CACHE.put(key, table);
         return table;
     }
 
-    private static List<TriggerSpec> read(int weaponId) {
+    private static List<TriggerSpec> read(int weaponId, int rank) {
+        Map<String, com.google.gson.JsonElement> file = parse(weaponId);
+        if (file == null || file.isEmpty()) {
+            return List.of();
+        }
+        com.google.gson.JsonElement flat = file.get("rules");
+        if (flat != null) {
+            return GSON.fromJson(flat, new TypeToken<List<TriggerSpec>>() {
+            }.getType());                            // one set of rules for every rank
+        }
+        // ⚠ The EXACT rank, not "the highest threshold met": a light cone's superimposition does not accumulate the way a
+        // relic set's piece count does. A rank with no row falls back to the lowest one that exists, so a file with fewer
+        // rows than the game's five still works.
+        com.google.gson.JsonElement exact = file.get(String.valueOf(rank));
+        if (exact == null) {
+            String lowest = file.keySet().stream().min(java.util.Comparator.comparingInt(Integer::parseInt))
+                    .orElseThrow();
+            exact = file.get(lowest);
+        }
+        return GSON.fromJson(exact, new TypeToken<List<TriggerSpec>>() {
+        }.getType());
+    }
+
+    private static Map<String, com.google.gson.JsonElement> parse(int weaponId) {
         String path = pathFor(weaponId);
         if (WeaponTriggerTables.class.getResource(path) == null) {
-            return List.of();
+            return null;
         }
         try (InputStream stream = WeaponTriggerTables.class.getResourceAsStream(path);
              Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            File file = GSON.fromJson(reader, File.class);
-            return file == null || file.rules == null ? List.of() : List.copyOf(file.rules);
+            return GSON.fromJson(reader, new TypeToken<Map<String, com.google.gson.JsonElement>>() {
+            }.getType());
         } catch (Exception error) {
             throw new IllegalStateException("light cone " + weaponId + " has an unreadable rule file " + path, error);
         }
@@ -71,8 +96,4 @@ public final class WeaponTriggerTables {
         return "/" + DIR + "/" + weaponId + ".json";
     }
 
-    /** The file is {@code {"rules": [ ... ]}} -- the same shape a character file may take. */
-    private static final class File {
-        private List<TriggerSpec> rules;
-    }
 }
