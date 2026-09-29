@@ -2498,13 +2498,19 @@ public class Battle {
         // rather than on the damage's type or cast category: a memosprite's skill is an ordinary NORMAL damage like any other.
         // ⚠ `instanceof Summon` would be an approximation -- the documents distinguish 忆灵 from ordinary 召唤物 -- so the test
         // is the precise one: the attacker IS the unit that its master's memospriteOf returns.
-        // ⚠ Read from the MASTER, not from the attacker: a memosprite's panel inherits only the attributes its spec NAMES
-        // (`SummonFactory` snapshots them at summon time, and MemospriteSpec says nothing else is inherited), so an attribute a
-        // light cone grants to the wearer is invisible on the memosprite itself. 「装备者的忆灵造成的伤害」 is a boost the WEARER
-        // owns and that applies to damage its memosprite deals.
-        if (attacker instanceof Summon summon && summon.getMaster() != null
-                && attacker == memospriteOf(summon.getMaster())) {
-            damage.addBoost(summon.getMaster().getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get());
+        // ...and the memosprite sibling, gated on the damage TYPE the game itself names: `DamageType.MEMORY` is 忆灵伤害
+        // (GLOSSARY.md), and the constant has been declared since the type table was written -- its javadoc even notes that only
+        // some of the constants are in use. ⚠ This replaces the earlier heuristic (`attacker == memospriteOf(master)` plus
+        // reading the MASTER's attribute), which existed only because the type had not been found: the type is the game's own
+        // vocabulary, and it holds for a memosprite that outlives its master.
+        if (damage.getType() == DamageType.MEMORY) {
+            // ⚠ Two facts, both measured: the TYPE is what decides whether this clause applies (忆灵伤害), and the VALUE comes
+            // from the memosprite's master -- a panel inherits only the attributes its spec NAMES (`SummonFactory` snapshots
+            // them, `MemospriteSpec` says nothing else crosses), so an ability granted to the wearer is invisible on the
+            // memosprite itself. Reading the attacker alone measured exactly 1.0, i.e. no boost at all.
+            CanHit owner = attacker instanceof Summon summon && summon.getMaster() != null
+                    ? summon.getMaster() : attacker;
+            damage.addBoost(owner.getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get());
         }
 
         // Scoped boosts (P10-4): 「普攻 / 战技 / 终结技造成的伤害提高 X%」. These cannot be gated on the damage
