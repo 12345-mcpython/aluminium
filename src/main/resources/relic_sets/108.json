@@ -1,0 +1,43 @@
+{
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic108_ignore_defence",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.1,
+          "instance": true,
+          "target": "self",
+          "turns": 1
+        }
+      ],
+      "source": "遗器 108 繁星璀璨的天才 4 件套: 当装备者对敌方目标造成伤害时，无视其#1[i]%的防御力。若目标拥有量子属性弱点，额外无视其#2[i]%的防御力。",
+      "note": "「对敌方目标造成伤害时，无视其 #1% 防御力」—— ⭐ **实例级**：`MODIFY_ATTR` + **`instance: true`** ✓（第 162/270 轮新增的开关 ✓），写入**当前这一击**而不是挂 buff ✓；`Battle` 在 **2539** 触发 `DEALING_DAMAGE`、**2551** 才结算防御区 ✓ ⇒ 来得及 ✓。 ⚠ **`turns: 1` 是\"名义寿命\"** ✓：实例路由在**构建任何 buff 之前就返回** ✓ ⇒ 该字段**确实不被使用** ✓，它只是满足加载器的形状校验（否则 `getTurns()` 会在校验里被拆箱 ⇒ NPE ✗）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic108_ignore_defence_quantum",
+      "when": [
+        "actor == self",
+        "target has_weakness Quantum"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.1,
+          "instance": true,
+          "target": "self",
+          "turns": 1
+        }
+      ],
+      "source": "遗器 108 繁星璀璨的天才 4 件套（量子弱点分支）: 当装备者对敌方目标造成伤害时，无视其#1[i]%的防御力。若目标拥有量子属性弱点，额外无视其#2[i]%的防御力。",
+      "note": "「若目标拥有**量子属性弱点**，额外无视其 #2% 防御力」—— 用 `target has_weakness Quantum` ✓（触发器词表里已有 ✓）；⚠ 两半**相加**（弱点目标共 20% ✓），与文档\"额外\"一致 ✓。 ⚠ **`turns: 1` 是\"名义寿命\"** ✓：实例路由在**构建任何 buff 之前就返回** ✓ ⇒ 该字段**确实不被使用** ✓，它只是满足加载器的形状校验（否则 `getTurns()` 会在校验里被拆箱 ⇒ NPE ✗）。"
+    }
+  ]
+}

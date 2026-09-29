@@ -1365,6 +1365,18 @@ public final class TriggerInterpreter {
         // ⚠ Which is why it does not go through `statModifier`'s usual base-attribute convention (`add_percent`).
         // ? A flat `amount` is ABSOLUTE too (2026-09-29): measured, `amount: 50` on SPEED produced +5500, i.e. 50 x the target's base speed, because a
         // plain modifier is fed to `statModifier` as an `add_percent` fraction. The same reasoning the derived case already follows applies here.
+        // ⭐ A rule on DEALING_DAMAGE may say its modifier belongs to THIS hit (2026-09-29): 「对<某类目标>造成伤害时，
+        // 无视其 X% 防御力」 (relic 108/4) is a property of the instance, not of the wearer -- and `Battle` fires
+        // DEALING_DAMAGE (2539) before it settles the defence zone (2551), so a rule really can still change it.
+        // Opt-in (`instance: true`) because seven shipped rules already use MODIFY_ATTR on that event.
+        if (Boolean.TRUE.equals(effect.getInstance()) && ctx.damage() != null) {
+            if (attribute == AttributeType.DEFENCE_IGNORE) {
+                ctx.damage().addDefenceIgnore(effect.getPercent() == null ? 0 : effect.getPercent());
+                return;
+            }
+            throw new IllegalStateException("Op MODIFY_ATTR with instance=true supports DEFENCE_IGNORE on "
+                    + "DEALING_DAMAGE; " + attribute + " has no instance-level slot yet");
+        }
         boolean derived = (effect.getScale() != null && !effect.getScale().isBlank()) || effect.getPercent() == null;
         // ? A plain modifier is a share OR a flat value (2026-09-29): `amount` alone means "raise the attribute by this many points", which the
         // validator enforces as exactly one of the two.

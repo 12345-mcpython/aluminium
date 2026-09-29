@@ -405,8 +405,25 @@ public class Damage {
      * @param defenderDefence defender's DEF
      * @param defenceIgnore   DEF-ignore ratio, clamped to [0,1]
      */
+    /** Extra DEF-ignore carried by THIS hit, added by a rule firing on {@code DEALING_DAMAGE} (2026-09-29). */
+    private double extraDefenceIgnore = 0;
+
+    /**
+     * Adds to the DEF-ignore this instance carries: 「对<某类目标>造成伤害时无视其 X% 防御力」 is a property of this hit,
+     * not of the wearer. `Battle` fires `DEALING_DAMAGE` before it settles the defence zone, so this is read in time.
+     */
+    public Damage addDefenceIgnore(double value) {
+        this.extraDefenceIgnore += value;
+        return this;
+    }
+
+    /** The DEF-ignore this instance carries beyond the attacker's attribute, as a fraction. */
+    public double getDefenceIgnore() {
+        return this.extraDefenceIgnore;
+    }
+
     public Damage defence(int attackerLevel, double defenderDefence, double defenceIgnore) {
-        defenceArea().set(attackerLevel, defenderDefence, defenceIgnore);
+        defenceArea().set(attackerLevel, defenderDefence, defenceIgnore + extraDefenceIgnore);
         return this;
     }
 
