@@ -2450,17 +2450,24 @@ public final class TriggerInterpreter {
     private static void addStack(Battle battle, EffectSpec effect, TriggerContext ctx) {
         int cap = effect.stackCap() == null ? 1 : effect.stackCap();
         String name = effect.getBuff().trim();
+        // ⚠ How many marks this application carries (2026-09-29): 「立即获得15层【当品】」 (1314 翡翠's technique) grants
+        // FIFTEEN at once, and `amount` used to be ignored, so it granted one. The readers are the 「获得 N 层」 family --
+        // 1314 alone states 5 (its talent's follow-up), 15 (its technique), 1 and 3 (its traces). One application still
+        // means one mark unless it says otherwise, so no existing file changes.
+        int wanted = effect.getAmount() == null ? 1 : Math.max(1, effect.getAmount().intValue());
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            if (target.getBuffManager().stacksOf(name) >= cap) {
-                continue;                       // 「2 次」 is a threshold, not an invitation to keep counting
+            for (int i = 0; i < wanted; i++) {
+                if (target.getBuffManager().stacksOf(name) >= cap) {
+                    break;                      // 「2 次」 is a threshold, not an invitation to keep counting
+                }
+                boolean permanent = unticked(effect);
+                AbstractBuff stack = new com.laosun.aluminium.models.buff.StackBuff(
+                        name, permanent ? 1 : effect.getTurns(), permanent, cap);
+                stack = withLifetime(stack, effect);
+                stack = withTickOwner(stack, effect, ctx);
+                stack = withSource(stack, ctx);
+                target.getBuffManager().addBuff(stack);
             }
-            boolean permanent = unticked(effect);
-            AbstractBuff stack = new com.laosun.aluminium.models.buff.StackBuff(
-                    name, permanent ? 1 : effect.getTurns(), permanent, cap);
-            stack = withLifetime(stack, effect);
-            stack = withTickOwner(stack, effect, ctx);
-            stack = withSource(stack, ctx);
-            target.getBuffManager().addBuff(stack);
         }
     }
 

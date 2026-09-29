@@ -15,5 +15,56 @@
     ],
     "source": "1314 翡翠 星魂 4 真诚？唯凭认沽: 「施放终结技时，使翡翠造成的伤害无视敌方目标#1[i]%的防御力，持续#2[i]回合。」 param = [0.12, 3]",
     "note": "The wearer's damage ignores 12% of the target's DEF for 3 turns, so the effect belongs to HER, not to the target -- hence no `target` selector (absent means self, and 使翡翠造成的伤害 is a fact about the damage she deals). DEFENCE_IGNORE is a ratio attribute, so MODIFY_ATTR adds a flat 0.12 there (0.12 means 12%), and Battle.assemble hands the attacker's total to the defence zone. ⚠ This is the FIRST user of that attribute in the whole shipped content: it was read by the pipeline and its arithmetic was tested, but no rule file had ever granted it, so the path 'rule -> attribute -> defence zone' had never run end to end. That is what DefenceIgnoreTest now covers. It is also the second Eidolon-gated rule (after Bronya's), which is why min_eidolon: 4 sits next to the mechanic."
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "trace_reverse_repo_one_goods",
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "当品",
+        "amount": 1,
+        "max_stacks": 50,
+        "permanent": true,
+        "target": "self"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "CRIT_ATTACK",
+        "scale": "self_stacks:当品",
+        "percent": 0.024,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1314 翡翠 行迹 逆回购: 「在敌方目标进入战斗时，翡翠获得1层【当品】」＋ 天赋「每层【当品】使暴击伤害提高2.40%，最多叠加50层」",
+    "note": "「在敌方目标**进入战斗时**，翡翠获得 **1** 层【当品】」✓ ⇒ `BATTLE_START` ⇒ `ADD_STACK` ✓（`max_stacks: 50` ✓ = 文档的「最多叠加 50 层」✓，`permanent` ✓ 因为没有到期条件 ✓）。⚠ **同一条规则里第 2 个效果**是「**每层**【当品】使**暴击伤害提高 2.40%**」✓ ⇒ `MODIFY_ATTR CRIT_ATTACK scale: self_stacks:当品 percent: 0.024` ✓ —— **放在加层之后** ✓ ⇒ 读到的层数**包含刚加的这些** ✓；⭐ 这里用**按层缩放**是对的 ✓，因为 `CRIT_ATTACK` 是**比率型**属性 ✓（第 20/270 轮量出的边界 ✓）；⚠ 值 = `0.024 × 层数` ✓，且**本条自身不可叠** ✓ ⇒ 不会把层数平方 ✓。⚠ **登记（同文件）**：① 行迹「**绝当品**：天赋中**每层**【当品】额外使翡翠的**攻击力提高 0.50%**」✗ —— `ATTACK` 是**平值属性** ✓，而「**基数的份额 × 层数**」**引擎没有这个拼法** ✗：派生算式给的是**绝对值** ✓（`0.005 × 层数` ✗），而 plain 修饰只给**一层**的份额 ✓；\"每层一份\"要求层数**一次来一层** ✓，而本条的计数器会**一次来 15 层** ✗ ⇒ 精确登记 ✓（这是第 20/270 轮边界结论的新实例 ✓）；② 天赋「发动**天赋的追加攻击**时立即获得 5 层」✗（需要追加攻击自己的触发条件 ✗）；③ 星魂 2「叠加至 **15** 层时暴击率提高 18%」✓ —— 形状**可写** ✓（`self_stacks:当品 >= 15` ✓），与其它星魂一并处理 ✓；④ 行迹「处于【收债人】状态的角色**回合开始时**额外获得 3 层」✗（【收债人】未出货 ✗）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "technique_fifteen_goods",
+    "when": [
+      "self has_state 秘技"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "当品",
+        "amount": 15,
+        "max_stacks": 50,
+        "permanent": true,
+        "target": "self"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "CRIT_ATTACK",
+        "scale": "self_stacks:当品",
+        "percent": 0.024,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1314 翡翠 秘技 猎手的视界: 「进入战斗后…立即获得15层【当品】」（param = [10, 0.5, 15] ⇒ 15 层 ✓）＋ 天赋「每层【当品】使暴击伤害提高2.40%」",
+    "note": "「进入战斗后…**立即获得 15 层【当品】**」✓ ⇒ `BATTLE_START` + `self has_state 秘技` ✓（参数行 **`[10, 0.5, 15]`** 里的 **15** 与之吻合 ✓；`10` 是伤害段数、`0.5` 是伤害份额 ✓）。⚠ 同样在**加层之后**重算一次暴击伤害 ✓ ⇒ 与逆回购那条**先后**决定最终值 ✓（两条都是 `permanent` 同名 ❌ 不具名 ✓ ⇒ **后者替换前者** ✓ ⇒ 结果是\"当前层数 × 2.4%\" ✓）。⚠ **登记（同文件）**：① 行迹「**绝当品**：天赋中**每层**【当品】额外使翡翠的**攻击力提高 0.50%**」✗ —— `ATTACK` 是**平值属性** ✓，而「**基数的份额 × 层数**」**引擎没有这个拼法** ✗：派生算式给的是**绝对值** ✓（`0.005 × 层数` ✗），而 plain 修饰只给**一层**的份额 ✓；\"每层一份\"要求层数**一次来一层** ✓，而本条的计数器会**一次来 15 层** ✗ ⇒ 精确登记 ✓（这是第 20/270 轮边界结论的新实例 ✓）；② 天赋「发动**天赋的追加攻击**时立即获得 5 层」✗（需要追加攻击自己的触发条件 ✗）；③ 星魂 2「叠加至 **15** 层时暴击率提高 18%」✓ —— 形状**可写** ✓（`self_stacks:当品 >= 15` ✓），与其它星魂一并处理 ✓；④ 行迹「处于【收债人】状态的角色**回合开始时**额外获得 3 层」✗（【收债人】未出货 ✗）。"
   }
 ]
