@@ -132,7 +132,7 @@ public class RelicTriggerTableTest {
      * A set with a registered ability and <b>no</b> rule file — used by the "nothing to merge" case, which must
      * therefore pick a set that is still unwritten (102 was that set until it was authored on 2026-09-28).
      */
-    private static final int NO_RULE_SET = 125;
+    private static final int NO_RULE_SET = 112;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -216,6 +216,9 @@ public class RelicTriggerTableTest {
             // Authored on 2026-09-29 (round 95) once `ally_count` existed and it was measured
             // that SUMMONED fires from a settle, so the memosprite half works.
             "321/2",
+            // Authored on 2026-09-29 (round 97): `actor is_ally` covers the wearer AND their
+            // memosprite, and `per_turn` supplies 「每回合最多触发1次」.
+            "125/4",
             // Authored on 2026-09-27 once a derived value could read MAX ENERGY
             // (`self_max_energy`, both as a condition and as a scale).
             "328/2",
@@ -249,7 +252,7 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
      * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 21;
+    private static final int STILL_REGISTERED = 20;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
