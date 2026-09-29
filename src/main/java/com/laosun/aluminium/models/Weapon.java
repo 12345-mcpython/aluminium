@@ -32,6 +32,14 @@ public class Weapon implements Cloneable {
      * It was already in hand at construction and simply not kept.
      */
     private int wid;
+
+    /**
+     * The light cone's <b>superimposition rank</b> (1..5), which selects the skill row whose values apply (2026-09-29).
+     *
+     * <p>⚠ Before this the engine always read the FIRST row — i.e. it modelled rank 1 without saying so. The default stays
+     * 1, so every existing caller behaves exactly as before; a caller that knows the wearer's rank can now say it.
+     */
+    private int rank = 1;
     private Translate name;
     /**
      * Skill description text.
@@ -67,18 +75,24 @@ public class Weapon implements Cloneable {
      * @return the constructed weapon
      * @throws RuntimeException if the weapon ID is not found
      */
-    public static Weapon build(int wid, int level, boolean isPromote) {
+    public static Weapon build(int wid, int level, boolean isPromote, int rank) {
         WeaponData wp = Constant.WEAPONS.get(wid);
         List<WeaponAttribute> weaponAttribute = new ArrayList<>();
         if (wp == null) {
             throw new RuntimeException("Weapon not found!");
         }
-        for (WeaponData.SkillData.AbilityProperty p : wp.weaponSkillData().getFirst().abilityProperties()) {
+        // ⚠ By RANK, not always the first row (2026-09-29): the rows are the five superimposition ranks, and taking
+        // `getFirst()` silently modelled rank 1 for every light cone in the game.
+        WeaponData.SkillData row = wp.weaponSkillData().stream()
+                .filter(candidate -> candidate.level() == rank)
+                .findFirst()
+                .orElseGet(() -> wp.weaponSkillData().getFirst());
+        for (WeaponData.SkillData.AbilityProperty p : row.abilityProperties()) {
             weaponAttribute.add(new WeaponAttribute(AttributeType.fromString(p.attribute()), p.value()));
         }
 
         double rate = LevelPromotionCalc.calcWeaponRate(level, isPromote);
-        return new Weapon(wid, wp.name(), "", wp.health() * rate,
+        return new Weapon(wid, rank, wp.name(), "", wp.health() * rate,
                 wp.attack() * rate,
                 wp.defence() * rate,
                 wp.type(), weaponAttribute);
@@ -91,8 +105,12 @@ public class Weapon implements Cloneable {
      * @param level weapon level (1-80)
      * @return the constructed weapon
      */
+    public static Weapon build(int wid, int level, boolean isPromote) {
+        return build(wid, level, isPromote, 1);
+    }
+
     public static Weapon build(int wid, int level) {
-        return build(wid, level, false);
+        return build(wid, level, false, 1);
     }
 
     /**
