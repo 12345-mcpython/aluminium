@@ -1,0 +1,152 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21007_healing",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 使装备者的治疗量提高#1[i]%，并在施放战技时为我方全体恢复#2[f1]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21007_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 2.0,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21007_healing",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.125,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 使装备者的治疗量提高#1[i]%，并在施放战技时为我方全体恢复#2[f1]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21007_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 2.5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21007_healing",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 使装备者的治疗量提高#1[i]%，并在施放战技时为我方全体恢复#2[f1]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21007_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 3.0,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21007_healing",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.175,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 使装备者的治疗量提高#1[i]%，并在施放战技时为我方全体恢复#2[f1]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21007_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 3.5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21007_healing",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 使装备者的治疗量提高#1[i]%，并在施放战技时为我方全体恢复#2[f1]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21007_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 4.0,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+    }
+  ]
+}
