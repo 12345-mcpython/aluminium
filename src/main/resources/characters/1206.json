@@ -100,5 +100,42 @@
     ],
     "source": "1206 素裳 秘技 云骑剑经•叩阵 (120607, Maze/MazeAttack): 「立即攻击敌人，进入战斗后对敌方全体造成等同于素裳80%攻击力的物理属性伤害。」",
     "note": "「使用秘技后…进入战斗后对敌方全体造成等同于素裳 **80% 攻击力**的物理属性伤害」—— ① 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；② 伤害用 **`DAMAGE` 的字面倍率形态** ✓ —— 第 186 轮新加 ✓：`DAMAGE` 原本**必须**指定技能槽位 ✗（倍率只能取自技能数据行 ✗），而 80% 不是任何一行的倍率 ✓ ⇒ 现在可以只写 `scale: self_attr:ATTACK` + `percent` + `element` ✓（引擎用**已有的**刻度读取器取值 ✓；因为\"无技能可借元素\"，校验器**要求写明 element** ✓）；③ 目标 `all_enemies` ✓。⚠ 这是\"任意倍率伤害\"这一大类句子的**第一个出货读者** ✓（实测：天赋类 53 份、星魂类 15 份 ✓）。"
+  },
+  {
+    "on": "HP_LOST",
+    "id": "trace_low_hp_aggro_down",
+    "when": [
+      "target == self",
+      "hp_percent <= 0.5"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "AGGRO_ADDED_RATIO",
+        "percent": -0.5,
+        "permanent": true,
+        "buff": "赤子",
+        "target": "self"
+      }
+    ],
+    "source": "1206 行迹 赤子 (1206101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）",
+    "note": "「若当前生命值百分比**小于等于 50%**，则被敌方目标攻击的概率**降低**」—— ⭐ **一句话，两位角色同形**，数值与门槛都在上游 ✓。① `ExcelOutput/AvatarSkillTreeConfig.json` 该点（`PointID 1206101`、`PointTriggerKey PointB1`）的 `ParamList = [{\"Value\": 0.5}, {\"Value\": 0.5}]` ✓：第一个 0.5 是文档点名的**门槛** ✓、第二个是**比率** ✓（两个值相等 ⇒ 顺序之争不影响数字 ✓，这一点如实写明 ✓）。② 上游挂的是 `MAvatar_Sushang_00_SkillTree_AggroDown` （扫描 Config/ConfigAbility/Avatar 得到，见 build/aggro_scan.txt），它写的属性是 **`AggroAddedRatio`** ✓，而全局 `M_SkillTree_AggroDown` 把它写成 **0 − 参数** ✓ ⇒ 值 = **−0.5** ⇒ 引擎读作 `权重 × (1 + (−0.5))` = **×0.5** ✓。③ ⭐ **触发时机是查出来的，不是猜的**：丹恒的 `MAvatar_DanHeng_00_LowHP_AggroDown` 在 **`OnStack` 与 `OnHPChange`** 两个回调上都挂了同一个 `ByCompareHPRatio` **LessEqual** 谓词 ✓ ⇒ 游戏是**只要生命值变化就重判** ✓；引擎里与它等价的是 **`HP_LOST`（掉到门槛下就挂）+ `HEALED`（回到门槛上就摘）** 这一对 ✓ —— 因为生命值只可能通过这两件事改变 ✓，所以这不是近似，而是同一次重判 ✓。④ 因此**两条规则**：挂（`MODIFY_ATTR` + 具名 `buff: 赤子` + `permanent`）与摘（`REMOVE_STATE` 同名的 `buff`）✓。⚠ 具名是必要的：`REMOVE_STATE` 按**名字**摘 ✓；不带名字的修饰摘不掉 ✗。⚠ 重复挂不会叠加 ✓（同名 buff 上限 1 ✓，测试里专门用\"再掉一次血\"钉住这一点 ✓）。⚠ **登记的两处差异**：① 若生命值**不经治疗**而回到门槛之上（例如生命上限被提高 ✗），这条摘除规则不会触发 ✗；② 战斗开始时若已低于 50%（这三位都不会 ✗，他们不消耗自身生命 ✗）⇒ 也不会挂上 ✗。"
+  },
+  {
+    "on": "HEALED",
+    "id": "trace_low_hp_aggro_down_cleanup",
+    "when": [
+      "target == self",
+      "hp_percent > 0.5"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STATE",
+        "buff": "赤子",
+        "target": "self"
+      }
+    ],
+    "source": "1206 行迹 赤子 (1206101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）（回到门槛之上的收尾，由 ③ 的 OnHPChange 重判推出）",
+    "note": "上一条规则的收尾 ✓：`REMOVE_STATE` 按**名字**摘掉 `赤子` 那个具名修饰 ✓，`target: self` 因为修饰挂在自己身上 ✓。⚠ 条件是 `hp_percent > 0.5` ✓（`hp_percent` 读的是**规则主人自己**的生命值 ✓，是分数 0–1 ⇒ 写 `0.5` 而不是 `50` ✓）；⚠ 摘一个不存在的东西**不是错误** ✓（每次治疗都会触发这条 ✓）。"
   }
 ]

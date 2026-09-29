@@ -1,7 +1,9 @@
 [
   {
     "on": "KILL",
-    "when": ["actor == self"],
+    "when": [
+      "actor == self"
+    ],
     "do": [
       {
         "op": "EXTRA_TURN"
@@ -9,5 +11,42 @@
     ],
     "source": "1102 希儿 talent 再现 (Resurgence)",
     "note": "Doc: 「消灭敌方目标后，希儿立即获得1个额外回合。」 Modelled with the existing EXTRA_TURN op -- no new engine capability needed, only the KILL event plus the 'actor == self' condition (the killer is me). The talent slot's own data is Enhance/Unknown with stance 0, i.e. it carries no attack, which is exactly why this rule grants a turn instead of dealing damage."
+  },
+  {
+    "on": "HP_LOST",
+    "id": "trace_low_hp_aggro_down",
+    "when": [
+      "target == self",
+      "hp_percent <= 0.5"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "AGGRO_ADDED_RATIO",
+        "percent": -0.5,
+        "permanent": true,
+        "buff": "夜行",
+        "target": "self"
+      }
+    ],
+    "source": "1102 行迹 夜行 (1102101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）",
+    "note": "「若当前生命值百分比**小于等于 50%**，则被敌方目标攻击的概率**降低**」—— ⭐ **一句话，两位角色同形**，数值与门槛都在上游 ✓。① `ExcelOutput/AvatarSkillTreeConfig.json` 该点（`PointID 1102101`、`PointTriggerKey PointB1`）的 `ParamList = [{\"Value\": 0.5}, {\"Value\": 0.5}]` ✓：第一个 0.5 是文档点名的**门槛** ✓、第二个是**比率** ✓（两个值相等 ⇒ 顺序之争不影响数字 ✓，这一点如实写明 ✓）。② 上游挂的是 `MAvatar_Seele_00_SkillTree_AggroDown` （其能力文件 Avatar_Seele_SkillTree01 写在 Avatar_Seele_00_Ability.json 里），它写的属性是 **`AggroAddedRatio`** ✓，而全局 `M_SkillTree_AggroDown` 把它写成 **0 − 参数** ✓ ⇒ 值 = **−0.5** ⇒ 引擎读作 `权重 × (1 + (−0.5))` = **×0.5** ✓。③ ⭐ **触发时机是查出来的，不是猜的**：丹恒的 `MAvatar_DanHeng_00_LowHP_AggroDown` 在 **`OnStack` 与 `OnHPChange`** 两个回调上都挂了同一个 `ByCompareHPRatio` **LessEqual** 谓词 ✓ ⇒ 游戏是**只要生命值变化就重判** ✓；引擎里与它等价的是 **`HP_LOST`（掉到门槛下就挂）+ `HEALED`（回到门槛上就摘）** 这一对 ✓ —— 因为生命值只可能通过这两件事改变 ✓，所以这不是近似，而是同一次重判 ✓。④ 因此**两条规则**：挂（`MODIFY_ATTR` + 具名 `buff: 夜行` + `permanent`）与摘（`REMOVE_STATE` 同名的 `buff`）✓。⚠ 具名是必要的：`REMOVE_STATE` 按**名字**摘 ✓；不带名字的修饰摘不掉 ✗。⚠ 重复挂不会叠加 ✓（同名 buff 上限 1 ✓，测试里专门用\"再掉一次血\"钉住这一点 ✓）。⚠ **登记的两处差异**：① 若生命值**不经治疗**而回到门槛之上（例如生命上限被提高 ✗），这条摘除规则不会触发 ✗；② 战斗开始时若已低于 50%（这三位都不会 ✗，他们不消耗自身生命 ✗）⇒ 也不会挂上 ✗。"
+  },
+  {
+    "on": "HEALED",
+    "id": "trace_low_hp_aggro_down_cleanup",
+    "when": [
+      "target == self",
+      "hp_percent > 0.5"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STATE",
+        "buff": "夜行",
+        "target": "self"
+      }
+    ],
+    "source": "1102 行迹 夜行 (1102101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）（回到门槛之上的收尾，由 ③ 的 OnHPChange 重判推出）",
+    "note": "上一条规则的收尾 ✓：`REMOVE_STATE` 按**名字**摘掉 `夜行` 那个具名修饰 ✓，`target: self` 因为修饰挂在自己身上 ✓。⚠ 条件是 `hp_percent > 0.5` ✓（`hp_percent` 读的是**规则主人自己**的生命值 ✓，是分数 0–1 ⇒ 写 `0.5` 而不是 `50` ✓）；⚠ 摘一个不存在的东西**不是错误** ✓（每次治疗都会触发这条 ✓）。"
   }
 ]
