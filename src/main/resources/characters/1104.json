@@ -40,6 +40,21 @@
     "note": "「为我方**全体**提供能够抵消等同于杰帕德 **45% 防御力 + 600** 伤害的护盾，持续 3 回合」—— 份额+常数（`scale: owner_def` + `percent` + `amount`），与 1001 的护盾同形 ✓。⚠ 是**杰帕德**的防御力（规则主人 ✓），不是受盾者的。⚠ 「我方全体」= `all_allies` ✓。"
   },
   {
+    "on": "BATTLE_START",
+    "id": "trace_steadfast_aggro",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "AGGRO_ADDED_RATIO",
+        "percent": 3,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1104 杰帕德 行迹 刚正 (1104101, Avatar_Gepard_SkillTree01): 「杰帕德被敌方攻击的概率提高。」上游数值：AvatarSkillTreeConfig 该点 ParamList = [{\"Value\": 3}]；该能力挂全局 modifier M_SkillTree_AggroUp，其 StackProperty 把 AggroAddedRatio 写成 **+参数** ⇒ 比率 +3（权重 ×4）",
+    "note": "「杰帕德被敌方攻击的概率**提高**」—— 文档**没有**给数值，但数值在上游，不需要近似 ✓。① `ExcelOutput/AvatarSkillTreeConfig.json` 的这一行（`PointID 1104101`、`PointTriggerKey PointB1`、`AbilityName Avatar_Gepard_SkillTree01`）带 `ParamList = [{\"Value\": 3}]` ✓；② `Config/ConfigAbility/Avatar/Avatar_Gepard_00_Ability.json` 里 `Avatar_Gepard_SkillTree01` 把**全局** modifier `M_SkillTree_AggroUp` 挂到自身（override `MDF_PropertyValue` 动态）✓，而 `Config/ConfigGlobalModifier/GlobalModifier_Avatar.json` 里该 modifier 的 `StackProperty` 写属性 **`AggroAddedRatio`**、操作码是\"**+参数**\"（`AQAR`、无 `FixedValues`）✓ ⇒ 值 = 该参数 = **3** ⇒ 引擎读作 `权重 × (1 + 3)` = **×4** ✓（她是存护，基础权重 150 ⇒ 600 ✓）。⭐ **方法自检（值得记一笔）**：同一张表里 `PointID 1104103`「战意」的 `ParamList` 是 `[0.35]`，而文档把「战意」渲染成「防御力提高 **35%**」✓ —— 参数与正文对得上，说明\"用这一行找数值\"这条路是对的 ✓。⚠ **符号约定**：`M_SkillTree_AggroDown` 的操作码是 `AAABAAMR` + `FixedValues [0]`，即\"**0 − 参数**\" ✓ ⇒ 「概率降低」在数据里就是**负比率** ✓，与 `Battle.aggroOf` 的\"权重 ×(1+ratio)\"一致 ✓（并因此需要那条`1 + ratio <= 0` 时保留原权重的护栏 ✓）。⚠ 行迹按**已解锁**处理（与 1001 的行迹 冰咒/纯洁 同一约定 ✓），因此这条是 `BATTLE_START` + `permanent` ✓。"
+  },
+  {
     "on": "TURN_START",
     "id": "trace_battle_will",
     "when": [
@@ -83,7 +98,7 @@
       }
     ],
     "source": "1104 杰帕德 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（战技 200% + 冻结 65% + 附加 60%、终结技 45%防御力+600）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **尚未分类（逐条登记）**：① 天赋「受到致命攻击时不会陷入无法战斗状态，并立即回复等同于自身生命上限50%的生命值。该效果单场战斗中只能触发1次」—— 缺**致命一击**这个可观测（`DEALING_DAMAGE` 只能看到「造成伤害」，看不到「这一击本来会致死」 ✗）；② 秘技「下一次战斗开始时为我方全体提供 24%防御力+150 的护盾，持续 2 回合」—— 缺**「用过秘技」**这个门槛（`BATTLE_START` 无条件写出就会**永远**给盾 ✗ 那是近似，故不写）；③ 星魂 1「施放战技时冻结的基础概率提高 35%」⇒ 已确认写法为 `MODIFY_RULE rule skill_daunting_smite percent 0.35` + 星魂门槛（门槛字段待读，下一轮照 1001 的写法补 ✓）；④ 星魂 2「冻结解除后目标速度降低 20%」—— 缺**控制解除**这个可观测；⑤ 星魂 3/5（技能等级 +2/+1）⇒ `RAISE_SKILL_LEVEL` + 星魂门槛即可；⑥ 星魂 4「杰帕德在场时我方全体效果抵抗提高 20%」⇒ `MODIFY_ATTR EFFECT_RESISTANCE percent 0.2 target all_allies` + 门槛；⑦ 星魂 6「触发天赋时立即行动，且回复量额外增加 50% 生命上限」—— 依赖 ①；⑧ 行迹「刚正：被敌方攻击的概率提高」—— 软嘲讽，**文档无任何数值**（与 1001 同族）；⑨ 行迹的静态数值（冰属性伤害提高 3.2%/4.8%/6.4%、效果抵抗 4%/6%/8%、防御力 5%/7.5%）—— 引擎有对应属性名，但本文件未写（待确认项目对「永久被动数值」的统一写法后一次补上，避免各角色各写一套 ✗）。"
+    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **尚未分类（逐条登记）**：① 天赋「受到致命攻击时不会陷入无法战斗状态，并立即回复等同于自身生命上限50%的生命值。该效果单场战斗中只能触发1次」—— 缺**致命一击**这个可观测（`DEALING_DAMAGE` 只能看到「造成伤害」，看不到「这一击本来会致死」 ✗）；② 秘技「下一次战斗开始时为我方全体提供 24%防御力+150 的护盾，持续 2 回合」—— 缺**「用过秘技」**这个门槛（`BATTLE_START` 无条件写出就会**永远**给盾 ✗ 那是近似，故不写）；③ 星魂 1「施放战技时冻结的基础概率提高 35%」⇒ 已确认写法为 `MODIFY_RULE rule skill_daunting_smite percent 0.35` + 星魂门槛（门槛字段待读，下一轮照 1001 的写法补 ✓）；④ 星魂 2「冻结解除后目标速度降低 20%」—— 缺**控制解除**这个可观测；⑤ 星魂 3/5（技能等级 +2/+1）⇒ `RAISE_SKILL_LEVEL` + 星魂门槛即可；⑥ 星魂 4「杰帕德在场时我方全体效果抵抗提高 20%」⇒ `MODIFY_ATTR EFFECT_RESISTANCE percent 0.2 target all_allies` + 门槛；⑦ 星魂 6「触发天赋时立即行动，且回复量额外增加 50% 生命上限」—— 依赖 ①；⑧ 行迹「刚正：被敌方攻击的概率提高」✅ **已出货（2026-09-29）** —— 数值在上游 `AvatarSkillTreeConfig` 该点（`PointID 1104101` / `AbilityName Avatar_Gepard_SkillTree01`）的 `ParamList = [3]` 里，该能力挂的全局 modifier `M_SkillTree_AggroUp` 把 `AggroAddedRatio` 写成 **+参数** ⇒ 比率 **+3（权重 ×4）** ✓；同表 `1104103`「战意」的 `[0.35]` 与文档的 **35%** 互相印证 ✓ ⇒ 见 `trace_steadfast_aggro` 规则；⑨ 行迹的静态数值（冰属性伤害提高 3.2%/4.8%/6.4%、效果抵抗 4%/6%/8%、防御力 5%/7.5%）—— 引擎有对应属性名，但本文件未写（待确认项目对「永久被动数值」的统一写法后一次补上，避免各角色各写一套 ✗）。"
   },
   {
     "on": "BATTLE_START",

@@ -76,8 +76,34 @@ public class GepardKitTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the freeze with its payload");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TURN_START), "the trace, refreshed each turn");
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the four eidolon rules (E1/E3/E4/E5) and the technique shield (round 180)");
+        Assertions.assertEquals(7, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the four eidolon rules (E1/E3/E4/E5), the technique shield (round 180) and "
+                        + "the 刚正 trace's aggro ratio (2026-09-29)");
+    }
+
+    /**
+     * 行迹「刚正」: 「杰帕德被敌方攻击的概率提高」 — the number is upstream, not in the prose.
+     *
+     * <p>{@code AvatarSkillTreeConfig}'s row for point 1104101 carries {@code ParamList = [3]} and the ability it names
+     * attaches {@code M_SkillTree_AggroUp}, which writes {@code AggroAddedRatio} as <b>+parameter</b>; so his weight
+     * becomes ×(1 + 3) = <b>×4</b>. The sibling trace 「战意」 is the method's own check: its row says 0.35 and the
+     * document renders it as 「防御力提高 35%」.
+     */
+    @Test
+    public void hisTraceRaisesHisOwnAggroWeight() {
+        Character gepard = CharacterFactory.create(GEPARD, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Battle battle = new Battle(List.of(gepard, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+                new Random(0));
+        double before = battle.aggroOf(gepard);
+
+        battle.startBattle();
+
+        Assertions.assertEquals(4.0, battle.aggroOf(gepard) / before, 1e-9,
+                "\u300c\u5091\u5e15\u5fb7\u88ab\u654c\u65b9\u653b\u51fb\u7684\u6982\u7387\u63d0\u9ad8\u300d "
+                        + "-- ParamList [3] reads as weight x (1 + 3)");
+        Assertions.assertTrue(battle.aggroOf(gepard) > battle.aggroOf(ally),
+                "and he now outweighs a plain ally, which is the whole point of the trace");
     }
 
     // ==================================================================
