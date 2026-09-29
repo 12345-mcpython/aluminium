@@ -88,7 +88,7 @@ public final class Memosprites {
             if (CACHE.containsKey(ownerCid)) {
                 return CACHE.get(ownerCid);
             }
-            MemospriteSpec loaded = load(ownerCid);
+            MemospriteSpec loaded = load(ownerCid, dir);
             CACHE.put(ownerCid, loaded);
             return loaded;
         }
@@ -333,6 +333,37 @@ public final class Memosprites {
 
     private static MemospriteSpec load(int ownerCid) {
         String path = resourceFor(ownerCid);
+        if (path == null) {
+            return null;                        // no memosprite: an ordinary state
+        }
+        try (InputStream stream = Memosprites.class.getResourceAsStream(path)) {
+            if (stream == null) {
+                return null;
+            }
+            synchronized (CACHE) {
+                loadCount++;
+            }
+            MemospriteSpec spec;
+            try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                spec = GSON.fromJson(reader, MemospriteSpec.class);
+            }
+            if (spec == null) {
+                throw new IllegalStateException(
+                        "Memosprite file " + path + " parsed to null (an empty file?): a file that exists "
+                                + "must describe a memosprite");
+            }
+            return validate(spec, path);
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("Failed to read memosprite spec for cid " + ownerCid, e);
+        } catch (RuntimeException e) {
+            throw new IllegalStateException(
+                    "Invalid memosprite spec for cid " + ownerCid + " (" + path + "): " + e.getMessage(), e);
+        }
+    }
+
+    /** The same load against a named directory (「侍从」 vs 「忆灵」). */
+    private static MemospriteSpec load(int ownerCid, String dir) {
+        String path = resourceFor(ownerCid, dir);
         if (path == null) {
             return null;                        // no memosprite: an ordinary state
         }
