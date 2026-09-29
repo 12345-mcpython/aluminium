@@ -5,6 +5,7 @@ import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.data.RelicTriggerTables;
+import com.laosun.aluminium.data.WeaponTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
@@ -182,6 +183,11 @@ public final class CharacterFactory {
         // file get the empty table, which is the normal state for the ones not data-ised yet.
         // Worn relic sets contribute their own rules on top (see `effectiveTriggerTable`).
         TriggerTable table = effectiveTriggerTable(cid, relicSuit);
+        // A light cone's own abilities are rules of the same kind (see WeaponTriggerTables), so they merge here, at the
+        // same assembly point as a relic set's -- one line, because the create method already receives the Weapon.
+        if (weapon != null && WeaponTriggerTables.has(weapon.getWid())) {
+            table = table.plus(WeaponTriggerTables.of(weapon.getWid()));
+        }
         builder = builder.triggerTable(table);
         Character character = builder.build();
         // P8-8: the resources this character declares (「充能，上限3点」). Registered **after** the build
