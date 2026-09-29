@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20000_crit_chance",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20000 锋镝: 战斗开始时，使装备者的暴击率提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 1 档 ⇒ `skill_value = [0.12, 3.0]` ✓（**不是从正文抄** ✓）。⚠ 比率型属性 ⇒ `percent` 收**绝对加值** ✓（第 97/270 轮）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20000_crit_chance",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.15,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20000 锋镝: 战斗开始时，使装备者的暴击率提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 2 档 ⇒ `skill_value = [0.15, 3.0]` ✓（**不是从正文抄** ✓）。⚠ 比率型属性 ⇒ `percent` 收**绝对加值** ✓（第 97/270 轮）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20000_crit_chance",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.18,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20000 锋镝: 战斗开始时，使装备者的暴击率提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 3 档 ⇒ `skill_value = [0.18, 3.0]` ✓（**不是从正文抄** ✓）。⚠ 比率型属性 ⇒ `percent` 收**绝对加值** ✓（第 97/270 轮）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20000_crit_chance",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.21,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20000 锋镝: 战斗开始时，使装备者的暴击率提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 4 档 ⇒ `skill_value = [0.21, 3.0]` ✓（**不是从正文抄** ✓）。⚠ 比率型属性 ⇒ `percent` 收**绝对加值** ✓（第 97/270 轮）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20000_crit_chance",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.24,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20000 锋镝: 战斗开始时，使装备者的暴击率提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 5 档 ⇒ `skill_value = [0.24, 3.0]` ✓（**不是从正文抄** ✓）。⚠ 比率型属性 ⇒ `percent` 收**绝对加值** ✓（第 97/270 轮）。"
+    }
+  ]
+}
