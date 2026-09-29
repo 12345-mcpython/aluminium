@@ -1,0 +1,162 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_basic_attack_damage_boost_1",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 1: 「普攻和战技造成的伤害提高20%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 20%**」—— ① 用引擎**已有的作用域加伤属性** `BASIC_ATTACK_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 1 档剩余槽 = `0.2` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_1",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 1: 「普攻和战技造成的伤害提高20%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 20%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 1 档剩余槽 = `0.2` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_basic_attack_damage_boost_2",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.25,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 2: 「普攻和战技造成的伤害提高25%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 25%**」—— ① 用引擎**已有的作用域加伤属性** `BASIC_ATTACK_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 2 档剩余槽 = `0.25` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_2",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.25,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 2: 「普攻和战技造成的伤害提高25%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 25%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 2 档剩余槽 = `0.25` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_basic_attack_damage_boost_3",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 3: 「普攻和战技造成的伤害提高30%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 30%**」—— ① 用引擎**已有的作用域加伤属性** `BASIC_ATTACK_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 3 档剩余槽 = `0.3` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_3",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 3: 「普攻和战技造成的伤害提高30%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 30%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 3 档剩余槽 = `0.3` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_basic_attack_damage_boost_4",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.35,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 4: 「普攻和战技造成的伤害提高35%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 35%**」—— ① 用引擎**已有的作用域加伤属性** `BASIC_ATTACK_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 4 档剩余槽 = `0.35` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_4",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.35,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 4: 「普攻和战技造成的伤害提高35%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 35%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 4 档剩余槽 = `0.35` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_basic_attack_damage_boost_5",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 5: 「普攻和战技造成的伤害提高40%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 40%**」—— ① 用引擎**已有的作用域加伤属性** `BASIC_ATTACK_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 5 档剩余槽 = `0.4` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_5",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 20002 (Collapsing Sky), rank 5: 「普攻和战技造成的伤害提高40%」",
+      "note": "「使装备者**普攻和战技造成的伤害提高 40%**」—— ① 用引擎**已有的作用域加伤属性** `SKILL_DAMAGE_BOOST` ✓（`Battle.assemble` 按**伤害类型/施放类别**取值 ✓）；② 幅度取自 `weapons.json` 第 5 档剩余槽 = `0.4` ✓（与文档 20/25/30/35/40% 逐档吻合 ✓）；⚠ **本文件逐档** ✓（`{\"<叠影>\": […规则…]}` ✓）。"
+    }
+  ]
+}
