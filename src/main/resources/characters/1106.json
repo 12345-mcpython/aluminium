@@ -114,5 +114,24 @@
     ],
     "source": "1106 佩拉 终结技 领域压制 (110603, Ultra/AoEAttack): 「有100%的基础概率使敌方每个单体目标陷入【通解】状态，同时对敌方全体造成等同于佩拉100%攻击力的冰属性伤害。【通解】状态下，敌方目标防御力降低40%，持续2回合。」",
     "note": "「**有 100% 的基础概率**使敌方每个单体目标陷入【通解】状态…【通解】状态下，敌方目标**防御力降低 40%**，持续 2 回合」. ⚠ The state carries `base_chance: 1.0`, and that is **not** the same as \"apply unconditionally\": it goes through the same `tryApplyDebuff` path `APPLY_DOT`/`APPLY_CONTROL` use, so **effect resistance still applies** — 「基础概率」 means the chance before resistance, and it is exactly why this spelling was added (语料 **69 处 / 24 文件**，已出货角色里就有 6 位). ⚠ The defence reduction then uses `target_when: [\"target has_state 通解\"]`: it must land only on the enemies that actually **got** the state, since the roll above can fail on one of them. ⚠ That filter is evaluated **after** the state effect ran (effects of one rule run in order), which is exactly what makes it work here — the opposite of the trap 1211's file records, where a filter that asks for the state to be ABSENT must run first. ⚠ A plain `StateBuff` reports `isDebuff() == false` and carries no `debuffClass`, so 【通解】 meets **no class resistance** — correct for a state no document calls a control or a DOT, and the honest limit of this spelling."
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "technique_defence_down",
+    "when": [
+      "self has_state 秘技"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DEFENCE",
+        "percent": -0.2,
+        "base_chance": 1.0,
+        "turns": 2,
+        "target": "all_enemies"
+      }
+    ],
+    "source": "1106 佩拉 秘技 先发制人: 「…有100%的基础概率使敌方每个单体目标防御力降低20%，持续2回合」（param = [1, 0.2, 2, 0.8] ⇒ 100% / 20% / 2 回合）",
+    "note": "「有 **100%** 的<u>基础概率</u>使敌方每个单体目标**防御力降低 20%**，持续 **2 回合**」—— ① 出处是该**秘技**的入场半句 ⇒ 门槛用**已出货**的 `self has_state 秘技` ✓（`markTechniqueUsed` ✓，1104 的秘技盾同写法 ✓）；② 参数行 **`[1, 0.2, 2, 0.8]`** 与之**逐项吻合** ✓（100% / 20% / 2 回合 ✓）；③ `DEFENCE` 是**平值属性** ✓ ⇒ 引擎里 plain `percent` 是\"**基数的份额**\" ✓ —— 本文件既有的 `ult_zone_suppression` 把「防御力降低 **40%**」写成 `DEFENCE: -0.4` ✓，本条同约定 ✓；④ **`base_chance: 1.0`** ✓（「基础概率」走命中/抵抗管线 ✓，与\"固定概率\"不同 ✗）。⚠ **登记（同文件）**：**星魂 4**「…有 X% 基础概率使敌方目标**冰属性抗性降低 12%**，持续 2 回合」✗ —— 那是**按元素**的抗性（`rawResist` 来自该敌人自己的数据表 ✓），引擎**没有按元素的抗性属性** ✗ ⇒ 不写、登记 ✓。"
   }
 ]
