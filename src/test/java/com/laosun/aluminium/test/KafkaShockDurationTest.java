@@ -13,45 +13,42 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 /**
- * 1005's shock, and the trace that lengthens it by one turn.
+ * 1005's shock and the trace that lengthens it by one turn.
  *
- * <p>Two cases, because they answer different questions: the synthetic one proves the OP (identical runs, one extension), and
- * the second runs HER rule -- her Ultimate against a synthetic DOT of the same length -- so a wrong number in her file is
- * caught rather than merely counted.
+ * <p>⚠ The monster is chosen to SURVIVE the whole window, and that is the instrument's real requirement: with a 3777-HP
+ * monster two DOTs kill it on turn three whatever their durations are, so a real one-turn extension cannot move the count --
+ * which is what made this clause look unverifiable for several rounds. The highest-HP monster in the probe range has ~990k.
  *
- * <p>⚠ Instruments that matter here: a whole turn is `beforeMove()` plus `afterMove()` (the countdown is split into an early
- * and a late pass), and the horizon is wide (HER_DOT_TURNS + 6) because round 34's six-turn window saturated, making a real
- * extension invisible and the rule look like a no-op.
+ * <p>A whole turn is `beforeMove()` plus `afterMove()` (the countdown is split into an early and a late pass), and the count
+ * is the number of the victim's turns that cost it HP, which for two DOTs of different lengths is the LONGER one.
  */
 public class KafkaShockDurationTest {
     private static final int KAFKA = 1005;
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
+    private static final int MONSTER = 1002064;
     private static final int HER_DOT_TURNS = 2;
-    private static final int HORIZON = HER_DOT_TURNS + 6;
+    private static final int HORIZON = 10;
 
     @Test
     public void anExtendedDotBurnsForOneMoreTurn() {
-        int plain = syntheticBurningTurns(HER_DOT_TURNS, false);
-        int extended = syntheticBurningTurns(HER_DOT_TURNS, true);
-        Assertions.assertEquals(plain + 1, extended,
-                "the extension adds exactly one turn: " + plain + " -> " + extended);
+        Assertions.assertEquals(HER_DOT_TURNS, syntheticBurningTurns(HER_DOT_TURNS, 0),
+                "a plain synthetic DOT burns for its own length");
+        Assertions.assertEquals(HER_DOT_TURNS + 1, syntheticBurningTurns(HER_DOT_TURNS, 1),
+                "and one turn of extension adds exactly one");
     }
 
     @Test
-    public void herOwnUltimateBurnsOneLongerThanAnIdenticalDot() {
-        int control = syntheticBurningTurns(HER_DOT_TURNS, false);
-        int hers = herBurningTurns();
-        Assertions.assertEquals(control + 1, hers,
-                "her trace lengthens her own shock by one turn: control " + control + " -> hers " + hers);
+    public void herOwnUltimateBurnsOneLongerThanAnUnlengthenedDot() {
+        Assertions.assertEquals(syntheticBurningTurns(HER_DOT_TURNS, 1), herBurningTurns(),
+                "\u89e6\u7535\u72b6\u6001\u7684\u6301\u7eed\u65f6\u95f4\u589e\u52a01\u56de\u5408 -- two turns plus the trace's one");
     }
 
-    /** Her Ultimate, then the enemy's whole turns, counting those that cost it HP. */
     private static int herBurningTurns() {
         Character kafka = CharacterFactory.create(KAFKA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -62,8 +59,7 @@ public class KafkaShockDurationTest {
         return burningTurns(battle, enemy);
     }
 
-    /** A synthetic DOT of the given length, optionally extended by one, then the same count. */
-    private static int syntheticBurningTurns(int dotTurns, boolean extended) {
+    private static int syntheticBurningTurns(int dotTurns, int extension) {
         Character applier = CharacterFactory.create(ALLY, LEVEL);
         EffectSpec dot = new EffectSpec();
         TriggerSpecs.set(dot, "op", "APPLY_DOT");
@@ -71,10 +67,13 @@ public class KafkaShockDurationTest {
         TriggerSpecs.set(dot, "amount", 100.0);
         TriggerSpecs.set(dot, "turns", dotTurns);
         TriggerSpecs.set(dot, "target", "target");
-        List<EffectSpec> effects = extended ? List.of(dot, extension()) : List.of(dot);
-        applier.setTriggerTable(new TriggerTable(9101, List.of(TriggerSpecs.rule(
+        List<EffectSpec> effects = new ArrayList<>();
+        effects.add(dot);
+        if (extension > 0) {
+            effects.add(extension(extension));
+        }
+        applier.setTriggerTable(new TriggerTable(9105, List.of(TriggerSpecs.rule(
                 TriggerEvent.ALLY_ATTACK.name(), List.of(), effects.toArray(new EffectSpec[0])))));
-
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(applier), List.of(enemy), new Random(0));
         battle.startBattle();
@@ -97,11 +96,11 @@ public class KafkaShockDurationTest {
         return burning;
     }
 
-    private static EffectSpec extension() {
+    private static EffectSpec extension(int turns) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "EXTEND_BUFF");
         TriggerSpecs.set(effect, "buff", "\u89e6\u7535");
-        TriggerSpecs.set(effect, "turns", 1);
+        TriggerSpecs.set(effect, "turns", turns);
         TriggerSpecs.set(effect, "target", "target");
         return effect;
     }
