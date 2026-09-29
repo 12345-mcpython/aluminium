@@ -1662,6 +1662,13 @@ public final class TriggerInterpreter {
             AbstractBuff zone = withSource(withLifetime(percent > 0
                     ? new VulnerabilityBuff(turns, percent, permanent, scope)
                     : new ReductionBuff(turns, -percent, permanent, scope), effect), ctx);
+            // A NAMED modifier is what REMOVE_STATE can take off (the same field MODIFY_ATTR has used since 2026-09-28;
+            // BuffManager.removeState's last loop walks every buff that carries a name). Without it a zone-scoped
+            // 「受到的伤害降低」 could only be spelled `permanent`, i.e. it would stay on for the rest of the battle --
+            // which is why 1507's 千锻魂 needs it: the reduction lasts as long as the zone's countdown, not forever.
+            if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
+                zone.setBuffName(effect.getBuff().trim());
+            }
             // 「有 100% 的基础概率使…受到的持续伤害提高 30%」 (1108 桑波): a zone may be ROLLED, through the same
             // resist pipeline APPLY_BUFF/APPLY_DOT use. ⚠ Unstated = attached directly, so no existing file changes.
             attachRolled(battle, target, zone, effect, ctx);
