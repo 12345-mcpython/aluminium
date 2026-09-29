@@ -195,7 +195,10 @@ public final class SummonFactory {
                 DamageElement.fromString(attack.element()),
                 attack.percent(),
                 attack.hits() == null ? 1 : attack.hits(),
-                DamageType.NORMAL,
+                // ⚠ `DamageType.MEMORY` is 忆灵伤害 (GLOSSARY.md), and a memosprite's own skill is exactly that -- not NORMAL.
+                // The type has been declared since the table was written (its javadoc notes only some constants are in use);
+                // labelling it here is what lets a rule scope a bonus to memosprite damage, and it is the game's own word.
+                DamageType.MEMORY,
                 SkillEffectType.fromString(attack.shape()),
                 AttributeType.fromString(attack.base()),
                 attack.stance() == null ? 0 : attack.stance());
