@@ -1,0 +1,182 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21035_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21035 何物为真: 使装备者的击破特攻提高#1[i]%。施放普攻后，装备者回复等同于#2[f1]%生命上限+#3[i]点的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST"
+      ],
+      "id": "cone21035_heal",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.02,
+          "target": "self",
+          "amount": 800.0
+        }
+      ],
+      "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。 ⚠ 「**施放普攻后**」按游戏自身的三种攻击读解 ✓ ⇒ `on_any` 覆盖战技与终结技 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21035_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21035 何物为真: 使装备者的击破特攻提高#1[i]%。施放普攻后，装备者回复等同于#2[f1]%生命上限+#3[i]点的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST"
+      ],
+      "id": "cone21035_heal",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.025,
+          "target": "self",
+          "amount": 800.0
+        }
+      ],
+      "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。 ⚠ 「**施放普攻后**」按游戏自身的三种攻击读解 ✓ ⇒ `on_any` 覆盖战技与终结技 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21035_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21035 何物为真: 使装备者的击破特攻提高#1[i]%。施放普攻后，装备者回复等同于#2[f1]%生命上限+#3[i]点的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST"
+      ],
+      "id": "cone21035_heal",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.03,
+          "target": "self",
+          "amount": 800.0
+        }
+      ],
+      "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。 ⚠ 「**施放普攻后**」按游戏自身的三种攻击读解 ✓ ⇒ `on_any` 覆盖战技与终结技 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21035_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21035 何物为真: 使装备者的击破特攻提高#1[i]%。施放普攻后，装备者回复等同于#2[f1]%生命上限+#3[i]点的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST"
+      ],
+      "id": "cone21035_heal",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.035,
+          "target": "self",
+          "amount": 800.0
+        }
+      ],
+      "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。 ⚠ 「**施放普攻后**」按游戏自身的三种攻击读解 ✓ ⇒ `on_any` 覆盖战技与终结技 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21035_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21035 何物为真: 使装备者的击破特攻提高#1[i]%。施放普攻后，装备者回复等同于#2[f1]%生命上限+#3[i]点的生命值。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST"
+      ],
+      "id": "cone21035_heal",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.04,
+          "target": "self",
+          "amount": 800.0
+        }
+      ],
+      "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻触发 ✓，不依赖开战瞬间的动态状态 ✓。⚠ 治疗**两项式** ✓：「等同于 #2% 生命上限 **+ #3 点**」⇒ 一个效果里同时给 **`scale: owner_max_hp` + `percent` + `flat`** ✓（引擎已支持 `share × 属性 + flat` ✓）。⚠ **基准取规则生效后的值** ✓（第 133/270 轮 ✓）。 ⚠ 「**施放普攻后**」按游戏自身的三种攻击读解 ✓ ⇒ `on_any` 覆盖战技与终结技 ✓。"
+    }
+  ]
+}
