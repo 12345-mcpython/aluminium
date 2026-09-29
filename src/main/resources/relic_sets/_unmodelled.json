@@ -83,13 +83,6 @@
       "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. Increases the DMG dealt by other allies with the same Type as the wearer by 10%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the PARTY's composition -- 'another ally whose Type (element) matches mine' needs the rule to see its teammates, which the condition DSL cannot do (it looks at the owner, the actor and the event's subject only)."
     }
   ],
-  "313": [
-    {
-      "require": 2,
-      "ability": "Ability53131",
-      "reason": "\"Increases the wearer's CRIT Rate by #3[i]% (para 0.04, the `properties` stat CriticalChanceBase 0.04). When an enemy target is defeated, the wearer's CRIT DMG increases by #1[i]%, stacking up to #2[i] time(s).\" ⚠ **Two reasons it is still unwritten, and the first is why it was re-checked on 2026-09-28.** ① The event cannot say whose death it was: KILL fires for ANY death with the victim as `target`, and 「敌方目标被消灭」 means an ENEMY died -- but the condition DSL has no camp variable (F-5), so a rule written today would also fire when one of OUR units dies. ② The numbers in this reason used to be 20% and 5; the effect's param is [0.04, 10, 0.04], i.e. **4% per stack, up to 10** -- the same 'read the English sentence instead of the parameters' error the 2026-09-28 content pass found in four other entries (102/111/310 and this one)."
-    }
-  ],
   "315": [
     {
       "require": 2,

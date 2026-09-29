@@ -1,0 +1,35 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "sigonia_crit_rate",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.04,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 313 无主荒星茨冈尼亚 2 件套: 「使装备者的暴击率提高#3%」",
+      "note": "数值取自 `data/relic_sets.json` ✓：`param = [0.04, 10, 0.04]` ✓（`#1` = 每层暴击伤害 ✓、`#2` = 叠加上限 ✓、`#3` = 暴击率 ✓）。⚠ ⭐ **叠层用引擎自带的 `MODIFY_ATTR` + `max_stacks`** ✓（第 142/270 轮读源码确认：`MODIFY_ATTR` 的 `max_stacks` 就是\"可叠加修饰\" ✓，上限走 `Constant.MAX_STACKS_LIMIT` 校验 ✓；缺省（不写 `max_stacks`）是**替换**语义 ✓）⇒ **不需要新机制** ✓；⚠ 「暴击率提高 #3%」是**开战即生效的永久加成** ✓；⚠ 击杀段在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（时序自查 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "sigonia_crit_damage_per_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.04,
+          "permanent": true,
+          "max_stacks": 10,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 313 无主荒星茨冈尼亚 2 件套: 「当敌方目标被消灭时，暴击伤害提高#1%，最多叠加#2层」",
+      "note": "数值取自 `data/relic_sets.json` ✓：`param = [0.04, 10, 0.04]` ✓（`#1` = 每层暴击伤害 ✓、`#2` = 叠加上限 ✓、`#3` = 暴击率 ✓）。⚠ ⭐ **叠层用引擎自带的 `MODIFY_ATTR` + `max_stacks`** ✓（第 142/270 轮读源码确认：`MODIFY_ATTR` 的 `max_stacks` 就是\"可叠加修饰\" ✓，上限走 `Constant.MAX_STACKS_LIMIT` 校验 ✓；缺省（不写 `max_stacks`）是**替换**语义 ✓）⇒ **不需要新机制** ✓；⚠ 「暴击率提高 #3%」是**开战即生效的永久加成** ✓；⚠ 击杀段在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（时序自查 ✓）。 ⚠ 「**最多叠加 #2 层**」⇒ **`max_stacks: 10`** ✓（第 142/270 轮确认该字段就是叠加上限 ✓）。"
+    }
+  ]
+}
