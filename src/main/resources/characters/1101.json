@@ -84,5 +84,43 @@
     "min_eidolon": 6,
     "source": "1101 布洛妮娅 星魂 6 气贯长虹 (Avatar_Bronya_Rank06): 「战技对指定我方目标造成的伤害提高效果的持续时间增加1回合。」 param = [1]",
     "note": "「战技对指定我方目标造成的**伤害提高效果**的持续时间增加1回合」: the sentence names an <b>effect</b> rather than a state, and the engine's handle for it is the attribute the modifier sits on (`ALL_DAMAGE_TYPE_BOOST`) -- which is the Skill rule's own `MODIFY_ATTR` in the rule above. ⚠ `min_eidolon: 6` is the whole of what makes this an Eidolon (the engine knows nothing else about 星魂). ⚠ Why the filter is stated rather than \"lengthen everything I applied\": her 「作战再部署」 trace gives the whole party +20% DEFENCE for 2 turns at BATTLE_START, and that buff can still be ticking when she casts her Skill -- a filter that said \"all of mine\" would silently add a turn to it as well. That is the case the attribute/name axis exists to prevent (`ExtendBuffTest.itDoesNotLengthenTheOwnersOtherBuffs`). ⚠ NOT authored from this Eidolon: nothing else -- it is a one-sentence Eidolon."
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_party_attack",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.55,
+        "turns": 2,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1101 布洛妮娅 终结技（数据出处 skill_id 110102）: 「使我方全体攻击力提高55%…持续2回合」",
+    "note": "「使我方全体**攻击力提高 55%**…持续 **2 回合**」—— `MODIFY_ATTR ATTACK` + `percent: 0.55` ✓ + `turns: 2` ✓ + `all_allies` ✓；⭐ **数值出处在数据里定位到 `skill_id 110102`** ✓ （⚠ 前两次取不到的原因已记入文档 ✓：她的 id 是 6 位 ✓，且**该 id 自己的块里没有 `param` 数组** ✗ ⇒ 必须按\"值出现的位置反查最近的 skill_id\" ✓）。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_party_crit_damage",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "CRIT_ATTACK",
+        "scale": "self_attr:CRIT_ATTACK",
+        "percent": 0.16,
+        "amount": 0.2,
+        "turns": 2,
+        "target": "all_allies"
+      }
+    ],
+    "source": "1101 布洛妮娅 终结技: 「同时提高等同于布洛妮娅16.00%暴击伤害+20.00%的暴击伤害，持续2回合」",
+    "note": "「提高**等同于布洛妮娅 16.00% 暴击伤害 + 20.00%** 的暴击伤害，持续 2 回合」—— **派生量** ✓：`scale: \"self_attr:CRIT_ATTACK\"` + `percent: 0.16` + `amount: 0.20` ✓（与大丽花行迹同族 ✓）；⭐ 比率型属性用派生量是对的 ✓；⚠ **快照语义** ✓（触发瞬间读取并冻结 ✓）。"
   }
 ]
