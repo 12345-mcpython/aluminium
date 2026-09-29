@@ -149,7 +149,8 @@ public class SummonEntryTest {
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(OWNER).matching(TriggerEvent.SUMMONED,
                 new TriggerTable.TriggerContext(owner, battle.summonMemosprite(owner), null, 0, 0, null, battle));
 
-        Assertions.assertEquals(2, rules.size(), "忆灵技能3 and 忆灵技能2 both answer 被召唤时");
+        Assertions.assertEquals(3, rules.size(),
+                "忆灵技能3 (立即行动)、忆灵技能2 的免疫控制 (RESIST_DEBUFF) 与同句的「被攻击的概率提高」(AGGRO_ADDED_RATIO, 2026-09-29) 都在被召唤时生效");
         TriggerTable.CompiledRule arrival = rules.stream()
                 .filter(rule -> "ADVANCE".equals(rule.effects().getFirst().getOp()))
                 .findFirst()
