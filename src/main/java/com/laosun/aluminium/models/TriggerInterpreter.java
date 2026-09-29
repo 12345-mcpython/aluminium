@@ -1404,7 +1404,13 @@ public final class TriggerInterpreter {
             // a share of the target's BASE, while the derived path yields ABSOLUTE units -- so 「每层…提高 X%」 on a flat
             // attribute had no spelling. Read PER TARGET, because the count differs from one victim to the next.
             if (effect.getPerStack() != null && !effect.getPerStack().isBlank()) {
-                applied *= target.getBuffManager().stacksOf(effect.getPerStack().trim());
+                // ⭐ `per_stack` may name the target's DEBUFF COUNT, not only a counter (2026-09-29): 「敌方目标每承受 1 个负面效果，
+                // 装备者对其造成的<属性>额外提高 X%，最多叠加 N 层」 is cone 21001 / 23020, and 116/4 counts a target's DoTs. A named
+                // counter keeps its old meaning, so nothing existing moves.
+                String perStack = effect.getPerStack().trim();
+                applied *= "target_debuff_count".equals(perStack)
+                        ? target.getBuffManager().debuffCount()
+                        : target.getBuffManager().stacksOf(perStack);
             }
             if (derived) {
                 applied = applyDerivedCeiling(effect, ctx, applied);
