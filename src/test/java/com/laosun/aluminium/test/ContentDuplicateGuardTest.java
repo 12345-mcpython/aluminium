@@ -57,6 +57,7 @@ public class ContentDuplicateGuardTest {
                     List<String[]> entries = new ArrayList<>();
                     collect(JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)), "", entries);
                     Map<String, String> seen = new LinkedHashMap<>();
+                    Map<String, String> ids = new LinkedHashMap<>();
                     for (String[] entry : entries) {
                         rules++;
                         JsonObject rule = JsonParser.parseString(entry[1]).getAsJsonObject();
@@ -67,6 +68,18 @@ public class ContentDuplicateGuardTest {
                         String previous = seen.put(signature, String.valueOf(rule.get("id")));
                         if (previous != null) {
                             duplicates.add(path + " [" + signature + "] ids " + previous + " / " + rule.get("id"));
+                        }
+                        // \u26a0 The sibling fault: the same id twice in one file is a copy-paste that survived, and it makes
+                        // every later reference to that id ambiguous.
+                        JsonElement id = rule.get("id");
+                        if (id != null && !id.isJsonNull()) {
+                            // \u26a0 Scoped by the rank/piece key: per-rank content reuses the rule id across ranks on purpose
+                            // (each rank states its own numbers), so only a repeat INSIDE one scope is the copy-paste fault.
+                            String earlier = ids.put(entry[0] + "\u0000" + id.getAsString(), entry[0]);
+                            if (earlier != null) {
+                                duplicates.add(path + " reuses id \"" + id.getAsString() + "\" twice inside scope \""
+                                        + entry[0] + "\"");
+                            }
                         }
                     }
                 }
