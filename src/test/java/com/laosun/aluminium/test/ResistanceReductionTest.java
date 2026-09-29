@@ -5,6 +5,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
@@ -84,5 +85,28 @@ public class ResistanceReductionTest {
         TriggerSpecs.set(effect, "permanent", true);
         TriggerSpecs.set(effect, "target", "all_enemies");
         return effect;
+    }
+    /** Two more readers: 1203's Ultimate and 1304's Basic Attack state their own percentages. */
+    @Test
+    public void theTwoNewReadersStateTheirOwnPercentages() {
+        Character fuxuan = CharacterFactory.create(1203, LEVEL);
+        Enemy first = EnemyFactory.create(MONSTER, 90, 1);
+        Battle firstBattle = new Battle(List.of(fuxuan), List.of(first), new Random(0));
+        firstBattle.startBattle();
+
+        firstBattle.castImmediate(fuxuan.getSkills().get(SkillType.ULTRA), fuxuan, List.of(first));
+
+        Assertions.assertEquals(0.2, first.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
+                "\u300c\u65bd\u653e\u7ec8\u7ed3\u6280\u65f6\u2026\u654c\u65b9\u5168\u4f53\u5168\u5c5e\u6027\u6297\u6027\u964d\u4f4e20%\u300d");
+
+        Character nihility = CharacterFactory.create(1304, LEVEL);
+        Enemy second = EnemyFactory.create(MONSTER, 90, 1);
+        Battle secondBattle = new Battle(List.of(nihility), List.of(second), new Random(0));
+        secondBattle.startBattle();
+
+        secondBattle.castImmediate(nihility.getSkills().get(SkillType.COMMON), nihility, List.of(second));
+
+        Assertions.assertEquals(0.12, second.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
+                "\u300c\u65bd\u653e\u666e\u653b\u65f6\u4f7f\u76ee\u6807\u7684\u5168\u5c5e\u6027\u6297\u6027\u964d\u4f4e12%\u300d");
     }
 }
