@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20019_party_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 12.0,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20019_party_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 14.0,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20019_party_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 16.0,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20019_party_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 18.0,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20019_party_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 20.0,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+    }
+  ]
+}

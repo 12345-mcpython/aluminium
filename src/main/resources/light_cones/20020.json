@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20020_attack_on_ult",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.24,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20020 睿见: 当装备者施放终结技时，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20020_attack_on_ult",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20020 睿见: 当装备者施放终结技时，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20020_attack_on_ult",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.36,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20020 睿见: 当装备者施放终结技时，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20020_attack_on_ult",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.42,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20020 睿见: 当装备者施放终结技时，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone20020_attack_on_ult",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.48,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20020 睿见: 当装备者施放终结技时，攻击力提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。"
+    }
+  ]
+}
