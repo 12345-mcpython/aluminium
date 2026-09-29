@@ -38,7 +38,7 @@ public class UnitDisciplineTest {
     private static final Set<String> KNOWN = Set.of(
             "hit_count", "hp_percent", "target_hp_percent", "target_debuff_count",
             "self_summon_count", "target_summon_count", "self_max_energy", "from_skill_id",
-            "target_hp_percent_before", "enemy_count");   // added with the crossing variable (round 181)
+            "target_hp_percent_before", "enemy_count", "ally_count");   // added with the crossing variable (round 181)
 
     /** Of those, the ones that resolve to 0..1 rather than a count. */
     private static final Set<String> FRACTION = Set.of("hp_percent", "target_hp_percent", "target_hp_percent_before");

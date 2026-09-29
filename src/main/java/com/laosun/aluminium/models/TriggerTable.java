@@ -781,7 +781,7 @@ public class TriggerTable {
      * {@link AttributeType}, the second for shape here and for existence where the character is assembled.
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("enemy_count", "hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
+            Set.of("ally_count", "enemy_count", "hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
                     "target_summon_count", "self_max_energy", "from_skill_id");
 
     /**
@@ -2324,6 +2324,9 @@ public class TriggerTable {
                 // 「场上敌方目标数量」 -- a count of the OTHER camp as a whole, which no subject prefix fits: `self_*` and
                 // `target_*` are both about one unit. Its reader is 1413 长夜月's talent, whose thresholds are 4+/3/2/1 enemies.
                 case "enemy_count" -> enemyCount(ctx);
+                // 「我方目标数量」 -- the mirror of `enemy_count`, and the blocker set 321's entry names ("there is still no
+                // condition on the battlefield's PARTY SIZE, so the number of stacks cannot be computed").
+                case "ally_count" -> allyCount(ctx);
                 // 「若装备者的能量上限大于等于…」 -- not an attribute (`CanHit.getMaxEnergy()` is a field, and the
                 // attribute table has no slot for it), which is exactly why it needed a variable of its own.
                 case "self_max_energy" -> ctx.owner() == null ? Double.NaN : ctx.owner().getMaxEnergy();
@@ -2359,6 +2362,19 @@ public class TriggerTable {
                 return Double.NaN;
             }
             return ctx.battle().enemyUnits().stream().filter(enemy -> !enemy.isDeath()).count();
+        }
+
+        /**
+         * How many living allies are on the field -- 「我方目标数量」, the mirror of {@link #enemyCount}.
+         *
+         * <p>⚠ {@code NaN} when there is no battlefield, the rule every count in this vocabulary follows: "cannot read it" and
+         * "there are none" are different answers, and only one of them has a symptom.
+         */
+        private static double allyCount(TriggerContext ctx) {
+            if (ctx.battle() == null || ctx.battle().allies == null) {
+                return Double.NaN;
+            }
+            return ctx.battle().allies.stream().filter(ally -> ally != null && !ally.isDeath()).count();
         }
 
         /**
