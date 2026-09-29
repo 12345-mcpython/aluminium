@@ -1,0 +1,77 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20008_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 6.0,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20008 嘉果: 战斗开始时，立即为我方全体恢复#1[i]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20008_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 7.5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20008 嘉果: 战斗开始时，立即为我方全体恢复#1[i]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20008_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 9.0,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20008 嘉果: 战斗开始时，立即为我方全体恢复#1[i]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20008_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10.5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20008 嘉果: 战斗开始时，立即为我方全体恢复#1[i]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20008_party_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 12.0,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20008 嘉果: 战斗开始时，立即为我方全体恢复#1[i]点能量。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的触发在**战斗中**发生 ✓、且条件的成立**不依赖\"开战瞬间\"的状态** ✓ ⇒ **真实流程可驱动** ✓。"
+    }
+  ]
+}
