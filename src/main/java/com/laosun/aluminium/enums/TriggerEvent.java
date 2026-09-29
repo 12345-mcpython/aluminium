@@ -18,6 +18,14 @@ import java.util.Map;
  */
 public enum TriggerEvent {
     /**
+     * ✅ The wearer successfully applied a debuff to a target (2026-09-29).
+     *
+     * <p>Emitted from `Battle.tryApplyDebuff`, the one chokepoint every landed debuff passes through (controls and DoTs alike).
+     * ⚠ It also fires when an ENEMY debuffs our side, with the enemy as the actor, so content written here should say `actor == self`
+     * to mean "mine". Readers: relic 117/4's third clause and relic 132/4's second.
+     */
+    DEBUFF_APPLIED("DEBUFF_APPLIED", true),
+    /**
      * ✅ {@code Battle.startBattle()} — delivered once to <b>every character's own table</b>, after the opening
      * hooks and before {@code processRequests}.
      *
