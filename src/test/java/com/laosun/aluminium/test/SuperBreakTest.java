@@ -116,11 +116,16 @@ public class SuperBreakTest {
     private static Char strongEnemy() {
         Character hero = CharacterFactory.create(CID, LEVEL);
         DamageElement element = hero.getSkills().get(SkillType.COMMON).getData().getElement();
+        // ⚠ The candidate is BROKEN by this fixture, so it has to survive its own break damage: an earlier version
+        // took the first element-weak id and happened to survive by a narrow margin (break base 31037 against 16498
+        // Max HP), which made the test fail the moment anything raised that damage -- e.g. a 20% resistance reduction,
+        // measured 2026-09-29 (the fixture's hero is 1321, whose aura reduces enemies' resistance). Picking the
+        // element-weak candidate with the LARGEST Max HP is what makes the fixture say what it means.
         Enemy enemy = null;
-        for (int id = 1002010; id < 1002100 && enemy == null; id++) {
+        for (int id = 1002010; id < 1002100; id++) {
             try {
                 Enemy candidate = EnemyFactory.create(id, 90, 1);
-                if (candidate.isWeakTo(element)) {
+                if (candidate.isWeakTo(element) && (enemy == null || candidate.getMaxHp() > enemy.getMaxHp())) {
                     enemy = candidate;
                 }
             } catch (RuntimeException ignored) {
