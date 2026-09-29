@@ -1,0 +1,59 @@
+{
+  "2": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "valorous_merit_stack",
+      "when": [
+        "actor is_other_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "功勋",
+          "max_stacks": 5,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "遗器 315 奔狼的都蓝王朝 2 件套: 「我方角色施放追加攻击时，装备者获得一层【功勋】，最多叠加#1层」",
+      "note": "数值取自 `data/relic_sets.json` ✓：`param = [5, 0.05, 0.25]` ✓（`#1` = 叠加上限 ✓、`#2` = 每层追伤 ✓、`#3` = 叠满时的暴击伤害 ✓）。⚠ **触发时序自查** ✓：三段都在**战斗中**由**队友的追加攻击**驱动 ✓（`FOLLOW_UP` + `actor is_other_ally` ✓），不依赖开战瞬间的动态状态 ✓。⚠ ⭐ **叠层用引擎自带机制** ✓：`ADD_STACK`（命名计数器 ✓，**带 `max_stacks` 上限** ✓，第 142/270 轮读源码确认 ✓）+ 条件 **`self_stacks:<名称> >= 5`** ✓；⚠ **不写 `max_stacks` 的 `ADD_STACK` 缺省是\"一层旗帜\"** ✓ ⇒ 上限必须写明 ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "valorous_merit_damage",
+      "when": [
+        "self_stacks:功勋 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.05,
+          "permanent": true,
+          "max_stacks": 5,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 315 2 件套: 「每层【功勋】使装备者追加攻击造成的伤害提高#2%」",
+      "note": "数值取自 `data/relic_sets.json` ✓：`param = [5, 0.05, 0.25]` ✓（`#1` = 叠加上限 ✓、`#2` = 每层追伤 ✓、`#3` = 叠满时的暴击伤害 ✓）。⚠ **触发时序自查** ✓：三段都在**战斗中**由**队友的追加攻击**驱动 ✓（`FOLLOW_UP` + `actor is_other_ally` ✓），不依赖开战瞬间的动态状态 ✓。⚠ ⭐ **叠层用引擎自带机制** ✓：`ADD_STACK`（命名计数器 ✓，**带 `max_stacks` 上限** ✓，第 142/270 轮读源码确认 ✓）+ 条件 **`self_stacks:<名称> >= 5`** ✓；⚠ **不写 `max_stacks` 的 `ADD_STACK` 缺省是\"一层旗帜\"** ✓ ⇒ 上限必须写明 ✓。 ⚠ 属性用 **FOLLOW_UP_DAMAGE_BOOST** ✓（只影响追加攻击 ✓）。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "valorous_merit_threshold",
+      "when": [
+        "self_stacks:功勋 >= 5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.25,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 315 2 件套: 「叠满#1层时，额外使装备者的暴击伤害提高#3%」",
+      "note": "数值取自 `data/relic_sets.json` ✓：`param = [5, 0.05, 0.25]` ✓（`#1` = 叠加上限 ✓、`#2` = 每层追伤 ✓、`#3` = 叠满时的暴击伤害 ✓）。⚠ **触发时序自查** ✓：三段都在**战斗中**由**队友的追加攻击**驱动 ✓（`FOLLOW_UP` + `actor is_other_ally` ✓），不依赖开战瞬间的动态状态 ✓。⚠ ⭐ **叠层用引擎自带机制** ✓：`ADD_STACK`（命名计数器 ✓，**带 `max_stacks` 上限** ✓，第 142/270 轮读源码确认 ✓）+ 条件 **`self_stacks:<名称> >= 5`** ✓；⚠ **不写 `max_stacks` 的 `ADD_STACK` 缺省是\"一层旗帜\"** ✓ ⇒ 上限必须写明 ✓。 ⚠ 阈值用 **`self_stacks:功勋 >= 5`** ✓（命名计数器条件 ✓）。"
+    }
+  ]
+}
