@@ -52,6 +52,7 @@ public class EffectSpec {
         copy.turns = this.turns;
         copy.permanent = this.permanent;
         copy.maxStacks = this.maxStacks;
+        copy.instance = this.instance;
         copy.stacks = this.stacks;
         copy.resource = this.resource;
         copy.until = this.until;
@@ -266,6 +267,15 @@ return copy;
      */
     @SerializedName("max_stacks")
     private Integer maxStacks;
+
+    /**
+     * Apply this modifier to the damage instance being settled instead of attaching a buff (2026-09-29).
+     *
+     * <p>Only meaningful on {@code DEALING_DAMAGE}, the one event carrying a {@code Damage}. Opt-in on purpose: seven
+     * shipped rules already use {@code MODIFY_ATTR} on that event and must keep attaching buffs.
+     */
+    @SerializedName("instance")
+    private Boolean instance;
 
     /**
      * Alias of {@link #maxStacks}, from the wording of the effect text ("stacking up to N time(s)").
