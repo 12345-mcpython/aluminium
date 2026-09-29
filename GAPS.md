@@ -921,6 +921,18 @@
 > * ⚠ **下一步的确切读者（另一层）** ✓：23030 的仇恨幅度是 **`ConfigAbility` 层**的问题 ✓ —— 读 **`Ability23030`** 的 **modifiers** ✓，看它把哪个 **property** 写成什么值 ✓、被**什么谓词**分档 ✓（若它在 `GlobalModifiers` 或 `OnStart` 里写死 ✓，那就**有定案** ✓；若它引用某个 `ParamList` 槽 ✗，则说明"散文—参数—能力"三者里有一环缺失 ✓，也照样写明 ✓）。
 > * ✅ **另附一条对照（本轮顺带得到的）** ✓：`skill_value` 那些"与 `ability_property` 同值"的槽 ✗ **不需要写进内容** ✓（第 46/270 轮实测过重复计算 ✓，为 2 × 0.24 ✓）⇒ 光锥内容只写"数据没写的那一半" ✓。
 
+> **2026-09-29 更新（aggro 回收之四十三：能力层确认了机制名；值缺在"DynamicValues 的类型"这一层）**：
+> * ✅ **机制名被上游独立确认** ✓：读 **`Config/ConfigAbility/EquipmemtAbility.json`** ✓（游戏自己的拼写 ✓；`AbilityList` 共 **114** 条 ✓），逐条取出 `Ability23030` / `Ability23005` / `Ability21009` ✓ ⇒ **三条都写 `AggroAddedRatio`** ✓ —— 正是引擎里的 **`AGGRO_ADDED_RATIO`** ✓ ⇒ **命名不是我们的发明** ✓。⚠ 同一层还有 **`RelicAbility.json`** ✓（遗器能力 ✓ —— 与 `RelicTriggerTables` 镜像的是同一层 ✓）。
+> * ⚠⚠ **但"值"不在这层** ✓ —— 三条各自指向一个**动态哈希** ✓，而 `DynamicValues` 的**类型**把它分成两类 ✓：
+>   ```
+>   21009  AggroAddedRatio → hash -1558958362 → {"ReadInfo": {"Type": "None"}}
+>   23005  AggroAddedRatio → hash -1558958362 → {"ReadInfo": {"Type": "None"}}   ← 与 21009 同一个哈希
+>   23030  AggroAddedRatio → hash  1464617527 → {"ReadInfo": {"Type": "BattleEvent"}}
+>   ```
+>   ⇒ ⭐ **21009/23005 的值是 `Type: None`** ✗ ⇒ **本层不给数** ✓ ⇒ 我已出货的 **×2** 其依据**只是那一个"未被正文引用的 `ParamList` 槽 = 2"** ✓ —— **必须精确这样表述** ✓（不是"能力文件证明是 2" ✗）；⚠ 两把共用**同一个哈希** ✓ 这一点与"它们同值"**相容** ✓，但它**本身不给出数值** ✓。
+> * ⚠ **23030 的仇恨：问题从"哪个槽"变成了"哪个事件"** ✓ —— 它的类型是 **`BattleEvent`** ✗ ⇒ **值由事件路径产生** ✓ ⇒ **不能按 ×2 出货** ✓（第 47/270 轮已撤下该方案 ✓，本轮再次确认 ✓）。**下一步的确切读者** ✓：顺着 `DynamicValues` 的 `BattleEvent` 类型往下 ✓ —— 找该事件的定义与其写入的数值 ✓；若该事件只在**活动/模拟宇宙**里存在 ✗，就写明"这条从句在**常规战斗**里没有可读的数值来源" ✓（**写明缺在哪一层** ✓，而不是近似 ✓）。
+> * ✅ **本轮顺带确认的对照** ✓：`GlobalModifiers` 里另有 `MEquip_EquipUnique_AttackAddedRatio` 与 `MEquip_EquipUnique_DamageResistance` ✓（同样走 `DynamicValues` ✓）⇒ 说明"装备唯一被动"是**另一种挂载方式** ✓ （与按 id 的 `AbilityNNNNN` 并列 ✓）⇒ **登记**：若将来要收这类从句 ✓，入口是这两个全局修饰器 ✓。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
