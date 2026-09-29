@@ -132,5 +132,20 @@
     ],
     "source": "1105 娜塔莎 行迹（额外能力）: 「施放普攻时，额外造成等同于娜塔莎生命上限40%的物理属性伤害。」",
     "note": "「**施放普攻时，额外造成**等同于娜塔莎**生命上限 40%** 的物理属性伤害」—— ① 触发用 **`BASIC_ATTACK`** ✓（\"施放普攻\" ✓，目标是那名敌人 ✓ = `target` ✓）；② 「额外造成」正是 `DAMAGE` 的语义 ✓（引擎的**附加伤害**入口 ✓：`DamageType.ADDITIONAL` ✓、**不计为一次攻击** ✓ ⇒ 不会自我触发 ✓）；③ 倍率用**字面形态** + **`scale: owner_max_hp`** ✓ —— 即\"**娜塔莎自己的生命上限**\" ✓；该刻度是**第 189 轮新加**的 ✓（原本字面形态只认 `self_attr:<属性>` ✗，读不了生命上限 ✓；实测这类句子共 **16 份**文档 ✓）。⚠ 与她的**治疗**区分 ✓：技能自带的治疗由**数据表**负责 ✓（第 165 轮实测 ✓），本条是**规则自己**造成的伤害 ✓ ⇒ 不重复 ✗。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "trace_healer_outgoing_boost",
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "OUTGOING_HEALING_BOOST",
+        "percent": 0.1,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1105 娜塔莎 行迹 医者 (1105102, Avatar_Natasha_SkillTree02): 「娜塔莎提供的治疗量提高10%。」上游 AvatarSkillTreeConfig 该点 ParamList = [{\"Value\": 0.1}]",
+    "note": "「娜塔莎**提供的**治疗量提高 **10%**」—— ⭐ 这条**从来不是被机制卡住的** ✗：它在本文件里只是「Not classified yet」的未分类项 ✓，而读它的属性早就在引擎里 ✓。① 属性 **`OUTGOING_HEALING_BOOST`** ✓ 由 `Battle.heal` **从治疗者身上读** ✓（`Battle.java:1680`，其 javadoc 原文就是 \"read from the one applying the heal (the healer's traces/light cone)\" ✓）⇒ \"**提供的**\"这个主语与引擎的取法**一致** ✓（与其对称的是 `SHIELD_BOOST` ✓）；② 上游 `ExcelOutput/AvatarSkillTreeConfig.json` 的 `PointID 1105102`（`AbilityName Avatar_Natasha_SkillTree02`）参数表是 **`[{\"Value\": 0.1}]`** ✓ ⇒ 10% 由数据坐实 ✓，不是只照正文抄 ✓；③ 写法 `MODIFY_ATTR OUTGOING_HEALING_BOOST percent 0.1 permanent target self` ✓（行迹按已解锁处理 ✓，与 1001/1104 的约定一致 ✓）。⚠ **同一文件里另一条治疗句仍然登记** ✗，且现在能说清**缺在哪一层** ✓：**天赋 生机焕发**「为当前生命值百分比 ≤ 30% 的我方目标**提供治疗时**，娜塔莎的治疗量提高 **50%**，该效果对持续治疗效果也会生效」需要**在治疗被结算之前**的一个钩子 ✗ —— 引擎只有 `HEALED`（**治疗已经发生后**才发 ✓），而 `MODIFY_ATTR` 够不到一个**正在被结算**的实例 ✗ ⇒ 这是**缺少一个治疗前事件**，不是缺数字 ✓。⚠ 行迹「调理」（持续回复延长 1 回合）与星魂 2 各自另有登记 ✓。"
   }
 ]
