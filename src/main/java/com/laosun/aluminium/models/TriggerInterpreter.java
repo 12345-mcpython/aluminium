@@ -1382,7 +1382,11 @@ public final class TriggerInterpreter {
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 buff.setBuffName(effect.getBuff().trim());
             }
-            target.getBuffManager().addBuff(buff);
+            // 「有100%的基础概率额外使该目标的全属性抗性降低10.00%」 (2026-09-29): an attribute modifier may be ROLLED,
+            // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 17 corpus documents
+            // roll a base chance before an attribute change. ⚠ Unstated = attached directly, so no existing file changes
+            // (no shipped file uses base_chance on MODIFY_ATTR).
+            attachRolled(battle, target, buff, effect, ctx);
         }
     }
 
