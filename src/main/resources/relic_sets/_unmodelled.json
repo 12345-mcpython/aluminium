@@ -111,13 +111,6 @@
       "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
     }
   ],
-  "321": [
-    {
-      "require": 2,
-      "ability": "Ability53211",
-      "reason": "\"When the number of ally targets on the field is not equal to 4, for every 1 additional/missing ally target, increases the DMG dealt by the wearer and their memosprite by 9%/12%, stacking up to 4/3 time(s).\" The stacking counter and the memosprite half are both expressible now (`target: \"summon\"` + `self_summon_count >= 1`), but there is still no condition on the battlefield's PARTY SIZE, so the number of stacks cannot be derived from anything. (That is a different question from `self_summon_count`: it counts our whole side, not the owner's summons.)"
-    }
-  ],
   "323": [
     {
       "require": 2,

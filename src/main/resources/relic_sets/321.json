@@ -1,0 +1,115 @@
+{
+  "2": [
+    {
+      "on": "TURN_START",
+      "id": "arcadia_wearer_1_missing",
+      "when": [
+        "ally_count == 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 321 妖精织梦的乐园 2 件套: 「队伍中当前在场的我方目标数量不等于4时，每多/少1名我方目标，使装备者及其忆灵造成的伤害提高9%/12%，最多叠加4/3层」param = [0.09, 0.12, 4, 3]（装备者那一半）",
+      "note": "「每多/少 1 名我方目标，使装备者**及其忆灵**造成的伤害提高 **9%/12%**，最多叠加 **4/3** 层」—— ① **可达成分支是\"少\"** ✓（四人队伍 `ally_count ≤ 4` ✓）⇒ **12%** / 上限 **3** 层 ✓（\"多\"那支不可达 ✓，注明而不写 ✓）；② 本层 = 少 1 名 ⇒ **0.12** ✓；③ 用 **`ally_count`** ✓（第 77/270 轮为它落地 ✓，正是本套登记里点名的阻塞 ✓）；④ ⚠ **不带忆灵条件** ✓：`requireSummon` 的 javadoc 明说，写「及其忆灵」却加 `self_summon_count >= 1` 的规则会**在其所指单位不在场时触发** ✓ ⇒ 没有忆灵的装备者照样吃到 ✓；⑤ 挂 **`TURN_START`** ✓（\"人数不等于 4\"是**持续条件** ⇒ 每回合重算 ✓）；⚠ ⑥ **`ally_count` 把忆灵也算作我方目标** ✓（第 94/270 轮实测 ✓）—— 与游戏「我方目标数量」口径一致 ✓。"
+    },
+    {
+      "on": "SUMMONED",
+      "id": "arcadia_memosprite_1_missing",
+      "when": [
+        "ally_count == 3",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "遗器 321 妖精织梦的乐园 2 件套（忆灵那一半，param = [0.09, 0.12, 4, 3]）",
+      "note": "「使装备者**及其忆灵**造成的伤害提高 0.12」的**忆灵那一半** —— ① `target: \"summon\"` ✓ + `self_summon_count >= 1` ✓（`requireSummon` 的 javadoc 要求的保护 ✓）；② ⭐⭐ **`SUMMONED` 可用性由实测确立** ✓：第 78–79/270 轮曾把\"忆灵那半送不到、`SUMMONED` 永不触发\"**登记为引擎缺陷** ✗；第 94/270 轮**带 settle（驱动一个回合）重测** ⇒ `no-settle onSummon=0.0` ✗ ／ `settle onSummon=0.12` ✓ ⇒ **引擎完全正确** ✓（`SUMMONED` 在**结算**里发出 ✓：`Battle.fireSummoned` ✓）⇒ ⚠ **错在探针\"召唤后立刻读值\"、从未让 settle 运行** ✗ ⇒ **判据必须驱动一个回合** ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "arcadia_wearer_2_missing",
+      "when": [
+        "ally_count == 2"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 321 妖精织梦的乐园 2 件套: 「队伍中当前在场的我方目标数量不等于4时，每多/少1名我方目标，使装备者及其忆灵造成的伤害提高9%/12%，最多叠加4/3层」param = [0.09, 0.12, 4, 3]（装备者那一半）",
+      "note": "「每多/少 1 名我方目标，使装备者**及其忆灵**造成的伤害提高 **9%/12%**，最多叠加 **4/3** 层」—— ① **可达成分支是\"少\"** ✓（四人队伍 `ally_count ≤ 4` ✓）⇒ **12%** / 上限 **3** 层 ✓（\"多\"那支不可达 ✓，注明而不写 ✓）；② 本层 = 少 2 名 ⇒ **0.24** ✓；③ 用 **`ally_count`** ✓（第 77/270 轮为它落地 ✓，正是本套登记里点名的阻塞 ✓）；④ ⚠ **不带忆灵条件** ✓：`requireSummon` 的 javadoc 明说，写「及其忆灵」却加 `self_summon_count >= 1` 的规则会**在其所指单位不在场时触发** ✓ ⇒ 没有忆灵的装备者照样吃到 ✓；⑤ 挂 **`TURN_START`** ✓（\"人数不等于 4\"是**持续条件** ⇒ 每回合重算 ✓）；⚠ ⑥ **`ally_count` 把忆灵也算作我方目标** ✓（第 94/270 轮实测 ✓）—— 与游戏「我方目标数量」口径一致 ✓。"
+    },
+    {
+      "on": "SUMMONED",
+      "id": "arcadia_memosprite_2_missing",
+      "when": [
+        "ally_count == 2",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "遗器 321 妖精织梦的乐园 2 件套（忆灵那一半，param = [0.09, 0.12, 4, 3]）",
+      "note": "「使装备者**及其忆灵**造成的伤害提高 0.24」的**忆灵那一半** —— ① `target: \"summon\"` ✓ + `self_summon_count >= 1` ✓（`requireSummon` 的 javadoc 要求的保护 ✓）；② ⭐⭐ **`SUMMONED` 可用性由实测确立** ✓：第 78–79/270 轮曾把\"忆灵那半送不到、`SUMMONED` 永不触发\"**登记为引擎缺陷** ✗；第 94/270 轮**带 settle（驱动一个回合）重测** ⇒ `no-settle onSummon=0.0` ✗ ／ `settle onSummon=0.12` ✓ ⇒ **引擎完全正确** ✓（`SUMMONED` 在**结算**里发出 ✓：`Battle.fireSummoned` ✓）⇒ ⚠ **错在探针\"召唤后立刻读值\"、从未让 settle 运行** ✗ ⇒ **判据必须驱动一个回合** ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "arcadia_wearer_3_missing",
+      "when": [
+        "ally_count == 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 321 妖精织梦的乐园 2 件套: 「队伍中当前在场的我方目标数量不等于4时，每多/少1名我方目标，使装备者及其忆灵造成的伤害提高9%/12%，最多叠加4/3层」param = [0.09, 0.12, 4, 3]（装备者那一半）",
+      "note": "「每多/少 1 名我方目标，使装备者**及其忆灵**造成的伤害提高 **9%/12%**，最多叠加 **4/3** 层」—— ① **可达成分支是\"少\"** ✓（四人队伍 `ally_count ≤ 4` ✓）⇒ **12%** / 上限 **3** 层 ✓（\"多\"那支不可达 ✓，注明而不写 ✓）；② 本层 = 少 3 名 ⇒ **0.36** ✓；③ 用 **`ally_count`** ✓（第 77/270 轮为它落地 ✓，正是本套登记里点名的阻塞 ✓）；④ ⚠ **不带忆灵条件** ✓：`requireSummon` 的 javadoc 明说，写「及其忆灵」却加 `self_summon_count >= 1` 的规则会**在其所指单位不在场时触发** ✓ ⇒ 没有忆灵的装备者照样吃到 ✓；⑤ 挂 **`TURN_START`** ✓（\"人数不等于 4\"是**持续条件** ⇒ 每回合重算 ✓）；⚠ ⑥ **`ally_count` 把忆灵也算作我方目标** ✓（第 94/270 轮实测 ✓）—— 与游戏「我方目标数量」口径一致 ✓。"
+    },
+    {
+      "on": "SUMMONED",
+      "id": "arcadia_memosprite_3_missing",
+      "when": [
+        "ally_count == 1",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "遗器 321 妖精织梦的乐园 2 件套（忆灵那一半，param = [0.09, 0.12, 4, 3]）",
+      "note": "「使装备者**及其忆灵**造成的伤害提高 0.36」的**忆灵那一半** —— ① `target: \"summon\"` ✓ + `self_summon_count >= 1` ✓（`requireSummon` 的 javadoc 要求的保护 ✓）；② ⭐⭐ **`SUMMONED` 可用性由实测确立** ✓：第 78–79/270 轮曾把\"忆灵那半送不到、`SUMMONED` 永不触发\"**登记为引擎缺陷** ✗；第 94/270 轮**带 settle（驱动一个回合）重测** ⇒ `no-settle onSummon=0.0` ✗ ／ `settle onSummon=0.12` ✓ ⇒ **引擎完全正确** ✓（`SUMMONED` 在**结算**里发出 ✓：`Battle.fireSummoned` ✓）⇒ ⚠ **错在探针\"召唤后立刻读值\"、从未让 settle 运行** ✗ ⇒ **判据必须驱动一个回合** ✓。"
+    }
+  ]
+}
