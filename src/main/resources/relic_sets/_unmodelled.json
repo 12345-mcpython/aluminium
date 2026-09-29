@@ -41,13 +41,6 @@
       "reason": "\"If the wearer's Break Effect is 150% or higher, the Break DMG dealt to the enemy target ignores 10% of their DEF. If the wearer's Break Effect is 250% or higher, the Super Break DMG additionally ignores 15%.\" The attribute threshold it needed arrived on 2026-09-27 (`self_attr:BREAKING_EFFECT >= 1.5`), and the two thresholds are NOT an extra gap (an upper bound makes the tiers exclusive -- see set 311). What blocks it: it applies to Break / Super Break DMG only, which the DSL cannot name, and it is scoped to THIS hit rather than to a window of turns -- a MODIFY_ATTR buff (which is how 翡翠's Eidolon 4 grants DEF ignore) would also raise the wearer's other damage in those turns. So it needs an instance-scoped ignore plus a condition on the pending instance's damage type."
     }
   ],
-  "125": [
-    {
-      "require": 4,
-      "ability": "Ability51251",
-      "reason": "\"When the wearer or their memosprite provides healing to ally targets other than themselves, the wearer gains 'Gentle Rain' ... can only trigger once per turn. While the wearer has 'Gentle Rain,' SPD increases by 6% and all allies' CRIT DMG increases by 15% ...\" The trigger and both modifiers are expressible (HEALED with actor == self, extra conditions target != self), but the 'once per turn' limit is not: without it the buff would be re-applied by every heal in the same turn, which is a different mechanic, so this is not authored rather than approximated. ⚠ 2026-09-29, RE-STATED: the blocker is NOT \"no once-per-turn limit\" -- `TriggerSpec` has `cooldown` (at most once per OWN turn), `perTurn` (at most N per own turn) and `once_per_battle`. The 4-piece reads 「当装备者及其忆灵为装备者及其忆灵以外的我方目标提供治疗后…每回合最多触发1次，持续2回合；持有【甘霖】时速度+6%、我方全体暴击伤害+15%，该效果无法叠加」 (param [0.06, 0.15, 2]). What is still missing is a limit SHARED between two rules: the healer may be the wearer OR their memosprite, and `perTurn` counts per RULE, so if a memosprite's heal is credited to its own table, one faithful rule cannot exist and two rules would allow two triggers in a turn. ⚠ The probe that settles it: fire a memosprite heal and check whether HEALED reaches the MASTER's table with actor == the master (round 64 measured the adjacent case for damage: the master's table IS consulted when its memosprite deals damage). If it does, ONE rule with `actor == self` + `target is_other_ally` + `per_turn: 1` is exactly faithful and this set ships."
-    }
-  ],
   "126": [
     {
       "require": 4,
