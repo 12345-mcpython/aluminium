@@ -1,11 +1,4 @@
 {
-  "112": [
-    {
-      "require": 4,
-      "ability": "Ability51121",
-      "reason": "\"When dealing DMG to debuffed enemy targets, the wearer has their CRIT Rate increased by 10%. And when they deal DMG to Imprisoned enemy targets, their CRIT DMG increases by 20%.\" The FIRST clause became expressible on 2026-09-27 (`target_debuff_count >= 1` on DEALING_DAMAGE, with MODIFY_ATTR for the CRIT Rate), and the ability is a disjunction: authoring only that half would under-trigger it. What still blocks the second clause is that 'is Imprisoned' is a control state, and P10-2 models controls as a COMPOSITION (StunBuff + a speed debuff + an action delay) with no named carrier, so there is nothing for `has_state` to ask about yet."
-    }
-  ],
   "113": [
     {
       "require": 4,

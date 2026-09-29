@@ -1374,7 +1374,15 @@ public final class TriggerInterpreter {
                 ctx.damage().addDefenceIgnore(effect.getPercent() == null ? 0 : effect.getPercent());
                 return;
             }
-            throw new IllegalStateException("Op MODIFY_ATTR with instance=true supports DEFENCE_IGNORE on "
+            if (attribute == AttributeType.CRIT_CHANCE) {
+                ctx.damage().addCritChance(effect.getPercent() == null ? 0 : effect.getPercent());
+                return;
+            }
+            if (attribute == AttributeType.CRIT_ATTACK) {
+                ctx.damage().addCritDamage(effect.getPercent() == null ? 0 : effect.getPercent());
+                return;
+            }
+            throw new IllegalStateException("Op MODIFY_ATTR with instance=true supports DEFENCE_IGNORE, CRIT_CHANCE and CRIT_ATTACK on "
                     + "DEALING_DAMAGE; " + attribute + " has no instance-level slot yet");
         }
         boolean derived = (effect.getScale() != null && !effect.getScale().isBlank()) || effect.getPercent() == null;

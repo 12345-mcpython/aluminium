@@ -132,7 +132,7 @@ public class RelicTriggerTableTest {
      * A set with a registered ability and <b>no</b> rule file — used by the "nothing to merge" case, which must
      * therefore pick a set that is still unwritten (102 was that set until it was authored on 2026-09-28).
      */
-    private static final int NO_RULE_SET = 112;
+    private static final int NO_RULE_SET = 325;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -165,6 +165,7 @@ public class RelicTriggerTableTest {
      * mixed ones ({@code properties} plus an ability).
      */
     private static final Set<String> AUTHORED = Set.of(
+            "112/4",
             "108/4",
             "315/2",
             "313/2",
@@ -255,7 +256,7 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
      * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 17;
+    private static final int STILL_REGISTERED = 16;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
