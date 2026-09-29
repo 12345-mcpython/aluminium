@@ -35,6 +35,14 @@
         "percent": 0.024,
         "permanent": true,
         "target": "self"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.005,
+        "per_stack": "当品",
+        "permanent": true,
+        "target": "self"
       }
     ],
     "source": "1314 翡翠 行迹 逆回购: 「在敌方目标进入战斗时，翡翠获得1层【当品】」＋ 天赋「每层【当品】使暴击伤害提高2.40%，最多叠加50层」",
@@ -60,6 +68,14 @@
         "attribute": "CRIT_ATTACK",
         "scale": "self_stacks:当品",
         "percent": 0.024,
+        "permanent": true,
+        "target": "self"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.005,
+        "per_stack": "当品",
         "permanent": true,
         "target": "self"
       }

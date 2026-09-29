@@ -45,6 +45,7 @@ public class EffectSpec {
         EffectSpec copy = new EffectSpec();
         copy.op = this.op;
         copy.amount = this.amount;
+        copy.perStack = this.perStack;
         copy.scale = this.scale;
         copy.attribute = this.attribute;
         copy.percent = this.percent;
@@ -179,6 +180,11 @@ return copy;
      */
     @SerializedName("percent")
     private Double percent;
+
+    /** A counter this modifier's magnitude is multiplied by (2026-09-29): 「每层【当品】额外使翡翠的攻击力
+     * 提高0.50%」 is a SHARE of the base per layer. Read from the effect's TARGET. */
+    @SerializedName("per_stack")
+    private String perStack;
 
     /**
      * Which <b>kind</b> of incoming damage this modifier is about, or {@code null} for "all damage" (2026-09-28).

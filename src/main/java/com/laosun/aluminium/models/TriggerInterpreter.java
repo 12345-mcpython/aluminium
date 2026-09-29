@@ -330,6 +330,18 @@ public final class TriggerInterpreter {
                                     + "(source: " + spec.getSource() + ")");
                 }
                requireDerivedScale(effect, op, spec, true);
+               // ⚠ `per_stack` multiplies the PLAIN magnitude, so a scale would be a second multiplier on the same
+               // number. Refusing the combination keeps "the value" unambiguous.
+               if (effect.getPerStack() != null && !effect.getPerStack().isBlank()) {
+                   if (derivedModifier) {
+                       throw new IllegalArgumentException(
+                               "Op " + op + " states BOTH \"scale\" and \"per_stack\" (source: " + spec.getSource() + ")");
+                   }
+                   if (effect.getPercent() == null) {
+                       throw new IllegalArgumentException(
+                               "Op " + op + " states \"per_stack\" without \"percent\" (source: " + spec.getSource() + ")");
+                   }
+               }
                 requireDuration(effect, op, spec);
                 requireStackCap(effect, op, spec);
                 requireTickOwner(effect, op, spec);
@@ -1367,6 +1379,12 @@ public final class TriggerInterpreter {
             //   * a SHARE scales off the target's BASE value, so the ceiling is divided by that base first
             //     -- comparing a share with an absolute number (the first attempt) compares nothing.
             double applied = magnitude;
+            // 「每层【当品】额外使翡翠的攻击力提高0.50%」 (2026-09-29): a SHARE times a count. A plain modifier's magnitude is
+            // a share of the target's BASE, while the derived path yields ABSOLUTE units -- so 「每层…提高 X%」 on a flat
+            // attribute had no spelling. Read PER TARGET, because the count differs from one victim to the next.
+            if (effect.getPerStack() != null && !effect.getPerStack().isBlank()) {
+                applied *= target.getBuffManager().stacksOf(effect.getPerStack().trim());
+            }
             if (derived) {
                 applied = applyDerivedCeiling(effect, ctx, applied);
             } else if (effect.getCapScale() != null || effect.getCapPercent() != null) {
