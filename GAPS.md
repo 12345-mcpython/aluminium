@@ -1300,6 +1300,38 @@
 > * ⭐ **下一步** ✓：**"不吻合"与"未认定"逐条查** ✓ —— 不吻合的三种可能各不相同 ✓：① 规则的数值本就不来自该技能的 `param_list`（**行迹/星魂/光锥/遗器** ✓ ⇒ 应换用对应的数据源 ✓）；② 我从正文抄错了 ✗ ⇒ **改进货** ✓；③ 我认定的技能错了 ✗ ⇒ 归属要重认 ✓。⚠ 未认定的多半是 `source` 只写了角色名与从句 ✓ ⇒ 补上技能名/id 即可 ✓（**同时改善 `source` 的可核查性** ✓）。
 
 
+> **2026-09-29 更新（aggro 回收之七十八：把"认定技能"收紧到「规则事件 ↔ `attack_type`」—— 不吻合从 74 降到 54）**：
+> * ⚠ **上一条的 74 条"不吻合"多半是"我认错了技能"** ✗：`source` 里常出现**多个** 6 位 id ✓（技能 ✓、引用 ✓、星魂 ✓），而脚本取**第一个** ✗ ⇒ 例如 `1001 skill_shield` 被认成 `100102 (Frigid Cold Arrow)` ✓，而它的 Lv10 是 `[1.4]` —— **那是普攻倍率** ✗。
+> * ✅ **收紧办法** ✓：候选只取**属于该角色**的 id ✓，并按**规则自己的事件**过滤 —— `BASIC_ATTACK→Normal` ✓、`SKILL_CAST→BPSkill` ✓、`ULT_CAST→Ultra` ✓、`TALENT_CAST→Talent` ✓；⚠ **多技能共用的名字（`Attack` 之类）直接判为歧义而丢弃** ✗，不参与匹配 ✓。
+> * ✅ **收紧后的逐条结果** ✓：**吻合 93 条** ✓、**不吻合 54 条** ⚠、**未认定 134 条** ⚠（本次共有 44 次"候选里没有与该事件同类型的技能" ✓）。
+>   * ⚠ **仍不吻合**：`1002 talent_wind_pen · 100204 (Sawblade Tuning/Normal) · [0.36] · Lv10 [1.4]`
+>   * ⚠ **仍不吻合**：`1013 skill_bonus_on_healthy_targets · 101302 (It's Magic, I Added Some Magic/Ultra) · [0.2] · Lv10 [2]`
+>   * ⚠ **仍不吻合**：`1103 None · 110303 (Attack/MazeNormal) · [2] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1104 technique_opening_shield · 110407 (Behind the Kindness/Normal) · [0.24, 150, 2] · Lv10 [1.4]`
+>   * ⚠ **仍不吻合**：`1108 talent_windtorn · 110804 (Attack/MazeNormal) · [0.52, 3, 0.65] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1110 skill_survival_response · 111002 (Applies \/Ultra) · [2] · Lv10 [1, 0.135, 360]`
+>   * ⚠ **仍不吻合**：`1110 skill_survival_response · 111002 (Applies \/Ultra) · [0.075, 200, 2] · Lv10 [1, 0.135, 360]`
+>   * ⚠ **仍不吻合**：`1111 talent_start · 111104 (After Luka uses his Basic ATK \/MazeNormal) · [1] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1202 skill_benediction · 120202 (Thorns of the Abyss/Normal) · [3] · Lv10 [1.4]`
+>   * ⚠ **仍不吻合**：`1202 ult_energy_and_boost · 120203 (Violet Sparknado/) · [0.5, 2] · Lv10 [0.6]`
+>   * ⚠ **仍不吻合**：`1203 skill_trigger_on_crossing · 120302 (Death Wish/Ultra) · [0.6, 800] · Lv10 [2, 1]`
+>   * ⚠ **仍不吻合**：`1206 talent_speed_on_break · 120604 (Attack/MazeNormal) · [0.2, 2] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1208 talent_misfortune_avoidance · 120804 (Attack/MazeNormal) · [-0.18] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1208 skill_knowledge_state_and_modifiers · 120802 (Woes of Many Morphed to One/Ultra) · [3] · Lv10 [1]`
+>   * ⚠ **仍不吻合**：`1208 skill_knowledge_state_and_modifiers · 120802 (Woes of Many Morphed to One/Ultra) · [0.06, 3] · Lv10 [1]`
+>   * ⚠ **仍不吻合**：`1208 skill_knowledge_state_and_modifiers · 120802 (Woes of Many Morphed to One/Ultra) · [0.12, 3] · Lv10 [1]`
+>   * ⚠ **仍不吻合**：`1213 talent_righteous_heart · 121304 (Attack/MazeNormal) · [0.1, 1] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1217 None · 121704 (Attack/MazeNormal) · [2] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1218 talent_ashen_roast_and_burn · 121804 (Attack/MazeNormal) · [1, 2] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1218 talent_ashen_roast_and_burn · 121804 (Attack/MazeNormal) · [1.8, 2] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1220 talent_damage_up_on_this_attack · 122004 (Can activate Ultimate when \/MazeNormal) · [0.6, 2] · Lv10 []`
+>   * ⚠ **仍不吻合**：`1221 skill_heal · 122102 (Earthbind, Etherbreak/Ultra) · [0.3, 200] · Lv10 [2.2, 1, 0, 6, 0, 1.1, 0.72, 120]`
+>   * ⚠ **仍不吻合**：`1223 technique_damage_up · 122307 (Votive Incense/Normal) · [0.3, 2] · Lv10 [1.4]`
+>   * ⚠ **仍不吻合**：`1225 technique_advance_and_defence_down · 122507 (Thorned Nectar/Normal) · [0.4] · Lv10 [1.4, 1]`
+>   * ⚠ **仍不吻合**：`1225 technique_advance_and_defence_down · 122507 (Thorned Nectar/Normal) · [-0.18, 2] · Lv10 [1.4, 1]`
+> * ⭐ **下一步** ✓：剩下的"不吻合"逐条分类 ✓：① 数值来自**行迹** ✓（`skill_traces.json` ✓）或**星魂** ✓（`eidolons.json` ✓）或**光锥/遗器** ✓ ⇒ **换数据源** ✓；② 数值来自**另一个技能**（如强化普攻 ✓）⇒ 补 `source` 里的 id ✓；③ **确系抄错** ✗ ⇒ **改进货** ✓。⚠ 而 **134 条未认定** 里绝大多数是**星魂/行迹**来源 ✓（`source` 写的是 `Avatar_…_Rank0N` ✓、`(1001101)` 之类 ✓）⇒ **应改为对 `eidolons.json` / `skill_traces.json` 取证** ✓，这正是"按数据源分流"的第一步 ✓。
+
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
