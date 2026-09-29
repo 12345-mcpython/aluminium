@@ -63,4 +63,64 @@ public class LightConeHealthyTargetTest {
         battle.castImmediate(wearer.getSkills().get(SkillType.SKILL), wearer, List.of(enemy));
         return before - enemy.getCurrentHp();
     }
+
+    /**
+     * The clause's negative half: below the threshold, the rank must not matter at all.
+     *
+     * <p>⚠ The fixture finds a monster it can WOUND without KILLING, by walking candidate ids and checking after each ally
+     * attack that the target is still alive and now under half health. Without that self-check the test could pass by
+     * measuring a corpse, or by never satisfying the condition it is about.
+     */
+    @Test
+    public void belowTheThresholdTheRankStopsMattering() {
+        double rankOne = damageAgainstWoundedTarget(1);
+        double rankFive = damageAgainstWoundedTarget(5);
+        Assertions.assertTrue(rankOne > 0, "precondition: the attack still lands on a wounded target: " + rankOne);
+        Assertions.assertEquals(1.0, rankFive / rankOne, 1e-9,
+                "below the threshold the boost is off for BOTH ranks, so the damage is identical: "
+                        + rankOne + " vs " + rankFive);
+    }
+
+    /** The wearer's skill damage against a target already brought below half health. */
+    private static double damageAgainstWoundedTarget(int rank) {
+        Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(WEAPON_ID, LEVEL, false, rank));
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Random noCrit = new Random(0) {
+            @Override
+            public double nextDouble() {
+                return 0.99;
+            }
+        };
+        int monster = woundableMonster(ally, noCrit);
+        Enemy enemy = EnemyFactory.create(monster, 90, 1);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), noCrit);
+        battle.startBattle();
+        while (enemy.getCurrentHp() / enemy.getMaxHp() >= 0.5) {
+            battle.castImmediate(ally.getSkills().get(SkillType.SKILL), ally, List.of(enemy));
+            Assertions.assertFalse(enemy.isDeath(), "the wounding must not kill the target (monster " + monster + ")");
+        }
+        double before = enemy.getCurrentHp();
+        battle.castImmediate(wearer.getSkills().get(SkillType.SKILL), wearer, List.of(enemy));
+        return before - enemy.getCurrentHp();
+    }
+
+    /** A monster that an ally's skill can bring below half health without killing. */
+    private static int woundableMonster(Character ally, Random noCrit) {
+        for (int id = 1002010; id < 1002120; id++) {
+            try {
+                Enemy probe = EnemyFactory.create(id, 90, 1);
+                Battle battle = new Battle(List.of(ally), List.of(probe), noCrit);
+                battle.startBattle();
+                for (int hit = 0; hit < 12 && !probe.isDeath() && probe.getCurrentHp() / probe.getMaxHp() >= 0.5; hit++) {
+                    battle.castImmediate(ally.getSkills().get(SkillType.SKILL), ally, List.of(probe));
+                }
+                if (!probe.isDeath() && probe.getCurrentHp() / probe.getMaxHp() < 0.5) {
+                    return id;
+                }
+            } catch (RuntimeException ignored) {
+                // not in the data: keep walking
+            }
+        }
+        throw new IllegalStateException("no monster could be wounded without dying in the probe range");
+    }
 }
