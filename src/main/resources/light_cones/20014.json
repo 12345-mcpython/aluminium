@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "KILL",
+      "id": "cone20014_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.1,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20014 相抗: 使装备者在消灭敌方目标后，速度提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 1 档 ⇒ `skill_value = [0.1, 2.0]` ✓（**不是从正文抄** ✓）。⚠ 平值型属性 ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 97/270 轮）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "KILL",
+      "id": "cone20014_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.12,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20014 相抗: 使装备者在消灭敌方目标后，速度提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 2 档 ⇒ `skill_value = [0.12, 2.0]` ✓（**不是从正文抄** ✓）。⚠ 平值型属性 ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 97/270 轮）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "KILL",
+      "id": "cone20014_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.14,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20014 相抗: 使装备者在消灭敌方目标后，速度提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 3 档 ⇒ `skill_value = [0.14, 2.0]` ✓（**不是从正文抄** ✓）。⚠ 平值型属性 ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 97/270 轮）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "KILL",
+      "id": "cone20014_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.16,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20014 相抗: 使装备者在消灭敌方目标后，速度提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 4 档 ⇒ `skill_value = [0.16, 2.0]` ✓（**不是从正文抄** ✓）。⚠ 平值型属性 ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 97/270 轮）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "KILL",
+      "id": "cone20014_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.18,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20014 相抗: 使装备者在消灭敌方目标后，速度提高#1[i]%，持续#2[i]回合。",
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` 第 5 档 ⇒ `skill_value = [0.18, 2.0]` ✓（**不是从正文抄** ✓）。⚠ 平值型属性 ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 97/270 轮）。"
+    }
+  ]
+}
