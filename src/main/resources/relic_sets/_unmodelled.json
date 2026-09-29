@@ -20,13 +20,6 @@
       "reason": "\"For every DoT the enemy target is afflicted with, the wearer will ignore 6% of its DEF when dealing DMG to it. This effect is valid for a max of 3 DoTs.\" Needs a count of the target's DoTs and a per-count scaling of the effect (the amount must be '6% x count, at most 3', and MODIFY_ATTR takes a literal). ⚠ The DEF-ignore itself is not a gap: DEFENCE_IGNORE is an attribute the defence zone already reads (engine.md 3.2)."
     }
   ],
-  "117": [
-    {
-      "require": 4,
-      "ability": "Ability51171",
-      "reason": "\"Increases the wearer's CRIT Rate by 4%, and increases the wearer's CRIT DMG against enemy targets afflicted with at least 2/4 debuffs by 8%/12%. After the wearer inflicts a debuff on an enemy target, the above effect increases by 100% for 1 turn(s).\" The debuff COUNT is expressible (`target_debuff_count`), but CRIT DMG is read by the crit zone, not by the DMG-boost zone -- BOOST_DAMAGE cannot raise it for one instance, and a MODIFY_ATTR buff granted on DEALING_DAMAGE would persist past the hit it was meant for. The third clause adds a 'this effect x2 for N turns' layer on top. (The CRIT Rate in this effect is the `properties` stat, CriticalChanceBase 0.04.)"
-    }
-  ],
   "119": [
     {
       "require": 4,

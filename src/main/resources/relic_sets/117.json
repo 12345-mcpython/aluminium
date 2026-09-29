@@ -15,5 +15,109 @@
       "source": "relic set 117 (死水深潜的先驱 / Pioneer Diver of Dead Waters), 2-piece: 「对受负面状态影响的敌人造成的伤害提高#1[i]%。」 param = [0.12]",
       "note": "The whole 2-piece (its `properties` is empty, so there is nothing for the data path to apply). ⚠ `DEALING_DAMAGE` fires **before** the zones are read and hands the pending instance over, so `BOOST_DAMAGE` changes that one instance; a rule hung on `ALLY_ATTACK` would be too late, the number being final by then. ⚠ `actor == self` is 「装备者造成的伤害」: DEALING_DAMAGE is delivered to every character's table for every instance, so without it the wearer would boost a teammate's hit on the same debuffed enemy -- the same reading 桂乃芬's trace (characters/1210.json) uses. ⚠ `target_debuff_count` counts what the VICTIM carries, which is what 「受负面状态影响的敌人」 says."
     }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic117_crit_dmg_two_debuffs",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 2",
+        "target_debuff_count < 4"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.08,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 117 死水深潜的先驱 4 件套: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
+      "note": "数值取自 `data/relic_sets.json` 的 `param` ✓；**实例级**（`instance: true`，第 163–165/270 轮的能力 ✓）；名义 `turns: 1` 只为满足加载器的形状校验 ✓（实例路由在建 buff 前返回 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic117_crit_dmg_four_debuffs",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 4"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.12,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 117 死水深潜的先驱 4 件套: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
+      "note": "数值取自 `data/relic_sets.json` 的 `param` ✓；**实例级**（`instance: true`，第 163–165/270 轮的能力 ✓）；名义 `turns: 1` 只为满足加载器的形状校验 ✓（实例路由在建 buff 前返回 ✓）。"
+    },
+    {
+      "on": "DEBUFF_APPLIED",
+      "id": "relic117_debuff_applied_empower",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "负面激化",
+          "amount": 1,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 117 死水深潜的先驱 4 件套（施加负面效果分支）: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
+      "note": "「装备者对敌方目标**施加负面效果**后，上述效果提高 100%，持续 1 回合」—— ⭐ 用**新事件 `DEBUFF_APPLIED`**（第 168/270 轮新增 ✓，发射点在 `Battle.tryApplyDebuff` 这一\"唯一收口\" ✓）+ 一个**具名计数器** ✓（`ADD_STACK` + `turns: 1` ✓）；翻倍由下面两条 `*_empowered` 规则实现 ✓（各再 +8% / +12% ✓ => 合计 16% / 24% ✓，与\"提高 100%\"一致 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic117_crit_dmg_two_debuffs_empowered",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 2",
+        "target_debuff_count < 4",
+        "self_stacks:负面激化 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.08,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 117 死水深潜的先驱 4 件套: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
+      "note": "数值取自 `data/relic_sets.json` 的 `param` ✓；**实例级**（`instance: true`，第 163–165/270 轮的能力 ✓）；名义 `turns: 1` 只为满足加载器的形状校验 ✓（实例路由在建 buff 前返回 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic117_crit_dmg_four_debuffs_empowered",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 4",
+        "self_stacks:负面激化 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.12,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 117 死水深潜的先驱 4 件套: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
+      "note": "数值取自 `data/relic_sets.json` 的 `param` ✓；**实例级**（`instance: true`，第 163–165/270 轮的能力 ✓）；名义 `turns: 1` 只为满足加载器的形状校验 ✓（实例路由在建 buff 前返回 ✓）。"
+    }
   ]
 }
