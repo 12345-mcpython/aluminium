@@ -112,7 +112,7 @@ public final class TriggerInterpreter {
     private static final Set<String> WIRED = Set.of(
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
-            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
             "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT");
 
@@ -897,6 +897,7 @@ public final class TriggerInterpreter {
             case "APPLY_REGEN" -> applyRegen(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
+            case "SUMMON_SERVANT" -> battle.summonServant(requireCharacterOwner(effect, ctx));
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' passed validation but has no implementation");
