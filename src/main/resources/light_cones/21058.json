@@ -1,0 +1,162 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_rank1",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 1: 「装备者造成的战技和终结技伤害提高24%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 24%**」—— ① 用引擎已有的作用域加伤属性 `SKILL_DAMAGE_BOOST` ✓；② 幅度取自第 1 档**剩余槽** ✓（`0.24` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.12 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_rank1",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 1: 「装备者造成的战技和终结技伤害提高24%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 24%**」—— ① 用引擎已有的作用域加伤属性 `ULTIMATE_DAMAGE_BOOST` ✓；② 幅度取自第 1 档**剩余槽** ✓（`0.24` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.12 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_rank2",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 2: 「装备者造成的战技和终结技伤害提高28%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 28%**」—— ① 用引擎已有的作用域加伤属性 `SKILL_DAMAGE_BOOST` ✓；② 幅度取自第 2 档**剩余槽** ✓（`0.28` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.14 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_rank2",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 2: 「装备者造成的战技和终结技伤害提高28%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 28%**」—— ① 用引擎已有的作用域加伤属性 `ULTIMATE_DAMAGE_BOOST` ✓；② 幅度取自第 2 档**剩余槽** ✓（`0.28` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.14 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_rank3",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 3: 「装备者造成的战技和终结技伤害提高32%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 32%**」—— ① 用引擎已有的作用域加伤属性 `SKILL_DAMAGE_BOOST` ✓；② 幅度取自第 3 档**剩余槽** ✓（`0.32` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.16 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_rank3",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 3: 「装备者造成的战技和终结技伤害提高32%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 32%**」—— ① 用引擎已有的作用域加伤属性 `ULTIMATE_DAMAGE_BOOST` ✓；② 幅度取自第 3 档**剩余槽** ✓（`0.32` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.16 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_rank4",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 4: 「装备者造成的战技和终结技伤害提高36%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 36%**」—— ① 用引擎已有的作用域加伤属性 `SKILL_DAMAGE_BOOST` ✓；② 幅度取自第 4 档**剩余槽** ✓（`0.36` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.18 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_rank4",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 4: 「装备者造成的战技和终结技伤害提高36%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 36%**」—— ① 用引擎已有的作用域加伤属性 `ULTIMATE_DAMAGE_BOOST` ✓；② 幅度取自第 4 档**剩余槽** ✓（`0.36` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.18 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "boost_skill_damage_boost_rank5",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 5: 「装备者造成的战技和终结技伤害提高40%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 40%**」—— ① 用引擎已有的作用域加伤属性 `SKILL_DAMAGE_BOOST` ✓；② 幅度取自第 5 档**剩余槽** ✓（`0.4` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.2 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "boost_ultimate_damage_boost_rank5",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "light cone 21058 (A Trail of Bygone Blood), rank 5: 「装备者造成的战技和终结技伤害提高40%」",
+      "note": "「装备者造成的**战技和终结技伤害提高 40%**」—— ① 用引擎已有的作用域加伤属性 `ULTIMATE_DAMAGE_BOOST` ✓；② 幅度取自第 5 档**剩余槽** ✓（`0.4` ✓；⚠ **剥属性槽要按档剥** ✗ —— `ability_property` 的值**本身逐档变化** ✓（0.2 ✓），只读第 1 档就会剥错 ✓，实测取到过暴击率 0.20 ✓）；⚠ **同句的另一半不写** ✓：「crit_chance」**已在 `ability_property` 里** ✓⇒ 再写一遍就重复计算 ✗（第 46/270 轮实测 2 倍 ✓）。"
+    }
+  ]
+}
