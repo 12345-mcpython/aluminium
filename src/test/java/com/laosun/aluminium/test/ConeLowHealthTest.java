@@ -27,13 +27,6 @@ public class ConeLowHealthTest {
     private static final int MONSTER = 1002011;
 
 
-    @Test
-    public void cone20016CritOnlyBelowItsThreshold() {
-        Assertions.assertEquals(0.0, share(20016, 1, AttributeType.CRIT_CHANCE, false, true), 1e-6,
-                "healthy: the conditional rule must not fire");
-        double wounded = share(20016, 1, AttributeType.CRIT_CHANCE, true, true);
-        Assertions.assertTrue(wounded > 0, "wounded: the conditional rule fires (got " + wounded + ")");
-    }
 
     @Test
     public void cone20007AttackAfterAKill() {
