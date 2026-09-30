@@ -80,6 +80,7 @@ public class EffectSpec {
 copy.damageType = this.damageType;
                 copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
+        copy.capAmount = this.capAmount;
         copy.skillId = this.skillId;
 return copy;
     }
@@ -211,6 +212,15 @@ return copy;
     /** The ceiling's share, used with {@link #capScale} (both are required together). */
     @SerializedName("cap_percent")
     private Double capPercent;
+
+    /**
+     * A <b>constant</b> ceiling on this effect's magnitude (2026-09-29): {@code cap_amount}.
+     *
+     * <p>{@code cap_scale}+{@code cap_percent} state a ceiling DERIVED from another value; 「最多使造成的伤害提高 #4%」 states a
+     * plain number, and no scale spelling is a constant. Three cones need it (21039, 21034, 23018).
+     */
+    @SerializedName("cap_amount")
+    private Double capAmount;
 
     /**
      * A skill <b>loader key</b> for a skill, used by {@code REPLACE_SKILL} (2026-09-28).

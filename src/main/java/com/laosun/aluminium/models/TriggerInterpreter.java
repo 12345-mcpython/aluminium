@@ -323,6 +323,12 @@ public final class TriggerInterpreter {
                                     + " (source: " + spec.getSource() + ")");
                 }
                 // ? A derived ceiling on a modifier (2026-09-29): both fields, or neither.
+                if (effect.getCapAmount() != null
+                        && (effect.getCapScale() != null || effect.getCapPercent() != null)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states BOTH a derived ceiling and a constant \"cap_amount\"; state one "
+                                    + "(source: " + spec.getSource() + ")");
+                }
                 if ((effect.getCapScale() != null || effect.getCapPercent() != null)
                         && (effect.getCapScale() == null || effect.getCapPercent() == null)) {
                     throw new IllegalArgumentException(
@@ -2314,11 +2320,16 @@ public final class TriggerInterpreter {
      * would exceed the ceiling is brought down to it.
      */
     private static double applyDerivedCeiling(EffectSpec effect, TriggerContext ctx, double magnitude) {
-        if (effect.getCapScale() == null) {
-            return magnitude;
+        // ⚠ The constant ceiling is applied HERE and not in the caller's cap branch (2026-09-29): this method used to
+        // return early when there was no `cap_scale`, so a `cap_amount` wired beside it never ran.
+        double capped = magnitude;
+        if (effect.getCapScale() != null) {
+            capped = Math.min(capped, resolveScale(effect.getCapScale(), effect.getCapPercent(), ctx));
         }
-        double ceiling = resolveScale(effect.getCapScale(), effect.getCapPercent(), ctx);
-        return Math.min(magnitude, ceiling);
+        if (effect.getCapAmount() != null) {
+            capped = Math.min(capped, effect.getCapAmount());
+        }
+        return capped;
     }
 
     /** Resolves one {@code scale} + {@code percent} pair into a number (owner attributes, the owner's Max HP/energy, or the target's Max HP). */
