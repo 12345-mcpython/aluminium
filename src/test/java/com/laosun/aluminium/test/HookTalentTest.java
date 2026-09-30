@@ -12,51 +12,57 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1109 Hook's talent: the extra damage instance, and the guard that stops it from re-triggering itself (round 136).
+ * 1109 Hook's talent: the extra damage instance, and the guard that stops it from re-triggering itself.
  *
  * <p>The clause reacts to a hit on a burning target by dealing one more Fire instance and granting 5 energy. That extra
- * instance is a damage instance too, so without a guard the rule would react to itself until the engine's trigger depth limit
- * threw. The guard is the positive condition `damage_is_attack`, which is false for additional damage.
+ * instance is a damage instance too, so without a guard the rule would react to itself until the engine's trigger depth
+ * limit threw. The guard is the positive condition `damage_is_attack`, which is TRUE for an ordinary attack and FALSE
+ * for additional damage.
  *
- * <p>\u26a0 <b>A negative control was REMOVED, not fixed</b> (round 136, measured): the first version asserted that an
- * attack on a NON-burning target gains no energy, but a basic attack grants energy on its own, so that assertion was
- * about the wrong thing entirely. The condition 	arget has_state 灼烧 in the rule is what keeps the talent off such a
- * target, and it is the same condition shape every other file uses.
+ * <p>\u26a0 <b>Why this file was rewritten (round 4 of the current goal).</b> It used to assert
+ * {@code energy >= before + 5} after one basic attack -- but a basic attack grants energy on its own, so the assertion was
+ * satisfied whether or not the talent fired. Measured: with {@code damage_is_attack} inverted (its implementation until
+ * 2026-09-30) the talent did NOT fire on ordinary attacks, and this test stayed green. The reading is now the
+ * <b>difference</b> between attacking a burning target and attacking a plain one: only the talent can produce it.
  *
- * <p>\u26a0 <b>That this test finishes is itself the assertion about recursion.</b> If the guard were missing or ineffective, the
- * engine would raise "Trigger recursion exceeded" and the test would fail with that, not with a number.
+ * <p>\u26a0 <b>That this test finishes is itself the assertion about recursion.</b> If the guard were missing or
+ * ineffective, the engine would raise "Trigger recursion exceeded" and the test would fail with that, not with a number.
  */
 public class HookTalentTest {
     private static final int HOOK = 1109;
     private static final int LEVEL = 80;
+    private static final double TALENT_ENERGY = 5;
 
-    @Test
-    public void theTalentAddsAnInstanceAndPaysEnergyWithoutRecursing() {
-        Fixture f = new Fixture();
-        f.battle.castImmediate(f.hook.getSkills().get(SkillType.SKILL), f.hook, List.of(f.enemy));
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"), "precondition: the target burns");
-
-        double energyBefore = f.hook.getCurrentEnergy();
-        double hpBefore = f.enemy.getCurrentHp();
-        f.battle.castImmediate(f.hook.getSkills().get(SkillType.COMMON), f.hook, List.of(f.enemy));
-
-        Assertions.assertTrue(f.enemy.getCurrentHp() < hpBefore, "the attack itself lands");
-        Assertions.assertTrue(f.hook.getCurrentEnergy() >= energyBefore + 5,
-                "\u300c\u5e76\u989d\u5916\u6062\u590d5\u70b9\u80fd\u91cf\u300d -- the talent pays, and the extra instance did not recurse");
-    }
-
-    private static final class Fixture {
-        private final Character hook = CharacterFactory.create(HOOK, LEVEL);
-        private final Enemy enemy = Enemy.fromAttributes("Test Dummy", 20000, 100, 100, 90);
-        private final Battle battle = new Battle(List.of(hook), List.of(enemy), new Random() {
+    /** The energy one basic attack gains, with and without the burning target the talent needs. */
+    private double energyFromOneBasicAttack(boolean burning) {
+        Character hook = CharacterFactory.create(HOOK, LEVEL);
+        Enemy enemy = Enemy.fromAttributes("Test Dummy", 20000, 100, 100, 90);
+        Battle battle = new Battle(List.of(hook), List.of(enemy), new Random() {
             @Override
             public double nextDouble() {
                 return 0.0;
             }
         });
-
-        private Fixture() {
-            battle.startBattle();
+        battle.startBattle();
+        if (burning) {
+            battle.castImmediate(hook.getSkills().get(SkillType.SKILL), hook, List.of(enemy));
+            Assertions.assertTrue(enemy.getBuffManager().hasState("\u707c\u70e7"), "precondition: the target burns");
         }
+        double before = hook.getCurrentEnergy();
+        battle.castImmediate(hook.getSkills().get(SkillType.COMMON), hook, List.of(enemy));
+        double gained = hook.getCurrentEnergy() - before;
+        Assertions.assertTrue(hook.getMaxEnergy() > gained, "precondition: the bar is not clipped by the cap");
+        return gained;
+    }
+
+    @Test
+    public void theTalentPaysFiveEnergyThatTheAttackAloneDoesNot() {
+        double plain = energyFromOneBasicAttack(false);
+        double burning = energyFromOneBasicAttack(true);
+        System.out.println("[1109] energy from one basic attack: burning=" + burning + " plain=" + plain
+                + " difference=" + (burning - plain));
+        Assertions.assertEquals(TALENT_ENERGY, burning - plain, 1e-6,
+                "the talent's 5 energy is the DIFFERENCE -- the attack's own gain cancels out, so this reading is "
+                        + "attributable to the talent and to nothing else");
     }
 }
