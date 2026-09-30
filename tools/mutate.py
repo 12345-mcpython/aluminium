@@ -25,7 +25,9 @@ EFFECT_LEVEL = {
 }
 
 
-def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=None):
+def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=None, every=False):
+    """\u2605 `every=True` accepts several matches (round 328): a rule that states the same effect for `self` AND
+    `summon` is ONE clause with two targets, and "touch only one of them" is not a mutation of that clause."""
     """Set `field` on the named rule; returns the value read back from disk."""
     if field not in RULE_LEVEL and field not in EFFECT_LEVEL:
         raise SystemExit('mutation refused: field %r belongs to no known layer' % field)
@@ -52,8 +54,11 @@ def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=N
                     continue
                 do[field] = value
                 touched += 1
-    if touched != 1:
-        raise SystemExit('mutation refused: %s.%s touched %d targets' % (rule_id, field, touched))
+    if touched > 1 and not every:
+        raise SystemExit('mutation refused: %s.%s touched %d targets (pass every=True to mean all of them)'
+                         % (rule_id, field, touched))
+    if touched == 0:
+        raise SystemExit('mutation refused: %s.%s touched nothing' % (rule_id, field))
     open(path, 'w', encoding='utf-8', newline='').write(json.dumps(raw, ensure_ascii=False, indent=2) + '\n')
     back = json.load(open(path, encoding='utf-8'))
     rule = next(r for r in (back if isinstance(back, list) else back[rank])
