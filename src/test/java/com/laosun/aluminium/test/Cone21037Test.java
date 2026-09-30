@@ -65,6 +65,35 @@ public class Cone21037Test {
         Assertions.assertEquals(0.08 * 4, after - before, 1e-9, "six crits cap at four layers of 8 points");
     }
 
+    /**
+     * \u26a0 The owner gate needs a SECOND ally: with only the wearer in the party, `actor == self` and `actor is_ally`
+     * behave identically, so swapping them changed nothing (measured: 0 red). A teammate's crit is the case that tells
+     * them apart -- it must not stack the wearer's layers.
+     */
+    @Test
+    public void aTeammatesCritDoesNotGrantTheWearersLayers() {
+        Character wearer = wearer(true);
+        Character ally = CharacterFactory.create(1002, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        battle.startBattle();
+        double before = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        ally.getAttribute(AttributeType.CRIT_CHANCE)
+                .addModifier(DoubleValue.Modifier.pure(1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210371));
+        for (int i = 0; i < 3; i++) {
+            battle.applyDamage(enemy, new Damage(ally, enemy, DamageElement.FIRE, DamageType.NORMAL, 50));
+        }
+        double afterAllyCrits = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        System.out.println("[21037] wearer after three ALLY crits: " + before + " -> " + afterAllyCrits);
+        Assertions.assertEquals(before, afterAllyCrits, 1e-9, "the clause is about the WEARER's own crits");
+        wearer.getAttribute(AttributeType.CRIT_CHANCE)
+                .addModifier(DoubleValue.Modifier.pure(1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210372));
+        battle.applyDamage(enemy, new Damage(wearer, enemy, DamageElement.FIRE, DamageType.NORMAL, 50));
+        System.out.println("[21037] wearer after its OWN crit: " + wearer.getAttribute(AttributeType.CRIT_ATTACK).get());
+        Assertions.assertEquals(before + 0.08, wearer.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "and it does stack on the wearer's own crit");
+    }
+
     @Test
     public void theLayersGoAwayWhenTheWearersTurnEnds() {
         Character unit = wearer(true);
