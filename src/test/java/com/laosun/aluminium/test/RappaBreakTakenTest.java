@@ -20,8 +20,8 @@ import java.util.Random;
 /**
  * 1317 Rappa, trace 1317103: 「敌方目标的弱点被击破时，受到的击破伤害提高2%；若当前攻击力高于2400，每超过100点额外提高1%，最多额外提高8%」.
  *
- * <p>The clause is a step function of the wearer's ATTACK, so the judge computes the expected share from the ATTACK it measures -- and the branches must be exclusive,
- * which the compiled table is asked to prove.
+ * <p>Two assertions that a magnitude mutation cannot survive: the base branch's own share (read from the compiled rule) and the measured ratio between break and normal
+ * damage. The branch is selected by its condition, because the tiers are mutually exclusive step functions of ATTACK.
  */
 public class RappaBreakTakenTest {
     private static final int WEARER = 1317;
@@ -32,35 +32,33 @@ public class RappaBreakTakenTest {
     public void theBaseBranchStatesTwoPercentScopedToBreak() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        double attack = unit.getAttribute(AttributeType.ATTACK).get();
         var rules = unit.getTriggerTable().matching(TriggerEvent.BREAK,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0));
-        int breakScoped = 0;
+        Assertions.assertTrue(attack < 2500, "precondition: this wearer sits in the base tier, ATTACK=" + attack);
+        double baseShare = -1;
         for (var rule : rules) {
             for (var effect : rule.effects()) {
-                if ("MODIFY_DAMAGE_TAKEN".equals(effect.getOp()) && "BREAK".equals(effect.getDamageType())) {
-                    breakScoped++;
-                    System.out.println("[1317] rule id=" + rule.id() + " conditions="
-                            + rule.conditions().stream().map(c -> c.source()).toList()
-                            + " percent=" + effect.getPercent());
+                if ("MODIFY_DAMAGE_TAKEN".equals(effect.getOp()) && "BREAK".equals(effect.getDamageType())
+                        && rule.conditions().stream().anyMatch(c -> c.source().contains("attack < 2500"))) {
+                    baseShare = effect.getPercent();
+                    System.out.println("[1317] base rule=" + rule.id() + " percent=" + baseShare);
                 }
             }
         }
-        Assertions.assertTrue(breakScoped >= 1, "at least one break-scoped branch is compiled");
+        Assertions.assertEquals(0.02, baseShare, 1e-9, "the base tier is 2%");
     }
 
     @Test
-    public void breakDamageIsAmplifiedAndNormalIsNot() {
+    public void breakDamageIsAmplifiedByExactlyTheAuthoredShare() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
-        double attack = unit.getAttribute(AttributeType.ATTACK).get();
-        int tiers = Math.min(8, Math.max(0, (int) ((2500 - attack) <= 0 ? 0 : 0)));
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
         double breaking = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.BREAK, 1000));
-        System.out.println("[1317] attack=" + attack + " normal=" + normal + " break=" + breaking
-                + " tiers=" + tiers);
-        Assertions.assertTrue(normal > 0 && breaking > 0, "both settle");
+        System.out.println("[1317] normal=" + normal + " break=" + breaking + " ratio=" + (breaking / normal));
+        Assertions.assertEquals(1.02, breaking / normal, 1e-6, "break damage rises by exactly the authored 2%");
     }
 }
