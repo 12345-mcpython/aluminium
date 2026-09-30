@@ -50,7 +50,11 @@ class Control:
         print('control: compile exit=%s' % comp.returncode)
         if comp.returncode != 0:
             print(((comp.stdout or '') + (comp.stderr or ''))[-600:])
-            return {'compile': comp.returncode, 'test': None, 'reds': None, 'xml_age': None}
+            # \u2605 `ok` exists because `reds=None` LOOKS like a result (round 345, discipline 179): a control that
+            # failed to compile says nothing about the code it aimed at, and reading its None as "0 red" would be the
+            # same mistake in a new coat. Callers should test `ok` (or use `verdict`) before believing `reds`.
+            return {'ok': False, 'why': 'the control did not compile, so it proves nothing',
+                    'compile': comp.returncode, 'test': None, 'reds': None, 'xml_age': None}
         before = time.time()
         test = subprocess.run(gradle + ['test', '--tests', test_class, '--quiet', '--console=plain'],
                               cwd=self.work, capture_output=True, text=True, encoding='utf-8', errors='replace')
@@ -66,7 +70,23 @@ class Control:
         print('control: test exit=%s reds=%s xml_age=%ss' % (test.returncode, reds, age))
         if age is None or age < 0:
             print('control: WARNING the XML predates this run -- the reds count is not evidence')
-        return {'compile': comp.returncode, 'test': test.returncode, 'reds': reds, 'xml_age': age}
+            return {'ok': False, 'why': 'the XML predates this run, so the reds count is not evidence',
+                    'compile': comp.returncode, 'test': test.returncode, 'reds': None, 'xml_age': age}
+        return {'ok': True, 'compile': comp.returncode, 'test': test.returncode, 'reds': reds, 'xml_age': age}
+
+    @staticmethod
+    def verdict(result):
+        """\u2605 The one way to read a control (disciplines 173 / 174 / 178 / 179).
+
+        A check is evidence only when: the control COMPILED (`ok`), the XML is from this run, and the test class really
+        failed (`reds > 0`). Everything else -- 0 red with a live judge, a replacement identical to the original, an
+        equivalent mutation, or `reds=None` -- is a finding about the CHECK, not about the code.
+        """
+        if not result.get('ok'):
+            return 'NOT EVIDENCE: %s' % result.get('why')
+        if not result.get('reds'):
+            return 'NOT EVIDENCE: the control ran but nothing failed -- the judge may not press this code'
+        return 'evidence: reds=%s (compile=%s, test=%s)' % (result['reds'], result['compile'], result['test'])
 
     def restore(self):
         for path, body in self.saved.items():
