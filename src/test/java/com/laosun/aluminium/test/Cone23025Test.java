@@ -57,7 +57,9 @@ public class Cone23025Test {
         System.out.println("[23025] collapse stacks=" + collapse + " (hasState="
                 + enemy.getBuffManager().hasState(COLLAPSE) + ") ; speed " + speedBefore + " -> " + speedAfter);
         Assertions.assertEquals(1, collapse, "\u9020\u6210\u51fb\u7834\u4f24\u5bb9\u65f6 collapses the target");
-        Assertions.assertTrue(speedAfter < speedBefore, "and the collapsed target is slower");
+        // \u2605 The AMOUNT, not just the direction (discipline 200): the enemy carries no other speed modifier, so the slow
+        // is exactly a fifth of it. `speedAfter < speedBefore` survives a `20 -> 10 percent` mutation -- measured, 0 red.
+        Assertions.assertEquals(0.8, speedAfter / speedBefore, 1e-9, "20% slower, as a share of its own speed");
     }
 
     @Test
