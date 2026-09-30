@@ -1,0 +1,202 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_apply_the_state",
+      "when": [
+        "actor == self",
+        "!target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "攻陷",
+          "base_chance": 0.6,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「当装备者命中敌方目标时，如果该目标不处于【攻陷】状态，则有#1[i]%的基础概率使其陷入【攻陷】状态」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_defence_down_while_stated",
+      "when": [
+        "actor == self",
+        "target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.12,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「【攻陷】状态下的敌方目标防御力降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_apply_the_state",
+      "when": [
+        "actor == self",
+        "!target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "攻陷",
+          "base_chance": 0.7,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「当装备者命中敌方目标时，如果该目标不处于【攻陷】状态，则有#1[i]%的基础概率使其陷入【攻陷】状态」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_defence_down_while_stated",
+      "when": [
+        "actor == self",
+        "target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.13,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「【攻陷】状态下的敌方目标防御力降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_apply_the_state",
+      "when": [
+        "actor == self",
+        "!target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "攻陷",
+          "base_chance": 0.8,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「当装备者命中敌方目标时，如果该目标不处于【攻陷】状态，则有#1[i]%的基础概率使其陷入【攻陷】状态」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_defence_down_while_stated",
+      "when": [
+        "actor == self",
+        "target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.14,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「【攻陷】状态下的敌方目标防御力降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_apply_the_state",
+      "when": [
+        "actor == self",
+        "!target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "攻陷",
+          "base_chance": 0.9,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「当装备者命中敌方目标时，如果该目标不处于【攻陷】状态，则有#1[i]%的基础概率使其陷入【攻陷】状态」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_defence_down_while_stated",
+      "when": [
+        "actor == self",
+        "target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.15,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「【攻陷】状态下的敌方目标防御力降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_apply_the_state",
+      "when": [
+        "actor == self",
+        "!target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "攻陷",
+          "base_chance": 1,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「当装备者命中敌方目标时，如果该目标不处于【攻陷】状态，则有#1[i]%的基础概率使其陷入【攻陷】状态」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21015_defence_down_while_stated",
+      "when": [
+        "actor == self",
+        "target has_state 攻陷"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.16,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21015: 「【攻陷】状态下的敌方目标防御力降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 两句都能完整表达 ✓：① 命中且**目标不处于【攻陷】**（`!target has_state 攻陷` ✓）时以 **60% 基础概率**上状态 ✓；② 目标**处于【攻陷】**时降其**防御力 12%**（`MODIFY_ATTR DEFENCE` ✓、时长 1 回合 ✓）。⚠ 【攻陷】是**有名状态** ✓，所以两条规则可以各自持有一个方向 ✓。"
+    }
+  ]
+}
