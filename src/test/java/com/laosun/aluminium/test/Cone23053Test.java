@@ -80,6 +80,20 @@ public class Cone23053Test {
         System.out.println("[23053] none=" + none + " one=" + one + " four=" + four + " after six=" + capped
                 + " layers=" + wearer.getBuffManager().stacksOf("\u6d88\u8017\u5c42\u6570"));
         Assertions.assertTrue(one > none, "one spent point must raise the settled elation damage");
+        // \u2605 The VALUE, not just the direction (discipline 189): the settled damage is `base / (effDef + 200 + 10L)`, and
+        // the ignore multiplies effDef. Everything here comes from the engine's own numbers, so a wrong `percent` has to
+        // move this line -- a monotonicity-only judge let `5% -> 2.5%` pass (measured, 0 red).
+        double defence = enemy.getAttribute(AttributeType.DEFENCE).get();
+        double level = wearer.getLevel();
+        double zoneNone = 1.0 / (defence + 200 + 10 * level);
+        double zoneFour = 1.0 / (defence * (1 - 4 * PER_POINT) + 200 + 10 * level);
+        double expectedFour = none * zoneFour / zoneNone;
+        System.out.println("[23053] defence=" + defence + " level=" + level + " expectedFour=" + expectedFour
+                + " measured=" + four);
+        if (Math.abs(expectedFour - none) > 1e-9) {
+            Assertions.assertEquals(expectedFour, four, Math.abs(expectedFour) * 1e-6,
+                    "four layers must ignore exactly " + (4 * PER_POINT) + " of the defence");
+        }
         Assertions.assertTrue(four > one, "and four must raise it further (" + PER_POINT + " per layer)");
         Assertions.assertEquals(four, capped, 1e-9, "but the clause caps at " + CAP + " layers");
         Assertions.assertEquals(CAP, wearer.getBuffManager().stacksOf("\u6d88\u8017\u5c42\u6570"), "counter at the cap");
