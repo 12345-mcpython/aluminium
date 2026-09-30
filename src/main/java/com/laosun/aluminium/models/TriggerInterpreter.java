@@ -748,10 +748,6 @@ public final class TriggerInterpreter {
         int effectIndex = 0;
         for (EffectSpec effect : rule.effects()) {
             final int thisEffect = effectIndex++;
-            if (ctx.target() != null) {
-                System.out.println("[loop] effect#" + thisEffect + " op=" + effect.getOp() + " stacks="
-                        + ctx.target().getBuffManager().stacksOf("\u70ec\u714e"));
-            }
             // 「终结技的持续时间额外增加 1 回合」/「天赋的伤害提高效果额外提高 10%」 (2026-09-28): an amendment to the
             // named rule's own effect values. ⚠ A COPY, not a mutation: the compiled EffectSpec is shared by every
             // battle, so adjusting it in place would leak the amendment (and, in the test suite, into other tests).

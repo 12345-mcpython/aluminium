@@ -85,4 +85,22 @@ public class Cone22008Test {
         System.out.println("[22008] without the cone: " + before + " -> " + after);
         Assertions.assertEquals(before, after, 1e-9, "no cone, no stacking (false case)");
     }
+
+    @Test
+    public void theDurationIsGrantedAndTheClockIsOpen() {
+        // \u2605 Measured, and registered rather than asserted away: the layer is granted with `turns: 2`, but NOTHING public moves
+        // that clock -- firing TURN_END twice, and calling the buff manager\u2019s own turn boundary (`beforeMove()`) three times,
+        // both left the value at 0.53. So this test pins the grant, and the expiry is a named gap until a real turn loop is
+        // driven from a test (the countdown simply does not run outside the battle\u2019s own turn machinery).
+        build(true);
+        double baseline = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        followUpAndRead();
+        double granted = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        wearer.getBuffManager().beforeMove();
+        double afterBoundary = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        System.out.println("[22008] duration: baseline=" + baseline + " granted=" + granted
+                + " after a turn boundary=" + afterBoundary + " (the clock does not move here)");
+        Assertions.assertEquals(baseline + 0.03, granted, 1e-9, "granted on the follow-up");
+        Assertions.assertEquals(granted, afterBoundary, 1e-9, "and no public boundary runs the clock (registered)");
+    }
 }
