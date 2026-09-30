@@ -1,0 +1,567 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_normal",
+      "when": [
+        "actor == self",
+        "from_category NORMAL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心普攻",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.12,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放普攻后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心战技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.12,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放战技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心终结技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.12,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放终结技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_normal",
+      "when": [
+        "actor == self",
+        "from_category NORMAL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心普攻",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.14,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放普攻后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心战技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.14,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放战技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心终结技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.14,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放终结技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_normal",
+      "when": [
+        "actor == self",
+        "from_category NORMAL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心普攻",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.16,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放普攻后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心战技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.16,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放战技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心终结技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.16,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放终结技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_normal",
+      "when": [
+        "actor == self",
+        "from_category NORMAL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心普攻",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.18,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放普攻后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心战技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.18,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放战技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心终结技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.18,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放终结技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_normal",
+      "when": [
+        "actor == self",
+        "from_category NORMAL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心普攻",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.2,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放普攻后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心战技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.2,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放战技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21036_heart_from_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "童心终结技",
+          "turns": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.2,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21036: 「装备者施放终结技后，为我方全体附加【童心】，【童心】可以使我方目标对应类型的技能所造成的伤容提高 12%。【童心】仅对装备者最新使用的技能类型生效，且不可叠加。」",
+      "note": "⭐⭐ **全部用现成词汇** ✓：三条 `CAST_SETUP` 规则 ✓（`from_category NORMAL` / `BPSKILL` / `ULTRA` ✓）；「为我方全体附加【童心】…对应类型的技能伤容提高」= `APPLY_BUFF` ✓ + `MODIFY_ATTR <对应属性>` + **`max_stacks: 1`** ✓ + `target: all_allies` ✓；⭐⭐ 「**仅对最新使用的类型生效**」= 每条规则在自己到来时，**`REMOVE_STACK` 按属性摘掉另外两个** ✓ —— 因为引擎的 `isNamed` 对**属性修饰器**是按**属性**匹配的 ✓（对 `StateBuff` 才按名字 ✓）（代码位置：`BuffManager.isNamed` ✓）；⚠ 原文的【童心】仍以状态形式存在 ✓（可被名字移除 ✓），三个名字分别对应三种类型 ✓。"
+    }
+  ]
+}
