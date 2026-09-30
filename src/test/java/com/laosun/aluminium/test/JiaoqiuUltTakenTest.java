@@ -63,4 +63,38 @@ public class JiaoqiuUltTakenTest {
         System.out.println("[1218] normal=" + normal + " ultra=" + ultra + " ratio=" + (ultra / normal));
         Assertions.assertEquals(1.15, ultra / normal, 1e-6, "ultimate damage rises by exactly the authored 15%");
     }
+
+    @Test
+    public void theTieredRuleStatesItsBaseSharePerLayerAndCeiling() {
+        Character unit = CharacterFactory.create(WEARER, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        battle.startBattle();
+        // ⚠ `matching` EVALUATES the rule's conditions, so the counter must really be stacked: the character's own ADD_STACK rule
+        // (on ALLY_ATTACK) is what creates it -- a hand-made state does not register (round 219/240).
+        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, unit, enemy, 0, 0);
+        System.out.println("[1218] layers=" + enemy.getBuffManager().stacksOf("\u70ec\u7168"));
+        var rules = unit.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
+                new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0));
+        double amount = -1;
+        double percent = -1;
+        double cap = -1;
+        String scale = null;
+        for (var rule : rules) {
+            for (var effect : rule.effects()) {
+                if ("MODIFY_DAMAGE_TAKEN".equals(effect.getOp()) && effect.getScale() != null) {
+                    amount = effect.getAmount();
+                    percent = effect.getPercent();
+                    cap = effect.getCapAmount();
+                    scale = effect.getScale();
+                    System.out.println("[1218] tiered rule id=" + rule.id() + " amount=" + amount + " scale=" + scale
+                            + " percent=" + percent + " capAmount=" + cap + " turns=" + effect.getTurns());
+                }
+            }
+        }
+        Assertions.assertEquals("target_stacks:烬煨", scale, "the layers live on the event target");
+        Assertions.assertEquals(0.10, amount, 1e-9, "the base is 10% so that ONE layer reads 15%");
+        Assertions.assertEquals(0.05, percent, 1e-9, "each further layer adds 5%");
+        Assertions.assertEquals(0.35, cap, 1e-9, "five layers cap it at 35%");
+    }
 }
