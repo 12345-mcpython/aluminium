@@ -69,13 +69,6 @@
       "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
     }
   ],
-  "323": [
-    {
-      "require": 2,
-      "ability": "Ability53231",
-      "reason": "\"Increases the wearer's CRIT Rate by 8%. While the wearer's memosprite is on the field, increases all allies' SPD by 12%. This effect cannot be stacked.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08), the presence condition exists (`self_summon_count >= 1`, see set 318's file for the technique), and the party-wide SPD boost is expressible. What blocks it is the DURATION of a 'while' clause that affects OTHER units: the technique that works for 318 (re-evaluate at the wearer's own turn start for one turn) is faithful only while the wearer is acting, and a speed buff that comes and goes per turn would make the action bar oscillate. It needs a buff whose lifetime is tied to a condition, not a snapshot."
-    }
-  ],
   "324": [
     {
       "require": 2,
