@@ -2143,11 +2143,28 @@ public class Battle {
      */
     public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                             SkillCategory fromCast, int skillId) {
-        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId);
+        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId, 0);
+    }
+
+    /**
+     * \u2705 The same, plus how many of the hit targets carry the attack's own element weakness (2026-09-30; reader: cone
+     * 21040's \u300c\u82e5\u6709\u4e0d\u5c11\u4e8e 2 \u4e2a\u88ab\u653b\u51fb\u7684\u654c\u65b9\u76ee\u6807\u5177\u6709\u5bf9\u5e94\u5c5e\u6027\u5f31\u70b9\u300d).
+     *
+     * <p>\u2605 A count over a predicate cannot be assembled from the parts: a multi-target attack fires the damage event once
+     * per target, so "how many of them were weak" only exists where the whole set is in hand -- the caster's side.
+     */
+    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                            SkillCategory fromCast, int skillId, int weakHitCount) {
+        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId, weakHitCount);
     }
 
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast, int skillId) {
+        return fireTriggers(event, actor, target, hitCount, amount, damage, fromCast, skillId, 0);
+    }
+
+    private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                             Damage damage, SkillCategory fromCast, int skillId, int weakHitCount) {
         if (triggerDepth >= MAX_TRIGGER_DEPTH) {
             throw new IllegalStateException(
                     "Trigger recursion exceeded " + MAX_TRIGGER_DEPTH + " levels while firing "

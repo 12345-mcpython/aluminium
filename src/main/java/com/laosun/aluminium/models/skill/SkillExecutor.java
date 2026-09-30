@@ -157,6 +157,20 @@ public final class SkillExecutor {
         // own subject. The distinction is what 「使指定我方单体…」 needs (2026-09-28, M-35): before this the
         // field was null for every cast, and "the ally I chose" was unexpressible.
         CanHit aimed = chosen.isEmpty() ? null : chosen.getFirst();
+
+        // \u2705 How many of the targets this attack CONNECTED WITH carry its own element's weakness (2026-09-30; reader:
+        // cone 21040). Counted here because this is the only place holding the whole set; the per-target events cannot
+        // reconstruct it, since a multi-target attack fires them one target at a time.
+        int weakHitCount = 0;
+        if (skill != null && skill.getData() != null && skill.getData().getElement() != null) {
+            Object element = skill.getData().getElement();
+            for (CanHit hit : hits) {
+                if (hit instanceof com.laosun.aluminium.models.enemy.Enemy enemy
+                        && enemy.isWeakTo((com.laosun.aluminium.enums.DamageElement) element)) {
+                    weakHitCount++;
+                }
+            }
+        }
         // A skill with no data (an EnemySkill, a hand-made placeholder constructed by a test) has no
         // attack_type to testify and is treated as UNSPECIFIED: it fires none of the three events.
         // Guessing from the slot instead would make the answer depend on how the skill was built.
@@ -164,9 +178,9 @@ public final class SkillExecutor {
                 ? SkillCategory.UNSPECIFIED
                 : skill.getData().getCategory();
         switch (category) {
-            case ULTRA -> battle.fireTriggers(TriggerEvent.ULT_CAST, user, aimed, hits.size(), 0);
-            case BPSKILL -> battle.fireTriggers(TriggerEvent.SKILL_CAST, user, aimed, hits.size(), 0);
-            case NORMAL -> battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, aimed, hits.size(), 0);
+            case ULTRA -> battle.fireTriggers(TriggerEvent.ULT_CAST, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
+            case BPSKILL -> battle.fireTriggers(TriggerEvent.SKILL_CAST, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
+            case NORMAL -> battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
             default -> {
                 // not an in-battle cast: see above
             }
@@ -178,7 +192,7 @@ public final class SkillExecutor {
             // Passing it would be information with no reader, which is the shape this project keeps refusing.
             // ⚠ category rides along (2026-09-28): 「施放 2 次普攻/战技/终结技」 must tell the three slots apart, and this
             // is the one event that fires once per CAST (DEALING_DAMAGE would count hits).
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot());
+            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
         }
     }
 
