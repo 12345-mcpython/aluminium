@@ -1,0 +1,197 @@
+{
+  "1": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone24000_attack_per_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者施放攻击时，使装备者本场战斗中的攻击力提高#1[i]%，该效果最多叠加#2[i]层。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone24000_damage_after_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者击破敌方目标弱点后，造成的伤容提高#3[i]%，持续#4[i]回合。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone24000_attack_per_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者施放攻击时，使装备者本场战斗中的攻击力提高#1[i]%，该效果最多叠加#2[i]层。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone24000_damage_after_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者击破敌方目标弱点后，造成的伤容提高#3[i]%，持续#4[i]回合。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone24000_attack_per_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.12,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者施放攻击时，使装备者本场战斗中的攻击力提高#1[i]%，该效果最多叠加#2[i]层。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone24000_damage_after_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.18,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者击破敌方目标弱点后，造成的伤容提高#3[i]%，持续#4[i]回合。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone24000_attack_per_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.14,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者施放攻击时，使装备者本场战斗中的攻击力提高#1[i]%，该效果最多叠加#2[i]层。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone24000_damage_after_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.21,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者击破敌方目标弱点后，造成的伤容提高#3[i]%，持续#4[i]回合。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone24000_attack_per_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.16,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者施放攻击时，使装备者本场战斗中的攻击力提高#1[i]%，该效果最多叠加#2[i]层。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone24000_damage_after_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24000: 「当装备者击破敌方目标弱点后，造成的伤容提高#3[i]%，持续#4[i]回合。」",
+      "note": "⭐ **两句都是现成词汇** ✓：「装备者**施放攻击时**」= **`ALLY_ATTACK`** ✓ + `actor == self` ✓；「使装备者**本场战斗中**的攻击力提高#1[i]%，最多叠加#2[i]层」= 写下的 `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（层数式写法 ✓，22008 / 23022 已验证 ✓）；「当装备者**击破敌方目标弱点后**，造成的伤容提高#3[i]%，持续#4[i]回合」= **`BREAK`** 事件 ✓（枚举里已有 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns` ✓。"
+    }
+  ]
+}
