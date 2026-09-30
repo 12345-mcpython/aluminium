@@ -295,7 +295,17 @@ public enum TriggerEvent {
      * written on the character and reads its own state (「退出【协奏】」是 `REMOVE_STATE` 加 `EXTRA_TURN self`), so the actor is only ever used
      * to recognise the moment — and a rule that wants "my own countdown" says so by naming it in its own table.
      */
-    COUNTDOWN_TURN("COUNTDOWN_TURN", true);
+    COUNTDOWN_TURN("COUNTDOWN_TURN", true),
+
+    /**
+     * ★ A damage instance that CRIT.
+     *
+     * <p>{@code DEALING_DAMAGE} fires BEFORE the crit zone is read (the event at Battle:2542, the roll at
+     * 2547), so "当装备者对敌方目标造成暴击后" was not expressible: at the moment a rule could see the
+     * instance, nobody knew whether it would crit. This one fires right AFTER the zone and only when it did,
+     * so a rule needs no predicate -- and its SUBJECT is the critter, not the victim.
+     */
+    CRIT_DEALT("CRIT_DEALT", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 

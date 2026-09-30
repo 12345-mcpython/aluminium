@@ -2549,6 +2549,12 @@ public class Battle {
             boolean isCrit = critRate > 0 && rng.nextDouble() < critRate;
             damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get() + damage.getExtraCritDamage());
         }
+        // \u2605 "this instance crit" -- the only moment the answer exists. \u26a0 The SUBJECT is the ATTACKER: a crit is an event
+        // about the one who dealt it. Passing the victim here looks natural and silently does nothing, because
+        // `fireTriggersForAlly` refuses any subject that is not ours (round 266 measured exactly that).
+        if (damage.critArea().isCrit()) {
+            fireTriggersForAlly(TriggerEvent.CRIT_DEALT, attacker, attacker, 0);
+        }
 
         // 3) Defence zone: attacker level / victim defence / attacker defence ignore
         damage.defence(attacker.getLevel(),

@@ -748,6 +748,11 @@ public class Damage {
             return this;
         }
 
+        /** Whether this instance crit -- the reader {@code Battle} needs to fire {@code CRIT_DEALT}. */
+        public boolean isCrit() {
+            return crit;
+        }
+
         @Override
         protected double min() {
             return 1.0;
