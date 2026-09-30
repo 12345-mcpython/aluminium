@@ -5006,6 +5006,39 @@
 >   是**补充平面字符在 Windows 控制台参数里被拆成代理对** ✓）。
 > * **进度**：**角色 90 个文件 / 493 条规则** ✓；光锥 **77 / 169** ✓；遗器 **52 个文件 / 登记表 10 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之三百二十一：**遗器 115/4 出货**（登记理由已过时 ✓）—— 也顺手证明 `once_per_attack` 有第二个读者 ✓）**：
+> 
+> * ⚠⚠ **登记理由过时（"回到源码复核旧注记"第 N 次生效 ✓）** ✓：`relic_sets/_unmodelled.json` 里 115/4 的理由是
+>   「Needs a FOLLOW-UP dimension on the damage instance … `DamageType` has no such value」✗ —— **实测不成立** ✗：
+>   * `DamageType.ADDITIONAL` **就是**引擎对追加攻击的表示 ✓（`Battle` 的注释原话："the engine's one and only notion of
+>     a follow-up attack" ✓）；
+>   * 而且 **`FOLLOW_UP` 事件在每一个追加伤害实例上都触发** ✓（`Battle:2428` ✓）—— 「根据追加攻击造成伤害的**次数**、
+>     **每次造成伤害时**」正就是这个粒度 ✓。
+>   ⇒ **本条无需新能力** ✓，只需把已有能力写对 ✓。
+> * ✅ **出货：遗器 115（毁烬焚骨的大公）4 件套** ✓ —— 「装备者施放追加攻击时，根据追加攻击造成伤害的次数，
+>   **每次造成伤害时**使装备者的攻击力提高 **6%**，最多叠加 **8 次**，持续 **3 回合**。该效果**在装备者下一次施放追加攻击时移除**」✓
+>   * 两条规则 ✓：**先清后加** ✓（同一事件按文件顺序执行 ✓）——
+>     ① `FOLLOW_UP` + **`once_per_attack: true`** ⇒ `REMOVE_STACK` ✓（"下一次追加攻击的**第一个实例**" ✓ = 本目标的"下一次" ✓）；
+>     ② `FOLLOW_UP` ⇒ `ADD_STACK`（`max_stacks: 8`、`turns: 3` ✓）+ `MODIFY_ATTR ATTACK per_stack` ✓。
+>   * ⭐ 这是 **`once_per_attack` 的第二个读者** ✓（第一个是光锥 21031 ✓），而且用法不同 ✓：
+>     21031 用它**封顶次数** ✓，115/4 用它**定位"新一次攻击的开头"** ✓ —— 一个限制，两种用法 ✓。
+> * **判据读数（实测 ✓，含"条件为假"读数 ✓）** ✓：
+> >   * `[115/4] ten instances: delta=260.78976 cap=260.78976`
+>   * `[115/4] spec removal amount=8.0 oncePerAttack=true`
+>   * `[115/4] spec add maxStacks=8 turns=3`
+>   * `[115/4] without the set: 543.312 -> 543.312`
+>   * `[115/4] three follow-up instances: delta=97.79615999999999 expected=97.79616`
+>   * `[115/4] after the next follow-up: delta=32.59872000000007 expected=32.59872`
+>   ⭐ 第二行是本句最关键的读数 ✓：**清空 + 只留 1 层** ✓（若顺序反了会得到 0 ✓；若没有 `once_per_attack`，清空会在**每个实例**上发生 ⇒ 也得不到 3 层 ✓）。
+> * **三条变异（经 `tools/mutate.py` ✓）** ✓：115/4 per stack 6 -> 3 percent=2 | 115/4 cap 8 -> 3=1 | 115/4 removal no longer once per attack=3
+> * ✅ 三条**全部为红** ✓。
+> * ⭐ **普查数字必须同轮移动（纪律 123 ✓）** ✓：出货后 `RelicTriggerTableTest` **立刻报红** ✓，它的失败信息就是权威答案 ✓ ——
+>   我按差异（`expected vs actual`）只做了两处改动 ✓：`AUTHORED` 增 **`115/4`** ✓、`STILL_REGISTERED` **10 → 9** ✓；
+>   `PURE_ABILITY_ONLY` / `MIXED_STAT_AND_ABILITY` **未动** ✓（差异里没有它们 ✓）。
+> * **进度**：**角色 90 个文件 / 493 条规则** ✓；光锥 **77 / 169** ✓；遗器套装 **52 个文件 / 登记表 8 条** ✓
+>   （本轮掉了 115 ✓ —— 登记表从 10 条降到 **9 条** ✓）。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：

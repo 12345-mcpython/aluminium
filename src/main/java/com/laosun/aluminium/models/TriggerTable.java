@@ -594,7 +594,7 @@ public class TriggerTable {
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateId(spec), validateCooldown(spec),
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
-                validateMinEidolon(spec), validatePerTurn(spec), Boolean.TRUE.equals(spec.getOncePerAttack()), List.copyOf(targetFilters)));
+                validateMinEidolon(spec), validatePerTurn(spec), validatePerAttack(spec), List.copyOf(targetFilters)));
     }
 
     /**
@@ -720,6 +720,26 @@ public class TriggerTable {
      * {@code once_per_battle} <b>may</b> be combined with it: the two are cumulative ("twice per turn, and only
      * once in the whole battle"), which is a reading that cannot be misread.
      */
+    /**
+     * The per-ATTACK cap: {@code once_per_attack: true} means one, {@code per_attack: N} means N.
+     *
+     * <p>\u26a0 Both at once is refused rather than resolved: they are two spellings of one dimension, and picking one
+     * silently would make the other a lie.
+     */
+    private static int validatePerAttack(TriggerSpec spec) {
+        boolean once = Boolean.TRUE.equals(spec.getOncePerAttack());
+        Integer stated = spec.getPerAttack();
+        if (once && stated != null) {
+            throw new IllegalArgumentException("Trigger rule states BOTH \"once_per_attack\" and \"per_attack\": "
+                    + "they are the same cap, so say one (source: " + spec.getSource() + ")");
+        }
+        if (stated != null && stated < 1) {
+            throw new IllegalArgumentException("Trigger rule has per_attack " + stated
+                    + ", but a per-attack limit is a count of firings (source: " + spec.getSource() + ")");
+        }
+        return once ? 1 : (stated == null ? 0 : stated);
+    }
+
     private static int validatePerTurn(TriggerSpec spec) {
         Integer perTurn = spec.getPerTurn();
         if (perTurn == null) {
@@ -1489,7 +1509,7 @@ public class TriggerTable {
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
                                int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
-                               int perTurn, boolean oncePerAttack, List<List<Condition>> effectTargetFilters) {
+                               int perTurn, int perAttack, List<List<Condition>> effectTargetFilters) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.
@@ -1512,7 +1532,7 @@ public class TriggerTable {
          * cannot change the behaviour of any rule that does not use it.
          */
         public boolean isLimited() {
-            return cooldownTurns > 0 || oncePerBattle || perTurn > 0 || oncePerAttack;
+            return cooldownTurns > 0 || oncePerBattle || perTurn > 0 || perAttack > 0;
         }
 
         boolean matches(TriggerContext ctx) {
@@ -2018,7 +2038,11 @@ public class TriggerTable {
 
         @Override
         public boolean test(TriggerContext ctx) {
-            return ctx.damage() != null && !ctx.damage().isCountsAsAttack();
+            // \u2605 Was `!ctx.damage().isCountsAsAttack()`, i.e. the exact opposite of the keyword's contract (measured
+            // 2026-09-30: a rule guarded by `damage_is_attack` fired on ADDITIONAL damage and never on a real attack --
+            // cone 23008's energy clause read +0.0 because of it). `Damage.countsAsAttack` defaults to true, so the
+            // negation made every ordinary attack fail the guard it was written to pass.
+            return ctx.damage() != null && ctx.damage().isCountsAsAttack();
         }
 
         @Override

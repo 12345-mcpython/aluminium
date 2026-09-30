@@ -78,6 +78,27 @@ public class OncePerAttackLimitTest {
         Assertions.assertEquals(1, third, "no limit: and after the attack boundary");
     }
 
+    @Test
+    public void perAttackThreeLetsExactlyThreeFiringsThrough() {
+        TriggerSpec rule = TriggerSpecs.rule("DEALING_DAMAGE", null, TriggerSpecs.gainEnergy(1));
+        TriggerSpecs.set(rule, "perAttack", 3);
+        Battle battle = battleWith(rule);
+        int total = 0;
+        for (int i = 0; i < 6; i++) {
+            total += fire(battle);
+        }
+        System.out.println("[limit] per_attack=3, six instances in ONE attack: fired=" + total);
+        Assertions.assertEquals(3, total, "three firings per attack, then the cap holds");
+        endAttack(battle);
+        int after = 0;
+        for (int i = 0; i < 6; i++) {
+            after += fire(battle);
+        }
+        System.out.println("[limit] per_attack=3, six instances in the NEXT attack: fired=" + after);
+        Assertions.assertEquals(3, after, "the counter is per attack, so the next attack gets three more");
+    }
+
+    /** perAttackThree is named so the reason this file exists stays visible when it fails. */
     /** The contrast that proves the field is not `per_turn`: two attacks in ONE turn. */
     @Test
     public void perTurnIsNotTheSameThing() {

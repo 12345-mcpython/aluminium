@@ -104,8 +104,8 @@ public class Relic115FourPieceTest {
                 if ("REMOVE_STACK".equals(effect.getOp())) {
                     removals++;
                     System.out.println("[115/4] spec removal amount=" + effect.getAmount()
-                            + " oncePerAttack=" + rule.oncePerAttack());
-                    Assertions.assertTrue(rule.oncePerAttack(), "the removal is the FIRST instance of the next attack");
+                            + " cap=" + rule.perAttack());
+                    Assertions.assertEquals(1, rule.perAttack(), "the removal is the FIRST instance of the next attack");
                 } else if ("ADD_STACK".equals(effect.getOp())) {
                     additions++;
                     System.out.println("[115/4] spec add maxStacks=" + effect.getMaxStacks()

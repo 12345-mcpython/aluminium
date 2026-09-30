@@ -160,6 +160,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
 
     /** Per rule, the attack sequence of its last "once per attack" firing (see {@link #isAttackLimitReady}). */
     private final Map<String, Integer> ruleAttackUses = new HashMap<>();
+
+    /** Per rule, how many times it has fired inside that attack (the cap is {@code per_attack}). */
+    private final Map<String, Integer> ruleAttackFirings = new HashMap<>();
     /**
      * The rules that have used up a {@code once_per_battle} limit; they never fire again this battle.
      */
@@ -693,13 +696,23 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * progress shares one value and the next attack gets a new one. \u2605 Kept beside the cooldown/per-turn state because
      * it is the same kind of fact (how often a rule has run) and is cleared with it.
      */
-    public boolean isAttackLimitReady(String key, int attackSequence) {
-        return ruleAttackUses.getOrDefault(key, Integer.MIN_VALUE) != attackSequence;
+    public boolean isAttackLimitReady(String key, int attackSequence, int cap) {
+        Integer sequence = ruleAttackUses.get(key);
+        if (sequence == null || sequence.intValue() != attackSequence) {
+            return true;                             // no firing recorded for THIS attack yet
+        }
+        return ruleAttackFirings.getOrDefault(key, 0) < cap;
     }
 
-    /** Records that a rule has used up its one firing for this attack. */
+    /** Records one firing of a rule inside the attack identified by {@code attackSequence}. */
     public void recordAttackUse(String key, int attackSequence) {
-        ruleAttackUses.put(key, attackSequence);
+        Integer sequence = ruleAttackUses.get(key);
+        if (sequence == null || sequence.intValue() != attackSequence) {
+            ruleAttackUses.put(key, attackSequence);
+            ruleAttackFirings.put(key, 1);
+        } else {
+            ruleAttackFirings.merge(key, 1, Integer::sum);
+        }
     }
 
     public boolean isTriggerReady(String key, int perTurn) {
