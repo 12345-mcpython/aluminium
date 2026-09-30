@@ -1,0 +1,112 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21011_same_element",
+      "when": [
+        "actor is_ally",
+        "damage_element_is_self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21011: 「进入战斗后，当我方目标造成**与装备者相同属性**的伤容时，造成的伤容提高#1[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 + 遗器 312 ✓）** ✓：**`damage_element_is_self`** ✓ —— `damage_is_attack` 的兄弟：同样是**裸关键词** ✓（无主体、无取值 ✓），但问的是实例的**元素**是否等于**规则拥有者自己的元素** ✓（元素在单位身上：`Character.element` ✓；忆灵则取其主人 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21011_same_element",
+      "when": [
+        "actor is_ally",
+        "damage_element_is_self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21011: 「进入战斗后，当我方目标造成**与装备者相同属性**的伤容时，造成的伤容提高#1[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 + 遗器 312 ✓）** ✓：**`damage_element_is_self`** ✓ —— `damage_is_attack` 的兄弟：同样是**裸关键词** ✓（无主体、无取值 ✓），但问的是实例的**元素**是否等于**规则拥有者自己的元素** ✓（元素在单位身上：`Character.element` ✓；忆灵则取其主人 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21011_same_element",
+      "when": [
+        "actor is_ally",
+        "damage_element_is_self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.18,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21011: 「进入战斗后，当我方目标造成**与装备者相同属性**的伤容时，造成的伤容提高#1[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 + 遗器 312 ✓）** ✓：**`damage_element_is_self`** ✓ —— `damage_is_attack` 的兄弟：同样是**裸关键词** ✓（无主体、无取值 ✓），但问的是实例的**元素**是否等于**规则拥有者自己的元素** ✓（元素在单位身上：`Character.element` ✓；忆灵则取其主人 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21011_same_element",
+      "when": [
+        "actor is_ally",
+        "damage_element_is_self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.21,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21011: 「进入战斗后，当我方目标造成**与装备者相同属性**的伤容时，造成的伤容提高#1[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 + 遗器 312 ✓）** ✓：**`damage_element_is_self`** ✓ —— `damage_is_attack` 的兄弟：同样是**裸关键词** ✓（无主体、无取值 ✓），但问的是实例的**元素**是否等于**规则拥有者自己的元素** ✓（元素在单位身上：`Character.element` ✓；忆灵则取其主人 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21011_same_element",
+      "when": [
+        "actor is_ally",
+        "damage_element_is_self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21011: 「进入战斗后，当我方目标造成**与装备者相同属性**的伤容时，造成的伤容提高#1[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 + 遗器 312 ✓）** ✓：**`damage_element_is_self`** ✓ —— `damage_is_attack` 的兄弟：同样是**裸关键词** ✓（无主体、无取值 ✓），但问的是实例的**元素**是否等于**规则拥有者自己的元素** ✓（元素在单位身上：`Character.element` ✓；忆灵则取其主人 ✓）。"
+    }
+  ]
+}
