@@ -63,6 +63,38 @@ public class Cone23010Test {
         return seen;
     }
 
+    /**
+     * \u2605 The third sentence: after an Ultimate the wearer's FOLLOW-UP damage is 48% higher for one turn. It is a written
+     * modifier on the category attribute, not a damage-type scope -- measured: the attribute exists
+     * (`FOLLOW_UP_DAMAGE_BOOST`), which is what an earlier note of mine wrongly called missing.
+     */
+    @Test
+    public void theUltimateArmsTheFollowUp() {
+        Battle battle = battle(true);
+        double before = wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
+        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
+        double after = wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
+        int pinned = 0;
+        for (var rule : wearer.getTriggerTable().matching(TriggerEvent.ULT_CAST,
+                new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle, null))) {
+            if (!rule.id().startsWith("cone23010_")) {
+                continue;
+            }
+            for (var effect : rule.effects()) {
+                pinned++;
+                System.out.println("[23010] ult rule: attribute=" + effect.getAttribute() + " percent="
+                        + effect.getPercent() + " turns=" + effect.getTurns());
+                // \u26a0 `getAttribute()` is a String, not the enum (measured): compare the spelling.
+                Assertions.assertEquals("FOLLOW_UP_DAMAGE_BOOST", effect.getAttribute(),
+                        "the follow-up dimension is an attribute");
+                Assertions.assertEquals(0.48, effect.getPercent(), 1e-9, "48% at rank 1");
+                Assertions.assertEquals(1, effect.getTurns(), "for one turn");
+            }
+        }
+        Assertions.assertEquals(1, pinned, "one rule from the third sentence");
+        Assertions.assertTrue(after > before, "and firing the Ultimate arms it");
+    }
+
     @Test
     public void bothCategoriesAreCoveredAndOnlyThose() {
         Assertions.assertEquals(1, rulesFor(SkillCategory.BPSKILL), "one rule speaks about Skills");
