@@ -31,7 +31,10 @@ def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=N
         raise SystemExit('mutation refused: field %r belongs to no known layer' % field)
     raw = json.load(open(path, encoding='utf-8'))
     touched = 0
-    for rule in raw[rank]:
+    # \u2605 A content file is either {"1": [rules]} (cones, relic sets) or a bare [rules] list (characters): the
+    # caller passes rank=None for the latter, and the helper used to index it with None and raise.
+    rules_here = raw if isinstance(raw, list) else raw[rank]
+    for rule in rules_here:
         if rule.get('id') != rule_id:
             continue
         if field in RULE_LEVEL:
@@ -53,6 +56,7 @@ def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=N
         raise SystemExit('mutation refused: %s.%s touched %d targets' % (rule_id, field, touched))
     open(path, 'w', encoding='utf-8', newline='').write(json.dumps(raw, ensure_ascii=False, indent=2) + '\n')
     back = json.load(open(path, encoding='utf-8'))
-    rule = next(r for r in back[rank] if r.get('id') == rule_id)
+    rule = next(r for r in (back if isinstance(back, list) else back[rank])
+                if r.get('id') == rule_id)
     landed = rule.get(field) if field in RULE_LEVEL else [d.get(field) for d in rule['do']]
     return rule, landed
