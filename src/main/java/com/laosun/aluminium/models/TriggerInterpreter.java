@@ -2356,7 +2356,10 @@ public final class TriggerInterpreter {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns(), dotStackCap(effect));
+            // \u2605 A name, when the rule states one: it is what `has_state <name>` asks about (see DotBuff's named constructor).
+            // Without it the DOT keeps answering only to its element's state name, which is all the corpus needed until now.
+            String dotName = effect.getBuff() == null ? null : effect.getBuff().trim();
+            DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns(), dotStackCap(effect), dotName);
             if (battle.tryApplyDebuff(ctx.owner(), target, dot, baseChance, null)) {
                 // The DOT's state name is the document's name for the element (灼烧), from the one table that maps
                 // them — the same spelling 「每使1个目标陷入灼烧」 would count with.
@@ -3553,7 +3556,9 @@ public final class TriggerInterpreter {
      * reads is a rule that says one thing and does another (M-26).
      */
     private static void requireNoMalformedArguments(EffectSpec effect, String op, TriggerSpec spec) {
-        if (effect.getAttribute() != null || effect.getBuff() != null || effect.getSkill() != null
+        // ★ `buff` is allowed again as the DOT's NAME (2026-09-30): 「使其陷入【游丝】状态」 names a state the element
+        // alone cannot express. It is a name only -- the DOT's identity for merging stays its element.
+        if (effect.getAttribute() != null || effect.getSkill() != null
                 || effect.getDamageParam() != null) {
             throw new IllegalArgumentException(
                     "Op " + op + " takes an element, a magnitude and a duration; it has no \"attribute\" / "
