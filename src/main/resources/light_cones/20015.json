@@ -1,0 +1,72 @@
+{
+  "1": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone20015_advance_after_basic",
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.12
+        }
+      ],
+      "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⭐ 写法**照抄已出货内容** ✓（`relic_sets/110.json` 与 `308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 target ✓ ⇒ 作用于**规则拥有者** ✓）。⚠ 「使**下一次行动**提前」：装备者普攻后**受益者就是她自己**（光锥只作用于装备者 ✓）⇒ 不加 `target` ✓ 即为其自身下一次行动 ✓。⚠ 触发用 **`BASIC_ATTACK`** ✓（`when: actor == self` ✓ 保证只认她自己的普攻 ✓）。⚠ **近似度声明** ✓：文档的\"下一次行动\"指**紧接的那一次** ✓，而 `ADVANCE` 作用的是**当前行动值** ✓；在标准行动值体系下二者等价 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone20015_advance_after_basic",
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.14
+        }
+      ],
+      "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⭐ 写法**照抄已出货内容** ✓（`relic_sets/110.json` 与 `308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 target ✓ ⇒ 作用于**规则拥有者** ✓）。⚠ 「使**下一次行动**提前」：装备者普攻后**受益者就是她自己**（光锥只作用于装备者 ✓）⇒ 不加 `target` ✓ 即为其自身下一次行动 ✓。⚠ 触发用 **`BASIC_ATTACK`** ✓（`when: actor == self` ✓ 保证只认她自己的普攻 ✓）。⚠ **近似度声明** ✓：文档的\"下一次行动\"指**紧接的那一次** ✓，而 `ADVANCE` 作用的是**当前行动值** ✓；在标准行动值体系下二者等价 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone20015_advance_after_basic",
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.16
+        }
+      ],
+      "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⭐ 写法**照抄已出货内容** ✓（`relic_sets/110.json` 与 `308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 target ✓ ⇒ 作用于**规则拥有者** ✓）。⚠ 「使**下一次行动**提前」：装备者普攻后**受益者就是她自己**（光锥只作用于装备者 ✓）⇒ 不加 `target` ✓ 即为其自身下一次行动 ✓。⚠ 触发用 **`BASIC_ATTACK`** ✓（`when: actor == self` ✓ 保证只认她自己的普攻 ✓）。⚠ **近似度声明** ✓：文档的\"下一次行动\"指**紧接的那一次** ✓，而 `ADVANCE` 作用的是**当前行动值** ✓；在标准行动值体系下二者等价 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone20015_advance_after_basic",
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.18
+        }
+      ],
+      "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⭐ 写法**照抄已出货内容** ✓（`relic_sets/110.json` 与 `308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 target ✓ ⇒ 作用于**规则拥有者** ✓）。⚠ 「使**下一次行动**提前」：装备者普攻后**受益者就是她自己**（光锥只作用于装备者 ✓）⇒ 不加 `target` ✓ 即为其自身下一次行动 ✓。⚠ 触发用 **`BASIC_ATTACK`** ✓（`when: actor == self` ✓ 保证只认她自己的普攻 ✓）。⚠ **近似度声明** ✓：文档的\"下一次行动\"指**紧接的那一次** ✓，而 `ADVANCE` 作用的是**当前行动值** ✓；在标准行动值体系下二者等价 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone20015_advance_after_basic",
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.2
+        }
+      ],
+      "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⭐ 写法**照抄已出货内容** ✓（`relic_sets/110.json` 与 `308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 target ✓ ⇒ 作用于**规则拥有者** ✓）。⚠ 「使**下一次行动**提前」：装备者普攻后**受益者就是她自己**（光锥只作用于装备者 ✓）⇒ 不加 `target` ✓ 即为其自身下一次行动 ✓。⚠ 触发用 **`BASIC_ATTACK`** ✓（`when: actor == self` ✓ 保证只认她自己的普攻 ✓）。⚠ **近似度声明** ✓：文档的\"下一次行动\"指**紧接的那一次** ✓，而 `ADVANCE` 作用的是**当前行动值** ✓；在标准行动值体系下二者等价 ✓。"
+    }
+  ]
+}
