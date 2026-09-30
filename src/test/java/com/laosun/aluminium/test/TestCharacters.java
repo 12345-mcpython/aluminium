@@ -35,14 +35,17 @@ final class TestCharacters {
      *                               would be asserting the wrong thing
      */
     static int withoutTriggerFile() {
-        return Constant.CHARACTERS.keySet().stream()
-                .sorted()
-                .filter(cid -> !TriggerTables.exists(cid))
-                .filter(cid -> !CharacterFactory.usesSpecialResource(cid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        "Every character in the data now has a trigger file, so there is no "
-                                + "\"unregistered character\" control left. Pick a different control (or a "
-                                + "character built without a table) for the suites that need one."));
+        // ⚠ PINNED ON PURPOSE (2026-09-29, round 209/240). This used to return "the lowest id with no trigger
+        // file" -- a MOVING TARGET: shipping 1112 (round 207/240) handed every caller a DIFFERENT character, and
+        // a suite measuring HP numbers went red far from the change. The id below is a key of
+        // data/character_data.json with no content file; if it ever gains one, the guard fails loudly.
+        int cid = 1112;
+        if (TriggerTables.exists(cid)) {
+            throw new IllegalStateException(
+                    "Character " + cid + " now has a trigger file, so the \"unregistered character\" control is gone. "
+                            + "Pick another key of character_data.json that is deliberately left un-data-ised "
+                            + "and update this constant.");
+        }
+        return cid;
     }
 }
