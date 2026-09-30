@@ -1,0 +1,26 @@
+{
+  "2": [
+    {
+      "on": "SUMMONED",
+      "on_any": [
+        "BATTLE_START"
+      ],
+      "id": "relic323_allies_speed_with_memosprite",
+      "when": [
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.08,
+          "permanent": true,
+          "max_stacks": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "遗器 323 永恒之地翁法罗斯 2 件套: 使装备者的暴击率提高#1[i]%。装备者的忆灵在场时，我方全体速度提高#2[i]%，该效果无法叠加。",
+      "note": "数值取自 `data/relic_sets.json` 的 `param` ✓。⭐ **\"忆灵在场\"= `self_summon_count >= 1`** ✓ —— 由既有测试证明忆灵**就是召唤物** ✓（`AglaeaMemospriteTest` 直接断言 `battle.summonCountOf(aglaea) == 1` ✓）。⚠ 触发用 **`SUMMONED`（忆灵登场那一刻 ✓）+ `on_any: BATTLE_START`（开局就已在场 ✓）** ✓；「该效果无法叠加」由 **`max_stacks: 1` + `permanent`** 表达 ✓。⚠ 第一半「暴击率提高 8%」是 `properties` 属性行 ✓（由 `RelicSuit` 施加 ✓，**不写规则** ✓）。"
+    }
+  ]
+}
