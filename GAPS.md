@@ -4961,6 +4961,22 @@
 > * **最终状态（不变 ✓）** ✓：全量 **1728 用例 / 0 失败** ✓、双闸门 exit 0 ✓、光锥 **75 / 169** ✓、
 >   角色 **90 / 493** ✓、遗器 **52 文件 / 登记表 10 条** ✓、`tools/` 两件 ✓、树干净且 `main == origin/main` ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之三百一十九：`once_per_attack` 的变异与引擎级对照（补齐上一节的空位））**：
+> 
+> * **三条变异（经 `tools/mutate.py` ✓）** ✓：21031 chance 16 -> 8 percent=1 | 21031 per-attack cap dropped=1 | 21031 direction flipped to DISPEL=1
+> * ✅ 三条**全部为红** ✓。
+> * **引擎级对照（`tools/control.py` ✓）** ✓：把 `TriggerInterpreter` 里的
+>   `rule.oncePerAttack() && !owner.isAttackLimitReady(...)` 中和成 `false && ...` ✓ ⇒
+>   `compile=0 / test=1 / reds=1 / xml_age=1.1s` ✓
+>   ⇒ ⭐ **capability 的判据确实压在引擎那句话上** ✓（不是靠内容字段自证 ✓）。
+> * ⭐⭐ **工具"拒绝"的第三次教学（第 164/142 条同族 ✓）** ✓：`mutate.py` 先拒绝 `chance` ✗
+>   （"belongs to no known layer" ✓），随后又拒绝 `do` ✗（那是**列表** ✓，不是可写字段 ✓）——
+>   ⭐ 两次**拒绝都是对的** ✓（宁可报错也不乱写 ✓）；我因此做了两件事 ✓：
+>   ① 把 `chance` / `per_turn` / `once_per_battle` / `once_per_attack` / `min_eidolon` 补进**规则级**集合 ✓；
+>   ② 第三条变异改为**按效果**翻转 `op`（`effect_op='REMOVE_BUFF'` ✓）而不是替换整个 `do` ✓。
+> * **进度**：**角色 90 个文件 / 493 条规则** ✓；光锥 **76 / 169** ✓；遗器 **52 个文件 / 登记表 10 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
