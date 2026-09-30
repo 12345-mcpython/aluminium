@@ -1,0 +1,137 @@
+{
+  "1": [
+    {
+      "on": "BREAK",
+      "id": "cone23035_burn_the_broken",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "焚灼",
+          "base_chance": 1,
+          "turns": 2,
+          "target": "target",
+          "max_stacks": 2
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.18,
+          "damage_type": "BREAK",
+          "buff": "焚灼",
+          "per_stack": "焚灼",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23035: 「当有敌方目标的弱点被击破时，有#2[i]%的基础概率使其陷入【焚灼】状态，受到的击破伤害提高#3[i]%，持续#4[i]回合，此效果可叠加#5[i]层」",
+      "note": "⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ **`BREAK` 事件** ✓（弱点被击破 ✓）+ `APPLY_BUFF 焚灼` ✓（有名状态 ✓）+ **`MODIFY_DAMAGE_TAKEN` + `damage_type: \"BREAK\"`** ✓（只抬**击破伤害** ✓，同 1005/1108/1112 的现成写法 ✓）+ **`per_stack` 与 `max_stacks: 2`** ✓（「可叠加#5[i]层」✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BREAK",
+      "id": "cone23035_burn_the_broken",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "焚灼",
+          "base_chance": 1,
+          "turns": 2,
+          "target": "target",
+          "max_stacks": 2
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.21,
+          "damage_type": "BREAK",
+          "buff": "焚灼",
+          "per_stack": "焚灼",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23035: 「当有敌方目标的弱点被击破时，有#2[i]%的基础概率使其陷入【焚灼】状态，受到的击破伤害提高#3[i]%，持续#4[i]回合，此效果可叠加#5[i]层」",
+      "note": "⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ **`BREAK` 事件** ✓（弱点被击破 ✓）+ `APPLY_BUFF 焚灼` ✓（有名状态 ✓）+ **`MODIFY_DAMAGE_TAKEN` + `damage_type: \"BREAK\"`** ✓（只抬**击破伤害** ✓，同 1005/1108/1112 的现成写法 ✓）+ **`per_stack` 与 `max_stacks: 2`** ✓（「可叠加#5[i]层」✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BREAK",
+      "id": "cone23035_burn_the_broken",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "焚灼",
+          "base_chance": 1,
+          "turns": 2,
+          "target": "target",
+          "max_stacks": 2
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.24,
+          "damage_type": "BREAK",
+          "buff": "焚灼",
+          "per_stack": "焚灼",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23035: 「当有敌方目标的弱点被击破时，有#2[i]%的基础概率使其陷入【焚灼】状态，受到的击破伤害提高#3[i]%，持续#4[i]回合，此效果可叠加#5[i]层」",
+      "note": "⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ **`BREAK` 事件** ✓（弱点被击破 ✓）+ `APPLY_BUFF 焚灼` ✓（有名状态 ✓）+ **`MODIFY_DAMAGE_TAKEN` + `damage_type: \"BREAK\"`** ✓（只抬**击破伤害** ✓，同 1005/1108/1112 的现成写法 ✓）+ **`per_stack` 与 `max_stacks: 2`** ✓（「可叠加#5[i]层」✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BREAK",
+      "id": "cone23035_burn_the_broken",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "焚灼",
+          "base_chance": 1,
+          "turns": 2,
+          "target": "target",
+          "max_stacks": 2
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.27,
+          "damage_type": "BREAK",
+          "buff": "焚灼",
+          "per_stack": "焚灼",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23035: 「当有敌方目标的弱点被击破时，有#2[i]%的基础概率使其陷入【焚灼】状态，受到的击破伤害提高#3[i]%，持续#4[i]回合，此效果可叠加#5[i]层」",
+      "note": "⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ **`BREAK` 事件** ✓（弱点被击破 ✓）+ `APPLY_BUFF 焚灼` ✓（有名状态 ✓）+ **`MODIFY_DAMAGE_TAKEN` + `damage_type: \"BREAK\"`** ✓（只抬**击破伤害** ✓，同 1005/1108/1112 的现成写法 ✓）+ **`per_stack` 与 `max_stacks: 2`** ✓（「可叠加#5[i]层」✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BREAK",
+      "id": "cone23035_burn_the_broken",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "焚灼",
+          "base_chance": 1,
+          "turns": 2,
+          "target": "target",
+          "max_stacks": 2
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.3,
+          "damage_type": "BREAK",
+          "buff": "焚灼",
+          "per_stack": "焚灼",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23035: 「当有敌方目标的弱点被击破时，有#2[i]%的基础概率使其陷入【焚灼】状态，受到的击破伤害提高#3[i]%，持续#4[i]回合，此效果可叠加#5[i]层」",
+      "note": "⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ **`BREAK` 事件** ✓（弱点被击破 ✓）+ `APPLY_BUFF 焚灼` ✓（有名状态 ✓）+ **`MODIFY_DAMAGE_TAKEN` + `damage_type: \"BREAK\"`** ✓（只抬**击破伤害** ✓，同 1005/1108/1112 的现成写法 ✓）+ **`per_stack` 与 `max_stacks: 2`** ✓（「可叠加#5[i]层」✓）。"
+    }
+  ]
+}
