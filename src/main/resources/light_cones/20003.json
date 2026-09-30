@@ -1,0 +1,192 @@
+{
+  "1": [
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_base",
+      "when": [
+        "hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.16,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_below_threshold",
+      "when": [
+        "hp_percent < 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.32,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.32** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_base",
+      "when": [
+        "hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.2,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_below_threshold",
+      "when": [
+        "hp_percent < 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.4,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.4** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_base",
+      "when": [
+        "hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_below_threshold",
+      "when": [
+        "hp_percent < 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.48,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.48** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_base",
+      "when": [
+        "hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.28,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_below_threshold",
+      "when": [
+        "hp_percent < 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.56,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.56** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_base",
+      "when": [
+        "hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.32,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone20003_defence_below_threshold",
+      "when": [
+        "hp_percent < 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.64,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
+      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.64** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+    }
+  ]
+}
