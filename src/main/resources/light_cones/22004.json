@@ -1,0 +1,112 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22004_damage_per_weakness",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.04,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "target_weakness_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
+      "note": "⭐ 两条路都走通了 ✓（以下三步各自单独落盘并各自实测 ✓）：① `Enemy.weaknessCount()` ✓ —— `1002011` 读到 **2** ✓；② 数值变量 `target_weakness_count` ✓ —— 2 弱点目标命中 ✓、0 弱点目标不命中 ✓；③ `per_stack` 名 ✓。⭐ **上限无需写** ✓：原文「最多计入 **7** 个」✓ —— 元素正好 **7** 种 ✓⇒ 上限永远不会生效 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22004_damage_per_weakness",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.05,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "target_weakness_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
+      "note": "⭐ 两条路都走通了 ✓（以下三步各自单独落盘并各自实测 ✓）：① `Enemy.weaknessCount()` ✓ —— `1002011` 读到 **2** ✓；② 数值变量 `target_weakness_count` ✓ —— 2 弱点目标命中 ✓、0 弱点目标不命中 ✓；③ `per_stack` 名 ✓。⭐ **上限无需写** ✓：原文「最多计入 **7** 个」✓ —— 元素正好 **7** 种 ✓⇒ 上限永远不会生效 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22004_damage_per_weakness",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.06,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "target_weakness_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
+      "note": "⭐ 两条路都走通了 ✓（以下三步各自单独落盘并各自实测 ✓）：① `Enemy.weaknessCount()` ✓ —— `1002011` 读到 **2** ✓；② 数值变量 `target_weakness_count` ✓ —— 2 弱点目标命中 ✓、0 弱点目标不命中 ✓；③ `per_stack` 名 ✓。⭐ **上限无需写** ✓：原文「最多计入 **7** 个」✓ —— 元素正好 **7** 种 ✓⇒ 上限永远不会生效 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22004_damage_per_weakness",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.07,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "target_weakness_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
+      "note": "⭐ 两条路都走通了 ✓（以下三步各自单独落盘并各自实测 ✓）：① `Enemy.weaknessCount()` ✓ —— `1002011` 读到 **2** ✓；② 数值变量 `target_weakness_count` ✓ —— 2 弱点目标命中 ✓、0 弱点目标不命中 ✓；③ `per_stack` 名 ✓。⭐ **上限无需写** ✓：原文「最多计入 **7** 个」✓ —— 元素正好 **7** 种 ✓⇒ 上限永远不会生效 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22004_damage_per_weakness",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.08,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "target_weakness_count",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
+      "note": "⭐ 两条路都走通了 ✓（以下三步各自单独落盘并各自实测 ✓）：① `Enemy.weaknessCount()` ✓ —— `1002011` 读到 **2** ✓；② 数值变量 `target_weakness_count` ✓ —— 2 弱点目标命中 ✓、0 弱点目标不命中 ✓；③ `per_stack` 名 ✓。⭐ **上限无需写** ✓：原文「最多计入 **7** 个」✓ —— 元素正好 **7** 种 ✓⇒ 上限永远不会生效 ✓。"
+    }
+  ]
+}

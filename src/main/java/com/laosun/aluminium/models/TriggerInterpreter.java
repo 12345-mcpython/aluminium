@@ -1451,6 +1451,10 @@ public final class TriggerInterpreter {
                     .countBuffs(com.laosun.aluminium.models.buff.DotBuff.class);
             // \u2605 \u300c\u573a\u4e0a\u6bcf\u6709\u4e00\u540d\u6301\u6709\u62a4\u76fe\u7684\u89d2\u8272\u300d (cone 21043): OUR units currently holding a shield. A LIVE count,
             // read where the effect is evaluated -- it needs the battlefield because a unit does not know its own side.
+            case "target_weakness_count" -> {
+                int weak = target instanceof com.laosun.aluminium.models.enemy.Enemy enemy ? enemy.weaknessCount() : -1;
+                yield weak < 0 ? 0 : weak;
+            }
             case "shielded_count" -> ctx == null || ctx.battle() == null ? 0
                     : ctx.battle().allies.stream().filter(unit -> unit.getShield() > 0).count();
             default -> target.getBuffManager().stacksOf(name.trim());
