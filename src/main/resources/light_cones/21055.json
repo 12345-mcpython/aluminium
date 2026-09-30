@@ -1,0 +1,112 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21055_healthy_attacker",
+      "when": [
+        "actor is_ally",
+        "actor_hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
+      "note": "⭐ **新变量（读者：本卡 ✓）** ✓：**`actor_hp_percent`** ✓ —— 句子里的「**我方目标**」是**出手的那一个** ✓，既不是锥的装备者（那是 `hp_percent` ✗），也不是受害者（`target_hp_percent` ✗）⇒ 从事件上取第**三**个主体 ✓（与 `actor_stacks:` 同一个人 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21055_healthy_attacker",
+      "when": [
+        "actor is_ally",
+        "actor_hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.14,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
+      "note": "⭐ **新变量（读者：本卡 ✓）** ✓：**`actor_hp_percent`** ✓ —— 句子里的「**我方目标**」是**出手的那一个** ✓，既不是锥的装备者（那是 `hp_percent` ✗），也不是受害者（`target_hp_percent` ✗）⇒ 从事件上取第**三**个主体 ✓（与 `actor_stacks:` 同一个人 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21055_healthy_attacker",
+      "when": [
+        "actor is_ally",
+        "actor_hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.16,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
+      "note": "⭐ **新变量（读者：本卡 ✓）** ✓：**`actor_hp_percent`** ✓ —— 句子里的「**我方目标**」是**出手的那一个** ✓，既不是锥的装备者（那是 `hp_percent` ✗），也不是受害者（`target_hp_percent` ✗）⇒ 从事件上取第**三**个主体 ✓（与 `actor_stacks:` 同一个人 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21055_healthy_attacker",
+      "when": [
+        "actor is_ally",
+        "actor_hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.18,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
+      "note": "⭐ **新变量（读者：本卡 ✓）** ✓：**`actor_hp_percent`** ✓ —— 句子里的「**我方目标**」是**出手的那一个** ✓，既不是锥的装备者（那是 `hp_percent` ✗），也不是受害者（`target_hp_percent` ✗）⇒ 从事件上取第**三**个主体 ✓（与 `actor_stacks:` 同一个人 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21055_healthy_attacker",
+      "when": [
+        "actor is_ally",
+        "actor_hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.2,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
+      "note": "⭐ **新变量（读者：本卡 ✓）** ✓：**`actor_hp_percent`** ✓ —— 句子里的「**我方目标**」是**出手的那一个** ✓，既不是锥的装备者（那是 `hp_percent` ✗），也不是受害者（`target_hp_percent` ✗）⇒ 从事件上取第**三**个主体 ✓（与 `actor_stacks:` 同一个人 ✓）。"
+    }
+  ]
+}
