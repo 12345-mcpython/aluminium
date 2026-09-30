@@ -6514,6 +6514,34 @@
 >   所以"凭记忆找锚点"仍然会落空 ✓）。
 > * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **108 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百：**忆灵那一族的第一张卡（21050）—— 全用现成词汇，零引擎改动**（光锥 **109 / 169**））**：
+> 
+> * ✅ **出货：光锥 21050** ✓ 五档 —— 暴击伤害 +12%（`props` ✓ **未重写** ✗）；
+>   「**当装备者的忆灵对我方目标施放技能时**，使我方全体造成的伤害提高 **8%**，持续 **3** 回合」✓
+>   = `SKILL_CAST` ✓ + **`actor == summon`** ✓ + **`target is_ally`** ✓ ⇒ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.08 turns 3 target all_allies` ✓。
+>   * ⭐ **"我的忆灵"有现成写法** ✓：`TriggerEvent.SUMMON_ATTACK` 的注释自己就写着
+>     「用 **`actor == summon`** 收窄到规则拥有者自己的忆灵」✓；实现读的是 `Battle.summonsOf(owner)` ✓（第 2459 行 ✓）。
+>   * ⭐ **事件选 `SKILL_CAST` 而不是 `SUMMON_ATTACK`** ✓：后者只在**攻击**时触发 ✓（`EnemySkill` 里发 ✓，且**目标传 `null`** ✗），
+>     而忆灵的**支援技能**走 `SkillExecutor` ✓（`Memosprites` 的注释明说 `EnemySkill` 会把它当单体攻击跑 ✗）。
+> * **判据读数（实测 ✓）** ✓：
+> >   * `[21050] after the CHARACTER's own Skill: +0.0`
+>   * `[21050] memosprite aiming at an ENEMY: +0.0`
+>   * `[21050] spec attribute=ALL_DAMAGE_TYPE_BOOST percent=0.08 turns=3 target=all_allies`
+>   * `[21050] party damage boost before=0.0 after a memosprite support skill=0.16`
+>   ⭐ 两个**反例**都在：**佩戴者自己的技能** ⇒ 不触发 ✓（`actor == summon` 挡住 ✓）；
+>     **忆灵打敌人** ⇒ 不触发 ✓（`target is_ally` 挡住 ✓）。
+> * ⚠ **一条实测教训** ✓：`SummonFactory.memosprite(...)` 只是**造出来** ✗，没**上场** ✗ ——
+>   而 `actor == summon` 读的是**场上的** `summonsOf(owner)` ✓ ⇒ 正例读到 0 ✗（反例反而都"通过" ✓，因为它们本来就该是 0 ✗）。
+>   ✅ 正解：用公开入口 **`battle.summonMemosprite(master)`** ✓ 让它真正上场 ✓。
+>   * ⭐ **纪律（第 207 条）** ✓：**"造出一个对象"不等于"它在这个世界里"** ✗ ——
+>     凡是靠**归属关系**（我的忆灵 / 我的召唤物 / 我的倒计时 ✓）判断的条件 ✓，判据必须走**注册入口** ✓，
+>     否则**正例与反例都会读到 0** ✗，而反例"通过"会**掩盖**问题 ✓。
+> * **四条变异（经 `tools/mutate.py` ✓）** ✓：21050 drops "target is_ally"=1 | 21050 drops "actor == summon"=1 | 21050 boost 8 -> 4 percent=2 | 21050 all_allies -> self=2
+> * ✅ 四条**全部为红** ✓。
+> * **引擎级对照** ✓（按打印出的行号 ✓，落在一条语句上 ✓）：让"是否属于我的召唤物"恒为假 ⇒ **evidence: reds=2 (compile=0, test=1)** ✓。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **109 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
