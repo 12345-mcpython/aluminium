@@ -1,0 +1,342 @@
+{
+  "1": [
+    {
+      "id": "cone23034_chant_for_the_target_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 6,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "SKILL_CAST"
+    },
+    {
+      "id": "cone23034_chant_for_the_target_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 6,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "ULT_CAST"
+    }
+  ],
+  "2": [
+    {
+      "id": "cone23034_chant_for_the_target_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 6.5,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1725,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "SKILL_CAST"
+    },
+    {
+      "id": "cone23034_chant_for_the_target_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 6.5,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1725,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "ULT_CAST"
+    }
+  ],
+  "3": [
+    {
+      "id": "cone23034_chant_for_the_target_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 7,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.195,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "SKILL_CAST"
+    },
+    {
+      "id": "cone23034_chant_for_the_target_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 7,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.195,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "ULT_CAST"
+    }
+  ],
+  "4": [
+    {
+      "id": "cone23034_chant_for_the_target_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 7.5,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.2175,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "SKILL_CAST"
+    },
+    {
+      "id": "cone23034_chant_for_the_target_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 7.5,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.2175,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "ULT_CAST"
+    }
+  ],
+  "5": [
+    {
+      "id": "cone23034_chant_for_the_target_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 8,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "SKILL_CAST"
+    },
+    {
+      "id": "cone23034_chant_for_the_target_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 8,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "圣咏",
+          "amount": 1,
+          "max_stacks": 3,
+          "turns": 3,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "per_stack": "圣咏",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
+      "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
+      "on": "ULT_CAST"
+    }
+  ]
+}
