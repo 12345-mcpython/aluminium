@@ -932,6 +932,26 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])has_same_path_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The {@code is_same_element_as_self} keyword (2026-09-30): "<b>that unit carries the same element as me</b>".
+     *
+     * <p>\u2605 It is the per-CANDIDATE sibling of {@code damage_element_is_self}: that one asks about the damage instance
+     * being settled, this one about a unit -- which is what a per-target filter ({@code target_when}) needs, because
+     * there the candidate sits in {@code target} and the rule\u2019s owner in {@code owner()}. Readers: relic set 312\u2019s
+     * \u300c\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027\u7684\u5176\u4ed6\u6211\u65b9\u89d2\u8272\u300d.
+     */
+    private static final Pattern IS_SAME_ELEMENT =
+            Pattern.compile("(?<![\\w])is_same_element_as_self(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * The {@code is_other_same_element_as_self} variant: the same question with the owner excluded --
+     * \u300c\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027\u7684**\u5176\u4ed6**\u6211\u65b9\u89d2\u8272\u300d (relic set 312). \u2605 It exists separately because the\n     * owner is not a candidate the sentence means, and because a filter on a BATTLE_START rule cannot state a
+     * `target`-subjected condition at all (measured: the loader refuses those -- that event carries no
+     * actor and no target, so only argument-less keywords work there).
+     */
+    private static final Pattern IS_OTHER_SAME_ELEMENT =
+            Pattern.compile("(?<![\\w])is_other_same_element_as_self(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
      * The {@code has_weakness} keyword: "&lt;who&gt; is weak to this element".
      */
     private static final Pattern HAS_WEAKNESS =
@@ -1166,6 +1186,29 @@ public class TriggerTable {
                                 + "(source: " + spec.getSource() + ")");
             }
             return new DamageElementIsSelf(raw);
+        }
+
+        // `<who> is_same_element_as_self`: argument-less like `is_ally`, and stated about a UNIT rather than about an
+        // instance. The subject is optional because a per-target filter already means `target`; any other subject is
+        // refused rather than ignored, so a typo cannot look like a working rule.
+        if (IS_OTHER_SAME_ELEMENT.matcher(text).find()) {
+            return new IsSameElementAsSelf(raw, true);
+        }
+        Matcher sameElement = IS_SAME_ELEMENT.matcher(text);
+        if (sameElement.find()) {
+            String subject = normalize(text.substring(0, sameElement.start()));
+            String trailing = text.substring(sameElement.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException("Condition '" + raw + "' writes something after "
+                        + "\"is_same_element_as_self\": it takes no argument (source: " + spec.getSource() + ")");
+            }
+            if (!subject.isEmpty() && !"target".equals(subject)) {
+                throw new IllegalArgumentException("Condition '" + raw + "' states the subject '" + subject
+                        + "' for \"is_same_element_as_self\"; it is asked about the unit being tested "
+                        + "(write \"target is_same_element_as_self\", or nothing at all inside target_when) "
+                        + "(source: " + spec.getSource() + ")");
+            }
+            return new IsSameElementAsSelf(raw);
         }
 
         // `<subject>_debuff:<ATTR>`: the party carries a negative modifier on that attribute -- "\u9632\u5fa1\u529b\u88ab\u964d\u4f4e"
@@ -2166,6 +2209,61 @@ public class TriggerTable {
      * <p>Additional damage is an instance too, and it is deliberately marked {@code notCountsAsAttack()}, so this is the one
      * question that tells the two apart where it matters: a rule that would otherwise react to its own extra instance.
      */
+    /**
+     * \u2605 \u300c\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027\u7684\u5176\u4ed6\u6211\u65b9\u89d2\u8272\u300d: the candidate\u2019s element against the rule owner\u2019s own. A unit with no
+     * element (or the placeholder) is not "the same element" -- the same refusal {@code has_same_path_ally} makes about
+     * unknown Paths, because matching two unknowns would be a coincidence dressed as a rule.
+     */
+    private static final class IsSameElementAsSelf implements Condition, PartyCondition {
+        private final String raw;
+        private final boolean otherOnly;
+
+        IsSameElementAsSelf(String raw) {
+            this(raw, false);
+        }
+
+        IsSameElementAsSelf(String raw, boolean otherOnly) {
+            this.raw = raw;
+            this.otherOnly = otherOnly;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return ctx.target();
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            if (otherOnly && ctx.target() == ctx.owner()) {
+                return false;          // \u300c\u5176\u4ed6\u6211\u65b9\u89d2\u8272\u300d does not include the wearer
+            }
+            com.laosun.aluminium.enums.DamageElement mine = elementOf(ctx.owner());
+            com.laosun.aluminium.enums.DamageElement theirs = elementOf(ctx.target());
+            return mine != null && mine == theirs;
+        }
+
+        private static com.laosun.aluminium.enums.DamageElement elementOf(CanHit unit) {
+            if (unit instanceof com.laosun.aluminium.models.Character character) {
+                return character.getElement();
+            }
+            if (unit instanceof com.laosun.aluminium.models.Summon summon
+                    && summon.getMaster() instanceof com.laosun.aluminium.models.Character master) {
+                return master.getElement();
+            }
+            return null;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
     /** \u2605 The element half of {@link #DAMAGE_IS_ATTACK}: the instance\u2019s element against the rule owner\u2019s own. */
     private static final class DamageElementIsSelf implements Condition {
         private final String raw;

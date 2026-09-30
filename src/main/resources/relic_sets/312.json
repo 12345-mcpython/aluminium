@@ -1,0 +1,22 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "relic312_same_element_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "is_other_same_element_as_self"
+          ]
+        }
+      ],
+      "source": "relic set 312 (2-piece) Ability53121: \"Increases the wearer's Energy Regeneration Rate by 5%. Increases the DMG dealt by other allies with the same Type as the wearer by 10%.\" — the ERR is the properties stat; the DMG half is BATTLE_START + a per-target filter.",
+      "note": "⭐ **两句** ✓：「能量恢复效率 +5%」是 `properties` 里的统计项 ✓（**未重写** ✗）；「使我方其他**与装备者相同属性**的角色造成的伤容提高 10%」= `BATTLE_START` ⇒ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` ✓ + `target: all_allies` ✓ + **`target_when`** ✓（效果级的目标筛选 ✓）：**`is_same_element_as_self`** ✓（新关键词 ✓）+ **`target is_other_ally`** ✓（排除装备者自己 ✓）。⚠ 元素未知（占位符）的单位**不算\"相同\"** ✓（与 `has_same_path_ally` 对未知命途的态度一致 ✓）。⚠ 排除装备者自己用的是**身份比较** `target != self` ✓：实测 `BATTLE_START` **不带 actor/target** ✗ ⇒ `is_other_ally` 在它的目标筛选里被引擎拒绝 ✗（报错说明\"this event carries no actor and no target\" ✓），而身份比较比的是**候选本身** ✓。"
+    }
+  ]
+}
