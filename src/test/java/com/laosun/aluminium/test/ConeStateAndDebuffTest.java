@@ -63,7 +63,43 @@ public class ConeStateAndDebuffTest {
                 }
             }
         }
-        Assertions.assertTrue(pinned >= 1, "the defence-drop effect exists");
+        Assertions.assertEquals(1, pinned, "the defence-drop effect exists");
+        // \u26a0 The guard itself is only observable with a CONTRAST: a clean enemy must expose the "apply the state"
+        // rule and NOT the defence-drop one; an enemy that carries the state must expose exactly the opposite
+        // (measured before this: dropping the guard changed no reading at all).
+        int cleanApply = 0;
+        int cleanDrop = 0;
+        for (var rule : unit.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
+                new TriggerTable.TriggerContext(unit, unit,
+                        EnemyFactory.create(MONSTER, 90, 1), 0, 0))) {
+            for (var effect : rule.effects()) {
+                if ("APPLY_BUFF".equals(effect.getOp())) {
+                    cleanApply++;
+                }
+                if ("DEFENCE".equals(effect.getAttribute())) {
+                    cleanDrop++;
+                }
+            }
+        }
+        int statedApply = 0;
+        int statedDrop = 0;
+        for (var rule : unit.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
+                new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0))) {
+            for (var effect : rule.effects()) {
+                if ("APPLY_BUFF".equals(effect.getOp())) {
+                    statedApply++;
+                }
+                if ("DEFENCE".equals(effect.getAttribute())) {
+                    statedDrop++;
+                }
+            }
+        }
+        System.out.println("[21015] clean enemy: apply=" + cleanApply + " drop=" + cleanDrop
+                + " ; stated enemy: apply=" + statedApply + " drop=" + statedDrop);
+        Assertions.assertEquals(1, cleanApply, "a clean enemy is offered the state");
+        Assertions.assertEquals(0, cleanDrop, "but not the defence drop");
+        Assertions.assertEquals(1, statedDrop, "a stated enemy is offered the defence drop");
+        Assertions.assertEquals(0, statedApply, "and no longer the state");
     }
 
     /** A real debuff, attached through the engine's own roll path, so `target_debuff_count` is genuinely >= 1. */
@@ -126,17 +162,30 @@ public class ConeStateAndDebuffTest {
         Assertions.assertEquals((zone + 0.08) / zone, withDebuff / withoutDebuff, 1e-6,
                 "8 points of instance crit damage inside the wearer's own crit zone");
 
+        // \u26a0 The two readings must differ ONLY in the debate state: same enemy, same debuffs, same crit setup.
+        // Comparing two different enemies conflated the per-debuff crit rule (measured 1.424 instead of 1.0).
+        double additionalBefore = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
+        double ordinaryBefore = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
         System.out.println("[23020] debate state=" + unit.getBuffManager().hasState("\u8bba\u8fa9")
                 + " damage boost=" + unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
         Assertions.assertTrue(unit.getBuffManager().hasState("\u8bba\u8fa9"), "the debate state is on the wearer");
         Assertions.assertEquals(0.36, unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
                 "36 points of damage while it lasts");
-        double additional = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
-        double additionalPlain = plainBattle.applyAdditionalDamage(plain, clean, DamageElement.FIRE, 1000, 0.0, 1.5);
-        System.out.println("[23020] additional ratio=" + (additional / additionalPlain)
-                + " (the follow-up ignores part of the defence)");
-        Assertions.assertTrue(additional / additionalPlain > 1.0,
-                "the follow-up ignores part of the defence while the state holds");
+        double additionalAfter = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
+        double ordinaryAfter = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
+        System.out.println("[23020] additional " + additionalBefore + " -> " + additionalAfter
+                + " ratio=" + (additionalAfter / additionalBefore)
+                + " ; ordinary " + ordinaryBefore + " -> " + ordinaryAfter
+                + " ratio=" + (ordinaryAfter / ordinaryBefore));
+        // \u26a0 The state itself boosts EVERY hit by the authored 36%, so the ordinary ratio is 1.36, not 1.0 (my first
+        // wording was simply wrong). What proves the SCOPE is that the follow-up lands strictly higher: 1.5556 against
+        // 1.36 -- the extra factor is the defence ignore, and it exists only on ADDITIONAL instances.
+        Assertions.assertEquals(1.0 + 0.36, ordinaryAfter / ordinaryBefore, 1e-6,
+                "the state's own damage bonus applies to every instance");
+        Assertions.assertEquals(1.5555555507, additionalAfter / additionalBefore, 1e-6,
+                "the follow-up adds the defence ignore on top (measured, then pinned)");
+        Assertions.assertTrue(additionalAfter / additionalBefore > ordinaryAfter / ordinaryBefore,
+                "the ignore is scoped to ADDITIONAL: it only shows up on the follow-up");
     }
 }
