@@ -1,0 +1,97 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22000_energy_after_hitting_a_lowered_target",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 4,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22000: 「当装备者攻击**防御力被降低的**敌方目标后，恢复#2[i]点能量。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22000_energy_after_hitting_a_lowered_target",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 5,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22000: 「当装备者攻击**防御力被降低的**敌方目标后，恢复#2[i]点能量。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22000_energy_after_hitting_a_lowered_target",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 6,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22000: 「当装备者攻击**防御力被降低的**敌方目标后，恢复#2[i]点能量。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22000_energy_after_hitting_a_lowered_target",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 7,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22000: 「当装备者攻击**防御力被降低的**敌方目标后，恢复#2[i]点能量。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone22000_energy_after_hitting_a_lowered_target",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 8,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22000: 「当装备者攻击**防御力被降低的**敌方目标后，恢复#2[i]点能量。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    }
+  ]
+}

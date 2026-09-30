@@ -1,0 +1,202 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_defence_down",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_slowed",
+      "when": [
+        "actor == self",
+        "target_debuff:SPEED"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。⭐ 原文是「防御降低**或**减速」✓ —— 词汇里没有 OR ✗，而**两条规则就是 OR** ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_defence_down",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_slowed",
+      "when": [
+        "actor == self",
+        "target_debuff:SPEED"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。⭐ 原文是「防御降低**或**减速」✓ —— 词汇里没有 OR ✗，而**两条规则就是 OR** ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_defence_down",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_slowed",
+      "when": [
+        "actor == self",
+        "target_debuff:SPEED"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。⭐ 原文是「防御降低**或**减速」✓ —— 词汇里没有 OR ✗，而**两条规则就是 OR** ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_defence_down",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_slowed",
+      "when": [
+        "actor == self",
+        "target_debuff:SPEED"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。⭐ 原文是「防御降低**或**减速」✓ —— 词汇里没有 OR ✗，而**两条规则就是 OR** ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_defence_down",
+      "when": [
+        "actor == self",
+        "target_debuff:DEFENCE"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21044_crit_vs_slowed",
+      "when": [
+        "actor == self",
+        "target_debuff:SPEED"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
+      "note": "⭐⭐ **为它新增了一个条件** ✓：**`target_debuff:<ATTR>`** ✓（与 `self_attr:` / `target_stacks:` 同一个\"前缀参数\"族 ✓）：判定依据是**已有事实** ✓ —— 该属性上挂着一个**`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓，而\"属性被降低\"不属于任何一族 ✗。⚠ 同时修正一条旧登记 ✓：**`has_path` 本来就存在** ✓（我曾把 23053 的\"命途计数\"记为缺口 ✗）。⭐ 原文是「防御降低**或**减速」✓ —— 词汇里没有 OR ✗，而**两条规则就是 OR** ✓。"
+    }
+  ]
+}
