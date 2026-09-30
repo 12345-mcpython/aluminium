@@ -41,13 +41,6 @@
       "reason": "\"Increases the wearer's CRIT DMG dealt to enemy targets in the DEF reduction state by 28%. After the wearer inflicts the DEF reduction state on an enemy target, all allies gain 'Comburent' for 2 turn(s) ... The DMG dealt by ally targets with 'Comburent' increases by 15% ... can be triggered again after the wearer uses an attack.\" Needs a condition on the target's DEF-reduction state, a named buff with a per-attack refresh rule, and a damage-dealt bonus."
     }
   ],
-  "303": [
-    {
-      "require": 2,
-      "ability": "Ability53031",
-      "reason": "\"Increases the wearer's Effect Hit Rate by 10%. Meanwhile, increases the wearer's ATK by an amount equal to 25% of their current Effect Hit Rate, up to a max of 25%.\" The Effect Hit Rate is the `properties` stat (StatusProbabilityBase 0.1). What is missing is an amount that SCALES with one of my own attribute values and is CAPPED -- MODIFY_ATTR's amount is a literal with no arithmetic, and the DSL cannot express 'my ATK += 0.25 x my Effect Hit Rate, at most 25%'. (`self_attr` can now READ the value for a threshold, which is half of this and not enough.) ⚠ 2026-09-29, RE-STATED: the blocker is NOT \"no arithmetic\" -- `scale: \"self_attr:<ATTR>\"` is the derived path and its result is ABSOLUTE in the target attribute's units (first user: 大丽花's trace, where Break Effect is a ratio, so an absolute value is exactly the sentence). 303 needs 25% of EHR used as a SHARE of ATK (+2.5% ATK at 10% EHR); the derived path would give +0.025 ATK points and the share path cannot read an attribute. The real missing piece is an ATTRIBUTE-SCALED SHARE, and `per_stack` multiplies a share by a COUNT, not by an attribute. Registered rather than built: one reader is not enough to justify a capability."
-    }
-  ],
   "312": [
     {
       "require": 2,
