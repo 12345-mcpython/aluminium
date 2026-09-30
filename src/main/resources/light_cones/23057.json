@@ -1,0 +1,107 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23057_elation_def_ignore",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.2,
+          "instance": true,
+          "damage_type": "ELATION",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23057: 「造成的欢愉伤害无视目标#2[i]%的防御力。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗。⭐ 「造成的**欢愉伤害无视目标#2[i]%的防御力**」用 **实例路径** ✓：`DEALING_DAMAGE` + `MODIFY_ATTR` + `instance: true` + **`damage_type: ELATION`** ✓（该路径读 `damage_type` ✓）—— 它只改**那一个实例** ✓，所以永久生效也不会泄漏到普通伤害 ✓。⚠ **另一句已登记** ✗：「当装备者**对自身单体**施放终结技时，获得 **20 点【笑点】**。该效果**最多触发 1 次**，**施放 3 次普攻后重置**」—— 缺**\"次数 + 重置\"的计数器** ✗（`cooldown` 是**回合**级 ✗，`per_attack` 是**攻击**级 ✗，都不是\"几次普攻后重置\" ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23057_elation_def_ignore",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.24,
+          "instance": true,
+          "damage_type": "ELATION",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23057: 「造成的欢愉伤害无视目标#2[i]%的防御力。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗。⭐ 「造成的**欢愉伤害无视目标#2[i]%的防御力**」用 **实例路径** ✓：`DEALING_DAMAGE` + `MODIFY_ATTR` + `instance: true` + **`damage_type: ELATION`** ✓（该路径读 `damage_type` ✓）—— 它只改**那一个实例** ✓，所以永久生效也不会泄漏到普通伤害 ✓。⚠ **另一句已登记** ✗：「当装备者**对自身单体**施放终结技时，获得 **20 点【笑点】**。该效果**最多触发 1 次**，**施放 3 次普攻后重置**」—— 缺**\"次数 + 重置\"的计数器** ✗（`cooldown` 是**回合**级 ✗，`per_attack` 是**攻击**级 ✗，都不是\"几次普攻后重置\" ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23057_elation_def_ignore",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.28,
+          "instance": true,
+          "damage_type": "ELATION",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23057: 「造成的欢愉伤害无视目标#2[i]%的防御力。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗。⭐ 「造成的**欢愉伤害无视目标#2[i]%的防御力**」用 **实例路径** ✓：`DEALING_DAMAGE` + `MODIFY_ATTR` + `instance: true` + **`damage_type: ELATION`** ✓（该路径读 `damage_type` ✓）—— 它只改**那一个实例** ✓，所以永久生效也不会泄漏到普通伤害 ✓。⚠ **另一句已登记** ✗：「当装备者**对自身单体**施放终结技时，获得 **20 点【笑点】**。该效果**最多触发 1 次**，**施放 3 次普攻后重置**」—— 缺**\"次数 + 重置\"的计数器** ✗（`cooldown` 是**回合**级 ✗，`per_attack` 是**攻击**级 ✗，都不是\"几次普攻后重置\" ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23057_elation_def_ignore",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.32,
+          "instance": true,
+          "damage_type": "ELATION",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23057: 「造成的欢愉伤害无视目标#2[i]%的防御力。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗。⭐ 「造成的**欢愉伤害无视目标#2[i]%的防御力**」用 **实例路径** ✓：`DEALING_DAMAGE` + `MODIFY_ATTR` + `instance: true` + **`damage_type: ELATION`** ✓（该路径读 `damage_type` ✓）—— 它只改**那一个实例** ✓，所以永久生效也不会泄漏到普通伤害 ✓。⚠ **另一句已登记** ✗：「当装备者**对自身单体**施放终结技时，获得 **20 点【笑点】**。该效果**最多触发 1 次**，**施放 3 次普攻后重置**」—— 缺**\"次数 + 重置\"的计数器** ✗（`cooldown` 是**回合**级 ✗，`per_attack` 是**攻击**级 ✗，都不是\"几次普攻后重置\" ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23057_elation_def_ignore",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.36,
+          "instance": true,
+          "damage_type": "ELATION",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23057: 「造成的欢愉伤害无视目标#2[i]%的防御力。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗。⭐ 「造成的**欢愉伤害无视目标#2[i]%的防御力**」用 **实例路径** ✓：`DEALING_DAMAGE` + `MODIFY_ATTR` + `instance: true` + **`damage_type: ELATION`** ✓（该路径读 `damage_type` ✓）—— 它只改**那一个实例** ✓，所以永久生效也不会泄漏到普通伤害 ✓。⚠ **另一句已登记** ✗：「当装备者**对自身单体**施放终结技时，获得 **20 点【笑点】**。该效果**最多触发 1 次**，**施放 3 次普攻后重置**」—— 缺**\"次数 + 重置\"的计数器** ✗（`cooldown` 是**回合**级 ✗，`per_attack` 是**攻击**级 ✗，都不是\"几次普攻后重置\" ✗）。"
+    }
+  ]
+}
