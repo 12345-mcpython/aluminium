@@ -1,0 +1,97 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23004_boost_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23004 以世界之名: 使装备者对陷入负面效果的敌方目标造成的伤害提高#1[i]%。当装备者施放战技时，装备者此次攻击的效果命中提高#2[i]%，攻击力提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⭐ 「**陷入负面效果**的敌方目标」= **`target_debuff_count >= 1`** ✓（既有变量 ✓；⚠ 「负面效果」用 `BuffManager.debuffCount()` ✓）。⚠ **`BOOST_DAMAGE` 不带持续期** ✓（它作用于**单次结算** ✓ —— 加载器对此有断言 ✓），因此**不写** `turns`/`permanent` ✓。⚠ **只写了第一句从句** ✗：第二句「当装备者施放战技时，装备者**此次攻击**的效果命中提高 #2%，攻击力提高 #3%」需要**施放域**的`EFFECT_HIT_RATE` / `ATTACK` ✗（`instance` 只覆盖 `DEFENCE_IGNORE`/`CRIT_CHANCE`/`CRIT_ATTACK` ✓）⇒ **登记而不近似** ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23004_boost_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.28,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23004 以世界之名: 使装备者对陷入负面效果的敌方目标造成的伤害提高#1[i]%。当装备者施放战技时，装备者此次攻击的效果命中提高#2[i]%，攻击力提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⭐ 「**陷入负面效果**的敌方目标」= **`target_debuff_count >= 1`** ✓（既有变量 ✓；⚠ 「负面效果」用 `BuffManager.debuffCount()` ✓）。⚠ **`BOOST_DAMAGE` 不带持续期** ✓（它作用于**单次结算** ✓ —— 加载器对此有断言 ✓），因此**不写** `turns`/`permanent` ✓。⚠ **只写了第一句从句** ✗：第二句「当装备者施放战技时，装备者**此次攻击**的效果命中提高 #2%，攻击力提高 #3%」需要**施放域**的`EFFECT_HIT_RATE` / `ATTACK` ✗（`instance` 只覆盖 `DEFENCE_IGNORE`/`CRIT_CHANCE`/`CRIT_ATTACK` ✓）⇒ **登记而不近似** ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23004_boost_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.32,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23004 以世界之名: 使装备者对陷入负面效果的敌方目标造成的伤害提高#1[i]%。当装备者施放战技时，装备者此次攻击的效果命中提高#2[i]%，攻击力提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⭐ 「**陷入负面效果**的敌方目标」= **`target_debuff_count >= 1`** ✓（既有变量 ✓；⚠ 「负面效果」用 `BuffManager.debuffCount()` ✓）。⚠ **`BOOST_DAMAGE` 不带持续期** ✓（它作用于**单次结算** ✓ —— 加载器对此有断言 ✓），因此**不写** `turns`/`permanent` ✓。⚠ **只写了第一句从句** ✗：第二句「当装备者施放战技时，装备者**此次攻击**的效果命中提高 #2%，攻击力提高 #3%」需要**施放域**的`EFFECT_HIT_RATE` / `ATTACK` ✗（`instance` 只覆盖 `DEFENCE_IGNORE`/`CRIT_CHANCE`/`CRIT_ATTACK` ✓）⇒ **登记而不近似** ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23004_boost_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.36,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23004 以世界之名: 使装备者对陷入负面效果的敌方目标造成的伤害提高#1[i]%。当装备者施放战技时，装备者此次攻击的效果命中提高#2[i]%，攻击力提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⭐ 「**陷入负面效果**的敌方目标」= **`target_debuff_count >= 1`** ✓（既有变量 ✓；⚠ 「负面效果」用 `BuffManager.debuffCount()` ✓）。⚠ **`BOOST_DAMAGE` 不带持续期** ✓（它作用于**单次结算** ✓ —— 加载器对此有断言 ✓），因此**不写** `turns`/`permanent` ✓。⚠ **只写了第一句从句** ✗：第二句「当装备者施放战技时，装备者**此次攻击**的效果命中提高 #2%，攻击力提高 #3%」需要**施放域**的`EFFECT_HIT_RATE` / `ATTACK` ✗（`instance` 只覆盖 `DEFENCE_IGNORE`/`CRIT_CHANCE`/`CRIT_ATTACK` ✓）⇒ **登记而不近似** ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23004_boost_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.4,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23004 以世界之名: 使装备者对陷入负面效果的敌方目标造成的伤害提高#1[i]%。当装备者施放战技时，装备者此次攻击的效果命中提高#2[i]%，攻击力提高#3[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⭐ 「**陷入负面效果**的敌方目标」= **`target_debuff_count >= 1`** ✓（既有变量 ✓；⚠ 「负面效果」用 `BuffManager.debuffCount()` ✓）。⚠ **`BOOST_DAMAGE` 不带持续期** ✓（它作用于**单次结算** ✓ —— 加载器对此有断言 ✓），因此**不写** `turns`/`permanent` ✓。⚠ **只写了第一句从句** ✗：第二句「当装备者施放战技时，装备者**此次攻击**的效果命中提高 #2%，攻击力提高 #3%」需要**施放域**的`EFFECT_HIT_RATE` / `ATTACK` ✗（`instance` 只覆盖 `DEFENCE_IGNORE`/`CRIT_CHANCE`/`CRIT_ATTACK` ✓）⇒ **登记而不近似** ✓。"
+    }
+  ]
+}
