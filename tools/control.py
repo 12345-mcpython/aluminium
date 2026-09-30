@@ -28,13 +28,17 @@ class Control:
         self.paths = list(paths)
         self.saved = {p: io.open(os.path.join(work, p), encoding='utf-8').read() for p in self.paths}
 
-    def neutralize(self, old, new):
+    def neutralize(self, old, new, every=False):
         for path, body in list(self.saved.items()):
             full = os.path.join(self.work, path)
             text = io.open(full, encoding='utf-8').read()
-            if text.count(old) != 1:
-                raise SystemExit('control refused: %r appears %d times in %s' % (old, text.count(old), path))
-            io.open(full, 'w', encoding='utf-8', newline='').write(text.replace(old, new, 1))
+            seen = text.count(old)
+            if seen == 0:
+                raise SystemExit('control refused: %r does not appear in %s' % (old, path))
+            # `every=True` for anchors that repeat once per rank (a cone has five). Anything else must be unique:
+            # neutralizing half a file would make the control meaningless.
+            io.open(full, 'w', encoding='utf-8', newline='').write(
+                text.replace(old, new) if every else text.replace(old, new, 1))
             print('control: %s now has %r' % (path, new))
 
     def run(self, test_class):
