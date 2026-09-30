@@ -133,7 +133,16 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         /**
          * Ends after its owner casts an Ultimate.
          */
-        NEXT_ULTIMATE
+        NEXT_ULTIMATE,
+        /**
+         * \u2605 Ends when the cast being delivered right now finishes (2026-09-30, cones 20001 / 21000).
+         *
+         * <p>\u300c\u65bd\u653e\u6218\u6280\u548c\u7ec8\u7ed3\u6280\u65f6\uff0c\u6cbb\u7597\u91cf\u63d0\u9ad8 12%\u300d is neither a turn nor permanent: upstream scopes it to the cast
+         * itself ({@code MEquip_20001_Main} adds on {@code OnBeforeSkillUse} and removes on {@code OnAfterSkillUse}).
+         * `turns` would over-apply to later heals in the same turn, and heals have no instance scope (only damage
+         * does, as {@code BOOST_DAMAGE}) -- so this is the shape that states what the documents state.
+         */
+        CAST_END
     }
 
     /**
