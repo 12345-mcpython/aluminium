@@ -940,6 +940,17 @@ public class TriggerTable {
      * there the candidate sits in {@code target} and the rule\u2019s owner in {@code owner()}. Readers: relic set 312\u2019s
      * \u300c\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027\u7684\u5176\u4ed6\u6211\u65b9\u89d2\u8272\u300d.
      */
+    /**
+     * The {@code shares_path_with_an_ally} keyword (2026-09-30): "<b>that unit walks the same Path as somebody else on our
+     * side</b>". Reader: light cone 21046\u2019s \u300c\u82e5\u6709**\u4e24\u540d\u53ca\u4ee5\u4e0a\u6211\u65b9\u89d2\u8272\u62e5\u6709\u4efb\u610f\u76f8\u540c\u547d\u9014**\uff0c\u4f7f**\u8fd9\u4e9b\u89d2\u8272**\u2026\u300d.
+     *
+     * <p>\u2605 The existing {@code has_same_path_ally} answers for the PARTY (it looks from the rule\u2019s owner outward), so as a
+     * per-target filter it would pass every candidate -- the sentence names \u300cthese characters\u300d, not the party. This one is asked
+     * ABOUT a candidate, exactly like {@code is_same_element_as_self}.
+     */
+    private static final Pattern SHARES_PATH_WITH_AN_ALLY =
+            Pattern.compile("(?<![\\w])shares_path_with_an_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
+
     private static final Pattern IS_SAME_ELEMENT =
             Pattern.compile("(?<![\\w])is_same_element_as_self(?![\\w])", Pattern.CASE_INSENSITIVE);
 
@@ -1194,6 +1205,9 @@ public class TriggerTable {
         // refused rather than ignored, so a typo cannot look like a working rule.
         if (IS_OTHER_SAME_ELEMENT.matcher(text).find()) {
             return new IsSameElementAsSelf(raw, true);
+        }
+        if (SHARES_PATH_WITH_AN_ALLY.matcher(text).find()) {
+            return new SharesPathWithAnAlly(raw);
         }
         Matcher sameElement = IS_SAME_ELEMENT.matcher(text);
         if (sameElement.find()) {
@@ -2227,6 +2241,51 @@ public class TriggerTable {
      * <p>Additional damage is an instance too, and it is deliberately marked {@code notCountsAsAttack()}, so this is the one
      * question that tells the two apart where it matters: a rule that would otherwise react to its own extra instance.
      */
+    /**
+     * \u2605 \u300c\u62e5\u6709\u4efb\u610f\u76f8\u540c\u547d\u9014\u7684\u89d2\u8272\u300d: whether the candidate has a Path twin on our side. A unit whose Path is
+     * the placeholder ({@code Path.OTHER}) has no twin by definition -- the same refusal {@code has_same_path_ally} makes.
+     */
+    private static final class SharesPathWithAnAlly implements Condition, PartyCondition {
+        private final String raw;
+
+        SharesPathWithAnAlly(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return ctx.target();
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            if (ctx.battle() == null || !(ctx.target() instanceof com.laosun.aluminium.models.Character candidate)) {
+                return false;
+            }
+            com.laosun.aluminium.enums.Path mine = candidate.getPath();
+            if (mine == null || mine == com.laosun.aluminium.enums.Path.OTHER) {
+                return false;
+            }
+            for (CanHit ally : ctx.battle().allies) {
+                if (ally != candidate && !ally.isDeath()
+                        && ally instanceof com.laosun.aluminium.models.Character other && other.getPath() == mine) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
     /**
      * \u2605 \u300c\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027\u7684\u5176\u4ed6\u6211\u65b9\u89d2\u8272\u300d: the candidate\u2019s element against the rule owner\u2019s own. A unit with no
      * element (or the placeholder) is not "the same element" -- the same refusal {@code has_same_path_ally} makes about
