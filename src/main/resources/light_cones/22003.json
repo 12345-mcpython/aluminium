@@ -1,21 +1,6 @@
 {
   "1": [
     {
-      "on": "BATTLE_START",
-      "id": "cone22003_max_hp",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
-      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
-    },
-    {
       "on": "HP_LOST",
       "id": "cone22003_crit_after_hp_loss",
       "when": [
@@ -55,21 +40,6 @@
     }
   ],
   "2": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone22003_max_hp",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.15,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
-      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
-    },
     {
       "on": "HP_LOST",
       "id": "cone22003_crit_after_hp_loss",
@@ -111,21 +81,6 @@
   ],
   "3": [
     {
-      "on": "BATTLE_START",
-      "id": "cone22003_max_hp",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.18,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
-      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
-    },
-    {
       "on": "HP_LOST",
       "id": "cone22003_crit_after_hp_loss",
       "when": [
@@ -166,21 +121,6 @@
   ],
   "4": [
     {
-      "on": "BATTLE_START",
-      "id": "cone22003_max_hp",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.21,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
-      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
-    },
-    {
       "on": "HP_LOST",
       "id": "cone22003_crit_after_hp_loss",
       "when": [
@@ -220,21 +160,6 @@
     }
   ],
   "5": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone22003_max_hp",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.24,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
-      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
-    },
     {
       "on": "HP_LOST",
       "id": "cone22003_crit_after_hp_loss",
