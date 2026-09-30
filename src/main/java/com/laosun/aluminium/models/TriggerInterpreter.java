@@ -1431,7 +1431,7 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      */
     /** The multiplier `per_stack` names, read on the target: a debuff count, a DoT count, or a counter (2026-09-29). */
-    private static double perStackFactor(EffectSpec effect, CanHit target) {
+    private static double perStackFactor(EffectSpec effect, CanHit target, TriggerContext ctx) {
         String name = effect.getPerStack();
         if (name == null || name.isBlank()) {
             return 1;
@@ -1440,6 +1440,10 @@ public final class TriggerInterpreter {
             case "target_debuff_count" -> target.getBuffManager().debuffCount();
             case "target_dot_count" -> target.getBuffManager()
                     .countBuffs(com.laosun.aluminium.models.buff.DotBuff.class);
+            // \u2605 \u300c\u573a\u4e0a\u6bcf\u6709\u4e00\u540d\u6301\u6709\u62a4\u76fe\u7684\u89d2\u8272\u300d (cone 21043): OUR units currently holding a shield. A LIVE count,
+            // read where the effect is evaluated -- it needs the battlefield because a unit does not know its own side.
+            case "shielded_count" -> ctx == null || ctx.battle() == null ? 0
+                    : ctx.battle().allies.stream().filter(unit -> unit.getShield() > 0).count();
             default -> target.getBuffManager().stacksOf(name.trim());
         };
     }
@@ -1465,7 +1469,7 @@ public final class TriggerInterpreter {
             }
             if (attribute == AttributeType.DEFENCE_IGNORE) {
                 double instanceMagnitude = effect.getPercent() == null ? 0 : effect.getPercent();
-                instanceMagnitude *= ctx.target() == null ? 1 : perStackFactor(effect, ctx.target());
+                instanceMagnitude *= ctx.target() == null ? 1 : perStackFactor(effect, ctx.target(), ctx);
                 ctx.damage().addDefenceIgnore(instanceMagnitude);
                 return;
             }
@@ -1475,6 +1479,17 @@ public final class TriggerInterpreter {
             }
             if (attribute == AttributeType.CRIT_ATTACK) {
                 ctx.damage().addCritDamage(effect.getPercent() == null ? 0 : effect.getPercent());
+                return;
+            }
+            // \u2605 \u300c\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 X%\u300d as a property of THIS hit (2026-09-30; reader: cone 21043's
+            // \u300c\u573a\u4e0a\u6bcf\u6709\u4e00\u540d\u6301\u6709\u62a4\u76fe\u7684\u89d2\u8272\u300d). It reuses the same boost channel BOOST_DAMAGE writes, so the
+            // number this rule adds is read by the damage formula exactly like any other boost of that instance -- and
+            // `per_stack` is honoured, which is what makes a LIVE count ("the field right now") expressible at all.
+            // \u26a0 Before this, such a rule had to be a written modifier, i.e. a snapshot taken at cast time.
+            if (attribute == AttributeType.ALL_DAMAGE_TYPE_BOOST) {
+                double instanceBoost = effect.getPercent() == null ? 0 : effect.getPercent();
+                instanceBoost *= ctx.target() == null ? 1 : perStackFactor(effect, ctx.target(), ctx);
+                ctx.damage().addBoost(instanceBoost);
                 return;
             }
             throw new IllegalStateException("Op MODIFY_ATTR with instance=true supports DEFENCE_IGNORE, CRIT_CHANCE and CRIT_ATTACK on "
