@@ -70,7 +70,10 @@ public class Cone23044Test {
                 + " (x" + (afterTurnStart / plain) + ")");
         Assertions.assertTrue(withCone > plain, "the defence ignore alone already raises the damage");
         Assertions.assertTrue(sun, "an Ultimate grants the sun");
-        Assertions.assertTrue(withSun > withCone, "and the sun adds 60% on top");
+        // \u2605 The sun's own factor, as an EQUALITY against the clause's number (discipline 200): "> " cannot tell 60% from
+        // 30%, and the `60 -> 30 percent` mutation was 0 red until this line existed. Both are multipliers on the same
+        // instance, so the ratio is exactly 1 + the boost.
+        Assertions.assertEquals(1.6, withSun / withCone, 0.02, "the sun is exactly +60% on top of the ignore");
         Assertions.assertTrue(sunGone, "the wearer's turn start removes it");
         Assertions.assertEquals(withCone / plain, afterTurnStart / plain, 1e-9,
                 "so the third state is the first state again");
