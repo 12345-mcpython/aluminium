@@ -26,7 +26,9 @@ class Control:
     def __init__(self, work, *paths):
         self.work = work
         self.paths = list(paths)
-        self.saved = {p: io.open(os.path.join(work, p), encoding='utf-8').read() for p in self.paths}
+        # \u26a0 BYTES, not text: reading with universal newlines folds CRLF to LF, and writing that back leaves the
+        # working tree dirty with no content change (measured round 260). A control must be invisible when it restores.
+        self.saved = {p: open(os.path.join(work, p), 'rb').read() for p in self.paths}
 
     def neutralize(self, old, new, every=False):
         for path, body in list(self.saved.items()):
@@ -68,7 +70,7 @@ class Control:
 
     def restore(self):
         for path, body in self.saved.items():
-            io.open(os.path.join(self.work, path), 'w', encoding='utf-8', newline='').write(body)
+            open(os.path.join(self.work, path), 'wb').write(body)
         print('control: restored %d file(s)' % len(self.saved))
 
     def __enter__(self):
