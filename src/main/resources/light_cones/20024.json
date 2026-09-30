@@ -1,0 +1,289 @@
+{
+  "resources": [
+    {
+      "id": "笑点",
+      "max": 999,
+      "initial": 0
+    }
+  ],
+  "1": [
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_met",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 >= 10"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_lost",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 < 10"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_met",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 >= 10"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.25,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_lost",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 < 10"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.25,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_met",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 >= 10"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_lost",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 < 10"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_met",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 >= 10"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.35,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_lost",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 < 10"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.35,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_met",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 >= 10"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.4,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "cone20024_threshold_lost",
+      "when": [
+        "actor == self",
+        "self_resource:笑点 < 10"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "笑点达标",
+          "amount": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.4,
+          "per_stack": "笑点达标",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20024: 「当拥有的笑点大于等于#1[i]时，装备者的暴击伤害提高#2[i]%。」",
+      "note": "⭐ 本句是**阈值面板** ✓：引擎的修饰器是**已写下的值** ✗ ⇒ 必须在**资源变动时重算** ✓。写法：`RESOURCE_CHANGED` ✓ + 两条互斥的规则 ✓（`self_resource:笑点 >= 10` 加一层 ✓ / `< 10` 减一层 ✓）+ **读计数器的修饰器** ✓（两条都**重写**它 ✓，因为清掉计数器不会重算已写下的值 ✗ —— 纪律 166 ✓）。⭐ ⭐ **笑点由本光锥声明** ✓：文件顶层多了 `\"resources\"` ✓（与角色文件同一形状 ✓，`TriggerTable.plus` 本就会携带声明 ✓，`CharacterFactory` 本就会注册 ✓）。⚠ **上限无文档** ✗ ⇒ 取 **999** ✓（只要不截断即可 ✓；上限本身已登记 ✗）。"
+    }
+  ]
+}
