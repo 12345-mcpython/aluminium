@@ -308,6 +308,15 @@ public final class TriggerInterpreter {
                 requireFixedCrit(effect, op, spec);
             }
             case "MODIFY_ATTR" -> {
+                // ⚠ A damage-type scope is only read on the INSTANCE route (2026-09-29). Stating it on an ordinary modifier would
+                // be silently ignored, which is the hole the closed-set checks exist to close.
+                if (effect.getDamageType() != null && !effect.getDamageType().isBlank()
+                        && !Boolean.TRUE.equals(effect.getInstance())) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states \"damage_type\" without \"instance\": true; only an instance-scoped modifier reads it "
+                                    + "(source: " + spec.getSource() + ")");
+                }
+
                 requireAttribute(effect, op, spec);
                 // ? A FLAT boost as well as a share (2026-09-29). 「速度提高50点」 states points, not a percentage; 17 documents do this (7 for SPD alone).
                 // The rule is "exactly one": a DERIVED modifier reads `percent x attribute + amount`, while a plain one is either a share or a flat value,
@@ -1418,6 +1427,12 @@ public final class TriggerInterpreter {
         // DEALING_DAMAGE (2539) before it settles the defence zone (2551), so a rule really can still change it.
         // Opt-in (`instance: true`) because seven shipped rules already use MODIFY_ATTR on that event.
         if (Boolean.TRUE.equals(effect.getInstance()) && ctx.damage() != null) {
+            // ★ An optional damage-type scope (2026-09-29): 「对目标造成的<b>击破伤害</b>无视其 X% 防御力」 (relic 119/4)
+            // and 「<b>追加攻击</b>无视其 X% 防御力」. The instance already knows its own type, so this is a comparison, not a new dimension.
+            com.laosun.aluminium.enums.DamageType instanceScope = parseDamageType(effect, "MODIFY_ATTR", null);
+            if (instanceScope != null && ctx.damage().getType() != instanceScope) {
+                return;   // the instance belongs to another damage type: this rule does not speak about it
+            }
             if (attribute == AttributeType.DEFENCE_IGNORE) {
                 double instanceMagnitude = effect.getPercent() == null ? 0 : effect.getPercent();
                 instanceMagnitude *= ctx.target() == null ? 1 : perStackFactor(effect, ctx.target());

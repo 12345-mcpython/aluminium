@@ -6,13 +6,6 @@
       "reason": "Needs a FOLLOW-UP dimension on the damage instance. The 4-piece says \"when the wearer uses a Follow-Up ATK, for every time the Follow-Up ATK deals DMG, increases ATK by 6%, up to 8 times, for 3 turns; removed the next time the wearer uses a Follow-Up ATK\" -- per-DAMAGE stacking inside one follow-up, plus a clear on the next one. The FOLLOW_UP event exists, but nothing on a Damage instance can say \"this damage came from a follow-up\": DamageType has no such value and SkillCategory (NORMAL/BPSKILL/ULTRA/...) has none either (re-checked 2026-09-29, rounds 216/236). NOTE: relic_sets/115.json carries the 2-piece only, so this entry covers the 4-piece."
     }
   ],
-  "119": [
-    {
-      "require": 4,
-      "ability": "Ability51191",
-      "reason": "Needs a DAMAGE-TYPE-SCOPED attribute modifier (RE-CHECKED 2026-09-29). The attribute threshold it once lacked exists (`self_attr:BREAKING_EFFECT >= 1.5`), and `EffectSpec` already carries a `damage_type` field parsed by `parseDamageType` -- but only `MODIFY_DAMAGE_TAKEN` reads it, while `modifyAttr` ignores it, so 「击破伤害无视其 10% 防御力」 has no spelling today. The missing layer is therefore precise: let a modifier carry the damage type it applies to (and read it where the defence zone is settled). It stays registered because it has ONE reader (this entry; 超击破 is its other half, not a second reader), and the project does not build capabilities for one reader."
-    }
-  ],
   "126": [
     {
       "require": 4,
