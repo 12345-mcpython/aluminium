@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24005_party_damage_after_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.08,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 24005: 「装备者施放战技后，使我方全体造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ **现成词汇** ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗；「装备者**施放战技后**，使**我方全体**造成的伤容提高#2[i]%，持续#3[i]回合」✓= `SKILL_CAST` + `actor == self` ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `target: all_allies` ✓ + `turns` ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24005_party_damage_after_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 24005: 「装备者施放战技后，使我方全体造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ **现成词汇** ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗；「装备者**施放战技后**，使**我方全体**造成的伤容提高#2[i]%，持续#3[i]回合」✓= `SKILL_CAST` + `actor == self` ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `target: all_allies` ✓ + `turns` ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24005_party_damage_after_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 24005: 「装备者施放战技后，使我方全体造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ **现成词汇** ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗；「装备者**施放战技后**，使**我方全体**造成的伤容提高#2[i]%，持续#3[i]回合」✓= `SKILL_CAST` + `actor == self` ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `target: all_allies` ✓ + `turns` ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24005_party_damage_after_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.14,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 24005: 「装备者施放战技后，使我方全体造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ **现成词汇** ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗；「装备者**施放战技后**，使**我方全体**造成的伤容提高#2[i]%，持续#3[i]回合」✓= `SKILL_CAST` + `actor == self` ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `target: all_allies` ✓ + `turns` ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24005_party_damage_after_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.16,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 24005: 「装备者施放战技后，使我方全体造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ **现成词汇** ✓：`props` 写了 `speed_percent` ✓ ⇒ 速度那句**未重写** ✗；「装备者**施放战技后**，使**我方全体**造成的伤容提高#2[i]%，持续#3[i]回合」✓= `SKILL_CAST` + `actor == self` ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `target: all_allies` ✓ + `turns` ✓。"
+    }
+  ]
+}
