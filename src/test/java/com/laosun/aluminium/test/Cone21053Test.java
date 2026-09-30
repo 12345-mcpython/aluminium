@@ -79,7 +79,10 @@ public class Cone21053Test {
         double bare = hit(ally(true), false);
         double control = hit(ally(false), true);
         System.out.println("[21053] shielded=" + shielded + " bare=" + bare + " control(no cone)=" + control);
-        Assertions.assertTrue(shielded > bare, "with the cone, holding a shield raises the damage dealt");
+        // MEASURED first, then pinned: the shielded hit is exactly 12% bigger. "shielded > bare" alone let a halved
+        // percentage survive (measured: reds 0), because the inequality still held.
+        Assertions.assertEquals(1.12, shielded / bare, 1e-6,
+                "holding a shield raises the damage dealt by exactly the authored 12%");
         Assertions.assertEquals(bare, control, 1e-6, "without the cone a shield changes nothing");
     }
 }
