@@ -892,6 +892,18 @@ public class TriggerTable {
     private static final Set<String> STATE_SUBJECTS = Set.of("self", "actor", "target");
 
     /**
+     * \u2705 The keyword of the "that attribute of mine/theirs was lowered" condition (2026-09-30; readers: cone 22000's
+     * \u300c\u653b\u51fb\u9632\u5fa1\u529b\u88ab\u964d\u4f4e\u7684\u654c\u65b9\u76ee\u6807\u540e\u6062\u590d\u80fd\u91cf\u300d and cone 21044's \u300c\u5904\u4e8e\u9632\u5fa1\u964d\u4f4e\u6216\u51cf\u901f\u72b6\u6001\u4e0b\u7684\u654c\u4eba\u300d).
+     *
+     * <p>\u2605 Why not {@code DebuffClass}: that enum names the two FAMILIES the corpus groups states into (control, dot),
+     * and a lowered attribute belongs to neither. The fact that actually exists in the engine is a MODIFIER whose source is
+     * {@link DoubleValue.Modifier.ModifierSource#DEBUFF}, which is exactly what \u300c\u88ab\u964d\u4f4e\u300d asserts.
+     */
+    private static final Pattern DEBUFF_ON =
+            Pattern.compile("(?<![\\w])(?<subject>self|actor|target)_debuff:(?<attribute>[A-Za-z_]+)",
+                    Pattern.CASE_INSENSITIVE);
+
+    /**
      * The {@code has_path} keyword, read exactly like {@link #HAS_STATE}.
      */
     private static final Pattern HAS_PATH =
@@ -1130,6 +1142,22 @@ public class TriggerTable {
                                 + "(source: " + spec.getSource() + ")");
             }
             return new DamageIsAttack(raw);
+        }
+
+        // `<subject>_debuff:<ATTR>`: the party carries a negative modifier on that attribute -- "\u9632\u5fa1\u529b\u88ab\u964d\u4f4e"
+        // / "\u51cf\u901f" name the ATTRIBUTE that was lowered, and a modifier's DEBUFF source is the fact that says so.
+        Matcher debuffOn = DEBUFF_ON.matcher(text);
+        if (debuffOn.find()) {
+            String subject = normalize(debuffOn.group("subject"));
+            String attribute = debuffOn.group("attribute") == null ? "" : debuffOn.group("attribute").trim();
+            String trailing = text.substring(debuffOn.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes \"" + trailing + "\" after the attribute name; the keyword "
+                                + "takes exactly one attribute, for example \"target_debuff:DEFENCE\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new HasDebuffOn(subject, attribute, raw, spec);
         }
 
         Matcher fromSkill = FROM_SKILL.matcher(text);
@@ -2264,6 +2292,67 @@ public class TriggerTable {
      * <b>fails</b> the condition, exactly like {@link Equality} and {@link Numeric}: "the rule matched" must
      * never be the accidental outcome of a missing party.
      */
+    /**
+     * \u2705 "That party carries a negative modifier on this attribute" (2026-09-30).
+     *
+     * <p>\u2605 A party that does not exist for this event FAILS, exactly like {@link HasState}: "the rule matched" must never
+     * be the accidental outcome of a missing party.
+     */
+    private static final class HasDebuffOn implements Condition, PartyCondition {
+
+        private final String subject;
+        private final String attribute;
+        private final String raw;
+
+        HasDebuffOn(String subject, String attribute, String raw, TriggerSpec spec) {
+            if (!STATE_SUBJECTS.contains(subject)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks about a debuff on \"" + subject + "\"; the keyword names its "
+                                + "party with one of " + STATE_SUBJECTS + " before \"_debuff:\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            if (attribute.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' names no attribute after \"_debuff:\"; write the attribute whose "
+                                + "value was lowered, for example \"target_debuff:DEFENCE\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            if (AttributeType.fromString(attribute) == null) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' names the attribute \"" + attribute + "\", which is not one this "
+                                + "engine knows (source: " + spec.getSource() + ")");
+            }
+            this.subject = subject;
+            this.attribute = attribute;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            if (who == null) {
+                return false;
+            }
+            AttributeType type = AttributeType.fromString(attribute);
+            return !who.getAttribute(type).filterBySource(DoubleValue.Modifier.ModifierSource.DEBUFF).isEmpty();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     private static final class HasState implements Condition, PartyCondition {
 
         private final String subject;
