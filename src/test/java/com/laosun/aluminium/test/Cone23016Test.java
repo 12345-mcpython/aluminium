@@ -80,10 +80,15 @@ public class Cone23016Test {
         double atTwo = critHit();
         System.out.println("[23016] untamed=" + untamed + " at 1 layer=" + atOne + " at 2 layers=" + atTwo
                 + " ; one layer=" + (atOne - untamed) + " second layer=" + (atTwo - atOne));
-        // \u2605 The per-layer AMOUNT, without knowing the crit base (discipline 200): one layer's worth must equal the next
-        // layer's worth. `atTwo > atOne` survives a `12 -> 6 percent` mutation, and that mutation was 0 red until this line.
-        Assertions.assertEquals(atOne - untamed, atTwo - atOne, 1e-9,
-                "each layer is worth exactly the same as the first");
+        // \u2605 The per-layer AMOUNT, anchored to the crit base the engine reports (discipline 200). A crit multiplies by
+        // (1 + crit damage), so one layer of +12% must add `untamed * 0.12 / (1 + base)`.
+        // \u26a0 A ratio-of-deltas does NOT work here: halving the share halves BOTH deltas, so the equality survives --
+        // measured, the `12 -> 6 percent` mutation was still 0 red with that shape.
+        double base = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        double expected = untamed * 0.12 / (1 + base);
+        Assertions.assertEquals(expected, atOne - untamed, expected * 0.01,
+                "one layer is +12% of the crit MULTIPLIER");
+        Assertions.assertEquals(expected, atTwo - atOne, expected * 0.01, "and so is the next");
     }
 
     @Test
