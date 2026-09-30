@@ -1740,6 +1740,18 @@ public class TriggerTable {
         }
 
         /**
+         * \u2705 The same context carrying how many hit targets shared the attack's weakness (2026-09-30; reader: cone 21040).
+         *
+         * <p>\u26a0 A COPY helper rather than a wider constructor on purpose: the cast events are built by chaining these
+         * ({@code new TriggerContext(...).withSkillId(...)}), so a value that only the canonical constructor knows is
+         * silently dropped by every chain that starts from a compact one -- measured, and the reason this exists.
+         */
+        public TriggerContext withWeakHitCount(int count) {
+            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
+                    targetFilter, skillId, count);
+        }
+
+        /**
          * The same context with this firing's <b>per-target filter</b> (an effect's {@code target_when}).
          *
          * <p>Set by the interpreter once per effect and read only by {@code resolveTargets} — that being the single

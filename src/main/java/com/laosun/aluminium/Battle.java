@@ -2183,7 +2183,7 @@ public class Battle {
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
                         new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
-                                fromCast).withSkillId(skillId));
+                                fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount));
             }
             return fired;
         } finally {
