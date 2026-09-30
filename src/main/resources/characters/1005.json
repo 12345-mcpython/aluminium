@@ -98,5 +98,24 @@
     ],
     "source": "1005 卡芙卡 行迹: 「…使触电状态的持续时间增加1回合」",
     "note": "「…使**触电状态**的持续时间增加 1 回合」—— ① 状态名正是 `EXTEND_BUFF` 的 `buff` 拼写 ✓（实测：DOT 的 `getBuffName()` 是**空的** ✓，但 `isNamed(buff, \"触电\", null)` 答 **true** ✓ —— 引擎**按状态名**匹配 DOT ✓）；② 事件与**施加触电的那条**相同 ✓（她的终结技 ✓）并排在它之后 ✓；③ 门槛：行迹 ⇒ **不写 `min_eidolon`** ✓。⚠ 倍率那一半（\"伤害倍率提高 156%\" ✗）**登记** ✓。"
+  },
+  {
+    "on": "FOLLOW_UP",
+    "id": "talent_dot_taken_on_followup",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_DAMAGE_TAKEN",
+        "percent": 0.3,
+        "damage_type": "DOT",
+        "base_chance": 1.0,
+        "turns": 2,
+        "target": "target"
+      }
+    ],
+    "source": "1005 卡芙卡 天赋: 「天赋触发追加攻击时，有 100% 的基础概率使目标受到的持续伤害提高 30%，持续 2 回合」",
+    "note": "⭐ 这用的是**既有的\"伤害类型域\"** ✓（`MODIFY_DAMAGE_TAKEN` + `damage_type: \"DOT\"` ✓）—— 与 `characters/1108.json` 完全同款 ✓。⚠ **数值绑定到该从句的原文** ✓（同文档另有「我方全体**造成的**持续伤害提高 25%」✗ 与「强化后：**施放攻击时**…」✗ —— 两者**都不是**本条 ✓，本轮按第 106 条纪律**逐条绑定** ✓）。⚠ 触发用 **`FOLLOW_UP`** ✓（原文\"天赋触发追加攻击时\" ✓）；`base_chance: 1.0` ✓（原文\"100% 的基础概率\" ✓）；`turns: 2` ✓。"
   }
 ]
