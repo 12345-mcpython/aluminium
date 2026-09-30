@@ -72,8 +72,12 @@ public final class BreakDamageCalculator {
      */
     public static Damage build(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
         double breakingEffect = attacker.getAttribute(AttributeType.BREAKING_EFFECT).get();
+        // \u2705 A second, independent multiplier (2026-09-30; reader: cone 21056's \u300c\u4f7f\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u51fb\u7834\u4f24\u5bb9\u63d0\u9ad8 16%\u300d):
+        // the ordinary DMG boost zone cannot carry it, because DamageType.BREAK is deliberately not boostable. Read from
+        // the ATTACKER, so a party-wide grant is expressed by giving every ally the modifier (see cone 24005's shape).
+        double breakDamageBoost = attacker.getAttribute(AttributeType.BREAK_DAMAGE_BOOST).get();
         return new Damage(attacker, enemy, element, DamageType.BREAK,
-                breakBaseOf(attacker) * (1 + breakingEffect) * stanceDamage);
+                breakBaseOf(attacker) * (1 + breakingEffect) * (1 + breakDamageBoost) * stanceDamage);
     }
 
     /**
