@@ -53,6 +53,23 @@ public class ConeAuraPartyTest {
                 + " ratio=" + (watched / alone));
         Assertions.assertEquals(0.92, watched / alone, 1e-6, "the party takes 8% less");
         Assertions.assertEquals(1.0, control / alone, 1e-6, "without the cone the reading is untouched (false case)");
+        // \u26a0 Same lesson as 23011: pin the duration, or shortening it is invisible to this judge.
+        Character owner = wearer(21023);
+        int pinned = 0;
+        for (var r : owner.getTriggerTable().matching(TriggerEvent.BATTLE_START,
+                new TriggerTable.TriggerContext(owner, owner, owner, 0, 0))) {
+            for (var effect : r.effects()) {
+                if ("MODIFY_DAMAGE_TAKEN".equals(effect.getOp())) {
+                    pinned++;
+                    System.out.println("[21023] spec percent=" + effect.getPercent() + " turns=" + effect.getTurns()
+                            + " target=" + effect.getTarget());
+                    Assertions.assertEquals(-0.08, effect.getPercent(), 1e-9, "rank 1 states 8% less");
+                    Assertions.assertEquals(5, effect.getTurns(), "for five turns");
+                    Assertions.assertEquals("all_allies", effect.getTarget(), "the whole party");
+                }
+            }
+        }
+        Assertions.assertEquals(1, pinned, "exactly one party damage-taken rule comes from this cone");
     }
 
     @Test
