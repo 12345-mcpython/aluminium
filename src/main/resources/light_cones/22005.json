@@ -1,0 +1,107 @@
+{
+  "1": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22005_attack_stack_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22005_attack_stack_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22005_attack_stack_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.12,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22005_attack_stack_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.14,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22005_attack_stack_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.16,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+    }
+  ]
+}
