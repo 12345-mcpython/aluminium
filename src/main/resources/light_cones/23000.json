@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "BREAK",
+      "id": "cone23000_damage_up_on_break",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
+      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BREAK",
+      "id": "cone23000_damage_up_on_break",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.35,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
+      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BREAK",
+      "id": "cone23000_damage_up_on_break",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
+      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BREAK",
+      "id": "cone23000_damage_up_on_break",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.45,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
+      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BREAK",
+      "id": "cone23000_damage_up_on_break",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.5,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
+      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+    }
+  ]
+}
