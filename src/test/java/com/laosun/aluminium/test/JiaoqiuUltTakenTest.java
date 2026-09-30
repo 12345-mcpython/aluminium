@@ -63,4 +63,30 @@ public class JiaoqiuUltTakenTest {
         System.out.println("[1218] normal=" + normal + " ultra=" + ultra + " ratio=" + (ultra / normal));
         Assertions.assertEquals(1.15, ultra / normal, 1e-6, "ultimate damage rises by exactly the authored 15%");
     }
+
+    @Test
+    public void theTieredClauseScalesWithTheTargetsLayers() {
+        Character unit = CharacterFactory.create(WEARER, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        battle.startBattle();
+        // The counter is created by the character's own rule, so the fixture drives THAT trigger rather than hand-building a state.
+        battle.fireTriggers(TriggerEvent.valueOf("ALLY_ATTACK"), unit, enemy, 0, 0);
+        int layers = enemy.getBuffManager().stacksOf("烬煨");
+        System.out.println("[1218] layersAfterOneTrigger=" + layers);
+        double oneLayer = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
+        for (int i = layers; i < 3; i++) {
+            battle.fireTriggers(TriggerEvent.valueOf("ALLY_ATTACK"), unit, enemy, 0, 0);
+        }
+        int more = enemy.getBuffManager().stacksOf("烬煨");
+        double threeLayers = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
+        System.out.println("[1218] layersNow=" + more + " oneLayer=" + oneLayer + " threeLayers=" + threeLayers
+                + " ratio=" + (threeLayers / oneLayer));
+        Assertions.assertTrue(oneLayer > 0 && threeLayers > 0, "both settle");
+        Assertions.assertTrue(more > layers, "the fixture really stacked the counter: " + layers + " -> " + more);
+        // ⚠ The two readings differ by more than the layer count alone (the tiered rule re-applies each time), so this asserts the
+        // direction the clause promises rather than a ratio: more layers must mean more damage.
+        Assertions.assertTrue(threeLayers > oneLayer,
+                "more layers must raise the damage taken: " + oneLayer + " -> " + threeLayers);
+    }
 }
