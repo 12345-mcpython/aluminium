@@ -1,0 +1,122 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21024_battle_start",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.08,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
+      "note": "⭐ 第一句（本轮出货 ✓）：「进入战斗后，使装备者**速度提高#1[i]%**，**造成的伤容提高#2[i]%**」⇒ `BATTLE_START` 两条（速度 ✓ / 伤容 ✓）。⚠ **同句后半已登记** ✗：「当装备者**受到伤害后**该效果**失效**，**下个回合结束时**该效果恢复」—— 需要\"**挂起/恢复**一个已写下的修饰器\" ✗（现有词汇里只有 `REMOVE_BUFF`（只能移除**临时的正向增益** ✗）与`EXTEND_BUFF`（只延长 ✗）；且\"下个回合结束时\"这个时点 cũng 没有谓词 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21024_battle_start",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.09,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
+      "note": "⭐ 第一句（本轮出货 ✓）：「进入战斗后，使装备者**速度提高#1[i]%**，**造成的伤容提高#2[i]%**」⇒ `BATTLE_START` 两条（速度 ✓ / 伤容 ✓）。⚠ **同句后半已登记** ✗：「当装备者**受到伤害后**该效果**失效**，**下个回合结束时**该效果恢复」—— 需要\"**挂起/恢复**一个已写下的修饰器\" ✗（现有词汇里只有 `REMOVE_BUFF`（只能移除**临时的正向增益** ✗）与`EXTEND_BUFF`（只延长 ✗）；且\"下个回合结束时\"这个时点 cũng 没有谓词 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21024_battle_start",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
+      "note": "⭐ 第一句（本轮出货 ✓）：「进入战斗后，使装备者**速度提高#1[i]%**，**造成的伤容提高#2[i]%**」⇒ `BATTLE_START` 两条（速度 ✓ / 伤容 ✓）。⚠ **同句后半已登记** ✗：「当装备者**受到伤害后**该效果**失效**，**下个回合结束时**该效果恢复」—— 需要\"**挂起/恢复**一个已写下的修饰器\" ✗（现有词汇里只有 `REMOVE_BUFF`（只能移除**临时的正向增益** ✗）与`EXTEND_BUFF`（只延长 ✗）；且\"下个回合结束时\"这个时点 cũng 没有谓词 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21024_battle_start",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.11,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.21,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
+      "note": "⭐ 第一句（本轮出货 ✓）：「进入战斗后，使装备者**速度提高#1[i]%**，**造成的伤容提高#2[i]%**」⇒ `BATTLE_START` 两条（速度 ✓ / 伤容 ✓）。⚠ **同句后半已登记** ✗：「当装备者**受到伤害后**该效果**失效**，**下个回合结束时**该效果恢复」—— 需要\"**挂起/恢复**一个已写下的修饰器\" ✗（现有词汇里只有 `REMOVE_BUFF`（只能移除**临时的正向增益** ✗）与`EXTEND_BUFF`（只延长 ✗）；且\"下个回合结束时\"这个时点 cũng 没有谓词 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21024_battle_start",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
+      "note": "⭐ 第一句（本轮出货 ✓）：「进入战斗后，使装备者**速度提高#1[i]%**，**造成的伤容提高#2[i]%**」⇒ `BATTLE_START` 两条（速度 ✓ / 伤容 ✓）。⚠ **同句后半已登记** ✗：「当装备者**受到伤害后**该效果**失效**，**下个回合结束时**该效果恢复」—— 需要\"**挂起/恢复**一个已写下的修饰器\" ✗（现有词汇里只有 `REMOVE_BUFF`（只能移除**临时的正向增益** ✗）与`EXTEND_BUFF`（只延长 ✗）；且\"下个回合结束时\"这个时点 cũng 没有谓词 ✗）。"
+    }
+  ]
+}

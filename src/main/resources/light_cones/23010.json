@@ -31,6 +31,24 @@
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.48,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐⭐ **本轮订正** ✓：我曾把「追加攻击伤害 +X%，持续 1 回合」记成\"缺少按类型的持续加成\" ✗ —— **不成立** ✓：属性表里本来就有 **`FOLLOW_UP_DAMAGE_BOOST`** ✓（以及 `SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST` /`BASIC_ATTACK_DAMAGE_BOOST` ✓）⇒ 写下的修饰器 + `turns: 1` 就够了 ✓。⭐ **教训** ✓：字段在**属性枚举**里 ✓，不在**伤害类型**里 ✗ —— 与第 196 条同族：先查它在哪一层词汇里 ✓。"
     }
   ],
   "2": [
@@ -65,6 +83,24 @@
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.48,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐⭐ **本轮订正** ✓：我曾把「追加攻击伤害 +X%，持续 1 回合」记成\"缺少按类型的持续加成\" ✗ —— **不成立** ✓：属性表里本来就有 **`FOLLOW_UP_DAMAGE_BOOST`** ✓（以及 `SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST` /`BASIC_ATTACK_DAMAGE_BOOST` ✓）⇒ 写下的修饰器 + `turns: 1` 就够了 ✓。⭐ **教训** ✓：字段在**属性枚举**里 ✓，不在**伤害类型**里 ✗ —— 与第 196 条同族：先查它在哪一层词汇里 ✓。"
     }
   ],
   "3": [
@@ -99,6 +135,24 @@
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.48,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐⭐ **本轮订正** ✓：我曾把「追加攻击伤害 +X%，持续 1 回合」记成\"缺少按类型的持续加成\" ✗ —— **不成立** ✓：属性表里本来就有 **`FOLLOW_UP_DAMAGE_BOOST`** ✓（以及 `SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST` /`BASIC_ATTACK_DAMAGE_BOOST` ✓）⇒ 写下的修饰器 + `turns: 1` 就够了 ✓。⭐ **教训** ✓：字段在**属性枚举**里 ✓，不在**伤害类型**里 ✗ —— 与第 196 条同族：先查它在哪一层词汇里 ✓。"
     }
   ],
   "4": [
@@ -133,6 +187,24 @@
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.48,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐⭐ **本轮订正** ✓：我曾把「追加攻击伤害 +X%，持续 1 回合」记成\"缺少按类型的持续加成\" ✗ —— **不成立** ✓：属性表里本来就有 **`FOLLOW_UP_DAMAGE_BOOST`** ✓（以及 `SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST` /`BASIC_ATTACK_DAMAGE_BOOST` ✓）⇒ 写下的修饰器 + `turns: 1` 就够了 ✓。⭐ **教训** ✓：字段在**属性枚举**里 ✓，不在**伤害类型**里 ✗ —— 与第 196 条同族：先查它在哪一层词汇里 ✓。"
     }
   ],
   "5": [
@@ -167,6 +239,24 @@
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.48,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐⭐ **本轮订正** ✓：我曾把「追加攻击伤害 +X%，持续 1 回合」记成\"缺少按类型的持续加成\" ✗ —— **不成立** ✓：属性表里本来就有 **`FOLLOW_UP_DAMAGE_BOOST`** ✓（以及 `SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST` /`BASIC_ATTACK_DAMAGE_BOOST` ✓）⇒ 写下的修饰器 + `turns: 1` 就够了 ✓。⭐ **教训** ✓：字段在**属性枚举**里 ✓，不在**伤害类型**里 ✗ —— 与第 196 条同族：先查它在哪一层词汇里 ✓。"
     }
   ]
 }
