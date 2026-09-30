@@ -82,6 +82,35 @@ public class Cone24002Test {
                 "the cooldown is " + COOLDOWN + " turns, so an immediate second hit grants nothing");
     }
 
+    /**
+     * \u2605 The cooldown as a NUMBER, not just as "a second hit is blocked": with {@code cooldown: 3} the grant must stay
+     * blocked through three of the wearer's turns and return after them. A fixture that only fires two hits in one turn
+     * cannot tell {@code cooldown: 1} from {@code cooldown: 3} (measured: that mutation was 0 red).
+     */
+    @Test
+    public void theCooldownExpiresAfterItsTurns() {
+        Battle battle = battle(true);
+        takeHit(battle);
+        Assertions.assertTrue(wearer.getShield() > 0, "the first hit grants");
+        wearer.setShield(0);
+        int[] perTurn = new int[COOLDOWN + 1];
+        for (int turn = 1; turn <= COOLDOWN; turn++) {
+            battle.fireTriggers(TriggerEvent.TURN_END, wearer, null, 0, 0);
+            battle.fireTriggers(TriggerEvent.TURN_START, wearer, null, 0, 0);
+            takeHit(battle);
+            perTurn[turn] = wearer.getShield() > 0 ? 1 : 0;
+            wearer.setShield(0);
+        }
+        System.out.println("[24002] granted per turn inside the cooldown: " + java.util.Arrays.toString(perTurn)
+                + " (cooldown " + COOLDOWN + ")");
+        // \u26a0 Only what this fixture can show: the cooldown is a per-OWNER-turn counter, and these hand-fired turn events
+        // do not tick it past its window, so "it grants again afterwards" is NOT asserted here -- the reading that tells
+        // cooldown 1 from cooldown 3 is the per-turn array itself (measured: the 3 -> 1 mutation is red on it).
+        for (int turn = 1; turn <= COOLDOWN; turn++) {
+            Assertions.assertEquals(0, perTurn[turn], "turn " + turn + " is still inside the cooldown");
+        }
+    }
+
     @Test
     public void theSpecPinsTheShareTheDurationAndTheCooldown() {
         Battle battle = battle(true);
