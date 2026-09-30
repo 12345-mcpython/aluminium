@@ -65,6 +65,21 @@ public class Cone23033Test {
         Assertions.assertFalse(stillArmed, "and the state is removed by the payout");
     }
 
+    /**
+     * \u2605 The exact number, not "it went up" (discipline 200): `> 0` cannot tell 30 from 15 -- measured, the `30 -> 15`
+     * mutation was 0 red until this line existed.
+     */
+    @Test
+    public void thirtyEnergyAtTheStartOfTheBattle() {
+        Battle baseline = battle(false);
+        double base = wearer.getCurrentEnergy();
+        Battle battle = battle(true);
+        double gain = wearer.getCurrentEnergy() - base;
+        System.out.println("[23033] energy at battle start: base=" + base + " with the cone="
+                + wearer.getCurrentEnergy() + " gain=" + gain);
+        Assertions.assertEquals(30.0, gain, 1e-9, "30 energy at rank 1");
+    }
+
     @Test
     public void anotherUltimateResetsTheCount() {
         Battle battle = battle(true);
