@@ -36,10 +36,18 @@
           "percent": 1.5,
           "element": "Fire",
           "target": "target"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.5,
+          "damage_type": "ADDITIONAL",
+          "turns": 2,
+          "buff": "负债证明",
+          "target": "target"
         }
       ],
-      "source": "1112 托帕&账账 战技「扭亏为盈！」: 「使指定敌方单体陷入【负债证明】状态，使其受到的追加攻击伤害提高 50%…使账账对该目标造成等同于托帕 150% 攻击力的火属性伤害」",
-      "note": "⚠ 数值 **150%** 目前**只见于正文** ✓（该技能 `param_list` 未能解析 ✓）。⚠⚠ **未写「使其受到的追加攻击伤害提高 50%」** ✗ —— **不是近似，是登记** ✓：追加攻击在引擎里是**属性 `FOLLOW_UP_DAMAGE_BOOST`（造成侧）** ✓（`Battle:2528` 注释原话 ✓），而 `DamageType` 只有 `NORMAL/ULTRA/BREAK/DOT/TECHNIQUE/ELATION` ✗ ⇒ **承受侧无法按\"追加攻击\"分域** ✗。⚠ 另外「【负债证明】仅对最新被施加的目标生效」✗ 与「我方回合开始/行动时若场上无该状态则随机施加」✗ ⇒ 同样登记 ✓。"
+      "source": "1112 托帕&账账 战技「扭亏为盈！」: 「使指定敌方单体陷入【负债证明】状态，使其受到的追加攻击伤害提高 50%…使账账对该目标造成等同于托帕 150% 攻击力的火属性伤害」 + 「使其受到的追加攻击伤害提高 50%」（同一次施放）",
+      "note": "⚠ 数值 **150%** 目前**只见于正文** ✓（该技能 `param_list` 未能解析 ✓）。⚠⚠ **未写「使其受到的追加攻击伤害提高 50%」** ✗ —— **不是近似，是登记** ✓：追加攻击在引擎里是**属性 `FOLLOW_UP_DAMAGE_BOOST`（造成侧）** ✓（`Battle:2528` 注释原话 ✓），而 `DamageType` 只有 `NORMAL/ULTRA/BREAK/DOT/TECHNIQUE/ELATION` ✗ ⇒ **承受侧无法按\"追加攻击\"分域** ✗。⚠ 另外「【负债证明】仅对最新被施加的目标生效」✗ 与「我方回合开始/行动时若场上无该状态则随机施加」✗ ⇒ 同样登记 ✓。 ⭐⭐ **「追加攻击」维度早已存在**：引擎用 **`DamageType.ADDITIONAL`** 表示追加攻击（`Battle.applyAdditionalDamage` 里写着\"this is the engine's one and only notion of a follow-up attack\"），并据此发放 `FOLLOW_UP_DAMAGE_BOOST`、发出 `FOLLOW_UP` 事件 ⇒ 承受侧只要写 **`damage_type: \"ADDITIONAL\"`** 即可 ✓（⚠ 第 216/240 轮我曾判定\"追加攻击没有维度\" ✗ —— 那次查的是 `SkillCategory` ✗，而 `DamageType` 的常量表被我的正则截断了 ✗；本轮订正 ✓）。⚠ 数值 **50%** 取自正文 ✓（该技能 `param_list` 未能解析 ✓）；持续 **2 回合**与【负债证明】同寿 ✓。"
     },
     {
       "on": "BATTLE_START",
