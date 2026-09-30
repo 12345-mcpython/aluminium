@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "HP_LOST",
+      "id": "cone23011_party_damage_up_when_wearer_hurt",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.09,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "HP_LOST",
+      "id": "cone23011_party_damage_up_when_wearer_hurt",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.105,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "HP_LOST",
+      "id": "cone23011_party_damage_up_when_wearer_hurt",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "HP_LOST",
+      "id": "cone23011_party_damage_up_when_wearer_hurt",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.135,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "HP_LOST",
+      "id": "cone23011_party_damage_up_when_wearer_hurt",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21023_party_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.08,
+          "turns": 5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21023: 「战斗开始时，使我方全体受到的伤害降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 常数半不存在 ✓；条件半是 **战斗开始时的全队光环** ✓（`BATTLE_START` + `MODIFY_DAMAGE_TAKEN` + `target: all_allies` ✓，受伤减免的阈值为 0 ✓）。⚠ **第二句已登记** ✗：「立即为我方全体回复**各自已损失生命值**30% 的生命值」需要**逐目标的\"已损失生命值\"作为缩放基准** ✗（`scale` 只能名字段/属性 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21023_party_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.1,
+          "turns": 5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21023: 「战斗开始时，使我方全体受到的伤害降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 常数半不存在 ✓；条件半是 **战斗开始时的全队光环** ✓（`BATTLE_START` + `MODIFY_DAMAGE_TAKEN` + `target: all_allies` ✓，受伤减免的阈值为 0 ✓）。⚠ **第二句已登记** ✗：「立即为我方全体回复**各自已损失生命值**30% 的生命值」需要**逐目标的\"已损失生命值\"作为缩放基准** ✗（`scale` 只能名字段/属性 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21023_party_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.12,
+          "turns": 5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21023: 「战斗开始时，使我方全体受到的伤害降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 常数半不存在 ✓；条件半是 **战斗开始时的全队光环** ✓（`BATTLE_START` + `MODIFY_DAMAGE_TAKEN` + `target: all_allies` ✓，受伤减免的阈值为 0 ✓）。⚠ **第二句已登记** ✗：「立即为我方全体回复**各自已损失生命值**30% 的生命值」需要**逐目标的\"已损失生命值\"作为缩放基准** ✗（`scale` 只能名字段/属性 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21023_party_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.14,
+          "turns": 5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21023: 「战斗开始时，使我方全体受到的伤害降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 常数半不存在 ✓；条件半是 **战斗开始时的全队光环** ✓（`BATTLE_START` + `MODIFY_DAMAGE_TAKEN` + `target: all_allies` ✓，受伤减免的阈值为 0 ✓）。⚠ **第二句已登记** ✗：「立即为我方全体回复**各自已损失生命值**30% 的生命值」需要**逐目标的\"已损失生命值\"作为缩放基准** ✗（`scale` 只能名字段/属性 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21023_party_damage_taken_down",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.16,
+          "turns": 5,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21023: 「战斗开始时，使我方全体受到的伤害降低#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 常数半不存在 ✓；条件半是 **战斗开始时的全队光环** ✓（`BATTLE_START` + `MODIFY_DAMAGE_TAKEN` + `target: all_allies` ✓，受伤减免的阈值为 0 ✓）。⚠ **第二句已登记** ✗：「立即为我方全体回复**各自已损失生命值**30% 的生命值」需要**逐目标的\"已损失生命值\"作为缩放基准** ✗（`scale` 只能名字段/属性 ✓）。"
+    }
+  ]
+}
