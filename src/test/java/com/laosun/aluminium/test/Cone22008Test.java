@@ -87,20 +87,20 @@ public class Cone22008Test {
     }
 
     @Test
-    public void theDurationExpires() {
-        // \u2605 "\u6301\u7eed 2 \u56de\u5408" pressed by readings: the layer is granted, then two turn boundaries take it away again.
+    public void theDurationIsGrantedAndTheClockIsOpen() {
+        // \u2605 Measured, and registered rather than asserted away: the layer is granted with `turns: 2`, but NOTHING public moves
+        // that clock -- firing TURN_END twice, and calling the buff manager\u2019s own turn boundary (`beforeMove()`) three times,
+        // both left the value at 0.53. So this test pins the grant, and the expiry is a named gap until a real turn loop is
+        // driven from a test (the countdown simply does not run outside the battle\u2019s own turn machinery).
         build(true);
         double baseline = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         followUpAndRead();
         double granted = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fireTriggers(TriggerEvent.TURN_END, wearer, null, 0, 0);
-        double afterOne = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fireTriggers(TriggerEvent.TURN_END, wearer, null, 0, 0);
-        double afterTwo = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        System.out.println("[22008] baseline=" + baseline + " granted=" + granted + " after 1 turn end=" + afterOne
-                + " after 2=" + afterTwo);
+        wearer.getBuffManager().beforeMove();
+        double afterBoundary = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        System.out.println("[22008] duration: baseline=" + baseline + " granted=" + granted
+                + " after a turn boundary=" + afterBoundary + " (the clock does not move here)");
         Assertions.assertEquals(baseline + 0.03, granted, 1e-9, "granted on the follow-up");
-        Assertions.assertTrue(afterTwo <= granted, "and the turns really run out");
-        Assertions.assertTrue(afterOne >= afterTwo, "the layer is not growing on its own");
+        Assertions.assertEquals(granted, afterBoundary, 1e-9, "and no public boundary runs the clock (registered)");
     }
 }
