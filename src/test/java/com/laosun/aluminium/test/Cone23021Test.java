@@ -95,6 +95,28 @@ public class Cone23021Test {
         Assertions.assertTrue(wearer.getBuffManager().hasState(MASK), "and it grants the mask");
     }
 
+    /**
+     * \u2605 The sentence says \u300c\u6062\u590d\u65f6\u6ea2\u51fa\u7684\u6218\u6280\u70b9\u4e5f\u4f1a\u88ab\u8ba1\u7b97\u5728\u5185\u300d, and that is exactly what a rule listening only to
+     * SKILL_POINT_GAINED gets wrong: a restore at the cap credits NOTHING, so no event fires at all -- measured before the
+     * overflow event existed.
+     */
+    @Test
+    public void overflowCountsToo() {
+        Battle battle = battle(true);
+        while (battle.getSkillPoints() < battle.getSkillPointMax()) {
+            battle.gainSkillPoint(1);
+        }
+        int atCap = wearer.getBuffManager().stacksOf(FLAME);
+        battle.gainSkillPoint(2);
+        int afterOverflow = wearer.getBuffManager().stacksOf(FLAME);
+        System.out.println("[23021] at the cap (" + battle.getSkillPoints() + "/" + battle.getSkillPointMax()
+                + ") flame=" + atCap + " ; after a refused restore of 2: " + afterOverflow);
+        Assertions.assertEquals(0, afterOverflow,
+                "a refused restore of 2 takes the counter to 4, which PAYS OUT: back to 0 with a fresh mask");
+        Assertions.assertTrue(wearer.getBuffManager().hasState(MASK),
+                "the payout listens to both events -- the text says the flame REACHES 4 layers, not \"4 credited layers\"");
+    }
+
     @Test
     public void withoutTheConeNothingHappens() {
         Battle battle = battle(false);

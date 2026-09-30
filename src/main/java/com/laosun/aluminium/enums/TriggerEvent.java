@@ -126,6 +126,15 @@ public enum TriggerEvent {
      */
     SKILL_POINT_GAINED("SKILL_POINT_GAINED", true),
     /**
+     * \u2705 Skill points that were ASKED for but NOT credited, because the pool was already at its cap (2026-09-30; readers:
+     * cone 23021's \u300c\u6062\u590d\u65f6\u6ea2\u51fa\u7684\u6218\u6280\u70b9\u4e5f\u4f1a\u88ab\u8ba1\u7b97\u5728\u5185\u300d and character 1306's \u300c\u82e5\u6218\u6280\u70b9\u6ea2\u51fa\uff0c\u5219\u8bb0\u5f55\u6ea2\u51fa\u7684\u6218\u6280\u70b9\u6570\u300d).
+     *
+     * <p>\u2605 Without it the swallowed points are invisible: {@code SKILL_POINT_GAINED} only fires when something was really
+     * credited (「gained > 0」), so a gain at the cap is indistinguishable from no gain at all. The amount carried here is
+     * exactly {@code asked - credited}, computed by {@code Battle.gainSkillPoint}, which is where both numbers are at hand.
+     */
+    SKILL_POINT_OVERFLOWED("SKILL_POINT_OVERFLOWED", true),
+    /**
      * ✅ A character's turn began — emitted by {@code Battle.beforeMove}, after the actor's buffs have
      * been settled and before its {@code MoveEvent.beforeMove} hook.
      *
