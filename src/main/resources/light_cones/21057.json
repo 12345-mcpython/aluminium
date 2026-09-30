@@ -1,0 +1,107 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21057_summon_crit_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.24,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21057_summon_crit_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21057_summon_crit_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.36,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21057_summon_crit_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.42,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21057_summon_crit_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.48,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+    }
+  ]
+}

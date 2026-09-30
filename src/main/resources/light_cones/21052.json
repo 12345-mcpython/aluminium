@@ -1,0 +1,207 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_wearer_while_summoned",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「装备者的忆灵在场上时，装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_summon_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「…装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_wearer_while_summoned",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.27,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「装备者的忆灵在场上时，装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_summon_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.27,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「…装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_wearer_while_summoned",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「装备者的忆灵在场上时，装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_summon_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「…装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_wearer_while_summoned",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.33,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「装备者的忆灵在场上时，装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_summon_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.33,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「…装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_wearer_while_summoned",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「装备者的忆灵在场上时，装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21052_summon_damage",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21052: 「…装备者与忆灵造成的伤容提高#2[i]%。」",
+      "note": "⭐ **两个现成词汇** ✓：「装备者**忆灵在场上**时」= **`self_summon_count >= 1`** ✓（现成数值变量 ✓）；「装备者**与忆灵**造成的伤容提高」= **两条规则** ✓（`actor == self` ✓ / **`actor == summon`** ✓）。⚠ 用**实例**加成 ✓（`permanent: true` + `instance: true` ✓），因为\"忆灵在场\"是**活的事实** ✓，写下的修饰器只能拍快照 ✗。"
+    }
+  ]
+}
