@@ -918,7 +918,11 @@ public final class TriggerInterpreter {
                 // is `owner_max_hp`, which derivedMagnitude refuses (it names an ATTRIBUTE).
                 for (CanHit spender : resolveTargets(battle, effect, ctx)) {
                     if (spender != null) {
-                        spender.consumeHp(grantAmount(effect, spender, ctx));
+                        double spent = spender.consumeHp(grantAmount(effect, spender, ctx));
+                        if (spent > 0) {
+                            // 「受到伤害<b>或</b>消耗生命值」: the second half gets its own event (2026-09-29).
+                            battle.fireTriggers(TriggerEvent.HP_CONSUMED, spender, spender, (int) Math.round(spent), 0);
+                        }
                     }
                 }
             }
