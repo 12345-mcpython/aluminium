@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21031_dispel_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "chance": 0.16,
+      "once_per_attack": true,
+      "do": [
+        {
+          "op": "REMOVE_BUFF",
+          "amount": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
+      "note": "⭐三个句子现在都能表达 ✓：① 常数（暴击率）归引擎 ✓；② **`CRIT_DEALT`** ✓（第 267 轮新增的事件 ✓），且它的 **subject 是受害者** ✓（这正是本句能够着敌方增益的原因 ✓）；③ 概率用规则级 **`chance`** ✓（「16% 的**固定概率**」✓）；④ **`once_per_attack`** ✓（本轮新增的限制 ✓）。⚠ 方向不能弄反 ✗：`DISPEL` 是\"清**我方**的负面\" ✓，而「解除敌方**增益**」是它的镜像 **`REMOVE_BUFF`** ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21031_dispel_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "chance": 0.2,
+      "once_per_attack": true,
+      "do": [
+        {
+          "op": "REMOVE_BUFF",
+          "amount": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
+      "note": "⭐三个句子现在都能表达 ✓：① 常数（暴击率）归引擎 ✓；② **`CRIT_DEALT`** ✓（第 267 轮新增的事件 ✓），且它的 **subject 是受害者** ✓（这正是本句能够着敌方增益的原因 ✓）；③ 概率用规则级 **`chance`** ✓（「16% 的**固定概率**」✓）；④ **`once_per_attack`** ✓（本轮新增的限制 ✓）。⚠ 方向不能弄反 ✗：`DISPEL` 是\"清**我方**的负面\" ✓，而「解除敌方**增益**」是它的镜像 **`REMOVE_BUFF`** ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21031_dispel_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "chance": 0.24,
+      "once_per_attack": true,
+      "do": [
+        {
+          "op": "REMOVE_BUFF",
+          "amount": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
+      "note": "⭐三个句子现在都能表达 ✓：① 常数（暴击率）归引擎 ✓；② **`CRIT_DEALT`** ✓（第 267 轮新增的事件 ✓），且它的 **subject 是受害者** ✓（这正是本句能够着敌方增益的原因 ✓）；③ 概率用规则级 **`chance`** ✓（「16% 的**固定概率**」✓）；④ **`once_per_attack`** ✓（本轮新增的限制 ✓）。⚠ 方向不能弄反 ✗：`DISPEL` 是\"清**我方**的负面\" ✓，而「解除敌方**增益**」是它的镜像 **`REMOVE_BUFF`** ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21031_dispel_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "chance": 0.28,
+      "once_per_attack": true,
+      "do": [
+        {
+          "op": "REMOVE_BUFF",
+          "amount": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
+      "note": "⭐三个句子现在都能表达 ✓：① 常数（暴击率）归引擎 ✓；② **`CRIT_DEALT`** ✓（第 267 轮新增的事件 ✓），且它的 **subject 是受害者** ✓（这正是本句能够着敌方增益的原因 ✓）；③ 概率用规则级 **`chance`** ✓（「16% 的**固定概率**」✓）；④ **`once_per_attack`** ✓（本轮新增的限制 ✓）。⚠ 方向不能弄反 ✗：`DISPEL` 是\"清**我方**的负面\" ✓，而「解除敌方**增益**」是它的镜像 **`REMOVE_BUFF`** ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21031_dispel_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "chance": 0.32,
+      "once_per_attack": true,
+      "do": [
+        {
+          "op": "REMOVE_BUFF",
+          "amount": 1,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
+      "note": "⭐三个句子现在都能表达 ✓：① 常数（暴击率）归引擎 ✓；② **`CRIT_DEALT`** ✓（第 267 轮新增的事件 ✓），且它的 **subject 是受害者** ✓（这正是本句能够着敌方增益的原因 ✓）；③ 概率用规则级 **`chance`** ✓（「16% 的**固定概率**」✓）；④ **`once_per_attack`** ✓（本轮新增的限制 ✓）。⚠ 方向不能弄反 ✗：`DISPEL` 是\"清**我方**的负面\" ✓，而「解除敌方**增益**」是它的镜像 **`REMOVE_BUFF`** ✓。"
+    }
+  ]
+}

@@ -115,6 +115,19 @@ public class TriggerSpec {
     private Boolean oncePerBattle;
 
     /**
+     * 「该效果**每次攻击**只可触发 1 次」: at most one firing per ATTACK.
+     *
+     * <p><b>Why {@code per_turn} is not enough.</b> An attack can settle several instances — a blast hits three enemies, a
+     * multi-hit skill connects six times — and all of them are one attack. A per-turn cap cannot tell those apart from
+     * three separate attacks in the same turn, which is exactly the distinction 「每次攻击只可触发 1 次」 makes.
+     *
+     * <p>The boundary is the engine's own: {@code Battle.fireAfterAttack} ends an attack, so the next instance belongs to
+     * the next one. Cumulative with the other caps (they are all upper bounds).
+     */
+    @SerializedName("once_per_attack")
+    private Boolean oncePerAttack;
+
+    /**
      * A fixed probability that the rule fires at all — 「有 X% 的固定概率…」 ({@code 0.35} = 35%). Absent = always.
      *
      * <p>Rolled against the battle's <b>injected</b> random source (never a fresh one), so a seeded battle stays

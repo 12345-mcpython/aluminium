@@ -157,6 +157,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     @Getter(AccessLevel.NONE)
     private final Map<String, Integer> triggerTurnUses = new HashMap<>();
+
+    /** Per rule, the attack sequence of its last "once per attack" firing (see {@link #isAttackLimitReady}). */
+    private final Map<String, Integer> ruleAttackUses = new HashMap<>();
     /**
      * The rules that have used up a {@code once_per_battle} limit; they never fire again this battle.
      */
@@ -683,6 +686,22 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return {@code false} while the rule is on cooldown, has spent a once-per-battle limit, or has already
      *         fired {@code perTurn} times this turn
      */
+    /**
+     * Whether a rule limited to one firing per ATTACK may run now.
+     *
+     * <p>The sequence is {@code Battle.attackSequence()}: it counts finished attacks, so every instance of the attack in
+     * progress shares one value and the next attack gets a new one. \u2605 Kept beside the cooldown/per-turn state because
+     * it is the same kind of fact (how often a rule has run) and is cleared with it.
+     */
+    public boolean isAttackLimitReady(String key, int attackSequence) {
+        return ruleAttackUses.getOrDefault(key, Integer.MIN_VALUE) != attackSequence;
+    }
+
+    /** Records that a rule has used up its one firing for this attack. */
+    public void recordAttackUse(String key, int attackSequence) {
+        ruleAttackUses.put(key, attackSequence);
+    }
+
     public boolean isTriggerReady(String key, int perTurn) {
         if (triggerSpentOnce.contains(key) || triggerCooldowns.getOrDefault(key, 0) > 0) {
             return false;
