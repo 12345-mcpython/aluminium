@@ -1,0 +1,222 @@
+{
+  "1": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone20018_arm_next_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "max_stacks": 1,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
+      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone20018_spend_marker",
+      "when": [
+        "actor == self",
+        "self_stacks:下一次普攻待命 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 0.6,
+          "scale": "self_attr:ATTACK"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「…造成等同于自身#1[i]%攻击力的**附加伤害**。」",
+      "note": "⭐ 消耗标记并造成附加伤害 ✓（`ADD_DAMAGE` + `scale: owner_attack` ✓）。⚠ 本句**没有**限定普攻类型 ✓：`until: next_attack` 已经把它限定在\"下一次普攻\"上 ✓。⭐ **`scale` 的拼写由加载器给出** ✓：「自身攻击力」写成 **`self_attr:ATTACK`** ✓（派生修饰器命名拥有者属性的通用拼写 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone20018_arm_next_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "max_stacks": 1,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
+      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone20018_spend_marker",
+      "when": [
+        "actor == self",
+        "self_stacks:下一次普攻待命 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 0.75,
+          "scale": "self_attr:ATTACK"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「…造成等同于自身#1[i]%攻击力的**附加伤害**。」",
+      "note": "⭐ 消耗标记并造成附加伤害 ✓（`ADD_DAMAGE` + `scale: owner_attack` ✓）。⚠ 本句**没有**限定普攻类型 ✓：`until: next_attack` 已经把它限定在\"下一次普攻\"上 ✓。⭐ **`scale` 的拼写由加载器给出** ✓：「自身攻击力」写成 **`self_attr:ATTACK`** ✓（派生修饰器命名拥有者属性的通用拼写 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone20018_arm_next_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "max_stacks": 1,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
+      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone20018_spend_marker",
+      "when": [
+        "actor == self",
+        "self_stacks:下一次普攻待命 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 0.9,
+          "scale": "self_attr:ATTACK"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「…造成等同于自身#1[i]%攻击力的**附加伤害**。」",
+      "note": "⭐ 消耗标记并造成附加伤害 ✓（`ADD_DAMAGE` + `scale: owner_attack` ✓）。⚠ 本句**没有**限定普攻类型 ✓：`until: next_attack` 已经把它限定在\"下一次普攻\"上 ✓。⭐ **`scale` 的拼写由加载器给出** ✓：「自身攻击力」写成 **`self_attr:ATTACK`** ✓（派生修饰器命名拥有者属性的通用拼写 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone20018_arm_next_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "max_stacks": 1,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
+      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone20018_spend_marker",
+      "when": [
+        "actor == self",
+        "self_stacks:下一次普攻待命 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 1.05,
+          "scale": "self_attr:ATTACK"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「…造成等同于自身#1[i]%攻击力的**附加伤害**。」",
+      "note": "⭐ 消耗标记并造成附加伤害 ✓（`ADD_DAMAGE` + `scale: owner_attack` ✓）。⚠ 本句**没有**限定普攻类型 ✓：`until: next_attack` 已经把它限定在\"下一次普攻\"上 ✓。⭐ **`scale` 的拼写由加载器给出** ✓：「自身攻击力」写成 **`self_attr:ATTACK`** ✓（派生修饰器命名拥有者属性的通用拼写 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone20018_arm_next_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "max_stacks": 1,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
+      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone20018_spend_marker",
+      "when": [
+        "actor == self",
+        "self_stacks:下一次普攻待命 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 1.2,
+          "scale": "self_attr:ATTACK"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "下一次普攻待命",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20018: 「…造成等同于自身#1[i]%攻击力的**附加伤害**。」",
+      "note": "⭐ 消耗标记并造成附加伤害 ✓（`ADD_DAMAGE` + `scale: owner_attack` ✓）。⚠ 本句**没有**限定普攻类型 ✓：`until: next_attack` 已经把它限定在\"下一次普攻\"上 ✓。⭐ **`scale` 的拼写由加载器给出** ✓：「自身攻击力」写成 **`self_attr:ATTACK`** ✓（派生修饰器命名拥有者属性的通用拼写 ✓）。"
+    }
+  ]
+}
