@@ -806,7 +806,7 @@ public class TriggerTable {
      */
     private static final Set<String> NUMERIC_VARIABLES =
             Set.of("ally_count", "enemy_count", "hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
-                    "target_summon_count", "self_max_energy", "from_skill_id");
+                    "target_summon_count", "self_max_energy", "from_skill_id", "target_dot_count");
 
     /**
      * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -2331,7 +2331,10 @@ public class TriggerTable {
                 // makes the comparison false rather than accidentally true for the row 0 that no skill has).
                 case "from_skill_id" -> ctx.skillId();
                 case "hp_percent" -> hpPercent(ctx.owner());
-                case "target_debuff_count" -> ctx.target() == null ? Double.NaN : ctx.target().getBuffManager().debuffCount();
+                case "target_debuff_count", "target_dot_count" -> ctx.target() == null ? Double.NaN
+                        : ("target_dot_count".equals(variable)
+                                ? ctx.target().getBuffManager().countBuffs(com.laosun.aluminium.models.buff.DotBuff.class)
+                                : ctx.target().getBuffManager().debuffCount());
                 // 「若该目标当前生命值百分比大于等于 30%」 -- the OTHER unit's HP, which `hp_percent` cannot ask
                 // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
                 case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());
