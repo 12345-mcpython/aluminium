@@ -1,0 +1,592 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_1",
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_2",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_3",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_4",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_1",
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.06,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_2",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.06,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_3",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.06,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_4",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.06,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_1",
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.07,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_2",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.07,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_3",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.07,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_4",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.07,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_1",
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_2",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_3",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_4",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_1",
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.09,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_2",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.09,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_3",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.09,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_seer_from_dot_4",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.09,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    }
+  ]
+}
