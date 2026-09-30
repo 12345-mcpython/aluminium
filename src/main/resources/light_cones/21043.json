@@ -1,0 +1,107 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21043_damage_per_shielded_ally",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.04,
+          "per_stack": "shielded_count",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21043: 「场上每有一名持有护盾的角色，装备者造成的伤害提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `defence_percent` ✓ ⇒ 防御力那句**未重写** ✗。⭐⭐ 「场上**每有一名持有护盾的角色**，装备者造成的伤害提高#2[i]%」⇒ `DEALING_DAMAGE` + **`MODIFY_ATTR` + `instance: true` + `permanent: true`** ✓（实例路径 ✓，它会读 `per_stack` ✓）+ `attribute: ALL_DAMAGE_TYPE_BOOST` ✓+ **`per_stack: shielded_count`** ✓（本轮新增的**活值乘数** ✓：我方当前持盾单位数 ✓）。⭐ 为什么必须是实例路径 ✓：`BOOST_DAMAGE` **不读 `per_stack`** ✗（实测 ✓），而写成**持久修饰器**则只能是\"施放时的快照\" ✗（修饰器是已写下的值 ✗）。⚠ 口径：「角色」取**我方** ✓（上游监听器看不出阵营 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21043_damage_per_shielded_ally",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.05,
+          "per_stack": "shielded_count",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21043: 「场上每有一名持有护盾的角色，装备者造成的伤害提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `defence_percent` ✓ ⇒ 防御力那句**未重写** ✗。⭐⭐ 「场上**每有一名持有护盾的角色**，装备者造成的伤害提高#2[i]%」⇒ `DEALING_DAMAGE` + **`MODIFY_ATTR` + `instance: true` + `permanent: true`** ✓（实例路径 ✓，它会读 `per_stack` ✓）+ `attribute: ALL_DAMAGE_TYPE_BOOST` ✓+ **`per_stack: shielded_count`** ✓（本轮新增的**活值乘数** ✓：我方当前持盾单位数 ✓）。⭐ 为什么必须是实例路径 ✓：`BOOST_DAMAGE` **不读 `per_stack`** ✗（实测 ✓），而写成**持久修饰器**则只能是\"施放时的快照\" ✗（修饰器是已写下的值 ✗）。⚠ 口径：「角色」取**我方** ✓（上游监听器看不出阵营 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21043_damage_per_shielded_ally",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.06,
+          "per_stack": "shielded_count",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21043: 「场上每有一名持有护盾的角色，装备者造成的伤害提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `defence_percent` ✓ ⇒ 防御力那句**未重写** ✗。⭐⭐ 「场上**每有一名持有护盾的角色**，装备者造成的伤害提高#2[i]%」⇒ `DEALING_DAMAGE` + **`MODIFY_ATTR` + `instance: true` + `permanent: true`** ✓（实例路径 ✓，它会读 `per_stack` ✓）+ `attribute: ALL_DAMAGE_TYPE_BOOST` ✓+ **`per_stack: shielded_count`** ✓（本轮新增的**活值乘数** ✓：我方当前持盾单位数 ✓）。⭐ 为什么必须是实例路径 ✓：`BOOST_DAMAGE` **不读 `per_stack`** ✗（实测 ✓），而写成**持久修饰器**则只能是\"施放时的快照\" ✗（修饰器是已写下的值 ✗）。⚠ 口径：「角色」取**我方** ✓（上游监听器看不出阵营 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21043_damage_per_shielded_ally",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.07,
+          "per_stack": "shielded_count",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21043: 「场上每有一名持有护盾的角色，装备者造成的伤害提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `defence_percent` ✓ ⇒ 防御力那句**未重写** ✗。⭐⭐ 「场上**每有一名持有护盾的角色**，装备者造成的伤害提高#2[i]%」⇒ `DEALING_DAMAGE` + **`MODIFY_ATTR` + `instance: true` + `permanent: true`** ✓（实例路径 ✓，它会读 `per_stack` ✓）+ `attribute: ALL_DAMAGE_TYPE_BOOST` ✓+ **`per_stack: shielded_count`** ✓（本轮新增的**活值乘数** ✓：我方当前持盾单位数 ✓）。⭐ 为什么必须是实例路径 ✓：`BOOST_DAMAGE` **不读 `per_stack`** ✗（实测 ✓），而写成**持久修饰器**则只能是\"施放时的快照\" ✗（修饰器是已写下的值 ✗）。⚠ 口径：「角色」取**我方** ✓（上游监听器看不出阵营 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21043_damage_per_shielded_ally",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.08,
+          "per_stack": "shielded_count",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21043: 「场上每有一名持有护盾的角色，装备者造成的伤害提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `defence_percent` ✓ ⇒ 防御力那句**未重写** ✗。⭐⭐ 「场上**每有一名持有护盾的角色**，装备者造成的伤害提高#2[i]%」⇒ `DEALING_DAMAGE` + **`MODIFY_ATTR` + `instance: true` + `permanent: true`** ✓（实例路径 ✓，它会读 `per_stack` ✓）+ `attribute: ALL_DAMAGE_TYPE_BOOST` ✓+ **`per_stack: shielded_count`** ✓（本轮新增的**活值乘数** ✓：我方当前持盾单位数 ✓）。⭐ 为什么必须是实例路径 ✓：`BOOST_DAMAGE` **不读 `per_stack`** ✗（实测 ✓），而写成**持久修饰器**则只能是\"施放时的快照\" ✗（修饰器是已写下的值 ✗）。⚠ 口径：「角色」取**我方** ✓（上游监听器看不出阵营 ✗）。"
+    }
+  ]
+}
