@@ -72,4 +72,28 @@ public class SelfScopedDamageGuardTest {
         Assertions.assertEquals(1.3, ultimate / ordinary, 1e-6,
                 "only the ULTRA-category instance is multiplied, by exactly 30%");
     }
+
+    /** An ALLY's own ULTRA-category instance, with and without the owner in the party. */
+    private double allyUltimate(int owner, boolean withOwner) {
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(withOwner ? List.of(CharacterFactory.create(owner, LEVEL), ally) : List.of(ally),
+                List.of(enemy), new Random(0));
+        battle.startBattle();
+        return battle.applyDamage(enemy, new Damage(ally, enemy, DamageElement.WIND, DamageType.NORMAL, 1000,
+                com.laosun.aluminium.enums.SkillCategory.ULTRA));
+    }
+
+    /**
+     * \u26a0 The case that makes 1220's `actor == self` observable: her rule ALSO requires `from_skill ULTRA`, so a teammate's
+     * ordinary swing never reaches it -- only a teammate's ULTRA-category instance does. Measured: without this test, removing
+     * her self-guard turned nothing red.
+     */
+    @Test
+    public void theAllyDoesNotInheritTheUltimateMultiplierOnAnUltimateInstance() {
+        double alone = allyUltimate(1220, false);
+        double watched = allyUltimate(1220, true);
+        System.out.println("[guard] 1220 ally ULTRA instance: alone=" + alone + " withOwner=" + watched);
+        Assertions.assertEquals(alone, watched, 1e-6, "her ultimate multiplier must not reach the ally's ultimate");
+    }
 }
