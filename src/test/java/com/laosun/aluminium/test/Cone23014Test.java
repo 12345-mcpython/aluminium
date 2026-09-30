@@ -115,8 +115,14 @@ public class Cone23014Test {
     @Test
     public void theSpecPinsTheIgnoreClause() {
         // \u2605 The one clause whose AMOUNT is not separable from the stack behaviourally (it rides the same instance as the
-        // full-stack boost), so the number itself is pinned here -- measured, otherwise a `12 -> 6 percent` change is 0 red.
+        // full-stack boost), so the number itself is pinned here.
         build(true);
+        // \u2605\u2605 The rule exists only at a FULL stack, and `matching` evaluates conditions, so the state must be BUILT first --
+        // measured: without this the loop found zero rules and pinned nothing, and `12 -> 6 percent` stayed 0 red.
+        for (int i = 0; i < CAP; i++) {
+            teammateIsHit();
+        }
+        Assertions.assertEquals(CAP, wearer.getBuffManager().stacksOf(MOON), "the stack is really full before matching");
         int pinned = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null,
@@ -134,6 +140,6 @@ public class Cone23014Test {
                 Assertions.assertEquals(0.12, effect.getPercent(), 1e-9, "12% at rank 1");
             }
         }
-        Assertions.assertEquals(0, pinned, "the full-stack rule needs three layers, checked behaviourally above");
+        Assertions.assertEquals(1, pinned, "at three layers the rule IS live -- the state is built above");
     }
 }
