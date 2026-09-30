@@ -1,0 +1,262 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone24001_crit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.08,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24001_crit_vs_low_hp",
+      "when": [
+        "actor == self",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.08,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ **`instance: true`** ✓（第 163/270 轮的能力 ✓）⇒ 这条暴击率写进**当前这次伤害** ✓（`Damage.extraCritChance` ✓），而不是挂在角色身上 ✓ —— 与第一条（常驻 `CRIT_CHANCE` ✓）**不会互相替换** ✓（两者身份与作用域都不同 ✓）。条件用 **`target_hp_percent`** ✓（读**事件目标** ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24001_attack_after_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ 「消灭敌方目标后」= **`KILL`** 事件 ✓；持续回合取 `#5` ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone24001_crit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24001_crit_vs_low_hp",
+      "when": [
+        "actor == self",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.1,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ **`instance: true`** ✓（第 163/270 轮的能力 ✓）⇒ 这条暴击率写进**当前这次伤害** ✓（`Damage.extraCritChance` ✓），而不是挂在角色身上 ✓ —— 与第一条（常驻 `CRIT_CHANCE` ✓）**不会互相替换** ✓（两者身份与作用域都不同 ✓）。条件用 **`target_hp_percent`** ✓（读**事件目标** ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24001_attack_after_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.25,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ 「消灭敌方目标后」= **`KILL`** 事件 ✓；持续回合取 `#5` ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone24001_crit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24001_crit_vs_low_hp",
+      "when": [
+        "actor == self",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ **`instance: true`** ✓（第 163/270 轮的能力 ✓）⇒ 这条暴击率写进**当前这次伤害** ✓（`Damage.extraCritChance` ✓），而不是挂在角色身上 ✓ —— 与第一条（常驻 `CRIT_CHANCE` ✓）**不会互相替换** ✓（两者身份与作用域都不同 ✓）。条件用 **`target_hp_percent`** ✓（读**事件目标** ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24001_attack_after_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ 「消灭敌方目标后」= **`KILL`** 事件 ✓；持续回合取 `#5` ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone24001_crit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.14,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24001_crit_vs_low_hp",
+      "when": [
+        "actor == self",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.14,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ **`instance: true`** ✓（第 163/270 轮的能力 ✓）⇒ 这条暴击率写进**当前这次伤害** ✓（`Damage.extraCritChance` ✓），而不是挂在角色身上 ✓ —— 与第一条（常驻 `CRIT_CHANCE` ✓）**不会互相替换** ✓（两者身份与作用域都不同 ✓）。条件用 **`target_hp_percent`** ✓（读**事件目标** ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24001_attack_after_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.35,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ 「消灭敌方目标后」= **`KILL`** 事件 ✓；持续回合取 `#5` ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone24001_crit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24001_crit_vs_low_hp",
+      "when": [
+        "actor == self",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.16,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ **`instance: true`** ✓（第 163/270 轮的能力 ✓）⇒ 这条暴击率写进**当前这次伤害** ✓（`Damage.extraCritChance` ✓），而不是挂在角色身上 ✓ —— 与第一条（常驻 `CRIT_CHANCE` ✓）**不会互相替换** ✓（两者身份与作用域都不同 ✓）。条件用 **`target_hp_percent`** ✓（读**事件目标** ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24001_attack_after_kill",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.4,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⭐ 「消灭敌方目标后」= **`KILL`** 事件 ✓；持续回合取 `#5` ✓。"
+    }
+  ]
+}
