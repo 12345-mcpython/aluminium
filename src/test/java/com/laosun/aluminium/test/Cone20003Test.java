@@ -30,9 +30,15 @@ public class Cone20003Test {
     @Test
     public void theBaseBranchAppliesAndTheThresholdBranchStatesTheSum() {
         double[] healthy = defence(0.0);
+        double[] middle = defence(0.7);
         double[] hurt = defence(0.5);
         System.out.println("[20003] healthyGain=" + healthy[0] + " base=" + healthy[1]
+                + " middleGain=" + middle[0] + " middleHp=" + middle[2]
                 + " hurtGain=" + hurt[0] + " hp=" + hurt[2]);
+        // ⭐ The band between the two thresholds: above #2, so ONLY the base branch may apply. Without this reading, a file whose
+        // branches stop being exhaustive (e.g. base gated on hp >= 90%) would still pass.
+        Assertions.assertTrue(middle[2] >= 0.5 && middle[2] < 0.9, "precondition: inside the untested band");
+        Assertions.assertEquals(0.32 * middle[1], middle[0], 1e-6, "above the threshold only #1 applies");
         Assertions.assertEquals(0.32 * healthy[1], healthy[0], 1e-6, "the base branch is unconditional");
         Assertions.assertTrue(hurt[2] < 0.5, "precondition: below the threshold");
         Assertions.assertEquals(0.64 * hurt[1], hurt[0], 1e-6,
