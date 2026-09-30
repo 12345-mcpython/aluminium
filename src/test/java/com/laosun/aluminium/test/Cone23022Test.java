@@ -84,8 +84,11 @@ public class Cone23022Test {
         plant(FIRE_NAME, DamageElement.FIRE);
         strike();
         double after = wearer.getAttribute(AttributeType.ATTACK).get();
-        System.out.println("[23022] attack " + before + " -> " + after);
-        Assertions.assertTrue(after > before, "one layer is +5% attack");
+        System.out.println("[23022] attack " + before + " -> " + after + " (delta " + (after - before)
+                + ", 5% of the base is " + (0.05 * before) + ")");
+        // \u2605 The SHARE, as an equality (discipline 200): a percent modifier is a share of the pre-bonus base, so one layer adds
+        // exactly 5% of `before`. Measured, `after > before` survives a `5 -> 2 percent` mutation (0 red).
+        Assertions.assertEquals(0.05 * before, after - before, 1e-9, "one layer is 5% of the base, exactly");
     }
 
     @Test
