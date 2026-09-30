@@ -50,10 +50,45 @@ public final class WeaponTriggerTables {
         if (cached != null) {
             return cached;
         }
-        TriggerTable table = new TriggerTable(weaponId, read(weaponId, rank));
+        // \u2605 A light cone may DECLARE resources (2026-09-30): its file allows a top-level "resources" array next to the
+        // rank keys, the same declaration shape a character's file uses. \u26a0 The merged table refuses two declaring
+        // sides, so this is a cone-side declaration only while no character declares the same name.
+        TriggerTable table = new TriggerTable(weaponId, read(weaponId, rank), readResources(weaponId));
         CACHE.put(key, table);
         return table;
     }
+
+    /**
+     * The resource declarations of a light cone's file ({@code { "resources": [...], "1": [...], ... }}).
+     *
+     * <p>\u2605 P8-8's shape, reused: {@code TriggerTable.plus} already carries declarations across a merge, and
+     * {@code CharacterFactory} already registers whatever the merged table declares -- so the only missing piece was a
+     * loader that reads them.
+     *
+     * @param weaponId the light cone id
+     * @return the declarations, or an empty list
+     */
+    private static List<com.laosun.aluminium.beans.ResourceSpec> readResources(int weaponId) {
+        String path = pathFor(weaponId);
+        if (WeaponTriggerTables.class.getResource(path) == null) {
+            return List.of();
+        }
+        try (InputStream stream = WeaponTriggerTables.class.getResourceAsStream(path)) {
+            com.google.gson.JsonElement root = com.google.gson.JsonParser.parseString(
+                    new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8));
+            if (!root.isJsonObject() || !root.getAsJsonObject().has("resources")) {
+                return List.of();
+            }
+            List<com.laosun.aluminium.beans.ResourceSpec> declared =
+                    GSON.fromJson(root.getAsJsonObject().get("resources"), RESOURCE_LIST);
+            return declared == null ? List.of() : declared;
+        } catch (Exception unreadable) {
+            throw new IllegalStateException("Failed to read resource declarations of light cone " + weaponId, unreadable);
+        }
+    }
+
+    private static final java.lang.reflect.Type RESOURCE_LIST =
+            new com.google.gson.reflect.TypeToken<List<com.laosun.aluminium.beans.ResourceSpec>>() { }.getType();
 
     private static List<TriggerSpec> read(int weaponId, int rank) {
         Map<String, com.google.gson.JsonElement> file = parse(weaponId);
@@ -70,7 +105,11 @@ public final class WeaponTriggerTables {
         // rows than the game's five still works.
         com.google.gson.JsonElement exact = file.get(String.valueOf(rank));
         if (exact == null) {
-            String lowest = file.keySet().stream().min(java.util.Comparator.comparingInt(Integer::parseInt))
+            // \u2605 Only NUMERIC keys are ranks: a cone's file may also carry a top-level "resources" declaration, and
+            // parsing that as a rank would throw. (Measured: the shape is new, the fallback was written before it.)
+            String lowest = file.keySet().stream()
+                    .filter(key -> !key.isEmpty() && key.chars().allMatch(Character::isDigit))
+                    .min(java.util.Comparator.comparingInt(Integer::parseInt))
                     .orElseThrow();
             exact = file.get(lowest);
         }

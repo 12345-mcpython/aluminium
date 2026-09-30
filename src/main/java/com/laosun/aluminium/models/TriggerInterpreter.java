@@ -917,8 +917,14 @@ public final class TriggerInterpreter {
                     battle.queue.advanceActionByPercent(target, effect.getPercent());
                 }
             }
-            case "GAIN_RESOURCE" -> gainResource(effect, ctx);
-            case "SPEND_RESOURCE" -> spendResource(effect, ctx);
+            case "GAIN_RESOURCE" -> {
+                gainResource(effect, ctx);
+                fireResourceChanged(battle, ctx);
+            }
+            case "SPEND_RESOURCE" -> {
+                spendResource(effect, ctx);
+                fireResourceChanged(battle, ctx);
+            }
             case "DAMAGE" -> {
                 // A list, like HEAL/SHIELD: 「对敌方全体」 is one effect that reaches several units, and the
                 // engine settles one instance per victim (that is what a group attack is here).
@@ -2190,6 +2196,18 @@ public final class TriggerInterpreter {
                     "Op " + op + " names the damage type '" + raw + "', which is not one this engine settles; known: "
                             + java.util.Arrays.toString(com.laosun.aluminium.enums.DamageType.values())
                             + (spec == null ? "" : " (source: " + spec.getSource() + ")"));
+        }
+    }
+
+    /**
+     * Tells the holder that a resource moved ({@code RESOURCE_CHANGED}, 2026-09-30).
+     *
+     * <p>\u2605 From the OP, not from {@code ResourceManager}: the manager owns no battle, so it cannot raise a trigger.
+     */
+    private static void fireResourceChanged(Battle battle, TriggerContext ctx) {
+        CanHit holder = ctx.owner();
+        if (battle != null && holder != null) {
+            battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, holder, holder, 0, 0);
         }
     }
 
