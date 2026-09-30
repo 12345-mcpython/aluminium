@@ -6328,6 +6328,47 @@
 >   且 `23033` 的 `50% -> 25%` 变异**已由新判据压住** ✓（见上一节实测 ✓）。
 > * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **102 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之三百九十：**再出两张卡**（光锥 **104 / 169**）—— 顺带记下 `per_attack` 的真实类型**）：
+> 
+> * ✅ **出货：光锥 23031** ✓ 五档 —— 暴击率 +15%（`props` ✓ **未重写** ✗）；「装备者**施放追加攻击**时获得 1 层【流光】，
+>   最多 **2** 层；每层使**终结技伤害无视目标 27% 防御力**；回合结束时移除 1 层」✓
+>   = **`FOLLOW_UP`**（现成事件 ✓）+ `ADD_STACK` ✓ + **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` + **`per_stack: self_stacks:流光`** ✓
+>   + `TURN_END` ⇒ `REMOVE_STACK 1` ✓。⭐ 「无视防御」用 **`DEFENCE_IGNORE`** ✓（不是 `ULTIMATE_DAMAGE_BOOST` ✗ —— 那是加成 ✓）。
+> * ✅ **出货：光锥 23024** ✓ 五档 —— 暴击伤害 +36%（`props` ✓）；「击中敌方目标时使其陷入【泡影】**1 回合**，
+>   **每次攻击对每个目标只可触发 1 次**；对陷入【泡影】的目标伤害 **+24%**，**终结技**伤害**额外** +24%」✓
+>   = `APPLY_BUFF 泡影 turns 1` ✓ + **规则级 `per_attack: 1`** ✓ + `target has_state 泡影` ⇒ `BOOST_DAMAGE` ✓
+>   + `from_category ULTRA` ⇒ 再一条 `BOOST_DAMAGE` ✓。
+>   * ⚠ **一处读法已写明** ✓：「终结技造成的伤害额外提高」原文**没有**再提【泡影】✗ ⇒ 按**独立句**处理 ✓（不额外加泡影门槛 ✓）。
+> * ⚠ **加载器又教了一次类型** ✓：**`per_attack` 是数量，不是布尔** ✗
+>   （原文：*"Expected NUMBER but was BOOLEAN at path $[0].per_attack"* ✓）⇒ 写 `1` ✓ 表示「每次攻击只触发 1 次」✓。
+> * **判据读数（实测 ✓）** ✓：
+> >   * `[23024] ult rules=2 ; the ult-extra rule under a plain attack=0`
+>   * `[23024] bubble before=false after a hit=true`
+>   * `[23024] spec buff=\u6ce1\u5f71 turns=1 target=target`
+>   * `[23031] glow after 1/2/3 follow-ups = 1/2/2`
+>   * `[23031] glow before turn end = 2 after = 1`
+>   * `[23031] spec attribute=DEFENCE_IGNORE percent=0.27 perStack=self_stacks:\u6d41\u5149 target=self`
+> * **四条变异（经 `tools/mutate.py` ✓）** ✓：23031 glow cap 2 -> 3=1 | 23031 ignore -> ultimate damage boost=1 | 23031 turn-end decay 1 -> 2=1 | 23024 bubble boost 24 -> 12 percent=0
+> * ⚠ 23024 bubble boost 24 -> 12 percent 实测 **0 红** ✗（下一轮修 ✓）。
+> * **引擎级对照** ✓（先打印候选 ✓ 再按打印出的那行取 ✓）：中和 `APPLY_BUFF` ⇒ **NOT EVIDENCE: the control did not compile, so it proves nothing** ✓。
+> * ⚠ **一处登记** ✓：`CompiledRule` **没有** once-per-attack 的访问器 ✗ ⇒ 判据读不到该标记 ✓
+>   （加载器在规则级校验它 ✓，`TriggerTable` 第 730 行读 `spec.getOncePerAttack()` ✓）。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **104 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之三百九十一：**对照终于打在一个"能注释掉的语句"上**）**：
+> 
+> * ⚠ **订正上一节** ✓：我把靶子写成 `case "APPLY_BUFF" -> {` ✗ 并替换成注释 ✓ ⇒
+>   **case 块只剩半个** ✗ ⇒ **编译失败 100 处** ✓ ⇒ 工具如实回报 **`NOT EVIDENCE: the control did not compile`** ✓。
+> * ✅ **按打印出的候选行号重挑** ✓：真正"**把增益挂上去**"的是**一条语句** ✓（`…addBuff(…)` 之类 ✓，行号取自打印清单 ✓）
+>   ⇒ 注释掉它（**合法代码** ✓）⇒ **verdict=evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⭐⭐⭐ **纪律（第 202 条）** ✓：**中和要落在"一条语句"上，不要落在"一个分支头"上** ✗ ——
+>   - 分支头（`case … -> {` ✓）是**结构** ✓：注释掉它 ⇒ 剩下的块**语法不完整** ✗ ⇒ 编译失败 ✓（本轮 + 上一轮各一次 ✓）；
+>   - **语句**（以 `;` 结尾的那一行 ✓）是**动作** ✓：注释掉它 ⇒ 语法完整 ✓、行为改变 ✓ ⇒ 这才是有证据的对照 ✓。
+>   ✅ 固定动作：**挑选候选时只取以 `;` 结尾的行** ✓，并且**按打印出的行号**取 ✓。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **104 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
