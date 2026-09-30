@@ -89,11 +89,17 @@ public class CipherTest {
         return before - enemy.getCurrentHp();
     }
 
+    /**
+     * ⚠ Returns 1.0, i.e. NEVER crits (2026-09-29, round 242). It used to return 0.0, which forced every hit to crit -- and that silently
+     * coupled this test to 1406's 追加攻击 crit-damage clause: the shipped path carries it, the hand-built reference (which REPLACES her
+     * trigger table) does not, so the 150%/300% comparison drifted from 0.5 to 0.833 the moment that clause shipped. The test's subject is
+     * the BASE SHARE, so measuring it without crits is both the minimal fix and the more honest reading.
+     */
     private static Random fixed() {
         return new Random() {
             @Override
             public double nextDouble() {
-                return 0.0;
+                return 1.0;
             }
         };
     }
