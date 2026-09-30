@@ -1999,6 +1999,14 @@ public class Battle {
      */
     private int triggerDepth;
 
+    /** How many attacks have FINISHED; see {@link #fireAfterAttack} and {@code CanHit.isAttackLimitReady}. */
+    private int attackSequence;
+
+    /** How many attacks have finished -- the boundary a rule-level {@code once_per_attack} reads. */
+    public int attackSequence() {
+        return attackSequence;
+    }
+
     /**
      * Nesting depth of buff-path reactions; see {@link #runCounter}. Per battle, never static.
      */
@@ -2235,6 +2243,9 @@ public class Battle {
         if (attacker == null || hitTargets == null || hitTargets.isEmpty()) {
             return;                                  // not a single hit landed → it does not count as an attack
         }
+        // ★ The attack is over, so the NEXT instance belongs to a new one. This is the boundary a rule-level
+        // `once_per_attack` reads (see CanHit.isAttackLimitReady): every instance of ONE attack sees the same number.
+        attackSequence++;
         List<CanHit> targets = List.copyOf(hitTargets);
         for (CanHit ally : allies) {
             ally.afterAttack(this, attacker, mainTarget, targets, totalDamage);
@@ -2553,7 +2564,11 @@ public class Battle {
         // about the one who dealt it. Passing the victim here looks natural and silently does nothing, because
         // `fireTriggersForAlly` refuses any subject that is not ours (round 266 measured exactly that).
         if (damage.critArea().isCrit()) {
-            fireTriggersForAlly(TriggerEvent.CRIT_DEALT, attacker, attacker, 0);
+            // \u2605 subject = the VICTIM, actor = the critter. The victim has to be nameable, because a clause like
+            // "\u89e3\u9664\u88ab\u653b\u51fb\u654c\u65b9\u76ee\u6807\u7684 1 \u4e2a\u589e\u76ca" acts on it. `fireTriggersWithSubject` (unlike its ally-only sibling)
+            // does not refuse a subject from the other camp -- and enemy crits still reach nobody, because every such
+            // rule says `actor == self` and the actor here is whoever dealt it.
+            fireTriggersWithSubject(TriggerEvent.CRIT_DEALT, attacker, defender, 0);
         }
 
         // 3) Defence zone: attacker level / victim defence / attacker defence ignore

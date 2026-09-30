@@ -800,6 +800,11 @@ public final class TriggerInterpreter {
                     rule.perTurn() + owner.rulePerTurnBonus(rule.id()))) {
                 continue;
             }
+            // \u300c\u6bcf\u6b21\u653b\u51fb\u53ea\u53ef\u89e6\u53d1 1 \u6b21\u300d: the attack in progress is one sequence value for every instance it
+            // settles, so this is the one cap a per-turn count cannot express.
+            if (owner != null && rule.oncePerAttack() && !owner.isAttackLimitReady(rule.key(), battle.attackSequence())) {
+                continue;
+            }
             // An Eidolon gate (「星魂 N 解锁」): the rank is a construction-time property of the rule's owner, so
             // the rule itself is the only place that has to know it is an Eidolon.
             if (rule.minEidolon() > 0 && eidolonRankOf(owner) < rule.minEidolon()) {
@@ -817,6 +822,9 @@ public final class TriggerInterpreter {
                 // raised cap). One expression, read twice -- see `amendedPerTurn`.
                 owner.startTriggerCooldown(rule.key(), rule.cooldownTurns(), rule.oncePerBattle(),
                         rule.perTurn() + owner.rulePerTurnBonus(rule.id()));
+                if (rule.oncePerAttack()) {
+                    owner.recordAttackUse(rule.key(), battle.attackSequence());
+                }
             }
             fired++;
         }
