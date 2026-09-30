@@ -1,0 +1,147 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23006_speed_stack_on_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "游丝加速",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.048,
+          "per_stack": "游丝加速",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23006: 「装备者每次施放攻击后，速度提高#3[f1]%，最多叠加#4[i]层」",
+      "note": "⭐ 常数半（造成伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 「每次施放攻击后速度提高#3[f1]%，最多叠加#4[i]层」⇒ `ATTACK_FINISHED`? ✗ 改用 **`DEALING_DAMAGE`** + `actor == self` ✓ + `ADD_STACK` → `SPEED_PERCENT` `per_stack` ✓（文本没给持续期 ✗ ⇒ 沿用 `21005` 先例 `permanent` ✓）。 ⚠⚠ **2026-09-29 登记** ✗：「当装备者击中敌方目标时，如果该目标**不处于【游丝】状态**，则有100%的基础概率使其陷入【游丝】状态」本句**只能写一半** ✗：**`APPLY_DOT` 创建的持续伤害没有名字** ✗（它没有 `buff` 字段 ✓，身份来自**元素** ✓）⇒ `target has_state 游丝` **永远为假** ✗（实测：盖上守卫后第二次命中依然**又叠了一层** ✗）。⚠ 缺的层次很明确：**缺一个\"持续伤害带名字\"的建模** ✗（或者一个\"持有某元素持续伤害\"的谓词 ✗）。⚠ 另有一句已登记 ✗：「【游丝】状态下也被视为陷入了触电状态」需\"一个状态算作另一个状态\"的别名机制 ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23006_speed_stack_on_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "游丝加速",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.055999998,
+          "per_stack": "游丝加速",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23006: 「装备者每次施放攻击后，速度提高#3[f1]%，最多叠加#4[i]层」",
+      "note": "⭐ 常数半（造成伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 「每次施放攻击后速度提高#3[f1]%，最多叠加#4[i]层」⇒ `ATTACK_FINISHED`? ✗ 改用 **`DEALING_DAMAGE`** + `actor == self` ✓ + `ADD_STACK` → `SPEED_PERCENT` `per_stack` ✓（文本没给持续期 ✗ ⇒ 沿用 `21005` 先例 `permanent` ✓）。 ⚠⚠ **2026-09-29 登记** ✗：「当装备者击中敌方目标时，如果该目标**不处于【游丝】状态**，则有100%的基础概率使其陷入【游丝】状态」本句**只能写一半** ✗：**`APPLY_DOT` 创建的持续伤害没有名字** ✗（它没有 `buff` 字段 ✓，身份来自**元素** ✓）⇒ `target has_state 游丝` **永远为假** ✗（实测：盖上守卫后第二次命中依然**又叠了一层** ✗）。⚠ 缺的层次很明确：**缺一个\"持续伤害带名字\"的建模** ✗（或者一个\"持有某元素持续伤害\"的谓词 ✗）。⚠ 另有一句已登记 ✗：「【游丝】状态下也被视为陷入了触电状态」需\"一个状态算作另一个状态\"的别名机制 ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23006_speed_stack_on_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "游丝加速",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.064,
+          "per_stack": "游丝加速",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23006: 「装备者每次施放攻击后，速度提高#3[f1]%，最多叠加#4[i]层」",
+      "note": "⭐ 常数半（造成伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 「每次施放攻击后速度提高#3[f1]%，最多叠加#4[i]层」⇒ `ATTACK_FINISHED`? ✗ 改用 **`DEALING_DAMAGE`** + `actor == self` ✓ + `ADD_STACK` → `SPEED_PERCENT` `per_stack` ✓（文本没给持续期 ✗ ⇒ 沿用 `21005` 先例 `permanent` ✓）。 ⚠⚠ **2026-09-29 登记** ✗：「当装备者击中敌方目标时，如果该目标**不处于【游丝】状态**，则有100%的基础概率使其陷入【游丝】状态」本句**只能写一半** ✗：**`APPLY_DOT` 创建的持续伤害没有名字** ✗（它没有 `buff` 字段 ✓，身份来自**元素** ✓）⇒ `target has_state 游丝` **永远为假** ✗（实测：盖上守卫后第二次命中依然**又叠了一层** ✗）。⚠ 缺的层次很明确：**缺一个\"持续伤害带名字\"的建模** ✗（或者一个\"持有某元素持续伤害\"的谓词 ✗）。⚠ 另有一句已登记 ✗：「【游丝】状态下也被视为陷入了触电状态」需\"一个状态算作另一个状态\"的别名机制 ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23006_speed_stack_on_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "游丝加速",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.072,
+          "per_stack": "游丝加速",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23006: 「装备者每次施放攻击后，速度提高#3[f1]%，最多叠加#4[i]层」",
+      "note": "⭐ 常数半（造成伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 「每次施放攻击后速度提高#3[f1]%，最多叠加#4[i]层」⇒ `ATTACK_FINISHED`? ✗ 改用 **`DEALING_DAMAGE`** + `actor == self` ✓ + `ADD_STACK` → `SPEED_PERCENT` `per_stack` ✓（文本没给持续期 ✗ ⇒ 沿用 `21005` 先例 `permanent` ✓）。 ⚠⚠ **2026-09-29 登记** ✗：「当装备者击中敌方目标时，如果该目标**不处于【游丝】状态**，则有100%的基础概率使其陷入【游丝】状态」本句**只能写一半** ✗：**`APPLY_DOT` 创建的持续伤害没有名字** ✗（它没有 `buff` 字段 ✓，身份来自**元素** ✓）⇒ `target has_state 游丝` **永远为假** ✗（实测：盖上守卫后第二次命中依然**又叠了一层** ✗）。⚠ 缺的层次很明确：**缺一个\"持续伤害带名字\"的建模** ✗（或者一个\"持有某元素持续伤害\"的谓词 ✗）。⚠ 另有一句已登记 ✗：「【游丝】状态下也被视为陷入了触电状态」需\"一个状态算作另一个状态\"的别名机制 ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23006_speed_stack_on_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "游丝加速",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.08,
+          "per_stack": "游丝加速",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23006: 「装备者每次施放攻击后，速度提高#3[f1]%，最多叠加#4[i]层」",
+      "note": "⭐ 常数半（造成伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 「每次施放攻击后速度提高#3[f1]%，最多叠加#4[i]层」⇒ `ATTACK_FINISHED`? ✗ 改用 **`DEALING_DAMAGE`** + `actor == self` ✓ + `ADD_STACK` → `SPEED_PERCENT` `per_stack` ✓（文本没给持续期 ✗ ⇒ 沿用 `21005` 先例 `permanent` ✓）。 ⚠⚠ **2026-09-29 登记** ✗：「当装备者击中敌方目标时，如果该目标**不处于【游丝】状态**，则有100%的基础概率使其陷入【游丝】状态」本句**只能写一半** ✗：**`APPLY_DOT` 创建的持续伤害没有名字** ✗（它没有 `buff` 字段 ✓，身份来自**元素** ✓）⇒ `target has_state 游丝` **永远为假** ✗（实测：盖上守卫后第二次命中依然**又叠了一层** ✗）。⚠ 缺的层次很明确：**缺一个\"持续伤害带名字\"的建模** ✗（或者一个\"持有某元素持续伤害\"的谓词 ✗）。⚠ 另有一句已登记 ✗：「【游丝】状态下也被视为陷入了触电状态」需\"一个状态算作另一个状态\"的别名机制 ✗。"
+    }
+  ]
+}
