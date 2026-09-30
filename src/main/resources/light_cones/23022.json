@@ -27,7 +27,7 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。⚠ **后半句已登记** ✗：「造成的持续伤容无视目标 7.2% 防御」—— 实测：**门槛成立**（`layers=1` ✓）、规则命中、`damage_type: DOT` 也匹配 ✓，但 **DOT 实例的伤容一分不动** ✗（`x1.0` ✗），同一条规则对 NORMAL 实例也不生效 ✓（作用域正确 ✓）⇒ 只能是\"**实例修饰器在 DOT 实例上被丢弃**\" ✗。⚠ 同时纠正上一轮的推论 ✗：**DoT 并不在不可加成之列** ✓（引擎注释：只有 `BREAK`/`SUPER_BREAK`/`TRUE` 是 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -115,6 +115,28 @@
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
       "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_dot_ignores_defence",
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.072,
+          "instance": true,
+          "damage_type": "DOT",
+          "permanent": true,
+          "per_stack": "self_stacks:先知",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
     }
   ],
   "2": [
@@ -145,7 +167,7 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。⚠ **后半句已登记** ✗：「造成的持续伤容无视目标 7.2% 防御」—— 实测：**门槛成立**（`layers=1` ✓）、规则命中、`damage_type: DOT` 也匹配 ✓，但 **DOT 实例的伤容一分不动** ✗（`x1.0` ✗），同一条规则对 NORMAL 实例也不生效 ✓（作用域正确 ✓）⇒ 只能是\"**实例修饰器在 DOT 实例上被丢弃**\" ✗。⚠ 同时纠正上一轮的推论 ✗：**DoT 并不在不可加成之列** ✓（引擎注释：只有 `BREAK`/`SUPER_BREAK`/`TRUE` 是 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -233,6 +255,28 @@
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
       "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_dot_ignores_defence",
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.078999996,
+          "instance": true,
+          "damage_type": "DOT",
+          "permanent": true,
+          "per_stack": "self_stacks:先知",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
     }
   ],
   "3": [
@@ -263,7 +307,7 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。⚠ **后半句已登记** ✗：「造成的持续伤容无视目标 7.2% 防御」—— 实测：**门槛成立**（`layers=1` ✓）、规则命中、`damage_type: DOT` 也匹配 ✓，但 **DOT 实例的伤容一分不动** ✗（`x1.0` ✗），同一条规则对 NORMAL 实例也不生效 ✓（作用域正确 ✓）⇒ 只能是\"**实例修饰器在 DOT 实例上被丢弃**\" ✗。⚠ 同时纠正上一轮的推论 ✗：**DoT 并不在不可加成之列** ✓（引擎注释：只有 `BREAK`/`SUPER_BREAK`/`TRUE` 是 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -351,6 +395,28 @@
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
       "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_dot_ignores_defence",
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.086,
+          "instance": true,
+          "damage_type": "DOT",
+          "permanent": true,
+          "per_stack": "self_stacks:先知",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
     }
   ],
   "4": [
@@ -381,7 +447,7 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。⚠ **后半句已登记** ✗：「造成的持续伤容无视目标 7.2% 防御」—— 实测：**门槛成立**（`layers=1` ✓）、规则命中、`damage_type: DOT` 也匹配 ✓，但 **DOT 实例的伤容一分不动** ✗（`x1.0` ✗），同一条规则对 NORMAL 实例也不生效 ✓（作用域正确 ✓）⇒ 只能是\"**实例修饰器在 DOT 实例上被丢弃**\" ✗。⚠ 同时纠正上一轮的推论 ✗：**DoT 并不在不可加成之列** ✓（引擎注释：只有 `BREAK`/`SUPER_BREAK`/`TRUE` 是 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -469,6 +535,28 @@
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
       "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_dot_ignores_defence",
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.093,
+          "instance": true,
+          "damage_type": "DOT",
+          "permanent": true,
+          "per_stack": "self_stacks:先知",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
     }
   ],
   "5": [
@@ -499,7 +587,7 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+      "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。⚠ **后半句已登记** ✗：「造成的持续伤容无视目标 7.2% 防御」—— 实测：**门槛成立**（`layers=1` ✓）、规则命中、`damage_type: DOT` 也匹配 ✓，但 **DOT 实例的伤容一分不动** ✗（`x1.0` ✗），同一条规则对 NORMAL 实例也不生效 ✓（作用域正确 ✓）⇒ 只能是\"**实例修饰器在 DOT 实例上被丢弃**\" ✗。⚠ 同时纠正上一轮的推论 ✗：**DoT 并不在不可加成之列** ✓（引擎注释：只有 `BREAK`/`SUPER_BREAK`/`TRUE` 是 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -587,6 +675,28 @@
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
       "note": "⭐ **现成词汇** ✓：四种 DoT 各一条 `DEALING_DAMAGE` 规则 ✓ + `target has_state <名>` ✓（探针实测：**按名字挂上的 `DotBuff` 对四个中文名全部为真** ✓）+ **规则级 `once_per_battle: true`** ✓（「每种类型仅 1 次」就是它 ✓）+ `ADD_STACK max_stacks 4` ✓ + 写下的 `MODIFY_ATTR ATTACK` + `max_stacks` ✓。⚠ **本卡后半句已登记** ✗：「造成的**持续伤容无视目标 7.2% 的防御力**」—— 探针实测：**同一条实例修饰器规则**（不写 `damage_type`）对 NORMAL 实例是 `x1.499999999999998` ✓，对 **DOT 实例是 `x1.0`** ✗ ⇒ 与 `BREAK` 同族（不可加成 ⇒ 整条实例通道不适用 ✗）⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23022_dot_ignores_defence",
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.1,
+          "instance": true,
+          "damage_type": "DOT",
+          "permanent": true,
+          "per_stack": "self_stacks:先知",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
     }
   ]
 }
