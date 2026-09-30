@@ -1,0 +1,187 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23018_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23018_ult_damage_per_energy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0036000002,
+          "cap_amount": 0.648,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底（终结技时）: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "⭐ 「每点能量提高 #2」= 派生份额 ✓ 配 `scale: self_max_energy` ✓；「最多计入 #3 点」= **`cap_amount: #2 × #3 = 0.648`** ✓。⚠ **持续期**：文档写「**当装备者施放终结技时**」✓ ⇒ 用 `turns: 1` ✓；⭐ 而**作用域本身是终结技** ✓（属性即 `ULTIMATE_DAMAGE_BOOST` ✓）⇒ 多出的这一回合**不会**影响别的东西 ✓ ⇒ **不是近似** ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23018_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23018_ult_damage_per_energy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0042,
+          "cap_amount": 0.756,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底（终结技时）: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "⭐ 「每点能量提高 #2」= 派生份额 ✓ 配 `scale: self_max_energy` ✓；「最多计入 #3 点」= **`cap_amount: #2 × #3 = 0.756`** ✓。⚠ **持续期**：文档写「**当装备者施放终结技时**」✓ ⇒ 用 `turns: 1` ✓；⭐ 而**作用域本身是终结技** ✓（属性即 `ULTIMATE_DAMAGE_BOOST` ✓）⇒ 多出的这一回合**不会**影响别的东西 ✓ ⇒ **不是近似** ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23018_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23018_ult_damage_per_energy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0048,
+          "cap_amount": 0.864,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底（终结技时）: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "⭐ 「每点能量提高 #2」= 派生份额 ✓ 配 `scale: self_max_energy` ✓；「最多计入 #3 点」= **`cap_amount: #2 × #3 = 0.864`** ✓。⚠ **持续期**：文档写「**当装备者施放终结技时**」✓ ⇒ 用 `turns: 1` ✓；⭐ 而**作用域本身是终结技** ✓（属性即 `ULTIMATE_DAMAGE_BOOST` ✓）⇒ 多出的这一回合**不会**影响别的东西 ✓ ⇒ **不是近似** ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23018_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.54,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23018_ult_damage_per_energy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0054,
+          "cap_amount": 0.972,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底（终结技时）: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "⭐ 「每点能量提高 #2」= 派生份额 ✓ 配 `scale: self_max_energy` ✓；「最多计入 #3 点」= **`cap_amount: #2 × #3 = 0.972`** ✓。⚠ **持续期**：文档写「**当装备者施放终结技时**」✓ ⇒ 用 `turns: 1` ✓；⭐ 而**作用域本身是终结技** ✓（属性即 `ULTIMATE_DAMAGE_BOOST` ✓）⇒ 多出的这一回合**不会**影响别的东西 ✓ ⇒ **不是近似** ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23018_crit_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23018_ult_damage_per_energy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0059999996,
+          "cap_amount": 1.08,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23018 片刻，留在眼底（终结技时）: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
+      "note": "⭐ 「每点能量提高 #2」= 派生份额 ✓ 配 `scale: self_max_energy` ✓；「最多计入 #3 点」= **`cap_amount: #2 × #3 = 1.08`** ✓。⚠ **持续期**：文档写「**当装备者施放终结技时**」✓ ⇒ 用 `turns: 1` ✓；⭐ 而**作用域本身是终结技** ✓（属性即 `ULTIMATE_DAMAGE_BOOST` ✓）⇒ 多出的这一回合**不会**影响别的东西 ✓ ⇒ **不是近似** ✓。"
+    }
+  ]
+}
