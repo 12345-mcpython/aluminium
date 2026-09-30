@@ -165,6 +165,7 @@ public class RelicTriggerTableTest {
      * mixed ones ({@code properties} plus an ability).
      */
     private static final Set<String> AUTHORED = Set.of(
+            "119/4",
             "303/2",
             "113/4",
             "323/2",
@@ -261,7 +262,7 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
      * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 11;
+    private static final int STILL_REGISTERED = 10;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;

@@ -176,18 +176,18 @@ public class SummonOpTest {
      * The assembly point really calls that check — a rule file alone cannot be trusted to be consistent.
      *
      * <p>Driven through {@code CharacterFactory.create} with a <b>relic</b> whose rules summon (a test-resource
-     * fixture, {@code src/test/resources/relic_sets/119.json}) on a character with no memosprite spec. The
+     * fixture, {@code src/test/resources/relic_sets/130.json}) on a character with no memosprite spec. The
      * relic half is the harder one and the reason the check lives at assembly at all: a relic rule is shared by
      * every wearer, so no rule file can know the cid it will be checked against.
      *
-     * <p>⚠ The fixture lives on set <b>119</b>: its 2-piece is a plain stat (so that tier is outside the census) and it has no rule file of its own, so this fixture shadows nothing: a file in {@code src/test/resources} shadows the shipped -- which is exactly why it must not sit on a set that HAS a rule file (set 108 did, and hid its 4-piece)
+     * <p>⚠ The fixture lives on set <b>130</b>: its 2-piece is a plain stat (so that tier is outside the census) and it has no rule file of its own, so this fixture shadows nothing: a file in {@code src/test/resources} shadows the shipped -- which is exactly why it must not sit on a set that HAS a rule file (set 108 did, and hid its 4-piece)
      * file of the same name, and 103 became real content on 2026-09-28 (see the fixture's own note).
      *
      * <p>Without a case like this, "the check is correct" and "the check is never called" look identical.
      */
     @Test
     public void buildingACharacterWhoseEquippedRulesSummonWithoutASpecIsRefused() {
-        RelicSuit suit = RelicFactory.suit(119, 5, 15);
+        RelicSuit suit = RelicFactory.suit(130, 5, 15);
 
         CharacterException refused = Assertions.assertThrows(CharacterException.class,
                 () -> CharacterFactory.create(NO_MEMOSPRITE, LEVEL, true, null, suit));
