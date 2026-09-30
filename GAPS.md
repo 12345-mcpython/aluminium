@@ -5973,6 +5973,35 @@
 > * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **94 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
 > * ⚠ **仍登记** ✗：`SKILL_POINT_SPENT` **不带行动者** ✗（读者：23061「我方任意角色」✓）；23053 的命途计数 + 战技点**上限**钩子（F-1）✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之三百七十二：**光锥 23061 出货**（光锥线 **95 / 169**）—— "谁消耗的"终于能问了）**：
+> 
+> * ✅✅ **两件新能力（读者都是 23061 ✓）** ✓：
+>   ① **`SKILL_POINT_SPENT` 现在带行动者** ✓ —— 监听接口从 `onSpent(int)` 变成 **`onSpent(CanHit user, int)`** ✓，
+>      policy 在 `onSkillCast(user, skill)` 里**本来就握着** user ✓（丢在回调里是唯一的缺口 ✓），
+>      `Battle` 于是能用 `fireTriggers(SKILL_POINT_SPENT, spender, …)` ✓；
+>   ② **`actor_stacks:<NAME>`** ✓ —— 条件的**第三个主语** ✓：`self_stacks:` 读**规则拥有者** ✓、
+>      `target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。
+> * ✅ **出货：光锥 23061 的 ①** ✓ —— 「**我方任意角色在自身同一回合内**累计消耗 ≥ **4** 点战技点时，
+>   装备者获得【闪耀王冠】，持续 **3** 回合」✓ = `actor_stacks:` + **`until: turn_end`** ✓（上一轮做的寿命 ✓）
+>   + `ADD_STACK … target: attacker` ✓ + 发放时给**佩戴者**上状态 ✓。
+>   * ⭐ 清扫发生在**计数器持有者**（即消耗者）的回合结束 ✓ —— 这正是「在**自身**同一回合内」的字面意思 ✓。
+> * **判据读数（实测 ✓，两条判别式 ✓）** ✓：
+> >   * `[23061] after the WEARER's own four spends: crown=true`
+>   * `[23061] without the cone: crown=false`
+>   * `[23061] ally: three, then its turn boundary (counter=0), then one: crown=false`
+>   * `[23061] after the ALLY's four spends: crown=true ally counter=0`
+> * **四条变异（经 `tools/mutate.py` ✓）** ✓：23061 in-turn scope -> cast_end=1 | 23061 threshold 4 -> 2=2 | 23061 gate actor is_ally -> actor == self=1 | 23061 crown lands on the spender instead of the wearer=1
+> * ✅ 四条**全部为红** ✓。
+> * **引擎级对照** ✓（`verdict()` 读法 ✓，只替换那一行 ✓）：去掉 actor 主语的解析 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⭐ **加载器又一次给出正确答案** ✓：我先写 `target: actor` ✗ ⇒ 它**响亮列出**全部合法选择器 ✓
+>   （`all_allies / all_enemies / **attacker** / lowest_hp_ally / other_allies / party / self / summon / target / target_and_summon` ✓）
+>   ⇒ 选择器叫 **`attacker`** ✓；而**条件**里的主语仍写 `actor` ✓ —— **两套词汇各自成系** ✓，已写进内容注记 ✓。
+> * ⚠ **同卡 ② 仍登记** ✗：「装备者持有【闪耀王冠】时，**我方全体造成的伤害无视目标 20% 的防御力**，
+>   装备者造成的**战技伤害**提高 **72%**」—— 前者需要确认**写下的 `DEFENCE_IGNORE` 修饰器**是否被防御区读取 ✗
+>   （实例路径的 `DEFENCE_IGNORE` 是**确定**支持的 ✓）；后者的"**战技伤害**"是**技能类别**维度 ✗，不是伤害类型 ✗。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **95 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
