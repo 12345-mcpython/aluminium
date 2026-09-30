@@ -1,0 +1,24 @@
+{
+  "4": [
+    {
+      "on": "TAKING_HIT",
+      "on_any": [
+        "HP_CONSUMED"
+      ],
+      "id": "relic113_4_crit_after_hit_or_price",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.08,
+          "turns": 2,
+          "max_stacks": 2,
+          "buff": "113/4 暴击率",
+          "target": "self"
+        }
+      ],
+      "source": "遗器 113 四件套: 「当装备者受到攻击或被我方目标消耗生命值后，暴击率提高 8%，持续 2 回合，该效果最多叠加 2 层」",
+      "note": "⭐⭐ **一个事件对是两个触发** ⇒ `on: \"TAKING_HIT\"` + `on_any: [\"HP_CONSUMED\"]`（与已出货的 `323.json` 同形状）—— **一条规则**持有计数器，⚠ 因为 `StatModifierBuff` 身份 = `(attribute, modifierType, sourceRole)` ⇒ 两条同属性同来源会**互相替换**。⭐ `max_stacks: 2` 是可叠加修饰量惯用法；三数值取自数据行 `param=[0.08, 2, 2]`。⚠ 未写：二件套「生命上限提高 12%」（常数，该套没有 `properties` 行）⇒ 登记。"
+    }
+  ]
+}
