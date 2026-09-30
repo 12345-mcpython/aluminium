@@ -55,6 +55,16 @@ public enum AttributeType {
      * multiplies the break BASE (see {@code BreakDamageCalculator.build}), next to break effect.
      */
     @SerializedName("break_damage_boost") BREAK_DAMAGE_BOOST("break_damage_boost"),
+    /**
+     * \u2705 How much less damage this unit TAKES, across every element (2026-09-30; reader: cone 21002's
+     * \u300c\u4f7f\u6211\u65b9\u5168\u4f53\u7684\u5168\u5c5e\u6027\u6297\u6027\u63d0\u9ad8\u300d).
+     *
+     * <p>\u2605 The victim-side twin of {@link #RESISTANCE_REDUCTION}: that one is stated on the ATTACKER and
+     * lowers the target's resistance, this one is stated on the VICTIM and raises its own. Both feed the same
+     * subtraction in the resistance zone, and neither is folded into penetration -- a negative resistance is
+     * meant to be fully effective, which is why the zone's clamp must not swallow them.
+     */
+    @SerializedName("all_type_resistance") ALL_TYPE_RESISTANCE("all_type_resistance"),
     @SerializedName("energy_regeneration_rate") ENERGY_REGENERATION_RATE("energy_regeneration_rate"),
 
     @SerializedName("physical_damage_boost") PHYSICAL_DAMAGE_BOOST("physical_damage_boost"),

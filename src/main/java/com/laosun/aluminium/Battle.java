@@ -2619,6 +2619,12 @@ public class Battle {
         // penetration. Done here rather than inside `ResistArea` so that class's clamp (which exists for
         // penetration) cannot swallow a reduction: negative resistance is meant to be fully effective.
         rawResist -= defender.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+        // \u2705 The victim's own counterpart (2026-09-30; reader: cone 21002's \u300c\u5168\u5c5e\u6027\u6297\u6027\u63d0\u9ad8\u300d):
+        // stated on the one being hit, so it is subtracted here beside the reducer rather than on the attacker.
+        // \u26a0 Measured sign (2026-09-30, cone 21002): a POSITIVE resistance has to be ADDED here. Writing it as a
+        // subtraction -- the way the reducer beside it reads -- turned "+8% resistance" into +8% DAMAGE taken
+        // (`711.28 -> 768.18 (x1.08)`), because the zone multiplies by (1 - rawResist).
+        rawResist += defender.getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get();
         damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
 
         // 5) Hook: entity-level DamageEvent (HSR.md §2.2: weakness = attacker's debuff, vulnerability = victim's
