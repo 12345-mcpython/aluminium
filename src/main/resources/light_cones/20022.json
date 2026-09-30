@@ -1,0 +1,232 @@
+{
+  "1": [
+    {
+      "on": "TURN_START",
+      "id": "cone20022_memorial_on_memosprite_turn",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone20022_memorial_removed_when_it_is_killed",
+      "when": [
+        "target == summon"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "缅怀",
+          "amount": 4,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "TURN_START",
+      "id": "cone20022_memorial_on_memosprite_turn",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone20022_memorial_removed_when_it_is_killed",
+      "when": [
+        "target == summon"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "缅怀",
+          "amount": 4,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "TURN_START",
+      "id": "cone20022_memorial_on_memosprite_turn",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone20022_memorial_removed_when_it_is_killed",
+      "when": [
+        "target == summon"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "缅怀",
+          "amount": 4,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "TURN_START",
+      "id": "cone20022_memorial_on_memosprite_turn",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone20022_memorial_removed_when_it_is_killed",
+      "when": [
+        "target == summon"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "缅怀",
+          "amount": 4,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "TURN_START",
+      "id": "cone20022_memorial_on_memosprite_turn",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "缅怀",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone20022_memorial_removed_when_it_is_killed",
+      "when": [
+        "target == summon"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "缅怀",
+          "amount": 4,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20022: 「**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
+      "note": "⭐⭐ **零引擎改动，全用现成词汇** ✓：「**忆灵的回合开始时**」= `TURN_START` + **`actor == summon`** ✓；「使装备者和忆灵**分别**获得 1 层」= **两条** `ADD_STACK`（`target: self` ✓ / `target: summon` ✓）；「**忆灵消失时**移除」✓ = **`KILL` + `target == summon`** ✓ （忆灵自己倒下走它 ✓，此时佩戴者还在 ✓ ⇒ 清理有效 ✓）。⚠ **\"主人倒下\"那条路已实测并收回** ✗：那时**两个持有者都已不在** ✓，且引擎刻意不碰已死亡单位 ✓ ⇒ 没有读者 ✗（纪律 190 / 209 ✓）。"
+    }
+  ]
+}

@@ -2456,7 +2456,12 @@ public class TriggerTable {
             if (ctx.battle() == null || ctx.owner() == null) {
                 return false;
             }
-            boolean own = ctx.battle().summonsOf(ctx.owner()).contains(subject);
+            // \u2b50 Identity, not headcount (2026-09-30; reader: cone 20022's \u300c\u5fc6\u7075\u6d88\u5931\u65f6\u79fb\u9664\u2026\u3010\u7f05\u6000\u3011\u300d): a summon that has ALREADY
+            // DIED is still "one of my summons" -- the camp roster keeps its corpse, and the case that needs this is
+            // exactly the KILL whose victim is that corpse. \u26a0 `summonsOf` deliberately answers the LIVING question
+            // (self_summon_count reads it, and a headcount of corpses is not what it means), so identity asks the unit
+            // itself instead. Measured: with the living list, `target == summon` was false for a just-killed memosprite.
+            boolean own = subject instanceof Summon summon && summon.getMaster() == ctx.owner();
             return negated != own;
         }
 
