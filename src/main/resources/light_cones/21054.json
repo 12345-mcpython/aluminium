@@ -1,0 +1,137 @@
+{
+  "1": [
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone21054_summon_heal_boost",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.12,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.12,
+          "turns": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 21054: 使装备者的生命上限提高color=#f29e38ffunbreak#1[i]%/unbreak/color。装备者的忆灵攻击后，使装备者与忆灵的治疗量提高color=#f29e38ffunbreak#2[i]%/unbreak/color，持续unbreak#3[i]/unbreak回合。",
+      "note": "⭐两个句子都能完整表达 ✓：常数归引擎 ✓（见下方 `props` ✓）；「装备者**与忆灵**」写成 **`target: self` + `target: summon`** 两条效果 ✓ ——⭐ 引擎注释里有一句关键提醒 ✓：**给装备者的加成在忆灵面板上看不见** ✗（忆灵只继承 spec 点名的属性 ✓）⇒ **必须分别写** ✓；用 `all_allies` 会连**第三个队友**一起加成 ✗（过量 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone21054_summon_heal_boost",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.15,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.15,
+          "turns": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 21054: 使装备者的生命上限提高color=#f29e38ffunbreak#1[i]%/unbreak/color。装备者的忆灵攻击后，使装备者与忆灵的治疗量提高color=#f29e38ffunbreak#2[i]%/unbreak/color，持续unbreak#3[i]/unbreak回合。",
+      "note": "⭐两个句子都能完整表达 ✓：常数归引擎 ✓（见下方 `props` ✓）；「装备者**与忆灵**」写成 **`target: self` + `target: summon`** 两条效果 ✓ ——⭐ 引擎注释里有一句关键提醒 ✓：**给装备者的加成在忆灵面板上看不见** ✗（忆灵只继承 spec 点名的属性 ✓）⇒ **必须分别写** ✓；用 `all_allies` 会连**第三个队友**一起加成 ✗（过量 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone21054_summon_heal_boost",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.18,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.18,
+          "turns": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 21054: 使装备者的生命上限提高color=#f29e38ffunbreak#1[i]%/unbreak/color。装备者的忆灵攻击后，使装备者与忆灵的治疗量提高color=#f29e38ffunbreak#2[i]%/unbreak/color，持续unbreak#3[i]/unbreak回合。",
+      "note": "⭐两个句子都能完整表达 ✓：常数归引擎 ✓（见下方 `props` ✓）；「装备者**与忆灵**」写成 **`target: self` + `target: summon`** 两条效果 ✓ ——⭐ 引擎注释里有一句关键提醒 ✓：**给装备者的加成在忆灵面板上看不见** ✗（忆灵只继承 spec 点名的属性 ✓）⇒ **必须分别写** ✓；用 `all_allies` 会连**第三个队友**一起加成 ✗（过量 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone21054_summon_heal_boost",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.21,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.21,
+          "turns": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 21054: 使装备者的生命上限提高color=#f29e38ffunbreak#1[i]%/unbreak/color。装备者的忆灵攻击后，使装备者与忆灵的治疗量提高color=#f29e38ffunbreak#2[i]%/unbreak/color，持续unbreak#3[i]/unbreak回合。",
+      "note": "⭐两个句子都能完整表达 ✓：常数归引擎 ✓（见下方 `props` ✓）；「装备者**与忆灵**」写成 **`target: self` + `target: summon`** 两条效果 ✓ ——⭐ 引擎注释里有一句关键提醒 ✓：**给装备者的加成在忆灵面板上看不见** ✗（忆灵只继承 spec 点名的属性 ✓）⇒ **必须分别写** ✓；用 `all_allies` 会连**第三个队友**一起加成 ✗（过量 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone21054_summon_heal_boost",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "光锥 21054: 使装备者的生命上限提高color=#f29e38ffunbreak#1[i]%/unbreak/color。装备者的忆灵攻击后，使装备者与忆灵的治疗量提高color=#f29e38ffunbreak#2[i]%/unbreak/color，持续unbreak#3[i]/unbreak回合。",
+      "note": "⭐两个句子都能完整表达 ✓：常数归引擎 ✓（见下方 `props` ✓）；「装备者**与忆灵**」写成 **`target: self` + `target: summon`** 两条效果 ✓ ——⭐ 引擎注释里有一句关键提醒 ✓：**给装备者的加成在忆灵面板上看不见** ✗（忆灵只继承 spec 点名的属性 ✓）⇒ **必须分别写** ✓；用 `all_allies` 会连**第三个队友**一起加成 ✗（过量 ✗）。"
+    }
+  ]
+}
