@@ -1,0 +1,417 @@
+{
+  "1": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_wearer_weaves",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和装备者的忆灵在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_summon_weaves",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和**装备者的忆灵**在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_brocade_crit_damage",
+      "when": [
+        "actor == self",
+        "self_stacks:织锦 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.09,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「每层【织锦】使装备者和装备者的忆灵暴击伤容提高#4[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_cap_basic_attack",
+      "when": [
+        "actor == self",
+        "from_category Normal",
+        "self_stacks:织锦 >= 6"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.09,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「叠加至上限时，每层【织锦】额外使造成的普攻伤容提高#3[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。⭐⭐ **改写成“限定这一击”** ✓：实测发现 BASIC_ATTACK_DAMAGE_BOOST **没有实例槽** ✗（引擎报错很响亮 ✓）⇒ 用 **\from_category Normal** 限定这一击 ✓ + 实例 ALL_DAMAGE_TYPE_BOOST ✓（这一击本身就是普攻 ✓ ⇒ 语义等价 ✓），**无需改引擎** ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_wearer_weaves",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和装备者的忆灵在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_summon_weaves",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和**装备者的忆灵**在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_brocade_crit_damage",
+      "when": [
+        "actor == self",
+        "self_stacks:织锦 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.105,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「每层【织锦】使装备者和装备者的忆灵暴击伤容提高#4[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_cap_basic_attack",
+      "when": [
+        "actor == self",
+        "from_category Normal",
+        "self_stacks:织锦 >= 6"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.105,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「叠加至上限时，每层【织锦】额外使造成的普攻伤容提高#3[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。⭐⭐ **改写成“限定这一击”** ✓：实测发现 BASIC_ATTACK_DAMAGE_BOOST **没有实例槽** ✗（引擎报错很响亮 ✓）⇒ 用 **\from_category Normal** 限定这一击 ✓ + 实例 ALL_DAMAGE_TYPE_BOOST ✓（这一击本身就是普攻 ✓ ⇒ 语义等价 ✓），**无需改引擎** ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_wearer_weaves",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和装备者的忆灵在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_summon_weaves",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和**装备者的忆灵**在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_brocade_crit_damage",
+      "when": [
+        "actor == self",
+        "self_stacks:织锦 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.12,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「每层【织锦】使装备者和装备者的忆灵暴击伤容提高#4[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_cap_basic_attack",
+      "when": [
+        "actor == self",
+        "from_category Normal",
+        "self_stacks:织锦 >= 6"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「叠加至上限时，每层【织锦】额外使造成的普攻伤容提高#3[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。⭐⭐ **改写成“限定这一击”** ✓：实测发现 BASIC_ATTACK_DAMAGE_BOOST **没有实例槽** ✗（引擎报错很响亮 ✓）⇒ 用 **\from_category Normal** 限定这一击 ✓ + 实例 ALL_DAMAGE_TYPE_BOOST ✓（这一击本身就是普攻 ✓ ⇒ 语义等价 ✓），**无需改引擎** ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_wearer_weaves",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和装备者的忆灵在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_summon_weaves",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和**装备者的忆灵**在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_brocade_crit_damage",
+      "when": [
+        "actor == self",
+        "self_stacks:织锦 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.135,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「每层【织锦】使装备者和装备者的忆灵暴击伤容提高#4[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_cap_basic_attack",
+      "when": [
+        "actor == self",
+        "from_category Normal",
+        "self_stacks:织锦 >= 6"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.135,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「叠加至上限时，每层【织锦】额外使造成的普攻伤容提高#3[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。⭐⭐ **改写成“限定这一击”** ✓：实测发现 BASIC_ATTACK_DAMAGE_BOOST **没有实例槽** ✗（引擎报错很响亮 ✓）⇒ 用 **\from_category Normal** 限定这一击 ✓ + 实例 ALL_DAMAGE_TYPE_BOOST ✓（这一击本身就是普攻 ✓ ⇒ 语义等价 ✓），**无需改引擎** ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_wearer_weaves",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和装备者的忆灵在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23036_summon_weaves",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "织锦",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「装备者和**装备者的忆灵**在攻击后使装备者获得1层【织锦】。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_brocade_crit_damage",
+      "when": [
+        "actor == self",
+        "self_stacks:织锦 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.15,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「每层【织锦】使装备者和装备者的忆灵暴击伤容提高#4[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23036_cap_basic_attack",
+      "when": [
+        "actor == self",
+        "from_category Normal",
+        "self_stacks:织锦 >= 6"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "self_stacks:织锦",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23036: 「叠加至上限时，每层【织锦】额外使造成的普攻伤容提高#3[f1]%。」",
+      "note": "⭐ **四句全用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「装备者和装备者的**忆灵在攻击后**使装备者获得 1 层【织锦】」= **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK` ✓；③ 「每层使装备者和忆灵**暴击伤容**提高#4[f1]%，最多#2[i]层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + **`max_stacks: 6`** ✓（层数式写法 ✓）；④ 「**叠加至上限时**，每层【织锦】额外使**普攻伤容**提高#3[f1]%」= `DEALING_DAMAGE` + **`self_stacks:织锦 >= 6`** ✓ ⇒ 实例 `BASIC_ATTACK_DAMAGE_BOOST` + **`per_stack: self_stacks:织锦`** ✓（“满层”是**活的事实** ✓，所以走实例 ✓）。⭐⭐ **改写成“限定这一击”** ✓：实测发现 BASIC_ATTACK_DAMAGE_BOOST **没有实例槽** ✗（引擎报错很响亮 ✓）⇒ 用 **\from_category Normal** 限定这一击 ✓ + 实例 ALL_DAMAGE_TYPE_BOOST ✓（这一击本身就是普攻 ✓ ⇒ 语义等价 ✓），**无需改引擎** ✓。"
+    }
+  ]
+}
