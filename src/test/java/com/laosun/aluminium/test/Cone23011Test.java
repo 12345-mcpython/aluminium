@@ -84,6 +84,38 @@ public class Cone23011Test {
         Assertions.assertEquals(1, pinned, "exactly one wave-start heal from this cone");
     }
 
+    /**
+     * \u2605 The WIRING test, closing the debt round 21 registered: this one enters a wave for real, through
+     * {@code WaveManager.nextWave}, so the line that fires {@code WAVE_START} is covered -- every other case fires the event
+     * by hand and therefore judges only the content.
+     *
+     * <p>\u26a0 Stage-dependent: {@code stage.json} is generator output, so the test skips when the table is empty, the same
+     * convention {@code WaveManagerTest} uses.
+     */
+    @Test
+    public void aRealWaveBoundaryFiresTheHeal() {
+        org.junit.jupiter.api.Assumptions.assumeFalse(com.laosun.aluminium.Constant.stages().isEmpty(),
+                "stage.json has not been generated");
+        var stage = com.laosun.aluminium.Constant.stages().get(310030);
+        Assertions.assertNotNull(stage, "310030 is a multi-wave stage");
+        // \u26a0 Its own party: the fixture fields belong to the other cases, and a unit must not be in two battles.
+        Character waveWearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
+        Character waveAlly = CharacterFactory.create(ALLY, LEVEL);
+        Battle battle = new Battle(List.of(waveWearer, waveAlly), new java.util.ArrayList<>(), new Random(0));
+        new com.laosun.aluminium.models.WaveManager(battle, stage);
+        Enemy source = EnemyFactory.create(MONSTER, 90, 1);
+        battle.applyDamage(waveAlly, new Damage(source, waveAlly, DamageElement.FIRE, DamageType.NORMAL, 400));
+        double lost = waveAlly.getMaxHp() - waveAlly.getCurrentHp();
+        double before = waveAlly.getCurrentHp();
+        boolean entered = battle.getWaveManager().nextWave();
+        double healed = waveAlly.getCurrentHp() - before;
+        System.out.println("[23011] REAL wave entry=" + entered + " lost=" + lost + " healed=" + healed
+                + " enemies=" + battle.enemies.size());
+        Assertions.assertTrue(entered, "310030 has a wave to enter");
+        Assertions.assertEquals(lost * SHARE, healed, 1e-6,
+                "entering a wave for real must fire WAVE_START -- that is the wiring, not the content");
+    }
+
     @Test
     public void withoutTheConeNothingIsHealed() {
         Battle battle = battle(false);
