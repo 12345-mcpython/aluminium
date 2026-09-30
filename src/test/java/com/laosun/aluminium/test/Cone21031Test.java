@@ -33,12 +33,12 @@ public class Cone21031Test {
         int pinned = 0;
         for (var rule : unit.getTriggerTable().matching(TriggerEvent.CRIT_DEALT,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0))) {
-            if (!rule.oncePerAttack()) {
+            if (rule.perAttack() != 1) {
                 continue;
             }
             pinned++;
             var effect = rule.effects().getFirst();
-            System.out.println("[21031] spec chance=" + rule.chance() + " oncePerAttack=" + rule.oncePerAttack()
+            System.out.println("[21031] spec chance=" + rule.chance() + " oncePerAttack=" + rule.perAttack() == 1
                     + " op=" + effect.getOp() + " amount=" + effect.getAmount() + " target=" + effect.getTarget());
             Assertions.assertEquals(0.16, rule.chance(), 1e-9,
                     "rank 1 states a 16% fixed chance -- slot #1 of the row, not the crit-rate constant in slot #0");

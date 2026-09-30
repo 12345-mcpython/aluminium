@@ -128,6 +128,15 @@ public class TriggerSpec {
     private Boolean oncePerAttack;
 
     /**
+     * \u300c\u6bcf\u6b21\u653b\u51fb\u6700\u591a\u901a\u8fc7\u8be5\u65b9\u5f0f\u2026 N \u6b21\u300d: at most N firings per ATTACK (cone 23008 states 3).
+     *
+     * <p>The same dimension as {@link #oncePerAttack}, with a count. Both mean "counted per attack, not per turn", so
+     * stating them together would be two readings of one cap -- refused, like {@code cooldown} next to {@code per_turn}.
+     */
+    @SerializedName("per_attack")
+    private Integer perAttack;
+
+    /**
      * A fixed probability that the rule fires at all — 「有 X% 的固定概率…」 ({@code 0.35} = 35%). Absent = always.
      *
      * <p>Rolled against the battle's <b>injected</b> random source (never a fresh one), so a seeded battle stays
