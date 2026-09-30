@@ -1,0 +1,46 @@
+{
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic116_ignore_per_dot",
+      "when": [
+        "actor == self",
+        "target_dot_count >= 1",
+        "target_dot_count < 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.06,
+          "instance": true,
+          "turns": 1,
+          "per_stack": "target_dot_count",
+          "target": "self"
+        }
+      ],
+      "source": "probe fixture for 116/4",
+      "note": "probe"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic116_ignore_at_cap",
+      "when": [
+        "actor == self",
+        "target_dot_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.18,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "probe fixture for 116/4 (cap)",
+      "note": "probe"
+    }
+  ]
+}

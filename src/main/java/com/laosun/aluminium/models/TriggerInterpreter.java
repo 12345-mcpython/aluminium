@@ -1357,6 +1357,20 @@ public final class TriggerInterpreter {
      *               {@code permanent}, optional {@code max_stacks}, {@code target})
      * @param ctx    the context
      */
+    /** The multiplier `per_stack` names, read on the target: a debuff count, a DoT count, or a counter (2026-09-29). */
+    private static double perStackFactor(EffectSpec effect, CanHit target) {
+        String name = effect.getPerStack();
+        if (name == null || name.isBlank()) {
+            return 1;
+        }
+        return switch (name.trim()) {
+            case "target_debuff_count" -> target.getBuffManager().debuffCount();
+            case "target_dot_count" -> target.getBuffManager()
+                    .countBuffs(com.laosun.aluminium.models.buff.DotBuff.class);
+            default -> target.getBuffManager().stacksOf(name.trim());
+        };
+    }
+
     private static void modifyAttr(Battle battle, EffectSpec effect, TriggerContext ctx) {
         AttributeType attribute = AttributeType.fromString(effect.getAttribute());
         // P11-2 (M-42): a **derived** magnitude — 「提高数值等同于<某人的属性>的 X% + Y%」. It is computed once,
@@ -1371,7 +1385,9 @@ public final class TriggerInterpreter {
         // Opt-in (`instance: true`) because seven shipped rules already use MODIFY_ATTR on that event.
         if (Boolean.TRUE.equals(effect.getInstance()) && ctx.damage() != null) {
             if (attribute == AttributeType.DEFENCE_IGNORE) {
-                ctx.damage().addDefenceIgnore(effect.getPercent() == null ? 0 : effect.getPercent());
+                double instanceMagnitude = effect.getPercent() == null ? 0 : effect.getPercent();
+                instanceMagnitude *= ctx.target() == null ? 1 : perStackFactor(effect, ctx.target());
+                ctx.damage().addDefenceIgnore(instanceMagnitude);
                 return;
             }
             if (attribute == AttributeType.CRIT_CHANCE) {
