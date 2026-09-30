@@ -89,8 +89,21 @@ public class ConeAuraPartyTest {
         double after = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[23011] after the WEARER was hurt: boost " + before + " -> " + after);
         Assertions.assertEquals(before + 0.09, after, 1e-9, "the wearer losing HP raises the party's damage by 9 points");
-        var rule = wearer.getTriggerTable().matching(TriggerEvent.HP_LOST,
-                new TriggerTable.TriggerContext(wearer, enemy, wearer, 0, 0));
-        Assertions.assertFalse(rule.isEmpty(), "the rule is registered on HP_LOST");
+        // \u26a0 Durations must be PINNED: every reading above happens in the same turn, so shortening one changes
+        // nothing (measured: 2 -> 1 turn gave reds 0 until this block existed).
+        int pinned = 0;
+        for (var r : wearer.getTriggerTable().matching(TriggerEvent.HP_LOST,
+                new TriggerTable.TriggerContext(wearer, enemy, wearer, 0, 0))) {
+            for (var effect : r.effects()) {
+                if ("ALL_DAMAGE_TYPE_BOOST".equals(effect.getAttribute()) && effect.getPercent() == 0.09) {
+                    pinned++;
+                    System.out.println("[23011] spec percent=" + effect.getPercent() + " turns=" + effect.getTurns()
+                            + " target=" + effect.getTarget());
+                    Assertions.assertEquals(2, effect.getTurns(), "for two turns");
+                    Assertions.assertEquals("all_allies", effect.getTarget(), "the party, not the wearer");
+                }
+            }
+        }
+        Assertions.assertEquals(1, pinned, "the party damage rule is registered on HP_LOST");
     }
 }
