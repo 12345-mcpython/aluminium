@@ -1,0 +1,272 @@
+{
+  "1": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21037_luck_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "好运",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.08,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「当装备者对敌方目标造成暴击后获得一层【好运】，最多叠加#3[i]层。每层【好运】使装备者的暴击伤害提高#2[i]%」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。"
+    },
+    {
+      "on": "TURN_END",
+      "id": "cone21037_luck_expires",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "好运",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.08,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「【好运】在装备者的回合结束时移除」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。 ⭐ ⚠ **只清计数器是不够的** ✗：加成是一个**已写下的修饰器** ✓（`permanent` ✓），**清掉计数器不会重算它** ✗（实测：移除后依然 +0.08 ✗）⇒ 同一条规则里**先移除层数、再以同一身份重写一次** ✓（此时 `per_stack` 读到 0 ✓ ⇒ 加成归零 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21037_luck_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "好运",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.09,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「当装备者对敌方目标造成暴击后获得一层【好运】，最多叠加#3[i]层。每层【好运】使装备者的暴击伤害提高#2[i]%」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。"
+    },
+    {
+      "on": "TURN_END",
+      "id": "cone21037_luck_expires",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "好运",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.08,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「【好运】在装备者的回合结束时移除」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。 ⭐ ⚠ **只清计数器是不够的** ✗：加成是一个**已写下的修饰器** ✓（`permanent` ✓），**清掉计数器不会重算它** ✗（实测：移除后依然 +0.08 ✗）⇒ 同一条规则里**先移除层数、再以同一身份重写一次** ✓（此时 `per_stack` 读到 0 ✓ ⇒ 加成归零 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21037_luck_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "好运",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.1,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「当装备者对敌方目标造成暴击后获得一层【好运】，最多叠加#3[i]层。每层【好运】使装备者的暴击伤害提高#2[i]%」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。"
+    },
+    {
+      "on": "TURN_END",
+      "id": "cone21037_luck_expires",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "好运",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.08,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「【好运】在装备者的回合结束时移除」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。 ⭐ ⚠ **只清计数器是不够的** ✗：加成是一个**已写下的修饰器** ✓（`permanent` ✓），**清掉计数器不会重算它** ✗（实测：移除后依然 +0.08 ✗）⇒ 同一条规则里**先移除层数、再以同一身份重写一次** ✓（此时 `per_stack` 读到 0 ✓ ⇒ 加成归零 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21037_luck_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "好运",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.11,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「当装备者对敌方目标造成暴击后获得一层【好运】，最多叠加#3[i]层。每层【好运】使装备者的暴击伤害提高#2[i]%」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。"
+    },
+    {
+      "on": "TURN_END",
+      "id": "cone21037_luck_expires",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "好运",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.08,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「【好运】在装备者的回合结束时移除」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。 ⭐ ⚠ **只清计数器是不够的** ✗：加成是一个**已写下的修饰器** ✓（`permanent` ✓），**清掉计数器不会重算它** ✗（实测：移除后依然 +0.08 ✗）⇒ 同一条规则里**先移除层数、再以同一身份重写一次** ✓（此时 `per_stack` 读到 0 ✓ ⇒ 加成归零 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CRIT_DEALT",
+      "id": "cone21037_luck_on_crit",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "好运",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.12,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「当装备者对敌方目标造成暴击后获得一层【好运】，最多叠加#3[i]层。每层【好运】使装备者的暴击伤害提高#2[i]%」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。"
+    },
+    {
+      "on": "TURN_END",
+      "id": "cone21037_luck_expires",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "好运",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.08,
+          "per_stack": "好运",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21037: 「【好运】在装备者的回合结束时移除」",
+      "note": "⭐⭐⭐ **本椎催生了新事件 `CRIT_DEALT`** ✓：「对敌方目标**造成暴击后**」在 `DEALING_DAMAGE` 上**原理上无法表达** ✗（源码：事件在 `Battle:2542` 发出 ✓、**暴击投骰在 2547** ✗）⇒ 新事件在**暴击区之后**且**只在真的暴击时**触发 ✓（规则**不需谓词** ✓）；⭐ 它的 **subject 是攻击者** ✓（暴击是\"打出来\"的事 ✓）。⭐ 叠层用 `ADD_STACK` ✓；⭐ 「在装备者的回合结束时移除」用 **`TURN_END` + `REMOVE_STACK`** ✓。 ⭐ ⚠ **只清计数器是不够的** ✗：加成是一个**已写下的修饰器** ✓（`permanent` ✓），**清掉计数器不会重算它** ✗（实测：移除后依然 +0.08 ✗）⇒ 同一条规则里**先移除层数、再以同一身份重写一次** ✓（此时 `per_stack` 读到 0 ✓ ⇒ 加成归零 ✓）。"
+    }
+  ]
+}
