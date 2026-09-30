@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23058_elation_cast_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.15,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「装备者施放欢愉技时，使**敌方全体受到的伤害**提高#2[f1]%，持续#3[i]回合，同类效果无法叠加」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `MODIFY_DAMAGE_TAKEN`（**不限伤害类型** ✓）+ `turns: 2` ✓ + `target: all_enemies` ✓。⚠ 「同类效果无法叠加」是**默认行为** ✓（同一身份会替换 ✓）。⚠ **前一句已登记** ✗：「能量上限大于#5[i]时，**每超出10点**能量上限额外使能量恢复效率提高#6[f1]%，最多计入#7[i]点超出的能量上限」—— 需一个**\"每超出 X 点\"的缩放** ✗（现有 `scale` 只能名字段/属性 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23058_elation_cast_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.1875,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「装备者施放欢愉技时，使**敌方全体受到的伤害**提高#2[f1]%，持续#3[i]回合，同类效果无法叠加」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `MODIFY_DAMAGE_TAKEN`（**不限伤害类型** ✓）+ `turns: 2` ✓ + `target: all_enemies` ✓。⚠ 「同类效果无法叠加」是**默认行为** ✓（同一身份会替换 ✓）。⚠ **前一句已登记** ✗：「能量上限大于#5[i]时，**每超出10点**能量上限额外使能量恢复效率提高#6[f1]%，最多计入#7[i]点超出的能量上限」—— 需一个**\"每超出 X 点\"的缩放** ✗（现有 `scale` 只能名字段/属性 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23058_elation_cast_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.225,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「装备者施放欢愉技时，使**敌方全体受到的伤害**提高#2[f1]%，持续#3[i]回合，同类效果无法叠加」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `MODIFY_DAMAGE_TAKEN`（**不限伤害类型** ✓）+ `turns: 2` ✓ + `target: all_enemies` ✓。⚠ 「同类效果无法叠加」是**默认行为** ✓（同一身份会替换 ✓）。⚠ **前一句已登记** ✗：「能量上限大于#5[i]时，**每超出10点**能量上限额外使能量恢复效率提高#6[f1]%，最多计入#7[i]点超出的能量上限」—— 需一个**\"每超出 X 点\"的缩放** ✗（现有 `scale` 只能名字段/属性 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23058_elation_cast_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2625,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「装备者施放欢愉技时，使**敌方全体受到的伤害**提高#2[f1]%，持续#3[i]回合，同类效果无法叠加」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `MODIFY_DAMAGE_TAKEN`（**不限伤害类型** ✓）+ `turns: 2` ✓ + `target: all_enemies` ✓。⚠ 「同类效果无法叠加」是**默认行为** ✓（同一身份会替换 ✓）。⚠ **前一句已登记** ✗：「能量上限大于#5[i]时，**每超出10点**能量上限额外使能量恢复效率提高#6[f1]%，最多计入#7[i]点超出的能量上限」—— 需一个**\"每超出 X 点\"的缩放** ✗（现有 `scale` 只能名字段/属性 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23058_elation_cast_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「装备者施放欢愉技时，使**敌方全体受到的伤害**提高#2[f1]%，持续#3[i]回合，同类效果无法叠加」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `MODIFY_DAMAGE_TAKEN`（**不限伤害类型** ✓）+ `turns: 2` ✓ + `target: all_enemies` ✓。⚠ 「同类效果无法叠加」是**默认行为** ✓（同一身份会替换 ✓）。⚠ **前一句已登记** ✗：「能量上限大于#5[i]时，**每超出10点**能量上限额外使能量恢复效率提高#6[f1]%，最多计入#7[i]点超出的能量上限」—— 需一个**\"每超出 X 点\"的缩放** ✗（现有 `scale` 只能名字段/属性 ✓）。"
+    }
+  ]
+}
