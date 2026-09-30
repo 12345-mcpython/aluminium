@@ -114,7 +114,7 @@ public final class TriggerInterpreter {
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT", "CONSUME_HP");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -396,6 +396,13 @@ public final class TriggerInterpreter {
                 // ADD_DAMAGE does, plus a percentage of that instance's toughness reduction.
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "CONSUME_HP" -> {
+                // 「消耗等同于刃生命上限 30% 的生命值」: a COST paid in HP, not damage (2026-09-29).
+                requirePercent(effect, op, spec);
+                requireNonZeroPercent(effect, op, spec);
+                requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             case "BOOST_TOUGHNESS" -> {
@@ -906,6 +913,15 @@ public final class TriggerInterpreter {
             case "RAISE_SKILL_LEVEL" -> raiseSkillLevel(effect, ctx);
             case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
             case "ADD_STACK" -> addStack(battle, effect, ctx);
+            case "CONSUME_HP" -> {
+                // ⚠ The share vocabulary is the HEAL/SHIELD one, not the modifier one: 「消耗等同于刃生命上限 30%」
+                // is `owner_max_hp`, which derivedMagnitude refuses (it names an ATTRIBUTE).
+                for (CanHit spender : resolveTargets(battle, effect, ctx)) {
+                    if (spender != null) {
+                        spender.consumeHp(grantAmount(effect, spender, ctx));
+                    }
+                }
+            }
             case "BOOST_TOUGHNESS" -> boostToughness(battle, effect, ctx);
             case "SUPER_BREAK" -> superBreak(battle, effect, ctx);
             case "APPLY_REGEN" -> applyRegen(battle, effect, ctx);
