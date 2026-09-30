@@ -1,0 +1,74 @@
+{
+  "rules": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "trace_damage_vs_fire_weakness",
+      "when": [
+        "actor == self",
+        "target has_weakness Fire"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.15,
+          "target": "self"
+        }
+      ],
+      "source": "1112 托帕&账账 行迹「金融动荡」(1112102): 「托帕和账账对拥有火属性弱点的敌方目标造成的伤害提高 #1[i]%」",
+      "note": "数值取自 `data/skill_traces.json` 的 **1112102 行**（`param = [0.15]` ✓）。⭐ 条件用 **`target has_weakness Fire`** ✓（既有写法 ✓，遗器 108/4 同款 ✓）；⚠ `BOOST_DAMAGE` 不带持续期 ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_proof_of_debt",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "负债证明",
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.5,
+          "element": "Fire",
+          "target": "target"
+        }
+      ],
+      "source": "1112 托帕&账账 战技「扭亏为盈！」: 「使指定敌方单体陷入【负债证明】状态，使其受到的追加攻击伤害提高 50%…使账账对该目标造成等同于托帕 150% 攻击力的火属性伤害」",
+      "note": "⚠ 数值 **150%** 目前**只见于正文** ✓（该技能 `param_list` 未能解析 ✓）。⚠⚠ **未写「使其受到的追加攻击伤害提高 50%」** ✗ —— **不是近似，是登记** ✓：追加攻击在引擎里是**属性 `FOLLOW_UP_DAMAGE_BOOST`（造成侧）** ✓（`Battle:2528` 注释原话 ✓），而 `DamageType` 只有 `NORMAL/ULTRA/BREAK/DOT/TECHNIQUE/ELATION` ✗ ⇒ **承受侧无法按\"追加攻击\"分域** ✗。⚠ 另外「【负债证明】仅对最新被施加的目标生效」✗ 与「我方回合开始/行动时若场上无该状态则随机施加」✗ ⇒ 同样登记 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "when": null,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "项目约定：面板按满级给出 ⇒ 与其余角色文件一致地在开局把技能等级抬高",
+      "note": "与所有已出货角色一致的约定 ✓。"
+    }
+  ]
+}

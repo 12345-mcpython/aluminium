@@ -39,7 +39,7 @@ final class TestCharacters {
         // file" -- a MOVING TARGET: shipping 1112 (round 207/240) handed every caller a DIFFERENT character, and
         // a suite measuring HP numbers went red far from the change. The id below is a key of
         // data/character_data.json with no content file; if it ever gains one, the guard fails loudly.
-        int cid = 1112;
+        int cid = 1505;
         if (TriggerTables.exists(cid)) {
             throw new IllegalStateException(
                     "Character " + cid + " now has a trigger file, so the \"unregistered character\" control is gone. "
