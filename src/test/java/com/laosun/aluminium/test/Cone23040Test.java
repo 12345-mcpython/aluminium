@@ -85,4 +85,18 @@ public class Cone23040Test {
         System.out.println("[23040] without the cone: ignore=" + ignore());
         Assertions.assertEquals(0.0, ignore(), 1e-9, "no cone, no flower (false case)");
     }
+
+    @Test
+    public void theWearerAloneGrantsIt() {
+        // \u2605 The two rules grant the SAME state, so a mutation of one is invisible while the other can fire -- measured:
+        // moving the wearer's rule to ULT_CAST left every earlier reading at 0.3, because the memosprite's rule covered it.
+        // With NO memosprite on the field the wearer's rule is the only one that can match.
+        build(true);
+        double before = ignore();
+        battle.fireTriggers(TriggerEvent.HP_LOST, wearer, wearer, 0, 0);
+        double after = ignore();
+        System.out.println("[23040] with no memosprite at all: before=" + before + " after the wearer's loss=" + after);
+        Assertions.assertEquals(0.0, before, 1e-9, "nothing before a loss");
+        Assertions.assertEquals(0.3, after, 1e-9, "the wearer's own rule is enough (no memosprite in play)");
+    }
 }
