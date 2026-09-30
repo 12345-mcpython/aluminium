@@ -1,0 +1,287 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23016_follow_up_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「装备者**追加攻击**造成的伤容提高#2[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23016_tame_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "温驯",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23016: 「装备者施放追加攻击后，使目标陷入【温驯】状态，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23016_crit_per_tame_layer",
+      "when": [
+        "actor == self",
+        "target_stacks:温驯 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.12,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "温驯",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「我方目标击中【温驯】状态下的敌方目标时，每层【温驯】使造成的暴击伤容提高#3[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。⚠ **per_stack 认的是目标身上的**裸名字** ✓（不是 \target_stacks: ✗）—— 实测：写 \target_stacks: 时加成为 0 ✗。⚠⚠ **门槛改用数值变量** ✓：has_state 似乎**不认层数型增益** ✗（实测：用 has_state 时每层加成为 0 ✗）⇒ **\target_stacks:温驯 >= 1** ✓（现成前缀 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23016_follow_up_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.35,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「装备者**追加攻击**造成的伤容提高#2[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23016_tame_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "温驯",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23016: 「装备者施放追加攻击后，使目标陷入【温驯】状态，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23016_crit_per_tame_layer",
+      "when": [
+        "actor == self",
+        "target_stacks:温驯 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.14,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "温驯",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「我方目标击中【温驯】状态下的敌方目标时，每层【温驯】使造成的暴击伤容提高#3[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。⚠ **per_stack 认的是目标身上的**裸名字** ✓（不是 \target_stacks: ✗）—— 实测：写 \target_stacks: 时加成为 0 ✗。⚠⚠ **门槛改用数值变量** ✓：has_state 似乎**不认层数型增益** ✗（实测：用 has_state 时每层加成为 0 ✗）⇒ **\target_stacks:温驯 >= 1** ✓（现成前缀 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23016_follow_up_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「装备者**追加攻击**造成的伤容提高#2[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23016_tame_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "温驯",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23016: 「装备者施放追加攻击后，使目标陷入【温驯】状态，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23016_crit_per_tame_layer",
+      "when": [
+        "actor == self",
+        "target_stacks:温驯 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.16,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "温驯",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「我方目标击中【温驯】状态下的敌方目标时，每层【温驯】使造成的暴击伤容提高#3[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。⚠ **per_stack 认的是目标身上的**裸名字** ✓（不是 \target_stacks: ✗）—— 实测：写 \target_stacks: 时加成为 0 ✗。⚠⚠ **门槛改用数值变量** ✓：has_state 似乎**不认层数型增益** ✗（实测：用 has_state 时每层加成为 0 ✗）⇒ **\target_stacks:温驯 >= 1** ✓（现成前缀 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23016_follow_up_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.45,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「装备者**追加攻击**造成的伤容提高#2[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23016_tame_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "温驯",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23016: 「装备者施放追加攻击后，使目标陷入【温驯】状态，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23016_crit_per_tame_layer",
+      "when": [
+        "actor == self",
+        "target_stacks:温驯 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.18,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "温驯",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「我方目标击中【温驯】状态下的敌方目标时，每层【温驯】使造成的暴击伤容提高#3[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。⚠ **per_stack 认的是目标身上的**裸名字** ✓（不是 \target_stacks: ✗）—— 实测：写 \target_stacks: 时加成为 0 ✗。⚠⚠ **门槛改用数值变量** ✓：has_state 似乎**不认层数型增益** ✗（实测：用 has_state 时每层加成为 0 ✗）⇒ **\target_stacks:温驯 >= 1** ✓（现成前缀 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23016_follow_up_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.5,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「装备者**追加攻击**造成的伤容提高#2[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23016_tame_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "温驯",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23016: 「装备者施放追加攻击后，使目标陷入【温驯】状态，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23016_crit_per_tame_layer",
+      "when": [
+        "actor == self",
+        "target_stacks:温驯 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "温驯",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23016: 「我方目标击中【温驯】状态下的敌方目标时，每层【温驯】使造成的暴击伤容提高#3[i]%。」",
+      "note": "⭐ **三句全用现成词汇** ✓：① 「**追加攻击**造成的伤容提高#2[i]%」= `MODIFY_ATTR` + **`FOLLOW_UP_DAMAGE_BOOST`** ✓（枚举里已有 ✓）+ `permanent` ✓；② 「施放追加攻击后，使**目标**陷入【温驯】，最多叠加#4[i]层」= `FOLLOW_UP` + `actor == self` ⇒ **`ADD_STACK` 且 `target: target`** ✓（负面状态落在敌人身上 ✓）；③ 「我方目标击中【温驯】状态下的敌方目标时，**每层**使造成的**暴击伤容**提高#3[i]%」= `DEALING_DAMAGE` + **`target has_state 温驯`** ✓ ⇒ **实例** `CRIT_ATTACK` + **`per_stack: target_stacks:温驯`** ✓。⚠ **per_stack 认的是目标身上的**裸名字** ✓（不是 \target_stacks: ✗）—— 实测：写 \target_stacks: 时加成为 0 ✗。⚠⚠ **门槛改用数值变量** ✓：has_state 似乎**不认层数型增益** ✗（实测：用 has_state 时每层加成为 0 ✗）⇒ **\target_stacks:温驯 >= 1** ✓（现成前缀 ✓）。"
+    }
+  ]
+}
