@@ -13,7 +13,11 @@ Effect-level: op, percent, amount, scale, turns, permanent, until, target, attri
 
 import json
 
-RULE_LEVEL = {'on', 'on_any', 'when', 'id', 'cooldown', 'source', 'note'}
+RULE_LEVEL = {'on', 'on_any', 'when', 'id', 'cooldown', 'source', 'note',
+              # \u2605 the rest of a rule's own fields (round 317 taught the tool `chance`, `per_turn`,
+              # `once_per_battle` and `once_per_attack`: it refused them rather than writing them somewhere
+              # harmless, which is right -- but the list has to keep up with the vocabulary).
+              'chance', 'per_turn', 'once_per_battle', 'once_per_attack', 'min_eidolon'}
 EFFECT_LEVEL = {
     'op', 'percent', 'amount', 'scale', 'turns', 'permanent', 'until', 'target', 'attribute', 'buff',
     'max_stacks', 'per_stack', 'cap_amount', 'cap_scale', 'cap_percent', 'instance', 'damage_type',
