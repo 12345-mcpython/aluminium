@@ -1,0 +1,202 @@
+{
+  "1": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24006_ally_elation_on_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.12,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone24006_ally_elation_on_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.12,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24006_ally_elation_on_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.15,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone24006_ally_elation_on_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.15,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24006_ally_elation_on_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.18,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone24006_ally_elation_on_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.18,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24006_ally_elation_on_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.21,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone24006_ally_elation_on_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.21,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone24006_ally_elation_on_skill",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone24006_ally_elation_on_ult",
+      "when": [
+        "actor == self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 24006: 「当装备者对我方单体角色施放战技或终结技后，使目标欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 「对我方单体角色施放战技或终结技**后**」⇒ 用 `SKILL_CAST` / `ULT_CAST` ✓（它们本来就是\"施放之后\"的事件 ✓，与文案一致 ✓）+ 条件 **`target is_ally`** ✓（施放事件的 target 就是**被指定的那个单位** ✓）。⭐ 收益者是**那个目标** ✓ ⇒ `target: target` ✓（不是装备者自己 ✗）。⚠ 「单体」的**形状**层没有可用谓词 ✗（目标形状只在技能数据里 ✓）⇒ 一个**群体**的我方施放也会算 ✗ —— 这一点已在本注记里写明 ✓。"
+    }
+  ]
+}
