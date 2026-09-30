@@ -74,6 +74,12 @@ public enum TriggerEvent {
      * ✅ Someone really lost HP (shield absorption does not count).
      */
     HP_LOST("HP_LOST", true),
+
+    /**
+     * 「消耗生命值」 (2026-09-29): HP paid as a PRICE. The texts list it separately from 「受到伤害」
+     * (「当装备者受到攻击<b>或</b>被我方目标消耗生命值后」, 113/4) because a hit can be shielded and can kill, and a price can do neither.
+     */
+    HP_CONSUMED("HP_CONSUMED", true),
     /**
      * ✅ Someone was really healed.
      */
