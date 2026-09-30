@@ -556,6 +556,25 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *
      * @param amount the amount to heal
      */
+    /**
+     * Spends HP as a COST (2026-09-29): 「消耗等同于刃生命上限 30% 的生命值」.
+     *
+     * <p>⚠ Deliberately NOT {@code takeDamage}: a price, not an attack -- no shield absorbs it, no {@code HP_LOST} fires
+     * (the texts list them side by side: 「受到伤害<b>或</b>消耗生命值」), and it never kills.
+     * The floor is the documents' own: 「若当前生命值不足…当前生命值降低至 1 点」.
+     *
+     * @return the HP actually spent
+     */
+    public double consumeHp(double amount) {
+        if (amount <= 0 || isDeath()) {
+            return 0;
+        }
+        double spendable = Math.max(0, currentHp - 1);
+        double spent = Math.min(amount, spendable);
+        currentHp -= spent;
+        return spent;
+    }
+
     public void heal(double amount) {        if (death || amount <= 0) {
             return;
         }
