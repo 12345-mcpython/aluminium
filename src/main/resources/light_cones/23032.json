@@ -1,0 +1,262 @@
+{
+  "1": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23032_forget_worry",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "忘忧",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23032: 「装备者施放终结技攻击敌方目标后，使其陷入【忘忧】状态，持续#5[i]回合」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_damage_up_vs_forgetful",
+      "when": [
+        "target has_state 忘忧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「【忘忧】状态下的敌方目标受到的伤害提高#2[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_extra_at_high_break",
+      "when": [
+        "target has_state 忘忧",
+        "self_attr:BREAKING_EFFECT >= 1.5"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.08,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「若装备者当前击破特攻大于等于#3[i]%，受到的伤害提高效果额外提高#4[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23032_forget_worry",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "忘忧",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23032: 「装备者施放终结技攻击敌方目标后，使其陷入【忘忧】状态，持续#5[i]回合」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_damage_up_vs_forgetful",
+      "when": [
+        "target has_state 忘忧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.12,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「【忘忧】状态下的敌方目标受到的伤害提高#2[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_extra_at_high_break",
+      "when": [
+        "target has_state 忘忧",
+        "self_attr:BREAKING_EFFECT >= 1.5"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「若装备者当前击破特攻大于等于#3[i]%，受到的伤害提高效果额外提高#4[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23032_forget_worry",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "忘忧",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23032: 「装备者施放终结技攻击敌方目标后，使其陷入【忘忧】状态，持续#5[i]回合」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_damage_up_vs_forgetful",
+      "when": [
+        "target has_state 忘忧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.14,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「【忘忧】状态下的敌方目标受到的伤害提高#2[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_extra_at_high_break",
+      "when": [
+        "target has_state 忘忧",
+        "self_attr:BREAKING_EFFECT >= 1.5"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.12,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「若装备者当前击破特攻大于等于#3[i]%，受到的伤害提高效果额外提高#4[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23032_forget_worry",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "忘忧",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23032: 「装备者施放终结技攻击敌方目标后，使其陷入【忘忧】状态，持续#5[i]回合」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_damage_up_vs_forgetful",
+      "when": [
+        "target has_state 忘忧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.16,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「【忘忧】状态下的敌方目标受到的伤害提高#2[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_extra_at_high_break",
+      "when": [
+        "target has_state 忘忧",
+        "self_attr:BREAKING_EFFECT >= 1.5"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.14,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「若装备者当前击破特攻大于等于#3[i]%，受到的伤害提高效果额外提高#4[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23032_forget_worry",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "忘忧",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23032: 「装备者施放终结技攻击敌方目标后，使其陷入【忘忧】状态，持续#5[i]回合」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_damage_up_vs_forgetful",
+      "when": [
+        "target has_state 忘忧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.18,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「【忘忧】状态下的敌方目标受到的伤害提高#2[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23032_extra_at_high_break",
+      "when": [
+        "target has_state 忘忧",
+        "self_attr:BREAKING_EFFECT >= 1.5"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.16,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23032: 「若装备者当前击破特攻大于等于#3[i]%，受到的伤害提高效果额外提高#4[i]%」",
+      "note": "⭐ 三个句子都能完整表达 ✓：① `ULT_CAST` + `APPLY_BUFF 忘忧` ✓；② `DEALING_DAMAGE` + `target has_state 忘忧` + `BOOST_DAMAGE` ✓（「【忘忧】状态下**受到的伤害**提高」✓）；③ 同一加成另写一条，多一个条件 **`self_attr:BREAKING_EFFECT >= 1.5`** ✓（「若装备者当前击破特攻≥#3[i]%」✓）。⭐ 常数半（击破特攻）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ]
+}
