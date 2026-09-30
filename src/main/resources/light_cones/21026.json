@@ -1,0 +1,262 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21026_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；⚠ **攻击力是平值属性** ⇒ `percent` 按 `baseValue()` 缩放 ✓（基准取规则生效后 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_burning",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.16,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达**（照抄 21022 ✓）：另一条负责「裂伤 且 **非** 灼烧」 ✓ => **不会双倍加成** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_wounded",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤",
+        "!target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.16,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条的 `!target has_state 灼烧` 与上一条合起来正是\"灼烧**或**裂伤\" ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21026_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.125,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；⚠ **攻击力是平值属性** ⇒ `percent` 按 `baseValue()` 缩放 ✓（基准取规则生效后 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_burning",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达**（照抄 21022 ✓）：另一条负责「裂伤 且 **非** 灼烧」 ✓ => **不会双倍加成** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_wounded",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤",
+        "!target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条的 `!target has_state 灼烧` 与上一条合起来正是\"灼烧**或**裂伤\" ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21026_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；⚠ **攻击力是平值属性** ⇒ `percent` 按 `baseValue()` 缩放 ✓（基准取规则生效后 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_burning",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达**（照抄 21022 ✓）：另一条负责「裂伤 且 **非** 灼烧」 ✓ => **不会双倍加成** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_wounded",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤",
+        "!target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条的 `!target has_state 灼烧` 与上一条合起来正是\"灼烧**或**裂伤\" ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21026_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.175,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；⚠ **攻击力是平值属性** ⇒ `percent` 按 `baseValue()` 缩放 ✓（基准取规则生效后 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_burning",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.28,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达**（照抄 21022 ✓）：另一条负责「裂伤 且 **非** 灼烧」 ✓ => **不会双倍加成** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_wounded",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤",
+        "!target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.28,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条的 `!target has_state 灼烧` 与上一条合起来正是\"灼烧**或**裂伤\" ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21026_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；⚠ **攻击力是平值属性** ⇒ `percent` 按 `baseValue()` 缩放 ✓（基准取规则生效后 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_burning",
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.32,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达**（照抄 21022 ✓）：另一条负责「裂伤 且 **非** 灼烧」 ✓ => **不会双倍加成** ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21026_boost_vs_wounded",
+      "when": [
+        "actor == self",
+        "target has_state 裂伤",
+        "!target has_state 灼烧"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.32,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条的 `!target has_state 灼烧` 与上一条合起来正是\"灼烧**或**裂伤\" ✓。"
+    }
+  ]
+}
