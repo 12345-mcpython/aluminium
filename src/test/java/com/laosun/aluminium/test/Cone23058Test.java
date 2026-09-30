@@ -82,6 +82,30 @@ public class Cone23058Test {
         Assertions.assertEquals(before, ordinaryHit(battle), 1e-9, "the clause names an ELATION skill (false case)");
     }
 
+    /** \u2605 The spec half: op, share, duration and the target set pinned, so a wrong duration has something to break. */
+    @Test
+    public void theSpecPinsTheNumbers() {
+        Battle battle = battle(true);
+        int pinned = 0;
+        for (var rule : wearer.getTriggerTable().matching(TriggerEvent.CAST_SETUP,
+                new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle,
+                        SkillCategory.ELATION_DAMAGE))) {
+            for (var effect : rule.effects()) {
+                if (!"MODIFY_DAMAGE_TAKEN".equals(effect.getOp())) {
+                    continue;
+                }
+                pinned++;
+                System.out.println("[23058] spec percent=" + effect.getPercent() + " damageType=" + effect.getDamageType()
+                        + " turns=" + effect.getTurns() + " target=" + effect.getTarget());
+                Assertions.assertEquals(0.15, effect.getPercent(), 1e-9, "15% at rank 1");
+                Assertions.assertNull(effect.getDamageType(), "no damage type -- the sentence says \u53d7\u5230\u7684\u4f24\u5bb3");
+                Assertions.assertEquals(2, effect.getTurns(), "for 2 turns");
+                Assertions.assertEquals("all_enemies", effect.getTarget(), "on every enemy");
+            }
+        }
+        Assertions.assertEquals(1, pinned, "exactly one such rule from this cone");
+    }
+
     @Test
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
