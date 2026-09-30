@@ -1,0 +1,262 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21022_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_shocked",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.16,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达** ✓：另一条规则负责「风化 且 **非** 触电」 ✓ => **不会双倍加成** ✓（「该效果对持续伤害也会生效」由 `BOOST_DAMAGE` 在每次伤害结算时自然覆盖 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_winded",
+      "when": [
+        "actor == self",
+        "target has_state 风化",
+        "!target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.16,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条要求**非**触电 ✓，与上一条合起来正好是\"触电**或**风化\" ✓。⚠ 状态名取自引擎的 DOT 状态表（灼烧/触电/裂伤/风化 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21022_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_shocked",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达** ✓：另一条规则负责「风化 且 **非** 触电」 ✓ => **不会双倍加成** ✓（「该效果对持续伤害也会生效」由 `BOOST_DAMAGE` 在每次伤害结算时自然覆盖 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_winded",
+      "when": [
+        "actor == self",
+        "target has_state 风化",
+        "!target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条要求**非**触电 ✓，与上一条合起来正好是\"触电**或**风化\" ✓。⚠ 状态名取自引擎的 DOT 状态表（灼烧/触电/裂伤/风化 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21022_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_shocked",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达** ✓：另一条规则负责「风化 且 **非** 触电」 ✓ => **不会双倍加成** ✓（「该效果对持续伤害也会生效」由 `BOOST_DAMAGE` 在每次伤害结算时自然覆盖 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_winded",
+      "when": [
+        "actor == self",
+        "target has_state 风化",
+        "!target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条要求**非**触电 ✓，与上一条合起来正好是\"触电**或**风化\" ✓。⚠ 状态名取自引擎的 DOT 状态表（灼烧/触电/裂伤/风化 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21022_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_shocked",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.28,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达** ✓：另一条规则负责「风化 且 **非** 触电」 ✓ => **不会双倍加成** ✓（「该效果对持续伤害也会生效」由 `BOOST_DAMAGE` 在每次伤害结算时自然覆盖 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_winded",
+      "when": [
+        "actor == self",
+        "target has_state 风化",
+        "!target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.28,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条要求**非**触电 ✓，与上一条合起来正好是\"触电**或**风化\" ✓。⚠ 状态名取自引擎的 DOT 状态表（灼烧/触电/裂伤/风化 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21022_break_effect",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_shocked",
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.32,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **析取用\"取反\"表达** ✓：另一条规则负责「风化 且 **非** 触电」 ✓ => **不会双倍加成** ✓（「该效果对持续伤害也会生效」由 `BOOST_DAMAGE` 在每次伤害结算时自然覆盖 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21022_boost_vs_winded",
+      "when": [
+        "actor == self",
+        "target has_state 风化",
+        "!target has_state 触电"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.32,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
+      "note": "⭐ **互斥** ✓：本条要求**非**触电 ✓，与上一条合起来正好是\"触电**或**风化\" ✓。⚠ 状态名取自引擎的 DOT 状态表（灼烧/触电/裂伤/风化 ✓）。"
+    }
+  ]
+}
