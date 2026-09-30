@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21056_party_break_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAK_DAMAGE_BOOST",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21056: 「进入战斗后，使我方全体造成的**击破伤容**提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐⭐ **为它新建了一个通道** ✓：**`BREAK_DAMAGE_BOOST`** ✓ —— 因为 `DamageType.BREAK` **刻意不受普通加成** ✓（`isBoostable() == false` ✓），所以「击破伤容提高」**没有地方可落** ✗⇒ 在 `BreakDamageCalculator.build` 里乘入基数 ✓（与破韧特攻并列 ✓，从**攻击者**读 ✓ ⇒ 全队只需每人都拿到该修饰器 ✓）。⚠ 强化击破（super break）**不受它影响** ✓（它自有 `SUPER_BREAK_BOOST` 独立一区 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21056_party_break_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAK_DAMAGE_BOOST",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21056: 「进入战斗后，使我方全体造成的**击破伤容**提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐⭐ **为它新建了一个通道** ✓：**`BREAK_DAMAGE_BOOST`** ✓ —— 因为 `DamageType.BREAK` **刻意不受普通加成** ✓（`isBoostable() == false` ✓），所以「击破伤容提高」**没有地方可落** ✗⇒ 在 `BreakDamageCalculator.build` 里乘入基数 ✓（与破韧特攻并列 ✓，从**攻击者**读 ✓ ⇒ 全队只需每人都拿到该修饰器 ✓）。⚠ 强化击破（super break）**不受它影响** ✓（它自有 `SUPER_BREAK_BOOST` 独立一区 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21056_party_break_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAK_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21056: 「进入战斗后，使我方全体造成的**击破伤容**提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐⭐ **为它新建了一个通道** ✓：**`BREAK_DAMAGE_BOOST`** ✓ —— 因为 `DamageType.BREAK` **刻意不受普通加成** ✓（`isBoostable() == false` ✓），所以「击破伤容提高」**没有地方可落** ✗⇒ 在 `BreakDamageCalculator.build` 里乘入基数 ✓（与破韧特攻并列 ✓，从**攻击者**读 ✓ ⇒ 全队只需每人都拿到该修饰器 ✓）。⚠ 强化击破（super break）**不受它影响** ✓（它自有 `SUPER_BREAK_BOOST` 独立一区 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21056_party_break_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAK_DAMAGE_BOOST",
+          "percent": 0.22,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21056: 「进入战斗后，使我方全体造成的**击破伤容**提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐⭐ **为它新建了一个通道** ✓：**`BREAK_DAMAGE_BOOST`** ✓ —— 因为 `DamageType.BREAK` **刻意不受普通加成** ✓（`isBoostable() == false` ✓），所以「击破伤容提高」**没有地方可落** ✗⇒ 在 `BreakDamageCalculator.build` 里乘入基数 ✓（与破韧特攻并列 ✓，从**攻击者**读 ✓ ⇒ 全队只需每人都拿到该修饰器 ✓）。⚠ 强化击破（super break）**不受它影响** ✓（它自有 `SUPER_BREAK_BOOST` 独立一区 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21056_party_break_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAK_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21056: 「进入战斗后，使我方全体造成的**击破伤容**提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐⭐ **为它新建了一个通道** ✓：**`BREAK_DAMAGE_BOOST`** ✓ —— 因为 `DamageType.BREAK` **刻意不受普通加成** ✓（`isBoostable() == false` ✓），所以「击破伤容提高」**没有地方可落** ✗⇒ 在 `BreakDamageCalculator.build` 里乘入基数 ✓（与破韧特攻并列 ✓，从**攻击者**读 ✓ ⇒ 全队只需每人都拿到该修饰器 ✓）。⚠ 强化击破（super break）**不受它影响** ✓（它自有 `SUPER_BREAK_BOOST` 独立一区 ✓）。"
+    }
+  ]
+}

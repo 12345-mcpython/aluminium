@@ -47,6 +47,14 @@ public enum AttributeType {
     @SerializedName("heal_taken_ratio") HEAL_TAKEN_RATIO("heal_taken_ratio"),
 
     @SerializedName("breaking_effect") BREAKING_EFFECT("breaking_effect"),
+    /**
+     * \u2705 How much a BREAK hit is worth (2026-09-30; reader: cone 21056's \u300c\u4f7f\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u51fb\u7834\u4f24\u5bb9\u63d0\u9ad8\u300d).
+     *
+     * <p>\u2605 A channel of its own because {@link DamageType#BREAK} is deliberately NOT boostable: the ordinary DMG
+     * boost zone never touches break damage, so a sentence about break damage needs somewhere else to land. It
+     * multiplies the break BASE (see {@code BreakDamageCalculator.build}), next to break effect.
+     */
+    @SerializedName("break_damage_boost") BREAK_DAMAGE_BOOST("break_damage_boost"),
     @SerializedName("energy_regeneration_rate") ENERGY_REGENERATION_RATE("energy_regeneration_rate"),
 
     @SerializedName("physical_damage_boost") PHYSICAL_DAMAGE_BOOST("physical_damage_boost"),
