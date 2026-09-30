@@ -1,0 +1,187 @@
+{
+  "1": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23015_dragon_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "龙吟",
+          "amount": 1,
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.18,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.06,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23015 比阳光更明亮的: 「当装备者施放普攻时，获得1层【龙吟】，持续#2[i]回合。每层【龙吟】使装备者的攻击力提高#4[i]%，能量恢复效率提高#5[f1]%。【龙吟】最多叠加#3[i]层」",
+      "note": "⭐⭐ **先叠层、后加成** ✓（与 `21005` 同型 ✓）：`ADD_STACK` 在同一条规则里排在前面 ✓ ⇒ `per_stack` 读到的是**当前层数** ✓（`21005` 的 note 实测过：挂在 `BATTLE_START` 会读到 0 ✗）。⭐ **两个属性共一个计数器** ✓（攻击力 + 能量恢复效率 ✓）。⭐ 文本**给了持续期** ✓（【龙吟】持续 2 回合 ✓）⇒ 两个加成也写 `turns: 2` ✓，与层数**同生共死** ✓（否则层数过期后加成会残留 ✗）。⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23015_dragon_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "龙吟",
+          "amount": 1,
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.21,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.07,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23015 比阳光更明亮的: 「当装备者施放普攻时，获得1层【龙吟】，持续#2[i]回合。每层【龙吟】使装备者的攻击力提高#4[i]%，能量恢复效率提高#5[f1]%。【龙吟】最多叠加#3[i]层」",
+      "note": "⭐⭐ **先叠层、后加成** ✓（与 `21005` 同型 ✓）：`ADD_STACK` 在同一条规则里排在前面 ✓ ⇒ `per_stack` 读到的是**当前层数** ✓（`21005` 的 note 实测过：挂在 `BATTLE_START` 会读到 0 ✗）。⭐ **两个属性共一个计数器** ✓（攻击力 + 能量恢复效率 ✓）。⭐ 文本**给了持续期** ✓（【龙吟】持续 2 回合 ✓）⇒ 两个加成也写 `turns: 2` ✓，与层数**同生共死** ✓（否则层数过期后加成会残留 ✗）。⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23015_dragon_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "龙吟",
+          "amount": 1,
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.24,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.08,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23015 比阳光更明亮的: 「当装备者施放普攻时，获得1层【龙吟】，持续#2[i]回合。每层【龙吟】使装备者的攻击力提高#4[i]%，能量恢复效率提高#5[f1]%。【龙吟】最多叠加#3[i]层」",
+      "note": "⭐⭐ **先叠层、后加成** ✓（与 `21005` 同型 ✓）：`ADD_STACK` 在同一条规则里排在前面 ✓ ⇒ `per_stack` 读到的是**当前层数** ✓（`21005` 的 note 实测过：挂在 `BATTLE_START` 会读到 0 ✗）。⭐ **两个属性共一个计数器** ✓（攻击力 + 能量恢复效率 ✓）。⭐ 文本**给了持续期** ✓（【龙吟】持续 2 回合 ✓）⇒ 两个加成也写 `turns: 2` ✓，与层数**同生共死** ✓（否则层数过期后加成会残留 ✗）。⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23015_dragon_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "龙吟",
+          "amount": 1,
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.27,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.09,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23015 比阳光更明亮的: 「当装备者施放普攻时，获得1层【龙吟】，持续#2[i]回合。每层【龙吟】使装备者的攻击力提高#4[i]%，能量恢复效率提高#5[f1]%。【龙吟】最多叠加#3[i]层」",
+      "note": "⭐⭐ **先叠层、后加成** ✓（与 `21005` 同型 ✓）：`ADD_STACK` 在同一条规则里排在前面 ✓ ⇒ `per_stack` 读到的是**当前层数** ✓（`21005` 的 note 实测过：挂在 `BATTLE_START` 会读到 0 ✗）。⭐ **两个属性共一个计数器** ✓（攻击力 + 能量恢复效率 ✓）。⭐ 文本**给了持续期** ✓（【龙吟】持续 2 回合 ✓）⇒ 两个加成也写 `turns: 2` ✓，与层数**同生共死** ✓（否则层数过期后加成会残留 ✗）。⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23015_dragon_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "龙吟",
+          "amount": 1,
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.3,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.1,
+          "per_stack": "龙吟",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23015 比阳光更明亮的: 「当装备者施放普攻时，获得1层【龙吟】，持续#2[i]回合。每层【龙吟】使装备者的攻击力提高#4[i]%，能量恢复效率提高#5[f1]%。【龙吟】最多叠加#3[i]层」",
+      "note": "⭐⭐ **先叠层、后加成** ✓（与 `21005` 同型 ✓）：`ADD_STACK` 在同一条规则里排在前面 ✓ ⇒ `per_stack` 读到的是**当前层数** ✓（`21005` 的 note 实测过：挂在 `BATTLE_START` 会读到 0 ✗）。⭐ **两个属性共一个计数器** ✓（攻击力 + 能量恢复效率 ✓）。⭐ 文本**给了持续期** ✓（【龙吟】持续 2 回合 ✓）⇒ 两个加成也写 `turns: 2` ✓，与层数**同生共死** ✓（否则层数过期后加成会残留 ✗）。⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。"
+    }
+  ]
+}
