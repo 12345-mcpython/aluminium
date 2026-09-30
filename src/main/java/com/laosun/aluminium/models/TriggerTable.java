@@ -979,6 +979,17 @@ public class TriggerTable {
      * this is true exactly when the instance is an ordinary attack, and false for additional damage.
      */
     static final String DAMAGE_IS_ATTACK = "damage_is_attack";
+    /**
+     * \u2705 The bare keyword \u300c\u9020\u6210**\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027**\u7684\u4f24\u5bb9\u300d (2026-09-30; readers: light cone 21011 and
+     * relic set 312). No subject and no value, like {@link #DAMAGE_IS_ATTACK}: the second party is the RULE\u2019S OWNER, so
+     * "same Type as the wearer" is the only reading it can have.
+     *
+     * <p>\u2605 The element lives on the unit ({@code Character.element}, set from the character data\u2019s own attribute), not on
+     * the skill, and the damage instance carries the element it was built with -- so this compares the two directly. For a
+     * memosprite owner the master\u2019s element is the one the sentence means, which is the same convention the MEMORY damage
+     * hook uses in {@code Battle.assemble}.
+     */
+    static final String DAMAGE_ELEMENT_IS_SELF = "damage_element_is_self";
 
     /**
      * The events whose {@code TriggerContext} carries the <b>causing cast</b>, and therefore the only ones on which
@@ -1142,6 +1153,19 @@ public class TriggerTable {
                                 + "(source: " + spec.getSource() + ")");
             }
             return new DamageIsAttack(raw);
+        }
+
+        // `damage_element_is_self`: the bare-keyword sibling of `damage_is_attack`, one clause further in --
+        // it asks about the instance\u2019s ELEMENT instead of its type, and compares it with the rule owner\u2019s own.
+        if (text.trim().equalsIgnoreCase(DAMAGE_ELEMENT_IS_SELF)) {
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks whether the instance shares my element, but " + spec.getOn()
+                                + " carries no damage instance; it belongs on an event that settles one "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new DamageElementIsSelf(raw);
         }
 
         // `<subject>_debuff:<ATTR>`: the party carries a negative modifier on that attribute -- "\u9632\u5fa1\u529b\u88ab\u964d\u4f4e"
@@ -2142,6 +2166,40 @@ public class TriggerTable {
      * <p>Additional damage is an instance too, and it is deliberately marked {@code notCountsAsAttack()}, so this is the one
      * question that tells the two apart where it matters: a rule that would otherwise react to its own extra instance.
      */
+    /** \u2605 The element half of {@link #DAMAGE_IS_ATTACK}: the instance\u2019s element against the rule owner\u2019s own. */
+    private static final class DamageElementIsSelf implements Condition {
+        private final String raw;
+
+        DamageElementIsSelf(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            if (ctx.damage() == null || ctx.damage().getElement() == null) {
+                return false;
+            }
+            CanHit owner = ctx.owner();
+            if (owner instanceof com.laosun.aluminium.models.Summon summon && summon.getMaster() != null) {
+                owner = summon.getMaster();
+            }
+            if (!(owner instanceof com.laosun.aluminium.models.Character character)) {
+                return false;
+            }
+            return character.getElement() != null && character.getElement() == ctx.damage().getElement();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
     private static final class DamageIsAttack implements Condition {
         private final String raw;
 
