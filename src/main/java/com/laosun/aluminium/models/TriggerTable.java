@@ -946,6 +946,18 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])from_skill(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The {@code from_category} keyword: "the cast that caused this event was of this CATEGORY"
+     * (\u300c\u88c5\u5907\u8005\u65bd\u653e**\u6b22\u6109\u6280**\u65f6\u300d, \u5149\u9525 21064 / 21066 / 23058 / 23064).
+     *
+     * <p>\u2605 Why it exists next to {@code from_skill}: the slot names a SKILL SLOT ({@code SKILL} = an ordinary Skill), while
+     * a memosprite's or a \u6b22\u6109 kit's cast is a category the slot vocabulary does not have at all --
+     * {@code SkillCategory.ELATION_DAMAGE} is precisely the one {@code SkillType} lacks. Reading the category directly is
+     * the honest spelling for those sentences; {@code from_skill} keeps its meaning for the slot ones.
+     */
+    private static final Pattern FROM_CATEGORY =
+            Pattern.compile("(?<![\\w])from_category(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
      * The bare keyword {@code damage_is_attack}: "the instance being settled counts as an attack".
      *
      * <p><b>Why this exists</b> (2026-09-28): additional damage is settled as a real instance with
@@ -1139,6 +1151,43 @@ public class TriggerTable {
                                 + " (source: " + spec.getSource() + ")");
             }
             return new FromSkill(requireInBattleSlot(slot, raw, spec), raw, spec);
+        }
+
+        Matcher fromCategory = FROM_CATEGORY.matcher(text);
+        if (fromCategory.find()) {
+            String before = normalize(text.substring(0, fromCategory.start()));
+            String stated = text.substring(fromCategory.end()).trim();
+            if (!before.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something before \"from_category\": the keyword takes no "
+                                + "subject -- who cast it is its own condition, so write for example "
+                                + "\"actor == self\" and \"from_category ELATION_DAMAGE\" (source: " + spec.getSource() + ")");
+            }
+            // \u2605 Two spellings, one fact: the skill data says `ElationDamage`, the enum's own name is `ELATION_DAMAGE`.
+            // The project already lives with this pair for attributes (JSON name vs enum name), so both are accepted --
+            // `fromString` for the data's spelling, `valueOf` for the engine's.
+            SkillCategory wanted = SkillCategory.fromString(stated);
+            if (wanted == null) {
+                try {
+                    wanted = SkillCategory.valueOf(stated.trim().toUpperCase(java.util.Locale.ROOT));
+                } catch (IllegalArgumentException unknown) {
+                    wanted = null;
+                }
+            }
+            if (wanted == null || !wanted.isKnownValue()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' names the cast category '" + stated + "', which the engine does not "
+                                + "know; the categories are the ones the skill data spells (source: " + spec.getSource() + ")");
+            }
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !CAST_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks the cast's category, but " + spec.getOn()
+                                + " carries none, so the condition could never hold; it works on "
+                                + String.join(" / ", CAST_CARRYING_EVENTS.stream().map(Enum::name).sorted().toList())
+                                + " (source: " + spec.getSource() + ")");
+            }
+            return new FromCategory(wanted, raw);
         }
 
         if (!containsOperator(text)) {
@@ -2055,6 +2104,28 @@ public class TriggerTable {
             // cone 23008's energy clause read +0.0 because of it). `Damage.countsAsAttack` defaults to true, so the
             // negation made every ordinary attack fail the guard it was written to pass.
             return ctx.damage() != null && ctx.damage().isCountsAsAttack();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /** \u2605 {@code from_category}: the causing cast's category, read straight from the event's context. */
+    private static final class FromCategory implements Condition {
+
+        private final SkillCategory wanted;
+        private final String raw;
+
+        FromCategory(SkillCategory wanted, String raw) {
+            this.wanted = wanted;
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.fromCast() != null && ctx.fromCast() == wanted;
         }
 
         @Override
