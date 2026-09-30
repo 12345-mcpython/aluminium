@@ -825,7 +825,7 @@ public class TriggerTable {
      * {@link AttributeType}, the second for shape here and for existence where the character is assembled.
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
+            Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
                     "target_summon_count", "self_max_energy", "from_skill_id", "target_dot_count");
 
     /**
@@ -2562,7 +2562,9 @@ public class TriggerTable {
                 // makes the comparison false rather than accidentally true for the row 0 that no skill has).
                 case "from_skill_id" -> ctx.skillId();
                 case "hp_percent" -> hpPercent(ctx.owner());
-                case "target_debuff_count", "target_dot_count" -> ctx.target() == null ? Double.NaN
+                case "target_weakness_count" -> ctx.target() instanceof com.laosun.aluminium.models.enemy.Enemy weak
+                            ? weak.weaknessCount() : 0;
+                    case "target_debuff_count", "target_dot_count" -> ctx.target() == null ? Double.NaN
                         : ("target_dot_count".equals(variable)
                                 ? ctx.target().getBuffManager().countBuffs(com.laosun.aluminium.models.buff.DotBuff.class)
                                 : ctx.target().getBuffManager().debuffCount());
