@@ -74,9 +74,15 @@ public final class SkillExecutor {
         // P11-1 (M-40): the **pre-cast hook**, and the only moment at which a rule can still change what this cast
         // does. It fires before the damage is expanded because "this cast's damage is not mine to deal" is a fact
         // about the CAST: a rule that learns it afterwards (on ULT_CAST, say) can no longer stop the swing.
+        // \u2605 Which cast this is, computed ONCE and early (2026-09-30): `CAST_SETUP` is the pre-cast hook and the only
+        // place a rule can raise something the cast's OWN heal must see, so it has to know the slot -- cones 20001 /
+        // 21000 state exactly that. The expression is the same one the after-events use, so the two cannot disagree.
+        SkillCategory category = skill == null || skill.getData() == null
+                ? SkillCategory.UNSPECIFIED
+                : skill.getData().getCategory();
         Battle.PendingCast cast = battle.beginCast(skill, user);
         try {
-            battle.fireTriggers(TriggerEvent.CAST_SETUP, user, null, 0, 0);
+            battle.fireTriggers(TriggerEvent.CAST_SETUP, user, null, 0, 0, category);
             if (!cast.damageDelegated()) {
                 resolveHits(battle, skill, user, targets, hitTargets);
             }

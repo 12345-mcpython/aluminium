@@ -969,6 +969,18 @@ public class TriggerTable {
     private static final Set<TriggerEvent> DAMAGE_CARRYING_EVENTS =
             Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK);
 
+    /**
+     * The events whose context carries the <b>cast category</b>, which is what {@code from_skill} reads.
+     *
+     * <p>\u2605 A superset of {@link #DAMAGE_CARRYING_EVENTS}: {@code CAST_SETUP} carries the category without a damage instance,
+     * and it is precisely the event a rule needs for \u300c\u65bd\u653e\u2026\u65f6\u300d -- the modifier must exist while the cast's own
+     * heal settles, and {@code ULT_CAST} / {@code SKILL_CAST} fire after that. Keeping the sets apart is what lets
+     * {@code damage_is_attack} stay damage-only.
+     */
+    private static final Set<TriggerEvent> CAST_CARRYING_EVENTS =
+            Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK,
+                    TriggerEvent.CAST_SETUP);
+
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
             throw new IllegalArgumentException("Empty trigger condition (source: " + spec.getSource() + ")");
@@ -1119,11 +1131,11 @@ public class TriggerTable {
                                 + "\"actor == self\" and \"from_skill SKILL\" (source: " + spec.getSource() + ")");
             }
             TriggerEvent event = TriggerEvent.fromString(spec.getOn());
-            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+            if (event == null || !CAST_CARRYING_EVENTS.contains(event)) {
                 throw new IllegalArgumentException(
                         "Condition '" + raw + "' asks which slot caused the event, but " + spec.getOn()
-                                + " carries no causing damage instance, so the condition could never hold; it works on "
-                                + String.join(" / ", DAMAGE_CARRYING_EVENTS.stream().map(Enum::name).sorted().toList())
+                                + " carries no cast category, so the condition could never hold; it works on "
+                                + String.join(" / ", CAST_CARRYING_EVENTS.stream().map(Enum::name).sorted().toList())
                                 + " (source: " + spec.getSource() + ")");
             }
             return new FromSkill(requireInBattleSlot(slot, raw, spec), raw, spec);

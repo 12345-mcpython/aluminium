@@ -878,6 +878,26 @@ public class BuffManager {
         return count;
     }
 
+    /**
+     * Removes every buff whose lifetime names {@code lifetime} -- the cast-scoped one is the current reader.
+     *
+     * <p>\u26a0 Over the manager's own list, not {@code allBuffsOf}: that helper compares classes exactly and a modifier may be
+     * a subclass (the same trap {@link #suspendsTurns} documents).
+     *
+     * @param lifetime which end-of-event lifetime to drop
+     * @return how many were removed
+     */
+    public int removeWithLifetime(AbstractBuff.Lifetime lifetime) {
+        int removed = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff.getLifetimes().contains(lifetime)) {
+                removeBuff(buff);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
     public boolean suspendsTurns() {
         // ⚠ Over the manager's own list, NOT `allBuffsOf`/`instanceof`: that helper compares classes exactly
         // (`buff.getClass() == kind`), and a modifier may be a *subclass* of StatModifierBuff -- a per-class scan

@@ -307,6 +307,15 @@ public class Battle {
      */
     public void endCastOutcome() {
         castApplied.clear();
+        // \u2605 \u300c\u65bd\u653e\u2026\u65f6\u300d ends here: every event of this cast has been delivered, so a modifier stating
+        // `"until": "cast_end"` has covered every heal the cast performed and nothing after it. Swept on both sides,
+        // because either camp may carry one.
+        for (CanHit unit : allies) {
+            unit.getBuffManager().removeWithLifetime(AbstractBuff.Lifetime.CAST_END);
+        }
+        for (CanHit unit : enemies) {
+            unit.getBuffManager().removeWithLifetime(AbstractBuff.Lifetime.CAST_END);
+        }
     }
 
     /**
