@@ -6196,6 +6196,34 @@
 >   （本轮两次都栽在这里：第 6 轮凭想象拼源码 ✓，本轮凭想象限定了 grep 条件 ✓）。
 > * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **100 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之三百八十三：**再出两张卡**（光锥 **102 / 169**）—— 顺带记下三条"加载器教的写法"**）：
+> 
+> * ✅ **出货：光锥 20018** ✓ 五档 —— 「施放战技后，使装备者的**下一次普攻**对敌方目标造成等同于自身 **60%** 攻击力的**附加伤害**」✓
+>   = **两步**：`SKILL_CAST` ⇒ 上标记（**`until: next_attack`** ✓）；`DEALING_DAMAGE` + 标记在手 ⇒ **`ADD_DAMAGE`** ✓
+>   （`percent: 0.6` + **`scale: self_attr:ATTACK`** ✓）+ 清标记 ✓。
+> * ✅ **出货：光锥 23033** ✓ 五档 —— 击破特攻 +60%（`props` ✓ **未重写** ✗）；「进入战斗时立即恢复 **30** 点能量」✓；
+>   「施放终结技后获得【雷遁】，**施放 2 次普攻后**行动提前 **50%** 并移除【雷遁】；**终结技会重置【雷遁】**」✓
+>   = 计数器状态机 ✓（与 23057 / 23064 / 23021 同一套 ✓，纪律 184 ✓）+ `ADVANCE` ✓。
+> * ⚠ **三条加载器给的写法（都对 ✓）**：
+>   ① **`ADD_DAMAGE` 只能挂在 `DEALING_DAMAGE`** ✓（原文：*"that is the event that hands over what it changes"* ✓）⇒ 改成"**先上标记、命中时消耗**" ✓。
+>   ② **`scale` 的写法是 `self_attr:ATTACK`** ✓；我写 `owner_attack` ✗ 被拒 ✓。
+>   ③ **`APPLY_BUFF` + `permanent` 无法被移除** ✗ ⇒ 【雷遁】改用**同名计数器** ✓（实测发放时真能清掉 ✓）。
+> * **判据读数（实测 ✓）** ✓：
+> >   * `[20018] spec armed by cone20018_arm_next_basic op=ADD_STACK until=[next_attack] target=self`
+>   * `[20018] plain=476.19048752834533 ; with the cone before a Skill=476.19048752834533 after a Skill=722.1424933843446`
+>   * `[20018] without the cone, rules matching: 0`
+>   * `[23033] after a Skill used as an attack: count=0`
+>   * `[23033] armed=true after 1 basic=1 after 2 basics=0 stillArmed=false`
+>   * `[23033] one basic=1 ; after another Ultimate=0`
+> * **四条变异（经 `tools/mutate.py` ✓）** ✓：20018 extra damage 60 -> 30 percent=0 | 20018 marker lifetime -> cast_end=2 | 23033 start energy 30 -> 15=0 | 23033 advance 50 -> 25 percent=0
+> * ⚠ 20018 extra damage 60 -> 30 percent、23033 start energy 30 -> 15、23033 advance 50 -> 25 percent 实测 **0 红** ✗（下一轮修 ✓）。
+> * **引擎级对照** ✓：让 `ADD_DAMAGE` 的分支直接返回 ⇒ **NOT EVIDENCE: the control ran but nothing failed -- the judge may not press this code** ✓。
+> * ⚠ **两处判据教训** ✓：① 规格半要在**满计数**（或标记在手 ✓）时才看得到另一条规则 ✓ ⇒
+>   必须**用真实事件**把它推到位 ✓（"直接塞 StackBuff"与"手推 SKILL_CAST"**都不生效** ✗ —— 后者没有施放上下文 ✓）；
+>   ② 本卡**两条规则挂在两个事件上** ✓ ⇒ 查规则时要么**两个事件都查** ✓，要么把消耗那半**交给行为半** ✓（本轮选后者 ✓）。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **102 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
