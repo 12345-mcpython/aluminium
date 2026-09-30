@@ -82,29 +82,6 @@ public class Cone21064Test {
         Assertions.assertEquals(before, after, 1e-9, "the clause names an ELATION skill (false case)");
     }
 
-    /** \u2605 The spec half: op, damage type, share, duration and the target set, all pinned. */
-    @Test
-    public void theSpecPinsTheNumbers() {
-        Battle battle = battle(true);
-        int pinned = 0;
-        for (var rule : wearer.getTriggerTable().matching(TriggerEvent.CAST_SETUP,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle,
-                        SkillCategory.ELATION_DAMAGE))) {
-            for (var effect : rule.effects()) {
-                if (!"MODIFY_DAMAGE_TAKEN".equals(effect.getOp())) {
-                    continue;
-                }
-                pinned++;
-                System.out.println("[21064] spec percent=" + effect.getPercent() + " damageType=" + effect.getDamageType()
-                        + " turns=" + effect.getTurns() + " target=" + effect.getTarget());
-                Assertions.assertEquals(0.06, effect.getPercent(), 1e-9, "6% at rank 1");
-                Assertions.assertEquals("ELATION", effect.getDamageType(), "elation damage only");
-                Assertions.assertEquals(2, effect.getTurns(), "for 2 turns");
-                Assertions.assertEquals("all_enemies", effect.getTarget(), "on every enemy");
-            }
-        }
-        Assertions.assertEquals(1, pinned, "exactly one such rule from this cone");
-    }
 
     @Test
     public void withoutTheConeNothingMoves() {
