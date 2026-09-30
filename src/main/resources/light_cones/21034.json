@@ -1,0 +1,97 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21034_damage_per_energy",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0019999999,
+          "cap_amount": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21034 今日亦是和平的一日: 进入战斗后，根据装备者的能量上限，提高装备者造成的伤害：每点能量提高#1[f2]%，最多计入#2[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⭐ 「根据装备者的**能量上限** ⇒ **每点能量提高 #1**」= **`scale: self_max_energy`** ✓ + `percent: #1` ✓；「**最多计入 #2 点**」= **`cap_amount: #1 × #2 = 0.32`** ✓（第 203/240 轮新增的常量上限 ✓；⚠ 已在 `applyDerivedCeiling` **内部**夹取 ✓，不在 cap 分支 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21034_damage_per_energy",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0025000002,
+          "cap_amount": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21034 今日亦是和平的一日: 进入战斗后，根据装备者的能量上限，提高装备者造成的伤害：每点能量提高#1[f2]%，最多计入#2[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⭐ 「根据装备者的**能量上限** ⇒ **每点能量提高 #1**」= **`scale: self_max_energy`** ✓ + `percent: #1` ✓；「**最多计入 #2 点**」= **`cap_amount: #1 × #2 = 0.4`** ✓（第 203/240 轮新增的常量上限 ✓；⚠ 已在 `applyDerivedCeiling` **内部**夹取 ✓，不在 cap 分支 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21034_damage_per_energy",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0029999998,
+          "cap_amount": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21034 今日亦是和平的一日: 进入战斗后，根据装备者的能量上限，提高装备者造成的伤害：每点能量提高#1[f2]%，最多计入#2[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⭐ 「根据装备者的**能量上限** ⇒ **每点能量提高 #1**」= **`scale: self_max_energy`** ✓ + `percent: #1` ✓；「**最多计入 #2 点**」= **`cap_amount: #1 × #2 = 0.48`** ✓（第 203/240 轮新增的常量上限 ✓；⚠ 已在 `applyDerivedCeiling` **内部**夹取 ✓，不在 cap 分支 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21034_damage_per_energy",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0035,
+          "cap_amount": 0.56,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21034 今日亦是和平的一日: 进入战斗后，根据装备者的能量上限，提高装备者造成的伤害：每点能量提高#1[f2]%，最多计入#2[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⭐ 「根据装备者的**能量上限** ⇒ **每点能量提高 #1**」= **`scale: self_max_energy`** ✓ + `percent: #1` ✓；「**最多计入 #2 点**」= **`cap_amount: #1 × #2 = 0.56`** ✓（第 203/240 轮新增的常量上限 ✓；⚠ 已在 `applyDerivedCeiling` **内部**夹取 ✓，不在 cap 分支 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21034_damage_per_energy",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_max_energy",
+          "percent": 0.0039999997,
+          "cap_amount": 0.64,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21034 今日亦是和平的一日: 进入战斗后，根据装备者的能量上限，提高装备者造成的伤害：每点能量提高#1[f2]%，最多计入#2[i]点。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⭐ 「根据装备者的**能量上限** ⇒ **每点能量提高 #1**」= **`scale: self_max_energy`** ✓ + `percent: #1` ✓；「**最多计入 #2 点**」= **`cap_amount: #1 × #2 = 0.64`** ✓（第 203/240 轮新增的常量上限 ✓；⚠ 已在 `applyDerivedCeiling` **内部**夹取 ✓，不在 cap 分支 ✗）。"
+    }
+  ]
+}
