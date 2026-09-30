@@ -6369,6 +6369,35 @@
 >   ✅ 固定动作：**挑选候选时只取以 `;` 结尾的行** ✓，并且**按打印出的行号**取 ✓。
 > * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **104 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之三百九十二：**新条件 `target_debuff:<ATTR>`** —— 由两张卡提出，含三处反例（光锥 **106 / 169**））**：
+> 
+> * ✅✅ **能力（读者：光锥 22000 ✓ 与 21044 ✓）** ✓：条件 **`<subject>_debuff:<ATTR>`** ✓
+>   （`self_` / `actor_` / `target_` ✓，与 `self_attr:` / `target_stacks:` 同一个"前缀参数"族 ✓）。
+>   ⭐ **判定依据是既有事实** ✓：该属性上挂着 **`DEBUFF` 来源**的修饰器 ✓（`DoubleValue.filterBySource(DEBUFF)` ✓ 本来就在 ✓）。
+> * ⭐⭐ **为何不用 `DebuffClass`** ✗：它只有 **CONTROL / DOT** 两个**族** ✓（控制类 / 持续伤害类 ✓），
+>   而"**属性被降低**"**不属于任何一族** ✗ ⇒ 用它会把"防御降低 / 减速"这类句子**逼成近似** ✓。
+> * ⚠ **同时修正一条旧登记** ✓：我曾在 GAPS 里把 23053 需要的「**每有一名某命途角色**」记成缺能力 ✗ ——
+>   **`has_path` 本来就在** ✓（`TriggerTable` 第 895 行 ✓）⇒ 纪律 197（先查词汇在哪一层 ✓）再次适用 ✓。
+> * ✅ **出货：光锥 22000** ✓（「攻击**防御力被降低的**敌方目标后恢复 4 点能量」✓）与 **21044** ✓
+>   （「对处于**防御降低或减速**状态的敌人暴击伤害 +24%」✓ = **两条规则** ✓，因为词汇里**没有 OR** ✓，而两条规则就是 OR ✓）。
+> * **判据读数（实测 ✓）** ✓：
+> >   * `[debuff] after RAISING the enemy's defence: matches=false`
+>   * `[debuff] refused: Unknown AttributeType: NOT_AN_ATTRIBUTE`
+>   * `[debuff] the ENEMY is lowered, the condition asks about SELF: matches=false`
+>   * `[debuff] after lowering the enemy's defence: matches=true`
+>   * `[22000] without the cone: energy +0.0`
+>   * `[22000] energy after a plain hit = 0.0 ; after hitting a lowered target = 4.0`
+>   * `[21044] rules matching -- plain=0 defence lowered=1 defence+speed lowered=2`
+>   ⭐ 三处**反例**都在：**把防御"提高"** ⇒ `false` ✓（`被降低` ≠ `被提高` ✓）、
+>   **"别人"身上被降低** ⇒ `false` ✓（条件指明当事人 ✓）、**没有减益** ⇒ `0` ✓。
+> * **四条变异（经 `tools/mutate.py` ✓ + 一条引擎级 ✓）** ✓：22000 energy 4 -> 8=1 | 21044 crit damage 24 -> 12 percent=0 | 21044 defence rule now asks about SPEED=1 | engine condition inverted=4
+> * ⚠ 21044 crit damage 24 -> 12 percent 实测 **0 红** ✗（下一轮修 ✓）。
+> * **引擎级对照** ✓（先打印候选 ✓ 再按行取 ✓）：让"是否被降低"恒为假 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⚠ **一处加载器事实** ✓：`AttributeType.fromString` 对未知拼写是**抛异常**（`Unknown AttributeType: …` ✓），
+>   不是返回 null ✗ ⇒ 我原先那句"引擎不认识"的自检**永远不会执行** ✓（判据改为断言枚举自己的文案 ✓）。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **106 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：

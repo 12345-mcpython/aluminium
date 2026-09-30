@@ -67,6 +67,10 @@ public class Cone21044Test {
     @Test
     public void theSpecPinsTheShareAndTheAttribute() {
         build();
+        // \u2605 Arm the condition FIRST (discipline 182): `matching` evaluates conditions, and without a lowered attribute
+        // no cone rule exists at all -- which is how the `24 -> 12 percent` mutation escaped this half (measured: 0 red).
+        lower(AttributeType.DEFENCE);
+        lower(AttributeType.SPEED);
         int pinned = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle, null))) {
@@ -81,6 +85,6 @@ public class Cone21044Test {
                 Assertions.assertEquals(0.24, effect.getPercent(), 1e-9, "24% at rank 1");
             }
         }
-        Assertions.assertEquals(0, pinned, "the effect lives on the condition-bearing rule, primed above");
+        Assertions.assertEquals(2, pinned, "both conditions' rules are reachable once the target is lowered");
     }
 }
