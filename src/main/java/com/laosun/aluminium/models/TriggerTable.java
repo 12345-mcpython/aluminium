@@ -826,7 +826,8 @@ public class TriggerTable {
      */
     private static final Set<String> NUMERIC_VARIABLES =
             Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
-                    "target_summon_count", "self_max_energy", "from_skill_id", "target_dot_count");
+                    "target_summon_count", "self_max_energy", "from_skill_id", "target_dot_count",
+            "actor_hp_percent");
 
     /**
      * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -2785,6 +2786,9 @@ public class TriggerTable {
                 // 「若该目标当前生命值百分比大于等于 30%」 -- the OTHER unit's HP, which `hp_percent` cannot ask
                 // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
                 case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());
+                // \u2705 The ACTOR's share (2026-09-30; reader: light cone 21055's \u300c\u6211\u65b9\u76ee\u6807\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4
+                // \u5927\u4e8e\u7b49\u4e8e 50%\u65f6\u300d): "our unit" there is the one dealing the damage, so the third subject.
+                case "actor_hp_percent" -> hpPercent(ctx.actor());
                 // ? The same fraction BEFORE this event's loss (2026-09-29): 「降到50%或以下」 is a CROSSING, not "is below half", and the
                 // difference is firing once versus firing on every later hit. HP_LOST carries the loss in `amount`, so before = (current + amount) / max.
                 case "target_hp_percent_before" -> ctx.target() == null || ctx.target().getMaxHp() <= 0
