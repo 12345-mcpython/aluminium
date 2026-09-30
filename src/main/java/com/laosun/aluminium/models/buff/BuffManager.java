@@ -727,6 +727,14 @@ public class BuffManager {
         if (BROKEN_STATE.equals(wanted)) {
             return instance instanceof com.laosun.aluminium.models.enemy.Enemy enemy && enemy.isBroken();
         }
+        // ★ A named DOT answers to its NAME too (2026-09-30): the element table below only knows 灼烧/触电/裂伤/风化,
+        // while the corpus also asks about 【游丝】 by name. A named THUNDER DOT therefore answers BOTH 游丝 and 触电 -- which is
+        // exactly the sentence 「【游丝】状态下也被视为陷入了触电状态」.
+        for (DotBuff dot : allBuffsOf(DotBuff.class)) {
+            if (wanted.equals(dot.getBuffName())) {
+                return true;
+            }
+        }
         DamageElement dotElement = DOT_STATES.get(wanted);
         if (dotElement == null) {
             return false;
