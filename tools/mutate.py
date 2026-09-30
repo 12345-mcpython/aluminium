@@ -21,7 +21,7 @@ EFFECT_LEVEL = {
 }
 
 
-def mutate(path, rank, rule_id, field, value, effect_op=None):
+def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=None):
     """Set `field` on the named rule; returns the value read back from disk."""
     if field not in RULE_LEVEL and field not in EFFECT_LEVEL:
         raise SystemExit('mutation refused: field %r belongs to no known layer' % field)
@@ -36,6 +36,8 @@ def mutate(path, rank, rule_id, field, value, effect_op=None):
         else:
             for do in rule.get('do', []):
                 if effect_op is not None and do.get('op') != effect_op:
+                    continue
+                if effect_attribute is not None and do.get('attribute') != effect_attribute:
                     continue
                 do[field] = value
                 touched += 1
