@@ -32,6 +32,8 @@ public class Cone20018Test {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
+    private static final double RANK_ONE = 0.6;
+    private static final double RANK_TWO = 0.75;
 
     private Character wearer;
     private Enemy enemy;
@@ -46,6 +48,25 @@ public class Cone20018Test {
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 200181));
         return battle;
+    }
+
+    private double extraDamageAtRank(int rank) {
+        Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
+        Enemy target = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(unit), List.of(target), new Random(0));
+        battle.startBattle();
+        unit.getAttribute(AttributeType.CRIT_CHANCE)
+                .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 200183));
+        double before = battle.applyDamage(target,
+                new Damage(unit, target, DamageElement.FIRE, DamageType.NORMAL, 1000));
+        var skill = unit.getSkills().values().stream()
+                .filter(candidate -> candidate.getData() != null
+                        && candidate.getData().getCategory() == SkillCategory.BPSKILL)
+                .findFirst().orElseThrow();
+        battle.castImmediate(skill, unit, List.of(target));
+        double after = battle.applyDamage(target,
+                new Damage(unit, target, DamageElement.FIRE, DamageType.NORMAL, 1000));
+        return after - before;
     }
 
     private void castASkill(Battle battle) {
@@ -96,6 +117,17 @@ public class Cone20018Test {
                 "before the Skill the cone changes nothing");
         Assertions.assertTrue(afterSkill > beforeAnySkill,
                 "after a real Skill cast the next hit carries the extra damage");
+        // \u2605 The SHARE, judged by scaling (discipline 200): a direction-only assertion holds for ANY non-zero share, so the
+        // `60% -> 30%` mutation was 0 red. An absolute expectation is unavailable (the extra damage has its own defence zone),
+        // and a HAND-BUILT half share is not comparable either -- its unit has a different table and a different attack
+        // (measured: 245.95 vs 77.62, i.e. 3.2:1). Two RANKS of the SAME cone on the SAME wearer are comparable, so the ratio
+        // of their extras must be the ratio of their shares.
+        double full = afterSkill - beforeAnySkill;
+        double otherRank = extraDamageAtRank(2);
+        System.out.println("[20018] extra at rank 1 (" + RANK_ONE + ") = " + full + " ; rank 2 (" + RANK_TWO + ") = "
+                + otherRank);
+        Assertions.assertEquals(RANK_TWO / RANK_ONE, otherRank / full, 0.02,
+                "the two ranks' extras must be in the ratio of their shares");
     }
 
     @Test
