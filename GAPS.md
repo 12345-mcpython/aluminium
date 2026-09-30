@@ -5737,6 +5737,35 @@
 >   **先找到，再最小化** ✓）。
 > * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **90 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之三百六十：**光锥 24002 出货**（光锥线 **91 / 169**）—— `cooldown` 的层级陷阱**）：
+> 
+> * ✅ **出货：光锥 24002 的第 ① 句** ✓ 五档 —— 效果抵抗 +8%（`props` ✓ **未重写** ✗）；
+>   「受到攻击后，若**自身未持有护盾** ⇒ 获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**每 3 回合只触发 1 次**」✓
+>   = `TAKING_HIT` ✓ + **`!self has_shield`** ✓ + `SHIELD scale owner_max_hp` ✓ + `turns: 2` ✓ + **规则级 `cooldown: 3`** ✓。
+> * **判据读数（实测 ✓，三个方向都有"不成立"的读数 ✓）** ✓：
+> >   * `[24002] after a hit: shield=603.2033280000002 expected=603.2033280000002 maxHp=3770.0208000000007`
+>   * `[24002] second hit within 3 turns: shield=0.0 (first was 603.2033280000002)`
+>   * `[24002] already shielded: 500.0 -> 500.0`
+>   * `[24002] spec scale=owner_max_hp percent=0.16 turns=2`
+> * ⭐⭐⭐ **本轮最有价值的一条（纪律 187）** ✓：**同一个词可以活在两个层级，放错层级是静默的** ✗ ——
+>   我把 `cooldown` 写在**效果里** ✗ ⇒ **加载器没有报错** ✓、规则照常命中 ✓，只有"第二次命中不放行"这条读数不对 ✗。
+>   实测定位：`cooldown` 属于 **`TriggerSpec`（规则级）** ✓，由 `validateCooldown` 在加载时校验 ✓，并在
+>   `CanHit.startTriggerCooldown(rule.key(), …)` 处生效 ✓。⇒ **规则级字段**（`cooldown` / `once_per_battle` ✓ /
+>   `per_turn` / `per_attack` / `chance` / `min_eidolon` ✓）与**效果级字段**（`percent` / `turns` / `target` / `scale` ✓）
+>   **不能混放** ✗，而且**只有行为读数**能发现放错 ✓。
+> * ✅ 另修一处**我自己的错** ✓：规格半的上下文用了 `target = 敌人` ✗，而本句的闸门是 `target == self`（**被击者是目标** ✓）
+>   ⇒ 改成 `target = 佩戴者` ✓（纪律 182 的又一形态 ✓）。
+> * **五条变异（经 `tools/mutate.py` ✓）** ✓：24002 shield share 16 -> 8 percent=2 | 24002 scale owner_max_hp -> target_max_hp=0 | 24002 duration 2 -> 1 turn=1 | 24002 cooldown 3 -> 1 turn (rule level)=0 | 24002 gate !has_shield -> has_shield=3
+> * ⚠ 24002 scale owner_max_hp -> target_max_hp、24002 cooldown 3 -> 1 turn (rule level) 实测 **0 红** ✗（下一轮修 ✓）。
+> * **引擎级对照** ✓（`verdict()` 读法 ✓，只替换那一行调用 ✓）：`grantShield(...)` 清空 ⇒ **NOT EVIDENCE: the control ran but nothing failed -- the judge may not press this code** ✓。
+> * ⚠ **同卡第 ② 句仍登记** ✗（活值面板：持有护盾时受伤 −12% ✓，伤害结算时机待实测 ✓）。
+> * ⚠ **7.4 的 `shielded_count`** ✗：上游 21043 要**同时监听护盾的授予与移除** ✓，引擎今天只有 `SHIELD_GRANTED` ✓，
+>   而护盾消失有**三条**路径（伤害耗尽 ✓ / 限时到期 ✓ / 被替换 ✓）⇒ 需先确定唯一收口点 ✓（本轮未做 ✓）。
+>   * ⚠ **订正旧备注** ✓：**1405** 用的是「**可攻击的敌方目标**」= `enemy_count` ✓（**已存在** ✓）与「不同属性弱点计数」✗，
+>     **不是** `shielded_count` ✗。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **91 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
