@@ -98,6 +98,22 @@ public class ConeBreakAndAuraTest {
         System.out.println("[23038] ally crit damage baseline(no cone)=" + baseline + " with cone=" + afterFollowUp
                 + " ; state on the wearer=" + wearer.getBuffManager().hasState("\u8c15\u793a"));
         Assertions.assertEquals(baseline + 0.48, afterFollowUp, 1e-9, "the aura gives the party 48 points of crit damage");
+        // \u26a0 The duration has to be PINNED: every reading here happens in the same turn, so shortening the aura is
+        // invisible to them (measured: 2 -> 1 turn gave reds 0). Discipline 147.
+        int pinnedTurns = 0;
+        for (var rule : wearer.getTriggerTable().matching(TriggerEvent.FOLLOW_UP,
+                new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, wearer, 0, 0))) {
+            for (var effect : rule.effects()) {
+                if ("CRIT_ATTACK".equals(effect.getAttribute()) && "all_allies".equals(effect.getTarget())) {
+                    pinnedTurns++;
+                    System.out.println("[23038] spec aura percent=" + effect.getPercent()
+                            + " turns=" + effect.getTurns() + " target=" + effect.getTarget());
+                    Assertions.assertEquals(0.48, effect.getPercent(), 1e-9, "rank 1 states 48%");
+                    Assertions.assertEquals(2, effect.getTurns(), "for two turns");
+                }
+            }
+        }
+        Assertions.assertEquals(1, pinnedTurns, "exactly one party aura rule on FOLLOW_UP");
         Assertions.assertTrue(wearer.getBuffManager().hasState("\u8c15\u793a"), "carried by the state");
         // A battle without the cone: the same stimulus changes nothing.
         plainBattle.fireTriggers(TriggerEvent.FOLLOW_UP, plainWearer, enemyOf(plainBattle, plainWearer), 0, 0);
