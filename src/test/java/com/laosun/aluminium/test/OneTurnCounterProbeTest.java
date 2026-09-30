@@ -72,9 +72,9 @@ public class OneTurnCounterProbeTest {
         // equality so that the day somebody gives counters a per-turn reset, this test FAILS and the gap for cones 23053
         // (\u3010\u63a8\u6d41\u3011) and 23061 (\u3010\u95ea\u8000\u738b\u51a0\u3011) gets revisited instead of silently becoming shippable.
         Assertions.assertEquals(1, insideTurn, "the layer is there inside the turn (the default cap is one)");
-        Assertions.assertEquals(1, afterTickForeign,
-                "MEASURED 2026-09-30: no tick entry clears a `turns: 1` counter, i.e. \u540c\u4e00\u56de\u5408\u5185 is not "
-                        + "expressible yet (gap: cones 23053 / 23061). If this line fails, that gap changed -- re-read it");
+        // \u2605 UPDATED 2026-09-30 (this test was WRITTEN to fail when the gap closed -- and it did): `until: turn_end` is the
+        // spelling for \u300c\u540c\u4e00\u56de\u5408\u5185\u300d, and `BuffManager.afterMove` sweeps it. A plain `turns: 1` counter still does NOT reset.
+        Assertions.assertEquals(1, afterTickForeign, "a plain turns: 1 counter still survives the tick entries");
 
         // The other half of the same gap: a SKILL_POINT_SPENT rule cannot tell WHO spent, because the event is fired with
         // no actor. Cone 23061 says \u300c\u6211\u65b9\u4efb\u610f\u89d2\u8272\u5728\u81ea\u8eab\u540c\u4e00\u56de\u5408\u5185\u300d and needs exactly that.

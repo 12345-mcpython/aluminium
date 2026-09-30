@@ -38,6 +38,55 @@
       ],
       "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_count",
+      "when": [
+        "self_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「若在**同一回合内**消耗大于等于#7[i]个战技点则使装备者获得【推流】。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_pays_out",
+      "when": [
+        "self_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "推流",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23053: 「装备者持有【推流】时，**我方全体欢愉度提高#4[i]%**。「若在同一回合内消耗大于等于#7[i]个战技点则使装备者获得【推流】」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
     }
   ],
   "2": [
@@ -79,6 +128,55 @@
       ],
       "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_count",
+      "when": [
+        "self_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「若在**同一回合内**消耗大于等于#7[i]个战技点则使装备者获得【推流】。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_pays_out",
+      "when": [
+        "self_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "推流",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23053: 「装备者持有【推流】时，**我方全体欢愉度提高#4[i]%**。「若在同一回合内消耗大于等于#7[i]个战技点则使装备者获得【推流】」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
     }
   ],
   "3": [
@@ -120,6 +218,55 @@
       ],
       "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_count",
+      "when": [
+        "self_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「若在**同一回合内**消耗大于等于#7[i]个战技点则使装备者获得【推流】。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_pays_out",
+      "when": [
+        "self_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "推流",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23053: 「装备者持有【推流】时，**我方全体欢愉度提高#4[i]%**。「若在同一回合内消耗大于等于#7[i]个战技点则使装备者获得【推流】」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
     }
   ],
   "4": [
@@ -161,6 +308,55 @@
       ],
       "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_count",
+      "when": [
+        "self_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「若在**同一回合内**消耗大于等于#7[i]个战技点则使装备者获得【推流】。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_pays_out",
+      "when": [
+        "self_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "推流",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23053: 「装备者持有【推流】时，**我方全体欢愉度提高#4[i]%**。「若在同一回合内消耗大于等于#7[i]个战技点则使装备者获得【推流】」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
     }
   ],
   "5": [
@@ -202,6 +398,55 @@
       ],
       "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_count",
+      "when": [
+        "self_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「若在**同一回合内**消耗大于等于#7[i]个战技点则使装备者获得【推流】。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_turn_spend_pays_out",
+      "when": [
+        "self_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "推流",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23053: 「装备者持有【推流】时，**我方全体欢愉度提高#4[i]%**。「若在同一回合内消耗大于等于#7[i]个战技点则使装备者获得【推流】」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐⭐ 本轮新增 **`Lifetime.TURN_END`** ✓（`\"until\": \"turn_end\"` ✓，在 `BuffManager.afterMove`（持有者**自己的回合结束** ✓）清扫 ✓）—— 它是 `CAST_END` 的对称伙伴 ✓，也是「同一回合内」这句话唯一的写法 ✓（上一轮实测：普通 `turns: 1` 不会被任何计时入口清零 ✗）。⭐ 【推流】的寿命取自上游的**缺席** ✓：`Equip40.json` 全文件 `\"Duration\"` 出现 **0** 次 ✓，而 `MEquip_23053_Sub02_Halo`（带 `ElationDamageAddedRatioBase` ✓）等四个定义都**没有期限字段** ✗ ⇒ **持续存在** ✓ ⇒ `permanent: true` ✓。"
     }
   ]
 }
