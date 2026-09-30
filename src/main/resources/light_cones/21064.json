@@ -1,0 +1,107 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21064_elation_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.06,
+          "damage_type": "ELATION",
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 21064: 「装备者施放欢愉技时，使敌方全体受到的欢愉伤害提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放**欢愉技**时」用本轮新增的 **`from_category ELATION_DAMAGE`** ✓ ——为什么不能用 `from_skill` ✗：它读的是**技能位** ✓，而欢愉技是一个**`SkillType` 根本没有的类别** ✗（引擎注释原话：`ELATION_DAMAGE` that `SkillType` does not have ✓）。⭐ 第二句用 `MODIFY_DAMAGE_TAKEN` + **`damage_type: ELATION`** ✓（它是读 `damage_type` 的三个 op 之一 ✓）作用于 `all_enemies` ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21064_elation_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.07,
+          "damage_type": "ELATION",
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 21064: 「装备者施放欢愉技时，使敌方全体受到的欢愉伤害提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放**欢愉技**时」用本轮新增的 **`from_category ELATION_DAMAGE`** ✓ ——为什么不能用 `from_skill` ✗：它读的是**技能位** ✓，而欢愉技是一个**`SkillType` 根本没有的类别** ✗（引擎注释原话：`ELATION_DAMAGE` that `SkillType` does not have ✓）。⭐ 第二句用 `MODIFY_DAMAGE_TAKEN` + **`damage_type: ELATION`** ✓（它是读 `damage_type` 的三个 op 之一 ✓）作用于 `all_enemies` ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21064_elation_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.08,
+          "damage_type": "ELATION",
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 21064: 「装备者施放欢愉技时，使敌方全体受到的欢愉伤害提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放**欢愉技**时」用本轮新增的 **`from_category ELATION_DAMAGE`** ✓ ——为什么不能用 `from_skill` ✗：它读的是**技能位** ✓，而欢愉技是一个**`SkillType` 根本没有的类别** ✗（引擎注释原话：`ELATION_DAMAGE` that `SkillType` does not have ✓）。⭐ 第二句用 `MODIFY_DAMAGE_TAKEN` + **`damage_type: ELATION`** ✓（它是读 `damage_type` 的三个 op 之一 ✓）作用于 `all_enemies` ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21064_elation_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.09,
+          "damage_type": "ELATION",
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 21064: 「装备者施放欢愉技时，使敌方全体受到的欢愉伤害提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放**欢愉技**时」用本轮新增的 **`from_category ELATION_DAMAGE`** ✓ ——为什么不能用 `from_skill` ✗：它读的是**技能位** ✓，而欢愉技是一个**`SkillType` 根本没有的类别** ✗（引擎注释原话：`ELATION_DAMAGE` that `SkillType` does not have ✓）。⭐ 第二句用 `MODIFY_DAMAGE_TAKEN` + **`damage_type: ELATION`** ✓（它是读 `damage_type` 的三个 op 之一 ✓）作用于 `all_enemies` ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone21064_elation_damage_taken",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.1,
+          "damage_type": "ELATION",
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 21064: 「装备者施放欢愉技时，使敌方全体受到的欢愉伤害提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放**欢愉技**时」用本轮新增的 **`from_category ELATION_DAMAGE`** ✓ ——为什么不能用 `from_skill` ✗：它读的是**技能位** ✓，而欢愉技是一个**`SkillType` 根本没有的类别** ✗（引擎注释原话：`ELATION_DAMAGE` that `SkillType` does not have ✓）。⭐ 第二句用 `MODIFY_DAMAGE_TAKEN` + **`damage_type: ELATION`** ✓（它是读 `damage_type` 的三个 op 之一 ✓）作用于 `all_enemies` ✓。"
+    }
+  ]
+}
