@@ -70,14 +70,20 @@ public class Cone23016Test {
 
     @Test
     public void eachTameLayerAddsCritDamage() {
+        double untamed;
+        build(false);
+        untamed = critHit();
         build(true);
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
         double atOne = critHit();
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
         double atTwo = critHit();
-        System.out.println("[23016] crit at 1 layer=" + atOne + " at 2 layers=" + atTwo
-                + " ; difference per layer=" + (atTwo - atOne));
-        Assertions.assertTrue(atTwo > atOne, "a second layer adds more crit damage");
+        System.out.println("[23016] untamed=" + untamed + " at 1 layer=" + atOne + " at 2 layers=" + atTwo
+                + " ; one layer=" + (atOne - untamed) + " second layer=" + (atTwo - atOne));
+        // \u2605 The per-layer AMOUNT, without knowing the crit base (discipline 200): one layer's worth must equal the next
+        // layer's worth. `atTwo > atOne` survives a `12 -> 6 percent` mutation, and that mutation was 0 red until this line.
+        Assertions.assertEquals(atOne - untamed, atTwo - atOne, 1e-9,
+                "each layer is worth exactly the same as the first");
     }
 
     @Test
