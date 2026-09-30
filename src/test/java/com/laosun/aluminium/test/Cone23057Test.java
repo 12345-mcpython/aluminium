@@ -66,6 +66,37 @@ public class Cone23057Test {
                 "ignoring 20% of the defence multiplies the settled value by (def + K)/(def*0.8 + K)");
     }
 
+    /**
+     * \u2605 Discipline 168, re-taught by a 0-red mutation this round: an ownership condition needs a NON-owner in the
+     * judge. The cone's rule says `actor == self`, so a teammate's elation damage must NOT be raised -- with only the
+     * wearer in the party, `self` and `is_ally` are indistinguishable and the mutation cannot fail.
+     */
+    @Test
+    public void aTeammatesElationDamageIsNotRaised() {
+        Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
+        Character ally = CharacterFactory.create(1002, LEVEL);
+        for (Character unit : List.of(wearer, ally)) {
+            unit.getAttribute(AttributeType.CRIT_CHANCE)
+                    .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230571));
+        }
+        Enemy target = EnemyFactory.create(MONSTER, 90, 1);
+        Battle armed = new Battle(List.of(wearer, ally), List.of(target), new Random(0));
+        armed.startBattle();
+        double boosted = armed.applyDamage(target, new Damage(ally, target, DamageElement.FIRE, DamageType.ELATION, 1000));
+
+        Character plainWearer = CharacterFactory.create(WEARER, LEVEL);
+        Character plainAlly = CharacterFactory.create(1002, LEVEL);
+        plainAlly.getAttribute(AttributeType.CRIT_CHANCE)
+                .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230572));
+        Enemy other = EnemyFactory.create(MONSTER, 90, 1);
+        Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), new Random(0));
+        plain.startBattle();
+        double plainHit = plain.applyDamage(other, new Damage(plainAlly, other, DamageElement.FIRE, DamageType.ELATION, 1000));
+        System.out.println("[23057] a teammate's elation hit: armed=" + boosted + " plain=" + plainHit);
+        Assertions.assertEquals(1.0, boosted / plainHit, 1e-9,
+                "the clause is the WEARER's -- a teammate's elation damage is untouched (false case)");
+    }
+
     @Test
     public void ordinaryDamageIsUntouched() {
         Battle armed = battle(true);
