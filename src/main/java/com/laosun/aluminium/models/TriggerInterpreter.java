@@ -1432,6 +1432,15 @@ public final class TriggerInterpreter {
      */
     /** The multiplier `per_stack` names, read on the target: a debuff count, a DoT count, or a counter (2026-09-29). */
     private static double perStackFactor(EffectSpec effect, CanHit target, TriggerContext ctx) {
+        // \u2605 A SELF counter (2026-09-30; reader: cone 23053's \u300c\u88c5\u5907\u8005\u6bcf\u6d88\u8017 1 \u4e2a\u6218\u6280\u70b9\u2026\u6700\u591a\u53e0\u52a0 4 \u5c42\u300d).
+        // The bare name below is resolved on the TARGET, which is right for \u300c\u6bcf\u5c42\u3010\u5f53\u54c1\u3011\u300d (a counter on the victim) but
+        // cannot say "MY counter" when the effect lands on somebody else -- so the condition vocabulary's own prefix is
+        // accepted here too: `per_stack: self_stacks:<NAME>`. Same spelling, same meaning, one vocabulary.
+        if (effect.getPerStack() != null && effect.getPerStack().trim().startsWith("self_stacks:")) {
+            String own = effect.getPerStack().trim().substring("self_stacks:".length()).trim();
+            CanHit owner = ctx == null ? null : ctx.owner();
+            return own.isEmpty() || owner == null ? 1 : owner.getBuffManager().stacksOf(own);
+        }
         String name = effect.getPerStack();
         if (name == null || name.isBlank()) {
             return 1;

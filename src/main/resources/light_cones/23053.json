@@ -1,0 +1,207 @@
+{
+  "1": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_spent_stack",
+      "when": [
+        "self_stacks:消耗层数 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "消耗层数",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23053_def_ignore_per_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.05,
+          "per_stack": "self_stacks:消耗层数",
+          "damage_type": "ELATION",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_spent_stack",
+      "when": [
+        "self_stacks:消耗层数 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "消耗层数",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23053_def_ignore_per_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.06,
+          "per_stack": "self_stacks:消耗层数",
+          "damage_type": "ELATION",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_spent_stack",
+      "when": [
+        "self_stacks:消耗层数 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "消耗层数",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23053_def_ignore_per_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.07,
+          "per_stack": "self_stacks:消耗层数",
+          "damage_type": "ELATION",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_spent_stack",
+      "when": [
+        "self_stacks:消耗层数 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "消耗层数",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23053_def_ignore_per_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.08,
+          "per_stack": "self_stacks:消耗层数",
+          "damage_type": "ELATION",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23053_spent_stack",
+      "when": [
+        "self_stacks:消耗层数 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "消耗层数",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23053_def_ignore_per_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.09,
+          "per_stack": "self_stacks:消耗层数",
+          "damage_type": "ELATION",
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23053: 「装备者每消耗1个战技点使自身造成的欢愉伤害无视敌方目标#6[f1]%的防御力，最多叠加#5[i]层」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ **现成能力拼成** ✓：`SKILL_POINT_SPENT` ✓（**已是触发器事件** ✓，每次真实消耗都触发 ✓，`Battle.listenToSkillPointChanges` 第 515 行 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）+ `MODIFY_ATTR`的**实例路径** ✓（它**支持 `DEFENCE_IGNORE` + `per_stack`** ✓，第 1466-1470 行 ✓）+ `damage_type: ELATION` ✓。⭐ 因为实例路径在**结算时刻**求值 ✓，所以层数是**活值** ✓（纪律 191 ✓）。⚠ **同句的【推流】部分已登记** ✗：「若在**同一回合内**消耗大于等于#7[i]个战技点则获得【推流】」需要**一个每回合重置的计数** ✗（`per_turn` 是\"规则级发放上限\" ✗，不是计数器重置 ✗）。⚠ 另一句（命途计数 ⇒ 战技点**上限** ✗）仍在登记表里 ✗。⭐⭐ **`per_stack` 默认读「目标」身上的计数器** ✗（relic 108/4 的【当品】在受害者身上 ✓），而本句的层数在**装备者自己**身上 ✗ ⇒ 本轮新增同名拼写 **`self_stacks:<NAME>`** ✓（第 190 条的同族：词汇要能说出「谁的计数器」 ✓）。"
+    }
+  ]
+}
