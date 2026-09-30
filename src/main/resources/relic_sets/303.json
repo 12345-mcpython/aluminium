@@ -1,0 +1,21 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "relic303_2_atk_from_effect_hit_rate",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "scale": "self_attr:EFFECT_HIT_RATE",
+          "percent": 0.25,
+          "cap_amount": 0.25,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 303 二件套: 「使装备者的效果命中提高 10%。同时提高装备者等同于当前效果命中 25% 的攻击力，最多提高 25%」",
+      "note": "⭐⭐ **一个\"按自身属性缩放 + 封顶\"的修饰量**：`scale: \"self_attr:EFFECT_HIT_RATE\"` + `percent: 0.25` + **`cap_amount: 0.25`** —— ⭐ **两样词汇都已存在**（派生量自 2026-09-29、上限 `cap_amount` 自第 203 轮），所以这条登记了三轮的缺口其实**早已可写**。⚠ 数值绑定数据行（`param=[0.1, 0.25, 0.25]` ⇒ 效果命中 10% / 比例 25% / 上限 25%）。"
+    }
+  ]
+}
