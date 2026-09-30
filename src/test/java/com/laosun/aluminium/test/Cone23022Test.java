@@ -108,4 +108,26 @@ public class Cone23022Test {
         System.out.println("[23022] with DoTs but no cone: seer=" + wearer.getBuffManager().stacksOf(SEER));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(SEER), "no cone, no layers (false case)");
     }
+
+    @Test
+    public void theDotInstanceCarriesTheIgnore() {
+        // \u2b50 Read off the INSTANCE, not off a second battle: rules of one DEALING_DAMAGE event are evaluated in order and see
+        // each other (discipline 212), so the very first DOT instance already granted the seer layer that the ignore rule needs.
+        // Measured: the DOT instance carries 0.072 while an ordinary hit of the same battle carries 0.0 (damage_type: DOT).
+        build(true);
+        plant(FIRE_NAME, DamageElement.FIRE);
+        com.laosun.aluminium.models.Damage dot = new com.laosun.aluminium.models.Damage(wearer, enemy,
+                DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.DOT, 1000);
+        double dotValue = battle.applyDamage(enemy, dot);
+        com.laosun.aluminium.models.Damage normal = new com.laosun.aluminium.models.Damage(wearer, enemy,
+                DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.NORMAL, 1000);
+        double normalValue = battle.applyDamage(enemy, normal);
+        System.out.println("[23022] seer=" + wearer.getBuffManager().stacksOf(SEER) + " ; DOT value=" + dotValue
+                + " defenceIgnore=" + dot.getDefenceIgnore() + " zone=" + dot.breakdown().get("DefenceArea")
+                + " ; NORMAL value=" + normalValue + " defenceIgnore=" + normal.getDefenceIgnore());
+        Assertions.assertEquals(0.072, dot.getDefenceIgnore(), 1e-9,
+                "the DOT instance itself carries one layer's 7.2% ignore");
+        Assertions.assertEquals(0.0, normal.getDefenceIgnore(), 1e-9,
+                "and an ordinary hit is outside the clause\u2019s scope");
+    }
 }
