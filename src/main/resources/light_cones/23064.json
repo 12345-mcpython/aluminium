@@ -24,6 +24,62 @@
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23064_skill_point_per_wave",
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23064: 「每个波次开始时或装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_elation_cast_count",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 < 3"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "欢愉技计数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_skill_point_per_three_casts",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 >= 3"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "欢愉技计数",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
     }
   ],
   "2": [
@@ -51,6 +107,62 @@
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23064_skill_point_per_wave",
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23064: 「每个波次开始时或装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_elation_cast_count",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 < 3"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "欢愉技计数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_skill_point_per_three_casts",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 >= 3"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "欢愉技计数",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
     }
   ],
   "3": [
@@ -78,6 +190,62 @@
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23064_skill_point_per_wave",
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23064: 「每个波次开始时或装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_elation_cast_count",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 < 3"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "欢愉技计数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_skill_point_per_three_casts",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 >= 3"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "欢愉技计数",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
     }
   ],
   "4": [
@@ -105,6 +273,62 @@
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23064_skill_point_per_wave",
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23064: 「每个波次开始时或装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_elation_cast_count",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 < 3"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "欢愉技计数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_skill_point_per_three_casts",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 >= 3"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "欢愉技计数",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
     }
   ],
   "5": [
@@ -132,6 +356,62 @@
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23064_skill_point_per_wave",
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23064: 「每个波次开始时或装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_elation_cast_count",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 < 3"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "欢愉技计数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_skill_point_per_three_casts",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "self_stacks:欢愉技计数 >= 3"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "欢愉技计数",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者每施放#4[i]次欢愉技后，恢复1个战技点。」",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_SKILL_POINT` ✓（第 877 行已接线 ✓，语料里 10 个角色 + 遗器 101 在用 ✓）+ **`WAVE_START`** ✓（第 21 轮做的事件 ✓）+ **`self_stacks:`** ✓（引擎自带 ✓）。⭐两条次数门槛按**纪律 184** 写 ✓：先加满（`< #4` ✓），再按满值判断与清零（`>= #4` ✓）—— 同事件的规则看得到彼此的即时效果 ✗，写成 `N-1` 会**提前一次**发放 ✗。⚠ **同卡的【潮流】句仍登记** ✗：「与上一次不同的欢愉技」需**记住上一次的技能** ✗（现有词汇里没有\"记忆\"层 ✗）。"
     }
   ]
 }
