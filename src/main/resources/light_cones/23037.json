@@ -1,0 +1,137 @@
+{
+  "1": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_skill_and_ult_damage_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.6,
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.6,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 双作用域各写一条效果 ✓：**`SKILL_DAMAGE_BOOST`** ✓ 与 **`ULTIMATE_DAMAGE_BOOST`** ✓（属性表里各有其名 ✓，而不是一个万能 key ✗）。⚠ **第二句已登记** ✗：「若**本次**终结技消耗的能量 ≥ 140 点」需要**\"本次释放的能量成本\"这个口径** ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_skill_and_ult_damage_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.7,
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.7,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 双作用域各写一条效果 ✓：**`SKILL_DAMAGE_BOOST`** ✓ 与 **`ULTIMATE_DAMAGE_BOOST`** ✓（属性表里各有其名 ✓，而不是一个万能 key ✗）。⚠ **第二句已登记** ✗：「若**本次**终结技消耗的能量 ≥ 140 点」需要**\"本次释放的能量成本\"这个口径** ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_skill_and_ult_damage_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.8,
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.8,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 双作用域各写一条效果 ✓：**`SKILL_DAMAGE_BOOST`** ✓ 与 **`ULTIMATE_DAMAGE_BOOST`** ✓（属性表里各有其名 ✓，而不是一个万能 key ✗）。⚠ **第二句已登记** ✗：「若**本次**终结技消耗的能量 ≥ 140 点」需要**\"本次释放的能量成本\"这个口径** ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_skill_and_ult_damage_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.9,
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.9,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 双作用域各写一条效果 ✓：**`SKILL_DAMAGE_BOOST`** ✓ 与 **`ULTIMATE_DAMAGE_BOOST`** ✓（属性表里各有其名 ✓，而不是一个万能 key ✗）。⚠ **第二句已登记** ✗：「若**本次**终结技消耗的能量 ≥ 140 点」需要**\"本次释放的能量成本\"这个口径** ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_skill_and_ult_damage_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 1,
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 1,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
+      "note": "⭐ 常数半（暴击率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 双作用域各写一条效果 ✓：**`SKILL_DAMAGE_BOOST`** ✓ 与 **`ULTIMATE_DAMAGE_BOOST`** ✓（属性表里各有其名 ✓，而不是一个万能 key ✗）。⚠ **第二句已登记** ✗：「若**本次**终结技消耗的能量 ≥ 140 点」需要**\"本次释放的能量成本\"这个口径** ✗。"
+    }
+  ]
+}
