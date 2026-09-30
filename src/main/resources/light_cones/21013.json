@@ -1,0 +1,152 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_energy_on_entry",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 20.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_ult_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_energy_on_entry",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 23.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_ult_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_energy_on_entry",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 26.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_ult_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_energy_on_entry",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 29.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_ult_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.56,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_energy_on_entry",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 32.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21013_ult_damage",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ULTIMATE_DAMAGE_BOOST",
+          "percent": 0.64,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21013 别让世界静下来: 使装备者进入战斗时立即恢复#2[i]点能量，同时使其终结技造成的伤害提高#1[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⭐ 两个从句**都无条件** ✓ ⇒ 直接 `BATTLE_START` + `permanent` ✓；属性名 **`ULTIMATE_DAMAGE_BOOST`** 取自 `AttributeType` ✓（第 188/240 轮纪律：属性名必须查、不能凭记忆 ✗）。"
+    }
+  ]
+}
