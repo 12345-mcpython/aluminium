@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone22007_party_elation_after_ult",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.08,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 22007: 「装备者施放终结技后，使我方全体欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 「装备者**施放终结技后**，使**我方全体欢愉度提高#2[i]%**，持续#3[i]回合」⇒ **零新增能力** ✓：`ULT_CAST` ✓（它本来就是\"施放之后\"的事件 ✓）+ `MODIFY_ATTR ELATION_DAMAGE_BOOST` ✓ + `turns: #3` ✓ + `target: all_allies` ✓。⚠ “我方全体”包括装备者自己 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone22007_party_elation_after_ult",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.09,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 22007: 「装备者施放终结技后，使我方全体欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 「装备者**施放终结技后**，使**我方全体欢愉度提高#2[i]%**，持续#3[i]回合」⇒ **零新增能力** ✓：`ULT_CAST` ✓（它本来就是\"施放之后\"的事件 ✓）+ `MODIFY_ATTR ELATION_DAMAGE_BOOST` ✓ + `turns: #3` ✓ + `target: all_allies` ✓。⚠ “我方全体”包括装备者自己 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone22007_party_elation_after_ult",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.1,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 22007: 「装备者施放终结技后，使我方全体欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 「装备者**施放终结技后**，使**我方全体欢愉度提高#2[i]%**，持续#3[i]回合」⇒ **零新增能力** ✓：`ULT_CAST` ✓（它本来就是\"施放之后\"的事件 ✓）+ `MODIFY_ATTR ELATION_DAMAGE_BOOST` ✓ + `turns: #3` ✓ + `target: all_allies` ✓。⚠ “我方全体”包括装备者自己 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone22007_party_elation_after_ult",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.11,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 22007: 「装备者施放终结技后，使我方全体欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 「装备者**施放终结技后**，使**我方全体欢愉度提高#2[i]%**，持续#3[i]回合」⇒ **零新增能力** ✓：`ULT_CAST` ✓（它本来就是\"施放之后\"的事件 ✓）+ `MODIFY_ATTR ELATION_DAMAGE_BOOST` ✓ + `turns: #3` ✓ + `target: all_allies` ✓。⚠ “我方全体”包括装备者自己 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone22007_party_elation_after_ult",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.12,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 22007: 「装备者施放终结技后，使我方全体欢愉度提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 「装备者**施放终结技后**，使**我方全体欢愉度提高#2[i]%**，持续#3[i]回合」⇒ **零新增能力** ✓：`ULT_CAST` ✓（它本来就是\"施放之后\"的事件 ✓）+ `MODIFY_ATTR ELATION_DAMAGE_BOOST` ✓ + `turns: #3` ✓ + `target: all_allies` ✓。⚠ “我方全体”包括装备者自己 ✓。"
+    }
+  ]
+}
