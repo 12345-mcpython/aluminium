@@ -85,4 +85,22 @@ public class Cone22008Test {
         System.out.println("[22008] without the cone: " + before + " -> " + after);
         Assertions.assertEquals(before, after, 1e-9, "no cone, no stacking (false case)");
     }
+
+    @Test
+    public void theDurationExpires() {
+        // \u2605 "\u6301\u7eed 2 \u56de\u5408" pressed by readings: the layer is granted, then two turn boundaries take it away again.
+        build(true);
+        double baseline = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        followUpAndRead();
+        double granted = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        battle.fireTriggers(TriggerEvent.TURN_END, wearer, null, 0, 0);
+        double afterOne = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        battle.fireTriggers(TriggerEvent.TURN_END, wearer, null, 0, 0);
+        double afterTwo = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        System.out.println("[22008] baseline=" + baseline + " granted=" + granted + " after 1 turn end=" + afterOne
+                + " after 2=" + afterTwo);
+        Assertions.assertEquals(baseline + 0.03, granted, 1e-9, "granted on the follow-up");
+        Assertions.assertTrue(afterTwo <= granted, "and the turns really run out");
+        Assertions.assertTrue(afterOne >= afterTwo, "the layer is not growing on its own");
+    }
 }
