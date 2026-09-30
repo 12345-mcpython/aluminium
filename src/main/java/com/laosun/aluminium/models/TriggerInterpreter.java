@@ -2653,6 +2653,13 @@ public final class TriggerInterpreter {
         // 1314 alone states 5 (its talent's follow-up), 15 (its technique), 1 and 3 (its traces). One application still
         // means one mark unless it says otherwise, so no existing file changes.
         int wanted = effect.getAmount() == null ? 1 : Math.max(1, effect.getAmount().intValue());
+        // \u2605 \u300c\u6bcf\u6062\u590d 1 \u4e2a\u6218\u6280\u70b9\uff0c\u83b7\u5f97 1 \u5c42\u3010\u5f69\u7130\u3011\u300d (cone 23021): the marks follow the EVENT's own amount, not the
+        // number of times the event fired -- `Battle.gainSkillPoint(2)` raises one event carrying 2, and \u300c\u6bcf 1 \u4e2a\u300d means two
+        // marks. `scale: event_amount` + `percent: 1` is the same "share of a live quantity" shape HEAL/SHIELD already use.
+        if ("event_amount".equals(String.valueOf(effect.getScale()).trim())) {
+            double share = effect.getPercent() == null ? 1 : effect.getPercent();
+            wanted = Math.max(1, (int) Math.round(share * ctx.amount()));
+        }
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             for (int i = 0; i < wanted; i++) {
                 if (target.getBuffManager().stacksOf(name) >= cap) {
