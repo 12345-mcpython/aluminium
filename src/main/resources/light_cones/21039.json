@@ -1,0 +1,172 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_effect_res",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_damage_per_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_attr:DEFENCE",
+          "percent": 7.999999e-05,
+          "cap_amount": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线（每 #2 点防御力）: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "⭐ 「每有 **#2 = 100** 点防御力 ⇒ 造成的伤害提高 **#3 = 0.007999999**」= 派生份额 **`#3 / #2`** ✓ 配 `scale: self_attr:DEFENCE` ✓；「**最多使造成的伤害提高 #4 = 0.32**」= **`cap_amount`** ✓（第 203/240 轮接对了位置 ✓：`applyDerivedCeiling` **内部** ✓ —— 旧写法在该方法开头 `cap_scale == null` 时提前返回 ✗，所以常量上限必须加在这里 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_effect_res",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.14,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_damage_per_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_attr:DEFENCE",
+          "percent": 8.999999999999999e-05,
+          "cap_amount": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线（每 #2 点防御力）: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "⭐ 「每有 **#2 = 100** 点防御力 ⇒ 造成的伤害提高 **#3 = 0.009**」= 派生份额 **`#3 / #2`** ✓ 配 `scale: self_attr:DEFENCE` ✓；「**最多使造成的伤害提高 #4 = 0.36**」= **`cap_amount`** ✓（第 203/240 轮接对了位置 ✓：`applyDerivedCeiling` **内部** ✓ —— 旧写法在该方法开头 `cap_scale == null` 时提前返回 ✗，所以常量上限必须加在这里 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_effect_res",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_damage_per_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_attr:DEFENCE",
+          "percent": 0.0001,
+          "cap_amount": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线（每 #2 点防御力）: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "⭐ 「每有 **#2 = 100** 点防御力 ⇒ 造成的伤害提高 **#3 = 0.01**」= 派生份额 **`#3 / #2`** ✓ 配 `scale: self_attr:DEFENCE` ✓；「**最多使造成的伤害提高 #4 = 0.4**」= **`cap_amount`** ✓（第 203/240 轮接对了位置 ✓：`applyDerivedCeiling` **内部** ✓ —— 旧写法在该方法开头 `cap_scale == null` 时提前返回 ✗，所以常量上限必须加在这里 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_effect_res",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_damage_per_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_attr:DEFENCE",
+          "percent": 0.00010999999999999999,
+          "cap_amount": 0.44,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线（每 #2 点防御力）: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "⭐ 「每有 **#2 = 100** 点防御力 ⇒ 造成的伤害提高 **#3 = 0.011**」= 派生份额 **`#3 / #2`** ✓ 配 `scale: self_attr:DEFENCE` ✓；「**最多使造成的伤害提高 #4 = 0.44**」= **`cap_amount`** ✓（第 203/240 轮接对了位置 ✓：`applyDerivedCeiling` **内部** ✓ —— 旧写法在该方法开头 `cap_scale == null` 时提前返回 ✗，所以常量上限必须加在这里 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_effect_res",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21039_damage_per_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_attr:DEFENCE",
+          "percent": 0.00012,
+          "cap_amount": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21039 织造命运之线（每 #2 点防御力）: 使装备者的效果抵抗提高#1[i]%。装备者每有#2[i]点防御力，使装备者造成的伤害提高#3[f1]%，最多使造成的伤害提高#4[i]%。",
+      "note": "⭐ 「每有 **#2 = 100** 点防御力 ⇒ 造成的伤害提高 **#3 = 0.012**」= 派生份额 **`#3 / #2`** ✓ 配 `scale: self_attr:DEFENCE` ✓；「**最多使造成的伤害提高 #4 = 0.48**」= **`cap_amount`** ✓（第 203/240 轮接对了位置 ✓：`applyDerivedCeiling` **内部** ✓ —— 旧写法在该方法开头 `cap_scale == null` 时提前返回 ✗，所以常量上限必须加在这里 ✓）。"
+    }
+  ]
+}
