@@ -92,7 +92,9 @@ public class OneTurnCounterProbeTest {
         Assertions.assertTrue(second.applySkillPointCost(secondSkill, watcher));
         int withActorGate = watcher.getBuffManager().stacksOf(COUNT);
         System.out.println("[probe] a rule gated on `actor == self` saw the spend: stacks=" + withActorGate);
-        Assertions.assertEquals(0, withActorGate,
-                "MEASURED 2026-09-30: SKILL_POINT_SPENT is fired with no actor, so `actor == self` is false for the spender");
+        // \u2605 UPDATED 2026-09-30, the same design as the assertion above: this half of the gap closed in the same session --
+        // the policy always knew the spender (`onSkillCast(user, skill)`) and now passes it on, so `actor == self` fires.
+        Assertions.assertEquals(1, withActorGate,
+                "SKILL_POINT_SPENT names its spender now, so a rule gated on `actor == self` sees the spend");
     }
 }

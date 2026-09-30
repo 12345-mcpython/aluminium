@@ -1,0 +1,232 @@
+{
+  "1": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_turn_spend_count",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23061: 「我方**任意角色**在自身**同一回合内**累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_crown_pays_out",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "attacker"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "闪耀王冠",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23061: 「我方任意角色在自身同一回合内累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_turn_spend_count",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23061: 「我方**任意角色**在自身**同一回合内**累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_crown_pays_out",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "attacker"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "闪耀王冠",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23061: 「我方任意角色在自身同一回合内累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_turn_spend_count",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23061: 「我方**任意角色**在自身**同一回合内**累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_crown_pays_out",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "attacker"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "闪耀王冠",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23061: 「我方任意角色在自身同一回合内累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_turn_spend_count",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23061: 「我方**任意角色**在自身**同一回合内**累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_crown_pays_out",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "attacker"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "闪耀王冠",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23061: 「我方任意角色在自身同一回合内累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_turn_spend_count",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23061: 「我方**任意角色**在自身**同一回合内**累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "id": "cone23061_crown_pays_out",
+      "when": [
+        "actor is_ally",
+        "actor_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4,
+          "target": "attacker"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "闪耀王冠",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23061: 「我方任意角色在自身同一回合内累计消耗大于等于#3[i]点战技点时，装备者获得【闪耀王冠】，持续#4[i]回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 暴击率那句**未重写** ✗。⭐⭐ 本轮新增两件（读者都是本卡 ✓）：**`SKILL_POINT_SPENT` 现在带行动者** ✓（`Listener.onSpent(user, amount)` ✓）与 **`actor_stacks:<NAME>`** ✓（读\"事件发起者\"自己的计数器 ✓）。⭐ 为什么必须有后者 ✓：`self_stacks:` 读**规则拥有者** ✓，`target_stacks:` 读**事件目标** ✓，而「**我方任意角色**消耗」把计数器放在**消耗者**身上 ✗ —— 它两者都不是 ✗。⭐ 层数用 `until: turn_end` ✓（上一轮做的寿命 ✓）⇒ 「**同一回合内**」成立 ✓；注意清扫发生在**计数器持有者**（即消耗者 ✓）的回合结束 ✓。⭐⚠ **选择器的名字是 \u0007ttacker ✓**（不是 \u0007ctor ✗）—— 加载器会列出全部合法值 ✓；而**条件里**的主语仍写 \u0007ctor ✓（\u0007ctor_stacks: / \u0007ctor is_ally ✓），两套词汇各自成系 ✓。"
+    }
+  ]
+}

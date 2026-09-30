@@ -1247,7 +1247,7 @@ public class TriggerTable {
         }
         if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)
                 && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
-                && !variable.startsWith(TARGET_STACKS_PREFIX)) {
+                && !variable.startsWith(TARGET_STACKS_PREFIX) && !variable.startsWith(ACTOR_STACKS_PREFIX)) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' compares unknown variable '" + variable
                             + "'; known numeric variables: " + String.join(", ", knownNumericVariables())
@@ -1258,9 +1258,12 @@ public class TriggerTable {
                             + "counter has been marked, e.g. \"target_stacks:承负 >= 2\" "
                             + "(source: " + spec.getSource() + ")");
         }
+        boolean onActor = variable.startsWith(ACTOR_STACKS_PREFIX);
         return new Numeric(variable, selfAttributeOf(variable, raw, spec),
-                selfResourceOf(variable, raw, spec), stacksNameOf(variable, raw, spec),
-                variable.startsWith(TARGET_STACKS_PREFIX), operator, literal, literalOnLeft);
+                selfResourceOf(variable, raw, spec),
+                onActor ? variable.substring(ACTOR_STACKS_PREFIX.length()).trim()
+                        : stacksNameOf(variable, raw, spec),
+                variable.startsWith(TARGET_STACKS_PREFIX), onActor, operator, literal, literalOnLeft);
     }
 
     /**
@@ -1337,6 +1340,15 @@ public class TriggerTable {
      * them public is what keeps the two from drifting (the same reason {@link #SELF_ATTR_PREFIX} is not private).
      */
     public static final String SELF_STACKS_PREFIX = "self_stacks:";
+    /**
+     * \u2705 The counter of the unit that CAUSED the event (2026-09-30; reader: cone 23061's \u300c\u6211\u65b9\u4efb\u610f\u89d2\u8272\u5728\u81ea\u8eab\u540c\u4e00\u56de\u5408\u5185\u7d2f\u8ba1\u6d88\u8017 \u2265 4 \u70b9\u6218\u6280\u70b9\u300d).
+     *
+     * <p>\u2605 The third subject, and it was missing: {@code self_stacks:} reads the rule's OWNER and {@code target_stacks:}
+     * the event's target, but "any of our characters spends" puts the counter on the SPENDER -- a unit that is neither.
+     * With {@code SKILL_POINT_SPENT} now naming its spender as the actor ({@code onSpent(user, amount)}), a rule owned by
+     * the light cone's wearer can finally read it.
+     */
+    public static final String ACTOR_STACKS_PREFIX = "actor_stacks:";
     public static final String TARGET_STACKS_PREFIX = "target_stacks:";
 
     /**
@@ -2375,17 +2387,20 @@ public class TriggerTable {
         private final String stacksName;
         /** Whether that counter is read off the event's <b>target</b> rather than the rule's owner. */
         private final boolean stacksOnTarget;
+        /** Whether it is read off the event's <b>actor</b> (the unit that caused it) instead. */
+        private final boolean stacksOnActor;
         private final String operator;
         private final double literal;
         private final boolean literalOnLeft;
 
         Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
-                String operator, double literal, boolean literalOnLeft) {
+                boolean stacksOnActor, String operator, double literal, boolean literalOnLeft) {
             this.variable = variable;
             this.attribute = attribute;
             this.resource = resource;
             this.stacksName = stacksName;
             this.stacksOnTarget = stacksOnTarget;
+            this.stacksOnActor = stacksOnActor;
             this.operator = operator;
             this.literal = literal;
             this.literalOnLeft = literalOnLeft;
@@ -2429,7 +2444,9 @@ public class TriggerTable {
                 // 「每当我方目标对【承负】状态下的敌方目标施放 2 次…」 reads the counter on the ENEMY (target), while a
                 // counter of "how many refunds so far" would be read on the owner -- hence the two spellings. An
                 // unreadable subject gives NaN, like every other variable that needs one.
-                CanHit holder = stacksOnTarget ? ctx.target() : ctx.owner();
+                // \u2605 Three subjects now: the owner (self_\u2026), the event's target, and the event's actor -- the last one is what
+                // makes \u300c\u6211\u65b9\u4efb\u610f\u89d2\u8272\u2026\u6d88\u8017\u300d readable from the light cone wearer's own table.
+                CanHit holder = stacksOnActor ? ctx.actor() : stacksOnTarget ? ctx.target() : ctx.owner();
                 return holder == null ? Double.NaN : holder.getBuffManager().stacksOf(stacksName);
             }
             return switch (variable) {
