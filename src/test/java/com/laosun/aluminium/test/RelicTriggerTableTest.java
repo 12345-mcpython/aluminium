@@ -165,7 +165,7 @@ public class RelicTriggerTableTest {
      * mixed ones ({@code properties} plus an ability).
      */
     private static final Set<String> AUTHORED = Set.of(
-            "119/4",
+            "312/2", "119/4",
             "303/2",
             "113/4",
             "323/2",
@@ -263,7 +263,7 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
      * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 9;
+    private static final int STILL_REGISTERED = 8;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
@@ -688,7 +688,7 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(5, twoPiece,
+        Assertions.assertEquals(4, twoPiece,
                 "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (11 until set "
                         + "128's 2-piece was authored on 2026-09-28)");
     }

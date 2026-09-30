@@ -27,13 +27,6 @@
       "reason": "\"Increases the wearer's CRIT DMG dealt to enemy targets in the DEF reduction state by 28%. After the wearer inflicts the DEF reduction state on an enemy target, all allies gain 'Comburent' for 2 turn(s) ... The DMG dealt by ally targets with 'Comburent' increases by 15% ... can be triggered again after the wearer uses an attack.\" Needs a condition on the target's DEF-reduction state, a named buff with a per-attack refresh rule, and a damage-dealt bonus."
     }
   ],
-  "312": [
-    {
-      "require": 2,
-      "ability": "Ability53121",
-      "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. Increases the DMG dealt by other allies with the same Type as the wearer by 10%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the PARTY's composition -- 'another ally whose Type (element) matches mine' needs the rule to see its teammates, which the condition DSL cannot do (it looks at the owner, the actor and the event's subject only)."
-    }
-  ],
   "317": [
     {
       "require": 2,
