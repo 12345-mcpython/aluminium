@@ -1,0 +1,272 @@
+{
+  "1": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23038_after_follow_up",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 12,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.48,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23038_at_battle_start",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 21,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.48,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23038_after_follow_up",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 12,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.6,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23038_at_battle_start",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 21,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.6,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23038_after_follow_up",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 12,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.72,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23038_at_battle_start",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 21,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.72,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23038_after_follow_up",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 12,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.84,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23038_at_battle_start",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 21,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.84,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23038_after_follow_up",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 12,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.96,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23038_at_battle_start",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 21,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "谕示",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.96,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
+      "note": "⭐ 常数半（暴击伤害）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 两条规则（`FOLLOW_UP` ✓ 与 `BATTLE_START` ✓）各自给出：**能量** ✓ + **`APPLY_BUFF 谕示`** ✓+ **全队 `CRIT_ATTACK` 光环** ✓（`target: all_allies` ✓，持续期与状态同生共死 ✓）。⭐ 「当装备者**持有**【谕示】时」写成\"与授予状态同一条规则\" ✓（两者同时上下线 ✓；本句里没有提前移除状态的分支 ✓）。"
+    }
+  ]
+}
