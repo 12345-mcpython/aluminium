@@ -402,6 +402,14 @@ public final class TriggerInterpreter {
                 // 「使本次攻击的削韧值提高100%」 / 「前2段攻击…削韧值提高50%」: a multiplier on the toughness reduction this
                 // instance will cause. ⚠ Read at ONE place (SkillExecutor.applyStanceDamage), never inside
                 // Battle.reduceToughness -- that method is also called by enemy skills and by the demo script.
+                // ⚠⚠ A `scale` would be SILENTLY IGNORED (2026-09-29): the magnitude is read as a plain `percent` when the buff is built
+                // (see boostToughness). Loading such a rule and doing nothing is the "wrong number with no symptom" this interpreter refuses
+                // elsewhere, so it is refused here until `scale` is actually wired -- 1315 优势口袋 is the reader that would need it.
+                if (effect.getScale() != null && !effect.getScale().isBlank()) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states \"scale\", which this op does NOT read yet (it takes a plain \"percent\"); "
+                                    + "stating it would silently do nothing (source: " + spec.getSource() + ")");
+                }
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireDuration(effect, op, spec);
