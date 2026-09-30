@@ -1,0 +1,172 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_skill_damage",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.18
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_ult_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.18
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_skill_damage",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.21
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_ult_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.21
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_skill_damage",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_ult_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_skill_damage",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.27
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_ult_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.27
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_skill_damage",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.3
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_ult_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.3
+        }
+      ],
+      "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20005_party_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20005: 「进入战斗后，使我方全体的攻击力提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐ **一句话的卡** ✓：「进入战斗后，使**我方全体**的攻击力提高#1[i]%。同类技能无法重复生效」⇒ `BATTLE_START` + `MODIFY_ATTR ATTACK` + `target: all_allies` + `permanent: true` ✓。⚠ 「同类无法重复」是**默认行为** ✓（同一身份会替换 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20005_party_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.09,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20005: 「进入战斗后，使我方全体的攻击力提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐ **一句话的卡** ✓：「进入战斗后，使**我方全体**的攻击力提高#1[i]%。同类技能无法重复生效」⇒ `BATTLE_START` + `MODIFY_ATTR ATTACK` + `target: all_allies` + `permanent: true` ✓。⚠ 「同类无法重复」是**默认行为** ✓（同一身份会替换 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20005_party_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20005: 「进入战斗后，使我方全体的攻击力提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐ **一句话的卡** ✓：「进入战斗后，使**我方全体**的攻击力提高#1[i]%。同类技能无法重复生效」⇒ `BATTLE_START` + `MODIFY_ATTR ATTACK` + `target: all_allies` + `permanent: true` ✓。⚠ 「同类无法重复」是**默认行为** ✓（同一身份会替换 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20005_party_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.11,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20005: 「进入战斗后，使我方全体的攻击力提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐ **一句话的卡** ✓：「进入战斗后，使**我方全体**的攻击力提高#1[i]%。同类技能无法重复生效」⇒ `BATTLE_START` + `MODIFY_ATTR ATTACK` + `target: all_allies` + `permanent: true` ✓。⚠ 「同类无法重复」是**默认行为** ✓（同一身份会替换 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone20005_party_attack",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 20005: 「进入战斗后，使我方全体的攻击力提高#1[i]%。同类技能无法重复生效。」",
+      "note": "⭐ **一句话的卡** ✓：「进入战斗后，使**我方全体**的攻击力提高#1[i]%。同类技能无法重复生效」⇒ `BATTLE_START` + `MODIFY_ATTR ATTACK` + `target: all_allies` + `permanent: true` ✓。⚠ 「同类无法重复」是**默认行为** ✓（同一身份会替换 ✓）。"
+    }
+  ]
+}
