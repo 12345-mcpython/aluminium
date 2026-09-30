@@ -1,0 +1,92 @@
+{
+  "1": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone21018_party_advance",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.16,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21018: 「当装备者施放终结技后，我方全体行动提前#1[i]%」",
+      "note": "⭐ 行动提前是**瞬时**效果 ✓（`ADVANCE` ✓）⇒ **不需要持续期** ✓（这正是本句能完整表达的原因 ✓）。⭐ 作用于 **`all_allies`** ✓（「我方全体」✓）。⚠ 本椎没有 `ability_property` ✗⇒ 无常数半 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone21018_party_advance",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.18,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21018: 「当装备者施放终结技后，我方全体行动提前#1[i]%」",
+      "note": "⭐ 行动提前是**瞬时**效果 ✓（`ADVANCE` ✓）⇒ **不需要持续期** ✓（这正是本句能完整表达的原因 ✓）。⭐ 作用于 **`all_allies`** ✓（「我方全体」✓）。⚠ 本椎没有 `ability_property` ✗⇒ 无常数半 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone21018_party_advance",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21018: 「当装备者施放终结技后，我方全体行动提前#1[i]%」",
+      "note": "⭐ 行动提前是**瞬时**效果 ✓（`ADVANCE` ✓）⇒ **不需要持续期** ✓（这正是本句能完整表达的原因 ✓）。⭐ 作用于 **`all_allies`** ✓（「我方全体」✓）。⚠ 本椎没有 `ability_property` ✗⇒ 无常数半 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone21018_party_advance",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.22,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21018: 「当装备者施放终结技后，我方全体行动提前#1[i]%」",
+      "note": "⭐ 行动提前是**瞬时**效果 ✓（`ADVANCE` ✓）⇒ **不需要持续期** ✓（这正是本句能完整表达的原因 ✓）。⭐ 作用于 **`all_allies`** ✓（「我方全体」✓）。⚠ 本椎没有 `ability_property` ✗⇒ 无常数半 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone21018_party_advance",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.24,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21018: 「当装备者施放终结技后，我方全体行动提前#1[i]%」",
+      "note": "⭐ 行动提前是**瞬时**效果 ✓（`ADVANCE` ✓）⇒ **不需要持续期** ✓（这正是本句能完整表达的原因 ✓）。⭐ 作用于 **`all_allies`** ✓（「我方全体」✓）。⚠ 本椎没有 `ability_property` ✗⇒ 无常数半 ✓。"
+    }
+  ]
+}
