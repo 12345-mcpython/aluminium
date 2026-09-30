@@ -39,6 +39,10 @@ def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=N
                     continue
                 if effect_attribute is not None and do.get('attribute') != effect_attribute:
                     continue
+                if field not in do:
+                    # \u26a0 Never INVENT a field: writing `percent` into an effect that has none would make the mutation
+                    # meaningless (or worse, change the effect's shape). Only overwrite what the author wrote.
+                    continue
                 do[field] = value
                 touched += 1
     if touched != 1:
