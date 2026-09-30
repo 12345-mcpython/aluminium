@@ -7335,6 +7335,28 @@
 >   ⇒ 照抄形状一次就编过 ✓（只补了接口要求的 `source()` ✓）。
 > * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **129 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百四十一：**遗器 312 出货**（登记表 9 -> 8 条；光锥 **132 / 169**，遗器 **53 个文件**））**：
+> 
+> * ✅ **出货：遗器套装 312（2 件套）** ✓ —— 「使我方**其他**与装备者**相同属性**的角色造成的伤害提高 10%」✓
+>   = `BATTLE_START` ⇒ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.1 permanent target: all_allies` ✓
+>   + **`target_when`**（效果级目标筛选 ✓）：**`is_other_same_element_as_self`** ✓；第一句「能量恢复效率 +5%」是 `properties` ✓（**未重写** ✗）✓。
+> * ✅ **新能力（读者：本遗器 ✓）** ✓：**`is_same_element_as_self`** ✓ 及其变体 **`is_other_same_element_as_self`** ✓ ——
+>   前者问"**受测单位**与规则拥有者是否同元素" ✓；后者**排除拥有者自己** ✓（原句说的是「**其他**我方角色」✓）。
+> * ⚠⚠ **两处由引擎报错逐字纠正（纪律 221 ✓）**：
+>   ① `is_other_ally` 用在 `BATTLE_START` 的目标筛选里被拒 ✗ —— *"this event carries no actor and no target"* ✓；
+>   ② 换成身份比较 `target != self` **同样被拒** ✗（同一条理由 ✓）⇒ ⭐ **凡是 `target` 作主体的条件都不能出现在 `BATTLE_START` 的筛选里** ✓
+>      ⇒ ✅ 可行的形状只有**无主体关键词** ✓ ⇒ 这正是需要那个变体的原因 ✓。
+> * **判据读数（实测 ✓）** ✓：`[312] the wearer's element=WIND ; same-element allies=1 different=1` ✓；
+>   `Dan Heng (WIND) boost=0.1` ✓ / `Welt (IMAGINARY) boost=0.0` ✓ / `the wearer itself: boost=0.0` ✓ / `without the set: 0.0` ✓
+>   ⭐ 判据**不假设**谁是什么元素 ✓：它在候选表里**搜出**同元素与异元素各一名 ✓，找不到就失败 ✓。
+> * **三条内容变异 + 一条引擎变异（判红前先删 XML 并校验年龄 ✓）** ✓：312 the share 10 -> 5 percent=1 | 312 the filter loses the "other" variant=1 | 312 every ally is boosted (no filter)=1 | engine variant check=1
+> * ✅ 四条**全部为红** ✓。
+> * **引擎级对照** ✓（先打印候选 ✓ 再取 ✓）：让元素永不相等 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⭐ **登记表的守卫测试（本轮学到的）** ✓：`RelicTriggerTableTest` 用 **`AUTHORED` 常量**与 **`STILL_REGISTERED` 计数**把
+>   "哪些能力已表达 / 还欠几条"钉成数据 ✓ ⇒ **出货一件遗器就要同步改这两处** ✓（我最初漏了 ✓，套件当场变红 ✓ = 守卫按设计工作 ✓）。
+> * ⚠ **一处未定（登记）** ✓：光锥 21011 队友侧同元素那一击读到 `x1.0980392156862728`（= `1.12 / 1.02` ✓），跨两场战斗的 **2% 基线差**原因未定 ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：

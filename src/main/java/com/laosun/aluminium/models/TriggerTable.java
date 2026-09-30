@@ -1335,6 +1335,15 @@ public class TriggerTable {
         } else if (isNumeric(right)) {
             variable = left;
             literal = Double.parseDouble(right);
+        } else if (isNumericVariable(left) && isNumericVariable(right)) {
+            // \u2705 Two variables (2026-09-30; reader: light cone 21012). The left one keeps the existing slots and the right
+            // one gets its own, so `target_hp_percent >= self_hp_percent` reads exactly as it is written.
+            return new Numeric(left, selfAttributeOf(left, raw, spec), selfResourceOf(left, raw, spec),
+                    stacksNameOf(left, raw, spec), left.startsWith(TARGET_STACKS_PREFIX),
+                    left.startsWith(ACTOR_STACKS_PREFIX), operator, 0, false, right,
+                    selfAttributeOf(right, raw, spec), selfResourceOf(right, raw, spec),
+                    stacksNameOf(right, raw, spec), right.startsWith(TARGET_STACKS_PREFIX),
+                    right.startsWith(ACTOR_STACKS_PREFIX));
         } else {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' has no numeric literal on either side (source: "
@@ -1645,6 +1654,14 @@ public class TriggerTable {
 
     private static String normalize(String token) {
         return token.trim().toLowerCase(Locale.ROOT);
+    }
+
+    /** \u2605 Whether a side may stand as a numeric variable on its own (2026-09-30). */
+    private static boolean isNumericVariable(String token) {
+        String name = token == null ? "" : token.trim();
+        return NUMERIC_VARIABLES.contains(name) || name.startsWith(SELF_ATTR_PREFIX)
+                || name.startsWith(SELF_RESOURCE_PREFIX) || name.startsWith(SELF_STACKS_PREFIX)
+                || name.startsWith(TARGET_STACKS_PREFIX) || name.startsWith(ACTOR_STACKS_PREFIX);
     }
 
     private static boolean isNumeric(String token) {
@@ -2654,9 +2671,29 @@ public class TriggerTable {
         private final String operator;
         private final double literal;
         private final boolean literalOnLeft;
+        /**
+         * \u2705 The RIGHT-hand side when it is a variable rather than a literal (2026-09-30; reader: light cone 21012's
+         * \u300c\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4**\u5927\u4e8e\u7b49\u4e8e\u88c5\u5907\u8005\u81ea\u8eab\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4**\u300d): the DSL always said comparisons were against a
+         * party or a literal, and this is the third shape the corpus actually uses. Four descriptors, exactly like the
+         * left-hand variable's, so a two-variable comparison needs no new vocabulary at all.
+         */
+        private final String otherVariable;
+        private final AttributeType otherAttribute;
+        private final String otherResource;
+        private final String otherStacksName;
+        private final boolean otherStacksOnTarget;
+        private final boolean otherStacksOnActor;
 
         Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
                 boolean stacksOnActor, String operator, double literal, boolean literalOnLeft) {
+            this(variable, attribute, resource, stacksName, stacksOnTarget, stacksOnActor, operator, literal,
+                    literalOnLeft, null, null, null, null, false, false);
+        }
+
+        Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
+                boolean stacksOnActor, String operator, double literal, boolean literalOnLeft, String otherVariable,
+                AttributeType otherAttribute, String otherResource, String otherStacksName, boolean otherStacksOnTarget,
+                boolean otherStacksOnActor) {
             this.variable = variable;
             this.attribute = attribute;
             this.resource = resource;
@@ -2666,13 +2703,28 @@ public class TriggerTable {
             this.operator = operator;
             this.literal = literal;
             this.literalOnLeft = literalOnLeft;
+            this.otherVariable = otherVariable;
+            this.otherAttribute = otherAttribute;
+            this.otherResource = otherResource;
+            this.otherStacksName = otherStacksName;
+            this.otherStacksOnTarget = otherStacksOnTarget;
+            this.otherStacksOnActor = otherStacksOnActor;
         }
 
         @Override
         public boolean test(TriggerContext ctx) {
             double value = numericValue(ctx);
-            double left = literalOnLeft ? literal : value;
-            double right = literalOnLeft ? value : literal;
+            double left;
+            double right;
+            if (otherVariable != null) {
+                double other = value(ctx, otherVariable, otherAttribute, otherResource, otherStacksName,
+                        otherStacksOnTarget, otherStacksOnActor);
+                left = literalOnLeft ? other : value;
+                right = literalOnLeft ? value : other;
+            } else {
+                left = literalOnLeft ? literal : value;
+                right = literalOnLeft ? value : literal;
+            }
             return switch (operator) {
                 case ">" -> left > right;
                 case ">=" -> left >= right;
@@ -2696,6 +2748,12 @@ public class TriggerTable {
          * {@code *_PERCENT} keys but must not become an NPE inside a battle if it ever does.
          */
         private double numericValue(TriggerContext ctx) {
+            return value(ctx, variable, attribute, resource, stacksName, stacksOnTarget, stacksOnActor);
+        }
+
+        /** \u2605 One reader for every numeric variable, so a comparison can read two of them (2026-09-30). */
+        private double value(TriggerContext ctx, String variable, AttributeType attribute, String resource,
+                String stacksName, boolean stacksOnTarget, boolean stacksOnActor) {
             if (attribute != null) {
                 return ownerAttribute(ctx.owner(), attribute);
             }
