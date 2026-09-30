@@ -96,7 +96,15 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
         /**
          * Actually spent {@code amount} points ({@code > 0}).
          */
-        void onSpent(int amount);
+        /**
+         * \u2705 A spend, WITH the unit that spent (2026-09-30; reader: cone 23061's \u300c\u6211\u65b9\u4efb\u610f\u89d2\u8272\u5728\u81ea\u8eab\u540c\u4e00\u56de\u5408\u5185\u7d2f\u8ba1\u6d88\u8017 \u2265 4 \u70b9\u6218\u6280\u70b9\u300d).
+         *
+         * <p>\u2605 The spender was always known one frame up -- {@code onSkillCast(CanHit user, Skill skill)} is where the
+         * policy decides -- and dropping it here is why a trigger rule could not tell who spent. It stays {@code null} for
+         * the bare {@link StandardSkillPointPolicy#spend()} path, which has no actor to name, and a rule gated on
+         * {@code actor == self} then simply does not fire for it.
+         */
+        void onSpent(CanHit user, int amount);
     }
 
     private static final Listener NO_OP = new Listener() {
@@ -105,7 +113,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
         }
 
         @Override
-        public void onSpent(int amount) {
+        public void onSpent(CanHit user, int amount) {
         }
     };
 
@@ -142,7 +150,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
             }
             case BPSKILL -> {
                 if (spend()) {
-                    listener.onSpent(1);
+                    listener.onSpent(user, 1);
                     yield true;
                 }
                 yield false;                    // not enough → the action does not happen, and **no** spend event is fired

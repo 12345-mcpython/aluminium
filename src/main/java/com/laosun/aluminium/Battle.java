@@ -510,9 +510,9 @@ public class Battle {
                 }
 
                 @Override
-                public void onSpent(int amount) {
+                public void onSpent(CanHit spender, int amount) {
                     broadcastSkillPointSpent(amount);
-                    fireTriggers(TriggerEvent.SKILL_POINT_SPENT, null, null, 0, amount);
+                    fireTriggers(TriggerEvent.SKILL_POINT_SPENT, spender, null, 0, amount);
                 }
             });
         }
