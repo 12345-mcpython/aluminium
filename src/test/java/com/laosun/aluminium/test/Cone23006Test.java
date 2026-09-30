@@ -79,6 +79,8 @@ public class Cone23006Test {
                             + " turns=" + effect.getTurns() + " element=" + effect.getElement());
                     Assertions.assertEquals("self_attr:ATTACK", effect.getScale(), "60% of the wearer's attack");
                     Assertions.assertEquals(0.6, effect.getPercent(), 1e-9, "rank 1 states 60%");
+                    Assertions.assertEquals(1, effect.getTurns(),
+                            "rank 1 states one turn; printing a value is not pinning it");
                 }
             }
         }
