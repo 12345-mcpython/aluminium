@@ -314,7 +314,15 @@ public enum TriggerEvent {
      * about one unit. That class already documented this exact spot as the extension point ("if between-wave config ever
      * appears, the extension point is inside nextWave()").
      */
-    WAVE_START("WAVE_START", true);
+    WAVE_START("WAVE_START", true),
+    /**
+     * \u2705 A <b>resource changed</b> (2026-09-30; readers: cone 20024's \u300c\u5f53\u62e5\u6709\u7684\u7b11\u70b9\u2265 10 \u65f6\u2026\u300d).
+     *
+     * <p>Fired by {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} with the <b>holder</b> as the actor: a battle is at hand
+     * there, while {@code ResourceManager} owns none and so cannot raise a trigger itself. \u26a0 The consequence is stated
+     * rather than hidden -- a resource moved by anything other than those two ops does not announce itself yet.
+     */
+    RESOURCE_CHANGED("RESOURCE_CHANGED", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 
