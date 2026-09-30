@@ -1887,6 +1887,13 @@ public final class TriggerInterpreter {
             throw new IllegalStateException(
                     "Op BOOST_DAMAGE needs the damage instance being settled, but this context carries none");
         }
+        // \u26a0 A `damage_type` here must actually SCOPE the boost (round 258: the loader accepted it while this method
+        // ignored it, so "follow-up attacks only" silently raised every hit -- measured: an ordinary hit against a low-HP
+        // target came out 1.24x instead of 1.0x). Same semantics as MODIFY_ATTR's instance route.
+        com.laosun.aluminium.enums.DamageType only = parseDamageType(effect, "BOOST_DAMAGE", null);
+        if (only != null && damage.getType() != only) {
+            return;
+        }
         damage.addBoost(effect.getPercent());
     }
 
