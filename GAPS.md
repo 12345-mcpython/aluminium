@@ -4571,6 +4571,38 @@
 >     **不能只在同一队里换一个单位** ✗ —— 因为光环的受益者**本来就不是佩戴者** ✓。
 > * **进度**：**角色 90 个文件 / 493 条规则** ✓；光锥 **65 / 169** ✓；遗器 **52 个文件 / 登记表 10 条** ✓。
 > 
+
+> **2026-09-29 更新（aggro 回收之二百九十一：**抓到一个真引擎缺陷并修好** —— `BOOST_DAMAGE` 收下了 `damage_type` 却不执行）**：
+> 
+> * ⚠⚠ **缺陷** ✓：`BOOST_DAMAGE` 的 `damage_type` **在校验期被接受** ✓，但 `boostDamage()`（`TriggerInterpreter:1882`）
+>   **完全没有读它** ✗ ⇒ 「追加攻击造成的伤害额外提高 24%」会**把普通伤害也抬起来** ✗（**静默过量** ✓，正是第 112 条要防的那类 ✓）。
+> * ⭐ **实测定位（两步 ✓）**：
+>   ```
+>   两条规则都在：follow-up healthy 1.24 / low 1.48 / ORDINARY at low hp 1.24   ← 普通伤害也被抬 ✗
+>   只留无条件那条：                                        ORDINARY at low hp 1.0    ← 证明属性本身是类型门控的 ✓
+>   ⇒ 罪魁是"额外那条"的 BOOST_DAMAGE + damage_type ✗
+>   ```
+> * ✅ **修法** ✓：让 `boostDamage` **尊重 `damage_type`** ✓，语义与 `MODIFY_ATTR` 的实例路径**完全一致** ✓
+>   （复用同一个解析函数 `parseDamageType(effect, "BOOST_DAMAGE", null)` ✓ + `Damage.getType()` ✓，见 `MODIFY_ATTR` 在 1432-1435 的现成写法 ✓）。
+> * ✅ **修复后读数（实测 ✓，含"条件为假"的读数 ✓）** ✓：
+>   ```
+>   [21006] spec constant percent=0.24
+>   [21006] follow-up healthy 1.24      ← 无条件那半
+>   [21006] follow-up low 1.48          ← 再加上额外那半（0.24 + 0.24）
+>   [21006] ORDINARY at low hp 1.0      ← ★ 类型作用域生效：普通伤害一点没动
+>   ```
+> * ✅ **出货：光锥 21006**（「我」的诞生）✓ 五档 —— 两个从句**都能完整表达** ✓：
+>   ① 无条件：`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST +24%` ✓（本锥**没有 `ability_property`** ✗ ⇒ 常数由我们写 ✓）；
+>   ② 低血额外：`DEALING_DAMAGE` + `target_hp_percent <= 0.5` + **`BOOST_DAMAGE` + `damage_type: "ADDITIONAL"`** ✓。
+> * **四条变异（经 `tools/mutate.py` ✓）** ✓：remove the engine damage-type check=1 | extra half 24 -> 12 percent=1 | the low-HP condition dropped=1 | the extra half scoped to NORMAL instead=1
+> * ✅ 四条**全部为红** ✓。
+>   * ⭐ 第一条是**"把引擎修复撤掉"** ✓ —— 它证明**这个修复是承重的** ✓（撤销后普通伤害又变成 1.24 ✗）。
+> * ⚠ **一处流程教训（第 155 条）** ✓：本轮我**写锥文件的脚本失败了却没读它的输出** ✗ ⇒ 直到跑判据看到"全 1.0 / 规格 0 条"才发现**文件根本不存在** ✗。
+>   ⇒ **写内容的调用必须读它的输出** ✓（与第 148/150 条同族：**"我做了"≠"我验证了"** ✓）。
+> * **进度**：**角色 90 个文件 / 493 条规则** ✓；光锥 **66 / 169** ✓；遗器 **52 个文件 / 登记表 10 条** ✓。
+> * ⭐ **下一轮候选** ✓：把第 112 条的检查**系统化** —— 让校验期**拒绝**那些"收下 `damage_type` 却不读它"的 op ✓
+>   （现在只有 `BOOST_DAMAGE` / `MODIFY_ATTR`(instance) / `MODIFY_DAMAGE_TAKEN` 读它 ✓）。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：

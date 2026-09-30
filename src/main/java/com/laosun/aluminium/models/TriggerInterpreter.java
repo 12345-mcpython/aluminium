@@ -225,6 +225,10 @@ public final class TriggerInterpreter {
      * @throws IllegalArgumentException when the op is unknown, planned-but-unwired, or missing a
      *                                  required argument
      */
+    /** The ops that actually read {@code damage_type} (see the guard in {@link #validate}). */
+    private static final java.util.Set<String> DAMAGE_TYPE_READERS =
+            java.util.Set.of("BOOST_DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN");
+
     public static void validate(EffectSpec effect, TriggerSpec spec) {
         // ⚠ A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
         // kind of mistake this interpreter's closed sets exist to prevent.
@@ -238,6 +242,17 @@ public final class TriggerInterpreter {
 
         String op = normalizeOp(effect, spec);
         requireTargetSelector(effect, op, spec);
+        // \u26a0 A damage-type scope is only meaningful for the ops that actually READ it, and one of them used to accept it
+        // while ignoring it (BOOST_DAMAGE, fixed 2026-09-29: "follow-up attacks only" silently raised every hit). The
+        // closed set below is the fix's other half -- stating a scope an op cannot honour is refused at load time, never
+        // silently dropped.
+        if (effect.getDamageType() != null && !effect.getDamageType().isBlank()
+                && !DAMAGE_TYPE_READERS.contains(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"damage_type\", but only " + DAMAGE_TYPE_READERS
+                            + " read it; an op that ignores it would silently apply to every damage type "
+                            + "(source: " + spec.getSource() + ")");
+        }
         if (PLANNED.contains(op)) {
             throw new IllegalArgumentException(
                     "Trigger op '" + op + "' is declared in the roadmap but not wired yet "
