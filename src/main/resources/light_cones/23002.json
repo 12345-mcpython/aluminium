@@ -1,0 +1,242 @@
+{
+  "1": [
+    {
+      "on": "KILL",
+      "id": "cone23002_after_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.08,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23002_after_being_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.08,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "KILL",
+      "id": "cone23002_after_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.09,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.28,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23002_after_being_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.09,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.28,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "KILL",
+      "id": "cone23002_after_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23002_after_being_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "KILL",
+      "id": "cone23002_after_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.11,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23002_after_being_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.11,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "KILL",
+      "id": "cone23002_after_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.12,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23002_after_being_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 0.12,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+    }
+  ]
+}
