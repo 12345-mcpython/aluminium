@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "TURN_START",
+      "id": "cone20016_crit_below_threshold",
+      "when": [
+        "hp_percent < 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓）；⚠ 引擎在**事件边界**求值 ⇒ 挂 **`TURN_START` 刷新** ✓（文档未规定刷新时机 ✓，取\"每次自己回合开始重算\" ✓）；**`CRIT_CHANCE` 是比率属性** ⇒ 份额即**绝对点数** ✓（实测 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "TURN_START",
+      "id": "cone20016_crit_below_threshold",
+      "when": [
+        "hp_percent < 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.15,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓）；⚠ 引擎在**事件边界**求值 ⇒ 挂 **`TURN_START` 刷新** ✓（文档未规定刷新时机 ✓，取\"每次自己回合开始重算\" ✓）；**`CRIT_CHANCE` 是比率属性** ⇒ 份额即**绝对点数** ✓（实测 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "TURN_START",
+      "id": "cone20016_crit_below_threshold",
+      "when": [
+        "hp_percent < 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.18,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓）；⚠ 引擎在**事件边界**求值 ⇒ 挂 **`TURN_START` 刷新** ✓（文档未规定刷新时机 ✓，取\"每次自己回合开始重算\" ✓）；**`CRIT_CHANCE` 是比率属性** ⇒ 份额即**绝对点数** ✓（实测 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "TURN_START",
+      "id": "cone20016_crit_below_threshold",
+      "when": [
+        "hp_percent < 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.21,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓）；⚠ 引擎在**事件边界**求值 ⇒ 挂 **`TURN_START` 刷新** ✓（文档未规定刷新时机 ✓，取\"每次自己回合开始重算\" ✓）；**`CRIT_CHANCE` 是比率属性** ⇒ 份额即**绝对点数** ✓（实测 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "TURN_START",
+      "id": "cone20016_crit_below_threshold",
+      "when": [
+        "hp_percent < 0.8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓）；⚠ 引擎在**事件边界**求值 ⇒ 挂 **`TURN_START` 刷新** ✓（文档未规定刷新时机 ✓，取\"每次自己回合开始重算\" ✓）；**`CRIT_CHANCE` 是比率属性** ⇒ 份额即**绝对点数** ✓（实测 ✓）。"
+    }
+  ]
+}
