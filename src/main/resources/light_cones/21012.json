@@ -1,0 +1,112 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21012_healthier_target",
+      "when": [
+        "actor == self",
+        "target_hp_percent >= hp_percent"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.2,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21012: 「同时对**当前生命值百分比大于等于装备者自身当前生命值百分比**的敌方目标造成的伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇 + 一个新能力** ✓：「当前生命值百分比**大于等于装备者自身当前生命值百分比**」= **两个变量相比** `target_hp_percent >= self_hp_percent` ✓（数值条件原本**必须一侧是字面量** ✗）；「额外提高#2[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21012_healthier_target",
+      "when": [
+        "actor == self",
+        "target_hp_percent >= hp_percent"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.25,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21012: 「同时对**当前生命值百分比大于等于装备者自身当前生命值百分比**的敌方目标造成的伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇 + 一个新能力** ✓：「当前生命值百分比**大于等于装备者自身当前生命值百分比**」= **两个变量相比** `target_hp_percent >= self_hp_percent` ✓（数值条件原本**必须一侧是字面量** ✗）；「额外提高#2[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21012_healthier_target",
+      "when": [
+        "actor == self",
+        "target_hp_percent >= hp_percent"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21012: 「同时对**当前生命值百分比大于等于装备者自身当前生命值百分比**的敌方目标造成的伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇 + 一个新能力** ✓：「当前生命值百分比**大于等于装备者自身当前生命值百分比**」= **两个变量相比** `target_hp_percent >= self_hp_percent` ✓（数值条件原本**必须一侧是字面量** ✗）；「额外提高#2[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21012_healthier_target",
+      "when": [
+        "actor == self",
+        "target_hp_percent >= hp_percent"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.35,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21012: 「同时对**当前生命值百分比大于等于装备者自身当前生命值百分比**的敌方目标造成的伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇 + 一个新能力** ✓：「当前生命值百分比**大于等于装备者自身当前生命值百分比**」= **两个变量相比** `target_hp_percent >= self_hp_percent` ✓（数值条件原本**必须一侧是字面量** ✗）；「额外提高#2[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21012_healthier_target",
+      "when": [
+        "actor == self",
+        "target_hp_percent >= hp_percent"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21012: 「同时对**当前生命值百分比大于等于装备者自身当前生命值百分比**的敌方目标造成的伤容额外提高#2[i]%。」",
+      "note": "⭐ **现成词汇 + 一个新能力** ✓：「当前生命值百分比**大于等于装备者自身当前生命值百分比**」= **两个变量相比** `target_hp_percent >= self_hp_percent` ✓（数值条件原本**必须一侧是字面量** ✗）；「额外提高#2[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` ✓。"
+    }
+  ]
+}
