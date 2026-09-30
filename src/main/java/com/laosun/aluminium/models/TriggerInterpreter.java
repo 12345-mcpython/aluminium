@@ -1926,7 +1926,8 @@ public final class TriggerInterpreter {
      * every other vocabulary here: a typo has to be rejected at load time, and the two spellings are the ones
      * the content actually uses (see {@link EffectSpec#getScale()}).
      */
-    private static final Set<String> SCALES = Set.of("target_max_hp", "owner_max_hp", "owner_def", "owner_attack");
+    private static final Set<String> SCALES =
+        Set.of("target_max_hp", "target_lost_hp", "owner_max_hp", "owner_def", "owner_attack");
 
     /**
      * The one scale {@code GAIN_ENERGY} accepts: a share of the <b>receiving</b> unit's maximum energy.
@@ -2061,6 +2062,10 @@ public final class TriggerInterpreter {
         double flat = effect.getAmount() == null ? 0 : effect.getAmount();
         return switch (scale.trim()) {
             case "target_max_hp" -> target.getMaxHp() * share + flat;
+            // \u2605 \u300c\u56de\u590d\u7b49\u540c\u4e8e\u5404\u81ea**\u5df2\u635f\u5931\u751f\u547d\u503c** X% \u7684\u751f\u547d\u503c\u300d (cone 21023): "each one's own" is what
+            // `target` already means here -- the heal is granted per recipient -- so the reading is `target`'s max HP minus
+            // its current HP, never the healer's and never a battle-wide total (that is 1205's separate cumulative idea).
+            case "target_lost_hp" -> Math.max(0, target.getMaxHp() - target.getCurrentHp()) * share + flat;
             case "owner_max_hp" -> ownerAttributeOf(ctx, "owner_max_hp", AttributeType.HEALTH) * share + flat;
             // 三月七 100102: a shield of 「57% 防御力 + 760」 -- a share of the maker's DEFENCE plus a constant.
             case "owner_def" -> ownerAttributeOf(ctx, "owner_def", AttributeType.DEFENCE) * share + flat;
