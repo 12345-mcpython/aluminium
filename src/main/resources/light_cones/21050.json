@@ -1,0 +1,107 @@
+{
+  "1": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21050_memosprite_support",
+      "when": [
+        "actor == summon",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.08,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21050: 「当装备者的**忆灵对我方目标施放技能**时，使我方全体目标造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐⭐ **全用现成词汇** ✓：`SUMMON_ATTACK` 的注释本就写着「用 **`actor == summon`** 收窄到规则拥有者自己的忆灵」✓；而「对**我方目标**施放技能」= `target is_ally` ✓（`IsAlly` 条件本就存在 ✓）。⚠ 事件用 **`SKILL_CAST`** ✓ 而不是 `SUMMON_ATTACK` ✗：后者只在**攻击**时触发 ✓（`EnemySkill` 里发 ✓），而忆灵的**支援技能**走 `SkillExecutor` ✓（`Memosprites` 的注释明说 `EnemySkill` 会把它当单体攻击跑 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21050_memosprite_support",
+      "when": [
+        "actor == summon",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21050: 「当装备者的**忆灵对我方目标施放技能**时，使我方全体目标造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐⭐ **全用现成词汇** ✓：`SUMMON_ATTACK` 的注释本就写着「用 **`actor == summon`** 收窄到规则拥有者自己的忆灵」✓；而「对**我方目标**施放技能」= `target is_ally` ✓（`IsAlly` 条件本就存在 ✓）。⚠ 事件用 **`SKILL_CAST`** ✓ 而不是 `SUMMON_ATTACK` ✗：后者只在**攻击**时触发 ✓（`EnemySkill` 里发 ✓），而忆灵的**支援技能**走 `SkillExecutor` ✓（`Memosprites` 的注释明说 `EnemySkill` 会把它当单体攻击跑 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21050_memosprite_support",
+      "when": [
+        "actor == summon",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21050: 「当装备者的**忆灵对我方目标施放技能**时，使我方全体目标造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐⭐ **全用现成词汇** ✓：`SUMMON_ATTACK` 的注释本就写着「用 **`actor == summon`** 收窄到规则拥有者自己的忆灵」✓；而「对**我方目标**施放技能」= `target is_ally` ✓（`IsAlly` 条件本就存在 ✓）。⚠ 事件用 **`SKILL_CAST`** ✓ 而不是 `SUMMON_ATTACK` ✗：后者只在**攻击**时触发 ✓（`EnemySkill` 里发 ✓），而忆灵的**支援技能**走 `SkillExecutor` ✓（`Memosprites` 的注释明说 `EnemySkill` 会把它当单体攻击跑 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21050_memosprite_support",
+      "when": [
+        "actor == summon",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.14,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21050: 「当装备者的**忆灵对我方目标施放技能**时，使我方全体目标造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐⭐ **全用现成词汇** ✓：`SUMMON_ATTACK` 的注释本就写着「用 **`actor == summon`** 收窄到规则拥有者自己的忆灵」✓；而「对**我方目标**施放技能」= `target is_ally` ✓（`IsAlly` 条件本就存在 ✓）。⚠ 事件用 **`SKILL_CAST`** ✓ 而不是 `SUMMON_ATTACK` ✗：后者只在**攻击**时触发 ✓（`EnemySkill` 里发 ✓），而忆灵的**支援技能**走 `SkillExecutor` ✓（`Memosprites` 的注释明说 `EnemySkill` 会把它当单体攻击跑 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone21050_memosprite_support",
+      "when": [
+        "actor == summon",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.16,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 21050: 「当装备者的**忆灵对我方目标施放技能**时，使我方全体目标造成的伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐⭐ **全用现成词汇** ✓：`SUMMON_ATTACK` 的注释本就写着「用 **`actor == summon`** 收窄到规则拥有者自己的忆灵」✓；而「对**我方目标**施放技能」= `target is_ally` ✓（`IsAlly` 条件本就存在 ✓）。⚠ 事件用 **`SKILL_CAST`** ✓ 而不是 `SUMMON_ATTACK` ✗：后者只在**攻击**时触发 ✓（`EnemySkill` 里发 ✓），而忆灵的**支援技能**走 `SkillExecutor` ✓（`Memosprites` 的注释明说 `EnemySkill` 会把它当单体攻击跑 ✗）。"
+    }
+  ]
+}
