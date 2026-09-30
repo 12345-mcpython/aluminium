@@ -6830,6 +6830,31 @@
 >   ✅ 要么钉**绝对值** ✓，要么钉**读得到的基数** ✓（本轮：从引擎读 `CRIT_ATTACK` ✓）。
 > * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **120 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百一十六：**23036 出货**（光锥 **119 / 169**）—— 一次"引擎拒绝"换来更精确的写法**）**：
+> 
+> * ✅ **出货：光锥 23036** ✓ 五档 —— 基础速度 +12（`props` ✓）；① + ② 「装备者**和装备者的忆灵**在攻击后使装备者获得 1 层【织锦】」
+>   = **两条** `ALLY_ATTACK` 规则 ✓（`actor == self` ✓ / **`actor == summon`** ✓）⇒ `ADD_STACK max_stacks 6` ✓；
+>   ③ 「每层使装备者和忆灵**暴击伤害**提高 9%」= 实例 `CRIT_ATTACK` + `self_stacks:织锦` ✓；
+>   ④ 「**叠加上限时**，每层额外使**普攻伤害**提高 9%」= 实例 `ALL_DAMAGE_TYPE_BOOST` + `from_category Normal` ✓
+>   + `self_stacks:织锦 >= 6` ✓ ⇒ **无需改引擎** ✓。
+> * ⚠⚠ **一次"响亮的拒绝"带来的更正** ✓：原写 ④ 用 `BASIC_ATTACK_DAMAGE_BOOST` ✓ ⇒ 引擎当场报
+>   *"BASIC_ATTACK_DAMAGE_BOOST has no instance-level slot yet"* ✓（**正是本项目想要的失败方式** ✓）
+>   ⇒ ⭐ 更精确：**用 `from_category Normal` 限定"这一击就是普攻"** ✓ + 实例通用加成 ✓ ⇒ 语义等价 ✓。
+> * **判据读数（实测 ✓）** ✓：
+>   * `[23036] brocade after the wearer's attack=1 after the memosprite's attack=2` ✓（**两者都织** ✓）
+>   * `[23036] brocade after nine attacks=6` ✓（上限 ✓）
+>   * `[23036] crit untamed=714.2857312925171 one layer=757.1428751700678 at cap=1496.0000356190485 ; per layer=0.0899999999999993`
+>     ⇒ ⭐ **每层恰为 9%** ✓（锚在引擎可读的暴击基数上 ✓，纪律 216 ✓）
+>   * cap 的**算式**也钉住了 ✓：`476.19 × (1+0.5+0.54) × (1+0.54) = 1496.0` ✓（③ 加在暴击乘数、④ 乘在伤害区 ✓）
+>   * `[23036] without the cone: stacks=0` ✓
+> * **四条变异（经 `tools/mutate.py` ✓）** ✓：23036 per layer 9 -> 4.5 percent=1 | 23036 the basic-attack layer 9 -> 4.5 percent=1 | 23036 the stack cap 6 -> 9=2 | 23036 the memosprite no longer weaves=2
+> * ✅ 四条**全部为红** ✓。
+> * **引擎级对照** ✓（一条语句 ✓）：让实例暴伤槽永不填充 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⭐ **纪律 215 的复查结论** ✓：并排四个实例分支中 ✓，`DEFENCE_IGNORE` ✓ / `CRIT_ATTACK` ✓ / `ALL_DAMAGE_TYPE_BOOST` ✓ 都乘了 `per_stack` ✓，
+>   **只有 `CRIT_CHANCE` 没乘** ✗ —— 而全语料「**每层…暴击率**」是 **0** 句 ✗ ⇒ 按**纪律 190 只登记、不改代码** ✓。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **119 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
