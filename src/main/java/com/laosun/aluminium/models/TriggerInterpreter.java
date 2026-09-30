@@ -1491,7 +1491,12 @@ public final class TriggerInterpreter {
                 return;
             }
             if (attribute == AttributeType.CRIT_ATTACK) {
-                ctx.damage().addCritDamage(effect.getPercent() == null ? 0 : effect.getPercent());
+                // \u2705 per_stack belongs here too (2026-09-30; reader: cone 23016's \u300c\u6bcf\u5c42\u3010\u6e29\u9a6f\u3011\u4f7f\u66b4\u51fb\u4f24\u5bb9\u63d0\u9ad8\u300d):
+                // the two branches beside this one already scaled by the factor, and this one did not -- measured, a rule at
+                // one layer and at two layers produced the SAME number. Same shape as DEFENCE_IGNORE / the boost channel.
+                double critDamage = effect.getPercent() == null ? 0 : effect.getPercent();
+                critDamage *= ctx.target() == null ? 1 : perStackFactor(effect, ctx.target(), ctx);
+                ctx.damage().addCritDamage(critDamage);
                 return;
             }
             // \u2605 \u300c\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 X%\u300d as a property of THIS hit (2026-09-30; reader: cone 21043's
