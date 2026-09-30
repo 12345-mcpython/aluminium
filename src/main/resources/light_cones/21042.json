@@ -1,0 +1,177 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21042_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.28,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone21042_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.15,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21042_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.35,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone21042_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.1875,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21042_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.42,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone21042_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.225,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21042_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.49,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone21042_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.2625,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21042_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.56,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone21042_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.3,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 21042 铭记于心的约定: 使装备者的击破特攻提高#1[i]%。当装备者施放终结技时，暴击率提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ]
+}

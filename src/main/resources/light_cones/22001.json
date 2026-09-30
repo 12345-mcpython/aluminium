@@ -1,0 +1,177 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22001_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.08,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22001_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.16,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22001_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.09,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22001_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.19,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22001_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.1,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22001_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.22,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22001_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.11,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22001_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.25,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22001_permanent",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.12,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性也必须写成规则 ✓、用 `permanent` ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone22001_turns",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.28,
+          "target": "self",
+          "turns": 2
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "source": "光锥 22001 嘿，我在这儿: 使装备者的生命上限提高#1[i]%。当装备者施放战技时，治疗量提高#2[i]%，持续#3[i]回合。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。⭐ 「持续 #3 回合」直接取 **`turns = 2`** ✓ ⇒ **不是近似** ✓（与 20003 的\"HP 阈值\"不同 ✓，这里文档自己给了持续期 ✓）。⚠ 两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
+    }
+  ]
+}
