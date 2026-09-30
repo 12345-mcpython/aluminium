@@ -130,4 +130,20 @@ public class Cone23022Test {
         Assertions.assertEquals(0.0, normal.getDefenceIgnore(), 1e-9,
                 "and an ordinary hit is outside the clause\u2019s scope");
     }
+
+    @Test
+    public void theNoLayerSide() {
+        // \u2605 The other half of the clause, and the shape that a `when`-dropping mutation cannot survive: with NO DoT on the
+        // enemy the four seer rules have nothing to match, so no layer is ever granted -- and then the DOT instance must carry
+        // no ignore at all. \u26a0 Measuring this in a battle that HAS a DoT planted does not work: the first DOT instance grants
+        // the layer itself (discipline 212), which is exactly how the gap looked like an engine limitation.
+        build(true);
+        com.laosun.aluminium.models.Damage dot = new com.laosun.aluminium.models.Damage(wearer, enemy,
+                DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.DOT, 1000);
+        battle.applyDamage(enemy, dot);
+        System.out.println("[23022] no DoT on the enemy: seer=" + wearer.getBuffManager().stacksOf(SEER)
+                + " DOT defenceIgnore=" + dot.getDefenceIgnore());
+        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(SEER), "no DoT type, no layer");
+        Assertions.assertEquals(0.0, dot.getDefenceIgnore(), 1e-9, "and therefore no ignore on the instance");
+    }
 }
