@@ -825,7 +825,7 @@ public class TriggerTable {
      * {@link AttributeType}, the second for shape here and for existence where the character is assembled.
      */
     private static final Set<String> NUMERIC_VARIABLES =
-            Set.of("ally_count", "enemy_count", "hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
+            Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
                     "target_summon_count", "self_max_energy", "from_skill_id", "target_dot_count");
 
     /**
@@ -1685,14 +1685,14 @@ public class TriggerTable {
      */
     public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                                  Damage damage, Battle battle, SkillCategory fromCast, String ruleId,
-                                 List<Condition> targetFilter, int skillId) {
+                                 List<Condition> targetFilter, int skillId, int weakHitCount) {
 
         /**
          * The same context for an event that carries no cast category — i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle, SkillCategory fromCast) {
-            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0);
+            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0, 0);
         }
 
         /**
@@ -1704,7 +1704,7 @@ public class TriggerTable {
          */
         public TriggerContext withRule(String id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
-                    id == null ? "" : id, targetFilter, skillId);
+                    id == null ? "" : id, targetFilter, skillId, weakHitCount);
         }
         /**
          * The same context, saying <b>which data row</b> of a skill produced this event (2026-09-28).
@@ -1716,7 +1716,7 @@ public class TriggerTable {
          */
         public TriggerContext withSkillId(int id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, id);
+                    targetFilter, id, weakHitCount);
         }
 
         /**
@@ -1724,7 +1724,7 @@ public class TriggerTable {
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle) {
-            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of(), 0);
+            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of(), 0, 0);
         }
 
         /**
@@ -1747,7 +1747,7 @@ public class TriggerTable {
          */
         public TriggerContext withTargetFilter(List<Condition> filter) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    filter == null ? List.of() : filter, skillId);
+                    filter == null ? List.of() : filter, skillId, weakHitCount);
         }
 
         /**
@@ -1757,7 +1757,7 @@ public class TriggerTable {
          */
         public TriggerContext withSubject(CanHit candidate) {
             return new TriggerContext(owner, actor, candidate, hitCount, amount, damage, battle, fromCast, ruleId,
-                    List.of(), 0);
+                    List.of(), 0, weakHitCount);
         }
 
         /** Whether {@code candidate} passes the per-target conditions (an empty filter admits everything). */
@@ -1771,7 +1771,7 @@ public class TriggerTable {
         }
 
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0);
+            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0, 0);
         }
     }
 
@@ -2539,7 +2539,8 @@ public class TriggerTable {
                 return holder == null ? Double.NaN : holder.getBuffManager().stacksOf(stacksName);
             }
             return switch (variable) {
-                case "hit_count" -> ctx.hitCount();
+                case "weakness_hit_count" -> ctx.weakHitCount();   // \u2705 how many hit targets share the attack's weakness
+                    case "hit_count" -> ctx.hitCount();
                 // 「强化普攻命中…」: the DATA ROW of the skill that produced this event (0 = the event named none, which
                 // makes the comparison false rather than accidentally true for the row 0 that no skill has).
                 case "from_skill_id" -> ctx.skillId();
