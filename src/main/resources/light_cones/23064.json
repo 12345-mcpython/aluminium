@@ -1,0 +1,137 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_wind_gust",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "风口",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_wind_gust",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "风口",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_wind_gust",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "风口",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_wind_gust",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "风口",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23064_wind_gust",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "风口",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】，【风口】使装备者的速度提高#2[i]%。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，**获得【风口】**，【风口】使装备者的速度提高#2[i]%」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。⭐ **寿命取自上游** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里 `MEquip_23064_Buff_1` 在 `OnBeforeSkillUse` 被施加 ✓、带 `OnStack` + `Stacking: ReplaceByCaster` ✓，而**整个文件里没有 `\"Duration\"`** ✓（`LifeTime` 在该文件里出现 2 次，但属于**其它内容** ✓；这两个 modifier 的定义是**整段抽出**看过的 ✓） ⇒ 与 21065 同一签名 ✓ ⇒ **状态无期限 = 持续存在** ✓ ⇒ `permanent: true` ✓。⚠ **另两句已登记** ✗：「若施放的欢愉技**与上一次不同**，则额外获得【潮流】」需**记住上一次的欢愉技** ✗；「每个**波次**开始或每施放#4[i]次欢愉技后恢复 1 个战技点」需**波次事件** ✗ + **计数器** ✗。"
+    }
+  ]
+}
