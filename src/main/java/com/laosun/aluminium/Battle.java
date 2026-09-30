@@ -409,6 +409,12 @@ public class Battle {
         if (gained > 0) {
             fireTriggers(TriggerEvent.SKILL_POINT_GAINED, null, null, 0, gained);
         }
+        // \u2605 What the pool refused (2026-09-30): `asked - credited`. Both numbers are right here, which is why this is computed
+        // at the call site rather than inside the policy -- the policy reports what it credited, not what it was asked for.
+        int overflowed = n - gained;
+        if (overflowed > 0) {
+            fireTriggers(TriggerEvent.SKILL_POINT_OVERFLOWED, null, null, 0, overflowed);
+        }
     }
 
     /**
