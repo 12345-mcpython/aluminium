@@ -1,0 +1,48 @@
+{
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic119_4_break_ignores_defence",
+      "when": [
+        "actor == self",
+        "self_attr:BREAKING_EFFECT >= 1.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.1,
+          "instance": true,
+          "damage_type": "BREAK",
+          "target": "self",
+          "permanent": true,
+          "note": "⚠ 存活期字段在 **instance 路径上不被读取** ✓（修饰只活在这**一次伤害**里 ✓）—— 但加载器要求 `MODIFY_ATTR` 必须声明一种存活期 ✓ ⇒ 沿用既有遗器 108/4 的写法 `permanent: true` ✓。"
+        }
+      ],
+      "source": "遗器 119 四件套: 「当装备者的击破特攻大于等于 150% 时，对敌方目标造成的击破伤害无视其 10% 的防御力。当装备者的击破特攻大于等于 250% 时，对敌方目标造成的超击破伤害额外无视其 15% 的防御力」",
+      "note": "⭐⭐ **本轮新增的两样词汇**：① `MODIFY_ATTR` 的 **`instance: true`** 路径（第 163 轮 ✓，把修饰写进**当前这次伤害** ✓）现在支持 **`damage_type` 域** ✓ —— 只差\"比较一次类型\" ✓；② 该域**只**在 instance 路径上被读取 ✓，写在普通修饰上会在**加载期拒绝** ✓（第 112 条 ✓）。⚠ 数值绑定数据行 ✓（`param` 见运行记录 ✓ ⇒ 阈值 150%/250% ✓、无视 10%/15% ✓）。⚠ **登记**：本条写的是**两个阈值各一条规则** ✓，与原文的两句一一对应 ✓。 ⚠ 存活期写 `permanent: true` 只为了通过加载器校验 ✓，instance 路径不读它 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic119_4_super_break_ignores_more_defence",
+      "when": [
+        "actor == self",
+        "self_attr:BREAKING_EFFECT >= 2.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.15,
+          "instance": true,
+          "damage_type": "SUPER_BREAK",
+          "target": "self",
+          "permanent": true,
+          "note": "⚠ 存活期字段在 **instance 路径上不被读取** ✓（修饰只活在这**一次伤害**里 ✓）—— 但加载器要求 `MODIFY_ATTR` 必须声明一种存活期 ✓ ⇒ 沿用既有遗器 108/4 的写法 `permanent: true` ✓。"
+        }
+      ],
+      "source": "遗器 119 四件套: 「当装备者的击破特攻大于等于 150% 时，对敌方目标造成的击破伤害无视其 10% 的防御力。当装备者的击破特攻大于等于 250% 时，对敌方目标造成的超击破伤害额外无视其 15% 的防御力」",
+      "note": "⭐⭐ **本轮新增的两样词汇**：① `MODIFY_ATTR` 的 **`instance: true`** 路径（第 163 轮 ✓，把修饰写进**当前这次伤害** ✓）现在支持 **`damage_type` 域** ✓ —— 只差\"比较一次类型\" ✓；② 该域**只**在 instance 路径上被读取 ✓，写在普通修饰上会在**加载期拒绝** ✓（第 112 条 ✓）。⚠ 数值绑定数据行 ✓（`param` 见运行记录 ✓ ⇒ 阈值 150%/250% ✓、无视 10%/15% ✓）。⚠ **登记**：本条写的是**两个阈值各一条规则** ✓，与原文的两句一一对应 ✓。 ⚠ 存活期写 `permanent: true` 只为了通过加载器校验 ✓，instance 路径不读它 ✓。"
+    }
+  ]
+}
