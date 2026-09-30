@@ -14,5 +14,52 @@
       "source": "relic set 115 (The Ashblazing Grand Duke), 2-piece ability Ability51150: \"Increases the DMG dealt by Follow-Up ATK by #1[i]%.\" param = [0.2]",
       "note": "#1[i] -> percent = 0.2. This bonus is unconditional for as long as the set is worn, so it is granted once at BATTLE_START with 'permanent': true ('for the whole battle'). It could not be a stat in the effect's 'properties' list because the generated data leaves that list empty for this ability, so the rule is the only available vehicle -- and it stays data, with no per-set code.\n\nThe attribute is FOLLOW_UP_DAMAGE_BOOST rather than ALL_DAMAGE_TYPE_BOOST on purpose: the text says Follow-Up ATK specifically, and the all-type boost would also raise basic attacks, skills and ultimates. Battle.assemble applies it only when the damage type is ADDITIONAL, which is the engine's one representation of a follow-up attack."
     }
+  ],
+  "4": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "relic115_clear_on_followup",
+      "when": [
+        "actor == self"
+      ],
+      "once_per_attack": true,
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "追加攻击",
+          "amount": 8,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 115 (The Ashblazing Grand Duke), 4-piece ability Ability51151: \"该效果在装备者下一次施放追加攻击时移除。\"",
+      "note": "⭐⭐⭐ **这一条登记的理由已经过时** ✗：它写的是\"缺 `Damage` 上的追加攻击维度\" ✗，但引擎**早就把 `DamageType.ADDITIONAL` 当成追加攻击** ✓，而且**`FOLLOW_UP` 事件在每个追加伤害实例上都触发** ✓（`Battle:2428` ✓）——「每次造成伤害时」正好就是这个粒度 ✓。⭐ 「**下一次施放追加攻击时移除**」用本轮新做的 **`once_per_attack`** ✓：它只在**本次攻击的第一个**事件上生效 ✓ ⇒ 正好是\"下一次追加攻击的开头清空\" ✓。⚠ 规则顺序很重要 ✓：**先清后加** ✓（同一事件按文件顺序执行 ✓）。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "relic115_stack_per_followup_hit",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "追加攻击",
+          "amount": 1,
+          "max_stacks": 8,
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.06,
+          "per_stack": "追加攻击",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 115 (The Ashblazing Grand Duke), 4-piece ability Ability51151: \"装备者施放追加攻击时，根据追加攻击造成伤害的次数，每次造成伤害时使装备者的攻击力提高#1[i]%，最多叠加#2[i]次，持续#3[i]回合。\"",
+      "note": "⭐⭐⭐ **这一条登记的理由已经过时** ✗：它写的是\"缺 `Damage` 上的追加攻击维度\" ✗，但引擎**早就把 `DamageType.ADDITIONAL` 当成追加攻击** ✓，而且**`FOLLOW_UP` 事件在每个追加伤害实例上都触发** ✓（`Battle:2428` ✓）——「每次造成伤害时」正好就是这个粒度 ✓。⭐ 「**下一次施放追加攻击时移除**」用本轮新做的 **`once_per_attack`** ✓：它只在**本次攻击的第一个**事件上生效 ✓ ⇒ 正好是\"下一次追加攻击的开头清空\" ✓。⚠ 规则顺序很重要 ✓：**先清后加** ✓（同一事件按文件顺序执行 ✓）。"
+    }
   ]
 }

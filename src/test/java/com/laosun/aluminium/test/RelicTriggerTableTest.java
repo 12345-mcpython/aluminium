@@ -247,7 +247,8 @@ public class RelicTriggerTableTest {
             // that ally holds is the wearer's, and a whole-rule condition cannot say that (M-53).
             "103/4",
             "128/2",
-            "128/4");
+            "128/4",
+        "115/4");
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
@@ -262,7 +263,7 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
      * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 10;
+    private static final int STILL_REGISTERED = 9;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
