@@ -4603,6 +4603,28 @@
 > * ⭐ **下一轮候选** ✓：把第 112 条的检查**系统化** —— 让校验期**拒绝**那些"收下 `damage_type` 却不读它"的 op ✓
 >   （现在只有 `BOOST_DAMAGE` / `MODIFY_ATTR`(instance) / `MODIFY_DAMAGE_TAKEN` 读它 ✓）。
 > 
+
+> **2026-09-29 更新（aggro 回收之二百九十二：把第 112 条**系统化** —— 校验期拒绝"收下 `damage_type` 却不读它"的 op）**：
+> 
+> * ⚠ **背景** ✓：上一轮抓到 `BOOST_DAMAGE` **接受但忽略** `damage_type` ✗（"只对追加攻击"静默地抬高了每一次伤害 ✓）。
+>   只修一处**不够** ✓ —— 同类漏洞会在**下一个 op** 上重演 ✓。
+> * ✅ **修法** ✓：`TriggerInterpreter.validate` 增加**封闭集合**守卫 ✓：
+>   ```
+>   DAMAGE_TYPE_READERS = Set.of("BOOST_DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN")
+>   ```
+>   ⇒ 任何**不在**该集合里的 op 写了 `damage_type` ⇒ **加载期报错** ✓，并**在消息里点名**该字段与可用的 op ✓
+>     （"an op that ignores it would silently apply to every damage type" ✓）。
+>   * ⭐ 位置很关键 ✓：守卫放在 `normalizeOp` **之后、各 op 自己的校验之前** ✓ ⇒ 它是**第一条**会触发的检查 ✓。
+> * **判据（新增 `DamageTypeScopeValidationTest` ✓，写法照 `AddDamageOpTest` ✓）** ✓：
+>   * **接受**：`BOOST_DAMAGE` + `damage_type` ✓（它真的读 ✓）；
+>   * **拒绝**：`GAIN_ENERGY` / `HEAL` / `APPLY_BUFF` / `ADD_STACK` ✓ —— 四个都 **`assertThrows`** ✓，
+>     并断言**报错消息里出现 `damage_type`** ✓（第 143 条：校验器要把正确答案/罪名写进消息 ✓）。
+> * **负向对照（"把修复撤掉" ✓）** ✓：删掉守卫后 ⇒ 拒绝用例 **reds=0** ✓ ⇒ 守卫**是承重的** ✓。
+> * ⭐ **一处测试工具的知识（本轮踩到 ✓）** ✓：`TriggerSpecs.set(obj, field, value)` 用的是 **Java 字段名** ✓，
+>   不是 JSON 名 ✗（写 `"damage_type"` 会得到 `NoSuchFieldException` ✗ ⇒ 要写 **`"damageType"`** ✓）。
+>   ⇒ ⭐ 小纪律（第 156 条）✓：**反射式测试工具吃的是"字段名"，内容文件吃的是"JSON 名"** ✓ —— 两者**不要混用** ✓。
+> * **进度**：**角色 90 个文件 / 493 条规则** ✓；光锥 **66 / 169** ✓；遗器 **52 个文件 / 登记表 10 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
