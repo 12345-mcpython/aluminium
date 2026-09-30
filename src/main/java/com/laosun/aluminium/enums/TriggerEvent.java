@@ -305,7 +305,16 @@ public enum TriggerEvent {
      * instance, nobody knew whether it would crit. This one fires right AFTER the zone and only when it did,
      * so a rule needs no predicate -- and its SUBJECT is the critter, not the victim.
      */
-    CRIT_DEALT("CRIT_DEALT", true);
+    CRIT_DEALT("CRIT_DEALT", true),
+    /**
+     * \u2705 A <b>wave entered the field</b> (2026-09-30; readers: cones 23011 and 23064, \u300c\u6bcf\u4e2a\u6ce2\u6b21\u5f00\u59cb\u65f6\u300d).
+     *
+     * <p>Fired by {@code WaveManager.nextWave} right after the wave's monsters are spawned, and with neither actor nor
+     * subject -- the same shape as {@code BATTLE_START}, because a wave arriving is a fact about the battle rather than
+     * about one unit. That class already documented this exact spot as the extension point ("if between-wave config ever
+     * appears, the extension point is inside nextWave()").
+     */
+    WAVE_START("WAVE_START", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 
