@@ -83,6 +83,12 @@ public class Cone21053Test {
         // percentage survive (measured: reds 0), because the inequality still held.
         Assertions.assertEquals(1.12, shielded / bare, 1e-6,
                 "holding a shield raises the damage dealt by exactly the authored 12%");
+        // \u26a0 The pair above does NOT move when the shield CONDITION is removed: both readings then carry the boost and
+        // the ratio survives (measured: reds 0). The pair that does move pairs the shielded hit with a CONE-LESS shielded
+        // control, whose reading nothing in this cone touches.
+        System.out.println("[21053] shielded/control = " + (shielded / control));
+        Assertions.assertEquals(1.12, shielded / control, 1e-6,
+                "the shield condition is what separates a shielded hit from the same hit without the cone");
         Assertions.assertEquals(bare, control, 1e-6, "without the cone a shield changes nothing");
     }
 }
