@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21030_ult_defence_scaled_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "per_attack": 1,
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 0.6,
+          "scale": "self_attr:DEFENCE"
+        }
+      ],
+      "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
+      "note": "⭐ **用已证可行的写法** ✓：「造成等同于装备者**防御力的#2[i]%**的伤害」⇒ **`ADD_DAMAGE`** ✓ + `percent` ✓ + **`scale: self_attr:DEFENCE`** ✓（与 20018 同一个派生修饰器拼写 ✓）。⚠ 「每次施放终结技时对**每个目标**仅生效 1 次」⇒ **规则级 `per_attack: 1`** ✓（与 23024 同一写法 ✓）。⚠ 原文说的是「伤容**提高**」✓ 而不是「额外一段**附加伤容**」✗ —— 但只有 `ADD_DAMAGE` 能拿\"**防御力的百分比**\"作为量 ✓；`BOOST_DAMAGE` 只接百分比 ✗。这是**已登记**的差异 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21030_ult_defence_scaled_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "per_attack": 1,
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 0.75,
+          "scale": "self_attr:DEFENCE"
+        }
+      ],
+      "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
+      "note": "⭐ **用已证可行的写法** ✓：「造成等同于装备者**防御力的#2[i]%**的伤害」⇒ **`ADD_DAMAGE`** ✓ + `percent` ✓ + **`scale: self_attr:DEFENCE`** ✓（与 20018 同一个派生修饰器拼写 ✓）。⚠ 「每次施放终结技时对**每个目标**仅生效 1 次」⇒ **规则级 `per_attack: 1`** ✓（与 23024 同一写法 ✓）。⚠ 原文说的是「伤容**提高**」✓ 而不是「额外一段**附加伤容**」✗ —— 但只有 `ADD_DAMAGE` 能拿\"**防御力的百分比**\"作为量 ✓；`BOOST_DAMAGE` 只接百分比 ✗。这是**已登记**的差异 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21030_ult_defence_scaled_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "per_attack": 1,
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 0.9,
+          "scale": "self_attr:DEFENCE"
+        }
+      ],
+      "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
+      "note": "⭐ **用已证可行的写法** ✓：「造成等同于装备者**防御力的#2[i]%**的伤害」⇒ **`ADD_DAMAGE`** ✓ + `percent` ✓ + **`scale: self_attr:DEFENCE`** ✓（与 20018 同一个派生修饰器拼写 ✓）。⚠ 「每次施放终结技时对**每个目标**仅生效 1 次」⇒ **规则级 `per_attack: 1`** ✓（与 23024 同一写法 ✓）。⚠ 原文说的是「伤容**提高**」✓ 而不是「额外一段**附加伤容**」✗ —— 但只有 `ADD_DAMAGE` 能拿\"**防御力的百分比**\"作为量 ✓；`BOOST_DAMAGE` 只接百分比 ✗。这是**已登记**的差异 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21030_ult_defence_scaled_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "per_attack": 1,
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 1.05,
+          "scale": "self_attr:DEFENCE"
+        }
+      ],
+      "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
+      "note": "⭐ **用已证可行的写法** ✓：「造成等同于装备者**防御力的#2[i]%**的伤害」⇒ **`ADD_DAMAGE`** ✓ + `percent` ✓ + **`scale: self_attr:DEFENCE`** ✓（与 20018 同一个派生修饰器拼写 ✓）。⚠ 「每次施放终结技时对**每个目标**仅生效 1 次」⇒ **规则级 `per_attack: 1`** ✓（与 23024 同一写法 ✓）。⚠ 原文说的是「伤容**提高**」✓ 而不是「额外一段**附加伤容**」✗ —— 但只有 `ADD_DAMAGE` 能拿\"**防御力的百分比**\"作为量 ✓；`BOOST_DAMAGE` 只接百分比 ✗。这是**已登记**的差异 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21030_ult_defence_scaled_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "per_attack": 1,
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "percent": 1.2,
+          "scale": "self_attr:DEFENCE"
+        }
+      ],
+      "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
+      "note": "⭐ **用已证可行的写法** ✓：「造成等同于装备者**防御力的#2[i]%**的伤害」⇒ **`ADD_DAMAGE`** ✓ + `percent` ✓ + **`scale: self_attr:DEFENCE`** ✓（与 20018 同一个派生修饰器拼写 ✓）。⚠ 「每次施放终结技时对**每个目标**仅生效 1 次」⇒ **规则级 `per_attack: 1`** ✓（与 23024 同一写法 ✓）。⚠ 原文说的是「伤容**提高**」✓ 而不是「额外一段**附加伤容**」✗ —— 但只有 `ADD_DAMAGE` 能拿\"**防御力的百分比**\"作为量 ✓；`BOOST_DAMAGE` 只接百分比 ✗。这是**已登记**的差异 ✓。"
+    }
+  ]
+}
