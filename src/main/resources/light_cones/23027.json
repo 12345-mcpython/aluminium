@@ -1,0 +1,112 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23027_break_ignores_defence",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.2,
+          "instance": true,
+          "damage_type": "BREAK",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
+      "note": "⭐ **两句可写** ✓：① 击破特攻 +60% 是 `props` ✓（**未重写** ✗）；② 「造成的**击破伤容无视目标#3[i]%的防御力**」= `DEALING_DAMAGE` + `actor == self` ⇒ 实例 `DEFENCE_IGNORE` + **`damage_type: BREAK`** ✓（只管击破伤容 ✓）。⚠ **第三句已登记** ✗：「当装备者在战斗中**击破特攻大于等于 150%**时，速度提高 12%」—— `self_attr:BREAKING_EFFECT >= 1.5` 本来就能写 ✓，但它是**无事件的常驻判定** ✗：引擎没有\"持续重评估\"的路径 ✗（挂 `BATTLE_START` 只是**快照** ✗）⇒ 不写近似 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23027_break_ignores_defence",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.23,
+          "instance": true,
+          "damage_type": "BREAK",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
+      "note": "⭐ **两句可写** ✓：① 击破特攻 +60% 是 `props` ✓（**未重写** ✗）；② 「造成的**击破伤容无视目标#3[i]%的防御力**」= `DEALING_DAMAGE` + `actor == self` ⇒ 实例 `DEFENCE_IGNORE` + **`damage_type: BREAK`** ✓（只管击破伤容 ✓）。⚠ **第三句已登记** ✗：「当装备者在战斗中**击破特攻大于等于 150%**时，速度提高 12%」—— `self_attr:BREAKING_EFFECT >= 1.5` 本来就能写 ✓，但它是**无事件的常驻判定** ✗：引擎没有\"持续重评估\"的路径 ✗（挂 `BATTLE_START` 只是**快照** ✗）⇒ 不写近似 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23027_break_ignores_defence",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.26,
+          "instance": true,
+          "damage_type": "BREAK",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
+      "note": "⭐ **两句可写** ✓：① 击破特攻 +60% 是 `props` ✓（**未重写** ✗）；② 「造成的**击破伤容无视目标#3[i]%的防御力**」= `DEALING_DAMAGE` + `actor == self` ⇒ 实例 `DEFENCE_IGNORE` + **`damage_type: BREAK`** ✓（只管击破伤容 ✓）。⚠ **第三句已登记** ✗：「当装备者在战斗中**击破特攻大于等于 150%**时，速度提高 12%」—— `self_attr:BREAKING_EFFECT >= 1.5` 本来就能写 ✓，但它是**无事件的常驻判定** ✗：引擎没有\"持续重评估\"的路径 ✗（挂 `BATTLE_START` 只是**快照** ✗）⇒ 不写近似 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23027_break_ignores_defence",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.29,
+          "instance": true,
+          "damage_type": "BREAK",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
+      "note": "⭐ **两句可写** ✓：① 击破特攻 +60% 是 `props` ✓（**未重写** ✗）；② 「造成的**击破伤容无视目标#3[i]%的防御力**」= `DEALING_DAMAGE` + `actor == self` ⇒ 实例 `DEFENCE_IGNORE` + **`damage_type: BREAK`** ✓（只管击破伤容 ✓）。⚠ **第三句已登记** ✗：「当装备者在战斗中**击破特攻大于等于 150%**时，速度提高 12%」—— `self_attr:BREAKING_EFFECT >= 1.5` 本来就能写 ✓，但它是**无事件的常驻判定** ✗：引擎没有\"持续重评估\"的路径 ✗（挂 `BATTLE_START` 只是**快照** ✗）⇒ 不写近似 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23027_break_ignores_defence",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.32,
+          "instance": true,
+          "damage_type": "BREAK",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
+      "note": "⭐ **两句可写** ✓：① 击破特攻 +60% 是 `props` ✓（**未重写** ✗）；② 「造成的**击破伤容无视目标#3[i]%的防御力**」= `DEALING_DAMAGE` + `actor == self` ⇒ 实例 `DEFENCE_IGNORE` + **`damage_type: BREAK`** ✓（只管击破伤容 ✓）。⚠ **第三句已登记** ✗：「当装备者在战斗中**击破特攻大于等于 150%**时，速度提高 12%」—— `self_attr:BREAKING_EFFECT >= 1.5` 本来就能写 ✓，但它是**无事件的常驻判定** ✗：引擎没有\"持续重评估\"的路径 ✗（挂 `BATTLE_START` 只是**快照** ✗）⇒ 不写近似 ✓。"
+    }
+  ]
+}
