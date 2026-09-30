@@ -1,0 +1,277 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22003_max_hp",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "cone22003_crit_after_hp_loss",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.18,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone22003_crit_after_heal",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.18,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22003_max_hp",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "cone22003_crit_after_hp_loss",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.225,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone22003_crit_after_heal",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.225,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22003_max_hp",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "cone22003_crit_after_hp_loss",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.27,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone22003_crit_after_heal",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.27,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22003_max_hp",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.21,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "cone22003_crit_after_hp_loss",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.315,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone22003_crit_after_heal",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.315,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22003_max_hp",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐ 光锥的**常数半**写成规则 ✓（与遗器不同：光锥**没有 `properties` 行** ✗）⇒ `BATTLE_START` + `permanent` ✓。数值取自 `data/weapons.json` 的 `skill_value` ✓（每档一组 ✓）。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "cone22003_crit_after_hp_loss",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.36,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone22003_crit_after_heal",
+      "when": [
+        "target == self"
+      ],
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.36,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22003: 「使装备者的生命上限提高#1[i]%。损失或恢复自身生命值后，暴击伤害提高#2[i]%，持续#3[i]回合，该效果每回合只可触发1次」",
+      "note": "⭐⭐ 「**损失或恢复**自身生命值后」是**析取** ✓ ⇒ **拆成两条互相独立的规则** ✓（`HP_LOST` ✓ 与 `HEALED` ✓）。⭐ 「每回合只可触发 1 次」⇒ 规则级 **`cooldown: 1`** ✓。⚠ 两条写的是**同一个修饰量** ✓（同值 ✓），若同一回合先后触发，后者会**替换**前者 ✓而不是叠加 ✓（同值故无差 ✓）。"
+    }
+  ]
+}
