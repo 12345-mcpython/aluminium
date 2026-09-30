@@ -89,6 +89,12 @@ public class Cone21053Test {
         System.out.println("[21053] shielded/control = " + (shielded / control));
         Assertions.assertEquals(1.12, shielded / control, 1e-6,
                 "the shield condition is what separates a shielded hit from the same hit without the cone");
+        // \u26a0 But BOTH readings above hold a shield, so the condition is TRUE in each and removing it changes nothing
+        // (measured: reds 0, three attempts). What proves the condition is a reading where it is FALSE: the SAME cone
+        // wearer with no shield must deal exactly what a cone-less wearer deals.
+        System.out.println("[21053] bare/control = " + (bare / control));
+        Assertions.assertEquals(1.0, bare / control, 1e-6,
+                "without a shield this cone adds nothing: the condition is doing the work");
         Assertions.assertEquals(bare, control, 1e-6, "without the cone a shield changes nothing");
     }
 }
