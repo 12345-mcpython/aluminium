@@ -17,6 +17,20 @@
       ],
       "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
       "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23011_heal_lost_hp_per_wave",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_lost_hp",
+          "percent": 0.8,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「每个波次开始时，为我方全体回复等同于各自已损失生命值#3[i]%的生命值。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `health_percent` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「每个**波次开始**时，为我方全体回复**等同于各自已损失生命值#3[i]%**的生命值」⇒ 本轮新增的 **`WAVE_START`** ✓（在 `WaveManager.nextWave()` 里、怪物入场之后触发 ✓，与 `BATTLE_START` **同一形状**：无 actor、无 target ✓）+ **现成的** `HEAL scale: target_lost_hp` ✓（第 5 轮做的能力 ✓）+ `target: all_allies` ✓。⭐ **引擎自己就点名了这个扩展点** ✓：`WaveManager` 的注释写着“if between-wave config ever appears, the extension point is inside `nextWave()`” ✓。"
     }
   ],
   "2": [
@@ -37,6 +51,20 @@
       ],
       "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
       "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23011_heal_lost_hp_per_wave",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_lost_hp",
+          "percent": 0.85,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「每个波次开始时，为我方全体回复等同于各自已损失生命值#3[i]%的生命值。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `health_percent` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「每个**波次开始**时，为我方全体回复**等同于各自已损失生命值#3[i]%**的生命值」⇒ 本轮新增的 **`WAVE_START`** ✓（在 `WaveManager.nextWave()` 里、怪物入场之后触发 ✓，与 `BATTLE_START` **同一形状**：无 actor、无 target ✓）+ **现成的** `HEAL scale: target_lost_hp` ✓（第 5 轮做的能力 ✓）+ `target: all_allies` ✓。⭐ **引擎自己就点名了这个扩展点** ✓：`WaveManager` 的注释写着“if between-wave config ever appears, the extension point is inside `nextWave()`” ✓。"
     }
   ],
   "3": [
@@ -57,6 +85,20 @@
       ],
       "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
       "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23011_heal_lost_hp_per_wave",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_lost_hp",
+          "percent": 0.9,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「每个波次开始时，为我方全体回复等同于各自已损失生命值#3[i]%的生命值。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `health_percent` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「每个**波次开始**时，为我方全体回复**等同于各自已损失生命值#3[i]%**的生命值」⇒ 本轮新增的 **`WAVE_START`** ✓（在 `WaveManager.nextWave()` 里、怪物入场之后触发 ✓，与 `BATTLE_START` **同一形状**：无 actor、无 target ✓）+ **现成的** `HEAL scale: target_lost_hp` ✓（第 5 轮做的能力 ✓）+ `target: all_allies` ✓。⭐ **引擎自己就点名了这个扩展点** ✓：`WaveManager` 的注释写着“if between-wave config ever appears, the extension point is inside `nextWave()`” ✓。"
     }
   ],
   "4": [
@@ -77,6 +119,20 @@
       ],
       "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
       "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23011_heal_lost_hp_per_wave",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_lost_hp",
+          "percent": 0.95,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「每个波次开始时，为我方全体回复等同于各自已损失生命值#3[i]%的生命值。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `health_percent` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「每个**波次开始**时，为我方全体回复**等同于各自已损失生命值#3[i]%**的生命值」⇒ 本轮新增的 **`WAVE_START`** ✓（在 `WaveManager.nextWave()` 里、怪物入场之后触发 ✓，与 `BATTLE_START` **同一形状**：无 actor、无 target ✓）+ **现成的** `HEAL scale: target_lost_hp` ✓（第 5 轮做的能力 ✓）+ `target: all_allies` ✓。⭐ **引擎自己就点名了这个扩展点** ✓：`WaveManager` 的注释写着“if between-wave config ever appears, the extension point is inside `nextWave()`” ✓。"
     }
   ],
   "5": [
@@ -97,6 +153,20 @@
       ],
       "source": "光锥 23011: 「当装备者的生命值降低时，使我方全体造成的伤害提高#4[i]%，持续#5[i]回合」",
       "note": "⭐ 常数半（生命上限/能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 条件半：**`HP_LOST`** ✓ + `when: [\"target == self\"]` ✓（装备者自己掉血 ✓）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` 作用于 **`all_allies`** ✓（「我方全体造成的伤害」✓）。⚠ **第二句已登记** ✗：「**每个波次开始时**，为我方全体回复各自已损失生命值 8% 的生命值」同样需要\"已损失生命值\"基准 ✗，且「波次」在引擎里尚无事件 ✗。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23011_heal_lost_hp_per_wave",
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_lost_hp",
+          "percent": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23011: 「每个波次开始时，为我方全体回复等同于各自已损失生命值#3[i]%的生命值。」",
+      "note": "⭐ 常数归引擎 ✓：`props` 写了 `health_percent` / `energy_regeneration_rate` ✓ ⇒ 那两句**未重写** ✗。⭐ 「每个**波次开始**时，为我方全体回复**等同于各自已损失生命值#3[i]%**的生命值」⇒ 本轮新增的 **`WAVE_START`** ✓（在 `WaveManager.nextWave()` 里、怪物入场之后触发 ✓，与 `BATTLE_START` **同一形状**：无 actor、无 target ✓）+ **现成的** `HEAL scale: target_lost_hp` ✓（第 5 轮做的能力 ✓）+ `target: all_allies` ✓。⭐ **引擎自己就点名了这个扩展点** ✓：`WaveManager` 的注释写着“if between-wave config ever appears, the extension point is inside `nextWave()`” ✓。"
     }
   ]
 }
