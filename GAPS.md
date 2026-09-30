@@ -6568,6 +6568,33 @@
 > * **进度（回退后，实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **109 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓；
 >   有忆灵规格的角色 **5** 个：**1402 / 1413 / 1512 / 8007 / 8008** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百零三：**20022 出货**（光锥 **110 / 169**）—— 附一处"身份 vs 计数"的订正**）**：
+> 
+> * ✅ **出货：光锥 20022** ✓ 五档 —— 「**忆灵的回合开始时**，使装备者和忆灵**分别获得 1 层【缅怀】**（每层伤害 +8%，最多 **4** 层）；
+>   **忆灵消失时**移除装备者和忆灵的【缅怀】」✓ = `TURN_START` + **`actor == summon`** ✓ ⇒ 两条 `ADD_STACK`（`self` ✓ / `summon` ✓）
+>   + `KILL` + **`target == summon`** ✓ ⇒ `REMOVE_STACK` ✓。
+> * ⚠⚠ **一处引擎订正（本轮实测换来 ✓）** ✓：`summon` 选择器原本读 `Battle.summonsOf(owner)` ✓ ——
+>   而它的文档明说返回 **living** summons ✓ ⇒ 在 **`KILL`** 事件里，受害者**已经死了** ✗ ⇒ `target == summon` **恒假** ✗
+>   （实测：`the memosprite was killed: wearer stacks 1 -> 1 ; sprite dead=true` ✗）。
+>   * ✅ **改法** ✓：**身份**问对象自己 ✓（`subject instanceof Summon && getMaster() == owner` ✓ —— 阵营名册里**留着尸体** ✓）；
+>     **计数**仍走 living ✓（`self_summon_count` 读的就是 `summonsOf` ✓，它的语义是"场上有几个" ✓ 不是"尸体有几个" ✓）。
+> * **判据读数（实测 ✓）** ✓：
+>   * `[20022] after one memosprite turn: wearer=1 sprite=1`
+>   * `[20022] after the WEARER's turn start: 0`
+>   * `[20022] the memosprite was killed: wearer stacks 1 -> 0 ; sprite dead=true`
+>   * `[20022] spec op=ADD_STACK buff=缅怀 amount=1.0 max=4 target=self` / `target=summon`
+>   * `[20022] without the cone, a memosprite turn matches a rule: false`
+> * **三条内容变异 + 一条引擎变异** ✓：20022 turn gate actor == summon -> self=4 | 20022 the second stack targets self instead of summon=3 | 20022 kill gate target == summon -> target == self=1 | identity -> living=1
+> * ✅ 四条**全部为红** ✓。
+> * **引擎级对照** ✓（一条语句 ✓）：让 `REMOVE_STACK` 什么都不做 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⭐⭐ **纪律（第 211 条）** ✓：**"身份"与"计数"是两个问题** ✗ ——
+>   "**这是我的忆灵吗**" ✓（身份 ✓，尸体也仍是 ✓）与"**我有几个忆灵**" ✓（计数 ✓，只数活的 ✓）**不能用同一个查询** ✓；
+>   本轮正是把两者混用（都走 living 列表 ✓）才让"忆灵阵亡时的清理"永远不触发 ✓。
+> * ⭐ **上两轮的纪律也在本轮兑现** ✓：**210**（一个文件一次写全 ✓ —— 本轮内容与判据都是整份写入 ✓，没有再出结构性损坏 ✓）；
+>   **209**（"能触发"不等于"有意义" ✓ —— 真实 `KILL` 路径一轮就揭穿了那个假通过 ✓）。
+> * **进度（实测 ✓）**：角色 **90 个文件 / 493 条规则** ✓；光锥 **110 / 169** ✓；遗器 **52 个文件 / 登记表 9 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
