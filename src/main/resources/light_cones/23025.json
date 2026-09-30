@@ -1,0 +1,197 @@
+{
+  "1": [
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_on_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "崩溃",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_slows",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": -0.2,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_on_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "崩溃",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_slows",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": -0.2,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_on_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "崩溃",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_slows",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": -0.2,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_on_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "崩溃",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_slows",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": -0.2,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_on_break",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "崩溃",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_slows",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": -0.2,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
+      "note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    }
+  ]
+}
