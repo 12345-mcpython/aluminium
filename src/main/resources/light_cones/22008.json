@@ -1,0 +1,107 @@
+{
+  "1": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone22008_crit_after_follow_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.03,
+          "turns": 2,
+          "max_stacks": 10,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22008: 「装备者施放追加攻击后，使装备者的暴击伤容提高#2[f1]%，持续#3[i]回合，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **两句全用现成词汇** ✓：「装备者**施放追加攻击后**」= **`FOLLOW_UP`** ✓ + `actor == self` ✓；「使装备者的**暴击伤容提高 3%**，**持续 2 回合**，最多叠加 **10** 层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + `turns: 2` + **`max_stacks: 10`** ✓（层数式写法 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone22008_crit_after_follow_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.035,
+          "turns": 2,
+          "max_stacks": 10,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22008: 「装备者施放追加攻击后，使装备者的暴击伤容提高#2[f1]%，持续#3[i]回合，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **两句全用现成词汇** ✓：「装备者**施放追加攻击后**」= **`FOLLOW_UP`** ✓ + `actor == self` ✓；「使装备者的**暴击伤容提高 3%**，**持续 2 回合**，最多叠加 **10** 层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + `turns: 2` + **`max_stacks: 10`** ✓（层数式写法 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone22008_crit_after_follow_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.04,
+          "turns": 2,
+          "max_stacks": 10,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22008: 「装备者施放追加攻击后，使装备者的暴击伤容提高#2[f1]%，持续#3[i]回合，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **两句全用现成词汇** ✓：「装备者**施放追加攻击后**」= **`FOLLOW_UP`** ✓ + `actor == self` ✓；「使装备者的**暴击伤容提高 3%**，**持续 2 回合**，最多叠加 **10** 层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + `turns: 2` + **`max_stacks: 10`** ✓（层数式写法 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone22008_crit_after_follow_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.044999998,
+          "turns": 2,
+          "max_stacks": 10,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22008: 「装备者施放追加攻击后，使装备者的暴击伤容提高#2[f1]%，持续#3[i]回合，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **两句全用现成词汇** ✓：「装备者**施放追加攻击后**」= **`FOLLOW_UP`** ✓ + `actor == self` ✓；「使装备者的**暴击伤容提高 3%**，**持续 2 回合**，最多叠加 **10** 层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + `turns: 2` + **`max_stacks: 10`** ✓（层数式写法 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone22008_crit_after_follow_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.05,
+          "turns": 2,
+          "max_stacks": 10,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 22008: 「装备者施放追加攻击后，使装备者的暴击伤容提高#2[f1]%，持续#3[i]回合，该效果最多叠加#4[i]层。」",
+      "note": "⭐ **两句全用现成词汇** ✓：「装备者**施放追加攻击后**」= **`FOLLOW_UP`** ✓ + `actor == self` ✓；「使装备者的**暴击伤容提高 3%**，**持续 2 回合**，最多叠加 **10** 层」= 写下的 `MODIFY_ATTR CRIT_ATTACK` + `turns: 2` + **`max_stacks: 10`** ✓（层数式写法 ✓）。"
+    }
+  ]
+}
