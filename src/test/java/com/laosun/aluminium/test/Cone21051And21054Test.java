@@ -5,6 +5,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -91,6 +92,61 @@ public class Cone21051And21054Test {
                 + (wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - before));
         Assertions.assertEquals(before, wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get(), 1e-9,
                 "only the wearer's own memosprite counts (false case)");
+    }
+
+    /**
+     * \u2b50 The spec half. Without it the judge only read the deltas, and a wrong DURATION went unnoticed (measured: the
+     * `turns` mutation was 0 red) -- the project's own rule is that a duration must be pinned, not just observed.
+     */
+    @Test
+    public void theSpecsPinTheAttributeTheNumbersTheDurationAndExactlyTwoTargets() {
+        Battle battle = battle(CONE_BASIC);
+        double basicPercent = pinOne(battle, TriggerEvent.ULT_CAST, wearer,
+                "cone21051_ult_basic_damage", "BASIC_ATTACK_DAMAGE_BOOST", 0.2, 3);
+        Battle other = battle(CONE_HEAL);
+        double healPercent = pinOne(other, TriggerEvent.SUMMON_ATTACK, memosprite,
+                "cone21054_summon_heal_boost", "OUTGOING_HEALING_BOOST", 0.12, 1);
+        System.out.println("[21051/21054] spec percents " + basicPercent + " / " + healPercent);
+    }
+
+    /** Every effect of the one rule for that event: attribute, percent, turns, and the two targets exactly once each. */
+    private double pinOne(Battle battle, TriggerEvent event, com.laosun.aluminium.models.CanHit actor,
+                          String ruleId, String attribute, double percent, int turns) {
+        int effects = 0;
+        double seen = 0;
+        boolean selfSeen = false;
+        boolean summonSeen = false;
+        for (var rule : wearer.getTriggerTable().matching(event,
+                // \u26a0 The battle must be in the context: `actor == summon` resolves the owner's memosprite THROUGH it, so a
+                // hand-built context without one matches nothing (measured: 0 effects, and the spec half could not tell
+                // "wrong number" from "no rule at all").
+                new TriggerTable.TriggerContext(wearer, actor, enemy, 0, 0, null, battle, null))) {
+            // \u26a0 `matching` returns every rule the wearer owns for that event -- the character's own rules included. The
+            // spec half is about THIS cone, so it filters by the rule's id (measured: without this the duration read 1,
+            // a number from another source entirely).
+            if (!ruleId.equals(rule.id())) {
+                continue;
+            }
+            for (var effect : rule.effects()) {
+                if (!"MODIFY_ATTR".equals(effect.getOp()) || !attribute.equals(effect.getAttribute())) {
+                    continue;                        // the cone's other clauses are not this rule's business
+                }
+                effects++;
+                seen = effect.getPercent();
+                Assertions.assertEquals(percent, effect.getPercent(), 1e-9, "the stated share");
+                Assertions.assertEquals(turns, effect.getTurns(), "the stated duration");
+                if ("self".equals(effect.getTarget())) {
+                    selfSeen = true;
+                } else if ("summon".equals(effect.getTarget())) {
+                    summonSeen = true;
+                } else {
+                    Assertions.fail("the clause names the wearer and its memosprite, not " + effect.getTarget());
+                }
+            }
+        }
+        Assertions.assertEquals(2, effects, "exactly two effects: one for the wearer, one for the memosprite");
+        Assertions.assertTrue(selfSeen && summonSeen, "and they are `self` and `summon`");
+        return seen;
     }
 
     @Test
