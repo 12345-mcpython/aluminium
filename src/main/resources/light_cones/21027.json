@@ -1,0 +1,107 @@
+{
+  "1": [
+    {
+      "on": "KILL",
+      "id": "cone21027_attack_stack_on_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.04,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "KILL",
+      "id": "cone21027_attack_stack_on_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "KILL",
+      "id": "cone21027_attack_stack_on_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.06,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "KILL",
+      "id": "cone21027_attack_stack_on_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.07,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "KILL",
+      "id": "cone21027_attack_stack_on_kill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
+      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+    }
+  ]
+}
