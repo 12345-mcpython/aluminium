@@ -1,0 +1,97 @@
+{
+  "1": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23017_heal_lowest_ally",
+      "when": [
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 0.1,
+          "target": "lowest_hp_ally"
+        }
+      ],
+      "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
+      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23017_heal_lowest_ally",
+      "when": [
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 0.11,
+          "target": "lowest_hp_ally"
+        }
+      ],
+      "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
+      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23017_heal_lowest_ally",
+      "when": [
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 0.12,
+          "target": "lowest_hp_ally"
+        }
+      ],
+      "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
+      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23017_heal_lowest_ally",
+      "when": [
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 0.13,
+          "target": "lowest_hp_ally"
+        }
+      ],
+      "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
+      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23017_heal_lowest_ally",
+      "when": [
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 0.14,
+          "target": "lowest_hp_ally"
+        }
+      ],
+      "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
+      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+    }
+  ]
+}
