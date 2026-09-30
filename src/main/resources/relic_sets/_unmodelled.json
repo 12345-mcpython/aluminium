@@ -13,13 +13,6 @@
       "reason": "\"When the wearer uses a Follow-Up ATK, increases the wearer's ATK by 6% for every time the Follow-Up ATK deals DMG. This effect can stack up to 8 time(s) and lasts for 3 turn(s). This effect is removed the next time the wearer uses a Follow-Up ATK.\" The trigger (FOLLOW_UP), the stacking counter and the 3-turn duration are all expressible now. Two clauses still are not: 'for every time the Follow-Up ATK deals DMG' counts the damage instances of one follow-up, and the engine settles a follow-up as a single additional-damage instance, so it can never reach the documented maximum of 8 stacks -- and 'removed the next time the wearer uses a Follow-Up ATK' needs an explicit 'drop every stack of this buff' op, which the vocabulary does not have (BuffManager.removeOneBuff exists as the API but nothing exposes it to data). Writing it now would silently under-count, which is why it stays registered."
     }
   ],
-  "116": [
-    {
-      "require": 4,
-      "ability": "Ability51161",
-      "reason": "\"For every DoT the enemy target is afflicted with, the wearer will ignore 6% of its DEF when dealing DMG to it. This effect is valid for a max of 3 DoTs.\" Needs a count of the target's DoTs and a per-count scaling of the effect (the amount must be '6% x count, at most 3', and MODIFY_ATTR takes a literal). ⚠ The DEF-ignore itself is not a gap: DEFENCE_IGNORE is an attribute the defence zone already reads (engine.md 3.2)."
-    }
-  ],
   "119": [
     {
       "require": 4,
