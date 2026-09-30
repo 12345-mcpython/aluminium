@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21046_path_twins",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "shares_path_with_an_ally"
+          ]
+        }
+      ],
+      "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 ✓）** ✓：**`shares_path_with_an_ally`** ✓ —— 逐**候选**地问「该单位是否在我方有**同命途的另一人**」✓。⚠ 现有的 `has_same_path_ally` 是**队伍级**存在性检查 ✗（它从**规则拥有者**出发 ✗）⇒ 作为**目标筛选**会命中每一个候选 ✗，而原句说的是「**这些角色**」✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21046_path_twins",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "shares_path_with_an_ally"
+          ]
+        }
+      ],
+      "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 ✓）** ✓：**`shares_path_with_an_ally`** ✓ —— 逐**候选**地问「该单位是否在我方有**同命途的另一人**」✓。⚠ 现有的 `has_same_path_ally` 是**队伍级**存在性检查 ✗（它从**规则拥有者**出发 ✗）⇒ 作为**目标筛选**会命中每一个候选 ✗，而原句说的是「**这些角色**」✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21046_path_twins",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "shares_path_with_an_ally"
+          ]
+        }
+      ],
+      "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 ✓）** ✓：**`shares_path_with_an_ally`** ✓ —— 逐**候选**地问「该单位是否在我方有**同命途的另一人**」✓。⚠ 现有的 `has_same_path_ally` 是**队伍级**存在性检查 ✗（它从**规则拥有者**出发 ✗）⇒ 作为**目标筛选**会命中每一个候选 ✗，而原句说的是「**这些角色**」✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21046_path_twins",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "shares_path_with_an_ally"
+          ]
+        }
+      ],
+      "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 ✓）** ✓：**`shares_path_with_an_ally`** ✓ —— 逐**候选**地问「该单位是否在我方有**同命途的另一人**」✓。⚠ 现有的 `has_same_path_ally` 是**队伍级**存在性检查 ✗（它从**规则拥有者**出发 ✗）⇒ 作为**目标筛选**会命中每一个候选 ✗，而原句说的是「**这些角色**」✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21046_path_twins",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "shares_path_with_an_ally"
+          ]
+        }
+      ],
+      "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
+      "note": "⭐ **新关键词（读者：本卡 ✓）** ✓：**`shares_path_with_an_ally`** ✓ —— 逐**候选**地问「该单位是否在我方有**同命途的另一人**」✓。⚠ 现有的 `has_same_path_ally` 是**队伍级**存在性检查 ✗（它从**规则拥有者**出发 ✗）⇒ 作为**目标筛选**会命中每一个候选 ✗，而原句说的是「**这些角色**」✓。"
+    }
+  ]
+}
