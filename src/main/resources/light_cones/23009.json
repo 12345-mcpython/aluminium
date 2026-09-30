@@ -1,0 +1,192 @@
+{
+  "1": [
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23009_damage_up_after_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone23009_damage_up_after_price",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23009_damage_up_after_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.28,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone23009_damage_up_after_price",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.28,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23009_damage_up_after_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone23009_damage_up_after_price",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23009_damage_up_after_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone23009_damage_up_after_price",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23009_damage_up_after_hit",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone23009_damage_up_after_price",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23009: 「当装备者受到攻击或装备者消耗自身生命值后，造成的伤害提高#3[i]%，该效果在装备者施放攻击后解除」",
+      "note": "⭐⭐ 两个常数半（暴击率、生命上限）**已由引擎发放** ✓（`ability_property` ✓ —— `Weapon.java:90` 读它 ✓）⇒ **我们只写条件半** ✓。⭐ 「受到攻击**或**消耗自身生命值后」是**析取** ✓ ⇒ 拆成两条规则 ✓（`TAKING_HIT` ✓ 与 **`HP_CONSUMED`** ✓ —— 后者正是第 227/240 轮新建的通道 ✓）。⭐ 「在装备者**施放攻击后解除**」⇒ `until: \"next_attack\"` ✓（已有 6 处先例 ✓）。"
+    }
+  ]
+}

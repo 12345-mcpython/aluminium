@@ -19,9 +19,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 22003: a constant Max HP half, and a crit-damage half for "after losing OR recovering HP, once per turn".
+ * Light cone 22003 (round 247, corrected in 248): the Max HP constant belongs to the engine's ability_property, not to us.
  *
- * <p>The disjunction is two rules; the per-turn limit is the rule-level cooldown; the constant half is a rule because cones have no properties row.
+ * <p>Writing it as a rule as well DOUBLE-COUNTED it: measured 4350.02 with the rule against 4060.02 without, i.e. our rule added a second 12%
+ * on top of the one Weapon already grants. What is genuinely ours is the other half: after losing OR recovering HP, crit damage +18% for two
+ * turns, at most once per turn.
  */
 public class Cone22003Test {
     private static final int CONE = 22003;
@@ -36,21 +38,8 @@ public class Cone22003Test {
     }
 
     @Test
-    public void theConeCarriesTheConstantHalfAndBothHalvesOfTheDisjunction() {
+    public void bothHalvesOfTheDisjunctionAreWritten() {
         Character unit = wearer(true);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        int maxHp = 0;
-        for (var rule : unit.getTriggerTable().matching(TriggerEvent.BATTLE_START,
-                new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0))) {
-            for (var effect : rule.effects()) {
-                if ("MODIFY_ATTR".equals(effect.getOp()) && "HEALTH".equals(effect.getAttribute())) {
-                    maxHp++;
-                    System.out.println("[22003] max hp rule id=" + rule.id() + " percent=" + effect.getPercent());
-                    Assertions.assertEquals(0.12, effect.getPercent(), 1e-9, "rank 1 states 12%");
-                }
-            }
-        }
-        Assertions.assertEquals(1, maxHp, "exactly one constant half");
         int halves = 0;
         for (var event : List.of(TriggerEvent.HP_LOST, TriggerEvent.HEALED)) {
             for (var rule : unit.getTriggerTable().matching(event,
@@ -70,14 +59,30 @@ public class Cone22003Test {
     }
 
     @Test
-    public void theConstantHalfRaisesMaxHpAndTheLossHalfRaisesCritDamage() {
+    public void theConstantHalfComesFromAbilityPropertyNotFromUs() {
+        Character rank1 = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
+        Character rank5 = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 5));
+        Character without = CharacterFactory.create(WEARER, LEVEL);
+        System.out.println("[22003] maxHp rank1=" + rank1.getMaxHp() + " rank5=" + rank5.getMaxHp()
+                + " without=" + without.getMaxHp());
+        Assertions.assertTrue(rank1.getMaxHp() > without.getMaxHp(), "the cone grants Max HP via ability_property");
+        Assertions.assertTrue(rank5.getMaxHp() > rank1.getMaxHp(), "and the grant scales with the superimposition");
+        for (var rule : rank1.getTriggerTable().matching(TriggerEvent.BATTLE_START,
+                new TriggerTable.TriggerContext(rank1, rank1, rank1, 0, 0))) {
+            for (var effect : rule.effects()) {
+                Assertions.assertNotEquals("HEALTH", effect.getAttribute(),
+                        "we must NOT write the constant half ourselves: the engine already does");
+            }
+        }
+    }
+
+    @Test
+    public void losingHpRaisesCritDamageAndTheControlWithoutTheConeDoesNot() {
         Character withCone = wearer(true);
         Character without = wearer(false);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(withCone, without), List.of(enemy), new Random(0));
         battle.startBattle();
-        System.out.println("[22003] maxHp withCone=" + withCone.getMaxHp() + " without=" + without.getMaxHp());
-        Assertions.assertTrue(withCone.getMaxHp() > without.getMaxHp(), "the constant half raises Max HP");
         double before = withCone.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.applyDamage(withCone, new Damage(enemy, withCone, DamageElement.PHYSICAL, DamageType.NORMAL, 20));
         double afterLoss = withCone.getAttribute(AttributeType.CRIT_ATTACK).get();
@@ -91,41 +96,18 @@ public class Cone22003Test {
     }
 
     @Test
-    public void theMaxHpHalfScalesWithTheSuperimposition() {
-        // \u26a0 A cone ALSO contributes its own base HP stat, so "with vs without" mixes two causes. The rank contrast
-        // isolates the ability: the base stat does not change with superimposition, only the 12% -> 24% does.
-        Character rank1 = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
-        Character rank5 = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 5));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(rank1, rank5), List.of(enemy), new Random(0));
-        battle.startBattle();
-        int halves = 0;
-        for (var rule : rank5.getTriggerTable().matching(TriggerEvent.BATTLE_START,
-                new TriggerTable.TriggerContext(rank5, rank5, enemy, 0, 0))) {
-            for (var effect : rule.effects()) {
-                if ("MODIFY_ATTR".equals(effect.getOp()) && "HEALTH".equals(effect.getAttribute())) {
-                    halves++;
-                    System.out.println("[22003] rank5 max hp rule percent=" + effect.getPercent());
-                    Assertions.assertEquals(0.24, effect.getPercent(), 1e-9, "rank 5 states 24%");
-                }
-            }
-        }
-        Assertions.assertEquals(1, halves, "the rank-5 file has its own constant half");
-        System.out.println("[22003] maxHp rank1=" + rank1.getMaxHp() + " rank5=" + rank5.getMaxHp());
-        Assertions.assertTrue(rank5.getMaxHp() > rank1.getMaxHp(),
-                "the higher rank grants a bigger Max HP share (base stat is rank-independent)");
-    }
-
-    @Test
     public void recoveringHpAlsoRaisesCritDamage() {
         Character healer = CharacterFactory.create(WEARER, LEVEL);
-        Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
+        Character target = wearer(true);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(healer, wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(healer, target), List.of(enemy), new Random(0));
         battle.startBattle();
-        double before = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.heal(healer, wearer, 200);
-        double afterHeal = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
+        // NOT via battle.heal on a damaged target: losing HP would already fire the OTHER half of the disjunction, and the two
+        // write the same modifier (same value, so the second replaces the first and nothing moves). Emitting HEALED directly
+        // isolates this half, which is exactly what the clause says ("after recovering HP").
+        double before = target.getAttribute(AttributeType.CRIT_ATTACK).get();
+        battle.fireTriggers(TriggerEvent.HEALED, healer, target, 0, 200.0);
+        double afterHeal = target.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[22003] heal half: crit " + before + " -> " + afterHeal);
         Assertions.assertEquals(before + 0.18, afterHeal, 1e-9, "recovering HP raises crit damage by 18 points");
     }
