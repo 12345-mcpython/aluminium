@@ -1,0 +1,162 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_basic_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓（`BASIC_ATTACK_DAMAGE_BOOST` / `SKILL_DAMAGE_BOOST` ✓）。⚠ **只写了第一句从句** ✗：「普攻和战技造成的伤害提高 #1%」✓；**第二句**「当装备者的**当前能量值等于其能量上限**时，该效果额外提高 #2%」**未写** ✗ —— 引擎没有\"当前能量 == 上限\"这一条件 ✗（`self_max_energy` 只是上限 ✓），且它与第一句**作用于同一属性** ✓ ⇒ 不能近似 ✗ ⇒ 按纪律**登记而不猜** ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_skill_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_basic_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓（`BASIC_ATTACK_DAMAGE_BOOST` / `SKILL_DAMAGE_BOOST` ✓）。⚠ **只写了第一句从句** ✗：「普攻和战技造成的伤害提高 #1%」✓；**第二句**「当装备者的**当前能量值等于其能量上限**时，该效果额外提高 #2%」**未写** ✗ —— 引擎没有\"当前能量 == 上限\"这一条件 ✗（`self_max_energy` 只是上限 ✓），且它与第一句**作用于同一属性** ✓ ⇒ 不能近似 ✗ ⇒ 按纪律**登记而不猜** ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_skill_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_basic_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓（`BASIC_ATTACK_DAMAGE_BOOST` / `SKILL_DAMAGE_BOOST` ✓）。⚠ **只写了第一句从句** ✗：「普攻和战技造成的伤害提高 #1%」✓；**第二句**「当装备者的**当前能量值等于其能量上限**时，该效果额外提高 #2%」**未写** ✗ —— 引擎没有\"当前能量 == 上限\"这一条件 ✗（`self_max_energy` 只是上限 ✓），且它与第一句**作用于同一属性** ✓ ⇒ 不能近似 ✗ ⇒ 按纪律**登记而不猜** ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_skill_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_basic_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓（`BASIC_ATTACK_DAMAGE_BOOST` / `SKILL_DAMAGE_BOOST` ✓）。⚠ **只写了第一句从句** ✗：「普攻和战技造成的伤害提高 #1%」✓；**第二句**「当装备者的**当前能量值等于其能量上限**时，该效果额外提高 #2%」**未写** ✗ —— 引擎没有\"当前能量 == 上限\"这一条件 ✗（`self_max_energy` 只是上限 ✓），且它与第一句**作用于同一属性** ✓ ⇒ 不能近似 ✗ ⇒ 按纪律**登记而不猜** ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_skill_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.42,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_basic_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓（`BASIC_ATTACK_DAMAGE_BOOST` / `SKILL_DAMAGE_BOOST` ✓）。⚠ **只写了第一句从句** ✗：「普攻和战技造成的伤害提高 #1%」✓；**第二句**「当装备者的**当前能量值等于其能量上限**时，该效果额外提高 #2%」**未写** ✗ —— 引擎没有\"当前能量 == 上限\"这一条件 ✗（`self_max_energy` 只是上限 ✓），且它与第一句**作用于同一属性** ✓ ⇒ 不能近似 ✗ ⇒ 按纪律**登记而不猜** ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone21017_skill_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.48,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
+      "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    }
+  ]
+}
