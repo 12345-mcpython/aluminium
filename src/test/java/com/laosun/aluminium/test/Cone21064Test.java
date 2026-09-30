@@ -83,6 +83,36 @@ public class Cone21064Test {
     }
 
 
+    /**
+     * \u2605 The WIRING test: it casts for real, through {@code SkillExecutor}, so the line that hands the cast category to
+     * {@code CAST_SETUP} is covered -- the other cases fire the event by hand and therefore judge only the condition
+     * (measured: neutralizing that line left them all green).
+     *
+     * <p>\u26a0 The skill is built with {@code DefaultSkill} directly: an elation kit's slot 20/21 has no {@link com.laosun.aluminium.enums.SkillType},
+     * so the loader never asks for it (1513 / 8009 / 8010 all carry one). That is a TEST-side construction, not a new engine
+     * accessor -- content does not need to reach the slot, only a judge that wants to exercise a real cast does.
+     */
+    @Test
+    public void aRealElationCastReachesTheRule() {
+        Character caster = CharacterFactory.create(1513, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
+        caster.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE)
+                .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210641));
+        Enemy target = EnemyFactory.create(MONSTER, 90, 1);
+        Battle arena = new Battle(List.of(caster), List.of(target), new Random(0));
+        arena.startBattle();
+        var elation = new com.laosun.aluminium.models.skill.DefaultSkill(1513, 20, LEVEL);
+        Assertions.assertNotNull(elation.getData(), "1513 has a skill at slot 20");
+        Assertions.assertEquals(SkillCategory.ELATION_DAMAGE, elation.getData().getCategory(),
+                "and its data spells the category ElationDamage");
+        double before = arena.applyDamage(target, new Damage(caster, target, DamageElement.FIRE, DamageType.ELATION, 1000));
+        arena.castImmediate(elation, caster, List.of(target));
+        double after = arena.applyDamage(target, new Damage(caster, target, DamageElement.FIRE, DamageType.ELATION, 1000));
+        System.out.println("[21064] REAL elation cast: before=" + before + " after=" + after
+                + " ratio=" + (after / before));
+        Assertions.assertEquals(1.06, after / before, 1e-6,
+                "the engine's own cast path must hand the category to CAST_SETUP -- that is the wiring, not the condition");
+    }
+
     @Test
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
