@@ -143,5 +143,25 @@
     ],
     "source": "1309 知更鸟 终结技 ⑥「…倒计时回合开始时知更鸟退出【协奏】状态并立即行动」",
     "note": "Clause ⑥, the end of the timeline: 「倒计时回合开始时知更鸟退出【协奏】状态<b>并立即行动</b>」. ⚠ <b>One</b> `REMOVE_STATE 协奏` ends the whole thing, because the state and both of its effects carry that same name (see the ③⑤ rule above) -- including the `suspendsTurns` flag, which rides on the state itself, so her turns come back with no second switch to remember. ⚠ Its target is `all_allies`, not `self`, and that is the point: the STATE lives on her while its named effects sit on <b>every</b> ally, so removing it from her alone would leave the party ATK boost behind forever. ⚠ `EXTRA_TURN` is 「立即行动」, granted after the removal so she really takes the turn the state was holding back. ⚠ The gate is `actor == countdown` (added 2026-09-28): the identity term means <b>the countdown I placed</b>, so this rule cannot answer somebody else's countdown -- the earlier version narrowed by `self has_state 协奏`, which is the same answer only while one countdown exists in the fight."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "trace_followup_crit_aura",
+    "when": [
+      "self has_state 协奏"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "CRIT_ATTACK",
+        "percent": 0.25,
+        "instance": true,
+        "damage_type": "ADDITIONAL",
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1309 行迹「即兴装饰」(1309102): 「处于【协奏】状态时，我方全体发动追加攻击造成的暴击伤害提高 25%」",
+    "note": "⭐⭐ **\"我方全体\"不需要新能力** ✓：本引擎的 `fireTriggers` **本来就遍历全队**（`Battle:2136` ✓），每个队友的触发桌都会被问一遍 ✓ ⇒ 本规则虽然挂在 1309 身上 ✓，但**任何队友**打出追加攻击时都会生效 ✓。⭐ 条件用 **`self has_state 协奏`** ✓（= 光环自己的条件 ✓）；⚠「在场」由 `Battle:2137` 的 **`isDead()` 跳过**天然保证 ✓。⭐ 数值 **25%** 取自数据行 ✓（`1309102` 的 `param` ✓，第 106 条 ✓）。⚠ 存活期 `permanent: true` 仅为过加载器校验 ✓（instance 路径不读 ✓）。"
   }
 ]
