@@ -440,6 +440,9 @@ public class BuffManager {
      * Settles late buffs after the owner's move (tick duration, remove expired).
      */
     public void afterMove() {
+        // \u2605 The carrier's OWN turn just ended (2026-09-30): values scoped to \u300c\u540c\u4e00\u56de\u5408\u5185\u300d go away here. This runs beside the
+        // duration tick, which is the same "this unit's turn is over" moment -- one place, not two.
+        removeWithLifetime(AbstractBuff.Lifetime.TURN_END);
         processBuffTick(false);
     }
 
