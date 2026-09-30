@@ -108,6 +108,15 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * Called when speed-changing buffs or debuffs are applied.
      * IT'S IMPORTANT TO CALL WHEN CHANGING SPEED!!!
      */
+    /**
+     * \u2705 The signal's owner (2026-09-30; readers: cone 23033's advance judge, and every \u300c\u884c\u52a8\u63d0\u524d / \u5ef6\u540e\u300d sentence that
+     * has to say WHOSE action value moved). {@code Queue.getTimeRemaining(Signal)} and {@code Queue.getActionLength(Signal)} already
+     * take a signal, but until now nothing could tie one back to a unit: {@code canHit} is private and had no accessor.
+     */
+    public CanHit getCanHit() {
+        return canHit;
+    }
+
     public void refreshSpeed() {
         this.speed = canHit.getAttribute(AttributeType.SPEED).get();
     }

@@ -27,6 +27,8 @@ public class Cone23033Test {
     private static final int MONSTER = 1002011;
     private static final String MINE = "\u96f7\u9041";
     private static final String COUNT = "\u666e\u653b\u8ba1\u6570";
+    private static final double RANK_ONE = 0.5;
+    private static final double RANK_TWO = 0.55;
 
     private Character wearer;
     private Enemy enemy;
@@ -78,6 +80,45 @@ public class Cone23033Test {
         System.out.println("[23033] energy at battle start: base=" + base + " with the cone="
                 + wearer.getCurrentEnergy() + " gain=" + gain);
         Assertions.assertEquals(30.0, gain, 1e-9, "30 energy at rank 1");
+    }
+
+    /**
+     * \u2605 The advance as a NUMBER, read off the action bar: `Signal.nextActionTime` is public and `Battle.queue.getHeap()` finds a
+     * unit's signal, so nothing had to be built -- only used. Judged by RANKS again (discipline 200): the two ranks' shares
+     * are 0.5 and 0.55, so their movements must be in that ratio, which a direction-only reading cannot see.
+     */
+    @Test
+    public void theAdvanceMovesTheActionValue() {
+        double one = advanceDistance(1);
+        double two = advanceDistance(2);
+        System.out.println("[23033] action-value gain at rank 1 (" + RANK_ONE + ") = " + one
+                + " ; rank 2 (" + RANK_TWO + ") = " + two);
+        Assertions.assertTrue(one > 0, "the payout really advances the wearer");
+        Assertions.assertEquals(RANK_TWO / RANK_ONE, two / one, 0.05,
+                "the two ranks' advances must be in the ratio of their shares");
+    }
+
+    /** \u2605 How far the wearer's next action moves when the payout fires, at the given superimposition rank. */
+    private double advanceDistance(int rank) {
+        wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        battle.startBattle();
+        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
+        basicAttack(battle);
+        double before = actionTime(battle);
+        basicAttack(battle);
+        battle.processRequests();
+        double after = actionTime(battle);
+        return before - after;
+    }
+
+    private double actionTime(Battle battle) {
+        return battle.queue.getHeap().stream()
+                .filter(signal -> signal.getCanHit() == wearer)
+                .mapToDouble(signal -> signal.nextActionTime)
+                .findFirst().orElseThrow(() -> new AssertionError("the wearer is not in the action bar"));
     }
 
     @Test
