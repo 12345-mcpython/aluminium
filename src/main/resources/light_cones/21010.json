@@ -1,0 +1,212 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_stack_on_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "睚准",
+          "amount": 1,
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21010: 「当装备者多次击中同一敌方目标时…该效果最多叠加#2[i]层。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_damage_per_stack",
+      "when": [
+        "actor == self",
+        "target_stacks:睚准 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.08,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "睚准",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21010: 「…每次造成的伤容提高#1[i]%。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_stack_on_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "睚准",
+          "amount": 1,
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21010: 「当装备者多次击中同一敌方目标时…该效果最多叠加#2[i]层。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_damage_per_stack",
+      "when": [
+        "actor == self",
+        "target_stacks:睚准 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "睚准",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21010: 「…每次造成的伤容提高#1[i]%。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_stack_on_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "睚准",
+          "amount": 1,
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21010: 「当装备者多次击中同一敌方目标时…该效果最多叠加#2[i]层。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_damage_per_stack",
+      "when": [
+        "actor == self",
+        "target_stacks:睚准 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "睚准",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21010: 「…每次造成的伤容提高#1[i]%。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_stack_on_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "睚准",
+          "amount": 1,
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21010: 「当装备者多次击中同一敌方目标时…该效果最多叠加#2[i]层。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_damage_per_stack",
+      "when": [
+        "actor == self",
+        "target_stacks:睚准 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.14,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "睚准",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21010: 「…每次造成的伤容提高#1[i]%。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_stack_on_the_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "睚准",
+          "amount": 1,
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21010: 「当装备者多次击中同一敌方目标时…该效果最多叠加#2[i]层。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21010_damage_per_stack",
+      "when": [
+        "actor == self",
+        "target_stacks:睚准 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.16,
+          "instance": true,
+          "permanent": true,
+          "per_stack": "睚准",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21010: 「…每次造成的伤容提高#1[i]%。」",
+      "note": "⭐⭐ **层数挂在目标身上** ✓：「多次击中**同一**敌方目标」= **该目标自己的计数器** ✓（`ADD_STACK … target: target` ✓；探针实测：三次命中后目标身上 1/2/3 ✓）；「每次造成的伤容提高#1[i]%」= **实例** `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: 睚准`** ✓。⚠ **第三句已登记** ✗：「若攻击目标发生变化，立即解除当前的增益效果」——其**可观察结果**已成立 ✓（换目标时新目标计数为 0 ✓ ⇒ 不给加成 ✓），但「旧目标计数被清零」**未建模** ✗。"
+    }
+  ]
+}
