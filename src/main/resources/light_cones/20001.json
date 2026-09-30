@@ -1,0 +1,202 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_skill",
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.12,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_ult",
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.12,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_skill",
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.15,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_ult",
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.15,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_skill",
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.18,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_ult",
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.18,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_skill",
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.21,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_ult",
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.21,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_skill",
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.24,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone20001_heal_on_ult",
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.24,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 20001 物穰: 「装备者施放战技和终结技时，治疗量提高#1[i]%。」",
+      "note": "⭐⭐⭐ **窗口 = 那一次施放** ✓（上游 `MEquip_20001_Main` 的回调对是 **`OnBeforeSkillUse` → `OnAfterSkillUse`** ✓）⇒ 用新增的寿命 **`\"until\": \"cast_end\"`** ✓。⭐ 触发用 **`CAST_SETUP`** ✓：它是**结算之前**唯一的施放事件 ✓（`ULT_CAST`/`SKILL_CAST` 是\"之后\" ✗，救不了这次施放自己的治疗 ✗）；本轮让它**带上了施放类别** ✓。⚠ 为什么不能用别的 ✗：`turns: 1` 会把**同回合后续的治疗**也加成 ✗（过量 ✗）；而**治疗没有实例作用域** ✗（伤害有 `BOOST_DAMAGE` ✓）。"
+    }
+  ]
+}

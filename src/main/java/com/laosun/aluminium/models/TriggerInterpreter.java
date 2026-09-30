@@ -1737,6 +1737,8 @@ public final class TriggerInterpreter {
                 case "next_attack" -> AbstractBuff.Lifetime.NEXT_ATTACK;
                 case "next_skill" -> AbstractBuff.Lifetime.NEXT_SKILL;
                 case "next_ultimate" -> AbstractBuff.Lifetime.NEXT_ULTIMATE;
+            // \u2605 The cast being delivered right now: raised inside the cast window, dropped when its events are done.
+            case "cast_end" -> AbstractBuff.Lifetime.CAST_END;
                 default -> throw new IllegalStateException(
                         "Lifetime '" + name + "' passed validation but has no implementation");
             });
@@ -3148,7 +3150,7 @@ public final class TriggerInterpreter {
      * writing {@code "next_atack"} must hear about it while the file is read, not by watching a buff that
      * quietly never expires.
      */
-    private static final Set<String> LIFETIMES = Set.of("next_attack", "next_skill", "next_ultimate");
+    private static final Set<String> LIFETIMES = Set.of("next_attack", "next_skill", "cast_end", "next_ultimate");
 
     /**
      * Validates the optional stack cap of a {@code MODIFY_ATTR} effect <b>at load time</b>.
