@@ -1,0 +1,262 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23023_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「使装备者的防御力提高 #1[i]%」—— 无条件永久属性 ✓；数值本档 ParamList 第 1 项 = 0.4 ✓。"
+    },
+    {
+      "on": "SHIELD_GRANTED",
+      "id": "cone23023_crit_on_shield",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.4,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者为我方目标提供护盾时，使装备者的暴击伤害提高 #2[i]%，持续 #3[i] 回合」—— 发送点是 Battle.fireTriggersForAlly(SHIELD_GRANTED, provider, target, value) ✓，provider 就是 actor ⇒ `actor == self` 表达\"装备者提供的护盾\" ✓；持续 #3[i] = 2 ✓；数值 #2[i] = 0.4 ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23023_vuln_on_followup",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.1,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者发动追加攻击击中敌方目标时…使受到攻击的敌方目标受到的伤害提高 #5[f1]%，持续 #6[i] 回合」—— ① FOLLOW_UP 是 fireTriggersWithSubject(FOLLOW_UP, attacker, target, …) ✓ ⇒ 只带单个 target ✓，但它按\"每个受击目标逐次发送\" ✓ ⇒ `target: target` 恰好是「受到攻击的敌方目标」 ✓（引擎把命中集合扇开成多次触发 ✓，不需要集合机制 ✓）；② #4 = 1 ⇒ 100% 基础概率 = 必定施加 ⇒ 省略 base_chance ✓；③ #5[i] = 0.1 ✓、#6[i] = 2 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23023_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.46,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「使装备者的防御力提高 #1[i]%」—— 无条件永久属性 ✓；数值本档 ParamList 第 1 项 = 0.46 ✓。"
+    },
+    {
+      "on": "SHIELD_GRANTED",
+      "id": "cone23023_crit_on_shield",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.46,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者为我方目标提供护盾时，使装备者的暴击伤害提高 #2[i]%，持续 #3[i] 回合」—— 发送点是 Battle.fireTriggersForAlly(SHIELD_GRANTED, provider, target, value) ✓，provider 就是 actor ⇒ `actor == self` 表达\"装备者提供的护盾\" ✓；持续 #3[i] = 2 ✓；数值 #2[i] = 0.46 ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23023_vuln_on_followup",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.115,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者发动追加攻击击中敌方目标时…使受到攻击的敌方目标受到的伤害提高 #5[f1]%，持续 #6[i] 回合」—— ① FOLLOW_UP 是 fireTriggersWithSubject(FOLLOW_UP, attacker, target, …) ✓ ⇒ 只带单个 target ✓，但它按\"每个受击目标逐次发送\" ✓ ⇒ `target: target` 恰好是「受到攻击的敌方目标」 ✓（引擎把命中集合扇开成多次触发 ✓，不需要集合机制 ✓）；② #4 = 1 ⇒ 100% 基础概率 = 必定施加 ⇒ 省略 base_chance ✓；③ #5[i] = 0.115 ✓、#6[i] = 2 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23023_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.52,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「使装备者的防御力提高 #1[i]%」—— 无条件永久属性 ✓；数值本档 ParamList 第 1 项 = 0.52 ✓。"
+    },
+    {
+      "on": "SHIELD_GRANTED",
+      "id": "cone23023_crit_on_shield",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.52,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者为我方目标提供护盾时，使装备者的暴击伤害提高 #2[i]%，持续 #3[i] 回合」—— 发送点是 Battle.fireTriggersForAlly(SHIELD_GRANTED, provider, target, value) ✓，provider 就是 actor ⇒ `actor == self` 表达\"装备者提供的护盾\" ✓；持续 #3[i] = 2 ✓；数值 #2[i] = 0.52 ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23023_vuln_on_followup",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.13,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者发动追加攻击击中敌方目标时…使受到攻击的敌方目标受到的伤害提高 #5[f1]%，持续 #6[i] 回合」—— ① FOLLOW_UP 是 fireTriggersWithSubject(FOLLOW_UP, attacker, target, …) ✓ ⇒ 只带单个 target ✓，但它按\"每个受击目标逐次发送\" ✓ ⇒ `target: target` 恰好是「受到攻击的敌方目标」 ✓（引擎把命中集合扇开成多次触发 ✓，不需要集合机制 ✓）；② #4 = 1 ⇒ 100% 基础概率 = 必定施加 ⇒ 省略 base_chance ✓；③ #5[i] = 0.13 ✓、#6[i] = 2 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23023_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.58,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「使装备者的防御力提高 #1[i]%」—— 无条件永久属性 ✓；数值本档 ParamList 第 1 项 = 0.58 ✓。"
+    },
+    {
+      "on": "SHIELD_GRANTED",
+      "id": "cone23023_crit_on_shield",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.58,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者为我方目标提供护盾时，使装备者的暴击伤害提高 #2[i]%，持续 #3[i] 回合」—— 发送点是 Battle.fireTriggersForAlly(SHIELD_GRANTED, provider, target, value) ✓，provider 就是 actor ⇒ `actor == self` 表达\"装备者提供的护盾\" ✓；持续 #3[i] = 2 ✓；数值 #2[i] = 0.58 ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23023_vuln_on_followup",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.145,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者发动追加攻击击中敌方目标时…使受到攻击的敌方目标受到的伤害提高 #5[f1]%，持续 #6[i] 回合」—— ① FOLLOW_UP 是 fireTriggersWithSubject(FOLLOW_UP, attacker, target, …) ✓ ⇒ 只带单个 target ✓，但它按\"每个受击目标逐次发送\" ✓ ⇒ `target: target` 恰好是「受到攻击的敌方目标」 ✓（引擎把命中集合扇开成多次触发 ✓，不需要集合机制 ✓）；② #4 = 1 ⇒ 100% 基础概率 = 必定施加 ⇒ 省略 base_chance ✓；③ #5[i] = 0.145 ✓、#6[i] = 2 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23023_defence",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.64,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「使装备者的防御力提高 #1[i]%」—— 无条件永久属性 ✓；数值本档 ParamList 第 1 项 = 0.64 ✓。"
+    },
+    {
+      "on": "SHIELD_GRANTED",
+      "id": "cone23023_crit_on_shield",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.64,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者为我方目标提供护盾时，使装备者的暴击伤害提高 #2[i]%，持续 #3[i] 回合」—— 发送点是 Battle.fireTriggersForAlly(SHIELD_GRANTED, provider, target, value) ✓，provider 就是 actor ⇒ `actor == self` 表达\"装备者提供的护盾\" ✓；持续 #3[i] = 2 ✓；数值 #2[i] = 0.64 ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "cone23023_vuln_on_followup",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.16,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23023 全下: 使装备者的防御力提高#1[i]%，当装备者为我方目标提供护盾时，使装备者的暴击伤害提高#2[i]%，持续#3[i]回合。当装备者发动追加攻击击中敌方目标时，有#4[i]%的基础概率使受到攻击的敌方目标受到的伤害提高#5[f1]%，持续#6[i]回合。",
+      "note": "「当装备者发动追加攻击击中敌方目标时…使受到攻击的敌方目标受到的伤害提高 #5[f1]%，持续 #6[i] 回合」—— ① FOLLOW_UP 是 fireTriggersWithSubject(FOLLOW_UP, attacker, target, …) ✓ ⇒ 只带单个 target ✓，但它按\"每个受击目标逐次发送\" ✓ ⇒ `target: target` 恰好是「受到攻击的敌方目标」 ✓（引擎把命中集合扇开成多次触发 ✓，不需要集合机制 ✓）；② #4 = 1 ⇒ 100% 基础概率 = 必定施加 ⇒ 省略 base_chance ✓；③ #5[i] = 0.16 ✓、#6[i] = 2 ✓。"
+    }
+  ]
+}
