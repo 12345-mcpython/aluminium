@@ -103,12 +103,16 @@ public class Character1505Test {
                     // \u2705 the third source (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d -- the amount is the event\u2019s own
                     Assertions.assertEquals("\u597d\u6d3b\u5f53\u8d4f", effect.getResource(),
                             "the mirrored resource is \u3010\u597d\u6d3b\u5f53\u8d4f\u3011");
+                } else if ("DAMAGE".equals(effect.getOp())) {
+                    // \u2705 the technique\u2019s own damage (2026-09-30): a rule-driven ORDINARY instance, so it has no `amount` at all
+                    Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "100% of her attack");
+                    Assertions.assertEquals(Boolean.TRUE, effect.getOrdinary(), "as an ordinary hit");
                 } else {
                     Assertions.assertEquals(20.0, effect.getAmount(), 1e-9, "the technique grants twenty");
                 }
             }
         }
-        Assertions.assertEquals(2, seen, "BATTLE_START carries the derive and the technique");
+        Assertions.assertEquals(3, seen, "BATTLE_START carries the derive, the technique\u2019s twenty and its damage");
 
         // \u2705 The third clause lives on a DIFFERENT event (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d
         // is triggered by ENERGY_GAINED, so it is pinned by reading that event\u2019s rules -- the first version of this test counted

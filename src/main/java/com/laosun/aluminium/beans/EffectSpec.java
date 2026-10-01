@@ -49,6 +49,7 @@ public class EffectSpec {
         copy.amountPercent = amountPercent;
         copy.amountFromEvent = amountFromEvent;
         copy.amountCap = amountCap;
+        copy.ordinary = ordinary;
         copy.perStack = this.perStack;
         copy.scale = this.scale;
         copy.attribute = this.attribute;
@@ -151,6 +152,13 @@ return copy;
      * \u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u4e0d\u8d85\u8fc7 100 \u70b9\u300d). The clause bounds one conversion, not the resource: \u300c\u83b7\u5f97\u4e00\u70b9\u80fd\u91cf\n     * \u5c31\u5f97\u4e00\u70b9\u793c\u5305\uff0c\u4f46\u4e00\u6b21\u6700\u591a\u7ed9 100\u300d is two different statements, and only the first had a spelling before this.
      */
     private Double amountCap;
+    /**
+     * \u2705 Settle this {@code DAMAGE} effect as an ORDINARY instance rather than additional damage (2026-09-30;
+     * reader: 1505 \u7eef\u82f1\u2019s technique, \u300c\u8fdb\u5165\u6218\u6597\u540e\uff0c\u5bf9\u654c\u65b9\u5168\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u7eef\u82f1 <b>100%</b> \u653b\u51fb\u529b\u7684
+     * <b>\u7269\u7406\u5c5e\u6027\u4f24\u5bb9</b>\u300d). The two are not the same thing and the difference is measurable: additional damage is
+     * boostable-only-as-additional, does not count as an attack and credits the victim energy only on a kill, while the
+     * sentence above describes an ordinary hit.\n     */
+    private Boolean ordinary;
 
     /**
      * What a {@code HEAL} / {@code SHIELD} amount is a <b>percentage of</b>, instead of a flat number.
