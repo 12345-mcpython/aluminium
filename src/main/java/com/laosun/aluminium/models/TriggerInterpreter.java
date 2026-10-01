@@ -141,7 +141,11 @@ public final class TriggerInterpreter {
     private static final Set<String> TARGET_SELECTORS =
             Set.of("party_first", "next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
                     "target_and_summon", "all_enemies", "lowest_hp_ally",
-            "random_enemy", "random_hit_enemy");
+            "random_enemy", "random_hit_enemy",
+            // ⭐ 「若追加攻击施放前目标被消灭则对敌方随机单体发动」 (2026-09-30; three registered readers:
+            // 1220 reason 1, 1221 reason 2, 1305). The preferred target is dead -> take a random enemy.
+            // CanHit:88-90 keeps death orthogonal to invulnerability, so this is the clause own wording.
+            "target_else_random_enemy");
 
     /**
      * The two spellings of "every one of our characters".
@@ -1308,6 +1312,16 @@ public final class TriggerInterpreter {
             // battle.characters, not battle.allies (summons are appended to that one).
             case "party_first" -> require(partyFirst(ctx), "party_first", ctx);
             case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);
+            // ⭐ The fallback (2026-09-30): 「若…目标被消灭则对敌方随机单体发动」. The preferred target
+            // is the trigger's own, and CanHit has a real "defeated" flag orthogonal to invulnerability (CanHit:88-90),
+            // so a dead preferred target -- and only that -- falls through to the battle's seeded random opponent.
+            case "target_else_random_enemy" -> {
+                CanHit preferred = ctx.target();
+                yield preferred != null && !preferred.isDeath()
+                        ? preferred
+                        : require(ctx.battle() == null ? null
+                        : ctx.battle().randomOpponent(ctx.owner()), "target_else_random_enemy", ctx);
+            }
             case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                     TARGET_RANDOM_ENEMY, ctx);
             default -> throw new IllegalStateException(
