@@ -7594,6 +7594,30 @@
 >   `damageTypeOf` 对它是 `ELATION` ✓、对其余是 `NORMAL` ✓）；**第二步**把 `ELATION_DAMAGE_BOOST` 折进基数 ✓
 >   （判据用 1501 的真实技能 ✓）；**第三步**才谈 1505 的出货 ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百五十五：**欢愉切片 1a 回退，但它的三步已经全部实测通过**）**：
+> 
+> * ⚠ **本轮没有落地出货** ✗（改动已全部撤回 ✓，树干净 ✓、全量绿 ✓）。**但切片本身在定向判据下是绿的** ✓，
+>   回退的**唯一**原因是要同时更新一个**守卫测试** ✗，而我的自动补丁两次都没打准（插错循环 / 取块越界 ✓）
+>   ⇒ 按纪律不把**半绿的树**留在仓库里 ✓。
+> * ⭐⭐ **已经实测成立的三步（下一轮照抄即可 ✓）**：
+>   ① **档位表** ✓：`Constant.SKILL_SLOT` 加上 `SkillType.ELATION_SKILL, 20` 与 `SkillType.ELATION_EXTRA, 21`
+>      （**枚举常量不带参数** ✗ —— 我最初写成 `ELATION_SKILL(20)` 被编译器当场否掉 ✓）；
+>   ② **`isIntrinsic()`** ✓：kit 构建器有一道 `if (!type.isIntrinsic()) continue;` ✗（`Character` 约 392 行 ✓）
+>      ⇒ 新档位必须加进 `isIntrinsic()`（`return COMMON/SKILL/ULTRA/TALENT || ELATION_SKILL || ELATION_EXTRA;` ✓）
+>      —— **这是 20/21 长期不可见的真正闸门** ✓（`Battle.startBattle()` 只补 `MAZE`/`TECHNIQUE` ✗）；
+>   ③ **类型由数据决定** ✓：`SkillExecutor` 里按已解析的 `SkillCategory` 选类型 ✓（`damageTypeOf` ✓）。
+>      ⭐ **定向判据读数（当时是绿的 ✓）**：
+>      `[slots] ELATION_SKILL is ElationDamage (category ELATION_DAMAGE) -> ELATION` ✓
+>      `[slots] Sparxie: 1 Elation skill(s), 5 ordinary` ✓（**1501 的 kit 真的带上了欢愉技** ✓、其余仍是 `NORMAL` ✓）。
+> * ⚠ **只差的一件事（下一轮的第一步 ✓）**：`SkillSlotMappingTest` 的**两处**要更新 ✓ ——
+>   ① `slotTableIsTheSingleSourceOfTruth`（第 40 行起的 `Map.of(...)` ✓）要加 `ELATION_SKILL = 20` / `ELATION_EXTRA = 21` ✓；
+>   ② `builderDataMatchesTheRawSkillData`（约 137 行 ✓）在 `Constant.SKILLS.get(cid).get(slot)` **为 null 时应跳过** ✓
+>      （**表列的是档位，不是每个角色都有的行** ✓ ⇒ 只有 7 个角色有 20/21 ✓）。
+>   ✅ 教训 ✓：**改共享表之前，先看有哪些守卫测试钉着它** ✓（这一轮我是在红了之后才发现的 ✓）——
+>   与遗器那边的 `AUTHORED` 常量守卫是同一回事 ✓。
+> * **进度（回退后，实测 ✓）**：角色 **90 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
