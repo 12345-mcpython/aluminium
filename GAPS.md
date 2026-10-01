@@ -7662,6 +7662,33 @@
 >   ⇒ 剩下的 P10 部分是 **「欢愉度」这个量**（1505 天赋：等同于暴击伤害 50% ✓、随能量获取增长 ✓）、**笑点**（1502/126 ✓）、
 >   【好活当赏】✓ ⇒ 那才是 **1502/1505/1506 出货**与遗器 126/130/132/325 解锁的前置 ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百五十八：**新能力 —— 资源增益的量可以取自某个属性的一份**）**：
+> 
+> * ✅ **能力（读者：1505 绯英天赋原文 ✓）** ✓：`GAIN_RESOURCE` 的 `amount` 现在可以换成
+>   **`amountFromAttr`（属性名）** ✓ + **`amountPercent`（份额，缺省为整个值）** ✓ ——
+>   因为 1505 的天赋写的是「绯英获得**等同于暴击伤害 50%** 的**欢愉度**」✓，而此前 `GAIN_RESOURCE` **只能加一个字面量** ✗
+>   （`scaledAmount` 只认 `amount` × 命中数 ✓）⇒ 那句话**根本没有写法** ✓。
+> * ⭐ **实现要点** ✓：份额由**持有者本人**读（`holder.getAttribute(...)` ✓），而 `scaledAmount` 保持"只认字面量" ✓；
+>   名字不是合法属性时 **大声拒绝** ✓（`AttributeType.fromString` 抛 `IllegalArgumentException` ✓，不是静默加 0 ✓）；
+>   同时把**效果校验表**（`requireAmount` ✓）改成"`amount` 或 `amountFromAttr` 二者之一" ✓
+>   —— ⚠ 否则加载器会先报 `Op GAIN_RESOURCE requires "amount"` ✗（这正是本轮第一次运行时的报错 ✓）。
+> * **判据读数（实测 ✓）** ✓（读者角色 1003，它有已声明的资源 ✓；⭐ 资源**有 `initial` 初值** ⇒ 一律断言**增量** ✓）：
+>   * `[share] crit damage=0.5 -> the gain was 0 (half of the panel is 0)` ✓
+>   * `[share] with no percent the gain is the whole value: 1 (panel 0.5)` ✓
+>   * `[share] a literal amount still adds 3: 3` ✓（**假例** ✓：字面量不变 ✓）
+>   * `[share] refused loudly: Unknown AttributeType: NOT_AN_ATTRIBUTE` ✓（**响亮拒绝** ✓）
+> * **两条引擎变异 + 一条对照（判红前先删 XML 并校验年龄 ✓）** ✓：the share is ignored (whole value)(applied=True)=1 | the named attribute is ignored(applied=True)=3
+> * ✅ 两条**全部为红** ✓。
+> * **引擎级对照** ✓（靶子=带分号的语句 ✓）：让份额永远到不了资源 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⚠ **两处判据侧的类型错误（已修 ✓）**：① 资源**有初值** ⇒ 不能把"总量"当"增量" ✓；
+>   ② `TriggerSpecs.set(spec, "amount", 3)` 传 `Integer` 给 `Double` 字段 ⇒ 引擎报
+>      `Can not set java.lang.Double field … amount to java.lang.Integer` ✓ ⇒ 写 `3.0` ✓。
+> * **进度（实测 ✓）**：角色 **90 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> * **欢愉（P10）还差什么（可交付清单 ✓）**：类型 ✓ / 档位 ✓ / 加成折基数 ✓ / 作用域 ✓ / **属性份额的资源量 ✓（本轮）**
+>   ⇒ 剩下 **1505 的【好活当赏】上限**（其文本只给了"单次不超过 100 点" ✗ ⇒ **资源 `max` 未在数据中给出** ✓）、
+>   **笑点** ✓ 与 **【狐狸老师】追加攻击** ✓ ⇒ 下一轮先查这三者的数据出处 ✓，再决定 1505 的出货范围 ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
