@@ -42,7 +42,13 @@ public class HimekoChargeTest {
      * An ordinary character with no rules of their own: the ally who attacks, so nothing but her own table can
      * react ({@link TestCharacters}).
      */
-    private static final int ALLY = TestCharacters.withoutTriggerFile();
+    // \u2705 2026-09-30: this test\u2019s ally must be SINGLE-TARGET, named here instead of taken from the shared
+    // "unregistered character" control. Measured: the control used to be 1505, and when it moved to 1502/1506 the
+    // bystander enemy in `onePointShortOfTheCapNothingHappens` lost 26.6 HP -- because that test has the ally cast
+    // `DefaultSkill(ALLY, 1, 1)` at the FIRST enemy while asserting on the SECOND, and slot 1 is a blast for some
+    // characters and a single hit for others. 1002 (Dan Heng, The Hunt) attacks one enemy, so the witness stays out of
+    // reach whatever the shared control happens to be.
+    private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     /** 冰刃 (Ice Edge) @90: Fire-weak with 60 toughness, so two Fire basic attacks break it. */
     private static final int ICE_EDGE = 1002011;
