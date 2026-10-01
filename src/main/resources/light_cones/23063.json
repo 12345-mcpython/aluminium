@@ -25,10 +25,23 @@
           "op": "ADVANCE",
           "percent": 0.4,
           "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "新声",
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.4,
+          "turns": 2,
+          "target": "all_allies"
         }
       ],
       "source": "光锥 23063：「进入战斗时，使装备者的行动提前#2[i]%，并使装备者获得【新声】，持续#4[i]回合。」",
-      "note": "⭐ 原文 ✓：`BATTLE_START` + **`ADVANCE`** 0.4 + `target: self` ✓（op 已核对 ✓）。⚠ 仍登记 ✗：「获得【新声】」与「持有【新声】时我方全体速度提高#3[i]%」（需要带名状态及其条件 ✗）。⚠ 第一句「生命上限提高#1[i]%」**不写** ✓（属性行 ✓）。"
+      "note": "⭐ 原文 ✓：`BATTLE_START` + **`ADVANCE`** 0.4 + `target: self` ✓（op 已核对 ✓）。⚠ 仍登记 ✗：「获得【新声】」与「持有【新声】时我方全体速度提高#3[i]%」（需要带名状态及其条件 ✗）。⚠ 第一句「生命上限提高#1[i]%」**不写** ✓（属性行 ✓）。 ✅ 后两句补齐 ✓：「获得【新声】，持续 2 回合」= `APPLY_BUFF buff 新声 turns 2 target self` ✓；「持有【新声】时我方全体速度提高 40%」= `MODIFY_ATTR SPEED 0.4 turns 2 target all_allies` ✓ —— 三者**同寿命** ✓ ⇒ 与「持有期间」语义等价 ✓。⚠ 仍登记 ✗：若状态**被提前移除**，加成应随之消失 ✗。"
     }
   ]
 }
