@@ -25,5 +25,7 @@ public class LightCone23046Test {
         Assertions.assertEquals("ATTACK", effect.getAttribute(), "attack");
         Assertions.assertEquals(0.2, effect.getPercent(), 1e-9, "20% per cast");
         Assertions.assertEquals("self", effect.getTarget(), "on the wearer");
+        System.out.println("[23046] the stack cap is " + effect.stackCap());
+        Assertions.assertEquals(4, effect.stackCap(), "up to four stacks");
     }
 }
