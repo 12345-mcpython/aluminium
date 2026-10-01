@@ -1,0 +1,40 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21061_damage_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21061：「使装备者造成的伤容提高#1[i]%。」",
+      "note": "⭐ 第一句 ✓：**照抄已出货的 21010** ✓ —— 平铺的、永久的 `ALL_DAMAGE_TYPE_BOOST` 挂在 **`DEALING_DAMAGE`** 上 ✓，而**不是** `BATTLE_START` ✗（实测：挂在开战上四次都不落地 ✗）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone21061_vulnerability",
+      "when": [
+        "actor == self"
+      ],
+      "chance": 1.0,
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.16,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 21061：「装备者攻击后，有#2[i]%基础概率使受到攻击的目标陷入**易伤**状态，受到的伤容提高#3[i]%，持续#4[i]回合。同类效果无法叠加。」",
+      "note": "⭐ 第二句 ✓：`DEALING_DAMAGE` + `actor == self` ⇒ `MODIFY_DAMAGE_TAKEN 0.16` + `turns: 2` + `chance: 1.0` ✓。⚠ 仍登记 ✗：「**同类效果无法叠加**」。"
+    }
+  ]
+}
