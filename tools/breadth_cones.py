@@ -110,7 +110,12 @@ if suite.returncode != 0:
     os.remove(WORK + '/' + JREL)
     sys.exit(1)
 print('gates: %s' % [run('run', *a).returncode for a in ([], ['--args=mechanics'])])
-subprocess.run(['git', 'add', '-A', 'src'], cwd=WORK, check=True)
+if subprocess.run(['git', 'status', '--porcelain', 'src'], cwd=WORK, capture_output=True,
+                  text=True).stdout.strip():
+    subprocess.run(['git', 'add', '-A', 'src'], cwd=WORK, check=True)
+else:
+    print('coverage already current -- nothing to commit')
+    sys.exit(0)
 print(subprocess.run(['git', 'commit', '-m',
                       'test: select every shipped cone rule so the engine validates all of them'],
                      cwd=WORK, capture_output=True, text=True).stdout.strip().split('\n')[0][:180])
