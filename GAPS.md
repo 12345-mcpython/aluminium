@@ -12744,6 +12744,25 @@
 > * **变异（实测）**：**23047 sweep: 7 mutations, 0 blind []**
 >   —— 覆盖逐档数值 / 属性名 / 事件 / 条件 / 时长 / 基础概率 / 状态名七个语义面。
 > * **实测**：全量 0、闸门 [0, 0]、树干净、已推送。
+
+> **2026-09-30 更新（aggro 回收之六百九十八：23026 出货、判据与七处变异；一次转写事故的记录）**：
+>
+> * **出货**（`content: ship cone 23026, both of its clauses`）：5 档 × 2 规则 = 10 条。
+>   ① `ALLY_ATTACK` + `ADD_STACK 歌咏`（`max_stacks: 5`）+ `MODIFY_ATTR ENERGY_REGENERATION_RATE`
+>   配 `per_stack: 歌咏`（⚠ **故意不再写 `max_stacks`**，避免与层数上限二次计数）；
+>   ② `ULT_CAST` + `REMOVE_STATE 歌咏` + `APPLY_BUFF 华彩` + `MODIFY_ATTR ATTACK`（自身）+
+>   `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST`（`all_allies`），均 1 回合。
+>   ⚠ 这是**第一份把 `REMOVE_STATE` 与 `per_stack` 组合**的内容。
+> * **判据**（`test: judge cone 23026, with its state names built from codepoints`）：5 档 × 2 规则，
+>   含 `maxStacks == 5`、`perStack` 的名字、两个 `MODIFY_ATTR` 的**不同目标**（`self` vs `all_allies`）。
+> * **变异（实测）**：**23026 sweep: 7 mutations, 0 blind []**
+>   —— 覆盖 数值 / 属性名 / per_stack 名 / 层数上限 / 被移除的状态名 / 全队目标 / 数值 七个语义面。
+> * **一次转写事故（如实记录）**：第 307 轮判据首次运行时断言报
+>   `expected: <歌诵> but was: <歌咏>` —— **是我手打的转义码点写错了字，引擎是对的**；
+>   随后两次"补丁"都静默 `hits: 0`（对 `\uXXXX` 在源码中的存法判断有误），
+>   我按纪律**删掉未完成的判据并记录**，第 308 轮改为**在生成侧用码点构造状态名**后一次通过。
+>   ⚠ 教训：**补丁报 0 命中时不要照打，要重建**；**生成的 Java 里少用 `\uXXXX`**。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
