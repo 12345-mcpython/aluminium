@@ -141,7 +141,7 @@ public final class TriggerInterpreter {
     private static final Set<String> TARGET_SELECTORS =
             Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
                     "target_and_summon", "all_enemies", "lowest_hp_ally",
-            "random_enemy");
+            "random_enemy", "random_hit_enemy");
 
     /**
      * The two spellings of "every one of our characters".
@@ -200,6 +200,16 @@ public final class TriggerInterpreter {
      * honest answer -- \u300c\u968f\u673a 1 \u4e2a\u300d is not a group.
      */
     private static final String TARGET_RANDOM_ENEMY = "random_enemy";
+
+    /**
+     * 「随机 1 个受到攻击的敌方目标」: a random ONE of the enemies this attack hit.
+     *
+     * <p>⚠ MEASURED SEMANTICS (see {@code Damage#hitTargets}): the set is snapshotted when each damage
+     * instance is built, so a PER-HIT reader sees 「so far」 while a CAST-LEVEL reader (firing after the cast
+     * settled) sees all of them. An empty or absent set means 「unknown」 and this selector FAILS rather
+     * than falling back to 「a random enemy」 -- a silent wrong target is worse than an error.
+     */
+    private static final String TARGET_RANDOM_HIT_ENEMY = "random_hit_enemy";
 
     /**
      * "The ally with the lowest HP <b>percentage</b>" — 「当前<b>生命值百分比</b>最低的我方目标」.
@@ -1187,6 +1197,22 @@ public final class TriggerInterpreter {
      * @return the resolved entity
      * @throws IllegalStateException when the requested party is missing from this event
      */
+    /**
+     * A random enemy among the ones the attack behind this context actually hit.
+     *
+     * @return the pick, or {@code null} when the set is unknown/empty/entirely friendly -- the caller turns that
+     *         into an error, which is the point: never answer 「a random enemy」 for 「a random one that was hit」.
+     */
+    private static CanHit randomHitEnemy(TriggerContext ctx) {
+        if (ctx.damage() == null || ctx.damage().hitTargets().isEmpty() || ctx.battle() == null) {
+            return null;
+        }
+        List<CanHit> hitEnemies = ctx.damage().hitTargets().stream()
+                .filter(ctx.battle().getOpponents(null)::contains)
+                .toList();
+        return hitEnemies.isEmpty() ? null : hitEnemies.get(ctx.battle().getRng().nextInt(hitEnemies.size()));
+    }
+
     private static CanHit resolveTarget(EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
         return switch (selector) {
@@ -1196,6 +1222,7 @@ public final class TriggerInterpreter {
             case "summon" -> requireSummon(ctx);
             // \u2705 \u300c\u968f\u673a 1 \u4e2a\u654c\u65b9\u76ee\u6807\u300d: the roll is the battle\u2019s own seeded one, so the same seed picks the
             // same unit -- and the judge can therefore pin both determinism and genuine variation.
+            case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);
             case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                     TARGET_RANDOM_ENEMY, ctx);
             default -> throw new IllegalStateException(
