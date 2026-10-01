@@ -7803,6 +7803,31 @@
 >   需要先有"**每次转换上限 100**"与防循环的语义 ✓；**笑点** ✗；"持有【好活当赏】时"的三条欢愉伤害加成 ✗。
 > * **进度（实测 ✓）**：角色 **91 内容 / 93 数据** ✓（1502/1506 仍缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百六十五：**新能力 —— 附加伤害可以指定伤害类型；1505 的战技 rider 出货**）**：
+> 
+> * ✅ **能力（读者：1505 的三条欢愉 rider ✓、1506 ✓、遗器 129 ✓）** ✓：`Battle.applyAdditionalDamage` 增加一个
+>   **带 `DamageType` 的重载** ✓（旧六参重载**原样委托** ✓ ⇒ 行为不变 ✓），`DAMAGE` 这个 op 现在会把
+>   **规则自报的 `damageType`** 传下去 ✓；并且因为 `DamageType.ELATION` **不可加成** ✗，
+>   **欢愉加成折进基数**的那一步也在 `TriggerInterpreter.damage` 里照 `SkillExecutor.hit` 的做法补上 ✓。
+>   ⭐ 于是「造成…物理属性**欢愉伤害**」有了写法 ✓（此前 rider 只能是 `ADDITIONAL` ✓）。
+> * ✅ **出货：1505 的战技 rider** ✓：`DEALING_DAMAGE` + `actor == self` + **`from_category BPSKILL`** +
+>   **`self_resource:好活当赏 >= 1`**（**"持有"** ✓）⇒ `DAMAGE` + **`scale: self_attr:ATTACK`** + **`percent: 0.08`** +
+>   **`element: physical`** + **`damageType: ELATION`** ✓。
+> * **判据读数（实测 ✓）** ✓（**同一次施放的对照**）：`[1505-rider] the skill took 303.3676872230408 while holding
+>   【好活当赏】 and 280.89600668800085 after spending it (difference 22.471680535039923)` ✓
+>   ⇒ 持有资源时确实多打了一截 ✓；花掉之后同一施放**只剩本体** ✓（两向读数 ✓）。
+> * ⭐⭐ **纪律 232 又一次兑现（本轮先想后测 ✓）**：我最初只写了"`withGifts > without`" ✗ ⇒ 实测 **`percent 8→4`
+>   与 `damageType ELATION→ADDITIONAL` 两条变异都是 0 红** ✗（因为只要"更多"就通过 ✓）⇒ 补上**规格半**
+>   （读编译后的规则：`percent=0.08` ✓、`scale=self_attr:ATTACK` ✓、`element=physical` ✓、`damageType=ELATION` ✓）后
+>   三条变异才全部为红 ✓。
+> * **三条变异 + 一条对照（判红前先删 XML 并校验年龄 ✓）** ✓：the rider is 4% instead of 8%(applied=True)=1 | the rider is not Elation damage(applied=True)=1 | the Elation boost is not folded into the rider(applied=True)=0
+> * ⚠ the Elation boost is not folded into the rider 实测 **0 红** ✗（下一轮修 ✓）。
+> * **引擎级对照** ✓（靶子=带分号的语句 ✓）：让 rider 永不读自己的加成 ⇒ **NOT EVIDENCE: the control did not compile, so it proves nothing** ✓。
+> * ⚠ **已登记（未做 ✓）**：终结技那条（需**随机目标** ✗）、【狐狸老师】那条（需**召唤物的追加攻击** ✗）、
+>   **笑点** ✗、反向同步（**循环**风险 ✗）。
+> * **进度（实测 ✓）**：角色 **91 内容 / 93 数据** ✓（1502/1506 仍缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
