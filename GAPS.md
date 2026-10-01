@@ -13336,6 +13336,38 @@
 > * **下一步（纯实现，无需再探索 ✓）**：① `317`：条件类 ✓ + 选择器两处 ✓ + 一条内容 ✓ + 判据链 ✓；
 >   ② `21025`：条件类 ✓ + 一条内容 ✓ + 判据链 ✓。⚠ 两者都必须配 **端到端判据 + 引擎侧变异** ✓
 >   （⚠ 照 `23048` 那条已验证的链条：形状判据 ✓ → 规则级运行时 ✓ → 端到端 ✓ → 引擎变异变红 ✓）。
+
+> **2026-09-30 更新（aggro 回收之七百二十二：新关键词的解析分支模板；以及一条硬约束 `PartyCondition`）**：
+>
+> * **实测（`TriggerTable:1122-1134`）**：
+>   ```java
+>   1124:  Matcher isOtherAlly = IS_OTHER_ALLY.matcher(text);
+>   1125:  if (isOtherAlly.find()) {
+>   1126:      String subject  = normalize(text.substring(0, isOtherAlly.start()));
+>   1127:      String trailing = text.substring(isOtherAlly.end()).trim();
+>   1128:      if (!trailing.isEmpty()) {
+>   1130:          throw new IllegalArgumentException("Condition '" + raw + "' writes something after …");
+>   1133:      return new IsOtherAlly(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw);
+>   ```
+>   ⇒ ⭐ **新关键词的解析分支 = 照抄这 10 行、只换三处** ✓：正则常量 ✓、报错文案里的关键词串 ✓、类名 ✓。
+> * ⭐⭐ **硬约束（读出来的，不是猜的 ✓）**：`:1133` 套了 **`requireStateSubject(...)`** ✓ 与
+>   **`requireCarriedParty(...)`** ✓ ⇒ ⚠ **新条件类必须 `implements Condition, PartyCondition`** ✗
+>   —— ⭐ 这正好解释了 `IsOtherAlly`（`:2121`）为何那样声明 ✓；⚠ 否则**解析阶段就会拒绝** ✗。
+> * ✅ **两条能力现在连逐行模板都齐（402→424 的最终产出 ✓）**：
+>   * **`21025` 下一个我方**：① 正则常量 + javadoc（照 `:920-927` ✓）；② 解析分支（照 `:1124` 的 10 行 ✓，
+>     **类须为 `PartyCondition`** ✓）；③ 条件类（照 `:2121` 的 `IsOtherAlly` ✓）—— `test` 里改为
+>     **沿队列扫描到第一个"我方且非自己"** ✓（⚠ `battle.queue` ✓，只用 `peekNext()` 只读 ✓，❌ 不取堆顶 ✗）；
+>     ④ 内容：`21025` 一句（⚠ 数值待读 ✓）；⑤ 判据链 ✓。
+>   * **`317` 队伍第一名**：① 条件类同型 ✓（`characters.get(0) != owner` ✓）；
+>     ② 选择器：**`TriggerInterpreter:142` 加名字** ✓ + **`:1232` 加 `case`** ✓（返回 `characters.get(0)` ✓）；
+>     ③ 内容：**一条规则** ✓（`ATTACK 0.12` ✓、`permanent` ✓；`#1` 的 ERR 5% 属 `properties` ✓ 不重写）；
+>     ④ 判据链 ✓。
+> * ⚠ **两条都必须配**：形状判据 ✓ + 规则级运行时判据 ✓ + **端到端判据** ✓ + **引擎侧变异变红** ✓
+>   （⚠ 照 `23048` 那条已验证的链条 ✓；⚠ 内容侧变异永远够不到引擎 ✗，见第 394 轮的盲区教训 ✓）。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送；
+>   角色 93 / 93、光锥 163 / 170、遗器 55 文件 / 登记表 5 条。
+> * **⚠ 明账（未完成）**：`21025` 与 `317` 的**实现与判据链尚未落地** ✗ ——
+>   ⭐ 但两者的**语义、位置、模板、约束、数值（`317`）**已全部实测固定 ✓ ⇒ 下一步是**纯机械实现** ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
