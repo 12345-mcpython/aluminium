@@ -932,8 +932,17 @@ public final class TriggerInterpreter {
                 }
             }
             case "RESET_TRIGGER_LIMIT" -> {
-                for (CanHit owner : resolveTargets(battle, effect, ctx)) {
-                    owner.resetTriggerLimit(effect.getRule().trim());
+                String wanted = effect.getRule().trim();
+                for (CanHit cleared : resolveTargets(battle, effect, ctx)) {
+                    TriggerTable table = cleared instanceof com.laosun.aluminium.models.Character ch
+                            ? ch.getTriggerTable() : null;
+                    String limitKey = table == null ? null : table.keyOf(wanted);
+                    if (limitKey == null) {
+                        throw new IllegalStateException(
+                                "Op RESET_TRIGGER_LIMIT names the rule " + wanted + ", which " + cleared.getName()
+                                        + " does not carry -- an id that matches nothing would clear nothing, silently");
+                    }
+                    cleared.resetTriggerLimit(limitKey);
                 }
             }
             case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);

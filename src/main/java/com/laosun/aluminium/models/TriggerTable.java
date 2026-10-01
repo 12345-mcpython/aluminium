@@ -507,6 +507,26 @@ public class TriggerTable {
      * 「每 2 次…后」 is exactly that shape. `matching` stays the pure predicate it always was — the data-binding tests
      * and {@code ruleCount} read it — and this accessor is what lets firing differ.
      */
+    /**
+     * The limiter key of the rule carrying this id, or {@code null} when this table has no such id.
+     *
+     * <p>⚠ An id is optional and a key is not -- that is why both exist (see {@link CompiledRule}), and why
+     * a caller holding an id cannot clear a limit without this lookup. Seven shipped rules have no id at all.
+     */
+    public String keyOf(String id) {
+        if (id == null) {
+            return null;
+        }
+        for (List<CompiledRule> rules : byEvent.values()) {
+            for (CompiledRule rule : rules) {
+                if (id.equals(rule.id())) {
+                    return rule.key();
+                }
+            }
+        }
+        return null;
+    }
+
     public List<CompiledRule> rulesFor(TriggerEvent event) {
         return byEvent.getOrDefault(event, List.of());
     }
