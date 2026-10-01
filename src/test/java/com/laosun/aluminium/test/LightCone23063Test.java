@@ -29,6 +29,7 @@ public class LightCone23063Test {
                 + " ; advance op=" + adv.getOp() + " percent=" + adv.getPercent() + " target=" + adv.getTarget());
         Assertions.assertEquals(1.0, sp.getAmount(), 1e-9, "one skill point");
         Assertions.assertEquals(0.4, adv.getPercent(), 1e-9, "40% action advance");
+        Assertions.assertEquals("self", adv.getTarget(), "the advance targets the wearer");
         Assertions.assertEquals("self", adv.getTarget(), "for the wearer");
         var effects = starts.getFirst().effects();
         System.out.println("[23063] battle effects=" + effects.stream()
