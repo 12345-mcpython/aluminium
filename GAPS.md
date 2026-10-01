@@ -12297,6 +12297,42 @@
 >       ① **搜名字**（含**字段名 + 方法名** ✓）；② **搜闭合名单**（条件名 / 选择器名 / op 名 ✓）。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **143 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百七十五：**🎉 写法找到 —— `MODIFY_ATTR` + `CRIT_CHANCE` + `instance: true`**）**：
+> 
+> * ⭐⭐⭐ **实测（`TriggerInterpreter` 的 `MODIFY_ATTR` 分支 ✓）**：
+>   ```java
+>   if (Boolean.TRUE.equals(effect.getInstance()) && ctx.damage() != null) {
+>       ...
+>       if (attribute == AttributeType.CRIT_CHANCE) {
+>           ctx.damage().addCritChance(effect.getPercent() == null ? 0 : effect.getPercent());
+>           return;
+>       }
+>       if (attribute == AttributeType.CRIT_ATTACK) {
+>           double critDamage = ...; critDamage *= perStackFactor(...);
+>           ctx.damage().addCritDamage(critDamage);
+>           return;
+>       }
+>       if (attribute == AttributeType.ALL_DAMAGE_TYPE_BOOST) { ... }
+>   }
+>   ```
+>   ⇒ ✅ **"本次命中"的写法 = `MODIFY_ATTR` + `instance: true`** ✓，而**属性名 `CRIT_CHANCE`** ✓ 就是"
+>     **本次暴击率 +X**" ✓（同族还有 `CRIT_ATTACK` ✓、`DEFENCE_IGNORE` ✓、`ALL_DAMAGE_TYPE_BOOST` ✓）
+>     ⇒ ⭐ 注释也点明了这套写法的由来：`instance: true` 是**可选**的 ✓，因为**已有 7 条既有规则在该事件上用 `MODIFY_ATTR`** ✓。
+> * ✅ **所以 `23007` ② 的形状（已定 ✓，下一轮补进 5 档 ✓）**：
+>   ```json
+>   { "on": "DEALING_DAMAGE", "id": "cone23007_crit_vs_debuffed",
+>     "when": ["actor == self", "target_debuff_count >= 3"],
+>     "do": [{"op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": <#5[i]>, "instance": true}] }
+>   ```
+>   ⚠ `#4[i] = 3` ✓（阈值，各档相同 ✓）、`#5[i]` = **0.12 / 0.14 / 0.16 / 0.18 / 0.2** ✓；
+>   ⚠ **`instance: true` 是必须的** ✓（否则会去改**拥有者的属性** ✗ ⇒ 语义完全不同 ✗）。
+> * ⭐⭐⭐ **本段第五次"缺口其实早就能写"（写死 ✓）**：`weakHitCount` ✓ → `target_debuff_count` ✓ →
+>   `extraCritChance` ✓ → `addCritChance` ✓ → **`CRIT_CHANCE` + `instance`** ✓
+>   ⇒ ✅ **处置纪律**：**凡登记缺口，动手前先做两搜** ✓ —— ① 搜名字（**字段名 + 方法名** ✓）；
+>     ② 搜闭合名单（**条件名 / 选择器名 / op 名 / 属性名** ✓）。⚠ 五次里有四次是因为**少搜了一样** ✗。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **143 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
