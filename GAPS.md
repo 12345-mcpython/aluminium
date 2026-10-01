@@ -10641,6 +10641,44 @@
 >   （⚠ 否则队友攻击也会触发 ✗ —— 这正是 `actor == self` 这个条件的用处 ✓，而且**我们的条件判据已覆盖它** ✓）。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百零八：**⚠ 更正 —— `fireAfterAttack` 不触发任何 `TriggerEvent`；缺的能力已完全确定**）**：
+> 
+> * ⚠⚠ **更正第 192 轮的推断 ✓（如实 ✓）**：`Battle.fireAfterAttack`（**:2349-2361** ✓）的**全部**行为是：
+>   ```java
+>   if (attacker == null || hitTargets == null || hitTargets.isEmpty()) return;   // 没有任何命中 ⇒ 不算一次攻击
+>   attackSequence++;                                   // ★ 攻击结束的边界（once_per_attack 读它）
+>   List<CanHit> targets = List.copyOf(hitTargets);      // ← 完整、已冻结的命中集合
+>   for (CanHit ally : allies) ally.afterAttack(this, attacker, mainTarget, targets, totalDamage);
+>   ```
+>   ⇒ ⛔ **它一次 `fireTriggers(...)` 都没有调用** ✗ ⇒ ✅ **`ALLY_ATTACK` 不是从这里发出的** ✗
+>     （⚠ 我第 192 轮把那句注释读成了"两者都由这里触达" ✗ —— 实际应是"两者走**同一条路径**" ✓，
+>       而 `SUMMON_ATTACK` 是在别处发的 ✓）⇒ ⭐ **所以 `ALLY_ATTACK` 也不带命中集合** ✓，不能拿来出货 ✗。
+> * ⭐⭐⭐ **由此，缺的能力**完全确定 ✓（不再是"可能已有" ✓）：
+>   **一个"攻击已结束"的触发事件** ✓ + **让 `TriggerContext` 能携带"本次攻击的完整命中集合"** ✓。
+>   ⇒ ⭐ **而且这处正是最佳落点** ✓：该方法**已经有** ✓ `attacker` ✓、`mainTarget` ✓、
+>     **冻结好的 `targets`** ✓（`List.copyOf` ✓）、`totalDamage` ✓ ——
+>     ⚠ **唯一的结构障碍**：`fireTriggers(...)` 的第 6 参是 **`Damage`** ✗，
+>     而一次攻击有**多个** `Damage` 实例 ✓、没有"那一个" ✓
+>     ⇒ ✅ **所以载体不能是 `Damage`，必须是命中集合本身** ✓ ⇒ `TriggerContext` 需要**新增一个分量** ✓
+>       （如 `List<CanHit> attackHitTargets` ✓，不可变 ✓，**空 = 未知** ✓）。
+> * ✅ **实现清单（下一步机械可做 ✓，四处小改 ✓）**：
+>   ① **枚举**：`enums/TriggerEvent.java` 新增 `ATTACK_FINISHED("ATTACK_FINISHED", true)` ✓
+>      （⚠ 名字按引擎惯例 ✓，语义注释写清"**结算全部完成、命中集合已冻结之后**" ✓ —— 与
+>        `fireAfterAttack` 的"**没有任何命中则不算一次攻击**"约定**保持一致** ✓：沿用同一个早退 ✓）；
+>   ② **上下文**：`TriggerTable.TriggerContext` 新增分量 `List<CanHit> attackHitTargets` ✓
+>      （⚠ record 分量 ⇒ 要更新**所有**构造点 ✗ ⇒ ⭐ 加一个**紧凑构造器/便捷构造**保持既有调用不变 ✓，
+>        与它已有的第二个构造器同型 ✓）；
+>   ③ **设置**：`TriggerContext` 里让 `random_hit_enemy` 改成**先读 `attackHitTargets`** ✓、
+>      为空再退回 `ctx.damage().hitTargets()` ✓（⚠ 这样**逐击读者**（`DEALING_DAMAGE` ✓）与
+>        **攻击后读者**（新事件 ✓）**都能用同一个选择器** ✓ —— ⭐ 一个选择器、两种完备度，文档按读者写 ✓（㉟ ✓））；
+>   ④ **触发**：`fireAfterAttack` 里在 `attackSequence++` 之后 ✓ 调 `fireTriggers(ATTACK_FINISHED, attacker, mainTarget, …, targets, …)` ✓。
+>   ⚠ 然后才：**出货 `21029`** ✓ + 判据（**多目标攻击下该事件读到的候选数 = 全部命中数** ✓）+ 变异 ✓。
+> * ⭐⭐ **为什么这不是"为一张光锥造机制" ✓**：`21029` / `23007` / `21029` 同族的「**施放…后，对受到攻击的目标…**」 ✓
+>   是**一类**从句 ✓，而且引擎**自己**在 `fireAfterAttack` 里已经承认"**an attack happened**"是它的职责 ✓
+>   （注释原文 ✓）⇒ ✅ **把"攻击已结束"变成可触发事件，是把这个既有边界暴露给内容** ✓，不是新机制 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
