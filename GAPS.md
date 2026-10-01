@@ -13525,6 +13525,34 @@
 >   ⚠ 但它**天然有分辨力** ✓（条件是"装备者**不是**第一名"✗ ⇒ 只要让装备者不是第一名即成立 ✓）。
 > * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`c4ecc03` ✓）；
 >   角色 93 / 93、光锥 164 / 170、遗器 **56 文件 / 登记表 4 条**。
+
+> **2026-09-30 更新（aggro 回收之七百二十九：`317` 判据链闭合 —— 第三条能力全链条完成；并更正一处夹具笔记）**：
+>
+> * **判据链（`test: judge relic 317, with a runtime test and an engine first-vs-last mutation` ✓）**：
+>   * **形状** ✓：`RelicTriggerTables.of(317).at(2).rulesFor(BATTLE_START)` ⇒ 一条规则 ✓，
+>     条件 **`["!self is_party_first"]`** ✓、`ATTACK` ✓、**0.12** ✓、`target: party_first` ✓；
+>   * **运行时** ✓：⭐ 把**我方放在队伍列表首位**（`List.of(ally, wearer)` ✓）⇒ 装备者不是第一名 ✓ ⇒
+>     规则触发 ✓，且**第一名的攻击力恰好 +12%** ✓（实测 `ally ATTACK ratio=1.12` ✓）；
+>     判据同时断言 **`battle.characters.getFirst() == ally`** ✓ —— ⭐ 即"队伍第一名"就是**队伍列表顺序** ✓；
+>   * ⭐⭐ **引擎侧变异变红** ✓：把 `partyFirst` 的 `characters.getFirst()` 改成 `getLast()` ✗ ⇒ `reds=1` ✓；
+>   * 全量 0 ✓、闸门 [0, 0] ✓、树干净 ✓、已推送 ✓（`8142061` ✓）。
+> * ⚠ **一处夹具笔记更正（编译器点名 ✓）**：`TriggerTable.TriggerContext` 的**第 8 个分量是 `SkillCategory`** ✗，
+>   **不是 boolean** ✗（⚠ 旧笔记写的是 `fromCast` ✗）⇒ 构造应为
+>   `new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, SkillCategory.UNSPECIFIED)` ✓
+>   （⚠ 第 6 个 `damage` 可传 `null` ✓）。
+> * ⭐⭐⭐ **三条能力全部闭合，且三条都有引擎级变异证明** ✓：
+>   | 能力 | 引擎改动 | 读者 | 变异 |
+>   |---|---|---|---|
+>   | `CAST_SETUP` 携带被瞄准者 | `SkillExecutor` 一行 ✓ | 光锥 `23048` ③ ✓ | 端到端 ✓ 变红 ✓ |
+>   | `next_ally` 目标选择器 | `TriggerInterpreter` 三处 ✓ | 光锥 `21025` ✓ | 三我方搜夹具 ✓ 变红 ✓ |
+>   | `is_party_first` 条件 + `party_first` 选择器 | `TriggerTable` 三处 + `TriggerInterpreter` 三处 ✓ | 遗器 `317` ✓ | first→last ✓ 变红 ✓ |
+> * ✅ **三次登记回收**：`23056` ②b ✓、遗器 `324` ✓、遗器 `325` ✓、**`317`** ✓
+>   ⇒ 登记表 **5 → 4 条**（余 `126 / 130 / 132 / 327` ✓）。
+> * **实测**：角色 93 / 93、光锥 **164 / 170**、遗器 **56 文件 / 登记表 4 条**、测试类 **476**；
+>   全量 0、闸门 [0, 0]、树干净、已推送。
+> * **下一步**：`327`（⚠ 需先定"命途名如何进 DSL"✗ —— ⭐ 而本项目已有 `is_same_element_as_self` 与
+>   `has_same_path_ally` 两个"配对可、命名不可"的先例 ✓ ⇒ 设计可从"给关键词加一个命途名参数"入手 ✓）；
+>   或 6 张整卡登记的光锥（各缺：阿哈时刻 ✗ / 随机友方 ✗ / 元素 ✗ / 随机选一 ✗ / 单次累计 ✗ / 下一个行动者 ✓ 已收）✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
