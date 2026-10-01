@@ -1216,8 +1216,12 @@ public final class TriggerInterpreter {
         if (pool.isEmpty()) {
             return null;                      // unknown or nothing hit: the caller turns this into an error
         }
+        // \u2705 FILTER FIRST, ROLL SECOND (2026-09-30): `resolveTargets` resolves and only then applies the
+        // effect's `target_when`, so a roll landing on an excluded unit would simply be dropped instead of
+        // re-rolled -- \u300ca random one of the hit targets NOT holding X\u300d needs the exclusion inside the roll.
         List<CanHit> hitEnemies = pool.stream()
                 .filter(ctx.battle().getOpponents(ctx.owner())::contains)
+                .filter(ctx::passesTargetFilter)
                 .toList();
         return hitEnemies.isEmpty() ? null : hitEnemies.get(ctx.battle().getRng().nextInt(hitEnemies.size()));
     }
