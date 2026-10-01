@@ -48,7 +48,10 @@ public class Cone23007Test {
                 var conditions = rules.getFirst().conditions().stream().map(c -> c.source()).toList();
                 Assertions.assertEquals(2, conditions.size(), id + " has two conditions");
                 Assertions.assertEquals("actor == self", conditions.get(0), id);
-                Assertions.assertTrue(conditions.get(1).startsWith("from_category"), id + ": " + conditions.get(1));
+                // \u26a0 The VALUE, not just the keyword: a mutation that swaps BPSKILL for ULTRA stayed green
+                // while this line only asked for the prefix -- measured, and the reason the expected text is literal.
+                Assertions.assertEquals(id.endsWith("bpskill") ? "from_category BPSKILL" : "from_category ULTRA",
+                        conditions.get(1), id + ": the cast category the sentence names");
                 var effects = rules.getFirst().effects();
                 Assertions.assertEquals(2, effects.size(), id + " has two effects");
                 Assertions.assertEquals("APPLY_BUFF", effects.get(0).getOp(), id);
