@@ -1,0 +1,35 @@
+{
+  "1": [
+    {
+      "on": "TURN_START",
+      "id": "cone23041_turn_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23041：「装备者回合开始时恢复#5[i]点能量。」",
+      "note": "⭐ 原文 ✓：`TURN_START` ✓ + **`GAIN_ENERGY`** 10 ✓ + `target: self` ✓（op 名已核对 ✓）。⚠ 该事件在已出货内容里**没有先例** ✗ ⇒ 本条是第一个用它的 ✓；按 `BATTLE_START` 的教训，**不写 `when`** ✓（事件送达各自的表 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23041_defence_down",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.24,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23041：「当敌方目标受到装备者攻击时，装备者使其防御力降低#2[i]%，持续#4[i]回合。同类效果无法叠加。」",
+      "note": "⭐ 原文 ✓：`DEALING_DAMAGE` + `actor == self` ⇒ `MODIFY_ATTR` 属性名 **`DEFENCE`** ✓（实测核对过 ✓）+ `-0.24` ✓ + `turns: 2` ✓ + `target: target` ✓。⚠ 仍登记 ✗：「**同类效果无法叠加**」。"
+    }
+  ]
+}
