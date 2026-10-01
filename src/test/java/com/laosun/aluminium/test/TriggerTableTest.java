@@ -178,8 +178,15 @@ public class TriggerTableTest {
      */
     @Test
     public void unregisteredCharacterHasAnEmptyTableAndTheBattleStillRuns() {
-        Character plain = CharacterFactory.create(NO_TRIGGERS, 80);
-        Assertions.assertTrue(plain.getTriggerTable().isEmpty(), "no file -> empty table");
+        // \u2705 2026-09-30: this test asserts what an EMPTY TABLE does, so it builds the empty table itself instead of borrowing
+        // the shared "unregistered character" control. Measured: that control\u2019s data matters here -- the assertion below is
+        // about the character recovering energy from its own basic attack, and the last file-less id (1506) has max energy 0,
+        // so it read 0.0. Replacing a table is usually a trap (it deletes the rule under test, hit in round 70), but here the
+        // empty table IS the subject, which is exactly why it is the right construction.
+        Character plain = CharacterFactory.create(1002, 80);
+        plain.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1002, java.util.List.of()));
+        Assertions.assertTrue(plain.getTriggerTable().isEmpty(), "the table really is empty");
+        // The file-less property is a separate fact and keeps its own witness (1506 is a key of character_data.json with no file).
         Assertions.assertFalse(TriggerTables.exists(NO_TRIGGERS), "and no resource either");
 
         Battle battle = newBattle(List.of(plain), 1);
