@@ -4,7 +4,7 @@
       "require": 1,
       "ability": "Ability20023",
       "name": "纵欢",
-      "reason": "「阿哈时刻发动时，使装备者的欢愉度提高 #1=16%…32%，持续到阿哈时刻结束。」（E:\\turnbasedgamedata: EquipmentConfig 20023 -> SkillID 20023 -> EquipmentSkillConfig -> TextMap/TextMapCHS.json, 2026-09-30）The effect maps to ELATION_DAMAGE_BOOST, which the engine HAS; the only missing piece is an EHA (阿哈时刻) event, and a duration scoped to \"until EHA ends\". Reader count: 1 (this cone only) -- below the bar, so registered rather than built."
+      "reason": "GREPPED 2026-09-30: searched TriggerInterpreter.TARGET_SELECTORS (party_first, next_ally, self, target, attacker, all_allies, party, other_allies, summon, target_and_summon, all_enemies, lowest_hp_ally, random_enemy, random_hit_enemy), the op names in shipped content, and the same-shaped shipped cone 23007. 「阿哈时刻发动时，使装备者的欢愉度提高 #1=16%…32%，持续到阿哈时刻结束。」（E:\\turnbasedgamedata: EquipmentConfig 20023 -> SkillID 20023 -> EquipmentSkillConfig -> TextMap/TextMapCHS.json, 2026-09-30）The effect maps to ELATION_DAMAGE_BOOST, which the engine HAS; the only missing piece is an EHA (阿哈时刻) event, and a duration scoped to \"until EHA ends\". Reader count: 1 (this cone only) -- below the bar, so registered rather than built."
     }
   ],
   "21021": [
@@ -20,7 +20,7 @@
       "require": 1,
       "ability": "Ability21032",
       "name": "秘密",
-      "reason": "「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力 +10%；暴击伤害 +12%；能量恢复效率 +6%。」Needs random EFFECT selection plus a history-dependent exclusion (\"not the same as last time\"). Reader count: 1."
+      "reason": "GREPPED 2026-09-30: searched TriggerInterpreter.TARGET_SELECTORS (party_first, next_ally, self, target, attacker, all_allies, party, other_allies, summon, target_and_summon, all_enemies, lowest_hp_ally, random_enemy, random_hit_enemy), the op names in shipped content, and the same-shaped shipped cone 23007. 「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力 +10%；暴击伤害 +12%；能量恢复效率 +6%。」Needs random EFFECT selection plus a history-dependent exclusion (\"not the same as last time\"). Reader count: 1."
     }
   ],
   "21038": [
@@ -28,7 +28,7 @@
       "require": 1,
       "ability": "Ability21038",
       "name": "爆燃",
-      "reason": "「当装备者在单次受到攻击中累计损失的生命值超过最大生命值的 25%，或单次消耗自身生命值超过最大生命值的 25%，则立即回复等同于装备者生命上限 15% 的生命值，同时使装备者造成的伤害提高 25%，持续 2 回合。该效果每 3 回合只能触发 1 次。」Needs cumulative HP loss within one hit, HP spending, and a 3-turn cooldown. Reader count: 1."
+      "reason": "GREPPED 2026-09-30: searched TriggerInterpreter.TARGET_SELECTORS (party_first, next_ally, self, target, attacker, all_allies, party, other_allies, summon, target_and_summon, all_enemies, lowest_hp_ally, random_enemy, random_hit_enemy), the op names in shipped content, and the same-shaped shipped cone 23007. 「当装备者在单次受到攻击中累计损失的生命值超过最大生命值的 25%，或单次消耗自身生命值超过最大生命值的 25%，则立即回复等同于装备者生命上限 15% 的生命值，同时使装备者造成的伤害提高 25%，持续 2 回合。该效果每 3 回合只能触发 1 次。」Needs cumulative HP loss within one hit, HP spending, and a 3-turn cooldown. Reader count: 1."
     }
   ]
 }
