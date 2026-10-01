@@ -8799,6 +8799,26 @@
 > * ⭐ **仍登记（本光锥 ✓）**：21061 的「**同类效果无法叠加**」✗（需要「同名效果只保留一份」的写法 ✓）。
 > * **进度（回退后，实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之五百一十八：**光锥 21061 再次撤回；两处 API/事件约束已量清**）**：
+> 
+> * ⚠ **本轮没有落地** ✗（`21061.json` 与判据文件已删 ✓；树干净、全量绿 ✓），但**两处硬约束实测到手** ✓。
+> * ⭐⭐⭐ **实测的 API 与事件约束（都可直接复用 ✓）**：
+>   ① 光锥装法是 **`Weapon.build(WEAPON_ID, LEVEL)`** ✓ + **`CharacterFactory.create(WEARER, LEVEL, true, weapon)`** ✓
+>      （4 参、接 `Weapon` ✓；`import com.laosun.aluminium.models.Weapon;` ✓）
+>      —— ⚠ 我先前连猜两次 ✗（`LightConeFactory.of` ✗、`new Weapon(...)` ✗），**第三次靠"打印既有判据的装配行"才对** ✓；
+>   ② ⭐ **`BATTLE_START` 不携带 actor/target** ✓ ⇒ **该事件的规则不能写 `when: ["actor == self"]`** ✗，
+>      **也不能给效果写 `target`** ✗ —— 守卫的原话很直白 ✓：
+>      「`Condition 'actor == self' asks about 'actor', but BATTLE_START carries no actor and no target, so the rule could never fire.
+>      This event is delivered to every character's own table`」✓。✅ 改成"不写 `when`、不写 `target`"后，**该规则通过** ✓。
+> * ⚠ **仍剩一条失败（未及细看 ✓，原因已存底层 report ✓）**：org.opentest4j.AssertionFailedError: the cone grants 32% damage ==> expected: <0.32> but was: <0.16>
+>   ⇒ ✅ **下一轮第一件事**：跑一次聚焦判据并**完整读它的 message** ✓（我本轮把它截断了 ✗ ——
+>   ⭐ 又是同一条纪律：**读数不要截断** ✓）。
+> * ⭐ **仍登记（本光锥 ✓）**：21061 的「**同类效果无法叠加**」✗。
+> * ⭐⭐⭐ **本轮固化的纪律（与前面几条合并成一套 ✓）**：
+>   **① 换目标先量数据入口 ✓；② 调 API 前先打印仓库里的真实装配行 ✓；③ 事件能不能带 actor/target，交给守卫告诉你 ✓；④ 读数不要截断 ✓。**
+> * **进度（回退后，实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
