@@ -1,0 +1,387 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23007_effect_hit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 使装备者的效果命中提高#1[i]%。当装备者对同时处于大于等于#4[i]个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。装备者施放普攻、战技、终结技后，有#2[i]%的基础概率对随机1个未持有【以太编码】的受击目标施加【以太编码】。持有【以太编码】的目标受到的伤害提高#3[i]%，持续1回合。",
+      "note": "「使装备者的效果命中提高」—— 无条件永久属性；`EFFECT_HIT_RATE` 是比率型属性（照 20004/21008 的写法）。数值取自本档 ParamList 第 1 项 = 0.24。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.12,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 装备者施放普攻、战技、终结技后，有#2[i]%的基础概率对随机1个未持有【以太编码】的受击目标施加【以太编码】。持有【以太编码】的目标受到的伤害提高#3[i]%，持续1回合。",
+      "note": "① 事件 ATTACK_FINISHED（带已冻结的命中集合）；② 目标 random_hit_enemy + target_when 取反（`!` 是 DSL 唯一的取反，照 1103）；第 245 轮把随机选择器改成先筛后掷，所以这里筛掉已持有者再随机 = 原文语义；③ #2 = 1 ⇒ ParamList 是分数 ⇒ 100% 基础概率 = 必定施加 ⇒ 省略 base_chance；④ 第二个效果必须在施加之后求值（同规则内效果按顺序，照 1106）。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.12,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 装备者施放普攻、战技、终结技后，有#2[i]%的基础概率对随机1个未持有【以太编码】的受击目标施加【以太编码】。持有【以太编码】的目标受到的伤害提高#3[i]%，持续1回合。",
+      "note": "同句的第三个并列（终结技）。条件 DSL 没有 OR，照 1215 的既有做法拆成两条规则：每次施放恰好命中一条 ⇒ 恰好施加一次。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23007_effect_hit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.28,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 使装备者的效果命中提高#1[i]%。",
+      "note": "第 2 档：效果命中 0.28（ParamList 第 1 项）。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.14,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 装备者施放普攻、战技后…",
+      "note": "第 2 档：施加【以太编码】+ 持有者受到的伤害提高 0.14。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.14,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: …终结技后…",
+      "note": "第 2 档的终结技并列。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23007_effect_hit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 使装备者的效果命中提高#1[i]%。",
+      "note": "第 3 档：效果命中 0.32。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.16,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 装备者施放普攻、战技后…",
+      "note": "第 3 档：伤害提高 0.16。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.16,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: …终结技后…",
+      "note": "第 3 档的终结技并列。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23007_effect_hit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 使装备者的效果命中提高#1[i]%。",
+      "note": "第 4 档：效果命中 0.36。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.18,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 装备者施放普攻、战技后…",
+      "note": "第 4 档：伤害提高 0.18。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.18,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: …终结技后…",
+      "note": "第 4 档的终结技并列。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23007_effect_hit",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_HIT_RATE",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 使装备者的效果命中提高#1[i]%。",
+      "note": "第 5 档：效果命中 0.4（40%）。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 装备者施放普攻、战技后…",
+      "note": "第 5 档：伤害提高 0.2（20%）。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23007_mark_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "以太编码",
+          "turns": 1,
+          "target": "random_hit_enemy",
+          "target_when": [
+            "!target has_state 以太编码"
+          ]
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2,
+          "turns": 1,
+          "target": "target",
+          "target_when": [
+            "target has_state 以太编码"
+          ]
+        }
+      ],
+      "source": "光锥 23007 雨一直下: …终结技后…",
+      "note": "第 5 档的终结技并列。"
+    }
+  ]
+}
