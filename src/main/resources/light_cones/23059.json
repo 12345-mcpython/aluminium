@@ -6,7 +6,7 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "HP",
+          "attribute": "HEALTH",
           "percent": 0.3,
           "permanent": true,
           "target": "self"
@@ -51,7 +51,7 @@
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。"
     },
     {
-      "on": "SKILL_CAST",
+      "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
       "when": [
         "from_category BPSKILL"
@@ -75,7 +75,7 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "HP",
+          "attribute": "HEALTH",
           "percent": 0.375,
           "permanent": true,
           "target": "self"
@@ -120,7 +120,7 @@
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。"
     },
     {
-      "on": "SKILL_CAST",
+      "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
       "when": [
         "from_category BPSKILL"
@@ -144,7 +144,7 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "HP",
+          "attribute": "HEALTH",
           "percent": 0.45,
           "permanent": true,
           "target": "self"
@@ -189,7 +189,7 @@
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。"
     },
     {
-      "on": "SKILL_CAST",
+      "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
       "when": [
         "from_category BPSKILL"
@@ -213,7 +213,7 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "HP",
+          "attribute": "HEALTH",
           "percent": 0.525,
           "permanent": true,
           "target": "self"
@@ -258,7 +258,7 @@
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。"
     },
     {
-      "on": "SKILL_CAST",
+      "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
       "when": [
         "from_category BPSKILL"
@@ -282,7 +282,7 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "HP",
+          "attribute": "HEALTH",
           "percent": 0.6,
           "permanent": true,
           "target": "self"
@@ -327,7 +327,7 @@
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。"
     },
     {
-      "on": "SKILL_CAST",
+      "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
       "when": [
         "from_category BPSKILL"
