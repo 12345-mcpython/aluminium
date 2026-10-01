@@ -15,14 +15,6 @@
       "reason": "「当装备者的回合开始时，随机为 1 个当前能量百分比小于 #1=50% 的我方其他目标恢复 #2=8 点能量。」Needs the shared RANDOM-TARGET selector (reader count 2, with 21029) plus energy restoration and an energy-percentage filter. The selector is worth building; this cone waits for it."
     }
   ],
-  "21029": [
-    {
-      "require": 1,
-      "ability": "Ability21029",
-      "name": "交手如交谈",
-      "reason": "「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身攻击力 #1=48% 的附加伤害。」Needs the shared RANDOM-TARGET selector (reader count 2, with 21021) drawn from ATTACK_FINISHED's frozen hit set, plus appended damage. ATTACK_FINISHED already carries that hit set."
-    }
-  ],
   "21032": [
     {
       "require": 1,
