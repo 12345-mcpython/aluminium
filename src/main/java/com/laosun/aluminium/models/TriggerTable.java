@@ -1054,6 +1054,14 @@ public class TriggerTable {
         }
         String text = raw.trim();
 
+        // ✅ 「变化的是【NAME】」 (2026-09-30; reader: 1506’s forwarding clause). ⚠ FIRST: the chain below is long.
+        java.util.regex.Matcher changed =
+                java.util.regex.Pattern.compile("resource_changed:([^\\s]+)", java.util.regex.Pattern.CASE_INSENSITIVE)
+                        .matcher(text);
+        if (changed.find()) {
+            return new ResourceChanged(raw, changed.group(1).trim());
+        }
+
         // `!` negates the condition that follows it. The list of conditions is an AND, so without this the DSL
         // can only say "the target is on some Path" and never 「对「同谐」命途的角色…无法触发」 (星期日's Skill, the
         // first user) — and writing that as nine positive rules is the shape this prefix exists to avoid.
@@ -2245,6 +2253,32 @@ public class TriggerTable {
      * \u2605 \u300c\u62e5\u6709\u4efb\u610f\u76f8\u540c\u547d\u9014\u7684\u89d2\u8272\u300d: whether the candidate has a Path twin on our side. A unit whose Path is
      * the placeholder ({@code Path.OTHER}) has no twin by definition -- the same refusal {@code has_same_path_ally} makes.
      */
+    /** \u2705 \u300c\u53d8\u5316\u7684是\u3010NAME\u3011\u300d: the guard that stops a forwarding rule from eating its own output. */
+    private static final class ResourceChanged implements Condition {
+        private final String raw;
+        private final String resource;
+
+        ResourceChanged(String raw, String resource) {
+            this.raw = raw;
+            this.resource = resource;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.battle() != null && resource.equals(ctx.battle().lastChangedResource());
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
     private static final class SharesPathWithAnAlly implements Condition, PartyCondition {
         private final String raw;
 
