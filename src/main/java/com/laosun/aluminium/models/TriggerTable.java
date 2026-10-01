@@ -1813,7 +1813,7 @@ public class TriggerTable {
          */
         public TriggerContext withRule(String id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
-                    id == null ? "" : id, targetFilter, skillId, weakHitCount, List.of());
+                    id == null ? "" : id, targetFilter, skillId, weakHitCount, attackHitTargets);
         }
         /**
          * The same context, saying <b>which data row</b> of a skill produced this event (2026-09-28).
@@ -1879,7 +1879,7 @@ public class TriggerTable {
          */
         public TriggerContext withTargetFilter(List<Condition> filter) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    filter == null ? List.of() : filter, skillId, weakHitCount, List.of());
+                    filter == null ? List.of() : filter, skillId, weakHitCount, attackHitTargets);
         }
 
         /**
