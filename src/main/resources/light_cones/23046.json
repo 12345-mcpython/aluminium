@@ -1,0 +1,24 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23046_skill_stacks",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23046：「装备者每次施放战技后，使装备者的攻击力提高#4[i]%，最多叠加#5[i]次。」",
+      "note": "⭐ 原文 ✓：「每次施放战技后」= `CAST_SETUP` + `from_category BPSKILL` ✓；「攻击力提高 20%，最多叠加 4 次」= `MODIFY_ATTR ATTACK` + **`max_stacks: 4`** + `permanent` ✓（与已出货的光锥 24000 同形状 ✓）。⚠ 仍登记 ✗：① 第一句「暴击率提高#1[i]%」（**属性行** ✓）；② 「进入战斗时，若**我方的战技点上限**大于等于 6 点，攻击力提高 80%」（缺「战技点上限」这一条件 ✗）。"
+    }
+  ]
+}
