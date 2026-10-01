@@ -1106,6 +1106,14 @@ public final class TriggerInterpreter {
         if (effect.getAmountCap() != null) {
             amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
         }
+        com.laosun.aluminium.models.Resource party = holder.getResources().has(effect.getResource())
+                ? null
+                : (ctx.battle() == null ? null : ctx.battle().partyResource(effect.getResource()));
+        // \u2705 A PARTY-scoped counter has no home on the unit (2026-09-30): the battle owns it, so any ally may add to it.
+        if (party != null) {
+            party.gain(amount);
+            return;
+        }
         holder.getResources().gain(effect.getResource(), amount);
     }
 
