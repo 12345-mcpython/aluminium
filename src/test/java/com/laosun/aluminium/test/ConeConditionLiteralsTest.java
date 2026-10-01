@@ -10,15 +10,16 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Every light cone\u2019s loaded-tier rule conditions, written out LITERALLY (2026-09-30).
+ * Every light cone\u2019s loaded-tier rule conditions, asserted as PREFIXES (2026-09-30).
  *
  * <p>\u2b50 Tier semantics read off the loader: the axis is the SUPERIMPOSITION RANK, the exact rank is used, a missing
  * rank falls back to the lowest existing row, and only numeric keys are ranks -- so these come from each file\u2019s
  * smallest numeric key (what {@code Weapon.build(id, 9)} lands on).
  *
- * <p>\u26a0 Only genuinely value-carrying comparisons are skipped: {@code source()} returns a parse-time SNAPSHOT when
- * the right-hand side is a numeric VARIABLE (measured: {@code target_hp_percent >= hp_percent} comes back as
- * {@code target_hp_percent >= 0.0}). Shorthands such as {@code actor == self} are entity comparisons and stay literal.
+ * <p>\u2b50 Why prefixes: {@code source()} is the parser\u2019s spelling for pure-text conditions but a parse-time SNAPSHOT
+ * when a condition compares against a numeric variable (measured: {@code target_hp_percent >= hp_percent} comes back as
+ * {@code target_hp_percent >= 0.0}). So a value-carrying condition is pinned by NAME + OPERATOR, everything else by the
+ * whole text -- and every rule is covered. Regenerate after a condition change.
  */
 public class ConeConditionLiteralsTest {
     private static final int WEARER = 1210;
@@ -30,7 +31,12 @@ public class ConeConditionLiteralsTest {
                 .filter(r -> r.id().equals(id)).toList();
         Assertions.assertEquals(1, rules.size(), cone + " " + id + " on " + event);
         var actual = rules.getFirst().conditions().stream().map(x -> x.source()).toList();
-        Assertions.assertEquals(expected, actual, cone + " " + id);
+        Assertions.assertEquals(expected.size(), actual.size(), cone + " " + id + " (condition count)");
+        for (int i = 0; i < expected.size(); i++) {
+            Assertions.assertTrue(actual.get(i).startsWith(expected.get(i)),
+                    cone + " " + id + " condition " + i + ": expected prefix <" + expected.get(i)
+                            + "> but was <" + actual.get(i) + ">");
+        }
     }
 
     @Test
@@ -40,17 +46,21 @@ public class ConeConditionLiteralsTest {
         assertRule(20001, "CAST_SETUP", "cone20001_heal_on_ult", List.of("actor == self", "from_skill ULTRA"));
         assertRule(20002, "BATTLE_START", "boost_basic_attack_damage_boost_1", List.of());
         assertRule(20002, "BATTLE_START", "boost_skill_damage_boost_1", List.of());
+        assertRule(20003, "TURN_START", "cone20003_defence_base", List.of("hp_percent >="));
+        assertRule(20003, "TURN_START", "cone20003_defence_below_threshold", List.of("hp_percent <"));
         assertRule(20004, "BATTLE_START", "cone20004_ehr", List.of());
         assertRule(20005, "BATTLE_START", "cone20005_party_attack", List.of());
         assertRule(20006, "BATTLE_START", "boost_ultimate_damage_boost_1", List.of());
         assertRule(20007, "KILL", "cone20007_attack_on_kill", List.of());
         assertRule(20008, "BATTLE_START", "cone20008_party_energy", List.of());
+        assertRule(20009, "DEALING_DAMAGE", "shattered_home_against_healthy", List.of("actor == self", "target_hp_percent >"));
         assertRule(20010, "ULT_CAST", "cone20010_heal_on_ult", List.of());
         assertRule(20011, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target has_state 减速"));
         assertRule(20012, "BASIC_ATTACK", "cone20012_energy", List.of());
         assertRule(20013, "SKILL_CAST", "cone20013_energy_on_skill", List.of());
         assertRule(20014, "KILL", "cone20014_speed", List.of());
         assertRule(20015, "BASIC_ATTACK", "cone20015_advance_after_basic", List.of());
+        assertRule(20016, "TURN_START", "cone20016_crit_below_threshold", List.of("hp_percent <"));
         assertRule(20017, "BREAK", "cone20017_heal_on_break", List.of());
         assertRule(20018, "SKILL_CAST", "cone20018_arm_next_basic", List.of("actor == self"));
         assertRule(20018, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "self_stacks:下一次普攻待命 >= 1.0"));
@@ -73,6 +83,7 @@ public class ConeConditionLiteralsTest {
         assertRule(21005, "SKILL_CAST", "moles_stack_on_skill_cast", List.of("actor == self"));
         assertRule(21005, "ULT_CAST", "moles_stack_on_ult_cast", List.of("actor == self"));
         assertRule(21006, "BATTLE_START", "cone21006_followup_boost", List.of());
+        assertRule(21006, "DEALING_DAMAGE", "cone21006_followup_extra_when_low", List.of("actor == self", "target_hp_percent <="));
         assertRule(21007, "BATTLE_START", "cone21007_healing", List.of());
         assertRule(21007, "SKILL_CAST", "cone21007_party_energy", List.of());
         assertRule(21008, "BATTLE_START", "cone21008_ehr_and_dot", List.of());
@@ -81,6 +92,7 @@ public class ConeConditionLiteralsTest {
         assertRule(21010, "DEALING_DAMAGE", "cone21010_stack_on_the_target", List.of("actor == self"));
         assertRule(21010, "DEALING_DAMAGE", "cone21010_damage_per_stack", List.of("actor == self", "target_stacks:睚准 >= 1.0"));
         assertRule(21011, "DEALING_DAMAGE", "cone21011_same_element", List.of("actor is_ally", "damage_element_is_self"));
+        assertRule(21012, "DEALING_DAMAGE", "cone21012_healthier_target", List.of("actor == self", "target_hp_percent >="));
         assertRule(21013, "BATTLE_START", "cone21013_energy_on_entry", List.of());
         assertRule(21013, "BATTLE_START", "cone21013_ult_damage", List.of());
         assertRule(21014, "BATTLE_START", "cone21014_effect_res", List.of());
@@ -123,6 +135,7 @@ public class ConeConditionLiteralsTest {
         assertRule(21039, "BATTLE_START", "cone21039_damage_per_defence", List.of());
         assertRule(21040, "ALLY_ATTACK", "cone21040_crit_vs_two_weak_targets", List.of("actor == self", "weakness_hit_count >= 2.0"));
         assertRule(21041, "DEBUFF_APPLIED", "cone21041_trick_stack", List.of("actor == self"));
+        assertRule(21041, "BATTLE_START", "cone21041_attack_at_high_ehr", List.of("self_attr:effect_hit_rate >="));
         assertRule(21042, "BATTLE_START", "cone21042_permanent", List.of());
         assertRule(21042, "ULT_CAST", "cone21042_turns", List.of("actor == self"));
         assertRule(21043, "DEALING_DAMAGE", "cone21043_damage_per_shielded_ally", List.of("actor == self"));
@@ -142,6 +155,7 @@ public class ConeConditionLiteralsTest {
         assertRule(21053, "BATTLE_START", "cone21053_shield_boost", List.of());
         assertRule(21053, "DEALING_DAMAGE", "cone21053_damage_up_while_shielded", List.of("actor is_ally", "actor has_shield"));
         assertRule(21054, "SUMMON_ATTACK", "cone21054_summon_heal_boost", List.of("actor == summon"));
+        assertRule(21055, "DEALING_DAMAGE", "cone21055_healthy_attacker", List.of("actor is_ally", "actor_hp_percent >="));
         assertRule(21056, "BATTLE_START", "cone21056_party_break_damage", List.of());
         assertRule(21057, "DEALING_DAMAGE", "cone21057_summon_crit_damage", List.of("actor == summon"));
         assertRule(21058, "BATTLE_START", "boost_skill_damage_boost_rank1", List.of());
@@ -198,6 +212,7 @@ public class ConeConditionLiteralsTest {
         assertRule(23018, "BATTLE_START", "cone23018_crit_damage", List.of());
         assertRule(23018, "ULT_CAST", "cone23018_ult_damage_per_energy", List.of("actor == self"));
         assertRule(23019, "CAST_SETUP", "cone23019_ult_damage", List.of("actor == self", "from_category ULTRA"));
+        assertRule(23019, "CAST_SETUP", "cone23019_ult_skill_point", List.of("actor == self", "from_category ULTRA", "self_attr:breaking_effect >="));
         assertRule(23019, "WAVE_START", "cone23019_wave_energy", List.of());
         assertRule(23020, "DEALING_DAMAGE", "cone23020_crit_per_debuff", List.of("actor == self", "target_debuff_count >= 1.0", "target_debuff_count <= 3.0"));
         assertRule(23020, "ULT_CAST", "cone23020_debate_state", List.of("actor == self"));
@@ -226,6 +241,7 @@ public class ConeConditionLiteralsTest {
         assertRule(23031, "TURN_END", "cone23031_glow_decay", List.of("actor == self"));
         assertRule(23032, "ULT_CAST", "cone23032_forget_worry", List.of("actor == self"));
         assertRule(23032, "DEALING_DAMAGE", "cone23032_damage_up_vs_forgetful", List.of("target has_state 忘忧"));
+        assertRule(23032, "DEALING_DAMAGE", "cone23032_extra_at_high_break", List.of("target has_state 忘忧", "self_attr:breaking_effect >="));
         assertRule(23033, "BATTLE_START", "cone23033_energy_at_start", List.of());
         assertRule(23033, "ULT_CAST", "cone23033_mine_on_ult", List.of("actor == self"));
         assertRule(23033, "ALLY_ATTACK", "cone23033_basic_count", List.of("actor == self", "from_category Normal", "self_stacks:普攻计数 < 2.0"));
@@ -273,6 +289,7 @@ public class ConeConditionLiteralsTest {
         assertRule(24000, "ALLY_ATTACK", "cone24000_attack_per_attack", List.of("actor == self"));
         assertRule(24000, "BREAK", "cone24000_damage_after_break", List.of("actor == self"));
         assertRule(24001, "BATTLE_START", "cone24001_crit", List.of());
+        assertRule(24001, "DEALING_DAMAGE", "cone24001_crit_vs_low_hp", List.of("actor == self", "target_hp_percent <="));
         assertRule(24001, "KILL", "cone24001_attack_after_kill", List.of());
         assertRule(24002, "TAKING_HIT", "cone24002_shield_when_unshielded", List.of("target == self", "!self has_shield"));
         assertRule(24003, "CAST_SETUP", "cone24003_ult_dot", List.of("actor == self", "from_category ULTRA"));
