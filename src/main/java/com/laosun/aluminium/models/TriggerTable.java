@@ -1046,7 +1046,8 @@ public class TriggerTable {
      */
     private static final Set<TriggerEvent> CAST_CARRYING_EVENTS =
             Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK,
-                    TriggerEvent.CAST_SETUP);
+                    TriggerEvent.CAST_SETUP,
+                    TriggerEvent.ATTACK_FINISHED);
 
     private static Condition parseCondition(String raw, TriggerSpec spec) {
         if (raw == null || raw.isBlank()) {
@@ -1857,6 +1858,17 @@ public class TriggerTable {
         public TriggerContext withWeakHitCount(int count) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
                     targetFilter, skillId, count, List.of());
+        }
+
+        /**
+         * ✅ The same context carrying the targets this attack hit (2026-09-30; reader: cone 21029).
+         *
+         * <p>⚠ This helper CARRIES {@code weakHitCount} along rather than resetting it: every helper rebuilds the
+         * whole record, so one that resets a field it does not own would make the firing ORDER significant.
+         */
+        public TriggerContext withAttackHitTargets(List<CanHit> targets) {
+            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
+                    targetFilter, skillId, weakHitCount, List.copyOf(targets));
         }
 
         /**
