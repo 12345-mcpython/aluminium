@@ -56,9 +56,9 @@ public class Character1505UltRiderTest {
     public void theShippedUltRiderStatesItsNumberScopeAndType() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         var rules = elation.getTriggerTable().rulesFor(com.laosun.aluminium.enums.TriggerEvent.CAST_SETUP)
-                .stream().filter(rule -> rule.id().startsWith("p1505_")).toList();
+                .stream().filter(rule -> rule.id().contains("ult_")).toList();
         Assertions.assertEquals(2, rules.size(),
-                "both ultimate riders (the 12% all-enemy one and the 14% random one) are CAST_SETUP rules");
+                "the two ultimate riders (12% all-enemy, 14% random) -- picked by id, because CAST_SETUP also carries the skill\u2019s laugh rule");
         var effect = rules.getFirst().effects().getFirst();
         System.out.println("[1505-ult] spec " + rules.getFirst().id() + " percent=" + effect.getPercent()
                 + " target=" + effect.getTarget() + " damage_type=" + effect.getDamageType());
