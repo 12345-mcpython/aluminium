@@ -1,11 +1,8 @@
 {
-  "1": [
+  "2": [
     {
-      "on": "DEALING_DAMAGE",
+      "on": "BATTLE_START",
       "id": "times_three",
-      "when": [
-        "actor == self"
-      ],
       "do": [
         {
           "op": "DAMAGE",
@@ -16,14 +13,11 @@
           "times": 3
         }
       ],
-      "note": "测试夹具：整次结算重复 3 遍（每次重抽随机敌方目标）。"
+      "note": "测试夹具：整次结算重复 3 遍（每次重抽随机敌方目标）。⚠ 事件用 BATTLE_START 而不是 DEALING_DAMAGE —— 后者会被本效果自己再次触发（第 630 轮实测：Trigger recursion exceeded 8 levels）。"
     },
     {
-      "on": "DEALING_DAMAGE",
+      "on": "BATTLE_START",
       "id": "times_one",
-      "when": [
-        "actor == self"
-      ],
       "do": [
         {
           "op": "DAMAGE",
@@ -34,7 +28,7 @@
           "times": 1
         }
       ],
-      "note": "测试夹具：同一条但 times: 1，用作比值基线（其余字段逐字相同）。"
+      "note": "测试夹具：只重复 1 遍，作为比值基线。⚠ 除 times 外与 times_three 逐字相同。⚠ 判据必须在**同一场战斗内**把本规则连用 3 次去比**一场** times_three：两者都在一场战斗里结算 3 次、推进同样的随机量（第 631/632 轮实测：跨战斗求和会得到 993.69 对 1159.30，因为每场战斗各自从 Random(0) 开始）。"
     }
   ]
 }
