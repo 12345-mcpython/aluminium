@@ -933,6 +933,33 @@ public class TriggerTable {
      * {@code allies}, which has memosprites and servants appended as they are summoned (light cone 21025 and
      * relic 317 both mean the party as formed). Its reader is relic 317: 「若装备者不是队伍第一名」.
      */
+    /**
+     * The Trailblaze Companions group (2026-09-30): the twenty character ids the documentation's glossary lists as
+     * 「开拓同行」 -- 开拓者 (8001-8010), 姬子 (1003), 姬子•启行 (1510), 三月七 (1001, 1224), 长夜月 (1413), 丹恒 (1002),
+     * 丹恒•饮月 (1213), 丹恒•腾荒 (1414), 瓦尔特 (1004), 星期日 (1313).
+     *
+     * <p>\u26a0 PROVENANCE: membership is NOT marked by any data field -- AvatarConfig, AvatarCamp and SpecialAvatar were
+     * all checked, and a co-occurrence scan over 2253 tables hit 355 generic ones. The ids themselves come from
+     * character_data.json; only the GROUPING comes from the documentation's glossary (1510_姬子•启行.md:408 /
+     * export_glossary.py:70). If a data marker is ever found, read it and delete this set. Its reader is relic 327.
+     */
+    private static final java.util.Set<Integer> TRAILBLAZE_COMPANIONS = java.util.Set.of(
+            8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010,
+            1001, 1002, 1003, 1004, 1213, 1224, 1313, 1413, 1414, 1510);
+
+    /** The {@code is_companion} keyword: "<b>that unit is a Trailblaze Companion</b>". */
+    private static final Pattern IS_COMPANION =
+            Pattern.compile("(?<![\\w])is_companion(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /** The {@code has_companion_ally} keyword: "<b>somebody else on my side is a Trailblaze Companion</b>". */
+    private static final Pattern HAS_COMPANION_ALLY =
+            Pattern.compile("(?<![\\w])has_companion_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /** Companion-group membership, by character id (never by name: 姬子 is a prefix of 姬子•启行). */
+    private static boolean isCompanion(CanHit unit) {
+        return unit instanceof Character c && TRAILBLAZE_COMPANIONS.contains(c.getCid());
+    }
+
     private static final Pattern IS_PARTY_FIRST =
             Pattern.compile("(?<![\\w])is_party_first(?![\\w])", Pattern.CASE_INSENSITIVE);
 
@@ -1131,6 +1158,30 @@ public class TriggerTable {
 
         // `is_ally`: "<who> is_ally" — no argument at all, so it is checked before the operator branch too.
         // `is_other_ally`: "<who> is_other_ally" -- same shape as `is_ally`, one clause stricter.
+        Matcher hasCompanionAlly = HAS_COMPANION_ALLY.matcher(text);
+        if (hasCompanionAlly.find()) {
+            String subject = normalize(text.substring(0, hasCompanionAlly.start()));
+            String trailing = text.substring(hasCompanionAlly.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"has_companion_ally\": it takes no argument "
+                                + "(write \"self has_companion_ally\") (source: " + spec.getSource() + ")");
+            }
+            return new HasCompanionAlly(raw, spec);
+        }
+
+        Matcher isCompanionM = IS_COMPANION.matcher(text);
+        if (isCompanionM.find()) {
+            String subject = normalize(text.substring(0, isCompanionM.start()));
+            String trailing = text.substring(isCompanionM.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"is_companion\": it takes no argument "
+                                + "(write \"self is_companion\") (source: " + spec.getSource() + ")");
+            }
+            return new IsCompanion(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw);
+        }
+
         Matcher isPartyFirst = IS_PARTY_FIRST.matcher(text);
         if (isPartyFirst.find()) {
             String subject = normalize(text.substring(0, isPartyFirst.start()));
@@ -2145,6 +2196,70 @@ public class TriggerTable {
      * 「若装备者不是队伍第一名，则使队伍第一名的攻击力提高」 -- one rule needs both halves, so this answers the condition
      * half and {@code party_first} (a target selector) answers the other.
      */
+    /** {@code <who> is_companion} ? the unit is one of the Trailblaze Companions (relic 327). */
+    private static final class IsCompanion implements Condition, PartyCondition {
+        private final String subject;
+        private final String raw;
+
+        IsCompanion(String subject, String raw) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            return who != null && isCompanion(who);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /** {@code self has_companion_ally} ? somebody else on our side is a Trailblaze Companion (relic 327). */
+    private static final class HasCompanionAlly implements Condition, PartyCondition {
+        private final String raw;
+
+        HasCompanionAlly(String raw, TriggerSpec spec) {
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return ctx.owner();
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            if (ctx.battle() == null || ctx.owner() == null) {
+                return false;
+            }
+            for (CanHit ally : ctx.battle().allies) {
+                if (ally != ctx.owner() && !ally.isDeath() && isCompanion(ally)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     private static final class IsPartyFirst implements Condition, PartyCondition {
         private final String subject;
         private final String raw;

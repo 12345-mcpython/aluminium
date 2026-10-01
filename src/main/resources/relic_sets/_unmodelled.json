@@ -12,12 +12,5 @@
       "ability": "Ability51321",
       "reason": "\"Increases the wearer's CRIT DMG dealt to enemy targets in the DEF reduction state by 28%. After the wearer inflicts the DEF reduction state on an enemy target, all allies gain 'Comburent' for 2 turn(s) ... The DMG dealt by ally targets with 'Comburent' increases by 15% ... can be triggered again after the wearer uses an attack.\" Needs a condition on the target's DEF-reduction state, a named buff with a per-attack refresh rule, and a damage-dealt bonus."
     }
-  ],
-  "327": [
-    {
-      "require": 2,
-      "ability": "Ability53271",
-      "reason": "\"Increases the wearer's CRIT Rate by 8%. When entering combat, if the wearer and another teammate are both Trailblaze Companions characters, increases the wearer's CRIT DMG by 32%.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08). CORRECTED TWICE, both times by measurement. (a) The old reason claimed \"the rule cannot name a Path\" -- FALSE: `has_path <chinese path name>` exists (TriggerTable HAS_PATH, closed vocabulary of nine, negation allowed), so the engine CAN name a Path. (b) The old English said 24% CRIT DMG -- also FALSE: the project's own src/main/resources/data/relic_sets.json carries the authoritative text and states #2[i]% with param = [0.08, 0.32], so it is 32%. What is actually missing is neither of those: the sentence says 开拓同行角色 / \"Trailblaze Companions\", which is a COMPANION-GROUP membership tag -- not one of the nine Paths, and not the Trailblazer character. The engine models element and path but has no faction/companion-group test, so this clause has no spelling. Registered rather than approximated. NOTE ON SOURCES: the trustworthy order is (1) src/main/resources/data/*.json, (2) E:\\turnbasedgamedata, (3) this registry's prose -- LAST, and only as a lead: it has now been wrong about 325's blocker, about 327's \"cannot name a Path\", about 23048's damage_type, and about 327's number."
-    }
   ]
 }
