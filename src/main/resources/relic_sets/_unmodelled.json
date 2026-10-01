@@ -31,7 +31,7 @@
     {
       "require": 2,
       "ability": "Ability53271",
-      "reason": "\"Increases the wearer's CRIT Rate by 8%. Upon entering battle, if the wearer and another ally are both Trailblazer-path characters, increases the wearer's CRIT DMG by 24%.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08). What is missing is a condition on the PARTY's composition -- 'another ally of the Trailblazer Path' needs the rule to see its teammates (same gap as sets 312 and 314)."
+      "reason": "\"Increases the wearer's CRIT Rate by 8%. Upon entering battle, if the wearer and another ally are both Trailblazer-path characters, increases the wearer's CRIT DMG by 24%.\" The CRIT Rate is the `properties` stat (CriticalChanceBase 0.08). CORRECTED 2026-09-30 by measurement, the old reason was wrong: TWO path conditions already exist -- `self has_same_path_ally` (a party-level existence check, shipped by relic 314) and `shares_path_with_an_ally` (the per-candidate form, shipped by light cone 21046). What is missing is the ability to NAME a path: both keywords compare the wearer's OWN path against the side, and relic 314's note states the limit plainly -- \"the rule cannot name a Path, because the relic can be worn by anybody\". So \"the wearer and another ally are both TRAILBLAZER-path\" is not the same sentence as \"somebody shares MY path\": it needs a test of the wearer's own path as well, which no spelling provides. The same shape holds for `is_same_element_as_self` (pairing yes, naming no). Registered rather than approximated."
     }
   ]
 }
