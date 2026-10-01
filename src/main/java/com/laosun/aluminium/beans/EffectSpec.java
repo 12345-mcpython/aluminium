@@ -45,6 +45,8 @@ public class EffectSpec {
         EffectSpec copy = new EffectSpec();
         copy.op = this.op;
         copy.amount = this.amount;
+        copy.amountFromAttr = amountFromAttr;
+        copy.amountPercent = amountPercent;
         copy.perStack = this.perStack;
         copy.scale = this.scale;
         copy.attribute = this.attribute;
@@ -125,6 +127,17 @@ return copy;
      */
     @SerializedName("amount")
     private Double amount;
+    /**
+     * \u2705 An amount read from an ATTRIBUTE instead of a literal (2026-09-30; reader: light cone/character 1505
+     * \u7eef\u82f1\u2019s talent \u300c\u7eef\u82f1\u83b7\u5f97\u7b49\u540c\u4e8e\u66b4\u51fb\u4f24\u5bb9 <b>50%</b> \u7684\u6b22\u6109\u5ea6\u300d). The clause names a SHARE of a panel
+     * value, which no literal can carry -- until this field a `GAIN_RESOURCE` rule could only add a fixed number, so
+     * that sentence had no spelling at all.
+     */
+    private String amountFromAttr;
+    /**
+     * The share of {@link #amountFromAttr} to take (0.5 for \u300c50%\u300d). Null means the whole value.
+     */
+    private Double amountPercent;
 
     /**
      * What a {@code HEAL} / {@code SHIELD} amount is a <b>percentage of</b>, instead of a flat number.
