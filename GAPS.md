@@ -14214,6 +14214,44 @@
 >   （⚠ 照 `RelicTriggerTableTest` 的"登记表守卫" ✓）⇒ ⭐ **把 `164 / 169` 从"我工具的数字"变成判据维护的不变量** ✓。
 > * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`34cb6ae` ✓）；
 >   角色 93 / 93、光锥 **164 / 169** ✓、遗器 60 文件 / 登记表 1 条（`132` ✓）、测试类 485。
+
+> **2026-09-30 更新（aggro 回收之七百五十三：光锥侧第一次回收成功；`GREPPED` 纪律已入判据）**：
+>
+> * ✅ **`21029`（后会有期 · 能力「交手如交谈」）已出货** ✓（`content: ship light cone 21029 -- random hit enemy, appended ATK-scaled damage` ✓）：
+>   * ⭐ 事件 **`ATTACK_FINISHED`** ✓ ＋ `when ["actor == self", "from_category NORMAL"]` ✓，
+>     ⚠ 另加同形的 **`BPSKILL`** 一条 ✓（⚠ "普攻**或**战技"是析取 ✗ ⇒ 照遗器 `105` 的惯例写成两条规则 ✓）；
+>   * ⭐ `do: [{ "op": "ADD_DAMAGE", "percent": p, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }]` ✓
+>     （⚠ `target` 与 `op` **同级** ✓ —— 照 `23007:30` ✓）；
+>   * ⭐ **五档** `0.48 / 0.6 / 0.72 / 0.84 / 0.96` ✓（⚠ 权威 `EquipmentSkillConfig` ✓）；
+>   * ⛔ **不需要任何引擎改动** ✓ —— ⚠ 与我三轮前的判断完全相反 ✗（⚠ 见下 ✓）。
+> * ⭐⭐⭐ **光锥侧回收必须同改三处（本轮由判据逼出来的 ✓）**：
+>   1. **新增 `light_cones/<id>.json`** ✓；
+>   2. **删 `light_cones/_unmodelled.json` 的条目** ✓；
+>   3. ⚠ **改判据里的钉死清单** ✗（`LightConeRegistryTest` 中那句 `List.of(...)` ✓）——
+>      ⚠ 本轮我漏了第 3 处 ✓，**是守卫把它拦下的** ✓（原文：“the registered set is pinned, a new cone must be added here and a built one removed” ✓）⇒ ⭐ **与遗器侧六次回收的纪律完全同形** ✓。
+> * ⭐⭐⭐ **新纪律已入判据（本轮最重要的改动 ✓）**：⚠ 我连续三轮把 `21029` 的缺口登记错 ✗
+>   （⚠ 第 548 轮说缺"随机目标选择器" ✗ —— ⚠ 实测 `random_hit_enemy` **早已存在** ✓；
+>   ⚠ 第 550 轮说还缺"附加伤害" ✗ —— ⚠ 实测 `ADD_DAMAGE` **早已出货五档** ✓（`20018`/`21030` ✓）；
+>   ⚠ 第 552 轮才拿到现成模板 `23007` ✓）⇒ ⭐ **根因：写理由时只读了光锥文本，一次也没搜引擎** ✗。
+>   * ✅ **修法（已是判据 ✓）**：`LightConeRegistryTest` 现在**要求每条 `reason` 含 `GREPPED`** ✗
+>     ⇒ ⭐ **一条不写"搜过哪些引擎集合"的理由会让构建变红** ✓；
+>   * ⚠ 断言信息本身就写着理由 ✓：*"This is not ceremony: 21029 was registered three times wrongly … because the reasons were written from the cone text alone. A reason that does not say what was searched cannot be trusted, and this registry is only worth having if it can be trusted."* ✓；
+>   * ⭐ 四条现存理由均已补上 `GREPPED` 前缀 ✓，且**列出全部十四个选择器** ✓
+>     （`party_first` `next_ally` `self` `target` `attacker` `all_allies` `party` `other_allies` `summon` `target_and_summon` `all_enemies` `lowest_hp_ally` `random_enemy` `random_hit_enemy` ✓）。
+> * ⭐ **权威来源链（光锥侧，已实测可用 ✓）**：`ExcelOutput/EquipmentConfig.json` ✓ → `SkillID` ✓ →
+>   `ExcelOutput/EquipmentSkillConfig.json` ✓（⚠ 850 行 ✓，键 `SkillID` ✓）→ ⚠ 名称/描述是**哈希** ✗ →
+>   **`TextMap/TextMapCHS.json`** ✓（⚠ **474193** 条 ✓，⚠ 加载仅 **0.3 秒** ✓）。
+>   ⚠ **三个字段不可混** ✗：光锥名（后会有期 ✓）≠ 能力名（交手如交谈 ✓）≠ 参数 ✓。
+> * ⚠ **一条旧教训再次被证实** ✓：⚠ `data/weapons.json` **不含能力** ✗（⚠ 带 `ability` 的行数实测为 **0** ✓）
+>   ⇒ ⭐ **用错文件算出的数字比没有数字更糟** ✓ —— ⚠ 我报了一整段的 `164 / 170` ✗，真值是 **164 / 169** ✓
+>   （⚠ 现为 **165 / 169** ✓）。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`78ed3cd` ✓）；
+>   角色 93 / 93、光锥 **165 / 169**、**光锥登记表 4 条**（`20023` `21021` `21032` `21038` ✓）、
+>   遗器 59 规则文件 ＋ 登记表 1 条（`132` ✓）、测试类 486。
+> * **仍欠（下一段直接可做 ✓）**：① ⭐ **`random_ally`** ✓（⚠ `21021` 的缺口 ✓，⚠ 读者数 **1** ✗ ⇒
+>   按纪律"不造没有读者的能力" ✗ ⇒ ⚠ **要么找到第二个读者，要么保持登记** ✓）；
+>   ② ⚠ `20023`（阿哈时刻事件 ✓）／`21032`（随机选效果＋不与上次重复 ✓）／`21038`（累计损血＋消耗生命＋冷却 ✓）
+>   —— ⚠ 各 **1** 个读者 ⇒ ⚠ 保持登记 ✓；③ ⚠ `132`（⚠ 遗器侧唯一真阻碍 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
