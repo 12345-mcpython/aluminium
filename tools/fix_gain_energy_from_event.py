@@ -31,6 +31,26 @@ NEW = '''    private static void gainEnergyFor(Battle battle, EffectSpec effect,
         }
         if (effect.getScale() == null || effect.getScale().isBlank()) {'''
 
+# ⭐ The key: EffectSpec has NO @SerializedName for this field, so Gson maps it by its JAVA name -- `amountFromEvent`.
+# Round 668 wrote `amount_from_event`, which Gson silently drops, so the flag never lit and the change was a no-op that
+# passed the load check, the full suite and both demo gates. Measured in round 675/676.
+CHAR = 'src/main/resources/characters/1312.json'
+cdoc = json.load(io.open(WORK + '/' + CHAR, encoding='utf-8'))
+cwhere = cdoc if isinstance(cdoc, list) else cdoc.get('rules')
+crule = next((r for r in cwhere if isinstance(r, dict)
+              and r.get('id') == 'talent_energy_on_skill_point_spent'), None)
+if crule is None:
+    print('REFUSING: 1312 rule not found')
+    sys.exit(1)
+centry = crule['do'][0]
+print('1312 before: %s' % json.dumps(centry, ensure_ascii=False))
+centry.pop('amount_from_event', None)
+centry['amountFromEvent'] = True
+ctxt = json.dumps(cdoc, ensure_ascii=False, indent=2) + '\n'
+json.loads(ctxt)
+io.open(WORK + '/' + CHAR, 'w', encoding='utf-8', newline='').write(ctxt)
+print('1312 after:  %s' % json.dumps(centry, ensure_ascii=False))
+
 eng_saved = io.open(WORK + '/' + ENG, encoding='utf-8').read()
 print('engine anchor count: %d' % eng_saved.count(OLD))
 if eng_saved.count(OLD) != 1:
