@@ -11096,6 +11096,43 @@
 >   ② 写判据 ✓；③ `compileJava` → 全量 ✓；④ 提交 + 文档 ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百二十四：**判据配方到手（`Cone21040Test` 是完整样板 ✓）**）**：
+> 
+> * ⭐⭐⭐ **样板里的三件现成东西（按测试名/锚点记 ✓）**：
+>   ① **战斗夹具** ✓：`CharacterFactory.create(ALLY, LEVEL)` ✓、
+>      `EnemyFactory.create(1002011, 90, 1)` ✓、**`new Battle(List.of(wearer, ally), List.of(enemy), new Random(0))`** ✓
+>      ⇒ ⭐ **种子是显式给的** ✓（`new Random(0)` ✓）—— 第 209 轮"用种子 RNG 做行为级证明"**可行** ✓；
+>   ② ⭐⭐ **一条我没用过的重载** ✓：**`Weapon.build(CONE, LEVEL, false, 1)`** ✓
+>      ⇒ **四参版**（第三参 + **第四参 = 叠影 rank** ✓）⇒ ⚠ 与我此前用的两参版**不同** ✓
+>      （⚠ 第 163/164 轮查明两参版的第二参**不影响档位** ✓ ⇒ **要指定 rank 就得用四参版** ✓ —— ⭐ 记下来 ✓）；
+>   ③ ⭐⭐ **手工构造上下文 + `with…` 助手** ✓：
+>      `new TriggerTable.TriggerContext(wearer, wearer, enemy, 1, 0, null, battle, null).withWeakHitCount(n)` ✓
+>      ⇒ ✅ **八参紧凑构造 + 链式设置** ✓ ⇒ ⭐ 我的 `withAttackHitTargets(...)` **用法完全相同** ✓
+>        （⚠ 这正是第 199 轮加的那个分量 ✓、第 201 轮抄的那个助手 ✓）。
+> * ⭐⭐⭐ **判据配方（下一轮机械可写 ✓）**：
+>   ```java
+>   // 夹具：种子战斗 + 三个敌人（照 21040）
+>   Battle battle = new Battle(List.of(wearer, ally), List.of(e1, e2, e3), new Random(0));
+>   battle.startBattle();
+>   // 手工规则：挂在 ATTACK_FINISHED，目标 = 本次命中的随机 1 个敌人，效果 = 一个"落在目标身上"的 op
+>   wearer.setTriggerTable(new TriggerTable(CID, List.of(<rule 的 TriggerSpec>)));   // 形式照 21040 (:53 一带)
+>   // 驱动：用第 203 轮新增的 public 十参重载（攻击结束 + 冻结集合）
+>   battle.fireTriggers(TriggerEvent.ATTACK_FINISHED, wearer, e1, 3, 0.0, null, null, 0, 0, List.of(e1, e2, e3));
+>   // 断言：恰好一个敌人被加上；且它属于 {e1,e2,e3}
+>   ```
+>   ⭐ **第二段（钉"冻结"）** ✓：把上面的驱动**跑多次** ✓（⚠ 种子固定 ⇒ ⭐ 需要**每次换一场战斗**或
+>     **换一个 rank/装备** 才能换随机流 ✗ —— ⚠ 这点**必须先试**再下结论 ✓，
+>     若换不动种子 ⇒ ⭐ **降级**为"断言落在被命中集合内" ✓ 并**登记** ✓（㉓ ✓））。
+> * ⚠ **两处待试（下一轮先试，不猜 ✓）**：
+>   ① **`MODIFY_DAMAGE_TAKEN`** 是否**对敌方目标**可施加 ✓（⚠ 它是减益 ✓ ⇒ 按第 188/190 轮的惯例应当可以 ✓，
+>     但**没实测过** ✗）⇒ ⚠ 若不行，换 **`APPLY_DOT`**（⚠ 需要元素 ✗）或 **`ADD_STACK`**（⚠ 需要状态名 ✗）
+>     ⇒ ⭐ 所以**先试 `MODIFY_DAMAGE_TAKEN`** ✓；
+>   ② **手工 `TriggerSpec` 的构造形状** ✓（⚠ 我是照 `21040` 的"直接 `new TriggerTable(cid, List.of(...))`" ✓，
+>     但**规则对象的字段拼写**要先读一处实例 ✓ —— ⭐ `Cone21040Test` 里那段 `List.of(...)` 的**后半段**
+>       （第 95 行之后 ✓）应当就有 ✓ ⇒ 下一轮读它 ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
