@@ -10496,6 +10496,297 @@
 > * ⚠ **本轮只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百零三：**✅ 选择器 `random_hit_enemy` 落地 —— 能力三步全部完成**）**：
+> 
+> * ✅ **落地的改动（`feat: a target selector for a random one of the enemies this attack hit` ✓）**
+>   （`models/TriggerInterpreter.java` ✓，四处 ✓）：
+>   ① **登记进 `TARGET_SELECTORS`** ✓（`:141` 的已知清单 ✓ —— ⚠ 没有它会被 default 分支当成"能命中多个单位"而抛错 ✓）；
+>   ② **常量** `TARGET_RANDOM_HIT_ENEMY = "random_hit_enemy"` ✓ + 一段 javadoc ✓（把"**快照语义**"与
+>      "**宁可报错也不给错目标**"写进代码 ✓）；
+>   ③ **switch 一例** ✓：`case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);` ✓
+>      —— ⭐ **照抄既有 `random_enemy` 的写法** ✓（`require(值或 null, 常量, ctx)` ✓ ⇒ **null 即抛错** ✓）；
+>   ④ **助手 `randomHitEnemy(ctx)`** ✓：`ctx.damage() == null` ✓ / 命中集合为空 ✓ / `battle == null` ✓ ⇒ **返回 null** ✓；
+>      否则 `hitTargets() ∩ getOpponents(null)` ✓，空则 null ✓，非空则用**战斗自己的 seeded RNG** 取一个 ✓。
+> * ⭐⭐⭐ **分阶段验证（㉝ ✓）**：脚本先**打印阵营 API 候选** ✓（`randomOpponent(` ✓ / `getOpponents(` ✓）
+>   ⇒ 再写补丁 ⇒ **`compileJava exit: 0`** ✓ ⇒ **`suite exit: 0`** ✓ ⇒ ✅ **一次通过** ✓
+>   （⭐ 这是"**先列名再动手**"的又一次直接收益 ✓；⚠ 第 178 轮的"凭常识写"则白跑一轮 ✗）。
+> * ✅ **能力三步全部完成 ✓**：① 实例携带 ✓（第 180 轮 ✓）；② 施放流程写入 ✓（第 183 轮 ✓）；
+>   ③ 选择器可读 ✓（本轮 ✓）⇒ **`21029` 的前置条件已全部满足** ✓。
+> * ⚠ **仍未出货（如实 ✓）**：**`21029` 后会有期** ✓ —— 下一步要 ✓：
+>   ① 核对它各档 `ParamList` ✓（`#1[i]%` 攻击力 ✓）；② 核对 `from_category` 词表 ✓（"普攻"与"战技"在引擎里叫什么 ✓
+>      —— ⚠ 这决定规则挂在 **`CAST_SETUP` + 哪个分类** ✓）；③ 写内容 + 判据 + 变异 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百零四：**`21029` 的数据与分类词到手；并暴露一个**决定性疑问****)**：
+> 
+> * ✅ **`21029` 的原始数据（实测 ✓，5 档 ✓）**：
+>   `level=1..5 params=[0.48] / [0.6] / [0.72] / [0.84] / [0.96]` ✓
+>   文案 ✓：「装备者施放**普攻或战技**后，对**随机 1 个受到攻击的敌方目标**造成等同于自身 **#1[i]% 攻击力**的**附加伤害**。」 ✓
+>   ⇒ ⭐ 按第 166 轮定下的读法（`ParamList` 是**分数** ✓）⇒ **48% → 96% 攻击力** ✓，逐档 +12% ✓。
+> * ✅ **分类词表（实测 ✓，来自已出货内容 ✓）**：
+>   `BPSKILL` ✓（40 处，例：`21036`/`23010`/`23046` ✓ —— ⭐ 它就是「**普攻或战技**」 ✓）、
+>   `ULTRA` ✓（80 处 ✓）、`NORMAL` ✓、`ElationDamage`/`ELATION_DAMAGE` ✓
+>   ⇒ ✅ **规则应挂在 `CAST_SETUP` + `from_category BPSKILL`** ✓（与 `23010`「普攻/战技造成的伤害提高」的既有写法一致 ✓）。
+> * ⚠⚠ **决定性疑问（下一轮第一步 ✓，必须先查 ✓）**：
+>   **`CAST_SETUP` 的触发上下文里到底有没有 `Damage`** ✓？
+>   ⭐ 因为命中集合是**挂在 `Damage` 实例上**的 ✓（第 180/183 轮 ✓），而 `CAST_SETUP` 是**施放时**的事件 ✓ ——
+>   ⚠ 如果它的上下文 `damage` 是 **null** ✗，那么在 `CAST_SETUP` 规则里用 `random_hit_enemy` 会**直接抛错** ✗
+>     （⚠ 而"抛错"正是我设计的**正确**行为 ✓ —— 但那样 `21029` **就出货不了** ✗）。
+>   * ⇒ ⚠ 这会**推翻我第 182 轮的乐观结论之一** ✗：我说"**施放级读者看到全部**" ✓，
+>     ⚠ 但那**前提是它能拿到实例** ✗ —— 若拿不到 ✓，则"施放级读者"根本**读不到**这个字段 ✓。
+>   * ⇒ ✅ **两条出路（下一轮据实择一 ✓）**：
+>     **A**：`CAST_SETUP` 的上下文**带 `Damage`** ✓ ⇒ 直接用（并实测"读到几个候选" ✓）；
+>     **B**：**不带** ✓ ⇒ 需要**第二个读者可达的载体** ✓ —— ⭐ 这恰好回到我第 175 轮的"**战斗级**"方案 ✓
+>       （⚠ 即第 176 轮"实例携带答案"的更正**只对逐击读者成立** ✓，对施放级读者**不够** ✗）
+>       ⇒ 但**先别急着加** ✓：按纪律**先查**"施放级规则目前是怎么拿到伤害信息的" ✓
+>         （⭐ 引擎里若有 `AttackEvent`/`fireAfterAttack` 之类的**施放后**事件 ✓，命中集合可能**已经**被它带上了 ✓
+>           —— `SkillExecutor:501 battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage)` ✓ **正是** ✓！）
+>   * ⭐⭐ **重要线索（本轮顺手看到 ✓）**：`SkillExecutor:501` 的
+>     **`battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage)`** ✓
+>     ⇒ ✅ **"施放后"事件本来就拿到了 `hitTargets`** ✓ ⇒ ⭐ `21029` 很可能该挂在**那个事件**上 ✓，
+>       而不是 ` CAST_SETUP` ✓ —— ⚠ 下一轮先**列出该事件**（名字 ✓、上下文 ✓、是否带命中集合 ✓）。
+> * ⚠ **本轮为只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百零五：**"施放后"是 **Java 接口钩子**而不是触发事件 ⇒ `21029` 的疑问仍未解**）**：
+> 
+> * ⭐⭐⭐ **实测（`Battle.java:2349` ✓、`models/event/AttackEvent.java` ✓）**：
+>   `public void fireAfterAttack(CanHit attacker, CanHit mainTarget, List<CanHit> targets, double totalDamage)` ✓
+>   ⇒ 它**遍历 `battle.allies`** 调 `ally.afterAttack(...)` ✓ ⇒ `CanHit.afterAttack` ✓ → `BuffManager.afterAttack` ✓
+>     → 每个 buff 实现的 `AttackEvent.afterAttack(battle, attacker, mainTarget, hitTargets, totalDamage)` ✓
+>   ⇒ ✅ **这个钩子参数里确实直接带 `hitTargets`** ✓（**施放级、且完整** ✓ —— 正是 `21029` 想要的那种信息 ✓）
+>   ⚠ **但它是一条 Java 接口链，不是 `TriggerEvent`** ✗
+>     （grep 里**没有** `TriggerEvent.AFTER_ATTACK` ✗；提到的只有 `SUMMON_ATTACK` ✓）
+>   ⇒ ⛔ **所以内容规则（JSON 里的 `on`）挂不上去** ✗ —— 只有**Java 侧的 buff/事件实现**能用它 ✓。
+> * ⭐⭐⭐ **因此 `21029` 的疑问**仍未解 ✓（我第 189 轮的两条出路依旧成立 ✓）：
+>   * **A**：`CAST_SETUP` 的上下文**带 `Damage`** ⇒ 直接用 ✓（⚠ 但要注意 `CAST_SETUP` 在**结算前**触发 ✓，
+>     所以即便带 ✓，读到的也是**空/极少**的集合 ✗ ⇒ ⚠ **A 很可能不成立** ✓）；
+>   * **B**：加一个**施放级可达的载体** ✓ —— ⭐ 现在这条**更有依据**了 ✓：引擎**已经**在"施放后"知道完整命中集合 ✓
+>     （`fireAfterAttack` 的参数 ✓），只是**没把它变成规则能读的东西** ✗
+>     ⇒ ✅ 最自然的做法：**在 `fireAfterAttack` 里把本次攻击的命中集合记到一个规则可达处** ✓
+>       （⚠ 但按第 176 轮的教训：**先读实现再定方案** ✓ —— 重点是**这个"可达处"要不要长命** ✓：
+>         逐击读者已经用实例 ✓，**施放后读者**需要的只是"**最近一次攻击的命中集合**" ✓
+>         ⇒ ⭐ 语义上**可以**是"最后一次已结束攻击的命中集合" ✓ —— ⚠ 但要写清**嵌套攻击**时的行为 ✓，不猜 ✓）。
+> * ✅ **交接清单（下一轮起 ✓，按顺序 ✓）**：
+>   ① 查 `CAST_SETUP` 触发点的 `damage` 实参 ✓（一次 grep/read ✓ ⇒ 决定 A 是否成立 ✓）；
+>   ② 若不成立 ⇒ 读 `fireAfterAttack` 与 `TriggerEvent` 的**施放后**事件清单 ✓，再定载体 ✓（㉜：先读后定 ✓）；
+>   ③ 载体就位后 ⇒ **出货 `21029`** ✓（数据已备 ✓：5 档 48%→96% 攻击力 ✓、
+>      `CAST_SETUP` + `from_category BPSKILL` ✓、附加伤害 ✓）+ 判据 + 变异 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百零六：**✅ 交接清单第 1 条查明 —— `CAST_SETUP` **不带**伤害实例（实参就是 `null`）**）**：
+> 
+> * ⭐⭐⭐ **三处源码一致佐证（实测 ✓）**：
+>   ① **`SkillExecutor.java:85`**：`battle.fireTriggers(TriggerEvent.CAST_SETUP, user, null, 0, 0, category);` ✓
+>      ⇒ **`damage` 实参就是 `null`** ✓✓（决定性的那一行 ✓）；
+>   ② **`TriggerTable.java:1042`**：「★ A superset of `DAMAGE_CARRYING_EVENTS`: **`CAST_SETUP` carries the category
+>      without a damage instance**」 ✓；
+>   ③ **`TriggerInterpreter.java:2154`**：「**`CAST_SETUP` fires before anything has landed**」 ✓。
+>   ⇒ ✅ **所以"路 A"不成立** ✗（正如我第 189 轮的预判 ✓）：在 `CAST_SETUP` 规则里用 `random_hit_enemy`
+>     会**立刻抛错**（或读到空集合 ✓）⇒ **`21029` 不能挂在 `CAST_SETUP`** ✗。
+> * ⭐⭐⭐ **更要紧的一点（本轮顺带想清 ✓）**：`CAST_SETUP` **在任何东西落地之前**触发 ✓
+>   ⇒ ⚠ **即便给它一个命中集合载体也救不了** ✗ —— **攻击还没发生** ✓✓
+>   ⇒ ✅ 而 `21029` 的从句是「施放普攻或战技**后**，对随机 1 个**受到攻击的**敌方目标…」 ✓
+>   ⇒ ⭐ **它需要的触发时机本来就是"攻击结束之后"** ✓，不是"施放时" ✗。
+> * ⭐⭐⭐ **由此得出缺失能力的准确名字 ✓**：引擎需要**一个"攻击已结束"的触发事件** ✓
+>   （⚠ 它同时天然带着**完整的**命中集合 ✓ —— 因为"结束"意味着集合不再增长 ✓ ⇒
+>     ⭐ 而这也**一次性解决**了第 182 轮那个"逐击读者只看到到目前为止"的别扭之处 ✓）。
+>   * ⚠ 第 190 轮已查明：`Battle.fireAfterAttack` **是 Java 接口链**（参数里**有** `hitTargets` ✓）
+>     ⇒ ✅ **信息已经在手边** ✓，缺的只是"**把它变成一个 `TriggerEvent` + 让上下文带上命中集合**" ✓；
+>   * ⚠ **但先别急着加** ✓（㉖/㉜：先列后定 ✓）：下一轮先**列出全部 `TriggerEvent` 常量** ✓，
+>     确认**是否已经有**"攻击后/攻击结束"这个事件 ✓（⚠ 第 190 轮的 grep 只搜了三个词 ✗，**不构成"没有"的证据** ✗
+>       —— 这正是纪律 ㉞"探测器说没有≠没有" ✓）。
+> * ✅ **下一轮（唯一一步 ✓）**：`grep` 列全 `TriggerEvent` 常量 ✓（含注释里的事件语义 ✓）⇒
+>   * **若已有**"攻击后"事件 ✓ ⇒ 查它**上下文是否带命中集合** ✓ ⇒ 带就**直接出货 `21029`** ✓；
+>   * **若没有** ✓ ⇒ ⭐ **这就是要补的通用能力** ✓：新增一个"**攻击已结束**"事件 ✓
+>     （⚠ 语义写清：**在一次攻击的结算全部完成、命中集合定型之后触发** ✓；
+>       带**完整命中集合** ✓ + 攻击者 ✓ + 是否命中 ✓ ⇒ ⚠ 并注意 `fireAfterAttack` 已有"命中为空则不发"的约定 ✓，
+>       新事件是**沿用**还是**不同**，要按内容需要决定 ✓，不猜 ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百零七：**✅ 列全 28 个触发事件 —— 找到候选 `ALLY_ATTACK`（"我方攻击"）**）**：
+> 
+> * ⭐⭐⭐ **实测清单（`enums/TriggerEvent.java` ✓，共 28 个 ✓）**：
+>   `DEBUFF_APPLIED` / `BATTLE_START` / **`ALLY_ATTACK`** / `SKILL_CAST` / `BASIC_ATTACK` / `ENERGY_GAINED` /
+>   `HP_LOST` / `HP_CONSUMED` / `HEALED` / `SHIELD_GRANTED` / `KILL` / `BREAK` / `SKILL_POINT_SPENT` /
+>   `SKILL_POINT_GAINED` / `SKILL_POINT_OVERFLOWED` / `TURN_START` / `TURN_END` / `TAKING_HIT` /
+>   `DEALING_DAMAGE` / `ULT_CAST` / `FOLLOW_UP` / **`SUMMON_ATTACK`** / `SUMMONED` / `CAST_SETUP` /
+>   `COUNTDOWN_TURN` / `CRIT_DEALT` / `WAVE_START` / `RESOURCE_CHANGED` ✓
+>   ⇒ ✅ **所以"列全"这一步是有价值的** ✓：证据 ㉞ 再次兑现 ✓ ——
+>     ⚠ 若按第 190 轮"没搜到 AFTER_ATTACK"就下结论 ✗，会**白白新增一个事件** ✓，
+>     而其实**已有** `ALLY_ATTACK` ✓（⚠ 名字里没有 "after" ✗ ⇒ **按名字搜是搜不到的** ✓✓）。
+> * ⭐⭐⭐ **候选 `ALLY_ATTACK` 的依据（两处交叉 ✓）**：
+>   ① **第 190 轮读到的注释**（`TriggerInterpreter.java:1351` ✓）：
+>      「it (`Battle.fireAfterAttack` + `TriggerEvent.SUMMON_ATTACK`, **both reached through** …)」 ✓
+>      ⇒ ⭐ **说明 `ALLY_ATTACK` 与 `SUMMON_ATTACK` 都由 `fireAfterAttack` 触达** ✓；
+>   ② **第 190 轮读到的签名**（`Battle.fireAfterAttack(attacker, mainTarget, targets, totalDamage)` ✓）
+>      ⇒ ⚠ **它收着 `hitTargets`（`targets` ✓）** ✓ ⇒ ✅ **"攻击后"这个时机本来就是命中集合最完整的时候** ✓。
+>   ⇒ ⭐ **因此 `21029` 很可能应当挂在 `ALLY_ATTACK`** ✓（"装备者施放普攻或战技**后**" ✓）。
+> * ⚠ **仍待确认的唯一一点（下一轮唯一一步 ✓）**：
+>   **`Battle.fireAfterAttack` 触发 `ALLY_ATTACK` 时，往上下文里放了什么** ✓ ——
+>   具体看 `Battle.java` 里 `fireAfterAttack` 的函数体 ✓（约 :2349-2380 ✓）：
+>   * 它 `fireTriggers(TriggerEvent.ALLY_ATTACK, <attacker>, <target>, …, <damage?>)` 的**第 6 个实参**是什么 ✓；
+>   * ⚠ 若**没有传 `Damage`** ✗ ⇒ 那么 `ALLY_ATTACK` 的上下文同样读不到 `damage.hitTargets()` ✗
+>     ⇒ ✅ 这时才需要**最小的通用补充**：**把 `Damage`（或直接是命中集合）放进该事件的上下文** ✓
+>       （⭐ 而这是**顺理成章**的 ✓：`fireAfterAttack` **本来就有** `targets` ✓，等于**只差一次传递** ✓）；
+>   * ⚠ 若**传了** ✓ ⇒ ⭐ **直接出货 `21029`** ✓（内容：`ALLY_ATTACK` + 自身为攻击者 + `from_category BPSKILL` ✓ +
+>     效果为附加伤害、目标 `random_hit_enemy` ✓；5 档 48%→96% 攻击力 ✓）。
+> * ⭐⭐ **同时注意一个语义细节（先记下 ✓，实现时验证 ✓）**：`21029` 只说「施放普攻或战技后」 ✓，
+>   ⚠ 而 `ALLY_ATTACK` 是**我方任意角色**攻击都会触发 ✓ ⇒ 规则里**必须限定 `actor == self`** ✓
+>   （⚠ 否则队友攻击也会触发 ✗ —— 这正是 `actor == self` 这个条件的用处 ✓，而且**我们的条件判据已覆盖它** ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百零八：**⚠ 更正 —— `fireAfterAttack` 不触发任何 `TriggerEvent`；缺的能力已完全确定**）**：
+> 
+> * ⚠⚠ **更正第 192 轮的推断 ✓（如实 ✓）**：`Battle.fireAfterAttack`（**:2349-2361** ✓）的**全部**行为是：
+>   ```java
+>   if (attacker == null || hitTargets == null || hitTargets.isEmpty()) return;   // 没有任何命中 ⇒ 不算一次攻击
+>   attackSequence++;                                   // ★ 攻击结束的边界（once_per_attack 读它）
+>   List<CanHit> targets = List.copyOf(hitTargets);      // ← 完整、已冻结的命中集合
+>   for (CanHit ally : allies) ally.afterAttack(this, attacker, mainTarget, targets, totalDamage);
+>   ```
+>   ⇒ ⛔ **它一次 `fireTriggers(...)` 都没有调用** ✗ ⇒ ✅ **`ALLY_ATTACK` 不是从这里发出的** ✗
+>     （⚠ 我第 192 轮把那句注释读成了"两者都由这里触达" ✗ —— 实际应是"两者走**同一条路径**" ✓，
+>       而 `SUMMON_ATTACK` 是在别处发的 ✓）⇒ ⭐ **所以 `ALLY_ATTACK` 也不带命中集合** ✓，不能拿来出货 ✗。
+> * ⭐⭐⭐ **由此，缺的能力**完全确定 ✓（不再是"可能已有" ✓）：
+>   **一个"攻击已结束"的触发事件** ✓ + **让 `TriggerContext` 能携带"本次攻击的完整命中集合"** ✓。
+>   ⇒ ⭐ **而且这处正是最佳落点** ✓：该方法**已经有** ✓ `attacker` ✓、`mainTarget` ✓、
+>     **冻结好的 `targets`** ✓（`List.copyOf` ✓）、`totalDamage` ✓ ——
+>     ⚠ **唯一的结构障碍**：`fireTriggers(...)` 的第 6 参是 **`Damage`** ✗，
+>     而一次攻击有**多个** `Damage` 实例 ✓、没有"那一个" ✓
+>     ⇒ ✅ **所以载体不能是 `Damage`，必须是命中集合本身** ✓ ⇒ `TriggerContext` 需要**新增一个分量** ✓
+>       （如 `List<CanHit> attackHitTargets` ✓，不可变 ✓，**空 = 未知** ✓）。
+> * ✅ **实现清单（下一步机械可做 ✓，四处小改 ✓）**：
+>   ① **枚举**：`enums/TriggerEvent.java` 新增 `ATTACK_FINISHED("ATTACK_FINISHED", true)` ✓
+>      （⚠ 名字按引擎惯例 ✓，语义注释写清"**结算全部完成、命中集合已冻结之后**" ✓ —— 与
+>        `fireAfterAttack` 的"**没有任何命中则不算一次攻击**"约定**保持一致** ✓：沿用同一个早退 ✓）；
+>   ② **上下文**：`TriggerTable.TriggerContext` 新增分量 `List<CanHit> attackHitTargets` ✓
+>      （⚠ record 分量 ⇒ 要更新**所有**构造点 ✗ ⇒ ⭐ 加一个**紧凑构造器/便捷构造**保持既有调用不变 ✓，
+>        与它已有的第二个构造器同型 ✓）；
+>   ③ **设置**：`TriggerContext` 里让 `random_hit_enemy` 改成**先读 `attackHitTargets`** ✓、
+>      为空再退回 `ctx.damage().hitTargets()` ✓（⚠ 这样**逐击读者**（`DEALING_DAMAGE` ✓）与
+>        **攻击后读者**（新事件 ✓）**都能用同一个选择器** ✓ —— ⭐ 一个选择器、两种完备度，文档按读者写 ✓（㉟ ✓））；
+>   ④ **触发**：`fireAfterAttack` 里在 `attackSequence++` 之后 ✓ 调 `fireTriggers(ATTACK_FINISHED, attacker, mainTarget, …, targets, …)` ✓。
+>   ⚠ 然后才：**出货 `21029`** ✓ + 判据（**多目标攻击下该事件读到的候选数 = 全部命中数** ✓）+ 变异 ✓。
+> * ⭐⭐ **为什么这不是"为一张光锥造机制" ✓**：`21029` / `23007` / `21029` 同族的「**施放…后，对受到攻击的目标…**」 ✓
+>   是**一类**从句 ✓，而且引擎**自己**在 `fireAfterAttack` 里已经承认"**an attack happened**"是它的职责 ✓
+>   （注释原文 ✓）⇒ ✅ **把"攻击已结束"变成可触发事件，是把这个既有边界暴露给内容** ✓，不是新机制 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百零九：**`fireTriggers` 有 **9 个重载** —— 新事件走哪条链已明确，下一步读私有链**）**：
+> 
+> * ⭐⭐⭐ **实测（`Battle.java` ✓）**：`fireTriggers` 共 **9 个重载** ✓：
+>   `:2138`（只给 event ✓，`BATTLE_START` 用 ✓）、`:2162`（event+actor+target+hitCount+amount ✓）、
+>   `:2178`（多一个参数 ✓）、`:2196` / `:2209`（**private** ✓）、`:2220` / `:2232`（public ✓）、
+>   `:2237` / `:2242`（**private** ✓ —— ⭐ **最底层的两条** ✓，`TriggerContext` 应当就在这一层构造 ✓）。
+>   ⇒ ⭐ `DEALING_DAMAGE` 用的是 **`:2220` 一族的 8 参版本** ✓（`:2672` 传了 `damage` + `castCategory` ✓）。
+> * ⭐⭐⭐ **由此，`ATTACK_FINISHED` 的接线方式已清楚 ✓**：它**不能**照抄 `DEALING_DAMAGE` ✓
+>   （那次调用手里有**一个** `Damage` ✓，而攻击结束时**没有"那一个"** ✗）
+>   ⇒ ✅ 需要**一条新路径**：把 **命中集合（`List<CanHit>` ✓）** 送到 `TriggerContext` 的**新分量**上 ✓。
+>   ⚠ 两种写法，下一轮看代码后择一 ✓：
+>   * **A**：新增一个重载 `fireTriggers(event, actor, target, hitCount, amount, List<CanHit> attackHitTargets)` ✓
+>     （⚠ 与 `…, Damage, …` 不冲突 ✓ —— 类型不同 ✓）；
+>   * **B**：在**最底层私有链**里加一个参数 ✓（⚠ 会改到**所有**上层重载的转发 ✗ ⇒ 改动面更大 ✓）。
+>   ⭐ 倾向 **A** ✓（改动面最小 ✓，且与既有 `:2162`/`:2178` 的"逐层加参数"风格一致 ✓）。
+> * ⚠ **下一步（唯一一步 ✓，仍按 ㉜ 先读后定 ✓）**：读 **`:2196-2260`** ✓ 那两条私有链 ✓
+>   —— 目的是看清 ✓：
+>   ① `TriggerContext` **到底在哪一行、用哪些参数**构造 ✓（⚠ 这就是 `attackHitTargets` 要传进去的地方 ✓）；
+>   ② 它的**第 6 参**是 `Damage` 还是"可空" ✓（⚠ 若可空 ✓，也许**能复用** `damage` 位置 ✗ —— 但**不要**这么做 ✗：
+>      语义上"命中集合 ≠ 一个伤害实例" ✓，混用会让下一位读者误解 ✓）；
+>   ③ 既有便捷构造器有几处 ✓（第 186 轮见过一个 8 参版 ✓ ⇒ 新增分量要补哪个构造器 ✓，不猜 ✓）。
+> * ⭐ **本轮价值 ✓**：把"新事件怎么接"从"一个未知"缩成"读 60 行然后二选一" ✓ ——
+>   ⚠ 这正是前几轮反复验证的做法 ✓（先读实现 ✓、再定规格 ✓、再机械实现 ✓），也是第 176/193 两轮更正的教训所在 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百一十：**✅ 找到同型先例 `weakHitCount` —— 接线方式就此定死**）**：
+> 
+> * ⭐⭐⭐ **实测（`Battle.java:2225-2243` ✓）**：`fireTriggers` 的**终端重载**（**:2242** ✓，9 参 ✓）里已经有
+>   **`weakHitCount`** ✓，而它的 javadoc 把**我正面临的问题**说得一模一样 ✓：
+>   > ✅ The same, plus **how many of the hit targets carry the attack's own element weakness**
+>   > (2026-09-30; reader: cone 21040's 「若有不少于 2 个被攻击的敌方目标具有对应属性弱点」) ✓
+>   >
+>   > ★ **A count over a predicate cannot be assembled from the parts**: a multi-target attack fires the damage
+>   > event **once per target**, so "how many of them were weak" **only exists where the whole set is in hand**
+>   > —— **the caster's side** ✓
+>   ⇒ ✅ **"整次攻击的聚合量"必须由持有整集合的那一侧带上事件** ✓ —— **与命中集合完全同型** ✓✓。
+> * ⭐⭐⭐ **因此接线方式定死（= 我第 194 轮倾向的 A ✓，且有先例背书 ✓）**：
+>   ① 在**终端重载**（:2242 ✓）再加一个参数 **`List<CanHit> attackHitTargets`** ✓；
+>   ② 照 **`:2232` 的形状**（public ✓，"逐层加参数" ✓）加一个**新的 public 重载** ✓ ——
+>     ⚠ 与既有 `…, SkillCategory fromCast, int skillId, int weakHitCount` 的区别只在**多一个 `List`** ✓
+>     ⇒ ⚠ **注意重载歧义** ✗：终端层的参数顺序要让 `weakHitCount`（int ✓）与 `List` **不混淆** ✓
+>       —— 由于类型不同 ✓，`fireTriggers(e, a, t, h, amt, Damage, SkillCategory, int, int, List)` 与既有 9 参版**不会冲突** ✓；
+>   ③ `TriggerContext` 加分量 `attackHitTargets` ✓ + **便捷构造器**（第 186 轮见过的 8 参版 ✓）保持既有调用不变 ✓；
+>   ④ **`fireAfterAttack`** 里在 `attackSequence++` 之后 ✓ 调新重载 ✓（⚠ **沿用它的早退约定** ✓：无命中 ⇒ 不通知 ✓）；
+>   ⑤ **`random_hit_enemy`** 改成**先读 `attackHitTargets`** ✓、空再退回 `ctx.damage().hitTargets()` ✓
+>     ⇒ **一个选择器、两种完备度** ✓（逐击读者 / 攻击后读者 ✓，文档按读者写 ✓ ㉟）。
+> * ⭐⭐ **另一条重要收获 ✓**：**`21040` 是已出货的光锥** ✓，它的从句「若有不少于 2 个被攻击的敌方目标具有对应属性弱点」
+>   正是**用这个机制**做的 ✓ ⇒ ⭐ **我有一份"已经跑通的样板"** ✓（同一条链 ✓、同一个"整集合在施放方"的论点 ✓）
+>   ⇒ ✅ 于是 `ATTACK_FINISHED` **不引入新范式** ✓，只是把同一机制**换个聚合量**（命中集合本身 ✓）✓。
+> * ⚠ **本轮为只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百一十一：**⚠ 正则改多了（7 处替换、两处语法错误）—— 脚本已自动还原；改用逐行改**）**：
+> 
+> * ⚠ **本轮未落地** ✗（`compileJava` 红 ⇒ 脚本**自动 `git checkout`** ✓ ⇒ 树干净、全量绿 ✓），
+>   但**失败方式本身很有信息量** ✓：**事件已声明** ✓、**7 处替换**（⚠ 真实构造点是 **6** 处 ✗）、
+>   报错在 **`TriggerTable.java:1880` 与 `:1894` —— "非法的表达式开始"** ✓。
+> * ⭐⭐⭐ **根因（我的写法错 ✓）**：我用 `new TriggerContext\(([^;]*?)\)(?=[;,])` 做**非贪婪跨行**匹配 ✗ ——
+>   ① `[^;]*?` 会**跨过嵌套调用** ✓（⚠ 例如某个构造点内部还嵌着别的调用 ✓）
+>     ⇒ 替换范围**越界** ✓、把 `, List.of()` 插到了**不该插**的位置 ✓；
+>   ② 我的 `fix()` 里还有一行**没有任何作用的死代码**（算了 `argc` 却不用它 ✓）✗
+>     ⇒ ⚠ **没有"参数个数校验"就敢插参数** ✓ —— 这正是本轮翻车的地方 ✓。
+> * ⭐⭐ **纪律（第三十六条 ✓）**：**"给调用补一个参数"必须先数清参数、并用括号配平定位实参末尾** ✓ ——
+>   ⚠ 用**非贪婪正则跨行**定位调用括号 ✗ 是不可靠的（嵌套会骗过它 ✓）；
+>   ✅ 稳妥做法二选一 ✓：
+>   * **逐行改** ✓：6 个构造点的**行号已知**（`:1813 / :1825 / :1857 / :1868 / :1878 / :1893` ✓ —— 第 196 轮实测 ✓）
+>     ⇒ 按行尾插入 `, List.of()`（⚠ 并**先断言该行以 `new TriggerContext(` 或续行结尾** ✓）；
+>   * **或** 括号配平扫描器 ✓：从左括号起**逐字符**数括号层级 ✓，到层级归零处插入 ✓
+>     （⚠ 并且**先断言顶层逗号数 = 11**（12 个参数）✓，否则**不插** ✓）。
+> * ✅ **下一轮（机械 ✓，用**逐行改** ✓）**：
+>   ① `TriggerTable.java` 记录分量加 `List<CanHit> attackHitTargets` ✓；
+>   ② **按 6 个已知行号**逐个补 `, List.of()` ✓（⚠ 每处替换前先断言 ✓；⚠ 行号会因①的文件改动而**位移** ✗
+>      ⇒ ⭐ **先改构造点、后改 record 行** ✓，或**按内容匹配（不是行号）** ✓ —— 我选后者 ✓：匹配
+>      `List<Condition> targetFilter, int skillId, int weakHitCount)` 与各构造点**各自的尾部特征** ✓）；
+>   ③ `compileJava` 把关 ✓（同本轮 ✓ —— ⭐ **这个"红就自动还原"的护栏本轮正好发挥了作用** ✓）。
+> * ⭐⭐ **值得记下的正面一点 ✓**：护栏（`compileJava` 红 ⇒ 自动 `git checkout` ✓）让**一次失败的尝试零成本** ✓ ——
+>   树干净 ✓、全量绿 ✓、已推送 ✓，只花了**一轮时间** ✗ 而**没有留下半成品** ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百一十二：**扫描器改对了 6 处 ✓，仍差 **record 内部的 `this(...)` 委托** ✗**）**：
+> 
+> * ⭐⭐⭐ **本轮读数（实测 ✓）**：
+>   * **事件已声明** ✓；
+>   * **括号配平扫描器**：`construction sites patched: 6 (skipped 1) ; calls mentioning it: 7` ✓
+>     ⇒ ✅ **6 个规范构造点全部改对** ✓，并且**正确地跳过**了 1 处"顶层逗号数 = 0"的调用 ✓
+>       （⭐ 那正是第 196 轮看到的 **注释里**的 `new TriggerContext(...)` ✓ —— ⚠ 扫描器**没有**上当 ✓，
+>        这比上一轮的越界正则**好得多** ✓）；
+>   * **`compileJava` 仍红** ✗ ⇒ 报错是 **`:1803` 与 `:1835`**：
+>     「对于 `TriggerContext(CanHit,CanHit,CanHit,int,double,Damage,Battle,SkillCategory,…)` 找不到匹配的构造器」 ✓。
+> * ⭐⭐⭐ **根因（精确 ✓）**：record **自己内部**还有 **`this(...)` 委托构造** ✗ ——
+>   ⚠ 我第 186 轮**亲眼见过**其中一个（`:1800-1803` 的 8 参便捷构造 ✓：
+>     `this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0, 0);` ✓）
+>   ⇒ ⛔ 而我的扫描器**只找 `new TriggerContext(`** ✗ ⇒ **`this(` 完全没被覆盖** ✓ ⇒ 少补参数 ⇒ 编译红 ✓。
+>   ⇒ ✅ **这也解释了为什么是"两处"** ✓：`:1803` 与 `:1835` —— **两个便捷构造器各委托一次** ✓。
+> * ✅ **下一轮（机械 ✓，一行扩展 ✓）**：把扫描器同时扫 **`this(`** ✓（⚠ 但只扫 **record 的构造器体内** ✓ ——
+>   ⚠ 全文件里 `this(` 可能还有别处 ✗ ⇒ 用**行首缩进 + 后跟 12 个实参**的双重判据 ✓，或
+>     干脆**只在 `TriggerTable` 的 record 体范围内**替换 ✓）；判据仍是"**顶层逗号数 = 11**" ✓；
+>   然后 `compileJava` ✓（护栏照旧 ✓）⇒ 再继续 (c)(d)(e) 三步 ✓。
+> * ⭐⭐ **本轮把两件事同时验证了 ✓**：
+>   ① **㊱ 的正解有效** ✓（配平扫描器 + 参数个数断言 ✓ ⇒ 6/6 正确 ✓、不误伤注释 ✓）；
+>   ② **护栏有效** ✓（红 ⇒ 自动还原 ⇒ 零残留 ✓）—— ⚠ 所以本轮虽然没落地 ✗，
+>     却把"错在哪一行、为什么"**精确缩小到两个 `this(...)`** ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：

@@ -331,7 +331,15 @@ public enum TriggerEvent {
      * there, while {@code ResourceManager} owns none and so cannot raise a trigger itself. \u26a0 The consequence is stated
      * rather than hidden -- a resource moved by anything other than those two ops does not announce itself yet.
      */
-    RESOURCE_CHANGED("RESOURCE_CHANGED", true);
+    RESOURCE_CHANGED("RESOURCE_CHANGED", true),
+
+    /**
+     * ✅ An attack has FINISHED: settlement complete, hit set frozen (2026-09-30).
+     *
+     * <p>⭐ {@code Battle.fireAfterAttack} already decides 「an attack happened」 and holds the whole set; this
+     * exposes that boundary to content. A per-hit event cannot assemble it (⚠ as {@code weakHitCount} notes).
+     */
+    ATTACK_FINISHED("ATTACK_FINISHED", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 
