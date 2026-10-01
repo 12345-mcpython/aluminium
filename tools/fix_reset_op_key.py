@@ -61,7 +61,8 @@ old_case = ('            case "RESET_TRIGGER_LIMIT" -> {' + NL
 new_case = ('            case "RESET_TRIGGER_LIMIT" -> {' + NL
             + '                String wanted = effect.getRule().trim();' + NL
             + '                for (CanHit cleared : resolveTargets(battle, effect, ctx)) {' + NL
-            + '                    TriggerTable table = cleared.getTriggerTable();' + NL
+            + '                    TriggerTable table = cleared instanceof com.laosun.aluminium.models.Character ch' + NL
+            + '                            ? ch.getTriggerTable() : null;' + NL
             + '                    String limitKey = table == null ? null : table.keyOf(wanted);' + NL
             + '                    if (limitKey == null) {' + NL
             + '                        throw new IllegalStateException(' + NL
