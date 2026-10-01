@@ -72,7 +72,8 @@ public class SiblingHarmonyTest {
     public void hisFileCarriesTheClauses() {
         var table = com.laosun.aluminium.data.TriggerTables.of(TB);
         Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST));
-        Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE));
+        // 2026-09-30: 2 -- 8005 gained the skill clause 「额外造成 4 次伤害，每次对随机敌方单体」 (times).
+        Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE));
         Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BREAK));
         Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START),
                 "the technique and the convention");

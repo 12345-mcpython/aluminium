@@ -162,5 +162,26 @@
     ],
     "source": "8006 开拓者 终结技: 「持有【伴舞】的我方目标击破特攻提高30%，并且攻击处于弱点击破状态下的敌方目标后，会将本次攻击的削韧值转化为1次超击破伤害。」 param Lv10 = [3, 1, 0.3] → #2 = 1（转化倍率）",
     "note": "「**持有【伴舞】的**我方目标…攻击**处于弱点击破状态下的**敌方目标后，会将本次攻击的**削韧值**转化为 1 次超击破伤害」 — the clause this file registered until now, and the first shipped content for the pair that landed in round 75 (the `弱点击破` condition + `SUPER_BREAK`). ⚠ 「持有【伴舞】的我方目标」 is `actor has_state 伴舞`: the **attacker** must carry it, so an unbuffed ally's attack converts nothing. ⚠ The multiplier is #2 of her own ultimate row (1 = 100%); the row states it even though the prose leaves it implicit, which is why the data is worth reading. ⚠ The magnitude is the instance's **削韧值** (`Damage.stance`, recorded by `SkillExecutor` before settlement), not its damage — the two differ by an order of magnitude."
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "skill_extra_hits_random",
+    "when": [
+      "actor == self",
+      "from_skill SKILL",
+      "damage_is_attack"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "scale": "self_attr:ATTACK",
+        "percent": 0.5,
+        "element": "Imaginary",
+        "target": "random_enemy",
+        "times": 4
+      }
+    ],
+    "source": "8006 开拓者·虚数 战技: 「并额外造成 4 次伤害，每次对随机敌方单体造成 50% 攻击力虚数伤害。」",
+    "note": "⭐ **`times` 的第二个读者，也是 `8005` 的兄弟镜像** ✓ —— ⚠ 「额外造成4次伤害」在 **8005 与 8006 两份文档里都有** ✓（2026-09-30 实测 ✓）⇒ ⚠ 按 `SiblingHarmonyTest` 的宗旨（*mirrored where the two documents agree* ✓）本条与 8005 同名同形 ✓。⚠ 护栏与 8005 一致 ✓：`from_skill SKILL` ✓ ＋ **`damage_is_attack`** ✗（⚠ 不可省 —— 追加实例本身也是一次 `DEALING_DAMAGE` ✓，⚠ 无护栏会撞上递归上限 ✓，第 630 轮实测过 ✓）＋ `target: random_enemy` ＋ **`times: 4`** ✓。⚠ 本条的落地同时改了一处**被钉死的计数** ✓：`SuperBreakContentTest` 里 `8006` 的 `DEALING_DAMAGE` 条数 `1 → 2` ✓（⚠ 该处消息原文写的是*the file ONLY DEALING_DAMAGE rule* ✗，⚠ 一并改写以免消息本身变成假账 ✓）。"
   }
 ]

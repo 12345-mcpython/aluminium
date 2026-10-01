@@ -319,6 +319,20 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "DAMAGE" -> {
+                // ⚠ `times` says "settle N independent times"; `per_target` says "multiply this one settlement
+                // by the event's hit count". Together they have two readings, so the pair is refused -- the
+                // same house rule that refuses `scale` next to `per_target`.
+                if (effect.getTimes() != null && effect.getTimes() < 1) {
+                    throw new IllegalArgumentException(
+                            "Op DAMAGE states \"times\" = " + effect.getTimes() + ", which settles nothing: "
+                                    + "it must be at least 1 (source: " + spec.getSource() + ")");
+                }
+                if (effect.getTimes() != null && Boolean.TRUE.equals(effect.getPerTarget())) {
+                    throw new IllegalArgumentException(
+                            "Op DAMAGE cannot combine \"times\" with \"per_target\": one repeats the whole "
+                                    + "settlement and the other multiplies a single one, so the pair has two "
+                                    + "readings (source: " + spec.getSource() + ")");
+                }
                 // ? Two ways to state the multiplier (2026-09-29): a SKILL ROW (`skill` + `damage_param`) or a LITERAL ratio
                 // (`scale` + `percent`, plus `element` because no skill lends one). 「造成等同于素裳80%攻击力的伤害」 in a technique, a
                 // talent's follow-up or an eidolon has no row to name — 53 and 15 documents state such a ratio.
@@ -949,8 +963,13 @@ public final class TriggerInterpreter {
             case "DAMAGE" -> {
                 // A list, like HEAL/SHIELD: 「对敌方全体」 is one effect that reaches several units, and the
                 // engine settles one instance per victim (that is what a group attack is here).
-                for (CanHit victim : resolveTargets(battle, effect, ctx)) {
-                    damage(battle, effect, ctx, victim);
+                // ⚠ `times` repeats the WHOLE settlement, and because resolveTargets is called INSIDE the outer
+                // loop, every repetition re-draws its target -- which is what 「每次对随机敌方单体」 means.
+                int times = effect.getTimes() == null ? 1 : effect.getTimes();
+                for (int repeat = 0; repeat < times; repeat++) {
+                    for (CanHit victim : resolveTargets(battle, effect, ctx)) {
+                        damage(battle, effect, ctx, victim);
+                    }
                 }
             }
             case "MODIFY_ATTR" -> modifyAttr(battle, effect, ctx);

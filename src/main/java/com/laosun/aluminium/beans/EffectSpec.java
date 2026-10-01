@@ -70,6 +70,7 @@ public class EffectSpec {
         copy.asAttack = this.asAttack;
         copy.rule = this.rule;
         copy.perTarget = this.perTarget;
+        copy.times = this.times;
         copy.control = this.control;
         copy.baseChance = this.baseChance;
         copy.speed = this.speed;
@@ -546,6 +547,19 @@ return copy;
      */
     @SerializedName("per_target")
     private Boolean perTarget;
+
+    /**
+     * How many times this effect settles, <b>each time re-resolving its targets</b> -- 「额外造成 N 次伤害，
+     * 每次对随机敌方单体」, which nine shipped clauses are registered on (1009, 1214, 1302, 1312, 1513, 1505,
+     * 1510, 8005, 1221). Only {@code DAMAGE} reads it.
+     *
+     * <p><b>Why it is not {@link #perTarget}.</b> That one multiplies <i>one</i> settlement by the event's
+     * hit count ("hit three enemies, so ×3"); this one makes N <i>independent</i> settlements, each drawing
+     * its own target. Stating both would have two readings, so the pair is refused at load time -- the same
+     * house rule that refuses {@code scale} next to {@code per_target}.
+     */
+    @SerializedName("times")
+    private Integer times;
 
     /**
      * The <b>control state</b> this effect applies — the name the documents and the {@code has_state} condition

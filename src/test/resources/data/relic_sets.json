@@ -3491,5 +3491,59 @@
         "ability": ""
       }
     ]
+  },
+  "99004": {
+    "set_id": 99004,
+    "name": {
+      "chinese": "测试效果级重复宿主",
+      "english": "Synthetic times-fixture host"
+    },
+    "release_version": "test",
+    "is_planar": false,
+    "parts": [
+      {
+        "type": "HEAD",
+        "type_cn": "头部",
+        "rarity": 5,
+        "max_level": 15
+      },
+      {
+        "type": "HAND",
+        "type_cn": "手部",
+        "rarity": 5,
+        "max_level": 15
+      },
+      {
+        "type": "BODY",
+        "type_cn": "躯干",
+        "rarity": 5,
+        "max_level": 15
+      },
+      {
+        "type": "FOOT",
+        "type_cn": "脚部",
+        "rarity": 5,
+        "max_level": 15
+      }
+    ],
+    "effects": [
+      {
+        "require": 2,
+        "desc": {
+          "chinese": "测试合成套装：只为让测试有一个永不出货的宿主。",
+          "english": "Synthetic test-only set: a permanent home that is never shipped."
+        },
+        "param": [
+          0.01
+        ],
+        "properties": [
+          {
+            "type": "AttackAddedRatio",
+            "value": 0.01
+          }
+        ],
+        "ability": ""
+      }
+    ]
   }
 }
