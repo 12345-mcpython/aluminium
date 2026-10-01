@@ -12573,6 +12573,26 @@
 >   （只退出 ✓）⇒ ✅ **下一步直接修字面量就能重跑** ✓，不用重写判据 ✓
 >   （❗ 第 259 轮的教训已纳入脚本 ✓）。
 > * **进度（实测 ✓）**：角色 **93 / 93** ✓；光锥 **145 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> **2026-09-30 更新（aggro 回收之六百九十：**✅ `per_stack` 的新来源 = 一个 `case`（读者：24004 ②）**）**：
+>
+> * ⭐⭐⭐ **实测（`perStackFactor` 全文 ✓）**：它是一个 **`switch (effect.getPerStack())`** ✓：
+>   ```java
+>   case "target_debuff_count" -> target.getBuffManager().debuffCount();
+>   case "target_dot_count"    -> target.getBuffManager().countBuffs(DotBuff.class);
+>   case "target_weakness_count" -> … ;
+>   case "shielded_count"      -> … ctx.battle().allies … ;
+>   default                    -> target.getBuffManager().stacksOf(name.trim());
+>   ```
+>   ⇒ ✅ **新来源只需一个 `case`** ✓：**`case "hit_count" -> ctx == null ? 1 : ctx.hitCount();`** ✓
+>     —— ❗ `ctx.hitCount()` 就是**事件的命中数** ✓（`ATTACK_FINISHED` 上就是 `targets.size()` ✓）。
+> * ⚠ **一处需先看清（不猜 ✗）**：`per_stack`（乘数 ✓）与 `max_stacks`（层数上限 ✓）
+>   **如何共存** ✓ —— ❗ `24004` ② 是“每击中一名 × 最多 5 次” ✓
+>     ⇒ 若二者**会相乘** ✗ 则语义不对 ✗；若 `max_stacks` 只限**叠加次数** ✓ 则正好 ✓。
+> * ✅ **下一步（唯一一步 ✓）**：读 **`max_stacks` 的生效处** ✓（❗ 它在 `MODIFY_ATTR` 里怎么用 ✓）
+>   ⇒ 然后**加那一个 `case`** ✓ + **给 `24004` 补上 ②** ✓ + 判据 + 变异 ✓（❗ 它的读者现成 ✓）。
+>   ⚠ 若两者相乘 ✗ 则改用**另一种写法** ✓（例如以 `hit_count` 为上限来源的一个新字段 ✓）
+>     —— ❗ 依然**不近似** ✗。
+> * **实测 ✓**：全量 **0** ✓、树干净 ✓、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
