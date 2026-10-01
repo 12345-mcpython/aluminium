@@ -75,10 +75,13 @@ public class RelicSetTest {
     public void relicSetsAreLoadedFromTheGeneratedTable() {
         Assertions.assertFalse(Constant.RELIC_SETS.isEmpty(),
                 "relic_sets.json was not loaded — the engine cannot apply any set bonus without it");
-        Assertions.assertEquals(60, Constant.RELIC_SETS.size(),
+        // Synthetic test-side sets (release_version == "test") never ship, so no census counts them.
+        List<RelicSet> shipped = Constant.RELIC_SETS.values().stream()
+                .filter(s -> !"test".equals(s.releaseVersion())).toList();
+        Assertions.assertEquals(60, shipped.size(),
                 "the shipped relic_sets.json holds 60 sets (32 cavern + 28 planar); a different number means "
                         + "the file changed and this registry line needs re-checking");
-        int effects = Constant.RELIC_SETS.values().stream().mapToInt(set -> set.effects().size()).sum();
+        int effects = shipped.stream().mapToInt(set -> set.effects().size()).sum();
         Assertions.assertEquals(92, effects, "the shipped file holds 92 set bonuses (2- and 4-piece)");
         Assertions.assertTrue(RelicSets.loadCount() >= 1, "the file must have been read at least once");
         Assertions.assertSame(Constant.RELIC_SETS, RelicSets.table(), "the table is read once and cached");
@@ -409,7 +412,9 @@ public class RelicSetTest {
     public void everyEffectIsEitherStatsOrANamedAbility() {
         int withStats = 0;
         int abilityOnly = 0;
-        for (RelicSet set : Constant.RELIC_SETS.values()) {
+        List<RelicSet> shipped = Constant.RELIC_SETS.values().stream()
+                .filter(s -> !"test".equals(s.releaseVersion())).toList();
+        for (RelicSet set : shipped) {
             for (RelicSet.Effect effect : set.effects()) {
                 if (!effect.properties().isEmpty()) {
                     withStats++;
@@ -425,7 +430,7 @@ public class RelicSetTest {
         Assertions.assertEquals(35, abilityOnly,
                 "the shipped file's ability-only bonuses: selected by RelicSuit.activeEffects(), not executed "
                         + "— the engine has no ability interpreter");
-        Assertions.assertEquals(Constant.RELIC_SETS.values().stream().mapToInt(s -> s.effects().size()).sum(),
+        Assertions.assertEquals(shipped.stream().mapToInt(s -> s.effects().size()).sum(),
                 withStats + abilityOnly, "every effect is accounted for");
     }
 
