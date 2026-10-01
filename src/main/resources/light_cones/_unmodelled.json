@@ -1,0 +1,42 @@
+{
+  "20023": [
+    {
+      "require": 1,
+      "ability": "Ability20023",
+      "name": "纵欢",
+      "reason": "「阿哈时刻发动时，使装备者的欢愉度提高 #1=16%…32%，持续到阿哈时刻结束。」（E:\\turnbasedgamedata: EquipmentConfig 20023 -> SkillID 20023 -> EquipmentSkillConfig -> TextMap/TextMapCHS.json, 2026-09-30）The effect maps to ELATION_DAMAGE_BOOST, which the engine HAS; the only missing piece is an EHA (阿哈时刻) event, and a duration scoped to \"until EHA ends\". Reader count: 1 (this cone only) -- below the bar, so registered rather than built."
+    }
+  ],
+  "21021": [
+    {
+      "require": 1,
+      "ability": "Ability21021",
+      "name": "酣适",
+      "reason": "「当装备者的回合开始时，随机为 1 个当前能量百分比小于 #1=50% 的我方其他目标恢复 #2=8 点能量。」Needs the shared RANDOM-TARGET selector (reader count 2, with 21029) plus energy restoration and an energy-percentage filter. The selector is worth building; this cone waits for it."
+    }
+  ],
+  "21029": [
+    {
+      "require": 1,
+      "ability": "Ability21029",
+      "name": "交手如交谈",
+      "reason": "「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身攻击力 #1=48% 的附加伤害。」Needs the shared RANDOM-TARGET selector (reader count 2, with 21021) drawn from ATTACK_FINISHED's frozen hit set, plus appended damage. ATTACK_FINISHED already carries that hit set."
+    }
+  ],
+  "21032": [
+    {
+      "require": 1,
+      "ability": "Ability21032",
+      "name": "秘密",
+      "reason": "「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力 +10%；暴击伤害 +12%；能量恢复效率 +6%。」Needs random EFFECT selection plus a history-dependent exclusion (\"not the same as last time\"). Reader count: 1."
+    }
+  ],
+  "21038": [
+    {
+      "require": 1,
+      "ability": "Ability21038",
+      "name": "爆燃",
+      "reason": "「当装备者在单次受到攻击中累计损失的生命值超过最大生命值的 25%，或单次消耗自身生命值超过最大生命值的 25%，则立即回复等同于装备者生命上限 15% 的生命值，同时使装备者造成的伤害提高 25%，持续 2 回合。该效果每 3 回合只能触发 1 次。」Needs cumulative HP loss within one hit, HP spending, and a 3-turn cooldown. Reader count: 1."
+    }
+  ]
+}
