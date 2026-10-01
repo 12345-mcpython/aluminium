@@ -74,6 +74,27 @@
       ],
       "source": "绯英 天赋：「当绯英持有【好活当赏】时：施放战技可对受到攻击的敌方目标造成#7[f1]%的物理属性欢愉伤容。」",
       "note": "⭐ 三件事在这一条里合作 ✓：条件 `self_resource:好活当赏 >= 1` ✓（\"持有\"✓）、`from_category BPSKILL` ✓（施放战技 ✓）、以及**带类型的附加伤容** ✓（`damageType: ELATION` ✓ —— 本轮新能力 ✓）。⚠ 同族的另两条已登记 ✗：终结技那条需要**随机目标** ✗、【狐狸老师】那条需要**召唤物的追加攻击** ✗。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "p1505_ult_elation_rider",
+      "when": [
+        "actor == self",
+        "from_category ULTRA",
+        "self_resource:好活当赏 >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.12,
+          "element": "physical",
+          "damage_type": "ELATION",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "绯英 天赋：「当绯英持有【好活当赏】时：施放终结技可对敌方全体造成#6[i]%的物理属性欢愉伤容。」",
+      "note": "⭐ 三件事合作 ✓：**`CAST_SETUP`** ✓（每次施放一次 ✓ —— ⚠ 不能用 `DEALING_DAMAGE` ✗：大招打全体会产生 N 个伤容实例 ✗，规则会跟着触发 N 次 ✗）、`from_category ULTRA` ✓、**带类型的附加伤容 + `all_enemies`** ✓。⚠ 同句的另两半已登记 ✗：「对随机造成伤容的敌方目标造成 14%」（**随机目标** ✗）与「至少计入等同于**能量上限**的【好活当赏】」（需要\"用量至少为 X\" ✗）。"
     }
   ]
 }
