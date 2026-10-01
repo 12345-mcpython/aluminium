@@ -37,11 +37,13 @@ public class UnitDisciplineTest {
     /** {@code TriggerTable}'s numeric-variable switch (set at "hit_count" ... "from_skill_id"). */
     private static final Set<String> KNOWN = Set.of(
             "hit_count", "hp_percent", "target_hp_percent", "target_debuff_count",
-            "self_summon_count", "target_summon_count", "self_max_energy", "from_skill_id",
+            "self_summon_count", "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id",
             "target_hp_percent_before", "enemy_count", "ally_count");   // added with the crossing variable (round 181)
 
     /** Of those, the ones that resolve to 0..1 rather than a count. */
-    private static final Set<String> FRACTION = Set.of("hp_percent", "target_hp_percent", "target_hp_percent_before");
+    // self_energy_percent is a RATIO (current/max), so it joins the fraction family: any literal above 1 is refused.
+    private static final Set<String> FRACTION = Set.of("hp_percent", "target_hp_percent", "target_hp_percent_before",
+            "self_energy_percent");
 
     private static final Pattern COMPARISON =
             Pattern.compile("^\\s*([a-z_]+)\\s*(>=|<=|>|<|==)\\s*(-?[0-9.]+)\\s*$");
