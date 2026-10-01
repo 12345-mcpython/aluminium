@@ -7618,6 +7618,31 @@
 >   与遗器那边的 `AUTHORED` 常量守卫是同一回事 ✓。
 > * **进度（回退后，实测 ✓）**：角色 **90 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百五十六：**欢愉切片 1a 出货** —— 档位可见 + 类型由数据决定**）**：
+> 
+> * ✅ **能力（读者：1502/1505/1506 ✓，外加已出货的 1501/8009/8010/1513 ✓）** ✓ 三处一起落：
+>   ① `Constant.SKILL_SLOT` 增 `SkillType.ELATION_SKILL, 20` / `ELATION_EXTRA, 21` ✓（数据里 **9 个**
+>      `attack_type: ElationDamage` 的技能就在这两档 ✓）；
+>   ② `SkillType.isIntrinsic()` **纳入这两个档位** ✓ —— ⭐⭐ 这才是长期的真闸门 ✓（`Character` 的 kit 构建器有
+>      `if (!type.isIntrinsic()) continue;` ✗，而 `Battle.startBattle()` 只补 `MAZE`/`TECHNIQUE` ✗）；
+>   ③ `SkillExecutor` **按已解析的 `SkillCategory` 选类型** ✓（助手 `damageTypeOf` ✓，原先一律 `NORMAL` ✗）。
+> * ⭐⭐ **读者判据（实测 ✓）** ✓：读**已出货的 1501** 自己的 kit ✓ ⇒
+>   `[slots] ELATION_SKILL is ElationDamage (category ELATION_DAMAGE) -> ELATION` ✓
+>   `[slots] Sparxie: 1 Elation skill(s), 5 ordinary` ✓（**欢愉技真的进了 kit** ✓，其余仍 `NORMAL` ✓，两个方向都断言 ✓）。
+> * ✅ **守卫测试先改后动表** ✓（第 231 条纪律的落实 ✓）：`SkillSlotMappingTest` 三处 —— 档位表加 20/21 ✓、
+>   `isIntrinsic` 名单加这两档 ✓、**`raw == null` 时 `continue`** ✓（**表列的是档位，不是每个角色都有的行** ✓；
+>   该测试用 1204 ✓，他没有 20/21 ✓）。
+> * ⚠ **本轮踩到的两个编译期细节（已修 ✓）**：① 枚举常量**不带参数** ✗（档位在 `Constant` 里 ✓）；
+>   ② 新常量必须插在**枚举列表的分号之前** ✗（我第一次插到了分号之后 ⇒ 编译器"此处不需要枚举常量" ✓）。
+> * **三条引擎变异 + 一条对照（判红前先删 XML 并校验年龄 ✓）** ✓：slot 20 is unmapped again(applied=True)=1 | the Elation skill stops being intrinsic(applied=True)=1 | the data no longer decides the type(applied=True)=1
+> * ✅ 三条**全部为红** ✓。
+> * **引擎级对照** ✓（靶子=带分号的语句 ✓）：让 slot 20 映射不到任何东西 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * **进度（实测 ✓）**：角色 **90 内容 / 93 数据** ✓（1502/1505/1506 的技能**现在可装载** ✓，但角色本身仍缺内容 ✓）；
+>   光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> * **下一轮（切片 1b ✓）**：把 `ELATION_DAMAGE_BOOST` **折进基数** ✓（该类型 crittable=true / boostable=false ✗ ⇒
+>   与强化击破同款做法 ✓），判据用 **1501 的真实欢愉技**跑结算 ✓；然后才是 1505 的出货 ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
