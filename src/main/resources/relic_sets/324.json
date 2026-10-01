@@ -1,0 +1,45 @@
+{
+  "2": [
+    {
+      "on": "SKILL_POINT_SPENT",
+      "when": [
+        "self_stacks:本回合消耗 < 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1.0,
+          "max_stacks": 4,
+          "until": "turn_end",
+          "target": "self"
+        }
+      ],
+      "source": "relic set 324 二件套: 「暴击伤害提高 16%。若装备者在单个回合内消耗 4 个或更多战技点，则暴击伤害额外提高 16%，持续 3 回合。」param = [0.16, 3, 0.32, 3]",
+      "note": "计一半：把「单个回合内消耗的战技点」记进一个**回合结束即清零**的计数器（`until: turn_end`）——写法照抄已出货的光锥 23053（它同样用 `SKILL_POINT_SPENT` + `< 4` 加层 + `>= 4` 结算）。⚠ `amount` 是 Double（第 297 轮实测）。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "when": [
+        "self_stacks:本回合消耗 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 4.0,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.16,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 324 二件套: 「暴击伤害提高 16%。若装备者在单个回合内消耗 4 个或更多战技点，则暴击伤害额外提高 16%，持续 3 回合。」param = [0.16, 3, 0.32, 3]",
+      "note": "结算的一半：满 4 点即给 3 回合的暴击伤害 +16%（`#1 = 0.16`、`#2 = 3`，取自 RelicSetSkillConfig 的 AbilityParamList）；`REMOVE_STACK 4` 让它是「每满 4 点一次」而不是「一次」。⚠ 二件套的**暴击伤害 +16% 是 `PropertyList` 里的 `CriticalDamageBase`** ⇒ 由上层的 `properties` 承担，本文件不重写（与已出货的 311 同一惯例）。⚠ 参数 #3 = 0.32、#4 = 3 未被文案解释 ⇒ 如实登记，不猜。"
+    }
+  ]
+}
