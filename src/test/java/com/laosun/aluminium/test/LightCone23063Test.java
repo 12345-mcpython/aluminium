@@ -34,8 +34,10 @@ public class LightCone23063Test {
         System.out.println("[23063] battle effects=" + effects.stream()
                 .map(e -> e.getOp() + "@" + e.getTarget()).toList());
         Assertions.assertEquals(3, effects.size(), "advance, the named state, and the speed boost");
-        Assertions.assertTrue(effects.stream().anyMatch(e -> "APPLY_BUFF".equals(e.getOp())),
-                "the named state is applied");
+        var state = effects.stream().filter(e -> "APPLY_BUFF".equals(e.getOp()))
+                .findFirst().orElseThrow();
+        System.out.println("[23063] the state is " + state.getBuff());
+        Assertions.assertEquals("\u65b0\u58f0", state.getBuff(), "the state name");
         var speed = effects.stream().filter(e -> "MODIFY_ATTR".equals(e.getOp()))
                 .findFirst().orElseThrow();
         System.out.println("[23063] speed percent=" + speed.getPercent() + " target=" + speed.getTarget());
