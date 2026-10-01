@@ -10496,6 +10496,28 @@
 > * ⚠ **本轮只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百零三：**✅ 选择器 `random_hit_enemy` 落地 —— 能力三步全部完成**）**：
+> 
+> * ✅ **落地的改动（`feat: a target selector for a random one of the enemies this attack hit` ✓）**
+>   （`models/TriggerInterpreter.java` ✓，四处 ✓）：
+>   ① **登记进 `TARGET_SELECTORS`** ✓（`:141` 的已知清单 ✓ —— ⚠ 没有它会被 default 分支当成"能命中多个单位"而抛错 ✓）；
+>   ② **常量** `TARGET_RANDOM_HIT_ENEMY = "random_hit_enemy"` ✓ + 一段 javadoc ✓（把"**快照语义**"与
+>      "**宁可报错也不给错目标**"写进代码 ✓）；
+>   ③ **switch 一例** ✓：`case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);` ✓
+>      —— ⭐ **照抄既有 `random_enemy` 的写法** ✓（`require(值或 null, 常量, ctx)` ✓ ⇒ **null 即抛错** ✓）；
+>   ④ **助手 `randomHitEnemy(ctx)`** ✓：`ctx.damage() == null` ✓ / 命中集合为空 ✓ / `battle == null` ✓ ⇒ **返回 null** ✓；
+>      否则 `hitTargets() ∩ getOpponents(null)` ✓，空则 null ✓，非空则用**战斗自己的 seeded RNG** 取一个 ✓。
+> * ⭐⭐⭐ **分阶段验证（㉝ ✓）**：脚本先**打印阵营 API 候选** ✓（`randomOpponent(` ✓ / `getOpponents(` ✓）
+>   ⇒ 再写补丁 ⇒ **`compileJava exit: 0`** ✓ ⇒ **`suite exit: 0`** ✓ ⇒ ✅ **一次通过** ✓
+>   （⭐ 这是"**先列名再动手**"的又一次直接收益 ✓；⚠ 第 178 轮的"凭常识写"则白跑一轮 ✗）。
+> * ✅ **能力三步全部完成 ✓**：① 实例携带 ✓（第 180 轮 ✓）；② 施放流程写入 ✓（第 183 轮 ✓）；
+>   ③ 选择器可读 ✓（本轮 ✓）⇒ **`21029` 的前置条件已全部满足** ✓。
+> * ⚠ **仍未出货（如实 ✓）**：**`21029` 后会有期** ✓ —— 下一步要 ✓：
+>   ① 核对它各档 `ParamList` ✓（`#1[i]%` 攻击力 ✓）；② 核对 `from_category` 词表 ✓（"普攻"与"战技"在引擎里叫什么 ✓
+>      —— ⚠ 这决定规则挂在 **`CAST_SETUP` + 哪个分类** ✓）；③ 写内容 + 判据 + 变异 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
