@@ -1,0 +1,41 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "relic130_spd120_crit",
+      "when": [
+        "self_attr:SPEED >= 120.0",
+        "self_attr:SPEED < 160.0"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 130 四件套: Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.",
+      "note": "「进入战斗前，若装备者速度 ≥ #1=120 / #2=160，则暴击率 + #3=10% / #4=18%」—— 事件 BATTLE_START ✓；两档**必须互斥** ✓：低档附上界 `self_attr:SPEED < 160.0` ✓ —— ⚠ 否则速度 160 以上会两档同中 ✗，得到 +28% ✗ 而文案是 18% ✓（与遗器 325 的\"上界使两档互斥\"同一手法 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "relic130_spd160_crit",
+      "when": [
+        "self_attr:SPEED >= 160.0"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 130 四件套: Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.",
+      "note": "「进入战斗前，若装备者速度 ≥ #1=120 / #2=160，则暴击率 + #3=10% / #4=18%」—— 事件 BATTLE_START ✓；两档**必须互斥** ✓：低档附上界 `self_attr:SPEED < 160.0` ✓ —— ⚠ 否则速度 160 以上会两档同中 ✗，得到 +28% ✗ 而文案是 18% ✓（与遗器 325 的\"上界使两档互斥\"同一手法 ✓）。 ⛔ 未出货的第二句：「装备者**每场战斗第一次**施放**欢愉技**时，我方全体欢愉度提高 #5=10%」—— ⚠ 需要\"**欢愉技**\"这一技能类 ✗（引擎有 `from_category` ✓ 但**没有这个类别** ✗）；「每场战斗第一次」本身**可写** ✓（单向标记 + 每场重置 ✓，同 23059 的\"每波次一次\" ✓）。"
+    }
+  ]
+}
