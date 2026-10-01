@@ -10916,6 +10916,30 @@
 >   —— ⚠ 下一轮**一次就能过** ✓（前提：新增而不是替换 ✓）。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百一十七：**✅ 步骤 (c)(d) 落地 —— 攻击结束时带着"已冻结的命中集合"触发事件**）**：
+> 
+> * ✅ **落地的五处改动（`feat: fire ATTACK_FINISHED with the frozen hit set of the attack` ✓）**：
+>   ① **`TriggerContext.withAttackHitTargets(List<CanHit>)`** ✓ —— **复制型助手** ✓，⚠ 且**带上 `weakHitCount`** ✓
+>      （㊲ ✓：这样**链的顺序不影响结果** ✓）；
+>   ② **`ATTACK_FINISHED` 登记进 `CAST_CARRYING_EVENTS`** ✓ —— ⚠ 第 201 轮的关键发现 ✓：
+>      **不进这个集合，`from_category BPSKILL` 在该事件上永远不会成立** ✓（⚠ 而且是**静默**的 ✗）；
+>   ③ **终端重载扩到 10 参** ✓（链尾 `.withAttackHitTargets(...)` ✓）**并保留 9 参重载**（转发 + `List.of()` ✓，㊴ ✓）；
+>   ④ **新增 public 重载** ✓（照 `:2232` 形状 ✓，javadoc 写明"**只有持整集合的一侧能传**" ✓）；
+>   ⑤ **`fireAfterAttack` 触发 `ATTACK_FINISHED`** ✓（在 `List.copyOf(hitTargets)` 之后 ✓：
+>      `hitCount = targets.size()` ✓、`amount = totalDamage` ✓、`damage/fromCast = null` ✓，
+>      ⚠ **沿用"无命中不通知"的早退** ✓）。
+> * ⭐⭐⭐ **分阶段验证一次通过 ✓**：`compileJava exit: 0` ✓ → `suite exit: 0` ✓
+>   ⇒ ✅ **㊴ 正是第 202 轮缺的那一块** ✓："**改签名**"会让所有既有调用点的类型匹配一起搬走 ✗
+>     （报错长得像"参数写错" ✓，实际是"**重载消失**" ✓）；补回 9 参重载后**一次通过** ✓。
+> * ⚠ **仍未完成（e)(f) ✓）**：
+>   * **(e)** `random_hit_enemy` 改成**先读 `attackHitTargets`** ✓、为空再退回 `ctx.damage().hitTargets()` ✓
+>     ⇒ **一个选择器、两种完备度**（逐击读者 / 攻击后读者 ✓，文档按读者写 ✓ ㉟）；+ 判据：
+>     **多目标攻击**下该事件读到的候选数 = **全部命中数** ✓（把"已冻结"钉住 ✓）；
+>   * **(f)** **出货 `21029`** ✓（数据已备 ✓：5 档 48%→96% 攻击力 ✓、`ATTACK_FINISHED` + `actor == self` +
+>     `from_category BPSKILL` ✓、附加伤害、目标 `random_hit_enemy` ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
