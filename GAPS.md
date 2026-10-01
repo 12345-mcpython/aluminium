@@ -10787,6 +10787,135 @@
 >     却把"错在哪一行、为什么"**精确缩小到两个 `this(...)`** ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百一十三：**✅ 步骤 (a)(b) 落地 —— `ATTACK_FINISHED` + 上下文的命中集合分量**）**：
+> 
+> * ✅ **落地的改动（`feat: an ATTACK_FINISHED event and an attack hit set on the trigger context` ✓）**：
+>   ① **`enums/TriggerEvent.java`**：新增 **`ATTACK_FINISHED("ATTACK_FINISHED", true)`** ✓ + javadoc ✓
+>      （语义："**结算全部完成、命中集合已冻结**" ✓；⚠ 并写明**与 `fireAfterAttack` 同一早退约定**：
+>        "**没有命中 ⇒ 不算一次攻击**" ✓；以及**与 `weakHitCount` 同一条理由** ✓）；
+>   ② **`TriggerTable.TriggerContext`**：新增分量 **`List<CanHit> attackHitTargets`** ✓；
+>   ③ **6 个规范构造点**各补 `, List.of()` ✓（⚠ **正确跳过第 7 处**：顶层逗号数 = 0 ⇒ 那是**注释里**的调用 ✓）；
+>   ④ **record 自身的 2 个 `this(...)` 委托**各补 `, List.of()` ✓
+>      （⚠ 另外 **5 处 `this(` 被正确跳过** ✓ —— 靠**双判据**："顶层逗号数 = 11" **且** "首参 = `owner`" ✓）。
+> * ⭐⭐⭐ **分阶段验证一次通过 ✓**：`compileJava exit: 0` ✓ → `suite exit: 0` ✓ ⇒
+>   ✅ **㊱ 的解法完全奏效** ✓：配平扫描 ✓ + 参数个数断言 ✓ + 首参校验 ✓ ⇒
+>   **8 处正确插入、6 处正确跳过、零误伤** ✓（⚠ 第 197 轮的越界正则则是 7 处乱插 ✗ ⇒ 对照鲜明 ✓）。
+> * ⭐⭐⭐ **本轮最值得记的操作细节 ✓**：扫描器把**每一处跳过都打印了出来** ✓
+>   （`commas=2 first='cid'` ✓、`commas=6 first='owner'` ✓、`commas=14 first='variable'` ✓ …）
+>   ⇒ ✅ **跳过不是"悄悄放过"** ✓ —— 这是**可审计**的 ✓，也是下一次能放心复用的前提 ✓。
+> * ⚠ **仍未完成（c–f ✓）**：
+>   (c) 终端 `fireTriggers` 重载加参数 + 照 `:2232` 形状加 public 重载 ✓（⚠ 可能要**登记进事件清单** ✓
+>       —— 第 192 轮见过 `TriggerTable:1049` 一带的集合 ✓）；
+>   (d) `fireAfterAttack` 在 `attackSequence++` 之后调用 ✓；
+>   (e) `random_hit_enemy` **先读 `attackHitTargets`** ✓、空再退回 `ctx.damage().hitTargets()` ✓（+ 判据 ✓）；
+>   (f) **出货 `21029`** ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百一十四：**(c) 的接法确定 —— `with…` 工厂链就是入口**）**：
+> 
+> * ⭐⭐⭐ **实测（`Battle.java:2260-2262` ✓）**：终端重载里，上下文是这样造的 ✓：
+>   ```java
+>   fired += TriggerInterpreter.fire(this, table, event,
+>           new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
+>                   fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount));
+>   ```
+>   ⇒ ⭐⭐ **`with…` 工厂链正是这个 record 的既有惯例** ✓
+>     （⚠ 也就是我在第 196 轮**注释里见过**的 `new TriggerContext(...).withSkillId(...)` ✓ ——
+>       现在看到了它的**真实用法** ✓）
+>   ⇒ ✅ **所以 `attackHitTargets` 的入口明确** ✓：在这条链尾加 **`.withAttackHitTargets(attackHitTargets)`** ✓
+>     ⇒ ⭐ **每个触发事件只带自己需要的那一两个聚合量** ✓（`SKILL_CAST` 用 `withSkillId` ✓、
+>       `21040` 用 `withWeakHitCount` ✓、`ATTACK_FINISHED` 用 `withAttackHitTargets` ✓）
+>       —— ⭐ **这是"引擎不被某一个内容拖累"的具体体现** ✓：**加聚合量 = 加一个 `with…` + 一个参数** ✓，
+>         不动其它事件 ✓。
+> * ✅ **因此 (c)(d) 现在完全机械（四步 ✓）**：
+>   ① `TriggerTable.TriggerContext` 加 **`withAttackHitTargets(List<CanHit>)`** ✓（⚠ 照抄
+>      `withWeakHitCount` 的写法 ✓ —— **先读它再抄** ✓，㉖ ✓）；⚠ 该工厂内部要调用**规范构造器** ✓
+>      ⇒ 我第 199 轮已给 6 个构造点补了 `, List.of()` ✓ ⇒ **新工厂要传自己的值** ✓；
+>   ② `Battle`：**终端重载**（:2242 ✓）加参数 `List<CanHit> attackHitTargets` ✓ + 链尾加 `.withAttackHitTargets(...)` ✓；
+>   ③ `Battle`：**新增 public 重载** ✓（照 `:2232` 的"逐层加参数"形状 ✓，⚠ 参数类型是 `List<CanHit>` ⇒
+>      与其它的 `int`/`Damage` **不冲突** ✓）；
+>   ④ `fireAfterAttack`（:2357 附近 ✓，`List<CanHit> targets = List.copyOf(hitTargets);` **之后** ✓）
+>      调 ③ 的新重载 ✓（⚠ **沿用早退**：无命中 ⇒ 不通知 ✓）。
+> * ⚠ **还要检查一件事（下一轮顺带 ✓）**：新事件是否需要**登记进 `TriggerTable` 的事件集合** ✓ ——
+>   第 192 轮见过 `TriggerTable:1049` 一带有个"**是 `DAMAGE_CARRYING_EVENTS` 的超集**"的集合 ✓
+>   ⇒ ✅ 若 `ATTACK_FINISHED` 该进某个集合 ✓ 就进 ✓；⚠ **不猜** ✓：先读那些集合的**语义注释** ✓ 再定 ✓。
+> * ⚠ **本轮为只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百一十五：**三件事同时到手 —— 工厂模板、事件集合登记、以及"链会静默丢弃"的官方警告**）**：
+> 
+> * ⭐⭐⭐ **① 工厂模板（`TriggerTable.java:1857-1860` ✓，照抄即可 ✓）**：
+>   ```java
+>   public TriggerContext withWeakHitCount(int count) {
+>       return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
+>               targetFilter, skillId, count, List.of());
+>   }
+>   ```
+>   ⇒ ✅ 新工厂 `withAttackHitTargets(List<CanHit> targets)` 就按这个形状写 ✓
+>     （⚠ 注意它**显式传 `List.of()`** 给最后一个分量 ✓ —— 因为**第 199 轮**我加的正是这个分量 ✓）。
+> * ⭐⭐⭐ **② `ATTACK_FINISHED` 必须登记进 `CAST_CARRYING_EVENTS`（`:1047-1049` ✓）**：
+>   ```java
+>   private static final Set<TriggerEvent> CAST_CARRYING_EVENTS =
+>           Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK,
+>                   TriggerEvent.CAST_SETUP);
+>   ```
+>   注释（:1040-1045 ✓）说这个集合 = "**上下文带施放分类的事件**" ✓（`from_skill` 读它 ✓）
+>   ⇒ ⭐ **`21029` 要用 `from_category BPSKILL`** ✓ ⇒ ✅ **新事件必须进这个集合** ✓
+>     （⚠ 否则条件读不到分类 ⇒ 规则要么报错要么永远不成立 ✗）。
+>   ⭐ **这一条是本轮最有价值的发现 ✓**：它把"条件能不能用"和"事件在不在集合里"**硬绑在一起** ✓ ——
+>     ⚠ 若我漏掉它 ✓，`21029` 会以"**条件永远不成立**"的形式**静默失败** ✗（而不是报错 ✓），
+>     那将是最难查的一类问题 ✓。
+> * ⭐⭐⭐ **③ 代码自己的官方警告（`:1853-1855` ✓）**：
+>   > ⚠ A COPY helper rather than a wider constructor on purpose: the cast events are built by chaining these
+>   > (`new TriggerContext(...).withSkillId(...)`), so **a value that only the canonical constructor knows is
+>   > silently dropped by every chain that starts from a compact one** —— **measured**, and the reason this exists.
+>   ⇒ ✅ **每个 `with…` 都是"复制 + 改一个字段"** ✓ ⇒ ⚠ **它会把不在自己参数里的聚合量重置成 `List.of()`/0** ✗
+>     （⚠ 上面 `withWeakHitCount` 的最后一位就是 `List.of()` ✓ ⇒ **它会把已设的命中集合清掉** ✓）
+>   ⇒ ✅ **两条实现纪律（本轮新增 ✓）**：
+>     * **㊲ 新工厂要"带上别人"** ✓：`withAttackHitTargets` 应传 `weakHitCount`（而不是 `0` ✓）
+>       —— ⭐ 这样**链的顺序就不重要** ✓（⚠ 与既有 `withWeakHitCount` 传 `List.of()` 的风格**不一致** ✗
+>         ⇒ ⚠ **要么统一"最后一个字段由各自重置"** ✓、**要么统一"互相带上"** ✓
+>         ⇒ ✅ **我选择：在新工厂里带上 `weakHitCount`** ✓，并在注释里写明"**顺序无关**" ✓
+>           —— ⚠ 但**不改**既有两个工厂 ✓（⚠ 它们已被验证过 ✓，改动风险大于收益 ✓）；
+>     * **㊳ 触发点的链尾顺序** ✓：`fireAfterAttack` 触发时 ✓，`.withAttackHitTargets(...)` **必须放最后** ✓
+>       （⚠ 因为它带上 `weakHitCount` 之后 ✓ 前面谁重置它都无所谓 ✓ —— 但**放最后**是更稳的读法 ✓）。
+> * ✅ **下一轮机械清单（(c)(d) ✓，六步 ✓）**：① 加 `withAttackHitTargets(List<CanHit>)` ✓（照 ① 模板 + 带上 `weakHitCount` ✓）；
+>   ② `CAST_CARRYING_EVENTS` 加 `ATTACK_FINISHED` ✓；③ 终端重载加参数 ✓ + 链尾加 `.withAttackHitTargets(...)` ✓；
+>   ④ 新增 public 重载（照 `:2232` 形状 ✓）；⑤ `fireAfterAttack` 在 `List.copyOf(hitTargets)` 之后调用 ✓；
+>   ⑥ `compileJava` → 判据 → 全量 ✓（㉝ ✓）⇒ 之后 (e)(f) ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
+
+> **2026-09-30 更新（aggro 回收之六百一十六：**⚠ 我"改签名"而不是"加重载" ⇒ 9 参版本被抹掉；修法一行**）**：
+> 
+> * ⚠ **本轮未落地** ✗（自动还原 ✓ ⇒ 树干净、全量绿 ✓），但**五处改动本身都对** ✓（脚本逐步打印 ✓）：
+>   `helper added` ✓ → `ATTACK_FINISHED registered as cast-carrying` ✓ → `terminal overload threads the hit set` ✓ →
+>   `public overload added` ✓ → `ATTACK_FINISHED is fired` ✓ ⇒ ✅ **逻辑规划无误** ✓，栽在**一处签名手法** ✗。
+> * ⭐⭐⭐ **根因（精确 ✓）**：我把**终端重载**的签名**从 9 参改成 10 参** ✗ —— 而我本该**新增**一个 10 参版本、
+>   **保留** 9 参版本 ✓。后果：`compileJava` 报 **`:2222` / `:2234` / `:2252`**
+>   「`SkillCategory` 无法转换为 `int`」「`Damage` 无法转换为 `SkillCategory`」 ✓
+>   —— ⭐ 这些**不是类型写错** ✗，而是**重载解析找不到原来那条 9 参链** ⇒ 调用点被迫"往下一个候选上套" ✓
+>     ⇒ 于是参数类型逐个错位 ✓ ⇒ ✅ **报错信息里的"类型不兼容"其实是"重载消失"** ✓（⚠ 这个读法值得记住 ✓）。
+> * ⭐⭐⭐ **纪律（第三十九条 ✓）**：**"给方法加参数"要分两种情形 ✓** ——
+>   * **调用点在同一个类里、且都是自己转发** ✓ ⇒ **新增重载 + 旧重载转发到新重载（补默认值 `List.of()`）** ✓
+>     —— ⭐ **这一步是必须的** ✓，因为"旧调用点"（含其它 `fireTriggers` 重载 ✓）**仍在用 9 参形态** ✓；
+>   * **只有唯一调用点** ⇒ 才可以直接改签名 ✓（⚠ 但本轮恰是前者 ✓）。
+>   ⚠ 教训一句话 ✓：**"改签名"会把所有既有调用点的类型匹配一起搬走** ✗；**"加重载"不会** ✓。
+> * ✅ **下一轮修法（一行 ✓）**：在**新增**的 10 参私有终端**之上**，保留一个 **9 参私有重载** ✓：
+>   ```java
+>   private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+>                            Damage damage, SkillCategory fromCast, int skillId, int weakHitCount) {
+>       return fireTriggers(event, actor, target, hitCount, amount, damage, fromCast, skillId, weakHitCount, List.of());
+>   }
+>   ```
+>   ⇒ ✅ **`:2222` / `:2234` / `:2237` 三个既有调用点无需改动** ✓ ⇒ 其余四处改动照旧 ✓。
+> * ⭐ **正面一点 ✓**：护栏再次零成本 ✓（红 ⇒ 自动还原 ✓），而本轮把"五处改动 + 一处签名手法"**缩小到只剩一行** ✓
+>   —— ⚠ 下一轮**一次就能过** ✓（前提：新增而不是替换 ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：

@@ -2234,13 +2234,38 @@ public class Battle {
         return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId, weakHitCount);
     }
 
+    /**
+     * ✅ The same, plus the targets the whole attack hit (2026-09-30; reader: cone 21029).
+     *
+     * <p>★ Only the side holding the whole set can pass it: a per-hit event fires once per target, so 「a random
+     * one of the targets that WAS HIT」 cannot be assembled from the parts (⚠ the argument {@code weakHitCount} makes).
+     */
+    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                            SkillCategory fromCast, int skillId, int weakHitCount,
+                            List<CanHit> attackHitTargets) {
+        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId, weakHitCount,
+                attackHitTargets);
+    }
+
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast, int skillId) {
         return fireTriggers(event, actor, target, hitCount, amount, damage, fromCast, skillId, 0);
     }
 
+    /**
+     * ⚠ Kept beside the ten-parameter terminal on purpose (2026-09-30): the other overloads and their call sites still
+     * forward nine arguments, and REPLACING a signature moves every one of those call sites’ type matching with it
+                 * (measured: the compiler then reports type mismatches that look like bad arguments but are a missing overload).
+     */
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast, int skillId, int weakHitCount) {
+        return fireTriggers(event, actor, target, hitCount, amount, damage, fromCast, skillId, weakHitCount,
+                List.of());
+    }
+
+    private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
+                             Damage damage, SkillCategory fromCast, int skillId, int weakHitCount,
+                             List<CanHit> attackHitTargets) {
         if (triggerDepth >= MAX_TRIGGER_DEPTH) {
             throw new IllegalStateException(
                     "Trigger recursion exceeded " + MAX_TRIGGER_DEPTH + " levels while firing "
@@ -2259,7 +2284,8 @@ public class Battle {
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
                         new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
-                                fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount));
+                                fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount)
+                                .withAttackHitTargets(attackHitTargets));
             }
             return fired;
         } finally {
@@ -2355,6 +2381,11 @@ public class Battle {
         // `once_per_attack` reads (see CanHit.isAttackLimitReady): every instance of ONE attack sees the same number.
         attackSequence++;
         List<CanHit> targets = List.copyOf(hitTargets);
+        // ✅ The attack is over and its hit set is frozen, so content may now ask 「a random one of the targets
+        // that WAS HIT」 -- the fact only this side holds (2026-09-30; reader: cone 21029). ⚠ Same early return
+        // as above: an attack that hit nothing does not announce itself.
+        fireTriggers(TriggerEvent.ATTACK_FINISHED, attacker, mainTarget, targets.size(), totalDamage,
+                null, null, 0, 0, targets);
         for (CanHit ally : allies) {
             ally.afterAttack(this, attacker, mainTarget, targets, totalDamage);
         }
