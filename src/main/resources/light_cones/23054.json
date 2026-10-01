@@ -1,0 +1,327 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「使装备者的速度提高 #1[i]%」—— 无条件永久属性。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_divination",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "上上签",
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.1,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.12,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「进入战斗或对我方目标施放终结技时获得【上上签】，持续 3 回合。持有【上上签】时，我方全体暴击率 + #2%、暴击伤害 + #3%，装备者自身能量恢复效率 + #5%」——状态与三个加成同写一条规则、同为 3 回合（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；两个全体加成给 all_allies，回能给 self。⛔ 未出货的一半：「或对我方目标施放终结技时」需要\"终结技打在我方身上\"的判定。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23054_wave_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 15.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「每个波次开始时，装备者固定恢复 #6 = 15 点能量」—— 事件 WAVE_START（引擎已发），GAIN_ENERGY 15。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.21,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「使装备者的速度提高 #1[i]%」—— 无条件永久属性。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_divination",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "上上签",
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.11,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.375,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.14,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「进入战斗或对我方目标施放终结技时获得【上上签】，持续 3 回合。持有【上上签】时，我方全体暴击率 + #2%、暴击伤害 + #3%，装备者自身能量恢复效率 + #5%」——状态与三个加成同写一条规则、同为 3 回合（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；两个全体加成给 all_allies，回能给 self。⛔ 未出货的一半：「或对我方目标施放终结技时」需要\"终结技打在我方身上\"的判定。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23054_wave_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 15.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「每个波次开始时，装备者固定恢复 #6 = 15 点能量」—— 事件 WAVE_START（引擎已发），GAIN_ENERGY 15。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「使装备者的速度提高 #1[i]%」—— 无条件永久属性。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_divination",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "上上签",
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.45,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.16,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「进入战斗或对我方目标施放终结技时获得【上上签】，持续 3 回合。持有【上上签】时，我方全体暴击率 + #2%、暴击伤害 + #3%，装备者自身能量恢复效率 + #5%」——状态与三个加成同写一条规则、同为 3 回合（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；两个全体加成给 all_allies，回能给 self。⛔ 未出货的一半：「或对我方目标施放终结技时」需要\"终结技打在我方身上\"的判定。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23054_wave_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 15.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「每个波次开始时，装备者固定恢复 #6 = 15 点能量」—— 事件 WAVE_START（引擎已发），GAIN_ENERGY 15。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.27,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「使装备者的速度提高 #1[i]%」—— 无条件永久属性。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_divination",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "上上签",
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.13,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.525,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.18,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「进入战斗或对我方目标施放终结技时获得【上上签】，持续 3 回合。持有【上上签】时，我方全体暴击率 + #2%、暴击伤害 + #3%，装备者自身能量恢复效率 + #5%」——状态与三个加成同写一条规则、同为 3 回合（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；两个全体加成给 all_allies，回能给 self。⛔ 未出货的一半：「或对我方目标施放终结技时」需要\"终结技打在我方身上\"的判定。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23054_wave_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 15.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「每个波次开始时，装备者固定恢复 #6 = 15 点能量」—— 事件 WAVE_START（引擎已发），GAIN_ENERGY 15。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「使装备者的速度提高 #1[i]%」—— 无条件永久属性。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23054_divination",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "上上签",
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.14,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.6,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.2,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「进入战斗或对我方目标施放终结技时获得【上上签】，持续 3 回合。持有【上上签】时，我方全体暴击率 + #2%、暴击伤害 + #3%，装备者自身能量恢复效率 + #5%」——状态与三个加成同写一条规则、同为 3 回合（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；两个全体加成给 all_allies，回能给 self。⛔ 未出货的一半：「或对我方目标施放终结技时」需要\"终结技打在我方身上\"的判定。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23054_wave_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 15.0,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23054 破局: 使装备者的速度提高#1[i]%。装备者进入战斗或对我方目标施放终结技时，使装备者获得【上上签】，持续#4[i]回合。当装备者持有【上上签】时，我方全体暴击率提高#2[i]%，暴击伤害提高#3[i]%，装备者自身能量恢复效率提高#5[i]%。每个波次开始时，装备者固定恢复#6[i]点能量。",
+      "note": "「每个波次开始时，装备者固定恢复 #6 = 15 点能量」—— 事件 WAVE_START（引擎已发），GAIN_ENERGY 15。"
+    }
+  ]
+}
