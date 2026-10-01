@@ -36,6 +36,31 @@
       ],
       "source": "遗器 130 四件套: Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.",
       "note": "「进入战斗前，若装备者速度 ≥ #1=120 / #2=160，则暴击率 + #3=10% / #4=18%」—— 事件 BATTLE_START ✓；两档**必须互斥** ✓：低档附上界 `self_attr:SPEED < 160.0` ✓ —— ⚠ 否则速度 160 以上会两档同中 ✗，得到 +28% ✗ 而文案是 18% ✓（与遗器 325 的\"上界使两档互斥\"同一手法 ✓）。 ⛔ 未出货的第二句：「装备者**每场战斗第一次**施放**欢愉技**时，我方全体欢愉度提高 #5=10%」—— ⚠ 需要\"**欢愉技**\"这一技能类 ✗（引擎有 `from_category` ✓ 但**没有这个类别** ✗）；「每场战斗第一次」本身**可写** ✓（单向标记 + 每场重置 ✓，同 23059 的\"每波次一次\" ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "relic130_elation_first",
+      "when": [
+        "from_category ElationDamage",
+        "!self has_state relic130_elation_used"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "relic130_elation_used",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "遗器 130 四件套: Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.",
+      "note": "「装备者**每场战斗第一次**施放**欢愉技**时，我方全体**欢愉度**提高 #5=10%」—— 事件 **`CAST_SETUP`** ✓（⭐ 唯一\"携带类别\"且\"在结算之前\"的事件 ✗ —— ⚠ 这是 `23048` 那条线测出来的 ✓）；类别用 **`from_category ELATION_DAMAGE`** ✓（⚠ 该类**已存在且已出货 60 处** ✗ —— ⚠ 旧登记写\"缺欢愉技类别\"**是错的** ✗）；\"每场战斗第一次\"用**单向标记** ✓（`!self has_state relic130_elation_used` ✓ ＋ 同规则打上该标记 ✓）—— ⚠ 战斗不会重开 ✓ ⇒ **无需重置** ✓；效果 `ELATION_DAMAGE_BOOST` ✓（⚠ 引擎一等属性 ✓，见 `SkillExecutor` 的欢愉伤害基数折叠 ✓）＋ `target: all_allies` ✓。"
     }
   ]
 }
