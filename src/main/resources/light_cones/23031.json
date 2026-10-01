@@ -33,7 +33,8 @@
           "percent": 0.27,
           "permanent": true,
           "per_stack": "self_stacks:流光",
-          "target": "self"
+          "target": "self",
+          "instance": true
         }
       ],
       "source": "光锥 23031: 「每层【流光】使装备者造成的终结技伤容无视目标#2[i]%的防御力。」",
@@ -91,7 +92,8 @@
           "percent": 0.3,
           "permanent": true,
           "per_stack": "self_stacks:流光",
-          "target": "self"
+          "target": "self",
+          "instance": true
         }
       ],
       "source": "光锥 23031: 「每层【流光】使装备者造成的终结技伤容无视目标#2[i]%的防御力。」",
@@ -149,7 +151,8 @@
           "percent": 0.33,
           "permanent": true,
           "per_stack": "self_stacks:流光",
-          "target": "self"
+          "target": "self",
+          "instance": true
         }
       ],
       "source": "光锥 23031: 「每层【流光】使装备者造成的终结技伤容无视目标#2[i]%的防御力。」",
@@ -207,7 +210,8 @@
           "percent": 0.36,
           "permanent": true,
           "per_stack": "self_stacks:流光",
-          "target": "self"
+          "target": "self",
+          "instance": true
         }
       ],
       "source": "光锥 23031: 「每层【流光】使装备者造成的终结技伤容无视目标#2[i]%的防御力。」",
@@ -265,7 +269,8 @@
           "percent": 0.39,
           "permanent": true,
           "per_stack": "self_stacks:流光",
-          "target": "self"
+          "target": "self",
+          "instance": true
         }
       ],
       "source": "光锥 23031: 「每层【流光】使装备者造成的终结技伤容无视目标#2[i]%的防御力。」",
