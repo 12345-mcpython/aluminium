@@ -64,7 +64,9 @@ public class ConeEventsTest {
                 "the burn is 40% of the WEARER's defence; scale names the owner's attribute");
         Assertions.assertEquals(0.4, dot.getPercent(), 1e-9, "rank 1 states 40% of DEF");
         Assertions.assertEquals(2, dot.getTurns(), "for two turns");
-        Assertions.assertEquals(1.0, dot.getBaseChance(), 1e-9, "rank 1 states 100% base chance");
+        // ⚠ The data says 100%–120% at the five ranks, and an unstated chance IS 100% (TriggerTable: "an unstated chance is 100% and has no number to raise"), so the field is omitted.
+        Assertions.assertNull(dot.getBaseChance(),
+                "the data says 100-120%, so base_chance is omitted (unstated = 100%)");
         // Behaviour: the burn lands on the enemy when the WEARER is hit. \u26a0 A base_chance effect still ROLLS against
         // the target's effect RES, so the applier needs effect hit rate to make this deterministic -- measured: with a
         // bare wearer the roll failed and the enemy carried 0 DoTs.
