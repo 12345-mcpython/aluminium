@@ -27,13 +27,6 @@
       "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
     }
   ],
-  "325": [
-    {
-      "require": 2,
-      "ability": "Ability53251",
-      "reason": "\"Increases the wearer's Elation by 8%. When the wearer's Elation reaches 30%/60% for the first time in battle, increases the wearer's CRIT DMG by 15%/30%.\" The Elation is the `properties` stat (ElationDamageAddedRatioBase 0.08). CORRECTED 2026-09-30 by measurement, the old reason was wrong: the threshold itself has a spelling (`self_attr:ELATION_DAMAGE_BOOST >= 0.3`, the same shape relic 311 uses for SPEED and character 1317 uses on BREAK), and the \"first time\" limit is expressible (once_per_battle / a one-way marker). What is missing is an EVENT: none of the 29 trigger events says \"this attribute just changed\", and a self_attr test can only run on an event that happens. The Elation is raised by our own content (light cones 21065 on CAST_SETUP, 22007 on ULT_CAST, 24006 after a skill or ultimate), so the judgement could hang on those -- but only once the sources that can raise it for THIS wearer are enumerated, which is not yet done. Registered rather than approximated: a TURN_START re-check would mean \"checked at each turn start\", which is not the same sentence."
-    }
-  ],
   "327": [
     {
       "require": 2,
