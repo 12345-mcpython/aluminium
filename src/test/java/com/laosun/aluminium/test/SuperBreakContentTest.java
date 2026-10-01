@@ -59,8 +59,8 @@ public class SuperBreakContentTest {
     /** Her file carries the clause now (and the tally says so). */
     @Test
     public void herFileCarriesTheConversion() {
-        Assertions.assertEquals(1, TriggerTables.of(HARMONY).ruleCount(TriggerEvent.DEALING_DAMAGE),
-                "the conversion rule is the file's only DEALING_DAMAGE rule");
+        Assertions.assertEquals(2, TriggerTables.of(HARMONY).ruleCount(TriggerEvent.DEALING_DAMAGE),
+                "the conversion rule is one of the file's DEALING_DAMAGE rules (2 since the skill extra-hits clause landed)");
     }
 
     /** 1321's Skill hands the whole side the toughness boost — 「弱点击破效率提高 50%」. */
