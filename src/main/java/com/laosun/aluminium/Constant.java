@@ -192,7 +192,10 @@ public final class Constant {
             SkillType.ULTRA, 3,
             SkillType.TALENT, 4,
             SkillType.MAZE, 6,
-            SkillType.TECHNIQUE, 7);
+            SkillType.TECHNIQUE, 7,
+            // \u2705 The Elation damage skills (2026-09-30): the data files them under slots 20 and 21.
+            SkillType.ELATION_SKILL, 20,
+            SkillType.ELATION_EXTRA, 21);
 
     /**
      * Maps percentage-type attributes to their corresponding base-type attributes.
