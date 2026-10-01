@@ -11133,6 +11133,42 @@
 >       （第 95 行之后 ✓）应当就有 ✓ ⇒ 下一轮读它 ✓）。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百二十五：**✅ 判据的最后一块到手 —— 两个测试助手 + 可换种子 + 免 `MODIFY_DAMAGE_TAKEN`**）**：
+> 
+> * ⭐⭐⭐ **`Cone21040Test` 后半段给出的三件东西（实测 ✓）**：
+>   ① **`TriggerSpecs.rule(event, List.of(条件…), 效果…)`** ✓ —— **测试用的手工规则助手** ✓
+>      （实例：`TriggerSpecs.rule("ALLY_ATTACK", List.of("actor == self", "weakness_hit_count >= 1"), probe(...))` ✓）；
+>   ② **`TriggerSpecs.set(effect, "op", "ADD_STACK")`** ✓ / `"buff"` / `"amount"` / `"permanent"` / `"target"` ✓
+>      —— **逐字段设置 `EffectSpec` 的助手** ✓ ⇒ ✅ 我**不必**手写 Java 字段拼写 ✓；
+>   ③ **真实施放的驱动样板** ✓：从施放者身上挑一个 **`SkillCategory.BPSKILL`** 的技能 ✓
+>      ⇒ `fight.castImmediate(skill, caster, List.copyOf(foes))` ✓（⚠ **N 个敌人**由测试自己造 ✓）。
+> * ⭐⭐⭐ **由此解决了我上一轮担心的两件事 ✓**：
+>   * **观察手段**：⚠ 我原打算用 `MODIFY_DAMAGE_TAKEN` ✓，但样板里的 `probe(...)` 用的是
+>     **`ADD_STACK` + `target`** ✓ ⇒ ⭐ **我改用 `ADD_STACK` 落在"被选中的那个敌人"身上** ✓
+>     ⇒ 观察方式现成 ✓：**`enemy.getBuffManager().stacksOf(name)`** ✓（样板对施放者正是这么数的 ✓）
+>     ⇒ ✅ **不需要 `MODIFY_DAMAGE_TAKEN`，也不需要元素** ✓；
+>   * **换种子**：⚠ 我上一轮担心"种子固定、无法做行为级证明" ✗ ⇒ ✅ **不成立** ✓：
+>     `new Battle(..., new Random(0))` 的 **`Random` 是夹具参数** ✓ ⇒ ⭐ **我只要 `new Random(k)`** ✓
+>       就能取不同随机流 ✓ ⇒ ⭐ **第二段（覆盖全部命中目标）可行** ✓✓。
+> * ✅ **判据（现在完全机械 ✓，形状照抄 ✓）**：
+>   ```java
+>   // 1. 手工规则：挂在 ATTACK_FINISHED，效果 = 给"本次命中的随机 1 个敌人"叠一层可观察的标记
+>   caster.setTriggerTable(new TriggerTable(FIRE_BLAST, List.of(
+>           TriggerSpecs.rule("ATTACK_FINISHED", List.of("actor == self"),
+>                   probeOnTarget("命中标记", 1)))));     // target: random_hit_enemy  ← 关键
+>   // 2. 种子战斗 + N 个敌人（照 probesFired）
+>   // 3. 真实施放（照 :122-126）
+>   // 4. 断言：恰好 1 个敌人身上有标记；且它属于被命中的 N 个
+>   // 5. 第二段：换 new Random(k) 跑多次 ⇒ 断言"被标记过的敌人集合"最终覆盖全部 N 个
+>   ```
+>   ⚠ `probeOnTarget` 的 `target` 字段值 = **`"random_hit_enemy"`** ✓（⚠ 第 188 轮登记的名字 ✓；
+>     第 208 轮已确认它**能过两道校验** ✓ 且**能被单目标回落接住** ✓）。
+> * ⚠ **一处要顺手核实的**：`probe` 里 `"target": "self"` ✓ ⇒ 我改成 `"random_hit_enemy"` 后 ✓
+>    ⚠ **`ADD_STACK` 的校验是否允许"目标是敌人"** ✓（⚠ 与 `MODIFY_DAMAGE_TAKEN` 同类的疑虑 ✓）
+>    ⇒ ⭐ 若不允许 ✓，就换成**对该敌人可用的减益 op** ✓（⚠ 仍**不猜**：一次 `compileJava` + 跑判据即知 ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
