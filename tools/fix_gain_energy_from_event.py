@@ -9,6 +9,7 @@ Everything rolls back on any failure, engine included.
 
 import glob
 import io
+import json
 import os
 import subprocess
 import sys
