@@ -10844,6 +10844,50 @@
 > * ⚠ **本轮为只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百一十五：**三件事同时到手 —— 工厂模板、事件集合登记、以及"链会静默丢弃"的官方警告**）**：
+> 
+> * ⭐⭐⭐ **① 工厂模板（`TriggerTable.java:1857-1860` ✓，照抄即可 ✓）**：
+>   ```java
+>   public TriggerContext withWeakHitCount(int count) {
+>       return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
+>               targetFilter, skillId, count, List.of());
+>   }
+>   ```
+>   ⇒ ✅ 新工厂 `withAttackHitTargets(List<CanHit> targets)` 就按这个形状写 ✓
+>     （⚠ 注意它**显式传 `List.of()`** 给最后一个分量 ✓ —— 因为**第 199 轮**我加的正是这个分量 ✓）。
+> * ⭐⭐⭐ **② `ATTACK_FINISHED` 必须登记进 `CAST_CARRYING_EVENTS`（`:1047-1049` ✓）**：
+>   ```java
+>   private static final Set<TriggerEvent> CAST_CARRYING_EVENTS =
+>           Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK,
+>                   TriggerEvent.CAST_SETUP);
+>   ```
+>   注释（:1040-1045 ✓）说这个集合 = "**上下文带施放分类的事件**" ✓（`from_skill` 读它 ✓）
+>   ⇒ ⭐ **`21029` 要用 `from_category BPSKILL`** ✓ ⇒ ✅ **新事件必须进这个集合** ✓
+>     （⚠ 否则条件读不到分类 ⇒ 规则要么报错要么永远不成立 ✗）。
+>   ⭐ **这一条是本轮最有价值的发现 ✓**：它把"条件能不能用"和"事件在不在集合里"**硬绑在一起** ✓ ——
+>     ⚠ 若我漏掉它 ✓，`21029` 会以"**条件永远不成立**"的形式**静默失败** ✗（而不是报错 ✓），
+>     那将是最难查的一类问题 ✓。
+> * ⭐⭐⭐ **③ 代码自己的官方警告（`:1853-1855` ✓）**：
+>   > ⚠ A COPY helper rather than a wider constructor on purpose: the cast events are built by chaining these
+>   > (`new TriggerContext(...).withSkillId(...)`), so **a value that only the canonical constructor knows is
+>   > silently dropped by every chain that starts from a compact one** —— **measured**, and the reason this exists.
+>   ⇒ ✅ **每个 `with…` 都是"复制 + 改一个字段"** ✓ ⇒ ⚠ **它会把不在自己参数里的聚合量重置成 `List.of()`/0** ✗
+>     （⚠ 上面 `withWeakHitCount` 的最后一位就是 `List.of()` ✓ ⇒ **它会把已设的命中集合清掉** ✓）
+>   ⇒ ✅ **两条实现纪律（本轮新增 ✓）**：
+>     * **㊲ 新工厂要"带上别人"** ✓：`withAttackHitTargets` 应传 `weakHitCount`（而不是 `0` ✓）
+>       —— ⭐ 这样**链的顺序就不重要** ✓（⚠ 与既有 `withWeakHitCount` 传 `List.of()` 的风格**不一致** ✗
+>         ⇒ ⚠ **要么统一"最后一个字段由各自重置"** ✓、**要么统一"互相带上"** ✓
+>         ⇒ ✅ **我选择：在新工厂里带上 `weakHitCount`** ✓，并在注释里写明"**顺序无关**" ✓
+>           —— ⚠ 但**不改**既有两个工厂 ✓（⚠ 它们已被验证过 ✓，改动风险大于收益 ✓）；
+>     * **㊳ 触发点的链尾顺序** ✓：`fireAfterAttack` 触发时 ✓，`.withAttackHitTargets(...)` **必须放最后** ✓
+>       （⚠ 因为它带上 `weakHitCount` 之后 ✓ 前面谁重置它都无所谓 ✓ —— 但**放最后**是更稳的读法 ✓）。
+> * ✅ **下一轮机械清单（(c)(d) ✓，六步 ✓）**：① 加 `withAttackHitTargets(List<CanHit>)` ✓（照 ① 模板 + 带上 `weakHitCount` ✓）；
+>   ② `CAST_CARRYING_EVENTS` 加 `ATTACK_FINISHED` ✓；③ 终端重载加参数 ✓ + 链尾加 `.withAttackHitTargets(...)` ✓；
+>   ④ 新增 public 重载（照 `:2232` 形状 ✓）；⑤ `fireAfterAttack` 在 `List.copyOf(hitTargets)` 之后调用 ✓；
+>   ⑥ `compileJava` → 判据 → 全量 ✓（㉝ ✓）⇒ 之后 (e)(f) ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
