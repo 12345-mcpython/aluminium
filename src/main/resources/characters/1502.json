@@ -1,0 +1,23 @@
+{
+  "rules": [
+    {
+      "on": "CAST_SETUP",
+      "id": "p1502_ult_penetration",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "RESISTANCE_REDUCTION",
+          "percent": 0.1,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "爻光 终结技 霓裳铁翎，六爻皆吉：「…并使我方全体目标全属性抗性穿透提高#2[f1]%，持续#3[i]回合。」",
+      "note": "⭐ 只写**能完整表达**的那一句 ✓：终结技「使我方全体目标**全属性抗性穿透提高 10%**，持续 **3** 回合」✓ = `CAST_SETUP` + `from_category ULTRA` ⇒ `MODIFY_ATTR` + `turns` + `target: all_allies` ✓。⚠ 同技能另两半已登记 ✗：「获得 5 个**笑点**」（队伍级资源 ✗）、「使阿哈立即获得 1 个固定计入 20 笑点的额外回合」（额外回合 + 笑点 ✗）；以及天赋/额外能力里的【大吉大利】、【凶星低语】与\"随机目标\" 部分 ✗。"
+    }
+  ]
+}
