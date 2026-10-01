@@ -25,6 +25,7 @@ public class LightCone23029Test {
                 + " turns=" + effect.getTurns() + " target=" + effect.getTarget());
         Assertions.assertEquals(0.18, effect.getPercent(), 1e-9, "18% more damage taken");
         Assertions.assertEquals(2.0, effect.getTurns(), 1e-9, "for two turns");
+        Assertions.assertEquals(0.6, rules.getFirst().chance(), 1e-9, "a 60% base chance");
         Assertions.assertEquals("target", effect.getTarget(), "on the enemy it hit");
     }
 }

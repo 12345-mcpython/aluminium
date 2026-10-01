@@ -42,6 +42,11 @@ public class LightCone23063Test {
                 .findFirst().orElseThrow();
         System.out.println("[23063] speed percent=" + speed.getPercent() + " target=" + speed.getTarget());
         Assertions.assertEquals(0.4, speed.getPercent(), 1e-9, "40% speed");
+        Assertions.assertEquals(2.0, speed.getTurns(), 1e-9, "for the same two turns");
+        var stateEffect = effects.stream().filter(e -> "APPLY_BUFF".equals(e.getOp()))
+                .findFirst().orElseThrow();
+        Assertions.assertEquals(2.0, stateEffect.getTurns(), 1e-9, "the state lasts two turns");
+        Assertions.assertEquals("self", stateEffect.getTarget(), "on the wearer");
         Assertions.assertEquals("all_allies", speed.getTarget(), "for the party");
     }
 }
