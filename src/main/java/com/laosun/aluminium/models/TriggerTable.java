@@ -826,7 +826,7 @@ public class TriggerTable {
      */
     private static final Set<String> NUMERIC_VARIABLES =
             Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
-                    "target_summon_count", "self_max_energy", "from_skill_id", "target_dot_count",
+                    "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id", "target_dot_count",
             "actor_hp_percent");
 
     /**
@@ -3090,6 +3090,15 @@ public class TriggerTable {
                 // 「若装备者的能量上限大于等于…」 -- not an attribute (`CanHit.getMaxEnergy()` is a field, and the
                 // attribute table has no slot for it), which is exactly why it needed a variable of its own.
                 case "self_max_energy" -> ctx.owner() == null ? Double.NaN : ctx.owner().getMaxEnergy();
+                // 「当前能量值等于其能量上限」 / 「当前能量百分比小于 50%」 -- the same reasoning as the variable above,
+                // one step further: energy is a field rather than an attribute, so the RATIO needs its own name too.
+                // Five shipped readers are already on record as blocked on exactly this spelling: light cone 21017's
+                // second sentence, character 1310's third and fourth clauses, character 1215's eidolon 2, and the
+                // filter light cone 21021 needs. A unit with no energy bar, or a zero maximum, yields NaN -- and
+                // every comparison against NaN is false, which is the convention `self_max_energy` already set.
+                case "self_energy_percent" -> ctx.owner() == null || ctx.owner().getMaxEnergy() <= 0
+                        ? Double.NaN
+                        : (double) ctx.owner().getCurrentEnergy() / ctx.owner().getMaxEnergy();
                 default -> Double.NaN;
             };
         }
