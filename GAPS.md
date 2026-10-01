@@ -10608,6 +10608,39 @@
 >       新事件是**沿用**还是**不同**，要按内容需要决定 ✓，不猜 ✓）。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百零七：**✅ 列全 28 个触发事件 —— 找到候选 `ALLY_ATTACK`（"我方攻击"）**）**：
+> 
+> * ⭐⭐⭐ **实测清单（`enums/TriggerEvent.java` ✓，共 28 个 ✓）**：
+>   `DEBUFF_APPLIED` / `BATTLE_START` / **`ALLY_ATTACK`** / `SKILL_CAST` / `BASIC_ATTACK` / `ENERGY_GAINED` /
+>   `HP_LOST` / `HP_CONSUMED` / `HEALED` / `SHIELD_GRANTED` / `KILL` / `BREAK` / `SKILL_POINT_SPENT` /
+>   `SKILL_POINT_GAINED` / `SKILL_POINT_OVERFLOWED` / `TURN_START` / `TURN_END` / `TAKING_HIT` /
+>   `DEALING_DAMAGE` / `ULT_CAST` / `FOLLOW_UP` / **`SUMMON_ATTACK`** / `SUMMONED` / `CAST_SETUP` /
+>   `COUNTDOWN_TURN` / `CRIT_DEALT` / `WAVE_START` / `RESOURCE_CHANGED` ✓
+>   ⇒ ✅ **所以"列全"这一步是有价值的** ✓：证据 ㉞ 再次兑现 ✓ ——
+>     ⚠ 若按第 190 轮"没搜到 AFTER_ATTACK"就下结论 ✗，会**白白新增一个事件** ✓，
+>     而其实**已有** `ALLY_ATTACK` ✓（⚠ 名字里没有 "after" ✗ ⇒ **按名字搜是搜不到的** ✓✓）。
+> * ⭐⭐⭐ **候选 `ALLY_ATTACK` 的依据（两处交叉 ✓）**：
+>   ① **第 190 轮读到的注释**（`TriggerInterpreter.java:1351` ✓）：
+>      「it (`Battle.fireAfterAttack` + `TriggerEvent.SUMMON_ATTACK`, **both reached through** …)」 ✓
+>      ⇒ ⭐ **说明 `ALLY_ATTACK` 与 `SUMMON_ATTACK` 都由 `fireAfterAttack` 触达** ✓；
+>   ② **第 190 轮读到的签名**（`Battle.fireAfterAttack(attacker, mainTarget, targets, totalDamage)` ✓）
+>      ⇒ ⚠ **它收着 `hitTargets`（`targets` ✓）** ✓ ⇒ ✅ **"攻击后"这个时机本来就是命中集合最完整的时候** ✓。
+>   ⇒ ⭐ **因此 `21029` 很可能应当挂在 `ALLY_ATTACK`** ✓（"装备者施放普攻或战技**后**" ✓）。
+> * ⚠ **仍待确认的唯一一点（下一轮唯一一步 ✓）**：
+>   **`Battle.fireAfterAttack` 触发 `ALLY_ATTACK` 时，往上下文里放了什么** ✓ ——
+>   具体看 `Battle.java` 里 `fireAfterAttack` 的函数体 ✓（约 :2349-2380 ✓）：
+>   * 它 `fireTriggers(TriggerEvent.ALLY_ATTACK, <attacker>, <target>, …, <damage?>)` 的**第 6 个实参**是什么 ✓；
+>   * ⚠ 若**没有传 `Damage`** ✗ ⇒ 那么 `ALLY_ATTACK` 的上下文同样读不到 `damage.hitTargets()` ✗
+>     ⇒ ✅ 这时才需要**最小的通用补充**：**把 `Damage`（或直接是命中集合）放进该事件的上下文** ✓
+>       （⭐ 而这是**顺理成章**的 ✓：`fireAfterAttack` **本来就有** `targets` ✓，等于**只差一次传递** ✓）；
+>   * ⚠ 若**传了** ✓ ⇒ ⭐ **直接出货 `21029`** ✓（内容：`ALLY_ATTACK` + 自身为攻击者 + `from_category BPSKILL` ✓ +
+>     效果为附加伤害、目标 `random_hit_enemy` ✓；5 档 48%→96% 攻击力 ✓）。
+> * ⭐⭐ **同时注意一个语义细节（先记下 ✓，实现时验证 ✓）**：`21029` 只说「施放普攻或战技后」 ✓，
+>   ⚠ 而 `ALLY_ATTACK` 是**我方任意角色**攻击都会触发 ✓ ⇒ 规则里**必须限定 `actor == self`** ✓
+>   （⚠ 否则队友攻击也会触发 ✗ —— 这正是 `actor == self` 这个条件的用处 ✓，而且**我们的条件判据已覆盖它** ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
