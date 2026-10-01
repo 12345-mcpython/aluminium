@@ -132,7 +132,7 @@ public class RelicTriggerTableTest {
      * A set with a registered ability and <b>no</b> rule file — used by the "nothing to merge" case, which must
      * therefore pick a set that is still unwritten (102 was that set until it was authored on 2026-09-28).
      */
-    private static final int NO_RULE_SET = 132;
+    private static final int NO_RULE_SET = 99002;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -512,8 +512,9 @@ public class RelicTriggerTableTest {
 
         Assertions.assertSame(TriggerTables.of(NO_RULES), wearer.getTriggerTable(),
                 "set " + NO_RULE_SET + " has no rule file, so the character's table is untouched (no empty "
-                        + "merge copy) -- which is why this case must name a set that is still unwritten: it "
-                        + "was 102 until set 102 was authored on 2026-09-28");
+                        + "merge copy). It names the synthetic set 99002 (release_version \"test\"), which "
+                        + "exists only in the test-side copy of relic_sets.json, so it can never be authored "
+                        + "-- that is what ended the 102 -> 132 treadmill");
     }
 
     // ==================================================================
