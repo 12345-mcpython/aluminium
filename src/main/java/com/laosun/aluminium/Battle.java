@@ -475,6 +475,14 @@ public class Battle {
     @Getter
     private final Random rng;
 
+    /**
+     * \u2705 The per-battle home of PARTY-scoped resources (2026-09-30; reader: the shared \u7b11\u70b9 counter). A resource like
+     * that belongs to the party, not to whoever happened to declare it -- `ResourceManager` refuses to keep such a thing
+     * per character, and this is the owner it asks for. Registered once at the start of the battle from the declarations.
+     */
+    private final Map<String, com.laosun.aluminium.models.Resource> partyResources =
+            new java.util.LinkedHashMap<>();
+
     public record AdvanceRequest(CanHit object, double rate) {
     }
 
@@ -664,8 +672,45 @@ public class Battle {
         return true;
     }
 
+    /** \u2705 Collects the PARTY-scoped declarations of our side into this battle\u2019s own store (2026-09-30). */
+    private void registerPartyResources() {
+        for (CanHit ally : allies) {
+            if (!(ally instanceof Character character) || character.getTriggerTable() == null) {
+                continue;
+            }
+            for (com.laosun.aluminium.beans.ResourceSpec spec : character.getTriggerTable().resources()) {
+                if (!"PARTY".equalsIgnoreCase(spec.scope() == null ? "" : spec.scope().trim())) {
+                    continue;
+                }
+                partyResources.putIfAbsent(spec.id(), new com.laosun.aluminium.models.Resource(
+                        spec.id(), com.laosun.aluminium.enums.ResourceScope.PARTY, spec.max(),
+                        spec.initial() == null ? 0 : spec.initial()));
+                if (spec.overflow() != null) {
+                    partyResources.get(spec.id()).setMaxOverflow(spec.overflow());
+                }
+            }
+        }
+    }
+
+    /**
+     * \u2705 The party\u2019s own counter, or {@code null} when this battle has none by that name (2026-09-30).
+     *
+     * <p>\u2605 Asked by both sides of the DSL: a `self_resource:NAME` read and a `GAIN_RESOURCE`/`SPEND_RESOURCE` write. They try the
+     * unit first, exactly as before, and fall back here -- so nothing changes for a resource a character owns itself.
+     */
+    /** \u2705 The party counter\u2019s current value, or 0 when this battle has no such counter (2026-09-30). */
+    public int partyResourceValue(String id) {
+        com.laosun.aluminium.models.Resource resource = partyResources.get(id);
+        return resource == null ? 0 : resource.value();
+    }
+
+    public com.laosun.aluminium.models.Resource partyResource(String id) {
+        return partyResources.get(id);
+    }
+
     public void startBattle() {
         status = Status.RUNNING;
+        registerPartyResources();   // \u2705 before any hook, so a BATTLE_START rule can already gain a shared counter
         attachBattleSkills();
         applyTechniqueStates();   // ? before every BATTLE_START rule, so `self has_state 秘技` already answers
         for (Signal signal : queue.snapshot()) {

@@ -2818,7 +2818,7 @@ public class TriggerTable {
                 return ownerAttribute(ctx.owner(), attribute);
             }
             if (resource != null) {
-                return resourceValue(ctx.owner(), resource);
+                return resourceValue(ctx.owner(), resource, ctx.battle());
             }
             if (stacksName != null) {
                 // 「每当我方目标对【承负】状态下的敌方目标施放 2 次…」 reads the counter on the ENEMY (target), while a
@@ -2925,11 +2925,17 @@ public class TriggerTable {
          * vocabulary is built to avoid, so it fails the condition instead. The same rule every other
          * unreadable variable follows.
          */
-        private static double resourceValue(CanHit owner, String resource) {
-            if (owner == null || !owner.getResources().has(resource)) {
-                return Double.NaN;
+        private static double resourceValue(CanHit owner, String resource, Battle battle) {
+            if (owner != null && owner.getResources().has(resource)) {
+                return owner.getResources().value(resource);
             }
-            return owner.getResources().value(resource);
+            // \u2705 A PARTY-scoped counter is read from the battle, whichever ally declared it (2026-09-30). Nothing changes for a
+            // resource a unit owns itself -- that case answered above.
+            if (battle != null && battle.partyResource(resource) != null) {
+                return battle.partyResourceValue(resource);
+            }
+            // \u26a0 NaN, not 0: "nobody declares that" must fail the condition rather than read as "none left".
+            return Double.NaN;
         }
 
         /**

@@ -8076,6 +8076,37 @@
 >   ⚠ **务必重测读数**：旧实测 `a plain gain of 100 took the resource to 60` ✓ ⇒ 接线后期望 **plain gain ⇒ 100**、**`gainClamped` ⇒ 60** ✓。
 > * **进度（回退后，实测 ✓）**：角色 **92 内容 / 93 数据**（仅 1506 缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百七十八：**见证者退休 + 1506 出货 —— 角色 93/93 全部到齐**）**：
+> 
+> * ✅ **测试卫生做完** ✓：那个"有数据、没有内容文件"的见证者**已不存在**（它随最后一个角色自然消失 ✓）。逐点替换如下 ✓：
+>   * `TriggerTableTest`：**合成 id `999999`** 只留给"**没有文件**"这类事实（`exists` 为假 ✓、查表是缓存 miss ✓）；
+>     凡是把它当**身体**用的地方改用真实角色 ✓，其中**数规则条数**的那条（Robin 的 BATTLE_START）必须用**自身没有该事件规则**的
+>     角色 ⇒ 选 **1402** ✓（读数 `expected: <1> but was: <2>` 就是这么暴露出来的 ✓）。
+>   * `CharacterResourceTest`：`PLAIN` ⇒ **1002** ✓（它是**纯规则数组**、**不声明资源** ✓，而该类的断言都在讲"声明" ✓，
+>     且每一处都**自装规则表** ✓）。
+>   * `RelicTriggerTableTest`：`NO_RULES` ⇒ **1402** ✓（该套件**数 BATTLE_START 的条数** ✓，所以身体自身不能有 ✓
+>     —— 用 1002 会带进它自己的规则 ⇒ 读数 `expected: <1> but was: <3>` ✓）。
+>   * `ShieldDurationTest`：见证者只是**身体** ⇒ **1002** ✓。
+>   ⭐ 失败数一路 **23 → 16 → 1 → 0** ✓，每一步都由**读数**指出下一个该换谁 ✓。
+> * ✅ **新能力：资源声明可以写"溢出"** ✓（读者：1506 天赋「**达到上限后还可溢出 240 点**」✓）：
+>   `ResourceSpec.overflow` ✓（⚠ 记得同步它的**两个便捷构造器** ✗，否则编译不过 ✓）、
+>   `ResourceManager.register(id, max, initial, overflow)` ✓、`CharacterFactory` 调用点传值 ✓
+>   —— 底层 `Resource` **本来就有两级**（`max` + `maxOverflow` ✓），缺的只是**声明**能写第二个数 ✓。
+> * ✅ **出货：1506 银狼LV.999 —— 最后一个角色** ✓（**角色 93 / 93** ✓✓）：
+>   ① 资源【隐藏分】：**max 60 + overflow 240** ✓；② 终结技「**行动提前 100%**」✓ = `CAST_SETUP` + `from_category ULTRA` ⇒
+>   `ADVANCE percent: 1.0` ✓（与 1210 同一个 op ✓）。
+> * ⭐⭐⭐ **判据读数（实测 ✓，两级都可见 ✓）**：
+>   * `[1506] declared 隐藏分: max=60 overflow=240` ✓
+>   * `a plain gain of 100 took the resource to 100 (it added 100)` ✓ —— **旧实测是 60** ✓ ⇒ 溢出**真的接通了** ✓
+>   * `a clamped gain of 100 ... left it at 60` ✓ + `the panel reads 隐藏分=60/60(+240)` ✓（toString 自己就显示两级 ✓）
+> * **四条变异 + 一条对照（判红前先删 XML 并校验年龄 ✓）** ✓：the declared overflow is gone(applied=True)=2 | the normal cap is 30 instead of 60(applied=True)=2 | the registered overflow is dropped(applied=True)=1 | the ultimate advances by 50% instead of 100%(applied=True)=1
+> * ✅ 四条**全部为红** ✓。
+> * **引擎级对照** ✓（写成能编译的语句 ✓）：让声明的溢出永远落不到资源上 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⚠ **1506 其余部分（登记 ✓）**：技能/额外能力给的**笑点**（**队伍级资源** ✗）、「获得笑点时获得**等量【隐藏分】**」✗、
+>   「达到 60 点后**可激活**终结技」（新机制 ✗）、【无敌玩家】的**结界** ✗。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据**（**全部到齐** ✓✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
