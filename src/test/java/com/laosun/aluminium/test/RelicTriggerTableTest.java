@@ -132,7 +132,7 @@ public class RelicTriggerTableTest {
      * A set with a registered ability and <b>no</b> rule file — used by the "nothing to merge" case, which must
      * therefore pick a set that is still unwritten (102 was that set until it was authored on 2026-09-28).
      */
-    private static final int NO_RULE_SET = 325;
+    private static final int NO_RULE_SET = 327;
 
     /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
     private static final int UNKNOWN_SET = 999_999;
@@ -166,7 +166,7 @@ public class RelicTriggerTableTest {
      * <p>Spans <b>both</b> kinds of ability-bearing effect: the pure ones ({@code properties} empty) and the
      * mixed ones ({@code properties} plus an ability).
      */
-    private static final Set<String> AUTHORED = Set.of("324/2", "129/4",
+    private static final Set<String> AUTHORED = Set.of("325/2", "324/2", "129/4",
             
             "312/2", "119/4",
             "303/2",
@@ -266,7 +266,7 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
      * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 6;
+    private static final int STILL_REGISTERED = 5;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
@@ -691,7 +691,7 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(3, twoPiece,
+        Assertions.assertEquals(2, twoPiece,
                 "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (11 until set "
                         + "128's 2-piece was authored on 2026-09-28)");
     }

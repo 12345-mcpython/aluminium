@@ -27,13 +27,6 @@
       "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
     }
   ],
-  "325": [
-    {
-      "require": 2,
-      "ability": "Ability53251",
-      "reason": "\"Increases the wearer's Elation by 8%. When the wearer's Elation reaches 30%/60% for the first time in battle, increases the wearer's CRIT DMG by 15%/30%.\" The Elation is the `properties` stat (ElationDamageAddedRatioBase 0.08), and the 'first time in battle' limit is expressible (`once_per_battle`). What blocks it is the Elation system itself: 欢愉度 is a resource the engine does not model (engine.md 18.4), so there is nothing for the threshold to read. (The two thresholds are not an extra gap -- an upper bound makes the tiers exclusive, see set 311.)"
-    }
-  ],
   "327": [
     {
       "require": 2,

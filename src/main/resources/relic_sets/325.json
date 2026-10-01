@@ -1,0 +1,200 @@
+{
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.3",
+        "self_attr:ELATION_DAMAGE_BOOST < 0.6",
+        "!self has_state 325_30"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_30",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
+      "note": "欢愉度达到 0.3 时暴击伤害 +0.15 —— 二件套的「欢愉度提高 8%」是 PropertyList，由 properties 层承担。⚠ 上界 `< 0.6` 使两档互斥。⭐「首次达到」用**单向标记**：`!self has_state 325_XX` ⇒ 只会在第一次满足时施加；标记是 `permanent`。⚠ 覆盖性（如实写明）：阈值判定必须挂在「会发生的事件」上，因为 29 个触发事件里没有「属性刚变化」（第 335 轮实测）。第 337/338 轮枚举了 `ELATION_DAMAGE_BOOST` 的**全部**来源：`CAST_SETUP`（21065）/ `SKILL_CAST` 与 `ULT_CAST`（24006）/ `ULT_CAST`（22007）/ `SKILL_POINT_SPENT`（23053），**角色侧一处也没有** ⇒ 这 4 个事件就是当前全部来源 ✓。将来若新增来源，需要同步为它补规则。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.6",
+        "!self has_state 325_60"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_60",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
+      "note": "欢愉度达到 0.6 时暴击伤害 +0.3 —— 二件套的「欢愉度提高 8%」是 PropertyList，由 properties 层承担。⭐「首次达到」用**单向标记**：`!self has_state 325_XX` ⇒ 只会在第一次满足时施加；标记是 `permanent`。⚠ 覆盖性（如实写明）：阈值判定必须挂在「会发生的事件」上，因为 29 个触发事件里没有「属性刚变化」（第 335 轮实测）。第 337/338 轮枚举了 `ELATION_DAMAGE_BOOST` 的**全部**来源：`CAST_SETUP`（21065）/ `SKILL_CAST` 与 `ULT_CAST`（24006）/ `ULT_CAST`（22007）/ `SKILL_POINT_SPENT`（23053），**角色侧一处也没有** ⇒ 这 4 个事件就是当前全部来源 ✓。将来若新增来源，需要同步为它补规则。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.3",
+        "self_attr:ELATION_DAMAGE_BOOST < 0.6",
+        "!self has_state 325_30"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_30",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
+      "note": "欢愉度达到 0.3 时暴击伤害 +0.15 —— 二件套的「欢愉度提高 8%」是 PropertyList，由 properties 层承担。⚠ 上界 `< 0.6` 使两档互斥。⭐「首次达到」用**单向标记**：`!self has_state 325_XX` ⇒ 只会在第一次满足时施加；标记是 `permanent`。⚠ 覆盖性（如实写明）：阈值判定必须挂在「会发生的事件」上，因为 29 个触发事件里没有「属性刚变化」（第 335 轮实测）。第 337/338 轮枚举了 `ELATION_DAMAGE_BOOST` 的**全部**来源：`CAST_SETUP`（21065）/ `SKILL_CAST` 与 `ULT_CAST`（24006）/ `ULT_CAST`（22007）/ `SKILL_POINT_SPENT`（23053），**角色侧一处也没有** ⇒ 这 4 个事件就是当前全部来源 ✓。将来若新增来源，需要同步为它补规则。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.6",
+        "!self has_state 325_60"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_60",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
+      "note": "欢愉度达到 0.6 时暴击伤害 +0.3 —— 二件套的「欢愉度提高 8%」是 PropertyList，由 properties 层承担。⭐「首次达到」用**单向标记**：`!self has_state 325_XX` ⇒ 只会在第一次满足时施加；标记是 `permanent`。⚠ 覆盖性（如实写明）：阈值判定必须挂在「会发生的事件」上，因为 29 个触发事件里没有「属性刚变化」（第 335 轮实测）。第 337/338 轮枚举了 `ELATION_DAMAGE_BOOST` 的**全部**来源：`CAST_SETUP`（21065）/ `SKILL_CAST` 与 `ULT_CAST`（24006）/ `ULT_CAST`（22007）/ `SKILL_POINT_SPENT`（23053），**角色侧一处也没有** ⇒ 这 4 个事件就是当前全部来源 ✓。将来若新增来源，需要同步为它补规则。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.3",
+        "self_attr:ELATION_DAMAGE_BOOST < 0.6",
+        "!self has_state 325_30"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_30",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
+      "note": "欢愉度达到 0.3 时暴击伤害 +0.15 —— 二件套的「欢愉度提高 8%」是 PropertyList，由 properties 层承担。⚠ 上界 `< 0.6` 使两档互斥。⭐「首次达到」用**单向标记**：`!self has_state 325_XX` ⇒ 只会在第一次满足时施加；标记是 `permanent`。⚠ 覆盖性（如实写明）：阈值判定必须挂在「会发生的事件」上，因为 29 个触发事件里没有「属性刚变化」（第 335 轮实测）。第 337/338 轮枚举了 `ELATION_DAMAGE_BOOST` 的**全部**来源：`CAST_SETUP`（21065）/ `SKILL_CAST` 与 `ULT_CAST`（24006）/ `ULT_CAST`（22007）/ `SKILL_POINT_SPENT`（23053），**角色侧一处也没有** ⇒ 这 4 个事件就是当前全部来源 ✓。将来若新增来源，需要同步为它补规则。"
+    },
+    {
+      "on": "SKILL_POINT_SPENT",
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.6",
+        "!self has_state 325_60"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_60",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
+      "note": "欢愉度达到 0.6 时暴击伤害 +0.3 —— 二件套的「欢愉度提高 8%」是 PropertyList，由 properties 层承担。⭐「首次达到」用**单向标记**：`!self has_state 325_XX` ⇒ 只会在第一次满足时施加；标记是 `permanent`。⚠ 覆盖性（如实写明）：阈值判定必须挂在「会发生的事件」上，因为 29 个触发事件里没有「属性刚变化」（第 335 轮实测）。第 337/338 轮枚举了 `ELATION_DAMAGE_BOOST` 的**全部**来源：`CAST_SETUP`（21065）/ `SKILL_CAST` 与 `ULT_CAST`（24006）/ `ULT_CAST`（22007）/ `SKILL_POINT_SPENT`（23053），**角色侧一处也没有** ⇒ 这 4 个事件就是当前全部来源 ✓。将来若新增来源，需要同步为它补规则。"
+    },
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.3",
+        "self_attr:ELATION_DAMAGE_BOOST < 0.6",
+        "!self has_state 325_30"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_30",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
+      "note": "欢愉度达到 0.3 时暴击伤害 +0.15 —— 二件套的「欢愉度提高 8%」是 PropertyList，由 properties 层承担。⚠ 上界 `< 0.6` 使两档互斥。⭐「首次达到」用**单向标记**：`!self has_state 325_XX` ⇒ 只会在第一次满足时施加；标记是 `permanent`。⚠ 覆盖性（如实写明）：阈值判定必须挂在「会发生的事件」上，因为 29 个触发事件里没有「属性刚变化」（第 335 轮实测）。第 337/338 轮枚举了 `ELATION_DAMAGE_BOOST` 的**全部**来源：`CAST_SETUP`（21065）/ `SKILL_CAST` 与 `ULT_CAST`（24006）/ `ULT_CAST`（22007）/ `SKILL_POINT_SPENT`（23053），**角色侧一处也没有** ⇒ 这 4 个事件就是当前全部来源 ✓。将来若新增来源，需要同步为它补规则。"
+    },
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.6",
+        "!self has_state 325_60"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_60",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
+      "note": "欢愉度达到 0.6 时暴击伤害 +0.3 —— 二件套的「欢愉度提高 8%」是 PropertyList，由 properties 层承担。⭐「首次达到」用**单向标记**：`!self has_state 325_XX` ⇒ 只会在第一次满足时施加；标记是 `permanent`。⚠ 覆盖性（如实写明）：阈值判定必须挂在「会发生的事件」上，因为 29 个触发事件里没有「属性刚变化」（第 335 轮实测）。第 337/338 轮枚举了 `ELATION_DAMAGE_BOOST` 的**全部**来源：`CAST_SETUP`（21065）/ `SKILL_CAST` 与 `ULT_CAST`（24006）/ `ULT_CAST`（22007）/ `SKILL_POINT_SPENT`（23053），**角色侧一处也没有** ⇒ 这 4 个事件就是当前全部来源 ✓。将来若新增来源，需要同步为它补规则。"
+    }
+  ]
+}
