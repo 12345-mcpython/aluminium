@@ -7760,6 +7760,27 @@
 >   让它**可以为空**是更干净的下一步 ✓。
 > * **进度（实测 ✓）**：角色 **91 内容 / 93 数据**（1502/1506 仍缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百六十三：**1505 的判据补上"规格半"，上一轮那条无效变异被堵住**）**：
+> 
+> * ✅ **补的是什么** ✓：`Character1505Test` 新增一条**规格半**（`theShippedRulesCarryTheStatedNumbers` ✓）——
+>   直接读**角色自己的编译后规则**（`getTriggerTable().rulesFor(BATTLE_START)` ✓），断言
+>   **`amountFromAttr = CRIT_ATTACK`** ✓、**`amountPercent = 0.5`** ✓、**`amount = 20.0`** ✓，并数到**两条**规则 ✓。
+> * ⭐⭐ **为什么需要它（上一轮的实测教训 ✓）**：那两条**行为**判据里的 effect 是**在 Java 里手搭的** ✗
+>   ⇒ 只改 **JSON** 的变异**打不中**它们 ✗（实测：`amountPercent 0.5 -> 0.25` ⇒ **0 红** ✓），
+>   而原始面板那条 0.25 也四舍五入成 0 ✓ ⇒ 两条都不动 ✓。✅ 规格半把**内容里写的数**钉死 ✓，
+>   于是"改内容而不改引擎"这类变异再也不会静默通过 ✓。
+> * **判据读数（实测 ✓）** ✓：
+>   * `[1505] spec p1505_elation_value resource=欢愉度 amount=null fromAttr=CRIT_ATTACK percent=0.5` ✓
+>   * `[1505] spec p1505_technique_gift resource=好活当赏 amount=20.0 fromAttr=null percent=null` ✓
+>   * 行为：`crit damage=0.5 -> 欢愉度=0` ✓ / `with a raised panel: crit damage=1.5 -> 欢愉度=1` ✓
+> * **三条内容变异 + 一条引擎对照（判红前先删 XML 并校验年龄 ✓）** ✓：the share 50% -> 25% (was 0 red last round)(applied=True)=1 | reads ATK instead of crit damage(applied=True)=2 | the technique gives 10 instead of 20(applied=True)=2
+> * ✅ 三条**全部为红** ✓。
+> * **引擎级对照** ✓（靶子=带分号的语句 ✓）：让推导值永远落不到资源上 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * ⭐ **纪律（第 232 条）** ✓：**行为判据若自己手搭 effect，就挡不住"只改内容"的变异** ✗ ——
+>   ✅ 每条有内容的出货都要有一条**从内容读数的规格半** ✓（`24000` / `21010` / 本轮的 1505 都是这么做的 ✓）。
+> * **进度（实测 ✓）**：角色 **91 内容 / 93 数据** ✓（1502/1506 仍缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
