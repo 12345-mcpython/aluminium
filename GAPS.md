@@ -12054,6 +12054,37 @@
 >     而应当用**既有的 `target_when`** ✓ —— ✅ 这就是"引擎不被内容拖累"的正确落点 ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百六十四：**✅ 实测推翻上一轮的希望 —— 引擎是"**先随机、后过滤**"⇒ 必须让选择器自己先筛**）**：
+> 
+> * ⭐⭐⭐ **实测（`resolveTargets` 全文 ✓）**：
+>   ```java
+>   private static List<CanHit> resolveTargets(Battle battle, EffectSpec effect, TriggerContext ctx) {
+>       List<CanHit> resolved = resolveTargetsUnfiltered(battle, effect, ctx);   // ← 先"随机取一个"
+>       if (ctx.targetFilter().isEmpty()) return resolved;
+>       List<CanHit> filtered = new ArrayList<>();
+>       for (CanHit candidate : resolved) {
+>           if (candidate != null && ctx.passesTargetFilter(candidate)) filtered.add(candidate);   // ← 后过滤
+>       }
+>       return List.copyOf(filtered);
+>   }
+>   ```
+>   ⇒ ✅ **顺序是"先解析（含随机 ✓）、后过滤"** ✗
+>     ⇒ ⭐ **所以 `target_when` 表达不了「随机 1 个**未持有**X 的目标」** ✓ ——
+>       ⚠ 随机若落到已持有的目标 ✓ ⇒ **那一次就被丢掉** ✗（**不会重掷** ✗）⇒ 语义与原文不符 ✓。
+>   ⇒ ⛔ **因此"带筛选的选择器"确实需要** ✓（⚠ 我上一轮的乐观被实测推翻 ✓ —— 又是一次"先读再定"的收益 ✓）。
+> * ⭐⭐⭐ **设计（定稿 ✓，最小且通用 ✓）**：**让"随机类选择器"自己先按 `targetFilter` 筛，再随机** ✓ ——
+>   即在 `randomHitEnemy(ctx)` 里 ✓，对命中集合先应用 **`ctx.targetFilter()`** ✓（用 `ctx.passesTargetFilter(...)` ✓，
+>   与 `resolveTargets` 同一套判定 ✓）⇒ ✅ 这样：
+>   * **语义正确** ✓：「随机 1 个**未持有 X 的受击目标**」= 先筛后掷 ✓；
+>   * **通用** ✓：任何"随机 + 条件"的内容都能用 ✓（不是为 `23007` 特制 ✓）；
+>   * **不动 `resolveTargets`** ✓：⚠ 改它会波及**所有**效果 ✓（风险大 ✗）⇒ ⭐ 只在**随机选择器内部**处理 ✓。
+> * ✅ **下一轮（机械 ✓）**：改 `randomHitEnemy` ✓（加"先按 `targetFilter` 筛"这一步 ✓，
+>   ⚠ 候选为空 ⇒ 仍返回 null ⇒ `require` 报错 ✓ 保持规格 ✓）⇒ 写判据 ✓ ⇒ 再出货 `23007` ✓。
+> * ⭐⭐ **顺带一条可复用事实 ✓**：`ctx.targetFilter()` 与 `passesTargetFilter(candidate)` 是**公开的** ✓
+>   （`resolveTargets` 就在同一文件里用 ✓）⇒ 选择器**不需要新 API** ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
