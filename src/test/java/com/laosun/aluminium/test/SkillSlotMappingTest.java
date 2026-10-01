@@ -43,7 +43,10 @@ public class SkillSlotMappingTest {
                         SkillType.ULTRA, 3,
                         SkillType.TALENT, 4,
                         SkillType.MAZE, 6,
-                        SkillType.TECHNIQUE, 7),
+                        SkillType.TECHNIQUE, 7,
+                        // \u2705 2026-09-30: the Elation damage skills live in slots 20/21 in `skills.json`
+                        SkillType.ELATION_SKILL, 20,
+                        SkillType.ELATION_EXTRA, 21),
                 Constant.SKILL_SLOT);
 
         // The summon's two slots belong to the memosprite (P9-4) and are not in the character slot table
@@ -52,7 +55,9 @@ public class SkillSlotMappingTest {
 
         // The dividing line between intrinsic and attached-at-battle-start
         for (SkillType type : new SkillType[]{SkillType.COMMON, SkillType.SKILL,
-                SkillType.ULTRA, SkillType.TALENT}) {
+                SkillType.ULTRA, SkillType.TALENT,
+                // the Elation skill is always-on too (it is not attached at battle start)
+                SkillType.ELATION_SKILL, SkillType.ELATION_EXTRA}) {
             Assertions.assertTrue(type.isIntrinsic(), type + " should be an intrinsic skill");
         }
         for (SkillType type : new SkillType[]{SkillType.MAZE, SkillType.TECHNIQUE,
@@ -147,6 +152,11 @@ public class SkillSlotMappingTest {
         for (Map.Entry<SkillType, Integer> entry : Constant.SKILL_SLOT.entrySet()) {
             int slot = entry.getValue();
             var raw = Constant.SKILLS.get(cid).get(slot);
+            // \u2705 2026-09-30: the table lists SLOTS, not per-character rows -- only seven characters carry slots 20/21, so a
+            // character without a row for a slot is the normal case (a failure here would assert the opposite).
+            if (raw == null) {
+                continue;
+            }
             var data = jingYuan.getSkills().get(entry.getKey()).getData();
 
             Assertions.assertEquals(raw.attackType(), data.getSkillType(),

@@ -515,6 +515,21 @@ public final class SkillExecutor {
      *                     the total evenly over the hits)
      * @return the settled damage of this hit (0 if the target was dead / invulnerable)
      */
+    /**
+     * \u2705 Which {@link DamageType} a cast produces, read from the parsed skill data (2026-09-30).
+     *
+     * <p>\u2605 The only distinction today is \u6b22\u6109: the data spells it {@code ElationDamage} on the attack type, and
+     * {@link SkillCategory} has parsed that value since the type table was written -- so a skill the game calls Elation damage
+     * settles as {@link DamageType#ELATION}. Everything else stays NORMAL, exactly as before.
+     * \u26a0 Its boost is folded into the base in slice 1b (the type is deliberately not boostable).
+     */
+    public static DamageType damageTypeOf(SkillData data) {
+        if (data != null && data.getCategory() == SkillCategory.ELATION_DAMAGE) {
+            return DamageType.ELATION;
+        }
+        return DamageType.NORMAL;
+    }
+
     private static double hit(Battle battle, SkillData data, CanHit user, DamageElement element, double base,
                               CanHit target, Set<CanHit> hitTargets, double stanceDamage, int skillKey) {
         if (target == null || target.isDeath()) {
@@ -525,7 +540,9 @@ public final class SkillExecutor {
         // DMG boost ("普攻/战技/终结技造成的伤害提高 X%"), which the damage *type* cannot express -- every
         // in-battle cast produces DamageType.NORMAL. `data` is null for a hand-made or placeholder skill, and
         // then the instance has no scoped boost rather than a guessed one.
-        Damage damage = new Damage(user, target, element, DamageType.NORMAL, base,
+        // \u2705 The DAMAGE TYPE follows the data (2026-09-30; readers: the nine `ElationDamage` skills -- 1501/1502/1505/1506/
+        // 8009/8010/1513, four of them already shipped and until now settling their \u6b22\u6109 damage as NORMAL).
+        Damage damage = new Damage(user, target, element, damageTypeOf(data), base,
                 data == null ? SkillCategory.UNSPECIFIED : data.getCategory());
         // ? Which skill caused it (2026-09-28): DEALING_DAMAGE is where a target-bearing clause can ask, and this is the
         // only place that knows -- the caller holds the Skill, the instance carries the answer.
