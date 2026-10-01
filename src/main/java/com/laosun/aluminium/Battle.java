@@ -2438,7 +2438,18 @@ public class Battle {
      */
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
                                         Double fixedCritRate, Double fixedCritDamage) {
-        Damage extra = new Damage(attacker, target, element, DamageType.ADDITIONAL, base);
+        return applyAdditionalDamage(attacker, target, element, base, fixedCritRate, fixedCritDamage, null);
+    }
+
+    /**
+     * \u2705 The same, with the instance\u2019s DAMAGE TYPE stated (2026-09-30; reader: 1505 \u7eef\u82f1\u2019s three \u6b22\u6109 riders, whose
+     * text says \u300c\u9020\u6210\u2026\u7269\u7406\u5c5e\u6027<b>\u6b22\u6109\u4f24\u5bb9</b>\u300d). A rule-driven rider could only ever be {@code ADDITIONAL} before,
+     * so the one thing its sentence names -- the damage type -- had no spelling. {@code null} keeps the old meaning, which is why
+     * the six-argument overload above still answers exactly as it did.
+     */
+    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
+                                        Double fixedCritRate, Double fixedCritDamage, DamageType type) {
+        Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base);
         if (fixedCritRate != null) {
             extra.fixedCrit(true, fixedCritDamage);
         }

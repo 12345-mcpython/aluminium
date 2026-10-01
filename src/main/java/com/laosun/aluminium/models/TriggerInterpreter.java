@@ -227,7 +227,7 @@ public final class TriggerInterpreter {
      */
     /** The ops that actually read {@code damage_type} (see the guard in {@link #validate}). */
     private static final java.util.Set<String> DAMAGE_TYPE_READERS =
-            java.util.Set.of("BOOST_DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN");
+            java.util.Set.of("BOOST_DAMAGE", "DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN");
 
     public static void validate(EffectSpec effect, TriggerSpec spec) {
         // ⚠ A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
@@ -3391,10 +3391,20 @@ public final class TriggerInterpreter {
           double base = skill == null
                   ? literalBase(attacker, victim, effect)   // ? a literal ratio, off the SETTLED attribute or a Max HP (2026-09-29)
                   : attacker.getAttribute(AttributeType.ATTACK).get() * multiplierOf(skill, effect, attacker);
+          // \u2705 The instance\u2019s type is the rule\u2019s own when it states one (2026-09-30; reader: 1505\u2019s \u6b22\u6109 riders). And because
+          // `DamageType.ELATION` is deliberately not boostable, its own boost is folded into the BASE here, exactly as the cast
+          // path does it in `SkillExecutor.hit` -- a type that settles but ignores its own boost zone is the silent hole this
+          // project refuses.
+          DamageType damageType = effect.getDamageType() == null || effect.getDamageType().isBlank()
+                  ? null
+                  : DamageType.fromString(effect.getDamageType().trim());
+          double settledBase = damageType == DamageType.ELATION
+                  ? base * (1 + attacker.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get())
+                  : base;
           battle.applyAdditionalDamage(attacker, victim, skill == null
                           ? DamageElement.fromString(effect.getElement().trim())
-                          : elementOf(effect, skill), base,
-                  effect.getCritRate(), effect.getCritDamage());
+                          : elementOf(effect, skill), settledBase,
+                  effect.getCritRate(), effect.getCritDamage(), damageType);
     }
 
     /**
