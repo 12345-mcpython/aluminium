@@ -11169,6 +11169,37 @@
 >    ⇒ ⭐ 若不允许 ✓，就换成**对该敌人可用的减益 op** ✓（⚠ 仍**不猜**：一次 `compileJava` + 跑判据即知 ✓）。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百二十六：**判据编译并运行 ✓，失败信息精确：`random_hit_enemy` 在该事件上**没有候选****)**：
+> 
+> * ⭐⭐⭐ **两轮进展（都是实质的 ✓）**：
+>   ① ⚠ 第一次编译失败是**我又凭猜写 import** ✗（`models.Battle` ✗ 真包是 **`com.laosun.aluminium.Battle`** ✓；
+>      `Enemy`/`EnemyFactory` 在 **`models.enemy`** ✓；⭐ 而 **`TriggerSpecs` 与本测试同包** ✓ 不需要 import ✓）
+>      ⇒ ✅ **改法是"抄模板的 import 块"** ✓（㉝ 第 N 次兑现 ✓）；
+>   ② ✅ 改对之后**判据编译通过并真的跑起来了** ✓ ⇒ 失败信息**由引擎给出** ✓：
+>      ```
+>      IllegalStateException: Effect targets "random_hit_enemy" but this event has no such party
+>      ```
+>      ⚠ 这句**不是我的选择器抛的** ✗ —— 是 **`require(...)`** 的 ✓ ⇒ ⭐ 含义：**规则确实触发了** ✓，
+>        而 `randomHitEnemy(ctx)` **返回了 null** ✓ ⇒ 即**候选为空** ✗
+>        （⚠ 说明 `ctx.attackHitTargets()` 为空 **且** `ctx.damage()` 为 null ✓）。
+> * ⭐⭐⭐ **下一轮的唯一一步：把它一分为二（二分诊断 ✓）** ——
+>   ⚠ 现在有两种可能 ✗，必须**分别证伪** ✓：
+>   * **可能 A：选择器本身坏了** ✓ ⇒ 用**手工构造的上下文**直接验 ✓：
+>     `new TriggerTable.TriggerContext(wearer, wearer, enemy, 1, 0, null, battle, null).withAttackHitTargets(List.of(e1,e2,e3))`
+>     ✓（⚠ 形状照 `Cone21040Test:53` ✓）⇒ 若这样能选中 ✓ ⇒ **A 被证伪** ✓ ⇒ 问题在**触发路径** ✗；
+>   * **可能 B：触发路径没把集合带上** ✓ ⇒ 检查 `fireAfterAttack` 到我那条 10 参重载的**实际调用** ✓
+>     —— ⚠ **最可能的疏漏** ✓：`fireAfterAttack` 里我传的 `targets` ✓ 是否**真的**进了
+>       `.withAttackHitTargets(...)` ✓（⚠ 也就是**我改的那条链是不是这条事件走的那条** ✗
+>         —— `fireAfterAttack` 调的是 **public 10 参** ✓ ⇒ 转发到 **private 10 参终端** ✓ ⇒ 链在那里 ✓）。
+>   ✅ **更省的一步（推荐先做 ✓）**：在 `randomHitEnemy` 里**临时加一行打印** ✓
+>     （`System.out.println("[probe] attackHitTargets=" + ctx.attackHitTargets().size() + " damage=" + (ctx.damage()!=null))` ✓）
+>     ⇒ ⭐ 一次运行就能分辨 A/B ✓（⭐ 这与第 146/150 轮"让读数点名"是同一招 ✓），
+>       **查明后立刻撤掉那行** ✓（⚠ 不留在提交里 ✗）。
+> * ⚠ **本轮未落地 ✓**（判据已自动删除 ✓；树干净、全量绿 ✓）—— ⚠ 但**判据的骨架已经写好并验证可编译** ✓
+>   （⚠ 那一份脚本 `.git/write_judge_212.py` 还在 ✓ ⇒ 下一轮改完 import 可直接复用 ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
