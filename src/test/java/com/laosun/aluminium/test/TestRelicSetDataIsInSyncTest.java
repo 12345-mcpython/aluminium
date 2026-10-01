@@ -56,10 +56,10 @@ public class TestRelicSetDataIsInSyncTest {
 
         TreeSet<String> synthetic = test.entrySet().stream()
                 .filter(e -> isSynthetic(e.getValue())).map(Map.Entry::getKey).collect(Collectors.toCollection(TreeSet::new));
-        Assertions.assertEquals(new TreeSet<>(java.util.List.of("99001", "99002")), synthetic,
+        Assertions.assertEquals(new TreeSet<>(java.util.List.of("99001", "99002", "99004")), synthetic,
                 "exactly the two synthetic sets may be marked release_version \"test\"");
-        Assertions.assertEquals(main.size() + 2, test.size(),
-                "the copy is the shipped file plus those two sets");
+        Assertions.assertEquals(main.size() + 3, test.size(),
+                "the copy is the shipped file plus those synthetic sets");
         Assertions.assertTrue(main.values().stream().noneMatch(TestRelicSetDataIsInSyncTest::isSynthetic),
                 "no SHIPPED set may be marked test");
 

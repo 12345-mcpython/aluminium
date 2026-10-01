@@ -1,0 +1,40 @@
+{
+  "1": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "times_three",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.0,
+          "element": "Physical",
+          "target": "random_enemy",
+          "times": 3
+        }
+      ],
+      "note": "测试夹具：整次结算重复 3 遍（每次重抽随机敌方目标）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "times_one",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.0,
+          "element": "Physical",
+          "target": "random_enemy",
+          "times": 1
+        }
+      ],
+      "note": "测试夹具：同一条但 times: 1，用作比值基线（其余字段逐字相同）。"
+    }
+  ]
+}
