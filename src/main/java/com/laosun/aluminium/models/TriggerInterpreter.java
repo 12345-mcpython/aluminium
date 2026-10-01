@@ -1622,10 +1622,14 @@ public final class TriggerInterpreter {
                 // ⭐ `per_stack` may name the target's DEBUFF COUNT, not only a counter (2026-09-29): 「敌方目标每承受 1 个负面效果，
                 // 装备者对其造成的<属性>额外提高 X%，最多叠加 N 层」 is cone 21001 / 23020, and 116/4 counts a target's DoTs. A named
                 // counter keeps its old meaning, so nothing existing moves.
-                String perStack = effect.getPerStack().trim();
-                applied *= "target_debuff_count".equals(perStack)
-                        ? target.getBuffManager().debuffCount()
-                        : target.getBuffManager().stacksOf(perStack);
+                // ONE definition, one use (2026-09-30): this block used to compute per_stack itself and knew
+                // only `target_debuff_count` plus a generic counter, so `self_stacks:`, `shielded_count`,
+                // `target_dot_count` and `target_weakness_count` all fell through to
+                // `stacksOf("shielded_count")` = 0 -- a silent multiplier of zero on this path. Measured
+                // beforehand: 86 shipped uses live on this path (81 bare counters, 5 x target_debuff_count),
+                // and every one of them resolves identically through perStackFactor, so merging changes no
+                // shipped behaviour -- it removes the trap.
+                applied *= perStackFactor(effect, target, ctx);
             }
             if (derived) {
                 applied = applyDerivedCeiling(effect, ctx, applied);
