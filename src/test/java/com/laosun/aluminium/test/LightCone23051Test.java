@@ -23,6 +23,12 @@ public class LightCone23051Test {
         System.out.println("[23051] effects=" + effects.size()
                 + " ops=" + effects.stream().map(e -> e.getOp() + "@" + e.getTarget()).toList());
         Assertions.assertEquals(3, effects.size(), "two heals and the damage boost");
+        // me: assert the SELECTORS too -- a mutation of lowest_hp_ally to self stayed green without this.
+        var healTargets = effects.stream().filter(e -> "HEAL".equals(e.getOp()))
+                .map(e -> e.getTarget()).toList();
+        System.out.println("[23051] heal targets=" + healTargets);
+        Assertions.assertEquals(java.util.List.of("all_allies", "lowest_hp_ally"), healTargets,
+                "the party heal and the extra one for the lowest-HP ally");
         var boost = effects.stream().filter(e -> "MODIFY_ATTR".equals(e.getOp())).findFirst().orElseThrow();
         System.out.println("[23051] spec boost percent=" + boost.getPercent() + " turns=" + boost.getTurns()
                 + " target=" + boost.getTarget());
