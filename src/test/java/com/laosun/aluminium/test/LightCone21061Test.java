@@ -47,7 +47,9 @@ public class LightCone21061Test {
                 + " ; vulnerability percent=" + hit.effects().getFirst().getPercent()
                 + " turns=" + hit.effects().getFirst().getTurns());
         Assertions.assertEquals(0.32, boost.effects().getFirst().getPercent(), 1e-9, "32% damage");
+        Assertions.assertEquals("self", boost.effects().getFirst().getTarget(), "on the wearer");
         Assertions.assertEquals(0.16, hit.effects().getFirst().getPercent(), 1e-9, "16% more damage taken");
         Assertions.assertEquals(2.0, hit.effects().getFirst().getTurns(), 1e-9, "two turns");
+        Assertions.assertEquals("target", hit.effects().getFirst().getTarget(), "on the enemy it hit");
     }
 }

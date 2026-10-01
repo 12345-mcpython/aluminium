@@ -41,6 +41,8 @@ public class LightCone23019Test {
         Assertions.assertEquals(3.0, dmg.effects().getFirst().getTurns(), 1e-9, "for three turns");
         Assertions.assertEquals("all_allies", dmg.effects().getFirst().getTarget(), "for the party");
         Assertions.assertEquals(1.0, sp.effects().getFirst().getAmount(), 1e-9, "one skill point");
+        Assertions.assertEquals("self", sp.effects().getFirst().getTarget(), "for the wearer");
         Assertions.assertEquals(20.0, energy.effects().getFirst().getAmount(), 1e-9, "twenty energy");
+        Assertions.assertEquals("all_allies", energy.effects().getFirst().getTarget(), "for the party");
     }
 }
