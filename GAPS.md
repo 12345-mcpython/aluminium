@@ -8669,6 +8669,29 @@
 >   `Battle.lastChangedResource` + `noteChangedResource` + 读取器 ✓；**case 里量前后差**（不动两个入账方法 ✓）。
 > * **进度（回退后，实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之五百一十二：**✅ 新能力 —— 资源变化可转发；1506 出货（落地 ✓）**）**：
+> 
+> * ✅✅ **落地** ✓（第 91–110 轮反复受挫之后 ✓）。**`RESOURCE_CHANGED` 现在带上"是哪个资源、变了多少"** ✓
+>   ⇒ 「**获得【A】时获得等量【B】**」这一族从句可以说全 ✓。
+> * **实现（三处 ✓）**：① `Battle.lastChangedResource` + `noteChangedResource` + 读取器 ✓
+>   （⭐ **状态归属**：一次变化只在一个事件的存续期内有效 ✓ ⇒ 它属于**战斗** ✓，而不是那个 12 分量、132 处构造点的 record ✓）；
+>   ② `resource_changed:<NAME>` 的分支放在 **`parseCondition` 的第一句** ✓（那条链很长，任何一条都可能先吃掉 ✓）
+>   + `ResourceChanged` 条件（读 `ctx.battle().lastChangedResource()` ✓）；
+>   ③ **case 里量前后差** ✓ ⇒ 触发点带 **(名字, 增量)** ✓，而 `gainResource`/`spendResource` **一字未动** ✓。
+> * ⭐⭐⭐ **判据读数（实测 ✓）**：
+>   * `[forward] spec p1506_laughs_to_hidden when=[resource_changed:笑点] resource=隐藏分 amountFromEvent=true` ✓
+>   * `[forward] laughs 0 -> 10 ; 1506’s hidden points 0 -> 10` ✓ ← **转发成功** ✓
+>   * 假例 `with an ally that has no clause: laughs 0 -> 10 ; its hidden points 0 -> 0` ✓
+> * **三条变异（判红前删 XML 并校验年龄 ✓）**：it watches what it grants(applied=True)=1 | the amount is a constant 1(applied=True)=2 | the battle forgets the name(applied=True)=1
+> * ✅ 三条**全部为红** ✓。
+> * ⭐⭐⭐ **本段积累的六条流程经验（都值钱 ✓）**：① **多件套改动每件独立判断** ✓；
+>   ② **改返回类型时所有出口（含裸 `return;`）一起处理** ✓；③ **"原来那条读数"是回归的锚** ✓；
+>   ④ **探针要设计成"零改动也能跑"** ✓；⑤ **优先跑"本来就绿"的既有测试** ✓；
+>   ⑥ ⭐ **同一时刻只让一个变量变** ✓ —— 正是"锚（改动 × 1002）/ 探针（HEAD × 1506）/ 判据（改动 × 1506）"三点对照，
+>      把"我的改动 × 队友 1506 的交互"这一假象隔离出来 ✓，并最终发现**旧判据自身有缺陷** ✓（换成新判据后全绿 ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
