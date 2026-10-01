@@ -75,4 +75,35 @@ public class Character1505Test {
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,
                 "the talent still tracks the panel, and now the half is not zero");
     }
+
+    /**
+     * \u2605 The shipped numbers themselves (2026-09-30). The behavioural tests above build their own effect in Java, so a
+     * json-only change to `amountPercent` slipped past them -- measured: `0.5 -> 0.25` came back with 0 red. This reads the
+     * character\u2019s OWN compiled rules, which is exactly what the content file says.
+     */
+    @Test
+    public void theShippedRulesCarryTheStatedNumbers() {
+        Character elation = CharacterFactory.create(WEARER, LEVEL);
+        int seen = 0;
+        for (var rule : elation.getTriggerTable().rulesFor(
+                com.laosun.aluminium.enums.TriggerEvent.BATTLE_START)) {
+            if (!rule.id().startsWith("p1505_")) {
+                continue;
+            }
+            for (var effect : rule.effects()) {
+                seen++;
+                System.out.println("[1505] spec " + rule.id() + " resource=" + effect.getResource()
+                        + " amount=" + effect.getAmount() + " fromAttr=" + effect.getAmountFromAttr()
+                        + " percent=" + effect.getAmountPercent());
+                if (effect.getAmountFromAttr() != null) {
+                    Assertions.assertEquals("CRIT_ATTACK", effect.getAmountFromAttr(),
+                            "the talent derives the value from the crit-damage panel");
+                    Assertions.assertEquals(0.5, effect.getAmountPercent(), 1e-9, "and takes half of it");
+                } else {
+                    Assertions.assertEquals(20.0, effect.getAmount(), 1e-9, "the technique grants twenty");
+                }
+            }
+        }
+        Assertions.assertEquals(2, seen, "both shipped rules are read");
+    }
 }
