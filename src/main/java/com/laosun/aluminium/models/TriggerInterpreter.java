@@ -1077,7 +1077,11 @@ public final class TriggerInterpreter {
         // 50% \u7684\u6b22\u6109\u5ea6\u300d). `scaledAmount` stays literal-only on purpose: this share is read off the HOLDER, which only
         // this method has resolved. Unknown attribute names are refused loudly rather than silently adding zero.
         int amount;
-        if (effect.getAmountFromAttr() == null) {
+        if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+            // \u2705 The event\u2019s own magnitude (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c\u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d is exactly this -- the
+            // amount is not a literal and not an attribute, it is what the trigger just reported.
+            amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+        } else if (effect.getAmountFromAttr() == null) {
             amount = (int) Math.round(scaledAmount(effect, ctx));
         } else {
             AttributeType attribute = AttributeType.fromString(effect.getAmountFromAttr());
@@ -2981,7 +2985,8 @@ public final class TriggerInterpreter {
     }
 
     private static void requireAmount(EffectSpec effect, String op, TriggerSpec spec) {
-        if (effect.getAmount() == null && effect.getAmountFromAttr() == null) {
+        if (effect.getAmount() == null && effect.getAmountFromAttr() == null
+                && !Boolean.TRUE.equals(effect.getAmountFromEvent())) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"amount\" (source: " + spec.getSource() + ")");
         }

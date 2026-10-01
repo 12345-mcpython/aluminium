@@ -99,11 +99,28 @@ public class Character1505Test {
                     Assertions.assertEquals("CRIT_ATTACK", effect.getAmountFromAttr(),
                             "the talent derives the value from the crit-damage panel");
                     Assertions.assertEquals(0.5, effect.getAmountPercent(), 1e-9, "and takes half of it");
+                } else if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+                    // \u2705 the third source (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d -- the amount is the event\u2019s own
+                    Assertions.assertEquals("\u597d\u6d3b\u5f53\u8d4f", effect.getResource(),
+                            "the mirrored resource is \u3010\u597d\u6d3b\u5f53\u8d4f\u3011");
                 } else {
                     Assertions.assertEquals(20.0, effect.getAmount(), 1e-9, "the technique grants twenty");
                 }
             }
         }
-        Assertions.assertEquals(2, seen, "both shipped rules are read");
+        Assertions.assertEquals(2, seen, "BATTLE_START carries the derive and the technique");
+
+        // \u2705 The third clause lives on a DIFFERENT event (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d
+        // is triggered by ENERGY_GAINED, so it is pinned by reading that event\u2019s rules -- the first version of this test counted
+        // BATTLE_START only and read 2, which is exactly what made it obvious.
+        var theSyncRule = elation.getTriggerTable().rulesFor(
+                com.laosun.aluminium.enums.TriggerEvent.ENERGY_GAINED).stream()
+                .filter(rule -> rule.id().startsWith("p1505_")).toList();
+        Assertions.assertEquals(1, theSyncRule.size(), "the energy sync is wired to ENERGY_GAINED");
+        var syncEffect = theSyncRule.getFirst().effects().getFirst();
+        System.out.println("[1505] spec " + theSyncRule.getFirst().id() + " resource=" + syncEffect.getResource()
+                + " amountFromEvent=" + syncEffect.getAmountFromEvent());
+        Assertions.assertEquals(Boolean.TRUE, syncEffect.getAmountFromEvent(),
+                "and its amount is the event\u2019s own magnitude");
     }
 }
