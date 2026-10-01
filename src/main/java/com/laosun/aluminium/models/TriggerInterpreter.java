@@ -139,7 +139,7 @@ public final class TriggerInterpreter {
      * variables being a closed set.
      */
     private static final Set<String> TARGET_SELECTORS =
-            Set.of("next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
+            Set.of("party_first", "next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
                     "target_and_summon", "all_enemies", "lowest_hp_ally",
             "random_enemy", "random_hit_enemy");
 
@@ -1255,6 +1255,15 @@ public final class TriggerInterpreter {
         return null;
     }
 
+    /** The first character of the party (relic 317), or null when there is no battle. */
+    private static CanHit partyFirst(TriggerContext ctx) {
+        Battle battle = ctx.battle();
+        if (battle == null || battle.characters.isEmpty()) {
+            return null;
+        }
+        return battle.characters.getFirst();
+    }
+
     private static CanHit resolveTarget(EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
         return switch (selector) {
@@ -1270,6 +1279,9 @@ public final class TriggerInterpreter {
             // acted). Read from the queue; the head alone is not enough (measured: peekNext() can be the
             // acting unit itself).
             case "next_ally" -> require(nextAllyToAct(ctx), "next_ally", ctx);
+            // 「队伍第一名」(relic 317): the FIRST CHARACTER of the party, in party order -- read from
+            // battle.characters, not battle.allies (summons are appended to that one).
+            case "party_first" -> require(partyFirst(ctx), "party_first", ctx);
             case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);
             case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                     TARGET_RANDOM_ENEMY, ctx);
