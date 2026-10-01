@@ -166,7 +166,8 @@ public class RelicTriggerTableTest {
      * <p>Spans <b>both</b> kinds of ability-bearing effect: the pure ones ({@code properties} empty) and the
      * mixed ones ({@code properties} plus an ability).
      */
-    private static final Set<String> AUTHORED = Set.of(
+    private static final Set<String> AUTHORED = Set.of("129/4",
+            
             "312/2", "119/4",
             "303/2",
             "113/4",
@@ -265,7 +266,7 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
      * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 8;
+    private static final int STILL_REGISTERED = 7;
 
     /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
     private static final int PURE_ABILITY_ONLY = 35;
