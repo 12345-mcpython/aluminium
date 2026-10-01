@@ -78,7 +78,10 @@ saved[ENG] = saved[ENG].replace(old_load, new_load, 1)
 # 4) the execution case (before GAIN_ENERGY's)
 old_exec = '            case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);'
 new_exec = ('            case "ADD_ELEMENTAL_WEAKNESS" -> {' + NL
-            + '                DamageElement weakness = parseElement(effect, "ADD_ELEMENTAL_WEAKNESS");' + NL
+            + '                DamageElement weakness = DamageElement.fromString(effect.getElement());' + NL
+            + '                if (weakness == null) {' + NL
+            + '                    throw new IllegalStateException("Op ADD_ELEMENTAL_WEAKNESS names element " + effect.getElement() + ", which is not a DamageElement (source: " + spec.getSource() + ")");' + NL
+            + '                }' + NL
             + '                for (CanHit victim : resolveTargets(battle, effect, ctx)) {' + NL
             + '                    if (victim instanceof com.laosun.aluminium.models.enemy.Enemy enemy) {' + NL
             + '                        enemy.addWeakness(weakness);' + NL
@@ -117,7 +120,9 @@ if s.returncode != 0:
                 if m is not None:
                     print('  FAIL %s#%s %s' % (c.get('classname'), c.get('name'),
                                                (m.get('message') or '')[:220]))
-    for l in ((s.stdout or '') + (s.stderr or '')).strip().split(NL)[-8:]:
+    for l in ((s.stdout or '') + (s.stderr or '')).strip().split(NL):
+        if 'error:' in l or '错误' in l:
+            print('  ERR ' + l.strip()[:200])
         print('  RAW ' + l.strip()[:160])
     bail('suite red')
 g = [run('run', *a).returncode for a in ([], ['--args=mechanics'])]
