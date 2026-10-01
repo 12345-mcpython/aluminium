@@ -13996,6 +13996,45 @@
 >   ② **`RelicSetTest` 三处计数**（`:78` 套装 ✓、`:82` 效果 ✓、`:424` 统计项 ✓）各加"排除合成套装"过滤 ✓；
 >   ③ 夹具迁 `99001` ＋ `SummonOpTest` 三处引用 ✓；④ `NO_RULE_SET` 改指 `99002` ＋ 改注释 ✓；
 >   ⑤ 加"副本与 `src/main` 逐字段一致（除合成套装外）"断言 ✓；⑥ 出货 `126` ＋ 登记表 2 → 1 ✓。
+
+> **2026-09-30 更新（aggro 回收之七百四十六：夹具住房修复 —— **可直接照做的规格**）**：
+>
+> * ⭐ **访问器已确认** ✓：`RelicSet` 是 **record** ✓（`beans/RelicSet.java:34-39` ✓），
+>   分量 `@SerializedName("release_version") String releaseVersion` ✓ ⇒ ⭐ **访问器是 `releaseVersion()`** ✓
+>   （⚠ 不是 `getReleaseVersion()` ✗ —— record 无 `get` 前缀 ✓）。判据里写 `!"test".equals(set.releaseVersion())` ✓。
+> * ⭐⭐ **计数一共四处**（⚠ 前几轮只看到 2～3 处 ✓，因为**一个断言失败会遮住同一方法里的下一个** ✗）：
+>   | 位置 | 数字 | 含义 |
+>   |---|---|---|
+>   | `RelicSetTest:78` | **60** | 套装数（32 cavern + 28 planar ✓）|
+>   | `RelicSetTest:82` | **92** | 全部套装效果数（2/4 档 ✓）|
+>   | `RelicSetTest:424` | **57** | 带 `properties` 的效果数 ✓ |
+>   | `RelicSetTest:425` | **35** | 仅能力（`properties` 空）的效果数 ✓ |
+>   ⚠ 另有 `:428` 一条**内部一致性恒等式** ✓（`withStats + abilityOnly == 效果总数` ✓）⇒ ⚠ 它的两侧也必须用**同一套过滤** ✓。
+> * ✅ **推荐写法（每方法一个过滤后的局部集合 ✓，改动最小 ✓）**：
+>   ```java
+>   // 每个方法开头一次：合成套装（release_version == "test"）不参与任何出货普查
+>   List<RelicSet> shipped = Constant.RELIC_SETS.values().stream()
+>           .filter(s -> !"test".equals(s.releaseVersion())).toList();
+>   // 然后 60/92/57/35 四处计数、以及 :428 的恒等式，全部改用 shipped
+>   ```
+>   ⚠ 注意 `:412` 的 `for (RelicSet set : Constant.RELIC_SETS.values())` ✗ 与 `:428` 的 `…values().stream()…` ✗
+>   **是两处独立的遍历** ✓ ⇒ ⚠ 必须**都**换成 `shipped` ✓，否则恒等式两侧不一致 ✓。
+> * ⭐ **安全性已验证** ✓：合成套装的效果**带 `properties`** ✓ ⇒ ⚠ 它们走 `withStats++` 分支 ✓
+>   ⇒ ⚠ `:418` 的"既无 properties 又无 ability"断言**不会**被它们触发 ✓（⚠ 第 526 轮实测正是如此 ✓：报的是计数，不是那条 ✓）。
+> * ✅ **完整执行清单（六步，全部已无未知 ✓）**：
+>   1. 写 `src/test/resources/data/relic_sets.json` ＝ `src/main` 同名文件的**全量副本** ＋
+>      两个 `release_version: "test"` 的合成套装 ✓（`99001` 给夹具 ✓、`99002` 给 `NO_RULE_SET` ✓；
+>      各自一个 2 档效果 ✓：`properties = [AttackAddedRatio 0.01]` ✓、`ability = ""` ✓）；
+>   2. 按上方写法给 `RelicSetTest` **两个方法**加过滤 ✓（四处计数 ＋ `:428` 恒等式 ✓）；
+>   3. 夹具 `src/test/resources/relic_sets/126.json` **迁到 `99001.json`** ✓
+>      ＋ `SummonOpTest` 三处引用（`suit(126,` ✗ / `relic_sets/126.json` ✗ / `set <b>126</b>` ✗）✓；
+>   4. `RelicTriggerTableTest:135 NO_RULE_SET = 132` **改指 `99002`** ✓ ＋ 把 `:514-516` 那句
+>      *"it was 102 until set 102 was authored…"* 改写成 *"a synthetic set (release_version: test), never shipped"* ✓；
+>   5. 加一条"副本与 `src/main` 逐字段一致（除合成套装外）"的断言 ✓；
+>   6. 出货 `126` ✓（⚠ 内容早已备好 ✓，⚠ 唯一改动：`!actor == self` → **`actor != self`** ✓）
+>      ＋ 登记表回收 **2 → 1** ✓（`AUTHORED += "126/4"` ✓、`STILL_REGISTERED` 2→1 ✓、`NO_RULE_SET` 改指后 `132` 移交 ✓）。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`2b1a61c` ✓）；
+>   角色 93 / 93、光锥 164 / 170、遗器 58 文件 / 登记表 2 条、测试类 482。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
