@@ -28,6 +28,7 @@ public class LightCone23063Test {
         System.out.println("[23063] spec sp op=" + sp.getOp() + " amount=" + sp.getAmount()
                 + " ; advance op=" + adv.getOp() + " percent=" + adv.getPercent() + " target=" + adv.getTarget());
         Assertions.assertEquals(1.0, sp.getAmount(), 1e-9, "one skill point");
+        Assertions.assertEquals("self", sp.getTarget(), "the skill point goes to the wearer");
         Assertions.assertEquals(0.4, adv.getPercent(), 1e-9, "40% action advance");
         Assertions.assertEquals("self", adv.getTarget(), "the advance targets the wearer");
         Assertions.assertEquals("self", adv.getTarget(), "for the wearer");
