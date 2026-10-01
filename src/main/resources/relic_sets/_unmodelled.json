@@ -27,13 +27,6 @@
       "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
     }
   ],
-  "324": [
-    {
-      "require": 2,
-      "ability": "Ability53241",
-      "reason": "\"Increases the wearer's CRIT DMG by 16%. If the wearer consumes 4 or more Skill Points in a single turn, increases the wearer's CRIT DMG by an extra 16% for 3 turn(s).\" The CRIT DMG is the `properties` stat (CriticalDamageBase 0.16), and SKILL_POINT_SPENT exists as an event. What is missing is a count WITHIN one turn: a rule cannot accumulate 'skill points spent since this turn began' and compare it to 4, because the effect vocabulary has no accumulator and the firing limits are per-rule cooldowns, not per-turn tallies."
-    }
-  ],
   "325": [
     {
       "require": 2,
