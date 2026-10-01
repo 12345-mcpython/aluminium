@@ -48,6 +48,7 @@ public class EffectSpec {
         copy.amountFromAttr = amountFromAttr;
         copy.amountPercent = amountPercent;
         copy.amountFromEvent = amountFromEvent;
+        copy.amountCap = amountCap;
         copy.perStack = this.perStack;
         copy.scale = this.scale;
         copy.attribute = this.attribute;
@@ -145,6 +146,11 @@ return copy;
      * context ({@code TriggerContext.amount}); until this flag no op could spend it, so "as much as it just gained" had no spelling.
      */
     private Boolean amountFromEvent;
+    /**
+     * \u2705 A ceiling on a single conversion (2026-09-30; reader: 1505 \u7eef\u82f1\u2019s \u300c\u5355\u6b21\u901a\u8fc7\u6b64\u65b9\u5f0f\u8ba1\u7b97\u7684
+     * \u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u4e0d\u8d85\u8fc7 100 \u70b9\u300d). The clause bounds one conversion, not the resource: \u300c\u83b7\u5f97\u4e00\u70b9\u80fd\u91cf\n     * \u5c31\u5f97\u4e00\u70b9\u793c\u5305\uff0c\u4f46\u4e00\u6b21\u6700\u591a\u7ed9 100\u300d is two different statements, and only the first had a spelling before this.
+     */
+    private Double amountCap;
 
     /**
      * What a {@code HEAL} / {@code SHIELD} amount is a <b>percentage of</b>, instead of a flat number.
