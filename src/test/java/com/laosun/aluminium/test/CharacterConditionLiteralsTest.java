@@ -58,6 +58,8 @@ public class CharacterConditionLiteralsTest {
         assertRule(1009, "ULT_CAST", "ult_flat_speed_for_all_allies", List.of("actor == self"));
         assertRule(1009, "BATTLE_START", "technique_opening_aoe", List.of("self has_state 秘技"));
         assertRule(1009, "BATTLE_START", "level_convention", List.of());
+        assertRule(1009, "DEALING_DAMAGE", "skill_extra_hits_random",
+                List.of("actor == self", "from_skill SKILL", "damage_is_attack"));
         assertRule(1013, "BATTLE_START", "trace_puppet_control_resist", List.of());
         assertRule(1013, "BATTLE_START", "level_convention", List.of());
         assertRule(1013, "DEALING_DAMAGE", "skill_bonus_on_healthy_targets", List.of("actor == self", "from_skill SKILL", "target_hp_percent >= 0.5"));
