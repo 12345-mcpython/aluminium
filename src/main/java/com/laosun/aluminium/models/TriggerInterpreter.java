@@ -1101,6 +1101,11 @@ public final class TriggerInterpreter {
             double share = effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
             amount = (int) Math.round(holder.getAttribute(attribute).get() * share);
         }
+        // \u2705 A single conversion may be capped (2026-09-30; reader: 1505\u2019s \u300c\u5355\u6b21\u2026\u4e0d\u8d85\u8fc7 100 \u70b9\u300d). The clamp is the LAST
+        // thing that happens, so it bounds whichever source answered -- a literal, an attribute share or the event\u2019s own magnitude.
+        if (effect.getAmountCap() != null) {
+            amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
+        }
         holder.getResources().gain(effect.getResource(), amount);
     }
 
