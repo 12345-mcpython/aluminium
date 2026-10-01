@@ -22,7 +22,7 @@ public class LightCone23063Test {
                 .filter(r -> r.id().startsWith("cone23063_")).toList();
         System.out.println("[23063] cast rules=" + casts.size() + " battle rules=" + starts.size());
         Assertions.assertEquals(1, casts.size(), "the ultimate's skill point");
-        Assertions.assertEquals(1, starts.size(), "the battle-start advance");
+        Assertions.assertEquals(1, starts.size(), "the battle-start rule");
         var sp = casts.getFirst().effects().getFirst();
         var adv = starts.getFirst().effects().getFirst();
         System.out.println("[23063] spec sp op=" + sp.getOp() + " amount=" + sp.getAmount()
@@ -30,5 +30,16 @@ public class LightCone23063Test {
         Assertions.assertEquals(1.0, sp.getAmount(), 1e-9, "one skill point");
         Assertions.assertEquals(0.4, adv.getPercent(), 1e-9, "40% action advance");
         Assertions.assertEquals("self", adv.getTarget(), "for the wearer");
+        var effects = starts.getFirst().effects();
+        System.out.println("[23063] battle effects=" + effects.stream()
+                .map(e -> e.getOp() + "@" + e.getTarget()).toList());
+        Assertions.assertEquals(3, effects.size(), "advance, the named state, and the speed boost");
+        Assertions.assertTrue(effects.stream().anyMatch(e -> "APPLY_BUFF".equals(e.getOp())),
+                "the named state is applied");
+        var speed = effects.stream().filter(e -> "MODIFY_ATTR".equals(e.getOp()))
+                .findFirst().orElseThrow();
+        System.out.println("[23063] speed percent=" + speed.getPercent() + " target=" + speed.getTarget());
+        Assertions.assertEquals(0.4, speed.getPercent(), 1e-9, "40% speed");
+        Assertions.assertEquals("all_allies", speed.getTarget(), "for the party");
     }
 }
