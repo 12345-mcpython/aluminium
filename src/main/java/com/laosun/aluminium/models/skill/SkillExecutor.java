@@ -542,7 +542,15 @@ public final class SkillExecutor {
         // then the instance has no scoped boost rather than a guessed one.
         // \u2705 The DAMAGE TYPE follows the data (2026-09-30; readers: the nine `ElationDamage` skills -- 1501/1502/1505/1506/
         // 8009/8010/1513, four of them already shipped and until now settling their \u6b22\u6109 damage as NORMAL).
-        Damage damage = new Damage(user, target, element, damageTypeOf(data), base,
+        // \u2705 The \u6b22\u6109 damage boost is folded into the BASE (2026-09-30, slice 1b). `DamageType.ELATION` is deliberately
+        // NOT boostable -- the ordinary DMG-boost zone must not touch it -- so its own zone cannot ride `addBoost`, which is
+        // gated on `isBoostable()`. Measured before this line: with `ELATION_DAMAGE_BOOST` at 0.78 the instance still read
+        // x1.0. Super break folds `SUPER_BREAK_BOOST` into its base the same way, for the same reason.
+        DamageType damageType = damageTypeOf(data);
+        double settledBase = damageType == DamageType.ELATION
+                ? base * (1 + user.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get())
+                : base;
+        Damage damage = new Damage(user, target, element, damageType, settledBase,
                 data == null ? SkillCategory.UNSPECIFIED : data.getCategory());
         // ? Which skill caused it (2026-09-28): DEALING_DAMAGE is where a target-bearing clause can ask, and this is the
         // only place that knows -- the caller holds the Skill, the instance carries the answer.
