@@ -1,0 +1,102 @@
+{
+  "1": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone21025_next_ally",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.16,
+          "turns": 1,
+          "target": "next_ally"
+        }
+      ],
+      "source": "光锥 21025 旧日纸鸢: 当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高#1[i]%，持续#2[i]回合。",
+      "note": "「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #1[i]%，持续 #2[i]=1 回合」—— 事件 ATTACK_FINISHED（⚠ 不能用 SKILL_CAST：它不携带类别 ✗）+ from_category BPSKILL ✓；目标用新选择器 `next_ally` ✓（引擎本轮新增 ✓）：从当前行动者之后沿队列绕行，跳过非我方与自己 ✓ —— ⚠ 用 peekNext() 的堆顶是错的 ✗（实测它可能是行动者本人）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone21025_next_ally",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.2,
+          "turns": 1,
+          "target": "next_ally"
+        }
+      ],
+      "source": "光锥 21025 旧日纸鸢: 当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高#1[i]%，持续#2[i]回合。",
+      "note": "「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #1[i]%，持续 #2[i]=1 回合」—— 事件 ATTACK_FINISHED（⚠ 不能用 SKILL_CAST：它不携带类别 ✗）+ from_category BPSKILL ✓；目标用新选择器 `next_ally` ✓（引擎本轮新增 ✓）：从当前行动者之后沿队列绕行，跳过非我方与自己 ✓ —— ⚠ 用 peekNext() 的堆顶是错的 ✗（实测它可能是行动者本人）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone21025_next_ally",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "next_ally"
+        }
+      ],
+      "source": "光锥 21025 旧日纸鸢: 当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高#1[i]%，持续#2[i]回合。",
+      "note": "「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #1[i]%，持续 #2[i]=1 回合」—— 事件 ATTACK_FINISHED（⚠ 不能用 SKILL_CAST：它不携带类别 ✗）+ from_category BPSKILL ✓；目标用新选择器 `next_ally` ✓（引擎本轮新增 ✓）：从当前行动者之后沿队列绕行，跳过非我方与自己 ✓ —— ⚠ 用 peekNext() 的堆顶是错的 ✗（实测它可能是行动者本人）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone21025_next_ally",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.28,
+          "turns": 1,
+          "target": "next_ally"
+        }
+      ],
+      "source": "光锥 21025 旧日纸鸢: 当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高#1[i]%，持续#2[i]回合。",
+      "note": "「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #1[i]%，持续 #2[i]=1 回合」—— 事件 ATTACK_FINISHED（⚠ 不能用 SKILL_CAST：它不携带类别 ✗）+ from_category BPSKILL ✓；目标用新选择器 `next_ally` ✓（引擎本轮新增 ✓）：从当前行动者之后沿队列绕行，跳过非我方与自己 ✓ —— ⚠ 用 peekNext() 的堆顶是错的 ✗（实测它可能是行动者本人）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone21025_next_ally",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "turns": 1,
+          "target": "next_ally"
+        }
+      ],
+      "source": "光锥 21025 旧日纸鸢: 当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高#1[i]%，持续#2[i]回合。",
+      "note": "「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #1[i]%，持续 #2[i]=1 回合」—— 事件 ATTACK_FINISHED（⚠ 不能用 SKILL_CAST：它不携带类别 ✗）+ from_category BPSKILL ✓；目标用新选择器 `next_ally` ✓（引擎本轮新增 ✓）：从当前行动者之后沿队列绕行，跳过非我方与自己 ✓ —— ⚠ 用 peekNext() 的堆顶是错的 ✗（实测它可能是行动者本人）。"
+    }
+  ]
+}

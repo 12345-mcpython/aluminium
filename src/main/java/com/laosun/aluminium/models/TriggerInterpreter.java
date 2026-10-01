@@ -139,7 +139,7 @@ public final class TriggerInterpreter {
      * variables being a closed set.
      */
     private static final Set<String> TARGET_SELECTORS =
-            Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
+            Set.of("next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
                     "target_and_summon", "all_enemies", "lowest_hp_ally",
             "random_enemy", "random_hit_enemy");
 
@@ -1226,6 +1226,35 @@ public final class TriggerInterpreter {
         return hitEnemies.isEmpty() ? null : hitEnemies.get(ctx.battle().getRng().nextInt(hitEnemies.size()));
     }
 
+    /**
+     * The next unit on OUR side to act after the current one, walking the queue forward and wrapping (2026-09-30).
+     *
+     * <p>For cone 21025's 「使下一个行动的我方其他目标造成的伤害提高」. "Next to act" is read from the queue order, and the
+     * walk starts AFTER the acting unit: the head alone is wrong (measured -- {@code peekNext()} returns the head, which
+     * can be the acting unit itself), and taking the party's first ally is wrong too (that is the unit who just acted).
+     */
+    private static CanHit nextAllyToAct(TriggerContext ctx) {
+        Battle battle = ctx.battle();
+        if (battle == null || battle.queue == null) {
+            return null;
+        }
+        List<CanHit> order = new java.util.ArrayList<>();
+        for (var signal : battle.getQueueSnapshot()) {
+            order.add(signal.getCanHit());
+        }
+        if (order.isEmpty()) {
+            return null;
+        }
+        int start = order.indexOf(ctx.owner()) + 1;
+        for (int i = 0; i < order.size(); i++) {
+            CanHit candidate = order.get((start + i) % order.size());
+            if (candidate != ctx.owner() && battle.allies.contains(candidate)) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
     private static CanHit resolveTarget(EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
         return switch (selector) {
@@ -1235,6 +1264,12 @@ public final class TriggerInterpreter {
             case "summon" -> requireSummon(ctx);
             // \u2705 \u300c\u968f\u673a 1 \u4e2a\u654c\u65b9\u76ee\u6807\u300d: the roll is the battle\u2019s own seeded one, so the same seed picks the
             // same unit -- and the judge can therefore pin both determinism and genuine variation.
+            // 「下一个行动的我方其他目标」(cone 21025): the unit that will act after this one, walking the
+            // queue forward and wrapping, skipping the other side and the owner itself. The text says
+            // "下一个行动" -- the NEXT to act, not the party's first ally (which would be the one who just
+            // acted). Read from the queue; the head alone is not enough (measured: peekNext() can be the
+            // acting unit itself).
+            case "next_ally" -> require(nextAllyToAct(ctx), "next_ally", ctx);
             case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);
             case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                     TARGET_RANDOM_ENEMY, ctx);
