@@ -10024,6 +10024,35 @@
 >   光锥六维变异 **69 条 / 0 盲区** ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之五百八十四：**`Weapon.build` 的第二参数**不影响档位**（实测 9 行读数）；按档覆盖需换 API**）**：
+> 
+> * ⭐⭐⭐ **探针读数（全量 9 行 ✓ 不筛 ✓）**：
+>   [probe] cone=20002 second=1 battleStartRules=[boost_basic_attack_damage_boost_1, boost_skill_damage_boost_1]
+>   [probe] cone=20002 second=2 battleStartRules=[boost_basic_attack_damage_boost_1, boost_skill_damage_boost_1]
+>   [probe] cone=20002 second=3 battleStartRules=[boost_basic_attack_damage_boost_1, boost_skill_damage_boost_1]
+>   [probe] cone=20002 second=5 battleStartRules=[boost_basic_attack_damage_boost_1, boost_skill_damage_boost_1]
+>   [probe] cone=20002 second=9 battleStartRules=[boost_basic_attack_damage_boost_1, boost_skill_damage_boost_1]
+>   [probe] cone=20002 second=80 battleStartRules=[boost_basic_attack_damage_boost_1, boost_skill_damage_boost_1]
+>   [probe] cone=21061 second=1 battleStartRules=[]
+>   [probe] cone=21061 second=5 battleStartRules=[]
+>   [probe] cone=21061 second=80 battleStartRules=[]
+> * ⭐⭐⭐ **定论** ✓：`20002` 的**每一个**第二参数（**1 / 2 / 3 / 5 / 9 / 80** ✓）都取回**同一套 tier 1 规则** ✓
+>   （`boost_basic_attack_damage_boost_1` / `boost_skill_damage_boost_1` ✓）
+>   ⇒ ✅ **`Weapon.build(cone, second)` 的第二个参数不影响档位** ✓，
+>     经该入口装配的表**总是最低存在的那一档** ✓（与第 162 轮看到的"rank 2 取不到"一致 ✓）。
+> * ⭐⭐ **两条直接后果** ✓：
+>   ① ✅ **当前判据（`Weapon.build(cone, 9)`）是正确的、且与装配行为一致** ✓
+>      （它断言的就是"**实际装配出来的那一档**" ✓）⇒ **不需要改** ✓；
+>   ② ⚠ **"按档覆盖"经这个入口做不到** ✗ —— 因为**入口根本不暴露档位** ✓。
+> * ✅ **若要真做按档覆盖（正确路线 ✓）**：第 156 轮读代码时见过另一个入口 ✓ ——
+>   **`WeaponTriggerTables.of(int weaponId, int rank)`** ✓（`public static synchronized TriggerTable of(...)` ✓），
+>   它**直接收 rank** ✓ ⇒ ⭐ 下一轮可用它**逐档取表**并断言各档自己的条件 ✓
+>   （⚠ 前提：**先打印**它返回的规则集合 ✓ 确认 rank 真的生效 ✓ —— ㉚ 的教训 ✓）。
+> * ⭐⭐⭐ **本轮把 ㉚ 用对了一次 ✓**：不再从"读到的实现"推断 ✓，而是**打印"传入不同值得到什么"** ✓
+>   ⇒ 一次实验就把一个**悬了三轮**的接口疑问解决 ✓，而且顺带确认了**现有判据是对的** ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
