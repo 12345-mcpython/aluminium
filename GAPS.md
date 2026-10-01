@@ -14420,6 +14420,44 @@
 > * ⭐ **累计修正 23 条** ✓（⚠ 遗器 4 ✓、光锥 4 ✓、**角色 12** ✓、引擎侧陈旧注记 3 ✓）；
 >   ⭐ **本段五条能力（全带引擎级变异证明 ✓）**：`CAST_SETUP` 携带被瞄准者 ✓、`next_ally` ✓、
 >   `is_party_first` ＋ `party_first` ✓、同行组两关键词 ✓、`self_energy_percent` ✓。
+
+> **2026-09-30 更新（aggro 回收之七百五十九：效果级重复 —— 落点已精确到行，三点改动）**：
+>
+> * ⭐⭐⭐ **为什么这次值得做** ✓：⚠ 读者 **9** ✓（⚠ 见上一条 ✓）、⚠ 改动面 **3 点** ✓、
+>   ⚠ 落点**已精确到行** ✓、⚠ 所需语义**由现成结构白送** ✓ —— ⚠ 这四样同时具备的能力，本段仅此一个 ✓。
+> * ⭐⭐⭐ **关键洞察（本轮实测 ✓）**：⚠ `resolveTargets(...)` 是**在逐目标的循环里**被调用的 ✗：
+>   ```java
+>    949:      case "DAMAGE" -> {
+>    952:          for (CanHit victim : resolveTargets(battle, effect, ctx)) {   // ⭐ 目标解析在循环内 ✓
+>   3492:      private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim)
+>   1310:      private static List<CanHit> resolveTargets(Battle battle, EffectSpec effect, TriggerContext ctx)
+>   ```
+>   ⇒ ⚠ 只要把 `:952` 的循环**包进一个重复循环** ✓：
+>   ```java
+>   for (int i = 0; i < times; i++)
+>       for (CanHit victim : resolveTargets(battle, effect, ctx)) { … }
+>   ```
+>   ⭐ **每次重复都会重新调用 `resolveTargets`** ✓ ⇒ ⚠ **「每次对随机单体」要的"逐次重抽"是白送的** ✓ ✓
+>   —— ⚠ 不需要为目标重解析单独做任何事 ✓。
+> * ✅ **三点改动（全部有先例可照 ✓）**：
+>   1. ⚠ **加字段** ✗：`EffectSpec` 加 `@SerializedName("times") private Integer times;` ✓
+>      （⚠ 照同档 `per_target` 的写法 ✓，`EffectSpec:547-548` ✓）；
+>   2. ⭐ **包循环** ✓：`TriggerInterpreter:949` 的 `case DAMAGE` 里，把 `:952` 的循环外包一层 ✓；
+>   3. ⚠ **装载期守卫** ✗：`TriggerInterpreter:321` 的校验分支 ✓。
+> * ⭐ **守卫该拒什么（有现成风格 ✓）**：⚠ `TriggerInterpreter:2173` 原文 ——
+>   *"Op … cannot combine `scale` with `per_target`: the scale is already a share …"* ✓
+>   ⇒ ⭐ **本项目的风格是"意义会二义性的组合一律拒绝"** ✓ ⇒ ⚠ 所以 **`times` 与 `per_target` 同用应当拒绝** ✓
+>   （⚠ "重复 6 次" × "按命中数倍增" 有两个读法 ✓）；⚠ 且 `times` 只应出现在 `DAMAGE` 上 ✓。
+> * ⚠ **出货第一个读者（建议 ✓）**：⚠ `1009` 艾丝妲「**额外造成 4 次**伤害，每次对随机敌方单体造成 50% 
+>   攻击力火伤」✓ 或 `8005`「额外造成 4 次…50% 攻击力虚数伤害」✓ —— ⚠ 两句形状**完全相同** ✓，
+>   都只需 `DAMAGE` + `times: 4` + `target: random_enemy` + 字面倍率 ✓。
+> * ⚠ **判据与变异（照本段成熟流程 ✓）**：⚠ 判据走 `matching` 正反例 ✓，⚠ 并断言**结算次数**（⚠ 例如
+>   `times: 3` 时伤害实例数 / 总伤害 = 3 倍 ✓）；⚠ 引擎级变异 = ⚠ **把 `times` 读成 1** ✗ ⇒ ⚠ 判据必红 ✓。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`4b7e052` ✓）；
+>   角色 93 / 93、光锥 165 / 169（登记表 4 条 ✓）、遗器 59 规则文件 ＋ 登记表 1 条（`132` ✓）。
+> * ⭐ **本段五条能力（全带引擎级变异证明 ✓）**：`CAST_SETUP` 携带被瞄准者 ✓、`next_ally` ✓、
+>   `is_party_first` ＋ `party_first` ✓、同行组两关键词 ✓、`self_energy_percent` ✓；
+>   ⭐ **累计修正 23 条陈旧/腐烂声明** ✓（⚠ 遗器 4 ✓、光锥 4 ✓、角色 12 ✓、引擎侧 3 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
