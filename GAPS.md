@@ -8856,6 +8856,27 @@
 >   ⑥ ⭐ **读结构化数据要用 `json.load`，不要用正则** ✓（本轮正则 0 命中、JSON 一扫就有 ✓）。
 > * **进度（回退后，实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之五百二十一：**"平铺增伤"的正确挂点找到了（JSON 扫描 ✓）—— 21061 已可一次写完**）**：
+> 
+> * ⚠ **本轮没有出货** ✗（树干净、全量绿 ✓），但**找到了唯一缺的那一条事实** ✓。
+> * ⭐⭐⭐ **实测（本轮，用 `json.load` 扫描全部已出货光锥 ✓）**：凡是"**平铺的、永久的** `ALL_DAMAGE_TYPE_BOOST`" ✓，
+>   挂点都是 **`DEALING_DAMAGE`** ✓ —— **不是** `BATTLE_START` ✗（我在 21061 上一连试了四次 ✗）：
+>   * **21010.json**：`on=DEALING_DAMAGE` ✓、`when=['actor == self', 'target_stacks:睦准 >= 1']` ✓、`percent` 按 tier 0.08–0.16 ✓；
+>   * **21011.json**：`on=DEALING_DAMAGE` ✓、`when=['actor is_ally', 'damage_element_is_self']` ✓、`percent=0.12` ✓。
+>   ⇒ ✅ **结论：`BATTLE_START` 上的 `MODIFY_ATTR … permanent` 不会落地** ✓（这解释了四次读数都只剩余属性 0.16 ✓），
+>     而 `DEALING_DAMAGE` 上"每次伤害都带上这条永久加成"才是本仓的既有写法 ✓。
+> * ⭐⭐ **下一轮的 21061（已完全规格化 ✓，可一次写完 ✓）**：
+>   ① `{"on": "DEALING_DAMAGE", "when": ["actor == self"], "do": [{"op": "MODIFY_ATTR", "attribute":
+>      "ALL_DAMAGE_TYPE_BOOST", "percent": 0.32, "permanent": true, "target": "self"}]}` ✓（照抄 21010 的形状 ✓）；
+>   ② 同一条事件上的易伤规则 ✓：`MODIFY_DAMAGE_TAKEN 0.16` + `turns: 2` + `chance: 1.0` + `target: target` ✓（这条**已实测可用** ✓）；
+>   ③ 判据读 `ALL_DAMAGE_TYPE_BOOST`：**期望 = 属性行 0.16 + 句子 0.32 = 0.48** ✓（⚠ 0.16 是光锥自身属性行 ✓，别把它当成句子 ✓）；
+>   ④ 装配用 **`Weapon.build(21061, LEVEL)` + `CharacterFactory.create(WEARER, LEVEL, true, weapon)`** ✓（已实测 ✓）。
+> * ⭐⭐⭐ **纪律合并（本段共六条，本轮新增第 ⑥ ✓）**：① 换目标先量**数据入口** ✓；② 调 API 前先打印**真实装配行** ✓；
+>   ③ 事件能不能带 actor/target **交给守卫** ✓；④ **读数不要截断** ✓；⑤ 写不落地的效果前**先找同类既有文件照抄** ✓；
+>   ⑥ ⭐ **读结构化数据用 `json.load`，不要用正则** ✓（本轮正则 `not found` ✗、JSON 一扫即得 ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
