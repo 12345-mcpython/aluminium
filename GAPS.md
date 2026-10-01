@@ -7916,6 +7916,27 @@
 >   【狐狸老师】的追加攻击 ✗；反向同步（**循环**风险 ✗）；「至少计入能量上限的【好活当赏】」✗。
 > * **进度（实测 ✓）**：角色 **91 内容 / 93 数据** ✓（1502/1506 仍缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百七十：**新能力 —— 规则驱动的**普通**伤害实例；1505 秘技的伤害从句出货**）**：
+> 
+> * ✅ **能力（读者：1505 秘技 ✓，以及"造成等同于…的物理属性伤害"这一族 ✓）** ✓：`DAMAGE` 效果新增 **`ordinary: true`** ✓
+>   —— 它走**公开的** `Battle.applyDamage`（= 一次命中的**主实例** ✓），而原来的路径只产生**附加伤害** ✓
+>   （`applyAdditionalDamage` ✓：`KILL_ONLY` 回能 ✓ + `notCountsAsAttack` ✓）⇒ 那两句**语义不同** ✓。
+> * ✅ **出货：1505 秘技的伤害** ✓：`BATTLE_START` ⇒ `DAMAGE` + `scale: self_attr:ATTACK` + **`percent: 1.0`** +
+>   `element: physical` + **`target: all_enemies`** + **`ordinary: true`** ✓（原文：「进入战斗后，对敌方全体造成等同于绯英 **100%** 攻击力的物理属性伤害」✓）。
+> * ⭐⭐⭐ **判据被实测纠正过一次（值得记 ✓）**：我第一版假设"普通结算会在 `applyDamage` 里给**受击者**回能" ✗
+>   ⇒ 读数 **`0 -> 0`** ✓（回能其实发生在**攻击管线**里 ✓）⇒ 那条读数**根本不能区分两条路径** ✗！
+>   ✅ 换成**真正的判别式** `countsAsAttack` ✓：在**盟友**身上种一条 `damage_is_attack` 的探针规则 ✓
+>   （⭐ 种在盟友身上是有意的 ✓ —— 替换**被测角色**的表会把被测的规则自己删掉 ✗，这条坑第 70 轮踩过 ✓）
+>   ⇒ 读数：`[ordinary] the technique took 561.7920133759908 in total, and 842.6880200640007 when a
+>   `damage_is_attack` rule was watching (x1.500000000000026)` ✓ —— **正好 ×1.5** ✓（探针 +50% 生效 ✓），
+>   附加伤害**不会**被它看到 ✓。
+> * **判据读数（实测 ✓）** ✓：规格 `[ordinary] spec p1505_technique_damage percent=1.0 target=all_enemies ordinary=true` ✓。
+> * **三条变异 + 一条对照（判红前先删 XML 并校验年龄 ✓）** ✓：the technique settles as additional damage(applied=True)=2 | the technique is 50% instead of 100%(applied=True)=1 | the ordinary branch is never taken(applied=True)=1
+> * ✅ 三条**全部为红** ✓。
+> * **引擎级对照** ✓（写成能编译的语句 ✓）：把那一支**取反**（普通伤害改走附加路径）⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
+> * **进度（实测 ✓）**：角色 **91 内容 / 93 数据** ✓（1502/1506 仍缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
