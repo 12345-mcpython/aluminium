@@ -140,7 +140,8 @@ public final class TriggerInterpreter {
      */
     private static final Set<String> TARGET_SELECTORS =
             Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
-                    "target_and_summon", "all_enemies", "lowest_hp_ally");
+                    "target_and_summon", "all_enemies", "lowest_hp_ally",
+            "random_enemy");
 
     /**
      * The two spellings of "every one of our characters".
@@ -191,6 +192,14 @@ public final class TriggerInterpreter {
      * the list resolver and not the single-target one.
      */
     private static final String TARGET_ALL_ENEMIES = "all_enemies";
+    /**
+     * \u2705 \u300c\u5bf9<b>\u968f\u673a</b>1 \u4e2a\u2026\u7684\u654c\u65b9\u76ee\u6807\u300d (2026-09-30; reader: 1505\u2019s ultimate rider, and the family of
+     * \u201crandom 1\u201d sentences this project had registered as unexpressible: 21029 / 21021 / 21032).
+     *
+     * <p>\u26a0 It is a SINGLE target, so it answers in {@code resolveTarget}; an op that wants a list still refuses it, which is the
+     * honest answer -- \u300c\u968f\u673a 1 \u4e2a\u300d is not a group.
+     */
+    private static final String TARGET_RANDOM_ENEMY = "random_enemy";
 
     /**
      * "The ally with the lowest HP <b>percentage</b>" — 「当前<b>生命值百分比</b>最低的我方目标」.
@@ -1166,6 +1175,10 @@ public final class TriggerInterpreter {
             case "target" -> require(ctx.target(), "target", ctx);
             case "attacker" -> require(ctx.actor(), "attacker", ctx);
             case "summon" -> requireSummon(ctx);
+            // \u2705 \u300c\u968f\u673a 1 \u4e2a\u654c\u65b9\u76ee\u6807\u300d: the roll is the battle\u2019s own seeded one, so the same seed picks the
+            // same unit -- and the judge can therefore pin both determinism and genuine variation.
+            case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
+                    TARGET_RANDOM_ENEMY, ctx);
             default -> throw new IllegalStateException(
                     "Effect names the target selector '" + selector + "', which can reach several units: it needs "
                             + "an op that takes a list, not one that resolves a single target");

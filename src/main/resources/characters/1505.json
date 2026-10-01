@@ -95,6 +95,27 @@
       ],
       "source": "绯英 天赋：「当绯英持有【好活当赏】时：施放终结技可对敌方全体造成#6[i]%的物理属性欢愉伤容。」",
       "note": "⭐ 三件事合作 ✓：**`CAST_SETUP`** ✓（每次施放一次 ✓ —— ⚠ 不能用 `DEALING_DAMAGE` ✗：大招打全体会产生 N 个伤容实例 ✗，规则会跟着触发 N 次 ✗）、`from_category ULTRA` ✓、**带类型的附加伤容 + `all_enemies`** ✓。⚠ 同句的另两半已登记 ✗：「对随机造成伤容的敌方目标造成 14%」（**随机目标** ✗）与「至少计入等同于**能量上限**的【好活当赏】」（需要\"用量至少为 X\" ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "p1505_ult_random_rider",
+      "when": [
+        "actor == self",
+        "from_category ULTRA",
+        "self_resource:好活当赏 >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.14,
+          "element": "physical",
+          "damage_type": "ELATION",
+          "target": "random_enemy"
+        }
+      ],
+      "source": "绯英 天赋：「…并对终结技随机造成伤容的敌方目标造成#8[i]%的物理属性欢愉伤容。」",
+      "note": "⭐ 读者原文 ✓：「对终结技**随机**造成伤容的敌方目标造成 14%」✓ ⇒ 新选择器 **`random_enemy`** ✓（单个目标 ✓；抽签用战斗自己的**种子随机** ✓）。⚠ 已登记 ✗：原句的\"随机造成伤容的\"限定（=只在**大招命中过**的目标里抽 ✗）当前只能表达为\"在存活敌方中抽一个\" ✓。"
     }
   ]
 }
