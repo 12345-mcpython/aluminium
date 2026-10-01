@@ -72,4 +72,32 @@ public class Cone23007Test {
             }
         }
     }
+
+    /**
+     * The second sentence: the crit rate against a target carrying three or more negative effects.
+     *
+     * <p>\u26a0 The bonus belongs to THIS hit, so it carries {@code instance: true} -- without it the op would raise the
+     * WEARER's attribute for a while, a different sentence. \u26a0 It also carries {@code permanent}, because the op's
+     * validation demands one of turn/permanent/until even on the instance path (measured 2026-09-30).
+     * \u26a0 The threshold reads {@code >= 3.0}: the parser writes an integral threshold with a decimal point.
+     */
+    @Test
+    public void theCritClauseIsAnInstanceModifier() {
+        for (int rank = 1; rank <= 5; rank++) {
+            var table = wearer(rank).getTriggerTable();
+            var rules = table.rulesFor(TriggerEvent.DEALING_DAMAGE).stream()
+                    .filter(r -> r.id().equals("cone23007_crit_vs_debuffed")).toList();
+            Assertions.assertEquals(1, rules.size(), "rank " + rank + ": the crit rule");
+            var conditions = rules.getFirst().conditions().stream().map(c -> c.source()).toList();
+            Assertions.assertEquals(List.of("actor == self", "target_debuff_count >= 3.0"), conditions,
+                    "rank " + rank + ": the threshold, in the form the parser writes");
+            var effect = rules.getFirst().effects().getFirst();
+            Assertions.assertEquals("MODIFY_ATTR", effect.getOp());
+            Assertions.assertEquals("CRIT_CHANCE", effect.getAttribute());
+            Assertions.assertEquals(VULN[rank - 1], effect.getPercent(), 1e-9, "rank " + rank + ": the crit rate");
+            Assertions.assertEquals(Boolean.TRUE, effect.getInstance(),
+                    "the crit bonus is a property of the hit, not of the wearer");
+            System.out.println("[23007] rank=" + rank + " crit conditions=" + conditions);
+        }
+    }
 }
