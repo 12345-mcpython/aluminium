@@ -555,6 +555,11 @@ public final class SkillExecutor {
         // ? Which skill caused it (2026-09-28): DEALING_DAMAGE is where a target-bearing clause can ask, and this is the
         // only place that knows -- the caller holds the Skill, the instance carries the answer.
         damage.setSkillKey(skillKey);
+        // ✅ The attack’s hit set rides the instance, like skillKey and stance (2026-09-30):
+        // a `DEALING_DAMAGE` rule is handed this damage, so 「a random one of the enemies HIT」 can read it.
+        // ⚠ MEASURED SEMANTICS: the set is snapshotted here, so a PER-HIT reader sees 「so far」 while a
+        // CAST-LEVEL reader (「after the wearer casts a basic attack or skill」, firing after settlement) sees all.
+        damage.setHitTargets(hitTargets);
         // ⚠ The intended toughness reduction rides on the instance (2026-09-28): a `DEALING_DAMAGE` rule is handed this
         // damage, and 「本次伤害的**削韧值**」 has to be readable there -- 1321/8006's super-break clauses are exactly that.
         // ⚠ Set BEFORE the settlement below: `DEALING_DAMAGE` is fired from inside `battle.applyDamage`.
