@@ -114,6 +114,25 @@ public class Battle {
     public List<CanHit> enemies;
 
     /**
+     * \u2705 One living unit from the other side, chosen with the battle\u2019s own seeded randomness (2026-09-30; reader:
+     * 1505 \u7eef\u82f1\u2019s ultimate, \u300c\u5bf9\u968f\u673a\u9020\u6210\u4f24\u5bb9\u7684\u654c\u65b9\u76ee\u6807\u9020\u6210 14%\u2026\u300d).
+     *
+     * <p>\u2605 The roll lives here rather than in the interpreter for the same reason crit does: one seeded source means a judge
+     * can pin determinism (same seed -> same pick) and still show the choice varies across seeds.
+     *
+     * @return the chosen unit, or {@code null} when the other side is already empty
+     */
+    public CanHit randomOpponent(CanHit owner) {
+        List<CanHit> candidates = new ArrayList<>();
+        for (CanHit unit : getOpponents(owner)) {
+            if (unit != null && !unit.isDeath()) {
+                candidates.add(unit);
+            }
+        }
+        return candidates.isEmpty() ? null : candidates.get(rng.nextInt(candidates.size()));
+    }
+
+    /**
      * The {@link Enemy} entries of {@link #enemies}, in the same order — the monsters, without any
      * summon that may be sharing the camp.
      *
