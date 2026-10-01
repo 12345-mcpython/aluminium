@@ -74,6 +74,25 @@
       ],
       "source": "光锥 23007 雨一直下: 装备者施放普攻、战技、终结技后，有#2[i]%的基础概率对随机1个未持有【以太编码】的受击目标施加【以太编码】。持有【以太编码】的目标受到的伤害提高#3[i]%，持续1回合。",
       "note": "同句的第三个并列（终结技）。条件 DSL 没有 OR，照 1215 的既有做法拆成两条规则：每次施放恰好命中一条 ⇒ 恰好施加一次。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23007_crit_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
+      "note": "「对同时处于 ≥3 个负面效果的敌方目标造成伤害时，暴击率提高」——① 事件 DEALING_DAMAGE ✓（引擎在结算防御区之前发它 ✓，所以这一击的暴击率还来得及改 ✓）；② 阈值用 target_debuff_count >= 3 ✓（引擎的闭合条件名单里已有它 ✓，实现是 ctx.target().getBuffManager().debuffCount() ✓ —— 数的是被打的那个敌人的负面效果 ✓，第 252 轮核实过口径 ✓）；③ 写法用 MODIFY_ATTR + attribute CRIT_CHANCE + instance: true ✓ ——instance: true 是必须的 ✓（否则会改拥有者的属性、语义完全不同 ✗），它把加成落到\"本次命中的实例\"上（Damage.addCritChance ✓，第 255 轮定位 ✓）；④ 数值 #5[i] 逐档 = 0.12/0.14/0.16/0.18/0.2 ✓。"
     }
   ],
   "2": [
@@ -151,6 +170,25 @@
       ],
       "source": "光锥 23007 雨一直下: …终结技后…",
       "note": "第 2 档的终结技并列。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23007_crit_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.14,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
+      "note": "「对同时处于 ≥3 个负面效果的敌方目标造成伤害时，暴击率提高」——① 事件 DEALING_DAMAGE ✓（引擎在结算防御区之前发它 ✓，所以这一击的暴击率还来得及改 ✓）；② 阈值用 target_debuff_count >= 3 ✓（引擎的闭合条件名单里已有它 ✓，实现是 ctx.target().getBuffManager().debuffCount() ✓ —— 数的是被打的那个敌人的负面效果 ✓，第 252 轮核实过口径 ✓）；③ 写法用 MODIFY_ATTR + attribute CRIT_CHANCE + instance: true ✓ ——instance: true 是必须的 ✓（否则会改拥有者的属性、语义完全不同 ✗），它把加成落到\"本次命中的实例\"上（Damage.addCritChance ✓，第 255 轮定位 ✓）；④ 数值 #5[i] 逐档 = 0.12/0.14/0.16/0.18/0.2 ✓。"
     }
   ],
   "3": [
@@ -228,6 +266,25 @@
       ],
       "source": "光锥 23007 雨一直下: …终结技后…",
       "note": "第 3 档的终结技并列。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23007_crit_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.16,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
+      "note": "「对同时处于 ≥3 个负面效果的敌方目标造成伤害时，暴击率提高」——① 事件 DEALING_DAMAGE ✓（引擎在结算防御区之前发它 ✓，所以这一击的暴击率还来得及改 ✓）；② 阈值用 target_debuff_count >= 3 ✓（引擎的闭合条件名单里已有它 ✓，实现是 ctx.target().getBuffManager().debuffCount() ✓ —— 数的是被打的那个敌人的负面效果 ✓，第 252 轮核实过口径 ✓）；③ 写法用 MODIFY_ATTR + attribute CRIT_CHANCE + instance: true ✓ ——instance: true 是必须的 ✓（否则会改拥有者的属性、语义完全不同 ✗），它把加成落到\"本次命中的实例\"上（Damage.addCritChance ✓，第 255 轮定位 ✓）；④ 数值 #5[i] 逐档 = 0.12/0.14/0.16/0.18/0.2 ✓。"
     }
   ],
   "4": [
@@ -305,6 +362,25 @@
       ],
       "source": "光锥 23007 雨一直下: …终结技后…",
       "note": "第 4 档的终结技并列。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23007_crit_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.18,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
+      "note": "「对同时处于 ≥3 个负面效果的敌方目标造成伤害时，暴击率提高」——① 事件 DEALING_DAMAGE ✓（引擎在结算防御区之前发它 ✓，所以这一击的暴击率还来得及改 ✓）；② 阈值用 target_debuff_count >= 3 ✓（引擎的闭合条件名单里已有它 ✓，实现是 ctx.target().getBuffManager().debuffCount() ✓ —— 数的是被打的那个敌人的负面效果 ✓，第 252 轮核实过口径 ✓）；③ 写法用 MODIFY_ATTR + attribute CRIT_CHANCE + instance: true ✓ ——instance: true 是必须的 ✓（否则会改拥有者的属性、语义完全不同 ✗），它把加成落到\"本次命中的实例\"上（Damage.addCritChance ✓，第 255 轮定位 ✓）；④ 数值 #5[i] 逐档 = 0.12/0.14/0.16/0.18/0.2 ✓。"
     }
   ],
   "5": [
@@ -382,6 +458,25 @@
       ],
       "source": "光锥 23007 雨一直下: …终结技后…",
       "note": "第 5 档的终结技并列。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23007_crit_vs_debuffed",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.2,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
+      "note": "「对同时处于 ≥3 个负面效果的敌方目标造成伤害时，暴击率提高」——① 事件 DEALING_DAMAGE ✓（引擎在结算防御区之前发它 ✓，所以这一击的暴击率还来得及改 ✓）；② 阈值用 target_debuff_count >= 3 ✓（引擎的闭合条件名单里已有它 ✓，实现是 ctx.target().getBuffManager().debuffCount() ✓ —— 数的是被打的那个敌人的负面效果 ✓，第 252 轮核实过口径 ✓）；③ 写法用 MODIFY_ATTR + attribute CRIT_CHANCE + instance: true ✓ ——instance: true 是必须的 ✓（否则会改拥有者的属性、语义完全不同 ✗），它把加成落到\"本次命中的实例\"上（Damage.addCritChance ✓，第 255 轮定位 ✓）；④ 数值 #5[i] 逐档 = 0.12/0.14/0.16/0.18/0.2 ✓。"
     }
   ]
 }
