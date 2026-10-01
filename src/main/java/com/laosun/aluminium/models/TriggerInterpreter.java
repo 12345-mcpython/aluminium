@@ -110,6 +110,8 @@ public final class TriggerInterpreter {
      * Ops that are implemented today.
      */
     private static final Set<String> WIRED = Set.of(
+            // ⭐ 「为指定敌方单体添加 X 属性弱点」 (2026-09-30; readers 1315, 1310).
+            "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
@@ -286,6 +288,12 @@ public final class TriggerInterpreter {
                     "Unknown trigger op '" + op + "' (source: " + spec.getSource() + ")");
         }
         switch (op) {
+            case "ADD_ELEMENTAL_WEAKNESS" -> {
+                if (effect.getElement() == null || effect.getElement().isBlank()) {
+                    throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS requires element (source: " + spec.getSource() + ")");
+                }
+                requireNoStackArguments(effect, op, spec);
+            }
             case "GAIN_ENERGY" -> {
                 requireAmountOrScale(effect, op, spec, ENERGY_SCALES, "max energy");
                 requireNoStackArguments(effect, op, spec);
@@ -906,6 +914,15 @@ public final class TriggerInterpreter {
     private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String op = normalizeOp(effect, null);
         switch (op) {
+            case "ADD_ELEMENTAL_WEAKNESS" -> {
+                DamageElement weakness = DamageElement.fromString(effect.getElement());
+                if (weakness == null) {
+                    throw new IllegalStateException("Op ADD_ELEMENTAL_WEAKNESS names an element that is not a DamageElement");
+                }
+                for (CanHit victim : resolveTargets(battle, effect, ctx)) {
+                    if (victim instanceof com.laosun.aluminium.models.enemy.Enemy en) { en.addWeakness(weakness); }
+                }
+            }
             case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);
             case "GAIN_SKILL_POINT" -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
             case "HEAL" -> {
