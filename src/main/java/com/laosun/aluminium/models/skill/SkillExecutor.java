@@ -82,7 +82,15 @@ public final class SkillExecutor {
                 : skill.getData().getCategory();
         Battle.PendingCast cast = battle.beginCast(skill, user);
         try {
-            battle.fireTriggers(TriggerEvent.CAST_SETUP, user, null, 0, 0, category);
+            // The AIMED unit, not null (2026-09-30): `targets` is the caller's selection and only its first entry is
+            // the main target (see the method's javadoc), so this is exactly the unit the cast is aimed at -- the ally,
+            // when the skill is aimed at one. The pre-cast hook is where a rule still has time to change what the cast
+            // does, so it must be able to answer "at WHOM". Reader: light cone 23048 clause 3 ("after the wearer casts
+            // a skill on a single ally, the TARGET's skill damage rises"), which needs a category-carrying event that
+            // fires BEFORE settlement and names the ally -- SKILL_CAST names it but fires after, and it is refused by
+            // `from_category` for that reason (see CAST_CARRYING_EVENTS).
+            CanHit aimed = targets == null || targets.isEmpty() ? null : targets.getFirst();
+            battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category);
             if (!cast.damageDelegated()) {
                 resolveHits(battle, skill, user, targets, hitTargets);
             }
