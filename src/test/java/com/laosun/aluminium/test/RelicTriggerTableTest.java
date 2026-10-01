@@ -150,7 +150,9 @@ public class RelicTriggerTableTest {
      * <p>⚠ Looked up rather than named since 2026-09-27: it was 姬子 (1003) until her kit was authored, which put
      * a {@code BATTLE_START} rule of her own into the counts pinned below. See {@link TestCharacters}.
      */
-    private static final int NO_RULES = TestCharacters.withoutTriggerFile();
+    // \u2705 2026-09-30: a REAL character whose own file carries NO BATTLE_START rule (this suite counts them), so the count it
+    // reads is the RELIC SET’s alone. The old witness (a cid with no content file) no longer exists once every character ships.
+    private static final int NO_RULES = 1402;
 
     private static final int STAR = 5;
     private static final int LEVEL = 15;
