@@ -13,12 +13,11 @@
           "scale": "self_attr:DEFENCE",
           "percent": 0.4,
           "turns": 2,
-          "base_chance": 1,
           "target": "attacker"
         }
       ],
       "source": "光锥 21016: 「当装备者受到攻击后，有#2[i]%的基础概率使敌方目标陷入灼烧状态，每回合造成等同于装备者#3[i]%防御力的持续伤害，持续#4[i]回合」",
-      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。"
+      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。 ✅ 实测修正 ✓：数据为 100%–120% ✓（`ParamList` 第 2 项 = 1 / 1.05 / 1.1 / 1.15 / 1.2 ✓）⇒ 必定命中 ⇒ 按引擎写法**省略 `base_chance`** ✓（`TriggerTable` 提示：unstated chance is 100% ✓）。"
     }
   ],
   "2": [
@@ -35,12 +34,11 @@
           "scale": "self_attr:DEFENCE",
           "percent": 0.5,
           "turns": 2,
-          "base_chance": 1.05,
           "target": "attacker"
         }
       ],
       "source": "光锥 21016: 「当装备者受到攻击后，有#2[i]%的基础概率使敌方目标陷入灼烧状态，每回合造成等同于装备者#3[i]%防御力的持续伤害，持续#4[i]回合」",
-      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。"
+      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。 ✅ 实测修正 ✓：数据为 100%–120% ✓（`ParamList` 第 2 项 = 1 / 1.05 / 1.1 / 1.15 / 1.2 ✓）⇒ 必定命中 ⇒ 按引擎写法**省略 `base_chance`** ✓（`TriggerTable` 提示：unstated chance is 100% ✓）。"
     }
   ],
   "3": [
@@ -57,12 +55,11 @@
           "scale": "self_attr:DEFENCE",
           "percent": 0.6,
           "turns": 2,
-          "base_chance": 1.1,
           "target": "attacker"
         }
       ],
       "source": "光锥 21016: 「当装备者受到攻击后，有#2[i]%的基础概率使敌方目标陷入灼烧状态，每回合造成等同于装备者#3[i]%防御力的持续伤害，持续#4[i]回合」",
-      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。"
+      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。 ✅ 实测修正 ✓：数据为 100%–120% ✓（`ParamList` 第 2 项 = 1 / 1.05 / 1.1 / 1.15 / 1.2 ✓）⇒ 必定命中 ⇒ 按引擎写法**省略 `base_chance`** ✓（`TriggerTable` 提示：unstated chance is 100% ✓）。"
     }
   ],
   "4": [
@@ -79,12 +76,11 @@
           "scale": "self_attr:DEFENCE",
           "percent": 0.7,
           "turns": 2,
-          "base_chance": 1.15,
           "target": "attacker"
         }
       ],
       "source": "光锥 21016: 「当装备者受到攻击后，有#2[i]%的基础概率使敌方目标陷入灼烧状态，每回合造成等同于装备者#3[i]%防御力的持续伤害，持续#4[i]回合」",
-      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。"
+      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。 ✅ 实测修正 ✓：数据为 100%–120% ✓（`ParamList` 第 2 项 = 1 / 1.05 / 1.1 / 1.15 / 1.2 ✓）⇒ 必定命中 ⇒ 按引擎写法**省略 `base_chance`** ✓（`TriggerTable` 提示：unstated chance is 100% ✓）。"
     }
   ],
   "5": [
@@ -101,12 +97,11 @@
           "scale": "self_attr:DEFENCE",
           "percent": 0.8,
           "turns": 2,
-          "base_chance": 1.2,
           "target": "attacker"
         }
       ],
       "source": "光锥 21016: 「当装备者受到攻击后，有#2[i]%的基础概率使敌方目标陷入灼烧状态，每回合造成等同于装备者#3[i]%防御力的持续伤害，持续#4[i]回合」",
-      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。"
+      "note": "⭐ 用 **`TAKING_HIT`** ✓ + 条件 `target == self` ✓ + **`APPLY_DOT`** ✓（`scale: \"owner_def\"` ✓ —— 同于现有实例的写法 ✓）。⭐ 常数半（防御力）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 数值取自数据行 ✓（`base_chance` 是文本里的百分位数 ✓）。 ✅ 实测修正 ✓：数据为 100%–120% ✓（`ParamList` 第 2 项 = 1 / 1.05 / 1.1 / 1.15 / 1.2 ✓）⇒ 必定命中 ⇒ 按引擎写法**省略 `base_chance`** ✓（`TriggerTable` 提示：unstated chance is 100% ✓）。"
     }
   ]
 }
