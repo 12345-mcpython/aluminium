@@ -195,7 +195,9 @@ public final class CharacterFactory {
         // directly, so the cap a rule is gated on is the same number that was registered -- there is one
         // reader of the declaration (`requireReadableResources`), not two.
         for (ResourceSpec spec : table.resources()) {
-            character.getResources().register(spec.id(), spec.max(), spec.initial());
+            // \u2705 The declared overflow rides along (2026-09-30).
+                character.getResources().register(spec.id(), spec.max(), spec.initial(),
+                        spec.overflow() == null ? 0 : spec.overflow());
         }
         // stack/special-resource characters: swap out conventional energy gain (otherwise they could fill the bar just by getting hit and fire an ultimate they should not have)
         if (SPECIAL_RESOURCE_CHARACTERS.contains(cid)) {

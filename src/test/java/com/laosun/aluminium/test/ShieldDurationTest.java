@@ -253,7 +253,7 @@ public class ShieldDurationTest {
         private final Battle battle;
 
         private Fixture(TriggerSpec... specs) {
-            this(TestCharacters.withoutTriggerFile(), ALLY, specs);
+            this(1002, ALLY, specs);
         }
 
         private Fixture(int casterCid, int allyCid, TriggerSpec... specs) {

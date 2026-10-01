@@ -47,7 +47,10 @@ public class TriggerTableTest {
      * <p>⚠ Looked up rather than named since 2026-09-27: this was 姬子 (1003) until her own kit was authored, and
      * the control having acquired rules broke three of the claims below. See {@link TestCharacters}.
      */
-    private static final int NO_TRIGGERS = TestCharacters.withoutTriggerFile();
+    // \u2705 2026-09-30: split in two. The "there is no file" facts (`TriggerTables.exists` is false, a lookup is a cache miss)
+    // use a SYNTHETIC id that is never built; every use as a BODY builds 1002 instead, because those claims are about the table
+    // the test installs or about the body’s own data, not about the body having no rules.
+    private static final int NO_TRIGGERS = 999999;
 
     /**
      * An ally whose ultimate connects with <b>every</b> enemy — the driver for the 「per target hit」 pair.
@@ -100,7 +103,7 @@ public class TriggerTableTest {
     @Test
     public void tribbieScalesWithTheNumberOfTargets() {
         Character tribbie = CharacterFactory.create(TRIBBIE, 80);
-        Character himeko = CharacterFactory.create(NO_TRIGGERS, 80);
+        Character himeko = CharacterFactory.create(1002, 80);
         Battle battle = newBattle(List.of(tribbie, himeko), 1);
 
         double before = tribbie.getCurrentEnergy();
@@ -232,7 +235,7 @@ public class TriggerTableTest {
     @Test
     public void battleStartAndACastFireDifferentRules() {
         Character robin = CharacterFactory.create(ROBIN, 80);
-        Character himeko = CharacterFactory.create(NO_TRIGGERS, 80);
+        Character himeko = CharacterFactory.create(1402, 80);
         Battle battle = newBattle(List.of(robin, himeko), 1);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.BATTLE_START),
@@ -430,7 +433,7 @@ public class TriggerTableTest {
      */
     @Test
     public void modifyAttrOpAddsARatioAttributeRatherThanScalingIt() {
-        Character owner = CharacterFactory.create(NO_TRIGGERS, 80);
+        Character owner = CharacterFactory.create(1002, 80);
         double before = owner.getAttribute(AttributeType.CRIT_ATTACK).get();
         Assertions.assertTrue(before > 0, "precondition: the character's CRIT DMG comes from the data");
 
@@ -580,8 +583,8 @@ public class TriggerTableTest {
         TriggerTable table = new TriggerTable(1, List.of(
                 trigger("ALLY_ATTACK", List.of("actor != self", "hit_count > 0"), energy(2))));
 
-        Character owner = CharacterFactory.create(NO_TRIGGERS, 80);
-        Character other = CharacterFactory.create(NO_TRIGGERS, 80);
+        Character owner = CharacterFactory.create(1002, 80);
+        Character other = CharacterFactory.create(1002, 80);
 
         Assertions.assertEquals(1, table.matching(TriggerEvent.ALLY_ATTACK,
                 new TriggerTable.TriggerContext(owner, other, null, 1, 0)).size(),
@@ -602,8 +605,8 @@ public class TriggerTableTest {
         TriggerTable right = new TriggerTable(1, List.of(
                 trigger("ALLY_ATTACK", List.of("hit_count > 0"), energy(1))));
 
-        Character owner = CharacterFactory.create(NO_TRIGGERS, 80);
-        Character other = CharacterFactory.create(NO_TRIGGERS, 80);
+        Character owner = CharacterFactory.create(1002, 80);
+        Character other = CharacterFactory.create(1002, 80);
         TriggerTable.TriggerContext oneHit = new TriggerTable.TriggerContext(owner, other, null, 1, 0);
         TriggerTable.TriggerContext noHit = new TriggerTable.TriggerContext(owner, other, null, 0, 0);
 
@@ -619,8 +622,8 @@ public class TriggerTableTest {
         TriggerTable table = new TriggerTable(1, List.of(
                 trigger("SKILL_CAST", List.of("self"), energy(5))));
 
-        Character owner = CharacterFactory.create(NO_TRIGGERS, 80);
-        Character other = CharacterFactory.create(NO_TRIGGERS, 80);
+        Character owner = CharacterFactory.create(1002, 80);
+        Character other = CharacterFactory.create(1002, 80);
 
         Assertions.assertEquals(1, table.matching(TriggerEvent.SKILL_CAST,
                 new TriggerTable.TriggerContext(owner, owner, null, 0, 0)).size());

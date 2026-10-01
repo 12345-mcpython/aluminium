@@ -47,6 +47,9 @@ import com.google.gson.annotations.SerializedName;
 public record ResourceSpec(@SerializedName("id") String id,
                            @SerializedName("max") Integer max,
                            @SerializedName("initial") Integer initial,
+        // \u2705 A declared OVERFLOW (2026-09-30; reader: 1506\u2019s \u3010\u9690\u85cf\u5206\u3011: \u300c\u8fbe\u5230 60 \u70b9\u540e\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\uff0c\n        // \u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6ea2\u51fa 240 \u70b9\u300d). `Resource` has had both tiers all along (`max` + `maxOverflow`);
+        // what was missing was a way for a DECLARATION to state the second number.
+        @SerializedName("overflow") Integer overflow,
                            @SerializedName("source") String source,
                            @SerializedName("note") String note) {
 
@@ -97,13 +100,13 @@ public record ResourceSpec(@SerializedName("id") String id,
      * A declaration that starts at 0 and states no provenance — the ordinary case in a test.
      */
     public ResourceSpec(String id, int max) {
-        this(id, max, 0, null, null);
+        this(id, max, 0, null, null, null);
     }
 
     /**
      * The same, starting at a stated value.
      */
     public ResourceSpec(String id, int max, int initial) {
-        this(id, max, initial, null, null);
+        this(id, max, initial, null, null, null);
     }
 }
