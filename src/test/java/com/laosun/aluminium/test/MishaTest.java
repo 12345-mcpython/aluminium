@@ -36,7 +36,9 @@ public class MishaTest {
         Assertions.assertEquals(0.0, misha.getCurrentEnergy() - before, 1e-9,
                 "\u300c\u6211\u65b9\u5168\u4f53\u6bcf\u6d88\u8017 1 \u4e2a\u6218\u6280\u70b9\u300d -- an attack is not a spend");
 
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 0);
+        // 2026-09-30: the amount is the number of points spent -- 1, not 0. It used to be 0, which only passed
+        // while the literal `amount: 2` ignored the context entirely (measured rounds 680-682).
+        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 1);
         Assertions.assertEquals(2.0, misha.getCurrentEnergy() - before, 1e-6,
                 "\u300c\u540c\u65f6\u7c73\u6c99\u6062\u590d2.00\u70b9\u80fd\u91cf\u300d");
     }
