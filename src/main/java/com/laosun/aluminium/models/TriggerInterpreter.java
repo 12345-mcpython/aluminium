@@ -1217,7 +1217,7 @@ public final class TriggerInterpreter {
             return null;                      // unknown or nothing hit: the caller turns this into an error
         }
         List<CanHit> hitEnemies = pool.stream()
-                .filter(ctx.battle().getOpponents(null)::contains)
+                .filter(ctx.battle().getOpponents(ctx.owner())::contains)
                 .toList();
         return hitEnemies.isEmpty() ? null : hitEnemies.get(ctx.battle().getRng().nextInt(hitEnemies.size()));
     }
