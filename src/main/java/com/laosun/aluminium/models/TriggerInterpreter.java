@@ -1204,10 +1204,19 @@ public final class TriggerInterpreter {
      *         into an error, which is the point: never answer 「a random enemy」 for 「a random one that was hit」.
      */
     private static CanHit randomHitEnemy(TriggerContext ctx) {
-        if (ctx.damage() == null || ctx.damage().hitTargets().isEmpty() || ctx.battle() == null) {
+        if (ctx.battle() == null) {
             return null;
         }
-        List<CanHit> hitEnemies = ctx.damage().hitTargets().stream()
+        // \u2b50 TWO carriers, one selector (2026-09-30): an ATTACK_FINISHED context carries the attack's FROZEN hit set,
+        // while a per-hit context (DEALING_DAMAGE) only has its instance's snapshot -- so the attack-level set wins and
+        // the instance is the fallback. \u26a0 That is why the doc says what a reader sees depends on its event.
+        java.util.Set<CanHit> pool = !ctx.attackHitTargets().isEmpty()
+                ? new java.util.LinkedHashSet<>(ctx.attackHitTargets())
+                : (ctx.damage() == null ? java.util.Set.of() : ctx.damage().hitTargets());
+        if (pool.isEmpty()) {
+            return null;                      // unknown or nothing hit: the caller turns this into an error
+        }
+        List<CanHit> hitEnemies = pool.stream()
                 .filter(ctx.battle().getOpponents(null)::contains)
                 .toList();
         return hitEnemies.isEmpty() ? null : hitEnemies.get(ctx.battle().getRng().nextInt(hitEnemies.size()));
