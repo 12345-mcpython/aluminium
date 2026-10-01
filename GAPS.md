@@ -12734,6 +12734,16 @@
 > * **收官核验（实测）**：全量 0、闸门 [0, 0]、树干净、已推送；
 >   角色 93 / 93、光锥 146 / 170、遗器 53 文件 / 登记表 7 条、测试类 460+。
 >
+
+> **2026-09-30 更新（aggro 回收之六百九十七：23047 判据与七处变异）**：
+>
+> * **判据**（`test: judge cone 23047, and keep its three unshipped clauses on the record`）：5 档各断言
+>   ① `BATTLE_START` + `MODIFY_ATTR EFFECT_HIT_RATE` + 逐档数值 + `target: self`；
+>   ② `DEBUFF_APPLIED` + 恰好一个条件 `actor == self` + `APPLY_BUFF 魂迷` + `turns 3` +
+>   `target: target` + `base_chance 0.8`。⚠ 判据的 javadoc 同时带着三句未出货的条款与理由。
+> * **变异（实测）**：**23047 sweep: 7 mutations, 0 blind []**
+>   —— 覆盖逐档数值 / 属性名 / 事件 / 条件 / 时长 / 基础概率 / 状态名七个语义面。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
