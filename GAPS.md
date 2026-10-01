@@ -7828,6 +7828,29 @@
 >   **笑点** ✗、反向同步（**循环**风险 ✗）。
 > * **进度（实测 ✓）**：角色 **91 内容 / 93 数据** ✓（1502/1506 仍缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百六十六：**1505 终结技 rider 出货**（`CAST_SETUP` 才是"每次施放一次"的正确事件））**：
+> 
+> * ✅ **出货：1505 终结技 rider** ✓：`CAST_SETUP` + `actor == self` + **`from_category ULTRA`** +
+>   **`self_resource:好活当赏 >= 1`** ⇒ `DAMAGE` + `scale: self_attr:ATTACK` + **`percent: 0.12`** +
+>   **`element: physical`** + **`damage_type: ELATION`** + **`target: all_enemies`** ✓。
+> * ⭐⭐ **一个关键设计判断（值得记 ✓）**：**不能挂在 `DEALING_DAMAGE` 上** ✗ —— 大招打全体会产生 **N 个伤害实例** ✓，
+>   规则会跟着**触发 N 次** ✗（N 倍伤害 ✗）。✅ `CAST_SETUP` 每次施放**只触发一次** ✓，且它**认 `from_category`** ✓
+>   （`SKILL_CAST` 不认 ✗ —— 这是很早就量出来的事实 ✓）。
+> * **判据读数（实测 ✓）** ✓：
+>   * 行为（两名敌人**血量之和**）：`[1505-ult] the ultimate took 528.9833597948309 in total while holding 【好活当赏】
+>     and 449.43361070079845 after spending it (difference 79.54974909403245)` ✓
+>   * 规格：`[1505-ult] spec p1505_ult_elation_rider percent=0.12 target=all_enemies damage_type=ELATION` ✓
+> * **四条变异 + 一条对照（判红前先删 XML 并校验年龄 ✓）** ✓：the ultimate rider is 6% instead of 12%(applied=True)=1 | the ultimate rider is not Elation damage(applied=False)=None | the ultimate rider hits one enemy only(applied=True)=2 | the Elation boost is not folded into riders(applied=True)=0
+> * ⚠ the Elation boost is not folded into riders 实测 **0 红** ✗（下一轮修 ✓）。
+> * **引擎级对照** ✓：这次把中和写成**能编译**的语句（`settledBase = base;` ✓；上一轮写成表达式导致编译失败 ✗，
+>   工具因此拒绝称其为证据 ✓）⇒ **NOT EVIDENCE: the control did not compile, so it proves nothing** ✓。
+> * ⚠ **工具层面的一处失误（已修 ✓）**：落地脚本里变异函数的路径拼接把**绝对路径又拼了一遍** ✗ ⇒ 它在**提交之后**崩了 ✓
+>   （提交已在 ✓、推送未做 ✗）⇒ ✅ 教训：**变异/对照/推送这些"尾部步骤"要能在提交后单独重跑** ✓（这次就是分两步补完的 ✓）。
+> * ⚠ **同句另两半已登记（未做 ✓）**：「对**随机**造成伤害的敌方目标造成 14%」✗（随机目标）、
+>   「至少计入**等同于能量上限**的【好活当赏】」✗（需要"用量至少为 X"的取法）。
+> * **进度（实测 ✓）**：角色 **91 内容 / 93 数据** ✓（1502/1506 仍缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
