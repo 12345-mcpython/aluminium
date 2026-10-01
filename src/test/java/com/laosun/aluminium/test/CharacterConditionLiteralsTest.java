@@ -255,6 +255,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1310, "SKILL_CAST", "skill_action_advance", List.of("actor == self"));
         assertRule(1310, "ULT_CAST", "ult_action_advance", List.of("actor == self"));
         assertRule(1310, "BATTLE_START", "level_convention", List.of());
+        assertRule(1310, "WAVE_START", "technique_adds_fire_weakness", List.of("self has_state 秘技"));
         assertRule(1312, "SKILL_POINT_SPENT", "talent_energy_on_skill_point_spent", List.of());
         assertRule(1312, "BATTLE_START", "level_convention", List.of());
         assertRule(1314, "BATTLE_START", "trace_reverse_repo_one_goods", List.of());
@@ -264,6 +265,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1315, "KILL", "standoff_stack_on_kill", List.of());
         assertRule(1315, "BREAK", "standoff_stack_on_break", List.of());
         assertRule(1315, "BATTLE_START", "level_convention", List.of());
+        assertRule(1315, "ULT_CAST", "ult_adds_physical_weakness", List.of("actor == self"));
         assertRule(1315, "BATTLE_START", "eidolon1_defence_ignore", List.of());
         assertRule(1317, "BREAK", "talent_charge_on_break", List.of());
         assertRule(1317, "BATTLE_START", "level_convention", List.of());

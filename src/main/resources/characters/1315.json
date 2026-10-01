@@ -97,5 +97,21 @@
     ],
     "source": "1315 波提欧 星魂 1 扬尘孤星: 「波提欧造成伤害时无视敌方目标16%的防御力」",
     "note": "「波提欧**造成伤害时无视敌方目标 16% 的防御力**」—— ① 「无视…防御」= **`DEFENCE_IGNORE`** ✓（引擎的防御区读**攻击方**的该属性 ✓ ⇒ `MODIFY_ATTR` 能到达它 ✓）；② 本条**无条件** ✓（\"造成伤害时\"是他**每一次**伤害 ✓）⇒ `BATTLE_START` + `permanent` ✓ **一条规则** ✓；⚠ **为什么不挂 `DEALING_DAMAGE`** ✗：那是\"把待结算实例交出去\"的时刻 ✓ ⇒ 此时才加的修饰**对这一击太晚** ✗（与第 25/270 轮\"暴击率不能挂 `DEALING_DAMAGE`\"同一条教训 ✓）；③ 门槛 `min_eidolon: 1` ✓。⚠ **登记（这一族很大，值得单列）** ✓：语料里「（造成/本次/该次）伤害时**无视…防御**」共 **12 份文档** ✓（1102、1221、1303、1306、1313、1315、1403、1412、1414、1509 + RELICS.md + WEAPONS.md ✓），而它们的文件里 `DEFENCE_IGNORE` 几乎都是 **0 次** ✓ ⇒ **这一族基本没写** ✓；其中**实例级**读法（「**本次**伤害无视…」✓，1307 与 WEAPONS.md ✓）需要一个\"只作用于这一击\"的修饰 ✗ （`Damage` 的防御区**有** `defenceIgnore` 字段 ✓，但没有 op 去改它 ✗）⇒ 精确登记 ✓。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_adds_physical_weakness",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "ADD_ELEMENTAL_WEAKNESS",
+        "element": "Physical",
+        "target": "target"
+      }
+    ],
+    "source": "1315 波提欧 终结技: 「为指定敌方单体添加物理弱点，持续 2 回合。」",
+    "note": "⭐ 弱点植入已出货 ✓（2026-09-30 ✓）：⚠ 原先登记为 **弱点植入 ✗**（⚠ 与 1006/1408 同一族 ✓）⇒ ⚠ 现已写出**添加**那一半 ✓ —— ⚠ `ADD_ELEMENTAL_WEAKNESS` ＋ ⚠ `element: Physical` ✗。⛔ **仍登记的是时长** ✗：⚠ 文档写 ⚠ **持续 2 回合** ✗，⚠ 而 ⚠ `Enemy.stanceWeak` 是一个**无寿命的集合** ✓（⚠ 只在 `EnemyFactory` 里由怪物数据写入 ✓）⇒ ⚠ 写了添加之后那个弱点**不会自己消失** ✓（⚠ 差异已写明 ✓，⚠ 不装作等价 ✓）。⚠ 引擎侧：⚠ `Enemy.addWeakness` ✓（⚠ 经 `setStanceWeak` ✓，⚠ 遵守该类第 192 行的要求 ✓）＋ ⚠ `TriggerInterpreter` 的 `ADD_ELEMENTAL_WEAKNESS` ✓；⚠ 判据见 `WeaknessOpTest` ✓（⚠ 实测 ⚠ 施加前 `isWeakTo` 为假、⚠ 施加后为真 ✓）。"
   }
 ]
