@@ -12715,6 +12715,25 @@
 >   `new TriggerTable.TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast)`；
 >   观测：`getAttribute(AttributeType.ATTACK).get()`（`enums.AttributeType`）、`getBuffManager().stacksOf(name)`。
 >
+
+> **2026-09-30 更新（aggro 回收之六百九十六：出货光锥 23047 独奏，两句；收官核验）**：
+>
+> * **出货**（`content: ship cone 23047, two of its five clauses`）：5 档 × 2 规则 = 10 条，一次通过。
+>   * ① `BATTLE_START` + `MODIFY_ATTR EFFECT_HIT_RATE` + `permanent` + `target: self`
+>     （`#1` = 0.4 / 0.45 / 0.5 / 0.55 / 0.6）；
+>   * ② `DEBUFF_APPLIED` + `["actor == self"]` + `APPLY_BUFF 魂迷` + `turns: 3` + `base_chance: 0.8`
+>     —— 依据：`Battle.fireTriggers(DEBUFF_APPLIED, caster, target, 0, 0)` 的 **actor 就是施加者**，
+>     所以 `actor == self` 正是「装备者施加的负面效果」。
+> * **逐条登记（三句，理由写在内容注记里）**：
+>   1. 「每有 1 个装备者施加的负面效果使持续伤害提高」—— `per_stack` 读的是**目标身上的**负面数，
+>      不是「谁施加的」；
+>   2. 「受到我方攻击时使**攻击者**加速」—— 缺「把加成给攻击者」的写法；
+>   3. 「装备者**无法战斗**时移除所有魂迷」—— 缺「无法战斗」事件。
+> * **欠账（如实）**：`23047` 的**判据与变异**未做（重点应覆盖 `actor == self`、`base_chance 0.8`、
+>   `turns 3` 与事件本身）；本轮文档即为这笔欠账的登记。
+> * **收官核验（实测）**：全量 0、闸门 [0, 0]、树干净、已推送；
+>   角色 93 / 93、光锥 146 / 170、遗器 53 文件 / 登记表 7 条、测试类 460+。
+>
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
