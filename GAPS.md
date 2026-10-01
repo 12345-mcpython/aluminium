@@ -8005,6 +8005,32 @@
 >   「达到 60 点后**可激活**终结技」（"可激活"是新机制 ✗）、【无敌玩家】的**结界** ✗。
 > * **进度（回退后，实测 ✓）**：角色 **92 内容 / 93 数据**（仅 1506 缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之四百七十五：**"无内容文件"的见证者彻底消失 —— 下一轮要把它换成显式的空表构造**）**：
+> 
+> * ⚠ **本轮仍无落地** ✗（见证者改用**合成 cid** 的尝试、溢出接线与 1506 全部撤回 ✓；树干净、全量绿 ✓）。
+> * ⭐⭐⭐ **决定性读数（本轮查清 ✓）**：合成 cid **`999999`** 让 **4 个测试类**在 `CharacterFactory.create` 处报
+>   `Character '999999' not found` ✓（它们要的是"**能建出来**、但没有规则文件"的角色 ✓）；改用**测试夹具 9001** 也不行 ✗
+>   —— ⚠ **夹具本身就是"触发器文件"**（它们在 `src/test/resources/characters/` 下 ✓）⇒ `TriggerTables.exists(9001)` 为**真** ✗
+>   ⇒ 帮助函数里的守卫直接抛错 ✓。✅ 结论：**类路径上已经不存在"有数据、没有触发器文件"的 cid** ✓ ——
+>   这个概念在最后一个角色出货时**自然寿终正寝** ✓。
+> * ⭐⭐ **下一轮的完整清单（逐个 ✓，都在 `src/test/java/.../test/` 下 ✓）**：
+>   1. `TestCharacters.withoutTriggerFile()` ⇒ 改成一个**显式的空表构造器**（例如 `static Character emptyTable(int level)` ✓：
+>      取一个**有内容**的角色、把它的表换成 `new TriggerTable(cid, List.of())` ✓；
+>      ⚠ 第 70 轮的坑在这里**不适用** ✓，因为**被测的就是空表本身** ✓ —— `TriggerTableTest` 的能源那条上一轮已经这样改过 ✓）；
+>   2. 四个调用点分别替换 ✓：`TriggerTableTest`（`NO_TRIGGERS` ✓，其中 `exists(...)`/缓存两条只需一个**合成** cid ✓）、
+>      `CharacterResourceTest`（`PLAIN` ✓）、`RelicTriggerTableTest`（`NO_RULES` ✓）、`ShieldDurationTest`（构造参数 ✓）。
+>   3. 之后再出货 **1506** ✓（并把下面已接好线的**溢出**一起落 ✓）。
+> * ✅ **已接好线、编译通过、当时只剩见证者挡路的改动（下一轮直接重放 ✓）**：
+>   ① `ResourceSpec` 增加 **`overflow`** ✓（record 组件；⚠ 记得同步它**两个便捷构造器** ✗ 否则编译不过 ✓）；
+>   ② `ResourceManager` 增加 **`register(id, max, initial, overflow)`** 重载 ✓（内部 `setMaxOverflow` ✓）；
+>   ③ `CharacterFactory` 的调用点传 **`spec.overflow()`** ✓（`spec.id(), spec.max(), spec.initial()` ⇒ 再加一个参数 ✓）。
+>   ⭐ 底层 `Resource` **本来就有两级**（`max` + `maxOverflow` ✓，`absoluteMax = max + maxOverflow` ✓）——
+>   缺的只是**声明**能写第二个数 ✓。⚠ 但仍要**重测那条读数** ✓：旧的实测 `a plain gain of 100 took the resource to 60` ✓
+>   说明溢出**没有传下去** ✓ ⇒ 接线后期望 **plain gain ⇒ 100** ✓、**`gainClamped` ⇒ 60** ✓（两级都可见 ✓）。
+> * * **1506 可表达的从句（已确认 ✓）**：终结技「**行动提前 100%**」✓（`ADVANCE percent: 1.0` ✓）+ 资源【隐藏分】**60 / +240** ✓。
+> * **进度（回退后，实测 ✓）**：角色 **92 内容 / 93 数据**（仅 1506 缺 ✓）；光锥 **134 / 169** ✓；遗器 **53 文件 / 登记表 8 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
