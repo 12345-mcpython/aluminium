@@ -49,3 +49,16 @@ print('tree: ' + (subprocess.run(['git', 'status', '--porcelain'], cwd=WORK, cap
                                  text=True).stdout.strip() or 'clean'))
 print('branch: ' + subprocess.run(['git', 'status', '-sb'], cwd=WORK, capture_output=True,
                                   text=True).stdout.split('\n')[0])
+
+# --- fixture-shadowing preflight (2026-09-30) -------------------------------------------
+# A same-id file under src/test/resources SHADOWS shipped content on the test classpath and does so
+# silently. Set 108 once hid its own 4-piece that way, and set 130 could not be reclaimed until its
+# fixture moved to 126. This check fails only when a fixture id HAS a rule file -- the dangerous case.
+shadow = subprocess.run([sys.executable, WORK + '/tools/check_shadowing.py'], cwd=WORK,
+                        capture_output=True, text=True, encoding='utf-8', errors='replace')
+for _l in ((shadow.stdout or '') + (shadow.stderr or '')).strip().split('\n'):
+    if _l.strip():
+        print('SHADOW ' + _l.strip()[:150])
+if shadow.returncode != 0:
+    print('STOP: a test fixture shadows shipped content')
+    sys.exit(1)
