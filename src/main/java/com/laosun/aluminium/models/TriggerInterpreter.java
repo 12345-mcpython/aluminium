@@ -1073,7 +1073,22 @@ public final class TriggerInterpreter {
 
     private static void gainResource(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = resolveTarget(effect, ctx);
-        holder.getResources().gain(effect.getResource(), (int) Math.round(scaledAmount(effect, ctx)));
+        // \u2705 A gain whose amount is a SHARE of an attribute (2026-09-30; reader: 1505\u2019s talent \u300c\u83b7\u5f97\u7b49\u540c\u4e8e\u66b4\u51fb\u4f24\u5bb9
+        // 50% \u7684\u6b22\u6109\u5ea6\u300d). `scaledAmount` stays literal-only on purpose: this share is read off the HOLDER, which only
+        // this method has resolved. Unknown attribute names are refused loudly rather than silently adding zero.
+        int amount;
+        if (effect.getAmountFromAttr() == null) {
+            amount = (int) Math.round(scaledAmount(effect, ctx));
+        } else {
+            AttributeType attribute = AttributeType.fromString(effect.getAmountFromAttr());
+            if (attribute == null) {
+                throw new IllegalStateException("GAIN_RESOURCE '" + effect.getResource() + "' reads the attribute '"
+                        + effect.getAmountFromAttr() + "', which is not an AttributeType");
+            }
+            double share = effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
+            amount = (int) Math.round(holder.getAttribute(attribute).get() * share);
+        }
+        holder.getResources().gain(effect.getResource(), amount);
     }
 
     /**
@@ -2966,7 +2981,7 @@ public final class TriggerInterpreter {
     }
 
     private static void requireAmount(EffectSpec effect, String op, TriggerSpec spec) {
-        if (effect.getAmount() == null) {
+        if (effect.getAmount() == null && effect.getAmountFromAttr() == null) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"amount\" (source: " + spec.getSource() + ")");
         }
