@@ -200,6 +200,18 @@ public class Enemy extends CanHit {
     }
 
     /**
+     * ⭐ Adds an element to this enemy weaknesses (「为指定敌方单体添加 X 属性弱点」, 2026-09-30; readers 1315, 1310).
+     * Goes through the setter, as the note above asks. ⚠ No LIFETIME: the documents say 「持续 2 回合」,
+     * and a set has no expiry -- that half stays registered.
+     */
+    public void addWeakness(DamageElement element) {
+        if (element == null || stanceWeak.contains(element)) { return; }
+        java.util.Set<DamageElement> widened = new java.util.HashSet<>(stanceWeak);
+        widened.add(element);
+        setStanceWeak(widened);
+    }
+
+    /**
      * \u2705 How many elements this one is weak to (2026-09-30; reader: cone 22004's \u300c\u654c\u65b9\u76ee\u6807\u6bcf\u62e5\u67091\u4e2a\u4e0d\u540c\u5c5e\u6027\u7684\u5f31\u70b9\u300d).
      *
      * <p>\u2605 The enemy's own data is the answer (its {@code stance_weak} list); no new state is tracked, and a unit with no
