@@ -12793,6 +12793,20 @@
 > * **变异（实测）**：**23062 sweep: 6 mutations, 0 blind []**
 >   —— 覆盖 数值 / 属性名 / 数值 / 全体目标 / 时长 / 状态名 六个语义面。
 > * **实测**：全量 0、闸门 [0, 0]、树干净、已推送。
+
+> **2026-09-30 更新（aggro 回收之七百零一：23054 出货、判据与六处变异）**：
+>
+> * **出货**（`content: ship cone 23054, three of its four clauses`）：5 档 × 3 规则。
+>   ① `BATTLE_START` + `MODIFY_ATTR SPEED`（permanent，0.18…0.30）；
+>   ② `BATTLE_START` + `APPLY_BUFF 上上签 turns 3` + `CRIT_CHANCE`（all_allies，0.10…0.14）+
+>   `CRIT_ATTACK`（all_allies，0.30…0.60）+ `ENERGY_REGENERATION_RATE`（self，0.12…0.20），全部 3 回合；
+>   ③ **`WAVE_START` + `GAIN_ENERGY 15`** —— ⭐ **`WAVE_START` 的首个内容读者**。
+>   ⚠ 数值先读全 5 档再写（`#6 = 15` 实测恒定）。
+> * ⛔ **登记的半个条件**：「或对我方目标施放终结技时」—— 需要"终结技打在我方身上"的判定。
+> * **判据**：5 档 × 3 规则，含双 `all_allies` 目标、`self` 的回能、`turns 3`、`WAVE_START` + `GAIN_ENERGY 15`。
+> * **变异（实测）**：**23054 sweep: 6 mutations, 0 blind []**
+>   —— 覆盖 数值 / 全体目标 / 数值 / self↔all_allies / 波次回能量 / 波次事件 六个语义面。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
