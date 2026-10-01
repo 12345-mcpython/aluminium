@@ -1792,14 +1792,15 @@ public class TriggerTable {
      */
     public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                                  Damage damage, Battle battle, SkillCategory fromCast, String ruleId,
-                                 List<Condition> targetFilter, int skillId, int weakHitCount) {
+                                 List<Condition> targetFilter, int skillId, int weakHitCount,
+                                 List<CanHit> attackHitTargets) {
 
         /**
          * The same context for an event that carries no cast category — i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle, SkillCategory fromCast) {
-            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0, 0);
+            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0, 0, List.of());
         }
 
         /**
@@ -1811,7 +1812,7 @@ public class TriggerTable {
          */
         public TriggerContext withRule(String id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
-                    id == null ? "" : id, targetFilter, skillId, weakHitCount);
+                    id == null ? "" : id, targetFilter, skillId, weakHitCount, List.of());
         }
         /**
          * The same context, saying <b>which data row</b> of a skill produced this event (2026-09-28).
@@ -1823,7 +1824,7 @@ public class TriggerTable {
          */
         public TriggerContext withSkillId(int id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, id, weakHitCount);
+                    targetFilter, id, weakHitCount, List.of());
         }
 
         /**
@@ -1831,7 +1832,7 @@ public class TriggerTable {
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle) {
-            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of(), 0, 0);
+            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of(), 0, 0, List.of());
         }
 
         /**
@@ -1855,7 +1856,7 @@ public class TriggerTable {
          */
         public TriggerContext withWeakHitCount(int count) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, skillId, count);
+                    targetFilter, skillId, count, List.of());
         }
 
         /**
@@ -1866,7 +1867,7 @@ public class TriggerTable {
          */
         public TriggerContext withTargetFilter(List<Condition> filter) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    filter == null ? List.of() : filter, skillId, weakHitCount);
+                    filter == null ? List.of() : filter, skillId, weakHitCount, List.of());
         }
 
         /**
@@ -1876,7 +1877,7 @@ public class TriggerTable {
          */
         public TriggerContext withSubject(CanHit candidate) {
             return new TriggerContext(owner, actor, candidate, hitCount, amount, damage, battle, fromCast, ruleId,
-                    List.of(), 0, weakHitCount);
+                    List.of(), 0, weakHitCount, List.of());
         }
 
         /** Whether {@code candidate} passes the per-target conditions (an empty filter admits everything). */
@@ -1890,7 +1891,7 @@ public class TriggerTable {
         }
 
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0, 0);
+            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0, 0, List.of());
         }
     }
 
