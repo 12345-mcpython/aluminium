@@ -11341,6 +11341,33 @@
 >     ⇒ ⭐ **一次读清，再改一次** ✓（⚠ 这正是第 176/193 两轮"先读实现再定规格"的教训 ✓，我又忘了 ✓）。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百三十四：**✅ 读清了 `effectCtx` —— 它是 `withTargetFilter` 的副本 ⇒ **丢失在更早处**（`matching` / `fire` 的规则循环）**）**：
+> 
+> * ⭐⭐⭐ **实测（按锚点 ✓，`TriggerInterpreter` 里 `effectCtx` 只有 3 处命中 ✓）**：
+>   ```java
+>   // M-53: this effect's per-target conditions. The ops below take `effectCtx`, whose filter `resolveTargets` …
+>   TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect));
+>   applyOne(battle, effect, effectCtx);
+>   ```
+>   ⇒ ✅ **op 执行用的上下文 = `ctx.withTargetFilter(...)`** ✓
+>     ⇒ ⭐ **而我第 217 轮已经把 `withTargetFilter` 改成带上 `attackHitTargets`** ✓
+>       ⇒ ✅ **所以只要 `ctx` 里本来有值，就一定能传到这里** ✓
+>     ⇒ ⛔ **结论：丢失发生在更早的环节** ✓ —— 即 **`ctx` 在进入 `fire`/`applyOne` 之前就已经是空的了** ✗。
+> * ⭐⭐⭐ **下一轮的两个锚点（唯一一步 ✓，这次**一次读清两处** ✓，不再"改一处跑一次" ✓）**：
+>   ① **`TriggerInterpreter.fire(...)` 的函数体** ✓ —— ⭐ 看它**从参数拿到 `ctx` 后有没有重建** ✓
+>     （⚠ 例如 `ctx.withRule(ruleId)` ✓ —— ⚠ **而 `withRule` 正是我第 217 轮改的五个之一** ✓
+>       ⇒ ⚠ 若它在 `fire` 里被调用 ✓ 就已修好 ✓；若没有 ✓ 就继续往前找 ✓）；
+>   ② **`TriggerTable.matching(event, ctx)`** ✓ —— ⭐ 看"规则匹配"这一步是否**自己造**了一个上下文 ✓
+>     （⚠ 若是 `new TriggerContext(...)` ✓ ⇒ **那就是我第 194/199 轮没数到的构造点** ✗
+>       ⇒ ⭐ 也说明"三类锚点清单"当时仍不完整 ✓）。
+>   ⇒ ✅ **做法** ✓：把这两处**一起读** ✓，画出 **`fireTriggers` 终端 → `fire` → `matching` → `effectCtx` → op** 的
+>     **每环 `ctx` 来源** ✓ ⇒ ⭐ **一次读清，再改一次** ✓（⚠ 这正是我第 217 轮承诺的换法 ✓）。
+> * ⭐⭐ **为什么这轮值得记 ✓**：`effectCtx` 只有 **3 处命中** ✓ ⇒ **一次 grep 就排除了一个嫌疑** ✓
+>   —— ⭐ 这是"**用命中数判断嫌疑大小**"的正例 ✓（⚠ 与第 217 轮"凭部分清单改"的反例对照 ✓）。
+> * ⚠ **本轮为只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
