@@ -12455,6 +12455,27 @@
 > * ✅ **下一步（唯一一步 ✓）**：搜 **`FOLLOW_UP` 的发送点** ✓ ⇒ 看它带不带命中集合 ✓
 >   ⇒ 然后**出货 ①② ✓ + ③（能写的那部分 ✓）**，并把不能写的逐条登记 ✓。
 > * **实测 ✓**：全量 **0** ✓、树干净 ✓、已推送 ✓。
+> **2026-09-30 更新（aggro 回收之六百八十三：**✅ `FOLLOW_UP` 按“每个受击目标”逐个发送 ⇒ `target: target` 正是原文语义**）**：
+>
+> * ⭐⭐⭐ **实测（`Battle` 的发送点 ✓）**：
+>   ```java
+>   2566| // data-facing FOLLOW_UP event is emitted here rather than from a second attack path.
+>   2578| fireTriggersWithSubject(TriggerEvent.FOLLOW_UP, attacker, target, settled);
+>   ```
+>   ⇒ ❗ **它只带一个 `target`** ✗（不是命中集合 ✗）
+>     ⇒ ⚠ 但**注释点明它就在“第二条攻击路径”上发出** ✓
+>       ⇒ ⭐ **所以它是“按每个受击目标逐个发送”** ✓
+>         ⇒ ✅ **因此 `target: target` 恰好等于「受到攻击的敌方目标」** ✓
+>           （❗ 引擎自己就把命中集合**扇开成多次触发** ✓ —— 所以不需要 `ATTACK_FINISHED` 那套集合机制 ✓）。
+> * ✅ **由此③ 也可表达 ✓** ⇒ ⛐ **三句全可出货** ✓：
+>   * ① `BATTLE_START` + `MODIFY_ATTR DEFENCE` + `permanent` + `target: self` ✓（`#1` 逐档 ✓）；
+>   * ② `SHIELD_GRANTED` + `MODIFY_ATTR CRIT_ATTACK` + `turns: 2` + `target: self` ✓（`#2` 逐档 ✓）；
+>   * ③ `FOLLOW_UP` + `actor == self` + `MODIFY_DAMAGE_TAKEN` + `turns: 2` + `target: target` ✓
+>     （`#5` 逐档 ✓；❗ `#4 = 1` ⇒ **100% 基础概率 = 必定** ⇒ 省略 `base_chance` ✓）。
+> * ⚠ **一处仍需在出货时核对 ✓**：② 的条件是否需要**“提供给我方目标”** ✓
+>   （原文：“当装备者**为我方目标**提供护盾时” ✓）⇒ ⭐ 看 `SHIELD_GRANTED` 携带哪些参数 ✓
+>     （❗ 若能表达“护盾给了我方”则加条件 ✓；若不能 ✗ 则按“次级差别”登记 ✓ —— ❗ 不近似 ✗）。
+> * **实测 ✓**：全量 **0** ✓、树干净 ✓、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
