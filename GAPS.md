@@ -13274,6 +13274,37 @@
 >   角色 93 / 93、光锥 163 / 170、遗器 55 文件 / 登记表 5 条。
 > * **一族现状**：`23048` ③ ✅ 已收 ✓；`21025` ⭐ 可下笔（条件类 ✓）；
 >   `317` ⭐ 语义已定、清单已列（⚠ 条件 + 选择器两件 ✓）；`327` ⛔ 仍缺 DSL 设计 ✗。
+
+> **2026-09-30 更新（aggro 回收之七百二十：目标选择器的机位；两条能力的最终清单）**：
+>
+> * **实测（`TriggerInterpreter`，选择器不在 `TriggerTable` ✓）**：
+>   ```
+>    142:  Set.of("self", "target", "attacker", "all_allies", "party", "other_allies", "summon", …)  ← 已知集合 ✓
+>    149:  TARGET_ALL_ALLIES = Set.of("all_allies", "party");
+>   1229:  private static CanHit resolveTarget(EffectSpec effect, TriggerContext ctx) {              ← 单目标 ✓
+>   1232:      case "self" -> ctx.owner();                                                            ← 加 case 处 ✓
+>   1263:  private static List<CanHit> resolveTargets(Battle, EffectSpec, TriggerContext)
+>   1277:  private static List<CanHit> resolveTargetsUnfiltered(…)
+>   1342:      return List.of(resolveTarget(effect, ctx));                                             ← 单目标回落 ✓
+>   ```
+>   ⇒ ✅ **单目标选择器只需两处改动** ✓：**`:142` 的已知集合** ✓（⚠ 不加则解析阶段就拒 ✓ ——
+>   ⚠ 与 `23059` 的"白名单"同型 ✗）＋ **`:1232` 的 `switch` 里加一个 `case`** ✓；
+>   ⭐ **多目标侧不用碰** ✓（`:1342` 会把单目标自动包成列表 ✓）。
+> * ✅ **`21025` 最终清单**（唯一读者 ✓）：正则 `TriggerTable:926` 旁 ✓；解析分支 `:1124` 旁 ✓；
+>   条件类照 `:2121` 的 `IsOtherAlly` ✓；⭐ 语义 = **沿队列扫描到第一个"我方且非自己"** ✓
+>   （❌ 不取堆顶 ✗ —— 第 406 轮实测 ✓）；查询只能用 `peekNext()` ✓（`getNext()` 会推进 ✗）。
+> * ✅ **`317` 最终清单**（读者之一 ✓）：条件侧照 `IsOtherAlly` ✓，核心 `battle.characters.get(0) != owner` ✓；
+>   ⭐ 目标侧 **`TriggerInterpreter:142` 加名字** ✓ ＋ **`:1232` 加 `case`** ✓，返回 `ctx.battle().characters.get(0)` ✓；
+>   ⚠ 数值待读 `AbilityParamList` ✓（文案 12% ✓、属性 `ATTACK` ✓；ERR 5% 属 `properties` ✓ **不重写** ✓）。
+> * ⭐⭐ **为什么 `characters` 而不是 `allies`（两处独立证据 ✓）**：文案用 **"character"** ✗（第 416 轮 ✓）＋
+>   `Battle:60 public List<Character> characters;` ✓、`characters = characterQueue;` ✓（第 415 轮 ✓）；
+>   ⚠ 而 `allies` 会被 `allies.add(memosprite/servant)` 追加 ✗（`:2956` / `:2975` ✓）。
+> * **一族现状**：`23048` ③ ✅ **已收**（引擎一行 + 端到端变异红 ✓）；`21025` ✅ 清单齐备 ✓；
+>   `317` ✅ 清单齐备 ✓；`327` ⛔ 仍需先定"命途名如何进 DSL" ✗（⚠ 三者中最难 ✓）。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送；
+>   角色 93 / 93、光锥 163 / 170、遗器 55 文件 / 登记表 5 条。
+> * **下一步**：实现 `21025` 与 `317` 两条能力 ✓（⚠ 每条都要：读者出货 + 形状判据 +
+>   **端到端判据 + 引擎侧变异** ✓，照 `23048` 那条已验证的链条 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
