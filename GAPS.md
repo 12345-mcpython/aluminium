@@ -10705,6 +10705,34 @@
 >   ⚠ 这正是前几轮反复验证的做法 ✓（先读实现 ✓、再定规格 ✓、再机械实现 ✓），也是第 176/193 两轮更正的教训所在 ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百一十：**✅ 找到同型先例 `weakHitCount` —— 接线方式就此定死**）**：
+> 
+> * ⭐⭐⭐ **实测（`Battle.java:2225-2243` ✓）**：`fireTriggers` 的**终端重载**（**:2242** ✓，9 参 ✓）里已经有
+>   **`weakHitCount`** ✓，而它的 javadoc 把**我正面临的问题**说得一模一样 ✓：
+>   > ✅ The same, plus **how many of the hit targets carry the attack's own element weakness**
+>   > (2026-09-30; reader: cone 21040's 「若有不少于 2 个被攻击的敌方目标具有对应属性弱点」) ✓
+>   >
+>   > ★ **A count over a predicate cannot be assembled from the parts**: a multi-target attack fires the damage
+>   > event **once per target**, so "how many of them were weak" **only exists where the whole set is in hand**
+>   > —— **the caster's side** ✓
+>   ⇒ ✅ **"整次攻击的聚合量"必须由持有整集合的那一侧带上事件** ✓ —— **与命中集合完全同型** ✓✓。
+> * ⭐⭐⭐ **因此接线方式定死（= 我第 194 轮倾向的 A ✓，且有先例背书 ✓）**：
+>   ① 在**终端重载**（:2242 ✓）再加一个参数 **`List<CanHit> attackHitTargets`** ✓；
+>   ② 照 **`:2232` 的形状**（public ✓，"逐层加参数" ✓）加一个**新的 public 重载** ✓ ——
+>     ⚠ 与既有 `…, SkillCategory fromCast, int skillId, int weakHitCount` 的区别只在**多一个 `List`** ✓
+>     ⇒ ⚠ **注意重载歧义** ✗：终端层的参数顺序要让 `weakHitCount`（int ✓）与 `List` **不混淆** ✓
+>       —— 由于类型不同 ✓，`fireTriggers(e, a, t, h, amt, Damage, SkillCategory, int, int, List)` 与既有 9 参版**不会冲突** ✓；
+>   ③ `TriggerContext` 加分量 `attackHitTargets` ✓ + **便捷构造器**（第 186 轮见过的 8 参版 ✓）保持既有调用不变 ✓；
+>   ④ **`fireAfterAttack`** 里在 `attackSequence++` 之后 ✓ 调新重载 ✓（⚠ **沿用它的早退约定** ✓：无命中 ⇒ 不通知 ✓）；
+>   ⑤ **`random_hit_enemy`** 改成**先读 `attackHitTargets`** ✓、空再退回 `ctx.damage().hitTargets()` ✓
+>     ⇒ **一个选择器、两种完备度** ✓（逐击读者 / 攻击后读者 ✓，文档按读者写 ✓ ㉟）。
+> * ⭐⭐ **另一条重要收获 ✓**：**`21040` 是已出货的光锥** ✓，它的从句「若有不少于 2 个被攻击的敌方目标具有对应属性弱点」
+>   正是**用这个机制**做的 ✓ ⇒ ⭐ **我有一份"已经跑通的样板"** ✓（同一条链 ✓、同一个"整集合在施放方"的论点 ✓）
+>   ⇒ ✅ 于是 `ATTACK_FINISHED` **不引入新范式** ✓，只是把同一机制**换个聚合量**（命中集合本身 ✓）✓。
+> * ⚠ **本轮为只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
