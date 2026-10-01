@@ -10812,6 +10812,38 @@
 >   (f) **出货 `21029`** ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之六百一十四：**(c) 的接法确定 —— `with…` 工厂链就是入口**）**：
+> 
+> * ⭐⭐⭐ **实测（`Battle.java:2260-2262` ✓）**：终端重载里，上下文是这样造的 ✓：
+>   ```java
+>   fired += TriggerInterpreter.fire(this, table, event,
+>           new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
+>                   fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount));
+>   ```
+>   ⇒ ⭐⭐ **`with…` 工厂链正是这个 record 的既有惯例** ✓
+>     （⚠ 也就是我在第 196 轮**注释里见过**的 `new TriggerContext(...).withSkillId(...)` ✓ ——
+>       现在看到了它的**真实用法** ✓）
+>   ⇒ ✅ **所以 `attackHitTargets` 的入口明确** ✓：在这条链尾加 **`.withAttackHitTargets(attackHitTargets)`** ✓
+>     ⇒ ⭐ **每个触发事件只带自己需要的那一两个聚合量** ✓（`SKILL_CAST` 用 `withSkillId` ✓、
+>       `21040` 用 `withWeakHitCount` ✓、`ATTACK_FINISHED` 用 `withAttackHitTargets` ✓）
+>       —— ⭐ **这是"引擎不被某一个内容拖累"的具体体现** ✓：**加聚合量 = 加一个 `with…` + 一个参数** ✓，
+>         不动其它事件 ✓。
+> * ✅ **因此 (c)(d) 现在完全机械（四步 ✓）**：
+>   ① `TriggerTable.TriggerContext` 加 **`withAttackHitTargets(List<CanHit>)`** ✓（⚠ 照抄
+>      `withWeakHitCount` 的写法 ✓ —— **先读它再抄** ✓，㉖ ✓）；⚠ 该工厂内部要调用**规范构造器** ✓
+>      ⇒ 我第 199 轮已给 6 个构造点补了 `, List.of()` ✓ ⇒ **新工厂要传自己的值** ✓；
+>   ② `Battle`：**终端重载**（:2242 ✓）加参数 `List<CanHit> attackHitTargets` ✓ + 链尾加 `.withAttackHitTargets(...)` ✓；
+>   ③ `Battle`：**新增 public 重载** ✓（照 `:2232` 的"逐层加参数"形状 ✓，⚠ 参数类型是 `List<CanHit>` ⇒
+>      与其它的 `int`/`Damage` **不冲突** ✓）；
+>   ④ `fireAfterAttack`（:2357 附近 ✓，`List<CanHit> targets = List.copyOf(hitTargets);` **之后** ✓）
+>      调 ③ 的新重载 ✓（⚠ **沿用早退**：无命中 ⇒ 不通知 ✓）。
+> * ⚠ **还要检查一件事（下一轮顺带 ✓）**：新事件是否需要**登记进 `TriggerTable` 的事件集合** ✓ ——
+>   第 192 轮见过 `TriggerTable:1049` 一带有个"**是 `DAMAGE_CARRYING_EVENTS` 的超集**"的集合 ✓
+>   ⇒ ✅ 若 `ATTACK_FINISHED` 该进某个集合 ✓ 就进 ✓；⚠ **不猜** ✓：先读那些集合的**语义注释** ✓ 再定 ✓。
+> * ⚠ **本轮为只读 ✓** ⇒ 树干净、全量绿、已推送 ✓。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
