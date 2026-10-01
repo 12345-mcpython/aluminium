@@ -923,12 +923,18 @@ public final class TriggerInterpreter {
                 }
             }
             case "GAIN_RESOURCE" -> {
+                CanHit mover = ctx.owner();
+                String movedId = effect.getResource();
+                int before = resourceAmount(battle, mover, movedId);
                 gainResource(effect, ctx);
-                fireResourceChanged(battle, ctx);
+                fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
             }
             case "SPEND_RESOURCE" -> {
+                CanHit mover = ctx.owner();
+                String movedId = effect.getResource();
+                int before = resourceAmount(battle, mover, movedId);
                 spendResource(effect, ctx);
-                fireResourceChanged(battle, ctx);
+                fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
             }
             case "DAMAGE" -> {
                 // A list, like HEAL/SHIELD: 「对敌方全体」 is one effect that reaches several units, and the
@@ -1115,7 +1121,7 @@ public final class TriggerInterpreter {
             return;
         }
         holder.getResources().gain(effect.getResource(), amount);
-    }
+        }
 
     /**
      * Spends from the target's resource (P8-8).
@@ -1140,7 +1146,7 @@ public final class TriggerInterpreter {
                     "SPEND_RESOURCE '" + id + "' needs " + amount + " but " + holder.getName()
                             + " has only " + holder.getResources().value(id));
         }
-    }
+        }
 
     /**
      * The effect's amount, scaled by the event's hit count when the rule asked for it.
@@ -2279,10 +2285,18 @@ public final class TriggerInterpreter {
      *
      * <p>\u2605 From the OP, not from {@code ResourceManager}: the manager owns no battle, so it cannot raise a trigger.
      */
-    private static void fireResourceChanged(Battle battle, TriggerContext ctx) {
+    /** \u2705 Tells the holder that a resource moved, WITH its name and delta (2026-09-30). */
+    /** \u2705 How much of a resource exists right now: the unit\u2019s own copy plus the party counter (2026-09-30). */
+    private static int resourceAmount(Battle battle, CanHit owner, String id) {
+        int total = (owner == null || !owner.getResources().has(id)) ? 0 : owner.getResources().value(id);
+        return battle == null ? total : total + battle.partyResourceValue(id);
+    }
+
+    private static void fireResourceChanged(Battle battle, TriggerContext ctx, String resource, int delta) {
         CanHit holder = ctx.owner();
         if (battle != null && holder != null) {
-            battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, holder, holder, 0, 0);
+            battle.noteChangedResource(resource);
+            battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, holder, holder, 0, delta);
         }
     }
 

@@ -25,6 +25,22 @@
       ],
       "source": "银狼LV.999 终结技 无敌玩家，启动！：「进入【无敌玩家】状态并且**行动提前 100%**。」",
       "note": "⭐ 只写这一句 ✓（**行动提前 100%** ✓ = `ADVANCE percent: 1.0` ✓，与 1210 桂乃芬的开场提前 25% 同一个 op ✓）。⚠ 【无敌玩家】状态本身与其**结界**已登记 ✗（结界需要区域机制 ✗，且状态若无任何规则读它就没有读者 ✗）。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "p1506_laughs_to_hidden",
+      "when": [
+        "resource_changed:笑点"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "隐藏分",
+          "amountFromEvent": true
+        }
+      ],
+      "source": "银狼LV.999 天赋：「获得笑点时，获得等量【隐藏分】。」",
+      "note": "⭐ 新能力**资源变化可转发** ✓（`resource_changed:<NAME>` + `amountFromEvent` ✓）。"
     }
   ]
 }

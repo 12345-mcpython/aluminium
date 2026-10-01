@@ -474,6 +474,8 @@ public class Battle {
      */
     @Getter
     private final Random rng;
+    /** \u2705 The resource a RESOURCE_CHANGED event is about (2026-09-30; reader: 1506\u2019s forwarding clause). */
+    private String lastChangedResource;
 
     /**
      * \u2705 The per-battle home of PARTY-scoped resources (2026-09-30; reader: the shared \u7b11\u70b9 counter). A resource like
@@ -706,6 +708,16 @@ public class Battle {
 
     public com.laosun.aluminium.models.Resource partyResource(String id) {
         return partyResources.get(id);
+    }
+
+    /** \u2705 Notes which resource a change is about, then fires (2026-09-30). */
+    public void noteChangedResource(String resource) {
+        lastChangedResource = resource;
+    }
+
+    /** \u2705 The resource the change being evaluated is about, or null. */
+    public String lastChangedResource() {
+        return lastChangedResource;
     }
 
     public void startBattle() {
