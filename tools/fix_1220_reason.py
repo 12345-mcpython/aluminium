@@ -42,6 +42,14 @@ print('suite exit: %d' % suite.returncode)
 if suite.returncode != 0:
     for l in ((suite.stdout or '') + (suite.stderr or '')).strip().split('\n')[-12:]:
         print('  RAW ' + l.strip()[:175])
+    import glob as _g, xml.etree.ElementTree as _E
+    for _p in _g.glob(WORK + '/build/test-results/test/*.xml'):
+        try: _r = _E.parse(_p).getroot()
+        except Exception: continue
+        for _c in _r.iter('testcase'):
+            for _k in ('failure', 'error'):
+                _n = _c.find(_k)
+                if _n is not None: print('  XMLFAIL ' + (_n.get('message') or '')[:400])
     io.open(path, 'w', encoding='utf-8', newline='').write(orig)
     print('rolled back')
     sys.exit(1)
