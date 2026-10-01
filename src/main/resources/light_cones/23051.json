@@ -1,0 +1,35 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23051_ult_heal",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "amountFromAttr": "ATTACK",
+          "amountPercent": 0.2,
+          "target": "all_allies"
+        },
+        {
+          "op": "HEAL",
+          "amountFromAttr": "ATTACK",
+          "amountPercent": 0.2,
+          "target": "lowest_hp_ally"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.48,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23051：「装备者施放终结技时，为我方全体回复等同于装备者攻击力#5[i]%的生命值，额外为当前生命值最低的角色回复等同于装备者攻击力#6[i]%的生命值，并使我方全体获得【卫戍】，【卫戍】持续#4[i]回合。获得【卫戍】的目标，造成的伤容提高#2[i]%。」",
+      "note": "⭐ 原文 ✓：`CAST_SETUP` + `from_category ULTRA` ⇒ **`HEAL`** × 2 ✓（`amountFromAttr: ATTACK` + `amountPercent: 0.2` ✓，一个 `all_allies` ✓、一个 **`lowest_hp_ally`** ✓ = 「当前生命值最低的角色」 ✓）+ 「造成的伤容提高 **48%**，持续 **3** 回合」= **`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.48` + `turns: 3`** ✓（不必写【卫戍】这个**名字** ✓ —— 它在本条里只是「持续 3 回合」的包装 ✓）。⚠ 仍登记 ✗：「若目标**拥有召唤物**则额外提高#3[i]%」（缺「是否拥有召唤物」的条件 ✗）。⚠ 第一句「攻击力提高#1[i]%」**不写** ✓（属性行 ✓）。"
+    }
+  ]
+}
