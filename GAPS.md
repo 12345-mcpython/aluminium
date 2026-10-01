@@ -13787,6 +13787,39 @@
 >   角色 93 / 93、光锥 164 / 170、遗器 57 文件 / 登记表 3 条、测试类 477。
 > * **下一步（纯实现，无未知 ✓）**：① `Constant` 建同伴组集合 ✓（⚠ 20 id ✓，注记写明来源 ✓）；
 >   ② 两个关键词 ✓（⚠ 装备者 ∈ 组 ✓ / 我方存在他人 ∈ 组 ✓）；③ 出货 `327` ✓；④ 判据链 ✓（⚠ 天生可分辨 ✓）。
+
+> **2026-09-30 更新（aggro 回收之七百三十九：`327` 闭合 —— 第六次登记回收、第四条能力；并记下"判据又一次绕过被测代码"）**：
+>
+> * **出货**（`feat: the Trailblaze-Companion keywords, and relic 327 uses both` ✓）：
+>   * ⭐ **`TRAILBLAZE_COMPANIONS` = 20 个 id** ✓（⚠ 开拓者 `8001`–`8010` ✓、三月七 `1001`/`1224` ✓ ＋ 八个单形态 ✓），
+>     并把**来源**写进代码注释 ✓（⚠ "membership is NOT marked by any data field … only the GROUPING comes from the
+>     documentation's glossary … If a data marker is ever found, read it and delete this set." ✓）；
+>   * ⭐ 两个关键词 ✓：**`is_companion`** ✓（单单位 ✓，照 `IsPartyFirst` ✓）＋ **`has_companion_ally`** ✓
+>     （队伍级存在性 ✓，照 `HasSamePathAlly` 的 25 行 ✓，只换谓词 ✓）；助手 `isCompanion` 用 **`Character.getCid()`** ✓
+>     （⚠ 注释写明**按 id 不按名字** ✗："姬子 is a prefix of 姬子•启行" ✓）；
+>   * 内容：`BATTLE_START` + `when ["self is_companion", "has_companion_ally"]` ⇒ `CRIT_ATTACK` **0.32** ✓
+>     + `permanent` ✓ + `self` ✓；⚠ 8% 归 `properties`（`CriticalChanceBase 0.08` ✓）**不重写** ✓；
+>   * **登记表 3 → 2** ✓（余 `126 / 132` ✓）、`AUTHORED += "327/2"` ✓、`STILL_REGISTERED` 3→2 ✓、
+>     **`NO_RULE_SET` 327 → 132** ✓、两件套计数 **1 → 0** ✓（⭐ 即**再无未书写的带能力二件套** ✓）。
+> * ⭐⭐⭐ **一条被违反两次的纪律（本轮最重要的记录 ✓）**：**运行时判据必须穿过被测代码** ✗。
+>   * **第一次（第 394 轮）**：判据自己调 `fireTriggers` ✗ ⇒ **绕过 `SkillExecutor`** ✗ ⇒ 引擎变异**盲** ✗；
+>   * **第二次（本轮）**：判据用 **`TriggerInterpreter.apply(...)`** ✗ ⇒ **它只执行效果、不求值 `when`** ✗
+>     ⇒ ⚠ 把 `1002`（丹恒 ✓）从同伴集合里删掉后 ✗，判据**依然全绿** ✗（⚠ 实测：`GREEN (blind!)` ✓）；
+>   * ✅ **修法（一处换方法 ✓）**：改用 **`matching(event, ctx)`** ✓（⚠ 它**求值条件** ✓）⇒ ⭐ 变异立刻**变红** ✓
+>     （`engine restored; membership mutation is red (reds=1)` ✓）。
+>   * ⭐⭐ **因此新增一条可执行纪律** ✗：**凡在判据里用 `TriggerInterpreter.apply` / `fireTriggers` 直接施加规则的，
+>     必须同时给出一个走 `matching(...)` 的反例** ✓（⚠ 否则该判据对"条件"是盲的 ✓）。
+> * ✅ **四条能力全部闭合，且四条都有引擎级变异证明** ✓：
+>   | 能力 | 读者 | 变异 |
+>   |---|---|---|
+>   | `CAST_SETUP` 携带被瞄准者 | 光锥 `23048` ③ | `aimed→null` ⇒ 端到端判据红 ✓ |
+>   | `next_ally` 选择器 | 光锥 `21025` | `start=0`（队首）⇒ 红 ✓ |
+>   | `is_party_first` + `party_first` | 遗器 `317` | `getFirst→getLast` ⇒ 红 ✓ |
+>   | 同行组两关键词 | 遗器 `327` | 从集合删一名成员 ⇒ 红 ✓ |
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`ccd2278` ✓）；
+>   角色 93 / 93、光锥 164 / 170、**遗器 58 文件 / 登记表 2 条**、测试类 **479**。
+> * **剩余账目（已很少 ✓）**：`126` / `132`（⚠ 夹具钉在 `126` ✗）；6 张整卡光锥各缺一种机制 ✗；
+>   遗器 `130` 第二句缺"欢愉**技**"类别 ✗；两个"可写但无读者"的模式按纪律未抽象 ✗。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
