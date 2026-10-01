@@ -47,6 +47,7 @@ public class EffectSpec {
         copy.amount = this.amount;
         copy.amountFromAttr = amountFromAttr;
         copy.amountPercent = amountPercent;
+        copy.amountFromEvent = amountFromEvent;
         copy.perStack = this.perStack;
         copy.scale = this.scale;
         copy.attribute = this.attribute;
@@ -138,6 +139,12 @@ return copy;
      * The share of {@link #amountFromAttr} to take (0.5 for \u300c50%\u300d). Null means the whole value.
      */
     private Double amountPercent;
+    /**
+     * \u2705 Take the amount from the EVENT itself (2026-09-30; reader: 1505 \u7eef\u82f1\u2019s talent \u300c\u7eef\u82f1\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c
+     * \u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d). The magnitude a rule reacts to -- energy credited, damage dealt -- is already on the
+     * context ({@code TriggerContext.amount}); until this flag no op could spend it, so "as much as it just gained" had no spelling.
+     */
+    private Boolean amountFromEvent;
 
     /**
      * What a {@code HEAL} / {@code SHIELD} amount is a <b>percentage of</b>, instead of a flat number.
