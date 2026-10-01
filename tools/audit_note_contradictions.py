@@ -21,7 +21,7 @@ WORK = r'E:\code\java\aluminium'
 # "this clause is NOT written" markers
 UNWRITTEN = re.compile(r'(已登记|仍登记|登记而不猜|未写|尚未写|写不出来|不能写|不写近似)')
 # "this clause IS written" markers
-WRITTEN = re.compile(r'(已写出|已经写好|今天就能完整表达|已写|WRITTEN|已补齐|已补)')
+WRITTEN = re.compile(r'(?<!未)(已经写好|已写出|已出货|今天就能完整表达|本句已写|已补齐|WRITTEN)')
 
 roots = [
     ('characters', WORK + '/src/main/resources/characters/*.json'),
