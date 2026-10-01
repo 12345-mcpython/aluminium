@@ -158,6 +158,25 @@ public class Damage {
     }
 
     /** Records the intended toughness reduction (fluent, like the other instance mutators). */
+    /**
+     * The targets hit by the attack that produced this instance (2026-09-30).
+     *
+     * <p>\u26a0 The engine\u2019s pattern for \u300ca cast-level fact a rule must be able to read\u300d: the caller holds it and
+     * <b>the instance carries the answer</b> (see {@code setSkillKey} / {@code setStance}). An EMPTY set means
+     * \u300cunknown\u300d -- a hand-made or placeholder skill -- so a selector fails rather than guesses.
+     */
+    private java.util.Set<CanHit> hitTargets = java.util.Set.of();
+
+    /** Records the targets of the attack behind this instance. Immutable by construction. */
+    public void setHitTargets(java.util.Set<? extends CanHit> targets) {
+        this.hitTargets = java.util.Set.copyOf(targets);
+    }
+
+    /** The targets of the attack behind this instance; empty means unknown. */
+    public java.util.Set<CanHit> hitTargets() {
+        return hitTargets;
+    }
+
     public Damage setStance(double value) {
         this.stance = value;
         return this;
