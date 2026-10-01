@@ -1,0 +1,23 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone24003_ult_dot",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.48,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24003：「当装备者施放终结技时，使装备者造成的持续伤容提高#2[i]%，持续#3[i]回合。」",
+      "note": "⭐ 原文 ✓：`CAST_SETUP` + `from_category ULTRA` ⇒ 属性名 **`DOT_DAMAGE_BOOST`** ✓（实测核对，已有两处先例：光锥 21008 与遗器 322 ✓）+ 48% ✓ + `turns: 2` ✓ + `target: self` ✓。⚠ 仍登记 ✗：① 第一句「击破特攻提高#1[i]%」是**属性行** ✓（不写 ✓）；② 「陷入装备者施加的持续伤容效果的敌方目标被消灭时，装备者恢复 6 点能量」✗ —— 核心（`KILL` ⇒ `GAIN_ENERGY 6` ✓）可写 ✓，但**作用域**（只限身上有我的 DOT 的敌人 ✗）不可写 ✗ ⇒ 按纪律**不近似** ✓，整句登记 ✓。"
+    }
+  ]
+}
