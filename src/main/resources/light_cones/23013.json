@@ -1,0 +1,122 @@
+{
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23013_stats",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23013 日有四时: 使装备者生命上限提高#1[i]%，治疗量提高#2[i]%。当装备者对我方目标提供治疗时，记录治疗量。当任意我方目标施放攻击后，根据记录治疗量的#3[i]%，对随机1个受到攻击的敌方目标造成基于",
+      "note": "「使装备者生命上限提高 #1[i]%，治疗量提高 #2[i]%」—— 两个无条件永久属性：`HEALTH` ✓（已出货名）与 **`OUTGOING_HEALING_BOOST`** ✓（\"自己发出的治疗\"，已出货于 20001 / 21054 / 21000 / 21007 / 21014 / 22001 / 320 ✓）。⛔ 未出货的两句：「对我方目标提供治疗时记录治疗量…按记录量的 #3[i]% 对随机 1 个受击敌人造成附加伤害」—— 需要\"记录型量\" ✗（引擎没有\"记录治疗量\"的概念）与\"按记录量缩放\" ✗。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23013_stats",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.21,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.14,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23013 日有四时: 使装备者生命上限提高#1[i]%，治疗量提高#2[i]%。当装备者对我方目标提供治疗时，记录治疗量。当任意我方目标施放攻击后，根据记录治疗量的#3[i]%，对随机1个受到攻击的敌方目标造成基于",
+      "note": "「使装备者生命上限提高 #1[i]%，治疗量提高 #2[i]%」—— 两个无条件永久属性：`HEALTH` ✓（已出货名）与 **`OUTGOING_HEALING_BOOST`** ✓（\"自己发出的治疗\"，已出货于 20001 / 21054 / 21000 / 21007 / 21014 / 22001 / 320 ✓）。⛔ 未出货的两句：「对我方目标提供治疗时记录治疗量…按记录量的 #3[i]% 对随机 1 个受击敌人造成附加伤害」—— 需要\"记录型量\" ✗（引擎没有\"记录治疗量\"的概念）与\"按记录量缩放\" ✗。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23013_stats",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23013 日有四时: 使装备者生命上限提高#1[i]%，治疗量提高#2[i]%。当装备者对我方目标提供治疗时，记录治疗量。当任意我方目标施放攻击后，根据记录治疗量的#3[i]%，对随机1个受到攻击的敌方目标造成基于",
+      "note": "「使装备者生命上限提高 #1[i]%，治疗量提高 #2[i]%」—— 两个无条件永久属性：`HEALTH` ✓（已出货名）与 **`OUTGOING_HEALING_BOOST`** ✓（\"自己发出的治疗\"，已出货于 20001 / 21054 / 21000 / 21007 / 21014 / 22001 / 320 ✓）。⛔ 未出货的两句：「对我方目标提供治疗时记录治疗量…按记录量的 #3[i]% 对随机 1 个受击敌人造成附加伤害」—— 需要\"记录型量\" ✗（引擎没有\"记录治疗量\"的概念）与\"按记录量缩放\" ✗。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23013_stats",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.27,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23013 日有四时: 使装备者生命上限提高#1[i]%，治疗量提高#2[i]%。当装备者对我方目标提供治疗时，记录治疗量。当任意我方目标施放攻击后，根据记录治疗量的#3[i]%，对随机1个受到攻击的敌方目标造成基于",
+      "note": "「使装备者生命上限提高 #1[i]%，治疗量提高 #2[i]%」—— 两个无条件永久属性：`HEALTH` ✓（已出货名）与 **`OUTGOING_HEALING_BOOST`** ✓（\"自己发出的治疗\"，已出货于 20001 / 21054 / 21000 / 21007 / 21014 / 22001 / 320 ✓）。⛔ 未出货的两句：「对我方目标提供治疗时记录治疗量…按记录量的 #3[i]% 对随机 1 个受击敌人造成附加伤害」—— 需要\"记录型量\" ✗（引擎没有\"记录治疗量\"的概念）与\"按记录量缩放\" ✗。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23013_stats",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23013 日有四时: 使装备者生命上限提高#1[i]%，治疗量提高#2[i]%。当装备者对我方目标提供治疗时，记录治疗量。当任意我方目标施放攻击后，根据记录治疗量的#3[i]%，对随机1个受到攻击的敌方目标造成基于",
+      "note": "「使装备者生命上限提高 #1[i]%，治疗量提高 #2[i]%」—— 两个无条件永久属性：`HEALTH` ✓（已出货名）与 **`OUTGOING_HEALING_BOOST`** ✓（\"自己发出的治疗\"，已出货于 20001 / 21054 / 21000 / 21007 / 21014 / 22001 / 320 ✓）。⛔ 未出货的两句：「对我方目标提供治疗时记录治疗量…按记录量的 #3[i]% 对随机 1 个受击敌人造成附加伤害」—— 需要\"记录型量\" ✗（引擎没有\"记录治疗量\"的概念）与\"按记录量缩放\" ✗。"
+    }
+  ]
+}
