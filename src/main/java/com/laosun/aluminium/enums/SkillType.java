@@ -57,6 +57,17 @@ public enum SkillType {
     /**
      * Passive talent of a summoned entity.
      */
+    /**
+     * \u2705 The data\u2019s slot 20 (2026-09-30): the Elation skill \u300c\u6b22\u6109\u6280\u300d, named by the game\u2019s own text
+     * (relic set 130 says \u300c\u9996\u6b21\u4f7f\u7528\u6b22\u6109\u6280\u300d). Nine skills in `skills.json` carry `attack_type: ElationDamage`
+     * and every one of them was invisible to the loader until this constant existed.
+     */
+    ELATION_SKILL,
+    /**
+     * \u26a0 The data\u2019s slot 21 (2026-09-30): a second Elation-damage skill carried by 1506 and 1513 only. The game text
+     * does not name it, so this name records the SLOT and nothing more.
+     */
+    ELATION_EXTRA,
     SUMMON_TALENT;
 
     /**
@@ -70,6 +81,9 @@ public enum SkillType {
      * character's own skills (P9-4).
      */
     public boolean isIntrinsic() {
-        return this == COMMON || this == SKILL || this == ULTRA || this == TALENT;
+        // \u2705 2026-09-30: the Elation damage skills are part of the always-on kit. This method is the gate that kept
+        // them invisible: `Character`\u2019s kit builder skips every type it does not call intrinsic.
+        return this == COMMON || this == SKILL || this == ULTRA || this == TALENT
+                || this == ELATION_SKILL || this == ELATION_EXTRA;
     }
 }
