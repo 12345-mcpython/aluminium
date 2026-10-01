@@ -53,6 +53,27 @@
       ],
       "source": "绯英 天赋：「绯英获得能量时，将同步获得等值的【好活当赏】」",
       "note": "⭐ 读者原文 ✓：获得能量时**同步获得等值**的【好活当赏】✓ ⇒ `amountFromEvent` ✓（事件的量就是这次获得的能量 ✓）。⚠ 未做 ✗：反向（获得【好活当赏】时同步获得等值能量 ✗）—— 它会形成**循环** ✗，需要先有\"每次转换上限 100\" 与防循环的语义 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "p1505_skill_elation_rider",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL",
+        "self_resource:好活当赏 >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.08,
+          "element": "physical",
+          "damage_type": "ELATION",
+          "target": "target"
+        }
+      ],
+      "source": "绯英 天赋：「当绯英持有【好活当赏】时：施放战技可对受到攻击的敌方目标造成#7[f1]%的物理属性欢愉伤容。」",
+      "note": "⭐ 三件事在这一条里合作 ✓：条件 `self_resource:好活当赏 >= 1` ✓（\"持有\"✓）、`from_category BPSKILL` ✓（施放战技 ✓）、以及**带类型的附加伤容** ✓（`damageType: ELATION` ✓ —— 本轮新能力 ✓）。⚠ 同族的另两条已登记 ✗：终结技那条需要**随机目标** ✗、【狐狸老师】那条需要**召唤物的追加攻击** ✗。"
     }
   ]
 }
