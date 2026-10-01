@@ -57,6 +57,12 @@ public class LightConeRegistryTest {
                 Assertions.assertTrue(reason.toString().length() > 80,
                         id + " must name the missing capability, and a one-liner is not enough: " + reason);
                 Assertions.assertNotNull(entry.get("ability"), id + " must name the ability");
+                Assertions.assertTrue(reason.toString().contains("GREPPED"),
+                        id + " must record WHICH engine sets were searched before calling a capability missing. "
+                                + "This is not ceremony: 21029 was registered three times wrongly (its random-target "
+                                + "selector and ADD_DAMAGE both already existed), because the reasons were written "
+                                + "from the cone text alone. A reason that does not say what was searched cannot be "
+                                + "trusted, and this registry is only worth having if it can be trusted.");
             }
             Assertions.assertFalse(hasRuleFile(id),
                     id + " IS written (a rule file exists), so it must be removed from the registry in the same "
