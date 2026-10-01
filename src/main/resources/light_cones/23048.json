@@ -27,6 +27,24 @@
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
       "note": "「施放终结技攻击后恢复 #3[i] 个战技点」—— 事件 ULT_CAST + `GAIN_SKILL_POINT`；数值取自本档 ParamList 第 3 项。⛔ 未出货的一句：「装备者对我方**单体角色**施放战技后，使**目标**造成的战技伤害提高 #4[f1]%，持续 #5[i] 回合」。实测更正（2026-09-30，旧注记说\"待核实 damage_type\"是**错的方向** ✗）：① 「战技伤害提高」**有专门属性** ✓ —— `SKILL_DAMAGE_BOOST`（已出货：`21036` 用 `[\"actor == self\", \"from_category BPSKILL\"]` 守卫它；同族还有 `BASIC_ATTACK_DAMAGE_BOOST` 与 `ULTIMATE_DAMAGE_BOOST`）；全项目有 45 处 `MODIFY_ATTR` 被 `from_category` 守卫 ✓；② ⚠ 但 `damage_type` 只接受**伤害类型**（实测取值：ADDITIONAL / ULTRA / BREAK / ELATION / DOT / SUPER_BREAK ✗），**不能**用来限定\"战技\" ✗；③ ⛔ 真正缺的是「**技能作用于我方哪一个单位**」✗ —— 需要指认\"被施放的那个友方\" ✗，与遗器 317 的\"队伍第一名\"、327 的\"命名命途\"**同族**（引擎能描述事件，但不能指认被选中的队友 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23048_skill_damage",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.54,
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
+      "note": "「装备者对我方单体角色施放战技后，使目标造成的战技伤害提高 #4[f1]%，持续 #5[i]=3 回合」—— 事件 CAST_SETUP（结算之前的唯一时机）✓ + from_category BPSKILL ✓ + 目标取事件 target（=被瞄准的我方 ✓，本轮刚给 CAST_SETUP 补上）✓。⚠ 曾判为缺指认技能接收者 ✗，实测三类事件各缺一样后收敛到此写法 ✓。"
     }
   ],
   "2": [
@@ -57,6 +75,24 @@
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
       "note": "「施放终结技攻击后恢复 #3[i] 个战技点」—— 事件 ULT_CAST + `GAIN_SKILL_POINT`；数值取自本档 ParamList 第 3 项。⛔ 未出货的一句：「装备者对我方**单体角色**施放战技后，使**目标**造成的战技伤害提高 #4[f1]%，持续 #5[i] 回合」。实测更正（2026-09-30，旧注记说\"待核实 damage_type\"是**错的方向** ✗）：① 「战技伤害提高」**有专门属性** ✓ —— `SKILL_DAMAGE_BOOST`（已出货：`21036` 用 `[\"actor == self\", \"from_category BPSKILL\"]` 守卫它；同族还有 `BASIC_ATTACK_DAMAGE_BOOST` 与 `ULTIMATE_DAMAGE_BOOST`）；全项目有 45 处 `MODIFY_ATTR` 被 `from_category` 守卫 ✓；② ⚠ 但 `damage_type` 只接受**伤害类型**（实测取值：ADDITIONAL / ULTRA / BREAK / ELATION / DOT / SUPER_BREAK ✗），**不能**用来限定\"战技\" ✗；③ ⛔ 真正缺的是「**技能作用于我方哪一个单位**」✗ —— 需要指认\"被施放的那个友方\" ✗，与遗器 317 的\"队伍第一名\"、327 的\"命名命途\"**同族**（引擎能描述事件，但不能指认被选中的队友 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23048_skill_damage",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.675,
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
+      "note": "「装备者对我方单体角色施放战技后，使目标造成的战技伤害提高 #4[f1]%，持续 #5[i]=3 回合」—— 事件 CAST_SETUP（结算之前的唯一时机）✓ + from_category BPSKILL ✓ + 目标取事件 target（=被瞄准的我方 ✓，本轮刚给 CAST_SETUP 补上）✓。⚠ 曾判为缺指认技能接收者 ✗，实测三类事件各缺一样后收敛到此写法 ✓。"
     }
   ],
   "3": [
@@ -87,6 +123,24 @@
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
       "note": "「施放终结技攻击后恢复 #3[i] 个战技点」—— 事件 ULT_CAST + `GAIN_SKILL_POINT`；数值取自本档 ParamList 第 3 项。⛔ 未出货的一句：「装备者对我方**单体角色**施放战技后，使**目标**造成的战技伤害提高 #4[f1]%，持续 #5[i] 回合」。实测更正（2026-09-30，旧注记说\"待核实 damage_type\"是**错的方向** ✗）：① 「战技伤害提高」**有专门属性** ✓ —— `SKILL_DAMAGE_BOOST`（已出货：`21036` 用 `[\"actor == self\", \"from_category BPSKILL\"]` 守卫它；同族还有 `BASIC_ATTACK_DAMAGE_BOOST` 与 `ULTIMATE_DAMAGE_BOOST`）；全项目有 45 处 `MODIFY_ATTR` 被 `from_category` 守卫 ✓；② ⚠ 但 `damage_type` 只接受**伤害类型**（实测取值：ADDITIONAL / ULTRA / BREAK / ELATION / DOT / SUPER_BREAK ✗），**不能**用来限定\"战技\" ✗；③ ⛔ 真正缺的是「**技能作用于我方哪一个单位**」✗ —— 需要指认\"被施放的那个友方\" ✗，与遗器 317 的\"队伍第一名\"、327 的\"命名命途\"**同族**（引擎能描述事件，但不能指认被选中的队友 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23048_skill_damage",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.81,
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
+      "note": "「装备者对我方单体角色施放战技后，使目标造成的战技伤害提高 #4[f1]%，持续 #5[i]=3 回合」—— 事件 CAST_SETUP（结算之前的唯一时机）✓ + from_category BPSKILL ✓ + 目标取事件 target（=被瞄准的我方 ✓，本轮刚给 CAST_SETUP 补上）✓。⚠ 曾判为缺指认技能接收者 ✗，实测三类事件各缺一样后收敛到此写法 ✓。"
     }
   ],
   "4": [
@@ -117,6 +171,24 @@
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
       "note": "「施放终结技攻击后恢复 #3[i] 个战技点」—— 事件 ULT_CAST + `GAIN_SKILL_POINT`；数值取自本档 ParamList 第 3 项。⛔ 未出货的一句：「装备者对我方**单体角色**施放战技后，使**目标**造成的战技伤害提高 #4[f1]%，持续 #5[i] 回合」。实测更正（2026-09-30，旧注记说\"待核实 damage_type\"是**错的方向** ✗）：① 「战技伤害提高」**有专门属性** ✓ —— `SKILL_DAMAGE_BOOST`（已出货：`21036` 用 `[\"actor == self\", \"from_category BPSKILL\"]` 守卫它；同族还有 `BASIC_ATTACK_DAMAGE_BOOST` 与 `ULTIMATE_DAMAGE_BOOST`）；全项目有 45 处 `MODIFY_ATTR` 被 `from_category` 守卫 ✓；② ⚠ 但 `damage_type` 只接受**伤害类型**（实测取值：ADDITIONAL / ULTRA / BREAK / ELATION / DOT / SUPER_BREAK ✗），**不能**用来限定\"战技\" ✗；③ ⛔ 真正缺的是「**技能作用于我方哪一个单位**」✗ —— 需要指认\"被施放的那个友方\" ✗，与遗器 317 的\"队伍第一名\"、327 的\"命名命途\"**同族**（引擎能描述事件，但不能指认被选中的队友 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23048_skill_damage",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.945,
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
+      "note": "「装备者对我方单体角色施放战技后，使目标造成的战技伤害提高 #4[f1]%，持续 #5[i]=3 回合」—— 事件 CAST_SETUP（结算之前的唯一时机）✓ + from_category BPSKILL ✓ + 目标取事件 target（=被瞄准的我方 ✓，本轮刚给 CAST_SETUP 补上）✓。⚠ 曾判为缺指认技能接收者 ✗，实测三类事件各缺一样后收敛到此写法 ✓。"
     }
   ],
   "5": [
@@ -147,6 +219,24 @@
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
       "note": "「施放终结技攻击后恢复 #3[i] 个战技点」—— 事件 ULT_CAST + `GAIN_SKILL_POINT`；数值取自本档 ParamList 第 3 项。⛔ 未出货的一句：「装备者对我方**单体角色**施放战技后，使**目标**造成的战技伤害提高 #4[f1]%，持续 #5[i] 回合」。实测更正（2026-09-30，旧注记说\"待核实 damage_type\"是**错的方向** ✗）：① 「战技伤害提高」**有专门属性** ✓ —— `SKILL_DAMAGE_BOOST`（已出货：`21036` 用 `[\"actor == self\", \"from_category BPSKILL\"]` 守卫它；同族还有 `BASIC_ATTACK_DAMAGE_BOOST` 与 `ULTIMATE_DAMAGE_BOOST`）；全项目有 45 处 `MODIFY_ATTR` 被 `from_category` 守卫 ✓；② ⚠ 但 `damage_type` 只接受**伤害类型**（实测取值：ADDITIONAL / ULTRA / BREAK / ELATION / DOT / SUPER_BREAK ✗），**不能**用来限定\"战技\" ✗；③ ⛔ 真正缺的是「**技能作用于我方哪一个单位**」✗ —— 需要指认\"被施放的那个友方\" ✗，与遗器 317 的\"队伍第一名\"、327 的\"命名命途\"**同族**（引擎能描述事件，但不能指认被选中的队友 ✗）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23048_skill_damage",
+      "when": [
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 1.08,
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
+      "note": "「装备者对我方单体角色施放战技后，使目标造成的战技伤害提高 #4[f1]%，持续 #5[i]=3 回合」—— 事件 CAST_SETUP（结算之前的唯一时机）✓ + from_category BPSKILL ✓ + 目标取事件 target（=被瞄准的我方 ✓，本轮刚给 CAST_SETUP 补上）✓。⚠ 曾判为缺指认技能接收者 ✗，实测三类事件各缺一样后收敛到此写法 ✓。"
     }
   ]
 }
