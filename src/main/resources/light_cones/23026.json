@@ -1,0 +1,292 @@
+{
+  "1": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23026_song",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "歌咏",
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.03,
+          "per_stack": "歌咏",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「我方角色每次攻击时，使装备者获得 1 层【歌咏】，每层使装备者的能量恢复效率提高 #1[f1]%，最多叠加 #2[i]=5 层」—— ① 事件 ALLY_ATTACK（我方任何角色攻击都会发）；② 层数用 ADD_STACK，上限 5 由 max_stacks 承担；③ 加成用 per_stack: 歌咏 按层缩放，⚠ 因此**不再写 max_stacks**（否则会与层数上限二次计数）；数值 #1 = 0.03。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23026_flourish",
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "歌咏",
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "华彩",
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.48,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高 #4[i]%，使我方全体造成的伤害提高 #3[i]%，持续 #5[i]=1 回合」—— ① 事件 ULT_CAST；② 移除用 REMOVE_STATE <名>（既有写法，先例：「退出【协奏】」= REMOVE_STATE + EXTRA_TURN）；③ 攻击力给自身、增伤给我方全体，各一个 MODIFY_ATTR，turns 1；数值 #4 = 0.48、#3 = 0.24。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23026_song",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "歌咏",
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.035,
+          "per_stack": "歌咏",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「我方角色每次攻击时，使装备者获得 1 层【歌咏】，每层使装备者的能量恢复效率提高 #1[f1]%，最多叠加 #2[i]=5 层」—— ① 事件 ALLY_ATTACK（我方任何角色攻击都会发）；② 层数用 ADD_STACK，上限 5 由 max_stacks 承担；③ 加成用 per_stack: 歌咏 按层缩放，⚠ 因此**不再写 max_stacks**（否则会与层数上限二次计数）；数值 #1 = 0.035。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23026_flourish",
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "歌咏",
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "华彩",
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.6,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.28,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高 #4[i]%，使我方全体造成的伤害提高 #3[i]%，持续 #5[i]=1 回合」—— ① 事件 ULT_CAST；② 移除用 REMOVE_STATE <名>（既有写法，先例：「退出【协奏】」= REMOVE_STATE + EXTRA_TURN）；③ 攻击力给自身、增伤给我方全体，各一个 MODIFY_ATTR，turns 1；数值 #4 = 0.6、#3 = 0.28。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23026_song",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "歌咏",
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.04,
+          "per_stack": "歌咏",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「我方角色每次攻击时，使装备者获得 1 层【歌咏】，每层使装备者的能量恢复效率提高 #1[f1]%，最多叠加 #2[i]=5 层」—— ① 事件 ALLY_ATTACK（我方任何角色攻击都会发）；② 层数用 ADD_STACK，上限 5 由 max_stacks 承担；③ 加成用 per_stack: 歌咏 按层缩放，⚠ 因此**不再写 max_stacks**（否则会与层数上限二次计数）；数值 #1 = 0.04。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23026_flourish",
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "歌咏",
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "华彩",
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.72,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高 #4[i]%，使我方全体造成的伤害提高 #3[i]%，持续 #5[i]=1 回合」—— ① 事件 ULT_CAST；② 移除用 REMOVE_STATE <名>（既有写法，先例：「退出【协奏】」= REMOVE_STATE + EXTRA_TURN）；③ 攻击力给自身、增伤给我方全体，各一个 MODIFY_ATTR，turns 1；数值 #4 = 0.72、#3 = 0.32。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23026_song",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "歌咏",
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.045,
+          "per_stack": "歌咏",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「我方角色每次攻击时，使装备者获得 1 层【歌咏】，每层使装备者的能量恢复效率提高 #1[f1]%，最多叠加 #2[i]=5 层」—— ① 事件 ALLY_ATTACK（我方任何角色攻击都会发）；② 层数用 ADD_STACK，上限 5 由 max_stacks 承担；③ 加成用 per_stack: 歌咏 按层缩放，⚠ 因此**不再写 max_stacks**（否则会与层数上限二次计数）；数值 #1 = 0.045。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23026_flourish",
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "歌咏",
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "华彩",
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.84,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高 #4[i]%，使我方全体造成的伤害提高 #3[i]%，持续 #5[i]=1 回合」—— ① 事件 ULT_CAST；② 移除用 REMOVE_STATE <名>（既有写法，先例：「退出【协奏】」= REMOVE_STATE + EXTRA_TURN）；③ 攻击力给自身、增伤给我方全体，各一个 MODIFY_ATTR，turns 1；数值 #4 = 0.84、#3 = 0.36。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23026_song",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "歌咏",
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.05,
+          "per_stack": "歌咏",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「我方角色每次攻击时，使装备者获得 1 层【歌咏】，每层使装备者的能量恢复效率提高 #1[f1]%，最多叠加 #2[i]=5 层」—— ① 事件 ALLY_ATTACK（我方任何角色攻击都会发）；② 层数用 ADD_STACK，上限 5 由 max_stacks 承担；③ 加成用 per_stack: 歌咏 按层缩放，⚠ 因此**不再写 max_stacks**（否则会与层数上限二次计数）；数值 #1 = 0.05。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23026_flourish",
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "歌咏",
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "华彩",
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.96,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23026 抚慰: 我方角色每次攻击时，使装备者获得1层【歌咏】，每层【歌咏】使装备者的能量恢复效率提高#1[f1]%，最多叠加#2[i]层。装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高#4[i]%，使我方全体造成的伤害提高#3[i]%，持续#5[i]回合。",
+      "note": "「装备者施放终结技时，移除【歌咏】并获得【华彩】，【华彩】使装备者的攻击力提高 #4[i]%，使我方全体造成的伤害提高 #3[i]%，持续 #5[i]=1 回合」—— ① 事件 ULT_CAST；② 移除用 REMOVE_STATE <名>（既有写法，先例：「退出【协奏】」= REMOVE_STATE + EXTRA_TURN）；③ 攻击力给自身、增伤给我方全体，各一个 MODIFY_ATTR，turns 1；数值 #4 = 0.96、#3 = 0.4。"
+    }
+  ]
+}
