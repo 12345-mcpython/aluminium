@@ -12,7 +12,7 @@ import sys
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 WORK = r'E:\code\java\aluminium'
-CHAR = 'src/main/resources/characters/1215.json'
+CHAR = 'src/main/resources/characters/1207.json'
 FRAG = 'per-unit trigger count'
 
 ADD = (' ⚠ RE-VERIFIED 2026-09-30: the FIRST half of that is no longer true -- the ENERGY_GAINED event together '
