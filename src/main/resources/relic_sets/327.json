@@ -1,0 +1,23 @@
+{
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "relic327_companion_crit_dmg",
+      "when": [
+        "self is_companion",
+        "has_companion_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 327 二件套: Increases the wearer's CRIT Rate by 8%. When entering combat, if the wearer and another teammate are both Trailblaze Companions characters, increases the wearer's CRIT DMG by 32%.",
+      "note": "「使装备者的暴击率提高 8%」是 `properties` 的 `CriticalChanceBase 0.08` ✓ **不重写** ✓；「进入战斗时，若装备者与另一名队友**均为开拓同行角色**，使装备者的暴击伤害提高 32%」—— 条件用两个新关键词 ✓：`self is_companion` ✓（单单位 ✓）＋ `has_companion_ally` ✓（我方存在性 ✓）；效果 `CRIT_ATTACK 0.32` ✓ + `permanent` ✓ + `self` ✓（⚠ 数值取自权威文本 `data/relic_sets.json` 的 `param=[0.08,0.32]` ✗ —— ⚠ 旧登记写的 24% **是错的** ✗）。⚠ **同伴名单来源**：成员归属**没有任何数据字段标记** ✗（`AvatarConfig` / `AvatarCamp` / `SpecialAvatar` 均已排查 ✓、2253 张表的共现扫描命中 355 张泛用表 ✗）⇒ 名单转写自**文档术语表** ✓（`1510_姬子•启行.md:408` ✓ / `export_glossary.py:70` ✓）；⚠ id 本身来自 `character_data.json` ✓。⚠ 按 **id** 匹配而非名字 ✓（⚠ `姬子` 是 `姬子•启行` 的前缀 ✗；开拓者 ×10、三月七 ×2 ✓）。"
+    }
+  ]
+}
