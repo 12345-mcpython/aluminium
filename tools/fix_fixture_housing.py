@@ -27,13 +27,17 @@ FX_OLD = WORK + '/src/test/resources/relic_sets/126.json'
 FX_NEW = WORK + '/src/test/resources/relic_sets/99001.json'
 
 touched = {}
+orig = {}
 for p in (RS, RTT, SO):
+    # ⚠ Keep TWO dicts: `touched` is edited in place while patching, so restoring from it would write the MODIFIED
+    # text back (measured 2026-09-30: three test files left dirty). `orig` is never reassigned.
     touched[p] = io.open(p, encoding='utf-8').read()
+    orig[p] = touched[p]
 fx_text = io.open(FX_OLD, encoding='utf-8').read() if os.path.exists(FX_OLD) else None
 
 
 def fail(msg):
-    for p, text in touched.items():
+    for p, text in orig.items():
         io.open(p, 'w', encoding='utf-8', newline='').write(text)
     if fx_text is not None and os.path.exists(FX_NEW):
         io.open(FX_OLD, 'w', encoding='utf-8', newline='').write(fx_text)
@@ -91,12 +95,18 @@ if old not in touched[RS]:
 touched[RS] = touched[RS].replace(old, new, 1)
 
 # 2b. the census method (:412 loop, :424/:425 counts, :428 identity)
-old = '        for (RelicSet set : Constant.RELIC_SETS.values()) {'
-new = ('        List<RelicSet> shipped = Constant.RELIC_SETS.values().stream()\n'
+# ⚠ The bare loop header is NOT unique in this file (measured: an earlier method has the same line, which is why the
+# first attempt patched the wrong one and the identity's method never got `shipped`). Anchor with context, and assert.
+old = ('        int withStats = 0;\n'
+       '        int abilityOnly = 0;\n'
+       '        for (RelicSet set : Constant.RELIC_SETS.values()) {')
+new = ('        int withStats = 0;\n'
+       '        int abilityOnly = 0;\n'
+       '        List<RelicSet> shipped = Constant.RELIC_SETS.values().stream()\n'
        '                .filter(s -> !"test".equals(s.releaseVersion())).toList();\n'
        '        for (RelicSet set : shipped) {')
-if old not in touched[RS]:
-    fail('RelicSetTest :412 anchor not found')
+if touched[RS].count(old) != 1:
+    fail('RelicSetTest :412 anchor is not unique (%d matches)' % touched[RS].count(old))
 touched[RS] = touched[RS].replace(old, new, 1)
 old = ('        Assertions.assertEquals(Constant.RELIC_SETS.values().stream().mapToInt(s -> s.effects().size()).sum(),\n'
        '                withStats + abilityOnly, "every effect is accounted for");')
