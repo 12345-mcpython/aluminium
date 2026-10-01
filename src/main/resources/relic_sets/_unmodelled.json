@@ -6,13 +6,6 @@
       "reason": "\"When the wearer becomes the target of another ally target's ability, gains 1 stack of 'Help,' stacking up to 2 time(s). If there are 2 stack(s) ... when the wearer uses their Ultimate, consumes all 'Help' to increase the wearer's ATK by 48% for 1 turn(s).\" The stacking counter and the 'for 1 turn' buff are now expressible, but there is no event for 'the wearer was targeted by an ally's ability' and no condition for 'I have exactly N stacks' (the DSL reads the owner's HP percentage, attribute values and the hit count, not buff stacks), nor an op that consumes them."
     }
   ],
-  "130": [
-    {
-      "require": 4,
-      "ability": "Ability51301",
-      "reason": "\"Before entering combat, if the wearer's SPD is greater than or equal to 120/160, increases the wearer's CRIT Rate by 10%/18%. When the wearer uses Elation Skill for the first time in each battle, increases all allies' Elation by 10%.\" The SPD threshold arrived on 2026-09-27 (`self_attr:SPEED`), and the 'first time each battle' limit is expressible (`once_per_battle`). What still blocks it is the Elation system in the second sentence. (The 120/160 pair is not a gap -- an upper bound makes the tiers exclusive, see set 311.)"
-    }
-  ],
   "132": [
     {
       "require": 4,
