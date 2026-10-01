@@ -1,0 +1,24 @@
+{
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic129_elation_ignores_defence",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.1,
+          "instance": true,
+          "damage_type": "ELATION",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 129 四件套：「装备者及其忆灵造成的**欢愉伤容**无视目标 10% 防御」",
+      "note": "⭐ 只写**前半句** ✓：「装备者造成的**欢愉伤容**无视目标 **10%** 防御」✓ = `DEALING_DAMAGE` + `actor == self` ⇒ 实例 `MODIFY_ATTR DEFENCE_IGNORE` + **`damage_type: ELATION`** ✓（这个作用域早已在３轮前的欢愉切片里实测过 ✓）。⚠ 同条能力的后半句仍登记 ✗：「每累计获得 **5 点笑点**，欢愉伤容额外无视 **1%** 防御，最多叠加 **5** 层」（需要\"累计获得的笑点总量\" **按 5 取整** ✗）；以及「**及其忆灵**」那一半 ✗（需要\"本伤容的出手方是我的忆灵\"的条件 ✗）。"
+    }
+  ]
+}

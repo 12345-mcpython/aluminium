@@ -6,13 +6,6 @@
       "reason": "\"When the wearer becomes the target of another ally target's ability, gains 1 stack of 'Help,' stacking up to 2 time(s). If there are 2 stack(s) ... when the wearer uses their Ultimate, consumes all 'Help' to increase the wearer's ATK by 48% for 1 turn(s).\" The stacking counter and the 'for 1 turn' buff are now expressible, but there is no event for 'the wearer was targeted by an ally's ability' and no condition for 'I have exactly N stacks' (the DSL reads the owner's HP percentage, attribute values and the hit count, not buff stacks), nor an op that consumes them."
     }
   ],
-  "129": [
-    {
-      "require": 4,
-      "ability": "Ability51291",
-      "reason": "\"The Elation DMG dealt by the wearer and their memosprites ignores 10% of targets' DEF. For every 5 accumulated Punchline allies gain, the Elation DMG dealt additionally ignores 1% of targets' DEF, stacking up to 10 time(s).\" Needs an Elation damage channel (engine.md 18.4), a stacking counter driven by a resource, and an instance-scoped ignore (⚠ the DEF-ignore STAT itself is not a gap -- see set 116)."
-    }
-  ],
   "130": [
     {
       "require": 4,
