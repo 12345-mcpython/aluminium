@@ -51,6 +51,8 @@ JAVA = ('package com.laosun.aluminium.test;' + NL + NL
         + '        TriggerSpecs.set(stack, ' + Q + 'buff' + Q + ', ' + Q + '探针' + Q + ');' + NL
         + '        TriggerSpecs.set(stack, ' + Q + 'amount' + Q + ', 1.0d);' + NL
         + '        TriggerSpecs.set(stack, ' + Q + 'target' + Q + ', ' + Q + 'self' + Q + ');' + NL
+        + '        // ADD_STACK has no default lifetime: the loader names turns / permanent / until (measured in round 733).' + NL
+        + '        TriggerSpecs.set(stack, ' + Q + 'permanent' + Q + ', Boolean.TRUE);' + NL
         + '        TriggerSpec capped = TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of(), stack);' + NL
         + '        TriggerSpecs.set(capped, ' + Q + 'id' + Q + ', CAPPED);' + NL
         + '        TriggerSpecs.set(capped, ' + Q + 'perTurn' + Q + ', 1);' + NL + NL
