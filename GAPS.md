@@ -12687,6 +12687,34 @@
 >   现有判据断言的是**写法**（`instance: true` / `per_stack` 的字符串），不是**数值**。
 >   ⚠ 这条缺口在本段反复出现（**内容对 ≠ 数对**），所以它值得单独一轮，且**必须先看到红**。
 >
+
+> **2026-09-30 更新（aggro 回收之六百九十五：运行时的数判据落地，欠账清零）**：
+>
+> * **判据**（`test: prove the per_stack number at run time, red-proved against the old formula`）：
+>   `PerStackRuntimeTest` 加 2 层自定义计数器（`ADD_STACK` + `amount: 2.0` + `maxStacks: 2`），
+>   在同一条 `TURN_START` 规则里施加 `MODIFY_ATTR ATTACK +10%` + **`per_stack: self_stacks:<该计数器>`**，
+>   先断言 `stacksOf(mark) == 2`，**再断言攻击力 after > before**。
+>   —— 这是本段**第一个断言"运行时的量"而不是"写法"**的判据。
+> * **红的证明（关键证据）**：把 `modifyAttr` 临时改回旧公式后，
+>   **聚焦判据立刻变红**（`RED PROOF: focused exit with the old formula = 1`）⇒ 判据不瞎 ⇒ 随后还原引擎。
+>   证据链：`focused 0` → 红证明 `1` → **全量 0** → 闸门 `[0, 0]` → 树干净 → 已推送。
+> * **一处自伤（价值在于报错即修法）**：首次运行报
+>   `Can not set java.lang.Double field …EffectSpec.amount to java.lang.Integer`
+>   ⇒ **`amount` 是 `Double`**（写 `2.0` 即过）。反射的报错**直接点出了修法**。
+> * **欠账状态**：欠账一（运行时数值判据）**已还**；欠账二（两处 `per_stack` 合并）**已关闭**。
+>   —— **本段无挂账**。
+> * **夹具 API 已全部实测钉死（可复用清单）**：
+>   `new EffectSpec()` / `TriggerSpecs.modifyAttr(attr, percent, turns)` / `applyBuff` / `dot` / `applyControl` /
+>   `modifyDamageTaken` / `gainEnergy` / `heal` / `shield` / `advance` / `taunt` / `extendBuff` /
+>   `gainResource` / `spendResource`；
+>   `TriggerSpecs.set(bean, "<Java 字段名>", value)`（反射；字段名 = `op` `attribute` `percent` `turns`
+>   `permanent` `maxStacks` `stacks` `target` `buff` `amount`（**Double**）`perStack` `scale` `baseChance` `control` …）；
+>   `TriggerSpecs.rule(event, conditions, effects…)`；
+>   `RelicTriggerTables.parse(setId, Map<String, List<TriggerSpec>>, origin).at(pieces).matching(event, ctx)`
+>   → `List<CompiledRule>` → **`TriggerInterpreter.apply(battle, rule, ctx)`**；
+>   `new TriggerTable.TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast)`；
+>   观测：`getAttribute(AttributeType.ATTACK).get()`（`enums.AttributeType`）、`getBuffManager().stacksOf(name)`。
+>
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
