@@ -31,6 +31,7 @@ public class LightCone23041Test {
                 + " turns=" + down.getTurns() + " target=" + down.getTarget());
         Assertions.assertEquals(10.0, energy.getAmount(), 1e-9, "ten energy");
         Assertions.assertEquals("self", energy.getTarget(), "for the wearer");
+        Assertions.assertEquals("GAIN_ENERGY", energy.getOp(), "energy");
         Assertions.assertEquals(-0.24, down.getPercent(), 1e-9, "24% less defence");
         Assertions.assertEquals(2.0, down.getTurns(), 1e-9, "for two turns");
         Assertions.assertEquals("target", down.getTarget(), "on the enemy it hit");
