@@ -1,0 +1,54 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23019_ult_damage",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23019：「装备者施放终结技后，使我方全体造成的伤容提高#2[i]%，持续#3[i]回合」",
+      "note": "⭐ 原文 ✓：`CAST_SETUP` + `from_category ULTRA` + `target: all_allies` ✓（与 1502 终结技穿透同形状 ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23019_ult_skill_point",
+      "when": [
+        "actor == self",
+        "from_category ULTRA",
+        "self_attr:BREAKING_EFFECT >= 1.5"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23019：「并且若装备者击破特攻大于等于#4[i]%，则恢复1个战技点。」",
+      "note": "⭐ 原文 ✓：**`self_attr:BREAKING_EFFECT >= 1.5`** ✓（属性名实测为 `BREAKING_EFFECT` ✓）+ **`GAIN_SKILL_POINT`** ✓（op 名实测存在 ✓）。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "cone23019_wave_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 20,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23019：「每个波次开始时，我方全体立即恢复#5[f1]点能量，同类技能无法重复生效。」",
+      "note": "⭐ 原文 ✓：`WAVE_START` ✓ + **`GAIN_ENERGY`** ✓（op 名实测存在 ✓）+ `target: all_allies` ✓。⚠ 仍登记 ✗：「同类技能无法重复生效」。"
+    }
+  ]
+}
