@@ -1,0 +1,34 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23063_ult_skill_point",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23063：「装备者施放终结技后，为我方恢复1点战技点。」",
+      "note": "⭐ 原文 ✓：`CAST_SETUP` + `from_category ULTRA` ⇒ **`GAIN_SKILL_POINT`** 1 ✓（op 名已核对 ✓，与 23019 同一形状 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23063_battle_advance",
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.4,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23063：「进入战斗时，使装备者的行动提前#2[i]%，并使装备者获得【新声】，持续#4[i]回合。」",
+      "note": "⭐ 原文 ✓：`BATTLE_START` + **`ADVANCE`** 0.4 + `target: self` ✓（op 已核对 ✓）。⚠ 仍登记 ✗：「获得【新声】」与「持有【新声】时我方全体速度提高#3[i]%」（需要带名状态及其条件 ✗）。⚠ 第一句「生命上限提高#1[i]%」**不写** ✓（属性行 ✓）。"
+    }
+  ]
+}
