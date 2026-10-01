@@ -1094,6 +1094,12 @@ public final class TriggerInterpreter {
 
     /** The amount one recipient gets: a flat sum, a share of ITS OWN maximum, or a per-landing count. */
     private static void gainEnergyFor(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit target) {
+        // ⭐ The event own magnitude (2026-09-30; reader: 1312 per-spent-point energy), as gainResource does.
+        if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+            double share = effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
+            battle.grantEnergy(target, Math.round(ctx.amount() * share));
+            return;
+        }
         if (effect.getScale() == null || effect.getScale().isBlank()) {
             battle.grantEnergy(target, scaledAmount(effect, ctx));
             return;
