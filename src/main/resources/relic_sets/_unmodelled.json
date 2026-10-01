@@ -20,13 +20,6 @@
       "reason": "\"Increases the wearer's CRIT DMG dealt to enemy targets in the DEF reduction state by 28%. After the wearer inflicts the DEF reduction state on an enemy target, all allies gain 'Comburent' for 2 turn(s) ... The DMG dealt by ally targets with 'Comburent' increases by 15% ... can be triggered again after the wearer uses an attack.\" Needs a condition on the target's DEF-reduction state, a named buff with a per-attack refresh rule, and a damage-dealt bonus."
     }
   ],
-  "317": [
-    {
-      "require": 2,
-      "ability": "Ability53171",
-      "reason": "\"Increases the wearer's Energy Regeneration Rate by 5%. If the wearer is not the first character in the party, increases the ATK of the first character in the party by 12%.\" The ERR is the `properties` stat (SPRatioBase 0.05). What is missing is a condition on the wearer's POSITION in the party, and a way to name 'the first character' as a target -- the target selectors are self / target / attacker / all_allies, and the condition DSL cannot see the party's order."
-    }
-  ],
   "327": [
     {
       "require": 2,

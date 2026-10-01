@@ -13496,6 +13496,63 @@
 >   角色 93 / 93、光锥 **164 / 170**、遗器 55 文件 / 登记表 5 条。
 > * **下一步**：`317`（⚠ 配方早已齐备 ✓：条件侧须 `PartyCondition` ✓ + 选择器侧 `:142`/`:1232` ✓ +
 >   一条内容 ✓ ⇒ ⭐ 且它**天然有分辨力** ✓，因为条件是"装备者**不是**第一名"✗ —— 只要让装备者不是第一名即成立 ✓）。
+
+> **2026-09-30 更新（aggro 回收之七百二十八：`317` 闭合 —— 第三条能力、第三次登记回收）**：
+>
+> * **一次提交完成四处（`feat: the party-first condition and target selector, and relic 317 uses both` ✓）**：
+>   * **引擎六处编辑、跨两个文件、锚点 6/6 命中** ✓（`REFUSING` 守卫 ✓）：
+>     `TriggerTable` = `is_party_first` 正则 ✓ + 解析分支（⚠ 复用 `requireCarriedParty` ⇒ **类必须是 `PartyCondition`** ✓）
+>     + `IsPartyFirst` 类 ✓（⚠ 含 `source()` ✗ —— 第一次漏写时**编译器直接点名** ✓）；
+>     `TriggerInterpreter` = `party_first` 进已知集合 ✓ + `resolveTarget` 加 `case` ✓ + `partyFirst(ctx)` 助手 ✓；
+>   * ⭐ **两处都读 `battle.characters`** ✓（**角色**名单、编队顺序 ✓）—— ⛔ **不是 `allies`** ✗
+>     （⚠ 忆灵与随从会被追加进去 ✓；文案用的是 "character" ✓）⇒ ⭐ 这条判断在**写第一行之前**就已实测固定 ✓；
+>   * **内容**：`BATTLE_START` + `when ["!self is_party_first"]` ✓（`!` 是 DSL 唯一的否定 ✓）⇒
+>     `MODIFY_ATTR ATTACK 0.12` + `permanent` + `target: party_first` ✓；
+>     ⚠ 能量恢复效率 5% 是 `properties` 的 `SPRatioBase` ✓ **不重写** ✓；⚠ **该套装只有二件套** ✓（实测 ✓）；
+>   * **登记表回收四处** ✓：`_unmodelled.json` **5 → 4** ✓（余 `126 / 130 / 132 / 327` ✓）、
+>     `AUTHORED += "317/2"` ✓、`STILL_REGISTERED` **5 → 4** ✓、两件套计数 **2 → 1** ✓、`NO_RULE_SET = 327` 不动 ✓。
+> * ⭐⭐⭐ **一个重要陷阱（本轮实测 ✓）**：`.git/update_relic_expectations.py` **不能复用** ✗ ——
+>   它是 **324 专用**的：会插入**写死的 `"324/2"`** ✗（重复项 ✓）、按**过期的值** 7 与 4 查找 ✗（静默不改 ✓）、
+>   并最后 **重跑 `ship_relic324.py`** ✗ ⇒ ⛔ 复用它会造出"重复项 + 静默失败 + 二次出货" ✓。
+>   ⭐ **正确做法 = 三处外科式更新，按当前值**（`STILL_REGISTERED` 5→4 ✓、两件套 2→1 ✓、`AUTHORED` 插 `"317/2"` ✓）；
+>   ⚠ 且 `PURE_ABILITY_ONLY = 35` **不动** ✓（⚠ 该 helper 为 `324`/`325` 两次都没碰它 ✓ ⇒ 它计的不是这类内容 ✓）。
+> * ⚠ **过程中两次受挫（都记在这里 ✓）**：① 镜像判据的**静态字段初始化**因簿记过期而抛
+>   `ExceptionInInitializerError` ✗（⚠ 报错形态因此不是 AssertionFailedError ✓）；
+>   ② 我改脚本时被 `edit` 拒绝（*"file changed since it was read"* ✓）—— ⚠ **因为我自己先用 shell 脚本改过它** ✗，
+>   没遵守"先读后改"✓。
+> * ✅ **三条能力现已闭合**：`23048` ③ ✓、`21025` ✓、**`317`** ✓ —— ⚠ 其中**两条已有引擎级变异证明** ✓
+>   （`23048` ✓、`21025` ✓）；⭐ `317` 的判据链（形状 + 运行时 + **引擎变异** ✓）尚欠 ✓，
+>   ⚠ 但它**天然有分辨力** ✓（条件是"装备者**不是**第一名"✗ ⇒ 只要让装备者不是第一名即成立 ✓）。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`c4ecc03` ✓）；
+>   角色 93 / 93、光锥 164 / 170、遗器 **56 文件 / 登记表 4 条**。
+
+> **2026-09-30 更新（aggro 回收之七百二十九：`317` 判据链闭合 —— 第三条能力全链条完成；并更正一处夹具笔记）**：
+>
+> * **判据链（`test: judge relic 317, with a runtime test and an engine first-vs-last mutation` ✓）**：
+>   * **形状** ✓：`RelicTriggerTables.of(317).at(2).rulesFor(BATTLE_START)` ⇒ 一条规则 ✓，
+>     条件 **`["!self is_party_first"]`** ✓、`ATTACK` ✓、**0.12** ✓、`target: party_first` ✓；
+>   * **运行时** ✓：⭐ 把**我方放在队伍列表首位**（`List.of(ally, wearer)` ✓）⇒ 装备者不是第一名 ✓ ⇒
+>     规则触发 ✓，且**第一名的攻击力恰好 +12%** ✓（实测 `ally ATTACK ratio=1.12` ✓）；
+>     判据同时断言 **`battle.characters.getFirst() == ally`** ✓ —— ⭐ 即"队伍第一名"就是**队伍列表顺序** ✓；
+>   * ⭐⭐ **引擎侧变异变红** ✓：把 `partyFirst` 的 `characters.getFirst()` 改成 `getLast()` ✗ ⇒ `reds=1` ✓；
+>   * 全量 0 ✓、闸门 [0, 0] ✓、树干净 ✓、已推送 ✓（`8142061` ✓）。
+> * ⚠ **一处夹具笔记更正（编译器点名 ✓）**：`TriggerTable.TriggerContext` 的**第 8 个分量是 `SkillCategory`** ✗，
+>   **不是 boolean** ✗（⚠ 旧笔记写的是 `fromCast` ✗）⇒ 构造应为
+>   `new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, SkillCategory.UNSPECIFIED)` ✓
+>   （⚠ 第 6 个 `damage` 可传 `null` ✓）。
+> * ⭐⭐⭐ **三条能力全部闭合，且三条都有引擎级变异证明** ✓：
+>   | 能力 | 引擎改动 | 读者 | 变异 |
+>   |---|---|---|---|
+>   | `CAST_SETUP` 携带被瞄准者 | `SkillExecutor` 一行 ✓ | 光锥 `23048` ③ ✓ | 端到端 ✓ 变红 ✓ |
+>   | `next_ally` 目标选择器 | `TriggerInterpreter` 三处 ✓ | 光锥 `21025` ✓ | 三我方搜夹具 ✓ 变红 ✓ |
+>   | `is_party_first` 条件 + `party_first` 选择器 | `TriggerTable` 三处 + `TriggerInterpreter` 三处 ✓ | 遗器 `317` ✓ | first→last ✓ 变红 ✓ |
+> * ✅ **三次登记回收**：`23056` ②b ✓、遗器 `324` ✓、遗器 `325` ✓、**`317`** ✓
+>   ⇒ 登记表 **5 → 4 条**（余 `126 / 130 / 132 / 327` ✓）。
+> * **实测**：角色 93 / 93、光锥 **164 / 170**、遗器 **56 文件 / 登记表 4 条**、测试类 **476**；
+>   全量 0、闸门 [0, 0]、树干净、已推送。
+> * **下一步**：`327`（⚠ 需先定"命途名如何进 DSL"✗ —— ⭐ 而本项目已有 `is_same_element_as_self` 与
+>   `has_same_path_ally` 两个"配对可、命名不可"的先例 ✓ ⇒ 设计可从"给关键词加一个命途名参数"入手 ✓）；
+>   或 6 张整卡登记的光锥（各缺：阿哈时刻 ✗ / 随机友方 ✗ / 元素 ✗ / 随机选一 ✗ / 单次累计 ✗ / 下一个行动者 ✓ 已收）✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：

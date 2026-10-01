@@ -927,6 +927,16 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])is_other_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The {@code is_party_first} keyword (2026-09-30): "<b>that unit is the FIRST CHARACTER of the party</b>".
+     *
+     * <p>Read from {@code battle.characters} -- the roster of characters, in party order -- and NOT from
+     * {@code allies}, which has memosprites and servants appended as they are summoned (light cone 21025 and
+     * relic 317 both mean the party as formed). Its reader is relic 317: 「若装备者不是队伍第一名」.
+     */
+    private static final Pattern IS_PARTY_FIRST =
+            Pattern.compile("(?<![\\w])is_party_first(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
      * The {@code has_same_path_ally} keyword: "somebody else on my side walks my Path".
      */
     private static final Pattern SAME_PATH_ALLY =
@@ -1121,6 +1131,18 @@ public class TriggerTable {
 
         // `is_ally`: "<who> is_ally" — no argument at all, so it is checked before the operator branch too.
         // `is_other_ally`: "<who> is_other_ally" -- same shape as `is_ally`, one clause stricter.
+        Matcher isPartyFirst = IS_PARTY_FIRST.matcher(text);
+        if (isPartyFirst.find()) {
+            String subject = normalize(text.substring(0, isPartyFirst.start()));
+            String trailing = text.substring(isPartyFirst.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"is_party_first\": it takes no argument "
+                                + "(write \"self is_party_first\") (source: " + spec.getSource() + ")");
+            }
+            return new IsPartyFirst(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw);
+        }
+
         Matcher isOtherAlly = IS_OTHER_ALLY.matcher(text);
         if (isOtherAlly.find()) {
             String subject = normalize(text.substring(0, isOtherAlly.start()));
@@ -2118,6 +2140,45 @@ public class TriggerTable {
      * <p>The "other" half is the whole point: {@code is_ally} already answers "on our side", and the owner satisfies it. A rule
      * that means 「my ALLY did something」 must exclude its own actions, or the follow-up it grants would trigger itself.
      */
+    /**
+     * {@code <who> is_party_first} ? the unit is the FIRST CHARACTER of the party (2026-09-30). Its reader is relic 317:
+     * 「若装备者不是队伍第一名，则使队伍第一名的攻击力提高」 -- one rule needs both halves, so this answers the condition
+     * half and {@code party_first} (a target selector) answers the other.
+     */
+    private static final class IsPartyFirst implements Condition, PartyCondition {
+        private final String subject;
+        private final String raw;
+
+        IsPartyFirst(String subject, String raw) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            if (who == null || ctx.battle() == null || ctx.battle().characters.isEmpty()) {
+                return false;
+            }
+            return ctx.battle().characters.getFirst() == who;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     private static final class IsOtherAlly implements Condition, PartyCondition {
         private final String subject;
         private final String raw;
