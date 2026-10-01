@@ -10053,6 +10053,37 @@
 >   ⇒ 一次实验就把一个**悬了三轮**的接口疑问解决 ✓，而且顺带确认了**现有判据是对的** ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
+
+> **2026-09-30 更新（aggro 回收之五百八十五：**✅ 按 rank 的入口找到了 —— `WeaponTriggerTables.of(id, rank)`（实测生效）**）**：
+> 
+> * ⭐⭐⭐ **探针读数（全量 11 行 ✓）**：
+>   [rank] cone=20002 rank=1 battleStart=[boost_basic_attack_damage_boost_1, boost_skill_damage_boost_1]
+>   [rank] cone=20002 rank=2 battleStart=[boost_basic_attack_damage_boost_2, boost_skill_damage_boost_2]
+>   [rank] cone=20002 rank=3 battleStart=[boost_basic_attack_damage_boost_3, boost_skill_damage_boost_3]
+>   [rank] cone=20002 rank=4 battleStart=[boost_basic_attack_damage_boost_4, boost_skill_damage_boost_4]
+>   [rank] cone=20002 rank=5 battleStart=[boost_basic_attack_damage_boost_5, boost_skill_damage_boost_5]
+>   [rank] cone=20006 rank=1 battleStart=[boost_ultimate_damage_boost_1]
+>   [rank] cone=20006 rank=2 battleStart=[boost_ultimate_damage_boost_2]
+>   [rank] cone=20006 rank=3 battleStart=[boost_ultimate_damage_boost_3]
+>   [rank] cone=20006 rank=4 battleStart=[boost_ultimate_damage_boost_4]
+>   [rank] cone=20006 rank=5 battleStart=[boost_ultimate_damage_boost_5]
+>   [rank] cone=21061 rank=1 battleStart=[]
+> * ⭐⭐⭐ **定论** ✓：**`WeaponTriggerTables.of(weaponId, rank)` 确实按 rank 选档** ✓ ——
+>   `20002` 的 rank 1→`_1` ✓、2→`_2` ✓、3→`_3` ✓、4→`_4` ✓、5→`_5` ✓；`20006` 同型 ✓；
+>   而 `21061 rank 1` 的 `BATTLE_START` 为空 ✓（与它自身内容一致 ✓）
+>   ⇒ ✅ 这也**正面确认**了第 156 轮从代码读到的"**取精确档、不累积**" ✓（与 `Weapon.build` 的行为**相反** ✓：
+>     后者**忽略**第二参数 ✓，第 163 轮实测 ✓）。
+> * ⭐⭐⭐ **两个入口的分工（写下来 ✓）**：
+>   * **`Weapon.build(id, second)`** ✓ ⇒ 用于**装配角色** ✓（第二参数**不影响档位** ✓，表按**最低存在档** ✓）；
+>   * **`WeaponTriggerTables.of(id, rank)`** ✓ ⇒ 用于**按档取表** ✓（rank **精确生效** ✓）。
+> * ✅ **下一轮的实现（已明确 ✓，且更简单 ✓）**：按档条件判据**不需要 `Character`** ✓ ——
+>   直接在 `WeaponTriggerTables.of(cone, rank)` 的**表**上取 `rulesFor(event)` ✓ 断言条件前缀 ✓
+>   ⇒ 覆盖 **142 张 × 各档自己的规则** ✓（预计约 1223 条 ✓），并顺带把"**精确档**"钉成判据 ✓。
+> * ⭐⭐⭐ **本段（161–164 轮）的收束 ✓**：这三轮都在做同一件事 ——
+>   **把"条件覆盖"从"回落档"推到"按档"** ✓，而每一步的障碍都靠**打印读数**解决 ✓
+>   （㉚：**"读到的实现"≠"调用点实际传的值"** ✓；⚠ 我因此在第 162 轮撤回一次、第 163 轮确认现有判据正确 ✓）。
+> * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 169** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
+> 
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
