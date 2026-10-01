@@ -13846,6 +13846,37 @@
 >   角色 93 / 93、光锥 164 / 170、遗器 58 文件 / 登记表 2 条、测试类 **480**。
 > * **四条能力现状** ✓：`23048` ③ ✓（端到端 ✓）｜`21025` ✓（引擎变异 ✓）｜`317` ✓（引擎变异 ✓ ＋ 条件半边 ✓）｜
 >   `327` ✓（引擎变异 ✓ ＋ 命中/不命中双向 ✓）⇒ ⭐ **四条都同时具备"效果半边"与"条件半边"的证据** ✓。
+
+> **2026-09-30 更新（aggro 回收之七百四十一：`130` 全句闭合 —— 第二个"全文出货且变异证明"的套装）**：
+>
+> * ⛔ **旧登记第四处被推翻** ✗：`130` 原写"第二句缺**欢愉技**这一技能类别" ✗ —— **假** ✓：
+>   `SkillCategory` 里**有 `ELATION_DAMAGE`** ✓（⚠ 与 `NORMAL` / `BPSKILL` / `ULTRA` / `MAZE_NORMAL` / `MAZE` /
+>   `ASSIST` / `UNSPECIFIED` / `UNKNOWN` 并列 ✓），且**已出货 60 处** ✓（实测 `from_category` 取值分布：
+>   `ULTRA` 85 ✓、`BPSKILL` 80 ✓、`NORMAL` 20 ✓、**`ElationDamage` 55** ✓、`ELATION_DAMAGE` 5 ✓、`Normal` 65 ✓）
+>   ⇒ ⭐ **"欢愉技"可写** ✓。
+> * ⭐⭐⭐ **但拼法必须是数据侧那种** ✓：首次用 `from_category ELATION_DAMAGE` ✗ 被引擎拒绝 ✓，报错原文：
+>   *"names the cast category `ELATION_DAMAGE`, which the engine does not know; **the categories are the ones the
+>   skill data spells**"* ✓ ⇒ ✅ 改成 **`ElationDamage`** ✓ 后**一次通过** ✓。
+>   ⚠ 这已是本段**第四次**"引擎拒绝 ⇒ 报错点名修法 ⇒ 一个词"（`HP` ✗、`SKILL_CAST` ✗、
+>   `TriggerContext` 第 8 参 ✗、`ELATION_DAMAGE` ✗）⇒ ⭐ **规律：本引擎的校验信息质量很高，被拒时先读它、不要猜** ✓。
+> * ✅ **出货**（`content: ship relic 130 second sentence -- once-per-battle Elation skill grant` ✓）：
+>   `CAST_SETUP` ✓ ＋ `when ["from_category ElationDamage", "!self has_state relic130_elation_used"]` ✓
+>   ⇒ `APPLY_BUFF relic130_elation_used`（permanent ✓，**单向标记** ✓）＋
+>   `MODIFY_ATTR ELATION_DAMAGE_BOOST` **0.10** ✓ ＋ **`target: all_allies`** ✓；
+>   ⭐ **全部由既有写法拼成** ✓：`CAST_SETUP` 的"结算前"性质来自 `23048` 那条线 ✓；单向标记来自 `325` ✓；
+>   类别来自已出货内容 ✓ ⇒ ⛔ **不需要任何引擎改动** ✓（⚠ 与 `327` 形成对照 ✓：那条确实需要新能力 ✓）。
+> * ✅ **判据**（`test: judge relic 130 second sentence, with the category and marker mutations` ✓）：
+>   形状 ✓（条件两条 ✓、标记 ✓、`ELATION_DAMAGE_BOOST 0.10` ✓、`all_allies` ✓）；
+>   ⭐ **运行时走 `matching(...)` 并给两个类别的 ctx** ✓（⚠ 遵第 502/505 轮的纪律 ✓）：
+>   `ELATION_DAMAGE` ⇒ **1** ✓、`BPSKILL` ⇒ **0** ✓；
+>   ⭐ **变异 3 处全红** ✓：`category` ✓（⚠ 改动 ⇒ **两个测试都失败** ✓）、`percent` ✓、**`marker`** ✓
+>   （⚠ 删掉"未用过"条件 ⇒ 变红 ✓ ⇒ **"每场战斗第一次"这半边确实被判据覆盖** ✓）。
+> * ⭐⭐ **`130` 至此全文出货且逐句有据** ✓（两档速度阈值 ✓ ＋ 每场战斗一次的欢愉授勋 ✓）⇒
+>   ⭐ **第二个"全文出货 + 变异证明"的登记表条目** ✓（⚠ 第一个是 `23056` ✓）。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`6cfdb9d` ✓）；
+>   角色 93 / 93、光锥 164 / 170、**遗器 58 文件 / 登记表 2 条**、测试类 **482**。
+> * **剩余账目（很短了 ✓）**：`126` / `132`（⚠ 夹具钉在 `126` ✗ 且各自仍需机制 ✗）；
+>   6 张整卡光锥各缺一种机制 ✗；两个"可写但无读者"的模式按纪律未抽象 ✗。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
