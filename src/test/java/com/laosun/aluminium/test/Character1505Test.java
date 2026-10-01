@@ -115,7 +115,7 @@ public class Character1505Test {
         // BATTLE_START only and read 2, which is exactly what made it obvious.
         var theSyncRule = elation.getTriggerTable().rulesFor(
                 com.laosun.aluminium.enums.TriggerEvent.ENERGY_GAINED).stream()
-                .filter(rule -> rule.id().startsWith("p1505_")).toList();
+                .filter(rule -> rule.id().endsWith("energy_sync")).toList();
         Assertions.assertEquals(1, theSyncRule.size(), "the energy sync is wired to ENERGY_GAINED");
         var syncEffect = theSyncRule.getFirst().effects().getFirst();
         System.out.println("[1505] spec " + theSyncRule.getFirst().id() + " resource=" + syncEffect.getResource()

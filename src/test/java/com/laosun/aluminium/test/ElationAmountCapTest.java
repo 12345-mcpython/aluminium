@@ -49,7 +49,7 @@ public class ElationAmountCapTest {
     public void theShippedRuleCarriesTheCeiling() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         var rules = elation.getTriggerTable().rulesFor(TriggerEvent.ENERGY_GAINED).stream()
-                .filter(rule -> rule.id().startsWith("p1505_")).toList();
+                .filter(rule -> rule.id().endsWith("energy_sync")).toList();
         Assertions.assertEquals(1, rules.size(), "the mirror rule");
         var effect = rules.getFirst().effects().getFirst();
         System.out.println("[cap] spec " + rules.getFirst().id() + " amountCap=" + effect.getAmountCap()
