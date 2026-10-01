@@ -12,7 +12,7 @@
       "require": 1,
       "ability": "Ability21021",
       "name": "酣适",
-      "reason": "「当装备者的回合开始时，随机为 1 个当前能量百分比小于 #1=50% 的我方其他目标恢复 #2=8 点能量。」Needs the shared RANDOM-TARGET selector (reader count 2, with 21029) plus energy restoration and an energy-percentage filter. The selector is worth building; this cone waits for it."
+      "reason": "「当装备者的回合开始时，随机为 1 个当前能量百分比小于 #1=50% 的我方其他目标恢复 #2=8 点能量。」GREPPED 2026-09-30 (the discipline added after 21029 was registered three times wrongly): TriggerInterpreter.TARGET_SELECTORS holds random_enemy and random_hit_enemy but NO random_ally, so the missing capability is specifically a RANDOM-ALLY selector symmetric to random_enemy. Also missing: energy restoration and the energy-percentage filter. Reader count for the selector: 1 (this cone), so it is NOT built; 21029 did not need it (random_hit_enemy already existed) and has already been shipped and reclaimed."
     }
   ],
   "21032": [
