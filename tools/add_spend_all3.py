@@ -116,7 +116,7 @@ rules.append({
         "op": "DAMAGE",
         "scale": "self_attr:ATTACK",
         "percent": 0.21,
-        "timesFrom": "event_amount",
+        "times_from": "event_amount",
         "element": "Quantum",
         "target": "target",
         "critRate": 0.0,

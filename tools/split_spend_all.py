@@ -107,11 +107,14 @@ public class SpendAllTest {
         Battle battle = primed(start);
         Character owner = (Character) battle.allies.get(0);
         Enemy enemy = (Enemy) battle.enemies.get(0);
+        // \u26a0 The priming itself fires RESOURCE_CHANGED once per point GAINED, and the rule answers those too -- so the
+        // baseline is taken AFTER priming and only the hand-fired change is measured.
+        battle.processRequests();
+        double baseline = enemy.getCurrentHp();
         battle.noteChangedResource(RES);
-        double before = enemy.getCurrentHp();
         battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, owner, enemy, 0, -start);
         battle.processRequests();
-        return before - enemy.getCurrentHp();
+        return baseline - enemy.getCurrentHp();
     }
 }
 ''')
