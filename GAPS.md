@@ -16763,6 +16763,25 @@
 >   不如把"状态不再存在"这件事**收成一个事实** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2111** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百五十五：✅ "自然到期"找到了 —— `BuffManager.processBuffTick`（并经 `removeBuff`／`tickEffect` 摘除）⇒ **收口点就四个**，形状写清了）**：
+>
+> * ✅ **实测（读 `AbstractBuff` 的时长模型 ＋ `BuffManager` 的顶部注释 ✓）** ✓：
+>   * **时长**住在 `AbstractBuff.remainingDuration`（`:20` ✓）＋ `permanent` 标志 ✓ ＋ ⭐ **`clockOwner` 锚点** ✓
+>     （`:40-68` ✓ —— 「【蒙福者】状态持续回合减 1」那类：**状态挂在 A 身上，却由 B 的回合来数** ✓）；
+>   * **滴答点**是 `BuffManager.processBuffTick` ✓（`AbstractBuff:31` 提到它 ✓，"`ticked` 的才递减 ✓，所以时长不会漂移" ✓），
+>     它由 **`beforeMove`／`afterMove`** 驱动 ✓（`isEarlyBuff` 决定在哪一个 ✓，`:101` ✓）；
+>   * `BuffManager` 顶部注释（`:25` ✓）自己写明：`processBuffTick` **曾经**通过 `removeIf` 摘除 ✓，
+>     而那个谓词**会调 `tickEffect`／`removeBuff`** ✓ ⇒ ⭐ **到期与显式移除在同一个方法族里** ✓。
+> * ⭐⭐ **所以"状态不再存在"的落点一共四个** ✓（下一轮收口的目标 ✓）：
+>   ① `processBuffTick` 的**到期**摘除 ✓；② `removeBuff(AbstractBuff)`（显式 ✓，`:214` ✓）；
+>   ③ `removeOneBuff(Class)`（`:153` ✓，它自己 `buffs.remove(i)` ✓）；④ `addStackable` 的**替换**（`:55` ✓）。
+>   ⇒ **收口形状** ✓：抽一个 `private void detach(AbstractBuff buff, StateEndedReason reason)` ✓，
+>     四处都调它 ✓ ⇒ 事件**只发一次** ✓（并天然带上"到期／被移除／被替换"的**原因** ✓ —— ⚠ 而**要不要暴露原因**
+>     仍按读者的句子定 ✗，不许先加 ✓）。
+> * ⚠ **一处要注意的** ✓（注释里已经踩过 ✓）：`removeIf` 式遍历中**修改列表**会崩 ✗ ⇒ 现有的做法是**每次遍历前拷一份** ✓
+>   ⇒ `detach` 也必须遵守这条 ✓（**不要在 `processBuffTick` 内联里改列表** ✗）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2111** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
