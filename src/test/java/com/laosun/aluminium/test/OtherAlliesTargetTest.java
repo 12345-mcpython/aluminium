@@ -158,9 +158,9 @@ public class OtherAlliesTargetTest {
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(ROBIN).matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(robin, robin, null, 0, 0, null, battle));
 
-        // ⚠ 3 since 2026-09-28: her ultimate's seven clauses are written now, and three of them fire on ULT_CAST
-        // (this ADVANCE, the 【协奏】 state plus its countdown, and the state's own ATK boost plus control immunity).
-        Assertions.assertEquals(3, rules.size());
+        // ⚠ 4 since 2026-09-30: her ultimate's clauses fire four rules on ULT_CAST -- this ADVANCE, the 【协奏】 state
+        // plus its countdown, the state's own ATK boost plus control immunity, and (new) the zone's 20% defence ignore.
+        Assertions.assertEquals(4, rules.size());
         List<EffectSpec> effects = rules.getFirst().effects();
         Assertions.assertEquals(1, effects.size());
         Assertions.assertEquals("ADVANCE", effects.getFirst().getOp());
