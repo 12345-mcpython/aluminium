@@ -16230,6 +16230,23 @@
 >   ⚠ 但**在此如实写明它是冗余的** ✓ —— 免得下一个读者以为它承重 ✓（"两条护栏"那句话在 1127 轮写得太满了 ✓，这里收窄 ✓）。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
 
+> **2026-10-02 更新（aggro 回收之八百二十三：⭐ 「真实伤害」**引擎有**，但**从 op 那条路够不到** —— 两处读它，下一轮三行接上）**：
+>
+> * ✅ **实测（读代码）** ✓：**真伤害的通道早就存在** ✓ —— `Battle.applyTrueDamage`（`:2655` ✓）造
+>   `new Damage(attacker, target, element, DamageType.TRUE, base)` ＋ **`.trueDamage()`** ✓（`toValue()` 因此
+>   **跳过所有区** ✓，见 `Damage.toValue` 里的 `trueDamage && Constant.TRUE_DMG_SKIP_ZONES` ✓）＋ `.notCountsAsAttack()` ✓。
+> * ⛔ **而 `DAMAGE` op 那条路**够不到**它** ✗：全库只有 `applyTrueDamage` 内部调用 `.trueDamage()` ✓，
+>   而 `TriggerInterpreter` 里**一处都没提 `DamageType.TRUE`** ✓ ⇒ 一条规则今天写 `damage_type: "TRUE"` 会得到
+>   ⚠ **一个"标着 TRUE 却照旧乘区"的实例** ✗ —— **类型对、语义错** ✓，正是最难发现的那种 ✓（没有任何症状 ✓）。
+> * ⭐ **读者 2 ✓（达到门槛）** ✓：「额外造成 1 次等同于原伤害 X% 的**真实伤害**」——
+>   `8007` 开拓者【迷迷的声援】**28%** ✓、`1415` 昔涟 结界 **24%** ✓（两条都同时需要上一轮那个
+>   `scale: original_damage` ✓，而它**已经出货并验证** ✓）。
+> * ⭐ **下一轮的第一步（三行，已具名）** ✗：在 `DAMAGE` op 的落点处按 **`damage_type == TRUE`** 分派到
+>   `battle.applyTrueDamage(attacker, victim, element, base)` ✓（而不是走 `applyAdditionalDamage` ✓），
+>   并在装载期把"TRUE 只能配 DAMAGE / 不能被别的 op 忽略"写清 ✓；随后**逐条出货** `8007`／`1415` ✓
+>   （各自带判据：真伤害**不受防御/抗性影响** ✓ ⇒ 用两个不同防御的目标做对照 ✓，与 1122 轮那条同类 ✓）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
