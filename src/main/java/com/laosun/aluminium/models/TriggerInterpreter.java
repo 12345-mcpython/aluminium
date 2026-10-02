@@ -2174,13 +2174,6 @@ public final class TriggerInterpreter {
             double spent = hit == null ? 0 : hit.getCastEnergySpent();
             return effect.getPercent() * spent + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
-        if (EVENT_AMOUNT.equals(effect.getScale().trim())) {
-            // ⭐ 「本次攻击每消耗了 1 点【亿质】额外使长夜月的速度提高 1%」 (2026-10-02): the
-            // triggering event's own magnitude, taken as a quantity (a spend arrives negative). Before the
-            // attribute branch below, for the reason `cast_energy_spent` states: this source is not an attribute.
-            return effect.getPercent() * Math.abs(ctx.amount())
-                    + (effect.getAmount() == null ? 0 : effect.getAmount());
-        }
         if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
@@ -2212,7 +2205,7 @@ public final class TriggerInterpreter {
     private static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
-        if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw)) {
+        if (SELF_MAX_ENERGY.equals(raw)) {
             return null;                      // handled by derivedMagnitude; not an AttributeType
         }
         if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
@@ -2549,7 +2542,7 @@ public final class TriggerInterpreter {
      * the content actually uses (see {@link EffectSpec#getScale()}).
      */
     private static final Set<String> SCALES =
-        Set.of("target_max_hp", "target_lost_hp", "owner_max_hp", "owner_def", "owner_attack", "event_amount");
+        Set.of("target_max_hp", "target_lost_hp", "owner_max_hp", "owner_def", "owner_attack");
 
     /**
      * The one scale {@code GAIN_ENERGY} accepts: a share of the <b>receiving</b> unit's maximum energy.
@@ -2558,7 +2551,7 @@ public final class TriggerInterpreter {
      * because the maximum is per character (姬子 120 / 星期日 130 / 翡翠 140) — writing 20 would be wrong for all of
      * them, and it would look right for whichever one the author happened to check.
      */
-    private static final Set<String> ENERGY_SCALES = Set.of("target_max_energy", "event_amount");
+    private static final Set<String> ENERGY_SCALES = Set.of("target_max_energy");
 
     /**
      * The one derived scale that is not an attribute: {@code MODIFY_ATTR}'s magnitude may be a share of the rule
@@ -2577,13 +2570,6 @@ public final class TriggerInterpreter {
      */
     private static final String CAST_ENERGY_SPENT = "cast_energy_spent";
 
-    /**
-     * 「每消耗/每损失 1 点…」 (2026-10-02): a magnitude that follows the <b>triggering event</b>.
-     *
-     * <p>Sits beside {@link #CAST_ENERGY_SPENT} on purpose -- that one is the same shape bound to the cast
-     * instead of the event -- and, like it, is deliberately not an {@code AttributeType}.
-     */
-    private static final String EVENT_AMOUNT = "event_amount";
 
     /**
      * Validates the magnitude of a {@code HEAL} / {@code SHIELD} effect: either a flat {@code amount}, or
@@ -2714,7 +2700,6 @@ public final class TriggerInterpreter {
             case "owner_attack" -> ownerAttributeOf(ctx, "owner_attack", AttributeType.ATTACK) * share + flat;
             // ⭐ 「每消耗/每损失 1 点…」 (2026-10-02): the triggering EVENT's own magnitude.
             // The absolute value, because a spend arrives negative and "每 1 点" counts points.
-            case "event_amount" -> Math.abs(ctx.amount()) * share + flat;
             default -> throw new IllegalStateException(
                     "Scale '" + scale + "' passed validation but has no implementation");
         };
