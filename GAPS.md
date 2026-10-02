@@ -20227,6 +20227,27 @@
 >   ⇒ ⭐ 具体查法：读 **`SkillExecutor.execute` 的实现** ✓（看它发哪些事件、带哪些上下文 ✓）。
 > * ⭐ **顺带确认** ✓：`BuffManager.hasState(String)` ✓ 与 `SkillType.ELATION_SKILL` ✓ **两个名字都对** ✓（本段"先查再写"的纪律奏效 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据已删 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十五：✅✅✅ **"结束"该挂哪个事件，答案在 `SkillExecutor` 里** —— 它发的每个事件**都带 `category`**，**但没有 `ATTACK_FINISHED`**）**：
+>
+> * ✅ **实测（读 `models/skill/SkillExecutor` ✓）** ✓：
+>   ```java
+>   Battle.PendingCast cast = battle.beginCast(skill, user);            // :83  ★ 施放类别**早算一次**
+>   battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category);   // :93  ← **带类别** ✓（⭐ 我那条"开始"规则正是靠它触发 ✓）
+>   battle.endCast(cast);                                              // :98
+>   … case ULTRA -> fireTriggers(ULT_CAST, …, category, …)              // :189 ← 带类别 ✓
+>     case BPSKILL -> fireTriggers(SKILL_CAST, …, category, …)          // :190 ← 带类别 ✓
+>     case NORMAL -> fireTriggers(BASIC_ATTACK, …, category, …)         // :191 ← 带类别 ✓
+>   battle.fireTriggers(TriggerEvent.ALLY_ATTACK, …, category, …)       // :203 ← 带类别 ✓
+>   ```
+>   ⇒ ⭐⭐ **两点**：**(i)** 我那条"开始"（`CAST_SETUP`）**注定会触发** ✓（本段已实测 ✓）；
+>     **(ii)** ⛔ **这里**没有 `ATTACK_FINISHED`** ✗** ⇒ 它由别处发出（`TriggerEvent:372` 说 *"settlement complete, hit set frozen"* ✓ ⇒ 多半在 `Battle` 的伤害结算里 ✓）
+>       ⇒ ⭐ **而那时施放早已 `endCast`** ✗ ⇒ **类别不在上下文里** ✗ ⇒ ⛔ **我那条"结束"规则在真路径上也永远不会触发** ✗（⚠ 不只是判据手工 fire 的问题 ✓）。
+> * ⭐⭐ **修法（内容层，一个词）** ✗：把"结束"那条的 `on` 从 **`ATTACK_FINISHED`** 换成 **`ALLY_ATTACK`** ✓
+>   （它**带类别** ✓、且在**同一施放的命中之后** ✓ ⇒ 记账 +1（`CAST_SETUP`）→ −1（`ALLY_ATTACK`）⇒ ⭐ **归零 ⇒ 摘状态 ⇒ 引擎发 `STATE_ENDED`** ✓）。
+>   ⚠ **语义核对** ✓：文档说"持续至**本次最后一个欢愉技施放结束**" ✓ ⇒ **单次施放**的这一版**正是**它的最小正确实现** ✓
+>     （⚠ 多次施放的版本需要知道"总共几个" ✗ ⇒ 那属于**阿哈行动**那一层，仍登记 ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：改 `on` ⇒ 重放脚本 ✓ ⇒ 跑判据 ⇒ ⭐ 若绿 ⇒ **变异（去掉 `REMOVE_STATE` ⇒ 全量必红）** ⇒ 这件就出货了 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23520,6 +23541,27 @@
 >   ⇒ ⭐ 具体查法：读 **`SkillExecutor.execute` 的实现** ✓（看它发哪些事件、带哪些上下文 ✓）。
 > * ⭐ **顺带确认** ✓：`BuffManager.hasState(String)` ✓ 与 `SkillType.ELATION_SKILL` ✓ **两个名字都对** ✓（本段"先查再写"的纪律奏效 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据已删 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十五：✅✅✅ **"结束"该挂哪个事件，答案在 `SkillExecutor` 里** —— 它发的每个事件**都带 `category`**，**但没有 `ATTACK_FINISHED`**）**：
+>
+> * ✅ **实测（读 `models/skill/SkillExecutor` ✓）** ✓：
+>   ```java
+>   Battle.PendingCast cast = battle.beginCast(skill, user);            // :83  ★ 施放类别**早算一次**
+>   battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category);   // :93  ← **带类别** ✓（⭐ 我那条"开始"规则正是靠它触发 ✓）
+>   battle.endCast(cast);                                              // :98
+>   … case ULTRA -> fireTriggers(ULT_CAST, …, category, …)              // :189 ← 带类别 ✓
+>     case BPSKILL -> fireTriggers(SKILL_CAST, …, category, …)          // :190 ← 带类别 ✓
+>     case NORMAL -> fireTriggers(BASIC_ATTACK, …, category, …)         // :191 ← 带类别 ✓
+>   battle.fireTriggers(TriggerEvent.ALLY_ATTACK, …, category, …)       // :203 ← 带类别 ✓
+>   ```
+>   ⇒ ⭐⭐ **两点**：**(i)** 我那条"开始"（`CAST_SETUP`）**注定会触发** ✓（本段已实测 ✓）；
+>     **(ii)** ⛔ **这里**没有 `ATTACK_FINISHED`** ✗** ⇒ 它由别处发出（`TriggerEvent:372` 说 *"settlement complete, hit set frozen"* ✓ ⇒ 多半在 `Battle` 的伤害结算里 ✓）
+>       ⇒ ⭐ **而那时施放早已 `endCast`** ✗ ⇒ **类别不在上下文里** ✗ ⇒ ⛔ **我那条"结束"规则在真路径上也永远不会触发** ✗（⚠ 不只是判据手工 fire 的问题 ✓）。
+> * ⭐⭐ **修法（内容层，一个词）** ✗：把"结束"那条的 `on` 从 **`ATTACK_FINISHED`** 换成 **`ALLY_ATTACK`** ✓
+>   （它**带类别** ✓、且在**同一施放的命中之后** ✓ ⇒ 记账 +1（`CAST_SETUP`）→ −1（`ALLY_ATTACK`）⇒ ⭐ **归零 ⇒ 摘状态 ⇒ 引擎发 `STATE_ENDED`** ✓）。
+>   ⚠ **语义核对** ✓：文档说"持续至**本次最后一个欢愉技施放结束**" ✓ ⇒ **单次施放**的这一版**正是**它的最小正确实现** ✓
+>     （⚠ 多次施放的版本需要知道"总共几个" ✗ ⇒ 那属于**阿哈行动**那一层，仍登记 ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：改 `on` ⇒ 重放脚本 ✓ ⇒ 跑判据 ⇒ ⭐ 若绿 ⇒ **变异（去掉 `REMOVE_STATE` ⇒ 全量必红）** ⇒ 这件就出货了 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
