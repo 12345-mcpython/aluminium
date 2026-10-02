@@ -3915,6 +3915,13 @@ public final class TriggerInterpreter {
         String scale = effect.getScale() == null ? "" : effect.getScale().trim();
         double share = effect.getPercent() == null ? 0.0 : effect.getPercent();
         double flat = effect.getAmount() == null ? 0.0 : effect.getAmount();
+        // ⚠⚠ A share of the TRIGGERING instance (「等同于原伤害 X%」) was implemented here on 2026-10-02 and ROLLED
+        // BACK the same round, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries
+        // the instance -- `damage.toValue()` is 4.2x the value the victim actually loses (measured: 1093.02 vs
+        // 260.237584 on one 姬子 attack), since settlement happens AFTER that event by design. The scale itself was
+        // faithful and linear (a 50% rider gave exactly half of a 100% one) -- only the source number is too early.
+        // ⇒ It needs a POST-settlement carrier for the value; the reader table and the exact numbers are in GAPS
+        // (entry "aggro 回收之八百"). Do not re-add it here without reading that entry first.
         // ? A Max HP share (2026-09-29): 「造成等同于X%生命上限的伤害」 -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
         // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
         switch (scale) {
