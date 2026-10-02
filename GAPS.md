@@ -17182,6 +17182,32 @@
 > * ⭐ **而这一轮的账并不亏** ✓：① `hp_percent` 这条语法**被发现了** ✓（它服务 `1102`／`1008`／`1205`／`1217` 的 8＋ 条从句 ✓）；
 >   ② `1008` 的行迹**确认已完整** ✓；③ 重复能力**已撤** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓ —— revert 后回到旧数 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百八十：⭐⭐⭐ **在用的条件词汇普查**（不是源码常量，而是**出货内容里真的写着的**）—— 29 个首词、**164 条**不同的条件；这条普查从今往后是"有没有"的第一站）**：
+>
+> * ✅ **实测（扫 `characters`／`light_cones`／`relics` 的全部 `when` ✓）** ✓：
+>
+>   | 首词 | 条数 | 一例 |
+>   |---|---|---|
+>   | `self_stacks:<名>` | **29** | `self_stacks:下一次普攻待命 >= 1` |
+>   | `target` | 26 | `target != self` |
+>   | `self_attr:` | 18 | `self_attr:ATTACK < 2500` |
+>   | `actor` | 13 | `actor != self` |
+>   | `self`（含 `has_state`） | 9 | `self has_state 协奏` |
+>   | ⭐ **`hp_percent`** | 6 | `hp_percent < 0.5` |
+>   | `self_resource:` | 6 | `self_resource:充能 >= 3` |
+>   | `target_hp_percent` | 5 | `target_hp_percent <= 0.5` |
+>   | `enemy_count`／`from_category`／`target_stacks:` | 5 | `enemy_count <= 2` |
+>   | `target_debuff_count` | 4 | `target_debuff_count < 3` |
+>   | `from_skill`／`target_debuff:`／`hit_count`／`actor_stacks:`／`self_summon_count`／`target_summon_count` | 2 | `target_debuff:DEFENCE` |
+>   | `actor_hp_percent`／**`target_hp_percent_before`**／`self_energy_percent`／`from_skill_id`／`damage_is_attack`／`damage_element_is_self`／`resource_changed:<名>`／`weakness_hit_count` | 1 | `target_hp_percent_before > 0.5` |
+> * ⭐⭐⭐ **它一眼解释了上一轮的重复** ✓：**`hp_percent`／`actor_hp_percent`／`target_hp_percent`／`target_hp_percent_before`** 四种
+>   血线写法**都在用** ✓ ⇒ 我那个 `self_hp_at_most` 是**第四遍**同一个东西 ✗✗。
+> * ⭐ **它还纠正了两条我早先的"缺能力"判断** ✓：
+>   ① **`self_stacks:<名>` 早就在用** ✓（29 处 ✓）⇒ 「按**层数**读/写」这条路**存在** ✓（⚠ 但"**层数的 50%**"仍缺 ✗，`ADD_STACK` 是按**个数** ✓）；
+>   ② **`self_summon_count`／`target_summon_count`** ✓ 与 **`resource_changed:<名>`** ✓ 都在用 ✓ ⇒ 涉及召唤物**数量**／资源变化的句子**有现成语汇** ✓。
+> * ⭐ **下一轮第一步（把这条普查变成纪律）** ✗：任何"要不要造"的问题，**先在这张表里找** ✓（`grep` 出货内容 ✓，不是 `grep` 源码常量 ✗ ——
+>   源码里那 23 条**只是关键词那一半** ✓，属性比较那一半**只在内容里看得见** ✓）。⚠ 并把这张表**放进 `engine.md`** ✓（一份"在用的条件词汇"清单 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -17430,6 +17456,32 @@
 > * ⭐ **而这一轮的账并不亏** ✓：① `hp_percent` 这条语法**被发现了** ✓（它服务 `1102`／`1008`／`1205`／`1217` 的 8＋ 条从句 ✓）；
 >   ② `1008` 的行迹**确认已完整** ✓；③ 重复能力**已撤** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓ —— revert 后回到旧数 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百八十：⭐⭐⭐ **在用的条件词汇普查**（不是源码常量，而是**出货内容里真的写着的**）—— 29 个首词、**164 条**不同的条件；这条普查从今往后是"有没有"的第一站）**：
+>
+> * ✅ **实测（扫 `characters`／`light_cones`／`relics` 的全部 `when` ✓）** ✓：
+>
+>   | 首词 | 条数 | 一例 |
+>   |---|---|---|
+>   | `self_stacks:<名>` | **29** | `self_stacks:下一次普攻待命 >= 1` |
+>   | `target` | 26 | `target != self` |
+>   | `self_attr:` | 18 | `self_attr:ATTACK < 2500` |
+>   | `actor` | 13 | `actor != self` |
+>   | `self`（含 `has_state`） | 9 | `self has_state 协奏` |
+>   | ⭐ **`hp_percent`** | 6 | `hp_percent < 0.5` |
+>   | `self_resource:` | 6 | `self_resource:充能 >= 3` |
+>   | `target_hp_percent` | 5 | `target_hp_percent <= 0.5` |
+>   | `enemy_count`／`from_category`／`target_stacks:` | 5 | `enemy_count <= 2` |
+>   | `target_debuff_count` | 4 | `target_debuff_count < 3` |
+>   | `from_skill`／`target_debuff:`／`hit_count`／`actor_stacks:`／`self_summon_count`／`target_summon_count` | 2 | `target_debuff:DEFENCE` |
+>   | `actor_hp_percent`／**`target_hp_percent_before`**／`self_energy_percent`／`from_skill_id`／`damage_is_attack`／`damage_element_is_self`／`resource_changed:<名>`／`weakness_hit_count` | 1 | `target_hp_percent_before > 0.5` |
+> * ⭐⭐⭐ **它一眼解释了上一轮的重复** ✓：**`hp_percent`／`actor_hp_percent`／`target_hp_percent`／`target_hp_percent_before`** 四种
+>   血线写法**都在用** ✓ ⇒ 我那个 `self_hp_at_most` 是**第四遍**同一个东西 ✗✗。
+> * ⭐ **它还纠正了两条我早先的"缺能力"判断** ✓：
+>   ① **`self_stacks:<名>` 早就在用** ✓（29 处 ✓）⇒ 「按**层数**读/写」这条路**存在** ✓（⚠ 但"**层数的 50%**"仍缺 ✗，`ADD_STACK` 是按**个数** ✓）；
+>   ② **`self_summon_count`／`target_summon_count`** ✓ 与 **`resource_changed:<名>`** ✓ 都在用 ✓ ⇒ 涉及召唤物**数量**／资源变化的句子**有现成语汇** ✓。
+> * ⭐ **下一轮第一步（把这条普查变成纪律）** ✗：任何"要不要造"的问题，**先在这张表里找** ✓（`grep` 出货内容 ✓，不是 `grep` 源码常量 ✗ ——
+>   源码里那 23 条**只是关键词那一半** ✓，属性比较那一半**只在内容里看得见** ✓）。⚠ 并把这张表**放进 `engine.md`** ✓（一份"在用的条件词汇"清单 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
