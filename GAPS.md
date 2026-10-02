@@ -16921,6 +16921,21 @@
 >   再把"对每个 ally 调 `unit.getBuffManager().setBattle(this)`"放在 **`allies = …` 之后** ✓ ——
 >   ⚠ 并**先确认 `CanHit` 有 `getBuffManager()`** ✓（若没有就改用 `characters`＋`allies` 的公共读法 ✓）。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百六十四：✅✅ `STATE_ENDED` 第 1 步**完成** —— battle 把手已到手（全量 2114 绿 ＋ 两闸门 [0,0]））**：
+>
+> * ✅ **实测与修法** ✓：第一次插到**委托构造器**里 ⇒ 编译失败、1481 红 ✗（上一轮已回滚 ✓）。
+>   本轮先读**规范构造器**（`Battle(List<Character>, List<? extends CanHit>, Random)` ✓，`:505` ✓）：
+>   `characters = characterQueue;` → `allies = new ArrayList<>(characterQueue);` → … → `listenToSkillPointChanges();` ✓
+>   ⇒ 在**它之后**加两个循环 ✓（两侧 roster 的 `getBuffManager().setBattle(this)` ✓）⇒ ✅ **全量 0** ✓（2114 例 ✓）。
+>   ⭐ 另一处订正 ✓：**`getBuffManager` 在源码里 grep 不到** ✗ —— 它是 **Lombok 在 `CanHit` 上生成的** ✓
+>   （这就是为什么我第一轮"确认它存不存在"的 grep 是白做的 ✗ ⇒ **Lombok 生成的访问器要按字段名找** ✓）。
+> * ⚠ **登记**：`summon(...)` 之后加入 `allies` 的**友方召唤物**的 manager **还没有被绑** ✓（只在构造器里绑了两侧初始 roster ✓）
+>   ⇒ 下一步绑 `allies` 的**追加点** ✓（或改成"用的时候惰性取" ✓）—— ⚠ 状态结束事件对**忆灵**也要成立 ✓（写作 `1407`／`1512` 时用得上 ✓）。
+> * ⭐ **下一步（第 2 步）** ✗：`TriggerEvent` 加 **`STATE_ENDED("STATE_ENDED", true)`** ✓（写法紧邻 `DEBUFF_APPLIED(...)` ✓，`:27` ✓）
+>   ＋ `TriggerContext` 加**状态名**字段 ✓ ⇒ 才轮到 `tickBuff` 里"先取名再摘"发事件 ✓。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+
+## 二、仍然受阻的缺口（逐条带读者与前置）
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
