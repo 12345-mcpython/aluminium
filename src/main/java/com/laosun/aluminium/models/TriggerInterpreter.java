@@ -395,7 +395,22 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "GAIN_RESOURCE", "SPEND_RESOURCE" -> {
-                requireAmount(effect, op, spec);
+                if (Boolean.TRUE.equals(effect.getSpendAll())) {
+                    // 「消耗所有【X】」 (2026-10-02): a spend with no stated SIZE -- and stating one
+                    // beside it is a contradiction, so it is refused rather than silently preferring one.
+                    if (!"SPEND_RESOURCE".equals(op)) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"spendAll\", which only means something for SPEND_RESOURCE "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                    if (effect.getAmount() != null) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states both \"spendAll\" and \"amount\": \"all of it\" and a fixed "
+                                        + "number are different claims (source: " + spec.getSource() + ")");
+                    }
+                } else {
+                    requireAmount(effect, op, spec);
+                }
                 requireResource(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
@@ -1372,8 +1387,12 @@ public final class TriggerInterpreter {
      */
     private static void spendResource(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = resolveTarget(effect, ctx);
-        int amount = (int) Math.round(scaledAmount(effect, ctx));
         String id = effect.getResource();
+        // 「消耗所有【X】」 (2026-10-02): the size is whatever is there; the "not enough"
+        // failure below cannot happen for it, which is why the two spellings are kept apart.
+        int amount = Boolean.TRUE.equals(effect.getSpendAll())
+                ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)
+                : (int) Math.round(scaledAmount(effect, ctx));
         if (!holder.getResources().has(id)) {
             throw new IllegalStateException(
                     "SPEND_RESOURCE '" + id + "' but " + holder.getName() + " has no such resource");

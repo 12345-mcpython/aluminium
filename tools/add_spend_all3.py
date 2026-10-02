@@ -118,9 +118,9 @@ rules.append({
         "percent": 0.21,
         "times_from": "event_amount",
         "element": "Quantum",
-        "target": "target",
-        "critRate": 0.0,
-        "critDamage": 0.0,
+        "target": "random_enemy",
+        # \u26a0 \u771f\u540d\u662f `crit_rate` / `crit_damage` (EffectSpec)\uff0c\u800c `crit_rate` \u662f**\u56fa\u5b9a\u66b4\u51fb**\u7684\u610f\u601d
+        # (`Damage.fixedCrit`)\uff0c\u4e0d\u662f\u6982\u7387\u66b4\u51fb -- \u6240\u4ee5\u4e0d\u5199\u5b83\u4eec\u3002
     }],
     "source": ("1513 \u7802\u91d1\u2022\u620f\u6d6a \u5f3a\u5316\u6b22\u6109\u6280 \u4e0b\u534a\u53e5\uff08`:283`\uff09: "
                "\u300c**\u6bcf\u6d88\u80171\u70b9**\u3010\u70ed\u610f\u3011\u90fd\u4f1a\u989d\u5916\u5bf9\u968f\u673a\u654c\u65b9\u5355\u4f53"
