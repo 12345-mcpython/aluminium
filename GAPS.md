@@ -20987,6 +20987,28 @@
 >             （⚠ 线索：`modifyAttr` 的注释里提过 lifetime 与 `permanent` ✓ ⇒ ⭐ **下一轮读 `withLifetime`** ✓）。
 > * ⚠ **推送**：本地仍**领先 3** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十四：✅✅✅ **`withLifetime` 读了** —— 它只是 `buff.setLifetimes(lifetimesOf(effect))` ⇒ ⭐ **生命周期来自 `lifetimesOf(effect)`** ⇒ ⭐ 而紧邻的 javadoc 把两种"时间"讲得很清楚：**`until` 指"哪个事件结束它"**，**`ticks_on` 指"哪个单位的回合花掉它"**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter:2306` ✓ 与它下方 javadoc ✓）** ✓ 原文要点：
+>   ```java
+>   private static AbstractBuff withLifetime(AbstractBuff buff, EffectSpec effect) {
+>       buff.setLifetimes(lifetimesOf(effect));      // ★ 生命周期**由 effect 派生**
+>       return buff;
+>   }
+>   ```
+>   ＋ javadoc：*"Separate from `withLifetime` because the two say different things about time: **`until` names the event that ends
+>   a buff**, this [ticks_on] names **whose turn boundary** spends it. … ⭐ **Two spellings since 2026-10-02** … `"self"` — the rule
+>   owner's turns (星期日's 【蒙福者】, 1321's domain, 缇宝's 结界) …"* ✓
+> * ⭐⭐⭐ **于是"静默摘除"的机制有了确切入口** ✓：**`afterMove()` 第一行** `removeWithLifetime(AbstractBuff.Lifetime.TURN_END)` ✓
+>   ⇒ ⭐ **它按"lifetime 集合"摘** ✗ ⇒ ⚠ 若 `lifetimesOf(effect)` 对"普通 `turns: 2` 的状态"**也含 `TURN_END`** ✗
+>     ⇒ ⭐ **那么它会在每次回合结束时被静默摘掉** ✗ ⇒ **活不到 `duration() <= 0`** ✗ ⇒ **永远不公告** ✓✓ —— ⭐ **与全部实测吻合** ✓。
+> * ⭐ **下一轮第一步（一次读，定案）** ✗：读 **`lifetimesOf(EffectSpec)`** ✓（⚠ 同一文件 ✓）
+>   ⇒ ⭐ 看"普通状态"的 lifetime 集合到底是什么 ✓：
+>     * **含 `TURN_END`** ⇒ ⭐ **根因确证** ✓ ⇒ ⭐ **这是一条引擎级限制**（"限时状态"活不到到期）⇒ 按纪律**登记** ✓
+>       （⚠ 读者 ≥4 ✓；⚠ 并写明"内容侧无法规避"✗ —— 除非有 `until` 可写 ✓ ⇒ ⭐ **那就用 `until` 换掉 `turns`** ✓ 值得一试 ✓）；
+>     * **不含** ⇒ ⭐ 那就回去看 `removeWithLifetime` 的匹配条件 ✓（⚠ 也许它按**别的**规则摘错了 ✓）。
+> * ⚠ **推送**：本地仍**领先 4** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -25040,6 +25062,28 @@
 >             （⚠ 线索：`modifyAttr` 的注释里提过 lifetime 与 `permanent` ✓ ⇒ ⭐ **下一轮读 `withLifetime`** ✓）。
 > * ⚠ **推送**：本地仍**领先 3** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十四：✅✅✅ **`withLifetime` 读了** —— 它只是 `buff.setLifetimes(lifetimesOf(effect))` ⇒ ⭐ **生命周期来自 `lifetimesOf(effect)`** ⇒ ⭐ 而紧邻的 javadoc 把两种"时间"讲得很清楚：**`until` 指"哪个事件结束它"**，**`ticks_on` 指"哪个单位的回合花掉它"**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter:2306` ✓ 与它下方 javadoc ✓）** ✓ 原文要点：
+>   ```java
+>   private static AbstractBuff withLifetime(AbstractBuff buff, EffectSpec effect) {
+>       buff.setLifetimes(lifetimesOf(effect));      // ★ 生命周期**由 effect 派生**
+>       return buff;
+>   }
+>   ```
+>   ＋ javadoc：*"Separate from `withLifetime` because the two say different things about time: **`until` names the event that ends
+>   a buff**, this [ticks_on] names **whose turn boundary** spends it. … ⭐ **Two spellings since 2026-10-02** … `"self"` — the rule
+>   owner's turns (星期日's 【蒙福者】, 1321's domain, 缇宝's 结界) …"* ✓
+> * ⭐⭐⭐ **于是"静默摘除"的机制有了确切入口** ✓：**`afterMove()` 第一行** `removeWithLifetime(AbstractBuff.Lifetime.TURN_END)` ✓
+>   ⇒ ⭐ **它按"lifetime 集合"摘** ✗ ⇒ ⚠ 若 `lifetimesOf(effect)` 对"普通 `turns: 2` 的状态"**也含 `TURN_END`** ✗
+>     ⇒ ⭐ **那么它会在每次回合结束时被静默摘掉** ✗ ⇒ **活不到 `duration() <= 0`** ✗ ⇒ **永远不公告** ✓✓ —— ⭐ **与全部实测吻合** ✓。
+> * ⭐ **下一轮第一步（一次读，定案）** ✗：读 **`lifetimesOf(EffectSpec)`** ✓（⚠ 同一文件 ✓）
+>   ⇒ ⭐ 看"普通状态"的 lifetime 集合到底是什么 ✓：
+>     * **含 `TURN_END`** ⇒ ⭐ **根因确证** ✓ ⇒ ⭐ **这是一条引擎级限制**（"限时状态"活不到到期）⇒ 按纪律**登记** ✓
+>       （⚠ 读者 ≥4 ✓；⚠ 并写明"内容侧无法规避"✗ —— 除非有 `until` 可写 ✓ ⇒ ⭐ **那就用 `until` 换掉 `turns`** ✓ 值得一试 ✓）；
+>     * **不含** ⇒ ⭐ 那就回去看 `removeWithLifetime` 的匹配条件 ✓（⚠ 也许它按**别的**规则摘错了 ✓）。
+> * ⚠ **推送**：本地仍**领先 4** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
