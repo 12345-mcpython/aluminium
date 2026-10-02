@@ -25,6 +25,16 @@ public enum TriggerEvent {
      * to mean "mine". Readers: relic 117/4's third clause and relic 132/4's second.
      */
     DEBUFF_APPLIED("DEBUFF_APPLIED", true),
+
+    /**
+     * A named state has just left the unit that carried it (2026-10-02).
+     *
+     * <p>⚠ <b>The name must ride on the event, not be read off the carrier</b>: by the time this fires the state is
+     * already gone (the removal happens first), so a {@code has_state} condition on the carrier can never be true.
+     * Readers: 1211's 「【生息】结束时…」, 1505's 「队友持有的【好活当赏】结束时…」, 1408's three 「变身结束时…」,
+     * 1501's two 「阿哈时刻结束时…」 and the light cone's 「奇袭结束后…」.
+     */
+    STATE_ENDED("STATE_ENDED", true),
     /**
      * ✅ {@code Battle.startBattle()} — delivered once to <b>every character's own table</b>, after the opening
      * hooks and before {@code processRequests}.
