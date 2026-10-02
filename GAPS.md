@@ -20020,6 +20020,32 @@
 > * ⭐ **纪律（收束）** ✗：**这两个"守卫"的名字都曾被我误读** ✓（`CharacterConditionLiterals` ✗、`…IsSelected` ✗）
 >   ⇒ ⭐ **结论不变**：**名字只是线索，读到断言/谓词才算知道** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、**已推送且同步** ✓（⚠ 十轮积压已清 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十三：✅✅ **谓词读到了** —— 它把每个角色 × 每个事件的 `table.rulesFor(event)` 包在 `try/catch` 里收集 `RuntimeException` ⇒ ⭐ **所以那 1 红是**装载期抛的异常**，而**异常文本就是原因****；⚠ 而我又一次没能从控制台抓到那句话）**：
+>
+> * ✅ **实测（读 `:23`–`:40` ✓）** ✓，原文骨架：
+>   ```java
+>   for (int id : CHARACTERS) {
+>       var table = CharacterFactory.create(id, LEVEL).getTriggerTable();
+>       for (TriggerEvent event : TriggerEvent.values()) {
+>           try { selected += table.rulesFor(event).size(); }
+>           catch (RuntimeException e) { problems.add("character " + id + " on " + event + ": " + e.getMessage()); }
+>       }
+>   }
+>   … throw new AssertionError("invalid character rules:\n" + String.join("\n", problems));
+>   ```
+>   ⇒ ⭐⭐ **所以它的红 = 我的某条规则在 `rulesFor(event)` 时**抛了异常**** ✓（⚠ 装载期校验 ✓，不是行为差异 ✗）
+>     ⇒ ⭐ **异常信息形如 `character 1513 on <EVENT>: <原因>`** ✓ ⇒ **那句话就是全部答案** ✓。
+> * ⚠ **而我这一轮又没抓到它** ✗：`Select-String` 的模式（`character 1513` 等 ✓）与控制台实际输出**不匹配** ✗
+>   ⇒ ⭐ **结论（第二次同形）** ✗：**不要 grep 控制台** ✓ —— ⭐ **正路是读结果 XML 的 `message` 属性** ✓
+>     （⚠ 我上一次只读了"文件名"（判据名 ✓）✗，没读 `message` ✗ ⇒ 这次要读 `message` ✓）。
+> * ⭐ **下一轮第一步（一次调用，务必读到那句话）** ✗：
+>   ① `python tools/ship_aha_moment.py` ✓；② 跑 **只这一个判据** ✓；
+>   ③ ⭐ **读 `build/test-results/test/TEST-com.laosun.aluminium.test.EveryCharacterAndRelicRuleIsSelectedTest.xml`**
+>      ⇒ 取 `<failure message="…">` ✓（⚠ 先 `Select-String -Pattern 'character 1513'` **在该 XML 上** ✓）⇒ 拿到原因 ✓；
+>   ④ 回滚 ✓ ⇒ ⭐ **然后按那句话改规则** ✓（⚠ 大概率就是 `self_resource:待演 <= 0` 这个条件写法 ✓，或 `APPLY_BUFF` 的字段 ✓）。
+> * ⭐ **纪律（第三次收紧）** ✗：**凡"要看失败原因"，一律读 `build/test-results/test/*.xml` 的 `failure` 节点（名单 ＋ `message`）** ✓
+>   ⇒ ⚠ 本段为此浪费了三轮 ✓（⚠ 前两次都只拿到部分信息 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23106,6 +23132,32 @@
 > * ⭐ **纪律（收束）** ✗：**这两个"守卫"的名字都曾被我误读** ✓（`CharacterConditionLiterals` ✗、`…IsSelected` ✗）
 >   ⇒ ⭐ **结论不变**：**名字只是线索，读到断言/谓词才算知道** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、**已推送且同步** ✓（⚠ 十轮积压已清 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十三：✅✅ **谓词读到了** —— 它把每个角色 × 每个事件的 `table.rulesFor(event)` 包在 `try/catch` 里收集 `RuntimeException` ⇒ ⭐ **所以那 1 红是**装载期抛的异常**，而**异常文本就是原因****；⚠ 而我又一次没能从控制台抓到那句话）**：
+>
+> * ✅ **实测（读 `:23`–`:40` ✓）** ✓，原文骨架：
+>   ```java
+>   for (int id : CHARACTERS) {
+>       var table = CharacterFactory.create(id, LEVEL).getTriggerTable();
+>       for (TriggerEvent event : TriggerEvent.values()) {
+>           try { selected += table.rulesFor(event).size(); }
+>           catch (RuntimeException e) { problems.add("character " + id + " on " + event + ": " + e.getMessage()); }
+>       }
+>   }
+>   … throw new AssertionError("invalid character rules:\n" + String.join("\n", problems));
+>   ```
+>   ⇒ ⭐⭐ **所以它的红 = 我的某条规则在 `rulesFor(event)` 时**抛了异常**** ✓（⚠ 装载期校验 ✓，不是行为差异 ✗）
+>     ⇒ ⭐ **异常信息形如 `character 1513 on <EVENT>: <原因>`** ✓ ⇒ **那句话就是全部答案** ✓。
+> * ⚠ **而我这一轮又没抓到它** ✗：`Select-String` 的模式（`character 1513` 等 ✓）与控制台实际输出**不匹配** ✗
+>   ⇒ ⭐ **结论（第二次同形）** ✗：**不要 grep 控制台** ✓ —— ⭐ **正路是读结果 XML 的 `message` 属性** ✓
+>     （⚠ 我上一次只读了"文件名"（判据名 ✓）✗，没读 `message` ✗ ⇒ 这次要读 `message` ✓）。
+> * ⭐ **下一轮第一步（一次调用，务必读到那句话）** ✗：
+>   ① `python tools/ship_aha_moment.py` ✓；② 跑 **只这一个判据** ✓；
+>   ③ ⭐ **读 `build/test-results/test/TEST-com.laosun.aluminium.test.EveryCharacterAndRelicRuleIsSelectedTest.xml`**
+>      ⇒ 取 `<failure message="…">` ✓（⚠ 先 `Select-String -Pattern 'character 1513'` **在该 XML 上** ✓）⇒ 拿到原因 ✓；
+>   ④ 回滚 ✓ ⇒ ⭐ **然后按那句话改规则** ✓（⚠ 大概率就是 `self_resource:待演 <= 0` 这个条件写法 ✓，或 `APPLY_BUFF` 的字段 ✓）。
+> * ⭐ **纪律（第三次收紧）** ✗：**凡"要看失败原因"，一律读 `build/test-results/test/*.xml` 的 `failure` 节点（名单 ＋ `message`）** ✓
+>   ⇒ ⚠ 本段为此浪费了三轮 ✓（⚠ 前两次都只拿到部分信息 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
