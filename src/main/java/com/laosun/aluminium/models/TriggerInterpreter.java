@@ -956,7 +956,12 @@ public final class TriggerInterpreter {
                     throw new IllegalStateException("Op ADD_ELEMENTAL_WEAKNESS names an element that is not a DamageElement");
                 }
                 for (CanHit victim : resolveTargets(battle, effect, ctx)) {
-                    if (victim instanceof com.laosun.aluminium.models.enemy.Enemy en) { en.addWeakness(weakness); }
+                    // ⭐ 「为敌方目标添加弱点时」(cone 23050). ⚠ Asked first, then changed, then fired:
+                    //    a repeat insertion is NOT an insertion, and firing then would be a quiet OVER-fire.
+                    if (victim instanceof com.laosun.aluminium.models.enemy.Enemy en && !en.isWeakTo(weakness)) {
+                        en.addWeakness(weakness);
+                        battle.fireTriggers(TriggerEvent.WEAKNESS_ADDED, ctx.owner(), en, 0, 0);
+                    }
                 }
             }
             case "RESET_TRIGGER_LIMIT" -> {
