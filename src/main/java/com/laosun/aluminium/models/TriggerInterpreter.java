@@ -786,6 +786,18 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
                 requireNoTarget(effect, op, spec);
             }
+            case "CAST_SKILL" -> {
+                if (effect.getSkill() == null || effect.getSkill().isBlank()) {
+                    throw new IllegalArgumentException("Op CAST_SKILL requires skill, a SkillType slot name (source: "
+                            + spec.getSource() + ")");
+                }
+                try {
+                    SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+                } catch (IllegalArgumentException notASlot) {
+                    throw new IllegalArgumentException("Op CAST_SKILL names skill \"" + effect.getSkill()
+                            + "\", which is not a SkillType (source: " + spec.getSource() + ")");
+                }
+            }
             case "COMMAND_SUMMON" -> {
                 // The numbers are the NAMED SKILL's, not this file's: 长夜月's ultimate is skill 141303, whose
                 // parameter row says 2.0 at Lv10 and whose effect says AoEAttack / Ice. Stating them again here
