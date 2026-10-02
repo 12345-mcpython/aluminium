@@ -3,6 +3,7 @@ package com.laosun.aluminium.test;
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.enemy.SummonFactory;
@@ -11,10 +12,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * The dead dragon's panel (2026-10-02): speed 165 flat, health = 100% of the 【新蕊】 cap.
+ * The dead dragon (2026-10-02): its panel states speed 165 flat and health = 100% of the 【新蕊】 cap, its ATTACK slot
+ * carries the SUMMONER's Max HP, and 忆灵技能 1 deals 40% of that.
  *
- * <p>The first reader of the resource-based panel: the same spec yields a different health for a different resource
- * value, which is exactly what the sentence says.
+ * <p>The first reader of the resource-based panel AND of the `attr:` spelling (a share of another of the master's
+ * attributes, which the plain branch cannot express because it reads the SAME attribute the entry names).
  */
 public class DragonPanelTest {
     /** ⭐ The panel is a share of a battle-level RESOURCE, and the flat speed rides beside it. */
