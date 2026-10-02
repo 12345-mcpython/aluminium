@@ -47,6 +47,8 @@ public class AglaeaMemospriteTest {
     private static final double EPS = 1e-6;
 
     private static final int AGLAEA = 1402;
+    /** The stance her ultimate enters, and the state whose life is anchored to the memosprite. */
+    private static final String STANCE = "至高之姿";
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
@@ -194,10 +196,56 @@ public class AglaeaMemospriteTest {
         List<TriggerTable.CompiledRule> ultimate = TriggerTables.of(AGLAEA).matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(aglaea, aglaea, null, 0, 0, null, battle));
         Assertions.assertEquals(1, ultimate.size());
-        Assertions.assertEquals(List.of("SUMMON", "HEAL", "ADVANCE"), ultimate.getFirst().effects().stream()
-                        .map(EffectSpec::getOp).toList(),
-                "the order the sentence writes them -- SUMMON must come first, the other two aim at the summon");
+        Assertions.assertEquals(List.of("SUMMON", "HEAL", "APPLY_BUFF", "ADVANCE"),
+                ultimate.getFirst().effects().stream().map(EffectSpec::getOp).toList(),
+                "the order the sentence writes them -- SUMMON must come first (the other three aim at the summon, "
+                        + "and the stance is ANCHORED to it, which needs it to exist), and the stance 「阿格莱雅进入"
+                        + "【至高之姿】状态」 precedes 「并使自身立即行动」");
         Assertions.assertEquals(1.0, ultimate.getFirst().effects().get(1).getPercent(), EPS, "回复至上限");
+    }
+
+    // ==================================================================
+    // 4. The stance, and whose existence ends it
+    // ==================================================================
+
+    /**
+     * ⭐ 「阿格莱雅进入【至高之姿】状态」 + 「**衣匠消失时**阿格莱雅解除【至高之姿】状态」 — the state's whole
+     * <b>lifecycle</b>, through the anchor ({@code ticks_on: "summon"}).
+     *
+     * <p><b>Why the anchor rather than a turn count.</b> The document gives the stance no duration: it ends when the
+     * 衣匠 is gone (「行动序列上出现倒计时…回合开始时使衣匠自毁。**衣匠消失时**阿格莱雅解除【至高之姿】状态」). The
+     * engine's anchor <i>is</i> the tick owner — {@code BuffManager.removeBuffsAnchoredTo} asks
+     * {@code buff.ticksOn(dead)} — so one field says both things, and this case measures both ends of it:
+     * <ul>
+     *   <li>the stance is on her right after the ultimate, and a turn of hers does <b>not</b> spend it (it is
+     *       permanent, so nothing counts it down — ⌖ the control for "no turn count was invented");</li>
+     *   <li>and when the 衣匠 dies, it is gone — the half a turn-count spelling could never deliver.</li>
+     * </ul>
+     */
+    @Test
+    public void herStanceEndsWhenTheGarmentmakerDoes() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Battle battle = new Battle(List.of(aglaea), List.of(dummy()), new Random(0));
+        battle.startBattle();
+        Summon tailor = battle.summonMemosprite(aglaea);
+        battle.processRequests();
+        Assertions.assertNotNull(tailor, "precondition: the memosprite is out");
+
+        battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
+        battle.processRequests();
+        Assertions.assertTrue(aglaea.getBuffManager().hasState(STANCE), "「阿格莱雅进入【至高之姿】状态」");
+
+        battle.beforeMove();
+        battle.afterMove();
+        Assertions.assertTrue(aglaea.getBuffManager().hasState(STANCE),
+                "⚠ nothing counts it down: the document gives the stance NO turn count, and a turn of hers must not "
+                        + "spend it (that is what 「permanent」 is for here)");
+
+        tailor.takeDamage(tailor.getMaxHp() * 10);
+        battle.processRequests();
+        Assertions.assertTrue(tailor.isDeath(), "precondition: the memosprite is gone");
+        Assertions.assertFalse(aglaea.getBuffManager().hasState(STANCE),
+                "「衣匠消失时阿格莱雅解除【至高之姿】状态」 -- the anchor's death takes it off");
     }
 
     // ==================================================================

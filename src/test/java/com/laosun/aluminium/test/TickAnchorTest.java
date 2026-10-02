@@ -138,17 +138,37 @@ public class TickAnchorTest {
         Assertions.assertTrue(refused.getMessage().contains("self"), refused.getMessage());
     }
 
-    /** A permanent buff is never counted down at all, so an anchor on it would be ignored. */
+    /**
+     * ⚠ <b>This case used to assert the OPPOSITE</b>, and the change is the point (2026-10-02).
+     *
+     * <p>Until {@code ticks_on: "summon"} existed, an anchor was only a <i>clock</i>: the field said whose turn
+     * boundaries spend a duration, so on a {@code permanent} buff — never counted down — it was refused as "ignored".
+     * The same field is now also the <b>anchor</b> ({@code removeBuffsAnchoredTo} asks {@code buff.ticksOn(dead)}),
+     * and "permanent, but it ends when THAT unit disappears" is a sentence two documents write (1402's 【至高之姿】,
+     * and the 死龙 family's 「随死龙消失而解除」). So the combination is legal; that it <b>loads</b> is pinned here,
+     * and what it buys is pinned in {@code AglaeaMemospriteTest}.
+     */
     @Test
-    public void anAnchorOnAPermanentBuffIsRefused() {
+    public void aPermanentBuffMayStillBeAnchored() {
         EffectSpec effect = boost("BREAKING_EFFECT", 0.5, null);
         TriggerSpecs.set(effect, "permanent", true);
         TriggerSpecs.set(effect, "ticksOn", "self");
 
+        Assertions.assertDoesNotThrow(
+                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))),
+                "「permanent」 says nothing counts it down; the anchor still says what ends it");
+    }
+
+    /** And an anchor naming neither clock is still refused, with both spellings named in the message. */
+    @Test
+    public void anAnchorOnSomethingThatIsNotAClockIsRefused() {
+        EffectSpec effect = boost("BREAKING_EFFECT", 0.5, 3);
+        TriggerSpecs.set(effect, "ticksOn", "memosprites");
+
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
 
-        Assertions.assertTrue(refused.getMessage().contains("permanent"), refused.getMessage());
+        Assertions.assertTrue(refused.getMessage().contains("summon"), refused.getMessage());
     }
 
     // ==================================================================
