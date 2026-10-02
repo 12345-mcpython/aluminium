@@ -16512,6 +16512,24 @@
 >   之后步骤 2–4 是一小组 ✓、5–6 是判据与变异 ✓ —— **每一步都能单独验证并单独提交** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百四十一：✅✅ 上一轮的"必须先重构"**被读代码推翻** —— 平路就在 `BuffManager.addBuff`，切片回到 ~7 步且无回归风险）**：
+>
+> * ✅✅ **实测（读 `attachRolled`，`:2761-2768`）** ✓：它只有两种情况 ✓：
+>   * **`base_chance` 为 null**（绝大多数 ✓）⇒ ⭐ **`target.getBuffManager().addBuff(buff)`** ✓ —— **一个公开方法** ✓✓；
+>   * 有 `base_chance` ⇒ `battle.tryApplyDebuff(...)` ✓（**抵抗判定**那条路 ✓，也需要 ctx ✓）。
+>   ⇒ ⭐⭐ **所以 caster 那条 `Buff` 分支**根本不需要碰 `TriggerInterpreter` 的私有链** ✗ ——
+>   它只要 `new StateBuff(名, turns, permanent)` ✓ ＋ **`target.getBuffManager().addBuff(buff)`** ✓（公开 ✓）。
+> * ⭐ **订正上一轮** ✓：我写的"要跨两个类／先抽公开入口／有回归风险／~10 步"**太悲观** ✗（那是我**没读到这一行就估的** ✓
+>   —— 本轮第四次同形：**估工也不许不读** ✓）。**真实形状**：
+>   0. `SkillEffectSpec` 加 `buff` 字段 ✓（一行 ✓）；
+>   1. `SkillExecutor.dispatchNonDamaging` 加 `"Buff"` 分支 ⇒ `new StateBuff(...)` ＋ `getBuffManager().addBuff(...)` ✓；
+>   2. `skill_effects.json` 加 `1412` 的 `"2"` ✓（数据在手 ✓）；
+>   3. 内容 `CAST_SKILL`（槽位 2 ＋ `cast_target` ✓）；
+>   4. 判据（目标有【军功】＋ 队友没有 ✓）；5. 变异（去掉分支 ⇒ 1 红 ✓）；6. 全量；7. 提交。
+> * ⚠ **登记的一处**：`base_chance`（抵抗判定）**这一档不在第一片里** ✓ —— 那需要 `ctx.owner()` ✓（caster 侧没有 ✗）
+>   ⇒ 若将来某条技能效果要**掷抵抗** ✓，那时再给它设计入口 ✓（今天的两条读者 ✓ 都不掷 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
