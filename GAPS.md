@@ -18367,6 +18367,21 @@
 >   （b）触发写法 **`from_category ELATION_DAMAGE`** ✓（本轮确认 ✓）；（c）"每点一次伤害" 用**已有的** `times_from` ✓（已出货 ✓）；
 >   （d）判据走 **`SkillExecutor.execute`** ✓（本轮确认 ✓）⇒ ⭐ **只差"取 `Skill` 对象"一步** ✓，下一轮应能**一次做完并进树** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十五：⚠ `spendAll` 第四次：引擎与内容再次就位、**触发已改成正确的 `from_category ELATION_DAMAGE`**，但判据在取 `Skill` 对象那一步编译不过）**：
+>
+> * ✅ **本轮又推进了两格** ✓：
+>   * 判据现在走 **`SkillExecutor.execute(battle, skill, user, targets)`** ✓（public static ✓，`models/skill/SkillExecutor.java:72` ✓）；
+>   * 触发条件已按实测改成 **`from_category ELATION_DAMAGE`** ✓（不是数字行 ✗），并写进 `1513.json` 的 `note` ✓。
+> * ⛔ **编译错误指向 `owner.getSkill(SkillType.ELATION_SKILL)`** ✗：实测 **`Character` 根本没有公开的 `getSkill(...)`** ✓
+>   —— 它只有 **`setSkillByClass(SkillType, Function…)`** ✓、`setSkillLevel` ✓、以及 Builder 的 `skill(SkillType, Skill)` ✓
+>   （⚠ 我在死龙那条判据里用的 `getSkill(...)` 是 **`Summon`** 上的 ✓ ⇒ **两个类不一样** ✗ —— 这正是它编译不过的原因 ✓）。
+> * ⭐ **下一轮第一步（一步就能定性）** ✗：看 **`Character` 怎么在运行期拿到自己的 `Skill`** ✓ —— 候选：
+>   `getSkillHolder()` ✓／`getSkills()` ✓／`getSkillData(...)` ✓／或走 `SkillType → 某个表` ✓
+>   ⇒ 找到后把判据那一行改成真名 ✓ ⇒ 应当就能**跑起来并进树** ✓（其余拼图都已就位 ✓）。
+> * ✅ **处置** ✓：引擎（`EffectSpec`／`TriggerInterpreter`）与 `1513.json` **再次 `git checkout`** ✓、判据删除 ✓
+>   ⇒ 全量 **0** ✓、树干净 ✓；⭐ **两个脚本留在仓里** ✓（`tools/add_spend_all3.py` ＝ 引擎＋内容 ✓、
+>     `tools/ship_spend_all.py` ＝ 重放＋触发修正＋判据模板 ✓）⇒ 下一轮**只改一行判据**即可 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19799,6 +19814,21 @@
 > * ⭐ **于是这条链的**全部拼图**现在都齐了** ✓：（a）引擎 `spendAll` ✓（写好、编译过 ✓，脚本在仓 ✓）；
 >   （b）触发写法 **`from_category ELATION_DAMAGE`** ✓（本轮确认 ✓）；（c）"每点一次伤害" 用**已有的** `times_from` ✓（已出货 ✓）；
 >   （d）判据走 **`SkillExecutor.execute`** ✓（本轮确认 ✓）⇒ ⭐ **只差"取 `Skill` 对象"一步** ✓，下一轮应能**一次做完并进树** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十五：⚠ `spendAll` 第四次：引擎与内容再次就位、**触发已改成正确的 `from_category ELATION_DAMAGE`**，但判据在取 `Skill` 对象那一步编译不过）**：
+>
+> * ✅ **本轮又推进了两格** ✓：
+>   * 判据现在走 **`SkillExecutor.execute(battle, skill, user, targets)`** ✓（public static ✓，`models/skill/SkillExecutor.java:72` ✓）；
+>   * 触发条件已按实测改成 **`from_category ELATION_DAMAGE`** ✓（不是数字行 ✗），并写进 `1513.json` 的 `note` ✓。
+> * ⛔ **编译错误指向 `owner.getSkill(SkillType.ELATION_SKILL)`** ✗：实测 **`Character` 根本没有公开的 `getSkill(...)`** ✓
+>   —— 它只有 **`setSkillByClass(SkillType, Function…)`** ✓、`setSkillLevel` ✓、以及 Builder 的 `skill(SkillType, Skill)` ✓
+>   （⚠ 我在死龙那条判据里用的 `getSkill(...)` 是 **`Summon`** 上的 ✓ ⇒ **两个类不一样** ✗ —— 这正是它编译不过的原因 ✓）。
+> * ⭐ **下一轮第一步（一步就能定性）** ✗：看 **`Character` 怎么在运行期拿到自己的 `Skill`** ✓ —— 候选：
+>   `getSkillHolder()` ✓／`getSkills()` ✓／`getSkillData(...)` ✓／或走 `SkillType → 某个表` ✓
+>   ⇒ 找到后把判据那一行改成真名 ✓ ⇒ 应当就能**跑起来并进树** ✓（其余拼图都已就位 ✓）。
+> * ✅ **处置** ✓：引擎（`EffectSpec`／`TriggerInterpreter`）与 `1513.json` **再次 `git checkout`** ✓、判据删除 ✓
+>   ⇒ 全量 **0** ✓、树干净 ✓；⭐ **两个脚本留在仓里** ✓（`tools/add_spend_all3.py` ＝ 引擎＋内容 ✓、
+>     `tools/ship_spend_all.py` ＝ 重放＋触发修正＋判据模板 ✓）⇒ 下一轮**只改一行判据**即可 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
