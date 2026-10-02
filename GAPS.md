@@ -16658,6 +16658,23 @@
 >   第 163 轮那类 ✗ —— **先查** ✓，不许猜 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2111** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百四十九：⭐ 事件表里**没有**"状态结束"这一类 ⇒ 「奇袭结束后」需要一个新事件；而"结束后"在语料里 **21 份文件、50 处**）**：
+>
+> * ⛔ **实测（列 `TriggerEvent` 的全部成员 ✓）** ✓：现有事件 **33 个** —— `ALLY_ATTACK`／`ATTACK_FINISHED`／`BASIC_ATTACK`／
+>   `BATTLE_START`／`BREAK`／`CAST_SETUP`／`COUNTDOWN_TURN`／`CRIT_DEALT`／`DAMAGE_SETTLED`／`DEALING_DAMAGE`／
+>   `DEBUFF_APPLIED`／`ENERGY_GAINED`／`FOLLOW_UP`／`HEALED`／`HP_CONSUMED`／`HP_LOST`／`KILL`／`RESOURCE_CHANGED`／
+>   `SHIELD_GRANTED`／`SKILL_CAST`／`SKILL_POINT_GAINED`／`SKILL_POINT_OVERFLOWED`／`SKILL_POINT_SPENT`／`SUMMON_ATTACK`／
+>   `SUMMONED`／`TAKING_HIT`／`TURN_END`／`TURN_START`／`ULT_CAST`／`WAVE_START`／`WEAKNESS_ADDED` ✓ ——
+>   ⭐ **没有**"状态到期／被移除"这一类 ✗（`REMOVE_BUFF`／`REMOVE_STATE` 是 **op** ✗，不是事件 ✓）。
+>   ⇒ 光锥那句「**奇袭结束后**，使刻律德菈获得 1 点充能」**今天无处可挂** ✗。
+> * ⭐⭐ **而读者数不小** ✓：`grep 结束后|结束时` ⇒ **21 份文件、50 处** ✓（`1408` 白厄 **4** ✓、`1212` 镜流 **2** ✓、
+>   `1005`／`1204`／`1207`／`1211`／`1221`／`1306`／`1310`／`1412`／… 各 1 ✓）
+>   ⇒ ⚠ **但这 50 处不都是"状态结束"** ✗（有的是"攻击结束后" ✓、有的是"回合结束后" ✓ ⇒ `TURN_END`／`ATTACK_FINISHED` **已经覆盖** ✓）
+>   ⇒ ⭐ **下一步必须先分类** ✓，不能拿 50 当读者数 ✗（**这正是同一条纪律**：计数 ≠ 读者 ✓）。
+> * ⭐ **下一轮第一步（分类，一次跑完）** ✗：把这 50 处的**整行**导出来读 ✓，按"**状态**结束 ✓ / **回合**结束 ✓ /
+>   **攻击**结束 ✓ / 其它"分成四类 ✓ ⇒ 只有第一类才是新事件的读者 ✓；⚠ 并**排除术语文案**（`GLOSSARY` 那类 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2111** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
