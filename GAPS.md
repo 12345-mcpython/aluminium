@@ -19957,6 +19957,32 @@
 >   ⚠ 本段多次因"控制台过滤式写错"而**误判为 0 红／没失败** ✗（⚠ 最严重的一次是变异测 ✓ ⇒ 第十条纪律 ✓ 就是这个形状 ✓）。
 > * ⚠ **推送**：本地仍**领先 7** ✗（八轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十：✅✅ **名单拿到了（读结果 XML ✓）而且它**指路**** —— 11 个红里有两条是**结构性守卫**（条件字面量 ＋ 每条规则都要有判据选中））**：
+>
+> * ✅ **实测（写内容 ⇒ 跑全量 ⇒ 读 `build/test-results/test/*.xml` 的 `<failure` ✓ ⇒ 回滚 ✓）** ✓，名单（共 11 ✗）：
+>   | 判据 | 红数 |
+>   |---|---|
+>   | `AventurineWaveflairTest` | 2 |
+>   | `SkillSlotMappingTest` | 2 |
+>   | `SpendAllTest` | 2 |
+>   | `UltraThresholdTest` | 2 |
+>   | ⭐ **`CharacterConditionLiteralsTest`** | **1** |
+>   | ⭐ **`EveryCharacterAndRelicRuleIsSelectedTest`** | **1** |
+>   | `Cone21064Test` | 1 |
+>   ⇒ ⭐ **两条守卫是关键** ✓：
+>     * **`CharacterConditionLiteralsTest`** ✓ ⇒ 条件里的字面量必须**在允许表里** ✗ ⇒ ⭐ 强烈暗示
+>       **`self_resource:待演 <= 0` 这个写法**没被条件解析器接受**** ✗（⚠ 尽管 `TriggerTable` 里有那个常量 ✓
+>         —— ⭐ **常量存在 ≠ DSL 接受** ✗，与本段"枚举里有名字 ≠ 内容能用"同一类 ✓）；
+>     * **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓ ⇒ ⭐ **每条新规则都必须被某个判据"选中"** ✗ ⇒ 我**没写判据**就加规则 ✓
+>       ⇒ ⭐ **这正是本项目"不造没有读者的能力"的机器化守卫** ✓✓（⚠ 我此前一直是**先写判据再加规则** ✓，这次顺序反了 ✗）。
+>   * ⭐ 其余（`AventurineWaveflair`／`SpendAll`／`UltraThreshold`／`SkillSlotMapping`／`Cone21064` ✓）是**行为**变化 ✓
+>     —— ⚠ 都与 `1513` 的资源／欢愉路径有关 ✓ ⇒ 印证了"**条件太宽**"那个判断 ✓（`from_category ElationDamage` ✓）。
+> * ⭐ **下一轮第一步（读那两条守卫的期望，1 次调用）** ✗：
+>   ① 读 **`CharacterConditionLiteralsTest`** ✓ ⇒ 取**允许的条件字面量清单** ✓ ⇒ ⭐ 就知道"资源值条件"**到底该怎么写** ✓
+>     （⚠ 若确实不支持 ⇒ ⭐ **这是一个可出货的小能力** ✗ —— 但它要先有 **≥2 个读者** ✓ ⇒ 本段只找到 1 个（本设计 ✓）⇒ 按纪律**登记** ✓）；
+>   ② 读 **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓ ⇒ 明白"判据要先于规则"的**具体形状** ✓ ⇒ 下次**先写判据** ✓。
+> * ⚠ **推送**：本地仍**领先 8** ✗（九轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -22979,6 +23005,32 @@
 > * ⭐ **纪律（补一条，本段第十二条同类）** ✗：**"看失败名单"要读结果 XML，不要 grep 控制台** ✓ ——
 >   ⚠ 本段多次因"控制台过滤式写错"而**误判为 0 红／没失败** ✗（⚠ 最严重的一次是变异测 ✓ ⇒ 第十条纪律 ✓ 就是这个形状 ✓）。
 > * ⚠ **推送**：本地仍**领先 7** ✗（八轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十：✅✅ **名单拿到了（读结果 XML ✓）而且它**指路**** —— 11 个红里有两条是**结构性守卫**（条件字面量 ＋ 每条规则都要有判据选中））**：
+>
+> * ✅ **实测（写内容 ⇒ 跑全量 ⇒ 读 `build/test-results/test/*.xml` 的 `<failure` ✓ ⇒ 回滚 ✓）** ✓，名单（共 11 ✗）：
+>   | 判据 | 红数 |
+>   |---|---|
+>   | `AventurineWaveflairTest` | 2 |
+>   | `SkillSlotMappingTest` | 2 |
+>   | `SpendAllTest` | 2 |
+>   | `UltraThresholdTest` | 2 |
+>   | ⭐ **`CharacterConditionLiteralsTest`** | **1** |
+>   | ⭐ **`EveryCharacterAndRelicRuleIsSelectedTest`** | **1** |
+>   | `Cone21064Test` | 1 |
+>   ⇒ ⭐ **两条守卫是关键** ✓：
+>     * **`CharacterConditionLiteralsTest`** ✓ ⇒ 条件里的字面量必须**在允许表里** ✗ ⇒ ⭐ 强烈暗示
+>       **`self_resource:待演 <= 0` 这个写法**没被条件解析器接受**** ✗（⚠ 尽管 `TriggerTable` 里有那个常量 ✓
+>         —— ⭐ **常量存在 ≠ DSL 接受** ✗，与本段"枚举里有名字 ≠ 内容能用"同一类 ✓）；
+>     * **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓ ⇒ ⭐ **每条新规则都必须被某个判据"选中"** ✗ ⇒ 我**没写判据**就加规则 ✓
+>       ⇒ ⭐ **这正是本项目"不造没有读者的能力"的机器化守卫** ✓✓（⚠ 我此前一直是**先写判据再加规则** ✓，这次顺序反了 ✗）。
+>   * ⭐ 其余（`AventurineWaveflair`／`SpendAll`／`UltraThreshold`／`SkillSlotMapping`／`Cone21064` ✓）是**行为**变化 ✓
+>     —— ⚠ 都与 `1513` 的资源／欢愉路径有关 ✓ ⇒ 印证了"**条件太宽**"那个判断 ✓（`from_category ElationDamage` ✓）。
+> * ⭐ **下一轮第一步（读那两条守卫的期望，1 次调用）** ✗：
+>   ① 读 **`CharacterConditionLiteralsTest`** ✓ ⇒ 取**允许的条件字面量清单** ✓ ⇒ ⭐ 就知道"资源值条件"**到底该怎么写** ✓
+>     （⚠ 若确实不支持 ⇒ ⭐ **这是一个可出货的小能力** ✗ —— 但它要先有 **≥2 个读者** ✓ ⇒ 本段只找到 1 个（本设计 ✓）⇒ 按纪律**登记** ✓）；
+>   ② 读 **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓ ⇒ 明白"判据要先于规则"的**具体形状** ✓ ⇒ 下次**先写判据** ✓。
+> * ⚠ **推送**：本地仍**领先 8** ✗（九轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
