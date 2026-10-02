@@ -20174,6 +20174,26 @@
 >   ③ **变异（全量）**：去掉 `REMOVE_STATE` ⇒ 全量必红 ✓。
 > * ⚠ **推送**：本地仍**领先 9** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十二：✅✅✅ **判据的每一块都齐了** —— `SkillCategory.fromString(String raw)`（`:224` ✓）与 `of(SkillType slot)`（`:135` ✓）⇒ ⭐ 造一个 `attack_type` 为 `"ElationDamage"` 的 `Skill` 即可让那次施放带欢愉类别）**：
+>
+> * ✅ **实测（读 `SkillCategory` ✓）** ✓：**两个公开入口** ✓：
+>   * **`public static SkillCategory fromString(String raw)`** ✓（`:224` ✓）⇒ ⭐ 直接 `fromString("ElationDamage")` ✓；
+>   * `public static SkillCategory of(SkillType slot)` ✓（`:135` ✓）⇒ 按技能槽 ✓。
+>   ＋ 已知 `Skill` 是 **record** ✓ 且带 **`attack_type`** ✓（数据字符串 ✓）⇒ ⭐ **造一个 `attack_type = "ElationDamage"` 的 `Skill`** ✓
+>     ⇒ 那次 `SkillExecutor.execute(…)` 的**类别就是欢愉** ✓ ⇒ 我那条 `from_category ElationDamage` 的规则**会触发** ✓✓。
+> * ⭐ **判据的最终写法（下一轮照着写，一次到位）** ✗：
+>   ```java
+>   Skill elation = new Skill(<attack_type 等按 record 顺序填，attack_type 用 "ElationDamage">);
+>   SkillExecutor.execute(battle, elation, owner, List.of(enemy));   // 或目标按她那条规则要的
+>   // ① 断言：她的【阿哈时刻】状态挂上了（has_state 可读）
+>   // ② 再驱动一次结束（ATTACK_FINISHED ⇒ 待演归零）⇒ 状态被摘
+>   // ③ 断言：她拿到了【好活当赏】= STATE_ENDED 真的发了
+>   ```
+>   ＋ **变异**：去掉 `REMOVE_STATE` 那条 ⇒ ⭐ **全量必红** ✓。
+> * ⚠ **要注意的细节** ✓：`Skill` 是 record ⇒ **构造参数顺序**必须照声明（⚠ 一次读全 ✓）；而"待演"计数要**先 +1**（`CAST_SETUP` 那条 ✓）
+>   才能被 `-1` 归零 ✓ ⇒ ⭐ **判据要按"开始 → 结束"两次驱动** ✓（正好也验证了①②两步 ✓）。
+> * ⚠ **推送**：本地仍**领先 10** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23413,6 +23433,26 @@
 >     ⇒ 断言 **① 状态挂上**（`has_state`）✓ **② 归零后摘掉** ✓ **③ `STATE_ENDED` 发出 ⇒ 她拿到【好活当赏】** ✓；
 >   ③ **变异（全量）**：去掉 `REMOVE_STATE` ⇒ 全量必红 ✓。
 > * ⚠ **推送**：本地仍**领先 9** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十二：✅✅✅ **判据的每一块都齐了** —— `SkillCategory.fromString(String raw)`（`:224` ✓）与 `of(SkillType slot)`（`:135` ✓）⇒ ⭐ 造一个 `attack_type` 为 `"ElationDamage"` 的 `Skill` 即可让那次施放带欢愉类别）**：
+>
+> * ✅ **实测（读 `SkillCategory` ✓）** ✓：**两个公开入口** ✓：
+>   * **`public static SkillCategory fromString(String raw)`** ✓（`:224` ✓）⇒ ⭐ 直接 `fromString("ElationDamage")` ✓；
+>   * `public static SkillCategory of(SkillType slot)` ✓（`:135` ✓）⇒ 按技能槽 ✓。
+>   ＋ 已知 `Skill` 是 **record** ✓ 且带 **`attack_type`** ✓（数据字符串 ✓）⇒ ⭐ **造一个 `attack_type = "ElationDamage"` 的 `Skill`** ✓
+>     ⇒ 那次 `SkillExecutor.execute(…)` 的**类别就是欢愉** ✓ ⇒ 我那条 `from_category ElationDamage` 的规则**会触发** ✓✓。
+> * ⭐ **判据的最终写法（下一轮照着写，一次到位）** ✗：
+>   ```java
+>   Skill elation = new Skill(<attack_type 等按 record 顺序填，attack_type 用 "ElationDamage">);
+>   SkillExecutor.execute(battle, elation, owner, List.of(enemy));   // 或目标按她那条规则要的
+>   // ① 断言：她的【阿哈时刻】状态挂上了（has_state 可读）
+>   // ② 再驱动一次结束（ATTACK_FINISHED ⇒ 待演归零）⇒ 状态被摘
+>   // ③ 断言：她拿到了【好活当赏】= STATE_ENDED 真的发了
+>   ```
+>   ＋ **变异**：去掉 `REMOVE_STATE` 那条 ⇒ ⭐ **全量必红** ✓。
+> * ⚠ **要注意的细节** ✓：`Skill` 是 record ⇒ **构造参数顺序**必须照声明（⚠ 一次读全 ✓）；而"待演"计数要**先 +1**（`CAST_SETUP` 那条 ✓）
+>   才能被 `-1` 归零 ✓ ⇒ ⭐ **判据要按"开始 → 结束"两次驱动** ✓（正好也验证了①②两步 ✓）。
+> * ⚠ **推送**：本地仍**领先 10** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
