@@ -18285,6 +18285,23 @@
 >   **(b)** 若还不是 ⇒ 打印 `AbilityList` 前 3 条的**全部键** ✓（⚠ 先看结构再筛 ✓ —— 与"先读 `do` 再选观测量"同一条纪律 ✓）。
 > * ⚠ 在此之前 `spendAll` 与 `1513` 那两半句**继续停在登记** ✓（脚本 `tools/add_spend_all3.py` 在仓里 ✓，重放即得 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十：✅✅ **"强化欢愉技"确实存在** —— `Avatar_AventurineW_00_ElationSkill_Phase01`（`W` = 强化版，基础版文件里**没有** ElationSkill））**：
+>
+> * ✅ **实测（打印两个文件的 `AbilityList[].Name` ✓）** ✓：
+>   * `Avatar_Aventurine_00_Ability.json` ✓（**15 条**）：`Skill01/02/03_Phase01/02` ✓、`Skill03_EnterReady` ✓、
+>     `PassiveSkill01`（＋`_InsertAbility` ✓）、`SkillMazeInLevel*` ✓、`SkillTree02` ✓ —— ⚠ **没有** `ElationSkill` ✗；
+>   * `Avatar_AventurineW_00_Ability.json` ✓（**13 条**）：同样那些 ✓ **外加** ⭐
+>     **`Avatar_AventurineW_00_ElationSkill_Phase01`** ✓／`…_Phase02` ✓／**`…_Phase11`** ✓／**`…_Phase12`** ✓
+>     ⇒ ⭐⭐ **"强化欢愉技"就是它** ✓（⚠ `Phase11/12` 与 `Phase01/02` 成对 ⇒ **很可能正是"普通／强化"两态** ✓
+>       —— 与文档「施放**强化**欢愉技时」对得上 ✓）。
+> * ⭐ **但还差"数字 id"** ✗：`AbilityList[].Name` 是**字符串名** ✓，而内容 DSL 里用的是**键**（她已有的
+>   `CAST_SKILL{skill: "ELATION_SKILL"}` ✓）与 `from_skill_id:<数字>` ✗ ⇒ ⭐ **下一轮第一步**：
+>   在 `ConfigCharacter`／`ConfigAvatar` 里找**技能表** ✓（把 `Avatar_AventurineW_00_ElationSkill*` 映射到数字技能 id ✓，
+>   ⚠ 或者看引擎的 `from_skill_id` 究竟比的是什么 ✓ —— **先读引擎那一端** ✓ 更省：`TriggerTable.from_skill_id` 的实现 ✓）。
+> * ⭐ **顺带一条** ✓：**该角色的"欢愉技"只存在于 `W`（强化）文件里** ✓ ⇒ ⭐ 这也解释了为什么她内容里那条
+>   `CAST_SKILL{ELATION_SKILL}` 是**自动施放** ✓（`TURN_START` ＋ 热意 ≥ 10 ✓）—— ⚠ 而句子要的"**强化**版"到底是不是同一个键 ✗
+>   仍要按上一段说的办法落定 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19635,6 +19652,23 @@
 >   **(a)** 看 `Avatar_AventurineW_00_Ability.json` ✓（`W` 后缀 ⇒ 很可能是"强化"那一版 ✓）⇒ 找它里面的欢愉技 ✓；
 >   **(b)** 若还不是 ⇒ 打印 `AbilityList` 前 3 条的**全部键** ✓（⚠ 先看结构再筛 ✓ —— 与"先读 `do` 再选观测量"同一条纪律 ✓）。
 > * ⚠ 在此之前 `spendAll` 与 `1513` 那两半句**继续停在登记** ✓（脚本 `tools/add_spend_all3.py` 在仓里 ✓，重放即得 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十：✅✅ **"强化欢愉技"确实存在** —— `Avatar_AventurineW_00_ElationSkill_Phase01`（`W` = 强化版，基础版文件里**没有** ElationSkill））**：
+>
+> * ✅ **实测（打印两个文件的 `AbilityList[].Name` ✓）** ✓：
+>   * `Avatar_Aventurine_00_Ability.json` ✓（**15 条**）：`Skill01/02/03_Phase01/02` ✓、`Skill03_EnterReady` ✓、
+>     `PassiveSkill01`（＋`_InsertAbility` ✓）、`SkillMazeInLevel*` ✓、`SkillTree02` ✓ —— ⚠ **没有** `ElationSkill` ✗；
+>   * `Avatar_AventurineW_00_Ability.json` ✓（**13 条**）：同样那些 ✓ **外加** ⭐
+>     **`Avatar_AventurineW_00_ElationSkill_Phase01`** ✓／`…_Phase02` ✓／**`…_Phase11`** ✓／**`…_Phase12`** ✓
+>     ⇒ ⭐⭐ **"强化欢愉技"就是它** ✓（⚠ `Phase11/12` 与 `Phase01/02` 成对 ⇒ **很可能正是"普通／强化"两态** ✓
+>       —— 与文档「施放**强化**欢愉技时」对得上 ✓）。
+> * ⭐ **但还差"数字 id"** ✗：`AbilityList[].Name` 是**字符串名** ✓，而内容 DSL 里用的是**键**（她已有的
+>   `CAST_SKILL{skill: "ELATION_SKILL"}` ✓）与 `from_skill_id:<数字>` ✗ ⇒ ⭐ **下一轮第一步**：
+>   在 `ConfigCharacter`／`ConfigAvatar` 里找**技能表** ✓（把 `Avatar_AventurineW_00_ElationSkill*` 映射到数字技能 id ✓，
+>   ⚠ 或者看引擎的 `from_skill_id` 究竟比的是什么 ✓ —— **先读引擎那一端** ✓ 更省：`TriggerTable.from_skill_id` 的实现 ✓）。
+> * ⭐ **顺带一条** ✓：**该角色的"欢愉技"只存在于 `W`（强化）文件里** ✓ ⇒ ⭐ 这也解释了为什么她内容里那条
+>   `CAST_SKILL{ELATION_SKILL}` 是**自动施放** ✓（`TURN_START` ＋ 热意 ≥ 10 ✓）—— ⚠ 而句子要的"**强化**版"到底是不是同一个键 ✗
+>   仍要按上一段说的办法落定 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
