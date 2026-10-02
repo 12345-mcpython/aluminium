@@ -20062,6 +20062,29 @@
 > * ⭐ **纪律（本段第十五条）** ✗：**装载器一次只报一个错** ✓ ⇒ 面对"全表被拒"时，**逐个修、每次读新 `message`** ✓
 >   （⚠ 我这一轮一次只推进一步，正是这个节奏 ✓ —— ⚠ 比一次猜五个键名快得多 ✓）。
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 1 个文档提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十五：✅ **`state_ended` 的写法查清了**（`TriggerTable:1209`–`:1214`）⇒ ⭐ 修法是把**主体名补上**；⚠ 而重跑后**报错又回到 `name` 键**（⚠ 怀疑我读的是**旧 XML** ⇒ 下一轮要先确认"文件 dump"与"报错"是**同一次**运行）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1200`–`:1215` ✓）** ✓ 原文：
+>   ```java
+>   Matcher stateEnded = STATE_ENDED_KEYWORD.matcher(text);
+>   if (stateEnded.find()) {
+>       String subject = normalize(text.substring(0, stateEnded.start()));   // ← 主体 = 关键词**之前**那段
+>       String state   = text.substring(stateEnded.end()).trim();            // ← 状态名 = 关键词**之后**
+>       return new StateEnded(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw, spec);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **正确写法 = `<主体> state_ended <状态名>`** ✓（例：**`self state_ended 阿哈时刻`** ✓）
+>     ⇒ ⛔ 我原来写的 `state_ended 阿哈时刻` **缺主体** ✗ ⇒ 主体为空 ⇒ 正是那句报错 ✓（⭐ 诊断与原文**完全对上** ✓）。
+>   ⇒ ✅ 已把脚本里的条件改成 **`"self state_ended " + MOMENT`** ✓。
+> * ⚠ **而重跑后仍是 11 红** ✗，且我从 XML 读到的 `message` **又是 `unknown key "name"`** ✗
+>   ⇒ ⚠ 两种可能：**(i)** 我读到的是**上一次运行**留下的 XML ✗（⚠ 这次我**先 dump 了文件**（两份都是 `id` ✓）却读到了旧报错 ✓ ⇒ **不自洽** ✗）；
+>     **(ii)** 或者**文件里还有一处** `name` 键 ✗（⚠ 但 dump 只列了 `resources` ✓ ⇒ 也许**别处**也有资源声明 ✗）。
+>   ⇒ ⭐ **下一轮第一步（把"同一次运行"钉死）** ✗：① `git checkout` ✓；② `python tools/ship_aha_moment.py` ✓；
+>     ③ **同一调用里**先 `dump 文件` ✓ 再 `跑全量` ✓ 再 `读 XML message` ✓（⚠ 三步同 shell ✓）⇒ 若 dump 全 `id` 而报错仍说 `name` ⇒
+>     ⭐ **说明 `name` 来自我没 dump 到的地方** ✓（⚠ 例如 `rules[].do[]` 里的**未知键** ✓ —— 报错文本说的是 *"in a resource declaration"* ✗，
+>       但 ⚠ 也许装载器把它归到那一类 ✓）。
+> * ⭐ **纪律（本段第十六条）** ✗：**"文件 dump" 与 "报错摘录" 必须来自同一次运行** ✓ —— ⚠ 否则会把**旧错误**当成**新证据** ✓（本轮疑似如此 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 2 个提交待补推 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23190,6 +23213,29 @@
 > * ⭐ **纪律（本段第十五条）** ✗：**装载器一次只报一个错** ✓ ⇒ 面对"全表被拒"时，**逐个修、每次读新 `message`** ✓
 >   （⚠ 我这一轮一次只推进一步，正是这个节奏 ✓ —— ⚠ 比一次猜五个键名快得多 ✓）。
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 1 个文档提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十五：✅ **`state_ended` 的写法查清了**（`TriggerTable:1209`–`:1214`）⇒ ⭐ 修法是把**主体名补上**；⚠ 而重跑后**报错又回到 `name` 键**（⚠ 怀疑我读的是**旧 XML** ⇒ 下一轮要先确认"文件 dump"与"报错"是**同一次**运行）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1200`–`:1215` ✓）** ✓ 原文：
+>   ```java
+>   Matcher stateEnded = STATE_ENDED_KEYWORD.matcher(text);
+>   if (stateEnded.find()) {
+>       String subject = normalize(text.substring(0, stateEnded.start()));   // ← 主体 = 关键词**之前**那段
+>       String state   = text.substring(stateEnded.end()).trim();            // ← 状态名 = 关键词**之后**
+>       return new StateEnded(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw, spec);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **正确写法 = `<主体> state_ended <状态名>`** ✓（例：**`self state_ended 阿哈时刻`** ✓）
+>     ⇒ ⛔ 我原来写的 `state_ended 阿哈时刻` **缺主体** ✗ ⇒ 主体为空 ⇒ 正是那句报错 ✓（⭐ 诊断与原文**完全对上** ✓）。
+>   ⇒ ✅ 已把脚本里的条件改成 **`"self state_ended " + MOMENT`** ✓。
+> * ⚠ **而重跑后仍是 11 红** ✗，且我从 XML 读到的 `message` **又是 `unknown key "name"`** ✗
+>   ⇒ ⚠ 两种可能：**(i)** 我读到的是**上一次运行**留下的 XML ✗（⚠ 这次我**先 dump 了文件**（两份都是 `id` ✓）却读到了旧报错 ✓ ⇒ **不自洽** ✗）；
+>     **(ii)** 或者**文件里还有一处** `name` 键 ✗（⚠ 但 dump 只列了 `resources` ✓ ⇒ 也许**别处**也有资源声明 ✗）。
+>   ⇒ ⭐ **下一轮第一步（把"同一次运行"钉死）** ✗：① `git checkout` ✓；② `python tools/ship_aha_moment.py` ✓；
+>     ③ **同一调用里**先 `dump 文件` ✓ 再 `跑全量` ✓ 再 `读 XML message` ✓（⚠ 三步同 shell ✓）⇒ 若 dump 全 `id` 而报错仍说 `name` ⇒
+>     ⭐ **说明 `name` 来自我没 dump 到的地方** ✓（⚠ 例如 `rules[].do[]` 里的**未知键** ✓ —— 报错文本说的是 *"in a resource declaration"* ✗，
+>       但 ⚠ 也许装载器把它归到那一类 ✓）。
+> * ⭐ **纪律（本段第十六条）** ✗：**"文件 dump" 与 "报错摘录" 必须来自同一次运行** ✓ —— ⚠ 否则会把**旧错误**当成**新证据** ✓（本轮疑似如此 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 2 个提交待补推 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
