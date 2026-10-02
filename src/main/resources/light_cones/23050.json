@@ -14,6 +14,37 @@
       ],
       "source": "光锥 23050 焚身: 使装备者的击破特攻提高#1[i]%。进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%，若不存在开战的队友则对装备者和击破特攻最高的队友生效，同类效果无法叠加。装备者为敌方目标添加弱点时，恢复1个战技点，该效果最多触发1次，施放终结技时重置可触发次数。",
       "note": "「使装备者的击破特攻提高 #1[i]%」—— 无条件永久属性，属性名用已出货的 `BREAKING_EFFECT`（实测：21035 / 127 等已出货内容用的就是它）。⛔ 未出货的两句：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高 #2[i]%（若不存在开战的队友则对装备者和击破特攻最高的队友生效）」—— 需要\"队友\"的**位置/身份**选择 ✗；「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果最多触发 1 次，施放终结技时重置可触发次数」—— 需要\"添加弱点\"这一事件 ✗ 与\"终结技重置的一次性计数\" ✗。"
+    },
+    {
+      "on": "WEAKNESS_ADDED",
+      "id": "cone23050_weakness_grants_skill_point",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "once_per_battle": true,
+      "note": "「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果**最多触发 1 次**，**施放终结技时重置**可触发次数」—— ① 事件 `WEAKNESS_ADDED` ✓（本段新造：`TriggerEvent` 声明 ＋ `ADD_ELEMENTAL_WEAKNESS` 的成功分支发射；⚠ **先问 `isWeakTo` 再改再发** ⇒ 重复添加不点着 ✓）；② `GAIN_SKILL_POINT amount: 1 target: self` ✓；③ 「最多触发 1 次」用 **`once_per_battle`** ✓（实测 `TriggerSpec:123` ✓ —— ⚠ 不是 `cooldown`，那是「每 N 回合」✗，而 `21038` 的登记表为这个区别订正过一次 ✓）；④ 「施放终结技时重置」用 **`RESET_TRIGGER_LIMIT`** ✓（本段第 13 件出货，读者 1403／1305／1207 同形态 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23050_resets_the_weakness_count",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "RESET_TRIGGER_LIMIT",
+          "rule": "cone23050_weakness_grants_skill_point",
+          "target": "self"
+        }
+      ],
+      "note": "「施放终结技时重置可触发次数」—— 与上一条配对 ✓：`RESET_TRIGGER_LIMIT` 需要 `rule` 指名目标规则的 **id** ✓，⚠ 而限制键是 `source#index` ✗ ⇒ 引擎用 `TriggerTable.keyOf` 把 id 换成键 ✓，⚠ 认不出就**抛** ✓（一个什么都不清的重置是静默的错 ✓）。"
     }
   ],
   "2": [
@@ -31,6 +62,37 @@
       ],
       "source": "光锥 23050 焚身: 使装备者的击破特攻提高#1[i]%。进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%，若不存在开战的队友则对装备者和击破特攻最高的队友生效，同类效果无法叠加。装备者为敌方目标添加弱点时，恢复1个战技点，该效果最多触发1次，施放终结技时重置可触发次数。",
       "note": "「使装备者的击破特攻提高 #1[i]%」—— 无条件永久属性，属性名用已出货的 `BREAKING_EFFECT`（实测：21035 / 127 等已出货内容用的就是它）。⛔ 未出货的两句：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高 #2[i]%（若不存在开战的队友则对装备者和击破特攻最高的队友生效）」—— 需要\"队友\"的**位置/身份**选择 ✗；「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果最多触发 1 次，施放终结技时重置可触发次数」—— 需要\"添加弱点\"这一事件 ✗ 与\"终结技重置的一次性计数\" ✗。"
+    },
+    {
+      "on": "WEAKNESS_ADDED",
+      "id": "cone23050_weakness_grants_skill_point",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "once_per_battle": true,
+      "note": "「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果**最多触发 1 次**，**施放终结技时重置**可触发次数」—— ① 事件 `WEAKNESS_ADDED` ✓（本段新造：`TriggerEvent` 声明 ＋ `ADD_ELEMENTAL_WEAKNESS` 的成功分支发射；⚠ **先问 `isWeakTo` 再改再发** ⇒ 重复添加不点着 ✓）；② `GAIN_SKILL_POINT amount: 1 target: self` ✓；③ 「最多触发 1 次」用 **`once_per_battle`** ✓（实测 `TriggerSpec:123` ✓ —— ⚠ 不是 `cooldown`，那是「每 N 回合」✗，而 `21038` 的登记表为这个区别订正过一次 ✓）；④ 「施放终结技时重置」用 **`RESET_TRIGGER_LIMIT`** ✓（本段第 13 件出货，读者 1403／1305／1207 同形态 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23050_resets_the_weakness_count",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "RESET_TRIGGER_LIMIT",
+          "rule": "cone23050_weakness_grants_skill_point",
+          "target": "self"
+        }
+      ],
+      "note": "「施放终结技时重置可触发次数」—— 与上一条配对 ✓：`RESET_TRIGGER_LIMIT` 需要 `rule` 指名目标规则的 **id** ✓，⚠ 而限制键是 `source#index` ✗ ⇒ 引擎用 `TriggerTable.keyOf` 把 id 换成键 ✓，⚠ 认不出就**抛** ✓（一个什么都不清的重置是静默的错 ✓）。"
     }
   ],
   "3": [
@@ -48,6 +110,37 @@
       ],
       "source": "光锥 23050 焚身: 使装备者的击破特攻提高#1[i]%。进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%，若不存在开战的队友则对装备者和击破特攻最高的队友生效，同类效果无法叠加。装备者为敌方目标添加弱点时，恢复1个战技点，该效果最多触发1次，施放终结技时重置可触发次数。",
       "note": "「使装备者的击破特攻提高 #1[i]%」—— 无条件永久属性，属性名用已出货的 `BREAKING_EFFECT`（实测：21035 / 127 等已出货内容用的就是它）。⛔ 未出货的两句：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高 #2[i]%（若不存在开战的队友则对装备者和击破特攻最高的队友生效）」—— 需要\"队友\"的**位置/身份**选择 ✗；「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果最多触发 1 次，施放终结技时重置可触发次数」—— 需要\"添加弱点\"这一事件 ✗ 与\"终结技重置的一次性计数\" ✗。"
+    },
+    {
+      "on": "WEAKNESS_ADDED",
+      "id": "cone23050_weakness_grants_skill_point",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "once_per_battle": true,
+      "note": "「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果**最多触发 1 次**，**施放终结技时重置**可触发次数」—— ① 事件 `WEAKNESS_ADDED` ✓（本段新造：`TriggerEvent` 声明 ＋ `ADD_ELEMENTAL_WEAKNESS` 的成功分支发射；⚠ **先问 `isWeakTo` 再改再发** ⇒ 重复添加不点着 ✓）；② `GAIN_SKILL_POINT amount: 1 target: self` ✓；③ 「最多触发 1 次」用 **`once_per_battle`** ✓（实测 `TriggerSpec:123` ✓ —— ⚠ 不是 `cooldown`，那是「每 N 回合」✗，而 `21038` 的登记表为这个区别订正过一次 ✓）；④ 「施放终结技时重置」用 **`RESET_TRIGGER_LIMIT`** ✓（本段第 13 件出货，读者 1403／1305／1207 同形态 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23050_resets_the_weakness_count",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "RESET_TRIGGER_LIMIT",
+          "rule": "cone23050_weakness_grants_skill_point",
+          "target": "self"
+        }
+      ],
+      "note": "「施放终结技时重置可触发次数」—— 与上一条配对 ✓：`RESET_TRIGGER_LIMIT` 需要 `rule` 指名目标规则的 **id** ✓，⚠ 而限制键是 `source#index` ✗ ⇒ 引擎用 `TriggerTable.keyOf` 把 id 换成键 ✓，⚠ 认不出就**抛** ✓（一个什么都不清的重置是静默的错 ✓）。"
     }
   ],
   "4": [
@@ -65,6 +158,37 @@
       ],
       "source": "光锥 23050 焚身: 使装备者的击破特攻提高#1[i]%。进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%，若不存在开战的队友则对装备者和击破特攻最高的队友生效，同类效果无法叠加。装备者为敌方目标添加弱点时，恢复1个战技点，该效果最多触发1次，施放终结技时重置可触发次数。",
       "note": "「使装备者的击破特攻提高 #1[i]%」—— 无条件永久属性，属性名用已出货的 `BREAKING_EFFECT`（实测：21035 / 127 等已出货内容用的就是它）。⛔ 未出货的两句：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高 #2[i]%（若不存在开战的队友则对装备者和击破特攻最高的队友生效）」—— 需要\"队友\"的**位置/身份**选择 ✗；「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果最多触发 1 次，施放终结技时重置可触发次数」—— 需要\"添加弱点\"这一事件 ✗ 与\"终结技重置的一次性计数\" ✗。"
+    },
+    {
+      "on": "WEAKNESS_ADDED",
+      "id": "cone23050_weakness_grants_skill_point",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "once_per_battle": true,
+      "note": "「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果**最多触发 1 次**，**施放终结技时重置**可触发次数」—— ① 事件 `WEAKNESS_ADDED` ✓（本段新造：`TriggerEvent` 声明 ＋ `ADD_ELEMENTAL_WEAKNESS` 的成功分支发射；⚠ **先问 `isWeakTo` 再改再发** ⇒ 重复添加不点着 ✓）；② `GAIN_SKILL_POINT amount: 1 target: self` ✓；③ 「最多触发 1 次」用 **`once_per_battle`** ✓（实测 `TriggerSpec:123` ✓ —— ⚠ 不是 `cooldown`，那是「每 N 回合」✗，而 `21038` 的登记表为这个区别订正过一次 ✓）；④ 「施放终结技时重置」用 **`RESET_TRIGGER_LIMIT`** ✓（本段第 13 件出货，读者 1403／1305／1207 同形态 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23050_resets_the_weakness_count",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "RESET_TRIGGER_LIMIT",
+          "rule": "cone23050_weakness_grants_skill_point",
+          "target": "self"
+        }
+      ],
+      "note": "「施放终结技时重置可触发次数」—— 与上一条配对 ✓：`RESET_TRIGGER_LIMIT` 需要 `rule` 指名目标规则的 **id** ✓，⚠ 而限制键是 `source#index` ✗ ⇒ 引擎用 `TriggerTable.keyOf` 把 id 换成键 ✓，⚠ 认不出就**抛** ✓（一个什么都不清的重置是静默的错 ✓）。"
     }
   ],
   "5": [
@@ -82,6 +206,37 @@
       ],
       "source": "光锥 23050 焚身: 使装备者的击破特攻提高#1[i]%。进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%，若不存在开战的队友则对装备者和击破特攻最高的队友生效，同类效果无法叠加。装备者为敌方目标添加弱点时，恢复1个战技点，该效果最多触发1次，施放终结技时重置可触发次数。",
       "note": "「使装备者的击破特攻提高 #1[i]%」—— 无条件永久属性，属性名用已出货的 `BREAKING_EFFECT`（实测：21035 / 127 等已出货内容用的就是它）。⛔ 未出货的两句：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高 #2[i]%（若不存在开战的队友则对装备者和击破特攻最高的队友生效）」—— 需要\"队友\"的**位置/身份**选择 ✗；「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果最多触发 1 次，施放终结技时重置可触发次数」—— 需要\"添加弱点\"这一事件 ✗ 与\"终结技重置的一次性计数\" ✗。"
+    },
+    {
+      "on": "WEAKNESS_ADDED",
+      "id": "cone23050_weakness_grants_skill_point",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "once_per_battle": true,
+      "note": "「装备者为敌方目标**添加弱点**时，恢复 1 个战技点，该效果**最多触发 1 次**，**施放终结技时重置**可触发次数」—— ① 事件 `WEAKNESS_ADDED` ✓（本段新造：`TriggerEvent` 声明 ＋ `ADD_ELEMENTAL_WEAKNESS` 的成功分支发射；⚠ **先问 `isWeakTo` 再改再发** ⇒ 重复添加不点着 ✓）；② `GAIN_SKILL_POINT amount: 1 target: self` ✓；③ 「最多触发 1 次」用 **`once_per_battle`** ✓（实测 `TriggerSpec:123` ✓ —— ⚠ 不是 `cooldown`，那是「每 N 回合」✗，而 `21038` 的登记表为这个区别订正过一次 ✓）；④ 「施放终结技时重置」用 **`RESET_TRIGGER_LIMIT`** ✓（本段第 13 件出货，读者 1403／1305／1207 同形态 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23050_resets_the_weakness_count",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "RESET_TRIGGER_LIMIT",
+          "rule": "cone23050_weakness_grants_skill_point",
+          "target": "self"
+        }
+      ],
+      "note": "「施放终结技时重置可触发次数」—— 与上一条配对 ✓：`RESET_TRIGGER_LIMIT` 需要 `rule` 指名目标规则的 **id** ✓，⚠ 而限制键是 `source#index` ✗ ⇒ 引擎用 `TriggerTable.keyOf` 把 id 换成键 ✓，⚠ 认不出就**抛** ✓（一个什么都不清的重置是静默的错 ✓）。"
     }
   ]
 }
