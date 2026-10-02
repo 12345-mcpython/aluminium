@@ -20144,6 +20144,20 @@
 >   （⚠ 而"猜字段名"这类错误本段已犯四次 ✓ ⇒ ⭐ **凡"名字"类信息，一律先查、再写** ✓）。
 > * ⚠ **推送**：本地仍**领先 7** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十：✅ `Skill` **是个 `record`**，字段区里**没有 `category`** ⇒ ⭐ 所以"类别"是**推导出来的**（不是数据里的一个键）；下一轮查它的推导处）**）**：
+>
+> * ✅ **实测（读 `beans/Skill.java` ✓）** ✓：`public record Skill(` 后面是
+>   `attack_type`(attackType) ✓／`max_level…` ✓／`param_list`(paramList) ✓／`skill_effect`(skillEffect) ✓／
+>   `skill_id`(skillID) ✓／`skill_introduction` ✓／`stance_list`(stanceList) ✓／…／`sp_need`(spNeed) ✓／`sp_base`(spBase) ✓
+>   ⇒ ⭐ **没有 `category` 字段** ✗ ⇒ ⭐ **`SkillCategory` 是从这些字段（很可能 `attack_type`／`stance_list`）推导出来的** ✓
+>     （⚠ 与本段早前那条"memosprites/servants 的 `attack` 能带 `stance`"呼应 ✓）。
+> * ⭐ **下一轮第一步（1 次调用）** ✗：读 **`SkillCategory`** ✓（`enums/SkillCategory.java` ✓ 本段已知它在 `enums/` ✓）
+>   ⇒ 找**"从 Skill 推出类别"的方法** ✓（⚠ 名字未知 ⇒ ⭐ 先 `glob`／读整个小文件 ✓，别猜 ✓）
+>     ⇒ 拿到它之后：**判据里造一个攻击类型/站姿属于欢愉的 `Skill`** ✓ ⇒ `SkillExecutor.execute(...)` ✓ ⇒ 三断言 ＋ 变异 ✓。
+> * ⚠ **若推导需要一个真实的技能数据条目**（✗ 无法凭空造 ✓）⇒ ⭐ **那么判据就改用"文件驱动 ＋ 找到她自己的欢愉技"** ✓
+>   （⚠ 本段已知 `1513` 的欢愉技在文档里有 ✓ 且 `SkillCategory.ELATION_DAMAGE` 就是为它设的 ✓ ⇒ **她的技能数据里应该有那一条** ✓）。
+> * ⚠ **推送**：本地仍**领先 8** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23353,6 +23367,20 @@
 > * ⭐ **纪律（本段第十九条）** ✗：**找文件用 `glob`，别按包名猜路径** ✓ —— ⚠ 本段为此浪费两次调用 ✓
 >   （⚠ 而"猜字段名"这类错误本段已犯四次 ✓ ⇒ ⭐ **凡"名字"类信息，一律先查、再写** ✓）。
 > * ⚠ **推送**：本地仍**领先 7** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十：✅ `Skill` **是个 `record`**，字段区里**没有 `category`** ⇒ ⭐ 所以"类别"是**推导出来的**（不是数据里的一个键）；下一轮查它的推导处）**）**：
+>
+> * ✅ **实测（读 `beans/Skill.java` ✓）** ✓：`public record Skill(` 后面是
+>   `attack_type`(attackType) ✓／`max_level…` ✓／`param_list`(paramList) ✓／`skill_effect`(skillEffect) ✓／
+>   `skill_id`(skillID) ✓／`skill_introduction` ✓／`stance_list`(stanceList) ✓／…／`sp_need`(spNeed) ✓／`sp_base`(spBase) ✓
+>   ⇒ ⭐ **没有 `category` 字段** ✗ ⇒ ⭐ **`SkillCategory` 是从这些字段（很可能 `attack_type`／`stance_list`）推导出来的** ✓
+>     （⚠ 与本段早前那条"memosprites/servants 的 `attack` 能带 `stance`"呼应 ✓）。
+> * ⭐ **下一轮第一步（1 次调用）** ✗：读 **`SkillCategory`** ✓（`enums/SkillCategory.java` ✓ 本段已知它在 `enums/` ✓）
+>   ⇒ 找**"从 Skill 推出类别"的方法** ✓（⚠ 名字未知 ⇒ ⭐ 先 `glob`／读整个小文件 ✓，别猜 ✓）
+>     ⇒ 拿到它之后：**判据里造一个攻击类型/站姿属于欢愉的 `Skill`** ✓ ⇒ `SkillExecutor.execute(...)` ✓ ⇒ 三断言 ＋ 变异 ✓。
+> * ⚠ **若推导需要一个真实的技能数据条目**（✗ 无法凭空造 ✓）⇒ ⭐ **那么判据就改用"文件驱动 ＋ 找到她自己的欢愉技"** ✓
+>   （⚠ 本段已知 `1513` 的欢愉技在文档里有 ✓ 且 `SkillCategory.ELATION_DAMAGE` 就是为它设的 ✓ ⇒ **她的技能数据里应该有那一条** ✓）。
+> * ⚠ **推送**：本地仍**领先 8** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
