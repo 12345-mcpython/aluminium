@@ -20334,6 +20334,25 @@
 >       ⇒ ⭐ **一次施放 = 一个时刻** ✓，与文档"持续至**本次**最后一个欢愉技施放结束"的**单次**读法一致 ✓✓。
 > * ⭐ **下一轮第一步** ✗：按 **(丙)** 改（最简单、无计数 ✓）⇒ 重放 ⇒ 跑判据 ⇒ 绿 ⇒ **变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）⇒ 出货 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十一：✅✅✅ **"时刻"的生命周期整条跑通了** —— 施放开始挂、施放结束摘（同一施放内完成 ✓）；⛔ 只剩"摘的时候那条 `STATE_ENDED` 没送到我的读者"**）**：
+>
+> * ✅ **实测（把收尾简化成"同一次施放的 `ALLY_ATTACK` 就摘" ✓）** ✓：
+>   * ⭐ **`assertFalse(hasState(阿哈时刻))` 在施放后通过** ✓（*"one cast is one moment: by the time it has settled, the moment has ended again"* ✓）
+>     ⇒ ⭐⭐ **说明 `CAST_SETUP` 挂上 ✓、`ALLY_ATTACK` 摘掉 ✓ —— 四步里的"挂/摘"两半都实测成立** ✓；
+>   * ⛔ `assertTrue(hasState(好活当赏))` **失败** ✗（*"and the reader answers the engine's report: the reward lands"* ✓）
+>     ⇒ ⭐ **即"摘状态时引擎发的那条 `STATE_ENDED` 没有触发我的读者规则"** ✗。
+> * ⭐ **三个候选（下一轮一次判掉）** ✓：
+>   **(甲)** ⭐ **读者规则的写法** ✗ —— 我用的是 **`self state_ended 阿哈时刻`** ✓（形态照 `TriggerTable:1211` ✓）
+>     ⇒ ⚠ 但**状态名是否与我挂的那个完全一致** ✗（⚠ 我在两处都用同一个常量 ✓ ⇒ 应一致 ✓）⇒ 更可能是 **(乙)**；
+>   **(乙)** ⭐⭐ **`STATE_ENDED` 的"名字"从哪来** ✗ —— `TriggerTable:2022` 有一句：*"⚠ **The name has to ride here** because the state is already gone
+>     by the time …"* ✓ ⇒ ⭐ 说明**状态名是随事件带过去的** ✓ ⇒ ⚠ 若我挂的是 **`APPLY_BUFF`**（而不是"状态"那条通道 ✓）
+>       ⇒ **它可能根本不发 `STATE_ENDED`** ✗（⚠ 本段读到的 `BuffManager:666` 是 `battle.fireStateEnded(instance, ended.getState())` ✓
+>         ⇒ ⭐ **只有当 buff 有 `getState()` 非空时才发** ✗）⇒ ⭐ **而我用 `APPLY_BUFF` ＋ `buff:` 字段挂的，可能没有"状态名"** ✗✗；
+>   **(丙)** `REMOVE_STATE` 与 `APPLY_BUFF` 挂的是**同一条** buff 与否 ✓（⚠ 名字一致 ⇒ 应是 ✓）。
+> * ⭐⭐ **于是最可能的正解** ✗：**给"阿哈时刻"用"带状态名的挂法"** ✓ —— ⚠ 本段见过 `APPLY_STATE` 不是 op ✗、`buff` 字段同时用于两者 ✗
+>   ⇒ ⭐ **下一轮第一步**：读 **`BuffManager:660`–`:670`（`fireStateEnded` 那一处）** ✓ ＋ 读 **`APPLY_BUFF`／`REMOVE_STATE` 怎么设 `state`** ✓
+>     ⇒ 两处一读就知道"什么写法才会发 `STATE_ENDED`" ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23733,6 +23752,25 @@
 >     ⇒ ⭐ 所以正解可能是 **(丙)**：**不计数**，改成"**施放开始挂、施放结束摘**" ✓（`CAST_SETUP` 挂 ✓ ＋ `ALLY_ATTACK` 摘 ✓）
 >       ⇒ ⭐ **一次施放 = 一个时刻** ✓，与文档"持续至**本次**最后一个欢愉技施放结束"的**单次**读法一致 ✓✓。
 > * ⭐ **下一轮第一步** ✗：按 **(丙)** 改（最简单、无计数 ✓）⇒ 重放 ⇒ 跑判据 ⇒ 绿 ⇒ **变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）⇒ 出货 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十一：✅✅✅ **"时刻"的生命周期整条跑通了** —— 施放开始挂、施放结束摘（同一施放内完成 ✓）；⛔ 只剩"摘的时候那条 `STATE_ENDED` 没送到我的读者"**）**：
+>
+> * ✅ **实测（把收尾简化成"同一次施放的 `ALLY_ATTACK` 就摘" ✓）** ✓：
+>   * ⭐ **`assertFalse(hasState(阿哈时刻))` 在施放后通过** ✓（*"one cast is one moment: by the time it has settled, the moment has ended again"* ✓）
+>     ⇒ ⭐⭐ **说明 `CAST_SETUP` 挂上 ✓、`ALLY_ATTACK` 摘掉 ✓ —— 四步里的"挂/摘"两半都实测成立** ✓；
+>   * ⛔ `assertTrue(hasState(好活当赏))` **失败** ✗（*"and the reader answers the engine's report: the reward lands"* ✓）
+>     ⇒ ⭐ **即"摘状态时引擎发的那条 `STATE_ENDED` 没有触发我的读者规则"** ✗。
+> * ⭐ **三个候选（下一轮一次判掉）** ✓：
+>   **(甲)** ⭐ **读者规则的写法** ✗ —— 我用的是 **`self state_ended 阿哈时刻`** ✓（形态照 `TriggerTable:1211` ✓）
+>     ⇒ ⚠ 但**状态名是否与我挂的那个完全一致** ✗（⚠ 我在两处都用同一个常量 ✓ ⇒ 应一致 ✓）⇒ 更可能是 **(乙)**；
+>   **(乙)** ⭐⭐ **`STATE_ENDED` 的"名字"从哪来** ✗ —— `TriggerTable:2022` 有一句：*"⚠ **The name has to ride here** because the state is already gone
+>     by the time …"* ✓ ⇒ ⭐ 说明**状态名是随事件带过去的** ✓ ⇒ ⚠ 若我挂的是 **`APPLY_BUFF`**（而不是"状态"那条通道 ✓）
+>       ⇒ **它可能根本不发 `STATE_ENDED`** ✗（⚠ 本段读到的 `BuffManager:666` 是 `battle.fireStateEnded(instance, ended.getState())` ✓
+>         ⇒ ⭐ **只有当 buff 有 `getState()` 非空时才发** ✗）⇒ ⭐ **而我用 `APPLY_BUFF` ＋ `buff:` 字段挂的，可能没有"状态名"** ✗✗；
+>   **(丙)** `REMOVE_STATE` 与 `APPLY_BUFF` 挂的是**同一条** buff 与否 ✓（⚠ 名字一致 ⇒ 应是 ✓）。
+> * ⭐⭐ **于是最可能的正解** ✗：**给"阿哈时刻"用"带状态名的挂法"** ✓ —— ⚠ 本段见过 `APPLY_STATE` 不是 op ✗、`buff` 字段同时用于两者 ✗
+>   ⇒ ⭐ **下一轮第一步**：读 **`BuffManager:660`–`:670`（`fireStateEnded` 那一处）** ✓ ＋ 读 **`APPLY_BUFF`／`REMOVE_STATE` 怎么设 `state`** ✓
+>     ⇒ 两处一读就知道"什么写法才会发 `STATE_ENDED`" ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
