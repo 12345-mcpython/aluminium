@@ -2187,6 +2187,37 @@ public class Battle {
      * @param event the event
      * @return how many rules fired in total
      */
+    /**
+     * The name of the state that just left a unit, for the duration of a {@link TriggerEvent#STATE_ENDED}
+     * firing (2026-10-02).
+     *
+     * <p><b>Why a field and not a context component.</b> The firing chain is four overloads deep, and a name
+     * would be a parameter on every one of them for a fact that exactly one event carries. State also has to ride
+     * <i>here</i> rather than be read off the carrier: by the time the event fires the state is already gone.
+     */
+    private String lastStateEndedName;
+
+    /** The state named by the {@link TriggerEvent#STATE_ENDED} currently being fired, or {@code null}. */
+    public String getLastStateEndedName() {
+        return lastStateEndedName;
+    }
+
+    /**
+     * Fires {@link TriggerEvent#STATE_ENDED} for a state that has just left {@code carrier}.
+     *
+     * <p>⚠ Save/restore, not a plain clear: a rule handling this event may itself remove another state, and the
+     * outer name must survive that. This is the guard {@code lastUltEnergySpent}'s comment warns about.
+     */
+    public void fireStateEnded(CanHit carrier, String stateName) {
+        String previous = lastStateEndedName;
+        lastStateEndedName = stateName;
+        try {
+            fireTriggers(TriggerEvent.STATE_ENDED, carrier, carrier, 0, 0);
+        } finally {
+            lastStateEndedName = previous;
+        }
+    }
+
     public int fireTriggers(TriggerEvent event) {
         return fireTriggers(event, null, null, 0, 0);
     }

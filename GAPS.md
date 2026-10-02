@@ -16935,7 +16935,157 @@
 >   ＋ `TriggerContext` 加**状态名**字段 ✓ ⇒ 才轮到 `tickBuff` 里"先取名再摘"发事件 ✓。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
 
+> **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
+>
+> * ✅ **实测（读 `TriggerContext` 的定义 ✓）** ✓：它是一个 **record** ✓，规范构造器有 **13 个分量** ✓
+>   （`owner／actor／target／hitCount／amount／damage／battle／fromCast／ruleId／targetFilter／skillId／weakHitCount／attackHitTargets` ✓，`:1976` ✓），
+>   下面还有**若干便利构造器** ✓（例：8 分量的那条 ✓，`:1984` ✓）。
+>   ⇒ ⭐ **加第 14 个分量（状态名）会牵动每一条便利构造器** ✓（它们都要多传一个 `null` ✓）
+>   ⇒ ⚠ 这正是"**改动不要按字面搜、要按结构改**"那条教训的下一处 ✓：**先把便利构造器数清楚** ✓，再一次性加分量 ＋ 给每条补 `null` ＋ 新增一条**带状态名**的便利构造器 ✓（tick 路径用它 ✓）。
+> * ✅ **本轮已进树** ✓：`TriggerEvent.STATE_ENDED("STATE_ENDED", true)` ✓（紧邻 `DEBUFF_APPLIED` ✓，附注写明
+>   ⚠ **名字必须随事件走、不能从持有者身上读**（发事件时状态已经摘掉了 ⇒ `has_state` 永远为假 ✓）＋ 五个读者点名 ✓）。
+>   纯加声明、暂无人发 ✓ ⇒ 判据 = 全量 **2114 例绿** ✓。
+> * ⭐ **下一步（第 2b 步，已具名）** ✗：`grep -c "this(" TriggerTable.java` 数清便利构造器 ✓ ⇒ 加 `String stateName` 分量 ✓ ⇒
+>   逐条补 `null` ✓ ⇒ 加一条带名字的便利构造器 ✓ ⇒ 然后才是 `tickBuff` 里"**先取名再摘**"发事件 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百六十六：⛔ 第 2b 步第一次失败并已回滚 —— `TriggerContext` 有**静态工厂**，它引用不到记录分量）**：
+>
+> * ⛔ **实测** ✓：脚本按结构改了三类落点 ✓（规范头加 `String stateName` ✓；两条"规范形状"的便利构造器补 `null` ✓；
+>   **8 处** `new TriggerContext(...)` 拷贝助手**带上当前 `stateName`** ✓）⇒ **编译失败 1 处** ✗：
+>   **`TriggerTable.java:2098`：`无法从静态上下文中引用非静态 记录组件 stateName`** ✓
+>   ⇒ ⭐ **那 8 处里至少有一处是 `static` 工厂**（静态方法里造 context ✓）⇒ **它引用不到记录分量** ✗。
+>   ✅ 已当场 `git checkout` 回滚 ✓（全量回到 **0** ✓）。
+> * ⭐ **教训（本段第三次同形）** ✗：**"按结构改"也要先知道结构里有什么** ✓ —— 我用正则覆盖了 8 处 `new TriggerContext(` ✓，
+>   却**没先分类**（实例方法 ✓ / **静态工厂** ✗）⇒ 一处静态工厂就把整次改动打成红 ✗。
+>   ⚠ 这与"自己的 note 变成第二个锚点"（上一段）**同族**：**先看清目标集合的成员，再批量改** ✓。
+> * ⭐ **下一步（已具名，两个选择）** ✗：① 先把 `TriggerContext` 的**全部静态工厂**点名出来 ✓（`grep 'static TriggerContext'` ✓），
+>   静态的传 `null` ✓、实例的带 `stateName` ✓ ⇒ 再跑一次 ✓；② 或者**干脆不让助手携带** ✗（`stateName` 只在
+>   **tick 路径直接构造**的 context 上出现 ✓），⚠ 代价是"链式构造会把它丢掉" ✗（文件自己的注释正警告过这种丢字段 ✓）
+>   ⇒ ⭐ **选 ①** ✓（更对 ✓，而且只是多一次 `grep`）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓（工作树与 `ca96cab` 一致 ✓）。
+> **2026-10-02 更新（aggro 回收之八百六十七：✅✅ 第 2b 步**落地** —— `TriggerContext` 现在带 `stateName`（分类后一次通过，全量 2114 绿））**：
+>
+> * ✅ **分类先做，再一次改对** ✓（上一轮就是漏了这一步 ⇒ 一处静态工厂把整次改动打成红 ✗）：
+>   `grep` 出**六个** `with*` 拷贝助手（`:1997／2009／2041／2052／2063／2073` ✓，**实例方法** ✓ ⇒ 携带 `stateName` ✓）
+>   ＋ **一个静态工厂** `public static TriggerContext of(CanHit, CanHit)` ✓（`:2087-2088` ✓ ⇒ **传 `null`** ✓ ——
+>   ⚠ 它在静态上下文里引用不到记录分量 ✓）。
+> * ✅ **本轮进树** ✓（`9a7311b` ✓）：`TriggerContext` 的规范构造器加**第 14 个分量** `String stateName` ✓；
+>   两条"规范形状"的便利构造器补 `null` ✓；**8 处**拷贝助手带当前值 ✓（**链式构造不再丢字段** ✓ —— 文件自己的注释
+>   正是为 `weakHitCount` 记下过这个坑 ✓）；新增 **`withStateName(String)`** ✓ 给 tick 路径用 ✓。判据 = 全量 **2114 绿** ✓。
+> * ⭐ **下一步（第 3 步，已具名）** ✗：在 `BuffManager.tickBuff` 的到期分支里发事件 ✓ ——
+>   ① **先取名字**（`AbstractBuff` 的状态名访问器**要先读** ✗：`stateNameOf`／`isNamed` 那些私有方法暗示 buff 带名字 ✓，
+>     但**访问器叫什么还没读** ✓）；② **再摘**（顺序陷阱 ✓）；③ `stateName` 由 `withStateName(...)` 进入 context ✓；
+>   ④ **注意 `battle` 可能是 null** ✓（战斗外造的单位 ✓ ⇒ 判空 ✓，这正是第 1 步附注里写下的 ✓）。
+> * ⭐ **第 4 步（条件形状）** ✗：`TriggerTable.parseCondition` 加 **`state_ended <名>`** ✓（与 `HAS_STATE` 同族 ✓，
+>   ⚠ 但**读的是 context 的名字**而不是持有者身上的状态 ✓ —— 这正是本轮那个 14 分量存在的理由 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百六十八：⭐ 第 3 步还缺**一个"带名字的发事件入口"** —— `Battle` 现有的 `fireTriggers` 都不收名字（读调用形状定案））**：
+>
+> * ✅ **实测（读 `StateBuff` ✓）** ✓：它的**名字在字段里** ✓ —— `private final String state;` ✓（`:40` ✓），
+>   而类的 javadoc 自己写着 *"**Identity is the name, not the class.** {@link #isSameKind} compares state names"* ✓
+>   ⇒ ⭐ 名字可取 ✓（⚠ 访问器是 Lombok 生成还是手写**没读到** ✗ ⇒ **写的时候用 `getState()` 让编译器判** ✓，
+>     错了就 `git checkout` ✓ —— 这是本项目在这类"看不到生成代码"处的常规做法 ✓）。
+> * ⭐⭐ **而真正缺的是发事件的口子** ✓（读 `Battle` 里全部 `fireTriggers` 的**调用形状** ✓）：
+>   `fireTriggers(event)` ✓、`fireTriggers(event, actor, subject, amount)` ✓、`fireTriggersWithSubject(...)` ✓
+>   —— ⛔ **没有一个收"状态名"** ✗ ⇒ 第 3 步要**再加一个公开入口** ✓：
+>   `public void fireStateEnded(CanHit carrier, String stateName)` ✓（内部用 `withStateName(...)` 构造 context ✓）。
+>   ⚠ **代价**：要先**读 `fireTriggers` 的定义**（它内部怎么建 context ✓、`withStateName` 该在哪一环接上 ✓）
+>     —— 这正是"**要接入一个现有机制前先读它的定义**"那条纪律 ✓（本轮只读了调用形状 ✗，不足以动手 ✓）。
+> * ⭐ **因此第 3 步拆成两小步（都已具名）** ✗：**3a** 读 `fireTriggers` 的定义 ⇒ 加 `fireStateEnded(carrier, name)` ✓
+>   （纯加方法 ✓，全量绿为判据 ✓）；**3b** `tickBuff` 到期分支**先取名再摘**调它 ✓（判空 `battle != null` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之八百六十九：✅✅✅ `STATE_ENDED`**发出了第一个事件** —— 3a 入口（`122b296`）＋ 3b 到期时先报后摘（`e8d9cd5`），两处全量 2114 绿）**：
+>
+> * ✅ **3a** ✓：`Battle` 新增 **`fireStateEnded(CanHit carrier, String stateName)`** ✓ ＋ 一个
+>   **`lastStateEndedName`** 字段与只读访问器 ✓ —— ⭐ **为什么用字段而不是给四级 `fireTriggers` 链各加一个参数** ✓：
+>   那个名字**只有一个事件**要 ✓；而且本项目**已经有这个形状的先例**（`lastUltEnergySpent` ✓）
+>   ⇒ ⚠ 并照它的教训加了**保存/恢复**（`try { … } finally { lastStateEndedName = previous; }` ✓）——
+>   **嵌套发事件时外层名字不会被内层冲掉** ✓。
+> * ✅ **3b** ✓：`BuffManager.tickBuff` 的到期分支现在**先报后摘** ✓：
+>   `if (battle != null && buff instanceof StateBuff ended) { battle.fireStateEnded(instance, ended.getState()); }` ✓
+>   —— ⚠ **判空 `battle`** ✓（战斗外造的单位 ⇒ 没人可报 ✓）；`getState()` 是 Lombok 生成的 ✓（编译通过 ⇒ 假设成立 ✓）；
+>   ⭐ **顺序**就是这条能力存在的理由 ✓（先摘再报 ⇒ 读者去查"我在不在这个状态"会得到错答案 ✓）。
+> * ⭐ **剩下的两步（已具名）** ✗：**4a** 条件形状 **`state_ended <名>`** ✓（在 `TriggerTable.parseCondition` 里，
+>   读 `battle.getLastStateEndedName()` ✓ 与名字比对 ✓ —— 与 `HAS_STATE` 同族但**数据来源不同** ✓）；
+>   **4b** 内容接 **`1211`**（【生息】结束时回能 **8** ✓）＋ 判据（把【生息】推到自然到期 ⇒ 能量 +8 ✓；
+>   ⚠ 并加**对照**：不持该状态时不加 ✓）＋ **变异**（把条件里的名字改掉 ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
+> **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
+>
+> * ✅ **实测（读 `TriggerContext` 的定义 ✓）** ✓：它是一个 **record** ✓，规范构造器有 **13 个分量** ✓
+>   （`owner／actor／target／hitCount／amount／damage／battle／fromCast／ruleId／targetFilter／skillId／weakHitCount／attackHitTargets` ✓，`:1976` ✓），
+>   下面还有**若干便利构造器** ✓（例：8 分量的那条 ✓，`:1984` ✓）。
+>   ⇒ ⭐ **加第 14 个分量（状态名）会牵动每一条便利构造器** ✓（它们都要多传一个 `null` ✓）
+>   ⇒ ⚠ 这正是"**改动不要按字面搜、要按结构改**"那条教训的下一处 ✓：**先把便利构造器数清楚** ✓，再一次性加分量 ＋ 给每条补 `null` ＋ 新增一条**带状态名**的便利构造器 ✓（tick 路径用它 ✓）。
+> * ✅ **本轮已进树** ✓：`TriggerEvent.STATE_ENDED("STATE_ENDED", true)` ✓（紧邻 `DEBUFF_APPLIED` ✓，附注写明
+>   ⚠ **名字必须随事件走、不能从持有者身上读**（发事件时状态已经摘掉了 ⇒ `has_state` 永远为假 ✓）＋ 五个读者点名 ✓）。
+>   纯加声明、暂无人发 ✓ ⇒ 判据 = 全量 **2114 例绿** ✓。
+> * ⭐ **下一步（第 2b 步，已具名）** ✗：`grep -c "this(" TriggerTable.java` 数清便利构造器 ✓ ⇒ 加 `String stateName` 分量 ✓ ⇒
+>   逐条补 `null` ✓ ⇒ 加一条带名字的便利构造器 ✓ ⇒ 然后才是 `tickBuff` 里"**先取名再摘**"发事件 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百六十六：⛔ 第 2b 步第一次失败并已回滚 —— `TriggerContext` 有**静态工厂**，它引用不到记录分量）**：
+>
+> * ⛔ **实测** ✓：脚本按结构改了三类落点 ✓（规范头加 `String stateName` ✓；两条"规范形状"的便利构造器补 `null` ✓；
+>   **8 处** `new TriggerContext(...)` 拷贝助手**带上当前 `stateName`** ✓）⇒ **编译失败 1 处** ✗：
+>   **`TriggerTable.java:2098`：`无法从静态上下文中引用非静态 记录组件 stateName`** ✓
+>   ⇒ ⭐ **那 8 处里至少有一处是 `static` 工厂**（静态方法里造 context ✓）⇒ **它引用不到记录分量** ✗。
+>   ✅ 已当场 `git checkout` 回滚 ✓（全量回到 **0** ✓）。
+> * ⭐ **教训（本段第三次同形）** ✗：**"按结构改"也要先知道结构里有什么** ✓ —— 我用正则覆盖了 8 处 `new TriggerContext(` ✓，
+>   却**没先分类**（实例方法 ✓ / **静态工厂** ✗）⇒ 一处静态工厂就把整次改动打成红 ✗。
+>   ⚠ 这与"自己的 note 变成第二个锚点"（上一段）**同族**：**先看清目标集合的成员，再批量改** ✓。
+> * ⭐ **下一步（已具名，两个选择）** ✗：① 先把 `TriggerContext` 的**全部静态工厂**点名出来 ✓（`grep 'static TriggerContext'` ✓），
+>   静态的传 `null` ✓、实例的带 `stateName` ✓ ⇒ 再跑一次 ✓；② 或者**干脆不让助手携带** ✗（`stateName` 只在
+>   **tick 路径直接构造**的 context 上出现 ✓），⚠ 代价是"链式构造会把它丢掉" ✗（文件自己的注释正警告过这种丢字段 ✓）
+>   ⇒ ⭐ **选 ①** ✓（更对 ✓，而且只是多一次 `grep`）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓（工作树与 `ca96cab` 一致 ✓）。
+> **2026-10-02 更新（aggro 回收之八百六十七：✅✅ 第 2b 步**落地** —— `TriggerContext` 现在带 `stateName`（分类后一次通过，全量 2114 绿））**：
+>
+> * ✅ **分类先做，再一次改对** ✓（上一轮就是漏了这一步 ⇒ 一处静态工厂把整次改动打成红 ✗）：
+>   `grep` 出**六个** `with*` 拷贝助手（`:1997／2009／2041／2052／2063／2073` ✓，**实例方法** ✓ ⇒ 携带 `stateName` ✓）
+>   ＋ **一个静态工厂** `public static TriggerContext of(CanHit, CanHit)` ✓（`:2087-2088` ✓ ⇒ **传 `null`** ✓ ——
+>   ⚠ 它在静态上下文里引用不到记录分量 ✓）。
+> * ✅ **本轮进树** ✓（`9a7311b` ✓）：`TriggerContext` 的规范构造器加**第 14 个分量** `String stateName` ✓；
+>   两条"规范形状"的便利构造器补 `null` ✓；**8 处**拷贝助手带当前值 ✓（**链式构造不再丢字段** ✓ —— 文件自己的注释
+>   正是为 `weakHitCount` 记下过这个坑 ✓）；新增 **`withStateName(String)`** ✓ 给 tick 路径用 ✓。判据 = 全量 **2114 绿** ✓。
+> * ⭐ **下一步（第 3 步，已具名）** ✗：在 `BuffManager.tickBuff` 的到期分支里发事件 ✓ ——
+>   ① **先取名字**（`AbstractBuff` 的状态名访问器**要先读** ✗：`stateNameOf`／`isNamed` 那些私有方法暗示 buff 带名字 ✓，
+>     但**访问器叫什么还没读** ✓）；② **再摘**（顺序陷阱 ✓）；③ `stateName` 由 `withStateName(...)` 进入 context ✓；
+>   ④ **注意 `battle` 可能是 null** ✓（战斗外造的单位 ✓ ⇒ 判空 ✓，这正是第 1 步附注里写下的 ✓）。
+> * ⭐ **第 4 步（条件形状）** ✗：`TriggerTable.parseCondition` 加 **`state_ended <名>`** ✓（与 `HAS_STATE` 同族 ✓，
+>   ⚠ 但**读的是 context 的名字**而不是持有者身上的状态 ✓ —— 这正是本轮那个 14 分量存在的理由 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百六十八：⭐ 第 3 步还缺**一个"带名字的发事件入口"** —— `Battle` 现有的 `fireTriggers` 都不收名字（读调用形状定案））**：
+>
+> * ✅ **实测（读 `StateBuff` ✓）** ✓：它的**名字在字段里** ✓ —— `private final String state;` ✓（`:40` ✓），
+>   而类的 javadoc 自己写着 *"**Identity is the name, not the class.** {@link #isSameKind} compares state names"* ✓
+>   ⇒ ⭐ 名字可取 ✓（⚠ 访问器是 Lombok 生成还是手写**没读到** ✗ ⇒ **写的时候用 `getState()` 让编译器判** ✓，
+>     错了就 `git checkout` ✓ —— 这是本项目在这类"看不到生成代码"处的常规做法 ✓）。
+> * ⭐⭐ **而真正缺的是发事件的口子** ✓（读 `Battle` 里全部 `fireTriggers` 的**调用形状** ✓）：
+>   `fireTriggers(event)` ✓、`fireTriggers(event, actor, subject, amount)` ✓、`fireTriggersWithSubject(...)` ✓
+>   —— ⛔ **没有一个收"状态名"** ✗ ⇒ 第 3 步要**再加一个公开入口** ✓：
+>   `public void fireStateEnded(CanHit carrier, String stateName)` ✓（内部用 `withStateName(...)` 构造 context ✓）。
+>   ⚠ **代价**：要先**读 `fireTriggers` 的定义**（它内部怎么建 context ✓、`withStateName` 该在哪一环接上 ✓）
+>     —— 这正是"**要接入一个现有机制前先读它的定义**"那条纪律 ✓（本轮只读了调用形状 ✗，不足以动手 ✓）。
+> * ⭐ **因此第 3 步拆成两小步（都已具名）** ✗：**3a** 读 `fireTriggers` 的定义 ⇒ 加 `fireStateEnded(carrier, name)` ✓
+>   （纯加方法 ✓，全量绿为判据 ✓）；**3b** `tickBuff` 到期分支**先取名再摘**调它 ✓（判空 `battle != null` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之八百六十九：✅✅✅ `STATE_ENDED`**发出了第一个事件** —— 3a 入口（`122b296`）＋ 3b 到期时先报后摘（`e8d9cd5`），两处全量 2114 绿）**：
+>
+> * ✅ **3a** ✓：`Battle` 新增 **`fireStateEnded(CanHit carrier, String stateName)`** ✓ ＋ 一个
+>   **`lastStateEndedName`** 字段与只读访问器 ✓ —— ⭐ **为什么用字段而不是给四级 `fireTriggers` 链各加一个参数** ✓：
+>   那个名字**只有一个事件**要 ✓；而且本项目**已经有这个形状的先例**（`lastUltEnergySpent` ✓）
+>   ⇒ ⚠ 并照它的教训加了**保存/恢复**（`try { … } finally { lastStateEndedName = previous; }` ✓）——
+>   **嵌套发事件时外层名字不会被内层冲掉** ✓。
+> * ✅ **3b** ✓：`BuffManager.tickBuff` 的到期分支现在**先报后摘** ✓：
+>   `if (battle != null && buff instanceof StateBuff ended) { battle.fireStateEnded(instance, ended.getState()); }` ✓
+>   —— ⚠ **判空 `battle`** ✓（战斗外造的单位 ⇒ 没人可报 ✓）；`getState()` 是 Lombok 生成的 ✓（编译通过 ⇒ 假设成立 ✓）；
+>   ⭐ **顺序**就是这条能力存在的理由 ✓（先摘再报 ⇒ 读者去查"我在不在这个状态"会得到错答案 ✓）。
+> * ⭐ **剩下的两步（已具名）** ✗：**4a** 条件形状 **`state_ended <名>`** ✓（在 `TriggerTable.parseCondition` 里，
+>   读 `battle.getLastStateEndedName()` ✓ 与名字比对 ✓ —— 与 `HAS_STATE` 同族但**数据来源不同** ✓）；
+>   **4b** 内容接 **`1211`**（【生息】结束时回能 **8** ✓）＋ 判据（把【生息】推到自然到期 ⇒ 能量 +8 ✓；
+>   ⚠ 并加**对照**：不持该状态时不加 ✓）＋ **变异**（把条件里的名字改掉 ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
