@@ -65,7 +65,10 @@ public class PermansorTerraeTest {
         var table = TriggerTables.of(DHPT);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the Bondmate and the shield");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention -- ⚠ and NOTHING ELSE since 2026-10-02: the entry auto-cast "
+                        + "(「入场自动施放 1 次战技」) was rolled back, because his skill's effect is DEFENCE, i.e. a "
+                        + "shield, and CAST_SKILL delivers a SWING -- it refuses a non-damaging skill by design");
     }
 
     private static Random fixed() {

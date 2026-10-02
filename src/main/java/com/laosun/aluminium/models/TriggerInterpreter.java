@@ -797,6 +797,9 @@ public final class TriggerInterpreter {
                     throw new IllegalArgumentException("Op CAST_SKILL names skill \"" + effect.getSkill()
                             + "\", which is not a SkillType (source: " + spec.getSource() + ")");
                 }
+                // ⭐ The named skill is executed by the ENGINE's own path, so there is no column to name (2026-10-02):
+                // the fields that would be a second reading of the row are refused rather than silently ignored.
+                requireNoRowArguments(effect, op, spec);
             }
             case "COMMAND_SUMMON" -> {
                 // The numbers are the NAMED SKILL's, not this file's: 长夜月's ultimate is skill 141303, whose
@@ -1691,7 +1694,7 @@ public final class TriggerInterpreter {
         CanHit actor = require(resolveTarget(effect, ctx), "target", ctx);
         SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
         Skill skill = actor.getSkills().get(slot);
-        if (skill == null || skill.getData() == null) {
+        if (skill == null || skill.getData() == null || !skill.getData().isLoaded()) {
             throw new IllegalStateException(
                     actor.getName() + " has no " + slot + " skill, so a CAST_SKILL effect has nothing to "
                             + "read: the rule names the skill whose numbers the commanded cast uses");
@@ -1710,15 +1713,23 @@ public final class TriggerInterpreter {
         if (victims.isEmpty()) {
             return;                                  // nothing left to hit: an empty battlefield, not a bad rule
         }
-        EnemySkill attack = new EnemySkill(
-                skill.getData().getElement(),
-                multiplierOf(skill, effect, actor),
-                1,                                   // one segment, like the precedent
-                DamageType.NORMAL,
-                skill.getData().getEffect(),
-                AttributeType.fromString(effect.getAttribute()),
-                skill.getData().stanceFor(true));
-        attack.execute(battle, actor, victims);
+        // ⭐⭐ THE ENGINE'S OWN CAST PATH (2026-10-02), and the whole point of this op is that there is only one
+        // reading of a skill's row. This used to hand-build an `EnemySkill` beside `SkillExecutor`, and that second
+        // reader was wrong in three ways at once -- measured, because no test had ever let the op fire:
+        //   * it read the multiplier through `multiplierOf`, which REQUIRES `damage_param`, so all nine shipped
+        //     rules (none of which states one) died with a NullPointerException on the first firing;
+        //   * it hard-coded `DamageType.NORMAL`, while the engine asks the data (`damageTypeOf`) -- an Elation
+        //     skill would have been settled as ordinary damage;
+        //   * it passed ONE multiplier to every victim, so a BLAST skill gave the neighbours the centre's number --
+        //     the exact defect §24.10 had just fixed on the other path (1008's row is `[1.92, 0.96]`).
+        // `SkillExecutor.execute` answers all three by construction: it reads `params.getFirst()` at the skill's own
+        // level, the neighbouring column for BLAST, the element, the base attribute (`damageBaseAttribute`) and the
+        // damage type from the row, and it dispatches a non-damaging skill the same way a real cast would.
+        // ⚠ What follows from that: the cast is announced (CAST_SETUP / SKILL_CAST / ULT_CAST / BASIC_ATTACK /
+        // ALLY_ATTACK) and settles its own energy, because a commanded cast IS a cast. A skill the engine's model
+        // itself mis-reads (an Elation skill's row starts with a HIT COUNT) is mis-read here too -- which is why the
+        // Elation auto-casts stay registered rather than shipped (see §24.12).
+        skill.execute(battle, actor, victims);
     }
 
     /**
@@ -3956,6 +3967,29 @@ public final class TriggerInterpreter {
      * never reads is a rule that says one thing and does another (M-26). The message names the field, because
      * "which of my six fields was ignored" is otherwise a guessing game.
      */
+    /**
+     * Refuses the fields that would be a <b>second reading</b> of a skill's row, on the ops that cast a named skill
+     * through the engine's own {@code SkillExecutor} path (2026-10-02, {@code CAST_SKILL}).
+     *
+     * <p>Why this is a refusal rather than "just ignore it": the op reads the multiplier from the row's first column,
+     * the neighbouring column for a blast, the element, the base attribute and the damage type from the skill's own
+     * data. An author who writes {@code damage_param} is asking for a different reading -- and the honest answer is
+     * no, because a second reading is how this op came to be broken in three ways at once (see {@code castSkill}).
+     * A field the engine silently ignores is the failure mode this project ranks worst.
+     */
+    private static void requireNoRowArguments(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getDamageParam() != null || effect.getDamageLevel() != null || effect.getAttribute() != null
+                || effect.getElement() != null || effect.getAmount() != null || effect.getScale() != null
+                || effect.getPercent() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " casts the named skill with that skill's OWN row, so it takes no "
+                            + "\"damage_param\" / \"damage_level\" / \"attribute\" / \"element\" / \"amount\" / "
+                            + "\"scale\" / \"percent\": those would be a second reading of numbers the engine "
+                            + "already reads once, and the engine's own cast path would ignore them without a word "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
     private static void requireNoMagnitudeArguments(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getAmount() != null || effect.getScale() != null || effect.getPercent() != null
                 || effect.getAttribute() != null || effect.getBuff() != null) {
