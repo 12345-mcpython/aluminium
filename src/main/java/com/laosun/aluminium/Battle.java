@@ -665,6 +665,7 @@ public class Battle {
         // Reversing the order eats the energy the ultimate itself earns: the kill energy / break energy
         // inside processRequests() are both credited to damage.getAttacker() (= the one casting the ultimate),
         // so settling first and zeroing afterwards wipes those entries out.
+        lastUltEnergySpent = user.getCurrentEnergy();   // ⭐ read it BEFORE the zeroing below
         user.setCurrentEnergy(0);
         processRequests();                      // ultimate body settles: the Ultra slot gains no energy in onSkillCast, so no double credit
         EnergyGain ultraGain = user.getEnergyProvider().onUltCast(user, ultra);
@@ -675,6 +676,19 @@ public class Battle {
     }
 
     /** \u2705 Collects the PARTY-scoped declarations of our side into this battle\u2019s own store (2026-09-30). */
+    /**
+     * The energy the ultimate now settling consumed, for {@code ULT_CAST}’s amount.
+     *
+     * <p>⚠ It cannot be read one layer down: Battle zeroes the energy BEFORE the ultimate body settles
+     * (see the H-5 comment above), so by the time the event fires the unit already reads 0.
+     */
+    private double lastUltEnergySpent;
+
+    /** The energy the ultimate now settling consumed ({@code 0} when none is in flight). */
+    public double getLastUltEnergySpent() {
+        return lastUltEnergySpent;
+    }
+
     private void registerPartyResources() {
         for (CanHit ally : allies) {
             if (!(ally instanceof Character character) || character.getTriggerTable() == null) {
