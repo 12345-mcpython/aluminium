@@ -2243,16 +2243,29 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Anchors a fresh buff's duration to the rule owner's turns when the rule asks for it ({@code "ticks_on":
-     * "self"}, M-42 ④), and leaves it on its carrier otherwise.
+     * Anchors a fresh buff's duration to another unit's turns when the rule asks for it ({@code "ticks_on"},
+     * M-42 ④), and leaves it on its carrier otherwise.
      *
      * <p>Separate from {@link #withLifetime} because the two say different things about time: {@code until} names the
      * <b>event</b> that ends a buff, this names <b>whose turn boundary</b> spends it. A rule may state either, and
-     * the state names are the same ones the rest of the op vocabulary uses ({@code "self"} = the rule owner).
+     * the state names are the same ones the rest of the op vocabulary uses.
+     *
+     * <p>⭐ Two spellings since 2026-10-02, and the second one is what 「…消失时解除」 is built on:
+     * <ul>
+     *   <li>{@code "self"} — the rule owner's turns (星期日's 【蒙福者】, 1321's domain, 缇宝's 结界);</li>
+     *   <li>{@code "summon"} — <b>the owner's memosprite</b> (1402's 【至高之姿】 「<b>衣匠消失时</b>阿格莱雅解除
+     *       【至高之姿】状态」, and 1407/1415's 「随死龙消失而解除」).</li>
+     * </ul>
+     * ⚠ <b>The anchor IS the clock</b> ({@code BuffManager.removeBuffsAnchoredTo} asks {@code buff.ticksOn(dead)}),
+     * so this one field delivers both halves for free: the duration is spent on that unit's turn boundaries, and when
+     * it dies the buff goes with it ({@code Battle.releaseBuffsAnchoredToTheDead}, which already sweeps both camps).
+     * ⚠ A missing summon is a <b>loud</b> error ({@link #requireSummon}) rather than a silent fall-back to the owner:
+     * "my memosprite's turns" is meaningless when there is none, and a rule that quietly anchored to herself instead
+     * would keep a buff alive for the rest of the battle.
      */
     private static AbstractBuff withTickOwner(AbstractBuff buff, EffectSpec effect, TriggerContext ctx) {
         if (effect.getTicksOn() != null) {
-            buff.setTickOwner(ctx.owner());
+            buff.setTickOwner("summon".equals(effect.getTicksOn().trim()) ? requireSummon(ctx) : ctx.owner());
         }
         return buff;
     }
@@ -2260,23 +2273,28 @@ public final class TriggerInterpreter {
     /**
      * Validates {@code "ticks_on"} at load time: one value, spelled exactly, and only on ops that create a timed
      * buff — the same "fail while the file is read" discipline as every other argument.
+     *
+     * <p>⚠ <b>A refusal can be invalidated by a later widening, and this one was</b> (2026-10-02). Until
+     * {@code "summon"} existed, this method also refused {@code "ticks_on"} together with {@code "permanent": true},
+     * because "nothing counts it down" made the field meaningless. That premise is gone: the same field is now the
+     * <b>anchor</b> as well, so a permanent buff anchored to another unit means exactly 「<i>that unit</b> disappears,
+     * so the buff ends</i>」 — which is a sentence two documents actually write (1402's 【至高之姿】, and the
+     * 死龙 family). Read the <b>reason</b> a refusal was written, not just the code: what it was protecting against
+     * may have stopped being true.
      */
     private static void requireTickOwner(EffectSpec effect, String op, TriggerSpec spec) {
         String ticksOn = effect.getTicksOn();
         if (ticksOn == null || ticksOn.isBlank()) {
             return;
         }
-        if (!"self".equals(ticksOn.trim())) {
+        String spelling = ticksOn.trim();
+        if (!"self".equals(spelling) && !"summon".equals(spelling)) {
             throw new IllegalArgumentException(
                     "Op " + op + " has \"ticks_on\": \"" + ticksOn + "\", which is not a spelling it knows; the "
-                            + "only other clock a document has asked for is the RULE OWNER's, written "
-                            + "\"ticks_on\": \"self\" (say nothing for the ordinary case: the unit that carries "
-                            + "the buff) (source: " + spec.getSource() + ")");
-        }
-        if (Boolean.TRUE.equals(effect.getPermanent())) {
-            throw new IllegalArgumentException(
-                    "Op " + op + " is \"permanent\": true, so nothing counts it down and \"ticks_on\": \"self\" "
-                            + "would be ignored (source: " + spec.getSource() + ")");
+                            + "clocks a document has asked for are the RULE OWNER's (\"ticks_on\": \"self\") and its "
+                            + "MEMOSPRITE's (\"ticks_on\": \"summon\" — 「<the summon> disappears, so the buff "
+                            + "ends」) (say nothing for the ordinary case: the unit that carries the buff) "
+                            + "(source: " + spec.getSource() + ")");
         }
     }
 
