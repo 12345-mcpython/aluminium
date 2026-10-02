@@ -426,15 +426,21 @@ public final class TriggerInterpreter {
                     // attribute, exactly like a Max HP share, and it needs `element` for the same reason (no skill row
                     // lends one). ⚠ It is NOT a `requireDerivedScale` name -- that reader resolves an ATTRIBUTE, and
                     // 「原伤害」 is not one -- and it must hang on the ONE event whose `amount` is a settled damage.
-                    // ⚠ `original_damage` is out (third attempt, 2026-10-02): the number it reads is right and linear
-                    // (measured with the crit pinned), but a DAMAGE rider does not settle to it -- see `literalBase`.
-                    boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
-                    if (maxHpShare) {
+                    // ⭐ A share of the SETTLED instance (2026-10-02): `percent` + `element` like a Max HP share, and it
+                    // must hang on the one event whose `amount` is a settled damage (`DAMAGE_SETTLED`).
+                    if ("original_damage".equals(literalScale)) {
+                        requireEvent(spec, op, TriggerEvent.DAMAGE_SETTLED);
                         requirePercent(effect, op, spec);
+                        requireElement(effect, op, spec);
                     } else {
-                        requireDerivedScale(effect, op, spec, false);
+                        boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
+                        if (maxHpShare) {
+                            requirePercent(effect, op, spec);
+                        } else {
+                            requireDerivedScale(effect, op, spec, false);
+                        }
+                        requireElement(effect, op, spec);
                     }
-                    requireElement(effect, op, spec);
                 } else {
                     requireSkill(effect, op, spec);
                     requireDamageParam(effect, op, spec);
@@ -3928,13 +3934,28 @@ public final class TriggerInterpreter {
         // faithful and linear (a 50% rider gave exactly half of a 100% one) -- only the source number is too early.
         // ⇒ It needs a POST-settlement carrier for the value; the reader table and the exact numbers are in GAPS
         // (entry "aggro 回收之八百"). Do not re-add it here without reading that entry first.
-        // ⚠⚠ ROLLED BACK AGAIN (2026-10-02, third attempt): with the rider's crit now PINNED OFF (`crit_rate: 0.0`,
-        // added the same round), a 100% rider on one 姬子 COMMON attack still settled 151.681338 where the instance it
-        // copied had settled 260.237583796 -- exactly 0.5829x, and the 50% case gave exactly half of that, so the scale
-        // is LINEAR and reads the right number; the RIDER simply does not settle to the number it reads. 0.5829 is
-        // exactly twice the original's own zone factor (0.29145), i.e. the extra instance gets one zone the cast did not
-        // -- not a crit (pinned), not the damage type (measured identical for all three), not `countsAsAttack` (that
-        // gates energy only). Out until that zone is found. See GAPS "aggro 回收之八百一十二".
+        // ⭐⭐ 「等同于**原伤害** X%」 (2026-10-02): a share of the damage instance that triggered this rule -- of the
+        // number the victim actually took, which is what `DAMAGE_SETTLED`'s `amount` is.
+        // ⚠⚠ The division is the whole point, and it took a long detour to see: a `DAMAGE`'s value is a BASE, i.e. the
+        // settlement multiplies it by the instance's zones again. Feeding it the already-settled amount would multiply
+        // those zones a second time (measured: a 40% share landed as 0.4 x 0.5829 = 0.233 of the original, with 0.5829
+        // the shared zone factor). Dividing by the triggering instance's own factor -- `toValue() / skillBaseValue`,
+        // both on the instance the event hands over -- makes the rider SETTLE to exactly the share the text states.
+        // ⚠ That detour was my own error, not the engine's: my first probes replaced the character's table with a
+        // hand-built one to control variables, which also dropped `level_convention`, so the cast ran at the Lv1 row
+        // (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy and rolled
+        // a CORRECT implementation back three times (M-32's own trap, sprung by the judge).
+        if ("original_damage".equals(scale)) {
+            if (ctx == null || ctx.damage() == null) {
+                throw new IllegalStateException(
+                        "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
+                                + "evaluated without one (it must hang on DAMAGE_SETTLED)");
+            }
+            double factor = ctx.damage().getSkillBaseValue() == 0
+                    ? 1.0
+                    : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
+            return ctx.amount() / factor * share + flat;
+        }
         // ? A Max HP share (2026-09-29): 「造成等同于X%生命上限的伤害」 -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
         // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
         switch (scale) {
