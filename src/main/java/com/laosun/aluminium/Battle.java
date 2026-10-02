@@ -665,16 +665,31 @@ public class Battle {
         // Reversing the order eats the energy the ultimate itself earns: the kill energy / break energy
         // inside processRequests() are both credited to damage.getAttacker() (= the one casting the ultimate),
         // so settling first and zeroing afterwards wipes those entries out.
+        lastUltEnergySpent = user.getCurrentEnergy();   // ⭐ read it BEFORE the zeroing below
         user.setCurrentEnergy(0);
         processRequests();                      // ultimate body settles: the Ultra slot gains no energy in onSkillCast, so no double credit
         EnergyGain ultraGain = user.getEnergyProvider().onUltCast(user, ultra);
         if (ultraGain != null) {
             applyEnergyGain(user, ultraGain);   // then the 5 points of its own (× energy gain rate)
+        lastUltEnergySpent = 0;             // ⚠ cleared, so the instance write cannot leak into later hits
         }
         return true;
     }
 
     /** \u2705 Collects the PARTY-scoped declarations of our side into this battle\u2019s own store (2026-09-30). */
+    /**
+     * The energy the ultimate now settling consumed, for {@code ULT_CAST}’s amount.
+     *
+     * <p>⚠ It cannot be read one layer down: Battle zeroes the energy BEFORE the ultimate body settles
+     * (see the H-5 comment above), so by the time the event fires the unit already reads 0.
+     */
+    private double lastUltEnergySpent;
+
+    /** The energy the ultimate now settling consumed ({@code 0} when none is in flight). */
+    public double getLastUltEnergySpent() {
+        return lastUltEnergySpent;
+    }
+
     private void registerPartyResources() {
         for (CanHit ally : allies) {
             if (!(ally instanceof Character character) || character.getTriggerTable() == null) {
@@ -2700,6 +2715,18 @@ public class Battle {
         //
         // It fires for every instance the engine settles, DOT ticks and break damage included: those are damage
         // too, and a rule that means "attacks only" says so with its own conditions.
+        // ⭐ 「每消耗 1 点能量值」 (light cone 23062) scales off THIS cast’s spend, which is why it rides on the
+        // instance: the settlement reads the instance, and this is the only event that hands it over.
+        // ⚠ The guard is load-bearing: lastUltEnergySpent is written only on the ultimate path and never
+        // cleared, so without it every later hit -- basics, DOT ticks, break damage -- would inherit it, an
+        // error with no symptom.
+        // ⭐ The guard is our OWN fact, not another component's: lastUltEnergySpent is set only on the ultimate
+        // path and cleared right after it settles, so "> 0" means exactly "this hit is that ultimate".
+        // ⚠ An earlier version asked damage.getCastCategory() == ULTRA instead, and measured, that does NOT
+        // hold on the castImmediate path -- the write was skipped and the clause silently read 0.
+        if (lastUltEnergySpent > 0) {
+            damage.withCastEnergySpent(lastUltEnergySpent);
+        }
         fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage, damage.getCastCategory(),
                 damage.getSkillKey());
 

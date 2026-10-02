@@ -186,7 +186,7 @@ public final class SkillExecutor {
                 ? SkillCategory.UNSPECIFIED
                 : skill.getData().getCategory();
         switch (category) {
-            case ULTRA -> battle.fireTriggers(TriggerEvent.ULT_CAST, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
+            case ULTRA -> battle.fireTriggers(TriggerEvent.ULT_CAST, user, aimed, hits.size(), battle.getLastUltEnergySpent(), category, skill.getSkillSlot(), weakHitCount);
             case BPSKILL -> battle.fireTriggers(TriggerEvent.SKILL_CAST, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
             case NORMAL -> battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
             default -> {

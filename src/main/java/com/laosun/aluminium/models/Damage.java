@@ -424,6 +424,16 @@ public class Damage {
      * @param defenderDefence defender's DEF
      * @param defenceIgnore   DEF-ignore ratio, clamped to [0,1]
      */
+    /**
+     * The energy the cast that produced THIS hit spent, or {@code 0} (2026-09-30; reader: light cone 23062).
+     *
+     * <p>⚠ It rides on the instance for the same reason the extras below do: 「每消耗 1 点能量值」
+     * modifies the hit BEING SETTLED, and {@code DEALING_DAMAGE} is the only event that hands that instance over.
+     * ⚠ Not a constructor parameter like {@code castCategory}: its value is only known after the damage is built
+     * (Battle reads the energy just before zeroing it) and before the settlement.
+     */
+    private double castEnergySpent = 0;
+
     /** Extra DEF-ignore carried by THIS hit, added by a rule firing on {@code DEALING_DAMAGE} (2026-09-29). */
     private double extraDefenceIgnore = 0;
 
@@ -432,6 +442,17 @@ public class Damage {
 
     /** Extra CRIT DAMAGE carried by THIS hit, same route. */
     private double extraCritDamage = 0;
+
+    /** Records how much energy the producing cast spent; the settlement reads it (light cone 23062). */
+    public Damage withCastEnergySpent(double value) {
+        this.castEnergySpent = value;
+        return this;
+    }
+
+    /** The energy the producing cast spent ({@code 0} for anything that is not an ultimate). */
+    public double getCastEnergySpent() {
+        return castEnergySpent;
+    }
 
     /** 「对陷入负面效果的敌方目标造成伤害时暴击率提高 X%」 is a property of the hit, not of the wearer. */
     public Damage addCritChance(double value) {
