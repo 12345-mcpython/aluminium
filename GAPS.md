@@ -20939,6 +20939,28 @@
 >         ⇒ ⭐ 即**`tickEffect` 没有让它递减** ✗ —— ⚠ 那是**最后一块**待读（`StateBuff.tickEffect` ✓））。
 > * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十二：🎯 **`StateBuff` 的类注释一句话终结了全部引擎侧猜测** —— *"**Duration ticks late** (`early = false`, i.e. in `afterMove`)"* ⇒ ⭐ 所以 `afterMove()` **确实**递减它 ✓、`tickEffect` 就是 `decreaseDuration()` ✓ ⇒ ⭐ **引擎侧无懈可击** ⇒ 元凶**只能是"读者规则没进她的表"**）**）**：
+>
+> * ✅ **实测（读 `models/buff/StateBuff.java` ✓）** ✓：
+>   * `:30` ⭐ 原文：*"**Duration ticks late** ({@code early = false}, i.e. in {@code afterMove}): a state applied during a …"* ✓
+>     ⇒ ⭐⭐ **所以状态**就是**在 `afterMove` 里递减的** ✓（⚠ 我早前"早半天"的猜测**作废** ✓ —— 本段第十七次自我纠正 ✓）；
+>   * `:113`–`:114` ✓：`public void tickEffect(CanHit target) { decreaseDuration(); … }` ✓ ⇒ ⭐ **递减确实发生** ✓；
+>   * `:27` ✓ 还有一句有用的 ✓：*"Re-applying the **same** state refreshes its duration, which is what the engine's ordinary rule
+>     means by …"* ✓（⭐ 与文档"延长 1 回合"呼应 ✓）；
+>   * `:62` ✓：*"a non-positive duration is not a zero-length …"* ✓（⚠ 说明它对"0 回合"有保护 ✓）。
+> * ⭐⭐⭐ **于是引擎侧**全部排除**** ✓：三道守卫 ✗、`ticksOn` ✗、`tickEffect` ✗、两类递减时机 ✗、名字 ✗、主体词 ✗、条件 ✗、目标 ✗
+>   ⇒ ⭐ **结论**：**`battle.fireStateEnded(她, "生息")` 应当被调用** ✗ ⇒ ⭐ **而我的读者规则没反应** ✗
+>     ⇒ ⭐ **只能是"这条规则不在她的表里"** ✓（⚠ 或在装载期被静默丢掉 ✗）。
+> * ⭐ **下一轮第一步（一次判据定案，就是上一轮写好的那个）** ✗：
+>   ```java
+>   assertEquals(1, owner.getTriggerTable().rulesFor(TriggerEvent.STATE_ENDED).size(), "the reader must be in her table");
+>   ```
+>   ⇒ ⭐ **0** ⇒ 规则没进表 ✓（⚠ 查装载：⚠ 提示 —— **`STATE_ENDED` 的 `when` 若只写状态名而不带主体** ⇒ 装载期会**抛异常** ✓
+>     ⇒ 而"抛异常"会被 `EveryCharacter…` 守卫抓住 ✓（它是绿的 ✓）⇒ ⭐ 那"少一条而不抛"的可能就是**别的机制** ✗
+>       —— ⚠ 例如**规则被 `target_when`／别的字段影响** ✗ ⇒ 一次 dump 她的表即可看清 ✓）；
+>     ⭐ **1** ⇒ 事件没发 ⇒ ⭐ 回去查 `BuffManager` 的那个分支**是否真的走到了** ✗（⚠ 用判据打印 `hasState` 与能量的**逐回合变化** ✓）。
+> * ⚠ **推送**：本地仍**领先 2** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24943,6 +24965,28 @@
 >       （⚠ 而 `applyState` 建的**确实是 `StateBuff`** ✓ 本段已读 ✓ ⇒ 那就只剩"**它没走到 `duration() <= 0`**" ✗
 >         ⇒ ⭐ 即**`tickEffect` 没有让它递减** ✗ —— ⚠ 那是**最后一块**待读（`StateBuff.tickEffect` ✓））。
 > * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十二：🎯 **`StateBuff` 的类注释一句话终结了全部引擎侧猜测** —— *"**Duration ticks late** (`early = false`, i.e. in `afterMove`)"* ⇒ ⭐ 所以 `afterMove()` **确实**递减它 ✓、`tickEffect` 就是 `decreaseDuration()` ✓ ⇒ ⭐ **引擎侧无懈可击** ⇒ 元凶**只能是"读者规则没进她的表"**）**）**：
+>
+> * ✅ **实测（读 `models/buff/StateBuff.java` ✓）** ✓：
+>   * `:30` ⭐ 原文：*"**Duration ticks late** ({@code early = false}, i.e. in {@code afterMove}): a state applied during a …"* ✓
+>     ⇒ ⭐⭐ **所以状态**就是**在 `afterMove` 里递减的** ✓（⚠ 我早前"早半天"的猜测**作废** ✓ —— 本段第十七次自我纠正 ✓）；
+>   * `:113`–`:114` ✓：`public void tickEffect(CanHit target) { decreaseDuration(); … }` ✓ ⇒ ⭐ **递减确实发生** ✓；
+>   * `:27` ✓ 还有一句有用的 ✓：*"Re-applying the **same** state refreshes its duration, which is what the engine's ordinary rule
+>     means by …"* ✓（⭐ 与文档"延长 1 回合"呼应 ✓）；
+>   * `:62` ✓：*"a non-positive duration is not a zero-length …"* ✓（⚠ 说明它对"0 回合"有保护 ✓）。
+> * ⭐⭐⭐ **于是引擎侧**全部排除**** ✓：三道守卫 ✗、`ticksOn` ✗、`tickEffect` ✗、两类递减时机 ✗、名字 ✗、主体词 ✗、条件 ✗、目标 ✗
+>   ⇒ ⭐ **结论**：**`battle.fireStateEnded(她, "生息")` 应当被调用** ✗ ⇒ ⭐ **而我的读者规则没反应** ✗
+>     ⇒ ⭐ **只能是"这条规则不在她的表里"** ✓（⚠ 或在装载期被静默丢掉 ✗）。
+> * ⭐ **下一轮第一步（一次判据定案，就是上一轮写好的那个）** ✗：
+>   ```java
+>   assertEquals(1, owner.getTriggerTable().rulesFor(TriggerEvent.STATE_ENDED).size(), "the reader must be in her table");
+>   ```
+>   ⇒ ⭐ **0** ⇒ 规则没进表 ✓（⚠ 查装载：⚠ 提示 —— **`STATE_ENDED` 的 `when` 若只写状态名而不带主体** ⇒ 装载期会**抛异常** ✓
+>     ⇒ 而"抛异常"会被 `EveryCharacter…` 守卫抓住 ✓（它是绿的 ✓）⇒ ⭐ 那"少一条而不抛"的可能就是**别的机制** ✗
+>       —— ⚠ 例如**规则被 `target_when`／别的字段影响** ✗ ⇒ 一次 dump 她的表即可看清 ✓）；
+>     ⭐ **1** ⇒ 事件没发 ⇒ ⭐ 回去查 `BuffManager` 的那个分支**是否真的走到了** ✗（⚠ 用判据打印 `hasState` 与能量的**逐回合变化** ✓）。
+> * ⚠ **推送**：本地仍**领先 2** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
