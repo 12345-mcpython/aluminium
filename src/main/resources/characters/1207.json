@@ -256,5 +256,41 @@
     "min_eidolon": 5,
     "source": "1207 驭空 星魂 5 井仪贯侯，疾羽参连 (Avatar_Yukong_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'120703': 2, '120704': 2}",
     "note": "星魂 5's two raises. ⚠ The TALENT half moves the row her additional-damage rule reads, so it is not bookkeeping here."
+  },
+  {
+    "on": "ENERGY_GAINED",
+    "id": "eidolon2_energy_on_ally_full",
+    "when": [
+      "actor is_ally",
+      "self_energy_percent >= 1.0"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 5,
+        "target": "self"
+      }
+    ],
+    "per_turn": 1,
+    "per_subject": "actor",
+    "min_eidolon": 2,
+    "source": "1207 驭空 星魂 2（E:\\turnbasedgamedata\\aluminium_texts\\1207_驭空.md）: 「当我方任意单体当前能量值等于其能量上限时，驭空额外恢复5点能量。该效果我方每个单体仅可触发1次，当驭空施放终结技后，重置该效果触发次数。」",
+    "note": "⭐ 三个维度都已具备 ✓（2026-09-30 ✓）：⚠ 「**1 次**」＝ `per_turn: 1` ✗ ＋ ⚠ 「我方**每个单体**」＝ `per_subject: actor` ✗（⚠ 计数落在**那个能量满的单体**身上 ✓，⚠ 因为 `ENERGY_GAINED` 的 `actor` 就是它 ✓）＋ ⚠ 「**重置**」＝ 另一条 `ULT_CAST` 规则 ✓。⚠⚠ **条件不能照抄 1310** ✗：⚠ `1310` 的同类句 ⚠ 「当**能量恢复至上限时**」✗（⚠ 主语是**她自己** ✓）⇒ 写 `actor == self` ✓；⚠ 而本句的主语是 ⚠ 「我方**任意单体**」✗ ⇒ 必须写 ⚠ `actor is_ally` ✓ —— ⚠ 照抄会得到「只有驭空自己能量满时才回能」✗ ⚠，⚠ 一个**看起来正常、实际漏掉队友**的近似 ✓。⚠ 事件 `ENERGY_GAINED` ✓ 与条件 `self_energy_percent >= 1.0` ✗ 都是既有词汇 ✓（⚠ 后者由 `1310` 那条出货时新增 ✓）。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_resets_the_eidolon2_energy_count",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "RESET_TRIGGER_LIMIT",
+        "rule": "eidolon2_energy_on_ally_full",
+        "target": "self"
+      }
+    ],
+    "source": "1207 驭空 星魂 2 后半: 「当驭空施放终结技后，重置该效果触发次数。」",
+    "note": "⭐ 「重置」那一半 ✓（2026-09-30 ✓）：⚠ 只清 ⚠ `eidolon2_energy_on_ally_full` 这一条的计数 ✓（⚠ 用 `RESET_TRIGGER_LIMIT` ✗），⚠ 而不是清她全部规则的计数 ✓（⚠ 她 `ULT_CAST` 上还有别的规则 ✓）。"
   }
 ]
