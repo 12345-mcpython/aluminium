@@ -19911,6 +19911,23 @@
 >   ⇒ ⭐ **那正是 `STATE_ENDED` 该有的用法** ✓（⚠ 我此前一直在想"内容怎么发事件" ✗ —— ⭐ **可能从一开始就该是"挂一个状态、让它到点自己结束"** ✓）。
 > * ⚠ **推送**：本地仍**领先 4** ✗（网络连续五轮不通 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零二十七：✅✅✅ **不需要"发事件"的 op** —— 内容有 **`APPLY_BUFF`（＝挂状态 ✓）** 与 **`REMOVE_STATE`（＝摘状态 ✓）** ⇒ ⭐ **把"阿哈时刻"做成一个真状态，引擎自己就会发 `STATE_ENDED`**）**：
+>
+> * ✅ **实测（读 op 表 ✓）** ✓：`case "APPLY_BUFF" -> applyState(battle, effect, ctx);` ✓（`:1192` ✓）与 **`case "REMOVE_STATE"`** ✓
+>   （`:644` ✓、`:1201` ✓）⇒ ⭐⭐ **内容是能"挂状态/摘状态"的** ✓ ⇒ ⭐ 而本段建的 `STATE_ENDED` 链正是"**状态被摘时先报后摘**" ✓
+>     （`tickBuff` ✓）⇒ ⛔ **所以整件事根本不需要新 op** ✗✗。
+> * ⭐⭐⭐ **于是 `STATE_ENDED("阿哈时刻")` 的完整做法（全用已出货的拼写 ✓）** ✓：
+>   1. **开始**：`CAST_SETUP` ＋ `from_category ElationDamage` ✓ ⇒ `APPLY_BUFF{阿哈时刻, turns: N}` ✓ **＋** `GAIN_RESOURCE{待演, amount: 1}` ✓（记账 ✓）；
+>   2. **每个欢愉技结束**：`ATTACK_FINISHED` ＋ `from_category ElationDamage` ✓ ⇒ `SPEND_RESOURCE{待演, amount: 1}` ✓；
+>   3. **最后一个结束 ⇒ 摘状态**：`RESOURCE_CHANGED{待演}` ＋ `when: ["self_resource:待演 <= 0"]` ✓ ⇒ **`REMOVE_STATE{阿哈时刻}`** ✓
+>      ⇒ ⭐ **引擎随即发 `STATE_ENDED("阿哈时刻")`** ✓ ⇒ 触发那 **≥3 个读者** ✓（`1505` 的【好活当赏】✓ ＋ `eidolons` 两条 ✓）
+>      ＋ **`SPEND_RESOURCE{spendAll}` 清空笑点** ✓（⭐ 本段出货的 `spendAll` ✓）。
+>   ⇒ ⭐ **这条链上的每一块都已出货并有判据** ✓（`from_category` ✓／资源 ✓／`self_resource:` 条件 ✓／`APPLY_BUFF`／`REMOVE_STATE` ✓／`spendAll` ✓／
+>     `STATE_ENDED` ＋ `state_ended` 条件 ✓）⇒ ⭐ **下一轮应当能"一次出货"** ✓（⚠ 唯一要很小心的仍是：**判据先证明"那个状态真的挂上了、又真的被摘掉"** ✓ —— 第十三条纪律 ✓）。
+> * ⭐ **回看这一段的找法** ✓：从"谁发动阿哈时刻"→`GLOSSARY` ✓ → "召唤物不会行动" ✗ → "用结束条件" ✓ → "条件 DSL 在 `TriggerTable`" ✓ →
+>   "`self_resource:` 存在" ✓ → ⭐ **"`APPLY_BUFF`/`REMOVE_STATE` 就是挂摘状态"** ✓ ⇒ **每一步都由上一步的实测指路** ✓（⚠ 而不是猜 ✗）。
+> * ⚠ **推送**：本地仍**领先 5** ✗（六轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -22887,6 +22904,23 @@
 > * ⭐ **注意 (乙) 的分量** ✓：它把"发出时刻结束"**完全交给既有链** ✓（`tickBuff` 先报后摘 ✓ 本段已建 ✓）
 >   ⇒ ⭐ **那正是 `STATE_ENDED` 该有的用法** ✓（⚠ 我此前一直在想"内容怎么发事件" ✗ —— ⭐ **可能从一开始就该是"挂一个状态、让它到点自己结束"** ✓）。
 > * ⚠ **推送**：本地仍**领先 4** ✗（网络连续五轮不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零二十七：✅✅✅ **不需要"发事件"的 op** —— 内容有 **`APPLY_BUFF`（＝挂状态 ✓）** 与 **`REMOVE_STATE`（＝摘状态 ✓）** ⇒ ⭐ **把"阿哈时刻"做成一个真状态，引擎自己就会发 `STATE_ENDED`**）**：
+>
+> * ✅ **实测（读 op 表 ✓）** ✓：`case "APPLY_BUFF" -> applyState(battle, effect, ctx);` ✓（`:1192` ✓）与 **`case "REMOVE_STATE"`** ✓
+>   （`:644` ✓、`:1201` ✓）⇒ ⭐⭐ **内容是能"挂状态/摘状态"的** ✓ ⇒ ⭐ 而本段建的 `STATE_ENDED` 链正是"**状态被摘时先报后摘**" ✓
+>     （`tickBuff` ✓）⇒ ⛔ **所以整件事根本不需要新 op** ✗✗。
+> * ⭐⭐⭐ **于是 `STATE_ENDED("阿哈时刻")` 的完整做法（全用已出货的拼写 ✓）** ✓：
+>   1. **开始**：`CAST_SETUP` ＋ `from_category ElationDamage` ✓ ⇒ `APPLY_BUFF{阿哈时刻, turns: N}` ✓ **＋** `GAIN_RESOURCE{待演, amount: 1}` ✓（记账 ✓）；
+>   2. **每个欢愉技结束**：`ATTACK_FINISHED` ＋ `from_category ElationDamage` ✓ ⇒ `SPEND_RESOURCE{待演, amount: 1}` ✓；
+>   3. **最后一个结束 ⇒ 摘状态**：`RESOURCE_CHANGED{待演}` ＋ `when: ["self_resource:待演 <= 0"]` ✓ ⇒ **`REMOVE_STATE{阿哈时刻}`** ✓
+>      ⇒ ⭐ **引擎随即发 `STATE_ENDED("阿哈时刻")`** ✓ ⇒ 触发那 **≥3 个读者** ✓（`1505` 的【好活当赏】✓ ＋ `eidolons` 两条 ✓）
+>      ＋ **`SPEND_RESOURCE{spendAll}` 清空笑点** ✓（⭐ 本段出货的 `spendAll` ✓）。
+>   ⇒ ⭐ **这条链上的每一块都已出货并有判据** ✓（`from_category` ✓／资源 ✓／`self_resource:` 条件 ✓／`APPLY_BUFF`／`REMOVE_STATE` ✓／`spendAll` ✓／
+>     `STATE_ENDED` ＋ `state_ended` 条件 ✓）⇒ ⭐ **下一轮应当能"一次出货"** ✓（⚠ 唯一要很小心的仍是：**判据先证明"那个状态真的挂上了、又真的被摘掉"** ✓ —— 第十三条纪律 ✓）。
+> * ⭐ **回看这一段的找法** ✓：从"谁发动阿哈时刻"→`GLOSSARY` ✓ → "召唤物不会行动" ✗ → "用结束条件" ✓ → "条件 DSL 在 `TriggerTable`" ✓ →
+>   "`self_resource:` 存在" ✓ → ⭐ **"`APPLY_BUFF`/`REMOVE_STATE` 就是挂摘状态"** ✓ ⇒ **每一步都由上一步的实测指路** ✓（⚠ 而不是猜 ✗）。
+> * ⚠ **推送**：本地仍**领先 5** ✗（六轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
