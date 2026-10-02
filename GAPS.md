@@ -17941,6 +17941,31 @@
 > * ⭐ **本段教训（第五次同形，这次是"订正也要有实测"）** ✓：**推翻一个结论和提出一个结论，门槛应当一样** ✗ ——
 >   我这一轮只用"引擎会广播"就推翻了"规则不触发" ✓，那是**换了论题** ✗。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2117** 例 ✓）、树干净、已推送 ✓（数据与判据**已回滚** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十：✅✅✅ **找到了** —— `HP_LOST` **确实在发**，走的是 `fireTriggersForAlly`（`:1345`）；⚠ 我前几轮的 `grep 'fireTriggers('` **匹配不到 `fireTriggersForAlly(`** ⇒ 又白跑了两轮）**：
+>
+> * ✅ **实测（读 `Battle.applyDamage` 的 `:1341-1358` ✓）** ✓：
+>   ```java
+>   if (hpLoss > 0) {
+>       broadcastHpLoss(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
+>       // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
+>       fireTriggersForAlly(TriggerEvent.HP_LOST, damage.getAttacker(), target, hpLoss);   // ← :1345 ★ 就在这儿
+>   }
+>   …
+>   fireTriggersWithSubject(TriggerEvent.DAMAGE_SETTLED, damage.getAttacker(), target, settled, damage, damage.getCastCategory());  // :1352
+>   if (died) { broadcastKill(…); fireTriggersWithSubject(TriggerEvent.KILL, …); }        // :1354-1358
+>   ```
+>   ⇒ ⭐ **`HP_LOST` 带着 `hpLoss` 发出** ✓（正是【新蕊】需要的 `amountFromEvent` ✓），而且**注释直接写了
+>     "A counter rule keys off `target == self`"** ✓ ⇒ ⭐ **内容侧应当写 `when: ["target == self"]`** ✓。
+> * ⛔ **而我前几轮为什么没看见** ✗✗：我用的是 `Select-String -Pattern 'fireTriggers\('` ✓ ——
+>   ⚠ **`fireTriggersForAlly(` 里没有 `fireTriggers(` 这个子串** ✗（多一个 `ForAlly` ✗）⇒ **这一行被漏掉** ✓
+>   ⇒ ⭐ **本段第六次同形** ✓（前五次：措辞太窄／太空、模式太松、`grep` 匹配到 `permanent`、
+>     只看 `fireTriggers` 不看监听器、以及这次"函数名后缀" ✗）⇒ ⭐⭐ **教训写死**：**在这份代码里搜事件派发，
+>     必须同时搜 `fireTriggers(`、`fireTriggersForAlly(`、`fireTriggersWithSubject(` 与 `onXxx` 监听器** ✓。
+> * ⭐ **下一轮第一步（内容，一次做完）** ✗：重写【新蕊】（声明 ＋ `HP_LOST` 那条规则 ✓）但**加上
+>   `"when": ["target == self"]`** ✓（⚠ 文档说的是「**我方全体**每损失 1 点」✗ ⇒ 全体那一半要看 `fireTriggersForAlly`
+>   的派发范围 ✓ —— **先只做本人这一半**并**把全体那一半登记** ✓），判据用**真实伤害**（`applyDamage` ✓，已验前提 208 点 ✓）
+>   ⇒ 断言【新蕊】 == 掉血量 ✓ ＋ 变异（把 `amountFromEvent` 去掉 ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2117** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -18948,6 +18973,31 @@
 > * ⭐ **本段教训（第五次同形，这次是"订正也要有实测"）** ✓：**推翻一个结论和提出一个结论，门槛应当一样** ✗ ——
 >   我这一轮只用"引擎会广播"就推翻了"规则不触发" ✓，那是**换了论题** ✗。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2117** 例 ✓）、树干净、已推送 ✓（数据与判据**已回滚** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十：✅✅✅ **找到了** —— `HP_LOST` **确实在发**，走的是 `fireTriggersForAlly`（`:1345`）；⚠ 我前几轮的 `grep 'fireTriggers('` **匹配不到 `fireTriggersForAlly(`** ⇒ 又白跑了两轮）**：
+>
+> * ✅ **实测（读 `Battle.applyDamage` 的 `:1341-1358` ✓）** ✓：
+>   ```java
+>   if (hpLoss > 0) {
+>       broadcastHpLoss(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
+>       // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
+>       fireTriggersForAlly(TriggerEvent.HP_LOST, damage.getAttacker(), target, hpLoss);   // ← :1345 ★ 就在这儿
+>   }
+>   …
+>   fireTriggersWithSubject(TriggerEvent.DAMAGE_SETTLED, damage.getAttacker(), target, settled, damage, damage.getCastCategory());  // :1352
+>   if (died) { broadcastKill(…); fireTriggersWithSubject(TriggerEvent.KILL, …); }        // :1354-1358
+>   ```
+>   ⇒ ⭐ **`HP_LOST` 带着 `hpLoss` 发出** ✓（正是【新蕊】需要的 `amountFromEvent` ✓），而且**注释直接写了
+>     "A counter rule keys off `target == self`"** ✓ ⇒ ⭐ **内容侧应当写 `when: ["target == self"]`** ✓。
+> * ⛔ **而我前几轮为什么没看见** ✗✗：我用的是 `Select-String -Pattern 'fireTriggers\('` ✓ ——
+>   ⚠ **`fireTriggersForAlly(` 里没有 `fireTriggers(` 这个子串** ✗（多一个 `ForAlly` ✗）⇒ **这一行被漏掉** ✓
+>   ⇒ ⭐ **本段第六次同形** ✓（前五次：措辞太窄／太空、模式太松、`grep` 匹配到 `permanent`、
+>     只看 `fireTriggers` 不看监听器、以及这次"函数名后缀" ✗）⇒ ⭐⭐ **教训写死**：**在这份代码里搜事件派发，
+>     必须同时搜 `fireTriggers(`、`fireTriggersForAlly(`、`fireTriggersWithSubject(` 与 `onXxx` 监听器** ✓。
+> * ⭐ **下一轮第一步（内容，一次做完）** ✗：重写【新蕊】（声明 ＋ `HP_LOST` 那条规则 ✓）但**加上
+>   `"when": ["target == self"]`** ✓（⚠ 文档说的是「**我方全体**每损失 1 点」✗ ⇒ 全体那一半要看 `fireTriggersForAlly`
+>   的派发范围 ✓ —— **先只做本人这一半**并**把全体那一半登记** ✓），判据用**真实伤害**（`applyDamage` ✓，已验前提 208 点 ✓）
+>   ⇒ 断言【新蕊】 == 掉血量 ✓ ＋ 变异（把 `amountFromEvent` 去掉 ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2117** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
