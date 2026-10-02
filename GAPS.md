@@ -20300,6 +20300,23 @@
 > * ⭐ **下一轮第一步（一次读清 (甲)／(乙)）** ✗：读 **`TriggerTable` 里 `SELF_RESOURCE_PREFIX` 的解析处** ✓（⚠ 看它**期望的前缀形态** ✓）
 >   ＋ 读 **`TriggerInterpreter` 里 `SPEND_RESOURCE` 是否 `fireTriggers(RESOURCE_CHANGED, …)`** ✓ ⇒ 两问一次读完 ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十九：✅✅✅ **条件的写法被证清白**（`self_resource:<名>` 就是**数值变量**，官方示例 `"self_resource:充能 >= 3"` ✓）⇒ ⭐ 于是收尾那步的元凶锁定为 **(甲)：`SPEND_RESOURCE` 不发 `RESOURCE_CHANGED`**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1549` 附近 ✓）** ✓ 报错文案原文（它把"已知数值变量"一次列全 ✓）：
+>   *"Condition '…' compares unknown variable '…'; known numeric variables: … , plus `"self_attr:<ATTRIBUTE>"` for one of my own attribute
+>   values, e.g. `"self_attr:SPEED >= 145"`, **`"self_resource:<NAME>"` for how much of one of MY declared resources I hold, e.g.
+>   `"self_resource:充能 >= 3"`**, and `"self_stacks:<NAME>"` / `"target_stacks:<NAME>"` for how many times a named counter has been
+>   marked, e.g. `"target_stacks:承负 >= 2"`"* ✓
+>   ⇒ ⭐⭐ **三条结论** ✓：**(i)** 我写的 **`self_resource:待演 <= 0`** ✓ **形态完全正确** ✓（⚠ 变量位置**不需要**主体前缀 ✗
+>     —— ⚠ 与 `state_ended` 不同 ✓，那次是"**谓词**"要主体 ✓）；**(ii)** 它读的是"**我自己声明的**资源" ✓（⭐ 与本轮改成的
+>     "她自己的表" ✓ **正好对上** ✓）；**(iii)** 所以**(乙) 排除** ✓ ⇒ ⛔ **元凶只剩 (甲)** ✓。
+> * ⭐⭐ **于是修法（内容层，一次改到位）** ✗：**把"收尾"从 `RESOURCE_CHANGED` 挪到 `ALLY_ATTACK`** ✓ ——
+>   即**同一条事件上放两条规则** ✓：① 先扣计数（`SPEND_RESOURCE` ✓）；② 再判 **`when: ["from_category ElationDamage",
+>   "self_resource:待演 <= 0"]` ⇒ `REMOVE_STATE{阿哈时刻}`** ✓ ⇒ ⚠ 这要求"同事件的规则**按声明顺序执行**" ✗
+>     （⚠ 若顺序不保证 ⇒ 那就改成"扣之前先判"✗ 或把两条合成一条 ✓ —— ⭐ **下一轮先用一次判据验证顺序** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：按上面改成两条 `ALLY_ATTACK` 规则 ⇒ 重放 ⇒ 跑判据 ⇒
+>   ⭐ **绿 ⇒ 立刻做变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）⇒ 这件（`STATE_ENDED` 的第一个真读者）**出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23666,6 +23683,23 @@
 > * ⭐ **下一轮第一步（一次读清 (甲)／(乙)）** ✗：读 **`TriggerTable` 里 `SELF_RESOURCE_PREFIX` 的解析处** ✓（⚠ 看它**期望的前缀形态** ✓）
 >   ＋ 读 **`TriggerInterpreter` 里 `SPEND_RESOURCE` 是否 `fireTriggers(RESOURCE_CHANGED, …)`** ✓ ⇒ 两问一次读完 ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十九：✅✅✅ **条件的写法被证清白**（`self_resource:<名>` 就是**数值变量**，官方示例 `"self_resource:充能 >= 3"` ✓）⇒ ⭐ 于是收尾那步的元凶锁定为 **(甲)：`SPEND_RESOURCE` 不发 `RESOURCE_CHANGED`**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1549` 附近 ✓）** ✓ 报错文案原文（它把"已知数值变量"一次列全 ✓）：
+>   *"Condition '…' compares unknown variable '…'; known numeric variables: … , plus `"self_attr:<ATTRIBUTE>"` for one of my own attribute
+>   values, e.g. `"self_attr:SPEED >= 145"`, **`"self_resource:<NAME>"` for how much of one of MY declared resources I hold, e.g.
+>   `"self_resource:充能 >= 3"`**, and `"self_stacks:<NAME>"` / `"target_stacks:<NAME>"` for how many times a named counter has been
+>   marked, e.g. `"target_stacks:承负 >= 2"`"* ✓
+>   ⇒ ⭐⭐ **三条结论** ✓：**(i)** 我写的 **`self_resource:待演 <= 0`** ✓ **形态完全正确** ✓（⚠ 变量位置**不需要**主体前缀 ✗
+>     —— ⚠ 与 `state_ended` 不同 ✓，那次是"**谓词**"要主体 ✓）；**(ii)** 它读的是"**我自己声明的**资源" ✓（⭐ 与本轮改成的
+>     "她自己的表" ✓ **正好对上** ✓）；**(iii)** 所以**(乙) 排除** ✓ ⇒ ⛔ **元凶只剩 (甲)** ✓。
+> * ⭐⭐ **于是修法（内容层，一次改到位）** ✗：**把"收尾"从 `RESOURCE_CHANGED` 挪到 `ALLY_ATTACK`** ✓ ——
+>   即**同一条事件上放两条规则** ✓：① 先扣计数（`SPEND_RESOURCE` ✓）；② 再判 **`when: ["from_category ElationDamage",
+>   "self_resource:待演 <= 0"]` ⇒ `REMOVE_STATE{阿哈时刻}`** ✓ ⇒ ⚠ 这要求"同事件的规则**按声明顺序执行**" ✗
+>     （⚠ 若顺序不保证 ⇒ 那就改成"扣之前先判"✗ 或把两条合成一条 ✓ —— ⭐ **下一轮先用一次判据验证顺序** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：按上面改成两条 `ALLY_ATTACK` 规则 ⇒ 重放 ⇒ 跑判据 ⇒
+>   ⭐ **绿 ⇒ 立刻做变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）⇒ 这件（`STATE_ENDED` 的第一个真读者）**出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
