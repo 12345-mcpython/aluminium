@@ -19878,6 +19878,21 @@
 >     ⇒ ⭐ **于是"待办计数"也许根本不用资源** ✗：**用 `self_stacks:` 或 `per_stack:` 那套现成计数器** ✓。
 > * ⚠ **推送**：本地仍**领先 2** ✗（连续**四**轮网络失败 ✓）⇒ 网络一恢复执行一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零二十五：✅ **条件 DSL 的家找到了** —— 在 **`TriggerTable`** 里（不是 `TriggerInterpreter` ✓）；⭐ 而且它与 `scale` 共用同一套前缀常量，注释写明"**shared so the two cannot drift**"）**：
+>
+> * ✅ **实测（顺藤摸瓜 ✓）** ✓：在 `TriggerInterpreter` 里搜 `self_attr` ✓ ⇒ 命中 `:2236-2239` 的注释 ✓ 原文：
+>   *"The attribute a `"scale": "self_attr:<ATTRIBUTE>"` names. **Deliberately the same spelling as the condition DSL's variable**
+>   (`self_attr:SPEED` — **`TriggerTable.SELF_ATTR_PREFIX`, shared so the two cannot drift**): one says 'my Speed matters', the
+>   other …"* ✓
+>   ⇒ ⭐⭐ **所以"条件词汇表"的权威处是 `TriggerTable`** ✓（⚠ 不是解释器 ✗ —— ⚠ 我上一轮猜的三个方法名都扑空 ✗，
+>     这次**顺着已知拼写**找到的 ✓ ⇒ ⭐ 又一次印证：**别猜名字，从已知常量反查** ✓）。
+> * ⭐ **下一轮第一步（一次调用读完条件词汇表）** ✗：读 **`TriggerTable` 里的条件前缀常量** ✓
+>   （⚠ 关键词：`PREFIX`／`_PREFIX`／`resource`／`stacks` ✓）⇒ ⭐ **就能回答"计数能不能用现成拼写"** ✓
+>     —— 也就是本段最后那个未决问题（"待办计数"用资源 ✗ 还是用 `self_stacks:` ✓）✓。
+> * ⭐ **而这一步的直接目标仍是** ✓：**发出 `STATE_ENDED("阿哈时刻")`**（⭐ 目标 ① 的第一个真读者 ✓，≥3 个读者已在手 ✓）
+>   ⇒ 落点已定（`CAST_SETUP` 记账 ＋ `ATTACK_FINISHED` 递减 ✓）⇒ **只差计数拼写** ✓。
+> * ⚠ **推送**：本地仍**领先 3** ✗（网络连续四轮不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -22821,6 +22836,21 @@
 >   （⚠ 本段见过 `self_stacks:当品` ✓ ＝"按某个**计数器**的层数" ✓ ⇒ ⭐ 那**计数就是既有能力** ✓✓）
 >     ⇒ ⭐ **于是"待办计数"也许根本不用资源** ✗：**用 `self_stacks:` 或 `per_stack:` 那套现成计数器** ✓。
 > * ⚠ **推送**：本地仍**领先 2** ✗（连续**四**轮网络失败 ✓）⇒ 网络一恢复执行一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零二十五：✅ **条件 DSL 的家找到了** —— 在 **`TriggerTable`** 里（不是 `TriggerInterpreter` ✓）；⭐ 而且它与 `scale` 共用同一套前缀常量，注释写明"**shared so the two cannot drift**"）**：
+>
+> * ✅ **实测（顺藤摸瓜 ✓）** ✓：在 `TriggerInterpreter` 里搜 `self_attr` ✓ ⇒ 命中 `:2236-2239` 的注释 ✓ 原文：
+>   *"The attribute a `"scale": "self_attr:<ATTRIBUTE>"` names. **Deliberately the same spelling as the condition DSL's variable**
+>   (`self_attr:SPEED` — **`TriggerTable.SELF_ATTR_PREFIX`, shared so the two cannot drift**): one says 'my Speed matters', the
+>   other …"* ✓
+>   ⇒ ⭐⭐ **所以"条件词汇表"的权威处是 `TriggerTable`** ✓（⚠ 不是解释器 ✗ —— ⚠ 我上一轮猜的三个方法名都扑空 ✗，
+>     这次**顺着已知拼写**找到的 ✓ ⇒ ⭐ 又一次印证：**别猜名字，从已知常量反查** ✓）。
+> * ⭐ **下一轮第一步（一次调用读完条件词汇表）** ✗：读 **`TriggerTable` 里的条件前缀常量** ✓
+>   （⚠ 关键词：`PREFIX`／`_PREFIX`／`resource`／`stacks` ✓）⇒ ⭐ **就能回答"计数能不能用现成拼写"** ✓
+>     —— 也就是本段最后那个未决问题（"待办计数"用资源 ✗ 还是用 `self_stacks:` ✓）✓。
+> * ⭐ **而这一步的直接目标仍是** ✓：**发出 `STATE_ENDED("阿哈时刻")`**（⭐ 目标 ① 的第一个真读者 ✓，≥3 个读者已在手 ✓）
+>   ⇒ 落点已定（`CAST_SETUP` 记账 ＋ `ATTACK_FINISHED` 递减 ✓）⇒ **只差计数拼写** ✓。
+> * ⚠ **推送**：本地仍**领先 3** ✗（网络连续四轮不通 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
