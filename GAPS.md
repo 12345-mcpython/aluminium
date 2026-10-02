@@ -16434,6 +16434,25 @@
 >   ⑤ **奇袭**（复制一次即将施放的技能并提前施放 ✓ ＋ 「奇袭不会再次触发奇袭」✓）—— 这是**独立的一块能力** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百三十六：⭐ `Buff` 的落点查清了 —— 是一个**枚举** ＋ 一处分派，不是散装字符串）**：
+>
+> * ⭐ **实测（读代码结构）** ✓：`skill_effects.json` 的 `effect` 值有一个**枚举**接着 ✓ ——
+>   **`enums/SkillEffectType.java`** ✓（`Defence`／`Restore` 在其中 ✓），分派点在 **`models/skill/SkillExecutor.java`** ✓
+>   （`dispatchNonDamaging` 那一族 ✓，`defence()` ⇒ `battle.grantShield` ✓、`restore()` ⇒ `battle.heal` ✓）。
+>   ⚠ `SkillEffectCaster.java` **不存在** ✗（我上一轮把它当成类名写进 GAPS ✗ —— **又一次没读就写名字** ✓，本轮订正 ✓）。
+> * ⭐ **所以那一行"认 `Buff`"是两处** ✓：① `SkillEffectType` 加一个成员 ✓（几行 ✓，每个成员都带自己的说明 ✓）；
+>   ② `SkillExecutor` 加一条分派 ⇒ **`battle.grantBuff(target, 名, …)`** ✓（`APPLY_BUFF` 用的就是它 ✓ ⇒
+>   **不需要新引擎能力** ✓，只需要把这个形状接上 ✓）。
+> * ⭐ **下一轮的执行清单（一次做完，五步，数据在手）** ✗：
+>   1. `SkillEffectType` 加 `Buff` ✓（说明里写清"名称来自数据、时长 `turns_param` 可为空 ✓"）；
+>   2. `SkillExecutor` 分派 ⇒ `grantBuff` ✓（`turns_param` 为空 ⇒ **不设时长** ✓，与 `1412` 的【军功】一致 ✓）；
+>   3. `skill_effects.json` 加 `1412` 的 `"2"` ✓（`effect: "Buff"` ＋ `buff: "军功"` ✓ ＋ `source` ✓）；
+>   4. 内容一条 `CAST_SKILL` ✓（`skill: 1412` 的槽位 2 ✓ ＋ `cast_target` 指向**被指定的我方单体** ✓
+>      —— ⚠ 该选择器**已出货** ✓，见 `CAST_SKILL` 那一节 ✓）；
+>   5. 判据 ✓：施放后**目标身上出现【军功】** ✓（`has_state` ✓ 可查 ✓）＋ **另一个队友身上没有** ✓（判别性 ✓）。
+> * **读者账** ✓：`1303`（2 处）＋ `1412`（1 处）✓ ⇒ 这一片**过门槛** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
