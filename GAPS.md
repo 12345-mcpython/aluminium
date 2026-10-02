@@ -17807,6 +17807,22 @@
 >   ⇒ ⭐ **下一轮第一步**：`grep 'MODIFY_ATTR'` 找到它的 `requireAmountOrScale(..., 那张表, ...)` 调用 ✓ ⇒ 把 `event_amount` 加进去 ✓
 >   ＋ 在 `derivedMagnitude` 加那一支 ✓ ⇒ 然后接 **`1413`**（⚠ 先查【忆质】是否已声明 ✓）⇒ 判据"损失 20 点 ⇒ 速度 +20%（percent 0.01）" ✓ ＋ 变异 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2118** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百一十二：⛔ `GAIN_RESOURCE` **只收 `amount`（常数）** ⇒ 想写"每损失 1 点生命 ⇒ 1 点【新蕊】"还得先给它开**标度**这条路）**：
+>
+> * ✅ **实测（读 `GAIN_RESOURCE` 的装载臂 ✓，`:397` ✓）** ✓：`case "GAIN_RESOURCE", "SPEND_RESOURCE" -> { requireAmount(...); requireResource(...);
+>   requireNoStackArguments(...); }` ✓ ⇒ ⭐ **它要的是 `amount`（一个数）** ✗，**根本没有 `scale` 这条门** ✗
+>   （与 `HEAL`／`SHIELD`／`MODIFY_ATTR` 不同 ✗ —— 那三个走 `requireAmountOrScale` ✓）。
+>   ⇒ ⛔ 所以 `scale: "event_amount"` ＋ `GAIN_RESOURCE` **现在会被拒** ✗（我上一轮把 `HEAL`／`ENERGY` 加进白名单时**没碰它** ✓，
+>     而这正是**死龙那条链的第 1 级** ✗ ⇒ **仍然接不上** ✓）。
+> * ⭐ **要做的（已具名，约 3 处）** ✗：① `:397` 那支改成 **`requireAmountOrScale(effect, op, spec, GAIN_SCALES, "gain")`** ✓
+>   （⚠ 先看 `requireAmountOrScale` 的既有调用处 ✓ 抄它的形状 ✓）；② 建一张 **`GAIN_SCALES`** ✓（含 `event_amount` ✓，
+>   ⚠ 要不要 `target_max_hp` 那族要看内容里有没有"S 按上限的 X% 给资源"的句子 ✗ ⇒ **先查再定** ✓）；
+>   ③ `GAIN_RESOURCE` 的**执行臂**要改成走 **`grantAmount`** ✓（否则装载放行、执行仍读常数 ⇒ **静默少给** ✗✗ —— 本项目最忌 ✓）；
+>   ④ 判据（损失 20 点 ⇒ 【新蕊】+20 ✓，且**不超过上限** ✓）＋ 变异 ✓。
+> * ⭐ **另一条更便宜的路（同一天可做）** ✗：**`1413`** 那句只需**已有的** `MODIFY_ATTR` 标度 ✓（本轮已出货 ✓）
+>   ⇒ ⚠ 只差"**先查【忆质】是否已声明**" ✓ —— ⭐ **下一轮第一步就查它** ✓（若已声明 ⇒ **一步出货** ✓；
+>   ⚠ 若没声明 ⇒ 按纪律登记 ✓ 并转 `1223` 的"每 N 点"除数 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -18680,6 +18696,22 @@
 >   ⇒ ⭐ **下一轮第一步**：`grep 'MODIFY_ATTR'` 找到它的 `requireAmountOrScale(..., 那张表, ...)` 调用 ✓ ⇒ 把 `event_amount` 加进去 ✓
 >   ＋ 在 `derivedMagnitude` 加那一支 ✓ ⇒ 然后接 **`1413`**（⚠ 先查【忆质】是否已声明 ✓）⇒ 判据"损失 20 点 ⇒ 速度 +20%（percent 0.01）" ✓ ＋ 变异 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2118** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百一十二：⛔ `GAIN_RESOURCE` **只收 `amount`（常数）** ⇒ 想写"每损失 1 点生命 ⇒ 1 点【新蕊】"还得先给它开**标度**这条路）**：
+>
+> * ✅ **实测（读 `GAIN_RESOURCE` 的装载臂 ✓，`:397` ✓）** ✓：`case "GAIN_RESOURCE", "SPEND_RESOURCE" -> { requireAmount(...); requireResource(...);
+>   requireNoStackArguments(...); }` ✓ ⇒ ⭐ **它要的是 `amount`（一个数）** ✗，**根本没有 `scale` 这条门** ✗
+>   （与 `HEAL`／`SHIELD`／`MODIFY_ATTR` 不同 ✗ —— 那三个走 `requireAmountOrScale` ✓）。
+>   ⇒ ⛔ 所以 `scale: "event_amount"` ＋ `GAIN_RESOURCE` **现在会被拒** ✗（我上一轮把 `HEAL`／`ENERGY` 加进白名单时**没碰它** ✓，
+>     而这正是**死龙那条链的第 1 级** ✗ ⇒ **仍然接不上** ✓）。
+> * ⭐ **要做的（已具名，约 3 处）** ✗：① `:397` 那支改成 **`requireAmountOrScale(effect, op, spec, GAIN_SCALES, "gain")`** ✓
+>   （⚠ 先看 `requireAmountOrScale` 的既有调用处 ✓ 抄它的形状 ✓）；② 建一张 **`GAIN_SCALES`** ✓（含 `event_amount` ✓，
+>   ⚠ 要不要 `target_max_hp` 那族要看内容里有没有"S 按上限的 X% 给资源"的句子 ✗ ⇒ **先查再定** ✓）；
+>   ③ `GAIN_RESOURCE` 的**执行臂**要改成走 **`grantAmount`** ✓（否则装载放行、执行仍读常数 ⇒ **静默少给** ✗✗ —— 本项目最忌 ✓）；
+>   ④ 判据（损失 20 点 ⇒ 【新蕊】+20 ✓，且**不超过上限** ✓）＋ 变异 ✓。
+> * ⭐ **另一条更便宜的路（同一天可做）** ✗：**`1413`** 那句只需**已有的** `MODIFY_ATTR` 标度 ✓（本轮已出货 ✓）
+>   ⇒ ⚠ 只差"**先查【忆质】是否已声明**" ✓ —— ⭐ **下一轮第一步就查它** ✓（若已声明 ⇒ **一步出货** ✓；
+>   ⚠ 若没声明 ⇒ 按纪律登记 ✓ 并转 `1223` 的"每 N 点"除数 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
