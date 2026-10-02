@@ -59,16 +59,21 @@ public class PermansorTerraeTest {
         Assertions.assertTrue(ally.getShield() > 0, "\u300c\u4e3a\u6211\u65b9\u5168\u4f53\u63d0\u4f9b\u2026\u62a4\u76fe\u300d");
     }
 
-    /** Census: the skill, the ultimate and the level convention. */
+    /** Census: his skill and its trace, the ultimate, the technique, and the two halves of 葳蕤. */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DHPT);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the Bondmate and the shield");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "the Bondmate/shield rule AND (since 2026-10-02) the trace 神秀 that buffs whoever holds 【同袍】 -- "
+                        + "which is why the two are in this order in the file: the first designates, the second reads "
+                        + "`holder_of:同袍`");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention -- ⚠ and NOTHING ELSE since 2026-10-02: the entry auto-cast "
-                        + "(「入场自动施放 1 次战技」) was rolled back, because his skill's effect is DEFENCE, i.e. a "
-                        + "shield, and CAST_SKILL delivers a SWING -- it refuses a non-damaging skill by design");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the technique's 【同袍】 (「使用秘技后获得【同袍】」) and 葳蕤's 「行动提前40%」 "
+                        + "-- ⚠ still registered: the entry auto-cast (「入场自动施放 1 次战技」), because his skill's "
+                        + "effect is DEFENCE and CAST_SKILL delivers a swing");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+                "葳蕤's second half: 「【同袍】施放攻击时，丹恒•腾荒恢复6点能量」");
     }
 
     private static Random fixed() {

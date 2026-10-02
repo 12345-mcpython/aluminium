@@ -179,6 +179,34 @@ public final class TriggerInterpreter {
     private static final String TARGET_OTHER_ALLIES = "other_allies";
 
     /**
+     * The prefix of the <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} — 「持有【同袍】的角色」
+     * (1414 丹恒•腾荒's trace 神秀, and the aim of his technique's auto-cast).
+     *
+     * <p><b>Why a parameterised selector had to exist.</b> The engine can already ask 「I am in state X」
+     * ({@code has_state}, a condition) and it can name a fixed <i>role</i> ({@code target} = the unit this cast was
+     * aimed at, {@code attacker}, {@code summon}, {@code party_first}…), but it had no way to say <b>the unit that
+     * carries a state</b> — and 1414's kit is built on exactly that: the skill marks one ally as 【同袍】, and both
+     * the trace that buffs it and the technique that re-aims the skill speak about whoever holds it, not about a
+     * slot in the roster. A condition cannot do this job: conditions decide whether a <b>rule</b> runs, not which
+     * units an effect reaches.
+     *
+     * <p>⚠ <b>How many may hold it.</b> The marker is read on the <b>owner's own camp</b> and the <b>first</b> living
+     * holder answers. Keeping it to one is the content's job, and it already has the spelling for it:
+     * {@code REMOVE_STATE} over {@code all_allies} followed by {@code APPLY_BUFF} on the new one (「顺序即语义」,
+     * the same two lines 1414's own skill rule uses).
+     *
+     * <p>⚠ <b>Nobody holding it is not an error</b> — it is a legal state of the world for these clauses ("if there
+     * is a 同袍, buff them"). So the selector answers <b>nobody</b>: a list op reaches nobody, and a single-target op
+     * reports it through {@code require} like every other missing party. This is deliberately <i>not</i> the
+     * {@code summon} treatment, which throws: a rule whose whole subject is the summon contradicts itself when there
+     * is none, whereas these clauses are conditional by nature.
+     *
+     * <p>The prefix is spelled lower-case (it is <b>not</b> the data): the state name after it is read exactly as
+     * written, because a state's name is data (`has_state` makes the same promise).
+     */
+    static final String HOLDER_OF_PREFIX = "holder_of:";
+
+    /**
      * "The unit this cast <b>aimed at</b>, and <b>its</b> summon" — 「指定我方单体<b>及其召唤物</b>」.
      *
      * <p>Its first user is 星期日's Skill (131302): 「使指定我方单体角色<b>及其召唤物</b>立即行动」. It is a
@@ -1490,9 +1518,18 @@ public final class TriggerInterpreter {
             }
             case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                     TARGET_RANDOM_ENEMY, ctx);
-            default -> throw new IllegalStateException(
-                    "Effect names the target selector '" + selector + "', which can reach several units: it needs "
-                            + "an op that takes a list, not one that resolves a single target");
+            // 「持有【同袍】的角色」: the single-target path asks the same question the list path does, and a
+            // single-target op has to name ONE unit -- so "nobody holds it" surfaces through `require`'s message
+            // rather than silently applying to nobody (the list path's empty answer is documented on the prefix).
+            default -> {
+                if (selector.startsWith(HOLDER_OF_PREFIX)) {
+                    List<CanHit> holders = holderOf(ctx.battle(), effect, ctx);
+                    yield require(holders.isEmpty() ? null : holders.getFirst(), selector, ctx);
+                }
+                throw new IllegalStateException(
+                        "Effect names the target selector '" + selector + "', which can reach several units: it needs "
+                                + "an op that takes a list, not one that resolves a single target");
+            }
         };
     }
 
@@ -1528,6 +1565,9 @@ public final class TriggerInterpreter {
 
     private static List<CanHit> resolveTargetsUnfiltered(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
+        if (selector.startsWith(HOLDER_OF_PREFIX)) {
+            return holderOf(battle, effect, ctx);
+        }
         if (TARGET_ALL_ALLIES.contains(selector) || TARGET_OTHER_ALLIES.equals(selector)) {
             if (battle == null) {
                 throw new IllegalStateException(
@@ -1785,6 +1825,33 @@ public final class TriggerInterpreter {
     private static String normalizeTarget(EffectSpec effect) {
         // `target` lives on the effect as an optional selector; absent means "self".
         return effect.getTarget() == null ? "self" : effect.getTarget().trim().toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * The units on the rule owner's own camp that carry the state named after {@link #HOLDER_OF_PREFIX}
+     * — 「持有【同袍】的角色」.
+     *
+     * <p>At most one is returned (the first living holder), and an empty list is a legitimate answer: see the
+     * constant's javadoc for why this is not an exception.
+     *
+     * @param battle the running battle (the owner's camp lives there)
+     * @param effect the effect naming the state
+     * @return the holder, or an empty list when nobody holds it
+     */
+    private static List<CanHit> holderOf(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        String raw = effect.getTarget().trim();
+        String state = raw.substring(HOLDER_OF_PREFIX.length()).trim();
+        if (battle == null || ctx.owner() == null) {
+            throw new IllegalStateException(
+                    "Effect targets \"" + raw + "\" but this rule was evaluated without a battlefield, so the "
+                            + "units that could hold 【" + state + "】 cannot be listed");
+        }
+        for (CanHit ally : battle.getSideOf(ctx.owner())) {
+            if (ally != null && !ally.isDeath() && ally.getBuffManager().hasState(state)) {
+                return List.of(ally);
+            }
+        }
+        return List.of();
     }
 
     private static String normalizeOp(EffectSpec effect, TriggerSpec spec) {
@@ -3402,12 +3469,22 @@ public final class TriggerInterpreter {
             return;
         }
         String selector = normalizeTarget(effect);
-        if (!TARGET_SELECTORS.contains(selector)) {
+        if (!TARGET_SELECTORS.contains(selector) && !selector.startsWith(HOLDER_OF_PREFIX)) {
             throw new IllegalArgumentException(
                     "Op " + op + " names an unknown \"target\" selector '" + effect.getTarget()
                             + "' (known: " + String.join(" / ", TARGET_SELECTORS.stream().sorted().toList())
+                            + ", and the state-holder spelling " + HOLDER_OF_PREFIX + "<state>"
                             + "); it used to fall back to the owner, which made a typo behave like self "
                             + "(source: " + spec.getSource() + ")");
+        }
+        // ⚠ The prefix must be spelled exactly (lower-case, with the colon): the state name behind it is DATA and is
+        // read as written, so a selector that only matches case-insensitively would slice the name in the wrong place.
+        if (effect.getTarget().trim().startsWith(HOLDER_OF_PREFIX)
+                && effect.getTarget().trim().length() == HOLDER_OF_PREFIX.length()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " writes \"" + effect.getTarget().trim() + "\" with no state after \""
+                            + HOLDER_OF_PREFIX + "\"; write the state whose holder the effect speaks about, e.g. \""
+                            + HOLDER_OF_PREFIX + "同袍\" (source: " + spec.getSource() + ")");
         }
     }
 
