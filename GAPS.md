@@ -18173,6 +18173,379 @@
 >   ② **死龙的 50% 秘技版** ✗（需要"哪个入口召唤"的新机制 ✗ ⇒ 大 ✓）；
 >   ③ **忆灵技能 2–8** ✓（同一条 `attr:` 口径 ✓ ⇒ 逐条可加 ✓：`燎尽黯泽的焰息` ✓／`月茧荫蔽的身躯` ✓…⚠ 各要读参数表 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十三：⭐ "**消耗所有 X**"这一档**不存在** —— 而它与**已经出货**的 `times_from` 合起来正好能接两条从句）**：
+>
+> * ✅ **实测（扫内容 ＋ 读 `EffectSpec` ✓）** ✓：
+>   * **没有任何规则**用"花光"这个动作 ✗（我按 `all / spend_all / amountAll` 扫了全部 `characters/*.json` 的 `SPEND_RESOURCE`／`GAIN_RESOURCE` ✓ ⇒ **0 条** ✓）；
+>   * `EffectSpec` 里也**没有**对应字段 ✗（`SPEND_RESOURCE` 只有 `resource` ＋ `amount` ✓ ⇒ 与 `GAIN_RESOURCE` 同形 ✓）。
+> * ⭐ **读者 ≥2（都带数据文件 ✓）** ✓：
+>   * **`1513:283`** ✓：「施放时会**消耗所有**【热意】，**每消耗1点**【热意】都会额外对随机敌方单体造成 1 次 **21.00%** 量子属性欢愉伤害」✓
+>     ⇒ ⚠ 前半句缺"花光"✗、后半句**已经有拼写** ✓（`times_from: "event_amount"` ✓，本段已出货 ✓）；
+>   * **`1415:542`** ✓：「召唤死龙时会**消耗所有溢出**【新蕊】，**每消耗 1%** 溢出值…伤害倍率提高 **0.24%**」✓
+>     ⇒ 同样：缺"花光"✗ ＋ 后半句可用 `event_amount` ✓（⚠ 但 `GRANT` 的 `scale` 白名单我**没有**加 `event_amount` ✗ ⇒ 那一步还得补 ✓）。
+> * ⭐ **于是下一轮的最小切片很清楚** ✗：**给 `SPEND_RESOURCE` 加一档"花光"** ✓（例如 `"spendAll": true` ✓ —— 加到
+>   `requireAmount` 的旁边 ✓：有了它就不必写 `amount` ✓，且**必须响亮地拒绝两者同时出现** ✓），然后：
+>   ① 判据：把资源设成 7 ⇒ 花光 ⇒ 资源 **0** ✓、而 `RESOURCE_CHANGED` 的 `delta` = **−7** ✓（⇒ 后半句的 `times_from` 得 7 次 ✓）；
+>   ② 接 **`1513`** 的一条从句 ✓（`SKILL_CAST` ⇒ `SPEND_RESOURCE{spendAll}` ＋ `DAMAGE{times_from: event_amount, percent 0.21}` ✓
+>      —— ⚠ 两件事要在**同一规则里按顺序**发生 ✓ ⇒ 若引擎的 `do` 是**顺序执行** ✓ 就成立 ✓，否则要拆两条并靠事件衔接 ✓）；
+>   ③ 变异：把 `spendAll` 去掉（改回固定 `amount`）⇒ 判据必红 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十四：⚠ "花光"那一刀写了又撤 —— 判据的**前置**就红了：单位资源的**初始值没生效**（`ResourceSpec(id, max, initial)` ⇒ 读出来是 0））**：
+>
+> * ⛔ **实测（判据红在第一句 ✓）** ✓：我按 3 参构造 `new ResourceSpec("热意", 30, 1)` ✓ ⇒ 判据断言"它从 1 开始" ✓ ⇒
+>   **实际是 0** ✗（*"precondition: it starts at 1 ==> expected: <1> but was: <0>"* ✓）⇒ ⭐ 所以**手搭表里的初始值没有生效** ✗
+>   —— ⚠ 是"我没读懂单位资源的初始化路径" ✗，**不是** `spendAll` 本身的问题 ✓（引擎那两处改动**编译通过** ✓）。
+> * ✅ **处置** ✓：引擎那两处（`EffectSpec.spendAll` ＋ 装载/执行）与判据**全部 `git checkout`/删除回滚** ✓
+>   ⇒ 全量回到 **0** ✓（树干净 ✓、没有半成品 ✓）。
+> * ⭐ **下一轮第一步（先查初始化，再写能力）** ✗：读 **`TriggerTable` 怎么把 `ResourceSpec` 变成单位的 `Resource`** ✓
+>   （⚠ 注意：`SPEND_RESOURCE` 用的是 `holder.getResources()` ✓ —— **单位**资源 ✓，而 `Battle.partyResource` 是**队伍**资源 ✓
+>     ⇒ 两条注册路**不同** ✓ ⇒ 我上一轮把两者混着想了 ✓）；看清"初值从哪来"（可能是 `ResourceSpec.initial()` ✓、
+>     也可能由规则 `GAIN_RESOURCE` 给 ✓）⇒ 再决定判据怎么把资源"置成 7" ✓（⚠ 也许**必须**用一条 `GAIN_RESOURCE` 规则 ✓，
+>     那反而是更贴近真实战斗的写法 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十五：✅ 初始化那一路也读到了 —— 校验/写入都在 `ResourceSpec` 的**紧凑构造器**里，而 `TriggerTable:105/109` 会把它们登记进表）**：
+>
+> * ✅ **实测（读 `ResourceSpec` 与 `TriggerTable` ✓）** ✓：
+>   * `ResourceSpec` 是**记录** ✓ 且带**紧凑构造器**（`:65` ✓）：`int start = initial == null ? 0 : initial;` ✓
+>     ＋ **越界拒绝** ✓（*"declares \"initial\": …, which is outside [0, …"* ✓）⇒ 所以"初值"这条**在 bean 层是好的** ✓；
+>   * `TriggerTable(int cid, List<TriggerSpec> specs, List<ResourceSpec> resources)` ✓（`:105` ✓）会**遍历并登记** ✓（`:109` ✓）。
+>   ⇒ ⚠ **所以判据里读到 0** 的原因**还没定位** ✗ —— 可能是"单位资源要等**合并/战斗开始**那一步才落到 `holder.getResources()`" ✗
+>     （⚠ 与**文件驱动**的角色不同：`1513` 的【热意】是从 `characters/1513.json` 来的 ✓ ⇒ **走的是另一条路** ✓）。
+> * ⭐ **下一轮第一步（判据侧，不改引擎）** ✗：**不要手搭资源** ✓ —— 改用**文件驱动**的角色做这条判据 ✓：
+>   ⭐ **`1513` 的【热意】本来就在文件里 ✓**（`max: 30` ✓、`initial` 未给 ⇒ 0 ✓）⇒ 判据只要：
+>     ① 用一条 `GAIN_RESOURCE{amount: 7}` 的**测试表**把热意加到 7 ✓（⚠ 那是**已有**的 op ✓ ⇒ 也顺带验证了"加"这条路 ✓）；
+>     ② 再跑"花光"那条 ✓ ⇒ 断言 **0** ✓ ＋ 后续 `DAMAGE{times_from}` 的次数 = 7 ✓。
+> * ⭐ **这样做的附带好处** ✓：它把……"手搭表能不能用"这个**与能力无关**的问题**绕开** ✓（⚠ 本段第 N 次同形：
+>   **判据的脚手架本身要先被验证** ✗ ⇒ 我应当**优先用文件驱动的角色**写判据 ✓，因为它们**已经被既有判据覆盖** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十六：⚠ "花光"第二次写了又撤 —— **手搭表里连"加资源"这条规则也没生效**（`BATTLE_START` ＋ `GAIN_RESOURCE` 之后资源仍是 0）⇒ 结论写死：**判据只用文件驱动的角色**）**：
+>
+> * ⛔ **实测（三次尝试、三种症状 ✓，全部来自**判据脚手架**而非能力** ✗）** ✓：
+>   1. `TriggerSpecs.set(gain, "amount", start)` **传 `int`** ⇒ 反射报 *"Can not set java.lang.Double field …amount to java.lang.Integer"* ✗
+>      （⭐ 本段**第二次**踩这条 ✓ ⇒ 写死：**`amount` 永远是 `Double`** ✓）；
+>   2. `BATTLE_START` 带 `when: ["actor == self"]` ⇒ 装载期**响亮拒绝** ✓：*"Condition 'actor == self' asks about 'actor', but
+>      BATTLE_START carries no actor and no target"* ✓（⭐ 这个护栏很好 ✓，是我的判据写错了 ✓）；
+>   3. 改成分明正确之后 ✓ ⇒ **资源仍是 0** ✗（*"precondition: the rule primed it to 1 ==> expected: <1> but was: <0>"* ✓）
+>      ⇒ ⭐ **手搭的 `TriggerTable` 里"写资源"这条路也没走通** ✗（与上一轮"初始值不生效"**同族** ✓）。
+> * ✅ **处置** ✓：引擎那两处（`EffectSpec.spendAll` ＋ 装载/执行）与判据**再次全部回滚** ✓ ⇒ 全量 **0** ✓、树干净 ✓。
+> * ⭐⭐ **结论（本段第五次同形，这次要写死到纪律里）** ✓：**判据的脚手架必须先用"已被别的判据覆盖过的东西"搭** ✗ ——
+>   手搭 `TriggerTable` ＋ 手搭 `ResourceSpec` 在本项目里**不止一次**给我假阴性 ✓（初始值 0 ✓、写资源不动 ✓）
+>   ⇒ ⭐ **从今往后**：判据一律用 **`CharacterFactory.create(文件驱动的角色)`** ✓；要"造一个资源值"就**用它文件里已有的资源**
+>     （`1513` 的【热意】✓、`1415` 的【追忆】✓）＋**已有的规则**去加 ✓；够不到时才考虑手搭，且**先单独验证脚手架** ✓。
+> * ⭐ **下一轮第一步（照新纪律）** ✗：`spendAll` 的判据改用 **`1513`**（文件驱动 ✓）＋ 她**文件里**已有的 `ALLY_ATTACK ⇒ +1 热意`
+>   规则 ✓ 把热意加到 7 ✓（发 7 次 `ALLY_ATTACK` ✓ —— **不需要任何手搭** ✓）⇒ 再验证"花光"与"每点一次伤害" ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十七：⚠ "花光"第三次：**引擎与内容都写好了、编译通过**，但**判据还没写** ⇒ 按纪律**回滚**（脚本留着，`tools/add_spend_all3.py` ✓））**：
+>
+> * ✅ **这一轮确实推进了** ✓（都实测过 ✓，只是没进树 ✓）：
+>   * `EffectSpec.spendAll` ✓（＋ `copy()` ✓ —— 反射判据会查 ✓）＋ 装载臂**互斥检查** ✓（`spendAll` 与 `amount` 同时出现 ⇒ 响亮拒绝 ✓）
+>     ＋ `spendResource` 在 `spendAll` 时取**当前全部** ✓ ⇒ **`gradlew compileJava` rc 0** ✓；
+>   * **`1513.json` 的两半句**都写好了 ✓（✅ 都是**文档原话** ✓）：
+>     ① `elation_spend_all_fervor`（`CAST_SETUP` ＋ `from_skill_id:<强化欢愉技>` ⇒ **`SPEND_RESOURCE{spendAll}`** ✓）；
+>     ② `fervor_extra_hit_per_point`（`RESOURCE_CHANGED` ＋ `resource_changed:热意` ⇒
+>        `DAMAGE{times_from:"event_amount", percent:0.21, element:"Quantum"}` ✓ —— **`times_from` 正是同日出货的那一档** ✓）。
+>     ⚠ 并在 `note` 里写清两处待办 ✓：触发用的**强化欢愉技 id 还没核**（⚠ 我写的是猜的 ✗）＋ **伤害类型应为"欢愉伤害"** ✗（隔在另一条线上 ✓）。
+> * ⛔ **为什么仍回滚** ✓：**没有判据** ✗（本轮上下文已尽 ⇒ 写不出带判据＋变异的验证 ✓）⇒ 按纪律"**没验证过的不进树**" ✓
+>   ⇒ 三个文件 `git checkout` 回滚 ✓、全量 **0** ✓、树干净 ✓；⚠ **`tools/add_spend_all3.py` 留在仓里** ✓
+>     ⇒ 下一轮"重放脚本 ⇒ 写判据（**文件驱动**：发 7 次她自己的 `ALLY_ATTACK` 把热意加到 7 ✓）⇒ 跑 ⇒ 变异 ⇒ 提交" ✓。
+> * ⭐ **下一轮第一步（照新纪律，最省）** ✗：① `python tools/add_spend_all3.py` ✓（重放，幂等 ✓）；
+>   ② 写 `SpendAllTest`：`CharacterFactory.create(1513,…)` ✓ ⇒ 连发 7 次 `ALLY_ATTACK`（**用她文件里已有的规则** ✓）
+>     ⇒ 断言热意 == 7 ✓ ⇒ 触发强化欢愉技 ✓ ⇒ 断言热意 == **0** ✓ ＋ 敌人掉血 = **7 ×** 单次 ✓；
+>   ③ 变异：把 `spendAll` 换回 `amount: 1` ⇒ 必红 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十八：⚠ 第三次重放后又回滚 —— **卡在"强化欢愉技"这个 id 上**（她文档里没有 `15130x`；tbgd 里 1513 只有两个文件，都不是技能表））**：
+>
+> * ✅ **本轮读到的两条硬事实** ✓：
+>   * 她的【热意】**获取**规则是 `ALLY_ATTACK` ＋ **`when: ["actor is_other_ally"]`** ✓
+>     （⇒ ⭐ **判据要"队友当 actor"** ✓：`fireTriggers(ALLY_ATTACK, 队友, 砂金, 0, 0)` ✓ —— 这条**记下来** ✓）；
+>   * 她的欢愉技**自动施放**是 `TURN_START` ＋ `self_resource:热意 >= 10` ⇒ `CAST_SKILL` ✓（**已有** ✓）。
+> * ⛔ **而"强化欢愉技"的 id 查不到** ✗：① 文档里**没有** `151307/151308/151309` 任何一处 ✓（我上一轮写的 `from_skill_id:151307`
+>   是**猜的** ✗ ⇒ 按纪律**不能进树** ✓）；② `E:\turnbasedgamedata` 里**名字含 `1513` 的 JSON 只有两个** ✓
+>   （`CharacterEffect_1513.json` ✓ 与一个关卡脚本 ✗）⇒ 技能表**不在按 id 命名的文件里** ✗ ⇒ 要找得先弄清技能配置的存放方式 ✓。
+> * ✅ **处置** ✓：引擎三处＋内容**再次 `git checkout`** ✓（脚本 `tools/add_spend_all3.py` 仍在 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * ⭐ **下一轮第一步（两条路，先做便宜的那条）** ✗：
+>   **(a)** 先查 tbgd 里**技能配置怎么放** ✓（例如 `Config/Ability/**` ✓ 或 `Config/Trigger/**` ✓ ⇒ 用"搜内容里出现的技能名"的办法定位 ✓）
+>     ⇒ 找到强化欢愉技的真 id ✓ ⇒ 再把 `from_skill_id` 写对 ✓；
+>   **(b)** ⚠ 或者**先不做触发** ✗：把 `spendAll` 那一档**只做引擎** ✓（判据用**她已有的** `TURN_START` 自动施放那条 ✓
+>     —— ⚠ 它 `CAST_SKILL` 的是**普通**欢愉技 ✗，而句子要的是**强化**版 ✗ ⇒ 不行 ✗）。
+>   ⇒ ⭐ **取 (a)** ✓；⚠ 在 id 落实之前，`spendAll` 与那两半句**都停在登记** ✓（本轮已经如此 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十九：⭐ **技能配置的存放方式查到了** —— `E:\turnbasedgamedata\Config\ConfigAbility\Avatar\Avatar_<英文名>_00_Ability.json`，砂金是 `Avatar_Aventurine_00_Ability.json`（**15 个 Ability**，顶层键 `AbilityList` / `GlobalModifiers` / `GlobalTemplates`））**：
+>
+> * ✅ **实测（两步定位 ✓）** ✓：
+>   1. `Config` 下按功能分目录 ✓（`ConfigAbility` / `ConfigAvatar` / `ConfigCharacter` / `ConfigBattlePerform` … ✓）
+>     ⇒ ⭐ **技能不叫 Skill 而叫 Ability** ✓（这也是我前面两次搜不到的原因之一 ✗）；
+>   2. `Config/ConfigAbility/Avatar/` 下每个角色一个文件 ✓ —— ⚠ **按英文名**命名 ✓（砂金 = **Aventurine** ✓，
+>      另有 `Avatar_AventurineW_00_Ability.json` ✓ —— 那个 `W` 很可能就是**强化**版 ✗ ⇒ ⭐ **下一轮先看它** ✓）；
+>   3. `Avatar_Aventurine_00_Ability.json` 的顶层是 `{"AbilityList": [...], "GlobalModifiers": …, "GlobalTemplates": …}` ✓，
+>      **15 条 Ability** ✓ —— ⚠ 但**没有一条的名字里含 `1513`** ✗（我上一次按 `'1513' in Name` 过滤 ⇒ 空 ✗）
+>      ⇒ ⭐ **下一轮要看 `AbilityList` 每条的真实字段**（`Name` / `_Name` / `TargetType` / `AbilityType` … ✓）而不是猜字段名 ✓。
+> * ⭐ **于是"强化欢愉技 id"这件事现在有明确的两步路** ✗：
+>   **(a)** 看 `Avatar_AventurineW_00_Ability.json` ✓（`W` 后缀 ⇒ 很可能是"强化"那一版 ✓）⇒ 找它里面的欢愉技 ✓；
+>   **(b)** 若还不是 ⇒ 打印 `AbilityList` 前 3 条的**全部键** ✓（⚠ 先看结构再筛 ✓ —— 与"先读 `do` 再选观测量"同一条纪律 ✓）。
+> * ⚠ 在此之前 `spendAll` 与 `1513` 那两半句**继续停在登记** ✓（脚本 `tools/add_spend_all3.py` 在仓里 ✓，重放即得 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十：✅✅ **"强化欢愉技"确实存在** —— `Avatar_AventurineW_00_ElationSkill_Phase01`（`W` = 强化版，基础版文件里**没有** ElationSkill））**：
+>
+> * ✅ **实测（打印两个文件的 `AbilityList[].Name` ✓）** ✓：
+>   * `Avatar_Aventurine_00_Ability.json` ✓（**15 条**）：`Skill01/02/03_Phase01/02` ✓、`Skill03_EnterReady` ✓、
+>     `PassiveSkill01`（＋`_InsertAbility` ✓）、`SkillMazeInLevel*` ✓、`SkillTree02` ✓ —— ⚠ **没有** `ElationSkill` ✗；
+>   * `Avatar_AventurineW_00_Ability.json` ✓（**13 条**）：同样那些 ✓ **外加** ⭐
+>     **`Avatar_AventurineW_00_ElationSkill_Phase01`** ✓／`…_Phase02` ✓／**`…_Phase11`** ✓／**`…_Phase12`** ✓
+>     ⇒ ⭐⭐ **"强化欢愉技"就是它** ✓（⚠ `Phase11/12` 与 `Phase01/02` 成对 ⇒ **很可能正是"普通／强化"两态** ✓
+>       —— 与文档「施放**强化**欢愉技时」对得上 ✓）。
+> * ⭐ **但还差"数字 id"** ✗：`AbilityList[].Name` 是**字符串名** ✓，而内容 DSL 里用的是**键**（她已有的
+>   `CAST_SKILL{skill: "ELATION_SKILL"}` ✓）与 `from_skill_id:<数字>` ✗ ⇒ ⭐ **下一轮第一步**：
+>   在 `ConfigCharacter`／`ConfigAvatar` 里找**技能表** ✓（把 `Avatar_AventurineW_00_ElationSkill*` 映射到数字技能 id ✓，
+>   ⚠ 或者看引擎的 `from_skill_id` 究竟比的是什么 ✓ —— **先读引擎那一端** ✓ 更省：`TriggerTable.from_skill_id` 的实现 ✓）。
+> * ⭐ **顺带一条** ✓：**该角色的"欢愉技"只存在于 `W`（强化）文件里** ✓ ⇒ ⭐ 这也解释了为什么她内容里那条
+>   `CAST_SKILL{ELATION_SKILL}` 是**自动施放** ✓（`TURN_START` ＋ 热意 ≥ 10 ✓）—— ⚠ 而句子要的"**强化**版"到底是不是同一个键 ✗
+>   仍要按上一段说的办法落定 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十一：⭐ `from_skill_id` 比的是**技能的数据行 id**（`ctx.skillId()`），所以内容里要写的是**数字**，而不是 `AbilityList` 里的字符串名）**：
+>
+> * ✅ **实测（读 `TriggerTable` 两处 ✓）** ✓：
+>   * `from_skill_id` 属于 **`NUMERIC_VARIABLES`** ✓（`:874` ✓，与 `hp_percent`／`enemy_count` 同族 ✓）；
+>   * 它的取值是 **`ctx.skillId()`** ✓（`:3301` ✓），注释原文：*"「强化普攻命中…」: **the DATA ROW of the skill** that produced this
+>     event (0 = the event named none, which makes the comparison false rather than accidentally true for the row 0 that no
+>     skill has)"* ✓ ⇒ ⭐ **要的是技能的数据行 id** ✓（例如 `1407` 那边出现过的 **`140703`** ✓ ⇒ 形状是 `<cid><slot><idx>` ✓）。
+> * ⭐ **于是"强化欢愉技"这条链现在只剩最后一步** ✗：把
+>   **`Avatar_AventurineW_00_ElationSkill_Phase01`**（上一轮在 `ConfigAbility` 里找到的 ✓）映射到它的**数字数据行** ✓
+>   —— ⚠ 数据行**不在 `ConfigAbility`** ✗（那里只有行为脚本 ✓）⇒ 下一轮去 **`ConfigCharacter`／`ConfigAvatar` 的技能表** ✓
+>     或 `.layout.json` ✓ 里找；⚠ 也可用**反查**：在 tbgd 里搜 `1513` 开头的**数字 id** ✓ 看哪些与"欢愉技"同处一个文件 ✓。
+> * ⭐ **并且**上一轮那份 `W` 文件的发现仍成立 ✓：**欢愉技只在强化版文件里** ✓ ⇒ ⭐ 若数字行也只有一个 ✓，那"普通／强化"
+>   可能靠 **`Phase01/02` vs `Phase11/12`** 区分 ✓ ⇒ ⭐ **那 `from_skill_id` 就要写到具体 Phase** ✓（⚠ 这正好解释文档为什么强调"**强化**"✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十二：⛔ "强化欢愉技"的**数字数据行**在按角色命名的文件里找不到 —— 三轮同一卡点，登记并转下一项）**：
+>
+> * ✅ **实测（两次定位尝试 ✓）** ✓：
+>   * 一次**全库扫描**（`Config/**/*.json` 里搜 `\b1513\d{2}\b` ✓）**太慢** ✗（2 分钟未完 ⇒ 我把它**杀掉**了 ✓
+>     —— ⚠ 教训：**tbgd 的全库扫描要先估体量** ✓，别一上来就 walk 整棵树 ✓）；
+>   * 换**按名定位** ✓：`ConfigCharacter` 下只有几个**通用**技能表（`CharacterSkillStatisticConfig.json` ✓、
+>     `CharacterPhaseSkillInfoMappingConfig.json` ✓ …）✗，而 `*Aventurine*` 的文件**全在 `Config/Activity/RtBattle/**`** ✓
+>     （那是**活动战斗**那一套 ✗，不是常规战斗 ✗）⇒ ⭐ **常规的技能数据行还没找到存放处** ✓。
+> * ⛔ **结论（如实）** ✗：`from_skill_id` 要的是**数据行 id** ✓（上一轮实测 ✓），而我**拿不到**"强化欢愉技"的那一行 ✗
+>   ⇒ `spendAll` ＋ `1513` 两半句**继续停在登记** ✓（引擎与内容都写好并编译通过 ✓，脚本在仓里 ✓ 重放即得 ✓）。
+>   ⚠ **注意**：这不影响其它已出货的能力 ✓（它们各自都有判据与变异 ✓）。
+> * ⭐ **下一轮第一步（换个更省的找法）** ✗：**反查文档里的技能编号** ✓ —— 文档里每段技能章节常带形如 `(`1407101`)` ✓
+>   （我在 `1407`／`1512` 的都见过 ✓ ⇒ 格式是**反引号包住的数字** ✓）⇒ ⭐ 在那两处**搜 `1513`** 或直接用
+>   `grep -o '`[0-9]\{6,7\}`'` 收集**文档自己给出的行号** ✓（比扫 tbgd 便宜得多 ✓、且**文档就是判据来源** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十三：✅✅✅ **卡点解除了，而且卡点本身就是我搞错的** —— 触发器根本不需要"数字数据行"：`from_category` 早就有，且有 **`ELATION_DAMAGE`** 这一档（内容里用了 **153** 次））**：
+>
+> * ✅ **实测（三步 ✓）** ✓：
+>   1. **反查她文档里的行号** ✓：她的技能**等级表** id 是 `151301`／`151302`／`151303`／`151304` ✓（`{:351}`／`{:362}` 的"技能等级+"里 ✓），
+>      行迹是 `1513101`… ✓、属性节点 `1513201`… ✓；⭐ 而**欢愉技那一节（`:277`–`:300`）**：标题是
+>      **「欢愉技·强化：All in！敬炽烈一夏」** ✓、`攻击类型: 欢愉技` ✓、`效果: 全体攻击` ✓、`元素: 量子` ✓、`最高等级: 15` ✓、
+>      `破韧值: 单体 15, 全体 60` ✓、⭐ **`参演编号: 156`**（*"越小，阿哈时刻中释放欢愉技越靠前"* ✓ —— **阿哈时刻的排序键** ✓！）
+>      —— ⚠ **这一节没有引用数字行号** ✗ ⇒ 这就是我三轮拿不到它的原因 ✓；
+>   2. ⭐ **于是改查"有没有别的写法"** ✓ ⇒ `TriggerTable` 里有 **`from_skill`**（槽位 ✓）与 **`from_category`**（**施放类别** ✓，
+>      注释原文：*"the cast that caused this event was of this CATEGORY … the honest spelling for those sentences"* ✓）；
+>   3. ⭐ **而 `SkillCategory` 里有 `ELATION_DAMAGE("ElationDamage")`** ✓（`:61`–`:63` ✓，注释：*"Elation damage skill (data
+>      `ElationDamage`, 9 measured, **P10 Elation system**)"* ✓）＋ **内容里 `from_category` 用了 153 次** ✓
+>      （`1502` 的 `ULTRA` ✓、`1505` 的 `BPSKILL`／`ULTRA` ✓ …）。
+> * ⭐⭐ **所以**：那条从句的触发应当写 **`from_category ELATION_DAMAGE`** ✓ —— **不需要数字行** ✓✓
+>   ⇒ ⛔ **我前三轮"卡在 id 上"的判断是错的** ✗（⚠ 本段第六次同形：**没查"有没有别的写法"就先认定缺数据** ✗）。
+> * ⚠ **仍差一步（判据侧）** ✗：`from_category` 读的是**事件带过来的施放类别** ✓ ⇒ 判据要触发它就得**让一次真实的欢愉技施放发生** ✗
+>   （手工 `fireTriggers` 不带类别 ✗；`fireTriggersWithSubject(…, castCategory)` 那个重载是 **private** ✗）
+>   ⇒ ⭐ **下一轮第一步**：看 **`SkillExecutor`** 有没有公开的"施放一个技能"入口 ✓（若有 ⇒ 判据用它 ✓；
+>     若没有 ⇒ ⚠ 为判据加一个**测试可见**的入口要慎重 ✓ —— 更可能的是：把这条内容规则的触发**同时**写成
+>     `from_category` ✓ 并用**她已有的** `CAST_SKILL{ELATION_SKILL}` 链把类别带过来 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十四：✅ 判据侧的入口找到了 —— `SkillExecutor.execute(battle, skill, user, targets)` 是 **public static**）**：
+>
+> * ✅ **实测（两处阅读 ✓）** ✓：
+>   * `Battle` 有 **`beginCast(Skill, CanHit)` ／ `endCast(PendingCast)`** ✓（公开 ✓，`PendingCast` 还带 `caster()`／`outer()` ✓）；
+>   * ⭐ **`models/skill/SkillExecutor.java:72`** ✓：**`public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets)`** ✓
+>     ⇒ ⭐ **判据可以真的"施放一次技能"** ✓ ⇒ `from_category` 所需的事件类别会**随真实施放**带上 ✓✓
+>     （⚠ 与"手工发事件"那条死路不同 ✓ —— 这次是**引擎自己的施放路径** ✓）。
+> * ⚠ **只剩一个未知（下一轮第一步）** ✗：判据要拿到"**欢愉技**那个 `Skill` 对象" ✓ —— 我已知她内容里用
+>   **`CAST_SKILL{skill: "ELATION_SKILL"}`** ✓（键 ✓，不是 id ✓）⇒ ⭐ **读 `TriggerInterpreter` 里 `CAST_SKILL` 怎么把这个键解析成 `Skill`** ✓
+>   （一行就能看出：是 `SkillType.ELATION_SKILL` ✓、还是 `SkillHolder` 的某个键表 ✓、还是角色身上按名字取 ✓）
+>   ⇒ 然后判据照同一条路取 ✓。
+> * ⭐ **于是这条链的**全部拼图**现在都齐了** ✓：（a）引擎 `spendAll` ✓（写好、编译过 ✓，脚本在仓 ✓）；
+>   （b）触发写法 **`from_category ELATION_DAMAGE`** ✓（本轮确认 ✓）；（c）"每点一次伤害" 用**已有的** `times_from` ✓（已出货 ✓）；
+>   （d）判据走 **`SkillExecutor.execute`** ✓（本轮确认 ✓）⇒ ⭐ **只差"取 `Skill` 对象"一步** ✓，下一轮应能**一次做完并进树** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十五：⚠ `spendAll` 第四次：引擎与内容再次就位、**触发已改成正确的 `from_category ELATION_DAMAGE`**，但判据在取 `Skill` 对象那一步编译不过）**：
+>
+> * ✅ **本轮又推进了两格** ✓：
+>   * 判据现在走 **`SkillExecutor.execute(battle, skill, user, targets)`** ✓（public static ✓，`models/skill/SkillExecutor.java:72` ✓）；
+>   * 触发条件已按实测改成 **`from_category ELATION_DAMAGE`** ✓（不是数字行 ✗），并写进 `1513.json` 的 `note` ✓。
+> * ⛔ **编译错误指向 `owner.getSkill(SkillType.ELATION_SKILL)`** ✗：实测 **`Character` 根本没有公开的 `getSkill(...)`** ✓
+>   —— 它只有 **`setSkillByClass(SkillType, Function…)`** ✓、`setSkillLevel` ✓、以及 Builder 的 `skill(SkillType, Skill)` ✓
+>   （⚠ 我在死龙那条判据里用的 `getSkill(...)` 是 **`Summon`** 上的 ✓ ⇒ **两个类不一样** ✗ —— 这正是它编译不过的原因 ✓）。
+> * ⭐ **下一轮第一步（一步就能定性）** ✗：看 **`Character` 怎么在运行期拿到自己的 `Skill`** ✓ —— 候选：
+>   `getSkillHolder()` ✓／`getSkills()` ✓／`getSkillData(...)` ✓／或走 `SkillType → 某个表` ✓
+>   ⇒ 找到后把判据那一行改成真名 ✓ ⇒ 应当就能**跑起来并进树** ✓（其余拼图都已就位 ✓）。
+> * ✅ **处置** ✓：引擎（`EffectSpec`／`TriggerInterpreter`）与 `1513.json` **再次 `git checkout`** ✓、判据删除 ✓
+>   ⇒ 全量 **0** ✓、树干净 ✓；⭐ **两个脚本留在仓里** ✓（`tools/add_spend_all3.py` ＝ 引擎＋内容 ✓、
+>     `tools/ship_spend_all.py` ＝ 重放＋触发修正＋判据模板 ✓）⇒ 下一轮**只改一行判据**即可 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十六：✅✅ **"花光"本身验成了**（判据里"资源归 0"那一步**过了** ⇒ 引擎与触发都对）——⛔ 而**"每点一次伤害"那一半没随点数变化**（1 点与 7 点都是 60.984）⇒ 分开登记）**：
+>
+> * ✅ **本轮打通的链路（全部有实测 ✓）** ✓：
+>   * 触发写法落定为 **`from_category ElationDamage`** ✓（⚠ **必须用数据值 `ElationDamage`**，用枚举名 `ELATION_DAMAGE` 会被装载期拒绝 ✓
+>     —— 报错原文：*"names the cast category …, which the engine does not know; the categories are the ones the skill data spells"* ✓）；
+>   * 判据走 **`Character.getSkills().get(SkillType.ELATION_SKILL)`** ✓（`Character` 没有 `getSkill(...)` ✗，只有 `getSkills()` ✓）
+>     ＋ **`SkillExecutor.execute`** ✓ ⇒ **真的施放了一次欢愉技** ✓；
+>   * **`SPEND_RESOURCE{spendAll}` 生效** ✓：判据里 `assertEquals(0, owner.getResources().value(RES))` **通过了** ✓
+>     （1 点与 7 点两种情况都把【热意】**花到 0** ✓）。
+> * ⛔ **没通过的那一半** ✗：`random 单体额外 1 次 21.00% 伤害` **每点一次** ⇒ 实测 **1 点与 7 点的伤害完全相同（60.984）** ✗
+>   ⇒ ⭐ 说明**嵌套的 `RESOURCE_CHANGED` 没有按"花掉的量"重复** ✗（⚠ 三种可能：(a) `fireResourceChanged` 的 `delta` 传的不是 −7 ✗；
+>     (b) 那条规则的 `when: ["resource_changed:热意"]` 没匹配 ✓；(c) `times_from` 在**嵌套事件**里读到的量不对 ✗）。
+> * ✅ **处置** ✓：三处改动＋判据**全部回滚** ✓（脚本留在仓 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * ⭐ **下一轮第一步（把那一半查清，一条判据两个断言、让失败行号说话 ✓）** ✗：
+>   ① 断言**花掉多少**：`SPEND_RESOURCE` 之后 `noteChangedResource`／`lastChangedResource` 与**事件的量**是否 = −7 ✓；
+>   ② 断言**嵌套规则有没有跑**（例如让它给一个可观察的 buff ✓）⇒ 分清"没跑"还是"跑了但量不对" ✓；
+>   ③ 若量不对 ⇒ 看 `fireResourceChanged(battle, ctx, movedId, after - before)` 在 `spendAll` 这条路上算出的差值 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百四十七：⚠ 判据的**脚手架**又卡了一次 —— `Battle` 没有 `getAllies()`／`getEnemies()`，那四个编译错误就是它们）**：
+>
+> * ⛔ **实测（编译报错 4 处 ✓）** ✓：我在"两路对照"判据里写了 `battle.getAllies().get(0)` ✗／`battle.getEnemies().get(0)` ✗
+>   ⇒ **两个方法都不存在** ✗ ⇒ ⭐ 又一次"**判据的脚手架没先被验证**" ✓（与"手搭表"那两次同族 ✓ —— 本段**第三次** ✓）。
+> * ⭐ **教训（写死）** ✓：**判据里凡是用到"我没读过的 API"，先花一次调用把它读出来** ✗ ——
+>   本段因为省这一步已经白跑三轮（`amount` 传 int ✗、手搭资源初值 ✗、`getAllies/getEnemies` ✗）✓。
+> * ⭐ **下一轮第一步（两条，都不需要猜）** ✗：
+>   ① 读 **`Battle` 的 roster 访问器** ✓（我刚在找：候选 `getAllies`／`getEnemies`／`party()`／`opponents()` ✓
+>      ⇒ 一句话就能看到真名 ✓）＋ 判据里改成真名 ✓；
+>   ② 然后跑**两路对照** ✓（真实施放 vs 手工 `RESOURCE_CHANGED` ✓）⇒ 一次分清：
+>      **两路都不随点数变** ⇒ 是**规则自己的 `when`** 不匹配 ✗；**手工那路变而施放那路不变** ⇒ 是**施放时的嵌套事件**没到位 ✗。
+> * ✅ **处置** ✓：三处改动 ＋ 判据**全部回滚** ✓（脚本 `tools/split_spend_all.py` 留在仓 ✓，含两路对照的模板 ✓）
+>   ⇒ 全量 **0** ✓、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百四十八：✅✅✅ **两路对照分出了责任方** —— **手工那一路也不随点数变**（1 点与 7 点都是 **38.808**）⇒ 故障在**规则自己／`times_from` 的读取**上，**不在施放路径**上）**：
+>
+> * ✅ **实测（一条判据两个测试、失败行号即答案 ✓）** ✓：
+>   * `theCastSpendsAllFervor` **通过** ✓（真实施放 ⇒ 【热意】**花到 0** ✓ ⇒ `spendAll` 引擎与触发都对 ✓）；
+>   * `theRuleScalesWithTheAmount`（**手工** `fireTriggers(RESOURCE_CHANGED, owner, enemy, 0, -start)` ＋ `noteChangedResource` ✓）
+>     **失败** ✗：*"the nested rule must repeat once per point (38.808 -> 38.808)"* ✓ ⇒ ⭐ **两路都只出 1 次** ✓
+>     ⇒ ⛔ **责任方是规则／取数那一侧** ✗（不是"施放时嵌套事件没到位" ✗ —— 那是我上一轮的假设 ✓ 被推翻 ✓）。
+> * ⭐ **下一轮第一步（两点，都很小）** ✗：
+>   ① 连 `EventAmountTest` 一起看 ✓ —— 那里 `times_from` **是绿的** ✓（在**手搭表**里 ✓）⇒ ⚠ 所以差别在**文件驱动**这条路上 ✗
+>      ⇒ 检查 `1513.json` 那条规则的字段名与形状 ✓（`"timesFrom"` ✓ 是否被 `EffectSpec` 按 `@SerializedName("times_from")` 读到 ✗
+>      —— ⚠ **注意**：我在 TS 模板里写的是 `timesFrom` ✓ 而反序列化名是 **`times_from`** ✗✗ ⇒ ⭐ **这很可能就是全部原因** ✓！）；
+>   ② 若是它 ⇒ 改成 `"times_from"` ✓ 再跑 ⇒ 两路应当都随点数变 ✓（⚠ 与"`amount` 必是 Double"同族的**字段名**陷阱 ✓）。
+> * ✅ **处置** ✓：三处改动 ＋ 判据回滚 ✓（脚本在仓 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百四十九：✅✅ **字段名就是那一半的原因** —— 改成 `"times_from"` 后，**手工那一路随点数变了**（1 点 38.808 ⇒ 7 点 **329.868**，此前是"两路都 38.808"））**：
+>
+> * ✅ **实测定性** ✓：`1513.json` 里那条嵌套规则我原先写成 **`"timesFrom"`** ✗，而 `EffectSpec` 的反序列化名是
+>   **`@SerializedName("times_from")`** ✓ ⇒ Gson **静默丢弃** ✗ ⇒ `times_from` 从未生效 ✓。
+>   ⚠ 这与"`amount` 必须是 `Double`"同族 ✓ —— **字段名/类型写错就是静默失效** ✗ ⇒ ⭐ **纪律**：写内容前**照 `EffectSpec` 的
+>     `@SerializedName` 拼**字段名 ✓（不是照 Java 的 getter 名猜 ✓）。
+> * ⚠ **而判据还有一处**判据侧**的算术没对上** ✗：7 点的损失是 **329.868** ✗，而 `7 × 38.808 = 271.656` ✓
+>   ⇒ 比值 **≈ 8.5** ✗（**不是整数倍** ✗）⇒ ⭐ 说明**两次运行里"每次伤害"的大小不同** ✗（⚠ 可能：① 预热那 7 次
+>     `ALLY_ATTACK` 的**增益**也各自触发了这条规则 ✓，而它们的 `target` 是**施法者本人** ✗ ⇒ 把**她自己的状态/血**改了 ✓
+>     ⇒ 第二次运行的施法者与第一次不同 ✓；② 或者 `critRate 0` 之外的某个随机量 ✓）。⇒ ⭐ **下一轮第一步**：
+>     把"每次伤害"**先量出来** ✓（单点情况下的那一次 ✓ ÷ 1 ✓）再乘 ✓，或**只发一次** `RESOURCE_CHANGED` ✓ 并把预热
+>     放到**规则之外**的办法 ✓（例如预热**用另一份资源** ✗ 或直接把资源**置值** ✓）。
+> * ✅ **处置** ✓：三处改动 ＋ 判据**回滚** ✓（三个脚本留在仓 ✓：`add_spend_all3.py` 已带 `times_from` 修正 ✓、
+>   `ship_spend_all.py`／`split_spend_all.py` 是判据模板 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百五十：⚠⚠ `spendAll` ＋ 1513 两半句的判据**自己绿了**，但**全量**跑出 **2 红** ⇒ 又是"单条绿 ≠ 整体绿" ⇒ 回滚并记录两条真发现）**：
+>
+> * ⛔ **全量的两条红（都在我这次改动的影响面里 ✓）** ✓：
+>   1. **`EffectKeyDisciplineTest.everyEffectKeyIsOneTheEngineReads`** ✓：
+>      *"these effect keys are not fields of EffectSpec, so Gson drops them silently: **{critDamage=[1513.json], critRate=[1513.json]}**"* ✗
+>      ⇒ ⭐ 我在嵌套的 `DAMAGE` 里写了 **`critRate`／`critDamage`** ✗，而 `EffectSpec` **没有这两个字段** ✗ ⇒ 被静默丢弃 ✓
+>      （⚠ 本段**第二次**踩这条护栏 ✓ —— 上一次是 `source` ✗）⇒ ⭐ **纪律**：写 `do` 的字段前，**照 `EffectSpec` 的字段表**核对 ✓
+>      （⚠ `crit_rate`／`crit_damage` 很可能才是真名 ✗ ⇒ 下一轮先读 ✓）；
+>   2. **`AventurineWaveflairTest.teammateAttacksFeedFervorUpToThirty`** ✓：*"「【热意】上限为30点」 -- forty-one firings must
+>      still read thirty ==> expected: **30** but was: **13**"* ✗ ⇒ ⭐ 因为我新增的"**施放欢愉技时花光热意**" ✓
+>      会**在她已有的自动施放**（`TURN_START` ＋ `热意 ≥ 10` ⇒ `CAST_SKILL{ELATION_SKILL}` ✓）时触发 ✓ ⇒ 热意**被花掉** ✓
+>      ⇒ ⚠ **那条既有判据的模型**（只涨不花 ✗）**与文档不符** ✗（文档：施放时消耗所有 ✓）⇒ ⭐ **是既有判据不完整** ✗，
+>        不是我的内容错 ✗ —— ⚠ 但"改既有判据来迁就新内容"必须**写清理由**并单独提交 ✓（本条先记录 ✓）。
+> * ✅ **处置** ✓：引擎、内容、判据**全部回滚** ✓ ⇒ 全量回到 **0** ✓（树干净 ✓）。
+>   ⭐ **但这一轮并不白跑**：两条红把**两个真问题**挖出来了 ✓（一条是我的字段名 ✗、一条是既有判据的模型缺口 ✓）。
+> * ⭐ **下一轮第一步（三条，都已具名）** ✗：
+>   ① 读 `EffectSpec` 的**真实字段名** ✓（`crit_rate`／`crit_damage` ✓？）⇒ 把嵌套 `DAMAGE` 写对 ✓；
+>   ② 重新评估 **`AventurineWaveflairTest`** ✓：它测的是"队友攻击喂热意直到上限" ✓ ⇒ 在"施放会花光"的文档事实下 ✓
+>      它要么**限制在 10 点以下**（不触发自动施放 ✓）要么**同时断言花光** ✓（⚠ 二选一并写清 ✓）；
+>   ③ 然后重放三个脚本 ✓（`add_spend_all3.py` 已带 `times_from` 修正 ✓）⇒ 全量绿后再提交 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十一：✅ 字段名读到真名了；⚠ 而那两条红里的**第二条**（热意 13 而非 30）**不该**由我那两条规则引起 ⇒ 下一轮用**二分**定位）**：
+>
+> * ✅ **实测（读 `EffectSpec` ＋ 扫内容 ✓）** ✓：`crit` 两个字段的真名是 **`crit_rate`** ✓ 与 **`crit_damage`** ✓
+>   （`:646`／`:653` ✓），且文档式用法在 `1309.json`：`{"crit_rate": 1.0, "crit_damage": 1.5}` ✓
+>   ⇒ ⭐ 我写的 `critRate`／`critDamage` ✗ **必然被 Gson 丢掉** ✓（护栏 `EffectKeyDisciplineTest` 正是这么报的 ✓）。
+>   ⚠ 语义提醒：`crit_rate` 是"**固定暴击**"（`Damage.fixedCrit` ✓，注释：*"「该伤害暴击率固定为 100%」… the outcome is not
+>     rolled at all"* ✓），**不是**"概率暴击"（那是 `CRIT_CHANCE` 属性 ✓）⇒ 我在判据里想表达的"不要随机暴击"应当**不写或写 `0.0`** ✓。
+> * ⚠ **第二条红的原因还不清楚** ✓：`AventurineWaveflairTest`（`:27` ✓）先发 **1** 次队友攻击 ⇒ 断言 **1** ✓；再发 **40** 次 ⇒ 断言
+>   **30**（上限 ✓）。而我加的两条规则是：①`CAST_SETUP` ＋ `from_category ElationDamage` ⇒ **花光**（⚠ 这个判据里**没有任何
+>   `CAST_SETUP`** ✗）②`RESOURCE_CHANGED` ⇒ **打伤害**（不花资源 ✓）⇒ ⭐ 按理**都不该**把热意从 30 降到 **13** ✗
+>   ⇒ ⚠ 所以要么是**判据自己**在某处触发了 `TURN_START`（她那条自动施放 `热意≥10 ⇒ CAST_SKILL` ✓ ⇒ 会花光 ✓），
+>     要么是我漏看了一条既有规则 ✓ ⇒ ⭐ **下一轮第一步：二分**（只加"花光"那条 ⇒ 跑 ✓；只加"伤害"那条 ⇒ 跑 ✓）
+>     —— 一次就能定谁是元凶 ✓（⚠ 与"两路对照"同一手法 ✓：**让失败的行/用例自己说话** ✓）。
+> * ⭐ **顺带**：`AventurineWaveflairTest` 这条判据的**模型**（只涨不花 ✗）在"施放会花光"的文档事实下确实**不完整** ✓，
+>   但**先别改它** ✗ —— 等二分结果出来，再决定是"我的规则触发了它不该触发的东西" ✗ 还是"它的模型缺一环" ✓
+>   （⚠ 顺序很重要：**先查事实，再改判据** ✓ —— 改判据去迁就代码是本项目最忌的 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十二：✅✅✅ **`spendAll` 与 1513 那两半句出货了**（`9ef32ac` ✓）—— 判据 2 条绿 ＋ **实测变异 1 红** ＋ 全量绿 ＋ 两闸门 [0,0]）**：
+>
+> * ✅ **进树** ✓：
+>   * **引擎**：`EffectSpec.spendAll` ✓（＋ `copy()` ✓）＋ 装载臂**互斥检查** ✓（`spendAll` 与 `amount` 同时出现 ⇒ 响亮拒绝 ✓）
+>     ＋ `spendResource` 在 `spendAll` 时取**当前全部** ✓；
+>   * **内容**（都在 `1513.json`，**都是文档原话** ✓）：①`elation_spend_all_fervor` ✓（`CAST_SETUP` ＋
+>     **`from_category ElationDamage`** ⇒ `SPEND_RESOURCE{spendAll}` ✓）②`fervor_extra_hit_per_point` ✓
+>     （`RESOURCE_CHANGED` ＋ `resource_changed:热意` ⇒ `DAMAGE{times_from:"times_from 的 snake_case", target:"random_enemy", percent:0.21, element:"Quantum"}` ✓）；
+>   * **判据** `SpendAllTest` ✓（**文件驱动到底** ✓）：发 7 次队友攻击（用**她文件里**的规则 ✓）⇒ 热意 7 ✓
+>     ⇒ **`SkillExecutor.execute` 真实施放一次欢愉技** ✓ ⇒ ①**热意花到 0** ✓ ②**手工路随点数变大** ✓。
+> * ✅ **实测变异（1 红 ✓）** ✓：把 `spendAll` 换成固定 `amount: 1` ⇒ 判据报
+>   *"the cast spends ALL of it (7 -> 0) ==> expected: <0> but was: **6**"* ✓ ⇒ ⭐ **承重** ✓。
+> * ⭐⭐ **三条"最后才挖出来"的真因（都写进注释/记录）**：
+>   1. **触发写法**：不是数字行 ✗，而是 **`from_category ElationDamage`** ✓（⚠ **必须用数据值拼写** ✓，枚举名 `ELATION_DAMAGE` 会被装载期拒绝 ✓）；
+>   2. **字段名**：`times_from` 是 **snake_case** ✓ —— 我原先写 `timesFrom` ✗ ⇒ Gson **静默丢弃** ✗（同族的还有 **`crit_rate`／`crit_damage`** ✗）；
+>   3. ⭐ **`"target": "target"` 会打到自己** ✗ ⇒ 那条规则把**砂金自己**打成 13 点血/热意 ✗，
+>      而既有判据 `AventurineWaveflairTest` 期望 **30** ✗ ⇒ **二分**（只留伤害那条规则 ✓）一次就证明是它 ✓
+>      ⇒ 改成文档说的 **`"target": "random_enemy"`** ✓ ⇒ 两条判据同时绿 ✓✓（⚠ **不是**改既有判据迁就代码 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百五十三：⭐ "溢出"**是引擎已有的机制**（`Resource.setMaxOverflow` ✓）⇒ `1415` 那条"溢出【新蕊】"的前半句今天就能声明；后半句仍缺两档）**：
+>
+> * ✅ **实测（读 `Resource` 的类注释 ✓）** ✓：
+>   * **正常路径**（`gainClamped`／`gain`）**绝不超过 `max`** ✓；
+>   * ⭐ **溢出是显式且封顶的** ✓：只有 `setMaxOverflow` 配置过之后 ✓，`gain` 才会把值存到 `max` 之上 ✓，
+>     且封在 **`max + maxOverflow`** ✓（注释：*"By default `maxOverflow == 0`, so 'overflowing by accident with gain' is
+>     impossible"* ✓）；另有 `setValue`（同样限在 `max + maxOverflow` ✓）供**存档恢复/调试** ✓，正常玩法走 gain/spend ✓；
+>   * 设计动机也写着 ✓：*"the game really does have mechanics like 'cap is 5 but can temporarily be stored up to 10'"*
+>     ✓（例子正是**花火的战技点** ✓）。
+> * ⭐ **于是 `1407`／`1415` 那条"【新蕊】可溢出至 200%"** ✓ ⇒ **今天可以声明** ✓（`"overflow": <量>` ✓，⚠ 与 `max` 一起 ✓）。
+> * ⛔ **但那一句的另外两半仍缺** ✗（都记在案 ✓）：
+>   1. **"消耗所有**溢出**"** ✗ —— `spendAll` 是"花光**全部**" ✓，而这里要的是"**花到上限为止**" ✗
+>      ⇒ ⭐ 这是第三种花法 ✓（可叫 `spendDownToMax` ✗／`spendOverflow` ✓ —— **名字照文档写** ✓）；
+>   2. **"每消耗 1% 溢出值 ⇒ 伤害倍率提高 0.24%"** ✗ —— 需要一个 `BOOST_DAMAGE`／`MODIFY_ATTR` 上的
+>      **`scale: "event_amount"`** ✗（⚠ 我当日**删掉**了 `event_amount` 的"值"那一半 ✓，因为它与已有的
+>      `amount_from_event` 重复 ✓ —— 而 `amount_from_event` **只服务 `GAIN_RESOURCE`** ✗ ⇒ 这里是**另一个 op** ✓
+>      ⇒ ⭐ **它不算重复** ✓，但要**先数读者** ✓：用它的从句有几条 ✗）。
+> * ⭐ **下一轮第一步** ✗：**数读者** ✓ —— 扫内容里"**每消耗 1%（或 1 点）⇒ 某个倍率/属性提高**"的从句 ✓
+>   （已知 `1415:542` ✓ ＋ 可能 `1413:343` 的"每消耗 1 点【忆质】+1% 速度" ✓ ⇒ **≥2 就能做** ✓）；
+>   够门槛 ⇒ 给 `MODIFY_ATTR`／`BOOST_DAMAGE` 开 `scale: "event_amount"` ✓ ＋ 配判据与变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十四：✅✅ **数完了** —— "每消耗 1 点/1% ⇒ 提升"这一族有 **3＋ 个带数据文件的读者**（过门槛 ✓），另有一族"**每超过** 1 点 ⇒ 提升"有 **4＋** 个（是**另一个**缺口 ✓））**：
+>
+> * ✅ **实测（扫文档 ＋ 按是否有数据文件过滤 ✓）** ✓：
+>   | 出处（有文件 ✓） | 句子 | 那"1 点"是什么 |
+>   |---|---|---|
+>   | **`1306:159`** | 「我方目标**每消耗1点战技点**，则使我方全体造成的伤害提高 **6.00%**…最多可叠加 **3** 层」 | **战技点被花掉** ✓ |
+>   | **`1306:161`** | 「…**每消耗1点战技点**，花火获得 1 层【幻相】，每层使敌方全体受到的伤害提高 **4.00%**…最多 3 层」 | 同上 ✓ |
+>   | **`1413:343`** | 「本次攻击**每消耗了1点**【忆质】额外使长夜月的速度提高 **1%**，最多计算 **40** 点」 | **【忆质】花掉** ✓ |
+>   | **`1415:542`** | 「**每消耗1%溢出值**，使…伤害倍率提高 **0.24%**」 | **溢出值花掉** ✓ |
+>   | `1404:166`／`1407:194` | 「每损失 1%／1 点生命值…」 | ⚠ **按掉血的量**（另一支 ✓，`1407` 那条已出货 ✓） |
+>   | **`1317:440`** | 「若乱破当前攻击力高于 2400 点，**每超过100点攻击力**可使该数值额外提高 **1%**，最多额外提高 8%」 | ⚠ **超过阈值**（**另一族** ✗） |
+>   | **`1415:823`** | 「速度大于等于 180 时…之后**每超过1点速度**…抗性穿透提高 **2%**，最多计入 60 点」 | 同上 ✓ |
+>   | **`1502:269`**／**`1513:314`** | 「速度大于等于 120／140 时…之后**每超过1点速度**使自身欢愉度提高 **1%**，最多计入 200 点」 | 同上 ✓ |
+> * ⭐⭐ **结论** ✓：
+>   **(甲) "每花掉 1 点 ⇒ 提升"** ✓ ⇒ 读者 **≥3** ✓ **过门槛** ⇒ 该做：给 **`MODIFY_ATTR`／`BOOST_DAMAGE`** 开
+>     **`scale: "event_amount"`** ✗（⚠ 与 `GAIN_RESOURCE` 的 `amount_from_event` **不重复** ✓ —— 那是**另一个 op** ✓）；
+>   **(乙) "每超过阈值 1 点 ⇒ 提升"** ✓ ⇒ 读者 **≥4** ✓ **也过门槛** ✓ ⇒ 但它要的是"**超出某个阈值的量**" ✗
+>     （⚠ 引擎里 **`self_max_energy`** 那一档正是"每超过 1 点（能量上限）" ✓ 的**同族** ✓ ⇒ ⭐ **先查它能不能推广到任意阈值** ✓）；
+> * ⭐ **下一轮第一步（选 (甲)，因为它更小且形状已验 ✓）** ✗：① `EffectSpec` 侧不动 ✓（`scale` 已存在 ✓）；
+>   ② 在 `derivedMagnitude`（`:2170` 那条链 ✓）**与** 它的早退名单（`scaleAttribute` ✓）各加一支 `event_amount` ✓
+>     —— ⚠ **照我当日已验过的那两处改法** ✓（那次撤掉是因为"值"这一半与 `amount_from_event` 重复 ✗，**而那个结论只对 `GAIN_RESOURCE` 成立** ✓
+>     ⇒ ⭐ **这次要写清"为什么这次不算重复"** ✓：`amount_from_event` **只在 `gainResource` 里被读** ✓）；
+>   ③ 判据：**花 20 点 ⇒ 面板 +20×percent** ✓（⚠ 用**文件驱动**的角色 ✓，且**目标写 `random_enemy`** ✗ 别打自己 ✓）；
+>   ④ 变异：把 `event_amount` 换成常数 ⇒ 必红 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19411,6 +19784,379 @@
 >      ⇒ **可以一步出货** ✓：给 `times_from` 加一个除数（例如 `"event_amount/3"` ✗ 或另立 `per` 字段 ✓，⚠ 名字照文档写 ✓）；
 >   ② **死龙的 50% 秘技版** ✗（需要"哪个入口召唤"的新机制 ✗ ⇒ 大 ✓）；
 >   ③ **忆灵技能 2–8** ✓（同一条 `attr:` 口径 ✓ ⇒ 逐条可加 ✓：`燎尽黯泽的焰息` ✓／`月茧荫蔽的身躯` ✓…⚠ 各要读参数表 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十三：⭐ "**消耗所有 X**"这一档**不存在** —— 而它与**已经出货**的 `times_from` 合起来正好能接两条从句）**：
+>
+> * ✅ **实测（扫内容 ＋ 读 `EffectSpec` ✓）** ✓：
+>   * **没有任何规则**用"花光"这个动作 ✗（我按 `all / spend_all / amountAll` 扫了全部 `characters/*.json` 的 `SPEND_RESOURCE`／`GAIN_RESOURCE` ✓ ⇒ **0 条** ✓）；
+>   * `EffectSpec` 里也**没有**对应字段 ✗（`SPEND_RESOURCE` 只有 `resource` ＋ `amount` ✓ ⇒ 与 `GAIN_RESOURCE` 同形 ✓）。
+> * ⭐ **读者 ≥2（都带数据文件 ✓）** ✓：
+>   * **`1513:283`** ✓：「施放时会**消耗所有**【热意】，**每消耗1点**【热意】都会额外对随机敌方单体造成 1 次 **21.00%** 量子属性欢愉伤害」✓
+>     ⇒ ⚠ 前半句缺"花光"✗、后半句**已经有拼写** ✓（`times_from: "event_amount"` ✓，本段已出货 ✓）；
+>   * **`1415:542`** ✓：「召唤死龙时会**消耗所有溢出**【新蕊】，**每消耗 1%** 溢出值…伤害倍率提高 **0.24%**」✓
+>     ⇒ 同样：缺"花光"✗ ＋ 后半句可用 `event_amount` ✓（⚠ 但 `GRANT` 的 `scale` 白名单我**没有**加 `event_amount` ✗ ⇒ 那一步还得补 ✓）。
+> * ⭐ **于是下一轮的最小切片很清楚** ✗：**给 `SPEND_RESOURCE` 加一档"花光"** ✓（例如 `"spendAll": true` ✓ —— 加到
+>   `requireAmount` 的旁边 ✓：有了它就不必写 `amount` ✓，且**必须响亮地拒绝两者同时出现** ✓），然后：
+>   ① 判据：把资源设成 7 ⇒ 花光 ⇒ 资源 **0** ✓、而 `RESOURCE_CHANGED` 的 `delta` = **−7** ✓（⇒ 后半句的 `times_from` 得 7 次 ✓）；
+>   ② 接 **`1513`** 的一条从句 ✓（`SKILL_CAST` ⇒ `SPEND_RESOURCE{spendAll}` ＋ `DAMAGE{times_from: event_amount, percent 0.21}` ✓
+>      —— ⚠ 两件事要在**同一规则里按顺序**发生 ✓ ⇒ 若引擎的 `do` 是**顺序执行** ✓ 就成立 ✓，否则要拆两条并靠事件衔接 ✓）；
+>   ③ 变异：把 `spendAll` 去掉（改回固定 `amount`）⇒ 判据必红 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十四：⚠ "花光"那一刀写了又撤 —— 判据的**前置**就红了：单位资源的**初始值没生效**（`ResourceSpec(id, max, initial)` ⇒ 读出来是 0））**：
+>
+> * ⛔ **实测（判据红在第一句 ✓）** ✓：我按 3 参构造 `new ResourceSpec("热意", 30, 1)` ✓ ⇒ 判据断言"它从 1 开始" ✓ ⇒
+>   **实际是 0** ✗（*"precondition: it starts at 1 ==> expected: <1> but was: <0>"* ✓）⇒ ⭐ 所以**手搭表里的初始值没有生效** ✗
+>   —— ⚠ 是"我没读懂单位资源的初始化路径" ✗，**不是** `spendAll` 本身的问题 ✓（引擎那两处改动**编译通过** ✓）。
+> * ✅ **处置** ✓：引擎那两处（`EffectSpec.spendAll` ＋ 装载/执行）与判据**全部 `git checkout`/删除回滚** ✓
+>   ⇒ 全量回到 **0** ✓（树干净 ✓、没有半成品 ✓）。
+> * ⭐ **下一轮第一步（先查初始化，再写能力）** ✗：读 **`TriggerTable` 怎么把 `ResourceSpec` 变成单位的 `Resource`** ✓
+>   （⚠ 注意：`SPEND_RESOURCE` 用的是 `holder.getResources()` ✓ —— **单位**资源 ✓，而 `Battle.partyResource` 是**队伍**资源 ✓
+>     ⇒ 两条注册路**不同** ✓ ⇒ 我上一轮把两者混着想了 ✓）；看清"初值从哪来"（可能是 `ResourceSpec.initial()` ✓、
+>     也可能由规则 `GAIN_RESOURCE` 给 ✓）⇒ 再决定判据怎么把资源"置成 7" ✓（⚠ 也许**必须**用一条 `GAIN_RESOURCE` 规则 ✓，
+>     那反而是更贴近真实战斗的写法 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十五：✅ 初始化那一路也读到了 —— 校验/写入都在 `ResourceSpec` 的**紧凑构造器**里，而 `TriggerTable:105/109` 会把它们登记进表）**：
+>
+> * ✅ **实测（读 `ResourceSpec` 与 `TriggerTable` ✓）** ✓：
+>   * `ResourceSpec` 是**记录** ✓ 且带**紧凑构造器**（`:65` ✓）：`int start = initial == null ? 0 : initial;` ✓
+>     ＋ **越界拒绝** ✓（*"declares \"initial\": …, which is outside [0, …"* ✓）⇒ 所以"初值"这条**在 bean 层是好的** ✓；
+>   * `TriggerTable(int cid, List<TriggerSpec> specs, List<ResourceSpec> resources)` ✓（`:105` ✓）会**遍历并登记** ✓（`:109` ✓）。
+>   ⇒ ⚠ **所以判据里读到 0** 的原因**还没定位** ✗ —— 可能是"单位资源要等**合并/战斗开始**那一步才落到 `holder.getResources()`" ✗
+>     （⚠ 与**文件驱动**的角色不同：`1513` 的【热意】是从 `characters/1513.json` 来的 ✓ ⇒ **走的是另一条路** ✓）。
+> * ⭐ **下一轮第一步（判据侧，不改引擎）** ✗：**不要手搭资源** ✓ —— 改用**文件驱动**的角色做这条判据 ✓：
+>   ⭐ **`1513` 的【热意】本来就在文件里 ✓**（`max: 30` ✓、`initial` 未给 ⇒ 0 ✓）⇒ 判据只要：
+>     ① 用一条 `GAIN_RESOURCE{amount: 7}` 的**测试表**把热意加到 7 ✓（⚠ 那是**已有**的 op ✓ ⇒ 也顺带验证了"加"这条路 ✓）；
+>     ② 再跑"花光"那条 ✓ ⇒ 断言 **0** ✓ ＋ 后续 `DAMAGE{times_from}` 的次数 = 7 ✓。
+> * ⭐ **这样做的附带好处** ✓：它把……"手搭表能不能用"这个**与能力无关**的问题**绕开** ✓（⚠ 本段第 N 次同形：
+>   **判据的脚手架本身要先被验证** ✗ ⇒ 我应当**优先用文件驱动的角色**写判据 ✓，因为它们**已经被既有判据覆盖** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十六：⚠ "花光"第二次写了又撤 —— **手搭表里连"加资源"这条规则也没生效**（`BATTLE_START` ＋ `GAIN_RESOURCE` 之后资源仍是 0）⇒ 结论写死：**判据只用文件驱动的角色**）**：
+>
+> * ⛔ **实测（三次尝试、三种症状 ✓，全部来自**判据脚手架**而非能力** ✗）** ✓：
+>   1. `TriggerSpecs.set(gain, "amount", start)` **传 `int`** ⇒ 反射报 *"Can not set java.lang.Double field …amount to java.lang.Integer"* ✗
+>      （⭐ 本段**第二次**踩这条 ✓ ⇒ 写死：**`amount` 永远是 `Double`** ✓）；
+>   2. `BATTLE_START` 带 `when: ["actor == self"]` ⇒ 装载期**响亮拒绝** ✓：*"Condition 'actor == self' asks about 'actor', but
+>      BATTLE_START carries no actor and no target"* ✓（⭐ 这个护栏很好 ✓，是我的判据写错了 ✓）；
+>   3. 改成分明正确之后 ✓ ⇒ **资源仍是 0** ✗（*"precondition: the rule primed it to 1 ==> expected: <1> but was: <0>"* ✓）
+>      ⇒ ⭐ **手搭的 `TriggerTable` 里"写资源"这条路也没走通** ✗（与上一轮"初始值不生效"**同族** ✓）。
+> * ✅ **处置** ✓：引擎那两处（`EffectSpec.spendAll` ＋ 装载/执行）与判据**再次全部回滚** ✓ ⇒ 全量 **0** ✓、树干净 ✓。
+> * ⭐⭐ **结论（本段第五次同形，这次要写死到纪律里）** ✓：**判据的脚手架必须先用"已被别的判据覆盖过的东西"搭** ✗ ——
+>   手搭 `TriggerTable` ＋ 手搭 `ResourceSpec` 在本项目里**不止一次**给我假阴性 ✓（初始值 0 ✓、写资源不动 ✓）
+>   ⇒ ⭐ **从今往后**：判据一律用 **`CharacterFactory.create(文件驱动的角色)`** ✓；要"造一个资源值"就**用它文件里已有的资源**
+>     （`1513` 的【热意】✓、`1415` 的【追忆】✓）＋**已有的规则**去加 ✓；够不到时才考虑手搭，且**先单独验证脚手架** ✓。
+> * ⭐ **下一轮第一步（照新纪律）** ✗：`spendAll` 的判据改用 **`1513`**（文件驱动 ✓）＋ 她**文件里**已有的 `ALLY_ATTACK ⇒ +1 热意`
+>   规则 ✓ 把热意加到 7 ✓（发 7 次 `ALLY_ATTACK` ✓ —— **不需要任何手搭** ✓）⇒ 再验证"花光"与"每点一次伤害" ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十七：⚠ "花光"第三次：**引擎与内容都写好了、编译通过**，但**判据还没写** ⇒ 按纪律**回滚**（脚本留着，`tools/add_spend_all3.py` ✓））**：
+>
+> * ✅ **这一轮确实推进了** ✓（都实测过 ✓，只是没进树 ✓）：
+>   * `EffectSpec.spendAll` ✓（＋ `copy()` ✓ —— 反射判据会查 ✓）＋ 装载臂**互斥检查** ✓（`spendAll` 与 `amount` 同时出现 ⇒ 响亮拒绝 ✓）
+>     ＋ `spendResource` 在 `spendAll` 时取**当前全部** ✓ ⇒ **`gradlew compileJava` rc 0** ✓；
+>   * **`1513.json` 的两半句**都写好了 ✓（✅ 都是**文档原话** ✓）：
+>     ① `elation_spend_all_fervor`（`CAST_SETUP` ＋ `from_skill_id:<强化欢愉技>` ⇒ **`SPEND_RESOURCE{spendAll}`** ✓）；
+>     ② `fervor_extra_hit_per_point`（`RESOURCE_CHANGED` ＋ `resource_changed:热意` ⇒
+>        `DAMAGE{times_from:"event_amount", percent:0.21, element:"Quantum"}` ✓ —— **`times_from` 正是同日出货的那一档** ✓）。
+>     ⚠ 并在 `note` 里写清两处待办 ✓：触发用的**强化欢愉技 id 还没核**（⚠ 我写的是猜的 ✗）＋ **伤害类型应为"欢愉伤害"** ✗（隔在另一条线上 ✓）。
+> * ⛔ **为什么仍回滚** ✓：**没有判据** ✗（本轮上下文已尽 ⇒ 写不出带判据＋变异的验证 ✓）⇒ 按纪律"**没验证过的不进树**" ✓
+>   ⇒ 三个文件 `git checkout` 回滚 ✓、全量 **0** ✓、树干净 ✓；⚠ **`tools/add_spend_all3.py` 留在仓里** ✓
+>     ⇒ 下一轮"重放脚本 ⇒ 写判据（**文件驱动**：发 7 次她自己的 `ALLY_ATTACK` 把热意加到 7 ✓）⇒ 跑 ⇒ 变异 ⇒ 提交" ✓。
+> * ⭐ **下一轮第一步（照新纪律，最省）** ✗：① `python tools/add_spend_all3.py` ✓（重放，幂等 ✓）；
+>   ② 写 `SpendAllTest`：`CharacterFactory.create(1513,…)` ✓ ⇒ 连发 7 次 `ALLY_ATTACK`（**用她文件里已有的规则** ✓）
+>     ⇒ 断言热意 == 7 ✓ ⇒ 触发强化欢愉技 ✓ ⇒ 断言热意 == **0** ✓ ＋ 敌人掉血 = **7 ×** 单次 ✓；
+>   ③ 变异：把 `spendAll` 换回 `amount: 1` ⇒ 必红 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十八：⚠ 第三次重放后又回滚 —— **卡在"强化欢愉技"这个 id 上**（她文档里没有 `15130x`；tbgd 里 1513 只有两个文件，都不是技能表））**：
+>
+> * ✅ **本轮读到的两条硬事实** ✓：
+>   * 她的【热意】**获取**规则是 `ALLY_ATTACK` ＋ **`when: ["actor is_other_ally"]`** ✓
+>     （⇒ ⭐ **判据要"队友当 actor"** ✓：`fireTriggers(ALLY_ATTACK, 队友, 砂金, 0, 0)` ✓ —— 这条**记下来** ✓）；
+>   * 她的欢愉技**自动施放**是 `TURN_START` ＋ `self_resource:热意 >= 10` ⇒ `CAST_SKILL` ✓（**已有** ✓）。
+> * ⛔ **而"强化欢愉技"的 id 查不到** ✗：① 文档里**没有** `151307/151308/151309` 任何一处 ✓（我上一轮写的 `from_skill_id:151307`
+>   是**猜的** ✗ ⇒ 按纪律**不能进树** ✓）；② `E:\turnbasedgamedata` 里**名字含 `1513` 的 JSON 只有两个** ✓
+>   （`CharacterEffect_1513.json` ✓ 与一个关卡脚本 ✗）⇒ 技能表**不在按 id 命名的文件里** ✗ ⇒ 要找得先弄清技能配置的存放方式 ✓。
+> * ✅ **处置** ✓：引擎三处＋内容**再次 `git checkout`** ✓（脚本 `tools/add_spend_all3.py` 仍在 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * ⭐ **下一轮第一步（两条路，先做便宜的那条）** ✗：
+>   **(a)** 先查 tbgd 里**技能配置怎么放** ✓（例如 `Config/Ability/**` ✓ 或 `Config/Trigger/**` ✓ ⇒ 用"搜内容里出现的技能名"的办法定位 ✓）
+>     ⇒ 找到强化欢愉技的真 id ✓ ⇒ 再把 `from_skill_id` 写对 ✓；
+>   **(b)** ⚠ 或者**先不做触发** ✗：把 `spendAll` 那一档**只做引擎** ✓（判据用**她已有的** `TURN_START` 自动施放那条 ✓
+>     —— ⚠ 它 `CAST_SKILL` 的是**普通**欢愉技 ✗，而句子要的是**强化**版 ✗ ⇒ 不行 ✗）。
+>   ⇒ ⭐ **取 (a)** ✓；⚠ 在 id 落实之前，`spendAll` 与那两半句**都停在登记** ✓（本轮已经如此 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十九：⭐ **技能配置的存放方式查到了** —— `E:\turnbasedgamedata\Config\ConfigAbility\Avatar\Avatar_<英文名>_00_Ability.json`，砂金是 `Avatar_Aventurine_00_Ability.json`（**15 个 Ability**，顶层键 `AbilityList` / `GlobalModifiers` / `GlobalTemplates`））**：
+>
+> * ✅ **实测（两步定位 ✓）** ✓：
+>   1. `Config` 下按功能分目录 ✓（`ConfigAbility` / `ConfigAvatar` / `ConfigCharacter` / `ConfigBattlePerform` … ✓）
+>     ⇒ ⭐ **技能不叫 Skill 而叫 Ability** ✓（这也是我前面两次搜不到的原因之一 ✗）；
+>   2. `Config/ConfigAbility/Avatar/` 下每个角色一个文件 ✓ —— ⚠ **按英文名**命名 ✓（砂金 = **Aventurine** ✓，
+>      另有 `Avatar_AventurineW_00_Ability.json` ✓ —— 那个 `W` 很可能就是**强化**版 ✗ ⇒ ⭐ **下一轮先看它** ✓）；
+>   3. `Avatar_Aventurine_00_Ability.json` 的顶层是 `{"AbilityList": [...], "GlobalModifiers": …, "GlobalTemplates": …}` ✓，
+>      **15 条 Ability** ✓ —— ⚠ 但**没有一条的名字里含 `1513`** ✗（我上一次按 `'1513' in Name` 过滤 ⇒ 空 ✗）
+>      ⇒ ⭐ **下一轮要看 `AbilityList` 每条的真实字段**（`Name` / `_Name` / `TargetType` / `AbilityType` … ✓）而不是猜字段名 ✓。
+> * ⭐ **于是"强化欢愉技 id"这件事现在有明确的两步路** ✗：
+>   **(a)** 看 `Avatar_AventurineW_00_Ability.json` ✓（`W` 后缀 ⇒ 很可能是"强化"那一版 ✓）⇒ 找它里面的欢愉技 ✓；
+>   **(b)** 若还不是 ⇒ 打印 `AbilityList` 前 3 条的**全部键** ✓（⚠ 先看结构再筛 ✓ —— 与"先读 `do` 再选观测量"同一条纪律 ✓）。
+> * ⚠ 在此之前 `spendAll` 与 `1513` 那两半句**继续停在登记** ✓（脚本 `tools/add_spend_all3.py` 在仓里 ✓，重放即得 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十：✅✅ **"强化欢愉技"确实存在** —— `Avatar_AventurineW_00_ElationSkill_Phase01`（`W` = 强化版，基础版文件里**没有** ElationSkill））**：
+>
+> * ✅ **实测（打印两个文件的 `AbilityList[].Name` ✓）** ✓：
+>   * `Avatar_Aventurine_00_Ability.json` ✓（**15 条**）：`Skill01/02/03_Phase01/02` ✓、`Skill03_EnterReady` ✓、
+>     `PassiveSkill01`（＋`_InsertAbility` ✓）、`SkillMazeInLevel*` ✓、`SkillTree02` ✓ —— ⚠ **没有** `ElationSkill` ✗；
+>   * `Avatar_AventurineW_00_Ability.json` ✓（**13 条**）：同样那些 ✓ **外加** ⭐
+>     **`Avatar_AventurineW_00_ElationSkill_Phase01`** ✓／`…_Phase02` ✓／**`…_Phase11`** ✓／**`…_Phase12`** ✓
+>     ⇒ ⭐⭐ **"强化欢愉技"就是它** ✓（⚠ `Phase11/12` 与 `Phase01/02` 成对 ⇒ **很可能正是"普通／强化"两态** ✓
+>       —— 与文档「施放**强化**欢愉技时」对得上 ✓）。
+> * ⭐ **但还差"数字 id"** ✗：`AbilityList[].Name` 是**字符串名** ✓，而内容 DSL 里用的是**键**（她已有的
+>   `CAST_SKILL{skill: "ELATION_SKILL"}` ✓）与 `from_skill_id:<数字>` ✗ ⇒ ⭐ **下一轮第一步**：
+>   在 `ConfigCharacter`／`ConfigAvatar` 里找**技能表** ✓（把 `Avatar_AventurineW_00_ElationSkill*` 映射到数字技能 id ✓，
+>   ⚠ 或者看引擎的 `from_skill_id` 究竟比的是什么 ✓ —— **先读引擎那一端** ✓ 更省：`TriggerTable.from_skill_id` 的实现 ✓）。
+> * ⭐ **顺带一条** ✓：**该角色的"欢愉技"只存在于 `W`（强化）文件里** ✓ ⇒ ⭐ 这也解释了为什么她内容里那条
+>   `CAST_SKILL{ELATION_SKILL}` 是**自动施放** ✓（`TURN_START` ＋ 热意 ≥ 10 ✓）—— ⚠ 而句子要的"**强化**版"到底是不是同一个键 ✗
+>   仍要按上一段说的办法落定 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十一：⭐ `from_skill_id` 比的是**技能的数据行 id**（`ctx.skillId()`），所以内容里要写的是**数字**，而不是 `AbilityList` 里的字符串名）**：
+>
+> * ✅ **实测（读 `TriggerTable` 两处 ✓）** ✓：
+>   * `from_skill_id` 属于 **`NUMERIC_VARIABLES`** ✓（`:874` ✓，与 `hp_percent`／`enemy_count` 同族 ✓）；
+>   * 它的取值是 **`ctx.skillId()`** ✓（`:3301` ✓），注释原文：*"「强化普攻命中…」: **the DATA ROW of the skill** that produced this
+>     event (0 = the event named none, which makes the comparison false rather than accidentally true for the row 0 that no
+>     skill has)"* ✓ ⇒ ⭐ **要的是技能的数据行 id** ✓（例如 `1407` 那边出现过的 **`140703`** ✓ ⇒ 形状是 `<cid><slot><idx>` ✓）。
+> * ⭐ **于是"强化欢愉技"这条链现在只剩最后一步** ✗：把
+>   **`Avatar_AventurineW_00_ElationSkill_Phase01`**（上一轮在 `ConfigAbility` 里找到的 ✓）映射到它的**数字数据行** ✓
+>   —— ⚠ 数据行**不在 `ConfigAbility`** ✗（那里只有行为脚本 ✓）⇒ 下一轮去 **`ConfigCharacter`／`ConfigAvatar` 的技能表** ✓
+>     或 `.layout.json` ✓ 里找；⚠ 也可用**反查**：在 tbgd 里搜 `1513` 开头的**数字 id** ✓ 看哪些与"欢愉技"同处一个文件 ✓。
+> * ⭐ **并且**上一轮那份 `W` 文件的发现仍成立 ✓：**欢愉技只在强化版文件里** ✓ ⇒ ⭐ 若数字行也只有一个 ✓，那"普通／强化"
+>   可能靠 **`Phase01/02` vs `Phase11/12`** 区分 ✓ ⇒ ⭐ **那 `from_skill_id` 就要写到具体 Phase** ✓（⚠ 这正好解释文档为什么强调"**强化**"✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十二：⛔ "强化欢愉技"的**数字数据行**在按角色命名的文件里找不到 —— 三轮同一卡点，登记并转下一项）**：
+>
+> * ✅ **实测（两次定位尝试 ✓）** ✓：
+>   * 一次**全库扫描**（`Config/**/*.json` 里搜 `\b1513\d{2}\b` ✓）**太慢** ✗（2 分钟未完 ⇒ 我把它**杀掉**了 ✓
+>     —— ⚠ 教训：**tbgd 的全库扫描要先估体量** ✓，别一上来就 walk 整棵树 ✓）；
+>   * 换**按名定位** ✓：`ConfigCharacter` 下只有几个**通用**技能表（`CharacterSkillStatisticConfig.json` ✓、
+>     `CharacterPhaseSkillInfoMappingConfig.json` ✓ …）✗，而 `*Aventurine*` 的文件**全在 `Config/Activity/RtBattle/**`** ✓
+>     （那是**活动战斗**那一套 ✗，不是常规战斗 ✗）⇒ ⭐ **常规的技能数据行还没找到存放处** ✓。
+> * ⛔ **结论（如实）** ✗：`from_skill_id` 要的是**数据行 id** ✓（上一轮实测 ✓），而我**拿不到**"强化欢愉技"的那一行 ✗
+>   ⇒ `spendAll` ＋ `1513` 两半句**继续停在登记** ✓（引擎与内容都写好并编译通过 ✓，脚本在仓里 ✓ 重放即得 ✓）。
+>   ⚠ **注意**：这不影响其它已出货的能力 ✓（它们各自都有判据与变异 ✓）。
+> * ⭐ **下一轮第一步（换个更省的找法）** ✗：**反查文档里的技能编号** ✓ —— 文档里每段技能章节常带形如 `(`1407101`)` ✓
+>   （我在 `1407`／`1512` 的都见过 ✓ ⇒ 格式是**反引号包住的数字** ✓）⇒ ⭐ 在那两处**搜 `1513`** 或直接用
+>   `grep -o '`[0-9]\{6,7\}`'` 收集**文档自己给出的行号** ✓（比扫 tbgd 便宜得多 ✓、且**文档就是判据来源** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十三：✅✅✅ **卡点解除了，而且卡点本身就是我搞错的** —— 触发器根本不需要"数字数据行"：`from_category` 早就有，且有 **`ELATION_DAMAGE`** 这一档（内容里用了 **153** 次））**：
+>
+> * ✅ **实测（三步 ✓）** ✓：
+>   1. **反查她文档里的行号** ✓：她的技能**等级表** id 是 `151301`／`151302`／`151303`／`151304` ✓（`{:351}`／`{:362}` 的"技能等级+"里 ✓），
+>      行迹是 `1513101`… ✓、属性节点 `1513201`… ✓；⭐ 而**欢愉技那一节（`:277`–`:300`）**：标题是
+>      **「欢愉技·强化：All in！敬炽烈一夏」** ✓、`攻击类型: 欢愉技` ✓、`效果: 全体攻击` ✓、`元素: 量子` ✓、`最高等级: 15` ✓、
+>      `破韧值: 单体 15, 全体 60` ✓、⭐ **`参演编号: 156`**（*"越小，阿哈时刻中释放欢愉技越靠前"* ✓ —— **阿哈时刻的排序键** ✓！）
+>      —— ⚠ **这一节没有引用数字行号** ✗ ⇒ 这就是我三轮拿不到它的原因 ✓；
+>   2. ⭐ **于是改查"有没有别的写法"** ✓ ⇒ `TriggerTable` 里有 **`from_skill`**（槽位 ✓）与 **`from_category`**（**施放类别** ✓，
+>      注释原文：*"the cast that caused this event was of this CATEGORY … the honest spelling for those sentences"* ✓）；
+>   3. ⭐ **而 `SkillCategory` 里有 `ELATION_DAMAGE("ElationDamage")`** ✓（`:61`–`:63` ✓，注释：*"Elation damage skill (data
+>      `ElationDamage`, 9 measured, **P10 Elation system**)"* ✓）＋ **内容里 `from_category` 用了 153 次** ✓
+>      （`1502` 的 `ULTRA` ✓、`1505` 的 `BPSKILL`／`ULTRA` ✓ …）。
+> * ⭐⭐ **所以**：那条从句的触发应当写 **`from_category ELATION_DAMAGE`** ✓ —— **不需要数字行** ✓✓
+>   ⇒ ⛔ **我前三轮"卡在 id 上"的判断是错的** ✗（⚠ 本段第六次同形：**没查"有没有别的写法"就先认定缺数据** ✗）。
+> * ⚠ **仍差一步（判据侧）** ✗：`from_category` 读的是**事件带过来的施放类别** ✓ ⇒ 判据要触发它就得**让一次真实的欢愉技施放发生** ✗
+>   （手工 `fireTriggers` 不带类别 ✗；`fireTriggersWithSubject(…, castCategory)` 那个重载是 **private** ✗）
+>   ⇒ ⭐ **下一轮第一步**：看 **`SkillExecutor`** 有没有公开的"施放一个技能"入口 ✓（若有 ⇒ 判据用它 ✓；
+>     若没有 ⇒ ⚠ 为判据加一个**测试可见**的入口要慎重 ✓ —— 更可能的是：把这条内容规则的触发**同时**写成
+>     `from_category` ✓ 并用**她已有的** `CAST_SKILL{ELATION_SKILL}` 链把类别带过来 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十四：✅ 判据侧的入口找到了 —— `SkillExecutor.execute(battle, skill, user, targets)` 是 **public static**）**：
+>
+> * ✅ **实测（两处阅读 ✓）** ✓：
+>   * `Battle` 有 **`beginCast(Skill, CanHit)` ／ `endCast(PendingCast)`** ✓（公开 ✓，`PendingCast` 还带 `caster()`／`outer()` ✓）；
+>   * ⭐ **`models/skill/SkillExecutor.java:72`** ✓：**`public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets)`** ✓
+>     ⇒ ⭐ **判据可以真的"施放一次技能"** ✓ ⇒ `from_category` 所需的事件类别会**随真实施放**带上 ✓✓
+>     （⚠ 与"手工发事件"那条死路不同 ✓ —— 这次是**引擎自己的施放路径** ✓）。
+> * ⚠ **只剩一个未知（下一轮第一步）** ✗：判据要拿到"**欢愉技**那个 `Skill` 对象" ✓ —— 我已知她内容里用
+>   **`CAST_SKILL{skill: "ELATION_SKILL"}`** ✓（键 ✓，不是 id ✓）⇒ ⭐ **读 `TriggerInterpreter` 里 `CAST_SKILL` 怎么把这个键解析成 `Skill`** ✓
+>   （一行就能看出：是 `SkillType.ELATION_SKILL` ✓、还是 `SkillHolder` 的某个键表 ✓、还是角色身上按名字取 ✓）
+>   ⇒ 然后判据照同一条路取 ✓。
+> * ⭐ **于是这条链的**全部拼图**现在都齐了** ✓：（a）引擎 `spendAll` ✓（写好、编译过 ✓，脚本在仓 ✓）；
+>   （b）触发写法 **`from_category ELATION_DAMAGE`** ✓（本轮确认 ✓）；（c）"每点一次伤害" 用**已有的** `times_from` ✓（已出货 ✓）；
+>   （d）判据走 **`SkillExecutor.execute`** ✓（本轮确认 ✓）⇒ ⭐ **只差"取 `Skill` 对象"一步** ✓，下一轮应能**一次做完并进树** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十五：⚠ `spendAll` 第四次：引擎与内容再次就位、**触发已改成正确的 `from_category ELATION_DAMAGE`**，但判据在取 `Skill` 对象那一步编译不过）**：
+>
+> * ✅ **本轮又推进了两格** ✓：
+>   * 判据现在走 **`SkillExecutor.execute(battle, skill, user, targets)`** ✓（public static ✓，`models/skill/SkillExecutor.java:72` ✓）；
+>   * 触发条件已按实测改成 **`from_category ELATION_DAMAGE`** ✓（不是数字行 ✗），并写进 `1513.json` 的 `note` ✓。
+> * ⛔ **编译错误指向 `owner.getSkill(SkillType.ELATION_SKILL)`** ✗：实测 **`Character` 根本没有公开的 `getSkill(...)`** ✓
+>   —— 它只有 **`setSkillByClass(SkillType, Function…)`** ✓、`setSkillLevel` ✓、以及 Builder 的 `skill(SkillType, Skill)` ✓
+>   （⚠ 我在死龙那条判据里用的 `getSkill(...)` 是 **`Summon`** 上的 ✓ ⇒ **两个类不一样** ✗ —— 这正是它编译不过的原因 ✓）。
+> * ⭐ **下一轮第一步（一步就能定性）** ✗：看 **`Character` 怎么在运行期拿到自己的 `Skill`** ✓ —— 候选：
+>   `getSkillHolder()` ✓／`getSkills()` ✓／`getSkillData(...)` ✓／或走 `SkillType → 某个表` ✓
+>   ⇒ 找到后把判据那一行改成真名 ✓ ⇒ 应当就能**跑起来并进树** ✓（其余拼图都已就位 ✓）。
+> * ✅ **处置** ✓：引擎（`EffectSpec`／`TriggerInterpreter`）与 `1513.json` **再次 `git checkout`** ✓、判据删除 ✓
+>   ⇒ 全量 **0** ✓、树干净 ✓；⭐ **两个脚本留在仓里** ✓（`tools/add_spend_all3.py` ＝ 引擎＋内容 ✓、
+>     `tools/ship_spend_all.py` ＝ 重放＋触发修正＋判据模板 ✓）⇒ 下一轮**只改一行判据**即可 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十六：✅✅ **"花光"本身验成了**（判据里"资源归 0"那一步**过了** ⇒ 引擎与触发都对）——⛔ 而**"每点一次伤害"那一半没随点数变化**（1 点与 7 点都是 60.984）⇒ 分开登记）**：
+>
+> * ✅ **本轮打通的链路（全部有实测 ✓）** ✓：
+>   * 触发写法落定为 **`from_category ElationDamage`** ✓（⚠ **必须用数据值 `ElationDamage`**，用枚举名 `ELATION_DAMAGE` 会被装载期拒绝 ✓
+>     —— 报错原文：*"names the cast category …, which the engine does not know; the categories are the ones the skill data spells"* ✓）；
+>   * 判据走 **`Character.getSkills().get(SkillType.ELATION_SKILL)`** ✓（`Character` 没有 `getSkill(...)` ✗，只有 `getSkills()` ✓）
+>     ＋ **`SkillExecutor.execute`** ✓ ⇒ **真的施放了一次欢愉技** ✓；
+>   * **`SPEND_RESOURCE{spendAll}` 生效** ✓：判据里 `assertEquals(0, owner.getResources().value(RES))` **通过了** ✓
+>     （1 点与 7 点两种情况都把【热意】**花到 0** ✓）。
+> * ⛔ **没通过的那一半** ✗：`random 单体额外 1 次 21.00% 伤害` **每点一次** ⇒ 实测 **1 点与 7 点的伤害完全相同（60.984）** ✗
+>   ⇒ ⭐ 说明**嵌套的 `RESOURCE_CHANGED` 没有按"花掉的量"重复** ✗（⚠ 三种可能：(a) `fireResourceChanged` 的 `delta` 传的不是 −7 ✗；
+>     (b) 那条规则的 `when: ["resource_changed:热意"]` 没匹配 ✓；(c) `times_from` 在**嵌套事件**里读到的量不对 ✗）。
+> * ✅ **处置** ✓：三处改动＋判据**全部回滚** ✓（脚本留在仓 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * ⭐ **下一轮第一步（把那一半查清，一条判据两个断言、让失败行号说话 ✓）** ✗：
+>   ① 断言**花掉多少**：`SPEND_RESOURCE` 之后 `noteChangedResource`／`lastChangedResource` 与**事件的量**是否 = −7 ✓；
+>   ② 断言**嵌套规则有没有跑**（例如让它给一个可观察的 buff ✓）⇒ 分清"没跑"还是"跑了但量不对" ✓；
+>   ③ 若量不对 ⇒ 看 `fireResourceChanged(battle, ctx, movedId, after - before)` 在 `spendAll` 这条路上算出的差值 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百四十七：⚠ 判据的**脚手架**又卡了一次 —— `Battle` 没有 `getAllies()`／`getEnemies()`，那四个编译错误就是它们）**：
+>
+> * ⛔ **实测（编译报错 4 处 ✓）** ✓：我在"两路对照"判据里写了 `battle.getAllies().get(0)` ✗／`battle.getEnemies().get(0)` ✗
+>   ⇒ **两个方法都不存在** ✗ ⇒ ⭐ 又一次"**判据的脚手架没先被验证**" ✓（与"手搭表"那两次同族 ✓ —— 本段**第三次** ✓）。
+> * ⭐ **教训（写死）** ✓：**判据里凡是用到"我没读过的 API"，先花一次调用把它读出来** ✗ ——
+>   本段因为省这一步已经白跑三轮（`amount` 传 int ✗、手搭资源初值 ✗、`getAllies/getEnemies` ✗）✓。
+> * ⭐ **下一轮第一步（两条，都不需要猜）** ✗：
+>   ① 读 **`Battle` 的 roster 访问器** ✓（我刚在找：候选 `getAllies`／`getEnemies`／`party()`／`opponents()` ✓
+>      ⇒ 一句话就能看到真名 ✓）＋ 判据里改成真名 ✓；
+>   ② 然后跑**两路对照** ✓（真实施放 vs 手工 `RESOURCE_CHANGED` ✓）⇒ 一次分清：
+>      **两路都不随点数变** ⇒ 是**规则自己的 `when`** 不匹配 ✗；**手工那路变而施放那路不变** ⇒ 是**施放时的嵌套事件**没到位 ✗。
+> * ✅ **处置** ✓：三处改动 ＋ 判据**全部回滚** ✓（脚本 `tools/split_spend_all.py` 留在仓 ✓，含两路对照的模板 ✓）
+>   ⇒ 全量 **0** ✓、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百四十八：✅✅✅ **两路对照分出了责任方** —— **手工那一路也不随点数变**（1 点与 7 点都是 **38.808**）⇒ 故障在**规则自己／`times_from` 的读取**上，**不在施放路径**上）**：
+>
+> * ✅ **实测（一条判据两个测试、失败行号即答案 ✓）** ✓：
+>   * `theCastSpendsAllFervor` **通过** ✓（真实施放 ⇒ 【热意】**花到 0** ✓ ⇒ `spendAll` 引擎与触发都对 ✓）；
+>   * `theRuleScalesWithTheAmount`（**手工** `fireTriggers(RESOURCE_CHANGED, owner, enemy, 0, -start)` ＋ `noteChangedResource` ✓）
+>     **失败** ✗：*"the nested rule must repeat once per point (38.808 -> 38.808)"* ✓ ⇒ ⭐ **两路都只出 1 次** ✓
+>     ⇒ ⛔ **责任方是规则／取数那一侧** ✗（不是"施放时嵌套事件没到位" ✗ —— 那是我上一轮的假设 ✓ 被推翻 ✓）。
+> * ⭐ **下一轮第一步（两点，都很小）** ✗：
+>   ① 连 `EventAmountTest` 一起看 ✓ —— 那里 `times_from` **是绿的** ✓（在**手搭表**里 ✓）⇒ ⚠ 所以差别在**文件驱动**这条路上 ✗
+>      ⇒ 检查 `1513.json` 那条规则的字段名与形状 ✓（`"timesFrom"` ✓ 是否被 `EffectSpec` 按 `@SerializedName("times_from")` 读到 ✗
+>      —— ⚠ **注意**：我在 TS 模板里写的是 `timesFrom` ✓ 而反序列化名是 **`times_from`** ✗✗ ⇒ ⭐ **这很可能就是全部原因** ✓！）；
+>   ② 若是它 ⇒ 改成 `"times_from"` ✓ 再跑 ⇒ 两路应当都随点数变 ✓（⚠ 与"`amount` 必是 Double"同族的**字段名**陷阱 ✓）。
+> * ✅ **处置** ✓：三处改动 ＋ 判据回滚 ✓（脚本在仓 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百四十九：✅✅ **字段名就是那一半的原因** —— 改成 `"times_from"` 后，**手工那一路随点数变了**（1 点 38.808 ⇒ 7 点 **329.868**，此前是"两路都 38.808"））**：
+>
+> * ✅ **实测定性** ✓：`1513.json` 里那条嵌套规则我原先写成 **`"timesFrom"`** ✗，而 `EffectSpec` 的反序列化名是
+>   **`@SerializedName("times_from")`** ✓ ⇒ Gson **静默丢弃** ✗ ⇒ `times_from` 从未生效 ✓。
+>   ⚠ 这与"`amount` 必须是 `Double`"同族 ✓ —— **字段名/类型写错就是静默失效** ✗ ⇒ ⭐ **纪律**：写内容前**照 `EffectSpec` 的
+>     `@SerializedName` 拼**字段名 ✓（不是照 Java 的 getter 名猜 ✓）。
+> * ⚠ **而判据还有一处**判据侧**的算术没对上** ✗：7 点的损失是 **329.868** ✗，而 `7 × 38.808 = 271.656` ✓
+>   ⇒ 比值 **≈ 8.5** ✗（**不是整数倍** ✗）⇒ ⭐ 说明**两次运行里"每次伤害"的大小不同** ✗（⚠ 可能：① 预热那 7 次
+>     `ALLY_ATTACK` 的**增益**也各自触发了这条规则 ✓，而它们的 `target` 是**施法者本人** ✗ ⇒ 把**她自己的状态/血**改了 ✓
+>     ⇒ 第二次运行的施法者与第一次不同 ✓；② 或者 `critRate 0` 之外的某个随机量 ✓）。⇒ ⭐ **下一轮第一步**：
+>     把"每次伤害"**先量出来** ✓（单点情况下的那一次 ✓ ÷ 1 ✓）再乘 ✓，或**只发一次** `RESOURCE_CHANGED` ✓ 并把预热
+>     放到**规则之外**的办法 ✓（例如预热**用另一份资源** ✗ 或直接把资源**置值** ✓）。
+> * ✅ **处置** ✓：三处改动 ＋ 判据**回滚** ✓（三个脚本留在仓 ✓：`add_spend_all3.py` 已带 `times_from` 修正 ✓、
+>   `ship_spend_all.py`／`split_spend_all.py` 是判据模板 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百五十：⚠⚠ `spendAll` ＋ 1513 两半句的判据**自己绿了**，但**全量**跑出 **2 红** ⇒ 又是"单条绿 ≠ 整体绿" ⇒ 回滚并记录两条真发现）**：
+>
+> * ⛔ **全量的两条红（都在我这次改动的影响面里 ✓）** ✓：
+>   1. **`EffectKeyDisciplineTest.everyEffectKeyIsOneTheEngineReads`** ✓：
+>      *"these effect keys are not fields of EffectSpec, so Gson drops them silently: **{critDamage=[1513.json], critRate=[1513.json]}**"* ✗
+>      ⇒ ⭐ 我在嵌套的 `DAMAGE` 里写了 **`critRate`／`critDamage`** ✗，而 `EffectSpec` **没有这两个字段** ✗ ⇒ 被静默丢弃 ✓
+>      （⚠ 本段**第二次**踩这条护栏 ✓ —— 上一次是 `source` ✗）⇒ ⭐ **纪律**：写 `do` 的字段前，**照 `EffectSpec` 的字段表**核对 ✓
+>      （⚠ `crit_rate`／`crit_damage` 很可能才是真名 ✗ ⇒ 下一轮先读 ✓）；
+>   2. **`AventurineWaveflairTest.teammateAttacksFeedFervorUpToThirty`** ✓：*"「【热意】上限为30点」 -- forty-one firings must
+>      still read thirty ==> expected: **30** but was: **13**"* ✗ ⇒ ⭐ 因为我新增的"**施放欢愉技时花光热意**" ✓
+>      会**在她已有的自动施放**（`TURN_START` ＋ `热意 ≥ 10` ⇒ `CAST_SKILL{ELATION_SKILL}` ✓）时触发 ✓ ⇒ 热意**被花掉** ✓
+>      ⇒ ⚠ **那条既有判据的模型**（只涨不花 ✗）**与文档不符** ✗（文档：施放时消耗所有 ✓）⇒ ⭐ **是既有判据不完整** ✗，
+>        不是我的内容错 ✗ —— ⚠ 但"改既有判据来迁就新内容"必须**写清理由**并单独提交 ✓（本条先记录 ✓）。
+> * ✅ **处置** ✓：引擎、内容、判据**全部回滚** ✓ ⇒ 全量回到 **0** ✓（树干净 ✓）。
+>   ⭐ **但这一轮并不白跑**：两条红把**两个真问题**挖出来了 ✓（一条是我的字段名 ✗、一条是既有判据的模型缺口 ✓）。
+> * ⭐ **下一轮第一步（三条，都已具名）** ✗：
+>   ① 读 `EffectSpec` 的**真实字段名** ✓（`crit_rate`／`crit_damage` ✓？）⇒ 把嵌套 `DAMAGE` 写对 ✓；
+>   ② 重新评估 **`AventurineWaveflairTest`** ✓：它测的是"队友攻击喂热意直到上限" ✓ ⇒ 在"施放会花光"的文档事实下 ✓
+>      它要么**限制在 10 点以下**（不触发自动施放 ✓）要么**同时断言花光** ✓（⚠ 二选一并写清 ✓）；
+>   ③ 然后重放三个脚本 ✓（`add_spend_all3.py` 已带 `times_from` 修正 ✓）⇒ 全量绿后再提交 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十一：✅ 字段名读到真名了；⚠ 而那两条红里的**第二条**（热意 13 而非 30）**不该**由我那两条规则引起 ⇒ 下一轮用**二分**定位）**：
+>
+> * ✅ **实测（读 `EffectSpec` ＋ 扫内容 ✓）** ✓：`crit` 两个字段的真名是 **`crit_rate`** ✓ 与 **`crit_damage`** ✓
+>   （`:646`／`:653` ✓），且文档式用法在 `1309.json`：`{"crit_rate": 1.0, "crit_damage": 1.5}` ✓
+>   ⇒ ⭐ 我写的 `critRate`／`critDamage` ✗ **必然被 Gson 丢掉** ✓（护栏 `EffectKeyDisciplineTest` 正是这么报的 ✓）。
+>   ⚠ 语义提醒：`crit_rate` 是"**固定暴击**"（`Damage.fixedCrit` ✓，注释：*"「该伤害暴击率固定为 100%」… the outcome is not
+>     rolled at all"* ✓），**不是**"概率暴击"（那是 `CRIT_CHANCE` 属性 ✓）⇒ 我在判据里想表达的"不要随机暴击"应当**不写或写 `0.0`** ✓。
+> * ⚠ **第二条红的原因还不清楚** ✓：`AventurineWaveflairTest`（`:27` ✓）先发 **1** 次队友攻击 ⇒ 断言 **1** ✓；再发 **40** 次 ⇒ 断言
+>   **30**（上限 ✓）。而我加的两条规则是：①`CAST_SETUP` ＋ `from_category ElationDamage` ⇒ **花光**（⚠ 这个判据里**没有任何
+>   `CAST_SETUP`** ✗）②`RESOURCE_CHANGED` ⇒ **打伤害**（不花资源 ✓）⇒ ⭐ 按理**都不该**把热意从 30 降到 **13** ✗
+>   ⇒ ⚠ 所以要么是**判据自己**在某处触发了 `TURN_START`（她那条自动施放 `热意≥10 ⇒ CAST_SKILL` ✓ ⇒ 会花光 ✓），
+>     要么是我漏看了一条既有规则 ✓ ⇒ ⭐ **下一轮第一步：二分**（只加"花光"那条 ⇒ 跑 ✓；只加"伤害"那条 ⇒ 跑 ✓）
+>     —— 一次就能定谁是元凶 ✓（⚠ 与"两路对照"同一手法 ✓：**让失败的行/用例自己说话** ✓）。
+> * ⭐ **顺带**：`AventurineWaveflairTest` 这条判据的**模型**（只涨不花 ✗）在"施放会花光"的文档事实下确实**不完整** ✓，
+>   但**先别改它** ✗ —— 等二分结果出来，再决定是"我的规则触发了它不该触发的东西" ✗ 还是"它的模型缺一环" ✓
+>   （⚠ 顺序很重要：**先查事实，再改判据** ✓ —— 改判据去迁就代码是本项目最忌的 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十二：✅✅✅ **`spendAll` 与 1513 那两半句出货了**（`9ef32ac` ✓）—— 判据 2 条绿 ＋ **实测变异 1 红** ＋ 全量绿 ＋ 两闸门 [0,0]）**：
+>
+> * ✅ **进树** ✓：
+>   * **引擎**：`EffectSpec.spendAll` ✓（＋ `copy()` ✓）＋ 装载臂**互斥检查** ✓（`spendAll` 与 `amount` 同时出现 ⇒ 响亮拒绝 ✓）
+>     ＋ `spendResource` 在 `spendAll` 时取**当前全部** ✓；
+>   * **内容**（都在 `1513.json`，**都是文档原话** ✓）：①`elation_spend_all_fervor` ✓（`CAST_SETUP` ＋
+>     **`from_category ElationDamage`** ⇒ `SPEND_RESOURCE{spendAll}` ✓）②`fervor_extra_hit_per_point` ✓
+>     （`RESOURCE_CHANGED` ＋ `resource_changed:热意` ⇒ `DAMAGE{times_from:"times_from 的 snake_case", target:"random_enemy", percent:0.21, element:"Quantum"}` ✓）；
+>   * **判据** `SpendAllTest` ✓（**文件驱动到底** ✓）：发 7 次队友攻击（用**她文件里**的规则 ✓）⇒ 热意 7 ✓
+>     ⇒ **`SkillExecutor.execute` 真实施放一次欢愉技** ✓ ⇒ ①**热意花到 0** ✓ ②**手工路随点数变大** ✓。
+> * ✅ **实测变异（1 红 ✓）** ✓：把 `spendAll` 换成固定 `amount: 1` ⇒ 判据报
+>   *"the cast spends ALL of it (7 -> 0) ==> expected: <0> but was: **6**"* ✓ ⇒ ⭐ **承重** ✓。
+> * ⭐⭐ **三条"最后才挖出来"的真因（都写进注释/记录）**：
+>   1. **触发写法**：不是数字行 ✗，而是 **`from_category ElationDamage`** ✓（⚠ **必须用数据值拼写** ✓，枚举名 `ELATION_DAMAGE` 会被装载期拒绝 ✓）；
+>   2. **字段名**：`times_from` 是 **snake_case** ✓ —— 我原先写 `timesFrom` ✗ ⇒ Gson **静默丢弃** ✗（同族的还有 **`crit_rate`／`crit_damage`** ✗）；
+>   3. ⭐ **`"target": "target"` 会打到自己** ✗ ⇒ 那条规则把**砂金自己**打成 13 点血/热意 ✗，
+>      而既有判据 `AventurineWaveflairTest` 期望 **30** ✗ ⇒ **二分**（只留伤害那条规则 ✓）一次就证明是它 ✓
+>      ⇒ 改成文档说的 **`"target": "random_enemy"`** ✓ ⇒ 两条判据同时绿 ✓✓（⚠ **不是**改既有判据迁就代码 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百五十三：⭐ "溢出"**是引擎已有的机制**（`Resource.setMaxOverflow` ✓）⇒ `1415` 那条"溢出【新蕊】"的前半句今天就能声明；后半句仍缺两档）**：
+>
+> * ✅ **实测（读 `Resource` 的类注释 ✓）** ✓：
+>   * **正常路径**（`gainClamped`／`gain`）**绝不超过 `max`** ✓；
+>   * ⭐ **溢出是显式且封顶的** ✓：只有 `setMaxOverflow` 配置过之后 ✓，`gain` 才会把值存到 `max` 之上 ✓，
+>     且封在 **`max + maxOverflow`** ✓（注释：*"By default `maxOverflow == 0`, so 'overflowing by accident with gain' is
+>     impossible"* ✓）；另有 `setValue`（同样限在 `max + maxOverflow` ✓）供**存档恢复/调试** ✓，正常玩法走 gain/spend ✓；
+>   * 设计动机也写着 ✓：*"the game really does have mechanics like 'cap is 5 but can temporarily be stored up to 10'"*
+>     ✓（例子正是**花火的战技点** ✓）。
+> * ⭐ **于是 `1407`／`1415` 那条"【新蕊】可溢出至 200%"** ✓ ⇒ **今天可以声明** ✓（`"overflow": <量>` ✓，⚠ 与 `max` 一起 ✓）。
+> * ⛔ **但那一句的另外两半仍缺** ✗（都记在案 ✓）：
+>   1. **"消耗所有**溢出**"** ✗ —— `spendAll` 是"花光**全部**" ✓，而这里要的是"**花到上限为止**" ✗
+>      ⇒ ⭐ 这是第三种花法 ✓（可叫 `spendDownToMax` ✗／`spendOverflow` ✓ —— **名字照文档写** ✓）；
+>   2. **"每消耗 1% 溢出值 ⇒ 伤害倍率提高 0.24%"** ✗ —— 需要一个 `BOOST_DAMAGE`／`MODIFY_ATTR` 上的
+>      **`scale: "event_amount"`** ✗（⚠ 我当日**删掉**了 `event_amount` 的"值"那一半 ✓，因为它与已有的
+>      `amount_from_event` 重复 ✓ —— 而 `amount_from_event` **只服务 `GAIN_RESOURCE`** ✗ ⇒ 这里是**另一个 op** ✓
+>      ⇒ ⭐ **它不算重复** ✓，但要**先数读者** ✓：用它的从句有几条 ✗）。
+> * ⭐ **下一轮第一步** ✗：**数读者** ✓ —— 扫内容里"**每消耗 1%（或 1 点）⇒ 某个倍率/属性提高**"的从句 ✓
+>   （已知 `1415:542` ✓ ＋ 可能 `1413:343` 的"每消耗 1 点【忆质】+1% 速度" ✓ ⇒ **≥2 就能做** ✓）；
+>   够门槛 ⇒ 给 `MODIFY_ATTR`／`BOOST_DAMAGE` 开 `scale: "event_amount"` ✓ ＋ 配判据与变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十四：✅✅ **数完了** —— "每消耗 1 点/1% ⇒ 提升"这一族有 **3＋ 个带数据文件的读者**（过门槛 ✓），另有一族"**每超过** 1 点 ⇒ 提升"有 **4＋** 个（是**另一个**缺口 ✓））**：
+>
+> * ✅ **实测（扫文档 ＋ 按是否有数据文件过滤 ✓）** ✓：
+>   | 出处（有文件 ✓） | 句子 | 那"1 点"是什么 |
+>   |---|---|---|
+>   | **`1306:159`** | 「我方目标**每消耗1点战技点**，则使我方全体造成的伤害提高 **6.00%**…最多可叠加 **3** 层」 | **战技点被花掉** ✓ |
+>   | **`1306:161`** | 「…**每消耗1点战技点**，花火获得 1 层【幻相】，每层使敌方全体受到的伤害提高 **4.00%**…最多 3 层」 | 同上 ✓ |
+>   | **`1413:343`** | 「本次攻击**每消耗了1点**【忆质】额外使长夜月的速度提高 **1%**，最多计算 **40** 点」 | **【忆质】花掉** ✓ |
+>   | **`1415:542`** | 「**每消耗1%溢出值**，使…伤害倍率提高 **0.24%**」 | **溢出值花掉** ✓ |
+>   | `1404:166`／`1407:194` | 「每损失 1%／1 点生命值…」 | ⚠ **按掉血的量**（另一支 ✓，`1407` 那条已出货 ✓） |
+>   | **`1317:440`** | 「若乱破当前攻击力高于 2400 点，**每超过100点攻击力**可使该数值额外提高 **1%**，最多额外提高 8%」 | ⚠ **超过阈值**（**另一族** ✗） |
+>   | **`1415:823`** | 「速度大于等于 180 时…之后**每超过1点速度**…抗性穿透提高 **2%**，最多计入 60 点」 | 同上 ✓ |
+>   | **`1502:269`**／**`1513:314`** | 「速度大于等于 120／140 时…之后**每超过1点速度**使自身欢愉度提高 **1%**，最多计入 200 点」 | 同上 ✓ |
+> * ⭐⭐ **结论** ✓：
+>   **(甲) "每花掉 1 点 ⇒ 提升"** ✓ ⇒ 读者 **≥3** ✓ **过门槛** ⇒ 该做：给 **`MODIFY_ATTR`／`BOOST_DAMAGE`** 开
+>     **`scale: "event_amount"`** ✗（⚠ 与 `GAIN_RESOURCE` 的 `amount_from_event` **不重复** ✓ —— 那是**另一个 op** ✓）；
+>   **(乙) "每超过阈值 1 点 ⇒ 提升"** ✓ ⇒ 读者 **≥4** ✓ **也过门槛** ✓ ⇒ 但它要的是"**超出某个阈值的量**" ✗
+>     （⚠ 引擎里 **`self_max_energy`** 那一档正是"每超过 1 点（能量上限）" ✓ 的**同族** ✓ ⇒ ⭐ **先查它能不能推广到任意阈值** ✓）；
+> * ⭐ **下一轮第一步（选 (甲)，因为它更小且形状已验 ✓）** ✗：① `EffectSpec` 侧不动 ✓（`scale` 已存在 ✓）；
+>   ② 在 `derivedMagnitude`（`:2170` 那条链 ✓）**与** 它的早退名单（`scaleAttribute` ✓）各加一支 `event_amount` ✓
+>     —— ⚠ **照我当日已验过的那两处改法** ✓（那次撤掉是因为"值"这一半与 `amount_from_event` 重复 ✗，**而那个结论只对 `GAIN_RESOURCE` 成立** ✓
+>     ⇒ ⭐ **这次要写清"为什么这次不算重复"** ✓：`amount_from_event` **只在 `gainResource` 里被读** ✓）；
+>   ③ 判据：**花 20 点 ⇒ 面板 +20×percent** ✓（⚠ 用**文件驱动**的角色 ✓，且**目标写 `random_enemy`** ✗ 别打自己 ✓）；
+>   ④ 变异：把 `event_amount` 换成常数 ⇒ 必红 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 

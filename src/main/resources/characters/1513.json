@@ -121,6 +121,42 @@
         }
       ],
       "note": "⭐ 2026-09-30：用 `CAST_SKILL` 让那个单位**立即施放一次** `ELATION_SKILL` ✓ —— ⚠ 读的是**它自己的数据行** ✓（而不是手写倍率 ✗），⚠ 而护栏会拒绝**不造成伤害**的技能 ✗。⚠ 来源：`CAST_SKILL` 是 `commandSummon` 放宽三处而来（见 `aggro 回收之七百八十五`）；⚠ 它不经过战技点消耗 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_spend_all_fervor",
+      "when": [
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "热意",
+          "spendAll": true,
+          "target": "self"
+        }
+      ],
+      "source": "1513 砂金•戏浪 强化欢愉技 下半句（`:283`）: 「施放时会**消耗所有**【热意】」",
+      "note": "⭐ 首个 `spendAll` 读者 ✓。⚠ 触发用 **`from_category ElationDamage`** ✓（数据值拼写！用枚举名会被装载期拒绝 ✗）。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "fervor_extra_hit_per_point",
+      "when": [
+        "resource_changed:热意"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.21,
+          "times_from": "event_amount",
+          "element": "Quantum",
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1513 砂金•戏浪 强化欢愉技 下半句（`:283`）: 「**每消耗1点**【热意】都会额外对随机敌方单体造成1次 **21.00%** 量子属性欢愉伤害」",
+      "note": "⭐ 用的是已有的 `times_from: \"event_amount\"` ✓（同日出货 ✓）⇒ **点数 = 花掉的量** ✓。⚠ 伤害类型未写**欢愉**（隔离在另一条线 ✗）⇒ 本条先按普通量子属性伤害给 ✓，待「欢愉伤害」那一档落地后再改 ✓。"
     }
   ]
 }

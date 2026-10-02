@@ -73,6 +73,7 @@ public class EffectSpec {
         copy.perTarget = this.perTarget;
         copy.times = this.times;
         copy.timesFrom = this.timesFrom;
+        copy.spendAll = this.spendAll;
         copy.control = this.control;
         copy.baseChance = this.baseChance;
         copy.speed = this.speed;
@@ -585,6 +586,13 @@ return copy;
      * How many times the effect repeats, read from the triggering EVENT instead of a constant (2026-10-02);
      * the only value today is {@code "event_amount"} (「每消耗 1 点…额外 1 次」). {@code null} = use {@code times}.
      */
+    /**
+     * 「消耗所有【X】」 (2026-10-02): {@code SPEND_RESOURCE} takes whatever the holder has.
+     * Mutually exclusive with {@code amount}, because "all of it" and "5 of it" are different claims.
+     */
+    @SerializedName("spendAll")
+    private Boolean spendAll;
+
     @SerializedName("times_from")
     private String timesFrom;
 
