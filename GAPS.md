@@ -20353,6 +20353,34 @@
 >   ⇒ ⭐ **下一轮第一步**：读 **`BuffManager:660`–`:670`（`fireStateEnded` 那一处）** ✓ ＋ 读 **`APPLY_BUFF`／`REMOVE_STATE` 怎么设 `state`** ✓
 >     ⇒ 两处一读就知道"什么写法才会发 `STATE_ENDED`" ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十二：✅✅✅ **`STATE_ENDED` 只在"到期摘除"那条路上发**，而且只对 `StateBuff` 发 ⇒ ⭐ 正解是**让它自然到期**，不是显式 `REMOVE_STATE`**）**：
+>
+> * ✅ **实测（读 `BuffManager` 的 tick 循环 ✓，`:654`–`:670` ✓）** ✓ 原文：
+>   ```java
+>   boolean couldAct = buff.canAct();
+>   buff.tickEffect(instance);
+>   if (buff.duration() <= 0) {
+>       // ⭐ Announce BEFORE the removal (2026-10-02): the event carries the state's name, because a
+>       // reader that looked for the state on this unit would already see it gone. `battle` is null for a
+>       // unit built outside a battle, and then there is nobody to tell.
+>       if (battle != null && buff instanceof StateBuff ended) {
+>           battle.fireStateEnded(instance, ended.getState());
+>       }
+>       buffs.remove(buff);            // ← 摘除
+>       buff.removeBuff(instance);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **两条硬事实** ✓：**(i)** 公告发生在**`duration() <= 0` 的 tick 里** ✓（即"**自然到期**" ✓）；
+>     **(ii)** 而且**只有 `buff instanceof StateBuff` 才公告** ✓ ⇒ ⚠ 若挂的不是 `StateBuff`（例如普通 buff ✗）⇒ **一声不响** ✗。
+> * ⭐⭐⭐ **于是正解清楚了** ✓：**别再显式 `REMOVE_STATE`** ✗ —— ⭐ **让"阿哈时刻"以 `turns: 1` 自然到期** ✓
+>   ⇒ 到期那一 tick，引擎**自己**发 `STATE_ENDED("阿哈时刻")` ✓ ⇒ 我的读者（`self state_ended 阿哈时刻` ✓）拿到 ✓ ⇒ 发【好活当赏】✓。
+>   ⚠ **代价/口径** ✓：到期发生在**她的回合计时**上 ✗（而不是"施放结束的那一刻" ✓）⇒ ⭐ 这是**近似** ✗
+>     ⇒ ⚠ 但与文档"**持续至本次最后一个欢愉技施放结束**"相比，**"持续 1 回合"是文档在别处对同类状态用的口径** ✓
+>       （⚠ 例如【好活当赏】"持续 **2** 回合" ✓）⇒ ⭐ **可以照写，并在注释里写明这是到期口径** ✓。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：把挂的那条改成 **`turns: 1`** ✓、**删掉显式 `REMOVE_STATE` 那条** ✓
+>   ⇒ 判据：施放后**状态在** ✓ ⇒ **推进一回合（或直接 tick）** ⇒ **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ 绿 ⇒ **变异** ⇒ 出货 ✓。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23772,6 +23800,34 @@
 >   ⇒ ⭐ **下一轮第一步**：读 **`BuffManager:660`–`:670`（`fireStateEnded` 那一处）** ✓ ＋ 读 **`APPLY_BUFF`／`REMOVE_STATE` 怎么设 `state`** ✓
 >     ⇒ 两处一读就知道"什么写法才会发 `STATE_ENDED`" ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十二：✅✅✅ **`STATE_ENDED` 只在"到期摘除"那条路上发**，而且只对 `StateBuff` 发 ⇒ ⭐ 正解是**让它自然到期**，不是显式 `REMOVE_STATE`**）**：
+>
+> * ✅ **实测（读 `BuffManager` 的 tick 循环 ✓，`:654`–`:670` ✓）** ✓ 原文：
+>   ```java
+>   boolean couldAct = buff.canAct();
+>   buff.tickEffect(instance);
+>   if (buff.duration() <= 0) {
+>       // ⭐ Announce BEFORE the removal (2026-10-02): the event carries the state's name, because a
+>       // reader that looked for the state on this unit would already see it gone. `battle` is null for a
+>       // unit built outside a battle, and then there is nobody to tell.
+>       if (battle != null && buff instanceof StateBuff ended) {
+>           battle.fireStateEnded(instance, ended.getState());
+>       }
+>       buffs.remove(buff);            // ← 摘除
+>       buff.removeBuff(instance);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **两条硬事实** ✓：**(i)** 公告发生在**`duration() <= 0` 的 tick 里** ✓（即"**自然到期**" ✓）；
+>     **(ii)** 而且**只有 `buff instanceof StateBuff` 才公告** ✓ ⇒ ⚠ 若挂的不是 `StateBuff`（例如普通 buff ✗）⇒ **一声不响** ✗。
+> * ⭐⭐⭐ **于是正解清楚了** ✓：**别再显式 `REMOVE_STATE`** ✗ —— ⭐ **让"阿哈时刻"以 `turns: 1` 自然到期** ✓
+>   ⇒ 到期那一 tick，引擎**自己**发 `STATE_ENDED("阿哈时刻")` ✓ ⇒ 我的读者（`self state_ended 阿哈时刻` ✓）拿到 ✓ ⇒ 发【好活当赏】✓。
+>   ⚠ **代价/口径** ✓：到期发生在**她的回合计时**上 ✗（而不是"施放结束的那一刻" ✓）⇒ ⭐ 这是**近似** ✗
+>     ⇒ ⚠ 但与文档"**持续至本次最后一个欢愉技施放结束**"相比，**"持续 1 回合"是文档在别处对同类状态用的口径** ✓
+>       （⚠ 例如【好活当赏】"持续 **2** 回合" ✓）⇒ ⭐ **可以照写，并在注释里写明这是到期口径** ✓。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：把挂的那条改成 **`turns: 1`** ✓、**删掉显式 `REMOVE_STATE` 那条** ✓
+>   ⇒ 判据：施放后**状态在** ✓ ⇒ **推进一回合（或直接 tick）** ⇒ **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ 绿 ⇒ **变异** ⇒ 出货 ✓。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
