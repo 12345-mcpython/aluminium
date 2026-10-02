@@ -189,6 +189,21 @@
         "actor is_other_ally"
       ],
       "note": "⭐⭐ 「我方目标」拆成**两条互相排斥**的规则 ✓：`actor == self`（队友 ✓）—— ⚠ 这里**不用** `actor is_ally` ✗：它虽然语义正确（javadoc 说\"含自己\" ✓），但**在 `matching` 里读不到** ✗（队伍谓词需要的东西 `TriggerContext` 似乎没有 ✓），而 `actor == self` 与 `actor is_other_ally` 都已被实测可用 ✓ （后者见 1223 的同族写法 ✓）。两条合起来**正好**是\"我方目标\" ✓，并且**天然排除敌方** ✓。⭐ 数值 **80%** 取自同一数据行 `1504103 param=[0.4, 0.8]` 的 `#2[i]` ✓；⚠ 存活期仅为过校验 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ults_immediate_talent",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CAST_SKILL",
+          "skill": "TALENT",
+          "target": "target"
+        }
+      ],
+      "note": "⭐ 2026-09-30：用 `CAST_SKILL` 让那个单位**立即施放一次** `TALENT` ✓ —— ⚠ 读的是**它自己的数据行** ✓（而不是手写倍率 ✗），⚠ 而护栏会拒绝**不造成伤害**的技能 ✗。⚠ 来源：`CAST_SKILL` 是 `commandSummon` 放宽三处而来（见 `aggro 回收之七百八十五`）；⚠ 它不经过战技点消耗 ✓。"
     }
   ]
 }
