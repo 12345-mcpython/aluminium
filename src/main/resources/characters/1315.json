@@ -108,10 +108,11 @@
       {
         "op": "ADD_ELEMENTAL_WEAKNESS",
         "element": "Physical",
-        "target": "target"
+        "target": "target",
+        "turns": 2
       }
     ],
     "source": "1315 波提欧 终结技: 「为指定敌方单体添加物理弱点，持续 2 回合。」",
-    "note": "⭐ 弱点植入已出货 ✓（2026-09-30 ✓）：⚠ 原先登记为 **弱点植入 ✗**（⚠ 与 1006/1408 同一族 ✓）⇒ ⚠ 现已写出**添加**那一半 ✓ —— ⚠ `ADD_ELEMENTAL_WEAKNESS` ＋ ⚠ `element: Physical` ✗。⛔ **仍登记的是时长** ✗：⚠ 文档写 ⚠ **持续 2 回合** ✗，⚠ 而 ⚠ `Enemy.stanceWeak` 是一个**无寿命的集合** ✓（⚠ 只在 `EnemyFactory` 里由怪物数据写入 ✓）⇒ ⚠ 写了添加之后那个弱点**不会自己消失** ✓（⚠ 差异已写明 ✓，⚠ 不装作等价 ✓）。⚠ 引擎侧：⚠ `Enemy.addWeakness` ✓（⚠ 经 `setStanceWeak` ✓，⚠ 遵守该类第 192 行的要求 ✓）＋ ⚠ `TriggerInterpreter` 的 `ADD_ELEMENTAL_WEAKNESS` ✓；⚠ 判据见 `WeaknessOpTest` ✓（⚠ 实测 ⚠ 施加前 `isWeakTo` 为假、⚠ 施加后为真 ✓）。"
+    "note": "⭐ 弱点植入已出货 ✓（2026-09-30 ✓）：⚠ 原先登记为 **弱点植入 ✗**（⚠ 与 1006/1408 同一族 ✓）⇒ ⚠ 现已写出**添加**那一半 ✓ —— ⚠ `ADD_ELEMENTAL_WEAKNESS` ＋ ⚠ `element: Physical` ✗。⛔ **仍登记的是时长** ✗：⚠ 文档写 ⚠ **持续 2 回合** ✗，⚠ 而 ⚠ `Enemy.stanceWeak` 是一个**无寿命的集合** ✓（⚠ 只在 `EnemyFactory` 里由怪物数据写入 ✓）⇒ ⚠ 写了添加之后那个弱点**不会自己消失** ✓（⚠ 差异已写明 ✓，⚠ 不装作等价 ✓）。⚠ 引擎侧：⚠ `Enemy.addWeakness` ✓（⚠ 经 `setStanceWeak` ✓，⚠ 遵守该类第 192 行的要求 ✓）＋ ⚠ `TriggerInterpreter` 的 `ADD_ELEMENTAL_WEAKNESS` ✓；⚠ 判据见 `WeaknessOpTest` ✓（⚠ 实测 ⚠ 施加前 `isWeakTo` 为假、⚠ 施加后为真 ✓）。\n\n⭐ 2026-09-30 更新：「持续 2 回合」现在可写了 ✓ —— 弱点可以过期（\timedWeak，95ff510），计数按**目标自己的回合**，在 Battle.afterMove() 里递减。"
   }
 ]
