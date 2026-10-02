@@ -19198,6 +19198,24 @@
 > * ⭐ **下一轮第一步（一次读清）** ✗：读 **`DoubleValue.compute()`** ✓（⚠ 顺带看 `Modifier` 的构造里 `source` 从哪来 ✓ ——
 >   `MODIFY_ATTR` 执行时给的是什么来源 ✓）⇒ 然后 ⭐ **把 (甲)/(乙)/(丙) 定性** ✓ 并决定"修引擎"还是"登记为设计" ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百九十：✅✅✅ **`compute()` 读到了 —— 同属性的加成就**相加**（`base × (1 + Σ加算%) × Π(1+乘算%) + Σ加值`）⇒ ⭐ 所以"同属性不叠加"**彻底是错的** ✗；但读数事实仍指向一个更尖锐的问题）**：
+>
+> * ✅ **实测（读 `DoubleValue.compute()` ✓，`:224` ✓）** ✓ 原文：
+>   ```java
+>   double percentModifiersTotal = 1;  for (… addPercentModifiers …) percentModifiersTotal += percentModifier.value;
+>   double multiplyPercentTotal = 1;   for (… multiplyPercentModifiers …) multiplyPercentTotal *= (1 + …);
+>   double valueModifiersTotal = 0;    for (… valueModifiers …) valueModifiersTotal += valueModifier.value;
+>   value = baseValue * percentModifiersTotal * multiplyPercentTotal + valueModifiersTotal;
+>   ```
+>   ⇒ ⭐⭐ **加算型修饰符是求和** ✓（`1 + Σ` ✓）⇒ ⭐ **两条 +20% 应当得到 0.4** ✓ ⇒ ⛔ **我上一轮那句"不叠加"是错的** ✓（⚠ 本段**第二次**用"结论要有实测支撑"纠正自己 ✓ —— 上一次是 Rappa ✓）。
+> * ⭐⭐ **于是问题变得**更尖锐、也更值得查**** ✓：实测既然证明**规则触发了**（`BREAKING_EFFECT` 有增量 ✓）、**`compute()` 又是相加的** ✓
+>   ⇒ ⭐ 那么"同一个属性读不出第二份 20%"只能说明：**那条 `MODIFY_ATTR:ALL_DAMAGE_TYPE_BOOST` 的修饰符没有进到**我读的那个槽**里** ✗
+>   ⇒ ⚠ 候选：**(子)** 她的天赋写的**不是这个属性的修饰符** ✗（而是伤害计算期的一次 boost ✓ —— ⚠ 那"读面板 0.2"就不该出现 ✗）；
+>     **(丑)** 我的规则写进去了 ✓ 但**读法**取的是 `baseValue`／别的层 ✗；**(寅)** `turns: 1` 在我读之前**已经过期被摘** ✗（⚠ 但干净表同形却读到了 0.2 ✓ ⇒ 若成立，说明"她的表里有东西让它更快过期" ✗）。
+> * ⭐ **下一轮第一步（把三候选一次分开，1-2 次调用）** ✗：
+>   ① **在干净表上重跑同一形状** ✓（已知 0.2 ✓）⇒ 再**在干净表上把天赋那条也放进去** ✓ ⇒ 若得 0.4 ⇒ ⭐ **她的表里有别的东西在干扰** ✗（寅 ✓）；
+>   ② 若得 0.2 ⇒ ⭐ 问题在"**天赋那条与我的那条同时存在时，其中之一被丢弃**" ✗ ⇒ 去读 `MODIFY_ATTR` 的**装载/去重**逻辑 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -21461,6 +21479,24 @@
 >       ⇒ 若两条规则都用 `BASE` ⇒ 可能被按来源合并 ✓）。
 > * ⭐ **下一轮第一步（一次读清）** ✗：读 **`DoubleValue.compute()`** ✓（⚠ 顺带看 `Modifier` 的构造里 `source` 从哪来 ✓ ——
 >   `MODIFY_ATTR` 执行时给的是什么来源 ✓）⇒ 然后 ⭐ **把 (甲)/(乙)/(丙) 定性** ✓ 并决定"修引擎"还是"登记为设计" ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百九十：✅✅✅ **`compute()` 读到了 —— 同属性的加成就**相加**（`base × (1 + Σ加算%) × Π(1+乘算%) + Σ加值`）⇒ ⭐ 所以"同属性不叠加"**彻底是错的** ✗；但读数事实仍指向一个更尖锐的问题）**：
+>
+> * ✅ **实测（读 `DoubleValue.compute()` ✓，`:224` ✓）** ✓ 原文：
+>   ```java
+>   double percentModifiersTotal = 1;  for (… addPercentModifiers …) percentModifiersTotal += percentModifier.value;
+>   double multiplyPercentTotal = 1;   for (… multiplyPercentModifiers …) multiplyPercentTotal *= (1 + …);
+>   double valueModifiersTotal = 0;    for (… valueModifiers …) valueModifiersTotal += valueModifier.value;
+>   value = baseValue * percentModifiersTotal * multiplyPercentTotal + valueModifiersTotal;
+>   ```
+>   ⇒ ⭐⭐ **加算型修饰符是求和** ✓（`1 + Σ` ✓）⇒ ⭐ **两条 +20% 应当得到 0.4** ✓ ⇒ ⛔ **我上一轮那句"不叠加"是错的** ✓（⚠ 本段**第二次**用"结论要有实测支撑"纠正自己 ✓ —— 上一次是 Rappa ✓）。
+> * ⭐⭐ **于是问题变得**更尖锐、也更值得查**** ✓：实测既然证明**规则触发了**（`BREAKING_EFFECT` 有增量 ✓）、**`compute()` 又是相加的** ✓
+>   ⇒ ⭐ 那么"同一个属性读不出第二份 20%"只能说明：**那条 `MODIFY_ATTR:ALL_DAMAGE_TYPE_BOOST` 的修饰符没有进到**我读的那个槽**里** ✗
+>   ⇒ ⚠ 候选：**(子)** 她的天赋写的**不是这个属性的修饰符** ✗（而是伤害计算期的一次 boost ✓ —— ⚠ 那"读面板 0.2"就不该出现 ✗）；
+>     **(丑)** 我的规则写进去了 ✓ 但**读法**取的是 `baseValue`／别的层 ✗；**(寅)** `turns: 1` 在我读之前**已经过期被摘** ✗（⚠ 但干净表同形却读到了 0.2 ✓ ⇒ 若成立，说明"她的表里有东西让它更快过期" ✗）。
+> * ⭐ **下一轮第一步（把三候选一次分开，1-2 次调用）** ✗：
+>   ① **在干净表上重跑同一形状** ✓（已知 0.2 ✓）⇒ 再**在干净表上把天赋那条也放进去** ✓ ⇒ 若得 0.4 ⇒ ⭐ **她的表里有别的东西在干扰** ✗（寅 ✓）；
+>   ② 若得 0.2 ⇒ ⭐ 问题在"**天赋那条与我的那条同时存在时，其中之一被丢弃**" ✗ ⇒ 去读 `MODIFY_ATTR` 的**装载/去重**逻辑 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
