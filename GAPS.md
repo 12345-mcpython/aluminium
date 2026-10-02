@@ -19928,6 +19928,179 @@
 >   "`self_resource:` 存在" ✓ → ⭐ **"`APPLY_BUFF`/`REMOVE_STATE` 就是挂摘状态"** ✓ ⇒ **每一步都由上一步的实测指路** ✓（⚠ 而不是猜 ✗）。
 > * ⚠ **推送**：本地仍**领先 5** ✗（六轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零二十八：⛔ **阿哈时刻那份内容把 11 个既有判据打红了** ⇒ 按纪律**回滚**，并记下失败形态）**：
+>
+> * ⛔ **实测（把四步内容写进 `1513.json` 后跑全量 ✓）** ✓：**2129 例中 11 例红** ✗（⚠ 不是编译错 ✓ ⇒ 是**行为**变了 ✓）
+>   ⇒ ⭐ 最可能：新规则挂在 **`CAST_SETUP`／`ATTACK_FINISHED`** 上 ✓ 且条件是 `from_category ElationDamage` ✓
+>     ⇒ ⚠ 而 `1513` **本来就有**欢愉技相关判据（本段出货的 `spendAll` 那条 ✓ 与 `AventurineWaveflairTest` ✓）
+>     ⇒ ⭐ **新规则在那些判据里也触发了** ✗（⚠ 挂状态 ✓／加减资源 ✓ ⇒ 读数与资源状态都变了 ✓）。
+> * ✅ **处置** ✓：`1513.json` **回滚** ✓（按纪律"未完成要回滚并记录" ✓ ＋ "**先全量绿再提交**" ✓）⇒ 全量恢复 **0** ✓、树干净 ✓。
+> * ⭐ **下一轮的第一步（把"打扰"消掉，1-2 次调用）** ✗：
+>   **(甲)** **先看清那 11 个红是谁** ✓（⚠ 跑一次全量并**列出失败的判据名** ✓ —— 本段一直只看"几个红"，⚠ 这次要看**名单** ✓）；
+>   **(乙)** 再决定：**(i)** 给新规则**更窄的条件** ✓（⚠ 例如只在"**她自己的欢愉技**"上记账 ✓ —— 需要"她是不是施放者"的判据 ✓ 本段见过 `actor == self` ✓）；
+>     **(ii)** 或者**另开一个文件/角色**承载阿哈时刻 ✗（⚠ 没有"阿哈"这个单位 ✗ ⇒ 也许**最合适的是它自己的文件** ✓）。
+> * ⭐ **教训（补进纪律）** ✗：**"给现有角色加规则"必须预设"会打扰它的既有判据"** ✓ ——
+>   ⚠ 本段此前几次加规则都绿 ✓（因为条件很窄 ✓），**这次的条件（`from_category ElationDamage`）覆盖了她多数判据** ✗
+>     ⇒ ⭐ **加规则前先问：这个事件的这个条件，在她的哪些既有判据里也会成立？** ✓
+> * ⚠ **推送**：本地仍**领先 6** ✗（网络七轮不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零二十九：⚠ **"11 个红是谁"没抓到** —— 我的 `Select-String` 模式（`^\S+ > .* FAILED` ✗）与 Gradle 的实际输出格式不匹配 ⇒ 名单为空 ✗；⭐ 而**可靠取法已经知道**：读 `build/test-results/test/*.xml` 里的 `failure` 节点 ✓）**：
+>
+> * ⚠ **实测（重新写入内容 ⇒ 跑全量 ⇒ 抓失败名 ✓ ⇒ 回滚 ⇒ 再跑 ✓）** ✓：
+>   * 抓失败名那一步**输出为空** ✗ ⇒ ⭐ **不是"没有失败"** ✗，而是**我的匹配式不对** ✗（⚠ Gradle 的失败行格式与本段前几次读到的不一样 ✓）；
+>   * 回滚后全量 **rc 0** ✓、树干净 ✓（**2129** 例 ✓）。
+> * ⭐ **下一轮第一步（可靠取名单，1 次调用）** ✗：
+>   ① 重新 `python tools/ship_aha_moment.py` ✓；② 跑 `test --rerun-tasks` ✓；
+>   ③ ⭐ **列 `build/test-results/test/*.xml` 里带 `<failure` 的文件名** ✓（⚠ 用 `Select-String -Path build/test-results/test/*.xml -Pattern '<failure'` ✓ ⇒
+>      文件名就是判据名 ✓ 且 `message=` 里有原因 ✓）；④ 回滚 ✓。
+> * ⭐ **纪律（补一条，本段第十二条同类）** ✗：**"看失败名单"要读结果 XML，不要 grep 控制台** ✓ ——
+>   ⚠ 本段多次因"控制台过滤式写错"而**误判为 0 红／没失败** ✗（⚠ 最严重的一次是变异测 ✓ ⇒ 第十条纪律 ✓ 就是这个形状 ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（八轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十：✅✅ **名单拿到了（读结果 XML ✓）而且它**指路**** —— 11 个红里有两条是**结构性守卫**（条件字面量 ＋ 每条规则都要有判据选中））**：
+>
+> * ✅ **实测（写内容 ⇒ 跑全量 ⇒ 读 `build/test-results/test/*.xml` 的 `<failure` ✓ ⇒ 回滚 ✓）** ✓，名单（共 11 ✗）：
+>   | 判据 | 红数 |
+>   |---|---|
+>   | `AventurineWaveflairTest` | 2 |
+>   | `SkillSlotMappingTest` | 2 |
+>   | `SpendAllTest` | 2 |
+>   | `UltraThresholdTest` | 2 |
+>   | ⭐ **`CharacterConditionLiteralsTest`** | **1** |
+>   | ⭐ **`EveryCharacterAndRelicRuleIsSelectedTest`** | **1** |
+>   | `Cone21064Test` | 1 |
+>   ⇒ ⭐ **两条守卫是关键** ✓：
+>     * **`CharacterConditionLiteralsTest`** ✓ ⇒ 条件里的字面量必须**在允许表里** ✗ ⇒ ⭐ 强烈暗示
+>       **`self_resource:待演 <= 0` 这个写法**没被条件解析器接受**** ✗（⚠ 尽管 `TriggerTable` 里有那个常量 ✓
+>         —— ⭐ **常量存在 ≠ DSL 接受** ✗，与本段"枚举里有名字 ≠ 内容能用"同一类 ✓）；
+>     * **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓ ⇒ ⭐ **每条新规则都必须被某个判据"选中"** ✗ ⇒ 我**没写判据**就加规则 ✓
+>       ⇒ ⭐ **这正是本项目"不造没有读者的能力"的机器化守卫** ✓✓（⚠ 我此前一直是**先写判据再加规则** ✓，这次顺序反了 ✗）。
+>   * ⭐ 其余（`AventurineWaveflair`／`SpendAll`／`UltraThreshold`／`SkillSlotMapping`／`Cone21064` ✓）是**行为**变化 ✓
+>     —— ⚠ 都与 `1513` 的资源／欢愉路径有关 ✓ ⇒ 印证了"**条件太宽**"那个判断 ✓（`from_category ElationDamage` ✓）。
+> * ⭐ **下一轮第一步（读那两条守卫的期望，1 次调用）** ✗：
+>   ① 读 **`CharacterConditionLiteralsTest`** ✓ ⇒ 取**允许的条件字面量清单** ✓ ⇒ ⭐ 就知道"资源值条件"**到底该怎么写** ✓
+>     （⚠ 若确实不支持 ⇒ ⭐ **这是一个可出货的小能力** ✗ —— 但它要先有 **≥2 个读者** ✓ ⇒ 本段只找到 1 个（本设计 ✓）⇒ 按纪律**登记** ✓）；
+>   ② 读 **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓ ⇒ 明白"判据要先于规则"的**具体形状** ✓ ⇒ 下次**先写判据** ✓。
+> * ⚠ **推送**：本地仍**领先 8** ✗（九轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十一：⚠ **订正上一轮的猜测** —— `CharacterConditionLiteralsTest` **不是"条件字面量白名单"** ✗，而是**逐角色逐规则的**黄金快照**（`assertRule(cid, event, id, expectedWhenList)` ＋ `assertEquals(1, rules.size(), …)`）⇒ ⭐ 所以那 1 红讲的是**规则的身份/条数**，不是"`self_resource:` 不被支持"）**：
+>
+> * ✅ **实测（读该判据 ✓）** ✓：它的形状是
+>   `assertRule(1001, "SKILL_CAST", "skill_shield", List.of("actor == self"))` ✓
+>   ＋ `Assertions.assertEquals(1, rules.size(), cid + " " + id + " on " + event)` ✓
+>   ⇒ ⭐ **它按 `(cid, event, id)` 断言"**恰好一条**规则 ＋ 它的 `when` 列表**" ✓
+>     ⇒ ⛔ **所以我上一轮那句"资源值条件的写法没被接受"是**猜的**✗**（⚠ 本段第 **六** 次自我纠正 ✓）。
+>   * ⚠ 更可能的解释 ✓：它遍历某个角色的规则时，**我新增的四条落到它检查的 (cid, event) 组合上** ✗
+>     （⚠ 例：我用了 `ATTACK_FINISHED`／`RESOURCE_CHANGED`／`STATE_ENDED` ✓ ⇒ 若该判据恰好也快照了这些事件上的条数 ✓ ⇒ 就红 ✓）。
+> * ⭐ **于是"资源值条件到底怎么写"仍未判** ✗ —— ⚠ 但**它已经不在关键路径上** ✓：
+>   ⭐ 因为**更硬的守卫**是 **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓（"每条规则都要被某个判据选中" ✓）
+>     ⇒ ⭐ **下一轮第一步仍是它** ✓：先读它的期望形状 ✓ ⇒ **先写判据、再加规则** ✓ ⇒ 这才是让那 11 红变成绿的正路 ✓。
+> * ⭐ **纪律（收束）** ✗：**"名字像什么"不等于"它是什么"** ✓ —— 本段从 `CharacterConditionLiteralsTest` 的名字
+>   猜出"字面量白名单" ✗，读一行就推翻了 ✓ ⇒ ⭐ **凡是要靠名字判断用途时，先读那个文件的第一处断言** ✓。
+> * ⚠ **推送**：本地仍**领先 9** ✗（十轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十二：✅ `EveryCharacterAndRelicRuleIsSelectedTest` 的形状读到了（**全角色 × 全事件 的普查，收集 `problems` 后一次性抛出**）⇒ ⭐ 下一轮只需读它循环体里的**谓词**（`:27`–`:39`）**）**：
+>
+> * ✅ **实测（读该判据骨架 ✓）** ✓：
+>   ```java
+>   List<String> problems = new ArrayList<>();
+>   for (int id : CHARACTERS) {                       // 全角色
+>       for (TriggerEvent event : TriggerEvent.values()) {   // 全事件
+>           …                                             // ⭐ 谓词在这一段（下一轮读）
+>       }
+>   }
+>   throw new AssertionError("invalid character rules:\n" + String.join("\n", problems));   // 一次性列出全部问题
+>   ```
+>   ＋ 同形的一段对 **遗器**（`RELICS` × `{2, 4}` 件套 ✓，`:45`–`:71` ✓）。
+>   ⇒ ⭐ **两点有用** ✓：**(i)** 它**不是"每条规则都要有判据"**的注册表 ✗（⚠ 我上一轮的推测又偏了 ✓ ⇒ ⭐ **本段第七次自我纠正** ✓）；
+>     **(ii)** ⭐ 它把**所有问题一次性列出** ✓ ⇒ 下次触发它时，**报错文本本身就是完整名单** ✓（⚠ 比读 XML 更直接 ✓）。
+> * ⭐ **下一轮第一步（1 次调用）** ✗：读 **`:27`–`:39`** ✓ ⇒ 看它对"每个事件下的规则"要求什么 ✓
+>   （⚠ 候选：**必须有触发者** ✓／**必须能被某条判据选中** ✗／**必须有 `target`／`when` 的合法形状** ✓）
+>   ⇒ ⭐ 拿到谓词后，**阿哈时刻那四条要按它改** ✓（⭐ 并且**先写判据、再加规则** ✓）。
+> * ⭐ **纪律（收束）** ✗：**这两个"守卫"的名字都曾被我误读** ✓（`CharacterConditionLiterals` ✗、`…IsSelected` ✗）
+>   ⇒ ⭐ **结论不变**：**名字只是线索，读到断言/谓词才算知道** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、**已推送且同步** ✓（⚠ 十轮积压已清 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十三：✅✅ **谓词读到了** —— 它把每个角色 × 每个事件的 `table.rulesFor(event)` 包在 `try/catch` 里收集 `RuntimeException` ⇒ ⭐ **所以那 1 红是**装载期抛的异常**，而**异常文本就是原因****；⚠ 而我又一次没能从控制台抓到那句话）**：
+>
+> * ✅ **实测（读 `:23`–`:40` ✓）** ✓，原文骨架：
+>   ```java
+>   for (int id : CHARACTERS) {
+>       var table = CharacterFactory.create(id, LEVEL).getTriggerTable();
+>       for (TriggerEvent event : TriggerEvent.values()) {
+>           try { selected += table.rulesFor(event).size(); }
+>           catch (RuntimeException e) { problems.add("character " + id + " on " + event + ": " + e.getMessage()); }
+>       }
+>   }
+>   … throw new AssertionError("invalid character rules:\n" + String.join("\n", problems));
+>   ```
+>   ⇒ ⭐⭐ **所以它的红 = 我的某条规则在 `rulesFor(event)` 时**抛了异常**** ✓（⚠ 装载期校验 ✓，不是行为差异 ✗）
+>     ⇒ ⭐ **异常信息形如 `character 1513 on <EVENT>: <原因>`** ✓ ⇒ **那句话就是全部答案** ✓。
+> * ⚠ **而我这一轮又没抓到它** ✗：`Select-String` 的模式（`character 1513` 等 ✓）与控制台实际输出**不匹配** ✗
+>   ⇒ ⭐ **结论（第二次同形）** ✗：**不要 grep 控制台** ✓ —— ⭐ **正路是读结果 XML 的 `message` 属性** ✓
+>     （⚠ 我上一次只读了"文件名"（判据名 ✓）✗，没读 `message` ✗ ⇒ 这次要读 `message` ✓）。
+> * ⭐ **下一轮第一步（一次调用，务必读到那句话）** ✗：
+>   ① `python tools/ship_aha_moment.py` ✓；② 跑 **只这一个判据** ✓；
+>   ③ ⭐ **读 `build/test-results/test/TEST-com.laosun.aluminium.test.EveryCharacterAndRelicRuleIsSelectedTest.xml`**
+>      ⇒ 取 `<failure message="…">` ✓（⚠ 先 `Select-String -Pattern 'character 1513'` **在该 XML 上** ✓）⇒ 拿到原因 ✓；
+>   ④ 回滚 ✓ ⇒ ⭐ **然后按那句话改规则** ✓（⚠ 大概率就是 `self_resource:待演 <= 0` 这个条件写法 ✓，或 `APPLY_BUFF` 的字段 ✓）。
+> * ⭐ **纪律（第三次收紧）** ✗：**凡"要看失败原因"，一律读 `build/test-results/test/*.xml` 的 `failure` 节点（名单 ＋ `message`）** ✓
+>   ⇒ ⚠ 本段为此浪费了三轮 ✓（⚠ 前两次都只拿到部分信息 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十四：✅✅ **逐个报错往前推**：键名已修（`id` ✓，两次 dump 确认 ✓）；⛔ 下一个错是 **`state_ended` 那条条件**，而它给出的原文极有用）**：
+>
+> * ✅ **先修掉的一个** ✓：资源声明的键从 `"name"` 改成 **`"id"`** ✓（dump 确认两份声明现在都是 `['id','max','initial','scope','note']` ✓）
+>   ⇒ ⚠ 但仍 11 红 ✗（⭐ 因为**装载器一次只报第一个错** ✓ ⇒ 修一个、露一个 ✓）。
+> * ⛔ **下一个错的原文（读结果 XML 的 `message` ✓）** ✓：
+>   *`Condition 'state_ended 阿哈时刻' asks whether '' is in a named state, but the parties are actor, self, target (self = the character whose tab…`*
+>   ⇒ ⭐ 它把 `state_ended 阿哈时刻` 当成"**某个（空的）主体 是否处于某命名状态**"来解析 ✗
+>     ⇒ ⚠ 也就是说**主体名缺失** ✗ ⇒ ⭐ **写法应当是"主体 ＋ 关键词 ＋ 状态名"** ✗（⚠ 而不是我以为的关键词打头 ✗）。
+> * ✅ **而 `state_ended` 确实是关键词** ✓（读 `TriggerTable` ✓）：`:943` 有
+>   `Pattern.compile("(?<![\\w])state_ended(?![\\w])", CASE_INSENSITIVE)` ✓（`:1209` 用它匹配 ✓）
+>   ＋ `:3036` 有报错分支 *"Condition '…' names no state after \"state_ended\""* ✓
+>   ⇒ ⭐ **所以拼写对、位置错** ✓ —— ⭐ **下一轮第一步（一次调用）**：读 `:1209` 附近那段（`STATE_ENDED_KEYWORD` 的**使用处** ✓）
+>     ⇒ 看它把 `state_ended` **从哪一段文本里**取状态名 ✓ 与 **主体**怎么写 ✓ ⇒ 照抄 ✓。
+> * ⭐ **纪律（本段第十五条）** ✗：**装载器一次只报一个错** ✓ ⇒ 面对"全表被拒"时，**逐个修、每次读新 `message`** ✓
+>   （⚠ 我这一轮一次只推进一步，正是这个节奏 ✓ —— ⚠ 比一次猜五个键名快得多 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 1 个文档提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十五：✅ **`state_ended` 的写法查清了**（`TriggerTable:1209`–`:1214`）⇒ ⭐ 修法是把**主体名补上**；⚠ 而重跑后**报错又回到 `name` 键**（⚠ 怀疑我读的是**旧 XML** ⇒ 下一轮要先确认"文件 dump"与"报错"是**同一次**运行）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1200`–`:1215` ✓）** ✓ 原文：
+>   ```java
+>   Matcher stateEnded = STATE_ENDED_KEYWORD.matcher(text);
+>   if (stateEnded.find()) {
+>       String subject = normalize(text.substring(0, stateEnded.start()));   // ← 主体 = 关键词**之前**那段
+>       String state   = text.substring(stateEnded.end()).trim();            // ← 状态名 = 关键词**之后**
+>       return new StateEnded(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw, spec);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **正确写法 = `<主体> state_ended <状态名>`** ✓（例：**`self state_ended 阿哈时刻`** ✓）
+>     ⇒ ⛔ 我原来写的 `state_ended 阿哈时刻` **缺主体** ✗ ⇒ 主体为空 ⇒ 正是那句报错 ✓（⭐ 诊断与原文**完全对上** ✓）。
+>   ⇒ ✅ 已把脚本里的条件改成 **`"self state_ended " + MOMENT`** ✓。
+> * ⚠ **而重跑后仍是 11 红** ✗，且我从 XML 读到的 `message` **又是 `unknown key "name"`** ✗
+>   ⇒ ⚠ 两种可能：**(i)** 我读到的是**上一次运行**留下的 XML ✗（⚠ 这次我**先 dump 了文件**（两份都是 `id` ✓）却读到了旧报错 ✓ ⇒ **不自洽** ✗）；
+>     **(ii)** 或者**文件里还有一处** `name` 键 ✗（⚠ 但 dump 只列了 `resources` ✓ ⇒ 也许**别处**也有资源声明 ✗）。
+>   ⇒ ⭐ **下一轮第一步（把"同一次运行"钉死）** ✗：① `git checkout` ✓；② `python tools/ship_aha_moment.py` ✓；
+>     ③ **同一调用里**先 `dump 文件` ✓ 再 `跑全量` ✓ 再 `读 XML message` ✓（⚠ 三步同 shell ✓）⇒ 若 dump 全 `id` 而报错仍说 `name` ⇒
+>     ⭐ **说明 `name` 来自我没 dump 到的地方** ✓（⚠ 例如 `rules[].do[]` 里的**未知键** ✓ —— 报错文本说的是 *"in a resource declaration"* ✗，
+>       但 ⚠ 也许装载器把它归到那一类 ✓）。
+> * ⭐ **纪律（本段第十六条）** ✗：**"文件 dump" 与 "报错摘录" 必须来自同一次运行** ✓ —— ⚠ 否则会把**旧错误**当成**新证据** ✓（本轮疑似如此 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 2 个提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十六：✅✅✅ **根因抓到了** —— `1513.json` **第 10 行** 就有 `"name": "待演"` ⇒ ⭐ 那是**很早一次未打补丁的运行**写进去的，而它**被提交进了 HEAD**（所以 `git checkout` 也带回来 ⇒ ⚠ 这才是"改了键还报旧错"的原因）**）**：
+>
+> * ✅ **实测（同一个调用里：应用 ⇒ `Select-String` 找 `"name"` ⇒ 回滚 ⇒ 复跑 ✓）** ✓：
+>   * `Select-String -Path src/main/resources/characters/1513.json -Pattern '"name"'` ⇒ ⭐ **只命中一行：`:10  "name": "待演",`** ✓
+>   * 回滚后全量 **rc 0** ✓、树干净 ✓（**2129** 例 ✓）。
+> * ⭐⭐⭐ **于是那句顽固的报错彻底解释了** ✓：`"name": "待演"` **就在文件里**（`:10` ✓）⇒ 装载器拒表 ✓ ⇒ 11 红 ✓
+>   ⇒ ⚠ 而我此前 `git checkout -- …1513.json` **并没有清掉它** ✗ ⇒ ⭐ **因为它已经在 HEAD 里** ✗
+>     （⚠ 我在某次 `git add -f src/main/resources/characters/1513.json` 时把"未修好"的那一版**提交**了 ✓ —— ⭐ **这是本段最值得记的一次操作失误** ✓）。
+> * ⭐ **下一轮第一步（一步就能绿）** ✗：**把 `1513.json` 第 10 行那份 `"name": "待演"` 资源声明删掉** ✓
+>   （⚠ 保留合法的那份 `id` 版 ✓；若两份内容重复 ⇒ **整块删掉旧的** ✓）⇒ 再 `python tools/ship_aha_moment.py` 重放 ✓
+>   ⇒ 跑全量 ⇒ ⭐ **要么全绿** ✓、**要么报下一个错**（⚠ 那就继续"一个错一步" ✓）。
+> * ⭐ **纪律（本段第十七条，最痛的一条）** ✗：**不要把"调试中途的坏文件"提交进树** ✓ ——
+>   ⚠ 本次因为提交了 `"name"` 版，导致**后面三轮的 `git checkout` 都在"恢复一个坏文件"** ✗
+>     ⇒ ⭐ **规矩**：调试期间的中间产物**要么不 `git add`，要么先修好** ✓；⭐ 而 `git checkout` 只能回到**已提交**的状态 ✓
+>       ⇒ **"回滚到干净" 不等于 "回滚到正确"** ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 3 个提交待补推 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -22922,6 +23095,179 @@
 >   "`self_resource:` 存在" ✓ → ⭐ **"`APPLY_BUFF`/`REMOVE_STATE` 就是挂摘状态"** ✓ ⇒ **每一步都由上一步的实测指路** ✓（⚠ 而不是猜 ✗）。
 > * ⚠ **推送**：本地仍**领先 5** ✗（六轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零二十八：⛔ **阿哈时刻那份内容把 11 个既有判据打红了** ⇒ 按纪律**回滚**，并记下失败形态）**：
+>
+> * ⛔ **实测（把四步内容写进 `1513.json` 后跑全量 ✓）** ✓：**2129 例中 11 例红** ✗（⚠ 不是编译错 ✓ ⇒ 是**行为**变了 ✓）
+>   ⇒ ⭐ 最可能：新规则挂在 **`CAST_SETUP`／`ATTACK_FINISHED`** 上 ✓ 且条件是 `from_category ElationDamage` ✓
+>     ⇒ ⚠ 而 `1513` **本来就有**欢愉技相关判据（本段出货的 `spendAll` 那条 ✓ 与 `AventurineWaveflairTest` ✓）
+>     ⇒ ⭐ **新规则在那些判据里也触发了** ✗（⚠ 挂状态 ✓／加减资源 ✓ ⇒ 读数与资源状态都变了 ✓）。
+> * ✅ **处置** ✓：`1513.json` **回滚** ✓（按纪律"未完成要回滚并记录" ✓ ＋ "**先全量绿再提交**" ✓）⇒ 全量恢复 **0** ✓、树干净 ✓。
+> * ⭐ **下一轮的第一步（把"打扰"消掉，1-2 次调用）** ✗：
+>   **(甲)** **先看清那 11 个红是谁** ✓（⚠ 跑一次全量并**列出失败的判据名** ✓ —— 本段一直只看"几个红"，⚠ 这次要看**名单** ✓）；
+>   **(乙)** 再决定：**(i)** 给新规则**更窄的条件** ✓（⚠ 例如只在"**她自己的欢愉技**"上记账 ✓ —— 需要"她是不是施放者"的判据 ✓ 本段见过 `actor == self` ✓）；
+>     **(ii)** 或者**另开一个文件/角色**承载阿哈时刻 ✗（⚠ 没有"阿哈"这个单位 ✗ ⇒ 也许**最合适的是它自己的文件** ✓）。
+> * ⭐ **教训（补进纪律）** ✗：**"给现有角色加规则"必须预设"会打扰它的既有判据"** ✓ ——
+>   ⚠ 本段此前几次加规则都绿 ✓（因为条件很窄 ✓），**这次的条件（`from_category ElationDamage`）覆盖了她多数判据** ✗
+>     ⇒ ⭐ **加规则前先问：这个事件的这个条件，在她的哪些既有判据里也会成立？** ✓
+> * ⚠ **推送**：本地仍**领先 6** ✗（网络七轮不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零二十九：⚠ **"11 个红是谁"没抓到** —— 我的 `Select-String` 模式（`^\S+ > .* FAILED` ✗）与 Gradle 的实际输出格式不匹配 ⇒ 名单为空 ✗；⭐ 而**可靠取法已经知道**：读 `build/test-results/test/*.xml` 里的 `failure` 节点 ✓）**：
+>
+> * ⚠ **实测（重新写入内容 ⇒ 跑全量 ⇒ 抓失败名 ✓ ⇒ 回滚 ⇒ 再跑 ✓）** ✓：
+>   * 抓失败名那一步**输出为空** ✗ ⇒ ⭐ **不是"没有失败"** ✗，而是**我的匹配式不对** ✗（⚠ Gradle 的失败行格式与本段前几次读到的不一样 ✓）；
+>   * 回滚后全量 **rc 0** ✓、树干净 ✓（**2129** 例 ✓）。
+> * ⭐ **下一轮第一步（可靠取名单，1 次调用）** ✗：
+>   ① 重新 `python tools/ship_aha_moment.py` ✓；② 跑 `test --rerun-tasks` ✓；
+>   ③ ⭐ **列 `build/test-results/test/*.xml` 里带 `<failure` 的文件名** ✓（⚠ 用 `Select-String -Path build/test-results/test/*.xml -Pattern '<failure'` ✓ ⇒
+>      文件名就是判据名 ✓ 且 `message=` 里有原因 ✓）；④ 回滚 ✓。
+> * ⭐ **纪律（补一条，本段第十二条同类）** ✗：**"看失败名单"要读结果 XML，不要 grep 控制台** ✓ ——
+>   ⚠ 本段多次因"控制台过滤式写错"而**误判为 0 红／没失败** ✗（⚠ 最严重的一次是变异测 ✓ ⇒ 第十条纪律 ✓ 就是这个形状 ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（八轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十：✅✅ **名单拿到了（读结果 XML ✓）而且它**指路**** —— 11 个红里有两条是**结构性守卫**（条件字面量 ＋ 每条规则都要有判据选中））**：
+>
+> * ✅ **实测（写内容 ⇒ 跑全量 ⇒ 读 `build/test-results/test/*.xml` 的 `<failure` ✓ ⇒ 回滚 ✓）** ✓，名单（共 11 ✗）：
+>   | 判据 | 红数 |
+>   |---|---|
+>   | `AventurineWaveflairTest` | 2 |
+>   | `SkillSlotMappingTest` | 2 |
+>   | `SpendAllTest` | 2 |
+>   | `UltraThresholdTest` | 2 |
+>   | ⭐ **`CharacterConditionLiteralsTest`** | **1** |
+>   | ⭐ **`EveryCharacterAndRelicRuleIsSelectedTest`** | **1** |
+>   | `Cone21064Test` | 1 |
+>   ⇒ ⭐ **两条守卫是关键** ✓：
+>     * **`CharacterConditionLiteralsTest`** ✓ ⇒ 条件里的字面量必须**在允许表里** ✗ ⇒ ⭐ 强烈暗示
+>       **`self_resource:待演 <= 0` 这个写法**没被条件解析器接受**** ✗（⚠ 尽管 `TriggerTable` 里有那个常量 ✓
+>         —— ⭐ **常量存在 ≠ DSL 接受** ✗，与本段"枚举里有名字 ≠ 内容能用"同一类 ✓）；
+>     * **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓ ⇒ ⭐ **每条新规则都必须被某个判据"选中"** ✗ ⇒ 我**没写判据**就加规则 ✓
+>       ⇒ ⭐ **这正是本项目"不造没有读者的能力"的机器化守卫** ✓✓（⚠ 我此前一直是**先写判据再加规则** ✓，这次顺序反了 ✗）。
+>   * ⭐ 其余（`AventurineWaveflair`／`SpendAll`／`UltraThreshold`／`SkillSlotMapping`／`Cone21064` ✓）是**行为**变化 ✓
+>     —— ⚠ 都与 `1513` 的资源／欢愉路径有关 ✓ ⇒ 印证了"**条件太宽**"那个判断 ✓（`from_category ElationDamage` ✓）。
+> * ⭐ **下一轮第一步（读那两条守卫的期望，1 次调用）** ✗：
+>   ① 读 **`CharacterConditionLiteralsTest`** ✓ ⇒ 取**允许的条件字面量清单** ✓ ⇒ ⭐ 就知道"资源值条件"**到底该怎么写** ✓
+>     （⚠ 若确实不支持 ⇒ ⭐ **这是一个可出货的小能力** ✗ —— 但它要先有 **≥2 个读者** ✓ ⇒ 本段只找到 1 个（本设计 ✓）⇒ 按纪律**登记** ✓）；
+>   ② 读 **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓ ⇒ 明白"判据要先于规则"的**具体形状** ✓ ⇒ 下次**先写判据** ✓。
+> * ⚠ **推送**：本地仍**领先 8** ✗（九轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十一：⚠ **订正上一轮的猜测** —— `CharacterConditionLiteralsTest` **不是"条件字面量白名单"** ✗，而是**逐角色逐规则的**黄金快照**（`assertRule(cid, event, id, expectedWhenList)` ＋ `assertEquals(1, rules.size(), …)`）⇒ ⭐ 所以那 1 红讲的是**规则的身份/条数**，不是"`self_resource:` 不被支持"）**：
+>
+> * ✅ **实测（读该判据 ✓）** ✓：它的形状是
+>   `assertRule(1001, "SKILL_CAST", "skill_shield", List.of("actor == self"))` ✓
+>   ＋ `Assertions.assertEquals(1, rules.size(), cid + " " + id + " on " + event)` ✓
+>   ⇒ ⭐ **它按 `(cid, event, id)` 断言"**恰好一条**规则 ＋ 它的 `when` 列表**" ✓
+>     ⇒ ⛔ **所以我上一轮那句"资源值条件的写法没被接受"是**猜的**✗**（⚠ 本段第 **六** 次自我纠正 ✓）。
+>   * ⚠ 更可能的解释 ✓：它遍历某个角色的规则时，**我新增的四条落到它检查的 (cid, event) 组合上** ✗
+>     （⚠ 例：我用了 `ATTACK_FINISHED`／`RESOURCE_CHANGED`／`STATE_ENDED` ✓ ⇒ 若该判据恰好也快照了这些事件上的条数 ✓ ⇒ 就红 ✓）。
+> * ⭐ **于是"资源值条件到底怎么写"仍未判** ✗ —— ⚠ 但**它已经不在关键路径上** ✓：
+>   ⭐ 因为**更硬的守卫**是 **`EveryCharacterAndRelicRuleIsSelectedTest`** ✓（"每条规则都要被某个判据选中" ✓）
+>     ⇒ ⭐ **下一轮第一步仍是它** ✓：先读它的期望形状 ✓ ⇒ **先写判据、再加规则** ✓ ⇒ 这才是让那 11 红变成绿的正路 ✓。
+> * ⭐ **纪律（收束）** ✗：**"名字像什么"不等于"它是什么"** ✓ —— 本段从 `CharacterConditionLiteralsTest` 的名字
+>   猜出"字面量白名单" ✗，读一行就推翻了 ✓ ⇒ ⭐ **凡是要靠名字判断用途时，先读那个文件的第一处断言** ✓。
+> * ⚠ **推送**：本地仍**领先 9** ✗（十轮网络不通 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十二：✅ `EveryCharacterAndRelicRuleIsSelectedTest` 的形状读到了（**全角色 × 全事件 的普查，收集 `problems` 后一次性抛出**）⇒ ⭐ 下一轮只需读它循环体里的**谓词**（`:27`–`:39`）**）**：
+>
+> * ✅ **实测（读该判据骨架 ✓）** ✓：
+>   ```java
+>   List<String> problems = new ArrayList<>();
+>   for (int id : CHARACTERS) {                       // 全角色
+>       for (TriggerEvent event : TriggerEvent.values()) {   // 全事件
+>           …                                             // ⭐ 谓词在这一段（下一轮读）
+>       }
+>   }
+>   throw new AssertionError("invalid character rules:\n" + String.join("\n", problems));   // 一次性列出全部问题
+>   ```
+>   ＋ 同形的一段对 **遗器**（`RELICS` × `{2, 4}` 件套 ✓，`:45`–`:71` ✓）。
+>   ⇒ ⭐ **两点有用** ✓：**(i)** 它**不是"每条规则都要有判据"**的注册表 ✗（⚠ 我上一轮的推测又偏了 ✓ ⇒ ⭐ **本段第七次自我纠正** ✓）；
+>     **(ii)** ⭐ 它把**所有问题一次性列出** ✓ ⇒ 下次触发它时，**报错文本本身就是完整名单** ✓（⚠ 比读 XML 更直接 ✓）。
+> * ⭐ **下一轮第一步（1 次调用）** ✗：读 **`:27`–`:39`** ✓ ⇒ 看它对"每个事件下的规则"要求什么 ✓
+>   （⚠ 候选：**必须有触发者** ✓／**必须能被某条判据选中** ✗／**必须有 `target`／`when` 的合法形状** ✓）
+>   ⇒ ⭐ 拿到谓词后，**阿哈时刻那四条要按它改** ✓（⭐ 并且**先写判据、再加规则** ✓）。
+> * ⭐ **纪律（收束）** ✗：**这两个"守卫"的名字都曾被我误读** ✓（`CharacterConditionLiterals` ✗、`…IsSelected` ✗）
+>   ⇒ ⭐ **结论不变**：**名字只是线索，读到断言/谓词才算知道** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、**已推送且同步** ✓（⚠ 十轮积压已清 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十三：✅✅ **谓词读到了** —— 它把每个角色 × 每个事件的 `table.rulesFor(event)` 包在 `try/catch` 里收集 `RuntimeException` ⇒ ⭐ **所以那 1 红是**装载期抛的异常**，而**异常文本就是原因****；⚠ 而我又一次没能从控制台抓到那句话）**：
+>
+> * ✅ **实测（读 `:23`–`:40` ✓）** ✓，原文骨架：
+>   ```java
+>   for (int id : CHARACTERS) {
+>       var table = CharacterFactory.create(id, LEVEL).getTriggerTable();
+>       for (TriggerEvent event : TriggerEvent.values()) {
+>           try { selected += table.rulesFor(event).size(); }
+>           catch (RuntimeException e) { problems.add("character " + id + " on " + event + ": " + e.getMessage()); }
+>       }
+>   }
+>   … throw new AssertionError("invalid character rules:\n" + String.join("\n", problems));
+>   ```
+>   ⇒ ⭐⭐ **所以它的红 = 我的某条规则在 `rulesFor(event)` 时**抛了异常**** ✓（⚠ 装载期校验 ✓，不是行为差异 ✗）
+>     ⇒ ⭐ **异常信息形如 `character 1513 on <EVENT>: <原因>`** ✓ ⇒ **那句话就是全部答案** ✓。
+> * ⚠ **而我这一轮又没抓到它** ✗：`Select-String` 的模式（`character 1513` 等 ✓）与控制台实际输出**不匹配** ✗
+>   ⇒ ⭐ **结论（第二次同形）** ✗：**不要 grep 控制台** ✓ —— ⭐ **正路是读结果 XML 的 `message` 属性** ✓
+>     （⚠ 我上一次只读了"文件名"（判据名 ✓）✗，没读 `message` ✗ ⇒ 这次要读 `message` ✓）。
+> * ⭐ **下一轮第一步（一次调用，务必读到那句话）** ✗：
+>   ① `python tools/ship_aha_moment.py` ✓；② 跑 **只这一个判据** ✓；
+>   ③ ⭐ **读 `build/test-results/test/TEST-com.laosun.aluminium.test.EveryCharacterAndRelicRuleIsSelectedTest.xml`**
+>      ⇒ 取 `<failure message="…">` ✓（⚠ 先 `Select-String -Pattern 'character 1513'` **在该 XML 上** ✓）⇒ 拿到原因 ✓；
+>   ④ 回滚 ✓ ⇒ ⭐ **然后按那句话改规则** ✓（⚠ 大概率就是 `self_resource:待演 <= 0` 这个条件写法 ✓，或 `APPLY_BUFF` 的字段 ✓）。
+> * ⭐ **纪律（第三次收紧）** ✗：**凡"要看失败原因"，一律读 `build/test-results/test/*.xml` 的 `failure` 节点（名单 ＋ `message`）** ✓
+>   ⇒ ⚠ 本段为此浪费了三轮 ✓（⚠ 前两次都只拿到部分信息 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十四：✅✅ **逐个报错往前推**：键名已修（`id` ✓，两次 dump 确认 ✓）；⛔ 下一个错是 **`state_ended` 那条条件**，而它给出的原文极有用）**：
+>
+> * ✅ **先修掉的一个** ✓：资源声明的键从 `"name"` 改成 **`"id"`** ✓（dump 确认两份声明现在都是 `['id','max','initial','scope','note']` ✓）
+>   ⇒ ⚠ 但仍 11 红 ✗（⭐ 因为**装载器一次只报第一个错** ✓ ⇒ 修一个、露一个 ✓）。
+> * ⛔ **下一个错的原文（读结果 XML 的 `message` ✓）** ✓：
+>   *`Condition 'state_ended 阿哈时刻' asks whether '' is in a named state, but the parties are actor, self, target (self = the character whose tab…`*
+>   ⇒ ⭐ 它把 `state_ended 阿哈时刻` 当成"**某个（空的）主体 是否处于某命名状态**"来解析 ✗
+>     ⇒ ⚠ 也就是说**主体名缺失** ✗ ⇒ ⭐ **写法应当是"主体 ＋ 关键词 ＋ 状态名"** ✗（⚠ 而不是我以为的关键词打头 ✗）。
+> * ✅ **而 `state_ended` 确实是关键词** ✓（读 `TriggerTable` ✓）：`:943` 有
+>   `Pattern.compile("(?<![\\w])state_ended(?![\\w])", CASE_INSENSITIVE)` ✓（`:1209` 用它匹配 ✓）
+>   ＋ `:3036` 有报错分支 *"Condition '…' names no state after \"state_ended\""* ✓
+>   ⇒ ⭐ **所以拼写对、位置错** ✓ —— ⭐ **下一轮第一步（一次调用）**：读 `:1209` 附近那段（`STATE_ENDED_KEYWORD` 的**使用处** ✓）
+>     ⇒ 看它把 `state_ended` **从哪一段文本里**取状态名 ✓ 与 **主体**怎么写 ✓ ⇒ 照抄 ✓。
+> * ⭐ **纪律（本段第十五条）** ✗：**装载器一次只报一个错** ✓ ⇒ 面对"全表被拒"时，**逐个修、每次读新 `message`** ✓
+>   （⚠ 我这一轮一次只推进一步，正是这个节奏 ✓ —— ⚠ 比一次猜五个键名快得多 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 1 个文档提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十五：✅ **`state_ended` 的写法查清了**（`TriggerTable:1209`–`:1214`）⇒ ⭐ 修法是把**主体名补上**；⚠ 而重跑后**报错又回到 `name` 键**（⚠ 怀疑我读的是**旧 XML** ⇒ 下一轮要先确认"文件 dump"与"报错"是**同一次**运行）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1200`–`:1215` ✓）** ✓ 原文：
+>   ```java
+>   Matcher stateEnded = STATE_ENDED_KEYWORD.matcher(text);
+>   if (stateEnded.find()) {
+>       String subject = normalize(text.substring(0, stateEnded.start()));   // ← 主体 = 关键词**之前**那段
+>       String state   = text.substring(stateEnded.end()).trim();            // ← 状态名 = 关键词**之后**
+>       return new StateEnded(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw, spec);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **正确写法 = `<主体> state_ended <状态名>`** ✓（例：**`self state_ended 阿哈时刻`** ✓）
+>     ⇒ ⛔ 我原来写的 `state_ended 阿哈时刻` **缺主体** ✗ ⇒ 主体为空 ⇒ 正是那句报错 ✓（⭐ 诊断与原文**完全对上** ✓）。
+>   ⇒ ✅ 已把脚本里的条件改成 **`"self state_ended " + MOMENT`** ✓。
+> * ⚠ **而重跑后仍是 11 红** ✗，且我从 XML 读到的 `message` **又是 `unknown key "name"`** ✗
+>   ⇒ ⚠ 两种可能：**(i)** 我读到的是**上一次运行**留下的 XML ✗（⚠ 这次我**先 dump 了文件**（两份都是 `id` ✓）却读到了旧报错 ✓ ⇒ **不自洽** ✗）；
+>     **(ii)** 或者**文件里还有一处** `name` 键 ✗（⚠ 但 dump 只列了 `resources` ✓ ⇒ 也许**别处**也有资源声明 ✗）。
+>   ⇒ ⭐ **下一轮第一步（把"同一次运行"钉死）** ✗：① `git checkout` ✓；② `python tools/ship_aha_moment.py` ✓；
+>     ③ **同一调用里**先 `dump 文件` ✓ 再 `跑全量` ✓ 再 `读 XML message` ✓（⚠ 三步同 shell ✓）⇒ 若 dump 全 `id` 而报错仍说 `name` ⇒
+>     ⭐ **说明 `name` 来自我没 dump 到的地方** ✓（⚠ 例如 `rules[].do[]` 里的**未知键** ✓ —— 报错文本说的是 *"in a resource declaration"* ✗，
+>       但 ⚠ 也许装载器把它归到那一类 ✓）。
+> * ⭐ **纪律（本段第十六条）** ✗：**"文件 dump" 与 "报错摘录" 必须来自同一次运行** ✓ —— ⚠ 否则会把**旧错误**当成**新证据** ✓（本轮疑似如此 ✓）。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 2 个提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十六：✅✅✅ **根因抓到了** —— `1513.json` **第 10 行** 就有 `"name": "待演"` ⇒ ⭐ 那是**很早一次未打补丁的运行**写进去的，而它**被提交进了 HEAD**（所以 `git checkout` 也带回来 ⇒ ⚠ 这才是"改了键还报旧错"的原因）**）**：
+>
+> * ✅ **实测（同一个调用里：应用 ⇒ `Select-String` 找 `"name"` ⇒ 回滚 ⇒ 复跑 ✓）** ✓：
+>   * `Select-String -Path src/main/resources/characters/1513.json -Pattern '"name"'` ⇒ ⭐ **只命中一行：`:10  "name": "待演",`** ✓
+>   * 回滚后全量 **rc 0** ✓、树干净 ✓（**2129** 例 ✓）。
+> * ⭐⭐⭐ **于是那句顽固的报错彻底解释了** ✓：`"name": "待演"` **就在文件里**（`:10` ✓）⇒ 装载器拒表 ✓ ⇒ 11 红 ✓
+>   ⇒ ⚠ 而我此前 `git checkout -- …1513.json` **并没有清掉它** ✗ ⇒ ⭐ **因为它已经在 HEAD 里** ✗
+>     （⚠ 我在某次 `git add -f src/main/resources/characters/1513.json` 时把"未修好"的那一版**提交**了 ✓ —— ⭐ **这是本段最值得记的一次操作失误** ✓）。
+> * ⭐ **下一轮第一步（一步就能绿）** ✗：**把 `1513.json` 第 10 行那份 `"name": "待演"` 资源声明删掉** ✓
+>   （⚠ 保留合法的那份 `id` 版 ✓；若两份内容重复 ⇒ **整块删掉旧的** ✓）⇒ 再 `python tools/ship_aha_moment.py` 重放 ✓
+>   ⇒ 跑全量 ⇒ ⭐ **要么全绿** ✓、**要么报下一个错**（⚠ 那就继续"一个错一步" ✓）。
+> * ⭐ **纪律（本段第十七条，最痛的一条）** ✗：**不要把"调试中途的坏文件"提交进树** ✓ ——
+>   ⚠ 本次因为提交了 `"name"` 版，导致**后面三轮的 `git checkout` 都在"恢复一个坏文件"** ✗
+>     ⇒ ⭐ **规矩**：调试期间的中间产物**要么不 `git add`，要么先修好** ✓；⭐ 而 `git checkout` 只能回到**已提交**的状态 ✓
+>       ⇒ **"回滚到干净" 不等于 "回滚到正确"** ✓。
+> * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 3 个提交待补推 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
