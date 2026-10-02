@@ -1521,6 +1521,15 @@ public final class TriggerInterpreter {
             pair.addAll(battle.summonsOf(chosen));
             return List.copyOf(pair);
         }
+        // ⭐ 「随机为 1 个…当前能量百分比小于 50% 的我方其他目标」 (light cone 21021): this selector may
+        // legitimately have NO candidate (the wearer is excluded, and everyone else may be full), and then the
+        // clause does nothing. ⚠ Same shape as lowest_hp_ally just above -- empty list, not an error.
+        // ⚠ Only THIS name is allowed to be empty: every other selector still goes through require(), so a
+        // misspelling keeps failing loudly.
+        if ("random_ally_below_half_energy".equals(selector)) {
+            CanHit one = randomAllyBelowHalfEnergy(ctx);
+            return one == null ? List.of() : List.of(one);
+        }
         return List.of(resolveTarget(effect, ctx));
     }
 
