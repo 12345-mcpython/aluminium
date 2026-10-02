@@ -54,6 +54,13 @@ public class SkillEffectSpec {
     private Integer turnsParam;
 
     /**
+     * The named state a {@code Buff} entry attaches, for the one non-damaging shape that carries a name instead of a
+     * number (2026-10-02; reader: 1412's 战技 marking an ally with 【军功】). {@code null} for every other effect.
+     */
+    @SerializedName("buff")
+    private String buff;
+
+    /**
      * The authoritative {@code ConfigAbility} formula this entry was cross-checked against.
      */
     @SerializedName("formula")
