@@ -16494,6 +16494,24 @@
 > * ⭐ **读者账** ✓：`1303`（2 处）＋ `1412`（1 处）⇒ 过门槛 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百四十：⚠ 那条 `Buff` 分支**不是一行字符串分支** —— 它要接的是 `StateBuff` ＋ 一次 attach，估工上调）**：
+>
+> * ⚠ **实测（读 `applyState`）** ✓：规则侧的 `APPLY_BUFF` 走到
+>   `applyState(Battle, EffectSpec, TriggerContext)` ✓，里面是
+>   **`new StateBuff(state, turns, permanent)`** ✓ ＋ `withLifetime(...)` ✓ ＋ `attachRolled(battle, target, buff, effect, ctx)` ✓
+>   —— ⚠ 而这些**都在 `TriggerInterpreter` 里是私有的** ✗（`attachRolled`／`resolveTargets`／`withLifetime` ✓），
+>   而 `SkillExecutor` 那边拿到的是 **`SkillEffectSpec`**（字段少 ✗：没有 `buff`／`turns` ✗）⇒
+>   ⭐ **这条分支要跨两个类** ✓：要么①**把 attach 抽成一个公开入口** ✓（例如 `Battle` 上的一个"按名附加状态 N 回合" ✓，
+>     让 `TriggerInterpreter` 与 `SkillExecutor` 都走它 ✓ —— 这是**更对**的做法 ✓，因为它把"附加状态"这件事收成一处 ✓）；
+>     要么②在 caster 里**重写那几行** ✗（`StateBuff` ＋ lifetime ＋ attach ✓，重复 ✓）。
+> * ⭐ **估工订正** ✓：这条切片是 **~10 步** ✓（不是我上一轮说的 8 ✗）：0 字段 ✓、1 抽取公开入口 ✓、2 caster 分支 ✓、
+>   3 数据条目 ✓、4 内容 ✓、5 判据 ✓、6 变异 ✓、7 全量 ✓、8 闸门 ✓、9 提交 ✓ —— ⚠ **并且步骤 1 是"重构"** ✓
+>   （会碰到 `TriggerInterpreter` 的私有链 ✓）⇒ **它有回归风险** ✓ ⇒ **必须跑全量** ✓（2100＋ 例 ✓）——
+>   ⭐ 这也解释了为什么它**不该在一个只剩几次调用的会话末尾强行开工** ✓。
+> * ⭐ **下一轮的第一步因此改成** ✓：**先做步骤 1（抽公开入口）并单独提交** ✓（不动任何内容 ✓、全量必须仍绿 ✓），
+>   之后步骤 2–4 是一小组 ✓、5–6 是判据与变异 ✓ —— **每一步都能单独验证并单独提交** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
