@@ -20757,6 +20757,27 @@
 >     ⇒ 那"递减 + 公告"就在**别的方法**里 ✓ ⇒ 找到它 ⇒ 判据改用它 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十四：✅✅✅ **`afterMove()` **确实**调了 tick**（`processBuffTick(false)` ✓）⇒ ⭐ 所以"路径错了"这条也**不成立** ✗ ⇒ 元凶缩到**两处**：`processBuffTick` 的 `early` 语义 ✗，或**名字真的不一致** ✗）**）**：
+>
+> * ✅ **实测（读 `BuffManager.afterMove` ✓，`:454` ✓）** ✓ 原文：
+>   ```java
+>   public void afterMove() {
+>       // ★ The carrier's OWN turn just ended (2026-09-30): values scoped to 「同一回合内」… duration tick,
+>       // which is the same "this unit's turn is over" moment -- one place, not two.
+>       removeWithLifetime(AbstractBuff.Lifetime.TURN_END);
+>       processBuffTick(false);            // ★ 就是这里（公告在它内部）
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以判据的推进方式没错** ✓（⚠ 本段第十四次自我纠正**又被推翻**了一次 —— ⭐ **这就是"每个结论都要实测"的代价与价值** ✓）。
+> * ⭐ **于是只剩两处** ✓：
+>   **(甲)** ⭐ **`processBuffTick(false)` 里的 `false`** ✗ —— ⚠ 本段在 `tickForeign(clockOwner, early)` 上见过"`early` = 回合前／后" ✓
+>     ⇒ ⭐ 若 `processBuffTick` 同理，**`false` = 回合后** ✓ 而那正是**公告所在** ✓（⚠ 但仍没触发 ⇒ 看它的实现 ✓）；
+>   **(乙)** ⭐⭐ **名字真的不一致** ✗ —— ⚠ 本段那次 dump 的**编码是乱的** ✗（显示成 `'��Ϣ'` ✗）⇒ ⭐ **不能据此断定文件里就是"生息"** ✗
+>     ⇒ ⭐ **下一轮第一步（一次调用即可，最便宜）**：**读 `1211.json` 里那条 `APPLY_BUFF` 的 `buff` 值的确切字节** ✓
+>       （⚠ 用 `Select-String -Pattern 'APPLY_BUFF' -Context 0,2` ✓ 或 python 打印 `[hex]` ✓）⇒ 与 `生息` 对比 ✓
+>       ⇒ ⭐ 若不同 ⇒ **根因到手** ✓（改内容即可 ✓）；若相同 ⇒ 去读 `processBuffTick` ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24580,6 +24601,27 @@
 >     ⇒ 那"递减 + 公告"就在**别的方法**里 ✓ ⇒ 找到它 ⇒ 判据改用它 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十四：✅✅✅ **`afterMove()` **确实**调了 tick**（`processBuffTick(false)` ✓）⇒ ⭐ 所以"路径错了"这条也**不成立** ✗ ⇒ 元凶缩到**两处**：`processBuffTick` 的 `early` 语义 ✗，或**名字真的不一致** ✗）**）**：
+>
+> * ✅ **实测（读 `BuffManager.afterMove` ✓，`:454` ✓）** ✓ 原文：
+>   ```java
+>   public void afterMove() {
+>       // ★ The carrier's OWN turn just ended (2026-09-30): values scoped to 「同一回合内」… duration tick,
+>       // which is the same "this unit's turn is over" moment -- one place, not two.
+>       removeWithLifetime(AbstractBuff.Lifetime.TURN_END);
+>       processBuffTick(false);            // ★ 就是这里（公告在它内部）
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以判据的推进方式没错** ✓（⚠ 本段第十四次自我纠正**又被推翻**了一次 —— ⭐ **这就是"每个结论都要实测"的代价与价值** ✓）。
+> * ⭐ **于是只剩两处** ✓：
+>   **(甲)** ⭐ **`processBuffTick(false)` 里的 `false`** ✗ —— ⚠ 本段在 `tickForeign(clockOwner, early)` 上见过"`early` = 回合前／后" ✓
+>     ⇒ ⭐ 若 `processBuffTick` 同理，**`false` = 回合后** ✓ 而那正是**公告所在** ✓（⚠ 但仍没触发 ⇒ 看它的实现 ✓）；
+>   **(乙)** ⭐⭐ **名字真的不一致** ✗ —— ⚠ 本段那次 dump 的**编码是乱的** ✗（显示成 `'��Ϣ'` ✗）⇒ ⭐ **不能据此断定文件里就是"生息"** ✗
+>     ⇒ ⭐ **下一轮第一步（一次调用即可，最便宜）**：**读 `1211.json` 里那条 `APPLY_BUFF` 的 `buff` 值的确切字节** ✓
+>       （⚠ 用 `Select-String -Pattern 'APPLY_BUFF' -Context 0,2` ✓ 或 python 打印 `[hex]` ✓）⇒ 与 `生息` 对比 ✓
+>       ⇒ ⭐ 若不同 ⇒ **根因到手** ✓（改内容即可 ✓）；若相同 ⇒ 去读 `processBuffTick` ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
