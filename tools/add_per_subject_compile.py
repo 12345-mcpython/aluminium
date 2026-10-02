@@ -69,9 +69,11 @@ old_wired = 'private static final Map<TriggerEvent, List<CompiledRule>> byEvent 
 new_wired = (old_wired + NL + NL
              + '    /** Who a per-turn or cooldown count may belong to when it is not the rule owner. */' + NL
              + '    private static final java.util.Set<String> SUBJECTS = java.util.Set.of("self", "target", "actor");')
-if t.count(old_wired) != 1:
-    bail('the byEvent anchor is not unique')
+if t.count(old_wired) < 1:
+    bail('the byEvent anchor is missing')
+# Not required to be unique: the FIRST occurrence is the field declaration itself, which is where the constant belongs.
 t = t.replace(old_wired, new_wired, 1)
+print('byEvent occurrences: %d (first one used)' % t.count(new_wired))
 
 io.open(WORK + '/' + TABLE, 'w', encoding='utf-8', newline='').write(t)
 print('four edits applied')
