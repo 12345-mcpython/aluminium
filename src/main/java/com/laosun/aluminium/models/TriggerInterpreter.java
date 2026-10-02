@@ -2296,9 +2296,13 @@ public final class TriggerInterpreter {
         // 「受到的**击破伤害**提高」: an optional damage-type scope, spelled with the enum's own names (2026-09-28).
         com.laosun.aluminium.enums.DamageType scope = parseDamageType(effect, "MODIFY_DAMAGE_TAKEN", null);
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            AbstractBuff zone = withSource(withLifetime(percent > 0
+            AbstractBuff zone = withSource(withTickOwner(withLifetime(percent > 0
                     ? new VulnerabilityBuff(turns, percent, permanent, scope)
-                    : new ReductionBuff(turns, -percent, permanent, scope), effect), ctx);
+                    : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
+            // ⚠ `withTickOwner` joined this chain on 2026-09-30. It was missing, so `ticks_on` was a SILENT no-op on
+            // this op: 1218's zone carried `ticks_on: "self"` and its clock still belonged to the carrier, which meant
+            // 「椒丘陷入无法战斗状态时结界解除」 could never fire -- measured at exactly 1.40x before and after she fell
+            // (AnchorDeathTest). The other four buff-creating ops had it; this one did not.
             // A NAMED modifier is what REMOVE_STATE can take off (the same field MODIFY_ATTR has used since 2026-09-28;
             // BuffManager.removeState's last loop walks every buff that carries a name). Without it a zone-scoped
             // 「受到的伤害降低」 could only be spelled `permanent`, i.e. it would stay on for the rest of the battle --
