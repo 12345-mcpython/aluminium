@@ -46,6 +46,38 @@ public class OriginalDamageRiderTest {
                 "and 姬子's 星魂 6 share (40%) lands as 40%, not as 40% x the zone factor");
     }
 
+    /**
+     * ⭐ 姬子's shipped 星魂 6, through her own file.
+     *
+     * <p>⚠ <b>The baseline is NOT "her total damage at E0".</b> In the same battle another of her file's rules lands a
+     * 10764.438828 instance, so the E0 total (11482.69) is mostly damage this clause must <b>not</b> scale: 「原伤害」 is
+     * the damage of <b>that cast</b> -- the ultimate's own 718.255731 -- and the two guards ({@code damage_is_attack}
+     * and {@code from_skill ULTRA}) are what keep the clause off everything else. Reading the comparison the other way
+     * round cost two rounds: the expectation was 0.8 x the total instead of 0.8 x what the ultimate itself settled.
+     */
+    @Test
+    public void hisEidolonSixShips() {
+        double e6 = ultimateLoss(6);
+        double e0 = ultimateLoss(0);
+        double ultimateOwnInstance = 718.255731;      // measured: her ultimate's own settled damage in this fixture
+
+        Assertions.assertEquals(2 * 0.4 * ultimateOwnInstance, e6 - e0, 1e-6,
+                "「额外造成2次伤害…等同于原伤害40%」 = 2 x 40% x the ULTIMATE's own instance, and NOT of the "
+                        + "10764.438828 another rule contributes in the same battle: " + e0 + " -> " + e6);
+    }
+
+    /** Her ultimate alone, at the given eidolon rank (her own table, so the level convention is in force). */
+    private static double ultimateLoss(int eidolon) {
+        Character her = CharacterFactory.create(HIMEKO, LEVEL, false, null, null, eidolon);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(her), List.of(enemy), new Random(0));
+        battle.startBattle();
+        double before = enemy.getCurrentHp();
+        her.getSkills().get(SkillType.ULTRA).execute(battle, her, List.of(enemy));
+        battle.processRequests();
+        return before - enemy.getCurrentHp();
+    }
+
     // ==================================================================
     // Fixture
     // ==================================================================
