@@ -422,6 +422,13 @@ public final class TriggerInterpreter {
                     // `target_max_hp`, added 2026-09-29 for 「造成等同于X%生命上限的伤害」 -- 16 documents). `requireDerivedScale` stays strict because
                     // MODIFY_ATTR shares it and a modifier must not name a Max HP.
                     String literalScale = effect.getScale() == null ? "" : effect.getScale().trim();
+                    // ⭐ A share of the SETTLED instance joins this branch (2026-10-02): it states a `percent` and no
+                    // attribute, exactly like a Max HP share, and it needs `element` for the same reason (no skill row
+                    // lends one). ⚠ It is NOT a `requireDerivedScale` name -- that reader resolves an ATTRIBUTE, and
+                    // 「原伤害」 is not one -- and it must hang on the ONE event whose `amount` is a settled damage.
+                    // ⚠ `original_damage` was validated here for one round and is out again (2026-10-02): the number
+                    // it reads is right (DAMAGE_SETTLED carries the settled value) but a DAMAGE rider does not settle
+                    // to it -- see the note in `literalBase`.
                     boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
                     if (maxHpShare) {
                         requirePercent(effect, op, spec);
@@ -3911,7 +3918,7 @@ public final class TriggerInterpreter {
      * on the base) and the WRONG one for damage. Measured: a row-based instance at her Lv10 COMMON row dealt 674.365 while a literal 0.8 dealt 385.35 = 0.8 x
      * 481.7 — the base ATK rather than the settled one. A damage instance uses the settled value, so this path reads it directly.
      */
-    private static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect) {
+    private static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect, TriggerContext ctx) {
         String scale = effect.getScale() == null ? "" : effect.getScale().trim();
         double share = effect.getPercent() == null ? 0.0 : effect.getPercent();
         double flat = effect.getAmount() == null ? 0.0 : effect.getAmount();
@@ -3922,6 +3929,12 @@ public final class TriggerInterpreter {
         // faithful and linear (a 50% rider gave exactly half of a 100% one) -- only the source number is too early.
         // ⇒ It needs a POST-settlement carrier for the value; the reader table and the exact numbers are in GAPS
         // (entry "aggro 回收之八百"). Do not re-add it here without reading that entry first.
+        // ⚠⚠ ROLLED BACK 2026-10-02 (same round it was added): `scale: "original_damage"` = `ctx.amount()` reads the
+        // RIGHT number on `DAMAGE_SETTLED` (it is the settled value -- a 50% rider gave exactly half of a 100% one),
+        // but the rider's own settlement is NOT the same number: measured, a 100% rider on one 姬子 COMMON attack
+        // settled 151.681338 where the instance it copied had settled 260.237583796 (= 0.583x), i.e. the extra
+        // instance re-applies a zone the original already carried. Until that is understood, a rule built on this
+        // scale deals a wrong number with no symptom, so it is out. See GAPS "aggro 回收之八百零三".
         // ? A Max HP share (2026-09-29): 「造成等同于X%生命上限的伤害」 -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
         // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
         switch (scale) {
@@ -3977,7 +3990,7 @@ public final class TriggerInterpreter {
                             + "to lend)");
         }
           double base = skill == null
-                  ? literalBase(attacker, victim, effect)   // ? a literal ratio, off the SETTLED attribute or a Max HP (2026-09-29)
+                  ? literalBase(attacker, victim, effect, ctx)   // ? a literal ratio: off the SETTLED attribute, a Max HP share, or the triggering instance's settled value
                   : attacker.getAttribute(AttributeType.ATTACK).get() * multiplierOf(skill, effect, attacker);
           // \u2705 The instance\u2019s type is the rule\u2019s own when it states one (2026-09-30; reader: 1505\u2019s \u6b22\u6109 riders). And because
           // `DamageType.ELATION` is deliberately not boostable, its own boost is folded into the BASE here, exactly as the cast
