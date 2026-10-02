@@ -72,10 +72,20 @@ public record MemospriteSpec(@SerializedName("name") String name,
      *                  files spell it (e.g. {@code HEALTH}, {@code SPEED})
      * @param percent   the share of the summoner's own value ({@code 0.35} = 35%), or {@code null} for none
      * @param flat      a flat addition after the share, or {@code null} for none
+     * @param source    {@code "resource:<name>"} to derive from a battle-level RESOURCE instead of an attribute, or
+     *                  {@code null} for the attribute behaviour every shipped panel uses (2026-10-02)
      */
     public record Panel(@SerializedName("attribute") String attribute,
                         @SerializedName("percent") Double percent,
-                        @SerializedName("flat") Double flat) {
+                        @SerializedName("flat") Double flat,
+                        @SerializedName("source") String source) {
+
+        /**
+         * The attribute-derived panel, which is every panel shipped before 2026-10-02: no {@code source}.
+         */
+        public Panel(String attribute, Double percent, Double flat) {
+            this(attribute, percent, flat, null);
+        }
     }
 
     /**
