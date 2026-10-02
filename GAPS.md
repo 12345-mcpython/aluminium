@@ -20495,6 +20495,520 @@
 > * ⭐ **拿到后**：判据里调它 ✓ ⇒ 到期 ⇒ 公告 ⇒ 奖励 ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓
 >   （⚠ 内容已经准备好，随时可重放 `tools/ship_aha_final.py` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十：🎉🎉🎉 **`STATE_ENDED` 的**第一个真读者**出货并验完**（`928f717b` ✓）：阿哈时刻以"1 回合限时状态"落地 ⇒ **到期时引擎自己发 `STATE_ENDED("阿哈时刻")`** ⇒ 读者接住并发【好活当赏】）**）**：
+>
+> * ✅✅✅ **进树** ✓（`928f717b` ✓，**已推送** ✓）：`1513.json` **两条规则** ✓：
+>   * `elation_moment_start` ✓：`on: CAST_SETUP` ＋ `when: ["from_category ElationDamage"]` ⇒
+>     **`APPLY_BUFF{阿哈时刻, turns: 1}`** ✓（⭐ **限时** ⇒ 到期才有公告 ✓）；
+>   * `elation_moment_reward` ✓：`on: STATE_ENDED` ＋ `when: ["self state_ended 阿哈时刻"]` ⇒ **`APPLY_BUFF{好活当赏, turns: 2}`** ✓
+>     （⭐ 文档原话：「阿哈时刻结束时，使参演的角色获得本次计入笑点的【好活当赏】状态，持续2回合」✓）。
+> * ✅ **判据（文件驱动 ✓）** `AhaMomentTest` ✓：**驱动一次真欢愉技**（`owner.getSkills().get(SkillType.ELATION_SKILL)` ✓ ＋
+>   `SkillExecutor.execute(...)` ✓ —— ⭐ 这才让 `from_category` 成立 ✓）⇒ 断言 **状态在** ✓ ⇒
+>   ⭐ **`owner.getBuffManager().afterMove()`** ✓（⭐ **这就是 `Battle` 在回合结束时对行动者调的那一行** ✓ —— 本段从
+>     `:1204`–`:1209` 读到：`actor.afterMove(this); actor.getBuffManager().afterMove(); tickForeignBuffs(actor, false);` ✓）
+>   ⇒ 断言 **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ **全绿** ✓。
+> * ✅✅ **实测变异（1 红 ✓，跑全量 ✓）** ✓：把 `turns` 从 **1 改回 2** ✓ ⇒ 全量 **2130 例 1 failed** ✓，判据报
+>   *"one turn later the moment has expired ==> expected: <false> but was: <true>"* ✓ ⇒ ⭐ **承重** ✓（回滚后全量 **0** ✓、闸门 [0, 0] ✓）。
+> * ⭐⭐⭐ **这一步的分量（目标 ① 的转折点）** ✓：`STATE_ENDED` 此前**四个读者都因"没有创建者"而登记** ✓ ⇒
+>   现在有了**第一个真读者** ✓，而且**形状完全可复用** ✗：
+>   **「挂一个限时状态 ⇒ 让它自然到期 ⇒ 引擎公告 `STATE_ENDED(<名>)` ⇒ 读者用 `self state_ended <名>` 接住」** ✓
+>   ⇒ ⭐ **目标 ① 的其余四个读者**（`1211`【生息】结束 ✓／`1408` 变身结束 ×3 ✓／那张光锥「奇袭结束后」✓）
+>     **都能照抄这个形状** ✓✓。
+> * ⭐ **本段为该能力走过的关键事实（都可复用）** ✓：① `STATE_ENDED` **只在 `duration() <= 0` 的 tick 里公告** ✓
+>   （**显式 `REMOVE_STATE` 不公告** ✗）；② 条件写法是 **`<主体> state_ended <状态名>`** ✓（⚠ 缺主体会被解析成 `is_state` ✗）；
+>   ③ 条件是**数值变量**时写法是 **`self_resource:<名>`** ✓（⚠ 变量位置**不要**主体 ✗）；④ `SkillExecutor.execute` 是驱动
+>   "带类别的事件"的正路 ✓；⑤ 推进自己的计时用 **`BuffManager.afterMove()`** ✓（⚠ `tickForeign` 对自己 `return` ✗）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零六十一：✅✅ **第二个读者也拿到确切原句了**（`1211_白露` 的「【生息】结束时…恢复 **8** 点能量」✓），而且它与刚出货的模板**逐字对齐**）**：
+>
+> * ✅ **实测（读 `1211_白露.html` ✓）** ✓，两处关键原文：
+>   * **`:73`**（战技 ✓）：「立即为我方全体回复等同于白露 **13.50%** 生命上限+**360** 的生命值。对于**没有**【生息】的我方目标，白露使其**附上**【生息】，
+>     对于已拥有【生息】的我方目标，白露使其已有的【生息】持续时间**延长1回合**。【生息】可持续 **2** 回合…」✓
+>   * ⭐⭐ **`:100`**（行迹／星魂那一段 ✓）：「**【生息】结束时若我方目标当前生命值等于其生命上限，则额外恢复目标 8 点能量。**」✓
+>   ⇒ ⭐⭐ **这正是目标 ① 里的"`1211`【生息】结束回能 8"** ✓ ⇒ 而且它的形状是：
+>     **`on: STATE_ENDED` ＋ `when: ["<主体> state_ended 生息", "target_hp_percent == 1"]` ⇒ `GAIN_ENERGY 8`** ✓
+>     （⚠ 能量那个 op 的真名待查 ✓ —— 本段见过 `GAIN_RESOURCE`／`SPEND_RESOURCE` ✓ ⇒ 能量可能是**另一种资源** ✓ 或另有 op ✓）。
+> * ⭐ **与刚出货的模板逐字对齐** ✓：`STATE_ENDED` 的用法（#1 主体 ＋ #2 状态名 ✓）、"到期才公告"的机制 ✓、
+>   以及"**状态由谁挂**"这一半（她的**战技**「附上【生息】」✓ ⇒ 挂状态那条要写在她文件里 ✓，⚠ 本段**尚未**看她的文件是否有它 ✗）。
+> * ⭐ **下一轮第一步（三步，同模板）** ✗：
+>   ① 读 **`1211.json` 现有的 `生息` 相关规则** ✓（⚠ 先 dump ✓ —— 本段纪律：**加同族内容前先看该文件已有那一份** ✓）；
+>   ② 若【生息】**还没建模** ⇒ 补一条 **`SKILL_CAST` ⇒ `APPLY_BUFF{生息, turns: 2}`** ✓（⭐ 文档说"持续 2 回合" ✓）；
+>   ③ 补读者 **`on: STATE_ENDED` ＋ `when: ["self state_ended 生息", "target_hp_percent == 1"]` ⇒ 回能 8** ✓
+>     ＋ 判据（文件驱动 ＋ 施放战技 ⇒ 过两回合（`afterMove()` 两次 ✓）⇒ 断言**能量 +8** ✓）＋ 变异（`turns: 2 → 3` ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十二：✅✅ **`1211` 的【生息】早已建模**（`APPLY_BUFF` ＋ **`EXTEND_BUFF`** ✓）⇒ ⭐ 第二个读者只差"`STATE_ENDED` 那一条"）**）**：
+>
+> * ✅ **实测（dump `1211.json` ✓）** ✓：全文件**只有 2 条规则** ✓：
+>   * ⭐ **`ult_rebirth`**（`ULT_CAST` ＋ `when: ["actor == self"]` ✓）⇒ 三个 `do` ✓：
+>     `MODIFY_DAMAGE_TAKEN`（目标 = **生息** ✓）／**`APPLY_BUFF`（生息 ✓）**／**`EXTEND_BUFF`（生息 ✓）** ✓
+>     ⇒ ⭐⭐ **所以"【生息】"早就作为一个状态被挂上 ✓，"延长回合"也已有专门 op（`EXTEND_BUFF` ✓）** ✓；
+>   * `BATTLE_START` ⇒ `RAISE_SKILL_LEVEL` ×4 ✓（她的等级约定 ✓）；
+>   ⇒ ⭐ **本文件没有 `resources`** ✓（因此"回能 8"要用**能量自己的通道** ✗ —— ⚠ 而不是自造资源 ✓）。
+> * ⭐⭐ **于是第二个读者的**全部工作**就剩一条规则** ✓：
+>   **`on: STATE_ENDED` ＋ `when: ["self state_ended 生息", "target_hp_percent == 1"]` ⇒ 恢复目标 8 点能量** ✓
+>   ＋ 判据（⭐ 但要注意：她文件里**没有**"挂【生息】"的战技那条 ✗ —— ⚠ 现有的挂法在**终结技**上 ✓
+>     ⇒ ⭐ 判据可以直接**施放终结技** ✓ 再**过两个回合**（`afterMove()` ×2 ✓，文档说"持续 2 回合" ✓）
+>     ⇒ 断言**能量 +8** ✓）＋ 变异（把 `turns` 相关处改掉 ⇒ 必红 ✓）。
+> * ⚠ **唯一的名字待查** ✓：**"恢复 8 点能量"用哪个 op** ✗（⚠ 候选 `GAIN_ENERGY` ✗／对**能量**这一特殊资源用 `GAIN_RESOURCE` ✗
+>   ⇒ ⭐ 下一轮第一步：**搜 op 表里与 `ENERGY` 有关的写法** ✓ —— 一次调用 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十三：✅ **`1211` 的读者已经把"状态生命周期"整条跑通**（挂 ⇒ 两个回合 ⇒ 摘 ✓）；⚠ 只剩"那 8 点能量没到手"）**）**：
+>
+> * ✅ **实测（判据：施放终结技 ⇒ 过两回合 ⇒ 断言 ✓）** ✓：
+>   * ⭐ **`assertTrue(hasState(生息))` 通过** ✓（*"her ultra applies the state"* ✓）；
+>   * ⭐ **`assertFalse(hasState(生息))` 通过** ✓（*"two turns run it out"* ✓ ⇒ ⭐ **两回合到期成立** ✓）；
+>   * ⛔ `assertEquals(8.0, ΔEnergy)` **失败** ✗（*"the reader hands back the document's 8 energy (**0.0 -> 0.0**)"* ✓）
+>     ⇒ ⭐ **能量一点没加** ✗。
+> * ⭐ **三个候选（下一轮一次判掉）** ✓：
+>   **(甲)** ⭐ **读者规则的 `when` 里那条 `target_hp_percent >= 1`** ✗ —— ⚠ 在 `STATE_ENDED` 这个事件上，`target` 可能是**空**或**不是她** ✗
+>     （⚠ 文档说"若**我方目标**当前生命值等于其生命上限" ✓ ⇒ ⭐ 主体也许应是 **`self_hp_percent >= 1`** 或 **`actor…`** ✗ —— ⚠ 本段见过 `hp_percent <= 0.5` ✓ 与 `target_hp_percent` ✓ 两种 ✓ ⇒ **要看哪个在 `STATE_ENDED` 上有值** ✓）；
+>   **(乙)** ⭐ **`GAIN_ENERGY` 的 `target`** ✗ —— 我写 `"target": "target"` ✓ ⇒ ⚠ 若该事件的 `target` 不是她 ⇒ 能量加到了别人身上 ✗（⚠ 但本判据只看她 ⇒ 会表现为 0 ✓）；
+>   **(丙)** `owner.setCurrentEnergy(0)` ✓ 我为了读数归零 ✓ ⇒ ⚠ 若能量有**最低/基础回能**机制 ✗ ⇒ 读数会被别的来源影响 ✗（⚠ 但 0→0 说明**没有任何来源**加 ✓）。
+>   ⇒ ⭐ **下一轮第一步**：**先判 (甲)** ✓ —— 把条件里的 `target_hp_percent` 换成 **`self_hp_percent`**（或去掉条件先看能量是否到手 ✓）
+>     ⇒ ⭐ **一次就能分辨"条件挡了"还是"目标错了"** ✓。
+> * ⭐ **注意**：⚠ **内容与判据都已回滚** ✓（按纪律"没验成的不进树" ✓）⇒ 全量 **0**（**2130** 例 ✓）、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零六十四：✅ **候选 (甲) 被排除**（去掉血线条件后**读数仍是 0→0** ✗）⇒ ⭐ 元凶缩到"**规则没触发**"或"**能量加给了别人**"）**）**：
+>
+> * ✅ **实测（把 `when` 只留 `self state_ended 生息` ✓，去掉 `target_hp_percent >= 1` ✓，重跑 ✓）** ✓：
+>   读数**仍**是 **0.0 → 0.0** ✗ ⇒ ⭐ **所以"血线条件挡了"不是原因** ✗（⚠ 本段第 **九** 次用实测否掉自己的推测 ✓）。
+> * ⭐ **剩下的两个候选（下一次一次判掉）** ✓：
+>   **(乙)** ⭐ **`GAIN_ENERGY` 的 `"target": "target"`** ✗ —— ⚠ 在 `STATE_ENDED` 事件上，`target` 可能**不是她** ✗（或为空 ✗）
+>     ⇒ ⭐ **改法：把 `target` 写成 `"self"`** ✓（⚠ 一次改 ＋ 一次跑就能分辨 ✓）；
+>   **(丙)** ⭐ **读者规则根本没触发** ✗ —— ⚠ 最可能的原因是 **`self state_ended 生息` 里的状态名与"挂的那个"不完全一致** ✗
+>     （⚠ 她文件里挂的是 `APPLY_BUFF` ＋ `"buff": "生息"` ✓ ⇒ ⚠ 而**公告时带的是 `ended.getState()`** ✗ —— ⭐
+>       **`getState()` 与 `getBuffName()` 可能是两个东西** ✗✗ ⇒ ⭐ 若 `APPLY_BUFF` 只设了 `buffName` 而**没设 `state`**
+>         ⇒ 公告里的名字**为空**（⚠ 本段见过 `:335` 的 `stateName.equals(state.getState())` ✓ ⇒ `getState()` 确实存在 ✓）
+>         ⇒ ⭐ **那么"挂状态"要用能设 `state` 的写法** ✗ —— ⚠ 而本段在 `modifyAttr` 里见过只设 `buffName` 的 ✓
+>           ⇒ ⭐ **下一轮第一步（最关键的一读）**：读 **`APPLY_BUFF` → `applyState` 的实现** ✓（⚠ 看它有没有设 `state` ✓
+>             —— 若无 ⇒ ⭐ **那正是"公告名字为空"的根因** ✗ ⇒ ⭐ 而且它会**同时**解释 `1513` 为什么能成功 ✗
+>               （⚠ 可能 `1513` 的公告名恰好来自别处 ✓ ⇒ 要对照 ✓））。
+> * ⭐ **注意**：⚠ 内容与判据**已回滚** ✓ ⇒ 全量 **0**（**2130** 例 ✓）、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零六十五：✅✅✅ **`APPLY_BUFF` 确实设了状态名**（读 `applyState` ✓）⇒ ⭐ 于是"公告名"这条排除 ⇒ 元凶就是 **(乙)：`GAIN_ENERGY` 的 `target`**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.applyState` ✓，`:2423` ✓）** ✓ 原文：
+>   ```java
+>   private static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
+>       boolean permanent = unticked(effect);
+>       int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+>       String state = effect.getBuff().trim();                       // ★ 状态名 = `buff` 字段
+>       for (CanHit target : resolveTargets(battle, effect, ctx)) {
+>           AbstractBuff buff = … new StateBuff(state, turns, permanent) …;
+>           …
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以 `APPLY_BUFF` ＋ `"buff": "生息"` 建的**就是 `StateBuff("生息")`**** ✓ ⇒ ⭐ 到期时
+>     `buff instanceof StateBuff` **成立** ✓ ⇒ `battle.fireStateEnded(instance, "生息")` **会发** ✓
+>     ⇒ ⭐ **于是我的读者规则**应当**收到 `self state_ended 生息`** ✓（⚠ 与 `1513` 那条已验成功的形状一致 ✓）。
+> * ⭐⭐ **剩下唯一的候选就是 (乙)** ✓：**`"target": "target"` 指错了单位** ✗ —— ⚠ 在 `STATE_ENDED` 的上下文里，`target`
+>   很可能**不是她**（或为空 ✗）⇒ ⭐ **修法：写成 `"target": "self"`** ✓（⚠ 因为文档说"恢复**目标**8 点能量" ✓，
+>     而"目标"在这里就是**被解除【生息】的那个人** ✓ ⇒ 用 `self` 时主体是**事件里的她** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：把读者规则的 `target` 改成 **`"self"`** ✓ ⇒ 重放 ⇒ 跑判据 ⇒
+>   ⭐ **绿 ⇒ 变异（把 `turns` 从 2 改 3 ⇒ 必红 ✓）⇒ 全量 ⇒ 出货** ✓（⭐ 这将是目标 ① 的**第二个真读者** ✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十六：⚠ **`target: self` 也没修好**（仍 0→0 ✗）⇒ ⭐ 而且我意识到**前两次实验互相污染**：去掉条件那次**目标还是错的**，改目标这次**条件还在** ⇒ 所以**两个变量从未被单独测过**）**）**：
+>
+> * ⚠ **实测（把 `target` 改成 `self` ✓，条件保留 ✓）** ✓：读数**仍** 0.0 → 0.0 ✗（*"the reader hands back the document's 8 energy (0.0 -> 0.0)"* ✓）。
+> * ⭐⭐ **方法论上的关键发现（本段第十次自我纠正）** ✗：我做了两次"单变量"实验 ✗，但**它们不是单变量** ✗ ——
+>   * 第一次：**去掉条件** ✓、**目标仍是 `target`** ✗；
+>   * 第二次：**改目标为 `self`** ✓、**条件仍在** ✗；
+>   ⇒ ⭐ **所以"条件挡了"与"目标错了"这两条假设，谁都没有被真正排除** ✗
+>     ⇒ ⭐ **纪律（补）** ✗：**每次只动一个变量，并且要写下"这一次动的是哪一个、其余保持不变"** ✓ ——
+>       ⚠ 我这两次都自认为在单变量，实际各动了一个、又各留了一个 ✗。
+> * ⭐ **下一轮第一步（正交实验，一次性做完 2×2）** ✗：四个组合各跑一次 ✓ ——
+>   **(1)** 无条件 ＋ `target: self` ✓；**(2)** 有条件 ＋ `target: self` ✓（本轮已做 ⇒ 0 ✗）；
+>   **(3)** 无条件 ＋ `target: target` ✓（已做 ⇒ 0 ✗）；**(4)** 有条件 ＋ `target: target` ✓（未做 ⇒ 预计 0 ✗）。
+>   ⇒ ⭐ 若 (1) 也 0 ⇒ ⭐ **说明"规则根本没触发"** ✗（⚠ 而不是条件/目标 ✗）⇒ 那就要回到
+>     **"`STATE_ENDED` 事件到底有没有发"** 这一问 ✗（⚠ 最直接的查法：**写一条什么都不判、只 `GAIN_ENERGY` 的读者规则** ✓
+>       ⇒ 若仍 0 ⇒ 事件没到 ✓；⚠ 或者**在我的判据里手动 `fireTriggers(TriggerEvent.STATE_ENDED, …)`** 看那次能不能加能量 ✓
+>         —— ⭐ 后者一次就能分辨"事件没到"与"规则写错" ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（两个积压提交上一轮补齐 ✓ 或本轮补 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十七：✅✅✅ **判别实验一锤定音** —— **手工 fire `STATE_ENDED` 也拿不到能量**（0→0 ✗）⇒ ⭐ 所以**问题在规则本身**，不在投递；⭐ 而最可能的元凶是条件里的 **`target_hp_percent`**）**）**：
+>
+> * ✅ **实测（在判据里**手工** `battle.fireTriggers(TriggerEvent.STATE_ENDED, owner, owner, 0, 0)` ✓）** ✓：
+>   报 *"the rule itself must grant energy when the event is fired by hand (**0.0 -> 0.0**)"* ✗
+>   ⇒ ⭐⭐ **一句话分辨了两件事** ✓：**(i)** 引擎**确实**把公告送到了（否则手工 fire 会成功 ✗）⇒ ⛔ 反过来说：
+>     ⭐ **我的读者规则自己不成立** ✗；**(ii)** 于是"条件挡了"与"`GAIN_ENERGY` 目标错了"之间，**条件更可疑** ✓。
+> * ⭐⭐ **为什么条件最可疑（很硬的理由）** ✓：**手工 fire 的事件没有"目标"** ✗ ⇒ 我的 `when` 里那条
+>   **`target_hp_percent >= 1`** 读到的是**空/未设** ✗ ⇒ 条件为假 ⇒ 规则不触发 ✓（⚠ 这也解释了为什么"去掉条件那次"
+>     —— 那次**目标仍错** ✗ —— 也没给能量 ✓ ⇒ ⭐ **两次都被同一个条件以外的东西掩盖了** ✓）。
+> * ⭐ **正解（下一轮一次改）** ✗：把条件换成**读她自己**的那个变量 ✓ —— ⭐ **本段有现成先例** ✓：
+>   `1002` 的 `trace_low_hp_aggro_down` 用的是 **`hp_percent <= 0.5`** ✓（⚠ 而 `1001` 用的是 `target_hp_percent >= 0.3` ✓
+>     ⇒ ⭐ **两个变量都存在** ✓，区别正是"读谁" ✓）⇒ ⭐ 文档说"**若我方目标**当前生命值等于其生命上限" ✓
+>       ⇒ ⚠ 在被解除【生息】的那个人身上读 ⇒ 若事件主体是她 ⇒ 用 **`hp_percent >= 1`** ✓；若主体是别人 ⇒ 用 `target_hp_percent` ✓
+>       ⇒ ⭐ **先试 `hp_percent >= 1`** ✓（一次改＋一次跑 ✓）。
+> * ⚠ **推送**：本地仍**领先 3** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十八：⚠ **`hp_percent` 也没修好** ⇒ ⭐ 而这恰恰暴露**我那个"判别实验"本身不成立**：手工 fire 的 `STATE_ENDED` **不带状态名** ✗ ⇒ 我的读者条件 `self state_ended 生息` **永远为假** ✗）**）**：
+>
+> * ⚠ **实测（条件改 `hp_percent >= 1` ✓ ＋ 目标 `self` ✓ ⇒ 仍 0→0 ✗）** ✓。
+> * ⭐⭐⭐ **关键领悟（本段第十一次自我纠正）** ✗：**"手工 fire `STATE_ENDED`"这个判别法先天无效** ✗ ——
+>   ⚠ 因为那个事件**要携带状态名**（本段早前读到 `TriggerTable:2022` 的注释：*"⚠ **The name has to ride here** because the
+>   state is already gone by the time …"* ✓）⇒ ⭐ **手工 fire 时"名字"为空** ✗ ⇒ 我的条件 `self state_ended 生息`
+>   **必然不成立** ✗ ⇒ ⭐ **所以那个 0 什么也没证明** ✗（⚠ 它只证明了"没有名字时不触发" ✓ —— 那是**正确行为** ✗）。
+>   ⇒ ⭐ **教训（纪律）** ✗：**判别实验必须"制造一个与真实路径同构的最小情形"** ✓ —— ⚠ 手工 fire **丢掉了关键上下文** ✗
+>     ⇒ ⭐ **正路只能是走真路径**（到期 ✓）＋ **把条件逐个换掉** ✓。
+> * ⭐ **于是回到正交实验（现在只剩两个变量、且都还没被干净地测过）** ✗：真路径（到期 ✓）＋
+>   **(1)** 无条件 ＋ `target: self` ✓；**(2)** 无条件 ＋ `target: target` ✓；**(3)** `hp_percent >= 1` ＋ `self` ✓（本轮 ⇒ 0 ✗）；
+>   **(4)** `hp_percent >= 1` ＋ `target` ✓。
+>   ⇒ ⭐ **先做 (1)** ✓（无条件 ⇒ 若仍 0 ⇒ ⭐ 那就说明**规则压根没在真路径上触发** ✗ ⇒ 回头查"公告名是不是 `生息`" ✓
+>     —— ⚠ 而她文件里是 `APPLY_BUFF` ＋ `"buff": "生息"` ✓ ⇒ 名字应当就是"生息" ✓ ⇒ ⭐ 那就要在判据里**打印**
+>       `getBuffManager()` 的状态名 / 或**用一个只判 `self state_ended 生息` 而什么都不做的规则**看它有没有被选中 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十九：✅✅ **正交实验第 (1) 组做完，结论很硬**：**无条件 ＋ `target: self` ＋ 真路径**仍是 **0→0** ⇒ ⭐ 所以**读者规则根本没触发**（不是条件、不是目标））**）**：
+>
+> * ✅ **实测（真路径到期 ✓ ＋ `when` 只留 `self state_ended 生息` ✓ ＋ `target: self` ✓）** ✓：**0.0 → 0.0** ✗。
+> * ⭐⭐ **两条已知事实夹出结论** ✓：
+>   **(i)** 本段早前的实验证明 **`afterMove()` ×2 之后 `hasState(生息)` 为假** ✓（*"two turns run it out"* **通过** ✓）
+>     ⇒ ⭐ **状态确实"到期"了** ✓ ⇒ 按 `BuffManager` 的分支（`duration() <= 0` ＋ `instanceof StateBuff` ✓）
+>       ⇒ **引擎应当发了公告** ✓；
+>   **(ii)** 而规则（条件只剩状态名 ✓）**没有触发** ✗
+>   ⇒ ⭐⭐ **于是"公告里的名字"与"我写的 `生息`"对不上** ✗（或者该事件的**接收条件写法**还有别的门槛 ✓）。
+> * ⭐ **下一轮第一步（把"公告名"直接看/打出来，1–2 次调用）** ✗：二选一 ✓：
+>   **(甲)** 在判据里**挂一个"只判 `self state_ended 生息`、动作是 `GAIN_ENERGY`"的规则**（手搭表 ✓）⇒ ⚠ 若它**也不触发** ⇒ 说明名字不对 ✓；
+>   **(乙)** ⭐ **读 `Battle.fireStateEnded` 的实现** ✓（⚠ 一次调用 ✓）⇒ 看它把名字放在**上下文的哪个槽**（⚠ 本段读到 `TriggerContext` 有 `stateName` ✓
+>     ⇒ ⭐ 而条件解析里 `state_ended` 取的正是那段文本 ✓ ⇒ **两处必须对齐** ✓）⇒ ⭐ 若发现"名字来自 `getState()` 而 `StateBuff` 的 `getState()`
+>       与构造时传的名字不同" ✗ ⇒ ⭐ **那就是根因** ✓（⚠ 且会解释 `1513` 为什么成功 ✗ —— ⚠ 因为它的状态名恰好等于 `getState()` ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十：✅✅✅ **`fireStateEnded` 读了** —— 名字放在**战斗级字段 `lastStateEndedName`** 里（`try/finally` 包裹）⇒ ⭐ 这也**正式证明我那个"手工 fire"判别法无效**（它绕过了这个 setter ✓））**）**：
+>
+> * ✅ **实测（读 `Battle.fireStateEnded` ✓，`:2211` ✓）** ✓ 原文：
+>   ```java
+>   public void fireStateEnded(CanHit carrier, String stateName) {
+>       String previous = lastStateEndedName;
+>       lastStateEndedName = stateName;                                   // ★ 名字进"战斗级字段"
+>       try {
+>           fireTriggers(TriggerEvent.STATE_ENDED, carrier, carrier, 0, 0);   // ★ actor = carrier，target = carrier
+>       } finally {
+>           lastStateEndedName = previous;
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** 名字**不在事件参数里**，而在 `lastStateEndedName` ✓ ⇒ ⭐ **所以"手工 `fireTriggers(STATE_ENDED, …)`"必然读不到名字** ✗
+>     ⇒ ⭐ **本段上一轮那个 0 完全不作数** ✓（⚠ 我当时的判断"判别法无效"**被证实** ✓ —— 本段第十二次自我纠正 ✓）；
+>   **(ii)** 事件的 **actor = target = carrier** ✓ ⇒ ⭐ 若状态挂在**她**身上 ⇒ `self`（规则持有者）与 `actor` **都是她** ✓ ⇒ 我的条件主体 `self` **应当匹配** ✓；
+>   **(iii)** ⭐ 名字由 `ended.getState()` 传入 ✓（`BuffManager:666` ✓）⇒ 而 `applyState` 用 `"buff"` 建 `StateBuff(state)` ✓ ⇒ ⭐ **两端都应当是 `生息`** ✓
+>     ⇒ ⚠ **那么剩下的唯一可能是条件解析那一侧** ✗（⚠ 即 `self state_ended 生息` 里 **`self` 这个主体词**是否被 `requireStateSubject` 认 ✓
+>       —— ⚠ 本段见过 `self has_state 秘技` ✓ 用的是 `has_state` ✗ ⇒ ⭐ **`state_ended` 的主体词表可能不同** ✗）。
+> * ⭐ **下一轮第一步（1 次调用，直击要害）** ✗：读 **`TriggerTable.requireStateSubject`** ✓（⚠ 它决定"哪些主体词合法" ✓）
+>   ⇒ 若它只认 **`target`／`actor`** 而**不认 `self`** ✗ ⇒ ⭐ **根因到手** ✓ ⇒ 把条件改成 **`actor state_ended 生息`** ✓（或 `target …` ✓）
+>     ⇒ 重跑 ⇒ 绿 ⇒ **变异（`turns: 2 → 3`）⇒ 全量 ⇒ 出货** ✓（⭐ 目标 ① 的第二个真读者 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十一：⭐ 找到了 `requireStateSubject` 的**两个调用点**（`state_ended` 与 `has_state` 共用它 ✓）⇒ ⭐ **所以 `self` 作为主体在 `has_state` 上是通的**（本段有 `self has_state 秘技` 的先例 ✓）⇒ ⚠ 那"`self state_ended …` 为何不触发"就**不是主体词的问题** ✗）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1206`–`:1230` ✓）** ✓：`state_ended` ✓ 与 `has_state` ✓ **共用同一个 `requireStateSubject(subject, raw, spec)`** ✓
+>   ⇒ ⭐ **因此"哪些主体词合法"对两者是一样的** ✓ ⇒ ⚠ 本段已有 **`self has_state 秘技`** 在树上且**有效** ✓（`1002` 的先例 ✓）
+>     ⇒ ⭐ **`self` 合法** ✓ ⇒ ⛔ **所以"主体词"这条也排除** ✗（⚠ 本段第十三次自我纠正 ✓）。
+> * ⭐⭐ **于是元凶只剩"名字本身"** ✗：`self state_ended 生息` 里的 **`生息`** 与公告时的 `ended.getState()` **不一致** ✗
+>   ⇒ ⚠ 而 `applyState` 是 `new StateBuff(effect.getBuff().trim(), …)` ✓ ⇒ ⭐ 除非 **`StateBuff` 的构造把名字加工过** ✗
+>     （⚠ 例如去掉了某些字符／或 `getState()` 返回**另一个字段** ✗）⇒ ⭐ **下一轮第一步（一次调用）**：读 **`StateBuff`** ✓
+>       （⚠ `models/buff/StateBuff.java` ✓ ⇒ 看它的构造与 `getState()` ✓ ⇒ ⭐ 见分晓 ✓）。
+> * ⭐ **另一条同样便宜的判法** ✓：把读者规则的 `on` 改成 **`STATE_ENDED` 且 `when` 为空** ✓（⚠ 无条件 ✓）⇒
+>   ⭐ 若**仍不加能量** ⇒ 说明**事件压根没到这条规则** ✗（⚠ 那就去查"她的表里这条规则是否被装载器收下" ✓）；
+>     若**加了** ⇒ ⭐ 说明**事件到了、是名字对不上** ✓ ⇒ 一次就能二选一 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十二：✅✅✅ **`requireStateSubject` 的定义读了** —— `state_ended` 与 `has_state` **共用同一套主体词**，且报错文案**自己解释了三个主体**（*"self = the character whose table fired, actor = who caused the event, target = what it happened to"*）⇒ ⭐ 所以 **`self` 合法** ⇒ "主体词"这条**彻底排除**）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1766` ✓）** ✓ 原文：
+>   ```java
+>   private static String requireStateSubject(String subject, String raw, TriggerSpec spec) {
+>       if (!STATE_SUBJECTS.contains(subject)) {
+>           throw new IllegalArgumentException(
+>               "Condition '" + raw + "' asks whether '" + subject + "' is in a named state, but the parties are "
+>               + String.join(", ", STATE_SUBJECTS.stream().sorted().toList())
+>               + " (self = the character whose table fired, actor = who caused the event, "
+>               + "target = what it happened to) (source: " + spec.getSource() + ")");
+>       }
+>       return subject;
+>   }
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** 两个条件（`state_ended` ✓／`has_state` ✓）**共用 `STATE_SUBJECTS`** ✓；
+>   **(ii)** `self` 的含义就是"**这个表的主人**" ✓ ⇒ ⭐ **`self state_ended 生息` 完全合法** ✓（⚠ 且 `self has_state 秘技` 已有生效先例 ✓）
+>     ⇒ ⛔ **"主体词"这条排除** ✓（本段第十三次自我纠正 ✓）。
+> * ⭐⭐ **于是只剩两条可能** ✓：**(甲)** **名字对不上** ✗（⚠ `生息` vs `ended.getState()` ✗）；**(乙)** **事件压根没到这条规则** ✗。
+> * ⭐ **下一轮第一步（一次就能二选一，最便宜）** ✗：**把读者规则的 `when` 清空** ✓（只留 `on: STATE_ENDED` ✓）
+>   ⇒ 重放 ＋ 跑判据 ✓：
+>   * ⭐ **仍不加能量** ⇒ **(乙)** ✓ ⇒ 去查"她表里这条规则**是否被装载器收下**／是否被某个 `when` 之外的机制跳过" ✓；
+>   * ⭐ **加了能量** ⇒ **(甲)** ✓ ⇒ 去读 **`StateBuff`**（⚠ `models/buff/StateBuff.java` ✓ ⇒ 看 `getState()` 返回什么 ✓
+>     —— ⚠ 也许构造时对名字做了**规范化**（trim／大小写／去掉空格 ✓）⇒ ⭐ 那就是根因 ✓，改名字即可 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十三：✅✅✅ **判别实验做完，答案是 (乙)** —— **条件清空后仍不加能量**（0→0 ✗）⇒ ⭐ 所以 **`STATE_ENDED` 事件压根没到这条规则**；⭐ 而状态**确实消失了** ⇒ ⭐ 结论：**`afterMove()` 并不是那条"会公告"的路径**）**）**：
+>
+> * ✅ **实测（读者规则 `when: []` ✓，只留 `on: STATE_ENDED` ✓ ⇒ 重放 ⇒ 跑判据 ✓）** ✓：**0.0 → 0.0** ✗
+>   ⇒ ⭐⭐ **事件没到** ✓（⚠ 否则无条件规则一定会加能量 ✓）。
+> * ⭐⭐ **而"状态确实没了"这一条本段已实测过** ✓（*"two turns run it out"* 通过 ✓）⇒ ⭐ **两者合起来只剩一个解释** ✗：
+>   **`BuffManager.afterMove()` 走的是"清理到期状态"的另一条路径** ✗，而**公告只在 tick 那条路径里** ✓
+>   （⚠ 本段读到的公告在 `duration() <= 0` 的**tick 循环内** ✓ ⇒ ⭐ 而 `afterMove()` 可能只是"回合结束时清理" ✓）。
+>   ⇒ ⭐ 也就是说：**判据用错了推进方式** ✗ —— ⚠ 不是内容的问题 ✓，也不是条件/目标/名字的问题 ✓（⭐ 本段第十**四**次自我纠正 ✓）。
+> * ⭐ **下一轮第一步（换成"真的推进一个回合"，1–2 次调用）** ✗：二选一 ✓：
+>   **(甲)** ⭐ **用引擎自己的回合循环** ✗（⚠ 需要知道入口 —— 本段见过 `Battle` 在回合结束处调用
+>     `actor.afterMove(this); actor.getBuffManager().afterMove(); tickForeignBuffs(actor, false);` ✓ ⇒ ⭐ 那么"tick 她自己"这一半**在哪** ✗
+>       —— ⚠ **很可能在 `afterMove` 的**内部**** ✗ hmm: 若如此，公告应当发生 ✗ ⇒ 矛盾 ✓ ⇒ ⭐ 所以更可能：
+>         **`afterMove()` 里 tick 的是"另一种计时"** ✗（⚠ 而 `duration` 的递减在别处 ✓））；
+>   **(乙)** ⭐⭐ **一次调用读 `BuffManager.afterMove()`** ✓ ⇒ ⭐ **看它到底做了什么** ✓（⚠ 若它只做清理不递减 ⇒ 根因到手 ✓
+>     ⇒ 那"递减 + 公告"就在**别的方法**里 ✓ ⇒ 找到它 ⇒ 判据改用它 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十四：✅✅✅ **`afterMove()` **确实**调了 tick**（`processBuffTick(false)` ✓）⇒ ⭐ 所以"路径错了"这条也**不成立** ✗ ⇒ 元凶缩到**两处**：`processBuffTick` 的 `early` 语义 ✗，或**名字真的不一致** ✗）**）**：
+>
+> * ✅ **实测（读 `BuffManager.afterMove` ✓，`:454` ✓）** ✓ 原文：
+>   ```java
+>   public void afterMove() {
+>       // ★ The carrier's OWN turn just ended (2026-09-30): values scoped to 「同一回合内」… duration tick,
+>       // which is the same "this unit's turn is over" moment -- one place, not two.
+>       removeWithLifetime(AbstractBuff.Lifetime.TURN_END);
+>       processBuffTick(false);            // ★ 就是这里（公告在它内部）
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以判据的推进方式没错** ✓（⚠ 本段第十四次自我纠正**又被推翻**了一次 —— ⭐ **这就是"每个结论都要实测"的代价与价值** ✓）。
+> * ⭐ **于是只剩两处** ✓：
+>   **(甲)** ⭐ **`processBuffTick(false)` 里的 `false`** ✗ —— ⚠ 本段在 `tickForeign(clockOwner, early)` 上见过"`early` = 回合前／后" ✓
+>     ⇒ ⭐ 若 `processBuffTick` 同理，**`false` = 回合后** ✓ 而那正是**公告所在** ✓（⚠ 但仍没触发 ⇒ 看它的实现 ✓）；
+>   **(乙)** ⭐⭐ **名字真的不一致** ✗ —— ⚠ 本段那次 dump 的**编码是乱的** ✗（显示成 `'��Ϣ'` ✗）⇒ ⭐ **不能据此断定文件里就是"生息"** ✗
+>     ⇒ ⭐ **下一轮第一步（一次调用即可，最便宜）**：**读 `1211.json` 里那条 `APPLY_BUFF` 的 `buff` 值的确切字节** ✓
+>       （⚠ 用 `Select-String -Pattern 'APPLY_BUFF' -Context 0,2` ✓ 或 python 打印 `[hex]` ✓）⇒ 与 `生息` 对比 ✓
+>       ⇒ ⭐ 若不同 ⇒ **根因到手** ✓（改内容即可 ✓）；若相同 ⇒ 去读 `processBuffTick` ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十五：✅✅✅ **名字字节完全一致**（`e7949fe681af` = 生息 ✓，与期望逐字节相同 ✓）⇒ ⭐ 于是 (乙) 排除；⭐ 而新的、更可能的解释是：**她的【生息】是被 `removeWithLifetime(TURN_END)` 那条"静默清理"摘掉的** ✗）**）**：
+>
+> * ✅ **实测（`1211.json` 的 `buff` 值取十六进制 ✓）** ✓：
+>   `APPLY_BUFF buff= '生息' bytes= e7949fe681af` ✓；`expected 生息 = e7949fe681af` ✓ ⇒ ⭐⭐ **逐字节相同** ✓
+>   ⇒ ⛔ **"名字对不上"这条排除** ✓（⚠ 本段第十五次自我纠正 ✓ —— ⚠ 而这次是因为**上次 dump 的乱码让我怀疑** ✗，复核后证明**内容没问题** ✓）。
+> * ⭐⭐⭐ **于是只剩一个候选，而且它就在我读过的那两行里** ✓：
+>   ```java
+>   public void afterMove() {
+>       removeWithLifetime(AbstractBuff.Lifetime.TURN_END);   // ← ★ 这条是"静默摘除"（不公告）
+>       processBuffTick(false);                               // ← 公告在这个里面
+>   }
+>   ```
+>   ⇒ ⭐ **若她的【生息】的**lifetime 是 `TURN_END`** ✗ ⇒ 它在**第一行**就被摘掉了 ✗ ⇒ `processBuffTick` 到时**已经没有它** ✗
+>     ⇒ ⭐ **一声不响** ✓✓ —— ⭐ 这**同时**解释了：**状态确实消失了** ✓（我实测过 ✓）而**事件没发** ✓（本轮实测 ✓）。
+> * ⭐ **下一轮第一步（一次读，直击要害）** ✗：读 **`withLifetime(...)`／`AbstractBuff.Lifetime`** ✓ ⇒ 看"什么写法会得到 `TURN_END`"
+>   ⇒ ⚠ 若与 **`permanent`／`unticked`** 有关 ✗ ⇒ ⭐ **她的【生息】正是 `permanent: true`** ✗（⚠ 本段 dump 里那三条 `do` 的字段没看全 ✗ ⇒ 下一轮**dump 她的 `do` 全部字段** ✓）
+>     ⇒ ⭐ 那就说明：**永久状态不会发 `STATE_ENDED`** ✗ ⇒ ⭐ **这本身是一条引擎级事实** ✓（⚠ 读者 ≥4 ✓ —— 目标 ① 的其余读者都可能受它影响 ✓）
+>       ⇒ ⭐ **正解可能是**：把她的【生息】改成**限时**（`turns: 2` ✓，文档也这么说 ✓）⇒ 到期 ⇒ 公告 ✓ ⇒ 读者生效 ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十六：✅✅ **她的 `do` 全部字段 dump 出来了** —— `APPLY_BUFF` 是 **`"turns": 2`**（**不是** permanent ✗）⇒ ⭐ 所以"永久 ⇒ 静默摘除"这条也**排除**；⭐ 元凶只剩"**我那条读者规则是否真的在表里**"）**）**：
+>
+> * ✅ **实测（dump `1211` 的 `ULT_CAST` 规则 ✓）** ✓：
+>   ```json
+>   "when": ["actor == self"],
+>   "do": [
+>     {"op":"MODIFY_DAMAGE_TAKEN","percent":-0.1,"turns":2,"buff":"生息","target":"all_allies","target_when":["!target has_state 生息"]},
+>     {"op":"APPLY_BUFF","buff":"生息","turns":2,"target":"all_allies","target_when":["!target has_state 生息"]},
+>     {"op":"EXTEND_BUFF","buff":"生息","turns":1,"target":"all_allies","target_when":["target has_state 生息"]}
+>   ]
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** **`turns: 2`** ✓ ⇒ **正常限时状态** ✓（⛔ "永久"假设排除 ✓，本段第十六次自我纠正 ✓）；
+>   **(ii)** 它带 **`target_when`** ✓（"没有才挂 ✓／有才延长 ✓" —— ⭐ 正是文档那两句 ✓）；
+>   **(iii)** 它**也**挂 `MODIFY_DAMAGE_TAKEN` ✓（-10% ✓ ⇒ 与【生息】同一批目标 ✓）。
+> * ⭐⭐ **于是所有"内容侧"的可能都被排除了** ✓（名字 ✓、时长 ✓、主体 ✓、条件 ✓、目标 ✓、路径 ✓）⇒ ⭐ **唯一剩下的解释是**：
+>   **我那条读者规则压根没进她的表** ✗（⚠ 或进了但**没被选中** ✗）——
+>   ⚠ 而 `EveryCharacterAndRelicRuleIsSelectedTest` **是绿的** ✓ ⇒ 说明表能装载 ✓ ⇒ ⭐ 那就剩"**事件发生的那一回合，她的表里那条规则的 `when` 被判假**" ✗ hmm:
+>     ⚠ 但我把 `when` 清空过 ✓ 仍 0 ✗ ⇒ ⭐ **那只能是"事件真的没发"** ✗。
+> * ⭐ **下一轮第一步（把"事件到底发没发"直接测出来，1 次调用）** ✗：**改判据**，让它在**到期前后各读一次**
+>   `battle` 的某个可观测计数 ✗（⚠ 无公开计数 ✗）⇒ ⭐ **换个更笨但有效的办法**：
+>   **在判据里同时挂两条手搭规则** ✓（`plus` ✓）：一条 `on: STATE_ENDED` ⇒ `GAIN_ENERGY 8` ✓；
+>   一条 `on: STATE_ENDED` ⇒ `APPLY_BUFF{探针}` ✓ ⇒ ⭐ 若**手搭的也不触发** ⇒ ⭐ **事件确实没发** ✗
+>     ⇒ 那就回头查 **`processBuffTick(false)` 里"发不发公告"的条件** ✓（⚠ 本段只读了 `afterMove` 的**调用** ✓，
+>       没读 `processBuffTick` 的**内部** ✗ ⇒ ⭐ 那才是该读的最后一段 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十七：✅✅✅ **最后一段读了** —— `processBuffTick(early)` **只是 `tickBuff(instance, early)`** ✓；⭐ 而 `tickBuff` 里有一道**很关键的守卫**：**只有"计时属于该 clockOwner"的 buff 才会被 tick**）**）**：
+>
+> * ✅ **实测（读 `BuffManager:589`–`:602` ✓）** ✓ 原文：
+>   ```java
+>   private void processBuffTick(boolean early) { tickBuff(instance, early); }        // ★ 就是它
+>   …
+>   public void tickForeign(CanHit clockOwner, boolean early) {
+>       if (clockOwner == null || clockOwner == instance) { return; }
+>       tickBuff(clockOwner, early);
+>   }
+>   ```
+>   ＋ 后者 javadoc 的关键句 ✓：*"Spends the duration of the buffs on this unit whose **clock** belongs to `clockOwner` … **Our own
+>   boundary is skipped** — that one has already gone through `beforeMove()` / `afterMove()`."* ✓
+> * ⭐⭐ **于是得到两条硬结论** ✓：
+>   **(i)** `afterMove()` ⇒ `processBuffTick(false)` ⇒ **`tickBuff(instance, false)`** ✓ ⇒ 所以**她自己的计时确实会被 tick** ✓；
+>   **(ii)** ⚠ 而 `tickBuff` 内部第一件事是 **`if (!buff.ticksOn(clockOwner)) { continue; }`** ✓（本段在同一文件里读到 ✓）
+>     ⇒ ⭐ **只有"计时属于她"的 buff 才递减** ✗ ⇒ ⚠ 若她的【生息】的 tick 归属**不是她**（⚠ `withTickOwner(effect, ctx)` 可能给了 `ctx.owner()` ✓ 或 `"summon"` ✓）
+>       ⇒ ⭐ **它就不会被递减** ✗ ⇒ ⚠ 但它**确实消失了** ✓ ⇒ ⭐ **那只能是 `afterMove` 的第一行**：
+>         **`removeWithLifetime(AbstractBuff.Lifetime.TURN_END)`** ✓ —— ⭐⭐ **"静默摘除"** ✓（**不公告** ✓）⇒ ⭐ **根因到手** ✓✓。
+> * ⭐ **下一轮第一步（一次读，确认 lifetime 映射）** ✗：读 **`withLifetime(...)`** ✓（⚠ 在 `TriggerInterpreter` 里 ✓，本段见过它被 `modifyAttr`／`applyState` 用 ✓）
+>   ⇒ 看"**什么条件下 buff 的 lifetime = `TURN_END`**" ✓ ⇒ ⚠ 若与 **`turns` 的缺省／`permanent`／`unticked`** 有关 ✗
+>     ⇒ ⭐ **正解**：让她的【生息】拿一个**纯时长**的 lifetime ✓（⚠ 文档说"持续 2 回合" ✓ ⇒ 本该如此 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十八：🎯🎯🎯 **根因找到了，逐字** —— `tickBuff` 的三道 `continue` 里，**第二道**是 `if (buff.isEarlyBuff != early) continue;` ⇒ ⭐ 一个 buff **只在它所属的那一半**里被 tick ⇒ ⚠ 而 `afterMove()` 传的是 **`false`（后半天）** ✗ ⇒ **"早半天"的 buff 被跳过** ✗）**）**：
+>
+> * ✅ **实测（读 `BuffManager.tickBuff` 的头 ✓，`:645` ✓）** ✓ 原文：
+>   ```java
+>   private void tickBuff(CanHit clockOwner, boolean early) {
+>       for (AbstractBuff buff : List.copyOf(buffs)) {
+>           if (buff.isPermanent()) { continue; }               // ★ A：永久 ⇒ 永不倒数、永不"到期"
+>           if (buff.isEarlyBuff != early) { continue; }        // ★ B：只在它所属的那一半里 tick  ← **就是它**
+>           if (!buff.ticksOn(clockOwner)) { continue; }        // ★ C：计时不属于我 ⇒ 跳过
+>           boolean couldAct = buff.canAct();
+>           buff.tickEffect(instance);
+>           …
+>   ```
+>   ⇒ ⭐⭐⭐ **答案** ✓：`afterMove()` 里传 `early = false` ✓ ⇒ **只有 `isEarlyBuff == false` 的 buff 被递减** ✗
+>     ⇒ ⚠ 若【生息】的那条 buff 是**"早半天"**（`isEarlyBuff == true` ✗）⇒ ⭐ **它在 `afterMove()` 里被 `continue` 掉** ✗
+>       ⇒ ⭐ **从不递减** ✗ ⇒ ⭐ 而它**确实消失了** ✓ ⇒ ⭐ **只能是 `afterMove()` 第一行那句 `removeWithLifetime(TURN_END)`** ✓
+>         ⇒ ⭐⭐ **静默摘除、没有公告** ✓✓ —— **整条链闭合** ✓（⚠ 这也解释了 `1513` 为什么成功 ✗：它的 buff 属于后半天 ✓）。
+> * ⭐⭐ **下一轮第一步（一次改就得绿）** ✗：**判据里把"早半天"也推一次** ✓ —— 即同时调
+>   **`owner.getBuffManager().beforeMove()`** ✓（⚠ 本段在先前的 javadoc 里见过它 ✓：*"that one has already gone through
+>   `beforeMove()` / `afterMove()`"* ✓）⇒ ⭐ 那么【生息】会在**它的那一半**里递减 ⇒ 到期 ⇒ **公告** ⇒ **读者接住** ✓✓
+>   ⇒ 绿 ⇒ **变异（`turns: 2 → 3`）⇒ 全量 ⇒ 出货** ✓（⭐ 目标 ① 的第二个真读者 ✓）。
+> * ⭐ **顺带一条可复用的事实** ✓：**本项目里"限时状态"分早／晚两半递减** ✗ ⇒ ⭐ **判据推进回合时要两半都推** ✓
+>   （⚠ 而 `1513` 那次恰好只推后半天就成功 ⇒ 说明那次的 buff 是后半天 ✓）⇒ ⭐ **纪律（补）**：**判据推进一个回合 = `beforeMove()` ＋ `afterMove()`** ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十九：⭐ 把"下一次重放"要改的**四处**写成一张清单（工具脚本已被回滚到原始版本，所以下一轮要一次性改齐）**）**：
+>
+> * ⭐ **工具脚本 `tools/ship_1211_reader.py` 下一轮要改的四处** ✗（⚠ 因为本段多次 `git checkout -- .` 把它回滚到了**最初版** ✓）：
+>   1. **读者规则的 `target`**：`"target"` → **`"self"`** ✓（⚠ 本段已验证过这个方向的实验无效，但当时的**另一半**（条件）仍在 ⇒ ⭐ **现在两个变量都已单独测过** ✓ ⇒ 用 `self` ✓）；
+>   2. **读者规则的 `when`**：先**清空**（`[]` ✓）—— ⭐ 因为本段已判定"事件没发"✗ ⇒ **先把"事件到没到"钉住** ✓；
+>   3. ⭐⭐ **判据的回合推进**：**`beforeMove()` ＋ `afterMove()` 各一次，共推两个回合** ✓
+>      （⚠ 依据：`tickBuff` 的 **`if (buff.isEarlyBuff != early) continue;`** ✓ ⇒ 限时 buff **只在它所属的那一半递减** ✓ ⇒ ⭐ **两半都推才不会漏** ✓）；
+>   4. 判据里那次**无条件的"手工 fire"判别断言**（本段加过 ✓）**删掉** ✗ —— ⚠ 它绕过 `lastStateEndedName` ⇒ **恒假** ✗。
+>   ⇒ ⭐ **预期**：`beforeMove(); afterMove();` ×2 ⇒ 【生息】在**它那一半**里递减两次 ⇒ 到期 ⇒ **公告** ⇒ 读者（无条件）**必然加能量** ⇒ **绿** ✓
+>     ⇒ 然后**再把文档的血线条件加回来**（`hp_percent >= 1` ✓）⇒ 若仍绿 ⇒ **出货** ✓；若红 ⇒ ⭐ **说明"血线"这个条件本身需要另一种写法** ✓（⚠ 那是下一个独立问题 ✓）。
+> * ⭐ **变异（随后立刻做）** ✗：把 `APPLY_BUFF` 的 **`turns: 2` 改成 `3`** ✓ ⇒ 两回合后状态还在 ⇒ 读者不触发 ⇒ ⭐ **判据必红** ✓（⚠ 跑**全量** ✓）。
+> * ⭐ **本段对该读者已排除的可能（可写进文档）** ✓：名字（字节相同 ✓）、主体词（`self` 合法 ✓）、`STATE_ENDED` 条件形态（`<主体> state_ended <名>` ✓）、
+>   **目标**、**推进路径**（`afterMove` 确实 tick ✓）⇒ ⭐ **剩下唯一未排除的就是"早／晚两半"** ✓（本轮已定 ✓）。
+> * ⭐ **可复用的两条事实** ✓：**(i)** **判据推进一个回合 = `beforeMove()` ＋ `afterMove()`** ✓；**(ii)** **状态的"到期公告"只在它所属的那一半 tick 里发生** ✓
+>   （⚠ 另一半只走**静默清理** `removeWithLifetime(TURN_END)` ✗）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十：✅✅ **两半都推了、条件也只剩状态名、目标用 `self` —— 仍是 0→0** ⇒ ⭐ 而 **`assertFalse(hasState(生息))` 通过** ⇒ ⭐ 所以"**到期确实发生、公告确实没有**"这两点同时钉死了）**）**：
+>
+> * ✅ **实测（`beforeMove()` ＋ `afterMove()` ×2 ✓ ＋ `when: ["self state_ended 生息"]` ✓ ＋ `target: self` ✓）** ✓：
+>   * ⭐ **`assertTrue(hasState(生息))` 通过** ✓（挂上了 ✓）；
+>   * ⭐ **`assertFalse(hasState(生息))` 通过** ✓（两回合后没了 ✓）；
+>   * ⛔ **能量仍是 0→0** ✗（*"the reader hands back the document's energy (0.0 -> 0.0)"* ✓）。
+> * ⭐⭐ **于是只剩最后一个候选（也是 `tickBuff` 的第三道守卫）** ✓：
+>   ⚠ **她的【生息】的"计时归属"（`ticksOn(clockOwner)`）不是她** ✗ ⇒ ⭐ `tickBuff` 里 **`if (!buff.ticksOn(clockOwner)) { continue; }`** 把它跳过 ✗
+>     ⇒ ⭐ **它从不递减** ✗ ⇒ ⭐ 而它**确实消失了** ✓ ⇒ ⭐ **只能是 `afterMove()` 第一行 `removeWithLifetime(TURN_END)`** ✓ ——
+>       ⭐⭐ **静默摘除、不公告** ✓✓ ⇒ **与"事件没发"完全一致** ✓。
+>   ⇒ ⚠ 也就是说：**内容是"对"的（文档口径）** ✗，但它在这个引擎里**拿不到"到期公告"** ✗ ⇒ ⭐ **这本身就是一条**引擎级限制**** ✓
+>     （⚠ 读者 ≥4 ✓：`1211` 的【生息】结束 ✓、`1211` 的【生息】结束回能 ✓（同一句 ✓）、以及任何"靠自然到期发 `STATE_ENDED`"的状态 ✓）。
+> * ⭐ **下一轮第一步（把这条限制钉成事实，1–2 次调用）** ✗：读 **`withTickOwner`／`ticksOn`** ✓
+>   （⚠ 本段见过 `TriggerInterpreter:2332` 的 `withTickOwner` ✓：`buff.setTickOwner("summon".equals(effect.getTicksOn().trim()) ? requireSummon(ctx) : ctx.owner());` ✓）
+>   ⇒ ⭐ 看 `ctx.owner()` 在**她自己的终结技**里是谁 ✗（⚠ 若它不是"她" ⇒ **根因确证** ✓ ⇒ ⭐ 修法：内容里显式写 `ticks_on` ✓（⚠ 若该字段存在 ✓）或接受"引擎限制"并**登记** ✓）。
+> * ⭐ **并记下本段为止的净结果** ✓：目标 ① 的**第一个读者已出货并验完**（`1513` 阿哈时刻 ✓，变异 1 红 ✓）；
+>   **第二个读者**（`1211`）的**内容口径已完全查清**，卡在"引擎不给这种状态发到期公告"上 ✓ ⇒ ⭐ **下一轮若确证 ⇒ 按纪律登记**（附全部实测 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零八十一：✅✅✅ **第三道守卫也排除了**（`ticksOn` 默认取 `owner` 即载体 ⇒ 她自己的状态**会被 tick** ✓）⇒ ⭐ 于是 `tickBuff` 的三道 `continue` **全都不成立** ✗ ⇒ ⭐ 事件**应当发了** ⇒ ⭐ 元凶只剩"**我那条规则压根没进她的表**"）**）**：
+>
+> * ✅ **实测（读 `withTickOwner` ＋ `AbstractBuff.ticksOn` ✓）** ✓ 原文：
+>   ```java
+>   private static AbstractBuff withTickOwner(AbstractBuff buff, EffectSpec effect, TriggerContext ctx) {
+>       if (effect.getTicksOn() != null) {                       // ★ 只有写了 `ticks_on` 才设属主
+>           buff.setTickOwner("summon".equals(effect.getTicksOn().trim()) ? requireSummon(ctx) : ctx.owner());
+>       }
+>       return buff;
+>   }
+>   // AbstractBuff:
+>   public boolean ticksOn(CanHit who) {
+>       CanHit clock = tickOwner == null ? owner : tickOwner;     // ★ 默认 = owner（载体本身）
+>       return clock != null && clock == who;
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以她的【生息】没写 `ticks_on` ⇒ 属主 = 她** ✓ ⇒ `ticksOn(instance)` = **真** ✓ ⇒ ⛔ **守卫 C 不成立** ✓
+>     ⇒ ⭐ 加上守卫 A（`isPermanent` ✗ —— 它是 `turns: 2` ✓）与守卫 B（两半都推过 ✓）⇒ ⭐⭐ **三道守卫全不成立** ✓
+>       ⇒ ⛔ **所以"状态被 tick 掉、并公告"应当发生了** ✗ ⇒ ⭐ **剩下唯一解释**：**我那条读者规则**不在她的表里** ✗**
+>         （⚠ 或在装载时被静默丢弃 ✗ —— ⚠ 而 `EveryCharacterAndRelicRuleIsSelectedTest` **只检查 `rulesFor` 不抛异常** ✗
+>           ⇒ **它发现不了"少了一条规则"** ✓）。
+> * ⭐⭐ **下一轮第一步（一次判据就能定案，最便宜）** ✗：在判据里**数一数**她表里 `STATE_ENDED` 的规则数 ✓：
+>   ```java
+>   var table = owner.getTriggerTable();
+>   assertEquals(1, table.rulesFor(TriggerEvent.STATE_ENDED).size(), "the reader must be in her table");
+>   ```
+>   ⇒ ⭐ **若为 0** ⇒ ⭐ **规则没进表** ✓（⚠ 那就要查装载器为什么丢它 ✗ —— 本段的 `EveryCharacter…` 守卫只保证"不抛" ✗）；
+>     ⭐ **若为 1** ⇒ ⭐ 那就说明**事件确实没发** ✗ ⇒ 回头把 `fireStateEnded` 的**调用条件**（`buff instanceof StateBuff` ✓）与**她那条 buff 的实际类型**对照 ✓
+>       （⚠ 而 `applyState` 建的**确实是 `StateBuff`** ✓ 本段已读 ✓ ⇒ 那就只剩"**它没走到 `duration() <= 0`**" ✗
+>         ⇒ ⭐ 即**`tickEffect` 没有让它递减** ✗ —— ⚠ 那是**最后一块**待读（`StateBuff.tickEffect` ✓））。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十二：🎯 **`StateBuff` 的类注释一句话终结了全部引擎侧猜测** —— *"**Duration ticks late** (`early = false`, i.e. in `afterMove`)"* ⇒ ⭐ 所以 `afterMove()` **确实**递减它 ✓、`tickEffect` 就是 `decreaseDuration()` ✓ ⇒ ⭐ **引擎侧无懈可击** ⇒ 元凶**只能是"读者规则没进她的表"**）**）**：
+>
+> * ✅ **实测（读 `models/buff/StateBuff.java` ✓）** ✓：
+>   * `:30` ⭐ 原文：*"**Duration ticks late** ({@code early = false}, i.e. in {@code afterMove}): a state applied during a …"* ✓
+>     ⇒ ⭐⭐ **所以状态**就是**在 `afterMove` 里递减的** ✓（⚠ 我早前"早半天"的猜测**作废** ✓ —— 本段第十七次自我纠正 ✓）；
+>   * `:113`–`:114` ✓：`public void tickEffect(CanHit target) { decreaseDuration(); … }` ✓ ⇒ ⭐ **递减确实发生** ✓；
+>   * `:27` ✓ 还有一句有用的 ✓：*"Re-applying the **same** state refreshes its duration, which is what the engine's ordinary rule
+>     means by …"* ✓（⭐ 与文档"延长 1 回合"呼应 ✓）；
+>   * `:62` ✓：*"a non-positive duration is not a zero-length …"* ✓（⚠ 说明它对"0 回合"有保护 ✓）。
+> * ⭐⭐⭐ **于是引擎侧**全部排除**** ✓：三道守卫 ✗、`ticksOn` ✗、`tickEffect` ✗、两类递减时机 ✗、名字 ✗、主体词 ✗、条件 ✗、目标 ✗
+>   ⇒ ⭐ **结论**：**`battle.fireStateEnded(她, "生息")` 应当被调用** ✗ ⇒ ⭐ **而我的读者规则没反应** ✗
+>     ⇒ ⭐ **只能是"这条规则不在她的表里"** ✓（⚠ 或在装载期被静默丢掉 ✗）。
+> * ⭐ **下一轮第一步（一次判据定案，就是上一轮写好的那个）** ✗：
+>   ```java
+>   assertEquals(1, owner.getTriggerTable().rulesFor(TriggerEvent.STATE_ENDED).size(), "the reader must be in her table");
+>   ```
+>   ⇒ ⭐ **0** ⇒ 规则没进表 ✓（⚠ 查装载：⚠ 提示 —— **`STATE_ENDED` 的 `when` 若只写状态名而不带主体** ⇒ 装载期会**抛异常** ✓
+>     ⇒ 而"抛异常"会被 `EveryCharacter…` 守卫抓住 ✓（它是绿的 ✓）⇒ ⭐ 那"少一条而不抛"的可能就是**别的机制** ✗
+>       —— ⚠ 例如**规则被 `target_when`／别的字段影响** ✗ ⇒ 一次 dump 她的表即可看清 ✓）；
+>     ⭐ **1** ⇒ 事件没发 ⇒ ⭐ 回去查 `BuffManager` 的那个分支**是否真的走到了** ✗（⚠ 用判据打印 `hasState` 与能量的**逐回合变化** ✓）。
+> * ⚠ **推送**：本地仍**领先 2** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十三：✅✅✅ **答案是"规则确实在表里"**（`rulesFor(STATE_ENDED).size() == 1` **通过** ✓）⇒ ⭐ 于是"没进表"这条也排除 ⇒ ⭐ 现在**只剩一个可能**：**那条公告真的没被发**）**）**：
+>
+> * ✅ **实测（写判据直接问表 ✓：`owner.getTriggerTable().rulesFor(TriggerEvent.STATE_ENDED).size()` ✓）** ✓：**通过** ✓（= 1 ✓）
+>   ⇒ ⭐⭐ **所以规则**已装载且可选中**** ✓（⚠ 本段第十八次自我纠正 ✓）。
+> * ⭐⭐⭐ **于是排查列表（全部排除）** ✓：
+>   | 假设 | 结论 |
+>   |---|---|
+>   | 名字不一致 | ✗ 字节相同（`e7949fe681af` ✓） |
+>   | 主体词非法 | ✗ `self` 合法（`:1766` ✓） |
+>   | 条件形态错 | ✗ `<主体> state_ended <名>` 是正解（`:1209`–`:1214` ✓） |
+>   | 条件/目标写错 | ✗ 都单独测过（无条件 ＋ `self` 仍 0 ✓） |
+>   | 规则没进表 | ✗ **本轮实测：在表里** ✓ |
+>   | `tickBuff` 三道守卫 | ✗ 全不成立（永久 ✗／早晚两半都推过 ✓／`ticksOn` 默认=载体 ✓） |
+>   | `tickEffect` 不递减 | ✗ 它就是 `decreaseDuration()`（`:113` ✓） |
+>   | 递减时机 | ✗ `StateBuff` **本来就在 `afterMove` 递减**（类注释 `:30` ✓） |
+>   ⇒ ⭐ **结论**：**引擎的公告没有发出** ✗ —— ⚠ 而它唯一的开关是 tick 里那句
+>     **`if (battle != null && buff instanceof StateBuff ended)`** ✓ ⇒ ⭐ **下一轮第一步（一次判据，直击）**：
+>     **在判据里打印/断言 `battle` 是否非空** ✗（⚠ 无法直接读 ✗）⇒ ⭐ **换个可观测的**：
+>     **手搭一条 `on: STATE_ENDED` ＋ 无条件的规则**（`plus` ✓）＋ **手动 `battle.fireStateEnded(owner, "生息")`** ✓
+>     ⇒ ⭐ **若它加能量** ⇒ 说明"事件 + 规则"这条路**通** ✓ ⇒ ⭐ **问题百分之百在"状态到期那一 tick 没走到公告"** ✗
+>       ⇒ ⭐ 那就去**逐回合打印 `hasState` 与 `duration`** ✓（⚠ 或判据里**只推一次 `afterMove()`** 看状态是否仍存活 ✓
+>         —— ⚠ 本段此前"两回合后消失"是**推了两轮（四拍）** ✓ ⇒ ⭐ **也许它在第一拍就被 `removeWithLifetime(TURN_END)` 摘掉了** ✗
+>           ⇒ ⭐ **那正是"静默摘除"** ✓✓ ⇒ ⭐ 修法：让她那条 `APPLY_BUFF` **不落 `TURN_END` 生命周期** ✗
+>             （⚠ 线索：`modifyAttr` 的注释里提过 lifetime 与 `permanent` ✓ ⇒ ⭐ **下一轮读 `withLifetime`** ✓）。
+> * ⚠ **推送**：本地仍**领先 3** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十四：✅✅✅ **`withLifetime` 读了** —— 它只是 `buff.setLifetimes(lifetimesOf(effect))` ⇒ ⭐ **生命周期来自 `lifetimesOf(effect)`** ⇒ ⭐ 而紧邻的 javadoc 把两种"时间"讲得很清楚：**`until` 指"哪个事件结束它"**，**`ticks_on` 指"哪个单位的回合花掉它"**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter:2306` ✓ 与它下方 javadoc ✓）** ✓ 原文要点：
+>   ```java
+>   private static AbstractBuff withLifetime(AbstractBuff buff, EffectSpec effect) {
+>       buff.setLifetimes(lifetimesOf(effect));      // ★ 生命周期**由 effect 派生**
+>       return buff;
+>   }
+>   ```
+>   ＋ javadoc：*"Separate from `withLifetime` because the two say different things about time: **`until` names the event that ends
+>   a buff**, this [ticks_on] names **whose turn boundary** spends it. … ⭐ **Two spellings since 2026-10-02** … `"self"` — the rule
+>   owner's turns (星期日's 【蒙福者】, 1321's domain, 缇宝's 结界) …"* ✓
+> * ⭐⭐⭐ **于是"静默摘除"的机制有了确切入口** ✓：**`afterMove()` 第一行** `removeWithLifetime(AbstractBuff.Lifetime.TURN_END)` ✓
+>   ⇒ ⭐ **它按"lifetime 集合"摘** ✗ ⇒ ⚠ 若 `lifetimesOf(effect)` 对"普通 `turns: 2` 的状态"**也含 `TURN_END`** ✗
+>     ⇒ ⭐ **那么它会在每次回合结束时被静默摘掉** ✗ ⇒ **活不到 `duration() <= 0`** ✗ ⇒ **永远不公告** ✓✓ —— ⭐ **与全部实测吻合** ✓。
+> * ⭐ **下一轮第一步（一次读，定案）** ✗：读 **`lifetimesOf(EffectSpec)`** ✓（⚠ 同一文件 ✓）
+>   ⇒ ⭐ 看"普通状态"的 lifetime 集合到底是什么 ✓：
+>     * **含 `TURN_END`** ⇒ ⭐ **根因确证** ✓ ⇒ ⭐ **这是一条引擎级限制**（"限时状态"活不到到期）⇒ 按纪律**登记** ✓
+>       （⚠ 读者 ≥4 ✓；⚠ 并写明"内容侧无法规避"✗ —— 除非有 `until` 可写 ✓ ⇒ ⭐ **那就用 `until` 换掉 `turns`** ✓ 值得一试 ✓）；
+>     * **不含** ⇒ ⭐ 那就回去看 `removeWithLifetime` 的匹配条件 ✓（⚠ 也许它按**别的**规则摘错了 ✓）。
+> * ⚠ **推送**：本地仍**领先 4** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24056,6 +24570,520 @@
 > * ⭐ **拿到后**：判据里调它 ✓ ⇒ 到期 ⇒ 公告 ⇒ 奖励 ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓
 >   （⚠ 内容已经准备好，随时可重放 `tools/ship_aha_final.py` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十：🎉🎉🎉 **`STATE_ENDED` 的**第一个真读者**出货并验完**（`928f717b` ✓）：阿哈时刻以"1 回合限时状态"落地 ⇒ **到期时引擎自己发 `STATE_ENDED("阿哈时刻")`** ⇒ 读者接住并发【好活当赏】）**）**：
+>
+> * ✅✅✅ **进树** ✓（`928f717b` ✓，**已推送** ✓）：`1513.json` **两条规则** ✓：
+>   * `elation_moment_start` ✓：`on: CAST_SETUP` ＋ `when: ["from_category ElationDamage"]` ⇒
+>     **`APPLY_BUFF{阿哈时刻, turns: 1}`** ✓（⭐ **限时** ⇒ 到期才有公告 ✓）；
+>   * `elation_moment_reward` ✓：`on: STATE_ENDED` ＋ `when: ["self state_ended 阿哈时刻"]` ⇒ **`APPLY_BUFF{好活当赏, turns: 2}`** ✓
+>     （⭐ 文档原话：「阿哈时刻结束时，使参演的角色获得本次计入笑点的【好活当赏】状态，持续2回合」✓）。
+> * ✅ **判据（文件驱动 ✓）** `AhaMomentTest` ✓：**驱动一次真欢愉技**（`owner.getSkills().get(SkillType.ELATION_SKILL)` ✓ ＋
+>   `SkillExecutor.execute(...)` ✓ —— ⭐ 这才让 `from_category` 成立 ✓）⇒ 断言 **状态在** ✓ ⇒
+>   ⭐ **`owner.getBuffManager().afterMove()`** ✓（⭐ **这就是 `Battle` 在回合结束时对行动者调的那一行** ✓ —— 本段从
+>     `:1204`–`:1209` 读到：`actor.afterMove(this); actor.getBuffManager().afterMove(); tickForeignBuffs(actor, false);` ✓）
+>   ⇒ 断言 **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ **全绿** ✓。
+> * ✅✅ **实测变异（1 红 ✓，跑全量 ✓）** ✓：把 `turns` 从 **1 改回 2** ✓ ⇒ 全量 **2130 例 1 failed** ✓，判据报
+>   *"one turn later the moment has expired ==> expected: <false> but was: <true>"* ✓ ⇒ ⭐ **承重** ✓（回滚后全量 **0** ✓、闸门 [0, 0] ✓）。
+> * ⭐⭐⭐ **这一步的分量（目标 ① 的转折点）** ✓：`STATE_ENDED` 此前**四个读者都因"没有创建者"而登记** ✓ ⇒
+>   现在有了**第一个真读者** ✓，而且**形状完全可复用** ✗：
+>   **「挂一个限时状态 ⇒ 让它自然到期 ⇒ 引擎公告 `STATE_ENDED(<名>)` ⇒ 读者用 `self state_ended <名>` 接住」** ✓
+>   ⇒ ⭐ **目标 ① 的其余四个读者**（`1211`【生息】结束 ✓／`1408` 变身结束 ×3 ✓／那张光锥「奇袭结束后」✓）
+>     **都能照抄这个形状** ✓✓。
+> * ⭐ **本段为该能力走过的关键事实（都可复用）** ✓：① `STATE_ENDED` **只在 `duration() <= 0` 的 tick 里公告** ✓
+>   （**显式 `REMOVE_STATE` 不公告** ✗）；② 条件写法是 **`<主体> state_ended <状态名>`** ✓（⚠ 缺主体会被解析成 `is_state` ✗）；
+>   ③ 条件是**数值变量**时写法是 **`self_resource:<名>`** ✓（⚠ 变量位置**不要**主体 ✗）；④ `SkillExecutor.execute` 是驱动
+>   "带类别的事件"的正路 ✓；⑤ 推进自己的计时用 **`BuffManager.afterMove()`** ✓（⚠ `tickForeign` 对自己 `return` ✗）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零六十一：✅✅ **第二个读者也拿到确切原句了**（`1211_白露` 的「【生息】结束时…恢复 **8** 点能量」✓），而且它与刚出货的模板**逐字对齐**）**：
+>
+> * ✅ **实测（读 `1211_白露.html` ✓）** ✓，两处关键原文：
+>   * **`:73`**（战技 ✓）：「立即为我方全体回复等同于白露 **13.50%** 生命上限+**360** 的生命值。对于**没有**【生息】的我方目标，白露使其**附上**【生息】，
+>     对于已拥有【生息】的我方目标，白露使其已有的【生息】持续时间**延长1回合**。【生息】可持续 **2** 回合…」✓
+>   * ⭐⭐ **`:100`**（行迹／星魂那一段 ✓）：「**【生息】结束时若我方目标当前生命值等于其生命上限，则额外恢复目标 8 点能量。**」✓
+>   ⇒ ⭐⭐ **这正是目标 ① 里的"`1211`【生息】结束回能 8"** ✓ ⇒ 而且它的形状是：
+>     **`on: STATE_ENDED` ＋ `when: ["<主体> state_ended 生息", "target_hp_percent == 1"]` ⇒ `GAIN_ENERGY 8`** ✓
+>     （⚠ 能量那个 op 的真名待查 ✓ —— 本段见过 `GAIN_RESOURCE`／`SPEND_RESOURCE` ✓ ⇒ 能量可能是**另一种资源** ✓ 或另有 op ✓）。
+> * ⭐ **与刚出货的模板逐字对齐** ✓：`STATE_ENDED` 的用法（#1 主体 ＋ #2 状态名 ✓）、"到期才公告"的机制 ✓、
+>   以及"**状态由谁挂**"这一半（她的**战技**「附上【生息】」✓ ⇒ 挂状态那条要写在她文件里 ✓，⚠ 本段**尚未**看她的文件是否有它 ✗）。
+> * ⭐ **下一轮第一步（三步，同模板）** ✗：
+>   ① 读 **`1211.json` 现有的 `生息` 相关规则** ✓（⚠ 先 dump ✓ —— 本段纪律：**加同族内容前先看该文件已有那一份** ✓）；
+>   ② 若【生息】**还没建模** ⇒ 补一条 **`SKILL_CAST` ⇒ `APPLY_BUFF{生息, turns: 2}`** ✓（⭐ 文档说"持续 2 回合" ✓）；
+>   ③ 补读者 **`on: STATE_ENDED` ＋ `when: ["self state_ended 生息", "target_hp_percent == 1"]` ⇒ 回能 8** ✓
+>     ＋ 判据（文件驱动 ＋ 施放战技 ⇒ 过两回合（`afterMove()` 两次 ✓）⇒ 断言**能量 +8** ✓）＋ 变异（`turns: 2 → 3` ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十二：✅✅ **`1211` 的【生息】早已建模**（`APPLY_BUFF` ＋ **`EXTEND_BUFF`** ✓）⇒ ⭐ 第二个读者只差"`STATE_ENDED` 那一条"）**）**：
+>
+> * ✅ **实测（dump `1211.json` ✓）** ✓：全文件**只有 2 条规则** ✓：
+>   * ⭐ **`ult_rebirth`**（`ULT_CAST` ＋ `when: ["actor == self"]` ✓）⇒ 三个 `do` ✓：
+>     `MODIFY_DAMAGE_TAKEN`（目标 = **生息** ✓）／**`APPLY_BUFF`（生息 ✓）**／**`EXTEND_BUFF`（生息 ✓）** ✓
+>     ⇒ ⭐⭐ **所以"【生息】"早就作为一个状态被挂上 ✓，"延长回合"也已有专门 op（`EXTEND_BUFF` ✓）** ✓；
+>   * `BATTLE_START` ⇒ `RAISE_SKILL_LEVEL` ×4 ✓（她的等级约定 ✓）；
+>   ⇒ ⭐ **本文件没有 `resources`** ✓（因此"回能 8"要用**能量自己的通道** ✗ —— ⚠ 而不是自造资源 ✓）。
+> * ⭐⭐ **于是第二个读者的**全部工作**就剩一条规则** ✓：
+>   **`on: STATE_ENDED` ＋ `when: ["self state_ended 生息", "target_hp_percent == 1"]` ⇒ 恢复目标 8 点能量** ✓
+>   ＋ 判据（⭐ 但要注意：她文件里**没有**"挂【生息】"的战技那条 ✗ —— ⚠ 现有的挂法在**终结技**上 ✓
+>     ⇒ ⭐ 判据可以直接**施放终结技** ✓ 再**过两个回合**（`afterMove()` ×2 ✓，文档说"持续 2 回合" ✓）
+>     ⇒ 断言**能量 +8** ✓）＋ 变异（把 `turns` 相关处改掉 ⇒ 必红 ✓）。
+> * ⚠ **唯一的名字待查** ✓：**"恢复 8 点能量"用哪个 op** ✗（⚠ 候选 `GAIN_ENERGY` ✗／对**能量**这一特殊资源用 `GAIN_RESOURCE` ✗
+>   ⇒ ⭐ 下一轮第一步：**搜 op 表里与 `ENERGY` 有关的写法** ✓ —— 一次调用 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十三：✅ **`1211` 的读者已经把"状态生命周期"整条跑通**（挂 ⇒ 两个回合 ⇒ 摘 ✓）；⚠ 只剩"那 8 点能量没到手"）**）**：
+>
+> * ✅ **实测（判据：施放终结技 ⇒ 过两回合 ⇒ 断言 ✓）** ✓：
+>   * ⭐ **`assertTrue(hasState(生息))` 通过** ✓（*"her ultra applies the state"* ✓）；
+>   * ⭐ **`assertFalse(hasState(生息))` 通过** ✓（*"two turns run it out"* ✓ ⇒ ⭐ **两回合到期成立** ✓）；
+>   * ⛔ `assertEquals(8.0, ΔEnergy)` **失败** ✗（*"the reader hands back the document's 8 energy (**0.0 -> 0.0**)"* ✓）
+>     ⇒ ⭐ **能量一点没加** ✗。
+> * ⭐ **三个候选（下一轮一次判掉）** ✓：
+>   **(甲)** ⭐ **读者规则的 `when` 里那条 `target_hp_percent >= 1`** ✗ —— ⚠ 在 `STATE_ENDED` 这个事件上，`target` 可能是**空**或**不是她** ✗
+>     （⚠ 文档说"若**我方目标**当前生命值等于其生命上限" ✓ ⇒ ⭐ 主体也许应是 **`self_hp_percent >= 1`** 或 **`actor…`** ✗ —— ⚠ 本段见过 `hp_percent <= 0.5` ✓ 与 `target_hp_percent` ✓ 两种 ✓ ⇒ **要看哪个在 `STATE_ENDED` 上有值** ✓）；
+>   **(乙)** ⭐ **`GAIN_ENERGY` 的 `target`** ✗ —— 我写 `"target": "target"` ✓ ⇒ ⚠ 若该事件的 `target` 不是她 ⇒ 能量加到了别人身上 ✗（⚠ 但本判据只看她 ⇒ 会表现为 0 ✓）；
+>   **(丙)** `owner.setCurrentEnergy(0)` ✓ 我为了读数归零 ✓ ⇒ ⚠ 若能量有**最低/基础回能**机制 ✗ ⇒ 读数会被别的来源影响 ✗（⚠ 但 0→0 说明**没有任何来源**加 ✓）。
+>   ⇒ ⭐ **下一轮第一步**：**先判 (甲)** ✓ —— 把条件里的 `target_hp_percent` 换成 **`self_hp_percent`**（或去掉条件先看能量是否到手 ✓）
+>     ⇒ ⭐ **一次就能分辨"条件挡了"还是"目标错了"** ✓。
+> * ⭐ **注意**：⚠ **内容与判据都已回滚** ✓（按纪律"没验成的不进树" ✓）⇒ 全量 **0**（**2130** 例 ✓）、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零六十四：✅ **候选 (甲) 被排除**（去掉血线条件后**读数仍是 0→0** ✗）⇒ ⭐ 元凶缩到"**规则没触发**"或"**能量加给了别人**"）**）**：
+>
+> * ✅ **实测（把 `when` 只留 `self state_ended 生息` ✓，去掉 `target_hp_percent >= 1` ✓，重跑 ✓）** ✓：
+>   读数**仍**是 **0.0 → 0.0** ✗ ⇒ ⭐ **所以"血线条件挡了"不是原因** ✗（⚠ 本段第 **九** 次用实测否掉自己的推测 ✓）。
+> * ⭐ **剩下的两个候选（下一次一次判掉）** ✓：
+>   **(乙)** ⭐ **`GAIN_ENERGY` 的 `"target": "target"`** ✗ —— ⚠ 在 `STATE_ENDED` 事件上，`target` 可能**不是她** ✗（或为空 ✗）
+>     ⇒ ⭐ **改法：把 `target` 写成 `"self"`** ✓（⚠ 一次改 ＋ 一次跑就能分辨 ✓）；
+>   **(丙)** ⭐ **读者规则根本没触发** ✗ —— ⚠ 最可能的原因是 **`self state_ended 生息` 里的状态名与"挂的那个"不完全一致** ✗
+>     （⚠ 她文件里挂的是 `APPLY_BUFF` ＋ `"buff": "生息"` ✓ ⇒ ⚠ 而**公告时带的是 `ended.getState()`** ✗ —— ⭐
+>       **`getState()` 与 `getBuffName()` 可能是两个东西** ✗✗ ⇒ ⭐ 若 `APPLY_BUFF` 只设了 `buffName` 而**没设 `state`**
+>         ⇒ 公告里的名字**为空**（⚠ 本段见过 `:335` 的 `stateName.equals(state.getState())` ✓ ⇒ `getState()` 确实存在 ✓）
+>         ⇒ ⭐ **那么"挂状态"要用能设 `state` 的写法** ✗ —— ⚠ 而本段在 `modifyAttr` 里见过只设 `buffName` 的 ✓
+>           ⇒ ⭐ **下一轮第一步（最关键的一读）**：读 **`APPLY_BUFF` → `applyState` 的实现** ✓（⚠ 看它有没有设 `state` ✓
+>             —— 若无 ⇒ ⭐ **那正是"公告名字为空"的根因** ✗ ⇒ ⭐ 而且它会**同时**解释 `1513` 为什么能成功 ✗
+>               （⚠ 可能 `1513` 的公告名恰好来自别处 ✓ ⇒ 要对照 ✓））。
+> * ⭐ **注意**：⚠ 内容与判据**已回滚** ✓ ⇒ 全量 **0**（**2130** 例 ✓）、树干净 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零六十五：✅✅✅ **`APPLY_BUFF` 确实设了状态名**（读 `applyState` ✓）⇒ ⭐ 于是"公告名"这条排除 ⇒ 元凶就是 **(乙)：`GAIN_ENERGY` 的 `target`**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.applyState` ✓，`:2423` ✓）** ✓ 原文：
+>   ```java
+>   private static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
+>       boolean permanent = unticked(effect);
+>       int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+>       String state = effect.getBuff().trim();                       // ★ 状态名 = `buff` 字段
+>       for (CanHit target : resolveTargets(battle, effect, ctx)) {
+>           AbstractBuff buff = … new StateBuff(state, turns, permanent) …;
+>           …
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以 `APPLY_BUFF` ＋ `"buff": "生息"` 建的**就是 `StateBuff("生息")`**** ✓ ⇒ ⭐ 到期时
+>     `buff instanceof StateBuff` **成立** ✓ ⇒ `battle.fireStateEnded(instance, "生息")` **会发** ✓
+>     ⇒ ⭐ **于是我的读者规则**应当**收到 `self state_ended 生息`** ✓（⚠ 与 `1513` 那条已验成功的形状一致 ✓）。
+> * ⭐⭐ **剩下唯一的候选就是 (乙)** ✓：**`"target": "target"` 指错了单位** ✗ —— ⚠ 在 `STATE_ENDED` 的上下文里，`target`
+>   很可能**不是她**（或为空 ✗）⇒ ⭐ **修法：写成 `"target": "self"`** ✓（⚠ 因为文档说"恢复**目标**8 点能量" ✓，
+>     而"目标"在这里就是**被解除【生息】的那个人** ✓ ⇒ 用 `self` 时主体是**事件里的她** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：把读者规则的 `target` 改成 **`"self"`** ✓ ⇒ 重放 ⇒ 跑判据 ⇒
+>   ⭐ **绿 ⇒ 变异（把 `turns` 从 2 改 3 ⇒ 必红 ✓）⇒ 全量 ⇒ 出货** ✓（⭐ 这将是目标 ① 的**第二个真读者** ✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十六：⚠ **`target: self` 也没修好**（仍 0→0 ✗）⇒ ⭐ 而且我意识到**前两次实验互相污染**：去掉条件那次**目标还是错的**，改目标这次**条件还在** ⇒ 所以**两个变量从未被单独测过**）**）**：
+>
+> * ⚠ **实测（把 `target` 改成 `self` ✓，条件保留 ✓）** ✓：读数**仍** 0.0 → 0.0 ✗（*"the reader hands back the document's 8 energy (0.0 -> 0.0)"* ✓）。
+> * ⭐⭐ **方法论上的关键发现（本段第十次自我纠正）** ✗：我做了两次"单变量"实验 ✗，但**它们不是单变量** ✗ ——
+>   * 第一次：**去掉条件** ✓、**目标仍是 `target`** ✗；
+>   * 第二次：**改目标为 `self`** ✓、**条件仍在** ✗；
+>   ⇒ ⭐ **所以"条件挡了"与"目标错了"这两条假设，谁都没有被真正排除** ✗
+>     ⇒ ⭐ **纪律（补）** ✗：**每次只动一个变量，并且要写下"这一次动的是哪一个、其余保持不变"** ✓ ——
+>       ⚠ 我这两次都自认为在单变量，实际各动了一个、又各留了一个 ✗。
+> * ⭐ **下一轮第一步（正交实验，一次性做完 2×2）** ✗：四个组合各跑一次 ✓ ——
+>   **(1)** 无条件 ＋ `target: self` ✓；**(2)** 有条件 ＋ `target: self` ✓（本轮已做 ⇒ 0 ✗）；
+>   **(3)** 无条件 ＋ `target: target` ✓（已做 ⇒ 0 ✗）；**(4)** 有条件 ＋ `target: target` ✓（未做 ⇒ 预计 0 ✗）。
+>   ⇒ ⭐ 若 (1) 也 0 ⇒ ⭐ **说明"规则根本没触发"** ✗（⚠ 而不是条件/目标 ✗）⇒ 那就要回到
+>     **"`STATE_ENDED` 事件到底有没有发"** 这一问 ✗（⚠ 最直接的查法：**写一条什么都不判、只 `GAIN_ENERGY` 的读者规则** ✓
+>       ⇒ 若仍 0 ⇒ 事件没到 ✓；⚠ 或者**在我的判据里手动 `fireTriggers(TriggerEvent.STATE_ENDED, …)`** 看那次能不能加能量 ✓
+>         —— ⭐ 后者一次就能分辨"事件没到"与"规则写错" ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（两个积压提交上一轮补齐 ✓ 或本轮补 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十七：✅✅✅ **判别实验一锤定音** —— **手工 fire `STATE_ENDED` 也拿不到能量**（0→0 ✗）⇒ ⭐ 所以**问题在规则本身**，不在投递；⭐ 而最可能的元凶是条件里的 **`target_hp_percent`**）**）**：
+>
+> * ✅ **实测（在判据里**手工** `battle.fireTriggers(TriggerEvent.STATE_ENDED, owner, owner, 0, 0)` ✓）** ✓：
+>   报 *"the rule itself must grant energy when the event is fired by hand (**0.0 -> 0.0**)"* ✗
+>   ⇒ ⭐⭐ **一句话分辨了两件事** ✓：**(i)** 引擎**确实**把公告送到了（否则手工 fire 会成功 ✗）⇒ ⛔ 反过来说：
+>     ⭐ **我的读者规则自己不成立** ✗；**(ii)** 于是"条件挡了"与"`GAIN_ENERGY` 目标错了"之间，**条件更可疑** ✓。
+> * ⭐⭐ **为什么条件最可疑（很硬的理由）** ✓：**手工 fire 的事件没有"目标"** ✗ ⇒ 我的 `when` 里那条
+>   **`target_hp_percent >= 1`** 读到的是**空/未设** ✗ ⇒ 条件为假 ⇒ 规则不触发 ✓（⚠ 这也解释了为什么"去掉条件那次"
+>     —— 那次**目标仍错** ✗ —— 也没给能量 ✓ ⇒ ⭐ **两次都被同一个条件以外的东西掩盖了** ✓）。
+> * ⭐ **正解（下一轮一次改）** ✗：把条件换成**读她自己**的那个变量 ✓ —— ⭐ **本段有现成先例** ✓：
+>   `1002` 的 `trace_low_hp_aggro_down` 用的是 **`hp_percent <= 0.5`** ✓（⚠ 而 `1001` 用的是 `target_hp_percent >= 0.3` ✓
+>     ⇒ ⭐ **两个变量都存在** ✓，区别正是"读谁" ✓）⇒ ⭐ 文档说"**若我方目标**当前生命值等于其生命上限" ✓
+>       ⇒ ⚠ 在被解除【生息】的那个人身上读 ⇒ 若事件主体是她 ⇒ 用 **`hp_percent >= 1`** ✓；若主体是别人 ⇒ 用 `target_hp_percent` ✓
+>       ⇒ ⭐ **先试 `hp_percent >= 1`** ✓（一次改＋一次跑 ✓）。
+> * ⚠ **推送**：本地仍**领先 3** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十八：⚠ **`hp_percent` 也没修好** ⇒ ⭐ 而这恰恰暴露**我那个"判别实验"本身不成立**：手工 fire 的 `STATE_ENDED` **不带状态名** ✗ ⇒ 我的读者条件 `self state_ended 生息` **永远为假** ✗）**）**：
+>
+> * ⚠ **实测（条件改 `hp_percent >= 1` ✓ ＋ 目标 `self` ✓ ⇒ 仍 0→0 ✗）** ✓。
+> * ⭐⭐⭐ **关键领悟（本段第十一次自我纠正）** ✗：**"手工 fire `STATE_ENDED`"这个判别法先天无效** ✗ ——
+>   ⚠ 因为那个事件**要携带状态名**（本段早前读到 `TriggerTable:2022` 的注释：*"⚠ **The name has to ride here** because the
+>   state is already gone by the time …"* ✓）⇒ ⭐ **手工 fire 时"名字"为空** ✗ ⇒ 我的条件 `self state_ended 生息`
+>   **必然不成立** ✗ ⇒ ⭐ **所以那个 0 什么也没证明** ✗（⚠ 它只证明了"没有名字时不触发" ✓ —— 那是**正确行为** ✗）。
+>   ⇒ ⭐ **教训（纪律）** ✗：**判别实验必须"制造一个与真实路径同构的最小情形"** ✓ —— ⚠ 手工 fire **丢掉了关键上下文** ✗
+>     ⇒ ⭐ **正路只能是走真路径**（到期 ✓）＋ **把条件逐个换掉** ✓。
+> * ⭐ **于是回到正交实验（现在只剩两个变量、且都还没被干净地测过）** ✗：真路径（到期 ✓）＋
+>   **(1)** 无条件 ＋ `target: self` ✓；**(2)** 无条件 ＋ `target: target` ✓；**(3)** `hp_percent >= 1` ＋ `self` ✓（本轮 ⇒ 0 ✗）；
+>   **(4)** `hp_percent >= 1` ＋ `target` ✓。
+>   ⇒ ⭐ **先做 (1)** ✓（无条件 ⇒ 若仍 0 ⇒ ⭐ 那就说明**规则压根没在真路径上触发** ✗ ⇒ 回头查"公告名是不是 `生息`" ✓
+>     —— ⚠ 而她文件里是 `APPLY_BUFF` ＋ `"buff": "生息"` ✓ ⇒ 名字应当就是"生息" ✓ ⇒ ⭐ 那就要在判据里**打印**
+>       `getBuffManager()` 的状态名 / 或**用一个只判 `self state_ended 生息` 而什么都不做的规则**看它有没有被选中 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十九：✅✅ **正交实验第 (1) 组做完，结论很硬**：**无条件 ＋ `target: self` ＋ 真路径**仍是 **0→0** ⇒ ⭐ 所以**读者规则根本没触发**（不是条件、不是目标））**）**：
+>
+> * ✅ **实测（真路径到期 ✓ ＋ `when` 只留 `self state_ended 生息` ✓ ＋ `target: self` ✓）** ✓：**0.0 → 0.0** ✗。
+> * ⭐⭐ **两条已知事实夹出结论** ✓：
+>   **(i)** 本段早前的实验证明 **`afterMove()` ×2 之后 `hasState(生息)` 为假** ✓（*"two turns run it out"* **通过** ✓）
+>     ⇒ ⭐ **状态确实"到期"了** ✓ ⇒ 按 `BuffManager` 的分支（`duration() <= 0` ＋ `instanceof StateBuff` ✓）
+>       ⇒ **引擎应当发了公告** ✓；
+>   **(ii)** 而规则（条件只剩状态名 ✓）**没有触发** ✗
+>   ⇒ ⭐⭐ **于是"公告里的名字"与"我写的 `生息`"对不上** ✗（或者该事件的**接收条件写法**还有别的门槛 ✓）。
+> * ⭐ **下一轮第一步（把"公告名"直接看/打出来，1–2 次调用）** ✗：二选一 ✓：
+>   **(甲)** 在判据里**挂一个"只判 `self state_ended 生息`、动作是 `GAIN_ENERGY`"的规则**（手搭表 ✓）⇒ ⚠ 若它**也不触发** ⇒ 说明名字不对 ✓；
+>   **(乙)** ⭐ **读 `Battle.fireStateEnded` 的实现** ✓（⚠ 一次调用 ✓）⇒ 看它把名字放在**上下文的哪个槽**（⚠ 本段读到 `TriggerContext` 有 `stateName` ✓
+>     ⇒ ⭐ 而条件解析里 `state_ended` 取的正是那段文本 ✓ ⇒ **两处必须对齐** ✓）⇒ ⭐ 若发现"名字来自 `getState()` 而 `StateBuff` 的 `getState()`
+>       与构造时传的名字不同" ✗ ⇒ ⭐ **那就是根因** ✓（⚠ 且会解释 `1513` 为什么成功 ✗ —— ⚠ 因为它的状态名恰好等于 `getState()` ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十：✅✅✅ **`fireStateEnded` 读了** —— 名字放在**战斗级字段 `lastStateEndedName`** 里（`try/finally` 包裹）⇒ ⭐ 这也**正式证明我那个"手工 fire"判别法无效**（它绕过了这个 setter ✓））**）**：
+>
+> * ✅ **实测（读 `Battle.fireStateEnded` ✓，`:2211` ✓）** ✓ 原文：
+>   ```java
+>   public void fireStateEnded(CanHit carrier, String stateName) {
+>       String previous = lastStateEndedName;
+>       lastStateEndedName = stateName;                                   // ★ 名字进"战斗级字段"
+>       try {
+>           fireTriggers(TriggerEvent.STATE_ENDED, carrier, carrier, 0, 0);   // ★ actor = carrier，target = carrier
+>       } finally {
+>           lastStateEndedName = previous;
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** 名字**不在事件参数里**，而在 `lastStateEndedName` ✓ ⇒ ⭐ **所以"手工 `fireTriggers(STATE_ENDED, …)`"必然读不到名字** ✗
+>     ⇒ ⭐ **本段上一轮那个 0 完全不作数** ✓（⚠ 我当时的判断"判别法无效"**被证实** ✓ —— 本段第十二次自我纠正 ✓）；
+>   **(ii)** 事件的 **actor = target = carrier** ✓ ⇒ ⭐ 若状态挂在**她**身上 ⇒ `self`（规则持有者）与 `actor` **都是她** ✓ ⇒ 我的条件主体 `self` **应当匹配** ✓；
+>   **(iii)** ⭐ 名字由 `ended.getState()` 传入 ✓（`BuffManager:666` ✓）⇒ 而 `applyState` 用 `"buff"` 建 `StateBuff(state)` ✓ ⇒ ⭐ **两端都应当是 `生息`** ✓
+>     ⇒ ⚠ **那么剩下的唯一可能是条件解析那一侧** ✗（⚠ 即 `self state_ended 生息` 里 **`self` 这个主体词**是否被 `requireStateSubject` 认 ✓
+>       —— ⚠ 本段见过 `self has_state 秘技` ✓ 用的是 `has_state` ✗ ⇒ ⭐ **`state_ended` 的主体词表可能不同** ✗）。
+> * ⭐ **下一轮第一步（1 次调用，直击要害）** ✗：读 **`TriggerTable.requireStateSubject`** ✓（⚠ 它决定"哪些主体词合法" ✓）
+>   ⇒ 若它只认 **`target`／`actor`** 而**不认 `self`** ✗ ⇒ ⭐ **根因到手** ✓ ⇒ 把条件改成 **`actor state_ended 生息`** ✓（或 `target …` ✓）
+>     ⇒ 重跑 ⇒ 绿 ⇒ **变异（`turns: 2 → 3`）⇒ 全量 ⇒ 出货** ✓（⭐ 目标 ① 的第二个真读者 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十一：⭐ 找到了 `requireStateSubject` 的**两个调用点**（`state_ended` 与 `has_state` 共用它 ✓）⇒ ⭐ **所以 `self` 作为主体在 `has_state` 上是通的**（本段有 `self has_state 秘技` 的先例 ✓）⇒ ⚠ 那"`self state_ended …` 为何不触发"就**不是主体词的问题** ✗）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1206`–`:1230` ✓）** ✓：`state_ended` ✓ 与 `has_state` ✓ **共用同一个 `requireStateSubject(subject, raw, spec)`** ✓
+>   ⇒ ⭐ **因此"哪些主体词合法"对两者是一样的** ✓ ⇒ ⚠ 本段已有 **`self has_state 秘技`** 在树上且**有效** ✓（`1002` 的先例 ✓）
+>     ⇒ ⭐ **`self` 合法** ✓ ⇒ ⛔ **所以"主体词"这条也排除** ✗（⚠ 本段第十三次自我纠正 ✓）。
+> * ⭐⭐ **于是元凶只剩"名字本身"** ✗：`self state_ended 生息` 里的 **`生息`** 与公告时的 `ended.getState()` **不一致** ✗
+>   ⇒ ⚠ 而 `applyState` 是 `new StateBuff(effect.getBuff().trim(), …)` ✓ ⇒ ⭐ 除非 **`StateBuff` 的构造把名字加工过** ✗
+>     （⚠ 例如去掉了某些字符／或 `getState()` 返回**另一个字段** ✗）⇒ ⭐ **下一轮第一步（一次调用）**：读 **`StateBuff`** ✓
+>       （⚠ `models/buff/StateBuff.java` ✓ ⇒ 看它的构造与 `getState()` ✓ ⇒ ⭐ 见分晓 ✓）。
+> * ⭐ **另一条同样便宜的判法** ✓：把读者规则的 `on` 改成 **`STATE_ENDED` 且 `when` 为空** ✓（⚠ 无条件 ✓）⇒
+>   ⭐ 若**仍不加能量** ⇒ 说明**事件压根没到这条规则** ✗（⚠ 那就去查"她的表里这条规则是否被装载器收下" ✓）；
+>     若**加了** ⇒ ⭐ 说明**事件到了、是名字对不上** ✓ ⇒ 一次就能二选一 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十二：✅✅✅ **`requireStateSubject` 的定义读了** —— `state_ended` 与 `has_state` **共用同一套主体词**，且报错文案**自己解释了三个主体**（*"self = the character whose table fired, actor = who caused the event, target = what it happened to"*）⇒ ⭐ 所以 **`self` 合法** ⇒ "主体词"这条**彻底排除**）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1766` ✓）** ✓ 原文：
+>   ```java
+>   private static String requireStateSubject(String subject, String raw, TriggerSpec spec) {
+>       if (!STATE_SUBJECTS.contains(subject)) {
+>           throw new IllegalArgumentException(
+>               "Condition '" + raw + "' asks whether '" + subject + "' is in a named state, but the parties are "
+>               + String.join(", ", STATE_SUBJECTS.stream().sorted().toList())
+>               + " (self = the character whose table fired, actor = who caused the event, "
+>               + "target = what it happened to) (source: " + spec.getSource() + ")");
+>       }
+>       return subject;
+>   }
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** 两个条件（`state_ended` ✓／`has_state` ✓）**共用 `STATE_SUBJECTS`** ✓；
+>   **(ii)** `self` 的含义就是"**这个表的主人**" ✓ ⇒ ⭐ **`self state_ended 生息` 完全合法** ✓（⚠ 且 `self has_state 秘技` 已有生效先例 ✓）
+>     ⇒ ⛔ **"主体词"这条排除** ✓（本段第十三次自我纠正 ✓）。
+> * ⭐⭐ **于是只剩两条可能** ✓：**(甲)** **名字对不上** ✗（⚠ `生息` vs `ended.getState()` ✗）；**(乙)** **事件压根没到这条规则** ✗。
+> * ⭐ **下一轮第一步（一次就能二选一，最便宜）** ✗：**把读者规则的 `when` 清空** ✓（只留 `on: STATE_ENDED` ✓）
+>   ⇒ 重放 ＋ 跑判据 ✓：
+>   * ⭐ **仍不加能量** ⇒ **(乙)** ✓ ⇒ 去查"她表里这条规则**是否被装载器收下**／是否被某个 `when` 之外的机制跳过" ✓；
+>   * ⭐ **加了能量** ⇒ **(甲)** ✓ ⇒ 去读 **`StateBuff`**（⚠ `models/buff/StateBuff.java` ✓ ⇒ 看 `getState()` 返回什么 ✓
+>     —— ⚠ 也许构造时对名字做了**规范化**（trim／大小写／去掉空格 ✓）⇒ ⭐ 那就是根因 ✓，改名字即可 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十三：✅✅✅ **判别实验做完，答案是 (乙)** —— **条件清空后仍不加能量**（0→0 ✗）⇒ ⭐ 所以 **`STATE_ENDED` 事件压根没到这条规则**；⭐ 而状态**确实消失了** ⇒ ⭐ 结论：**`afterMove()` 并不是那条"会公告"的路径**）**）**：
+>
+> * ✅ **实测（读者规则 `when: []` ✓，只留 `on: STATE_ENDED` ✓ ⇒ 重放 ⇒ 跑判据 ✓）** ✓：**0.0 → 0.0** ✗
+>   ⇒ ⭐⭐ **事件没到** ✓（⚠ 否则无条件规则一定会加能量 ✓）。
+> * ⭐⭐ **而"状态确实没了"这一条本段已实测过** ✓（*"two turns run it out"* 通过 ✓）⇒ ⭐ **两者合起来只剩一个解释** ✗：
+>   **`BuffManager.afterMove()` 走的是"清理到期状态"的另一条路径** ✗，而**公告只在 tick 那条路径里** ✓
+>   （⚠ 本段读到的公告在 `duration() <= 0` 的**tick 循环内** ✓ ⇒ ⭐ 而 `afterMove()` 可能只是"回合结束时清理" ✓）。
+>   ⇒ ⭐ 也就是说：**判据用错了推进方式** ✗ —— ⚠ 不是内容的问题 ✓，也不是条件/目标/名字的问题 ✓（⭐ 本段第十**四**次自我纠正 ✓）。
+> * ⭐ **下一轮第一步（换成"真的推进一个回合"，1–2 次调用）** ✗：二选一 ✓：
+>   **(甲)** ⭐ **用引擎自己的回合循环** ✗（⚠ 需要知道入口 —— 本段见过 `Battle` 在回合结束处调用
+>     `actor.afterMove(this); actor.getBuffManager().afterMove(); tickForeignBuffs(actor, false);` ✓ ⇒ ⭐ 那么"tick 她自己"这一半**在哪** ✗
+>       —— ⚠ **很可能在 `afterMove` 的**内部**** ✗ hmm: 若如此，公告应当发生 ✗ ⇒ 矛盾 ✓ ⇒ ⭐ 所以更可能：
+>         **`afterMove()` 里 tick 的是"另一种计时"** ✗（⚠ 而 `duration` 的递减在别处 ✓））；
+>   **(乙)** ⭐⭐ **一次调用读 `BuffManager.afterMove()`** ✓ ⇒ ⭐ **看它到底做了什么** ✓（⚠ 若它只做清理不递减 ⇒ 根因到手 ✓
+>     ⇒ 那"递减 + 公告"就在**别的方法**里 ✓ ⇒ 找到它 ⇒ 判据改用它 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十四：✅✅✅ **`afterMove()` **确实**调了 tick**（`processBuffTick(false)` ✓）⇒ ⭐ 所以"路径错了"这条也**不成立** ✗ ⇒ 元凶缩到**两处**：`processBuffTick` 的 `early` 语义 ✗，或**名字真的不一致** ✗）**）**：
+>
+> * ✅ **实测（读 `BuffManager.afterMove` ✓，`:454` ✓）** ✓ 原文：
+>   ```java
+>   public void afterMove() {
+>       // ★ The carrier's OWN turn just ended (2026-09-30): values scoped to 「同一回合内」… duration tick,
+>       // which is the same "this unit's turn is over" moment -- one place, not two.
+>       removeWithLifetime(AbstractBuff.Lifetime.TURN_END);
+>       processBuffTick(false);            // ★ 就是这里（公告在它内部）
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以判据的推进方式没错** ✓（⚠ 本段第十四次自我纠正**又被推翻**了一次 —— ⭐ **这就是"每个结论都要实测"的代价与价值** ✓）。
+> * ⭐ **于是只剩两处** ✓：
+>   **(甲)** ⭐ **`processBuffTick(false)` 里的 `false`** ✗ —— ⚠ 本段在 `tickForeign(clockOwner, early)` 上见过"`early` = 回合前／后" ✓
+>     ⇒ ⭐ 若 `processBuffTick` 同理，**`false` = 回合后** ✓ 而那正是**公告所在** ✓（⚠ 但仍没触发 ⇒ 看它的实现 ✓）；
+>   **(乙)** ⭐⭐ **名字真的不一致** ✗ —— ⚠ 本段那次 dump 的**编码是乱的** ✗（显示成 `'��Ϣ'` ✗）⇒ ⭐ **不能据此断定文件里就是"生息"** ✗
+>     ⇒ ⭐ **下一轮第一步（一次调用即可，最便宜）**：**读 `1211.json` 里那条 `APPLY_BUFF` 的 `buff` 值的确切字节** ✓
+>       （⚠ 用 `Select-String -Pattern 'APPLY_BUFF' -Context 0,2` ✓ 或 python 打印 `[hex]` ✓）⇒ 与 `生息` 对比 ✓
+>       ⇒ ⭐ 若不同 ⇒ **根因到手** ✓（改内容即可 ✓）；若相同 ⇒ 去读 `processBuffTick` ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十五：✅✅✅ **名字字节完全一致**（`e7949fe681af` = 生息 ✓，与期望逐字节相同 ✓）⇒ ⭐ 于是 (乙) 排除；⭐ 而新的、更可能的解释是：**她的【生息】是被 `removeWithLifetime(TURN_END)` 那条"静默清理"摘掉的** ✗）**）**：
+>
+> * ✅ **实测（`1211.json` 的 `buff` 值取十六进制 ✓）** ✓：
+>   `APPLY_BUFF buff= '生息' bytes= e7949fe681af` ✓；`expected 生息 = e7949fe681af` ✓ ⇒ ⭐⭐ **逐字节相同** ✓
+>   ⇒ ⛔ **"名字对不上"这条排除** ✓（⚠ 本段第十五次自我纠正 ✓ —— ⚠ 而这次是因为**上次 dump 的乱码让我怀疑** ✗，复核后证明**内容没问题** ✓）。
+> * ⭐⭐⭐ **于是只剩一个候选，而且它就在我读过的那两行里** ✓：
+>   ```java
+>   public void afterMove() {
+>       removeWithLifetime(AbstractBuff.Lifetime.TURN_END);   // ← ★ 这条是"静默摘除"（不公告）
+>       processBuffTick(false);                               // ← 公告在这个里面
+>   }
+>   ```
+>   ⇒ ⭐ **若她的【生息】的**lifetime 是 `TURN_END`** ✗ ⇒ 它在**第一行**就被摘掉了 ✗ ⇒ `processBuffTick` 到时**已经没有它** ✗
+>     ⇒ ⭐ **一声不响** ✓✓ —— ⭐ 这**同时**解释了：**状态确实消失了** ✓（我实测过 ✓）而**事件没发** ✓（本轮实测 ✓）。
+> * ⭐ **下一轮第一步（一次读，直击要害）** ✗：读 **`withLifetime(...)`／`AbstractBuff.Lifetime`** ✓ ⇒ 看"什么写法会得到 `TURN_END`"
+>   ⇒ ⚠ 若与 **`permanent`／`unticked`** 有关 ✗ ⇒ ⭐ **她的【生息】正是 `permanent: true`** ✗（⚠ 本段 dump 里那三条 `do` 的字段没看全 ✗ ⇒ 下一轮**dump 她的 `do` 全部字段** ✓）
+>     ⇒ ⭐ 那就说明：**永久状态不会发 `STATE_ENDED`** ✗ ⇒ ⭐ **这本身是一条引擎级事实** ✓（⚠ 读者 ≥4 ✓ —— 目标 ① 的其余读者都可能受它影响 ✓）
+>       ⇒ ⭐ **正解可能是**：把她的【生息】改成**限时**（`turns: 2` ✓，文档也这么说 ✓）⇒ 到期 ⇒ 公告 ✓ ⇒ 读者生效 ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十六：✅✅ **她的 `do` 全部字段 dump 出来了** —— `APPLY_BUFF` 是 **`"turns": 2`**（**不是** permanent ✗）⇒ ⭐ 所以"永久 ⇒ 静默摘除"这条也**排除**；⭐ 元凶只剩"**我那条读者规则是否真的在表里**"）**）**：
+>
+> * ✅ **实测（dump `1211` 的 `ULT_CAST` 规则 ✓）** ✓：
+>   ```json
+>   "when": ["actor == self"],
+>   "do": [
+>     {"op":"MODIFY_DAMAGE_TAKEN","percent":-0.1,"turns":2,"buff":"生息","target":"all_allies","target_when":["!target has_state 生息"]},
+>     {"op":"APPLY_BUFF","buff":"生息","turns":2,"target":"all_allies","target_when":["!target has_state 生息"]},
+>     {"op":"EXTEND_BUFF","buff":"生息","turns":1,"target":"all_allies","target_when":["target has_state 生息"]}
+>   ]
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** **`turns: 2`** ✓ ⇒ **正常限时状态** ✓（⛔ "永久"假设排除 ✓，本段第十六次自我纠正 ✓）；
+>   **(ii)** 它带 **`target_when`** ✓（"没有才挂 ✓／有才延长 ✓" —— ⭐ 正是文档那两句 ✓）；
+>   **(iii)** 它**也**挂 `MODIFY_DAMAGE_TAKEN` ✓（-10% ✓ ⇒ 与【生息】同一批目标 ✓）。
+> * ⭐⭐ **于是所有"内容侧"的可能都被排除了** ✓（名字 ✓、时长 ✓、主体 ✓、条件 ✓、目标 ✓、路径 ✓）⇒ ⭐ **唯一剩下的解释是**：
+>   **我那条读者规则压根没进她的表** ✗（⚠ 或进了但**没被选中** ✗）——
+>   ⚠ 而 `EveryCharacterAndRelicRuleIsSelectedTest` **是绿的** ✓ ⇒ 说明表能装载 ✓ ⇒ ⭐ 那就剩"**事件发生的那一回合，她的表里那条规则的 `when` 被判假**" ✗ hmm:
+>     ⚠ 但我把 `when` 清空过 ✓ 仍 0 ✗ ⇒ ⭐ **那只能是"事件真的没发"** ✗。
+> * ⭐ **下一轮第一步（把"事件到底发没发"直接测出来，1 次调用）** ✗：**改判据**，让它在**到期前后各读一次**
+>   `battle` 的某个可观测计数 ✗（⚠ 无公开计数 ✗）⇒ ⭐ **换个更笨但有效的办法**：
+>   **在判据里同时挂两条手搭规则** ✓（`plus` ✓）：一条 `on: STATE_ENDED` ⇒ `GAIN_ENERGY 8` ✓；
+>   一条 `on: STATE_ENDED` ⇒ `APPLY_BUFF{探针}` ✓ ⇒ ⭐ 若**手搭的也不触发** ⇒ ⭐ **事件确实没发** ✗
+>     ⇒ 那就回头查 **`processBuffTick(false)` 里"发不发公告"的条件** ✓（⚠ 本段只读了 `afterMove` 的**调用** ✓，
+>       没读 `processBuffTick` 的**内部** ✗ ⇒ ⭐ 那才是该读的最后一段 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十七：✅✅✅ **最后一段读了** —— `processBuffTick(early)` **只是 `tickBuff(instance, early)`** ✓；⭐ 而 `tickBuff` 里有一道**很关键的守卫**：**只有"计时属于该 clockOwner"的 buff 才会被 tick**）**）**：
+>
+> * ✅ **实测（读 `BuffManager:589`–`:602` ✓）** ✓ 原文：
+>   ```java
+>   private void processBuffTick(boolean early) { tickBuff(instance, early); }        // ★ 就是它
+>   …
+>   public void tickForeign(CanHit clockOwner, boolean early) {
+>       if (clockOwner == null || clockOwner == instance) { return; }
+>       tickBuff(clockOwner, early);
+>   }
+>   ```
+>   ＋ 后者 javadoc 的关键句 ✓：*"Spends the duration of the buffs on this unit whose **clock** belongs to `clockOwner` … **Our own
+>   boundary is skipped** — that one has already gone through `beforeMove()` / `afterMove()`."* ✓
+> * ⭐⭐ **于是得到两条硬结论** ✓：
+>   **(i)** `afterMove()` ⇒ `processBuffTick(false)` ⇒ **`tickBuff(instance, false)`** ✓ ⇒ 所以**她自己的计时确实会被 tick** ✓；
+>   **(ii)** ⚠ 而 `tickBuff` 内部第一件事是 **`if (!buff.ticksOn(clockOwner)) { continue; }`** ✓（本段在同一文件里读到 ✓）
+>     ⇒ ⭐ **只有"计时属于她"的 buff 才递减** ✗ ⇒ ⚠ 若她的【生息】的 tick 归属**不是她**（⚠ `withTickOwner(effect, ctx)` 可能给了 `ctx.owner()` ✓ 或 `"summon"` ✓）
+>       ⇒ ⭐ **它就不会被递减** ✗ ⇒ ⚠ 但它**确实消失了** ✓ ⇒ ⭐ **那只能是 `afterMove` 的第一行**：
+>         **`removeWithLifetime(AbstractBuff.Lifetime.TURN_END)`** ✓ —— ⭐⭐ **"静默摘除"** ✓（**不公告** ✓）⇒ ⭐ **根因到手** ✓✓。
+> * ⭐ **下一轮第一步（一次读，确认 lifetime 映射）** ✗：读 **`withLifetime(...)`** ✓（⚠ 在 `TriggerInterpreter` 里 ✓，本段见过它被 `modifyAttr`／`applyState` 用 ✓）
+>   ⇒ 看"**什么条件下 buff 的 lifetime = `TURN_END`**" ✓ ⇒ ⚠ 若与 **`turns` 的缺省／`permanent`／`unticked`** 有关 ✗
+>     ⇒ ⭐ **正解**：让她的【生息】拿一个**纯时长**的 lifetime ✓（⚠ 文档说"持续 2 回合" ✓ ⇒ 本该如此 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十八：🎯🎯🎯 **根因找到了，逐字** —— `tickBuff` 的三道 `continue` 里，**第二道**是 `if (buff.isEarlyBuff != early) continue;` ⇒ ⭐ 一个 buff **只在它所属的那一半**里被 tick ⇒ ⚠ 而 `afterMove()` 传的是 **`false`（后半天）** ✗ ⇒ **"早半天"的 buff 被跳过** ✗）**）**：
+>
+> * ✅ **实测（读 `BuffManager.tickBuff` 的头 ✓，`:645` ✓）** ✓ 原文：
+>   ```java
+>   private void tickBuff(CanHit clockOwner, boolean early) {
+>       for (AbstractBuff buff : List.copyOf(buffs)) {
+>           if (buff.isPermanent()) { continue; }               // ★ A：永久 ⇒ 永不倒数、永不"到期"
+>           if (buff.isEarlyBuff != early) { continue; }        // ★ B：只在它所属的那一半里 tick  ← **就是它**
+>           if (!buff.ticksOn(clockOwner)) { continue; }        // ★ C：计时不属于我 ⇒ 跳过
+>           boolean couldAct = buff.canAct();
+>           buff.tickEffect(instance);
+>           …
+>   ```
+>   ⇒ ⭐⭐⭐ **答案** ✓：`afterMove()` 里传 `early = false` ✓ ⇒ **只有 `isEarlyBuff == false` 的 buff 被递减** ✗
+>     ⇒ ⚠ 若【生息】的那条 buff 是**"早半天"**（`isEarlyBuff == true` ✗）⇒ ⭐ **它在 `afterMove()` 里被 `continue` 掉** ✗
+>       ⇒ ⭐ **从不递减** ✗ ⇒ ⭐ 而它**确实消失了** ✓ ⇒ ⭐ **只能是 `afterMove()` 第一行那句 `removeWithLifetime(TURN_END)`** ✓
+>         ⇒ ⭐⭐ **静默摘除、没有公告** ✓✓ —— **整条链闭合** ✓（⚠ 这也解释了 `1513` 为什么成功 ✗：它的 buff 属于后半天 ✓）。
+> * ⭐⭐ **下一轮第一步（一次改就得绿）** ✗：**判据里把"早半天"也推一次** ✓ —— 即同时调
+>   **`owner.getBuffManager().beforeMove()`** ✓（⚠ 本段在先前的 javadoc 里见过它 ✓：*"that one has already gone through
+>   `beforeMove()` / `afterMove()`"* ✓）⇒ ⭐ 那么【生息】会在**它的那一半**里递减 ⇒ 到期 ⇒ **公告** ⇒ **读者接住** ✓✓
+>   ⇒ 绿 ⇒ **变异（`turns: 2 → 3`）⇒ 全量 ⇒ 出货** ✓（⭐ 目标 ① 的第二个真读者 ✓）。
+> * ⭐ **顺带一条可复用的事实** ✓：**本项目里"限时状态"分早／晚两半递减** ✗ ⇒ ⭐ **判据推进回合时要两半都推** ✓
+>   （⚠ 而 `1513` 那次恰好只推后半天就成功 ⇒ 说明那次的 buff 是后半天 ✓）⇒ ⭐ **纪律（补）**：**判据推进一个回合 = `beforeMove()` ＋ `afterMove()`** ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十九：⭐ 把"下一次重放"要改的**四处**写成一张清单（工具脚本已被回滚到原始版本，所以下一轮要一次性改齐）**）**：
+>
+> * ⭐ **工具脚本 `tools/ship_1211_reader.py` 下一轮要改的四处** ✗（⚠ 因为本段多次 `git checkout -- .` 把它回滚到了**最初版** ✓）：
+>   1. **读者规则的 `target`**：`"target"` → **`"self"`** ✓（⚠ 本段已验证过这个方向的实验无效，但当时的**另一半**（条件）仍在 ⇒ ⭐ **现在两个变量都已单独测过** ✓ ⇒ 用 `self` ✓）；
+>   2. **读者规则的 `when`**：先**清空**（`[]` ✓）—— ⭐ 因为本段已判定"事件没发"✗ ⇒ **先把"事件到没到"钉住** ✓；
+>   3. ⭐⭐ **判据的回合推进**：**`beforeMove()` ＋ `afterMove()` 各一次，共推两个回合** ✓
+>      （⚠ 依据：`tickBuff` 的 **`if (buff.isEarlyBuff != early) continue;`** ✓ ⇒ 限时 buff **只在它所属的那一半递减** ✓ ⇒ ⭐ **两半都推才不会漏** ✓）；
+>   4. 判据里那次**无条件的"手工 fire"判别断言**（本段加过 ✓）**删掉** ✗ —— ⚠ 它绕过 `lastStateEndedName` ⇒ **恒假** ✗。
+>   ⇒ ⭐ **预期**：`beforeMove(); afterMove();` ×2 ⇒ 【生息】在**它那一半**里递减两次 ⇒ 到期 ⇒ **公告** ⇒ 读者（无条件）**必然加能量** ⇒ **绿** ✓
+>     ⇒ 然后**再把文档的血线条件加回来**（`hp_percent >= 1` ✓）⇒ 若仍绿 ⇒ **出货** ✓；若红 ⇒ ⭐ **说明"血线"这个条件本身需要另一种写法** ✓（⚠ 那是下一个独立问题 ✓）。
+> * ⭐ **变异（随后立刻做）** ✗：把 `APPLY_BUFF` 的 **`turns: 2` 改成 `3`** ✓ ⇒ 两回合后状态还在 ⇒ 读者不触发 ⇒ ⭐ **判据必红** ✓（⚠ 跑**全量** ✓）。
+> * ⭐ **本段对该读者已排除的可能（可写进文档）** ✓：名字（字节相同 ✓）、主体词（`self` 合法 ✓）、`STATE_ENDED` 条件形态（`<主体> state_ended <名>` ✓）、
+>   **目标**、**推进路径**（`afterMove` 确实 tick ✓）⇒ ⭐ **剩下唯一未排除的就是"早／晚两半"** ✓（本轮已定 ✓）。
+> * ⭐ **可复用的两条事实** ✓：**(i)** **判据推进一个回合 = `beforeMove()` ＋ `afterMove()`** ✓；**(ii)** **状态的"到期公告"只在它所属的那一半 tick 里发生** ✓
+>   （⚠ 另一半只走**静默清理** `removeWithLifetime(TURN_END)` ✗）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十：✅✅ **两半都推了、条件也只剩状态名、目标用 `self` —— 仍是 0→0** ⇒ ⭐ 而 **`assertFalse(hasState(生息))` 通过** ⇒ ⭐ 所以"**到期确实发生、公告确实没有**"这两点同时钉死了）**）**：
+>
+> * ✅ **实测（`beforeMove()` ＋ `afterMove()` ×2 ✓ ＋ `when: ["self state_ended 生息"]` ✓ ＋ `target: self` ✓）** ✓：
+>   * ⭐ **`assertTrue(hasState(生息))` 通过** ✓（挂上了 ✓）；
+>   * ⭐ **`assertFalse(hasState(生息))` 通过** ✓（两回合后没了 ✓）；
+>   * ⛔ **能量仍是 0→0** ✗（*"the reader hands back the document's energy (0.0 -> 0.0)"* ✓）。
+> * ⭐⭐ **于是只剩最后一个候选（也是 `tickBuff` 的第三道守卫）** ✓：
+>   ⚠ **她的【生息】的"计时归属"（`ticksOn(clockOwner)`）不是她** ✗ ⇒ ⭐ `tickBuff` 里 **`if (!buff.ticksOn(clockOwner)) { continue; }`** 把它跳过 ✗
+>     ⇒ ⭐ **它从不递减** ✗ ⇒ ⭐ 而它**确实消失了** ✓ ⇒ ⭐ **只能是 `afterMove()` 第一行 `removeWithLifetime(TURN_END)`** ✓ ——
+>       ⭐⭐ **静默摘除、不公告** ✓✓ ⇒ **与"事件没发"完全一致** ✓。
+>   ⇒ ⚠ 也就是说：**内容是"对"的（文档口径）** ✗，但它在这个引擎里**拿不到"到期公告"** ✗ ⇒ ⭐ **这本身就是一条**引擎级限制**** ✓
+>     （⚠ 读者 ≥4 ✓：`1211` 的【生息】结束 ✓、`1211` 的【生息】结束回能 ✓（同一句 ✓）、以及任何"靠自然到期发 `STATE_ENDED`"的状态 ✓）。
+> * ⭐ **下一轮第一步（把这条限制钉成事实，1–2 次调用）** ✗：读 **`withTickOwner`／`ticksOn`** ✓
+>   （⚠ 本段见过 `TriggerInterpreter:2332` 的 `withTickOwner` ✓：`buff.setTickOwner("summon".equals(effect.getTicksOn().trim()) ? requireSummon(ctx) : ctx.owner());` ✓）
+>   ⇒ ⭐ 看 `ctx.owner()` 在**她自己的终结技**里是谁 ✗（⚠ 若它不是"她" ⇒ **根因确证** ✓ ⇒ ⭐ 修法：内容里显式写 `ticks_on` ✓（⚠ 若该字段存在 ✓）或接受"引擎限制"并**登记** ✓）。
+> * ⭐ **并记下本段为止的净结果** ✓：目标 ① 的**第一个读者已出货并验完**（`1513` 阿哈时刻 ✓，变异 1 红 ✓）；
+>   **第二个读者**（`1211`）的**内容口径已完全查清**，卡在"引擎不给这种状态发到期公告"上 ✓ ⇒ ⭐ **下一轮若确证 ⇒ 按纪律登记**（附全部实测 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零八十一：✅✅✅ **第三道守卫也排除了**（`ticksOn` 默认取 `owner` 即载体 ⇒ 她自己的状态**会被 tick** ✓）⇒ ⭐ 于是 `tickBuff` 的三道 `continue` **全都不成立** ✗ ⇒ ⭐ 事件**应当发了** ⇒ ⭐ 元凶只剩"**我那条规则压根没进她的表**"）**）**：
+>
+> * ✅ **实测（读 `withTickOwner` ＋ `AbstractBuff.ticksOn` ✓）** ✓ 原文：
+>   ```java
+>   private static AbstractBuff withTickOwner(AbstractBuff buff, EffectSpec effect, TriggerContext ctx) {
+>       if (effect.getTicksOn() != null) {                       // ★ 只有写了 `ticks_on` 才设属主
+>           buff.setTickOwner("summon".equals(effect.getTicksOn().trim()) ? requireSummon(ctx) : ctx.owner());
+>       }
+>       return buff;
+>   }
+>   // AbstractBuff:
+>   public boolean ticksOn(CanHit who) {
+>       CanHit clock = tickOwner == null ? owner : tickOwner;     // ★ 默认 = owner（载体本身）
+>       return clock != null && clock == who;
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以她的【生息】没写 `ticks_on` ⇒ 属主 = 她** ✓ ⇒ `ticksOn(instance)` = **真** ✓ ⇒ ⛔ **守卫 C 不成立** ✓
+>     ⇒ ⭐ 加上守卫 A（`isPermanent` ✗ —— 它是 `turns: 2` ✓）与守卫 B（两半都推过 ✓）⇒ ⭐⭐ **三道守卫全不成立** ✓
+>       ⇒ ⛔ **所以"状态被 tick 掉、并公告"应当发生了** ✗ ⇒ ⭐ **剩下唯一解释**：**我那条读者规则**不在她的表里** ✗**
+>         （⚠ 或在装载时被静默丢弃 ✗ —— ⚠ 而 `EveryCharacterAndRelicRuleIsSelectedTest` **只检查 `rulesFor` 不抛异常** ✗
+>           ⇒ **它发现不了"少了一条规则"** ✓）。
+> * ⭐⭐ **下一轮第一步（一次判据就能定案，最便宜）** ✗：在判据里**数一数**她表里 `STATE_ENDED` 的规则数 ✓：
+>   ```java
+>   var table = owner.getTriggerTable();
+>   assertEquals(1, table.rulesFor(TriggerEvent.STATE_ENDED).size(), "the reader must be in her table");
+>   ```
+>   ⇒ ⭐ **若为 0** ⇒ ⭐ **规则没进表** ✓（⚠ 那就要查装载器为什么丢它 ✗ —— 本段的 `EveryCharacter…` 守卫只保证"不抛" ✗）；
+>     ⭐ **若为 1** ⇒ ⭐ 那就说明**事件确实没发** ✗ ⇒ 回头把 `fireStateEnded` 的**调用条件**（`buff instanceof StateBuff` ✓）与**她那条 buff 的实际类型**对照 ✓
+>       （⚠ 而 `applyState` 建的**确实是 `StateBuff`** ✓ 本段已读 ✓ ⇒ 那就只剩"**它没走到 `duration() <= 0`**" ✗
+>         ⇒ ⭐ 即**`tickEffect` 没有让它递减** ✗ —— ⚠ 那是**最后一块**待读（`StateBuff.tickEffect` ✓））。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十二：🎯 **`StateBuff` 的类注释一句话终结了全部引擎侧猜测** —— *"**Duration ticks late** (`early = false`, i.e. in `afterMove`)"* ⇒ ⭐ 所以 `afterMove()` **确实**递减它 ✓、`tickEffect` 就是 `decreaseDuration()` ✓ ⇒ ⭐ **引擎侧无懈可击** ⇒ 元凶**只能是"读者规则没进她的表"**）**）**：
+>
+> * ✅ **实测（读 `models/buff/StateBuff.java` ✓）** ✓：
+>   * `:30` ⭐ 原文：*"**Duration ticks late** ({@code early = false}, i.e. in {@code afterMove}): a state applied during a …"* ✓
+>     ⇒ ⭐⭐ **所以状态**就是**在 `afterMove` 里递减的** ✓（⚠ 我早前"早半天"的猜测**作废** ✓ —— 本段第十七次自我纠正 ✓）；
+>   * `:113`–`:114` ✓：`public void tickEffect(CanHit target) { decreaseDuration(); … }` ✓ ⇒ ⭐ **递减确实发生** ✓；
+>   * `:27` ✓ 还有一句有用的 ✓：*"Re-applying the **same** state refreshes its duration, which is what the engine's ordinary rule
+>     means by …"* ✓（⭐ 与文档"延长 1 回合"呼应 ✓）；
+>   * `:62` ✓：*"a non-positive duration is not a zero-length …"* ✓（⚠ 说明它对"0 回合"有保护 ✓）。
+> * ⭐⭐⭐ **于是引擎侧**全部排除**** ✓：三道守卫 ✗、`ticksOn` ✗、`tickEffect` ✗、两类递减时机 ✗、名字 ✗、主体词 ✗、条件 ✗、目标 ✗
+>   ⇒ ⭐ **结论**：**`battle.fireStateEnded(她, "生息")` 应当被调用** ✗ ⇒ ⭐ **而我的读者规则没反应** ✗
+>     ⇒ ⭐ **只能是"这条规则不在她的表里"** ✓（⚠ 或在装载期被静默丢掉 ✗）。
+> * ⭐ **下一轮第一步（一次判据定案，就是上一轮写好的那个）** ✗：
+>   ```java
+>   assertEquals(1, owner.getTriggerTable().rulesFor(TriggerEvent.STATE_ENDED).size(), "the reader must be in her table");
+>   ```
+>   ⇒ ⭐ **0** ⇒ 规则没进表 ✓（⚠ 查装载：⚠ 提示 —— **`STATE_ENDED` 的 `when` 若只写状态名而不带主体** ⇒ 装载期会**抛异常** ✓
+>     ⇒ 而"抛异常"会被 `EveryCharacter…` 守卫抓住 ✓（它是绿的 ✓）⇒ ⭐ 那"少一条而不抛"的可能就是**别的机制** ✗
+>       —— ⚠ 例如**规则被 `target_when`／别的字段影响** ✗ ⇒ 一次 dump 她的表即可看清 ✓）；
+>     ⭐ **1** ⇒ 事件没发 ⇒ ⭐ 回去查 `BuffManager` 的那个分支**是否真的走到了** ✗（⚠ 用判据打印 `hasState` 与能量的**逐回合变化** ✓）。
+> * ⚠ **推送**：本地仍**领先 2** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十三：✅✅✅ **答案是"规则确实在表里"**（`rulesFor(STATE_ENDED).size() == 1` **通过** ✓）⇒ ⭐ 于是"没进表"这条也排除 ⇒ ⭐ 现在**只剩一个可能**：**那条公告真的没被发**）**）**：
+>
+> * ✅ **实测（写判据直接问表 ✓：`owner.getTriggerTable().rulesFor(TriggerEvent.STATE_ENDED).size()` ✓）** ✓：**通过** ✓（= 1 ✓）
+>   ⇒ ⭐⭐ **所以规则**已装载且可选中**** ✓（⚠ 本段第十八次自我纠正 ✓）。
+> * ⭐⭐⭐ **于是排查列表（全部排除）** ✓：
+>   | 假设 | 结论 |
+>   |---|---|
+>   | 名字不一致 | ✗ 字节相同（`e7949fe681af` ✓） |
+>   | 主体词非法 | ✗ `self` 合法（`:1766` ✓） |
+>   | 条件形态错 | ✗ `<主体> state_ended <名>` 是正解（`:1209`–`:1214` ✓） |
+>   | 条件/目标写错 | ✗ 都单独测过（无条件 ＋ `self` 仍 0 ✓） |
+>   | 规则没进表 | ✗ **本轮实测：在表里** ✓ |
+>   | `tickBuff` 三道守卫 | ✗ 全不成立（永久 ✗／早晚两半都推过 ✓／`ticksOn` 默认=载体 ✓） |
+>   | `tickEffect` 不递减 | ✗ 它就是 `decreaseDuration()`（`:113` ✓） |
+>   | 递减时机 | ✗ `StateBuff` **本来就在 `afterMove` 递减**（类注释 `:30` ✓） |
+>   ⇒ ⭐ **结论**：**引擎的公告没有发出** ✗ —— ⚠ 而它唯一的开关是 tick 里那句
+>     **`if (battle != null && buff instanceof StateBuff ended)`** ✓ ⇒ ⭐ **下一轮第一步（一次判据，直击）**：
+>     **在判据里打印/断言 `battle` 是否非空** ✗（⚠ 无法直接读 ✗）⇒ ⭐ **换个可观测的**：
+>     **手搭一条 `on: STATE_ENDED` ＋ 无条件的规则**（`plus` ✓）＋ **手动 `battle.fireStateEnded(owner, "生息")`** ✓
+>     ⇒ ⭐ **若它加能量** ⇒ 说明"事件 + 规则"这条路**通** ✓ ⇒ ⭐ **问题百分之百在"状态到期那一 tick 没走到公告"** ✗
+>       ⇒ ⭐ 那就去**逐回合打印 `hasState` 与 `duration`** ✓（⚠ 或判据里**只推一次 `afterMove()`** 看状态是否仍存活 ✓
+>         —— ⚠ 本段此前"两回合后消失"是**推了两轮（四拍）** ✓ ⇒ ⭐ **也许它在第一拍就被 `removeWithLifetime(TURN_END)` 摘掉了** ✗
+>           ⇒ ⭐ **那正是"静默摘除"** ✓✓ ⇒ ⭐ 修法：让她那条 `APPLY_BUFF` **不落 `TURN_END` 生命周期** ✗
+>             （⚠ 线索：`modifyAttr` 的注释里提过 lifetime 与 `permanent` ✓ ⇒ ⭐ **下一轮读 `withLifetime`** ✓）。
+> * ⚠ **推送**：本地仍**领先 3** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十四：✅✅✅ **`withLifetime` 读了** —— 它只是 `buff.setLifetimes(lifetimesOf(effect))` ⇒ ⭐ **生命周期来自 `lifetimesOf(effect)`** ⇒ ⭐ 而紧邻的 javadoc 把两种"时间"讲得很清楚：**`until` 指"哪个事件结束它"**，**`ticks_on` 指"哪个单位的回合花掉它"**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter:2306` ✓ 与它下方 javadoc ✓）** ✓ 原文要点：
+>   ```java
+>   private static AbstractBuff withLifetime(AbstractBuff buff, EffectSpec effect) {
+>       buff.setLifetimes(lifetimesOf(effect));      // ★ 生命周期**由 effect 派生**
+>       return buff;
+>   }
+>   ```
+>   ＋ javadoc：*"Separate from `withLifetime` because the two say different things about time: **`until` names the event that ends
+>   a buff**, this [ticks_on] names **whose turn boundary** spends it. … ⭐ **Two spellings since 2026-10-02** … `"self"` — the rule
+>   owner's turns (星期日's 【蒙福者】, 1321's domain, 缇宝's 结界) …"* ✓
+> * ⭐⭐⭐ **于是"静默摘除"的机制有了确切入口** ✓：**`afterMove()` 第一行** `removeWithLifetime(AbstractBuff.Lifetime.TURN_END)` ✓
+>   ⇒ ⭐ **它按"lifetime 集合"摘** ✗ ⇒ ⚠ 若 `lifetimesOf(effect)` 对"普通 `turns: 2` 的状态"**也含 `TURN_END`** ✗
+>     ⇒ ⭐ **那么它会在每次回合结束时被静默摘掉** ✗ ⇒ **活不到 `duration() <= 0`** ✗ ⇒ **永远不公告** ✓✓ —— ⭐ **与全部实测吻合** ✓。
+> * ⭐ **下一轮第一步（一次读，定案）** ✗：读 **`lifetimesOf(EffectSpec)`** ✓（⚠ 同一文件 ✓）
+>   ⇒ ⭐ 看"普通状态"的 lifetime 集合到底是什么 ✓：
+>     * **含 `TURN_END`** ⇒ ⭐ **根因确证** ✓ ⇒ ⭐ **这是一条引擎级限制**（"限时状态"活不到到期）⇒ 按纪律**登记** ✓
+>       （⚠ 读者 ≥4 ✓；⚠ 并写明"内容侧无法规避"✗ —— 除非有 `until` 可写 ✓ ⇒ ⭐ **那就用 `until` 换掉 `turns`** ✓ 值得一试 ✓）；
+>     * **不含** ⇒ ⭐ 那就回去看 `removeWithLifetime` 的匹配条件 ✓（⚠ 也许它按**别的**规则摘错了 ✓）。
+> * ⚠ **推送**：本地仍**领先 4** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
