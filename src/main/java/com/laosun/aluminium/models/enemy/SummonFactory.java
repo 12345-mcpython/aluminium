@@ -181,7 +181,14 @@ public final class SummonFactory {
             double share = entry.percent() == null ? 0 : entry.percent();
             double flat = entry.flat() == null ? 0 : entry.flat();
             double value;
-            if (entry.source() != null && entry.source().startsWith("resource:")) {
+            if (entry.source() != null && entry.source().startsWith("attr:")) {
+                // ⭐ 「等同于召唤者生命上限的 X%」 (2026-10-02): a share of ANOTHER of the
+                // master's attributes. The plain branch below reads `master.getAttribute(attribute)` -- the
+                // SAME attribute the entry names -- which is why the 景元-style trick (「神君」 = 66% of his
+                // ATTACK, carried in the ATTACK slot) works but "40% of the summoner's Max HP" did not.
+                String other = entry.source().substring("attr:".length()).trim();
+                value = share * master.getAttribute(AttributeType.fromString(other)).get() + flat;
+            } else if (entry.source() != null && entry.source().startsWith("resource:")) {
                 String name = entry.source().substring("resource:".length()).trim();
                 if (resourceValue == null) {
                     throw new IllegalStateException(
