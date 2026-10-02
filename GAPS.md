@@ -16463,6 +16463,22 @@
 >   ② **角色/光锥/遗器**三条线满 ✓（93/93、169/169、60/60 ✓）；③ **五个无数据行角色** ✓（本条 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百三十八：⚠⚠ **订正**：`Buff` 不挂在 `SkillEffectType` 上 —— 那个枚举读的是 `skills.json` 的 `skill_effect`）**：
+>
+> * ⚠⚠ **实测（读 `enums/SkillEffectType.java`）** ✓：这个枚举的成员是 **`SingleAttack`／`MazeAttack`／…** ✓
+>   —— 它映射的是 **`skills.json` 的 `skill_effect` 字段** ✓（附注原文：*"The type of effect a skill produces, mapped from
+>   the `skill_effect` field in `skills.json`"* ✓），每个成员带一个 **`Category`**（`DAMAGE`／`HEAL`／`BUFF`… ✓）。
+>   ⇒ ⛔ **它不是 `skill_effects.json` 里那个 `effect`（`Defence`／`Restore`）的枚举** ✗ —— 名字像、来源不同 ✓。
+> * ⚠ **所以上一轮那一步写错了** ✗（我又一次"**没读就写落点**" ✓ —— 本轮第三次同形 ✓，这次代价只是文案 ✓）：
+>   `skill_effects.json` 的 `effect` 是**普通字符串** ✓，分派在 **`SkillExecutor` 的 `dispatchNonDamaging`** ✓
+>   里按 `"Defence"`／`"Restore"` **比对** ✓ ⇒ ⭐ **加 `Buff` 就是再加一条字符串分支** ✓（**不需要动任何枚举** ✓）。
+> * ⭐ **订正后的五步（下一轮照此执行）** ✗：① `SkillExecutor.dispatchNonDamaging` 加 `"Buff"` 分支 ⇒
+>   `battle.grantBuff(target, spec.buff(), spec.turns())` ✓（`turns_param` 空 ⇒ 不设时长 ✓）；
+>   ② `data/skill_effects.json` 加 `1412` 的 `"2"` ✓（`effect: "Buff"` ＋ `buff: "军功"` ＋ `source` ✓）；
+>   ③ 内容 `CAST_SKILL`（槽位 2 ＋ `cast_target` ✓）；④ 判据（目标有【军功】＋ 队友没有 ✓）；⑤ 变异（去掉分支 ⇒ 1 红 ✓）。
+>   ⚠ 顺带确认：**`SkillEffectSpec` 需要有一个 `buff` 字段** ✓（若没有 ⇒ 那是第 0 步 ✓，一行 bean ＋ `copy()` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
