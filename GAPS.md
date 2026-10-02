@@ -18865,6 +18865,22 @@
 > * ⭐ **顺带**：这一轮把两个枚举的**拼写与语义**都读全了（`AttributeType` 的 `DAMAGE_PENETRATION`／`BREAK_DAMAGE_BOOST` ✓、
 >   `DamageType` 的 `BREAK`／`SUPER_BREAK` ＋ `crittable/boostable` ✓）⇒ ⭐ **这两张表以后可以直接抄** ✓（不必再猜 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2120** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百七十二：✅ `MODIFY_DAMAGE_TAKEN` 的装载要求读清了（**必带时长** ✓）；⭐ 而它的判据**应当断言"选择性"** —— 因为 `damage_type` 在装载期**没人检查**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter` 的该臂 ✓，`:551` ✓）** ✓：它要求 —— `requireBaseChance` ✓（"有 100% 的基础概率…" ✓）、
+>   `requirePercent` ＋ `requireNonZeroPercent` ✓、⭐ **`requireDuration`** ✓（**必须有时长** ⇒ 我上面那份草案里的 `turns: 2` ✓ **是必需的** ✓）、
+>   `requireNoStackArguments` ✓ ⇒ ⚠ **没有任何一处检查 `damage_type`** ✗。
+> * ⭐⭐ **于是判据的设计要点（写下来，免得写歪）** ✓：既然装载期**不管** `damage_type` ✓ ⇒ ⭐ **判据要证明它真的被读了** ✗
+>   —— 办法是断言**选择性** ✓：挂上 `damage_type: "break"` 的规则之后，
+>   **一次 `BREAK` 伤害被放大** ✓ **而一次 `NORMAL` 伤害不受影响** ✓✓
+>   （⚠ 若 `damage_type` 被静默忽略 ⇒ 两者**都会**被放大 ⇒ 判据必红 ✓ ⇒ ⭐ 这正是"没有症状的错误"的克星 ✓）。
+>   ⚠ 而且要**量真实结算** ✓（`applyDamage` ＋ `new Damage(attacker, target, element, DamageType.BREAK/NORMAL, base)` ✓，
+>     两次同一 `base` ✓ 比较"有规则／无规则"的**差** ✓ —— ⭐ 与本段 `SpendAllTest`／`DragonPanelTest` 同一手法 ✓）。
+> * ⭐ **下一轮就是"一次做完"** ✗：① 写 `1317.json` 的两条规则 ✓（草案已定 ✓，注意**两条都要 `turns: 2`** ✓）；
+>   ② 写判据（文件驱动 ✓、**选择性**断言 ✓、⚠ **上限那一档单独断言**：把攻击力顶到 2400+800 以上 ⇒ 增量**停在 8%** ✓
+>     —— ⚠ 但**属性能不能在判据里改** ✗ 待查 ⇒ 若不能 ⇒ 用 `self_attr_above` 的**阈值参数**间接验 ✓，
+>     即用两个不同阈值各跑一次、比较增量差 ✓）；③ 跑全量 ✓ ⇒ 提交 ✓ ⇒ **变异**（去掉 `cap_amount` ✓ 与去掉 `damage_type` ✓ 各一次 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2120** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -20795,6 +20811,22 @@
 >     —— ⭐ 与早前 `DragonPanelTest` 那条"判据量数据与槽位、不 mock 引擎"的做法类似 ✓，**但这条能真的量到伤害** ✓）。
 > * ⭐ **顺带**：这一轮把两个枚举的**拼写与语义**都读全了（`AttributeType` 的 `DAMAGE_PENETRATION`／`BREAK_DAMAGE_BOOST` ✓、
 >   `DamageType` 的 `BREAK`／`SUPER_BREAK` ＋ `crittable/boostable` ✓）⇒ ⭐ **这两张表以后可以直接抄** ✓（不必再猜 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2120** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百七十二：✅ `MODIFY_DAMAGE_TAKEN` 的装载要求读清了（**必带时长** ✓）；⭐ 而它的判据**应当断言"选择性"** —— 因为 `damage_type` 在装载期**没人检查**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter` 的该臂 ✓，`:551` ✓）** ✓：它要求 —— `requireBaseChance` ✓（"有 100% 的基础概率…" ✓）、
+>   `requirePercent` ＋ `requireNonZeroPercent` ✓、⭐ **`requireDuration`** ✓（**必须有时长** ⇒ 我上面那份草案里的 `turns: 2` ✓ **是必需的** ✓）、
+>   `requireNoStackArguments` ✓ ⇒ ⚠ **没有任何一处检查 `damage_type`** ✗。
+> * ⭐⭐ **于是判据的设计要点（写下来，免得写歪）** ✓：既然装载期**不管** `damage_type` ✓ ⇒ ⭐ **判据要证明它真的被读了** ✗
+>   —— 办法是断言**选择性** ✓：挂上 `damage_type: "break"` 的规则之后，
+>   **一次 `BREAK` 伤害被放大** ✓ **而一次 `NORMAL` 伤害不受影响** ✓✓
+>   （⚠ 若 `damage_type` 被静默忽略 ⇒ 两者**都会**被放大 ⇒ 判据必红 ✓ ⇒ ⭐ 这正是"没有症状的错误"的克星 ✓）。
+>   ⚠ 而且要**量真实结算** ✓（`applyDamage` ＋ `new Damage(attacker, target, element, DamageType.BREAK/NORMAL, base)` ✓，
+>     两次同一 `base` ✓ 比较"有规则／无规则"的**差** ✓ —— ⭐ 与本段 `SpendAllTest`／`DragonPanelTest` 同一手法 ✓）。
+> * ⭐ **下一轮就是"一次做完"** ✗：① 写 `1317.json` 的两条规则 ✓（草案已定 ✓，注意**两条都要 `turns: 2`** ✓）；
+>   ② 写判据（文件驱动 ✓、**选择性**断言 ✓、⚠ **上限那一档单独断言**：把攻击力顶到 2400+800 以上 ⇒ 增量**停在 8%** ✓
+>     —— ⚠ 但**属性能不能在判据里改** ✗ 待查 ⇒ 若不能 ⇒ 用 `self_attr_above` 的**阈值参数**间接验 ✓，
+>     即用两个不同阈值各跑一次、比较增量差 ✓）；③ 跑全量 ✓ ⇒ 提交 ✓ ⇒ **变异**（去掉 `cap_amount` ✓ 与去掉 `damage_type` ✓ 各一次 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2120** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
