@@ -16530,6 +16530,23 @@
 >   ⇒ 若将来某条技能效果要**掷抵抗** ✓，那时再给它设计入口 ✓（今天的两条读者 ✓ 都不掷 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百四十二：⭐⭐ `Buff` 要改**两处**字符串判断 —— 少改一处，`CAST_SKILL` 会**响亮地拒绝**）**：
+>
+> * ⭐⭐ **实测（读 `SkillExecutor`）** ✓：`skill_effects.json` 的效果在**两个**地方按字符串判 ✓：
+>   * **`deliverableSpec(Skill)`** ✓：`"Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect())`
+>     ＋ `!isAmbiguous(spec)` ✓ ⇒ 只有它列进去的才算"**可投递**" ✓；
+>   * **真正的分派** ✓（`dispatchNonDamaging` 那一族 ✓：`Restore` ⇒ 治疗 ✓、`Defence` ⇒ 护盾 ✓）。
+>   ⇒ ⚠ **只改分派不改 `deliverableSpec`** ⇒ `CAST_SKILL` 的护栏会说"这条技能投递不了"并**拒绝** ✗
+>     （⭐ 那正是它该做的 ✓ —— 见它自己的注释：*"1303's and 1412's are `Support` buffs with no `skill_effects.json`
+>     entry, and are still refused — loudly"* ✓）⇒ **下一轮两处都要加 `"Buff"`** ✓。
+> * ⭐ **顺带读到的一句（对下一轮有用）** ✓：那段注释里**明说**了 `1414` 的技能是 `Defence`（护盾 ✓，已出货 ✓），
+>   而 **`1303`／`1412` 的正是"没有条目的 `Support` 增益"** ✓ ⇒ ⭐ **本项目先前就写下了这条路的形状** ✓，
+>   本轮是把它的**落点**逐行读实 ✓（不再有未知 ✓）。
+> * **订正后的完整清单（下一轮 7 步，全部有落点）** ✗：① `SkillEffectSpec` 加 `buff` 字段 ✓；② `deliverableSpec`
+>   加 `"Buff"` ✓；③ `dispatchNonDamaging` 加 `"Buff"` 分支 ⇒ `new StateBuff(...)` ＋ `getBuffManager().addBuff(...)` ✓；
+>   ④ `skill_effects.json` 加 `1412` 的 `"2"` ✓；⑤ 内容 `CAST_SKILL` ✓；⑥ 判据 ✓；⑦ 变异 ＋ 全量 ＋ 提交 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
