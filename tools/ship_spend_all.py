@@ -26,7 +26,7 @@ doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
 for r in rules:
     if isinstance(r, dict) and r.get("id") == "elation_spend_all_fervor":
-        r["when"] = ["from_category ELATION_DAMAGE"]
+        r["when"] = ["from_category ElationDamage"]
         r["note"] = ("\u2b50 \u9996\u4e2a `spendAll` \u8bfb\u8005 \u2713\u3002\u26a0 \u89e6\u53d1\u7528 **`from_category ELATION_DAMAGE`** \u2713"
                      "\uff08`SkillCategory.ELATION_DAMAGE` \u2713\uff0c\u5185\u5bb9\u91cc `from_category` \u7528\u4e86 **153** \u6b21 \u2713\uff09"
                      "\u2014\u2014 \u26a0 \u6211\u524d\u4e09\u8f6e\u4ee5\u4e3a\u8981\u5199**\u6570\u636e\u884c id** \u2717\uff0c\u90a3\u662f\u9519\u7684 \u2713\u3002")
@@ -91,7 +91,7 @@ public class SpendAllTest {
                 "precondition: her own rule primed \\u3010\\u70ed\\u610f\\u3011 to " + start);
 
         double before = enemy.getCurrentHp();
-        SkillExecutor.execute(battle, owner.getSkill(SkillType.ELATION_SKILL), owner, List.of(enemy));
+        SkillExecutor.execute(battle, owner.getSkills().get(SkillType.ELATION_SKILL), owner, List.of(enemy));
         battle.processRequests();
         Assertions.assertEquals(0, owner.getResources().value(RES),
                 "the cast spends ALL of it (" + start + " -> 0)");
