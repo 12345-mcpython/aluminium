@@ -20824,6 +20824,30 @@
 >       没读 `processBuffTick` 的**内部** ✗ ⇒ ⭐ 那才是该读的最后一段 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十七：✅✅✅ **最后一段读了** —— `processBuffTick(early)` **只是 `tickBuff(instance, early)`** ✓；⭐ 而 `tickBuff` 里有一道**很关键的守卫**：**只有"计时属于该 clockOwner"的 buff 才会被 tick**）**）**：
+>
+> * ✅ **实测（读 `BuffManager:589`–`:602` ✓）** ✓ 原文：
+>   ```java
+>   private void processBuffTick(boolean early) { tickBuff(instance, early); }        // ★ 就是它
+>   …
+>   public void tickForeign(CanHit clockOwner, boolean early) {
+>       if (clockOwner == null || clockOwner == instance) { return; }
+>       tickBuff(clockOwner, early);
+>   }
+>   ```
+>   ＋ 后者 javadoc 的关键句 ✓：*"Spends the duration of the buffs on this unit whose **clock** belongs to `clockOwner` … **Our own
+>   boundary is skipped** — that one has already gone through `beforeMove()` / `afterMove()`."* ✓
+> * ⭐⭐ **于是得到两条硬结论** ✓：
+>   **(i)** `afterMove()` ⇒ `processBuffTick(false)` ⇒ **`tickBuff(instance, false)`** ✓ ⇒ 所以**她自己的计时确实会被 tick** ✓；
+>   **(ii)** ⚠ 而 `tickBuff` 内部第一件事是 **`if (!buff.ticksOn(clockOwner)) { continue; }`** ✓（本段在同一文件里读到 ✓）
+>     ⇒ ⭐ **只有"计时属于她"的 buff 才递减** ✗ ⇒ ⚠ 若她的【生息】的 tick 归属**不是她**（⚠ `withTickOwner(effect, ctx)` 可能给了 `ctx.owner()` ✓ 或 `"summon"` ✓）
+>       ⇒ ⭐ **它就不会被递减** ✗ ⇒ ⚠ 但它**确实消失了** ✓ ⇒ ⭐ **那只能是 `afterMove` 的第一行**：
+>         **`removeWithLifetime(AbstractBuff.Lifetime.TURN_END)`** ✓ —— ⭐⭐ **"静默摘除"** ✓（**不公告** ✓）⇒ ⭐ **根因到手** ✓✓。
+> * ⭐ **下一轮第一步（一次读，确认 lifetime 映射）** ✗：读 **`withLifetime(...)`** ✓（⚠ 在 `TriggerInterpreter` 里 ✓，本段见过它被 `modifyAttr`／`applyState` 用 ✓）
+>   ⇒ 看"**什么条件下 buff 的 lifetime = `TURN_END`**" ✓ ⇒ ⚠ 若与 **`turns` 的缺省／`permanent`／`unticked`** 有关 ✗
+>     ⇒ ⭐ **正解**：让她的【生息】拿一个**纯时长**的 lifetime ✓（⚠ 文档说"持续 2 回合" ✓ ⇒ 本该如此 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24712,6 +24736,30 @@
 >   一条 `on: STATE_ENDED` ⇒ `APPLY_BUFF{探针}` ✓ ⇒ ⭐ 若**手搭的也不触发** ⇒ ⭐ **事件确实没发** ✗
 >     ⇒ 那就回头查 **`processBuffTick(false)` 里"发不发公告"的条件** ✓（⚠ 本段只读了 `afterMove` 的**调用** ✓，
 >       没读 `processBuffTick` 的**内部** ✗ ⇒ ⭐ 那才是该读的最后一段 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十七：✅✅✅ **最后一段读了** —— `processBuffTick(early)` **只是 `tickBuff(instance, early)`** ✓；⭐ 而 `tickBuff` 里有一道**很关键的守卫**：**只有"计时属于该 clockOwner"的 buff 才会被 tick**）**）**：
+>
+> * ✅ **实测（读 `BuffManager:589`–`:602` ✓）** ✓ 原文：
+>   ```java
+>   private void processBuffTick(boolean early) { tickBuff(instance, early); }        // ★ 就是它
+>   …
+>   public void tickForeign(CanHit clockOwner, boolean early) {
+>       if (clockOwner == null || clockOwner == instance) { return; }
+>       tickBuff(clockOwner, early);
+>   }
+>   ```
+>   ＋ 后者 javadoc 的关键句 ✓：*"Spends the duration of the buffs on this unit whose **clock** belongs to `clockOwner` … **Our own
+>   boundary is skipped** — that one has already gone through `beforeMove()` / `afterMove()`."* ✓
+> * ⭐⭐ **于是得到两条硬结论** ✓：
+>   **(i)** `afterMove()` ⇒ `processBuffTick(false)` ⇒ **`tickBuff(instance, false)`** ✓ ⇒ 所以**她自己的计时确实会被 tick** ✓；
+>   **(ii)** ⚠ 而 `tickBuff` 内部第一件事是 **`if (!buff.ticksOn(clockOwner)) { continue; }`** ✓（本段在同一文件里读到 ✓）
+>     ⇒ ⭐ **只有"计时属于她"的 buff 才递减** ✗ ⇒ ⚠ 若她的【生息】的 tick 归属**不是她**（⚠ `withTickOwner(effect, ctx)` 可能给了 `ctx.owner()` ✓ 或 `"summon"` ✓）
+>       ⇒ ⭐ **它就不会被递减** ✗ ⇒ ⚠ 但它**确实消失了** ✓ ⇒ ⭐ **那只能是 `afterMove` 的第一行**：
+>         **`removeWithLifetime(AbstractBuff.Lifetime.TURN_END)`** ✓ —— ⭐⭐ **"静默摘除"** ✓（**不公告** ✓）⇒ ⭐ **根因到手** ✓✓。
+> * ⭐ **下一轮第一步（一次读，确认 lifetime 映射）** ✗：读 **`withLifetime(...)`** ✓（⚠ 在 `TriggerInterpreter` 里 ✓，本段见过它被 `modifyAttr`／`applyState` 用 ✓）
+>   ⇒ 看"**什么条件下 buff 的 lifetime = `TURN_END`**" ✓ ⇒ ⚠ 若与 **`turns` 的缺省／`permanent`／`unticked`** 有关 ✗
+>     ⇒ ⭐ **正解**：让她的【生息】拿一个**纯时长**的 lifetime ✓（⚠ 文档说"持续 2 回合" ✓ ⇒ 本该如此 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
