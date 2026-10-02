@@ -36,4 +36,23 @@ public class DragonPanelTest {
         Assertions.assertEquals(165, large.getAttribute(AttributeType.SPEED).get(), 1e-6,
                 "the document states 165 speed, flat");
     }
+
+    /** ⭐ 忆灵技能 1 as the document states it, and the panel slot it scales off. */
+    @Test
+    public void theDragonSkillIsWhatTheDocumentSays() {
+        MemospriteSpec spec = Memosprites.of(1407);
+        Assertions.assertNotNull(spec.attack(), "the skill must be stated (忆灵技能 1)");
+        Assertions.assertEquals("Quantum", spec.attack().element(), "document: 量子属性伤害");
+        Assertions.assertEquals("ATTACK", spec.attack().base(), "scales off this memosprite's ATTACK slot");
+        Assertions.assertEquals(0.4, spec.attack().percent(), 1e-9, "40.00%, the level the prose quotes");
+        Assertions.assertEquals("AoEAttack", spec.attack().shape(), "document: 全体攻击");
+        Assertions.assertEquals(30, spec.attack().stance(), 1e-9, "document: 全体 30");
+
+        Character master = CharacterFactory.create(1407, 80, false, null, null, 0);
+        Summon dragon = SummonFactory.memosprite(master, spec, name -> 34000);
+        Assertions.assertEquals(master.getAttribute(AttributeType.HEALTH).get(),
+                dragon.getAttribute(AttributeType.ATTACK).get(), 1e-6,
+                "and that slot carries the summoner's Max HP, so the hit is 40% of it");
+    }
+
 }
