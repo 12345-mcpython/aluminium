@@ -339,7 +339,14 @@ public enum TriggerEvent {
      * <p>⭐ {@code Battle.fireAfterAttack} already decides 「an attack happened」 and holds the whole set; this
      * exposes that boundary to content. A per-hit event cannot assemble it (⚠ as {@code weakHitCount} notes).
      */
-    ATTACK_FINISHED("ATTACK_FINISHED", true);
+    ATTACK_FINISHED("ATTACK_FINISHED", true),
+
+    /**
+     * ✅ 装备者为敌方目标添加了一个弱点（光锥 23050 随心：「装备者为敌方目标添加弱点时，
+     * 恢复 1 个战技点」）。⚠ 三个读者：23050 、 1405 的天赋、 1006 的战技。
+     * ⚠ 发在 {@code ADD_ELEMENTAL_WEAKNESS} 的成功分支里，所以只有真的添加了才会点着。
+     */
+    WEAKNESS_ADDED("WEAKNESS_ADDED", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 
