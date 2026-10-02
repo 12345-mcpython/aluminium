@@ -60,6 +60,14 @@ public class Enemy extends CanHit {
     private Set<DamageElement> stanceWeak = Set.of();
 
     /**
+     * ⭐ Weaknesses an EFFECT inserted, which EXPIRE: element ⇒ turns still to run (2026-09-30).
+     * ⚠ A second table on purpose, not a replacement: {@link #stanceWeak} is DATA (from
+     * {@code monster_config.json}) and never expires, so every existing reader keeps its meaning.
+     * ⚠ Counted in the TARGET’s own turns, matching {@code TURN_END} where it is ticked.
+     */
+    private final java.util.Map<DamageElement, Integer> timedWeak = new java.util.LinkedHashMap<>();
+
+    /**
      * Current toughness (P4 toughness reduction decreases it; the value is given by
      * {@code EnemyScaler}: template × level group × instance multiplier).
      */
@@ -196,7 +204,7 @@ public class Enemy extends CanHit {
      * @return {@code true} if the element is a weakness
      */
     public boolean isWeakTo(DamageElement element) {
-        return element != null && stanceWeak.contains(element);
+        return element != null && (stanceWeak.contains(element) || timedWeak.containsKey(element));
     }
 
     /**
@@ -212,13 +220,43 @@ public class Enemy extends CanHit {
     }
 
     /**
+     * ⭐ 「添加…弱点，持续 N 回合」 (1006 · 1405 · 1310 · 1315): the same insertion, but it expires.
+     * ⚠ A repeat call REFRESHES the count rather than being ignored -- the text says the weakness lasts N
+     * turns, and re-inserting an existing one is still that clause firing (unlike {@code WEAKNESS_ADDED},…)
+     * which the caller guards separately.)
+     */
+    public void addWeakness(DamageElement element, int turns) {
+        if (element == null || turns <= 0) {
+            return;
+        }
+        timedWeak.put(element, turns);
+    }
+
+    /** One of the target’s own turns has ended: run every timed weakness down, dropping the expired. */
+    public void tickTimedWeaknesses() {
+        if (timedWeak.isEmpty()) {
+            return;
+        }
+        java.util.Map<DamageElement, Integer> left = new java.util.LinkedHashMap<>();
+        for (java.util.Map.Entry<DamageElement, Integer> each : timedWeak.entrySet()) {
+            if (each.getValue() > 1) {
+                left.put(each.getKey(), each.getValue() - 1);
+            }
+        }
+        timedWeak.clear();
+        timedWeak.putAll(left);
+    }
+
+    /**
      * \u2705 How many elements this one is weak to (2026-09-30; reader: cone 22004's \u300c\u654c\u65b9\u76ee\u6807\u6bcf\u62e5\u67091\u4e2a\u4e0d\u540c\u5c5e\u6027\u7684\u5f31\u70b9\u300d).
      *
      * <p>\u2605 The enemy's own data is the answer (its {@code stance_weak} list); no new state is tracked, and a unit with no
      * weakness bar (a character, a summon) is not this class at all, so asking one is a type question the caller answers.
      */
     public int weaknessCount() {
-        return stanceWeak.size();
+        java.util.Set<DamageElement> both = new java.util.HashSet<>(stanceWeak);
+        both.addAll(timedWeak.keySet());
+        return both.size();
     }
 
     /**

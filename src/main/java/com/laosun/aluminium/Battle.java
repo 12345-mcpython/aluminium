@@ -1200,6 +1200,10 @@ public class Battle {
             tickForeignBuffs(actor, false);
             // 「回合结束时」 (2026-09-28): the turn is over HERE -- after the actor's own hook and the late tick, so a rule
             // sees the state the turn ended in.
+            // ⭐ A timed weakness is counted in the TARGET’s own turns, so it runs down when that unit’s turn ends.
+            if (actor instanceof com.laosun.aluminium.models.enemy.Enemy ticking) {
+                ticking.tickTimedWeaknesses();
+            }
             fireTriggers(TriggerEvent.TURN_END, actor, actor, 0, 0);
         }
         processRequests();
