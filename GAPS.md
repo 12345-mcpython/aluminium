@@ -18235,6 +18235,24 @@
 > * ⭐ **下一轮第一步（照新纪律）** ✗：`spendAll` 的判据改用 **`1513`**（文件驱动 ✓）＋ 她**文件里**已有的 `ALLY_ATTACK ⇒ +1 热意`
 >   规则 ✓ 把热意加到 7 ✓（发 7 次 `ALLY_ATTACK` ✓ —— **不需要任何手搭** ✓）⇒ 再验证"花光"与"每点一次伤害" ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十七：⚠ "花光"第三次：**引擎与内容都写好了、编译通过**，但**判据还没写** ⇒ 按纪律**回滚**（脚本留着，`tools/add_spend_all3.py` ✓））**：
+>
+> * ✅ **这一轮确实推进了** ✓（都实测过 ✓，只是没进树 ✓）：
+>   * `EffectSpec.spendAll` ✓（＋ `copy()` ✓ —— 反射判据会查 ✓）＋ 装载臂**互斥检查** ✓（`spendAll` 与 `amount` 同时出现 ⇒ 响亮拒绝 ✓）
+>     ＋ `spendResource` 在 `spendAll` 时取**当前全部** ✓ ⇒ **`gradlew compileJava` rc 0** ✓；
+>   * **`1513.json` 的两半句**都写好了 ✓（✅ 都是**文档原话** ✓）：
+>     ① `elation_spend_all_fervor`（`CAST_SETUP` ＋ `from_skill_id:<强化欢愉技>` ⇒ **`SPEND_RESOURCE{spendAll}`** ✓）；
+>     ② `fervor_extra_hit_per_point`（`RESOURCE_CHANGED` ＋ `resource_changed:热意` ⇒
+>        `DAMAGE{times_from:"event_amount", percent:0.21, element:"Quantum"}` ✓ —— **`times_from` 正是同日出货的那一档** ✓）。
+>     ⚠ 并在 `note` 里写清两处待办 ✓：触发用的**强化欢愉技 id 还没核**（⚠ 我写的是猜的 ✗）＋ **伤害类型应为"欢愉伤害"** ✗（隔在另一条线上 ✓）。
+> * ⛔ **为什么仍回滚** ✓：**没有判据** ✗（本轮上下文已尽 ⇒ 写不出带判据＋变异的验证 ✓）⇒ 按纪律"**没验证过的不进树**" ✓
+>   ⇒ 三个文件 `git checkout` 回滚 ✓、全量 **0** ✓、树干净 ✓；⚠ **`tools/add_spend_all3.py` 留在仓里** ✓
+>     ⇒ 下一轮"重放脚本 ⇒ 写判据（**文件驱动**：发 7 次她自己的 `ALLY_ATTACK` 把热意加到 7 ✓）⇒ 跑 ⇒ 变异 ⇒ 提交" ✓。
+> * ⭐ **下一轮第一步（照新纪律，最省）** ✗：① `python tools/add_spend_all3.py` ✓（重放，幂等 ✓）；
+>   ② 写 `SpendAllTest`：`CharacterFactory.create(1513,…)` ✓ ⇒ 连发 7 次 `ALLY_ATTACK`（**用她文件里已有的规则** ✓）
+>     ⇒ 断言热意 == 7 ✓ ⇒ 触发强化欢愉技 ✓ ⇒ 断言热意 == **0** ✓ ＋ 敌人掉血 = **7 ×** 单次 ✓；
+>   ③ 变异：把 `spendAll` 换回 `amount: 1` ⇒ 必红 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19536,6 +19554,24 @@
 > * ⭐ **下一轮第一步（照新纪律）** ✗：`spendAll` 的判据改用 **`1513`**（文件驱动 ✓）＋ 她**文件里**已有的 `ALLY_ATTACK ⇒ +1 热意`
 >   规则 ✓ 把热意加到 7 ✓（发 7 次 `ALLY_ATTACK` ✓ —— **不需要任何手搭** ✓）⇒ 再验证"花光"与"每点一次伤害" ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十七：⚠ "花光"第三次：**引擎与内容都写好了、编译通过**，但**判据还没写** ⇒ 按纪律**回滚**（脚本留着，`tools/add_spend_all3.py` ✓））**：
+>
+> * ✅ **这一轮确实推进了** ✓（都实测过 ✓，只是没进树 ✓）：
+>   * `EffectSpec.spendAll` ✓（＋ `copy()` ✓ —— 反射判据会查 ✓）＋ 装载臂**互斥检查** ✓（`spendAll` 与 `amount` 同时出现 ⇒ 响亮拒绝 ✓）
+>     ＋ `spendResource` 在 `spendAll` 时取**当前全部** ✓ ⇒ **`gradlew compileJava` rc 0** ✓；
+>   * **`1513.json` 的两半句**都写好了 ✓（✅ 都是**文档原话** ✓）：
+>     ① `elation_spend_all_fervor`（`CAST_SETUP` ＋ `from_skill_id:<强化欢愉技>` ⇒ **`SPEND_RESOURCE{spendAll}`** ✓）；
+>     ② `fervor_extra_hit_per_point`（`RESOURCE_CHANGED` ＋ `resource_changed:热意` ⇒
+>        `DAMAGE{times_from:"event_amount", percent:0.21, element:"Quantum"}` ✓ —— **`times_from` 正是同日出货的那一档** ✓）。
+>     ⚠ 并在 `note` 里写清两处待办 ✓：触发用的**强化欢愉技 id 还没核**（⚠ 我写的是猜的 ✗）＋ **伤害类型应为"欢愉伤害"** ✗（隔在另一条线上 ✓）。
+> * ⛔ **为什么仍回滚** ✓：**没有判据** ✗（本轮上下文已尽 ⇒ 写不出带判据＋变异的验证 ✓）⇒ 按纪律"**没验证过的不进树**" ✓
+>   ⇒ 三个文件 `git checkout` 回滚 ✓、全量 **0** ✓、树干净 ✓；⚠ **`tools/add_spend_all3.py` 留在仓里** ✓
+>     ⇒ 下一轮"重放脚本 ⇒ 写判据（**文件驱动**：发 7 次她自己的 `ALLY_ATTACK` 把热意加到 7 ✓）⇒ 跑 ⇒ 变异 ⇒ 提交" ✓。
+> * ⭐ **下一轮第一步（照新纪律，最省）** ✗：① `python tools/add_spend_all3.py` ✓（重放，幂等 ✓）；
+>   ② 写 `SpendAllTest`：`CharacterFactory.create(1513,…)` ✓ ⇒ 连发 7 次 `ALLY_ATTACK`（**用她文件里已有的规则** ✓）
+>     ⇒ 断言热意 == 7 ✓ ⇒ 触发强化欢愉技 ✓ ⇒ 断言热意 == **0** ✓ ＋ 敌人掉血 = **7 ×** 单次 ✓；
+>   ③ 变异：把 `spendAll` 换回 `amount: 1` ⇒ 必红 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
