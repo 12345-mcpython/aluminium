@@ -20585,6 +20585,30 @@
 >               （⚠ 可能 `1513` 的公告名恰好来自别处 ✓ ⇒ 要对照 ✓））。
 > * ⭐ **注意**：⚠ 内容与判据**已回滚** ✓ ⇒ 全量 **0**（**2130** 例 ✓）、树干净 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零六十五：✅✅✅ **`APPLY_BUFF` 确实设了状态名**（读 `applyState` ✓）⇒ ⭐ 于是"公告名"这条排除 ⇒ 元凶就是 **(乙)：`GAIN_ENERGY` 的 `target`**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.applyState` ✓，`:2423` ✓）** ✓ 原文：
+>   ```java
+>   private static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
+>       boolean permanent = unticked(effect);
+>       int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+>       String state = effect.getBuff().trim();                       // ★ 状态名 = `buff` 字段
+>       for (CanHit target : resolveTargets(battle, effect, ctx)) {
+>           AbstractBuff buff = … new StateBuff(state, turns, permanent) …;
+>           …
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以 `APPLY_BUFF` ＋ `"buff": "生息"` 建的**就是 `StateBuff("生息")`**** ✓ ⇒ ⭐ 到期时
+>     `buff instanceof StateBuff` **成立** ✓ ⇒ `battle.fireStateEnded(instance, "生息")` **会发** ✓
+>     ⇒ ⭐ **于是我的读者规则**应当**收到 `self state_ended 生息`** ✓（⚠ 与 `1513` 那条已验成功的形状一致 ✓）。
+> * ⭐⭐ **剩下唯一的候选就是 (乙)** ✓：**`"target": "target"` 指错了单位** ✗ —— ⚠ 在 `STATE_ENDED` 的上下文里，`target`
+>   很可能**不是她**（或为空 ✗）⇒ ⭐ **修法：写成 `"target": "self"`** ✓（⚠ 因为文档说"恢复**目标**8 点能量" ✓，
+>     而"目标"在这里就是**被解除【生息】的那个人** ✓ ⇒ 用 `self` 时主体是**事件里的她** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：把读者规则的 `target` 改成 **`"self"`** ✓ ⇒ 重放 ⇒ 跑判据 ⇒
+>   ⭐ **绿 ⇒ 变异（把 `turns` 从 2 改 3 ⇒ 必红 ✓）⇒ 全量 ⇒ 出货** ✓（⭐ 这将是目标 ① 的**第二个真读者** ✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24236,6 +24260,30 @@
 >               （⚠ 可能 `1513` 的公告名恰好来自别处 ✓ ⇒ 要对照 ✓））。
 > * ⭐ **注意**：⚠ 内容与判据**已回滚** ✓ ⇒ 全量 **0**（**2130** 例 ✓）、树干净 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零六十五：✅✅✅ **`APPLY_BUFF` 确实设了状态名**（读 `applyState` ✓）⇒ ⭐ 于是"公告名"这条排除 ⇒ 元凶就是 **(乙)：`GAIN_ENERGY` 的 `target`**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.applyState` ✓，`:2423` ✓）** ✓ 原文：
+>   ```java
+>   private static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
+>       boolean permanent = unticked(effect);
+>       int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+>       String state = effect.getBuff().trim();                       // ★ 状态名 = `buff` 字段
+>       for (CanHit target : resolveTargets(battle, effect, ctx)) {
+>           AbstractBuff buff = … new StateBuff(state, turns, permanent) …;
+>           …
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以 `APPLY_BUFF` ＋ `"buff": "生息"` 建的**就是 `StateBuff("生息")`**** ✓ ⇒ ⭐ 到期时
+>     `buff instanceof StateBuff` **成立** ✓ ⇒ `battle.fireStateEnded(instance, "生息")` **会发** ✓
+>     ⇒ ⭐ **于是我的读者规则**应当**收到 `self state_ended 生息`** ✓（⚠ 与 `1513` 那条已验成功的形状一致 ✓）。
+> * ⭐⭐ **剩下唯一的候选就是 (乙)** ✓：**`"target": "target"` 指错了单位** ✗ —— ⚠ 在 `STATE_ENDED` 的上下文里，`target`
+>   很可能**不是她**（或为空 ✗）⇒ ⭐ **修法：写成 `"target": "self"`** ✓（⚠ 因为文档说"恢复**目标**8 点能量" ✓，
+>     而"目标"在这里就是**被解除【生息】的那个人** ✓ ⇒ 用 `self` 时主体是**事件里的她** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：把读者规则的 `target` 改成 **`"self"`** ✓ ⇒ 重放 ⇒ 跑判据 ⇒
+>   ⭐ **绿 ⇒ 变异（把 `turns` 从 2 改 3 ⇒ 必红 ✓）⇒ 全量 ⇒ 出货** ✓（⭐ 这将是目标 ① 的**第二个真读者** ✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
