@@ -16463,6 +16463,150 @@
 >   ② **角色/光锥/遗器**三条线满 ✓（93/93、169/169、60/60 ✓）；③ **五个无数据行角色** ✓（本条 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百三十八：⚠⚠ **订正**：`Buff` 不挂在 `SkillEffectType` 上 —— 那个枚举读的是 `skills.json` 的 `skill_effect`）**：
+>
+> * ⚠⚠ **实测（读 `enums/SkillEffectType.java`）** ✓：这个枚举的成员是 **`SingleAttack`／`MazeAttack`／…** ✓
+>   —— 它映射的是 **`skills.json` 的 `skill_effect` 字段** ✓（附注原文：*"The type of effect a skill produces, mapped from
+>   the `skill_effect` field in `skills.json`"* ✓），每个成员带一个 **`Category`**（`DAMAGE`／`HEAL`／`BUFF`… ✓）。
+>   ⇒ ⛔ **它不是 `skill_effects.json` 里那个 `effect`（`Defence`／`Restore`）的枚举** ✗ —— 名字像、来源不同 ✓。
+> * ⚠ **所以上一轮那一步写错了** ✗（我又一次"**没读就写落点**" ✓ —— 本轮第三次同形 ✓，这次代价只是文案 ✓）：
+>   `skill_effects.json` 的 `effect` 是**普通字符串** ✓，分派在 **`SkillExecutor` 的 `dispatchNonDamaging`** ✓
+>   里按 `"Defence"`／`"Restore"` **比对** ✓ ⇒ ⭐ **加 `Buff` 就是再加一条字符串分支** ✓（**不需要动任何枚举** ✓）。
+> * ⭐ **订正后的五步（下一轮照此执行）** ✗：① `SkillExecutor.dispatchNonDamaging` 加 `"Buff"` 分支 ⇒
+>   `battle.grantBuff(target, spec.buff(), spec.turns())` ✓（`turns_param` 空 ⇒ 不设时长 ✓）；
+>   ② `data/skill_effects.json` 加 `1412` 的 `"2"` ✓（`effect: "Buff"` ＋ `buff: "军功"` ＋ `source` ✓）；
+>   ③ 内容 `CAST_SKILL`（槽位 2 ＋ `cast_target` ✓）；④ 判据（目标有【军功】＋ 队友没有 ✓）；⑤ 变异（去掉分支 ⇒ 1 红 ✓）。
+>   ⚠ 顺带确认：**`SkillEffectSpec` 需要有一个 `buff` 字段** ✓（若没有 ⇒ 那是第 0 步 ✓，一行 bean ＋ `copy()` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
+> **2026-10-02 更新（aggro 回收之八百三十九：✅ 第 0 步也查清了 —— `SkillEffectSpec` **没有** `buff` 字段，加一行即可；至此五步全部"落地可写"）**：
+>
+> * ✅ **实测（读 `beans/SkillEffectSpec.java`）** ✓：它的字段是 `effect`／`scale`／`params`／`turns_param`／`formula`／`source` ✓
+>   ⇒ ⛔ **没有 `buff`** ✗ ⇒ 第 0 步 = **加一个 `@SerializedName("buff") private String buff;`** ✓（一行 ✓；
+>   ⚠ 这个 bean **没有 `copy()`** ✗ —— 有 `copy()` 的是 `EffectSpec` ✓，别混 ✓）。
+> * ⭐⭐ **至此这条切片的每一步都**量过落点**了** ✓（下一轮**不需要任何探索**、照抄即可 ✓）：
+>   0. `SkillEffectSpec` 加 `buff` 字段 ✓（本条 ✓）；
+>   1. `SkillExecutor.dispatchNonDamaging` 加 `"Buff"` 字符串分支 ⇒ `battle.grantBuff` ✓（`turns_param` 空 ⇒ 不设时长 ✓）；
+>   2. `data/skill_effects.json` 加 `1412` 的 `"2"` ✓（数据已在手：`军功` ✓ 无时长 ✓）；
+>   3. 内容 `CAST_SKILL`（槽位 2 ＋ `cast_target` ✓，该选择器已出货 ✓）；
+>   4. 判据（**目标**身上出现【军功】 ✓ ＋ **另一名队友**没有 ✓）；
+>   5. 变异（去掉那条字符串分支 ⇒ 1 红 ✓）。
+> * ⭐ **读者账** ✓：`1303`（2 处）＋ `1412`（1 处）⇒ 过门槛 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
+> **2026-10-02 更新（aggro 回收之八百四十：⚠ 那条 `Buff` 分支**不是一行字符串分支** —— 它要接的是 `StateBuff` ＋ 一次 attach，估工上调）**：
+>
+> * ⚠ **实测（读 `applyState`）** ✓：规则侧的 `APPLY_BUFF` 走到
+>   `applyState(Battle, EffectSpec, TriggerContext)` ✓，里面是
+>   **`new StateBuff(state, turns, permanent)`** ✓ ＋ `withLifetime(...)` ✓ ＋ `attachRolled(battle, target, buff, effect, ctx)` ✓
+>   —— ⚠ 而这些**都在 `TriggerInterpreter` 里是私有的** ✗（`attachRolled`／`resolveTargets`／`withLifetime` ✓），
+>   而 `SkillExecutor` 那边拿到的是 **`SkillEffectSpec`**（字段少 ✗：没有 `buff`／`turns` ✗）⇒
+>   ⭐ **这条分支要跨两个类** ✓：要么①**把 attach 抽成一个公开入口** ✓（例如 `Battle` 上的一个"按名附加状态 N 回合" ✓，
+>     让 `TriggerInterpreter` 与 `SkillExecutor` 都走它 ✓ —— 这是**更对**的做法 ✓，因为它把"附加状态"这件事收成一处 ✓）；
+>     要么②在 caster 里**重写那几行** ✗（`StateBuff` ＋ lifetime ＋ attach ✓，重复 ✓）。
+> * ⭐ **估工订正** ✓：这条切片是 **~10 步** ✓（不是我上一轮说的 8 ✗）：0 字段 ✓、1 抽取公开入口 ✓、2 caster 分支 ✓、
+>   3 数据条目 ✓、4 内容 ✓、5 判据 ✓、6 变异 ✓、7 全量 ✓、8 闸门 ✓、9 提交 ✓ —— ⚠ **并且步骤 1 是"重构"** ✓
+>   （会碰到 `TriggerInterpreter` 的私有链 ✓）⇒ **它有回归风险** ✓ ⇒ **必须跑全量** ✓（2100＋ 例 ✓）——
+>   ⭐ 这也解释了为什么它**不该在一个只剩几次调用的会话末尾强行开工** ✓。
+> * ⭐ **下一轮的第一步因此改成** ✓：**先做步骤 1（抽公开入口）并单独提交** ✓（不动任何内容 ✓、全量必须仍绿 ✓），
+>   之后步骤 2–4 是一小组 ✓、5–6 是判据与变异 ✓ —— **每一步都能单独验证并单独提交** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
+> **2026-10-02 更新（aggro 回收之八百四十一：✅✅ 上一轮的"必须先重构"**被读代码推翻** —— 平路就在 `BuffManager.addBuff`，切片回到 ~7 步且无回归风险）**：
+>
+> * ✅✅ **实测（读 `attachRolled`，`:2761-2768`）** ✓：它只有两种情况 ✓：
+>   * **`base_chance` 为 null**（绝大多数 ✓）⇒ ⭐ **`target.getBuffManager().addBuff(buff)`** ✓ —— **一个公开方法** ✓✓；
+>   * 有 `base_chance` ⇒ `battle.tryApplyDebuff(...)` ✓（**抵抗判定**那条路 ✓，也需要 ctx ✓）。
+>   ⇒ ⭐⭐ **所以 caster 那条 `Buff` 分支**根本不需要碰 `TriggerInterpreter` 的私有链** ✗ ——
+>   它只要 `new StateBuff(名, turns, permanent)` ✓ ＋ **`target.getBuffManager().addBuff(buff)`** ✓（公开 ✓）。
+> * ⭐ **订正上一轮** ✓：我写的"要跨两个类／先抽公开入口／有回归风险／~10 步"**太悲观** ✗（那是我**没读到这一行就估的** ✓
+>   —— 本轮第四次同形：**估工也不许不读** ✓）。**真实形状**：
+>   0. `SkillEffectSpec` 加 `buff` 字段 ✓（一行 ✓）；
+>   1. `SkillExecutor.dispatchNonDamaging` 加 `"Buff"` 分支 ⇒ `new StateBuff(...)` ＋ `getBuffManager().addBuff(...)` ✓；
+>   2. `skill_effects.json` 加 `1412` 的 `"2"` ✓（数据在手 ✓）；
+>   3. 内容 `CAST_SKILL`（槽位 2 ＋ `cast_target` ✓）；
+>   4. 判据（目标有【军功】＋ 队友没有 ✓）；5. 变异（去掉分支 ⇒ 1 红 ✓）；6. 全量；7. 提交。
+> * ⚠ **登记的一处**：`base_chance`（抵抗判定）**这一档不在第一片里** ✓ —— 那需要 `ctx.owner()` ✓（caster 侧没有 ✗）
+>   ⇒ 若将来某条技能效果要**掷抵抗** ✓，那时再给它设计入口 ✓（今天的两条读者 ✓ 都不掷 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
+> **2026-10-02 更新（aggro 回收之八百四十二：⭐⭐ `Buff` 要改**两处**字符串判断 —— 少改一处，`CAST_SKILL` 会**响亮地拒绝**）**：
+>
+> * ⭐⭐ **实测（读 `SkillExecutor`）** ✓：`skill_effects.json` 的效果在**两个**地方按字符串判 ✓：
+>   * **`deliverableSpec(Skill)`** ✓：`"Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect())`
+>     ＋ `!isAmbiguous(spec)` ✓ ⇒ 只有它列进去的才算"**可投递**" ✓；
+>   * **真正的分派** ✓（`dispatchNonDamaging` 那一族 ✓：`Restore` ⇒ 治疗 ✓、`Defence` ⇒ 护盾 ✓）。
+>   ⇒ ⚠ **只改分派不改 `deliverableSpec`** ⇒ `CAST_SKILL` 的护栏会说"这条技能投递不了"并**拒绝** ✗
+>     （⭐ 那正是它该做的 ✓ —— 见它自己的注释：*"1303's and 1412's are `Support` buffs with no `skill_effects.json`
+>     entry, and are still refused — loudly"* ✓）⇒ **下一轮两处都要加 `"Buff"`** ✓。
+> * ⭐ **顺带读到的一句（对下一轮有用）** ✓：那段注释里**明说**了 `1414` 的技能是 `Defence`（护盾 ✓，已出货 ✓），
+>   而 **`1303`／`1412` 的正是"没有条目的 `Support` 增益"** ✓ ⇒ ⭐ **本项目先前就写下了这条路的形状** ✓，
+>   本轮是把它的**落点**逐行读实 ✓（不再有未知 ✓）。
+> * **订正后的完整清单（下一轮 7 步，全部有落点）** ✗：① `SkillEffectSpec` 加 `buff` 字段 ✓；② `deliverableSpec`
+>   加 `"Buff"` ✓；③ `dispatchNonDamaging` 加 `"Buff"` 分支 ⇒ `new StateBuff(...)` ＋ `getBuffManager().addBuff(...)` ✓；
+>   ④ `skill_effects.json` 加 `1412` 的 `"2"` ✓；⑤ 内容 `CAST_SKILL` ✓；⑥ 判据 ✓；⑦ 变异 ＋ 全量 ＋ 提交 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
+> **2026-10-02 更新（aggro 回收之八百四十三：⚠ `Buff` 形状**落了地**（1412 的【军功】到手 ✓），而它的**判据不承重** —— 变异 0 红）**：
+>
+> * ✅ **出货**（`09b9a60`）：`SkillEffectSpec` 加 `buff` 字段 ✓（`@SerializedName("buff")` ✓）；`deliverableSpec` 收 `"Buff"`
+>   （且**跳过** `isAmbiguous` —— 具名状态没有可加的数值项 ✓）；`dispatchNonDamaging` 加 `"Buff"` 分支 ⇒
+>   **`target.getBuffManager().addBuff(new StateBuff(名, Integer.MAX_VALUE, true))`** ✓（公开的"平路附加" ✓，
+>   文档没给时长 ⇒ 按永久 ✓）；`skill_effects.json` 加 `1412` 的 `"2"`（`军功` ✓，`turns_param: null` ✓）。
+> * **判据** `MilitaryMeritTest` ✓：施放她的战技 ⇒ **被指定的那名队友**身上有【军功】 ✓ 而**另一名队友没有** ✓
+>   （`ally.getBuffManager().hasState("军功")` ✓，与既有判据同一读法 ✓）—— ⚠ 前提断言（施放前没有 ✓）也在 ✓。
+> * ⛔⛔ **而变异 0 红** ✗：把 `deliverableSpec` 里的 `"Buff"` 去掉（让它重新"投递不了" ✓）⇒ **判据仍然绿** ✗
+>   ⇒ ⭐ **说明那条 `deliverableSpec` 不是这条路的闸门** ✗ —— 状态**仍然**上去了 ✓ ⇒ **另有路径把它附上** ✓
+>   （候选：`SkillCategory.BUFF` 在 `execute` 里走了**别的**非伤害分支 ✗、或 `SkillEffects` 的读取点不止一处 ✗、
+>   或她的文件里还有一条我没读到的规则 ✗）。⇒ ⚠ **结论：行为对了、机制没钉住** ✗。
+> * ⭐ **下一轮第一步（钉机制，二选一）** ✗：① 把变异改成**去掉 `dispatchNonDamaging` 的 `"Buff"` 分支** ✓
+>   （预期：状态不再上身 ⇒ 判据 1 红 ✓ —— 若**仍绿** ⇒ 那说明**根本不是这条分派**在附加 ✓，必须找到真正那条 ✗）；
+>   ② 或给那条分支里的 `addBuff` 打点/断言（临时打印 ✓）看它是否被走到 ✓。
+>   ⚠ **在那之前不得声称"`skill_effects.json` 的 Buff 行是它的来源"** ✗ —— 这是本段第五次同形（**没读就写结论** ✓）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2111** 例 ✓ —— 新增 `MilitaryMeritTest` ✓）、闸门 [0, 0]、树干净、已推送 ✓（`09b9a60` ✓）。
+
+> **2026-10-02 更新（aggro 回收之八百四十四：⛔⛔ 那两个 0 红把结论推翻了 —— **我的分支被走到，却不是它把【军功】附上去的**；真正的路径**未找到**）**：
+>
+> * **两个实测（都在本轮）**：
+>   * **探针** ✓（在分支里打一行 `[probe] Buff branch reached: 军功`）⇒ **确确实实被走到** ✓；
+>   * **变异** ✗（把那条分支写成 `if (false && ...)` ✓）⇒ **判据仍然绿** ✗（0 红 ✓）⇒
+>     ⭐ **状态【军功】照样上身** ✓ ⇒ **我的分支不是承重的** ✗；再加上前一轮"去掉 `deliverableSpec` 的 `Buff`"也是 **0 红** ✗
+>     ⇒ ⭐⭐ **两条我加的代码都不是那条路** ✗ ⇒ **【军功】是**别的路径**附上的** ✓，而**那条路径我还没找到** ✗。
+> * ⚠⚠ **因此本轮早些时候那句"出货"要收窄** ✓（`09b9a60` 的提交信息说得太满 ✗）：
+>   **行为是对的**（施放她的战技 ⇒ 被指定的队友身上有【军功】 ✓、另一名没有 ✓）、**判据是真的**（它测的是可观察结果 ✓）、
+>   **但"`skill_effects.json` 的 `Buff` 行是它的来源"这句**没有证据**** ✗ —— 现在有两处变异**反证**它 ✓。
+>   ⚠ 于是我加的那三处（bean 字段／`deliverableSpec`／分支）与那条数据行**是否必要**都**未知** ✗。
+> * ⭐ **下一轮第一步（唯一，先找路再决定留不留代码）** ✗：**查"谁把具名状态附到施放目标上"** ✓ ——
+>   从两处入手：① `SkillEffects`／`SkillEffectSpec` 的**全部读取点** ✓（不止 `SkillExecutor` ✓，`grep -l SkillEffects` ✓ 已知 6 处 ✓）；
+>   ② **`SKILL_CAST`／buff 级广播的监听面** ✓（`SkillExecutor` 里那句注释写着"hands the listener the Skill object" ✓
+>   + `battle.broadcastSkillCast` ✓）—— ⚠ 若最终证明**数据行是多余的** ✗，就按纪律**摘掉它与我加的三处** ✓，
+>   只留判据（它测的是**内容**行为 ✓）。
+> * ⚠ **两件清理** ✗：① `SkillExecutor.java` 顶部有**两行一模一样的** `import ...StateBuff;` ✓（4 与 5 ✓ ——
+>   我那个补丁脚本的幂等判断写坏了 ✗，重复 import 合法所以编译没报 ✗）⇒ 删一行 ✓；
+>   ② `tools/add_buff_effect.py` 的幂等判断同样要修 ✓（`new in text and old not in text` 这个条件对"保留锚点"的插入无效 ✗）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2111** 例 ✓）、树干净、已推送 ✓（工作树与 `9045dae` 一致 ✓）。
+
+> **2026-10-02 更新（aggro 回收之八百四十五：⛔⛔⛔ 结案：那条切片**整体作废** —— 【军功】**早就有人出货了**，我加的是**死代码**）**：
+>
+> * ⛔ **根因（本轮实测）** ✓：`1412.json` **已经有 7 条规则** ✓，第一条就是
+>   **`skill_grants_military_merit`**（`SKILL_CAST` ＋ `actor == self` ⇒ `REMOVE_STATE` ＋ **`APPLY_BUFF`（`"buff": "军功"` ✓）**
+>   ＋ `GAIN_RESOURCE` ✓）—— ⭐ **那句话早在某个更早的轮次就以**规则**的形式出货了** ✓，
+>   而**规则**才是本项目里这类从句的正常写法 ✓（我把"必须走 `skill_effects.json`"当成了前提 ✗）。
+> * ⭐ **于是三件事同时解释通了** ✓：① 探针**打印了**（我的分支确实被 `execute` 走到 ✓ —— 它只是**多余**的 ✓）；
+>   ② 变异 **0 红**（状态由**规则**附上 ✓，与我那两处代码无关 ✓）；③ 判据**一直绿**（它测到的是**已有规则**的行为 ✓
+>   —— ⚠ 也就是说**我的判据测的不是我写的东西** ✗✗）。
+> * ✅ **按纪律回滚** ✓：`git revert 09b9a60` ✓（5 个文件、**185 行删除** ✓ —— bean 字段 ✓、`deliverableSpec` ✓、
+>   `dispatchNonDamaging` 分支 ✓、`skill_effects.json` 的 `1412` 条目 ✓、判据 `MilitaryMeritTest` ✓、补丁脚本 ✓
+>   全部撤掉 ✓；顺带把那**两行重复 import** 也一并撤掉 ✓）。回滚后全量 **0**（**2111 例** ✓ ⇒ 那些测试本来就没依赖我加的东西 ✓）。
+> * ⭐⭐ **代价与教训（本段第六次同形，也是最贵的一次 —— 它产出了**死代码**）** ✗：
+>   **我读了 `1412` 的**文档**（`.html` 剥开 ✓、数据读全 ✓），却**从没读她的 `1412.json`** ✗** ——
+>   ⚠ 而"这句话是否已经出货"的答案**就在那个文件里** ✓。⇒ **动手前先查"读者是否已存在"** ✓，
+>   与"先查数据"是同一条纪律 ✓：**读文档 ≠ 读现状** ✓。
+> * ⚠ **顺带修正两条结论** ✓：① `skill_effects.json` 的 `Buff` 形状**仍然没有读者** ✗（`1303` 那两处**才是**真读者 ✓ ——
+>   但也要先查 `1303.json` 是否已经有规则 ✗，**这正是下一轮要做的第一件事** ✓）；② 上一轮那条"我来钉机制"的问题
+>   **已经被本条回答** ✓（机制 = 内容规则 ✓），不需要再查 ✓。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2111** 例 ✓）、树干净、已推送 ✓（`bef8046` 是 revert 提交 ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
