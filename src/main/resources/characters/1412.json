@@ -163,7 +163,6 @@
           "op": "APPLY_BUFF",
           "buff": "爵位",
           "target": "holder_of:军功",
-          "source": "1412 刻律德菈 战技 升变，士皆可帅 (141202): 「当充能达到 6 点时，自动使角色的【军功】升级为【爵位】」",
           "permanent": true
         }
       ],
