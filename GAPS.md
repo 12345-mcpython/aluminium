@@ -20475,6 +20475,26 @@
 > * ⭐ **下一步（一次读，然后一次改＋跑）** ✗：读 `Battle:1216`–`:1240` ✓ ⇒ 拿到"自己的 tick"入口名 ✓
 >   ⇒ 判据里改成调它 ✓ ⇒ **到期 ⇒ 公告 ⇒ 奖励** ✓ ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十九：✅ `tickForeignBuffs` 的**实现**读了（`Battle` 里 private ✓），它**只对"非行动者"**调 `tickForeign` ⇒ ⭐ 所以"行动者自己的时长"由**另一处**推进（下一轮搜那一处）**）**：
+>
+> * ✅ **实测（读 `Battle` 的该私有方法 ✓）** ✓ 原文要点：
+>   ```java
+>   /** Spends the duration of every buff on the field whose clock belongs to {@code clockOwner} (M-42 ④). … */
+>   private void tickForeignBuffs(CanHit clockOwner, boolean early) {
+>       for (CanHit ally : allies) {
+>           if (ally != null && ally != clockOwner) {        // ← ★ 跳过行动者自己
+>               ally.getBuffManager().tickForeign(clockOwner, early);
+>           }
+>       }
+>   }
+>   ```
+>   ＋ 它的 javadoc 说明 **`early`: `true` = before the move, `false` = after it** ✓ ⇒ ⭐ **回合边界**有两个 tick 时机 ✓。
+> * ⭐ **下一轮第一步（找"自己的时长"那一处，1 次调用）** ✗：搜 **`tickOwn`／`tick(`／`duration` 的递减处** ✓
+>   （⚠ 提示：`BuffManager` 里那个含 `duration() <= 0` 公告的循环 ✓ 是**同一个私有 `tickBuff`** ✓ ⇒ ⭐ 它**必然也被"自己的回合"调用** ✗
+>     ⇒ 搜 `tickBuff(` 的**另一处调用** ✓，或搜 `tickForeignBuffs(` 的调用处**旁边**那一行 ✓）。
+> * ⭐ **拿到后**：判据里调它 ✓ ⇒ 到期 ⇒ 公告 ⇒ 奖励 ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓
+>   （⚠ 内容已经准备好，随时可重放 `tools/ship_aha_final.py` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24015,6 +24035,26 @@
 >     ⇒ ⭐ **判据要调的就是那一行所调的方法** ✓（⚠ 很可能是 `tickOwn(early)` 或 `tick(…)` ✓）。
 > * ⭐ **下一步（一次读，然后一次改＋跑）** ✗：读 `Battle:1216`–`:1240` ✓ ⇒ 拿到"自己的 tick"入口名 ✓
 >   ⇒ 判据里改成调它 ✓ ⇒ **到期 ⇒ 公告 ⇒ 奖励** ✓ ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十九：✅ `tickForeignBuffs` 的**实现**读了（`Battle` 里 private ✓），它**只对"非行动者"**调 `tickForeign` ⇒ ⭐ 所以"行动者自己的时长"由**另一处**推进（下一轮搜那一处）**）**：
+>
+> * ✅ **实测（读 `Battle` 的该私有方法 ✓）** ✓ 原文要点：
+>   ```java
+>   /** Spends the duration of every buff on the field whose clock belongs to {@code clockOwner} (M-42 ④). … */
+>   private void tickForeignBuffs(CanHit clockOwner, boolean early) {
+>       for (CanHit ally : allies) {
+>           if (ally != null && ally != clockOwner) {        // ← ★ 跳过行动者自己
+>               ally.getBuffManager().tickForeign(clockOwner, early);
+>           }
+>       }
+>   }
+>   ```
+>   ＋ 它的 javadoc 说明 **`early`: `true` = before the move, `false` = after it** ✓ ⇒ ⭐ **回合边界**有两个 tick 时机 ✓。
+> * ⭐ **下一轮第一步（找"自己的时长"那一处，1 次调用）** ✗：搜 **`tickOwn`／`tick(`／`duration` 的递减处** ✓
+>   （⚠ 提示：`BuffManager` 里那个含 `duration() <= 0` 公告的循环 ✓ 是**同一个私有 `tickBuff`** ✓ ⇒ ⭐ 它**必然也被"自己的回合"调用** ✗
+>     ⇒ 搜 `tickBuff(` 的**另一处调用** ✓，或搜 `tickForeignBuffs(` 的调用处**旁边**那一行 ✓）。
+> * ⭐ **拿到后**：判据里调它 ✓ ⇒ 到期 ⇒ 公告 ⇒ 奖励 ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓
+>   （⚠ 内容已经准备好，随时可重放 `tools/ship_aha_final.py` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
