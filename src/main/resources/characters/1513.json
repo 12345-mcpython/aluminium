@@ -175,52 +175,12 @@
         {
           "op": "APPLY_BUFF",
           "buff": "阿哈时刻",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "待演",
-          "amount": 1,
-          "target": "self"
-        }
-      ],
-      "source": "文档（GLOSSARY）：「阿哈行动时发动阿哈时刻，并使可施放欢榆技的单位各自施放1次欢榆技」；以及「阿哈时刻持续至本次最后一个欢榆技施放结束」。",
-      "note": "⭐ 本条只做“**开始记账**”✓：欢榆技开始施放 ⇒ 挂上「阿哈时刻」状态 ✓ 并把待演计数 +1 ✓。"
-    },
-    {
-      "on": "ATTACK_FINISHED",
-      "id": "elation_moment_step",
-      "when": [
-        "from_category ElationDamage"
-      ],
-      "do": [
-        {
-          "op": "SPEND_RESOURCE",
-          "resource": "待演",
-          "amount": 1,
+          "turns": 1,
           "target": "self"
         }
       ],
       "source": "文档：「阿哈时刻持续至本次最后一个欢榆技施放结束」。",
-      "note": "⭐ 每一个欢榆技**结束**就把待演计数 -1 ✓（事件=ATTACK_FINISHED ✓，本段已确认它携带**结算完成**语义 ✓）。"
-    },
-    {
-      "on": "RESOURCE_CHANGED",
-      "id": "elation_moment_close",
-      "when": [
-        "resource_changed:待演",
-        "self_resource:待演 <= 0"
-      ],
-      "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "阿哈时刻",
-          "target": "self"
-        }
-      ],
-      "source": "文档：「阿哈时刻持续至本次最后一个欢榆技施放结束」。",
-      "note": "⭐⭐ 归零时**摘掉那个状态** ✓ ⇒ 引擎就会发 `STATE_ENDED(\"阿哈时刻\")` ✓（本段已建的链：状态被摘时**先报后摘** ✓）。"
+      "note": "⭐ ⭐ 2026-10-02：**挂 1 回合** ✓ —— 实测：`到期` 才会让引擎发 `STATE_ENDED` ✓（`BuffManager` 的 tick 里 `duration() <= 0` 才公告 ✓）；而**显式 `REMOVE_STATE` 不公告** ✗。⚠ 时长用文档对同族状态的口径（如【好活当赏】“持续 2 回合” ✓）。"
     },
     {
       "on": "STATE_ENDED",
@@ -237,7 +197,7 @@
         }
       ],
       "source": "文档：「阿哈时刻结束时，使参演的角色获得本次计入笑点的【好活当赏】状态，持续2回合。」",
-      "note": "⭐ 本段第一个**真** `STATE_ENDED` 读者 ✓（读者原文来自 `1505` 与 `GLOSSARY` ✓）。"
+      "note": "⭐ 本段第一个**真** `STATE_ENDED` 读者 ✓ —— 而且这是**本项目第一次**用“状态自然到期”去驱动 `STATE_ENDED` ✓（同一形状可复用给其余四个读者 ✓）。"
     }
   ]
 }

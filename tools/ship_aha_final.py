@@ -92,7 +92,7 @@ public class AhaMomentTest {
         Assertions.assertFalse(owner.getBuffManager().hasState(REWARD),
                 "and the reward is not there before it ends");
 
-        owner.getBuffManager().tickForeign(owner, false);      // one turn passes
+        owner.getBuffManager().afterMove();                    // one turn passes: Battle calls this for the actor at turn end
         battle.processRequests();
         Assertions.assertFalse(owner.getBuffManager().hasState(MOMENT),
                 "one turn later the moment has expired");
