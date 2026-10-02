@@ -20194,6 +20194,22 @@
 >   才能被 `-1` 归零 ✓ ⇒ ⭐ **判据要按"开始 → 结束"两次驱动** ✓（正好也验证了①②两步 ✓）。
 > * ⚠ **推送**：本地仍**领先 10** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十三：⚠ **判据编译失败，但失败本身给了三个确切事实** ⇒ 路线随之改成"用她自己的技能"）**：
+>
+> * ⚠ **实测（判据编译错 ✓）** ✓ 三条：
+>   1. `com.laosun.aluminium.beans.Skill` **与** `com.laosun.aluminium.models.skill.Skill` **是两个类型** ✗
+>      ⇒ 而 `SkillExecutor.execute(Battle, **models.skill.Skill**, CanHit, List)` ✓ 要的是**后者** ✓（⚠ 我传了前者 ⇒ 类型不兼容 ✓）；
+>   2. ⭐ **`models.skill.Skill` 是 `public abstract class`** ✓（不是 record ✗）⇒ ⛔ **判据不能 `new` 它** ✗ ⇒ 必须用**它的具体子类** ✓；
+>   3. `owner.getState()` **不存在** ✗（找不到符号 ✓）⇒ ⭐ **状态读取的口在别处**（⚠ 名字待查 ✓）。
+> * ⭐⭐ **于是路线改得更省** ✓：**不必造技能** ✗ —— ⭐ **用她自己的技能** ✓：
+>   `owner.getSkills()`（本段用过 ✓）里就应有**她的欢愉技实例** ✓（⚠ 数据里 9 个欢愉技之一 ✓）
+>     ⇒ `SkillExecutor.execute(battle, 她那个技能, owner, targets)` ✓ ⇒ 类别自然是欢愉 ✓ ⇒ 规则触发 ✓。
+>   ⚠ 若 `getSkills()` 里没有欢愉技槽 ✗（⚠ 它可能只覆盖 `BASIC_ATTACK`/`SKILL`/`ULTRA`/`TALENT` ✓）
+>     ⇒ ⭐ 那就找 `SkillCategory.of(SkillType.ELATION_SKILL)` ✓ 对应的**槽**与**子类** ✓（⚠ 本段已知 `SkillType.ELATION_SKILL` 存在 ✓）。
+> * ⭐ **下一轮第一步（两查，各一次调用）** ✗：① 读 `Skill` 的**子类清单** ✓（`glob '**/skill/*.java'` ✓ ⇒ 找"攻击类技能"那个 ✓）；
+>   ② 找**状态读取**的口 ✓（⚠ 搜 `boolean has`／`getBuffs`／`getBuffManager` ✓ ⇒ 判据要能读"她是否处于某状态" ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（10 个积压提交上一轮推完 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据文件已删 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23454,6 +23470,22 @@
 >   才能被 `-1` 归零 ✓ ⇒ ⭐ **判据要按"开始 → 结束"两次驱动** ✓（正好也验证了①②两步 ✓）。
 > * ⚠ **推送**：本地仍**领先 10** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十三：⚠ **判据编译失败，但失败本身给了三个确切事实** ⇒ 路线随之改成"用她自己的技能"）**：
+>
+> * ⚠ **实测（判据编译错 ✓）** ✓ 三条：
+>   1. `com.laosun.aluminium.beans.Skill` **与** `com.laosun.aluminium.models.skill.Skill` **是两个类型** ✗
+>      ⇒ 而 `SkillExecutor.execute(Battle, **models.skill.Skill**, CanHit, List)` ✓ 要的是**后者** ✓（⚠ 我传了前者 ⇒ 类型不兼容 ✓）；
+>   2. ⭐ **`models.skill.Skill` 是 `public abstract class`** ✓（不是 record ✗）⇒ ⛔ **判据不能 `new` 它** ✗ ⇒ 必须用**它的具体子类** ✓；
+>   3. `owner.getState()` **不存在** ✗（找不到符号 ✓）⇒ ⭐ **状态读取的口在别处**（⚠ 名字待查 ✓）。
+> * ⭐⭐ **于是路线改得更省** ✓：**不必造技能** ✗ —— ⭐ **用她自己的技能** ✓：
+>   `owner.getSkills()`（本段用过 ✓）里就应有**她的欢愉技实例** ✓（⚠ 数据里 9 个欢愉技之一 ✓）
+>     ⇒ `SkillExecutor.execute(battle, 她那个技能, owner, targets)` ✓ ⇒ 类别自然是欢愉 ✓ ⇒ 规则触发 ✓。
+>   ⚠ 若 `getSkills()` 里没有欢愉技槽 ✗（⚠ 它可能只覆盖 `BASIC_ATTACK`/`SKILL`/`ULTRA`/`TALENT` ✓）
+>     ⇒ ⭐ 那就找 `SkillCategory.of(SkillType.ELATION_SKILL)` ✓ 对应的**槽**与**子类** ✓（⚠ 本段已知 `SkillType.ELATION_SKILL` 存在 ✓）。
+> * ⭐ **下一轮第一步（两查，各一次调用）** ✗：① 读 `Skill` 的**子类清单** ✓（`glob '**/skill/*.java'` ✓ ⇒ 找"攻击类技能"那个 ✓）；
+>   ② 找**状态读取**的口 ✓（⚠ 搜 `boolean has`／`getBuffs`／`getBuffManager` ✓ ⇒ 判据要能读"她是否处于某状态" ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（10 个积压提交上一轮推完 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据文件已删 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
