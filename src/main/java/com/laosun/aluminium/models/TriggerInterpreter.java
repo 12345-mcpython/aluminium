@@ -2193,6 +2193,16 @@ public final class TriggerInterpreter {
             double spent = hit == null ? 0 : hit.getCastEnergySpent();
             return effect.getPercent() * spent + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (EVENT_AMOUNT.equals(effect.getScale().trim())) {
+            // ⭐ 「每消耗 1 点…提高 X%」 (2026-10-02): the triggering event's own magnitude, as a
+            // modifier. ⚠ `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's
+            // `talent_phantasm_stack`, one 【幻相】 layer per point spent). What was missing is this ROUTE --
+            // modifiers read their magnitude here and had no way to ask the event. (It was ALSO withdrawn once from
+            // `grantAmount`, where `amount_from_event` already served GAIN_RESOURCE; that note lives there.)
+            // Before the attribute branch below, for the reason `cast_energy_spent` gives.
+            return effect.getPercent() * Math.abs(ctx.amount())
+                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
@@ -2224,7 +2234,7 @@ public final class TriggerInterpreter {
     private static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
-        if (SELF_MAX_ENERGY.equals(raw)) {
+        if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw)) {
             return null;                      // handled by derivedMagnitude; not an AttributeType
         }
         if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
@@ -2588,6 +2598,14 @@ public final class TriggerInterpreter {
      * clause adds nothing when no energy was spent.
      */
     private static final String CAST_ENERGY_SPENT = "cast_energy_spent";
+
+    /**
+     * 「每消耗/每损失 1 点…提高 X%」 (2026-10-02): a modifier’s magnitude that follows the event.
+     *
+     * <p>Sits beside {@link #CAST_ENERGY_SPENT} on purpose — the same shape bound to the cast — and, like it,
+     * is deliberately not an {@code AttributeType}.
+     */
+    private static final String EVENT_AMOUNT = "event_amount";
 
 
     /**
