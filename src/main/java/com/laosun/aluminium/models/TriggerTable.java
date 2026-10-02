@@ -1976,14 +1976,14 @@ public class TriggerTable {
     public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                                  Damage damage, Battle battle, SkillCategory fromCast, String ruleId,
                                  List<Condition> targetFilter, int skillId, int weakHitCount,
-                                 List<CanHit> attackHitTargets) {
+                                 List<CanHit> attackHitTargets, String stateName) {
 
         /**
          * The same context for an event that carries no cast category — i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle, SkillCategory fromCast) {
-            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0, 0, List.of());
+            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0, 0, List.of(), null);
         }
 
         /**
@@ -1995,7 +1995,17 @@ public class TriggerTable {
          */
         public TriggerContext withRule(String id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
-                    id == null ? "" : id, targetFilter, skillId, weakHitCount, attackHitTargets);
+                    id == null ? "" : id, targetFilter, skillId, weakHitCount, attackHitTargets, stateName);
+        }
+
+        /**
+         * The same context, saying WHICH named state just left its carrier (2026-10-02; the
+         * {@code STATE_ENDED} event). ⚠ The name has to ride here because the state is already gone by the time
+         * the event fires, so no condition can read it off the carrier.
+         */
+        public TriggerContext withStateName(String name) {
+            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
+                    targetFilter, skillId, weakHitCount, attackHitTargets, name);
         }
         /**
          * The same context, saying <b>which data row</b> of a skill produced this event (2026-09-28).
@@ -2007,7 +2017,7 @@ public class TriggerTable {
          */
         public TriggerContext withSkillId(int id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, id, weakHitCount, List.of());
+                    targetFilter, id, weakHitCount, List.of(), stateName);
         }
 
         /**
@@ -2015,7 +2025,7 @@ public class TriggerTable {
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle) {
-            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of(), 0, 0, List.of());
+            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of(), 0, 0, List.of(), null);
         }
 
         /**
@@ -2034,12 +2044,12 @@ public class TriggerTable {
          * \u2705 The same context carrying how many hit targets shared the attack's weakness (2026-09-30; reader: cone 21040).
          *
          * <p>\u26a0 A COPY helper rather than a wider constructor on purpose: the cast events are built by chaining these
-         * ({@code new TriggerContext(...).withSkillId(...)}), so a value that only the canonical constructor knows is
+         * ({@code new TriggerContext(..., stateName).withSkillId(...)}), so a value that only the canonical constructor knows is
          * silently dropped by every chain that starts from a compact one -- measured, and the reason this exists.
          */
         public TriggerContext withWeakHitCount(int count) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, skillId, count, List.of());
+                    targetFilter, skillId, count, List.of(), stateName);
         }
 
         /**
@@ -2050,7 +2060,7 @@ public class TriggerTable {
          */
         public TriggerContext withAttackHitTargets(List<CanHit> targets) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, skillId, weakHitCount, List.copyOf(targets));
+                    targetFilter, skillId, weakHitCount, List.copyOf(targets), stateName);
         }
 
         /**
@@ -2061,7 +2071,7 @@ public class TriggerTable {
          */
         public TriggerContext withTargetFilter(List<Condition> filter) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    filter == null ? List.of() : filter, skillId, weakHitCount, attackHitTargets);
+                    filter == null ? List.of() : filter, skillId, weakHitCount, attackHitTargets, stateName);
         }
 
         /**
@@ -2071,7 +2081,7 @@ public class TriggerTable {
          */
         public TriggerContext withSubject(CanHit candidate) {
             return new TriggerContext(owner, actor, candidate, hitCount, amount, damage, battle, fromCast, ruleId,
-                    List.of(), 0, weakHitCount, List.of());
+                    List.of(), 0, weakHitCount, List.of(), stateName);
         }
 
         /** Whether {@code candidate} passes the per-target conditions (an empty filter admits everything). */
@@ -2085,7 +2095,7 @@ public class TriggerTable {
         }
 
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0, 0, List.of());
+            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0, 0, List.of(), null);
         }
     }
 

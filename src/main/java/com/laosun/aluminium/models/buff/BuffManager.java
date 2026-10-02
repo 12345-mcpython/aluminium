@@ -659,6 +659,12 @@ public class BuffManager {
             boolean couldAct = buff.canAct();
             buff.tickEffect(instance);
             if (buff.duration() <= 0) {
+                // ⭐ Announce BEFORE the removal (2026-10-02): the event carries the state's name, because a
+                // reader that looked for the state on this unit would already see it gone. `battle` is null for a
+                // unit built outside a battle, and then there is nobody to tell.
+                if (battle != null && buff instanceof StateBuff ended) {
+                    battle.fireStateEnded(instance, ended.getState());
+                }
                 // `remove` by identity: AbstractBuff does not override equals, and a buff that already
                 // removed itself during the tick simply is not there any more.
                 buffs.remove(buff);
