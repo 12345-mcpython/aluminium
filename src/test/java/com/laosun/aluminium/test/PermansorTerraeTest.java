@@ -59,13 +59,22 @@ public class PermansorTerraeTest {
         Assertions.assertTrue(ally.getShield() > 0, "\u300c\u4e3a\u6211\u65b9\u5168\u4f53\u63d0\u4f9b\u2026\u62a4\u76fe\u300d");
     }
 
-    /** Census: the skill, the ultimate and the level convention. */
+    /** Census: his skill and its trace, the ultimate, the technique, and the two halves of 葳蕤. */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DHPT);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the Bondmate and the shield");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "the Bondmate/shield rule AND (since 2026-10-02) the trace 神秀 that buffs whoever holds 【同袍】 -- "
+                        + "which is why the two are in this order in the file: the first designates, the second reads "
+                        + "`holder_of:同袍`");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the technique's 【同袍】 (「使用秘技后获得【同袍】」), 葳蕤's 「行动提前40%」 and "
+                        + "-- since 2026-10-02 -- the technique's auto-cast (「下一次战斗开始时自动对持有【同袍】的"
+                        + "角色施放1次战技」), which CAST_SKILL can now deliver because it casts the skill through the "
+                        + "engine's own path: his skill is a DEFENCE shield, not a swing");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+                "葳蕤's second half: 「【同袍】施放攻击时，丹恒•腾荒恢复6点能量」");
     }
 
     private static Random fixed() {

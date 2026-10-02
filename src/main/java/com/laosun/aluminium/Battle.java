@@ -1975,6 +1975,24 @@ public class Battle {
     }
 
     /**
+     * The members of a unit's <b>own</b> camp — the counterpart of {@link #getOpponents(CanHit)} (2026-10-02).
+     *
+     * <p>It exists because an effect can speak about "our side" without being aimed at it: the state-holder selector
+     * ({@code holder_of:同袍}) asks which of <i>my</i> units carries a state, and an enemy carrying it would be a
+     * different sentence entirely. Like its counterpart it does <b>not</b> filter the dead (the caller decides), and
+     * it answers an empty list for a unit with no camp rather than guessing one.
+     *
+     * @param self the querier
+     * @return the list of the querier's own camp (it is {@code allies} / {@code enemies} itself, not a copy)
+     */
+    public List<? extends CanHit> getSideOf(CanHit self) {
+        if (self == null || self.getCamp() == null) {
+            return List.of();
+        }
+        return self.getCamp() == com.laosun.aluminium.enums.Camp.PLAYER ? allies : enemies;
+    }
+
+    /**
      * Break energy gain (P3-3): P4-4 calls this **one** funnel point at the moment of the break; the rules
      * still belong to the breaker's own provider (the standard implementation gives 5; Rappa (乱破) +10,
      * Harmony Trailblazer (同谐开拓者) +10, Fugue (忘归人) +3 and the like get their own implementations when the
