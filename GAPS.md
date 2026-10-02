@@ -15830,6 +15830,30 @@
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓（本轮**未改代码** ✓ ——
 >   只把上一轮的回滚记完整 ✓，并把下一轮的第一步**收窄到三处编辑** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百零二：⚠⚠ 订正上一条 —— 那个载体**只对我方目标存在**，"原伤害"的读者在对面）**：
+>
+> * ⚠⚠ **上一条说"载体本来就有（`TAKING_HIT`）"，那句话**只对了一半** ✗**：`Battle.fireTriggersForAlly`
+>   （`:2344` ✓）**第一件事就是** `if (target.getCamp() != Camp.PLAYER) return 0;` ✓ —— 注释写得很清楚 ✓：
+>   *「an enemy taking damage should not make our characters react, and enemy events are not ours to data-ise yet
+>   (P9 owns monsters)」* ✓ ⇒ **`TAKING_HIT`（`:1329`）与 `HP_LOST`（`:1337`）在敌人挨打时根本不发** ✗。
+> * ⇒ ⭐ **而 `1003` 星魂 6 的读者正在对面** ✓：「对**随机敌方单体**各造成等同于**原伤害 40%** 的火属性伤害」✓ ——
+>   它要的是**施加侧**的事实（"**我**打出的这一下结算了多少"✓），不是"敌人身上发生了什么"✓。
+>   能到达对面的那条路只有 `DEALING_DAMAGE`（`:2752` ✓，双阵营 ✓），而它带的数是**基数** ✗。
+> * ⭐⭐ **所以正确的形状不是"让 TAKING_HIT 带上类别"，而是补一个**施加侧**的结算事件** ✓：
+>   `DAMAGE_SETTLED`（`actor` = 打人的那个 ✓、`target` = 挨打的那个 ✓、`amount` = **`settled`** ✓，
+>   在 `applyDamage` 里 `settled` 已知的那一处发 ✓，双阵营 ✓）—— 这样 `scale: "original_damage"` = `ctx.amount()` ✓
+>   且**装载期要求它挂在这个事件上** ✓（只有它的 amount 是"结算后的伤害" ✓）。
+>   ⚠ 它同时是**一整族**句子的入口 ✓：「（本次/该次/原）伤害的 X%」在语料里 14 份 ✓、「等同于本次…」6 份 ✓
+>   —— 只是绝大多数还叠着 `真实伤害` 或"本次攻击总伤害值" ✗。
+> * ⚠ **教训（本轮第二次同形）**：**"有这个事件"和"这个事件会为这个目标发"是两件事** ✓ ——
+>   `fireTriggersForAlly` 的**首个 return** 就是那道边界 ✓，而它写在**发射器的第一行** ✓ ⇒
+>   读事件表时要连**谁会被发**一起读 ✓（这与"装载期拒绝的理由会过期"同族：**读代码读到的是能力，读到注释才是边界** ✓）。
+> * **仍欠（已具名，下一轮从它开始）** ✗：① 事件 `DAMAGE_SETTLED`（枚举 + 双阵营发射 + `requireEvent` 允许面 ✓）；
+>   ② `scale: "original_damage"` = `ctx.amount()` ✓；③ 出货 `1003` 星魂 6（`TAKING_HIT`→`DAMAGE_SETTLED`、`from_skill ULTRA`、
+>   `min_eidolon: 6`、`DAMAGE { times: 2, target: random_enemy, percent: 0.4, element: Fire }` ✓，顺带给
+>   `random_enemy` 第一个读者 ✓）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
