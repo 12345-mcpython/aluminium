@@ -123,6 +123,20 @@ public final class SummonFactory {
         return memosprite(master, spec);
     }
 
+    /** The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}). */
+    public static Summon memosprite(Character master, java.util.function.ToIntFunction<String> resourceValue) {
+        MemospriteSpec spec = Memosprites.of(master.getCid());
+        if (spec == null) {
+            // The same text as the 1-arg overload: a caller must not be able to tell which entry point it used
+            // from the message alone (SummonOpTest pins the wording).
+            throw new IllegalArgumentException(
+                    "Character " + master.getName() + " (" + master.getCid() + ") has no memosprite spec: "
+                            + "add resources/" + Memosprites.DIR + "/" + master.getCid() + ".json describing "
+                            + "its name and how its panel derives from the summoner");
+        }
+        return memosprite(master, spec, resourceValue);
+    }
+
     public static Summon servant(Character master) {
         if (master == null) {
             throw new IllegalArgumentException("A memosprite needs a summoner");
@@ -137,6 +151,60 @@ public final class SummonFactory {
         return servant(master, spec);
     }
 
+    /** The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}). */
+    public static Summon servant(Character master, java.util.function.ToIntFunction<String> resourceValue) {
+        MemospriteSpec spec = Memosprites.of(master.getCid(), Memosprites.SERVANT_DIR);
+        if (spec == null) {
+            // The same text as the 1-arg overload (SummonOpTest pins the wording).
+            throw new IllegalArgumentException(
+                    "Character " + master.getName() + " (" + master.getCid() + ") has no memosprite spec: "
+                            + "add resources/" + Memosprites.DIR + "/" + master.getCid() + ".json describing "
+                            + "its name and how its panel derives from the summoner");
+        }
+        return servant(master, spec, resourceValue);
+    }
+
+    /**
+     * The panel every summon shares: each entry is a share of the <b>master's attribute</b> plus a flat term
+     * -- or, when it names {@code resource:<name>}, a share of a <b>battle-level resource</b> (2026-10-02;
+     * reader: 1407/1415's dead dragon).
+     *
+     * <p>⚠ The resource reader is handed in rather than reached for: resources live on the battle, and this
+     * derivation was deliberately split out to be exercised on its own. A {@code resource:} panel with no reader
+     * is refused loudly -- deriving 0 would be a number that looks plausible and is wrong.
+     */
+    private static AttributeBuilder panelOf(Character master, MemospriteSpec spec,
+                                            java.util.function.ToIntFunction<String> resourceValue) {
+        AttributeBuilder panel = new AttributeBuilder();
+        for (MemospriteSpec.Panel entry : spec.panel()) {
+            AttributeType attribute = AttributeType.fromString(entry.attribute());
+            double share = entry.percent() == null ? 0 : entry.percent();
+            double flat = entry.flat() == null ? 0 : entry.flat();
+            double value;
+            if (entry.source() != null && entry.source().startsWith("resource:")) {
+                String name = entry.source().substring("resource:".length()).trim();
+                if (resourceValue == null) {
+                    throw new IllegalStateException(
+                            "the panel of \"" + spec.name() + "\" derives from resource \"" + name
+                                    + "\", but no resource reader was handed in: use the overload that takes one "
+                                    + "(a missing reader would silently derive 0)");
+                }
+                value = share * resourceValue.applyAsInt(name) + flat;
+            } else {
+                value = share * master.getAttribute(attribute).get() + flat;
+            }
+            // The builder's own convention for the two kinds of attribute (see AttributeBuilder): a base
+            // attribute is set outright, and a ratio attribute -- whose base is literally 0 -- is given a
+            // percentage-point modifier, which is exactly `ModifyAttr`'s rule for the same situation.
+            if (attribute.isPercent) {
+                panel.addPercentPoint(attribute, value, DoubleValue.Modifier.ModifierSource.BASE);
+            } else {
+                panel.setBase(attribute, value);
+            }
+        }
+        return panel;
+    }
+
     /**
      * Builds a memosprite from an already-loaded spec.
      *
@@ -149,7 +217,16 @@ public final class SummonFactory {
      * @param spec   the validated spec
      * @return the memosprite, with its attack installed when the spec states one
      */
+    /** The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}). */
+    public static Summon memosprite(Character master, MemospriteSpec spec, java.util.function.ToIntFunction<String> resourceValue) {
+        return memospriteWith(master, spec, resourceValue);
+    }
+
     public static Summon memosprite(Character master, MemospriteSpec spec) {
+        return memospriteWith(master, spec, null);
+    }
+
+    private static Summon memospriteWith(Character master, MemospriteSpec spec, java.util.function.ToIntFunction<String> resourceValue) {
         if (master == null) {
             throw new IllegalArgumentException("A memosprite needs a summoner");
         }
@@ -160,21 +237,7 @@ public final class SummonFactory {
         // spec handed to it must fail the same way a bad file does -- otherwise the checks in
         // Memosprites.validate could be bypassed by the one caller that is easiest to get wrong.
         Memosprites.validate(spec, "SummonFactory.memosprite(master, spec)");
-        AttributeBuilder panel = new AttributeBuilder();
-        for (MemospriteSpec.Panel entry : spec.panel()) {
-            AttributeType attribute = AttributeType.fromString(entry.attribute());
-            double share = entry.percent() == null ? 0 : entry.percent();
-            double flat = entry.flat() == null ? 0 : entry.flat();
-            double value = share * master.getAttribute(attribute).get() + flat;
-            // The builder's own convention for the two kinds of attribute (see AttributeBuilder): a base
-            // attribute is set outright, and a ratio attribute -- whose base is literally 0 -- is given a
-            // percentage-point modifier, which is exactly `ModifyAttr`'s rule for the same situation.
-            if (attribute.isPercent) {
-                panel.addPercentPoint(attribute, value, DoubleValue.Modifier.ModifierSource.BASE);
-            } else {
-                panel.setBase(attribute, value);
-            }
-        }
+        AttributeBuilder panel = panelOf(master, spec, resourceValue);
         Summon summon = new Summon(spec.name(), Camp.PLAYER, panel.build());
         summon.setLevel(master.getLevel());
         if (spec.aggro() != null) {
@@ -189,7 +252,16 @@ public final class SummonFactory {
         return summon;
     }
 
+    /** The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}). */
+    public static Summon servant(Character master, MemospriteSpec spec, java.util.function.ToIntFunction<String> resourceValue) {
+        return servantWith(master, spec, resourceValue);
+    }
+
     public static Summon servant(Character master, MemospriteSpec spec) {
+        return servantWith(master, spec, null);
+    }
+
+    private static Summon servantWith(Character master, MemospriteSpec spec, java.util.function.ToIntFunction<String> resourceValue) {
         if (master == null) {
             throw new IllegalArgumentException("A memosprite needs a summoner");
         }
@@ -200,21 +272,7 @@ public final class SummonFactory {
         // spec handed to it must fail the same way a bad file does -- otherwise the checks in
         // Memosprites.validate could be bypassed by the one caller that is easiest to get wrong.
         Memosprites.validate(spec, "SummonFactory.servant(master, spec)");
-        AttributeBuilder panel = new AttributeBuilder();
-        for (MemospriteSpec.Panel entry : spec.panel()) {
-            AttributeType attribute = AttributeType.fromString(entry.attribute());
-            double share = entry.percent() == null ? 0 : entry.percent();
-            double flat = entry.flat() == null ? 0 : entry.flat();
-            double value = share * master.getAttribute(attribute).get() + flat;
-            // The builder's own convention for the two kinds of attribute (see AttributeBuilder): a base
-            // attribute is set outright, and a ratio attribute -- whose base is literally 0 -- is given a
-            // percentage-point modifier, which is exactly `ModifyAttr`'s rule for the same situation.
-            if (attribute.isPercent) {
-                panel.addPercentPoint(attribute, value, DoubleValue.Modifier.ModifierSource.BASE);
-            } else {
-                panel.setBase(attribute, value);
-            }
-        }
+        AttributeBuilder panel = panelOf(master, spec, resourceValue);
         Summon summon = new Summon(spec.name(), Camp.PLAYER, panel.build());
         summon.setLevel(master.getLevel());
         if (spec.aggro() != null) {

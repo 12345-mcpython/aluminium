@@ -3072,7 +3072,7 @@ public class Battle {
         if (existing != null) {
             return existing;
         }
-        Summon memosprite = SummonFactory.memosprite(master);
+        Summon memosprite = SummonFactory.memosprite(master, this::partyResourceValue);
         memosprite.setMaster(master);
         allies.add(memosprite);
         addRequestItems.add(memosprite);
@@ -3091,7 +3091,7 @@ public class Battle {
                             + "already orphaned, and the very next removeDeadCombatants would take it "
                             + "straight back out");
         }
-        Summon servant = SummonFactory.servant(master);
+        Summon servant = SummonFactory.servant(master, this::partyResourceValue);
         servant.setMaster(master);
         allies.add(servant);
         addRequestItems.add(servant);
