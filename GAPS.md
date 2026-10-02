@@ -18603,6 +18603,25 @@
 >   在**既有内容**里怎么表达 ✓；② 若它**已用某种"随量"写法** ⇒ ⭐ **核对我那一档是否真新** ✓（若是重复 ⇒ 按纪律**撤掉** ✓）；
 >     若不是 ⇒ 它仍是新能力 ✓，只是**读者要换**（`1306` 那条已出货 ✗ ⇒ 换 `1413:343` 的【忆质】或 `1415:542` 的溢出 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十八：✅ 推送补上了（`c843522` ✓）；⭐ 而"既有那条怎么写的"也读清了 —— **`event_amount` 这个拼写早就存在，只是挂在 `ADD_STACK` 上**）**：
+>
+> * ✅ **实测（读 `1306.json` 的现有规则 ✓）** ✓：
+>   * **`SKILL_POINT_SPENT` / `talent_party_damage_on_spend`** ✓（= 我重复的那条 ✓）：
+>     `{"op":"MODIFY_ATTR","attribute":"ALL_DAMAGE_TYPE_BOOST","percent":0.06,"turns":2,"max_stacks":3,"target":"all_allies","buff":"叙述性诡计"}` ✓
+>     ⇒ ⭐ **它没有 `scale`** ✓ ⇒ 语义是"**每触发一次算一层**" ✓（⚠ 与文档"每消耗 1 点"**不完全同义** ✗ —— 一次消耗 3 点它只算 1 层 ✗
+>       ⇒ ⭐ 那是既有内容的一处**近似** ✓，**登记** ✓，但**不改它** ✗ —— 改既有内容要单独一轮 ＋ 写清文档依据 ✓）；
+>   * ⭐⭐ **`SKILL_POINT_SPENT` / `talent_phantasm_stack`** ✓：`{"op":"ADD_STACK","buff":"幻相","max_stacks":3,"turns":2,"scale":"event_amount","percent":1}`
+>     ⇒ ⛔ **`scale: "event_amount"` 早就存在** ✗ —— **只是挂在 `ADD_STACK` 上** ✓（走的是它自己那条取数路 ✓，与
+>       `MODIFY_ATTR` 的 `derivedMagnitude` ✗ **不是同一处** ✓）。
+>   * 另两条给旁证 ✓：`eidolon2_defence_ignore_per_layer` 用 **`scale: "self_stacks:叙述性诡计"`** ✓（层数当标度 ✓）、
+>     `talent_phantasm_damage_taken` 用 `self_stacks:幻相` ＋ **`cap_amount: 0.12`** ✓（上限那一档也有 ✓）。
+> * ⭐ **于是我那档的正确定性** ✓：**不是新拼写，而是"把已有的 `event_amount` 拼写接到 `MODIFY_ATTR` 这条取数路上"** ✓
+>   ⇒ ⚠ 我当日写进注释的理由（*"no such spelling exists"* ✗）**不准确** ✓ ⇒ ⭐ **下一轮把它改准** ✓
+>     （写成：*"`event_amount` already existed for `ADD_STACK`; modifiers had no way to read the event"* ✓）。
+> * ⭐ **读者清单随之更新** ✓：`1306` 的两条**已出货** ✗（`talent_party_damage_on_spend` ✓／`talent_phantasm_stack` ✓）
+>   ⇒ 我这一档现在的读者是 **`1413:343`** ✓（每消耗 1 点【忆质】⇒ 速度 +1%／最多 40 点 ✓）与 **`1415:542`** ✓（每消耗 1% 溢出 ⇒ +0.24% ✓）
+>     ⇒ **≥2** ✓ 仍过门槛 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（`c843522` ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -20272,6 +20291,25 @@
 >   在**既有内容**里怎么表达 ✓；② 若它**已用某种"随量"写法** ⇒ ⭐ **核对我那一档是否真新** ✓（若是重复 ⇒ 按纪律**撤掉** ✓）；
 >     若不是 ⇒ 它仍是新能力 ✓，只是**读者要换**（`1306` 那条已出货 ✗ ⇒ 换 `1413:343` 的【忆质】或 `1415:542` 的溢出 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十八：✅ 推送补上了（`c843522` ✓）；⭐ 而"既有那条怎么写的"也读清了 —— **`event_amount` 这个拼写早就存在，只是挂在 `ADD_STACK` 上**）**：
+>
+> * ✅ **实测（读 `1306.json` 的现有规则 ✓）** ✓：
+>   * **`SKILL_POINT_SPENT` / `talent_party_damage_on_spend`** ✓（= 我重复的那条 ✓）：
+>     `{"op":"MODIFY_ATTR","attribute":"ALL_DAMAGE_TYPE_BOOST","percent":0.06,"turns":2,"max_stacks":3,"target":"all_allies","buff":"叙述性诡计"}` ✓
+>     ⇒ ⭐ **它没有 `scale`** ✓ ⇒ 语义是"**每触发一次算一层**" ✓（⚠ 与文档"每消耗 1 点"**不完全同义** ✗ —— 一次消耗 3 点它只算 1 层 ✗
+>       ⇒ ⭐ 那是既有内容的一处**近似** ✓，**登记** ✓，但**不改它** ✗ —— 改既有内容要单独一轮 ＋ 写清文档依据 ✓）；
+>   * ⭐⭐ **`SKILL_POINT_SPENT` / `talent_phantasm_stack`** ✓：`{"op":"ADD_STACK","buff":"幻相","max_stacks":3,"turns":2,"scale":"event_amount","percent":1}`
+>     ⇒ ⛔ **`scale: "event_amount"` 早就存在** ✗ —— **只是挂在 `ADD_STACK` 上** ✓（走的是它自己那条取数路 ✓，与
+>       `MODIFY_ATTR` 的 `derivedMagnitude` ✗ **不是同一处** ✓）。
+>   * 另两条给旁证 ✓：`eidolon2_defence_ignore_per_layer` 用 **`scale: "self_stacks:叙述性诡计"`** ✓（层数当标度 ✓）、
+>     `talent_phantasm_damage_taken` 用 `self_stacks:幻相` ＋ **`cap_amount: 0.12`** ✓（上限那一档也有 ✓）。
+> * ⭐ **于是我那档的正确定性** ✓：**不是新拼写，而是"把已有的 `event_amount` 拼写接到 `MODIFY_ATTR` 这条取数路上"** ✓
+>   ⇒ ⚠ 我当日写进注释的理由（*"no such spelling exists"* ✗）**不准确** ✓ ⇒ ⭐ **下一轮把它改准** ✓
+>     （写成：*"`event_amount` already existed for `ADD_STACK`; modifiers had no way to read the event"* ✓）。
+> * ⭐ **读者清单随之更新** ✓：`1306` 的两条**已出货** ✗（`talent_party_damage_on_spend` ✓／`talent_phantasm_stack` ✓）
+>   ⇒ 我这一档现在的读者是 **`1413:343`** ✓（每消耗 1 点【忆质】⇒ 速度 +1%／最多 40 点 ✓）与 **`1415:542`** ✓（每消耗 1% 溢出 ⇒ +0.24% ✓）
+>     ⇒ **≥2** ✓ 仍过门槛 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（`c843522` ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
