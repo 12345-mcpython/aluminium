@@ -52,8 +52,7 @@ public class BuffManager {
         for (int i = buffs.size() - 1; i >= 0; i--) {
             AbstractBuff existed = buffs.get(i);
             if (existed.isSameKind(buff)) {
-                buffs.remove(i);
-                existed.removeBuff(instance);
+                removeBuff(existed);
             }
         }
         buff.setOwner(instance);      // C-1: record the owner, so buffs that inject zones per side can tell which side they stand on
@@ -157,8 +156,7 @@ public class BuffManager {
         for (int i = buffs.size() - 1; i >= 0; i--) {
             AbstractBuff buff = buffs.get(i);
             if (buff.getClass() == kind) {
-                buffs.remove(i);
-                buff.removeBuff(instance);
+                removeBuff(buff);
                 return true;
             }
         }
