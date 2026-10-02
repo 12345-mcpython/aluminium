@@ -20101,6 +20101,19 @@
 >     ⇒ ⭐ **规矩**：调试期间的中间产物**要么不 `git add`，要么先修好** ✓；⭐ 而 `git checkout` 只能回到**已提交**的状态 ✓
 >       ⇒ **"回滚到干净" 不等于 "回滚到正确"** ✓。
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 3 个提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十七：✅ **阿哈时刻已进树且全量绿**（`ec30d193` ✓）；⭐ 而判据要的那个语义也读到了：`from_category` ＝「**造成该事件的那次施放属于某类别**」）**：
+>
+> * ✅ **实测（读 `TriggerTable:1103` 附近的常量说明 ✓）** ✓ 原文要点：
+>   *`from_category`: "the cast that caused this event was of this CATEGORY" (\u300c\u88c5\u5907\u8005\u65bd\u653e**\u6b22\u6109\u6280**\u65f6\u300d, \u5149\u9525 21064/21066/23058/23064). … the slot names a SKILL SLOT (`SKILL` = an ordinary Skill), while a memosprite's or a **\u6b22\u6109 kit's cast is a category the slot vocabulary does not have at all** — `SkillCategory.ELATION_DAMAGE` is precisely the one `SkillType` lacks.`*
+>   ⇒ ⭐⭐ **两点** ✓：**(i)** 我那条 `from_category ElationDamage` 的写法**有明确来历** ✓（光锥 21064 等在用 ✓ —— ⚠ 而 21064 正是本段某次红过的判据名 ✓ 印证它在欢愉这条线上 ✓）；
+>     **(ii)** ⭐ **判据要满足它，就得让"造成事件的那次施放"真的带这个类别** ✗ ⇒ 也就是**判据必须驱动一次真的欢愉技施放** ✗
+>       （⚠ 不能像 `1215` 那样只 `fireTriggers` 一个事件 ✓ —— 那次的条件是 `from_skill` ✓ 不同 ✓）。
+> * ⭐ **下一轮第一步（判据的写法，先查入口再写）** ✗：
+>   ① 读 **`Battle`／`SkillExecutor` 里"施放"的入口** ✓（⚠ 一次调用：搜 `ELATION_DAMAGE` 的使用处 ✓ ⇒ 看哪条路径会把它写进 `TriggerContext` 的 cast ✓）；
+>   ② 用那条路径**在判据里驱动一次** ✓ ⇒ 断言：**状态挂上** ✓（`has_state` 可读 ✓）⇒ **归零后摘掉** ✓ ⇒ ⭐ **`STATE_ENDED` 发出** ✓（读者规则生效 ⇒ 她拿到【好活当赏】✓）；
+>   ③ **变异（全量）**：去掉 `REMOVE_STATE` 那条 ⇒ **必红** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络 ✓ 又断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、两闸门 [0, 0] ✓、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23268,6 +23281,19 @@
 >     ⇒ ⭐ **规矩**：调试期间的中间产物**要么不 `git add`，要么先修好** ✓；⭐ 而 `git checkout` 只能回到**已提交**的状态 ✓
 >       ⇒ **"回滚到干净" 不等于 "回滚到正确"** ✓。
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 3 个提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十七：✅ **阿哈时刻已进树且全量绿**（`ec30d193` ✓）；⭐ 而判据要的那个语义也读到了：`from_category` ＝「**造成该事件的那次施放属于某类别**」）**：
+>
+> * ✅ **实测（读 `TriggerTable:1103` 附近的常量说明 ✓）** ✓ 原文要点：
+>   *`from_category`: "the cast that caused this event was of this CATEGORY" (\u300c\u88c5\u5907\u8005\u65bd\u653e**\u6b22\u6109\u6280**\u65f6\u300d, \u5149\u9525 21064/21066/23058/23064). … the slot names a SKILL SLOT (`SKILL` = an ordinary Skill), while a memosprite's or a **\u6b22\u6109 kit's cast is a category the slot vocabulary does not have at all** — `SkillCategory.ELATION_DAMAGE` is precisely the one `SkillType` lacks.`*
+>   ⇒ ⭐⭐ **两点** ✓：**(i)** 我那条 `from_category ElationDamage` 的写法**有明确来历** ✓（光锥 21064 等在用 ✓ —— ⚠ 而 21064 正是本段某次红过的判据名 ✓ 印证它在欢愉这条线上 ✓）；
+>     **(ii)** ⭐ **判据要满足它，就得让"造成事件的那次施放"真的带这个类别** ✗ ⇒ 也就是**判据必须驱动一次真的欢愉技施放** ✗
+>       （⚠ 不能像 `1215` 那样只 `fireTriggers` 一个事件 ✓ —— 那次的条件是 `from_skill` ✓ 不同 ✓）。
+> * ⭐ **下一轮第一步（判据的写法，先查入口再写）** ✗：
+>   ① 读 **`Battle`／`SkillExecutor` 里"施放"的入口** ✓（⚠ 一次调用：搜 `ELATION_DAMAGE` 的使用处 ✓ ⇒ 看哪条路径会把它写进 `TriggerContext` 的 cast ✓）；
+>   ② 用那条路径**在判据里驱动一次** ✓ ⇒ 断言：**状态挂上** ✓（`has_state` 可读 ✓）⇒ **归零后摘掉** ✓ ⇒ ⭐ **`STATE_ENDED` 发出** ✓（读者规则生效 ⇒ 她拿到【好活当赏】✓）；
+>   ③ **变异（全量）**：去掉 `REMOVE_STATE` 那条 ⇒ **必红** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络 ✓ 又断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、两闸门 [0, 0] ✓、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
