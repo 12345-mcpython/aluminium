@@ -23,6 +23,9 @@ CID = sys.argv[1]
 NAMES = sys.argv[2:]
 PATH = '%s/src/main/resources/characters/%s.json' % (WORK, CID)
 
+# ⚠ 任何"挂在场上、按名字可摘"的修饰器。DAMAGE/GAIN_RESOURCE 这类是**瞬时**的，不属于这里。
+MODIFIER_OPS = {'MODIFY_ATTR', 'MODIFY_DAMAGE_TAKEN', 'MODIFY_DAMAGE_DEALT', 'MODIFY_RULE'}
+
 NOTE = (
     '\u2b50 2026-09-30 \u8865\u5b8c\u6574\uff1a\u4e0a\u4e00\u6b21\u53ea\u8f6c\u79fb\u4e86**\u4e00\u534a** \u2717 \u2014\u2014 \u26a0 '
     '`REMOVE_STATE` \u6309**\u540d\u5b57**\u6458\uff0c\u800c\u672c\u6761\u91cc\u9664\u4e86 `APPLY_BUFF` \u8fd8\u6709\u4e00\u4e2a**\u4e0d\u5177\u540d**\u7684 '
@@ -46,9 +49,11 @@ for r in rules:
         continue
     name = str(applied[0].get('buff'))
     for e in (r.get('do') or []):
-        if e.get('op') == 'MODIFY_ATTR' and not e.get('buff'):
+        # ⚠ 口径要完整：任何**留在场上**的修饰器都按名字摘，不只是 MODIFY_ATTR。
+        # 实测 1112 的规则里有 MODIFY_DAMAGE_TAKEN，而这一行原先只找 MODIFY_ATTR ⇒ 它误报"没事可做"。
+        if e.get('op') in MODIFIER_OPS and not e.get('buff'):
             e['buff'] = name
-            changed.append('%s.%s <- %s' % (r.get('id'), e.get('attribute'), name))
+            changed.append('%s.%s <- %s' % (r.get('id'), e.get('attribute') or e.get('op'), name))
     r['note'] = str(r.get('note') or '') + chr(10) + chr(10) + NOTE
 
 print('named modifiers: %s' % changed)
