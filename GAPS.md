@@ -17010,6 +17010,22 @@
 >   **4b** 内容接 **`1211`**（【生息】结束时回能 **8** ✓）＋ 判据（把【生息】推到自然到期 ⇒ 能量 +8 ✓；
 >   ⚠ 并加**对照**：不持该状态时不加 ✓）＋ **变异**（把条件里的名字改掉 ⇒ 必红 ✓）。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百七十：⭐ 条件词汇的**落点已定位**（模式常量区 ＋ `parseCondition` 两个调用点）；要动手还需读两处）**：
+>
+> * ✅ **实测（读 `TriggerTable` 的条件词汇区 ✓）** ✓：每个条件都是**一个 `Pattern` 常量** ✓ ＋ **一个主体集合** ✓
+>   ＋ 一个 `Condition` 实现 ✓，例：`HAS_STATE` 的正则带着**边界环视** ✓
+>   （注释写明理由：*"The keyword has to stand alone (a state whose name contains `has_state` must not be mistaken for the
+>   operator)"* ✓ —— ⚠ **这条对 `state_ended` 同样成立** ✓：状态名里可能含这几个字 ✓）；
+>   `STATE_SUBJECTS = Set.of("self", "actor", "target")` ✓；同族还有 `HAS_PATH`／`IS_ALLY`／`DEBUFF_ON` ✓。
+> * ✅ **调用点**：`parseCondition(raw, spec)` 在 `:569`（普通条件）与 `:612`（**过滤器** ✓）各一处 ✓
+>   ⇒ ⭐ `state_ended` 要**两处都认** ✓（否则 `target_filter` 里用不了 ✓）。
+> * ⭐ **下一步（两处必读，然后一次写对）** ✗：① 读 **`HasState` 那个 `Condition` 实现**（它怎么拿到"那一边"的单位 ✓、
+>   怎么判状态 ✓ ⇒ `state_ended` 版要改成"读 `battle.getLastStateEndedName()` 并与名字比对" ✓）；
+>   ② 读 **`parseCondition` 的分支形状**（每个关键字一段 ✓ ⇒ 照抄一段 ✓）。⚠ 并且**主体**那一栏要重新想 ✓：
+>   「【生息】**结束时**」的主体是**持有者**（= 事件里的 `subject`／`target` ✓），而**触发者**是别人 ✓ ⇒
+>   子句写作 **`target state_ended 生息`** ✓（与 `target has_state …` 同形 ✓）—— ⚠ **这一点先想清楚再写** ✓，
+>   免得像前几轮那样"写完才发现主体反了" ✗。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -17086,6 +17102,22 @@
 >   **4b** 内容接 **`1211`**（【生息】结束时回能 **8** ✓）＋ 判据（把【生息】推到自然到期 ⇒ 能量 +8 ✓；
 >   ⚠ 并加**对照**：不持该状态时不加 ✓）＋ **变异**（把条件里的名字改掉 ⇒ 必红 ✓）。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百七十：⭐ 条件词汇的**落点已定位**（模式常量区 ＋ `parseCondition` 两个调用点）；要动手还需读两处）**：
+>
+> * ✅ **实测（读 `TriggerTable` 的条件词汇区 ✓）** ✓：每个条件都是**一个 `Pattern` 常量** ✓ ＋ **一个主体集合** ✓
+>   ＋ 一个 `Condition` 实现 ✓，例：`HAS_STATE` 的正则带着**边界环视** ✓
+>   （注释写明理由：*"The keyword has to stand alone (a state whose name contains `has_state` must not be mistaken for the
+>   operator)"* ✓ —— ⚠ **这条对 `state_ended` 同样成立** ✓：状态名里可能含这几个字 ✓）；
+>   `STATE_SUBJECTS = Set.of("self", "actor", "target")` ✓；同族还有 `HAS_PATH`／`IS_ALLY`／`DEBUFF_ON` ✓。
+> * ✅ **调用点**：`parseCondition(raw, spec)` 在 `:569`（普通条件）与 `:612`（**过滤器** ✓）各一处 ✓
+>   ⇒ ⭐ `state_ended` 要**两处都认** ✓（否则 `target_filter` 里用不了 ✓）。
+> * ⭐ **下一步（两处必读，然后一次写对）** ✗：① 读 **`HasState` 那个 `Condition` 实现**（它怎么拿到"那一边"的单位 ✓、
+>   怎么判状态 ✓ ⇒ `state_ended` 版要改成"读 `battle.getLastStateEndedName()` 并与名字比对" ✓）；
+>   ② 读 **`parseCondition` 的分支形状**（每个关键字一段 ✓ ⇒ 照抄一段 ✓）。⚠ 并且**主体**那一栏要重新想 ✓：
+>   「【生息】**结束时**」的主体是**持有者**（= 事件里的 `subject`／`target` ✓），而**触发者**是别人 ✓ ⇒
+>   子句写作 **`target state_ended 生息`** ✓（与 `target has_state …` 同形 ✓）—— ⚠ **这一点先想清楚再写** ✓，
+>   免得像前几轮那样"写完才发现主体反了" ✗。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
