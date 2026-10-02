@@ -26,7 +26,7 @@ def bail(msg):
 
 
 # 1) the field, declared at class level just before a uniquely named method
-anchor = '    /** \u2705 Collects the PARTY-scoped declarations of our side into this battle\u2019s own store (2026-09-30). */'
+anchor = '    private void registerPartyResources() {'
 field = ('    /**' + NL
          + '     * The energy the ultimate now settling consumed, for {@code ULT_CAST}\u2019s amount.' + NL
          + '     *' + NL
