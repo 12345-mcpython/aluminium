@@ -20676,6 +20676,31 @@
 >       与构造时传的名字不同" ✗ ⇒ ⭐ **那就是根因** ✓（⚠ 且会解释 `1513` 为什么成功 ✗ —— ⚠ 因为它的状态名恰好等于 `getState()` ✓）。
 > * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十：✅✅✅ **`fireStateEnded` 读了** —— 名字放在**战斗级字段 `lastStateEndedName`** 里（`try/finally` 包裹）⇒ ⭐ 这也**正式证明我那个"手工 fire"判别法无效**（它绕过了这个 setter ✓））**）**：
+>
+> * ✅ **实测（读 `Battle.fireStateEnded` ✓，`:2211` ✓）** ✓ 原文：
+>   ```java
+>   public void fireStateEnded(CanHit carrier, String stateName) {
+>       String previous = lastStateEndedName;
+>       lastStateEndedName = stateName;                                   // ★ 名字进"战斗级字段"
+>       try {
+>           fireTriggers(TriggerEvent.STATE_ENDED, carrier, carrier, 0, 0);   // ★ actor = carrier，target = carrier
+>       } finally {
+>           lastStateEndedName = previous;
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** 名字**不在事件参数里**，而在 `lastStateEndedName` ✓ ⇒ ⭐ **所以"手工 `fireTriggers(STATE_ENDED, …)`"必然读不到名字** ✗
+>     ⇒ ⭐ **本段上一轮那个 0 完全不作数** ✓（⚠ 我当时的判断"判别法无效"**被证实** ✓ —— 本段第十二次自我纠正 ✓）；
+>   **(ii)** 事件的 **actor = target = carrier** ✓ ⇒ ⭐ 若状态挂在**她**身上 ⇒ `self`（规则持有者）与 `actor` **都是她** ✓ ⇒ 我的条件主体 `self` **应当匹配** ✓；
+>   **(iii)** ⭐ 名字由 `ended.getState()` 传入 ✓（`BuffManager:666` ✓）⇒ 而 `applyState` 用 `"buff"` 建 `StateBuff(state)` ✓ ⇒ ⭐ **两端都应当是 `生息`** ✓
+>     ⇒ ⚠ **那么剩下的唯一可能是条件解析那一侧** ✗（⚠ 即 `self state_ended 生息` 里 **`self` 这个主体词**是否被 `requireStateSubject` 认 ✓
+>       —— ⚠ 本段见过 `self has_state 秘技` ✓ 用的是 `has_state` ✗ ⇒ ⭐ **`state_ended` 的主体词表可能不同** ✗）。
+> * ⭐ **下一轮第一步（1 次调用，直击要害）** ✗：读 **`TriggerTable.requireStateSubject`** ✓（⚠ 它决定"哪些主体词合法" ✓）
+>   ⇒ 若它只认 **`target`／`actor`** 而**不认 `self`** ✗ ⇒ ⭐ **根因到手** ✓ ⇒ 把条件改成 **`actor state_ended 生息`** ✓（或 `target …` ✓）
+>     ⇒ 重跑 ⇒ 绿 ⇒ **变异（`turns: 2 → 3`）⇒ 全量 ⇒ 出货** ✓（⭐ 目标 ① 的第二个真读者 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24418,6 +24443,31 @@
 >       与构造时传的名字不同" ✗ ⇒ ⭐ **那就是根因** ✓（⚠ 且会解释 `1513` 为什么成功 ✗ —— ⚠ 因为它的状态名恰好等于 `getState()` ✓）。
 > * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十：✅✅✅ **`fireStateEnded` 读了** —— 名字放在**战斗级字段 `lastStateEndedName`** 里（`try/finally` 包裹）⇒ ⭐ 这也**正式证明我那个"手工 fire"判别法无效**（它绕过了这个 setter ✓））**）**：
+>
+> * ✅ **实测（读 `Battle.fireStateEnded` ✓，`:2211` ✓）** ✓ 原文：
+>   ```java
+>   public void fireStateEnded(CanHit carrier, String stateName) {
+>       String previous = lastStateEndedName;
+>       lastStateEndedName = stateName;                                   // ★ 名字进"战斗级字段"
+>       try {
+>           fireTriggers(TriggerEvent.STATE_ENDED, carrier, carrier, 0, 0);   // ★ actor = carrier，target = carrier
+>       } finally {
+>           lastStateEndedName = previous;
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** 名字**不在事件参数里**，而在 `lastStateEndedName` ✓ ⇒ ⭐ **所以"手工 `fireTriggers(STATE_ENDED, …)`"必然读不到名字** ✗
+>     ⇒ ⭐ **本段上一轮那个 0 完全不作数** ✓（⚠ 我当时的判断"判别法无效"**被证实** ✓ —— 本段第十二次自我纠正 ✓）；
+>   **(ii)** 事件的 **actor = target = carrier** ✓ ⇒ ⭐ 若状态挂在**她**身上 ⇒ `self`（规则持有者）与 `actor` **都是她** ✓ ⇒ 我的条件主体 `self` **应当匹配** ✓；
+>   **(iii)** ⭐ 名字由 `ended.getState()` 传入 ✓（`BuffManager:666` ✓）⇒ 而 `applyState` 用 `"buff"` 建 `StateBuff(state)` ✓ ⇒ ⭐ **两端都应当是 `生息`** ✓
+>     ⇒ ⚠ **那么剩下的唯一可能是条件解析那一侧** ✗（⚠ 即 `self state_ended 生息` 里 **`self` 这个主体词**是否被 `requireStateSubject` 认 ✓
+>       —— ⚠ 本段见过 `self has_state 秘技` ✓ 用的是 `has_state` ✗ ⇒ ⭐ **`state_ended` 的主体词表可能不同** ✗）。
+> * ⭐ **下一轮第一步（1 次调用，直击要害）** ✗：读 **`TriggerTable.requireStateSubject`** ✓（⚠ 它决定"哪些主体词合法" ✓）
+>   ⇒ 若它只认 **`target`／`actor`** 而**不认 `self`** ✗ ⇒ ⭐ **根因到手** ✓ ⇒ 把条件改成 **`actor state_ended 生息`** ✓（或 `target …` ✓）
+>     ⇒ 重跑 ⇒ 绿 ⇒ **变异（`turns: 2 → 3`）⇒ 全量 ⇒ 出货** ✓（⭐ 目标 ① 的第二个真读者 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
