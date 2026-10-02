@@ -16782,6 +16782,24 @@
 >   ⇒ `detach` 也必须遵守这条 ✓（**不要在 `processBuffTick` 内联里改列表** ✗）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2111** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百五十六：✅✅ 到期**本来就已经收口**了 —— 三条滴答路径都走同一个 `tickBuff`（收口只剩三处））**：
+>
+> * ✅ **实测（读 `processBuffTick` 与它的邻居 ✓）** ✓：
+>   `private void processBuffTick(boolean early) { tickBuff(instance, early); }`（`:577` ✓）
+>   ⇒ ⭐ **到期逻辑全在 `tickBuff(clockOwner, early)` 里** ✓，而**三条路径共用它** ✓：
+>   ① 自己的回合边界（`beforeMove`／`afterMove` ✓）；② `tickForeign`（**别人的**回合边界 ✓ —— 「【蒙福者】挂在队友身上、由**星期日**的回合数掉」✓）；
+>   ③ `removeBuffsAnchoredTo`（**锚点死亡**时的清理 ✓，M-42 ③ ✓）。⇒ ⭐⭐ **"到期"这件事**已经是**一个事实** ✓，
+>   不需要重构 ✓（我上一轮把 `processBuffTick` 当成"自己摘列表"✗ —— **没读到它的本体就写结论** ✓，本轮订正 ✓）。
+> * ⭐ **于是收口只剩三处** ✓（把显式摘除也接到同一个"再也不在身上了"的事实上 ✓）：
+>   * `tickBuff` 的**到期**摘除 ✓（**唯一**需要加发点的地方 ✓ —— ⚠ 而它已经是唯一 ✓）；
+>   * `removeBuff(AbstractBuff)`（`:214` ✓ 显式／被 `REMOVE_STATE`／`DISPEL` 那条路调用 ✓）；
+>   * `removeOneBuff(Class)`（`:153` ✓）与 `addStackable` 的**替换**（`:55` ✓）。
+> * ⭐ **下一轮的第一步（一次做完）** ✗：在 `tickBuff` 里发 `STATE_ENDED`（带**状态名** ＋ **持有者** ✓）
+>   ＋ 把 `removeOneBuff`／`addStackable` 的两处 `buffs.remove(i)` **改成调 `removeBuff`** ✓（**行为不变** ✓，
+>   全量 2111 例是它的判据 ✓）＋ 然后接**第一个读者**（`1211`【生息】结束回能 **8** 是最小的一条 ✓：
+>   `APPLY_BUFF`／`has_state` 都已有 ✓ —— 只差这个事件 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2111** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
