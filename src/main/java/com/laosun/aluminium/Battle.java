@@ -2714,6 +2714,14 @@ public class Battle {
         //
         // It fires for every instance the engine settles, DOT ticks and break damage included: those are damage
         // too, and a rule that means "attacks only" says so with its own conditions.
+        // ⭐ 「每消耗 1 点能量值」 (light cone 23062) scales off THIS cast’s spend, which is why it rides on the
+        // instance: the settlement reads the instance, and this is the only event that hands it over.
+        // ⚠ The guard is load-bearing: lastUltEnergySpent is written only on the ultimate path and never
+        // cleared, so without it every later hit -- basics, DOT ticks, break damage -- would inherit it, an
+        // error with no symptom.
+        if (damage.getCastCategory() == com.laosun.aluminium.enums.SkillCategory.ULTRA) {
+            damage.withCastEnergySpent(lastUltEnergySpent);
+        }
         fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage, damage.getCastCategory(),
                 damage.getSkillKey());
 
