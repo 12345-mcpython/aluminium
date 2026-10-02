@@ -753,6 +753,17 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * cleared in the same breath, and for the same reason: 「每回合可触发 N 次」 counts <b>my</b> turns, so a rule
      * reacting to other people's actions gets its N back when my own turn comes round.
      */
+    /**
+     * Clears the firing limits of ONE rule (「施放终结技后重置该效果触发次数」, 2026-09-30;
+     * readers 1305, 1207, 1403). ⚠ Deliberately not {@link #resetTriggerLimits()}: that clears EVERY rule of
+     * this combatant, and ULT_CAST carries unrelated rules too.
+     */
+    public void resetTriggerLimit(String key) {
+        triggerTurnUses.remove(key);
+        triggerSpentOnce.remove(key);
+        triggerCooldowns.remove(key);
+    }
+
     public void tickTriggerCooldowns() {
         triggerTurnUses.clear();
         if (triggerCooldowns.isEmpty()) {

@@ -110,6 +110,7 @@ public final class TriggerInterpreter {
      * Ops that are implemented today.
      */
     private static final Set<String> WIRED = Set.of(
+            "RESET_TRIGGER_LIMIT",
             // ⭐ 「为指定敌方单体添加 X 属性弱点」 (2026-09-30; readers 1315, 1310).
             "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
@@ -291,6 +292,13 @@ public final class TriggerInterpreter {
             case "ADD_ELEMENTAL_WEAKNESS" -> {
                 if (effect.getElement() == null || effect.getElement().isBlank()) {
                     throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS requires element (source: " + spec.getSource() + ")");
+                }
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "RESET_TRIGGER_LIMIT" -> {
+                if (effect.getRule() == null || effect.getRule().isBlank()) {
+                    throw new IllegalArgumentException(
+                            "Op RESET_TRIGGER_LIMIT requires \"rule\" (source: " + spec.getSource() + ")");
                 }
                 requireNoStackArguments(effect, op, spec);
             }
@@ -921,6 +929,20 @@ public final class TriggerInterpreter {
                 }
                 for (CanHit victim : resolveTargets(battle, effect, ctx)) {
                     if (victim instanceof com.laosun.aluminium.models.enemy.Enemy en) { en.addWeakness(weakness); }
+                }
+            }
+            case "RESET_TRIGGER_LIMIT" -> {
+                String wanted = effect.getRule().trim();
+                for (CanHit cleared : resolveTargets(battle, effect, ctx)) {
+                    TriggerTable table = cleared instanceof com.laosun.aluminium.models.Character ch
+                            ? ch.getTriggerTable() : null;
+                    String limitKey = table == null ? null : table.keyOf(wanted);
+                    if (limitKey == null) {
+                        throw new IllegalStateException(
+                                "Op RESET_TRIGGER_LIMIT names the rule " + wanted + ", which " + cleared.getName()
+                                        + " does not carry -- an id that matches nothing would clear nothing, silently");
+                    }
+                    cleared.resetTriggerLimit(limitKey);
                 }
             }
             case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);
