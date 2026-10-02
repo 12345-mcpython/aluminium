@@ -18066,6 +18066,28 @@
 >   ② 再给 `MemospriteSpec.Attack.base` 加一档（例如 `owner_max_hp` ✓ —— ⚠ **照 `SummonFactory.panelOf` 里 `resource:` 那支的形状** ✓：
 >     可空字段 ＋ 调用方传值 ✓）；③ 判据：龙的这一击 == **遐蝶生命上限 × 40%** ✓（改遐蝶面板 ⇒ 跟着变 ✓）＋ 变异 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十七：⭐ "召唤者口径"那一支的落点也读到了 —— `attackOf` 把 `base` 作为 **`AttributeType`** 交给 `EnemySkill`，所以它天然按**施放者（忆灵）自己**取数）**：
+>
+> * ✅ **实测（读 `SummonFactory.attackOf` ✓，`:309` ✓）** ✓：
+>   ```java
+>   private static EnemySkill attackOf(MemospriteSpec spec, DamageType type) {
+>       MemospriteSpec.Attack attack = spec.attack();
+>       return new EnemySkill(
+>               DamageElement.fromString(attack.element()),
+>               attack.percent(), attack.hits() == null ? 1 : attack.hits(), type,
+>               SkillEffectType.fromString(attack.shape()),
+>               AttributeType.fromString(attack.base()),          // ← ★ 交的是"属性名"，由技能在**施放者**身上解析
+>               attack.stance() == null ? 0 : attack.stance());
+>   }
+>   ```
+>   ⇒ ⭐ **"等同于召唤者生命上限 X%"** 要么① 给 `Attack` 加一档"基数来自召唤者" ✓（并把**数值**带进去 ✗ ⇒ 但 `EnemySkill`
+>     收的是 `AttributeType` ✗ ⇒ 得看它有没有"直接给基数数值"的构造 ✓），要么② 让忆灵**自己**带一个"我是按主人 X% 来的"
+>     的隐藏属性 ✗（更绕 ✓）。⇒ ⭐ **下一轮第一步**：读 **`EnemySkill` 的构造器/字段** ✓ —— 有没有"基数直接给数值"这一档 ✓；
+>     有 ⇒ ① 两步可成 ✓；没有 ⇒ 先加那一档 ✓（⚠ 那会影响所有敌人技能 ⇒ 必须全量绿后再提交 ✓）。
+> * ⭐ **同时提醒一件容易忘的事** ✓：这一支的**读者数**（`1407` 技能 1–8 ＋ `1512` 若干 ✓）**只是"技能 1"那一条**的读者 ✓
+>   —— ⚠ 真正要出货的最小切片是**一条**（忆灵技能 1 ✓：`AoEAttack` ✓ ＋ `element: Quantum` ✓ ＋ `stance: 30` ✓ ＋
+>     `percent: 0.4`（散文的 40.00% ✓，并注明整表 `0.2 → 0.56` ✓））⇒ ⚠ 但**先把"召唤者基数"做出来** ✓，否则仍是错数 ✗。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19197,6 +19219,28 @@
 > * ⭐ **下一轮第一步** ✗：① 先**数清**有多少条忆灵技能是"召唤者的某属性 X%" ✓（`1407` 8 条 ＋ `1512` 若干 ✓ ⇒ 数一遍 ✓）；
 >   ② 再给 `MemospriteSpec.Attack.base` 加一档（例如 `owner_max_hp` ✓ —— ⚠ **照 `SummonFactory.panelOf` 里 `resource:` 那支的形状** ✓：
 >     可空字段 ＋ 调用方传值 ✓）；③ 判据：龙的这一击 == **遐蝶生命上限 × 40%** ✓（改遐蝶面板 ⇒ 跟着变 ✓）＋ 变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十七：⭐ "召唤者口径"那一支的落点也读到了 —— `attackOf` 把 `base` 作为 **`AttributeType`** 交给 `EnemySkill`，所以它天然按**施放者（忆灵）自己**取数）**：
+>
+> * ✅ **实测（读 `SummonFactory.attackOf` ✓，`:309` ✓）** ✓：
+>   ```java
+>   private static EnemySkill attackOf(MemospriteSpec spec, DamageType type) {
+>       MemospriteSpec.Attack attack = spec.attack();
+>       return new EnemySkill(
+>               DamageElement.fromString(attack.element()),
+>               attack.percent(), attack.hits() == null ? 1 : attack.hits(), type,
+>               SkillEffectType.fromString(attack.shape()),
+>               AttributeType.fromString(attack.base()),          // ← ★ 交的是"属性名"，由技能在**施放者**身上解析
+>               attack.stance() == null ? 0 : attack.stance());
+>   }
+>   ```
+>   ⇒ ⭐ **"等同于召唤者生命上限 X%"** 要么① 给 `Attack` 加一档"基数来自召唤者" ✓（并把**数值**带进去 ✗ ⇒ 但 `EnemySkill`
+>     收的是 `AttributeType` ✗ ⇒ 得看它有没有"直接给基数数值"的构造 ✓），要么② 让忆灵**自己**带一个"我是按主人 X% 来的"
+>     的隐藏属性 ✗（更绕 ✓）。⇒ ⭐ **下一轮第一步**：读 **`EnemySkill` 的构造器/字段** ✓ —— 有没有"基数直接给数值"这一档 ✓；
+>     有 ⇒ ① 两步可成 ✓；没有 ⇒ 先加那一档 ✓（⚠ 那会影响所有敌人技能 ⇒ 必须全量绿后再提交 ✓）。
+> * ⭐ **同时提醒一件容易忘的事** ✓：这一支的**读者数**（`1407` 技能 1–8 ＋ `1512` 若干 ✓）**只是"技能 1"那一条**的读者 ✓
+>   —— ⚠ 真正要出货的最小切片是**一条**（忆灵技能 1 ✓：`AoEAttack` ✓ ＋ `element: Quantum` ✓ ＋ `stance: 30` ✓ ＋
+>     `percent: 0.4`（散文的 40.00% ✓，并注明整表 `0.2 → 0.56` ✓））⇒ ⚠ 但**先把"召唤者基数"做出来** ✓，否则仍是错数 ✗。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
