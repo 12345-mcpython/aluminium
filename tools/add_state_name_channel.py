@@ -50,6 +50,16 @@ if copies < 5:
     print("FAIL: only %d copy helpers found" % copies)
     sys.exit(1)
 
+# The one STATIC factory cannot see a record component: it passes null (measured: this site is what failed the first
+# attempt with "cannot reference the non-static record component stateName from a static context").
+OF_OLD = 'return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0, 0, List.of(), stateName);'
+OF_NEW = 'return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0, 0, List.of(), null);'
+if text.count(OF_OLD) != 1:
+    print("FAIL: static factory anchor matched %d times" % text.count(OF_OLD))
+    sys.exit(1)
+text = text.replace(OF_OLD, OF_NEW)
+print("ok   static factory passes null")
+
 ANCHOR = ("        public TriggerContext withRule(String id) {\n"
           "            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,\n"
           "                    id == null ? \"\" : id, targetFilter, skillId, weakHitCount, attackHitTargets, stateName);\n"
