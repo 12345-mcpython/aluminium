@@ -18352,6 +18352,21 @@
 >     若没有 ⇒ ⚠ 为判据加一个**测试可见**的入口要慎重 ✓ —— 更可能的是：把这条内容规则的触发**同时**写成
 >     `from_category` ✓ 并用**她已有的** `CAST_SKILL{ELATION_SKILL}` 链把类别带过来 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十四：✅ 判据侧的入口找到了 —— `SkillExecutor.execute(battle, skill, user, targets)` 是 **public static**）**：
+>
+> * ✅ **实测（两处阅读 ✓）** ✓：
+>   * `Battle` 有 **`beginCast(Skill, CanHit)` ／ `endCast(PendingCast)`** ✓（公开 ✓，`PendingCast` 还带 `caster()`／`outer()` ✓）；
+>   * ⭐ **`models/skill/SkillExecutor.java:72`** ✓：**`public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets)`** ✓
+>     ⇒ ⭐ **判据可以真的"施放一次技能"** ✓ ⇒ `from_category` 所需的事件类别会**随真实施放**带上 ✓✓
+>     （⚠ 与"手工发事件"那条死路不同 ✓ —— 这次是**引擎自己的施放路径** ✓）。
+> * ⚠ **只剩一个未知（下一轮第一步）** ✗：判据要拿到"**欢愉技**那个 `Skill` 对象" ✓ —— 我已知她内容里用
+>   **`CAST_SKILL{skill: "ELATION_SKILL"}`** ✓（键 ✓，不是 id ✓）⇒ ⭐ **读 `TriggerInterpreter` 里 `CAST_SKILL` 怎么把这个键解析成 `Skill`** ✓
+>   （一行就能看出：是 `SkillType.ELATION_SKILL` ✓、还是 `SkillHolder` 的某个键表 ✓、还是角色身上按名字取 ✓）
+>   ⇒ 然后判据照同一条路取 ✓。
+> * ⭐ **于是这条链的**全部拼图**现在都齐了** ✓：（a）引擎 `spendAll` ✓（写好、编译过 ✓，脚本在仓 ✓）；
+>   （b）触发写法 **`from_category ELATION_DAMAGE`** ✓（本轮确认 ✓）；（c）"每点一次伤害" 用**已有的** `times_from` ✓（已出货 ✓）；
+>   （d）判据走 **`SkillExecutor.execute`** ✓（本轮确认 ✓）⇒ ⭐ **只差"取 `Skill` 对象"一步** ✓，下一轮应能**一次做完并进树** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19769,6 +19784,21 @@
 >   ⇒ ⭐ **下一轮第一步**：看 **`SkillExecutor`** 有没有公开的"施放一个技能"入口 ✓（若有 ⇒ 判据用它 ✓；
 >     若没有 ⇒ ⚠ 为判据加一个**测试可见**的入口要慎重 ✓ —— 更可能的是：把这条内容规则的触发**同时**写成
 >     `from_category` ✓ 并用**她已有的** `CAST_SKILL{ELATION_SKILL}` 链把类别带过来 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十四：✅ 判据侧的入口找到了 —— `SkillExecutor.execute(battle, skill, user, targets)` 是 **public static**）**：
+>
+> * ✅ **实测（两处阅读 ✓）** ✓：
+>   * `Battle` 有 **`beginCast(Skill, CanHit)` ／ `endCast(PendingCast)`** ✓（公开 ✓，`PendingCast` 还带 `caster()`／`outer()` ✓）；
+>   * ⭐ **`models/skill/SkillExecutor.java:72`** ✓：**`public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets)`** ✓
+>     ⇒ ⭐ **判据可以真的"施放一次技能"** ✓ ⇒ `from_category` 所需的事件类别会**随真实施放**带上 ✓✓
+>     （⚠ 与"手工发事件"那条死路不同 ✓ —— 这次是**引擎自己的施放路径** ✓）。
+> * ⚠ **只剩一个未知（下一轮第一步）** ✗：判据要拿到"**欢愉技**那个 `Skill` 对象" ✓ —— 我已知她内容里用
+>   **`CAST_SKILL{skill: "ELATION_SKILL"}`** ✓（键 ✓，不是 id ✓）⇒ ⭐ **读 `TriggerInterpreter` 里 `CAST_SKILL` 怎么把这个键解析成 `Skill`** ✓
+>   （一行就能看出：是 `SkillType.ELATION_SKILL` ✓、还是 `SkillHolder` 的某个键表 ✓、还是角色身上按名字取 ✓）
+>   ⇒ 然后判据照同一条路取 ✓。
+> * ⭐ **于是这条链的**全部拼图**现在都齐了** ✓：（a）引擎 `spendAll` ✓（写好、编译过 ✓，脚本在仓 ✓）；
+>   （b）触发写法 **`from_category ELATION_DAMAGE`** ✓（本轮确认 ✓）；（c）"每点一次伤害" 用**已有的** `times_from` ✓（已出货 ✓）；
+>   （d）判据走 **`SkillExecutor.execute`** ✓（本轮确认 ✓）⇒ ⭐ **只差"取 `Skill` 对象"一步** ✓，下一轮应能**一次做完并进树** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
