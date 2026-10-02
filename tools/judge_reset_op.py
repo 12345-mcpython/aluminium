@@ -64,6 +64,10 @@ JAVA = ('package com.laosun.aluminium.test;' + NL + NL
         + '        owner.setTriggerTable(new TriggerTable(OWNER, List.of(capped, clear)));' + NL
         + '        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, enemy, 0, 0);' + NL
         + '        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, enemy, 0, 0);' + NL
+        + '        System.out.println(' + Q + '[reset] keyOf=' + Q + ' + owner.getTriggerTable().keyOf(CAPPED)' + NL
+        + '                + ' + Q + ' key=' + Q + ' + owner.getTriggerTable().rulesFor(TriggerEvent.SKILL_CAST)' + NL
+        + '                        .stream().filter(r -> CAPPED.equals(r.id())).findFirst()' + NL
+        + '                        .map(r -> r.key()).orElse(' + Q + '<none>' + Q + '));' + NL
         + '        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, enemy, 0, 0);' + NL
         + '        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, enemy, 0, 0);' + NL
         + '        return owner.getBuffManager().stacksOf(' + Q + '探针' + Q + ');' + NL
