@@ -20158,6 +20158,22 @@
 >   （⚠ 本段已知 `1513` 的欢愉技在文档里有 ✓ 且 `SkillCategory.ELATION_DAMAGE` 就是为它设的 ✓ ⇒ **她的技能数据里应该有那一条** ✓）。
 > * ⚠ **推送**：本地仍**领先 8** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十一：✅✅ **类别来自一个数据字符串**（`SkillCategory` 用 `BY_VALUE` 查表 ✓），⭐ 而且注释写明**数据里有 **9** 个欢愉技**（`ElationDamage` 9 measured ✓））**：
+>
+> * ✅ **实测（读 `enums/SkillCategory.java` ✓）** ✓：
+>   * `:63` **`ELATION_DAMAGE("ElationDamage")`** ✓ ⇒ ⭐ **枚举由一个**数据字符串**构造** ✓；
+>   * `:87` `private static final Map<String, SkillCategory> BY_VALUE` ✓ ⇒ ⭐ **有"字符串 ⇒ 枚举"的查表** ✓（⚠ 方法名待读 ✓，但入口确定 ✓）；
+>   * `:32` ✓ 注释列出各值的数据字符串与**实测计数** ✓：… `Maze` 93 ✓／`null` 94（天赋与追加攻击 ✓）／⭐ **`ElationDamage` 9** ✓
+>     ⇒ ⭐⭐ **数据里有 9 个欢愉技** ✓ ⇒ ⭐ **判据不必凭空造技能** ✗：**可以从她的技能数据里找那一个** ✓（⚠ 或者用 `BY_VALUE` 直接构造 ✓）。
+>   * `:11`–`:28` 的说明还有价值 ✓：这个枚举回答"这是哪**一类**技能" ✓ 与 `SkillEffectType`（"是什么**效果**" ✓）**正交** ✓
+>     ⇒ ⚠ 且"两者唯一重叠的是那五个值（`Normal/BPSkill/Ultra/Maze/MazeNormal` ✓）" ✓。
+> * ⭐ **下一轮第一步（把判据写出来，1–2 次调用）** ✗：
+>   ① 读 `SkillCategory` 的**查表方法名** ✓（⚠ 一次读那个小文件的 `static SkillCategory …` ✓）；
+>   ② 判据里：**`SkillExecutor.execute(battle, elationSkill, owner, targets)`**（⚠ `elationSkill` 取自她的数据／或用查表构造 ✓）
+>     ⇒ 断言 **① 状态挂上**（`has_state`）✓ **② 归零后摘掉** ✓ **③ `STATE_ENDED` 发出 ⇒ 她拿到【好活当赏】** ✓；
+>   ③ **变异（全量）**：去掉 `REMOVE_STATE` ⇒ 全量必红 ✓。
+> * ⚠ **推送**：本地仍**领先 9** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23381,6 +23397,22 @@
 > * ⚠ **若推导需要一个真实的技能数据条目**（✗ 无法凭空造 ✓）⇒ ⭐ **那么判据就改用"文件驱动 ＋ 找到她自己的欢愉技"** ✓
 >   （⚠ 本段已知 `1513` 的欢愉技在文档里有 ✓ 且 `SkillCategory.ELATION_DAMAGE` 就是为它设的 ✓ ⇒ **她的技能数据里应该有那一条** ✓）。
 > * ⚠ **推送**：本地仍**领先 8** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十一：✅✅ **类别来自一个数据字符串**（`SkillCategory` 用 `BY_VALUE` 查表 ✓），⭐ 而且注释写明**数据里有 **9** 个欢愉技**（`ElationDamage` 9 measured ✓））**：
+>
+> * ✅ **实测（读 `enums/SkillCategory.java` ✓）** ✓：
+>   * `:63` **`ELATION_DAMAGE("ElationDamage")`** ✓ ⇒ ⭐ **枚举由一个**数据字符串**构造** ✓；
+>   * `:87` `private static final Map<String, SkillCategory> BY_VALUE` ✓ ⇒ ⭐ **有"字符串 ⇒ 枚举"的查表** ✓（⚠ 方法名待读 ✓，但入口确定 ✓）；
+>   * `:32` ✓ 注释列出各值的数据字符串与**实测计数** ✓：… `Maze` 93 ✓／`null` 94（天赋与追加攻击 ✓）／⭐ **`ElationDamage` 9** ✓
+>     ⇒ ⭐⭐ **数据里有 9 个欢愉技** ✓ ⇒ ⭐ **判据不必凭空造技能** ✗：**可以从她的技能数据里找那一个** ✓（⚠ 或者用 `BY_VALUE` 直接构造 ✓）。
+>   * `:11`–`:28` 的说明还有价值 ✓：这个枚举回答"这是哪**一类**技能" ✓ 与 `SkillEffectType`（"是什么**效果**" ✓）**正交** ✓
+>     ⇒ ⚠ 且"两者唯一重叠的是那五个值（`Normal/BPSkill/Ultra/Maze/MazeNormal` ✓）" ✓。
+> * ⭐ **下一轮第一步（把判据写出来，1–2 次调用）** ✗：
+>   ① 读 `SkillCategory` 的**查表方法名** ✓（⚠ 一次读那个小文件的 `static SkillCategory …` ✓）；
+>   ② 判据里：**`SkillExecutor.execute(battle, elationSkill, owner, targets)`**（⚠ `elationSkill` 取自她的数据／或用查表构造 ✓）
+>     ⇒ 断言 **① 状态挂上**（`has_state`）✓ **② 归零后摘掉** ✓ **③ `STATE_ENDED` 发出 ⇒ 她拿到【好活当赏】** ✓；
+>   ③ **变异（全量）**：去掉 `REMOVE_STATE` ⇒ 全量必红 ✓。
+> * ⚠ **推送**：本地仍**领先 9** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
