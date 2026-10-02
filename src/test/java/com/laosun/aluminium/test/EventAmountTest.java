@@ -61,6 +61,30 @@ public class EventAmountTest {
         Assertions.assertEquals(0, loss(0), 1e-6, "and a change of 0 repeats it not at all");
     }
 
+    /** ⭐ The same number as a MODIFIER: 1 speed per 100 points of health lost. */
+    @Test
+    public void theModifierFollowsTheEvent() {
+        Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
+        TriggerSpecs.set(effect, "attribute", "SPEED");
+        TriggerSpecs.set(effect, "scale", "event_amount");
+        TriggerSpecs.set(effect, "percent", 0.01);
+        TriggerSpecs.set(effect, "permanent", true);
+        TriggerSpecs.set(effect, "target", "self");
+        owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("HP_LOST",
+                List.of("actor == self"), effect))));
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        battle.startBattle();
+
+        double before = owner.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+        battle.fireTriggers(TriggerEvent.HP_LOST, owner, owner, 0, 100);
+        battle.processRequests();
+        Assertions.assertEquals(1.0, owner.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get() - before,
+                1e-6, "100 points lost at 1% each is +1 speed");
+    }
+
     // ==================================================================
 
     /** The enemy's HP loss when the rule repeats its instance once per point spent. */

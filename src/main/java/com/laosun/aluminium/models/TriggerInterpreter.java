@@ -2174,6 +2174,13 @@ public final class TriggerInterpreter {
             double spent = hit == null ? 0 : hit.getCastEnergySpent();
             return effect.getPercent() * spent + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (EVENT_AMOUNT.equals(effect.getScale().trim())) {
+            // ⭐ 「本次攻击每消耗了 1 点【亿质】额外使长夜月的速度提高 1%」 (2026-10-02): the
+            // triggering event's own magnitude, taken as a quantity (a spend arrives negative). Before the
+            // attribute branch below, for the reason `cast_energy_spent` states: this source is not an attribute.
+            return effect.getPercent() * Math.abs(ctx.amount())
+                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
@@ -2205,7 +2212,7 @@ public final class TriggerInterpreter {
     private static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
-        if (SELF_MAX_ENERGY.equals(raw)) {
+        if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw)) {
             return null;                      // handled by derivedMagnitude; not an AttributeType
         }
         if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
@@ -2569,6 +2576,14 @@ public final class TriggerInterpreter {
      * clause adds nothing when no energy was spent.
      */
     private static final String CAST_ENERGY_SPENT = "cast_energy_spent";
+
+    /**
+     * 「每消耗/每损失 1 点…」 (2026-10-02): a magnitude that follows the <b>triggering event</b>.
+     *
+     * <p>Sits beside {@link #CAST_ENERGY_SPENT} on purpose -- that one is the same shape bound to the cast
+     * instead of the event -- and, like it, is deliberately not an {@code AttributeType}.
+     */
+    private static final String EVENT_AMOUNT = "event_amount";
 
     /**
      * Validates the magnitude of a {@code HEAL} / {@code SHIELD} effect: either a flat {@code amount}, or
