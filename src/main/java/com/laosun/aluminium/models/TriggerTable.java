@@ -932,6 +932,17 @@ public class TriggerTable {
      * <p>The keyword has to stand alone (a state whose name contains {@code has_state} must not be
      * mistaken for the operator), hence the lookarounds rather than a plain {@code contains}.
      */
+    /**
+     * The keyword of the "the named state just left that unit" condition (2026-10-02).
+     *
+     * <p>Boundary-guarded for the same reason {@link #HAS_STATE} is: a state whose NAME contains the
+     * keyword must not be mistaken for the operator. The answer comes from the event
+     * ({@code TriggerContext.battle().getLastStateEndedName()}) rather than from the unit, because the state
+     * is already gone by the time it fires -- which is exactly why the event carries the name.
+     */
+    private static final Pattern STATE_ENDED_KEYWORD =
+            Pattern.compile("(?<![\\w])state_ended(?![\\w])", Pattern.CASE_INSENSITIVE);
+
     private static final Pattern HAS_STATE =
             Pattern.compile("(?<![\\w])has_state(?![\\w])", Pattern.CASE_INSENSITIVE);
 
@@ -1195,6 +1206,14 @@ public class TriggerTable {
         // `has_state`: "<who> has_state <name>". Checked before the operator branch because this shape has
         // no symbol operator at all -- without it, "self has_state 协奏" would be reported as an unknown
         // shorthand, which sends the author looking in the wrong place.
+        Matcher stateEnded = STATE_ENDED_KEYWORD.matcher(text);
+        if (stateEnded.find()) {
+            String subject = normalize(text.substring(0, stateEnded.start()));
+            String state = text.substring(stateEnded.end()).trim();
+            return new StateEnded(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
+                    state, raw, spec);
+        }
+
         Matcher hasState = HAS_STATE.matcher(text);
         if (hasState.find()) {
             String subject = normalize(text.substring(0, hasState.start()));
@@ -2991,6 +3010,50 @@ public class TriggerTable {
             }
             AttributeType type = AttributeType.fromString(attribute);
             return !who.getAttribute(type).filterBySource(DoubleValue.Modifier.ModifierSource.DEBUFF).isEmpty();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * 「【X】结束时」: the state NAMED X has just left the subject (2026-10-02).
+     *
+     * <p>⚠ It cannot be written as {@code has_state}: the removal happens first, so by the time this event
+     * fires the carrier no longer has it. The name rides on the event instead.
+     */
+    private static final class StateEnded implements Condition, PartyCondition {
+
+        private final String subject;
+        private final String state;
+        private final String raw;
+
+        StateEnded(String subject, String state, String raw, TriggerSpec spec) {
+            if (state.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' names no state after \"state_ended\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            this.subject = subject;
+            this.state = state;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.battle() != null && state.equals(ctx.battle().getLastStateEndedName());
         }
 
         @Override
