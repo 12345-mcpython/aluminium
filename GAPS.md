@@ -18481,6 +18481,25 @@
 >   但**先别改它** ✗ —— 等二分结果出来，再决定是"我的规则触发了它不该触发的东西" ✗ 还是"它的模型缺一环" ✓
 >   （⚠ 顺序很重要：**先查事实，再改判据** ✓ —— 改判据去迁就代码是本项目最忌的 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十二：✅✅✅ **`spendAll` 与 1513 那两半句出货了**（`9ef32ac` ✓）—— 判据 2 条绿 ＋ **实测变异 1 红** ＋ 全量绿 ＋ 两闸门 [0,0]）**：
+>
+> * ✅ **进树** ✓：
+>   * **引擎**：`EffectSpec.spendAll` ✓（＋ `copy()` ✓）＋ 装载臂**互斥检查** ✓（`spendAll` 与 `amount` 同时出现 ⇒ 响亮拒绝 ✓）
+>     ＋ `spendResource` 在 `spendAll` 时取**当前全部** ✓；
+>   * **内容**（都在 `1513.json`，**都是文档原话** ✓）：①`elation_spend_all_fervor` ✓（`CAST_SETUP` ＋
+>     **`from_category ElationDamage`** ⇒ `SPEND_RESOURCE{spendAll}` ✓）②`fervor_extra_hit_per_point` ✓
+>     （`RESOURCE_CHANGED` ＋ `resource_changed:热意` ⇒ `DAMAGE{times_from:"times_from 的 snake_case", target:"random_enemy", percent:0.21, element:"Quantum"}` ✓）；
+>   * **判据** `SpendAllTest` ✓（**文件驱动到底** ✓）：发 7 次队友攻击（用**她文件里**的规则 ✓）⇒ 热意 7 ✓
+>     ⇒ **`SkillExecutor.execute` 真实施放一次欢愉技** ✓ ⇒ ①**热意花到 0** ✓ ②**手工路随点数变大** ✓。
+> * ✅ **实测变异（1 红 ✓）** ✓：把 `spendAll` 换成固定 `amount: 1` ⇒ 判据报
+>   *"the cast spends ALL of it (7 -> 0) ==> expected: <0> but was: **6**"* ✓ ⇒ ⭐ **承重** ✓。
+> * ⭐⭐ **三条"最后才挖出来"的真因（都写进注释/记录）**：
+>   1. **触发写法**：不是数字行 ✗，而是 **`from_category ElationDamage`** ✓（⚠ **必须用数据值拼写** ✓，枚举名 `ELATION_DAMAGE` 会被装载期拒绝 ✓）；
+>   2. **字段名**：`times_from` 是 **snake_case** ✓ —— 我原先写 `timesFrom` ✗ ⇒ Gson **静默丢弃** ✗（同族的还有 **`crit_rate`／`crit_damage`** ✗）；
+>   3. ⭐ **`"target": "target"` 会打到自己** ✗ ⇒ 那条规则把**砂金自己**打成 13 点血/热意 ✗，
+>      而既有判据 `AventurineWaveflairTest` 期望 **30** ✗ ⇒ **二分**（只留伤害那条规则 ✓）一次就证明是它 ✓
+>      ⇒ 改成文档说的 **`"target": "random_enemy"`** ✓ ⇒ 两条判据同时绿 ✓✓（⚠ **不是**改既有判据迁就代码 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -20028,6 +20047,25 @@
 >   但**先别改它** ✗ —— 等二分结果出来，再决定是"我的规则触发了它不该触发的东西" ✗ 还是"它的模型缺一环" ✓
 >   （⚠ 顺序很重要：**先查事实，再改判据** ✓ —— 改判据去迁就代码是本项目最忌的 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百五十二：✅✅✅ **`spendAll` 与 1513 那两半句出货了**（`9ef32ac` ✓）—— 判据 2 条绿 ＋ **实测变异 1 红** ＋ 全量绿 ＋ 两闸门 [0,0]）**：
+>
+> * ✅ **进树** ✓：
+>   * **引擎**：`EffectSpec.spendAll` ✓（＋ `copy()` ✓）＋ 装载臂**互斥检查** ✓（`spendAll` 与 `amount` 同时出现 ⇒ 响亮拒绝 ✓）
+>     ＋ `spendResource` 在 `spendAll` 时取**当前全部** ✓；
+>   * **内容**（都在 `1513.json`，**都是文档原话** ✓）：①`elation_spend_all_fervor` ✓（`CAST_SETUP` ＋
+>     **`from_category ElationDamage`** ⇒ `SPEND_RESOURCE{spendAll}` ✓）②`fervor_extra_hit_per_point` ✓
+>     （`RESOURCE_CHANGED` ＋ `resource_changed:热意` ⇒ `DAMAGE{times_from:"times_from 的 snake_case", target:"random_enemy", percent:0.21, element:"Quantum"}` ✓）；
+>   * **判据** `SpendAllTest` ✓（**文件驱动到底** ✓）：发 7 次队友攻击（用**她文件里**的规则 ✓）⇒ 热意 7 ✓
+>     ⇒ **`SkillExecutor.execute` 真实施放一次欢愉技** ✓ ⇒ ①**热意花到 0** ✓ ②**手工路随点数变大** ✓。
+> * ✅ **实测变异（1 红 ✓）** ✓：把 `spendAll` 换成固定 `amount: 1` ⇒ 判据报
+>   *"the cast spends ALL of it (7 -> 0) ==> expected: <0> but was: **6**"* ✓ ⇒ ⭐ **承重** ✓。
+> * ⭐⭐ **三条"最后才挖出来"的真因（都写进注释/记录）**：
+>   1. **触发写法**：不是数字行 ✗，而是 **`from_category ElationDamage`** ✓（⚠ **必须用数据值拼写** ✓，枚举名 `ELATION_DAMAGE` 会被装载期拒绝 ✓）；
+>   2. **字段名**：`times_from` 是 **snake_case** ✓ —— 我原先写 `timesFrom` ✗ ⇒ Gson **静默丢弃** ✗（同族的还有 **`crit_rate`／`crit_damage`** ✗）；
+>   3. ⭐ **`"target": "target"` 会打到自己** ✗ ⇒ 那条规则把**砂金自己**打成 13 点血/热意 ✗，
+>      而既有判据 `AventurineWaveflairTest` 期望 **30** ✗ ⇒ **二分**（只留伤害那条规则 ✓）一次就证明是它 ✓
+>      ⇒ 改成文档说的 **`"target": "random_enemy"`** ✓ ⇒ 两条判据同时绿 ✓✓（⚠ **不是**改既有判据迁就代码 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
