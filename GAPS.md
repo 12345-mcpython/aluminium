@@ -16994,6 +16994,22 @@
 > * ⭐ **因此第 3 步拆成两小步（都已具名）** ✗：**3a** 读 `fireTriggers` 的定义 ⇒ 加 `fireStateEnded(carrier, name)` ✓
 >   （纯加方法 ✓，全量绿为判据 ✓）；**3b** `tickBuff` 到期分支**先取名再摘**调它 ✓（判空 `battle != null` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之八百六十九：✅✅✅ `STATE_ENDED`**发出了第一个事件** —— 3a 入口（`122b296`）＋ 3b 到期时先报后摘（`e8d9cd5`），两处全量 2114 绿）**：
+>
+> * ✅ **3a** ✓：`Battle` 新增 **`fireStateEnded(CanHit carrier, String stateName)`** ✓ ＋ 一个
+>   **`lastStateEndedName`** 字段与只读访问器 ✓ —— ⭐ **为什么用字段而不是给四级 `fireTriggers` 链各加一个参数** ✓：
+>   那个名字**只有一个事件**要 ✓；而且本项目**已经有这个形状的先例**（`lastUltEnergySpent` ✓）
+>   ⇒ ⚠ 并照它的教训加了**保存/恢复**（`try { … } finally { lastStateEndedName = previous; }` ✓）——
+>   **嵌套发事件时外层名字不会被内层冲掉** ✓。
+> * ✅ **3b** ✓：`BuffManager.tickBuff` 的到期分支现在**先报后摘** ✓：
+>   `if (battle != null && buff instanceof StateBuff ended) { battle.fireStateEnded(instance, ended.getState()); }` ✓
+>   —— ⚠ **判空 `battle`** ✓（战斗外造的单位 ⇒ 没人可报 ✓）；`getState()` 是 Lombok 生成的 ✓（编译通过 ⇒ 假设成立 ✓）；
+>   ⭐ **顺序**就是这条能力存在的理由 ✓（先摘再报 ⇒ 读者去查"我在不在这个状态"会得到错答案 ✓）。
+> * ⭐ **剩下的两步（已具名）** ✗：**4a** 条件形状 **`state_ended <名>`** ✓（在 `TriggerTable.parseCondition` 里，
+>   读 `battle.getLastStateEndedName()` ✓ 与名字比对 ✓ —— 与 `HAS_STATE` 同族但**数据来源不同** ✓）；
+>   **4b** 内容接 **`1211`**（【生息】结束时回能 **8** ✓）＋ 判据（把【生息】推到自然到期 ⇒ 能量 +8 ✓；
+>   ⚠ 并加**对照**：不持该状态时不加 ✓）＋ **变异**（把条件里的名字改掉 ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -17054,6 +17070,22 @@
 > * ⭐ **因此第 3 步拆成两小步（都已具名）** ✗：**3a** 读 `fireTriggers` 的定义 ⇒ 加 `fireStateEnded(carrier, name)` ✓
 >   （纯加方法 ✓，全量绿为判据 ✓）；**3b** `tickBuff` 到期分支**先取名再摘**调它 ✓（判空 `battle != null` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之八百六十九：✅✅✅ `STATE_ENDED`**发出了第一个事件** —— 3a 入口（`122b296`）＋ 3b 到期时先报后摘（`e8d9cd5`），两处全量 2114 绿）**：
+>
+> * ✅ **3a** ✓：`Battle` 新增 **`fireStateEnded(CanHit carrier, String stateName)`** ✓ ＋ 一个
+>   **`lastStateEndedName`** 字段与只读访问器 ✓ —— ⭐ **为什么用字段而不是给四级 `fireTriggers` 链各加一个参数** ✓：
+>   那个名字**只有一个事件**要 ✓；而且本项目**已经有这个形状的先例**（`lastUltEnergySpent` ✓）
+>   ⇒ ⚠ 并照它的教训加了**保存/恢复**（`try { … } finally { lastStateEndedName = previous; }` ✓）——
+>   **嵌套发事件时外层名字不会被内层冲掉** ✓。
+> * ✅ **3b** ✓：`BuffManager.tickBuff` 的到期分支现在**先报后摘** ✓：
+>   `if (battle != null && buff instanceof StateBuff ended) { battle.fireStateEnded(instance, ended.getState()); }` ✓
+>   —— ⚠ **判空 `battle`** ✓（战斗外造的单位 ⇒ 没人可报 ✓）；`getState()` 是 Lombok 生成的 ✓（编译通过 ⇒ 假设成立 ✓）；
+>   ⭐ **顺序**就是这条能力存在的理由 ✓（先摘再报 ⇒ 读者去查"我在不在这个状态"会得到错答案 ✓）。
+> * ⭐ **剩下的两步（已具名）** ✗：**4a** 条件形状 **`state_ended <名>`** ✓（在 `TriggerTable.parseCondition` 里，
+>   读 `battle.getLastStateEndedName()` ✓ 与名字比对 ✓ —— 与 `HAS_STATE` 同族但**数据来源不同** ✓）；
+>   **4b** 内容接 **`1211`**（【生息】结束时回能 **8** ✓）＋ 判据（把【生息】推到自然到期 ⇒ 能量 +8 ✓；
+>   ⚠ 并加**对照**：不持该状态时不加 ✓）＋ **变异**（把条件里的名字改掉 ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
