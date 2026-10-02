@@ -16547,6 +16547,24 @@
 >   ④ `skill_effects.json` 加 `1412` 的 `"2"` ✓；⑤ 内容 `CAST_SKILL` ✓；⑥ 判据 ✓；⑦ 变异 ＋ 全量 ＋ 提交 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百四十三：⚠ `Buff` 形状**落了地**（1412 的【军功】到手 ✓），而它的**判据不承重** —— 变异 0 红）**：
+>
+> * ✅ **出货**（`09b9a60`）：`SkillEffectSpec` 加 `buff` 字段 ✓（`@SerializedName("buff")` ✓）；`deliverableSpec` 收 `"Buff"`
+>   （且**跳过** `isAmbiguous` —— 具名状态没有可加的数值项 ✓）；`dispatchNonDamaging` 加 `"Buff"` 分支 ⇒
+>   **`target.getBuffManager().addBuff(new StateBuff(名, Integer.MAX_VALUE, true))`** ✓（公开的"平路附加" ✓，
+>   文档没给时长 ⇒ 按永久 ✓）；`skill_effects.json` 加 `1412` 的 `"2"`（`军功` ✓，`turns_param: null` ✓）。
+> * **判据** `MilitaryMeritTest` ✓：施放她的战技 ⇒ **被指定的那名队友**身上有【军功】 ✓ 而**另一名队友没有** ✓
+>   （`ally.getBuffManager().hasState("军功")` ✓，与既有判据同一读法 ✓）—— ⚠ 前提断言（施放前没有 ✓）也在 ✓。
+> * ⛔⛔ **而变异 0 红** ✗：把 `deliverableSpec` 里的 `"Buff"` 去掉（让它重新"投递不了" ✓）⇒ **判据仍然绿** ✗
+>   ⇒ ⭐ **说明那条 `deliverableSpec` 不是这条路的闸门** ✗ —— 状态**仍然**上去了 ✓ ⇒ **另有路径把它附上** ✓
+>   （候选：`SkillCategory.BUFF` 在 `execute` 里走了**别的**非伤害分支 ✗、或 `SkillEffects` 的读取点不止一处 ✗、
+>   或她的文件里还有一条我没读到的规则 ✗）。⇒ ⚠ **结论：行为对了、机制没钉住** ✗。
+> * ⭐ **下一轮第一步（钉机制，二选一）** ✗：① 把变异改成**去掉 `dispatchNonDamaging` 的 `"Buff"` 分支** ✓
+>   （预期：状态不再上身 ⇒ 判据 1 红 ✓ —— 若**仍绿** ⇒ 那说明**根本不是这条分派**在附加 ✓，必须找到真正那条 ✗）；
+>   ② 或给那条分支里的 `addBuff` 打点/断言（临时打印 ✓）看它是否被走到 ✓。
+>   ⚠ **在那之前不得声称"`skill_effects.json` 的 Buff 行是它的来源"** ✗ —— 这是本段第五次同形（**没读就写结论** ✓）。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2111** 例 ✓ —— 新增 `MilitaryMeritTest` ✓）、闸门 [0, 0]、树干净、已推送 ✓（`09b9a60` ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
