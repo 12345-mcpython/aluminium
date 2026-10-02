@@ -20114,6 +20114,23 @@
 >   ③ **变异（全量）**：去掉 `REMOVE_STATE` 那条 ⇒ **必红** ✓。
 > * ⚠ **推送**：本地仍**领先 5** ✗（网络 ✓ 又断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、两闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十八：✅✅ **两处要点读到**：`from_category` **接受两种拼写**（数据的 `ElationDamage` ✓ 与枚举名 `ELATION_DAMAGE` ✓，注释写明"two spellings, one fact"）；⭐ 而判据的路子是**自己造一次欢愉技施放**）**：
+>
+> * ✅ **实测（搜 `ELATION_DAMAGE` 全部使用处 ✓）** ✓：
+>   * `TriggerTable:1455`–`:1457` ✓：报错文案里写 *"…\"actor == self\" and \"**from_category ELATION_DAMAGE**\"…"* ＋ 注释
+>     *"⭐ **Two spellings, one fact**: the skill data says `ElationDamage`, the enum's own name is `ELATION_DAMAGE`"* ✓
+>     ⇒ ⭐⭐ **所以条件里两种写法都收** ✓（⚠ 我内容里写的是**数据拼写** `ElationDamage` ✓ —— ⭐ 与本段"照数据写"的一贯口径一致 ✓）；
+>   * `SkillCategory:63` ✓ **`ELATION_DAMAGE("ElationDamage")`** ✓（枚举名 ↔ 数据值 ✓）；
+>   * ⚠ 其余命中只有 `AttributeType`（`elation_damage_boost` ✓ 是**属性**不是类别 ✓）与 `TriggerInterpreter:4104`（欢愉伤害公式 ✓）
+>     ⇒ ⭐ **没有任何既有路径"施放"过一次欢愉技** ✗ ⇒ 这解释了为什么判据必须自己造 ✓。
+> * ⭐ **判据的写法（下一轮照此）** ✗：用 **`SkillCategory.ELATION_DAMAGE`** 造一个技能 ✓ ⇒ **`SkillExecutor.execute(Battle, Skill, CanHit, List)`**（本段已确认它是 **public static** ✓）
+>   ⇒ 那次施放就会把类别写进 `TriggerContext` ✓ ⇒ 我那两条 `from_category ElationDamage` 的规则才会触发 ✓。
+>   ⚠ 然后断言三件事 ✓：**① 状态挂上** ✓（`has_state` 可读 ✓）；**② 归零后摘掉** ✓（`REMOVE_STATE` ✓）；
+>   **③ `STATE_ENDED` 发出** ✓（读者规则 ⇒ 她拿到【好活当赏】✓）＋ **变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）。
+> * ⭐ **纪律（本段第十八条）** ✗：**条件里出现"两种拼写"时，选**数据拼写**（与 `RuleEffectAmendmentTest`／`EffectKeyDisciplineTest` 的口径一致 ✓）
+>   —— ⚠ 本段在 `from_category` 上正好蒙对 ✓（用了 `ElationDamage` ✓）；而 `1306` 那次的 `ELATION_DAMAGE` ✗ 是被装载器**拒绝**的 ✓ ⇒ ⭐ **两种拼写的"收"是有前提的**（⚠ 见该行上下文 ✓）。
+> * ⚠ **推送**：本地仍**领先 6** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23294,6 +23311,23 @@
 >   ③ **变异（全量）**：去掉 `REMOVE_STATE` 那条 ⇒ **必红** ✓。
 > * ⚠ **推送**：本地仍**领先 5** ✗（网络 ✓ 又断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、两闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十八：✅✅ **两处要点读到**：`from_category` **接受两种拼写**（数据的 `ElationDamage` ✓ 与枚举名 `ELATION_DAMAGE` ✓，注释写明"two spellings, one fact"）；⭐ 而判据的路子是**自己造一次欢愉技施放**）**：
+>
+> * ✅ **实测（搜 `ELATION_DAMAGE` 全部使用处 ✓）** ✓：
+>   * `TriggerTable:1455`–`:1457` ✓：报错文案里写 *"…\"actor == self\" and \"**from_category ELATION_DAMAGE**\"…"* ＋ 注释
+>     *"⭐ **Two spellings, one fact**: the skill data says `ElationDamage`, the enum's own name is `ELATION_DAMAGE`"* ✓
+>     ⇒ ⭐⭐ **所以条件里两种写法都收** ✓（⚠ 我内容里写的是**数据拼写** `ElationDamage` ✓ —— ⭐ 与本段"照数据写"的一贯口径一致 ✓）；
+>   * `SkillCategory:63` ✓ **`ELATION_DAMAGE("ElationDamage")`** ✓（枚举名 ↔ 数据值 ✓）；
+>   * ⚠ 其余命中只有 `AttributeType`（`elation_damage_boost` ✓ 是**属性**不是类别 ✓）与 `TriggerInterpreter:4104`（欢愉伤害公式 ✓）
+>     ⇒ ⭐ **没有任何既有路径"施放"过一次欢愉技** ✗ ⇒ 这解释了为什么判据必须自己造 ✓。
+> * ⭐ **判据的写法（下一轮照此）** ✗：用 **`SkillCategory.ELATION_DAMAGE`** 造一个技能 ✓ ⇒ **`SkillExecutor.execute(Battle, Skill, CanHit, List)`**（本段已确认它是 **public static** ✓）
+>   ⇒ 那次施放就会把类别写进 `TriggerContext` ✓ ⇒ 我那两条 `from_category ElationDamage` 的规则才会触发 ✓。
+>   ⚠ 然后断言三件事 ✓：**① 状态挂上** ✓（`has_state` 可读 ✓）；**② 归零后摘掉** ✓（`REMOVE_STATE` ✓）；
+>   **③ `STATE_ENDED` 发出** ✓（读者规则 ⇒ 她拿到【好活当赏】✓）＋ **变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）。
+> * ⭐ **纪律（本段第十八条）** ✗：**条件里出现"两种拼写"时，选**数据拼写**（与 `RuleEffectAmendmentTest`／`EffectKeyDisciplineTest` 的口径一致 ✓）
+>   —— ⚠ 本段在 `from_category` 上正好蒙对 ✓（用了 `ElationDamage` ✓）；而 `1306` 那次的 `ELATION_DAMAGE` ✗ 是被装载器**拒绝**的 ✓ ⇒ ⭐ **两种拼写的"收"是有前提的**（⚠ 见该行上下文 ✓）。
+> * ⚠ **推送**：本地仍**领先 6** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
