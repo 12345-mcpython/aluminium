@@ -1869,6 +1869,13 @@ public final class TriggerInterpreter {
         if (fromStacks != null) {
             return fromStacks + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (CAST_ENERGY_SPENT.equals(effect.getScale().trim())) {
+            // ⚠ Before the attribute branch below, because this source is not an attribute and
+            // scaleAttribute would throw a message that reads like missing unit data.
+            com.laosun.aluminium.models.Damage hit = ctx.damage();
+            double spent = hit == null ? 0 : hit.getCastEnergySpent();
+            return effect.getPercent() * spent + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
@@ -2227,6 +2234,16 @@ public final class TriggerInterpreter {
      * above, and deliberately not an {@code AttributeType}.
      */
     private static final String SELF_MAX_ENERGY = "self_max_energy";
+
+    /**
+     * 「每消耗 1 点能量值」 (light cone 23062): the points are the energy THE CAST ITSELF spent.
+     *
+     * <p>⚠ Not an attribute, so it cannot go through 算子 「scaleAttribute」 — its branch below returns first.
+     * The value rides on the damage instance because DEALING_DAMAGE is the only event that hands it over.
+     * ⚠ A missing instance and a non-ultimate both read 0, which is the right answer for both: this
+     * clause adds nothing when no energy was spent.
+     */
+    private static final String CAST_ENERGY_SPENT = "cast_energy_spent";
 
     /**
      * Validates the magnitude of a {@code HEAL} / {@code SHIELD} effect: either a flat {@code amount}, or
