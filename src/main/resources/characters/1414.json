@@ -7,6 +7,11 @@
     ],
     "do": [
       {
+        "op": "REMOVE_STATE",
+        "buff": "同袍",
+        "target": "all_allies"
+      },
+      {
         "op": "APPLY_BUFF",
         "buff": "同袍",
         "turns": 3,
@@ -22,7 +27,7 @@
       }
     ],
     "source": "1414 丹恒•腾荒 战技 渊渟岳峙，地载八荒 (141402, BPSkill/Defence): 「使指定我方单体角色成为【同袍】，为我方全体提供能够抵消等同于丹恒•腾荒20.00%攻击力+400伤害的护盾，持续3回合。…【同袍】仅对丹恒•腾荒战技最新施放的目标生效。」",
-    "note": "「使指定我方单体角色成为【同袍】，为我方全体提供能够抵消等同于丹恒•腾荒 **20.00% 攻击力 + 400** 伤害的护盾，持续 3 回合」—— ① 状态用 `APPLY_BUFF 同袍` ✓（第 120 轮：状态要**造出来**才问得到 ✓）；② 护盾用 `SHIELD` + **`scale: owner_attack`** + `percent` + `amount` ✓ —— 该刻度是**第 176 轮新加**的 ✓（原本只有 `target_max_hp`/`owner_max_hp`/`owner_def` ✗，而\"按攻击力结算的护盾/治疗\"实测有 **7 份**文件 ✓，其中 1203 已出货 ✓）；③ 目标 `all_allies` ✓（\"我方全体\" ✓）。⚠ **登记**：① 「**重复获得时护盾量可以叠加，最高不超过当前战技护盾量的 300%**」✗ —— 护盾不是 `AbstractBuff` ✓，没有可叠层表示 ✗；② 「【同袍】**仅对最新施放的目标生效**」✗ —— 缺少\"只保留最新一个\"的不变量 ✗。"
+    "note": "「使指定我方单体角色成为【同袍】，为我方全体提供能够抵消等同于丹恒•腾荒 **20.00% 攻击力 + 400** 伤害的护盾，持续 3 回合」—— ① 状态用 `APPLY_BUFF 同袍` ✓（第 120 轮：状态要**造出来**才问得到 ✓）；② 护盾用 `SHIELD` + **`scale: owner_attack`** + `percent` + `amount` ✓ —— 该刻度是**第 176 轮新加**的 ✓（原本只有 `target_max_hp`/`owner_max_hp`/`owner_def` ✗，而\"按攻击力结算的护盾/治疗\"实测有 **7 份**文件 ✓，其中 1203 已出货 ✓）；③ 目标 `all_allies` ✓（\"我方全体\" ✓）。⚠ **登记**：① 「**重复获得时护盾量可以叠加，最高不超过当前战技护盾量的 300%**」✗ —— 护盾不是 `AbstractBuff` ✓，没有可叠层表示 ✗；② 「【同袍】**仅对最新施放的目标生效**」✗ —— 缺少\"只保留最新一个\"的不变量 ✗。\n\n⭐ 2026-09-30 转正：「【同袍】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 同袍 target: all_allies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
   },
   {
     "on": "ULT_CAST",

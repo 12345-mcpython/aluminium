@@ -38,6 +38,11 @@
     ],
     "do": [
       {
+        "op": "REMOVE_STATE",
+        "buff": "老主顾",
+        "target": "all_enemies"
+      },
+      {
         "op": "APPLY_BUFF",
         "buff": "老主顾",
         "permanent": true,
@@ -45,7 +50,7 @@
       }
     ],
     "source": "1406 赛飞儿 天赋 热情好客的多洛斯人 (140604, Enhance/FollowUp): 「…施放战技和终结技时，使主目标成为【老主顾】。【老主顾】状态仅对最新被施加的目标生效。【老主顾】受到我方其他目标攻击后，赛飞儿立即对【老主顾】发动追加攻击，造成等同于赛飞儿150%攻击力的量子属性伤害。该效果每回合最多触发1次，赛飞儿回合开始时重置可触发次数。赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
-    "note": "「**施放战技**…时，使**主目标**成为【老主顾】」—— `APPLY_BUFF` + **`permanent: true`** ✓（文档只给\"仅对最新目标生效\" ✓ ⇒ 直到被替换 ✓）。"
+    "note": "「**施放战技**…时，使**主目标**成为【老主顾】」—— `APPLY_BUFF` + **`permanent: true`** ✓（文档只给\"仅对最新目标生效\" ✓ ⇒ 直到被替换 ✓）。\n\n⭐ 2026-09-30 转正：「【老主顾】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 老主顾 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
   },
   {
     "on": "ULT_CAST",
