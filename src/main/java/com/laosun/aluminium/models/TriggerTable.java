@@ -1052,6 +1052,23 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])has_weakness(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The {@code has_skill} keyword: "&lt;who&gt; carries this skill slot at all" — 「若目标拥有欢愉技」 (8009/8010).
+     *
+     * <p><b>Why a condition had to exist for this.</b> The sentence branches on whether the unit it names has the
+     * skill, and nothing in the DSL could ask that: {@code has_state} asks about a buff, {@code has_path} about a
+     * Path, {@code has_weakness} about an enemy's bar, and the party predicates about which side a unit is on.
+     * The branch matters because the other one says something <i>else</i> (「若目标不拥有欢愉技，使其行动提前50%」),
+     * so an unguarded rule would not merely fire too often — it would fire on exactly the units the document sends
+     * down the other path.
+     *
+     * <p>⚠ It is also the guard {@code CAST_SKILL} needs: that op <b>throws</b> when the named unit has no such
+     * slot (see {@code TriggerInterpreter#castSkill}), so without this condition the auto-cast clause would explode
+     * on every ally who has no Elation skill.
+     */
+    private static final Pattern HAS_SKILL =
+            Pattern.compile("(?<![\\w])has_skill(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
      * The {@code has_shield} keyword: "&lt;who&gt; currently holds a shield" — read exactly like the other
      * argument-less predicates.
      */
@@ -1185,6 +1202,16 @@ public class TriggerTable {
             String element = text.substring(hasWeakness.end()).trim();
             return new HasWeakness(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
                     requireElement(element, raw, spec), raw, spec);
+        }
+
+        // `has_skill`: "<who> has_skill ELATION_SKILL" — does that party carry this skill slot at all
+        // (8009/8010's 「若目标拥有欢愉技」). Read before the operator branch, like the other keyword families.
+        Matcher hasSkill = HAS_SKILL.matcher(text);
+        if (hasSkill.find()) {
+            String subject = normalize(text.substring(0, hasSkill.start()));
+            String slot = text.substring(hasSkill.end()).trim();
+            return new HasSkill(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
+                    requireSkillSlot(slot, raw, spec), raw, spec);
         }
 
         // `self has_same_path_ally` — a party question with no argument, checked with the other predicates.
@@ -1738,6 +1765,35 @@ public class TriggerTable {
                             + " (source: " + spec.getSource() + ")");
         }
         return path;
+    }
+
+    /**
+     * The slot a {@code has_skill} condition names, checked against the closed vocabulary of {@link SkillType}.
+     *
+     * <p>Refused while the file is read, for the reason {@code has_path}'s name is: a typo would silently become
+     * "this unit does not carry that skill", i.e. a guard that permanently sends the rule down the branch it was
+     * written to exclude — the failure mode that has no symptom.
+     *
+     * <p>⚠ Unlike {@code from_skill} (which only accepts the four in-battle cast slots, because it asks about a
+     * <b>cast</b> that already happened) this one accepts the whole enum: {@code ELATION_SKILL} is a real slot that
+     * no cast event carries, and 「拥有」 is a question about the <b>kit</b>, not about this battle's events.
+     */
+    private static SkillType requireSkillSlot(String name, String raw, TriggerSpec spec) {
+        SkillType slot;
+        try {
+            slot = SkillType.valueOf(name.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException notASlot) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' names the skill \"" + name + "\", which is not a slot this engine "
+                            + "knows; the slots are " + String.join(" / ", skillSlots()) + " "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return slot;
+    }
+
+    /** The {@link SkillType} names, for the message a misspelled {@code has_skill} slot gets. */
+    private static List<String> skillSlots() {
+        return java.util.Arrays.stream(SkillType.values()).map(Enum::name).toList();
     }
 
     /**
@@ -2784,6 +2840,65 @@ public class TriggerTable {
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
             return who instanceof Character character && character.getPath() == path;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * Kit test: {@code target has_skill ELATION_SKILL} / {@code self has_skill COMMON} — 「若目标拥有欢愉技」
+     * (8009/8010's ultimate).
+     *
+     * <p>Read off the party named on the left, exactly like {@link HasPath}, so the same three subjects
+     * ({@code self} / {@code actor} / {@code target}) work and the {@code !} prefix comes for free
+     * ({@link PartyCondition} is what the negation path asks for) — and the document needs both polarities in one
+     * sentence.
+     *
+     * <p>⚠ "Has it" means the slot holds a skill <b>whose data row is real</b> — not merely that the slot has a key.
+     * {@code Character.Builder} fills every intrinsic slot, so a character with no such row still carries the slot,
+     * holding {@code SkillData}'s not-found placeholder; that is why the test is
+     * {@link com.laosun.aluminium.data.SkillData#isLoaded()} rather
+     * than a null check (measured: 姬子 has an {@code ELATION_SKILL} key, and only 8010's is a real row. A
+     * key-based first version answered "yes" for everyone — i.e. a guard that guards nothing, and the
+     * {@code CAST_SKILL} it guards would then have thrown on every ally the document excludes).
+     *
+     * <p>Anything else — an enemy (whose {@code skills} map is empty), a unit whose slot was never filled — answers
+     * {@code false}, which keeps this family's rule: "cannot read it, therefore the condition fails", and a missing
+     * party is never the accidental reason a rule matched.
+     */
+    private static final class HasSkill implements Condition, PartyCondition {
+
+        private final String subject;
+        private final SkillType slot;
+        private final String raw;
+
+        HasSkill(String subject, SkillType slot, String raw, TriggerSpec spec) {
+            this.subject = subject;
+            this.slot = slot;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            if (who == null || who.getSkills() == null) {
+                return false;
+            }
+            var skill = who.getSkills().get(slot);
+            return skill != null && skill.getData() != null && skill.getData().isLoaded();
         }
 
         @Override

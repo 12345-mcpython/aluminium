@@ -273,11 +273,8 @@ public final class SkillExecutor {
      */
     private static void dispatchNonDamaging(Battle battle, Skill skill, CanHit user,
                                             List<? extends CanHit> targets, SkillEffectType effect) {
-        SkillEffectSpec spec = SkillEffects.forSkill(skill);
-        boolean supported = spec != null
-                && ("Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect()))
-                && !isAmbiguous(spec);
-        if (!supported || targets == null || targets.isEmpty()) {
+        SkillEffectSpec spec = deliverableSpec(skill);
+        if (spec == null || targets == null || targets.isEmpty()) {
             logNotDispatched(skill, user, effect, targets);
             return;
         }
@@ -507,6 +504,37 @@ public final class SkillExecutor {
         // (EnemySkill) is an attack too and must raise the same notification -- see Battle.fireAfterAttack for
         // which attacks qualify and why derived hits deliberately do not.
         battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage);
+    }
+
+    /**
+     * The dispatch-table entry a <b>non-damaging</b> cast can really execute, or {@code null} (2026-10-02).
+     *
+     * <p>Factored out of {@link #dispatchNonDamaging} so that a caller which has to decide <i>before</i> the cast
+     * whether it will do anything can ask the same question — {@code CAST_SKILL} refuses loudly when the answer is
+     * "nothing", instead of commanding a cast that silently does nothing.
+     */
+    static SkillEffectSpec deliverableSpec(Skill skill) {
+        SkillEffectSpec spec = SkillEffects.forSkill(skill);
+        boolean supported = spec != null
+                && ("Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect()))
+                && !isAmbiguous(spec);
+        return supported ? spec : null;
+    }
+
+    /**
+     * Can this skill be delivered at all — as a swing, or as the one non-damaging shape the engine knows
+     * ({@code Restore} / {@code Defence} with a clean parameter row)?
+     *
+     * <p>Its reader is {@code CAST_SKILL}: 「使其立即施放 1 次…」 is a promise that something happens, and a rule
+     * pointing at a skill the engine has no definition for would keep that promise by doing nothing. 1414's own
+     * skill is a {@code Defence} (a shield) and was refused by the earlier "must be damaging" guardrail; 1303's and
+     * 1412's are {@code Support} buffs with no {@code skill_effects.json} entry, and are still refused — loudly.
+     */
+    public static boolean canDeliver(Skill skill) {
+        if (skill == null || skill.getData() == null) {
+            return false;
+        }
+        return skill.getData().getEffect().isDamaging() || deliverableSpec(skill) != null;
     }
 
     /**

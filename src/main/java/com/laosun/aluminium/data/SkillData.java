@@ -43,6 +43,25 @@ public class SkillData {
             DamageElement.PHYSICAL, SkillEffectType.ENHANCE, null, null, null);
 
     /**
+     * Is this a real row, or the {@link #EMPTY} placeholder the loader hands back for an id the data does not have?
+     *
+     * <p><b>Why this question needs a name.</b> {@code Character.Builder} fills every intrinsic slot with a
+     * {@code DefaultSkill}, and a slot whose character has no such row still ends up <b>present in the map</b> —
+     * holding this placeholder. So "the slot is there" and "the character has that skill" are different facts, and
+     * the difference is invisible to a null check: {@code getData()} answers non-null either way. Measured
+     * (2026-10-02): 姬子 carries a {@code ELATION_SKILL} key whose row is this placeholder, while 8010's is a real
+     * one — the first version of the {@code has_skill} condition asked about the key and answered "yes" for every
+     * character in the game.
+     *
+     * <p>⚠ The marker is {@code maxLevel}: a real row has at least one level of parameters, the placeholder has
+     * none ({@code 0}). It is the one field {@code EMPTY} is constructed with that no real row can share — which is
+     * why the test that uses this also prints both sides.
+     */
+    public boolean isLoaded() {
+        return maxLevel > 0;
+    }
+
+    /**
      * Maximum possible skill level (length of {@link #skills}).
      */
     private final int maxLevel;

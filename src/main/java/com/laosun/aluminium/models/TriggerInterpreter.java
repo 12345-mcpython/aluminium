@@ -25,6 +25,7 @@ import com.laosun.aluminium.models.buff.TauntBuff;
 import com.laosun.aluminium.models.buff.VulnerabilityBuff;
 import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.skill.SkillExecutor;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -179,6 +180,34 @@ public final class TriggerInterpreter {
     private static final String TARGET_OTHER_ALLIES = "other_allies";
 
     /**
+     * The prefix of the <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} — 「持有【同袍】的角色」
+     * (1414 丹恒•腾荒's trace 神秀, and the aim of his technique's auto-cast).
+     *
+     * <p><b>Why a parameterised selector had to exist.</b> The engine can already ask 「I am in state X」
+     * ({@code has_state}, a condition) and it can name a fixed <i>role</i> ({@code target} = the unit this cast was
+     * aimed at, {@code attacker}, {@code summon}, {@code party_first}…), but it had no way to say <b>the unit that
+     * carries a state</b> — and 1414's kit is built on exactly that: the skill marks one ally as 【同袍】, and both
+     * the trace that buffs it and the technique that re-aims the skill speak about whoever holds it, not about a
+     * slot in the roster. A condition cannot do this job: conditions decide whether a <b>rule</b> runs, not which
+     * units an effect reaches.
+     *
+     * <p>⚠ <b>How many may hold it.</b> The marker is read on the <b>owner's own camp</b> and the <b>first</b> living
+     * holder answers. Keeping it to one is the content's job, and it already has the spelling for it:
+     * {@code REMOVE_STATE} over {@code all_allies} followed by {@code APPLY_BUFF} on the new one (「顺序即语义」,
+     * the same two lines 1414's own skill rule uses).
+     *
+     * <p>⚠ <b>Nobody holding it is not an error</b> — it is a legal state of the world for these clauses ("if there
+     * is a 同袍, buff them"). So the selector answers <b>nobody</b>: a list op reaches nobody, and a single-target op
+     * reports it through {@code require} like every other missing party. This is deliberately <i>not</i> the
+     * {@code summon} treatment, which throws: a rule whose whole subject is the summon contradicts itself when there
+     * is none, whereas these clauses are conditional by nature.
+     *
+     * <p>The prefix is spelled lower-case (it is <b>not</b> the data): the state name after it is read exactly as
+     * written, because a state's name is data (`has_state` makes the same promise).
+     */
+    static final String HOLDER_OF_PREFIX = "holder_of:";
+
+    /**
      * "The unit this cast <b>aimed at</b>, and <b>its</b> summon" — 「指定我方单体<b>及其召唤物</b>」.
      *
      * <p>Its first user is 星期日's Skill (131302): 「使指定我方单体角色<b>及其召唤物</b>立即行动」. It is a
@@ -282,6 +311,15 @@ public final class TriggerInterpreter {
 
         String op = normalizeOp(effect, spec);
         requireTargetSelector(effect, op, spec);
+        // ⚠ `cast_target` (who a COMMANDED cast is aimed at) is read by CAST_SKILL and by nothing else, so stating it
+        // anywhere else is refused rather than dropped silently -- the same shape as the `cap_scale` and `damage_type`
+        // checks around it, and the reason both of those exist.
+        if (effect.getCastTarget() != null && !effect.getCastTarget().isBlank() && !"CAST_SKILL".equals(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"cast_target\" (" + effect.getCastTarget() + "), but only CAST_SKILL reads "
+                            + "it: it names the unit a COMMANDED cast is aimed at, which no other op performs "
+                            + "(source: " + spec.getSource() + ")");
+        }
         // \u26a0 A damage-type scope is only meaningful for the ops that actually READ it, and one of them used to accept it
         // while ignoring it (BOOST_DAMAGE, fixed 2026-09-29: "follow-up attacks only" silently raised every hit). The
         // closed set below is the fix's other half -- stating a scope an op cannot honour is refused at load time, never
@@ -797,6 +835,9 @@ public final class TriggerInterpreter {
                     throw new IllegalArgumentException("Op CAST_SKILL names skill \"" + effect.getSkill()
                             + "\", which is not a SkillType (source: " + spec.getSource() + ")");
                 }
+                // ⭐ The named skill is executed by the ENGINE's own path, so there is no column to name (2026-10-02):
+                // the fields that would be a second reading of the row are refused rather than silently ignored.
+                requireNoRowArguments(effect, op, spec);
             }
             case "COMMAND_SUMMON" -> {
                 // The numbers are the NAMED SKILL's, not this file's: 长夜月's ultimate is skill 141303, whose
@@ -1455,7 +1496,16 @@ public final class TriggerInterpreter {
     }
 
     private static CanHit resolveTarget(EffectSpec effect, TriggerContext ctx) {
-        String selector = normalizeTarget(effect);
+        return resolveSelector(normalizeTarget(effect), effect, ctx);
+    }
+
+    /**
+     * The same resolution, for a selector that is not the effect's own {@code target}
+     * ({@code cast_target}, 2026-10-02) — one switch, so the two spellings cannot drift apart.
+     *
+     * @param selector the selector token (already lower-cased and trimmed)
+     */
+    private static CanHit resolveSelector(String selector, EffectSpec effect, TriggerContext ctx) {
         return switch (selector) {
             case "self" -> ctx.owner();
             case "target" -> require(ctx.target(), "target", ctx);
@@ -1487,9 +1537,18 @@ public final class TriggerInterpreter {
             }
             case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                     TARGET_RANDOM_ENEMY, ctx);
-            default -> throw new IllegalStateException(
-                    "Effect names the target selector '" + selector + "', which can reach several units: it needs "
-                            + "an op that takes a list, not one that resolves a single target");
+            // 「持有【同袍】的角色」: the single-target path asks the same question the list path does, and a
+            // single-target op has to name ONE unit -- so "nobody holds it" surfaces through `require`'s message
+            // rather than silently applying to nobody (the list path's empty answer is documented on the prefix).
+            default -> {
+                if (selector.startsWith(HOLDER_OF_PREFIX)) {
+                    List<CanHit> holders = holderOf(ctx.battle(), selector, ctx);
+                    yield require(holders.isEmpty() ? null : holders.getFirst(), selector, ctx);
+                }
+                throw new IllegalStateException(
+                        "Effect names the target selector '" + selector + "', which can reach several units: it needs "
+                                + "an op that takes a list, not one that resolves a single target");
+            }
         };
     }
 
@@ -1525,6 +1584,9 @@ public final class TriggerInterpreter {
 
     private static List<CanHit> resolveTargetsUnfiltered(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
+        if (selector.startsWith(HOLDER_OF_PREFIX)) {
+            return holderOf(battle, effect.getTarget(), ctx);
+        }
         if (TARGET_ALL_ALLIES.contains(selector) || TARGET_OTHER_ALLIES.equals(selector)) {
             if (battle == null) {
                 throw new IllegalStateException(
@@ -1691,34 +1753,64 @@ public final class TriggerInterpreter {
         CanHit actor = require(resolveTarget(effect, ctx), "target", ctx);
         SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
         Skill skill = actor.getSkills().get(slot);
-        if (skill == null || skill.getData() == null) {
+        if (skill == null || skill.getData() == null || !skill.getData().isLoaded()) {
             throw new IllegalStateException(
                     actor.getName() + " has no " + slot + " skill, so a CAST_SKILL effect has nothing to "
                             + "read: the rule names the skill whose numbers the commanded cast uses");
         }
-        if (!skill.getData().getEffect().isDamaging()) {
+        // ⭐ What the engine can DELIVER, not "is it a swing" (2026-10-02): a cast may be a shield or a heal as well,
+        // and those go through `SkillExecutor.dispatchNonDamaging`, which reads `skill_effects.json`. A skill the
+        // engine has no definition for must fail HERE, loudly -- commanding it would be a cast that does nothing at
+        // all, with no symptom (1414's own skill is a shield; 1303/1412's are buffs the table has no entry for).
+        if (!SkillExecutor.canDeliver(skill)) {
             throw new IllegalStateException(
-                    "CAST_SKILL effect points at " + slot + ", whose effect is "
-                            + skill.getData().getEffect() + " rather than a damaging one");
+                    "CAST_SKILL effect points at " + slot + ", whose effect is " + skill.getData().getEffect()
+                            + " and which the engine cannot deliver: a non-damaging skill needs an entry in "
+                            + "skill_effects.json saying what it restores or shields, and this one has none -- the "
+                            + "commanded cast would do nothing at all, which is exactly the kind of silence this "
+                            + "engine refuses");
         }
+        boolean damaging = skill.getData().getEffect().isDamaging();
         List<CanHit> victims = new ArrayList<>();
-        for (CanHit unit : battle.getOpponents(actor)) {
+        // ⚠ Which side the cast reaches is the SKILL's business, not the rule's: a swing lands on the caster's
+        // opponents, a shield or a heal on the caster's own camp. (Until this, every commanded cast was treated as a
+        // swing -- a shield would have been granted to the ENEMY.)
+        for (CanHit unit : damaging ? battle.getOpponents(actor) : battle.getSideOf(actor)) {
             if (unit != null && !unit.isDeath()) {
                 victims.add(unit);
             }
         }
         if (victims.isEmpty()) {
-            return;                                  // nothing left to hit: an empty battlefield, not a bad rule
+            return;                                  // nothing left to reach: an empty battlefield, not a bad rule
         }
-        EnemySkill attack = new EnemySkill(
-                skill.getData().getElement(),
-                multiplierOf(skill, effect, actor),
-                1,                                   // one segment, like the precedent
-                DamageType.NORMAL,
-                skill.getData().getEffect(),
-                AttributeType.fromString(effect.getAttribute()),
-                skill.getData().stanceFor(true));
-        attack.execute(battle, actor, victims);
+        // ⭐ The AIM, when the rule states one (2026-10-02): the commanded cast's main target goes first, because that
+        // is the unit `SkillExecutor` reads (`targets.getFirst()`) -- it decides which unit a single-target or blast
+        // skill lands on, and which ally a skill's own cast events name as the unit it was aimed at (1414's skill
+        // designates THAT ally as 【同袍】).
+        if (effect.getCastTarget() != null && !effect.getCastTarget().isBlank()) {
+            CanHit aimed = resolveSelector(effect.getCastTarget().trim().toLowerCase(Locale.ROOT), effect, ctx);
+            victims.remove(aimed);
+            victims.addFirst(aimed);
+        }
+        // ⭐⭐ THE ENGINE'S OWN CAST PATH (2026-10-02), and the whole point of this op is that there is only one
+        // reading of a skill's row. This used to hand-build an `EnemySkill` beside `SkillExecutor`, and that second
+        // reader was wrong in three ways at once -- measured, because no test had ever let the op fire:
+        //   * it read the multiplier through `multiplierOf`, which REQUIRES `damage_param`, so all nine shipped
+        //     rules (none of which states one) died with a NullPointerException on the first firing;
+        //   * it hard-coded `DamageType.NORMAL`, while the engine asks the data (`damageTypeOf`) -- an Elation
+        //     skill would have been settled as ordinary damage;
+        //   * it passed ONE multiplier to every victim, so a BLAST skill gave the neighbours the centre's number --
+        //     the exact defect §24.10 had just fixed on the other path (1008's row is `[1.92, 0.96]`).
+        // `SkillExecutor.execute` answers all three by construction: it reads `params.getFirst()` at the skill's own
+        // level, the neighbouring column for BLAST, the element, the base attribute (`damageBaseAttribute`) and the
+        // damage type from the row, and it dispatches a non-damaging skill the same way a real cast would.
+        // ⚠ What follows from that: the cast is announced (CAST_SETUP / SKILL_CAST / ULT_CAST / BASIC_ATTACK /
+        // ALLY_ATTACK) and settles its own energy, because a commanded cast IS a cast. A skill the engine's model
+        // itself mis-reads (an Elation skill's row starts with a HIT COUNT) is mis-read here too -- which is why the
+        // Elation auto-casts stay registered rather than shipped (see §24.12).
+        // ⚠ It does NOT spend a skill point: that is the caller's act, and it is why 「此次战技不消耗战技点」 holds
+        // for free (pinned in `CastSkillTest`).
+        skill.execute(battle, actor, victims);
     }
 
     /**
@@ -1774,6 +1866,33 @@ public final class TriggerInterpreter {
     private static String normalizeTarget(EffectSpec effect) {
         // `target` lives on the effect as an optional selector; absent means "self".
         return effect.getTarget() == null ? "self" : effect.getTarget().trim().toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * The units on the rule owner's own camp that carry the state named after {@link #HOLDER_OF_PREFIX}
+     * — 「持有【同袍】的角色」.
+     *
+     * <p>At most one is returned (the first living holder), and an empty list is a legitimate answer: see the
+     * constant's javadoc for why this is not an exception.
+     *
+     * @param battle the running battle (the owner's camp lives there)
+     * @param effect the effect naming the state
+     * @return the holder, or an empty list when nobody holds it
+     */
+    private static List<CanHit> holderOf(Battle battle, String rawSelector, TriggerContext ctx) {
+        String raw = rawSelector.trim();
+        String state = raw.substring(HOLDER_OF_PREFIX.length()).trim();
+        if (battle == null || ctx.owner() == null) {
+            throw new IllegalStateException(
+                    "Effect targets \"" + raw + "\" but this rule was evaluated without a battlefield, so the "
+                            + "units that could hold 【" + state + "】 cannot be listed");
+        }
+        for (CanHit ally : battle.getSideOf(ctx.owner())) {
+            if (ally != null && !ally.isDeath() && ally.getBuffManager().hasState(state)) {
+                return List.of(ally);
+            }
+        }
+        return List.of();
     }
 
     private static String normalizeOp(EffectSpec effect, TriggerSpec spec) {
@@ -3388,15 +3507,43 @@ public final class TriggerInterpreter {
      */
     private static void requireTargetSelector(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getTarget() == null || effect.getTarget().isBlank()) {
+            if (effect.getCastTarget() != null && !effect.getCastTarget().isBlank()) {
+                requireSelectorSpelling(effect.getCastTarget(), "cast_target", op, spec);
+            }
             return;
         }
-        String selector = normalizeTarget(effect);
-        if (!TARGET_SELECTORS.contains(selector)) {
+        requireSelectorSpelling(effect.getTarget(), "target", op, spec);
+        if (effect.getCastTarget() != null && !effect.getCastTarget().isBlank()) {
+            requireSelectorSpelling(effect.getCastTarget(), "cast_target", op, spec);
+        }
+    }
+
+    /**
+     * One selector spelling, checked against the closed set plus the parameterised {@code holder_of:} prefix.
+     *
+     * <p>Split out of {@link #requireTargetSelector} when {@code cast_target} arrived (2026-10-02): the two fields
+     * take the <b>same</b> vocabulary, and two copies of this check would be able to drift apart.
+     *
+     * @param value the selector as written
+     * @param field the field's name, for the message ({@code target} / {@code cast_target})
+     */
+    private static void requireSelectorSpelling(String value, String field, String op, TriggerSpec spec) {
+        String selector = value.trim().toLowerCase(Locale.ROOT);
+        if (!TARGET_SELECTORS.contains(selector) && !selector.startsWith(HOLDER_OF_PREFIX)) {
             throw new IllegalArgumentException(
-                    "Op " + op + " names an unknown \"target\" selector '" + effect.getTarget()
+                    "Op " + op + " names an unknown \"" + field + "\" selector '" + value
                             + "' (known: " + String.join(" / ", TARGET_SELECTORS.stream().sorted().toList())
+                            + ", and the state-holder spelling " + HOLDER_OF_PREFIX + "<state>"
                             + "); it used to fall back to the owner, which made a typo behave like self "
                             + "(source: " + spec.getSource() + ")");
+        }
+        // ⚠ The prefix must be spelled exactly (lower-case, with the colon): the state name behind it is DATA and is
+        // read as written, so a selector that only matches case-insensitively would slice the name in the wrong place.
+        if (value.trim().startsWith(HOLDER_OF_PREFIX) && value.trim().length() == HOLDER_OF_PREFIX.length()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " writes \"" + value.trim() + "\" with no state after \""
+                            + HOLDER_OF_PREFIX + "\"; write the state whose holder the effect speaks about, e.g. \""
+                            + HOLDER_OF_PREFIX + "同袍\" (source: " + spec.getSource() + ")");
         }
     }
 
@@ -3956,6 +4103,29 @@ public final class TriggerInterpreter {
      * never reads is a rule that says one thing and does another (M-26). The message names the field, because
      * "which of my six fields was ignored" is otherwise a guessing game.
      */
+    /**
+     * Refuses the fields that would be a <b>second reading</b> of a skill's row, on the ops that cast a named skill
+     * through the engine's own {@code SkillExecutor} path (2026-10-02, {@code CAST_SKILL}).
+     *
+     * <p>Why this is a refusal rather than "just ignore it": the op reads the multiplier from the row's first column,
+     * the neighbouring column for a blast, the element, the base attribute and the damage type from the skill's own
+     * data. An author who writes {@code damage_param} is asking for a different reading -- and the honest answer is
+     * no, because a second reading is how this op came to be broken in three ways at once (see {@code castSkill}).
+     * A field the engine silently ignores is the failure mode this project ranks worst.
+     */
+    private static void requireNoRowArguments(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getDamageParam() != null || effect.getDamageLevel() != null || effect.getAttribute() != null
+                || effect.getElement() != null || effect.getAmount() != null || effect.getScale() != null
+                || effect.getPercent() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " casts the named skill with that skill's OWN row, so it takes no "
+                            + "\"damage_param\" / \"damage_level\" / \"attribute\" / \"element\" / \"amount\" / "
+                            + "\"scale\" / \"percent\": those would be a second reading of numbers the engine "
+                            + "already reads once, and the engine's own cast path would ignore them without a word "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
     private static void requireNoMagnitudeArguments(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getAmount() != null || effect.getScale() != null || effect.getPercent() != null
                 || effect.getAttribute() != null || effect.getBuff() != null) {

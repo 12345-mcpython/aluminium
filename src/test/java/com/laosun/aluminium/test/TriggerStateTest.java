@@ -4,6 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
@@ -37,6 +38,8 @@ import java.util.Set;
  *       class-based default would make 【协奏】 silently evict 【转魄】, the L-14 trap);</li>
  *   <li>the <b>same</b> state refreshes instead of stacking;</li>
  *   <li>a state expires after its turns, and a {@code permanent} one does not;</li>
+ *   <li>{@code target has_skill <SLOT>} reads the named party's <b>kit</b> — the guard 8009/8010's ultimate needs
+ *       before it may command that ally to cast (and the reason both its branches are expressible);</li>
  *   <li>every argument is validated at <b>load</b> time, and a missing party fails the condition rather than
  *       passing it.</li>
  * </ul>
@@ -465,6 +468,88 @@ public class TriggerStateTest {
 
         Assertions.assertTrue(refused.getMessage().contains("Fyre"), refused.getMessage());
         Assertions.assertTrue(refused.getMessage().contains("FIRE"), refused.getMessage());
+    }
+
+    // ==================================================================
+    // 3f. `has_skill` — "that party carries this slot at all" (8009/8010)
+    // ==================================================================
+
+    /**
+     * {@code target has_skill ELATION_SKILL} reads the <b>named party's kit</b>, not the owner's.
+     *
+     * <p>⭐ The discrimination is one slot asked about two units: 8010 carries the Elation skill (data slot 20) and
+     * 姬子 does not, while <b>both</b> carry {@code COMMON}. So a wrong implementation that read the owner's kit, or
+     * that answered "yes" for any slot, or "no" for every slot, fails at least one of the three counts below.
+     *
+     * <p>Why the condition exists at all: the sentence it comes from branches on it — 「若目标拥有欢愉技…**并使其立即
+     * 施放1次**…欢愉技…若目标不拥有欢愉技，使其**行动提前50%**」 — so the two polarities are two different rules, and
+     * this is also the <b>guard</b> {@code CAST_SKILL} needs (that op throws when the unit has no such slot).
+     */
+    @Test
+    public void hasSkillAsksTheNamedPartysKit() {
+        Battle battle = withAllyOf(8010,
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_skill ELATION_SKILL"), gain(1)),
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_skill COMMON"), gain(2)));
+        Character owner = battle.characters.getFirst();
+        Character elation = battle.characters.get(1);
+        drainSkillPoints(battle);
+
+        Assertions.assertTrue(elation.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded(),
+                "precondition: 8010's slot 20 is a REAL row, which is what the condition asks about");
+        Assertions.assertFalse(owner.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded(),
+                "precondition: 姬子 CARRIES the key too (the builder fills every intrinsic slot) -- its row is the "
+                        + "loader's not-found placeholder, so 'the slot is there' and 'she has the skill' differ, "
+                        + "and only the second is the question");
+        Assertions.assertTrue(owner.getSkills().get(SkillType.COMMON).getData().isLoaded(),
+                "precondition: and her COMMON row is real, so the two units differ in exactly one slot");
+
+        Assertions.assertEquals(2, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0),
+                "8010 has both slots, so both rules run");
+        Assertions.assertEquals(3, battle.getSkillPoints(), "and each granted its own amount (1 + 2)");
+
+        drainSkillPoints(battle);
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
+                "姬子 has COMMON but no Elation skill: only the second rule runs");
+        Assertions.assertEquals(2, battle.getSkillPoints(),
+                "and only ITS amount lands (2, measured from a drained bar so no cap can hide the difference)");
+    }
+
+    /**
+     * The other polarity: {@code !target has_skill ELATION_SKILL} is the document's second branch.
+     *
+     * <p>Both directions in one case, because "it fires for the unit without the skill" and "it does not fire for the
+     * unit with it" are two claims, and a wrong implementation satisfies either alone. The {@code !} prefix is
+     * available because {@code HasSkill} reads a party — the same rule {@code has_path} follows.
+     */
+    @Test
+    public void hasSkillNegationIsTheOtherBranch() {
+        Battle battle = withAllyOf(8010,
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_skill ELATION_SKILL"), gain(1)));
+        Character owner = battle.characters.getFirst();
+        Character elation = battle.characters.get(1);
+        drainSkillPoints(battle);
+
+        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
+                "姬子 has no Elation skill, so the negated condition holds");
+        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0),
+                "8010 HAS one, so it must not");
+    }
+
+    /**
+     * ⚠ A slot that is not a {@link SkillType} is refused where the file is read.
+     *
+     * <p>The wrong spelling in this case is not hypothetical: {@code ELATION} is a {@code DamageType} constant, and
+     * writing it here reads perfectly — 「欢愉」 — while naming nothing the kit can carry. The message has to name
+     * both the bad spelling and the right one, or the author is left with "unknown skill".
+     */
+    @Test
+    public void anUnknownSkillSlotIsRefused() {
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(OWNER, List.of(
+                        TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_skill ELATION"), gain(1)))));
+
+        Assertions.assertTrue(refused.getMessage().contains("ELATION"), refused.getMessage());
+        Assertions.assertTrue(refused.getMessage().contains("ELATION_SKILL"), refused.getMessage());
     }
 
     // ==================================================================

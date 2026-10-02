@@ -64,6 +64,7 @@ public class EffectSpec {
         copy.buff = this.buff;
         copy.ticksOn = this.ticksOn;
         copy.target = this.target;
+        copy.castTarget = this.castTarget;
         copy.skill = this.skill;
         copy.damageParam = this.damageParam;
         copy.damageLevel = this.damageLevel;
@@ -450,6 +451,27 @@ return copy;
      */
     @SerializedName("target")
     private String target;
+
+    /**
+     * <b>Who a commanded cast is aimed at</b> — {@code CAST_SKILL} only (2026-10-02).
+     *
+     * <p><b>Why a cast needs two names.</b> {@link #target} says <i>who performs the cast</i>, and this one says
+     * <i>which unit that cast is aimed at</i>. The sentence that needed it states both, and they are different units:
+     * 1414 丹恒•腾荒's technique says 「下一次战斗开始时自动对<b>持有【同袍】的角色</b>施放 1 次战技」 — <b>he</b> casts it
+     * ({@code "target": "self"}), and it is aimed at <b>whoever holds 【同袍】</b>
+     * ({@code "cast_target": "holder_of:同袍"}). Folding the two into one field was not an option: with the aim
+     * expressed as "the caster", the skill's own 「使指定我方单体角色成为【同袍】」 would re-designate the wrong ally.
+     *
+     * <p>It takes the same selector vocabulary as {@link #target} (a closed set plus the {@code holder_of:} prefix),
+     * is validated at load time, and is <b>refused on every other op</b> — a field the engine ignores is the failure
+     * mode this project ranks worst.
+     *
+     * <p>For a damaging cast the aimed unit becomes the main target (the one a single-target skill lands on, and the
+     * centre of a blast); for a non-damaging one it is the unit the cast's own events name as its target, while the
+     * effect still reaches the whole side.
+     */
+    @SerializedName("cast_target")
+    private String castTarget;
 
     /**
      * Which skill slot a {@code DAMAGE} effect takes its attack from, by

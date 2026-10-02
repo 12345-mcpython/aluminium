@@ -408,9 +408,13 @@ public class CharacterConditionLiteralsTest {
         assertRule(8008, "ULT_CAST", "ult_summon_mem", List.of("actor == self"));
         assertRule(8008, "BATTLE_START", "level_convention", List.of());
         assertRule(8009, "ULT_CAST", "ult_crit_damage_for_the_chosen_ally", List.of("actor == self"));
+        assertRule(8009, "ULT_CAST", "ult_advance_without_elation_skill",
+                List.of("actor == self", "!target has_skill ELATION_SKILL"));
         assertRule(8009, "ALLY_ATTACK", "talent_energy_after_attack", List.of("actor == self"));
         assertRule(8009, "BATTLE_START", "level_convention", List.of());
         assertRule(8010, "ULT_CAST", "ult_crit_damage_for_the_chosen_ally", List.of("actor == self"));
+        assertRule(8010, "ULT_CAST", "ult_advance_without_elation_skill",
+                List.of("actor == self", "!target has_skill ELATION_SKILL"));
         assertRule(8010, "ALLY_ATTACK", "talent_energy_after_attack", List.of("actor == self"));
         assertRule(8010, "BATTLE_START", "level_convention", List.of());
     }
