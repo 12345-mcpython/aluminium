@@ -27,6 +27,11 @@
     ],
     "do": [
       {
+        "op": "REMOVE_STATE",
+        "buff": "智者的短见",
+        "target": "all_enemies"
+      },
+      {
         "op": "APPLY_BUFF",
         "buff": "智者的短见",
         "permanent": true,
@@ -34,7 +39,7 @@
       }
     ],
     "source": "1305 真理医生 终结技 三段悖论 (130503, Ultra/SingleAttack): 「对指定敌方单体造成等同于真理医生240%攻击力的虚数属性伤害，并附上【智者的短见】。真理医生的队友攻击持有【智者的短见】的目标时，真理医生对该目标发动1次天赋的追加攻击。【智者的短见】效果最多触发2次且仅对真理医生终结技最新施放的目标生效。施放终结技后重置该效果触发次数。」",
-    "note": "「并附上【**智者的短见**】」—— `APPLY_BUFF` + **`permanent: true`** ✓：文档的存续规则只有「**仅对…最新施放的目标生效**」✓ ⇒ \"直到被替换\" ✓。⚠ **登记**：「**最多触发 2 次**」「**施放终结技后重置**该效果触发次数」✗（**按目标计数 + 重置** ✗）⇒ 下面那条反应规则**没有次数上限** ✗（文档有 2 次 ✓）⇒ 差异写在注释里 ✓。⚠ 终结技自身的伤害不写规则 ✓（由技能数据结算 ✓）。"
+    "note": "「并附上【**智者的短见**】」—— `APPLY_BUFF` + **`permanent: true`** ✓：文档的存续规则只有「**仅对…最新施放的目标生效**」✓ ⇒ \"直到被替换\" ✓。⚠ **登记**：「**最多触发 2 次**」「**施放终结技后重置**该效果触发次数」✗（**按目标计数 + 重置** ✗）⇒ 下面那条反应规则**没有次数上限** ✗（文档有 2 次 ✓）⇒ 差异写在注释里 ✓。⚠ 终结技自身的伤害不写规则 ✓（由技能数据结算 ✓）。\n\n⭐ 2026-09-30 转正：「【智者的短见】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 智者的短见 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
   },
   {
     "on": "ALLY_ATTACK",
