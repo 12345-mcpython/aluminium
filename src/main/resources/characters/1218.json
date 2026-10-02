@@ -130,11 +130,12 @@
         "percent": 0.15,
         "damage_type": "ULTRA",
         "turns": 3,
-        "target": "all_enemies"
+        "target": "all_enemies",
+        "ticks_on": "self"
       }
     ],
     "source": "1218 椒丘 终结技（结界）: 「处于结界中时，敌方目标受到的终结技伤害提高 15.00%…结界持续 3 回合」",
-    "note": "⭐ 用的是**既有\"伤害类型域\"** ✓（`damage_type: \"ULTRA\"` ✓）—— 与同族的 `BREAK`/`DOT` 同款 ✓。⚠ **数值与持续期同出一句** ✓（「…提高 **15.00%**…结界持续 **3 回合**」✓）⇒ `percent 0.15` ✓ + `turns 3` ✓（第 106 条纪律 ✓）。⚠ **未写**：同段的天赋**分档**（「1 层时使敌人受到的伤害提高 15.00%，此后每叠加 1 层提高 5.00%，最多叠加 5 层」✗）—— 层数在**敌方**身上 ✗，而 `MODIFY_DAMAGE_TAKEN` 的 `scale` 读**规则拥有者** ✓ ⇒ 需要\"**按目标层数缩放**\"这一能力 ✓（**已登记** ✓）。"
+    "note": "⭐ 用的是**既有\"伤害类型域\"** ✓（`damage_type: \"ULTRA\"` ✓）—— 与同族的 `BREAK`/`DOT` 同款 ✓。⚠ **数值与持续期同出一句** ✓（「…提高 **15.00%**…结界持续 **3 回合**」✓）⇒ `percent 0.15` ✓ + `turns 3` ✓（第 106 条纪律 ✓）。⚠ **未写**：同段的天赋**分档**（「1 层时使敌人受到的伤害提高 15.00%，此后每叠加 1 层提高 5.00%，最多叠加 5 层」✗）—— 层数在**敌方**身上 ✗，而 `MODIFY_DAMAGE_TAKEN` 的 `scale` 读**规则拥有者** ✓ ⇒ 需要\"**按目标层数缩放**\"这一能力 ✓（**已登记** ✓）。\n\n⭐ 2026-09-30 补上：「当椒丘陷入**无法战斗状态**时，结界也会被解除」—— ⚠ 零引擎改动 ✓：\ticks_on: 「self」 把那个修饰器的时钟挂到**施放者**身上 ✓，而 BuffManager.removeBuffsAnchoredTo 按 \ticksOn 摘 ✓（它的注释原话：*⚠ Without this, an anchored buff is a **leak**: its clock was somebody else’s turns, and that somebody will never take another one* ✓）。⚠ 而文档本来就说「**自身**每回合开始时减 1」✓ ⇒ 同一个字段同时满足两句话 ✓。"
   },
   {
     "on": "DEALING_DAMAGE",

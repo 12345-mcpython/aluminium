@@ -2834,15 +2834,23 @@ public class Battle {
      *
      * <p>Swept from here rather than from the dying unit's own table because {@code fireTriggers} <b>skips dead
      * units</b>: the unit that needs to react is gone before it could, and the buffs live on other units anyway.
+     *
+     * <p>⚠ <b>BOTH camps (2026-09-30).</b> This used to walk {@code allies} twice, so the sweep only ever reached
+     * buffs sitting on our own side. A caster on our side can anchor a modifier onto an ENEMY -- 1218's zone is
+     * {@code target: all_enemies} with {@code ticks_on: "self"} -- and that one was never taken off: measured at
+     * exactly 1.40x before and after she fell (the {@code AnchorDeathTest} that caught it). The buff's carrier is
+     * not necessarily on the dying unit's side.
      */
     private void releaseBuffsAnchoredToTheDead() {
-        for (CanHit ally : allies) {
-            if (ally == null || ally.isDeath()) {
+        List<CanHit> everyone = new ArrayList<>(allies);
+        everyone.addAll(enemies);
+        for (CanHit carrier : everyone) {
+            if (carrier == null || carrier.isDeath()) {
                 continue;
             }
-            for (CanHit other : allies) {
-                if (other != null && other != ally && other.isDeath()) {
-                    ally.getBuffManager().removeBuffsAnchoredTo(other);
+            for (CanHit other : everyone) {
+                if (other != null && other != carrier && other.isDeath()) {
+                    carrier.getBuffManager().removeBuffsAnchoredTo(other);
                 }
             }
         }

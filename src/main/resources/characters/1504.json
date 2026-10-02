@@ -84,7 +84,7 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.4,
           "permanent": true,
-          "buff": "饲饼",
+          "buff": "饲饵",
           "target": "all_enemies"
         },
         {

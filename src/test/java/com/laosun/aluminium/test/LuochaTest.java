@@ -43,7 +43,8 @@ public class LuochaTest {
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(LUOCHA);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the counter");
+        // ⚠ 2 since 2026-09-30: the counter, plus the rule that opens the 白花之刻 zone at two stacks
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the counter and the zone opener");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
     }
 

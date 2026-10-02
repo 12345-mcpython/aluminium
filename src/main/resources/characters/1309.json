@@ -163,5 +163,23 @@
     ],
     "source": "1309 行迹「即兴装饰」(1309102): 「处于【协奏】状态时，我方全体发动追加攻击造成的暴击伤害提高 25%」",
     "note": "⭐⭐ **\"我方全体\"不需要新能力** ✓：本引擎的 `fireTriggers` **本来就遍历全队**（`Battle:2136` ✓），每个队友的触发桌都会被问一遍 ✓ ⇒ 本规则虽然挂在 1309 身上 ✓，但**任何队友**打出追加攻击时都会生效 ✓。⭐ 条件用 **`self has_state 协奏`** ✓（= 光环自己的条件 ✓）；⚠「在场」由 `Battle:2137` 的 **`isDead()` 跳过**天然保证 ✓。⭐ 数值 **25%** 取自数据行 ✓（`1309102` 的 `param` ✓，第 106 条 ✓）。⚠ 存活期 `permanent: true` 仅为过加载器校验 ✓（instance 路径不读 ✓）。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_zone_defence_ignore",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DEFENCE_IGNORE",
+        "percent": 0.2,
+        "turns": 2,
+        "buff": "结界",
+        "target": "all_allies"
+      }
+    ],
+    "note": "⭐ 2026-09-30 转正 ✓：「结界期间无视 20% 防御」—— ⚠ 写法照 1303 星魂 1：具名 \buff: 结界 ✓ + \turns: 2 ✓，于是它随结界生灭 ✓（而 has_state 结界 也能读到它 ✔ —— 那正是本段落的 (a)：BuffManager.hasState 现在也走具名修饰器那一遍历 ✓）。"
   }
 ]
