@@ -18270,6 +18270,21 @@
 >     —— ⚠ 它 `CAST_SKILL` 的是**普通**欢愉技 ✗，而句子要的是**强化**版 ✗ ⇒ 不行 ✗）。
 >   ⇒ ⭐ **取 (a)** ✓；⚠ 在 id 落实之前，`spendAll` 与那两半句**都停在登记** ✓（本轮已经如此 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十九：⭐ **技能配置的存放方式查到了** —— `E:\turnbasedgamedata\Config\ConfigAbility\Avatar\Avatar_<英文名>_00_Ability.json`，砂金是 `Avatar_Aventurine_00_Ability.json`（**15 个 Ability**，顶层键 `AbilityList` / `GlobalModifiers` / `GlobalTemplates`））**：
+>
+> * ✅ **实测（两步定位 ✓）** ✓：
+>   1. `Config` 下按功能分目录 ✓（`ConfigAbility` / `ConfigAvatar` / `ConfigCharacter` / `ConfigBattlePerform` … ✓）
+>     ⇒ ⭐ **技能不叫 Skill 而叫 Ability** ✓（这也是我前面两次搜不到的原因之一 ✗）；
+>   2. `Config/ConfigAbility/Avatar/` 下每个角色一个文件 ✓ —— ⚠ **按英文名**命名 ✓（砂金 = **Aventurine** ✓，
+>      另有 `Avatar_AventurineW_00_Ability.json` ✓ —— 那个 `W` 很可能就是**强化**版 ✗ ⇒ ⭐ **下一轮先看它** ✓）；
+>   3. `Avatar_Aventurine_00_Ability.json` 的顶层是 `{"AbilityList": [...], "GlobalModifiers": …, "GlobalTemplates": …}` ✓，
+>      **15 条 Ability** ✓ —— ⚠ 但**没有一条的名字里含 `1513`** ✗（我上一次按 `'1513' in Name` 过滤 ⇒ 空 ✗）
+>      ⇒ ⭐ **下一轮要看 `AbilityList` 每条的真实字段**（`Name` / `_Name` / `TargetType` / `AbilityType` … ✓）而不是猜字段名 ✓。
+> * ⭐ **于是"强化欢愉技 id"这件事现在有明确的两步路** ✗：
+>   **(a)** 看 `Avatar_AventurineW_00_Ability.json` ✓（`W` 后缀 ⇒ 很可能是"强化"那一版 ✓）⇒ 找它里面的欢愉技 ✓；
+>   **(b)** 若还不是 ⇒ 打印 `AbilityList` 前 3 条的**全部键** ✓（⚠ 先看结构再筛 ✓ —— 与"先读 `do` 再选观测量"同一条纪律 ✓）。
+> * ⚠ 在此之前 `spendAll` 与 `1513` 那两半句**继续停在登记** ✓（脚本 `tools/add_spend_all3.py` 在仓里 ✓，重放即得 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19606,6 +19621,21 @@
 >     —— ⚠ 它 `CAST_SKILL` 的是**普通**欢愉技 ✗，而句子要的是**强化**版 ✗ ⇒ 不行 ✗）。
 >   ⇒ ⭐ **取 (a)** ✓；⚠ 在 id 落实之前，`spendAll` 与那两半句**都停在登记** ✓（本轮已经如此 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十九：⭐ **技能配置的存放方式查到了** —— `E:\turnbasedgamedata\Config\ConfigAbility\Avatar\Avatar_<英文名>_00_Ability.json`，砂金是 `Avatar_Aventurine_00_Ability.json`（**15 个 Ability**，顶层键 `AbilityList` / `GlobalModifiers` / `GlobalTemplates`））**：
+>
+> * ✅ **实测（两步定位 ✓）** ✓：
+>   1. `Config` 下按功能分目录 ✓（`ConfigAbility` / `ConfigAvatar` / `ConfigCharacter` / `ConfigBattlePerform` … ✓）
+>     ⇒ ⭐ **技能不叫 Skill 而叫 Ability** ✓（这也是我前面两次搜不到的原因之一 ✗）；
+>   2. `Config/ConfigAbility/Avatar/` 下每个角色一个文件 ✓ —— ⚠ **按英文名**命名 ✓（砂金 = **Aventurine** ✓，
+>      另有 `Avatar_AventurineW_00_Ability.json` ✓ —— 那个 `W` 很可能就是**强化**版 ✗ ⇒ ⭐ **下一轮先看它** ✓）；
+>   3. `Avatar_Aventurine_00_Ability.json` 的顶层是 `{"AbilityList": [...], "GlobalModifiers": …, "GlobalTemplates": …}` ✓，
+>      **15 条 Ability** ✓ —— ⚠ 但**没有一条的名字里含 `1513`** ✗（我上一次按 `'1513' in Name` 过滤 ⇒ 空 ✗）
+>      ⇒ ⭐ **下一轮要看 `AbilityList` 每条的真实字段**（`Name` / `_Name` / `TargetType` / `AbilityType` … ✓）而不是猜字段名 ✓。
+> * ⭐ **于是"强化欢愉技 id"这件事现在有明确的两步路** ✗：
+>   **(a)** 看 `Avatar_AventurineW_00_Ability.json` ✓（`W` 后缀 ⇒ 很可能是"强化"那一版 ✓）⇒ 找它里面的欢愉技 ✓；
+>   **(b)** 若还不是 ⇒ 打印 `AbilityList` 前 3 条的**全部键** ✓（⚠ 先看结构再筛 ✓ —— 与"先读 `do` 再选观测量"同一条纪律 ✓）。
+> * ⚠ 在此之前 `spendAll` 与 `1513` 那两半句**继续停在登记** ✓（脚本 `tools/add_spend_all3.py` 在仓里 ✓，重放即得 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
