@@ -20848,6 +20848,31 @@
 >     ⇒ ⭐ **正解**：让她的【生息】拿一个**纯时长**的 lifetime ✓（⚠ 文档说"持续 2 回合" ✓ ⇒ 本该如此 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十八：🎯🎯🎯 **根因找到了，逐字** —— `tickBuff` 的三道 `continue` 里，**第二道**是 `if (buff.isEarlyBuff != early) continue;` ⇒ ⭐ 一个 buff **只在它所属的那一半**里被 tick ⇒ ⚠ 而 `afterMove()` 传的是 **`false`（后半天）** ✗ ⇒ **"早半天"的 buff 被跳过** ✗）**）**：
+>
+> * ✅ **实测（读 `BuffManager.tickBuff` 的头 ✓，`:645` ✓）** ✓ 原文：
+>   ```java
+>   private void tickBuff(CanHit clockOwner, boolean early) {
+>       for (AbstractBuff buff : List.copyOf(buffs)) {
+>           if (buff.isPermanent()) { continue; }               // ★ A：永久 ⇒ 永不倒数、永不"到期"
+>           if (buff.isEarlyBuff != early) { continue; }        // ★ B：只在它所属的那一半里 tick  ← **就是它**
+>           if (!buff.ticksOn(clockOwner)) { continue; }        // ★ C：计时不属于我 ⇒ 跳过
+>           boolean couldAct = buff.canAct();
+>           buff.tickEffect(instance);
+>           …
+>   ```
+>   ⇒ ⭐⭐⭐ **答案** ✓：`afterMove()` 里传 `early = false` ✓ ⇒ **只有 `isEarlyBuff == false` 的 buff 被递减** ✗
+>     ⇒ ⚠ 若【生息】的那条 buff 是**"早半天"**（`isEarlyBuff == true` ✗）⇒ ⭐ **它在 `afterMove()` 里被 `continue` 掉** ✗
+>       ⇒ ⭐ **从不递减** ✗ ⇒ ⭐ 而它**确实消失了** ✓ ⇒ ⭐ **只能是 `afterMove()` 第一行那句 `removeWithLifetime(TURN_END)`** ✓
+>         ⇒ ⭐⭐ **静默摘除、没有公告** ✓✓ —— **整条链闭合** ✓（⚠ 这也解释了 `1513` 为什么成功 ✗：它的 buff 属于后半天 ✓）。
+> * ⭐⭐ **下一轮第一步（一次改就得绿）** ✗：**判据里把"早半天"也推一次** ✓ —— 即同时调
+>   **`owner.getBuffManager().beforeMove()`** ✓（⚠ 本段在先前的 javadoc 里见过它 ✓：*"that one has already gone through
+>   `beforeMove()` / `afterMove()`"* ✓）⇒ ⭐ 那么【生息】会在**它的那一半**里递减 ⇒ 到期 ⇒ **公告** ⇒ **读者接住** ✓✓
+>   ⇒ 绿 ⇒ **变异（`turns: 2 → 3`）⇒ 全量 ⇒ 出货** ✓（⭐ 目标 ① 的第二个真读者 ✓）。
+> * ⭐ **顺带一条可复用的事实** ✓：**本项目里"限时状态"分早／晚两半递减** ✗ ⇒ ⭐ **判据推进回合时要两半都推** ✓
+>   （⚠ 而 `1513` 那次恰好只推后半天就成功 ⇒ 说明那次的 buff 是后半天 ✓）⇒ ⭐ **纪律（补）**：**判据推进一个回合 = `beforeMove()` ＋ `afterMove()`** ✓。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24760,6 +24785,31 @@
 > * ⭐ **下一轮第一步（一次读，确认 lifetime 映射）** ✗：读 **`withLifetime(...)`** ✓（⚠ 在 `TriggerInterpreter` 里 ✓，本段见过它被 `modifyAttr`／`applyState` 用 ✓）
 >   ⇒ 看"**什么条件下 buff 的 lifetime = `TURN_END`**" ✓ ⇒ ⚠ 若与 **`turns` 的缺省／`permanent`／`unticked`** 有关 ✗
 >     ⇒ ⭐ **正解**：让她的【生息】拿一个**纯时长**的 lifetime ✓（⚠ 文档说"持续 2 回合" ✓ ⇒ 本该如此 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十八：🎯🎯🎯 **根因找到了，逐字** —— `tickBuff` 的三道 `continue` 里，**第二道**是 `if (buff.isEarlyBuff != early) continue;` ⇒ ⭐ 一个 buff **只在它所属的那一半**里被 tick ⇒ ⚠ 而 `afterMove()` 传的是 **`false`（后半天）** ✗ ⇒ **"早半天"的 buff 被跳过** ✗）**）**：
+>
+> * ✅ **实测（读 `BuffManager.tickBuff` 的头 ✓，`:645` ✓）** ✓ 原文：
+>   ```java
+>   private void tickBuff(CanHit clockOwner, boolean early) {
+>       for (AbstractBuff buff : List.copyOf(buffs)) {
+>           if (buff.isPermanent()) { continue; }               // ★ A：永久 ⇒ 永不倒数、永不"到期"
+>           if (buff.isEarlyBuff != early) { continue; }        // ★ B：只在它所属的那一半里 tick  ← **就是它**
+>           if (!buff.ticksOn(clockOwner)) { continue; }        // ★ C：计时不属于我 ⇒ 跳过
+>           boolean couldAct = buff.canAct();
+>           buff.tickEffect(instance);
+>           …
+>   ```
+>   ⇒ ⭐⭐⭐ **答案** ✓：`afterMove()` 里传 `early = false` ✓ ⇒ **只有 `isEarlyBuff == false` 的 buff 被递减** ✗
+>     ⇒ ⚠ 若【生息】的那条 buff 是**"早半天"**（`isEarlyBuff == true` ✗）⇒ ⭐ **它在 `afterMove()` 里被 `continue` 掉** ✗
+>       ⇒ ⭐ **从不递减** ✗ ⇒ ⭐ 而它**确实消失了** ✓ ⇒ ⭐ **只能是 `afterMove()` 第一行那句 `removeWithLifetime(TURN_END)`** ✓
+>         ⇒ ⭐⭐ **静默摘除、没有公告** ✓✓ —— **整条链闭合** ✓（⚠ 这也解释了 `1513` 为什么成功 ✗：它的 buff 属于后半天 ✓）。
+> * ⭐⭐ **下一轮第一步（一次改就得绿）** ✗：**判据里把"早半天"也推一次** ✓ —— 即同时调
+>   **`owner.getBuffManager().beforeMove()`** ✓（⚠ 本段在先前的 javadoc 里见过它 ✓：*"that one has already gone through
+>   `beforeMove()` / `afterMove()`"* ✓）⇒ ⭐ 那么【生息】会在**它的那一半**里递减 ⇒ 到期 ⇒ **公告** ⇒ **读者接住** ✓✓
+>   ⇒ 绿 ⇒ **变异（`turns: 2 → 3`）⇒ 全量 ⇒ 出货** ✓（⭐ 目标 ① 的第二个真读者 ✓）。
+> * ⭐ **顺带一条可复用的事实** ✓：**本项目里"限时状态"分早／晚两半递减** ✗ ⇒ ⭐ **判据推进回合时要两半都推** ✓
+>   （⚠ 而 `1513` 那次恰好只推后半天就成功 ⇒ 说明那次的 buff 是后半天 ✓）⇒ ⭐ **纪律（补）**：**判据推进一个回合 = `beforeMove()` ＋ `afterMove()`** ✓。
 > * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
