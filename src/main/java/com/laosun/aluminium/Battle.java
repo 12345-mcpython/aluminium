@@ -2616,8 +2616,10 @@ public class Battle {
         Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base);
         if (fixedCritRate != null) {
             // ⚠ A rate of 0.0 means "never crits" and must not REPORT a crit either (2026-10-02): the flag is what
-            // CRIT_DEALT and `isCrit()` read, so ``fixedCrit(true, 0)`` would multiply by 1.0 (numerically the same
+            // CRIT_DEALT and `isCrit()` read, so `fixedCrit(true, 0)` would multiply by 1.0 (numerically the same
             // damage) while telling every listener that a crit happened -- a wrong fact with no symptom.
+            // ⚠ Measured the same day: this flag does NOT move the number (a rider at `crit_rate: 0.0` settled the
+            // same 520.475168 either way), so the choice here is about the REPORT, not about the damage.
             extra.fixedCrit(fixedCritRate != 0.0, fixedCritDamage);
         }
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
