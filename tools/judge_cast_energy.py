@@ -126,9 +126,13 @@ for l in printed[:2]:
 if code != 0:
     for m in msgs[:3]:
         print('  XMLFAIL ' + m)
-    for l in out.split(NL):
-        if 'error:' in l or '错误' in l or '.java:' in l:
-            print('  DIAG ' + l.strip()[:190])
+    # ⚠ Print the WHOLE diagnostic, not just the headline: `错误: 找不到符号` is useless without the
+    # `符号:` / `位置:` lines beneath it (paid for three times: 759, 816, 818).
+    _out = out.split(NL)
+    for _i, l in enumerate(_out):
+        if '.java:' in l:
+            for _j in range(_i, min(len(_out), _i + 3)):
+                print('  DIAG ' + _out[_j].strip()[:200])
     bail('the judge is red')
 
 mut_old = '            damage.withCastEnergySpent(lastUltEnergySpent);'
