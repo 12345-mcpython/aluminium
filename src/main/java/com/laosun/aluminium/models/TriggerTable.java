@@ -940,16 +940,6 @@ public class TriggerTable {
      * ({@code TriggerContext.battle().getLastStateEndedName()}) rather than from the unit, because the state
      * is already gone by the time it fires -- which is exactly why the event carries the name.
      */
-    /**
-     * The keyword of the "that unit's health is at most X of its maximum" condition (2026-10-02).
-     *
-     * <p>The value is a FRACTION in (0, 1] -- the documents say "50%", the files say {@code 0.5}, exactly like
-     * every other percentage here. Boundary-guarded like the rest.
-     */
-    private static final Pattern HP_AT_MOST =
-            Pattern.compile("(?<![\\w])(?<subject>self|actor|target)_hp_at_most:(?<percent>[0-9.]+)",
-                    Pattern.CASE_INSENSITIVE);
-
     private static final Pattern STATE_ENDED_KEYWORD =
             Pattern.compile("(?<![\\w])state_ended(?![\\w])", Pattern.CASE_INSENSITIVE);
 
@@ -1216,21 +1206,6 @@ public class TriggerTable {
         // `has_state`: "<who> has_state <name>". Checked before the operator branch because this shape has
         // no symbol operator at all -- without it, "self has_state 协奏" would be reported as an unknown
         // shorthand, which sends the author looking in the wrong place.
-        Matcher hpAtMost = HP_AT_MOST.matcher(text);
-        if (hpAtMost.find()) {
-            String subject = normalize(hpAtMost.group("subject"));
-            double percent = Double.parseDouble(hpAtMost.group("percent"));
-            if (percent <= 0 || percent > 1) {
-                throw new IllegalArgumentException(
-                        "Condition '" + raw + "' states a health share of " + percent + ", but this is a FRACTION "
-                                + "(0.5 = 50%): the documents write percentages, the files write fractions, and a "
-                                + "whole number here would silently mean 100x too much "
-                                + "(source: " + spec.getSource() + ")");
-            }
-            return new HpAtMost(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), percent,
-                    raw, spec);
-        }
-
         Matcher stateEnded = STATE_ENDED_KEYWORD.matcher(text);
         if (stateEnded.find()) {
             String subject = normalize(text.substring(0, stateEnded.start()));
@@ -3035,51 +3010,6 @@ public class TriggerTable {
             }
             AttributeType type = AttributeType.fromString(attribute);
             return !who.getAttribute(type).filterBySource(DoubleValue.Modifier.ModifierSource.DEBUFF).isEmpty();
-        }
-
-        @Override
-        public String source() {
-            return raw;
-        }
-    }
-
-    /**
-     * 「当前生命值百分比小于等于 X」: the subject's health is at most X of its maximum
-     * (2026-10-02; readers: 1102's talent and trace, 1102's two "against a target at or below 80%", 1008's four,
-     * 1217's two, 1205's 无尽形寿).
-     *
-     * <p>⚠ The boundary is INCLUSIVE, because every one of those clauses says 「小于等于」.
-     */
-    private static final class HpAtMost implements Condition, PartyCondition {
-
-        private final String subject;
-        private final double percent;
-        private final String raw;
-
-        HpAtMost(String subject, double percent, String raw, TriggerSpec spec) {
-            this.subject = subject;
-            this.percent = percent;
-            this.raw = raw;
-        }
-
-        @Override
-        public CanHit partyOf(TriggerContext ctx) {
-            return switch (subject) {
-                case "self" -> ctx.owner();
-                case "actor" -> ctx.actor();
-                case "target" -> ctx.target();
-                default -> null;
-            };
-        }
-
-        @Override
-        public boolean test(TriggerContext ctx) {
-            CanHit unit = partyOf(ctx);
-            if (unit == null) {
-                return false;
-            }
-            double max = unit.getMaxHp();
-            return max > 0 && unit.getCurrentHp() / max <= percent;
         }
 
         @Override
