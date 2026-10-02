@@ -17793,6 +17793,20 @@
 >   **(B)** 给 **`MODIFY_ATTR`** 的 scale 表加 `event_amount` ✓（一行 ✓）⇒ 然后接 **`1413`**（⚠ 仍需先查【忆质】是否已声明 ✓）。
 >   ⭐ **建议先做 (B)** ✓：只有一行引擎改动 ✓，而 (A) 要动 `DAMAGE` 的计数语义 ✗（更大 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2118** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百一十一：⭐ 路径 (B) 的落点读到了 —— `MODIFY_ATTR` 的"取数"链在 `derivedMagnitude`（`:2170-2190`），只差**一支**）**：
+>
+> * ✅ **实测（读 `derivedMagnitude` ✓）** ✓：它按 `scale` 依次是 ——
+>   **`cast_energy_spent`** ✓（`:2170` ✓：`effect.getPercent() * spent + amount` ✓ —— ⭐ **这就是"每消耗 1 点"的现成先例** ✓，
+>   只是它的 `spent` 来自**本次施放的能量** ✗ 而不是**事件的量** ✗）、**`self_max_energy`** ✓（`:2177` ✓）、
+>   其余走 `scaleAttribute` ＋ `owner.getAttribute(...)` ✓（`:2182-2189` ✓）。
+>   ⇒ ⭐ **加 `event_amount` 就是在这条链里再插一支** ✓（`Math.abs(ctx.amount()) * percent + amount` ✓ —— 与 `grantAmount` 里那支同形 ✓），
+>   ⚠ 并且要**放在 `scaleAttribute` 之前** ✓（否则会像 `cast_energy_spent` 的注释说的那样 ✗：
+>     *"Before the attribute branch below, because this source is not an attribute and scaleAttribute would throw a message
+>     that reads like missing unit data"* ✓）。
+> * ⚠ **还差一处没读** ✗：`MODIFY_ATTR` **装载期认哪些 `scale`** ✗（`self_attr:` 前缀 ✓ ＋ 上面那两个 ✓ ⇒ 表在哪一行还没找 ✓）
+>   ⇒ ⭐ **下一轮第一步**：`grep 'MODIFY_ATTR'` 找到它的 `requireAmountOrScale(..., 那张表, ...)` 调用 ✓ ⇒ 把 `event_amount` 加进去 ✓
+>   ＋ 在 `derivedMagnitude` 加那一支 ✓ ⇒ 然后接 **`1413`**（⚠ 先查【忆质】是否已声明 ✓）⇒ 判据"损失 20 点 ⇒ 速度 +20%（percent 0.01）" ✓ ＋ 变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2118** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -18651,6 +18665,20 @@
 >     文档写"**每消耗 3 点**" ✓ ⇒ 一个 `per:` 字段最直 ✓）⇒ 然后接 **`1223`**（它的资源**已经在** ✓，一步到位 ✓）；
 >   **(B)** 给 **`MODIFY_ATTR`** 的 scale 表加 `event_amount` ✓（一行 ✓）⇒ 然后接 **`1413`**（⚠ 仍需先查【忆质】是否已声明 ✓）。
 >   ⭐ **建议先做 (B)** ✓：只有一行引擎改动 ✓，而 (A) 要动 `DAMAGE` 的计数语义 ✗（更大 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2118** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百一十一：⭐ 路径 (B) 的落点读到了 —— `MODIFY_ATTR` 的"取数"链在 `derivedMagnitude`（`:2170-2190`），只差**一支**）**：
+>
+> * ✅ **实测（读 `derivedMagnitude` ✓）** ✓：它按 `scale` 依次是 ——
+>   **`cast_energy_spent`** ✓（`:2170` ✓：`effect.getPercent() * spent + amount` ✓ —— ⭐ **这就是"每消耗 1 点"的现成先例** ✓，
+>   只是它的 `spent` 来自**本次施放的能量** ✗ 而不是**事件的量** ✗）、**`self_max_energy`** ✓（`:2177` ✓）、
+>   其余走 `scaleAttribute` ＋ `owner.getAttribute(...)` ✓（`:2182-2189` ✓）。
+>   ⇒ ⭐ **加 `event_amount` 就是在这条链里再插一支** ✓（`Math.abs(ctx.amount()) * percent + amount` ✓ —— 与 `grantAmount` 里那支同形 ✓），
+>   ⚠ 并且要**放在 `scaleAttribute` 之前** ✓（否则会像 `cast_energy_spent` 的注释说的那样 ✗：
+>     *"Before the attribute branch below, because this source is not an attribute and scaleAttribute would throw a message
+>     that reads like missing unit data"* ✓）。
+> * ⚠ **还差一处没读** ✗：`MODIFY_ATTR` **装载期认哪些 `scale`** ✗（`self_attr:` 前缀 ✓ ＋ 上面那两个 ✓ ⇒ 表在哪一行还没找 ✓）
+>   ⇒ ⭐ **下一轮第一步**：`grep 'MODIFY_ATTR'` 找到它的 `requireAmountOrScale(..., 那张表, ...)` 调用 ✓ ⇒ 把 `event_amount` 加进去 ✓
+>   ＋ 在 `derivedMagnitude` 加那一支 ✓ ⇒ 然后接 **`1413`**（⚠ 先查【忆质】是否已声明 ✓）⇒ 判据"损失 20 点 ⇒ 速度 +20%（percent 0.01）" ✓ ＋ 变异 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2118** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
