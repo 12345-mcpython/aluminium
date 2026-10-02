@@ -14957,6 +14957,50 @@
 >   **`target_else_random_enemy`** ✓、**`1220` 两个读者** ✓、**`ADD_ELEMENTAL_WEAKNESS`** ✓、**`RESET_TRIGGER_LIMIT`** ✓、
 >   **`per_subject`** ✓、**`cast_energy_spent`** ✓；⭐ **累计修正 27 条陈旧／不完整声明** ✓。
 
+
+> **2026-09-30 更新（aggro 回收之七百七十六：⭐ `random_ally` 的五处落点已勘察完；⚠ 三个「防静默」的表）**：
+>
+> * ⭐ **为什么做它**：⚠ 光锥登记表 4 条**全都缺一个目标选择器** ✓（⚠ `_unmodelled.json` 的 `reason` 都以
+>   ⚠ *GREPPED 2026-09-30: searched TriggerInterpreter.TARGET_SELECTORS* ✗ 开头 ✓）⚠ 而 ⚠ 最清楚的是 **`21021` 酣适** ✓：
+>   ⚠ 「当装备者的**回合开始时**，**随机**为 1 个**当前能量百分比小于 50%** 的**我方其他目标**恢复 **8** 点能量」✗
+>   ⇒ ⚠ 缺的是 ⚠ **「从 `other_allies` 里随机取一个满足筛选的」** ✗ —— ⛔ **不是「没有我方选择器」** ✓
+>   （⚠ `other_allies` **在**表里 ✓）。
+> * ⭐⭐ **模板齐全（⚠ 全部已实测读过 ✓）**：
+>   * ⚠ **「先筛后掷」已经实现过** ✗ ⚠ `TriggerInterpreter:1312-1319` ✗ —— ⚠ 注释原话：⚠ *RESOLVES AND ONLY THEN
+>     APPLIES THE EFFECT TARGET_WHEN, SO A ROLL LANDING ON AN EXCLUDED UNIT WOULD SIMPLY BE DROPPED INSTEAD OF
+>     RE-ROLLED* ✓ ⇒ ⚠ 即 ⚠ 那个坑**踩过并修好** ✓ ⇒ ⚠ `21021` **同形** ✓；
+>   * ⚠ **两个「我方目标」的实现** ✗ ⚠ `nextAllyToAct` ✗（⚠ `:1329` ✓，⚠ 队列序 ✓）⚠ 与 ⚠ `partyFirst` ✗
+>     （⚠ `:1352` ✓，⚠ `battle.characters.getFirst()` ✓）；
+>   * ⚠ **单目标 switch** ✗ ⚠ `resolveTarget` ✗（⚠ `:1360` ✓）⚠ 每个选择器一个 `case` ✓ ⚠ 用 ⚠ `require(…)` ✗；
+>   * ⚠ **列表侧** ✗ ⚠ `resolveTargets` ✗（⚠ `:1413` ✓）⚠ 走 ⚠ `resolveTargetsUnfiltered` ✗ ⚠ 然后套 ⚠ `ctx.targetFilter` ✗
+>     ⇒ ⚠ 所以 ⚠ **筛在列表层** ✗ ⚠ 而 ⚠ `resolveTarget` 的随机**必须自己筛** ✓。
+> * ⭐⭐⭐ **五处落点** ✗：
+>   1. ⚠ `TARGET_SELECTORS` ✗（⚠ `:144` ✓）⚠ 加名字 ✓；
+>   2. ⚠ `resolveTarget` ✗ 的 `case`（⚠ 单目标 ✓）⚠ 照 ⚠ `:1378` ✗；
+>   3. ⚠ `resolveTargetsUnfiltered` ✗ 的 `case`（⚠ 列表 ✓）；
+>   4. ⚠ 一个方法 ✗ ⚠ 照 ⚠ `:1315-1319` ✓（⚠ **先筛后掷** ✓：⚠ `.filter(allies::contains)` ✓ ⚠ ＋ ⚠ `.filter(能量阈值)` ✓
+>      ⚠ ＋ ⚠ `rng.nextInt(size)` ✓）；
+>   5. ⚠ 一个字段承载阈值 ✗（⚠ 能量百分比 < X ✓ —— ⚠ 照 ⚠ `per_stack` ✗ 的形态 ✓）⚠ —— ⚠ 因为 ⚠ 阈值**不随阶变** ✓
+>      ⚠ 但 ⚠ **写死就是近似** ✗（⚠ 别处若用同一选择器 ✓）。
+> * ⭐⭐ **而 `default ->` 那一支会替我发现遗漏** ✗（⚠ `:1391-1393` ✓）：⚠ 它抛 ⚠ *「… can reach several units:
+>   it needs an op that takes a list, not one that resolves a single target」* ✓ ⇒ ⚠ **只加一处漏一处**会响亮失败**** ✓
+>   ⚠ 而不是静默 ✓。
+> * ⭐⭐⭐ **三个「防静默」的表（⚠ 本段最一致的观察 ✓）**：⚠ `TARGET_SELECTORS` ✗ 的注释原话说得最清楚 ✓
+>   ⚠ *「This set exists to close a SILENT-TYPO HOLE: the resolver used to fall back to the owner for anything it
+>   did not recognise, so a misspelled target behaved exactly like self — A WRONG ANSWER THAT REPORTS NOTHING」* ✓；
+>   ⚠ 同类还有 ⚠ `scale` ✗ 的闭集（⚠ `:256` ✓）⚠ 与 ⚠ `default ->` ✗ 那一支 ✓ ⇒ ⭐ **共同形态**：
+>   ⚠ **「不认识的东西不许有默认行为」** ✗ ✓ —— ⚠ 而 ⚠ 我**三次**误读这些表 ✓（⚠ 792 ✓／854 ✓／856 ✓），
+>   ⚠ 根因都是 ⚠ **以为它们在描述「能做什么」，⚠ 其实它们在**禁止「悄悄做错」**** ✓。
+> * ⚠ **仍欠**：⚠ ① `21021` 的五处 ✓（⚠ 如上 ✓）；⚠ ② 光锥登记表另 3 条 ✓（20023／21032／21038 ✓）；
+>   ⚠ ③ 遗器 `132` ✓（⚠ 需「减防状态」条件 ＋ 「我造成了减防」事件 ✓ —— ⚠ 登记表说它**复查过且阻碍仍在** ✓）；
+>   ⚠ ④ `1006` 战技五件 ✓；⚠ ⑤ `1405` ✓；⚠ ⑥ `23050` 的「添加弱点时」事件 ✓；⚠ ⑦ `1221` 的 `attacker` 版 ✓。
+> * **实测**：全量 0、闸门 [0, 0]、树干净、已推送（`b863ccf` ✓）；
+>   角色 93 / 93、光锥 165 / 169（登记表 4 条 ✓）、遗器 59 规则文件 ＋ 登记表 1 条（`132` ✓）。
+> * ⭐ **本段十五件全部含实测变异证明** ✓：`CAST_SETUP` 携带被瞄准者 ✓、`next_ally` ✓、`is_party_first` ＋ `party_first` ✓、
+>   同行组两关键词 ✓、`self_energy_percent` ✓、**`times`** ✓、**`1306` 精确化** ✓、**`1312` 精确化** ✓、**键名守卫** ✓、
+>   **`target_else_random_enemy`** ✓、**`1220` 两个读者** ✓、**`ADD_ELEMENTAL_WEAKNESS`** ✓、**`RESET_TRIGGER_LIMIT`** ✓、
+>   **`per_subject`** ✓、**`cast_energy_spent`** ✓；⭐ **累计修正 27 条陈旧／不完整声明** ✓。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 > **2026-09-29 第二十五条更新（`from_skill` 修复的**行为变更审计**）**：修好发射处之后，**6 条已出货规则从"死"变"活"** ✓。审计用**词边界**匹配 ✓（第一遍用子串，把 `1301` 的 `from_skill_id` 误报成 `from_skill` ✗ ⇒ 假阳性 ✗）。清单：
