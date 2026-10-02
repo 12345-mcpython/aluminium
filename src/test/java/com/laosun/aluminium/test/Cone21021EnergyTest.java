@@ -71,5 +71,33 @@ public class Cone21021EnergyTest {
     // "什么都不做"，而 require 把它当成了错误。⚠ 那句话是**泛型消息**（一个共用的助手对所有选择器说同一句），
     // 所以它把诊断引向了"事件类型不对" —— 实测证明那不对（'不装光锥' 的对照得到 0，说明那 8 点确实来自本从句）。
     //
-    // 缺口已入册；在它被补上之前，这个场景留着只会让套件红。上面那条断言与它无关，且已实测通过。
+    // 缺口已补（`8c2ba29`：`resolveTargets` 对这一个名字返回空列表，照 `lowest_hp_ally` 的先例），
+    // 所以这个场景回来了 —— 而它是**唯一**能让变异必红的那一个，见下面的注释。
+    @Test
+    public void aLoneLowWearerIsStillExcluded() {
+        Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21021, LEVEL, false, 1));
+        Character a = CharacterFactory.create(ALLY_LOW, LEVEL);
+        Character b = CharacterFactory.create(ALLY_FULL, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(wearer, a, b), List.of(enemy), new Random(0));
+        battle.startBattle();
+
+        wearer.setCurrentEnergy(wearer.getMaxEnergy() * 0.3);   // ⚠ 唯一低于 50% 的
+        a.setCurrentEnergy(a.getMaxEnergy());
+        b.setCurrentEnergy(b.getMaxEnergy());
+
+        double w0 = wearer.getCurrentEnergy();
+        double a0 = a.getCurrentEnergy();
+        double b0 = b.getCurrentEnergy();
+        battle.fireTriggers(TriggerEvent.TURN_START, wearer, enemy, 0, 0);
+        double w = wearer.getCurrentEnergy() - w0;
+        double x = a.getCurrentEnergy() - a0;
+        double y = b.getCurrentEnergy() - b0;
+        System.out.println("[21021] lone-low wearer=" + w + " allyA=" + x + " allyB=" + y);
+        // ⚠ 这个场景是**变异探测**用的：合格集里只有装备者一个候选（队友都满），于是"排除装备者"与
+        // "低于 50%"这两条无论哪一条被拆掉，候选都会变成那一个 —— 随机在这里退化成确定，增量不再是 0。
+        Assertions.assertEquals(0.0, w, 1e-9, "the wearer is never a candidate, low or not");
+        Assertions.assertEquals(0.0, x, 1e-9, "an ally at full energy is above the threshold");
+        Assertions.assertEquals(0.0, y, 1e-9, "and so is the other one");
+    }
 }
