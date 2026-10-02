@@ -16935,7 +16935,33 @@
 >   ＋ `TriggerContext` 加**状态名**字段 ✓ ⇒ 才轮到 `tickBuff` 里"先取名再摘"发事件 ✓。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2114** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
 
+> **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
+>
+> * ✅ **实测（读 `TriggerContext` 的定义 ✓）** ✓：它是一个 **record** ✓，规范构造器有 **13 个分量** ✓
+>   （`owner／actor／target／hitCount／amount／damage／battle／fromCast／ruleId／targetFilter／skillId／weakHitCount／attackHitTargets` ✓，`:1976` ✓），
+>   下面还有**若干便利构造器** ✓（例：8 分量的那条 ✓，`:1984` ✓）。
+>   ⇒ ⭐ **加第 14 个分量（状态名）会牵动每一条便利构造器** ✓（它们都要多传一个 `null` ✓）
+>   ⇒ ⚠ 这正是"**改动不要按字面搜、要按结构改**"那条教训的下一处 ✓：**先把便利构造器数清楚** ✓，再一次性加分量 ＋ 给每条补 `null` ＋ 新增一条**带状态名**的便利构造器 ✓（tick 路径用它 ✓）。
+> * ✅ **本轮已进树** ✓：`TriggerEvent.STATE_ENDED("STATE_ENDED", true)` ✓（紧邻 `DEBUFF_APPLIED` ✓，附注写明
+>   ⚠ **名字必须随事件走、不能从持有者身上读**（发事件时状态已经摘掉了 ⇒ `has_state` 永远为假 ✓）＋ 五个读者点名 ✓）。
+>   纯加声明、暂无人发 ✓ ⇒ 判据 = 全量 **2114 例绿** ✓。
+> * ⭐ **下一步（第 2b 步，已具名）** ✗：`grep -c "this(" TriggerTable.java` 数清便利构造器 ✓ ⇒ 加 `String stateName` 分量 ✓ ⇒
+>   逐条补 `null` ✓ ⇒ 加一条带名字的便利构造器 ✓ ⇒ 然后才是 `tickBuff` 里"**先取名再摘**"发事件 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
+> **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
+>
+> * ✅ **实测（读 `TriggerContext` 的定义 ✓）** ✓：它是一个 **record** ✓，规范构造器有 **13 个分量** ✓
+>   （`owner／actor／target／hitCount／amount／damage／battle／fromCast／ruleId／targetFilter／skillId／weakHitCount／attackHitTargets` ✓，`:1976` ✓），
+>   下面还有**若干便利构造器** ✓（例：8 分量的那条 ✓，`:1984` ✓）。
+>   ⇒ ⭐ **加第 14 个分量（状态名）会牵动每一条便利构造器** ✓（它们都要多传一个 `null` ✓）
+>   ⇒ ⚠ 这正是"**改动不要按字面搜、要按结构改**"那条教训的下一处 ✓：**先把便利构造器数清楚** ✓，再一次性加分量 ＋ 给每条补 `null` ＋ 新增一条**带状态名**的便利构造器 ✓（tick 路径用它 ✓）。
+> * ✅ **本轮已进树** ✓：`TriggerEvent.STATE_ENDED("STATE_ENDED", true)` ✓（紧邻 `DEBUFF_APPLIED` ✓，附注写明
+>   ⚠ **名字必须随事件走、不能从持有者身上读**（发事件时状态已经摘掉了 ⇒ `has_state` 永远为假 ✓）＋ 五个读者点名 ✓）。
+>   纯加声明、暂无人发 ✓ ⇒ 判据 = 全量 **2114 例绿** ✓。
+> * ⭐ **下一步（第 2b 步，已具名）** ✗：`grep -c "this(" TriggerTable.java` 数清便利构造器 ✓ ⇒ 加 `String stateName` 分量 ✓ ⇒
+>   逐条补 `null` ✓ ⇒ 加一条带名字的便利构造器 ✓ ⇒ 然后才是 `tickBuff` 里"**先取名再摘**"发事件 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
