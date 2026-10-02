@@ -2203,6 +2203,20 @@ public final class TriggerInterpreter {
             return effect.getPercent() * Math.abs(ctx.amount())
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (effect.getScale().trim().startsWith(ABOVE_PREFIX)) {
+            // ⭐ 「速度大于等于 120 时…之后**每超过 1 点速度**…」 (2026-10-02): the EXCESS over a
+            // stated threshold, as a magnitude. ⚠ `self_max_energy` below is the same shape with the threshold
+            // hard-wired to MAX ENERGY; this is that, parameterised.
+            String[] parts = effect.getScale().trim().substring(ABOVE_PREFIX.length()).split(":", 2);
+            if (parts.length != 2) {
+                throw new IllegalStateException("the scale \"" + effect.getScale()
+                        + "\" must state <ATTRIBUTE>:<threshold>, e.g. self_attr_above:SPEED:120");
+            }
+            AttributeType over = AttributeType.fromString(parts[0].trim());
+            double threshold = Double.parseDouble(parts[1].trim());
+            double excess = Math.max(0, owner.getAttribute(over).get() - threshold);
+            return effect.getPercent() * excess + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
@@ -2234,7 +2248,7 @@ public final class TriggerInterpreter {
     private static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
-        if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw)) {
+        if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)) {
             return null;                      // handled by derivedMagnitude; not an AttributeType
         }
         if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
@@ -2606,6 +2620,14 @@ public final class TriggerInterpreter {
      * is deliberately not an {@code AttributeType}.
      */
     private static final String EVENT_AMOUNT = "event_amount";
+
+    /**
+     * 「速度大于等于 X 时…每超过 1 点速度…」 (2026-10-02): {@code self_attr_above:<ATTRIBUTE>:<threshold>}.
+     *
+     * <p>Like {@link #SELF_MAX_ENERGY} — the same shape, with the threshold stated instead of implied by the
+     * energy cap — and, like it, not an {@code AttributeType}.
+     */
+    private static final String ABOVE_PREFIX = "self_attr_above:";
 
 
     /**
