@@ -64,5 +64,21 @@
     ],
     "source": "1211 白露 技能表的**等级口径**: 文档引用的是 Lv10 行（战技 11.70%/312、终结技 13.50%/360、天赋 5.40%/144 都是该行）",
     "note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing (her Skill and ultimate are `Restore` skills whose rows it reads): without it those heals would use the Lv1 rows. The rule above states its own magnitude (a 10% reduction and a 2-turn state) and is unaffected. ⚠ **Not classified yet in this file** — the rest of her document, each with its blocker: 战技「然后白露**随机**为我方单体进行 2 次治疗，每提供 1 次治疗，下一次治疗回复的生命值会降低 15%」 (a random target sequence with a decaying multiplier — no vocabulary for either half), 天赋「拥有【生息】的我方目标，在受到攻击后会回复…**该效果可以触发 2 次**」 (the heal itself is expressible, but the *count* is not: without it the heal would fire on every hit, which is a wrong number rather than a missing one — so the clause is registered whole), 天赋「当白露的队友受到**致命攻击**时…不会陷入无法战斗状态…单场战斗中可以触发 1 次」 (death prevention), 行迹 持明龙脉「【生息】效果的触发次数增加 1 次」 (rides on that count), and 星魂 1–6 / the 秘技 (not yet read clause by clause)."
+  },
+  {
+    "on": "STATE_ENDED",
+    "id": "trace_invigoration_ending_energy",
+    "when": [
+      "self state_ended 生息"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 8.0,
+        "target": "self"
+      }
+    ],
+    "source": "1211 白露：【生息】结束时恢复 8 点能量。",
+    "note": "⭐ 用 `Battle.fireStateEnded` 测“能量能不能到位”。"
   }
 ]
