@@ -65,7 +65,7 @@ if t.count(old_val) != 1:
 t = t.replace(old_val, new_val, 1)
 
 # 4) the closed set
-old_wired = 'private static final Map<TriggerEvent, List<CompiledRule>> byEvent = new HashMap<>();'
+old_wired = 'private final Map<TriggerEvent, List<CompiledRule>> byEvent = new HashMap<>();'
 new_wired = (old_wired + NL + NL
              + '    /** Who a per-turn or cooldown count may belong to when it is not the rule owner. */' + NL
              + '    private static final java.util.Set<String> SUBJECTS = java.util.Set.of("self", "target", "actor");')
