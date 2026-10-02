@@ -45,7 +45,7 @@ public class LightConeRegistryTest {
     public void everyRegisteredLightConeIsUnwrittenAndSaysWhy() {
         Map<String, List<Map<String, Object>>> reg = registry();
         Assertions.assertEquals(
-                new TreeSet<>(java.util.List.of("20023", "21021", "21032", "21038")),
+                new TreeSet<>(java.util.List.of("20023", "21032", "21038")),
                 new TreeSet<>(reg.keySet()),
                 "the registered set is pinned: a new cone must be added here, a built one removed");
         for (Map.Entry<String, List<Map<String, Object>>> e : reg.entrySet()) {
