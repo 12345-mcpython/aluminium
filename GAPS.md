@@ -20263,6 +20263,27 @@
 >   ② 若确认扣的是**持有者自己的** ⇒ ⭐ 把"待演"从 **派对**改成**她自己**的资源 ✓（`scope` 去掉或改 `SELF` ✓）⇒ 重跑判据 ⇒ 绿则变异 ✓。
 > * ⭐ **顺带**：这条错误**再一次**证明"**开始半真的生效了**" ✓（否则走不到扣减 ✓）⇒ ⭐ 内容的四步里**前两步已被实测确认** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（判据与内容都已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十七：✅✅ **扣减走的是"持有者自己的资源表"**（`holder.getResources()` ✓）⇒ ⭐ 修法两条，任选其一，都只改内容）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.spendResource` ✓，`:1388` ✓）** ✓ 关键几行：
+>   ```java
+>   CanHit holder = resolveTarget(effect, ctx);
+>   String id = effect.getResource();
+>   int amount = Boolean.TRUE.equals(effect.getSpendAll())
+>           ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)
+>           : (int) Math.round(scaledAmount(effect, ctx));
+>   if (!holder.getResources().has(id)) { throw new IllegalStateException("SPEND_RESOURCE '" + id + "' but " + holder.getName() + " has no such resource"); }
+>   if (!holder.getResources().spendExactly(id, amount)) { … }
+>   ```
+>   ⇒ ⭐⭐ **两个事实** ✓：**(i)** `SPEND_RESOURCE` 只认 **`holder.getResources()`** ✓（持有者**自己的**表 ✓ —— ⚠ 与我猜的 (乙) **一致** ✓）；
+>     **(ii)** ⭐ **`spendAll` 那条分支**正好用 `holder.getResources()` ✓（本段出货的 `1513` 用法 ✓）⇒ ⚠ 它能跑通说明**"她自己的表里"确实有"热意"** ✓。
+> * ⭐⭐ **于是修法（内容层，二选一）** ✗：
+>   **(甲)** ⭐ **把「待演」从派对资源改成她自己的普通资源** ✓（⚠ 去掉 `"scope": "PARTY"` ✓ ⇒ 它就进 `holder.getResources()` ✓）
+>     ⇒ ⚠ 代价：**别的角色看不到它** ✗（⚠ 但本设计里**只有她自己在记账** ✓ ⇒ 完全够用 ✓）；
+>   **(乙)** 或者查 **`Battle.registerPartyResources`（`:701` ✓）为什么没把它注入她的表** ✗（⚠ 也可能是"派对资源**只用于 `GAIN`／`value`** ✓ 而**不能 `SPEND`** ✗" —— ⭐ 那也算一条**引擎约束** ✓，值得登记 ✓）。
+> * ⭐ **下一轮第一步（先 (甲)，最快）** ✗：改声明（去 `scope`）⇒ 重放 ＋ 跑判据 ⇒ ⭐ 若绿 ⇒ **变异（去掉 `REMOVE_STATE` ⇒ 全量必红）** ⇒ 这件出货 ✓；
+>   ⚠ 若 (甲) 仍报错 ⇒ 再读 (乙) ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23592,6 +23613,27 @@
 >   ② 若确认扣的是**持有者自己的** ⇒ ⭐ 把"待演"从 **派对**改成**她自己**的资源 ✓（`scope` 去掉或改 `SELF` ✓）⇒ 重跑判据 ⇒ 绿则变异 ✓。
 > * ⭐ **顺带**：这条错误**再一次**证明"**开始半真的生效了**" ✓（否则走不到扣减 ✓）⇒ ⭐ 内容的四步里**前两步已被实测确认** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（判据与内容都已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十七：✅✅ **扣减走的是"持有者自己的资源表"**（`holder.getResources()` ✓）⇒ ⭐ 修法两条，任选其一，都只改内容）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.spendResource` ✓，`:1388` ✓）** ✓ 关键几行：
+>   ```java
+>   CanHit holder = resolveTarget(effect, ctx);
+>   String id = effect.getResource();
+>   int amount = Boolean.TRUE.equals(effect.getSpendAll())
+>           ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)
+>           : (int) Math.round(scaledAmount(effect, ctx));
+>   if (!holder.getResources().has(id)) { throw new IllegalStateException("SPEND_RESOURCE '" + id + "' but " + holder.getName() + " has no such resource"); }
+>   if (!holder.getResources().spendExactly(id, amount)) { … }
+>   ```
+>   ⇒ ⭐⭐ **两个事实** ✓：**(i)** `SPEND_RESOURCE` 只认 **`holder.getResources()`** ✓（持有者**自己的**表 ✓ —— ⚠ 与我猜的 (乙) **一致** ✓）；
+>     **(ii)** ⭐ **`spendAll` 那条分支**正好用 `holder.getResources()` ✓（本段出货的 `1513` 用法 ✓）⇒ ⚠ 它能跑通说明**"她自己的表里"确实有"热意"** ✓。
+> * ⭐⭐ **于是修法（内容层，二选一）** ✗：
+>   **(甲)** ⭐ **把「待演」从派对资源改成她自己的普通资源** ✓（⚠ 去掉 `"scope": "PARTY"` ✓ ⇒ 它就进 `holder.getResources()` ✓）
+>     ⇒ ⚠ 代价：**别的角色看不到它** ✗（⚠ 但本设计里**只有她自己在记账** ✓ ⇒ 完全够用 ✓）；
+>   **(乙)** 或者查 **`Battle.registerPartyResources`（`:701` ✓）为什么没把它注入她的表** ✗（⚠ 也可能是"派对资源**只用于 `GAIN`／`value`** ✓ 而**不能 `SPEND`** ✗" —— ⭐ 那也算一条**引擎约束** ✓，值得登记 ✓）。
+> * ⭐ **下一轮第一步（先 (甲)，最快）** ✗：改声明（去 `scope`）⇒ 重放 ＋ 跑判据 ⇒ ⭐ 若绿 ⇒ **变异（去掉 `REMOVE_STATE` ⇒ 全量必红）** ⇒ 这件出货 ✓；
+>   ⚠ 若 (甲) 仍报错 ⇒ 再读 (乙) ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
