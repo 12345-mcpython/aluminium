@@ -19298,6 +19298,33 @@
 >   ⇒ ⭐ 所以真正的第一步应当先**数清**这些角色里"第二条被替换"的**实际后果** ✓（⚠ 也许有些本来就该生效 ✓，
 >     那正是本缺口的价值 ✓；也许有些是**刻意覆盖** ✓ ⇒ 那就不能一刀切 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净 ✓、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百九十五：✅✅✅ **根因找到，而且它是**刻意的、有两个判据钉着**的** —— `addBuff` 遇 `isSameKind` **先摘旧的再挂新的**；⭐ 而"要叠加"走的是**另一条路**（`isStackable`／`stackGroupKey`））**：
+>
+> * ✅ **实测（读 `BuffManager.addBuff` ✓，`:58`–`:75` ✓）** ✓：
+>   ```java
+>   public void addBuff(AbstractBuff buff) {
+>       if (buff.isStackable()) { addStackable(buff); return; }        // ⭐ 要"叠加"的走这条
+>       for (int i = buffs.size() - 1; i >= 0; i--) {
+>           AbstractBuff existed = buffs.get(i);
+>           if (existed.isSameKind(buff)) { removeBuff(existed); }      // ⛔ 同 kind ⇒ 先摘旧的 ⇒ 后挂的替换它
+>       }
+>       buffs.add(buff); buff.applyEffect(instance);
+>   }
+>   ```
+>   ＋ ⭐⭐ **紧跟着的注释就是设计说明** ✓（`:82`–`:85` ✓）原文：*"**`isSameKind` answers 'should re-applying this replace
+>   the old one?', and the engine's answer has always been yes** — `BuffManagerTest.sameKindBuffRefreshesInsteadOfStacking`
+>   和 `BuffRuleTest.theSameBuffAgainRefreshesInsteadOfStacking` **pin exactly that**. **Stacking is a different question**
+>   ('should these accumulate?'), so it is answered by a different predicate (`isStackable` / `stackGroupKey`)…"* ✓
+> * ⭐⭐⭐ **所以定性结束** ✓：**这不是缺陷** ✓ —— "同 kind 刷新而非叠加"是**刻意**的 ✓，而且**有两个既有判据钉着** ✓
+>   ⇒ ⛔ 我上一轮设想的"改引擎让同属性多实例共存"会**直接推翻那两个判据** ✗ ⇒ ⭐ **按纪律：不改** ✓（改判据去迁就新行为是本项目最忌的 ✓）。
+> * ⭐ **而"两条都要算"的正确写法，就写在那段注释里** ✓：**走 `isStackable`** ✓ ⇒ ⭐ **内容侧的正解 = 给该 `MODIFY_ATTR` 写 `max_stacks`** ✓
+>   （⚠ 我上一轮的两个探针**都没写 `max_stacks`** ✗ ⇒ 它们走的正是"替换"那条路 ✓ ⇒ 所以读出 0.2 完全**符合设计** ✓）。
+> * ⭐ **下一轮第一步（一次验证，且能直接出货）** ✗：探针改成**两条规则各带 `max_stacks`** ✓ ⇒ 断言 **0.4** ✓
+>   ⇒ 然后 ⭐ **把 `1415:823` 的行迹接回** ✓（写法 = `max_stacks: 1`？✗ 还是别的值要看她的句意 ✓：行迹说"提高 20%"✓，
+>     不涉及层数 ✓ ⇒ ⚠ 那"叠加"到底靠什么 ✗ 要读 `isStackable`／`stackGroupKey` 的判定条件 ✓ —— **这一问在下一次** ✓）。
+> * ⭐ **同时记下一条内容纪律** ✓：**凡"同一属性上有两个来源"的规则，都要问一句"它们该叠加吗"** ✓；
+>   该叠加 ⇒ **必须走 `isStackable` 那条路** ✓（⚠ 而不是指望"换个 buff 名" ✗ —— 那个已证伪 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -21662,6 +21689,33 @@
 >   ⇒ ⭐ 所以真正的第一步应当先**数清**这些角色里"第二条被替换"的**实际后果** ✓（⚠ 也许有些本来就该生效 ✓，
 >     那正是本缺口的价值 ✓；也许有些是**刻意覆盖** ✓ ⇒ 那就不能一刀切 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净 ✓、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百九十五：✅✅✅ **根因找到，而且它是**刻意的、有两个判据钉着**的** —— `addBuff` 遇 `isSameKind` **先摘旧的再挂新的**；⭐ 而"要叠加"走的是**另一条路**（`isStackable`／`stackGroupKey`））**：
+>
+> * ✅ **实测（读 `BuffManager.addBuff` ✓，`:58`–`:75` ✓）** ✓：
+>   ```java
+>   public void addBuff(AbstractBuff buff) {
+>       if (buff.isStackable()) { addStackable(buff); return; }        // ⭐ 要"叠加"的走这条
+>       for (int i = buffs.size() - 1; i >= 0; i--) {
+>           AbstractBuff existed = buffs.get(i);
+>           if (existed.isSameKind(buff)) { removeBuff(existed); }      // ⛔ 同 kind ⇒ 先摘旧的 ⇒ 后挂的替换它
+>       }
+>       buffs.add(buff); buff.applyEffect(instance);
+>   }
+>   ```
+>   ＋ ⭐⭐ **紧跟着的注释就是设计说明** ✓（`:82`–`:85` ✓）原文：*"**`isSameKind` answers 'should re-applying this replace
+>   the old one?', and the engine's answer has always been yes** — `BuffManagerTest.sameKindBuffRefreshesInsteadOfStacking`
+>   和 `BuffRuleTest.theSameBuffAgainRefreshesInsteadOfStacking` **pin exactly that**. **Stacking is a different question**
+>   ('should these accumulate?'), so it is answered by a different predicate (`isStackable` / `stackGroupKey`)…"* ✓
+> * ⭐⭐⭐ **所以定性结束** ✓：**这不是缺陷** ✓ —— "同 kind 刷新而非叠加"是**刻意**的 ✓，而且**有两个既有判据钉着** ✓
+>   ⇒ ⛔ 我上一轮设想的"改引擎让同属性多实例共存"会**直接推翻那两个判据** ✗ ⇒ ⭐ **按纪律：不改** ✓（改判据去迁就新行为是本项目最忌的 ✓）。
+> * ⭐ **而"两条都要算"的正确写法，就写在那段注释里** ✓：**走 `isStackable`** ✓ ⇒ ⭐ **内容侧的正解 = 给该 `MODIFY_ATTR` 写 `max_stacks`** ✓
+>   （⚠ 我上一轮的两个探针**都没写 `max_stacks`** ✗ ⇒ 它们走的正是"替换"那条路 ✓ ⇒ 所以读出 0.2 完全**符合设计** ✓）。
+> * ⭐ **下一轮第一步（一次验证，且能直接出货）** ✗：探针改成**两条规则各带 `max_stacks`** ✓ ⇒ 断言 **0.4** ✓
+>   ⇒ 然后 ⭐ **把 `1415:823` 的行迹接回** ✓（写法 = `max_stacks: 1`？✗ 还是别的值要看她的句意 ✓：行迹说"提高 20%"✓，
+>     不涉及层数 ✓ ⇒ ⚠ 那"叠加"到底靠什么 ✗ 要读 `isStackable`／`stackGroupKey` 的判定条件 ✓ —— **这一问在下一次** ✓）。
+> * ⭐ **同时记下一条内容纪律** ✓：**凡"同一属性上有两个来源"的规则，都要问一句"它们该叠加吗"** ✓；
+>   该叠加 ⇒ **必须走 `isStackable` 那条路** ✓（⚠ 而不是指望"换个 buff 名" ✗ —— 那个已证伪 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
