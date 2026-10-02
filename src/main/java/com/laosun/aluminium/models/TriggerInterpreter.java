@@ -2208,7 +2208,12 @@ public final class TriggerInterpreter {
         if (only != null && damage.getType() != only) {
             return;
         }
-        damage.addBoost(effect.getPercent());
+        // ⭐ Both a stated `scale` and a stated ceiling must be read (2026-09-30; reader: light cone 23062).
+        // ⚠ This method once ignored `damage_type` the same way -- see the comment above, round 258.
+        double magnitude = effect.getScale() == null || effect.getScale().isBlank()
+                ? effect.getPercent()
+                : derivedMagnitude(effect, ctx);
+        damage.addBoost(applyDerivedCeiling(effect, ctx, magnitude));
     }
 
     /**
