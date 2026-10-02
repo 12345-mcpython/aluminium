@@ -19254,6 +19254,32 @@
 > * ⭐ **纪律再加一条（本段第九条）** ✗：**比率属性上的 `amount` 不是点数** ✗ ⇒ ⭐ **凡是用 `amount` 抬一个百分比属性，
 >   都要把"抬后实测值"写进注释** ✓（⚠ 我这一轮差点把"210"当成事实写进记录 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百九十三：✅✅✅ **机制与**修法**同时找到了** —— `MODIFY_ATTR` 带时长时**创建的是一个具名 buff**；⭐ 而**注释自己写着**："不给名字 ⇒ 在 `REMOVE_STATE` 那个循环里**会被跳过**"）**：
+>
+> * ✅ **实测（读 `modifyAttr` 的后半 ✓，`:2085`–`:2125` ✓）** ✓ 关键几行：
+>   ```java
+>   AbstractBuff buff = withSource(withTickOwner(
+>           withLifetime(statModifier(attribute, applied, turns, permanent, maxStacks, derived), effect),
+>           effect, ctx), ctx);
+>   …
+>   if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
+>       buff.setBuffName(effect.getBuff().trim());          // ← ★ 内容可以给这个修饰符**起名**
+>   }
+>   attachRolled(battle, target, buff, effect, ctx);
+>   ```
+>   ＋ 注释原文：*"Naming the modifier is what lets `REMOVE_STATE <the same name>` take it off; ⚠ **without a name the
+>   modifier is skipped by that loop**, i.e. unnamed boosts keep exactly the lifetime they always had."* ✓
+> * ⭐⭐ **于是"同属性第二条读不出"的机制清楚了** ✓：**属性修饰符＝一个 buff** ✓，而**不带名字**时它按
+>   **属性/buff 类**被记账 ✗ ⇒ ⭐ **第二条同属性的无名修饰符与第一条"同一身份"** ✗ ⇒ **被替换而不是相加** ✓
+>   （⚠ 与 `compute()` **相加** 并不矛盾 ✓：**没进到列表** ≠ "进了却不加" ✓ —— 我上一轮的订正是对的 ✓，这一轮补上了**它没进去的原因** ✓）。
+> * ⭐⭐⭐ **而修法**就写在同一段注释里** ✓：**给每条规则一个 `buff` 名** ✓ —— ⚠ 这本项目**已有先例** ✓：
+>   `1306` 的规则写着 `"buff": "叙述性诡计"` ✓ ⇒ ⭐ **所以这很可能根本不用改引擎** ✗：**内容侧加一个 `buff` 名即可并存** ✓✓。
+> * ⭐ **下一轮第一步（三步，都能出货）** ✗：
+>   ① **验证**：在干净表上给两条 +20% 各起一个 `buff` 名 ✓ ⇒ 断言 **0.4** ✓（⚠ 照本段写死的"能指出改动哪个数会变红" ✓：
+>      改的就是那两个 `buff` 名 ✓）；
+>   ② **把 `1415:823` 的行迹重新接回** ✓（⚠ 撤下的原因**消失**了 ✓：给它一个 `buff` 名 ✓）＋ 判据（整表 ✓、总量 0.4 ✓）＋ 变异 ✓；
+>   ③ **把这条配方写进文档** ✓（⚠ `17 个角色`里凡"同属性多来源"的都适用 ✓ —— ⭐ 这是一条**内容纪律**，也是一次**大范围可出货的发现** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -21573,6 +21599,32 @@
 >      ⇒ ⭐ 这一步**同时**验证了"比率属性的 `amount` 语义"这条注释 ✓。
 > * ⭐ **纪律再加一条（本段第九条）** ✗：**比率属性上的 `amount` 不是点数** ✗ ⇒ ⭐ **凡是用 `amount` 抬一个百分比属性，
 >   都要把"抬后实测值"写进注释** ✓（⚠ 我这一轮差点把"210"当成事实写进记录 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百九十三：✅✅✅ **机制与**修法**同时找到了** —— `MODIFY_ATTR` 带时长时**创建的是一个具名 buff**；⭐ 而**注释自己写着**："不给名字 ⇒ 在 `REMOVE_STATE` 那个循环里**会被跳过**"）**：
+>
+> * ✅ **实测（读 `modifyAttr` 的后半 ✓，`:2085`–`:2125` ✓）** ✓ 关键几行：
+>   ```java
+>   AbstractBuff buff = withSource(withTickOwner(
+>           withLifetime(statModifier(attribute, applied, turns, permanent, maxStacks, derived), effect),
+>           effect, ctx), ctx);
+>   …
+>   if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
+>       buff.setBuffName(effect.getBuff().trim());          // ← ★ 内容可以给这个修饰符**起名**
+>   }
+>   attachRolled(battle, target, buff, effect, ctx);
+>   ```
+>   ＋ 注释原文：*"Naming the modifier is what lets `REMOVE_STATE <the same name>` take it off; ⚠ **without a name the
+>   modifier is skipped by that loop**, i.e. unnamed boosts keep exactly the lifetime they always had."* ✓
+> * ⭐⭐ **于是"同属性第二条读不出"的机制清楚了** ✓：**属性修饰符＝一个 buff** ✓，而**不带名字**时它按
+>   **属性/buff 类**被记账 ✗ ⇒ ⭐ **第二条同属性的无名修饰符与第一条"同一身份"** ✗ ⇒ **被替换而不是相加** ✓
+>   （⚠ 与 `compute()` **相加** 并不矛盾 ✓：**没进到列表** ≠ "进了却不加" ✓ —— 我上一轮的订正是对的 ✓，这一轮补上了**它没进去的原因** ✓）。
+> * ⭐⭐⭐ **而修法**就写在同一段注释里** ✓：**给每条规则一个 `buff` 名** ✓ —— ⚠ 这本项目**已有先例** ✓：
+>   `1306` 的规则写着 `"buff": "叙述性诡计"` ✓ ⇒ ⭐ **所以这很可能根本不用改引擎** ✗：**内容侧加一个 `buff` 名即可并存** ✓✓。
+> * ⭐ **下一轮第一步（三步，都能出货）** ✗：
+>   ① **验证**：在干净表上给两条 +20% 各起一个 `buff` 名 ✓ ⇒ 断言 **0.4** ✓（⚠ 照本段写死的"能指出改动哪个数会变红" ✓：
+>      改的就是那两个 `buff` 名 ✓）；
+>   ② **把 `1415:823` 的行迹重新接回** ✓（⚠ 撤下的原因**消失**了 ✓：给它一个 `buff` 名 ✓）＋ 判据（整表 ✓、总量 0.4 ✓）＋ 变异 ✓；
+>   ③ **把这条配方写进文档** ✓（⚠ `17 个角色`里凡"同属性多来源"的都适用 ✓ —— ⭐ 这是一条**内容纪律**，也是一次**大范围可出货的发现** ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2122** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
