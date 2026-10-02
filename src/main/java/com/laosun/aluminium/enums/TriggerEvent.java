@@ -76,6 +76,26 @@ public enum TriggerEvent {
     HP_LOST("HP_LOST", true),
 
     /**
+     * ⭐ <b>A damage instance was SETTLED</b> — 「我打出的这一下结算了多少」 (2026-10-02).
+     *
+     * <p><b>Why it had to exist.</b> The engine already announced damage <i>before</i> it was settled
+     * ({@link #DEALING_DAMAGE}, deliberately: that is where a rule can still change the instance, and its
+     * {@code amount} is therefore the <b>base</b> — measured: 1093.02 where the victim really lost 260.237584).
+     * The post-settlement number existed for <b>our own</b> units only: {@link #TAKING_HIT} carries {@code settled},
+     * but it is fired through {@code fireTriggersForAlly}, whose first line returns 0 for any target that is not on
+     * our side — so an enemy taking a hit never announced it. 姬子's 星魂 6
+     * 「终结技额外造成 2 次伤害，对随机敌方单体各造成等同于<b>原伤害 40%</b>的火属性伤害」 needs exactly that
+     * number about an <b>enemy</b> victim, and 「（本次/该次/原）伤害的 X%」 is a whole family (14 + 6 documents).
+     *
+     * <p>⚠ It is the <b>dealer's</b> event, not the victim's: {@code actor} = whoever dealt it, {@code target} =
+     * whoever took it, both sides. That is the honest reading of 「我造成的伤害」, and it is why this is a new event
+     * rather than "let TAKING_HIT reach enemies" — that one is the victim's fact and stays ours (P9 owns monsters).
+     *
+     * <p>Its {@code amount} is the <b>settled</b> value, which is what {@code scale: "original_damage"} reads.
+     */
+    DAMAGE_SETTLED("DAMAGE_SETTLED", true),
+
+    /**
      * 「消耗生命值」 (2026-09-29): HP paid as a PRICE. The texts list it separately from 「受到伤害」
      * (「当装备者受到攻击<b>或</b>被我方目标消耗生命值后」, 113/4) because a hit can be shielded and can kill, and a price can do neither.
      */

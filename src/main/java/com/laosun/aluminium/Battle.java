@@ -1336,6 +1336,13 @@ public class Battle {
             // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
             fireTriggersForAlly(TriggerEvent.HP_LOST, damage.getAttacker(), target, hpLoss);
         }
+        // ⭐ The DEALER-side fact, and the only post-settlement number that reaches BOTH camps (2026-10-02):
+        // 「我打出的这一下结算了多少」. `TAKING_HIT` above carries the same number but is fired through
+        // `fireTriggersForAlly`, which returns 0 for any target that is not on our side -- so an ENEMY victim never
+        // announced it, and 「对敌方目标…等同于原伤害 X%」 (姬子's 星魂 6) had no way to read what it had just dealt.
+        // The instance's cast category rides along, exactly like KILL below, so 「终结技」-scoped clauses work.
+        fireTriggersWithSubject(TriggerEvent.DAMAGE_SETTLED, damage.getAttacker(), target, settled,
+                damage, damage.getCastCategory());
         if (died) {
             broadcastKill(damage.getAttacker(), target);
             // The causing instance's cast category rides along: 「每消灭1个敌方目标」-style rules have to be able to
@@ -2384,6 +2391,19 @@ public class Battle {
     }
 
     /**
+     * The same, stating the <b>instance</b> the event is about as well (2026-10-02).
+     *
+     * <p>{@code DAMAGE_SETTLED} is a fact about one damage instance — its amount AND its identity — so the rules that
+     * read it must be able to ask the instance's own questions: {@code damage_is_attack} is the guard that keeps a
+     * rider from re-triggering itself (「额外造成 2 次伤害」 is additional damage, which is not an attack), and it
+     * reads exactly this field.
+     */
+    private int fireTriggersWithSubject(TriggerEvent event, CanHit actor, CanHit subject, double amount,
+                                        Damage damage, SkillCategory fromCast) {
+        return fireTriggers(event, actor, subject, 0, amount, damage, fromCast);
+    }
+
+    /**
      * Tells our side that one <b>attack</b> has finished — {@link com.laosun.aluminium.models.event.AttackEvent},
      * fired <b>once per attack</b>, after every instance of it has been settled.
      *
@@ -2595,7 +2615,12 @@ public class Battle {
                                         Double fixedCritRate, Double fixedCritDamage, DamageType type) {
         Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base);
         if (fixedCritRate != null) {
-            extra.fixedCrit(true, fixedCritDamage);
+            // ⚠ A rate of 0.0 means "never crits" and must not REPORT a crit either (2026-10-02): the flag is what
+            // CRIT_DEALT and `isCrit()` read, so `fixedCrit(true, 0)` would multiply by 1.0 (numerically the same
+            // damage) while telling every listener that a crit happened -- a wrong fact with no symptom.
+            // ⚠ Measured the same day: this flag does NOT move the number (a rider at `crit_rate: 0.0` settled the
+            // same 520.475168 either way), so the choice here is about the REPORT, not about the damage.
+            extra.fixedCrit(fixedCritRate != 0.0, fixedCritDamage);
         }
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
         double settled = applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);

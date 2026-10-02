@@ -1133,7 +1133,11 @@ public class TriggerTable {
      * 2026-09-28 (it is the one event that fires <b>once per cast</b>, which is what 「施放 2 次普攻/战技/终结技」 counts).
      */
     private static final Set<TriggerEvent> DAMAGE_CARRYING_EVENTS =
-            Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK);
+            Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK,
+                    // ⭐ The settled instance is still the same instance (2026-10-02), so it carries it: that is what
+                    // makes `damage_is_attack` available as the guard against 「额外造成 N 次伤害」 re-triggering
+                    // itself (additional damage is not an attack).
+                    TriggerEvent.DAMAGE_SETTLED);
 
     /**
      * The events whose context carries the <b>cast category</b>, which is what {@code from_skill} reads.
@@ -1146,6 +1150,10 @@ public class TriggerTable {
     private static final Set<TriggerEvent> CAST_CARRYING_EVENTS =
             Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK,
                     TriggerEvent.CAST_SETUP,
+                    // ⭐ The settled instance carries its own cast too (2026-10-02): 「终结技额外造成 2 次伤害…」 needs
+                    // to know WHICH skill produced the damage it is a share of, and `Battle.applyDamage` states the
+                    // category when it announces the settlement (the same field KILL already rides).
+                    TriggerEvent.DAMAGE_SETTLED,
                     TriggerEvent.ATTACK_FINISHED);
 
     private static Condition parseCondition(String raw, TriggerSpec spec) {
