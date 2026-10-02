@@ -109,6 +109,17 @@ public final class TriggerInterpreter {
     /**
      * Ops that are implemented today.
      */
+    /**
+     * ⭐ The two element sources `ADD_ELEMENTAL_WEAKNESS` accepts besides a real element name
+     * (2026-09-30). ⚠ A closed set on purpose: without it a misspelled element would only blow up at
+     * RUN time, and only if the rule ever fired -- a wrong answer that reports nothing.
+     *
+     * <p>`party_first` -- 「场上我方目标持有属性的弱点」 (character 1006); its
+     * skill text names the rule: 「优先添加我方编队第一位角色持有属性的弱点」.
+     * <p>`random_absent` -- 「添加 1 个随机属性弱点，优先添加目标尚未拥有的弱点」 (character 1405).
+     */
+    private static final Set<String> SPECIAL_ELEMENTS = Set.of("party_first", "random_absent");
+
     private static final Set<String> WIRED = Set.of(
             "RESET_TRIGGER_LIMIT",
             // ⭐ 「为指定敌方单体添加 X 属性弱点」 (2026-09-30; readers 1315, 1310).
@@ -295,6 +306,15 @@ public final class TriggerInterpreter {
             case "ADD_ELEMENTAL_WEAKNESS" -> {
                 if (effect.getElement() == null || effect.getElement().isBlank()) {
                     throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS requires element (source: " + spec.getSource() + ")");
+                }
+                // ⚠ Reject it HERE, not at run time: an unknown element that only blows up when the rule
+                // finally fires is exactly the silent mistake this library keeps closing.
+                String named = effect.getElement().trim();
+                if (!SPECIAL_ELEMENTS.contains(named)
+                        && com.laosun.aluminium.enums.DamageElement.fromString(named) == null) {
+                    throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS names element \"" + named
+                            + "\", which is neither a DamageElement nor one of " + SPECIAL_ELEMENTS
+                            + " (source: " + spec.getSource() + ")");
                 }
                 requireNoStackArguments(effect, op, spec);
             }
@@ -951,8 +971,33 @@ public final class TriggerInterpreter {
         String op = normalizeOp(effect, null);
         switch (op) {
             case "ADD_ELEMENTAL_WEAKNESS" -> {
-                DamageElement weakness = DamageElement.fromString(effect.getElement());
+                // ⚠ Two named sources beside a real element name (the loader keeps this a closed set):
+                //   `party_first` -- the first character of the party, per 1006’s own skill text.
+                //   `random_absent` -- a random element the target does NOT already have (1405).
+                String named = effect.getElement().trim();
+                DamageElement weakness;
+                if ("party_first".equals(named)) {
+                    weakness = battle == null || battle.characters.isEmpty()
+                            ? null : battle.characters.getFirst().getElement();
+                } else if ("random_absent".equals(named)) {
+                    weakness = null;
+                    for (CanHit victim : resolveTargets(battle, effect, ctx)) {
+                        if (victim instanceof com.laosun.aluminium.models.enemy.Enemy en) {
+                            java.util.List<DamageElement> absent = new java.util.ArrayList<>();
+                            for (DamageElement candidate : DamageElement.values()) {
+                                if (!en.isWeakTo(candidate)) { absent.add(candidate); }
+                            }
+                            weakness = absent.isEmpty() ? null
+                                    : absent.get(battle.getRng().nextInt(absent.size()));
+                        }
+                    }
+                } else {
+                    weakness = DamageElement.fromString(named);
+                }
                 if (weakness == null) {
+                    // ⚠ Not an error for the two named sources: 1006 may have no party attribute to offer and
+                    // 1405 may find no absent element. The clause simply does nothing then.
+                    if (SPECIAL_ELEMENTS.contains(named)) { break; }
                     throw new IllegalStateException("Op ADD_ELEMENTAL_WEAKNESS names an element that is not a DamageElement");
                 }
                 for (CanHit victim : resolveTargets(battle, effect, ctx)) {
