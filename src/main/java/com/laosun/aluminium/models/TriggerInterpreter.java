@@ -426,16 +426,21 @@ public final class TriggerInterpreter {
                     // attribute, exactly like a Max HP share, and it needs `element` for the same reason (no skill row
                     // lends one). ⚠ It is NOT a `requireDerivedScale` name -- that reader resolves an ATTRIBUTE, and
                     // 「原伤害」 is not one -- and it must hang on the ONE event whose `amount` is a settled damage.
-                    // ⚠ `original_damage` was validated here for one round and is out again (2026-10-02): the number
-                    // it reads is right (DAMAGE_SETTLED carries the settled value) but a DAMAGE rider does not settle
-                    // to it -- see the note in `literalBase`.
-                    boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
-                    if (maxHpShare) {
+                    // ⭐ A share of the SETTLED instance (2026-10-02): `percent` + `element` like a Max HP share, and it
+                    // must hang on the one event whose `amount` is a settled damage (`DAMAGE_SETTLED`).
+                    if ("original_damage".equals(literalScale)) {
+                        requireEvent(spec, op, TriggerEvent.DAMAGE_SETTLED);
                         requirePercent(effect, op, spec);
+                        requireElement(effect, op, spec);
                     } else {
-                        requireDerivedScale(effect, op, spec, false);
+                        boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
+                        if (maxHpShare) {
+                            requirePercent(effect, op, spec);
+                        } else {
+                            requireDerivedScale(effect, op, spec, false);
+                        }
+                        requireElement(effect, op, spec);
                     }
-                    requireElement(effect, op, spec);
                 } else {
                     requireSkill(effect, op, spec);
                     requireDamageParam(effect, op, spec);
@@ -3929,12 +3934,15 @@ public final class TriggerInterpreter {
         // faithful and linear (a 50% rider gave exactly half of a 100% one) -- only the source number is too early.
         // ⇒ It needs a POST-settlement carrier for the value; the reader table and the exact numbers are in GAPS
         // (entry "aggro 回收之八百"). Do not re-add it here without reading that entry first.
-        // ⚠⚠ ROLLED BACK 2026-10-02 (same round it was added): `scale: "original_damage"` = `ctx.amount()` reads the
-        // RIGHT number on `DAMAGE_SETTLED` (it is the settled value -- a 50% rider gave exactly half of a 100% one),
-        // but the rider's own settlement is NOT the same number: measured, a 100% rider on one 姬子 COMMON attack
-        // settled 151.681338 where the instance it copied had settled 260.237583796 (= 0.583x), i.e. the extra
-        // instance re-applies a zone the original already carried. Until that is understood, a rule built on this
-        // scale deals a wrong number with no symptom, so it is out. See GAPS "aggro 回收之八百零三".
+        // ⭐⭐ 「等同于**原伤害** X%」 (2026-10-02): a share of the damage instance that triggered this rule, read from
+        // the CONTEXT's `amount` -- the settled value, announced by `DAMAGE_SETTLED` (the one event whose amount is
+        // post-settlement: `DEALING_DAMAGE` fires from *inside* `assemble`, before the crit/defence/resistance zones).
+        // ⚠ The four rounds this took were spent on a crit roll: two battles with their own `Random(0)` consume the
+        // rng differently, so one instance crit and the other did not, and the difference read exactly like a zone
+        // discrepancy (260.237584 -> 520.475168, i.e. a 2.0 multiplier). Pin the crit (`crit_rate`) when comparing.
+        if ("original_damage".equals(scale)) {
+            return ctx.amount() * share + flat;
+        }
         // ? A Max HP share (2026-09-29): 「造成等同于X%生命上限的伤害」 -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
         // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
         switch (scale) {
