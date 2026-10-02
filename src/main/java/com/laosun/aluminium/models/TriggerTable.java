@@ -52,6 +52,9 @@ public class TriggerTable {
      */
     private final Map<TriggerEvent, List<CompiledRule>> byEvent = new HashMap<>();
 
+    /** Who a per-turn or cooldown count may belong to when it is not the rule owner. */
+    private static final java.util.Set<String> SUBJECTS = java.util.Set.of("self", "target", "actor");
+
     /**
      * The resources this character <b>declares</b> (P8-8): 「充能，上限3点」 written down once, where the
      * character is built. Empty for a character with no stacks — the ordinary state, and the reason
@@ -507,6 +510,26 @@ public class TriggerTable {
      * 「每 2 次…后」 is exactly that shape. `matching` stays the pure predicate it always was — the data-binding tests
      * and {@code ruleCount} read it — and this accessor is what lets firing differ.
      */
+    /**
+     * The limiter key of the rule carrying this id, or {@code null} when this table has no such id.
+     *
+     * <p>⚠ An id is optional and a key is not -- that is why both exist (see {@link CompiledRule}), and why
+     * a caller holding an id cannot clear a limit without this lookup. Seven shipped rules have no id at all.
+     */
+    public String keyOf(String id) {
+        if (id == null) {
+            return null;
+        }
+        for (List<CompiledRule> rules : byEvent.values()) {
+            for (CompiledRule rule : rules) {
+                if (id.equals(rule.id())) {
+                    return rule.key();
+                }
+            }
+        }
+        return null;
+    }
+
     public List<CompiledRule> rulesFor(TriggerEvent event) {
         return byEvent.getOrDefault(event, List.of());
     }
@@ -594,7 +617,8 @@ public class TriggerTable {
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateId(spec), validateCooldown(spec),
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
-                validateMinEidolon(spec), validatePerTurn(spec), validatePerAttack(spec), List.copyOf(targetFilters)));
+                validateMinEidolon(spec), validatePerTurn(spec), validatePerAttack(spec), List.copyOf(targetFilters),
+                validatePerSubject(spec)));
     }
 
     /**
@@ -604,6 +628,27 @@ public class TriggerTable {
      * ordinary case and the reason this is not an error. ⚠ The name is scoped to its file (uniqueness and
      * resolvability are checked in {@link #validateAmendments()}).
      */
+    /**
+     * Validates {@code per_subject} and returns it ({@code ""} = the rule owner, the shipped default).
+     *
+     * <p>Validated at load time like the other limits: an unknown name would fall back to the owner and
+     * count the wrong thing -- a wrong answer with no symptom, and the reason the family needs the field
+     * at all (2026-09-30; readers 1305, 1207, 1403).
+     */
+    private static String validatePerSubject(TriggerSpec spec) {
+        String subject = spec.getPerSubject();
+        if (subject == null || subject.isBlank()) {
+            return "";
+        }
+        String trimmed = subject.trim();
+        if (!SUBJECTS.contains(trimmed)) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"per_subject\": " + trimmed + ", which is not one of " + SUBJECTS
+                            + "; omit the field to count the rule owner (source: " + spec.getSource() + ")");
+        }
+        return trimmed;
+    }
+
     private static String validateId(TriggerSpec spec) {
         String id = spec.getId();
         return id == null ? "" : id.trim();
@@ -1791,7 +1836,7 @@ public class TriggerTable {
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
                                int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
-                               int perTurn, int perAttack, List<List<Condition>> effectTargetFilters) {
+                               int perTurn, int perAttack, List<List<Condition>> effectTargetFilters, String perSubject) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.

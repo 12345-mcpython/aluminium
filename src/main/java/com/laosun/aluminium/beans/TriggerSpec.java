@@ -105,6 +105,15 @@ public class TriggerSpec {
     private Integer perTurn;
 
     /**
+     * Whose firings {@link #perTurn} and {@link #cooldown} count, when it is not the rule owner — the count-and-reset
+     * family (2026-09-30; readers 1305, 1207, 1403) counts on the marked TARGET, on the TRIGGERER, or per UNIT.
+     * One of {@code self} / {@code target} / {@code actor}; absent means the owner, which is what every
+     * shipped rule already does, so omitting it changes nothing.
+     */
+    @SerializedName("per_subject")
+    private String perSubject;
+
+    /**
      * {@code true} = the rule fires at most once per battle (「单场战斗中只能触发1次」).
      *
      * <p>Deliberately not the same field as {@link #cooldown}: a cooldown comes back after a few turns,
