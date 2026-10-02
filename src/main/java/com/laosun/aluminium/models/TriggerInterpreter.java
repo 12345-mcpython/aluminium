@@ -836,6 +836,10 @@ public final class TriggerInterpreter {
         CanHit owner = ctx.owner();
         int fired = 0;
         for (CompiledRule rule : rules) {
+            // ⭐ ONE expression, read at all four sites below (2026-09-30; the count-and-reset family).
+            // The comment on startTriggerCooldown names the failure this avoids: recording one key while
+            // checking another makes a rule fire forever, or never again.
+            String limitKey = rule.key() + subjectSuffix(rule, ctx);
             // ⚠ The conditions are checked HERE, per rule, because rulesFor no longer filters (2026-09-28). Harmless
             // to re-check: matches is the same pure predicate matching used.
             if (!rule.matches(ctx)) {
@@ -845,14 +849,14 @@ public final class TriggerInterpreter {
             // applying, because the limit is about how often the rule may run, not about whether it fits the
             // event: `matching` stays a pure predicate, which is what `TriggerTable.ruleCount` and the
             // data-binding tests read.
-            if (owner != null && !owner.isTriggerReady(rule.key(),
+            if (owner != null && !owner.isTriggerReady(limitKey,
                     rule.perTurn() + owner.rulePerTurnBonus(rule.id()))) {
                 continue;
             }
             // \u300c\u6bcf\u6b21\u653b\u51fb\u53ea\u53ef\u89e6\u53d1 1 \u6b21\u300d: the attack in progress is one sequence value for every instance it
             // settles, so this is the one cap a per-turn count cannot express.
             if (owner != null && rule.perAttack() > 0
-                    && !owner.isAttackLimitReady(rule.key(), battle.attackSequence(), rule.perAttack())) {
+                    && !owner.isAttackLimitReady(limitKey, battle.attackSequence(), rule.perAttack())) {
                 continue;
             }
             // An Eidolon gate (「星魂 N 解锁」): the rank is a construction-time property of the rule's owner, so
@@ -870,10 +874,10 @@ public final class TriggerInterpreter {
                 // ⚠ The count recorded is the SAME number the check above used: recording the stated per_turn while
                 // checking the amended one would make an amended rule fire forever (its counter would never reach the
                 // raised cap). One expression, read twice -- see `amendedPerTurn`.
-                owner.startTriggerCooldown(rule.key(), rule.cooldownTurns(), rule.oncePerBattle(),
+                owner.startTriggerCooldown(limitKey, rule.cooldownTurns(), rule.oncePerBattle(),
                         rule.perTurn() + owner.rulePerTurnBonus(rule.id()));
                 if (rule.perAttack() > 0) {
-                    owner.recordAttackUse(rule.key(), battle.attackSequence());
+                    owner.recordAttackUse(limitKey, battle.attackSequence());
                 }
             }
             fired++;
@@ -917,6 +921,27 @@ public final class TriggerInterpreter {
             amended = amended.withMaxStacks(stacksDelta);
         }
         return amended;
+    }
+
+    /**
+     * The suffix that scopes a firing count to another unit, or {@code ""} for the owner.
+     *
+     * <p>「该效果每个角色最多触发 1 次」 counts per TRIGGERER, 「目标每有 1 个负面效果」-style
+     * limits count per TARGET. ⚠ The identity is System.identityHashCode: names are for messages and may
+     * repeat, and the counters live on the combatant, so an identity within one battle is exactly the scope
+     * the counters have.
+     */
+    private static String subjectSuffix(CompiledRule rule, TriggerContext ctx) {
+        String subject = rule.perSubject();
+        if (subject == null || subject.isBlank()) {
+            return "";
+        }
+        CanHit unit = switch (subject) {
+            case "target" -> ctx.target();
+            case "actor" -> ctx.actor();
+            default -> ctx.owner();
+        };
+        return unit == null ? "" : "@" + System.identityHashCode(unit);
     }
 
     private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {
