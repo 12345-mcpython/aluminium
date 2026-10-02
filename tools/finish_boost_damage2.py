@@ -21,18 +21,21 @@ TESTNAME = 'com.laosun.aluminium.test.Cone23062SpendTest'
 NL = chr(10)
 
 t = io.open(WORK + '/' + ENG, encoding='utf-8').read()
+anchor = '        damage.addBoost(effect.getPercent());'
 if 'damage.addBoost(applyDerivedCeiling(effect, ctx, magnitude))' in t:
     print('boostDamage: already wired, skipping')
+elif t.count(anchor) != 1:
+    print('REFUSING: the addBoost anchor is not unique (or missing)')
+    sys.exit(1)
 else:
-    anchor = '        damage.addBoost(magnitude);'
-    if t.count(anchor) != 1:
-        print('REFUSING: the addBoost anchor is not unique (or missing)')
-        sys.exit(1)
-    new = ('        // \u2b50 The ceiling too, through the same wrapper MODIFY_ATTR\'s instance route ends with: copying' + NL
-           + '        // only derivedMagnitude left `cap_amount` unread (measured: 1,000,000 points gave 16498, not the cap).' + NL
+    new = ('        // \u2b50 Both a stated `scale` and a stated ceiling must be read (2026-09-30; reader: light cone 23062).' + NL
+           + '        // \u26a0 This method once ignored `damage_type` the same way -- see the comment above, round 258.' + NL
+           + '        double magnitude = effect.getScale() == null || effect.getScale().isBlank()' + NL
+           + '                ? effect.getPercent()' + NL
+           + '                : derivedMagnitude(effect, ctx);' + NL
            + '        damage.addBoost(applyDerivedCeiling(effect, ctx, magnitude));')
     io.open(WORK + '/' + ENG, 'w', encoding='utf-8', newline='').write(t.replace(anchor, new, 1))
-    print('TriggerInterpreter: ceiling wired')
+    print('TriggerInterpreter: scale + ceiling wired')
 saved = io.open(WORK + '/' + ENG, encoding='utf-8').read()
 
 
