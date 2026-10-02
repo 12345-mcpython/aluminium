@@ -20417,6 +20417,21 @@
 > * ⭐ **顺带**：这条链一旦通，**目标 ① 的其余四个读者**（`1211`【生息】结束 ✓、`1408` 变身结束 ×3 ✓、那张光锥「奇袭结束后」✓）
 >   **都能照抄"挂一个限时状态 ⇒ 到期自动公告 ⇒ 读者接住"这个形状** ✓✓ ⇒ ⭐ **这是本段最有复用价值的一块** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十五：✅✅ **最后那个未知也拿到了** —— 判据推进计时用 **`BuffManager.tickForeign(CanHit clockOwner, boolean early)`**（**public** ✓，`:603` ✓）**）**：
+>
+> * ✅ **实测（读 `BuffManager` ✓ ＋ 搜全仓 `.tick(` ✓）** ✓：
+>   * **`public void tickForeign(CanHit clockOwner, boolean early)`** ✓（`:603` ✓）—— ⭐ **公开** ✓ ⇒ 判据可调 ✓；
+>   * `private void tickBuff(CanHit clockOwner, boolean early)` ✓（`:645` ✓）—— 私有 ✓ ⇒ 由 `tickForeign` 驱动 ✓（⚠ 也由回合循环驱动 ✓）。
+> * ⭐⭐⭐ **于是"阿哈时刻"这条链**从引擎到判据**全部具名、可以一次做完** ✓（下一轮照此执行 ✗）：
+>   1. **内容**（`tools/ship_aha_moment.py` ✓）：`elation_moment_start` 的 **`turns: 2` → `turns: 1`** ✓；
+>      **删掉** `elation_moment_close` ✓ 与 `elation_moment_step` ✓（⚠ 不留显式 `REMOVE_STATE` ✗ —— 它不公告 ✗）；
+>   2. **判据**（`tools/judge_aha_moment2.py` ✓）：施放 ⇒ `processRequests()` ⇒ **`assertTrue(hasState(阿哈时刻))`** ✓ ⇒
+>      ⭐ **`owner.getBuffManager().tickForeign(owner, false)`** ✓（推进一次计时 ⇒ 到期 ⇒ 引擎公告 ✓）⇒
+>      **`assertFalse(hasState(阿哈时刻))`** ✓ ＋ **`assertTrue(hasState(好活当赏))`** ✓；
+>   3. **变异（全量）**：把 `turns` 改回 `2` ⇒ ⭐ **判据必红** ✓（状态不到期 ⇒ 没有公告 ⇒ 没有奖励 ✓）。
+> * ⭐ **这一步的分量** ✓：它是**本项目第一次让 `STATE_ENDED` 由"状态自然到期"驱动** ✓ ⇒ ⭐ **目标 ① 的其余四个读者**
+>   （`1211`【生息】结束 ✓／`1408` 变身结束 ×3 ✓／那张光锥「奇袭结束后」✓）**都能复用同一个形状** ✓✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23899,6 +23914,21 @@
 >     ⇒ 看它由谁调用、需要什么前置（⚠ 例如"当前行动者" ✓）⇒ 判据里照调 ✓ ⇒ 然后立刻做完那两步内容改动 ✓ ⇒ 跑 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
 > * ⭐ **顺带**：这条链一旦通，**目标 ① 的其余四个读者**（`1211`【生息】结束 ✓、`1408` 变身结束 ×3 ✓、那张光锥「奇袭结束后」✓）
 >   **都能照抄"挂一个限时状态 ⇒ 到期自动公告 ⇒ 读者接住"这个形状** ✓✓ ⇒ ⭐ **这是本段最有复用价值的一块** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十五：✅✅ **最后那个未知也拿到了** —— 判据推进计时用 **`BuffManager.tickForeign(CanHit clockOwner, boolean early)`**（**public** ✓，`:603` ✓）**）**：
+>
+> * ✅ **实测（读 `BuffManager` ✓ ＋ 搜全仓 `.tick(` ✓）** ✓：
+>   * **`public void tickForeign(CanHit clockOwner, boolean early)`** ✓（`:603` ✓）—— ⭐ **公开** ✓ ⇒ 判据可调 ✓；
+>   * `private void tickBuff(CanHit clockOwner, boolean early)` ✓（`:645` ✓）—— 私有 ✓ ⇒ 由 `tickForeign` 驱动 ✓（⚠ 也由回合循环驱动 ✓）。
+> * ⭐⭐⭐ **于是"阿哈时刻"这条链**从引擎到判据**全部具名、可以一次做完** ✓（下一轮照此执行 ✗）：
+>   1. **内容**（`tools/ship_aha_moment.py` ✓）：`elation_moment_start` 的 **`turns: 2` → `turns: 1`** ✓；
+>      **删掉** `elation_moment_close` ✓ 与 `elation_moment_step` ✓（⚠ 不留显式 `REMOVE_STATE` ✗ —— 它不公告 ✗）；
+>   2. **判据**（`tools/judge_aha_moment2.py` ✓）：施放 ⇒ `processRequests()` ⇒ **`assertTrue(hasState(阿哈时刻))`** ✓ ⇒
+>      ⭐ **`owner.getBuffManager().tickForeign(owner, false)`** ✓（推进一次计时 ⇒ 到期 ⇒ 引擎公告 ✓）⇒
+>      **`assertFalse(hasState(阿哈时刻))`** ✓ ＋ **`assertTrue(hasState(好活当赏))`** ✓；
+>   3. **变异（全量）**：把 `turns` 改回 `2` ⇒ ⭐ **判据必红** ✓（状态不到期 ⇒ 没有公告 ⇒ 没有奖励 ✓）。
+> * ⭐ **这一步的分量** ✓：它是**本项目第一次让 `STATE_ENDED` 由"状态自然到期"驱动** ✓ ⇒ ⭐ **目标 ① 的其余四个读者**
+>   （`1211`【生息】结束 ✓／`1408` 变身结束 ×3 ✓／那张光锥「奇袭结束后」✓）**都能复用同一个形状** ✓✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
