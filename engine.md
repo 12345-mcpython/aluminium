@@ -4207,3 +4207,32 @@ base = ctx.amount() / (触发实例的 toValue() / 它的 skillBaseValue()) * pe
 **两名读者（今天的状态）**：`1415` 昔涟 结界 **24%** ✅ 已出货；`8007` 开拓者《迷迷的声援》**28%** ⛔ 不可出货 ——
 读原文确认那句属于 **「忆灵技能 5」**（`8007_开拓者.md:388`），即**忆灵自己的技能**，而引擎的忆灵侧今天只有
 **面板 ＋ `attack`**（`SUMMON_SERVANT` op 的读者数 = **0**）⇒ 位置不在角色规则表上，按纪律登记。
+
+### 24.14 在用的条件词汇（普查 ✅ 2026-10-02）
+
+**怎么量的**：扫 `src/main/resources/characters/**` ＋ `light_cones/**` ＋ `relics/**` 里**全部规则的 `when`** ✓
+（不是看源码常量 ✓）⇒ **29 个首词、164 条不同的条件**：
+
+| 首词 | 条数 | 一例 |
+|---|---|---|
+| `self_stacks:<名>` | 29 | `self_stacks:下一次普攻待命 >= 1` |
+| `target` | 26 | `target != self` |
+| `self_attr:` | 18 | `self_attr:ATTACK < 2500` |
+| `actor` | 13 | `actor != self` |
+| `self`（含 `has_state` / `has_path` / `has_shield` …） | 9 | `self has_state 协奏` |
+| `hp_percent` | 6 | `hp_percent < 0.5` |
+| `self_resource:<名>` | 6 | `self_resource:充能 >= 3` |
+| `target_hp_percent` | 5 | `target_hp_percent <= 0.5` |
+| `enemy_count` / `from_category` / `target_stacks:<名>` | 5 | `enemy_count <= 2` |
+| `target_debuff_count` | 4 | `target_debuff_count < 3` |
+| `from_skill` / `target_debuff:<属性>` / `hit_count` / `actor_stacks:<名>` / `self_summon_count` / `target_summon_count` | 2 | `target_debuff:DEFENCE` |
+| `actor_hp_percent` / `target_hp_percent_before` / `self_energy_percent` / `from_skill_id` / `damage_is_attack` / `damage_element_is_self` / `resource_changed:<名>` / `weakness_hit_count` | 1 | `target_hp_percent_before > 0.5` |
+
+⚠⚠ **为什么要看这张表，而不是看源码**：`TriggerTable` 里那 23 个 `Pattern.compile` 只是**关键词那一半** ✓ ——
+**属性比较那一半**（`hp_percent` ✓、`self_stacks:` ✓、`enemy_count` ✓、`target_hp_percent_before` ✓…）**只在内容里看得见** ✓。
+⭐ 代价已付过一次 ✓：`hp_at_most` 被造出来后才发现 **`hp_percent`／`actor_hp_percent`／`target_hp_percent`／
+`target_hp_percent_before` 四种血线写法早就在用** ✓ ⇒ 整个能力**回滚** ✓（`42a7b21` ✓）。
+⇒ **任何"要不要造"的问题，先 `grep` 出货内容的 `when`** ✓。
+
+⭐ **一处顺带的确证**：这张表里**没有**任何"某个具名状态结束"的写法 ✓ ⇒
+`STATE_ENDED`（2026-10-02 新增 ✓）**不是重复能力** ✓ —— ⚠ 而这句话现在有**实测**支撑 ✓，不再是假设 ✓。
