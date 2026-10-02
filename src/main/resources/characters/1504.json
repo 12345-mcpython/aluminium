@@ -81,6 +81,13 @@
           "target": "all_enemies"
         },
         {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.4,
+          "permanent": true,
+          "buff": "饲饼",
+          "target": "all_enemies"
+        },
+        {
           "op": "APPLY_BUFF",
           "buff": "饲饵",
           "permanent": true,
@@ -88,7 +95,7 @@
         }
       ],
       "source": "1504 不死途 战技 鞭哨，逐尽恶兽 (150402, BPSkill/SingleAttack): 「使指定敌方单体成为【饲饵】，对其造成等同于不死途200%攻击力的雷属性伤害。…【饲饵】状态仅对最新被施加的目标生效。」",
-      "note": "「使**指定敌方单体**成为【饲饵】」—— `APPLY_BUFF` + **`permanent: true`** ✓：文档**没有给时长** ✗，而「【饲饵】状态**仅对最新被施加的目标生效**」✓ 说明它是\"**直到被替换**\" ✓ ⇒ `permanent` 是文档自己说的语义 ✓，不是偷懒的默认值 ✓。⚠ **登记**：① 「场上**存在**【饲饵】**时**，敌方全体**防御力降低 40%**」✗ —— 这是**场条件**（\"存在\"是持续判断 ✓），而引擎的修饰是**施加那一瞬间**算好就固定下来 ✗ ⇒ 写成\"施加时给全体 -40% 防御\"会在**饲饵被替换/死亡后仍留着** ✗（没有症状的错误 ✗）；② 「场上不存在【饲饵】时，不死途**立即使当前场上生命值最低的敌方单体**成为【饲饵】」✗（\"不存在\"的持续判断 ✗ + `lowest_hp` 选择器 ✓ 有，但\"立即\"需要一个观察点 ✗）；③ 战技「若该目标**为【饲饵】**，则额外造成 100% 攻击力雷伤，并**恢复 1 点战技点**」✗（\"already the bait\"这个条件 ✗ —— ⭐ 其实 `target has_state 饲饵` 可写 ✓，但**它必须在\"施加之前\"判断** ✗，而本条规则会在**施加之后**求值 ✗ ⇒ 次序不可表达 ✗）；④ 「【饲饵】**仅对最新**被施加的目标生效」✗（\"只保留最新一个\"的不变量 ✗，与 1414/1112 登记过的是同一件事 ✓）。\n\n⭐ 2026-09-30 转正：「【饲饵】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 饲饵 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
+      "note": "「使**指定敌方单体**成为【饲饵】」—— `APPLY_BUFF` + **`permanent: true`** ✓：文档**没有给时长** ✗，而「【饲饵】状态**仅对最新被施加的目标生效**」✓ 说明它是\"**直到被替换**\" ✓ ⇒ `permanent` 是文档自己说的语义 ✓，不是偷懒的默认值 ✓。⚠ **登记**：① 「场上**存在**【饲饵】**时**，敌方全体**防御力降低 40%**」✗ —— 这是**场条件**（\"存在\"是持续判断 ✓），而引擎的修饰是**施加那一瞬间**算好就固定下来 ✗ ⇒ 写成\"施加时给全体 -40% 防御\"会在**饲饵被替换/死亡后仍留着** ✗（没有症状的错误 ✗）；② 「场上不存在【饲饵】时，不死途**立即使当前场上生命值最低的敌方单体**成为【饲饵】」✗（\"不存在\"的持续判断 ✗ + `lowest_hp` 选择器 ✓ 有，但\"立即\"需要一个观察点 ✗）；③ 战技「若该目标**为【饲饵】**，则额外造成 100% 攻击力雷伤，并**恢复 1 点战技点**」✗（\"already the bait\"这个条件 ✗ —— ⭐ 其实 `target has_state 饲饵` 可写 ✓，但**它必须在\"施加之前\"判断** ✗，而本条规则会在**施加之后**求值 ✗ ⇒ 次序不可表达 ✗）；④ 「【饲饵】**仅对最新**被施加的目标生效」✗（\"只保留最新一个\"的不变量 ✗，与 1414/1112 登记过的是同一件事 ✓）。\n\n⭐ 2026-09-30 转正：「【饲饵】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 饲饵 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。\n\n⭐ 2026-09-30 转正 ✓：「【饲饼】存在时，敌方全体目标防御力降低 40%」—— ⚠ 不需要新能力 ✓：给那个修饰器**同名** \buff: 饲饼，而本条已有的 REMOVE_STATE 饲饼 会**同时摘掉它** ✓（⚠ “名字相同”就是这里的机制 —— 与族一“仅保留最新”同一招 ✓），于是“存在时”的语义成立。"
     },
     {
       "on": "BATTLE_START",
