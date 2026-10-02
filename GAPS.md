@@ -17908,6 +17908,24 @@
 >     要么把那些规则**改挂**到真实存在的事件上 ✓（⚠ 二者取一，且必须写清"为什么是这个名字" ✓）；
 >   * **1**（只有 1407）⇒ 按纪律**登记** ✓ 并把那条规则**标注为不触发** ✓（⚠ 或删掉以免误导 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2117** 例 ✓）、树干净、已推送 ✓（【新蕊】的数据与判据**已回滚** ✓）。
+> **2026-10-02 更新（aggro 回收之九百一十八：⛔⛔ **订正上一轮的结论** —— **不是**死内容：掉血走的是**监听器**那条路（`onHpLoss`），我的 `grep` 只找 `fireTriggers(` 因而**看漏了**）**：
+>
+> * ✅ **实测（读 `Battle.applyDamage` 与 `broadcastHpLoss` ✓）** ✓：
+>   * `applyDamage`（`:1318` ✓）**确实在算掉血** ✓：`double hpBefore = target.getCurrentHp(); boolean died = target.takeDamage(settled);
+>     double hpLoss = hpBefore - target.getCurrentHp();` ✓ ⇒ `if (hpLoss > 0) { broadcastHpLoss(target, hpBefore, target.getCurrentHp(),
+>     damage.getAttacker(), hpLoss); … }` ✓（`:1341-1342` ✓）；
+>   * `broadcastHpLoss`（`:2078` ✓）＝ `dispatch(t -> t.onHpLoss(this, target, before, after, source, amount), target, source);` ✓
+>     ⇒ ⭐ **掉血事件走的是"监听器接口"** ✓（`onHpLoss` ✓），**不是** `battle.fireTriggers(TriggerEvent.HP_LOST, …)` ✗
+>     ⇒ ⛔ **我上一轮那句"引擎里没有任何地方发 `HP_LOST`、26 条规则全是死代码"是错的** ✗✗
+>     —— ⚠ 它是**又一次 `grep` 形状的误判** ✓（本段第五次同族 ✓：**搜索模式决定结论** ✗）。
+> * ⭐ **而这一轮两次 +0 的真因也随之清楚了** ✓：我用的 **`applyTrueDamage`** ✗ **不走 `applyDamage`** ✗ ⇒
+>   **它不广播掉血** ✓ ⇒ 规则当然不动 ✓（⚠ **不是**【新蕊】的写法有问题 ✗）。
+>   ⇒ ⭐ **下一轮第一步（判据侧，两处都不用改引擎）** ✗：把判据改成**让一次真实伤害结算** ✓ —— 用 `Battle` 的
+>     伤害入口（敌人的一次攻击 ✓ 或 `applyDamage` 那条路 ✓，**不是** `applyTrueDamage` ✓）⇒ 再验【新蕊】 ✓；
+>     ⚠ 同时把 `1407` 的 `talent_damage_up_on_hp_loss` 一并验 ✓（它是判断"路走通了"的现成探针 ✓）。
+> * ⭐ **本段教训再记一次** ✓：**"有没有人发这个事件"不能用 `fireTriggers(` 一个模式去数** ✗ ——
+>   这个引擎**两条派发路都有**（`fireTriggers` ✓ 与 **`onXxx` 监听器** ✓）⇒ ⭐ **数事件要先数"派发路"** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2117** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -18882,6 +18900,24 @@
 >     要么把那些规则**改挂**到真实存在的事件上 ✓（⚠ 二者取一，且必须写清"为什么是这个名字" ✓）；
 >   * **1**（只有 1407）⇒ 按纪律**登记** ✓ 并把那条规则**标注为不触发** ✓（⚠ 或删掉以免误导 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2117** 例 ✓）、树干净、已推送 ✓（【新蕊】的数据与判据**已回滚** ✓）。
+> **2026-10-02 更新（aggro 回收之九百一十八：⛔⛔ **订正上一轮的结论** —— **不是**死内容：掉血走的是**监听器**那条路（`onHpLoss`），我的 `grep` 只找 `fireTriggers(` 因而**看漏了**）**：
+>
+> * ✅ **实测（读 `Battle.applyDamage` 与 `broadcastHpLoss` ✓）** ✓：
+>   * `applyDamage`（`:1318` ✓）**确实在算掉血** ✓：`double hpBefore = target.getCurrentHp(); boolean died = target.takeDamage(settled);
+>     double hpLoss = hpBefore - target.getCurrentHp();` ✓ ⇒ `if (hpLoss > 0) { broadcastHpLoss(target, hpBefore, target.getCurrentHp(),
+>     damage.getAttacker(), hpLoss); … }` ✓（`:1341-1342` ✓）；
+>   * `broadcastHpLoss`（`:2078` ✓）＝ `dispatch(t -> t.onHpLoss(this, target, before, after, source, amount), target, source);` ✓
+>     ⇒ ⭐ **掉血事件走的是"监听器接口"** ✓（`onHpLoss` ✓），**不是** `battle.fireTriggers(TriggerEvent.HP_LOST, …)` ✗
+>     ⇒ ⛔ **我上一轮那句"引擎里没有任何地方发 `HP_LOST`、26 条规则全是死代码"是错的** ✗✗
+>     —— ⚠ 它是**又一次 `grep` 形状的误判** ✓（本段第五次同族 ✓：**搜索模式决定结论** ✗）。
+> * ⭐ **而这一轮两次 +0 的真因也随之清楚了** ✓：我用的 **`applyTrueDamage`** ✗ **不走 `applyDamage`** ✗ ⇒
+>   **它不广播掉血** ✓ ⇒ 规则当然不动 ✓（⚠ **不是**【新蕊】的写法有问题 ✗）。
+>   ⇒ ⭐ **下一轮第一步（判据侧，两处都不用改引擎）** ✗：把判据改成**让一次真实伤害结算** ✓ —— 用 `Battle` 的
+>     伤害入口（敌人的一次攻击 ✓ 或 `applyDamage` 那条路 ✓，**不是** `applyTrueDamage` ✓）⇒ 再验【新蕊】 ✓；
+>     ⚠ 同时把 `1407` 的 `talent_damage_up_on_hp_loss` 一并验 ✓（它是判断"路走通了"的现成探针 ✓）。
+> * ⭐ **本段教训再记一次** ✓：**"有没有人发这个事件"不能用 `fireTriggers(` 一个模式去数** ✗ ——
+>   这个引擎**两条派发路都有**（`fireTriggers` ✓ 与 **`onXxx` 监听器** ✓）⇒ ⭐ **数事件要先数"派发路"** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2117** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
