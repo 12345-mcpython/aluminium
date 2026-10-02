@@ -1004,7 +1004,11 @@ public final class TriggerInterpreter {
                     // ⭐ 「为敌方目标添加弱点时」(cone 23050). ⚠ Asked first, then changed, then fired:
                     //    a repeat insertion is NOT an insertion, and firing then would be a quiet OVER-fire.
                     if (victim instanceof com.laosun.aluminium.models.enemy.Enemy en && !en.isWeakTo(weakness)) {
-                        en.addWeakness(weakness);
+                        if (effect.getTurns() != null && effect.getTurns() > 0) {
+                            en.addWeakness(weakness, effect.getTurns());
+                        } else {
+                            en.addWeakness(weakness);
+                        }
                         battle.fireTriggers(TriggerEvent.WEAKNESS_ADDED, ctx.owner(), en, 0, 0);
                     }
                 }
