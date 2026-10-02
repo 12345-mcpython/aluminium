@@ -20210,6 +20210,23 @@
 >   ② 找**状态读取**的口 ✓（⚠ 搜 `boolean has`／`getBuffs`／`getBuffManager` ✓ ⇒ 判据要能读"她是否处于某状态" ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（10 个积压提交上一轮推完 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据文件已删 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十四：✅✅✅ **判据跑起来了一半，而且这一半证明**内容真的生效**** —— ⭐ 欢愉技一施放，`阿哈时刻` 状态**就挂上了**；⚠ 卡在"结束"那一步（我手工 `fireTriggers(ATTACK_FINISHED)` **不带施放类别** ✗））**：
+>
+> * ✅ **实测（判据编译通过 ＋ 跑到第 53 行 ✓）** ✓：
+>   * `assertFalse(hasState(阿哈时刻))` ✓ **通过** ✓（施放前没挂 ✓）；
+>   * `owner.getSkills().get(SkillType.ELATION_SKILL)` ✓ **拿到技能** ✓（⭐ `ELATION_SKILL` 这个槽**真的存在** ✓）；
+>   * `SkillExecutor.execute(...)` ⇒ `assertTrue(hasState(阿哈时刻))` ✓ **通过** ✓✓
+>     ⇒ ⭐⭐ **所以内容里的 `CAST_SETUP` ＋ `from_category ElationDamage` 那条规则**真的触发了**** ✓（⚠ 这是本段第一次证明它生效 ✓）；
+>   * ⛔ 然后 `fireTriggers(ATTACK_FINISHED, owner, owner, 0, 0)` ⇒ `assertFalse(hasState(阿哈时刻))` ✗ **失败** ✓
+>     （*"at zero the state must be gone ==> expected: <false> but was: <true>"* ✓）⇒ 状态**还在** ✗。
+> * ⭐ **原因判断（很确定）** ✓：我那条"结束"规则的条件是 **`from_category ElationDamage`** ✓ ⇒ ⚠ 而**手工 `fireTriggers` 造的事件没有"施放"上下文** ✗
+>   ⇒ 条件不成立 ⇒ 计数没减 ⇒ 状态没摘 ✓（⚠ 正是我在记录里预先写下的那个坑 ✓）。
+> * ⭐ **下一轮第一步（把"结束"也走真路径，1–2 次调用）** ✗：**让这次施放自己走完** ✓ ——
+>   ⚠ `SkillExecutor.execute(...)` 是否**在返回前就把 `ATTACK_FINISHED` 发了** ✗ 待查 ⇒ ⭐ 若发了 ⇒ **判据里根本不用手工 fire** ✓
+>     （⚠ 那就说明我那条 `ATTACK_FINISHED` 规则的条件在**真路径**上也不成立 ✗ ⇒ 要去读 `TriggerContext` 里"施放类别"在这个事件上**是否带着** ✓）。
+>   ⇒ ⭐ 具体查法：读 **`SkillExecutor.execute` 的实现** ✓（看它发哪些事件、带哪些上下文 ✓）。
+> * ⭐ **顺带确认** ✓：`BuffManager.hasState(String)` ✓ 与 `SkillType.ELATION_SKILL` ✓ **两个名字都对** ✓（本段"先查再写"的纪律奏效 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据已删 ✓）、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23486,6 +23503,23 @@
 >   ② 找**状态读取**的口 ✓（⚠ 搜 `boolean has`／`getBuffs`／`getBuffManager` ✓ ⇒ 判据要能读"她是否处于某状态" ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（10 个积压提交上一轮推完 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据文件已删 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十四：✅✅✅ **判据跑起来了一半，而且这一半证明**内容真的生效**** —— ⭐ 欢愉技一施放，`阿哈时刻` 状态**就挂上了**；⚠ 卡在"结束"那一步（我手工 `fireTriggers(ATTACK_FINISHED)` **不带施放类别** ✗））**：
+>
+> * ✅ **实测（判据编译通过 ＋ 跑到第 53 行 ✓）** ✓：
+>   * `assertFalse(hasState(阿哈时刻))` ✓ **通过** ✓（施放前没挂 ✓）；
+>   * `owner.getSkills().get(SkillType.ELATION_SKILL)` ✓ **拿到技能** ✓（⭐ `ELATION_SKILL` 这个槽**真的存在** ✓）；
+>   * `SkillExecutor.execute(...)` ⇒ `assertTrue(hasState(阿哈时刻))` ✓ **通过** ✓✓
+>     ⇒ ⭐⭐ **所以内容里的 `CAST_SETUP` ＋ `from_category ElationDamage` 那条规则**真的触发了**** ✓（⚠ 这是本段第一次证明它生效 ✓）；
+>   * ⛔ 然后 `fireTriggers(ATTACK_FINISHED, owner, owner, 0, 0)` ⇒ `assertFalse(hasState(阿哈时刻))` ✗ **失败** ✓
+>     （*"at zero the state must be gone ==> expected: <false> but was: <true>"* ✓）⇒ 状态**还在** ✗。
+> * ⭐ **原因判断（很确定）** ✓：我那条"结束"规则的条件是 **`from_category ElationDamage`** ✓ ⇒ ⚠ 而**手工 `fireTriggers` 造的事件没有"施放"上下文** ✗
+>   ⇒ 条件不成立 ⇒ 计数没减 ⇒ 状态没摘 ✓（⚠ 正是我在记录里预先写下的那个坑 ✓）。
+> * ⭐ **下一轮第一步（把"结束"也走真路径，1–2 次调用）** ✗：**让这次施放自己走完** ✓ ——
+>   ⚠ `SkillExecutor.execute(...)` 是否**在返回前就把 `ATTACK_FINISHED` 发了** ✗ 待查 ⇒ ⭐ 若发了 ⇒ **判据里根本不用手工 fire** ✓
+>     （⚠ 那就说明我那条 `ATTACK_FINISHED` 规则的条件在**真路径**上也不成立 ✗ ⇒ 要去读 `TriggerContext` 里"施放类别"在这个事件上**是否带着** ✓）。
+>   ⇒ ⭐ 具体查法：读 **`SkillExecutor.execute` 的实现** ✓（看它发哪些事件、带哪些上下文 ✓）。
+> * ⭐ **顺带确认** ✓：`BuffManager.hasState(String)` ✓ 与 `SkillType.ELATION_SKILL` ✓ **两个名字都对** ✓（本段"先查再写"的纪律奏效 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据已删 ✓）、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
