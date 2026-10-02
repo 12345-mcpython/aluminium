@@ -18035,6 +18035,144 @@
 >   资源本身（本轮 ✓）**现在都在位** ✓ ⇒ 这一级**只剩写数据 ＋ 判据** ✓；⚠ 但"战技 100% / 秘技 50%"那两个比例 ✗
 >   仍需一个决断 ✓（登记在案 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2118** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百二十五：✅✅✅ **死龙面板出货** —— 资源基数面板的**第一个真读者**落地（`d43be88` ✓）；同时把"技能"与"50% 秘技版"如实登记为未做）**：
+>
+> * ✅ **进树** ✓（全量 **2119** 绿 ✓、两闸门 [0,0] ✓、树干净、已推送 `d43be88` ✓）：
+>   `src/main/resources/memosprites/1407.json` ✓ ＋ 判据 `DragonPanelTest` ✓（**3 个断言全绿 ✓**）：
+>   * 【新蕊】上限 **1000** ⇒ 龙血 **1000** ✓；上限 **34,000** ⇒ 龙血 **34,000** ✓（**同一份 spec、跟着资源走** ✓）；
+>   * 速度 **165**（`flat` ✓，文档原话 ✓）。
+>   ⇒ ⭐ 这是"**资源基数的忆灵面板**"（`504952b` ✓ 引擎侧）与"**【新蕊】**"（`7bd3472` ✓ 内容侧）**两条线合拢的地方** ✓。
+> * ⚠ **本文件只写面板，不写 `attack`** ✓ —— 理由写进了 `note` ✓：忆灵技能 1–8（`:311`–`:527` ✓）是**另外的句子** ✓，
+>   而 `shape` 认哪些字**还没查** ✗ ⇒ 猜一个 shape 会是"没有症状的错数" ✗ ⇒ **登记** ✓（下一步先数 shape 词汇 ✓）。
+> * ⚠ **两个比例**（战技 **100%** ✓ ／ 秘技 **50%** ✓，`1407_遐蝶.md:242` ✓）：一份 spec 只能给**一个** `percent` ✗
+>   ⇒ 本件取**战技的 100%** ✓ 并把 50% **登记** ✓（⚠ 要它就得先决断"哪个入口召唤" ✗ —— 那是一个**新机制** ✗）。
+> * ⭐ **顺带**：`Note` 里写清了"这是 `SummonFactory.panelOf` 的 `resource:` 分支的第一个读者" ✓ ⇒ 后来人一眼能看出
+>   **为什么这个 spec 的 `HEALTH` 不是 `percent` of 主人** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百二十六：⭐⭐ 死龙的**技能**卡在一处真缺口上 —— `attack.base` 只能指**忆灵自己**的属性，而句子要的是**召唤者**的属性）**：
+>
+> * ✅ **实测（读 `Memosprites.validateAttack` ✓，`:198` ✓）** ✓：形状词汇查清了 —— `Attack(element, base, percent, hits, shape, stance)` ✓，
+>   其中 `shape` 走 **`SkillEffectType.fromString` ✓ 且必须 `isDamaging()`** ✓（报错示例给的是 **`SingleAttack` / `AoEAttack` / `Blast`** ✓）
+>   ⇒ ⭐ **忆灵技能 1（`全体攻击` ✓）应写 `AoEAttack`** ✓；并校验 `base` 必须是**面板里出现过的**属性 ✓（`:227` ✓）。
+> * ⛔ **但这就是卡点** ✓：`1407` 忆灵技能 1 的句子是「对敌方全体造成等同于**遐蝶** **40.00%** 生命上限的量子属性伤害」✓
+>   —— ⭐ 基数是**召唤者（遐蝶）**的生命上限 ✗，而 `base` 只能指**忆灵自己**的属性 ✗
+>   （`validateAttack` 的语义是"share of **its own** base" ✓，报错原文：*"a share of its own " + base.name()* ✓）。
+>   ⇒ ⚠ 若硬写 `base: "HEALTH"` ⇒ 会按**死龙自己的血**算 ✗（而死龙的血 = 【新蕊】上限 ×100% ✗ ≠ 遐蝶生命上限 ✗）
+>     ⇒ **一个"没有症状的错数"** ✗ ⇒ ⛔ **不写** ✓（与项目纪律一致 ✓）。
+> * ⭐ **这不是孤例，过门槛** ✓：`1413` 的忆灵技能 1 是「等同于**「长夜」** 50% 生命上限」✓（**自己的** ✓ ⇒ 已出货 ✓），
+>   而 `1407` 的技能 1–8 全是「等同于**遐蝶** …生命上限」✗、`1512` 的忆灵技也多为**召唤者**口径 ✗
+>   ⇒ ⭐ **读者 ≥2** ✓ ⇒ **值得造** ✓（给 `attack` 加一个"基数是召唤者"的写法 ✓ —— 与**资源基数面板**同一族思路 ✓）。
+> * ⭐ **下一轮第一步** ✗：① 先**数清**有多少条忆灵技能是"召唤者的某属性 X%" ✓（`1407` 8 条 ＋ `1512` 若干 ✓ ⇒ 数一遍 ✓）；
+>   ② 再给 `MemospriteSpec.Attack.base` 加一档（例如 `owner_max_hp` ✓ —— ⚠ **照 `SummonFactory.panelOf` 里 `resource:` 那支的形状** ✓：
+>     可空字段 ＋ 调用方传值 ✓）；③ 判据：龙的这一击 == **遐蝶生命上限 × 40%** ✓（改遐蝶面板 ⇒ 跟着变 ✓）＋ 变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十七：⭐ "召唤者口径"那一支的落点也读到了 —— `attackOf` 把 `base` 作为 **`AttributeType`** 交给 `EnemySkill`，所以它天然按**施放者（忆灵）自己**取数）**：
+>
+> * ✅ **实测（读 `SummonFactory.attackOf` ✓，`:309` ✓）** ✓：
+>   ```java
+>   private static EnemySkill attackOf(MemospriteSpec spec, DamageType type) {
+>       MemospriteSpec.Attack attack = spec.attack();
+>       return new EnemySkill(
+>               DamageElement.fromString(attack.element()),
+>               attack.percent(), attack.hits() == null ? 1 : attack.hits(), type,
+>               SkillEffectType.fromString(attack.shape()),
+>               AttributeType.fromString(attack.base()),          // ← ★ 交的是"属性名"，由技能在**施放者**身上解析
+>               attack.stance() == null ? 0 : attack.stance());
+>   }
+>   ```
+>   ⇒ ⭐ **"等同于召唤者生命上限 X%"** 要么① 给 `Attack` 加一档"基数来自召唤者" ✓（并把**数值**带进去 ✗ ⇒ 但 `EnemySkill`
+>     收的是 `AttributeType` ✗ ⇒ 得看它有没有"直接给基数数值"的构造 ✓），要么② 让忆灵**自己**带一个"我是按主人 X% 来的"
+>     的隐藏属性 ✗（更绕 ✓）。⇒ ⭐ **下一轮第一步**：读 **`EnemySkill` 的构造器/字段** ✓ —— 有没有"基数直接给数值"这一档 ✓；
+>     有 ⇒ ① 两步可成 ✓；没有 ⇒ 先加那一档 ✓（⚠ 那会影响所有敌人技能 ⇒ 必须全量绿后再提交 ✓）。
+> * ⭐ **同时提醒一件容易忘的事** ✓：这一支的**读者数**（`1407` 技能 1–8 ＋ `1512` 若干 ✓）**只是"技能 1"那一条**的读者 ✓
+>   —— ⚠ 真正要出货的最小切片是**一条**（忆灵技能 1 ✓：`AoEAttack` ✓ ＋ `element: Quantum` ✓ ＋ `stance: 30` ✓ ＋
+>     `percent: 0.4`（散文的 40.00% ✓，并注明整表 `0.2 → 0.56` ✓））⇒ ⚠ 但**先把"召唤者基数"做出来** ✓，否则仍是错数 ✗。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十八：⭐ `EnemySkill` **只有 `baseAttribute`、没有"基数直接给数值"那一档** ⇒ "召唤者口径"有两条实现路，各有代价）**：
+>
+> * ✅ **实测（读 `EnemySkill` ✓）** ✓：它持有 `element / multiplier / hits / type / effect / baseAttribute(AttributeType) / stanceDamage` ✓
+>   与三个构造器（`:72` ✓／`:92` ✓／`:101` ✓，**全部只收 `AttributeType`** ✗）⇒ ⛔ **没有**"基数＝一个数值"的入口 ✗。
+> * ⭐ **两条路** ✗：
+>   **(A) 给 `EnemySkill` 加 `baseValue`** ✓（一个字段 ＋ 一个构造器 ✓ ⇒ `attackOf` 在**召唤时**算出
+>     `percent × 召唤者.getAttribute(base)` 并把它作为**基数数值**传进去 ✓）—— ⚠ **代价**：动到**敌人技能**这条公共路 ✗
+>     ⇒ 必须全量绿后再提交 ✓（且要证明**既有敌人不受影响** ✓：新增构造器 ＋ 旧构造器委托 ✓）。
+>   **(B) 在召唤时把"主人的该属性"写进忆灵自己的某个隐藏属性** ✗ ⇒ ⚠ 更绕、且会让忆灵"看起来拥有"一个它没有的属性 ✗
+>     ⇒ **不取** ✓。
+>   ⭐ **倾向 (A)** ✓：它把口径落在**数据**里（`Attack` 加一档 `owner_base` 之类 ✓），而 `EnemySkill` 只是多一个入口 ✓。
+> * ⭐ **下一轮第一步（一次做完，四步）** ✗：① `MemospriteSpec.Attack` 加可空字段（例如 `"ownerBase": "HEALTH"` ✓ —— 空 = 旧行为 ✓）；
+>   ② `EnemySkill` 加 `baseValue` 字段与构造器（旧构造器委托 ✓ ⇒ 零行为变化 ✓）；
+>   ③ `attackOf` 在**有** `ownerBase` 时算 `percent × master.getAttribute(ownerBase)` 并走新构造器 ✓
+>      （⚠ `master` 要传进 `attackOf` ✗ ⇒ 它现在只收 `spec` ✓ ⇒ 签名要改 ✓，调用点在 `memosprite`／`servant` 体内 ✓）；
+>   ④ 判据：死龙这一击 == **遐蝶生命上限 × 40%** ✓（改遐蝶面板 ⇒ 跟着变 ✓）＋ 变异（把 40% 改成 20% ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十九：⛔⛔ **又一次"白设计"** —— `MemospriteSpec.Attack` 的 javadoc **自己写着**"召唤者口径怎么表达"：**份额放进面板**，攻击再按**忆灵自己的**那个属性取数；而"景元」那条能这么做，是因为它是 ATTACK→ATTACK）**：
+>
+> * ✅ **实测（读 `MemospriteSpec.Attack` 的 javadoc ✓，`:95`–`:115` ✓）** ✓，原文两段：
+>   * *"it cannot live on the summoning character, because the numbers are stated against the **memosprite**: 长夜月's 「长夜」
+>     hits for 「等同于「长夜」200%生命上限」, which is the memosprite's own Max HP, **not the summoner's**. Reading it off the
+>     summoner would produce a number 2× too large … a wrong number that looks plausible, which is the worst kind."* ✓
+>   * ⭐ *"⚠ `base` names an attribute of the **memosprite**. Where a document instead scales off the *summoner*
+>     （景元's 「神君」 hits for 「等同于景元攻击力 66%」）, **the panel carries the share and the attack then scales off the
+>     memosprite's own ATTACK**: the same number, stated the same way every other inherited attribute is."* ✓
+>   ⇒ ⭐⭐ **所以"召唤者口径"**不需要新机制** ✓（我上一轮设计的"给 `EnemySkill` 加 `baseValue`" ✗ **是多余的** ✗ ——
+>     本段**第三次**同一个毛病 ✓：**没读代码自己的说明就先设计** ✓）。
+> * ⚠ **但 1407 这条仍然不行** ✓：那条约定之所以够用，是因为景元是 **ATTACK → ATTACK** ✓；而死龙的句子是
+>   「等同于**遐蝶生命上限**的 40%」✗ ⇒ 需要的是"**主人**的**另一个**属性的 X%" ✗ —— 而 `panelOf` 的语义是
+>   `percent × master.getAttribute(**同一个** attribute)` ✗ ⇒ ⛔ **表达不了** ✓。
+> * ⭐⭐⭐ **正确的最小切法（下一轮，一次做完）** ✗：把**我已经拥有的那个分支**再扩一档 ✓ ——
+>   `SummonFactory.panelOf` 里 `source:` 现在认 **`resource:<名>`** ✓（本轮已出货 ✓）⇒ **再认 `attr:<属性名>`** ✓
+>   （= 主人**该属性**的 X% ✓）⇒ 那么死龙可以写：
+>   `panel: [ {HEALTH, source:"resource:新蕊", percent:1.0}, {ATTACK, source:"attr:HEALTH", percent:1.0}, {SPEED, flat:165} ]`
+>   ＋ `attack: {element:"Quantum", base:"ATTACK", percent:0.4, shape:"AoEAttack", stance:30}` ✓
+>   ⇒ 这一击 **= 遐蝶生命上限 × 40%** ✓✓（口径对上了 ✓），而死龙**自己的血**仍是【新蕊】上限 ×100% ✓。
+> * ⭐ **读者数** ✓：`1407` 技能 1–8 全是这个口径 ✓ ＋ `1512` 的忆灵技多为召唤者口径 ✓ ⇒ **≥2** ✓ 过门槛 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十：✅ `attr:<属性>` 这一档出货 —— 面板项现在可以取**主人另一个属性**的份额（`2a4e1d8` ✓）；技能数据这一轮**如实不下去**）**：
+>
+> * ✅ **进树** ✓（全量 **2119** 绿 ✓、两闸门 [0,0] ✓、树干净、已推送 `2a4e1d8` ✓）：
+>   `SummonFactory.panelOf` 新增一支 ✓ —— `source: "attr:<属性名>"` ⇒ **`share × 主人该属性`** ✓，插在 `resource:` 与
+>   "同名属性"那一支之间 ✓；判据 `DragonPanelTest` 断言 **死龙的 `ATTACK` 槽 = 遐蝶生命上限** ✓（绿 ✓）。
+>   ⚠ 注释里写明了**为什么需要它** ✓：原来那支读的是 `master.getAttribute(**attribute**)`（**同一个**属性 ✗）
+>   ⇒ 景元那种 `ATTACK→ATTACK` 的写法够用 ✓，而"**遐蝶生命上限的 40%**"进不来 ✗。
+> * ⚠ **技能数据这一轮没写下去** ✓，理由如实：`Memosprites.validateAttack` 要求 `attack.base` **出现在面板里** ✓
+>   （本轮已把 `ATTACK` 加进面板 ✓ 所以它**可以**写了 ✓），但**判据测不到** ✗ —— 我在判据里用
+>   `getSkill(SkillType.COMMON).damageOf(dragon)` ✗ **编译报"找不到符号"** ✗ ⇒ ⭐ **`EnemySkill` 取基数的 API 名我猜错了** ✗
+>   ⇒ 按纪律（**不写"没验证过的东西"** ✓）**把 `attack` 从 spec 里撤下** ✓、并在 `note` 里写明"先登记、下一步读 API" ✓。
+> * ⭐ **下一轮第一步** ✗：读 **`EnemySkill` 的取数方法**（谁把 `baseAttribute × multiplier` 算出来 ✓ ——
+>    可能是 `damageOf(caster)` ✗／`buildDamage(...)` ✗／在 `SkillExecutor` 里 ✗）⇒ 找到真名后：
+>    ① 判据断言 **死龙这一击 == 遐蝶生命上限 × 40%** ✓；② 把 `attack` 写回 spec ✓（`element Quantum` ✓／`base ATTACK` ✓／
+>    `percent 0.4`（散文那一级 ✓）／`shape AoEAttack` ✓／`stance 30` ✓）；③ 变异（`0.4 → 0.2` ⇒ 必红 ✓）。
+> * ⚠ **顺带一条过程教训** ✓：这一轮我插判据时**插错了位置**（新方法落进旧方法体内 ✗ 且在类外重复了一份 ✗），
+>   靠"读回来看"才发现 ✓ ⇒ ⭐ **往文件里插代码后要读一眼插入点** ✓（不能只看脚本 print 的 "ok" ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十一：✅✅✅ **死龙的忆灵技能 1 出货**（`3408e65` ✓）—— 判据 2 条绿、全量 2119 绿、两闸门 [0,0]）**：
+>
+> * ✅ **进树** ✓：`memosprites/1407.json` 的 `attack` 补上 ✓ —— `element Quantum` ✓／`base ATTACK` ✓／
+>   `percent 0.4` ✓（**散文引用的那一级** ✓，并在 `note` 里写明整表 `0.2 → 0.56` ✓，与 1413 同例 ✓）／
+>   `shape AoEAttack` ✓（文档「全体攻击」✓）／`stance 30` ✓（文档「破韧值: 单体 0, **全体 30**, 扩散 0」✓）；
+>   判据 `DragonPanelTest` 扩到 **2 条** ✓：① 面板跟着【新蕊】走 ✓（1000 ⇒ 1000 ✓、34,000 ⇒ 34,000 ✓、速度 165 ✓）；
+>   ② 技能与文档一致 ✓ ＋ ⭐ **它取数的那个 `ATTACK` 槽 = 遐蝶生命上限** ✓ ⇒ 合起来就是「等同于遐蝶 40.00% 生命上限」✓。
+> * ⚠ **判据的诚实边界（写进注释了 ✓）**：这一条断言的是**数据与槽位** ✓，而"基数 × 倍率"那一步是引擎**既有**的
+>   `SkillData` 路径 ✓（本次没有改动它 ✓）⇒ 所以没有把"伤害数值"再 mock 一遍 ✓（⚠ 也没有声称已验到那一层 ✓）。
+> * ⭐ **这一支的路线值得记一笔** ✓：`MemospriteSpec.Attack` 的 javadoc 说"召唤者口径就把份额放进面板" ✓ ——
+>   而**同样的属性**才走得通 ✗ ⇒ 我加了 `attr:<属性>`（**主人另一个属性**的份额 ✓，`2a4e1d8` ✓）
+>   ⇒ 死龙于是能写 `panel: ATTACK = 主人生命上限 100%` ＋ `attack: base ATTACK, 40%` ✓ ⇒ 口径对上 ✓，
+>   而它**自己的血**仍是【新蕊】上限 ×100% ✓（两件事互不干扰 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十二：✅ 实测变异（`attr:` 那一档 **1 红**）—— 把槽位指向"主人的 ATTACK" ⇒ 判据当场红）**：
+>
+> * ✅ **实测（改数据、跑判据、回滚 ✓）** ✓：把 `panel` 里那一项从 `source: "attr:HEALTH"` 改成 `"attr:ATTACK"` ✓ ⇒
+>   判据报 *"and that slot carries the summoner's Max HP, so the hit is 40% of it ==> expected: <1629.936…> but was: <…>"* ✓
+>   ⇒ ⭐ **`attr:<属性>` 这一档是承重的** ✓（它取的就是**主人那个被点名的属性** ✓，改一个字就换了口径 ✓）。
+>   ⚠ 回滚后全量仍 **0** ✓、树干净 ✓。
+> * ⭐ **于是死龙这一支四件齐了** ✓：**能力**（`attr:` 面板来源 ✓ ＋ 资源基数面板 ✓）＋ **内容**（`memosprites/1407.json` ✓）＋
+>   **测试**（`DragonPanelTest` 2 条 ✓）＋ **实测变异**（本轮 1 红 ✓）＋ **文档**（`note` ＋ 本条 ✓）。
+> * ⭐ **下一轮可选（按"过门槛"排序 ✓）** ✗：
+>   ① **`per-N` 除数**（`1223` 的"每消耗 3 点充能 ⇒ 1 次" ✓；读者：`1223` ✓、`1504` ✓ ⇒ **≥2** ✓ —— ⚠ 它的资源【充能】**已声明** ✓
+>      ⇒ **可以一步出货** ✓：给 `times_from` 加一个除数（例如 `"event_amount/3"` ✗ 或另立 `per` 字段 ✓，⚠ 名字照文档写 ✓）；
+>   ② **死龙的 50% 秘技版** ✗（需要"哪个入口召唤"的新机制 ✗ ⇒ 大 ✓）；
+>   ③ **忆灵技能 2–8** ✓（同一条 `attr:` 口径 ✓ ⇒ 逐条可加 ✓：`燎尽黯泽的焰息` ✓／`月茧荫蔽的身躯` ✓…⚠ 各要读参数表 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19136,6 +19274,144 @@
 >   资源本身（本轮 ✓）**现在都在位** ✓ ⇒ 这一级**只剩写数据 ＋ 判据** ✓；⚠ 但"战技 100% / 秘技 50%"那两个比例 ✗
 >   仍需一个决断 ✓（登记在案 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2118** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百二十五：✅✅✅ **死龙面板出货** —— 资源基数面板的**第一个真读者**落地（`d43be88` ✓）；同时把"技能"与"50% 秘技版"如实登记为未做）**：
+>
+> * ✅ **进树** ✓（全量 **2119** 绿 ✓、两闸门 [0,0] ✓、树干净、已推送 `d43be88` ✓）：
+>   `src/main/resources/memosprites/1407.json` ✓ ＋ 判据 `DragonPanelTest` ✓（**3 个断言全绿 ✓**）：
+>   * 【新蕊】上限 **1000** ⇒ 龙血 **1000** ✓；上限 **34,000** ⇒ 龙血 **34,000** ✓（**同一份 spec、跟着资源走** ✓）；
+>   * 速度 **165**（`flat` ✓，文档原话 ✓）。
+>   ⇒ ⭐ 这是"**资源基数的忆灵面板**"（`504952b` ✓ 引擎侧）与"**【新蕊】**"（`7bd3472` ✓ 内容侧）**两条线合拢的地方** ✓。
+> * ⚠ **本文件只写面板，不写 `attack`** ✓ —— 理由写进了 `note` ✓：忆灵技能 1–8（`:311`–`:527` ✓）是**另外的句子** ✓，
+>   而 `shape` 认哪些字**还没查** ✗ ⇒ 猜一个 shape 会是"没有症状的错数" ✗ ⇒ **登记** ✓（下一步先数 shape 词汇 ✓）。
+> * ⚠ **两个比例**（战技 **100%** ✓ ／ 秘技 **50%** ✓，`1407_遐蝶.md:242` ✓）：一份 spec 只能给**一个** `percent` ✗
+>   ⇒ 本件取**战技的 100%** ✓ 并把 50% **登记** ✓（⚠ 要它就得先决断"哪个入口召唤" ✗ —— 那是一个**新机制** ✗）。
+> * ⭐ **顺带**：`Note` 里写清了"这是 `SummonFactory.panelOf` 的 `resource:` 分支的第一个读者" ✓ ⇒ 后来人一眼能看出
+>   **为什么这个 spec 的 `HEALTH` 不是 `percent` of 主人** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百二十六：⭐⭐ 死龙的**技能**卡在一处真缺口上 —— `attack.base` 只能指**忆灵自己**的属性，而句子要的是**召唤者**的属性）**：
+>
+> * ✅ **实测（读 `Memosprites.validateAttack` ✓，`:198` ✓）** ✓：形状词汇查清了 —— `Attack(element, base, percent, hits, shape, stance)` ✓，
+>   其中 `shape` 走 **`SkillEffectType.fromString` ✓ 且必须 `isDamaging()`** ✓（报错示例给的是 **`SingleAttack` / `AoEAttack` / `Blast`** ✓）
+>   ⇒ ⭐ **忆灵技能 1（`全体攻击` ✓）应写 `AoEAttack`** ✓；并校验 `base` 必须是**面板里出现过的**属性 ✓（`:227` ✓）。
+> * ⛔ **但这就是卡点** ✓：`1407` 忆灵技能 1 的句子是「对敌方全体造成等同于**遐蝶** **40.00%** 生命上限的量子属性伤害」✓
+>   —— ⭐ 基数是**召唤者（遐蝶）**的生命上限 ✗，而 `base` 只能指**忆灵自己**的属性 ✗
+>   （`validateAttack` 的语义是"share of **its own** base" ✓，报错原文：*"a share of its own " + base.name()* ✓）。
+>   ⇒ ⚠ 若硬写 `base: "HEALTH"` ⇒ 会按**死龙自己的血**算 ✗（而死龙的血 = 【新蕊】上限 ×100% ✗ ≠ 遐蝶生命上限 ✗）
+>     ⇒ **一个"没有症状的错数"** ✗ ⇒ ⛔ **不写** ✓（与项目纪律一致 ✓）。
+> * ⭐ **这不是孤例，过门槛** ✓：`1413` 的忆灵技能 1 是「等同于**「长夜」** 50% 生命上限」✓（**自己的** ✓ ⇒ 已出货 ✓），
+>   而 `1407` 的技能 1–8 全是「等同于**遐蝶** …生命上限」✗、`1512` 的忆灵技也多为**召唤者**口径 ✗
+>   ⇒ ⭐ **读者 ≥2** ✓ ⇒ **值得造** ✓（给 `attack` 加一个"基数是召唤者"的写法 ✓ —— 与**资源基数面板**同一族思路 ✓）。
+> * ⭐ **下一轮第一步** ✗：① 先**数清**有多少条忆灵技能是"召唤者的某属性 X%" ✓（`1407` 8 条 ＋ `1512` 若干 ✓ ⇒ 数一遍 ✓）；
+>   ② 再给 `MemospriteSpec.Attack.base` 加一档（例如 `owner_max_hp` ✓ —— ⚠ **照 `SummonFactory.panelOf` 里 `resource:` 那支的形状** ✓：
+>     可空字段 ＋ 调用方传值 ✓）；③ 判据：龙的这一击 == **遐蝶生命上限 × 40%** ✓（改遐蝶面板 ⇒ 跟着变 ✓）＋ 变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十七：⭐ "召唤者口径"那一支的落点也读到了 —— `attackOf` 把 `base` 作为 **`AttributeType`** 交给 `EnemySkill`，所以它天然按**施放者（忆灵）自己**取数）**：
+>
+> * ✅ **实测（读 `SummonFactory.attackOf` ✓，`:309` ✓）** ✓：
+>   ```java
+>   private static EnemySkill attackOf(MemospriteSpec spec, DamageType type) {
+>       MemospriteSpec.Attack attack = spec.attack();
+>       return new EnemySkill(
+>               DamageElement.fromString(attack.element()),
+>               attack.percent(), attack.hits() == null ? 1 : attack.hits(), type,
+>               SkillEffectType.fromString(attack.shape()),
+>               AttributeType.fromString(attack.base()),          // ← ★ 交的是"属性名"，由技能在**施放者**身上解析
+>               attack.stance() == null ? 0 : attack.stance());
+>   }
+>   ```
+>   ⇒ ⭐ **"等同于召唤者生命上限 X%"** 要么① 给 `Attack` 加一档"基数来自召唤者" ✓（并把**数值**带进去 ✗ ⇒ 但 `EnemySkill`
+>     收的是 `AttributeType` ✗ ⇒ 得看它有没有"直接给基数数值"的构造 ✓），要么② 让忆灵**自己**带一个"我是按主人 X% 来的"
+>     的隐藏属性 ✗（更绕 ✓）。⇒ ⭐ **下一轮第一步**：读 **`EnemySkill` 的构造器/字段** ✓ —— 有没有"基数直接给数值"这一档 ✓；
+>     有 ⇒ ① 两步可成 ✓；没有 ⇒ 先加那一档 ✓（⚠ 那会影响所有敌人技能 ⇒ 必须全量绿后再提交 ✓）。
+> * ⭐ **同时提醒一件容易忘的事** ✓：这一支的**读者数**（`1407` 技能 1–8 ＋ `1512` 若干 ✓）**只是"技能 1"那一条**的读者 ✓
+>   —— ⚠ 真正要出货的最小切片是**一条**（忆灵技能 1 ✓：`AoEAttack` ✓ ＋ `element: Quantum` ✓ ＋ `stance: 30` ✓ ＋
+>     `percent: 0.4`（散文的 40.00% ✓，并注明整表 `0.2 → 0.56` ✓））⇒ ⚠ 但**先把"召唤者基数"做出来** ✓，否则仍是错数 ✗。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十八：⭐ `EnemySkill` **只有 `baseAttribute`、没有"基数直接给数值"那一档** ⇒ "召唤者口径"有两条实现路，各有代价）**：
+>
+> * ✅ **实测（读 `EnemySkill` ✓）** ✓：它持有 `element / multiplier / hits / type / effect / baseAttribute(AttributeType) / stanceDamage` ✓
+>   与三个构造器（`:72` ✓／`:92` ✓／`:101` ✓，**全部只收 `AttributeType`** ✗）⇒ ⛔ **没有**"基数＝一个数值"的入口 ✗。
+> * ⭐ **两条路** ✗：
+>   **(A) 给 `EnemySkill` 加 `baseValue`** ✓（一个字段 ＋ 一个构造器 ✓ ⇒ `attackOf` 在**召唤时**算出
+>     `percent × 召唤者.getAttribute(base)` 并把它作为**基数数值**传进去 ✓）—— ⚠ **代价**：动到**敌人技能**这条公共路 ✗
+>     ⇒ 必须全量绿后再提交 ✓（且要证明**既有敌人不受影响** ✓：新增构造器 ＋ 旧构造器委托 ✓）。
+>   **(B) 在召唤时把"主人的该属性"写进忆灵自己的某个隐藏属性** ✗ ⇒ ⚠ 更绕、且会让忆灵"看起来拥有"一个它没有的属性 ✗
+>     ⇒ **不取** ✓。
+>   ⭐ **倾向 (A)** ✓：它把口径落在**数据**里（`Attack` 加一档 `owner_base` 之类 ✓），而 `EnemySkill` 只是多一个入口 ✓。
+> * ⭐ **下一轮第一步（一次做完，四步）** ✗：① `MemospriteSpec.Attack` 加可空字段（例如 `"ownerBase": "HEALTH"` ✓ —— 空 = 旧行为 ✓）；
+>   ② `EnemySkill` 加 `baseValue` 字段与构造器（旧构造器委托 ✓ ⇒ 零行为变化 ✓）；
+>   ③ `attackOf` 在**有** `ownerBase` 时算 `percent × master.getAttribute(ownerBase)` 并走新构造器 ✓
+>      （⚠ `master` 要传进 `attackOf` ✗ ⇒ 它现在只收 `spec` ✓ ⇒ 签名要改 ✓，调用点在 `memosprite`／`servant` 体内 ✓）；
+>   ④ 判据：死龙这一击 == **遐蝶生命上限 × 40%** ✓（改遐蝶面板 ⇒ 跟着变 ✓）＋ 变异（把 40% 改成 20% ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十九：⛔⛔ **又一次"白设计"** —— `MemospriteSpec.Attack` 的 javadoc **自己写着**"召唤者口径怎么表达"：**份额放进面板**，攻击再按**忆灵自己的**那个属性取数；而"景元」那条能这么做，是因为它是 ATTACK→ATTACK）**：
+>
+> * ✅ **实测（读 `MemospriteSpec.Attack` 的 javadoc ✓，`:95`–`:115` ✓）** ✓，原文两段：
+>   * *"it cannot live on the summoning character, because the numbers are stated against the **memosprite**: 长夜月's 「长夜」
+>     hits for 「等同于「长夜」200%生命上限」, which is the memosprite's own Max HP, **not the summoner's**. Reading it off the
+>     summoner would produce a number 2× too large … a wrong number that looks plausible, which is the worst kind."* ✓
+>   * ⭐ *"⚠ `base` names an attribute of the **memosprite**. Where a document instead scales off the *summoner*
+>     （景元's 「神君」 hits for 「等同于景元攻击力 66%」）, **the panel carries the share and the attack then scales off the
+>     memosprite's own ATTACK**: the same number, stated the same way every other inherited attribute is."* ✓
+>   ⇒ ⭐⭐ **所以"召唤者口径"**不需要新机制** ✓（我上一轮设计的"给 `EnemySkill` 加 `baseValue`" ✗ **是多余的** ✗ ——
+>     本段**第三次**同一个毛病 ✓：**没读代码自己的说明就先设计** ✓）。
+> * ⚠ **但 1407 这条仍然不行** ✓：那条约定之所以够用，是因为景元是 **ATTACK → ATTACK** ✓；而死龙的句子是
+>   「等同于**遐蝶生命上限**的 40%」✗ ⇒ 需要的是"**主人**的**另一个**属性的 X%" ✗ —— 而 `panelOf` 的语义是
+>   `percent × master.getAttribute(**同一个** attribute)` ✗ ⇒ ⛔ **表达不了** ✓。
+> * ⭐⭐⭐ **正确的最小切法（下一轮，一次做完）** ✗：把**我已经拥有的那个分支**再扩一档 ✓ ——
+>   `SummonFactory.panelOf` 里 `source:` 现在认 **`resource:<名>`** ✓（本轮已出货 ✓）⇒ **再认 `attr:<属性名>`** ✓
+>   （= 主人**该属性**的 X% ✓）⇒ 那么死龙可以写：
+>   `panel: [ {HEALTH, source:"resource:新蕊", percent:1.0}, {ATTACK, source:"attr:HEALTH", percent:1.0}, {SPEED, flat:165} ]`
+>   ＋ `attack: {element:"Quantum", base:"ATTACK", percent:0.4, shape:"AoEAttack", stance:30}` ✓
+>   ⇒ 这一击 **= 遐蝶生命上限 × 40%** ✓✓（口径对上了 ✓），而死龙**自己的血**仍是【新蕊】上限 ×100% ✓。
+> * ⭐ **读者数** ✓：`1407` 技能 1–8 全是这个口径 ✓ ＋ `1512` 的忆灵技多为召唤者口径 ✓ ⇒ **≥2** ✓ 过门槛 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百三十：✅ `attr:<属性>` 这一档出货 —— 面板项现在可以取**主人另一个属性**的份额（`2a4e1d8` ✓）；技能数据这一轮**如实不下去**）**：
+>
+> * ✅ **进树** ✓（全量 **2119** 绿 ✓、两闸门 [0,0] ✓、树干净、已推送 `2a4e1d8` ✓）：
+>   `SummonFactory.panelOf` 新增一支 ✓ —— `source: "attr:<属性名>"` ⇒ **`share × 主人该属性`** ✓，插在 `resource:` 与
+>   "同名属性"那一支之间 ✓；判据 `DragonPanelTest` 断言 **死龙的 `ATTACK` 槽 = 遐蝶生命上限** ✓（绿 ✓）。
+>   ⚠ 注释里写明了**为什么需要它** ✓：原来那支读的是 `master.getAttribute(**attribute**)`（**同一个**属性 ✗）
+>   ⇒ 景元那种 `ATTACK→ATTACK` 的写法够用 ✓，而"**遐蝶生命上限的 40%**"进不来 ✗。
+> * ⚠ **技能数据这一轮没写下去** ✓，理由如实：`Memosprites.validateAttack` 要求 `attack.base` **出现在面板里** ✓
+>   （本轮已把 `ATTACK` 加进面板 ✓ 所以它**可以**写了 ✓），但**判据测不到** ✗ —— 我在判据里用
+>   `getSkill(SkillType.COMMON).damageOf(dragon)` ✗ **编译报"找不到符号"** ✗ ⇒ ⭐ **`EnemySkill` 取基数的 API 名我猜错了** ✗
+>   ⇒ 按纪律（**不写"没验证过的东西"** ✓）**把 `attack` 从 spec 里撤下** ✓、并在 `note` 里写明"先登记、下一步读 API" ✓。
+> * ⭐ **下一轮第一步** ✗：读 **`EnemySkill` 的取数方法**（谁把 `baseAttribute × multiplier` 算出来 ✓ ——
+>    可能是 `damageOf(caster)` ✗／`buildDamage(...)` ✗／在 `SkillExecutor` 里 ✗）⇒ 找到真名后：
+>    ① 判据断言 **死龙这一击 == 遐蝶生命上限 × 40%** ✓；② 把 `attack` 写回 spec ✓（`element Quantum` ✓／`base ATTACK` ✓／
+>    `percent 0.4`（散文那一级 ✓）／`shape AoEAttack` ✓／`stance 30` ✓）；③ 变异（`0.4 → 0.2` ⇒ 必红 ✓）。
+> * ⚠ **顺带一条过程教训** ✓：这一轮我插判据时**插错了位置**（新方法落进旧方法体内 ✗ 且在类外重复了一份 ✗），
+>   靠"读回来看"才发现 ✓ ⇒ ⭐ **往文件里插代码后要读一眼插入点** ✓（不能只看脚本 print 的 "ok" ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十一：✅✅✅ **死龙的忆灵技能 1 出货**（`3408e65` ✓）—— 判据 2 条绿、全量 2119 绿、两闸门 [0,0]）**：
+>
+> * ✅ **进树** ✓：`memosprites/1407.json` 的 `attack` 补上 ✓ —— `element Quantum` ✓／`base ATTACK` ✓／
+>   `percent 0.4` ✓（**散文引用的那一级** ✓，并在 `note` 里写明整表 `0.2 → 0.56` ✓，与 1413 同例 ✓）／
+>   `shape AoEAttack` ✓（文档「全体攻击」✓）／`stance 30` ✓（文档「破韧值: 单体 0, **全体 30**, 扩散 0」✓）；
+>   判据 `DragonPanelTest` 扩到 **2 条** ✓：① 面板跟着【新蕊】走 ✓（1000 ⇒ 1000 ✓、34,000 ⇒ 34,000 ✓、速度 165 ✓）；
+>   ② 技能与文档一致 ✓ ＋ ⭐ **它取数的那个 `ATTACK` 槽 = 遐蝶生命上限** ✓ ⇒ 合起来就是「等同于遐蝶 40.00% 生命上限」✓。
+> * ⚠ **判据的诚实边界（写进注释了 ✓）**：这一条断言的是**数据与槽位** ✓，而"基数 × 倍率"那一步是引擎**既有**的
+>   `SkillData` 路径 ✓（本次没有改动它 ✓）⇒ 所以没有把"伤害数值"再 mock 一遍 ✓（⚠ 也没有声称已验到那一层 ✓）。
+> * ⭐ **这一支的路线值得记一笔** ✓：`MemospriteSpec.Attack` 的 javadoc 说"召唤者口径就把份额放进面板" ✓ ——
+>   而**同样的属性**才走得通 ✗ ⇒ 我加了 `attr:<属性>`（**主人另一个属性**的份额 ✓，`2a4e1d8` ✓）
+>   ⇒ 死龙于是能写 `panel: ATTACK = 主人生命上限 100%` ＋ `attack: base ATTACK, 40%` ✓ ⇒ 口径对上 ✓，
+>   而它**自己的血**仍是【新蕊】上限 ×100% ✓（两件事互不干扰 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百三十二：✅ 实测变异（`attr:` 那一档 **1 红**）—— 把槽位指向"主人的 ATTACK" ⇒ 判据当场红）**：
+>
+> * ✅ **实测（改数据、跑判据、回滚 ✓）** ✓：把 `panel` 里那一项从 `source: "attr:HEALTH"` 改成 `"attr:ATTACK"` ✓ ⇒
+>   判据报 *"and that slot carries the summoner's Max HP, so the hit is 40% of it ==> expected: <1629.936…> but was: <…>"* ✓
+>   ⇒ ⭐ **`attr:<属性>` 这一档是承重的** ✓（它取的就是**主人那个被点名的属性** ✓，改一个字就换了口径 ✓）。
+>   ⚠ 回滚后全量仍 **0** ✓、树干净 ✓。
+> * ⭐ **于是死龙这一支四件齐了** ✓：**能力**（`attr:` 面板来源 ✓ ＋ 资源基数面板 ✓）＋ **内容**（`memosprites/1407.json` ✓）＋
+>   **测试**（`DragonPanelTest` 2 条 ✓）＋ **实测变异**（本轮 1 红 ✓）＋ **文档**（`note` ＋ 本条 ✓）。
+> * ⭐ **下一轮可选（按"过门槛"排序 ✓）** ✗：
+>   ① **`per-N` 除数**（`1223` 的"每消耗 3 点充能 ⇒ 1 次" ✓；读者：`1223` ✓、`1504` ✓ ⇒ **≥2** ✓ —— ⚠ 它的资源【充能】**已声明** ✓
+>      ⇒ **可以一步出货** ✓：给 `times_from` 加一个除数（例如 `"event_amount/3"` ✗ 或另立 `per` 字段 ✓，⚠ 名字照文档写 ✓）；
+>   ② **死龙的 50% 秘技版** ✗（需要"哪个入口召唤"的新机制 ✗ ⇒ 大 ✓）；
+>   ③ **忆灵技能 2–8** ✓（同一条 `attr:` 口径 ✓ ⇒ 逐条可加 ✓：`燎尽黯泽的焰息` ✓／`月茧荫蔽的身躯` ✓…⚠ 各要读参数表 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
