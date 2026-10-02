@@ -72,6 +72,7 @@ public class EffectSpec {
         copy.rule = this.rule;
         copy.perTarget = this.perTarget;
         copy.times = this.times;
+        copy.timesFrom = this.timesFrom;
         copy.control = this.control;
         copy.baseChance = this.baseChance;
         copy.speed = this.speed;
@@ -580,6 +581,13 @@ return copy;
      * its own target. Stating both would have two readings, so the pair is refused at load time -- the same
      * house rule that refuses {@code scale} next to {@code per_target}.
      */
+    /**
+     * How many times the effect repeats, read from the triggering EVENT instead of a constant (2026-10-02);
+     * the only value today is {@code "event_amount"} (「每消耗 1 点…额外 1 次」). {@code null} = use {@code times}.
+     */
+    @SerializedName("times_from")
+    private String timesFrom;
+
     @SerializedName("times")
     private Integer times;
 
