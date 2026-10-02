@@ -36,7 +36,8 @@ else:
            + '        damage.addBoost(applyDerivedCeiling(effect, ctx, magnitude));')
     io.open(WORK + '/' + ENG, 'w', encoding='utf-8', newline='').write(t.replace(anchor, new, 1))
     print('TriggerInterpreter: scale + ceiling wired')
-saved = io.open(WORK + '/' + ENG, encoding='utf-8').read()
+BATTLE = 'src/main/java/com/laosun/aluminium/Battle.java'
+saved = io.open(WORK + '/' + BATTLE, encoding='utf-8').read()   # ⚠ 那行在 Battle 里，不是 ENG
 
 
 def run_focused():
@@ -80,10 +81,10 @@ print('mutation matches: %d' % len(mut_re.findall(saved)))
 if len(mut_re.findall(saved)) != 1:
     print('REFUSING: the mutation anchor is not unique')
     sys.exit(1)
-io.open(WORK + '/' + ENG, 'w', encoding='utf-8', newline='').write(
+io.open(WORK + '/' + BATTLE, 'w', encoding='utf-8', newline='').write(
     mut_re.sub(NL + '            // MUTATION: the spend never reaches the instance', saved))
 _, r2, _, _, _ = run_focused()
-io.open(WORK + '/' + ENG, 'w', encoding='utf-8', newline='').write(saved)
+io.open(WORK + '/' + BATTLE, 'w', encoding='utf-8', newline='').write(saved)
 print('mutation reds=%d -> %s' % (len(r2), 'red (good)' if r2 else 'GREEN (BLIND!)'))
 if not r2:
     sys.exit(1)
