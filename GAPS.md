@@ -16979,6 +16979,21 @@
 > * ⭐ **第 4 步（条件形状）** ✗：`TriggerTable.parseCondition` 加 **`state_ended <名>`** ✓（与 `HAS_STATE` 同族 ✓，
 >   ⚠ 但**读的是 context 的名字**而不是持有者身上的状态 ✓ —— 这正是本轮那个 14 分量存在的理由 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百六十八：⭐ 第 3 步还缺**一个"带名字的发事件入口"** —— `Battle` 现有的 `fireTriggers` 都不收名字（读调用形状定案））**：
+>
+> * ✅ **实测（读 `StateBuff` ✓）** ✓：它的**名字在字段里** ✓ —— `private final String state;` ✓（`:40` ✓），
+>   而类的 javadoc 自己写着 *"**Identity is the name, not the class.** {@link #isSameKind} compares state names"* ✓
+>   ⇒ ⭐ 名字可取 ✓（⚠ 访问器是 Lombok 生成还是手写**没读到** ✗ ⇒ **写的时候用 `getState()` 让编译器判** ✓，
+>     错了就 `git checkout` ✓ —— 这是本项目在这类"看不到生成代码"处的常规做法 ✓）。
+> * ⭐⭐ **而真正缺的是发事件的口子** ✓（读 `Battle` 里全部 `fireTriggers` 的**调用形状** ✓）：
+>   `fireTriggers(event)` ✓、`fireTriggers(event, actor, subject, amount)` ✓、`fireTriggersWithSubject(...)` ✓
+>   —— ⛔ **没有一个收"状态名"** ✗ ⇒ 第 3 步要**再加一个公开入口** ✓：
+>   `public void fireStateEnded(CanHit carrier, String stateName)` ✓（内部用 `withStateName(...)` 构造 context ✓）。
+>   ⚠ **代价**：要先**读 `fireTriggers` 的定义**（它内部怎么建 context ✓、`withStateName` 该在哪一环接上 ✓）
+>     —— 这正是"**要接入一个现有机制前先读它的定义**"那条纪律 ✓（本轮只读了调用形状 ✗，不足以动手 ✓）。
+> * ⭐ **因此第 3 步拆成两小步（都已具名）** ✗：**3a** 读 `fireTriggers` 的定义 ⇒ 加 `fireStateEnded(carrier, name)` ✓
+>   （纯加方法 ✓，全量绿为判据 ✓）；**3b** `tickBuff` 到期分支**先取名再摘**调它 ✓（判空 `battle != null` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -17024,6 +17039,21 @@
 > * ⭐ **第 4 步（条件形状）** ✗：`TriggerTable.parseCondition` 加 **`state_ended <名>`** ✓（与 `HAS_STATE` 同族 ✓，
 >   ⚠ 但**读的是 context 的名字**而不是持有者身上的状态 ✓ —— 这正是本轮那个 14 分量存在的理由 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之八百六十八：⭐ 第 3 步还缺**一个"带名字的发事件入口"** —— `Battle` 现有的 `fireTriggers` 都不收名字（读调用形状定案））**：
+>
+> * ✅ **实测（读 `StateBuff` ✓）** ✓：它的**名字在字段里** ✓ —— `private final String state;` ✓（`:40` ✓），
+>   而类的 javadoc 自己写着 *"**Identity is the name, not the class.** {@link #isSameKind} compares state names"* ✓
+>   ⇒ ⭐ 名字可取 ✓（⚠ 访问器是 Lombok 生成还是手写**没读到** ✗ ⇒ **写的时候用 `getState()` 让编译器判** ✓，
+>     错了就 `git checkout` ✓ —— 这是本项目在这类"看不到生成代码"处的常规做法 ✓）。
+> * ⭐⭐ **而真正缺的是发事件的口子** ✓（读 `Battle` 里全部 `fireTriggers` 的**调用形状** ✓）：
+>   `fireTriggers(event)` ✓、`fireTriggers(event, actor, subject, amount)` ✓、`fireTriggersWithSubject(...)` ✓
+>   —— ⛔ **没有一个收"状态名"** ✗ ⇒ 第 3 步要**再加一个公开入口** ✓：
+>   `public void fireStateEnded(CanHit carrier, String stateName)` ✓（内部用 `withStateName(...)` 构造 context ✓）。
+>   ⚠ **代价**：要先**读 `fireTriggers` 的定义**（它内部怎么建 context ✓、`withStateName` 该在哪一环接上 ✓）
+>     —— 这正是"**要接入一个现有机制前先读它的定义**"那条纪律 ✓（本轮只读了调用形状 ✗，不足以动手 ✓）。
+> * ⭐ **因此第 3 步拆成两小步（都已具名）** ✗：**3a** 读 `fireTriggers` 的定义 ⇒ 加 `fireStateEnded(carrier, name)` ✓
+>   （纯加方法 ✓，全量绿为判据 ✓）；**3b** `tickBuff` 到期分支**先取名再摘**调它 ✓（判空 `battle != null` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
