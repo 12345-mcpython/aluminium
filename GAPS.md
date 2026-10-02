@@ -18842,6 +18842,29 @@
 >   ⚠ 并注意 `when`：文档说"**若乱破当前攻击力高于 2400 点**" ✓ ⇒ ⭐ 那**只是**额外那一档的条件 ✓
 >     ⇒ 写法上要么给第二条 `do` 单独加条件 ✗（`do` 级条件有没有 ✗ 待查 ✓），要么拆**两条规则** ✓（都挂在 `BREAK` 上 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2120** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百七十一：✅ 拼写到手：**`DamageType.BREAK("break")`** ⇒ `1317:440` 的每一样都齐了；⚠ 只剩"判据怎么量"这一步）**：
+>
+> * ✅ **实测（读 `DamageType` ✓）** ✓：`NORMAL("normal")` ✓／`SKILL("skill")` ✓／`ULTRA("ultra")` ✓／`ADDITIONAL("additional")` ✓／
+>   ⭐ **`BREAK("break")`** ✓／**`SUPER_BREAK("super_break")`** ✓／`DOT("dot")` ✓／`EXTRA("extra")` ✓／`TECHNIQUE` ✓／`MEMORY` ✓／
+>   `ELATION("elation")` ✓／`TRUE("true")` ✓，且构造器还带两个布尔：**`crittable`／`boostable`** ✓
+>   （⭐ `BREAK("break", false, false)` ✓ —— **不可暴击、不吃增伤** ✓ ⇒ ⚠ 这正好对应文档那句
+>     *"击破伤害无法暴击，不受伤害提高类效果所影响"* ✓ ⇒ ⭐ **引擎与文档在这一处是对上的** ✓）。
+> * ⭐⭐ **于是 `1317:440` 的全部拼图第一次齐了** ✓（**不需要任何新能力** ✓）：
+>   ```json
+>   {"on":"BREAK","when":["actor == self"],
+>    "do":[{"op":"MODIFY_DAMAGE_TAKEN","damage_type":"break","percent":0.02,"turns":2,"target":"target"}]}
+>   {"on":"BREAK","when":["actor == self","self_attr:ATTACK > 2400"],
+>    "do":[{"op":"MODIFY_DAMAGE_TAKEN","damage_type":"break","scale":"self_attr_above:ATTACK:2400",
+>           "percent":0.0001,"cap_amount":0.08,"turns":2,"target":"target"}]}
+>   ```
+>   （⭐ 拆成两条规则，因为"攻击力 > 2400"**只**约束额外那一档 ✓；⚠ `do` 级条件有没有待查 ✓，拆两条最稳 ✓。）
+> * ⚠ **只剩"判据怎么量"** ✗：`MODIFY_DAMAGE_TAKEN` **不写进 `AttributeType`** ✗ ⇒ 读面板值量不到 ✗
+>   ⇒ ⭐ 下一轮第一步：**先查它有没有可读的取数口**（例如 `CanHit` 上有取"受到的某类伤害修正"的方法 ✗／
+>     或者判据走**真实结算**：用 `applyDamage` 打一下 **`DamageType.BREAK`** 的伤害 ✓ 比较 有/无 该规则两次 ✓
+>     —— ⭐ 与早前 `DragonPanelTest` 那条"判据量数据与槽位、不 mock 引擎"的做法类似 ✓，**但这条能真的量到伤害** ✓）。
+> * ⭐ **顺带**：这一轮把两个枚举的**拼写与语义**都读全了（`AttributeType` 的 `DAMAGE_PENETRATION`／`BREAK_DAMAGE_BOOST` ✓、
+>   `DamageType` 的 `BREAK`／`SUPER_BREAK` ＋ `crittable/boostable` ✓）⇒ ⭐ **这两张表以后可以直接抄** ✓（不必再猜 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2120** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -20749,6 +20772,29 @@
 >   ＋ 判据（⚠ 文件驱动 ✓、零基线 ✓、**上限单独断言** ✓）＋ 变异（去掉 `cap_amount` ⇒ 必红 ✓）。
 >   ⚠ 并注意 `when`：文档说"**若乱破当前攻击力高于 2400 点**" ✓ ⇒ ⭐ 那**只是**额外那一档的条件 ✓
 >     ⇒ 写法上要么给第二条 `do` 单独加条件 ✗（`do` 级条件有没有 ✗ 待查 ✓），要么拆**两条规则** ✓（都挂在 `BREAK` 上 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2120** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百七十一：✅ 拼写到手：**`DamageType.BREAK("break")`** ⇒ `1317:440` 的每一样都齐了；⚠ 只剩"判据怎么量"这一步）**：
+>
+> * ✅ **实测（读 `DamageType` ✓）** ✓：`NORMAL("normal")` ✓／`SKILL("skill")` ✓／`ULTRA("ultra")` ✓／`ADDITIONAL("additional")` ✓／
+>   ⭐ **`BREAK("break")`** ✓／**`SUPER_BREAK("super_break")`** ✓／`DOT("dot")` ✓／`EXTRA("extra")` ✓／`TECHNIQUE` ✓／`MEMORY` ✓／
+>   `ELATION("elation")` ✓／`TRUE("true")` ✓，且构造器还带两个布尔：**`crittable`／`boostable`** ✓
+>   （⭐ `BREAK("break", false, false)` ✓ —— **不可暴击、不吃增伤** ✓ ⇒ ⚠ 这正好对应文档那句
+>     *"击破伤害无法暴击，不受伤害提高类效果所影响"* ✓ ⇒ ⭐ **引擎与文档在这一处是对上的** ✓）。
+> * ⭐⭐ **于是 `1317:440` 的全部拼图第一次齐了** ✓（**不需要任何新能力** ✓）：
+>   ```json
+>   {"on":"BREAK","when":["actor == self"],
+>    "do":[{"op":"MODIFY_DAMAGE_TAKEN","damage_type":"break","percent":0.02,"turns":2,"target":"target"}]}
+>   {"on":"BREAK","when":["actor == self","self_attr:ATTACK > 2400"],
+>    "do":[{"op":"MODIFY_DAMAGE_TAKEN","damage_type":"break","scale":"self_attr_above:ATTACK:2400",
+>           "percent":0.0001,"cap_amount":0.08,"turns":2,"target":"target"}]}
+>   ```
+>   （⭐ 拆成两条规则，因为"攻击力 > 2400"**只**约束额外那一档 ✓；⚠ `do` 级条件有没有待查 ✓，拆两条最稳 ✓。）
+> * ⚠ **只剩"判据怎么量"** ✗：`MODIFY_DAMAGE_TAKEN` **不写进 `AttributeType`** ✗ ⇒ 读面板值量不到 ✗
+>   ⇒ ⭐ 下一轮第一步：**先查它有没有可读的取数口**（例如 `CanHit` 上有取"受到的某类伤害修正"的方法 ✗／
+>     或者判据走**真实结算**：用 `applyDamage` 打一下 **`DamageType.BREAK`** 的伤害 ✓ 比较 有/无 该规则两次 ✓
+>     —— ⭐ 与早前 `DragonPanelTest` 那条"判据量数据与槽位、不 mock 引擎"的做法类似 ✓，**但这条能真的量到伤害** ✓）。
+> * ⭐ **顺带**：这一轮把两个枚举的**拼写与语义**都读全了（`AttributeType` 的 `DAMAGE_PENETRATION`／`BREAK_DAMAGE_BOOST` ✓、
+>   `DamageType` 的 `BREAK`／`SUPER_BREAK` ＋ `crittable/boostable` ✓）⇒ ⭐ **这两张表以后可以直接抄** ✓（不必再猜 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2120** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
