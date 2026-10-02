@@ -15962,6 +15962,24 @@
 >   一个表就能把 0.2381 归到具体某一区 ✓。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百零九：⭐ `assemble` 的骨架读完了 ＋ 两个假设都被排除（类型 ✗、`countsAsAttack` ✗））**：
+>
+> * ⭐⭐ **一个结构性事实** ✓：`DEALING_DAMAGE` 是**在 `assemble` 内部**发的 ✓（`Battle:2772` ✓）——
+>   而 `assemble` 在它**之后**还要继续乘好几层区 ✓ ⇒ ⭐ **这就是"`DEALING_DAMAGE` 的 amount 是基数"的**机制**** ✓
+>   （不是"事件早于结算"这么笼统 ✓，而是**它就发在结算的中途** ✓）。⚠ 这也解释了第 1106 轮那个 1093.02 ✓：
+>   它是"boost 区之后、防御区之前"的那个数 ✓。
+> * ✅ **读到的两处 gating（都**不是**我们要找的那个）** ✓：
+>   * **类别** ⇒ **scoped boost** ✓（`:2747` `damage.getCastCategory().damageBoost()` ✓）—— 而注释**明说**这是**故意**的 ✓：
+>     *"Break / super break / DOT / additional instances stay UNSPECIFIED, so 'the Skill's DMG' does not silently grow to mean the break damage that Skill caused"* ✓
+>     ⇒ 附加伤害**本来就不该**吃到「战技造成的伤害提高」✓（这条**不是 bug** ✓）；
+>   * **`countsAsAttack`** ⇒ **只用于能量** ✓（`:2489` `if (grant != EnergyGrant.ALL || !damage.isCountsAsAttack())` ✓）——
+>     ⭐ **所以"附加伤害跳过了防御区"这个假设被排除** ✗（本轮实测前先读的代码 ✓，省掉一次探针 ✓）。
+> * * **结论**：0.2381 只可能在 `assemble` **`:2772` 之后**的那些区里 ✓，而两条路用的是**同一个** `assemble`
+>   ⇒ 差别只能来自**实例带着的东西**（类别／skillKey／`stance` ✓，见上一条）被**后面的某一区**读了 ✓。
+>   ⚠ 下一轮的**第一次测量（唯一一步）** ✗：把 `Damage` 的**逐区分解**印出来 ✓（同 base 各一条：真实施放 vs api ✓），
+>   **相减即可** ✓ —— 这是本轮第三次把问题收窄到"一个表" ✓，而前两次的假设（类型、countsAsAttack）**都已排除** ✓。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
