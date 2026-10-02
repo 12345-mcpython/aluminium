@@ -16277,6 +16277,25 @@
 >   （⚠ `8007` 还挂在"【迷迷的声援】的持有者"上 ✓ ⇒ 需要 `holder_of:迷迷的声援` ✓ —— **那个选择器上一轮已出货** ✓）。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓（`b6f141b` ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百二十六：⭐ 两条真伤害读者的**前置**已查清 —— 各缺一个状态标记，各一行）**：
+>
+> * ⭐ **实测（读两个文件）** ✓：
+>   * **`8007` 开拓者** ✓（3 条规则 ✓）：`skill_summon_mem`（`SUMMON` ＋ `HEAL` ✓）／`ult_summon_mem`（`SUMMON` ✓）／
+>     `level_convention` ✓ —— ⚠ **没有**【迷迷的声援】的标记 ✗（也没有那条「行动提前 100%」✓，两者都还没写 ✓）；
+>   * **`1415` 昔涟** ✓（4 条规则 ✓）：`basic_recollection`／`skill_recollection`（`GAIN_RESOURCE` 追忆 ✓）／
+>     `talent_party_damage`／`level_convention` ✓ —— ⚠ **没有**结界的标记 ✗。
+> * ⭐ **下一轮的执行清单（三行 × 两处，都不需要新引擎能力）** ✗：
+>   1. `8007`：把【迷迷的声援】**造出来** ✓（`APPLY_BUFF 迷迷的声援 target: target` ✓ ＋ 它的时长 `turns: 3` ✓ 来自那句原文 ✓）
+>      ＋ 那条「行动提前 100%」✓（`ADVANCE percent: 1.0 target: target` ✓）；
+>   2. `8007`：**骑手** ✓ = `DAMAGE_SETTLED` ＋ `actor is_other_ally ?` —— ⚠ 句子的主语是「**持有【迷迷的声援】的目标**」✓
+>      ⇒ 条件是 **`actor has_state 迷迷的声援`** ✓（`has_state` 认 `actor` ✓，2026-10-29 起 ✓）；
+>   3. `1415`：把结界**造出来** ✓（`APPLY_BUFF 结界 turns: 2 ticks_on: "self" target: self` ✓ —— 原文「持续 **2** 回合，
+>      昔涟每回合开始时结界持续回合数减 1」✓，与 **1321／缇宝 1403** 同一写法 ✓）＋ **骑手** ✓（`target has_state 结界`？
+>      ⚠ 结界在**她自己**身上而伤害来自**队友** ⇒ 条件应是 `self has_state 结界` ＋ `actor is_ally` ✓）。
+>   ⭐ 两条骑手都用**已经验证过**的三件套 ✓：`DAMAGE_SETTLED` ✓ ＋ `scale: original_damage` ✓ ＋ `damage_type: "TRUE"` ✓
+>   ＋ 28%／24% ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2109** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
