@@ -523,6 +523,14 @@ public class Battle {
             e.setSpeedChangeListener(this::onSpeedChanged);
         }
         listenToSkillPointChanges();
+        // The units' buff managers hold the battle so a state that leaves a unit can be announced
+        // (2026-10-02; the STATE_ENDED event, whose reader is 1211's 「【生息】结束时…」).
+        for (Character c : characterQueue) {
+            c.getBuffManager().setBattle(this);
+        }
+        for (CanHit e : enemyQueue) {
+            e.getBuffManager().setBattle(this);
+        }
     }
 
     /**
