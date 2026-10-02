@@ -4023,7 +4023,16 @@ public final class TriggerInterpreter {
           double settledBase = damageType == DamageType.ELATION
                   ? base * (1 + attacker.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get())
                   : base;
-          if (Boolean.TRUE.equals(effect.getOrdinary())) {
+          // ⚠⚠ ROLLED BACK the same round (2026-10-02), because its judge could not be written in the time left: a
+        // hand-fired `DAMAGE_SETTLED` carries no instance, so `damage_is_attack` (the guard that keeps an
+        // additional-damage rider from re-triggering itself) is false and the rule never fires; without the guard the
+        // rider recurses (measured: "Trigger recursion exceeded 8 levels"). The right fixture needs a REAL cast plus a
+        // rider-present/rider-absent difference, which is the next round's first job.
+        // ⭐ The finding stands and is recorded in GAPS: `Battle.applyTrueDamage` (`.trueDamage()` -> `toValue()` skips
+        // every zone) is the engine's one true-damage entry and NO op reaches it -- `damage_type: "TRUE"` today stamps
+        // the type and still lets defence and resistance multiply the instance. Readers (2): 8007 开拓者 28%,
+        // 1415 昔涟 24%, both 「等同于原伤害 X% 的真实伤害」.
+        if (Boolean.TRUE.equals(effect.getOrdinary())) {
               // \u2705 An ORDINARY instance (2026-09-30): the public `applyDamage` settles it as the main instance of a hit, so the
               // victim is credited energy and the instance is an attack -- exactly what \u300c\u9020\u6210\u7b49\u540c\u4e8e\u2026\u7684\u7269\u7406\u5c5e\u6027\u4f24\u5bb9\u300d means, and what the
               // additional-damage path (KILL_ONLY, not-an-attack) could not express.
