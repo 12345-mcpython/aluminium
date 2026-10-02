@@ -145,6 +145,9 @@ public final class TriggerInterpreter {
             Set.of("party_first", "next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
                     "target_and_summon", "all_enemies", "lowest_hp_ally",
             "random_enemy", "random_hit_enemy",
+            // ⭐ 「随机为 1 个当前能量百分比小于 50% 的我方其他目标」 (light cone 21021). ⚠ The 50%
+            // threshold is the text’s own and no tier changes it, so it is in the method and registered there.
+            "random_ally_below_half_energy",
             // ⭐ 「若追加攻击施放前目标被消灭则对敌方随机单体发动」 (2026-09-30; three registered readers:
             // 1220 reason 1, 1221 reason 2, 1305). The preferred target is dead -> take a random enemy.
             // CanHit:88-90 keeps death orthogonal to invulnerability, so this is the clause own wording.
@@ -1348,6 +1351,33 @@ public final class TriggerInterpreter {
         return null;
     }
 
+    /**
+     * 「随机为 1 个当前能量百分比小于 50% 的我方其他目标」 (light cone 21021).
+     *
+     * <p>⚠ FILTER FIRST, ROLL SECOND — the same order `randomHitEnemy` documents: a roll landing on an
+     * excluded ally would be dropped rather than re-rolled, which is a wrong answer that reports nothing.
+     * ⚠ The 50% is written in rather than carried by a field: the text states it once and no tier changes
+     * it (the five tiers differ only in how much energy is restored).
+     */
+    private static CanHit randomAllyBelowHalfEnergy(TriggerContext ctx) {
+        Battle battle = ctx.battle();
+        if (battle == null) {
+            return null;
+        }
+        List<CanHit> eligible = new java.util.ArrayList<>();
+        for (CanHit ally : battle.allies) {
+            if (ally == ctx.owner() || !(ally instanceof Character character)) {
+                continue;
+            }
+            double max = character.getMaxEnergy();
+            if (max > 0 && character.getCurrentEnergy() / max < 0.5) {
+                eligible.add(character);
+            }
+        }
+        return eligible.isEmpty() ? null
+                : eligible.get(battle.getRng().nextInt(eligible.size()));
+    }
+
     /** The first character of the party (relic 317), or null when there is no battle. */
     private static CanHit partyFirst(TriggerContext ctx) {
         Battle battle = ctx.battle();
@@ -1375,6 +1405,8 @@ public final class TriggerInterpreter {
             // 「队伍第一名」(relic 317): the FIRST CHARACTER of the party, in party order -- read from
             // battle.characters, not battle.allies (summons are appended to that one).
             case "party_first" -> require(partyFirst(ctx), "party_first", ctx);
+            case "random_ally_below_half_energy" ->
+                    require(randomAllyBelowHalfEnergy(ctx), "random_ally_below_half_energy", ctx);
             case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);
             // ⭐ The fallback (2026-09-30): 「若…目标被消灭则对敌方随机单体发动」. The preferred target
             // is the trigger's own, and CanHit has a real "defeated" flag orthogonal to invulnerability (CanHit:88-90),
