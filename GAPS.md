@@ -20495,6 +20495,30 @@
 > * ⭐ **拿到后**：判据里调它 ✓ ⇒ 到期 ⇒ 公告 ⇒ 奖励 ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓
 >   （⚠ 内容已经准备好，随时可重放 `tools/ship_aha_final.py` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十：🎉🎉🎉 **`STATE_ENDED` 的**第一个真读者**出货并验完**（`928f717b` ✓）：阿哈时刻以"1 回合限时状态"落地 ⇒ **到期时引擎自己发 `STATE_ENDED("阿哈时刻")`** ⇒ 读者接住并发【好活当赏】）**）**：
+>
+> * ✅✅✅ **进树** ✓（`928f717b` ✓，**已推送** ✓）：`1513.json` **两条规则** ✓：
+>   * `elation_moment_start` ✓：`on: CAST_SETUP` ＋ `when: ["from_category ElationDamage"]` ⇒
+>     **`APPLY_BUFF{阿哈时刻, turns: 1}`** ✓（⭐ **限时** ⇒ 到期才有公告 ✓）；
+>   * `elation_moment_reward` ✓：`on: STATE_ENDED` ＋ `when: ["self state_ended 阿哈时刻"]` ⇒ **`APPLY_BUFF{好活当赏, turns: 2}`** ✓
+>     （⭐ 文档原话：「阿哈时刻结束时，使参演的角色获得本次计入笑点的【好活当赏】状态，持续2回合」✓）。
+> * ✅ **判据（文件驱动 ✓）** `AhaMomentTest` ✓：**驱动一次真欢愉技**（`owner.getSkills().get(SkillType.ELATION_SKILL)` ✓ ＋
+>   `SkillExecutor.execute(...)` ✓ —— ⭐ 这才让 `from_category` 成立 ✓）⇒ 断言 **状态在** ✓ ⇒
+>   ⭐ **`owner.getBuffManager().afterMove()`** ✓（⭐ **这就是 `Battle` 在回合结束时对行动者调的那一行** ✓ —— 本段从
+>     `:1204`–`:1209` 读到：`actor.afterMove(this); actor.getBuffManager().afterMove(); tickForeignBuffs(actor, false);` ✓）
+>   ⇒ 断言 **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ **全绿** ✓。
+> * ✅✅ **实测变异（1 红 ✓，跑全量 ✓）** ✓：把 `turns` 从 **1 改回 2** ✓ ⇒ 全量 **2130 例 1 failed** ✓，判据报
+>   *"one turn later the moment has expired ==> expected: <false> but was: <true>"* ✓ ⇒ ⭐ **承重** ✓（回滚后全量 **0** ✓、闸门 [0, 0] ✓）。
+> * ⭐⭐⭐ **这一步的分量（目标 ① 的转折点）** ✓：`STATE_ENDED` 此前**四个读者都因"没有创建者"而登记** ✓ ⇒
+>   现在有了**第一个真读者** ✓，而且**形状完全可复用** ✗：
+>   **「挂一个限时状态 ⇒ 让它自然到期 ⇒ 引擎公告 `STATE_ENDED(<名>)` ⇒ 读者用 `self state_ended <名>` 接住」** ✓
+>   ⇒ ⭐ **目标 ① 的其余四个读者**（`1211`【生息】结束 ✓／`1408` 变身结束 ×3 ✓／那张光锥「奇袭结束后」✓）
+>     **都能照抄这个形状** ✓✓。
+> * ⭐ **本段为该能力走过的关键事实（都可复用）** ✓：① `STATE_ENDED` **只在 `duration() <= 0` 的 tick 里公告** ✓
+>   （**显式 `REMOVE_STATE` 不公告** ✗）；② 条件写法是 **`<主体> state_ended <状态名>`** ✓（⚠ 缺主体会被解析成 `is_state` ✗）；
+>   ③ 条件是**数值变量**时写法是 **`self_resource:<名>`** ✓（⚠ 变量位置**不要**主体 ✗）；④ `SkillExecutor.execute` 是驱动
+>   "带类别的事件"的正路 ✓；⑤ 推进自己的计时用 **`BuffManager.afterMove()`** ✓（⚠ `tickForeign` 对自己 `return` ✗）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24056,6 +24080,30 @@
 > * ⭐ **拿到后**：判据里调它 ✓ ⇒ 到期 ⇒ 公告 ⇒ 奖励 ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓
 >   （⚠ 内容已经准备好，随时可重放 `tools/ship_aha_final.py` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零六十：🎉🎉🎉 **`STATE_ENDED` 的**第一个真读者**出货并验完**（`928f717b` ✓）：阿哈时刻以"1 回合限时状态"落地 ⇒ **到期时引擎自己发 `STATE_ENDED("阿哈时刻")`** ⇒ 读者接住并发【好活当赏】）**）**：
+>
+> * ✅✅✅ **进树** ✓（`928f717b` ✓，**已推送** ✓）：`1513.json` **两条规则** ✓：
+>   * `elation_moment_start` ✓：`on: CAST_SETUP` ＋ `when: ["from_category ElationDamage"]` ⇒
+>     **`APPLY_BUFF{阿哈时刻, turns: 1}`** ✓（⭐ **限时** ⇒ 到期才有公告 ✓）；
+>   * `elation_moment_reward` ✓：`on: STATE_ENDED` ＋ `when: ["self state_ended 阿哈时刻"]` ⇒ **`APPLY_BUFF{好活当赏, turns: 2}`** ✓
+>     （⭐ 文档原话：「阿哈时刻结束时，使参演的角色获得本次计入笑点的【好活当赏】状态，持续2回合」✓）。
+> * ✅ **判据（文件驱动 ✓）** `AhaMomentTest` ✓：**驱动一次真欢愉技**（`owner.getSkills().get(SkillType.ELATION_SKILL)` ✓ ＋
+>   `SkillExecutor.execute(...)` ✓ —— ⭐ 这才让 `from_category` 成立 ✓）⇒ 断言 **状态在** ✓ ⇒
+>   ⭐ **`owner.getBuffManager().afterMove()`** ✓（⭐ **这就是 `Battle` 在回合结束时对行动者调的那一行** ✓ —— 本段从
+>     `:1204`–`:1209` 读到：`actor.afterMove(this); actor.getBuffManager().afterMove(); tickForeignBuffs(actor, false);` ✓）
+>   ⇒ 断言 **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ **全绿** ✓。
+> * ✅✅ **实测变异（1 红 ✓，跑全量 ✓）** ✓：把 `turns` 从 **1 改回 2** ✓ ⇒ 全量 **2130 例 1 failed** ✓，判据报
+>   *"one turn later the moment has expired ==> expected: <false> but was: <true>"* ✓ ⇒ ⭐ **承重** ✓（回滚后全量 **0** ✓、闸门 [0, 0] ✓）。
+> * ⭐⭐⭐ **这一步的分量（目标 ① 的转折点）** ✓：`STATE_ENDED` 此前**四个读者都因"没有创建者"而登记** ✓ ⇒
+>   现在有了**第一个真读者** ✓，而且**形状完全可复用** ✗：
+>   **「挂一个限时状态 ⇒ 让它自然到期 ⇒ 引擎公告 `STATE_ENDED(<名>)` ⇒ 读者用 `self state_ended <名>` 接住」** ✓
+>   ⇒ ⭐ **目标 ① 的其余四个读者**（`1211`【生息】结束 ✓／`1408` 变身结束 ×3 ✓／那张光锥「奇袭结束后」✓）
+>     **都能照抄这个形状** ✓✓。
+> * ⭐ **本段为该能力走过的关键事实（都可复用）** ✓：① `STATE_ENDED` **只在 `duration() <= 0` 的 tick 里公告** ✓
+>   （**显式 `REMOVE_STATE` 不公告** ✗）；② 条件写法是 **`<主体> state_ended <状态名>`** ✓（⚠ 缺主体会被解析成 `is_state` ✗）；
+>   ③ 条件是**数值变量**时写法是 **`self_resource:<名>`** ✓（⚠ 变量位置**不要**主体 ✗）；④ `SkillExecutor.execute` 是驱动
+>   "带类别的事件"的正路 ✓；⑤ 推进自己的计时用 **`BuffManager.afterMove()`** ✓（⚠ `tickForeign` 对自己 `return` ✗）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
