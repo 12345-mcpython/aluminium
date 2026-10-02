@@ -21,8 +21,8 @@ TESTNAME = 'com.laosun.aluminium.test.Cone23062SpendTest'
 NL = chr(10)
 
 t = io.open(WORK + '/' + ENG, encoding='utf-8').read()
-if 'applyDerivedCeiling(effect, ctx, magnitude)' in t:
-    print('TriggerInterpreter: already applied, skipping')
+if 'damage.addBoost(applyDerivedCeiling(effect, ctx, magnitude))' in t:
+    print('boostDamage: already wired, skipping')
 else:
     anchor = '        damage.addBoost(magnitude);'
     if t.count(anchor) != 1:

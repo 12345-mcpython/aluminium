@@ -671,6 +671,7 @@ public class Battle {
         EnergyGain ultraGain = user.getEnergyProvider().onUltCast(user, ultra);
         if (ultraGain != null) {
             applyEnergyGain(user, ultraGain);   // then the 5 points of its own (× energy gain rate)
+        lastUltEnergySpent = 0;             // ⚠ cleared, so the instance write cannot leak into later hits
         }
         return true;
     }
@@ -2719,7 +2720,11 @@ public class Battle {
         // ⚠ The guard is load-bearing: lastUltEnergySpent is written only on the ultimate path and never
         // cleared, so without it every later hit -- basics, DOT ticks, break damage -- would inherit it, an
         // error with no symptom.
-        if (damage.getCastCategory() == com.laosun.aluminium.enums.SkillCategory.ULTRA) {
+        // ⭐ The guard is our OWN fact, not another component's: lastUltEnergySpent is set only on the ultimate
+        // path and cleared right after it settles, so "> 0" means exactly "this hit is that ultimate".
+        // ⚠ An earlier version asked damage.getCastCategory() == ULTRA instead, and measured, that does NOT
+        // hold on the castImmediate path -- the write was skipped and the clause silently read 0.
+        if (lastUltEnergySpent > 0) {
             damage.withCastEnergySpent(lastUltEnergySpent);
         }
         fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage, damage.getCastCategory(),
