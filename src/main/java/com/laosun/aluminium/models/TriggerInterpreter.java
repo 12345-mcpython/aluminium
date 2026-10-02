@@ -3951,6 +3951,13 @@ public final class TriggerInterpreter {
                         "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
                                 + "evaluated without one (it must hang on DAMAGE_SETTLED)");
             }
+            // ⚠ The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
+            // correction at all: 真实伤害 (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
+            // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured 2026-10-02: a 24% rider landed as
+            // 44% -- 77.43 where 42.01 was due). Readers: 1415 昔涟's 结界 rider.
+            if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
+                return ctx.amount() * share + flat;
+            }
             double factor = ctx.damage().getSkillBaseValue() == 0
                     ? 1.0
                     : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
