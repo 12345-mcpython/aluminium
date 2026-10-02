@@ -20714,6 +20714,32 @@
 >   ⭐ 若**仍不加能量** ⇒ 说明**事件压根没到这条规则** ✗（⚠ 那就去查"她的表里这条规则是否被装载器收下" ✓）；
 >     若**加了** ⇒ ⭐ 说明**事件到了、是名字对不上** ✓ ⇒ 一次就能二选一 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十二：✅✅✅ **`requireStateSubject` 的定义读了** —— `state_ended` 与 `has_state` **共用同一套主体词**，且报错文案**自己解释了三个主体**（*"self = the character whose table fired, actor = who caused the event, target = what it happened to"*）⇒ ⭐ 所以 **`self` 合法** ⇒ "主体词"这条**彻底排除**）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1766` ✓）** ✓ 原文：
+>   ```java
+>   private static String requireStateSubject(String subject, String raw, TriggerSpec spec) {
+>       if (!STATE_SUBJECTS.contains(subject)) {
+>           throw new IllegalArgumentException(
+>               "Condition '" + raw + "' asks whether '" + subject + "' is in a named state, but the parties are "
+>               + String.join(", ", STATE_SUBJECTS.stream().sorted().toList())
+>               + " (self = the character whose table fired, actor = who caused the event, "
+>               + "target = what it happened to) (source: " + spec.getSource() + ")");
+>       }
+>       return subject;
+>   }
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** 两个条件（`state_ended` ✓／`has_state` ✓）**共用 `STATE_SUBJECTS`** ✓；
+>   **(ii)** `self` 的含义就是"**这个表的主人**" ✓ ⇒ ⭐ **`self state_ended 生息` 完全合法** ✓（⚠ 且 `self has_state 秘技` 已有生效先例 ✓）
+>     ⇒ ⛔ **"主体词"这条排除** ✓（本段第十三次自我纠正 ✓）。
+> * ⭐⭐ **于是只剩两条可能** ✓：**(甲)** **名字对不上** ✗（⚠ `生息` vs `ended.getState()` ✗）；**(乙)** **事件压根没到这条规则** ✗。
+> * ⭐ **下一轮第一步（一次就能二选一，最便宜）** ✗：**把读者规则的 `when` 清空** ✓（只留 `on: STATE_ENDED` ✓）
+>   ⇒ 重放 ＋ 跑判据 ✓：
+>   * ⭐ **仍不加能量** ⇒ **(乙)** ✓ ⇒ 去查"她表里这条规则**是否被装载器收下**／是否被某个 `when` 之外的机制跳过" ✓；
+>   * ⭐ **加了能量** ⇒ **(甲)** ✓ ⇒ 去读 **`StateBuff`**（⚠ `models/buff/StateBuff.java` ✓ ⇒ 看 `getState()` 返回什么 ✓
+>     —— ⚠ 也许构造时对名字做了**规范化**（trim／大小写／去掉空格 ✓）⇒ ⭐ 那就是根因 ✓，改名字即可 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24493,6 +24519,32 @@
 > * ⭐ **另一条同样便宜的判法** ✓：把读者规则的 `on` 改成 **`STATE_ENDED` 且 `when` 为空** ✓（⚠ 无条件 ✓）⇒
 >   ⭐ 若**仍不加能量** ⇒ 说明**事件压根没到这条规则** ✗（⚠ 那就去查"她的表里这条规则是否被装载器收下" ✓）；
 >     若**加了** ⇒ ⭐ 说明**事件到了、是名字对不上** ✓ ⇒ 一次就能二选一 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零七十二：✅✅✅ **`requireStateSubject` 的定义读了** —— `state_ended` 与 `has_state` **共用同一套主体词**，且报错文案**自己解释了三个主体**（*"self = the character whose table fired, actor = who caused the event, target = what it happened to"*）⇒ ⭐ 所以 **`self` 合法** ⇒ "主体词"这条**彻底排除**）**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1766` ✓）** ✓ 原文：
+>   ```java
+>   private static String requireStateSubject(String subject, String raw, TriggerSpec spec) {
+>       if (!STATE_SUBJECTS.contains(subject)) {
+>           throw new IllegalArgumentException(
+>               "Condition '" + raw + "' asks whether '" + subject + "' is in a named state, but the parties are "
+>               + String.join(", ", STATE_SUBJECTS.stream().sorted().toList())
+>               + " (self = the character whose table fired, actor = who caused the event, "
+>               + "target = what it happened to) (source: " + spec.getSource() + ")");
+>       }
+>       return subject;
+>   }
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** 两个条件（`state_ended` ✓／`has_state` ✓）**共用 `STATE_SUBJECTS`** ✓；
+>   **(ii)** `self` 的含义就是"**这个表的主人**" ✓ ⇒ ⭐ **`self state_ended 生息` 完全合法** ✓（⚠ 且 `self has_state 秘技` 已有生效先例 ✓）
+>     ⇒ ⛔ **"主体词"这条排除** ✓（本段第十三次自我纠正 ✓）。
+> * ⭐⭐ **于是只剩两条可能** ✓：**(甲)** **名字对不上** ✗（⚠ `生息` vs `ended.getState()` ✗）；**(乙)** **事件压根没到这条规则** ✗。
+> * ⭐ **下一轮第一步（一次就能二选一，最便宜）** ✗：**把读者规则的 `when` 清空** ✓（只留 `on: STATE_ENDED` ✓）
+>   ⇒ 重放 ＋ 跑判据 ✓：
+>   * ⭐ **仍不加能量** ⇒ **(乙)** ✓ ⇒ 去查"她表里这条规则**是否被装载器收下**／是否被某个 `when` 之外的机制跳过" ✓；
+>   * ⭐ **加了能量** ⇒ **(甲)** ✓ ⇒ 去读 **`StateBuff`**（⚠ `models/buff/StateBuff.java` ✓ ⇒ 看 `getState()` 返回什么 ✓
+>     —— ⚠ 也许构造时对名字做了**规范化**（trim／大小写／去掉空格 ✓）⇒ ⭐ 那就是根因 ✓，改名字即可 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
