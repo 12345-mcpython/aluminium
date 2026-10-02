@@ -18105,6 +18105,28 @@
 >      （⚠ `master` 要传进 `attackOf` ✗ ⇒ 它现在只收 `spec` ✓ ⇒ 签名要改 ✓，调用点在 `memosprite`／`servant` 体内 ✓）；
 >   ④ 判据：死龙这一击 == **遐蝶生命上限 × 40%** ✓（改遐蝶面板 ⇒ 跟着变 ✓）＋ 变异（把 40% 改成 20% ⇒ 必红 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十九：⛔⛔ **又一次"白设计"** —— `MemospriteSpec.Attack` 的 javadoc **自己写着**"召唤者口径怎么表达"：**份额放进面板**，攻击再按**忆灵自己的**那个属性取数；而"景元」那条能这么做，是因为它是 ATTACK→ATTACK）**：
+>
+> * ✅ **实测（读 `MemospriteSpec.Attack` 的 javadoc ✓，`:95`–`:115` ✓）** ✓，原文两段：
+>   * *"it cannot live on the summoning character, because the numbers are stated against the **memosprite**: 长夜月's 「长夜」
+>     hits for 「等同于「长夜」200%生命上限」, which is the memosprite's own Max HP, **not the summoner's**. Reading it off the
+>     summoner would produce a number 2× too large … a wrong number that looks plausible, which is the worst kind."* ✓
+>   * ⭐ *"⚠ `base` names an attribute of the **memosprite**. Where a document instead scales off the *summoner*
+>     （景元's 「神君」 hits for 「等同于景元攻击力 66%」）, **the panel carries the share and the attack then scales off the
+>     memosprite's own ATTACK**: the same number, stated the same way every other inherited attribute is."* ✓
+>   ⇒ ⭐⭐ **所以"召唤者口径"**不需要新机制** ✓（我上一轮设计的"给 `EnemySkill` 加 `baseValue`" ✗ **是多余的** ✗ ——
+>     本段**第三次**同一个毛病 ✓：**没读代码自己的说明就先设计** ✓）。
+> * ⚠ **但 1407 这条仍然不行** ✓：那条约定之所以够用，是因为景元是 **ATTACK → ATTACK** ✓；而死龙的句子是
+>   「等同于**遐蝶生命上限**的 40%」✗ ⇒ 需要的是"**主人**的**另一个**属性的 X%" ✗ —— 而 `panelOf` 的语义是
+>   `percent × master.getAttribute(**同一个** attribute)` ✗ ⇒ ⛔ **表达不了** ✓。
+> * ⭐⭐⭐ **正确的最小切法（下一轮，一次做完）** ✗：把**我已经拥有的那个分支**再扩一档 ✓ ——
+>   `SummonFactory.panelOf` 里 `source:` 现在认 **`resource:<名>`** ✓（本轮已出货 ✓）⇒ **再认 `attr:<属性名>`** ✓
+>   （= 主人**该属性**的 X% ✓）⇒ 那么死龙可以写：
+>   `panel: [ {HEALTH, source:"resource:新蕊", percent:1.0}, {ATTACK, source:"attr:HEALTH", percent:1.0}, {SPEED, flat:165} ]`
+>   ＋ `attack: {element:"Quantum", base:"ATTACK", percent:0.4, shape:"AoEAttack", stance:30}` ✓
+>   ⇒ 这一击 **= 遐蝶生命上限 × 40%** ✓✓（口径对上了 ✓），而死龙**自己的血**仍是【新蕊】上限 ×100% ✓。
+> * ⭐ **读者数** ✓：`1407` 技能 1–8 全是这个口径 ✓ ＋ `1512` 的忆灵技多为召唤者口径 ✓ ⇒ **≥2** ✓ 过门槛 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19275,6 +19297,28 @@
 >   ③ `attackOf` 在**有** `ownerBase` 时算 `percent × master.getAttribute(ownerBase)` 并走新构造器 ✓
 >      （⚠ `master` 要传进 `attackOf` ✗ ⇒ 它现在只收 `spec` ✓ ⇒ 签名要改 ✓，调用点在 `memosprite`／`servant` 体内 ✓）；
 >   ④ 判据：死龙这一击 == **遐蝶生命上限 × 40%** ✓（改遐蝶面板 ⇒ 跟着变 ✓）＋ 变异（把 40% 改成 20% ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百二十九：⛔⛔ **又一次"白设计"** —— `MemospriteSpec.Attack` 的 javadoc **自己写着**"召唤者口径怎么表达"：**份额放进面板**，攻击再按**忆灵自己的**那个属性取数；而"景元」那条能这么做，是因为它是 ATTACK→ATTACK）**：
+>
+> * ✅ **实测（读 `MemospriteSpec.Attack` 的 javadoc ✓，`:95`–`:115` ✓）** ✓，原文两段：
+>   * *"it cannot live on the summoning character, because the numbers are stated against the **memosprite**: 长夜月's 「长夜」
+>     hits for 「等同于「长夜」200%生命上限」, which is the memosprite's own Max HP, **not the summoner's**. Reading it off the
+>     summoner would produce a number 2× too large … a wrong number that looks plausible, which is the worst kind."* ✓
+>   * ⭐ *"⚠ `base` names an attribute of the **memosprite**. Where a document instead scales off the *summoner*
+>     （景元's 「神君」 hits for 「等同于景元攻击力 66%」）, **the panel carries the share and the attack then scales off the
+>     memosprite's own ATTACK**: the same number, stated the same way every other inherited attribute is."* ✓
+>   ⇒ ⭐⭐ **所以"召唤者口径"**不需要新机制** ✓（我上一轮设计的"给 `EnemySkill` 加 `baseValue`" ✗ **是多余的** ✗ ——
+>     本段**第三次**同一个毛病 ✓：**没读代码自己的说明就先设计** ✓）。
+> * ⚠ **但 1407 这条仍然不行** ✓：那条约定之所以够用，是因为景元是 **ATTACK → ATTACK** ✓；而死龙的句子是
+>   「等同于**遐蝶生命上限**的 40%」✗ ⇒ 需要的是"**主人**的**另一个**属性的 X%" ✗ —— 而 `panelOf` 的语义是
+>   `percent × master.getAttribute(**同一个** attribute)` ✗ ⇒ ⛔ **表达不了** ✓。
+> * ⭐⭐⭐ **正确的最小切法（下一轮，一次做完）** ✗：把**我已经拥有的那个分支**再扩一档 ✓ ——
+>   `SummonFactory.panelOf` 里 `source:` 现在认 **`resource:<名>`** ✓（本轮已出货 ✓）⇒ **再认 `attr:<属性名>`** ✓
+>   （= 主人**该属性**的 X% ✓）⇒ 那么死龙可以写：
+>   `panel: [ {HEALTH, source:"resource:新蕊", percent:1.0}, {ATTACK, source:"attr:HEALTH", percent:1.0}, {SPEED, flat:165} ]`
+>   ＋ `attack: {element:"Quantum", base:"ATTACK", percent:0.4, shape:"AoEAttack", stance:30}` ✓
+>   ⇒ 这一击 **= 遐蝶生命上限 × 40%** ✓✓（口径对上了 ✓），而死龙**自己的血**仍是【新蕊】上限 ×100% ✓。
+> * ⭐ **读者数** ✓：`1407` 技能 1–8 全是这个口径 ✓ ＋ `1512` 的忆灵技多为召唤者口径 ✓ ⇒ **≥2** ✓ 过门槛 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
