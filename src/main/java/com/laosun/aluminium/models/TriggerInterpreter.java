@@ -426,21 +426,15 @@ public final class TriggerInterpreter {
                     // attribute, exactly like a Max HP share, and it needs `element` for the same reason (no skill row
                     // lends one). ⚠ It is NOT a `requireDerivedScale` name -- that reader resolves an ATTRIBUTE, and
                     // 「原伤害」 is not one -- and it must hang on the ONE event whose `amount` is a settled damage.
-                    // ⭐ A share of the SETTLED instance (2026-10-02): `percent` + `element` like a Max HP share, and it
-                    // must hang on the one event whose `amount` is a settled damage (`DAMAGE_SETTLED`).
-                    if ("original_damage".equals(literalScale)) {
-                        requireEvent(spec, op, TriggerEvent.DAMAGE_SETTLED);
+                    // ⚠ `original_damage` is out (third attempt, 2026-10-02): the number it reads is right and linear
+                    // (measured with the crit pinned), but a DAMAGE rider does not settle to it -- see `literalBase`.
+                    boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
+                    if (maxHpShare) {
                         requirePercent(effect, op, spec);
-                        requireElement(effect, op, spec);
                     } else {
-                        boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
-                        if (maxHpShare) {
-                            requirePercent(effect, op, spec);
-                        } else {
-                            requireDerivedScale(effect, op, spec, false);
-                        }
-                        requireElement(effect, op, spec);
+                        requireDerivedScale(effect, op, spec, false);
                     }
+                    requireElement(effect, op, spec);
                 } else {
                     requireSkill(effect, op, spec);
                     requireDamageParam(effect, op, spec);
@@ -3934,15 +3928,13 @@ public final class TriggerInterpreter {
         // faithful and linear (a 50% rider gave exactly half of a 100% one) -- only the source number is too early.
         // ⇒ It needs a POST-settlement carrier for the value; the reader table and the exact numbers are in GAPS
         // (entry "aggro 回收之八百"). Do not re-add it here without reading that entry first.
-        // ⭐⭐ 「等同于**原伤害** X%」 (2026-10-02): a share of the damage instance that triggered this rule, read from
-        // the CONTEXT's `amount` -- the settled value, announced by `DAMAGE_SETTLED` (the one event whose amount is
-        // post-settlement: `DEALING_DAMAGE` fires from *inside* `assemble`, before the crit/defence/resistance zones).
-        // ⚠ The four rounds this took were spent on a crit roll: two battles with their own `Random(0)` consume the
-        // rng differently, so one instance crit and the other did not, and the difference read exactly like a zone
-        // discrepancy (260.237584 -> 520.475168, i.e. a 2.0 multiplier). Pin the crit (`crit_rate`) when comparing.
-        if ("original_damage".equals(scale)) {
-            return ctx.amount() * share + flat;
-        }
+        // ⚠⚠ ROLLED BACK AGAIN (2026-10-02, third attempt): with the rider's crit now PINNED OFF (`crit_rate: 0.0`,
+        // added the same round), a 100% rider on one 姬子 COMMON attack still settled 151.681338 where the instance it
+        // copied had settled 260.237583796 -- exactly 0.5829x, and the 50% case gave exactly half of that, so the scale
+        // is LINEAR and reads the right number; the RIDER simply does not settle to the number it reads. 0.5829 is
+        // exactly twice the original's own zone factor (0.29145), i.e. the extra instance gets one zone the cast did not
+        // -- not a crit (pinned), not the damage type (measured identical for all three), not `countsAsAttack` (that
+        // gates energy only). Out until that zone is found. See GAPS "aggro 回收之八百一十二".
         // ? A Max HP share (2026-09-29): 「造成等同于X%生命上限的伤害」 -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
         // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
         switch (scale) {
@@ -4486,9 +4478,13 @@ public final class TriggerInterpreter {
     /**
      * Validates a <b>stated crit</b> on a damage instance: {@code crit_rate: 1} plus {@code crit_damage: X}.
      *
-     * <p>⚠ {@code 1.0} is the only legal rate (see {@link EffectSpec#getCritRate()}): "always crits" is a different fact
-     * from the {@code CRIT_CHANCE} attribute, and any other number would be a third mechanic with no reader. The pair
-     * is also both-or-neither: a crit damage without a rate says which number to use for a roll nobody described.
+     * <p>⚠ <b>Two legal rates, and they are the two ways of taking the roll away</b> (2026-10-02):
+     * {@code 1.0} = "always crits, no roll" (1505's riders) and {@code 0.0} = "<b>never</b> crits, no roll" — the
+     * second one exists because a rule that copies a settled damage needs a <b>controlled</b> comparison: two battles
+     * consume {@code Random} differently, so without it one instance crits and the other does not, and the ratio reads
+     * exactly like a zone discrepancy (measured: 260.237584 -> 520.475168, a clean 2.0 that cost four rounds).
+     * ⚠ Any other number is still refused: a probabilistic rate is the {@code CRIT_CHANCE} attribute, and these two
+     * are not probabilities at all — they mean "the roll does not happen".
      */
     private static void requireFixedCrit(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getCritRate() == null && effect.getCritDamage() == null) {
@@ -4496,17 +4492,19 @@ public final class TriggerInterpreter {
         }
         if (effect.getCritRate() == null || effect.getCritDamage() == null) {
             throw new IllegalArgumentException(
-                    "Op " + op + " states half a fixed crit: \"crit_rate\" (100%) and \"crit_damage\" (e.g. 1.5 for "
-                            + "150%) go together, because neither number is usable without the other "
+                    "Op " + op + " states half a fixed crit: \"crit_rate\" (100% or 0%) and \"crit_damage\" (e.g. 1.5 "
+                            + "for 150%; with a 0% rate the damage is what the instance settles without a crit) go "
+                            + "together, because neither number is usable without the other "
                             + "(source: " + spec.getSource() + ")");
         }
-        if (effect.getCritRate() != 1.0) {
+        if (effect.getCritRate() != 1.0 && effect.getCritRate() != 0.0) {
             throw new IllegalArgumentException(
-                    "Op " + op + " has \"crit_rate\": " + effect.getCritRate() + ", but only 1.0 is a spelling this "
-                            + "engine has: a probabilistic crit rate is the CRIT_CHANCE attribute, and \"fixed\" "
-                            + "means the roll does not happen at all (source: " + spec.getSource() + ")");
+                    "Op " + op + " has \"crit_rate\": " + effect.getCritRate() + ", but the spellings this engine has "
+                            + "are 1.0 (\"always crits, no roll\") and 0.0 (\"never crits, no roll\"): a probabilistic "
+                            + "crit rate is the CRIT_CHANCE attribute, and \"fixed\" means the roll does not happen at "
+                            + "all (source: " + spec.getSource() + ")");
         }
-        if (effect.getCritDamage() <= 0) {
+        if (effect.getCritRate() == 1.0 && effect.getCritDamage() <= 0) {
             throw new IllegalArgumentException(
                     "Op " + op + " has \"crit_damage\": " + effect.getCritDamage() + ", which is not a crit damage "
                             + "(1.5 = 150%) (source: " + spec.getSource() + ")");
