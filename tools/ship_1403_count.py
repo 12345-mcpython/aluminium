@@ -54,8 +54,23 @@ io.open(path, 'w', encoding='utf-8', newline='').write(text)
 print('1403 rules: %d；%s 现在带 per_turn=1 与 per_subject=actor' % (len(rules), TARGET_ID))
 
 
-def bail(msg):
+TEST = 'src/test/java/com/laosun/aluminium/test/TribbieTest.java'
+TOUCHED = [CHAR, TEST]
+tpath = WORK + '/' + TEST
+tt = io.open(tpath, encoding='utf-8').read()
+old_pin = 'Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),'
+new_pin = 'Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),'
+print('TribbieTest pin anchor: %d' % tt.count(old_pin))
+if tt.count(old_pin) != 1:
     subprocess.run(['git', 'checkout', '--', CHAR], cwd=WORK)
+    print('REFUSING: the pin anchor is not unique; 1403 reverted')
+    sys.exit(1)
+io.open(tpath, 'w', encoding='utf-8', newline='').write(tt.replace(old_pin, new_pin, 1))
+print('TribbieTest pin moved 2 -> 3 (the new reset rule)')
+
+
+def bail(msg):
+    subprocess.run(['git', 'checkout', '--'] + TOUCHED, cwd=WORK)
     print('ROLLED BACK via git checkout (%s)' % msg)
     sys.exit(1)
 
