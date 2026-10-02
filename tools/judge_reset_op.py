@@ -53,6 +53,9 @@ JAVA = ('package com.laosun.aluminium.test;' + NL + NL
         + '        TriggerSpecs.set(stack, ' + Q + 'target' + Q + ', ' + Q + 'self' + Q + ');' + NL
         + '        // ADD_STACK has no default lifetime: the loader names turns / permanent / until (measured in round 733).' + NL
         + '        TriggerSpecs.set(stack, ' + Q + 'permanent' + Q + ', Boolean.TRUE);' + NL
+        + '        // \u26a0 addStack defaults the cap to 1, so a probe without this saturates at one and looks like a' + NL
+        + '        // frozen failure (measured in round 747 after six rounds of chasing the wrong thing).' + NL
+        + '        TriggerSpecs.set(stack, ' + Q + 'maxStacks' + Q + ', 3);' + NL
         + '        TriggerSpec capped = TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of(), stack);' + NL
         + '        TriggerSpecs.set(capped, ' + Q + 'id' + Q + ', CAPPED);' + NL
         + '        TriggerSpecs.set(capped, ' + Q + 'perTurn' + Q + ', 1);' + NL + NL
