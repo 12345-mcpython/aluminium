@@ -468,3 +468,36 @@
   它的第五个"读者"（`1505`【好活当赏】）其实是**资源**，属 `RESOURCE_CHANGED`，卡在"资源前值"（**读者 1** ✗）。
 - **阿哈时刻**与**忆灵面板**是**唯二**"缺块自己过门槛"的能力 ✓；**段数/列位**过门槛（≥5 ✓）但**不开新玩法、不修现有错** ✗ ⇒ 优先级低。
 - `8009`／`8010`／`1505` 的欢愉行**第 0 列是段数**（`8`／`8`／`5`）⇒ 读第 0 列会**约 8 倍／5 倍**偏差；`1513`（已出货）与 `1501` 是倍率 ✓。
+
+---
+
+## 2026-10-02 第三次交接（这一段跑了很多轮；仓干净、全量 2119 绿、两闸门 [0,0]、已推送 `0c71bfd`）
+
+### 这一段**已出货**且四件齐（内容/读者 ＋ 判据 ＋ **实测变异** ＋ 文档）
+| 能力 | 提交 | 判据 | 变异 |
+|---|---|---|---|
+| `STATE_ENDED` 整条引擎链（`BuffManager` 持 `Battle` ✓、枚举 ✓、`TriggerContext.stateName` ✓、`Battle.fireStateEnded` ✓、`tickBuff` **先报后摘** ✓、条件 `state_ended <名>` ✓） | 早前 | — | — |（**读者仍 0**：四个真读者都缺"创建者" ✓ —— 见下）
+| **资源基数的忆灵面板**（`Panel.source: "resource:<名>"` ✓；两处重复推导抽成一个 `panelOf` ✓） | `504952b` | `MemospriteResourcePanelTest` | **2 红** |
+| **`attr:<属性>` 面板来源**（取**主人另一个属性**的份额 ✓） | `2a4e1d8` | `DragonPanelTest` | **1 红** |
+| **`times_from: "event_amount"`**（重复次数随事件量 ✓；`times` 的姊妹档 ✓） | `64d6548` | `EventAmountTest` | **1 红** |
+| **【新蕊】资源 ＋ 天赋 1:1 写入**（⚠ 关键是 `"scope": "PARTY"` ✓ —— 缺它 `partyResource` 就是 **null** ✓） | `7bd3472` | `NewbudResourceTest` | — |
+| **死龙面板 ＋ 忆灵技能 1**（血 = 【新蕊】上限 ×100% ✓；速度 165 ✓；技能 40% 主人生命上限 ✓ `AoEAttack` ✓ `stance 30` ✓） | `d43be88`／`3408e65` | `DragonPanelTest` | **1 红** |
+
+### ⭐ 下一件工作（已具名到字段，五步）
+**"花光某资源"这一档**（读者 ≥2：`1513:283` 的【热意】✓、`1415:542` 的溢出【新蕊】✓）：
+1. `EffectSpec` 加 `"spendAll": true` ✓（与 `amount` **互斥** ⇒ 装载期响亮拒绝同时出现 ✓）；
+2. `SPEND_RESOURCE` 的执行臂（`TriggerInterpreter:1146` ✓）在 `spendAll` 时把 `spendResource(...)` 的量取成**当前全部** ✓
+   （它已经在算 `before` ✓ ⇒ 差值就是全部 ✓）；
+3. ⚠ 确认 `do` 数组是**顺序执行** ✓（`1513` 那条要"先花光、再按花掉的量打 N 次" ✓）；
+4. 判据：资源 7 ⇒ 花光 ⇒ 资源 **0** ✓ ＋ `RESOURCE_CHANGED` 的 `delta = −7` ✓ ＋ `times_from` 给 **7 次** ✓；
+5. 变异：把 `spendAll` 换回固定 `amount` ⇒ 必红 ✓。
+
+### ⭐ 这一段用血换来的**判读纪律**（下次别再交学费）
+1. **先查内容，再判能力**：`TriggerTable` 的 23 个关键词只是**一半**词汇 ✓，另一半（`hp_percent`／`self_stacks:`／`amount_from_event`…）只在出货内容里 ✓。
+2. **"门后面还有门"**：别只看共用函数（`grantAmount` ✓）—— **每个 op 有自己的 scale 白名单** ✓（`SCALES`／`ENERGY_SCALES`／`MODIFY_ATTR` 的 `scaleAttribute` ✓／`gainResource` ✓）。
+3. **搜索模式决定结论**：`fireTriggers(` **匹配不到** `fireTriggersForAlly(` ✗、`per` 会命中 `permanent` ✗ ⇒ **搜事件派发要把四种写法都搜** ✓（`fireTriggers(`／`fireTriggersForAlly(`／`fireTriggersWithSubject(`／`onXxx` 监听器 ✓）。
+4. **先验路，再验货**：手工 `fireTriggers(HP_LOST,…)` 到不了规则 ✓、`applyTrueDamage` **不广播** `onHpLoss` ✓ ⇒ 判据要用**引擎自己的**入口（`Battle.applyDamage` ✓）。
+5. **观测量要照规则自己产出什么来选**（`talent_damage_up_on_hp_loss` 改的是 `ALL_DAMAGE_TYPE_BOOST` ✓，不是 ATTACK ✗）。
+6. **一个判据多个断言、让失败行号说话** ✓（`scope: PARTY` 那一轮就是这么一次切开的 ✓）。
+7. **推翻一个结论和提出一个结论，门槛一样**（我曾用"引擎会广播"推翻了"规则不触发" ✓ —— 那是**换了论题** ✗）。
+8. **给文件插代码后要读一眼插入点**（这一轮插错过一次 ✓，靠读回来才发现 ✓）。
