@@ -72,8 +72,8 @@ public class AttackStacking1401Test {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
 
         EffectSpec technique = new EffectSpec();
-        TriggerSpecs.set(technique, "op", "APPLY_STATE");
-        TriggerSpecs.set(technique, "state", "\u79d8\u6280");
+        TriggerSpecs.set(technique, "op", "APPLY_BUFF");
+        TriggerSpecs.set(technique, "buff", "\u79d8\u6280");   // the Java field; the JSON name is buff
         TriggerSpecs.set(technique, "turns", 3);
         TriggerSpecs.set(technique, "target", "self");
         owner.setTriggerTable(owner.getTriggerTable()
