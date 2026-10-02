@@ -172,5 +172,18 @@
     ],
     "source": "1406 赛飞儿 行迹「偷天换日」(1406103): 「天赋的追加攻击造成的暴击伤害提高 100%」",
     "note": "⭐⭐ 实例路径 + 伤害类型域 ✓（`instance: true` + `damage_type: \"ADDITIONAL\"` ✓）⇒ 只给**追加攻击那一次伤害**加暴击伤害 ✓。⭐ 数值 **100%** 取自**数据行** ✓（`1406103 param=[0.4, 1]` ⇒ `#2[i] = 1` ✓，第 106 条 ✓）。⚠ 存活期 `permanent: true` 仅为过加载器校验 ✓。⚠ **登记同句后半** ✗：「赛飞儿在场时，敌方全体目标**受到的伤害提高 40%**」—— 那是**队伍/在场光环** ✗（需要\"某角色在场时对全体敌方生效\"的通道 ✗），与 1309/1504 同族 ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "aura_damage_taken_while_present",
+    "do": [
+      {
+        "op": "MODIFY_DAMAGE_TAKEN",
+        "percent": 0.4,
+        "permanent": true,
+        "target": "all_enemies"
+      }
+    ],
+    "note": "「赛飞儿**在场时**，敌方全体目标**受到的伤害提高 40%**」—— ⭐ 2026-09-30 转正 ✓：⚠ 旧登记写“需要某角色在场时对全体敌方生效的通道”✗ —— 而那个通道**已经存在** ✓：withSource 给每个 buff 记下 source = ctx.owner()，而 BuffManager.removeBuffsAnchoredTo 由 Battle.removeDeadCombatants 调用 ⇒ **她倒下时它自动被摘** ✓，正是“在场”的语义。⚠ 判据必须断言**两件**：伤害 +40% ✓，以及**她倒下后它消失** ✗。"
   }
 ]

@@ -71,8 +71,17 @@ public class CipherTest {
             TriggerSpecs.set(markEffect, "buff", "\u8001\u4e3b\u987e");
             TriggerSpecs.set(markEffect, "permanent", true);
             TriggerSpecs.set(markEffect, "target", "target");
+            // ⚠ The reference must carry her presence aura too. Round 1040 shipped 「赛飞儿在场时，敌方全体受到的伤害提高
+            // 40%」, and this path REPLACES her whole trigger table -- so without this line the aura lands on the shipped
+            // side only and the ratio drifts 0.5 -> 0.7. Same shape as the crit clause recorded below (round 242).
+            EffectSpec aura = new EffectSpec();
+            TriggerSpecs.set(aura, "op", "MODIFY_DAMAGE_TAKEN");
+            TriggerSpecs.set(aura, "percent", 0.4);
+            TriggerSpecs.set(aura, "permanent", true);
+            TriggerSpecs.set(aura, "target", "all_enemies");
             cipher.setTriggerTable(new TriggerTable(CIPHER, List.of(
                     TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), markEffect),
+                    TriggerSpecs.rule(TriggerEvent.BATTLE_START.name(), List.of(), aura),
                     TriggerSpecs.rule(TriggerEvent.ALLY_ATTACK.name(),
                             List.of("actor is_other_ally", "target has_state \u8001\u4e3b\u987e"), effect))));
         }

@@ -710,6 +710,17 @@ public class BuffManager {
                 return true;
             }
         }
+        // Named buffs (2026-09-30): an effect *of* a state carries the state's own name, so 「处于结界中时」 must
+        // answer yes for the modifier that carries it -- the zone is a MODIFY_ATTR with `buff: "结界"`, not a
+        // StateBuff. ⚠ Over the manager's own list rather than `allBuffsOf`: that helper compares classes EXACTLY,
+        // and a modifier may be a SUBCLASS. ⚠ Unnamed buffs are skipped, which is what keeps this loop from touching
+        // anything that existed before the field did -- and that is why widening this read is safe for every
+        // existing rule that gates on a name nothing carries.
+        for (AbstractBuff named : List.copyOf(buffs)) {
+            if (!named.getBuffName().isEmpty() && wanted.equals(named.getBuffName())) {
+                return true;
+            }
+        }
         // Engine states: the names below are not StateBuff names -- they are states the engine represents with
         // a buff of its own. Resolving them here is what makes 「对处于灼烧状态的目标造成的伤害提高」 and
         // 「冻结状态下的敌方目标」 expressible without inventing a second fact for "this unit is burning/frozen".
