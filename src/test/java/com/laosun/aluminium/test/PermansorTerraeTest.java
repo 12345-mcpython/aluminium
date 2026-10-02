@@ -68,10 +68,11 @@ public class PermansorTerraeTest {
                         + "which is why the two are in this order in the file: the first designates, the second reads "
                         + "`holder_of:同袍`");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the technique's 【同袍】 (「使用秘技后获得【同袍】」) and 葳蕤's 「行动提前40%」 "
-                        + "-- ⚠ still registered: the entry auto-cast (「入场自动施放 1 次战技」), because his skill's "
-                        + "effect is DEFENCE and CAST_SKILL delivers a swing");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the technique's 【同袍】 (「使用秘技后获得【同袍】」), 葳蕤's 「行动提前40%」 and "
+                        + "-- since 2026-10-02 -- the technique's auto-cast (「下一次战斗开始时自动对持有【同袍】的"
+                        + "角色施放1次战技」), which CAST_SKILL can now deliver because it casts the skill through the "
+                        + "engine's own path: his skill is a DEFENCE shield, not a swing");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "葳蕤's second half: 「【同袍】施放攻击时，丹恒•腾荒恢复6点能量」");
     }
