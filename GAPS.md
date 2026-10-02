@@ -18500,6 +18500,27 @@
 >      而既有判据 `AventurineWaveflairTest` 期望 **30** ✗ ⇒ **二分**（只留伤害那条规则 ✓）一次就证明是它 ✓
 >      ⇒ 改成文档说的 **`"target": "random_enemy"`** ✓ ⇒ 两条判据同时绿 ✓✓（⚠ **不是**改既有判据迁就代码 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百五十三：⭐ "溢出"**是引擎已有的机制**（`Resource.setMaxOverflow` ✓）⇒ `1415` 那条"溢出【新蕊】"的前半句今天就能声明；后半句仍缺两档）**：
+>
+> * ✅ **实测（读 `Resource` 的类注释 ✓）** ✓：
+>   * **正常路径**（`gainClamped`／`gain`）**绝不超过 `max`** ✓；
+>   * ⭐ **溢出是显式且封顶的** ✓：只有 `setMaxOverflow` 配置过之后 ✓，`gain` 才会把值存到 `max` 之上 ✓，
+>     且封在 **`max + maxOverflow`** ✓（注释：*"By default `maxOverflow == 0`, so 'overflowing by accident with gain' is
+>     impossible"* ✓）；另有 `setValue`（同样限在 `max + maxOverflow` ✓）供**存档恢复/调试** ✓，正常玩法走 gain/spend ✓；
+>   * 设计动机也写着 ✓：*"the game really does have mechanics like 'cap is 5 but can temporarily be stored up to 10'"*
+>     ✓（例子正是**花火的战技点** ✓）。
+> * ⭐ **于是 `1407`／`1415` 那条"【新蕊】可溢出至 200%"** ✓ ⇒ **今天可以声明** ✓（`"overflow": <量>` ✓，⚠ 与 `max` 一起 ✓）。
+> * ⛔ **但那一句的另外两半仍缺** ✗（都记在案 ✓）：
+>   1. **"消耗所有**溢出**"** ✗ —— `spendAll` 是"花光**全部**" ✓，而这里要的是"**花到上限为止**" ✗
+>      ⇒ ⭐ 这是第三种花法 ✓（可叫 `spendDownToMax` ✗／`spendOverflow` ✓ —— **名字照文档写** ✓）；
+>   2. **"每消耗 1% 溢出值 ⇒ 伤害倍率提高 0.24%"** ✗ —— 需要一个 `BOOST_DAMAGE`／`MODIFY_ATTR` 上的
+>      **`scale: "event_amount"`** ✗（⚠ 我当日**删掉**了 `event_amount` 的"值"那一半 ✓，因为它与已有的
+>      `amount_from_event` 重复 ✓ —— 而 `amount_from_event` **只服务 `GAIN_RESOURCE`** ✗ ⇒ 这里是**另一个 op** ✓
+>      ⇒ ⭐ **它不算重复** ✓，但要**先数读者** ✓：用它的从句有几条 ✗）。
+> * ⭐ **下一轮第一步** ✗：**数读者** ✓ —— 扫内容里"**每消耗 1%（或 1 点）⇒ 某个倍率/属性提高**"的从句 ✓
+>   （已知 `1415:542` ✓ ＋ 可能 `1413:343` 的"每消耗 1 点【忆质】+1% 速度" ✓ ⇒ **≥2 就能做** ✓）；
+>   够门槛 ⇒ 给 `MODIFY_ATTR`／`BOOST_DAMAGE` 开 `scale: "event_amount"` ✓ ＋ 配判据与变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -20066,6 +20087,27 @@
 >      而既有判据 `AventurineWaveflairTest` 期望 **30** ✗ ⇒ **二分**（只留伤害那条规则 ✓）一次就证明是它 ✓
 >      ⇒ 改成文档说的 **`"target": "random_enemy"`** ✓ ⇒ 两条判据同时绿 ✓✓（⚠ **不是**改既有判据迁就代码 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百五十三：⭐ "溢出"**是引擎已有的机制**（`Resource.setMaxOverflow` ✓）⇒ `1415` 那条"溢出【新蕊】"的前半句今天就能声明；后半句仍缺两档）**：
+>
+> * ✅ **实测（读 `Resource` 的类注释 ✓）** ✓：
+>   * **正常路径**（`gainClamped`／`gain`）**绝不超过 `max`** ✓；
+>   * ⭐ **溢出是显式且封顶的** ✓：只有 `setMaxOverflow` 配置过之后 ✓，`gain` 才会把值存到 `max` 之上 ✓，
+>     且封在 **`max + maxOverflow`** ✓（注释：*"By default `maxOverflow == 0`, so 'overflowing by accident with gain' is
+>     impossible"* ✓）；另有 `setValue`（同样限在 `max + maxOverflow` ✓）供**存档恢复/调试** ✓，正常玩法走 gain/spend ✓；
+>   * 设计动机也写着 ✓：*"the game really does have mechanics like 'cap is 5 but can temporarily be stored up to 10'"*
+>     ✓（例子正是**花火的战技点** ✓）。
+> * ⭐ **于是 `1407`／`1415` 那条"【新蕊】可溢出至 200%"** ✓ ⇒ **今天可以声明** ✓（`"overflow": <量>` ✓，⚠ 与 `max` 一起 ✓）。
+> * ⛔ **但那一句的另外两半仍缺** ✗（都记在案 ✓）：
+>   1. **"消耗所有**溢出**"** ✗ —— `spendAll` 是"花光**全部**" ✓，而这里要的是"**花到上限为止**" ✗
+>      ⇒ ⭐ 这是第三种花法 ✓（可叫 `spendDownToMax` ✗／`spendOverflow` ✓ —— **名字照文档写** ✓）；
+>   2. **"每消耗 1% 溢出值 ⇒ 伤害倍率提高 0.24%"** ✗ —— 需要一个 `BOOST_DAMAGE`／`MODIFY_ATTR` 上的
+>      **`scale: "event_amount"`** ✗（⚠ 我当日**删掉**了 `event_amount` 的"值"那一半 ✓，因为它与已有的
+>      `amount_from_event` 重复 ✓ —— 而 `amount_from_event` **只服务 `GAIN_RESOURCE`** ✗ ⇒ 这里是**另一个 op** ✓
+>      ⇒ ⭐ **它不算重复** ✓，但要**先数读者** ✓：用它的从句有几条 ✗）。
+> * ⭐ **下一轮第一步** ✗：**数读者** ✓ —— 扫内容里"**每消耗 1%（或 1 点）⇒ 某个倍率/属性提高**"的从句 ✓
+>   （已知 `1415:542` ✓ ＋ 可能 `1413:343` 的"每消耗 1 点【忆质】+1% 速度" ✓ ⇒ **≥2 就能做** ✓）；
+>   够门槛 ⇒ 给 `MODIFY_ATTR`／`BOOST_DAMAGE` 开 `scale: "event_amount"` ✓ ＋ 配判据与变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
