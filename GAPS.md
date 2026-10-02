@@ -20131,6 +20131,19 @@
 >   —— ⚠ 本段在 `from_category` 上正好蒙对 ✓（用了 `ElationDamage` ✓）；而 `1306` 那次的 `ELATION_DAMAGE` ✗ 是被装载器**拒绝**的 ✓ ⇒ ⭐ **两种拼写的"收"是有前提的**（⚠ 见该行上下文 ✓）。
 > * ⚠ **推送**：本地仍**领先 6** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十九：✅ `SkillExecutor.execute` 的**确切签名**拿到了；⚠ 而 `Skill` 里"类别"那个字段名还没找到（我两次猜路径都错，第三次用 `glob` 才拿到文件））**）**：
+>
+> * ✅ **实测（`glob` ⇒ 读文件 ✓）** ✓：
+>   * ⚠ **`SkillExecutor` 不在 `models/` 里** ✗ ⇒ 在 **`models/skill/SkillExecutor.java`** ✓（⚠ 我先前两次按 `models/…` 猜 ✗ ⇒ ⭐ **纪律：找文件先用 `glob`** ✓）；
+>   * ⭐ **签名（`:72` ✓）**：**`public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets)`** ✓
+>     ⇒ 判据里可以**直接驱动一次施放** ✓（⚠ 只要造出一个"类别属于欢愉"的 `Skill` ✓）。
+> * ⚠ **还没找到的** ✗：`Skill`（`beans/Skill.java` ✓）里表示**类别**的字段名 ✗ —— 我 grep 了 `category`／`public Skill(` ✓ **都没命中** ✗
+>   ⇒ ⭐ **下一轮第一步（1 次调用）** ✗：**读 `beans/Skill.java` 的字段区** ✓（⚠ 或 grep `SerializedName` 全部 ✓ ⇒ 一次看全 ✓）
+>     ⇒ 拿到字段名后：**造一个欢愉技** ✓ ⇒ `execute(...)` ✓ ⇒ 断言三件事 ＋ 变异 ✓。
+> * ⭐ **纪律（本段第十九条）** ✗：**找文件用 `glob`，别按包名猜路径** ✓ —— ⚠ 本段为此浪费两次调用 ✓
+>   （⚠ 而"猜字段名"这类错误本段已犯四次 ✓ ⇒ ⭐ **凡"名字"类信息，一律先查、再写** ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23327,6 +23340,19 @@
 > * ⭐ **纪律（本段第十八条）** ✗：**条件里出现"两种拼写"时，选**数据拼写**（与 `RuleEffectAmendmentTest`／`EffectKeyDisciplineTest` 的口径一致 ✓）
 >   —— ⚠ 本段在 `from_category` 上正好蒙对 ✓（用了 `ElationDamage` ✓）；而 `1306` 那次的 `ELATION_DAMAGE` ✗ 是被装载器**拒绝**的 ✓ ⇒ ⭐ **两种拼写的"收"是有前提的**（⚠ 见该行上下文 ✓）。
 > * ⚠ **推送**：本地仍**领先 6** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十九：✅ `SkillExecutor.execute` 的**确切签名**拿到了；⚠ 而 `Skill` 里"类别"那个字段名还没找到（我两次猜路径都错，第三次用 `glob` 才拿到文件））**）**：
+>
+> * ✅ **实测（`glob` ⇒ 读文件 ✓）** ✓：
+>   * ⚠ **`SkillExecutor` 不在 `models/` 里** ✗ ⇒ 在 **`models/skill/SkillExecutor.java`** ✓（⚠ 我先前两次按 `models/…` 猜 ✗ ⇒ ⭐ **纪律：找文件先用 `glob`** ✓）；
+>   * ⭐ **签名（`:72` ✓）**：**`public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets)`** ✓
+>     ⇒ 判据里可以**直接驱动一次施放** ✓（⚠ 只要造出一个"类别属于欢愉"的 `Skill` ✓）。
+> * ⚠ **还没找到的** ✗：`Skill`（`beans/Skill.java` ✓）里表示**类别**的字段名 ✗ —— 我 grep 了 `category`／`public Skill(` ✓ **都没命中** ✗
+>   ⇒ ⭐ **下一轮第一步（1 次调用）** ✗：**读 `beans/Skill.java` 的字段区** ✓（⚠ 或 grep `SerializedName` 全部 ✓ ⇒ 一次看全 ✓）
+>     ⇒ 拿到字段名后：**造一个欢愉技** ✓ ⇒ `execute(...)` ✓ ⇒ 断言三件事 ＋ 变异 ✓。
+> * ⭐ **纪律（本段第十九条）** ✗：**找文件用 `glob`，别按包名猜路径** ✓ —— ⚠ 本段为此浪费两次调用 ✓
+>   （⚠ 而"猜字段名"这类错误本段已犯四次 ✓ ⇒ ⭐ **凡"名字"类信息，一律先查、再写** ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
