@@ -1,8 +1,6 @@
 package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.beans.SkillEffectSpec;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.data.SkillEffects;
@@ -281,13 +279,6 @@ public final class SkillExecutor {
             return;
         }
         for (CanHit target : targets) {
-            if ("Buff".equals(spec.getEffect())) {
-                // The one non-damaging shape that carries a NAME rather than an amount (2026-10-02; reader: 1412
-                // marking an ally with a charge-driven state). No duration is stated by the text, so the state is
-                // attached as permanent -- an unbounded turn count, exactly like a rule that omits `turns`.
-                target.getBuffManager().addBuff(new StateBuff(spec.getBuff(), Integer.MAX_VALUE, true));
-                continue;
-            }
             double amount = effectAmount(skill, spec, user, target);
             if ("Restore".equals(spec.getEffect())) {
                 battle.heal(user, target, amount);
@@ -525,11 +516,8 @@ public final class SkillExecutor {
     static SkillEffectSpec deliverableSpec(Skill skill) {
         SkillEffectSpec spec = SkillEffects.forSkill(skill);
         boolean supported = spec != null
-                && ("Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect())
-                        || "Buff".equals(spec.getEffect()))
-                // A Buff row names a state instead of carrying numbers, so the parameter-summing guard -- which
-                // exists for heal rows that mix several terms -- has nothing to sum and must not refuse it.
-                && ("Buff".equals(spec.getEffect()) || !isAmbiguous(spec));
+                && ("Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect()))
+                && !isAmbiguous(spec);
         return supported ? spec : null;
     }
 

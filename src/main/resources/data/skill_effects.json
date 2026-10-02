@@ -576,14 +576,5 @@
             "formula": null,
             "source": "SkillDesc 占位符"
         }
-    },
-    "1412": {
-        "2": {
-            "effect": "Buff",
-            "buff": "军功",
-            "turns_param": null,
-            "formula": null,
-            "source": "1412 刻律德菈 战技 升变，士皆可帅 (141502, BPSkill/Support) 第一句：「使指定我方单体角色获得【军功】」 + SkillDesc 槽位"
-        }
     }
 }
