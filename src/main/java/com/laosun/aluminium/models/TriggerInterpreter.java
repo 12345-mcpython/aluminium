@@ -2195,8 +2195,10 @@ public final class TriggerInterpreter {
         }
         if (EVENT_AMOUNT.equals(effect.getScale().trim())) {
             // ⭐ 「每消耗 1 点…提高 X%」 (2026-10-02): the triggering event's own magnitude, as a
-            // modifier. ⚠ Not a duplicate of `amount_from_event`: that spelling is read in `gainResource` ONLY
-            // (it was withdrawn from `grantAmount` for exactly that reason), while these readers are all modifiers.
+            // modifier. ⚠ `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's
+            // `talent_phantasm_stack`, one 【幻相】 layer per point spent). What was missing is this ROUTE --
+            // modifiers read their magnitude here and had no way to ask the event. (It was ALSO withdrawn once from
+            // `grantAmount`, where `amount_from_event` already served GAIN_RESOURCE; that note lives there.)
             // Before the attribute branch below, for the reason `cast_energy_spent` gives.
             return effect.getPercent() * Math.abs(ctx.amount())
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
