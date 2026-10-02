@@ -18382,6 +18382,24 @@
 >   ⇒ 全量 **0** ✓、树干净 ✓；⭐ **两个脚本留在仓里** ✓（`tools/add_spend_all3.py` ＝ 引擎＋内容 ✓、
 >     `tools/ship_spend_all.py` ＝ 重放＋触发修正＋判据模板 ✓）⇒ 下一轮**只改一行判据**即可 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十六：✅✅ **"花光"本身验成了**（判据里"资源归 0"那一步**过了** ⇒ 引擎与触发都对）——⛔ 而**"每点一次伤害"那一半没随点数变化**（1 点与 7 点都是 60.984）⇒ 分开登记）**：
+>
+> * ✅ **本轮打通的链路（全部有实测 ✓）** ✓：
+>   * 触发写法落定为 **`from_category ElationDamage`** ✓（⚠ **必须用数据值 `ElationDamage`**，用枚举名 `ELATION_DAMAGE` 会被装载期拒绝 ✓
+>     —— 报错原文：*"names the cast category …, which the engine does not know; the categories are the ones the skill data spells"* ✓）；
+>   * 判据走 **`Character.getSkills().get(SkillType.ELATION_SKILL)`** ✓（`Character` 没有 `getSkill(...)` ✗，只有 `getSkills()` ✓）
+>     ＋ **`SkillExecutor.execute`** ✓ ⇒ **真的施放了一次欢愉技** ✓；
+>   * **`SPEND_RESOURCE{spendAll}` 生效** ✓：判据里 `assertEquals(0, owner.getResources().value(RES))` **通过了** ✓
+>     （1 点与 7 点两种情况都把【热意】**花到 0** ✓）。
+> * ⛔ **没通过的那一半** ✗：`random 单体额外 1 次 21.00% 伤害` **每点一次** ⇒ 实测 **1 点与 7 点的伤害完全相同（60.984）** ✗
+>   ⇒ ⭐ 说明**嵌套的 `RESOURCE_CHANGED` 没有按"花掉的量"重复** ✗（⚠ 三种可能：(a) `fireResourceChanged` 的 `delta` 传的不是 −7 ✗；
+>     (b) 那条规则的 `when: ["resource_changed:热意"]` 没匹配 ✓；(c) `times_from` 在**嵌套事件**里读到的量不对 ✗）。
+> * ✅ **处置** ✓：三处改动＋判据**全部回滚** ✓（脚本留在仓 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * ⭐ **下一轮第一步（把那一半查清，一条判据两个断言、让失败行号说话 ✓）** ✗：
+>   ① 断言**花掉多少**：`SPEND_RESOURCE` 之后 `noteChangedResource`／`lastChangedResource` 与**事件的量**是否 = −7 ✓；
+>   ② 断言**嵌套规则有没有跑**（例如让它给一个可观察的 buff ✓）⇒ 分清"没跑"还是"跑了但量不对" ✓；
+>   ③ 若量不对 ⇒ 看 `fireResourceChanged(battle, ctx, movedId, after - before)` 在 `spendAll` 这条路上算出的差值 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19830,6 +19848,24 @@
 >   ⇒ 全量 **0** ✓、树干净 ✓；⭐ **两个脚本留在仓里** ✓（`tools/add_spend_all3.py` ＝ 引擎＋内容 ✓、
 >     `tools/ship_spend_all.py` ＝ 重放＋触发修正＋判据模板 ✓）⇒ 下一轮**只改一行判据**即可 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十六：✅✅ **"花光"本身验成了**（判据里"资源归 0"那一步**过了** ⇒ 引擎与触发都对）——⛔ 而**"每点一次伤害"那一半没随点数变化**（1 点与 7 点都是 60.984）⇒ 分开登记）**：
+>
+> * ✅ **本轮打通的链路（全部有实测 ✓）** ✓：
+>   * 触发写法落定为 **`from_category ElationDamage`** ✓（⚠ **必须用数据值 `ElationDamage`**，用枚举名 `ELATION_DAMAGE` 会被装载期拒绝 ✓
+>     —— 报错原文：*"names the cast category …, which the engine does not know; the categories are the ones the skill data spells"* ✓）；
+>   * 判据走 **`Character.getSkills().get(SkillType.ELATION_SKILL)`** ✓（`Character` 没有 `getSkill(...)` ✗，只有 `getSkills()` ✓）
+>     ＋ **`SkillExecutor.execute`** ✓ ⇒ **真的施放了一次欢愉技** ✓；
+>   * **`SPEND_RESOURCE{spendAll}` 生效** ✓：判据里 `assertEquals(0, owner.getResources().value(RES))` **通过了** ✓
+>     （1 点与 7 点两种情况都把【热意】**花到 0** ✓）。
+> * ⛔ **没通过的那一半** ✗：`random 单体额外 1 次 21.00% 伤害` **每点一次** ⇒ 实测 **1 点与 7 点的伤害完全相同（60.984）** ✗
+>   ⇒ ⭐ 说明**嵌套的 `RESOURCE_CHANGED` 没有按"花掉的量"重复** ✗（⚠ 三种可能：(a) `fireResourceChanged` 的 `delta` 传的不是 −7 ✗；
+>     (b) 那条规则的 `when: ["resource_changed:热意"]` 没匹配 ✓；(c) `times_from` 在**嵌套事件**里读到的量不对 ✗）。
+> * ✅ **处置** ✓：三处改动＋判据**全部回滚** ✓（脚本留在仓 ✓）⇒ 全量 **0** ✓、树干净 ✓。
+> * ⭐ **下一轮第一步（把那一半查清，一条判据两个断言、让失败行号说话 ✓）** ✗：
+>   ① 断言**花掉多少**：`SPEND_RESOURCE` 之后 `noteChangedResource`／`lastChangedResource` 与**事件的量**是否 = −7 ✓；
+>   ② 断言**嵌套规则有没有跑**（例如让它给一个可观察的 buff ✓）⇒ 分清"没跑"还是"跑了但量不对" ✓；
+>   ③ 若量不对 ⇒ 看 `fireResourceChanged(battle, ctx, movedId, after - before)` 在 `spendAll` 这条路上算出的差值 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
