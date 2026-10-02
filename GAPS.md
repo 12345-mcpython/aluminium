@@ -18302,6 +18302,20 @@
 >   `CAST_SKILL{ELATION_SKILL}` 是**自动施放** ✓（`TURN_START` ＋ 热意 ≥ 10 ✓）—— ⚠ 而句子要的"**强化**版"到底是不是同一个键 ✗
 >   仍要按上一段说的办法落定 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十一：⭐ `from_skill_id` 比的是**技能的数据行 id**（`ctx.skillId()`），所以内容里要写的是**数字**，而不是 `AbilityList` 里的字符串名）**：
+>
+> * ✅ **实测（读 `TriggerTable` 两处 ✓）** ✓：
+>   * `from_skill_id` 属于 **`NUMERIC_VARIABLES`** ✓（`:874` ✓，与 `hp_percent`／`enemy_count` 同族 ✓）；
+>   * 它的取值是 **`ctx.skillId()`** ✓（`:3301` ✓），注释原文：*"「强化普攻命中…」: **the DATA ROW of the skill** that produced this
+>     event (0 = the event named none, which makes the comparison false rather than accidentally true for the row 0 that no
+>     skill has)"* ✓ ⇒ ⭐ **要的是技能的数据行 id** ✓（例如 `1407` 那边出现过的 **`140703`** ✓ ⇒ 形状是 `<cid><slot><idx>` ✓）。
+> * ⭐ **于是"强化欢愉技"这条链现在只剩最后一步** ✗：把
+>   **`Avatar_AventurineW_00_ElationSkill_Phase01`**（上一轮在 `ConfigAbility` 里找到的 ✓）映射到它的**数字数据行** ✓
+>   —— ⚠ 数据行**不在 `ConfigAbility`** ✗（那里只有行为脚本 ✓）⇒ 下一轮去 **`ConfigCharacter`／`ConfigAvatar` 的技能表** ✓
+>     或 `.layout.json` ✓ 里找；⚠ 也可用**反查**：在 tbgd 里搜 `1513` 开头的**数字 id** ✓ 看哪些与"欢愉技"同处一个文件 ✓。
+> * ⭐ **并且**上一轮那份 `W` 文件的发现仍成立 ✓：**欢愉技只在强化版文件里** ✓ ⇒ ⭐ 若数字行也只有一个 ✓，那"普通／强化"
+>   可能靠 **`Phase01/02` vs `Phase11/12`** 区分 ✓ ⇒ ⭐ **那 `from_skill_id` 就要写到具体 Phase** ✓（⚠ 这正好解释文档为什么强调"**强化**"✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19669,6 +19683,20 @@
 > * ⭐ **顺带一条** ✓：**该角色的"欢愉技"只存在于 `W`（强化）文件里** ✓ ⇒ ⭐ 这也解释了为什么她内容里那条
 >   `CAST_SKILL{ELATION_SKILL}` 是**自动施放** ✓（`TURN_START` ＋ 热意 ≥ 10 ✓）—— ⚠ 而句子要的"**强化**版"到底是不是同一个键 ✗
 >   仍要按上一段说的办法落定 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之九百四十一：⭐ `from_skill_id` 比的是**技能的数据行 id**（`ctx.skillId()`），所以内容里要写的是**数字**，而不是 `AbilityList` 里的字符串名）**：
+>
+> * ✅ **实测（读 `TriggerTable` 两处 ✓）** ✓：
+>   * `from_skill_id` 属于 **`NUMERIC_VARIABLES`** ✓（`:874` ✓，与 `hp_percent`／`enemy_count` 同族 ✓）；
+>   * 它的取值是 **`ctx.skillId()`** ✓（`:3301` ✓），注释原文：*"「强化普攻命中…」: **the DATA ROW of the skill** that produced this
+>     event (0 = the event named none, which makes the comparison false rather than accidentally true for the row 0 that no
+>     skill has)"* ✓ ⇒ ⭐ **要的是技能的数据行 id** ✓（例如 `1407` 那边出现过的 **`140703`** ✓ ⇒ 形状是 `<cid><slot><idx>` ✓）。
+> * ⭐ **于是"强化欢愉技"这条链现在只剩最后一步** ✗：把
+>   **`Avatar_AventurineW_00_ElationSkill_Phase01`**（上一轮在 `ConfigAbility` 里找到的 ✓）映射到它的**数字数据行** ✓
+>   —— ⚠ 数据行**不在 `ConfigAbility`** ✗（那里只有行为脚本 ✓）⇒ 下一轮去 **`ConfigCharacter`／`ConfigAvatar` 的技能表** ✓
+>     或 `.layout.json` ✓ 里找；⚠ 也可用**反查**：在 tbgd 里搜 `1513` 开头的**数字 id** ✓ 看哪些与"欢愉技"同处一个文件 ✓。
+> * ⭐ **并且**上一轮那份 `W` 文件的发现仍成立 ✓：**欢愉技只在强化版文件里** ✓ ⇒ ⭐ 若数字行也只有一个 ✓，那"普通／强化"
+>   可能靠 **`Phase01/02` vs `Phase11/12`** 区分 ✓ ⇒ ⭐ **那 `from_skill_id` 就要写到具体 Phase** ✓（⚠ 这正好解释文档为什么强调"**强化**"✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
