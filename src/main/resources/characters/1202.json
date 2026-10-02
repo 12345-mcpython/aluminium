@@ -24,11 +24,12 @@
         "cap_scale": "self_attr:ATTACK",
         "cap_percent": 0.25,
         "turns": 3,
-        "target": "target"
+        "target": "target",
+        "buff": "赐福"
       }
     ],
     "source": "1202 停云 战技 祥音和韵 (120202, BPSkill/Support): 「为指定我方单体提供【赐福】，使其攻击力提高50%，最高不超过停云当前攻击力的25%。获得【赐福】的目标施放攻击后，会额外造成1次等同于其自身40%攻击力的雷属性附加伤害。【赐福】持续3回合且仅对停云战技最新的施放目标生效。」",
-    "note": "「为指定我方单体提供【赐福】，使其**攻击力提高 50%**，**最高不超过停云当前攻击力的 25%**，持续 3 回合」—— ① 状态与数值**拆成两个效果** ✓（第 120 轮的教训：`MODIFY_ATTR` 的 `buff` 只是显示名 ✗，造状态要用 `APPLY_BUFF` ✓）；② 上限用 `cap_scale: self_attr:ATTACK` + `cap_percent: 0.25` ✓（基准是**规则主人**=停云 ✓）—— 引擎自 2026-09-29 起对 `MODIFY_ATTR` 也读这对字段 ✓，且**逐目标换算单位** ✓（份额 ÷ 目标基础值 ✓，与绝对值比大小 ✗）。⚠ **登记**：① 「获得【赐福】的目标施放攻击后，会额外造成 1 次等同于**其自身** 40% 攻击力的雷属性附加伤害」与天赋的 60% 写不了 ✗ —— `DAMAGE` op 的攻击者是**规则主人** ✗，需要\"以另一个单位为攻击者造成实例\"的写法 ✓；② 「仅对停云战技**最新的施放目标**生效」缺\"只保留最新一个\"的不变量 ✗。\n\n⭐ 2026-09-30 转正：「【赐福】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 赐福 target: all_allies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
+    "note": "「为指定我方单体提供【赐福】，使其**攻击力提高 50%**，**最高不超过停云当前攻击力的 25%**，持续 3 回合」—— ① 状态与数值**拆成两个效果** ✓（第 120 轮的教训：`MODIFY_ATTR` 的 `buff` 只是显示名 ✗，造状态要用 `APPLY_BUFF` ✓）；② 上限用 `cap_scale: self_attr:ATTACK` + `cap_percent: 0.25` ✓（基准是**规则主人**=停云 ✓）—— 引擎自 2026-09-29 起对 `MODIFY_ATTR` 也读这对字段 ✓，且**逐目标换算单位** ✓（份额 ÷ 目标基础值 ✓，与绝对值比大小 ✗）。⚠ **登记**：① 「获得【赐福】的目标施放攻击后，会额外造成 1 次等同于**其自身** 40% 攻击力的雷属性附加伤害」与天赋的 60% 写不了 ✗ —— `DAMAGE` op 的攻击者是**规则主人** ✗，需要\"以另一个单位为攻击者造成实例\"的写法 ✓；② 「仅对停云战技**最新的施放目标**生效」缺\"只保留最新一个\"的不变量 ✗。\n\n⭐ 2026-09-30 转正：「【赐福】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 赐福 target: all_allies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。\n\n⭐ 2026-09-30 补完整：上一次只转移了**一半** ✗ —— ⚠ `REMOVE_STATE` 按**名字**摘，而本条里除了 `APPLY_BUFF` 还有一个**不具名**的 `MODIFY_ATTR` ✗ ⇒ 它会留在旧目标身上 ✗。⚠ `TriggerInterpreter:2241` 的原话：*A NAMED modifier is what REMOVE_STATE can take off* ✓ ⇒ 现在给它同名 `buff` ✓，于是一条 `REMOVE_STATE` 同时摘掉**状态与数值** ✓。"
   },
   {
     "on": "ULT_CAST",
