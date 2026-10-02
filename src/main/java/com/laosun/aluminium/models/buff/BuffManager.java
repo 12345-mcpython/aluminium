@@ -41,6 +41,20 @@ public class BuffManager {
         this.instance = instance;
     }
 
+    /**
+     * The battle this unit is in, so a state that leaves the unit can be announced (2026-10-02; the
+     * {@code STATE_ENDED} event's reader: 1211's 「【生息】结束时…」).
+     *
+     * <p>Set by {@link com.laosun.aluminium.Battle} when it takes the roster. It may stay {@code null} in a
+     * unit built outside a battle, which is why every use of it guards for that: a state still leaves the
+     * unit, there is simply nobody to tell.
+     */
+    private com.laosun.aluminium.Battle battle;
+
+    public void setBattle(com.laosun.aluminium.Battle battle) {
+        this.battle = battle;
+    }
+
     public void addBuff(AbstractBuff buff) {
         if (buff == null) {
             return;
