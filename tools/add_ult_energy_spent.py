@@ -33,9 +33,9 @@ field = ('    /**' + NL
          + '     * <p>\u26a0 It cannot be read one layer down: Battle zeroes the energy BEFORE the ultimate body settles' + NL
          + '     * (see the H-5 comment above), so by the time the event fires the unit already reads 0.' + NL
          + '     */' + NL
-         + '    private int lastUltEnergySpent;' + NL + NL
+         + '    private double lastUltEnergySpent;' + NL + NL
          + '    /** The energy the ultimate now settling consumed ({@code 0} when none is in flight). */' + NL
-         + '    public int getLastUltEnergySpent() {' + NL
+         + '    public double getLastUltEnergySpent() {' + NL
          + '        return lastUltEnergySpent;' + NL
          + '    }' + NL + NL
          + anchor)
