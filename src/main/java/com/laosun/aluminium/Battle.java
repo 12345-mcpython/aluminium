@@ -2725,7 +2725,7 @@ public class Battle {
         // ⚠ An earlier version asked damage.getCastCategory() == ULTRA instead, and measured, that does NOT
         // hold on the castImmediate path -- the write was skipped and the clause silently read 0.
         if (lastUltEnergySpent > 0) {
-            // MUTATION: the spend never reaches the instance
+            damage.withCastEnergySpent(lastUltEnergySpent);
         }
         fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage, damage.getCastCategory(),
                 damage.getSkillKey());
