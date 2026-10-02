@@ -27,9 +27,9 @@ doc = json.load(io.open(DATA, encoding="utf-8"))
 
 # 1) declare the pending counter as a party resource
 res = doc.setdefault("resources", [])
-if not any(isinstance(r, dict) and r.get("name") == PENDING for r in res):
+if not any(isinstance(r, dict) and r.get("id") == PENDING for r in res):
     res.append({
-        "name": PENDING,
+        "id": PENDING,   # the key is `id`; an unknown key here makes the loader reject the whole table
         "max": 999,
         "initial": 0,
         "scope": "PARTY",
@@ -66,7 +66,7 @@ rules.append({
              "\uff08\u672c\u6bb5\u5df2\u5efa\u7684\u94fe\uff1a\u72b6\u6001\u88ab\u6458\u65f6**\u5148\u62a5\u540e\u6458** \u2713\uff09\u3002"),
 })
 rules.append({
-    "on": "STATE_ENDED", "id": "elation_moment_reward", "when": ["state_ended " + MOMENT],
+    "on": "STATE_ENDED", "id": "elation_moment_reward", "when": ["self state_ended " + MOMENT],
     "do": [{"op": "APPLY_BUFF", "buff": REWARD, "turns": 2, "target": "self"}],
     "source": "\u6587\u6863\uff1a\u300c\u963f\u54c8\u65f6\u523b\u7ed3\u675f\u65f6\uff0c\u4f7f\u53c2\u6f14\u7684\u89d2\u8272\u83b7\u5f97\u672c\u6b21\u8ba1\u5165\u7b11\u70b9\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u72b6\u6001\uff0c\u6301\u7eed2\u56de\u5408\u3002\u300d",
     "note": "\u2b50 \u672c\u6bb5\u7b2c\u4e00\u4e2a**\u771f** `STATE_ENDED` \u8bfb\u8005 \u2713\uff08\u8bfb\u8005\u539f\u6587\u6765\u81ea `1505` \u4e0e `GLOSSARY` \u2713\uff09\u3002",
