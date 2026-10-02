@@ -1155,7 +1155,18 @@ public final class TriggerInterpreter {
                 // engine settles one instance per victim (that is what a group attack is here).
                 // ⚠ `times` repeats the WHOLE settlement, and because resolveTargets is called INSIDE the outer
                 // loop, every repetition re-draws its target -- which is what 「每次对随机敌方单体」 means.
+                // ⭐ 「每消耗 1 点…额外 1 次」 (2026-10-02): the repeat count can follow the event.
                 int times = effect.getTimes() == null ? 1 : effect.getTimes();
+                if (effect.getTimesFrom() != null) {
+                    if (!"event_amount".equals(effect.getTimesFrom().trim())) {
+                        throw new IllegalStateException("times_from '" + effect.getTimesFrom()
+                                + "' is not a spelling this engine has: only \"event_amount\"");
+                    }
+                    times = (int) Math.abs(ctx.amount());
+                    if (times <= 0) {
+                        return;
+                    }
+                }
                 for (int repeat = 0; repeat < times; repeat++) {
                     for (CanHit victim : resolveTargets(battle, effect, ctx)) {
                         damage(battle, effect, ctx, victim);
@@ -2559,6 +2570,7 @@ public final class TriggerInterpreter {
      */
     private static final String CAST_ENERGY_SPENT = "cast_energy_spent";
 
+
     /**
      * Validates the magnitude of a {@code HEAL} / {@code SHIELD} effect: either a flat {@code amount}, or
      * {@code scale} + {@code percent}.
@@ -2686,6 +2698,8 @@ public final class TriggerInterpreter {
             // ? 1414's shield is 「20.00% 攻击力 + 400」 (2026-09-29): the same derived shape, off ATTACK. Seven documents state
             // an ATK-scaled shield or heal and the vocabulary had no name for it.
             case "owner_attack" -> ownerAttributeOf(ctx, "owner_attack", AttributeType.ATTACK) * share + flat;
+            // ⭐ 「每消耗/每损失 1 点…」 (2026-10-02): the triggering EVENT's own magnitude.
+            // The absolute value, because a spend arrives negative and "每 1 点" counts points.
             default -> throw new IllegalStateException(
                     "Scale '" + scale + "' passed validation but has no implementation");
         };
