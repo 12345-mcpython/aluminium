@@ -20907,6 +20907,38 @@
 > * ⭐ **并记下本段为止的净结果** ✓：目标 ① 的**第一个读者已出货并验完**（`1513` 阿哈时刻 ✓，变异 1 红 ✓）；
 >   **第二个读者**（`1211`）的**内容口径已完全查清**，卡在"引擎不给这种状态发到期公告"上 ✓ ⇒ ⭐ **下一轮若确证 ⇒ 按纪律登记**（附全部实测 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零八十一：✅✅✅ **第三道守卫也排除了**（`ticksOn` 默认取 `owner` 即载体 ⇒ 她自己的状态**会被 tick** ✓）⇒ ⭐ 于是 `tickBuff` 的三道 `continue` **全都不成立** ✗ ⇒ ⭐ 事件**应当发了** ⇒ ⭐ 元凶只剩"**我那条规则压根没进她的表**"）**）**：
+>
+> * ✅ **实测（读 `withTickOwner` ＋ `AbstractBuff.ticksOn` ✓）** ✓ 原文：
+>   ```java
+>   private static AbstractBuff withTickOwner(AbstractBuff buff, EffectSpec effect, TriggerContext ctx) {
+>       if (effect.getTicksOn() != null) {                       // ★ 只有写了 `ticks_on` 才设属主
+>           buff.setTickOwner("summon".equals(effect.getTicksOn().trim()) ? requireSummon(ctx) : ctx.owner());
+>       }
+>       return buff;
+>   }
+>   // AbstractBuff:
+>   public boolean ticksOn(CanHit who) {
+>       CanHit clock = tickOwner == null ? owner : tickOwner;     // ★ 默认 = owner（载体本身）
+>       return clock != null && clock == who;
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以她的【生息】没写 `ticks_on` ⇒ 属主 = 她** ✓ ⇒ `ticksOn(instance)` = **真** ✓ ⇒ ⛔ **守卫 C 不成立** ✓
+>     ⇒ ⭐ 加上守卫 A（`isPermanent` ✗ —— 它是 `turns: 2` ✓）与守卫 B（两半都推过 ✓）⇒ ⭐⭐ **三道守卫全不成立** ✓
+>       ⇒ ⛔ **所以"状态被 tick 掉、并公告"应当发生了** ✗ ⇒ ⭐ **剩下唯一解释**：**我那条读者规则**不在她的表里** ✗**
+>         （⚠ 或在装载时被静默丢弃 ✗ —— ⚠ 而 `EveryCharacterAndRelicRuleIsSelectedTest` **只检查 `rulesFor` 不抛异常** ✗
+>           ⇒ **它发现不了"少了一条规则"** ✓）。
+> * ⭐⭐ **下一轮第一步（一次判据就能定案，最便宜）** ✗：在判据里**数一数**她表里 `STATE_ENDED` 的规则数 ✓：
+>   ```java
+>   var table = owner.getTriggerTable();
+>   assertEquals(1, table.rulesFor(TriggerEvent.STATE_ENDED).size(), "the reader must be in her table");
+>   ```
+>   ⇒ ⭐ **若为 0** ⇒ ⭐ **规则没进表** ✓（⚠ 那就要查装载器为什么丢它 ✗ —— 本段的 `EveryCharacter…` 守卫只保证"不抛" ✗）；
+>     ⭐ **若为 1** ⇒ ⭐ 那就说明**事件确实没发** ✗ ⇒ 回头把 `fireStateEnded` 的**调用条件**（`buff instanceof StateBuff` ✓）与**她那条 buff 的实际类型**对照 ✓
+>       （⚠ 而 `applyState` 建的**确实是 `StateBuff`** ✓ 本段已读 ✓ ⇒ 那就只剩"**它没走到 `duration() <= 0`**" ✗
+>         ⇒ ⭐ 即**`tickEffect` 没有让它递减** ✗ —— ⚠ 那是**最后一块**待读（`StateBuff.tickEffect` ✓））。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -24880,6 +24912,38 @@
 > * ⭐ **并记下本段为止的净结果** ✓：目标 ① 的**第一个读者已出货并验完**（`1513` 阿哈时刻 ✓，变异 1 红 ✓）；
 >   **第二个读者**（`1211`）的**内容口径已完全查清**，卡在"引擎不给这种状态发到期公告"上 ✓ ⇒ ⭐ **下一轮若确证 ⇒ 按纪律登记**（附全部实测 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零八十一：✅✅✅ **第三道守卫也排除了**（`ticksOn` 默认取 `owner` 即载体 ⇒ 她自己的状态**会被 tick** ✓）⇒ ⭐ 于是 `tickBuff` 的三道 `continue` **全都不成立** ✗ ⇒ ⭐ 事件**应当发了** ⇒ ⭐ 元凶只剩"**我那条规则压根没进她的表**"）**）**：
+>
+> * ✅ **实测（读 `withTickOwner` ＋ `AbstractBuff.ticksOn` ✓）** ✓ 原文：
+>   ```java
+>   private static AbstractBuff withTickOwner(AbstractBuff buff, EffectSpec effect, TriggerContext ctx) {
+>       if (effect.getTicksOn() != null) {                       // ★ 只有写了 `ticks_on` 才设属主
+>           buff.setTickOwner("summon".equals(effect.getTicksOn().trim()) ? requireSummon(ctx) : ctx.owner());
+>       }
+>       return buff;
+>   }
+>   // AbstractBuff:
+>   public boolean ticksOn(CanHit who) {
+>       CanHit clock = tickOwner == null ? owner : tickOwner;     // ★ 默认 = owner（载体本身）
+>       return clock != null && clock == who;
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以她的【生息】没写 `ticks_on` ⇒ 属主 = 她** ✓ ⇒ `ticksOn(instance)` = **真** ✓ ⇒ ⛔ **守卫 C 不成立** ✓
+>     ⇒ ⭐ 加上守卫 A（`isPermanent` ✗ —— 它是 `turns: 2` ✓）与守卫 B（两半都推过 ✓）⇒ ⭐⭐ **三道守卫全不成立** ✓
+>       ⇒ ⛔ **所以"状态被 tick 掉、并公告"应当发生了** ✗ ⇒ ⭐ **剩下唯一解释**：**我那条读者规则**不在她的表里** ✗**
+>         （⚠ 或在装载时被静默丢弃 ✗ —— ⚠ 而 `EveryCharacterAndRelicRuleIsSelectedTest` **只检查 `rulesFor` 不抛异常** ✗
+>           ⇒ **它发现不了"少了一条规则"** ✓）。
+> * ⭐⭐ **下一轮第一步（一次判据就能定案，最便宜）** ✗：在判据里**数一数**她表里 `STATE_ENDED` 的规则数 ✓：
+>   ```java
+>   var table = owner.getTriggerTable();
+>   assertEquals(1, table.rulesFor(TriggerEvent.STATE_ENDED).size(), "the reader must be in her table");
+>   ```
+>   ⇒ ⭐ **若为 0** ⇒ ⭐ **规则没进表** ✓（⚠ 那就要查装载器为什么丢它 ✗ —— 本段的 `EveryCharacter…` 守卫只保证"不抛" ✗）；
+>     ⭐ **若为 1** ⇒ ⭐ 那就说明**事件确实没发** ✗ ⇒ 回头把 `fireStateEnded` 的**调用条件**（`buff instanceof StateBuff` ✓）与**她那条 buff 的实际类型**对照 ✓
+>       （⚠ 而 `applyState` 建的**确实是 `StateBuff`** ✓ 本段已读 ✓ ⇒ 那就只剩"**它没走到 `duration() <= 0`**" ✗
+>         ⇒ ⭐ 即**`tickEffect` 没有让它递减** ✗ —— ⚠ 那是**最后一块**待读（`StateBuff.tickEffect` ✓））。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
