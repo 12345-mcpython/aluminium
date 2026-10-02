@@ -21009,6 +21009,31 @@
 >     * **不含** ⇒ ⭐ 那就回去看 `removeWithLifetime` 的匹配条件 ✓（⚠ 也许它按**别的**规则摘错了 ✓）。
 > * ⚠ **推送**：本地仍**领先 4** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十五：✅✅✅ **`lifetimesOf` 读了，静默摘除这条也排除** —— **没有 `until` 就返回空集** ⇒ `removeWithLifetime(TURN_END)` **摘不掉任何东西** ⇒ ⭐ 于是状态**只能**通过 tick 到期 ⇒ **公告应当发了** ⇒ ⭐ 与"读者无声"形成**硬矛盾**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.lifetimesOf` ✓，`:2375` ✓）** ✓ 原文：
+>   ```java
+>   private static Set<AbstractBuff.Lifetime> lifetimesOf(EffectSpec effect) {
+>       List<String> until = effect.getUntil();
+>       if (until == null || until.isEmpty()) { return Set.of(); }        // ★ 没写 `until` ⇒ 空集
+>       … case "turn_end" -> TURN_END; …
+>   }
+>   ```
+>   ⇒ ⭐⭐ **而她的【生息】那条只有 `op/buff/turns/target/target_when`** ✓（本段 dump 过 ✓）⇒ **没有 `until`** ✓
+>     ⇒ ⭐ **lifetime 集合为空** ✓ ⇒ ⛔ **`removeWithLifetime(TURN_END)` 摘不到它** ✓（本段第十九次自我纠正 ✓）
+>     ⇒ ⭐ **所以它只能走 tick 到期** ✓ ⇒ **`battle.fireStateEnded(她, "生息")` 必然被调用** ✓
+>       ⇒ ⭐⭐⭐ **与"读者无声"直接矛盾** ✗ ⇒ ⭐ **剩下的唯一嫌疑是"能量那条 op 在这个上下文里没生效"** ✗
+>         （⚠ 而**不是**投递、不是规则、不是名字、不是生命周期 ✓ —— ⭐ **八个假设之外的最后一块** ✓）。
+> * ⭐⭐ **下一轮第一步（一次判据定案，且这一次的 fire 是**合法的**** ✓）** ✗：
+>   ⚠ 本段早前的"手工 fire"错在**用 `fireTriggers` 直接发** ✗ ⇒ ⭐ **正解是用 `battle.fireStateEnded(owner, "生息")`** ✓
+>     —— ⭐ **它会把名字写进 `lastStateEndedName`** ✓（本段读过 ✓）⇒ ⭐ 于是条件 `self state_ended 生息` **会成立** ✓
+>   ⇒ 判据：`battle.fireStateEnded(owner, "生息")` ⇒ 断言 `getCurrentEnergy()` **+8** ✓：
+>     * **加了** ⇒ ⭐ 说明"事件 + 规则 + `GAIN_ENERGY`"整条**通** ✓ ⇒ ⭐ **问题百分之百在"到期那一 tick 没走到公告"** ✗
+>       ⇒ ⭐ 那就**逐拍打印**（⚠ 推**一次** `afterMove()` 后看状态还在不在 ✓ —— ⚠ 若**一次就没了** ⇒ 它不是 `turns: 2` 那样递减的 ✗
+>         ⇒ ⭐ 回头查"是谁把它摘了" ✓（⚠ 那就只剩 `StateBuff.tickEffect` 之外的东西 ✗））；
+>     * **没加** ⇒ ⭐ 元凶就是 **`GAIN_ENERGY` 在这个目标上的解析** ✗ ⇒ 换写法（`target: target`／或按"能量上限比例" ✓）再试 ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络连续失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -25083,6 +25108,31 @@
 >       （⚠ 读者 ≥4 ✓；⚠ 并写明"内容侧无法规避"✗ —— 除非有 `until` 可写 ✓ ⇒ ⭐ **那就用 `until` 换掉 `turns`** ✓ 值得一试 ✓）；
 >     * **不含** ⇒ ⭐ 那就回去看 `removeWithLifetime` 的匹配条件 ✓（⚠ 也许它按**别的**规则摘错了 ✓）。
 > * ⚠ **推送**：本地仍**领先 4** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零八十五：✅✅✅ **`lifetimesOf` 读了，静默摘除这条也排除** —— **没有 `until` 就返回空集** ⇒ `removeWithLifetime(TURN_END)` **摘不掉任何东西** ⇒ ⭐ 于是状态**只能**通过 tick 到期 ⇒ **公告应当发了** ⇒ ⭐ 与"读者无声"形成**硬矛盾**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.lifetimesOf` ✓，`:2375` ✓）** ✓ 原文：
+>   ```java
+>   private static Set<AbstractBuff.Lifetime> lifetimesOf(EffectSpec effect) {
+>       List<String> until = effect.getUntil();
+>       if (until == null || until.isEmpty()) { return Set.of(); }        // ★ 没写 `until` ⇒ 空集
+>       … case "turn_end" -> TURN_END; …
+>   }
+>   ```
+>   ⇒ ⭐⭐ **而她的【生息】那条只有 `op/buff/turns/target/target_when`** ✓（本段 dump 过 ✓）⇒ **没有 `until`** ✓
+>     ⇒ ⭐ **lifetime 集合为空** ✓ ⇒ ⛔ **`removeWithLifetime(TURN_END)` 摘不到它** ✓（本段第十九次自我纠正 ✓）
+>     ⇒ ⭐ **所以它只能走 tick 到期** ✓ ⇒ **`battle.fireStateEnded(她, "生息")` 必然被调用** ✓
+>       ⇒ ⭐⭐⭐ **与"读者无声"直接矛盾** ✗ ⇒ ⭐ **剩下的唯一嫌疑是"能量那条 op 在这个上下文里没生效"** ✗
+>         （⚠ 而**不是**投递、不是规则、不是名字、不是生命周期 ✓ —— ⭐ **八个假设之外的最后一块** ✓）。
+> * ⭐⭐ **下一轮第一步（一次判据定案，且这一次的 fire 是**合法的**** ✓）** ✗：
+>   ⚠ 本段早前的"手工 fire"错在**用 `fireTriggers` 直接发** ✗ ⇒ ⭐ **正解是用 `battle.fireStateEnded(owner, "生息")`** ✓
+>     —— ⭐ **它会把名字写进 `lastStateEndedName`** ✓（本段读过 ✓）⇒ ⭐ 于是条件 `self state_ended 生息` **会成立** ✓
+>   ⇒ 判据：`battle.fireStateEnded(owner, "生息")` ⇒ 断言 `getCurrentEnergy()` **+8** ✓：
+>     * **加了** ⇒ ⭐ 说明"事件 + 规则 + `GAIN_ENERGY`"整条**通** ✓ ⇒ ⭐ **问题百分之百在"到期那一 tick 没走到公告"** ✗
+>       ⇒ ⭐ 那就**逐拍打印**（⚠ 推**一次** `afterMove()` 后看状态还在不在 ✓ —— ⚠ 若**一次就没了** ⇒ 它不是 `turns: 2` 那样递减的 ✗
+>         ⇒ ⭐ 回头查"是谁把它摘了" ✓（⚠ 那就只剩 `StateBuff.tickEffect` 之外的东西 ✗））；
+>     * **没加** ⇒ ⭐ 元凶就是 **`GAIN_ENERGY` 在这个目标上的解析** ✗ ⇒ 换写法（`target: target`／或按"能量上限比例" ✓）再试 ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络连续失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2130** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
