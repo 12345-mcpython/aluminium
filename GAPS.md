@@ -19683,6 +19683,23 @@
 >   —— ⚠ 候选：`APPLY_BUFF` 的字段／事件顺序 ✗（已试一种 ✗）／`TechniqueState` 的**开局自动附加** ✗（⚠ 或许"带了秘技光锥/秘技"是个**队伍级的开关** ✓ 在 `Battle` 构造里 ✗）
 >   ⇒ ⭐ **读 `Battle` 里 `秘技` 的装载路径** ✓ 一次调用即可判"判据能否给" ✓ ⇒ 能给 ⇒ **3 组一起出货** ✓✓（收益最大的一步 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2126** 例 ✓）、树干净 ✓、已推送（若网络允许 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零一十四：✅✅✅ **那堵墙没了** —— 秘技状态在判据里**能建立**：`battle.markTechniqueUsed(unit)`，**在 `startBattle()` 之前调用** ✓；而 `applyTechniqueStates()` 在**每一条 `BATTLE_START` 规则之前**执行 ⇒ `self has_state 秘技` 已经为真）**：
+>
+> * ✅ **实测（读 `Battle` ✓ 三处互相印证 ✓）** ✓：
+>   * `:192-199` ✓ 原注释：*"Units whose technique was used before this battle (2026-09-29). **A technique happens OUTSIDE the
+>     battle, so the engine cannot observe it; the caller says so**"* ✓ ＋ 字段 `techniqueUsers` ✓；
+>   * `:3206` ✓：**`public void markTechniqueUsed(CanHit unit)`** ✓ —— *"Call **before** `startBattle()`"* ✓；
+>   * `:750` ✓：**`applyTechniqueStates();   // ? before every BATTLE_START rule, so `self has_state 秘技` already answers`** ✓✓
+>   ⇒ ⭐⭐ **所以判据里只要在开战前 `markTechniqueUsed(owner)` ✓，`秘技` 状态就在**每条 `BATTLE_START` 规则求值之前**已成立** ✓
+>     ⇒ ⛔ **`1401`／`1106`／`8005` 那三组的"同一堵墙"被打掉了** ✓✓（⭐ 这就是本段一直在找的那把钥匙 ✓）。
+> * ⭐ **下一轮第一步（三组一起出货，模板已定型）** ✗，每组三步：
+>   ① 内容：**后触发的那条**写 `max_stacks: 2` ✓（⚠ 两组"秘技（`BATTLE_START`）＋ 大招（`ULT_CAST`）"的 ⇒ **大招是后写者** ✓）；
+>   ② 判据（**文件驱动** ✓）：`battle.markTechniqueUsed(owner)` ✓ **在 `startBattle()` 之前** ✓ ⇒ 读基线 ⇒ 放终结技 ⇒
+>      ⭐ 断言**增量 = 两条之和**（`1401`：+0.6 与 +0.8 ⇒ 合计 +1.4 ✓；`1106`：−0.2 与 −0.4 ⇒ 合计 **−0.6** ✓；`8005`：+0.3 与 +0.3 ⇒ **+0.6** ✓）；
+>   ③ 变异：把 `max_stacks` 去掉 ⇒ ⭐ **跑全量** ⇒ 必红 ✓（⭐ 并**先确认"两条都在场"** ✓ —— 第十三条纪律 ✓，⚠ 这次有了 `markTechniqueUsed` 就能确认 ✓）。
+> * ⭐ **顺带**：`1401` 那次假阳性的**根因也在此** ✓ —— 我当时用**追加 `APPLY_BUFF`** 去给状态 ✗，而正解是**开战前 `markTechniqueUsed`** ✓
+>   ⇒ ⭐ **教训并进第十三条** ✗：**"给状态"要找引擎自己的入口（`markTechniqueUsed`／`APPLY_BUFF` 各有用途 ✓），而不是自己造一条规则** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2126** 例 ✓）、树干净 ✓、已推送 ✓（`b6f29af6` ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -22432,6 +22449,23 @@
 >   —— ⚠ 候选：`APPLY_BUFF` 的字段／事件顺序 ✗（已试一种 ✗）／`TechniqueState` 的**开局自动附加** ✗（⚠ 或许"带了秘技光锥/秘技"是个**队伍级的开关** ✓ 在 `Battle` 构造里 ✗）
 >   ⇒ ⭐ **读 `Battle` 里 `秘技` 的装载路径** ✓ 一次调用即可判"判据能否给" ✓ ⇒ 能给 ⇒ **3 组一起出货** ✓✓（收益最大的一步 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2126** 例 ✓）、树干净 ✓、已推送（若网络允许 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零一十四：✅✅✅ **那堵墙没了** —— 秘技状态在判据里**能建立**：`battle.markTechniqueUsed(unit)`，**在 `startBattle()` 之前调用** ✓；而 `applyTechniqueStates()` 在**每一条 `BATTLE_START` 规则之前**执行 ⇒ `self has_state 秘技` 已经为真）**：
+>
+> * ✅ **实测（读 `Battle` ✓ 三处互相印证 ✓）** ✓：
+>   * `:192-199` ✓ 原注释：*"Units whose technique was used before this battle (2026-09-29). **A technique happens OUTSIDE the
+>     battle, so the engine cannot observe it; the caller says so**"* ✓ ＋ 字段 `techniqueUsers` ✓；
+>   * `:3206` ✓：**`public void markTechniqueUsed(CanHit unit)`** ✓ —— *"Call **before** `startBattle()`"* ✓；
+>   * `:750` ✓：**`applyTechniqueStates();   // ? before every BATTLE_START rule, so `self has_state 秘技` already answers`** ✓✓
+>   ⇒ ⭐⭐ **所以判据里只要在开战前 `markTechniqueUsed(owner)` ✓，`秘技` 状态就在**每条 `BATTLE_START` 规则求值之前**已成立** ✓
+>     ⇒ ⛔ **`1401`／`1106`／`8005` 那三组的"同一堵墙"被打掉了** ✓✓（⭐ 这就是本段一直在找的那把钥匙 ✓）。
+> * ⭐ **下一轮第一步（三组一起出货，模板已定型）** ✗，每组三步：
+>   ① 内容：**后触发的那条**写 `max_stacks: 2` ✓（⚠ 两组"秘技（`BATTLE_START`）＋ 大招（`ULT_CAST`）"的 ⇒ **大招是后写者** ✓）；
+>   ② 判据（**文件驱动** ✓）：`battle.markTechniqueUsed(owner)` ✓ **在 `startBattle()` 之前** ✓ ⇒ 读基线 ⇒ 放终结技 ⇒
+>      ⭐ 断言**增量 = 两条之和**（`1401`：+0.6 与 +0.8 ⇒ 合计 +1.4 ✓；`1106`：−0.2 与 −0.4 ⇒ 合计 **−0.6** ✓；`8005`：+0.3 与 +0.3 ⇒ **+0.6** ✓）；
+>   ③ 变异：把 `max_stacks` 去掉 ⇒ ⭐ **跑全量** ⇒ 必红 ✓（⭐ 并**先确认"两条都在场"** ✓ —— 第十三条纪律 ✓，⚠ 这次有了 `markTechniqueUsed` 就能确认 ✓）。
+> * ⭐ **顺带**：`1401` 那次假阳性的**根因也在此** ✓ —— 我当时用**追加 `APPLY_BUFF`** 去给状态 ✗，而正解是**开战前 `markTechniqueUsed`** ✓
+>   ⇒ ⭐ **教训并进第十三条** ✗：**"给状态"要找引擎自己的入口（`markTechniqueUsed`／`APPLY_BUFF` 各有用途 ✓），而不是自己造一条规则** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2126** 例 ✓）、树干净 ✓、已推送 ✓（`b6f29af6` ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
