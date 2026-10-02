@@ -25,6 +25,11 @@
       ],
       "do": [
         {
+          "op": "REMOVE_STATE",
+          "buff": "负债证明",
+          "target": "all_enemies"
+        },
+        {
           "op": "APPLY_BUFF",
           "buff": "负债证明",
           "turns": 2,
@@ -47,7 +52,7 @@
         }
       ],
       "source": "1112 托帕&账账 战技「扭亏为盈！」: 「使指定敌方单体陷入【负债证明】状态，使其受到的追加攻击伤害提高 50%…使账账对该目标造成等同于托帕 150% 攻击力的火属性伤害」 + 「使其受到的追加攻击伤害提高 50%」（同一次施放）",
-      "note": "⚠ 数值 **150%** 目前**只见于正文** ✓（该技能 `param_list` 未能解析 ✓）。✅ **该从句已经写好** ✓（见上方 `MODIFY_DAMAGE_TAKEN` 规则 ✓：`percent` **0.5** ✓ ＋ `damage_type` **ADDITIONAL** ✓ ＋ `turns` **2** ✓ ＋ `buff` **负债证明** ✓）—— **2026-09-30 修订** ✓。⚠ 以下为**修订前**的记录，保留以便对照：追加攻击在引擎里是**属性 `FOLLOW_UP_DAMAGE_BOOST`（造成侧）** ✓（`Battle:2528` 注释原话 ✓），而 `DamageType` 只有 `NORMAL/ULTRA/BREAK/DOT/TECHNIQUE/ELATION` ✗ ⇒ **承受侧无法按\"追加攻击\"分域** ✗。⚠ 另外「【负债证明】仅对最新被施加的目标生效」✗ 与「我方回合开始/行动时若场上无该状态则随机施加」✗ ⇒ 同样登记 ✓。 ⭐⭐ **「追加攻击」维度早已存在**：引擎用 **`DamageType.ADDITIONAL`** 表示追加攻击（`Battle.applyAdditionalDamage` 里写着\"this is the engine's one and only notion of a follow-up attack\"），并据此发放 `FOLLOW_UP_DAMAGE_BOOST`、发出 `FOLLOW_UP` 事件 ⇒ 承受侧只要写 **`damage_type: \"ADDITIONAL\"`** 即可 ✓（⚠ 第 216/240 轮我曾判定\"追加攻击没有维度\" ✗ —— 那次查的是 `SkillCategory` ✗，而 `DamageType` 的常量表被我的正则截断了 ✗；本轮订正 ✓）。⚠ 数值 **50%** 取自正文 ✓（该技能 `param_list` 未能解析 ✓）；持续 **2 回合**与【负债证明】同寿 ✓。"
+      "note": "⚠ 数值 **150%** 目前**只见于正文** ✓（该技能 `param_list` 未能解析 ✓）。✅ **该从句已经写好** ✓（见上方 `MODIFY_DAMAGE_TAKEN` 规则 ✓：`percent` **0.5** ✓ ＋ `damage_type` **ADDITIONAL** ✓ ＋ `turns` **2** ✓ ＋ `buff` **负债证明** ✓）—— **2026-09-30 修订** ✓。⚠ 以下为**修订前**的记录，保留以便对照：追加攻击在引擎里是**属性 `FOLLOW_UP_DAMAGE_BOOST`（造成侧）** ✓（`Battle:2528` 注释原话 ✓），而 `DamageType` 只有 `NORMAL/ULTRA/BREAK/DOT/TECHNIQUE/ELATION` ✗ ⇒ **承受侧无法按\"追加攻击\"分域** ✗。⚠ 另外「【负债证明】仅对最新被施加的目标生效」✗ 与「我方回合开始/行动时若场上无该状态则随机施加」✗ ⇒ 同样登记 ✓。 ⭐⭐ **「追加攻击」维度早已存在**：引擎用 **`DamageType.ADDITIONAL`** 表示追加攻击（`Battle.applyAdditionalDamage` 里写着\"this is the engine's one and only notion of a follow-up attack\"），并据此发放 `FOLLOW_UP_DAMAGE_BOOST`、发出 `FOLLOW_UP` 事件 ⇒ 承受侧只要写 **`damage_type: \"ADDITIONAL\"`** 即可 ✓（⚠ 第 216/240 轮我曾判定\"追加攻击没有维度\" ✗ —— 那次查的是 `SkillCategory` ✗，而 `DamageType` 的常量表被我的正则截断了 ✗；本轮订正 ✓）。⚠ 数值 **50%** 取自正文 ✓（该技能 `param_list` 未能解析 ✓）；持续 **2 回合**与【负债证明】同寿 ✓。\n\n⭐ 2026-09-30 转正：「【负债证明】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 负债证明 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
     },
     {
       "on": "BATTLE_START",
