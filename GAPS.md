@@ -16479,6 +16479,21 @@
 >   ⚠ 顺带确认：**`SkillEffectSpec` 需要有一个 `buff` 字段** ✓（若没有 ⇒ 那是第 0 步 ✓，一行 bean ＋ `copy()` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 
+> **2026-10-02 更新（aggro 回收之八百三十九：✅ 第 0 步也查清了 —— `SkillEffectSpec` **没有** `buff` 字段，加一行即可；至此五步全部"落地可写"）**：
+>
+> * ✅ **实测（读 `beans/SkillEffectSpec.java`）** ✓：它的字段是 `effect`／`scale`／`params`／`turns_param`／`formula`／`source` ✓
+>   ⇒ ⛔ **没有 `buff`** ✗ ⇒ 第 0 步 = **加一个 `@SerializedName("buff") private String buff;`** ✓（一行 ✓；
+>   ⚠ 这个 bean **没有 `copy()`** ✗ —— 有 `copy()` 的是 `EffectSpec` ✓，别混 ✓）。
+> * ⭐⭐ **至此这条切片的每一步都**量过落点**了** ✓（下一轮**不需要任何探索**、照抄即可 ✓）：
+>   0. `SkillEffectSpec` 加 `buff` 字段 ✓（本条 ✓）；
+>   1. `SkillExecutor.dispatchNonDamaging` 加 `"Buff"` 字符串分支 ⇒ `battle.grantBuff` ✓（`turns_param` 空 ⇒ 不设时长 ✓）；
+>   2. `data/skill_effects.json` 加 `1412` 的 `"2"` ✓（数据已在手：`军功` ✓ 无时长 ✓）；
+>   3. 内容 `CAST_SKILL`（槽位 2 ＋ `cast_target` ✓，该选择器已出货 ✓）；
+>   4. 判据（**目标**身上出现【军功】 ✓ ＋ **另一名队友**没有 ✓）；
+>   5. 变异（去掉那条字符串分支 ⇒ 1 红 ✓）。
+> * ⭐ **读者账** ✓：`1303`（2 处）＋ `1412`（1 处）⇒ 过门槛 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2110** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
