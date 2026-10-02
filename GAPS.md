@@ -5,7 +5,7 @@
 
 ## 一、已实现的能力（op —— ⚠ **订正（2026-10-02 实测）**：这里是**三个不同的集合** ✓，用 `tools/audit_op_vocabulary.py` 量出来的 ✓：**调度表读到 40 个** op 名 ✓ / **装载器有 36 个专属 case 臂**（另有 3 个走它的 `default` 臂 ✓）/ **出货内容里出现 39 个** ✓ —— 旧标题写的「34」**口径不明** ✓（既不是其中任何一个 ✗）；另有**条件/选择器/寿命**一批 ✓）
 
-- **op 34 个**（实测）（`TriggerInterpreter` 的 dispatch 表为准）：伤害与结算（`DAMAGE`/`ADD_DAMAGE`/`BOOST_DAMAGE`/`MODIFY_DAMAGE_TAKEN`/
+- **op 40 个**（实测 2026-10-02，`tools/audit_op_vocabulary.py` 的 **DISPATCH** 那一行；`TriggerInterpreter` 的 dispatch 表为准）：伤害与结算（`DAMAGE`/`ADD_DAMAGE`/`BOOST_DAMAGE`/`MODIFY_DAMAGE_TAKEN`/
   `SUPER_BREAK`/`DELEGATE_DAMAGE`）、削韧（`BOOST_TOUGHNESS`）、状态（`APPLY_BUFF`/`APPLY_DOT`/`APPLY_CONTROL`/`APPLY_REGEN`/
   `REMOVE_STATE`/`REMOVE_BUFF`/`DISPEL`/`EXTEND_BUFF`/`TAUNT`/`RESIST_DEBUFF`）、层数与资源（`ADD_STACK`/`REMOVE_STACK`/
   `GAIN_ENERGY`/`GAIN_SKILL_POINT`/`GAIN_RESOURCE`/`SPEND_RESOURCE`）、防护与治疗（`SHIELD`/`HEAL`）、行动（`ADVANCE`）、
