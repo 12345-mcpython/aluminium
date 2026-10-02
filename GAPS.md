@@ -18443,6 +18443,27 @@
 > * ✅ **处置** ✓：三处改动 ＋ 判据**回滚** ✓（三个脚本留在仓 ✓：`add_spend_all3.py` 已带 `times_from` 修正 ✓、
 >   `ship_spend_all.py`／`split_spend_all.py` 是判据模板 ✓）⇒ 全量 **0** ✓、树干净 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百五十：⚠⚠ `spendAll` ＋ 1513 两半句的判据**自己绿了**，但**全量**跑出 **2 红** ⇒ 又是"单条绿 ≠ 整体绿" ⇒ 回滚并记录两条真发现）**：
+>
+> * ⛔ **全量的两条红（都在我这次改动的影响面里 ✓）** ✓：
+>   1. **`EffectKeyDisciplineTest.everyEffectKeyIsOneTheEngineReads`** ✓：
+>      *"these effect keys are not fields of EffectSpec, so Gson drops them silently: **{critDamage=[1513.json], critRate=[1513.json]}**"* ✗
+>      ⇒ ⭐ 我在嵌套的 `DAMAGE` 里写了 **`critRate`／`critDamage`** ✗，而 `EffectSpec` **没有这两个字段** ✗ ⇒ 被静默丢弃 ✓
+>      （⚠ 本段**第二次**踩这条护栏 ✓ —— 上一次是 `source` ✗）⇒ ⭐ **纪律**：写 `do` 的字段前，**照 `EffectSpec` 的字段表**核对 ✓
+>      （⚠ `crit_rate`／`crit_damage` 很可能才是真名 ✗ ⇒ 下一轮先读 ✓）；
+>   2. **`AventurineWaveflairTest.teammateAttacksFeedFervorUpToThirty`** ✓：*"「【热意】上限为30点」 -- forty-one firings must
+>      still read thirty ==> expected: **30** but was: **13**"* ✗ ⇒ ⭐ 因为我新增的"**施放欢愉技时花光热意**" ✓
+>      会**在她已有的自动施放**（`TURN_START` ＋ `热意 ≥ 10` ⇒ `CAST_SKILL{ELATION_SKILL}` ✓）时触发 ✓ ⇒ 热意**被花掉** ✓
+>      ⇒ ⚠ **那条既有判据的模型**（只涨不花 ✗）**与文档不符** ✗（文档：施放时消耗所有 ✓）⇒ ⭐ **是既有判据不完整** ✗，
+>        不是我的内容错 ✗ —— ⚠ 但"改既有判据来迁就新内容"必须**写清理由**并单独提交 ✓（本条先记录 ✓）。
+> * ✅ **处置** ✓：引擎、内容、判据**全部回滚** ✓ ⇒ 全量回到 **0** ✓（树干净 ✓）。
+>   ⭐ **但这一轮并不白跑**：两条红把**两个真问题**挖出来了 ✓（一条是我的字段名 ✗、一条是既有判据的模型缺口 ✓）。
+> * ⭐ **下一轮第一步（三条，都已具名）** ✗：
+>   ① 读 `EffectSpec` 的**真实字段名** ✓（`crit_rate`／`crit_damage` ✓？）⇒ 把嵌套 `DAMAGE` 写对 ✓；
+>   ② 重新评估 **`AventurineWaveflairTest`** ✓：它测的是"队友攻击喂热意直到上限" ✓ ⇒ 在"施放会花光"的文档事实下 ✓
+>      它要么**限制在 10 点以下**（不触发自动施放 ✓）要么**同时断言花光** ✓（⚠ 二选一并写清 ✓）；
+>   ③ 然后重放三个脚本 ✓（`add_spend_all3.py` 已带 `times_from` 修正 ✓）⇒ 全量绿后再提交 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -19952,6 +19973,27 @@
 > * ✅ **处置** ✓：三处改动 ＋ 判据**回滚** ✓（三个脚本留在仓 ✓：`add_spend_all3.py` 已带 `times_from` 修正 ✓、
 >   `ship_spend_all.py`／`split_spend_all.py` 是判据模板 ✓）⇒ 全量 **0** ✓、树干净 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓。
+> **2026-10-02 更新（aggro 回收之九百五十：⚠⚠ `spendAll` ＋ 1513 两半句的判据**自己绿了**，但**全量**跑出 **2 红** ⇒ 又是"单条绿 ≠ 整体绿" ⇒ 回滚并记录两条真发现）**：
+>
+> * ⛔ **全量的两条红（都在我这次改动的影响面里 ✓）** ✓：
+>   1. **`EffectKeyDisciplineTest.everyEffectKeyIsOneTheEngineReads`** ✓：
+>      *"these effect keys are not fields of EffectSpec, so Gson drops them silently: **{critDamage=[1513.json], critRate=[1513.json]}**"* ✗
+>      ⇒ ⭐ 我在嵌套的 `DAMAGE` 里写了 **`critRate`／`critDamage`** ✗，而 `EffectSpec` **没有这两个字段** ✗ ⇒ 被静默丢弃 ✓
+>      （⚠ 本段**第二次**踩这条护栏 ✓ —— 上一次是 `source` ✗）⇒ ⭐ **纪律**：写 `do` 的字段前，**照 `EffectSpec` 的字段表**核对 ✓
+>      （⚠ `crit_rate`／`crit_damage` 很可能才是真名 ✗ ⇒ 下一轮先读 ✓）；
+>   2. **`AventurineWaveflairTest.teammateAttacksFeedFervorUpToThirty`** ✓：*"「【热意】上限为30点」 -- forty-one firings must
+>      still read thirty ==> expected: **30** but was: **13**"* ✗ ⇒ ⭐ 因为我新增的"**施放欢愉技时花光热意**" ✓
+>      会**在她已有的自动施放**（`TURN_START` ＋ `热意 ≥ 10` ⇒ `CAST_SKILL{ELATION_SKILL}` ✓）时触发 ✓ ⇒ 热意**被花掉** ✓
+>      ⇒ ⚠ **那条既有判据的模型**（只涨不花 ✗）**与文档不符** ✗（文档：施放时消耗所有 ✓）⇒ ⭐ **是既有判据不完整** ✗，
+>        不是我的内容错 ✗ —— ⚠ 但"改既有判据来迁就新内容"必须**写清理由**并单独提交 ✓（本条先记录 ✓）。
+> * ✅ **处置** ✓：引擎、内容、判据**全部回滚** ✓ ⇒ 全量回到 **0** ✓（树干净 ✓）。
+>   ⭐ **但这一轮并不白跑**：两条红把**两个真问题**挖出来了 ✓（一条是我的字段名 ✗、一条是既有判据的模型缺口 ✓）。
+> * ⭐ **下一轮第一步（三条，都已具名）** ✗：
+>   ① 读 `EffectSpec` 的**真实字段名** ✓（`crit_rate`／`crit_damage` ✓？）⇒ 把嵌套 `DAMAGE` 写对 ✓；
+>   ② 重新评估 **`AventurineWaveflairTest`** ✓：它测的是"队友攻击喂热意直到上限" ✓ ⇒ 在"施放会花光"的文档事实下 ✓
+>      它要么**限制在 10 点以下**（不触发自动施放 ✓）要么**同时断言花光** ✓（⚠ 二选一并写清 ✓）；
+>   ③ 然后重放三个脚本 ✓（`add_spend_all3.py` 已带 `times_from` 修正 ✓）⇒ 全量绿后再提交 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2119** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
