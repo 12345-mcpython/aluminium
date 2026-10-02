@@ -17431,6 +17431,27 @@
 >   ② 给它加"基数是资源"的分支 ✓；③ 判据：造一个忆灵 ✓ ⇒ **它的生命 = 主人【新蕊】上限的 100%** ✓（改主人资源 ⇒ 龙血跟着变 ✓）
 >   ＋ 变异（把 1.0 改成 0.5 ⇒ 必红 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之八百九十二：✅ "以资源为基数的忆灵面板"**落点读到手**：`SummonFactory:163-176` 的循环里那一行 `share * master.getAttribute(attribute).get() + flat`）**：
+>
+> * ✅ **实测（读 `SummonFactory` 的面板推导 ✓）** ✓：
+>   ```java
+>   for (MemospriteSpec.Panel entry : spec.panel()) {
+>       AttributeType attribute = ...;
+>       double share = entry.percent() == null ? 0 : entry.percent();
+>       double flat  = entry.flat() == null ? 0 : entry.flat();
+>       double value = share * master.getAttribute(attribute).get() + flat;   // ← :168  ★ 基数是**主人的属性**
+>       if (attribute.isPercent) { panel.addPercentPoint(...); } else { panel.setBase(attribute, value); }
+>   }
+>   ```
+>   ⇒ ⭐ **"以资源为基数"要改的就是 `:168` 那一行的基数来源** ✓（＋ `Panel` 加一个"来源"字段 ✓ 让 JSON 能说出
+>   `resource:<名>` ✓）。⚠ 同段注释还写明「**面板读的是召唤者**解析后**的面板**（`getAttribute`）」✓
+>   ⇒ 资源那条同理应当读**资源当前值**（不是属性 ✓）。
+> * ⭐ **下一轮（一次做完，4 步）** ✗：① `MemospriteSpec.Panel` 加 `source`（可空 ✓，空 = 旧行为 ✓ ⇒ **不破坏 5 个现有忆灵** ✓）；
+>   ② `:168` 分支：`source` 以 `resource:` 开头 ⇒ 用主人的那个资源值 ✓；③ 判据：把主人的资源调大 ⇒ **忆灵的生命跟着变** ✓
+>   ＋ 旧行为对照（不带 `source` 的 `1512` 面板**不受影响** ✓）；④ 变异（把 `1.0` 改成 `0.5` ⇒ 必红 ✓）。
+>   ⚠ **顺带**：③ 的判据里"资源"要用一个**已有资源**（`1415` 的【新蕊】✗ 若还没声明 ⇒ 可用**已有的**资源名建一个手搭忆灵 ✓，
+>   这样判据不依赖新的内容 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -17927,6 +17948,27 @@
 > * ⭐ **下一轮第一步（小而完整，且判据好写）** ✗：① 读 `SummonFactory` **怎么把 `Panel` 变成数值** ✓（`percent` 乘的是谁 ✓）；
 >   ② 给它加"基数是资源"的分支 ✓；③ 判据：造一个忆灵 ✓ ⇒ **它的生命 = 主人【新蕊】上限的 100%** ✓（改主人资源 ⇒ 龙血跟着变 ✓）
 >   ＋ 变异（把 1.0 改成 0.5 ⇒ 必红 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之八百九十二：✅ "以资源为基数的忆灵面板"**落点读到手**：`SummonFactory:163-176` 的循环里那一行 `share * master.getAttribute(attribute).get() + flat`）**：
+>
+> * ✅ **实测（读 `SummonFactory` 的面板推导 ✓）** ✓：
+>   ```java
+>   for (MemospriteSpec.Panel entry : spec.panel()) {
+>       AttributeType attribute = ...;
+>       double share = entry.percent() == null ? 0 : entry.percent();
+>       double flat  = entry.flat() == null ? 0 : entry.flat();
+>       double value = share * master.getAttribute(attribute).get() + flat;   // ← :168  ★ 基数是**主人的属性**
+>       if (attribute.isPercent) { panel.addPercentPoint(...); } else { panel.setBase(attribute, value); }
+>   }
+>   ```
+>   ⇒ ⭐ **"以资源为基数"要改的就是 `:168` 那一行的基数来源** ✓（＋ `Panel` 加一个"来源"字段 ✓ 让 JSON 能说出
+>   `resource:<名>` ✓）。⚠ 同段注释还写明「**面板读的是召唤者**解析后**的面板**（`getAttribute`）」✓
+>   ⇒ 资源那条同理应当读**资源当前值**（不是属性 ✓）。
+> * ⭐ **下一轮（一次做完，4 步）** ✗：① `MemospriteSpec.Panel` 加 `source`（可空 ✓，空 = 旧行为 ✓ ⇒ **不破坏 5 个现有忆灵** ✓）；
+>   ② `:168` 分支：`source` 以 `resource:` 开头 ⇒ 用主人的那个资源值 ✓；③ 判据：把主人的资源调大 ⇒ **忆灵的生命跟着变** ✓
+>   ＋ 旧行为对照（不带 `source` 的 `1512` 面板**不受影响** ✓）；④ 变异（把 `1.0` 改成 `0.5` ⇒ 必红 ✓）。
+>   ⚠ **顺带**：③ 的判据里"资源"要用一个**已有资源**（`1415` 的【新蕊】✗ 若还没声明 ⇒ 可用**已有的**资源名建一个手搭忆灵 ✓，
+>   这样判据不依赖新的内容 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2114** 例 ✓）、树干净、已推送 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
