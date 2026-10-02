@@ -19847,6 +19847,24 @@
 > * ⭐ **这一步的意义** ✓：目标 ① 里"阿哈时刻结束"这一条从"缺创建者"变成"**创建者 = 最后一个欢愉技结束**" ✓
 >   ⇒ ⭐ **`STATE_ENDED` 的第一个真读者变得可出货** ✓（⚠ 而"阿哈"这个单位本身**降级为可以不建** ✓ —— 记为登记 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送（若网络允许 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零二十三：✅ **落点找到了** —— `ATTACK_FINISHED`（*"settlement complete, hit set frozen"* ✓）＋ `CAST_SETUP` ✓；⭐ 于是"时刻的结束"可以用**引用计数**表达，不必新造事件）**：
+>
+> * ✅ **实测（读 `TriggerEvent` ✓）** ✓：
+>   * `:372` ⭐ **`ATTACK_FINISHED("ATTACK_FINISHED", true)`** ✓ —— 注释：*"An attack has FINISHED: **settlement complete, hit set frozen**"* ✓；
+>   * `:323` **`CAST_SETUP("CAST_SETUP", true)`** ✓（本段 `1513` 的 `elation_spend_all_fervor` 就挂在它上面 ✓）；
+>   * `:258` ✓ 另有"**召唤物攻击结束**"的事件（P9-4 忆灵 ✓，由 `EnemySkill.execute` 发出 ✓）；
+>   * ⚠ `:75` 的一行注释很关键 ✓：*"assists, **elation damage** or talents — **none of those is an in-battle cast**, and inventing an event…"*
+>     ⇒ ⭐ **欢愉伤害不是"战斗内施放"** ✗ ⇒ **不能指望有一个现成的"欢愉技施放"事件** ✗。
+> * ⭐⭐ **于是最省的设计（不新增引擎事件 ✓）** ✓：
+>   1. **开始**：在 `CAST_SETUP`（`from_category ElationDamage` ✓）时**记一个待办计数**（= 本次时刻还要跑几个欢愉技 ✓）；
+>   2. **结束**：在 **`ATTACK_FINISHED`**（同样 `from_category ElationDamage` ✓）时**递减** ✓ ⇒ ⭐ **减到 0 时**发
+>      **`STATE_ENDED("阿哈时刻")`** ✓（⭐ 这正是文档那句「**阿哈时刻持续至本次最后一个欢愉技施放结束**」的直译 ✓）；
+>   3. **随后**：`GAIN_RESOURCE`／`SPEND_RESOURCE{spendAll}` 清空**笑点** ✓（已在树上 ✓）＋ 给参演者发【好活当赏】✓（`1505` 的读者 ✓）。
+> * ⭐ **下一轮第一步（第一步就能出货，1-2 次调用）** ✗：**只做"发出 `STATE_ENDED`"这一半** ✓ ——
+>   ⚠ 用一个**小的引用计数规则**（⚠ 待查：引擎里有没有"计数即条件"的现成写法 ✗ —— 本段见过 `self_stacks:`／`per_stack:` ✓
+>     ⇒ ⭐ 若能用**资源**当计数（`resource: 待演` ✓ 每次开始 +N、每次结束 −1 ✓、`when: resource <= 0` ✗）⇒ 那就**全用现有拼写** ✓✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（连续两轮网络失败 ✓）⇒ 下一轮补推 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -22760,6 +22778,24 @@
 > * ⭐ **这一步的意义** ✓：目标 ① 里"阿哈时刻结束"这一条从"缺创建者"变成"**创建者 = 最后一个欢愉技结束**" ✓
 >   ⇒ ⭐ **`STATE_ENDED` 的第一个真读者变得可出货** ✓（⚠ 而"阿哈"这个单位本身**降级为可以不建** ✓ —— 记为登记 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送（若网络允许 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零二十三：✅ **落点找到了** —— `ATTACK_FINISHED`（*"settlement complete, hit set frozen"* ✓）＋ `CAST_SETUP` ✓；⭐ 于是"时刻的结束"可以用**引用计数**表达，不必新造事件）**：
+>
+> * ✅ **实测（读 `TriggerEvent` ✓）** ✓：
+>   * `:372` ⭐ **`ATTACK_FINISHED("ATTACK_FINISHED", true)`** ✓ —— 注释：*"An attack has FINISHED: **settlement complete, hit set frozen**"* ✓；
+>   * `:323` **`CAST_SETUP("CAST_SETUP", true)`** ✓（本段 `1513` 的 `elation_spend_all_fervor` 就挂在它上面 ✓）；
+>   * `:258` ✓ 另有"**召唤物攻击结束**"的事件（P9-4 忆灵 ✓，由 `EnemySkill.execute` 发出 ✓）；
+>   * ⚠ `:75` 的一行注释很关键 ✓：*"assists, **elation damage** or talents — **none of those is an in-battle cast**, and inventing an event…"*
+>     ⇒ ⭐ **欢愉伤害不是"战斗内施放"** ✗ ⇒ **不能指望有一个现成的"欢愉技施放"事件** ✗。
+> * ⭐⭐ **于是最省的设计（不新增引擎事件 ✓）** ✓：
+>   1. **开始**：在 `CAST_SETUP`（`from_category ElationDamage` ✓）时**记一个待办计数**（= 本次时刻还要跑几个欢愉技 ✓）；
+>   2. **结束**：在 **`ATTACK_FINISHED`**（同样 `from_category ElationDamage` ✓）时**递减** ✓ ⇒ ⭐ **减到 0 时**发
+>      **`STATE_ENDED("阿哈时刻")`** ✓（⭐ 这正是文档那句「**阿哈时刻持续至本次最后一个欢愉技施放结束**」的直译 ✓）；
+>   3. **随后**：`GAIN_RESOURCE`／`SPEND_RESOURCE{spendAll}` 清空**笑点** ✓（已在树上 ✓）＋ 给参演者发【好活当赏】✓（`1505` 的读者 ✓）。
+> * ⭐ **下一轮第一步（第一步就能出货，1-2 次调用）** ✗：**只做"发出 `STATE_ENDED`"这一半** ✓ ——
+>   ⚠ 用一个**小的引用计数规则**（⚠ 待查：引擎里有没有"计数即条件"的现成写法 ✗ —— 本段见过 `self_stacks:`／`per_stack:` ✓
+>     ⇒ ⭐ 若能用**资源**当计数（`resource: 待演` ✓ 每次开始 +N、每次结束 −1 ✓、`when: resource <= 0` ✗）⇒ 那就**全用现有拼写** ✓✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（连续两轮网络失败 ✓）⇒ 下一轮补推 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
