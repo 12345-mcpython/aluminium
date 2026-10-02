@@ -15806,6 +15806,30 @@
 >   （⚠ 而且它会顺带给 `random_enemy` 这个"有 op、没读者"的选择器**第一个读者** ✓）。
 > * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓。
 
+> **2026-10-02 更新（aggro 回收之八百零一：⭐ 上一轮那个"结算后的载体"**本来就有** —— 是 `TAKING_HIT`，缺的只是"这是哪次施放"）**：
+>
+> * ⭐⭐⭐ **读代码定案** ✓：三个事件的 `amount` 各是什么，一眼可查 ✓ ——
+>   * `DEALING_DAMAGE`（`Battle:2752` ✓）带的是 **`damage.getSkillBaseValue()`** ✗ —— 即**基数**（结算之前 ✓），
+>     这正是上一轮量到 1093.02 而不是 260.237584 的原因 ✓；
+>   * **`TAKING_HIT`（`Battle:1329` ✓）带的是 `settled`** ✓✓ —— **结算之后的伤害** ✓，就是「原伤害」 ✓；
+>   * `HP_LOST`（`Battle:1337` ✓）带的是 `hpLoss` ✓（≈settled，但**被护盾吃掉的那部分不算** ✗ ⇒ 不是"原伤害" ✓）。
+>   ⇒ ⭐ **`scale: "original_damage"` 该读的是 `ctx.amount()`、挂在 `TAKING_HIT` 上** ✓，而不是上一轮那个
+>     `ctx.damage().toValue()` ✓ —— **载体本来就有** ✓，我上一轮找错了地方 ✓（教训：**"缺一个东西"之前，先把
+>     现有事件各带什么数查一遍** ✓ —— 这张三行表只要读三个发射点 ✓）。
+> * ⚠ **唯一还缺的一件** ✗（已具名 ✓）：`TAKING_HIT` 不带**施放类别** ✓（`fireTriggersForAlly(event, actor, target,
+>   amount)` 只有四个参数 ✓，而 `DEALING_DAMAGE` 那条走的是带 `damage.getCastCategory()` 的重载 ✓）
+>   ⇒ 「**终结技**额外造成 2 次伤害」（`1003` 星魂 6 ✓）里的"终结技"这一半今天说不出来 ✗。
+>   精确改动清单（照 `DELEGATE_DAMAGE` 的先例 ✓）：① 给 `fireTriggersForAlly` 加一个**带类别**的重载 ✓，
+>   在 `1329` 处传 `damage.getCastCategory()` ✓；② 把 `TAKING_HIT` 加进 `from_skill` 的**合法事件集** ✓
+>   （它现在只认带实例的那几个 ✓，而 TAKING_HIT 正是"实例落地"的那一个 ✓）；③ `scale: "original_damage"` = `ctx.amount()` ✓，
+>   并在装载期要求它挂在 `TAKING_HIT` 上 ✓（就这一种事件的 amount 是"结算后的伤害" ✓）。
+> * **出货内容（等上面三件）** ✓：`1003` 姬子 **星魂 6**「终结技额外造成 **2** 次伤害，对随机敌方单体各造成等同于
+>   **原伤害 40%** 的火属性伤害」（参数 `[0.4]` ✓）＝ `TAKING_HIT` + `actor == self` + `from_skill ULTRA` +
+>   **`min_eidolon: 6`** + `DAMAGE { times: 2, target: random_enemy, scale: original_damage, percent: 0.4, element: Fire }` ✓
+>   —— ⚠ 而且它会顺带给 **`random_enemy`**（"有 op、没读者"的那个选择器 ✓）**第一个读者** ✓。
+> * **实测（本轮）**：全量 **0**（`--rerun-tasks`，**2109** 例 ✓）、闸门 [0, 0]、树干净、已推送 ✓（本轮**未改代码** ✓ ——
+>   只把上一轮的回滚记完整 ✓，并把下一轮的第一步**收窄到三处编辑** ✓）。
+
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
