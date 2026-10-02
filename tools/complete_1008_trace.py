@@ -14,7 +14,8 @@ PATH = "src/main/resources/characters/1008.json"
 COND = "self_hp_at_most:0.3"
 
 doc = json.load(io.open(PATH, encoding="utf-8"))
-rule = next(r for r in doc["rules"] if r.get("id") == "trace_survival_heal")
+rules = doc["rules"] if isinstance(doc, dict) else doc
+rule = next(r for r in rules if r.get("id") == "trace_survival_heal")
 if COND in rule.get("when", []):
     print("already states the condition")
     raise SystemExit(0)
