@@ -121,4 +121,36 @@ public class ContentWeaknessClausesTest {
         Assertions.assertTrue(a.isWeakTo(DamageElement.FIRE) && b.isWeakTo(DamageElement.FIRE),
                 "the technique clause reaches EVERY enemy, not just the first");
     }
+
+    /**
+     * ⚠ 内容层的**另一半**：那条从句真的把 	urns 交给了引擎吗。
+     *
+     * <p>底层已证（第 19 件），所以这里只问**内容**：1315 那条规则带
+     * "turns": 2，于是它的物理弱点**应当会过期**。
+     *
+     * <p>⚠ 变异点：删掉 1315.json 里的 "turns": 2 ⇒ 这条必红。否则这弱点**永久留着** ——
+     * 而“永久”与“文档说的 2 回合”在断言眼里**长得一模一样**，除非真的走几个回合。
+     */
+    @Test
+    public void theInsertedWeaknessFromContentActuallyExpires() {
+        Character bto = CharacterFactory.create(1315, LEVEL);
+        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Battle battle = new Battle(List.of(bto), List.of(enemy), new Random(0));
+        battle.startBattle();
+        Assertions.assertFalse(enemy.isWeakTo(DamageElement.PHYSICAL), "1002011 must not already have Physical");
+        bto.setCurrentEnergy(bto.getMaxEnergy());
+        Assertions.assertTrue(battle.castUltra(bto, List.of(enemy)), "the ultimate must cast at full energy");
+        Assertions.assertTrue(enemy.isWeakTo(DamageElement.PHYSICAL), "the clause inserts it");
+
+        int steps = 0;
+        while (enemy.isWeakTo(DamageElement.PHYSICAL) && !battle.isOver() && steps < 60) {
+            battle.stepForward();      // ⚠ 只换 currentMove（实测：它不执行回合）
+            battle.afterMove();        // ⭐ 结束那次行动 —— 计时弱点就在这里递减
+            steps++;
+        }
+        System.out.println("[content] 1315 timed: physical gone after " + steps + " steps (over=" + battle.isOver() + ")");
+        Assertions.assertFalse(enemy.isWeakTo(DamageElement.PHYSICAL),
+                "the content carries turns: 2, so it must expire -- " + steps + " steps and it is still there");
+        Assertions.assertTrue(steps > 1, "but not on the first step: the count would be wrong, not just the ticking");
+    }
 }
