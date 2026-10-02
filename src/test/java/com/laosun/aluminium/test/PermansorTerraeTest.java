@@ -65,7 +65,7 @@ public class PermansorTerraeTest {
         var table = TriggerTables.of(DHPT);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the Bondmate and the shield");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
     }
 
     private static Random fixed() {

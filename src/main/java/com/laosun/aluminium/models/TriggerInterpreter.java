@@ -126,7 +126,7 @@ public final class TriggerInterpreter {
             "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
-            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "DELEGATE_DAMAGE",
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "CAST_SKILL", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
             "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT", "CONSUME_HP");
 
@@ -786,6 +786,18 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
                 requireNoTarget(effect, op, spec);
             }
+            case "CAST_SKILL" -> {
+                if (effect.getSkill() == null || effect.getSkill().isBlank()) {
+                    throw new IllegalArgumentException("Op CAST_SKILL requires skill, a SkillType slot name (source: "
+                            + spec.getSource() + ")");
+                }
+                try {
+                    SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+                } catch (IllegalArgumentException notASlot) {
+                    throw new IllegalArgumentException("Op CAST_SKILL names skill \"" + effect.getSkill()
+                            + "\", which is not a SkillType (source: " + spec.getSource() + ")");
+                }
+            }
             case "COMMAND_SUMMON" -> {
                 // The numbers are the NAMED SKILL's, not this file's: 长夜月's ultimate is skill 141303, whose
                 // parameter row says 2.0 at Lv10 and whose effect says AoEAttack / Ice. Stating them again here
@@ -1135,6 +1147,7 @@ public final class TriggerInterpreter {
             case "APPLY_REGEN" -> applyRegen(battle, effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> commandSummon(battle, effect, ctx);
+            case "CAST_SKILL" -> castSkill(battle, effect, ctx);
             case "SUMMON_SERVANT" -> battle.summonServant(requireCharacterOwner(effect, ctx));
             case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
             default -> throw new IllegalStateException(
@@ -1658,6 +1671,54 @@ public final class TriggerInterpreter {
                 // an AOE that is `all` (per victim, matching the caster-side path), for BLAST `single`.
                 skill.getData().stanceFor(true));
         attack.execute(battle, summon, victims);
+    }
+
+    /**
+     * {@code CAST_SKILL}: the resolved target performs <b>one cast, right now</b>, with the numbers of the skill
+     * the rule names -- 「使其立即施放 1 次…」。
+     *
+     * <p>⚠ It is {@code commandSummon} with three spots loosened, and nothing else (see `aggro 回收之七百八十五`):
+     *
+     * <ol><li>the <b>actor</b> is the resolved target, not the owner’s summon;</li>
+     * <li>the <b>skill</b> is looked up on that actor, not on the rule owner;</li>
+     * <li>no {@code SUMMON_ATTACK} is announced -- that event belongs to a memosprite (the swing itself still
+     * announces itself through {@code EnemySkill.execute}).</li></ol>
+     *
+     * <p>⚠ <b>韧性必须自己带</b> —— 先例的原话：*when a cast is DELEGATED the executor expands no damage of its
+     * own, so the stance would otherwise be dropped on the floor*. ⚠ Do not drop {@code stanceFor(true)}.
+     */
+    private static void castSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        CanHit actor = require(resolveTarget(effect, ctx), "target", ctx);
+        SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+        Skill skill = actor.getSkills().get(slot);
+        if (skill == null || skill.getData() == null) {
+            throw new IllegalStateException(
+                    actor.getName() + " has no " + slot + " skill, so a CAST_SKILL effect has nothing to "
+                            + "read: the rule names the skill whose numbers the commanded cast uses");
+        }
+        if (!skill.getData().getEffect().isDamaging()) {
+            throw new IllegalStateException(
+                    "CAST_SKILL effect points at " + slot + ", whose effect is "
+                            + skill.getData().getEffect() + " rather than a damaging one");
+        }
+        List<CanHit> victims = new ArrayList<>();
+        for (CanHit unit : battle.getOpponents(actor)) {
+            if (unit != null && !unit.isDeath()) {
+                victims.add(unit);
+            }
+        }
+        if (victims.isEmpty()) {
+            return;                                  // nothing left to hit: an empty battlefield, not a bad rule
+        }
+        EnemySkill attack = new EnemySkill(
+                skill.getData().getElement(),
+                multiplierOf(skill, effect, actor),
+                1,                                   // one segment, like the precedent
+                DamageType.NORMAL,
+                skill.getData().getEffect(),
+                AttributeType.fromString(effect.getAttribute()),
+                skill.getData().stanceFor(true));
+        attack.execute(battle, actor, victims);
     }
 
     /**

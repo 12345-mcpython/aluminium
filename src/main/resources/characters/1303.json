@@ -123,5 +123,20 @@
     ],
     "source": "1303 阮•梅 星魂 6 半脱纱巾落团扇: 「终结技展开的结界持续时间延长1回合」",
     "note": "「终结技展开的结界**持续时间延长 1 回合**」—— ① ⚠ `EXTEND_BUFF` 的命名**二选一** ✓：给 `buff`（状态名）**或**给 `attribute`（修饰所在的属性 ✓），**不能同时** ✓（装载期原文 \"a buff is named one way or the other\" ✓）；② 本结界的**两条具名修饰**都是属性修饰 ✓ ⇒ 按**属性**点名 ✓ ⇒ **两个** `EXTEND_BUFF` ✓（`DAMAGE_PENETRATION` ✓ 与 `DEFENCE_IGNORE` ✓）；③ 排在结界之后 ✓、门槛 `min_eidolon: 6` ✓。⭐ **判据** ✓：**完整回合**（`beforeMove()` + `afterMove()` ✓ —— 递减分早晚两遍 ✓，属性修饰是**晚**的那遍 ✓）⇒ `turns: 2` 两个完整回合**到期** ✓；**有星魂 6（+1）⇒ 同样两回合后仍在** ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "ults_autocast_skill",
+    "when": [
+      "self has_state 秘技"
+    ],
+    "do": [
+      {
+        "op": "CAST_SKILL",
+        "skill": "SKILL",
+        "target": "target"
+      }
+    ],
+    "note": "⭐ 2026-09-30：用 `CAST_SKILL` 让那个单位**立即施放一次** `SKILL` ✓ —— ⚠ 读的是**它自己的数据行** ✓（而不是手写倍率 ✗），⚠ 而护栏会拒绝**不造成伤害**的技能 ✗。⚠ 来源：`CAST_SKILL` 是 `commandSummon` 放宽三处而来（见 `aggro 回收之七百八十五`）；⚠ 它不经过战技点消耗 ✓。"
   }
 ]
