@@ -20101,6 +20101,400 @@
 >     ⇒ ⭐ **规矩**：调试期间的中间产物**要么不 `git add`，要么先修好** ✓；⭐ 而 `git checkout` 只能回到**已提交**的状态 ✓
 >       ⇒ **"回滚到干净" 不等于 "回滚到正确"** ✓。
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 3 个提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十七：✅ **阿哈时刻已进树且全量绿**（`ec30d193` ✓）；⭐ 而判据要的那个语义也读到了：`from_category` ＝「**造成该事件的那次施放属于某类别**」）**：
+>
+> * ✅ **实测（读 `TriggerTable:1103` 附近的常量说明 ✓）** ✓ 原文要点：
+>   *`from_category`: "the cast that caused this event was of this CATEGORY" (\u300c\u88c5\u5907\u8005\u65bd\u653e**\u6b22\u6109\u6280**\u65f6\u300d, \u5149\u9525 21064/21066/23058/23064). … the slot names a SKILL SLOT (`SKILL` = an ordinary Skill), while a memosprite's or a **\u6b22\u6109 kit's cast is a category the slot vocabulary does not have at all** — `SkillCategory.ELATION_DAMAGE` is precisely the one `SkillType` lacks.`*
+>   ⇒ ⭐⭐ **两点** ✓：**(i)** 我那条 `from_category ElationDamage` 的写法**有明确来历** ✓（光锥 21064 等在用 ✓ —— ⚠ 而 21064 正是本段某次红过的判据名 ✓ 印证它在欢愉这条线上 ✓）；
+>     **(ii)** ⭐ **判据要满足它，就得让"造成事件的那次施放"真的带这个类别** ✗ ⇒ 也就是**判据必须驱动一次真的欢愉技施放** ✗
+>       （⚠ 不能像 `1215` 那样只 `fireTriggers` 一个事件 ✓ —— 那次的条件是 `from_skill` ✓ 不同 ✓）。
+> * ⭐ **下一轮第一步（判据的写法，先查入口再写）** ✗：
+>   ① 读 **`Battle`／`SkillExecutor` 里"施放"的入口** ✓（⚠ 一次调用：搜 `ELATION_DAMAGE` 的使用处 ✓ ⇒ 看哪条路径会把它写进 `TriggerContext` 的 cast ✓）；
+>   ② 用那条路径**在判据里驱动一次** ✓ ⇒ 断言：**状态挂上** ✓（`has_state` 可读 ✓）⇒ **归零后摘掉** ✓ ⇒ ⭐ **`STATE_ENDED` 发出** ✓（读者规则生效 ⇒ 她拿到【好活当赏】✓）；
+>   ③ **变异（全量）**：去掉 `REMOVE_STATE` 那条 ⇒ **必红** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络 ✓ 又断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、两闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十八：✅✅ **两处要点读到**：`from_category` **接受两种拼写**（数据的 `ElationDamage` ✓ 与枚举名 `ELATION_DAMAGE` ✓，注释写明"two spellings, one fact"）；⭐ 而判据的路子是**自己造一次欢愉技施放**）**：
+>
+> * ✅ **实测（搜 `ELATION_DAMAGE` 全部使用处 ✓）** ✓：
+>   * `TriggerTable:1455`–`:1457` ✓：报错文案里写 *"…\"actor == self\" and \"**from_category ELATION_DAMAGE**\"…"* ＋ 注释
+>     *"⭐ **Two spellings, one fact**: the skill data says `ElationDamage`, the enum's own name is `ELATION_DAMAGE`"* ✓
+>     ⇒ ⭐⭐ **所以条件里两种写法都收** ✓（⚠ 我内容里写的是**数据拼写** `ElationDamage` ✓ —— ⭐ 与本段"照数据写"的一贯口径一致 ✓）；
+>   * `SkillCategory:63` ✓ **`ELATION_DAMAGE("ElationDamage")`** ✓（枚举名 ↔ 数据值 ✓）；
+>   * ⚠ 其余命中只有 `AttributeType`（`elation_damage_boost` ✓ 是**属性**不是类别 ✓）与 `TriggerInterpreter:4104`（欢愉伤害公式 ✓）
+>     ⇒ ⭐ **没有任何既有路径"施放"过一次欢愉技** ✗ ⇒ 这解释了为什么判据必须自己造 ✓。
+> * ⭐ **判据的写法（下一轮照此）** ✗：用 **`SkillCategory.ELATION_DAMAGE`** 造一个技能 ✓ ⇒ **`SkillExecutor.execute(Battle, Skill, CanHit, List)`**（本段已确认它是 **public static** ✓）
+>   ⇒ 那次施放就会把类别写进 `TriggerContext` ✓ ⇒ 我那两条 `from_category ElationDamage` 的规则才会触发 ✓。
+>   ⚠ 然后断言三件事 ✓：**① 状态挂上** ✓（`has_state` 可读 ✓）；**② 归零后摘掉** ✓（`REMOVE_STATE` ✓）；
+>   **③ `STATE_ENDED` 发出** ✓（读者规则 ⇒ 她拿到【好活当赏】✓）＋ **变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）。
+> * ⭐ **纪律（本段第十八条）** ✗：**条件里出现"两种拼写"时，选**数据拼写**（与 `RuleEffectAmendmentTest`／`EffectKeyDisciplineTest` 的口径一致 ✓）
+>   —— ⚠ 本段在 `from_category` 上正好蒙对 ✓（用了 `ElationDamage` ✓）；而 `1306` 那次的 `ELATION_DAMAGE` ✗ 是被装载器**拒绝**的 ✓ ⇒ ⭐ **两种拼写的"收"是有前提的**（⚠ 见该行上下文 ✓）。
+> * ⚠ **推送**：本地仍**领先 6** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十九：✅ `SkillExecutor.execute` 的**确切签名**拿到了；⚠ 而 `Skill` 里"类别"那个字段名还没找到（我两次猜路径都错，第三次用 `glob` 才拿到文件））**）**：
+>
+> * ✅ **实测（`glob` ⇒ 读文件 ✓）** ✓：
+>   * ⚠ **`SkillExecutor` 不在 `models/` 里** ✗ ⇒ 在 **`models/skill/SkillExecutor.java`** ✓（⚠ 我先前两次按 `models/…` 猜 ✗ ⇒ ⭐ **纪律：找文件先用 `glob`** ✓）；
+>   * ⭐ **签名（`:72` ✓）**：**`public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets)`** ✓
+>     ⇒ 判据里可以**直接驱动一次施放** ✓（⚠ 只要造出一个"类别属于欢愉"的 `Skill` ✓）。
+> * ⚠ **还没找到的** ✗：`Skill`（`beans/Skill.java` ✓）里表示**类别**的字段名 ✗ —— 我 grep 了 `category`／`public Skill(` ✓ **都没命中** ✗
+>   ⇒ ⭐ **下一轮第一步（1 次调用）** ✗：**读 `beans/Skill.java` 的字段区** ✓（⚠ 或 grep `SerializedName` 全部 ✓ ⇒ 一次看全 ✓）
+>     ⇒ 拿到字段名后：**造一个欢愉技** ✓ ⇒ `execute(...)` ✓ ⇒ 断言三件事 ＋ 变异 ✓。
+> * ⭐ **纪律（本段第十九条）** ✗：**找文件用 `glob`，别按包名猜路径** ✓ —— ⚠ 本段为此浪费两次调用 ✓
+>   （⚠ 而"猜字段名"这类错误本段已犯四次 ✓ ⇒ ⭐ **凡"名字"类信息，一律先查、再写** ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十：✅ `Skill` **是个 `record`**，字段区里**没有 `category`** ⇒ ⭐ 所以"类别"是**推导出来的**（不是数据里的一个键）；下一轮查它的推导处）**）**：
+>
+> * ✅ **实测（读 `beans/Skill.java` ✓）** ✓：`public record Skill(` 后面是
+>   `attack_type`(attackType) ✓／`max_level…` ✓／`param_list`(paramList) ✓／`skill_effect`(skillEffect) ✓／
+>   `skill_id`(skillID) ✓／`skill_introduction` ✓／`stance_list`(stanceList) ✓／…／`sp_need`(spNeed) ✓／`sp_base`(spBase) ✓
+>   ⇒ ⭐ **没有 `category` 字段** ✗ ⇒ ⭐ **`SkillCategory` 是从这些字段（很可能 `attack_type`／`stance_list`）推导出来的** ✓
+>     （⚠ 与本段早前那条"memosprites/servants 的 `attack` 能带 `stance`"呼应 ✓）。
+> * ⭐ **下一轮第一步（1 次调用）** ✗：读 **`SkillCategory`** ✓（`enums/SkillCategory.java` ✓ 本段已知它在 `enums/` ✓）
+>   ⇒ 找**"从 Skill 推出类别"的方法** ✓（⚠ 名字未知 ⇒ ⭐ 先 `glob`／读整个小文件 ✓，别猜 ✓）
+>     ⇒ 拿到它之后：**判据里造一个攻击类型/站姿属于欢愉的 `Skill`** ✓ ⇒ `SkillExecutor.execute(...)` ✓ ⇒ 三断言 ＋ 变异 ✓。
+> * ⚠ **若推导需要一个真实的技能数据条目**（✗ 无法凭空造 ✓）⇒ ⭐ **那么判据就改用"文件驱动 ＋ 找到她自己的欢愉技"** ✓
+>   （⚠ 本段已知 `1513` 的欢愉技在文档里有 ✓ 且 `SkillCategory.ELATION_DAMAGE` 就是为它设的 ✓ ⇒ **她的技能数据里应该有那一条** ✓）。
+> * ⚠ **推送**：本地仍**领先 8** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十一：✅✅ **类别来自一个数据字符串**（`SkillCategory` 用 `BY_VALUE` 查表 ✓），⭐ 而且注释写明**数据里有 **9** 个欢愉技**（`ElationDamage` 9 measured ✓））**：
+>
+> * ✅ **实测（读 `enums/SkillCategory.java` ✓）** ✓：
+>   * `:63` **`ELATION_DAMAGE("ElationDamage")`** ✓ ⇒ ⭐ **枚举由一个**数据字符串**构造** ✓；
+>   * `:87` `private static final Map<String, SkillCategory> BY_VALUE` ✓ ⇒ ⭐ **有"字符串 ⇒ 枚举"的查表** ✓（⚠ 方法名待读 ✓，但入口确定 ✓）；
+>   * `:32` ✓ 注释列出各值的数据字符串与**实测计数** ✓：… `Maze` 93 ✓／`null` 94（天赋与追加攻击 ✓）／⭐ **`ElationDamage` 9** ✓
+>     ⇒ ⭐⭐ **数据里有 9 个欢愉技** ✓ ⇒ ⭐ **判据不必凭空造技能** ✗：**可以从她的技能数据里找那一个** ✓（⚠ 或者用 `BY_VALUE` 直接构造 ✓）。
+>   * `:11`–`:28` 的说明还有价值 ✓：这个枚举回答"这是哪**一类**技能" ✓ 与 `SkillEffectType`（"是什么**效果**" ✓）**正交** ✓
+>     ⇒ ⚠ 且"两者唯一重叠的是那五个值（`Normal/BPSkill/Ultra/Maze/MazeNormal` ✓）" ✓。
+> * ⭐ **下一轮第一步（把判据写出来，1–2 次调用）** ✗：
+>   ① 读 `SkillCategory` 的**查表方法名** ✓（⚠ 一次读那个小文件的 `static SkillCategory …` ✓）；
+>   ② 判据里：**`SkillExecutor.execute(battle, elationSkill, owner, targets)`**（⚠ `elationSkill` 取自她的数据／或用查表构造 ✓）
+>     ⇒ 断言 **① 状态挂上**（`has_state`）✓ **② 归零后摘掉** ✓ **③ `STATE_ENDED` 发出 ⇒ 她拿到【好活当赏】** ✓；
+>   ③ **变异（全量）**：去掉 `REMOVE_STATE` ⇒ 全量必红 ✓。
+> * ⚠ **推送**：本地仍**领先 9** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十二：✅✅✅ **判据的每一块都齐了** —— `SkillCategory.fromString(String raw)`（`:224` ✓）与 `of(SkillType slot)`（`:135` ✓）⇒ ⭐ 造一个 `attack_type` 为 `"ElationDamage"` 的 `Skill` 即可让那次施放带欢愉类别）**：
+>
+> * ✅ **实测（读 `SkillCategory` ✓）** ✓：**两个公开入口** ✓：
+>   * **`public static SkillCategory fromString(String raw)`** ✓（`:224` ✓）⇒ ⭐ 直接 `fromString("ElationDamage")` ✓；
+>   * `public static SkillCategory of(SkillType slot)` ✓（`:135` ✓）⇒ 按技能槽 ✓。
+>   ＋ 已知 `Skill` 是 **record** ✓ 且带 **`attack_type`** ✓（数据字符串 ✓）⇒ ⭐ **造一个 `attack_type = "ElationDamage"` 的 `Skill`** ✓
+>     ⇒ 那次 `SkillExecutor.execute(…)` 的**类别就是欢愉** ✓ ⇒ 我那条 `from_category ElationDamage` 的规则**会触发** ✓✓。
+> * ⭐ **判据的最终写法（下一轮照着写，一次到位）** ✗：
+>   ```java
+>   Skill elation = new Skill(<attack_type 等按 record 顺序填，attack_type 用 "ElationDamage">);
+>   SkillExecutor.execute(battle, elation, owner, List.of(enemy));   // 或目标按她那条规则要的
+>   // ① 断言：她的【阿哈时刻】状态挂上了（has_state 可读）
+>   // ② 再驱动一次结束（ATTACK_FINISHED ⇒ 待演归零）⇒ 状态被摘
+>   // ③ 断言：她拿到了【好活当赏】= STATE_ENDED 真的发了
+>   ```
+>   ＋ **变异**：去掉 `REMOVE_STATE` 那条 ⇒ ⭐ **全量必红** ✓。
+> * ⚠ **要注意的细节** ✓：`Skill` 是 record ⇒ **构造参数顺序**必须照声明（⚠ 一次读全 ✓）；而"待演"计数要**先 +1**（`CAST_SETUP` 那条 ✓）
+>   才能被 `-1` 归零 ✓ ⇒ ⭐ **判据要按"开始 → 结束"两次驱动** ✓（正好也验证了①②两步 ✓）。
+> * ⚠ **推送**：本地仍**领先 10** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十三：⚠ **判据编译失败，但失败本身给了三个确切事实** ⇒ 路线随之改成"用她自己的技能"）**：
+>
+> * ⚠ **实测（判据编译错 ✓）** ✓ 三条：
+>   1. `com.laosun.aluminium.beans.Skill` **与** `com.laosun.aluminium.models.skill.Skill` **是两个类型** ✗
+>      ⇒ 而 `SkillExecutor.execute(Battle, **models.skill.Skill**, CanHit, List)` ✓ 要的是**后者** ✓（⚠ 我传了前者 ⇒ 类型不兼容 ✓）；
+>   2. ⭐ **`models.skill.Skill` 是 `public abstract class`** ✓（不是 record ✗）⇒ ⛔ **判据不能 `new` 它** ✗ ⇒ 必须用**它的具体子类** ✓；
+>   3. `owner.getState()` **不存在** ✗（找不到符号 ✓）⇒ ⭐ **状态读取的口在别处**（⚠ 名字待查 ✓）。
+> * ⭐⭐ **于是路线改得更省** ✓：**不必造技能** ✗ —— ⭐ **用她自己的技能** ✓：
+>   `owner.getSkills()`（本段用过 ✓）里就应有**她的欢愉技实例** ✓（⚠ 数据里 9 个欢愉技之一 ✓）
+>     ⇒ `SkillExecutor.execute(battle, 她那个技能, owner, targets)` ✓ ⇒ 类别自然是欢愉 ✓ ⇒ 规则触发 ✓。
+>   ⚠ 若 `getSkills()` 里没有欢愉技槽 ✗（⚠ 它可能只覆盖 `BASIC_ATTACK`/`SKILL`/`ULTRA`/`TALENT` ✓）
+>     ⇒ ⭐ 那就找 `SkillCategory.of(SkillType.ELATION_SKILL)` ✓ 对应的**槽**与**子类** ✓（⚠ 本段已知 `SkillType.ELATION_SKILL` 存在 ✓）。
+> * ⭐ **下一轮第一步（两查，各一次调用）** ✗：① 读 `Skill` 的**子类清单** ✓（`glob '**/skill/*.java'` ✓ ⇒ 找"攻击类技能"那个 ✓）；
+>   ② 找**状态读取**的口 ✓（⚠ 搜 `boolean has`／`getBuffs`／`getBuffManager` ✓ ⇒ 判据要能读"她是否处于某状态" ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（10 个积压提交上一轮推完 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据文件已删 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十四：✅✅✅ **判据跑起来了一半，而且这一半证明**内容真的生效**** —— ⭐ 欢愉技一施放，`阿哈时刻` 状态**就挂上了**；⚠ 卡在"结束"那一步（我手工 `fireTriggers(ATTACK_FINISHED)` **不带施放类别** ✗））**：
+>
+> * ✅ **实测（判据编译通过 ＋ 跑到第 53 行 ✓）** ✓：
+>   * `assertFalse(hasState(阿哈时刻))` ✓ **通过** ✓（施放前没挂 ✓）；
+>   * `owner.getSkills().get(SkillType.ELATION_SKILL)` ✓ **拿到技能** ✓（⭐ `ELATION_SKILL` 这个槽**真的存在** ✓）；
+>   * `SkillExecutor.execute(...)` ⇒ `assertTrue(hasState(阿哈时刻))` ✓ **通过** ✓✓
+>     ⇒ ⭐⭐ **所以内容里的 `CAST_SETUP` ＋ `from_category ElationDamage` 那条规则**真的触发了**** ✓（⚠ 这是本段第一次证明它生效 ✓）；
+>   * ⛔ 然后 `fireTriggers(ATTACK_FINISHED, owner, owner, 0, 0)` ⇒ `assertFalse(hasState(阿哈时刻))` ✗ **失败** ✓
+>     （*"at zero the state must be gone ==> expected: <false> but was: <true>"* ✓）⇒ 状态**还在** ✗。
+> * ⭐ **原因判断（很确定）** ✓：我那条"结束"规则的条件是 **`from_category ElationDamage`** ✓ ⇒ ⚠ 而**手工 `fireTriggers` 造的事件没有"施放"上下文** ✗
+>   ⇒ 条件不成立 ⇒ 计数没减 ⇒ 状态没摘 ✓（⚠ 正是我在记录里预先写下的那个坑 ✓）。
+> * ⭐ **下一轮第一步（把"结束"也走真路径，1–2 次调用）** ✗：**让这次施放自己走完** ✓ ——
+>   ⚠ `SkillExecutor.execute(...)` 是否**在返回前就把 `ATTACK_FINISHED` 发了** ✗ 待查 ⇒ ⭐ 若发了 ⇒ **判据里根本不用手工 fire** ✓
+>     （⚠ 那就说明我那条 `ATTACK_FINISHED` 规则的条件在**真路径**上也不成立 ✗ ⇒ 要去读 `TriggerContext` 里"施放类别"在这个事件上**是否带着** ✓）。
+>   ⇒ ⭐ 具体查法：读 **`SkillExecutor.execute` 的实现** ✓（看它发哪些事件、带哪些上下文 ✓）。
+> * ⭐ **顺带确认** ✓：`BuffManager.hasState(String)` ✓ 与 `SkillType.ELATION_SKILL` ✓ **两个名字都对** ✓（本段"先查再写"的纪律奏效 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据已删 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十五：✅✅✅ **"结束"该挂哪个事件，答案在 `SkillExecutor` 里** —— 它发的每个事件**都带 `category`**，**但没有 `ATTACK_FINISHED`**）**：
+>
+> * ✅ **实测（读 `models/skill/SkillExecutor` ✓）** ✓：
+>   ```java
+>   Battle.PendingCast cast = battle.beginCast(skill, user);            // :83  ★ 施放类别**早算一次**
+>   battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category);   // :93  ← **带类别** ✓（⭐ 我那条"开始"规则正是靠它触发 ✓）
+>   battle.endCast(cast);                                              // :98
+>   … case ULTRA -> fireTriggers(ULT_CAST, …, category, …)              // :189 ← 带类别 ✓
+>     case BPSKILL -> fireTriggers(SKILL_CAST, …, category, …)          // :190 ← 带类别 ✓
+>     case NORMAL -> fireTriggers(BASIC_ATTACK, …, category, …)         // :191 ← 带类别 ✓
+>   battle.fireTriggers(TriggerEvent.ALLY_ATTACK, …, category, …)       // :203 ← 带类别 ✓
+>   ```
+>   ⇒ ⭐⭐ **两点**：**(i)** 我那条"开始"（`CAST_SETUP`）**注定会触发** ✓（本段已实测 ✓）；
+>     **(ii)** ⛔ **这里**没有 `ATTACK_FINISHED`** ✗** ⇒ 它由别处发出（`TriggerEvent:372` 说 *"settlement complete, hit set frozen"* ✓ ⇒ 多半在 `Battle` 的伤害结算里 ✓）
+>       ⇒ ⭐ **而那时施放早已 `endCast`** ✗ ⇒ **类别不在上下文里** ✗ ⇒ ⛔ **我那条"结束"规则在真路径上也永远不会触发** ✗（⚠ 不只是判据手工 fire 的问题 ✓）。
+> * ⭐⭐ **修法（内容层，一个词）** ✗：把"结束"那条的 `on` 从 **`ATTACK_FINISHED`** 换成 **`ALLY_ATTACK`** ✓
+>   （它**带类别** ✓、且在**同一施放的命中之后** ✓ ⇒ 记账 +1（`CAST_SETUP`）→ −1（`ALLY_ATTACK`）⇒ ⭐ **归零 ⇒ 摘状态 ⇒ 引擎发 `STATE_ENDED`** ✓）。
+>   ⚠ **语义核对** ✓：文档说"持续至**本次最后一个欢愉技施放结束**" ✓ ⇒ **单次施放**的这一版**正是**它的最小正确实现** ✓
+>     （⚠ 多次施放的版本需要知道"总共几个" ✗ ⇒ 那属于**阿哈行动**那一层，仍登记 ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：改 `on` ⇒ 重放脚本 ✓ ⇒ 跑判据 ⇒ ⭐ 若绿 ⇒ **变异（去掉 `REMOVE_STATE` ⇒ 全量必红）** ⇒ 这件就出货了 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十六：✅ **换到 `ALLY_ATTACK` 之后，"开始"与"结束"两条都触发了** —— 而新的报错说明**派对资源在她身上花不出去**）**：
+>
+> * ✅ **实测（改 `on` ⇒ 重放 ⇒ 跑判据 ✓）** ✓：新报错是
+>   *`java.lang.IllegalStateException: SPEND_RESOURCE '待演' but Aventurine • Waveflair has no such resource`*
+>   ⇒ ⭐ 说明**判据已经走到** "结束 ⇒ 扣计数" 那一步 ✓（⚠ 即 `ALLY_ATTACK` 那条**触发了** ✓）⇒ ⭐ 而**扣的时候找不到那份派对资源** ✗。
+> * ⭐ **两个候选** ✓：
+>   **(甲)** 我那份声明的**形状不全** ✗ —— ⚠ 装载器认的键是 `[id, initial, max, note, overflow, scope, source]` ✓（本段读到 ✓）
+>     ⇒ 我写了 `id/max/initial/scope/note` ✓ ⇒ ⚠ 缺 `source`／`overflow` **应当可选** ✓ ⇒ ⭐ 那更可能是 **(乙)**；
+>   **(乙)** ⭐ **`SPEND_RESOURCE` 的"花谁的"解析的是**持有者自己的**资源** ✗（⚠ 而不是队伍池 ✓）
+>     ⇒ ⚠ 那么"派对计数"这个用法**不成立** ✗ ⇒ ⭐ 要改成**她自己文件里的普通资源** ✓（⚠ 这也与 `1407` 的【新蕊】不同：那份是**写入**（`GAIN_RESOURCE` ✓ 在派对上 ✓），而这里是**扣减** ✗）。
+> * ⭐ **下一轮第一步（一次读清，然后一次改）** ✗：
+>   ① 读 **`TriggerInterpreter` 里 `SPEND_RESOURCE` 的取数路径** ✓（⚠ 本段早前读过 `spendResource` ✓ ⇒ 再确认"它从 `holder.getResources()` 还是 `battle.partyResource()` 里扣" ✓）；
+>   ② 若确认扣的是**持有者自己的** ⇒ ⭐ 把"待演"从 **派对**改成**她自己**的资源 ✓（`scope` 去掉或改 `SELF` ✓）⇒ 重跑判据 ⇒ 绿则变异 ✓。
+> * ⭐ **顺带**：这条错误**再一次**证明"**开始半真的生效了**" ✓（否则走不到扣减 ✓）⇒ ⭐ 内容的四步里**前两步已被实测确认** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（判据与内容都已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十七：✅✅ **扣减走的是"持有者自己的资源表"**（`holder.getResources()` ✓）⇒ ⭐ 修法两条，任选其一，都只改内容）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.spendResource` ✓，`:1388` ✓）** ✓ 关键几行：
+>   ```java
+>   CanHit holder = resolveTarget(effect, ctx);
+>   String id = effect.getResource();
+>   int amount = Boolean.TRUE.equals(effect.getSpendAll())
+>           ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)
+>           : (int) Math.round(scaledAmount(effect, ctx));
+>   if (!holder.getResources().has(id)) { throw new IllegalStateException("SPEND_RESOURCE '" + id + "' but " + holder.getName() + " has no such resource"); }
+>   if (!holder.getResources().spendExactly(id, amount)) { … }
+>   ```
+>   ⇒ ⭐⭐ **两个事实** ✓：**(i)** `SPEND_RESOURCE` 只认 **`holder.getResources()`** ✓（持有者**自己的**表 ✓ —— ⚠ 与我猜的 (乙) **一致** ✓）；
+>     **(ii)** ⭐ **`spendAll` 那条分支**正好用 `holder.getResources()` ✓（本段出货的 `1513` 用法 ✓）⇒ ⚠ 它能跑通说明**"她自己的表里"确实有"热意"** ✓。
+> * ⭐⭐ **于是修法（内容层，二选一）** ✗：
+>   **(甲)** ⭐ **把「待演」从派对资源改成她自己的普通资源** ✓（⚠ 去掉 `"scope": "PARTY"` ✓ ⇒ 它就进 `holder.getResources()` ✓）
+>     ⇒ ⚠ 代价：**别的角色看不到它** ✗（⚠ 但本设计里**只有她自己在记账** ✓ ⇒ 完全够用 ✓）；
+>   **(乙)** 或者查 **`Battle.registerPartyResources`（`:701` ✓）为什么没把它注入她的表** ✗（⚠ 也可能是"派对资源**只用于 `GAIN`／`value`** ✓ 而**不能 `SPEND`** ✗" —— ⭐ 那也算一条**引擎约束** ✓，值得登记 ✓）。
+> * ⭐ **下一轮第一步（先 (甲)，最快）** ✗：改声明（去 `scope`）⇒ 重放 ＋ 跑判据 ⇒ ⭐ 若绿 ⇒ **变异（去掉 `REMOVE_STATE` ⇒ 全量必红）** ⇒ 这件出货 ✓；
+>   ⚠ 若 (甲) 仍报错 ⇒ 再读 (乙) ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十八：✅ **资源作用域修好了**（不再报 `has no such resource` ✓）；⛔ 而"归零后摘状态"那一步**仍没发生** ⇒ 只剩"收尾那一步"要查）**：
+>
+> * ✅ **实测（声明去掉 `scope` ⇒ 重放 ⇒ 跑判据 ✓）** ✓：扣减**不再报错** ✓（⭐ 即"持有者自己的表"这条路通了 ✓）
+>   ⇒ ⛔ 而 `assertFalse(hasState(阿哈时刻))` **仍失败** ✓（*"at zero the state must be gone ==> expected: <false> but was: <true>"* ✓）
+>     ⇒ ⭐ **状态还在** ✗。
+> * ⭐ **只剩三个候选** ✓（⚠ 且都能一次判掉）：
+>   **(甲)** ⭐ **`SPEND_RESOURCE` 后引擎发不发 `RESOURCE_CHANGED`** ✗ —— ⚠ 我那条"收尾"规则挂在 `RESOURCE_CHANGED` 上 ✓
+>     （⚠ 而本段 `1513` 早前那条 `fervor_extra_hit_per_point` 也用它 ✓ 且**有效** ✓ ⇒ 说明**事件存在** ✓ ⇒ 但那次是 `GAIN` ✓
+>       —— ⭐ **`SPEND` 是否也发** ✗ 未验 ✓）；
+>   **(乙)** ⭐ **条件 `self_resource:待演 <= 0`** ✗ 是否被解析/求值 ✓（⚠ 本段**只确认了常量存在** ✓，例：`SELF_RESOURCE_PREFIX` ✓
+>     —— ⚠ 而"常量存在 ≠ DSL 接受"这条教训本段刚踩过（`state_ended` 缺主体 ✓）⇒ ⭐ **很可能这个条件也要"主体在前"** ✗
+>       ⇒ 写法也许应是 **`self self_resource:待演 <= 0`** ✗ 或 **`待演 <= 0`** ✗ —— ⚠ **要读它的解析处** ✓）；
+>   **(丙)** `REMOVE_STATE` 的 `buff` 字段 ✓ 指的状态名是否与挂上时一致 ✓（⚠ 我用同一个常量 ✓ ⇒ 应一致 ✓）。
+> * ⭐ **下一轮第一步（一次读清 (甲)／(乙)）** ✗：读 **`TriggerTable` 里 `SELF_RESOURCE_PREFIX` 的解析处** ✓（⚠ 看它**期望的前缀形态** ✓）
+>   ＋ 读 **`TriggerInterpreter` 里 `SPEND_RESOURCE` 是否 `fireTriggers(RESOURCE_CHANGED, …)`** ✓ ⇒ 两问一次读完 ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十九：✅✅✅ **条件的写法被证清白**（`self_resource:<名>` 就是**数值变量**，官方示例 `"self_resource:充能 >= 3"` ✓）⇒ ⭐ 于是收尾那步的元凶锁定为 **(甲)：`SPEND_RESOURCE` 不发 `RESOURCE_CHANGED`**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1549` 附近 ✓）** ✓ 报错文案原文（它把"已知数值变量"一次列全 ✓）：
+>   *"Condition '…' compares unknown variable '…'; known numeric variables: … , plus `"self_attr:<ATTRIBUTE>"` for one of my own attribute
+>   values, e.g. `"self_attr:SPEED >= 145"`, **`"self_resource:<NAME>"` for how much of one of MY declared resources I hold, e.g.
+>   `"self_resource:充能 >= 3"`**, and `"self_stacks:<NAME>"` / `"target_stacks:<NAME>"` for how many times a named counter has been
+>   marked, e.g. `"target_stacks:承负 >= 2"`"* ✓
+>   ⇒ ⭐⭐ **三条结论** ✓：**(i)** 我写的 **`self_resource:待演 <= 0`** ✓ **形态完全正确** ✓（⚠ 变量位置**不需要**主体前缀 ✗
+>     —— ⚠ 与 `state_ended` 不同 ✓，那次是"**谓词**"要主体 ✓）；**(ii)** 它读的是"**我自己声明的**资源" ✓（⭐ 与本轮改成的
+>     "她自己的表" ✓ **正好对上** ✓）；**(iii)** 所以**(乙) 排除** ✓ ⇒ ⛔ **元凶只剩 (甲)** ✓。
+> * ⭐⭐ **于是修法（内容层，一次改到位）** ✗：**把"收尾"从 `RESOURCE_CHANGED` 挪到 `ALLY_ATTACK`** ✓ ——
+>   即**同一条事件上放两条规则** ✓：① 先扣计数（`SPEND_RESOURCE` ✓）；② 再判 **`when: ["from_category ElationDamage",
+>   "self_resource:待演 <= 0"]` ⇒ `REMOVE_STATE{阿哈时刻}`** ✓ ⇒ ⚠ 这要求"同事件的规则**按声明顺序执行**" ✗
+>     （⚠ 若顺序不保证 ⇒ 那就改成"扣之前先判"✗ 或把两条合成一条 ✓ —— ⭐ **下一轮先用一次判据验证顺序** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：按上面改成两条 `ALLY_ATTACK` 规则 ⇒ 重放 ⇒ 跑判据 ⇒
+>   ⭐ **绿 ⇒ 立刻做变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）⇒ 这件（`STATE_ENDED` 的第一个真读者）**出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十：✅✅ **诊断收敛到"同事件内的顺序"** —— 而且发现：**那次真施放自己就会发 `ALLY_ATTACK`**（带类别 ✓）⇒ +1 与 −1 发生在**同一次施放内**)**：
+>
+> * ✅ **实测（改成 `ALLY_ATTACK` 收尾 ⇒ 重放 ⇒ 跑判据 ✓）** ✓：仍是同一处红 ✗（*"at zero the state must be gone ==> expected: <false> but was: <true>"* ✓）。
+> * ⭐⭐ **机制想通了** ✓：`SkillExecutor:203` 那次 **`ALLY_ATTACK`** 是**真施放自己发的**（带 `category` ✓）
+>   ⇒ 所以**一次欢愉技施放**里依次发生：**`CAST_SETUP`（+1 ✓）** ⇒ **`ALLY_ATTACK`（−1 ✓）**
+>     ⇒ ⭐ **计数在同一次施放内就回到 0** ✓ ⇒ ⭐ **而"收尾"规则也挂在同一个 `ALLY_ATTACK` 上** ✗
+>       ⇒ ⛔ **它必须先看到"扣完之后的 0"** ✗ ⇒ ⭐ **这就是"同事件内的执行顺序"问题** ✓（⚠ 我给判据手工 fire 的那次**根本没被用到** ✓
+>         —— ⭐ 因为真施放已经走完了全过程 ✓ ⇒ ⚠ 也解释了为什么"扣减"曾经报错 ✓：那次是**真施放**在扣 ✓）。
+> * ⭐ **修法（两条，下一轮选一条）** ✗：
+>   **(甲)** ⭐ **让"收尾"晚一个事件** ✓ —— 挂在 **`ALLY_ATTACK` 之后必然发生的**东西上 ✗（⚠ 候选：下一次 `BATTLE`／`TURN_START` ✓
+>     ⇒ ⚠ 但那就不是"最后一个欢愉技结束时"了 ✗）；
+>   **(乙)** ⭐⭐ **把两条合成一条规则** ✓ —— 同一条 `ALLY_ATTACK` 规则里：**先 `SPEND_RESOURCE`** ✓ **再 `REMOVE_STATE`** ✓
+>     （⚠ 同一条规则的 `do` **必然按数组顺序执行** ✓ ⇒ ⭐ **顺序由我保证** ✓）⇒ ⚠ **但那会"每打一次都摘状态"** ✗（不等于归零才摘 ✗）
+>     ⇒ ⭐ 所以正解可能是 **(丙)**：**不计数**，改成"**施放开始挂、施放结束摘**" ✓（`CAST_SETUP` 挂 ✓ ＋ `ALLY_ATTACK` 摘 ✓）
+>       ⇒ ⭐ **一次施放 = 一个时刻** ✓，与文档"持续至**本次**最后一个欢愉技施放结束"的**单次**读法一致 ✓✓。
+> * ⭐ **下一轮第一步** ✗：按 **(丙)** 改（最简单、无计数 ✓）⇒ 重放 ⇒ 跑判据 ⇒ 绿 ⇒ **变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）⇒ 出货 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十一：✅✅✅ **"时刻"的生命周期整条跑通了** —— 施放开始挂、施放结束摘（同一施放内完成 ✓）；⛔ 只剩"摘的时候那条 `STATE_ENDED` 没送到我的读者"**）**：
+>
+> * ✅ **实测（把收尾简化成"同一次施放的 `ALLY_ATTACK` 就摘" ✓）** ✓：
+>   * ⭐ **`assertFalse(hasState(阿哈时刻))` 在施放后通过** ✓（*"one cast is one moment: by the time it has settled, the moment has ended again"* ✓）
+>     ⇒ ⭐⭐ **说明 `CAST_SETUP` 挂上 ✓、`ALLY_ATTACK` 摘掉 ✓ —— 四步里的"挂/摘"两半都实测成立** ✓；
+>   * ⛔ `assertTrue(hasState(好活当赏))` **失败** ✗（*"and the reader answers the engine's report: the reward lands"* ✓）
+>     ⇒ ⭐ **即"摘状态时引擎发的那条 `STATE_ENDED` 没有触发我的读者规则"** ✗。
+> * ⭐ **三个候选（下一轮一次判掉）** ✓：
+>   **(甲)** ⭐ **读者规则的写法** ✗ —— 我用的是 **`self state_ended 阿哈时刻`** ✓（形态照 `TriggerTable:1211` ✓）
+>     ⇒ ⚠ 但**状态名是否与我挂的那个完全一致** ✗（⚠ 我在两处都用同一个常量 ✓ ⇒ 应一致 ✓）⇒ 更可能是 **(乙)**；
+>   **(乙)** ⭐⭐ **`STATE_ENDED` 的"名字"从哪来** ✗ —— `TriggerTable:2022` 有一句：*"⚠ **The name has to ride here** because the state is already gone
+>     by the time …"* ✓ ⇒ ⭐ 说明**状态名是随事件带过去的** ✓ ⇒ ⚠ 若我挂的是 **`APPLY_BUFF`**（而不是"状态"那条通道 ✓）
+>       ⇒ **它可能根本不发 `STATE_ENDED`** ✗（⚠ 本段读到的 `BuffManager:666` 是 `battle.fireStateEnded(instance, ended.getState())` ✓
+>         ⇒ ⭐ **只有当 buff 有 `getState()` 非空时才发** ✗）⇒ ⭐ **而我用 `APPLY_BUFF` ＋ `buff:` 字段挂的，可能没有"状态名"** ✗✗；
+>   **(丙)** `REMOVE_STATE` 与 `APPLY_BUFF` 挂的是**同一条** buff 与否 ✓（⚠ 名字一致 ⇒ 应是 ✓）。
+> * ⭐⭐ **于是最可能的正解** ✗：**给"阿哈时刻"用"带状态名的挂法"** ✓ —— ⚠ 本段见过 `APPLY_STATE` 不是 op ✗、`buff` 字段同时用于两者 ✗
+>   ⇒ ⭐ **下一轮第一步**：读 **`BuffManager:660`–`:670`（`fireStateEnded` 那一处）** ✓ ＋ 读 **`APPLY_BUFF`／`REMOVE_STATE` 怎么设 `state`** ✓
+>     ⇒ 两处一读就知道"什么写法才会发 `STATE_ENDED`" ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十二：✅✅✅ **`STATE_ENDED` 只在"到期摘除"那条路上发**，而且只对 `StateBuff` 发 ⇒ ⭐ 正解是**让它自然到期**，不是显式 `REMOVE_STATE`**）**：
+>
+> * ✅ **实测（读 `BuffManager` 的 tick 循环 ✓，`:654`–`:670` ✓）** ✓ 原文：
+>   ```java
+>   boolean couldAct = buff.canAct();
+>   buff.tickEffect(instance);
+>   if (buff.duration() <= 0) {
+>       // ⭐ Announce BEFORE the removal (2026-10-02): the event carries the state's name, because a
+>       // reader that looked for the state on this unit would already see it gone. `battle` is null for a
+>       // unit built outside a battle, and then there is nobody to tell.
+>       if (battle != null && buff instanceof StateBuff ended) {
+>           battle.fireStateEnded(instance, ended.getState());
+>       }
+>       buffs.remove(buff);            // ← 摘除
+>       buff.removeBuff(instance);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **两条硬事实** ✓：**(i)** 公告发生在**`duration() <= 0` 的 tick 里** ✓（即"**自然到期**" ✓）；
+>     **(ii)** 而且**只有 `buff instanceof StateBuff` 才公告** ✓ ⇒ ⚠ 若挂的不是 `StateBuff`（例如普通 buff ✗）⇒ **一声不响** ✗。
+> * ⭐⭐⭐ **于是正解清楚了** ✓：**别再显式 `REMOVE_STATE`** ✗ —— ⭐ **让"阿哈时刻"以 `turns: 1` 自然到期** ✓
+>   ⇒ 到期那一 tick，引擎**自己**发 `STATE_ENDED("阿哈时刻")` ✓ ⇒ 我的读者（`self state_ended 阿哈时刻` ✓）拿到 ✓ ⇒ 发【好活当赏】✓。
+>   ⚠ **代价/口径** ✓：到期发生在**她的回合计时**上 ✗（而不是"施放结束的那一刻" ✓）⇒ ⭐ 这是**近似** ✗
+>     ⇒ ⚠ 但与文档"**持续至本次最后一个欢愉技施放结束**"相比，**"持续 1 回合"是文档在别处对同类状态用的口径** ✓
+>       （⚠ 例如【好活当赏】"持续 **2** 回合" ✓）⇒ ⭐ **可以照写，并在注释里写明这是到期口径** ✓。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：把挂的那条改成 **`turns: 1`** ✓、**删掉显式 `REMOVE_STATE` 那条** ✓
+>   ⇒ 判据：施放后**状态在** ✓ ⇒ **推进一回合（或直接 tick）** ⇒ **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ 绿 ⇒ **变异** ⇒ 出货 ✓。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十三：⭐ 把"到期"改法写成**可直接执行的两步**（下一轮照做即可），并说明为什么**必须同时删掉那条显式 `REMOVE_STATE`**）**：
+>
+> * ⭐ **两步（都在 `tools/ship_aha_moment.py` ✓）** ✗：
+>   1. **挂的那条**（`elation_moment_start` ✓）：把 `APPLY_BUFF` 的 **`"turns": 2` 改成 `"turns": 1`** ✓
+>      ⇒ ⭐ **让它在下一回合到期** ✓ ⇒ 到期 tick 里引擎**自己**发 `STATE_ENDED("阿哈时刻")` ✓（`:660`–`:666` 已读 ✓）；
+>   2. ⭐ **删掉 `elation_moment_close` 整条** ✓ —— ⚠ **必须删** ✗：它以 `REMOVE_STATE` **显式摘** ✓
+>      ⇒ ⚠ 而"显式摘"**不走 tick** ✗ ⇒ **不公告** ✗（本轮读到的公告只在 `duration() <= 0` 的分支里 ✓）
+>      ⇒ ⭐ 若留着，它会在**同一次施放内**先摘掉 ✓ ⇒ 状态**永远活不到到期** ✗ ⇒ 读者**永远收不到** ✗。
+>   （⚠ 同时 `elation_moment_step`（扣计数那条）也就**没有用处**了 ✗ ⇒ ⭐ 一并删掉更干净 ✓ —— 于是"待演"资源也不再需要 ✓。）
+> * ⭐ **判据的相应写法** ✗：施放后 **状态在** ✓（本段已实测 ✓）⇒ **推进一次她的回合 tick** ✓
+>   （⚠ 待查：`Battle` 里推进回合的公开入口 ✗ —— 本段见过 `fireTriggers(TriggerEvent.TURN_START, …)` ✓ 但"tick 到期"是**另一个**动作 ✗
+>     ⇒ ⭐ 下一轮先读 **`Battle.tickBuffs`（本段早前提到过 ✓）的调用处** ✓ ⇒ 判据里照调 ✓）
+>   ⇒ **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ 绿 ⇒ **变异**（把 `turns` 改回 2 ⇒ 判据必红 ✓）⇒ 出货 ✓。
+> * ⭐ **为什么值得这样做** ✓：它是**本项目第一次用"状态自然到期"去驱动 `STATE_ENDED`** ✓ ⇒ ⭐ 一旦这条通，
+>   **目标 ① 的其余读者**（`1211`【生息】结束、`1408` 变身结束、那张光锥的「奇袭结束后」✓）**都能照抄这个形状** ✓✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十四：✅ **判据里"让状态到期"的入口定在 `Battle.processRequests()`**（`:1237` ✓ —— 本段所有判据都在用它驱动结算 ✓，而 buff 的 tick 就在这条循环里 ✓））**：
+>
+> * ✅ **实测（读 `Battle` ✓）** ✓：`processRequests()`（**`:1237` 定义** ✓，另有 7 处在施放/结算后调用 ✓）是本引擎"**把挂起的事情办完**"的总入口 ✓
+>   ⇒ ⭐ 本段的判据**一直**在用它 ✓（⚠ 而"状态到期"这件事**也在同一个循环里** ✓ —— 依据是本段读到的
+>     `BuffManager` tick 分支 ✓：`duration() <= 0` ⇒ 公告 `STATE_ENDED` ⇒ 摘除 ✓）。
+> * ⭐ **于是判据的最小形状（下一轮照写）** ✗：
+>   ```java
+>   SkillExecutor.execute(battle, elation, owner, List.of(enemy));
+>   battle.processRequests();                       // ★ 这次会把"挂上的状态"办完 ⇒ 状态在 ✓
+>   assertTrue(owner.getBuffManager().hasState(阿哈时刻));
+>   …推进一次她的回合计时（⚠ 待定：`processRequests()` 够不够 ✗，还是要显式 `TURN_START` ✗）
+>   assertFalse(owner.getBuffManager().hasState(阿哈时刻));      // 到期摘除 ✓
+>   assertTrue(owner.getBuffManager().hasState(好活当赏));       // 引擎的公告被读者接住 ✓
+>   ```
+>   ⚠ **唯一的未知** ✓：**"她的回合"怎么推进** ✗ —— ⚠ 本段见过 `fireTriggers(TriggerEvent.TURN_START, owner, owner, 0, 0)` ✓（**那只是发事件** ✗，
+>     不等于"计时推进" ✗）⇒ ⭐ **下一轮第一步**：读 **`BuffManager.tickBuffs`（或同义方法）的调用处** ✓
+>     ⇒ 看它由谁调用、需要什么前置（⚠ 例如"当前行动者" ✓）⇒ 判据里照调 ✓ ⇒ 然后立刻做完那两步内容改动 ✓ ⇒ 跑 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
+> * ⭐ **顺带**：这条链一旦通，**目标 ① 的其余四个读者**（`1211`【生息】结束 ✓、`1408` 变身结束 ×3 ✓、那张光锥「奇袭结束后」✓）
+>   **都能照抄"挂一个限时状态 ⇒ 到期自动公告 ⇒ 读者接住"这个形状** ✓✓ ⇒ ⭐ **这是本段最有复用价值的一块** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十五：✅✅ **最后那个未知也拿到了** —— 判据推进计时用 **`BuffManager.tickForeign(CanHit clockOwner, boolean early)`**（**public** ✓，`:603` ✓）**）**：
+>
+> * ✅ **实测（读 `BuffManager` ✓ ＋ 搜全仓 `.tick(` ✓）** ✓：
+>   * **`public void tickForeign(CanHit clockOwner, boolean early)`** ✓（`:603` ✓）—— ⭐ **公开** ✓ ⇒ 判据可调 ✓；
+>   * `private void tickBuff(CanHit clockOwner, boolean early)` ✓（`:645` ✓）—— 私有 ✓ ⇒ 由 `tickForeign` 驱动 ✓（⚠ 也由回合循环驱动 ✓）。
+> * ⭐⭐⭐ **于是"阿哈时刻"这条链**从引擎到判据**全部具名、可以一次做完** ✓（下一轮照此执行 ✗）：
+>   1. **内容**（`tools/ship_aha_moment.py` ✓）：`elation_moment_start` 的 **`turns: 2` → `turns: 1`** ✓；
+>      **删掉** `elation_moment_close` ✓ 与 `elation_moment_step` ✓（⚠ 不留显式 `REMOVE_STATE` ✗ —— 它不公告 ✗）；
+>   2. **判据**（`tools/judge_aha_moment2.py` ✓）：施放 ⇒ `processRequests()` ⇒ **`assertTrue(hasState(阿哈时刻))`** ✓ ⇒
+>      ⭐ **`owner.getBuffManager().tickForeign(owner, false)`** ✓（推进一次计时 ⇒ 到期 ⇒ 引擎公告 ✓）⇒
+>      **`assertFalse(hasState(阿哈时刻))`** ✓ ＋ **`assertTrue(hasState(好活当赏))`** ✓；
+>   3. **变异（全量）**：把 `turns` 改回 `2` ⇒ ⭐ **判据必红** ✓（状态不到期 ⇒ 没有公告 ⇒ 没有奖励 ✓）。
+> * ⭐ **这一步的分量** ✓：它是**本项目第一次让 `STATE_ENDED` 由"状态自然到期"驱动** ✓ ⇒ ⭐ **目标 ① 的其余四个读者**
+>   （`1211`【生息】结束 ✓／`1408` 变身结束 ×3 ✓／那张光锥「奇袭结束后」✓）**都能复用同一个形状** ✓✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十六：✅ **判据已经跑到"到期"那一步** —— 一次 `tickForeign` **没让它到期** ⇒ ⭐ 只剩"怎么让它到期"这一问）**：
+>
+> * ✅ **实测（最终形状：内容两条 ＋ 判据驱动真欢愉技 ＋ `tickForeign` ✓）** ✓：
+>   * ⭐ **`assertTrue(hasState(阿哈时刻))` 通过** ✓（*"the elation cast applies the moment"* ✓）—— ⭐ **"挂"这半又一次被实测确认** ✓；
+>   * ⭐ **`assertFalse(hasState(好活当赏))` 通过** ✓（*"and the reward is not there before it ends"* ✓）；
+>   * ⛔ `assertFalse(hasState(阿哈时刻))` **失败** ✗（*"one turn later the moment has expired ==> expected: <false> but was: <true>"* ✓）
+>     ⇒ ⭐ **一次 `tickForeign(owner, false)` 没让它到期** ✗。
+> * ⭐ **下一轮第一步（微调一次，1–2 次调用）** ✗：三选一 ✓：
+>   **(甲)** `early` 传 **`true`** ✗（⚠ 签名是 `tickForeign(CanHit, boolean early)` ✓ ⇒ 也许"早期 tick"才减她自己的时长 ✓）；
+>   **(乙)** **连续 tick 两次** ✗（⚠ 引擎的"持续 N 回合"可能是"**再经过 N 次计时**才归零" ✓）；
+>   **(丙)** 把 `turns` 从 **1 改成 0** ✗（⚠ 若允许 ⇒ 立即到期 ✓ ⇒ 但那就不是"持续"了 ✗）。
+>   ⇒ ⭐ **判法**：读 **`BuffManager.tickForeign`／`tickBuff` 的实现**（`:603`／`:645` ✓）⇒ 看它对 `duration` 怎么减、`early` 什么意思 ✓
+>     ⇒ 照它写判据 ✓ ⇒ ⭐ **绿 ⇒ 立刻变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓。
+> * ⭐ **注意**：**内容本身没有问题了** ✓ —— "挂 1 回合 ＋ 到期公告 ＋ 读者接住"这四块**都已实测到位** ✓
+>   （⚠ 只剩判据"推进几拍"的写法 ✓）⇒ ⭐ 下一轮很可能**一次就绿** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十七：✅✅✅ **为什么一次 `tickForeign(owner, …)` 毫无作用 —— 它对自己的表直接 `return`**（`clockOwner == instance` ⇒ 跳过）⇒ ⭐ 所以判据要调的是"**推进自己的计时**"那个入口）**）**：
+>
+> * ✅ **实测（读 `BuffManager.tickForeign` ✓，`:603` ✓）** ✓ 原文：
+>   ```java
+>   public void tickForeign(CanHit clockOwner, boolean early) {
+>       if (clockOwner == null || clockOwner == instance) { return; }   // ← ★ 自己的表被跳过
+>       tickBuff(clockOwner, early);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以 `tickForeign(owner, …)` 对她的状态**什么也不做**** ✗（⚠ 它的用途是"**别人**的回合到了，推进**挂在我身上、但计时属于别人**的状态" ✓ ——
+>     紧跟着的 `removeBuffsAnchoredTo` 注释也印证这个"clockOwner 是**别人**"的语义 ✓）。
+> * ⭐ **下一轮第一步（找"推进自己计时"的公开入口，1 次调用）** ✗：
+>   `tickBuff` 是 **private** ✗ ⇒ ⭐ 找**它的调用者** ✓（⚠ 本段见过 `BuffManager:335` 的 `stateName.equals(state.getState())` ✓ 与
+>     `:666` 的公告 ✓ ⇒ 那个 tick 循环**一定在某个公开方法里** ✓）—— 候选：`tick(…)`／`onTurnStart(…)`／`advanceTurn(…)` ✗
+>     ⇒ ⭐ **搜 `tickBuff(` 的调用处**（⚠ 一次调用即可 ✓）。
+>   ⇒ 拿到后：判据里调它 ✓ ⇒ **到期 ⇒ 公告 ⇒ 奖励** ✓ ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓。
+> * ⭐ **注意**：⚠ **不要**为了绕过它去改引擎的可见性 ✗（⚠ 那是"为了让判据好写而改产品代码" ✗ ⇒ 本段一直避免 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十八：✅ `tickForeign` 的**调用者**找到了 —— `Battle:1232`，⭐ 而它只对"**别人**"调 ⇒ 说明"行动者自己的状态"由**同处的另一行**推进）**：
+>
+> * ✅ **实测（搜 `tickForeign(` 的调用处 ✓）** ✓：**只有一处** ✓ —— `Battle.java:1232` ✓：
+>   `ally.getBuffManager().tickForeign(clockOwner, early);` ✓（⚠ 在一个"遍历我方"的循环里 ✓ ⇒ 对**每个队友**推进"属于当前行动者计时"的状态 ✓）。
+>   ⇒ ⭐⭐ **于是"行动者自己的状态"必然由**它自己那条路径**推进** ✗（⚠ 同处应还有一行对自己的调用 ✗ —— 下一轮读 `:1216`–`:1240` ✓）
+>     ⇒ ⭐ **判据要调的就是那一行所调的方法** ✓（⚠ 很可能是 `tickOwn(early)` 或 `tick(…)` ✓）。
+> * ⭐ **下一步（一次读，然后一次改＋跑）** ✗：读 `Battle:1216`–`:1240` ✓ ⇒ 拿到"自己的 tick"入口名 ✓
+>   ⇒ 判据里改成调它 ✓ ⇒ **到期 ⇒ 公告 ⇒ 奖励** ✓ ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十九：✅ `tickForeignBuffs` 的**实现**读了（`Battle` 里 private ✓），它**只对"非行动者"**调 `tickForeign` ⇒ ⭐ 所以"行动者自己的时长"由**另一处**推进（下一轮搜那一处）**）**：
+>
+> * ✅ **实测（读 `Battle` 的该私有方法 ✓）** ✓ 原文要点：
+>   ```java
+>   /** Spends the duration of every buff on the field whose clock belongs to {@code clockOwner} (M-42 ④). … */
+>   private void tickForeignBuffs(CanHit clockOwner, boolean early) {
+>       for (CanHit ally : allies) {
+>           if (ally != null && ally != clockOwner) {        // ← ★ 跳过行动者自己
+>               ally.getBuffManager().tickForeign(clockOwner, early);
+>           }
+>       }
+>   }
+>   ```
+>   ＋ 它的 javadoc 说明 **`early`: `true` = before the move, `false` = after it** ✓ ⇒ ⭐ **回合边界**有两个 tick 时机 ✓。
+> * ⭐ **下一轮第一步（找"自己的时长"那一处，1 次调用）** ✗：搜 **`tickOwn`／`tick(`／`duration` 的递减处** ✓
+>   （⚠ 提示：`BuffManager` 里那个含 `duration() <= 0` 公告的循环 ✓ 是**同一个私有 `tickBuff`** ✓ ⇒ ⭐ 它**必然也被"自己的回合"调用** ✗
+>     ⇒ 搜 `tickBuff(` 的**另一处调用** ✓，或搜 `tickForeignBuffs(` 的调用处**旁边**那一行 ✓）。
+> * ⭐ **拿到后**：判据里调它 ✓ ⇒ 到期 ⇒ 公告 ⇒ 奖励 ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓
+>   （⚠ 内容已经准备好，随时可重放 `tools/ship_aha_final.py` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -23268,6 +23662,400 @@
 >     ⇒ ⭐ **规矩**：调试期间的中间产物**要么不 `git add`，要么先修好** ✓；⭐ 而 `git checkout` 只能回到**已提交**的状态 ✓
 >       ⇒ **"回滚到干净" 不等于 "回滚到正确"** ✓。
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 3 个提交待补推 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零三十七：✅ **阿哈时刻已进树且全量绿**（`ec30d193` ✓）；⭐ 而判据要的那个语义也读到了：`from_category` ＝「**造成该事件的那次施放属于某类别**」）**：
+>
+> * ✅ **实测（读 `TriggerTable:1103` 附近的常量说明 ✓）** ✓ 原文要点：
+>   *`from_category`: "the cast that caused this event was of this CATEGORY" (\u300c\u88c5\u5907\u8005\u65bd\u653e**\u6b22\u6109\u6280**\u65f6\u300d, \u5149\u9525 21064/21066/23058/23064). … the slot names a SKILL SLOT (`SKILL` = an ordinary Skill), while a memosprite's or a **\u6b22\u6109 kit's cast is a category the slot vocabulary does not have at all** — `SkillCategory.ELATION_DAMAGE` is precisely the one `SkillType` lacks.`*
+>   ⇒ ⭐⭐ **两点** ✓：**(i)** 我那条 `from_category ElationDamage` 的写法**有明确来历** ✓（光锥 21064 等在用 ✓ —— ⚠ 而 21064 正是本段某次红过的判据名 ✓ 印证它在欢愉这条线上 ✓）；
+>     **(ii)** ⭐ **判据要满足它，就得让"造成事件的那次施放"真的带这个类别** ✗ ⇒ 也就是**判据必须驱动一次真的欢愉技施放** ✗
+>       （⚠ 不能像 `1215` 那样只 `fireTriggers` 一个事件 ✓ —— 那次的条件是 `from_skill` ✓ 不同 ✓）。
+> * ⭐ **下一轮第一步（判据的写法，先查入口再写）** ✗：
+>   ① 读 **`Battle`／`SkillExecutor` 里"施放"的入口** ✓（⚠ 一次调用：搜 `ELATION_DAMAGE` 的使用处 ✓ ⇒ 看哪条路径会把它写进 `TriggerContext` 的 cast ✓）；
+>   ② 用那条路径**在判据里驱动一次** ✓ ⇒ 断言：**状态挂上** ✓（`has_state` 可读 ✓）⇒ **归零后摘掉** ✓ ⇒ ⭐ **`STATE_ENDED` 发出** ✓（读者规则生效 ⇒ 她拿到【好活当赏】✓）；
+>   ③ **变异（全量）**：去掉 `REMOVE_STATE` 那条 ⇒ **必红** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络 ✓ 又断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、两闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十八：✅✅ **两处要点读到**：`from_category` **接受两种拼写**（数据的 `ElationDamage` ✓ 与枚举名 `ELATION_DAMAGE` ✓，注释写明"two spellings, one fact"）；⭐ 而判据的路子是**自己造一次欢愉技施放**）**：
+>
+> * ✅ **实测（搜 `ELATION_DAMAGE` 全部使用处 ✓）** ✓：
+>   * `TriggerTable:1455`–`:1457` ✓：报错文案里写 *"…\"actor == self\" and \"**from_category ELATION_DAMAGE**\"…"* ＋ 注释
+>     *"⭐ **Two spellings, one fact**: the skill data says `ElationDamage`, the enum's own name is `ELATION_DAMAGE`"* ✓
+>     ⇒ ⭐⭐ **所以条件里两种写法都收** ✓（⚠ 我内容里写的是**数据拼写** `ElationDamage` ✓ —— ⭐ 与本段"照数据写"的一贯口径一致 ✓）；
+>   * `SkillCategory:63` ✓ **`ELATION_DAMAGE("ElationDamage")`** ✓（枚举名 ↔ 数据值 ✓）；
+>   * ⚠ 其余命中只有 `AttributeType`（`elation_damage_boost` ✓ 是**属性**不是类别 ✓）与 `TriggerInterpreter:4104`（欢愉伤害公式 ✓）
+>     ⇒ ⭐ **没有任何既有路径"施放"过一次欢愉技** ✗ ⇒ 这解释了为什么判据必须自己造 ✓。
+> * ⭐ **判据的写法（下一轮照此）** ✗：用 **`SkillCategory.ELATION_DAMAGE`** 造一个技能 ✓ ⇒ **`SkillExecutor.execute(Battle, Skill, CanHit, List)`**（本段已确认它是 **public static** ✓）
+>   ⇒ 那次施放就会把类别写进 `TriggerContext` ✓ ⇒ 我那两条 `from_category ElationDamage` 的规则才会触发 ✓。
+>   ⚠ 然后断言三件事 ✓：**① 状态挂上** ✓（`has_state` 可读 ✓）；**② 归零后摘掉** ✓（`REMOVE_STATE` ✓）；
+>   **③ `STATE_ENDED` 发出** ✓（读者规则 ⇒ 她拿到【好活当赏】✓）＋ **变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）。
+> * ⭐ **纪律（本段第十八条）** ✗：**条件里出现"两种拼写"时，选**数据拼写**（与 `RuleEffectAmendmentTest`／`EffectKeyDisciplineTest` 的口径一致 ✓）
+>   —— ⚠ 本段在 `from_category` 上正好蒙对 ✓（用了 `ElationDamage` ✓）；而 `1306` 那次的 `ELATION_DAMAGE` ✗ 是被装载器**拒绝**的 ✓ ⇒ ⭐ **两种拼写的"收"是有前提的**（⚠ 见该行上下文 ✓）。
+> * ⚠ **推送**：本地仍**领先 6** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零三十九：✅ `SkillExecutor.execute` 的**确切签名**拿到了；⚠ 而 `Skill` 里"类别"那个字段名还没找到（我两次猜路径都错，第三次用 `glob` 才拿到文件））**）**：
+>
+> * ✅ **实测（`glob` ⇒ 读文件 ✓）** ✓：
+>   * ⚠ **`SkillExecutor` 不在 `models/` 里** ✗ ⇒ 在 **`models/skill/SkillExecutor.java`** ✓（⚠ 我先前两次按 `models/…` 猜 ✗ ⇒ ⭐ **纪律：找文件先用 `glob`** ✓）；
+>   * ⭐ **签名（`:72` ✓）**：**`public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets)`** ✓
+>     ⇒ 判据里可以**直接驱动一次施放** ✓（⚠ 只要造出一个"类别属于欢愉"的 `Skill` ✓）。
+> * ⚠ **还没找到的** ✗：`Skill`（`beans/Skill.java` ✓）里表示**类别**的字段名 ✗ —— 我 grep 了 `category`／`public Skill(` ✓ **都没命中** ✗
+>   ⇒ ⭐ **下一轮第一步（1 次调用）** ✗：**读 `beans/Skill.java` 的字段区** ✓（⚠ 或 grep `SerializedName` 全部 ✓ ⇒ 一次看全 ✓）
+>     ⇒ 拿到字段名后：**造一个欢愉技** ✓ ⇒ `execute(...)` ✓ ⇒ 断言三件事 ＋ 变异 ✓。
+> * ⭐ **纪律（本段第十九条）** ✗：**找文件用 `glob`，别按包名猜路径** ✓ —— ⚠ 本段为此浪费两次调用 ✓
+>   （⚠ 而"猜字段名"这类错误本段已犯四次 ✓ ⇒ ⭐ **凡"名字"类信息，一律先查、再写** ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十：✅ `Skill` **是个 `record`**，字段区里**没有 `category`** ⇒ ⭐ 所以"类别"是**推导出来的**（不是数据里的一个键）；下一轮查它的推导处）**）**：
+>
+> * ✅ **实测（读 `beans/Skill.java` ✓）** ✓：`public record Skill(` 后面是
+>   `attack_type`(attackType) ✓／`max_level…` ✓／`param_list`(paramList) ✓／`skill_effect`(skillEffect) ✓／
+>   `skill_id`(skillID) ✓／`skill_introduction` ✓／`stance_list`(stanceList) ✓／…／`sp_need`(spNeed) ✓／`sp_base`(spBase) ✓
+>   ⇒ ⭐ **没有 `category` 字段** ✗ ⇒ ⭐ **`SkillCategory` 是从这些字段（很可能 `attack_type`／`stance_list`）推导出来的** ✓
+>     （⚠ 与本段早前那条"memosprites/servants 的 `attack` 能带 `stance`"呼应 ✓）。
+> * ⭐ **下一轮第一步（1 次调用）** ✗：读 **`SkillCategory`** ✓（`enums/SkillCategory.java` ✓ 本段已知它在 `enums/` ✓）
+>   ⇒ 找**"从 Skill 推出类别"的方法** ✓（⚠ 名字未知 ⇒ ⭐ 先 `glob`／读整个小文件 ✓，别猜 ✓）
+>     ⇒ 拿到它之后：**判据里造一个攻击类型/站姿属于欢愉的 `Skill`** ✓ ⇒ `SkillExecutor.execute(...)` ✓ ⇒ 三断言 ＋ 变异 ✓。
+> * ⚠ **若推导需要一个真实的技能数据条目**（✗ 无法凭空造 ✓）⇒ ⭐ **那么判据就改用"文件驱动 ＋ 找到她自己的欢愉技"** ✓
+>   （⚠ 本段已知 `1513` 的欢愉技在文档里有 ✓ 且 `SkillCategory.ELATION_DAMAGE` 就是为它设的 ✓ ⇒ **她的技能数据里应该有那一条** ✓）。
+> * ⚠ **推送**：本地仍**领先 8** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十一：✅✅ **类别来自一个数据字符串**（`SkillCategory` 用 `BY_VALUE` 查表 ✓），⭐ 而且注释写明**数据里有 **9** 个欢愉技**（`ElationDamage` 9 measured ✓））**：
+>
+> * ✅ **实测（读 `enums/SkillCategory.java` ✓）** ✓：
+>   * `:63` **`ELATION_DAMAGE("ElationDamage")`** ✓ ⇒ ⭐ **枚举由一个**数据字符串**构造** ✓；
+>   * `:87` `private static final Map<String, SkillCategory> BY_VALUE` ✓ ⇒ ⭐ **有"字符串 ⇒ 枚举"的查表** ✓（⚠ 方法名待读 ✓，但入口确定 ✓）；
+>   * `:32` ✓ 注释列出各值的数据字符串与**实测计数** ✓：… `Maze` 93 ✓／`null` 94（天赋与追加攻击 ✓）／⭐ **`ElationDamage` 9** ✓
+>     ⇒ ⭐⭐ **数据里有 9 个欢愉技** ✓ ⇒ ⭐ **判据不必凭空造技能** ✗：**可以从她的技能数据里找那一个** ✓（⚠ 或者用 `BY_VALUE` 直接构造 ✓）。
+>   * `:11`–`:28` 的说明还有价值 ✓：这个枚举回答"这是哪**一类**技能" ✓ 与 `SkillEffectType`（"是什么**效果**" ✓）**正交** ✓
+>     ⇒ ⚠ 且"两者唯一重叠的是那五个值（`Normal/BPSkill/Ultra/Maze/MazeNormal` ✓）" ✓。
+> * ⭐ **下一轮第一步（把判据写出来，1–2 次调用）** ✗：
+>   ① 读 `SkillCategory` 的**查表方法名** ✓（⚠ 一次读那个小文件的 `static SkillCategory …` ✓）；
+>   ② 判据里：**`SkillExecutor.execute(battle, elationSkill, owner, targets)`**（⚠ `elationSkill` 取自她的数据／或用查表构造 ✓）
+>     ⇒ 断言 **① 状态挂上**（`has_state`）✓ **② 归零后摘掉** ✓ **③ `STATE_ENDED` 发出 ⇒ 她拿到【好活当赏】** ✓；
+>   ③ **变异（全量）**：去掉 `REMOVE_STATE` ⇒ 全量必红 ✓。
+> * ⚠ **推送**：本地仍**领先 9** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十二：✅✅✅ **判据的每一块都齐了** —— `SkillCategory.fromString(String raw)`（`:224` ✓）与 `of(SkillType slot)`（`:135` ✓）⇒ ⭐ 造一个 `attack_type` 为 `"ElationDamage"` 的 `Skill` 即可让那次施放带欢愉类别）**：
+>
+> * ✅ **实测（读 `SkillCategory` ✓）** ✓：**两个公开入口** ✓：
+>   * **`public static SkillCategory fromString(String raw)`** ✓（`:224` ✓）⇒ ⭐ 直接 `fromString("ElationDamage")` ✓；
+>   * `public static SkillCategory of(SkillType slot)` ✓（`:135` ✓）⇒ 按技能槽 ✓。
+>   ＋ 已知 `Skill` 是 **record** ✓ 且带 **`attack_type`** ✓（数据字符串 ✓）⇒ ⭐ **造一个 `attack_type = "ElationDamage"` 的 `Skill`** ✓
+>     ⇒ 那次 `SkillExecutor.execute(…)` 的**类别就是欢愉** ✓ ⇒ 我那条 `from_category ElationDamage` 的规则**会触发** ✓✓。
+> * ⭐ **判据的最终写法（下一轮照着写，一次到位）** ✗：
+>   ```java
+>   Skill elation = new Skill(<attack_type 等按 record 顺序填，attack_type 用 "ElationDamage">);
+>   SkillExecutor.execute(battle, elation, owner, List.of(enemy));   // 或目标按她那条规则要的
+>   // ① 断言：她的【阿哈时刻】状态挂上了（has_state 可读）
+>   // ② 再驱动一次结束（ATTACK_FINISHED ⇒ 待演归零）⇒ 状态被摘
+>   // ③ 断言：她拿到了【好活当赏】= STATE_ENDED 真的发了
+>   ```
+>   ＋ **变异**：去掉 `REMOVE_STATE` 那条 ⇒ ⭐ **全量必红** ✓。
+> * ⚠ **要注意的细节** ✓：`Skill` 是 record ⇒ **构造参数顺序**必须照声明（⚠ 一次读全 ✓）；而"待演"计数要**先 +1**（`CAST_SETUP` 那条 ✓）
+>   才能被 `-1` 归零 ✓ ⇒ ⭐ **判据要按"开始 → 结束"两次驱动** ✓（正好也验证了①②两步 ✓）。
+> * ⚠ **推送**：本地仍**领先 10** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十三：⚠ **判据编译失败，但失败本身给了三个确切事实** ⇒ 路线随之改成"用她自己的技能"）**：
+>
+> * ⚠ **实测（判据编译错 ✓）** ✓ 三条：
+>   1. `com.laosun.aluminium.beans.Skill` **与** `com.laosun.aluminium.models.skill.Skill` **是两个类型** ✗
+>      ⇒ 而 `SkillExecutor.execute(Battle, **models.skill.Skill**, CanHit, List)` ✓ 要的是**后者** ✓（⚠ 我传了前者 ⇒ 类型不兼容 ✓）；
+>   2. ⭐ **`models.skill.Skill` 是 `public abstract class`** ✓（不是 record ✗）⇒ ⛔ **判据不能 `new` 它** ✗ ⇒ 必须用**它的具体子类** ✓；
+>   3. `owner.getState()` **不存在** ✗（找不到符号 ✓）⇒ ⭐ **状态读取的口在别处**（⚠ 名字待查 ✓）。
+> * ⭐⭐ **于是路线改得更省** ✓：**不必造技能** ✗ —— ⭐ **用她自己的技能** ✓：
+>   `owner.getSkills()`（本段用过 ✓）里就应有**她的欢愉技实例** ✓（⚠ 数据里 9 个欢愉技之一 ✓）
+>     ⇒ `SkillExecutor.execute(battle, 她那个技能, owner, targets)` ✓ ⇒ 类别自然是欢愉 ✓ ⇒ 规则触发 ✓。
+>   ⚠ 若 `getSkills()` 里没有欢愉技槽 ✗（⚠ 它可能只覆盖 `BASIC_ATTACK`/`SKILL`/`ULTRA`/`TALENT` ✓）
+>     ⇒ ⭐ 那就找 `SkillCategory.of(SkillType.ELATION_SKILL)` ✓ 对应的**槽**与**子类** ✓（⚠ 本段已知 `SkillType.ELATION_SKILL` 存在 ✓）。
+> * ⭐ **下一轮第一步（两查，各一次调用）** ✗：① 读 `Skill` 的**子类清单** ✓（`glob '**/skill/*.java'` ✓ ⇒ 找"攻击类技能"那个 ✓）；
+>   ② 找**状态读取**的口 ✓（⚠ 搜 `boolean has`／`getBuffs`／`getBuffManager` ✓ ⇒ 判据要能读"她是否处于某状态" ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（10 个积压提交上一轮推完 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据文件已删 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十四：✅✅✅ **判据跑起来了一半，而且这一半证明**内容真的生效**** —— ⭐ 欢愉技一施放，`阿哈时刻` 状态**就挂上了**；⚠ 卡在"结束"那一步（我手工 `fireTriggers(ATTACK_FINISHED)` **不带施放类别** ✗））**：
+>
+> * ✅ **实测（判据编译通过 ＋ 跑到第 53 行 ✓）** ✓：
+>   * `assertFalse(hasState(阿哈时刻))` ✓ **通过** ✓（施放前没挂 ✓）；
+>   * `owner.getSkills().get(SkillType.ELATION_SKILL)` ✓ **拿到技能** ✓（⭐ `ELATION_SKILL` 这个槽**真的存在** ✓）；
+>   * `SkillExecutor.execute(...)` ⇒ `assertTrue(hasState(阿哈时刻))` ✓ **通过** ✓✓
+>     ⇒ ⭐⭐ **所以内容里的 `CAST_SETUP` ＋ `from_category ElationDamage` 那条规则**真的触发了**** ✓（⚠ 这是本段第一次证明它生效 ✓）；
+>   * ⛔ 然后 `fireTriggers(ATTACK_FINISHED, owner, owner, 0, 0)` ⇒ `assertFalse(hasState(阿哈时刻))` ✗ **失败** ✓
+>     （*"at zero the state must be gone ==> expected: <false> but was: <true>"* ✓）⇒ 状态**还在** ✗。
+> * ⭐ **原因判断（很确定）** ✓：我那条"结束"规则的条件是 **`from_category ElationDamage`** ✓ ⇒ ⚠ 而**手工 `fireTriggers` 造的事件没有"施放"上下文** ✗
+>   ⇒ 条件不成立 ⇒ 计数没减 ⇒ 状态没摘 ✓（⚠ 正是我在记录里预先写下的那个坑 ✓）。
+> * ⭐ **下一轮第一步（把"结束"也走真路径，1–2 次调用）** ✗：**让这次施放自己走完** ✓ ——
+>   ⚠ `SkillExecutor.execute(...)` 是否**在返回前就把 `ATTACK_FINISHED` 发了** ✗ 待查 ⇒ ⭐ 若发了 ⇒ **判据里根本不用手工 fire** ✓
+>     （⚠ 那就说明我那条 `ATTACK_FINISHED` 规则的条件在**真路径**上也不成立 ✗ ⇒ 要去读 `TriggerContext` 里"施放类别"在这个事件上**是否带着** ✓）。
+>   ⇒ ⭐ 具体查法：读 **`SkillExecutor.execute` 的实现** ✓（看它发哪些事件、带哪些上下文 ✓）。
+> * ⭐ **顺带确认** ✓：`BuffManager.hasState(String)` ✓ 与 `SkillType.ELATION_SKILL` ✓ **两个名字都对** ✓（本段"先查再写"的纪律奏效 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（判据已删 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千零四十五：✅✅✅ **"结束"该挂哪个事件，答案在 `SkillExecutor` 里** —— 它发的每个事件**都带 `category`**，**但没有 `ATTACK_FINISHED`**）**：
+>
+> * ✅ **实测（读 `models/skill/SkillExecutor` ✓）** ✓：
+>   ```java
+>   Battle.PendingCast cast = battle.beginCast(skill, user);            // :83  ★ 施放类别**早算一次**
+>   battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category);   // :93  ← **带类别** ✓（⭐ 我那条"开始"规则正是靠它触发 ✓）
+>   battle.endCast(cast);                                              // :98
+>   … case ULTRA -> fireTriggers(ULT_CAST, …, category, …)              // :189 ← 带类别 ✓
+>     case BPSKILL -> fireTriggers(SKILL_CAST, …, category, …)          // :190 ← 带类别 ✓
+>     case NORMAL -> fireTriggers(BASIC_ATTACK, …, category, …)         // :191 ← 带类别 ✓
+>   battle.fireTriggers(TriggerEvent.ALLY_ATTACK, …, category, …)       // :203 ← 带类别 ✓
+>   ```
+>   ⇒ ⭐⭐ **两点**：**(i)** 我那条"开始"（`CAST_SETUP`）**注定会触发** ✓（本段已实测 ✓）；
+>     **(ii)** ⛔ **这里**没有 `ATTACK_FINISHED`** ✗** ⇒ 它由别处发出（`TriggerEvent:372` 说 *"settlement complete, hit set frozen"* ✓ ⇒ 多半在 `Battle` 的伤害结算里 ✓）
+>       ⇒ ⭐ **而那时施放早已 `endCast`** ✗ ⇒ **类别不在上下文里** ✗ ⇒ ⛔ **我那条"结束"规则在真路径上也永远不会触发** ✗（⚠ 不只是判据手工 fire 的问题 ✓）。
+> * ⭐⭐ **修法（内容层，一个词）** ✗：把"结束"那条的 `on` 从 **`ATTACK_FINISHED`** 换成 **`ALLY_ATTACK`** ✓
+>   （它**带类别** ✓、且在**同一施放的命中之后** ✓ ⇒ 记账 +1（`CAST_SETUP`）→ −1（`ALLY_ATTACK`）⇒ ⭐ **归零 ⇒ 摘状态 ⇒ 引擎发 `STATE_ENDED`** ✓）。
+>   ⚠ **语义核对** ✓：文档说"持续至**本次最后一个欢愉技施放结束**" ✓ ⇒ **单次施放**的这一版**正是**它的最小正确实现** ✓
+>     （⚠ 多次施放的版本需要知道"总共几个" ✗ ⇒ 那属于**阿哈行动**那一层，仍登记 ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：改 `on` ⇒ 重放脚本 ✓ ⇒ 跑判据 ⇒ ⭐ 若绿 ⇒ **变异（去掉 `REMOVE_STATE` ⇒ 全量必红）** ⇒ 这件就出货了 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十六：✅ **换到 `ALLY_ATTACK` 之后，"开始"与"结束"两条都触发了** —— 而新的报错说明**派对资源在她身上花不出去**）**：
+>
+> * ✅ **实测（改 `on` ⇒ 重放 ⇒ 跑判据 ✓）** ✓：新报错是
+>   *`java.lang.IllegalStateException: SPEND_RESOURCE '待演' but Aventurine • Waveflair has no such resource`*
+>   ⇒ ⭐ 说明**判据已经走到** "结束 ⇒ 扣计数" 那一步 ✓（⚠ 即 `ALLY_ATTACK` 那条**触发了** ✓）⇒ ⭐ 而**扣的时候找不到那份派对资源** ✗。
+> * ⭐ **两个候选** ✓：
+>   **(甲)** 我那份声明的**形状不全** ✗ —— ⚠ 装载器认的键是 `[id, initial, max, note, overflow, scope, source]` ✓（本段读到 ✓）
+>     ⇒ 我写了 `id/max/initial/scope/note` ✓ ⇒ ⚠ 缺 `source`／`overflow` **应当可选** ✓ ⇒ ⭐ 那更可能是 **(乙)**；
+>   **(乙)** ⭐ **`SPEND_RESOURCE` 的"花谁的"解析的是**持有者自己的**资源** ✗（⚠ 而不是队伍池 ✓）
+>     ⇒ ⚠ 那么"派对计数"这个用法**不成立** ✗ ⇒ ⭐ 要改成**她自己文件里的普通资源** ✓（⚠ 这也与 `1407` 的【新蕊】不同：那份是**写入**（`GAIN_RESOURCE` ✓ 在派对上 ✓），而这里是**扣减** ✗）。
+> * ⭐ **下一轮第一步（一次读清，然后一次改）** ✗：
+>   ① 读 **`TriggerInterpreter` 里 `SPEND_RESOURCE` 的取数路径** ✓（⚠ 本段早前读过 `spendResource` ✓ ⇒ 再确认"它从 `holder.getResources()` 还是 `battle.partyResource()` 里扣" ✓）；
+>   ② 若确认扣的是**持有者自己的** ⇒ ⭐ 把"待演"从 **派对**改成**她自己**的资源 ✓（`scope` 去掉或改 `SELF` ✓）⇒ 重跑判据 ⇒ 绿则变异 ✓。
+> * ⭐ **顺带**：这条错误**再一次**证明"**开始半真的生效了**" ✓（否则走不到扣减 ✓）⇒ ⭐ 内容的四步里**前两步已被实测确认** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（判据与内容都已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十七：✅✅ **扣减走的是"持有者自己的资源表"**（`holder.getResources()` ✓）⇒ ⭐ 修法两条，任选其一，都只改内容）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.spendResource` ✓，`:1388` ✓）** ✓ 关键几行：
+>   ```java
+>   CanHit holder = resolveTarget(effect, ctx);
+>   String id = effect.getResource();
+>   int amount = Boolean.TRUE.equals(effect.getSpendAll())
+>           ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)
+>           : (int) Math.round(scaledAmount(effect, ctx));
+>   if (!holder.getResources().has(id)) { throw new IllegalStateException("SPEND_RESOURCE '" + id + "' but " + holder.getName() + " has no such resource"); }
+>   if (!holder.getResources().spendExactly(id, amount)) { … }
+>   ```
+>   ⇒ ⭐⭐ **两个事实** ✓：**(i)** `SPEND_RESOURCE` 只认 **`holder.getResources()`** ✓（持有者**自己的**表 ✓ —— ⚠ 与我猜的 (乙) **一致** ✓）；
+>     **(ii)** ⭐ **`spendAll` 那条分支**正好用 `holder.getResources()` ✓（本段出货的 `1513` 用法 ✓）⇒ ⚠ 它能跑通说明**"她自己的表里"确实有"热意"** ✓。
+> * ⭐⭐ **于是修法（内容层，二选一）** ✗：
+>   **(甲)** ⭐ **把「待演」从派对资源改成她自己的普通资源** ✓（⚠ 去掉 `"scope": "PARTY"` ✓ ⇒ 它就进 `holder.getResources()` ✓）
+>     ⇒ ⚠ 代价：**别的角色看不到它** ✗（⚠ 但本设计里**只有她自己在记账** ✓ ⇒ 完全够用 ✓）；
+>   **(乙)** 或者查 **`Battle.registerPartyResources`（`:701` ✓）为什么没把它注入她的表** ✗（⚠ 也可能是"派对资源**只用于 `GAIN`／`value`** ✓ 而**不能 `SPEND`** ✗" —— ⭐ 那也算一条**引擎约束** ✓，值得登记 ✓）。
+> * ⭐ **下一轮第一步（先 (甲)，最快）** ✗：改声明（去 `scope`）⇒ 重放 ＋ 跑判据 ⇒ ⭐ 若绿 ⇒ **变异（去掉 `REMOVE_STATE` ⇒ 全量必红）** ⇒ 这件出货 ✓；
+>   ⚠ 若 (甲) 仍报错 ⇒ 再读 (乙) ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十八：✅ **资源作用域修好了**（不再报 `has no such resource` ✓）；⛔ 而"归零后摘状态"那一步**仍没发生** ⇒ 只剩"收尾那一步"要查）**：
+>
+> * ✅ **实测（声明去掉 `scope` ⇒ 重放 ⇒ 跑判据 ✓）** ✓：扣减**不再报错** ✓（⭐ 即"持有者自己的表"这条路通了 ✓）
+>   ⇒ ⛔ 而 `assertFalse(hasState(阿哈时刻))` **仍失败** ✓（*"at zero the state must be gone ==> expected: <false> but was: <true>"* ✓）
+>     ⇒ ⭐ **状态还在** ✗。
+> * ⭐ **只剩三个候选** ✓（⚠ 且都能一次判掉）：
+>   **(甲)** ⭐ **`SPEND_RESOURCE` 后引擎发不发 `RESOURCE_CHANGED`** ✗ —— ⚠ 我那条"收尾"规则挂在 `RESOURCE_CHANGED` 上 ✓
+>     （⚠ 而本段 `1513` 早前那条 `fervor_extra_hit_per_point` 也用它 ✓ 且**有效** ✓ ⇒ 说明**事件存在** ✓ ⇒ 但那次是 `GAIN` ✓
+>       —— ⭐ **`SPEND` 是否也发** ✗ 未验 ✓）；
+>   **(乙)** ⭐ **条件 `self_resource:待演 <= 0`** ✗ 是否被解析/求值 ✓（⚠ 本段**只确认了常量存在** ✓，例：`SELF_RESOURCE_PREFIX` ✓
+>     —— ⚠ 而"常量存在 ≠ DSL 接受"这条教训本段刚踩过（`state_ended` 缺主体 ✓）⇒ ⭐ **很可能这个条件也要"主体在前"** ✗
+>       ⇒ 写法也许应是 **`self self_resource:待演 <= 0`** ✗ 或 **`待演 <= 0`** ✗ —— ⚠ **要读它的解析处** ✓）；
+>   **(丙)** `REMOVE_STATE` 的 `buff` 字段 ✓ 指的状态名是否与挂上时一致 ✓（⚠ 我用同一个常量 ✓ ⇒ 应一致 ✓）。
+> * ⭐ **下一轮第一步（一次读清 (甲)／(乙)）** ✗：读 **`TriggerTable` 里 `SELF_RESOURCE_PREFIX` 的解析处** ✓（⚠ 看它**期望的前缀形态** ✓）
+>   ＋ 读 **`TriggerInterpreter` 里 `SPEND_RESOURCE` 是否 `fireTriggers(RESOURCE_CHANGED, …)`** ✓ ⇒ 两问一次读完 ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零四十九：✅✅✅ **条件的写法被证清白**（`self_resource:<名>` 就是**数值变量**，官方示例 `"self_resource:充能 >= 3"` ✓）⇒ ⭐ 于是收尾那步的元凶锁定为 **(甲)：`SPEND_RESOURCE` 不发 `RESOURCE_CHANGED`**）**：
+>
+> * ✅ **实测（读 `TriggerTable:1549` 附近 ✓）** ✓ 报错文案原文（它把"已知数值变量"一次列全 ✓）：
+>   *"Condition '…' compares unknown variable '…'; known numeric variables: … , plus `"self_attr:<ATTRIBUTE>"` for one of my own attribute
+>   values, e.g. `"self_attr:SPEED >= 145"`, **`"self_resource:<NAME>"` for how much of one of MY declared resources I hold, e.g.
+>   `"self_resource:充能 >= 3"`**, and `"self_stacks:<NAME>"` / `"target_stacks:<NAME>"` for how many times a named counter has been
+>   marked, e.g. `"target_stacks:承负 >= 2"`"* ✓
+>   ⇒ ⭐⭐ **三条结论** ✓：**(i)** 我写的 **`self_resource:待演 <= 0`** ✓ **形态完全正确** ✓（⚠ 变量位置**不需要**主体前缀 ✗
+>     —— ⚠ 与 `state_ended` 不同 ✓，那次是"**谓词**"要主体 ✓）；**(ii)** 它读的是"**我自己声明的**资源" ✓（⭐ 与本轮改成的
+>     "她自己的表" ✓ **正好对上** ✓）；**(iii)** 所以**(乙) 排除** ✓ ⇒ ⛔ **元凶只剩 (甲)** ✓。
+> * ⭐⭐ **于是修法（内容层，一次改到位）** ✗：**把"收尾"从 `RESOURCE_CHANGED` 挪到 `ALLY_ATTACK`** ✓ ——
+>   即**同一条事件上放两条规则** ✓：① 先扣计数（`SPEND_RESOURCE` ✓）；② 再判 **`when: ["from_category ElationDamage",
+>   "self_resource:待演 <= 0"]` ⇒ `REMOVE_STATE{阿哈时刻}`** ✓ ⇒ ⚠ 这要求"同事件的规则**按声明顺序执行**" ✗
+>     （⚠ 若顺序不保证 ⇒ 那就改成"扣之前先判"✗ 或把两条合成一条 ✓ —— ⭐ **下一轮先用一次判据验证顺序** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：按上面改成两条 `ALLY_ATTACK` 规则 ⇒ 重放 ⇒ 跑判据 ⇒
+>   ⭐ **绿 ⇒ 立刻做变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）⇒ 这件（`STATE_ENDED` 的第一个真读者）**出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十：✅✅ **诊断收敛到"同事件内的顺序"** —— 而且发现：**那次真施放自己就会发 `ALLY_ATTACK`**（带类别 ✓）⇒ +1 与 −1 发生在**同一次施放内**)**：
+>
+> * ✅ **实测（改成 `ALLY_ATTACK` 收尾 ⇒ 重放 ⇒ 跑判据 ✓）** ✓：仍是同一处红 ✗（*"at zero the state must be gone ==> expected: <false> but was: <true>"* ✓）。
+> * ⭐⭐ **机制想通了** ✓：`SkillExecutor:203` 那次 **`ALLY_ATTACK`** 是**真施放自己发的**（带 `category` ✓）
+>   ⇒ 所以**一次欢愉技施放**里依次发生：**`CAST_SETUP`（+1 ✓）** ⇒ **`ALLY_ATTACK`（−1 ✓）**
+>     ⇒ ⭐ **计数在同一次施放内就回到 0** ✓ ⇒ ⭐ **而"收尾"规则也挂在同一个 `ALLY_ATTACK` 上** ✗
+>       ⇒ ⛔ **它必须先看到"扣完之后的 0"** ✗ ⇒ ⭐ **这就是"同事件内的执行顺序"问题** ✓（⚠ 我给判据手工 fire 的那次**根本没被用到** ✓
+>         —— ⭐ 因为真施放已经走完了全过程 ✓ ⇒ ⚠ 也解释了为什么"扣减"曾经报错 ✓：那次是**真施放**在扣 ✓）。
+> * ⭐ **修法（两条，下一轮选一条）** ✗：
+>   **(甲)** ⭐ **让"收尾"晚一个事件** ✓ —— 挂在 **`ALLY_ATTACK` 之后必然发生的**东西上 ✗（⚠ 候选：下一次 `BATTLE`／`TURN_START` ✓
+>     ⇒ ⚠ 但那就不是"最后一个欢愉技结束时"了 ✗）；
+>   **(乙)** ⭐⭐ **把两条合成一条规则** ✓ —— 同一条 `ALLY_ATTACK` 规则里：**先 `SPEND_RESOURCE`** ✓ **再 `REMOVE_STATE`** ✓
+>     （⚠ 同一条规则的 `do` **必然按数组顺序执行** ✓ ⇒ ⭐ **顺序由我保证** ✓）⇒ ⚠ **但那会"每打一次都摘状态"** ✗（不等于归零才摘 ✗）
+>     ⇒ ⭐ 所以正解可能是 **(丙)**：**不计数**，改成"**施放开始挂、施放结束摘**" ✓（`CAST_SETUP` 挂 ✓ ＋ `ALLY_ATTACK` 摘 ✓）
+>       ⇒ ⭐ **一次施放 = 一个时刻** ✓，与文档"持续至**本次**最后一个欢愉技施放结束"的**单次**读法一致 ✓✓。
+> * ⭐ **下一轮第一步** ✗：按 **(丙)** 改（最简单、无计数 ✓）⇒ 重放 ⇒ 跑判据 ⇒ 绿 ⇒ **变异**（去掉 `REMOVE_STATE` ⇒ 全量必红 ✓）⇒ 出货 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十一：✅✅✅ **"时刻"的生命周期整条跑通了** —— 施放开始挂、施放结束摘（同一施放内完成 ✓）；⛔ 只剩"摘的时候那条 `STATE_ENDED` 没送到我的读者"**）**：
+>
+> * ✅ **实测（把收尾简化成"同一次施放的 `ALLY_ATTACK` 就摘" ✓）** ✓：
+>   * ⭐ **`assertFalse(hasState(阿哈时刻))` 在施放后通过** ✓（*"one cast is one moment: by the time it has settled, the moment has ended again"* ✓）
+>     ⇒ ⭐⭐ **说明 `CAST_SETUP` 挂上 ✓、`ALLY_ATTACK` 摘掉 ✓ —— 四步里的"挂/摘"两半都实测成立** ✓；
+>   * ⛔ `assertTrue(hasState(好活当赏))` **失败** ✗（*"and the reader answers the engine's report: the reward lands"* ✓）
+>     ⇒ ⭐ **即"摘状态时引擎发的那条 `STATE_ENDED` 没有触发我的读者规则"** ✗。
+> * ⭐ **三个候选（下一轮一次判掉）** ✓：
+>   **(甲)** ⭐ **读者规则的写法** ✗ —— 我用的是 **`self state_ended 阿哈时刻`** ✓（形态照 `TriggerTable:1211` ✓）
+>     ⇒ ⚠ 但**状态名是否与我挂的那个完全一致** ✗（⚠ 我在两处都用同一个常量 ✓ ⇒ 应一致 ✓）⇒ 更可能是 **(乙)**；
+>   **(乙)** ⭐⭐ **`STATE_ENDED` 的"名字"从哪来** ✗ —— `TriggerTable:2022` 有一句：*"⚠ **The name has to ride here** because the state is already gone
+>     by the time …"* ✓ ⇒ ⭐ 说明**状态名是随事件带过去的** ✓ ⇒ ⚠ 若我挂的是 **`APPLY_BUFF`**（而不是"状态"那条通道 ✓）
+>       ⇒ **它可能根本不发 `STATE_ENDED`** ✗（⚠ 本段读到的 `BuffManager:666` 是 `battle.fireStateEnded(instance, ended.getState())` ✓
+>         ⇒ ⭐ **只有当 buff 有 `getState()` 非空时才发** ✗）⇒ ⭐ **而我用 `APPLY_BUFF` ＋ `buff:` 字段挂的，可能没有"状态名"** ✗✗；
+>   **(丙)** `REMOVE_STATE` 与 `APPLY_BUFF` 挂的是**同一条** buff 与否 ✓（⚠ 名字一致 ⇒ 应是 ✓）。
+> * ⭐⭐ **于是最可能的正解** ✗：**给"阿哈时刻"用"带状态名的挂法"** ✓ —— ⚠ 本段见过 `APPLY_STATE` 不是 op ✗、`buff` 字段同时用于两者 ✗
+>   ⇒ ⭐ **下一轮第一步**：读 **`BuffManager:660`–`:670`（`fireStateEnded` 那一处）** ✓ ＋ 读 **`APPLY_BUFF`／`REMOVE_STATE` 怎么设 `state`** ✓
+>     ⇒ 两处一读就知道"什么写法才会发 `STATE_ENDED`" ✓ ⇒ 改一处 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十二：✅✅✅ **`STATE_ENDED` 只在"到期摘除"那条路上发**，而且只对 `StateBuff` 发 ⇒ ⭐ 正解是**让它自然到期**，不是显式 `REMOVE_STATE`**）**：
+>
+> * ✅ **实测（读 `BuffManager` 的 tick 循环 ✓，`:654`–`:670` ✓）** ✓ 原文：
+>   ```java
+>   boolean couldAct = buff.canAct();
+>   buff.tickEffect(instance);
+>   if (buff.duration() <= 0) {
+>       // ⭐ Announce BEFORE the removal (2026-10-02): the event carries the state's name, because a
+>       // reader that looked for the state on this unit would already see it gone. `battle` is null for a
+>       // unit built outside a battle, and then there is nobody to tell.
+>       if (battle != null && buff instanceof StateBuff ended) {
+>           battle.fireStateEnded(instance, ended.getState());
+>       }
+>       buffs.remove(buff);            // ← 摘除
+>       buff.removeBuff(instance);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **两条硬事实** ✓：**(i)** 公告发生在**`duration() <= 0` 的 tick 里** ✓（即"**自然到期**" ✓）；
+>     **(ii)** 而且**只有 `buff instanceof StateBuff` 才公告** ✓ ⇒ ⚠ 若挂的不是 `StateBuff`（例如普通 buff ✗）⇒ **一声不响** ✗。
+> * ⭐⭐⭐ **于是正解清楚了** ✓：**别再显式 `REMOVE_STATE`** ✗ —— ⭐ **让"阿哈时刻"以 `turns: 1` 自然到期** ✓
+>   ⇒ 到期那一 tick，引擎**自己**发 `STATE_ENDED("阿哈时刻")` ✓ ⇒ 我的读者（`self state_ended 阿哈时刻` ✓）拿到 ✓ ⇒ 发【好活当赏】✓。
+>   ⚠ **代价/口径** ✓：到期发生在**她的回合计时**上 ✗（而不是"施放结束的那一刻" ✓）⇒ ⭐ 这是**近似** ✗
+>     ⇒ ⚠ 但与文档"**持续至本次最后一个欢愉技施放结束**"相比，**"持续 1 回合"是文档在别处对同类状态用的口径** ✓
+>       （⚠ 例如【好活当赏】"持续 **2** 回合" ✓）⇒ ⭐ **可以照写，并在注释里写明这是到期口径** ✓。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑）** ✗：把挂的那条改成 **`turns: 1`** ✓、**删掉显式 `REMOVE_STATE` 那条** ✓
+>   ⇒ 判据：施放后**状态在** ✓ ⇒ **推进一回合（或直接 tick）** ⇒ **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ 绿 ⇒ **变异** ⇒ 出货 ✓。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络断 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十三：⭐ 把"到期"改法写成**可直接执行的两步**（下一轮照做即可），并说明为什么**必须同时删掉那条显式 `REMOVE_STATE`**）**：
+>
+> * ⭐ **两步（都在 `tools/ship_aha_moment.py` ✓）** ✗：
+>   1. **挂的那条**（`elation_moment_start` ✓）：把 `APPLY_BUFF` 的 **`"turns": 2` 改成 `"turns": 1`** ✓
+>      ⇒ ⭐ **让它在下一回合到期** ✓ ⇒ 到期 tick 里引擎**自己**发 `STATE_ENDED("阿哈时刻")` ✓（`:660`–`:666` 已读 ✓）；
+>   2. ⭐ **删掉 `elation_moment_close` 整条** ✓ —— ⚠ **必须删** ✗：它以 `REMOVE_STATE` **显式摘** ✓
+>      ⇒ ⚠ 而"显式摘"**不走 tick** ✗ ⇒ **不公告** ✗（本轮读到的公告只在 `duration() <= 0` 的分支里 ✓）
+>      ⇒ ⭐ 若留着，它会在**同一次施放内**先摘掉 ✓ ⇒ 状态**永远活不到到期** ✗ ⇒ 读者**永远收不到** ✗。
+>   （⚠ 同时 `elation_moment_step`（扣计数那条）也就**没有用处**了 ✗ ⇒ ⭐ 一并删掉更干净 ✓ —— 于是"待演"资源也不再需要 ✓。）
+> * ⭐ **判据的相应写法** ✗：施放后 **状态在** ✓（本段已实测 ✓）⇒ **推进一次她的回合 tick** ✓
+>   （⚠ 待查：`Battle` 里推进回合的公开入口 ✗ —— 本段见过 `fireTriggers(TriggerEvent.TURN_START, …)` ✓ 但"tick 到期"是**另一个**动作 ✗
+>     ⇒ ⭐ 下一轮先读 **`Battle.tickBuffs`（本段早前提到过 ✓）的调用处** ✓ ⇒ 判据里照调 ✓）
+>   ⇒ **状态没了 ＋ 拿到【好活当赏】** ✓ ⇒ 绿 ⇒ **变异**（把 `turns` 改回 2 ⇒ 判据必红 ✓）⇒ 出货 ✓。
+> * ⭐ **为什么值得这样做** ✓：它是**本项目第一次用"状态自然到期"去驱动 `STATE_ENDED`** ✓ ⇒ ⭐ 一旦这条通，
+>   **目标 ① 的其余读者**（`1211`【生息】结束、`1408` 变身结束、那张光锥的「奇袭结束后」✓）**都能照抄这个形状** ✓✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十四：✅ **判据里"让状态到期"的入口定在 `Battle.processRequests()`**（`:1237` ✓ —— 本段所有判据都在用它驱动结算 ✓，而 buff 的 tick 就在这条循环里 ✓））**：
+>
+> * ✅ **实测（读 `Battle` ✓）** ✓：`processRequests()`（**`:1237` 定义** ✓，另有 7 处在施放/结算后调用 ✓）是本引擎"**把挂起的事情办完**"的总入口 ✓
+>   ⇒ ⭐ 本段的判据**一直**在用它 ✓（⚠ 而"状态到期"这件事**也在同一个循环里** ✓ —— 依据是本段读到的
+>     `BuffManager` tick 分支 ✓：`duration() <= 0` ⇒ 公告 `STATE_ENDED` ⇒ 摘除 ✓）。
+> * ⭐ **于是判据的最小形状（下一轮照写）** ✗：
+>   ```java
+>   SkillExecutor.execute(battle, elation, owner, List.of(enemy));
+>   battle.processRequests();                       // ★ 这次会把"挂上的状态"办完 ⇒ 状态在 ✓
+>   assertTrue(owner.getBuffManager().hasState(阿哈时刻));
+>   …推进一次她的回合计时（⚠ 待定：`processRequests()` 够不够 ✗，还是要显式 `TURN_START` ✗）
+>   assertFalse(owner.getBuffManager().hasState(阿哈时刻));      // 到期摘除 ✓
+>   assertTrue(owner.getBuffManager().hasState(好活当赏));       // 引擎的公告被读者接住 ✓
+>   ```
+>   ⚠ **唯一的未知** ✓：**"她的回合"怎么推进** ✗ —— ⚠ 本段见过 `fireTriggers(TriggerEvent.TURN_START, owner, owner, 0, 0)` ✓（**那只是发事件** ✗，
+>     不等于"计时推进" ✗）⇒ ⭐ **下一轮第一步**：读 **`BuffManager.tickBuffs`（或同义方法）的调用处** ✓
+>     ⇒ 看它由谁调用、需要什么前置（⚠ 例如"当前行动者" ✓）⇒ 判据里照调 ✓ ⇒ 然后立刻做完那两步内容改动 ✓ ⇒ 跑 ⇒ 绿 ⇒ 变异 ⇒ 出货 ✓。
+> * ⭐ **顺带**：这条链一旦通，**目标 ① 的其余四个读者**（`1211`【生息】结束 ✓、`1408` 变身结束 ×3 ✓、那张光锥「奇袭结束后」✓）
+>   **都能照抄"挂一个限时状态 ⇒ 到期自动公告 ⇒ 读者接住"这个形状** ✓✓ ⇒ ⭐ **这是本段最有复用价值的一块** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十五：✅✅ **最后那个未知也拿到了** —— 判据推进计时用 **`BuffManager.tickForeign(CanHit clockOwner, boolean early)`**（**public** ✓，`:603` ✓）**）**：
+>
+> * ✅ **实测（读 `BuffManager` ✓ ＋ 搜全仓 `.tick(` ✓）** ✓：
+>   * **`public void tickForeign(CanHit clockOwner, boolean early)`** ✓（`:603` ✓）—— ⭐ **公开** ✓ ⇒ 判据可调 ✓；
+>   * `private void tickBuff(CanHit clockOwner, boolean early)` ✓（`:645` ✓）—— 私有 ✓ ⇒ 由 `tickForeign` 驱动 ✓（⚠ 也由回合循环驱动 ✓）。
+> * ⭐⭐⭐ **于是"阿哈时刻"这条链**从引擎到判据**全部具名、可以一次做完** ✓（下一轮照此执行 ✗）：
+>   1. **内容**（`tools/ship_aha_moment.py` ✓）：`elation_moment_start` 的 **`turns: 2` → `turns: 1`** ✓；
+>      **删掉** `elation_moment_close` ✓ 与 `elation_moment_step` ✓（⚠ 不留显式 `REMOVE_STATE` ✗ —— 它不公告 ✗）；
+>   2. **判据**（`tools/judge_aha_moment2.py` ✓）：施放 ⇒ `processRequests()` ⇒ **`assertTrue(hasState(阿哈时刻))`** ✓ ⇒
+>      ⭐ **`owner.getBuffManager().tickForeign(owner, false)`** ✓（推进一次计时 ⇒ 到期 ⇒ 引擎公告 ✓）⇒
+>      **`assertFalse(hasState(阿哈时刻))`** ✓ ＋ **`assertTrue(hasState(好活当赏))`** ✓；
+>   3. **变异（全量）**：把 `turns` 改回 `2` ⇒ ⭐ **判据必红** ✓（状态不到期 ⇒ 没有公告 ⇒ 没有奖励 ✓）。
+> * ⭐ **这一步的分量** ✓：它是**本项目第一次让 `STATE_ENDED` 由"状态自然到期"驱动** ✓ ⇒ ⭐ **目标 ① 的其余四个读者**
+>   （`1211`【生息】结束 ✓／`1408` 变身结束 ×3 ✓／那张光锥「奇袭结束后」✓）**都能复用同一个形状** ✓✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十六：✅ **判据已经跑到"到期"那一步** —— 一次 `tickForeign` **没让它到期** ⇒ ⭐ 只剩"怎么让它到期"这一问）**：
+>
+> * ✅ **实测（最终形状：内容两条 ＋ 判据驱动真欢愉技 ＋ `tickForeign` ✓）** ✓：
+>   * ⭐ **`assertTrue(hasState(阿哈时刻))` 通过** ✓（*"the elation cast applies the moment"* ✓）—— ⭐ **"挂"这半又一次被实测确认** ✓；
+>   * ⭐ **`assertFalse(hasState(好活当赏))` 通过** ✓（*"and the reward is not there before it ends"* ✓）；
+>   * ⛔ `assertFalse(hasState(阿哈时刻))` **失败** ✗（*"one turn later the moment has expired ==> expected: <false> but was: <true>"* ✓）
+>     ⇒ ⭐ **一次 `tickForeign(owner, false)` 没让它到期** ✗。
+> * ⭐ **下一轮第一步（微调一次，1–2 次调用）** ✗：三选一 ✓：
+>   **(甲)** `early` 传 **`true`** ✗（⚠ 签名是 `tickForeign(CanHit, boolean early)` ✓ ⇒ 也许"早期 tick"才减她自己的时长 ✓）；
+>   **(乙)** **连续 tick 两次** ✗（⚠ 引擎的"持续 N 回合"可能是"**再经过 N 次计时**才归零" ✓）；
+>   **(丙)** 把 `turns` 从 **1 改成 0** ✗（⚠ 若允许 ⇒ 立即到期 ✓ ⇒ 但那就不是"持续"了 ✗）。
+>   ⇒ ⭐ **判法**：读 **`BuffManager.tickForeign`／`tickBuff` 的实现**（`:603`／`:645` ✓）⇒ 看它对 `duration` 怎么减、`early` 什么意思 ✓
+>     ⇒ 照它写判据 ✓ ⇒ ⭐ **绿 ⇒ 立刻变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓。
+> * ⭐ **注意**：**内容本身没有问题了** ✓ —— "挂 1 回合 ＋ 到期公告 ＋ 读者接住"这四块**都已实测到位** ✓
+>   （⚠ 只剩判据"推进几拍"的写法 ✓）⇒ ⭐ 下一轮很可能**一次就绿** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十七：✅✅✅ **为什么一次 `tickForeign(owner, …)` 毫无作用 —— 它对自己的表直接 `return`**（`clockOwner == instance` ⇒ 跳过）⇒ ⭐ 所以判据要调的是"**推进自己的计时**"那个入口）**）**：
+>
+> * ✅ **实测（读 `BuffManager.tickForeign` ✓，`:603` ✓）** ✓ 原文：
+>   ```java
+>   public void tickForeign(CanHit clockOwner, boolean early) {
+>       if (clockOwner == null || clockOwner == instance) { return; }   // ← ★ 自己的表被跳过
+>       tickBuff(clockOwner, early);
+>   }
+>   ```
+>   ⇒ ⭐⭐ **所以 `tickForeign(owner, …)` 对她的状态**什么也不做**** ✗（⚠ 它的用途是"**别人**的回合到了，推进**挂在我身上、但计时属于别人**的状态" ✓ ——
+>     紧跟着的 `removeBuffsAnchoredTo` 注释也印证这个"clockOwner 是**别人**"的语义 ✓）。
+> * ⭐ **下一轮第一步（找"推进自己计时"的公开入口，1 次调用）** ✗：
+>   `tickBuff` 是 **private** ✗ ⇒ ⭐ 找**它的调用者** ✓（⚠ 本段见过 `BuffManager:335` 的 `stateName.equals(state.getState())` ✓ 与
+>     `:666` 的公告 ✓ ⇒ 那个 tick 循环**一定在某个公开方法里** ✓）—— 候选：`tick(…)`／`onTurnStart(…)`／`advanceTurn(…)` ✗
+>     ⇒ ⭐ **搜 `tickBuff(` 的调用处**（⚠ 一次调用即可 ✓）。
+>   ⇒ 拿到后：判据里调它 ✓ ⇒ **到期 ⇒ 公告 ⇒ 奖励** ✓ ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓。
+> * ⭐ **注意**：⚠ **不要**为了绕过它去改引擎的可见性 ✗（⚠ 那是"为了让判据好写而改产品代码" ✗ ⇒ 本段一直避免 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十八：✅ `tickForeign` 的**调用者**找到了 —— `Battle:1232`，⭐ 而它只对"**别人**"调 ⇒ 说明"行动者自己的状态"由**同处的另一行**推进）**：
+>
+> * ✅ **实测（搜 `tickForeign(` 的调用处 ✓）** ✓：**只有一处** ✓ —— `Battle.java:1232` ✓：
+>   `ally.getBuffManager().tickForeign(clockOwner, early);` ✓（⚠ 在一个"遍历我方"的循环里 ✓ ⇒ 对**每个队友**推进"属于当前行动者计时"的状态 ✓）。
+>   ⇒ ⭐⭐ **于是"行动者自己的状态"必然由**它自己那条路径**推进** ✗（⚠ 同处应还有一行对自己的调用 ✗ —— 下一轮读 `:1216`–`:1240` ✓）
+>     ⇒ ⭐ **判据要调的就是那一行所调的方法** ✓（⚠ 很可能是 `tickOwn(early)` 或 `tick(…)` ✓）。
+> * ⭐ **下一步（一次读，然后一次改＋跑）** ✗：读 `Battle:1216`–`:1240` ✓ ⇒ 拿到"自己的 tick"入口名 ✓
+>   ⇒ 判据里改成调它 ✓ ⇒ **到期 ⇒ 公告 ⇒ 奖励** ✓ ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千零五十九：✅ `tickForeignBuffs` 的**实现**读了（`Battle` 里 private ✓），它**只对"非行动者"**调 `tickForeign` ⇒ ⭐ 所以"行动者自己的时长"由**另一处**推进（下一轮搜那一处）**）**：
+>
+> * ✅ **实测（读 `Battle` 的该私有方法 ✓）** ✓ 原文要点：
+>   ```java
+>   /** Spends the duration of every buff on the field whose clock belongs to {@code clockOwner} (M-42 ④). … */
+>   private void tickForeignBuffs(CanHit clockOwner, boolean early) {
+>       for (CanHit ally : allies) {
+>           if (ally != null && ally != clockOwner) {        // ← ★ 跳过行动者自己
+>               ally.getBuffManager().tickForeign(clockOwner, early);
+>           }
+>       }
+>   }
+>   ```
+>   ＋ 它的 javadoc 说明 **`early`: `true` = before the move, `false` = after it** ✓ ⇒ ⭐ **回合边界**有两个 tick 时机 ✓。
+> * ⭐ **下一轮第一步（找"自己的时长"那一处，1 次调用）** ✗：搜 **`tickOwn`／`tick(`／`duration` 的递减处** ✓
+>   （⚠ 提示：`BuffManager` 里那个含 `duration() <= 0` 公告的循环 ✓ 是**同一个私有 `tickBuff`** ✓ ⇒ ⭐ 它**必然也被"自己的回合"调用** ✗
+>     ⇒ 搜 `tickBuff(` 的**另一处调用** ✓，或搜 `tickForeignBuffs(` 的调用处**旁边**那一行 ✓）。
+> * ⭐ **拿到后**：判据里调它 ✓ ⇒ 到期 ⇒ 公告 ⇒ 奖励 ⇒ 绿 ⇒ **变异（`turns: 1` → `2`）⇒ 全量 ⇒ 出货** ✓
+>   （⚠ 内容已经准备好，随时可重放 `tools/ship_aha_final.py` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
