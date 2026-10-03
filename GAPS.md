@@ -24460,6 +24460,30 @@
 >   ⚠ **并记住第 73 条纪律** ✓：⭐ **判据**不要**为了控制变量而重建角色表**（⚠ 那会丢掉 `level_convention` ✓ —— ⭐ 代码里判过我三次 ✓）。
 > * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十六：🎉🎉🎉 **`8007` 的元素取自数据 ⇒ `element: "Ice"` 不是猜的**）**）**：
+>
+> * ✅ **实测（读 `src/main/resources/data/character_data.json` 的 `8007` 条目 ✓）** ✓ 全文：
+>   ```json
+>   { "id": 8007, "attribute": "ice", "short_name": "playerboy4", "max_energy": 160,
+>     "name": { "chinese": "开拓者", "english": "Trailblazer" },
+>     "mt": "memory", "rarity": 5,
+>     "health": 142.56, "attack": 73.92, "defence": 85.8, "speed": 103, "aggro": 100 }
+>   ```
+>   ⇒ ⭐⭐⭐ **四条** ✓：**(i)** ⭐⭐ **`"attribute": "ice"`** ✓ ⇒ ⭐ **他的伤害元素是**冰**** ✓
+>     ⇒ ⭐ **所以 rider 里的 `element: "Ice"` 是**数据给的**，不是猜的** ✓（⭐ 与 `1415` 用 `Ice` 也一致 ✓ —— ⚠ 两位都是冰属性角色 ✓）；
+>   **(ii)** ⭐ **`"mt": "memory"`** ✓ ⇒ ⭐ **命途＝记忆** ✓（⚠ 正是忆灵那一系 ✓ ⇒ ⭐ **与"忆灵技能通道"这个目标 ③ 的名字对上了** ✓）；
+>   **(iii)** ⭐ **`short_name: "playerboy4"`** ✓ ⇒ ⭐ **解释了数据里那个 `MAvatar_PlayerGirl_40_…`／`PlayerGirl` 命名家族** ✓（⚠ 与 `1501` 的 `PlayerGirl_40` 同族 ✓）；
+>   **(iv)** ⭐ **`speed: 103`／`max_energy: 160`／`health: 142.56`／`attack: 73.92`** ✓ ⇒ ⭐ **都是可引用的真数** ✓。
+> * ⭐⭐ **于是第 27 件的**最后一个未知也消掉了**** ✓（⚠ 下一轮两次调用 ⇒ **出货**）✗：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "cheer_true_damage_rider",
+>     "when": ["actor has_state 迷迷的声援", "actor is_ally", "damage_is_attack"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.28,
+>               "element": "Ice", "damage_type": "TRUE", "target": "target" } ] }
+>   ```
+>   ⇒ ⭐ **判据两向**（⚠ 有【迷迷的声援】⇒ 追加 ✓／没有 ⇒ 不追加 ✓）＋ **变异**（⚠ 0.28 → 0.10 ✓）⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
+> * ⚠ **推送**：本地仍**领先 3** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -32015,6 +32039,30 @@
 >   ＋ **变异**（⚠ `percent` 0.28 → 0.10 ⇒ 必红 ✓）⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
 >   ⚠ **并记住第 73 条纪律** ✓：⭐ **判据**不要**为了控制变量而重建角色表**（⚠ 那会丢掉 `level_convention` ✓ —— ⭐ 代码里判过我三次 ✓）。
 > * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十六：🎉🎉🎉 **`8007` 的元素取自数据 ⇒ `element: "Ice"` 不是猜的**）**）**：
+>
+> * ✅ **实测（读 `src/main/resources/data/character_data.json` 的 `8007` 条目 ✓）** ✓ 全文：
+>   ```json
+>   { "id": 8007, "attribute": "ice", "short_name": "playerboy4", "max_energy": 160,
+>     "name": { "chinese": "开拓者", "english": "Trailblazer" },
+>     "mt": "memory", "rarity": 5,
+>     "health": 142.56, "attack": 73.92, "defence": 85.8, "speed": 103, "aggro": 100 }
+>   ```
+>   ⇒ ⭐⭐⭐ **四条** ✓：**(i)** ⭐⭐ **`"attribute": "ice"`** ✓ ⇒ ⭐ **他的伤害元素是**冰**** ✓
+>     ⇒ ⭐ **所以 rider 里的 `element: "Ice"` 是**数据给的**，不是猜的** ✓（⭐ 与 `1415` 用 `Ice` 也一致 ✓ —— ⚠ 两位都是冰属性角色 ✓）；
+>   **(ii)** ⭐ **`"mt": "memory"`** ✓ ⇒ ⭐ **命途＝记忆** ✓（⚠ 正是忆灵那一系 ✓ ⇒ ⭐ **与"忆灵技能通道"这个目标 ③ 的名字对上了** ✓）；
+>   **(iii)** ⭐ **`short_name: "playerboy4"`** ✓ ⇒ ⭐ **解释了数据里那个 `MAvatar_PlayerGirl_40_…`／`PlayerGirl` 命名家族** ✓（⚠ 与 `1501` 的 `PlayerGirl_40` 同族 ✓）；
+>   **(iv)** ⭐ **`speed: 103`／`max_energy: 160`／`health: 142.56`／`attack: 73.92`** ✓ ⇒ ⭐ **都是可引用的真数** ✓。
+> * ⭐⭐ **于是第 27 件的**最后一个未知也消掉了**** ✓（⚠ 下一轮两次调用 ⇒ **出货**）✗：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "cheer_true_damage_rider",
+>     "when": ["actor has_state 迷迷的声援", "actor is_ally", "damage_is_attack"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.28,
+>               "element": "Ice", "damage_type": "TRUE", "target": "target" } ] }
+>   ```
+>   ⇒ ⭐ **判据两向**（⚠ 有【迷迷的声援】⇒ 追加 ✓／没有 ⇒ 不追加 ✓）＋ **变异**（⚠ 0.28 → 0.10 ✓）⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
+> * ⚠ **推送**：本地仍**领先 3** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
