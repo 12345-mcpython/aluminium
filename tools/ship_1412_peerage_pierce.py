@@ -122,6 +122,11 @@ public class PeerageSkillPierceTest {
         for (int i = 0; i < charge; i++) {
             SkillExecutor.execute(battle, skill, owner, List.of(ally));
             battle.processRequests();
+            // \u26a0 A turn between casts (measured: without it the charge stopped at 1, and three enemies changed nothing --
+            // so the stall is the repeated-cast driver, not a dead battle). A skill is once per turn anyway.
+            owner.getBuffManager().beforeMove();
+            owner.getBuffManager().afterMove();
+            battle.processRequests();
         }
         Assertions.assertTrue(ally.getBuffManager().hasState("\u519b\u529f"),
                 "precondition: the ally holds the merit");
