@@ -21251,6 +21251,26 @@
 >     ⇒ ⚠ 而这条能力**同时**服务目标 ①（名单里的「奇袭结束后」✓）与 ②（爵位链的"奇袭结束"✓）✓。
 > * ⚠ **推送**：本地仍**领先 4** ✗（网络五连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百零一：🎯 **她的英文名找到了 —— `Cerydra`**（⚠ 从 `CharacterEffect_1412.json` 的 `Eff_Avatar_**Cerydra**_00_*` 反查 ✓）⇒ ⭐ 于是能力文件是 `Avatar_Cerydra_00_Ability.json`）**）**：
+>
+> * ✅ **实测（读 `Config\AssetPreload\CharacterEffect\CharacterEffect_1412.json` ✓）** ✓ 原文片段：
+>   ```json
+>   { "$type": "RPG.GameCore.CharacterPreloadConfig",
+>     "EffectAssetList": [
+>       "Effects/Eff_Prefab/Eff_Avatar/Eff_Avatar_**Cerydra**_00/Eff_Avatar_Cerydra_00_Effect.prefab",
+>       "Effects/…/Eff_Avatar_Cerydra_00_Skill_Select_Cutin.prefab" ] }
+>   ```
+>   ⇒ ⭐⭐ **英文名 = `Cerydra`** ✓（⚠ 与本段已知的命名法一致：`Aventurine`／`Castorice`／`Evernight` ✓）
+>     ⇒ ⭐ **能力文件 = `Config\ConfigAbility\Avatar\Avatar_Cerydra_00_Ability.json`** ✓
+>       （⚠ 以及可能存在的强化版 `Avatar_CerydraW_00_*` ✓ —— 本段早前见过 `Avatar_AventurineW_00_ElationSkill_Phase01` ✓）。
+> * ⭐ **下一轮第一步（一次读，取数值）** ✗：在 `Avatar_Cerydra_00_Ability.json` 里**定位 `1284115273769523069`** ✓
+>   ⇒ 读它的**参数表** ✓ ⇒ ⭐ **`#1`（持军功者暴伤 %）与 `#2`（奇袭结束后她获得的充能）** ✓
+>   ⇒ ⭐ 拿到 `#2` ⇒ **读者规则可以立刻写出** ✓（`on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}` ✓）
+>     ＋ ⚠ **`#1` 也顺手给**（"持【军功】者暴伤 +`#1`%" ✓ —— ⚠ 那是一条**独立的读者** ✓ 也许已在树上 ✓ ⇒ 顺便核 ✓）。
+> * ⭐ **并记下这一段的"找名"手法（可复用）** ✓：⚠ **tbgd 里能力文件按英文名命名** ✗ ⇒ ⭐ **用带编号的 `AssetPreload\CharacterEffect\CharacterEffect_<编号>.json` 反查**
+>   （⚠ 它的 `EffectAssetList` 里就写着 `Eff_Avatar_<英文名>_00_*` ✓）⇒ ⭐ **一次调用即可** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络六连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -25567,6 +25587,26 @@
 >   ⇒ ⭐ 所以**最省的开工序**是：**先建"奇袭"的标记（一个状态）＋ 复制一次施放 ＋ 不可递归** ✓ ⇒ **再接读者** ✓
 >     ⇒ ⚠ 而这条能力**同时**服务目标 ①（名单里的「奇袭结束后」✓）与 ②（爵位链的"奇袭结束"✓）✓。
 > * ⚠ **推送**：本地仍**领先 4** ✗（网络五连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百零一：🎯 **她的英文名找到了 —— `Cerydra`**（⚠ 从 `CharacterEffect_1412.json` 的 `Eff_Avatar_**Cerydra**_00_*` 反查 ✓）⇒ ⭐ 于是能力文件是 `Avatar_Cerydra_00_Ability.json`）**）**：
+>
+> * ✅ **实测（读 `Config\AssetPreload\CharacterEffect\CharacterEffect_1412.json` ✓）** ✓ 原文片段：
+>   ```json
+>   { "$type": "RPG.GameCore.CharacterPreloadConfig",
+>     "EffectAssetList": [
+>       "Effects/Eff_Prefab/Eff_Avatar/Eff_Avatar_**Cerydra**_00/Eff_Avatar_Cerydra_00_Effect.prefab",
+>       "Effects/…/Eff_Avatar_Cerydra_00_Skill_Select_Cutin.prefab" ] }
+>   ```
+>   ⇒ ⭐⭐ **英文名 = `Cerydra`** ✓（⚠ 与本段已知的命名法一致：`Aventurine`／`Castorice`／`Evernight` ✓）
+>     ⇒ ⭐ **能力文件 = `Config\ConfigAbility\Avatar\Avatar_Cerydra_00_Ability.json`** ✓
+>       （⚠ 以及可能存在的强化版 `Avatar_CerydraW_00_*` ✓ —— 本段早前见过 `Avatar_AventurineW_00_ElationSkill_Phase01` ✓）。
+> * ⭐ **下一轮第一步（一次读，取数值）** ✗：在 `Avatar_Cerydra_00_Ability.json` 里**定位 `1284115273769523069`** ✓
+>   ⇒ 读它的**参数表** ✓ ⇒ ⭐ **`#1`（持军功者暴伤 %）与 `#2`（奇袭结束后她获得的充能）** ✓
+>   ⇒ ⭐ 拿到 `#2` ⇒ **读者规则可以立刻写出** ✓（`on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}` ✓）
+>     ＋ ⚠ **`#1` 也顺手给**（"持【军功】者暴伤 +`#1`%" ✓ —— ⚠ 那是一条**独立的读者** ✓ 也许已在树上 ✓ ⇒ 顺便核 ✓）。
+> * ⭐ **并记下这一段的"找名"手法（可复用）** ✓：⚠ **tbgd 里能力文件按英文名命名** ✗ ⇒ ⭐ **用带编号的 `AssetPreload\CharacterEffect\CharacterEffect_<编号>.json` 反查**
+>   （⚠ 它的 `EffectAssetList` 里就写着 `Eff_Avatar_<英文名>_00_*` ✓）⇒ ⭐ **一次调用即可** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络六连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
