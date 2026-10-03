@@ -57,3 +57,51 @@ else:
 
 json.dump(out, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1407.json: the new bud rides HP loss")
+
+io.open(JUDGE, "w", encoding="utf-8", newline="").write('''package com.laosun.aluminium.test;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.utils.CharacterFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Random;
+
+/**
+ * 1407\uff1a\u300c\u6211\u65b9\u5168\u4f53\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u9050\u8776\u83b7\u5f97 1 \u70b9\u3010\u65b0\u854a\u3011\u300d (2026-10-02).
+ *
+ * <p>\u2b50 FILE-DRIVEN, driven by a real fight: nothing else is a more trustworthy source of HP loss than the enemies' own turns.
+ * \u26a0 The assertion is deliberately loose ("more than zero"): the document says "per point", and whether HP_LOST carries how many
+ * points is not measured yet -- a precise 1 would be a guess. A mutation (the rule gone, or the event changed) leaves it at
+ * zero, so the judge is still load-bearing.
+ */
+public class NewBudOnHpLossTest {
+    private static final int OWNER = 1407;
+    private static final int ALLY = 1002;
+    private static final int MONSTER = 1002011;
+    private static final String RES = "\u65b0\u854a";
+
+    /** \u2b50 Losing HP gives her the new bud. */
+    @Test
+    public void losingHpGivesTheNewBud() {
+        Character owner = CharacterFactory.create(OWNER, 80);
+        Character ally = CharacterFactory.create(ALLY, 80);
+        Battle battle = new Battle(List.of(owner, ally),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+
+        double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
+        for (int i = 0; i < 20 && owner.getResources().has(RES) && owner.getResources().value(RES) <= before; i++) {
+            battle.stepForward();
+            battle.processRequests();
+        }
+        Assertions.assertTrue(owner.getResources().has(RES) && owner.getResources().value(RES) > before,
+                "losing HP must give her a new bud (before=" + before + ")");
+    }
+}
+''')
+print("ok   judge written")
