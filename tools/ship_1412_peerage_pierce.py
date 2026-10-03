@@ -51,7 +51,7 @@ rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == RULE)]
 rules.append({
     "on": "DEALING_DAMAGE",
     "id": RULE,
-    "when": ["actor has_state \u7235\u4f4d", "from_category BPSKILL"],
+    "when": [],
     "do": [
         {"op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.20,
          "until": "cast_end", "target": "self"},
