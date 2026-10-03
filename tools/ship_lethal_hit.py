@@ -121,6 +121,25 @@ public class LethalHitTest {
                 "\u300c\u56de\u590d\u7b49\u540c\u4e8e\u81ea\u8eab\u751f\u547d\u4e0a\u9650 50% \u7684\u751f\u547d\u503c\u300d");
     }
 
+    /** \u26a0 \u300c\u8be5\u6548\u679c**\u5355\u573a\u6218\u6597\u4e2d\u53ea\u80fd\u89e6\u53d1 1 \u6b21**\u300d: the second lethal blow kills her. */
+    @Test
+    public void jingliuDiesToASecondLethalBlow() {
+        Character her = CharacterFactory.create(JINGLIU, 80, false, null, null, 0);
+        Battle battle = new Battle(List.of(her),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+
+        battle.applyTrueDamage(battle.enemies.getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
+        battle.processRequests();
+        Assertions.assertFalse(her.isDeath(), "precondition: the first blow is survived");
+
+        battle.applyTrueDamage(battle.enemies.getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
+        battle.processRequests();
+        Assertions.assertTrue(her.isDeath(),
+                "\u300c\u8be5\u6548\u679c\u5355\u573a\u6218\u6597\u4e2d\u53ea\u80fd\u89e6\u53d1 1 \u6b21\u300d-- the second one is not saved");
+    }
+
     // ==================================================================
 
     /** builds the scene, optionally transforms her, deals one lethal hit, and returns her. */
