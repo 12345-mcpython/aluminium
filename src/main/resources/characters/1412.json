@@ -203,6 +203,45 @@
       ],
       "source": "1412 刻律德菈 行迹（文档 `:105`）：「若当前【军功】已升级为【爵位】，则该角色**造成战技伤害时额外无视目标 20%** 的防御力」",
       "note": "⭐ 2026-10-02：走 **instance 路由** ✓（`instance: true` ✓ —— 引擎文档：“`MODIFY_ATTR` with instance=true supports DEFENCE_IGNORE” ✓），⚠ 但仍需时长 ✗（装载器逐字：*requires \"turns\" … \"permanent\": true*）。⚠ **判据不再问属性表** ✓（属性探针已量出：16% 恒在、两个单位都看不到 20% ✗）而是**比伤害** ✓（同一场戏、只换“有没有爵位” ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "coup_de_main",
+      "when": [
+        "actor has_state 爵位",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "target": "attacker"
+        }
+      ],
+      "source": "1412 刻律德菈（文档 `:67`/`:68`）：「…对敌方目标施放战技时触发**奇袭**」＋定义「**奇袭**：复制一次即将施放的技能并**提前施放**，随后施放原技能」",
+      "note": "⭐ 2026-10-02：`CAST_SETUP`（引擎自述的**前置钩子** ✓）＋`CAST_SKILL`（“**使其立即施放 1 次**” ✓）。⚠ 防递归在**引擎侧** ✓（`castSkill` 看施放栈：`currentCast().outer() != null` ⇒ 跳过 ✓）—— 因为条件 DSL 的 `!` **只能否定队伍条件** ✗，内容侧写不出来 ✗。"
+    },
+    {
+      "on": "INSERTED_CAST_END",
+      "id": "coup_de_main_ends",
+      "when": [
+        "actor has_state 爵位",
+        "self_resource:充能 >= 6"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "充能",
+          "amount": 6
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "爵位",
+          "target": "attacker"
+        }
+      ],
+      "source": "1412 刻律德菈（文档 `:67`）：「**奇袭结束后，消耗 6 点充能使【爵位】变回【军功】**」",
+      "note": "⭐ 2026-10-02：触发用**新建的 `INSERTED_CAST_END`** ✓（“被命令的施放结束” ✓）；“变回【军功】”就是**取消【爵位】** ✓（文档：「持有【爵位】的角色**被视为同时持有【军功】**」 ✓）；门槛 `self_resource:充能 >= 6` ✓ 保证不会花不起 ✗。"
     }
   ]
 }

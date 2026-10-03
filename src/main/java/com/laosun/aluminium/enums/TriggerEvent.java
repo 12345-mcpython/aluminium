@@ -35,6 +35,21 @@ public enum TriggerEvent {
      * 1501's two 「阿哈时刻结束时…」 and the light cone's 「奇袭结束后…」.
      */
     STATE_ENDED("STATE_ENDED", true),
+
+    /**
+     * The end of a cast that a RULE commanded -- 「被插入的施放」 (2026-10-02).
+     *
+     * <p>⚠ A commanded cast IS a real cast: it announces CAST_SETUP / SKILL_CAST and settles its own energy, so no existing
+     * event tells it apart from the original it was copied from. This is the moment that names it, and the reader is
+     * 1412's 「**奇袭结束后**，消耗 6 点充能使【爵位】变回【军功】」 -- "after the INSERTED one ended", not "after a skill was cast".
+     *
+     * <p>⚠ <b>A commanded cast may not command another one</b> (the same sentence: 「奇袭不会再次触发奇袭」). The guard
+     * lives in {@code TriggerInterpreter.castSkill} and reads the cast stack the engine already keeps:
+     * {@code Battle.currentCast().outer() != null} means the open cast is itself a commanded one, which is exactly the
+     * "inserting inside an insert" that would otherwise recurse forever -- the same shape as {@code castUltra}'s refusal
+     * during an extra turn ("inserting another ultimate inside an extra turn turns 'extra' into infinite chain").
+     */
+    INSERTED_CAST_END("INSERTED_CAST_END", true),
     /**
      * ✅ {@code Battle.startBattle()} — delivered once to <b>every character's own table</b>, after the opening
      * hooks and before {@code processRequests}.
