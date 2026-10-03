@@ -23918,6 +23918,36 @@
 >   **`1407` 的【新蕊】（8 轮、六项已证、登记 ✓）**／**`8007` 的 28% 真伤害（忆灵技能通道，未动 ✓）**。
 > * ⚠ **推送**：本地已**同步** ✓（`f65fd580` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百三十九：🎯🎯🎯 **忆灵判据的"三行骨干"抄到手** —— 下一轮可**一次写成** `1512` 的面板判据**）**）**：
+>
+> * ✅ **实测（读 `AglaeaMemospriteTest` 的断言段 ✓）** ✓ 原文骨架（⚠ 逐个方法名都是真名 ✓）：
+>   ```java
+>   private static final double EPS = 1e-6;
+>   Battle battle = battle();                        // ⚠ 它自己的建场助手
+>   Character aglaea = battle.characters.getFirst();
+>   battle.startBattle();
+>   Summon tailor = battle.summonMemosprite(aglaea); // ⭐ 忆灵就是 `Summon`
+>   battle.processRequests();
+>   tailor.takeDamage(tailor.getMaxHp() * 0.8);
+>   double before = tailor.getCurrentHp();           // ⭐ 还有 `getCurrentHp()`（⚠ 本段早前缺的那个访问器 ✓）
+>   battle.fireTriggers(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0);
+>   Assertions.assertEquals(before + tailor.getMaxHp() * 0.5, tailor.getCurrentHp(), EPS, "「回复等于其 50% 生命上限」");
+>   Assertions.assertEquals(1, battle.summonCountOf(aglaea), "…and no second one appeared");
+>   ```
+>   ⇒ ⭐⭐ **四个真名** ✓：⭐ **`battle.summonMemosprite(角色)`** ✓／⭐ **`battle.summonCountOf(角色)`** ✓／⭐ **`Summon.getMaxHp()` ＋ `getCurrentHp()`** ✓／⭐ **`battle.characters.getFirst()`** ✓。
+> * ⭐⭐ **于是 `1512` 的面板判据可以**一次写成**** ✓（⚠ 下一轮两次调用 ⇒ 本块四件齐 ✓）：
+>   ```java
+>   Character robin = battle.characters.getFirst();
+>   battle.startBattle();
+>   Summon bird = battle.summonMemosprite(robin);
+>   Assertions.assertEquals(robin.getMaxHp() * 0.7, bird.getMaxHp(), EPS, "70% \u751f\u547d\u4e0a\u9650");
+>   Assertions.assertEquals(robin.getAttribute(AttributeType.SPEED).get() * 1.8,
+>                           bird.getAttribute(AttributeType.SPEED).get(), EPS, "180% \u901f\u5ea6");
+>   ```
+>   ＋ ⭐ **变异**：把 `memosprites/1512.json` 的 `0.7` 改成 `0.5` ⇒ ⭐ **必红** ✓ ⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
+>   ⚠ **两点注意** ✓：① ⭐ **`Summon.getAttribute` 的真名要先看一眼**（⚠ `CanHit` 有 `getAttribute` ✓ ⇒ ⭐ 大概率可用 ✓）；② ⭐ **签名里 `EPS` 的存在说明面板是**浮点**比例** ✓ ⇒ ⭐ **`assertEquals(..., EPS, ...)` 而不是整数断言** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`9a9d7aa0` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -30931,6 +30961,36 @@
 > * ⭐ **本段的进度总览（如实）** ✓：**已出货 24 件** ✓；⭐ **目标 ③ 的三块**：**忆灵面板（内容已在树、判据待写 ✓ 本轮已核账）**／
 >   **`1407` 的【新蕊】（8 轮、六项已证、登记 ✓）**／**`8007` 的 28% 真伤害（忆灵技能通道，未动 ✓）**。
 > * ⚠ **推送**：本地已**同步** ✓（`f65fd580` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百三十九：🎯🎯🎯 **忆灵判据的"三行骨干"抄到手** —— 下一轮可**一次写成** `1512` 的面板判据**）**）**：
+>
+> * ✅ **实测（读 `AglaeaMemospriteTest` 的断言段 ✓）** ✓ 原文骨架（⚠ 逐个方法名都是真名 ✓）：
+>   ```java
+>   private static final double EPS = 1e-6;
+>   Battle battle = battle();                        // ⚠ 它自己的建场助手
+>   Character aglaea = battle.characters.getFirst();
+>   battle.startBattle();
+>   Summon tailor = battle.summonMemosprite(aglaea); // ⭐ 忆灵就是 `Summon`
+>   battle.processRequests();
+>   tailor.takeDamage(tailor.getMaxHp() * 0.8);
+>   double before = tailor.getCurrentHp();           // ⭐ 还有 `getCurrentHp()`（⚠ 本段早前缺的那个访问器 ✓）
+>   battle.fireTriggers(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0);
+>   Assertions.assertEquals(before + tailor.getMaxHp() * 0.5, tailor.getCurrentHp(), EPS, "「回复等于其 50% 生命上限」");
+>   Assertions.assertEquals(1, battle.summonCountOf(aglaea), "…and no second one appeared");
+>   ```
+>   ⇒ ⭐⭐ **四个真名** ✓：⭐ **`battle.summonMemosprite(角色)`** ✓／⭐ **`battle.summonCountOf(角色)`** ✓／⭐ **`Summon.getMaxHp()` ＋ `getCurrentHp()`** ✓／⭐ **`battle.characters.getFirst()`** ✓。
+> * ⭐⭐ **于是 `1512` 的面板判据可以**一次写成**** ✓（⚠ 下一轮两次调用 ⇒ 本块四件齐 ✓）：
+>   ```java
+>   Character robin = battle.characters.getFirst();
+>   battle.startBattle();
+>   Summon bird = battle.summonMemosprite(robin);
+>   Assertions.assertEquals(robin.getMaxHp() * 0.7, bird.getMaxHp(), EPS, "70% \u751f\u547d\u4e0a\u9650");
+>   Assertions.assertEquals(robin.getAttribute(AttributeType.SPEED).get() * 1.8,
+>                           bird.getAttribute(AttributeType.SPEED).get(), EPS, "180% \u901f\u5ea6");
+>   ```
+>   ＋ ⭐ **变异**：把 `memosprites/1512.json` 的 `0.7` 改成 `0.5` ⇒ ⭐ **必红** ✓ ⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
+>   ⚠ **两点注意** ✓：① ⭐ **`Summon.getAttribute` 的真名要先看一眼**（⚠ `CanHit` 有 `getAttribute` ✓ ⇒ ⭐ 大概率可用 ✓）；② ⭐ **签名里 `EPS` 的存在说明面板是**浮点**比例** ✓ ⇒ ⭐ **`assertEquals(..., EPS, ...)` 而不是整数断言** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`9a9d7aa0` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
