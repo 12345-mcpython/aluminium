@@ -95,12 +95,16 @@ public class NewBudOnHpLossTest {
         battle.processRequests();
 
         double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
-        for (int i = 0; i < 20 && owner.getResources().has(RES) && owner.getResources().value(RES) <= before; i++) {
-            battle.stepForward();
-            battle.processRequests();
-        }
-        Assertions.assertTrue(owner.getResources().has(RES) && owner.getResources().value(RES) > before,
-                "losing HP must give her a new bud (before=" + before + ")");
+        // \u2b50 2026-10-02, measured: `CanHit.takeDamage(double)` (:504) causes HP loss deterministically -- no enemy turn is
+        // needed, and twenty steps of "let them fight" left HP untouched (which is what the first draft asserted on).
+        owner.takeDamage(100.0);
+        battle.processRequests();
+
+        // \u26a0 Two assertions, not one: "the resource is in the battle's registry" and "it grew" are different unknowns.
+        Assertions.assertTrue(owner.getResources().has(RES),
+                "the new bud must be in the battle's resource table");
+        Assertions.assertEquals(before + 1, owner.getResources().value(RES),
+                "losing HP must give her one new bud (before=" + before + ")");
     }
 }
 ''')
