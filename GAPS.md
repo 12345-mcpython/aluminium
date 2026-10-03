@@ -22676,6 +22676,31 @@
 >   | ⭐ 奇袭结束后 **消耗 6 点充能、【爵位】变回【军功】** | ⚠ 要写 ✓（⚠ `SPEND_RESOURCE` ✓ 现成 ＋ ⭐ **显式移除会公告** ✓ 已通） |
 > * ⚠ **推送**：本轮**已推送** ✓（`7de66cf2` ✓，**pending 0** ✓）⇒ ⭐ **纪律五项全部满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百七十三：🎯 **目标 ② 的两个关键事实读到了** ⇒ ⭐ **爵位确实是一个状态**（挂在 `holder_of:军功` 上 ✓），⭐ 而"额外无视 20%"的**形状问题**也看清了）**）**：
+>
+> * ✅ **实测（dump 她文件里那两条规则 ✓）** ✓ 原文：
+>   ```json
+>   // skill_grants_military_merit (SKILL_CAST, actor == self)
+>   [ {REMOVE_STATE 军功, target all_allies}, {APPLY_BUFF 军功, permanent, target},
+>     {GAIN_RESOURCE 充能, 1}, {MODIFY_ATTR DEFENCE_IGNORE 0.16, permanent, target} ]     // ★ 第 22 件就是最后这条
+>
+>   // peerage_upgrade_at_six_charge (RESOURCE_CHANGED, actor == self, self_resource:充能 >= 6)
+>   [ {APPLY_BUFF 爵位, permanent, **target: "holder_of:军功"**} ]                          // ★ 爵位 = 状态 ✓
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **【爵位】是**状态**，且**挂对了人**（`holder_of:军功` ✓ —— ⭐ 本段第一次见这个"持有者别名"用法 ✓）；
+>   **(ii)** ⭐ **升爵位那条规则已经在树上** ✓（`RESOURCE_CHANGED` ＋ `self_resource:充能 >= 6` ✓ ⇒ ⭐ **门槛 6 已实现** ✓）；
+>   **(iii)** ⭐ **"给目标上【军功】"这条规则里已经有 `REMOVE_STATE` 先清场** ✓（⚠ 顺序即语义 ✓ ⇒ ⭐ **本段立的写法在树上已有先例** ✓）。
+> * ⭐⭐ **于是"已是【爵位】⇒ 战技额外无视 20%"的**形状问题**明确了** ✗：
+>   ⚠ **它不能靠一条 `permanent` 的效果**（⚠ 每次战技都叠 20% ⇒ **会无限叠加** ✗）；
+>   ⭐ **正解要看引擎有没有"**条件性属性修正**"** ✗ —— ⚠ 本段的候选：
+>   **(甲)** ⭐ 挂在 `DEALING_DAMAGE` ＋ `when: ["actor has_state 爵位", "from_category BPSKILL"]` ＋ **一个"只在本次伤害内有效"的时限** ✓
+>     （⚠ 本段见过的时限：`next_attack`／`next_skill`／`cast_end`／`turn_end` ✓ ⇒ ⭐ **`cast_end` 最贴近"本次施放内"** ✓ —— ⚠ **一次 grep 即可定** ✓）；
+>   **(乙)** ⚠ 若没有合适的时限 ⇒ ⭐ **登记**"缺'仅本次技能内有效'的时限" ✓（⚠ 按纪律**不近似** ✓）。
+> * ⭐ **下一轮第一步（一次可成）** ✗：① **读 `lifetimesOf` 的闭集** ✓（⚠ 本段读过它：`next_attack`／`next_skill`／`next_ultimate`／`cast_end`／`turn_end` ✓）；
+>   ② 在 `1412.json` 加一条 **`DEALING_DAMAGE`** 规则（⚠ `when: ["actor has_state 爵位", "from_category BPSKILL"]` ✓）⇒ `MODIFY_ATTR{DEFENCE_IGNORE, 0.20, until: <选定>}` ✓
+>   ⇒ ⭐ **判据**：把她推到 6 点充能（⚠ 现成规则 ✓）⇒ 断言**她的** `DEFENCE_IGNORE` 在战技伤害时 **0.16 ＋ 0.20** ✗ hmm: ⚠ 16% 是给**持军功者**的 ✓ ⇒ ⭐ 若**她自己**也持军功 ⇒ ⚠ 两个人可能不同 ✓ ⇒ ⭐ **判据要按"持爵位的那位"读** ✓ ⇒ **变异** ⇒ **全量** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`ba10a5be` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -28448,6 +28473,31 @@
 >   | ⭐ 奇袭结束后 **消耗 6 点充能、【爵位】变回【军功】** | ⚠ 要写 ✓（⚠ `SPEND_RESOURCE` ✓ 现成 ＋ ⭐ **显式移除会公告** ✓ 已通） |
 > * ⚠ **推送**：本轮**已推送** ✓（`7de66cf2` ✓，**pending 0** ✓）⇒ ⭐ **纪律五项全部满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百七十三：🎯 **目标 ② 的两个关键事实读到了** ⇒ ⭐ **爵位确实是一个状态**（挂在 `holder_of:军功` 上 ✓），⭐ 而"额外无视 20%"的**形状问题**也看清了）**）**：
+>
+> * ✅ **实测（dump 她文件里那两条规则 ✓）** ✓ 原文：
+>   ```json
+>   // skill_grants_military_merit (SKILL_CAST, actor == self)
+>   [ {REMOVE_STATE 军功, target all_allies}, {APPLY_BUFF 军功, permanent, target},
+>     {GAIN_RESOURCE 充能, 1}, {MODIFY_ATTR DEFENCE_IGNORE 0.16, permanent, target} ]     // ★ 第 22 件就是最后这条
+>
+>   // peerage_upgrade_at_six_charge (RESOURCE_CHANGED, actor == self, self_resource:充能 >= 6)
+>   [ {APPLY_BUFF 爵位, permanent, **target: "holder_of:军功"**} ]                          // ★ 爵位 = 状态 ✓
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **【爵位】是**状态**，且**挂对了人**（`holder_of:军功` ✓ —— ⭐ 本段第一次见这个"持有者别名"用法 ✓）；
+>   **(ii)** ⭐ **升爵位那条规则已经在树上** ✓（`RESOURCE_CHANGED` ＋ `self_resource:充能 >= 6` ✓ ⇒ ⭐ **门槛 6 已实现** ✓）；
+>   **(iii)** ⭐ **"给目标上【军功】"这条规则里已经有 `REMOVE_STATE` 先清场** ✓（⚠ 顺序即语义 ✓ ⇒ ⭐ **本段立的写法在树上已有先例** ✓）。
+> * ⭐⭐ **于是"已是【爵位】⇒ 战技额外无视 20%"的**形状问题**明确了** ✗：
+>   ⚠ **它不能靠一条 `permanent` 的效果**（⚠ 每次战技都叠 20% ⇒ **会无限叠加** ✗）；
+>   ⭐ **正解要看引擎有没有"**条件性属性修正**"** ✗ —— ⚠ 本段的候选：
+>   **(甲)** ⭐ 挂在 `DEALING_DAMAGE` ＋ `when: ["actor has_state 爵位", "from_category BPSKILL"]` ＋ **一个"只在本次伤害内有效"的时限** ✓
+>     （⚠ 本段见过的时限：`next_attack`／`next_skill`／`cast_end`／`turn_end` ✓ ⇒ ⭐ **`cast_end` 最贴近"本次施放内"** ✓ —— ⚠ **一次 grep 即可定** ✓）；
+>   **(乙)** ⚠ 若没有合适的时限 ⇒ ⭐ **登记**"缺'仅本次技能内有效'的时限" ✓（⚠ 按纪律**不近似** ✓）。
+> * ⭐ **下一轮第一步（一次可成）** ✗：① **读 `lifetimesOf` 的闭集** ✓（⚠ 本段读过它：`next_attack`／`next_skill`／`next_ultimate`／`cast_end`／`turn_end` ✓）；
+>   ② 在 `1412.json` 加一条 **`DEALING_DAMAGE`** 规则（⚠ `when: ["actor has_state 爵位", "from_category BPSKILL"]` ✓）⇒ `MODIFY_ATTR{DEFENCE_IGNORE, 0.20, until: <选定>}` ✓
+>   ⇒ ⭐ **判据**：把她推到 6 点充能（⚠ 现成规则 ✓）⇒ 断言**她的** `DEFENCE_IGNORE` 在战技伤害时 **0.16 ＋ 0.20** ✗ hmm: ⚠ 16% 是给**持军功者**的 ✓ ⇒ ⭐ 若**她自己**也持军功 ⇒ ⚠ 两个人可能不同 ✓ ⇒ ⭐ **判据要按"持爵位的那位"读** ✓ ⇒ **变异** ⇒ **全量** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`ba10a5be` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
