@@ -97,8 +97,12 @@ public class PeerageSkillPierceTest {
     private static boolean pierceSeen(int charge) {
         Character owner = CharacterFactory.create(OWNER, 80);
         Character ally = CharacterFactory.create(ALLY, 80);
+        // \u26a0 Three enemies, not one: the first draft killed the single 90-level monster on the opening cast, and a terminal
+        // battle makes every later cast a no-op -- which showed up as "the charge stopped at 1".
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 90, 1),
+                        EnemyFactory.create(MONSTER, 90, 1),
+                        EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
 
