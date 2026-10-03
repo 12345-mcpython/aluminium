@@ -49,6 +49,7 @@ public class EffectSpec {
         copy.amountPercent = amountPercent;
         copy.amountFromEvent = amountFromEvent;
         copy.amountFromPrevious = amountFromPrevious;
+        copy.minEidolon = minEidolon;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -152,6 +153,14 @@ return copy;
      * context ({@code TriggerContext.amount}); until this flag no op could spend it, so "as much as it just gained" had no spelling.
      */
     private Boolean amountFromEvent;
+
+    /**
+     * ⭐ 2026-10-02：**效果级**的星魂分层。读者：1505 星魂的 50%／100%，
+     * 以及 1415 第二半那条“随层级”的穿透。规则级的 `min_eidolon`
+     * 只能关掉整条规则，而这里要关的只是其中一条效果。
+     */
+    @com.google.gson.annotations.SerializedName("min_eidolon")
+    private Integer minEidolon;
 
     /**
      * ⚠ 2026-10-02（读者：1505 星魂「额外获得等同于本次获得的【好活当赏】50%/100%」）：

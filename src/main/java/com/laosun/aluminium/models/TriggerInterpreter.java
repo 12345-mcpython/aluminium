@@ -909,6 +909,11 @@ public final class TriggerInterpreter {
             // named rule's own effect values. ⚠ A COPY, not a mutation: the compiled EffectSpec is shared by every
             // battle, so adjusting it in place would leak the amendment (and, in the test suite, into other tests).
             // The fast path returns the same instance, so the 57 places that read `percent`/`turns` stay untouched.
+            if (effect.getMinEidolon() != null && eidolonRankOf(ctx.owner()) < effect.getMinEidolon()) {
+                // ⭐ 2026-10-02: this EFFECT belongs to an Eidolon rank the unit does not have. The rule-level
+                // `min_eidolon` cannot express this -- it would switch off the whole rule, base part included.
+                continue;
+            }
             effect = amendedEffect(effect, ctx);
             // M-53: this effect's per-target conditions. The ops below take `effectCtx`, whose filter `resolveTargets`
             // applies -- so the whole vocabulary cost four lines in the loop and one branch in the resolver.
