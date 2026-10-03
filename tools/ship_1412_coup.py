@@ -132,8 +132,10 @@ public class CoupDeMainTest {
         SkillExecutor.execute(battle, his, ally, List.of(battle.enemies.get(0)));
         battle.processRequests();
 
-        Assertions.assertEquals(charge - 6, owner.getResources().value(CHARGE), 1e-9,
-                "\u300c\u6d88\u8017 6 \u70b9\u5145\u80fd\u300d");
+        Assertions.assertEquals(charge - 6 + 2, owner.getResources().value(CHARGE), 1e-9,
+                "\u300c\u6d88\u8017 6 \u70b9\u5145\u80fd\u300d\u2014\u2014 \u2757 \u800c\u4e24\u6b21\u65bd\u653e\uff08\u590d\u5236 + \u539f\u6280\u80fd\uff09"
+                        + "\u5404\u7ed9\u5979 +1 \u70b9\uff08\u3010\u519b\u529f\u3011\u90a3\u6761\uff1a\u300c\u65bd\u653e\u666e\u653b\u6216\u6218\u6280\u65f6\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f97 1 \u70b9\u5145\u80fd\u300d\uff09"
+                        + "\uff0c\u6240\u4ee5\u51c0\u53d8\u5316\u662f -4 \u2713 (before=" + charge + ")");
         Assertions.assertFalse(ally.getBuffManager().hasState(PEERAGE),
                 "\u300c\u4f7f\u3010\u7235\u4f4d\u3011\u53d8\u56de\u3010\u519b\u529f\u3011\u300d");
         Assertions.assertTrue(ally.getBuffManager().hasState(MERIT),
