@@ -23199,6 +23199,26 @@
 > * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ 脚本已**先提交再跑** ✓。
 > * ⚠ **推送**：本地领先 1 ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百：🎯 **倒计时的存储找到了（私有）** ⇒ ⭐ 判据需要"能看见它"的入口 ⇒ ⚠ 这是一处**小小的引擎侧补充** ✓）**）**：
+>
+> * ✅ **实测（读 `Battle` ✓）** ✓：
+>   * ⭐ **`:183`** ＝ **`private final List<Countdown> countdowns = new ArrayList<>();`** ✗（**私有** ✓）；
+>   * ⭐ 它的 javadoc（`:177`–`:181`）逐字：*"The **countdown units** this battle has placed on the action order (M-49). Kept in their own
+>     list, and ⚠ **not** in `allies`: a countdown belongs to our camp (our rules react…), [otherwise every targeting rule] could pick it,
+>     and it would be a legal target for every ally-directed effect. See `Countdown`."* ✓
+>     ⇒ ⭐⭐ **即：倒计时是**行动序列上的一个单位**（⚠ 有自己的 `Countdown` 类 ✓）** ✓；
+>   * ⭐ **`:946`** 附近还有一句关键的 ✓：*"a countdown exists to HAVE a turn -- this is the moment its reader waits for
+>     （「倒计时回合开始时知更鸟退出【协奏】状态并立即行动」）. **The countdown has no table of its own**…"* ✓
+>     ⇒ ⭐ **倒计时**没有自己的规则表** ✓（⚠ 所以"它走完 ⇒ 触发什么"要由**拥有者的表**来管 ✓）。
+> * ⭐⭐ **于是判据的路有两条** ✗：
+>   **(甲)** ⭐ **给 `Battle` 加一个公开的只读入口** ✓（⚠ 例如 `public List<Countdown> countdowns()` 或 `hasCountdown(String name)` ✓）
+>     ⇒ ⭐ **这是一处小改动、且它本身有读者** ✓（⚠ 本判据 ✓ ＋ 任何要断言倒计时的判据 ✓）；
+>   **(乙)** ⭐ **让判据推进回合、观察"额外回合"发生** ✓（⚠ 更真实 ✓ 但更慢 ✓，⚠ 且要处理 `Countdown` 的语义 ✓）。
+>   ⇒ ⭐ **推荐 (甲)** ✓（⚠ 一步到位、且后续 `1408`／`1507`／`1309` 的判据都能用 ✓ —— ⭐ **读者 ≥2** ✓）。
+> * ⭐ **本段在 `1408` 这条上的进度（收束）** ✓：**变身状态** ✓（第 21 件）／**倒计时内容写法** ✓（照抄两例）／**那个数** ✓（59.4）／
+>   **倒计时的存储** ✓（`Battle.countdowns`，私有）⇒ ⭐ **只差一个只读入口 ＋ 判据 ＋ 变异** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`536ecd9c` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -29494,6 +29514,26 @@
 > * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ 脚本已**先提交再跑** ✓。
 > * ⚠ **推送**：本地领先 1 ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百：🎯 **倒计时的存储找到了（私有）** ⇒ ⭐ 判据需要"能看见它"的入口 ⇒ ⚠ 这是一处**小小的引擎侧补充** ✓）**）**：
+>
+> * ✅ **实测（读 `Battle` ✓）** ✓：
+>   * ⭐ **`:183`** ＝ **`private final List<Countdown> countdowns = new ArrayList<>();`** ✗（**私有** ✓）；
+>   * ⭐ 它的 javadoc（`:177`–`:181`）逐字：*"The **countdown units** this battle has placed on the action order (M-49). Kept in their own
+>     list, and ⚠ **not** in `allies`: a countdown belongs to our camp (our rules react…), [otherwise every targeting rule] could pick it,
+>     and it would be a legal target for every ally-directed effect. See `Countdown`."* ✓
+>     ⇒ ⭐⭐ **即：倒计时是**行动序列上的一个单位**（⚠ 有自己的 `Countdown` 类 ✓）** ✓；
+>   * ⭐ **`:946`** 附近还有一句关键的 ✓：*"a countdown exists to HAVE a turn -- this is the moment its reader waits for
+>     （「倒计时回合开始时知更鸟退出【协奏】状态并立即行动」）. **The countdown has no table of its own**…"* ✓
+>     ⇒ ⭐ **倒计时**没有自己的规则表** ✓（⚠ 所以"它走完 ⇒ 触发什么"要由**拥有者的表**来管 ✓）。
+> * ⭐⭐ **于是判据的路有两条** ✗：
+>   **(甲)** ⭐ **给 `Battle` 加一个公开的只读入口** ✓（⚠ 例如 `public List<Countdown> countdowns()` 或 `hasCountdown(String name)` ✓）
+>     ⇒ ⭐ **这是一处小改动、且它本身有读者** ✓（⚠ 本判据 ✓ ＋ 任何要断言倒计时的判据 ✓）；
+>   **(乙)** ⭐ **让判据推进回合、观察"额外回合"发生** ✓（⚠ 更真实 ✓ 但更慢 ✓，⚠ 且要处理 `Countdown` 的语义 ✓）。
+>   ⇒ ⭐ **推荐 (甲)** ✓（⚠ 一步到位、且后续 `1408`／`1507`／`1309` 的判据都能用 ✓ —— ⭐ **读者 ≥2** ✓）。
+> * ⭐ **本段在 `1408` 这条上的进度（收束）** ✓：**变身状态** ✓（第 21 件）／**倒计时内容写法** ✓（照抄两例）／**那个数** ✓（59.4）／
+>   **倒计时的存储** ✓（`Battle.countdowns`，私有）⇒ ⭐ **只差一个只读入口 ＋ 判据 ＋ 变异** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`536ecd9c` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
