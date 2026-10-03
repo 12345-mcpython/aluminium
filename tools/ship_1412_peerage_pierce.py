@@ -27,6 +27,26 @@ RULE = "peerage_skill_extra_pierce"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
+
+# \u2b50 2026-10-02, measured: the charge grant on the merit rule had NO `target`, so it fell to the cast's own target --
+# the ALLY -- while the document says "\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f97 1 \u70b9\u5145\u80fd" (SHE gains it). Five engine-side
+# hypotheses were eliminated before this one; the dead giveaway was a judge that read 1 no matter how often she cast.
+fixed = 0
+for rule in rules:
+    if isinstance(rule, dict) and rule.get("id") == "skill_grants_military_merit":
+        for eff in (rule.get("do") or []):
+            if isinstance(eff, dict) and eff.get("op") == "GAIN_RESOURCE" and eff.get("resource") == "\u5145\u80fd" \
+                    and eff.get("target") is None:
+                eff["target"] = "self"
+                fixed += 1
+        rule["note"] = ((rule.get("note") or "") +
+                        "\n\u2b50 2026-10-02\uff1a\u8865\u4e0a **`\"target\": \"self\"`** \u2713 \u2014\u2014 \u539f\u672c\u6f0f\u5199\u5b83 \u2717\uff0c"
+                        "\u4e8e\u662f\u5145\u80fd\u843d\u5728\u4e86**\u672c\u6b21\u65bd\u653e\u7684\u76ee\u6807**\uff08\u90a3\u4f4d\u961f\u53cb\uff09\u4e0a \u2717\uff1b"
+                        "\u6587\u6863\uff08`:67`\uff09\u8bf4\u7684\u662f\u300c\u4f7f\u6307\u5b9a\u6211\u65b9\u5355\u4f53\u89d2\u8272\u83b7\u5f97\u3010\u519b\u529f\u3011"
+                        "**\u5e76\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f97 1 \u70b9\u5145\u80fd**\u300d\u2713 \u2014\u2014 \u5145\u80fd\u5e94\u52a0**\u5979** \u2713\u3002")
+if fixed != 1:
+    raise SystemExit("expected exactly one untargeted charge grant, fixed " + str(fixed))
+
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == RULE)]
 rules.append({
     "on": "CAST_SETUP",
