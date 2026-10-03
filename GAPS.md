@@ -23355,6 +23355,27 @@
 >   ⇒ 资源在数据里叫 **`ElationEchoPoint`** ✓ ⇒ 它的状态条目 **`MAvatar_PlayerGirl_40_ElationEchoPointBuff`** ✓ ⇒ ⭐ **只差它的数值定义** ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`074f9869` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百零九：✅ **状态条目读全了** ⇒ ⭐ 参数名 = `ElationEchoPoint`，⭐ **数值在 `Modifier` 定义里**（⭐ 与 `1412` 的 `MDF_ExtraPoint` 完全同构））**）**：
+>
+> * ✅ **实测（读 `:12696`–`:12712` ✓）** ✓ 全文骨架：
+>   ```json
+>   { "StatusID": 10080101,
+>     "ModifierName": "MAvatar_PlayerGirl_40_ElationEchoPointBuff",
+>     "StatusType": "Buff",
+>     "StatusDesc": { "Hash": 17798488669535617204 },
+>     "StatusIconPath": "SpriteOutput/BuffIcon/Inlevel/IconBuffElationDamage.png",
+>     "ReadParamList": [ "ElationEchoPoint" ],      // ★ 参数名就是它
+>     "TagList": [] }
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **这个文件只声明"读哪些参数"** ✓（⚠ 与 `1408`／`1412` 两次一致 ✓）；
+>   **(ii)** ⭐ **参数名 = `ElationEchoPoint`** ✓ ⇒ ⭐ **它的数值（可能含上限）在 `Modifier` 定义里** ✓。
+> * ⭐ **下一轮第一步（一次调用，成熟手法第三次复用）** ✗：**在 tbgd 里搜 `MAvatar_PlayerGirl_40_ElationEchoPointBuff`** ✓
+>   ⇒ ⭐ 命中处附近就是它的数值 ✓（⚠ 若为 `FixedValue`／`MaxCount` ⇒ ⭐ **拿到上限 ⇒ 立刻能出货** ✓；
+>     ⚠ 若又是 `DynamicHashes` 编译表达式 ⇒ ⭐ **登记**，⚠ 与 `1408` 的 `SetPhainonChargePoint` 同处置 ✓）。
+> * ⭐⭐ **顺带记一条可复用的"取数三连"** ✓（本段已用三次 ✓）：**文档术语表 → `AvatarStatusConfig.json` 的状态条目（拿参数名）→ `Modifier` 定义（拿数值）** ✓
+>   ⇒ ⭐ **而若要的是"某个机制的专属点"**（如 `1408` 的【毁伤】）⇒ **走 `ConfigAbility\Avatar\Avatar_<英文名>_00_Ability.json` 找 `Set<...>Point`** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`0d2bd04f` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -29805,6 +29826,27 @@
 > * ⭐ **本段在 `1501` 这条上的完整侦察链（已留档 ✓）** ✓：文档两句（`:141` ＋5 笑点／`:145` 额外回合＋2 爆点 ✓）⇒ 术语表"**全队共享**" ✓
 >   ⇒ 资源在数据里叫 **`ElationEchoPoint`** ✓ ⇒ 它的状态条目 **`MAvatar_PlayerGirl_40_ElationEchoPointBuff`** ✓ ⇒ ⭐ **只差它的数值定义** ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`074f9869` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百零九：✅ **状态条目读全了** ⇒ ⭐ 参数名 = `ElationEchoPoint`，⭐ **数值在 `Modifier` 定义里**（⭐ 与 `1412` 的 `MDF_ExtraPoint` 完全同构））**）**：
+>
+> * ✅ **实测（读 `:12696`–`:12712` ✓）** ✓ 全文骨架：
+>   ```json
+>   { "StatusID": 10080101,
+>     "ModifierName": "MAvatar_PlayerGirl_40_ElationEchoPointBuff",
+>     "StatusType": "Buff",
+>     "StatusDesc": { "Hash": 17798488669535617204 },
+>     "StatusIconPath": "SpriteOutput/BuffIcon/Inlevel/IconBuffElationDamage.png",
+>     "ReadParamList": [ "ElationEchoPoint" ],      // ★ 参数名就是它
+>     "TagList": [] }
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **这个文件只声明"读哪些参数"** ✓（⚠ 与 `1408`／`1412` 两次一致 ✓）；
+>   **(ii)** ⭐ **参数名 = `ElationEchoPoint`** ✓ ⇒ ⭐ **它的数值（可能含上限）在 `Modifier` 定义里** ✓。
+> * ⭐ **下一轮第一步（一次调用，成熟手法第三次复用）** ✗：**在 tbgd 里搜 `MAvatar_PlayerGirl_40_ElationEchoPointBuff`** ✓
+>   ⇒ ⭐ 命中处附近就是它的数值 ✓（⚠ 若为 `FixedValue`／`MaxCount` ⇒ ⭐ **拿到上限 ⇒ 立刻能出货** ✓；
+>     ⚠ 若又是 `DynamicHashes` 编译表达式 ⇒ ⭐ **登记**，⚠ 与 `1408` 的 `SetPhainonChargePoint` 同处置 ✓）。
+> * ⭐⭐ **顺带记一条可复用的"取数三连"** ✓（本段已用三次 ✓）：**文档术语表 → `AvatarStatusConfig.json` 的状态条目（拿参数名）→ `Modifier` 定义（拿数值）** ✓
+>   ⇒ ⭐ **而若要的是"某个机制的专属点"**（如 `1408` 的【毁伤】）⇒ **走 `ConfigAbility\Avatar\Avatar_<英文名>_00_Ability.json` 找 `Set<...>Point`** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`0d2bd04f` ✓，pending 0 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
