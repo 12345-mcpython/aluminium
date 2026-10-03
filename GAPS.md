@@ -21786,6 +21786,28 @@
 >   ⇒ ⭐ **按纪律：先全量绿 ⇒ 提交 ⇒ 再跑演示闸门** ✓；⚠ 且**提交必须被 `$LASTEXITCODE` 守住** ✓（⭐ 本轮已立 ✓）。
 > * ⚠ **推送**：本地仍**领先 1** ✗（网络再次失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十七：✅✅✅ **`TriggerContext` 的真身找到了 —— 它是 `TriggerTable` 里的一个 `record`** ⇒ ⭐ 于是"记录上一次入账量"的**确切补丁点**到手）**）**：
+>
+> * ✅ **实测（按类名搜声明与构造 ✓）** ✓：
+>   * ⭐ **声明**：`TriggerTable.java:1995` ✓ ——
+>     **`public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount, …)`** ✓
+>     （⚠ 本段早前在条件解析里见过的 `stateName` ✓ 就在这个 record 里 ✓）；
+>   * ⭐ **两个便利构造**：`TriggerTable.java:2003` ✓ 与 **`:2016`** ✓ —— 后者形如
+>     `return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, …)` ✓；
+>   * ⭐ **一个外部构造点**：**`Battle.java:2369`** ✓ —— `new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this, …)` ✓。
+>   ⇒ ⭐⭐ **所以"新增一个量"这件事的完整改动面是**：**record 加一个分量 ✓ ＋ 上述 3 个构造点补参数 ✓（⚠ `:2003`／`:2016`／`Battle:2369` ✓）**
+>     ⇒ ⭐ **加上 `EffectSpec` 的新字段（`beans/EffectSpec.java` ✓，⚠ 见 `:48`–`:51` 的 `copy.*` 组 ✓）
+>       ＋ `gainResource` 里"记下截断后入账量"的那一行 ✓ ＋ 新字段的分支 ✓** ⇒ ⭐ **共 5–6 处小改** ✓（⭐ 可控 ✓）。
+> * ⭐⭐ **下一轮的施工单（照抄即可）** ✗：
+>   1. `beans/EffectSpec.java` ✓：加 **`private Boolean amountFromPrevious;`** ✓ ＋ `copy.amountFromPrevious = amountFromPrevious;` ✓（⚠ 紧跟 `:50` 的 `amountFromEvent` ✓）；
+>   2. `TriggerTable.java` ✓：record 加 **`double lastAmount`** ✓（⚠ 放 `amount` 之后 ✓）＋ `:2003`／`:2016` 两个构造补一个默认值 ✓；
+>   3. `Battle.java:2369` ✓：构造点补同样的默认值 ✓；
+>   4. `TriggerInterpreter.gainResource` ✓：**截断后的入账量**写进新建的上下文 ✓／**并让 `amountFromPrevious` 的分支读它** ✓
+>      （⚠ 实现上最省：在**同一次 `do` 遍历**里用一个局部变量传递 ✓ —— ⚠ 若 `do` 是逐条新建上下文 ✓，则需把"上一条的入账量"透传 ✓ ⇒ ⭐ **先读 `do` 的遍历点再定** ✓）；
+>   5. 内容：`1505` 星魂的 50%／100% 写成 **`amountFromPrevious: true, amountPercent: 0.5|1.0`** ✓；
+>   6. 判据：⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ 与既有守卫 `ElationAmountCapTest` 一致 ✓）＋ 变异 ⇒ 必红 ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（网络连续失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26637,6 +26659,28 @@
 > * ⭐ **并记一条流程要求** ✓：⚠ 这条要改**引擎**（`EffectSpec` ＋ `TriggerInterpreter` ＋ 可能的 `TriggerContext` ✓）
 >   ⇒ ⭐ **按纪律：先全量绿 ⇒ 提交 ⇒ 再跑演示闸门** ✓；⚠ 且**提交必须被 `$LASTEXITCODE` 守住** ✓（⭐ 本轮已立 ✓）。
 > * ⚠ **推送**：本地仍**领先 1** ✗（网络再次失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十七：✅✅✅ **`TriggerContext` 的真身找到了 —— 它是 `TriggerTable` 里的一个 `record`** ⇒ ⭐ 于是"记录上一次入账量"的**确切补丁点**到手）**）**：
+>
+> * ✅ **实测（按类名搜声明与构造 ✓）** ✓：
+>   * ⭐ **声明**：`TriggerTable.java:1995` ✓ ——
+>     **`public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount, …)`** ✓
+>     （⚠ 本段早前在条件解析里见过的 `stateName` ✓ 就在这个 record 里 ✓）；
+>   * ⭐ **两个便利构造**：`TriggerTable.java:2003` ✓ 与 **`:2016`** ✓ —— 后者形如
+>     `return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, …)` ✓；
+>   * ⭐ **一个外部构造点**：**`Battle.java:2369`** ✓ —— `new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this, …)` ✓。
+>   ⇒ ⭐⭐ **所以"新增一个量"这件事的完整改动面是**：**record 加一个分量 ✓ ＋ 上述 3 个构造点补参数 ✓（⚠ `:2003`／`:2016`／`Battle:2369` ✓）**
+>     ⇒ ⭐ **加上 `EffectSpec` 的新字段（`beans/EffectSpec.java` ✓，⚠ 见 `:48`–`:51` 的 `copy.*` 组 ✓）
+>       ＋ `gainResource` 里"记下截断后入账量"的那一行 ✓ ＋ 新字段的分支 ✓** ⇒ ⭐ **共 5–6 处小改** ✓（⭐ 可控 ✓）。
+> * ⭐⭐ **下一轮的施工单（照抄即可）** ✗：
+>   1. `beans/EffectSpec.java` ✓：加 **`private Boolean amountFromPrevious;`** ✓ ＋ `copy.amountFromPrevious = amountFromPrevious;` ✓（⚠ 紧跟 `:50` 的 `amountFromEvent` ✓）；
+>   2. `TriggerTable.java` ✓：record 加 **`double lastAmount`** ✓（⚠ 放 `amount` 之后 ✓）＋ `:2003`／`:2016` 两个构造补一个默认值 ✓；
+>   3. `Battle.java:2369` ✓：构造点补同样的默认值 ✓；
+>   4. `TriggerInterpreter.gainResource` ✓：**截断后的入账量**写进新建的上下文 ✓／**并让 `amountFromPrevious` 的分支读它** ✓
+>      （⚠ 实现上最省：在**同一次 `do` 遍历**里用一个局部变量传递 ✓ —— ⚠ 若 `do` 是逐条新建上下文 ✓，则需把"上一条的入账量"透传 ✓ ⇒ ⭐ **先读 `do` 的遍历点再定** ✓）；
+>   5. 内容：`1505` 星魂的 50%／100% 写成 **`amountFromPrevious: true, amountPercent: 0.5|1.0`** ✓；
+>   6. 判据：⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ 与既有守卫 `ElationAmountCapTest` 一致 ✓）＋ 变异 ⇒ 必红 ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（网络连续失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
