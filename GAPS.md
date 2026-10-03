@@ -23342,6 +23342,19 @@
 >   （⚠ 若又是编译表达式 ⇒ ⭐ **登记**，⚠ 并把读者写成"**能写的一半**"✗ —— ⚠ 但那仍需上限 ✗ ⇒ ⭐ **所以上限是硬前置** ✓，⚠ 与前一轮结论一致 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（`13014b69` ✓，pending 0 ✓）⇒ ⭐ **纪律五项全部满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百零八：🎯🎯 **【笑点】的状态条目找到了** —— `MAvatar_PlayerGirl_40_ElationEchoPointBuff`**）**）**：
+>
+> * ✅ **实测（在 `ExcelOutput\AvatarStatusConfig.json` 里搜 `ElationEchoPoint` ✓）** ✓ 两处命中：
+>   * ⭐ **`:12698`** ＝ **`"ModifierName": "MAvatar_PlayerGirl_40_ElationEchoPointBuff"`** ✓（⚠ `PlayerGirl` ＝ 火花 ✓）；
+>   * ⭐ **`:12709`** ＝ 同一条目里再次出现 `ElationEchoPoint` ✓（⚠ 很可能在 **`ReadParamList`** 里 ✓ ⇒ ⭐ **那就是"参数名"** ✓）。
+>   ⇒ ⭐⭐ **于是"上限"的去处明确了** ✓：⭐ **在 `Modifier` 定义里找 `MAvatar_PlayerGirl_40_ElationEchoPointBuff`** ✓（⚠ 本段在 `1412` 上正是这么做的 ✓：
+>     `MServant_CyreneServant_00_AmazingBuff_Cerydra` ⇒ 在里面读到 `SetDynamicValueByAddValue`／`DynamicHashes` ✓）
+>     ⇒ ⭐ **若里面是**字面数**（`MaxCount`／`FixedValue` ✓）⇒ ⭐ 直接拿来当【笑点】的 `max`** ✓ ⇒ ⭐ **一次就能出货** ✓；
+>     ⚠ **若又是编译表达式** ⇒ ⭐ **登记**（⚠ 与 `1408` 的 `SetPhainonChargePoint` 同处置 ✓）。
+> * ⭐ **本段在 `1501` 这条上的完整侦察链（已留档 ✓）** ✓：文档两句（`:141` ＋5 笑点／`:145` 额外回合＋2 爆点 ✓）⇒ 术语表"**全队共享**" ✓
+>   ⇒ 资源在数据里叫 **`ElationEchoPoint`** ✓ ⇒ 它的状态条目 **`MAvatar_PlayerGirl_40_ElationEchoPointBuff`** ✓ ⇒ ⭐ **只差它的数值定义** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`074f9869` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -29779,6 +29792,19 @@
 > * ⚠ **并如实记下** ✓：⚠ 本条（`1501` 的笑点）**已探到"资源名 = `ElationEchoPoint`、来源 = 行为标记"** ✓ ⇒ ⭐ **只剩"上限"一个数** ✓ ⇒ ⭐ **下一次读 `AvatarStatusConfig.json` 即可** ✓
 >   （⚠ 若又是编译表达式 ⇒ ⭐ **登记**，⚠ 并把读者写成"**能写的一半**"✗ —— ⚠ 但那仍需上限 ✗ ⇒ ⭐ **所以上限是硬前置** ✓，⚠ 与前一轮结论一致 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（`13014b69` ✓，pending 0 ✓）⇒ ⭐ **纪律五项全部满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百零八：🎯🎯 **【笑点】的状态条目找到了** —— `MAvatar_PlayerGirl_40_ElationEchoPointBuff`**）**）**：
+>
+> * ✅ **实测（在 `ExcelOutput\AvatarStatusConfig.json` 里搜 `ElationEchoPoint` ✓）** ✓ 两处命中：
+>   * ⭐ **`:12698`** ＝ **`"ModifierName": "MAvatar_PlayerGirl_40_ElationEchoPointBuff"`** ✓（⚠ `PlayerGirl` ＝ 火花 ✓）；
+>   * ⭐ **`:12709`** ＝ 同一条目里再次出现 `ElationEchoPoint` ✓（⚠ 很可能在 **`ReadParamList`** 里 ✓ ⇒ ⭐ **那就是"参数名"** ✓）。
+>   ⇒ ⭐⭐ **于是"上限"的去处明确了** ✓：⭐ **在 `Modifier` 定义里找 `MAvatar_PlayerGirl_40_ElationEchoPointBuff`** ✓（⚠ 本段在 `1412` 上正是这么做的 ✓：
+>     `MServant_CyreneServant_00_AmazingBuff_Cerydra` ⇒ 在里面读到 `SetDynamicValueByAddValue`／`DynamicHashes` ✓）
+>     ⇒ ⭐ **若里面是**字面数**（`MaxCount`／`FixedValue` ✓）⇒ ⭐ 直接拿来当【笑点】的 `max`** ✓ ⇒ ⭐ **一次就能出货** ✓；
+>     ⚠ **若又是编译表达式** ⇒ ⭐ **登记**（⚠ 与 `1408` 的 `SetPhainonChargePoint` 同处置 ✓）。
+> * ⭐ **本段在 `1501` 这条上的完整侦察链（已留档 ✓）** ✓：文档两句（`:141` ＋5 笑点／`:145` 额外回合＋2 爆点 ✓）⇒ 术语表"**全队共享**" ✓
+>   ⇒ 资源在数据里叫 **`ElationEchoPoint`** ✓ ⇒ 它的状态条目 **`MAvatar_PlayerGirl_40_ElationEchoPointBuff`** ✓ ⇒ ⭐ **只差它的数值定义** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`074f9869` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
