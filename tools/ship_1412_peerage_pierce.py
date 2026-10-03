@@ -44,8 +44,10 @@ for rule in rules:
                         "\u4e8e\u662f\u5145\u80fd\u843d\u5728\u4e86**\u672c\u6b21\u65bd\u653e\u7684\u76ee\u6807**\uff08\u90a3\u4f4d\u961f\u53cb\uff09\u4e0a \u2717\uff1b"
                         "\u6587\u6863\uff08`:67`\uff09\u8bf4\u7684\u662f\u300c\u4f7f\u6307\u5b9a\u6211\u65b9\u5355\u4f53\u89d2\u8272\u83b7\u5f97\u3010\u519b\u529f\u3011"
                         "**\u5e76\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f97 1 \u70b9\u5145\u80fd**\u300d\u2713 \u2014\u2014 \u5145\u80fd\u5e94\u52a0**\u5979** \u2713\u3002")
-if fixed != 1:
-    raise SystemExit("expected exactly one untargeted charge grant, fixed " + str(fixed))
+if fixed > 1:
+    raise SystemExit("expected at most one untargeted charge grant, fixed " + str(fixed))
+# \u26a0 `fixed == 0` is the NORMAL case now: the untargeted charge grant was corrected in an earlier round, so this step is
+# idempotent and the guard must not demand a fix every time (it silently did nothing for a whole probe run).
 
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == RULE)]
 rules.append({
