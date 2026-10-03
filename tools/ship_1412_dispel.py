@@ -26,8 +26,8 @@ HOLDER = "holder_of:\u519b\u529f"
 CONTROLS = ["\u51bb\u7ed3", "\u7f20\u7ed5", "\u7981\u9522", "\u652f\u914d", "\u6012\u566a", "\u5f3a\u70c8\u9707\u8361",
             "\u5f02\u68a6", "\u7f20\u7981", "\u6050\u60e7", "\u884c\u52a8\u9501\u5b9a", "\u5e78\u798f\u5080\u5121",
             "\u6028\u706b\u707c\u8eab"]
-# NOTE: the glossary lists twelve; 缠禁 (above) is the twelfth and 怨火灼身 the twelveth. The list is taken verbatim from
-# :68 so that a reader can check it against the document line by line.
+# NOTE: the glossary's list is twelve names long -- counted from the document, not assumed ("冻结，纠缠，禁锢，支配，怒噪，强烈震荡，
+# 异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身"). The list below is taken verbatim from :68 so a reader can check it line by line.
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
