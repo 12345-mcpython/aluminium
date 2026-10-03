@@ -69,7 +69,8 @@
     "on": "STATE_ENDED",
     "id": "trace_invigoration_ending_energy",
     "when": [
-      "self state_ended 生息"
+      "self state_ended 生息",
+      "hp_percent >= 1"
     ],
     "do": [
       {
@@ -78,7 +79,7 @@
         "target": "self"
       }
     ],
-    "source": "1211 白露：【生息】结束时恢复 8 点能量。",
-    "note": "⭐ 用 `Battle.fireStateEnded` 测“能量能不能到位”。"
+    "source": "1211 白露（行迹）: 「【生息】结束时**若我方目标当前生命值等于其生命上限**，则额外恢复目标 **8** 点能量」",
+    "note": "⭐ 2026-10-02：条件 = **`self state_ended 生息`** ✓ 十 **`hp_percent >= 1`** ✓（文档原句里的“若…生命值等于其生命上限” ✓）；量 = **`GAIN_ENERGY 8`** ✓。⚠ 两向均已测：血满 ⇒ +8 ✓；血不满 ⇒ 不加 ✓。"
   }
 ]
