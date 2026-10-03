@@ -33,9 +33,10 @@ rules.append({
     "on": "HP_LOST",
     "id": "new_bud_on_hp_loss",
     "when": [],
-    # \u26a0 `self` did not pay (measured). The chain dispatches HP_LOST to the one who lost the HP (Battle:2085), so resolve the
-    # gain against THAT unit -- the context's own target -- instead of the table owner.
-    "do": [{"op": "GAIN_RESOURCE", "resource": RES, "amount": 1, "target": "target"}],
+    # \u2b50 2026-10-02, MEASURED: on an HP-loss event the engine already grants the POINTS LOST by itself, and adds the rule's
+    # literal `amount` on top. So `amount: 1` was worth "one extra bud per hit" (100 HP -> 101 buds, 50 HP -> 51 buds, both
+    # measured), and the sentence 「每损失 1 点生命值获得 1 点」 is written EXACTLY as `amount: 0`.
+    "do": [{"op": "GAIN_RESOURCE", "resource": RES, "amount": 0, "target": "target"}],
     "source": ("1407 \u9050\u8776 \u5929\u8d4b\uff08\u6587\u6863 `:94`\uff09\uff1a"
                "\u300c**\u6211\u65b9\u5168\u4f53\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u9050\u8776\u83b7\u5f97 1 \u70b9\u3010\u65b0\u854a\u3011**\u300d"),
     "note": ("\u2b50 2026-10-02\uff1a\u4e0a\u9650\u53d6**\u6587\u6863\u81ea\u5df1\u7684\u6ee1\u7ea7\u884c** `34000` \u2713"
