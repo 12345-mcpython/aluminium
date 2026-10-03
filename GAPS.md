@@ -21864,6 +21864,23 @@
 >   ⑥ 变异：`amountPercent` 0.5 → 0.25 ⇒ **必红** ✓。
 > * ⚠ **推送**：本地仍**领先 5** ✗（网络连六失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十一：✅✅ **新能力第 ① 步已落树且全量绿** —— `EffectSpec` 新增 **`amountFromPrevious`**（＋ `copy` 行 ✓）⇒ ⭐ 字段已就位，等第 ②③ 步把它接上）**）**：
+>
+> * ✅ **实测（改 ＋ 跑全量 ＋ 提交 ✓）** ✓：
+>   * ⭐ **`beans/EffectSpec.java`** 现在有 **`private Boolean amountFromPrevious;`** ✓（⚠ 附一段 javadoc，写明：**读的是"本规则里前一条效果**实际入账**的量"** ✓，
+>     ⚠ 而**不是**原始事件量 ✓ ⇒ ⭐ 这条注释把上一轮那条"已知偏差"的**正解**固定了下来 ✓）；
+>   * ⭐ 并在 `:50` 的拷贝组里加了 **`copy.amountFromPrevious = amountFromPrevious;`** ✓（⚠ 与既有 `copy.amountFromAttr/amountPercent/amountFromEvent/amountCap` 同组 ✓）；
+>   * ⭐ **全量 `--rerun-tasks` ⇒ `rc 0`（2132 例）** ✓ ⇒ ⭐ **字段是"惰性"的（还没人读它）** ✓ ⇒ 所以不破坏任何既有判据 ✓—— ⭐ **这正是"先落字段、再接逻辑"的安全序** ✓；
+>   * ⭐ **已提交** ✓（⚠ **提交被 `$LASTEXITCODE -eq 0` 守住** ✓ —— ⭐ 本轮严格执行了上一轮立的纪律 ✓）。
+> * ⭐⭐ **下一轮（第 ②③ 步，一次做完）** ✗：
+>   * ② ⭐ **`TriggerInterpreter.apply`**（`:903` 起 ✓）：循环里加 `double previousCredited = 0;` ✓；
+>     ⭐ **执行 `GAIN_RESOURCE` 前后取"资源差"** ✓（⚠ 用 `holder.getResources().value(id)` ✓ 相减 ✓ —— ⚠ 这样**不必改 `gainResource` 的签名** ✓）
+>     ⇒ 循环末尾 **更新 `previousCredited`** ✓；
+>   * ③ ⭐ **`gainResource`** ✓：新增分支 **`amountFromPrevious` ⇒ `previousCredited × amountPercent`** ✓
+>     （⚠ 实现上把那个量透传进 `effectCtx` ✓ —— ⚠ 或用一个短命的静态/线程局部 ✗ ⇒ ⭐ **优先透传** ✓）；
+>   * ④ 内容：`1505` 星魂改成 **`amountFromPrevious: true, amountPercent: 0.5`** ✓；⑤ 判据：**能量 150 ⇒ 好活当赏 150** ✓（⚠ 与 `ElationAmountCapTest` 一致 ✓）；⑥ 变异 ⇒ 必红 ✓。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络连七失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26794,6 +26811,23 @@
 >   ⑥ 变异：`amountPercent` 0.5 → 0.25 ⇒ **必红** ✓。
 > * ⚠ **推送**：本地仍**领先 5** ✗（网络连六失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十一：✅✅ **新能力第 ① 步已落树且全量绿** —— `EffectSpec` 新增 **`amountFromPrevious`**（＋ `copy` 行 ✓）⇒ ⭐ 字段已就位，等第 ②③ 步把它接上）**）**：
+>
+> * ✅ **实测（改 ＋ 跑全量 ＋ 提交 ✓）** ✓：
+>   * ⭐ **`beans/EffectSpec.java`** 现在有 **`private Boolean amountFromPrevious;`** ✓（⚠ 附一段 javadoc，写明：**读的是"本规则里前一条效果**实际入账**的量"** ✓，
+>     ⚠ 而**不是**原始事件量 ✓ ⇒ ⭐ 这条注释把上一轮那条"已知偏差"的**正解**固定了下来 ✓）；
+>   * ⭐ 并在 `:50` 的拷贝组里加了 **`copy.amountFromPrevious = amountFromPrevious;`** ✓（⚠ 与既有 `copy.amountFromAttr/amountPercent/amountFromEvent/amountCap` 同组 ✓）；
+>   * ⭐ **全量 `--rerun-tasks` ⇒ `rc 0`（2132 例）** ✓ ⇒ ⭐ **字段是"惰性"的（还没人读它）** ✓ ⇒ 所以不破坏任何既有判据 ✓—— ⭐ **这正是"先落字段、再接逻辑"的安全序** ✓；
+>   * ⭐ **已提交** ✓（⚠ **提交被 `$LASTEXITCODE -eq 0` 守住** ✓ —— ⭐ 本轮严格执行了上一轮立的纪律 ✓）。
+> * ⭐⭐ **下一轮（第 ②③ 步，一次做完）** ✗：
+>   * ② ⭐ **`TriggerInterpreter.apply`**（`:903` 起 ✓）：循环里加 `double previousCredited = 0;` ✓；
+>     ⭐ **执行 `GAIN_RESOURCE` 前后取"资源差"** ✓（⚠ 用 `holder.getResources().value(id)` ✓ 相减 ✓ —— ⚠ 这样**不必改 `gainResource` 的签名** ✓）
+>     ⇒ 循环末尾 **更新 `previousCredited`** ✓；
+>   * ③ ⭐ **`gainResource`** ✓：新增分支 **`amountFromPrevious` ⇒ `previousCredited × amountPercent`** ✓
+>     （⚠ 实现上把那个量透传进 `effectCtx` ✓ —— ⚠ 或用一个短命的静态/线程局部 ✗ ⇒ ⭐ **优先透传** ✓）；
+>   * ④ 内容：`1505` 星魂改成 **`amountFromPrevious: true, amountPercent: 0.5`** ✓；⑤ 判据：**能量 150 ⇒ 好活当赏 150** ✓（⚠ 与 `ElationAmountCapTest` 一致 ✓）；⑥ 变异 ⇒ 必红 ✓。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络连七失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
