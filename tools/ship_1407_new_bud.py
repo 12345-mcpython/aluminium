@@ -95,15 +95,19 @@ public class NewBudOnHpLossTest {
         battle.processRequests();
 
         double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
-        // \u2b50 2026-10-02, measured: `CanHit.takeDamage(double)` (:504) causes HP loss deterministically -- no enemy turn is
-        // needed, and twenty steps of "let them fight" left HP untouched (which is what the first draft asserted on).
+        // \u2b50 2026-10-02, measured twice over: \u3010\u65b0\u854a\u3011 is declared with `scope: "PARTY"`, so it is NOT in `owner.getResources()` --
+        // that is precisely what the first split assertion reported ("must be in the battle's resource table" was false).
+        // The declaration's own note names the way in: `partyResource(name)`, which returns null when the scope is missing.
+        com.laosun.aluminium.models.Resource bud = battle.partyResource(RES);
+        Assertions.assertNotNull(bud, "the new bud must be reachable as a party resource");
+        before = bud.value();
+
+        // \u2b50 `CanHit.takeDamage(double)` (:504) causes HP loss deterministically -- no enemy turn is needed, and twenty steps
+        // of "let them fight" left HP untouched (which is what the first draft asserted on).
         owner.takeDamage(100.0);
         battle.processRequests();
 
-        // \u26a0 Two assertions, not one: "the resource is in the battle's registry" and "it grew" are different unknowns.
-        Assertions.assertTrue(owner.getResources().has(RES),
-                "the new bud must be in the battle's resource table");
-        Assertions.assertEquals(before + 1, owner.getResources().value(RES),
+        Assertions.assertEquals(before + 1, battle.partyResource(RES).value(),
                 "losing HP must give her one new bud (before=" + before + ")");
     }
 }
