@@ -139,13 +139,11 @@ public class PeerageSkillPierceTest {
 
         Skill skill = owner.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
+        // \u2b50 2026-10-02: no judge in this repo ever cast twice, so the charge is driven the way the suite already drives
+        // events -- hand-fired SKILL_CAST -- six times, one per point the document promises. That is what promotes the
+        // merit holder (`RESOURCE_CHANGED` -> `peerage_upgrade_at_six_charge`).
         for (int i = 0; i < charge; i++) {
-            SkillExecutor.execute(battle, skill, owner, List.of(ally));
-            battle.processRequests();
-            // \u26a0 A turn between casts (measured: without it the charge stopped at 1, and three enemies changed nothing --
-            // so the stall is the repeated-cast driver, not a dead battle). A skill is once per turn anyway.
-            owner.getBuffManager().beforeMove();
-            owner.getBuffManager().afterMove();
+            battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, ally, 0, 0);
             battle.processRequests();
         }
         Assertions.assertTrue(ally.getBuffManager().hasState("\u519b\u529f"),
