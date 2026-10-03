@@ -42,18 +42,18 @@ rules.append({
              "\u4ee5\u53ca\u201c\u8fbe\u5230\u4e0a\u9650\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u201d\u90a3\u4e00\u53e5 \u2717\u3002"),
 })
 
-if is_dict:
-    doc["rules"] = rules
-    res = doc.get("resources")
-    if res is None:
-        doc["resources"] = [{"id": RES, "initial": 0, "max": 34000}]
-    else:
-        res = [r for r in res if not (isinstance(r, dict) and r.get("name") == RES)]
-        res.append({"id": RES, "initial": 0, "max": 34000})
-        doc["resources"] = res
-    out = doc
-else:
+if not is_dict:
     raise SystemExit("1407.json is a bare list, so the resource has nowhere to live -- measure its shape first")
+
+# \u2b50 2026-10-02, measured: the file ALREADY declares \u3010\u65b0\u854a\u3011 -- `{ "id": "\u65b0\u854a", "max": 34000, "scope": "PARTY", ... }` -- and its note
+# records why `scope` matters (registerPartyResources skips anything else, and partyResource(name) then returns null:
+# "that line explains all the earlier +0"). So this ship touches rules ONLY. \u26a0 The first draft deduplicated by `name`, which
+# is not the real key (`id`), and thereby CREATED a duplicate instead of preventing one.
+if not any(isinstance(r, dict) and r.get("id") == RES for r in (doc.get("resources") or [])):
+    raise SystemExit("expected the new bud to be declared already -- measure before adding it")
+
+doc["rules"] = rules
+out = doc
 
 json.dump(out, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1407.json: the new bud rides HP loss")
