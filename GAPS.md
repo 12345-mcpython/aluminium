@@ -24342,6 +24342,30 @@
 >       （⭐ **第七十二条：这是一条**代码里留给我**的纪律** ✓ —— ⭐ **比我自己写的笔记更硬** ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（`28efae4e` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十一：🎉🎉🎉 **机制看全了** —— ⭐ 对 `damage_type: "TRUE"` 的 rider，
+> `literalBase` 直接返回 **`ctx.amount() * share + flat`**，**连除法都不需要****）**）**：
+>
+> * ✅ **实测（读 `literalBase` 的 `:4052`–`:4073` ✓）** ✓ 原文：
+>   ```java
+>   // ⚠ The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
+>   // correction at all: 真实伤害 (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
+>   // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured 2026-10-02: a 24% rider landed as
+>   // 44% -- 77.43 where 42.01 was due). Readers: 1415 昔涟's 结界 rider.
+>   if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
+>       return ctx.amount() * share + flat;
+>   }
+>   double factor = ctx.damage().getSkillBaseValue() == 0 ? 1.0
+>           : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
+>   return ctx.amount() / factor * share + flat;
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **真伤害的 rider：`ctx.amount() * share`** ✓ —— ⚠ `ctx.amount()` 就是 **`DAMAGE_SETTLED` 的 `amount`** ✓、`share` 就是**内容里的 `percent`** ✓
+>     ⇒ ⭐ **所以 `8007` 的 28% ＝ `percent: 0.28` ＋ `damage_type: "TRUE"` ＋ **挂 `DAMAGE_SETTLED`**** ✓✓；
+>   **(ii)** ⭐ **普通 rider 才需要除以 `toValue()/skillBaseValue`** ✓（⚠ 注释连"24% 曾落地成 44%（77.43 vs 42.01）"都记了 ✓ ⇒ ⭐ **又一个"无症候"的坑被写进代码** ✓）；
+>   **(iii)** ⭐ **那位读者 `1415` 昔涟的结界 rider **已经在树上** ✓ ⇒ ⭐ **说明这条通道**有 2 个读者、且**至少一个已在用** ✓。
+> * ⚠ **只剩一个词** ✗：⭐ **那个 `case` 的 `scale` 记号**（⚠ 就在我读的窗口**上一行** ✓）⇒ ⭐ **下一轮一次读 ⇒ 然后写 `8007` 的 rider ⇒ 出货（第 27 件）** ✓
+>   （⚠ 预期形状：`on: DAMAGE_SETTLED` ＋ `when: ["self_resource:迷迷的声援 >= 1"]` ⇒ `{"op":"DAMAGE","scale":"<那个记号>","percent":0.28,"damage_type":"TRUE","element":…,"target":"target"}` ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`ec784de4` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -31779,6 +31803,30 @@
 >     ⇒ ⭐ **所以本段后续所有"重建表"的判据都要**补回 `level_convention`**（或有意识地避开按等级取值的行）** ✓
 >       （⭐ **第七十二条：这是一条**代码里留给我**的纪律** ✓ —— ⭐ **比我自己写的笔记更硬** ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（`28efae4e` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十一：🎉🎉🎉 **机制看全了** —— ⭐ 对 `damage_type: "TRUE"` 的 rider，
+> `literalBase` 直接返回 **`ctx.amount() * share + flat`**，**连除法都不需要****）**）**：
+>
+> * ✅ **实测（读 `literalBase` 的 `:4052`–`:4073` ✓）** ✓ 原文：
+>   ```java
+>   // ⚠ The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
+>   // correction at all: 真实伤害 (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
+>   // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured 2026-10-02: a 24% rider landed as
+>   // 44% -- 77.43 where 42.01 was due). Readers: 1415 昔涟's 结界 rider.
+>   if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
+>       return ctx.amount() * share + flat;
+>   }
+>   double factor = ctx.damage().getSkillBaseValue() == 0 ? 1.0
+>           : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
+>   return ctx.amount() / factor * share + flat;
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **真伤害的 rider：`ctx.amount() * share`** ✓ —— ⚠ `ctx.amount()` 就是 **`DAMAGE_SETTLED` 的 `amount`** ✓、`share` 就是**内容里的 `percent`** ✓
+>     ⇒ ⭐ **所以 `8007` 的 28% ＝ `percent: 0.28` ＋ `damage_type: "TRUE"` ＋ **挂 `DAMAGE_SETTLED`**** ✓✓；
+>   **(ii)** ⭐ **普通 rider 才需要除以 `toValue()/skillBaseValue`** ✓（⚠ 注释连"24% 曾落地成 44%（77.43 vs 42.01）"都记了 ✓ ⇒ ⭐ **又一个"无症候"的坑被写进代码** ✓）；
+>   **(iii)** ⭐ **那位读者 `1415` 昔涟的结界 rider **已经在树上** ✓ ⇒ ⭐ **说明这条通道**有 2 个读者、且**至少一个已在用** ✓。
+> * ⚠ **只剩一个词** ✗：⭐ **那个 `case` 的 `scale` 记号**（⚠ 就在我读的窗口**上一行** ✓）⇒ ⭐ **下一轮一次读 ⇒ 然后写 `8007` 的 rider ⇒ 出货（第 27 件）** ✓
+>   （⚠ 预期形状：`on: DAMAGE_SETTLED` ＋ `when: ["self_resource:迷迷的声援 >= 1"]` ⇒ `{"op":"DAMAGE","scale":"<那个记号>","percent":0.28,"damage_type":"TRUE","element":…,"target":"target"}` ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`ec784de4` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
