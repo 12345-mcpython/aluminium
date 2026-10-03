@@ -23964,6 +23964,502 @@
 >   ⚠ **`8007` 的 28% 真伤害（忆灵技能通道）**（未动 ✓）／⭐ **`1407` 的龙血＝【新蕊】上限 100%**（⚠ 与 `1512` 这块同族 ⇒ ⭐ **可照本件写判据** ✓ 若内容已在 ✓）。
 > * ⚠ **推送**：本地**领先 1** ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百四十一：🎉🎉🎉 **再一次核账成功** —— ⭐ `1407` 的忆灵面板（含**龙血 ＝【新蕊】上限 100%**）
+> **早已在树**，而且它用的写法**正是本段以为缺失的那条通道**）**）**：
+>
+> * ✅ **实测（读 `memosprites/1407.json` ✓）** ✓ 原文：
+>   ```json
+>   { "name": "死龙•玻吕刻斯", "aggro": 100,
+>     "panel": [ { "attribute": "HEALTH", "percent": 1.0, "source": "resource:新蕊" },   // ⭐⭐ 龙血 ＝ \u3010\u65b0\u854a\u3011\u4e0a\u9650\u7684 100% ✓
+>                { "attribute": "ATTACK", "percent": 1.0, "source": "attr:HEALTH" },
+>                { "attribute": "SPEED",  "flat": 165 } ] }                              // ⭐ 165 ✓ \u4e0e\u6587\u6863 `:87` \u4e00\u81f4 ✓
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：
+>   **(i)** ⭐ **"龙血 ＝【新蕊】上限 100%" 已在树** ✓**（⚠ 目标 ③ 里我记的那一项 ✓）；
+>   **(ii)** ⭐⭐ **`"source": "resource:新蕊"` 这个写法说明：引擎**早就有"把资源当量"的通道**** ✓✓
+>     —— ⚠ 而本段整整几轮都在登记"按资源计数派生的比例量"是**缺失的** ✗ ⇒ ⭐ **第六十七次自我纠正** ✓
+>       （⚠ 更值钱的是：⭐ **这条通道很可能正是 `1407` 的【新蕊】读者与 `1501` 的【笑点】穿透所需要的** ✓ ⇒ ⭐ **下一轮应当先把它读通** ✓）；
+>   **(iii)** ⭐ **`"source": "attr:HEALTH"`** 说明还能**引用另一个属性**（⚠ 死龙的 ATK ＝ 它的生命 ✓）⇒ ⭐ **又一条现成通道** ✓。
+> * ⭐⭐ **另外**：⭐ **`memosprites/8007.json` 也在树** ✓（`name: 迷迷` ✓，`SPEED flat 130` ＋ `HEALTH 0.8 flat 640` ✓）⇒ ⚠ **目标 ③ 里"`8007` 的 28% 真伤害"**已经是**最后一块**了**** ✓。
+> * ⭐ **下一轮第一步（两次调用，且很可能一次成）** ✗：① ⭐ **读 `panel` 的 `source` 解析**（⚠ `grep` `"resource:"`／`"attr:"` 在引擎里的处理 ✓ —— ⚠ **不猜** ✓）；
+>   ② ⭐ **用它把 `1407` 的【新蕊】读者重新写一遍**（⚠ 甚至 `1501` 的"每 1 个笑点 +1.5% 穿透"✓）⇒ ⭐ **两件登记项可能同时解放** ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十二：🎯🎯🎯 **`source:` 的解析找到了** —— ⭐ 引擎**确实有"把资源当量"的通道，但它只在**忆灵面板**这条路上****）**）**：
+>
+> * ✅ **实测（grep `resource:`／`attr:` ✓）** ✓ 命中 **`SummonFactory:184`／`191`**：
+>   ```java
+>   if (entry.source() != null && entry.source().startsWith("attr:")) {
+>       String other = entry.source().substring("attr:".length()).trim();     // ⭐ 引用另一个属性（死龙 ATK ＝ 其生命 ✓）
+>       …
+>   } else if (entry.source() != null && entry.source().startsWith("resource:")) {
+>       String name = entry.source().substring("resource:".length()).trim();  // ⭐⭐ 引用一个**资源**（龙血 ＝【新蕊】上限 ✓）
+>       …
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **两条** ✓：**(i)** ⭐ **忆灵面板**支持 `attr:` 与 `resource:` 两种来源** ✓ ⇒ ⭐ **目标 ③ 的"龙血＝【新蕊】上限 100%"是**已建成**的能力** ✓（⚠ 不是缺口 ✓）；
+>   **(ii)** ⭐⭐ **于是本段那条登记可以**精确化**** ✓（⚠ 这是它从"模糊的一类"变成"可用的一句话"的时刻 ✓）：
+>     ⭐ **"把资源当量"在**忆灵面板**里**有** ✓，在**规则**里**没有**** ✗
+>       ⇒ ⭐ **所以 `1407` 的【新蕊】读者（规则）**仍然**卡在"规则侧读不到资源量"上** ✓，⚠ **而它与"面板侧已经有"是**两件事**** ✓
+>         ⇒ ⭐ **下一轮有两条路** ✗：**（甲）** ⭐ **把 `resource:` 这个解析**提取出来给规则用**（⚠ 一处小引擎补充 ✓，⭐ **读者 ≥2**：`1407` 的【新蕊】✓ ＋ `1501` 的"每 1 个笑点 +1.5% 穿透" ✓）；
+>           **（乙）** ⚠ **登记为"规则侧缺资源当量"并转做 `8007`** ✓。
+> * ⭐ **本段的账目（本轮核完）** ✓：**目标 ③ 的三块** —— ⭐ **`1512` 面板（第 25 件 ✓ 出货）**／⭐ **`1407` 面板（早就在树 ✓ 含龙血与 165）**／
+>   ⚠ **`8007` 的 28% 真伤害（忆灵技能通道 —— 仍未动 ✓）**。
+> * ⚠ **推送**：本地仍**领先 3** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十三：🎉🎉🎉 **目标 ③ 最后一块（`8007` 的 28% 真伤害）原话到手**，⭐ 而且它与 `1505` 那件**同形**）**）**：
+>
+> * ✅ **实测（读 `8007_开拓者.html:143` ✓）** ✓ 逐字：
+>   > 「使指定我方单体<u>行动提前</u>**100%** 并附上【**迷迷的声援**】，持续 **3** 回合。
+>   > **持有【迷迷的声援】的目标每造成 1 次伤害，都会再额外造成 1 次等同于原伤害 28% 的真实伤害**。」
+>   ＋ ⭐ **术语表 `:144`**：「**真实伤害**：**不受任何效果所影响的无属性伤害**，本次伤害**不视为造成了 1 次攻击**。」✓
+>   ⇒ ⭐⭐ **三条** ✓：
+>   **(i)** ⭐ **"-每造成 1 次伤害 ⇒ 额外 28% 真伤害"** ✓ —— ⚠ 这是**挂在状态上的伤害追加** ✓；
+>   **(ii)** ⭐⭐ **它的形状与本段第 18 件（`1505` 的 `p1505_skill_elation_rider`）**完全同族**** ✓
+>     —— ⚠ 那件是 **`DEALING_DAMAGE` ＋ `from_category BPSKILL`** ⇒ ⭐ **在树有已出货的先例** ✓✓；
+>   **(iii)** ⭐ **"真伤害"有术语定义** ✓（⚠ 不受任何效果影响 ＋ 不视为一次攻击 ✓ ⇒ ⭐ **与普通伤害区分** ✓）。
+> * ⭐⭐ **于是目标 ③ 的最后一块有了路径** ✗（⚠ 下一轮）：
+>   ① ⭐ **先读 `1505` 那条规则**（⚠ `p1505_skill_elation_rider` ✓ —— ⭐ **它在树、有判据、有变异** ✓ ⇒ ⭐ **照抄形状** ✓）；
+>   ② ⭐ **再确认"真伤害"在引擎里怎么表达** ✗（⚠ 本段见过 `ELEMENT`／`CONTROL`／`DAMAGE` 类 op ✓ ⇒ ⭐ **先 `grep` "true"／"ignore_def"／`TRUE_DAMAGE`** ✓ —— ⚠ **不猜** ✓）；
+>   ③ ⭐ 写 `8007` 的规则 ＋ 判据（⚠ 断言"额外那一下是按 28% 算的" ✓）＋ **变异** ⇒ ⭐ **出货** ✓。
+> * ⚠ **推送**：⭐ **本轮**已推送成功**** ✓（`4bc82886..81d37e55` ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十四：🎯🎯🎯 **`1505` 那条 rider 的原样抄到了**，⭐ 而且它顺手**推翻了我上一轮刚立的"规则侧读不到资源"结论****）**）**：
+>
+> * ✅ **实测（dump `1505.json` ✓ ＋ grep op 词汇 ✓）** ✓ 原文：
+>   ```json
+>   { "on": "DEALING_DAMAGE", "id": "p1505_skill_elation_rider",
+>     "when": ["actor == self", "from_category BPSKILL", "self_resource:好活当赏 >= 1"],
+>     "do": [ { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.08,
+>               "element": "physical", "damage_type": "ELATION", "target": "target" } ] }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：
+>   **(i)** ⭐⭐ **`self_resource:好活当赏 >= 1`** ✓ ⇒ ⭐ **即：规则的条件里**可以**读资源** ✓✓
+>     —— ⚠ 我上一轮刚说"规则侧没有把资源当量的通道" ✗ ⇒ ⭐ **第六十八次自我纠正** ✓
+>       （⚠ 精确说法应当是：**条件**里能读 ✓；⚠ **而"把资源量当成**数值**用"（例如"每 1 点 +1.5%"）**仍未见** ✗ ⇒ ⭐ **登记要按这句改写** ✓）；
+>   **(ii)** ⭐⭐ **`"damage_type": "ELATION"`** ✓ ⇒ ⭐ **`DAMAGE` 有一个 `damage_type` 字段** ✓
+>     ⇒ ⭐ **那么"真伤害"很可能就是它的另一个取值**（⚠ 下一轮第一步：⭐ **`grep` `damage_type` 的取值闭集** ✓ —— ⚠ **不猜** ✓）；
+>   **(iii)** ⭐ **rider 的完整形状**（`DEALING_DAMAGE` ＋ `actor == self` ＋ `from_category` ＋ `self_resource:` 门槛 ⇒ `DAMAGE{scale, percent, element, damage_type, target}` ✓）
+>     ⇒ ⭐ **`8007` 的"每造成 1 次伤害 ⇒ 额外 28% 真伤害"照这个抄** ✓（⚠ `percent: 0.28` ✓ ＋ 正确的 `damage_type` ✓ ＋ ⚠ `target` 与 scale 按文档"**原伤害的 28%**" ✓
+>       —— ⚠ 注意：⚠ **文档说的是"等同于**原伤害**的 28%"** ✗ ⇒ ⭐ **而 `1505` 那条是"按 ATTACK 的 8%"** ✗ ⇒ ⚠ **两者不同** ✓
+>         ⇒ ⭐ **所以 `8007` 需要一个"按刚才那次伤害量"的比例** ✗ ⇒ ⭐ **下一轮要先看 `DAMAGE` 的 `scale` 支持哪些取值** ✓（⚠ 本段见过 `self_attr:` ✓ ⇒ ⚠ 是否有"事件里的伤害量"✗ **待查** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`4f56ab4c` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十五：🎯 **`damage_type` 是个**枚举**，且 `DAMAGE` 的合法键是 `skill`／`damage_param`**）**）**：
+>
+> * ✅ **实测（grep `TriggerInterpreter` ✓）** ✓ 三处：
+>   * ⭐ **`:9`** ＝ **`import com.laosun.aluminium.enums.DamageType;`** ✓ ⇒ ⭐ **`damage_type` 是枚举** ✓（⚠ 取值闭集在 `enums/DamageType.java` ✓）；
+>   * ⭐ **`:297`／`:298`** ＝ **`DAMAGE_TYPE_READERS`** 集合 ✓（⚠ 注释："The ops that actually read `damage_type`" ✓）＋ **`:327` 的守卫**（⚠ **非读者 op 写了 `damage_type` 会被拒** ✓ —— ⭐ 与"写错键会被装载器拒绝"同一种**自我纠正型**设计 ✓）；
+>   * ⭐ **`:101`**（op 表的 DAMAGE 行）＝ **`DAMAGE`｜`skill`，`damage_param`，optional `target`** ✓
+>     ⇒ ⚠ 而 `1505` 用的是 **`scale` ＋ `percent`** ✓ ⇒ ⭐ **说明 `DAMAGE` 接受**多种形状**** ✓（⚠ 或者 `skill`／`damage_param` 是另一条通道 ✓ —— ⭐ **下一轮要看清 `DAMAGE` 的字段全集** ✓）。
+> * ⭐⭐ **下一轮第一步（两次读 ⇒ 可能一次成）** ✗：
+>   ① ⭐ **读 `DamageType` 的成员** ✓ ⇒ ⭐ **找到"真伤害"那一个**（⚠ 若枚举里没有"真"，⭐ **那就是本块需要的一处小能力**，⚠ **而它读者 ≥1（`8007`）＋ 同族的 `1505` 可能也需要** ✓）；
+>   ② ⭐ **"按**原伤害**的 28%"怎么写** ✗（⚠ `1505` 是"按 ATTACK 的 8%" ✓ ⇒ ⭐ **不同的量** ✓
+>     ⇒ ⭐ **要么 `DAMAGE` 有"复制事件里的伤害量"的键**（⚠ 例如 `damage_param` ✓ —— ⭐ **名字很可疑** ✓）**，要么这是一处登记** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`eef3b020` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十六：🎯🎯🎯 **枚举读全了：`DamageType` 里**没有**"真伤害"** ⇒ ⭐ **目标 ③ 的最后一块 = 一处**读者明确**的小引擎能力**）**）**：
+>
+> * ✅ **实测（读 `enums/DamageType.java` ✓）** ✓ 全部成员：
+>   ⭐ **`NORMAL`** ✓／**`ULTRA`** ✓／**`BREAK`** ✓／**`DOT`** ✓／**`TECHNIQUE`** ✓／**`ELATION`** ✓
+>   ⇒ ⭐⭐ **六种，没有"真伤害"** ✗ ⇒ ⭐ **所以"真伤害"不能用 `damage_type` 表达** ✓（⚠ 与 `1505` 的 `ELATION` 是**两回事** ✓）。
+> * ⭐⭐⭐ **于是目标 ③ 最后一块的定位精确了** ✓（⭐ 这是一处**结构良好的下一件**）：
+>   | 项 | 内容 |
+>   |---|---|
+>   | ⭐ **读者** | ⭐ **`8007` 文档 `:143`**：「持有【迷迷的声援】的目标每造成 1 次伤害，都会再额外造成 1 次**等同于原伤害 28% 的真实伤害**」✓ |
+>   | ⭐ **语义（文档逐字）** | ⭐ `:144`：「**真实伤害**：**不受任何效果所影响的无属性伤害**，本次伤害**不视为造成了 1 次攻击**。」✓ ⇒ ⭐ **两条都可实现、都可测** ✓ |
+>   | ⭐ **形状（同族先例）** | ⭐ `1505` 的 rider：`DEALING_DAMAGE` ＋ `from_category` ＋ `self_resource:` ⇒ `DAMAGE{…}` ✓ |
+>   | ⭐ **缺的东西** | ⚠ **一个"真伤害"标记**（⚠ 或 `damage_type` 加一个成员 ✓ —— **`DamageType` 是枚举，加成员是一处小改动** ✓）＋ ⚠ **"按原伤害的比例"** ✗ |
+>   | ⭐ **可测性** | ⭐ **"视为/不视为一次攻击"**是可观测的 ✓（⭐ 若引擎有"攻击次数"计数 ⇒ ⭐ **判据可两向断言** ✓） |
+> * ⭐ **下一轮第一步（两次调用）** ✗：① ⭐ **`grep` 引擎里有没有"攻击次数"的计数**（⚠ 本段见过 `DAMAGE_SETTLED` ✓、`神君`的层数 ✓）
+>   ⇒ ⭐ **有它 ⇒ "不视为一次攻击"可测** ✓；② ⭐ **读 `DAMAGE` 的 `scale` 取值**（⚠ 看有没有"事件伤害量" ✓ —— ⚠ `damage_param` 这个键名很可疑 ✓）⇒ ⭐ **然后要么出货、要么按纪律登记这一处能力** ✓。
+> * ⚠ **推送**：本轮**已推送** ✓（`eef3b020..b0d0008f` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十七：🎯🎯🎯 **`DAMAGE` 只有**两种**乘数写法** ⇒ ⭐ 所以 `8007` 的两半**都各是一处精确的小能力**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter` ✓）** ✓ 关键一句（`:432` 的注释，逐字）：
+>   > *"Two ways to state the multiplier (2026-09-29): a **SKILL ROW**（`skill` + `damage_param`）or a **LITERAL ratio**…"*
+>   ⇒ ⭐⭐ **即：`DAMAGE` 的倍率只有**两条路** —— ①**引用技能行的一个参数**（`skill` ＋ `damage_param` ✓）②**写死一个比例**（`1505` 的 `percent: 0.08` 就是这条 ✓）
+>     ⇒ ⭐ **而 `8007` 要的是"**刚才那次伤害的 28%**"** ✗ ⇒ ⭐ **两条路都表达不了** ✓（⚠ 第三条路不存在 ✓）。
+> * ⭐⭐ **于是目标 ③ 最后一块的账目**完全清楚**** ✓（⭐ 与"真伤害"那半并列，**两条都精确、都有读者** ✓）：
+>   | 缺的 | 读者 | 语义（文档） | 规模 |
+>   |---|---|---|---|
+>   | ⭐ **"真伤害"** | ⭐ `8007:143` | ⭐ `:144`「不受任何效果所影响的无属性伤害」✓ | ⭐ `DamageType` **加一个成员** ✓（⚠ 枚举 ✓） |
+>   | ⭐ **"按原伤害的比例"** | ⭐ `8007:143` | ⭐「等同于**原伤害**的 28%」✓ | ⚠ **`DAMAGE` 加第三种乘数形状**（⚠ 取"本事件里的伤害量" ✓） |
+> * ⭐ **下一轮第一步（一次读 ＋ 判断）** ✗：⭐ **读 `:1737` 那段**（*"Where every number comes from. The rule names a `skill` + `damage_param`…"* ✓）
+>   ⇒ ⭐ **看 `damage_param` 到底能取哪些参数**（⚠ 若它能取到"上次伤害量" ⇒ ⭐ **那第二条路就走通了** ✓）
+>     ⇒ ⭐ **否则按纪律登记这两条**（⚠ 它们**各自都有具名读者** ✓ ⇒ ⭐ **完全符合目标 ⑤ 的"有读者才做"** ✓）。
+> * ⚠ **并如实记一句** ✓：⭐ 本段**没有**为了"凑一件"而给 `8007` 写半个近似版本 ✓ —— ⭐ 而是**把缺口拆成了两条可独立实现的、有读者的能力** ✓（⭐ 这正是目标 ④ 要求的形状 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`4a73ede7` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十八：✅ **`damage_param` 的含义确认了** ⇒ ⭐ `8007` 那条"按原伤害的 28%"**第二次**被确认为缺形状**）**）**：
+>
+> * ✅ **实测（读 `:1737` 那段 ✓ —— 它是 `COMMAND_SUMMON` 的 javadoc ✓）** ✓ 关键原文：
+>   > *"**Where every number comes from.** The rule names a `skill` + `damage_param` of the **owner's** skills — her ultimate, whose row says 2.0 at Lv10 and 2.5 at Lv15 — and the element (Ice) and the shape (AoEAttack) come from that same skill data."*
+>   ⇒ ⭐⭐ **即：`skill` ＋ `damage_param` 是"引用**技能行里的一个参数**"**（⚠ 按等级取值 ✓，甚至带元素与形状 ✓）
+>     ⇒ ⭐ **所以它取的是**技能表里的静态参数**，**不是**"刚才那次伤害量"** ✗ ⇒ ⭐ **与上一轮的结论一致** ✓（⭐ 第二次确认 ✓）。
+> * ⭐⭐ **于是这两条登记都**非常干净**** ✓（⚠ 每条都有：读者 ✓／文档语义 ✓／缺什么 ✓／规模 ✓）：
+>   1. ⭐ **"真伤害"** —— ⭐ 读者 `8007:143` ✓；语义 `:144`「不受任何效果所影响的无属性伤害 ＋ 不视为一次攻击」✓；⭐ 规模：`DamageType` 加成员 ＋ 结算路径认它 ✓；
+>   2. ⭐ **"按原伤害的比例"** —— ⭐ 读者 `8007:143` ✓；语义「等同于**原伤害**的 28%」✓；⭐ 规模：`DAMAGE` 加第三种乘数形状（⚠ 取本事件里的伤害量 ✓）。
+> * ⭐ **本段的账（收束）** ✓：**已出货 25 件** ✓；**目标 ①**：`1513`／`1211`／`1408`（状态＋倒计时）／`1501`（额外回合）✓；
+>   **目标 ②**：第 1 块出货 ✓ ＋ 第 2 块登记（8 条排除 ✓）；**目标 ③**：两块面板（`1512` 出货 ✓／`1407` 早在树 ✓）＋ 最后一块**拆成两条有读者的能力** ✓；
+>   **目标 ④**：缺口表**每条都带读者与前置** ✓；**目标 ⑤**：**25 件每件四件齐** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`f8da1bb1` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十九：🎯🎯🎯 **第 26 件差一步，而它的拦路者暴露了一条**很有价值的既有判据****）**）**：
+>
+> * ✅ **实测（`8007` 的【迷迷的声援】：内容 ＋ 判据都写成、且**首跑即绿**** ✓）** ✓：
+>   ⭐ 规则 **`skill_advance_and_cheer`**（`SKILL_CAST` ＋ `actor == self` ⇒ **`ADVANCE{percent: 1.0}`** ＋ **`APPLY_BUFF{迷迷的声援, turns: 3}`** ✓
+>     —— ⚠ 两个数都由文档 `:143` 给定（**100%**／**3 回合** ✓））；⭐ 判据 **`MimiCheerTest`**（放战技 ⇒ 断言目标身上有【迷迷的声援】 ✓ **绿** ✓）。
+> * ✅ **实测变异** ✓：把 `when` 改坏 ⇒ 全量 **2142 例 2 failed** ✓（⭐ 本判据的报错：*"「附上【迷迷的声援】」 ==> expected: **<true>** but was: **<false>**"* ✓ ⇒ **承重** ✓）。
+> * ⛔⛔ **但回滚后**全量仍是 **1 failed**** ✗ ⇒ ⭐ **一条既有判据拦住了** ✓：
+>   > **`RemembranceTrailblazerTest.hisFileCarriesTheClauses()`** ✗：*"cid 8007 ==> expected: **<1>** but was: **<2>**"* ✓
+>   ⇒ ⭐⭐ **即：它断言"`8007` 的文件里**恰好 1 条规则**** ✓ —— ⚠ **从名字看（`hisFileCarriesTheClauses`）它更像是"这个文件只承载了**已写的那些从句**"的**覆盖度**断言** ✓
+>     ⇒ ⭐ **下一轮第一步（一次读）**：**读 `hisFileCarriesTheClauses()`** ✓ ⇒ ⭐ **看清它的**前提****（⭐ 本段纪律：**"绝不为了自己的改动去改既有判据；先问它的前提是什么"** ✓）：
+>     * ⭐ **若它是"覆盖度＝已写的从句数"** ⇒ ⭐ **我加了一条真从句 ⇒ **这个数就该跟着变**** ✓（⭐ 那就**连它一起更新**，并在那次提交里**写明原因** ✓ —— ⭐ 本段对 `1505` 的两次教训正是"别改判据"，⚠ **而这里的关键区别是：它数的是"文件里应有几条"而不是"允许有几条"** ✓）；
+>     * ⚠ **若它是别的意思**（例如"此处只应有机制备注那一条" ✓）⇒ ⭐ **那就换一条路**（⚠ 例如把新规则**移到别的文件** ✗ 不行 ✓ ⇒ ⭐ **登记** ✓）。
+> * ✅ **纪律执行情况（值得记一笔）** ✓：⭐ **内容与判据**没有**进树**** ✓ —— ⚠ 因为我把提交挂在了"恢复后必须全绿"这个条件上 ✓
+>   ⇒ ⭐ **闸门挡住了半成品** ✓（⭐ 与"提交过一次红树"那次形成对照 ✓）。
+> * ⚠ **推送**：本地**领先 1** ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓（⚠ 待推的是**脚本**这一笔 ✓，内容**没进** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百五十：🎯🎯🎯 **拦路者的前提读清了** —— ⭐ 它是一条**普查（census）**，而且它**指对了正确的做法**）**）**：
+>
+> * ✅ **实测（读 `RemembranceTrailblazerTest.hisFileCarriesTheClauses()` ✓）** ✓ 全文骨架：
+>   ```java
+>   /** Census: the summon (Skill), the summon (Ultimate) and the level convention. */
+>   @Test
+>   public void hisFileCarriesTheClauses() {
+>       for (int cid : new int[]{8007, 8008}) {
+>           var table = TriggerTables.of(cid);
+>           Assertions.assertEquals(1, table.ruleCount(SKILL_CAST),  "cid " + cid);
+>           Assertions.assertEquals(1, table.ruleCount(ULT_CAST),    "cid " + cid);
+>           Assertions.assertEquals(1, table.ruleCount(BATTLE_START), "cid " + cid);
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **它的 javadoc 自己说了它是**普查****（*"Census: the summon (Skill), the summon (Ultimate) and the level convention"* ✓）；
+>   **(ii)** ⭐ **它按事件计数**（`SKILL_CAST`／`ULT_CAST`／`BATTLE_START` 各 **1** 条 ✓）⇒ ⚠ **我新加的那条 `SKILL_CAST` 让它变成了 2** ✗；
+>   **(iii)** ⭐⭐⭐ **而它同时**指对了路**** ✓ —— ⚠ `8007` 的 `SKILL_CAST` **本来就已经有一条**（"召唤迷迷；若已在场则回复其生命上限 100% 并获 6 点气氛值" ✓）
+>     ⇒ ⭐ **所以正确做法**不是再加第二条 `SKILL_CAST`** ✗，⭐ **而是把"行动提前 100% ＋ 附上【迷迷的声援】"**并进那一条的 `do`**** ✓✓
+>       —— ⭐ **而且这在语义上正是对的**：⭐ **文档 `:143` 那一整句**就是这**一个战技**的效果** ✓（⚠ 本段在 `1402` 的忆灵技能上见过同样的"一句话 = 一条规则"的处理 ✓）。
+> * ⭐⭐ **于是第 26 件有了**不碰任何既有判据**的写法** ✓（⚠ 下一轮）：
+>   ① ⭐ **读 `8007.json` 现有那条 `SKILL_CAST` 规则** ✓ ⇒ ⭐ **在它的 `do` 末尾追加** `ADVANCE{percent: 1.0, target: …}` ＋ `APPLY_BUFF{迷迷的声援, turns: 3, target: …}` ✓
+>     （⚠ `target` 要与那条规则里"指定我方单体"的既有写法一致 ✓ —— ⭐ **照它自己的来** ✓）；
+>   ② ⭐ **判据不变**（`MimiCheerTest` ✓ 已绿、已验变异 ✓）⇒ `SKILL_CAST` 计数**仍是 1** ⇒ ⭐ **普查不红** ✓；
+>   ③ ⇒ **全量绿** ⇒ **闸门** ⇒ ⭐ **出货（第 26 件）** ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十一：🎯🎯🎯 **又一条"会自己说出病名"的既有判据** —— `EffectKeyDisciplineTest`
+> **抓住的正是我自造的 `mark` 键****）**）**：
+>
+> * ✅ **实测（读失败项 ✓）** ✓：**`EffectKeyDisciplineTest`** ✗ 报
+>   > *"these effect keys are **not fields of `EffectSpec`**, so **Gson drops them silently**: `{mark=[8007.json]}` ==> expected: `<{}>` but was: `<{mark=[8007.json]}>`"*
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **仓库里有一条专门防"自造键被静默丢弃"的纪律判据** ✓
+>     —— ⚠ 它比我写在 `GAPS.md` 里的任何一条纪律都**更硬** ✓（⭐ 它会**在提交前**拦住 ✓，⭐ 而我的笔记只能靠我记得 ✓）；
+>   **(ii)** ⭐ **我踩的正是这个坑** ✗（⚠ 我为了"可重复执行"给两条效果加了 `"mark": …` ✗ ⇒ ⚠ `EffectSpec` 里没有这个字段 ⇒ **会被 Gson 静默丢掉** ✓
+>     ⇒ ⭐ **也就是说：那两条效果即使装载"成功"，`mark` 也是不存在的** ✓ ⇒ ⭐ **修法只有一步：把 `mark` 删掉** ✓）；
+>   **(iii)** ⭐ **而"重复执行要幂等"这件事有别的正当写法** ✓（⚠ 本段一直用的是"按 `id` 先删再加" ✓ —— ⭐ **那是**规则级**的去重 ✓，⚠ **而**效果级**必须只用 `EffectSpec` 的字段** ✓）。
+> * ⭐⭐ **下一轮第一步（两次调用 ⇒ 第 26 件出货）** ✗：
+>   ① ⭐ **删掉两处 `"mark": "advance_and_cheer"`** ✓（⚠ 其余不动 ✓ —— ⭐ **并入既有 `SKILL_CAST` 规则的方案是对的** ✓，⚠ 普查也因此不红 ✓）；
+>   ② ⭐ **幂等改成"按 `op` 去重"** ✓（⚠ 例如先剔除 `do` 里已有的 `ADVANCE`／同名 `APPLY_BUFF` ✓）⇒ ⭐ **脚本可重复跑、且不引入非法键** ✓；
+>   ③ ⇒ **全量绿** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
+> * ✅ **纪律执行情况（连着第二轮）** ✓：⭐ **内容与判据**又没有**进树**** ✓（⚠ 闸门再次挡住了 ✓）⇒ ⭐ **唯一进树的是脚本那笔** ✓。
+> * ⚠ **推送**：本地**领先 4** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百五十二：🎉🎉🎉 **本段第 26 件出货** —— ⭐ **目标 ③ 的最后一块的前半**：
+> `8007`「使指定我方单体**行动提前 100%** 并附上【**迷迷的声援**】，持续 **3** 回合」**四件齐****）**）**：
+>
+> * ✅ **内容** ✓：**并入 `8007` 既有的那条 `SKILL_CAST` 规则** ✓（⚠ 不新增规则 ⇒ ⭐ **普查 `RemembranceTrailblazerTest` 不红** ✓）
+>   ⇒ `do` 末尾追加 **`{"op":"ADVANCE","percent":1.0,"target":"target"}`** ＋ **`{"op":"APPLY_BUFF","buff":"迷迷的声援","turns":3,"target":"target"}`** ✓
+>   （⚠ 两个数都是文档 `:143` 给的：**100%** ✓／**3 回合** ✓）。
+> * ✅ **判据** ✓（`MimiCheerTest` ✓）：放战技 ⇒ ⭐ **断言被指定的队友身上有【迷迷的声援】** ✓（⚠ `assertFalse` 前置 ✓）。
+> * ✅ **变异** ✓（⚠ 上一轮跑的、当时就已验）：把 `when` 改坏 ⇒ **全量 2 failed**（含本判据）✓ ⇒ ⭐ **承重** ✓。
+> * ✅ **两道闸门都过** ✓：全量 **2142 例 rc 0** ✓（⭐ **含** `EffectKeyDisciplineTest` ✓ **与**那条普查 ✓）、`mechanics` **rc 0** ✓。
+> * ⭐⭐ **本件最值得留档的是它的**两次拦截**** ✓（⭐ 这正是目标 ⑤ 的"进树门槛"在起作用 ✓）：
+>   1. ⭐ **普查拦截**：⚠ 第一版**另加了一条 `SKILL_CAST`** ✗ ⇒ 判据绿、**全量红** ⇒ ⭐ **普查的 javadoc 指对了路：把效果**并进既有规则**** ✓；
+>   2. ⭐ **键纪律拦截**：⚠ 第二版给效果加了自造的 `"mark"` ✗ ⇒ **`EffectKeyDisciplineTest`** 报
+>      *"these effect keys are **not fields of `EffectSpec`**, so **Gson drops them silently**"* ✓ ⇒ ⭐ **修法是"按 `op` 去重"** ✓。
+>   ⇒ ⭐ **两轮都没有把半成品提交进树** ✓（⚠ 因为提交挂在"恢复后必须全绿"上 ✓）。
+> * ⚠ **推送**：本地**领先 7** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百五十三：🎯🎯 **引擎里**有"插入他人终结技"的概念** ⇒ ⭐ 目标 ② 的"奇袭结束"这个时刻**可能就挂在它上面****）**）**：
+>
+> * ✅ **实测（grep `INSERT|Insert` ✓ 与 `SPEND_RESOURCE` ✓）** ✓：
+>   * ⭐⭐ **`Battle:665`** ＝ *"P7-2: during an extra turn, inserting **someone else's** ultimate is forbidden."* ✓
+>     ＋ ⭐ **`Battle:858`** 的 javadoc：*"During an extra turn, **someone else's ultimate must not be inserted** (see `castUltra`) -- that is a rule requirement; inserting another ultimate inside an extra turn turns 'extra' into…"* ✓
+>     ⇒ ⭐⭐ **即：引擎**已经有"把一次施放插进行动序列"的概念** ✓（⚠ 甚至已经为它立了一条规则 ✓）
+>       ⇒ ⭐ **而目标 ② 的"奇袭"（数据里是 `TurnInsertAbility` ✓）正是这个家族** ✓ ⇒ ⭐ **所以"奇袭结束"这个时刻很可能**不需要新能力**，而是要**找到它插入/结束的那两个点**** ✓；
+>   * ⭐ **`SPEND_RESOURCE`** ✓ 有文档行（`:92`：`resource`, `amount` ✓）＋ **已接线**（`:397` ✓）
+>     ⇒ ⭐ **所以"奇袭结束后消耗 6 点充能、爵位变回【军功】"的三件（花钱 ✓／显式移除 ✓／`STATE_ENDED` ✓）**全在树上**** ✓。
+> * ⭐ **下一轮第一步（一次读）** ✗：⭐ **读 `Battle:858` 附近 ＋ `castUltra` 的插入路径** ✓（⚠ 本段读过 `grantExtraTurn` 在 `:859` 附近 ✓ ⇒ ⭐ **两者相邻** ✓）
+>   ⇒ ⭐ **找到"插入的施放完成"那个点**（⚠ 若已有事件 ⇒ ⭐ **直接写规则** ✓；⚠ 若无 ⇒ ⭐ **登记"缺'被插入的施放结束'时刻"** ✓，
+>     ⚠ 并写明**它的读者**：`1412` 的"奇袭结束后…" ✓ ＋ 那张光锥的「奇袭结束后」✓ ⇒ ⭐ **读者 ≥2** ✓）。
+> * ⚠ **推送**：本地仍**领先 8** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十四：🎯 **插入点就在 `castUltra`**，而且引擎自己写下的理由**与数据里的防递归完全同源****）**）**：
+>
+> * ✅ **实测（读 `Battle:854`–`:884` ✓）** ✓：
+>   * ⭐ **这一段的两个方法是 `grantExtraTurn(CanHit)`**（⚠ 转给 `queue.grantExtraTurn` ✓）与 **`getExtraTurnActor()`** ✓（⚠ 本段用过它做判据 ✓）；
+>   * ⭐⭐ **而"插入"不在这里** ✗ —— javadoc 说 *"**During an extra turn, someone else's ultimate must not be inserted（see `castUltra`）** -- that is a rule requirement; inserting another ultimate inside an extra turn turns **'extra' into 'infinite chain'**"* ✓
+>     ⇒ ⭐ **即：插入逻辑在 `castUltra` 里** ✓（⭐ **下一轮第一步：读 `castUltra`** ✓ ⇒ ⭐ **找"插入"与"插入完成"两个点** ✓）。
+> * ⭐⭐⭐ **而这句话本身很值钱** ✓：⭐ **"插进额外回合会让 extra 变成无限链"** 正是**引擎层的防递归原则** ✓
+>   ⇒ ⭐⭐ **它与数据里 `1412` 的 `TurnInsertAbilityCondition: AbilityOwnerInsertUnusedCount = 1`（本段早前读到）**完全同源**** ✓
+>     ⇒ ⭐ **所以"奇袭"这个机制的设计意图，在引擎侧和内容侧**各有一半**，而两半都已经被我读到** ✓
+>       ⇒ ⭐ **剩下的只是"把它的**结束**时刻暴露出来"** ✓（⚠ 而那有**两个读者**：`1412` 的"奇袭结束后…" ✓ ＋ 那张光锥的「奇袭结束后」✓）。
+> * ⚠ **推送**：本地仍**领先 9** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十五：🎯🎯 **`castUltra` 读完了** ⇒ ⭐ "插入"这个词在引擎里指的是"额外回合中施放他人终结技"，
+> **不是**奇袭 ⇒ ⭐ 所以"奇袭结束"这个时刻**需要新造**（读者 2 ✓）**）**）**：
+>
+> * ✅ **实测（读 `Battle:661` 的 `castUltra` ✓）** ✓ 骨架：
+>   ```java
+>   public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
+>       if (user == null || user.isDeath() || !isUltraReady(user)) return false;
+>       // P7-2: during an extra turn, inserting **someone else's** ultimate is forbidden.
+>       CanHit extraTurnActor = queue.getExtraTurnActor();
+>       if (extraTurnActor != null && extraTurnActor != user) return false;
+>       …
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **"插入"在引擎里＝"在额外回合里施放**他人**的终结技"** ✓（⚠ 被明令禁止 ✓，理由已由注释给出 ✓）；
+>   **(ii)** ⭐ **而这**不是**数据里的奇袭** ✗ —— ⚠ 奇袭是 `TurnInsertAbility`（⚠ 一个**被插入的、有优先级的战技** ✓）
+>     ⇒ ⭐ **两者只是"同族"** ✓ ⇒ ⭐ **引擎里没有"被插入的战技结束"这个时刻** ✗ ⇒ ⭐⭐ **所以要**新造**它** ✓。
+> * ⭐⭐ **于是这条登记完全成形**（⭐ **正好是目标 ④／⑤ 要的形状**）✗：
+>   | 项 | 内容 |
+>   |---|---|
+>   | ⭐ **缺的能力** | ⭐ **"一次被插入的施放结束"这个时刻**（⚠ 或更一般：**"某次技能施放结束"的时刻** ✓） |
+>   | ⭐ **读者（≥2）** | ⭐ **`1412`**「奇袭结束后，消耗 **6** 点充能，爵位变回【军功】」✓ ＋ ⭐ **那张光锥**「奇袭结束后…」✓ |
+>   | ⭐ **现成的一半** | ⭐ `SPEND_RESOURCE` ✓／**显式移除会公告 `STATE_ENDED`** ✓（第 20 件）／⭐ 防递归原则两侧都已读到 ✓ |
+>   | ⚠ **规模** | ⚠ 一个事件 ＋ 一个"插入并等待它结束"的路径 ✓（⚠ 比本段做过的四件引擎能力略大 ✓） |
+> * ⚠ **如实记** ✓：⭐ 本段**没有**为了凑数而用"施放结束"去**近似**"奇袭结束" ✓ —— ⚠ **文档两处都写"**奇袭**结束后"** ✓
+>   ⇒ ⭐ **近似会让两处读者都读到错的时刻** ✓ ⇒ ⭐ **按纪律登记** ✓（⭐ 与 `1408` 的溢出奖励、`8007` 的 28% 真伤害同一处置 ✓）。
+> * ⚠ **推送**：本地仍**领先 10** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十六：🎉🎉🎉 **"真伤害"其实**早就实现了**** —— ⭐ `Battle:2701` 里就在 `new Damage(…, DamageType.TRUE, base)`；
+> ⚠ 我上一轮说"`DamageType` 里没有 TRUE"是**正则漏读**）**）**：
+>
+> * ✅ **实测（grep `DamageType.` 的全部用法 ✓）** ✓ 关键命中：
+>   ```
+>   Battle:1008  new Damage(dot.getSource(), target, dot.getElement(), DamageType.DOT, …)
+>   Battle:2661  Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base);
+>   Battle:2701  Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);      // ⭐⭐⭐
+>   Battle:2757  if (damage.getType() == DamageType.ADDITIONAL) { … }
+>   Battle:2764  if (damage.getType() == DamageType.DOT) { … }
+>   Battle:2777  if (damage.getType() == DamageType.MEMORY) { … }        // ⭐ 忆灵！
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **`DamageType.TRUE` **存在**且**有构造点****（`:2701` ✓）⇒ ⭐ **"真伤害"这条通道**已经建成**** ✓
+>     ⇒ ⚠ **我上一轮的结论（"枚举里没有真伤害"）是错的** ✗ —— ⚠ 原因是我**用正则抓 `DamageType.java` 的成员时漏读了**（⚠ 那些成员可能带注解或换行 ✓）
+>       ⇒ ⭐ **第六十九次自我纠正** ✓（⭐ 教训：⭐ **"读枚举成员"不能只靠一条正则** ✓ —— ⚠ 应当**直接读文件**或用编译器 ✓）；
+>   **(ii)** ⭐ **还有 `ADDITIONAL`（`:2661` ✓）与 `MEMORY`（`:2777`，**忆灵**专属 ✓）** ⇒ ⭐ **三种我上一轮没见到的类型** ✓；
+>   **(iii)** ⭐ **`Damage` 是带 `type` 的对象** ✓ ⇒ ⭐ **结算路径按 type 分支**（`:2757`／`:2764`／`:2777` ✓）⇒ ⭐ **所以"真伤害不受任何效果影响"多半已在 `TRUE` 的构造/结算里处理** ✓。
+> * ⭐⭐ **于是目标 ③ 最后一块大幅降级** ✓：⭐ **"真伤害"不是缺口** ✓（⚠ 只是我读错 ✓）；
+>   ⚠ **而真正剩下的可能只有"**按原伤害的 28%**"这一个量** ✗ ⇒ ⭐ **下一轮第一步**：⭐ **读 `Battle:2640`–`:2710`** ✓
+>     （⚠ 看 `:2701` 的 `base` 从哪来 ✓，⭐ **以及谁调用它** ✓ —— ⚠ **若调用点正是"某次伤害之后"** ⇒ ⭐ **那 `8007` 的 28% 也许只差一个比例参数** ✓）。
+> * ⚠ **推送**：本地仍**领先 11** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十七：🎉🎉🎉 **两条登记同时被推翻** —— ⭐ `applyTrueDamage` **早在树上**，
+> 而且它的 javadoc **逐字点名了"原伤害 × %"这种派生形式****）**）**：
+>
+> * ✅ **实测（读 `Battle:2705`–`:2715` ✓）** ✓ 全文：
+>   ```java
+>   /**
+>    * True damage: a fixed amount, or a derived value such as "this attack's total damage × %" -- it **skips every
+>    * damage zone** and does not count as an attack.
+>    * <p>{@code notCountsAsAttack()} is likewise set: the victim gains no energy and no toughness is reduced; but it is
+>    * attributed to the attacker, so on a kill the attacker still settles kill energy gain.
+>    * @param base the true damage amount (no longer affected by defence/resistance/DMG boost/crit/vulnerability)
+>    */
+>   public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
+>       Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
+>       return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), EnergyGrant.KILL_ONLY);
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **`applyTrueDamage` 存在** ✓ ⇒ ⭐ **"真伤害"是**已建成**的能力** ✓（⚠ 我上一轮登记它为"缺口" ✗）；
+>   **(ii)** ⭐⭐ **javadoc 逐字写着** *"a fixed amount, **or a derived value such as 'this attack's total damage × %'"*** ✓✓
+>     ⇒ ⭐ **这**正是 `8007` 的"等同于**原伤害**的 28%"** ✓✓ ⇒ ⭐ **所以那条也**不是缺口**** ✓（⭐ **第七十次自我纠正** ✓）；
+>   **(iii)** ⭐ **它与文档 `138:144` 的两条语义**逐字对应**** ✓：**"skips every damage zone"** ＝「不受任何效果所影响」✓；
+>     **`notCountsAsAttack()`** ＝「**不视为造成了 1 次攻击**」✓（⚠ 连"受害者不回能、不削韧"都写了 ✓）。
+> * ⭐⭐ **于是 `8007` 的 28% 完全可做** ✓（⚠ 下一轮两次调用）✗：⭐ **只差确认"内容侧怎么写"** ✗
+>   ⇒ ⭐ **`DAMAGE` 的 `damage_type`** 很可能就接受 **`TRUE`** ✓（⚠ 本段读过 **`DAMAGE_TYPE_READERS`** ✓ —— ⚠ 那个集合**就是"哪些 op 会读 `damage_type`"** ✓ ⇒ ⭐ **看 `DAMAGE` 在不在里面** ✓，**一次 grep** ✓）；
+>     ⭐ **而 `base` 的"原伤害 × %"** 在内容侧怎么写 ⇒ ⭐ **`DAMAGE` 若支持 `percent` 相对事件伤害** ✓（⚠ 本段只见过"相对属性" ✗ ⇒ ⭐ **待查** ✓）。
+> * ⚠ **推送**：⭐ **本轮已推送成功** ✓（`2ae46535..c51fcf0d` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十八：🎯🎯🎯 **两条答案到手** —— ⭐ `damage_type` 在 `DAMAGE` 上合法，
+> ⭐ 而且**已经有 op 在调 `applyTrueDamage`****）**）**：
+>
+> * ✅ **实测（两处 grep ✓）** ✓：
+>   * ⭐⭐ **`DAMAGE_TYPE_READERS = Set.of("BOOST_DAMAGE", "DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN")`** ✓
+>     ⇒ ⭐ **即：`DAMAGE` **是**会读 `damage_type` 的 op** ✓ ⇒ ⭐ **所以内容里写 `{"op":"DAMAGE", …, "damage_type":"TRUE"}` **会通过校验**** ✓
+>       （⚠ 而上轮已知：**非读者 op 写了它会被拒** ✓ ⇒ ⭐ **这个白名单正是"合法写法表"** ✓）；
+>   * ⭐⭐⭐ **`TriggerInterpreter:4139`** ＝ **`battle.applyTrueDamage(attacker, victim, skill == null …`** ✓
+>     ⇒ ⭐ **即：**已经有一个 op 在走真伤害** ✓ ⇒ ⭐ **下一步就是看它是哪个 op、以及它的 `base` 怎么来** ✓（⚠ **一次读** ✓）。
+> * ⭐⭐ **于是 `8007` 的 28% 距离出货只差"看清那个 op"** ✓（⚠ 下一轮两次调用 ⇒ 很可能直接成 ✓）：
+>   ⭐ **若 `:4139` 所在的 op 能取"本次事件的伤害量 × percent"** ⇒ ⭐ **`8007` 一句就能写** ✓；
+>   ⚠ **若它只取绝对值** ⇒ ⭐ **那就按纪律登记"缺'相对事件伤害的比例'"** ✓（⚠ **而它的读者就是 `8007`** ✓）。
+> * ⭐ **顺带记一条** ✓：⭐ 本轮的两次"读错"（`DamageType` 成员、真伤害是否存在）**都源于"用一条正则代替读文件"** ✗
+>   ⇒ ⭐ **纪律（第七十条的产物）**：⭐ **凡是要"列全某事物的成员"，直接读文件或问编译器；正则只用于寻找位置** ✓。
+> * ⚠ **推送**：⭐ **本轮已推送** ✓（`c51fcf0d..e97b6dc6` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十九：🎉🎉🎉 **`damage_type: "TRUE"` 的分支**早就在引擎里**，
+> 而且它的注释**点名了我要接的两个读者****）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter:4119`–`:4145` ✓）** ✓ 逐字：
+>   ```java
+>   // ⭐ `damage_type: "TRUE"` is 真实伤害: it SKIPS every zone (2026-10-02). Without this branch the op stamped the
+>   // TYPE and still went through `applyAdditionalDamage`, so the instance was labelled TRUE while defence and
+>   // resistance multiplied it -- a right label on a wrong number, with no symptom. `Battle.applyTrueDamage` is the
+>   // engine's one true-damage entry: it sets `.trueDamage()`, which `toValue()` honours by skipping the zones.
+>   // Readers (2): 8007 开拓者's 【迷迷的声援】 (28%) and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」.
+>   if (damageType == DamageType.TRUE) {
+>       battle.applyTrueDamage(attacker, victim, skill == null
+>               ? DamageElement.fromString(effect.getElement().trim())
+>               : elementOf(effect, skill),
+>               settledBase);
+>       return;
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **`damage_type: "TRUE"` 这条分支**已经建成**** ✓（⚠ 而且注释记下了"只有标签对、数字被防御乘过"的那个**无症候**的坑 ✓ —— ⭐ 与本段"先写标签再修语义"的教训同型 ✓）；
+>   **(ii)** ⭐⭐⭐ **注释**点名了读者**：*"Readers (2): **8007 开拓者's 【迷迷的声援】(28%)** and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」"*
+>     ⇒ ⭐ **即：本段的目标 ③ 最后一块的**引擎侧**，**早在本段内就建好了**** ✓（⚠ 日期 `2026-10-02` ＝ 今天 ✓ ⇒ ⭐ **是前几轮的我做的** ✓✓ —— ⭐ **第七十一次自我纠正：我在找的东西，我已经做过了** ✓）；
+>   **(iii)** ⭐ **`base` 在 `skill == null` 时来自 `literalBase(...)`** ✓（⚠ 注释：*"a literal ratio: off the SETTLED attribute, a Max HP share, or the…"* ✓）
+>     ⇒ ⚠ **只剩一点要确认**：⭐ **`literalBase` 能不能取"**本次事件的伤害量**"** ✗（⚠ 若行 ⇒ ⭐ **`8007` 一句话就能出货** ✓；⚠ 若不行 ⇒ ⭐ **那才是一条真缺口** ✓）。
+> * ⭐ **下一轮第一步（一次读 ＋ 可能直接出货）** ✗：⭐ **读 `literalBase`** ✓ ⇒ ⭐ **看它支持哪些来源**（⚠ 本段见过 `self_attr:` ✓ ⇒ ⭐ **看有没有"事件伤害量"或类似 `event:` 前缀** ✓）
+>   ⇒ ⭐ **然后写 `8007` 的 rider**：`DEALING_DAMAGE` ＋ `from_category` ＋ `self_resource:迷迷的声援 >= 1` ⇒ **`DAMAGE{damage_type: "TRUE", percent: 0.28, element: …}`** ✓ ＋ **判据**（⚠ 两向：真伤害不被防御削弱 ✓）＋ **变异** ⇒ ⭐ **出货（第 27 件）** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`7304d250` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十：🎉🎉🎉 **"原伤害 × %"也**已经实现了**** —— ⭐ 挂在 **`DAMAGE_SETTLED`** 上，
+> 而且代码里留着**我自己那轮的完整复盘**（含一条**警告我用过的判据手法**的话））**）**：
+>
+> * ✅ **实测（读 `literalBase` ✓，`:4026` 起 ✓）** ✓ 原文要点（⭐ 全部是**代码里的注释**，不是我事后总结 ✓）：
+>   * ⭐ *"A share of the TRIGGERING instance（「等同于原伤害 X%」）was implemented here on 2026-10-02 and **ROLLED BACK the same round**, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries the instance -- **`damage.toValue()` is 4.2x the value the victim actually loses**（measured: **1093.02 vs 260.237584** on one 姬子 attack）, since settlement happens AFTER that event by design."* ✓
+>     ＋ *"⇒ It needs a **POST-settlement carrier** for the value; the reader table and the exact numbers are in GAPS（entry "aggro 回收之八百"）."* ✓
+>   * ⭐⭐⭐ *"「等同于**原伤害** X%」(2026-10-02): a share of the damage instance that triggered this rule -- of the number the victim actually took, **which is what `DAMAGE_SETTLED`'s `amount` is**."* ✓
+>     ＋ ⭐ **除法的理由**：*"a `DAMAGE`'s value is a **BASE** … Feeding it the already-settled amount would multiply those zones a second time（measured: a 40% share landed as 0.4 × 0.5829 = 0.233）… **Dividing by the triggering instance's own factor（`toValue() / skillBaseValue`）makes the rider SETTLE to exactly the share the text states**."* ✓
+>   * ⚠⚠ **还有一句直接警告我用过的判据手法**：*"That detour was **my own error, not the engine's**: my first probes **replaced the character's table with a hand-built one** to control variables, **which also dropped `level_convention`**, so the cast ran at the Lv1 row (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy…"* ✓
+> * ⭐⭐⭐ **三条结论** ✓：**(i)** ⭐ **"原伤害 × %"已建成** ✓（⚠ 载体是 `DAMAGE_SETTLED` 的 `amount` ✓ ＋ `toValue()/skillBaseValue` 的除法 ✓）；
+>   **(ii)** ⭐ **"真伤害 + 原伤害比例"这两条**都早就在树上**** ✓ ⇒ ⭐ **所以 `8007` 的 28% 是**纯内容工作**** ✓（⚠ **第 27 件可以一次做成** ✓）；
+>   **(iii)** ⭐⭐ **而那段警告正对着本段反复使用的"重建表"手法** ✓ —— ⚠ **它提醒：重建表会连带丢掉 `level_convention`** ✓
+>     ⇒ ⭐ **所以本段后续所有"重建表"的判据都要**补回 `level_convention`**（或有意识地避开按等级取值的行）** ✓
+>       （⭐ **第七十二条：这是一条**代码里留给我**的纪律** ✓ —— ⭐ **比我自己写的笔记更硬** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`28efae4e` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十一：🎉🎉🎉 **机制看全了** —— ⭐ 对 `damage_type: "TRUE"` 的 rider，
+> `literalBase` 直接返回 **`ctx.amount() * share + flat`**，**连除法都不需要****）**）**：
+>
+> * ✅ **实测（读 `literalBase` 的 `:4052`–`:4073` ✓）** ✓ 原文：
+>   ```java
+>   // ⚠ The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
+>   // correction at all: 真实伤害 (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
+>   // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured 2026-10-02: a 24% rider landed as
+>   // 44% -- 77.43 where 42.01 was due). Readers: 1415 昔涟's 结界 rider.
+>   if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
+>       return ctx.amount() * share + flat;
+>   }
+>   double factor = ctx.damage().getSkillBaseValue() == 0 ? 1.0
+>           : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
+>   return ctx.amount() / factor * share + flat;
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **真伤害的 rider：`ctx.amount() * share`** ✓ —— ⚠ `ctx.amount()` 就是 **`DAMAGE_SETTLED` 的 `amount`** ✓、`share` 就是**内容里的 `percent`** ✓
+>     ⇒ ⭐ **所以 `8007` 的 28% ＝ `percent: 0.28` ＋ `damage_type: "TRUE"` ＋ **挂 `DAMAGE_SETTLED`**** ✓✓；
+>   **(ii)** ⭐ **普通 rider 才需要除以 `toValue()/skillBaseValue`** ✓（⚠ 注释连"24% 曾落地成 44%（77.43 vs 42.01）"都记了 ✓ ⇒ ⭐ **又一个"无症候"的坑被写进代码** ✓）；
+>   **(iii)** ⭐ **那位读者 `1415` 昔涟的结界 rider **已经在树上** ✓ ⇒ ⭐ **说明这条通道**有 2 个读者、且**至少一个已在用** ✓。
+> * ⚠ **只剩一个词** ✗：⭐ **那个 `case` 的 `scale` 记号**（⚠ 就在我读的窗口**上一行** ✓）⇒ ⭐ **下一轮一次读 ⇒ 然后写 `8007` 的 rider ⇒ 出货（第 27 件）** ✓
+>   （⚠ 预期形状：`on: DAMAGE_SETTLED` ＋ `when: ["self_resource:迷迷的声援 >= 1"]` ⇒ `{"op":"DAMAGE","scale":"<那个记号>","percent":0.28,"damage_type":"TRUE","element":…,"target":"target"}` ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`ec784de4` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十二：🎉🎉🎉 **最后一个词到手：`scale: "original_damage"`**** —— ⭐ 而且代码里留着一句
+> **直接点名我用"重建表"判据把正确实现回滚了三次**的记录**）**）**：
+>
+> * ✅ **实测（读 `:4054`–`:4068` ✓）** ✓ 原文：
+>   ```java
+>   // ⚠ That detour was my own error, not the engine's: my first probes replaced the character's table with a
+>   // hand-built one to control variables, which also dropped `level_convention`, so the cast ran at the Lv1 row
+>   // (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy and rolled
+>   // a CORRECT implementation back three times (M-32's own trap, sprung by the judge).
+>   if ("original_damage".equals(scale)) {
+>       if (ctx == null || ctx.damage() == null) {
+>           throw new IllegalStateException(
+>               "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
+>               + "evaluated without one (it must hang on DAMAGE_SETTLED)");
+>       }
+>       …
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **记号是 `"original_damage"`** ✓ ⇒ ⭐ **`8007` 的 rider 现在**每一个字都确定了**** ✓；
+>   **(ii)** ⭐ **它**必须**挂在 `DAMAGE_SETTLED` 上** ✓（⚠ 否则**当场抛异常** ✓ —— ⭐ 又是那种"会自己说出病名"的设计 ✓）；
+>   **(iii)** ⭐⭐⭐ **代码里留有对**我自己的**判据手法的判决** ✓：*"my first probes **replaced the character's table with a hand-built one** … which also dropped `level_convention` … **rolled a CORRECT implementation back three times** (M-32's own trap, **sprung by the judge**)"* ✓
+>     ⇒ ⭐ **这是一条**比我的笔记硬得多**的纪律** ✓（⭐ **第七十三条**：⚠ **凡"重建表"的判据必须补回 `level_convention`，或改用真内容驱动** ✓）。
+> * ⭐⭐ **于是第 27 件的全部材料**齐了**** ✓（⚠ 下一轮两三次调用）✗：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "cheer_true_damage_rider",
+>     "when": ["self_resource:迷迷的声援 >= 1"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.28,
+>               "damage_type": "TRUE", "element": "<无属性要写哪个记号，待 grep>", "target": "target" } ] }
+>   ```
+>   ⚠ **唯一待查**：⭐ **"无属性"要写哪个 `element` 记号** ✗（⚠ 文档 `:144` 说真伤害是**无属性** ✓ ⇒ ⭐ **`DamageElement` 里应当有一个对应值** ✓ —— ⚠ **一次 grep** ✓，⚠ **按第 70 条纪律：直接读那个枚举文件** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`8d1d09e1` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十三：🎯 **`DamageElement` 只有 7 个成员、没有"无属性"** ⇒ ⭐ 但"无属性"在引擎里的实现
+> 是**"跳过全部伤害区"**，⭐ 而 **`1415` 那条在树的同型 rider 就是现成范本****）**）**：
+>
+> * ✅ **实测（**直接读枚举文件** ✓ —— 按第 70 条纪律，不全靠正则 ✓）** ✓ 全部成员：
+>   ⭐ **`PHYSICAL`**（Physical）／**`FIRE`**／**`ICE`**／**`THUNDER`**／**`WIND`**／**`QUANTUM`**／**`IMAGINARY`**
+>   ＋ ⭐ 文件头的注释还写着：*"**No-element skills**: non-damaging skills … carry the value `"Unknown"` in the game data. Parsing such a value is **not** a failure and is not mapped to any element:
+>   `fromString` simply returns **null**, signalling 'this skill has no damage element'."* ✓
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **没有"无属性/真伤"这种 element 成员** ✗；
+>   **(ii)** ⭐ **而 `null` 是"非伤害技能"的信号** ✓（⚠ 不是给真伤害用的 ✓）。
+> * ⭐⭐⭐ **但"无属性"其实已经实现了** ✓ —— ⚠ 不是靠 element，而是靠**结算路径**：⭐ `applyTrueDamage` 的 javadoc 说
+>   *"**it skips every damage zone**"* ✓ ＋ ⭐ 文档 `:144` 说「**不受任何效果所影响的无属性伤害**」✓
+>   ⇒ ⭐ **两者是同一件事** ✓ ⇒ ⭐ **所以 TRUE 的 rider 上那个 `element` 只是**随行标签**，不参与抗性** ✓（⚠ 而 `applyTrueDamage` 的签名
+>     **要求**一个 element ✓ ⇒ ⭐ **那就要从**在树的例子里**看它写什么** ✓）。
+> * ⭐⭐ **于是范本找到了** ✓：⭐ **`1415` 昔涟的结界 rider**（⚠ 代码注释两次点名它 ✓：「`1415` 昔涟's 结界 rider」✓）
+>   ⇒ ⭐ **它就是"同一个 op、同一个 `original_damage`、同一个 TRUE"的**在树实例**** ✓ ⇒ ⭐⭐ **下一轮第一步：读 `1415.json` 那条 rider** ✓
+>     ⇒ ⭐ **照它的 `element`／`target`／`when` 写 `8007`** ✓ ⇒ **判据**（⚠ 两向：真伤害不被防御削弱 ✓）＋ **变异** ⇒ ⭐ **出货（第 27 件）** ✓。
+> * ⚠ **推送**：本地仍**领先 0**（⚠ 上一条记录已推 ✓）⇒ ⚠ 本轮记录待推 ✓（⚠ 网络连失败 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十四：🎉🎉🎉 **`1415` 的 rider **原样到手**** —— ⭐ 但抄之前要先答**一个结构问题**）**）**：
+>
+> * ✅ **实测（dump `1415.json` ✓）** ✓ 原文：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "zone_true_damage_rider",
+>     "when": ["self has_state 结界", "actor is_ally", "damage_is_attack"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.24,
+>               "element": "Ice", "damage_type": "TRUE", "target": "target" } ] }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **`element: "Ice"`** ✓ —— ⭐ **证实了我上一轮的推断：真伤害上的 `element` 只是**随行标签**（不参与抗性 ✓）；
+>   **(ii)** ⭐⭐ **两个我没见过的条件** ✓：**`actor is_ally`** ✓ ＋ ⭐⭐ **`damage_is_attack`** ✓
+>     —— ⭐ **后者正对着文档 `:144` 的「**不视为造成了 1 次攻击**」** ✓✓（⭐ **即：这个条件就是"这次伤害算不算一次攻击"的闸门** ✓）；
+>   **(iii)** ⭐ **其余与本段推出的**逐字一致**** ✓：`on: DAMAGE_SETTLED` ✓／`scale: "original_damage"` ✓／`damage_type: "TRUE"` ✓／`target: "target"` ✓／`percent` ✓。
+> * ⚠⚠ **但抄之前有一个**结构问题**要答** ✗：⭐ **`1415` 的规则挂在**她自己**的表上**（条件 `self has_state 结界` ✓ ⇒ ⭐ **状态在她身上、规则也在她身上** ✓）
+>   ⚠ **而 `8007` 的【迷迷的声援】是附在**队友**身上的** ✗（文档 `:143`「使**指定我方单体**…**附上**【迷迷的声援】」✓）
+>     ⇒ ⭐ **所以"持有者造成伤害时追加"这个语义，要求规则挂在**带有该状态的那个单位**的表上** ✗
+>       ⇒ ⚠ **而队友的表来自**他们自己的角色文件** ✗✗ ⇒ ⭐ **这就是目标 ③ 真正的最后一道坎** ✓。
+> * ⭐ **下一轮第一步（一次读，直指要害）** ✗：⭐ **查"**状态自带规则**"这件事在引擎里怎么写** ✓
+>   （⚠ 候选：**`APPLY_BUFF` 的 `buff` 指向一个**带效果的状态定义** ✗ 或 **`MODIFY_ATTR` 式的好处挂在状态上** ✓
+>     —— ⭐ **最省的一读：`grep` 引擎里有没有"buff 携带自己的 `do`／规则"的结构** ✓，⚠ **或看本段第 22 件（`1412` 的 16% 防御无视）是怎么把好处给到**持军功者**的** ✓
+>       —— ⭐ **那一件成功过！**（`MODIFY_ATTR{…, target: "target"}` 挂在**授予规则**里 ⇒ ⭐ **效果随授予一起落在目标身上** ✓✓）
+>     ⇒ ⭐ **若那条路能推广到 `DAMAGE_SETTLED` 的 rider** ⇒ ⭐ **`8007` 一次就能成** ✓；⚠ **否则按纪律登记"缺'状态携带 rider'"** ✓（⚠ **读者 ≥2**：`8007` ✓ ＋ ⚠ 其它"附身型 buff"✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十五：🎯🎯🎯 **结构问题有解了 —— 规则不必挂在队友的表上****：
+> ⭐ 只要 `DAMAGE_SETTLED` 的上下文里**能读"**造成伤害的那一位**"身上有没有状态**，规则就可以留在 `8007` 自己的表里****）**）**：
+>
+> * ⭐⭐ **推演（依据本段已实测的两条）** ✓：
+>   1. ⭐ **`1415` 的 rider 用 `actor is_ally`** ✓ ⇒ ⭐ **说明在 `DAMAGE_SETTLED` 里 `actor` **就是造成伤害的那一位**** ✓；
+>   2. ⭐⭐ **而条件 DSL 里 `has_state` 的**主语**是可换的** ✓ —— ⚠ 本段早前读过它的示例：*"**`target has_state 触电`** — it happened to someone in that state ← Kafka's「触电状态下的敌方目标」"* ✓
+>     ⇒ ⭐ **所以 `actor has_state 迷迷的声援` 应当成立** ✓✓（⚠ **一次实测即可确认** ✓）。
+>   ⇒ ⭐⭐⭐ **于是 `8007` 的 rider 可以**留在她自己的文件里**** ✓，⭐ **不需要"状态携带规则"这种新能力** ✓：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "cheer_true_damage_rider",
+>     "when": ["actor has_state 迷迷的声援", "actor is_ally", "damage_is_attack"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.28,
+>               "element": "<他的伤害元素，照 1415 用自带元素>", "damage_type": "TRUE", "target": "target" } ] }
+>   ```
+>   ⇒ ⭐ **三条** ✓：**(i)** ⭐ **`percent: 0.28`** ＝ 文档 ✓；**(ii)** ⭐ **`damage_is_attack`** ＝ 文档「不视为造成了 1 次攻击」的闸门 ✓；
+>   **(iii)** ⚠ **`element` 要照 `8007` 自己的伤害元素**（⚠ `1415` 用 `Ice` 是因为她的伤害是冰 ✓ ⇒ ⭐ **一次 `grep` 就能定** ✓，⚠ **但 element 只是标签、不影响数值** ✓）。
+> * ⭐⭐ **于是第 27 件的路径**完全打通**** ✓（⚠ 下一轮两三次调用 ⇒ **出货**）✗：⭐ 写内容 ＋ **判据**（⚠ **两向**：①**有【迷迷的声援】的队友造成伤害 ⇒ 追加 28% 真伤害** ✓；②**没有该状态 ⇒ 不追加** ✓）
+>   ＋ **变异**（⚠ `percent` 0.28 → 0.10 ⇒ 必红 ✓）⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
+>   ⚠ **并记住第 73 条纪律** ✓：⭐ **判据**不要**为了控制变量而重建角色表**（⚠ 那会丢掉 `level_convention` ✓ —— ⭐ 代码里判过我三次 ✓）。
+> * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -31024,6 +31520,502 @@
 >   ⚠ **`8007` 的 28% 真伤害（忆灵技能通道）**（未动 ✓）／⭐ **`1407` 的龙血＝【新蕊】上限 100%**（⚠ 与 `1512` 这块同族 ⇒ ⭐ **可照本件写判据** ✓ 若内容已在 ✓）。
 > * ⚠ **推送**：本地**领先 1** ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百四十一：🎉🎉🎉 **再一次核账成功** —— ⭐ `1407` 的忆灵面板（含**龙血 ＝【新蕊】上限 100%**）
+> **早已在树**，而且它用的写法**正是本段以为缺失的那条通道**）**）**：
+>
+> * ✅ **实测（读 `memosprites/1407.json` ✓）** ✓ 原文：
+>   ```json
+>   { "name": "死龙•玻吕刻斯", "aggro": 100,
+>     "panel": [ { "attribute": "HEALTH", "percent": 1.0, "source": "resource:新蕊" },   // ⭐⭐ 龙血 ＝ \u3010\u65b0\u854a\u3011\u4e0a\u9650\u7684 100% ✓
+>                { "attribute": "ATTACK", "percent": 1.0, "source": "attr:HEALTH" },
+>                { "attribute": "SPEED",  "flat": 165 } ] }                              // ⭐ 165 ✓ \u4e0e\u6587\u6863 `:87` \u4e00\u81f4 ✓
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：
+>   **(i)** ⭐ **"龙血 ＝【新蕊】上限 100%" 已在树** ✓**（⚠ 目标 ③ 里我记的那一项 ✓）；
+>   **(ii)** ⭐⭐ **`"source": "resource:新蕊"` 这个写法说明：引擎**早就有"把资源当量"的通道**** ✓✓
+>     —— ⚠ 而本段整整几轮都在登记"按资源计数派生的比例量"是**缺失的** ✗ ⇒ ⭐ **第六十七次自我纠正** ✓
+>       （⚠ 更值钱的是：⭐ **这条通道很可能正是 `1407` 的【新蕊】读者与 `1501` 的【笑点】穿透所需要的** ✓ ⇒ ⭐ **下一轮应当先把它读通** ✓）；
+>   **(iii)** ⭐ **`"source": "attr:HEALTH"`** 说明还能**引用另一个属性**（⚠ 死龙的 ATK ＝ 它的生命 ✓）⇒ ⭐ **又一条现成通道** ✓。
+> * ⭐⭐ **另外**：⭐ **`memosprites/8007.json` 也在树** ✓（`name: 迷迷` ✓，`SPEED flat 130` ＋ `HEALTH 0.8 flat 640` ✓）⇒ ⚠ **目标 ③ 里"`8007` 的 28% 真伤害"**已经是**最后一块**了**** ✓。
+> * ⭐ **下一轮第一步（两次调用，且很可能一次成）** ✗：① ⭐ **读 `panel` 的 `source` 解析**（⚠ `grep` `"resource:"`／`"attr:"` 在引擎里的处理 ✓ —— ⚠ **不猜** ✓）；
+>   ② ⭐ **用它把 `1407` 的【新蕊】读者重新写一遍**（⚠ 甚至 `1501` 的"每 1 个笑点 +1.5% 穿透"✓）⇒ ⭐ **两件登记项可能同时解放** ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十二：🎯🎯🎯 **`source:` 的解析找到了** —— ⭐ 引擎**确实有"把资源当量"的通道，但它只在**忆灵面板**这条路上****）**）**：
+>
+> * ✅ **实测（grep `resource:`／`attr:` ✓）** ✓ 命中 **`SummonFactory:184`／`191`**：
+>   ```java
+>   if (entry.source() != null && entry.source().startsWith("attr:")) {
+>       String other = entry.source().substring("attr:".length()).trim();     // ⭐ 引用另一个属性（死龙 ATK ＝ 其生命 ✓）
+>       …
+>   } else if (entry.source() != null && entry.source().startsWith("resource:")) {
+>       String name = entry.source().substring("resource:".length()).trim();  // ⭐⭐ 引用一个**资源**（龙血 ＝【新蕊】上限 ✓）
+>       …
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **两条** ✓：**(i)** ⭐ **忆灵面板**支持 `attr:` 与 `resource:` 两种来源** ✓ ⇒ ⭐ **目标 ③ 的"龙血＝【新蕊】上限 100%"是**已建成**的能力** ✓（⚠ 不是缺口 ✓）；
+>   **(ii)** ⭐⭐ **于是本段那条登记可以**精确化**** ✓（⚠ 这是它从"模糊的一类"变成"可用的一句话"的时刻 ✓）：
+>     ⭐ **"把资源当量"在**忆灵面板**里**有** ✓，在**规则**里**没有**** ✗
+>       ⇒ ⭐ **所以 `1407` 的【新蕊】读者（规则）**仍然**卡在"规则侧读不到资源量"上** ✓，⚠ **而它与"面板侧已经有"是**两件事**** ✓
+>         ⇒ ⭐ **下一轮有两条路** ✗：**（甲）** ⭐ **把 `resource:` 这个解析**提取出来给规则用**（⚠ 一处小引擎补充 ✓，⭐ **读者 ≥2**：`1407` 的【新蕊】✓ ＋ `1501` 的"每 1 个笑点 +1.5% 穿透" ✓）；
+>           **（乙）** ⚠ **登记为"规则侧缺资源当量"并转做 `8007`** ✓。
+> * ⭐ **本段的账目（本轮核完）** ✓：**目标 ③ 的三块** —— ⭐ **`1512` 面板（第 25 件 ✓ 出货）**／⭐ **`1407` 面板（早就在树 ✓ 含龙血与 165）**／
+>   ⚠ **`8007` 的 28% 真伤害（忆灵技能通道 —— 仍未动 ✓）**。
+> * ⚠ **推送**：本地仍**领先 3** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十三：🎉🎉🎉 **目标 ③ 最后一块（`8007` 的 28% 真伤害）原话到手**，⭐ 而且它与 `1505` 那件**同形**）**）**：
+>
+> * ✅ **实测（读 `8007_开拓者.html:143` ✓）** ✓ 逐字：
+>   > 「使指定我方单体<u>行动提前</u>**100%** 并附上【**迷迷的声援**】，持续 **3** 回合。
+>   > **持有【迷迷的声援】的目标每造成 1 次伤害，都会再额外造成 1 次等同于原伤害 28% 的真实伤害**。」
+>   ＋ ⭐ **术语表 `:144`**：「**真实伤害**：**不受任何效果所影响的无属性伤害**，本次伤害**不视为造成了 1 次攻击**。」✓
+>   ⇒ ⭐⭐ **三条** ✓：
+>   **(i)** ⭐ **"-每造成 1 次伤害 ⇒ 额外 28% 真伤害"** ✓ —— ⚠ 这是**挂在状态上的伤害追加** ✓；
+>   **(ii)** ⭐⭐ **它的形状与本段第 18 件（`1505` 的 `p1505_skill_elation_rider`）**完全同族**** ✓
+>     —— ⚠ 那件是 **`DEALING_DAMAGE` ＋ `from_category BPSKILL`** ⇒ ⭐ **在树有已出货的先例** ✓✓；
+>   **(iii)** ⭐ **"真伤害"有术语定义** ✓（⚠ 不受任何效果影响 ＋ 不视为一次攻击 ✓ ⇒ ⭐ **与普通伤害区分** ✓）。
+> * ⭐⭐ **于是目标 ③ 的最后一块有了路径** ✗（⚠ 下一轮）：
+>   ① ⭐ **先读 `1505` 那条规则**（⚠ `p1505_skill_elation_rider` ✓ —— ⭐ **它在树、有判据、有变异** ✓ ⇒ ⭐ **照抄形状** ✓）；
+>   ② ⭐ **再确认"真伤害"在引擎里怎么表达** ✗（⚠ 本段见过 `ELEMENT`／`CONTROL`／`DAMAGE` 类 op ✓ ⇒ ⭐ **先 `grep` "true"／"ignore_def"／`TRUE_DAMAGE`** ✓ —— ⚠ **不猜** ✓）；
+>   ③ ⭐ 写 `8007` 的规则 ＋ 判据（⚠ 断言"额外那一下是按 28% 算的" ✓）＋ **变异** ⇒ ⭐ **出货** ✓。
+> * ⚠ **推送**：⭐ **本轮**已推送成功**** ✓（`4bc82886..81d37e55` ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十四：🎯🎯🎯 **`1505` 那条 rider 的原样抄到了**，⭐ 而且它顺手**推翻了我上一轮刚立的"规则侧读不到资源"结论****）**）**：
+>
+> * ✅ **实测（dump `1505.json` ✓ ＋ grep op 词汇 ✓）** ✓ 原文：
+>   ```json
+>   { "on": "DEALING_DAMAGE", "id": "p1505_skill_elation_rider",
+>     "when": ["actor == self", "from_category BPSKILL", "self_resource:好活当赏 >= 1"],
+>     "do": [ { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.08,
+>               "element": "physical", "damage_type": "ELATION", "target": "target" } ] }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：
+>   **(i)** ⭐⭐ **`self_resource:好活当赏 >= 1`** ✓ ⇒ ⭐ **即：规则的条件里**可以**读资源** ✓✓
+>     —— ⚠ 我上一轮刚说"规则侧没有把资源当量的通道" ✗ ⇒ ⭐ **第六十八次自我纠正** ✓
+>       （⚠ 精确说法应当是：**条件**里能读 ✓；⚠ **而"把资源量当成**数值**用"（例如"每 1 点 +1.5%"）**仍未见** ✗ ⇒ ⭐ **登记要按这句改写** ✓）；
+>   **(ii)** ⭐⭐ **`"damage_type": "ELATION"`** ✓ ⇒ ⭐ **`DAMAGE` 有一个 `damage_type` 字段** ✓
+>     ⇒ ⭐ **那么"真伤害"很可能就是它的另一个取值**（⚠ 下一轮第一步：⭐ **`grep` `damage_type` 的取值闭集** ✓ —— ⚠ **不猜** ✓）；
+>   **(iii)** ⭐ **rider 的完整形状**（`DEALING_DAMAGE` ＋ `actor == self` ＋ `from_category` ＋ `self_resource:` 门槛 ⇒ `DAMAGE{scale, percent, element, damage_type, target}` ✓）
+>     ⇒ ⭐ **`8007` 的"每造成 1 次伤害 ⇒ 额外 28% 真伤害"照这个抄** ✓（⚠ `percent: 0.28` ✓ ＋ 正确的 `damage_type` ✓ ＋ ⚠ `target` 与 scale 按文档"**原伤害的 28%**" ✓
+>       —— ⚠ 注意：⚠ **文档说的是"等同于**原伤害**的 28%"** ✗ ⇒ ⭐ **而 `1505` 那条是"按 ATTACK 的 8%"** ✗ ⇒ ⚠ **两者不同** ✓
+>         ⇒ ⭐ **所以 `8007` 需要一个"按刚才那次伤害量"的比例** ✗ ⇒ ⭐ **下一轮要先看 `DAMAGE` 的 `scale` 支持哪些取值** ✓（⚠ 本段见过 `self_attr:` ✓ ⇒ ⚠ 是否有"事件里的伤害量"✗ **待查** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`4f56ab4c` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十五：🎯 **`damage_type` 是个**枚举**，且 `DAMAGE` 的合法键是 `skill`／`damage_param`**）**）**：
+>
+> * ✅ **实测（grep `TriggerInterpreter` ✓）** ✓ 三处：
+>   * ⭐ **`:9`** ＝ **`import com.laosun.aluminium.enums.DamageType;`** ✓ ⇒ ⭐ **`damage_type` 是枚举** ✓（⚠ 取值闭集在 `enums/DamageType.java` ✓）；
+>   * ⭐ **`:297`／`:298`** ＝ **`DAMAGE_TYPE_READERS`** 集合 ✓（⚠ 注释："The ops that actually read `damage_type`" ✓）＋ **`:327` 的守卫**（⚠ **非读者 op 写了 `damage_type` 会被拒** ✓ —— ⭐ 与"写错键会被装载器拒绝"同一种**自我纠正型**设计 ✓）；
+>   * ⭐ **`:101`**（op 表的 DAMAGE 行）＝ **`DAMAGE`｜`skill`，`damage_param`，optional `target`** ✓
+>     ⇒ ⚠ 而 `1505` 用的是 **`scale` ＋ `percent`** ✓ ⇒ ⭐ **说明 `DAMAGE` 接受**多种形状**** ✓（⚠ 或者 `skill`／`damage_param` 是另一条通道 ✓ —— ⭐ **下一轮要看清 `DAMAGE` 的字段全集** ✓）。
+> * ⭐⭐ **下一轮第一步（两次读 ⇒ 可能一次成）** ✗：
+>   ① ⭐ **读 `DamageType` 的成员** ✓ ⇒ ⭐ **找到"真伤害"那一个**（⚠ 若枚举里没有"真"，⭐ **那就是本块需要的一处小能力**，⚠ **而它读者 ≥1（`8007`）＋ 同族的 `1505` 可能也需要** ✓）；
+>   ② ⭐ **"按**原伤害**的 28%"怎么写** ✗（⚠ `1505` 是"按 ATTACK 的 8%" ✓ ⇒ ⭐ **不同的量** ✓
+>     ⇒ ⭐ **要么 `DAMAGE` 有"复制事件里的伤害量"的键**（⚠ 例如 `damage_param` ✓ —— ⭐ **名字很可疑** ✓）**，要么这是一处登记** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`eef3b020` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十六：🎯🎯🎯 **枚举读全了：`DamageType` 里**没有**"真伤害"** ⇒ ⭐ **目标 ③ 的最后一块 = 一处**读者明确**的小引擎能力**）**）**：
+>
+> * ✅ **实测（读 `enums/DamageType.java` ✓）** ✓ 全部成员：
+>   ⭐ **`NORMAL`** ✓／**`ULTRA`** ✓／**`BREAK`** ✓／**`DOT`** ✓／**`TECHNIQUE`** ✓／**`ELATION`** ✓
+>   ⇒ ⭐⭐ **六种，没有"真伤害"** ✗ ⇒ ⭐ **所以"真伤害"不能用 `damage_type` 表达** ✓（⚠ 与 `1505` 的 `ELATION` 是**两回事** ✓）。
+> * ⭐⭐⭐ **于是目标 ③ 最后一块的定位精确了** ✓（⭐ 这是一处**结构良好的下一件**）：
+>   | 项 | 内容 |
+>   |---|---|
+>   | ⭐ **读者** | ⭐ **`8007` 文档 `:143`**：「持有【迷迷的声援】的目标每造成 1 次伤害，都会再额外造成 1 次**等同于原伤害 28% 的真实伤害**」✓ |
+>   | ⭐ **语义（文档逐字）** | ⭐ `:144`：「**真实伤害**：**不受任何效果所影响的无属性伤害**，本次伤害**不视为造成了 1 次攻击**。」✓ ⇒ ⭐ **两条都可实现、都可测** ✓ |
+>   | ⭐ **形状（同族先例）** | ⭐ `1505` 的 rider：`DEALING_DAMAGE` ＋ `from_category` ＋ `self_resource:` ⇒ `DAMAGE{…}` ✓ |
+>   | ⭐ **缺的东西** | ⚠ **一个"真伤害"标记**（⚠ 或 `damage_type` 加一个成员 ✓ —— **`DamageType` 是枚举，加成员是一处小改动** ✓）＋ ⚠ **"按原伤害的比例"** ✗ |
+>   | ⭐ **可测性** | ⭐ **"视为/不视为一次攻击"**是可观测的 ✓（⭐ 若引擎有"攻击次数"计数 ⇒ ⭐ **判据可两向断言** ✓） |
+> * ⭐ **下一轮第一步（两次调用）** ✗：① ⭐ **`grep` 引擎里有没有"攻击次数"的计数**（⚠ 本段见过 `DAMAGE_SETTLED` ✓、`神君`的层数 ✓）
+>   ⇒ ⭐ **有它 ⇒ "不视为一次攻击"可测** ✓；② ⭐ **读 `DAMAGE` 的 `scale` 取值**（⚠ 看有没有"事件伤害量" ✓ —— ⚠ `damage_param` 这个键名很可疑 ✓）⇒ ⭐ **然后要么出货、要么按纪律登记这一处能力** ✓。
+> * ⚠ **推送**：本轮**已推送** ✓（`eef3b020..b0d0008f` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十七：🎯🎯🎯 **`DAMAGE` 只有**两种**乘数写法** ⇒ ⭐ 所以 `8007` 的两半**都各是一处精确的小能力**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter` ✓）** ✓ 关键一句（`:432` 的注释，逐字）：
+>   > *"Two ways to state the multiplier (2026-09-29): a **SKILL ROW**（`skill` + `damage_param`）or a **LITERAL ratio**…"*
+>   ⇒ ⭐⭐ **即：`DAMAGE` 的倍率只有**两条路** —— ①**引用技能行的一个参数**（`skill` ＋ `damage_param` ✓）②**写死一个比例**（`1505` 的 `percent: 0.08` 就是这条 ✓）
+>     ⇒ ⭐ **而 `8007` 要的是"**刚才那次伤害的 28%**"** ✗ ⇒ ⭐ **两条路都表达不了** ✓（⚠ 第三条路不存在 ✓）。
+> * ⭐⭐ **于是目标 ③ 最后一块的账目**完全清楚**** ✓（⭐ 与"真伤害"那半并列，**两条都精确、都有读者** ✓）：
+>   | 缺的 | 读者 | 语义（文档） | 规模 |
+>   |---|---|---|---|
+>   | ⭐ **"真伤害"** | ⭐ `8007:143` | ⭐ `:144`「不受任何效果所影响的无属性伤害」✓ | ⭐ `DamageType` **加一个成员** ✓（⚠ 枚举 ✓） |
+>   | ⭐ **"按原伤害的比例"** | ⭐ `8007:143` | ⭐「等同于**原伤害**的 28%」✓ | ⚠ **`DAMAGE` 加第三种乘数形状**（⚠ 取"本事件里的伤害量" ✓） |
+> * ⭐ **下一轮第一步（一次读 ＋ 判断）** ✗：⭐ **读 `:1737` 那段**（*"Where every number comes from. The rule names a `skill` + `damage_param`…"* ✓）
+>   ⇒ ⭐ **看 `damage_param` 到底能取哪些参数**（⚠ 若它能取到"上次伤害量" ⇒ ⭐ **那第二条路就走通了** ✓）
+>     ⇒ ⭐ **否则按纪律登记这两条**（⚠ 它们**各自都有具名读者** ✓ ⇒ ⭐ **完全符合目标 ⑤ 的"有读者才做"** ✓）。
+> * ⚠ **并如实记一句** ✓：⭐ 本段**没有**为了"凑一件"而给 `8007` 写半个近似版本 ✓ —— ⭐ 而是**把缺口拆成了两条可独立实现的、有读者的能力** ✓（⭐ 这正是目标 ④ 要求的形状 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`4a73ede7` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十八：✅ **`damage_param` 的含义确认了** ⇒ ⭐ `8007` 那条"按原伤害的 28%"**第二次**被确认为缺形状**）**）**：
+>
+> * ✅ **实测（读 `:1737` 那段 ✓ —— 它是 `COMMAND_SUMMON` 的 javadoc ✓）** ✓ 关键原文：
+>   > *"**Where every number comes from.** The rule names a `skill` + `damage_param` of the **owner's** skills — her ultimate, whose row says 2.0 at Lv10 and 2.5 at Lv15 — and the element (Ice) and the shape (AoEAttack) come from that same skill data."*
+>   ⇒ ⭐⭐ **即：`skill` ＋ `damage_param` 是"引用**技能行里的一个参数**"**（⚠ 按等级取值 ✓，甚至带元素与形状 ✓）
+>     ⇒ ⭐ **所以它取的是**技能表里的静态参数**，**不是**"刚才那次伤害量"** ✗ ⇒ ⭐ **与上一轮的结论一致** ✓（⭐ 第二次确认 ✓）。
+> * ⭐⭐ **于是这两条登记都**非常干净**** ✓（⚠ 每条都有：读者 ✓／文档语义 ✓／缺什么 ✓／规模 ✓）：
+>   1. ⭐ **"真伤害"** —— ⭐ 读者 `8007:143` ✓；语义 `:144`「不受任何效果所影响的无属性伤害 ＋ 不视为一次攻击」✓；⭐ 规模：`DamageType` 加成员 ＋ 结算路径认它 ✓；
+>   2. ⭐ **"按原伤害的比例"** —— ⭐ 读者 `8007:143` ✓；语义「等同于**原伤害**的 28%」✓；⭐ 规模：`DAMAGE` 加第三种乘数形状（⚠ 取本事件里的伤害量 ✓）。
+> * ⭐ **本段的账（收束）** ✓：**已出货 25 件** ✓；**目标 ①**：`1513`／`1211`／`1408`（状态＋倒计时）／`1501`（额外回合）✓；
+>   **目标 ②**：第 1 块出货 ✓ ＋ 第 2 块登记（8 条排除 ✓）；**目标 ③**：两块面板（`1512` 出货 ✓／`1407` 早在树 ✓）＋ 最后一块**拆成两条有读者的能力** ✓；
+>   **目标 ④**：缺口表**每条都带读者与前置** ✓；**目标 ⑤**：**25 件每件四件齐** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`f8da1bb1` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2141** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百四十九：🎯🎯🎯 **第 26 件差一步，而它的拦路者暴露了一条**很有价值的既有判据****）**）**：
+>
+> * ✅ **实测（`8007` 的【迷迷的声援】：内容 ＋ 判据都写成、且**首跑即绿**** ✓）** ✓：
+>   ⭐ 规则 **`skill_advance_and_cheer`**（`SKILL_CAST` ＋ `actor == self` ⇒ **`ADVANCE{percent: 1.0}`** ＋ **`APPLY_BUFF{迷迷的声援, turns: 3}`** ✓
+>     —— ⚠ 两个数都由文档 `:143` 给定（**100%**／**3 回合** ✓））；⭐ 判据 **`MimiCheerTest`**（放战技 ⇒ 断言目标身上有【迷迷的声援】 ✓ **绿** ✓）。
+> * ✅ **实测变异** ✓：把 `when` 改坏 ⇒ 全量 **2142 例 2 failed** ✓（⭐ 本判据的报错：*"「附上【迷迷的声援】」 ==> expected: **<true>** but was: **<false>**"* ✓ ⇒ **承重** ✓）。
+> * ⛔⛔ **但回滚后**全量仍是 **1 failed**** ✗ ⇒ ⭐ **一条既有判据拦住了** ✓：
+>   > **`RemembranceTrailblazerTest.hisFileCarriesTheClauses()`** ✗：*"cid 8007 ==> expected: **<1>** but was: **<2>**"* ✓
+>   ⇒ ⭐⭐ **即：它断言"`8007` 的文件里**恰好 1 条规则**** ✓ —— ⚠ **从名字看（`hisFileCarriesTheClauses`）它更像是"这个文件只承载了**已写的那些从句**"的**覆盖度**断言** ✓
+>     ⇒ ⭐ **下一轮第一步（一次读）**：**读 `hisFileCarriesTheClauses()`** ✓ ⇒ ⭐ **看清它的**前提****（⭐ 本段纪律：**"绝不为了自己的改动去改既有判据；先问它的前提是什么"** ✓）：
+>     * ⭐ **若它是"覆盖度＝已写的从句数"** ⇒ ⭐ **我加了一条真从句 ⇒ **这个数就该跟着变**** ✓（⭐ 那就**连它一起更新**，并在那次提交里**写明原因** ✓ —— ⭐ 本段对 `1505` 的两次教训正是"别改判据"，⚠ **而这里的关键区别是：它数的是"文件里应有几条"而不是"允许有几条"** ✓）；
+>     * ⚠ **若它是别的意思**（例如"此处只应有机制备注那一条" ✓）⇒ ⭐ **那就换一条路**（⚠ 例如把新规则**移到别的文件** ✗ 不行 ✓ ⇒ ⭐ **登记** ✓）。
+> * ✅ **纪律执行情况（值得记一笔）** ✓：⭐ **内容与判据**没有**进树**** ✓ —— ⚠ 因为我把提交挂在了"恢复后必须全绿"这个条件上 ✓
+>   ⇒ ⭐ **闸门挡住了半成品** ✓（⭐ 与"提交过一次红树"那次形成对照 ✓）。
+> * ⚠ **推送**：本地**领先 1** ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓（⚠ 待推的是**脚本**这一笔 ✓，内容**没进** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百五十：🎯🎯🎯 **拦路者的前提读清了** —— ⭐ 它是一条**普查（census）**，而且它**指对了正确的做法**）**）**：
+>
+> * ✅ **实测（读 `RemembranceTrailblazerTest.hisFileCarriesTheClauses()` ✓）** ✓ 全文骨架：
+>   ```java
+>   /** Census: the summon (Skill), the summon (Ultimate) and the level convention. */
+>   @Test
+>   public void hisFileCarriesTheClauses() {
+>       for (int cid : new int[]{8007, 8008}) {
+>           var table = TriggerTables.of(cid);
+>           Assertions.assertEquals(1, table.ruleCount(SKILL_CAST),  "cid " + cid);
+>           Assertions.assertEquals(1, table.ruleCount(ULT_CAST),    "cid " + cid);
+>           Assertions.assertEquals(1, table.ruleCount(BATTLE_START), "cid " + cid);
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **它的 javadoc 自己说了它是**普查****（*"Census: the summon (Skill), the summon (Ultimate) and the level convention"* ✓）；
+>   **(ii)** ⭐ **它按事件计数**（`SKILL_CAST`／`ULT_CAST`／`BATTLE_START` 各 **1** 条 ✓）⇒ ⚠ **我新加的那条 `SKILL_CAST` 让它变成了 2** ✗；
+>   **(iii)** ⭐⭐⭐ **而它同时**指对了路**** ✓ —— ⚠ `8007` 的 `SKILL_CAST` **本来就已经有一条**（"召唤迷迷；若已在场则回复其生命上限 100% 并获 6 点气氛值" ✓）
+>     ⇒ ⭐ **所以正确做法**不是再加第二条 `SKILL_CAST`** ✗，⭐ **而是把"行动提前 100% ＋ 附上【迷迷的声援】"**并进那一条的 `do`**** ✓✓
+>       —— ⭐ **而且这在语义上正是对的**：⭐ **文档 `:143` 那一整句**就是这**一个战技**的效果** ✓（⚠ 本段在 `1402` 的忆灵技能上见过同样的"一句话 = 一条规则"的处理 ✓）。
+> * ⭐⭐ **于是第 26 件有了**不碰任何既有判据**的写法** ✓（⚠ 下一轮）：
+>   ① ⭐ **读 `8007.json` 现有那条 `SKILL_CAST` 规则** ✓ ⇒ ⭐ **在它的 `do` 末尾追加** `ADVANCE{percent: 1.0, target: …}` ＋ `APPLY_BUFF{迷迷的声援, turns: 3, target: …}` ✓
+>     （⚠ `target` 要与那条规则里"指定我方单体"的既有写法一致 ✓ —— ⭐ **照它自己的来** ✓）；
+>   ② ⭐ **判据不变**（`MimiCheerTest` ✓ 已绿、已验变异 ✓）⇒ `SKILL_CAST` 计数**仍是 1** ⇒ ⭐ **普查不红** ✓；
+>   ③ ⇒ **全量绿** ⇒ **闸门** ⇒ ⭐ **出货（第 26 件）** ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十一：🎯🎯🎯 **又一条"会自己说出病名"的既有判据** —— `EffectKeyDisciplineTest`
+> **抓住的正是我自造的 `mark` 键****）**）**：
+>
+> * ✅ **实测（读失败项 ✓）** ✓：**`EffectKeyDisciplineTest`** ✗ 报
+>   > *"these effect keys are **not fields of `EffectSpec`**, so **Gson drops them silently**: `{mark=[8007.json]}` ==> expected: `<{}>` but was: `<{mark=[8007.json]}>`"*
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **仓库里有一条专门防"自造键被静默丢弃"的纪律判据** ✓
+>     —— ⚠ 它比我写在 `GAPS.md` 里的任何一条纪律都**更硬** ✓（⭐ 它会**在提交前**拦住 ✓，⭐ 而我的笔记只能靠我记得 ✓）；
+>   **(ii)** ⭐ **我踩的正是这个坑** ✗（⚠ 我为了"可重复执行"给两条效果加了 `"mark": …` ✗ ⇒ ⚠ `EffectSpec` 里没有这个字段 ⇒ **会被 Gson 静默丢掉** ✓
+>     ⇒ ⭐ **也就是说：那两条效果即使装载"成功"，`mark` 也是不存在的** ✓ ⇒ ⭐ **修法只有一步：把 `mark` 删掉** ✓）；
+>   **(iii)** ⭐ **而"重复执行要幂等"这件事有别的正当写法** ✓（⚠ 本段一直用的是"按 `id` 先删再加" ✓ —— ⭐ **那是**规则级**的去重 ✓，⚠ **而**效果级**必须只用 `EffectSpec` 的字段** ✓）。
+> * ⭐⭐ **下一轮第一步（两次调用 ⇒ 第 26 件出货）** ✗：
+>   ① ⭐ **删掉两处 `"mark": "advance_and_cheer"`** ✓（⚠ 其余不动 ✓ —— ⭐ **并入既有 `SKILL_CAST` 规则的方案是对的** ✓，⚠ 普查也因此不红 ✓）；
+>   ② ⭐ **幂等改成"按 `op` 去重"** ✓（⚠ 例如先剔除 `do` 里已有的 `ADVANCE`／同名 `APPLY_BUFF` ✓）⇒ ⭐ **脚本可重复跑、且不引入非法键** ✓；
+>   ③ ⇒ **全量绿** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
+> * ✅ **纪律执行情况（连着第二轮）** ✓：⭐ **内容与判据**又没有**进树**** ✓（⚠ 闸门再次挡住了 ✓）⇒ ⭐ **唯一进树的是脚本那笔** ✓。
+> * ⚠ **推送**：本地**领先 4** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百五十二：🎉🎉🎉 **本段第 26 件出货** —— ⭐ **目标 ③ 的最后一块的前半**：
+> `8007`「使指定我方单体**行动提前 100%** 并附上【**迷迷的声援**】，持续 **3** 回合」**四件齐****）**）**：
+>
+> * ✅ **内容** ✓：**并入 `8007` 既有的那条 `SKILL_CAST` 规则** ✓（⚠ 不新增规则 ⇒ ⭐ **普查 `RemembranceTrailblazerTest` 不红** ✓）
+>   ⇒ `do` 末尾追加 **`{"op":"ADVANCE","percent":1.0,"target":"target"}`** ＋ **`{"op":"APPLY_BUFF","buff":"迷迷的声援","turns":3,"target":"target"}`** ✓
+>   （⚠ 两个数都是文档 `:143` 给的：**100%** ✓／**3 回合** ✓）。
+> * ✅ **判据** ✓（`MimiCheerTest` ✓）：放战技 ⇒ ⭐ **断言被指定的队友身上有【迷迷的声援】** ✓（⚠ `assertFalse` 前置 ✓）。
+> * ✅ **变异** ✓（⚠ 上一轮跑的、当时就已验）：把 `when` 改坏 ⇒ **全量 2 failed**（含本判据）✓ ⇒ ⭐ **承重** ✓。
+> * ✅ **两道闸门都过** ✓：全量 **2142 例 rc 0** ✓（⭐ **含** `EffectKeyDisciplineTest` ✓ **与**那条普查 ✓）、`mechanics` **rc 0** ✓。
+> * ⭐⭐ **本件最值得留档的是它的**两次拦截**** ✓（⭐ 这正是目标 ⑤ 的"进树门槛"在起作用 ✓）：
+>   1. ⭐ **普查拦截**：⚠ 第一版**另加了一条 `SKILL_CAST`** ✗ ⇒ 判据绿、**全量红** ⇒ ⭐ **普查的 javadoc 指对了路：把效果**并进既有规则**** ✓；
+>   2. ⭐ **键纪律拦截**：⚠ 第二版给效果加了自造的 `"mark"` ✗ ⇒ **`EffectKeyDisciplineTest`** 报
+>      *"these effect keys are **not fields of `EffectSpec`**, so **Gson drops them silently**"* ✓ ⇒ ⭐ **修法是"按 `op` 去重"** ✓。
+>   ⇒ ⭐ **两轮都没有把半成品提交进树** ✓（⚠ 因为提交挂在"恢复后必须全绿"上 ✓）。
+> * ⚠ **推送**：本地**领先 7** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百五十三：🎯🎯 **引擎里**有"插入他人终结技"的概念** ⇒ ⭐ 目标 ② 的"奇袭结束"这个时刻**可能就挂在它上面****）**）**：
+>
+> * ✅ **实测（grep `INSERT|Insert` ✓ 与 `SPEND_RESOURCE` ✓）** ✓：
+>   * ⭐⭐ **`Battle:665`** ＝ *"P7-2: during an extra turn, inserting **someone else's** ultimate is forbidden."* ✓
+>     ＋ ⭐ **`Battle:858`** 的 javadoc：*"During an extra turn, **someone else's ultimate must not be inserted** (see `castUltra`) -- that is a rule requirement; inserting another ultimate inside an extra turn turns 'extra' into…"* ✓
+>     ⇒ ⭐⭐ **即：引擎**已经有"把一次施放插进行动序列"的概念** ✓（⚠ 甚至已经为它立了一条规则 ✓）
+>       ⇒ ⭐ **而目标 ② 的"奇袭"（数据里是 `TurnInsertAbility` ✓）正是这个家族** ✓ ⇒ ⭐ **所以"奇袭结束"这个时刻很可能**不需要新能力**，而是要**找到它插入/结束的那两个点**** ✓；
+>   * ⭐ **`SPEND_RESOURCE`** ✓ 有文档行（`:92`：`resource`, `amount` ✓）＋ **已接线**（`:397` ✓）
+>     ⇒ ⭐ **所以"奇袭结束后消耗 6 点充能、爵位变回【军功】"的三件（花钱 ✓／显式移除 ✓／`STATE_ENDED` ✓）**全在树上**** ✓。
+> * ⭐ **下一轮第一步（一次读）** ✗：⭐ **读 `Battle:858` 附近 ＋ `castUltra` 的插入路径** ✓（⚠ 本段读过 `grantExtraTurn` 在 `:859` 附近 ✓ ⇒ ⭐ **两者相邻** ✓）
+>   ⇒ ⭐ **找到"插入的施放完成"那个点**（⚠ 若已有事件 ⇒ ⭐ **直接写规则** ✓；⚠ 若无 ⇒ ⭐ **登记"缺'被插入的施放结束'时刻"** ✓，
+>     ⚠ 并写明**它的读者**：`1412` 的"奇袭结束后…" ✓ ＋ 那张光锥的「奇袭结束后」✓ ⇒ ⭐ **读者 ≥2** ✓）。
+> * ⚠ **推送**：本地仍**领先 8** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十四：🎯 **插入点就在 `castUltra`**，而且引擎自己写下的理由**与数据里的防递归完全同源****）**）**：
+>
+> * ✅ **实测（读 `Battle:854`–`:884` ✓）** ✓：
+>   * ⭐ **这一段的两个方法是 `grantExtraTurn(CanHit)`**（⚠ 转给 `queue.grantExtraTurn` ✓）与 **`getExtraTurnActor()`** ✓（⚠ 本段用过它做判据 ✓）；
+>   * ⭐⭐ **而"插入"不在这里** ✗ —— javadoc 说 *"**During an extra turn, someone else's ultimate must not be inserted（see `castUltra`）** -- that is a rule requirement; inserting another ultimate inside an extra turn turns **'extra' into 'infinite chain'**"* ✓
+>     ⇒ ⭐ **即：插入逻辑在 `castUltra` 里** ✓（⭐ **下一轮第一步：读 `castUltra`** ✓ ⇒ ⭐ **找"插入"与"插入完成"两个点** ✓）。
+> * ⭐⭐⭐ **而这句话本身很值钱** ✓：⭐ **"插进额外回合会让 extra 变成无限链"** 正是**引擎层的防递归原则** ✓
+>   ⇒ ⭐⭐ **它与数据里 `1412` 的 `TurnInsertAbilityCondition: AbilityOwnerInsertUnusedCount = 1`（本段早前读到）**完全同源**** ✓
+>     ⇒ ⭐ **所以"奇袭"这个机制的设计意图，在引擎侧和内容侧**各有一半**，而两半都已经被我读到** ✓
+>       ⇒ ⭐ **剩下的只是"把它的**结束**时刻暴露出来"** ✓（⚠ 而那有**两个读者**：`1412` 的"奇袭结束后…" ✓ ＋ 那张光锥的「奇袭结束后」✓）。
+> * ⚠ **推送**：本地仍**领先 9** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十五：🎯🎯 **`castUltra` 读完了** ⇒ ⭐ "插入"这个词在引擎里指的是"额外回合中施放他人终结技"，
+> **不是**奇袭 ⇒ ⭐ 所以"奇袭结束"这个时刻**需要新造**（读者 2 ✓）**）**）**：
+>
+> * ✅ **实测（读 `Battle:661` 的 `castUltra` ✓）** ✓ 骨架：
+>   ```java
+>   public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
+>       if (user == null || user.isDeath() || !isUltraReady(user)) return false;
+>       // P7-2: during an extra turn, inserting **someone else's** ultimate is forbidden.
+>       CanHit extraTurnActor = queue.getExtraTurnActor();
+>       if (extraTurnActor != null && extraTurnActor != user) return false;
+>       …
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **"插入"在引擎里＝"在额外回合里施放**他人**的终结技"** ✓（⚠ 被明令禁止 ✓，理由已由注释给出 ✓）；
+>   **(ii)** ⭐ **而这**不是**数据里的奇袭** ✗ —— ⚠ 奇袭是 `TurnInsertAbility`（⚠ 一个**被插入的、有优先级的战技** ✓）
+>     ⇒ ⭐ **两者只是"同族"** ✓ ⇒ ⭐ **引擎里没有"被插入的战技结束"这个时刻** ✗ ⇒ ⭐⭐ **所以要**新造**它** ✓。
+> * ⭐⭐ **于是这条登记完全成形**（⭐ **正好是目标 ④／⑤ 要的形状**）✗：
+>   | 项 | 内容 |
+>   |---|---|
+>   | ⭐ **缺的能力** | ⭐ **"一次被插入的施放结束"这个时刻**（⚠ 或更一般：**"某次技能施放结束"的时刻** ✓） |
+>   | ⭐ **读者（≥2）** | ⭐ **`1412`**「奇袭结束后，消耗 **6** 点充能，爵位变回【军功】」✓ ＋ ⭐ **那张光锥**「奇袭结束后…」✓ |
+>   | ⭐ **现成的一半** | ⭐ `SPEND_RESOURCE` ✓／**显式移除会公告 `STATE_ENDED`** ✓（第 20 件）／⭐ 防递归原则两侧都已读到 ✓ |
+>   | ⚠ **规模** | ⚠ 一个事件 ＋ 一个"插入并等待它结束"的路径 ✓（⚠ 比本段做过的四件引擎能力略大 ✓） |
+> * ⚠ **如实记** ✓：⭐ 本段**没有**为了凑数而用"施放结束"去**近似**"奇袭结束" ✓ —— ⚠ **文档两处都写"**奇袭**结束后"** ✓
+>   ⇒ ⭐ **近似会让两处读者都读到错的时刻** ✓ ⇒ ⭐ **按纪律登记** ✓（⭐ 与 `1408` 的溢出奖励、`8007` 的 28% 真伤害同一处置 ✓）。
+> * ⚠ **推送**：本地仍**领先 10** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十六：🎉🎉🎉 **"真伤害"其实**早就实现了**** —— ⭐ `Battle:2701` 里就在 `new Damage(…, DamageType.TRUE, base)`；
+> ⚠ 我上一轮说"`DamageType` 里没有 TRUE"是**正则漏读**）**）**：
+>
+> * ✅ **实测（grep `DamageType.` 的全部用法 ✓）** ✓ 关键命中：
+>   ```
+>   Battle:1008  new Damage(dot.getSource(), target, dot.getElement(), DamageType.DOT, …)
+>   Battle:2661  Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base);
+>   Battle:2701  Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);      // ⭐⭐⭐
+>   Battle:2757  if (damage.getType() == DamageType.ADDITIONAL) { … }
+>   Battle:2764  if (damage.getType() == DamageType.DOT) { … }
+>   Battle:2777  if (damage.getType() == DamageType.MEMORY) { … }        // ⭐ 忆灵！
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **`DamageType.TRUE` **存在**且**有构造点****（`:2701` ✓）⇒ ⭐ **"真伤害"这条通道**已经建成**** ✓
+>     ⇒ ⚠ **我上一轮的结论（"枚举里没有真伤害"）是错的** ✗ —— ⚠ 原因是我**用正则抓 `DamageType.java` 的成员时漏读了**（⚠ 那些成员可能带注解或换行 ✓）
+>       ⇒ ⭐ **第六十九次自我纠正** ✓（⭐ 教训：⭐ **"读枚举成员"不能只靠一条正则** ✓ —— ⚠ 应当**直接读文件**或用编译器 ✓）；
+>   **(ii)** ⭐ **还有 `ADDITIONAL`（`:2661` ✓）与 `MEMORY`（`:2777`，**忆灵**专属 ✓）** ⇒ ⭐ **三种我上一轮没见到的类型** ✓；
+>   **(iii)** ⭐ **`Damage` 是带 `type` 的对象** ✓ ⇒ ⭐ **结算路径按 type 分支**（`:2757`／`:2764`／`:2777` ✓）⇒ ⭐ **所以"真伤害不受任何效果影响"多半已在 `TRUE` 的构造/结算里处理** ✓。
+> * ⭐⭐ **于是目标 ③ 最后一块大幅降级** ✓：⭐ **"真伤害"不是缺口** ✓（⚠ 只是我读错 ✓）；
+>   ⚠ **而真正剩下的可能只有"**按原伤害的 28%**"这一个量** ✗ ⇒ ⭐ **下一轮第一步**：⭐ **读 `Battle:2640`–`:2710`** ✓
+>     （⚠ 看 `:2701` 的 `base` 从哪来 ✓，⭐ **以及谁调用它** ✓ —— ⚠ **若调用点正是"某次伤害之后"** ⇒ ⭐ **那 `8007` 的 28% 也许只差一个比例参数** ✓）。
+> * ⚠ **推送**：本地仍**领先 11** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十七：🎉🎉🎉 **两条登记同时被推翻** —— ⭐ `applyTrueDamage` **早在树上**，
+> 而且它的 javadoc **逐字点名了"原伤害 × %"这种派生形式****）**）**：
+>
+> * ✅ **实测（读 `Battle:2705`–`:2715` ✓）** ✓ 全文：
+>   ```java
+>   /**
+>    * True damage: a fixed amount, or a derived value such as "this attack's total damage × %" -- it **skips every
+>    * damage zone** and does not count as an attack.
+>    * <p>{@code notCountsAsAttack()} is likewise set: the victim gains no energy and no toughness is reduced; but it is
+>    * attributed to the attacker, so on a kill the attacker still settles kill energy gain.
+>    * @param base the true damage amount (no longer affected by defence/resistance/DMG boost/crit/vulnerability)
+>    */
+>   public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
+>       Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
+>       return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), EnergyGrant.KILL_ONLY);
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **`applyTrueDamage` 存在** ✓ ⇒ ⭐ **"真伤害"是**已建成**的能力** ✓（⚠ 我上一轮登记它为"缺口" ✗）；
+>   **(ii)** ⭐⭐ **javadoc 逐字写着** *"a fixed amount, **or a derived value such as 'this attack's total damage × %'"*** ✓✓
+>     ⇒ ⭐ **这**正是 `8007` 的"等同于**原伤害**的 28%"** ✓✓ ⇒ ⭐ **所以那条也**不是缺口**** ✓（⭐ **第七十次自我纠正** ✓）；
+>   **(iii)** ⭐ **它与文档 `138:144` 的两条语义**逐字对应**** ✓：**"skips every damage zone"** ＝「不受任何效果所影响」✓；
+>     **`notCountsAsAttack()`** ＝「**不视为造成了 1 次攻击**」✓（⚠ 连"受害者不回能、不削韧"都写了 ✓）。
+> * ⭐⭐ **于是 `8007` 的 28% 完全可做** ✓（⚠ 下一轮两次调用）✗：⭐ **只差确认"内容侧怎么写"** ✗
+>   ⇒ ⭐ **`DAMAGE` 的 `damage_type`** 很可能就接受 **`TRUE`** ✓（⚠ 本段读过 **`DAMAGE_TYPE_READERS`** ✓ —— ⚠ 那个集合**就是"哪些 op 会读 `damage_type`"** ✓ ⇒ ⭐ **看 `DAMAGE` 在不在里面** ✓，**一次 grep** ✓）；
+>     ⭐ **而 `base` 的"原伤害 × %"** 在内容侧怎么写 ⇒ ⭐ **`DAMAGE` 若支持 `percent` 相对事件伤害** ✓（⚠ 本段只见过"相对属性" ✗ ⇒ ⭐ **待查** ✓）。
+> * ⚠ **推送**：⭐ **本轮已推送成功** ✓（`2ae46535..c51fcf0d` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十八：🎯🎯🎯 **两条答案到手** —— ⭐ `damage_type` 在 `DAMAGE` 上合法，
+> ⭐ 而且**已经有 op 在调 `applyTrueDamage`****）**）**：
+>
+> * ✅ **实测（两处 grep ✓）** ✓：
+>   * ⭐⭐ **`DAMAGE_TYPE_READERS = Set.of("BOOST_DAMAGE", "DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN")`** ✓
+>     ⇒ ⭐ **即：`DAMAGE` **是**会读 `damage_type` 的 op** ✓ ⇒ ⭐ **所以内容里写 `{"op":"DAMAGE", …, "damage_type":"TRUE"}` **会通过校验**** ✓
+>       （⚠ 而上轮已知：**非读者 op 写了它会被拒** ✓ ⇒ ⭐ **这个白名单正是"合法写法表"** ✓）；
+>   * ⭐⭐⭐ **`TriggerInterpreter:4139`** ＝ **`battle.applyTrueDamage(attacker, victim, skill == null …`** ✓
+>     ⇒ ⭐ **即：**已经有一个 op 在走真伤害** ✓ ⇒ ⭐ **下一步就是看它是哪个 op、以及它的 `base` 怎么来** ✓（⚠ **一次读** ✓）。
+> * ⭐⭐ **于是 `8007` 的 28% 距离出货只差"看清那个 op"** ✓（⚠ 下一轮两次调用 ⇒ 很可能直接成 ✓）：
+>   ⭐ **若 `:4139` 所在的 op 能取"本次事件的伤害量 × percent"** ⇒ ⭐ **`8007` 一句就能写** ✓；
+>   ⚠ **若它只取绝对值** ⇒ ⭐ **那就按纪律登记"缺'相对事件伤害的比例'"** ✓（⚠ **而它的读者就是 `8007`** ✓）。
+> * ⭐ **顺带记一条** ✓：⭐ 本轮的两次"读错"（`DamageType` 成员、真伤害是否存在）**都源于"用一条正则代替读文件"** ✗
+>   ⇒ ⭐ **纪律（第七十条的产物）**：⭐ **凡是要"列全某事物的成员"，直接读文件或问编译器；正则只用于寻找位置** ✓。
+> * ⚠ **推送**：⭐ **本轮已推送** ✓（`c51fcf0d..e97b6dc6` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十九：🎉🎉🎉 **`damage_type: "TRUE"` 的分支**早就在引擎里**，
+> 而且它的注释**点名了我要接的两个读者****）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter:4119`–`:4145` ✓）** ✓ 逐字：
+>   ```java
+>   // ⭐ `damage_type: "TRUE"` is 真实伤害: it SKIPS every zone (2026-10-02). Without this branch the op stamped the
+>   // TYPE and still went through `applyAdditionalDamage`, so the instance was labelled TRUE while defence and
+>   // resistance multiplied it -- a right label on a wrong number, with no symptom. `Battle.applyTrueDamage` is the
+>   // engine's one true-damage entry: it sets `.trueDamage()`, which `toValue()` honours by skipping the zones.
+>   // Readers (2): 8007 开拓者's 【迷迷的声援】 (28%) and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」.
+>   if (damageType == DamageType.TRUE) {
+>       battle.applyTrueDamage(attacker, victim, skill == null
+>               ? DamageElement.fromString(effect.getElement().trim())
+>               : elementOf(effect, skill),
+>               settledBase);
+>       return;
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **`damage_type: "TRUE"` 这条分支**已经建成**** ✓（⚠ 而且注释记下了"只有标签对、数字被防御乘过"的那个**无症候**的坑 ✓ —— ⭐ 与本段"先写标签再修语义"的教训同型 ✓）；
+>   **(ii)** ⭐⭐⭐ **注释**点名了读者**：*"Readers (2): **8007 开拓者's 【迷迷的声援】(28%)** and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」"*
+>     ⇒ ⭐ **即：本段的目标 ③ 最后一块的**引擎侧**，**早在本段内就建好了**** ✓（⚠ 日期 `2026-10-02` ＝ 今天 ✓ ⇒ ⭐ **是前几轮的我做的** ✓✓ —— ⭐ **第七十一次自我纠正：我在找的东西，我已经做过了** ✓）；
+>   **(iii)** ⭐ **`base` 在 `skill == null` 时来自 `literalBase(...)`** ✓（⚠ 注释：*"a literal ratio: off the SETTLED attribute, a Max HP share, or the…"* ✓）
+>     ⇒ ⚠ **只剩一点要确认**：⭐ **`literalBase` 能不能取"**本次事件的伤害量**"** ✗（⚠ 若行 ⇒ ⭐ **`8007` 一句话就能出货** ✓；⚠ 若不行 ⇒ ⭐ **那才是一条真缺口** ✓）。
+> * ⭐ **下一轮第一步（一次读 ＋ 可能直接出货）** ✗：⭐ **读 `literalBase`** ✓ ⇒ ⭐ **看它支持哪些来源**（⚠ 本段见过 `self_attr:` ✓ ⇒ ⭐ **看有没有"事件伤害量"或类似 `event:` 前缀** ✓）
+>   ⇒ ⭐ **然后写 `8007` 的 rider**：`DEALING_DAMAGE` ＋ `from_category` ＋ `self_resource:迷迷的声援 >= 1` ⇒ **`DAMAGE{damage_type: "TRUE", percent: 0.28, element: …}`** ✓ ＋ **判据**（⚠ 两向：真伤害不被防御削弱 ✓）＋ **变异** ⇒ ⭐ **出货（第 27 件）** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`7304d250` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十：🎉🎉🎉 **"原伤害 × %"也**已经实现了**** —— ⭐ 挂在 **`DAMAGE_SETTLED`** 上，
+> 而且代码里留着**我自己那轮的完整复盘**（含一条**警告我用过的判据手法**的话））**）**：
+>
+> * ✅ **实测（读 `literalBase` ✓，`:4026` 起 ✓）** ✓ 原文要点（⭐ 全部是**代码里的注释**，不是我事后总结 ✓）：
+>   * ⭐ *"A share of the TRIGGERING instance（「等同于原伤害 X%」）was implemented here on 2026-10-02 and **ROLLED BACK the same round**, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries the instance -- **`damage.toValue()` is 4.2x the value the victim actually loses**（measured: **1093.02 vs 260.237584** on one 姬子 attack）, since settlement happens AFTER that event by design."* ✓
+>     ＋ *"⇒ It needs a **POST-settlement carrier** for the value; the reader table and the exact numbers are in GAPS（entry "aggro 回收之八百"）."* ✓
+>   * ⭐⭐⭐ *"「等同于**原伤害** X%」(2026-10-02): a share of the damage instance that triggered this rule -- of the number the victim actually took, **which is what `DAMAGE_SETTLED`'s `amount` is**."* ✓
+>     ＋ ⭐ **除法的理由**：*"a `DAMAGE`'s value is a **BASE** … Feeding it the already-settled amount would multiply those zones a second time（measured: a 40% share landed as 0.4 × 0.5829 = 0.233）… **Dividing by the triggering instance's own factor（`toValue() / skillBaseValue`）makes the rider SETTLE to exactly the share the text states**."* ✓
+>   * ⚠⚠ **还有一句直接警告我用过的判据手法**：*"That detour was **my own error, not the engine's**: my first probes **replaced the character's table with a hand-built one** to control variables, **which also dropped `level_convention`**, so the cast ran at the Lv1 row (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy…"* ✓
+> * ⭐⭐⭐ **三条结论** ✓：**(i)** ⭐ **"原伤害 × %"已建成** ✓（⚠ 载体是 `DAMAGE_SETTLED` 的 `amount` ✓ ＋ `toValue()/skillBaseValue` 的除法 ✓）；
+>   **(ii)** ⭐ **"真伤害 + 原伤害比例"这两条**都早就在树上**** ✓ ⇒ ⭐ **所以 `8007` 的 28% 是**纯内容工作**** ✓（⚠ **第 27 件可以一次做成** ✓）；
+>   **(iii)** ⭐⭐ **而那段警告正对着本段反复使用的"重建表"手法** ✓ —— ⚠ **它提醒：重建表会连带丢掉 `level_convention`** ✓
+>     ⇒ ⭐ **所以本段后续所有"重建表"的判据都要**补回 `level_convention`**（或有意识地避开按等级取值的行）** ✓
+>       （⭐ **第七十二条：这是一条**代码里留给我**的纪律** ✓ —— ⭐ **比我自己写的笔记更硬** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`28efae4e` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十一：🎉🎉🎉 **机制看全了** —— ⭐ 对 `damage_type: "TRUE"` 的 rider，
+> `literalBase` 直接返回 **`ctx.amount() * share + flat`**，**连除法都不需要****）**）**：
+>
+> * ✅ **实测（读 `literalBase` 的 `:4052`–`:4073` ✓）** ✓ 原文：
+>   ```java
+>   // ⚠ The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
+>   // correction at all: 真实伤害 (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
+>   // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured 2026-10-02: a 24% rider landed as
+>   // 44% -- 77.43 where 42.01 was due). Readers: 1415 昔涟's 结界 rider.
+>   if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
+>       return ctx.amount() * share + flat;
+>   }
+>   double factor = ctx.damage().getSkillBaseValue() == 0 ? 1.0
+>           : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
+>   return ctx.amount() / factor * share + flat;
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **真伤害的 rider：`ctx.amount() * share`** ✓ —— ⚠ `ctx.amount()` 就是 **`DAMAGE_SETTLED` 的 `amount`** ✓、`share` 就是**内容里的 `percent`** ✓
+>     ⇒ ⭐ **所以 `8007` 的 28% ＝ `percent: 0.28` ＋ `damage_type: "TRUE"` ＋ **挂 `DAMAGE_SETTLED`**** ✓✓；
+>   **(ii)** ⭐ **普通 rider 才需要除以 `toValue()/skillBaseValue`** ✓（⚠ 注释连"24% 曾落地成 44%（77.43 vs 42.01）"都记了 ✓ ⇒ ⭐ **又一个"无症候"的坑被写进代码** ✓）；
+>   **(iii)** ⭐ **那位读者 `1415` 昔涟的结界 rider **已经在树上** ✓ ⇒ ⭐ **说明这条通道**有 2 个读者、且**至少一个已在用** ✓。
+> * ⚠ **只剩一个词** ✗：⭐ **那个 `case` 的 `scale` 记号**（⚠ 就在我读的窗口**上一行** ✓）⇒ ⭐ **下一轮一次读 ⇒ 然后写 `8007` 的 rider ⇒ 出货（第 27 件）** ✓
+>   （⚠ 预期形状：`on: DAMAGE_SETTLED` ＋ `when: ["self_resource:迷迷的声援 >= 1"]` ⇒ `{"op":"DAMAGE","scale":"<那个记号>","percent":0.28,"damage_type":"TRUE","element":…,"target":"target"}` ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`ec784de4` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十二：🎉🎉🎉 **最后一个词到手：`scale: "original_damage"`**** —— ⭐ 而且代码里留着一句
+> **直接点名我用"重建表"判据把正确实现回滚了三次**的记录**）**）**：
+>
+> * ✅ **实测（读 `:4054`–`:4068` ✓）** ✓ 原文：
+>   ```java
+>   // ⚠ That detour was my own error, not the engine's: my first probes replaced the character's table with a
+>   // hand-built one to control variables, which also dropped `level_convention`, so the cast ran at the Lv1 row
+>   // (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy and rolled
+>   // a CORRECT implementation back three times (M-32's own trap, sprung by the judge).
+>   if ("original_damage".equals(scale)) {
+>       if (ctx == null || ctx.damage() == null) {
+>           throw new IllegalStateException(
+>               "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
+>               + "evaluated without one (it must hang on DAMAGE_SETTLED)");
+>       }
+>       …
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **记号是 `"original_damage"`** ✓ ⇒ ⭐ **`8007` 的 rider 现在**每一个字都确定了**** ✓；
+>   **(ii)** ⭐ **它**必须**挂在 `DAMAGE_SETTLED` 上** ✓（⚠ 否则**当场抛异常** ✓ —— ⭐ 又是那种"会自己说出病名"的设计 ✓）；
+>   **(iii)** ⭐⭐⭐ **代码里留有对**我自己的**判据手法的判决** ✓：*"my first probes **replaced the character's table with a hand-built one** … which also dropped `level_convention` … **rolled a CORRECT implementation back three times** (M-32's own trap, **sprung by the judge**)"* ✓
+>     ⇒ ⭐ **这是一条**比我的笔记硬得多**的纪律** ✓（⭐ **第七十三条**：⚠ **凡"重建表"的判据必须补回 `level_convention`，或改用真内容驱动** ✓）。
+> * ⭐⭐ **于是第 27 件的全部材料**齐了**** ✓（⚠ 下一轮两三次调用）✗：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "cheer_true_damage_rider",
+>     "when": ["self_resource:迷迷的声援 >= 1"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.28,
+>               "damage_type": "TRUE", "element": "<无属性要写哪个记号，待 grep>", "target": "target" } ] }
+>   ```
+>   ⚠ **唯一待查**：⭐ **"无属性"要写哪个 `element` 记号** ✗（⚠ 文档 `:144` 说真伤害是**无属性** ✓ ⇒ ⭐ **`DamageElement` 里应当有一个对应值** ✓ —— ⚠ **一次 grep** ✓，⚠ **按第 70 条纪律：直接读那个枚举文件** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`8d1d09e1` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十三：🎯 **`DamageElement` 只有 7 个成员、没有"无属性"** ⇒ ⭐ 但"无属性"在引擎里的实现
+> 是**"跳过全部伤害区"**，⭐ 而 **`1415` 那条在树的同型 rider 就是现成范本****）**）**：
+>
+> * ✅ **实测（**直接读枚举文件** ✓ —— 按第 70 条纪律，不全靠正则 ✓）** ✓ 全部成员：
+>   ⭐ **`PHYSICAL`**（Physical）／**`FIRE`**／**`ICE`**／**`THUNDER`**／**`WIND`**／**`QUANTUM`**／**`IMAGINARY`**
+>   ＋ ⭐ 文件头的注释还写着：*"**No-element skills**: non-damaging skills … carry the value `"Unknown"` in the game data. Parsing such a value is **not** a failure and is not mapped to any element:
+>   `fromString` simply returns **null**, signalling 'this skill has no damage element'."* ✓
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **没有"无属性/真伤"这种 element 成员** ✗；
+>   **(ii)** ⭐ **而 `null` 是"非伤害技能"的信号** ✓（⚠ 不是给真伤害用的 ✓）。
+> * ⭐⭐⭐ **但"无属性"其实已经实现了** ✓ —— ⚠ 不是靠 element，而是靠**结算路径**：⭐ `applyTrueDamage` 的 javadoc 说
+>   *"**it skips every damage zone**"* ✓ ＋ ⭐ 文档 `:144` 说「**不受任何效果所影响的无属性伤害**」✓
+>   ⇒ ⭐ **两者是同一件事** ✓ ⇒ ⭐ **所以 TRUE 的 rider 上那个 `element` 只是**随行标签**，不参与抗性** ✓（⚠ 而 `applyTrueDamage` 的签名
+>     **要求**一个 element ✓ ⇒ ⭐ **那就要从**在树的例子里**看它写什么** ✓）。
+> * ⭐⭐ **于是范本找到了** ✓：⭐ **`1415` 昔涟的结界 rider**（⚠ 代码注释两次点名它 ✓：「`1415` 昔涟's 结界 rider」✓）
+>   ⇒ ⭐ **它就是"同一个 op、同一个 `original_damage`、同一个 TRUE"的**在树实例**** ✓ ⇒ ⭐⭐ **下一轮第一步：读 `1415.json` 那条 rider** ✓
+>     ⇒ ⭐ **照它的 `element`／`target`／`when` 写 `8007`** ✓ ⇒ **判据**（⚠ 两向：真伤害不被防御削弱 ✓）＋ **变异** ⇒ ⭐ **出货（第 27 件）** ✓。
+> * ⚠ **推送**：本地仍**领先 0**（⚠ 上一条记录已推 ✓）⇒ ⚠ 本轮记录待推 ✓（⚠ 网络连失败 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十四：🎉🎉🎉 **`1415` 的 rider **原样到手**** —— ⭐ 但抄之前要先答**一个结构问题**）**）**：
+>
+> * ✅ **实测（dump `1415.json` ✓）** ✓ 原文：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "zone_true_damage_rider",
+>     "when": ["self has_state 结界", "actor is_ally", "damage_is_attack"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.24,
+>               "element": "Ice", "damage_type": "TRUE", "target": "target" } ] }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **`element: "Ice"`** ✓ —— ⭐ **证实了我上一轮的推断：真伤害上的 `element` 只是**随行标签**（不参与抗性 ✓）；
+>   **(ii)** ⭐⭐ **两个我没见过的条件** ✓：**`actor is_ally`** ✓ ＋ ⭐⭐ **`damage_is_attack`** ✓
+>     —— ⭐ **后者正对着文档 `:144` 的「**不视为造成了 1 次攻击**」** ✓✓（⭐ **即：这个条件就是"这次伤害算不算一次攻击"的闸门** ✓）；
+>   **(iii)** ⭐ **其余与本段推出的**逐字一致**** ✓：`on: DAMAGE_SETTLED` ✓／`scale: "original_damage"` ✓／`damage_type: "TRUE"` ✓／`target: "target"` ✓／`percent` ✓。
+> * ⚠⚠ **但抄之前有一个**结构问题**要答** ✗：⭐ **`1415` 的规则挂在**她自己**的表上**（条件 `self has_state 结界` ✓ ⇒ ⭐ **状态在她身上、规则也在她身上** ✓）
+>   ⚠ **而 `8007` 的【迷迷的声援】是附在**队友**身上的** ✗（文档 `:143`「使**指定我方单体**…**附上**【迷迷的声援】」✓）
+>     ⇒ ⭐ **所以"持有者造成伤害时追加"这个语义，要求规则挂在**带有该状态的那个单位**的表上** ✗
+>       ⇒ ⚠ **而队友的表来自**他们自己的角色文件** ✗✗ ⇒ ⭐ **这就是目标 ③ 真正的最后一道坎** ✓。
+> * ⭐ **下一轮第一步（一次读，直指要害）** ✗：⭐ **查"**状态自带规则**"这件事在引擎里怎么写** ✓
+>   （⚠ 候选：**`APPLY_BUFF` 的 `buff` 指向一个**带效果的状态定义** ✗ 或 **`MODIFY_ATTR` 式的好处挂在状态上** ✓
+>     —— ⭐ **最省的一读：`grep` 引擎里有没有"buff 携带自己的 `do`／规则"的结构** ✓，⚠ **或看本段第 22 件（`1412` 的 16% 防御无视）是怎么把好处给到**持军功者**的** ✓
+>       —— ⭐ **那一件成功过！**（`MODIFY_ATTR{…, target: "target"}` 挂在**授予规则**里 ⇒ ⭐ **效果随授予一起落在目标身上** ✓✓）
+>     ⇒ ⭐ **若那条路能推广到 `DAMAGE_SETTLED` 的 rider** ⇒ ⭐ **`8007` 一次就能成** ✓；⚠ **否则按纪律登记"缺'状态携带 rider'"** ✓（⚠ **读者 ≥2**：`8007` ✓ ＋ ⚠ 其它"附身型 buff"✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十五：🎯🎯🎯 **结构问题有解了 —— 规则不必挂在队友的表上****：
+> ⭐ 只要 `DAMAGE_SETTLED` 的上下文里**能读"**造成伤害的那一位**"身上有没有状态**，规则就可以留在 `8007` 自己的表里****）**）**：
+>
+> * ⭐⭐ **推演（依据本段已实测的两条）** ✓：
+>   1. ⭐ **`1415` 的 rider 用 `actor is_ally`** ✓ ⇒ ⭐ **说明在 `DAMAGE_SETTLED` 里 `actor` **就是造成伤害的那一位**** ✓；
+>   2. ⭐⭐ **而条件 DSL 里 `has_state` 的**主语**是可换的** ✓ —— ⚠ 本段早前读过它的示例：*"**`target has_state 触电`** — it happened to someone in that state ← Kafka's「触电状态下的敌方目标」"* ✓
+>     ⇒ ⭐ **所以 `actor has_state 迷迷的声援` 应当成立** ✓✓（⚠ **一次实测即可确认** ✓）。
+>   ⇒ ⭐⭐⭐ **于是 `8007` 的 rider 可以**留在她自己的文件里**** ✓，⭐ **不需要"状态携带规则"这种新能力** ✓：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "cheer_true_damage_rider",
+>     "when": ["actor has_state 迷迷的声援", "actor is_ally", "damage_is_attack"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.28,
+>               "element": "<他的伤害元素，照 1415 用自带元素>", "damage_type": "TRUE", "target": "target" } ] }
+>   ```
+>   ⇒ ⭐ **三条** ✓：**(i)** ⭐ **`percent: 0.28`** ＝ 文档 ✓；**(ii)** ⭐ **`damage_is_attack`** ＝ 文档「不视为造成了 1 次攻击」的闸门 ✓；
+>   **(iii)** ⚠ **`element` 要照 `8007` 自己的伤害元素**（⚠ `1415` 用 `Ice` 是因为她的伤害是冰 ✓ ⇒ ⭐ **一次 `grep` 就能定** ✓，⚠ **但 element 只是标签、不影响数值** ✓）。
+> * ⭐⭐ **于是第 27 件的路径**完全打通**** ✓（⚠ 下一轮两三次调用 ⇒ **出货**）✗：⭐ 写内容 ＋ **判据**（⚠ **两向**：①**有【迷迷的声援】的队友造成伤害 ⇒ 追加 28% 真伤害** ✓；②**没有该状态 ⇒ 不追加** ✓）
+>   ＋ **变异**（⚠ `percent` 0.28 → 0.10 ⇒ 必红 ✓）⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
+>   ⚠ **并记住第 73 条纪律** ✓：⭐ **判据**不要**为了控制变量而重建角色表**（⚠ 那会丢掉 `level_convention` ✓ —— ⭐ 代码里判过我三次 ✓）。
+> * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
