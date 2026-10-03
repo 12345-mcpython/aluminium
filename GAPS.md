@@ -21425,6 +21425,37 @@
 >   （⚠ `#2` 的数值仍待取 ✓ —— ⚠ 但现在知道**该在哪找**：**`InsertActionCount` 附近的参数**或**行迹的参数表** ✓）。
 > * ⚠ **推送**：本地仍**领先 13** ✗（网络十四连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十：🎯🎯🎯 **"奇袭"的完整规格到手（含唯一那个数）** —— 它挂在**战技的 `SuccessTaskList`** 里：`TurnInsertAbility` ＋ **`PreCheck: AbilityOwnerInsertUnusedCount = 1`**）**）**：
+>
+> * ✅ **实测（读 `:2985`–`:3015` ✓）** ✓ 原文骨架：
+>   ```json
+>   "SuccessTaskList": [
+>     { "$type": "RPG.GameCore.TurnInsertAbility",
+>       "AbilityName": { "Value": "Avatar_Cerydra_00_Skill02_InsertRank01" },
+>       "AbilityTarget": { "Alias": "Cerydra_00_PromoteTarget" },
+>       "InsertAbilityPriority": "AvatarBuffOthers",
+>       "CanRunOnUnselectableTarget": true, "ShowInActionBar": true,
+>       "PreCheck": { "$type": "RPG.GameCore.TurnInsertAbilityCondition",
+>                     "Type": "AbilityOwnerInsertUnusedCount",
+>                     "Count": { "IsDynamic": false, "FixedValue": { "Value": **1** } } },
+>       "ActivePredicate": { … } } ]
+>   ```
+>   ⇒ ⭐⭐⭐ **三条定论** ✓：
+>   **(i)** ⭐ **"奇袭"由**她的战技**触发** ✓（⚠ 这块在 `SuccessTaskList` 里 ✓ ⇒ 战技**成功**后插入 ✓ —— 与文档"施放战技…"的口径一致 ✓）；
+>   **(ii)** ⭐⭐ **唯一的那个数 = `1`** ✓：**主人的"未用插入次数" ≥ 1 时才允许插入** ✓ ⇒ ⭐ **这就是"奇袭不会再次触发奇袭"** ✓
+>     ⇒ ⭐ **引擎侧=一个"奇袭已用/未用"的计数** ✓ ⇒ ⭐ **它归零的那一刻就是"奇袭结束"** ✓ ⇒ **发 `STATE_ENDED("奇袭")`** ✓✓；
+>   **(iii)** ⭐ **插入的目标是 `Cerydra_00_PromoteTarget`**（= 她**升级/加冕**的那个队友 ✓ —— ⚠ 与战技"使指定我方单体获得【军功】"一致 ✓）
+>     ＋ **优先级 `AvatarBuffOthers`** ✓ ＋ `CanRunOnUnselectableTarget` ✓。
+> * ⭐⭐ **于是本件（目标 ① 的「奇袭结束后」＝ 目标 ② 的"奇袭结束"）的规格**完整**且**只剩 `#2` 一个未知数**** ✓：
+>   | 要素 | 状态 |
+>   |---|---|
+>   | 触发 | ⭐ **她的战技成功** ✓（`:2996` 的宿主 ✓） |
+>   | 机制 | ⭐ **把 `InsertRank01` 插入回合序列** ✓（⚠ 引擎里对应 `ADVANCE`／`EXTRA_TURN` 那一族 ✓） |
+>   | 不可递归 | ⭐ **未用次数 = 1** ✓（`:3007`–`:3013` ✓） |
+>   | 结束 | ⭐ **"奇袭结束" ⇒ `STATE_ENDED("奇袭")`** ✓ |
+>   | 读者 | ⭐ **她 +`#2` 点充能** ✓（⚠ `#2` 仍待取 ✓） |
+> * ⚠ **推送**：本地仍**领先 14** ✗（网络十五连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -25915,6 +25946,37 @@
 > * ⭐ **读者（形状已定 ✓）**：`on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}` ✓
 >   （⚠ `#2` 的数值仍待取 ✓ —— ⚠ 但现在知道**该在哪找**：**`InsertActionCount` 附近的参数**或**行迹的参数表** ✓）。
 > * ⚠ **推送**：本地仍**领先 13** ✗（网络十四连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十：🎯🎯🎯 **"奇袭"的完整规格到手（含唯一那个数）** —— 它挂在**战技的 `SuccessTaskList`** 里：`TurnInsertAbility` ＋ **`PreCheck: AbilityOwnerInsertUnusedCount = 1`**）**）**：
+>
+> * ✅ **实测（读 `:2985`–`:3015` ✓）** ✓ 原文骨架：
+>   ```json
+>   "SuccessTaskList": [
+>     { "$type": "RPG.GameCore.TurnInsertAbility",
+>       "AbilityName": { "Value": "Avatar_Cerydra_00_Skill02_InsertRank01" },
+>       "AbilityTarget": { "Alias": "Cerydra_00_PromoteTarget" },
+>       "InsertAbilityPriority": "AvatarBuffOthers",
+>       "CanRunOnUnselectableTarget": true, "ShowInActionBar": true,
+>       "PreCheck": { "$type": "RPG.GameCore.TurnInsertAbilityCondition",
+>                     "Type": "AbilityOwnerInsertUnusedCount",
+>                     "Count": { "IsDynamic": false, "FixedValue": { "Value": **1** } } },
+>       "ActivePredicate": { … } } ]
+>   ```
+>   ⇒ ⭐⭐⭐ **三条定论** ✓：
+>   **(i)** ⭐ **"奇袭"由**她的战技**触发** ✓（⚠ 这块在 `SuccessTaskList` 里 ✓ ⇒ 战技**成功**后插入 ✓ —— 与文档"施放战技…"的口径一致 ✓）；
+>   **(ii)** ⭐⭐ **唯一的那个数 = `1`** ✓：**主人的"未用插入次数" ≥ 1 时才允许插入** ✓ ⇒ ⭐ **这就是"奇袭不会再次触发奇袭"** ✓
+>     ⇒ ⭐ **引擎侧=一个"奇袭已用/未用"的计数** ✓ ⇒ ⭐ **它归零的那一刻就是"奇袭结束"** ✓ ⇒ **发 `STATE_ENDED("奇袭")`** ✓✓；
+>   **(iii)** ⭐ **插入的目标是 `Cerydra_00_PromoteTarget`**（= 她**升级/加冕**的那个队友 ✓ —— ⚠ 与战技"使指定我方单体获得【军功】"一致 ✓）
+>     ＋ **优先级 `AvatarBuffOthers`** ✓ ＋ `CanRunOnUnselectableTarget` ✓。
+> * ⭐⭐ **于是本件（目标 ① 的「奇袭结束后」＝ 目标 ② 的"奇袭结束"）的规格**完整**且**只剩 `#2` 一个未知数**** ✓：
+>   | 要素 | 状态 |
+>   |---|---|
+>   | 触发 | ⭐ **她的战技成功** ✓（`:2996` 的宿主 ✓） |
+>   | 机制 | ⭐ **把 `InsertRank01` 插入回合序列** ✓（⚠ 引擎里对应 `ADVANCE`／`EXTRA_TURN` 那一族 ✓） |
+>   | 不可递归 | ⭐ **未用次数 = 1** ✓（`:3007`–`:3013` ✓） |
+>   | 结束 | ⭐ **"奇袭结束" ⇒ `STATE_ENDED("奇袭")`** ✓ |
+>   | 读者 | ⭐ **她 +`#2` 点充能** ✓（⚠ `#2` 仍待取 ✓） |
+> * ⚠ **推送**：本地仍**领先 14** ✗（网络十五连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
