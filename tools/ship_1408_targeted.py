@@ -120,8 +120,12 @@ public class SkillTargetCoreflameTest {
 
         Skill skill = support.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: the teammate has a skill");
-        Character aimed = aimAtHer ? owner : battle.enemies.get(0);
-        SkillExecutor.execute(battle, skill, support, List.of(aimed));
+        // \u26a0 \u4e24\u6761\u5206\u652f\uff0c\u800c\u4e0d\u662f\u4e00\u4e2a\u4e09\u5143\u8868\u8fbe\u5f0f\uff1a\u4e00\u4e2a\u662f `Character`\u3001\u4e00\u4e2a\u662f `CanHit`\uff0c\u6ca1\u6709\u5171\u540c\u7c7b\u578b\u53ef\u58f0\u660e\u3002
+        if (aimAtHer) {
+            SkillExecutor.execute(battle, skill, support, List.of(owner));
+        } else {
+            SkillExecutor.execute(battle, skill, support, List.of(battle.enemies.get(0)));
+        }
         battle.processRequests();
 
         return new double[]{
