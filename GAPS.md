@@ -21585,6 +21585,30 @@
 >     ⇒ ⚠ 若还支持**比例字段**（如 `amountRatio` ✓）⇒ ⭐ **这条一次就能出货** ✓；⚠ 若不支持 ⇒ ⭐ **按纪律登记**（⚠ 并记"引擎缺**按比例复制事件量**的通道" ✓ —— ⚠ 那是一条**有读者的引擎级缺口** ✓）。
 > * ⚠ **推送**：本地仍**领先 20** ✗（网络二十一连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十七：🎯🎯🎯 **那个问题有答案了** —— `GAIN_RESOURCE` **本来就支持"按本次事件量的比例"**（`amountFromEvent` × **`amountPercent`** ✓）⇒ ⭐ `1505` 的星魂那条**可以出货**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.gainResource` ✓，`:1341` ✓）** ✓ 原文：
+>   ```java
+>   private static void gainResource(EffectSpec effect, TriggerContext ctx) {
+>       CanHit holder = resolveTarget(effect, ctx);
+>       // ✅ A gain whose amount is a SHARE of an attribute (2026-09-30; reader: 1505's talent 「…50% 的欢愉度」).
+>       int amount;
+>       if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+>           // ✅ The event's own magnitude (2026-09-30): 「获得能量时，将…」
+>           amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+>       } else if (effect.getAmountFromAttr() == null) { … }
+>   ```
+>   ⇒ ⭐⭐⭐ **所以那条星魂可以逐字写成** ✓：
+>   **`GAIN_RESOURCE{resource: "好活当赏", amountFromEvent: true, amountPercent: 0.5}`** ✓（⚠ 100% 那一半用 **`1.0`** ✓，
+>     两者就是星魂里"**50%/100%**"那两个数 ✓）⇒ ⭐ **而"本次获得的量"正是 `ctx.amount()`** ✓（⚠ 与 `p1505_energy_sync` 的 `amountFromEvent` 同一机制 ✓）。
+> * ⚠⭐ **但有一个必须处理的自反风险** ✗：⚠ 若**无条件**跟她"获得好活当赏"，这条规则会**自己喂自己**（⚠ 每次获得再加 50% ✓ ⇒ 无限 ✗）
+>   ⇒ ⭐ **而文档自己给了限定条件** ✓：「**触发**行迹【瞰众乐】/行迹【开不败】**的获得好活当赏效果时**」✓
+>     ⇒ ⭐ 所以 `when` 必须**钉住"是那两条行迹触发的"** ✓（⚠ 本段在 `1505.json` 里见过 `p1505_elation_value`（`BATTLE_START`）与
+>       `p1505_technique_gift` ✗ ⇒ ⭐ **下一轮第一步**：**读那两条行迹规则的 `id`/`do`** ✓ ⇒ ⭐ 若"获得好活当赏"这件事**只由它们产生** ✓
+>         ⇒ 那么**用 `RESOURCE_CHANGED` ＋ 资源名条件**即可（⚠ 不会自反 ✓）；⚠ 若还有别的来源 ⇒ 需要**再加一个限定** ✓（⚠ 或登记"缺'来源限定'的通道" ✓）。
+> * ⭐ **并记下这是一条**真正的新能力**** ✓（⚠ 它**有读者**：`1505` 的星魂 ✓ ⇒ ⭐ 符合"不造没有读者的能力" ✓）
+>   ⇒ ⭐ 四件套（内容 ✓ 可写／判据 ✓ 可写（⚠ 判据里要断言"**恰好**多出 50%" ✓ 且**不自反** ✓）／变异 ✓（`0.5` → `0.25` ✓）／文档 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26236,6 +26260,30 @@
 >     ⇒ ⚠ 若还支持**比例字段**（如 `amountRatio` ✓）⇒ ⭐ **这条一次就能出货** ✓；⚠ 若不支持 ⇒ ⭐ **按纪律登记**（⚠ 并记"引擎缺**按比例复制事件量**的通道" ✓ —— ⚠ 那是一条**有读者的引擎级缺口** ✓）。
 > * ⚠ **推送**：本地仍**领先 20** ✗（网络二十一连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十七：🎯🎯🎯 **那个问题有答案了** —— `GAIN_RESOURCE` **本来就支持"按本次事件量的比例"**（`amountFromEvent` × **`amountPercent`** ✓）⇒ ⭐ `1505` 的星魂那条**可以出货**）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.gainResource` ✓，`:1341` ✓）** ✓ 原文：
+>   ```java
+>   private static void gainResource(EffectSpec effect, TriggerContext ctx) {
+>       CanHit holder = resolveTarget(effect, ctx);
+>       // ✅ A gain whose amount is a SHARE of an attribute (2026-09-30; reader: 1505's talent 「…50% 的欢愉度」).
+>       int amount;
+>       if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+>           // ✅ The event's own magnitude (2026-09-30): 「获得能量时，将…」
+>           amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+>       } else if (effect.getAmountFromAttr() == null) { … }
+>   ```
+>   ⇒ ⭐⭐⭐ **所以那条星魂可以逐字写成** ✓：
+>   **`GAIN_RESOURCE{resource: "好活当赏", amountFromEvent: true, amountPercent: 0.5}`** ✓（⚠ 100% 那一半用 **`1.0`** ✓，
+>     两者就是星魂里"**50%/100%**"那两个数 ✓）⇒ ⭐ **而"本次获得的量"正是 `ctx.amount()`** ✓（⚠ 与 `p1505_energy_sync` 的 `amountFromEvent` 同一机制 ✓）。
+> * ⚠⭐ **但有一个必须处理的自反风险** ✗：⚠ 若**无条件**跟她"获得好活当赏"，这条规则会**自己喂自己**（⚠ 每次获得再加 50% ✓ ⇒ 无限 ✗）
+>   ⇒ ⭐ **而文档自己给了限定条件** ✓：「**触发**行迹【瞰众乐】/行迹【开不败】**的获得好活当赏效果时**」✓
+>     ⇒ ⭐ 所以 `when` 必须**钉住"是那两条行迹触发的"** ✓（⚠ 本段在 `1505.json` 里见过 `p1505_elation_value`（`BATTLE_START`）与
+>       `p1505_technique_gift` ✗ ⇒ ⭐ **下一轮第一步**：**读那两条行迹规则的 `id`/`do`** ✓ ⇒ ⭐ 若"获得好活当赏"这件事**只由它们产生** ✓
+>         ⇒ 那么**用 `RESOURCE_CHANGED` ＋ 资源名条件**即可（⚠ 不会自反 ✓）；⚠ 若还有别的来源 ⇒ 需要**再加一个限定** ✓（⚠ 或登记"缺'来源限定'的通道" ✓）。
+> * ⭐ **并记下这是一条**真正的新能力**** ✓（⚠ 它**有读者**：`1505` 的星魂 ✓ ⇒ ⭐ 符合"不造没有读者的能力" ✓）
+>   ⇒ ⭐ 四件套（内容 ✓ 可写／判据 ✓ 可写（⚠ 判据里要断言"**恰好**多出 50%" ✓ 且**不自反** ✓）／变异 ✓（`0.5` → `0.25` ✓）／文档 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
