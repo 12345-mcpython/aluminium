@@ -24299,6 +24299,33 @@
 >   ⇒ ⭐ **纪律（第七十条的产物）**：⭐ **凡是要"列全某事物的成员"，直接读文件或问编译器；正则只用于寻找位置** ✓。
 > * ⚠ **推送**：⭐ **本轮已推送** ✓（`c51fcf0d..e97b6dc6` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十九：🎉🎉🎉 **`damage_type: "TRUE"` 的分支**早就在引擎里**，
+> 而且它的注释**点名了我要接的两个读者****）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter:4119`–`:4145` ✓）** ✓ 逐字：
+>   ```java
+>   // ⭐ `damage_type: "TRUE"` is 真实伤害: it SKIPS every zone (2026-10-02). Without this branch the op stamped the
+>   // TYPE and still went through `applyAdditionalDamage`, so the instance was labelled TRUE while defence and
+>   // resistance multiplied it -- a right label on a wrong number, with no symptom. `Battle.applyTrueDamage` is the
+>   // engine's one true-damage entry: it sets `.trueDamage()`, which `toValue()` honours by skipping the zones.
+>   // Readers (2): 8007 开拓者's 【迷迷的声援】 (28%) and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」.
+>   if (damageType == DamageType.TRUE) {
+>       battle.applyTrueDamage(attacker, victim, skill == null
+>               ? DamageElement.fromString(effect.getElement().trim())
+>               : elementOf(effect, skill),
+>               settledBase);
+>       return;
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **`damage_type: "TRUE"` 这条分支**已经建成**** ✓（⚠ 而且注释记下了"只有标签对、数字被防御乘过"的那个**无症候**的坑 ✓ —— ⭐ 与本段"先写标签再修语义"的教训同型 ✓）；
+>   **(ii)** ⭐⭐⭐ **注释**点名了读者**：*"Readers (2): **8007 开拓者's 【迷迷的声援】(28%)** and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」"*
+>     ⇒ ⭐ **即：本段的目标 ③ 最后一块的**引擎侧**，**早在本段内就建好了**** ✓（⚠ 日期 `2026-10-02` ＝ 今天 ✓ ⇒ ⭐ **是前几轮的我做的** ✓✓ —— ⭐ **第七十一次自我纠正：我在找的东西，我已经做过了** ✓）；
+>   **(iii)** ⭐ **`base` 在 `skill == null` 时来自 `literalBase(...)`** ✓（⚠ 注释：*"a literal ratio: off the SETTLED attribute, a Max HP share, or the…"* ✓）
+>     ⇒ ⚠ **只剩一点要确认**：⭐ **`literalBase` 能不能取"**本次事件的伤害量**"** ✗（⚠ 若行 ⇒ ⭐ **`8007` 一句话就能出货** ✓；⚠ 若不行 ⇒ ⭐ **那才是一条真缺口** ✓）。
+> * ⭐ **下一轮第一步（一次读 ＋ 可能直接出货）** ✗：⭐ **读 `literalBase`** ✓ ⇒ ⭐ **看它支持哪些来源**（⚠ 本段见过 `self_attr:` ✓ ⇒ ⭐ **看有没有"事件伤害量"或类似 `event:` 前缀** ✓）
+>   ⇒ ⭐ **然后写 `8007` 的 rider**：`DEALING_DAMAGE` ＋ `from_category` ＋ `self_resource:迷迷的声援 >= 1` ⇒ **`DAMAGE{damage_type: "TRUE", percent: 0.28, element: …}`** ✓ ＋ **判据**（⚠ 两向：真伤害不被防御削弱 ✓）＋ **变异** ⇒ ⭐ **出货（第 27 件）** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`7304d250` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -31693,6 +31720,33 @@
 > * ⭐ **顺带记一条** ✓：⭐ 本轮的两次"读错"（`DamageType` 成员、真伤害是否存在）**都源于"用一条正则代替读文件"** ✗
 >   ⇒ ⭐ **纪律（第七十条的产物）**：⭐ **凡是要"列全某事物的成员"，直接读文件或问编译器；正则只用于寻找位置** ✓。
 > * ⚠ **推送**：⭐ **本轮已推送** ✓（`c51fcf0d..e97b6dc6` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十九：🎉🎉🎉 **`damage_type: "TRUE"` 的分支**早就在引擎里**，
+> 而且它的注释**点名了我要接的两个读者****）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter:4119`–`:4145` ✓）** ✓ 逐字：
+>   ```java
+>   // ⭐ `damage_type: "TRUE"` is 真实伤害: it SKIPS every zone (2026-10-02). Without this branch the op stamped the
+>   // TYPE and still went through `applyAdditionalDamage`, so the instance was labelled TRUE while defence and
+>   // resistance multiplied it -- a right label on a wrong number, with no symptom. `Battle.applyTrueDamage` is the
+>   // engine's one true-damage entry: it sets `.trueDamage()`, which `toValue()` honours by skipping the zones.
+>   // Readers (2): 8007 开拓者's 【迷迷的声援】 (28%) and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」.
+>   if (damageType == DamageType.TRUE) {
+>       battle.applyTrueDamage(attacker, victim, skill == null
+>               ? DamageElement.fromString(effect.getElement().trim())
+>               : elementOf(effect, skill),
+>               settledBase);
+>       return;
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **`damage_type: "TRUE"` 这条分支**已经建成**** ✓（⚠ 而且注释记下了"只有标签对、数字被防御乘过"的那个**无症候**的坑 ✓ —— ⭐ 与本段"先写标签再修语义"的教训同型 ✓）；
+>   **(ii)** ⭐⭐⭐ **注释**点名了读者**：*"Readers (2): **8007 开拓者's 【迷迷的声援】(28%)** and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」"*
+>     ⇒ ⭐ **即：本段的目标 ③ 最后一块的**引擎侧**，**早在本段内就建好了**** ✓（⚠ 日期 `2026-10-02` ＝ 今天 ✓ ⇒ ⭐ **是前几轮的我做的** ✓✓ —— ⭐ **第七十一次自我纠正：我在找的东西，我已经做过了** ✓）；
+>   **(iii)** ⭐ **`base` 在 `skill == null` 时来自 `literalBase(...)`** ✓（⚠ 注释：*"a literal ratio: off the SETTLED attribute, a Max HP share, or the…"* ✓）
+>     ⇒ ⚠ **只剩一点要确认**：⭐ **`literalBase` 能不能取"**本次事件的伤害量**"** ✗（⚠ 若行 ⇒ ⭐ **`8007` 一句话就能出货** ✓；⚠ 若不行 ⇒ ⭐ **那才是一条真缺口** ✓）。
+> * ⭐ **下一轮第一步（一次读 ＋ 可能直接出货）** ✗：⭐ **读 `literalBase`** ✓ ⇒ ⭐ **看它支持哪些来源**（⚠ 本段见过 `self_attr:` ✓ ⇒ ⭐ **看有没有"事件伤害量"或类似 `event:` 前缀** ✓）
+>   ⇒ ⭐ **然后写 `8007` 的 rider**：`DEALING_DAMAGE` ＋ `from_category` ＋ `self_resource:迷迷的声援 >= 1` ⇒ **`DAMAGE{damage_type: "TRUE", percent: 0.28, element: …}`** ✓ ＋ **判据**（⚠ 两向：真伤害不被防御削弱 ✓）＋ **变异** ⇒ ⭐ **出货（第 27 件）** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`7304d250` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
