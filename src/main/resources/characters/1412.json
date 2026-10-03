@@ -30,10 +30,17 @@
           "op": "GAIN_RESOURCE",
           "resource": "充能",
           "amount": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "target"
         }
       ],
       "source": "1412 刻律德菈 战技 升变，士皆可帅 (141202, BPSkill/Support): 「使指定我方单体角色获得【军功】并使刻律德菈获得1点充能。充能上限8点。当充能达到6点时，自动使角色的【军功】升级为【爵位】…」",
-      "note": "「使指定我方单体角色获得【**军功**】并使刻律德菈获得 **1 点充能**。**充能上限 8 点**」—— ① 标记 `APPLY_BUFF` + **`permanent: true`** ✓（文档只给\"仅对最新目标生效\" ✓ ⇒ 直到被替换 ✓）；② 充能 `GAIN_RESOURCE 1` ✓（有声明 ✓ ⇒ 不是静默空操作 ✓）。⚠ **登记**：① 「当充能**达到 6 点**时，**自动**使角色的【军功】**升级为【爵位】**并解除其控制类负面状态」✗（**按资源阈值触发** ✗ + 状态升级 ✗ + 解除控制 ✗）；② 「持有【爵位】的角色被视为**同时持有**【军功】」✗（一个状态蕴含另一个 ✗）；③ 「持有【爵位】的角色造成的**战技伤害**的暴击伤害提高 **72%**、**全属性抗性穿透**提高 **10.00%**，对敌方目标施放战技时**触发奇袭**。**奇袭结束后，消耗 6 点充能**使【爵位】变回【军功】」✗（**只作用于战技伤害**的作用域 ✗ + **全属性**抗性穿透 ✗ + 奇袭 ✗ + 消耗并降级 ✗）。\n\n⭐ 2026-09-30 转正：「【军功】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 军功 target: all_allies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
+      "note": "「使指定我方单体角色获得【**军功**】并使刻律德菈获得 **1 点充能**。**充能上限 8 点**」—— ① 标记 `APPLY_BUFF` + **`permanent: true`** ✓（文档只给\"仅对最新目标生效\" ✓ ⇒ 直到被替换 ✓）；② 充能 `GAIN_RESOURCE 1` ✓（有声明 ✓ ⇒ 不是静默空操作 ✓）。⚠ **登记**：① 「当充能**达到 6 点**时，**自动**使角色的【军功】**升级为【爵位】**并解除其控制类负面状态」✗（**按资源阈值触发** ✗ + 状态升级 ✗ + 解除控制 ✗）；② 「持有【爵位】的角色被视为**同时持有**【军功】」✗（一个状态蕴含另一个 ✗）；③ 「持有【爵位】的角色造成的**战技伤害**的暴击伤害提高 **72%**、**全属性抗性穿透**提高 **10.00%**，对敌方目标施放战技时**触发奇袭**。**奇袭结束后，消耗 6 点充能**使【爵位】变回【军功】」✗（**只作用于战技伤害**的作用域 ✗ + **全属性**抗性穿透 ✗ + 奇袭 ✗ + 消耗并降级 ✗）。\n\n⭐ 2026-09-30 转正：「【军功】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 军功 target: all_allies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。\n⭐ 2026-10-02：文档 `:105`「持有【军功】的角色造成伤害时**无视目标 16% 的防御力**」✓ ⇒ 加在**授予【军功】的那条规则**里 ✓（目标就是领到军功的那位 ✓）。⚠ **已登记**：同句的「若已升为【爵位】…额外无视 20%」需“**该角色的战技伤害**”这个限定 ✗。"
     },
     {
       "on": "SKILL_CAST",
