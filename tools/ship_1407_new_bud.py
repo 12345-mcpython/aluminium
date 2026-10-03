@@ -63,6 +63,7 @@ print("ok   1407.json: the new bud rides HP loss")
 io.open(JUDGE, "w", encoding="utf-8", newline="").write('''package com.laosun.aluminium.test;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -104,18 +105,17 @@ public class NewBudOnHpLossTest {
         Assertions.assertNotNull(bud, "the new bud must be reachable as a party resource");
         before = bud.value();
 
-        // \u2b50 `CanHit.takeDamage(double)` (:504) causes HP loss deterministically -- no enemy turn is needed, and twenty steps
-        // of "let them fight" left HP untouched (which is what the first draft asserted on).
-        // \u26a0 A BARE `takeDamage` does NOT reach `Battle`'s HP-loss dispatch (`Battle:2085` is inside the battle's own damage
-        // path), so the first drafts' direct call could never pay. Drive turns instead and let the fight do the damage.
-        for (int i = 0; i < 30 && battle.partyResource(RES).value() == before; i++) {
-            battle.stepForward();
-            battle.processRequests();
-        }
+        // \u2b50 2026-10-02, MEASURED (a one-off probe reported "hp 1629.936 -> 1629.936 (max 1629.936) after 40 steps"):
+        // the enemy never touched her, so EVERY earlier draft failed for one trivial reason -- no HP loss ever happened.
+        // \u26a0 And a BARE `CanHit.takeDamage(double)` does not reach `Battle`'s HP-loss dispatch either (`Battle:2085` lives
+        // inside the battle's own damage path). So damage her through the battle's own entry point:
+        double dealt = battle.applyTrueDamage(battle.enemies.get(0), owner, DamageElement.ICE, 100.0);
         battle.processRequests();
+        Assertions.assertEquals(100.0, dealt, "precondition: the battle really took 100 HP off her");
 
-        Assertions.assertEquals(before + 1, battle.partyResource(RES).value(),
-                "losing HP must give her one new bud (before=" + before + ")");
+        // \u2b50 And the engine honours "per point" by itself: 100 HP lost -> exactly 100 buds, from an `amount: 1` rule.
+        Assertions.assertEquals(before + 100, battle.partyResource(RES).value(),
+                "\u300c\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u9050\u8776\u83b7\u5f97 1 \u70b9\u3010\u65b0\u854a\u3011\u300d (before=" + before + ")");
     }
 }
 ''')
