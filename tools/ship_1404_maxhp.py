@@ -5,9 +5,11 @@ Document, verbatim (1404 万敌 天赋「以血还血」, read as UTF-8 via a fi
 
 PARAMETER (measured: `skills.json` -> 1404/4/param_list, first row `[0.15, 0, 150, 0.5, 0.5]`): #5 = **0.5**.
 
-\u2b50 WHY "等同于**当前**生命上限的 50%" IS EXACT as an additive +50% on HEALTH: at the moment the state is applied there is only one
-Max HP in play, so "a share of the current one" and "an additive percentage of the base" describe the same number. (This is NOT the
-case for a stat that other effects have already moved -- it is exact here because it is the entry moment.)
+\u2b50 WHY IT TAKES THE DERIVED SPELLING (`scale: "self_attr:HEALTH"` + `percent`), MEASURED NOT ASSUMED: an ADDITIVE percentage on a base
+attribute is a share of the BASE, not of the current Max HP. The plain form was tried first and the judge reported 2607.8976 where the
+sentence's reading needs 2747.6064 -- a ratio of 1.424 rather than 1.5, i.e. the base and the current Max HP really do differ here. The
+derived form adds a FLAT `percent x attribute`, which is exactly 「等同于**当前**生命上限的 #5%」. (Two other hypotheses were eliminated first:
+the `buff:` link and `max_stacks` -- neither changed the number.)
 
 \u2b50 AND IT RIDES THE STATE: `"buff": "血仇"` ties the modifier's life to the state (the link measured in item 35), so removing 血仇 --
 which is exactly how the paragraph ends it -- takes the extra Max HP with it. No second rule, no cleanup.
@@ -39,7 +41,7 @@ if len(hit) != 1:
 
 rule = hit[0]
 kept = [e for e in (rule.get("do") or []) if not (isinstance(e, dict) and e.get("attribute") == "HEALTH")]
-kept.append({"op": "MODIFY_ATTR", "attribute": "HEALTH", "percent": 0.50,
+kept.append({"op": "MODIFY_ATTR", "attribute": "HEALTH", "scale": "self_attr:HEALTH", "percent": 0.50,
              "permanent": True, "buff": STATE, "target": "self"})
 rule["do"] = kept
 rule["note"] = ((rule.get("note") or "") +
