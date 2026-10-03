@@ -29,7 +29,8 @@ for rid, event, mark in (("diag_mark_on_ally_attack", "ALLY_ATTACK", "diag_mark_
         "on": event,
         "id": rid,
         "when": ["actor == self", "self has_state " + STATE],
-        "do": [{"op": "APPLY_BUFF", "buff": mark, "permanent": True, "target": "self"}],
+        "do": [{"op": "HEAL", "amount": 200, "target": "self"},
+               {"op": "APPLY_BUFF", "buff": mark, "permanent": True, "target": "self"}],
         "note": "DIAGNOSTIC ONLY (2026-10-02) -- not a shipment; the caller restores the file afterwards.",
     })
 
@@ -74,6 +75,12 @@ public class DiagAfterAttackTest {
         battle.processRequests();
         boolean transformed = owner.getBuffManager().hasState(STATE);
 
+        // \u26a0 Hurt her FIRST, so a heal has somewhere to go: fully-qualified so the diagnostic needs no new import.
+        battle.applyTrueDamage(battle.enemies.get(0), owner, com.laosun.aluminium.enums.DamageElement.ICE,
+                owner.getMaxHp() * 0.5);
+        battle.processRequests();
+        double hurt = owner.getCurrentHp();
+        double maxHp = owner.getMaxHp();
         Skill basic = owner.getSkills().get(SkillType.COMMON);
         boolean hasBasic = basic != null;
         if (hasBasic) {
@@ -82,6 +89,7 @@ public class DiagAfterAttackTest {
         }
 
         Assertions.fail("PROBE transformed=" + transformed + " hasBasic=" + hasBasic
+                + " hurt=" + hurt + " of " + maxHp + " after=" + owner.getCurrentHp()
                 + " allyAttackMark=" + owner.getBuffManager().hasState("diag_mark_ally")
                 + " attackFinishedMark=" + owner.getBuffManager().hasState("diag_mark_finished"));
     }
