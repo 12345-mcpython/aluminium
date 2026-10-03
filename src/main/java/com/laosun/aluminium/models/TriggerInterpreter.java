@@ -3215,6 +3215,14 @@ public final class TriggerInterpreter {
             if (target == null || target.isDeath()) {
                 continue;
             }
+            // ⭐⭐ 「使自身**所有**增益效果延长 1 回合」 (2026-10-02; readers: 1506's talent and its E2): `EXTEND_BUFF` with an explicit
+            // `"kind": "all"`. The origin filter `extendBuffsFrom` applies is deliberate (its note names 「战技提供的护盾」), so
+            // 「所有」 -- whoever applied it -- had no spelling; the implicit filter-less form stays refused by `requireExtendFilter`,
+            // because that one would lengthen buffs the sentence never mentions.
+            if (effect.getKind() != null && "all".equalsIgnoreCase(effect.getKind().trim())) {
+                target.getBuffManager().extendAllBuffs(effect.getTurns());
+                continue;
+            }
             target.getBuffManager().extendBuffsFrom(ctx.owner(), effect.getBuff(),
                     effect.getAttribute() == null ? null : AttributeType.fromString(effect.getAttribute()),
                     effect.getTurns());
@@ -4464,10 +4472,18 @@ public final class TriggerInterpreter {
                             + "(source: " + spec.getSource() + ")");
         }
         if (!byName && !byAttribute) {
+            // \u2b50 \u300c\u4f7f\u81ea\u8eab**\u6240\u6709**\u589e\u76ca\u6548\u679c\u5ef6\u957f 1 \u56de\u5408\u300d (2026-10-02; readers: 1506 \u94f6\u72fcLV.999 \u7684\u5929\u8d4b\u4e0e\u5176\u661f\u9b42 2).
+            // \u26a0 \u4e0b\u9762\u90a3\u6761\u62d2\u7edd**\u7ee7\u7eed\u751f\u6548** \u2713 \u2014\u2014 \u5b83\u53cd\u5bf9\u7684\u662f\u201c**\u4ec0\u4e48\u90fd\u4e0d\u8bf4**\u201d \u2717\uff0c
+            // \u800c\u8fd9\u91cc\u653e\u884c\u7684\u662f\u201c**\u660e\u8bf4\u5168\u90e8**\u201d \u2713 \u2014\u2014 \u4f5c\u8005\u8bf4\u4e86\u8981\u5ef6\u957f\u7684\u662f\u4ec0\u4e48\uff0c
+            // \u6240\u4ee5\u90a3\u6761\u62d2\u7edd\u7684\u7406\u7531\uff08\u201c\u4f1a\u5ef6\u957f\u53e5\u5b50\u4ece\u672a\u63d0\u53ca\u7684 buff\u201d\uff09\u5728\u8fd9\u91cc**\u4e0d\u6210\u7acb** \u2713\u3002
+            if (effect.getKind() != null && "all".equalsIgnoreCase(effect.getKind().trim())) {
+                return;
+            }
             throw new IllegalArgumentException(
-                    "Op " + op + " needs the buff it lengthens: \"buff\" (a state's name such as 灼烧 / 冻结 / "
-                            + "\"" + BuffManager.SHIELD_STATE + "\", or any named state) or \"attribute\" (e.g. "
-                            + "ALL_DAMAGE_TYPE_BOOST for a 「伤害提高效果」). Without one it would mean \"everything "
+                    "Op " + op + " needs the buff it lengthens: \"buff\" (a state's name such as \u707c\u70e7 / \u51bb\u7ed3 / "
+                            + "\"" + BuffManager.SHIELD_STATE + "\", or any named state), \"attribute\" (e.g. "
+                            + "ALL_DAMAGE_TYPE_BOOST for a \u300c\u4f24\u5bb3\u63d0\u9ad8\u6548\u679c\u300d), or an explicit "
+                            + "\"kind\": \"all\" for \u300c\u6240\u6709\u589e\u76ca\u6548\u679c\u300d. Without one it would mean \"everything "
                             + "I have on that unit\", which would lengthen buffs the sentence never mentions "
                             + "(source: " + spec.getSource() + ")");
         }
