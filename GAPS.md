@@ -21321,6 +21321,27 @@
 >   ⇒ ⭐ **`1412` = `Cerydra`** ✓（本段已用 ✓）。
 > * ⚠ **推送**：本地仍**领先 8** ✗（网络九连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百零五：✅✅✅ **【充能】的真身找到了 —— 它是她自己的"能量条"**（`SetEnergyBarState` ✓，`BarType: 2` ✓，图标 `Icon1412Passive01.png` ✓）⇒ ⭐ 上限/当前值都是**编译表达式**（`PostfixExpr` ✓），⭐ 而数值就藏在 `FixedValues` 里）**）**：
+>
+> * ✅ **实测（读 `Avatar_Cerydra_00_PassiveSkill` ✓，`:4707` 起 ✓）** ✓ 原文骨架：
+>   ```json
+>   { "Name": "Avatar_Cerydra_00_PassiveSkill", "TargetInfo": { "TargetType": "Caster" },
+>     "OnStart": [ { "$type": "RPG.GameCore.SetEnergyBarState", "Active": "True", "BarType": 2,
+>                    "CurrentState": "Disable", "IconPath": "SpriteOutput/BuffIcon/Inlevel/Avatar/Icon1412Passive01.png",
+>                    "MaxCount": { "IsDynamic": true, "PostfixExpr": { "OpCodes": "AQAR", "FixedValues": [],
+>                                   "DynamicHashes": [208472327] } }, "CurrentCount": { … } } ] }
+>   ```
+>   ⇒ ⭐⭐ **三点** ✓：**(i)** ⭐ **【充能】不是普通资源，而是**一条能量条**（`BarType: 2` ✓，图标名直接写着 `1412Passive01` ✓）
+>     ⇒ ⭐ 本段在引擎里把它当**资源**声明（`max: 8` ✓）**在口径上是对的** ✓（⚠ 它确实是一条 0–8 的计数条 ✓）；
+>   **(ii)** ⭐ **上限/当前值是**编译过的表达式**（`OpCodes` ＋ `FixedValues` ＋ `DynamicHashes` ✓）⇒ ⭐ **`#1`／`#2` 的实际数值就在这些 `FixedValues` 里** ✗
+>     ⇒ ⭐ **下一轮第一步**：**在她这条 `PassiveSkill` 里找含 `FixedValues: [ … ]` 的非空数组** ✓ ⇒ ⭐ 那里面就写着 `1`／`2` 之类的**实际数值** ✓；
+>   **(iii)** ⚠ 而**"奇袭"仍未出现** ✗ ⇒ ⭐ 它应当在 `AbilityList` 的**别的 `Name`** 里 ✓（⚠ 候选名：`…_Ambush…`／`…_SP…`／`…_Ultra…` ✓ ⇒ ⭐ 一次 grep `"Name": "Avatar_Cerydra` **列出全部名字**即可 ✓）。
+> * ⭐ **本件的可执行序（下一轮直接照做）** ✗：① `grep '"Name": "Avatar_Cerydra'` ⇒ **列出她所有能力名** ✓；
+>   ② 取那条**与"奇袭/复制施放"相关的** ✓（⚠ 或从名字看不出 ⇒ 顺次读 Desc ✓）；③ 读出**两个数值**（`#1` 暴伤 % ✓／`#2` 充能点 ✓）
+>   ⇒ ⭐ **然后**：**建"奇袭"状态（复制一次施放 ＋ 不可递归）＋ 到期 ⇒ `STATE_ENDED("奇袭")` ⇒ 读者（+`#2` 充能）** ✓
+>     ⇒ ⭐ **这条能力同时结清目标 ① 与 ② 的一大块** ✓。
+> * ⚠ **推送**：本地仍**领先 9** ✗（网络十连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -25707,6 +25728,27 @@
 > * ⭐ **并把"英文名反查法"写实** ✓（可复用）：`Config\AssetPreload\CharacterEffect\CharacterEffect_<编号>.json` ⇒ `Eff_Avatar_<英文名>_00_*` ✓
 >   ⇒ ⭐ **`1412` = `Cerydra`** ✓（本段已用 ✓）。
 > * ⚠ **推送**：本地仍**领先 8** ✗（网络九连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百零五：✅✅✅ **【充能】的真身找到了 —— 它是她自己的"能量条"**（`SetEnergyBarState` ✓，`BarType: 2` ✓，图标 `Icon1412Passive01.png` ✓）⇒ ⭐ 上限/当前值都是**编译表达式**（`PostfixExpr` ✓），⭐ 而数值就藏在 `FixedValues` 里）**）**：
+>
+> * ✅ **实测（读 `Avatar_Cerydra_00_PassiveSkill` ✓，`:4707` 起 ✓）** ✓ 原文骨架：
+>   ```json
+>   { "Name": "Avatar_Cerydra_00_PassiveSkill", "TargetInfo": { "TargetType": "Caster" },
+>     "OnStart": [ { "$type": "RPG.GameCore.SetEnergyBarState", "Active": "True", "BarType": 2,
+>                    "CurrentState": "Disable", "IconPath": "SpriteOutput/BuffIcon/Inlevel/Avatar/Icon1412Passive01.png",
+>                    "MaxCount": { "IsDynamic": true, "PostfixExpr": { "OpCodes": "AQAR", "FixedValues": [],
+>                                   "DynamicHashes": [208472327] } }, "CurrentCount": { … } } ] }
+>   ```
+>   ⇒ ⭐⭐ **三点** ✓：**(i)** ⭐ **【充能】不是普通资源，而是**一条能量条**（`BarType: 2` ✓，图标名直接写着 `1412Passive01` ✓）
+>     ⇒ ⭐ 本段在引擎里把它当**资源**声明（`max: 8` ✓）**在口径上是对的** ✓（⚠ 它确实是一条 0–8 的计数条 ✓）；
+>   **(ii)** ⭐ **上限/当前值是**编译过的表达式**（`OpCodes` ＋ `FixedValues` ＋ `DynamicHashes` ✓）⇒ ⭐ **`#1`／`#2` 的实际数值就在这些 `FixedValues` 里** ✗
+>     ⇒ ⭐ **下一轮第一步**：**在她这条 `PassiveSkill` 里找含 `FixedValues: [ … ]` 的非空数组** ✓ ⇒ ⭐ 那里面就写着 `1`／`2` 之类的**实际数值** ✓；
+>   **(iii)** ⚠ 而**"奇袭"仍未出现** ✗ ⇒ ⭐ 它应当在 `AbilityList` 的**别的 `Name`** 里 ✓（⚠ 候选名：`…_Ambush…`／`…_SP…`／`…_Ultra…` ✓ ⇒ ⭐ 一次 grep `"Name": "Avatar_Cerydra` **列出全部名字**即可 ✓）。
+> * ⭐ **本件的可执行序（下一轮直接照做）** ✗：① `grep '"Name": "Avatar_Cerydra'` ⇒ **列出她所有能力名** ✓；
+>   ② 取那条**与"奇袭/复制施放"相关的** ✓（⚠ 或从名字看不出 ⇒ 顺次读 Desc ✓）；③ 读出**两个数值**（`#1` 暴伤 % ✓／`#2` 充能点 ✓）
+>   ⇒ ⭐ **然后**：**建"奇袭"状态（复制一次施放 ＋ 不可递归）＋ 到期 ⇒ `STATE_ENDED("奇袭")` ⇒ 读者（+`#2` 充能）** ✓
+>     ⇒ ⭐ **这条能力同时结清目标 ① 与 ② 的一大块** ✓。
+> * ⚠ **推送**：本地仍**领先 9** ✗（网络十连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
