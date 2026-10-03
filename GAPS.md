@@ -21633,6 +21633,21 @@
 > * ⭐ **下一轮第一步（一次写 ＋ 一次跑）** ✗：改 `1505.json` 的那条规则（加第二条效果 ✓）＋ 写判据（⚠ 断言：能量 100 ⇒ 好活当赏 **150** ✓；
 >   ⚠ 并**双向**：秘技那 20 点**不**加成 ✓）＋ 变异（`0.5` → `0.25` ⇒ 必红 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十九：⚠ 星魂那条的**内容改好了**（写进 `p1505_energy_sync` 的第二条效果 ✓），但**判据编译不过** —— `owner.getBattle()` 与 `owner.getResource(...)` 都不是真名 ✗（⚠ 本段第四次同类翻车 ✓））**）**：
+>
+> * ⚠ **实测（编译错 4 处 ✓）** ✓：`ElationRewardBoostTest.java:30/31`（`owner.getBattle()` ✗）与 `:56/61`（`setResource`／`getResource` ✗）。
+> * ⭐ **真实 API（读源码 ✓）**：**`TriggerInterpreter:2888` ＝ `private static int resourceAmount(Battle battle, CanHit owner, String id)`** ✓
+>   ⇒ ⭐ 即**读取资源需要 `Battle` 一起传** ✓ ⇒ ⭐ **正解**：
+>   * 判据里**用自己的 `battle` 变量** ✓（⚠ 不要问 `owner` 要战斗 ✗）；
+>   * 读资源用 **`owner.getResources()`** ✓（⚠ 本段在 `SPEND_RESOURCE` 的读取里见过它 ✓：`holder.getResources()` ✓）⇒ ⭐ `owner.getResources().get("好活当赏")` ✓。
+> * ⭐ **纪律（第四次落点）** ✗：⚠ **判据里凡用"写/读状态"的 API ⇒ 先 `grep` 真名** ✓（⚠ 本段四次翻车：`setCurrentHp` ✗／缺 `import Damage` ✗／
+>   `DamageElement.IMAGINARY` ✗／`getBattle` ＋ `getResource` ✗ ⇒ ⭐ **全部是"猜 API"** ✓）。
+> * ⭐ **下一轮第一步（两处改 ＋ 一次跑）** ✗：把判据里的
+>   `owner.getBattle().fireTriggers(...)` 改成 **`battle.fireTriggers(TriggerEvent.ENERGY_GAINED, owner, owner, 100, 0)`** ✓；
+>   把 `owner.setResource/getResource` 改成 **`owner.getResources().put(...)`／`.get(...)`** ✓（⚠ 或按 `resourceAmount` 的语义 ✓）
+>   ⇒ 重放 ＋ 跑双向判据（⚠ 能量 100 ⇒ 好活当赏 **150** ✓；⚠ 秘技那条仍是 **20** ✓）⇒ 绿 ⇒ **变异（`0.5` → `0.25`）⇒ 全量**
+>     ⇒ ⭐ **`1505` 星魂这件四件齐** ✓（⚠ 并保留那条**已知偏差**的注释 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26332,6 +26347,21 @@
 > * ⭐ **下一轮第一步（一次写 ＋ 一次跑）** ✗：改 `1505.json` 的那条规则（加第二条效果 ✓）＋ 写判据（⚠ 断言：能量 100 ⇒ 好活当赏 **150** ✓；
 >   ⚠ 并**双向**：秘技那 20 点**不**加成 ✓）＋ 变异（`0.5` → `0.25` ⇒ 必红 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十九：⚠ 星魂那条的**内容改好了**（写进 `p1505_energy_sync` 的第二条效果 ✓），但**判据编译不过** —— `owner.getBattle()` 与 `owner.getResource(...)` 都不是真名 ✗（⚠ 本段第四次同类翻车 ✓））**）**：
+>
+> * ⚠ **实测（编译错 4 处 ✓）** ✓：`ElationRewardBoostTest.java:30/31`（`owner.getBattle()` ✗）与 `:56/61`（`setResource`／`getResource` ✗）。
+> * ⭐ **真实 API（读源码 ✓）**：**`TriggerInterpreter:2888` ＝ `private static int resourceAmount(Battle battle, CanHit owner, String id)`** ✓
+>   ⇒ ⭐ 即**读取资源需要 `Battle` 一起传** ✓ ⇒ ⭐ **正解**：
+>   * 判据里**用自己的 `battle` 变量** ✓（⚠ 不要问 `owner` 要战斗 ✗）；
+>   * 读资源用 **`owner.getResources()`** ✓（⚠ 本段在 `SPEND_RESOURCE` 的读取里见过它 ✓：`holder.getResources()` ✓）⇒ ⭐ `owner.getResources().get("好活当赏")` ✓。
+> * ⭐ **纪律（第四次落点）** ✗：⚠ **判据里凡用"写/读状态"的 API ⇒ 先 `grep` 真名** ✓（⚠ 本段四次翻车：`setCurrentHp` ✗／缺 `import Damage` ✗／
+>   `DamageElement.IMAGINARY` ✗／`getBattle` ＋ `getResource` ✗ ⇒ ⭐ **全部是"猜 API"** ✓）。
+> * ⭐ **下一轮第一步（两处改 ＋ 一次跑）** ✗：把判据里的
+>   `owner.getBattle().fireTriggers(...)` 改成 **`battle.fireTriggers(TriggerEvent.ENERGY_GAINED, owner, owner, 100, 0)`** ✓；
+>   把 `owner.setResource/getResource` 改成 **`owner.getResources().put(...)`／`.get(...)`** ✓（⚠ 或按 `resourceAmount` 的语义 ✓）
+>   ⇒ 重放 ＋ 跑双向判据（⚠ 能量 100 ⇒ 好活当赏 **150** ✓；⚠ 秘技那条仍是 **20** ✓）⇒ 绿 ⇒ **变异（`0.5` → `0.25`）⇒ 全量**
+>     ⇒ ⭐ **`1505` 星魂这件四件齐** ✓（⚠ 并保留那条**已知偏差**的注释 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
