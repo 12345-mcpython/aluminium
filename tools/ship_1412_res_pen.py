@@ -36,7 +36,7 @@ rule = hit[0]
 do = [e for e in (rule.get("do") or [])
       if not (isinstance(e, dict) and e.get("attribute") == "DAMAGE_PENETRATION")]
 do.append({"op": "MODIFY_ATTR", "attribute": "DAMAGE_PENETRATION", "percent": 0.10,
-           "permanent": True, "buff": "\u7235\u4f4d", "target": "holder_of:\u519b\u529f"})
+           "permanent": True, "target": "self"})
 rule["do"] = do
 rule["source"] = ((rule.get("source") or "") +
                   "\n\u2b50 2026-10-02\uff08\u6587\u6863 `:67`\uff09\uff1a\u300c\u6301\u6709\u3010\u7235\u4f4d\u3011\u7684\u89d2\u8272\u2026"
