@@ -1,19 +1,19 @@
-"""1408's transformation, first two documented halves (2026-10-02).
+"""1408's transformation state, and only that (2026-10-02, revised).
 
-Document, verbatim (1408_白厄.html):
-  * :77 「变身为卡厄斯兰那，变身期间展开境界【时墟铁墓】…」
-  * :90 「卡厄斯兰那的天赋。**变身时获得 4 点【毁伤】**。…」
+Document, verbatim (1408_白厄.html:77): 「**变身为卡厄斯兰那**，变身期间展开境界【时墟铁墓】…」
 
-This ships only what the document states outright and the engine can already express: the transformation becomes a STATE
-(permanent, because its end is not a duration -- :120 says the LAST countdown turn ends it, which is an explicit removal,
-and item 20 of this arc made explicit removals announce STATE_ENDED), and 【毁伤】 is declared and granted at +4.
+Why this ships alone. The same talent also says 「变形时获得 4 点【毁伤】」 (…:90) and 【毁伤】 turned out to be
+`RPG.GameCore.SetPhainonChargePoint` whose ceiling is a COMPILED expression (`FixedValues: []`, one dynamic hash) -- the
+same wall as 1412's `#2`. A resource declaration cannot omit its ceiling (the loader really does refuse an incomplete
+`ResourceSpec`, measured), so 【毁伤】 is registered instead of guessed, and this ships the half the document states with no
+number at all: the transformation is a STATE.
 
-⚠ Both unknowns stay registered rather than guessed:
-  * 【毁伤】's ceiling is not stated where the sentence is, so the resource is declared WITHOUT `max`;
-  * the 8 countdown turns and the speed at 60% (:77) need either an op or a mechanic; and the end-of-transformation reward
-    (「基于溢出点数获得【火种】」) needs an overflow counter above 火种's hard cap of 12.
+It is `permanent: true` on purpose: :120 says the LAST countdown turn ends the transformation, i.e. an explicit removal --
+and item 20 of this arc made explicit removals announce `STATE_ENDED`, so a later end-reader has something to hang on.
 
-Readers: the 【毁伤】 grant is read straight off her sentence; the state is what a later end-reader will hang on.
+Registered, not guessed: 【毁伤】's ceiling, the 8 countdown turns and the 60% speed (:77), the extra turn at the 【毁伤】
+threshold (:15232700682284445042), and the end reward 「基于溢出点数获得【火种】」 (needs an overflow counter above
+火种's hard cap of 12).
 ASCII only.
 """
 import io
@@ -21,7 +21,6 @@ import json
 
 DATA = "src/main/resources/characters/1408.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/TransformationStartsTest.java"
-WOUND = "\u6bc1\u4f24"
 STATE = "\u53d8\u8eab"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
@@ -37,33 +36,22 @@ rules.append({
     "when": ["actor == self"],
     "do": [
         {"op": "APPLY_BUFF", "buff": STATE, "permanent": True, "target": "self"},
-        {"op": "GAIN_RESOURCE", "resource": WOUND, "amount": 4},
     ],
-    "source": ("1408 \u767d\u5384 \u7ec8\u7ed3\u6280\u4e0e\u5361\u5384\u65af\u5170\u90a3\u5929\u8d4b\uff08\u6587\u6863 `:77`\u3001`:90`\uff09\uff1a"
-               "\u300c\u53d8\u8eab\u4e3a\u5361\u5384\u65af\u5170\u90a3\uff0c\u53d8\u8eab\u671f\u95f4\u5c55\u5f00\u5883\u754c\u3010\u65f6\u589f\u94c1\u5893\u3011\u300d\uff1b"
-               "\u300c**\u53d8\u8eab\u65f6\u83b7\u5f97 4 \u70b9\u3010\u6bc1\u4f24\u3011**\u300d"),
+    "source": ("1408 \u767d\u5384 \u7ec8\u7ed3\u6280\uff08\u6587\u6863 `:77`\uff09\uff1a"
+               "\u300c**\u53d8\u8eab\u4e3a\u5361\u5384\u65af\u5170\u90a3**\uff0c\u53d8\u8eab\u671f\u95f4\u5c55\u5f00\u5883\u754c\u3010\u65f6\u589f\u94c1\u5893\u3011\u300d"),
     "note": ("\u2b50 2026-10-02\uff1a\u53d8\u8eab\u5efa\u6210**\u6c38\u4e45\u72b6\u6001** \u2713\uff08\u56e0\u4e3a\u5b83\u7684\u7ed3\u675f**\u4e0d\u662f\u65f6\u957f** \u2713\uff1a"
-             "\u6587\u6863 `:120` \u8bf4\u662f\u300c\u6700\u540e 1 \u4e2a\u5012\u8ba1\u65f6\u56de\u5408\u2026\u7ed3\u675f\u53d8\u8eab\u300d\u2713\uff0c"
+             "\u6587\u6863 `:120` \u8bf4\u662f\u300c\u6700\u540e 1 \u4e2a\u5012\u8ba1\u65f6\u56de\u5408\u2026\u7ed3\u675f\u53d8\u8eab\u300d \u2713\uff0c"
              "\u800c**\u663e\u5f0f\u79fb\u9664\u73b0\u5728\u4f1a\u516c\u544a `STATE_ENDED`** \u2713 \u2014\u2014 \u672c\u6bb5\u7b2c 20 \u4ef6 \u2713\uff09\u3002"
-             "\u26a0 \u4e24\u4e2a\u672a\u77e5\u4ecd\u767b\u8bb0\uff1a**\u3010\u6bc1\u4f24\u3011\u4e0a\u9650\u672a\u7ed9** \u2717\uff1b"
-             "**8 \u4e2a\u5012\u8ba1\u65f6\u56de\u5408\u4e0e\u901f\u5ea6 60%** \u2717\uff1b**\u7ed3\u675f\u65f6\u7684\u6ea2\u51fa\u5956\u52b1** \u2717\u3002"),
+             "\u26a0 **\u5df2\u767b\u8bb0\u3001\u672c\u6761\u4e0d\u731c** \u2717\uff1a\u3010\u6bc1\u4f24\u3011\u7684\u4e0a\u9650\uff08\u5b83\u662f "
+             "`SetPhainonChargePoint`\uff0c\u4e0a\u9650\u662f**\u7f16\u8bd1\u8868\u8fbe\u5f0f** \u2717\uff09\uff1b**8 \u4e2a\u5012\u8ba1\u65f6\u56de\u5408\u4e0e\u901f\u5ea6 60%** \u2717\uff1b"
+             "**\u3010\u6bc1\u4f24\u3011\u95e8\u69db\u6362\u989d\u5916\u56de\u5408** \u2717\uff1b**\u7ed3\u675f\u65f6\u7684\u6ea2\u51fa\u5956\u52b1** \u2717\u3002"),
 })
 
-if isinstance(doc, dict):
-    doc["rules"] = rules
-    resources = doc.get("resources") or []
-    if not any(isinstance(r, dict) and r.get("id") == WOUND for r in resources):
-        resources.append({
-            "id": WOUND,
-            "initial": 0,
-            "note": ("\u2b50 2026-10-02\uff08\u6587\u6863 `:90`\uff09\uff1a\u300c\u53d8\u8eab\u65f6\u83b7\u5f97 4 \u70b9\u3010\u6bc1\u4f24\u3011\u300d\u3002"
-                     "\u26a0 **\u4e0a\u9650\u5728\u8be5\u53e5\u5904\u672a\u7ed9** \u2717 \u21d2 \u6545**\u4e0d\u58f0\u660e `max`** \u2713\uff08\u6309\u7eaa\u5f8b\u4e0d\u731c \u2713\uff09\u3002"),
-        })
-        doc["resources"] = resources
-else:
-    raise SystemExit("1408.json must be an object with resources")
+if not isinstance(doc, dict):
+    raise SystemExit("1408.json must be an object")
+doc["rules"] = rules
 json.dump(doc, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
-print("ok   1408.json: the transformation starts, and 【毁伤】 is declared")
+print("ok   1408.json: the transformation state ships on its own")
 
 io.open(JUDGE, "w", encoding="utf-8", newline="").write('''package com.laosun.aluminium.test;
 
@@ -81,18 +69,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408 \u767d\u5384\uff1a\u300c\u53d8\u8eab\u4e3a\u5361\u5384\u65af\u5170\u90a3\u2026\u300d\u5341\u300c**\u53d8\u8eab\u65f6\u83b7\u5f97 4 \u70b9\u3010\u6bc1\u4f24\u3011**\u300d (2026-10-02).
+ * 1408 \u767d\u5384\uff1a\u300c**\u53d8\u8eab\u4e3a\u5361\u5384\u65af\u5170\u90a3**\uff0c\u53d8\u8eab\u671f\u95f4\u5c55\u5f00\u5883\u754c\u3010\u65f6\u589f\u94c1\u5893\u3011\u300d (2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN: her ultimate puts the transformation state on and pays the 4 \u3010\u6bc1\u4f24\u3011 her own talent names. The
- * state is permanent on purpose -- its end is the last countdown turn (\u6587\u6863 :120), i.e. an explicit removal, not a duration.
+ * <p>\u2b50 FILE-DRIVEN, and only the half the document states with no number in it: her ultimate puts the transformation STATE
+ * on. It is permanent because its end is the last countdown turn (\u6587\u6863 :120) -- an explicit removal, which this arc made
+ * announce \u0060STATE_ENDED\u0060, so an end-reader now has something to hang on.
  */
 public class TransformationStartsTest {
     private static final int OWNER = 1408;
     private static final int MONSTER = 1002011;
     private static final String STATE = "\u53d8\u8eab";
-    private static final String WOUND = "\u6bc1\u4f24";
 
-    /** \u2b50 The ultimate starts the transformation and pays 4 \u3010\u6bc1\u4f24\u3011. */
+    /** \u2b50 The ultimate starts the transformation. */
     @Test
     public void theUltimateStartsTheTransformation() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -109,8 +97,6 @@ public class TransformationStartsTest {
 
         Assertions.assertTrue(owner.getBuffManager().hasState(STATE),
                 "the transformation is on (got " + owner.getBuffManager().hasState(STATE) + ")");
-        Assertions.assertEquals(4, owner.getResources().has(WOUND) ? owner.getResources().value(WOUND) : 0,
-                "\u53d8\u8eab\u65f6\u83b7\u5f97 4 \u70b9\u3010\u6bc1\u4f24\u3011");
     }
 }
 ''')
