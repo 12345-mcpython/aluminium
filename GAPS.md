@@ -22632,6 +22632,28 @@
 >   2. ⭐ **`1412` 的 `:105` 两条防御无视** ✓（⚠ 数字给全：**16%** ✓／**+20%** ✓ ⇒ ⭐ **也能一次做成** ✓）。
 > * ⚠ **推送**：本地仍**领先 5** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2137** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百七十一：🎯 **`MODIFY_ATTR` 的**逐字写法**到手（从真内容里抄）** ⇒ ⭐ 于是 `1412` 的 `:105` 那两条**已完全规格化、可以一次出货**）**）**：
+>
+> * ✅ **实测（在我们自己的内容里找真用法 ✓）** ✓：
+>   ```json
+>   { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5,    "turns": 3, "target": "target" }   // 1001
+>   { "op": "MODIFY_ATTR", "attribute": "DAMAGE_PENETRATION", "percent": 0.36, "until": "next_attack", "target": "self" }  // 1002
+>   { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.4, "turns": 3, "target": "self" }               // 1002
+>   { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": -0.5, "permanent": true, "buff": "潜龙", "target": "self" }  // 1002
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **键就是 `attribute` ＋ `percent`** ✓（⚠ 按纪律**从真内容抄，不猜** ✓）；
+>   **(ii)** ⭐ **`DAMAGE_PENETRATION` 已经在内容里用过** ✓（`1002` ✓）⇒ ⭐ **穿透那条有先例** ✓；
+>   **(iii)** ⭐ **时限三选一**：`turns` ✓／`until` ✓／`permanent` ✓（⚠ 且 `permanent` 可与 `buff` 一起给"有名有姓的永久增益" ✓）。
+> * ⭐⭐ **于是 `1412` 的 `:105` 出货规格（照抄即可）** ✗：
+>   * ⭐ **「持有【军功】的角色造成伤害时无视目标 16% 的防御力」** ⇒ 在**给【军功】的那条规则**（`skill_grants_military_merit` ✓）
+>     的 `do` 里加一条：**`{"op":"MODIFY_ATTR","attribute":"DEFENCE_IGNORE","percent":0.16,"permanent":true,"target":"target"}`** ✓
+>     （⚠ `target` ＝ 被授予【军功】的那位 ✓ ⇒ ⭐ **加成落在正确的人身上** ✓）；
+>   * ⭐ **「若已升级为【爵位】，则该角色造成战技伤害时额外无视 20%」** ⇒ ⚠ 需要"**是该角色的战技伤害**"这个条件 ✓
+>     （⚠ 本段见过 `from_category BPSKILL` ✓ ⇒ ⭐ **可用** ✓）⇒ ⭐ **一条新规则**：`on: DEALING_DAMAGE` ＋
+>       `when: ["actor has_state 爵位", "from_category BPSKILL"]` ⇒ `DEFENCE_IGNORE +0.20` ✓（⚠ 或与上一条合并 ✓）。
+>   * ⭐ **判据**：让她给队友上【军功】（⚠ 现成路径 ✓）⇒ 断言队友的 `DEFENCE_IGNORE` 为 **0.16** ✓ ⇒ ⭐ **变异**（0.16 → 0.10）⇒ **全量** ✓。
+> * ⚠ **推送**：本地仍**领先 6** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2137** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -28359,6 +28381,28 @@
 >   1. ⭐⭐ **`1408` 的倒计时链** ✓（⚠ 机制现成 ✓、数字给全 ✓（8 ✓／60% ✓）、结束用显式移除 ✓ ⇒ ⭐ **最完整的一条** ✓）；
 >   2. ⭐ **`1412` 的 `:105` 两条防御无视** ✓（⚠ 数字给全：**16%** ✓／**+20%** ✓ ⇒ ⭐ **也能一次做成** ✓）。
 > * ⚠ **推送**：本地仍**领先 5** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2137** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百七十一：🎯 **`MODIFY_ATTR` 的**逐字写法**到手（从真内容里抄）** ⇒ ⭐ 于是 `1412` 的 `:105` 那两条**已完全规格化、可以一次出货**）**）**：
+>
+> * ✅ **实测（在我们自己的内容里找真用法 ✓）** ✓：
+>   ```json
+>   { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5,    "turns": 3, "target": "target" }   // 1001
+>   { "op": "MODIFY_ATTR", "attribute": "DAMAGE_PENETRATION", "percent": 0.36, "until": "next_attack", "target": "self" }  // 1002
+>   { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.4, "turns": 3, "target": "self" }               // 1002
+>   { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": -0.5, "permanent": true, "buff": "潜龙", "target": "self" }  // 1002
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **键就是 `attribute` ＋ `percent`** ✓（⚠ 按纪律**从真内容抄，不猜** ✓）；
+>   **(ii)** ⭐ **`DAMAGE_PENETRATION` 已经在内容里用过** ✓（`1002` ✓）⇒ ⭐ **穿透那条有先例** ✓；
+>   **(iii)** ⭐ **时限三选一**：`turns` ✓／`until` ✓／`permanent` ✓（⚠ 且 `permanent` 可与 `buff` 一起给"有名有姓的永久增益" ✓）。
+> * ⭐⭐ **于是 `1412` 的 `:105` 出货规格（照抄即可）** ✗：
+>   * ⭐ **「持有【军功】的角色造成伤害时无视目标 16% 的防御力」** ⇒ 在**给【军功】的那条规则**（`skill_grants_military_merit` ✓）
+>     的 `do` 里加一条：**`{"op":"MODIFY_ATTR","attribute":"DEFENCE_IGNORE","percent":0.16,"permanent":true,"target":"target"}`** ✓
+>     （⚠ `target` ＝ 被授予【军功】的那位 ✓ ⇒ ⭐ **加成落在正确的人身上** ✓）；
+>   * ⭐ **「若已升级为【爵位】，则该角色造成战技伤害时额外无视 20%」** ⇒ ⚠ 需要"**是该角色的战技伤害**"这个条件 ✓
+>     （⚠ 本段见过 `from_category BPSKILL` ✓ ⇒ ⭐ **可用** ✓）⇒ ⭐ **一条新规则**：`on: DEALING_DAMAGE` ＋
+>       `when: ["actor has_state 爵位", "from_category BPSKILL"]` ⇒ `DEFENCE_IGNORE +0.20` ✓（⚠ 或与上一条合并 ✓）。
+>   * ⭐ **判据**：让她给队友上【军功】（⚠ 现成路径 ✓）⇒ 断言队友的 `DEFENCE_IGNORE` 为 **0.16** ✓ ⇒ ⭐ **变异**（0.16 → 0.10）⇒ **全量** ✓。
+> * ⚠ **推送**：本地仍**领先 6** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2137** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
