@@ -1327,7 +1327,23 @@ public class Battle {
         }
         double settled = assemble(damage);                       // damage after the zones (this is "how much was dealt")
         double hpBefore = target.getCurrentHp();
-        boolean died = target.takeDamage(settled);
+        // \u2b50\u2b50 \u81f4\u547d\u4e00\u51fb\uff082026-10-02\uff09: \u300c\u53d7\u5230**\u81f4\u547d\u653b\u51fb**\u65f6\u4e0d\u4f1a\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\uff0c\u800c\u662f**\u56de\u590d**\u7b49\u540c\u4e8e\u81ea\u8eab\u751f\u547d\u4e0a\u9650 20%\uff0f50% \u7684\u751f\u547d\u503c\u300d.
+        // \u26a0 THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
+        // target at full HP, where a heal is a no-op and nothing can ever answer. So the target is dropped to 0 HP first WITHOUT
+        // being marked dead, the tables are asked, and `perish()` is called only if nobody answered -- which is precisely
+        // \u300c\u4e0d\u4f1a\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d.
+        boolean lethal = settled >= hpBefore;
+        boolean died;
+        if (lethal) {
+            target.takeDamage(settled, false);
+            fireTriggersForAlly(TriggerEvent.LETHAL_DAMAGE, target, target, 0);
+            died = target.getCurrentHp() <= 0;
+            if (died) {
+                target.perish();
+            }
+        } else {
+            died = target.takeDamage(settled);
+        }
         double hpLoss = hpBefore - target.getCurrentHp();
         double shieldAbsorbed = target.getLastShieldAbsorbed();
         // P8-7: "I was hit" -- a *different fact* from "I lost HP", and the difference is the whole

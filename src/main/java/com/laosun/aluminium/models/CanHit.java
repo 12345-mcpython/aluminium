@@ -502,6 +502,19 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return {@code true} if the entity died from this damage
      */
     public boolean takeDamage(double damage) {
+        return takeDamage(damage, true);
+    }
+
+    /**
+     * The same, with the death decision left to the caller ({@code mayDie = false}, 2026-10-02).
+     *
+     * <p><b>Why it exists.</b> 「受到**致命攻击**时不会陷入无法战斗状态，而是**回复**…」 needs the target to reach 0 HP and be asked about it
+     * BEFORE it is dead -- a unit at full HP cannot be healed, so announcing the moment before the damage would make the answer a
+     * no-op (that was this feature's first, wrong, attempt). With this overload {@code Battle.applyDamage} can drop the target to
+     * 0, fire {@link com.laosun.aluminium.enums.TriggerEvent#LETHAL_DAMAGE}, and then call {@link #perish()} only if nothing
+     * answered -- which is exactly 「不会陷入无法战斗状态」.
+     */
+    public boolean takeDamage(double damage, boolean mayDie) {
         lastShieldAbsorbed = 0;                      // clear it at the start of every settlement so a stale value cannot be read
         if (death || damage <= 0) {
             return false;
@@ -521,6 +534,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         currentHp -= damage;
         if (currentHp <= 0) {
             currentHp = 0;
+            if (!mayDie) {
+                return false;                        // at 0, alive, waiting to be asked
+            }
             death = true;
             return true;
         }

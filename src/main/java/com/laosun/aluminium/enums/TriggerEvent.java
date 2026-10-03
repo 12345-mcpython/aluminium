@@ -50,6 +50,20 @@ public enum TriggerEvent {
      * during an extra turn ("inserting another ultimate inside an extra turn turns 'extra' into infinite chain").
      */
     INSERTED_CAST_END("INSERTED_CAST_END", true),
+
+    /**
+     * An incoming hit that WOULD kill the target, announced before it is applied (2026-10-02).
+     *
+     * <p>「受到**致命攻击**时不会陷入无法战斗状态，而是**回复**等同于自身生命上限 20%／50% 的生命值」 — two readers, both registered
+     * before this existed (1408's transformed form, and 1104, whose own file records the sentence as missing).
+     *
+     * <p>\u2b50 The semantics the sentence states, and why "heal and then take the hit" is NOT it: the text says the unit does
+     * <b>not</b> fall, so the killing blow is <b>cancelled</b> when a listener answers -- if the heal were simply applied first,
+     * any hit larger than the heal would still kill, which is the opposite of 「不会陷入无法战斗状态」.
+     *
+     * <p>Fired from {@code Battle.applyDamage} right before {@code takeDamage}, which is the single place a target is hurt.
+     */
+    LETHAL_DAMAGE("LETHAL_DAMAGE", true),
     /**
      * ✅ {@code Battle.startBattle()} — delivered once to <b>every character's own table</b>, after the opening
      * hooks and before {@code processRequests}.
