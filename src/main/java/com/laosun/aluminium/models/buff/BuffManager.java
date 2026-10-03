@@ -950,6 +950,11 @@ public class BuffManager {
         int removed = 0;
         for (StateBuff buff : allBuffsOf(StateBuff.class)) {
             if (wanted.equals(buff.getState())) {
+                // 2026-10-02: an explicit removal ends the state just as a spent duration does, so the tables hear
+                // about it the same way. Readers: 1408 transformation end, 1412 raid end.
+                if (battle != null) {
+                    battle.fireStateEnded(instance, buff.getState());
+                }
                 removeBuff(buff);
                 removed++;
             }
