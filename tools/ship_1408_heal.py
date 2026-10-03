@@ -111,7 +111,10 @@ public class TransformationHealsOnAttackTest {
         Assertions.assertEquals(transform, owner.getBuffManager().hasState(STATE),
                 "precondition: the transformation is " + (transform ? "on" : "off"));
 
-        battle.applyTrueDamage(battle.enemies.get(0), owner, DamageElement.ICE, owner.getMaxHp() * 0.5);
+        // \u26a0 HALF OF CURRENT HP, never half of MAX HP: the transformation raises Max HP (to 3.7x) WITHOUT filling the pool, so
+        // "50% of Max HP" is lethal here -- and a dead unit heals nothing, which is exactly how the first three attempts
+        // measured a healthy 0.0 and looked like a broken HEAL. Measured: hurt=0.0 of 5312.8 after that hit.
+        battle.applyTrueDamage(battle.enemies.get(0), owner, DamageElement.ICE, owner.getCurrentHp() * 0.5);
         battle.processRequests();
         double hurt = owner.getCurrentHp();
         double maxHp = owner.getMaxHp();
