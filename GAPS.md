@@ -24366,6 +24366,37 @@
 >   （⚠ 预期形状：`on: DAMAGE_SETTLED` ＋ `when: ["self_resource:迷迷的声援 >= 1"]` ⇒ `{"op":"DAMAGE","scale":"<那个记号>","percent":0.28,"damage_type":"TRUE","element":…,"target":"target"}` ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（`ec784de4` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十二：🎉🎉🎉 **最后一个词到手：`scale: "original_damage"`**** —— ⭐ 而且代码里留着一句
+> **直接点名我用"重建表"判据把正确实现回滚了三次**的记录**）**）**：
+>
+> * ✅ **实测（读 `:4054`–`:4068` ✓）** ✓ 原文：
+>   ```java
+>   // ⚠ That detour was my own error, not the engine's: my first probes replaced the character's table with a
+>   // hand-built one to control variables, which also dropped `level_convention`, so the cast ran at the Lv1 row
+>   // (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy and rolled
+>   // a CORRECT implementation back three times (M-32's own trap, sprung by the judge).
+>   if ("original_damage".equals(scale)) {
+>       if (ctx == null || ctx.damage() == null) {
+>           throw new IllegalStateException(
+>               "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
+>               + "evaluated without one (it must hang on DAMAGE_SETTLED)");
+>       }
+>       …
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **记号是 `"original_damage"`** ✓ ⇒ ⭐ **`8007` 的 rider 现在**每一个字都确定了**** ✓；
+>   **(ii)** ⭐ **它**必须**挂在 `DAMAGE_SETTLED` 上** ✓（⚠ 否则**当场抛异常** ✓ —— ⭐ 又是那种"会自己说出病名"的设计 ✓）；
+>   **(iii)** ⭐⭐⭐ **代码里留有对**我自己的**判据手法的判决** ✓：*"my first probes **replaced the character's table with a hand-built one** … which also dropped `level_convention` … **rolled a CORRECT implementation back three times** (M-32's own trap, **sprung by the judge**)"* ✓
+>     ⇒ ⭐ **这是一条**比我的笔记硬得多**的纪律** ✓（⭐ **第七十三条**：⚠ **凡"重建表"的判据必须补回 `level_convention`，或改用真内容驱动** ✓）。
+> * ⭐⭐ **于是第 27 件的全部材料**齐了**** ✓（⚠ 下一轮两三次调用）✗：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "cheer_true_damage_rider",
+>     "when": ["self_resource:迷迷的声援 >= 1"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.28,
+>               "damage_type": "TRUE", "element": "<无属性要写哪个记号，待 grep>", "target": "target" } ] }
+>   ```
+>   ⚠ **唯一待查**：⭐ **"无属性"要写哪个 `element` 记号** ✗（⚠ 文档 `:144` 说真伤害是**无属性** ✓ ⇒ ⭐ **`DamageElement` 里应当有一个对应值** ✓ —— ⚠ **一次 grep** ✓，⚠ **按第 70 条纪律：直接读那个枚举文件** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`8d1d09e1` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -31827,6 +31858,37 @@
 > * ⚠ **只剩一个词** ✗：⭐ **那个 `case` 的 `scale` 记号**（⚠ 就在我读的窗口**上一行** ✓）⇒ ⭐ **下一轮一次读 ⇒ 然后写 `8007` 的 rider ⇒ 出货（第 27 件）** ✓
 >   （⚠ 预期形状：`on: DAMAGE_SETTLED` ＋ `when: ["self_resource:迷迷的声援 >= 1"]` ⇒ `{"op":"DAMAGE","scale":"<那个记号>","percent":0.28,"damage_type":"TRUE","element":…,"target":"target"}` ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（`ec784de4` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十二：🎉🎉🎉 **最后一个词到手：`scale: "original_damage"`**** —— ⭐ 而且代码里留着一句
+> **直接点名我用"重建表"判据把正确实现回滚了三次**的记录**）**）**：
+>
+> * ✅ **实测（读 `:4054`–`:4068` ✓）** ✓ 原文：
+>   ```java
+>   // ⚠ That detour was my own error, not the engine's: my first probes replaced the character's table with a
+>   // hand-built one to control variables, which also dropped `level_convention`, so the cast ran at the Lv1 row
+>   // (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy and rolled
+>   // a CORRECT implementation back three times (M-32's own trap, sprung by the judge).
+>   if ("original_damage".equals(scale)) {
+>       if (ctx == null || ctx.damage() == null) {
+>           throw new IllegalStateException(
+>               "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
+>               + "evaluated without one (it must hang on DAMAGE_SETTLED)");
+>       }
+>       …
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐⭐ **记号是 `"original_damage"`** ✓ ⇒ ⭐ **`8007` 的 rider 现在**每一个字都确定了**** ✓；
+>   **(ii)** ⭐ **它**必须**挂在 `DAMAGE_SETTLED` 上** ✓（⚠ 否则**当场抛异常** ✓ —— ⭐ 又是那种"会自己说出病名"的设计 ✓）；
+>   **(iii)** ⭐⭐⭐ **代码里留有对**我自己的**判据手法的判决** ✓：*"my first probes **replaced the character's table with a hand-built one** … which also dropped `level_convention` … **rolled a CORRECT implementation back three times** (M-32's own trap, **sprung by the judge**)"* ✓
+>     ⇒ ⭐ **这是一条**比我的笔记硬得多**的纪律** ✓（⭐ **第七十三条**：⚠ **凡"重建表"的判据必须补回 `level_convention`，或改用真内容驱动** ✓）。
+> * ⭐⭐ **于是第 27 件的全部材料**齐了**** ✓（⚠ 下一轮两三次调用）✗：
+>   ```json
+>   { "on": "DAMAGE_SETTLED", "id": "cheer_true_damage_rider",
+>     "when": ["self_resource:迷迷的声援 >= 1"],
+>     "do": [ { "op": "DAMAGE", "scale": "original_damage", "percent": 0.28,
+>               "damage_type": "TRUE", "element": "<无属性要写哪个记号，待 grep>", "target": "target" } ] }
+>   ```
+>   ⚠ **唯一待查**：⭐ **"无属性"要写哪个 `element` 记号** ✗（⚠ 文档 `:144` 说真伤害是**无属性** ✓ ⇒ ⭐ **`DamageElement` 里应当有一个对应值** ✓ —— ⚠ **一次 grep** ✓，⚠ **按第 70 条纪律：直接读那个枚举文件** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`8d1d09e1` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
