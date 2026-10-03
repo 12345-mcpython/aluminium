@@ -117,7 +117,10 @@ public class TransformationHealsOnAttackTest {
         double maxHp = owner.getMaxHp();
         Assertions.assertTrue(hurt < maxHp, "precondition: she was really hurt (" + hurt + " of " + maxHp + ")");
 
-        Skill skill = owner.getSkills().get(SkillType.SKILL);
+        // \u26a0 Her BASIC attack, not her skill: the document says 卡厄斯兰那「拥有 1 个强化普攻和 2 个强化战技」, so the transformed
+        // form attacks with the basic slot.
+        Skill skill = owner.getSkills().get(SkillType.COMMON);
+        Assertions.assertNotNull(skill, "precondition: she has a basic attack");
         SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies.get(0)));
         battle.processRequests();
         return (owner.getCurrentHp() - hurt) / maxHp;
