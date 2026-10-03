@@ -139,17 +139,19 @@ public class PeerageSkillPierceTest {
 
         Skill skill = owner.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
-        // \u2b50 2026-10-02: no judge in this repo ever cast twice, so the charge is driven the way the suite already drives
-        // events -- hand-fired SKILL_CAST -- six times, one per point the document promises. That is what promotes the
-        // merit holder (`RESOURCE_CHANGED` -> `peerage_upgrade_at_six_charge`).
+        // \u2b50 2026-10-02 diagnostic: hand-fire SKILL_CAST six times and record the charge after each one. The list itself is
+        // the evidence -- 1,1,1,1,1,1 means the gain never lands; 1,2,3,4,5,6 means it lands and something else is wrong.
+        StringBuilder seen = new StringBuilder();
         for (int i = 0; i < charge; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, ally, 0, 0);
             battle.processRequests();
+            seen.append(owner.getResources().has("\u5145\u80fd")
+                    ? owner.getResources().value("\u5145\u80fd") : 0).append(',');
         }
         Assertions.assertTrue(ally.getBuffManager().hasState("\u519b\u529f"),
                 "precondition: the ally holds the merit");
         Assertions.assertEquals(6, owner.getResources().has("\u5145\u80fd")
-                ? owner.getResources().value("\u5145\u80fd") : 0, "charge reached its threshold");
+                ? owner.getResources().value("\u5145\u80fd") : 0, "charge reached its threshold -- trace: " + seen);
         Assertions.assertTrue(ally.getBuffManager().hasState("\u7235\u4f4d"),
                 "at six charge the merit holder is promoted to the peerage");
 
