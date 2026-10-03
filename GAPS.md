@@ -24256,6 +24256,33 @@
 >     （⚠ 看 `:2701` 的 `base` 从哪来 ✓，⭐ **以及谁调用它** ✓ —— ⚠ **若调用点正是"某次伤害之后"** ⇒ ⭐ **那 `8007` 的 28% 也许只差一个比例参数** ✓）。
 > * ⚠ **推送**：本地仍**领先 11** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十七：🎉🎉🎉 **两条登记同时被推翻** —— ⭐ `applyTrueDamage` **早在树上**，
+> 而且它的 javadoc **逐字点名了"原伤害 × %"这种派生形式****）**）**：
+>
+> * ✅ **实测（读 `Battle:2705`–`:2715` ✓）** ✓ 全文：
+>   ```java
+>   /**
+>    * True damage: a fixed amount, or a derived value such as "this attack's total damage × %" -- it **skips every
+>    * damage zone** and does not count as an attack.
+>    * <p>{@code notCountsAsAttack()} is likewise set: the victim gains no energy and no toughness is reduced; but it is
+>    * attributed to the attacker, so on a kill the attacker still settles kill energy gain.
+>    * @param base the true damage amount (no longer affected by defence/resistance/DMG boost/crit/vulnerability)
+>    */
+>   public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
+>       Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
+>       return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), EnergyGrant.KILL_ONLY);
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **`applyTrueDamage` 存在** ✓ ⇒ ⭐ **"真伤害"是**已建成**的能力** ✓（⚠ 我上一轮登记它为"缺口" ✗）；
+>   **(ii)** ⭐⭐ **javadoc 逐字写着** *"a fixed amount, **or a derived value such as 'this attack's total damage × %'"*** ✓✓
+>     ⇒ ⭐ **这**正是 `8007` 的"等同于**原伤害**的 28%"** ✓✓ ⇒ ⭐ **所以那条也**不是缺口**** ✓（⭐ **第七十次自我纠正** ✓）；
+>   **(iii)** ⭐ **它与文档 `138:144` 的两条语义**逐字对应**** ✓：**"skips every damage zone"** ＝「不受任何效果所影响」✓；
+>     **`notCountsAsAttack()`** ＝「**不视为造成了 1 次攻击**」✓（⚠ 连"受害者不回能、不削韧"都写了 ✓）。
+> * ⭐⭐ **于是 `8007` 的 28% 完全可做** ✓（⚠ 下一轮两次调用）✗：⭐ **只差确认"内容侧怎么写"** ✗
+>   ⇒ ⭐ **`DAMAGE` 的 `damage_type`** 很可能就接受 **`TRUE`** ✓（⚠ 本段读过 **`DAMAGE_TYPE_READERS`** ✓ —— ⚠ 那个集合**就是"哪些 op 会读 `damage_type`"** ✓ ⇒ ⭐ **看 `DAMAGE` 在不在里面** ✓，**一次 grep** ✓）；
+>     ⭐ **而 `base` 的"原伤害 × %"** 在内容侧怎么写 ⇒ ⭐ **`DAMAGE` 若支持 `percent` 相对事件伤害** ✓（⚠ 本段只见过"相对属性" ✗ ⇒ ⭐ **待查** ✓）。
+> * ⚠ **推送**：⭐ **本轮已推送成功** ✓（`2ae46535..c51fcf0d` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -31607,6 +31634,33 @@
 >   ⚠ **而真正剩下的可能只有"**按原伤害的 28%**"这一个量** ✗ ⇒ ⭐ **下一轮第一步**：⭐ **读 `Battle:2640`–`:2710`** ✓
 >     （⚠ 看 `:2701` 的 `base` 从哪来 ✓，⭐ **以及谁调用它** ✓ —— ⚠ **若调用点正是"某次伤害之后"** ⇒ ⭐ **那 `8007` 的 28% 也许只差一个比例参数** ✓）。
 > * ⚠ **推送**：本地仍**领先 11** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百五十七：🎉🎉🎉 **两条登记同时被推翻** —— ⭐ `applyTrueDamage` **早在树上**，
+> 而且它的 javadoc **逐字点名了"原伤害 × %"这种派生形式****）**）**：
+>
+> * ✅ **实测（读 `Battle:2705`–`:2715` ✓）** ✓ 全文：
+>   ```java
+>   /**
+>    * True damage: a fixed amount, or a derived value such as "this attack's total damage × %" -- it **skips every
+>    * damage zone** and does not count as an attack.
+>    * <p>{@code notCountsAsAttack()} is likewise set: the victim gains no energy and no toughness is reduced; but it is
+>    * attributed to the attacker, so on a kill the attacker still settles kill energy gain.
+>    * @param base the true damage amount (no longer affected by defence/resistance/DMG boost/crit/vulnerability)
+>    */
+>   public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
+>       Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
+>       return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), EnergyGrant.KILL_ONLY);
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **`applyTrueDamage` 存在** ✓ ⇒ ⭐ **"真伤害"是**已建成**的能力** ✓（⚠ 我上一轮登记它为"缺口" ✗）；
+>   **(ii)** ⭐⭐ **javadoc 逐字写着** *"a fixed amount, **or a derived value such as 'this attack's total damage × %'"*** ✓✓
+>     ⇒ ⭐ **这**正是 `8007` 的"等同于**原伤害**的 28%"** ✓✓ ⇒ ⭐ **所以那条也**不是缺口**** ✓（⭐ **第七十次自我纠正** ✓）；
+>   **(iii)** ⭐ **它与文档 `138:144` 的两条语义**逐字对应**** ✓：**"skips every damage zone"** ＝「不受任何效果所影响」✓；
+>     **`notCountsAsAttack()`** ＝「**不视为造成了 1 次攻击**」✓（⚠ 连"受害者不回能、不削韧"都写了 ✓）。
+> * ⭐⭐ **于是 `8007` 的 28% 完全可做** ✓（⚠ 下一轮两次调用）✗：⭐ **只差确认"内容侧怎么写"** ✗
+>   ⇒ ⭐ **`DAMAGE` 的 `damage_type`** 很可能就接受 **`TRUE`** ✓（⚠ 本段读过 **`DAMAGE_TYPE_READERS`** ✓ —— ⚠ 那个集合**就是"哪些 op 会读 `damage_type`"** ✓ ⇒ ⭐ **看 `DAMAGE` 在不在里面** ✓，**一次 grep** ✓）；
+>     ⭐ **而 `base` 的"原伤害 × %"** 在内容侧怎么写 ⇒ ⭐ **`DAMAGE` 若支持 `percent` 相对事件伤害** ✓（⚠ 本段只见过"相对属性" ✗ ⇒ ⭐ **待查** ✓）。
+> * ⚠ **推送**：⭐ **本轮已推送成功** ✓（`2ae46535..c51fcf0d` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
