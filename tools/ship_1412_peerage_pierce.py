@@ -143,7 +143,7 @@ public class PeerageSkillPierceTest {
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule(TriggerEvent.DEALING_DAMAGE.name(), List.of(), always),
                 TriggerSpecs.rule(TriggerEvent.DEALING_DAMAGE.name(),
-                        List.of("self_attr:DEFENCE_IGNORE >= 0.36"), probe))));
+                        List.of("self_attr:DEFENCE_IGNORE >= 0.19"), probe))));
 
         Skill skill = owner.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
