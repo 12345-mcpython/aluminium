@@ -21456,6 +21456,27 @@
 >   | 读者 | ⭐ **她 +`#2` 点充能** ✓（⚠ `#2` 仍待取 ✓） |
 > * ⚠ **推送**：本地仍**领先 14** ✗（网络十五连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十一：🎯🎯🎯 **两个占位符的名字找到了** —— `#1 = MDF_DamageIncrease`、`#2 = MDF_ExtraPoint`；⭐ 而承载它们的是 **`MServant_CyreneServant_00_AmazingBuff_Cerydra`** 这个 Modifier）**）**：
+>
+> * ✅ **实测（全量搜文案 id ⇒ 找到消费者 ⇒ 读它周边 ✓）** ✓：
+>   `ExcelOutput\AvatarStatusConfig.json:11387` ✓ 的实体是：
+>   ```json
+>   { "StatusID": 100141521,
+>     "ModifierName": "MServant_**CyreneServant**_00_AmazingBuff_**Cerydra**",
+>     "StatusType": "Buff",
+>     "StatusDesc": { "Hash": 1284115273769523069 },            // ⭐ 就是那句「…奇袭结束后，刻律德菈获得 #2 点充能」
+>     "StatusIconPath": "SpriteOutput/BuffIcon/Inlevel/Avatar/Icon1415Servantskil.png",
+>     "ReadParamList": [ "**MDF_DamageIncrease**", "**MDF_ExtraPoint**" ] }   // ⭐⭐ #1 与 #2 的名字
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **`#1` = `MDF_DamageIncrease`** ✓（"持【军功】者暴伤 +`#1`%" ✓）；
+>   **(ii)** ⭐⭐ **`#2` = `MDF_ExtraPoint`** ✓（"**奇袭结束后，刻律德菈获得 `#2` 点充能**" ✓）；
+>   **(iii)** ⚠ 这条状态的名字里带着 **`CyreneServant`** ✗（⚠ **昔涟的忆灵/召唤物** ✓ —— ⭐ 即"**德谬歌**"那一族 ✓✓）
+>     ⇒ ⭐ **所以"奇袭结束后给刻律德菈充能"这件事，是**昔涟侧**的一条增益** ✓（⚠ 与目标 ① 名单里那句"**那张光锥的**「奇袭结束后」"**未必同源** ✗
+>       ⇒ ⚠ **口径要再核** ✓ —— 本段第 **二十六** 次自我纠正预备 ✓）。
+> * ⭐⭐ **下一轮第一步（一次 grep，取数值）** ✗：搜 **`MDF_ExtraPoint`** ✓（⚠ 与它赋值的 `Modifier` 定义应同处 ✓）
+>   ⇒ ⭐ 拿到 `#2` 的**实际点数** ✓ ⇒ ⭐ **读者规则就能写出** ✓（`on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}` ✓）。
+> * ⚠ **推送**：本地仍**领先 15** ✗（网络十六连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -25977,6 +25998,27 @@
 >   | 结束 | ⭐ **"奇袭结束" ⇒ `STATE_ENDED("奇袭")`** ✓ |
 >   | 读者 | ⭐ **她 +`#2` 点充能** ✓（⚠ `#2` 仍待取 ✓） |
 > * ⚠ **推送**：本地仍**领先 14** ✗（网络十五连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十一：🎯🎯🎯 **两个占位符的名字找到了** —— `#1 = MDF_DamageIncrease`、`#2 = MDF_ExtraPoint`；⭐ 而承载它们的是 **`MServant_CyreneServant_00_AmazingBuff_Cerydra`** 这个 Modifier）**）**：
+>
+> * ✅ **实测（全量搜文案 id ⇒ 找到消费者 ⇒ 读它周边 ✓）** ✓：
+>   `ExcelOutput\AvatarStatusConfig.json:11387` ✓ 的实体是：
+>   ```json
+>   { "StatusID": 100141521,
+>     "ModifierName": "MServant_**CyreneServant**_00_AmazingBuff_**Cerydra**",
+>     "StatusType": "Buff",
+>     "StatusDesc": { "Hash": 1284115273769523069 },            // ⭐ 就是那句「…奇袭结束后，刻律德菈获得 #2 点充能」
+>     "StatusIconPath": "SpriteOutput/BuffIcon/Inlevel/Avatar/Icon1415Servantskil.png",
+>     "ReadParamList": [ "**MDF_DamageIncrease**", "**MDF_ExtraPoint**" ] }   // ⭐⭐ #1 与 #2 的名字
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **`#1` = `MDF_DamageIncrease`** ✓（"持【军功】者暴伤 +`#1`%" ✓）；
+>   **(ii)** ⭐⭐ **`#2` = `MDF_ExtraPoint`** ✓（"**奇袭结束后，刻律德菈获得 `#2` 点充能**" ✓）；
+>   **(iii)** ⚠ 这条状态的名字里带着 **`CyreneServant`** ✗（⚠ **昔涟的忆灵/召唤物** ✓ —— ⭐ 即"**德谬歌**"那一族 ✓✓）
+>     ⇒ ⭐ **所以"奇袭结束后给刻律德菈充能"这件事，是**昔涟侧**的一条增益** ✓（⚠ 与目标 ① 名单里那句"**那张光锥的**「奇袭结束后」"**未必同源** ✗
+>       ⇒ ⚠ **口径要再核** ✓ —— 本段第 **二十六** 次自我纠正预备 ✓）。
+> * ⭐⭐ **下一轮第一步（一次 grep，取数值）** ✗：搜 **`MDF_ExtraPoint`** ✓（⚠ 与它赋值的 `Modifier` 定义应同处 ✓）
+>   ⇒ ⭐ 拿到 `#2` 的**实际点数** ✓ ⇒ ⭐ **读者规则就能写出** ✓（`on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}` ✓）。
+> * ⚠ **推送**：本地仍**领先 15** ✗（网络十六连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
