@@ -109,12 +109,12 @@ public class NewBudOnHpLossTest {
         // the enemy never touched her, so EVERY earlier draft failed for one trivial reason -- no HP loss ever happened.
         // \u26a0 And a BARE `CanHit.takeDamage(double)` does not reach `Battle`'s HP-loss dispatch either (`Battle:2085` lives
         // inside the battle's own damage path). So damage her through the battle's own entry point:
-        double dealt = battle.applyTrueDamage(battle.enemies.get(0), owner, DamageElement.ICE, 100.0);
+        double dealt = battle.applyTrueDamage(battle.enemies.get(0), owner, DamageElement.ICE, 50.0);
         battle.processRequests();
-        Assertions.assertEquals(100.0, dealt, "precondition: the battle really took 100 HP off her");
+        Assertions.assertEquals(50.0, dealt, "precondition: the battle really took 50 HP off her");
 
-        // \u2b50 And the engine honours "per point" by itself: 100 HP lost -> exactly 100 buds, from an `amount: 1` rule.
-        Assertions.assertEquals(before + 100, battle.partyResource(RES).value(),
+        // \u2b50 And the engine honours "per point" by itself: 50 HP lost -> exactly 50 buds, from an `amount: 1` rule.
+        Assertions.assertEquals(before + 50, battle.partyResource(RES).value(),
                 "\u300c\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u9050\u8776\u83b7\u5f97 1 \u70b9\u3010\u65b0\u854a\u3011\u300d (before=" + before + ")");
     }
 }
