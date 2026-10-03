@@ -1,21 +1,26 @@
-"""Wire the capped-credit chain into TriggerInterpreter (2026-10-02).
+"""Wire the capped-credit chain into TriggerInterpreter (2026-10-02) -- slice-based, self-asserting.
 
-This is the second half of the `amountFromPrevious` capability -- the first half (the `EffectSpec` field and its copy line)
-is already in the tree. Every anchor below was read from the file, and `applyOne` has exactly ONE call site
-(TriggerInterpreter:918), so widening its signature is safe.
+The first attempt at this patch failed to compile, and the compiler named the reason exactly:
+
+    error: cannot find symbol
+        amount = (int) Math.round(previousCredited
+       symbol:   variable amount
+
+Both `amount` and `previousCredited` were out of scope, which means the insert landed OUTSIDE `gainResource`. The cause:
+the anchor text `if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {` occurs TWICE in the file -- at :1315 (not
+ours) and at :1347 (ours) -- and a plain `str.replace(..., 1)` takes the first. So this version slices the source at the
+`gainResource` definition and edits only what follows it, and every replacement asserts that it changed something.
 
 Reader (>= 2): 1505's eidolon 「触发行迹…的获得好活当赏效果时，额外获得等同于本次获得的【好活当赏】50%/100% 的
 【好活当赏】」 -- the 50% and the 100% are the two readers.
 
-Design note: the repo's own comment beside that call site says to pass per-rule data DOWN rather than keep shared state
-("a nested firing would clobber shared state"), so this threads a loop local through `applyOne` into `gainResource`
-instead of using a field, a ThreadLocal or a new TriggerContext component.
-
-The amount is measured from the holder before and after the effect runs, so the declared cap is included by construction:
-150 energy -> the trace credits 100 (capped) -> the eidolon's 50% is 50 -> 150 in total.
+Design note: the repo's own comment beside the `applyOne` call site says to pass per-rule data DOWN rather than keep
+shared state ("a nested firing would clobber shared state"), so a loop local is threaded through `applyOne` into
+`gainResource`. The credited amount is measured from the holder before and after the effect runs, so the declared cap is
+included by construction: 150 energy -> the trace credits 100 (capped) -> the eidolon's 50% is 50 -> 150 in total.
 
 Run:  python tools/patch_credit_chain.py
-Then: full suite must stay green (no content uses the new branch yet), and the next step is the 1505 rule + its judge.
+Then: full suite must stay green (no content uses the new branch yet).
 ASCII only in the code; the one Chinese comment mirrors the rule it serves.
 """
 import io
@@ -23,11 +28,11 @@ import sys
 
 PATH = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 
+GAIN_DEF = "    private static void gainResource(EffectSpec effect, TriggerContext ctx) {"
 LOOP_LOCAL_ANCHOR = "        int effectIndex = 0;\n"
 CALL_SITE = "            applyOne(battle, effect, effectCtx);\n"
-APPLY_ONE_SIG = ("    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {")
+APPLY_ONE_SIG = "    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {"
 DISPATCH = "                gainResource(effect, ctx);"
-GAIN_SIG = "    private static void gainResource(EffectSpec effect, TriggerContext ctx) {"
 BRANCH_ANCHOR = "        if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {"
 
 NEW_CALL_SITE = '''            if ("GAIN_RESOURCE".equals(normalizeOp(effect, null))) {
@@ -53,24 +58,38 @@ NEW_BRANCH = '''        if (Boolean.TRUE.equals(effect.getAmountFromPrevious()))
                     * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
         } else ''' + BRANCH_ANCHOR
 
+
+def must_replace(text, old, new, label):
+    if old not in text:
+        sys.exit("anchor missing: " + label)
+    return text.replace(old, new, 1)
+
+
 src = io.open(PATH, encoding="utf-8").read()
 if "previousCredited" in src:
     print("already patched")
     sys.exit(0)
 
-for needed in (LOOP_LOCAL_ANCHOR, CALL_SITE, APPLY_ONE_SIG, DISPATCH, GAIN_SIG, BRANCH_ANCHOR):
-    if needed not in src:
-        sys.exit("anchor missing: " + needed[:60])
+if GAIN_DEF not in src:
+    sys.exit("the gainResource definition is missing")
+cut = src.index(GAIN_DEF)
+head, body = src[:cut], src[cut:]
 
-src = src.replace(LOOP_LOCAL_ANCHOR, LOOP_LOCAL_ANCHOR + "        double previousCredited = 0;\n", 1)
-src = src.replace(CALL_SITE, NEW_CALL_SITE, 1)
-src = src.replace(APPLY_ONE_SIG,
-                  "    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx,\n"
-                  "            double previousCredited) {", 1)
-src = src.replace(DISPATCH, "                gainResource(effect, ctx, previousCredited);", 1)
-src = src.replace(GAIN_SIG,
-                  "    private static void gainResource(EffectSpec effect, TriggerContext ctx, double previousCredited) {", 1)
-src = src.replace(BRANCH_ANCHOR, NEW_BRANCH, 1)
+# The loop local and the call site live BEFORE gainResource; the signature and the new branch live inside it.
+head = must_replace(head, LOOP_LOCAL_ANCHOR, LOOP_LOCAL_ANCHOR + "        double previousCredited = 0;\n", "loop local")
+head = must_replace(head, CALL_SITE, NEW_CALL_SITE, "call site")
+head = must_replace(head, APPLY_ONE_SIG,
+                    "    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx,\n"
+                    "            double previousCredited) {", "applyOne signature")
+head = must_replace(head, DISPATCH, "                gainResource(effect, ctx, previousCredited);", "dispatch")
 
-io.open(PATH, "w", encoding="utf-8", newline="\n").write(src)
-print("ok   TriggerInterpreter: the credit chain is wired")
+body = must_replace(body, GAIN_DEF,
+                    "    private static void gainResource(EffectSpec effect, TriggerContext ctx,\n"
+                    "            double previousCredited) {", "gainResource signature")
+body = must_replace(body, BRANCH_ANCHOR, NEW_BRANCH, "the amountFromEvent branch")
+
+out = head + body
+if out.count("previousCredited") < 6:
+    sys.exit("the patch looks incomplete")
+io.open(PATH, "w", encoding="utf-8", newline="\n").write(out)
+print("ok   TriggerInterpreter: the credit chain is wired (slice-based)")

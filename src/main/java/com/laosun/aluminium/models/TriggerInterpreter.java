@@ -902,6 +902,7 @@ public final class TriggerInterpreter {
      */
     public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
         int effectIndex = 0;
+        double previousCredited = 0;
         for (EffectSpec effect : rule.effects()) {
             final int thisEffect = effectIndex++;
             // 「终结技的持续时间额外增加 1 回合」/「天赋的伤害提高效果额外提高 10%」 (2026-09-28): an amendment to the
@@ -915,7 +916,20 @@ public final class TriggerInterpreter {
             // The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance, and the only
             // op that consumes that amendment (APPLY_CONTROL) has to know which rule it is running inside. Passing it
             // down beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.
-            applyOne(battle, effect, effectCtx);
+            if ("GAIN_RESOURCE".equals(normalizeOp(effect, null))) {
+                // ⭐ 2026-10-02: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
+                // take a share of. Measured from the holder itself, so the cap is included by construction.
+                CanHit holder = resolveTarget(effect, effectCtx);
+                String resourceId = effect.getResource();
+                int creditedBefore = holder.getResources().has(resourceId)
+                        ? holder.getResources().value(resourceId) : 0;
+                applyOne(battle, effect, effectCtx, previousCredited);
+                int creditedAfter = holder.getResources().has(resourceId)
+                        ? holder.getResources().value(resourceId) : 0;
+                previousCredited = creditedAfter - creditedBefore;
+            } else {
+                applyOne(battle, effect, effectCtx, previousCredited);
+            }
         }
     }
 
@@ -1047,7 +1061,8 @@ public final class TriggerInterpreter {
         return unit == null ? "" : "@" + System.identityHashCode(unit);
     }
 
-    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx,
+            double previousCredited) {
         String op = normalizeOp(effect, null);
         switch (op) {
             case "ADD_ELEMENTAL_WEAKNESS" -> {
@@ -1155,7 +1170,7 @@ public final class TriggerInterpreter {
                 CanHit mover = ctx.owner();
                 String movedId = effect.getResource();
                 int before = resourceAmount(battle, mover, movedId);
-                gainResource(effect, ctx);
+                gainResource(effect, ctx, previousCredited);
                 fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
             }
             case "SPEND_RESOURCE" -> {
@@ -1338,13 +1353,19 @@ public final class TriggerInterpreter {
         battle.grantEnergy(target, effect.getPercent() * maxEnergy);
     }
 
-    private static void gainResource(EffectSpec effect, TriggerContext ctx) {
+    private static void gainResource(EffectSpec effect, TriggerContext ctx,
+            double previousCredited) {
         CanHit holder = resolveTarget(effect, ctx);
         // \u2705 A gain whose amount is a SHARE of an attribute (2026-09-30; reader: 1505\u2019s talent \u300c\u83b7\u5f97\u7b49\u540c\u4e8e\u66b4\u51fb\u4f24\u5bb9
         // 50% \u7684\u6b22\u6109\u5ea6\u300d). `scaledAmount` stays literal-only on purpose: this share is read off the HOLDER, which only
         // this method has resolved. Unknown attribute names are refused loudly rather than silently adding zero.
         int amount;
-        if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+        if (Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
+            // ⭐ 2026-10-02 读者：1505 星魂 「额外获得等同于本次获得的【好活当赏】50%/100%」。
+            // 取的是前一条效果已经过上限截断的入账量。
+            amount = (int) Math.round(previousCredited
+                    * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+        } else         if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
             // \u2705 The event\u2019s own magnitude (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c\u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d is exactly this -- the
             // amount is not a literal and not an attribute, it is what the trigger just reported.
             amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
