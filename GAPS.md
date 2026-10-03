@@ -24122,6 +24122,33 @@
 >   ⇒ ⭐ **闸门挡住了半成品** ✓（⭐ 与"提交过一次红树"那次形成对照 ✓）。
 > * ⚠ **推送**：本地**领先 1** ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓（⚠ 待推的是**脚本**这一笔 ✓，内容**没进** ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百五十：🎯🎯🎯 **拦路者的前提读清了** —— ⭐ 它是一条**普查（census）**，而且它**指对了正确的做法**）**）**：
+>
+> * ✅ **实测（读 `RemembranceTrailblazerTest.hisFileCarriesTheClauses()` ✓）** ✓ 全文骨架：
+>   ```java
+>   /** Census: the summon (Skill), the summon (Ultimate) and the level convention. */
+>   @Test
+>   public void hisFileCarriesTheClauses() {
+>       for (int cid : new int[]{8007, 8008}) {
+>           var table = TriggerTables.of(cid);
+>           Assertions.assertEquals(1, table.ruleCount(SKILL_CAST),  "cid " + cid);
+>           Assertions.assertEquals(1, table.ruleCount(ULT_CAST),    "cid " + cid);
+>           Assertions.assertEquals(1, table.ruleCount(BATTLE_START), "cid " + cid);
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **它的 javadoc 自己说了它是**普查****（*"Census: the summon (Skill), the summon (Ultimate) and the level convention"* ✓）；
+>   **(ii)** ⭐ **它按事件计数**（`SKILL_CAST`／`ULT_CAST`／`BATTLE_START` 各 **1** 条 ✓）⇒ ⚠ **我新加的那条 `SKILL_CAST` 让它变成了 2** ✗；
+>   **(iii)** ⭐⭐⭐ **而它同时**指对了路**** ✓ —— ⚠ `8007` 的 `SKILL_CAST` **本来就已经有一条**（"召唤迷迷；若已在场则回复其生命上限 100% 并获 6 点气氛值" ✓）
+>     ⇒ ⭐ **所以正确做法**不是再加第二条 `SKILL_CAST`** ✗，⭐ **而是把"行动提前 100% ＋ 附上【迷迷的声援】"**并进那一条的 `do`**** ✓✓
+>       —— ⭐ **而且这在语义上正是对的**：⭐ **文档 `:143` 那一整句**就是这**一个战技**的效果** ✓（⚠ 本段在 `1402` 的忆灵技能上见过同样的"一句话 = 一条规则"的处理 ✓）。
+> * ⭐⭐ **于是第 26 件有了**不碰任何既有判据**的写法** ✓（⚠ 下一轮）：
+>   ① ⭐ **读 `8007.json` 现有那条 `SKILL_CAST` 规则** ✓ ⇒ ⭐ **在它的 `do` 末尾追加** `ADVANCE{percent: 1.0, target: …}` ＋ `APPLY_BUFF{迷迷的声援, turns: 3, target: …}` ✓
+>     （⚠ `target` 要与那条规则里"指定我方单体"的既有写法一致 ✓ —— ⭐ **照它自己的来** ✓）；
+>   ② ⭐ **判据不变**（`MimiCheerTest` ✓ 已绿、已验变异 ✓）⇒ `SKILL_CAST` 计数**仍是 1** ⇒ ⭐ **普查不红** ✓；
+>   ③ ⇒ **全量绿** ⇒ **闸门** ⇒ ⭐ **出货（第 26 件）** ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -31340,6 +31367,33 @@
 >   ⇒ ⭐ **闸门挡住了半成品** ✓（⭐ 与"提交过一次红树"那次形成对照 ✓）。
 > * ⚠ **推送**：本地**领先 1** ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓（⚠ 待推的是**脚本**这一笔 ✓，内容**没进** ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百五十：🎯🎯🎯 **拦路者的前提读清了** —— ⭐ 它是一条**普查（census）**，而且它**指对了正确的做法**）**）**：
+>
+> * ✅ **实测（读 `RemembranceTrailblazerTest.hisFileCarriesTheClauses()` ✓）** ✓ 全文骨架：
+>   ```java
+>   /** Census: the summon (Skill), the summon (Ultimate) and the level convention. */
+>   @Test
+>   public void hisFileCarriesTheClauses() {
+>       for (int cid : new int[]{8007, 8008}) {
+>           var table = TriggerTables.of(cid);
+>           Assertions.assertEquals(1, table.ruleCount(SKILL_CAST),  "cid " + cid);
+>           Assertions.assertEquals(1, table.ruleCount(ULT_CAST),    "cid " + cid);
+>           Assertions.assertEquals(1, table.ruleCount(BATTLE_START), "cid " + cid);
+>       }
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **它的 javadoc 自己说了它是**普查****（*"Census: the summon (Skill), the summon (Ultimate) and the level convention"* ✓）；
+>   **(ii)** ⭐ **它按事件计数**（`SKILL_CAST`／`ULT_CAST`／`BATTLE_START` 各 **1** 条 ✓）⇒ ⚠ **我新加的那条 `SKILL_CAST` 让它变成了 2** ✗；
+>   **(iii)** ⭐⭐⭐ **而它同时**指对了路**** ✓ —— ⚠ `8007` 的 `SKILL_CAST` **本来就已经有一条**（"召唤迷迷；若已在场则回复其生命上限 100% 并获 6 点气氛值" ✓）
+>     ⇒ ⭐ **所以正确做法**不是再加第二条 `SKILL_CAST`** ✗，⭐ **而是把"行动提前 100% ＋ 附上【迷迷的声援】"**并进那一条的 `do`**** ✓✓
+>       —— ⭐ **而且这在语义上正是对的**：⭐ **文档 `:143` 那一整句**就是这**一个战技**的效果** ✓（⚠ 本段在 `1402` 的忆灵技能上见过同样的"一句话 = 一条规则"的处理 ✓）。
+> * ⭐⭐ **于是第 26 件有了**不碰任何既有判据**的写法** ✓（⚠ 下一轮）：
+>   ① ⭐ **读 `8007.json` 现有那条 `SKILL_CAST` 规则** ✓ ⇒ ⭐ **在它的 `do` 末尾追加** `ADVANCE{percent: 1.0, target: …}` ＋ `APPLY_BUFF{迷迷的声援, turns: 3, target: …}` ✓
+>     （⚠ `target` 要与那条规则里"指定我方单体"的既有写法一致 ✓ —— ⭐ **照它自己的来** ✓）；
+>   ② ⭐ **判据不变**（`MimiCheerTest` ✓ 已绿、已验变异 ✓）⇒ `SKILL_CAST` 计数**仍是 1** ⇒ ⭐ **普查不红** ✓；
+>   ③ ⇒ **全量绿** ⇒ **闸门** ⇒ ⭐ **出货（第 26 件）** ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
