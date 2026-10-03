@@ -95,26 +95,31 @@ public class ControlImmunityTest {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character applier = CharacterFactory.create(APPLIER, 80);
         applier.setTriggerTable(new TriggerTable(APPLIER, List.of(
-                TriggerSpecs.rule(TriggerEvent.BATTLE_START.name(), List.of(), control()))));
+                TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), control()))));
 
         Battle battle = new Battle(List.of(owner, applier),
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
 
         if (transform) {
-            battle.startBattle();
-            battle.processRequests();
             Skill ult = owner.getSkills().get(SkillType.ULTRA);
             Assertions.assertNotNull(ult, "precondition: she has an ultimate");
             SkillExecutor.execute(battle, ult, owner, List.of(owner));
             battle.processRequests();
             Assertions.assertTrue(owner.getBuffManager().hasState(STATE), "precondition: the transformation is on");
         } else {
-            // \u26a0 The applier's control fires at BATTLE_START, so the untransformed run must let it land BEFORE anything else --
-            // hence the same startBattle(), and the assertion below is that the control is there and 变身 is not.
-            battle.startBattle();
-            battle.processRequests();
             Assertions.assertFalse(owner.getBuffManager().hasState(STATE), "precondition: not transformed");
         }
+        Assertions.assertFalse(owner.getBuffManager().hasState(FREEZE),
+                "precondition: nothing has controlled her yet");
+
+        // \u2b50 NOW the control is aimed at her -- AFTER the transformation, which is the whole point. Measured: a control that lands at
+        // BATTLE_START is simply there when the transformation begins, and immunity cannot retroactively remove it.
+        Skill theirs = applier.getSkills().get(SkillType.SKILL);
+        Assertions.assertNotNull(theirs, "precondition: the applier has a skill");
+        SkillExecutor.execute(battle, theirs, applier, List.of(battle.enemies.getFirst()));
+        battle.processRequests();
         return owner.getBuffManager().hasState(FREEZE);
     }
 
