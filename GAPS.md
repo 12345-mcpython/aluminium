@@ -22726,6 +22726,33 @@
 >   ⇒ ⭐ **下一轮先花一次调用确认 (甲) 或 (乙) 可行** ✓，⚠ 若两条都不行 ⇒ ⭐ **按纪律登记**"缺'结算点读属性'的判据手段" ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`5b90eef0` ✓，pending 0 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百七十五：🎯🎯 **判据的手段定了** —— ⭐ 用 `self_attr:` 条件在手搭一条"探针规则"上读属性**）**）**：
+>
+> * ✅ **实测（两条线索 ✓）** ✓：
+>   * ⭐ **仓库已有"手工 fire ＋ 读属性"的先例** ✓：`DefenceStacking1106Test` ✓ 里
+>     `battle.fireTriggers(TriggerEvent.ULT_CAST, owner, owner, 0, 0);` ✓（`:55` ✓）⇒ `enemy.getAttribute(AttributeType.DEFENCE).get()` ✓（`:58` ✓）
+>     ⇒ ⭐ 即**方案 (乙) 的形态在仓库里是常规写法** ✓；
+>   * ⚠ **但它对 `cast_end` 不适用** ✗：⚠ `from_category` 需要**真的施放上下文** ✗（⚠ 手工 fire 没有 ✓）
+>     ⇒ ⚠ 而真施放走完 `SkillExecutor.execute` **`cast_end` 就已经掉了** ✗ ⇒ ⭐ **事后读必然读到 0** ✓。
+> * ⭐⭐ **于是正解 = 方案 (甲) 的一个更省变体** ✗：
+>   ⭐ **条件里可以直接读属性** ✓（⚠ 本段读过条件 DSL：**`self_attr:`** ✓ ⇒ ⭐ 例如 `self_attr:CRIT_ATTACK > 100` ✓）
+>   ⇒ ⭐ **判据里手搭一条"探针规则"** ✓：
+>   ```java
+>   EffectSpec probe = new EffectSpec();
+>   TriggerSpecs.set(probe, "op", "APPLY_BUFF");
+>   TriggerSpecs.set(probe, "buff", "probe_mark");
+>   TriggerSpecs.set(probe, "permanent", true);
+>   TriggerSpecs.set(probe, "target", "self");
+>   // 挂在 DEALING_DAMAGE 上，条件是"此刻 DEFENCE_IGNORE ≥ 0.36"（= 0.16 基础 ＋ 0.20 星魂）
+>   TriggerSpecs.rule(TriggerEvent.DEALING_DAMAGE.name(),
+>           List.of("self_attr:DEFENCE_IGNORE >= 0.36"), probe)
+>   ```
+>   ⇒ ⭐ **然后**用**真施放**（`SkillExecutor.execute` ✓）驱动一次战技 ⇒ ⭐ **在伤害结算的那一刻**条件成立 ⇒ 探针挂上 ✓
+>     ⇒ ⭐ **断言 `hasState("probe_mark")`** ✓ ⇒ ⭐ **这就把"本次施放内有效"钉住了** ✓✓（⚠ 而**事后**再读属性 ⇒ 掉回 0.16 ⇒ ⭐ **可以再加一条反面断言** ✓）。
+> * ⭐ **下一轮（两三次调用，一次做成）** ✗：① 写内容（`peerage_skill_extra_pierce` ✓ 形状已定 ✓）；② 写该判据（⚠ 照上面的探针写法 ✓）；
+>   ③ ⇒ 绿 ⇒ **变异**（0.20 → 0.10 ⇒ ⭐ 探针**不再挂上** ⇒ 必红 ✓）⇒ **全量** ⇒ 出货 ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`6b01a35a` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -28547,6 +28574,33 @@
 > * ⭐ **如实结论** ✓：**本条**形状已定、内容可写** ✓，⚠ **但判据需要一个"伤害结算时读属性"的手段** ✗（⚠ 本段尚无先例 ✓）
 >   ⇒ ⭐ **下一轮先花一次调用确认 (甲) 或 (乙) 可行** ✓，⚠ 若两条都不行 ⇒ ⭐ **按纪律登记**"缺'结算点读属性'的判据手段" ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`5b90eef0` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百七十五：🎯🎯 **判据的手段定了** —— ⭐ 用 `self_attr:` 条件在手搭一条"探针规则"上读属性**）**）**：
+>
+> * ✅ **实测（两条线索 ✓）** ✓：
+>   * ⭐ **仓库已有"手工 fire ＋ 读属性"的先例** ✓：`DefenceStacking1106Test` ✓ 里
+>     `battle.fireTriggers(TriggerEvent.ULT_CAST, owner, owner, 0, 0);` ✓（`:55` ✓）⇒ `enemy.getAttribute(AttributeType.DEFENCE).get()` ✓（`:58` ✓）
+>     ⇒ ⭐ 即**方案 (乙) 的形态在仓库里是常规写法** ✓；
+>   * ⚠ **但它对 `cast_end` 不适用** ✗：⚠ `from_category` 需要**真的施放上下文** ✗（⚠ 手工 fire 没有 ✓）
+>     ⇒ ⚠ 而真施放走完 `SkillExecutor.execute` **`cast_end` 就已经掉了** ✗ ⇒ ⭐ **事后读必然读到 0** ✓。
+> * ⭐⭐ **于是正解 = 方案 (甲) 的一个更省变体** ✗：
+>   ⭐ **条件里可以直接读属性** ✓（⚠ 本段读过条件 DSL：**`self_attr:`** ✓ ⇒ ⭐ 例如 `self_attr:CRIT_ATTACK > 100` ✓）
+>   ⇒ ⭐ **判据里手搭一条"探针规则"** ✓：
+>   ```java
+>   EffectSpec probe = new EffectSpec();
+>   TriggerSpecs.set(probe, "op", "APPLY_BUFF");
+>   TriggerSpecs.set(probe, "buff", "probe_mark");
+>   TriggerSpecs.set(probe, "permanent", true);
+>   TriggerSpecs.set(probe, "target", "self");
+>   // 挂在 DEALING_DAMAGE 上，条件是"此刻 DEFENCE_IGNORE ≥ 0.36"（= 0.16 基础 ＋ 0.20 星魂）
+>   TriggerSpecs.rule(TriggerEvent.DEALING_DAMAGE.name(),
+>           List.of("self_attr:DEFENCE_IGNORE >= 0.36"), probe)
+>   ```
+>   ⇒ ⭐ **然后**用**真施放**（`SkillExecutor.execute` ✓）驱动一次战技 ⇒ ⭐ **在伤害结算的那一刻**条件成立 ⇒ 探针挂上 ✓
+>     ⇒ ⭐ **断言 `hasState("probe_mark")`** ✓ ⇒ ⭐ **这就把"本次施放内有效"钉住了** ✓✓（⚠ 而**事后**再读属性 ⇒ 掉回 0.16 ⇒ ⭐ **可以再加一条反面断言** ✓）。
+> * ⭐ **下一轮（两三次调用，一次做成）** ✗：① 写内容（`peerage_skill_extra_pierce` ✓ 形状已定 ✓）；② 写该判据（⚠ 照上面的探针写法 ✓）；
+>   ③ ⇒ 绿 ⇒ **变异**（0.20 → 0.10 ⇒ ⭐ 探针**不再挂上** ⇒ 必红 ✓）⇒ **全量** ⇒ 出货 ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`6b01a35a` ✓，pending 0 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
