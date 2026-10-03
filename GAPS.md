@@ -22340,6 +22340,24 @@
 >   ⇒ ⭐ **然后**就能**接着做 `1408` 或 `1412` 的结束读者** ✓。
 > * ⚠ **推送**：本地仍**领先 13** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2135** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百五十五：✅ **写"显式移除会公告"这条判据的**现成模板**找到了** —— `BaitModifierLifetimeTest` 用 **`TriggerSpecs.rule(...)` ＋ `TriggerSpecs.set(strip, "op", "REMOVE_STATE")`** 手搭规则 ✓）**）**：
+>
+> * ✅ **实测（在 `src/test/java` 里搜手搭表与 `REMOVE_STATE` ✓）** ✓：
+>   * ⭐ **手搭表的写法**：`owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("BATTLE_START", …` ✓
+>     （⚠ 见 `AboveThresholdTest:54` ✓／`AglaeaFissureTest:64` ✓／`AddDamageOpTest:124` ✓）；
+>   * ⭐⭐ **`REMOVE_STATE` 的手搭模板**：**`BaitModifierLifetimeTest:39`** ＝ **`TriggerSpecs.set(strip, "op", "REMOVE_STATE");`** ✓
+>     ⇒ ⭐ **即"先 `TriggerSpecs.rule(...)` 建规则，再 `set(...)` 填 `op`／参数"** ✓✓；
+>   * ⭐ 另有 **`Cone23026Test`**（⚠ 光锥 23026 ✓）是**内容里第一个把 `REMOVE_STATE` 与 `per_stack` 组合**的例子 ✓
+>     ⇒ ⭐ **也可作参考** ✓。
+> * ⭐⭐ **下一轮的判据（照 `BaitModifierLifetimeTest` 的骨架写）** ✗：
+>   1. ⭐ **手搭两条规则**：`APPLY_BUFF{状态: X, turns: 2}` ✓ ＋ 一条 **`REMOVE_STATE{X}`** ✓（⚠ 或直接调 `buffManager.removeState("X")` ✓ 更省 ✓）；
+>   2. ⭐ **再手搭一条读者**：`on: STATE_ENDED` ＋ `when: ["self state_ended X"]` ⇒ **`GAIN_RESOURCE{某个已声明资源, amount: 1}`** ✓
+>     （⚠ 用一个**测试专用**的资源名 ✓ ⇒ ⭐ 不碰任何真实内容 ✓）；
+>   3. ⭐ **正向**：显式移除 ⇒ 资源 **+1** ✓；⭐ **反向**：**`REMOVE_BUFF`（非状态）** ⇒ 资源 **不变** ✓（⚠ 保证不越界 ✓）；
+>   4. ⭐ **变异**：把 `BuffManager.removeState` 里那两行公告**去掉** ⇒ **判据必红** ✓（⚠ 跑全量 ✓）。
+> * ⭐ **于是那处引擎改动就有"判据 ＋ 变异"了** ✓ ⇒ ⭐ **它成为本段第 20 件出货** ✓（⚠ 内容或读者 ＋ 判据 ＋ 实测变异 ＋ 文档 ⇒ 四件齐 ✓）。
+> * ⚠ **推送**：本地仍**领先 14** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2135** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -27776,6 +27794,24 @@
 >   ⇒ ⭐ **然后**就能**接着做 `1408` 或 `1412` 的结束读者** ✓。
 > * ⚠ **推送**：本地仍**领先 13** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2135** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百五十五：✅ **写"显式移除会公告"这条判据的**现成模板**找到了** —— `BaitModifierLifetimeTest` 用 **`TriggerSpecs.rule(...)` ＋ `TriggerSpecs.set(strip, "op", "REMOVE_STATE")`** 手搭规则 ✓）**）**：
+>
+> * ✅ **实测（在 `src/test/java` 里搜手搭表与 `REMOVE_STATE` ✓）** ✓：
+>   * ⭐ **手搭表的写法**：`owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("BATTLE_START", …` ✓
+>     （⚠ 见 `AboveThresholdTest:54` ✓／`AglaeaFissureTest:64` ✓／`AddDamageOpTest:124` ✓）；
+>   * ⭐⭐ **`REMOVE_STATE` 的手搭模板**：**`BaitModifierLifetimeTest:39`** ＝ **`TriggerSpecs.set(strip, "op", "REMOVE_STATE");`** ✓
+>     ⇒ ⭐ **即"先 `TriggerSpecs.rule(...)` 建规则，再 `set(...)` 填 `op`／参数"** ✓✓；
+>   * ⭐ 另有 **`Cone23026Test`**（⚠ 光锥 23026 ✓）是**内容里第一个把 `REMOVE_STATE` 与 `per_stack` 组合**的例子 ✓
+>     ⇒ ⭐ **也可作参考** ✓。
+> * ⭐⭐ **下一轮的判据（照 `BaitModifierLifetimeTest` 的骨架写）** ✗：
+>   1. ⭐ **手搭两条规则**：`APPLY_BUFF{状态: X, turns: 2}` ✓ ＋ 一条 **`REMOVE_STATE{X}`** ✓（⚠ 或直接调 `buffManager.removeState("X")` ✓ 更省 ✓）；
+>   2. ⭐ **再手搭一条读者**：`on: STATE_ENDED` ＋ `when: ["self state_ended X"]` ⇒ **`GAIN_RESOURCE{某个已声明资源, amount: 1}`** ✓
+>     （⚠ 用一个**测试专用**的资源名 ✓ ⇒ ⭐ 不碰任何真实内容 ✓）；
+>   3. ⭐ **正向**：显式移除 ⇒ 资源 **+1** ✓；⭐ **反向**：**`REMOVE_BUFF`（非状态）** ⇒ 资源 **不变** ✓（⚠ 保证不越界 ✓）；
+>   4. ⭐ **变异**：把 `BuffManager.removeState` 里那两行公告**去掉** ⇒ **判据必红** ✓（⚠ 跑全量 ✓）。
+> * ⭐ **于是那处引擎改动就有"判据 ＋ 变异"了** ✓ ⇒ ⭐ **它成为本段第 20 件出货** ✓（⚠ 内容或读者 ＋ 判据 ＋ 实测变异 ＋ 文档 ⇒ 四件齐 ✓）。
+> * ⚠ **推送**：本地仍**领先 14** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2135** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
