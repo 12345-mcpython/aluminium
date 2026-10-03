@@ -23376,6 +23376,34 @@
 >   ⇒ ⭐ **而若要的是"某个机制的专属点"**（如 `1408` 的【毁伤】）⇒ **走 `ConfigAbility\Avatar\Avatar_<英文名>_00_Ability.json` 找 `Set<...>Point`** ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`0d2bd04f` ✓，pending 0 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百一十：🎯🎯🎯 **第三次撞上同一堵墙 —— 而且这次能看清它是**系统性的****）**）**：
+>
+> * ✅ **实测（读 `Avatar_PlayerGirl_40_Ability.json:3524` ✓）** ✓ 全文骨架：
+>   ```json
+>   "MAvatar_PlayerGirl_40_ElationEchoPointBuff": {
+>     "LifeTime": 2,
+>     "BehaviorFlagList": [ "ElationEchoPoint" ],
+>     "UIConfig": { "UIPosition": "UI_Middle" },
+>     "_CallbackList": [ { "Event": "OnStack", "CallbackConfig": [
+>         { "$type": "RPG.GameCore.StackProperty",
+>           "TargetType": { "Alias": "ModifierOwnerEntity" },
+>           "Property": "ElationEchoPoint",
+>           "PropertyValue": { "IsDynamic": true, "PostfixExpr": { "OpCodes": "AQAR",
+>                             "FixedValues": [], "DynamicHashes": [ -1552518779 ] } } } ] } ] }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **`LifeTime: 2`** ✓（⚠ 与术语表"持续 2 回合"同形 ✓）；
+>   **(ii)** ⭐ **`BehaviorFlagList: ["ElationEchoPoint"]`** ✓（⚠ 正是我在谓词里见到的那个标记 ✓）；
+>   **(iii)** ⛔ **数值是 `DynamicHashes` 编译表达式** ✗ —— ⭐ **与 `1412` 的 `#2`（`MDF_ExtraPoint`）／`1408` 的 `SetPhainonChargePoint`**完全同型**** ✓。
+> * ⭐⭐⭐ **于是得到一条**系统性结论**** ✓（⭐ 这是本段最值钱的发现之一）：
+>   ⚠ **"角色专属点数"的数值（含上限）在数据里一律是**编译后的表达式**（`OpCodes` ＋ `DynamicHashes`，`FixedValues` 空）** ✗
+>     ⇒ ⭐ **三次尝试、三种角色、同一形状**（`1412`／`1408`／`1501` ✓）⇒ ⭐ **这不是运气不好，而是数据结构** ✓
+>       ⇒ ⭐ **结论**：⭐ **凡"上限/数值取决于专属点数"的从句，都缺同一个东西 —— "解 `PostfixExpr`"的能力** ✓
+>         ⇒ ⭐ **这应当作为**一条独立的引擎级缺口**登记**（⚠ 它**一次解释**了本段三条登记项 ✓ ⇒ ⭐ 而且它**读者 ≥3** ✓✓）。
+> * ⭐ **按纪律处置** ✓：⭐ **登记三条为同一根因**（`1412` 奇袭 `#2`／`1408` 【毁伤】上限＋溢出奖励／`1501`【笑点】上限 ✓）
+>   ＋ ⭐ **写明"实现路径"**：⚠ 要么**在 tbgd 侧解表达式**（⚠ 需要 opcode 表 ✗ 不在本仓库 ✓），⚠ 要么**在内容里绕开**
+>     （⚠ 例如【笑点】改用 `scope: PARTY` ＋ 一个**文档能推的** `max` ✗ —— ⚠ 文档确实没给 ⇒ ⭐ **不猜** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`2a62260c` ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -29847,6 +29875,34 @@
 > * ⭐⭐ **顺带记一条可复用的"取数三连"** ✓（本段已用三次 ✓）：**文档术语表 → `AvatarStatusConfig.json` 的状态条目（拿参数名）→ `Modifier` 定义（拿数值）** ✓
 >   ⇒ ⭐ **而若要的是"某个机制的专属点"**（如 `1408` 的【毁伤】）⇒ **走 `ConfigAbility\Avatar\Avatar_<英文名>_00_Ability.json` 找 `Set<...>Point`** ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`0d2bd04f` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百一十：🎯🎯🎯 **第三次撞上同一堵墙 —— 而且这次能看清它是**系统性的****）**）**：
+>
+> * ✅ **实测（读 `Avatar_PlayerGirl_40_Ability.json:3524` ✓）** ✓ 全文骨架：
+>   ```json
+>   "MAvatar_PlayerGirl_40_ElationEchoPointBuff": {
+>     "LifeTime": 2,
+>     "BehaviorFlagList": [ "ElationEchoPoint" ],
+>     "UIConfig": { "UIPosition": "UI_Middle" },
+>     "_CallbackList": [ { "Event": "OnStack", "CallbackConfig": [
+>         { "$type": "RPG.GameCore.StackProperty",
+>           "TargetType": { "Alias": "ModifierOwnerEntity" },
+>           "Property": "ElationEchoPoint",
+>           "PropertyValue": { "IsDynamic": true, "PostfixExpr": { "OpCodes": "AQAR",
+>                             "FixedValues": [], "DynamicHashes": [ -1552518779 ] } } } ] } ] }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **`LifeTime: 2`** ✓（⚠ 与术语表"持续 2 回合"同形 ✓）；
+>   **(ii)** ⭐ **`BehaviorFlagList: ["ElationEchoPoint"]`** ✓（⚠ 正是我在谓词里见到的那个标记 ✓）；
+>   **(iii)** ⛔ **数值是 `DynamicHashes` 编译表达式** ✗ —— ⭐ **与 `1412` 的 `#2`（`MDF_ExtraPoint`）／`1408` 的 `SetPhainonChargePoint`**完全同型**** ✓。
+> * ⭐⭐⭐ **于是得到一条**系统性结论**** ✓（⭐ 这是本段最值钱的发现之一）：
+>   ⚠ **"角色专属点数"的数值（含上限）在数据里一律是**编译后的表达式**（`OpCodes` ＋ `DynamicHashes`，`FixedValues` 空）** ✗
+>     ⇒ ⭐ **三次尝试、三种角色、同一形状**（`1412`／`1408`／`1501` ✓）⇒ ⭐ **这不是运气不好，而是数据结构** ✓
+>       ⇒ ⭐ **结论**：⭐ **凡"上限/数值取决于专属点数"的从句，都缺同一个东西 —— "解 `PostfixExpr`"的能力** ✓
+>         ⇒ ⭐ **这应当作为**一条独立的引擎级缺口**登记**（⚠ 它**一次解释**了本段三条登记项 ✓ ⇒ ⭐ 而且它**读者 ≥3** ✓✓）。
+> * ⭐ **按纪律处置** ✓：⭐ **登记三条为同一根因**（`1412` 奇袭 `#2`／`1408` 【毁伤】上限＋溢出奖励／`1501`【笑点】上限 ✓）
+>   ＋ ⭐ **写明"实现路径"**：⚠ 要么**在 tbgd 侧解表达式**（⚠ 需要 opcode 表 ✗ 不在本仓库 ✓），⚠ 要么**在内容里绕开**
+>     （⚠ 例如【笑点】改用 `scope: PARTY` ＋ 一个**文档能推的** `max` ✗ —— ⚠ 文档确实没给 ⇒ ⭐ **不猜** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`2a62260c` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2139** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
