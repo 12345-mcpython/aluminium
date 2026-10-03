@@ -33042,3 +33042,24 @@
 >   （⭐ `EffectSpec` 三路来源里没有资源 ✓，而 `resourceAmount(...)` 内部已有 ✓）。
 > * ⚠ **推送**：本地领先 4 ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2164** 例 ✓）、`mechanics` **rc 0** ✓、树干净（含未追踪 ✓）✓。
+
+> **2026-10-02 更新（aggro 回收之整千二百九十六：🔬 **把 `#4` 后半与目标 ① 的"变身结束 ×3"收窄到**一次测量****）**）**：
+>
+> * ⭐⭐⭐ **读代码读到一个**自称**（本段的教训：自称要量 ✓）** ✓：`BuffManager.removeState(String)` 里逐字写着 ——
+>   > *"2026-10-02: an explicit removal ends the state **just as a spent duration does**, so the tables hear about it the
+>   > same way. **Readers: 1408 transformation end, 1412 raid end.**"*
+>   ⇒ ⭐ **它声称"到期消耗也会公告 `STATE_ENDED`"** ✓ —— ⚠ **而本段此前登记的恰恰是**相反**的话**（"自然到期不公告" ✗）✓
+>     ⇒ ⭐⭐ **两条说法冲突，谁都没被打量过** ✗ ⇒ ⭐ **所以下一步是一次测量，不是一段代码** ✓。
+> * ⭐ **并顺手核清了两件事** ✓：
+>   1. ⭐ **公告点只有一个** ✓ —— `Battle.fireStateEnded(carrier, stateName)`（`Battle:2212` ✓），而它**只被 `removeState(String)` 调用** ✓
+>      （⚠ `REMOVE_STATE` op ⇒ `TriggerInterpreter:3537` ⇒ `BuffManager.removeState` ✓）；
+>   2. ⭐ **到期走的是另一条路** ✗ —— 缓冲的拆除是 `removeBuff(AbstractBuff)` ✓（⚠ 与 `removeState` **不是**同一个方法 ✓）
+>      ⇒ ⭐ **所以"到底会不会公告"取决于 `removeBuff` 那条路上有没有人调 `fireStateEnded`** ✗ —— ⭐ **这正是要量的那一件事** ✓。
+> * ⭐⭐ **下一轮的探针（设计已定，一次就能定案）** ✓：⭐ **用**手工表**在一个备用单位上装两条规则** ✓ ——
+>   ①`on: BATTLE_START ⇒ APPLY_BUFF{X, turns: 1}`（⚠ 让 X 自然到期 ✓）；②`on: STATE_ENDED ⇒ APPLY_BUFF{标记}` ✓
+>   ⇒ ⭐ **然后推进回合**（`battle.stepForward()` ✓）⇒ ⭐ **标记点了 ⇒ 声称为真** ✓（⚠ 那么 `#4` 后半就只剩 `amountFromResource` 一个前置 ✓）；
+>     ⚠ **没点 ⇒ 声称为假** ✗ ⇒ ⭐ **那就把公告收敛到 `removeBuff` 这一个点** ✓（⚠ 一次修好**两处**：到期与显式移除 ✓，并顺手消掉重复公告的可能 ✓）。
+> * ⚠ **为什么本轮不直接动手** ✓：⭐ **因为"该不该公告"是**行为**问题** ✓ —— ⚠ 在没量之前改 `removeBuff`，就是在**猜** ✓
+>   （⭐ 本段已有三次"仪器/前提未验"的教训 ✓）。
+> * ⚠ **推送**：本地领先 ? ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2164** 例 ✓）、`mechanics` **rc 0** ✓、树干净（含未追踪 ✓）✓。
