@@ -21971,6 +21971,34 @@
 > * ⚠ **进度如实** ✓：新能力**字段** ✓ 已落树；**传参链** ⚠ **两次尝试未成**（第一次引号 ✗／第二次落点 ✗）⇒ ⭐ **尚未进入树** ✓；
 >   **内容＋判据＋变异** ⚠ 待做 ⇒ ⭐ **本件仍是"已登记、施工中"** ✓，**没有冒充出货** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓（`822f6d53` ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十六：🎯🎯 **补丁落点其实是**对的****（`if (getAmountFromEvent())` 就在 `int amount;` 之后 ✓）⇒ ⭐ 所以那 4 个"找不到符号"**另有其因** —— ⚠ 最可能是 **`EffectSpec` 没有 `getAmountFromPrevious()` 这个 getter** ✗）**）**：
+>
+> * ✅ **实测（读 `gainResource` 真身 ✓，`:1341`–`:1370` ✓）** ✓ 全文骨架：
+>   ```java
+>   private static void gainResource(EffectSpec effect, TriggerContext ctx) {
+>       CanHit holder = resolveTarget(effect, ctx);
+>       … // 注释：这个 share 是"off the holder"，且未知属性名会被大声拒绝
+>       int amount;                                                      // ★ 声明
+>       if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {           // ★ 我的锚点 —— 位置正确 ✓
+>           amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+>       } else if (effect.getAmountFromAttr() == null) {
+>           amount = (int) Math.round(scaledAmount(effect, ctx));
+>       } else { … holder.getAttribute(attribute).get() * share … }
+>       if (effect.getAmountCap() != null) {                              // ★ 上限在这里
+>           amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
+>       }
+>       … // PARTY 作用域那一段
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **锚点正确** ✓（⚠ 本段上一轮"落点偏了"的判断**被推翻** ✓ —— ⭐ 第三十五次自我纠正 ✓）；
+>   **(ii)** ⭐⭐ **于是那 4 个 "找不到符号" 只能是"新分支里引用的名字不存在"** ✗ ⇒ ⭐ 最可能：
+>     **`EffectSpec` 没有 `getAmountFromPrevious()`** ✗（⚠ 我加的是**字段** ✓ ⇒ ⚠ **若该类不用 Lombok ⇒ 就没有 getter** ✗）
+>     ⇒ ⚠ 而报错行号显示在 `gainEnergyFor` 附近 ✓ ⇒ ⭐ **那是因为我的插入把它**下移了 9 行** ✓** ⇒ ⭐ **行号是"打补丁后"的** ✓。
+> * ⭐ **下一轮第一步（一次读 ＋ 一次改）** ✗：**读 `beans/EffectSpec.java` 的类头** ✓ ⇒ 看它有没有
+>   **`@Data`／`@Getter`／`@Setter`**（⚠ 本段早前见过 `@SerializedName` ✓ 但**没注意 Lombok** ✗）：
+>   * ⭐ **有 Lombok** ⇒ ⚠ 那么 getter 应当存在 ✗ ⇒ 去读**真正的编译错文本**（⚠ 用 `--console=plain` 抓**四行全文** ✓）；
+>   * ⭐ **没有 Lombok** ⇒ ⭐ **加一个显式 getter** ✓（⚠ 照该类既有 getter 的写法 ✓）⇒ 重跑 ⇒ 绿 ⇒ **当场提交** ✓。
+> * ⚠ **进度**：新能力**字段** ✓ 落树；**传参链** ⚠ 三次尝试未成（引号 ✗／落点误判 ✗／**getter 待确认** ✓）⇒ **仍未进树** ✓（如实 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -27008,6 +27036,34 @@
 > * ⚠ **进度如实** ✓：新能力**字段** ✓ 已落树；**传参链** ⚠ **两次尝试未成**（第一次引号 ✗／第二次落点 ✗）⇒ ⭐ **尚未进入树** ✓；
 >   **内容＋判据＋变异** ⚠ 待做 ⇒ ⭐ **本件仍是"已登记、施工中"** ✓，**没有冒充出货** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓（`822f6d53` ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十六：🎯🎯 **补丁落点其实是**对的****（`if (getAmountFromEvent())` 就在 `int amount;` 之后 ✓）⇒ ⭐ 所以那 4 个"找不到符号"**另有其因** —— ⚠ 最可能是 **`EffectSpec` 没有 `getAmountFromPrevious()` 这个 getter** ✗）**）**：
+>
+> * ✅ **实测（读 `gainResource` 真身 ✓，`:1341`–`:1370` ✓）** ✓ 全文骨架：
+>   ```java
+>   private static void gainResource(EffectSpec effect, TriggerContext ctx) {
+>       CanHit holder = resolveTarget(effect, ctx);
+>       … // 注释：这个 share 是"off the holder"，且未知属性名会被大声拒绝
+>       int amount;                                                      // ★ 声明
+>       if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {           // ★ 我的锚点 —— 位置正确 ✓
+>           amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+>       } else if (effect.getAmountFromAttr() == null) {
+>           amount = (int) Math.round(scaledAmount(effect, ctx));
+>       } else { … holder.getAttribute(attribute).get() * share … }
+>       if (effect.getAmountCap() != null) {                              // ★ 上限在这里
+>           amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
+>       }
+>       … // PARTY 作用域那一段
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **锚点正确** ✓（⚠ 本段上一轮"落点偏了"的判断**被推翻** ✓ —— ⭐ 第三十五次自我纠正 ✓）；
+>   **(ii)** ⭐⭐ **于是那 4 个 "找不到符号" 只能是"新分支里引用的名字不存在"** ✗ ⇒ ⭐ 最可能：
+>     **`EffectSpec` 没有 `getAmountFromPrevious()`** ✗（⚠ 我加的是**字段** ✓ ⇒ ⚠ **若该类不用 Lombok ⇒ 就没有 getter** ✗）
+>     ⇒ ⚠ 而报错行号显示在 `gainEnergyFor` 附近 ✓ ⇒ ⭐ **那是因为我的插入把它**下移了 9 行** ✓** ⇒ ⭐ **行号是"打补丁后"的** ✓。
+> * ⭐ **下一轮第一步（一次读 ＋ 一次改）** ✗：**读 `beans/EffectSpec.java` 的类头** ✓ ⇒ 看它有没有
+>   **`@Data`／`@Getter`／`@Setter`**（⚠ 本段早前见过 `@SerializedName` ✓ 但**没注意 Lombok** ✗）：
+>   * ⭐ **有 Lombok** ⇒ ⚠ 那么 getter 应当存在 ✗ ⇒ 去读**真正的编译错文本**（⚠ 用 `--console=plain` 抓**四行全文** ✓）；
+>   * ⭐ **没有 Lombok** ⇒ ⭐ **加一个显式 getter** ✓（⚠ 照该类既有 getter 的写法 ✓）⇒ 重跑 ⇒ 绿 ⇒ **当场提交** ✓。
+> * ⚠ **进度**：新能力**字段** ✓ 落树；**传参链** ⚠ 三次尝试未成（引号 ✗／落点误判 ✗／**getter 待确认** ✓）⇒ **仍未进树** ✓（如实 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
