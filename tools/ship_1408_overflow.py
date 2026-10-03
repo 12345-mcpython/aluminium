@@ -95,12 +95,17 @@ public class CoreflameOverflowTest {
         Skill skill = owner.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         for (int i = 0; i < casts; i++) {
-            SkillExecutor.execute(battle, skill, owner, List.of(owner));
+            // \u26a0 AIMED AT AN ENEMY. The first version of this judge aimed her skill at HERSELF, and that single choice made the
+            // resource read a constant 3 for every cast count: the first self-aimed cast landed (+2 for the skill, +1 for item 38's
+            // "being targeted" rule) and the later ones did nothing at all. Measured step by step, aimed at an enemy, the pool is
+            // 2, 4, 6, 8, 10, 12 -- exactly two per cast, up to its declared cap.
+            SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies.get(0)));
             battle.processRequests();
         }
-        // \u26a0 `battle.partyResource(...)`, not `owner.getResources()`: \u3010\u706b\u79cd\u3011 is a PARTY resource, and the per-character view read a
-        // constant 3 no matter how many casts went by (measured before this line was fixed).
-        return battle.partyResource(COREFLAME).value();
+        // \u26a0 `owner.getResources().value(...)`, and NOT `battle.partyResource(...)`: Coreflame is not a party resource, so the
+        // party view is null. The reader itself is innocent -- measured against 1412's Charge in the same probe, which accumulates
+        // exactly (+1 per cast).
+        return owner.getResources().value(COREFLAME);
     }
 }
 ''')
