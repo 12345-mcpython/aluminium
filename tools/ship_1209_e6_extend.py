@@ -25,7 +25,10 @@ RULE = "e6_extends_soulsteel_on_kill"
 STATE = "\u667a\u5251\u8fde\u5fc3"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
-rules = doc["rules"] if isinstance(doc, dict) else doc
+# \u26a0 Some character files are BARE LISTS (measured: 1104.json and 1209.json) and some are objects (1408.json). The file's own shape
+# is preserved on the way out -- the first version of the 1104 script said "must be an object" and wrote nothing.
+isObject = isinstance(doc, dict)
+rules = doc["rules"] if isObject else doc
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == RULE)]
 
 if len(rules) != 6:
@@ -45,9 +48,10 @@ rules.append({
              "\uff0c\u6309**\u5c5e\u6027**\u5ef6\u957f\u4f1a**\u8fde\u6218\u6280\u7684\u540c\u540d\u5c5e\u6027\u4e00\u5e76\u5ef6\u957f** \u2717\uff08\u90a3\u662f\u53e5\u5b50\u6ca1\u63d0\u7684 buff \u2717\uff09\u3002"),
 })
 
-if not isinstance(doc, dict):
-    raise SystemExit("1209.json must be an object")
-doc["rules"] = rules
+if isObject:
+    doc["rules"] = rules
+else:
+    doc = rules
 json.dump(doc, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1209.json: eidolon six extends the soulsteel on a kill")
 
