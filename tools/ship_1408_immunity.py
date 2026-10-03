@@ -124,7 +124,9 @@ public class ControlImmunityTest {
         TriggerSpecs.set(e, "op", "APPLY_CONTROL");
         TriggerSpecs.set(e, "control", FREEZE);
         TriggerSpecs.set(e, "turns", 3);
-        TriggerSpecs.set(e, "target", "all_enemies");
+        // \u26a0 `other_allies`, NOT `all_enemies`: from the applier's side the "enemies" are the monster, and the point of the judge is to
+        // aim the control AT HER. Measured: with `all_enemies` the control went to the monster and the untransformed run never saw it.
+        TriggerSpecs.set(e, "target", "other_allies");
         return e;
     }
 }
