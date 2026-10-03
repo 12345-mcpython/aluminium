@@ -82,6 +82,7 @@ public class CheerTrueDamageRiderTest {
     private static final int OWNER = 8007;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
+    private static final String CHEER = "\u8ff7\u8ff7\u7684\u58f0\u63f4";
 
     /** \u2b50 The holder's damage is raised by exactly the 28% the sentence states. */
     @Test
