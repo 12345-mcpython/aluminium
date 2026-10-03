@@ -182,6 +182,12 @@ public class Battle {
      */
     private final List<Countdown> countdowns = new ArrayList<>();
 
+    /** ⭐ 2026-10-02：倒计时的只读入口（读者：1408 的变身倒计时判据，以及 1507／1309 同类判据）。
+     *  ⚠ 名字避开字段 countdowns。 */
+    public List<Countdown> countdownUnits() {
+        return List.copyOf(countdowns);
+    }
+
     /**
      * Summons placed since the last settle, so {@link TriggerEvent#SUMMONED} can be fired once they are in the
      * action bar (see {@link #fireSummoned}). Separate from {@link #addRequestItems} on purpose: that queue is
