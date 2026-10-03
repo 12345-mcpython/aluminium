@@ -46,10 +46,10 @@ if is_dict:
     doc["rules"] = rules
     res = doc.get("resources")
     if res is None:
-        doc["resources"] = [{"name": RES, "initial": 0, "max": 34000}]
+        doc["resources"] = [{"id": RES, "initial": 0, "max": 34000}]
     else:
         res = [r for r in res if not (isinstance(r, dict) and r.get("name") == RES)]
-        res.append({"name": RES, "initial": 0, "max": 34000})
+        res.append({"id": RES, "initial": 0, "max": 34000})
         doc["resources"] = res
     out = doc
 else:
