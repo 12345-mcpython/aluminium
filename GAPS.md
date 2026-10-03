@@ -21477,6 +21477,27 @@
 >   ⇒ ⭐ 拿到 `#2` 的**实际点数** ✓ ⇒ ⭐ **读者规则就能写出** ✓（`on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}` ✓）。
 > * ⚠ **推送**：本地仍**领先 15** ✗（网络十六连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十二：✅ `MDF_ExtraPoint` 的两处命中说明了**数值不在这个文件里** —— 这份只有"某状态**读取**哪些参数"的清单，真正的数字在 **`Modifier` 定义**里）**）**：
+>
+> * ✅ **实测（两处命中 ✓）** ✓：
+>   * `AvatarStatusConfig.json:11352` ✓ 与 `:11396` ✓ 都是 **`ReadParamList`** 里的条目 ✓
+>     （⚠ `:11352` 那条属于**另一个**召唤物增益（其 `ReadParamList` 是 `MDF_EverNightRatio` ＋ `MDF_ExtraPoint` ✓）
+>      ⇒ ⭐ **所以这个文件只声明"读哪些参数"** ✗ ⇒ ⛔ **数值不在这里** ✓）。
+>   ⇒ ⭐⭐ **于是数值在**`Modifier` 定义**里** ✓ —— ⚠ 而"那条"的名字本段已经拿到 ✓：
+>     **`MServant_CyreneServant_00_AmazingBuff_Cerydra`** ✓（`StatusID 100141521` ✓）
+>     ⇒ ⭐ **下一轮第一步（一次 grep，必得）** ✗：在 tbgd 里搜 **`MServant_CyreneServant_00_AmazingBuff_Cerydra`** ✓
+>       ⇒ ⭐ 命中处附近就是它的 **`MDF_ExtraPoint` 数值** ✓ ⇒ ⭐ **`#2` 到手 ⇒ 读者规则可写** ✓。
+> * ⭐ **本件的账（收官，供下一轮直接接续）** ✓：
+>   | 要素 | 状态 |
+>   |---|---|
+>   | 文案 | ⭐ 「持有【军功】的角色的暴击伤害提高 `#1`%。**奇袭结束后，刻律德菈获得 `#2` 点充能**。」✓ |
+>   | 参数名 | ⭐ **`#1 = MDF_DamageIncrease`** ✓／**`#2 = MDF_ExtraPoint`** ✓ |
+>   | 承载者 | ⭐ **`MServant_CyreneServant_00_AmazingBuff_Cerydra`**（`StatusID 100141521` ✓，`Buff` ✓，图标 `Icon1415Servantskil` ✓） |
+>   | 机制 | ⭐ **`TurnInsertAbility`**（战技 `SuccessTaskList` ✓，`PreCheck` 未用次数 = **1** ✓） |
+>   | 引擎侧 | ⚠ **要建**：插入一次施放（走 `ADVANCE`/`EXTRA_TURN` 一族 ✓）＋ "奇袭未用"计数 ✓ ＋ 归零 ⇒ `STATE_ENDED("奇袭")` ✓ |
+>   | 读者 | ⭐ `on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}`（⚠ 充能已声明 ✓ `max 8` ✓） |
+> * ⚠ **推送**：本地仍**领先 16** ✗（网络十七连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26019,6 +26040,27 @@
 > * ⭐⭐ **下一轮第一步（一次 grep，取数值）** ✗：搜 **`MDF_ExtraPoint`** ✓（⚠ 与它赋值的 `Modifier` 定义应同处 ✓）
 >   ⇒ ⭐ 拿到 `#2` 的**实际点数** ✓ ⇒ ⭐ **读者规则就能写出** ✓（`on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}` ✓）。
 > * ⚠ **推送**：本地仍**领先 15** ✗（网络十六连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十二：✅ `MDF_ExtraPoint` 的两处命中说明了**数值不在这个文件里** —— 这份只有"某状态**读取**哪些参数"的清单，真正的数字在 **`Modifier` 定义**里）**）**：
+>
+> * ✅ **实测（两处命中 ✓）** ✓：
+>   * `AvatarStatusConfig.json:11352` ✓ 与 `:11396` ✓ 都是 **`ReadParamList`** 里的条目 ✓
+>     （⚠ `:11352` 那条属于**另一个**召唤物增益（其 `ReadParamList` 是 `MDF_EverNightRatio` ＋ `MDF_ExtraPoint` ✓）
+>      ⇒ ⭐ **所以这个文件只声明"读哪些参数"** ✗ ⇒ ⛔ **数值不在这里** ✓）。
+>   ⇒ ⭐⭐ **于是数值在**`Modifier` 定义**里** ✓ —— ⚠ 而"那条"的名字本段已经拿到 ✓：
+>     **`MServant_CyreneServant_00_AmazingBuff_Cerydra`** ✓（`StatusID 100141521` ✓）
+>     ⇒ ⭐ **下一轮第一步（一次 grep，必得）** ✗：在 tbgd 里搜 **`MServant_CyreneServant_00_AmazingBuff_Cerydra`** ✓
+>       ⇒ ⭐ 命中处附近就是它的 **`MDF_ExtraPoint` 数值** ✓ ⇒ ⭐ **`#2` 到手 ⇒ 读者规则可写** ✓。
+> * ⭐ **本件的账（收官，供下一轮直接接续）** ✓：
+>   | 要素 | 状态 |
+>   |---|---|
+>   | 文案 | ⭐ 「持有【军功】的角色的暴击伤害提高 `#1`%。**奇袭结束后，刻律德菈获得 `#2` 点充能**。」✓ |
+>   | 参数名 | ⭐ **`#1 = MDF_DamageIncrease`** ✓／**`#2 = MDF_ExtraPoint`** ✓ |
+>   | 承载者 | ⭐ **`MServant_CyreneServant_00_AmazingBuff_Cerydra`**（`StatusID 100141521` ✓，`Buff` ✓，图标 `Icon1415Servantskil` ✓） |
+>   | 机制 | ⭐ **`TurnInsertAbility`**（战技 `SuccessTaskList` ✓，`PreCheck` 未用次数 = **1** ✓） |
+>   | 引擎侧 | ⚠ **要建**：插入一次施放（走 `ADVANCE`/`EXTRA_TURN` 一族 ✓）＋ "奇袭未用"计数 ✓ ＋ 归零 ⇒ `STATE_ENDED("奇袭")` ✓ |
+>   | 读者 | ⭐ `on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}`（⚠ 充能已声明 ✓ `max 8` ✓） |
+> * ⚠ **推送**：本地仍**领先 16** ✗（网络十七连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
