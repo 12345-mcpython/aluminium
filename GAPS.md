@@ -22358,6 +22358,33 @@
 > * ⭐ **于是那处引擎改动就有"判据 ＋ 变异"了** ✓ ⇒ ⭐ **它成为本段第 20 件出货** ✓（⚠ 内容或读者 ＋ 判据 ＋ 实测变异 ＋ 文档 ⇒ 四件齐 ✓）。
 > * ⚠ **推送**：本地仍**领先 14** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2135** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百五十六：✅✅ **判据的骨架已逐字到手**（`BaitModifierLifetimeTest` ✓）⇒ ⭐ 下一轮**照抄即可**，且**不需要资源**（⚠ 用"读者挂一个标记状态"当观测量 ✓））**）**：
+>
+> * ✅ **实测（读 `BaitModifierLifetimeTest` 的前 70 行 ✓）** ✓ 关键惯用法（**逐字**）：
+>   ```java
+>   EffectSpec strip = new EffectSpec();
+>   TriggerSpecs.set(strip, "op", "REMOVE_STATE");
+>   TriggerSpecs.set(strip, "buff", "…");
+>   EffectSpec mark = new EffectSpec();
+>   TriggerSpecs.set(mark, "op", "APPLY_BUFF");
+>   TriggerSpecs.set(mark, "buff", "…");
+>   bait.setTriggerTable(new TriggerTable(BAIT, List.of(
+>           TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), strip, cut, mark))));
+>   ```
+>   ⇒ ⭐⭐ **三条要点** ✓：**(i)** ⭐ **手搭一条规则 = `TriggerSpecs.rule(<事件名>, List.of(<条件>), 效果…)`** ✓
+>   （⚠ 该测试一次给了 3 个效果 ✓ ⇒ ⭐ **"一条规则多效果"是常规写法** ✓）；**(ii)** ⭐ **每个效果先 `new EffectSpec()` 再 `TriggerSpecs.set(...)` 逐字段填** ✓
+>   （⚠ `op`／`buff`／`percent`／`permanent`／`target` ✓，⚠ `target` 用字符串 ✓）；**(iii)** ⭐ **`TriggerEvent.<X>.name()`** 传事件名 ✓。
+> * ⭐⭐ **于是本判据（下一轮照抄）** ✗：
+>   * ⭐ **规则甲**（`BATTLE_START`）：`APPLY_BUFF{probe_state, permanent: true, target: self}` ✓；
+>   * ⭐ **规则乙**（`BATTLE_START`，⚠ 或另一个事件 ✓）：**`REMOVE_STATE{probe_state}`** ✓（⚠ 顺序即语义 ✓ ⇒ 甲先乙后 ✓）；
+>   * ⭐ **规则丙**（`STATE_ENDED` ＋ **`["self state_ended probe_state"]`**）：`APPLY_BUFF{probe_mark}` ✓；
+>   * ⭐ **断言**：`hasState("probe_mark")` **为真** ✓（⚠ ⭐ **用状态当观测量 ⇒ 不必声明资源** ✓）；
+>   * ⭐ **反向**：把规则乙换成 **`REMOVE_BUFF`**（✗ 非状态）⇒ `probe_mark` **不出现** ✓（⚠ 保证改动**不越界** ✓）；
+>   * ⭐ **变异**：去掉 `BuffManager.removeState` 里那两行公告 ⇒ **判据必红** ✓（⚠ 跑全量 ✓）。
+> * ⭐ **注意一条** ✓：⚠ 该模板的注释还教了一课（*"any probe attack is an `ALLY_ATTACK`, so a probe against her real file measures the talent plus the aura"* ✓）
+>   ⇒ ⭐ **即：手搭表的目的就是"只留下被测的那一条"** ✓ ⇒ ⭐ **本判据也应当只用"探针状态"的名字，不碰任何真实内容** ✓。
+> * ⚠ **推送**：本地仍**领先 15** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2135** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -27811,6 +27838,33 @@
 >   4. ⭐ **变异**：把 `BuffManager.removeState` 里那两行公告**去掉** ⇒ **判据必红** ✓（⚠ 跑全量 ✓）。
 > * ⭐ **于是那处引擎改动就有"判据 ＋ 变异"了** ✓ ⇒ ⭐ **它成为本段第 20 件出货** ✓（⚠ 内容或读者 ＋ 判据 ＋ 实测变异 ＋ 文档 ⇒ 四件齐 ✓）。
 > * ⚠ **推送**：本地仍**领先 14** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2135** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百五十六：✅✅ **判据的骨架已逐字到手**（`BaitModifierLifetimeTest` ✓）⇒ ⭐ 下一轮**照抄即可**，且**不需要资源**（⚠ 用"读者挂一个标记状态"当观测量 ✓））**）**：
+>
+> * ✅ **实测（读 `BaitModifierLifetimeTest` 的前 70 行 ✓）** ✓ 关键惯用法（**逐字**）：
+>   ```java
+>   EffectSpec strip = new EffectSpec();
+>   TriggerSpecs.set(strip, "op", "REMOVE_STATE");
+>   TriggerSpecs.set(strip, "buff", "…");
+>   EffectSpec mark = new EffectSpec();
+>   TriggerSpecs.set(mark, "op", "APPLY_BUFF");
+>   TriggerSpecs.set(mark, "buff", "…");
+>   bait.setTriggerTable(new TriggerTable(BAIT, List.of(
+>           TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), strip, cut, mark))));
+>   ```
+>   ⇒ ⭐⭐ **三条要点** ✓：**(i)** ⭐ **手搭一条规则 = `TriggerSpecs.rule(<事件名>, List.of(<条件>), 效果…)`** ✓
+>   （⚠ 该测试一次给了 3 个效果 ✓ ⇒ ⭐ **"一条规则多效果"是常规写法** ✓）；**(ii)** ⭐ **每个效果先 `new EffectSpec()` 再 `TriggerSpecs.set(...)` 逐字段填** ✓
+>   （⚠ `op`／`buff`／`percent`／`permanent`／`target` ✓，⚠ `target` 用字符串 ✓）；**(iii)** ⭐ **`TriggerEvent.<X>.name()`** 传事件名 ✓。
+> * ⭐⭐ **于是本判据（下一轮照抄）** ✗：
+>   * ⭐ **规则甲**（`BATTLE_START`）：`APPLY_BUFF{probe_state, permanent: true, target: self}` ✓；
+>   * ⭐ **规则乙**（`BATTLE_START`，⚠ 或另一个事件 ✓）：**`REMOVE_STATE{probe_state}`** ✓（⚠ 顺序即语义 ✓ ⇒ 甲先乙后 ✓）；
+>   * ⭐ **规则丙**（`STATE_ENDED` ＋ **`["self state_ended probe_state"]`**）：`APPLY_BUFF{probe_mark}` ✓；
+>   * ⭐ **断言**：`hasState("probe_mark")` **为真** ✓（⚠ ⭐ **用状态当观测量 ⇒ 不必声明资源** ✓）；
+>   * ⭐ **反向**：把规则乙换成 **`REMOVE_BUFF`**（✗ 非状态）⇒ `probe_mark` **不出现** ✓（⚠ 保证改动**不越界** ✓）；
+>   * ⭐ **变异**：去掉 `BuffManager.removeState` 里那两行公告 ⇒ **判据必红** ✓（⚠ 跑全量 ✓）。
+> * ⭐ **注意一条** ✓：⚠ 该模板的注释还教了一课（*"any probe attack is an `ALLY_ATTACK`, so a probe against her real file measures the talent plus the aura"* ✓）
+>   ⇒ ⭐ **即：手搭表的目的就是"只留下被测的那一条"** ✓ ⇒ ⭐ **本判据也应当只用"探针状态"的名字，不碰任何真实内容** ✓。
+> * ⚠ **推送**：本地仍**领先 15** ✗（网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2135** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
