@@ -101,10 +101,14 @@ public class CheerTrueDamageRiderTest {
         battle.startBattle();
         battle.processRequests();
 
-        if (cheer) {
-            Skill his = owner.getSkills().get(SkillType.SKILL);
-            Assertions.assertNotNull(his, "precondition: he has a skill");
-            SkillExecutor.execute(battle, his, owner, List.of(ally));
+        // \u2b50 BOTH branches summon: his skill summons \u8ff7\u8ff7, and the first draft only cast it in the "with" branch -- so the
+        // excess contained the memosprite's own damage too. Same scene, one variable: the control removes the cheer instead.
+        Skill his = owner.getSkills().get(SkillType.SKILL);
+        Assertions.assertNotNull(his, "precondition: he has a skill");
+        SkillExecutor.execute(battle, his, owner, List.of(ally));
+        battle.processRequests();
+        if (!cheer) {
+            ally.getBuffManager().removeState(CHEER);
             battle.processRequests();
         }
         double before = battle.enemies.get(0).getCurrentHp();
