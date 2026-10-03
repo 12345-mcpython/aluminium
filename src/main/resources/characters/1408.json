@@ -142,6 +142,41 @@
       ],
       "source": "1408 白厄（文档，卡厄斯兰那的天赋）：「…变身期间…**施放攻击后回复等同于自身生命上限 20%** 的生命值」",
       "note": "⭐ 2026-10-02：三件都是本段已验的形状 ✓：“变身期间”用**状态条件** ✓（`self has_state 变身` ✓—— 本句是**规则效果**而非修饰 ✓ ⇒ 不涉及 `buff:` 绑定 ✓）；“施放攻击后”用 `ATTACK_FINISHED` ✓；“回 20% 生命上限”用 `HEAL{scale: \"owner_max_hp\", percent: 0.20}` ✓。⚠ 受量取**当时的**生命上限 ✓（而变身把它提高了 270% ✓ ⇒ 治疗量也随之变大 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "talent_coreflame_on_being_targeted",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 1
+        }
+      ],
+      "source": "1408 白厄（文档，白厄的天赋）：「当白厄成为**其他任意目标**的技能目标时，**获得 1 点【火种】**」",
+      "note": "⭐ 2026-10-02：形状**逐字取自已出货的 `1002.talent_wind_pen`** ✓（`SKILL_CAST` 是**带被瞄准单位**的施放事件 ✓ ⇒ “成为目标”＝`target == self` ✓）。⚠ “其他任意目标”（敌或友）无需额外条件 ✓，因为她无法把自己的技能瞄自己 ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "talent_crit_damage_when_ally_targets_her",
+      "when": [
+        "actor is_ally",
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1408 白厄（文档，白厄的天赋）：「**若施放者为白厄的队友**，还会使白厄的**暴击伤害提高 30%**，持续 **3** 回合」",
+      "note": "⭐ 2026-10-02：第二半的条件**比第一半窄** ✓（`actor is_ally` ✓ —— 与 `8007` 已出货的骑手同拼写 ✓）⇒ 所以**它是单独一条规则** ✓；❗ **不绑状态** ✓（“持续 3 回合”是它自己的时长 ✓—— 第 36 件已立的区分 ✓）。"
     }
   ]
 }
