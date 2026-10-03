@@ -34,10 +34,13 @@ if len(targets) != 1:
     raise SystemExit("expected exactly one SKILL_CAST rule, found " + str(len(targets)))
 
 rule = targets[0]
-do = [e for e in (rule.get("do") or [])
-      if not (isinstance(e, dict) and e.get("mark") == MARK)]
-do.append({"op": "ADVANCE", "percent": 1.0, "target": "target", "mark": MARK})
-do.append({"op": "APPLY_BUFF", "buff": CHEER, "turns": 3, "target": "target", "mark": MARK})
+# \u26a0 Idempotence by OP, not by an invented key: `EffectKeyDisciplineTest` reddened the first draft with "these effect keys
+# are not fields of EffectSpec, so Gson drops them silently: {mark=[8007.json]}" -- an invented key is not a marker, it is a
+# silent no-op. Drop any previous copy of these two ops, then append the real ones.
+do = [e for e in (rule.get("do") or []) if not (isinstance(e, dict) and (
+    e.get("op") == "ADVANCE" or (e.get("op") == "APPLY_BUFF" and e.get("buff") == CHEER)))]
+do.append({"op": "ADVANCE", "percent": 1.0, "target": "target"})
+do.append({"op": "APPLY_BUFF", "buff": CHEER, "turns": 3, "target": "target"})
 rule["do"] = do
 rule["source"] = ((rule.get("source") or "") +
                   "\n\u2b50 2026-10-02\uff08\u6587\u6863 `:143`\uff09\uff1a\u300c\u4f7f\u6307\u5b9a\u6211\u65b9\u5355\u4f53**\u884c\u52a8\u63d0\u524d 100%**"
