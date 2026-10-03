@@ -41,9 +41,10 @@ rules.append({
              "\u26a0 **\u5df2\u767b\u8bb0**\uff1a\u540c\u53e5\u7684\u3010\u7206\u70b9\u3011\uff08\u8d44\u6e90\u4e0a\u9650\u5728\u7f16\u8bd1\u8868\u8fbe\u5f0f\u91cc \u2717\uff09\u3002"),
 })
 
-if not isinstance(doc, dict):
-    raise SystemExit("1501.json must be an object")
-doc["rules"] = rules
+if isinstance(doc, dict):
+    doc["rules"] = rules
+else:
+    doc = rules            # \u26a0 1501.json is a bare list (measured)
 json.dump(doc, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1501.json: the Aha ending grants an extra turn")
 
