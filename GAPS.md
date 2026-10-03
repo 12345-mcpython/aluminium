@@ -21881,6 +21881,24 @@
 >   * ④ 内容：`1505` 星魂改成 **`amountFromPrevious: true, amountPercent: 0.5`** ✓；⑤ 判据：**能量 150 ⇒ 好活当赏 150** ✓（⚠ 与 `ElationAmountCapTest` 一致 ✓）；⑥ 变异 ⇒ 必红 ✓。
 > * ⚠ **推送**：本地仍**领先 7** ✗（网络连七失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百三十二：🎯 **仓库自己写下了实现这条能力该走的路** —— `apply` 里那条注释明说：*"Passing it down beats a field on the context -- a nested firing would clobber shared state"*
+> ⇒ ⭐ **所以"共享状态"（含我一度想用的 `ThreadLocal`）是被仓库明确否掉的** ✗ ⇒ 必须**逐层传参**）**）**：
+>
+> * ✅ **实测（读 `apply` 的循环尾与 `fire` 的头 ✓）** ✓：
+>   * ⭐ **每条效果的实际执行是 `applyOne(battle, effect, effectCtx);`** ✓（⚠ 就在循环最后一行 ✓）；
+>   * ⭐⭐ **紧挨着的注释**（原文）：*"The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance,
+>     and the only op that consumes that amendment (`APPLY_CONTROL`) has to know which rule it is running inside. **Passing it down
+>     beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.**"* ✓
+>     ⇒ ⭐⭐⭐ **这就是仓库给"每条效果的私有数据"定的规矩** ✓：**往下传** ✓，**不要放共享状态** ✗（⚠ 因为**嵌套触发**会让共享状态互相覆盖 ✓）。
+> * ⚠ **于是修正我上一轮的设计** ✗（本段第 **三十四** 次自我纠正 ✓）：⛔ **不要用 `ThreadLocal`** ✗ ⇒ ⭐ **正解**：
+>   ① ⭐ **`applyOne` 增加一个参数** ✓（⚠ 形如 `applyOne(battle, effect, effectCtx, previousCredited)` ✓ —— ⭐ **与 `MODIFY_RULE` 那条"把规则 id 传下去"完全同构** ✓）；
+>   ② ⭐ **`gainResource` 也增加一个参数**（或由一个小的 `record EffectRun(double previousCredited)` 承载 ✓）⇒ **在那里面实现新分支** ✓；
+>   ③ ⭐ **`previousCredited` 的来源**：⚠ 在循环里，**执行前后取"该资源的入账差"** ✓（⚠ 用 `holder.getResources().value(id)` ✓ 相减 ✓）
+>     —— ⚠ 只有 `GAIN_RESOURCE` 需要更新它 ✓（⚠ 其他效果保持不变 ✓）。
+> * ⭐ **本件的进度（三件套）** ✓：**字段** ✓ 已落树（`EffectSpec.amountFromPrevious` ✓，全量绿 ✓）；**传参链** ⚠ 待做（⚠ 但**路数已由仓库注释定死** ✓）；
+>   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络连八失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（⚠ 本轮我试改过一次 `apply` ✓ 但**当即回滚** ✓ ⇒ 未留痕 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26828,6 +26846,24 @@
 >   * ④ 内容：`1505` 星魂改成 **`amountFromPrevious: true, amountPercent: 0.5`** ✓；⑤ 判据：**能量 150 ⇒ 好活当赏 150** ✓（⚠ 与 `ElationAmountCapTest` 一致 ✓）；⑥ 变异 ⇒ 必红 ✓。
 > * ⚠ **推送**：本地仍**领先 7** ✗（网络连七失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百三十二：🎯 **仓库自己写下了实现这条能力该走的路** —— `apply` 里那条注释明说：*"Passing it down beats a field on the context -- a nested firing would clobber shared state"*
+> ⇒ ⭐ **所以"共享状态"（含我一度想用的 `ThreadLocal`）是被仓库明确否掉的** ✗ ⇒ 必须**逐层传参**）**）**：
+>
+> * ✅ **实测（读 `apply` 的循环尾与 `fire` 的头 ✓）** ✓：
+>   * ⭐ **每条效果的实际执行是 `applyOne(battle, effect, effectCtx);`** ✓（⚠ 就在循环最后一行 ✓）；
+>   * ⭐⭐ **紧挨着的注释**（原文）：*"The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance,
+>     and the only op that consumes that amendment (`APPLY_CONTROL`) has to know which rule it is running inside. **Passing it down
+>     beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.**"* ✓
+>     ⇒ ⭐⭐⭐ **这就是仓库给"每条效果的私有数据"定的规矩** ✓：**往下传** ✓，**不要放共享状态** ✗（⚠ 因为**嵌套触发**会让共享状态互相覆盖 ✓）。
+> * ⚠ **于是修正我上一轮的设计** ✗（本段第 **三十四** 次自我纠正 ✓）：⛔ **不要用 `ThreadLocal`** ✗ ⇒ ⭐ **正解**：
+>   ① ⭐ **`applyOne` 增加一个参数** ✓（⚠ 形如 `applyOne(battle, effect, effectCtx, previousCredited)` ✓ —— ⭐ **与 `MODIFY_RULE` 那条"把规则 id 传下去"完全同构** ✓）；
+>   ② ⭐ **`gainResource` 也增加一个参数**（或由一个小的 `record EffectRun(double previousCredited)` 承载 ✓）⇒ **在那里面实现新分支** ✓；
+>   ③ ⭐ **`previousCredited` 的来源**：⚠ 在循环里，**执行前后取"该资源的入账差"** ✓（⚠ 用 `holder.getResources().value(id)` ✓ 相减 ✓）
+>     —— ⚠ 只有 `GAIN_RESOURCE` 需要更新它 ✓（⚠ 其他效果保持不变 ✓）。
+> * ⭐ **本件的进度（三件套）** ✓：**字段** ✓ 已落树（`EffectSpec.amountFromPrevious` ✓，全量绿 ✓）；**传参链** ⚠ 待做（⚠ 但**路数已由仓库注释定死** ✓）；
+>   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络连八失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（⚠ 本轮我试改过一次 `apply` ✓ 但**当即回滚** ✓ ⇒ 未留痕 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
