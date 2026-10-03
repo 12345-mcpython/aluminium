@@ -21835,6 +21835,35 @@
 >   ⇒ ⭐ **读者 ≥2 ✓、规格齐全 ✓ ⇒ 下一轮可以正当开工并出货** ✓（⚠ 唯一前置：读完 `:898`–`:930` ✓）。
 > * ⚠ **推送**：本地仍**领先 4** ✗（网络连五失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十：🎯🎯🎯 **最后一问有答案了** —— `TriggerInterpreter.apply` 里，**每条效果都从同一个 `ctx` 派生 `effectCtx`**（`ctx.withTargetFilter(...)` ✓）⇒ ⭐ 所以"上一条的入账量"**可以在同一个循环里用局部变量传递** ⇒ 施工单第 4 步定了）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.apply` ✓，`:903` 起 ✓）** ✓ 原文骨架：
+>   ```java
+>   public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
+>       int effectIndex = 0;
+>       for (EffectSpec effect : rule.effects()) {
+>           final int thisEffect = effectIndex++;
+>           effect = amendedEffect(effect, ctx);
+>           // M-53: this effect's per-target conditions …
+>           TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect));   // ★ 同一个 ctx 派生
+>           …
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **上下文是"一个源头 ＋ 每条派生"** ✓ ⇒ ⭐ **不需要动 `TriggerContext` 的 record** ✗✓
+>     （⚠ 施工单第 2/3 步**可以省掉** ✓ —— ⭐ 这是本轮**省下一次改动**的发现 ✓）；**(ii)** ⭐ **"上一条的入账量"用循环里的局部变量即可** ✓
+>       （⚠ 形如 `double previousCredited = 0;` ✓ 循环末尾更新 ✓ 下一条构造 `effectCtx` 时带上 ✓）；
+>   **(iii)** ⚠ 而这需要 **`gainResource` 把"实际入账量"报出来** ✗（⚠ 它现在是 `void` ✓ ⇒ ⭐ **两种做法**：
+>     ⭐ **(a)** 在 `apply` 里对 `GAIN_RESOURCE` 单独取一次"入账前后之差" ✓（⚠ 最省、**不改 `gainResource` 的签名** ✓）；
+>     ⭐ **(b)** 给 `gainResource` 加一个"回报"出口 ✓（⚠ 改动面更大 ✗）⇒ ⭐ **推荐 (a)** ✓）。
+> * ⭐⭐ **于是最终施工单（修订版，下一轮照抄）** ✗：
+>   ① ⭐ `beans/EffectSpec.java`：加 **`private Boolean amountFromPrevious;`** ✓ ＋ `copy.amountFromPrevious = amountFromPrevious;` ✓；
+>   ② ⭐ `TriggerInterpreter.apply` ✓：循环里加 **`double previousCredited = 0;`** ✓ ＋ 构造 `effectCtx` 时**带上它** ✓（⚠ 用 `ctx` 的现有派生方式 ✓）
+>      ＋ ⭐ **在执行 `GAIN_RESOURCE` 前后取资源差** ✓ ⇒ **更新 `previousCredited`** ✓；
+>   ③ ⭐ `gainResource` ✓：新增分支 **`amountFromPrevious` ⇒ 用 `effectCtx` 里的那个量 × `amountPercent`** ✓；
+>   ④ 内容：`1505` 星魂 = **`amountFromPrevious: true, amountPercent: 0.5`** ✓（⚠ 100% 那条用 `1.0` ✓）；
+>   ⑤ 判据：⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ **与既有守卫 `ElationAmountCapTest` 一致** ✓ —— ⭐ 它就是上一轮抓我的那位 ✓）；
+>   ⑥ 变异：`amountPercent` 0.5 → 0.25 ⇒ **必红** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络连六失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26735,6 +26764,35 @@
 >   `TriggerInterpreter.gainResource`（记入账量 ＋ 新分支 ✓）／执行遍历点（`TriggerInterpreter:905` ✓）／内容（`1505` 星魂 50%·100% ✓）／判据（150 ⇒ 150 ✓）／变异 ✓
 >   ⇒ ⭐ **读者 ≥2 ✓、规格齐全 ✓ ⇒ 下一轮可以正当开工并出货** ✓（⚠ 唯一前置：读完 `:898`–`:930` ✓）。
 > * ⚠ **推送**：本地仍**领先 4** ✗（网络连五失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十：🎯🎯🎯 **最后一问有答案了** —— `TriggerInterpreter.apply` 里，**每条效果都从同一个 `ctx` 派生 `effectCtx`**（`ctx.withTargetFilter(...)` ✓）⇒ ⭐ 所以"上一条的入账量"**可以在同一个循环里用局部变量传递** ⇒ 施工单第 4 步定了）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.apply` ✓，`:903` 起 ✓）** ✓ 原文骨架：
+>   ```java
+>   public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
+>       int effectIndex = 0;
+>       for (EffectSpec effect : rule.effects()) {
+>           final int thisEffect = effectIndex++;
+>           effect = amendedEffect(effect, ctx);
+>           // M-53: this effect's per-target conditions …
+>           TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect));   // ★ 同一个 ctx 派生
+>           …
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **上下文是"一个源头 ＋ 每条派生"** ✓ ⇒ ⭐ **不需要动 `TriggerContext` 的 record** ✗✓
+>     （⚠ 施工单第 2/3 步**可以省掉** ✓ —— ⭐ 这是本轮**省下一次改动**的发现 ✓）；**(ii)** ⭐ **"上一条的入账量"用循环里的局部变量即可** ✓
+>       （⚠ 形如 `double previousCredited = 0;` ✓ 循环末尾更新 ✓ 下一条构造 `effectCtx` 时带上 ✓）；
+>   **(iii)** ⚠ 而这需要 **`gainResource` 把"实际入账量"报出来** ✗（⚠ 它现在是 `void` ✓ ⇒ ⭐ **两种做法**：
+>     ⭐ **(a)** 在 `apply` 里对 `GAIN_RESOURCE` 单独取一次"入账前后之差" ✓（⚠ 最省、**不改 `gainResource` 的签名** ✓）；
+>     ⭐ **(b)** 给 `gainResource` 加一个"回报"出口 ✓（⚠ 改动面更大 ✗）⇒ ⭐ **推荐 (a)** ✓）。
+> * ⭐⭐ **于是最终施工单（修订版，下一轮照抄）** ✗：
+>   ① ⭐ `beans/EffectSpec.java`：加 **`private Boolean amountFromPrevious;`** ✓ ＋ `copy.amountFromPrevious = amountFromPrevious;` ✓；
+>   ② ⭐ `TriggerInterpreter.apply` ✓：循环里加 **`double previousCredited = 0;`** ✓ ＋ 构造 `effectCtx` 时**带上它** ✓（⚠ 用 `ctx` 的现有派生方式 ✓）
+>      ＋ ⭐ **在执行 `GAIN_RESOURCE` 前后取资源差** ✓ ⇒ **更新 `previousCredited`** ✓；
+>   ③ ⭐ `gainResource` ✓：新增分支 **`amountFromPrevious` ⇒ 用 `effectCtx` 里的那个量 × `amountPercent`** ✓；
+>   ④ 内容：`1505` 星魂 = **`amountFromPrevious: true, amountPercent: 0.5`** ✓（⚠ 100% 那条用 `1.0` ✓）；
+>   ⑤ 判据：⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ **与既有守卫 `ElationAmountCapTest` 一致** ✓ —— ⭐ 它就是上一轮抓我的那位 ✓）；
+>   ⑥ 变异：`amountPercent` 0.5 → 0.25 ⇒ **必红** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络连六失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
