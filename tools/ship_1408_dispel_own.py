@@ -138,7 +138,9 @@ public class TransformationDispelsTest {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "APPLY_DOT");
         TriggerSpecs.set(e, "element", "Thunder");
-        TriggerSpecs.set(e, "base_chance", 1.0);
+        // \u26a0 `baseChance`, the JAVA field name: `TriggerSpecs.set` uses reflection, so the JSON key (`base_chance`) is not what it
+        // wants -- it failed loudly with "cannot set base_chance on class EffectSpec".
+        TriggerSpecs.set(e, "baseChance", 1.0);
         TriggerSpecs.set(e, "scale", "self_attr:ATTACK");
         TriggerSpecs.set(e, "percent", 2.9);
         TriggerSpecs.set(e, "turns", 2);
