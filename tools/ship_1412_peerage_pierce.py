@@ -133,7 +133,15 @@ public class PeerageSkillPierceTest {
         TriggerSpecs.set(probe, "buff", PROBE);
         TriggerSpecs.set(probe, "permanent", true);
         TriggerSpecs.set(probe, "target", "self");
+        // \u2b50 2026-10-02, the split: an UNCONDITIONAL probe proves the DEALING_DAMAGE event reaches this rebuilt table at
+        // all, and the conditional one proves the 16% base plus this 20% were both live. Their two marks read out the answer.
+        EffectSpec always = new EffectSpec();
+        TriggerSpecs.set(always, "op", "APPLY_BUFF");
+        TriggerSpecs.set(always, "buff", PROBE + "_any");
+        TriggerSpecs.set(always, "permanent", true);
+        TriggerSpecs.set(always, "target", "self");
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
+                TriggerSpecs.rule(TriggerEvent.DEALING_DAMAGE.name(), List.of(), always),
                 TriggerSpecs.rule(TriggerEvent.DEALING_DAMAGE.name(),
                         List.of("self_attr:DEFENCE_IGNORE >= 0.36"), probe))));
 
@@ -161,6 +169,10 @@ public class PeerageSkillPierceTest {
         Assertions.assertNotNull(allySkill, "precondition: the ally has a skill");
         SkillExecutor.execute(battle, allySkill, ally, List.of(battle.enemies.get(0)));
         battle.processRequests();
+        // \u2b50 The two marks ARE the diagnosis, in the order the GAPS entry spells out.
+        if (!ally.getBuffManager().hasState(PROBE + "_any")) {
+            Assertions.fail("the DEALING_DAMAGE event never reached the rebuilt table (charge=" + charge + ")");
+        }
         return ally.getBuffManager().hasState(PROBE);
     }
 }
