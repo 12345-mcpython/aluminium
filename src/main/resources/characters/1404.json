@@ -105,6 +105,68 @@
         }
       ],
       "note": "⭐ 2026-09-30：用 `CAST_SKILL` 让那个单位**立即施放一次** `SKILL` ✓ —— ⚠ 读的是**它自己的数据行** ✓（而不是手写倍率 ✗），⚠ 而护栏会拒绝**不造成伤害**的技能 ✗。⚠ 来源：`CAST_SKILL` 是 `commandSummon` 放宽三处而来（见 `aggro 回收之七百八十五`）；⚠ 它不经过战技点消耗 ✓。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "talent_enters_bloodfeud_at_a_hundred",
+      "when": [
+        "resource_changed:天赋充能",
+        "self_resource:天赋充能 >= 100"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "天赋充能",
+          "amount": 100
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "血仇",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "self"
+        }
+      ],
+      "source": "1404 万敌 天赋 以血还血 (140404)：「**充能达到 100 时消耗 100 点充能进入【血仇】状态**并回复等同于万敌 **15%** 生命上限的生命值，同时**行动提前 100%**」",
+      "note": "⭐ 2026-10-02：**进入【血仇】** ✓（阈值 100 ✓／消耗 100 ✓／治疗 15% ✓／行动提前 100% ✓）。⚠ **仍登记**：状态内的属性块（生命上限提高、**防御力保持为 0** ✗）与「每损失 1% 生命积攒 1 点充能」✗（比值无效果层拼法 ✗）。"
+    },
+    {
+      "on": "LETHAL_DAMAGE",
+      "id": "bloodfeud_survives_a_lethal_blow_and_ends",
+      "when": [
+        "actor == self",
+        "self has_state 血仇"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "天赋充能",
+          "spendAll": true
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "血仇",
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.5,
+          "target": "self"
+        }
+      ],
+      "source": "1404 万敌 天赋 以血还血 (140404)：「【血仇】状态期间，万敌**受到致命攻击时不会陷入无法战斗状态，但会清空充能退出【血仇】状态**并回复等同于自身 **50%** 生命上限的生命值」",
+      "note": "⭐ 2026-10-02：⭐ **`LETHAL_DAMAGE` 的第六位读者** ✓，而且是**唯一会退出一个状态的** ✓。❗ **“清空充能”用 `spendAll`** ✓（已出货拼法，首个读者是 `1513` ✓）。❗ **为何 `permanent` 是准确的** ✓：全文只给了**一个**出口（就是本句 ✓）。"
     }
   ]
 }
