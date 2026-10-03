@@ -82,17 +82,18 @@ public class PeerageResPenTest {
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 At six Charge the holder is a peer, and a peer has 10% All-Type RES PEN. */
+    /** \u2b50 At six Charge the holder is a peer, and being a peer is worth exactly 10% more All-Type RES PEN. */
     @Test
-    public void thePeerHoldsTenPercentResPen() {
-        Assertions.assertEquals(0.10, resPenAfter(6), EPS,
+    public void thePeerHoldsTenPercentMoreResPen() {
+        Assertions.assertEquals(0.10, resPenAfter(6) - resPenAfter(1), EPS,
                 "\u300c\u6301\u6709\u3010\u7235\u4f4d\u3011\u7684\u89d2\u8272\u2026\u5168\u5c5e\u6027\u6297\u6027\u7a7f\u900f\u63d0\u9ad8 10.00%\u300d");
     }
 
-    /** \u26a0 Below the threshold there is no peerage, so there is none of the 10% either. */
+    /** \u26a0 Five Charge is still short of the threshold, so the sentence has not started yet. */
     @Test
-    public void withoutThePeerageThereIsNoResPen() {
-        Assertions.assertEquals(0.0, resPenAfter(1), EPS, "below six Charge there is no peerage");
+    public void fiveChargeIsStillShortOfThePeerage() {
+        Assertions.assertEquals(resPenAfter(1), resPenAfter(5), EPS,
+                "below six Charge the sentence has not started");
     }
 
     // ==================================================================
