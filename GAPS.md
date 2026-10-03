@@ -21663,6 +21663,30 @@
 > * ⭐ **本件的现状（四件套进度）** ✓：**内容** ✓ 已写（第二条效果 ＋ 注释含已知偏差 ✓）／**判据** ⚠ 编译通过、一向绿 ✓、另一向待"用正规通道加能量" ✓／
 >   **变异** ⚠ 待做（`0.5` → `0.25` ✓）／**文档** ✓（⚠ 本段已写全 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十一：🎯🎯🎯 **判据为什么"连基础量都不到"的**真因**找到了** —— ⚠ `CanHit.gainEnergy(double)` **只是加值、不发事件** ✗；发事件的是 **`Battle.applyEnergyGain(target, gain)`**（`:1378` ✓））**）**：
+>
+> * ✅ **实测（读 `Battle.applyEnergyGain` ✓，`:1378` ✓）** ✓ 原文：
+>   ```java
+>   public double applyEnergyGain(CanHit target, EnergyGain gain) {
+>       if (target == null) { return 0; }
+>       double added = target.gainEnergy(gain);
+>       // P8-6: only emit when the amount actually credited > 0 -- "blocked by the cap" should not count as gaining
+>       if (added > 0) {
+>           broadcastEnergyGain(target, added);
+>           // P8-7: let the data-driven tables see it too (e.g. "when I gain energy, ...").
+>           fireTriggersForAlly(TriggerEvent.ENERGY_GAINED, target, target, added);      // ★ 规则在这里才被驱动
+>       }
+>       return added;
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三点** ✓：**(i)** ⭐ **规则的入口是 `applyEnergyGain`** ✓（⚠ 而不是 `gainEnergy` ✗ —— ⚠ 本段判据用了后者 ✓ ⇒ **所以什么都没发生** ✓，
+>     本段第 **二十九** 次自我纠正 ✓）；**(ii)** ⭐ **`added > 0` 才发事件** ✓（⚠ 注释明写"被上限挡住不算获得" ✓ ⇒ ⭐ **我先前的"满能量"猜测方向对** ✓
+>     —— ⚠ 但**真正的拦路虎是"我调错了函数"** ✓）；**(iii)** ⭐ **对友方广播**（`fireTriggersForAlly` ✓）。
+> * ⭐ **下一轮第一步（一次改，应当就绿）** ✗：判据里把
+>   `owner.gainEnergy(100);` 改成 **`battle.applyEnergyGain(owner, new EnergyGain(100));`** ✓
+>   （⚠ `EnergyGain` 的构造签名**先 grep** ✓ —— ⭐ 本段的教训就是"猜 API"✗）
+>   ⇒ ⭐ 预期：**`p1505_energy_sync` 驱动** ✓ ⇒ 好活当赏 **20 + 100 + 50 = 170** ✓ ⇒ **两向绿** ⇒ **变异（`0.5` → `0.25`）⇒ 全量** ⇒ ⭐ **四件齐** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26391,6 +26415,30 @@
 >       ⇒ ⭐ 这样"加能量"就走正规路 ✓ ⇒ **行迹必然被驱动** ✓。
 > * ⭐ **本件的现状（四件套进度）** ✓：**内容** ✓ 已写（第二条效果 ＋ 注释含已知偏差 ✓）／**判据** ⚠ 编译通过、一向绿 ✓、另一向待"用正规通道加能量" ✓／
 >   **变异** ⚠ 待做（`0.5` → `0.25` ✓）／**文档** ✓（⚠ 本段已写全 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十一：🎯🎯🎯 **判据为什么"连基础量都不到"的**真因**找到了** —— ⚠ `CanHit.gainEnergy(double)` **只是加值、不发事件** ✗；发事件的是 **`Battle.applyEnergyGain(target, gain)`**（`:1378` ✓））**）**：
+>
+> * ✅ **实测（读 `Battle.applyEnergyGain` ✓，`:1378` ✓）** ✓ 原文：
+>   ```java
+>   public double applyEnergyGain(CanHit target, EnergyGain gain) {
+>       if (target == null) { return 0; }
+>       double added = target.gainEnergy(gain);
+>       // P8-6: only emit when the amount actually credited > 0 -- "blocked by the cap" should not count as gaining
+>       if (added > 0) {
+>           broadcastEnergyGain(target, added);
+>           // P8-7: let the data-driven tables see it too (e.g. "when I gain energy, ...").
+>           fireTriggersForAlly(TriggerEvent.ENERGY_GAINED, target, target, added);      // ★ 规则在这里才被驱动
+>       }
+>       return added;
+>   }
+>   ```
+>   ⇒ ⭐⭐⭐ **三点** ✓：**(i)** ⭐ **规则的入口是 `applyEnergyGain`** ✓（⚠ 而不是 `gainEnergy` ✗ —— ⚠ 本段判据用了后者 ✓ ⇒ **所以什么都没发生** ✓，
+>     本段第 **二十九** 次自我纠正 ✓）；**(ii)** ⭐ **`added > 0` 才发事件** ✓（⚠ 注释明写"被上限挡住不算获得" ✓ ⇒ ⭐ **我先前的"满能量"猜测方向对** ✓
+>     —— ⚠ 但**真正的拦路虎是"我调错了函数"** ✓）；**(iii)** ⭐ **对友方广播**（`fireTriggersForAlly` ✓）。
+> * ⭐ **下一轮第一步（一次改，应当就绿）** ✗：判据里把
+>   `owner.gainEnergy(100);` 改成 **`battle.applyEnergyGain(owner, new EnergyGain(100));`** ✓
+>   （⚠ `EnergyGain` 的构造签名**先 grep** ✓ —— ⭐ 本段的教训就是"猜 API"✗）
+>   ⇒ ⭐ 预期：**`p1505_energy_sync` 驱动** ✓ ⇒ 好活当赏 **20 + 100 + 50 = 170** ✓ ⇒ **两向绿** ⇒ **变异（`0.5` → `0.25`）⇒ 全量** ⇒ ⭐ **四件齐** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
