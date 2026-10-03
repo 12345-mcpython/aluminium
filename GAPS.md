@@ -23727,6 +23727,30 @@
 >   ⭐ **转做 `1512` 的忆灵面板（70% 生命／180% 速度）** ✓（⚠ 目标 ③ 的另一半 ✓）。
 > * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百二十九：🎯🎯🎯 **四个签名到手** ⇒ ⭐ 判据可以写完，且**事件很可能带"损失了多少点"**）**）**：
+>
+> * ✅ **实测（读 `CanHit` 的四个方法头 ✓）** ✓：
+>   ```
+>   :335  public double  getMaxHp()
+>   :504  public boolean takeDamage(double damage)          // ⭐ 判据就用它制造掉血 ✓
+>   :574  public double  consumeHp(double amount)           // ⭐ 对应 HP_CONSUMED ✓
+>   :986  public void    onHpLoss(Battle battle, CanHit target, double before, double after, …)
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **`takeDamage(double)` 一行就能制造掉血** ✓（⚠ 确定性 ✓，不靠小怪 ✓）；
+>   **(ii)** ⭐⭐ **`onHpLoss(…, double before, double after, …)` 说明这条通路**手里就有损失量**** ✓
+>     ⇒ ⭐ **所以"每损失 1 点 ⇒ +1【新蕊】"**很可能是精确的**** ✓（⚠ 而引擎里已有 `amountFromEvent` ✓ ⇒ ⭐ **两者一对，就是精确实现** ✓✓
+>       —— ⚠ 而本段的纪律是**先粗后精**：⭐ **先 `+1` 出货**（⚠ 文档也说"每 1 点 +1" ✓），⚠ **若事件确实给了损失量 ⇒ 下一件再升级为 `amountFromEvent`** ✓）。
+> * ⭐⭐ **于是判据可以写完**（⚠ 下一轮两次调用 ⇒ 出货）✗：
+>   ```java
+>   double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
+>   owner.takeDamage(100.0);
+>   battle.processRequests();
+>   Assertions.assertTrue(owner.getResources().has(RES), "\u3010\u65b0\u854a\u3011\u5df2\u5728\u6218\u6597\u7684\u8d44\u6e90\u8868\u91cc");
+>   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9");
+>   ```
+>   ⚠ **（两条断言分开 ✓ —— 本段第 56 条的既定做法 ✓）**；⭐ **变异**：⚠ 把 `on: HP_LOST` 改成别的事件 ✗ ⇒ 增量 0 ⇒ **红** ✓。
+> * ⚠ **推送**：本地仍**领先 3** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -30549,6 +30573,30 @@
 > * ⚠ **并按纪律留一个上限** ✓：⭐ 本条（`1407` 的【新蕊】）已用 **4 轮** ✗ ⇒ ⭐ **若下一轮仍不亮 ⇒ 登记**（⚠ 附"资源已存在／装载通过／三个 HP 相关方法已找到"✓），
 >   ⭐ **转做 `1512` 的忆灵面板（70% 生命／180% 速度）** ✓（⚠ 目标 ③ 的另一半 ✓）。
 > * ⚠ **推送**：本地仍**领先 2** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百二十九：🎯🎯🎯 **四个签名到手** ⇒ ⭐ 判据可以写完，且**事件很可能带"损失了多少点"**）**）**：
+>
+> * ✅ **实测（读 `CanHit` 的四个方法头 ✓）** ✓：
+>   ```
+>   :335  public double  getMaxHp()
+>   :504  public boolean takeDamage(double damage)          // ⭐ 判据就用它制造掉血 ✓
+>   :574  public double  consumeHp(double amount)           // ⭐ 对应 HP_CONSUMED ✓
+>   :986  public void    onHpLoss(Battle battle, CanHit target, double before, double after, …)
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **`takeDamage(double)` 一行就能制造掉血** ✓（⚠ 确定性 ✓，不靠小怪 ✓）；
+>   **(ii)** ⭐⭐ **`onHpLoss(…, double before, double after, …)` 说明这条通路**手里就有损失量**** ✓
+>     ⇒ ⭐ **所以"每损失 1 点 ⇒ +1【新蕊】"**很可能是精确的**** ✓（⚠ 而引擎里已有 `amountFromEvent` ✓ ⇒ ⭐ **两者一对，就是精确实现** ✓✓
+>       —— ⚠ 而本段的纪律是**先粗后精**：⭐ **先 `+1` 出货**（⚠ 文档也说"每 1 点 +1" ✓），⚠ **若事件确实给了损失量 ⇒ 下一件再升级为 `amountFromEvent`** ✓）。
+> * ⭐⭐ **于是判据可以写完**（⚠ 下一轮两次调用 ⇒ 出货）✗：
+>   ```java
+>   double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
+>   owner.takeDamage(100.0);
+>   battle.processRequests();
+>   Assertions.assertTrue(owner.getResources().has(RES), "\u3010\u65b0\u854a\u3011\u5df2\u5728\u6218\u6597\u7684\u8d44\u6e90\u8868\u91cc");
+>   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9");
+>   ```
+>   ⚠ **（两条断言分开 ✓ —— 本段第 56 条的既定做法 ✓）**；⭐ **变异**：⚠ 把 `on: HP_LOST` 改成别的事件 ✗ ⇒ 增量 0 ⇒ **红** ✓。
+> * ⚠ **推送**：本地仍**领先 3** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
