@@ -23774,6 +23774,23 @@
 > * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ 脚本已**先提交再跑** ✓。
 > * ⚠ **推送**：本地领先 5 ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百三十一：🎯🎯 **文档的「损失」vs「消耗」在引擎里就是 `takeDamage` vs `consumeHp`** —— ⭐ 而 `consumeHp` **明确不触发** `HP_LOST`**）**）**：
+>
+> * ✅ **实测（读 `CanHit` ✓）** ✓ 两处关键：
+>   * ⭐⭐ **`:568`**（`consumeHp` 的 javadoc 原文）：
+>     > *"⚠ **Deliberately NOT `takeDamage`**: a price, not an attack -- no shield absorbs it, **no `HP_LOST` fire**…"*
+>     ⇒ ⭐ **即：`consumeHp`（"消耗"）**故意不发** `HP_LOST` ✓** —— ⭐ 而 `takeDamage`（"损失/受伤"）才发 ✓
+>       ⇒ ⭐⭐ **这正好对应文档的两种说法**（`:94` 的「每**损失** 1 点生命值」✓ vs `:77` 的「**消耗**我方全体当前 30% 生命值」✓）
+>         ⇒ ⭐ **所以我的规则挂 `HP_LOST` 是对的** ✓，⭐ **判据用 `takeDamage` 也是对的** ✓；
+>   * ⭐ **`:986`**：`public void onHpLoss(Battle battle, CanHit target, double before, double after, …)` ⇒ **`:988` 转给 `buffManager.onHpLoss(...)`** ✓
+>     ⇒ ⭐ **触发链：`takeDamage` ⇒ `onHpLoss` ⇒ `buffManager.onHpLoss` ⇒ 事件** ✓。
+> * ⚠ **本轮实测的精确状态** ✓（⚠ 已回滚、未进树 ✓）：⭐ **`battle.partyResource("新蕊")` 非空** ✓（`assertNotNull` 过了 ✓）⇒ ⭐ **资源读得到了** ✓；
+>   ⚠ **但 `takeDamage(100.0)` 之后它仍是 `0.0`** ✗ ⇒ ⭐⭐ **所以"规则没付账"** ✓ —— ⚠ 只剩两个候选 ✗：
+>   **(甲)** ⭐ **`takeDamage` 在判据里没走到 `onHpLoss`** ✗（⚠ 例如需要 `source` 非空 ✓ 或需要**战斗真的处于进行中**的某个前提 ✓）⇒ ⭐ **下一轮第一步：`grep` 谁调用了 `onHpLoss`** ✓（⚠ 一次 ✓，**不猜** ✓）；
+>   **(乙)** ⚠ **规则里的 `target: "self"` 在 `HP_LOST` 上下文里指的不是她** ✗（⚠ 那就改成 `target: "attacker"`／不写 target ⇒ ⚠ 看默认 ✓）。
+> * ⚠ **并按纪律**：⭐ 本条已 **6 轮** ✗ ⇒ ⭐ **下一轮若仍不亮 ⇒ 登记**（⚠ 附"资源可读 ✓／`takeDamage` 已调用 ✓／两种掉血的语义已分明 ✓"✓），⭐ **转做 `1512` 的忆灵面板** ✓。
+> * ⚠ **推送**：本地领先 6 ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓，回滚后）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -30643,6 +30660,23 @@
 >       ⇒ ⭐ **"先拆断言、再读作者留下的 note"应当成为默认动作** ✓。
 > * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ 脚本已**先提交再跑** ✓。
 > * ⚠ **推送**：本地领先 5 ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千二百三十一：🎯🎯 **文档的「损失」vs「消耗」在引擎里就是 `takeDamage` vs `consumeHp`** —— ⭐ 而 `consumeHp` **明确不触发** `HP_LOST`**）**）**：
+>
+> * ✅ **实测（读 `CanHit` ✓）** ✓ 两处关键：
+>   * ⭐⭐ **`:568`**（`consumeHp` 的 javadoc 原文）：
+>     > *"⚠ **Deliberately NOT `takeDamage`**: a price, not an attack -- no shield absorbs it, **no `HP_LOST` fire**…"*
+>     ⇒ ⭐ **即：`consumeHp`（"消耗"）**故意不发** `HP_LOST` ✓** —— ⭐ 而 `takeDamage`（"损失/受伤"）才发 ✓
+>       ⇒ ⭐⭐ **这正好对应文档的两种说法**（`:94` 的「每**损失** 1 点生命值」✓ vs `:77` 的「**消耗**我方全体当前 30% 生命值」✓）
+>         ⇒ ⭐ **所以我的规则挂 `HP_LOST` 是对的** ✓，⭐ **判据用 `takeDamage` 也是对的** ✓；
+>   * ⭐ **`:986`**：`public void onHpLoss(Battle battle, CanHit target, double before, double after, …)` ⇒ **`:988` 转给 `buffManager.onHpLoss(...)`** ✓
+>     ⇒ ⭐ **触发链：`takeDamage` ⇒ `onHpLoss` ⇒ `buffManager.onHpLoss` ⇒ 事件** ✓。
+> * ⚠ **本轮实测的精确状态** ✓（⚠ 已回滚、未进树 ✓）：⭐ **`battle.partyResource("新蕊")` 非空** ✓（`assertNotNull` 过了 ✓）⇒ ⭐ **资源读得到了** ✓；
+>   ⚠ **但 `takeDamage(100.0)` 之后它仍是 `0.0`** ✗ ⇒ ⭐⭐ **所以"规则没付账"** ✓ —— ⚠ 只剩两个候选 ✗：
+>   **(甲)** ⭐ **`takeDamage` 在判据里没走到 `onHpLoss`** ✗（⚠ 例如需要 `source` 非空 ✓ 或需要**战斗真的处于进行中**的某个前提 ✓）⇒ ⭐ **下一轮第一步：`grep` 谁调用了 `onHpLoss`** ✓（⚠ 一次 ✓，**不猜** ✓）；
+>   **(乙)** ⚠ **规则里的 `target: "self"` 在 `HP_LOST` 上下文里指的不是她** ✗（⚠ 那就改成 `target: "attacker"`／不写 target ⇒ ⚠ 看默认 ✓）。
+> * ⚠ **并按纪律**：⭐ 本条已 **6 轮** ✗ ⇒ ⭐ **下一轮若仍不亮 ⇒ 登记**（⚠ 附"资源可读 ✓／`takeDamage` 已调用 ✓／两种掉血的语义已分明 ✓"✓），⭐ **转做 `1512` 的忆灵面板** ✓。
+> * ⚠ **推送**：本地领先 6 ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2140** 例 ✓，回滚后）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
