@@ -24326,6 +24326,22 @@
 >   ⇒ ⭐ **然后写 `8007` 的 rider**：`DEALING_DAMAGE` ＋ `from_category` ＋ `self_resource:迷迷的声援 >= 1` ⇒ **`DAMAGE{damage_type: "TRUE", percent: 0.28, element: …}`** ✓ ＋ **判据**（⚠ 两向：真伤害不被防御削弱 ✓）＋ **变异** ⇒ ⭐ **出货（第 27 件）** ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`7304d250` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十：🎉🎉🎉 **"原伤害 × %"也**已经实现了**** —— ⭐ 挂在 **`DAMAGE_SETTLED`** 上，
+> 而且代码里留着**我自己那轮的完整复盘**（含一条**警告我用过的判据手法**的话））**）**：
+>
+> * ✅ **实测（读 `literalBase` ✓，`:4026` 起 ✓）** ✓ 原文要点（⭐ 全部是**代码里的注释**，不是我事后总结 ✓）：
+>   * ⭐ *"A share of the TRIGGERING instance（「等同于原伤害 X%」）was implemented here on 2026-10-02 and **ROLLED BACK the same round**, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries the instance -- **`damage.toValue()` is 4.2x the value the victim actually loses**（measured: **1093.02 vs 260.237584** on one 姬子 attack）, since settlement happens AFTER that event by design."* ✓
+>     ＋ *"⇒ It needs a **POST-settlement carrier** for the value; the reader table and the exact numbers are in GAPS（entry "aggro 回收之八百"）."* ✓
+>   * ⭐⭐⭐ *"「等同于**原伤害** X%」(2026-10-02): a share of the damage instance that triggered this rule -- of the number the victim actually took, **which is what `DAMAGE_SETTLED`'s `amount` is**."* ✓
+>     ＋ ⭐ **除法的理由**：*"a `DAMAGE`'s value is a **BASE** … Feeding it the already-settled amount would multiply those zones a second time（measured: a 40% share landed as 0.4 × 0.5829 = 0.233）… **Dividing by the triggering instance's own factor（`toValue() / skillBaseValue`）makes the rider SETTLE to exactly the share the text states**."* ✓
+>   * ⚠⚠ **还有一句直接警告我用过的判据手法**：*"That detour was **my own error, not the engine's**: my first probes **replaced the character's table with a hand-built one** to control variables, **which also dropped `level_convention`**, so the cast ran at the Lv1 row (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy…"* ✓
+> * ⭐⭐⭐ **三条结论** ✓：**(i)** ⭐ **"原伤害 × %"已建成** ✓（⚠ 载体是 `DAMAGE_SETTLED` 的 `amount` ✓ ＋ `toValue()/skillBaseValue` 的除法 ✓）；
+>   **(ii)** ⭐ **"真伤害 + 原伤害比例"这两条**都早就在树上**** ✓ ⇒ ⭐ **所以 `8007` 的 28% 是**纯内容工作**** ✓（⚠ **第 27 件可以一次做成** ✓）；
+>   **(iii)** ⭐⭐ **而那段警告正对着本段反复使用的"重建表"手法** ✓ —— ⚠ **它提醒：重建表会连带丢掉 `level_convention`** ✓
+>     ⇒ ⭐ **所以本段后续所有"重建表"的判据都要**补回 `level_convention`**（或有意识地避开按等级取值的行）** ✓
+>       （⭐ **第七十二条：这是一条**代码里留给我**的纪律** ✓ —— ⭐ **比我自己写的笔记更硬** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`28efae4e` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -31747,6 +31763,22 @@
 > * ⭐ **下一轮第一步（一次读 ＋ 可能直接出货）** ✗：⭐ **读 `literalBase`** ✓ ⇒ ⭐ **看它支持哪些来源**（⚠ 本段见过 `self_attr:` ✓ ⇒ ⭐ **看有没有"事件伤害量"或类似 `event:` 前缀** ✓）
 >   ⇒ ⭐ **然后写 `8007` 的 rider**：`DEALING_DAMAGE` ＋ `from_category` ＋ `self_resource:迷迷的声援 >= 1` ⇒ **`DAMAGE{damage_type: "TRUE", percent: 0.28, element: …}`** ✓ ＋ **判据**（⚠ 两向：真伤害不被防御削弱 ✓）＋ **变异** ⇒ ⭐ **出货（第 27 件）** ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`7304d250` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千二百六十：🎉🎉🎉 **"原伤害 × %"也**已经实现了**** —— ⭐ 挂在 **`DAMAGE_SETTLED`** 上，
+> 而且代码里留着**我自己那轮的完整复盘**（含一条**警告我用过的判据手法**的话））**）**：
+>
+> * ✅ **实测（读 `literalBase` ✓，`:4026` 起 ✓）** ✓ 原文要点（⭐ 全部是**代码里的注释**，不是我事后总结 ✓）：
+>   * ⭐ *"A share of the TRIGGERING instance（「等同于原伤害 X%」）was implemented here on 2026-10-02 and **ROLLED BACK the same round**, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries the instance -- **`damage.toValue()` is 4.2x the value the victim actually loses**（measured: **1093.02 vs 260.237584** on one 姬子 attack）, since settlement happens AFTER that event by design."* ✓
+>     ＋ *"⇒ It needs a **POST-settlement carrier** for the value; the reader table and the exact numbers are in GAPS（entry "aggro 回收之八百"）."* ✓
+>   * ⭐⭐⭐ *"「等同于**原伤害** X%」(2026-10-02): a share of the damage instance that triggered this rule -- of the number the victim actually took, **which is what `DAMAGE_SETTLED`'s `amount` is**."* ✓
+>     ＋ ⭐ **除法的理由**：*"a `DAMAGE`'s value is a **BASE** … Feeding it the already-settled amount would multiply those zones a second time（measured: a 40% share landed as 0.4 × 0.5829 = 0.233）… **Dividing by the triggering instance's own factor（`toValue() / skillBaseValue`）makes the rider SETTLE to exactly the share the text states**."* ✓
+>   * ⚠⚠ **还有一句直接警告我用过的判据手法**：*"That detour was **my own error, not the engine's**: my first probes **replaced the character's table with a hand-built one** to control variables, **which also dropped `level_convention`**, so the cast ran at the Lv1 row (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy…"* ✓
+> * ⭐⭐⭐ **三条结论** ✓：**(i)** ⭐ **"原伤害 × %"已建成** ✓（⚠ 载体是 `DAMAGE_SETTLED` 的 `amount` ✓ ＋ `toValue()/skillBaseValue` 的除法 ✓）；
+>   **(ii)** ⭐ **"真伤害 + 原伤害比例"这两条**都早就在树上**** ✓ ⇒ ⭐ **所以 `8007` 的 28% 是**纯内容工作**** ✓（⚠ **第 27 件可以一次做成** ✓）；
+>   **(iii)** ⭐⭐ **而那段警告正对着本段反复使用的"重建表"手法** ✓ —— ⚠ **它提醒：重建表会连带丢掉 `level_convention`** ✓
+>     ⇒ ⭐ **所以本段后续所有"重建表"的判据都要**补回 `level_convention`**（或有意识地避开按等级取值的行）** ✓
+>       （⭐ **第七十二条：这是一条**代码里留给我**的纪律** ✓ —— ⭐ **比我自己写的笔记更硬** ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`28efae4e` ✓，pending 0 ✓）⇒ ⭐ **纪律五项满足** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2142** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
