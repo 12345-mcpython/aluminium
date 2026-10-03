@@ -1,23 +1,24 @@
-"""「使自身**所有**增益效果延长 1 回合」 -- the filter-less EXTEND_BUFF (2026-10-02, item 44).
+"""「使自身**所有**增益效果延长 1 回合」 -- the explicit `kind: all` (2026-10-02, item 44).
 
 Readers, verbatim (1506 银狼LV.999, two sentences):
   * 「**每回合首次触发该效果时**，使自身**所有**增益效果延长 1 回合。」
   * 「星魂 2…**进入【无敌玩家】状态后**，使自身**所有**增益效果延长 1 回合。」
 
-WHY IT NEEDED AN ENGINE PIECE (measured, not assumed): `BuffManager.extendBuffsFrom` filters by ORIGIN --
-`if (buff.isPermanent() || buff.getSource() != source || !isNamed(...)) continue;` -- and its own note names the shape it was built
-for (「战技提供的护盾」). So 「所有」 (whoever applied it) had no spelling. Stating NEITHER `buff` NOR `attribute` used to be a
-silent no-op (`extendBuffsFrom` returns 0 when both are null), and **all eight** shipped EXTEND_BUFF effects name one or the other
-(measured), so that spelling was free to take the unfiltered meaning.
+THE ENGINE PIECE, and the decision that had to come first: `BuffManager.extendBuffsFrom` filters by ORIGIN (its own note names
+「战技提供的护盾」), so 「所有」 had no spelling -- but `requireExtendFilter` REFUSED the filter-less form deliberately, and said why:
+"Without one it would mean 'everything I have on that unit', which would lengthen buffs the sentence never mentions". That
+objection is about saying NOTHING; an author who writes an explicit `"kind": "all"` has said what they mean, so the refusal
+stays for the implicit form and the explicit one is allowed (both notes are in the code).
 
-THE JUDGE IS THE DISCRIMINATOR ITSELF: the two runs differ in ONE thing -- which spelling the extender uses. A buff applied by
-ANOTHER unit (`甲` -> `乙`) is lengthened only by the new, filter-less form; the origin-filtered form cannot touch it.
-Expiry is observed the way round 1619 measured it: `BuffManager.beforeMove()` -> `processBuffTick` is the decrement.
+THE JUDGE IS THE DISCRIMINATOR: both runs have 甲 put a two-turn buff on 乙, and 乙's extender differs in ONE thing -- `kind: all`
+versus the shipped `buff: "probe_mark"`. The origin-filtered form cannot reach a buff that 甲 applied; the unfiltered one must.
+Expiry is observed the way round 1619 measured it (`BuffManager.beforeMove()` -> `processBuffTick`).
 ASCII only.
 """
 import io
 
 JUDGE = "src/test/java/com/laosun/aluminium/test/ExtendAllBuffsTest.java"
+RULE = "probe"
 
 io.open(JUDGE, "w", encoding="utf-8", newline="").write('''package com.laosun.aluminium.test;
 
@@ -38,10 +39,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u4f7f\u81ea\u8eab**\u6240\u6709**\u589e\u76ca\u6548\u679c\u5ef6\u957f 1 \u56de\u5408\u300d (2026-10-02): the filter-less `EXTEND_BUFF`.
+ * \u300c\u4f7f\u81ea\u8eab**\u6240\u6709**\u589e\u76ca\u6548\u679c\u5ef6\u957f 1 \u56de\u5408\u300d (2026-10-02): `EXTEND_BUFF` with `kind: all`.
  *
- * <p>\u2b50 ONE VARIABLE: both runs have \u7532 put a two-turn buff on \u4e59; the extender on \u4e59's own table differs only in HOW it names what
- * to lengthen -- `buff: "probe_mark"` (the shipped, origin-filtered form) versus naming nothing (the new, unfiltered form).
+ * <p>\u2b50 ONE VARIABLE: \u7532 puts a two-turn buff on \u4e59 in both runs, and \u4e59\u2019s own extender differs only in HOW it says what to lengthen.
  */
 public class ExtendAllBuffsTest {
     private static final int FIRST = 1002;
@@ -49,44 +49,44 @@ public class ExtendAllBuffsTest {
     private static final int MONSTER = 1002011;
     private static final String MARK = "probe_mark";
 
-    /** \u2b50 The unfiltered form lengthens a buff that somebody ELSE applied. */
+    /** \u2b50 `kind: all` lengthens a buff that somebody ELSE applied. */
     @Test
-    public void theUnfilteredFormLengthensAnotherUnitsBuff() {
-        Assertions.assertTrue(survivesTheExtraTick(null),
+    public void kindAllLengthensAnotherUnitsBuff() {
+        Assertions.assertTrue(survivesTheTicks(ExtendKind.ALL),
                 "\u300c\u4f7f\u81ea\u8eab**\u6240\u6709**\u589e\u76ca\u6548\u679c\u5ef6\u957f 1 \u56de\u5408\u300d-- the buff came from \u7532, and it must still be lengthened");
     }
 
-    /** \u26a0 The shipped, origin-filtered form cannot: \u4e59 did not apply that buff, \u7532 did. */
+    /** \u26a0 Naming the buff keeps the shipped origin filter: \u4e59 did not apply it, \u7532 did. */
     @Test
-    public void theOriginFilteredFormCannot() {
-        Assertions.assertFalse(survivesTheExtraTick(MARK),
-                "\u26a0 the origin filter is the old behaviour: \u4e59\u2019s own rule may only lengthen \u4e59\u2019s own buffs");
+    public void namingTheBuffKeepsTheOriginFilter() {
+        Assertions.assertFalse(survivesTheTicks(ExtendKind.BY_NAME),
+                "\u26a0 the origin filter is the old behaviour: \u4e59\u2019s rule may only lengthen \u4e59\u2019s own buffs");
     }
+
+    private enum ExtendKind { ALL, BY_NAME }
 
     // ==================================================================
 
-    /** \u4e59\u2019s extender names {@code namedBuff} (or nothing at all), then both take the same tick, and we ask whether \u7532\u2019s buff is still there. */
-    private static boolean survivesTheExtraTick(String namedBuff) {
+    /** builds the scene, extends, takes two ticks, and asks whether \u7532\u2019s buff is still there. */
+    private static boolean survivesTheTicks(ExtendKind kind) {
         Character first = CharacterFactory.create(FIRST, 80);
         first.setTriggerTable(new TriggerTable(FIRST, List.of(
                 TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), mark()))));
         Character second = CharacterFactory.create(SECOND, 80);
         second.setTriggerTable(new TriggerTable(SECOND, List.of(
-                TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), extend(namedBuff)))));
+                TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), extend(kind)))));
 
         Battle battle = new Battle(List.of(first, second),
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
 
-        // \u7532 puts the two-turn buff on \u4e59.
         Skill theirs = first.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(theirs, "precondition: \u7532 has a skill");
         SkillExecutor.execute(battle, theirs, first, List.of(battle.enemies.getFirst()));
         battle.processRequests();
         Assertions.assertTrue(second.getBuffManager().hasState(MARK), "precondition: \u4e59 carries \u7532\u2019s buff");
 
-        // \u4e59 lengthens -- by name (filtered) or by saying nothing (unfiltered).
         Skill hers = second.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(hers, "precondition: \u4e59 has a skill");
         SkillExecutor.execute(battle, hers, second, List.of(battle.enemies.getFirst()));
@@ -110,12 +110,14 @@ public class ExtendAllBuffsTest {
         return e;
     }
 
-    /** \u4e59\u2019s extender: one turn, optionally naming the buff (that is the only difference between the two runs). */
-    private static EffectSpec extend(String namedBuff) {
+    /** \u4e59\u2019s extender: one turn, either \u300c\u6240\u6709\u300d or the shipped name form -- the only difference between the runs. */
+    private static EffectSpec extend(ExtendKind kind) {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "EXTEND_BUFF");
-        if (namedBuff != null) {
-            TriggerSpecs.set(e, "buff", namedBuff);
+        if (kind == ExtendKind.ALL) {
+            TriggerSpecs.set(e, "kind", "all");
+        } else {
+            TriggerSpecs.set(e, "buff", MARK);
         }
         TriggerSpecs.set(e, "turns", 1);
         TriggerSpecs.set(e, "target", "self");
