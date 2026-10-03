@@ -21899,6 +21899,38 @@
 >   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓）。
 > * ⚠ **推送**：本地仍**领先 7** ✗（网络连八失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（⚠ 本轮我试改过一次 `apply` ✓ 但**当即回滚** ✓ ⇒ 未留痕 ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十三：⭐⭐ **传参链的三个确切锚点到手** ⇒ ⭐ 下一轮一次就能改完（⚠ 但要先确认 `applyOne` 没有别的调用点 ✓）**）**：
+>
+> * ✅ **实测（三处 ✓）** ✓：
+>   | 锚点 | 内容 |
+>   |---|---|
+>   | ⭐ `applyOne` 定义 | **`private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx)`** ✓（`:1050` ✓） |
+>   | ⭐ 派发点 | **`gainResource(effect, ctx);`** ✓（`:1158` ✓，即 `switch (op)` 里 `GAIN_RESOURCE` 那一支 ✓） |
+>   | ⭐ 实现体 | **`private static void gainResource(EffectSpec effect, TriggerContext ctx)`** ✓（`:1341` ✓） |
+> * ⭐⭐ **拟定补丁（下一轮照抄；⚠ 先跑上面那次 `applyOne(` 的检索，确认只有 1 个调用点 ✓）** ✗：
+>   ```java
+>   // ① apply 的循环外：
+>   double previousCredited = 0;
+>   // ② 循环内（把上一条的"入账量"传下去，并在本条的 GAIN_RESOURCE 之后更新它）：
+>   if ("GAIN_RESOURCE".equals(normalizeOp(effect, null))) {
+>       CanHit holder = resolveTarget(effect, effectCtx);
+>       String id = effect.getResource();
+>       int before = holder.getResources().has(id) ? holder.getResources().value(id) : 0;
+>       applyOne(battle, effect, effectCtx, previousCredited);
+>       previousCredited = (holder.getResources().has(id) ? holder.getResources().value(id) : 0) - before;
+>   } else {
+>       applyOne(battle, effect, effectCtx, previousCredited);
+>   }
+>   // ③ applyOne(..., double previousCredited) ⇒ 传给 gainResource(effect, ctx, previousCredited)
+>   // ④ gainResource：新增分支 amountFromPrevious ⇒ amount = round(previousCredited * amountPercent)
+>   ```
+>   ⇒ ⭐ **为什么这样写** ✓：**(i)** ⭐ **不用改 `TriggerContext` 的 record** ✓（⚠ 与仓库"往下传"的规矩一致 ✓，⚠ 且不必动 3 个构造点 ✓）；
+>   **(ii)** ⭐ **"入账量"用 `Resource.value(id)` 的**前后差**取得** ✓ ⇒ ⭐ **天然带上"上限截断"** ✓✓ —— ⭐ **这正是这条能力的全部要点** ✓；
+>   **(iii)** ⚠ `normalizeOp`／`resolveTarget` **都是本文件已有方法** ✓ ⇒ **不引入新名字** ✓。
+> * ⚠ **本件的账** ✓：**字段** ✓ 已落树；**传参链** ⚠ 待改（⚠ 本轮已把**三处锚点与整段补丁**写死 ✓ ⇒ 下一轮是一次"照着贴"的活 ✓）；
+>   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓；⚠ 变异：`amountPercent` 0.5 → 0.25 ⇒ 必红 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26864,6 +26896,38 @@
 >   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓）。
 > * ⚠ **推送**：本地仍**领先 7** ✗（网络连八失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（⚠ 本轮我试改过一次 `apply` ✓ 但**当即回滚** ✓ ⇒ 未留痕 ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十三：⭐⭐ **传参链的三个确切锚点到手** ⇒ ⭐ 下一轮一次就能改完（⚠ 但要先确认 `applyOne` 没有别的调用点 ✓）**）**：
+>
+> * ✅ **实测（三处 ✓）** ✓：
+>   | 锚点 | 内容 |
+>   |---|---|
+>   | ⭐ `applyOne` 定义 | **`private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx)`** ✓（`:1050` ✓） |
+>   | ⭐ 派发点 | **`gainResource(effect, ctx);`** ✓（`:1158` ✓，即 `switch (op)` 里 `GAIN_RESOURCE` 那一支 ✓） |
+>   | ⭐ 实现体 | **`private static void gainResource(EffectSpec effect, TriggerContext ctx)`** ✓（`:1341` ✓） |
+> * ⭐⭐ **拟定补丁（下一轮照抄；⚠ 先跑上面那次 `applyOne(` 的检索，确认只有 1 个调用点 ✓）** ✗：
+>   ```java
+>   // ① apply 的循环外：
+>   double previousCredited = 0;
+>   // ② 循环内（把上一条的"入账量"传下去，并在本条的 GAIN_RESOURCE 之后更新它）：
+>   if ("GAIN_RESOURCE".equals(normalizeOp(effect, null))) {
+>       CanHit holder = resolveTarget(effect, effectCtx);
+>       String id = effect.getResource();
+>       int before = holder.getResources().has(id) ? holder.getResources().value(id) : 0;
+>       applyOne(battle, effect, effectCtx, previousCredited);
+>       previousCredited = (holder.getResources().has(id) ? holder.getResources().value(id) : 0) - before;
+>   } else {
+>       applyOne(battle, effect, effectCtx, previousCredited);
+>   }
+>   // ③ applyOne(..., double previousCredited) ⇒ 传给 gainResource(effect, ctx, previousCredited)
+>   // ④ gainResource：新增分支 amountFromPrevious ⇒ amount = round(previousCredited * amountPercent)
+>   ```
+>   ⇒ ⭐ **为什么这样写** ✓：**(i)** ⭐ **不用改 `TriggerContext` 的 record** ✓（⚠ 与仓库"往下传"的规矩一致 ✓，⚠ 且不必动 3 个构造点 ✓）；
+>   **(ii)** ⭐ **"入账量"用 `Resource.value(id)` 的**前后差**取得** ✓ ⇒ ⭐ **天然带上"上限截断"** ✓✓ —— ⭐ **这正是这条能力的全部要点** ✓；
+>   **(iii)** ⚠ `normalizeOp`／`resolveTarget` **都是本文件已有方法** ✓ ⇒ **不引入新名字** ✓。
+> * ⚠ **本件的账** ✓：**字段** ✓ 已落树；**传参链** ⚠ 待改（⚠ 本轮已把**三处锚点与整段补丁**写死 ✓ ⇒ 下一轮是一次"照着贴"的活 ✓）；
+>   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓；⚠ 变异：`amountPercent` 0.5 → 0.25 ⇒ 必红 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
