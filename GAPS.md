@@ -22113,6 +22113,28 @@
 >   （**含星魂：100 + 50 = 150** ✓／**秘技：20 仍 20** ✓）；⛔ **内容与判据仍未进树** ✗（⚠ 因为"无条件星魂"会与两条既有判据冲突 ✓
 >   ⇒ ⭐ **必须先解决"开关或登记"** ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百四十三：🎉🎉🎉 **"星魂开关"**根本不是缺口**** —— 引擎**早就有它**：规则上写 **`min_eidolon`**，与角色构造时的 **`eidolonRank`** 比较 ⇒ ⭐ **上一轮那条登记作废**（⭐ 第三十九次自我纠正））**）**：
+>
+> * ✅ **实测（读 `Character` 的字段与 javadoc ✓）** ✓ 原文要点：
+>   > *"How many Eidolon ranks (\u661f\u9b42) are active on this character: `0`\u2013`Constant.EIDOLON_MAX_RANK`. **It is a construction-time
+>   > property, like the relic suit.** The assembly point decides which ranks are active and hands the number over; **a trigger rule
+>   > that belongs to an Eidolon says so with `min_eidolon`, and the interpreter compares the two.** So the engine never looks an
+>   > Eidolon up by cid \u2026 Which is also why `eidolons.json` is **reference material** rather than a loaded table."*
+>   ＋ 字段 **`private int eidolonRank;`**（`:142` ✓，且**拷贝时保留** ✓ `:164` ✓）
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **"分层启用"机制**已经存在** ✓ —— 规则上 **`min_eidolon`** ✓，引擎拿角色的 **`eidolonRank`** 比 ✓；
+>   **(ii)** ⭐ **它是"构造期属性"** ✓（⚠ 与遗器套装同类 ✓）⇒ ⭐ **于是"只测基础层"的既有判据只要用 `eidolonRank = 0` 构造就**天然绿** ✓✓
+>     （⚠ 这正是它们现在全绿的原因 ✓ —— ⭐ 而**我上一轮把"无条件星魂"写进内容** ⇒ 才会红 ✓ ⇒ ⭐ **错在我没写 `min_eidolon`** ✗）；
+>   **(iii)** ⭐ **`eidolons.json` 是"参考资料"而不是被装载的表** ✓ ⇒ ⭐ **所以星魂内容写在角色文件里、用 `min_eidolon` 标注** ✓。
+> * ⭐⭐ **结论** ✓：**上一轮登记的"星魂开关"缺口**作废**** ✓（⚠ 我按现状纠正，不硬留一条假缺口 ✓）⇒ ⭐ **改成**：
+>   ⭐ **正确的出货路径** ✓：给 `1505` 那条星魂效果所在的规则（或新规则）加 **`min_eidolon: 1`** ✓
+>   ⇒ ⭐ **既有两条判据（`eidolonRank = 0`）保持绿** ✓ ＋ ⭐ **新判据用 `CharacterFactory.create(…, eidolonRank = 1)` 来测星魂** ✓
+>     ⇒ ⭐ **两方各自成立、互不干扰** ✓✓ —— ⭐ **这才是仓库设计好的用法** ✓。
+> * ⭐ **下一轮第一步（三次调用，一次做成）** ✗：
+>   ① **读 `CharacterFactory` 里带 `eidolonRank` 的那个重载** ✓（⚠ 本轮只看到 `create(cid, level)`／`(cid, level, promoted)`／`(cid, level, promoted, weapon)`／`(…, relicSuit)` 四个 ✓
+>     ⇒ ⭐ **带星魂的是哪一个要先确认** ✓，⚠ 也可能是 6 参的那个（⚠ 本段一直用的 `create(1505, 80, false, null, null, 0)` ✓ ⇒ ⭐ **最后那个 `0` 很可能就是 `eidolonRank`** ✓✓）；
+>   ② 给星魂效果所在的规则加 **`"min_eidolon": 1`** ✓（⚠ 并确认装载期接受这个键 ✓ —— ⚠ 它的名字按 javadoc 是 `min_eidolon` ✓）；
+>   ③ 判据：**星魂 1 ⇒ 能量 150 时总量 150** ✓；**星魂 0 ⇒ 与既有判据一致（100／一对一）** ✓ ⇒ ⭐ **双向** ✓ ⇒ **变异** ⇒ **全量** ⇒ **出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -27321,6 +27343,28 @@
 > * ⚠ **本件的账（如实）** ✓：**引擎三处** ✓ 落树且全绿 ✓；**行为** ✓ 已被**两条既有守卫的失败/通过信息**双向证实
 >   （**含星魂：100 + 50 = 150** ✓／**秘技：20 仍 20** ✓）；⛔ **内容与判据仍未进树** ✗（⚠ 因为"无条件星魂"会与两条既有判据冲突 ✓
 >   ⇒ ⭐ **必须先解决"开关或登记"** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百四十三：🎉🎉🎉 **"星魂开关"**根本不是缺口**** —— 引擎**早就有它**：规则上写 **`min_eidolon`**，与角色构造时的 **`eidolonRank`** 比较 ⇒ ⭐ **上一轮那条登记作废**（⭐ 第三十九次自我纠正））**）**：
+>
+> * ✅ **实测（读 `Character` 的字段与 javadoc ✓）** ✓ 原文要点：
+>   > *"How many Eidolon ranks (\u661f\u9b42) are active on this character: `0`\u2013`Constant.EIDOLON_MAX_RANK`. **It is a construction-time
+>   > property, like the relic suit.** The assembly point decides which ranks are active and hands the number over; **a trigger rule
+>   > that belongs to an Eidolon says so with `min_eidolon`, and the interpreter compares the two.** So the engine never looks an
+>   > Eidolon up by cid \u2026 Which is also why `eidolons.json` is **reference material** rather than a loaded table."*
+>   ＋ 字段 **`private int eidolonRank;`**（`:142` ✓，且**拷贝时保留** ✓ `:164` ✓）
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **"分层启用"机制**已经存在** ✓ —— 规则上 **`min_eidolon`** ✓，引擎拿角色的 **`eidolonRank`** 比 ✓；
+>   **(ii)** ⭐ **它是"构造期属性"** ✓（⚠ 与遗器套装同类 ✓）⇒ ⭐ **于是"只测基础层"的既有判据只要用 `eidolonRank = 0` 构造就**天然绿** ✓✓
+>     （⚠ 这正是它们现在全绿的原因 ✓ —— ⭐ 而**我上一轮把"无条件星魂"写进内容** ⇒ 才会红 ✓ ⇒ ⭐ **错在我没写 `min_eidolon`** ✗）；
+>   **(iii)** ⭐ **`eidolons.json` 是"参考资料"而不是被装载的表** ✓ ⇒ ⭐ **所以星魂内容写在角色文件里、用 `min_eidolon` 标注** ✓。
+> * ⭐⭐ **结论** ✓：**上一轮登记的"星魂开关"缺口**作废**** ✓（⚠ 我按现状纠正，不硬留一条假缺口 ✓）⇒ ⭐ **改成**：
+>   ⭐ **正确的出货路径** ✓：给 `1505` 那条星魂效果所在的规则（或新规则）加 **`min_eidolon: 1`** ✓
+>   ⇒ ⭐ **既有两条判据（`eidolonRank = 0`）保持绿** ✓ ＋ ⭐ **新判据用 `CharacterFactory.create(…, eidolonRank = 1)` 来测星魂** ✓
+>     ⇒ ⭐ **两方各自成立、互不干扰** ✓✓ —— ⭐ **这才是仓库设计好的用法** ✓。
+> * ⭐ **下一轮第一步（三次调用，一次做成）** ✗：
+>   ① **读 `CharacterFactory` 里带 `eidolonRank` 的那个重载** ✓（⚠ 本轮只看到 `create(cid, level)`／`(cid, level, promoted)`／`(cid, level, promoted, weapon)`／`(…, relicSuit)` 四个 ✓
+>     ⇒ ⭐ **带星魂的是哪一个要先确认** ✓，⚠ 也可能是 6 参的那个（⚠ 本段一直用的 `create(1505, 80, false, null, null, 0)` ✓ ⇒ ⭐ **最后那个 `0` 很可能就是 `eidolonRank`** ✓✓）；
+>   ② 给星魂效果所在的规则加 **`"min_eidolon": 1`** ✓（⚠ 并确认装载期接受这个键 ✓ —— ⚠ 它的名字按 javadoc 是 `min_eidolon` ✓）；
+>   ③ 判据：**星魂 1 ⇒ 能量 150 时总量 150** ✓；**星魂 0 ⇒ 与既有判据一致（100／一对一）** ✓ ⇒ ⭐ **双向** ✓ ⇒ **变异** ⇒ **全量** ⇒ **出货** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
