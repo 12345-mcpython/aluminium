@@ -27,12 +27,18 @@ STATE = "\u53d8\u8eab"
 
 def add_rule(path, rule):
     doc = json.load(io.open(path, encoding="utf-8"))
-    rules = doc["rules"] if isinstance(doc, dict) else doc
+    # \u26a0 Some character files are BARE LISTS and some are objects (measured: 1104.json is a list -- "must be an object" is what the
+    # first version of this script said, and it wrote nothing). The file's own shape is preserved on the way out.
+    if isinstance(doc, dict):
+        rules = doc["rules"]
+    else:
+        rules = doc
     rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == rule["id"])]
     rules.append(rule)
-    if not isinstance(doc, dict):
-        raise SystemExit(path + " must be an object")
-    doc["rules"] = rules
+    if isinstance(doc, dict):
+        doc["rules"] = rules
+    else:
+        doc = rules
     json.dump(doc, io.open(path, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
     print("ok   " + path + ": " + rule["id"])
 
