@@ -22914,6 +22914,33 @@
 > * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ 脚本已**先提交再跑** ✓。
 > * ⚠ **推送**：本地领先 1 ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百八十五：🎯🎯🎯 **根因确认** —— `target` 的默认值**不是** `self`** ⇒ ⭐ 所以那条"没写 target 的充能"确实加到了**别人**身上）**）**：
+>
+> * ✅ **实测（读 `resolveSelector` ✓，`:1566` 起 ✓）** ✓ 原文：
+>   ```java
+>   private static CanHit resolveTarget(EffectSpec effect, TriggerContext ctx) {
+>       return resolveSelector(normalizeTarget(effect), effect, ctx);
+>   }
+>   private static CanHit resolveSelector(String selector, EffectSpec effect, TriggerContext ctx) {
+>       return switch (selector) {
+>           case "self" -> ctx.owner();
+>           case "target" -> require(ctx.target(), "target", ctx);
+>           case "attacker" -> require(ctx.actor(), "attacker", ctx);
+>           case "summon" -> requireSummon(ctx);
+>           …
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **`self` 与 `target` 是两个**明确不同**的选择器** ✓（`self` ⇒ `ctx.owner()` ✓；`target` ⇒ `ctx.target()` ✓）；
+>   **(ii)** ⭐⭐ **而"没写 target 时的默认"既不是 `self` 也不会是 `owner`** ✓ —— ⚠ **反证**：⚠ 若默认是 `self` ⇒ ⭐ **她的充能就该涨到 6** ✗
+>     ⇒ ⚠ **而我实测三版都是 1** ✓ ⇒ ⭐ **所以默认落在 `target`（本次施放的目标 ＝ 那位队友）上** ✓✓ —— ⭐ **第五十二次自我纠正后，根因锁定** ✓。
+> * ⭐⭐ **结论（这是**内容里的真 bug**，不是判据的）** ✓：`1412.json` 的 `skill_grants_military_merit` 里那条
+>   **`{"op":"GAIN_RESOURCE","resource":"充能","amount":1}`** **漏了 `"target": "self"`** ✗ ⇒ ⭐ 与文档原话
+>   「使指定我方单体角色获得【军功】**并使刻律德菈获得 1 点充能**」✓ **不符** ✓（⚠ 充能应加**她** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑，最可能直接出货）** ✗：
+>   ① ⭐ **修内容**：给那条补 **`"target": "self"`** ✓（⚠ 并在 `note` 里写明这是**按文档逐字修正** ✓）；
+>   ② ⭐ **同时**给 `MODIFY_ATTR{DEFENCE_IGNORE 0.16}` 那条第 22 件的 `target` 复核 ✓（⚠ 它写的是 `target` ✓ ＝ 持军功的队友 ✓ **正确** ✓）；
+>   ③ ⇒ 跑三版判据（⚠ 脚本已在树 ✓）⇒ ⭐ **充能 6 ⇒ 爵位 ⇒ 探针点** ⇒ 绿 ⇒ **变异**（0.20 → 0.10）⇒ **全量** ⇒ ⭐ **目标 ② 第 2 块完成** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`21ef5209` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -28924,6 +28951,33 @@
 > * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ 脚本已**先提交再跑** ✓。
 > * ⚠ **推送**：本地领先 1 ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百八十五：🎯🎯🎯 **根因确认** —— `target` 的默认值**不是** `self`** ⇒ ⭐ 所以那条"没写 target 的充能"确实加到了**别人**身上）**）**：
+>
+> * ✅ **实测（读 `resolveSelector` ✓，`:1566` 起 ✓）** ✓ 原文：
+>   ```java
+>   private static CanHit resolveTarget(EffectSpec effect, TriggerContext ctx) {
+>       return resolveSelector(normalizeTarget(effect), effect, ctx);
+>   }
+>   private static CanHit resolveSelector(String selector, EffectSpec effect, TriggerContext ctx) {
+>       return switch (selector) {
+>           case "self" -> ctx.owner();
+>           case "target" -> require(ctx.target(), "target", ctx);
+>           case "attacker" -> require(ctx.actor(), "attacker", ctx);
+>           case "summon" -> requireSummon(ctx);
+>           …
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **`self` 与 `target` 是两个**明确不同**的选择器** ✓（`self` ⇒ `ctx.owner()` ✓；`target` ⇒ `ctx.target()` ✓）；
+>   **(ii)** ⭐⭐ **而"没写 target 时的默认"既不是 `self` 也不会是 `owner`** ✓ —— ⚠ **反证**：⚠ 若默认是 `self` ⇒ ⭐ **她的充能就该涨到 6** ✗
+>     ⇒ ⚠ **而我实测三版都是 1** ✓ ⇒ ⭐ **所以默认落在 `target`（本次施放的目标 ＝ 那位队友）上** ✓✓ —— ⭐ **第五十二次自我纠正后，根因锁定** ✓。
+> * ⭐⭐ **结论（这是**内容里的真 bug**，不是判据的）** ✓：`1412.json` 的 `skill_grants_military_merit` 里那条
+>   **`{"op":"GAIN_RESOURCE","resource":"充能","amount":1}`** **漏了 `"target": "self"`** ✗ ⇒ ⭐ 与文档原话
+>   「使指定我方单体角色获得【军功】**并使刻律德菈获得 1 点充能**」✓ **不符** ✓（⚠ 充能应加**她** ✓）。
+> * ⭐ **下一轮第一步（一次改 ＋ 一次跑，最可能直接出货）** ✗：
+>   ① ⭐ **修内容**：给那条补 **`"target": "self"`** ✓（⚠ 并在 `note` 里写明这是**按文档逐字修正** ✓）；
+>   ② ⭐ **同时**给 `MODIFY_ATTR{DEFENCE_IGNORE 0.16}` 那条第 22 件的 `target` 复核 ✓（⚠ 它写的是 `target` ✓ ＝ 持军功的队友 ✓ **正确** ✓）；
+>   ③ ⇒ 跑三版判据（⚠ 脚本已在树 ✓）⇒ ⭐ **充能 6 ⇒ 爵位 ⇒ 探针点** ⇒ 绿 ⇒ **变异**（0.20 → 0.10）⇒ **全量** ⇒ ⭐ **目标 ② 第 2 块完成** ✓。
+> * ⚠ **推送**：本地已**同步** ✓（`21ef5209` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
