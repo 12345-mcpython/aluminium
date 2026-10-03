@@ -89,14 +89,19 @@ public class BloodfeudMaxHpTest {
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        double base = him.getMaxHp();
-
         Skill ult = him.getSkills().get(SkillType.ULTRA);
         Assertions.assertNotNull(ult, "precondition: he has an ultimate");
-        for (int i = 0; i < 5; i++) {
+        // \u26a0 FOUR ultimates, then the reading, then the fifth: the entry fires at a hundred, so this compares "immediately before
+        // the state" with "immediately after" it. Measuring the baseline earlier (right after startBattle) let an unrelated modifier
+        // expire in between -- that is exactly the ~5% gap the first version of this judge reported (2747.6 expected, 2607.9 seen).
+        for (int i = 0; i < 4; i++) {
             SkillExecutor.execute(battle, ult, him, List.of(battle.enemies.getFirst()));
             battle.processRequests();
         }
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: not a hundred yet");
+        double base = him.getMaxHp();
+        SkillExecutor.execute(battle, ult, him, List.of(battle.enemies.getFirst()));
+        battle.processRequests();
         Assertions.assertTrue(him.getBuffManager().hasState(STATE), "precondition: \u3010\u8840\u4ec7\u3011 is on");
         Assertions.assertEquals(base * 1.5, him.getMaxHp(), base * 0.01,
                 "\u300c\u3010\u8840\u4ec7\u3011\u72b6\u6001\u4e0b\u751f\u547d\u4e0a\u9650\u63d0\u9ad8\uff0c\u6570\u503c\u7b49\u540c\u4e8e\u5f53\u524d\u751f\u547d\u4e0a\u9650\u7684 50%\u300d");
