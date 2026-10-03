@@ -48,6 +48,7 @@ public class EffectSpec {
         copy.amountFromAttr = amountFromAttr;
         copy.amountPercent = amountPercent;
         copy.amountFromEvent = amountFromEvent;
+        copy.amountFromPrevious = amountFromPrevious;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -151,6 +152,13 @@ return copy;
      * context ({@code TriggerContext.amount}); until this flag no op could spend it, so "as much as it just gained" had no spelling.
      */
     private Boolean amountFromEvent;
+
+    /**
+     * ⚠ 2026-10-02（读者：1505 星魂「额外获得等同于本次获得的【好活当赏】50%/100%」）：
+     * 读的是<b>本条规则里前一条效果实际入账的量</b>（已经过上限截断），而不是原始事件量。
+     * 原始事件量请用 {@link #amountFromEvent}。
+     */
+    private Boolean amountFromPrevious;
     /**
      * \u2705 A ceiling on a single conversion (2026-09-30; reader: 1505 \u7eef\u82f1\u2019s \u300c\u5355\u6b21\u901a\u8fc7\u6b64\u65b9\u5f0f\u8ba1\u7b97\u7684
      * \u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u4e0d\u8d85\u8fc7 100 \u70b9\u300d). The clause bounds one conversion, not the resource: \u300c\u83b7\u5f97\u4e00\u70b9\u80fd\u91cf\n     * \u5c31\u5f97\u4e00\u70b9\u793c\u5305\uff0c\u4f46\u4e00\u6b21\u6700\u591a\u7ed9 100\u300d is two different statements, and only the first had a spelling before this.

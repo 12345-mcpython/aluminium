@@ -21745,6 +21745,335 @@
 > * ⭐ **纪律（第三十二条，最贵的一条）** ✗：⚠ **"收尾清理"（`git checkout -- .`）会把**尚未提交**的工具脚本一起冲掉** ✗
 >   ⇒ ⭐ **凡改过工具脚本 ⇒ 当场提交** ✓，或**把关键内容写进 `GAPS.md`**（⚠ 本段已在做 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百二十五：🎯 **两条"冲突"读出来了，而且它们判得**对**** —— ⭐ **我的改动越界了**：它按**未截断**的事件量给了 50%，⭐ 而文档要求按**已截断（≤100）的好活当赏**给）**）**：
+>
+> * ✅ **实测（全量两红 ✓，名字与信息 ✓）** ✓：
+>   * **`Character1505EnergySyncTest`** ✓：*"every point of energy is mirrored one-for-one into 【好活当赏】 ==> expected: **<40>** but was: **<50>**"* ✓
+>     ⇒ ⭐ 它守的是"**一分能量一分好活当赏**" ✓ ⇒ ⭐ 我的加成把它变成 40 ＋ 10 ✓；
+>   * **`ElationAmountCapTest`** ✓：*"单次不超过 100 点 ==> expected: **<100>** but was: **<175>**"* ✓
+>     ⇒ ⭐⭐ **`175 = 100 + 0.5 × 150`** ✓ ⇒ ⭐ **即：我的加成读的是**未截断的事件量**（150 点能量 ⇒ 75）** ✗
+>       —— ⭐ **而文档说的是"本次获得的【好活当赏】**（那个量已被 100 截断 ✓）**的 50%"** ✓ ⇒ ⭐ **正解应是 100 ＋ 50 = 150** ✗。
+> * ⭐⭐⭐ **结论（本轮定案）** ✓：**这是我的改动越界，不是既有判据过时** ✗ ⇒ ⭐ **既有守卫抓得对** ✓✓
+>   （⚠ 而且它**正好抓住了我在注释里写下的那条"已知偏差"** ✓ —— ⭐ **这是本段第一次"我自己写下的偏差被自己的守卫逮住"** ✓）。
+> * ✅ **处置（按纪律"未完成的能力要回滚并记录" ✓）** ✓：**回滚 `1505.json` 与判据** ✓ ⇒ 全量复跑 **rc 0（2132 例）** ✓。
+> * ⭐ **于是这条的**正确形状**变成一条**有读者的引擎级缺口**** ✓：
+>   ⭐ **缺的能力**：**"按**已截断的事件产出**派生一份比例量"** ✗ —— ⚠ 现有 `amountFromEvent` 读的是**原始事件量** ✓，
+>   而文档这条要读的是"**本次实际入账的【好活当赏】**"（⚠ 即前一条效果**经上限截断后**的产出 ✓）
+>     ⇒ ⭐ **读者**：⭐ **`1505` 的星魂** ✓（⚠ 另有 `:127` 里的 **100%** 那一半 ✓）⇒ ⭐ **读者 ≥2** ✓（⭐ 满足"不造没有读者的能力" ✓）
+>       ⇒ ⭐ **下一轮可以正当地建它** ✓（⚠ 通道名候选：`amountFromPrevious`／`amountFromLastEffect` ✗ ⇒ ⭐ **按引擎既有命名习惯取** ✓）。
+> * ⭐ **并留下一条重要的方法记录** ✓：⚠ **"判据绿"那次我跑了过滤后的单条** ✗ ⇒ **全量才抓住了越界** ✓ ⇒ ⭐ **纪律重申**：
+>   **任何内容改动，提交前跑全量** ✓（⚠ 本段第三十三条 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百二十六：✅✅ **下一条能力（"按已截断的产出派生比例量"）的落点与字段名都查到了** ⇒ ⭐ 规格可以写死，下一轮直接开工）**）**：
+>
+> * ✅ **实测（`glob` ＋ 读字段 ✓）** ✓：
+>   * ⚠ **`EffectSpec` 在 `beans/` 下，不在 `models/`** ✗ ⇒ **`src/main/java/com/laosun/aluminium/beans/EffectSpec.java`** ✓
+>     （⭐ 本段第三次"猜包路径"翻车 ✓ ⇒ **纪律：按类名 `glob`，不猜** ✓）；
+>   * ⭐ 现有四个量字段 ✓：**`amountFromAttr`（`:143` ✓，`String`）／`amountPercent`（`:147` ✓，`Double`；
+>     其 javadoc 写的是 *"The share of `amountFromAttr` to take (0.5 for 「50%」)"* ✓）／`amountFromEvent`（`:153` ✓，`Boolean`）／`amountCap`** ✓；
+>   * ⭐ 而 `gainResource` 的算法是：`amountFromEvent` ⇒ **`ctx.amount() × amountPercent`** ✓（⚠ **先乘比例，与上限无关** ✗）。
+> * ⭐⭐ **于是"缺的能力"可以写成一条精确规格** ✓（⚠ 下一轮照做 ✓）：
+>   | 项 | 内容 |
+>   |---|---|
+>   | 名字（候选） | ⭐ **`amountFromPrevious`** ✓（⚠ 按引擎既有命名：`amountFromAttr`／`amountFromEvent` ✓ ⇒ ⭐ **"上一个效果的**实际入账量**"** ✓） |
+>   | 落点 | ⭐ **`beans/EffectSpec.java`** ✓（新字段 ＋ `copy.*` 的拷贝行 ✓，⚠ 见 `:48`–`:51` 那组 ✓） |
+>   | 语义 | ⭐ **读"本效果之前那一条效果**经上限截断后**的实际量"** ✓（⚠ 而不是原始事件量 ✗） |
+>   | 实现要点 | ⭐ 在 `TriggerInterpreter.gainResource` 里，把**截断后的入账量**记进上下文 ✓（⚠ 例如 `TriggerContext` 新增 `lastAmount` ✓）；下一条效果读它 ✓ |
+>   | 读者（≥2 ✓） | ⭐ **`1505` 星魂的 50%** ✓ ＋ ⭐ **同句的 100%** ✓（⚠ 文档 `:127` ✓） |
+>   | 判据 | ⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ 这正是既有守卫 `ElationAmountCapTest` 抓出的情形 ✓ ⇒ ⭐ **判据要与它一致** ✓） |
+>   | 变异 | ⭐ 把 `amountFromPrevious` 的分支关掉（或 `amountPercent` 0.5 → 0.25 ⇒ 150 → 125 ✓）⇒ **必红** ✓ |
+> * ⭐ **并记一条流程要求** ✓：⚠ 这条要改**引擎**（`EffectSpec` ＋ `TriggerInterpreter` ＋ 可能的 `TriggerContext` ✓）
+>   ⇒ ⭐ **按纪律：先全量绿 ⇒ 提交 ⇒ 再跑演示闸门** ✓；⚠ 且**提交必须被 `$LASTEXITCODE` 守住** ✓（⭐ 本轮已立 ✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络再次失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十七：✅✅✅ **`TriggerContext` 的真身找到了 —— 它是 `TriggerTable` 里的一个 `record`** ⇒ ⭐ 于是"记录上一次入账量"的**确切补丁点**到手）**）**：
+>
+> * ✅ **实测（按类名搜声明与构造 ✓）** ✓：
+>   * ⭐ **声明**：`TriggerTable.java:1995` ✓ ——
+>     **`public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount, …)`** ✓
+>     （⚠ 本段早前在条件解析里见过的 `stateName` ✓ 就在这个 record 里 ✓）；
+>   * ⭐ **两个便利构造**：`TriggerTable.java:2003` ✓ 与 **`:2016`** ✓ —— 后者形如
+>     `return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, …)` ✓；
+>   * ⭐ **一个外部构造点**：**`Battle.java:2369`** ✓ —— `new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this, …)` ✓。
+>   ⇒ ⭐⭐ **所以"新增一个量"这件事的完整改动面是**：**record 加一个分量 ✓ ＋ 上述 3 个构造点补参数 ✓（⚠ `:2003`／`:2016`／`Battle:2369` ✓）**
+>     ⇒ ⭐ **加上 `EffectSpec` 的新字段（`beans/EffectSpec.java` ✓，⚠ 见 `:48`–`:51` 的 `copy.*` 组 ✓）
+>       ＋ `gainResource` 里"记下截断后入账量"的那一行 ✓ ＋ 新字段的分支 ✓** ⇒ ⭐ **共 5–6 处小改** ✓（⭐ 可控 ✓）。
+> * ⭐⭐ **下一轮的施工单（照抄即可）** ✗：
+>   1. `beans/EffectSpec.java` ✓：加 **`private Boolean amountFromPrevious;`** ✓ ＋ `copy.amountFromPrevious = amountFromPrevious;` ✓（⚠ 紧跟 `:50` 的 `amountFromEvent` ✓）；
+>   2. `TriggerTable.java` ✓：record 加 **`double lastAmount`** ✓（⚠ 放 `amount` 之后 ✓）＋ `:2003`／`:2016` 两个构造补一个默认值 ✓；
+>   3. `Battle.java:2369` ✓：构造点补同样的默认值 ✓；
+>   4. `TriggerInterpreter.gainResource` ✓：**截断后的入账量**写进新建的上下文 ✓／**并让 `amountFromPrevious` 的分支读它** ✓
+>      （⚠ 实现上最省：在**同一次 `do` 遍历**里用一个局部变量传递 ✓ —— ⚠ 若 `do` 是逐条新建上下文 ✓，则需把"上一条的入账量"透传 ✓ ⇒ ⭐ **先读 `do` 的遍历点再定** ✓）；
+>   5. 内容：`1505` 星魂的 50%／100% 写成 **`amountFromPrevious: true, amountPercent: 0.5|1.0`** ✓；
+>   6. 判据：⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ 与既有守卫 `ElationAmountCapTest` 一致 ✓）＋ 变异 ⇒ 必红 ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（网络连续失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十八：⭐ **施工单第 4 步的关键一问查到了落点** —— 效果的列表叫 **`TriggerSpec.doEffects`**（`TriggerSpec.java:73` ✓）⇒ ⭐ 于是"同一次 `do` 里能不能传递'上一条的入账量'"就看**它的遍历点**）**）**：
+>
+> * ✅ **实测（按类名搜 ✓）** ✓：`TriggerSpec.java:73` ＝ **`private List<EffectSpec> doEffects;`** ✓
+>   ⇒ ⭐ 即 **JSON 里的 `do` 数组**就是它 ✓ ⇒ ⚠ 而**遍历点**（⚠ 决定第 4 步的写法 ✓）在下一处 ✓（⚠ 本轮的检索已把范围缩到"读 `doEffects` 的地方" ✓）。
+> * ⭐ **下一轮第一步（一次 grep，然后就能动手）** ✗：搜 **`doEffects` 的读取处** ✓（⚠ 候选：`TriggerSpec` 里的 getter ✓ 或 `TriggerInterpreter`／`TriggerTable` 的执行点 ✓）
+>   ⇒ ⭐ 看它是**逐条 new 一个 `TriggerContext`** ✗ 还是**把同一个上下文传给每条** ✓：
+>     * ⭐ **同一个上下文** ⇒ 第 4 步**最省**：给上下文加一个 **可变的"最近入账量"** ✗（⚠ record 不可变 ✗ ⇒ 那就用一个**局部变量/小数组**在同一次遍历里传递 ✓）；
+>     * ⭐ **逐条新建** ⇒ 第 4 步要**把上一条的入账量透传进下一个上下文** ✓ ⇒ ⭐ 那正好用施工单第 2 步的 **`lastAmount`** 字段 ✓。
+> * ⭐ **并把施工单再钉一遍（前 3 步与后 2 步已定 ✓）** ✓：
+>   ①`beans/EffectSpec.java` 加 `amountFromPrevious` ✓（＋`:48`–`:51` 那组拷贝行 ✓）；
+>   ②`TriggerTable` 的 `TriggerContext` record 加 `lastAmount` ✓（＋`:2003`／`:2016` 两个构造 ✓）；③`Battle:2369` 补默认值 ✓；
+>   ④`gainResource` 记录**截断后**的入账量并让新分支读它 ✓；⑤内容 ＝ `1505` 星魂的 50%／100% ✓；⑥判据：**能量 150 ⇒ 好活当赏 150** ✓（⚠ 与既有守卫 `ElationAmountCapTest` 一致 ✓）＋ 变异必红 ✓。
+> * ⚠ **推送**：本地仍**领先 3** ✗（网络连四失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十九：⭐ **执行点找到候选** —— `TriggerInterpreter:905` 的 `for (EffectSpec effect : rule.effects())` ✓ ⇒ ⭐ 它就是"同一条规则的多条效果"被执行的地方（⚠ 也正是判断"上下文是否共享"的关键处）**）**：
+>
+> * ✅ **实测（按类名搜遍历点 ✓）** ✓：命中 7 处，其中**执行路径**最可能是
+>   **`TriggerInterpreter.java:905` ＝ `for (EffectSpec effect : rule.effects())`** ✓（⚠ 其余 `TriggerTable:188/211/441/487/577/608` 多在**校验/编译/条件**路径上 ✓）。
+> * ⭐ **下一轮第一步（读 `:898`–`:930` 那一段）** ✗：看那次遍历**在循环外建了几个 `TriggerContext`** ✓：
+>   * ⭐ **循环外一个、循环内复用** ⇒ 施工单第 4 步可用"**同一次遍历里传递**"的最省写法 ✓；
+>   * ⭐ **循环内每条新建** ⇒ ⭐ 用施工单第 2 步的 **`lastAmount`** 字段透传 ✓（⚠ 把上一条的入账量带进下一条 ✓）。
+> * ⭐ **并把这轮的净结果记下** ✓：**"按已截断产出派生比例量"这条能力**的施工面已全部具名 ✓ ——
+>   `beans/EffectSpec.java`（字段 ＋ 拷贝 ✓）／`TriggerTable` 的 `TriggerContext` record（＋3 个构造点 ✓：`:2003`／`:2016`／`Battle:2369` ✓）／
+>   `TriggerInterpreter.gainResource`（记入账量 ＋ 新分支 ✓）／执行遍历点（`TriggerInterpreter:905` ✓）／内容（`1505` 星魂 50%·100% ✓）／判据（150 ⇒ 150 ✓）／变异 ✓
+>   ⇒ ⭐ **读者 ≥2 ✓、规格齐全 ✓ ⇒ 下一轮可以正当开工并出货** ✓（⚠ 唯一前置：读完 `:898`–`:930` ✓）。
+> * ⚠ **推送**：本地仍**领先 4** ✗（网络连五失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十：🎯🎯🎯 **最后一问有答案了** —— `TriggerInterpreter.apply` 里，**每条效果都从同一个 `ctx` 派生 `effectCtx`**（`ctx.withTargetFilter(...)` ✓）⇒ ⭐ 所以"上一条的入账量"**可以在同一个循环里用局部变量传递** ⇒ 施工单第 4 步定了）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.apply` ✓，`:903` 起 ✓）** ✓ 原文骨架：
+>   ```java
+>   public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
+>       int effectIndex = 0;
+>       for (EffectSpec effect : rule.effects()) {
+>           final int thisEffect = effectIndex++;
+>           effect = amendedEffect(effect, ctx);
+>           // M-53: this effect's per-target conditions …
+>           TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect));   // ★ 同一个 ctx 派生
+>           …
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **上下文是"一个源头 ＋ 每条派生"** ✓ ⇒ ⭐ **不需要动 `TriggerContext` 的 record** ✗✓
+>     （⚠ 施工单第 2/3 步**可以省掉** ✓ —— ⭐ 这是本轮**省下一次改动**的发现 ✓）；**(ii)** ⭐ **"上一条的入账量"用循环里的局部变量即可** ✓
+>       （⚠ 形如 `double previousCredited = 0;` ✓ 循环末尾更新 ✓ 下一条构造 `effectCtx` 时带上 ✓）；
+>   **(iii)** ⚠ 而这需要 **`gainResource` 把"实际入账量"报出来** ✗（⚠ 它现在是 `void` ✓ ⇒ ⭐ **两种做法**：
+>     ⭐ **(a)** 在 `apply` 里对 `GAIN_RESOURCE` 单独取一次"入账前后之差" ✓（⚠ 最省、**不改 `gainResource` 的签名** ✓）；
+>     ⭐ **(b)** 给 `gainResource` 加一个"回报"出口 ✓（⚠ 改动面更大 ✗）⇒ ⭐ **推荐 (a)** ✓）。
+> * ⭐⭐ **于是最终施工单（修订版，下一轮照抄）** ✗：
+>   ① ⭐ `beans/EffectSpec.java`：加 **`private Boolean amountFromPrevious;`** ✓ ＋ `copy.amountFromPrevious = amountFromPrevious;` ✓；
+>   ② ⭐ `TriggerInterpreter.apply` ✓：循环里加 **`double previousCredited = 0;`** ✓ ＋ 构造 `effectCtx` 时**带上它** ✓（⚠ 用 `ctx` 的现有派生方式 ✓）
+>      ＋ ⭐ **在执行 `GAIN_RESOURCE` 前后取资源差** ✓ ⇒ **更新 `previousCredited`** ✓；
+>   ③ ⭐ `gainResource` ✓：新增分支 **`amountFromPrevious` ⇒ 用 `effectCtx` 里的那个量 × `amountPercent`** ✓；
+>   ④ 内容：`1505` 星魂 = **`amountFromPrevious: true, amountPercent: 0.5`** ✓（⚠ 100% 那条用 `1.0` ✓）；
+>   ⑤ 判据：⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ **与既有守卫 `ElationAmountCapTest` 一致** ✓ —— ⭐ 它就是上一轮抓我的那位 ✓）；
+>   ⑥ 变异：`amountPercent` 0.5 → 0.25 ⇒ **必红** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络连六失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十一：✅✅ **新能力第 ① 步已落树且全量绿** —— `EffectSpec` 新增 **`amountFromPrevious`**（＋ `copy` 行 ✓）⇒ ⭐ 字段已就位，等第 ②③ 步把它接上）**）**：
+>
+> * ✅ **实测（改 ＋ 跑全量 ＋ 提交 ✓）** ✓：
+>   * ⭐ **`beans/EffectSpec.java`** 现在有 **`private Boolean amountFromPrevious;`** ✓（⚠ 附一段 javadoc，写明：**读的是"本规则里前一条效果**实际入账**的量"** ✓，
+>     ⚠ 而**不是**原始事件量 ✓ ⇒ ⭐ 这条注释把上一轮那条"已知偏差"的**正解**固定了下来 ✓）；
+>   * ⭐ 并在 `:50` 的拷贝组里加了 **`copy.amountFromPrevious = amountFromPrevious;`** ✓（⚠ 与既有 `copy.amountFromAttr/amountPercent/amountFromEvent/amountCap` 同组 ✓）；
+>   * ⭐ **全量 `--rerun-tasks` ⇒ `rc 0`（2132 例）** ✓ ⇒ ⭐ **字段是"惰性"的（还没人读它）** ✓ ⇒ 所以不破坏任何既有判据 ✓—— ⭐ **这正是"先落字段、再接逻辑"的安全序** ✓；
+>   * ⭐ **已提交** ✓（⚠ **提交被 `$LASTEXITCODE -eq 0` 守住** ✓ —— ⭐ 本轮严格执行了上一轮立的纪律 ✓）。
+> * ⭐⭐ **下一轮（第 ②③ 步，一次做完）** ✗：
+>   * ② ⭐ **`TriggerInterpreter.apply`**（`:903` 起 ✓）：循环里加 `double previousCredited = 0;` ✓；
+>     ⭐ **执行 `GAIN_RESOURCE` 前后取"资源差"** ✓（⚠ 用 `holder.getResources().value(id)` ✓ 相减 ✓ —— ⚠ 这样**不必改 `gainResource` 的签名** ✓）
+>     ⇒ 循环末尾 **更新 `previousCredited`** ✓；
+>   * ③ ⭐ **`gainResource`** ✓：新增分支 **`amountFromPrevious` ⇒ `previousCredited × amountPercent`** ✓
+>     （⚠ 实现上把那个量透传进 `effectCtx` ✓ —— ⚠ 或用一个短命的静态/线程局部 ✗ ⇒ ⭐ **优先透传** ✓）；
+>   * ④ 内容：`1505` 星魂改成 **`amountFromPrevious: true, amountPercent: 0.5`** ✓；⑤ 判据：**能量 150 ⇒ 好活当赏 150** ✓（⚠ 与 `ElationAmountCapTest` 一致 ✓）；⑥ 变异 ⇒ 必红 ✓。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络连七失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百三十二：🎯 **仓库自己写下了实现这条能力该走的路** —— `apply` 里那条注释明说：*"Passing it down beats a field on the context -- a nested firing would clobber shared state"*
+> ⇒ ⭐ **所以"共享状态"（含我一度想用的 `ThreadLocal`）是被仓库明确否掉的** ✗ ⇒ 必须**逐层传参**）**）**：
+>
+> * ✅ **实测（读 `apply` 的循环尾与 `fire` 的头 ✓）** ✓：
+>   * ⭐ **每条效果的实际执行是 `applyOne(battle, effect, effectCtx);`** ✓（⚠ 就在循环最后一行 ✓）；
+>   * ⭐⭐ **紧挨着的注释**（原文）：*"The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance,
+>     and the only op that consumes that amendment (`APPLY_CONTROL`) has to know which rule it is running inside. **Passing it down
+>     beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.**"* ✓
+>     ⇒ ⭐⭐⭐ **这就是仓库给"每条效果的私有数据"定的规矩** ✓：**往下传** ✓，**不要放共享状态** ✗（⚠ 因为**嵌套触发**会让共享状态互相覆盖 ✓）。
+> * ⚠ **于是修正我上一轮的设计** ✗（本段第 **三十四** 次自我纠正 ✓）：⛔ **不要用 `ThreadLocal`** ✗ ⇒ ⭐ **正解**：
+>   ① ⭐ **`applyOne` 增加一个参数** ✓（⚠ 形如 `applyOne(battle, effect, effectCtx, previousCredited)` ✓ —— ⭐ **与 `MODIFY_RULE` 那条"把规则 id 传下去"完全同构** ✓）；
+>   ② ⭐ **`gainResource` 也增加一个参数**（或由一个小的 `record EffectRun(double previousCredited)` 承载 ✓）⇒ **在那里面实现新分支** ✓；
+>   ③ ⭐ **`previousCredited` 的来源**：⚠ 在循环里，**执行前后取"该资源的入账差"** ✓（⚠ 用 `holder.getResources().value(id)` ✓ 相减 ✓）
+>     —— ⚠ 只有 `GAIN_RESOURCE` 需要更新它 ✓（⚠ 其他效果保持不变 ✓）。
+> * ⭐ **本件的进度（三件套）** ✓：**字段** ✓ 已落树（`EffectSpec.amountFromPrevious` ✓，全量绿 ✓）；**传参链** ⚠ 待做（⚠ 但**路数已由仓库注释定死** ✓）；
+>   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络连八失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（⚠ 本轮我试改过一次 `apply` ✓ 但**当即回滚** ✓ ⇒ 未留痕 ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十三：⭐⭐ **传参链的三个确切锚点到手** ⇒ ⭐ 下一轮一次就能改完（⚠ 但要先确认 `applyOne` 没有别的调用点 ✓）**）**：
+>
+> * ✅ **实测（三处 ✓）** ✓：
+>   | 锚点 | 内容 |
+>   |---|---|
+>   | ⭐ `applyOne` 定义 | **`private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx)`** ✓（`:1050` ✓） |
+>   | ⭐ 派发点 | **`gainResource(effect, ctx);`** ✓（`:1158` ✓，即 `switch (op)` 里 `GAIN_RESOURCE` 那一支 ✓） |
+>   | ⭐ 实现体 | **`private static void gainResource(EffectSpec effect, TriggerContext ctx)`** ✓（`:1341` ✓） |
+> * ⭐⭐ **拟定补丁（下一轮照抄；⚠ 先跑上面那次 `applyOne(` 的检索，确认只有 1 个调用点 ✓）** ✗：
+>   ```java
+>   // ① apply 的循环外：
+>   double previousCredited = 0;
+>   // ② 循环内（把上一条的"入账量"传下去，并在本条的 GAIN_RESOURCE 之后更新它）：
+>   if ("GAIN_RESOURCE".equals(normalizeOp(effect, null))) {
+>       CanHit holder = resolveTarget(effect, effectCtx);
+>       String id = effect.getResource();
+>       int before = holder.getResources().has(id) ? holder.getResources().value(id) : 0;
+>       applyOne(battle, effect, effectCtx, previousCredited);
+>       previousCredited = (holder.getResources().has(id) ? holder.getResources().value(id) : 0) - before;
+>   } else {
+>       applyOne(battle, effect, effectCtx, previousCredited);
+>   }
+>   // ③ applyOne(..., double previousCredited) ⇒ 传给 gainResource(effect, ctx, previousCredited)
+>   // ④ gainResource：新增分支 amountFromPrevious ⇒ amount = round(previousCredited * amountPercent)
+>   ```
+>   ⇒ ⭐ **为什么这样写** ✓：**(i)** ⭐ **不用改 `TriggerContext` 的 record** ✓（⚠ 与仓库"往下传"的规矩一致 ✓，⚠ 且不必动 3 个构造点 ✓）；
+>   **(ii)** ⭐ **"入账量"用 `Resource.value(id)` 的**前后差**取得** ✓ ⇒ ⭐ **天然带上"上限截断"** ✓✓ —— ⭐ **这正是这条能力的全部要点** ✓；
+>   **(iii)** ⚠ `normalizeOp`／`resolveTarget` **都是本文件已有方法** ✓ ⇒ **不引入新名字** ✓。
+> * ⚠ **本件的账** ✓：**字段** ✓ 已落树；**传参链** ⚠ 待改（⚠ 本轮已把**三处锚点与整段补丁**写死 ✓ ⇒ 下一轮是一次"照着贴"的活 ✓）；
+>   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓；⚠ 变异：`amountPercent` 0.5 → 0.25 ⇒ 必红 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十四：⚠ **补丁脚本把链接上了，但编译不过**（`TriggerInterpreter:1333` 报"找不到符号" ×4 ✓）⇒ ⭐ 已**当即回滚** ✓（⚠ 本轮严格执行了"红就不提交" ✓））**）**：
+>
+> * ⚠ **实测（跑脚本 ＋ 全量 ✓）** ✓：
+>   * ⭐ 脚本**成功改完六处** ✓（`ok TriggerInterpreter: the credit chain is wired` ✓）；
+>   * ⛔ 但编译在 **`:1333`** 报 **"找不到符号" ×4** ✗ ⇒ ⭐ **回滚** ✓（`git checkout -- <该文件>` ✓ ⇒ 全量恢复 ✓）。
+>   ⇒ ⭐ **最可能的原因** ✓（⚠ 下一轮一次即可定案 ✓）：⚠ 我那段**新分支插在原 `if (Boolean.TRUE.equals(effect.getAmountFromEvent()))` 之前** ✓
+>     ⇒ ⭐ 而那个位置**可能仍在 `int amount;` 声明之前** ✗（⚠ 本段前面读到的是 `int amount;` 紧跟着 `if (getAmountFromEvent())` ✓
+>       ⇒ ⭐ 但**插入点在"注释与 `int amount;` 之间"** ✗ 就会让 `amount = …` 指向未声明变量 ✓ —— ⭐ **正是 4 个"找不到符号"的形状** ✓）。
+> * ⭐ **下一轮第一步（两次调用）** ✗：
+>   ① **读 `TriggerInterpreter:1325`–`1345`** ✓ ⇒ 看清 `int amount;` 与新分支的**相对位置** ✓；
+>   ② 把脚本里的插入锚点从 **`if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {`** 改成 **`int amount;` 之后** ✓
+>     （⚠ 或直接在 `int amount;` 后面插入 ✓）⇒ 重跑 ⇒ 全量绿 ⇒ **提交脚本 ＋ 引擎改动** ✓（⚠ 按纪律当场提交 ✓）。
+> * ⚠ **并记一条** ✓：⚠ **"脚本改得动"≠"改得对"** ✗ ⇒ ⭐ **每次"生成式改动"后都要编译**（⚠ 本轮做到了 ✓ ⇒ 只损失一次调用 ✓，没有污染树 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树**待确认干净** ✓、已推送且同步 ✓（`7bec6493` ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十五：🎯 **那次编译错的**真因**看清了** —— ⚠ `:1333` 那几行**不属于 `gainResource`**，而属于**紧邻的 `gainEnergyFor`** ✗（⚠ 它里面有 `battle.grantEnergy(target, effect.getPercent() * …)` ✓）⇒ ⭐ 说明我的补丁**落点整体偏了几行** ✗）**）**：
+>
+> * ✅ **实测（读 `:1328`–`:1338` ✓）** ✓ 那一段是：
+>   ```java
+>   battle.grantEnergy(target, effect.getPercent() * battle.castAppliedCount(state));
+>   return;
+>   …
+>   double maxEnergy = target.getMaxEnergy();
+>   if (maxEnergy <= 0) {
+>       throw new IllegalStateException(
+>               "GAIN_ENERGY scales off " + target.getName() + "'s maximum energy, but that unit has no energy bar …");
+>   }
+>   battle.grantEnergy(target, effect.getPercent() * maxEnergy);
+>   ```
+>   ⇒ ⭐⭐ **这是 `gainEnergyFor`（`GAIN_ENERGY` 的实现）** ✓ —— ⚠ **不是 `gainResource`** ✗ ⇒ ⭐ 所以"4 个找不到符号"是**我的插入把这一带的语义搅乱了** ✗
+>     （⚠ 已回滚 ✓，树是干净的 ✓）。
+> * ⭐ **下一轮第一步（重读真锚点，两次调用）** ✗：
+>   ① **读 `TriggerInterpreter:1341`–`1372`** ✓（⭐ **`gainResource` 的真身** ✓ —— ⚠ 本段早前只从 `:1341` 读了**开头两行与 `amountFromEvent` 分支** ✓
+>      ⇒ ⭐ **必须把 `int amount;` 的**准确位置**、以及各分支的**完整形状**看全** ✓）；
+>   ② 把脚本的插入锚点改成 **`int amount;` 这一行之后** ✓（⚠ 或改成 `amount = (int) Math.round(ctx.amount()` 那个分支的**前一行** ✓）
+>     ⇒ ⭐ **重跑 ⇒ 编译 ⇒ 全量 ⇒ 绿 ⇒ 当场提交** ✓。
+> * ⚠ **纪律（本轮第二次落点）** ✗：⚠ **"生成式改动"必须**先读全锚点上下文**（⚠ 我只读了两行就下手 ✓ ⇒ 白丢一轮 ✓）
+>   ⇒ ⭐ **纪律：任何自动化补丁，锚点前后各读 15 行** ✓。
+> * ⚠ **进度如实** ✓：新能力**字段** ✓ 已落树；**传参链** ⚠ **两次尝试未成**（第一次引号 ✗／第二次落点 ✗）⇒ ⭐ **尚未进入树** ✓；
+>   **内容＋判据＋变异** ⚠ 待做 ⇒ ⭐ **本件仍是"已登记、施工中"** ✓，**没有冒充出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓（`822f6d53` ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十六：🎯🎯 **补丁落点其实是**对的****（`if (getAmountFromEvent())` 就在 `int amount;` 之后 ✓）⇒ ⭐ 所以那 4 个"找不到符号"**另有其因** —— ⚠ 最可能是 **`EffectSpec` 没有 `getAmountFromPrevious()` 这个 getter** ✗）**）**：
+>
+> * ✅ **实测（读 `gainResource` 真身 ✓，`:1341`–`:1370` ✓）** ✓ 全文骨架：
+>   ```java
+>   private static void gainResource(EffectSpec effect, TriggerContext ctx) {
+>       CanHit holder = resolveTarget(effect, ctx);
+>       … // 注释：这个 share 是"off the holder"，且未知属性名会被大声拒绝
+>       int amount;                                                      // ★ 声明
+>       if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {           // ★ 我的锚点 —— 位置正确 ✓
+>           amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+>       } else if (effect.getAmountFromAttr() == null) {
+>           amount = (int) Math.round(scaledAmount(effect, ctx));
+>       } else { … holder.getAttribute(attribute).get() * share … }
+>       if (effect.getAmountCap() != null) {                              // ★ 上限在这里
+>           amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
+>       }
+>       … // PARTY 作用域那一段
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **锚点正确** ✓（⚠ 本段上一轮"落点偏了"的判断**被推翻** ✓ —— ⭐ 第三十五次自我纠正 ✓）；
+>   **(ii)** ⭐⭐ **于是那 4 个 "找不到符号" 只能是"新分支里引用的名字不存在"** ✗ ⇒ ⭐ 最可能：
+>     **`EffectSpec` 没有 `getAmountFromPrevious()`** ✗（⚠ 我加的是**字段** ✓ ⇒ ⚠ **若该类不用 Lombok ⇒ 就没有 getter** ✗）
+>     ⇒ ⚠ 而报错行号显示在 `gainEnergyFor` 附近 ✓ ⇒ ⭐ **那是因为我的插入把它**下移了 9 行** ✓** ⇒ ⭐ **行号是"打补丁后"的** ✓。
+> * ⭐ **下一轮第一步（一次读 ＋ 一次改）** ✗：**读 `beans/EffectSpec.java` 的类头** ✓ ⇒ 看它有没有
+>   **`@Data`／`@Getter`／`@Setter`**（⚠ 本段早前见过 `@SerializedName` ✓ 但**没注意 Lombok** ✗）：
+>   * ⭐ **有 Lombok** ⇒ ⚠ 那么 getter 应当存在 ✗ ⇒ 去读**真正的编译错文本**（⚠ 用 `--console=plain` 抓**四行全文** ✓）；
+>   * ⭐ **没有 Lombok** ⇒ ⭐ **加一个显式 getter** ✓（⚠ 照该类既有 getter 的写法 ✓）⇒ 重跑 ⇒ 绿 ⇒ **当场提交** ✓。
+> * ⚠ **进度**：新能力**字段** ✓ 落树；**传参链** ⚠ 三次尝试未成（引号 ✗／落点误判 ✗／**getter 待确认** ✓）⇒ **仍未进树** ✓（如实 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十七：✅ `EffectSpec` **有 `@Getter`**（`:31` ✓）⇒ ⭐ "缺 getter"这条排除；⭐ 于是最可能是**我的脚本有一处替换**悄悄没生效**（⚠ 而它对那处**没写 assert** ✗））**）**：
+>
+> * ✅ **实测（读 `beans/EffectSpec.java` 类头 ✓）** ✓：**`@Getter`（`:31` ✓）＋ `public class EffectSpec {`（`:34` ✓）**
+>   ⇒ ⭐ 所以 **`getAmountFromPrevious()` 会被 Lombok 生成** ✓ ⇒ ⛔ **"找不到符号"不是缺 getter** ✓（⭐ 本段第三十六次自我纠正 ✓）。
+> * ⭐⭐ **于是嫌疑集中到脚本本身** ✓：⚠ 我那条脚本**只对 5 个锚点里的 4 个写了 `assert`** ✗
+>   ⇒ ⭐ **第 4 处**（`"                gainResource(effect, ctx);"` ⇒ 改成 3 参调用 ✓）**若没匹配上** ✗
+>     ⇒ ⚠ 那么**签名已是 3 参** ✓ 而**调用点还是 2 参** ✗ ⇒ ⭐ **编译期报的就是"找不到 2 参的 gainResource"** ✓✓
+>       ⇒ ⚠ 而且会有**多处**（⚠ 4 个"找不到符号"的形状也对 ✓）。
+> * ⭐ **下一轮第一步（三处小改，一次做完）** ✗：
+>   ① ⭐ **给脚本的每一处替换都加"改没改到"的断言** ✓（⚠ 用 `if old not in src: sys.exit(...)` ✓ ⇒ ⭐ **本段纪律："脚本改得动 ≠ 改得对" ⇒ 现在升级为"每一处都必须自证"** ✓）；
+>   ② ⭐ **先 `grep` 出 `gainResource(effect, ctx)` 的**真实缩进与全角/半角**** ✓（⚠ 我凭印象写了两组空格 ✗）；
+>   ③ 重跑 ⇒ 编译 ⇒ 全量 ⇒ 绿 ⇒ **当场提交** ✓。
+> * ⚠ **进度**：新能力**字段** ✓ 落树；**传参链** ⚠ 四次尝试未成 ⇒ **仍未进树** ✓（如实 ✓）；⭐ **但每一次都把原因缩小了一格** ✓
+>   （引号 ✗ → 落点 ✗ → getter ✗ → **锚点未匹配** ✓）⇒ ⭐ **下一轮命中概率已经很高** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十八：⚠ **锚点全部核对为"正确"**（`gainResource(effect, ctx);` 的**真实字节**是 **16 个空格** ＋ 该文本 ✓，与我脚本里的常量**逐字相同** ✓）⇒ ⭐ 所以"锚点没匹配"这条**也排除** ⇒ ⭐ **只剩"读编译错的全文"这一条路**）**）**：
+>
+> * ✅ **实测（`repr` 取真实上下文 ✓）** ✓：`'attle, mover, movedId);\n                gainResource(effect, ctx);\n'` ✓
+>   ⇒ ⭐ **缩进 = 16 空格** ✓，与我脚本里的 `DISPATCH` 常量**完全一致** ✓ ⇒ ⛔ **"替换没生效"排除** ✓（⭐ 第三十七次自我纠正 ✓）。
+> * ⭐ **下一轮第一步（唯一没做过的一步：把编译错的**全文**读出来）** ✗：
+>   ⚠ 我前几轮用的 `Select-String '错误:'` **只抓到"文件:行号"** ✗ ⇒ ⭐ **真正的符号名在**下一行**** ✓
+>   ⇒ ⭐ **做法**：重跑补丁 ✗ **不要** ✗ —— ⚠ 而是**先把补丁跑起来再抓完整输出** ✓：
+>   ```powershell
+>   python tools/patch_credit_chain.py
+>   .\gradlew.bat compileJava --console=plain 2>&1 | Select-String -Pattern '错误|symbol|符号' -Context 1,1
+>   ```
+>   ⚠ 然后**无论结果如何都回滚** ✓（⚠ 树必须绿 ✓）。
+> * ⭐ **或者更省的一条** ✓：⚠ **直接读脚本生成的那几行** ✗ —— ⚠ 但脚本已经回滚 ✓ ⇒ ⭐ **跑一次并把"改后的 `gainResource` 前 12 行"打出来** ✓
+>   （⚠ `python -c` 读文件 ＋ 打印 ✓）⇒ ⭐ **一眼就能看出**哪个名字不对 ✓。
+> * ⚠ **进度如实** ✓：新能力**字段** ✓ 落树；**传参链** ⚠ 五次尝试未成 ⇒ **仍未进树** ✓；
+>   ⭐ 排除链已经走到尽头（引号 → 落点 → getter → 锚点 → **只剩符号名** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十九：🎯🎯🎯 **真因拿到了（编译错的全文）** —— ⚠ 报的是 **"符号: 变量 `amount`"** 与 **"符号: 变量 `previousCredited`"**
+> ⇒ ⭐ 即我插入的那一行**落在了两个变量都不在作用域的地方** ✗ ⇒ ⭐ **说明那个锚点 `if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {` 在文件里**不止一处**** ✗，而 `python.replace(..., 1)` **替换了第一处**（⚠ 不在 `gainResource` 里 ✓））**）**：
+>
+> * ✅ **实测（跑补丁 ＋ `compileJava --console=plain` 抓全文 ✓，随后回滚 ✓）** ✓ 编译器原文：
+>   ```
+>   错误: 找不到符号
+>       amount = (int) Math.round(previousCredited
+>       ^
+>     符号:   变量 amount        位置: 类 TriggerInterpreter
+>   错误: 找不到符号
+>       amount = (int) Math.round(previousCredited
+>                                         ^
+>     符号:   变量 previousCredited
+>   2 个错误
+>   ```
+>   ⇒ ⭐⭐⭐ **两条** ✓：**(i)** ⭐ **我插入的代码没在 `gainResource` 里** ✗（⚠ 否则 `amount` 一定在作用域 ✓ —— 它是那个方法的第一条语句 ✓）；
+>   **(ii)** ⚠ **而锚点文本"存在且被替换了"** ✓（⚠ 所以前几轮"锚点匹配"的判断**没错** ✓）⇒ ⭐ **错的是"第一处"不是"我要的那处"** ✓✓
+>     ⇒ ⭐ **本段第三十八次自我纠正** ✓。
+> * ⭐⭐ **下一轮修法（一次成功，且写成自证脚本）** ✗：
+>   ① ⭐ **先按"定义位置"切片** ✓：`i = src.index('private static void gainResource(')` ✓ ⇒ **只对 `src[i:]` 做替换** ✓（⚠ 前段原样保留 ✓）；
+>   ② ⭐ **每一处替换都 `assert` 改到了** ✓（⚠ 本段纪律"每一处都必须自证" ✓）；
+>   ③ ⇒ 重跑 ⇒ 编译 ⇒ 全量 ⇒ 绿 ⇒ **当场提交** ✓。
+> * ⭐ **并记一条普适教训** ✓（本段第三十九条纪律候选）✗：
+>   ⚠ **锚点文本必须"唯一"** ✗ ⇒ ⭐ **凡做文本替换，锚点要么唯一 ✓，要么先用定义位置把范围切开 ✓**
+>     —— ⚠ 否则会**改到别处**（⚠ 本段这次就是：编译错在 `:1333` 而不是 `:1341` ✓ ⇒ 这正是"落在别处"的信号 ✓）。
+> * ⚠ **进度**：新能力**字段** ✓ 落树；**传参链** ⚠ 六次尝试未成 ⇒ **仍未进树** ✓（如实）；⭐ 但**真因已定** ✓ ⇒ **下一轮应当一次成** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百四十：🎯🎯🎯 **校验器把话说清楚了** —— `Op GAIN_RESOURCE requires "amount"` ⇒ ⭐ 所以新分支还差**第三处引擎改动**：把 `amountFromPrevious` 加进"可当金额来源"的白名单）**）**：
+>
+> * ✅ **实测（跑内容 ＋ 全量 ⇒ 31 红，信息完全一致 ✓）** ✓：
+>   * ⭐ **每一条红都是同一句**：**`Invalid trigger table for cid 1505: Op GAIN_RESOURCE requires "amount"`** ✓
+>     （⚠ 源文本正是那条行迹 ✓：「绯英获得能量时，将同步获得等值的【好活当赏】…」✓）
+>     ⇒ ⭐⭐ **即：装载期校验要求每条 `GAIN_RESOURCE` 都有 `amount`** ✗ ⇒ ⚠ 而 `amountFromEvent`／`amountFromAttr` **能过** ✓
+>       ⇒ ⭐ **说明校验器有一份"允许的金额来源"白名单** ✓ ⇒ ⭐ **而我的 `amountFromPrevious` 不在里面** ✗✓。
+> * ⭐ **下一轮第一步（读白名单 ＋ 加一项，两次调用）** ✗：
+>   ① **读那条校验** ✓（⚠ 就在 `TriggerInterpreter` 里报的 ✓ ⇒ grep **`requires \"amount\"`** ✓ —— ⚠ 本轮这条 grep 的**转义写错了**（`\\"` ✗）⇒ ⭐ 下一轮用
+>     `Select-String -Pattern 'requires'` 或直接搜 **`amountFromEvent`** 的校验处 ✓）；
+>   ② ⭐ **把 `amountFromPrevious` 加进同一条件** ✓（⚠ 形如 `effect.getAmount()==null && !TRUE.equals(effect.getAmountFromEvent()) && effect.getAmountFromAttr()==null && !TRUE.equals(effect.getAmountFromPrevious())` ✓）
+>     ⇒ ⭐ 重跑 ⇒ 全量 ⇒ 绿 ⇒ **提交** ✓（⚠ 三处引擎改动 ＋ 内容 ＋ 判据 ＋ 变异 ⇒ ⭐ **这件才算四件齐** ✓）。
+> * ⭐⭐ **而 31 红的形状本身很有价值** ✓：⚠ 它是**"一个内容文件校验失败 ⇒ 所有加载该角色的判据一起红"** ✓ —— ⭐ **本段早前记录过这条规律**（"第一次反射：多判据同角色全红 ⇒ 是表装载失败" ✓）
+>   ⇒ ⭐ **本轮正是它的第二次现身** ✓（⚠ 而且校验信息**直接给出了原因** ✓ ⇒ 比上次更快 ✓）。
+> * ⚠ **进度如实**：引擎**字段** ✓／**传参链** ✓／**校验器白名单** ⚠ 待加 ⇒ ⭐ **内容 ＋ 判据 ＋ 变异仍未进树** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26556,6 +26885,335 @@
 > * ⭐ **纪律（第三十二条，最贵的一条）** ✗：⚠ **"收尾清理"（`git checkout -- .`）会把**尚未提交**的工具脚本一起冲掉** ✗
 >   ⇒ ⭐ **凡改过工具脚本 ⇒ 当场提交** ✓，或**把关键内容写进 `GAPS.md`**（⚠ 本段已在做 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百二十五：🎯 **两条"冲突"读出来了，而且它们判得**对**** —— ⭐ **我的改动越界了**：它按**未截断**的事件量给了 50%，⭐ 而文档要求按**已截断（≤100）的好活当赏**给）**）**：
+>
+> * ✅ **实测（全量两红 ✓，名字与信息 ✓）** ✓：
+>   * **`Character1505EnergySyncTest`** ✓：*"every point of energy is mirrored one-for-one into 【好活当赏】 ==> expected: **<40>** but was: **<50>**"* ✓
+>     ⇒ ⭐ 它守的是"**一分能量一分好活当赏**" ✓ ⇒ ⭐ 我的加成把它变成 40 ＋ 10 ✓；
+>   * **`ElationAmountCapTest`** ✓：*"单次不超过 100 点 ==> expected: **<100>** but was: **<175>**"* ✓
+>     ⇒ ⭐⭐ **`175 = 100 + 0.5 × 150`** ✓ ⇒ ⭐ **即：我的加成读的是**未截断的事件量**（150 点能量 ⇒ 75）** ✗
+>       —— ⭐ **而文档说的是"本次获得的【好活当赏】**（那个量已被 100 截断 ✓）**的 50%"** ✓ ⇒ ⭐ **正解应是 100 ＋ 50 = 150** ✗。
+> * ⭐⭐⭐ **结论（本轮定案）** ✓：**这是我的改动越界，不是既有判据过时** ✗ ⇒ ⭐ **既有守卫抓得对** ✓✓
+>   （⚠ 而且它**正好抓住了我在注释里写下的那条"已知偏差"** ✓ —— ⭐ **这是本段第一次"我自己写下的偏差被自己的守卫逮住"** ✓）。
+> * ✅ **处置（按纪律"未完成的能力要回滚并记录" ✓）** ✓：**回滚 `1505.json` 与判据** ✓ ⇒ 全量复跑 **rc 0（2132 例）** ✓。
+> * ⭐ **于是这条的**正确形状**变成一条**有读者的引擎级缺口**** ✓：
+>   ⭐ **缺的能力**：**"按**已截断的事件产出**派生一份比例量"** ✗ —— ⚠ 现有 `amountFromEvent` 读的是**原始事件量** ✓，
+>   而文档这条要读的是"**本次实际入账的【好活当赏】**"（⚠ 即前一条效果**经上限截断后**的产出 ✓）
+>     ⇒ ⭐ **读者**：⭐ **`1505` 的星魂** ✓（⚠ 另有 `:127` 里的 **100%** 那一半 ✓）⇒ ⭐ **读者 ≥2** ✓（⭐ 满足"不造没有读者的能力" ✓）
+>       ⇒ ⭐ **下一轮可以正当地建它** ✓（⚠ 通道名候选：`amountFromPrevious`／`amountFromLastEffect` ✗ ⇒ ⭐ **按引擎既有命名习惯取** ✓）。
+> * ⭐ **并留下一条重要的方法记录** ✓：⚠ **"判据绿"那次我跑了过滤后的单条** ✗ ⇒ **全量才抓住了越界** ✓ ⇒ ⭐ **纪律重申**：
+>   **任何内容改动，提交前跑全量** ✓（⚠ 本段第三十三条 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（内容与判据均已回滚 ✓）、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百二十六：✅✅ **下一条能力（"按已截断的产出派生比例量"）的落点与字段名都查到了** ⇒ ⭐ 规格可以写死，下一轮直接开工）**）**：
+>
+> * ✅ **实测（`glob` ＋ 读字段 ✓）** ✓：
+>   * ⚠ **`EffectSpec` 在 `beans/` 下，不在 `models/`** ✗ ⇒ **`src/main/java/com/laosun/aluminium/beans/EffectSpec.java`** ✓
+>     （⭐ 本段第三次"猜包路径"翻车 ✓ ⇒ **纪律：按类名 `glob`，不猜** ✓）；
+>   * ⭐ 现有四个量字段 ✓：**`amountFromAttr`（`:143` ✓，`String`）／`amountPercent`（`:147` ✓，`Double`；
+>     其 javadoc 写的是 *"The share of `amountFromAttr` to take (0.5 for 「50%」)"* ✓）／`amountFromEvent`（`:153` ✓，`Boolean`）／`amountCap`** ✓；
+>   * ⭐ 而 `gainResource` 的算法是：`amountFromEvent` ⇒ **`ctx.amount() × amountPercent`** ✓（⚠ **先乘比例，与上限无关** ✗）。
+> * ⭐⭐ **于是"缺的能力"可以写成一条精确规格** ✓（⚠ 下一轮照做 ✓）：
+>   | 项 | 内容 |
+>   |---|---|
+>   | 名字（候选） | ⭐ **`amountFromPrevious`** ✓（⚠ 按引擎既有命名：`amountFromAttr`／`amountFromEvent` ✓ ⇒ ⭐ **"上一个效果的**实际入账量**"** ✓） |
+>   | 落点 | ⭐ **`beans/EffectSpec.java`** ✓（新字段 ＋ `copy.*` 的拷贝行 ✓，⚠ 见 `:48`–`:51` 那组 ✓） |
+>   | 语义 | ⭐ **读"本效果之前那一条效果**经上限截断后**的实际量"** ✓（⚠ 而不是原始事件量 ✗） |
+>   | 实现要点 | ⭐ 在 `TriggerInterpreter.gainResource` 里，把**截断后的入账量**记进上下文 ✓（⚠ 例如 `TriggerContext` 新增 `lastAmount` ✓）；下一条效果读它 ✓ |
+>   | 读者（≥2 ✓） | ⭐ **`1505` 星魂的 50%** ✓ ＋ ⭐ **同句的 100%** ✓（⚠ 文档 `:127` ✓） |
+>   | 判据 | ⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ 这正是既有守卫 `ElationAmountCapTest` 抓出的情形 ✓ ⇒ ⭐ **判据要与它一致** ✓） |
+>   | 变异 | ⭐ 把 `amountFromPrevious` 的分支关掉（或 `amountPercent` 0.5 → 0.25 ⇒ 150 → 125 ✓）⇒ **必红** ✓ |
+> * ⭐ **并记一条流程要求** ✓：⚠ 这条要改**引擎**（`EffectSpec` ＋ `TriggerInterpreter` ＋ 可能的 `TriggerContext` ✓）
+>   ⇒ ⭐ **按纪律：先全量绿 ⇒ 提交 ⇒ 再跑演示闸门** ✓；⚠ 且**提交必须被 `$LASTEXITCODE` 守住** ✓（⭐ 本轮已立 ✓）。
+> * ⚠ **推送**：本地仍**领先 1** ✗（网络再次失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十七：✅✅✅ **`TriggerContext` 的真身找到了 —— 它是 `TriggerTable` 里的一个 `record`** ⇒ ⭐ 于是"记录上一次入账量"的**确切补丁点**到手）**）**：
+>
+> * ✅ **实测（按类名搜声明与构造 ✓）** ✓：
+>   * ⭐ **声明**：`TriggerTable.java:1995` ✓ ——
+>     **`public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount, …)`** ✓
+>     （⚠ 本段早前在条件解析里见过的 `stateName` ✓ 就在这个 record 里 ✓）；
+>   * ⭐ **两个便利构造**：`TriggerTable.java:2003` ✓ 与 **`:2016`** ✓ —— 后者形如
+>     `return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, …)` ✓；
+>   * ⭐ **一个外部构造点**：**`Battle.java:2369`** ✓ —— `new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this, …)` ✓。
+>   ⇒ ⭐⭐ **所以"新增一个量"这件事的完整改动面是**：**record 加一个分量 ✓ ＋ 上述 3 个构造点补参数 ✓（⚠ `:2003`／`:2016`／`Battle:2369` ✓）**
+>     ⇒ ⭐ **加上 `EffectSpec` 的新字段（`beans/EffectSpec.java` ✓，⚠ 见 `:48`–`:51` 的 `copy.*` 组 ✓）
+>       ＋ `gainResource` 里"记下截断后入账量"的那一行 ✓ ＋ 新字段的分支 ✓** ⇒ ⭐ **共 5–6 处小改** ✓（⭐ 可控 ✓）。
+> * ⭐⭐ **下一轮的施工单（照抄即可）** ✗：
+>   1. `beans/EffectSpec.java` ✓：加 **`private Boolean amountFromPrevious;`** ✓ ＋ `copy.amountFromPrevious = amountFromPrevious;` ✓（⚠ 紧跟 `:50` 的 `amountFromEvent` ✓）；
+>   2. `TriggerTable.java` ✓：record 加 **`double lastAmount`** ✓（⚠ 放 `amount` 之后 ✓）＋ `:2003`／`:2016` 两个构造补一个默认值 ✓；
+>   3. `Battle.java:2369` ✓：构造点补同样的默认值 ✓；
+>   4. `TriggerInterpreter.gainResource` ✓：**截断后的入账量**写进新建的上下文 ✓／**并让 `amountFromPrevious` 的分支读它** ✓
+>      （⚠ 实现上最省：在**同一次 `do` 遍历**里用一个局部变量传递 ✓ —— ⚠ 若 `do` 是逐条新建上下文 ✓，则需把"上一条的入账量"透传 ✓ ⇒ ⭐ **先读 `do` 的遍历点再定** ✓）；
+>   5. 内容：`1505` 星魂的 50%／100% 写成 **`amountFromPrevious: true, amountPercent: 0.5|1.0`** ✓；
+>   6. 判据：⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ 与既有守卫 `ElationAmountCapTest` 一致 ✓）＋ 变异 ⇒ 必红 ✓。
+> * ⚠ **推送**：本地仍**领先 2** ✗（网络连续失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十八：⭐ **施工单第 4 步的关键一问查到了落点** —— 效果的列表叫 **`TriggerSpec.doEffects`**（`TriggerSpec.java:73` ✓）⇒ ⭐ 于是"同一次 `do` 里能不能传递'上一条的入账量'"就看**它的遍历点**）**）**：
+>
+> * ✅ **实测（按类名搜 ✓）** ✓：`TriggerSpec.java:73` ＝ **`private List<EffectSpec> doEffects;`** ✓
+>   ⇒ ⭐ 即 **JSON 里的 `do` 数组**就是它 ✓ ⇒ ⚠ 而**遍历点**（⚠ 决定第 4 步的写法 ✓）在下一处 ✓（⚠ 本轮的检索已把范围缩到"读 `doEffects` 的地方" ✓）。
+> * ⭐ **下一轮第一步（一次 grep，然后就能动手）** ✗：搜 **`doEffects` 的读取处** ✓（⚠ 候选：`TriggerSpec` 里的 getter ✓ 或 `TriggerInterpreter`／`TriggerTable` 的执行点 ✓）
+>   ⇒ ⭐ 看它是**逐条 new 一个 `TriggerContext`** ✗ 还是**把同一个上下文传给每条** ✓：
+>     * ⭐ **同一个上下文** ⇒ 第 4 步**最省**：给上下文加一个 **可变的"最近入账量"** ✗（⚠ record 不可变 ✗ ⇒ 那就用一个**局部变量/小数组**在同一次遍历里传递 ✓）；
+>     * ⭐ **逐条新建** ⇒ 第 4 步要**把上一条的入账量透传进下一个上下文** ✓ ⇒ ⭐ 那正好用施工单第 2 步的 **`lastAmount`** 字段 ✓。
+> * ⭐ **并把施工单再钉一遍（前 3 步与后 2 步已定 ✓）** ✓：
+>   ①`beans/EffectSpec.java` 加 `amountFromPrevious` ✓（＋`:48`–`:51` 那组拷贝行 ✓）；
+>   ②`TriggerTable` 的 `TriggerContext` record 加 `lastAmount` ✓（＋`:2003`／`:2016` 两个构造 ✓）；③`Battle:2369` 补默认值 ✓；
+>   ④`gainResource` 记录**截断后**的入账量并让新分支读它 ✓；⑤内容 ＝ `1505` 星魂的 50%／100% ✓；⑥判据：**能量 150 ⇒ 好活当赏 150** ✓（⚠ 与既有守卫 `ElationAmountCapTest` 一致 ✓）＋ 变异必红 ✓。
+> * ⚠ **推送**：本地仍**领先 3** ✗（网络连四失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百二十九：⭐ **执行点找到候选** —— `TriggerInterpreter:905` 的 `for (EffectSpec effect : rule.effects())` ✓ ⇒ ⭐ 它就是"同一条规则的多条效果"被执行的地方（⚠ 也正是判断"上下文是否共享"的关键处）**）**：
+>
+> * ✅ **实测（按类名搜遍历点 ✓）** ✓：命中 7 处，其中**执行路径**最可能是
+>   **`TriggerInterpreter.java:905` ＝ `for (EffectSpec effect : rule.effects())`** ✓（⚠ 其余 `TriggerTable:188/211/441/487/577/608` 多在**校验/编译/条件**路径上 ✓）。
+> * ⭐ **下一轮第一步（读 `:898`–`:930` 那一段）** ✗：看那次遍历**在循环外建了几个 `TriggerContext`** ✓：
+>   * ⭐ **循环外一个、循环内复用** ⇒ 施工单第 4 步可用"**同一次遍历里传递**"的最省写法 ✓；
+>   * ⭐ **循环内每条新建** ⇒ ⭐ 用施工单第 2 步的 **`lastAmount`** 字段透传 ✓（⚠ 把上一条的入账量带进下一条 ✓）。
+> * ⭐ **并把这轮的净结果记下** ✓：**"按已截断产出派生比例量"这条能力**的施工面已全部具名 ✓ ——
+>   `beans/EffectSpec.java`（字段 ＋ 拷贝 ✓）／`TriggerTable` 的 `TriggerContext` record（＋3 个构造点 ✓：`:2003`／`:2016`／`Battle:2369` ✓）／
+>   `TriggerInterpreter.gainResource`（记入账量 ＋ 新分支 ✓）／执行遍历点（`TriggerInterpreter:905` ✓）／内容（`1505` 星魂 50%·100% ✓）／判据（150 ⇒ 150 ✓）／变异 ✓
+>   ⇒ ⭐ **读者 ≥2 ✓、规格齐全 ✓ ⇒ 下一轮可以正当开工并出货** ✓（⚠ 唯一前置：读完 `:898`–`:930` ✓）。
+> * ⚠ **推送**：本地仍**领先 4** ✗（网络连五失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十：🎯🎯🎯 **最后一问有答案了** —— `TriggerInterpreter.apply` 里，**每条效果都从同一个 `ctx` 派生 `effectCtx`**（`ctx.withTargetFilter(...)` ✓）⇒ ⭐ 所以"上一条的入账量"**可以在同一个循环里用局部变量传递** ⇒ 施工单第 4 步定了）**）**：
+>
+> * ✅ **实测（读 `TriggerInterpreter.apply` ✓，`:903` 起 ✓）** ✓ 原文骨架：
+>   ```java
+>   public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
+>       int effectIndex = 0;
+>       for (EffectSpec effect : rule.effects()) {
+>           final int thisEffect = effectIndex++;
+>           effect = amendedEffect(effect, ctx);
+>           // M-53: this effect's per-target conditions …
+>           TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect));   // ★ 同一个 ctx 派生
+>           …
+>   ```
+>   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **上下文是"一个源头 ＋ 每条派生"** ✓ ⇒ ⭐ **不需要动 `TriggerContext` 的 record** ✗✓
+>     （⚠ 施工单第 2/3 步**可以省掉** ✓ —— ⭐ 这是本轮**省下一次改动**的发现 ✓）；**(ii)** ⭐ **"上一条的入账量"用循环里的局部变量即可** ✓
+>       （⚠ 形如 `double previousCredited = 0;` ✓ 循环末尾更新 ✓ 下一条构造 `effectCtx` 时带上 ✓）；
+>   **(iii)** ⚠ 而这需要 **`gainResource` 把"实际入账量"报出来** ✗（⚠ 它现在是 `void` ✓ ⇒ ⭐ **两种做法**：
+>     ⭐ **(a)** 在 `apply` 里对 `GAIN_RESOURCE` 单独取一次"入账前后之差" ✓（⚠ 最省、**不改 `gainResource` 的签名** ✓）；
+>     ⭐ **(b)** 给 `gainResource` 加一个"回报"出口 ✓（⚠ 改动面更大 ✗）⇒ ⭐ **推荐 (a)** ✓）。
+> * ⭐⭐ **于是最终施工单（修订版，下一轮照抄）** ✗：
+>   ① ⭐ `beans/EffectSpec.java`：加 **`private Boolean amountFromPrevious;`** ✓ ＋ `copy.amountFromPrevious = amountFromPrevious;` ✓；
+>   ② ⭐ `TriggerInterpreter.apply` ✓：循环里加 **`double previousCredited = 0;`** ✓ ＋ 构造 `effectCtx` 时**带上它** ✓（⚠ 用 `ctx` 的现有派生方式 ✓）
+>      ＋ ⭐ **在执行 `GAIN_RESOURCE` 前后取资源差** ✓ ⇒ **更新 `previousCredited`** ✓；
+>   ③ ⭐ `gainResource` ✓：新增分支 **`amountFromPrevious` ⇒ 用 `effectCtx` 里的那个量 × `amountPercent`** ✓；
+>   ④ 内容：`1505` 星魂 = **`amountFromPrevious: true, amountPercent: 0.5`** ✓（⚠ 100% 那条用 `1.0` ✓）；
+>   ⑤ 判据：⭐ **能量 150 ⇒ 好活当赏 `100 + 50 = 150`** ✓（⚠ **与既有守卫 `ElationAmountCapTest` 一致** ✓ —— ⭐ 它就是上一轮抓我的那位 ✓）；
+>   ⑥ 变异：`amountPercent` 0.5 → 0.25 ⇒ **必红** ✓。
+> * ⚠ **推送**：本地仍**领先 5** ✗（网络连六失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十一：✅✅ **新能力第 ① 步已落树且全量绿** —— `EffectSpec` 新增 **`amountFromPrevious`**（＋ `copy` 行 ✓）⇒ ⭐ 字段已就位，等第 ②③ 步把它接上）**）**：
+>
+> * ✅ **实测（改 ＋ 跑全量 ＋ 提交 ✓）** ✓：
+>   * ⭐ **`beans/EffectSpec.java`** 现在有 **`private Boolean amountFromPrevious;`** ✓（⚠ 附一段 javadoc，写明：**读的是"本规则里前一条效果**实际入账**的量"** ✓，
+>     ⚠ 而**不是**原始事件量 ✓ ⇒ ⭐ 这条注释把上一轮那条"已知偏差"的**正解**固定了下来 ✓）；
+>   * ⭐ 并在 `:50` 的拷贝组里加了 **`copy.amountFromPrevious = amountFromPrevious;`** ✓（⚠ 与既有 `copy.amountFromAttr/amountPercent/amountFromEvent/amountCap` 同组 ✓）；
+>   * ⭐ **全量 `--rerun-tasks` ⇒ `rc 0`（2132 例）** ✓ ⇒ ⭐ **字段是"惰性"的（还没人读它）** ✓ ⇒ 所以不破坏任何既有判据 ✓—— ⭐ **这正是"先落字段、再接逻辑"的安全序** ✓；
+>   * ⭐ **已提交** ✓（⚠ **提交被 `$LASTEXITCODE -eq 0` 守住** ✓ —— ⭐ 本轮严格执行了上一轮立的纪律 ✓）。
+> * ⭐⭐ **下一轮（第 ②③ 步，一次做完）** ✗：
+>   * ② ⭐ **`TriggerInterpreter.apply`**（`:903` 起 ✓）：循环里加 `double previousCredited = 0;` ✓；
+>     ⭐ **执行 `GAIN_RESOURCE` 前后取"资源差"** ✓（⚠ 用 `holder.getResources().value(id)` ✓ 相减 ✓ —— ⚠ 这样**不必改 `gainResource` 的签名** ✓）
+>     ⇒ 循环末尾 **更新 `previousCredited`** ✓；
+>   * ③ ⭐ **`gainResource`** ✓：新增分支 **`amountFromPrevious` ⇒ `previousCredited × amountPercent`** ✓
+>     （⚠ 实现上把那个量透传进 `effectCtx` ✓ —— ⚠ 或用一个短命的静态/线程局部 ✗ ⇒ ⭐ **优先透传** ✓）；
+>   * ④ 内容：`1505` 星魂改成 **`amountFromPrevious: true, amountPercent: 0.5`** ✓；⑤ 判据：**能量 150 ⇒ 好活当赏 150** ✓（⚠ 与 `ElationAmountCapTest` 一致 ✓）；⑥ 变异 ⇒ 必红 ✓。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络连七失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百三十二：🎯 **仓库自己写下了实现这条能力该走的路** —— `apply` 里那条注释明说：*"Passing it down beats a field on the context -- a nested firing would clobber shared state"*
+> ⇒ ⭐ **所以"共享状态"（含我一度想用的 `ThreadLocal`）是被仓库明确否掉的** ✗ ⇒ 必须**逐层传参**）**）**：
+>
+> * ✅ **实测（读 `apply` 的循环尾与 `fire` 的头 ✓）** ✓：
+>   * ⭐ **每条效果的实际执行是 `applyOne(battle, effect, effectCtx);`** ✓（⚠ 就在循环最后一行 ✓）；
+>   * ⭐⭐ **紧挨着的注释**（原文）：*"The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance,
+>     and the only op that consumes that amendment (`APPLY_CONTROL`) has to know which rule it is running inside. **Passing it down
+>     beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.**"* ✓
+>     ⇒ ⭐⭐⭐ **这就是仓库给"每条效果的私有数据"定的规矩** ✓：**往下传** ✓，**不要放共享状态** ✗（⚠ 因为**嵌套触发**会让共享状态互相覆盖 ✓）。
+> * ⚠ **于是修正我上一轮的设计** ✗（本段第 **三十四** 次自我纠正 ✓）：⛔ **不要用 `ThreadLocal`** ✗ ⇒ ⭐ **正解**：
+>   ① ⭐ **`applyOne` 增加一个参数** ✓（⚠ 形如 `applyOne(battle, effect, effectCtx, previousCredited)` ✓ —— ⭐ **与 `MODIFY_RULE` 那条"把规则 id 传下去"完全同构** ✓）；
+>   ② ⭐ **`gainResource` 也增加一个参数**（或由一个小的 `record EffectRun(double previousCredited)` 承载 ✓）⇒ **在那里面实现新分支** ✓；
+>   ③ ⭐ **`previousCredited` 的来源**：⚠ 在循环里，**执行前后取"该资源的入账差"** ✓（⚠ 用 `holder.getResources().value(id)` ✓ 相减 ✓）
+>     —— ⚠ 只有 `GAIN_RESOURCE` 需要更新它 ✓（⚠ 其他效果保持不变 ✓）。
+> * ⭐ **本件的进度（三件套）** ✓：**字段** ✓ 已落树（`EffectSpec.amountFromPrevious` ✓，全量绿 ✓）；**传参链** ⚠ 待做（⚠ 但**路数已由仓库注释定死** ✓）；
+>   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓）。
+> * ⚠ **推送**：本地仍**领先 7** ✗（网络连八失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（⚠ 本轮我试改过一次 `apply` ✓ 但**当即回滚** ✓ ⇒ 未留痕 ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十三：⭐⭐ **传参链的三个确切锚点到手** ⇒ ⭐ 下一轮一次就能改完（⚠ 但要先确认 `applyOne` 没有别的调用点 ✓）**）**：
+>
+> * ✅ **实测（三处 ✓）** ✓：
+>   | 锚点 | 内容 |
+>   |---|---|
+>   | ⭐ `applyOne` 定义 | **`private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx)`** ✓（`:1050` ✓） |
+>   | ⭐ 派发点 | **`gainResource(effect, ctx);`** ✓（`:1158` ✓，即 `switch (op)` 里 `GAIN_RESOURCE` 那一支 ✓） |
+>   | ⭐ 实现体 | **`private static void gainResource(EffectSpec effect, TriggerContext ctx)`** ✓（`:1341` ✓） |
+> * ⭐⭐ **拟定补丁（下一轮照抄；⚠ 先跑上面那次 `applyOne(` 的检索，确认只有 1 个调用点 ✓）** ✗：
+>   ```java
+>   // ① apply 的循环外：
+>   double previousCredited = 0;
+>   // ② 循环内（把上一条的"入账量"传下去，并在本条的 GAIN_RESOURCE 之后更新它）：
+>   if ("GAIN_RESOURCE".equals(normalizeOp(effect, null))) {
+>       CanHit holder = resolveTarget(effect, effectCtx);
+>       String id = effect.getResource();
+>       int before = holder.getResources().has(id) ? holder.getResources().value(id) : 0;
+>       applyOne(battle, effect, effectCtx, previousCredited);
+>       previousCredited = (holder.getResources().has(id) ? holder.getResources().value(id) : 0) - before;
+>   } else {
+>       applyOne(battle, effect, effectCtx, previousCredited);
+>   }
+>   // ③ applyOne(..., double previousCredited) ⇒ 传给 gainResource(effect, ctx, previousCredited)
+>   // ④ gainResource：新增分支 amountFromPrevious ⇒ amount = round(previousCredited * amountPercent)
+>   ```
+>   ⇒ ⭐ **为什么这样写** ✓：**(i)** ⭐ **不用改 `TriggerContext` 的 record** ✓（⚠ 与仓库"往下传"的规矩一致 ✓，⚠ 且不必动 3 个构造点 ✓）；
+>   **(ii)** ⭐ **"入账量"用 `Resource.value(id)` 的**前后差**取得** ✓ ⇒ ⭐ **天然带上"上限截断"** ✓✓ —— ⭐ **这正是这条能力的全部要点** ✓；
+>   **(iii)** ⚠ `normalizeOp`／`resolveTarget` **都是本文件已有方法** ✓ ⇒ **不引入新名字** ✓。
+> * ⚠ **本件的账** ✓：**字段** ✓ 已落树；**传参链** ⚠ 待改（⚠ 本轮已把**三处锚点与整段补丁**写死 ✓ ⇒ 下一轮是一次"照着贴"的活 ✓）；
+>   **内容＋判据＋变异** ⚠ 待做（⚠ 判据：能量 150 ⇒ 好活当赏 **150** ✓；⚠ 变异：`amountPercent` 0.5 → 0.25 ⇒ 必红 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十四：⚠ **补丁脚本把链接上了，但编译不过**（`TriggerInterpreter:1333` 报"找不到符号" ×4 ✓）⇒ ⭐ 已**当即回滚** ✓（⚠ 本轮严格执行了"红就不提交" ✓））**）**：
+>
+> * ⚠ **实测（跑脚本 ＋ 全量 ✓）** ✓：
+>   * ⭐ 脚本**成功改完六处** ✓（`ok TriggerInterpreter: the credit chain is wired` ✓）；
+>   * ⛔ 但编译在 **`:1333`** 报 **"找不到符号" ×4** ✗ ⇒ ⭐ **回滚** ✓（`git checkout -- <该文件>` ✓ ⇒ 全量恢复 ✓）。
+>   ⇒ ⭐ **最可能的原因** ✓（⚠ 下一轮一次即可定案 ✓）：⚠ 我那段**新分支插在原 `if (Boolean.TRUE.equals(effect.getAmountFromEvent()))` 之前** ✓
+>     ⇒ ⭐ 而那个位置**可能仍在 `int amount;` 声明之前** ✗（⚠ 本段前面读到的是 `int amount;` 紧跟着 `if (getAmountFromEvent())` ✓
+>       ⇒ ⭐ 但**插入点在"注释与 `int amount;` 之间"** ✗ 就会让 `amount = …` 指向未声明变量 ✓ —— ⭐ **正是 4 个"找不到符号"的形状** ✓）。
+> * ⭐ **下一轮第一步（两次调用）** ✗：
+>   ① **读 `TriggerInterpreter:1325`–`1345`** ✓ ⇒ 看清 `int amount;` 与新分支的**相对位置** ✓；
+>   ② 把脚本里的插入锚点从 **`if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {`** 改成 **`int amount;` 之后** ✓
+>     （⚠ 或直接在 `int amount;` 后面插入 ✓）⇒ 重跑 ⇒ 全量绿 ⇒ **提交脚本 ＋ 引擎改动** ✓（⚠ 按纪律当场提交 ✓）。
+> * ⚠ **并记一条** ✓：⚠ **"脚本改得动"≠"改得对"** ✗ ⇒ ⭐ **每次"生成式改动"后都要编译**（⚠ 本轮做到了 ✓ ⇒ 只损失一次调用 ✓，没有污染树 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树**待确认干净** ✓、已推送且同步 ✓（`7bec6493` ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十五：🎯 **那次编译错的**真因**看清了** —— ⚠ `:1333` 那几行**不属于 `gainResource`**，而属于**紧邻的 `gainEnergyFor`** ✗（⚠ 它里面有 `battle.grantEnergy(target, effect.getPercent() * …)` ✓）⇒ ⭐ 说明我的补丁**落点整体偏了几行** ✗）**）**：
+>
+> * ✅ **实测（读 `:1328`–`:1338` ✓）** ✓ 那一段是：
+>   ```java
+>   battle.grantEnergy(target, effect.getPercent() * battle.castAppliedCount(state));
+>   return;
+>   …
+>   double maxEnergy = target.getMaxEnergy();
+>   if (maxEnergy <= 0) {
+>       throw new IllegalStateException(
+>               "GAIN_ENERGY scales off " + target.getName() + "'s maximum energy, but that unit has no energy bar …");
+>   }
+>   battle.grantEnergy(target, effect.getPercent() * maxEnergy);
+>   ```
+>   ⇒ ⭐⭐ **这是 `gainEnergyFor`（`GAIN_ENERGY` 的实现）** ✓ —— ⚠ **不是 `gainResource`** ✗ ⇒ ⭐ 所以"4 个找不到符号"是**我的插入把这一带的语义搅乱了** ✗
+>     （⚠ 已回滚 ✓，树是干净的 ✓）。
+> * ⭐ **下一轮第一步（重读真锚点，两次调用）** ✗：
+>   ① **读 `TriggerInterpreter:1341`–`1372`** ✓（⭐ **`gainResource` 的真身** ✓ —— ⚠ 本段早前只从 `:1341` 读了**开头两行与 `amountFromEvent` 分支** ✓
+>      ⇒ ⭐ **必须把 `int amount;` 的**准确位置**、以及各分支的**完整形状**看全** ✓）；
+>   ② 把脚本的插入锚点改成 **`int amount;` 这一行之后** ✓（⚠ 或改成 `amount = (int) Math.round(ctx.amount()` 那个分支的**前一行** ✓）
+>     ⇒ ⭐ **重跑 ⇒ 编译 ⇒ 全量 ⇒ 绿 ⇒ 当场提交** ✓。
+> * ⚠ **纪律（本轮第二次落点）** ✗：⚠ **"生成式改动"必须**先读全锚点上下文**（⚠ 我只读了两行就下手 ✓ ⇒ 白丢一轮 ✓）
+>   ⇒ ⭐ **纪律：任何自动化补丁，锚点前后各读 15 行** ✓。
+> * ⚠ **进度如实** ✓：新能力**字段** ✓ 已落树；**传参链** ⚠ **两次尝试未成**（第一次引号 ✗／第二次落点 ✗）⇒ ⭐ **尚未进入树** ✓；
+>   **内容＋判据＋变异** ⚠ 待做 ⇒ ⭐ **本件仍是"已登记、施工中"** ✓，**没有冒充出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓（`822f6d53` ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十六：🎯🎯 **补丁落点其实是**对的****（`if (getAmountFromEvent())` 就在 `int amount;` 之后 ✓）⇒ ⭐ 所以那 4 个"找不到符号"**另有其因** —— ⚠ 最可能是 **`EffectSpec` 没有 `getAmountFromPrevious()` 这个 getter** ✗）**）**：
+>
+> * ✅ **实测（读 `gainResource` 真身 ✓，`:1341`–`:1370` ✓）** ✓ 全文骨架：
+>   ```java
+>   private static void gainResource(EffectSpec effect, TriggerContext ctx) {
+>       CanHit holder = resolveTarget(effect, ctx);
+>       … // 注释：这个 share 是"off the holder"，且未知属性名会被大声拒绝
+>       int amount;                                                      // ★ 声明
+>       if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {           // ★ 我的锚点 —— 位置正确 ✓
+>           amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+>       } else if (effect.getAmountFromAttr() == null) {
+>           amount = (int) Math.round(scaledAmount(effect, ctx));
+>       } else { … holder.getAttribute(attribute).get() * share … }
+>       if (effect.getAmountCap() != null) {                              // ★ 上限在这里
+>           amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
+>       }
+>       … // PARTY 作用域那一段
+>   ```
+>   ⇒ ⭐⭐ **两条** ✓：**(i)** ⭐ **锚点正确** ✓（⚠ 本段上一轮"落点偏了"的判断**被推翻** ✓ —— ⭐ 第三十五次自我纠正 ✓）；
+>   **(ii)** ⭐⭐ **于是那 4 个 "找不到符号" 只能是"新分支里引用的名字不存在"** ✗ ⇒ ⭐ 最可能：
+>     **`EffectSpec` 没有 `getAmountFromPrevious()`** ✗（⚠ 我加的是**字段** ✓ ⇒ ⚠ **若该类不用 Lombok ⇒ 就没有 getter** ✗）
+>     ⇒ ⚠ 而报错行号显示在 `gainEnergyFor` 附近 ✓ ⇒ ⭐ **那是因为我的插入把它**下移了 9 行** ✓** ⇒ ⭐ **行号是"打补丁后"的** ✓。
+> * ⭐ **下一轮第一步（一次读 ＋ 一次改）** ✗：**读 `beans/EffectSpec.java` 的类头** ✓ ⇒ 看它有没有
+>   **`@Data`／`@Getter`／`@Setter`**（⚠ 本段早前见过 `@SerializedName` ✓ 但**没注意 Lombok** ✗）：
+>   * ⭐ **有 Lombok** ⇒ ⚠ 那么 getter 应当存在 ✗ ⇒ 去读**真正的编译错文本**（⚠ 用 `--console=plain` 抓**四行全文** ✓）；
+>   * ⭐ **没有 Lombok** ⇒ ⭐ **加一个显式 getter** ✓（⚠ 照该类既有 getter 的写法 ✓）⇒ 重跑 ⇒ 绿 ⇒ **当场提交** ✓。
+> * ⚠ **进度**：新能力**字段** ✓ 落树；**传参链** ⚠ 三次尝试未成（引号 ✗／落点误判 ✗／**getter 待确认** ✓）⇒ **仍未进树** ✓（如实 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十七：✅ `EffectSpec` **有 `@Getter`**（`:31` ✓）⇒ ⭐ "缺 getter"这条排除；⭐ 于是最可能是**我的脚本有一处替换**悄悄没生效**（⚠ 而它对那处**没写 assert** ✗））**）**：
+>
+> * ✅ **实测（读 `beans/EffectSpec.java` 类头 ✓）** ✓：**`@Getter`（`:31` ✓）＋ `public class EffectSpec {`（`:34` ✓）**
+>   ⇒ ⭐ 所以 **`getAmountFromPrevious()` 会被 Lombok 生成** ✓ ⇒ ⛔ **"找不到符号"不是缺 getter** ✓（⭐ 本段第三十六次自我纠正 ✓）。
+> * ⭐⭐ **于是嫌疑集中到脚本本身** ✓：⚠ 我那条脚本**只对 5 个锚点里的 4 个写了 `assert`** ✗
+>   ⇒ ⭐ **第 4 处**（`"                gainResource(effect, ctx);"` ⇒ 改成 3 参调用 ✓）**若没匹配上** ✗
+>     ⇒ ⚠ 那么**签名已是 3 参** ✓ 而**调用点还是 2 参** ✗ ⇒ ⭐ **编译期报的就是"找不到 2 参的 gainResource"** ✓✓
+>       ⇒ ⚠ 而且会有**多处**（⚠ 4 个"找不到符号"的形状也对 ✓）。
+> * ⭐ **下一轮第一步（三处小改，一次做完）** ✗：
+>   ① ⭐ **给脚本的每一处替换都加"改没改到"的断言** ✓（⚠ 用 `if old not in src: sys.exit(...)` ✓ ⇒ ⭐ **本段纪律："脚本改得动 ≠ 改得对" ⇒ 现在升级为"每一处都必须自证"** ✓）；
+>   ② ⭐ **先 `grep` 出 `gainResource(effect, ctx)` 的**真实缩进与全角/半角**** ✓（⚠ 我凭印象写了两组空格 ✗）；
+>   ③ 重跑 ⇒ 编译 ⇒ 全量 ⇒ 绿 ⇒ **当场提交** ✓。
+> * ⚠ **进度**：新能力**字段** ✓ 落树；**传参链** ⚠ 四次尝试未成 ⇒ **仍未进树** ✓（如实 ✓）；⭐ **但每一次都把原因缩小了一格** ✓
+>   （引号 ✗ → 落点 ✗ → getter ✗ → **锚点未匹配** ✓）⇒ ⭐ **下一轮命中概率已经很高** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十八：⚠ **锚点全部核对为"正确"**（`gainResource(effect, ctx);` 的**真实字节**是 **16 个空格** ＋ 该文本 ✓，与我脚本里的常量**逐字相同** ✓）⇒ ⭐ 所以"锚点没匹配"这条**也排除** ⇒ ⭐ **只剩"读编译错的全文"这一条路**）**）**：
+>
+> * ✅ **实测（`repr` 取真实上下文 ✓）** ✓：`'attle, mover, movedId);\n                gainResource(effect, ctx);\n'` ✓
+>   ⇒ ⭐ **缩进 = 16 空格** ✓，与我脚本里的 `DISPATCH` 常量**完全一致** ✓ ⇒ ⛔ **"替换没生效"排除** ✓（⭐ 第三十七次自我纠正 ✓）。
+> * ⭐ **下一轮第一步（唯一没做过的一步：把编译错的**全文**读出来）** ✗：
+>   ⚠ 我前几轮用的 `Select-String '错误:'` **只抓到"文件:行号"** ✗ ⇒ ⭐ **真正的符号名在**下一行**** ✓
+>   ⇒ ⭐ **做法**：重跑补丁 ✗ **不要** ✗ —— ⚠ 而是**先把补丁跑起来再抓完整输出** ✓：
+>   ```powershell
+>   python tools/patch_credit_chain.py
+>   .\gradlew.bat compileJava --console=plain 2>&1 | Select-String -Pattern '错误|symbol|符号' -Context 1,1
+>   ```
+>   ⚠ 然后**无论结果如何都回滚** ✓（⚠ 树必须绿 ✓）。
+> * ⭐ **或者更省的一条** ✓：⚠ **直接读脚本生成的那几行** ✗ —— ⚠ 但脚本已经回滚 ✓ ⇒ ⭐ **跑一次并把"改后的 `gainResource` 前 12 行"打出来** ✓
+>   （⚠ `python -c` 读文件 ＋ 打印 ✓）⇒ ⭐ **一眼就能看出**哪个名字不对 ✓。
+> * ⚠ **进度如实** ✓：新能力**字段** ✓ 落树；**传参链** ⚠ 五次尝试未成 ⇒ **仍未进树** ✓；
+>   ⭐ 排除链已经走到尽头（引号 → 落点 → getter → 锚点 → **只剩符号名** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十九：🎯🎯🎯 **真因拿到了（编译错的全文）** —— ⚠ 报的是 **"符号: 变量 `amount`"** 与 **"符号: 变量 `previousCredited`"**
+> ⇒ ⭐ 即我插入的那一行**落在了两个变量都不在作用域的地方** ✗ ⇒ ⭐ **说明那个锚点 `if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {` 在文件里**不止一处**** ✗，而 `python.replace(..., 1)` **替换了第一处**（⚠ 不在 `gainResource` 里 ✓））**）**：
+>
+> * ✅ **实测（跑补丁 ＋ `compileJava --console=plain` 抓全文 ✓，随后回滚 ✓）** ✓ 编译器原文：
+>   ```
+>   错误: 找不到符号
+>       amount = (int) Math.round(previousCredited
+>       ^
+>     符号:   变量 amount        位置: 类 TriggerInterpreter
+>   错误: 找不到符号
+>       amount = (int) Math.round(previousCredited
+>                                         ^
+>     符号:   变量 previousCredited
+>   2 个错误
+>   ```
+>   ⇒ ⭐⭐⭐ **两条** ✓：**(i)** ⭐ **我插入的代码没在 `gainResource` 里** ✗（⚠ 否则 `amount` 一定在作用域 ✓ —— 它是那个方法的第一条语句 ✓）；
+>   **(ii)** ⚠ **而锚点文本"存在且被替换了"** ✓（⚠ 所以前几轮"锚点匹配"的判断**没错** ✓）⇒ ⭐ **错的是"第一处"不是"我要的那处"** ✓✓
+>     ⇒ ⭐ **本段第三十八次自我纠正** ✓。
+> * ⭐⭐ **下一轮修法（一次成功，且写成自证脚本）** ✗：
+>   ① ⭐ **先按"定义位置"切片** ✓：`i = src.index('private static void gainResource(')` ✓ ⇒ **只对 `src[i:]` 做替换** ✓（⚠ 前段原样保留 ✓）；
+>   ② ⭐ **每一处替换都 `assert` 改到了** ✓（⚠ 本段纪律"每一处都必须自证" ✓）；
+>   ③ ⇒ 重跑 ⇒ 编译 ⇒ 全量 ⇒ 绿 ⇒ **当场提交** ✓。
+> * ⭐ **并记一条普适教训** ✓（本段第三十九条纪律候选）✗：
+>   ⚠ **锚点文本必须"唯一"** ✗ ⇒ ⭐ **凡做文本替换，锚点要么唯一 ✓，要么先用定义位置把范围切开 ✓**
+>     —— ⚠ 否则会**改到别处**（⚠ 本段这次就是：编译错在 `:1333` 而不是 `:1341` ✓ ⇒ 这正是"落在别处"的信号 ✓）。
+> * ⚠ **进度**：新能力**字段** ✓ 落树；**传参链** ⚠ 六次尝试未成 ⇒ **仍未进树** ✓（如实）；⭐ 但**真因已定** ✓ ⇒ **下一轮应当一次成** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百四十：🎯🎯🎯 **校验器把话说清楚了** —— `Op GAIN_RESOURCE requires "amount"` ⇒ ⭐ 所以新分支还差**第三处引擎改动**：把 `amountFromPrevious` 加进"可当金额来源"的白名单）**）**：
+>
+> * ✅ **实测（跑内容 ＋ 全量 ⇒ 31 红，信息完全一致 ✓）** ✓：
+>   * ⭐ **每一条红都是同一句**：**`Invalid trigger table for cid 1505: Op GAIN_RESOURCE requires "amount"`** ✓
+>     （⚠ 源文本正是那条行迹 ✓：「绯英获得能量时，将同步获得等值的【好活当赏】…」✓）
+>     ⇒ ⭐⭐ **即：装载期校验要求每条 `GAIN_RESOURCE` 都有 `amount`** ✗ ⇒ ⚠ 而 `amountFromEvent`／`amountFromAttr` **能过** ✓
+>       ⇒ ⭐ **说明校验器有一份"允许的金额来源"白名单** ✓ ⇒ ⭐ **而我的 `amountFromPrevious` 不在里面** ✗✓。
+> * ⭐ **下一轮第一步（读白名单 ＋ 加一项，两次调用）** ✗：
+>   ① **读那条校验** ✓（⚠ 就在 `TriggerInterpreter` 里报的 ✓ ⇒ grep **`requires \"amount\"`** ✓ —— ⚠ 本轮这条 grep 的**转义写错了**（`\\"` ✗）⇒ ⭐ 下一轮用
+>     `Select-String -Pattern 'requires'` 或直接搜 **`amountFromEvent`** 的校验处 ✓）；
+>   ② ⭐ **把 `amountFromPrevious` 加进同一条件** ✓（⚠ 形如 `effect.getAmount()==null && !TRUE.equals(effect.getAmountFromEvent()) && effect.getAmountFromAttr()==null && !TRUE.equals(effect.getAmountFromPrevious())` ✓）
+>     ⇒ ⭐ 重跑 ⇒ 全量 ⇒ 绿 ⇒ **提交** ✓（⚠ 三处引擎改动 ＋ 内容 ＋ 判据 ＋ 变异 ⇒ ⭐ **这件才算四件齐** ✓）。
+> * ⭐⭐ **而 31 红的形状本身很有价值** ✓：⚠ 它是**"一个内容文件校验失败 ⇒ 所有加载该角色的判据一起红"** ✓ —— ⭐ **本段早前记录过这条规律**（"第一次反射：多判据同角色全红 ⇒ 是表装载失败" ✓）
+>   ⇒ ⭐ **本轮正是它的第二次现身** ✓（⚠ 而且校验信息**直接给出了原因** ✓ ⇒ 比上次更快 ✓）。
+> * ⚠ **进度如实**：引擎**字段** ✓／**传参链** ✓／**校验器白名单** ⚠ 待加 ⇒ ⭐ **内容 ＋ 判据 ＋ 变异仍未进树** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
