@@ -23178,6 +23178,27 @@
 >   ＋ **变异**（⚠ `speed` 59.4 → 30 ⇒ 若判据读的是"状态在不在"就不受影响 ✗ ⇒ ⭐ **变异应改 `buff` 名** ✓ 或断言的量 ✓）⇒ **全量** ⇒ ⭐ **出货（目标 ① 第三件）** ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`af5bb649` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，探针已删 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百九十九：✅ **倒计时**不住在角色身上**，而住在**战斗**上 ⇒ ⭐ 判据要问 `Battle`**）**）**：
+>
+> * ✅ **实测（读 `startCountdown` ✓，`:3368` ✓）** ✓ 全文：
+>   ```java
+>   private static void startCountdown(Battle battle, EffectSpec effect, TriggerContext ctx) {
+>       String name = effect.getBuff() == null || effect.getBuff().isBlank()
+>               ? (ctx.owner() == null ? "countdown" : ctx.owner().getName() + " 倒计时")
+>               : effect.getBuff().trim();
+>       battle.startCountdown(ctx.owner(), name, effect.getSpeed());
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **`buff` 就是倒计时的名字** ✓（⚠ 省略时自动取 `<她的名字> 倒计时` ✓）；
+>   **(ii)** ⭐ **它注册在 `Battle` 上**（`battle.startCountdown(...)` ✓）⇒ ⛔ **所以 `hasState(...)` 查不到** ✗ —— ⭐ **与本节实测完全一致** ✓（⭐ 第五十九次自我纠正 ✓）；
+>   **(iii)** ⚠ **它额外拒绝一堆字段**（`rejectCountdownExtras` ✓：`percent`／`scale`／`turns`／`attribute`／`element`／`control`／`baseChance` … 都会被拒 ✗）
+>     ⇒ ⭐ **所以我那条 `{"op":"START_COUNTDOWN","buff":…,"speed":59.4}` 是**干净**的** ✓（⚠ 没带多余键 ✓ ⇒ ⭐ **它应当装载成功** ✓ —— ⚠ 而装载成功这一点本轮已被证明 ✓，因为判据**跑到了断言**而不是装载异常 ✓）。
+> * ⭐ **下一轮第一步（一次调用）** ✗：**读 `Battle` 的 `startCountdown` 与它的存储** ✓（⚠ 本轮已 grep 到它在 `Battle` 里 ✓，⚠ 列表就在上面 ✓）
+>   ⇒ ⭐ 拿到**公开可读的入口**（⚠ 例如 `battle.countdowns` 或 `getCountdown(name)` ✓ —— ⭐ **按真名，不猜** ✓）
+>   ⇒ ⭐ 判据改成问它 ⇒ ⭐ **一次就绿** ⇒ **变异**（⚠ `buff` 名改掉 ⇒ 必红 ✓）⇒ **全量** ⇒ ⭐ **出货（目标 ① 第三件）** ✓。
+> * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ 脚本已**先提交再跑** ✓。
+> * ⚠ **推送**：本地领先 1 ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，回滚后）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -29452,6 +29473,27 @@
 >   ＋ **变异**（⚠ `speed` 59.4 → 30 ⇒ 若判据读的是"状态在不在"就不受影响 ✗ ⇒ ⭐ **变异应改 `buff` 名** ✓ 或断言的量 ✓）⇒ **全量** ⇒ ⭐ **出货（目标 ① 第三件）** ✓。
 > * ⚠ **推送**：本地已**同步** ✓（`af5bb649` ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，探针已删 ✓）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百九十九：✅ **倒计时**不住在角色身上**，而住在**战斗**上 ⇒ ⭐ 判据要问 `Battle`**）**）**：
+>
+> * ✅ **实测（读 `startCountdown` ✓，`:3368` ✓）** ✓ 全文：
+>   ```java
+>   private static void startCountdown(Battle battle, EffectSpec effect, TriggerContext ctx) {
+>       String name = effect.getBuff() == null || effect.getBuff().isBlank()
+>               ? (ctx.owner() == null ? "countdown" : ctx.owner().getName() + " 倒计时")
+>               : effect.getBuff().trim();
+>       battle.startCountdown(ctx.owner(), name, effect.getSpeed());
+>   }
+>   ```
+>   ⇒ ⭐⭐ **三条** ✓：**(i)** ⭐ **`buff` 就是倒计时的名字** ✓（⚠ 省略时自动取 `<她的名字> 倒计时` ✓）；
+>   **(ii)** ⭐ **它注册在 `Battle` 上**（`battle.startCountdown(...)` ✓）⇒ ⛔ **所以 `hasState(...)` 查不到** ✗ —— ⭐ **与本节实测完全一致** ✓（⭐ 第五十九次自我纠正 ✓）；
+>   **(iii)** ⚠ **它额外拒绝一堆字段**（`rejectCountdownExtras` ✓：`percent`／`scale`／`turns`／`attribute`／`element`／`control`／`baseChance` … 都会被拒 ✗）
+>     ⇒ ⭐ **所以我那条 `{"op":"START_COUNTDOWN","buff":…,"speed":59.4}` 是**干净**的** ✓（⚠ 没带多余键 ✓ ⇒ ⭐ **它应当装载成功** ✓ —— ⚠ 而装载成功这一点本轮已被证明 ✓，因为判据**跑到了断言**而不是装载异常 ✓）。
+> * ⭐ **下一轮第一步（一次调用）** ✗：**读 `Battle` 的 `startCountdown` 与它的存储** ✓（⚠ 本轮已 grep 到它在 `Battle` 里 ✓，⚠ 列表就在上面 ✓）
+>   ⇒ ⭐ 拿到**公开可读的入口**（⚠ 例如 `battle.countdowns` 或 `getCountdown(name)` ✓ —— ⭐ **按真名，不猜** ✓）
+>   ⇒ ⭐ 判据改成问它 ⇒ ⭐ **一次就绿** ⇒ **变异**（⚠ `buff` 名改掉 ⇒ 必红 ✓）⇒ **全量** ⇒ ⭐ **出货（目标 ① 第三件）** ✓。
+> * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ 脚本已**先提交再跑** ✓。
+> * ⚠ **推送**：本地领先 1 ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，回滚后）、树干净 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
