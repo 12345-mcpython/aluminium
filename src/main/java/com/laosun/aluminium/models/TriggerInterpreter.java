@@ -3673,7 +3673,8 @@ public final class TriggerInterpreter {
 
     private static void requireAmount(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getAmount() == null && effect.getAmountFromAttr() == null
-                && !Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+                && !Boolean.TRUE.equals(effect.getAmountFromEvent())
+                && !Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"amount\" (source: " + spec.getSource() + ")");
         }
