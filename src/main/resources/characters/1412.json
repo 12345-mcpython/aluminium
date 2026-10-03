@@ -242,6 +242,26 @@
       ],
       "source": "1412 刻律德菈（文档 `:67`）：「**奇袭结束后，消耗 6 点充能使【爵位】变回【军功】**」",
       "note": "⭐ 2026-10-02：触发用**新建的 `INSERTED_CAST_END`** ✓（“被命令的施放结束” ✓）；“变回【军功】”就是**取消【爵位】** ✓（文档：「持有【爵位】的角色**被视为同时持有【军功】**」 ✓）；门槛 `self_resource:充能 >= 6` ✓ 保证不会花不起 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "peerage_skill_crit_damage",
+      "when": [
+        "actor has_state 爵位",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.72,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1412 刻律德菈 行迹（文档 `:67`）：「持有【爵位】的角色…造成的**战技伤害的暴击伤害提高 72%**」",
+      "note": "⭐ 2026-10-02：`CRIT_ATTACK` 就是暴击伤害 ✓（数据：`1412` 的 `crit_chance 0.05` ⾏ `crit_attack 0.5` ✓）；而 instance 路由**按名支持它** ✓（`ctx.damage().addCritDamage(...)` ✓）。“战技伤害的”由 `from_category BPSKILL` 表达 ✓。"
     }
   ]
 }
