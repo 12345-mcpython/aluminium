@@ -38,7 +38,7 @@ rules.append({
     "on": "CAST_SETUP",
     "id": PIERCE,
     "when": ["actor has_state " + PEERAGE, "from_category BPSKILL"],
-    "do": [{"op": "CAST_SKILL", "skill": "SKILL", "target": "actor"}],
+    "do": [{"op": "CAST_SKILL", "skill": "SKILL", "target": "attacker"}],
     "source": ("1412 \u523b\u5f8b\u5fb7\u83c8\uff08\u6587\u6863 `:67`/`:68`\uff09\uff1a\u300c\u2026\u5bf9\u654c\u65b9\u76ee\u6807\u65bd\u653e\u6218\u6280\u65f6\u89e6\u53d1**\u5947\u88ad**\u300d"
                "\uff0b\u5b9a\u4e49\u300c**\u5947\u88ad**\uff1a\u590d\u5236\u4e00\u6b21\u5373\u5c06\u65bd\u653e\u7684\u6280\u80fd\u5e76**\u63d0\u524d\u65bd\u653e**\uff0c\u968f\u540e\u65bd\u653e\u539f\u6280\u80fd\u300d"),
     "note": ("\u2b50 2026-10-02\uff1a`CAST_SETUP`\uff08\u5f15\u64ce\u81ea\u8ff0\u7684**\u524d\u7f6e\u94a9\u5b50** \u2713\uff09\uff0b`CAST_SKILL`"
@@ -51,7 +51,7 @@ rules.append({
     "id": ENDS,
     "when": ["actor has_state " + PEERAGE, "self_resource:" + CHARGE + " >= 6"],
     "do": [{"op": "SPEND_RESOURCE", "resource": CHARGE, "amount": 6},
-           {"op": "REMOVE_STATE", "buff": PEERAGE, "target": "actor"}],
+           {"op": "REMOVE_STATE", "buff": PEERAGE, "target": "attacker"}],
     "source": ("1412 \u523b\u5f8b\u5fb7\u83c8\uff08\u6587\u6863 `:67`\uff09\uff1a\u300c**\u5947\u88ad\u7ed3\u675f\u540e\uff0c\u6d88\u8017 6 \u70b9\u5145\u80fd\u4f7f"
                "\u3010\u7235\u4f4d\u3011\u53d8\u56de\u3010\u519b\u529f\u3011**\u300d"),
     "note": ("\u2b50 2026-10-02\uff1a\u89e6\u53d1\u7528**\u65b0\u5efa\u7684 `INSERTED_CAST_END`** \u2713\uff08\u201c\u88ab\u547d\u4ee4\u7684\u65bd\u653e\u7ed3\u675f\u201d \u2713\uff09\uff1b"
