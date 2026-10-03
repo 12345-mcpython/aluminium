@@ -33142,3 +33142,37 @@
 > * ⚠ **本轮处置** ✓：探针删除（⚠ 不经诊断进树 ✓）⇒ 全量恢复 **rc 0** ✓。
 > * ⚠ **推送**：本地领先 ? ✗（⚠ 本轮 `git push` 首次报 **SSL connection timeout** ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2164** 例 ✓）、`mechanics` **rc 0** ✓、树干净（含未追踪 ✓）✓。
+
+> **2026-10-02 更新（aggro 回收之整千三百：🎉🎉🎉 **第 40 件出货** —— ⭐ **「最后 1 个倒计时回合…结束变身」**；
+> ⭐⭐ **并且它把"倒计时那一问"整个**重新框定**了**）**）**：
+>
+> * ⭐⭐⭐ **重新框定（读出来的，一次到位 ✓）** ✓：⭐ **"倒计时的钟走完了"根本不是引擎时刻** ✗ ——
+>   ⚠ `Countdown` 全文只有 **owner 链接 ＋ 一张属性表** ✓（**没有任何剩余回合计数器** ✓），
+>   而 `Battle` 的倒计时回合处（`Battle:955–958` ✓）**只做两件事**：
+>   ```java
+>   if (actor instanceof Countdown countdown) {
+>       fireTriggersForAlly(TriggerEvent.COUNTDOWN_TURN, countdown, countdown, 0);
+>   }
+>   actor.beforeMove(this);
+>   ```
+>   ⇒ ⭐⭐ **即："结束"必须由**内容自己数**** ✓✓ ⇒ ⚠ **我之前四轮想从引擎侧驱动"时钟走完"，问的是一个**不存在的东西**** ✗
+>     （⭐ **第六次"仪器/前提"教训** ✓ —— ⭐ 而这次是**问题本身**问错了 ✓）。
+> * ⭐⭐ **已出货的写法（抄的 ✓）** ✓：⭐ `1507.zone_ends_takes_thousand_forgings_off` —— `on: COUNTDOWN_TURN` ＋ `when: ["actor == countdown"]` ⇒ `REMOVE_STATE` ✓
+>   ⇒ ⭐ 而 `REMOVE_STATE` 正是**显式移除**那条路 ✓ ⇒ ⭐ **会公告 `STATE_ENDED`** ✓（第 1619 轮实测 ✓）。
+> * ✅ **内容（两条规则 ＋ 一个计数器资源 ✓）** ✓：
+>   1. ⭐ **`countdown_turn_counts`**（`COUNTDOWN_TURN` ＋ `actor == countdown` ⇒ **`GAIN_RESOURCE{额外回合计数, 1}`** ✓）；
+>   2. ⭐ **`last_countdown_turn_ends_the_transformation`**（同事件 ＋ **`self_resource:额外回合计数 >= 8`** ⇒ **`REMOVE_STATE{变身, target: self}`** ✓）；
+>      ⚠ **顺序要紧** ✓：⭐ 它**必须在计数规则之后** ✓（同一事件按文件顺序 ✓），否则第 8 次读不到 8 ✗；
+>   3. ⭐ 新资源 **`额外回合计数`（max 8）** ✓ —— ⚠ **它是计数器、不是游戏资源** ✓（⭐ 因为引擎没有倒计时剩余回合数 ✗）。
+> * ✅ **判据** ✓（`TransformationEndsOnLastCountdownTest` ✓，**两向** ✓）：⭐ **第 8 个倒计时回合 ⇒ 变身消失** ✓
+>   ＋ ⭐ **第 7 个 ⇒ 仍在** ✓（⭐ 这一向正卡在"**最后 1 个**"上 ✓）。
+>   ⭐ **并用的是**已出货的驱动法**** ✓（`CountdownTest` ✓）：⭐ `battle.currentMove = <从行动条查出的 Signal>` ＋ **`battle.beforeMove()`** ✓
+>     ⇒ ⭐ **本轮顺带证明：这套驱动**确实会发 `COUNTDOWN_TURN`**** ✓✓（⚠ 上一轮我只在 `STATE_ENDED` 上装标记，所以没验到这一点 ✓）。
+> * ✅ **实测变异（1 红 ✓）** ✓：⭐ 阈值 `>= 8` → **`>= 7`** ⇒ 全量 **2166 例 1 failed** ✓，判据报
+>   *"「最后 1 个」-- the seventh turn is not the last one ==> expected: **<true>** but was: **<false>**"* ✓（⚠ 回滚后全量 **0** ✓、闸门 **[0, 0]** ✓）。
+> * ⭐⭐ **对目标 ① 的意义** ✓：⭐ **「1408 变身结束 ×3」这个已点名读者的**时刻**至此**真正可用**** ✓ ——
+>   ⚠ 剩下的只是**那条句子本身**（「变身结束时会基于溢出点数获得【火种】」✗，仍缺 `amountFromResource` ✓）。
+> * ⚠ **同句仍登记** ✓：⭐ **「960% 攻击力的物理属性终结技伤害，由敌方全体**均分**」** ✗ ——
+>   ⚠ **全树搜过"均分"** ✓：**Java 里没有任何实现** ✓（只有文档文字 ✓）⇒ 写 `DAMAGE{target: all_enemies}` 会给**每个**敌人全额 960% ✗ ⇒ **那是近似，不写** ✓。
+> * ⚠ **推送**：⭐ **本轮已推送** ✓（`09c652c2..0c7a11b7` ✓，**pending 0** ✓）⇒ ⭐ **纪律五项满足** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2166** 例 ✓）、`mechanics` **rc 0** ✓、树干净（含未追踪 ✓）✓。
