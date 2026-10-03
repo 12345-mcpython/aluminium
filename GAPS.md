@@ -21498,6 +21498,34 @@
 >   | 读者 | ⭐ `on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}`（⚠ 充能已声明 ✓ `max 8` ✓） |
 > * ⚠ **推送**：本地仍**领先 16** ✗（网络十七连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十三：✅✅ **那个 Modifier 的定义读到了** —— 它在 **昔涟的忆灵（Servant）能力文件**里，⭐ 而"额外点数"是**销毁时**用**动态表达式**加的（`_WindfuryCostFixValue`））**）**：
+>
+> * ✅ **实测（全量搜该名字 ⇒ 定位 ⇒ 读定义 ✓）** ✓：
+>   * ⭐ **定义处**：`Config\ConfigAbility\Servant\Servant_CyreneServant_00_Ability.json:8826` ✓
+>     （⚠ 即 **`Servant_CyreneServant_00`** —— ⭐ **昔涟的忆灵/"德谬歌"那一族** ✓ ⇒ ⭐ 印证了它属于**昔涟侧** ✓）；
+>   * 原文骨架 ✓：
+>     ```json
+>     "MServant_CyreneServant_00_AmazingBuff_Cerydra": {
+>       "BehaviorFlagList": [ "RemoveWhenCasterDead" ],
+>       "_CallbackList": [ { "Event": "OnDestroy", "CallbackConfig": [
+>         { "$type": "RPG.GameCore.SetDynamicValueByAddValue",
+>           "TargetType": { "Alias": "ModifierOwnerEntity" },
+>           "Key": { "Value": "_WindfuryCostFixValue" },          // ⭐ 加的是"风怒/费用修正值"这一类动态量
+>           "AddValue": { "IsDynamic": true, "PostfixExpr": { "OpCodes": "AQAOEQ==", "FixedValues": [], "DynamicHashes": [ -678654436 ] } },
+>           "ContextScope": "TargetEntity" } ] } ] }
+>     ```
+>   ⇒ ⭐⭐ **两点** ✓：**(i)** ⭐ **"奇袭结束后给她充能"是通过"销毁这个增益时 + 一个动态值"实现的** ✓（⚠ 所以它**不是**一个常数 ✓）；
+>   **(ii)** ⛔ **那个动态值的字面数**要**解 `PostfixExpr`**（`OpCodes` ＋ `DynamicHashes` ✓）才能得到 ✗
+>     ⇒ ⭐ 按纪律：**登记** ✓（⚠ 写清"**参数名 ✓、承载者 ✓、实现方式 ✓，唯数值需解表达式**" ✓），
+>       并**不再为它花轮次** ✓（⚠ 本段在此已花 **12** 轮找数值 ✓ —— ⭐ 收益/成本已经倒挂 ✓）。
+> * ⭐⭐ **本段的净结论（这条能力的取舍）** ✓：**规格完整** ✓（触发 ✓／机制 ✓／不可递归 ✓／结束时刻 ✓／读者形状 ✓）
+>   ＝ ⭐ **"奇袭结束 ⇒ `STATE_ENDED("奇袭")` ⇒ 她 +`#2` 充能"** ✓ ⇒ ⭐ **唯一缺的是一个**动态表达式里的数**** ✗
+>     ⇒ ⭐ **所以它可以按"`#2` 用一个保守写法（`amount: 1` ＋ 注释说明取自表达式、待核）"出货** ✗ hmm: ⚠ **但按纪律不能猜数值** ✓
+>       ⇒ ⭐ **正解**：**读者规则里用 `ReadParamList` 的语义**（⚠ 引擎没有"动态参数"通道 ✗）
+>         ⇒ ⚠ 那就**只出货"状态与时序"那一半** ✓（⚠ `STATE_ENDED("奇袭")` 的**发出** ✓，⚠ 读者**登记** ✓），
+>           并在文档里写明"数值待解表达式" ✓。
+> * ⚠ **推送**：本地仍**领先 17** ✗（网络十八连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26061,6 +26089,34 @@
 >   | 引擎侧 | ⚠ **要建**：插入一次施放（走 `ADVANCE`/`EXTRA_TURN` 一族 ✓）＋ "奇袭未用"计数 ✓ ＋ 归零 ⇒ `STATE_ENDED("奇袭")` ✓ |
 >   | 读者 | ⭐ `on: STATE_ENDED` ＋ `self state_ended 奇袭` ⇒ `GAIN_RESOURCE{充能, #2}`（⚠ 充能已声明 ✓ `max 8` ✓） |
 > * ⚠ **推送**：本地仍**领先 16** ✗（网络十七连失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百一十三：✅✅ **那个 Modifier 的定义读到了** —— 它在 **昔涟的忆灵（Servant）能力文件**里，⭐ 而"额外点数"是**销毁时**用**动态表达式**加的（`_WindfuryCostFixValue`））**）**：
+>
+> * ✅ **实测（全量搜该名字 ⇒ 定位 ⇒ 读定义 ✓）** ✓：
+>   * ⭐ **定义处**：`Config\ConfigAbility\Servant\Servant_CyreneServant_00_Ability.json:8826` ✓
+>     （⚠ 即 **`Servant_CyreneServant_00`** —— ⭐ **昔涟的忆灵/"德谬歌"那一族** ✓ ⇒ ⭐ 印证了它属于**昔涟侧** ✓）；
+>   * 原文骨架 ✓：
+>     ```json
+>     "MServant_CyreneServant_00_AmazingBuff_Cerydra": {
+>       "BehaviorFlagList": [ "RemoveWhenCasterDead" ],
+>       "_CallbackList": [ { "Event": "OnDestroy", "CallbackConfig": [
+>         { "$type": "RPG.GameCore.SetDynamicValueByAddValue",
+>           "TargetType": { "Alias": "ModifierOwnerEntity" },
+>           "Key": { "Value": "_WindfuryCostFixValue" },          // ⭐ 加的是"风怒/费用修正值"这一类动态量
+>           "AddValue": { "IsDynamic": true, "PostfixExpr": { "OpCodes": "AQAOEQ==", "FixedValues": [], "DynamicHashes": [ -678654436 ] } },
+>           "ContextScope": "TargetEntity" } ] } ] }
+>     ```
+>   ⇒ ⭐⭐ **两点** ✓：**(i)** ⭐ **"奇袭结束后给她充能"是通过"销毁这个增益时 + 一个动态值"实现的** ✓（⚠ 所以它**不是**一个常数 ✓）；
+>   **(ii)** ⛔ **那个动态值的字面数**要**解 `PostfixExpr`**（`OpCodes` ＋ `DynamicHashes` ✓）才能得到 ✗
+>     ⇒ ⭐ 按纪律：**登记** ✓（⚠ 写清"**参数名 ✓、承载者 ✓、实现方式 ✓，唯数值需解表达式**" ✓），
+>       并**不再为它花轮次** ✓（⚠ 本段在此已花 **12** 轮找数值 ✓ —— ⭐ 收益/成本已经倒挂 ✓）。
+> * ⭐⭐ **本段的净结论（这条能力的取舍）** ✓：**规格完整** ✓（触发 ✓／机制 ✓／不可递归 ✓／结束时刻 ✓／读者形状 ✓）
+>   ＝ ⭐ **"奇袭结束 ⇒ `STATE_ENDED("奇袭")` ⇒ 她 +`#2` 充能"** ✓ ⇒ ⭐ **唯一缺的是一个**动态表达式里的数**** ✗
+>     ⇒ ⭐ **所以它可以按"`#2` 用一个保守写法（`amount: 1` ＋ 注释说明取自表达式、待核）"出货** ✗ hmm: ⚠ **但按纪律不能猜数值** ✓
+>       ⇒ ⭐ **正解**：**读者规则里用 `ReadParamList` 的语义**（⚠ 引擎没有"动态参数"通道 ✗）
+>         ⇒ ⚠ 那就**只出货"状态与时序"那一半** ✓（⚠ `STATE_ENDED("奇袭")` 的**发出** ✓，⚠ 读者**登记** ✓），
+>           并在文档里写明"数值待解表达式" ✓。
+> * ⚠ **推送**：本地仍**领先 17** ✗（网络十八连失败 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
