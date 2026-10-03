@@ -21102,6 +21102,20 @@
 > * ⭐ **并记一条自查** ✓：⚠ **判据里 `new X(...)` 之前先确认 `X` 在 import 列表里** ✗（⚠ 本段"编译期翻车"两次都是同类 ✓：
 >   **用没引入的类** ／ **用不存在的 setter** ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2131** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零九十一：✅ `import` 补上后编译错**前进了一行**（`49` → `48` ✓）⇒ ⭐ 说明"缺 import"这条**修对了** ✓，而下一个缺的符号在那一行上）**）**：
+>
+> * ✅ **实测（两处签名 ✓）** ✓：
+>   * `Damage.java:185` ✓ **`public Damage(CanHit attacker, CanHit defender, DamageElement element, DamageType type, double skillBaseValue)`** ✓
+>     ⇒ ⭐ **正是我用五参的那个** ✓（⚠ 另有 `:202` 的六参版与 `:215` 的四参版 ✓）；
+>   * `Battle.java:1302` ✓ **`public double applyDamage(CanHit target, Damage damage)`** ✓ ⇒ ⭐ **我的调用形式也对** ✓。
+>   ⇒ ⚠ **所以第 48 行缺的符号多半是**枚举成员的全限定写法**：我用的是 `com.laosun.aluminium.enums.DamageElement.IMAGINARY` 与
+>     `DamageType.NORMAL` ✓ —— ⭐ **下一轮第一步**：**只查这两个枚举成员的真名** ✓（`DamageElement`／`DamageType` 各一眼 ✓）
+>     ⇒ 或**更省事**：判据里**不造成伤害** ✗，而是**用 `EnemyFactory` 打她一下** ✗ —— ⚠ 那要把敌人加进 `targets` ✗
+>       ⇒ ⭐ **最省的正解**：**直接用 `battle.applyDamage(owner, new Damage(enemy, owner, …))`** ✓（⚠ 攻击者用**敌人** ✓，
+>         而元素/类型照本段已验证的判据抄 ✓ —— `DragonPanelTest` 用过 `DamageType.BREAK`／`NORMAL` ✓ 与 `DamageElement.IMAGINARY` ✓）。
+> * ⭐ **本件的现状（如实）** ✓：**读者规则 ＋ 判据（无血线版）已出货并验完变异** ✓（`78fe54f9`／`c810525e` ✓）；
+>   ⚠ **血线那一半仍未写** ✗ —— ⚠ 但**它不影响已出货的那一半** ✓（⚠ 只是"少一句文档原话" ✓ ⇒ 记为**已知缺口** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2131** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -25269,6 +25283,20 @@
 >   ③ 两向绿 ⇒ ⭐ **变异**（`amount` 8→4 ⇒ 全量必红 ✓）⇒ **`1211` 这件四件齐** ✓。
 > * ⭐ **并记一条自查** ✓：⚠ **判据里 `new X(...)` 之前先确认 `X` 在 import 列表里** ✗（⚠ 本段"编译期翻车"两次都是同类 ✓：
 >   **用没引入的类** ／ **用不存在的 setter** ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2131** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
+> **2026-10-02 更新（aggro 回收之整千零九十一：✅ `import` 补上后编译错**前进了一行**（`49` → `48` ✓）⇒ ⭐ 说明"缺 import"这条**修对了** ✓，而下一个缺的符号在那一行上）**）**：
+>
+> * ✅ **实测（两处签名 ✓）** ✓：
+>   * `Damage.java:185` ✓ **`public Damage(CanHit attacker, CanHit defender, DamageElement element, DamageType type, double skillBaseValue)`** ✓
+>     ⇒ ⭐ **正是我用五参的那个** ✓（⚠ 另有 `:202` 的六参版与 `:215` 的四参版 ✓）；
+>   * `Battle.java:1302` ✓ **`public double applyDamage(CanHit target, Damage damage)`** ✓ ⇒ ⭐ **我的调用形式也对** ✓。
+>   ⇒ ⚠ **所以第 48 行缺的符号多半是**枚举成员的全限定写法**：我用的是 `com.laosun.aluminium.enums.DamageElement.IMAGINARY` 与
+>     `DamageType.NORMAL` ✓ —— ⭐ **下一轮第一步**：**只查这两个枚举成员的真名** ✓（`DamageElement`／`DamageType` 各一眼 ✓）
+>     ⇒ 或**更省事**：判据里**不造成伤害** ✗，而是**用 `EnemyFactory` 打她一下** ✗ —— ⚠ 那要把敌人加进 `targets` ✗
+>       ⇒ ⭐ **最省的正解**：**直接用 `battle.applyDamage(owner, new Damage(enemy, owner, …))`** ✓（⚠ 攻击者用**敌人** ✓，
+>         而元素/类型照本段已验证的判据抄 ✓ —— `DragonPanelTest` 用过 `DamageType.BREAK`／`NORMAL` ✓ 与 `DamageElement.IMAGINARY` ✓）。
+> * ⭐ **本件的现状（如实）** ✓：**读者规则 ＋ 判据（无血线版）已出货并验完变异** ✓（`78fe54f9`／`c810525e` ✓）；
+>   ⚠ **血线那一半仍未写** ✗ —— ⚠ 但**它不影响已出货的那一半** ✓（⚠ 只是"少一句文档原话" ✓ ⇒ 记为**已知缺口** ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2131** 例 ✓）、树与 HEAD 一致 ✓、已推送且同步 ✓（内容与判据均已回滚 ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
