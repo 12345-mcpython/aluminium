@@ -1878,7 +1878,21 @@ public final class TriggerInterpreter {
         // Elation auto-casts stay registered rather than shipped (see §24.12).
         // ⚠ It does NOT spend a skill point: that is the caller's act, and it is why 「此次战技不消耗战技点」 holds
         // for free (pinned in `CastSkillTest`).
+        //
+        // ⭐⭐ 被插入的施放：一个"被命令的施放"不能再命令另一个 (2026-10-02). 「奇袭不会再次触发奇袭」 is the document's own
+        // sentence, and without this guard the copy's own CAST_SETUP would command a copy of the copy -- forever. The
+        // engine already keeps the cast STACK: `beginCast` links a new cast to the one it interrupts and `endCast`
+        // restores it, so "the open cast is itself a commanded one" is exactly `currentCast().outer() != null`.
+        // ⚠ Skipped, not thrown: this is a rule requirement of the sentence (like `castUltra` refusing inside an extra
+        // turn), not an authoring mistake.
+        if (battle.currentCast() != null && battle.currentCast().outer() != null) {
+            return;
+        }
         skill.execute(battle, actor, victims);
+        // ⭐ The moment 「奇袭结束后」 names: the commanded cast has finished, the original continues afterwards. A
+        // commanded cast announces the same CAST_SETUP / SKILL_CAST a real one does, so this is the only event that
+        // tells it apart -- see `TriggerEvent.INSERTED_CAST_END`.
+        battle.fireTriggers(TriggerEvent.INSERTED_CAST_END, actor, actor, 0, 0);
     }
 
     /**
