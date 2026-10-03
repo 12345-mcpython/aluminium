@@ -301,34 +301,6 @@ public class BuffManager {
     }
 
     /**
-     * Lengthens <b>every</b> buff on this unit, whoever applied it (2026-10-02).
-     *
-     * <p>Readers: 1506's two sentences -- 「每回合首次触发该效果时，使自身**所有**增益效果延长 1 回合」 and its E2 「进入【无敌玩家】状态后，
-     * 使自身**所有**增益效果延长 1 回合」. {@link #extendBuffsFrom} filters by origin on purpose (its own note names the shape
-     * 「战技提供的护盾」), so 「所有」 had no spelling at all.
-     *
-     * <p>\u26a0 Permanent and event-bound buffs are skipped for the same reason as above: they are never ticked, so there is no
-     * countdown to lengthen.
-     *
-     * @param turns how many turns to add
-     * @return how many buffs were lengthened ({@code 0} when none could be)
-     */
-    public int extendAllBuffs(int turns) {
-        if (turns <= 0) {
-            return 0;
-        }
-        int extended = 0;
-        for (AbstractBuff buff : List.copyOf(buffs)) {
-            if (buff.isPermanent()) {
-                continue;
-            }
-            buff.extendDuration(turns);
-            extended++;
-        }
-        return extended;
-    }
-
-    /**
      * The name a rule uses for a shield ({@code "buff": "护盾"}).
      *
      * <p>It is <b>not</b> part of {@link #hasState}'s vocabulary, deliberately: a shield is a <i>scalar</i> on the

@@ -3215,17 +3215,6 @@ public final class TriggerInterpreter {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            // ⭐⭐ 「使自身**所有**增益效果延长 1 回合」 (2026-10-02; readers: 1506's talent and its E2): stating NEITHER `buff` NOR
-            // `attribute` used to be a silent no-op -- `extendBuffsFrom` returns 0 when both are null -- and no shipped file
-            // relied on that (measured: all eight EXTEND_BUFF effects name one or the other). The unfiltered reading is the one the
-            // sentence needs: every buff on the unit, whoever applied it. Permanent buffs are still skipped, because there is no
-            // countdown to lengthen.
-            if (effect.getBuff() == null || effect.getBuff().isBlank()) {
-                if (effect.getAttribute() == null || effect.getAttribute().isBlank()) {
-                    target.getBuffManager().extendAllBuffs(effect.getTurns());
-                    continue;
-                }
-            }
             target.getBuffManager().extendBuffsFrom(ctx.owner(), effect.getBuff(),
                     effect.getAttribute() == null ? null : AttributeType.fromString(effect.getAttribute()),
                     effect.getTurns());
