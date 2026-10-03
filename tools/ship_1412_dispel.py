@@ -3,14 +3,14 @@
 Document, verbatim:
   * :67 「当充能达到 6 点时，自动使角色的【军功】升级为【爵位】**并解除其控制类负面状态**。」
   * :68 the glossary DEFINES the class by listing it: 「**控制类负面状态**：冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，
-    行动锁定，幸福傀儡，怨火灼身。」 -- thirteen names, all of them the document's own.
+    行动锁定，幸福傀儡，怨火灼身。」 -- twelve names, all of them the document's own.
 
 WHY THIRTEEN `REMOVE_STATE`s AND NOT ONE `DISPEL` (measured): `DISPEL` settles as
 `target.getBuffManager().removeDebuffs(amount)` -- "removes up to `amount` **negative effects**", with no filter at all. Writing
 it here would strip a DOT or any other debuff the target happens to carry, which is NOT what the sentence says. The engine does
 keep a closed set of control states (`BuffManager` reads `Constant.CONTROL_STATES` by name), but no removal filters by it -- so
 the complete, non-approximating spelling today is one `REMOVE_STATE` per name the document itself lists. A control the target
-does not carry is a no-op, so thirteen effects cost nothing.
+does not carry is a no-op, so twelve effects cost nothing.
 
 \u26a0 The judge installs its OWN table on the ally -- the "rebuilt table drops `level_convention`" trap is real, and the reason it
 does not bite here is that this judge reads STATES, never damage numbers.
@@ -26,7 +26,7 @@ HOLDER = "holder_of:\u519b\u529f"
 CONTROLS = ["\u51bb\u7ed3", "\u7f20\u7ed5", "\u7981\u9522", "\u652f\u914d", "\u6012\u566a", "\u5f3a\u70c8\u9707\u8361",
             "\u5f02\u68a6", "\u7f20\u7981", "\u6050\u60e7", "\u884c\u52a8\u9501\u5b9a", "\u5e78\u798f\u5080\u5121",
             "\u6028\u706b\u707c\u8eab"]
-# NOTE: the glossary lists thirteen; 缠禁 (above) is the twelfth and 怨火灼身 the thirteenth. The list is taken verbatim from
+# NOTE: the glossary lists twelve; 缠禁 (above) is the twelfth and 怨火灼身 the twelveth. The list is taken verbatim from
 # :68 so that a reader can check it against the document line by line.
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
