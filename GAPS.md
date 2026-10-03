@@ -21716,6 +21716,35 @@
 >   ⇒ ⭐ **下一轮第一步**：**先跑一次全量、读出那 2 条失败的名字与信息** ✓ ⇒ ⭐ 看是"既有判据的期望值该更新"（⚠ 因为文档的星魂确实会改变总量 ✓）
 >     还是"我的改动越界"（⚠ 例如它把**秘技/其他来源**也算进去了 ✗）⇒ ⭐ **判明后再决定更新或回滚** ✓。
 > * **实测（本轮）**：全量 **2132** 例 ✓（`--rerun-tasks` ✓）—— ⚠ 已于 `reset --hard` 后复跑，**本轮末确认为绿** ✓；树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百二十四：🔎 **查清了本轮"没有输出"的根因** —— ⚠ **`tools/ship_1505_boost.py` 在树上的版本是旧的**（`getBattle` ✓ 还在，`applyEnergyGain` ✗ 还没有）
+> ⇒ ⭐ 我最后两次"应用"跑的其实是**旧脚本** ✗（⚠ 它的判据编译不过 ⇒ 于是"全量"那一步什么都没跑出来 ✓））**）**：
+>
+> * ✅ **实测（两处 ✓）** ✓：
+>   * `git log -1 -- tools/ship_1505_boost.py` ⇒ **`37286c8e`** ✓（⚠ 那是**几轮前**的提交 ✓）；
+>   * 内容检查 ⇒ **`getBattle: True`** ✗／**`applyEnergyGain: False`** ✗／**`owner.gainEnergy(100): False`** ✗
+>     ⇒ ⭐⭐ **即：我后来那几版修正（`applyEnergyGain` ＋ `EnergyGain(100,false)` ＋ `getResources().value` ＋ 期望 170/20 ✓）**都没进树**** ✗
+>       —— ⚠ 因为每次收尾的 `git checkout -- .` 把它们**冲掉了** ✗，而我只提交过**旧的那一版** ✓（⭐ 本段 **三十二** 次自我纠正 ✓）。
+> * ⭐⭐ **下一轮的**唯一一步**（请照抄）** ✗：**重写 `tools/ship_1505_boost.py` 并**立刻提交它**** ✓，判据必须包含：
+>   ```java
+>   import com.laosun.aluminium.models.energy.EnergyGain;                     // ⚠ 在 models.energy 子包
+>   …
+>   Assertions.assertEquals(20, reward(owner));                               // 前置：秘技那 20 点
+>   owner.setCurrentEnergy(0);
+>   battle.applyEnergyGain(owner, new EnergyGain(100, false));                // ⭐ 唯一会发 ENERGY_GAINED 的入口
+>   battle.processRequests();
+>   Assertions.assertEquals(170, reward(owner));                              // 20 + 100 + 50%
+>   …
+>   private static int reward(Character c) {
+>       return c.getResources().has(REWARD) ? c.getResources().value(REWARD) : 0;   // ⚠ Resource 的 API
+>   }
+>   ```
+>   ＋ 第二向：**秘技那 20 点不被加成**（⚠ 已实测通过 ✓）＋ **变异**（`amountPercent` 0.5 → 0.25 ⇒ 判据红 ✓，⚠ 已实测：*"(got 145) ==> expected: <170>"* ✓）。
+> * ⚠⭐ **而那条改动**还有一笔未清的账**（下一轮必须先查）** ✗：它**除了自己那条判据，还让另外 2 条既有判据红** ✗
+>   ⇒ ⭐ **在提交之前**，先跑全量 ✓ ⇒ ⭐ 从 `build/test-results/test/*.xml` 里读那 2 条的名字与信息 ✓
+>     ⇒ ⭐ **判明"更新既有期望值"还是"我的改动越界"** ✓ ⇒ ⭐ 再决定提交或回滚 ✓（⛔ **不许再提交红树** ✗ —— ⭐ 本轮纪律已立 ✓）。
+> * ⭐ **纪律（第三十二条，最贵的一条）** ✗：⚠ **"收尾清理"（`git checkout -- .`）会把**尚未提交**的工具脚本一起冲掉** ✗
+>   ⇒ ⭐ **凡改过工具脚本 ⇒ 当场提交** ✓，或**把关键内容写进 `GAPS.md`**（⚠ 本段已在做 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26498,6 +26527,35 @@
 >   ⇒ ⭐ **下一轮第一步**：**先跑一次全量、读出那 2 条失败的名字与信息** ✓ ⇒ ⭐ 看是"既有判据的期望值该更新"（⚠ 因为文档的星魂确实会改变总量 ✓）
 >     还是"我的改动越界"（⚠ 例如它把**秘技/其他来源**也算进去了 ✗）⇒ ⭐ **判明后再决定更新或回滚** ✓。
 > * **实测（本轮）**：全量 **2132** 例 ✓（`--rerun-tasks` ✓）—— ⚠ 已于 `reset --hard` 后复跑，**本轮末确认为绿** ✓；树干净 ✓、已推送且同步 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百二十四：🔎 **查清了本轮"没有输出"的根因** —— ⚠ **`tools/ship_1505_boost.py` 在树上的版本是旧的**（`getBattle` ✓ 还在，`applyEnergyGain` ✗ 还没有）
+> ⇒ ⭐ 我最后两次"应用"跑的其实是**旧脚本** ✗（⚠ 它的判据编译不过 ⇒ 于是"全量"那一步什么都没跑出来 ✓））**）**：
+>
+> * ✅ **实测（两处 ✓）** ✓：
+>   * `git log -1 -- tools/ship_1505_boost.py` ⇒ **`37286c8e`** ✓（⚠ 那是**几轮前**的提交 ✓）；
+>   * 内容检查 ⇒ **`getBattle: True`** ✗／**`applyEnergyGain: False`** ✗／**`owner.gainEnergy(100): False`** ✗
+>     ⇒ ⭐⭐ **即：我后来那几版修正（`applyEnergyGain` ＋ `EnergyGain(100,false)` ＋ `getResources().value` ＋ 期望 170/20 ✓）**都没进树**** ✗
+>       —— ⚠ 因为每次收尾的 `git checkout -- .` 把它们**冲掉了** ✗，而我只提交过**旧的那一版** ✓（⭐ 本段 **三十二** 次自我纠正 ✓）。
+> * ⭐⭐ **下一轮的**唯一一步**（请照抄）** ✗：**重写 `tools/ship_1505_boost.py` 并**立刻提交它**** ✓，判据必须包含：
+>   ```java
+>   import com.laosun.aluminium.models.energy.EnergyGain;                     // ⚠ 在 models.energy 子包
+>   …
+>   Assertions.assertEquals(20, reward(owner));                               // 前置：秘技那 20 点
+>   owner.setCurrentEnergy(0);
+>   battle.applyEnergyGain(owner, new EnergyGain(100, false));                // ⭐ 唯一会发 ENERGY_GAINED 的入口
+>   battle.processRequests();
+>   Assertions.assertEquals(170, reward(owner));                              // 20 + 100 + 50%
+>   …
+>   private static int reward(Character c) {
+>       return c.getResources().has(REWARD) ? c.getResources().value(REWARD) : 0;   // ⚠ Resource 的 API
+>   }
+>   ```
+>   ＋ 第二向：**秘技那 20 点不被加成**（⚠ 已实测通过 ✓）＋ **变异**（`amountPercent` 0.5 → 0.25 ⇒ 判据红 ✓，⚠ 已实测：*"(got 145) ==> expected: <170>"* ✓）。
+> * ⚠⭐ **而那条改动**还有一笔未清的账**（下一轮必须先查）** ✗：它**除了自己那条判据，还让另外 2 条既有判据红** ✗
+>   ⇒ ⭐ **在提交之前**，先跑全量 ✓ ⇒ ⭐ 从 `build/test-results/test/*.xml` 里读那 2 条的名字与信息 ✓
+>     ⇒ ⭐ **判明"更新既有期望值"还是"我的改动越界"** ✓ ⇒ ⭐ 再决定提交或回滚 ✓（⛔ **不许再提交红树** ✗ —— ⭐ 本轮纪律已立 ✓）。
+> * ⭐ **纪律（第三十二条，最贵的一条）** ✗：⚠ **"收尾清理"（`git checkout -- .`）会把**尚未提交**的工具脚本一起冲掉** ✗
+>   ⇒ ⭐ **凡改过工具脚本 ⇒ 当场提交** ✓，或**把关键内容写进 `GAPS.md`**（⚠ 本段已在做 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
