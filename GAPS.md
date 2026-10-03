@@ -32706,3 +32706,30 @@
 >   （⚠ 定义已读全 ✓：*「复制一次即将施放的技能并提前施放，随后施放原技能。奇袭不会再次触发奇袭。」* ✓）。
 > * ⚠ **推送**：本地**领先 9** ✗（⚠ 网络 ✓）⇒ 恢复后一次 `git push` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2146** 例 ✓）、闸门 [0, 0] ✓、树干净 ✓。
+
+> **2026-10-02 更新（aggro 回收之整千二百八十二：🎯🎯🎯 **奇袭的规格查全了** —— 两块积木**都在树上**，
+> 唯一缺的是**防递归**，而它**没有内容侧写法**（DSL 的 `!` 只能否定队伍条件））**）**：
+>
+> * ✅ **实测（三处 ✓）** ✓：
+>   1. ⭐⭐ **`CAST_SKILL` 就是"立即施放 1 次"** ✓（`TriggerInterpreter:1820` 的 javadoc 逐字：*"the resolved target performs
+>      **one cast, right now**, with the numbers of the skill the rule names —— 「使其立即施放 1 次…」"* ✓
+>      ＋ ⭐ *"the **actor** is the resolved target, not the owner's summon; the **skill** is looked up on that actor"* ✓
+>      ＋ ⚠ *"when a cast is **DELEGATED** the executor expands no damage of its own"* ✓）；
+>   2. ⭐⭐ **`CAST_SETUP` 是引擎自述的"还能改变本次施放"的前置钩子** ✓（⚠ 本段早前读过它的注释：*"the **pre-cast hook**, and the only
+>      moment at which a rule can still change what this cast does"* ✓）⇒ ⭐ **"提前施放"正好落在这里** ✓；
+>   3. ⛔ **条件 DSL 的 `!` **只能否定"队伍条件"**** ✗（`TriggerTable:1195` 的报错逐字：*"condition negates a condition that does
+>      **not read a party** …"* ✓；⭐ 另一处注释也写：*"**`!` cannot express the guard**（negation is only for party conditions）, so the
+>      guard is stated positively"* ✓）。
+> * ⭐⭐⭐ **于是奇袭的完整规格**（读者 2 ✓）**：
+>   | 半句 | 写法 | 状态 |
+>   |---|---|---|
+>   | ⭐ **「复制一次即将施放的技能并**提前**施放」** | ⭐ **`on: CAST_SETUP`** ＋ `when: ["actor has_state 爵位", "from_category BPSKILL"]` ⇒ **`CAST_SKILL{skill: "SKILL", target: actor}`** ✓ | ⭐ **积木齐** ✓ |
+>   | ⭐ **「随后施放原技能」** | ⭐ 引擎**本来就会继续施放原技能** ✓（⚠ 与 `damageDelegated()` 的语义相接 ✓） | ⭐ **天然成立** ✓ |
+>   | ⛔ **「奇袭不会再次触发奇袭」** | ⚠ **需要"插入深度/未用次数"** ✗ —— ⭐ **而 DSL 否定不了状态** ⇒ ⛔ **没有内容侧写法** | ⛔ **缺（引擎侧）** |
+>   | ⭐ **「奇袭结束后，消耗 6 点充能、爵位变回【军功】」** | ⭐ `SPEND_RESOURCE` ＋ 显式移除（会公告 `STATE_ENDED` ✓ 第 20 件） | ⚠ **等"结束时刻"** |
+> * ⭐⭐ **于是登记的措辞精确到一句话** ✓：⭐ **缺的是「被插入的施放」这个概念 —— 它的**深度上限**与**结束时刻**** ✓
+>   （⚠ 数据里同名的东西是 `TurnInsertAbilityCondition: AbilityOwnerInsertUnusedCount = 1` ✓ ⇒ ⭐ **引擎与数据两侧的语义完全对得上** ✓）。
+> * ⚠ **不硬凑的理由（按纪律）** ✗：⭐ **若绕过防递归直接写 `CAST_SETUP` ＋ `CAST_SKILL`** ⇒ ⚠ **每一次复制都会再触发一次** ⇒
+>   ⭐ **无限递归** ✗ ⇒ ⭐ **不进树** ✓（⚠ 与第 30 件不同：那次是"仪器不对"，这次是"引擎真缺" ✓）。
+> * ⚠ **推送**：本地**领先 10** ✗（⚠ 网络连续失败 ✓）⇒ 恢复后一次 `git push` ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2146** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
