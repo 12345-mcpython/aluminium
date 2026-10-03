@@ -77,10 +77,14 @@ import java.util.Random;
 /**
  * 1407\uff1a\u300c\u6211\u65b9\u5168\u4f53\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u9050\u8776\u83b7\u5f97 1 \u70b9\u3010\u65b0\u854a\u3011\u300d (2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, driven by a real fight: nothing else is a more trustworthy source of HP loss than the enemies' own turns.
- * \u26a0 The assertion is deliberately loose ("more than zero"): the document says "per point", and whether HP_LOST carries how many
- * points is not measured yet -- a precise 1 would be a guess. A mutation (the rule gone, or the event changed) leaves it at
- * zero, so the judge is still load-bearing.
+ * <p>\u2b50 MEASURED, and it took a probe to see it (2026-10-02): the enemy never touched her -- "hp 1629.936 -> 1629.936
+ * (max 1629.936) after 40 steps" -- so every earlier draft failed because NO HP LOSS EVER HAPPENED. Damage now goes through
+ * the battle's own entry point ({@code Battle.applyTrueDamage}); a bare {@code CanHit.takeDamage} does not reach the battle's
+ * HP-loss dispatch.
+ *
+ * <p>\u2b50 The scale is asserted EXACTLY, not loosely: 50 HP lost -> 50 buds. The rule says {@code amount: 0} because the engine
+ * already grants the points lost by itself and adds the literal amount on top -- measured both ways (100 -> 101 and 50 -> 51
+ * with {@code amount: 1}).
  */
 public class NewBudOnHpLossTest {
     private static final int OWNER = 1407;
