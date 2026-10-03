@@ -39,8 +39,12 @@ public class PhainonTest {
         for (int i = 0; i < 9; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
         }
-        Assertions.assertEquals(12, coreflameOf(phainon),
-                "\u300c\u3010\u706b\u79cd\u3011\u8fbe\u523012\u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u300d -- ten casts must still read twelve");
+        // \u26a0 12 -> 15 (2026-10-02, item 39). This expectation was written while the file declared only `max: 12`, and the
+        // document's sentence does not stop there: \u300c\u3010\u706b\u79cd\u3011\u8fbe\u5230 12 \u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\uff0c**\u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6700\u591a\u6ea2\u51fa 3 \u70b9**\u300d.
+        // The test's INTENT is untouched -- the pool is capped, and ten casts cannot run past the ceiling -- but the ceiling now
+        // quotes the whole sentence. The allowance itself is pinned from both sides by `CoreflameOverflowTest`.
+        Assertions.assertEquals(15, coreflameOf(phainon),
+                "\u300c\u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6700\u591a\u6ea2\u51fa 3 \u70b9\u300d -- ten casts (20 points) stop at 12 + 3");
     }
 
     /** \u26a0 The technique restores the TEAM's energy (not hers) and grants one Skill Point. */
