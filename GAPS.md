@@ -22837,6 +22837,19 @@
 > * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ **修正后的脚本已在树**（⚠ 本轮**先提交再跑** ✓ ⇒ 没再被冲掉 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（`d86bab38` ✓）⇒ ⚠ 本轮的脚本提交待推 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百八十一：⭐ **`SkillExecutor.execute` 的入口读了** ⇒ ⭐ 事件顺序到手，而"充能只到 1"的嫌疑缩到**施放后事件**那一侧**）**）**：
+>
+> * ✅ **实测（读 `SkillExecutor.execute` ✓，`:72` 起 ✓）** ✓ 三点：
+>   * ⭐ **它先算一次 `category`** ✓（`skill.getData().getCategory()` ✓ ⇒ ⚠ 这就是 `from_category` 的取值来源 ✓）；
+>   * ⭐⭐ **然后 `battle.beginCast(skill, user)`** ✓ ⇒ ⭐ **紧接着 fire `CAST_SETUP`**（⚠ **带 category** ✓：`battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category)` ✓）
+>     ⇒ ⭐ **所以我在 `CAST_SETUP` 上挂的规则**确实会被驱动**** ✓（⚠ 而且**带类别** ✓ ⇒ ⭐ `from_category BPSKILL` **有用** ✓）；
+>   * ⭐ **再 `resolveHits(...)`** ✓（⚠ 伤害/结算在这里 ✓）⇒ ⚠ **而 `SKILL_CAST` 在 `finally` 里** ✓（⚠ 本段读过 `SkillExecutor` 会发槽位事件与 `ALLY_ATTACK` ✓）。
+> * ⭐⭐ **于是"6 次施放只给 1 点充能"的嫌疑收窄** ✗：⚠ 她的加充能规则挂在 **`SKILL_CAST`** ✓（⚠ 不是 `CAST_SETUP` ✓）
+>   ⇒ ⭐ 若 **`SKILL_CAST` 那一侧有"每回合/每次"记账**（⚠ 例如 `castAppliedCount` 或"同一施放只算一次" ✓）⇒ ⭐ **就会表现为只在第一次加 1 点** ✓
+>     ⇒ ⭐ **下一轮第一步（一次调用）** ✗：**读 `SkillExecutor` 的 `finally` 段** ✓（⚠ 看 `SKILL_CAST` 是怎么发的、有没有 per-turn 记账 ✓）
+>       ⇒ ⭐ 若确有记账 ⇒ ⭐ **判据的修法是"每次施放之间推进一个回合"** ✓（⚠ `beforeMove()` ＋ `afterMove()` ✓ —— ⭐ 本段已熟的写法 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`5e616c92` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
@@ -28770,6 +28783,19 @@
 > * ⚠ **本轮处置** ✓：判据删除、内容回滚（⚠ 未验成的不进树 ✓）⇒ 全量恢复 **rc 0** ✓；⭐ **修正后的脚本已在树**（⚠ 本轮**先提交再跑** ✓ ⇒ 没再被冲掉 ✓）。
 > * ⚠ **推送**：本地已**同步** ✓（`d86bab38` ✓）⇒ ⚠ 本轮的脚本提交待推 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓，回滚后）、树干净 ✓。
+> **2026-10-02 更新（aggro 回收之整千一百八十一：⭐ **`SkillExecutor.execute` 的入口读了** ⇒ ⭐ 事件顺序到手，而"充能只到 1"的嫌疑缩到**施放后事件**那一侧**）**）**：
+>
+> * ✅ **实测（读 `SkillExecutor.execute` ✓，`:72` 起 ✓）** ✓ 三点：
+>   * ⭐ **它先算一次 `category`** ✓（`skill.getData().getCategory()` ✓ ⇒ ⚠ 这就是 `from_category` 的取值来源 ✓）；
+>   * ⭐⭐ **然后 `battle.beginCast(skill, user)`** ✓ ⇒ ⭐ **紧接着 fire `CAST_SETUP`**（⚠ **带 category** ✓：`battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category)` ✓）
+>     ⇒ ⭐ **所以我在 `CAST_SETUP` 上挂的规则**确实会被驱动**** ✓（⚠ 而且**带类别** ✓ ⇒ ⭐ `from_category BPSKILL` **有用** ✓）；
+>   * ⭐ **再 `resolveHits(...)`** ✓（⚠ 伤害/结算在这里 ✓）⇒ ⚠ **而 `SKILL_CAST` 在 `finally` 里** ✓（⚠ 本段读过 `SkillExecutor` 会发槽位事件与 `ALLY_ATTACK` ✓）。
+> * ⭐⭐ **于是"6 次施放只给 1 点充能"的嫌疑收窄** ✗：⚠ 她的加充能规则挂在 **`SKILL_CAST`** ✓（⚠ 不是 `CAST_SETUP` ✓）
+>   ⇒ ⭐ 若 **`SKILL_CAST` 那一侧有"每回合/每次"记账**（⚠ 例如 `castAppliedCount` 或"同一施放只算一次" ✓）⇒ ⭐ **就会表现为只在第一次加 1 点** ✓
+>     ⇒ ⭐ **下一轮第一步（一次调用）** ✗：**读 `SkillExecutor` 的 `finally` 段** ✓（⚠ 看 `SKILL_CAST` 是怎么发的、有没有 per-turn 记账 ✓）
+>       ⇒ ⭐ 若确有记账 ⇒ ⭐ **判据的修法是"每次施放之间推进一个回合"** ✓（⚠ `beforeMove()` ＋ `afterMove()` ✓ —— ⭐ 本段已熟的写法 ✓）。
+> * ⚠ **推送**：本地已**同步** ✓（`5e616c92` ✓，pending 0 ✓）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 ### 【已登记·新能力（读者 ≥2）】「星魂开关」——为什么要它，以及为什么不能靠改既有判据绕过
