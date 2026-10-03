@@ -98,7 +98,9 @@ public class CoreflameOverflowTest {
             SkillExecutor.execute(battle, skill, owner, List.of(owner));
             battle.processRequests();
         }
-        return owner.getResources().value(COREFLAME);
+        // \u26a0 `battle.partyResource(...)`, not `owner.getResources()`: \u3010\u706b\u79cd\u3011 is a PARTY resource, and the per-character view read a
+        // constant 3 no matter how many casts went by (measured before this line was fixed).
+        return battle.partyResource(COREFLAME).value();
     }
 }
 ''')
