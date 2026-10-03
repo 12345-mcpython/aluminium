@@ -56,7 +56,7 @@ rules.append({
     "when": ["actor has_state \u7235\u4f4d", "from_category BPSKILL"],
     "do": [
         {"op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.20,
-         "instance": True, "target": "self"},
+         "instance": True, "permanent": True, "target": "self"},
     ],
     "source": ("1412 \u523b\u5f8b\u5fb7\u83c8 \u884c\u8ff9\uff08\u6587\u6863 `:105`\uff09\uff1a"
                "\u300c\u82e5\u5f53\u524d\u3010\u519b\u529f\u3011\u5df2\u5347\u7ea7\u4e3a\u3010\u7235\u4f4d\u3011\uff0c"
