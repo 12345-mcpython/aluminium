@@ -91,7 +91,8 @@ public class TransformationCountdownTest {
         SkillExecutor.execute(battle, ult, owner, List.of(owner));
         battle.processRequests();
 
-        Assertions.assertTrue(owner.getBuffManager().hasState(COUNTDOWN),
+        Assertions.assertTrue(battle.countdownUnits().stream()
+                        .anyMatch(c -> COUNTDOWN.equals(c.getName())),
                 "the countdown for the eight extra turns is running");
     }
 }
