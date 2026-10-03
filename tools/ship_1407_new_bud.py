@@ -1,0 +1,59 @@
+"""1407: 遐蝶's 【新蕊】 (2026-10-02).
+
+Document, verbatim (1407_遐蝶.html):
+  * :94 「【新蕊】上限与场上全体角色等级有关，**我方全体每损失 1 点生命值遐蝶获得 1 点【新蕊】**，当【新蕊】达到上限时可激活终结技。」
+  * :55 「【新蕊】（遐蝶的能量机制）上限与场上全体角色等级有关……数值依据（tbgd `Avatar_Castorice_00_Ability.json`）」
+  * :56 the ceiling table, row by row, all of it the document's own:
+        均衡0/Lv20 2,125 | 1/30 4,781.25 | 2/40 8,500 | 3/50 13,281.25 | 4/60 19,125 | 5/65 22,445.31 | 6/70 26,031.25
+        **满级(均衡8/9 封顶 Lv80)/80 → 34,000**
+
+This ships the half that is fully numbered: the resource and its gain on HP loss. The ceiling is DECLARED AT ITS MAX-LEVEL
+ROW (34,000, the document's own last row) and the note says so -- a level-dependent ceiling cannot be a static int today, and
+inventing a smaller number would be worse than quoting the document.
+
+⚠ Registered, not approximated: the level-dependence itself, and the ultimate-activation at the ceiling.
+ASCII only.
+"""
+import io
+import json
+
+DATA = "src/main/resources/characters/1407.json"
+JUDGE = "src/test/java/com/laosun/aluminium/test/NewBudOnHpLossTest.java"
+RES = "\u65b0\u854a"
+
+doc = json.load(io.open(DATA, encoding="utf-8"))
+is_dict = isinstance(doc, dict)
+rules = doc["rules"] if is_dict else doc
+
+if any(isinstance(r, dict) and r.get("id") == "new_bud_on_hp_loss" for r in rules):
+    print("already shipped")
+    raise SystemExit(0)
+
+rules.append({
+    "on": "HP_LOST",
+    "id": "new_bud_on_hp_loss",
+    "when": [],
+    "do": [{"op": "GAIN_RESOURCE", "resource": RES, "amount": 1, "target": "self"}],
+    "source": ("1407 \u9050\u8776 \u5929\u8d4b\uff08\u6587\u6863 `:94`\uff09\uff1a"
+               "\u300c**\u6211\u65b9\u5168\u4f53\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u9050\u8776\u83b7\u5f97 1 \u70b9\u3010\u65b0\u854a\u3011**\u300d"),
+    "note": ("\u2b50 2026-10-02\uff1a\u4e0a\u9650\u53d6**\u6587\u6863\u81ea\u5df1\u7684\u6ee1\u7ea7\u884c** `34000` \u2713"
+             "\uff08`:56` \u7684\u8868\uff1a\u5747\u8861 0/20\u21922,125 \u2026 **\u6ee1\u7ea7\uff08\u5747\u8861 8/9 \u5c01\u9876 Lv80\uff09/80 \u2192 34,000** \u2713\uff09\u3002"
+             "\u26a0 **\u5df2\u767b\u8bb0**\uff1a\u4e0a\u9650\u672c\u5e94\u968f\u5747\u8861\u7b49\u7ea7\u53d8 \u2717\uff08\u5f15\u64ce\u7684 `max` \u662f\u9759\u6001 int \u2717\uff09\uff1b"
+             "\u4ee5\u53ca\u201c\u8fbe\u5230\u4e0a\u9650\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u201d\u90a3\u4e00\u53e5 \u2717\u3002"),
+})
+
+if is_dict:
+    doc["rules"] = rules
+    res = doc.get("resources")
+    if res is None:
+        doc["resources"] = [{"name": RES, "initial": 0, "max": 34000}]
+    else:
+        res = [r for r in res if not (isinstance(r, dict) and r.get("name") == RES)]
+        res.append({"name": RES, "initial": 0, "max": 34000})
+        doc["resources"] = res
+    out = doc
+else:
+    raise SystemExit("1407.json is a bare list, so the resource has nowhere to live -- measure its shape first")
+
+json.dump(out, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
+print("ok   1407.json: the new bud rides HP loss")
