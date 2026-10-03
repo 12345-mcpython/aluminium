@@ -21945,6 +21945,32 @@
 >     （⚠ 或直接在 `int amount;` 后面插入 ✓）⇒ 重跑 ⇒ 全量绿 ⇒ **提交脚本 ＋ 引擎改动** ✓（⚠ 按纪律当场提交 ✓）。
 > * ⚠ **并记一条** ✓：⚠ **"脚本改得动"≠"改得对"** ✗ ⇒ ⭐ **每次"生成式改动"后都要编译**（⚠ 本轮做到了 ✓ ⇒ 只损失一次调用 ✓，没有污染树 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树**待确认干净** ✓、已推送且同步 ✓（`7bec6493` ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十五：🎯 **那次编译错的**真因**看清了** —— ⚠ `:1333` 那几行**不属于 `gainResource`**，而属于**紧邻的 `gainEnergyFor`** ✗（⚠ 它里面有 `battle.grantEnergy(target, effect.getPercent() * …)` ✓）⇒ ⭐ 说明我的补丁**落点整体偏了几行** ✗）**）**：
+>
+> * ✅ **实测（读 `:1328`–`:1338` ✓）** ✓ 那一段是：
+>   ```java
+>   battle.grantEnergy(target, effect.getPercent() * battle.castAppliedCount(state));
+>   return;
+>   …
+>   double maxEnergy = target.getMaxEnergy();
+>   if (maxEnergy <= 0) {
+>       throw new IllegalStateException(
+>               "GAIN_ENERGY scales off " + target.getName() + "'s maximum energy, but that unit has no energy bar …");
+>   }
+>   battle.grantEnergy(target, effect.getPercent() * maxEnergy);
+>   ```
+>   ⇒ ⭐⭐ **这是 `gainEnergyFor`（`GAIN_ENERGY` 的实现）** ✓ —— ⚠ **不是 `gainResource`** ✗ ⇒ ⭐ 所以"4 个找不到符号"是**我的插入把这一带的语义搅乱了** ✗
+>     （⚠ 已回滚 ✓，树是干净的 ✓）。
+> * ⭐ **下一轮第一步（重读真锚点，两次调用）** ✗：
+>   ① **读 `TriggerInterpreter:1341`–`1372`** ✓（⭐ **`gainResource` 的真身** ✓ —— ⚠ 本段早前只从 `:1341` 读了**开头两行与 `amountFromEvent` 分支** ✓
+>      ⇒ ⭐ **必须把 `int amount;` 的**准确位置**、以及各分支的**完整形状**看全** ✓）；
+>   ② 把脚本的插入锚点改成 **`int amount;` 这一行之后** ✓（⚠ 或改成 `amount = (int) Math.round(ctx.amount()` 那个分支的**前一行** ✓）
+>     ⇒ ⭐ **重跑 ⇒ 编译 ⇒ 全量 ⇒ 绿 ⇒ 当场提交** ✓。
+> * ⚠ **纪律（本轮第二次落点）** ✗：⚠ **"生成式改动"必须**先读全锚点上下文**（⚠ 我只读了两行就下手 ✓ ⇒ 白丢一轮 ✓）
+>   ⇒ ⭐ **纪律：任何自动化补丁，锚点前后各读 15 行** ✓。
+> * ⚠ **进度如实** ✓：新能力**字段** ✓ 已落树；**传参链** ⚠ **两次尝试未成**（第一次引号 ✗／第二次落点 ✗）⇒ ⭐ **尚未进入树** ✓；
+>   **内容＋判据＋变异** ⚠ 待做 ⇒ ⭐ **本件仍是"已登记、施工中"** ✓，**没有冒充出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓（`822f6d53` ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 > **2026-10-02 更新（aggro 回收之八百六十五：✅ `STATE_ENDED` 第 2a 步：事件已声明（全量 2114 绿）；下一步的**名字通道**要把 `TriggerContext` 的便利构造器全数读一遍）**：
 >
@@ -26956,6 +26982,32 @@
 >     （⚠ 或直接在 `int amount;` 后面插入 ✓）⇒ 重跑 ⇒ 全量绿 ⇒ **提交脚本 ＋ 引擎改动** ✓（⚠ 按纪律当场提交 ✓）。
 > * ⚠ **并记一条** ✓：⚠ **"脚本改得动"≠"改得对"** ✗ ⇒ ⭐ **每次"生成式改动"后都要编译**（⚠ 本轮做到了 ✓ ⇒ 只损失一次调用 ✓，没有污染树 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树**待确认干净** ✓、已推送且同步 ✓（`7bec6493` ✓）。
+> **2026-10-02 更新（aggro 回收之整千一百三十五：🎯 **那次编译错的**真因**看清了** —— ⚠ `:1333` 那几行**不属于 `gainResource`**，而属于**紧邻的 `gainEnergyFor`** ✗（⚠ 它里面有 `battle.grantEnergy(target, effect.getPercent() * …)` ✓）⇒ ⭐ 说明我的补丁**落点整体偏了几行** ✗）**）**：
+>
+> * ✅ **实测（读 `:1328`–`:1338` ✓）** ✓ 那一段是：
+>   ```java
+>   battle.grantEnergy(target, effect.getPercent() * battle.castAppliedCount(state));
+>   return;
+>   …
+>   double maxEnergy = target.getMaxEnergy();
+>   if (maxEnergy <= 0) {
+>       throw new IllegalStateException(
+>               "GAIN_ENERGY scales off " + target.getName() + "'s maximum energy, but that unit has no energy bar …");
+>   }
+>   battle.grantEnergy(target, effect.getPercent() * maxEnergy);
+>   ```
+>   ⇒ ⭐⭐ **这是 `gainEnergyFor`（`GAIN_ENERGY` 的实现）** ✓ —— ⚠ **不是 `gainResource`** ✗ ⇒ ⭐ 所以"4 个找不到符号"是**我的插入把这一带的语义搅乱了** ✗
+>     （⚠ 已回滚 ✓，树是干净的 ✓）。
+> * ⭐ **下一轮第一步（重读真锚点，两次调用）** ✗：
+>   ① **读 `TriggerInterpreter:1341`–`1372`** ✓（⭐ **`gainResource` 的真身** ✓ —— ⚠ 本段早前只从 `:1341` 读了**开头两行与 `amountFromEvent` 分支** ✓
+>      ⇒ ⭐ **必须把 `int amount;` 的**准确位置**、以及各分支的**完整形状**看全** ✓）；
+>   ② 把脚本的插入锚点改成 **`int amount;` 这一行之后** ✓（⚠ 或改成 `amount = (int) Math.round(ctx.amount()` 那个分支的**前一行** ✓）
+>     ⇒ ⭐ **重跑 ⇒ 编译 ⇒ 全量 ⇒ 绿 ⇒ 当场提交** ✓。
+> * ⚠ **纪律（本轮第二次落点）** ✗：⚠ **"生成式改动"必须**先读全锚点上下文**（⚠ 我只读了两行就下手 ✓ ⇒ 白丢一轮 ✓）
+>   ⇒ ⭐ **纪律：任何自动化补丁，锚点前后各读 15 行** ✓。
+> * ⚠ **进度如实** ✓：新能力**字段** ✓ 已落树；**传参链** ⚠ **两次尝试未成**（第一次引号 ✗／第二次落点 ✗）⇒ ⭐ **尚未进入树** ✓；
+>   **内容＋判据＋变异** ⚠ 待做 ⇒ ⭐ **本件仍是"已登记、施工中"** ✓，**没有冒充出货** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓，回滚后）、树干净 ✓、已推送且同步 ✓（`822f6d53` ✓）。
 ## 二、仍然受阻的缺口（逐条带读者与前置）
 
 
