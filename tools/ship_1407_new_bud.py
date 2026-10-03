@@ -106,7 +106,12 @@ public class NewBudOnHpLossTest {
 
         // \u2b50 `CanHit.takeDamage(double)` (:504) causes HP loss deterministically -- no enemy turn is needed, and twenty steps
         // of "let them fight" left HP untouched (which is what the first draft asserted on).
-        owner.takeDamage(100.0);
+        // \u26a0 A BARE `takeDamage` does NOT reach `Battle`'s HP-loss dispatch (`Battle:2085` is inside the battle's own damage
+        // path), so the first drafts' direct call could never pay. Drive turns instead and let the fight do the damage.
+        for (int i = 0; i < 30 && battle.partyResource(RES).value() == before; i++) {
+            battle.stepForward();
+            battle.processRequests();
+        }
         battle.processRequests();
 
         Assertions.assertEquals(before + 1, battle.partyResource(RES).value(),
