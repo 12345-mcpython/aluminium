@@ -2302,6 +2302,13 @@ public final class TriggerInterpreter {
             double excess = Math.max(0, owner.getAttribute(over).get() - threshold);
             return effect.getPercent() * excess + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        // ⭐ A battle-level PARTY counter (2026-10-02; reader: 1513's reward): the counter lives on the battle, so it is
+        // resolved here rather than through `scaleAttribute`, which answers "which attribute" and has no answer for it.
+        if (effect.getScale().trim().startsWith("party_resource:")) {
+            return resolveScale(effect.getScale(),
+                    effect.getPercent() == null ? 1 : effect.getPercent(), ctx)
+                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
@@ -2333,7 +2340,10 @@ public final class TriggerInterpreter {
     private static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
-        if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)) {
+        // ⭐ `party_resource:<name>` joins this list (2026-10-02): like EVENT_AMOUNT it is a magnitude the op can read
+        // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
+        if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)
+                || raw.startsWith("party_resource:")) {
             return null;                      // handled by derivedMagnitude; not an AttributeType
         }
         if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
@@ -2757,7 +2767,8 @@ public final class TriggerInterpreter {
                             + "the share is OF, so the share itself is missing "
                             + "(source: " + spec.getSource() + ")");
         }
-        if (!scales.contains(scale) && !scale.startsWith(TriggerTable.CAST_APPLIED_PREFIX)) {
+        if (!scales.contains(scale) && !scale.startsWith(TriggerTable.CAST_APPLIED_PREFIX)
+                && !scale.startsWith("party_resource:")) {
             throw new IllegalArgumentException(
                     "Op " + op + " has unknown \"scale\": '" + effect.getScale() + "'; known scales for this op "
                             + "are " + String.join(", ", scales.stream().sorted().toList())
@@ -3221,6 +3232,17 @@ public final class TriggerInterpreter {
         Double fromStacks = stackScale(key, percent, ctx);
         if (fromStacks != null) {
             return fromStacks;
+        }
+        // ⭐ A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands
+        // 【好活当赏】 the 【笑点】 the Aha moment spent). The counter lives on the battle, not on a unit.
+        if (key.startsWith("party_resource:")) {
+            String counter = key.substring("party_resource:".length()).trim();
+            if (ctx.battle() == null || ctx.battle().partyResource(counter) == null) {
+                throw new IllegalStateException(
+                        "a magnitude scales off the party counter '" + counter + "', which no file declares or which"
+                                + " has no battle to live on -- a counter that answers 0 is a wrong number with no symptom");
+            }
+            return percent * ctx.battle().partyResourceValue(counter);
         }
         if ("target_max_hp".equals(key)) {
             CanHit victim = ctx.target();
