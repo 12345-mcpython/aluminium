@@ -1,5 +1,7 @@
 package com.laosun.aluminium.test;
 
+import com.laosun.aluminium.enums.TriggerEvent;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -28,6 +30,7 @@ public class MydeiBloodfeudSkillsTest {
     private static final int MYDEI = 1404;
     private static final int MONSTER = 1002011;
     private static final String BLOODFEUD = "\u8840\u4ec7";
+    private static final String CHARGE = "\u5929\u8D4B\u5145\u80FD";
 
     /** 「消耗等同于万敌当前生命值 35% 的生命值」-- the cost is paid, on the CURRENT value, at the start of his turn. */
     @Test
@@ -135,5 +138,55 @@ public class MydeiBloodfeudSkillsTest {
 
         Assertions.assertEquals(manual, commanded, manual * 1e-9,
                 "「自动施放【弑王成王】」-- the commanded cast runs the row the swap installed, not the slot's original one");
+    }
+
+    /** ⭐ The gate: a charge that arrives WHILE 【血仇】 is already on must not be drained again. */
+    @Test
+    public void aChargeArrivingInBloodfeudIsNotDrainedAgain() {
+        Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
+        Battle battle = new Battle(List.of(him),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+        him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
+        battle.processRequests();
+
+        him.getResources().gain(CHARGE, 100);
+        battle.noteChangedResource(CHARGE);
+        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies.getFirst(), 0, 100);
+        battle.processRequests();
+        int charge = him.getResources().value(CHARGE);
+        System.out.println("[mydei-skills] charge after entering bloodfeud with 100 = " + charge);
+
+        Assertions.assertEquals(100, charge,
+                "「充能达到 100 时消耗 100 点充能进入【血仇】状态」-- already in it, so nothing is drained again; "
+                        + "without this the charge can never reach 150 and the next sentence is unreachable");
+    }
+
+    /** 「充能达到 150 点时，立即获得 1 个额外回合并自动施放【弑神登神】」. */
+    @Test
+    public void theHundredAndFiftyChargeCastsGodslayer() {
+        Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
+        Battle battle = new Battle(List.of(him),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+        him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
+        battle.processRequests();
+
+        him.getResources().gain(CHARGE, 150);
+        battle.noteChangedResource(CHARGE);
+        double enemyBefore = battle.enemies.getFirst().getCurrentHp();
+        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies.getFirst(), 0, 150);
+        battle.processRequests();
+        int charge = him.getResources().value(CHARGE);
+        double enemyAfter = battle.enemies.getFirst().getCurrentHp();
+        System.out.println("[mydei-skills] 150: charge " + charge + " ; enemy " + enemyBefore + " -> " + enemyAfter
+                + " ; SKILL slot now=" + him.getSkills().get(SkillType.SKILL).getSkillSlot());
+
+        Assertions.assertEquals(0, charge, "「消耗 150 点充能」");
+        Assertions.assertTrue(enemyAfter < enemyBefore, "【弑神登神】 was cast");
+        Assertions.assertEquals(11, him.getSkills().get(SkillType.SKILL).getSkillSlot(),
+                "the cast ran 槽 11, which is the row the sentence names");
     }
 }
