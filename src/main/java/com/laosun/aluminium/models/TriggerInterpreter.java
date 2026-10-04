@@ -2172,6 +2172,10 @@ public final class TriggerInterpreter {
             // when a countdown's turn arrives -- a lifetime no `turns` can state. Naming the modifier is what lets
             // `REMOVE_STATE <the same name>` take it off; ⚠ without a name the modifier is skipped by that loop, i.e.
             // unnamed boosts keep exactly the lifetime they always had.
+            // ⭐ The ask travels onto the buff (2026-10-02), so `BuffManager` can honour it without knowing about effects.
+            if (Boolean.TRUE.equals(effect.getCoexist())) {
+                buff.setKeepsSiblings(true);
+            }
             if (Boolean.TRUE.equals(effect.getPerStackLive())) {
                 // ⭐ 「每拥有 1 层…提高 X%」 as a SUSTAINED aura (2026-10-02; reader family: fourteen documents). The share is
                 // asked for on every read, so the aura follows the count -- a snapshot would only be right at the instant it

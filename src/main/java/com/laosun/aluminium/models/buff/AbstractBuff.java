@@ -253,6 +253,24 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     protected String ruleId = "";
 
     /**
+     * ⭐ Whether this buff asks NOT to evict others of its kind (2026-10-02). Measured: `StatModifierBuff` identity is
+     * `(attribute, modifierType, sourceRole)`, so two rules granting the same attribute evict each other -- while some
+     * documents have both in effect at once. ⚠ Opt-in on purpose: making every different rule coexist broke seven shipped
+     * readings, so eviction stays the default and only the effect that says so is exempt.
+     */
+    private boolean keepsSiblings;
+
+    /** Whether this buff asks not to evict others of its kind. */
+    public boolean keepsSiblings() {
+        return keepsSiblings;
+    }
+
+    /** Sets the ask (see {@link #keepsSiblings()}). */
+    public void setKeepsSiblings(boolean keeps) {
+        this.keepsSiblings = keeps;
+    }
+
+    /**
      * The <b>name the data gave this buff</b> — 「协奏」 for a modifier that is an effect <i>of</i> the 【协奏】 state
      * (2026-09-28).
      *

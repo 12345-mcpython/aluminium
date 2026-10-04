@@ -45,8 +45,11 @@ public class TransformationStatsTest {
         Assertions.assertTrue(owner.getBuffManager().hasState("变身"),
                 "precondition: the transformation is on");
 
-        Assertions.assertEquals(atk0 * 1.8, owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 0.001,
-                "「攻击力提高 80%」 (before=" + atk0 + ")");
+        // ⚠ Updated 2026-10-02: `atk0` already carries the trace's +50% (「进入战斗或变身结束时攻击力提高 50%」), so the
+        // block is measured against the BASE: 1 + 0.5 (trace) + 0.8 (transformation) = 2.3.
+        double base = atk0 / 1.5;
+        Assertions.assertEquals(base * 2.3, owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 0.001,
+                "「变身期间攻击力提高 80%」 beside the trace's 50% (before=" + atk0 + ")");
         Assertions.assertEquals(hp0 * 3.7, owner.getAttribute(AttributeType.HEALTH).get(), hp0 * 0.001,
                 "「生命上限提高 270%」 (before=" + hp0 + ")");
     }
