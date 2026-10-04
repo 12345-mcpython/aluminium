@@ -15,9 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1217：「当藿藿拥有【禳命】时，若我方目标受到致命攻击…立即回复等同于其自身生命上限 50% 的生命值」 (2026-10-02).
+ * 1217：「当藿藿拥有【禳命】时，若我方目标受到致命攻击…立即回复等同于其自身生命上限 50% 的生命值。
+ * 该效果单场战斗中可以触发 2 次」 (2026-10-02).
  *
- * <p>⭐ ONE VARIABLE: the eidolon rank. Same party, same skill (which is what puts 【禳命】 on her), same lethal blow.
+ * <p>⭐ ONE VARIABLE per test: the eidolon rank, or the NUMBER OF LETHAL BLOWS. Same party, same skill (which is what puts
+ * 【禳命】 on her), same blow.
  */
 public class TalismanSavesAnAllyTest {
     private static final int HUOHUO = 1217;
@@ -28,7 +30,7 @@ public class TalismanSavesAnAllyTest {
     /** ⭐ At E2 the ally survives, at HALF OF ITS OWN Max HP. */
     @Test
     public void atEidolonTwoTheAllySurvives() {
-        double[] result = afterLethalBlow(2);
+        double[] result = afterLethalBlows(2, 1);
         Assertions.assertTrue(result[0] > 0, "「不会陷入无法战斗状态」 (hp " + result[0] + ")");
         Assertions.assertEquals(result[1] * 0.50, result[0], result[1] * 0.01,
                 "「回复等同于**其自身**生命上限 50%」-- the VICTIM’s own, not the healer’s");
@@ -37,13 +39,31 @@ public class TalismanSavesAnAllyTest {
     /** ⚠ Below E2 the ally falls. */
     @Test
     public void belowEidolonTwoTheAllyFalls() {
-        Assertions.assertTrue(afterLethalBlow(0)[0] <= 0, "星魂 2 才有这一条");
+        Assertions.assertTrue(afterLethalBlows(0, 1)[0] <= 0, "星魂 2 才有这一条");
+    }
+
+    /**
+     * ⭐⭐ 「该效果单场战斗中可以触发 **2** 次」: the first two blows are answered, the third is not.
+     *
+     * <p>⭐ The count is a shipped spelling, not a new capability: a counter is `ADD_STACK` plus a `self_stacks:` condition
+     * (sample: 1111's 【斗志】). ⚠ The two answered blows each leave her ALLY at half of ITS OWN Max HP, so the third
+     * blow is lethal again -- the assertion is about the count, not about a first-blow-only effect.
+     */
+    @Test
+    public void theLimitIsTwoBlowsInOneBattle() {
+        double[] one = afterLethalBlows(2, 1);
+        double[] two = afterLethalBlows(2, 2);
+        double[] three = afterLethalBlows(2, 3);
+        Assertions.assertTrue(one[0] > 0, "第一次被救");
+        Assertions.assertTrue(two[0] > 0, "第二次仍被救（「可以触发 2 次」）");
+        Assertions.assertTrue(three[0] <= 0,
+                "第三次**不再**被救（「可以触发 2 次」的上限）");
     }
 
     // ==================================================================
 
-    /** { the ally's HP after the blow, the ally's Max HP }. */
-    private static double[] afterLethalBlow(int eidolon) {
+    /** { the ally's HP after the blows, the ally's Max HP }. */
+    private static double[] afterLethalBlows(int eidolon, int blows) {
         Character her = CharacterFactory.create(HUOHUO, 80, false, null, null, eidolon);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her, ally),
@@ -58,9 +78,13 @@ public class TalismanSavesAnAllyTest {
         battle.processRequests();
         Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: 【禳命】 is on her");
 
-        Battle dummy = battle;
-        dummy.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
-        battle.processRequests();
+        for (int blow = 0; blow < blows; blow++) {
+            if (ally.isDeath()) {
+                break;
+            }
+            battle.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
+            battle.processRequests();
+        }
         return new double[]{ally.isDeath() ? 0 : ally.getCurrentHp(), ally.getMaxHp()};
     }
 }
