@@ -208,6 +208,11 @@ public class CastSkillTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(him), List.of(enemy), new Random(0));
         battle.startBattle();
+        // ⚠ 「【血仇】状态期间…自身回合开始时自动施放【弑王成王】」: the gate is part of the sentence, so the scene
+        // enters the state. The rule used to fire unconditionally, which is the defect that gate corrects.
+        him.getBuffManager().addBuff(
+                new com.laosun.aluminium.models.buff.StateBuff("\u8840\u4ec7", 9, true));
+        battle.processRequests();
 
         double before = enemy.getCurrentHp();
         battle.fireTriggers(TriggerEvent.TURN_START, him, him, 0, 0);

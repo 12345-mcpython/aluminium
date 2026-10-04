@@ -2892,6 +2892,11 @@ public final class TriggerInterpreter {
             // its current HP, never the healer's and never a battle-wide total (that is 1205's separate cumulative idea).
             case "target_lost_hp" -> Math.max(0, target.getMaxHp() - target.getCurrentHp()) * share + flat;
             case "owner_max_hp" -> ownerAttributeOf(ctx, "owner_max_hp", AttributeType.HEALTH) * share + flat;
+            // ⭐ 「消耗等同于万敌**当前生命值** 35% 的生命值」 (2026-10-02, reader: 1404's two enhanced skills). The
+            // vocabulary had max-HP shares and a lost-HP share, and neither says "a share of what is left": 35% of MAX on a
+            // wounded unit is a plausible-looking wrong number, which is exactly the kind this engine refuses to guess.
+            // ⚠ `target` is the unit being resolved (for CONSUME_HP, the spender), matching the `target_*` family.
+            case "target_current_hp" -> target.getCurrentHp() * share + flat;
             // 三月七 100102: a shield of 「57% 防御力 + 760」 -- a share of the maker's DEFENCE plus a constant.
             case "owner_def" -> ownerAttributeOf(ctx, "owner_def", AttributeType.DEFENCE) * share + flat;
             // ? 1414's shield is 「20.00% 攻击力 + 400」 (2026-09-29): the same derived shape, off ATTACK. Seven documents state
