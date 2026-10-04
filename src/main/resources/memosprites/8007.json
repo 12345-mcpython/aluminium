@@ -1,7 +1,7 @@
 {
   "name": "迷迷",
   "source": "8007 开拓者•记忆 天赋 无所不能的伙伴: 「忆灵迷迷初始拥有130点速度和等同于开拓者80%生命上限+640的生命上限。」",
-  "note": "「忆灵迷迷**初始拥有 130 点速度**和等同于开拓者 **80% 生命上限 + 640** 的生命上限」—— 面板按**召唤者**陈述 ✓（与 1402/1413 同一约定 ✓）。⚠ **这是文档把两个数字都给全的第一只忆灵** ✓：第 163 轮 1409 的忆灵卡在\"引擎**必须**声明 `SPEED` 而文档没给\" ✗，而这里 **130** 是文档原话 ✓。⚠ 文档没有给攻击/防御/抗性 ⇒ 保持构建器的 0 ✓（与 1402 的既有说明一致 ✓），其后果（忆灵吃满伤害）已在 ROADMAP 登记 ✓。",
+  "note": "「忆灵迷迷**初始拥有 130 点速度**和等同于开拓者 **80% 生命上限 + 640** 的生命上限」—— 面板按**召唤者**陈述 ✓（与 1402/1413 同一约定 ✓）。⚠ **这是文档把两个数字都给全的第一只忆灵** ✓：第 163 轮 1409 的忆灵卡在\"引擎**必须**声明 `SPEED` 而文档没给\" ✗，而这里 **130** 是文档原话 ✓。⚠ 文档没有给攻击/防御/抗性 ⇒ 保持构建器的 0 ✓（与 1402 的既有说明一致 ✓），其后果（忆灵吃满伤害）已在 ROADMAP 登记 ✓。 || 2026-10-02: servant_id = 18007 and all 5 of its skills (data slots [1, 3, 5, 6, 7]), imported from ExcelOutput/AvatarServantSkillConfig.json. A memosprite's skills are ordinary skills: the engine addresses them by (cid, slot) with cid = the ServantID.",
   "panel": [
     {
       "attribute": "SPEED",
@@ -11,6 +11,29 @@
       "attribute": "HEALTH",
       "percent": 0.8,
       "flat": 640
+    }
+  ],
+  "servant_id": 18007,
+  "skills": [
+    {
+      "slot": 1,
+      "level": 10
+    },
+    {
+      "slot": 3,
+      "level": 10
+    },
+    {
+      "slot": 5,
+      "level": 10
+    },
+    {
+      "slot": 6,
+      "level": 10
+    },
+    {
+      "slot": 7,
+      "level": 10
     }
   ]
 }
