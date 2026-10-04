@@ -36,6 +36,32 @@ import lombok.ToString;
 public class Summon extends CanHit {
 
     /**
+     * This memosprite's own skills, keyed by their <b>data slot</b> -- the number `SkillEffects` and `DefaultSkill` use.
+     *
+     * <p>\u26a0 Not {@code CanHit.skills}: that map is keyed by {@link com.laosun.aluminium.enums.SkillType}, which has exactly two
+     * summon entries (\u4ebf\u7075\u6280\u80fd / \u4ebf\u7075\u5929\u8d4b), and a memosprite's own skill list runs to eighteen.
+     */
+    private final java.util.Map<Integer, com.laosun.aluminium.models.skill.Skill> skillsByDataSlot =
+            new java.util.LinkedHashMap<>();
+
+    /** Attaches one of this memosprite's own skills, addressed the way the data addresses it. */
+    public void setSkillAt(int dataSlot, com.laosun.aluminium.models.skill.Skill skill) {
+        if (skill != null) {
+            skillsByDataSlot.put(dataSlot, skill);
+        }
+    }
+
+    /** This memosprite's own skill at that data slot, or {@code null}. */
+    public com.laosun.aluminium.models.skill.Skill skillAt(int dataSlot) {
+        return skillsByDataSlot.get(dataSlot);
+    }
+
+    /** Every own skill of this memosprite, by data slot. */
+    public java.util.Map<Integer, com.laosun.aluminium.models.skill.Skill> skillsByDataSlot() {
+        return java.util.Map.copyOf(skillsByDataSlot);
+    }
+
+    /**
      * Who called this summon, or {@code null} for a hand-built one.
      *
      * <p>The link is one-way and lives here rather than as a list on the master because its only job is the
