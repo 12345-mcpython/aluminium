@@ -108,6 +108,39 @@ public class MemospriteSkillTest {
         }
         System.out.println(report.toString().trim());
     }
+    /**
+     * The imported elements are the ones the SERVANT'S ABILITY states -- not a default.
+     *
+     * <p>Where they come from, measured: not from `AvatarServantSkillConfig` (which carries the delivery shape and a toughness type but
+     * no damage element), but from `Config/ConfigAbility/Servant/Servant_*_Ability.json`, inside the ability the skill's own
+     * `SkillTriggerKey` names. Four of the thirteen damaging skills resolved unambiguously; the rest are recorded, not guessed.
+     */
+    @Test
+    public void theImportedElementsAreTheOnesTheAbilitiesState() {
+        String[][] want = {
+                {"1402", "1", "THUNDER"},
+                {"1407", "1", "QUANTUM"},
+                {"1512", "1", "WIND"},
+                {"8007", "1", "ICE"},
+        };
+        StringBuilder report = new StringBuilder("[elements] ");
+        for (String[] w : want) {
+            int cid = Integer.parseInt(w[0]);
+            int slot = Integer.parseInt(w[1]);
+            Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
+            Battle battle = new Battle(List.of(master),
+                    List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+            battle.startBattle();
+            Summon servant = battle.summonServant(master);
+            Skill skill = servant.skillAt(slot);
+            Assertions.assertNotNull(skill, cid + " carries skill " + slot);
+            Assertions.assertNotNull(skill.getData().getElement(), cid + " slot " + slot + " has an element at all");
+            String got = skill.getData().getElement().name();
+            report.append(cid).append("/").append(slot).append("=").append(got).append(" ");
+            Assertions.assertEquals(w[2], got, cid + " slot " + slot + ": the element the servant's ability states");
+        }
+        System.out.println(report.toString().trim());
+    }
     /** The memosprite at that cid, built through the seam a test uses. */
     private static Summon servantOf(int cid) {
         Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
