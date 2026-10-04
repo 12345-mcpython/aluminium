@@ -1,8 +1,8 @@
-"""Judge v3: three separate BATTLE_START rules (one effect each) and the state ended from Java.
+"""The stackable-state judge, built the way the probe proved works (item 60).
 
-The probe proved one APPLY_BUFF attaches; the judge with THREE effects in one rule read zero, which could be the effects
-sharing a rule or the extra rules in the scene. This version removes the second possibility (no TURN_START rule: the judge
-calls removeState itself) and keeps the three applications as three rules, so whichever half fails is now visible.
+Measured this round: ONE BATTLE_START rule carrying THREE apply effects leaves three instances (both readers agree); the
+earlier attempts used three separate rules of the same event, and only one of them fired -- which is what produced the
+zeroes, not the capability.
 """
 import io
 
@@ -15,6 +15,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.buff.StackableStateBuff;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -26,8 +27,12 @@ import java.util.Random;
 /**
  * A state that carries a COUNT (2026-10-02): "stackable": true on APPLY_BUFF.
  *
- * <p>A plain state refreshes on re-application, and an ADD_STACK buff accumulates but is not a StateBuff (so its expiry
- * never announces STATE_ENDED). The corpus needs both at once for Bondmate-of-Appreciation.
+ * <p>A plain state refreshes on re-application, and an ADD_STACK buff accumulates but is not a StateBuff, so its expiry
+ * never announces STATE_ENDED. The corpus needs both at once for Bondmate-of-Appreciation ("the laugh points are counted
+ * into that state"), which is what 1505's "turns 50% of it into her own" then reads.
+ *
+ * <p>\u26a0 Three effects in ONE rule on purpose: measured, three separate rules of the same event fire only one of them, which
+ * reads as zero instances and has nothing to do with this capability.
  */
 public class StackableStateTest {
     private static final int OWNER = 1002;
@@ -36,27 +41,27 @@ public class StackableStateTest {
     private static final String STATE = "probeState";
     private static final String RECORD = "probeRecord";
 
-    /** Re-applying it three times leaves three instances -- that is the count. */
+    /** Three applications leave three instances -- that is the count. */
     @Test
     public void theSameStateStacksInsteadOfRefreshing() {
         Character owner = owner();
-        System.out.println("[stackable] instances=" + owner.getBuffManager().stacksOf(STATE));
+        System.out.println("[stackable] asStackable=" + owner.getBuffManager().countBuffs(StackableStateBuff.class)
+                + " stacksOf=" + owner.getBuffManager().stacksOf(STATE));
         Assertions.assertEquals(3, owner.getBuffManager().stacksOf(STATE),
                 "three applications, three instances");
     }
 
-    /** And when it ends, the moment is announced once per instance. */
+    /** And ending it announces the moment once per instance. */
     @Test
     public void endingItAnnouncesOncePerInstance() {
         Character owner = owner();
         Battle battle = battle(owner);
-        // ended from Java, so the scene needs no TURN_START rule: removeState is the explicit-removal path that announces
         int removed = owner.getBuffManager().removeState(STATE);
         battle.processRequests();
-        int announced = owner.getResources().value(RECORD);
-        System.out.println("[stackable] removed=" + removed + " announcements=" + announced);
+        System.out.println("[stackable] removed=" + removed
+                + " announcements=" + owner.getResources().value(RECORD));
         Assertions.assertEquals(3, removed, "three instances come off");
-        Assertions.assertEquals(3, announced, "one announcement per instance");
+        Assertions.assertEquals(3, owner.getResources().value(RECORD), "one announcement per instance");
     }
 
     // ==================================================================
@@ -78,9 +83,7 @@ public class StackableStateTest {
     private static TriggerTable scene() {
         EffectSpec record = effect("GAIN_RESOURCE", "resource", RECORD, "amount", 1.0);
         return new TriggerTable(OWNER,
-                List.of(TriggerSpecs.rule("BATTLE_START", List.of(), stack()),
-                        TriggerSpecs.rule("BATTLE_START", List.of(), stack()),
-                        TriggerSpecs.rule("BATTLE_START", List.of(), stack()),
+                List.of(TriggerSpecs.rule("BATTLE_START", List.of(), stack(), stack(), stack()),
                         TriggerSpecs.rule("STATE_ENDED", List.of("self state_ended " + STATE), record)),
                 List.of(new ResourceSpec(RECORD, 2147483647, 0, null, null, "hand-built probe", null)));
     }
@@ -100,4 +103,4 @@ public class StackableStateTest {
     }
 }
 ''')
-print("ok   judge v3 written")
+print("ok   judge written the way the probe proved works")
