@@ -993,15 +993,22 @@ public class BuffManager {
         }
         String wanted = state.trim();
         int removed = 0;
+        // ⭐ ONE announcement per sweep, carrying the total, so a reader that converts a share of "it" sees the total once.
+        int ending = 0;
+        for (AbstractBuff carried : List.copyOf(buffs)) {
+            if (carried instanceof StateBuff buff && wanted.equals(buff.getState())) {
+                ending++;
+            }
+        }
+        if (ending > 0 && battle != null) {
+            battle.fireStateEnded(instance, wanted, ending);
+        }
         // ⚠ Subclass-inclusive (2026-10-02), the same widening has_state needed: a DeferredDeathBuff is a StateBuff
         // SUBCLASS, and an exact-class sweep cannot take it off -- so 1407's trace could never be removed by name.
         for (AbstractBuff carried : List.copyOf(buffs)) {
             if (carried instanceof StateBuff buff && wanted.equals(buff.getState())) {
                 // 2026-10-02: an explicit removal ends the state just as a spent duration does, so the tables hear
                 // about it the same way. Readers: 1408 transformation end, 1412 raid end.
-                if (battle != null) {
-                    battle.fireStateEnded(instance, buff.getState());
-                }
                 removeBuff(buff);
                 removed++;
             }

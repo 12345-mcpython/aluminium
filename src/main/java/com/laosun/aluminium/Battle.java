@@ -2240,10 +2240,19 @@ public class Battle {
      * outer name must survive that. This is the guard {@code lastUltEnergySpent}'s comment warns about.
      */
     public void fireStateEnded(CanHit carrier, String stateName) {
+        fireStateEnded(carrier, stateName, 0);
+    }
+
+    /**
+     * ⭐ The same moment, carrying <b>how many instances of that state</b> the carrier held. ⚠ The number goes in the AMOUNT
+     * slot, not the hit count: measured, `fireTriggers(event, actor, target, int hitCount, double amount)`, and putting it one
+     * place early left `ctx.amount()` at zero -- which is what 「将其中的 50%」 reads.
+     */
+    public void fireStateEnded(CanHit carrier, String stateName, int magnitude) {
         String previous = lastStateEndedName;
         lastStateEndedName = stateName;
         try {
-            fireTriggers(TriggerEvent.STATE_ENDED, carrier, carrier, 0, 0);
+            fireTriggers(TriggerEvent.STATE_ENDED, carrier, carrier, 0, magnitude);
         } finally {
             lastStateEndedName = previous;
         }
