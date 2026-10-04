@@ -746,13 +746,30 @@ public class BuffManager {
      * @param state the state name as the data spells it (trimmed; blank or {@code null} = never present)
      * @return {@code true} = a {@link StateBuff} with that name is on us
      */
+    /**
+     * ⭐ Whether any state on us <b>defers a lethal blow</b> (2026-10-02; reader: 1407's 月茧之庇).
+     *
+     * <p>Asked by {@code Battle} at the two moments that matter: before it commits a death, and at the carrier's own
+     * turn (where a still-present deferral is committed). By type, not by name -- see {@link DeferredDeathBuff}.
+     */
+    public boolean defersDeath() {
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff instanceof DeferredDeathBuff) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasState(String state) {
         if (state == null || state.isBlank()) {
             return false;
         }
         String wanted = state.trim();
-        for (StateBuff buff : allBuffsOf(StateBuff.class)) {
-            if (wanted.equals(buff.getState())) {
+        // ⚠ Subclass-inclusive (2026-10-02): allBuffsOf compares classes EXACTLY, and DeferredDeathBuff is a StateBuff
+        // SUBCLASS -- so a deferring state was invisible to has_state, and 1407's own content could never see its trace.
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff instanceof StateBuff carried && wanted.equals(carried.getState())) {
                 return true;
             }
         }
@@ -976,8 +993,10 @@ public class BuffManager {
         }
         String wanted = state.trim();
         int removed = 0;
-        for (StateBuff buff : allBuffsOf(StateBuff.class)) {
-            if (wanted.equals(buff.getState())) {
+        // ⚠ Subclass-inclusive (2026-10-02), the same widening has_state needed: a DeferredDeathBuff is a StateBuff
+        // SUBCLASS, and an exact-class sweep cannot take it off -- so 1407's trace could never be removed by name.
+        for (AbstractBuff carried : List.copyOf(buffs)) {
+            if (carried instanceof StateBuff buff && wanted.equals(buff.getState())) {
                 // 2026-10-02: an explicit removal ends the state just as a spent duration does, so the tables hear
                 // about it the same way. Readers: 1408 transformation end, 1412 raid end.
                 if (battle != null) {
