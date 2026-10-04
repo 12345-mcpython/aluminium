@@ -60,6 +60,7 @@ public class EffectSpec {
         copy.permanent = this.permanent;
         // ⭐ The deferral must survive a copy, or a rule that is amended/copied silently loses it (the guard test says so).
         copy.defersDeath = this.defersDeath;
+        copy.stackable = this.stackable;
         copy.maxStacks = this.maxStacks;
         copy.instance = this.instance;
         copy.stacks = this.stacks;
@@ -350,6 +351,16 @@ return copy;
      */
     @SerializedName("stacks")
     private Integer stacks;
+
+    /**
+     * ⭐ 「将笑点**计入该状态**」: apply this state as a <b>stackable</b> one (2026-10-02; reader: 1505's 【好活当赏】).
+     *
+     * <p>A plain state REFRESHES when re-applied (its identity is its name, deliberately), so a count cannot ride on it;
+     * this flag selects {@link com.laosun.aluminium.models.buff.StackableStateBuff}, whose instances accumulate and are
+     * counted by name, while still being the `StateBuff` that announces its own end.
+     */
+    @SerializedName("stackable")
+    private Boolean stackable;
 
     /**
      * Resource id for {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} (e.g. {@code "tribbie_charge"}).

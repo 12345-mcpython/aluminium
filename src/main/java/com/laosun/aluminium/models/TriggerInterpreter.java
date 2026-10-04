@@ -21,6 +21,7 @@ import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.DeferredDeathBuff;
+import com.laosun.aluminium.models.buff.StackableStateBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.buff.TauntBuff;
 import com.laosun.aluminium.models.buff.VulnerabilityBuff;
@@ -2467,7 +2468,10 @@ public final class TriggerInterpreter {
         String state = effect.getBuff().trim();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             AbstractBuff buff = withSource(withTickOwner(
-                    withLifetime(Boolean.TRUE.equals(effect.getDefersDeath())
+                    withLifetime(Boolean.TRUE.equals(effect.getStackable())
+                        ? new StackableStateBuff(state, turns, permanent,
+                                effect.getMaxStacks() == null ? 1 : effect.getMaxStacks())
+                        : Boolean.TRUE.equals(effect.getDefersDeath())
                         ? new DeferredDeathBuff(state, turns, permanent)
                         : new StateBuff(state, turns, permanent), effect), effect, ctx), ctx);
             // 「不会进入自己的回合」 rides on the state itself: a turn is not something a state could give back
@@ -3994,7 +3998,10 @@ public final class TriggerInterpreter {
      * each other rather than accumulating.
      */
     private static void requireNoStackArguments(EffectSpec effect, String op, TriggerSpec spec) {
-        if (effect.getMaxStacks() != null || effect.getStacks() != null) {
+        // ⚠ Relaxed for a STACKABLE STATE (2026-10-02): `max_stacks` is otherwise refused on every op but MODIFY_ATTR, and a
+        // stackable state needs a cap -- that is the whole point of "counted into that state".
+        if (!Boolean.TRUE.equals(effect.getStackable())
+                && (effect.getMaxStacks() != null || effect.getStacks() != null)) {
             throw new IllegalArgumentException(
                     "Op " + op + " does not support \"max_stacks\"/\"stacks\"; only MODIFY_ATTR "
                             + "accumulates (source: " + spec.getSource() + ")");
