@@ -61,6 +61,7 @@ public class EffectSpec {
         // ⭐ The deferral must survive a copy, or a rule that is amended/copied silently loses it (the guard test says so).
         copy.defersDeath = this.defersDeath;
         copy.stackable = this.stackable;
+        copy.perStackLive = this.perStackLive;
         copy.maxStacks = this.maxStacks;
         copy.instance = this.instance;
         copy.stacks = this.stacks;
@@ -361,6 +362,17 @@ return copy;
      */
     @SerializedName("stackable")
     private Boolean stackable;
+
+    /**
+     * ⭐ `per_stack` resolved at READ time instead of when the modifier is attached (2026-10-02).
+     *
+     * <p>「艾丝妲每拥有 1 层蓄能，会使我方全体攻击力提高 14.00%，最多 5 层」: a sustained aura whose number has to follow the count.
+     * A snapshot is right only at the instant it is taken, and re-attaching on every change would stack the buff
+     * itself. Only the ctx-free forms of `per_stack` may be live, and the loader refuses the others rather than
+     * silently keeping a snapshot.
+     */
+    @SerializedName("per_stack_live")
+    private Boolean perStackLive;
 
     /**
      * Resource id for {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} (e.g. {@code "tribbie_charge"}).
