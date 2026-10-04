@@ -31,8 +31,10 @@ public class StackTimesVariantsTest {
                 + " C(turns2,MAX,amount)=" + c + " D(turns2,99,amount)=" + d);
         Assertions.assertEquals(7, a, "A is the known-good shape");
         Assertions.assertEquals(7, b, "B: a two-turn state with an unbounded cap");
-        Assertions.assertEquals(7, c, "C: a literal count with an unbounded cap");
-        Assertions.assertEquals(7, d, "D: a literal count with a small cap");
+        // C and D state a literal FOUR, so four is the correct reading -- the first version of this test asserted 7 for them too,
+        // which is what made it fail from the start.
+        Assertions.assertEquals(4, c, "C: a literal count of four, with an unbounded cap");
+        Assertions.assertEquals(4, d, "D: a literal count of four, with a small cap");
     }
 
     // ==================================================================
