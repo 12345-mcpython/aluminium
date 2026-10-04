@@ -35629,3 +35629,22 @@
 >   ⭐⭐ **新纪律**：⭐ **写文件前先编码** ✓ —— ⚠ `open(.., "w")` **一打开就截断** ✗，⭐ 所以"先算字符串、再开文件"是不够的 ✓，
 >   ⭐ 必须 ⭐ **`payload = text.encode("utf-8")` 成功之后，才用 `"wb"` 落盘** ✓；⭐ 且 ⭐ **文案里只用 BMP 字符** ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2247** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 1 轮：⭐⭐⭐ **按 tbgd 的原始配置找到了游戏的机制** ✓ —— ⭐ 而且它与我登记的"缺一个 op"不同：
+> **游戏本来就是"给具名 modifier 的 `LifeTime` 加一个带符号的增量"** ✓）**）**：
+>
+> * ⭐⭐⭐ **机制原文（`Config/ConfigAbility/Avatar/Avatar_Huohuo_00_Ability.json` ✓）**：
+>   ⭐ 【禳命】的剩余回合数是 modifier ⭐ `MAvatar_Huohuo_Passive_HealMark` 上的计数值 ✓；⭐ 星魂 2 的能力是 ⭐ `Avatar_Huohuo_00_Rank02_Insert` ✓，⭐ 它做**两条同族任务**：
+>   ⭐ ① ⭐ `SetDynamicValueByAddValue{Key: "Huohuo_Passive_HotCount", AddValue: -1, Min: 0, Max: 2}` ✓
+>   ⭐ ② ⭐ **`SetModifierValue{ModifierName: "MAvatar_Huohuo_Passive_HealMark", ModifyFunction: "Add", ValueType: "LifeTime"}`** ✓✓
+>   ⇒ ⭐⭐ **"缩短时长"在游戏里就是"对具名 modifier 的 `LifeTime` 做 `Add`"** ✓ —— ⭐ 而我们的 `EXTEND_BUFF`
+>   （⭐ `extendBuffsFrom(source, stateName, attribute, turns)` ✓，⭐ 同样"具名 ＋ 按来源" ✓）**正是同一形状** ✓，⭐ 只差"允许取负" ✗。
+> * ⭐⭐⭐ **读者数（本轮实测 ✓，这是决定"造不造"的那个数）**：⭐ 扫 `ConfigAbility/Avatar` ＋ `ConfigAbility/Servant` 共 **286** 个文件 ✓
+>   ⇒ ⭐ 有 **50 处**改 modifier 的 `LifeTime` ✓，⭐ 分布在 **26** 个文件 ✓（⭐ 含 `Huohuo`／`RuanMei`／`SilverWolf999`／`Tingyun`／`Hyacine`／`YaoGuang`／`Jade`／`Phainon`／`Sunday`… ✓）
+>   ⇒ ⭐⭐ **远超本项目 2 位门槛** ✓ ⇒ ⭐ **该造** ✓（⭐ 这也回答了用户的"看看 tbgd 里表达的机制然后再实现" ✓）。
+> * ⭐ **由此我的登记被改准 ✓**：⭐ 上一版写"缺一个**缩短具名状态时长**的 op" ✗ —— ⭐ 更准的说法是 ⭐ **"我们的 `EXTEND_BUFF` 就是那个 op，只是它的时长被限制为正数"** ✓
+>   ⇒ ⭐ 修法是 ⭐ **让时长取符号** ✓（⭐ 而不是新增一个 op ✗ ⇒ ⭐ 这样**不会出现第二个方言** ✓，⭐ 与用户"尽量机制一致"的要求一致 ✓）。
+> * ⭐ **下一轮要做的三件（口径已定 ✓）**：⭐ ① `BuffManager.extendBuffsFrom`／`extendAllBuffs` 的 `turns <= 0` 改为 `turns == 0` ✓；
+>   ⭐ ② 结果**钳到 0** ✓（⭐ 照游戏的 `Min: 0` ✓ ⇒ ⭐ 归零即结束 ✓）；⭐ ③ `1217.json` 的 E2 加 `EXTEND_BUFF{buff: 禳命, turns: -1, target: self}` ✓ ＋ 判据 ＋ 实测变异 ✓。
+> * ⭐ **顺带记下**：⭐ `ConfigAbility/Servant/Servant_CyreneServant_00_Ability.json` ✓ ＝ 忆灵的技能表 ✓（⭐ 第二件要读的就是它 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2247** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
