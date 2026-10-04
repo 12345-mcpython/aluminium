@@ -39,6 +39,7 @@
 | 定时弱点（会过期） | `ADD_ELEMENTAL_WEAKNESS` ＋ `turns` | `src/main/resources/characters/1310.json` | `TimedWeaknessTest` |
 | 事件词汇表本身 | `TriggerEvent`（未接的事件在装载期就报错） | `src/main/java/com/laosun/aluminium/enums/TriggerEvent.java` | `TriggerEventWiringTest` |
 | 「获得 N 个**笑点**」（队伍级、无上限的共享计数） | 无上限资源的**既有拼法**：`max: 2147483647` ＋ `scope: "PARTY"`（⚠ 共享 ⇒ 任何在队角色都可加） | `src/main/resources/characters/1513.json` | `Character1513LaughterTest` |
+| **「某个状态的持续回合数在**它自己**的回合开始时减 1」** | `APPLY_BUFF` ＋ `turns` ＋ **`ticks_on: "self"`**（谁的回合花掉时长 ✓） | `src/main/resources/characters/1217.json` | `HuohuoTalismanDurationTest` |
 | **队友的状态结束时取一部分**（「其中的 50% 转化为自身的…」） | `STATE_ENDED` ＋ **事件携带的量**（被结束状态的**实例数**）＋ `amountFromEvent` × `amountPercent` | `src/main/resources/characters/1505.json`、`src/main/resources/characters/1513.json` | `GiftCarriesTheLaughsTest` |
 | **「变身结束时…」的三句**（白厄：全队速度 +15% ✓、获得 3 点【火种】✓、「进入战斗**或**变身结束时攻击力 +50%」） | `STATE_ENDED` ＋ `self state_ended 变身`；第三句还用 **`coexist: true`**（同一属性上的两条规则共存 ✓） | `src/main/resources/characters/1408.json`、`src/main/java/com/laosun/aluminium/models/buff/BuffManager.java` | `TransformationStatsTest` |
 | **层数＝队级计数**（「将本次…计入该状态」） | `scale: "party_resource:<NAME>"`（战斗级计数当数值读） | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java` | `PartyResourceScaleTest` |
@@ -57,6 +58,5 @@
 | 句族 | 缺什么 | 读者 | 前置 |
 |---|---|---|---|
 | 仓库技「获得该角色即生效，无需上场」 | 一个与队伍无关的被动装载路径（引擎只在角色**在队**时读它的表） | `1407`（1 位） | 被动装载点 |
-| 「使【禳命】的持续回合数 −1」 | 「缩短时长」的拼写（`EXTEND_BUFF` 只收正数） | `1217`（1 位） | 一个减时长的 op |
 | 「自动施放【弑神登神】」 | 数据 id 11 对应的技能槽（`SkillType` 没有它） | `1408`（1 位） | 槽位映射 |
 | 欢乐技「**8 次**随机单体…」的**按次数结算** | 引擎的“N 次命中”是**按技能种类**读的（如 `BOUNCE` 取**第二个**参数 ✓），而**欢乐技的行首列就是次数**这一种没有表示 ✗；⚠ 另缺：**我方 `data/` 里一个 elation 技能行都没有**（扫到 0 个 ✗） | `8009`／`8010`（**2 位**，逐条读到 ✓；⚠ 原登记写 5 位而 `1505`／`1502`／`1506` **逐条读不到** ✗ ⇒ 按本节规矩改为 2 位） | 技能行模型 ＋ 欢乐技的数据行 |
