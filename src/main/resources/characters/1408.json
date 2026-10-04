@@ -260,6 +260,78 @@
       ],
       "source": "1408 白厄（文档，卡厄斯兰那的天赋）：「卡厄斯兰那受到**致命攻击**时不会陷入**无法战斗状态**，而是**回复等同于自身生命上限 20%** 的生命值」",
       "note": "⭐ 2026-10-02：触发用**新建的 `LETHAL_DAMAGE`** ✓（它在 `Battle.applyDamage` 里发 ✓，❗ **而且目标先被扣到 0 但**不判死**** ✓ —— 否则满血时回血是空操作 ✗）。⚠ **绑到【变身】** ✓⇒“卡厄斯兰那”的作用域 ✓。"
+    },
+    {
+      "on": "STATE_ENDED",
+      "id": "transformation_end_speeds_the_party",
+      "when": [
+        "self state_ended 变身"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.15,
+          "turns": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1408 白厄 天赋：「变身结束时，使我方全体速度提高 **15%**，持续 **1** 回合」",
+      "note": "「变身结束时…我方全体速度 +15%，持续 1 回合」⇒ `STATE_ENDED` ＋ `self state_ended 变身` ⇒ `MODIFY_ATTR{SPEED, 15%, turns: 1, all_allies}` ✓。"
+    },
+    {
+      "on": "STATE_ENDED",
+      "id": "trace_worlds_end_three_seeds",
+      "when": [
+        "self state_ended 变身"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1408 白厄 行迹 行向世界终点 (1408101)：「战斗开始时，获得 1 点【火种】。变身结束时，获得 **3** 点【火种】」",
+      "note": "「变身结束时获得 **3** 点【火种】」⇒ `STATE_ENDED` ⇒ `GAIN_RESOURCE{火种, 3}` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_hero_true_colors_on_battle_start",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.5,
+          "permanent": true,
+          "max_stacks": 2,
+          "target": "self",
+          "coexist": true
+        }
+      ],
+      "source": "1408 白厄 行迹 照见英雄本色 (1408103): 「进入战斗或变身结束时，攻击力提高 **50%**。该效果最多叠加 **2** 层」",
+      "note": "⚠ 两个事件写成**两条规则** ✓（实测 `on_any` **不是** JSON 键 ✗：装载器报 *\"Unknown trigger event 'null'\"* ✓）。⭐ **`coexist: true`** ✓：她的变身同样给 `ATTACK` 加成 ✗，而语料说两者**同时生效** ✓（合计 +130% ✓）；⚠ “不同规则一律共存”已实测**破坏 7 例** ✗ ⇒ 挤出仍是默认 ✓。"
+    },
+    {
+      "on": "STATE_ENDED",
+      "id": "trace_hero_true_colors_on_transformation_end",
+      "when": [
+        "self state_ended 变身"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.5,
+          "permanent": true,
+          "max_stacks": 2,
+          "target": "self",
+          "coexist": true
+        }
+      ],
+      "source": "1408 白厄 行迹 照见英雄本色 (1408103): 「进入战斗或变身结束时，攻击力提高 **50%**。该效果最多叠加 **2** 层」",
+      "note": "同上的另一半：「**变身结束时**…攻击力 +50%，最多 2 层」⇒ `STATE_ENDED` ＋ `self state_ended 变身` ✓（两条共用 `max_stacks: 2` ✓ 与 `coexist` ✓）。"
     }
   ]
 }

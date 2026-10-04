@@ -63,9 +63,16 @@ public class BuffManager {
             addStackable(buff);
             return;
         }
-        for (int i = buffs.size() - 1; i >= 0; i--) {
+        // ⭐ An effect may ask NOT to evict (2026-10-02; reader: 1408's trace, whose +50% must live beside her transformation's
+        // +80%). Measured, eviction is load-bearing for three cones and two other kits, so this is opt-in and the default is
+        // untouched.
+        // ⭐ An effect may ask NOT to evict (2026-10-02; reader: 1408's trace, whose +50% must live beside her transformation's
+        // +80%). The ask protects the buff that CARRIES it, in both directions: the newcomer skips its own sweep, and an
+        // already-attached buff that asked is not swept by a later plain one. Measured, eviction is load-bearing for three
+        // cones and two other kits, so this is opt-in and the default is untouched.
+        for (int i = buffs.size() - 1; i >= 0 && !buff.keepsSiblings(); i--) {
             AbstractBuff existed = buffs.get(i);
-            if (existed.isSameKind(buff)) {
+            if (existed.isSameKind(buff) && !existed.keepsSiblings()) {
                 removeBuff(existed);
             }
         }

@@ -61,6 +61,7 @@ public class EffectSpec {
         // ⭐ The deferral must survive a copy, or a rule that is amended/copied silently loses it (the guard test says so).
         copy.defersDeath = this.defersDeath;
         copy.stackable = this.stackable;
+        copy.coexist = this.coexist;
         copy.perStackLive = this.perStackLive;
         copy.maxStacks = this.maxStacks;
         copy.instance = this.instance;
@@ -362,6 +363,13 @@ return copy;
      */
     @SerializedName("stackable")
     private Boolean stackable;
+
+    /**
+     * ⭐ {@code "coexist": true} -- this effect must not evict another effect of the same kind (2026-10-02; reader: 1408's
+     * trace 「进入战斗或变身结束时攻击力提高 50%」, which is in effect together with her transformation's +80%).
+     */
+    @SerializedName("coexist")
+    private Boolean coexist;
 
     /**
      * ⭐ `per_stack` resolved at READ time instead of when the modifier is attached (2026-10-02).
