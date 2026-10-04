@@ -51,6 +51,10 @@ public class GiftCarriesTheLaughsTest {
         int instances = sparkle.getBuffManager().stacksOf(GIFT);
         System.out.println("[gift-laughs] gift instances=" + instances);
         Assertions.assertEquals(4, instances, "the state carries one instance per laugh");
+        // ⭐ 「阿哈行动后会消耗全部笑点」 (glossary 10000026): the count was read FIRST, then the counter was emptied --
+        // asserting both in one scene is what makes the ordering part of the reading rather than of the prose.
+        Assertions.assertEquals(0, battle.partyResourceValue(LAUGHS),
+                "and all the laughs are spent at the same moment, after the gift has taken its count");
 
         int before = evanescia.getResources().value(GIFT);
         sparkle.getBuffManager().removeState(GIFT);

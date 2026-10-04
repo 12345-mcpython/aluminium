@@ -1416,6 +1416,23 @@ public final class TriggerInterpreter {
     private static void spendResource(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = resolveTarget(effect, ctx);
         String id = effect.getResource();
+        // ⭐ A PARTY counter has no home on the unit (the same fact `gainResource` records), so a spend has to fall back to the
+        // battle-level one -- measured: 【笑点】 is declared `scope: PARTY` (「笑点为全队共享」, glossary 10000027) and the holder's
+        // own Resources does not have it, so 「阿哈行动后会消耗全部笑点」 (10000026) could not be written at all.
+        com.laosun.aluminium.models.Resource partyCounter = holder.getResources().has(id)
+                ? null
+                : (ctx.battle() == null ? null : ctx.battle().partyResource(id));
+        if (partyCounter != null) {
+            int spend = Boolean.TRUE.equals(effect.getSpendAll())
+                    ? partyCounter.value()
+                    : (int) Math.round(scaledAmount(effect, ctx));
+            if (!partyCounter.spendExactly(spend)) {
+                throw new IllegalStateException(
+                        "SPEND_RESOURCE '" + id + "' needs " + spend + " but the party has only "
+                                + partyCounter.value());
+            }
+            return;
+        }
         // 「消耗所有【X】」 (2026-10-02): the size is whatever is there; the "not enough"
         // failure below cannot happen for it, which is why the two spellings are kept apart.
         int amount = Boolean.TRUE.equals(effect.getSpendAll())
