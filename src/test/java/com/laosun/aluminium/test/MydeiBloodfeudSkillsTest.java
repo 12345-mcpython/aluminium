@@ -97,4 +97,43 @@ public class MydeiBloodfeudSkillsTest {
         battle.afterMove();
         battle.processRequests();
     }
+
+    /**
+     * ⭐⭐ And the swap must REACH the cast -- read as a SAME-LEVEL comparison, which is what the first attempt got wrong.
+     *
+     * <p>The earlier "proof" compared against a scene whose trigger table had been REPLACED, so `level_convention` never ran there
+     * and the two numbers came from different levels. This one installs the same row by hand AFTER the battle has started (so the
+     * levels convention has already run), casts it directly, and requires the content's commanded cast to deal the same.
+     */
+    @Test
+    public void theSwapReachesTheCast() {
+        Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
+        Battle battle = new Battle(List.of(him),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+        him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
+        battle.processRequests();
+        double before = battle.enemies.getFirst().getCurrentHp();
+        spendTurnOf(battle, him);
+        double commanded = before - battle.enemies.getFirst().getCurrentHp();
+
+        Character byHand = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
+        Battle other = new Battle(List.of(byHand),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        other.startBattle();
+        other.processRequests();
+        // ⚠ AFTER startBattle, so the slot carries the level the convention gives it -- the trap the earlier attempt fell into.
+        byHand.getSkills().put(SkillType.SKILL, new com.laosun.aluminium.models.skill.DefaultSkill(
+                MYDEI, 9, byHand.getSkills().get(SkillType.SKILL).getLevel()));
+        double otherBefore = other.enemies.getFirst().getCurrentHp();
+        com.laosun.aluminium.models.skill.SkillExecutor.execute(other,
+                byHand.getSkills().get(SkillType.SKILL), byHand, List.of(other.enemies.getFirst()));
+        other.processRequests();
+        double manual = otherBefore - other.enemies.getFirst().getCurrentHp();
+        System.out.println("[mydei-skills] commanded=" + commanded + " ; slot-9 by hand=" + manual);
+
+        Assertions.assertEquals(manual, commanded, manual * 1e-9,
+                "「自动施放【弑王成王】」-- the commanded cast runs the row the swap installed, not the slot's original one");
+    }
 }
