@@ -439,6 +439,45 @@ public final class SkillExecutor {
 
         double totalDamage = 0;
 
+        // ⭐ An ElationDamage row reads its params as [hits, per-hit share, final split share] (2026-10-02; readers 8009/8010
+        // slot 20, whose text is 「造成 #1 次伤害，每次对敌方随机单体造成 #2%…。最后造成 #3%…由敌方全体均分」).
+        // ⚠ The row's own `skill_effect` is AoEAttack, so without this branch the leading 8 is read as a MULTIPLIER -- 800% damage
+        // -- which is the mis-reading the CAST_SKILL comment names as the reason the Elation auto-casts stay registered.
+        // ✅ The damage type and the Elation boost already follow the data (2026-09-30 "slice 1b"), so only the row reading is new.
+        // ⚠ `getSkillType()` hands back the DATA's own spelling, which for these rows is `ElationDamage`; the enum's name is
+        // accepted too, so the branch does not depend on which of the two the loader kept (the first version compared a String
+        // to the enum and did not compile).
+        String elationKind = data.getSkillType();
+        if (elationKind != null && ("ElationDamage".equalsIgnoreCase(elationKind)
+                || "ELATION_SKILL".equalsIgnoreCase(elationKind))) {
+            int elationHits = (int) Math.round(params.getFirst());
+            double perHit = params.size() > 1 ? params.get(1) : params.getFirst();
+            double perHitBase = user.getAttribute(baseAttribute).get() * perHit;
+            // H-3's rule, applied here too: the row's stance value is the WHOLE skill's toughness reduction, so it is spread
+            // evenly over the instances this row settles (the hits plus the one final split instance).
+            double elationStance = data.stanceFor(true) / Math.max(1, elationHits + 1);
+            for (int i = 0; i < elationHits; i++) {
+                // 「对敌方随机单体」: re-drawn every hit, so a target that dies mid-way is simply not drawn again.
+                CanHit victim = battle.randomOpponent(user);
+                if (victim == null) {
+                    break;
+                }
+                totalDamage += hit(battle, data, user, element, perHitBase, victim, hitTargets, elationStance,
+                        skill.getSkillSlot());
+            }
+            if (params.size() > 2) {
+                List<CanHit> everyone = battle.targetableEnemies();
+                if (!everyone.isEmpty()) {
+                    double share = user.getAttribute(baseAttribute).get() * params.get(2) / everyone.size();
+                    for (CanHit victim : everyone) {
+                        totalDamage += hit(battle, data, user, element, share, victim, hitTargets, elationStance,
+                                skill.getSkillSlot());
+                    }
+                }
+            }
+            return;
+        }
+
         switch (effect) {
             case SINGLE_ATTACK, MAZE_ATTACK ->
                     totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets,
