@@ -974,6 +974,16 @@ public class TriggerTable {
             Pattern.compile("(?<![\\w])is_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The {@code is_summon} keyword: "&lt;who&gt; is a memosprite" -- the fourth predicate (2026-10-02).
+     *
+     * <p>\u26a0 Why it was needed: 「对万敌施放时\u2026」 is 1415's memosprite skill 8, and the only spelling that names a SKILL is
+     * {@code from_skill_id}, which carries the SLOT -- so on its own it also matches any other unit's slot-16 skill aimed at the same
+     * target, enemies included. A condition about the CASTER's nature is what makes the trigger exact.
+     */
+    private static final Pattern IS_SUMMON =
+            Pattern.compile("(?<![\\w])is_summon(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
      * The {@code is_other_ally} keyword (2026-09-28): "<b>that unit is on our side and is not me</b>".
      *
      * <p>⚠ Why it exists: the corpus says 「卡芙卡的**队友**对敌方目标施放普攻后…」 in 16 files, and neither existing spelling fits —
@@ -1326,6 +1336,19 @@ public class TriggerTable {
                                 + "(source: " + spec.getSource() + ")");
             }
             return new IsAlly(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw, spec);
+        }
+
+        Matcher isSummon = IS_SUMMON.matcher(text);
+        if (isSummon.find()) {
+            String subject = normalize(text.substring(0, isSummon.start()));
+            String trailing = text.substring(isSummon.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"is_summon\": it takes no argument "
+                                + "(write \"actor is_summon\", or \"!actor is_summon\" for the opposite) "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new IsSummon(requireStateSubject(subject, raw, spec), raw, spec);
         }
 
         // `has_path`: "<who> has_path 同谐" — the same shape, and for the same reason checked here first.
@@ -2469,6 +2492,34 @@ public class TriggerTable {
                 return false;
             }
             return ctx.battle().allies.contains(who);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /** {@code <who> is_summon}: the subject is a memosprite, whatever its slot or its side in the party. */
+    private static final class IsSummon implements Condition {
+
+        private final String subject;
+        private final String raw;
+
+        IsSummon(String subject, String raw, TriggerSpec spec) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+            return who instanceof com.laosun.aluminium.models.Summon;
         }
 
         @Override

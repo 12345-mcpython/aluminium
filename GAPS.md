@@ -36056,3 +36056,32 @@
 >     ⭐ 所以没有两处判断打架 ✓；⭐ 但若将来有单位的**速度被改成 0** ✓，⭐ `Signal.refresh()` 那条路径会怎样**尚未量** ✓。
 >   ⭐ ② ⭐ 这只是"能进战斗" ✓ —— ⭐ ① **整句**仍未写 ✓（⭐ 本轮只解前置 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2254** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 6 轮：🎉🎉🎉 **第 85 件出货 ＝ ① 的第一个分支（血仇 ⇒ 不消耗充能的【弑神登神】）** ✓✓）**）**：
+>
+> * ✅ **出货内容** ✓：⭐ `1404` 表上新规则 ⭐ `memosprite_ode_commands_the_godslayer_in_bloodfeud` ✓ ——
+>   ⭐ `on: CAST_SETUP` ✓、⭐ `when: [self has_state 血仇, target == self, actor is_summon, from_skill_id == 16]` ✓、
+>   ⭐ `do: [REPLACE_SKILL{skill: SKILL, skill_id: 11, turns: 1}, CAST_SKILL{skill: SKILL}]` ✓
+>   —— ⭐ 形状照抄他**自己**那条 `bloodfeud_godslayer_at_a_hundred_and_fifty` ✓，⭐ **去掉** `SPEND_RESOURCE{天赋充能, 150}` ✓（⭐ 那就是「**不消耗充能**」四个字 ✓）。
+> * ✅ **引擎两处（都是加法 ✓）**：
+>   ⭐ ① ⭐ 新谓词 **`is_summon`** ✓（⭐ 三处：关键字 `IS_SUMMON` ✓、解析点 ✓、条件类 `IsSummon` ✓）；
+>   ⭐ ② ⭐ **`CAST_SETUP` 现在带上技能槽位** ✓（⭐ `SkillExecutor` 的 `fireTriggers(CAST_SETUP, …, skill.getSkillSlot())` ✓）。
+> * ✅ **判据（两个用例 ✓）**：⭐ `OdeToStrifeBloodfeudTest` ⇒ ⭐ `his SKILL slot 2 -> 11` ✓（⭐ 处于【血仇】 ✓）
+>   ＋ ⭐ `outside bloodfeud his SKILL slot 2 -> 2` ✓（⭐ 不在时**不动** ✓，⭐ 即「若…处于…」的另一半 ✓）。
+> * ✅ **实测变异** ✓：⭐ 撤掉引擎那一行（⭐ 即 `CAST_SETUP` 不再带槽位 ✓）⇒ ⭐ 正例失败 ⇒ 红 ✓。
+> * ⭐⭐⭐ **为什么 `SKILL_CAST` 写不出来（实测 ✓）**：⭐ `SkillExecutor` 的 switch ⭐ **只对 `BPSKILL` 发 `SKILL_CAST`** ✗
+>   （⭐ `ULTRA→ULT_CAST` ✓、⭐ `NORMAL→BASIC_ATTACK` ✓、⭐ `default -> { /* not an in-battle cast */ }` ✓）
+>   ⇒ ⭐ 而 ⭐ 忆灵技的类别是 ⭐ **BUFF** ✗（⭐ `SkillEffect: Support` ✓）⇒ ⭐ **它一个都不发** ✗。
+> * ⭐⭐⭐ **为什么 `CAST_SETUP` 一开始也不行**：⭐ 它**没带技能槽位** ✗ ⇒ ⭐ `from_skill_id` **读到 0** ✓ ——
+>   ⭐⭐ 而它的注释恰恰写着 ⭐ *"`CAST_SETUP` … so it **has to know the slot**"* ✓ ⇒ ⭐ **注释承诺了、代码没兑现** ✗ ⇒ ⭐ 本轮补上 ✓。
+> * ⭐⭐ **判别方法（本轮最值钱的一招 ✓，记下来 ✓）**：⭐ **逐条把条件加回** ✓ ⇒ ⭐
+>   ⭐ D（`self has_state 血仇` ＋ `target == self`）⇒ **触发** ✓；
+>   ⭐ E（＋ `actor is_summon`）⇒ **也触发** ✓ ⇒ ⭐ **新谓词是对的** ✓；
+>   ⭐ F（＋ `from_skill_id == 16`）⇒ **不触发** ✗；
+>   ⭐ H（把 `16` 换成 `0`）⇒ **触发** ✓ ⇒ ⭐ 定位到"该事件读到 0" ✓ ⇒ ⭐ 引擎补槽位 ⇒ 绿 ✓。
+> * ⚠ **我自己的两个错（记 ✓）**：
+>   ⭐ ① ⭐ 中途一次 `git checkout` 把**规则本身**也撤了 ✗ ⇒ ⭐ 紧接着那两跑是**空跑** ✓（⭐ 我认出来并重做了 ✓）；
+>   ⭐ ② ⭐ 第一个变异**选错** ✗：⭐ "去掉 `from_skill_id`" 在本场景里不影响结果 ✓（⭐ 因为场上只有忆灵在施放 ✓）
+>     ⇒ ⭐ 变异不判别 ✗ ⇒ ⭐ 换成**引擎级**变异（⭐ 撤掉槽位那一行 ✓）才打红 ✓。
+> * ⭐ **① 还剩四个分支** ✓：⭐ 控制类负面状态解除 ✓、⭐ 本次攻击暴击伤害 `#1%`（⭐ 满级 2 ＝ +200% ✓）、⭐ 新入场目标重定向 ✓、⭐ 行动提前 `#2%`（⭐ `#2` 恒为 1 ＝ 100% ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2256** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
