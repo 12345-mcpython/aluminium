@@ -216,7 +216,12 @@ public final class TriggerTables {
                                 "the object form needs a \"rules\" array; only a bare array may omit it "
                                         + "(a character with nothing but rules uses the array form)");
                     }
-                    specs = GSON.fromJson(rules, SPEC_LIST);
+                    // ⭐ The same guard, one level deeper (2026-10-02). The comment on the resource check describes this exact trap --
+        // "Gson drops a key it does not know" -- but only the resource declaration was walked, and an effect writing
+        // `maxStacks` (the Java name) was accepted here and then dropped, leaving a stackable state with a cap of 1. The allowed
+        // set comes from `EffectSpec`'s own `@SerializedName` annotations, so it cannot drift from what Gson maps.
+        requireKnownEffectKeys(rules);
+        specs = GSON.fromJson(rules, SPEC_LIST);
                     JsonElement declared = object.get("resources");
                     if (declared != null && !declared.isJsonNull()) {
                         // Checked on the raw JSON, before Gson sees it: Gson drops a key it does not know, so
@@ -278,6 +283,49 @@ public final class TriggerTables {
      * <p>{@code value} is either one object (the file) or an array of them (the resource declarations); an
      * array may be empty, and anything else is not a shape this file understands.
      */
+    /**
+     * ⭐ The keys {@link EffectSpec} actually maps, read from its own annotations (2026-10-02).
+     *
+     * <p>Reflection rather than a hand-kept list: the failure this guards is exactly a key the loader "knows" and Gson does
+     * not, so the two must be the same source of truth.
+     */
+    private static final Set<String> EFFECT_KEYS = effectKeys();
+
+    private static Set<String> effectKeys() {
+        Set<String> keys = new java.util.HashSet<>();
+        for (java.lang.reflect.Field field : com.laosun.aluminium.beans.EffectSpec.class.getDeclaredFields()) {
+            com.google.gson.annotations.SerializedName name =
+                    field.getAnnotation(com.google.gson.annotations.SerializedName.class);
+            // ⭐ Gson's own rule (2026-10-02): an annotated field is keyed by the annotation, a plain one by the field's
+            // name. Collecting only the annotated ones rejected `amountFromEvent` and `amountFromAttr` -- keys the shipped
+            // files use and Gson maps -- which the suite showed at once.
+            keys.add(name != null ? name.value() : field.getName());
+        }
+        // `when`/`on`/`id` style keys never appear on an effect, and an empty set would reject every file: a reflection
+        // result that came back empty is a broken build, not a validation result.
+        if (keys.isEmpty()) {
+            throw new IllegalStateException(
+                    "no @SerializedName fields were found on EffectSpec, so the effect keys cannot be checked");
+        }
+        return Set.copyOf(keys);
+    }
+
+    /** Walks every rule's {@code do} array and refuses a key Gson would silently drop. */
+    private static void requireKnownEffectKeys(JsonElement rules) {
+        if (rules == null || !rules.isJsonArray()) {
+            return;
+        }
+        for (JsonElement rule : rules.getAsJsonArray()) {
+            if (!rule.isJsonObject()) {
+                continue;
+            }
+            JsonElement effects = rule.getAsJsonObject().get("do");
+            if (effects != null && effects.isJsonArray()) {
+                requireKnownKeys(effects, EFFECT_KEYS, "effect");
+            }
+        }
+    }
+
     private static void requireKnownKeys(JsonElement value, Set<String> known, String what) {
         if (value.isJsonArray()) {
             for (JsonElement element : value.getAsJsonArray()) {
