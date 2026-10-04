@@ -2172,15 +2172,27 @@ public final class TriggerInterpreter {
                 // ⭐ 「每拥有 1 层…提高 X%」 as a SUSTAINED aura (2026-10-02; reader family: fourteen documents). The share is
                 // asked for on every read, so the aura follows the count -- a snapshot would only be right at the instant it
                 // was taken, and re-attaching on every change would stack the buff itself.
-                if (!ctxFreeCounter(effect)) {
+                boolean derivedCounter = effect.getScale() != null
+                        && effect.getScale().trim().startsWith("self_stacks:");
+                if (!derivedCounter && !ctxFreeCounter(effect)) {
                     throw new IllegalStateException(
                             "per_stack_live only exists for the counter forms (self_stacks:<NAME> or a bare name), but this "
-                                    + "rule's per_stack is '" + effect.getPerStack() + "'; the per-hit count forms are read "
-                                    + "from an event context and (source: " + ctx.ruleId() + ")");
+                                    + "rule states per_stack='" + effect.getPerStack() + "' and scale='" + effect.getScale()
+                                    + "'; the per-hit count forms are read from an event context and (source: "
+                                    + ctx.ruleId() + ")");
                 }
                 if (buff instanceof com.laosun.aluminium.models.buff.StatModifierBuff liveBuff) {
-                    String counter = counterName(effect);
-                    liveBuff.makeLive(() -> magnitude * target.getBuffManager().stacksOf(counter));
+                    if (derivedCounter) {
+                        // ⭐ The derived form is ABSOLUTE: percent x layers (+ amount), read on every computation. Building it from
+                        // `magnitude` would square the count, because magnitude already contains it.
+                        String own = effect.getScale().trim().substring("self_stacks:".length()).trim();
+                        double extra = effect.getAmount() == null ? 0 : effect.getAmount();
+                        double pct = effect.getPercent() == null ? 0 : effect.getPercent();
+                        liveBuff.makeLive(() -> pct * target.getBuffManager().stacksOf(own) + extra);
+                    } else {
+                        String counter = counterName(effect);
+                        liveBuff.makeLive(() -> magnitude * target.getBuffManager().stacksOf(counter));
+                    }
                 }
             }
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {

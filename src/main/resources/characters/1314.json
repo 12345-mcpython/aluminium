@@ -34,7 +34,8 @@
         "scale": "self_stacks:当品",
         "percent": 0.024,
         "permanent": true,
-        "target": "self"
+        "target": "self",
+        "per_stack_live": true
       },
       {
         "op": "MODIFY_ATTR",
@@ -70,7 +71,8 @@
         "scale": "self_stacks:当品",
         "percent": 0.024,
         "permanent": true,
-        "target": "self"
+        "target": "self",
+        "per_stack_live": true
       },
       {
         "op": "MODIFY_ATTR",
