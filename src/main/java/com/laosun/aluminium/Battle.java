@@ -1028,6 +1028,9 @@ public class Battle {
         // limit belongs to the rule's owner -- a rule of mine that fires on somebody else's attack still
         // comes back on MY turn (TriggerLimitTest.otherPeoplesTurnsDoNotCountTheCooldownDown).
         actor.tickTriggerCooldowns();
+        // \u2b50 \u300c\u4e00\u6b21\u884c\u52a8\u4e2d\u300d begins here: the action boundary already existed (this event brackets
+        // `performAction` and its settlement), so the lethal set is cleared at it.
+        lethallyHitThisAction.clear();
         fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
         // P12 (M-49): a countdown exists to HAVE a turn -- this is the moment its reader waits for
         // (「倒计时回合开始时知更鸟退出【协奏】状态并立即行动」). The countdown has no table of its own, and our
@@ -1422,6 +1425,9 @@ public class Battle {
         boolean died;
         if (lethal) {
             target.takeDamage(settled, false);
+            if (!lethallyHitThisAction.contains(target)) {
+                lethallyHitThisAction.add(target);
+            }
             fireTriggersForAlly(TriggerEvent.LETHAL_DAMAGE, target, target, 0);
             // ⭐ 「暂时延后陷入无法战斗状态」 (1407's 月茧之庇): a state may hold the death instead of
             // committing it. ⚠ The victim really is at zero HP here -- that IS 「延后」 -- so this is not a heal: what
@@ -3007,6 +3013,21 @@ public class Battle {
         return Math.max(1, damage.toValue());
     }
 
+    /**
+     * The allies a lethal blow has landed on during the CURRENT action (2026-10-02).
+     *
+     * <p>\u2b50 Reader: 1407 \u6708\u8309\u4e4b\u5e87, \u300c\u5728**\u4e00\u6b21\u884c\u52a8**\u4e2d\u53d7\u5230\u81f4\u547d\u653b\u51fb\u7684**\u5168\u4f53**\u300d. The set is what makes that ONE clause rather
+     * than one save per blow: the same action can land a lethal blow on several allies, and the effect reaches all of them.
+     *
+     * <p>\u26a0 Cleared when an action starts ({@code TURN_START}, which brackets {@code performAction} and its settlement), so
+     * "this action" is the action boundary the engine already had -- not a new one.
+     */
+    private final List<CanHit> lethallyHitThisAction = new ArrayList<>();
+
+    /** The allies a lethal blow has landed on since this action began, in the order it happened. */
+    public List<CanHit> lethallyHitThisAction() {
+        return List.copyOf(lethallyHitThisAction);
+    }
     private void processAddRequests() {
         if (addRequestItems.isEmpty()) {
             return;

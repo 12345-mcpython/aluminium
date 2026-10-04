@@ -36259,3 +36259,29 @@
 >   ⇒ ⭐ **写判据之前先确认它要构造/调用的类型** ✓ —— ⭐ 这与本会话反复出现的"没量就写"是同一族 ✓。
 > * ⭐ **④ 的四件（按量到的事实重排 ✓）**：⭐ ① 行动边界 ✅**已有**；⭐ ② 本次行动内的致死集合 ⭐ **本轮已写出、待判**；⭐ ③ 读它的选择器 ⭐ **同上**；⭐ ④ 1407 的内容文件 ＋ 原句 ⬜（⭐ `warehouse/1407.json` 尚不存在 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2259** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
+
+> **2026-10-02 更新（新目标第 15 轮：🎉🎉🎉 **第 88 件出货 ＝ ④「在一次行动中受到致命攻击的全体」** ✓✓ —— ⭐ 一个集合 ＋ 一个选择器 ✓）**）**：
+>
+> * ✅ **出货内容（引擎两处 ✓）**：
+>   ⭐ ① ⭐ `Battle.lethallyHitThisAction` ✓ —— ⭐ 在**唯一的**致死点（`fireTriggersForAlly(LETHAL_DAMAGE, …)` ✓）记录受害者 ✓，
+>     并 ⭐ 在**行动边界**（`TURN_START` ✓）清空 ✓；
+>   ⭐ ② ⭐ 选择器 ⭐ **`all_allies_lethally_hit_this_action`** ✓ —— ⭐ 注册进 `TARGET_SELECTORS` ✓ ＋ ⭐ 在 `resolveTargetsUnfiltered` 里解析 ✓。
+> * ✅ **判据（三段读数 ✓，⭐ 每一段都对着原句的一个字 ✓）**：⭐ `LethalSetTest` ⇒
+>   ⭐ 第一击：⭐ `first +100.0 second +0.0 third +0.0` ✓（⭐ 中招者在集合里、⭐ 未中招的不在 ✓）；
+>   ⭐ 同一行动的第二次：⭐ `first +100.0 second +100.0` ✓（⭐ 第二个受害者加入 ✓、⭐ 而 ⭐ 第一个**仍被效果触及** ✓ ＝ ⭐「**全体**」✓）；
+>   ⭐ **跨过行动边界**后：⭐ `second +0.0 third +100.0` ✓（⭐ 上一行动的不再算 ✓ ＝ ⭐「在**一次行动**中」✓）。
+> * ✅ **实测变异** ✓：⭐ 删掉引擎里那一行记录 ⇒ ⭐ 断言红 ✓。
+> * ⭐⭐⭐ **三条机制事实（本轮量到 ✓）**：
+>   ⭐ ① ⭐ **1407 的前半段早就实现了** ✓ —— ⭐ `BuffManager.defersDeath()` ✓ 查 `DeferredDeathBuff` ✓，⭐ 而 `Battle:1425` 的注释**点名**写着
+>     ⭐ *"「暂时延后陷入无法战斗状态」(1407 的 月茧之庇)：a state may hold the death instead of committing it"* ✓；
+>   ⭐ ② ⭐ **行动边界本来就有** ✓ —— ⭐ `TURN_START`（1031）与 `TURN_END`（1301）**夹住**了 ⭐ `performAction`（1245）与 ⭐ `afterMove`（1276）✓
+>     ⇒ ⭐ 登记里的"五位一体"**过重** ✗（⭐ 已改正 ✓）；
+>   ⭐ ③ ⭐ **多目标选择器走的是 `resolveTargetsUnfiltered`** ✓ —— ⭐ 那个 `switch` 只管**单目标**（`next_ally`／`party_first`／`random_ally_below_half_energy` ✓），
+>     ⭐ 所以分支放对了地方 ✓。
+> * ⭐⭐ **判据里建表的现成工厂（记 ✓，今后沿用 ✓）**：⭐ `TriggerSpecs` ✓（⭐ 位于**测试包** `com.laosun.aluminium.test` ✓，⭐ 所以**不需要 import** ✓）
+>   ⭐ 提供 ⭐ `set(EffectSpec, key, value)` ✓ 与 ⭐ `rule(on, List<String> when, EffectSpec… effects)` ✓。
+>   ⚠ ⭐ `EffectSpec.amount` 是 **`Double`** ✗（⭐ 传 `100` 会报 `Can not set … Double field … to Integer` ✓）。
+> * ⚠ **两条我自己的失误（记 ✓）**：⭐ 选择器名字出现的**第二处**是个 `switch` 分支 ✗ ⇒ ⭐ 脚本守闸**正确拒绝**了歧义锚点 ✓（⭐ 我改用唯一锚点 ✓）；
+>   ⭐ 以及 ⭐ 包名与 `Double` 两处猜错 ✗ ⇒ ⭐ **写判据前先确认它要调用的类型的包与类型** ✓。
+> * ⭐ **④ 的四件现状**：⭐ 行动边界 ✅已有；⭐ 致死集合 ✅**本轮出货**；⭐ 选择器 ✅**本轮出货**；⭐ `warehouse/1407.json` ＋ 原句 ⬜（⭐ 下一步 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2260** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
