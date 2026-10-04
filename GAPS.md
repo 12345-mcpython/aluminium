@@ -35956,3 +35956,27 @@
 > * ✅ **判据** ✓：⭐ `MemospriteSkillTest` 现在三条 ✓ —— ① 德谬歌槽位 16 可交付 ✓；② 七个忆灵各自的技能数与声明行数相等、且 cid 等于 `servant_id` ✓；
 >   ⭐ ③ **凡 `isDamaging()` 为真的忆灵技，`canDeliver` 必为真** ✓（⭐ 13 个 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2251** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 1 轮：`1415` 忆灵技能 8 那句话 —— ⭐ **本轮拿到五条真实读数，但没出货** ✗ ⇒ 按 ⑤ 已回滚 ✓）**）**：
+>
+> * ✅ **读完的四件事（都有出处 ✓）**：
+>   ⭐ ① ⭐ **`from_skill_id` 读的是"槽位"，不是数据行 id** ✓ —— ⭐ `SkillExecutor:190` 在 `SKILL_CAST` 上传的是 `skill.getSkillSlot()` ✓，
+>     而 ⭐ `1111.json` 那条的注释明写 ⭐ *"先前传的是**数据行 id** 111108，而装载器索引的是槽位"* ✓（⭐ 与我一贯踩的"编号陷阱"同族 ✓）。
+>     ⇒ ⭐ 所以我们的忆灵技 16 要写 ⭐ `from_skill_id == 16` ✓。
+>   ⭐ ② ⭐ **但单靠它会误触发** ✗ —— ⭐ 任何**其他单位**（⭐ 包括敌人 ✓）用 16 号技能打中同一目标都会命中 ✓
+>     ⇒ ⭐ 需要一条"**施放者是忆灵**"的条件 ✗，⭐ 而引擎**没有** ✗（⭐ `summon` 只是**目标选择器** ✓）。
+>   ⭐ ③ ⭐ **触发点的正确安放处** ＝ ⭐ **万敌自己的表** ＋ `target == self` ✓ —— ⭐ 这条拼法已出货 **20 条** ✓，
+>     ⭐ 同形的样板是 ⭐ 1408 的 `talent_coreflame_on_being_targeted` ✓（"有人把技能对准我" ✓）。
+>   ⭐ ④ ⭐ **效果侧的模板** ＝ ⭐ 1404 自己那条 `bloodfeud_godslayer_at_a_hundred_and_fifty` ✓：
+>     ⭐ `REPLACE_SKILL{skill: SKILL, skill_id: 11, turns: 1}` ＋ ⭐ `CAST_SKILL{skill: SKILL, target: self}` ✓；
+>     ⭐ 而「**不消耗充能**」的差别正是那条多出的 ⭐ `SPEND_RESOURCE{天赋充能, 150}` ✓ ⇒ ⭐ 照抄、**去掉那一句** ✓。
+> * ⭐⭐ **本轮实际写下的东西**：⭐ 一个**新谓词 `is_summon`** ✓（⭐ 照 `is_ally` 的形状，⭐ 三处：关键字 `IS_SUMMON` ✓、解析点 ✓、条件类 `IsSummon` ✓，
+>   ⭐ `who instanceof Summon` ✓）⭐ **编译通过** ✓；⭐ 以及那条内容规则 ＋ 判据 ✓。
+> * ⛔ **为什么又回滚了** ✗：
+>   ⚠ (a) ⭐ 判据**卡在场景**：⭐ `CharacterFactory.create(1404, 80, false, null, null, 0)` ⇒ ⭐ `"Speed must be greater than 0"` ✗
+>     ⇒ ⭐ 我自己搭的场景不行 ✗ —— ⭐ **又是"没有先抄已出货判据"** ✗（⭐ 本会话第 N 次 ✓ ⇒ 已列入下一轮第一步 ✓）。
+>   ⚠ (b) ⭐ 从 `1404.json` 里正则找 `self has_state <X>` 会 **匹配到两个**名字 ✗ ⇒ ⭐ 我脚本里的守闸**正确拒绝**了 ✓（⭐ 名字要按用法定，不能猜 ✓）。
+> * ⭐⭐ **下一轮的第一步（已具名 ✓）**：⭐ **照抄已出货的 1404 判据的场景** —— ⭐ `src/test/java/com/laosun/aluminium/test/` 下的
+>   ⭐ **`BloodfeudTest.java`** 与 ⭐ **`CastSkillTest.java`** ✓（⭐ 后者正是 `CAST_SKILL` 的场景 ✓），
+>   然后 ⭐ 重落 `is_summon` ＋ 内容 ＋ 判据 ＋ 变异 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
