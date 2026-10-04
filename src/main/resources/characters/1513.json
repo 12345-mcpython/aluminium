@@ -12,6 +12,13 @@
       "initial": 0,
       "scope": "PARTY",
       "note": "⭐ 2026-10-02：**阿哈时刻的待演计数** ✓ —— 文档：「阿哈时刻**持续至本次最后一个欢榆技施放结束**」✓ ⇒ 每开始一个欢榆技 +1 ✓、每结束一个 -1 ✓，归零时**摘掉「阿哈时刻」状态** ✓ ⇒ 引擎自己就会发 `STATE_ENDED` ✓。"
+    },
+    {
+      "id": "笑点",
+      "max": 2147483647,
+      "initial": 0,
+      "scope": "PARTY",
+      "source": "1513 砂金•戏浪 天赋／战技／终结技：「获得 1／4／6 个笑点」。⚠ 与 `1502`／`1505` 共用同名的**队伍级**计数 ✓（数据里没有上限 ⇒ 同 `1502` 的写法用 `Integer.MAX_VALUE` ✓）"
     }
   ],
   "rules": [
@@ -26,6 +33,11 @@
           "op": "GAIN_RESOURCE",
           "resource": "热意",
           "amount": 1
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "笑点",
+          "amount": 1
         }
       ],
       "source": "1513 砂金•戏浪 天赋 抛注，听深渊回响 (151304, Enhance): 「砂金•戏浪的【好活当赏】的持续时间增加1回合。队友施放攻击后，砂金•戏浪获得1点【热意】以及1个笑点，【热意】上限为30点。【热意】达到10点时，砂金•戏浪会立即施放1次固定计入20笑点的【举杯！敬炽烈一夏】…」",
@@ -38,6 +50,11 @@
         "actor == self"
       ],
       "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "笑点",
+          "amount": 4
+        },
         {
           "op": "GAIN_RESOURCE",
           "resource": "热意",
@@ -54,6 +71,11 @@
         "actor == self"
       ],
       "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "笑点",
+          "amount": 6
+        },
         {
           "op": "GAIN_RESOURCE",
           "resource": "热意",

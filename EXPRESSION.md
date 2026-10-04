@@ -38,6 +38,7 @@
 | 插入的施放结束 | `INSERTED_CAST_END` | `src/main/resources/characters/1412.json` | `CoupDeMainTest` |
 | 定时弱点（会过期） | `ADD_ELEMENTAL_WEAKNESS` ＋ `turns` | `src/main/resources/characters/1310.json` | `TimedWeaknessTest` |
 | 事件词汇表本身 | `TriggerEvent`（未接的事件在装载期就报错） | `src/main/java/com/laosun/aluminium/enums/TriggerEvent.java` | `TriggerEventWiringTest` |
+| 「获得 N 个**笑点**」（队伍级、无上限的共享计数） | 无上限资源的**既有拼法**：`max: 2147483647` ＋ `scope: "PARTY"`（⚠ 共享 ⇒ 任何在队角色都可加） | `src/main/resources/characters/1513.json` | `Character1513LaughterTest` |
 
 ## §3 登记中的句族（三列都必须写清）
 
@@ -52,5 +53,4 @@
 | 「自动施放【弑神登神】」 | 数据 id 11 对应的技能槽（`SkillType` 没有它） | `1408`（1 位） | 槽位映射 |
 | 「按数量／计数**缩放属性**」（面板跟随活值） | 一个"**读到即计算**"的修饰器：修饰器写下的是**当时的值**，而句子的数值随场上数量**实时变化**（`BATTLE_START` 会冻结，每回合刷新只是**回合级近似**） | `23000`（1 位，逐条读到；同族句子在语料里另有约 6 份含「每有 1 个」的文档，⚠ **未逐条读 ⇒ 不计入门槛**） | 一个活的（读时求值的）修饰器 |
 | 「施放瞬间作用域」 | 一个"只在本次施放内有效"的作用域 | `20001`／`23004`（2 位） | 实例级作用域 |
-| 「欢愉度」**量表**本身 | `AttributeType` 里**只有** `ELATION_DAMAGE_BOOST`（欢愉**伤害加成** ✓），没有"欢愉度"这个**量表值**本身（`1502`／`1513` 要读的正是它） | `1502`／`1513`（2 位） | 一个量表型属性 ＋ 它的读写点 |
 | 角色技能「按列位／段数结算」 | 引擎**已有"段"的概念** ✓（`EnemySkillData.hits` 与 `MemospriteSpec.hits` 都写作 segments ✓），缺的是**角色技能**按段位分次结算那一半 | `1505`／`8009`／`8010`／`1502`／`1506`（5 位） | 角色技能行的段位数据与结算 |
