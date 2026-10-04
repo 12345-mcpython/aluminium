@@ -278,6 +278,10 @@ public final class SkillExecutor {
             logNotDispatched(skill, user, effect, targets);
             return;
         }
+        if ("Rules".equals(spec.getEffect())) {
+            // ⭐ The cast happens (its events fire, so the rule table does its work) and delivers nothing by itself.
+            return;
+        }
         for (CanHit target : targets) {
             double amount = effectAmount(skill, spec, user, target);
             if ("Restore".equals(spec.getEffect())) {
@@ -554,9 +558,13 @@ public final class SkillExecutor {
      */
     static SkillEffectSpec deliverableSpec(Skill skill) {
         SkillEffectSpec spec = SkillEffects.forSkill(skill);
+        // ⭐ A third shape (2026-10-02): 「奇袭」 commands a copy of 1412's SKILL, which is a BUFF -- its work is done by the
+        // rule table (`skill_grants_military_merit` on SKILL_CAST), so there is no amount to restore or shield. `Rules` says
+        // exactly that, and it has no parameter row to be ambiguous about.
         boolean supported = spec != null
-                && ("Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect()))
-                && !isAmbiguous(spec);
+                && ("Restore".equals(spec.getEffect()) || "Defence".equals(spec.getEffect())
+                || "Rules".equals(spec.getEffect()))
+                && ("Rules".equals(spec.getEffect()) || !isAmbiguous(spec));
         return supported ? spec : null;
     }
 
