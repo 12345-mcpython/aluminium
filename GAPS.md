@@ -35204,3 +35204,23 @@
 >   ⭐ **先量基准，再量增量** ✓。
 > * ⛔ **回滚** ✓（`Battle`／`TriggerTable` 复原 ✓、测试删除 ✓、全量 **rc 0** ✓）；⭐ 登记不变（三件前置 ✓、读者 2 位 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2242** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（aggro 回收之整千三百八十九：⭐⭐ **地基查清了** —— 事件机制**完好** ✓；真正的卡点缩到**一处** ✓；
+> ⭐ 并量到一条**可复用的引擎事实** ✓）**）**：
+>
+> * ⭐ **读（不猜 ✓）**：⭐ `APPLY_CONTROL` **确实**走 `battle.tryApplyDebuff(...)` ✓（`TriggerInterpreter:3172` ✓），
+>   而它**正是**公告 `DEBUFF_APPLIED` 的咽喉点 ✓（`Battle:1807` ✓）；`APPLY_DOT` 同样 ✓。
+>   ⭐ 且 `applyControl` 的 `baseChance` **默认就是 1.0** ✓（L3151 ✓）⇒ ⭐ "没写概率"不是原因 ✓。
+> * ⭐⭐ **一次探针把两件事分开（关键 ✓）**：⭐ 同一个场景里，
+>   ⭐ **手抬事件**（`battle.fireTriggers(DEBUFF_APPLIED, …)` ✓，方式抄自已出货判据 `ConeEventsTest:99` ✓）
+>     ⇒ ⭐ 面板涨 **`273.42`** ✓✓ ⇒ **规则与事件机制完全正常** ✓；
+>   ⭐ 而 ⭐ **真实的 `APPLY_CONTROL` 落地后，敌人身上 `ControlBuff` 计数 = 0** ✗ ⇒ **控制根本没落地** ✓。
+>   ⇒ ⭐ 三轮的混乱收敛成一句话：⭐ **不是过滤器、不是解析、不是事件，而是"控制没落地"** ✓。
+> * ⭐⭐ **可复用的引擎事实（新 ✓）**：⭐ `BATTLE_START` **不携带 actor 也不携带 target** ✓ ——
+>   ⭐ 给它写 `actor == self` 会被装载器**响亮拒绝** ✓，原文：*"Condition 'actor == self' asks about 'actor', but BATTLE_START carries no
+>   actor and no target, so the rule could never fire."* ✓ ⇒ ⭐ 这条对**任何**新写 BATTLE_START 规则的人都省一轮 ✓。
+> * ⭐ **下一步（已具名 ✓，只剩一件）**：⭐ 量 `resolveTargets` 对 `all_enemies` 在 **`BATTLE_START`** 时是否**一个都解析不到** ✗
+>   （⭐ 若如此，那是"该事件上目标还没就位"的引擎事实 ✓；⭐ 若解析到了，则卡在 `rollDebuff` 的抗性 ✓）。
+>   ⚠ 方法上要注意：⭐ 本轮我**同一测试里两次 println，第二次没被 XML 捕获** ✗ ⇒ ⭐ 下次**一次只打印一行、或写到文件** ✓。
+> * ⛔ **回滚** ✓（探针删除 ✓、引擎**未改动** ✓、全量 **rc 0** ✓）；⭐ 登记不变（三件前置 ✓、读者 2 位 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2242** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
