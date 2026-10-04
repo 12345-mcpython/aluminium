@@ -35648,3 +35648,29 @@
 >   ⭐ ② 结果**钳到 0** ✓（⭐ 照游戏的 `Min: 0` ✓ ⇒ ⭐ 归零即结束 ✓）；⭐ ③ `1217.json` 的 E2 加 `EXTEND_BUFF{buff: 禳命, turns: -1, target: self}` ✓ ＋ 判据 ＋ 实测变异 ✓。
 > * ⭐ **顺带记下**：⭐ `ConfigAbility/Servant/Servant_CyreneServant_00_Ability.json` ✓ ＝ 忆灵的技能表 ✓（⭐ 第二件要读的就是它 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2247** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 2 轮：⛔ **有符号 `EXTEND_BUFF` 试造未通过行为验证 ⇒ 回滚** ✓ ——
+> ⭐ 但**已确认的部分**与**未隔离的原因**都记下了 ✓）**）**：
+>
+> * ✅ **已确认可用的部分（本轮实测 ✓，回滚后可原样重落 ✓）**：
+>   ⭐ ① ⭐ 机制原文：⭐ `Avatar_Huohuo_00_Rank02_Insert` 对具名 modifier `MAvatar_Huohuo_Passive_HealMark` 做
+>     ⭐ `SetModifierValue{ModifyFunction: "Add", ValueType: "LifeTime"}`（＋ 同族的 `SetDynamicValueByAddValue{AddValue: -1, Min: 0}` ✓）
+>     ⇒ ⭐ **"减时长"＝对具名状态的寿命做带符号 Add** ✓。
+>   ⭐ ② ⭐ 三处引擎改动**编译通过** ✓：⭐ `BuffManager.extendBuffsFrom` 与 `extendAllBuffs` 的 `turns <= 0` → `turns == 0` ✓；
+>     ⭐ `AbstractBuff.extendDuration` 改成 ⭐ `remainingDuration = Math.max(0, remainingDuration + turns)` ✓（⭐ 照游戏的 `Min: 0` ✓）。
+>   ⭐ ③ ⭐ 移除判据**已量清** ✓：⭐ `BuffManager.tickBuff` 在 ⭐ `buff.duration() <= 0` 时移除 ✓，⭐ 且**先**公告 `STATE_ENDED` ✓。
+>   ⭐ ④ ⭐ `EXTEND_BUFF` 的校验是 ⭐ `requirePositiveTurns` ✓（⭐ 它在 `case "EXTEND_BUFF"` 里被调用 ✓）⇒ ⭐ 需换成**有符号**版本 ✓；
+>     ⭐ 改后 ⭐ **装载器接受 `turns: -1`** ✓（⭐ 实测：不再报 "has to last at least one of the victim's turns" ✓）。
+> * ⛔ **未通过的部分**：⭐ 内容侧（`1217.json` 的 E2 加 `EXTEND_BUFF{buff: 禳命, turns: -1, target: self}` ✓）**行为没跑通** ✗ ——
+>   ⭐ 判据读数 ⭐ `duration after the E2 save = 2` ✗（⭐ 应为 1 ✓）⇒ ⭐ **该效果根本没执行** ✗，⭐ 不是钳制或跳数的问题 ✓。
+> * ⭐⭐ **原因尚未隔离（三个候选，下轮逐个排 ✓）**：
+>   ⭐ (i) ⭐ `CharacterFactory.create(cid, level, promoted, weapon, relic, N)` 的**第 6 参是不是星魂等级** ✗
+>     —— ⭐ 我把它从 `0` 改成 `2` 后读数**没变** ✓ ⇒ ⭐ 要么它不是星魂 ✗、要么 E2 规则**没有** `min_eidolon` 门 ✗；
+>   ⭐ (ii) ⭐ `when` 里的 ⭐ `self_stacks:救主计数 < 2` ✗ —— ⭐ 若该计数器**尚不存在**时这个条件怎么判 ✗（⭐ 可能为假 ⇒ 整条不触发 ✓）；
+>   ⭐ (iii) ⭐ **手抬的 `LETHAL_DAMAGE` 是否真到达她的表** ✗ —— ⭐ 引擎里它由 `fireTriggersForAlly(...)` 发出 ✓，
+>     ⭐ 而公用的 `fireTriggers(event, actor, target, …)` 可能带**阵营过滤** ✗（⭐ 与我此前那条"手抬事件不携带族"同族 ✓）。
+>   ⭐ **下一步（很小 ✓）**：⭐ 先打印 ⭐ 该规则**是否 fired** ✓（⭐ 或把 `when` 逐条拆开测 ✓），⭐ 再决定是判据的搭法错还是引擎缺东西 ✓。
+> * ⭐⭐ **新纪律（本轮用代价换来 ✓）**：⭐ **多行锚点在 CRLF 文件上会失配** ✗ ——
+>   ⭐ `TriggerInterpreter.java` 的工作副本是 CRLF ✓，⭐ 而我在 here-string 里写的锚点是 LF ✓ ⇒ ⭐ 匹配数 0 ✗（⭐ 单行锚点一直好使 ✓）。
+>   ⭐ 处置：⭐ **改文件前把文本规范化为 LF**（`Replace("\r\n", "\n")` ✓）⭐ 或只用**单行**锚点 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2247** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
