@@ -45,8 +45,7 @@
 | **「【血仇】状态期间充能达到 **150** 点时，立即获得 1 个额外回合并自动施放【弑神登神】」** | `SPEND_RESOURCE{150}` ＋ `EXTRA_TURN` ＋ **`REPLACE_SKILL{skill: SKILL, skill_id: 11, turns: 1}`** ＋ `CAST_SKILL{skill: SKILL, target: self}` | `src/main/resources/characters/1404.json` | `MydeiBloodfeudSkillsTest` |
 | **「**未**处于【X】状态时…」**（否定一个状态条件） | **`!self has_state X`**（`!` 前缀 ✓，只允许否定 `PartyCondition` ✓，而 `has_state` 读的就是单位的增益 ✓） | `src/main/resources/characters/1404.json` | `MydeiBloodfeudSkillsTest` |
 | **「施加的是**控制类**／**持续伤害类**负面状态」** | **`debuff_class:control`**／**`debuff_class:dot`**（刚落地的负面状态的**族** ✓；事实在咽喉点记录 ✓，而那里本来就读它算抗性 ✓） | `src/main/java/com/laosun/aluminium/Battle.java`、`src/main/java/com/laosun/aluminium/models/TriggerTable.java` | `DebuffClassConditionTest` |
-| **「获得该角色即生效，无需上场」的
-**装载点** | **`battle.registerWarehouseListener(character)`**（只被问、**不进队列、不被选中** ✓；为什么不能塞进 `characters`：那份名单就是队列的来源 ✓） | `src/main/java/com/laosun/aluminium/Battle.java` | `WarehouseListenerTest` |
+| **「获得该角色即生效，无需上场」的**装载点** | **`battle.registerWarehouseListener(character)`**（只被问、**不进队列、不被选中** ✓；为什么不能塞进 `characters`：那份名单就是队列的来源 ✓） | `src/main/java/com/laosun/aluminium/Battle.java` | `WarehouseListenerTest` |
 | **队友的状态结束时取一部分**（「其中的 50% 转化为自身的…」） | `STATE_ENDED` ＋ **事件携带的量**（被结束状态的**实例数**）＋ `amountFromEvent` × `amountPercent` | `src/main/resources/characters/1505.json`、`src/main/resources/characters/1513.json` | `GiftCarriesTheLaughsTest` |
 | **「变身结束时…」的三句**（白厄：全队速度 +15% ✓、获得 3 点【火种】✓、「进入战斗**或**变身结束时攻击力 +50%」） | `STATE_ENDED` ＋ `self state_ended 变身`；第三句还用 **`coexist: true`**（同一属性上的两条规则共存 ✓） | `src/main/resources/characters/1408.json`、`src/main/java/com/laosun/aluminium/models/buff/BuffManager.java` | `TransformationStatsTest` |
 | **层数＝队级计数**（「将本次…计入该状态」） | `scale: "party_resource:<NAME>"`（战斗级计数当数值读） | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java` | `PartyResourceScaleTest` |
