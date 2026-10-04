@@ -183,7 +183,24 @@ public final class TriggerTables {
     }
 
     private static TriggerTable load(int cid) {
-        String path = resourceFor(cid);
+        return load(cid, resourceFor(cid));
+    }
+
+    /**
+     * [WAREHOUSE] the global-support clauses of a character that is OWNED but need not be deployed
+     * (「获得该角色即生效，无需上场」), read from `warehouse/<cid>.json`.
+     *
+     * <p>Deliberately the same parser as `characters/`: same rule keys, same effect keys, same validation, so a warehouse clause cannot
+     * be written in a dialect of its own. EMPTY when the character has no warehouse file -- the ordinary case.
+     *
+     * <p>⚠ Not cached, unlike {@link #of(int)}: a warehouse clause is read once per battle that registers the listener, and the cache
+     * exists for the per-character table that is asked on every event.
+     */
+    public static TriggerTable warehouse(int cid) {
+        return load(cid, "/warehouse/" + cid + ".json");
+    }
+
+    private static TriggerTable load(int cid, String path) {
         if (path == null) {
             return TriggerTable.EMPTY;          // not data-ised yet -- an ordinary state
         }

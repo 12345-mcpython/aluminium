@@ -1,0 +1,24 @@
+[
+  {
+    "on": "DEBUFF_APPLIED",
+    "id": "firewall_whenever_a_control_lands",
+    "when": [
+      "debuff_class:control",
+      "target is_ally",
+      "!actor is_ally"
+    ],
+    "once_per_wave": true,
+    "do": [
+      {
+        "op": "RESIST_DEBUFF",
+        "kind": "control",
+        "percent": 1.0,
+        "turns": 1,
+        "buff": "防火墙",
+        "target": "all_allies"
+      }
+    ],
+    "source": "1506 银狼LV.999 仓库技 999安全卫士 (skillID 150604 / mapBuff 150602, 标签 辅助): 「获取「银狼LV.999」后或当前队伍存在「银狼LV.999」时获得效果：战斗中，若敌方目标对我方施加了控制类负面状态，则使我方全体获得【防火墙】，持续1回合。【防火墙】状态下，我方目标免疫敌方目标施加的控制类负面状态。该效果每个波次最多触发1次。」生效范围：获得该角色后，或该角色在队伍中时。",
+    "note": "四段各一句，逐段有词：①「敌方目标对我方施加了控制类负面状态」⇒ `DEBUFF_APPLIED` + `debuff_class:control` + `target is_ally` + `!actor is_ally`（⚠ 取反只对 PartyCondition 合法，`is_ally` 正是）；②「使我方全体获得【防火墙】，持续 1 回合」⇒ `RESIST_DEBUFF` 把抗性做成**载体身上的 buff**（`ClassResistBuff`），名字由 `buff` 给；③「免疫敌方目标施加的控制类负面状态」⇒ `percent: 1.0` —— 引擎自己的注释写着「⚠ `percent: 1` **就是免疫**，这是刻意的：『免疫控制类负面状态』与『抵抗…提高35%』是同一机制的两个强度」；④「每个波次最多触发 1 次」⇒ `once_per_wave: true`（2026-10-02 出货）。⚠ 时序是文档的形状：先落地的那个控制**仍然生效**，【防火墙】免疫的是**其后**的控制。"
+  }
+]
