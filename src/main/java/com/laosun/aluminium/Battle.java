@@ -484,6 +484,28 @@ public class Battle {
     private String lastChangedResource;
 
     /**
+     * ⭐ Units that are OWNED but NOT DEPLOYED, whose rules are asked without them ever acting (2026-10-02).
+     *
+     * <p>Two documents start 「获得该角色即生效，无需上场」 (1407's 月茇之庇, 1506's 999安全卫士), and the data files them under
+     * {@code AvatarGlobalBuffConfig} as global support skills. ⚠ Their tables cannot ride in `characters`: that list is the
+     * roster the QUEUE is built from (L520), so a listener put there would take turns of its own. They are asked by a second
+     * loop instead, and because they are in neither `allies` nor the queue they are never targeted and never act.
+     */
+    private final java.util.List<Character> warehouseListeners = new java.util.ArrayList<>();
+
+    /**
+     * Registers a unit whose rules are asked although it is not on the field (see {@link #warehouseListeners}).
+     *
+     * <p>⚠ The caller sets the table: this is deliberately about WHOSE rules are heard, not about which rules exist, so a listener
+     * can carry exactly the global support clauses instead of its whole battle kit.
+     */
+    public void registerWarehouseListener(Character listener) {
+        if (listener != null) {
+            warehouseListeners.add(listener);
+        }
+    }
+
+    /**
      * ⭐ The CLASS of the debuff that just landed (2026-10-02; reader: 1506's 「敌方对我方施加了**控制类**
      * 负面状态」). Same shape as {@link #lastChangedResource}: a battle-level fact the condition DSL reads, set at the one chokepoint
      * every landed debuff passes through. ⚠ Deliberately NOT folded into an existing argument slot -- the STATE_ENDED magnitude was once
@@ -2428,6 +2450,22 @@ public class Battle {
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
                         new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
+                                fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount)
+                                .withAttackHitTargets(attackHitTargets));
+            }
+            // ⭐ 获得该角色即生效，无需上场 (2026-10-02). ⚠ A SECOND pass, not extra entries in `characters`: that list is what
+            // the queue is built from, so a listener in it would act. ⚠ The owner handed to the context is the listener itself,
+            // which is what makes 「self」 mean “the character who owns this warehouse clause” rather than whoever is fighting.
+            for (Character listener : warehouseListeners) {
+                if (listener == null || listener.isDeath()) {
+                    continue;
+                }
+                TriggerTable table = listener.getTriggerTable();
+                if (table == null || table.isEmpty()) {
+                    continue;
+                }
+                fired += TriggerInterpreter.fire(this, table, event,
+                        new TriggerTable.TriggerContext(listener, actor, target, hitCount, amount, damage, this,
                                 fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount)
                                 .withAttackHitTargets(attackHitTargets));
             }

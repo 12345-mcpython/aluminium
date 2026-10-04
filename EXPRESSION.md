@@ -45,6 +45,8 @@
 | **「【血仇】状态期间充能达到 **150** 点时，立即获得 1 个额外回合并自动施放【弑神登神】」** | `SPEND_RESOURCE{150}` ＋ `EXTRA_TURN` ＋ **`REPLACE_SKILL{skill: SKILL, skill_id: 11, turns: 1}`** ＋ `CAST_SKILL{skill: SKILL, target: self}` | `src/main/resources/characters/1404.json` | `MydeiBloodfeudSkillsTest` |
 | **「**未**处于【X】状态时…」**（否定一个状态条件） | **`!self has_state X`**（`!` 前缀 ✓，只允许否定 `PartyCondition` ✓，而 `has_state` 读的就是单位的增益 ✓） | `src/main/resources/characters/1404.json` | `MydeiBloodfeudSkillsTest` |
 | **「施加的是**控制类**／**持续伤害类**负面状态」** | **`debuff_class:control`**／**`debuff_class:dot`**（刚落地的负面状态的**族** ✓；事实在咽喉点记录 ✓，而那里本来就读它算抗性 ✓） | `src/main/java/com/laosun/aluminium/Battle.java`、`src/main/java/com/laosun/aluminium/models/TriggerTable.java` | `DebuffClassConditionTest` |
+| **「获得该角色即生效，无需上场」的
+**装载点** | **`battle.registerWarehouseListener(character)`**（只被问、**不进队列、不被选中** ✓；为什么不能塞进 `characters`：那份名单就是队列的来源 ✓） | `src/main/java/com/laosun/aluminium/Battle.java` | `WarehouseListenerTest` |
 | **队友的状态结束时取一部分**（「其中的 50% 转化为自身的…」） | `STATE_ENDED` ＋ **事件携带的量**（被结束状态的**实例数**）＋ `amountFromEvent` × `amountPercent` | `src/main/resources/characters/1505.json`、`src/main/resources/characters/1513.json` | `GiftCarriesTheLaughsTest` |
 | **「变身结束时…」的三句**（白厄：全队速度 +15% ✓、获得 3 点【火种】✓、「进入战斗**或**变身结束时攻击力 +50%」） | `STATE_ENDED` ＋ `self state_ended 变身`；第三句还用 **`coexist: true`**（同一属性上的两条规则共存 ✓） | `src/main/resources/characters/1408.json`、`src/main/java/com/laosun/aluminium/models/buff/BuffManager.java` | `TransformationStatsTest` |
 | **层数＝队级计数**（「将本次…计入该状态」） | `scale: "party_resource:<NAME>"`（战斗级计数当数值读） | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java` | `PartyResourceScaleTest` |
@@ -62,7 +64,7 @@
 
 | 句族 | 缺什么 | 读者 | 前置 |
 |---|---|---|---|
-| 仓库技「**获得该角色即生效，无需上场**」（实测：全部角色里**只有 2 位**有 ✓） | 三件，各自都核到了具体能力 ✓：① **一个“拥有但未上场”的装载点** ✗（表是在角色**被创建**时读的 ✓ `CharacterFactory:240`）；② **1407「月茇之庇」**的「暂时**延后**陷入无法战斗状态…否则将**立即**陷入」✗（一次**延迟的倒下** ✗；❗ 触发事件 `LETHAL_DAMAGE` **已有** ✓、「每个波次最多 1 次」的 `WAVE_START` **已有** ✓）；③ **1506「999 安全卫士」**的「敌方对我方施加了**控制类**负面状态」✗（事件 `DEBUFF_APPLIED` **已有** ✓ ⇒ 缺的是**按“控制类”筛选** ✗） | `1407`（**月茇之庇** ✓）、`1506`（**999 安全卫士** ✓） **共 2 位** ✓ | ① 一个装载点 ✓；② 一次延迟的倒下 ✓；③ `DEBUFF_APPLIED` 上的**控制类**筛选 ✓ |
+| 仓库技「**获得该角色即生效，无需上场**」（实测：全部角色里**只有 2 位**有 ✓） | ⭐ **装载点已出货** ✓（本轮 ✓）；❗ 剩下两件，各自都是**一个语义** ✗：① **1407「月茇之庇」需一次延迟的倒下** ✗（「暂时延后陷入无法战斗状态…否则将立即陷入」）；② **1506「999 安全卫士」需一个每波次限额** ✗（实测：`TriggerSpec` 只有 `cooldown`／`per_turn`／`per_subject`／`once_per_battle`／`once_per_attack` ✗，**没有每波次的字段**） | `1407`（**月茇之庇** ✓）、`1506`（**999 安全卫士** ✓，其控制类筛选已出货 ✓） **共 2 位** ✓ | ① 一次延迟的倒下 ✓；② `TriggerSpec` 上一个**每波次**限额 ✓ |
 | 欢乐技「**8 次**随机单体…」的**按次数结算** | 引擎的“N 次命中”是**按技能种类**读的（如 `BOUNCE` 取**第二个**参数 ✓），而**欢乐技的行首列就是次数**这一种没有表示 ✗；⚠ 另缺：**我方 `data/` 里一个 elation 技能行都没有**（扫到 0 个 ✗） | `8009`／`8010`（**2 位**，逐条读到 ✓；⚠ 原登记写 5 位而 `1505`／`1502`／`1506` **逐条读不到** ✗ ⇒ 按本节规矩改为 2 位） | 技能行模型 ＋ 欢乐技的数据行 |
 
 | **「使万敌自动施放1次不消耗充能的【弑神登神】」**（`1415` 的忆灵技能 8 ✓） | ⭐⭐ **本轮测定：该技能根本无法被施放** ✗ —— ❗ 不是缺槽位 ✗，而是它**什么都不交付** ✗：技能 8 是「**辅助**」（非伤害 ✓），而 `skill_effects.json`（21 个 cid ✓）**里没有 1415** ✗，而 `CAST_SKILL` 的护栏**拒绝的恰恰就是**“什么都不做的被命令施放” ✓ ⇒ ⭐ **一个只触发规则、自身无交付的技能在当前模型里没有位置** ✗，因此它的「对万敌施放时」句子**没有触发点** ✗ | `1415`（1 位） | 一个**只触发规则**的技能能被承认（或给它一条 `skill_effects.json` 条目 ✓） |

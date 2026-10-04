@@ -8,7 +8,7 @@ if mode not in ("on", "off"):
     sys.exit("usage: mut_warehouse.py on|off")
 
 LIVE = "            for (Character listener : warehouseListeners) {"
-MUTATED = "            for (CanHit listener : java.util.List.<CanHit>of()) {"
+MUTATED = "            for (Character listener : java.util.List.<Character>of()) {"
 text = io.open(PATH, encoding="utf-8").read()
 if mode == "off":
     if text.count(LIVE) != 1:
