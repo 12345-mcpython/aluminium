@@ -1,587 +1,594 @@
 {
-    "1001": {
-        "2": {
-            "effect": "Defence",
-            "scale": "def",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 3,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 1,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1104": {
-        "3": {
-            "effect": "Defence",
-            "scale": "def",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 2,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 1,
-            "formula": null,
-            "source": "SkillDesc 占位符"
+  "1001": {
+    "2": {
+      "effect": "Defence",
+      "scale": "def",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
         },
-        "4": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "7": {
-            "effect": "Defence",
-            "scale": "def",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 2,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 1,
-            "formula": null,
-            "source": "SkillDesc 占位符"
+        {
+          "index": 3,
+          "kind": "flat"
         }
-    },
-    "1105": {
-        "2": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 3,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": "HealByHealerMaxHP",
-            "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
-        },
-        "3": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": "HealByHealerMaxHP",
-            "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
-        }
-    },
-    "1110": {
-        "2": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 3,
-                    "kind": "percent"
-                },
-                {
-                    "index": 4,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 2,
-            "formula": "HealByHealerMaxHP",
-            "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
-        },
-        "3": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 1,
-                    "kind": "percent"
-                },
-                {
-                    "index": 2,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": "HealByHealerMaxHP",
-            "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
-        },
-        "4": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 1,
-                    "kind": "percent"
-                },
-                {
-                    "index": 2,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 0,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "7": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1203": {
-        "7": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "2": {
-            "effect": "Restore",
-            "scale": "atk",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "4": {
-            "effect": "Restore",
-            "scale": "atk",
-            "params": [
-                {
-                    "index": 1,
-                    "kind": "percent"
-                },
-                {
-                    "index": 3,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 2,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1208": {
-        "2": {
-            "effect": "Defence",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 3,
-                    "kind": "percent"
-                }
-            ],
-            "turns_param": 2,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "4": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [
-                {
-                    "index": 2,
-                    "kind": "percent"
-                }
-            ],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "7": {
-            "effect": "Defence",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1211": {
-        "2": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": "HealByHealerMaxHP",
-            "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
-        },
-        "3": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": "HealByHealerMaxHP",
-            "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
-        },
-        "7": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "4": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "8002": {
-        "7": {
-            "effect": "Restore",
-            "scale": "target_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                }
-            ],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "8004": {
-        "2": {
-            "effect": "Defence",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "7": {
-            "effect": "Defence",
-            "scale": "def",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 2,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1217": {
-        "2": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": "HealByHealerMaxHP",
-            "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
-        },
-        "4": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 2,
-                    "kind": "percent"
-                },
-                {
-                    "index": 4,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1304": {
-        "2": {
-            "effect": "Defence",
-            "scale": "def",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 2,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "7": {
-            "effect": "Defence",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1310": {
-        "4": {
-            "effect": "Defence",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1301": {
-        "2": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "4": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1402": {
-        "9": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1409": {
-        "2": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": null,
-            "formula": "HealByHealerMaxHP",
-            "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
-        },
-        "7": {
-            "effect": "Restore",
-            "scale": "healer_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 3,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1414": {
-        "2": {
-            "effect": "Defence",
-            "scale": "atk",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 2,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "4": {
-            "effect": "Defence",
-            "scale": "atk",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 2,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "8007": {
-        "9": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "8008": {
-        "9": {
-            "effect": "Restore",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "8001": {
-        "7": {
-            "effect": "Restore",
-            "scale": "target_max_hp",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                }
-            ],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "8003": {
-        "2": {
-            "effect": "Defence",
-            "scale": null,
-            "params": [],
-            "turns_param": null,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        },
-        "7": {
-            "effect": "Defence",
-            "scale": "def",
-            "params": [
-                {
-                    "index": 0,
-                    "kind": "percent"
-                },
-                {
-                    "index": 1,
-                    "kind": "flat"
-                }
-            ],
-            "turns_param": 2,
-            "formula": null,
-            "source": "SkillDesc 占位符"
-        }
-    },
-    "1412": {
-        "2": {
-            "effect": "Rules",
-            "source": "1412 刻律德菈 战技 升变，士皆可帅 (141202)：增益型技能——「使指定我方单体角色获得【军功】并使刻律德菈获得 1 点充能」。它的效果**由规则表表达** ✓（`skill_grants_military_merit` 在 `SKILL_CAST` 上 ✓），本身没有治疗量或护盾量可写 ✗ ⇒ `Rules` ✓。",
-            "note": "⚠ `CAST_SKILL` 拒绝过它 ✗（报错原文自己点名：*\"1303/1412's are buffs the table has no entry for\"* ✓）。"
-        }
+      ],
+      "turns_param": 1,
+      "formula": null,
+      "source": "SkillDesc 占位符"
     }
+  },
+  "1104": {
+    "3": {
+      "effect": "Defence",
+      "scale": "def",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 2,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 1,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "4": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "7": {
+      "effect": "Defence",
+      "scale": "def",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 2,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 1,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1105": {
+    "2": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 3,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": "HealByHealerMaxHP",
+      "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
+    },
+    "3": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": "HealByHealerMaxHP",
+      "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
+    }
+  },
+  "1110": {
+    "2": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 3,
+          "kind": "percent"
+        },
+        {
+          "index": 4,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 2,
+      "formula": "HealByHealerMaxHP",
+      "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
+    },
+    "3": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 1,
+          "kind": "percent"
+        },
+        {
+          "index": 2,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": "HealByHealerMaxHP",
+      "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
+    },
+    "4": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 1,
+          "kind": "percent"
+        },
+        {
+          "index": 2,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 0,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "7": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1203": {
+    "7": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "2": {
+      "effect": "Restore",
+      "scale": "atk",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "4": {
+      "effect": "Restore",
+      "scale": "atk",
+      "params": [
+        {
+          "index": 1,
+          "kind": "percent"
+        },
+        {
+          "index": 3,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 2,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1208": {
+    "2": {
+      "effect": "Defence",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 3,
+          "kind": "percent"
+        }
+      ],
+      "turns_param": 2,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "4": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [
+        {
+          "index": 2,
+          "kind": "percent"
+        }
+      ],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "7": {
+      "effect": "Defence",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1211": {
+    "2": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": "HealByHealerMaxHP",
+      "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
+    },
+    "3": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": "HealByHealerMaxHP",
+      "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
+    },
+    "7": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "4": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "8002": {
+    "7": {
+      "effect": "Restore",
+      "scale": "target_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        }
+      ],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "8004": {
+    "2": {
+      "effect": "Defence",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "7": {
+      "effect": "Defence",
+      "scale": "def",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 2,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1217": {
+    "2": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": "HealByHealerMaxHP",
+      "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
+    },
+    "4": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 2,
+          "kind": "percent"
+        },
+        {
+          "index": 4,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1304": {
+    "2": {
+      "effect": "Defence",
+      "scale": "def",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 2,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "7": {
+      "effect": "Defence",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1310": {
+    "4": {
+      "effect": "Defence",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1301": {
+    "2": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "4": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1402": {
+    "9": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1409": {
+    "2": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": null,
+      "formula": "HealByHealerMaxHP",
+      "source": "SkillDesc 占位符 + ConfigAbility HealByHealerMaxHP"
+    },
+    "7": {
+      "effect": "Restore",
+      "scale": "healer_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 3,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1414": {
+    "2": {
+      "effect": "Defence",
+      "scale": "atk",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 2,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "4": {
+      "effect": "Defence",
+      "scale": "atk",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 2,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "8007": {
+    "9": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "8008": {
+    "9": {
+      "effect": "Restore",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "8001": {
+    "7": {
+      "effect": "Restore",
+      "scale": "target_max_hp",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        }
+      ],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "8003": {
+    "2": {
+      "effect": "Defence",
+      "scale": null,
+      "params": [],
+      "turns_param": null,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    },
+    "7": {
+      "effect": "Defence",
+      "scale": "def",
+      "params": [
+        {
+          "index": 0,
+          "kind": "percent"
+        },
+        {
+          "index": 1,
+          "kind": "flat"
+        }
+      ],
+      "turns_param": 2,
+      "formula": null,
+      "source": "SkillDesc 占位符"
+    }
+  },
+  "1412": {
+    "2": {
+      "effect": "Rules",
+      "source": "1412 刻律德菈 战技 升变，士皆可帅 (141202)：增益型技能——「使指定我方单体角色获得【军功】并使刻律德菈获得 1 点充能」。它的效果**由规则表表达** ✓（`skill_grants_military_merit` 在 `SKILL_CAST` 上 ✓），本身没有治疗量或护盾量可写 ✗ ⇒ `Rules` ✓。",
+      "note": "⚠ `CAST_SKILL` 拒绝过它 ✗（报错原文自己点名：*\"1303/1412's are buffs the table has no entry for\"* ✓）。"
+    }
+  },
+  "11415": {
+    "8": {
+      "effect": "Rules",
+      "source": "1415 昔涟's memosprite 德谬歌, 忆灵技能 8 'Ode to Strife' (tbgd: ServantID 11415, 效果 辅助, 效果ID [10000001, 10000011]): the skill itself delivers nothing -- its work is done by the rule table (dispel control-class debuffs on Mydei, command him to cast, or advance him), exactly the shape 1412's 奇袭 needed.",
+      "note": "The third kind (`Rules`) is what a skill whose work is elsewhere uses; it has no parameter row to be ambiguous about. Keyed by the SERVANT's cid and the data slot, because SkillEffects.forSkill keys on the SKILL's own cid and slot."
+    }
+  }
 }
