@@ -1174,6 +1174,15 @@ public class TriggerTable {
         String text = raw.trim();
 
         // ✅ 「变化的是【NAME】」 (2026-09-30; reader: 1506’s forwarding clause). ⚠ FIRST: the chain below is long.
+        // ⭐ 「施加的是控制类／持续伤害类负面状态」 (2026-10-02; reader: 1506's warehouse skill). Read like
+        // `resource_changed:` -- a battle-level fact recorded at the chokepoint -- and placed beside it, first in the chain.
+        java.util.regex.Matcher debuffClass =
+                java.util.regex.Pattern.compile("debuff_class:([^\\s]+)", java.util.regex.Pattern.CASE_INSENSITIVE)
+                        .matcher(text);
+        if (debuffClass.find()) {
+            return new AppliedDebuffClass(raw, debuffClass.group(1).trim());
+        }
+
         java.util.regex.Matcher changed =
                 java.util.regex.Pattern.compile("resource_changed:([^\\s]+)", java.util.regex.Pattern.CASE_INSENSITIVE)
                         .matcher(text);
@@ -2581,6 +2590,32 @@ public class TriggerTable {
      * the placeholder ({@code Path.OTHER}) has no twin by definition -- the same refusal {@code has_same_path_ally} makes.
      */
     /** \u2705 \u300c\u53d8\u5316\u7684是\u3010NAME\u3011\u300d: the guard that stops a forwarding rule from eating its own output. */
+    /** ✅ 「施加的是【X】类负面状态」: the family of the debuff that just landed (control / dot). */
+    private static final class AppliedDebuffClass implements Condition {
+        private final String raw;
+        private final com.laosun.aluminium.enums.DebuffClass expected;
+
+        AppliedDebuffClass(String raw, String wanted) {
+            this.raw = raw;
+            this.expected = com.laosun.aluminium.enums.DebuffClass.fromString(wanted);
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.battle() != null && expected == ctx.battle().lastAppliedDebuffClass();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
     private static final class ResourceChanged implements Condition {
         private final String raw;
         private final String resource;

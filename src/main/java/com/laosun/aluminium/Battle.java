@@ -484,6 +484,14 @@ public class Battle {
     private String lastChangedResource;
 
     /**
+     * ⭐ The CLASS of the debuff that just landed (2026-10-02; reader: 1506's 「敌方对我方施加了**控制类**
+     * 负面状态」). Same shape as {@link #lastChangedResource}: a battle-level fact the condition DSL reads, set at the one chokepoint
+     * every landed debuff passes through. ⚠ Deliberately NOT folded into an existing argument slot -- the STATE_ENDED magnitude was once
+     * put in `hitCount` and every reading of it was 0 until that was found.
+     */
+    private com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass;
+
+    /**
      * \u2705 The per-battle home of PARTY-scoped resources (2026-09-30; reader: the shared \u7b11\u70b9 counter). A resource like
      * that belongs to the party, not to whoever happened to declare it -- `ResourceManager` refuses to keep such a thing
      * per character, and this is the owner it asks for. Registered once at the start of the battle from the declarations.
@@ -740,6 +748,16 @@ public class Battle {
     }
 
     /** \u2705 Notes which resource a change is about, then fires (2026-09-30). */
+    /** Records the class of the debuff that just landed (see {@link #lastAppliedDebuffClass()}). */
+    public void noteAppliedDebuffClass(com.laosun.aluminium.enums.DebuffClass debuffClass) {
+        lastAppliedDebuffClass = debuffClass;
+    }
+
+    /** The class of the debuff that just landed, or {@code null} for a state belonging to neither family. */
+    public com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass() {
+        return lastAppliedDebuffClass;
+    }
+
     public void noteChangedResource(String resource) {
         lastChangedResource = resource;
     }
@@ -1804,6 +1822,9 @@ public class Battle {
         }
         target.getBuffManager().addBuff(buff);
         // ⭐ The one chokepoint every landed debuff passes through (2026-09-29): tell the tables, with the applier as actor.
+        // ⭐ Tell the tables WHICH FAMILY landed, before the event goes out (2026-10-02): the class is already read one line up for
+        // the resistance roll, so it costs nothing to make the same fact askable.
+        noteAppliedDebuffClass(buff.debuffClass());
         fireTriggers(TriggerEvent.DEBUFF_APPLIED, caster, target, 0, 0);
 
         return true;
