@@ -1,0 +1,16 @@
+[
+  {
+    "id": "fixture_rule_without_an_event",
+    "when": [
+      "self has_state probe"
+    ],
+    "do": [
+      {
+        "op": "GAIN_RESOURCE",
+        "resource": "probeSeed",
+        "amount": 1,
+        "target": "self"
+      }
+    ]
+  }
+]

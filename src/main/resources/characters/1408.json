@@ -305,9 +305,9 @@
           "attribute": "ATTACK",
           "percent": 0.5,
           "permanent": true,
-          "max_stacks": 2,
           "target": "self",
-          "coexist": true
+          "coexist": true,
+          "max_stacks": 2
         }
       ],
       "source": "1408 白厄 行迹 照见英雄本色 (1408103): 「进入战斗或变身结束时，攻击力提高 **50%**。该效果最多叠加 **2** 层」",
@@ -325,13 +325,27 @@
           "attribute": "ATTACK",
           "percent": 0.5,
           "permanent": true,
-          "max_stacks": 2,
           "target": "self",
-          "coexist": true
+          "coexist": true,
+          "max_stacks": 2
         }
       ],
       "source": "1408 白厄 行迹 照见英雄本色 (1408103): 「进入战斗或变身结束时，攻击力提高 **50%**。该效果最多叠加 **2** 层」",
       "note": "同上的另一半：「**变身结束时**…攻击力 +50%，最多 2 层」⇒ `STATE_ENDED` ＋ `self state_ended 变身` ✓（两条共用 `max_stacks: 2` ✓ 与 `coexist` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_worlds_end_one_seed_at_battle_start",
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1408 白厄 行迹 行向世界终点 (1408101)：「**战斗开始时，获得 1 点【火种】**。变身结束时，获得 3 点【火种】」",
+      "note": "「**战斗开始时**，获得 **1** 点【火种】」⇒ `BATTLE_START` ⇒ `GAIN_RESOURCE{火种, 1}` ✓。⚠ 与同句的另一半（变身结束 +3 ✓）是**两条规则** ✓：两个事件、两套条件（一个无条件 ✓、一个 `self state_ended 变身` ✓）—— ⚠ 实测：`on_any` **是**可用的（`@SerializedName(\"on_any\")` ✓、`TriggerTable` 会读 ✓），但它只能**追加事件**、**共用同一套条件** ✗ ⇒ 本句用不上 ✓。"
     }
   ]
 }

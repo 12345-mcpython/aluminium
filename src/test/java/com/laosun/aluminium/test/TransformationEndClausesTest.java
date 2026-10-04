@@ -71,6 +71,8 @@ public class TransformationEndClausesTest {
         battle.processRequests();
 
         int before = owner.getResources().value(SEEDS);
+        // ⭐ 「战斗开始时，获得 1 点【火种】」 -- the other half of the same trace line (1408101).
+        Assertions.assertEquals(1, before, "「战斗开始时，获得 1 点【火种】」");
         Skill ult = owner.getSkills().get(SkillType.ULTRA);
         SkillExecutor.execute(battle, ult, owner, List.of(owner));
         battle.processRequests();
@@ -84,5 +86,40 @@ public class TransformationEndClausesTest {
 
         Assertions.assertEquals(duringTransformation + 3, after,
                 "「变身结束时，获得 3 点【火种】」");
+    }
+
+    /**
+     * 「进入战斗或变身结束时，攻击力提高 50%。该效果**最多叠加 2 层**」-- read by firing the end clause more times than the cap allows.
+     *
+     * <p>⚠ The state is applied directly for these ends: the transformation is only granted by the ultimate, and what this reading
+     * is about is the CAP. The seed clause beside it has no cap, so its growth proves the later firings really happened --
+     * without that, a flat ATK could just mean "nothing fired".
+     */
+    @Test
+    public void theEndClauseCapsAtTwoLayers() {
+        Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
+        Battle battle = new Battle(List.of(owner),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+
+        owner.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff(STATE, 9, true));
+        owner.getBuffManager().removeState(STATE);
+        battle.processRequests();
+        double atkAfterOneEnd = owner.getAttribute(AttributeType.ATTACK).get();
+        int seedsAfterOneEnd = owner.getResources().value(SEEDS);
+
+        owner.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff(STATE, 9, true));
+        owner.getBuffManager().removeState(STATE);
+        battle.processRequests();
+        double atkAfterTwoEnds = owner.getAttribute(AttributeType.ATTACK).get();
+        int seedsAfterTwoEnds = owner.getResources().value(SEEDS);
+        System.out.println("[end-clauses] atk " + atkAfterOneEnd + " -> " + atkAfterTwoEnds
+                + " ; seeds " + seedsAfterOneEnd + " -> " + seedsAfterTwoEnds);
+
+        Assertions.assertEquals(seedsAfterOneEnd + 3, seedsAfterTwoEnds,
+                "the second end really fired -- the seed clause has no cap");
+        Assertions.assertEquals(0.0, atkAfterTwoEnds - atkAfterOneEnd, 1e-9,
+                "「最多叠加 2 层」: with the battle-start layer that is already two, so the third is dropped");
     }
 }

@@ -199,6 +199,8 @@ public final class TriggerTables {
             try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
                 JsonElement root = JsonParser.parseReader(reader);
                 if (root.isJsonArray()) {
+                    requireKnownRuleKeys(root);
+                    requireKnownEffectKeys(root);
                     specs = GSON.fromJson(root, SPEC_LIST);
                 } else if (root.isJsonObject()) {
                     JsonObject object = root.getAsJsonObject();
@@ -217,10 +219,12 @@ public final class TriggerTables {
                                         + "(a character with nothing but rules uses the array form)");
                     }
                     // ⭐ The same guard, one level deeper (2026-10-02). The comment on the resource check describes this exact trap --
-        // "Gson drops a key it does not know" -- but only the resource declaration was walked, and an effect writing
-        // `maxStacks` (the Java name) was accepted here and then dropped, leaving a stackable state with a cap of 1. The allowed
-        // set comes from `EffectSpec`'s own `@SerializedName` annotations, so it cannot drift from what Gson maps.
-        requireKnownEffectKeys(rules);
+                    // "Gson drops a key it does not know" -- but only the resource declaration was walked, and an effect
+                    // writing `maxStacks` (the Java name) was accepted and then dropped, leaving a stackable state with a cap
+                    // of 1. The allowed sets come from `EffectSpec`'s and `TriggerSpec`'s own `@SerializedName` annotations,
+                    // so they cannot drift from what Gson maps.
+                    requireKnownRuleKeys(rules);
+                    requireKnownEffectKeys(rules);
         specs = GSON.fromJson(rules, SPEC_LIST);
                     JsonElement declared = object.get("resources");
                     if (declared != null && !declared.isJsonNull()) {
@@ -308,6 +312,48 @@ public final class TriggerTables {
                     "no @SerializedName fields were found on EffectSpec, so the effect keys cannot be checked");
         }
         return Set.copyOf(keys);
+    }
+
+    /**
+     * ⭐ The keys {@link com.laosun.aluminium.beans.TriggerSpec} actually maps, read from its own annotations (2026-10-02).
+     *
+     * <p>The same reflection the effect guard uses, for the same reason: a key the loader "knows" and Gson does not is a value
+     * that vanishes without a word.
+     */
+    private static final Set<String> RULE_KEYS = ruleKeys();
+
+    private static Set<String> ruleKeys() {
+        Set<String> keys = new java.util.HashSet<>();
+        for (java.lang.reflect.Field field
+                : com.laosun.aluminium.beans.TriggerSpec.class.getDeclaredFields()) {
+            com.google.gson.annotations.SerializedName name =
+                    field.getAnnotation(com.google.gson.annotations.SerializedName.class);
+            keys.add(name != null ? name.value() : field.getName());
+        }
+        if (keys.isEmpty()) {
+            throw new IllegalStateException("no fields were found on TriggerSpec, so rule keys cannot be checked");
+        }
+        return Set.copyOf(keys);
+    }
+
+    /** ⭐ Walks the rules themselves: known keys, and an event to listen to (2026-10-02). */
+    private static void requireKnownRuleKeys(JsonElement rules) {
+        if (rules == null || !rules.isJsonArray()) {
+            return;
+        }
+        for (JsonElement rule : rules.getAsJsonArray()) {
+            requireKnownKeys(rule, RULE_KEYS, "rule");
+            if (!rule.isJsonObject()) {
+                continue;
+            }
+            JsonObject object = rule.getAsJsonObject();
+            boolean hasEvent = object.has("on") || object.has("on_any");
+            if (!hasEvent) {
+                throw new IllegalArgumentException(
+                        "a rule states neither \"on\" nor \"on_any\", so it would never fire (its keys: "
+                                + object.keySet().stream().sorted().toList() + ")");
+            }
+        }
     }
 
     /** Walks every rule's {@code do} array and refuses a key Gson would silently drop. */
