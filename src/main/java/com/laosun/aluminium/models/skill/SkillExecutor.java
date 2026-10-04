@@ -90,7 +90,14 @@ public final class SkillExecutor {
             // fires BEFORE settlement and names the ally -- SKILL_CAST names it but fires after, and it is refused by
             // `from_category` for that reason (see CAST_CARRYING_EVENTS).
             CanHit aimed = targets == null || targets.isEmpty() ? null : targets.getFirst();
-            battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category);
+            // \u2b50 The slot rides along (2026-10-02): the comment above already states that the pre-cast hook "has to know the slot",
+            // but the call did not pass one, so `from_skill_id` read 0 on this event -- measured: a rule gated on
+            // `self has_state <state>` + `target == self` + `actor is_summon` FIRED, and the same rule plus `from_skill_id == 0` also
+            // fired while `from_skill_id == 16` and `== 1141516` did not. Passing it is what makes a NON-attack cast nameable: a
+            // memosprite's skill is a BUFF, so it raises none of SKILL_CAST / ULT_CAST / BASIC_ATTACK (dispatch's switch fires those
+            // only for BPSKILL / ULTRA / NORMAL).
+            battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category,
+                    skill == null ? 0 : skill.getSkillSlot());
             if (!cast.damageDelegated()) {
                 resolveHits(battle, skill, user, targets, hitTargets);
             }
