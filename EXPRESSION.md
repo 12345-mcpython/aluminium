@@ -39,6 +39,9 @@
 | 定时弱点（会过期） | `ADD_ELEMENTAL_WEAKNESS` ＋ `turns` | `src/main/resources/characters/1310.json` | `TimedWeaknessTest` |
 | 事件词汇表本身 | `TriggerEvent`（未接的事件在装载期就报错） | `src/main/java/com/laosun/aluminium/enums/TriggerEvent.java` | `TriggerEventWiringTest` |
 | 「获得 N 个**笑点**」（队伍级、无上限的共享计数） | 无上限资源的**既有拼法**：`max: 2147483647` ＋ `scope: "PARTY"`（⚠ 共享 ⇒ 任何在队角色都可加） | `src/main/resources/characters/1513.json` | `Character1513LaughterTest` |
+| **队友的状态结束时取一部分**（「其中的 50% 转化为自身的…」） | `STATE_ENDED` ＋ **事件携带的量**（被结束状态的**实例数**）＋ `amountFromEvent` × `amountPercent` | `src/main/resources/characters/1505.json`、`src/main/resources/characters/1513.json` | `GiftCarriesTheLaughsTest` |
+| **层数＝队级计数**（「将本次…计入该状态」） | `scale: "party_resource:<NAME>"`（战斗级计数当数值读） | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java` | `PartyResourceScaleTest` |
+| **一次施加 N 个可叠加状态**（「层数＝某个数」的另一半） | `APPLY_BUFF` ＋ `stackable: true` ＋ **`max_stacks`** ＋ `amount`／`scale` | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java`、`src/main/resources/characters/1513.json` | `StackTimesTest` |
 | **按层数实时缩放（平坦属性）**（「每拥有 1 层…提高 X%」的持续光环） | `MODIFY_ATTR` 上 `per_stack: self_stacks:<NAME>` ＋ **`per_stack_live: true`**（份额 = `percent × 当前层数`，**每次读取重算**） | `src/main/java/com/laosun/aluminium/models/DoubleValue.java`、`src/main/java/com/laosun/aluminium/models/buff/StatModifierBuff.java` | `PerStackLiveTest` |
 | **按层数实时缩放（比率／绝对值）**（同一族的派生写法） | `MODIFY_ATTR` 上 `scale: self_stacks:<NAME>` ＋ **`per_stack_live: true`**（绝对值 = `percent × 当前层数 + amount`） | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java`、`src/main/resources/characters/1314.json` | `JadeLiveGoodsTest` |
 | **带计数的状态**（“将 N 计入该状态”） | `APPLY_BUFF` 上的 `"stackable": true` ＋ `max_stacks`（同名实例累加，且仍会公告自己的结束） | `src/main/java/com/laosun/aluminium/models/buff/StackableStateBuff.java` | `AttachedBuffProbeTest` |
@@ -55,5 +58,4 @@
 | 仓库技「获得该角色即生效，无需上场」 | 一个与队伍无关的被动装载路径（引擎只在角色**在队**时读它的表） | `1407`（1 位） | 被动装载点 |
 | 「使【禳命】的持续回合数 −1」 | 「缩短时长」的拼写（`EXTEND_BUFF` 只收正数） | `1217`（1 位） | 一个减时长的 op |
 | 「自动施放【弑神登神】」 | 数据 id 11 对应的技能槽（`SkillType` 没有它） | `1408`（1 位） | 槽位映射 |
-| 「队友持有的【好活当赏】**结束时**，绯英会将其中的 **50%** 转化为自身的【好活当赏】」 | 三件：① `STATE_ENDED` **要带上结束时的量**（已写好、已回滚：只有内容表能当判据）；② 【好活当赏】在树里**同名两模型并存**（`1513` 当状态、`1505`／`8009`／`8010` 当资源）；③ “将笑点计入该状态”的**数量还没有来源** | `1505`（1 位） | 一条内容判据（手工表到不了 `STATE_ENDED`）＋模型统一 |
 | 欢乐技「**8 次**随机单体…」的**按次数结算** | 引擎的“N 次命中”是**按技能种类**读的（如 `BOUNCE` 取**第二个**参数 ✓），而**欢乐技的行首列就是次数**这一种没有表示 ✗；⚠ 另缺：**我方 `data/` 里一个 elation 技能行都没有**（扫到 0 个 ✗） | `8009`／`8010`（**2 位**，逐条读到 ✓；⚠ 原登记写 5 位而 `1505`／`1502`／`1506` **逐条读不到** ✗ ⇒ 按本节规矩改为 2 位） | 技能行模型 ＋ 欢乐技的数据行 |
