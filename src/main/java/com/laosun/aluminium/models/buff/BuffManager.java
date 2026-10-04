@@ -293,7 +293,7 @@ public class BuffManager {
      * @return how many buffs were lengthened ({@code 0} when none matched)
      */
     public int extendBuffsFrom(CanHit source, String stateName, AttributeType attribute, int turns) {
-        if (source == null || turns <= 0 || (stateName == null && attribute == null)) {
+        if (source == null || turns == 0 || (stateName == null && attribute == null)) {
             return 0;
         }
         int extended = 0;
@@ -321,7 +321,7 @@ public class BuffManager {
      * @return how many buffs were lengthened ({@code 0} when none could be)
      */
     public int extendAllBuffs(int turns) {
-        if (turns <= 0) {
+        if (turns == 0) {
             return 0;
         }
         int extended = 0;

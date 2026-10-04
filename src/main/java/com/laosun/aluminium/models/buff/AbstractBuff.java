@@ -411,6 +411,6 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * @param turns how many turns to add (positive; the op that calls this validates that)
      */
     public void extendDuration(int turns) {
-        remainingDuration += turns;
+        remainingDuration = Math.max(0, remainingDuration + turns);   // signed, clamped at zero (the game's Min: 0)
     }
 }
