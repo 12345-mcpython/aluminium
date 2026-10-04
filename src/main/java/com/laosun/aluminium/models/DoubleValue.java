@@ -125,7 +125,33 @@ public final class DoubleValue implements Cloneable {
      * @return the final numeric value
      */
     public double get() {
+        // ⭐ A live modifier has to be re-resolved here, because compute() otherwise runs only when modifiers are attached
+        // or removed. Scanning costs nothing for the attributes that have none -- which is every attribute until a rule
+        // asks for 「每拥有 1 层…」.
+        if (hasLiveModifier()) {
+            compute();
+        }
         return value;
+    }
+
+    /** Whether any attached modifier resolves its share at read time. */
+    private boolean hasLiveModifier() {
+        for (Modifier modifier : addPercentModifiers) {
+            if (modifier.isLive()) {
+                return true;
+            }
+        }
+        for (Modifier modifier : multiplyPercentModifiers) {
+            if (modifier.isLive()) {
+                return true;
+            }
+        }
+        for (Modifier modifier : valueModifiers) {
+            if (modifier.isLive()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -226,13 +252,13 @@ public final class DoubleValue implements Cloneable {
         double multiplyPercentTotal = 1;
         double valueModifiersTotal = 0;
         for (Modifier percentModifier : addPercentModifiers) {
-            percentModifiersTotal += percentModifier.value;
+            percentModifiersTotal += percentModifier.rate();
         }
         for (Modifier valueModifier : valueModifiers) {
-            valueModifiersTotal += valueModifier.value;
+            valueModifiersTotal += valueModifier.rate();
         }
         for (Modifier multiplyPercentModifier : multiplyPercentModifiers) {
-            multiplyPercentTotal *= (1 + multiplyPercentModifier.value);
+            multiplyPercentTotal *= (1 + multiplyPercentModifier.rate());
         }
 
         value = baseValue * percentModifiersTotal * multiplyPercentTotal + valueModifiersTotal;
@@ -293,9 +319,19 @@ public final class DoubleValue implements Cloneable {
      * <p>Provides static factory methods for creating modifiers with either
      * raw decimal values (e.g. 0.18) or integer-percent values (e.g. 18).
      */
-    @AllArgsConstructor
     @Getter
     public static final class Modifier implements Cloneable {
+
+        /**
+         * The four fields every factory fills. Written out rather than generated: the class also carries the optional
+         * {@code live} supplier (2026-10-02), and a generated all-args constructor would silently require it too.
+         */
+        public Modifier(ModifierType modifierType, double value, ModifierSource source, int sourceRoleId) {
+            this.modifierType = modifierType;
+            this.value = value;
+            this.source = source;
+            this.sourceRoleId = sourceRoleId;
+        }
         /**
          * How this modifier affects the final value.
          */
@@ -312,12 +348,41 @@ public final class DoubleValue implements Cloneable {
          * Optional role/source identifier for precise tracking.
          */
         private int sourceRoleId;
+        /**
+         * ⭐ A modifier whose magnitude is resolved when it is READ, not when it was attached (2026-10-02).
+         *
+         * <p>The reader family is the 「每拥有 1 层…提高 X%」 auras (fourteen documents): their number has to follow the stack
+         * count, and a stored number can only be right at the instant it was stored.
+         */
+        private java.util.function.DoubleSupplier live;
 
         // these need to call with number for example 18 represent to 18% boost
 
         /**
          * Creates an add-percent modifier from an integer percentage (e.g. 18 means 18%).
          */
+        /**
+         * ⭐ A modifier whose ADD_PERCENT share is asked for on every computation (2026-10-02).
+         *
+         * @param share the supplier, read each time the owning attribute is computed
+         */
+        public static Modifier livePercent(java.util.function.DoubleSupplier share,
+                                           ModifierSource source, int sourceRoleId) {
+            Modifier modifier = new Modifier(ModifierType.ADD_PERCENT, 0, source, sourceRoleId);
+            modifier.live = share;
+            return modifier;
+        }
+
+        /** Whether this modifier re-resolves its magnitude on every computation. */
+        public boolean isLive() {
+            return live != null;
+        }
+
+        /** The magnitude to use NOW: a live modifier asks its supplier, every other one keeps its stored number. */
+        public double rate() {
+            return live != null ? live.getAsDouble() : value;
+        }
+
         public static Modifier addPercentNumber(double percentValue) {
             return new Modifier(ModifierType.ADD_PERCENT, percentValue / 100.0, ModifierSource.UNKNOWN, 0);
         }
