@@ -1219,6 +1219,12 @@ public class Battle {
                 ticking.tickTimedWeaknesses();
             }
             fireTriggers(TriggerEvent.TURN_END, actor, actor, 0, 0);
+        // ⭐ 「（若未回复）否则将立即陷入无法战斗状态」 (1407's 月茧之庇): a death that a deferring state held
+        // is committed HERE -- the carrier's turn is over (so it really did 「正常行动」), and the next turn has not begun
+        // (so a heal or a shield up to this point still saves it). Nothing removed the state, so it falls now.
+        if (actor.getCurrentHp() <= 0 && actor.getBuffManager().defersDeath()) {
+            actor.perish();
+        }
         }
         processRequests();
     }
@@ -1337,7 +1343,10 @@ public class Battle {
         if (lethal) {
             target.takeDamage(settled, false);
             fireTriggersForAlly(TriggerEvent.LETHAL_DAMAGE, target, target, 0);
-            died = target.getCurrentHp() <= 0;
+            // ⭐ 「暂时延后陷入无法战斗状态」 (1407's 月茧之庇): a state may hold the death instead of
+            // committing it. ⚠ The victim really is at zero HP here -- that IS 「延后」 -- so this is not a heal: what
+            // saves it is the state being GONE by its own turn (a heal or a shield removes it, in content).
+            died = target.getCurrentHp() <= 0 && !target.getBuffManager().defersDeath();
             if (died) {
                 target.perish();
             }

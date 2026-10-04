@@ -58,6 +58,8 @@ public class EffectSpec {
         copy.percent = this.percent;
         copy.turns = this.turns;
         copy.permanent = this.permanent;
+        // ⭐ The deferral must survive a copy, or a rule that is amended/copied silently loses it (the guard test says so).
+        copy.defersDeath = this.defersDeath;
         copy.maxStacks = this.maxStacks;
         copy.instance = this.instance;
         copy.stacks = this.stacks;
@@ -440,6 +442,16 @@ return copy;
      */
     @SerializedName("buff")
     private String buff;
+
+    /**
+     * 「暂时<b>延后</b>陷入无法战斗状态」: the state this effect applies does not let its carrier die (2026-10-02; reader: 1407's 月茧之庇).
+     *
+     * <p>⚠ Only {@code APPLY_BUFF} reads it. The engine holds the death instead of committing it, and commits it at the
+     * carrier's next turn if the state is still there -- so the state's own removal is what saves the carrier. See
+     * {@link com.laosun.aluminium.models.buff.DeferredDeathBuff}.
+     */
+    @SerializedName("defers_death")
+    private Boolean defersDeath;
 
     /**
      * Whose <b>turns</b> spend this buff's duration: {@code "self"} = the <b>rule owner's</b> (M-42 ④). Absent =
