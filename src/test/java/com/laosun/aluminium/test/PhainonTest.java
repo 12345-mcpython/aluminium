@@ -31,10 +31,13 @@ public class PhainonTest {
         Battle battle = new Battle(List.of(phainon, ally), List.of(enemy), fixed());
         battle.startBattle();
 
-        Assertions.assertEquals(0, coreflameOf(phainon), "the document states no initial value, so it starts at 0");
+        // ⚠ Updated 2026-10-02: the document DOES state one -- her trace 1408101 「战斗开始时，获得 1 点【火种】」, which is
+        // now written, so the pool opens at one. The reading is unchanged in kind: it starts where the sentences say.
+        Assertions.assertEquals(1, coreflameOf(phainon),
+                "\u300c\u6218\u6597\u5f00\u59cb\u65f6\uff0c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011\u300d");
         battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
-        Assertions.assertEquals(2, coreflameOf(phainon),
-                "\u300c\u83b7\u5f972\u70b9\u3010\u706b\u79cd\u3011\u300d");
+        Assertions.assertEquals(3, coreflameOf(phainon),
+                "\u300c\u83b7\u5f972\u70b9\u3010\u706b\u79cd\u3011\u300d -- one from the battle start, two from the cast");
 
         for (int i = 0; i < 9; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
