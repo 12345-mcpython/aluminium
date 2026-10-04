@@ -1894,7 +1894,11 @@ public final class TriggerInterpreter {
         // ⭐ The moment 「奇袭结束后」 names: the commanded cast has finished, the original continues afterwards. A
         // commanded cast announces the same CAST_SETUP / SKILL_CAST a real one does, so this is the only event that
         // tells it apart -- see `TriggerEvent.INSERTED_CAST_END`.
-        battle.fireTriggers(TriggerEvent.INSERTED_CAST_END, actor, actor, 0, 0);
+        // ⭐ The event carries the unit the commanded cast was AIMED at, not the caster (2026-10-02; reader: 1415's
+        // 「奇袭结束后，使刻律德菈获得 1 点充能」). The actor is still the actor; the target slot now answers "who was it cast on",
+        // which is what that sentence needs -- and 1412's own subscriber states no target, so nothing shipped moves.
+        CanHit aimed = victims == null || victims.isEmpty() ? actor : victims.getFirst();
+        battle.fireTriggers(TriggerEvent.INSERTED_CAST_END, actor, aimed, 0, 0);
     }
 
     /**
