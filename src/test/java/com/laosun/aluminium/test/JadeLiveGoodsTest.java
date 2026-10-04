@@ -37,6 +37,8 @@ public class JadeLiveGoodsTest {
         int start = jade.getBuffManager().stacksOf(GOODS);
         Assertions.assertTrue(start > 0, "precondition: her rules grant the first layers");
         double attackShare = share(jade, AttributeType.ATTACK);
+        // CRIT DMG's base is zero (the 50% everyone starts with is itself a modifier), so its reading is absolute
+        double critBefore = jade.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[jade] layers=" + start + " attackShare=" + attackShare);
 
         // four more layers, added directly: the auras are NOT re-applied
@@ -46,9 +48,13 @@ public class JadeLiveGoodsTest {
         Assertions.assertEquals(start + 4, jade.getBuffManager().stacksOf(GOODS));
 
         double attackAfter = share(jade, AttributeType.ATTACK);
+        double critAfter = jade.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[jade] after -> attackShare=" + attackAfter);
         Assertions.assertEquals(0.005 * 4, attackAfter - attackShare, 1e-9,
                 "the attack aura has to follow four more layers");
+        System.out.println("[jade] crit " + critBefore + " -> " + critAfter);
+        Assertions.assertEquals(0.024 * 4, critAfter - critBefore, 1e-9,
+                "the derived crit-damage clause follows too, in absolute units");
     }
 
     private static double share(Character unit, AttributeType attribute) {

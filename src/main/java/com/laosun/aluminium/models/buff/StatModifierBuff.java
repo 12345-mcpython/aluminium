@@ -309,9 +309,10 @@ public class StatModifierBuff extends AbstractBuff {
      *                               that type -- silently keeping the stored number would be a wrong number with no symptom
      */
     public void makeLive(java.util.function.DoubleSupplier share) {
-        if (modifierType != DoubleValue.Modifier.ModifierType.ADD_PERCENT) {
+        if (modifierType != DoubleValue.Modifier.ModifierType.ADD_PERCENT
+                && modifierType != DoubleValue.Modifier.ModifierType.PURE_VALUE) {
             throw new IllegalStateException(
-                    "A live share only exists for add_percent modifiers, but this one is " + modifierType);
+                    "A live magnitude only exists for add_percent and pure modifiers, but this one is " + modifierType);
         }
         this.liveShare = share;
     }
@@ -325,7 +326,9 @@ public class StatModifierBuff extends AbstractBuff {
     public void applyEffect(CanHit target) {
         DoubleValue attributeValue = target.getAttribute(attribute);
         attributeValue.addModifier(liveShare != null
-                ? DoubleValue.Modifier.livePercent(liveShare, sourceRole, id)
+                ? (modifierType == DoubleValue.Modifier.ModifierType.PURE_VALUE
+                ? DoubleValue.Modifier.livePure(liveShare, sourceRole, id)
+                : DoubleValue.Modifier.livePercent(liveShare, sourceRole, id))
                 : new DoubleValue.Modifier(modifierType, value, sourceRole, id));
         if (attribute == AttributeType.SPEED) {
             target.notifySpeedChanged();

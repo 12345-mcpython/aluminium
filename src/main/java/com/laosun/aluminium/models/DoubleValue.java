@@ -373,6 +373,19 @@ public final class DoubleValue implements Cloneable {
             return modifier;
         }
 
+        /**
+         * ⭐ The same, for a modifier whose magnitude is an ABSOLUTE number in the attribute's own units.
+         *
+         * <p>The derived form 「每层【当品】使暴击伤害提高 2.40%」 is absolute, and a ratio attribute takes it as
+         * a pure value -- so the live kind needs a pure factory as well as a percentage one.
+         */
+        public static Modifier livePure(java.util.function.DoubleSupplier value,
+                                        ModifierSource source, int sourceRoleId) {
+            Modifier modifier = new Modifier(ModifierType.PURE_VALUE, 0, source, sourceRoleId);
+            modifier.live = value;
+            return modifier;
+        }
+
         /** Whether this modifier re-resolves its magnitude on every computation. */
         public boolean isLive() {
             return live != null;
