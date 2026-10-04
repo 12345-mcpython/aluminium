@@ -42,6 +42,8 @@
 | **「某个状态的持续回合数在**它自己**的回合开始时减 1」** | `APPLY_BUFF` ＋ `turns` ＋ **`ticks_on: "self"`**（谁的回合花掉时长 ✓） | `src/main/resources/characters/1217.json` | `HuohuoTalismanDurationTest` |
 | **「消耗等同于…**当前**生命值 X% 的生命值」** | `CONSUME_HP` ＋ **`scale: "target_current_hp"`**（新增：**当前**生命值的份额 ✓；旧词汇只有 `owner_max_hp`／`target_max_hp`／`target_lost_hp` ✗） | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java`、`src/main/resources/characters/1404.json` | `MydeiBloodfeudSkillsTest` |
 | **「【血仇】状态期间…自身回合开始时自动施放【弑王成王】」** | `TURN_START` ＋ `self has_state 血仇` ＋ **`REPLACE_SKILL{skill: SKILL, skill_id: 9, turns: 1}`** ＋ `CONSUME_HP{scale: target_current_hp, percent: 0.35}` ＋ `CAST_SKILL{skill: SKILL}` | `src/main/resources/characters/1404.json` | `MydeiBloodfeudSkillsTest` |
+| **「【血仇】状态期间充能达到 **150** 点时，立即获得 1 个额外回合并自动施放【弑神登神】」** | `SPEND_RESOURCE{150}` ＋ `EXTRA_TURN` ＋ **`REPLACE_SKILL{skill: SKILL, skill_id: 11, turns: 1}`** ＋ `CAST_SKILL{skill: SKILL, target: self}` | `src/main/resources/characters/1404.json` | `MydeiBloodfeudSkillsTest` |
+| **「**未**处于【X】状态时…」**（否定一个状态条件） | **`!self has_state X`**（`!` 前缀 ✓，只允许否定 `PartyCondition` ✓，而 `has_state` 读的就是单位的增益 ✓） | `src/main/resources/characters/1404.json` | `MydeiBloodfeudSkillsTest` |
 | **队友的状态结束时取一部分**（「其中的 50% 转化为自身的…」） | `STATE_ENDED` ＋ **事件携带的量**（被结束状态的**实例数**）＋ `amountFromEvent` × `amountPercent` | `src/main/resources/characters/1505.json`、`src/main/resources/characters/1513.json` | `GiftCarriesTheLaughsTest` |
 | **「变身结束时…」的三句**（白厄：全队速度 +15% ✓、获得 3 点【火种】✓、「进入战斗**或**变身结束时攻击力 +50%」） | `STATE_ENDED` ＋ `self state_ended 变身`；第三句还用 **`coexist: true`**（同一属性上的两条规则共存 ✓） | `src/main/resources/characters/1408.json`、`src/main/java/com/laosun/aluminium/models/buff/BuffManager.java` | `TransformationStatsTest` |
 | **层数＝队级计数**（「将本次…计入该状态」） | `scale: "party_resource:<NAME>"`（战斗级计数当数值读） | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java` | `PartyResourceScaleTest` |
@@ -62,4 +64,4 @@
 | 仓库技「获得该角色即生效，无需上场」 | 一个与队伍无关的被动装载路径（引擎只在角色**在队**时读它的表） | `1407`（1 位） | 被动装载点 |
 | 欢乐技「**8 次**随机单体…」的**按次数结算** | 引擎的“N 次命中”是**按技能种类**读的（如 `BOUNCE` 取**第二个**参数 ✓），而**欢乐技的行首列就是次数**这一种没有表示 ✗；⚠ 另缺：**我方 `data/` 里一个 elation 技能行都没有**（扫到 0 个 ✗） | `8009`／`8010`（**2 位**，逐条读到 ✓；⚠ 原登记写 5 位而 `1505`／`1502`／`1506` **逐条读不到** ✗ ⇒ 按本节规矩改为 2 位） | 技能行模型 ＋ 欢乐技的数据行 |
 
-| **「充能 150 时自动施放【弑神登神】」** 与 **「使万敌自动施放1次不消耗充能的【弑神登神】」** | 两件 ✗：① 「充能 ≥ 100」那条**没有【血仇】门** ✗ ⇒ **反复**触发、把充能抽干 ✗（实测 ✓）⇒ 攒不到 150 ✗；② 在**别人的表**里命令**他**施放 ✗ —— `CAST_SKILL` 放的是**规则拥有者自己**的槽 ✓（`requireCharacterOwner` ✓） | `1404`（1 位）、**`1415` 的忆灵技能 8**（1 位） **共 2 位** ✓ | ① 一个**否定条件**（如 `self not_state 血仇`），或让那条只在**跨过**阈值时触发 ✓；② 一种**命令他人施放**的写法（`CAST_SKILL` 加一个“谁来放”的寻址 ✓） |
+| **「使万敌自动施放1次不消耗充能的【弑神登神】」**（`1415` 的忆灵技能 8 ✓） | 在**别人的表**里命令**他**施放 ✗ —— `CAST_SKILL` 放的是**规则拥有者自己**的槽 ✓（`requireCharacterOwner` ✓；实测：把 `target` 写成事件的目标时它会命令**敌人**施放 ✗ —— 装载器报 *“冰锋 has no SKILL skill”* ✓） | `1415`（1 位） | 一种**命令他人施放**的写法（`CAST_SKILL` 加一个“谁来放”的寻址 ✓） |
