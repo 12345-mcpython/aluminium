@@ -35936,3 +35936,23 @@
 > * ⭐ **场景上的一个坑（记 ✓）**：⭐ `1407` 的面板派生自 ⭐ **battle 级资源**（`新蕊` ✓）⇒ ⭐ 用 `SummonFactory.servant(master, spec)` 会抛
 >   ⭐ *"no resource reader was handed in"* ✓ ⇒ ⭐ 判据改用 ⭐ **`Battle.summonServant(master)`** ✓（⭐ 那个接缝自己传资源读取器 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2250** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 2 轮：🎉🎉🎉 **第 82 件出货 ＝ 忆灵技能行导入 `skills.json`** ✓✓ ——
+> ⭐ 于是**伤害类忆灵技无需任何条目即可交付** ✓）**）**：
+>
+> * ✅ **导入（生成器 `tools/import_servant_skill_rows.py` ✓）**：⭐ 从 ⭐ `ExcelOutput/AvatarServantSkillConfig.json` ✓ 读出 ⭐ **48 行** ✓
+>   （⭐ 键用 ⭐ `11402`／`11407`／`11409`／`11413`／`11415`／`11512`／`18007` ✓），⭐ 按 `skills.json` 的既有形状写入 ✓ ⇒ ⭐ `cid keys: 100` ✓（⭐ 93 角色 ＋ 7 忆灵 ✓）。
+> * ⭐⭐ **形状映射（已量清 ✓，逐一有据 ✓）**：⭐ 我们的 `attack_type` ← `AttackType` ✓；⭐ `max_level` ← `MaxLevel` ✓；
+>   ⭐ `name`／`skill_introduction` ← **TextMap 的 hash**（`SkillName.Hash`／`SkillDesc.Hash` ✓，⭐ CHS ＋ EN 都取 ✓）；
+>   ⭐ `param_list` ← `ParamList`（⭐ 表里**每级一行** ✓ ⇒ ⭐ 按 `Level` 归组并排序 ✓）；⭐ `skill_effect` ← **`SkillEffect`** ✓（⭐ 而它**正是 `isDamaging()` 读的那个字段** ✓）；
+>   ⭐ `skill_id` ← `SkillID` ✓；⭐ `stance_list` ← `ShowStanceList` ✓（⭐ single／all／spread ✓）。
+> * ⭐⭐ **读数（判据输出 ✓）**：⭐ 形状计数 ⭐ `Support 23 / Enhance 11 / AoEAttack 9 / Bounce 2 / Blast 1 / Restore 1 / SingleAttack 1` ✓
+>   ⇒ ⭐ **伤害类 13 个** ✓，⭐ 判据 ⭐ `[damaging] 1402=1 1407=6 1409=1 1413=2 1415=1 1512=1 8007=1` ✓（⭐ 逐个数相等 ✓）
+>   ⇒ ⭐⭐ **这 13 个现在无需 `skill_effects.json` 条目即可交付** ✓✓（⭐ 导入前它们全是占位符 ⇒ `isDamaging()` 假 ⇒ 48 个全都不可交付 ✓）。
+> * ⚠ **两项如实登记（不凭空补 ✓）**：
+>   ⭐ ① ⭐ **`element` 不在技能表里** ✗ —— ⭐ 该表只有 `StanceDamageType`（削韧类型 ✓），⭐ 没有伤害元素 ✗；
+>     ⭐ 而 ⭐ `Config/ConfigAbility/Servant/*` 里有 `DamageType` ✓（⭐ 扫描到字面量 `Ice`／`Fire`／`Wind` ✓）⇒ ⭐ **忆灵伤害技的元素**是**单独一步** ✓，⭐ 我**没有**给它编默认值 ✗（⭐ 否则会把本该是冰的伤害算成物理 ✓）。
+>   ⭐ ② ⭐ `Support`（23）／`Enhance`（11）那 **34 个**仍需按各自描述补条目 ✓（⭐ `Restore` 那 1 个可能已可用 ✓，⭐ 取决于参数行是否"不歧义" ✓）。
+> * ✅ **判据** ✓：⭐ `MemospriteSkillTest` 现在三条 ✓ —— ① 德谬歌槽位 16 可交付 ✓；② 七个忆灵各自的技能数与声明行数相等、且 cid 等于 `servant_id` ✓；
+>   ⭐ ③ **凡 `isDamaging()` 为真的忆灵技，`canDeliver` 必为真** ✓（⭐ 13 个 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2251** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

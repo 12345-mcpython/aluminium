@@ -79,6 +79,35 @@ public class MemospriteSkillTest {
         System.out.println(report.toString().trim());
     }
 
+    /**
+     * Every memosprite skill whose imported row says it DEALS DAMAGE is deliverable with no delivery entry at all.
+     *
+     * <p>That is what the row import bought: before it `SkillData` handed back a placeholder for a ServantID, so `isDamaging()` was false
+     * for all 48 skills and each needed an entry. Now the damaging ones are named by their own `skill_effect`.
+     */
+    @Test
+    public void damagingMemospriteSkillsNeedNoDeliveryEntry() {
+        StringBuilder report = new StringBuilder("[damaging] ");
+        for (int cid : new int[]{1402, 1407, 1409, 1413, 1415, 1512, 8007}) {
+            MemospriteSpec spec = Memosprites.of(cid);
+            Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
+            Battle battle = new Battle(List.of(master),
+                    List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+            battle.startBattle();
+            battle.processRequests();
+            Summon servant = battle.summonServant(master);
+            int damaging = 0;
+            for (Map.Entry<Integer, Skill> e : servant.skillsByDataSlot().entrySet()) {
+                if (e.getValue().getData() != null && e.getValue().getData().getEffect().isDamaging()) {
+                    damaging++;
+                    Assertions.assertTrue(SkillExecutor.canDeliver(e.getValue()),
+                            cid + " slot " + e.getKey() + ": a damaging skill is delivered as a swing, with no entry");
+                }
+            }
+            report.append(cid).append("=").append(damaging).append(" ");
+        }
+        System.out.println(report.toString().trim());
+    }
     /** The memosprite at that cid, built through the seam a test uses. */
     private static Summon servantOf(int cid) {
         Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
