@@ -2519,22 +2519,36 @@ public final class TriggerInterpreter {
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         String state = effect.getBuff().trim();
-        for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            AbstractBuff buff = withSource(withTickOwner(
-                    withLifetime(Boolean.TRUE.equals(effect.getStackable())
-                        ? new StackableStateBuff(state, turns, permanent,
-                                effect.getMaxStacks() == null ? 1 : effect.getMaxStacks())
-                        : Boolean.TRUE.equals(effect.getDefersDeath())
-                        ? new DeferredDeathBuff(state, turns, permanent)
-                        : new StateBuff(state, turns, permanent), effect), effect, ctx), ctx);
-            // 「不会进入自己的回合」 rides on the state itself: a turn is not something a state could give back
-            // later, so the flag and the state share one lifetime by construction.
-            if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
-                buff.setSuspendsTurns(true);
+        // ⭐ How many instances this application carries (2026-10-02; reader: 1513's reward, whose state's INSTANCE COUNT is
+        // the 【符点】 it spent). A plain state refreshes on re-application, so only a STACKABLE one is repeated --
+        // otherwise the loop would be a no-op dressed as a feature.
+        int times = 1;
+        if (Boolean.TRUE.equals(effect.getStackable())) {
+            if (effect.getScale() != null && effect.getScale().trim().startsWith("party_resource:")) {
+                times = Math.max(1, (int) Math.round(resolveScale(effect.getScale(),
+                        effect.getPercent() == null ? 1 : effect.getPercent(), ctx)));
+            } else if (effect.getAmount() != null) {
+                times = Math.max(1, (int) Math.round(effect.getAmount()));
             }
-            // 「有 100% 的基础概率使敌方…陷入【通解】状态」: when the rule states one, the state is ROLLED (effect resistance
-            // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
-            attachRolled(battle, target, buff, effect, ctx);
+        }
+        for (CanHit target : resolveTargets(battle, effect, ctx)) {
+            for (int instance = 0; instance < times; instance++) {
+                AbstractBuff buff = withSource(withTickOwner(
+                        withLifetime(Boolean.TRUE.equals(effect.getStackable())
+                            ? new StackableStateBuff(state, turns, permanent,
+                                    effect.getMaxStacks() == null ? 1 : effect.getMaxStacks())
+                            : Boolean.TRUE.equals(effect.getDefersDeath())
+                            ? new DeferredDeathBuff(state, turns, permanent)
+                            : new StateBuff(state, turns, permanent), effect), effect, ctx), ctx);
+                // 「不会进入自己的回合」 rides on the state itself: a turn is not something a state could give back
+                // later, so the flag and the state share one lifetime by construction.
+                if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
+                    buff.setSuspendsTurns(true);
+                }
+                // 「有 100% 的基础概率使敌方…陷入【通解】状态」: when the rule states one, the state is ROLLED (effect resistance
+                // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
+                attachRolled(battle, target, buff, effect, ctx);
+            }
         }
     }
 
