@@ -78,13 +78,19 @@ public record MemospriteSpec(@SerializedName("name") String name,
     public record Panel(@SerializedName("attribute") String attribute,
                         @SerializedName("percent") Double percent,
                         @SerializedName("flat") Double flat,
-                        @SerializedName("source") String source) {
+                        @SerializedName("source") String source,
+                        @SerializedName("by_ability") Boolean byAbility) {
 
         /**
          * The attribute-derived panel, which is every panel shipped before 2026-10-02: no {@code source}.
          */
         public Panel(String attribute, Double percent, Double flat) {
-            this(attribute, percent, flat, null);
+            this(attribute, percent, flat, null, null);
+        }
+
+        /** The resource-derived panel (2026-10-02), with nothing said about abilities. */
+        public Panel(String attribute, Double percent, Double flat, String source) {
+            this(attribute, percent, flat, source, null);
         }
     }
 

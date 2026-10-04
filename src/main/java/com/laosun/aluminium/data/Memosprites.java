@@ -298,8 +298,13 @@ public final class Memosprites {
                             + entry.flat() + ", but a flat addition must be finite and not negative "
                             + "(" + source + ")");
         }
+        // ⚠ A zero the DATA states is not the same as a value nobody stated (2026-10-02). Measured: the game's own
+        // `AvatarServantConfig.json` gives 小伊卡 and 德谬歌 `SpeedBase "0"` and `SpeedInherit "0"`, and their servant configs
+        // keep Speed OUT of the summoner sync -- an ability moves it. `by_ability` is how a file says that, so a zero can be
+        // written down instead of being silently accepted (`positive` alone would hide it).
         if ((attribute == AttributeType.HEALTH || attribute == AttributeType.SPEED)
-                && !(positive(entry.percent()) || positive(entry.flat()))) {
+                && !(positive(entry.percent()) || positive(entry.flat()))
+                && !Boolean.TRUE.equals(entry.byAbility())) {
             throw new IllegalArgumentException(
                     "Memosprite '" + spec.name() + "' would give " + attribute.name() + " a value of zero "
                             + "(a zero share and no flat addition): " + zeroConsequence(attribute)
