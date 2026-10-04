@@ -1,7 +1,7 @@
 {
   "name": "德谬歌",
   "source": "1415 昔涟 终结技 诗的「◦」誓约的「∞」 (141503/141504): 「德谬歌初始拥有等同于昔涟 100% 生命上限的生命上限。」＋ 游戏表第 11415 行：`HPInherit: \"#1\"`（技能 141503 的参数 #1 = 1 ✓）、`SpeedBase: \"0\"`、`SpeedInherit: \"0\"`、`Aggro: 100`。",
-  "note": "生命：文档 **100%** ✓、游戏表 `HPInherit #1` = **1** ✓ —— 一致 ✓✓。速度：同 1409 —— 游戏表给的就是 **0** ✗，且自己的侍从配置里无字面速度 ✗，`Speed` 同样在 `SyncPropertyExceptList` 里 ✓⇒ 写成 `flat: 0` ✓ **＋ `by_ability: true`** ✓。仇恨 **100** ✓ ⇒ 不写 ✓。⚠ 本份同时是目标 ①-b 的前提 ✓（她的忆灵技能「奇袭结束后，使刻律德菈获得 1 点充能」需她在场 ✓）。 || 2026-10-02: servant_id = 11415 and one skill row (slot 8, level 10). A memosprite's skills are ordinary skills: the engine addresses them by (cid, slot) with cid = the SERVANT id, which is what makes skill_effects.json able to hold an entry for them.",
+  "note": "生命：文档 **100%** ✓、游戏表 `HPInherit #1` = **1** ✓ —— 一致 ✓✓。速度：同 1409 —— 游戏表给的就是 **0** ✗，且自己的侍从配置里无字面速度 ✗，`Speed` 同样在 `SyncPropertyExceptList` 里 ✓⇒ 写成 `flat: 0` ✓ **＋ `by_ability: true`** ✓。仇恨 **100** ✓ ⇒ 不写 ✓。⚠ 本份同时是目标 ①-b 的前提 ✓（她的忆灵技能「奇袭结束后，使刻律德菈获得 1 点充能」需她在场 ✓）。 || 2026-10-02: servant_id = 11415 and one skill row (slot 8, level 10). A memosprite's skills are ordinary skills: the engine addresses them by (cid, slot) with cid = the SERVANT id, which is what makes skill_effects.json able to hold an entry for them. || 2026-10-02: servant_id = 11415 and all 18 of its skills (data slots [1, 2, 3, 5, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]), imported from ExcelOutput/AvatarServantSkillConfig.json. A memosprite's skills are ordinary skills: the engine addresses them by (cid, slot) with cid = the ServantID.",
   "panel": [
     {
       "attribute": "HEALTH",
@@ -16,7 +16,75 @@
   "servant_id": 11415,
   "skills": [
     {
-      "slot": 8,
+      "slot": 1,
+      "level": 10
+    },
+    {
+      "slot": 2,
+      "level": 10
+    },
+    {
+      "slot": 3,
+      "level": 10
+    },
+    {
+      "slot": 5,
+      "level": 10
+    },
+    {
+      "slot": 13,
+      "level": 10
+    },
+    {
+      "slot": 14,
+      "level": 10
+    },
+    {
+      "slot": 15,
+      "level": 10
+    },
+    {
+      "slot": 16,
+      "level": 10
+    },
+    {
+      "slot": 17,
+      "level": 10
+    },
+    {
+      "slot": 18,
+      "level": 10
+    },
+    {
+      "slot": 19,
+      "level": 10
+    },
+    {
+      "slot": 20,
+      "level": 10
+    },
+    {
+      "slot": 21,
+      "level": 10
+    },
+    {
+      "slot": 22,
+      "level": 10
+    },
+    {
+      "slot": 23,
+      "level": 10
+    },
+    {
+      "slot": 24,
+      "level": 10
+    },
+    {
+      "slot": 25,
+      "level": 10
+    },
+    {
+      "slot": 26,
       "level": 10
     }
   ]
