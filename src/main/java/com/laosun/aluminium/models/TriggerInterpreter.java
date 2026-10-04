@@ -704,7 +704,7 @@ public final class TriggerInterpreter {
                 // 「…的持续时间增加1回合」: lengthen the buffs THIS owner already applied to the target, named by
                 // their state (「战技提供的护盾」/「天赋使敌方目标陷入的风化状态」) or by the attribute a modifier
                 // sits on (「伤害提高效果」). Nothing else is stated.
-                requirePositiveTurns(effect, op, spec);
+                requireSignedTurns(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
                     throw new IllegalArgumentException(
@@ -4385,6 +4385,16 @@ public final class TriggerInterpreter {
      * a wrong mechanic that reads like a working rule, which is the one thing this vocabulary refuses. The
      * documents always state it (「持续1回合」).
      */
+    /** The delta of an EXTEND_BUFF: non-zero and signed (the game does `SetModifierValue{Add, LifeTime}` on a named modifier). */
+    private static void requireSignedTurns(EffectSpec effect, String op, TriggerSpec spec) {
+        Integer turns = effect.getTurns();
+        if (turns == null || turns == 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires a non-zero \"turns\" (add turns, or a negative number to take them away); zero would "
+                            + "read like a working rule and change nothing (source: " + spec.getSource() + ")");
+        }
+    }
+
     private static void requirePositiveTurns(EffectSpec effect, String op, TriggerSpec spec) {
         Integer turns = effect.getTurns();
         if (turns == null) {
