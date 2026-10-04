@@ -506,7 +506,8 @@ public class Battle {
      * roster the QUEUE is built from (L520), so a listener put there would take turns of its own. They are asked by a second
      * loop instead, and because they are in neither `allies` nor the queue they are never targeted and never act.
      */
-    private final java.util.List<Character> warehouseListeners = new java.util.ArrayList<>();
+    private final java.util.LinkedHashMap<Character, TriggerTable> warehouseListeners =
+            new java.util.LinkedHashMap<>();
 
     /**
      * Registers a unit whose rules are asked although it is not on the field (see {@link #warehouseListeners}).
@@ -514,9 +515,21 @@ public class Battle {
      * <p>⚠ The caller sets the table: this is deliberately about WHOSE rules are heard, not about which rules exist, so a listener
      * can carry exactly the global support clauses instead of its whole battle kit.
      */
+    /**
+     * The same, naming the table to ask.
+     *
+     * <p>This is the overload 「获得该角色后，或该角色在队伍中时」 needs: a member of the party is heard through her WAREHOUSE clauses while
+     * keeping her own battle table, because replacing that table would silently delete her kit the moment she deployed.
+     */
+    public void registerWarehouseListener(Character listener, TriggerTable warehouse) {
+        if (listener != null && warehouse != null && !warehouse.isEmpty()) {
+            warehouseListeners.put(listener, warehouse);
+        }
+    }
+
     public void registerWarehouseListener(Character listener) {
         if (listener != null) {
-            warehouseListeners.add(listener);
+            warehouseListeners.put(listener, listener.getTriggerTable());
         }
     }
 
@@ -806,6 +819,18 @@ public class Battle {
 
     public void startBattle() {
         status = Status.RUNNING;
+        // [WAREHOUSE] 「获得该角色后，或该角色在队伍中时」: a member carrying a `warehouse/<cid>.json` is heard through it, with her own
+        // battle table untouched. Registered before every hook below, so a warehouse clause can answer the opening too.
+        for (Character member : characters) {
+            if (member == null) {
+                continue;
+            }
+            com.laosun.aluminium.models.TriggerTable warehouse =
+                    com.laosun.aluminium.data.TriggerTables.warehouse(member.getCid());
+            if (warehouse != null && !warehouse.isEmpty()) {
+                registerWarehouseListener(member, warehouse);
+            }
+        }
         registerPartyResources();   // \u2705 before any hook, so a BATTLE_START rule can already gain a shared counter
         attachBattleSkills();
         applyTechniqueStates();   // ? before every BATTLE_START rule, so `self has_state 秘技` already answers
@@ -2471,11 +2496,11 @@ public class Battle {
             // ⭐ 获得该角色即生效，无需上场 (2026-10-02). ⚠ A SECOND pass, not extra entries in `characters`: that list is what
             // the queue is built from, so a listener in it would act. ⚠ The owner handed to the context is the listener itself,
             // which is what makes 「self」 mean “the character who owns this warehouse clause” rather than whoever is fighting.
-            for (Character listener : warehouseListeners) {
+            for (Character listener : warehouseListeners.keySet()) {
                 if (listener == null || listener.isDeath()) {
                     continue;
                 }
-                TriggerTable table = listener.getTriggerTable();
+                TriggerTable table = warehouseListeners.get(listener);
                 if (table == null || table.isEmpty()) {
                     continue;
                 }
