@@ -617,7 +617,8 @@ public class TriggerTable {
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateId(spec), validateCooldown(spec),
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
-                validateMinEidolon(spec), validatePerTurn(spec), validatePerAttack(spec), List.copyOf(targetFilters),
+                validateMinEidolon(spec), validatePerTurn(spec), validatePerAttack(spec),
+                Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
                 validatePerSubject(spec)));
     }
 
@@ -1928,7 +1929,8 @@ public class TriggerTable {
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
                                int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
-                               int perTurn, int perAttack, List<List<Condition>> effectTargetFilters, String perSubject) {
+                               int perTurn, int perAttack, boolean oncePerWave,
+                               List<List<Condition>> effectTargetFilters, String perSubject) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.
@@ -1951,7 +1953,7 @@ public class TriggerTable {
          * cannot change the behaviour of any rule that does not use it.
          */
         public boolean isLimited() {
-            return cooldownTurns > 0 || oncePerBattle || perTurn > 0 || perAttack > 0;
+            return cooldownTurns > 0 || oncePerBattle || perTurn > 0 || perAttack > 0 || oncePerWave;
         }
 
         boolean matches(TriggerContext ctx) {

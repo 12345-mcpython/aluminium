@@ -160,6 +160,22 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
 
     /** Per rule, the attack sequence of its last "once per attack" firing (see {@link #isAttackLimitReady}). */
     private final Map<String, Integer> ruleAttackUses = new HashMap<>();
+    /** Per rule, the wave sequence of its last "once per wave" firing (see {@link #isWaveLimitReady}). */
+    private final Map<String, Integer> ruleWaveUses = new HashMap<>();
+
+    /**
+     * The same question as {@link #isAttackLimitReady}, for a WAVE: the sequence is {@code Battle.waveSequence()}, and because a new
+     * wave is a new number, nothing has to be cleared when one starts.
+     */
+    public boolean isWaveLimitReady(String key, int waveSequence) {
+        Integer sequence = ruleWaveUses.get(key);
+        return sequence == null || sequence.intValue() != waveSequence;
+    }
+
+    /** Records that the rule has had its wave allowance in {@code waveSequence}. */
+    public void recordWaveUse(String key, int waveSequence) {
+        ruleWaveUses.put(key, waveSequence);
+    }
 
     /** Per rule, how many times it has fired inside that attack (the cap is {@code per_attack}). */
     private final Map<String, Integer> ruleAttackFirings = new HashMap<>();

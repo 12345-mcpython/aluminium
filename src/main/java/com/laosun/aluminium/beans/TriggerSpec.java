@@ -133,6 +133,20 @@ public class TriggerSpec {
      * <p>The boundary is the engine's own: {@code Battle.fireAfterAttack} ends an attack, so the next instance belongs to
      * the next one. Cumulative with the other caps (they are all upper bounds).
      */
+    /**
+     * [WAVE-LIMITED] at most one firing per WAVE (2026-10-02; reader: 1506's warehouse skill).
+     *
+     * <p><b>Why neither neighbour can say it.</b> {@code per_turn} counts one unit's turns and {@code once_per_battle} covers the
+     * whole fight; a wave is neither. So it gets the treatment {@code once_per_attack} got: a SEQUENCE comparison, which needs no
+     * reset because a new wave is a new number ({@code Battle.waveSequence()}).
+     */
+    @SerializedName("once_per_wave")
+    private Boolean oncePerWave;
+
+    /** The per-wave cap, as the engine reads it. Written out because the builder reads this exact name. */
+    public Boolean getOncePerWave() {
+        return oncePerWave;
+    }
     @SerializedName("once_per_attack")
     private Boolean oncePerAttack;
 

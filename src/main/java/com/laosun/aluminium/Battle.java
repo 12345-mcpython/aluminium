@@ -482,6 +482,21 @@ public class Battle {
     private final Random rng;
     /** \u2705 The resource a RESOURCE_CHANGED event is about (2026-09-30; reader: 1506\u2019s forwarding clause). */
     private String lastChangedResource;
+    /**
+     * [WAVE SEQUENCE] how many waves have begun (2026-10-02). A sequence, not a flag: a per-wave cap is a comparison against the
+     * number a rule last fired in, so nothing has to be reset -- the same reason the per-attack cap works that way.
+     */
+    private int waveSequence;
+
+    /** Starts a wave: the counter every per-wave limit is compared against. Called by WaveManager before WAVE_START. */
+    public void beginWave() {
+        waveSequence++;
+    }
+
+    /** The current wave's number. */
+    public int waveSequence() {
+        return waveSequence;
+    }
 
     /**
      * ⭐ Units that are OWNED but NOT DEPLOYED, whose rules are asked without them ever acting (2026-10-02).

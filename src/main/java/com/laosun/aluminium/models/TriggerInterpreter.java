@@ -985,7 +985,11 @@ public final class TriggerInterpreter {
             }
             // An Eidolon gate (「星魂 N 解锁」): the rank is a construction-time property of the rule's owner, so
             // the rule itself is the only place that has to know it is an Eidolon.
-            if (rule.minEidolon() > 0 && eidolonRankOf(owner) < rule.minEidolon()) {
+            // [WAVE CAP] the same shape as the attack cap above, compared against the wave number instead.
+            if (owner != null && Boolean.TRUE.equals(rule.oncePerWave())
+                    && !owner.isWaveLimitReady(limitKey, battle.waveSequence())) {
+                continue;
+            }            if (rule.minEidolon() > 0 && eidolonRankOf(owner) < rule.minEidolon()) {
                 continue;
             }
             // A rule-level probability (「有 35% 的固定概率…」). A failed roll costs nothing: no cooldown is
@@ -1000,7 +1004,9 @@ public final class TriggerInterpreter {
                 // raised cap). One expression, read twice -- see `amendedPerTurn`.
                 owner.startTriggerCooldown(limitKey, rule.cooldownTurns(), rule.oncePerBattle(),
                         rule.perTurn() + owner.rulePerTurnBonus(rule.id()));
-                if (rule.perAttack() > 0) {
+                if (Boolean.TRUE.equals(rule.oncePerWave())) {
+                    owner.recordWaveUse(limitKey, battle.waveSequence());
+                }                if (rule.perAttack() > 0) {
                     owner.recordAttackUse(limitKey, battle.attackSequence());
                 }
             }
