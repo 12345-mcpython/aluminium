@@ -60,6 +60,12 @@ public class StatModifierBuff extends AbstractBuff {
     private final double value;
     private final DoubleValue.Modifier.ModifierSource sourceRole;
     private final int maxStacks;
+    /**
+     * ⭐ When set, this modifier asks for its share on every read instead of holding the number it was built with
+     * (2026-10-02; reader: the fourteen 「每拥有 1 层…提高 X%」 auras). Only add-percent modifiers may be live -- a
+     * pure or multiply share has no spelling for 「随层数变化」 yet, and this refuses rather than guessing.
+     */
+    private java.util.function.DoubleSupplier liveShare;
 
     /**
      * @param attribute    the attribute to modify (must not be a {@code *_PERCENT} variant)
@@ -296,11 +302,31 @@ public class StatModifierBuff extends AbstractBuff {
         return sourceRole == DoubleValue.Modifier.ModifierSource.DEBUFF;
     }
 
+    /**
+     * Makes this modifier LIVE: its share is asked for on every read (2026-10-02).
+     *
+     * @throws IllegalStateException when the modifier is not an add-percent one, because the live kind only exists for
+     *                               that type -- silently keeping the stored number would be a wrong number with no symptom
+     */
+    public void makeLive(java.util.function.DoubleSupplier share) {
+        if (modifierType != DoubleValue.Modifier.ModifierType.ADD_PERCENT) {
+            throw new IllegalStateException(
+                    "A live share only exists for add_percent modifiers, but this one is " + modifierType);
+        }
+        this.liveShare = share;
+    }
+
+    /** Whether the share is re-read on every computation. */
+    public boolean isLive() {
+        return liveShare != null;
+    }
+
     @Override
     public void applyEffect(CanHit target) {
         DoubleValue attributeValue = target.getAttribute(attribute);
-        attributeValue.addModifier(
-                new DoubleValue.Modifier(modifierType, value, sourceRole, id));
+        attributeValue.addModifier(liveShare != null
+                ? DoubleValue.Modifier.livePercent(liveShare, sourceRole, id)
+                : new DoubleValue.Modifier(modifierType, value, sourceRole, id));
         if (attribute == AttributeType.SPEED) {
             target.notifySpeedChanged();
         }

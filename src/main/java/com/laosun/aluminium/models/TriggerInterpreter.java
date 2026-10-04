@@ -2027,6 +2027,18 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      */
     /** The multiplier `per_stack` names, read on the target: a debuff count, a DoT count, or a counter (2026-09-29). */
+    /** Whether `per_stack` names something a supplier can read later, without an event context (2026-10-02). */
+    private static boolean ctxFreeCounter(EffectSpec effect) {
+        return effect.getPerStack() != null && !effect.getPerStack().isBlank()
+                && !COUNT_FORMS.contains(effect.getPerStack().trim());
+    }
+
+    /** The counter name behind `self_stacks:<NAME>` (or the bare name), for a live reader. */
+    private static String counterName(EffectSpec effect) {
+        String stated = effect.getPerStack().trim();
+        return stated.startsWith("self_stacks:") ? stated.substring("self_stacks:".length()).trim() : stated;
+    }
+
     private static double perStackFactor(EffectSpec effect, CanHit target, TriggerContext ctx) {
         // \u2605 A SELF counter (2026-09-30; reader: cone 23053's \u300c\u88c5\u5907\u8005\u6bcf\u6d88\u8017 1 \u4e2a\u6218\u6280\u70b9\u2026\u6700\u591a\u53e0\u52a0 4 \u5c42\u300d).
         // The bare name below is resolved on the TARGET, which is right for \u300c\u6bcf\u5c42\u3010\u5f53\u54c1\u3011\u300d (a counter on the victim) but
@@ -2156,6 +2168,21 @@ public final class TriggerInterpreter {
             // when a countdown's turn arrives -- a lifetime no `turns` can state. Naming the modifier is what lets
             // `REMOVE_STATE <the same name>` take it off; ⚠ without a name the modifier is skipped by that loop, i.e.
             // unnamed boosts keep exactly the lifetime they always had.
+            if (Boolean.TRUE.equals(effect.getPerStackLive())) {
+                // ⭐ 「每拥有 1 层…提高 X%」 as a SUSTAINED aura (2026-10-02; reader family: fourteen documents). The share is
+                // asked for on every read, so the aura follows the count -- a snapshot would only be right at the instant it
+                // was taken, and re-attaching on every change would stack the buff itself.
+                if (!ctxFreeCounter(effect)) {
+                    throw new IllegalStateException(
+                            "per_stack_live only exists for the counter forms (self_stacks:<NAME> or a bare name), but this "
+                                    + "rule's per_stack is '" + effect.getPerStack() + "'; the per-hit count forms are read "
+                                    + "from an event context and (source: " + ctx.ruleId() + ")");
+                }
+                if (buff instanceof com.laosun.aluminium.models.buff.StatModifierBuff liveBuff) {
+                    String counter = counterName(effect);
+                    liveBuff.makeLive(() -> magnitude * target.getBuffManager().stacksOf(counter));
+                }
+            }
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 buff.setBuffName(effect.getBuff().trim());
             }
@@ -2631,6 +2658,10 @@ public final class TriggerInterpreter {
      * every other vocabulary here: a typo has to be rejected at load time, and the two spellings are the ones
      * the content actually uses (see {@link EffectSpec#getScale()}).
      */
+    /** The `per_stack` forms that count something about the CURRENT hit: they have no ctx-free reader (2026-10-02). */
+    private static final Set<String> COUNT_FORMS = Set.of(
+            "target_debuff_count", "target_dot_count", "target_weakness_count", "shielded_count");
+
     private static final Set<String> SCALES =
         Set.of("target_max_hp", "target_lost_hp", "owner_max_hp", "owner_def", "owner_attack");
 
