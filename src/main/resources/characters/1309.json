@@ -181,5 +181,21 @@
       }
     ],
     "note": "⭐ 2026-09-30 转正 ✓：「结界期间无视 20% 防御」—— ⚠ 写法照 1303 星魂 1：具名 \buff: 结界 ✓ + \turns: 2 ✓，于是它随结界生灭 ✓（而 has_state 结界 也能读到它 ✔ —— 那正是本段落的 (a)：BuffManager.hasState 现在也走具名修饰器那一遍历 ✓）。"
+  },
+  {
+    "on": "WAVE_START",
+    "id": "technique_field_recovers_five_at_each_wave",
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 5,
+        "target": "self"
+      }
+    ],
+    "source": "1309 知更鸟 秘技 沉醉吧，朋友 (skill 130907, Maze): 「施放秘技后，在自身周围展开持续 15 秒的特殊领域…领域展开期间进入战斗后，**每个波次开始时知更鸟恢复 5 点能量**」",
+    "note": "「领域展开期间进入战斗后，每个波次开始时知更鸟恢复 **5** 点能量」⇒ `WAVE_START` ＋ `self has_state 秘技` ⇒ `GAIN_ENERGY{amount: 5, target: self}` ✓。⚠ 「秘技」那半用的是本仓**已有的惯例** ✓（`1408` 的秘技条也写 `self has_state 秘技` ✓，且 `applyTechniqueStates()` 跑在任何规则之前 ✓）。⚠ 仍登记 ✓：「我方制造的领域效果最多存在 1 个」（同句末尾 ✗）。",
+    "when": [
+      "self has_state 秘技"
+    ]
   }
 ]
