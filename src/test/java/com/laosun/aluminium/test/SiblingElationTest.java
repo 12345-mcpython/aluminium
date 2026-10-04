@@ -66,12 +66,12 @@ public class SiblingElationTest {
     public void theirFilesCarryTheClauses() {
         for (int cid : new int[]{8009, 8010}) {
             var table = com.laosun.aluminium.data.TriggerTables.of(cid);
-            Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
-                    "cid " + cid + ": the ultimate is TWO clauses since 2026-10-02 -- the CRIT DMG buff and the "
-                            + "action advance for an ally with no Elation skill. ⚠ The document's OTHER branch "
-                            + "(「若目标拥有欢愉技…并使其立即施放1次…欢愉技」) is NOT shipped: measured, the named "
-                            + "skill's own row is 「8 次随机单体 20% + 最后 60% 由全体均分」, which CAST_SKILL cannot "
-                            + "deliver faithfully -- see the GAPS entry for the exact evidence");
+            // ⭐ 2026-10-02: FOUR clauses now, not two -- the document's other branch finally shipped. It waited on the
+            // engine's reading of an Elation skill's row (「8 次随机单体 + 最后一次均分」, whose leading column is a HIT
+            // COUNT): before that, a commanded Elation cast settled as ONE 800% instance. See `ElationRowTest`.
+            Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
+                    "cid " + cid + ": 终结技现在是四条 —— 暴伤 buff、无欢愉技时的行动提前、"
+                            + "获得 5 个笑点、以及「若目标拥有欢愉技…使其立即施放 1 次欢愉技」");
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "cid " + cid);
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid);
         }
