@@ -228,6 +228,26 @@
       "note": "「充能达到 **150** 点时，立即获得 1 个**额外回合**并**自动施放【弑神登神】**」⇒ 四个已有词 ✓：`SPEND_RESOURCE{150}` ✓（【弑神登神】自己那一行就写着「消耗 150 点充能」 ✓）；`EXTRA_TURN` ✓（已出货：`1102` 希儿、`1309` 知更鸟 ✓）；`REPLACE_SKILL{skill_id: **11**, turns: 1}` ✓ —— 槽 11 的破韧 **90/60** 与语料给【弑神登神】的逐字相符 ✓，而**换装会传到被命令的施放** ✓（同等级对比：有换装 767.585 vs 无换装 628.024 ✓）；`CAST_SKILL{SKILL}` ✓。⚠ 仍登记 ✓：「下一次【弑神登神】**优先攻击指定敌方单体**」（终结技标记的目标 ✗）与 `1415` 的忆灵技能 8「使其自动施放1次**不消耗充能**的【弑神登神】」✗。 ⚠ **2026-10-02 订正**：`CAST_SKILL` 的 `target` 选的是**谁来放** ✓（`requireCharacterOwner` ✓），而事件里的 `target` 是**敌人** ✗ ⇒ 原来那个 `target: \"target\"` 会**命令敌人施放** ✗（装载器报错：*“冰锋 has no SKILL skill…”* ✓）⇒ 改成 `self` ✓。"
     },
     {
+      "id": "memosprite_ode_raises_his_crit_damage_for_this_cast",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 16"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 2.0,
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 8 「献予「纷争」之诗」（数据槽位 16，SkillID 1141516）：「**本次攻击中**万敌的暴击伤害提高 `#1[i]%`」。（满级 `#1` = 2，即 **+200%**；属性名 `CRIT_ATTACK` —— 游戏的 `CriticalDamageBase` 就映射到它。）",
+      "note": "★ 「本次攻击中」是一个**寿命**：`MODIFY_ATTR` 接受 `until`，已出货的 **`cast_end`** 正是这个窗口（光锥 20001 同形）。⚠ 本条**不**受【行仇】限制（原句如此）。\n⭐⭐ **位置是必要的**：同一事件上的规则按**文件顺序派发**（`byEvent...add(rule)`），而 `CAST_SKILL` 是**同步**执行的 —— 若本条排在命令那条**之后**，那一击已经结算完了，增益才贴上去；实测差别是 **4391.48 → 9080.73**。"
+    },
+    {
       "id": "memosprite_ode_commands_the_godslayer_in_bloodfeud",
       "on": "CAST_SETUP",
       "when": [
