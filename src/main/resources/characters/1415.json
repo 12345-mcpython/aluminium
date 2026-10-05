@@ -292,6 +292,10 @@
           "target": "summon"
         },
         {
+          "op": "INSERT_ACTION",
+          "target": "summon"
+        },
+        {
           "op": "CAST_SKILL",
           "skill": "SKILL",
           "skill_id": 1,
@@ -299,7 +303,7 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」（SkillID 1141526）：「**当【故事】达到 3 点时，德谬歌消耗全部【故事】立即获得 1 个额外回合自动施放【花与箭的舞曲】**」。",
-      "note": "⭐ **2026-10-02**：⭐ **新词汇 `summon_resource:`**—— 实测 `fireResourceChanged` 是 `CanHit holder = ctx.owner()`（**规则主人**），而【故事】在**忆灵**身上 ⇒ 条件必须从主人**伸到它的召唤物**。⭐ 已落：**消耗全部【故事】**＋**立即自动施放【花与箭的舞曲】**（`SkillID 1141501`，忆灵槽位 1）。⛔ **仍登记**：「立即获得 1 个**额外回合**」—— `Battle.grantExtraTurn` 对**不在行动顺序**的单位返回 false，而本忆灵的速度**据数据就是 0**（本文件的 `memosprites/1415.json` 记录了游戏行：`SpeedBase: \"0\"`、`SpeedInherit: \"0\"`）。`EXTRA_TURN` 现在会**响亮地拒绝**，而它的注记说同一情形早前已在创世的「迷迷」上量到。"
+      "note": "⭐ **2026-10-02**：⭐ **新词汇 `summon_resource:`**—— 实测 `fireResourceChanged` 是 `CanHit holder = ctx.owner()`（**规则主人**），而【故事】在**忆灵**身上 ⇒ 条件必须从主人**伸到它的召唤物**。⭐ 「立即获得 1 个额外回合」用 **`INSERT_ACTION`**：本忆灵的速度**据数据就是 0**，而 `Queue.addCombatant` 的注释写明这种单位**不会出现在行动条上、也不会轮到它**（“skipped rather than refused”）⇒ 所以「**立即**…」的语义是“**立即行动**”（`INSERT_ACTION` 的自述：“makes X act now”），而不是排程意义的额外回合。⭐ 「花与箭的舞曲」= `SkillID 1141501`（忆灵槽位 1）。"
     }
   ]
 }
