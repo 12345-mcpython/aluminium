@@ -37030,3 +37030,26 @@
 >   ⇒ ⭐⭐ **下一轮的入口已具名**：⭐ 一个"**多造成 N 次附加伤害**"的 op ✗ —— ⭐ 引擎**知道**这个概念 ✓
 >     （⭐ `Battle` 的注释：⭐ *"额外造成 2 次伤害 is additional damage, which is not an attack"* ✓）⇒ ⭐ 缺的只是 ⭐ **可寻址的入口** ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2287** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 26 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但"多造成 N 次附加伤害"这条路**完全查清** ✓，⭐ 并发现那句诗要的**结界是现成的** ✓）**）**：
+>
+> * ⭐⭐⭐ **引擎那条唯一入口（⭐ 它的注释还**禁止**第二条路 ✓）**：⭐
+>   `Battle.applyAdditionalDamage(attacker, target, element, base, fixedCritRate, fixedCritDamage, damageType)` ✓ ——
+>   ⭐ 它 ⭐ `new Damage(…, DamageType.ADDITIONAL, base)` ✓ ⇒ ⭐ `applyDamage(…, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY)` ✓
+>   ⇒ ⭐⭐ **并在那里发 ⭐ `FOLLOW_UP`** ✓（⭐ 原文：⭐ *"this is the engine's one and only notion of a follow-up attack, so the data-facing
+>   FOLLOW_UP event is emitted here rather than from a second attack path"* ✓）。
+>   ⭐ 它的 javadoc 还**明确**写着：⭐ *"one additional-damage entry point (`DamagePipelineTest` pins the single-settlement invariant), so an extra
+>   overload is the honest place for them — **a second public way to build and settle an instance is exactly what that invariant exists to prevent**"* ✓
+>   ⇒ ⭐⭐ **所以任何新能力都必须走它** ✗，⭐ 不能另造一条结算路 ✓。
+> * ⭐ **op 那一层**：⭐ `damage(Battle, EffectSpec, TriggerContext, CanHit victim)` ✓（⭐ 名字是 ⭐ `DAMAGE` ✗），⭐ 三分支 ——
+>   ⭐ `damage_type: "TRUE"` ⇒ ⭐ `applyTrueDamage` ✓；⭐ `ordinary: true` ⇒ ⭐ `applyDamage` ✓；⭐ 否则 ⇒ ⭐ **`applyAdditionalDamage`** ✓。
+> * ⭐⭐⭐ **意外收获：那句诗的「结界」是现成内容** ✓ —— ⭐ 上面那个方法的注释**点名了它的两个读者** ✓：
+>   ⭐ *"8007 开拓者's 【迷迷的声援】(28%) and **1415 昔涟's 结界 (24%)**, both 「等同于原伤害 X% 的真实伤害」"* ✓
+>   ⭐ 内容侧确认：⭐ `1415.json:69` ✓ 与 ⭐ `8007.json:89` ✓ 都是 ⭐ `percent: 0.24 / 0.28` ＋ ⭐ `element: "Ice"` ＋ ⭐ `damage_type: "TRUE"` ✓✓
+> * ⛔ **`1141515` 第二句缺什么（⭐ 已具名，⭐ 做法已定 ✓）**：⭐「会**额外造成 `#1` 次**附加伤害」✗ ⇒ ⭐ 需要 ⭐ **N 次实例** ✗
+>   ⇒ ⭐⭐ **做法**：⭐ 给 ⭐ `DAMAGE` op ✗ 加 ⭐ `times` ✗，⭐ 并让它 ⭐ **逐次调用 ⭐ `applyAdditionalDamage`** ✓ ——
+>   ⭐ 走那条**唯一入口** ✓，⭐ 于是每次都会 ⭐ 发 `FOLLOW_UP` ✓ ⭐ 且 ⭐ 每次都是 ⭐ `countsAsAttack = false` ✓（⭐ 正是那句话的两半 ✓）。
+>   ⚠ 唯一要小心：⭐ 那个 worker 现在 ⭐ **每个分支都 `return`** ✗ ⇒ ⭐ 加 `times` 要把三分支改成"⭐ 先选定路径、⭐ 再循环" ✗（⭐ 别复制结算逻辑 ✓）。
+> * ⚠ **我自己的**：⭐ 本轮 7 次调用**全是读** ✗ —— ⚠ 但每一步都是"下一步必须知道"的 ✓，
+>   ⭐ 尤其那句"唯一入口"的注释 ✗：⭐ 它恰好阻止了我去造第二条结算路 ✓（⭐ 那会破坏 ⭐ `DamagePipelineTest` 守的"单次结算"不变式 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2287** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
