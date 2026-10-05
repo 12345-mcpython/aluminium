@@ -1730,7 +1730,14 @@
 - ⚠⚠ **这次修复的回归（我的错，已记录）**：第一版规则**漏了 `from_skill_id`**，于是**任何**忆灵的施放都会触发它，而队伍里没有风堇时 `ally_cid:1409` 会**抛异常** ⇒ **22 例红**（全是既有判据）。⭐ 修法有二：① 补上数据自己就有的那道门（该修饰写在 **19 号技能**的 `TaskList` 里）；② 判据要铸 **19 号**。
 - ✅ **已修（2026-10-02，第 63 轮）**：`ally_cid:<cid>` 现在在**复数**解析路径里解析 —— 点名的人不在场时返回**空列表**（与 `lowest_hp_ally` 同一形状：`return lowest == null ? List.of() : List.of(lowest);`），**不再抛异常**。⭐ 判据 `SkyOdeStackTest` 现在读**两侧**：她在场 ⇒ 2 层、旁人 0 层；她**不在场** ⇒ **不抛异常**、且不落到旁人身上。⭐ 变异（改回 `require(...)`）⇒ 第二条断言报 `Unexpected exception thrown: IllegalStateException` ⇒ 红。
 - ⭐⭐ **而数据已经证实了两件事**（`Config/ConfigAbility/Servant/Servant_CyreneServant_00_Ability.json` —— 目标点名的那个文件在 `Config/` 下，**不在** `ExcelOutput/`）：① 游戏用 **`ByCompareCharacterID` ＝ 1409** 点名风堇 —— **这与 `ally_cid:` 是同一件事**，所以那个设计是**源头确认过的**，不是猜的；② `LayerAddWhenStack: 2` —— **层数就是 2**，与原句一致。
-- ⛔「计入小伊卡忆灵技的治疗数值额外提高…等同于本次治疗数值的 `#1%`」：**机制已经量清，卡在判据的载体上**（2026-10-02，一次探针取三位）：
+- ⛔「计入小伊卡忆灵技的治疗数值额外提高…等同于本次治疗数值的 `#1%`」：**机制都对，卡在入账的 holder 上**（2026-10-02，三轮实测的结论）：
+  - ✅ `HEALED` **带量**，actor 是**治疗者**；满血单位被治疗时治疗量为 0，**根本不发 `HEALED`**；
+  - ✅ `GAIN_RESOURCE` 已支持 `amount_from_event` × `amount_percent`；`amount_percent` **没有**派生拼法；
+  - ✅ `TriggerTable` 有**三参构造器**收 `List<ResourceSpec>`；它声明的资源是 **`ResourceScope.PARTY`**（`registerPartyResources`），读法是 `battle.partyResourceValue(id)`；
+  - ⛔⛔ **即使 `HEALED` 发了（探针读到 1 次）、规则也在表里、资源也已声明**，`GAIN_RESOURCE`（带 `amountPercentFromSkillParam`）**读数仍是 0**；
+  - ⭐ **具体假设（下一问，一次即可）**：`gainResource` 用 `resolveTarget(effect, ctx)` 取 **holder**，往 holder 的**角色 store** 入账 —— 而**队伍级**资源不在那个 store 里。若属实，则“给队伍级资源入账”本身就是一个具名缺口；
+  - ⛔ **另外两条路**：选择器点不了**别人的忆灵**；`characters/1409.json` 是**列表**，装不下 `resources`。
+  - ⚠ ⭐⭐ **最重要的一条教训**：**判据的“载体”要当作被测物一样先量** —— 连续三轮我把失败归给引擎，而三次都是载体（满血 / 小上限 / 队伍 store）。
   - ✅ `HEALED` **带量**，且 actor 是**治疗者**；`GAIN_RESOURCE` 已支持 `amount_from_event` × `amount_percent`；
   - ✅ **修正上一轮的误判**：上一轮读数 0 不是引擎的错 —— **满血单位被治疗时治疗量为 0，根本不会发 `HEALED`**（实测：血量 1047.816 → 1047.816）；受伤后再治疗，记账**会**走到（实测：读数 2）；
   - ⛔ **而那个 2 是被资源上限截断的**（姬子「充能」上限 3、起始 1）⇒ **它无法区分“份额被读到了”与“份额被忽略了”**；

@@ -35210,3 +35210,17 @@
 > * ⭐ **还有一条 API 事实**：⭐ 引擎**没有 HP setter** ✗ ⇒ ⭐ 出货写法是 ⭐ `unit.takeDamage(...)` ✗（⭐ `AnchorDeathTest` 的原话：⭐ *"Killing a unit has no setter"* ✓）。
 > * ⭐ **回滚** ✓：⭐ 引擎改动与两套判据都已回滚 ✓（⭐ 这是**第二次**为同一能力回滚 ✗ ⚠ —— ⭐ 但这次带回了一条能判它的路 ✓）。
 > * **实测（本轮）**：⭐ 回滚后 ⭐ 全量 **0**（--rerun-tasks ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（第 67 轮：⚠ **本轮没有出货** ✗ —— ⭐ 这是**第三次**为同一能力回滚 ✗ ⚠；⭐ 但这次量到的是**判据载体的机制** ✓）**：
+>
+> * ⭐⭐ **载体三连错（⭐ 全是我自己的 ✓）**：① ⭐ 满血单位被治疗 ⇒ 治疗量 0 ⇒ **不发 `HEALED`** ✗；② ⭐ 资源上限太小 ⇒ 每次读数被截断 ✗；
+>   ③ ⭐ 表里声明的资源是 **`ResourceScope.PARTY`** ✗，⭐ 而我去读**角色 store** ✗ ⇒ ⭐ 读到 0 ✓。
+> * ⭐ **量到的 API 事实（⭐ 都值得记 ✓）**：⭐ `TriggerTable(int cid, List<TriggerSpec>, List<ResourceSpec>)` ✗ ✓；
+>   ⭐ `registerPartyResources` ✗ ⭐ 把表里的资源建成 **PARTY** 级 ✓ ⭐ 读法 ⭐ `battle.partyResourceValue(id)` ✗ ✓；
+>   ⭐ 引擎**没有 HP setter** ✗ ⇒ ⭐ `takeDamage(...)` ✗ ✓；⭐ `percent_from_skill_param` ✗ 的拼法是 ⭐ `"SKILL:<i>"` ✗ ✓。
+> * ⛔⛔ **仍然没解决的那一步** ✗：⭐ 即使 ⭐ `HEALED` 发了（⭐ 探针读到 **1** 次 ✓）、⭐ 规则在表里 ✓、⭐ 资源已声明 ✓（⭐ 队伍级 ✓），
+>   ⭐ `GAIN_RESOURCE` ✗（⭐ 带 `amountPercentFromSkillParam` ✗）⭐ **读数仍是 0** ✗ ✓ ⇒
+>   ⭐⭐ **具体假设**：⭐ `gainResource` ✗ ⭐ 用 `resolveTarget(effect, ctx)` ✗ ⭐ 取 **holder** ✗ ⭐ 往它的**角色 store** 入账 ✗，⭐ 而**队伍级**资源不在那个 store 里 ✓。
+> * ⭐ **回滚** ✓：⭐ 引擎改动与判据都已回滚 ✓ ⇒ ⭐ 树干净、⭐ 全量 0、⭐ mechanics rc 0 ✓。
+> * ⭐⭐ **本轮最值钱的一条** ✓：⭐ **判据的"载体"要当作被测物一样先量** ✗ —— ⭐ 连续三轮我把失败归给引擎 ✗，⭐ 而三次都是**载体** ✓。
+> * **实测（本轮）**：⭐ 回滚后 ⭐ 全量 **0**（--rerun-tasks ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
