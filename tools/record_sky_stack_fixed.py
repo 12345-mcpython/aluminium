@@ -24,12 +24,12 @@ NEW_BULLET = (
     "⭐ 判据 `SkyOdeStackTest`：点名的风堇 **2 层**、同一场里另一个我方角色 **0 层**。\n"
     "- ⭐⭐ **上限为什么写 99999（数据自己的惯例）**：能力数据把这句话写成 `AddModifier` ＋ `LayerAddWhenStack: 2`，前置 `ByCompareCharacterID = 1409`"
     "（**游戏就是按 cid 点名**）；提到该修饰的四个文件里它旁边**没有** `MaxLayer`（`AvatarStatusConfig` 的行甚至没有计数列），"
-    "而同一个能力文件里"不限"写的就是 `MaxLayer: 99999`（两处）⇒ **缺省 ＝ 不限**。⚠ 不写它，引擎的 `StackBuff`（`Math.max(1, maxStacks)`）只给 1 层。\n"
+    "而同一个能力文件里「不限」写的就是 `MaxLayer: 99999`（两处）⇒ **缺省 ＝ 不限**。⚠ 不写它，引擎的 `StackBuff`（`Math.max(1, maxStacks)`）只给 1 层。\n"
     "- ⚠⚠ **这次修复的回归（我的错，已记录）**：第一版规则**漏了 `from_skill_id`**，于是**任何**忆灵的施放都会触发它，"
     "而队伍里没有风堇时 `ally_cid:1409` 会**抛异常** ⇒ **22 例红**（全是既有判据）。"
     "⭐ 修法有二：① 补上数据自己就有的那道门（该修饰写在 **19 号技能**的 `TaskList` 里）；② 判据要铸 **19 号**。\n"
     "- ⭐ **引擎侧仍有一处锋利的边（已登记）**：`ally_cid:<cid>` 在**点名的人不在场**时走的是 `require(...)` ⇒ **抛异常**，"
-    "而引擎自己的惯例是**空列表、不是错误**（`resolveTargets` 里 `lowest_hp_ally` 旁边那句注释：*\"clause does nothing\"*）。"
+    "而引擎自己的惯例是**空列表、不是错误**（`resolveTargets` 里 `lowest_hp_ally` 旁边那句注释：「clause does nothing」）。"
     "⭐ **下一问**：把 `ally_cid:` 移进**复数**解析路径，让它在人不在场时静默不生效。"
 )
 
