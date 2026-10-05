@@ -48,6 +48,7 @@ public class EffectSpec {
         copy.amountFromAttr = amountFromAttr;
         copy.amountPercent = amountPercent;
         copy.amountFromResource = amountFromResource;
+        copy.overflowOnly = overflowOnly;
         copy.amountPercentFromResource = amountPercentFromResource;
         copy.percentFromResource = percentFromResource;
         copy.skillParamCid = skillParamCid;
@@ -168,6 +169,15 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("amount_from_resource")
     private String amountFromResource;
+
+    /**
+     * ⭐ Spend only the OVERFLOW tier (2026-10-02; reader: 1141517 「召唤死龙时会消耗**所有溢出【新蕊】**」).
+     *
+     * <p>A resource has a normal cap and an overflow above it; 「消耗所有溢出」 is the part above the cap, which `spendAll` (everything) and a stated `amount` (a
+     * flat number) both fail to say.
+     */
+    @com.google.gson.annotations.SerializedName("overflow_only")
+    private Boolean overflowOnly;
 
     /**
      * ⭐ The share of an EVENT's magnitude carried in a resource, in basis points (2026-10-02).

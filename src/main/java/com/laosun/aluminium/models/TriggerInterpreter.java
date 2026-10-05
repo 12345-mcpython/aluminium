@@ -448,7 +448,9 @@ public final class TriggerInterpreter {
                     if (isCastParamScale(effect)) {
                         requireNoStackArguments(effect, op, spec);
                     } else {
-                        requireAmount(effect, op, spec);
+                        if (!Boolean.TRUE.equals(effect.getOverflowOnly()) && !Boolean.TRUE.equals(effect.getSpendAll())) {
+                            requireAmount(effect, op, spec);
+                        }
                     }
                 }
                 requireResource(effect, op, spec);
@@ -1582,9 +1584,12 @@ public final class TriggerInterpreter {
                 ? null
                 : (ctx.battle() == null ? null : ctx.battle().partyResource(id));
         if (partyCounter != null) {
-            int spend = Boolean.TRUE.equals(effect.getSpendAll())
-                    ? partyCounter.value()
-                    : (int) Math.round(scaledAmount(effect, ctx));
+            // ⭐ 「消耗所有溢出」 is the tier ABOVE the cap (2026-10-02; reader: 1141517) -- neither `spendAll` (everything) nor a stated amount says it.
+            int spend = Boolean.TRUE.equals(effect.getOverflowOnly())
+                    ? Math.max(0, partyCounter.value() - partyCounter.getMax())
+                    : Boolean.TRUE.equals(effect.getSpendAll())
+                            ? partyCounter.value()
+                            : (int) Math.round(scaledAmount(effect, ctx));
             if (!partyCounter.spendExactly(spend)) {
                 throw new IllegalStateException(
                         "SPEND_RESOURCE '" + id + "' needs " + spend + " but the party has only "
@@ -1594,9 +1599,13 @@ public final class TriggerInterpreter {
         }
         // 「消耗所有【X】」 (2026-10-02): the size is whatever is there; the "not enough"
         // failure below cannot happen for it, which is why the two spellings are kept apart.
-        int amount = Boolean.TRUE.equals(effect.getSpendAll())
-                ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)
-                : (int) Math.round(scaledAmount(effect, ctx));
+        int amount = Boolean.TRUE.equals(effect.getOverflowOnly())
+                ? (holder.getResources().has(id)
+                        ? Math.max(0, holder.getResources().value(id) - holder.getResources().get(id).getMax())
+                        : 0)
+                : Boolean.TRUE.equals(effect.getSpendAll())
+                        ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)
+                        : (int) Math.round(scaledAmount(effect, ctx));
         if (!holder.getResources().has(id)) {
             throw new IllegalStateException(
                     "SPEND_RESOURCE '" + id + "' but " + holder.getName() + " has no such resource");

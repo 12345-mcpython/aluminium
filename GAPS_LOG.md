@@ -35682,3 +35682,15 @@
 >   3. ⭐⭐ **`case` 块必须整段重写**：本轮照做⇒一次通过；上一轮三次行手术全坏。
 > * ⭐ **而 `17` 的后两句仍登记**：“消耗所有溢出”与“消耗量 → 死龙天赋倍率”。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（第 104 轮：第 145 件出货 ＝ 能力 `SPEND_RESOURCE{overflow_only: true}`＋`1141517` 第二句的消耗部分）**：
+>
+> * ✅ **判据读数**：`[overflow_spend] from 14 it leaves 10 ; from 12 it leaves 10` ✓✓
+>   ⇒ ⭐ **变异**（让新拼法失效）⇒ `leaves 14 / 12` ⇒ 红 ✓。
+> * ⭐⭐⭐ **三条新事实**：
+>   1. ⭐ **内容里的键是 JSON 拼法**：我写了 Java 字段名 `overflowOnly`，而 `@SerializedName` 是 `overflow_only`
+>      ⇒ **加载器当场拒绝**（*"unknown key … known: […]"*），一口气 26 例红；
+>   2. `SPEND_RESOURCE` 的 `requireAmount` 在 `if (isCastParamScale(effect)) … else …` 里 ⇒ **自带尺寸的新拼法必须同样免检**；
+>   3. ⭐ `Resource` 用**逐字段 `@Getter`** ⇒ `getMax()` 与 `getMaxOverflow()` 都有，而 `ResourceManager` **没有** `max(String)` ⇒ 要 `get(id).getMax()`。
+> * ⭐ **仍登记**：“召唤**死龙**时”的触发（规则暂挂在通用 `SUMMONED`）与“消耗量 → 天赋倍率”。
+> * **实测（本轮）**：全量 **0**（2323 例，--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
