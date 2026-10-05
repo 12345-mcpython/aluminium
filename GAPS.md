@@ -2412,3 +2412,14 @@
     **只有 `1412`（刻律德菘，dict 且声明了「充能」）与 `1415`（昔涿）是“dict＋内容资源”**，
     而 **1412 正是奥词的被矄准者** ✓ ⇒ 用 **slot 23 的奥词 ＋ 在 `1412.json` 加内容捕获规则 ＋ 读「充能」**，
     “投递”与“资源”**同时满足**。
+
+- ✅ **已出货（2026-10-02，第 129 件）：`GAIN_RESOURCE` 能捕获**施放技能的参数**（`scale: "cast_skill_param:<i>"`）。
+  两处改动：校验（`requireAmount` 处）与量（`gainResource` 的 `amountFromAttr == null` 分支前），形状与第 58 件给 `GAIN_ENERGY` 加的一致。
+  ⭐ 常驻读者：`characters/1412.json` 的 `capture_reader_cast_param`（⚠ **不是数据里的句子**，
+  与 `1415.json` 的 `level_convention` 同一先例）。判据 `CaptureCastParamTest`：`row value 1 ; with the ode 0 -> 1 ; without it 0 -> 0`；
+  变异（让那条分支返回 0）⇒ `0 -> 0` ⇒ 红 ✓。
+- ⭐⭐⭐ **四条引擎事实（本轮与上一轮实测得来，后面的人少走很多弯路）**：
+  1. 忆灵的施放**只送到「被矄准者」的表**，**不送它自己的表**（探针：`1409` 读到 `0 -> 7`，`1415` 读到 `0 -> 0`）；
+  2. **战前 `setTriggerTable` 不会登记资源**（读数原话 `the probe resource is ABSENT`）⇒ 手工表的判据永远读不到资源；
+  3. **归账落在角色自己的 store**，队伍 store 是**另一份**（`party 0 -> 0 ; her own store 0 -> 1`）⇒ 读数要读 `unit.getResources().value(id)`；
+  4. 一个资源要么由**内容声明**、要么在**该角色的 dict 文件**里声明 —— **list 式角色文件装不下 `resources`**（`1409`/`1410`/`1413`/`1414`/`1405`/`1406` 都是 list）。

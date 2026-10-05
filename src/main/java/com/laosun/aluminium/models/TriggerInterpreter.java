@@ -429,7 +429,11 @@ public final class TriggerInterpreter {
                                         + "number are different claims (source: " + spec.getSource() + ")");
                     }
                 } else {
-                    requireAmount(effect, op, spec);
+                    if (isCastParamScale(effect)) {
+                        requireNoStackArguments(effect, op, spec);
+                    } else {
+                        requireAmount(effect, op, spec);
+                    }
                 }
                 requireResource(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
@@ -1470,6 +1474,9 @@ public final class TriggerInterpreter {
             // \u2705 The event\u2019s own magnitude (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c\u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d is exactly this -- the
             // amount is not a literal and not an attribute, it is what the trigger just reported.
             amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+        } else if (isCastParamScale(effect)) {
+            amount = (int) Math.round(castParamValue(effect, ctx,
+                    effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length())));
         } else if (effect.getAmountFromAttr() == null) {
             amount = (int) Math.round(scaledAmount(effect, ctx));
         } else {
