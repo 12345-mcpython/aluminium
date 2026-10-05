@@ -78,6 +78,40 @@ public final class Queue {
      * does not override equals.
      */
     private CanHit extraTurnActor;
+
+    /**
+     * A unit that will act BEFORE the heap is consulted (2026-10-02; an inserted action -- the game's {@code TurnInsertAction}).
+     *
+     * <p>\u2b50 Why a separate slot rather than a heap entry: the heap is a schedule, and a unit with no action value cannot have one. This is
+     * "who acts next regardless of the clock", which is what an inserted action is, and it is what `move()` hands out first.
+     */
+    private Signal insertedSignal;
+
+    /**
+     * Schedules an inserted action: the unit acts at the next {@link #move()}, and the clock does NOT move for it.
+     *
+     * @return whether it was accepted; a dead unit, or one already waiting, is refused rather than silently queued twice
+     */
+    public boolean insertAction(CanHit actor) {
+        if (actor == null || actor.isDeath() || insertedSignal != null) {
+            return false;
+        }
+        insertedSignal = Signal.inserted(actor);
+        return true;
+    }
+
+    /** Whether this unit has a place in the action order (as opposed to acting through an inserted action). */
+    public boolean isInActionOrder(CanHit actor) {
+        if (actor == null) {
+            return false;
+        }
+        for (Signal s : heap) {
+            if (s.getCanHit() == actor) {
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * When the extra turn was granted, that actor's original {@code nextActionTime} (P7-2).
      *
@@ -305,6 +339,13 @@ public final class Queue {
             // RuntimeException("Queue next shouldn't be null!"); it was unreachable, and an unreachable
             // guard cannot be tested -- so it is gone rather than kept as decoration.
             currentActor = null;
+            return 0;
+        }
+        // ⭐ An inserted action cuts in front of everything, and the clock does not move for it (2026-10-02) -- the same "the clock does not
+        // move" the extra turn states, but WITHOUT needing a place in the heap, which is what a zero-speed unit cannot have.
+        if (insertedSignal != null) {
+            currentActor = insertedSignal;
+            insertedSignal = null;
             return 0;
         }
         // P7-2: first handle "the pending restore left over from the previous extra turn",

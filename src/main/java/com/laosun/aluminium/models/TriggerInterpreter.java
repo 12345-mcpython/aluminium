@@ -124,7 +124,7 @@ public final class TriggerInterpreter {
     private static final Set<String> SPECIAL_ELEMENTS = Set.of("party_first", "random_absent");
 
     private static final Set<String> WIRED = Set.of(
-            "RESET_TRIGGER_LIMIT",
+            "INSERT_ACTION", "RESET_TRIGGER_LIMIT",
             // ⭐ 「为指定敌方单体添加 X 属性弱点」 (2026-09-30; readers 1315, 1310).
             "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
@@ -1183,6 +1183,16 @@ public final class TriggerInterpreter {
                             battle.fireTriggersForAlly(TriggerEvent.SHIELD_GRANTED, ctx.owner(), target, amount);
                         }
                     }
+                }
+            }
+            case "INSERT_ACTION" -> {
+                // ⭐ 「德谬歌立即获得 1 个额外回合并自动施放【花与箭的舞曲】」(1415 memosprite skill 10): a unit outside the action
+                // order acts now -- the game's `TurnInsertAction`. ⚠ NOT `EXTRA_TURN`: that one cuts into a queue the unit is already in, and
+                // a memosprite at Speed 0 is not in it at all (the game pins it there with `SpeedOverride`).
+                CanHit acting = require(resolveTarget(effect, ctx), "target", ctx);
+                if (!battle.insertAction(acting)) {
+                    throw new IllegalStateException("INSERT_ACTION makes " + acting.getName()
+                            + " act now, but it is dead or already waiting to act");
                 }
             }
             case "EXTRA_TURN" -> {

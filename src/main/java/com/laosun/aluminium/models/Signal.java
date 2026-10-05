@@ -95,6 +95,23 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      *
      * @param moveable the combatant to track
      */
+
+    /**
+     * A signal that exists to NAME an actor, not to schedule one (2026-10-02; an inserted action).
+     *
+     * <p>\u26a0 It is deliberately outside the normal constructor: a unit whose speed is 0 has no action value at all, which is exactly the case
+     * an inserted action has to cover (the game pins a memosprite's speed to 0 with `SpeedOverride`). Such a signal must NEVER enter the heap --
+     * nothing re-times it, and `Queue` only ever hands it back as the current actor.
+     */
+    public static Signal inserted(CanHit moveable) {
+        Signal signal = new Signal();
+        signal.canHit = moveable;
+        return signal;
+    }
+
+    /** For {@link #inserted(CanHit)} only. */
+    private Signal() {
+    }
     public Signal(CanHit moveable) {
         this.canHit = moveable;
         this.speed = moveable.getAttribute(AttributeType.SPEED).get();

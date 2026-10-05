@@ -942,6 +942,13 @@ public class Battle {
      * @param actor the unit that gets the extra turn
      * @return {@code true} = scheduled; {@code false} if the target is dead / not in the queue
      */
+    /**
+     * Makes a unit act at the next step, outside the action order (2026-10-02; the game's {@code TurnInsertAction}).
+     */
+    public boolean insertAction(CanHit actor) {
+        return queue.insertAction(actor);
+    }
+
     public boolean grantExtraTurn(CanHit actor) {
         return queue.grantExtraTurn(actor);
     }
@@ -1286,7 +1293,9 @@ public class Battle {
         if (actor.isDeath()) {
             actor.getBuffManager().clearAll();
             queue.removeCombatant(actor);
-        } else {
+        } else if (queue.isInActionOrder(actor)) {
+            // ⚠ Only an actor that HAS a place in the order has a cycle to re-time. An inserted action carries a signal that was never
+            // scheduled, and `setTopZero()` would re-time the top of the heap -- i.e. somebody else (2026-10-02).
             queue.setTopZero();
         }
         currentMove = null;
