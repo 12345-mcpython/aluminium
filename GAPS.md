@@ -36969,3 +36969,25 @@
 >   ⭐ 属性现成 ✓、⭐ 数值走 `percent_from_cast_param` ✓、⭐ 时长走 ⭐ `STATE_ENDED` ＋ ⭐ `kind: "own"` ✓；
 >   ⚠ 只要记住 ⭐ 判据场景必须 ⭐ **召出衣匠** ✗（⭐ `target: "summon"` 的效果需要它在场 ✓，⭐ 引擎会这么提示 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2283** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 23 轮：🎉🎉🎉 **第 106 件出货 ＝ `1141514` 献予「浪漫」之诗 **整句成句** ✓✓**）**）**：
+>
+> * ✅ **这一句剩下的两句也落地了** ✓（⭐ `characters/1402.json`，⭐ 现已 **11 条规则** ✓）：
+>   ⭐ 「阿格莱雅与衣匠造成的伤害提高 `#2%` 并无视目标 `#3%` 的防御，⭐ **持续至阿格莱雅退出【至高之姿】状态**」 ✓
+>   ⭐ 四条规则：⭐ 两条 `MODIFY_ATTR`（⭐ `ALL_DAMAGE_TYPE_BOOST` ＋ ⭐ `DEFENCE_IGNORE` ✓，⭐ 带**游戏自己的修饰名** ✓，
+>      ⭐ 数值走 `percent_from_cast_param`（#2 ⇒ 索引 1，⭐ #3 ⇒ 索引 2 ✓，⭐ 因为它们随等级变 ✓））⭐ 分给 `self` 与 `summon`（后者门控 ✓）；
+>   ⭐ 两条 ⭐ `on: STATE_ENDED` ＋ ⭐ `when: [self state_ended 至高之姿]` ⇒ ⭐ `REMOVE_STATE{…, kind: "own"}` ✓。
+> * ⭐⭐⭐ **本轮的最后一块引擎拼图（⭐ 而且是个真坑 ✓）**：⭐ `removeStateFrom` 的匹配 ⭐ **不能只用 `isNamed`** ✗ ——
+>   ⭐ 那个谓词管的是 ⭐ **状态／控制／护盾** ✗，⭐ **不读 `buffName`** ✗；⭐ 而 ⭐ `removeState(String)` 是在 ⭐ **它自己的一个循环**里
+>   匹配 ⭐ `getBuffName()` 的 ✓（⭐ 注释：⭐ *"an effect of a state carries the state own name"* ✓）。
+>   ⇒ ⭐ 我第一版只共用 `isNamed` ✗ ⇒ ⭐ **读数：⭐ 时长那儿 ⭐ 什么都没摘掉** ✗（⭐ `the Garmentmaker damage = 1.008` ✗）⇒
+>   ⭐ 新增 ⭐ `matchesFrom(...)` ✓ 把 ⭐ `buffName` 那条路也接上 ✓ ⇒ ⭐ **精确回到原值** ✓✓。
+>   ⇒ ⭐⭐ **教训：⭐ `isNamed` 与 `removeState(String)` 各自有各自的匹配面 ✗ —— ⭐ 复用一个时，⭐ 先看它**覆盖不覆盖**我要的那一类 ✓。**
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `OdeOfRomanceStanceTest2` ⇒ ⭐
+>   `[stance2] hers pierce +0.504 (=0.504) ; the Garmentmaker damage +1.008 (=1.008) pierce +0.504 (=0.504)` ✓✓（⭐ 三个读数**都精确等于**引擎实际用的那一行 ✓）
+>   ＋ ⭐ `[stance2] after the stance ended: the Garmentmaker damage = 0.0 (was 0.0 before the ode) ; its pierce = 0.0 ; hers pierce = 0.0` ✓
+>   ⇒ ⭐ **回到它们原本的值** ✓（⭐ 衣匠本来就是 0.0 ✓）；
+>   ⭐ **变异** ✓：⭐ 删掉 ⭐ `…_ends_with_her_stance` ✗ ⇒ ⭐ `hers pierce = 0.504` ⇒ 红 ✓。
+> * ⭐ **顺带确认（⭐ 上一轮的担心是多余的 ✓）**：⭐ `self_summon_count >= 1` 的门控 ⭐ **确实**让 ⭐ `target: "summon"` 的规则在衣匠不在场时**不触发** ✓ ——
+>   ⭐ 上一轮那 4 个红是 ⭐ **缺那两处 share 修正** ✗ ⭐ 造成的 ✓，⭐ 不是门控 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2284** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

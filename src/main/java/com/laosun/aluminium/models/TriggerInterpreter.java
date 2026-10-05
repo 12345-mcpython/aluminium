@@ -491,7 +491,10 @@ public final class TriggerInterpreter {
                 boolean derivedModifier = effect.getScale() != null && !effect.getScale().isBlank();
                 if (derivedModifier) {
                     requirePercent(effect, op, spec);
-                } else if ((effect.getPercent() == null) == (effect.getAmount() == null)) {
+                // ⚠ `percent_from_cast_param` is a SECOND way to state the share (2026-10-02): a share from the cast skill with
+                // no `scale` is exactly as well-formed as one with `percent`, and this check used to call it "neither".
+                } else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null)
+                        == (effect.getAmount() == null)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs exactly one of \"percent\" (a share) or \"amount\" (a flat value) unless it also states a \"scale\", in which "
                                     + "case both are read as percent x scale + amount; it states "
@@ -2430,6 +2433,13 @@ public final class TriggerInterpreter {
         return castParamValue(effect, ctx, spelled);
     }
     private static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
+        // ⭐ A share from the cast skill with NO scale (2026-10-02). This method is entered whenever `derived` is true, and `derived`
+        // is "(has a scale) OR (no percent)", so the flat-`amount` case arrives here too -- hence the guard: only the cast-skill share, and
+        // only when there is no scale to read.
+        if ((effect.getScale() == null || effect.getScale().isBlank())
+                && effect.getPercentFromCastParam() != null) {
+            return shareOf(effect, ctx) + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         Character owner = requireCharacterOwner(effect, ctx);
         // ⚠⚠ `stackScale` takes a primitive, so handing it `effect.getPercent()` unboxes a null the moment a rule states
         // its share as `percent_from_cast_param` instead. The share is what the counter multiplies, so ask for it the one way.

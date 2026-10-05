@@ -1050,7 +1050,7 @@ public class BuffManager {
         }
         int ending = 0;
         for (AbstractBuff carried : List.copyOf(buffs)) {
-            if (carried.getSource() == source && isNamed(carried, stateName, attribute)) {
+            if (matchesFrom(carried, source, stateName, attribute)) {
                 ending++;
             }
         }
@@ -1059,12 +1059,27 @@ public class BuffManager {
         }
         int removed = 0;
         for (AbstractBuff carried : List.copyOf(buffs)) {
-            if (carried.getSource() == source && isNamed(carried, stateName, attribute)) {
+            if (matchesFrom(carried, source, stateName, attribute)) {
                 removeBuff(carried);
                 removed++;
             }
         }
         return removed;
+    }
+
+    /**
+     * ⚠ `isNamed` answers for STATES, CONTROLS and shields -- it does NOT read {@code buffName}, which {@code removeState(String)} matches in
+     * a separate loop of its own (2026-09-28: "an effect *of* a state carries the state own name"). Sharing only `isNamed` here left a NAMED
+     * modifier unreachable: measured, the romance ode companions removed nothing at all.
+     */
+    private static boolean matchesFrom(AbstractBuff carried, CanHit source, String stateName, AttributeType attribute) {
+        if (carried.getSource() != source) {
+            return false;
+        }
+        if (isNamed(carried, stateName, attribute)) {
+            return true;
+        }
+        return stateName != null && !carried.getBuffName().isEmpty() && stateName.equals(carried.getBuffName());
     }
 
     public int removeState(String state) {

@@ -147,5 +147,99 @@
     ],
     "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「**阿格莱雅或衣匠攻击后，消耗【浪漫】为自身恢复 70 点能量。**」",
     "note": "⭐ 触发用 `ALLY_ATTACK`：原句是「阿格莱雅**或衣匠**攻击后」——两个主体都算，而能量给的是**规则持有者**（即阿格莱雅），所以两个效果都是 `target: \"self\"`。⭐ `#1` 在数据里**每一级都是 70**，所以写成字面量**不是**近似。"
+  },
+  {
+    "id": "memosprite_ode_of_romance_raises_damage_and_pierces_defence",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 14"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent_from_cast_param": 1,
+        "permanent": true,
+        "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+        "target": "self"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DEFENCE_IGNORE",
+        "percent_from_cast_param": 2,
+        "permanent": true,
+        "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，持续至阿格莱雅退出【至高之姿】状态。」",
+    "note": "⭐ 两个修饰带名字（`buff`，用游戏自己的修饰名 `MServant_CyreneServant_00_AmazingBuff_Aglaea`），⭐ 数值走 `percent_from_cast_param`（#2 ⇒ 索引 1，#3 ⇒ 索引 2），因为它们随等级变。 ⚠ 这一条只管她自己：「对衣匠也生效」需要忆灵在场，而那个条件不该压在她身上。"
+  },
+  {
+    "id": "memosprite_ode_of_romance_also_reaches_the_garmentmaker",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 14",
+      "self_summon_count >= 1"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent_from_cast_param": 1,
+        "permanent": true,
+        "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+        "target": "summon"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DEFENCE_IGNORE",
+        "percent_from_cast_param": 2,
+        "permanent": true,
+        "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+        "target": "summon"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，持续至阿格莱雅退出【至高之姿】状态。」",
+    "note": "「阿格莱雅**与衣匠**」的衣匠那一半。⭐ 两个修饰带名字（`buff`，用游戏自己的修饰名 `MServant_CyreneServant_00_AmazingBuff_Aglaea`），⭐ 数值走 `percent_from_cast_param`（#2 ⇒ 索引 1，#3 ⇒ 索引 2），因为它们随等级变。"
+  },
+  {
+    "id": "memosprite_ode_of_romance_ends_with_her_stance",
+    "on": "STATE_ENDED",
+    "when": [
+      "self state_ended 至高之姿"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STATE",
+        "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+        "kind": "own",
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，持续至阿格莱雅退出【至高之姿】状态。」",
+    "note": "⭐ 时长：看着 `STATE_ENDED` 的伴随规则。⭐ `\"kind\": \"own\"` 是关键：上一轮只按**名字**摘，把她**本来就有的 0.2** 也摘了下来（实测：两边都变 0.0，而它们在这句诗之前都是 0.2）。这个来源筛子就是 `EXTEND_BUFF` 一直在用的那个（`extendBuffsFrom(ctx.owner(), …)`）。"
+  },
+  {
+    "id": "memosprite_ode_of_romance_stance_end_also_clears_the_garmentmaker",
+    "on": "STATE_ENDED",
+    "when": [
+      "self state_ended 至高之姿",
+      "self_summon_count >= 1"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STATE",
+        "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+        "kind": "own",
+        "target": "summon"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，持续至阿格莱雅退出【至高之姿】状态。」",
+    "note": "同上，但摘的是衣匠身上那份。"
   }
 ]
