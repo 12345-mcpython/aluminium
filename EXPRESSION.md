@@ -3,7 +3,7 @@
 > **目的（目标 ⑥）**：文档里每一类句式，要么**能写出来**（有出货内容 ＋ 判据 ＋ 实测变异），
 > 要么**登记**（缺什么／读者是谁／前置是什么）。**不允许含糊，也不允许近似。**
 >
-> ⚠ 本文件由 `src/test/java/com/laosun/aluminium/test/ExpressionChecklistTest.java` 守着：
+> ⚠ 本文件由 `src/test/java/com/laosun/aluminium/test/trigger/ExpressionChecklistTest.java` 守着：
 > 它逐个检查本文件引用的**每个文件都真实存在**、§2 的每一行都点名了**存在的证据文件**、
 > §3 的每一行的**三列都非空**。⚠ 所以这份清单不能靠印象写：改它就要能通过那道闸。
 
@@ -27,7 +27,7 @@
 | 暂时延后陷入无法战斗状态 | `defers_death: true`（引擎在该单位 `TURN_END` 提交死亡） | `src/main/resources/characters/1407.json` | `MooncocoonTest` |
 | 最多叠 N 层（属性修饰） | `MODIFY_ATTR` ＋ `max_stacks` | `src/main/resources/relic_sets/313.json` | `SigoniaCritTest` |
 | 层数／计数当条件 | `ADD_STACK` ＋ `*_stacks:<名>` | `src/main/resources/relic_sets/126.json` | `WavestriderCaptainHelpTest` |
-| 每超过阈值 1 点就加 X% | `scale: "self_attr_above:<属性>:<阈值>"`（**超额**，不是属性本身） | `src/test/java/com/laosun/aluminium/test/AboveThresholdTest.java` | `AboveThresholdTest` |
+| 每超过阈值 1 点就加 X% | `scale: "self_attr_above:<属性>:<阈值>"`（**超额**，不是属性本身） | `src/test/java/com/laosun/aluminium/test/engine/AboveThresholdTest.java` | `AboveThresholdTest` |
 | 结界／领域（一个状态 ＋ 其上的修饰） | `APPLY_BUFF` ＋ `has_state` ＋ 带 `buff:` 的修饰 | `src/main/resources/characters/1415.json` | `ElysiumZoneTest` |
 | 真实伤害（跳过全部区间） | `damage_type: "TRUE"` | `src/main/resources/characters/1415.json` | `TrueDamageJudgeTest` |
 | 目标选择器族 | `random_enemy`／`lowest_hp_ally`／`party_first`／`next_ally`／`target_else_random_enemy` … | `src/main/resources/light_cones/21025.json` | `PastAndFutureNextAllyTest` |
