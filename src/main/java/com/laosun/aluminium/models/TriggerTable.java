@@ -892,6 +892,12 @@ public class TriggerTable {
  * (1415 memosprite skill 10, data slot 13). The sibling of {@link #SELF_ATTR_PREFIX}, one subject further out.
  */
 static final String SUMMON_ATTR_PREFIX = "summon_attr:";
+
+/**
+ * {@code cast_skill_param:<index>} -- a parameter of the skill that produced the event, at its CURRENT level: 「等同于德谬歌生命上限的 #1%」
+ * (1415 memosprite skill 10). The damage path reads the same row through {@code multiplierOf}.
+ */
+static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     static final String SELF_ATTR_PREFIX = "self_attr:";
 
     /**

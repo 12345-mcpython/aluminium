@@ -2352,6 +2352,36 @@ public final class TriggerInterpreter {
             return effect.getPercent() * Math.abs(ctx.amount())
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (effect.getScale().trim().startsWith(TriggerTable.CAST_SKILL_PARAM_PREFIX)) {
+            // ⭐ The skill that produced THIS event, and its parameter at the CURRENT level (1415 memosprite skill 10, data slot 13).
+            int index = Integer.parseInt(
+                    effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()).trim());
+            CanHit caster = ctx.actor();
+            if (!(caster instanceof Summon from)) {
+                throw new IllegalStateException("the scale \"" + effect.getScale()
+                        + "\" reads the parameter of the skill that produced the event, but the actor is "
+                        + (caster == null ? "nobody" : caster.getName() + ", which is not a memosprite"));
+            }
+            Skill casting = from.skillAt(ctx.skillId());
+            if (casting == null || casting.getData() == null || !casting.getData().isLoaded()) {
+                throw new IllegalStateException("the scale \"" + effect.getScale()
+                        + "\" reads the skill that produced the event, but " + from.getName()
+                        + " has no loaded skill at slot " + ctx.skillId());
+            }
+            var rows = casting.getData().getSkills();
+            int row = caster.skillLevel(casting) - 1;
+            if (row < 0 || row >= rows.size()) {
+                throw new IllegalStateException("skill level " + caster.skillLevel(casting) + " is outside " + from.getName()
+                        + " skill " + ctx.skillId() + " parameter table (rows=" + rows.size() + ")");
+            }
+            var values = rows.get(row);
+            if (index >= values.size()) {
+                throw new IllegalStateException("the scale \"" + effect.getScale() + "\" names index " + index
+                        + ", which is outside that skill parameter row (size=" + values.size() + ")");
+            }
+            return effect.getPercent() * values.get(index)
+                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (effect.getScale().trim().startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
             // The owner's MEMOSPRITE (1415 memosprite skill 10). Resolved through `Battle.summonOf`, the same accessor the `summon`
             // target selector reads, and before the attribute branch because the subject here is not the owner.
@@ -3813,6 +3843,28 @@ public final class TriggerInterpreter {
         // The owner MEMOSPRITE's attribute (2026-10-02). Accepted HERE and not in `scaleAttribute`, because that one is shared
         // with the DAMAGE path, where the subject is the attacker -- teaching it this spelling there would make damage quietly
         // read the wrong unit. The attribute name is still checked, so a typo is loud at load time.
+        // A parameter of the skill that produced the event (2026-10-02). 「等同于德谬歌生命上限的 #1%」: #1 is the skill own parameter
+        // and it RUNS WITH ITS LEVEL, so a literal `percent` would freeze one level -- the damage path reads it the same way, through
+        // `multiplierOf`. The index is checked here; whether the event has such a skill can only be known when it fires.
+        if (scale.startsWith(TriggerTable.CAST_SKILL_PARAM_PREFIX)) {
+            String raw2 = scale.substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()).trim();
+            if (raw2.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " scales off a skill parameter but names no index: \"" + scale
+                                + "\" (source: " + spec.getSource() + ")");
+            }
+            try {
+                if (Integer.parseInt(raw2) < 0) {
+                    throw new NumberFormatException();
+                }
+            } catch (NumberFormatException notAnIndex) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " scales off skill parameter \"" + raw2
+                                + "\", which is not a zero-based index (source: " + spec.getSource() + ")");
+            }
+            requirePercent(effect, op, spec);
+            return;
+        }
         if (scale.startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
             String summonAttr = scale.substring(TriggerTable.SUMMON_ATTR_PREFIX.length()).trim();
             if (summonAttr.isEmpty()) {
