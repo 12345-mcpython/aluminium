@@ -152,7 +152,15 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * every duration, so no battle handle is needed. Measured before adding it: a plain {@code turns: 1} stack is NOT
      * cleared by beforeMove / afterMove / tickForeign, so \u300c\u540c\u4e00\u56de\u5408\u5185\u300d had no spelling at all.
      */
-    TURN_END
+    TURN_END,
+    
+    /**
+     * ⭐ 「持续至下一个…回合开始时」 (2026-10-02; reader: 1405's 【真知】, whose text is 「持续至下一个那刻夏回合开始时」).
+     *
+     * <p>Ends when the OWNER's own turn starts, which is neither `TURN_END` (the end of the current turn, too early when the buff is granted during that turn) nor `NEXT_ATTACK` (ends when
+     * the owner next lands an attack, which the sentence does not say).
+     */
+    NEXT_TURN_START
     }
 
     /**
