@@ -8,6 +8,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.DebuffClass;
+import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.TriggerTable.CompiledRule;
@@ -1810,7 +1811,30 @@ public final class TriggerInterpreter {
     /** ⭐ 「向**风堇**…」: a selector that names a character by cid (2026-10-02). */
     static final String ALLY_CID_PREFIX = "ally_cid:";
 
+    /**
+     * ⭐ A second selector FAMILY, admitted by prefix (2026-10-02; reader: 1141518 「使所有「智识」命途角色攻击力提高」): every ALLY on the named path.
+     *
+     * <p>The name may be the path's Chinese name (「智识」) or the enum's own (「ERUDITION」), because the selector is lowercased on the way in and neither spelling is the other's.
+     */
+    static final String ALLIES_OF_PATH_PREFIX = "allies_of_path:";
+
     /** The party member whose cid is this one, or {@code null} when nobody matches. */
+    /**
+     * ⭐ The path a selector names, or {@code null} if it names none (2026-10-02). Both spellings are accepted because the selector arrives lowercased: the Chinese name through
+     * {@link Path#fromNameOrNull}, the enum's own through {@code valueOf} on the upper-cased text.
+     */
+    private static Path pathNamed(String text) {
+        Path byName = Path.fromNameOrNull(text);
+        if (byName != null) {
+            return byName;
+        }
+        try {
+            return Path.valueOf(text.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException notAPath) {
+            return null;
+        }
+    }
+
     private static CanHit allyWithCid(TriggerContext ctx, int cid) {
         if (ctx.battle() == null) {
             return null;
@@ -1963,6 +1987,27 @@ public final class TriggerInterpreter {
                 party.add(ally);
             }
             return List.copyOf(party);
+        }
+        if (selector.startsWith(ALLIES_OF_PATH_PREFIX)) {
+            // ⭐ ALL of them, not the first (2026-10-02; reader: 1141518 「使**所有**「智识」命途角色…」): the sentence says 所有, so the answer is the
+            // whole path in roster order. ⚠ An unknown path name is a refused SPELLING, not an empty answer -- the validation refuses it at load, and this mirrors that.
+            String rest = selector.substring(ALLIES_OF_PATH_PREFIX.length()).trim();
+            Path wanted = pathNamed(rest);
+            if (wanted == null) {
+                throw new IllegalStateException("Effect targets \"" + selector + "\" but \"" + rest
+                        + "\" is not a path (write its Chinese name, or the enum's)");
+            }
+            if (battle == null) {
+                throw new IllegalStateException(
+                        "Effect targets \"" + selector + "\" but no battle was supplied to take the party from");
+            }
+            List<CanHit> ofPath = new ArrayList<>();
+            for (CanHit ally : battle.allies) {
+                if (ally instanceof Character character && character.getPath() == wanted) {
+                    ofPath.add(ally);
+                }
+            }
+            return List.copyOf(ofPath);
         }
         if (selector.startsWith(ALLY_CID_PREFIX)) {
             // ⭐ 「使**风堇**获得…」 (2026-10-02): a selector that NAMES a character is handled HERE, in the plural path, because absence is not an error --
@@ -4363,6 +4408,17 @@ public final class TriggerInterpreter {
         }
         // ⭐ A selector FAMILY, admitted by prefix (2026-10-02): `ally_cid:<cid>` names a character outright. The closed set below stays closed --
         // this is an explicit door, not a fallback, which is why it is checked BEFORE the membership test.
+        if (effect.getTarget().startsWith(ALLIES_OF_PATH_PREFIX)) {
+            // ⭐ Same door, for paths (2026-10-02): the name must be one the engine knows, so a typo is refused at load rather than silently targeting nobody.
+            String rest = effect.getTarget().substring(ALLIES_OF_PATH_PREFIX.length()).trim();
+            if (pathNamed(rest) == null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " names \"" + effect.getTarget() + "\", whose part after \""
+                                + ALLIES_OF_PATH_PREFIX + "\" must be a path -- its Chinese name or the enum's (source: "
+                                + spec.getSource() + ")");
+            }
+            return;
+        }
         if (effect.getTarget().startsWith(ALLY_CID_PREFIX)) {
             String rest = effect.getTarget().substring(ALLY_CID_PREFIX.length()).trim();
             try {
