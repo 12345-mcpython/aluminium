@@ -240,3 +240,11 @@
   3. ⭐ **满血单位的治疗读数是 0**（第一版判据就是这么红的）⇒ 判据必须**先造伤**。
 - ⭐ **待办表更新**：第 1 项（死龙天赋的伤害规则）**已完成** ✓；剩下 `amount_from_previous` 取绝对值、`effect_percent_from_resource`、
   然后是 `17` 第二句的倍率加成。
+
+- ✅ **已出货（2026-10-02，第 147 件）：`amount_from_previous` **读出消耗的量值**（待办 2 完成）：
+  ① `previousCredited` 现在取**绝对值**；② 那个“测量入账差”的块**原先只对 `GAIN_RESOURCE` 运行**，现已纳入 `SPEND_RESOURCE`。
+  判据 `SpentAmountIsPositiveTest`：`after a spend of 7 the follower gained 7 ; after a gain of 7 it gained 7`；变异（保留符号）⇒ `gained 0` ⇒ 红 ✓。
+- ⭐⭐ **两条新事实（第 107 轮）**：
+  1. ⭐ **那个测量块只对 `GAIN_RESOURCE` 运行** ⇒ 消耗走 `else`、**从不设置 `previousCredited`**（第一版判据读到 0 就是这个）；
+  2. ⭐ **满上限的资源入账为 0**（判据的对照侧因此读到 0）⇒ 造判据时资源要**有余额又有余地**。
+- ⭐ **待办表**：第 2 项已完成 ✓；**剩最后一件引擎小件**（`MODIFY_RULE{effect_percent_from_resource}`）⇒ 然后 `17` 第二句的倍率加成就能落。

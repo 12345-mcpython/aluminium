@@ -35715,3 +35715,14 @@
 >   （2）`MODIFY_RULE{effect_percent}` 改**整条规则** ⇒ 多个数值必须分条；（3）**满血单位的治疗读数是 0** ⇒ 判据要先造伤。
 > * ⭐ **待办表**：第 1 项已完成 ✓；剩下两件引擎小件 ⇒ 然后 `17` 第二句的倍率加成就能落。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（第 107 轮：第 147 件出货 ＝ `amount_from_previous` 读出消耗的量值（待办 2）**：
+>
+> * ✅ **判据读数**：`[spent_amount] after a spend of 7 the follower gained 7 ; after a gain of 7 it gained 7` ✓✓
+>   ⇒ ⭐ **变异**（保留符号）⇒ `gained 0` ⇒ 红 ✓。
+> * ✅ **两处改动**：`previousCredited` 取绝对值；而“测入账差”的块纳入 `SPEND_RESOURCE`。
+> * ⭐⭐ **两条新事实**：
+>   1. 那个测量块**只对 `GAIN_RESOURCE` 运行** ⇒ 消耗走 `else`、从不设置 `previousCredited`；
+>   2. **满上限的资源入账为 0** ⇒ 造判据时资源要有余额又有余地。
+> * ⭐ **待办表**：第 2 项完成 ✓；只剩最后一件引擎小件。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
