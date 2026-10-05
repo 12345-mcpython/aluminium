@@ -47,6 +47,7 @@ public class EffectSpec {
         copy.amount = this.amount;
         copy.amountFromAttr = amountFromAttr;
         copy.amountPercent = amountPercent;
+        copy.amountPercentFromResource = amountPercentFromResource;
         copy.percentFromResource = percentFromResource;
         copy.skillParamCid = skillParamCid;
         copy.amountFromEvent = amountFromEvent;
@@ -157,6 +158,15 @@ return copy;
      * The share of {@link #amountFromAttr} to take (0.5 for \u300c50%\u300d). Null means the whole value.
      */
     private Double amountPercent;
+
+    /**
+     * ⭐ The share of an EVENT's magnitude carried in a resource, in basis points (2026-10-02).
+     *
+     * <p>Reader: 1415's sky ode -- 「提高数值等同于本次治疗数值的 #1%」. `amount_percent` is a literal, and #1 runs with level AND lives in a
+     * memosprite row that cannot be read later, so it is captured (in basis points) and read back here.
+     */
+    @com.google.gson.annotations.SerializedName("amount_percent_from_resource")
+    private String amountPercentFromResource;
 
     /**
      * ⭐ A share CARRIED IN A RESOURCE, in basis points (2026-10-02).

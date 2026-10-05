@@ -1,123 +1,174 @@
-[
-  {
-    "on": "ULT_CAST",
-    "id": "ult_state_and_max_hp",
-    "when": [
-      "actor == self"
-    ],
-    "do": [
-      {
-        "op": "APPLY_BUFF",
-        "buff": "雨过天晴",
-        "turns": 3,
-        "target": "self"
-      },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "HEALTH",
-        "percent": 0.3,
-        "turns": 3,
-        "target": "all_allies"
-      }
-    ],
-    "source": "1409 风堇 终结技 飞入晨昏的我们 (140903, Ultra/Support): 「…风堇进入【雨过天晴】状态，持续3回合，风堇每回合开始时持续回合数减1。处于【雨过天晴】状态时，我方全体目标生命上限提高30.00%+600点。」",
-    "note": "「风堇进入【雨过天晴】状态，持续 3 回合…我方全体目标**生命上限提高 30.00%+600**」—— ① 状态用 `APPLY_BUFF 雨过天晴` ✓（第 120 轮的教训：状态要**造出来**才问得到 ✓）；② 生命上限用 `MODIFY_ATTR` + **基础属性 `HEALTH`** ✓（不能写 `HEALTH_PERCENT` ✗：装载器说它是**构建期输入键** ✓）；⚠ **本条不写治疗** ✗ —— 见下面 level_convention 里的\"技能数据自带治疗\"说明 ✓。⚠ **登记**：「**+600**」的固定项 ✗（`MODIFY_ATTR` 的份额只能按属性百分比 ✓，需要\"按属性的固定加值\"这个能力 ✗）；「每回合开始时持续回合数减 1」由引擎自身的时长结算负责 ✓。"
-  },
-  {
-    "on": "BATTLE_START",
-    "id": "level_convention",
-    "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 9
-      }
-    ],
-    "source": "1409 风堇 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 50% 生命上限、战技 8%+160 / 10%+200、终结技 10%+200 / 12%+240 + 生命上限 +30%、天赋 忆灵 50% 生命上限 / 伤害 +80%）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠⚠ **重要（第 165–166 轮实测 ✓）**：**技能自身的数据就会治疗** ✓ —— 在**完全不装规则**时施放她的战技，队友仍被回复 **87.81145600000002** ✓；而**纯规则**治疗（手工触发 `TURN_START` + `lowest_hp_ally`）则**逐位精确**地等于 `owner_max_hp × 份额 + 固定值` ✓（219.52864 vs 219.52864000000002，比值 0.9999999999999999 ✓）。⇒ **治疗角色的规则不要重复写治疗** ✗（会**双重计算** ✗，这正是第 163–165 轮那些\"不可能的读数\"的来源 ✓：304.87 = 技能数据的 87.81 + 规则的 217.06 ✓）。引擎的 `HEAL` 本身**没有**问题 ✓。⚠ **登记**：① **忆灵小伊卡**的全部条款（召唤、它的治疗 10.00%+200 / 12.00%+240、它 50% 生命上限的初始面板、天赋「风堇**或小伊卡**提供治疗时小伊卡的伤害提高 80%，2 回合，最多 3 层」）✗ —— 阻塞点是忆灵文件**必须**声明 `SPEED` ✗ 而文档未给 ✓、数据集 `Servant*` 里也没定位到属性表 ✓；② 普攻「50% 生命上限的量子伤害」✗（`DAMAGE` 倍率取自技能数据行 ✓）；③ 秘技（缺门槛 ✗）；④ 星魂未读 ✗。"
-  },
-  {
-    "on": "SKILL_CAST",
-    "id": "skill_summons_ica",
-    "when": [
-      "actor == self"
-    ],
-    "do": [
-      {
-        "op": "SUMMON"
-      }
-    ],
-    "source": "1409 风堇 战技 彩虹尽头的… (140902): 「召唤忆灵 小伊卡，为除小伊卡以外的我方全体目标回复等同于风堇 8.00% 生命上限+ 160 的生命值。」",
-    "note": "「**召唤忆灵 小伊卡**」⇒ `SKILL_CAST` ⇒ **`SUMMON`** ✓（无参数 ✓：忆灵属于召唤者 ✓）；面板在 `resources/memosprites/1409.json` ✓。⚠ 同句的**治疗部分**（我方全体 8% 生命 + 160 ✗、小伊卡自己 10% + 200 ✗）尚未写 ✗ ⇒ 登记 ✓（它需要“除小伊卡以外”的目标词汇 ✗）。"
-  },
-  {
-    "id": "memosprite_ode_of_sky_gives_her_energy",
-    "on": "CAST_SETUP",
-    "when": [
-      "target == self",
-      "actor is_summon",
-      "from_skill_id == 19"
-    ],
-    "do": [
-      {
-        "op": "GAIN_ENERGY",
-        "scale": "cast_skill_param:1",
-        "percent": 1.0,
-        "target": "self"
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**对风堇施放时，为风堇恢复 #2 点能量**。」",
-    "note": "⭐ `#2` **随等级变**（**实测**：12 → 33.6）→ 走 `cast_skill_param:1`。⭐ 而 `GAIN_ENERGY` 本来**只收** `amount` 或 `target_max_energy` 的份额（**实测**：`ENERGY_SCALES = Set.of(\"target_max_energy\")`）—— **本轮给它加了第三种拼法**。"
-  },
-  {
-    "id": "casting_a_skill_spends_one_layer_of_the_sky_ode",
-    "on": "SKILL_CAST",
-    "when": [
-      "self has_state 献予「天空」之诗",
-      "from_skill_id == 2"
-    ],
-    "do": [
-      {
-        "op": "REMOVE_STACK",
-        "buff": "献予「天空」之诗",
-        "amount": 1,
-        "target": "self"
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**风堇施放战技后，消耗1层【献予「天空」之诗】**。」",
-    "note": "⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 `ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）—— 不发明一个“任一”拼法。⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。"
-  },
-  {
-    "id": "casting_the_ultimate_spends_one_layer_of_the_sky_ode",
-    "on": "ULT_CAST",
-    "when": [
-      "self has_state 献予「天空」之诗",
-      "from_skill_id == 3"
-    ],
-    "do": [
-      {
-        "op": "REMOVE_STACK",
-        "buff": "献予「天空」之诗",
-        "amount": 1,
-        "target": "self"
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**风堇施放终结技后，消耗1层【献予「天空」之诗】**。」",
-    "note": "⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 `ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）—— 不发明一个“任一”拼法。⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。  ⚠ 终结技要挂 `ULT_CAST`（2026-10-02 实测：`SkillExecutor` 里 `case ULTRA` 发的是 `ULT_CAST`，而战技才发 `SKILL_CAST`）。"
-  }
-]
+{
+  "rules": [
+    {
+      "on": "ULT_CAST",
+      "id": "ult_state_and_max_hp",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "雨过天晴",
+          "turns": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.3,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1409 风堇 终结技 飞入晨昏的我们 (140903, Ultra/Support): 「…风堇进入【雨过天晴】状态，持续3回合，风堇每回合开始时持续回合数减1。处于【雨过天晴】状态时，我方全体目标生命上限提高30.00%+600点。」",
+      "note": "「风堇进入【雨过天晴】状态，持续 3 回合…我方全体目标**生命上限提高 30.00%+600**」—— ① 状态用 `APPLY_BUFF 雨过天晴` ✓（第 120 轮的教训：状态要**造出来**才问得到 ✓）；② 生命上限用 `MODIFY_ATTR` + **基础属性 `HEALTH`** ✓（不能写 `HEALTH_PERCENT` ✗：装载器说它是**构建期输入键** ✓）；⚠ **本条不写治疗** ✗ —— 见下面 level_convention 里的\"技能数据自带治疗\"说明 ✓。⚠ **登记**：「**+600**」的固定项 ✗（`MODIFY_ATTR` 的份额只能按属性百分比 ✓，需要\"按属性的固定加值\"这个能力 ✗）；「每回合开始时持续回合数减 1」由引擎自身的时长结算负责 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1409 风堇 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 50% 生命上限、战技 8%+160 / 10%+200、终结技 10%+200 / 12%+240 + 生命上限 +30%、天赋 忆灵 50% 生命上限 / 伤害 +80%）",
+      "note": "本文件说明自己的数字来自哪一行（M-32）。⚠⚠ **重要（第 165–166 轮实测 ✓）**：**技能自身的数据就会治疗** ✓ —— 在**完全不装规则**时施放她的战技，队友仍被回复 **87.81145600000002** ✓；而**纯规则**治疗（手工触发 `TURN_START` + `lowest_hp_ally`）则**逐位精确**地等于 `owner_max_hp × 份额 + 固定值` ✓（219.52864 vs 219.52864000000002，比值 0.9999999999999999 ✓）。⇒ **治疗角色的规则不要重复写治疗** ✗（会**双重计算** ✗，这正是第 163–165 轮那些\"不可能的读数\"的来源 ✓：304.87 = 技能数据的 87.81 + 规则的 217.06 ✓）。引擎的 `HEAL` 本身**没有**问题 ✓。⚠ **登记**：① **忆灵小伊卡**的全部条款（召唤、它的治疗 10.00%+200 / 12.00%+240、它 50% 生命上限的初始面板、天赋「风堇**或小伊卡**提供治疗时小伊卡的伤害提高 80%，2 回合，最多 3 层」）✗ —— 阻塞点是忆灵文件**必须**声明 `SPEED` ✗ 而文档未给 ✓、数据集 `Servant*` 里也没定位到属性表 ✓；② 普攻「50% 生命上限的量子伤害」✗（`DAMAGE` 倍率取自技能数据行 ✓）；③ 秘技（缺门槛 ✗）；④ 星魂未读 ✗。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_summons_ica",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "SUMMON"
+        }
+      ],
+      "source": "1409 风堇 战技 彩虹尽头的… (140902): 「召唤忆灵 小伊卡，为除小伊卡以外的我方全体目标回复等同于风堇 8.00% 生命上限+ 160 的生命值。」",
+      "note": "「**召唤忆灵 小伊卡**」⇒ `SKILL_CAST` ⇒ **`SUMMON`** ✓（无参数 ✓：忆灵属于召唤者 ✓）；面板在 `resources/memosprites/1409.json` ✓。⚠ 同句的**治疗部分**（我方全体 8% 生命 + 160 ✗、小伊卡自己 10% + 200 ✗）尚未写 ✗ ⇒ 登记 ✓（它需要“除小伊卡以外”的目标词汇 ✗）。"
+    },
+    {
+      "id": "memosprite_ode_of_sky_gives_her_energy",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 19"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "scale": "cast_skill_param:1",
+          "percent": 1.0,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**对风堇施放时，为风堇恢复 #2 点能量**。」",
+      "note": "⭐ `#2` **随等级变**（**实测**：12 → 33.6）→ 走 `cast_skill_param:1`。⭐ 而 `GAIN_ENERGY` 本来**只收** `amount` 或 `target_max_energy` 的份额（**实测**：`ENERGY_SCALES = Set.of(\"target_max_energy\")`）—— **本轮给它加了第三种拼法**。"
+    },
+    {
+      "id": "casting_a_skill_spends_one_layer_of_the_sky_ode",
+      "on": "SKILL_CAST",
+      "when": [
+        "self has_state 献予「天空」之诗",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "献予「天空」之诗",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**风堇施放战技后，消耗1层【献予「天空」之诗】**。」",
+      "note": "⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 `ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）—— 不发明一个“任一”拼法。⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。"
+    },
+    {
+      "id": "casting_the_ultimate_spends_one_layer_of_the_sky_ode",
+      "on": "ULT_CAST",
+      "when": [
+        "self has_state 献予「天空」之诗",
+        "from_skill_id == 3"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "献予「天空」之诗",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**风堇施放终结技后，消耗1层【献予「天空」之诗】**。」",
+      "note": "⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 `ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）—— 不发明一个“任一”拼法。⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。  ⚠ 终结技要挂 `ULT_CAST`（2026-10-02 实测：`SkillExecutor` 里 `case ULTRA` 发的是 `ULT_CAST`，而战技才发 `SKILL_CAST`）。"
+    },
+    {
+      "id": "sky_ode_captures_its_healing_share",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "from_skill_id == 19"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "天空之诗的治疗份额",
+          "scale": "cast_skill_param:0",
+          "percent": 10000,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19）：「…提高数值等同于本次治疗数值的 #1%」—— 本条只做捕获。",
+      "note": "⭐ `#1` 随等级变（0.36 → 1.008）且住在忆灵行里 ⇒ 施放时捕获成基点。"
+    },
+    {
+      "id": "sky_ode_adds_a_share_of_each_heal_to_ikachis_total",
+      "on": "HEALED",
+      "when": [
+        "actor has_state 献予「天空」之诗"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "小伊卡累计治疗",
+          "amount_percent_from_resource": "天空之诗的治疗份额",
+          "target": "self",
+          "amountFromEvent": true
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 19：「当风堇持有【献予「天空」之诗】并提供治疗时，**计入小伊卡忆灵技的治疗数值额外提高，提高数值等同于本次治疗数值的 #1%**」。",
+      "note": "⭐ `HEALED` 带量且 actor 是**治疗者**（实测）⇒ 门是 `actor has_state`；⭐ 份额用 `amount_percent_from_resource` 读回捕获的基点（本轮新增的对称件）。"
+    }
+  ],
+  "resources": [
+    {
+      "id": "天空之诗的治疗份额",
+      "max": 2147483647,
+      "source": "⚠ **不是数据里的名字** —— 「本次治疗数值的 #1%」的那个 #1（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。"
+    },
+    {
+      "id": "小伊卡累计治疗",
+      "max": 2147483647,
+      "source": "⚠ **不是数据里的名字** —— “计入小伊卡忆灵技的治疗数值”（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。"
+    }
+  ]
+}

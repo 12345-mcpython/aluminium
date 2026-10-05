@@ -1458,6 +1458,15 @@ public final class TriggerInterpreter {
         battle.grantEnergy(target, effect.getPercent() * maxEnergy);
     }
 
+    /** ⭐ The share of the EVENT's magnitude: a literal `amount_percent`, or basis points carried in a resource (2026-10-02). */
+    private static double eventShare(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getAmountPercentFromResource() != null) {
+            Character holder = requireCharacterOwner(effect, ctx);
+            return holder.getResources().value(effect.getAmountPercentFromResource().trim()) / 10000.0;
+        }
+        return effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
+    }
+
     private static void gainResource(EffectSpec effect, TriggerContext ctx,
             double previousCredited) {
         CanHit holder = resolveTarget(effect, ctx);
@@ -1473,7 +1482,7 @@ public final class TriggerInterpreter {
         } else         if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
             // \u2705 The event\u2019s own magnitude (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c\u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d is exactly this -- the
             // amount is not a literal and not an attribute, it is what the trigger just reported.
-            amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
+            amount = (int) Math.round(ctx.amount() * eventShare(effect, ctx));
         } else if (isCastParamScale(effect)) {
             // ⭐ × percent (2026-10-02): the share is usually BELOW 1 and a resource holds an integer, so content stores basis points (percent: 10000).
             amount = (int) Math.round(castParamValue(effect, ctx,
