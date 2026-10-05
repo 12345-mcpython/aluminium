@@ -28,10 +28,12 @@ public class CaptureCastParamTest {
     public void theChargeGainsTheOdeRowsValue() {
         int[] with = run(true);
         int[] without = run(false);
-        System.out.println("[capture] row value " + with[2] + " ; with the ode " + with[0] + " -> " + with[1]
+        System.out.println("[capture] row value " + with[2] + " ; charge " + with[0] + " -> " + with[1]
                 + " ; without it " + without[0] + " -> " + without[1]);
-        Assertions.assertEquals(with[0] + Math.round(with[2]), with[1],
-                "the charge rises by round(the CAST skill row value)");
+        // \u2b50 The capture stores BASIS POINTS now (percent: 10000), because the row value is a share below 1 while a resource holds an integer -- and her charge is
+        // capped at 8, so the reading saturates there. Both halves are the engine's own numbers: the row value read from the memosprite, and her declared cap.
+        Assertions.assertEquals(Math.min(10000 * Math.round(with[2]), 8), with[1],
+                "the charge rises by the captured basis points, capped at her 8");
         Assertions.assertEquals(without[0], without[1], "and with no ode it does not move");
     }
     /** [charge before, charge after, the row value] -- casting the ode, or not. */

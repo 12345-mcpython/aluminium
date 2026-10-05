@@ -35365,3 +35365,14 @@
 >   ⭐ 条件以 ⭐ `} else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null` ✗ 开头 ✓ ⚠ **注意：⭐ 要把那一行整体重写 ✗，⭐ 不要往里插换行** ✗（⭐ 上一轮就是这么弄坏语法的 ✓）。
 > * ⚠ **我自己的两个坑（⭐ 本轮都踩了 ✓）**：⭐ ① ⭐ 用**行号偏移**改跨行语句 ⇒ ⭐ 把语句头吃掉了 ✓；⭐ ② ⭐ 用 `print` ✗ 打印含 ⭐ 星标的字符串 ⇒ ⭐ GBK 崩 ✓（⭐ 已知陷阱 ✓）。
 > * **实测（本轮）**：⭐ 回滚后 ⭐ 全量 **0**（--rerun-tasks ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（第 79 轮：🎉 **第 130 件出货 ＝ 以资源为份额 `percent_from_resource`** ✓ —— ⭐ 两句诗的公共前提齐了）**：
+>
+> * ✅ **三件一次落地**（⭐ 按我自己的对策：⭐ **读整段 → 整段重写** ✓，⭐ 不再用行号偏移 ✓）：⭐ `EffectSpec` 的字段 ✓、⭐ `shareOf` ✗ 的新分支 ✓、⭐ 捕获**乘上 `percent`** ✗（⭐ 好存基点 ✓）。
+> * ⭐⭐⭐ **而 NPE 教会了我最重要的一条** ✓：⭐ 引擎的 `modifyAttr` ✗ ⭐ 里有一段"⭐ 份额拼法清单 ✗" ✓ ——
+>   ⭐ 漏掉新拼法就会**走平坦 `amount` 分支并拆箱 null** ✗ ✓；⭐ 而 ⭐ **引擎自己的注释早就写着这件事** ✗：*"a share spelling left out of it sends the effect down the flat `amount` arm and unboxes a null"* ✓。
+>   ⭐⭐ **所以加一种份额拼法要改四处** ✗：⭐ ① ⭐ `EffectSpec` 字段 ✓ ② ⭐ `shareOf` 分支 ✓ ③ ⭐ 加载器的"⭐ 恰好一个份额 ✗"检查 ✓ ④ ⭐ `modifyAttr` ✗ 的份额清单 ✓ ✓。
+> * ✅ **判据 ＋ 实测变异**：⭐ `ResourceShareTest` ⇒ ⭐ `charge 8 ; boost 0.0 -> 8.0E-4 (expect +8.0E-4)` ✓✓；⭐ **变异**（⭐ 分支返回 0 ✗）⇒ ⭐ `0.0 -> 0.0` ⇒ 红 ✓。
+> * ⭐ **并更新了上一轮的判据**：⭐ 捕获现在存基点 ✗ ⇒ ⭐ `CaptureCastParamTest` ✗ ⭐ 的期望改为"⭐ 基点、⭐ 且被她「充能」上限 8 截断 ✗" ✓（⭐ 读数 `charge 0 -> 8` ✓）。
+> * ⭐ **顺带量到的语义**：⭐ `MODIFY_ATTR` ✗ 的 `percent` ✗ ⭐ 在没有 `scale` ✗ 时是**绝对量** ✓；⭐ 而 ⭐ 在 ⭐ `ALL_DAMAGE_TYPE_BOOST` ✗ 这类"⭐ 值就是份额 ✗"的属性上它**就是那个份额** ✓ ⇒ ⭐ 判据要用后者 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2309** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
