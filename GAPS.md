@@ -2423,3 +2423,11 @@
   2. **战前 `setTriggerTable` 不会登记资源**（读数原话 `the probe resource is ABSENT`）⇒ 手工表的判据永远读不到资源；
   3. **归账落在角色自己的 store**，队伍 store 是**另一份**（`party 0 -> 0 ; her own store 0 -> 1`）⇒ 读数要读 `unit.getResources().value(id)`；
   4. 一个资源要么由**内容声明**、要么在**该角色的 dict 文件**里声明 —— **list 式角色文件装不下 `resources`**（`1409`/`1410`/`1413`/`1414`/`1405`/`1406` 都是 list）。
+
+- ⛔ **第 78 轮试过、已回滚**（第 8 次）：为“份额 < 1 的捕获”加两件小东西：
+  ① 捕获时**乘上 `percent`**（内容就能存**基点**：`percent: 10000`）；② 新拼法 **`percent_from_resource: "<id>"`**（值 / 10000）。
+  - ⭐ 两处都**编译通过**，而且 `shareOf` 里的新分支也就位 ✓ —— 卡在**加载器的“恰好一个份额”检查**：
+    原话 `Op MODIFY_ATTR needs exactly one of "percent" (a share) or "amount" (a flat value)`。
+  - ⭐ **下一步（确切的两处）**：把 `percentFromResource` 加进那道检查（它在 `TriggerInterpreter` 的第 **509** 行附近，
+    条件以 `} else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null` 开头）—— ⚠ 上一次我把它**拆成两行**，结果语法坏了 ✗；
+    正确做法是**把那一行整体重写**，而不是往里面插换行。
