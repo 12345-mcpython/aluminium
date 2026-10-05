@@ -837,3 +837,24 @@
 - ⚠ **一条已出货判据因此移动**：⭐ `CyreneTest.bothWritersFeedRecollectionUpToTwentyFour` ✗ 原本断言 **24**
   —— ⭐ 它在本条落地**之前是对的、现在错了**（⭐ 数据自己说可溢出至 27 ✓）⇒ ⭐ 已改名为 `…UpToItsStatedOverflow` ✗ 并把期望改为 **27** ✓ ✓。
 - ⛔ **仍登记**：⭐ 「⭐ 处于【往昔的涟漪】状态时…**12 点** ✗」（⭐ 需要该状态，⭐ 套装尚未建模 ✓）⭐ 与 ⭐ 「⭐ **可激活终结技** ✗」本身 ✓。
+
+- ⛔ **新目标第 14 轮：回滚（第 12 次）—— 但槽位 18 那句的**实现设计已全部查明**，只剩落内容与判据。**
+- ⭐⭐ **已查明的三件事**（⭐ 直接决定写法 ✓）：
+  1. ⭐ **命中次数在哪里**：`SkillExecutor` 的 `BOUNCE` 分支
+     ```java
+     Integer additional = data.bounceAdditionalHits(bounceShare);
+     int hits = (additional == null ? 0 : additional) + 1;
+     for (int i = 0; i < hits; i++) { ... }
+     ```
+     ⭐ **`user` 就在作用域里** ⇒ ⭐ 加一份加成只需**一行** ✓；
+  2. ⭐ **键要用"数据槽位"**：`Skill` ✗ 只暴露 `getLevel()` / `getData()` / `getCid()` / **`getSkillSlot()`（int）**，
+     ⭐ **没有** `SkillType` ✗ ⇒ ⭐ 所以加成表应当是 **`Map<Integer,Integer>`** ✗，⭐ 与 ⭐ `CAST_SKILL{skill_id}` ✗ 同一口径 ✓
+     （⭐ 我第一版按 `SkillType` ✗ 做键，⭐ 编译器当场否掉 ✓）；
+  3. ⭐ **op 的形状照 `RAISE_SKILL_LEVEL` ✗ 抄**（⭐ 它的正文是 `ctx.owner()` ＋ `SkillType.valueOf(effect.getSkill())` ＋ `(int) Math.round(effect.getAmount())` ✓）
+     ⭐ 而本 op 读 ⭐ **`skill_id`** ✗（⭐ 数据槽位）＋ ⭐ `amount` ✗（⭐ 可为负 ⇒ ⭐ 「⭐ 持续 1 回合 ✗」⭐ 由读者在 `TURN_END` ✗ 用负值收回 ✓）。
+- ⛔ **为什么本轮仍回滚**：⭐ 引擎侧改完并**编译通过**（⭐ 三个文件 ✓），⭐ 但**内容与判据**来不及 ⇒
+  ⭐ 按项目纪律"**没有可归因效果的词汇不算出货**"⭐ **全部撤回** ✓（⭐ 不留半成品 ✓）。
+- ⭐ **下一轮的落法（预计 3 步）**：⭐ ① `CanHit.skillHitBonus` ✗（`Map<Integer,Integer>` ✗ ＋ ⭐ 两个存取器）＋ ⭐ `RAISE_SKILL_HITS` ✗ op（⭐ 含它自己的 `skill_id`/`amount` 校验 ✓）＋ ⭐ `SkillExecutor` ✗ 的那一行；
+  ⭐ ② 内容：⭐ `1405.json` ✗ 槽位 18 的规则加 `RAISE_SKILL_HITS{skill_id: 2, amount: 3}` ✗（⭐ 战技的数据槽位 ✓）＋ ⭐ 一条 `TURN_END` ✗ 收回；
+  ⭐ ③ 判据：⭐ **必须避开"有诗／无诗"的混杂**（⭐ 诗本身会给【真知】 ✗）；
+  ⭐ 最干净的是 ⭐ 比较**同一个技能在加成前后**的命中数（⭐ 用同种子、⭐ 只切换加成 ✓）。
