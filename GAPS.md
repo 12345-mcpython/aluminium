@@ -37258,3 +37258,24 @@
 >   ⭐ ② ⭐ **不要**落 ⭐ `times_from: hit_count` ✗；⭐ ③ ⭐ 判据：⭐ 一条读 ⭐ 他自己终结技的 `#3` 占比 ✓ ＋ ⭐ 一条读 ⭐ "每个被击目标各一次" ✓
 >   （⭐ 一次命中两个目标 ⇒ ⭐ 两笔 ✓，⭐ 而这条**不用新能力** ✓ —— ⭐ 用已有的 ⭐ `DEALING_DAMAGE` ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2292** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 全部回滚后 ✓）。
+
+> **2026-10-02 更新（新目标第 36 轮：🎉🎉🎉 **第 113 件出货 ＝ `percent_from_skill_param`** ✓✓ —— ⭐ 含**两处一行修法** ✓）**）**：
+>
+> * ✅ **出货内容** ✓：⭐ 拼法 ⭐ `percent_from_skill_param: "<SKILLTYPE>:<index>"` ✓ —— ⭐ **占比**取自 ⭐ **持有者自己的**技能 ✓（⭐ `percent_from_cast_param` 的兄弟 ✓）；
+>   ⭐ 落点：⭐ `EffectSpec` 字段 ✓ ＋ ⭐ `copy()` ✓ ＋ ⭐ `shareOf` ✓ ＋ ⭐ helper 重载 ⭐ `ownerSkillParamValue(…, spelled)` ✓ ＋ ⭐ `requirePercent` ✓
+>   ＋ ⭐ "恰好一个 share" 的检查 ✓ ＋ ⭐ **两处一行修法** ✓：
+>   ⭐ ① ⭐ `modifyAttr` 的幅度分支 ✓ —— ⭐ `if (percent != null || percent_from_cast_param != null)` ✗ ⇒ ⭐ 补上第三种拼法 ✓；
+>   ⭐ ② ⭐ `derivedMagnitude` 的派生行 ✓ —— ⭐ 它直接乘 ⭐ `effect.getPercent()` ✗ ⇒ ⭐ 改成 ⭐ `shareOf(effect, ctx)` ✓
+>     （⭐ 那个方法**其他每个分支**都走 `shareOf` ✓，⭐ 只有这一行漏了 ✓）。
+> * ⭐⭐⭐ **两处修法都不是猜的，⭐ 是判据逼出来的** ✓：⭐ 第一次跑 ⭐ NPE 在 ⭐ `modifyAttr:2300` ✗（⭐ `getAmount()` 是 null ✓）；
+>   ⭐ 修完之后 ⭐ 第二次跑 ⭐ NPE 在 ⭐ `derivedMagnitude:2635` ✗（⭐ `getPercent()` 是 null ✓）⇒
+>   ⭐⭐ **而 `modifyAttr` 上面那段注释早把这类错讲透了** ✓：⭐ *"…so 'is a share stated' is **NOT** `percent != null` -- asking only that sent a
+>   `percent_from_cast_param` modifier down the flat `amount` arm **and unboxed a null**."* ✓ ⇒ ⭐⭐ **新拼法要沿着老拼法留下的一整条路补齐** ✓。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `PercentFromSkillParamTest` ⇒ ⭐
+>   `[skill_share] row = [0.3, 0.3, 0.12, 2.0] ; maxHp = 1152.5976 ; expected 138.311712 (neighbour 345.77928) ; gained 138.31171200000006` ✓✓
+>   ⇒ ⭐ 读数正是 ⭐ `#3`（0.12）× ⭐ 生命上限 ✓，⭐ 而 **邻居是 345.78** ✓ ⇒ ⭐ 索引承重 ✓；
+>   ⭐ **变异** ✓：⭐ 让 `shareOf` 不看新拼法 ✗ ⇒ ⭐ 判据红 ✓。
+> * ⚠ **本轮踩到并记住的两条**：⭐ ① ⭐ `Set-Content -Encoding UTF8` ⭐ **会写 BOM** ✗ ⇒ ⭐ Java 直接拒绝 ✓（⭐ 写 `.java` 要用 ⭐ `UTF8Encoding($false)` ✓）；
+>   ⭐ ② ⭐ 上一轮的 `git checkout --` 回到的 HEAD ⭐ **已经含**上一轮提交的那两件引擎能力 ✓ ⇒ ⭐ 所以本轮只差 ⭐ `modifyAttr` 那一行 ✓，⭐ 我却先跑了一个会拒绝的整脚本 ✓
+>   ⇒ ⭐⭐ **教训：⭐ 回滚之后，⭐ 先 `grep` 现状（⭐ 5 个探针一次就够 ✓）再决定补哪几处 ✓。**
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2293** 例 ✓）、`mechanics` 见下、树干净 ✓ 已推送 ✓。
