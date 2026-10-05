@@ -36685,3 +36685,28 @@
 > * ⭐ **`1141513` 尚未写的那半（登记 ✓）**：⭐ 「本场战斗中，开拓者•记忆**施放强化普攻后**，德谬歌立即获得 1 个**额外回合**并自动施放【花与箭的舞曲】，
 >   若施放前目标被消灭则对新入场的敌方目标施放」✗ —— ⭐ 需要 ⭐ 一个"强化普攻"事件 ✗ ＋ ⭐ 额外回合 ✗（⭐ 其后半句"对新入场"用已出货的 `wave_monsters` ✓ 可写 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2277** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 10 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但「强化普攻 ＋ 额外回合」的形状**全部量清** ✓，⭐ 写出来的那条**没通过判据** ⇒ 按 ⑤ 回滚 ✓）**）**：
+>
+> * ⭐⭐⭐ **tbgd 的原话形状（这才是本轮的收获 ✓）**：
+>   ⭐ `MServant_CyreneServant_00_AmazingBuff_Player`（⭐ 开拓者 ✓）监听 ⭐ **`OnAfterSkillUse`** ✓，⭐ 用谓词 ⭐ **`ByCurrentSkillName`** ✓
+>   —— ⭐⭐ **"刚用的是哪个技能"** ✓，⭐ **这就是"强化普攻"在数据里的辨别方式** ✓ —— ⭐ 然后 ⭐ `TurnInsertAction{AutoCast}` ✓（⭐ 忆灵自动行动 ✓）。
+>   ⭐ 而 ⭐ `_M_Cyrene_Player_InsertActionCheck` ✓ 里带 ⭐ **`Retarget`** ✓ ＋ ⭐ `ByHaveEnemyAlive` ✓ ＋ ⭐ `ByIsTargetValid` ✓
+>   ⇒ ⭐⭐ **那多半就是「若施放前目标被消灭则对新入场的敌方目标施放」的原始机制** ✓（⭐ 新发现 ✓，⭐ 下一轮可据此重看那句 ✓）。
+> * ⭐ **我们这边的现成件（都已量 ✓）**：
+>   ⭐ `EXTRA_TURN` op **已经存在** ✓ —— ⭐ `battle.grantExtraTurn(resolveTarget(effect, ctx))` ✓ ⇒ ⭐ 它的 `target` 说的是**谁获得**额外回合 ✓（⭐ 1309 用 `"target": "self"` ✓）；
+>   ⭐ `8007/4` ＝ ⭐ **"Almighty Companion"，`skill_effect = Enhance`** ✓ ⇒ ⭐ **强化普攻就是它自己的槽位 4** ✓；
+>   ⭐ `11415/1` ＝ ⭐ **"Minuet of Blooms and Plumes"** ✓ ＝ ⭐ **【花与箭的舞曲】** ✓；
+>   ⭐ 而 ⭐ memosprite 的 buff 类技能 ⭐ 不触发 `SKILL_CAST`／`ULT_CAST`／`BASIC_ATTACK` ✓ ⇒ ⭐ 所以触发要用 ⭐ **`CAST_SETUP` ＋ `from_skill_id == 4`** ✓。
+> * ⛔ **写出来又回滚的那条** ✗：⭐ `on: CAST_SETUP` ＋ ⭐ `from_skill_id == 4` ＋ ⭐ `self_summon_count >= 1` ＋ ⭐ `self has_state <那句诗>` ⇒
+>   ⭐ `EXTRA_TURN{target: summon}` ＋ ⭐ `REPLACE_SKILL{SKILL, 1, target: summon}` ＋ ⭐ `CAST_SKILL{SKILL, target: summon}` ✓
+>   （⭐ 并为此在 ⭐ 第一半那条规则上加了 ⭐ 一个持久印记 ✓ —— ⭐ 因为原句说「**本场战斗中**」✓，⭐ 得有什么可以为真 ✓）。
+>   ⭐ **判据读数（关键 ✓）**：⭐ `extra turn actor = none ; the memosprite SKILL slot = 1 ; the enemy HP 16498.296 → 16498.296` ✗
+>   ⇒ ⭐ `REPLACE_SKILL` **确实跑了** ✓（⭐ 槽位变成 1 ✓）；⚠ 而 ⭐ `EXTRA_TURN` **没给出**额外回合 ✗、⭐ `CAST_SKILL` **没造成伤害** ✗。
+> * ⭐⭐ **下一轮先查这两点（已具名 ✓）**：
+>   ⭐ ① ⭐ `grantExtraTurn` 对 ⭐ **忆灵**是否有效 ✗ —— ⭐ `Battle:725` 会读 `getExtraTurnActor()` ✓，⭐ 而该函数**可能返回 false** ✗（⭐ 例如忆灵不在行动队列里 ✗）；
+>   ⭐ ② ⭐ `CAST_SKILL` 为什么**静默**地没有造成伤害 ✗ —— ⭐ 它本该**响亮报错** ✗ ⇒ ⭐ 也许是 ⭐ 在 `EXTRA_TURN` 之后被跳过 ✗，⭐ 或伤害被抹平 ✗（⚠ 但 HP 一位不差 ✓ ⇒ ⭐ 更像"根本没执行" ✗）。
+> * ⚠⚠ **我自己的两个坑（记 ✓）**：⭐ ① ⭐ 判据里写了 ⭐ `demiurge.getSkills().get(SkillType.SKILL)` ✗
+>   ⇒ ⭐ **忆灵没有那个键** ✗（⭐ 它的技能按**槽位**放 ✓）⇒ ⭐ NPE ✓（⭐ 该用 ⭐ `skillAt(slot)` ✓，⭐ 我在别处一直这么用 ✓）；
+>   ⭐ ② ⭐ 那个 NPE 发生在断言**之前** ✗ ⇒ ⭐ 白白花掉一次运行 ✓（⭐ 教训：⭐ **把"前置检查"和"被测读数"分开放** ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2277** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓，⭐ `characters/8007.json` 与 HEAD 完全一致 ✓）。
