@@ -1,134 +1,426 @@
-[
-  {
-    "on": "SKILL_CAST",
-    "id": "skill_damage_taken_up",
-    "when": [
-      "actor == self"
-    ],
-    "do": [
-      {
-        "op": "MODIFY_DAMAGE_TAKEN",
-        "percent": 0.2,
-        "turns": 3,
-        "target": "all_enemies"
-      }
-    ],
-    "source": "1410 海瑟音 战技 泛音，暗流后齐鸣 (141002, BPSkill/AoEAttack): 「有100%的基础概率使敌方全体受到的伤害提高20%，持续3回合，同时对敌方全体造成等同于海瑟音140%攻击力的物理属性伤害。」",
-    "note": "「有 **100% 的基础概率**使敌方全体**受到的伤害提高 20%**，持续 **3 回合**」—— `MODIFY_DAMAGE_TAKEN` + `all_enemies` ✓ + `turns: 3` ✓（\"敌方全体\" ✓ 不是单体 ✗）。⚠ **登记**：「**100% 的基础概率**」未写 ✗ —— 与 1218/1305/1406 同一判断 ✓（\"基础概率\"要过效果命中×效果抵抗 ✓，不拿\"100% = 必中\"近似 ✗）。⚠ 战技自身的伤害不写规则 ✓（由技能数据结算 ✓，140% 攻击力 ✓）。"
-  },
-  {
-    "on": "BATTLE_START",
-    "id": "level_convention",
-    "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 9
-      }
-    ],
-    "source": "1410 海瑟音 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 140%、终结技 200%、天赋 各 DoT 25.00% 攻击力 / 裂伤 20.00% 目标生命上限）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠⚠ **登记（整族停在 DoT 植入 + 结界上）**：① **天赋的植入** ✗ —— 「我方目标攻击时…有 100% 的基础概率使被击中的敌方目标陷入**风化/裂伤/灼烧/触电其中 1 种**，且会**优先陷入不同的状态**」✗（**四选一的随机** ✗ + \"**优先不同**\"的选择规则 ✗ + 基础概率 ✗）；虽然各 DoT 的**数值形状**都可写 ✓（风化/灼烧/触电 = `self_attr:ATTACK` **25.00%** 2 回合 ✓；裂伤 = **目标生命上限 20.00%**、**上限为海瑟音攻击力的 25.00%** ✓ —— 后者正是 `cap_scale`/`cap_percent` 那一对 ✓），但**没有施加者** ✗ ⇒ 数值写了也无处可用 ✗；② **终结技的结界** ✗ —— 「海瑟音**展开结界**，使敌方目标**攻击力降低 15.00%**，**防御力降低 25.00%**…处于结界中的敌方目标每受到 1 次持续伤害，海瑟音对其造成等同于自身 **80.00% 攻击力**的物理属性持续伤害，该伤害在**每回合开始时或我方目标单次攻击后**触发，且**最多触发 8 次**。该伤害**不会重复触发此效果**。结界持续 **3 回合**，自身每回合开始时减 1。当海瑟音陷入无法战斗状态时，结界也会被解除」✗ —— ⭐ 两句**减益**在**形式上可写** ✓，但它们挂在「**展开结界**」之下 ✗ ⇒ 用普通的 `turns: 3` 写会在**结界结束后仍然留着** ✗（**没有症状的错误** ✗）⇒ **按\"场条件\"政策登记** ✓（与 1504 的【饲饵】场条件、1321 的结界同一判断 ✓）；其余部分（触发点 ✗ + 8 次上限 ✗ + 递归护栏 ✗ + 随她倒下的解除 ✗）一并登记 ✓；③ **秘技** ✗（特殊领域 ✗ + 与天赋相同的**四选二**状态 ✗）；④ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；⑤ **星魂 1** ✗（DoT 伤害 ×116% ✗ + 额外植入一次 ✗）、**星魂 2** ✗（**结界持续期间**让行迹对全队生效 ✗）。"
-  },
-  {
-    "on": "ULT_CAST",
-    "id": "ult_zone_opens_and_lowers",
-    "when": [
-      "actor == self"
-    ],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ATTACK",
-        "percent": -0.15,
-        "turns": 3,
-        "buff": "结界",
-        "ticks_on": "self",
-        "target": "all_enemies"
-      },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "DEFENCE",
-        "percent": -0.25,
-        "turns": 3,
-        "buff": "结界",
-        "ticks_on": "self",
-        "target": "all_enemies"
-      }
-    ],
-    "note": "⭐ 2026-09-30 转正 ✓：「海瑟音**展开结界**，使敌方目标攻击力降低 15%、防御力降低 25%…结界持续 3 回合，自身每回合开始时减 1。当海瑟音陷入无法战斗状态时，结界也会被解除」—— ⚠ 旧登记担心“用普通的 `turns: 3` 写会在**结界结束后**仍留着” ✗。⭐ 答案不是新 op，而是**同名** ✓：两句都带 `buff: 结界` + 同一个 `turns: 3` + `ticksOn: self` ⇒ 时间一到两句一起没 ✓；而「她倒下时结界也被解除」由 `removeBuffsAnchoredTo` 承担 ✓（⚠ 同样依赖 (b)：`ticks_on` 直到 `b275250` 才真正接在 `MODIFY_ATTR` 上 ✓）。"
-  },
-  {
-    "id": "memosprite_ode_of_ocean_marks_hysilens",
-    "on": "CAST_SETUP",
-    "when": [
-      "target == self",
-      "actor is_summon",
-      "from_skill_id == 22"
-    ],
-    "do": [
-      {
-        "op": "APPLY_BUFF",
-        "buff": "暖流",
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 16 「献予「海洋」之诗」（数据槽位 22，SkillID 1141522）：「单次生效，对海瑟音施放时，使海瑟音获得【暖流】。」",
-    "note": "⭐ 形状照 1402 的 `memosprite_ode_of_romance_marks_aglaea`（同一句话的两个实例）。"
-  },
-  {
-    "id": "memosprite_ode_of_ocean_spends_itself_for_energy",
-    "on": "ALLY_ATTACK",
-    "when": [
-      "self has_state 暖流"
-    ],
-    "do": [
-      {
-        "op": "GAIN_ENERGY",
-        "amount": 60,
-        "target": "self"
-      },
-      {
-        "op": "REMOVE_STATE",
-        "buff": "暖流"
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 16 「献予「海洋」之诗」（数据槽位 22）：「**海瑟音施放攻击后消耗【暖流】为自身恢复 #4 点能量**。」",
-    "note": "⭐ 形状照 1402 的 `memosprite_ode_of_romance_spends_itself_for_energy`。⭐ `#4` 在 1141522 的**十行里全是 60**（**实测**）。"
-  },
-  {
-    "id": "memosprite_ode_of_ocean_raises_her_damage",
-    "on": "CAST_SETUP",
-    "when": [
-      "target == self",
-      "actor is_summon",
-      "from_skill_id == 22"
-    ],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent_from_cast_param": 0,
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 22 「献予「海洋」之诗」（数据槽位 22，SkillID 1141522）：「单次生效，对海瑟音施放时，使海瑟音获得【暖流】。…**本场战斗中，海瑟音造成的伤害提高 #1%**…」",
-    "note": "⭐ 形状照 1414 的浪漫之诗与 1406 的诡计之诗（**同一属性、同一目标、永久**）。⭐ **实测**：`#1` 随等级变（0.6 → 0.72）⇒ `percent_from_cast_param: 0`（施放技能就是本条诗）。⛔ 同句最后一句（使目标身上的**持续伤害立即产生**相当于原伤害 `#2%`/`#3%` 的伤害）**仍登记**，★ 形状已有先例：`characters/1111.json` 的 「使其当前承受的裂伤状态**立即产生 1 次**相当于原伤害 85% 的伤害」。"
-  }
-]
+{
+  "rules": [
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_damage_taken_up",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2,
+          "turns": 3,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1410 海瑟音 战技 泛音，暗流后齐鸣 (141002, BPSkill/AoEAttack): 「有100%的基础概率使敌方全体受到的伤害提高20%，持续3回合，同时对敌方全体造成等同于海瑟音140%攻击力的物理属性伤害。」",
+      "note": "「有 **100% 的基础概率**使敌方全体**受到的伤害提高 20%**，持续 **3 回合**」—— `MODIFY_DAMAGE_TAKEN` + `all_enemies` ✓ + `turns: 3` ✓（\"敌方全体\" ✓ 不是单体 ✗）。⚠ **登记**：「**100% 的基础概率**」未写 ✗ —— 与 1218/1305/1406 同一判断 ✓（\"基础概率\"要过效果命中×效果抵抗 ✓，不拿\"100% = 必中\"近似 ✗）。⚠ 战技自身的伤害不写规则 ✓（由技能数据结算 ✓，140% 攻击力 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1410 海瑟音 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 140%、终结技 200%、天赋 各 DoT 25.00% 攻击力 / 裂伤 20.00% 目标生命上限）",
+      "note": "本文件说明自己的数字来自哪一行（M-32）。⚠⚠ **登记（整族停在 DoT 植入 + 结界上）**：① **天赋的植入** ✗ —— 「我方目标攻击时…有 100% 的基础概率使被击中的敌方目标陷入**风化/裂伤/灼烧/触电其中 1 种**，且会**优先陷入不同的状态**」✗（**四选一的随机** ✗ + \"**优先不同**\"的选择规则 ✗ + 基础概率 ✗）；虽然各 DoT 的**数值形状**都可写 ✓（风化/灼烧/触电 = `self_attr:ATTACK` **25.00%** 2 回合 ✓；裂伤 = **目标生命上限 20.00%**、**上限为海瑟音攻击力的 25.00%** ✓ —— 后者正是 `cap_scale`/`cap_percent` 那一对 ✓），但**没有施加者** ✗ ⇒ 数值写了也无处可用 ✗；② **终结技的结界** ✗ —— 「海瑟音**展开结界**，使敌方目标**攻击力降低 15.00%**，**防御力降低 25.00%**…处于结界中的敌方目标每受到 1 次持续伤害，海瑟音对其造成等同于自身 **80.00% 攻击力**的物理属性持续伤害，该伤害在**每回合开始时或我方目标单次攻击后**触发，且**最多触发 8 次**。该伤害**不会重复触发此效果**。结界持续 **3 回合**，自身每回合开始时减 1。当海瑟音陷入无法战斗状态时，结界也会被解除」✗ —— ⭐ 两句**减益**在**形式上可写** ✓，但它们挂在「**展开结界**」之下 ✗ ⇒ 用普通的 `turns: 3` 写会在**结界结束后仍然留着** ✗（**没有症状的错误** ✗）⇒ **按\"场条件\"政策登记** ✓（与 1504 的【饲饵】场条件、1321 的结界同一判断 ✓）；其余部分（触发点 ✗ + 8 次上限 ✗ + 递归护栏 ✗ + 随她倒下的解除 ✗）一并登记 ✓；③ **秘技** ✗（特殊领域 ✗ + 与天赋相同的**四选二**状态 ✗）；④ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；⑤ **星魂 1** ✗（DoT 伤害 ×116% ✗ + 额外植入一次 ✗）、**星魂 2** ✗（**结界持续期间**让行迹对全队生效 ✗）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_zone_opens_and_lowers",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": -0.15,
+          "turns": 3,
+          "buff": "结界",
+          "ticks_on": "self",
+          "target": "all_enemies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.25,
+          "turns": 3,
+          "buff": "结界",
+          "ticks_on": "self",
+          "target": "all_enemies"
+        }
+      ],
+      "note": "⭐ 2026-09-30 转正 ✓：「海瑟音**展开结界**，使敌方目标攻击力降低 15%、防御力降低 25%…结界持续 3 回合，自身每回合开始时减 1。当海瑟音陷入无法战斗状态时，结界也会被解除」—— ⚠ 旧登记担心“用普通的 `turns: 3` 写会在**结界结束后**仍留着” ✗。⭐ 答案不是新 op，而是**同名** ✓：两句都带 `buff: 结界` + 同一个 `turns: 3` + `ticksOn: self` ⇒ 时间一到两句一起没 ✓；而「她倒下时结界也被解除」由 `removeBuffsAnchoredTo` 承担 ✓（⚠ 同样依赖 (b)：`ticks_on` 直到 `b275250` 才真正接在 `MODIFY_ATTR` 上 ✓）。"
+    },
+    {
+      "id": "memosprite_ode_of_ocean_marks_hysilens",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 22"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "暖流",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 16 「献予「海洋」之诗」（数据槽位 22，SkillID 1141522）：「单次生效，对海瑟音施放时，使海瑟音获得【暖流】。」",
+      "note": "⭐ 形状照 1402 的 `memosprite_ode_of_romance_marks_aglaea`（同一句话的两个实例）。"
+    },
+    {
+      "id": "memosprite_ode_of_ocean_spends_itself_for_energy",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "self has_state 暖流"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 60,
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "暖流"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 16 「献予「海洋」之诗」（数据槽位 22）：「**海瑟音施放攻击后消耗【暖流】为自身恢复 #4 点能量**。」",
+      "note": "⭐ 形状照 1402 的 `memosprite_ode_of_romance_spends_itself_for_energy`。⭐ `#4` 在 1141522 的**十行里全是 60**（**实测**）。"
+    },
+    {
+      "id": "memosprite_ode_of_ocean_raises_her_damage",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 22"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent_from_cast_param": 0,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22 「献予「海洋」之诗」（数据槽位 22，SkillID 1141522）：「单次生效，对海瑟音施放时，使海瑟音获得【暖流】。…**本场战斗中，海瑟音造成的伤害提高 #1%**…」",
+      "note": "⭐ 形状照 1414 的浪漫之诗与 1406 的诡计之诗（**同一属性、同一目标、永久**）。⭐ **实测**：`#1` 随等级变（0.6 → 0.72）⇒ `percent_from_cast_param: 0`（施放技能就是本条诗）。⛔ 同句最后一句（使目标身上的**持续伤害立即产生**相当于原伤害 `#2%`/`#3%` 的伤害）**仍登记**，★ 形状已有先例：`characters/1111.json` 的 「使其当前承受的裂伤状态**立即产生 1 次**相当于原伤害 85% 的伤害」。"
+    },
+    {
+      "id": "ocean_ode_captures_both_overflow_shares",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "from_skill_id == 22"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "奥词普攻溢出",
+          "scale": "cast_skill_param:1",
+          "percent": 10000,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "奥词战技溢出",
+          "scale": "cast_skill_param:2",
+          "percent": 10000,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22 「献予「海洋」之诗」（数据槽位 22）：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生相当于原伤害 #2%/#3% 的伤害」—— 本条只做捕获。",
+      "note": "⭐ `#2` 给普攻、`#3` 给战技（实测：0.3 → 0.42 与 0.4 → 0.56）；存基点。"
+    },
+    {
+      "id": "ocean_ode_ticks_普攻_physical",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Physical",
+          "percent_from_resource": "奥词普攻溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（普攻 那半，Physical 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_普攻_fire",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Fire",
+          "percent_from_resource": "奥词普攻溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（普攻 那半，Fire 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_普攻_ice",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Ice",
+          "percent_from_resource": "奥词普攻溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（普攻 那半，Ice 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_普攻_wind",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Wind",
+          "percent_from_resource": "奥词普攻溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（普攻 那半，Wind 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_普攻_thunder",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Thunder",
+          "percent_from_resource": "奥词普攻溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（普攻 那半，Thunder 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_普攻_quantum",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Quantum",
+          "percent_from_resource": "奥词普攻溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（普攻 那半，Quantum 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_普攻_imaginary",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Imaginary",
+          "percent_from_resource": "奥词普攻溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（普攻 那半，Imaginary 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_战技_physical",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Physical",
+          "percent_from_resource": "奥词战技溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（战技 那半，Physical 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_战技_fire",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Fire",
+          "percent_from_resource": "奥词战技溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（战技 那半，Fire 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_战技_ice",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Ice",
+          "percent_from_resource": "奥词战技溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（战技 那半，Ice 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_战技_wind",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Wind",
+          "percent_from_resource": "奥词战技溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（战技 那半，Wind 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_战技_thunder",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Thunder",
+          "percent_from_resource": "奥词战技溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（战技 那半，Thunder 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_战技_quantum",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Quantum",
+          "percent_from_resource": "奥词战技溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（战技 那半，Quantum 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    },
+    {
+      "id": "ocean_ode_ticks_战技_imaginary",
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Imaginary",
+          "percent_from_resource": "奥词战技溢出",
+          "target": "target"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 22：「使受到攻击的敌方目标当前承受的所有持续伤害立即产生…」（战技 那半，Imaginary 元素）。",
+      "note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
+    }
+  ],
+  "resources": [
+    {
+      "id": "奥词普攻溢出",
+      "max": 2147483647,
+      "source": "⚠ **不是数据里的名字** —— 数据行 22 的「普攻」那半（#2）在施放那一刻被捕获后存放的地方（基点）。"
+    },
+    {
+      "id": "奥词战技溢出",
+      "max": 2147483647,
+      "source": "⚠ **不是数据里的名字** —— 数据行 22 的「战技」那半（#3）在施放那一刻被捕获后存放的地方（基点）。"
+    }
+  ]
+}
