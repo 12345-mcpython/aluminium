@@ -322,6 +322,29 @@
       ],
       "source": "1412 刻律德菈 行迹（文档 `:67`）：「持有【爵位】的角色…造成的**战技伤害的暴击伤害提高 72%**」",
       "note": "⭐ 2026-10-02：`CRIT_ATTACK` 就是暴击伤害 ✓（数据：`1412` 的 `crit_chance 0.05` ⾏ `crit_attack 0.5` ✓）；而 instance 路由**按名支持它** ✓（`ctx.damage().addCritDamage(...)` ✓）。“战技伤害的”由 `from_category BPSKILL` 表达 ✓。"
+    },
+    {
+      "id": "memosprite_ode_of_law_raises_the_meritorious",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 23"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent_from_cast_param": 0,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "target has_state 军功"
+          ]
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23，SkillID 1141523）：「整场生效，对刻律德菈施放后，**持有【军功】的角色暴击伤害提高 #1%**。」",
+      "note": "⭐ 六轮单变量实验后，形状与引擎行为都已验证：`all_allies` 好、`target_when` 在已出货词汇里、字面量与**派生**份额都能落地（实测：字面量 +0.25、派生 +0.4199999999999591）。⭐ 占比是**施放技能的第 0 参数**（随等级变：0.15 → 0.42）。"
     }
   ]
 }
