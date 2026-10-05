@@ -1,0 +1,3 @@
+src/main/resources/memosprites/1413.json : dict ; keys=['aggro', 'attack', 'name', 'note', 'panel', 'servant_id', 'skills', 'source'] ; rules=0
+src/main/resources/memosprites/1415.json : dict ; keys=['name', 'note', 'panel', 'servant_id', 'skills', 'source'] ; rules=0
+src/main/resources/characters/1415.json : dict ; keys=['resources', 'rules'] ; rules=11

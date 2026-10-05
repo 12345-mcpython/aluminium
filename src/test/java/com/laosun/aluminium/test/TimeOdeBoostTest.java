@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test;
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
@@ -10,35 +11,36 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 24, first sentence -- the CAPTURE half (2026-10-02).
+ * 1415's memosprite skill 24, first sentence -- BOTH halves (2026-10-02).
  *
- * 「对长夜月施放后，「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%」. The number lives in slot 24's own row, which no share can read later (a memosprite's skill row is
- * unreachable), so it is captured as the ode is cast -- in basis points, because the share is below 1 and a resource holds an integer.
+ * The capture half: `#1` is captured into a resource on her as the ode is cast. The boost half: when HER memosprite's data slot 7 deals damage, that share raises its damage.
  *
- * \u2b50 Two-sided: with the ode cast at her, the captured value is exactly round(#1 * 10000); without it, the resource stays empty. The \u300c\u52a0\u6210\u90a3\u534a\u300d (spending it when
- * data slot 7 lands) is registered -- measured, a memosprite's damage does not reach the master's table through `DEALING_DAMAGE`, and gating `DAMAGE_SETTLED` by
- * `actor is_summon` + `from_skill_id == 7` still read nothing.
+ * \u2b50 Two-sided: with the ode the memosprite's boost is the ode's own #1; without it, nothing was captured and nothing is boosted.
  */
 public class TimeOdeBoostTest {
     private static final int LEVEL = 80;
+    private static final float EPS = 1e-9f;
     private static final int LONGNIGHT = 1413;
     private static final int CYRENE = 1415;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 24;
+    private static final int DREAM_SLOT = 7;
     private static final String SHARE = "\u957f\u591c\u7684\u8ff7\u68a6\u589e\u4f24";
 
     @Test
-    public void theOdeCapturesItsOwnShareOnHer() {
+    public void theOdeCapturesAndThenBoostsTheDreamSkill() {
         double[] with = run(true);
         double[] without = run(false);
-        System.out.println("[time_ode] row value " + with[1] + " ; captured " + with[0]
-                + " ; without the ode " + without[0]);
-        Assertions.assertEquals(Math.round(with[1] * 10000), with[0],
-                "the captured value is #1 in basis points -- the row read out of the engine");
-        Assertions.assertEquals(0, without[0], "and without the ode she has captured nothing");
+        System.out.println("[time_ode] row value " + with[2] + " ; captured " + with[1] + " ; boost " + with[0]
+                + " ; without the ode captured " + without[1] + " boost " + without[0]);
+        Assertions.assertEquals(Math.round(with[2] * 10000), with[1], "the captured value is #1 in basis points");
+        Assertions.assertEquals(with[2], with[0], Math.abs(with[2]) * 1e-6,
+                "\u300c\u300c\u957f\u591c\u300d\u65bd\u653e\u5fc6\u7075\u6280\u3010\u8ff7\u68a6\uff0c\u6d41\u5931\uff0c\u5982\u9732\u3011\u65f6\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d-- the captured share");
+        Assertions.assertEquals(0, without[1], EPS, "without the ode nothing is captured");
+        Assertions.assertEquals(0.0, without[0], EPS, "and nothing is boosted");
     }
 
-    /** [what she captured, the ode's row value] */
+    /** [the memosprite's boost after its dream skill lands, what she captured, the ode's row value] */
     private static double[] run(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character longnight = CharacterFactory.create(LONGNIGHT, LEVEL);
@@ -57,6 +59,15 @@ public class TimeOdeBoostTest {
             SkillExecutor.execute(battle, ode, sprite, List.of(longnight));
             battle.processRequests();
         }
-        return new double[]{battle.characters.get(1).getResources().value(SHARE), rowValue};
+        longnight = battle.characters.get(1);
+        int captured = longnight.getResources().value(SHARE);
+        var evey = battle.summonServant(longnight);
+        battle.processRequests();
+        Assertions.assertNotNull(evey, "precondition: her memosprite is out");
+        var dream = evey.skillAt(DREAM_SLOT);
+        Assertions.assertNotNull(dream, "precondition: data slot 7");
+        SkillExecutor.execute(battle, dream, evey, List.of(battle.enemies.getFirst()));
+        battle.processRequests();
+        return new double[]{evey.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), captured, rowValue};
     }
 }
