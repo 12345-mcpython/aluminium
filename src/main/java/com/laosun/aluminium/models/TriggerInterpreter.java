@@ -4563,7 +4563,9 @@ public final class TriggerInterpreter {
      */
     private static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect, TriggerContext ctx) {
         String scale = effect.getScale() == null ? "" : effect.getScale().trim();
-        double share = effect.getPercent() == null ? 0.0 : effect.getPercent();
+        // ⚠ `shareOf`, not the raw field (2026-10-02): a share may also come from one of the owner's own skills (`percent_from_skill_param`),
+        // and `derivedMagnitude` was fixed for exactly this one round earlier. Same family, same line.
+        double share = shareOf(effect, ctx);
         double flat = effect.getAmount() == null ? 0.0 : effect.getAmount();
         // ⚠⚠ A share of the TRIGGERING instance (「等同于原伤害 X%」) was implemented here on 2026-10-02 and ROLLED
         // BACK the same round, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries

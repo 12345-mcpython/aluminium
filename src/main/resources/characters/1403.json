@@ -207,5 +207,23 @@
     ],
     "source": "1403 缇宝 终结技 猜猜这里住着谁 (140303, Ultra/AllAttack)：「开启【结界】…**结界持续期间**，敌方目标受到的伤害提高 #2%…【结界】持续 **#4 回合**」。",
     "note": "⭐ 为什么要这个状态：本文件已经把**易伤**那半写成了敌人身上的 `MODIFY_DAMAGE_TAKEN`（`ult_zone_enemy_vulnerability`）—— 那是一个**减益**，所以「**结界持续期间**」这句话**无处可指**。⭐ 持续 #4 在 140303 的**每一级都是 2**，所以写 2 是数据说的话。⭐ 而 1415 的「门径」之诗正好需要它：「缇宝施放追加攻击触发**缇宝的结界的附加伤害**时…」。"
+  },
+  {
+    "id": "ult_zone_additional_damage",
+    "on": "ATTACK_FINISHED",
+    "when": [
+      "self has_state 结界"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "scale": "owner_max_hp",
+        "percent_from_skill_param": "ULTRA:2",
+        "element": "Quantum",
+        "target": "highest_hp_attack_hit"
+      }
+    ],
+    "source": "1403 缇宝 终结技 (140303)：「受到我方目标攻击后，**每有 1 名目标受到攻击**，会对**被攻击目标中当前生命值最高的目标**造成 1 次**等同于缇宝 #3% 生命上限**的量子属性附加伤害。」",
+    "note": "⭐ 挂 `ATTACK_FINISHED`：它的注释写着 “settlement complete, **hit set frozen**” —— 正是本句要的“被攻击目标”集合，而且它**存在**。⭐ `scale` 是 `owner_max_hp`（`self_attr:HEALTH` 不在 DAMAGE 字面量路径认的集里，静默算成 1.0，**实测**）。"
   }
 ]

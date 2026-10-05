@@ -37319,3 +37319,26 @@
 >   ⭐ ② ⭐ 它现在**除以** ⭐ 触发实例自己的因子 ✓（⭐ `toValue() / skillBaseValue` ✓）⇒ ⭐ 否则会**二次乘**区域 ✓；
 >   ⭐ ③ ⭐ 而 ⭐ `damage_type: "TRUE"` ✗ ⭐ 的 rider ⭐ **不要**除 ✓（⭐ 它因子恰好是 1 ✓；⭐ 除错会让 24% 变成 44% ✓）。
 > * **实测（本轮）**：⭐ 内容回滚后 ⭐ 全量 **0**（--rerun-tasks，**2293** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 39 轮：🎉🎉🎉 **第 114 件出货 ＝ 缇宝结界的附加伤害 ＋ `literalBase` 读占比走 `shareOf`** ✓✓）**）**：
+>
+> * ✅ **出货内容** ✓：
+>   ⭐ ① ⭐ `characters/1403.json` 新增 ⭐ `ult_zone_additional_damage` ✓ —— ⭐ `on: ATTACK_FINISHED` ＋ ⭐ `when: [self has_state 结界]` ⇒
+>     ⭐ `DAMAGE{scale: "owner_max_hp", percent_from_skill_param: "ULTRA:2", element: "Quantum", target: "highest_hp_attack_hit"}` ✓
+>     （⭐ 即 ⭐ 「受到我方目标攻击后…造成 1 次等同于缇宝 #3% 生命上限的量子属性附加伤害」 ✓）；
+>   ⭐ ② ⭐ 引擎一行 ✓：⭐ `literalBase` 的 ⭐ `double share = effect.getPercent() == null ? 0.0 : effect.getPercent();` ✗
+>     ⇒ ⭐ 改成 ⭐ `shareOf(effect, ctx)` ✓ —— ⭐ 与上一轮 ⭐ `derivedMagnitude` 那一行**同族** ✓。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `ZoneAdditionalDamageTest` ⇒ ⭐
+>   `[zone_rider] zone open, rider on = 333.1456207320389 ; rider off = 264.6483903011522 ; the rider's own instance = 68.4972304308867 (raw #3 x Max HP = 69.155856)` ✓✓
+>   ⇒ ⭐ **68.4972 对 69.1559** ✓（⭐ 只差约 1% 防御 ✓）⇒ ⭐ 读数正是 ⭐ `#3`（10 级 0.12）× ⭐ 生命上限 ✓；
+>   ⭐ **变异** ✓：⭐ 把那一行退回读原始 `percent` ✗ ⇒ ⭐ `the rider's own instance = 1.0` ⇒
+>   ⭐⭐ **它重现的正是前几轮那个 `1.0`** ✓ ⇒ ⭐ **所以那个 1.0 的真身一直是这一行** ✓，⭐ 不是对照场景 ✓
+>   （⭐ 两轮的 ⭐ `rider off` ⭐ 都是 ⭐ `264.6483903011522` ✓，⭐ 一模一样 ✓ ⇒ ⭐ 对照一直是干净的 ✓）。
+> * ⭐⭐⭐ **判据的隔离法（⭐ 本轮学到的正解 ✓）**：⭐ 要"⭐ 两个场景只差一条规则 ✗"，⭐ **不要** 换表 ✗（⭐ `literalBase` 的注释记着：
+>   ⭐ 换表会连 ⭐ `level_convention` ⭐ 一起丢掉 ✓，⭐ 于是技能跑在 **Lv1 行** ✓ —— ⭐ 而那个陷阱"**sprung by the judge**" ✓ 被绊过三次 ✓）；
+>   ⭐⭐ **正解**：⭐ **整张表原样保留** ✓，⭐ 终结技照放 ✓，⭐ 然后 ⭐ **只摘掉那条规则的门所读的状态** ✗
+>   （⭐ `tribbie.getBuffManager().removeState("结界")` ✓ —— ⭐ 它只动那个状态 ✓，⭐ 而 ⭐ 易伤在**敌人身上** ✓ ⇒ ⭐ 两个场景只差 rider 自己 ✓✓）。
+> * ⭐ **链条上还差最后一件** ✗：⭐ 1415 那句「⭐ 缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 `#1` 次附加伤害」✗ ——
+>   ⭐ 需要一个"⭐ **排除我自己刚造的那一笔**"的门 ✗（⭐ 它挂在附加伤害上、⭐ 又产出附加伤害 ✓ ⇒ ⭐ 会永久自触发 ✓，
+>   ⭐ 引擎的 ⭐ `Trigger recursion exceeded 8 levels` ✗ 就是为此 ✓）⇒ ⭐ 条件清单里**没有**现成拼法 ✗（⭐ `from_rule` 只管 `has_shield` ✓、`from_skill` 只认槽位 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2294** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
