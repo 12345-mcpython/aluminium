@@ -47,6 +47,7 @@ public class EffectSpec {
         copy.amount = this.amount;
         copy.amountFromAttr = amountFromAttr;
         copy.amountPercent = amountPercent;
+        copy.skillParamCid = skillParamCid;
         copy.amountFromEvent = amountFromEvent;
         copy.amountFromPrevious = amountFromPrevious;
         copy.minEidolon = minEidolon;
@@ -155,6 +156,18 @@ return copy;
      * The share of {@link #amountFromAttr} to take (0.5 for \u300c50%\u300d). Null means the whole value.
      */
     private Double amountPercent;
+
+    /**
+     * ⭐ Whose skill row a {@code skill_param:} / {@code percent_from_skill_param} share is read from, when it is NOT the rule owner's own (2026-10-02).
+     *
+     * <p>Readers: 1415's odes -- 「提高数值等同于本次治疗数值的 #1%」 (the value is in slot 19's row; the healing is 风堇's),
+     * the time ode's memosprite boost (value in slot 24; the damage is the memosprite's skill 7), and the ocean ode's overflow sentence (value in slot 22; the attack is 海瑟音's).
+     *
+     * <p>⚠ It is a FIELD and not part of the spelling on purpose: measured, a cid inside the slot string is refused --
+     * {@code Op MODIFY_ATTR scales off skill slot "1415|SKILL", which is not a SkillType}.
+     */
+    @com.google.gson.annotations.SerializedName("skill_param_cid")
+    private Integer skillParamCid;
     /**
      * \u2705 Take the amount from the EVENT itself (2026-09-30; reader: 1505 \u7eef\u82f1\u2019s talent \u300c\u7eef\u82f1\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c
      * \u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d). The magnitude a rule reacts to -- energy credited, damage dealt -- is already on the

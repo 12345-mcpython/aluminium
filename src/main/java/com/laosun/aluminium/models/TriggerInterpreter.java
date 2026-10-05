@@ -2507,7 +2507,18 @@ public final class TriggerInterpreter {
 
     /** The same read, for a caller that spells the slot itself (`percent_from_skill_param`). */
     private static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
-        Character owner = requireCharacterOwner(effect, ctx);
+        // ⭐ a share may name ANOTHER character's row (2026-10-02): the field says whose, and the slot stays a legal SkillType so the loader check still means something
+        Character owner;
+        if (effect.getSkillParamCid() != null) {
+        CanHit found = allyWithCid(ctx, effect.getSkillParamCid());
+        if (!(found instanceof Character)) {
+        throw new IllegalStateException("the share names cid " + effect.getSkillParamCid()
+        + ", which is not a character in this battle's party");
+        }
+        owner = (Character) found;
+        } else {
+        owner = requireCharacterOwner(effect, ctx);
+        }
         String[] parts = spelled.split(":", 2);
         int index = Integer.parseInt(parts[1].trim());
         SkillType slot = SkillType.valueOf(parts[0].trim().toUpperCase(Locale.ROOT));
