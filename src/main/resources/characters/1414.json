@@ -195,6 +195,28 @@
       ],
       "source": "同上：「…并使**龙灵行动提前 100%**，…」",
       "note": "⭐ `ADVANCE{percent: 1.0}` 已出货的语义：**当前行动值的份额** ⇒ 1.0 就是“立即行动”。⚠ 目标用 `all_summons`（丹恒•腾荒在战斗中只有【龙灵】一个召唤物）—— 已登记：它是“所有召唤物”，不是“名字叫龙灵的那一个”。"
+    },
+    {
+      "id": "earth_ode_raises_the_bondmates_damage",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 25"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.0012,
+          "permanent": true,
+          "target": "holder_of:同袍",
+          "coexist": true,
+          "max_stacks": 1
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 25 「献予「大地」之诗」（SkillID 1141525，`SkillCY13`，参数 `[0.12, 2, 3, 0.4, 1.5]`）：「**当丹恒•腾荒持有【献予「大地」之诗】时，【同袍】造成的伤害提高 #1(0.12)%**」。",
+      "note": "⭐ **2026-10-02**：目标用 **`holder_of:同袍`**（`1414.json` 自己已用过这个选择器）——【同袍】是**他自己的技能**给的 3 回合状态（`skill_bondmate_and_shield`），所以“【同袍】造成的伤害”指的是**持有者的伤害**。⭐ `#1` = **0.12%** ⇒ `percent: 0.0012`。⚠ 仍登记：原话的“**当…持有…时**”是**期间性**的，而本条写成了**持久**（无时长）；要严格期间化，需要一个“状态在则加成在”的语汇。  ⭐ **实测的坑**：同属性的 `MODIFY_ATTR` **默认替换** ——第一版没写 `coexist` 时，队友的 `ALL_DAMAGE_TYPE_BOOST` 从天赋给的 **0.2 直接变成 0.0012**（实测读数 `0.2 -> 0.0012`）⇒ 必须 **`coexist: true` 加 `max_stacks`** 才是叠加。"
     }
   ]
 }
