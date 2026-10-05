@@ -234,6 +234,15 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     @Getter(AccessLevel.NONE)
     private final Map<SkillType, Integer> skillLevelBonus = new HashMap<>();
 
+    /**
+     * ⭐ Extra damage SEGMENTS per DATA SLOT (2026-10-02; reader: 1405's 「使其战技的伤害次数增加 3 次」, the ode of reason).
+     *
+     * <p>Keyed by the slot number because that is what `Skill.getSkillSlot()` answers with -- the same number `CAST_SKILL{skill_id}` names -- and a skill's hit count itself comes from the data's
+     * description (see `SkillExecutor`'s BOUNCE branch), so this is how a rule adds to it at run time.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Map<Integer, Integer> skillHitBonus = new HashMap<>();
+
     // test event behavior
     public Runnable beforeMove = () -> {
     };
@@ -829,6 +838,21 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param slot  which skill (the same spelling the other ops use for {@code "skill"})
      * @param delta how many levels (a positive whole number)
      */
+    /**
+     * ⭐ Adds {@code delta} damage segments to a data slot for the rest of the battle (2026-10-02). A NEGATIVE delta takes them back, which is how a reader states a duration.
+     */
+    public void raiseSkillHits(int slot, int delta) {
+        if (slot <= 0 || delta == 0) {
+            return;
+        }
+        skillHitBonus.merge(slot, delta, Integer::sum);
+    }
+
+    /** The extra segments a data slot has been granted, or {@code 0}. */
+    public int skillHitBonus(int slot) {
+        return skillHitBonus.getOrDefault(slot, 0);
+    }
+
     public void raiseSkillLevel(SkillType slot, int delta) {
         if (slot == null || delta == 0) {
             return;

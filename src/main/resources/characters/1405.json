@@ -132,10 +132,15 @@
           "scale": "cast_skill_param:1",
           "percent": 10000,
           "target": "self"
+        },
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill_id": 2,
+          "amount": 3
         }
       ],
       "source": "1415 昔涟 忆灵技能 18 「献予「理性」之诗」（SkillID 1141518，`SkillCY06`，参数 `[3, 0.2, 0.3, 1]`）：「…**那刻夏在下一次施放普攻、战技时获得【真知】：所有「智识」命途角色攻击力提高 #3%、造成的战技伤害提高 #2%**，持续至下一个那刻夏回合开始时」（#2 = 0.20）。「…所有「智识」命途角色**攻击力提高 #3%**、造成的战技伤害提高 #2%…」（#3 = 0.30）。",
-      "note": "⭐ **两件能精确表达的**：状态本身（`until: next_attack`，已出货的取值）与它的**战技伤害**提高（`damage_type: SKILL`）。⚠ **而“所有「智识」命途角色攻击力提高 #3(30)%”没落**：条件词汇里**没有命途选择器**（实测：`actor`/`ally_count`/`enemy_count`/`self`/`target`/… 里没有一个是命途）—— 它会影响**队伍里的多人**，写成“被指名的那一个”就是近似。已登记。⭐ 而 `Path.ERUDITION`（`Map.entry(\"智识\", ERUDITION)`）**已在**，只差一个能读它的条件。  ⭐ **2026-10-02 实测**：第一版还想用 `MODIFY_ATTR{damage_type: SKILL}` 抬“战技伤害”，而**加载器拒绝**：*“Op MODIFY_ATTR states \\\"damage_type\\\" without \\\"instance\\\": true”*（它只能做**逐次**修正，像 `1406.json` 的 `trace_followup_crit_damage`）。⇒ 本条只落**状态本身**（它正是句子的一个从句）；而它的**两个数值**（智识命途攻击力 #3(30)%、战技伤害 #2(20)%）分别需要**命途选择器**与**“持续地抬某一类伤害”的词汇**，两者都不存在**——登记。  ⭐ **2026-10-02：攻击力那半已落**，用新能力 **`allies_of_path:智识`**（逐个名字的选择器族，同 `ally_cid:` 的形状）。⚠ 而“战技伤害 #2(20)%”**仍登记**：它需要“**持续地**抬高某一类伤害”的词汇（`damage_type` 只能配 `instance: true`，即逐次）。  ⭐ **2026-10-02：时长改成 `until: next_turn_start`**—— 原话是「持续至下一个那刻夏回合开始时」，而 `next_attack` 是“他下一次命中攻击”（两者不同）。"
+      "note": "⭐ **两件能精确表达的**：状态本身（`until: next_attack`，已出货的取值）与它的**战技伤害**提高（`damage_type: SKILL`）。⚠ **而“所有「智识」命途角色攻击力提高 #3(30)%”没落**：条件词汇里**没有命途选择器**（实测：`actor`/`ally_count`/`enemy_count`/`self`/`target`/… 里没有一个是命途）—— 它会影响**队伍里的多人**，写成“被指名的那一个”就是近似。已登记。⭐ 而 `Path.ERUDITION`（`Map.entry(\"智识\", ERUDITION)`）**已在**，只差一个能读它的条件。  ⭐ **2026-10-02 实测**：第一版还想用 `MODIFY_ATTR{damage_type: SKILL}` 抬“战技伤害”，而**加载器拒绝**：*“Op MODIFY_ATTR states \\\"damage_type\\\" without \\\"instance\\\": true”*（它只能做**逐次**修正，像 `1406.json` 的 `trace_followup_crit_damage`）。⇒ 本条只落**状态本身**（它正是句子的一个从句）；而它的**两个数值**（智识命途攻击力 #3(30)%、战技伤害 #2(20)%）分别需要**命途选择器**与**“持续地抬某一类伤害”的词汇**，两者都不存在**——登记。  ⭐ **2026-10-02：攻击力那半已落**，用新能力 **`allies_of_path:智识`**（逐个名字的选择器族，同 `ally_cid:` 的形状）。⚠ 而“战技伤害 #2(20)%”**仍登记**：它需要“**持续地**抬高某一类伤害”的词汇（`damage_type` 只能配 `instance: true`，即逐次）。  ⭐ **2026-10-02：时长改成 `until: next_turn_start`**—— 原话是「持续至下一个那刻夏回合开始时」，而 `next_attack` 是“他下一次命中攻击”（两者不同）。  ⭐ **2026-10-02**：本条还落了原句的「使其**战技的伤害次数增加 3 次**」（`RAISE_SKILL_HITS{skill_id: 2, amount: 3}`，⭐ 键是**数据槽位**）；「持续 1 回合」由下一条在他的 `TURN_END` 用负值收回。"
     },
     {
       "id": "true_knowledge_raises_his_skill_damage",
@@ -153,6 +158,22 @@
       ],
       "source": "1415 昔涟 忆灵技能 18 「献予「理性」之诗」（SkillID 1141518）：「…所有「智识」命途角色攻击力提高 #3%、**造成的战技伤害提高 #2%**」（#2 = 0.20）。",
       "note": "⭐ **本轮的发现：这件能力不需要新词汇**。当初登记的阻碍是“`damage_type` 只能逐次”，而正确的形状是：**用 `from_skill SKILL` 把它限定到战技实例**（已出货的条件）、用**状态**承载它的存续、而用 `BOOST_DAMAGE` 改那一次实例。⭐ 而 `requirePercent`（`BOOST_DAMAGE` 自己的校验就调它）**自第 83 轮起就接受 `percent_from_resource`**。"
+    },
+    {
+      "id": "memosprite_ode_of_reason_takes_the_extra_hits_back",
+      "on": "TURN_END",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill_id": 2,
+          "amount": -3
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 18 「献予「理性」之诗」：「…使其战技的伤害次数增加 3 次，**持续 1 回合**」—— 本条只负责到期收回。",
+      "note": "⭐ **2026-10-02**：「持续 1 回合」用**负量**表达（该 op 接受负值，因为它是**修饰量**而不是数量），而不引入新的时长机制；⭐ 时机正好：诗是在**他自己的回合**施放的，所以他的 `TURN_END` 就是“持续 1 回合”的尾巴。"
     }
   ],
   "resources": [

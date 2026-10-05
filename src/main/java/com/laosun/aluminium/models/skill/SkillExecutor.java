@@ -530,7 +530,9 @@ public final class SkillExecutor {
                         ? base
                         : user.getAttribute(baseAttribute).get() * bounceShare;
                 Integer additional = data.bounceAdditionalHits(bounceShare);
-                int hits = (additional == null ? 0 : additional) + 1;   // 「额外造成 N 次」: the total is N + 1
+                int hits = (additional == null ? 0 : additional) + 1;
+                // ⭐ plus whatever a rule has granted this slot (2026-10-02).
+                hits += user.skillHitBonus(skill.getSkillSlot());   // 「额外造成 N 次」: the total is N + 1
                 // H-3: for a bounce, `single` is the **total toughness reduction of the whole skill**,
                 // so it MUST be spread evenly over the hits; otherwise more hits means more reduction
                 double perHitStance = data.stanceFor(true) / Math.max(1, hits);

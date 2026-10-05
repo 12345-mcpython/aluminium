@@ -129,7 +129,7 @@ public final class TriggerInterpreter {
             // ⭐ 「为指定敌方单体添加 X 属性弱点」 (2026-09-30; readers 1315, 1310).
             "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
-            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
+            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK", "RAISE_SKILL_HITS",
             // ⭐ 「【新蕊】可以溢出至 #3%」 (2026-10-02; reader: 1141517 on 遐蝶): a declaration states a resource's overflow,
             // and `Resource` has had both tiers all along -- this widens the second one in battle.
             "RAISE_RESOURCE_CAP",
@@ -829,6 +829,15 @@ public final class TriggerInterpreter {
                 requireBuff(effect, op, spec);
                 requireDuration(effect, op, spec);
             }
+            case "RAISE_SKILL_HITS" -> {
+                // ⭐ The DATA SLOT, not a SkillType letter (2026-10-02): the executor knows the slot number.
+                if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " needs \"skill_id\": the data slot whose hit count changes (source: "
+                                    + spec.getSource() + ")");
+                }
+                requireAmount(effect, op, spec);
+            }
             case "RAISE_SKILL_LEVEL" -> {
                 // 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5 and the same sentence in most kits): the level a skill is
                 // READ at is character data plus this battle's raises (M-32), and one op is what raises it -- never a
@@ -1354,6 +1363,7 @@ public final class TriggerInterpreter {
             case "RESIST_DEBUFF" -> resistDebuff(battle, effect, ctx);
             case "MODIFY_RULE" -> modifyRule(effect, ctx);
             case "RAISE_SKILL_LEVEL" -> raiseSkillLevel(effect, ctx);
+        case "RAISE_SKILL_HITS" -> raiseSkillHits(effect, ctx);
             case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
             case "ADD_STACK" -> addStack(battle, effect, ctx);
             case "CONSUME_HP" -> {
@@ -4066,6 +4076,25 @@ public final class TriggerInterpreter {
                     "Op " + op + " places one countdown and states nothing else: \"speed\" (its fixed speed) and "
                             + "optionally \"buff\" (the name it shows in logs) "
                             + "(source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * ⭐ {@code RAISE_SKILL_HITS}: adds damage segments to a data slot of the target (2026-10-02; reader: 1405's ode of reason).
+     *
+     * <p>A negative amount takes them back, which is how 「持续 1 回合」 is stated without a new lifetime.
+     */
+    private static void raiseSkillHits(EffectSpec effect, TriggerContext ctx) {
+        CanHit owner = ctx.owner();
+        if (owner == null) {
+            throw new IllegalStateException(
+                    "RAISE_SKILL_HITS ran without a rule owner, so there is no combatant whose hits to raise; this is "
+                            + "an engine fault");
+        }
+        int slot = effect.getSkillId();
+        int amount = effect.getAmount() == null ? 0 : (int) Math.round(effect.getAmount());
+        for (CanHit target : resolveTargets(ctx.battle(), effect, ctx)) {
+            target.raiseSkillHits(slot, amount);
         }
     }
 

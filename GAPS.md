@@ -858,3 +858,20 @@
   ⭐ ② 内容：⭐ `1405.json` ✗ 槽位 18 的规则加 `RAISE_SKILL_HITS{skill_id: 2, amount: 3}` ✗（⭐ 战技的数据槽位 ✓）＋ ⭐ 一条 `TURN_END` ✗ 收回；
   ⭐ ③ 判据：⭐ **必须避开"有诗／无诗"的混杂**（⭐ 诗本身会给【真知】 ✗）；
   ⭐ 最干净的是 ⭐ 比较**同一个技能在加成前后**的命中数（⭐ 用同种子、⭐ 只切换加成 ✓）。
+
+- ✅ **已出货（新目标第 10 件）：槽位 18 的最后一句**「⭐ 使其**战技的伤害次数增加 `#1`(3) 次**，持续1回合 ✗」⇒ ⭐ **槽位 18 至此完整** ✓。
+  ⭐ **引擎三处**：⭐ `CanHit.skillHitBonus` ✗（⭐ **按数据槽位**的 `Map<Integer,Integer>` ✗ ＋ ⭐ 两个存取器 ✓）；
+  ⭐ op **`RAISE_SKILL_HITS{skill_id, amount}`** ✗（⭐ 照 `RAISE_SKILL_LEVEL` ✗ 的形状：⭐ `ctx.owner()` ✗ ＋ ⭐ 解析目标 ✓；⭐ **`amount` ✗ 可为负** ✓）；
+  ⭐ `SkillExecutor` ✗ 的 `BOUNCE` ✗ 分支加**一行**（`hits += user.skillHitBonus(skill.getSkillSlot())` ✗ ✓）。
+  ⭐ **内容**：⭐ `1405.json` ✗ 槽位 18 的规则加 `RAISE_SKILL_HITS{skill_id: 2, amount: 3}` ✗；
+  ⭐ 一条 `TURN_END` ✗（`actor == self` ✗）规则用 **`-3`** ✗ 收回 ⇒ ⭐ 「持续1回合」**不需要新的时长机制** ✓。
+  ⭐ **判据** `ReasonOdeExtraHitsTest`：`his skill deals 1721.6988481718581 with the three extra segments, 1052.1492961050244 without them` ✓；
+  ⭐ **变异（`skill_id: 2` → `1`）⇒ RED**（⭐ 两侧读数**相等** ✓）。
+- ⭐⭐ **两条新的工程事实（本轮量到）**：
+  1. ⭐ **新 op 除了"被处理"之外，还必须登记进 `TriggerInterpreter` ✗ 的已知 op 清单** ✗ ——
+     ⭐ 否则加载器报 *"Unknown trigger op 'RAISE_SKILL_HITS'"* ✗（⭐ 实测 ✓）。
+  2. ⭐⭐ **判据的控制侧必须"读回真实值"** ✗：⭐ 我第一版硬编码 `-3` ✗，⭐ 结果当加成被**误导到别的槽位**时，
+      ⭐ 控制侧把**真正该看的槽位减成负数** ✗ ⇒ ⭐ 两侧仍然"有多有少" ✗ ⇒ ⭐ **变异没咬** ✗ ✓。
+     ⭐ 改成 ⭐ `-aimed.skillHitBonus(slot)` ✗ ✓ ⇒ ⭐ 变异立刻打红 ✓。
+- ⭐ **槽位 18 现状**：⭐ 原话四句 —— ⭐ 「恢复战技点并立即行动」✓、「战技伤害次数 +3，持续1回合」✓、
+  ⭐ 「获得【真知】：智识命途攻击力提高、战技伤害提高、**持续至下一个那刻夏回合开始时**」✓ ⇒ ⭐ **本槽已完整** ✓。
