@@ -294,3 +294,20 @@
   ⇒ 下一步是在**消耗的派发块**（`case "SPEND_RESOURCE" -> { … }`，它自己就用 `resourceAmount` 量了 `before`）里看它把值发到了哪里。
 - ⭐ **本轮保留的两处引擎改进**（无害且方向正确，新判据绿灯）：
   ① 量入账差改用 `resourceAmount`（能读两个商店）；② 守卫同时匹配原始 op。
+
+- ⛔ **第 111 轮：回滚（第 17 次）**（我自己引入了一个回归：第 107 轮出货的 `SpentAmountIsPositiveTest` 变红）。
+  但**仪表化把整条链的真相全查清了**：
+- ⭐⭐⭐ **“重复触发”不是 bug，是两次到达**（`Battle.java`)：
+  `private final List<CanHit> justSummoned = new ArrayList<>();`（L196）而 `fireSummoned()`（L1359）**逐个元素触发一次**；
+  `summonMemosprite`、`summonServant`、`summon` 各自 `add` 一次（L3244/3289/3308）。而遐蝶**同时拥有忆灵与仆从**
+  ⇒ 她的 `SUMMONED` 规则**每次到达触发一次**。**这正是待办 5**（句子说的是“召唤**死龙**时”，不是“任何到达”）。
+- ⭐⭐ **`resourceAmount` 把两个商店相加**（L3505：`角色商店 + 队伍商店`）：它对“总量”是对的，
+  对“**差量**”则错 —— 一个 SELF 资源会被算两遍（实测：捕获 4 读成 **8**）。差量要**二者取一**。
+- ⭐⭐ **链条本身是好的**：删掉重复的消耗规则后，`[SPEND{overflow_only}, GAIN{amountFromPrevious}]`
+  在 **PARTY** 资源上读到 `captured 1360` = **2 × 680**（一次到达一份）；而 `【新蕊】 34680 -> 34000`。
+- ⭐ **回归教训**：把 `resourceAmount` 用到差量上会让 **第 107 轮的判据读到 `14`（7+7）** ⇒ “总量”与“差量”需要**不同的读法**。
+- ⭐⭐⭐ **下一步的确切顺序**：
+  1. **删掉 `life_ode_summon_spends_the_overflow`**（第 104 轮出货）—— 它会**抢先花掉**溢出，
+     而 `previousCredited` 是**每条规则独立**的，于是链条自己那一步读到 0；
+  2. 把差量改成**二者取一**（新增一个专用读法，**不碰 `resourceAmount`**）；
+  3. 再把三个效果写成一条规则（消耗 → 捕获 → 定大小）。
