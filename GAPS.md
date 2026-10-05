@@ -36731,3 +36731,24 @@
 > * ⚠⚠ **我自己的两个坑（记 ✓）**：⭐ ① ⭐ `fireTriggers` 的**重载写错** ✗（⭐ 该用单参那个 ✓，⭐ 照 `Cone23011Test` ✓）；
 >   ⭐ ② ⭐ 判据里给单参事件加了 ⭐ `actor == self` ✗ ⇒ ⭐ 那个条件**永远为假** ✗（⭐ 单参事件不带动作方 ✓）⇒ ⭐ 去掉 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2279** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 12 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但把前置**钉死了**，⭐ 并证明"额外回合"这条路**走不通** ✓）**）**：
+>
+> * ⭐⭐⭐ **先纠正我上一轮的措辞** ✗：⭐ 我写"⭐ 德谬歌不在行动顺序里"✓，⭐ 说对了一半 ✓ —— ⭐ 现在知道**为什么**了，⭐ 而且**是游戏自己的规定** ✓：
+>   ⭐ `Servant_CyreneServant_00_Ability.json` 里 ⭐ **`SpeedOverride`** ⭐ 只出现一次 ✓ ⇒ ⭐ 一个 modifier 用 ⭐
+>   ⭐ `StackProperty{Property: "SpeedOverride", FixedValue: 0}` ✓ ＋ ⭐ `HPSync` ✓ ＋ ⭐ `SetEntityActionState{UniqueName: "Cyrene_Summon"}` ✓
+>   ⇒ ⭐⭐ **游戏把忆灵的速度设成 0** ✗ ⇒ ⭐ 所以我们面板里那行 ⭐ `{"attribute": "SPEED", "flat": 0, "by_ability": true}` ⭐ **完全忠实** ✓✓
+>   （⭐ 那次 `by_ability: true` 现在有了原文对照 ✓）。
+> * ⭐⭐⭐ **由此得出的结论（本轮最重要的 ✓）**：⭐「**德谬歌立即获得 1 个额外回合**」**不可能**是 ⭐ 行动顺序里的一个回合 ✗
+>   —— ⭐ 速度 0 意味着**没有行动值** ✓（⭐ 引擎注释也这么说：⭐ *"targetable, castable at, commandable -- and simply never takes a turn"* ✓）。
+>   ⇒ ⭐⭐ 它只能是游戏的 ⭐ **插入行动** ✓：⭐ `TurnInsertAction` ✓ —— ⭐ 一个**不依赖队列**的"立刻行动" ✓。
+> * ⭐ **前置（已具名，⭐ 现在有游戏原文支撑 ✓）**：⭐ 一个"**让队列之外的单位立刻行动**"的能力 ✗（⭐ 插入行动 ✓）。
+>   ⭐ 现有两个都够不着 ✗：⭐ `EXTRA_TURN` ✓ 要求**在 heap 里** ✗（⭐ 本轮已让它响亮 ✓）；⭐ `ADVANCE` ✓ 也是按队列做的 ✗。
+>   ⭐ 形状在数据里已读到 ✓：⭐ `TurnInsertAction{TargetType: ModifierOwnerEntity, AutoCast: true}` ✓ ＋ ⭐ 生命周期事件
+>   ⭐ `OnInsertActionStart`／⭐ `OnInsertActionFinish`／⭐ `OnListenAllowAction`／⭐ `OnListenInsertAbilityFinish` ✓。
+> * ⭐ **顺带确认**：⭐ 那个"速度 0 就跳过"的引擎决定 ✓ **与数据一致** ✓（⭐ 不是权宜之计 ✓）。
+> * ⚠⚠ **我自己的两个坑（记 ✓）**：⭐ ① ⭐ 忘了 ⭐ `memosprites/` 是**按主人 cid** 命名 ✗ ⇒ ⭐ 去找 `11415.json` ⭐ 找不到 ✓（⭐ 它是 `1415.json` ✓）
+>   —— ⭐ 而 ⭐ **这条我早就知道并且写进过记录** ✗ ⇒ ⭐ 又一次没有先复用已知 ✓；
+>   ⭐ ② ⭐ 上一轮那句报错信息 ⭐ 是我自己写的 ✗（"a memosprite at Speed 0 is skipped…" ✓）⇒ ⭐ 我当时当成"事实"引用了 ✓
+>   —— ⭐ 现在它**被数据证实**了 ✓，⭐ 但**当时它只是我的推断** ✓ ⇒ ⭐ **教训：⭐ 自己写的错误信息不等于证据** ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2279** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
