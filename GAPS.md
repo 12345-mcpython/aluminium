@@ -198,3 +198,31 @@
   3. ⭐ `Resource` 用**逐字段 `@Getter`** ⇒ `getMax()` 与 `getMaxOverflow()` 都有，而 `ResourceManager` **没有** `max(String)` ⇒ 要 `get(id).getMax()`。
 - ⭐ **仍登记**：① “召唤**死龙**时”的**触发**（我们的 `1407.json` 里并无死龙，规则暂挂在通用 `SUMMONED`）；
   ② “消耗量 → 死龙天赋【灼掠幹墟的晦翼】伤害倍率”。
+
+- ⭐⭐⭐ **第 105 轮：`1141517` 最后半步的**路径完全钉死了**（全部实测）**：
+  - ✅ **“死龙”已经建模**！`memosprites/1407.json` 写着 `name: 死龙•玻吕刻斯`、`servant_id: 11407`，
+    并列了 8 个技能槽位（1,2,3,5,6,10,11,12）—— 那一块**已经在**。
+  - ✅ **那条天赋**：TextMap 哈希 `11802310553938915223` = **灼掠幽墟的晦翼**，它就是死龙的
+    **`Skill23`（`SkillID 1140712`）**，参数 `[0.2, 6, 0.03, 400]`（随等级）；而 `memosprites/1407.json` 的 `slot 12` ⇒ **等级 10**。
+  - ✅ **“刚花掉的量”的机制也在**：`TriggerInterpreter` 的 `previousCredited` 就是**资源值的差**
+    （L1005–1010：`creditedBefore/After` 读 `holder.getResources()`）⇒ **一次消耗的差是负值**，而 `amount_from_previous` 已经会读它。
+- ⭐ **剩下三件（按依赖顺序）**：
+  1. **死龙那条天赋的伤害规则**（内容可写）：从 `1140712` 的参数与它的 `SkillDesc` 来；
+     ⭐ 而它必须是一条**可被 `MODIFY_RULE` 寻得到的规则**（否则“倍率提高”无处可加）；
+  2. **消耗量 → 一个资源**（工程）：`GAIN_RESOURCE` + **带绝对值**的 `amount_from_previous`（现在对负值会取到负数）；
+  3. **`MODIFY_RULE` 的 `effect_percent_from_resource`**（工程）：与已出货的 `percent_from_resource` 同形，
+     让“每消耗 1% 溢出值”真正成为一个可算的倍率。
+  - ⭐ 而第三句的另一半（“若敌方 ≤ `#6`(2) 名，倍率额外提高 `#5`(0.0024)”）只需一个 `enemy_count <= 2` 条件，
+    而那个条件**已出货**（我们的 `talent_memosprite_damage_enemy_count_*` 就用它）。
+
+
+## 附：待办表（2026-10-02 第 105 轮整理）
+
+| 优先 | 待办 | 块 | 依赖 |
+|---|---|---|---|
+| 1 | 死龙天赋【灼掠幽墟的晦翼】的伤害规则（可被 `MODIFY_RULE` 寻得） | 内容 | `1140712` 参数 + `SkillDesc` |
+| 2 | `amount_from_previous` 对负值取绝对值（消耗侧） | 引擎 | 已测：L1005–1010 |
+| 3 | `MODIFY_RULE{effect_percent_from_resource}` | 引擎 | 同形已出货 `percent_from_resource` |
+| 4 | `17` 第二句的倍率加成（上三件齐了就能落） | 内容 | 1–3 |
+| 5 | `17`「召唤**死龙**时」的**触发**精度（现暂挂通用 `SUMMONED`） | 内容 | 需“哪个召唤物”的判断 |
+| 6 | 收敛：`GAPS.md` 里其余“登记”项逐条过一遍，该销的销 | 文档 | — |
