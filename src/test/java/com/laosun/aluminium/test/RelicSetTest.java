@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Relic set bonuses (P10-3): {@code relic_sets.json} is loaded, the game's property vocabulary maps onto
+ * Relic set bonuses: {@code relic_sets.json} is loaded, the game's property vocabulary maps onto
  * {@link AttributeType}, and wearing two or four pieces of a set actually changes the computed panel.
  *
  * <p>Before this, the engine loaded the relic <em>affix</em> tables and nothing else: {@code RelicSuit}

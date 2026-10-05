@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Gallagher (加拉赫) (1301), from his own file (2026-09-28): [酩酊] twice over, the 行迹 天然酵母 (Natural Yeast) trace's advance, Eidolon 1, and the talent's heal.
+ * Gallagher (加拉赫) (1301), from his own file: [酩酊] (Besotted) twice over, the "天然酵母" (Organic Yeast) trace's advance, Eidolon 1, and the talent's heal.
  *
  * <p><b>What it needed.</b> Nothing new - and one wrong assumption corrected: `attacker` is a legal target selector
  * (`TriggerInterpreter.TARGET_SELECTORS`), so "回复攻击者 640 点生命值" (restores 640 HP to the attacker) is expressible. The file's earlier claim that no
@@ -28,7 +28,7 @@ public class GallagherTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** The 秘技 (technique)'s in-battle half puts [酩酊] on the whole enemy side at battle start. */
+    /** The "秘技" (technique)'s in-battle half puts [酩酊] on the whole enemy side at battle start. */
     @Test
     public void theStateComesFromBattleStartToo() {
         Fixture f = new Fixture();

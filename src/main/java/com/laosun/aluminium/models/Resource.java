@@ -7,7 +7,7 @@ import lombok.Getter;
  * A team-level numeric resource: it has a current value, a maximum capacity, and an optional
  * maximum overflow allowance.
  *
- * <p><b>Why this class has to exist</b>: skill points (SP) (P8-4) and P8-8's stack resources
+ * <p><b>Why this class has to exist</b>: skill points (SP) and P8-8's stack resources
  * (Acheron's [残梦], Feixiao's [飞黄], Phainon's [火种], Cyrene's [追忆], Castorice's [新蕊] ...)
  * are essentially the same thing - a counter that some event adds to or subtracts from, that has a
  * capacity cap, and that fires a signal when full. Without extracting it, every character would need
@@ -45,7 +45,7 @@ public class Resource {
     private final String id;
 
     /**
-     * Who this resource belongs to (P8-8). See {@link ResourceScope}.
+     * Who this resource belongs to. See {@link ResourceScope}.
      */
     @Getter
     private final ResourceScope scope;

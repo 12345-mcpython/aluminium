@@ -30,16 +30,16 @@ import java.util.Set;
  * "when casting the <b>Skill</b> and breaking an enemy target's weakness" - an event that says <b>who</b>, and now also <b>which skill</b>.
  *
  * <p><b>Why the DSL needed it.</b> {@code BREAK} and {@code KILL} already carried the actor, so "when an enemy target's weakness is broken"
- * (Himeko (姬子)'s talent: anybody's break) was expressible. "when casting the Skill... and breaking a weakness" (her 星魂 (Eidolon) 4) was not: gating on
+ * (Himeko (姬子)'s talent: anybody's break) was expressible. "when casting the Skill... and breaking a weakness" (her Eidolon (星魂) 4) was not: gating on
  * {@code actor == self} would also pay for a break left by her basic attack or by her talent's follow-up attack, and the
  * text excludes both - a wrong +1 charge (充能) with nothing to report. So the causing instance now rides into the event
- * ({@code Battle.reduceToughness(…, Damage)} to {@code TriggerContext.damage()}) and {@code from_skill SKILL} compares its
+ * ({@code Battle.reduceToughness(..., Damage)} to {@code TriggerContext.damage()}) and {@code from_skill SKILL} compares its
  * cast category against {@code SkillCategory.of(SkillType.SKILL)}.
  *
  * <p><b>How the cases are built.</b> The mechanism cases use a hand-made table holding exactly two break rules - the
  * talent's (anybody's break) and the Eidolon's (my Skill's break) - so the numbers are the rules and not the rest of her
  * kit. The shipped-content cases drive her real file, where a skill break now reaches the 3-charge cap and her talent's
- * follow-up attack spends it (which is itself the observable: at 星魂 (Eidolon) 4 the follow-up happens, at 星魂 (Eidolon) 3 it does not).
+ * follow-up attack spends it (which is itself the observable: at Eidolon (星魂) 4 the follow-up happens, at Eidolon (星魂) 3 it does not).
  */
 public class SkillAttributionTest {
     private static final int HIMEKO = 1003;
@@ -64,7 +64,7 @@ public class SkillAttributionTest {
     }
 
     /**
-     * Note: The case the condition exists for: her <b>basic attack</b> breaks, and 星魂 (Eidolon) 4 must not pay.
+     * Note: The case the condition exists for: her <b>basic attack</b> breaks, and Eidolon (星魂) 4 must not pay.
      *
      * <p>The bar is chipped first through the raw API (which emits no break event), so the 30-point basic attack is what
      * empties it.
@@ -81,7 +81,7 @@ public class SkillAttributionTest {
     }
 
     /**
-     * Note: A different slot is a different slot: her <b>ultimate</b> breaks, and 星魂 (Eidolon) 4 (which names the Skill (战技)) must not pay.
+     * Note: A different slot is a different slot: her <b>ultimate</b> breaks, and Eidolon (星魂) 4 (which names the Skill (战技)) must not pay.
      *
      * <p>Note: The talent (天赋) branch cannot be exercised at all, and that is a fact about the engine worth stating rather than
      * hiding: a follow-up attack is settled as <b>additional damage</b> ({@code Battle.applyAdditionalDamage}), which
@@ -160,14 +160,14 @@ public class SkillAttributionTest {
     }
 
     // ==================================================================
-    // The shipped content: 1003 Himeko (姬子) 星魂 (Eidolon) 4
+    // The shipped content: 1003 Himeko (姬子) Eidolon (星魂) 4
     // ==================================================================
 
     /**
-     * End to end, through her real file: at 星魂 (Eidolon) 4 a Skill (战技) break fills the charge (充能) to the cap and her talent's follow-up fires.
+     * End to end, through her real file: at Eidolon (星魂) 4 a Skill (战技) break fills the charge (充能) to the cap and her talent's follow-up fires.
      *
      * <p>Note: Why the measurement is "did the follow-up happen" rather than a charge count: her own kit spends the charges
-     * as soon as they reach 3, so the follow-up <b>is</b> the observable consequence of the extra charge. At 星魂 (Eidolon) 3 the
+     * as soon as they reach 3, so the follow-up <b>is</b> the observable consequence of the extra charge. At Eidolon (星魂) 3 the
      * same break leaves 2 charges and nothing else happens - the contrast is the Eidolon.
      */
     @Test
@@ -181,7 +181,7 @@ public class SkillAttributionTest {
                 "the extra charge is what made her talent's follow-up attack happen");
     }
 
-    /** …and the shipped rule really states BOTH conditions, rather than only the actor. */
+    /** ...and the shipped rule really states BOTH conditions, rather than only the actor. */
     @Test
     public void theShippedRuleStatesTheSkillCondition() {
         Character owner = CharacterFactory.create(HIMEKO, LEVEL, true, null, null, 4);
@@ -226,7 +226,7 @@ public class SkillAttributionTest {
             List<TriggerSpec> rules = new ArrayList<>();
             rules.add(TriggerSpecs.rule("BREAK", null, chargeOne()));
             rules.add(TriggerSpecs.rule("BREAK", List.of("actor == self", "from_skill SKILL"), chargeOne()));
-            // Note: No manual registration: her own file declares 充能 (charge) and `CharacterFactory` registers it while the
+            // Note: No manual registration: her own file declares charge (充能) and `CharacterFactory` registers it while the
             // character is built, and the manager keeps it even though the table is replaced below.
             hero.setTriggerTable(new TriggerTable(HIMEKO, rules));
             this.enemy = breakableEnemy();
@@ -248,7 +248,7 @@ public class SkillAttributionTest {
         }
     }
 
-    /** What one skill break did to her 充能 (charge) and to the enemy, through her real file. */
+    /** What one skill break did to her charge (充能) and to the enemy, through her real file. */
     private record Outcome(int charge, double enemyHp) {
     }
 
@@ -281,7 +281,7 @@ public class SkillAttributionTest {
         return effect;
     }
 
-    /** One 充能 (charge), so the cases are about counting rather than about amounts. */
+    /** One charge (充能), so the cases are about counting rather than about amounts. */
     private static EffectSpec chargeOne() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "GAIN_RESOURCE");

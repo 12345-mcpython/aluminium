@@ -8,7 +8,7 @@ import com.laosun.aluminium.data.SkillData;
 import java.util.Set;
 
 /**
- * Energy gain rules (P3).
+ * Energy gain rules.
  *
  * <p>Regular characters use {@link StandardEnergyProvider} (basic attack 20 / skill 30 / ultimate 5 / taking a hit
  * 10 / kill 5 / break 5); special characters implement this interface on their own later, and the mechanics side
@@ -37,7 +37,7 @@ public interface EnergyProvider {
      *
      * <p>Keeping the decision here rather than in {@code Battle} means the engine still does not know
      * which character it is looking at: the stack characters get a provider that reads their resource,
-     * and the assembly point is the only place that knows the difference (P8-0).
+     * and the assembly point is the only place that knows the difference.
      *
      * <p>The default is the conventional rule. Note it is <b>not</b> {@code isEnergyFull()} on
      * {@code CanHit}: the threshold can be lower than the cap ({@link

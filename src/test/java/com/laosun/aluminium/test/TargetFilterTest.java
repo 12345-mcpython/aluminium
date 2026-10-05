@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * <b>Per-target conditions</b> (2026-09-28, {@code M-53}): an effect's {@code target_when}.
+ * <b>Per-target conditions</b>: an effect's {@code target_when}.
  *
  * <p><b>The sentences that needed it.</b> "deals additional damage to all enemies <b>in the shocked state</b>" (1103's talent), "makes enemies <b>not in the shocked state</b>
- * fall into shock" (her 星魂 (Eidolon) 4) and "attaches continuous healing to our targets <b>whose HP percentage is <= 30%</b>" (1105's 星魂 (Eidolon) 2). A rule's own conditions
- * filter the <b>rule</b>, so "all shocked enemies" could previously only be spelled as "the enemy I hit was shocked" - 
+ * fall into shock" (her Eidolon (星魂) 4) and "attaches continuous healing to our targets <b>whose HP percentage is <= 30%</b>" (1105's Eidolon (星魂) 2). A rule's own conditions
+ * filter the <b>rule</b>, so "all shocked enemies" can only be spelled as "the enemy I hit was shocked" - 
  * which then also hit the unshocked ones. The selector says which units; this filter says which of them qualify.
  *
  * <p><b>What is pinned here.</b> That the filter is applied <b>per candidate</b> (the subject really is the candidate,
@@ -102,7 +102,7 @@ public class TargetFilterTest {
             battle.startBattle();
         }
 
-        /** Puts 触电 on the second enemy through the engine's own DOT path. */
+        /** Puts shock (触电) on the second enemy through the engine's own DOT path. */
         private void markSecond() {
             EffectSpec dot = new EffectSpec();
             TriggerSpecs.set(dot, "op", "APPLY_DOT");

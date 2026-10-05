@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A PARTY-scoped resource (2026-09-30): the shared 笑点 counter, reader 1505 绯英's skill "... and additionally gain 10 笑点".
+ * A PARTY-scoped resource: the shared 笑点 counter, reader 1505 Evanescia (绯英)'s skill "... and additionally gain 10 笑点".
  *
  * <p>`ResourceManager` refuses an unwired scope with the reason this capability answers: "a party-level resource needs a per-battle
  * owner". The battle is that owner now, and the judge reads the counter from the BATTLE (not from the caster), which is what makes

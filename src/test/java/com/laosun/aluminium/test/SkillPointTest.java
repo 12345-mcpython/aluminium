@@ -18,7 +18,7 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 /**
- * Skill points (战技点, SP) (P8-4): start 3, cap 5, our basic attack +1, skill -1, ultimate and follow-up attacks
+ * Skill points (战技点, SP): start 3, cap 5, our basic attack +1, skill -1, ultimate and follow-up attacks
  * neutral.
  *
  * <p><b>Data fact</b>: {@code skills.json} has no skill point field - among the 638 skills, the

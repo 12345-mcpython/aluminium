@@ -23,14 +23,14 @@ import java.util.Random;
  * Himeko (姬子) (1003) - the first character whose kit is built on a <b>declared resource</b>.
  *
  * <p><b>Why her.</b> Her document is the corpus's most common shape that had no spelling: "gains charge, cap 3 points",
- * "if the charge reaches its cap then...", "consumes all charge". The ops to write such a resource existed since P8-8, but nothing could
+ * "if the charge reaches its cap then...", "consumes all charge". The ops to write such a resource existed, but nothing could
  * <em>read</em> one back, and nothing could declare one at all - 41 of the 9character documents gate something on
  * a count, which is the largest single hole the corpus scan found (ROADMAP §13.). Her three rules are the reader
  * that pays for both capabilities: {@code self_resource:<NAME>} in the condition DSL, and the {@code resources}
  * block that says what the cap is.
  *
  * <p>Note: What is <b>not</b> authored, and the capability each clause would need, is listed in
- * {@code characters/1003.json}'s note - 星魂 (Eidolon) 4's "when casting the Skill... on a break" and the ultimate's per-kill energy both need to
+ * {@code characters/1003.json}'s note - Eidolon (星魂) 4's "when casting the Skill... on a break" and the ultimate's per-kill energy both need to
  * know <em>which ability</em> caused the event, which no event carries.
  */
 public class HimekoChargeTest {
@@ -42,8 +42,8 @@ public class HimekoChargeTest {
      * An ordinary character with no rules of their own: the ally who attacks, so nothing but her own table can
      * react ({@link TestCharacters}).
      */
-    // 2026-09-30: this test's ally must be SINGLE-TARGET, named here instead of taken from the shared
-    // "unregistered character" control. Measured: the control used to be 1505, and when it moved to 1502/1506 the
+    // Note: this test's ally must be SINGLE-TARGET, named here instead of taken from the shared
+    // "unregistered character" control. Measured: with 1505 as the control, and again with 1502/1506, the
     // bystander enemy in `onePointShortOfTheCapNothingHappens` lost 26.6 HP -- because that test has the ally cast
     // `DefaultSkill(ALLY, 1, 1)` at the FIRST enemy while asserting on the SECOND, and slot 1 is a blast for some
     // characters and a single hit for others. 1002 (Dan Heng, The Hunt) attacks one enemy, so the witness stays out of
@@ -103,7 +103,7 @@ public class HimekoChargeTest {
     }
 
     /**
-     * "当我方目标施放攻击后，若姬子的充能达到上限则立即发动1次追加攻击，对敌方全体目标造成…伤害，并消耗全部充能。"
+     * "当我方目标施放攻击后，若姬子的充能达到上限则立即发动1次追加攻击，对敌方全体目标造成 ...伤害，并消耗全部充能。"
      *
      * <p>A real ally attack drives it, and the claim is about <b>both</b> enemies: "敌方全体" is the thing the
      * selector had to learn, and the second enemy is the witness - the ally aims at the first one only, so
@@ -221,15 +221,15 @@ public class HimekoChargeTest {
      * <p>Four clauses exist and each is pinned above; the counts here are what says nothing else was written. The one
      * missing clause would be a wrong number if it were spelled with the vocabulary that exists: the ultimate's
      * "recovers an extra 5 energy for each enemy target killed" needs to know the kill came from <b>that</b> ultimate - and while the
-     * attribution now exists ({@code from_skill}, added for 星魂 (Eidolon) 4 on 2026-09-28), what is still unresolved is a
+     * attribution now exists ({@code from_skill}, which is what Eidolon (星魂) 4 needs), what is still unresolved is a
      * <b>data</b> question: the engine's own rule already credits 5 energy to the killer, and the sentence says
      * "an extra 5 recovered" - whether those are the same 5 has to be settled against the game's numbers, because guessing
-     * it is a silent +/-5 energy (registered as {@code M-45}).
+     * it is a silent +/-5 energy that nothing checks.
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
         TriggerTable table = TriggerTables.of(HIMEKO);
-        // Note: 2 since M-32: "战斗开始时获得1点充能" and the rule that states which level her talent's numbers were
+        // Note: 2 rules: "战斗开始时获得1点充能" and the rule that states which level her talent's numbers were
         // quoted at ("quoted at Lv10" as a TALENT +9 raise) - before that the level lived in a `damage_level` field
         // on the follow-up's damage effect.
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),

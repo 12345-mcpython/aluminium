@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Owns a unit's buffs: attach / remove / tick, and dispatch the event callbacks to them.
  *
- * <p><b>Every traversal of {@link #buffs} goes over {@link List#copyOf} - keep it that way (M-12).</b>
+ * <p><b>Every traversal of {@link #buffs} goes over {@link List#copyOf} - keep it that way.</b>
  * The dispatch methods call <i>into</i> buff code, and attaching a buff from a reaction is ordinary
  * content, not an error: additional damage applies vulnerability, a counter attaches a marker, a
  * damage reaction boosts its owner (that last one is a literal test case). Iterating the live list made
@@ -30,7 +30,7 @@ import java.util.Map;
  * {@code findBuff} / {@code allBuffsOf}) copy for the same reason: one rule with no exceptions is what
  * stops a later edit from re-opening the hole in just one of them.
  *
- * <p>{@code buffs} is never handed out (P1-), so this class is also the only place that can get it wrong.
+ * <p>{@code buffs} is never handed out, so this class is also the only place that can get it wrong.
  */
 public class BuffManager {
     private CanHit instance;
@@ -42,8 +42,8 @@ public class BuffManager {
     }
 
     /**
-     * The battle this unit is in, so a state that leaves the unit can be announced (2026-10-02; the
-     * {@code STATE_ENDED} event's reader: 1211's "[生息]结束时…").
+     * The battle this unit is in, so a state that leaves the unit can be announced (the
+     * {@code STATE_ENDED} event, from 1211's "[生息]结束时…").
      *
      * <p>Set by {@link com.laosun.aluminium.Battle} when it takes the roster. It may stay {@code null} in a
      * unit built outside a battle, which is why every use of it guards for that: a state still leaves the
@@ -63,10 +63,10 @@ public class BuffManager {
             addStackable(buff);
             return;
         }
-        // An effect may ask NOT to evict (2026-10-02; reader: 1408's trace, whose +50% must live beside her transformation's
+        // An effect may ask NOT to evict (1408's trace, whose +50% must live beside her transformation's
         // +80%). Measured, eviction is load-bearing for three cones and two other kits, so this is opt-in and the default is
         // untouched.
-        // An effect may ask NOT to evict (2026-10-02; reader: 1408's trace, whose +50% must live beside her transformation's
+        // An effect may ask NOT to evict (1408's trace, whose +50% must live beside her transformation's
         // +80%). The ask protects the buff that CARRIES it, in both directions: the newcomer skips its own sweep, and an
         // already-attached buff that asked is not swept by a later plain one. Measured, eviction is load-bearing for three
         // cones and two other kits, so this is opt-in and the default is untouched.
@@ -199,7 +199,7 @@ public class BuffManager {
      * @return how many were actually removed
      */
     /**
-     * Removes the newest debuffs OF ONE CLASS (2026-10-02). Reader: 1415's memosprite skill 8, "when cast on Mydei, dispel all control-class
+     * Removes the newest debuffs OF ONE CLASS, as in 1415's memosprite skill 8, "when cast on Mydei, dispel all control-class
      * negative states Mydei is in" -- `removeDebuffs(int)` cannot say "control-class", and a class is a property of the state itself
      * (`AbstractBuff.debuffClass()`, which is also what class resistance reads).
      *
@@ -227,7 +227,7 @@ public class BuffManager {
         if (count <= 0) {
             return 0;
         }
-        // Snapshot + newest-first, for the reasons in the class javadoc (M-12) and above.
+        // Snapshot + newest-first, for the reasons in the class javadoc and above.
         List<AbstractBuff> snapshot = List.copyOf(buffs);
         int removed = 0;
         for (int i = snapshot.size() - 1; i >= 0 && removed < count; i--) {
@@ -291,16 +291,16 @@ public class BuffManager {
      * and reports how many.
      *
      * <p><b>Why the two filters.</b> Every sentence in this family identifies the buff by its <b>origin</b> - 
-     * "<b>the shield provided by the Skill</b>'s duration is increased by 1 turn" (三月七 加护) - and then by <b>what it is</b>: "the
-     * <b>damage-increase effect</b> the Skill inflicted on the designated ally's duration is increased by 1 turn" (布洛妮娅 星魂 6), "the windshear state <b>the talent makes enemy targets enter</b> has its duration extended by 1 turn"
-     * (桑博), "for our targets that <b>already have</b> [<b>生息</b>]... extended by 1 turn" (白露). The origin is exact ({@code AbstractBuff.source});
+     * "<b>the shield provided by the Skill</b>'s duration is increased by 1 turn" (March 7th's Reinforce (加护)) - and then by <b>what it is</b>: "the
+     * <b>damage-increase effect</b> the Skill inflicted on the designated ally's duration is increased by 1 turn" (Bronya's Eidolon (星魂) 6), "the windshear state <b>the talent makes enemy targets enter</b> has its duration extended by 1 turn"
+     * (Sampo (桑博)), "for our targets that <b>already have</b> [<b>生息</b>]... extended by 1 turn" (Bailu (白露)). The origin is exact ({@code AbstractBuff.source});
      * the "what" is a <b>name</b> in the same vocabulary the condition DSL already reads - a {@code StateBuff}'s own
-     * name, a DOT's element name (灼烧), a control's name (冻结), or {@link #SHIELD_STATE} for a shield - or, when
+     * name, a DOT's element name (burn (灼烧)), a control's name (frozen (冻结)), or {@link #SHIELD_STATE} for a shield - or, when
      * the sentence names no state at all but an <i>effect</i> ("damage-increase effect"), the <b>attribute</b> the modifier sits
      * on.
      *
      * <p>Note: <b>Both filters are required</b>, and "everything of mine on that unit" is deliberately not a spelling:
-     * 布洛妮娅's DEFENCE trace buff from {@code BATTLE_START} can still be ticking when she casts her Skill, and a
+     * Bronya (布洛妮娅)'s DEFENCE trace buff from {@code BATTLE_START} can still be ticking when she casts her Skill, and a
      * filter that said "all of mine" would silently lengthen that too - a wrong number with nothing to report,
      * which is exactly what the name/attribute axis exists to prevent.
      *
@@ -309,7 +309,7 @@ public class BuffManager {
      * <b>not</b> an error - the common shape fires on the same cast that applied the buff, and "it is not there"
      * is an ordinary empty case, the same reading {@code DISPEL} has.
      *
-     * <p>Note: Iterating over a snapshot (M-12), like every other traversal here.
+     * <p>Note: Iterating over a snapshot, like every other traversal here.
      *
      * @param source    who must have applied the buff (usually the rule's owner)
      * @param stateName a state's name (or {@link #SHIELD_STATE}), or {@code null} when the filter is by attribute
@@ -333,9 +333,9 @@ public class BuffManager {
     }
 
     /**
-     * Lengthens <b>every</b> buff on this unit, whoever applied it (2026-10-02).
+     * Lengthens <b>every</b> buff on this unit, whoever applied it.
      *
-     * <p>Readers: 1506's two sentences -- "when this effect is first triggered each turn, extend all of your own positive effects by 1 turn" and its E2 "after entering the [无敌玩家] state,
+     * <p>1506's two sentences -- "when this effect is first triggered each turn, extend all of your own positive effects by 1 turn" and its E2 "after entering the [无敌玩家] state,
      * extend all of your own positive effects by 1 turn". {@link #extendBuffsFrom} filters by origin on purpose (its own note names "the shield provided by the Skill"), so
      * "all" had no spelling; the interpreter reaches this only through an explicit {@code "kind": "all"}, never implicitly.
      *
@@ -372,10 +372,10 @@ public class BuffManager {
     public static final String SHIELD_STATE = "护盾";
 
     /**
-     * Whether one buff is the one a rule named - by state name (or 护盾, the shield state name), or by the attribute a modifier sits on.
+     * Whether one buff is the one a rule named - by state name (or shield (护盾), the shield state name), or by the attribute a modifier sits on.
      *
      * <p>The name vocabulary is the same one the documents and {@code has_state} use, and the translation from a
-     * DOT's element to its name ({@code FIRE} to 灼烧 (burn)) is {@link #DOT_STATES}, reversed here so the two directions
+     * DOT's element to its name ({@code FIRE} to burn (灼烧)) is {@link #DOT_STATES}, reversed here so the two directions
      * cannot drift.
      */
     private static boolean isNamed(AbstractBuff buff, String stateName, AttributeType attribute) {
@@ -398,7 +398,7 @@ public class BuffManager {
     }
 
     /**
-     * The document's name for a DOT's element ({@code FIRE} to 灼烧 (burn)), or {@code null} for an element no document
+     * The document's name for a DOT's element ({@code FIRE} to burn (灼烧)), or {@code null} for an element no document
      * names as a state.
      */
     private static String stateNameOf(DamageElement element) {
@@ -419,7 +419,7 @@ public class BuffManager {
      * than keeping a second element to name map that could drift from it.
      *
      * @param element the DOT's element, or {@code null}
-     * @return 灼烧 (burn) / 触电 (shock) / 裂伤 (bleed) / 风化 (windshear), or {@code null}
+     * @return burn (灼烧) / shock (触电) / bleed (裂伤) / windshear (风化), or {@code null}
      */
     /** The document's name for "韧性被削减至 0" (see {@link #hasState}). */
     public static final String BROKEN_STATE = "弱点击破";
@@ -432,8 +432,8 @@ public class BuffManager {
      * Whether {@code stateName} is a name the engine's state tables know as a <b>rolled</b> state.
      *
      * <p>Used to validate {@code "scale": "cast_applied:<状态名>"} at load time: the closed set is the control states
-     * (冻结 (frozen) / 纠缠 (entangled) / 禁锢 (imprisoned)) and the four DOT states (灼烧 / 触电 / 裂伤 / 风化) - the states that reach the field
-     * through {@code Battle.tryApplyDebuff}, which is what the counter counts. Note: 嘲讽 (taunt) is deliberately absent: no
+     * (frozen (冻结) / entangled (纠缠) / imprisoned (禁锢)) and the four DOT states (burn (灼烧) / shock (触电) / bleed (裂伤) / windshear (风化)) - the states that reach the field
+     * through {@code Battle.tryApplyDebuff}, which is what the counter counts. Note: taunt (嘲讽) is deliberately absent: no
      * document counts taunts, and whether the marker belongs to the control class is still an open decision (see
      * ROADMAP).
      *
@@ -475,7 +475,7 @@ public class BuffManager {
         if (attribute == null || count <= 0) {
             return 0;
         }
-        // Snapshot + newest-first, for the reasons in the class javadoc (M-12) and above.
+        // Snapshot + newest-first, for the reasons in the class javadoc and above.
         List<AbstractBuff> snapshot = List.copyOf(buffs);
         int removed = 0;
         for (int i = snapshot.size() - 1; i >= 0 && removed < count; i--) {
@@ -512,7 +512,7 @@ public class BuffManager {
      * Settles late buffs after the owner's move (tick duration, remove expired).
      */
     public void afterMove() {
-        // The carrier's OWN turn just ended (2026-09-30): values scoped to "同一回合内" go away here. This runs beside the
+        // The carrier's OWN turn just ended: values scoped to "同一回合内" go away here. This runs beside the
         // duration tick, which is the same "this unit's turn is over" moment -- one place, not two.
         removeWithLifetime(AbstractBuff.Lifetime.TURN_END);
         processBuffTick(false);
@@ -544,7 +544,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to a skill being cast（P8-6） -  - non-damaging skills also fire it,
+     * Lets every buff react to a skill being cast - non-damaging skills also fire it,
      * so "restore skill points after casting a skill" (Bronya / Sushang) effects of that kind can
      * also receive healing / shield skills.
      * Called by {@link CanHit#onSkillCast(Battle, CanHit, Skill, List, List)}.
@@ -559,7 +559,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to an energy credit（P8-6）. {@code actuallyAdded} is the
+     * Lets every buff react to an energy credit. {@code actuallyAdded} is the
      * value that really landed after the cap.
      * Called by {@link CanHit#onEnergyGain(Battle, CanHit, double)}.
      */
@@ -572,7 +572,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to real HP loss（P8-6） -  - the part absorbed by a shield does not count,
+     * Lets every buff react to real HP loss - the part absorbed by a shield does not count,
      * so this event does not fire while the shield is unbroken.
      * Called by {@link CanHit#onHpLoss(Battle, CanHit, double, double, CanHit, double)}.
      */
@@ -586,7 +586,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to real healing（P8-6）. Called by
+     * Lets every buff react to real healing. Called by
      * {@link CanHit#onHeal(Battle, CanHit, CanHit, double)}.
      */
     public void onHeal(Battle battle, CanHit healer, CanHit target, double actuallyHealed) {
@@ -598,7 +598,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to a kill（P8-6） -  - including additional damage / true damage finishing blows.
+     * Lets every buff react to a kill - including additional damage / true damage finishing blows.
      * Called by {@link CanHit#onKill(Battle, CanHit, CanHit)}.
      */
     public void onKill(Battle battle, CanHit attacker, CanHit victim) {
@@ -610,7 +610,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to a weakness break（P8-6） -  - fires only once at the moment toughness hits zero.
+     * Lets every buff react to a weakness break - fires only once at the moment toughness hits zero.
      * Called by {@link CanHit#onBreak(Battle, CanHit, CanHit, DamageElement)}.
      */
     public void onBreak(Battle battle, CanHit attacker, CanHit target, DamageElement element) {
@@ -622,7 +622,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to a skill point being gained（P8-6）.
+     * Lets every buff react to a skill point being gained.
      * Called by {@link CanHit#onSkillPointGained(Battle, int)}.
      */
     public void onSkillPointGained(Battle battle, int amount) {
@@ -634,7 +634,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to a skill point being really spent（P8-6） -  - 
+     * Lets every buff react to a skill point being really spent -
      * this event does not fire when skill points are insufficient and the action does not go through.
      * Called by {@link CanHit#onSkillPointSpent(Battle, int)}.
      */
@@ -651,9 +651,9 @@ public class BuffManager {
     }
 
     /**
-     * Spends the duration of the buffs on this unit whose <b>clock</b> belongs to {@code clockOwner} (M-42 ④).
+     * Spends the duration of the buffs on this unit whose <b>clock</b> belongs to {@code clockOwner}.
      *
-     * <p>Called by {@code Battle} at somebody else's turn boundary, for every other unit on the field: 星期日's
+     * <p>Called by {@code Battle} at somebody else's turn boundary, for every other unit on the field: Sunday (星期日)'s
      * [蒙福者] lives on the ally and is spent by <b>his</b> turns. Our own boundary is skipped - that one has
      * already gone through {@link #beforeMove()} / {@link #afterMove()}.
      *
@@ -668,10 +668,10 @@ public class BuffManager {
     }
 
     /**
-     * Removes every buff on this unit whose clock belongs to {@code clockOwner} - the anchor's death (M-42 ③).
+     * Removes every buff on this unit whose clock belongs to {@code clockOwner} - the anchor's death.
      *
      * <p>Note: Without this, an anchored buff is a <b>leak</b>: its clock was somebody else's turns, and that somebody
-     * will never take another one. 星期日's [蒙福者] says it outright ("when 星期日 falls into the cannot-fight state, the [蒙福者] effect
+     * will never take another one. Sunday (星期日)'s [蒙福者] says it outright ("when 星期日 falls into the cannot-fight state, the [蒙福者] effect
      * is dispelled too"), and the generic reason is stronger than the sentence - "spend it on my turns" is meaningless
      * once I am gone.
      *
@@ -697,7 +697,7 @@ public class BuffManager {
     /**
      * The tick itself, for the buffs on this manager whose clock is {@code clockOwner}.
      *
-     * <p>Note: Iterated over a snapshot, not with {@code removeIf} (M-12). {@code tickEffect} and {@code removeBuff}
+     * <p>Note: Iterated over a snapshot, not with {@code removeIf}. {@code tickEffect} and {@code removeBuff}
      * are buff code: a buff may attach or remove another buff while it ticks, and {@code removeIf} walks the live
      * list - a {@code ConcurrentModificationException} raised from the middle of a turn boundary, or a silently
      * skipped buff. Removal is stated explicitly here instead, which is the same thing {@code removeIf} did.
@@ -719,7 +719,7 @@ public class BuffManager {
             boolean couldAct = buff.canAct();
             buff.tickEffect(instance);
             if (buff.duration() <= 0) {
-                // Announce BEFORE the removal (2026-10-02): the event carries the state's name, because a
+                // Announce BEFORE the removal: the event carries the state's name, because a
                 // reader that looked for the state on this unit would already see it gone. `battle` is null for a
                 // unit built outside a battle, and then there is nobody to tell.
                 if (battle != null && buff instanceof StateBuff ended) {
@@ -737,9 +737,9 @@ public class BuffManager {
     }
 
     /**
-     * Whether a certain kind of buff is on us (needed by P4-6 / P8-/ P10-2 alike).
+     * Whether a certain kind of buff is on us.
      *
-     * <p>Why "ask about a kind" instead of "hand the list out" (the P1-design decision):
+     * <p>Why "ask about a kind" instead of "hand the list out" (the design decision):
      * iteration and matching stay inside the manager, so the outside cannot get a mutable list,
      * and therefore there is no opening for "a caller mutating the list causing
      * {@code ConcurrentModificationException}".
@@ -765,21 +765,21 @@ public class BuffManager {
     }
 
     /**
-     * Whether a <b>named</b> state ([协奏]/[转魄]/[增幅]…) is currently attached.
+     * Whether a <b>named</b> state ([协奏]/[转魄]/[增幅]...) is currently attached.
      *
      * <p>Same family as {@link #hasBuff(Class)}, with one difference that is the whole point of states:
      * the caller keys by the state's <b>name</b>, not by its class. A state is data ({@link StateBuff}
      * carries a name from the rule file), so a rule that says "处于[协奏]状态时" has no class to name.
      *
      * <p>Traversal goes through {@link #allBuffsOf(Class)}, i.e. the same snapshot copy as every other
-     * read here (M-12), so a state that removes or attaches another state while being queried cannot
+     * read here, so a state that removes or attaches another state while being queried cannot
      * disturb the iteration.
      *
      * @param state the state name as the data spells it (trimmed; blank or {@code null} = never present)
      * @return {@code true} = a {@link StateBuff} with that name is on us
      */
     /**
-     * Whether any state on us <b>defers a lethal blow</b> (2026-10-02; reader: 140's Moon Cocoon Ward (月茧之庇)).
+     * Whether any state on us <b>defers a lethal blow</b> (140's Sanctuary of Mooncocoon (月茧之庇)).
      *
      * <p>Asked by {@code Battle} at the two moments that matter: before it commits a death, and at the carrier's own
      * turn (where a still-present deferral is committed). By type, not by name -- see {@link DeferredDeathBuff}.
@@ -798,14 +798,14 @@ public class BuffManager {
             return false;
         }
         String wanted = state.trim();
-        // Note: Subclass-inclusive (2026-10-02): allBuffsOf compares classes EXACTLY, and DeferredDeathBuff is a StateBuff
+        // Note: Subclass-inclusive: allBuffsOf compares classes EXACTLY, and DeferredDeathBuff is a StateBuff
         // SUBCLASS -- so a deferring state was invisible to has_state, and 140's own content could never see its trace.
         for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof StateBuff carried && wanted.equals(carried.getState())) {
                 return true;
             }
         }
-        // Named buffs (2026-09-30): an effect *of* a state carries the state's own name, so "处于结界中时" must
+        // Named buffs: an effect *of* a state carries the state's own name, so "处于结界中时" must
         // answer yes for the modifier that carries it -- the zone is a MODIFY_ATTR with `buff: "结界"`, not a
         // StateBuff. Note: Over the manager's own list rather than `allBuffsOf`: that helper compares classes EXACTLY,
         // and a modifier may be a SUBCLASS. Note: Unnamed buffs are skipped, which is what keeps this loop from touching
@@ -823,21 +823,21 @@ public class BuffManager {
         // Note: Controls joined this table on 2026-09-2, when ControlBuff gave them a name. Before that the comment
         // here said they were "deliberately NOT in this table yet ... adding them later changes no JSON" -- and
         // that is exactly what happened: the break path and a skill-applied control now produce the SAME buff, so
-        // "冻结" answers the same thing whichever one froze the unit (a break-frozen enemy used to have no name
-        // at all, so a rule gated on "冻结状态" would have silently missed it).
+        // "冻结" answers the same thing whichever one froze the unit (a break-frozen enemy carries no name
+        // of its own, so a rule gated on "冻结状态" would silently miss it).
         for (ControlBuff control : allBuffsOf(ControlBuff.class)) {
             if (wanted.equals(control.getName())) {
                 return true;
             }
         }
-        // "弱点击破状态" (2026-09-28, corpus 58 hits / 15 files): the state a unit is in while its toughness bar is
+        // "弱点击破状态" (corpus 58 hits / 15 files): the state a unit is in while its toughness bar is
         // empty. It is a fact about the ENEMY rather than a buff anyone applied, so it belongs in this engine-state table
         // -- the same reason "灼烧" and "冻结" are resolved here.
         if (BROKEN_STATE.equals(wanted)) {
             return instance instanceof com.laosun.aluminium.models.enemy.Enemy enemy && enemy.isBroken();
         }
-        // A named DOT answers to its NAME too (2026-09-30): the element table below only knows the four DOT states (灼烧/触电/裂伤/风化),
-        // while the corpus also asks about [游丝] by name. A named THUNDER DOT therefore answers BOTH 游丝 and 触电 -- which is
+        // A named DOT answers to its NAME too: the element table below only knows the four DOT states (burn (灼烧) / shock (触电) / bleed (裂伤) / windshear (风化)),
+        // while the corpus also asks about [游丝] by name. A named THUNDER DOT therefore answers BOTH Erode (游丝) and shock (触电) -- which is
         // exactly the sentence "[游丝]状态下也被视为陷入了触电状态".
         for (DotBuff dot : allBuffsOf(DotBuff.class)) {
             if (wanted.equals(dot.getBuffName())) {
@@ -860,12 +860,12 @@ public class BuffManager {
      * Removes every buff that {@link #hasState(String)} would report for that name - the other half of the pair.
      *
      * <p><b>Why a "remove the named state" primitive.</b> "仅对…<b>最新的</b>施放目标生效" is a very common sentence
-     * (星期日's [蒙福者]), and the engine had no way to say "take that state off the others": {@link #removeDebuffs}
+     * (Sunday (星期日)'s [蒙福者]), and the engine has no way to say "take that state off the others": {@link #removeDebuffs}
      * only reaches <b>negative</b> buffs, and a named state is usually a positive one. Resolving the name here also
      * means the DoT spellings behave the same on this side as they do on the {@code has_state} side (removing "触电"
      * takes the thunder DoT off), which is the "one name, one meaning" rule that method documents.
      *
-     * <p>The traversal and the removal both go through the snapshot copy (M-12), exactly like {@link #removeDebuffs},
+     * <p>The traversal and the removal both go through the snapshot copy, exactly like {@link #removeDebuffs},
      * so a buff that reacts to being removed cannot disturb the iteration.
      *
      * @param state the state name as the data spells it (trimmed; blank or {@code null} = nothing to do)
@@ -879,7 +879,7 @@ public class BuffManager {
      */
     /**
      * Takes up to {@code max} layers off the buffs carrying one <b>name</b> - the named twin of
-     * {@link #removeStacks(AttributeType, int)} (2026-09-28).
+     * {@link #removeStacks(AttributeType, int)}.
      *
      * <p>"每次我方目标回合结束时，移除驭空 1 层[鸣弦号令]" is why: [鸣弦号令] is a <b>stackable named modifier</b>, and
      * neither existing spelling could take one layer off it - {@code REMOVE_STATE <name>} removes the named buffs
@@ -912,7 +912,7 @@ public class BuffManager {
     }
 
     /**
-     * Removes up to {@code max} <b>positive, temporary</b> buffs - "解除敌方 N 个增益效果" (2026-09-28).
+     * Removes up to {@code max} <b>positive, temporary</b> buffs - "解除敌方 N 个增益效果".
      *
      * <p>It is the mirror of the {@code DISPEL} op, and the direction is the whole point: that one cleans <i>our own</i>
      * side of negative effects, while this one strips an <b>enemy's</b> benefits. The filter is a decision taken per buff
@@ -962,7 +962,7 @@ public class BuffManager {
     }
 
     /**
-     * How many buffs on this unit carry the given <b>name</b> - "已经累计了几次" (2026-09-28).
+     * How many buffs on this unit carry the given <b>name</b> - "已经累计了几次".
      *
      * <p>Note: A counter is <b>several buffs with one name</b>, not one buff with a count field: that is the engine's
      * existing stacking ( {@code BuffManagerTest} pins "same kind refreshes, opt-in stacking accumulates"), and it is
@@ -1010,7 +1010,7 @@ public class BuffManager {
     public boolean suspendsTurns() {
         // Note: Over the manager's own list, NOT `allBuffsOf`/`instanceof`: that helper compares classes exactly
         // (`buff.getClass() == kind`), and a modifier may be a *subclass* of StatModifierBuff -- a per-class scan
-        // silently found nothing (measured: the party ATK boost survived "退出[协奏]状态" for exactly this reason).
+        // silently found nothing (measured: the party ATK boost survives "退出[协奏]状态" for exactly this reason).
         for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff.isSuspendsTurns()) {
                 return true;
@@ -1020,15 +1020,15 @@ public class BuffManager {
     }
 
     /**
-     * Takes off only the buffs <b>this source</b> applied, named by a state or by the attribute a modifier sits on (2026-10-02).
+     * Takes off only the buffs <b>this source</b> applied, named by a state or by the attribute a modifier sits on.
      *
-     * <p>The source filter is the whole point, and it is not new: `extendBuffsFrom` has filtered by origin since it was written. Reader:
-     * 1415's ode of romance -- the lifetime is "持续至阿格莱雅退出[至高之姿]状态" -- where removing by NAME alone also took a pre-existing
-     * `ALL_DAMAGE_TYPE_BOOST` of hers with it (measured: both units went to 0.0 although both held 0.2 before the ode).
+     * <p>The source filter is the whole point: `extendBuffsFrom` filters by origin too. 1415's ode of romance
+     * has the lifetime "持续至阿格莱雅退出[至高之姿]状态", where removing by NAME alone also takes a pre-existing
+     * `ALL_DAMAGE_TYPE_BOOST` of hers with it (measured: both units go to 0.0 although both held 0.2 before the ode).
      */
     /**
-     * Takes off every modifier sitting on <b>this attribute</b>, whoever applied it (2026-10-02). `isNamed` has answered by attribute since
-     * it was written; only the LENGTHENING path could reach that form, so removal had no entrance for it.
+     * Takes off every modifier sitting on <b>this attribute</b>, whoever applied it. `isNamed` answers by attribute;
+     * only the LENGTHENING path could reach that form, so removal has no entrance for it.
      */
     public int removeState(AttributeType attribute) {
         if (attribute == null) {
@@ -1069,7 +1069,7 @@ public class BuffManager {
 
     /**
      * Note: `isNamed` answers for STATES, CONTROLS and shields -- it does NOT read {@code buffName}, which {@code removeState(String)} matches in
-     * a separate loop of its own (2026-09-28: "an effect *of* a state carries the state own name"). Sharing only `isNamed` here left a NAMED
+     * a separate loop of its own ("an effect *of* a state carries the state own name"). Sharing only `isNamed` here would leave a NAMED
      * modifier unreachable: measured, the romance ode companions removed nothing at all.
      */
     private static boolean matchesFrom(AbstractBuff carried, CanHit source, String stateName, AttributeType attribute) {
@@ -1098,12 +1098,12 @@ public class BuffManager {
         if (ending > 0 && battle != null) {
             battle.fireStateEnded(instance, wanted, ending);
         }
-        // Note: Subclass-inclusive (2026-10-02), the same widening has_state needed: a DeferredDeathBuff is a StateBuff
+        // Note: Subclass-inclusive, the same widening has_state needed: a DeferredDeathBuff is a StateBuff
         // SUBCLASS, and an exact-class sweep cannot take it off -- so 140's trace could never be removed by name.
         for (AbstractBuff carried : List.copyOf(buffs)) {
             if (carried instanceof StateBuff buff && wanted.equals(buff.getState())) {
-                // 2026-10-02: an explicit removal ends the state just as a spent duration does, so the tables hear
-                // about it the same way. Readers: 1408 transformation end, 1412 raid end.
+                // Note: an explicit removal ends the state just as a spent duration does, so the tables hear
+                // about it the same way.
                 removeBuff(buff);
                 removed++;
             }
@@ -1117,9 +1117,9 @@ public class BuffManager {
             }
         }
 
-        // Named buffs (2026-09-28): an effect *of* a state carries the state's own name, so "退出[协奏]状态" takes the
+        // Named buffs: an effect *of* a state carries the state's own name, so "退出[协奏]状态" takes the
         // state, its stat boost and its immunity off with one statement. Note: Unnamed buffs are skipped, which is what
-        // keeps this loop from touching anything that existed before the field did. Note: Over the manager's own list
+        // keeps this loop from touching anything that carries no name. Note: Over the manager's own list
         // rather than `allBuffsOf`: that helper compares classes exactly, and a modifier may be a subclass.
         for (AbstractBuff named : List.copyOf(buffs)) {
             if (!named.getBuffName().isEmpty() && wanted.equals(named.getBuffName())) {
@@ -1154,13 +1154,13 @@ public class BuffManager {
             "风化", DamageElement.WIND);
 
     /**
-     * Takes the first buff of that type on us, or {@code null} if there is none (needed since P5-2:
-     * the target selector must obtain the taunter itself, merely knowing "whether there is one"
-     * is not enough).
+     * Takes the first buff of that type on us, or {@code null} if there is none: the
+     * target selector must obtain the taunter itself, and merely knowing "whether there is one"
+     * is not enough.
      *
      * <p>It is a strict superset of {@link #hasBuff(Class)} ({@code findBuff(X) != null} means "there is one").
-     * It still does not expose {@code getBuffs()}: keeping iteration inside the manager is the P1-
-     * decision, and handing out the mutable list would add one more opening for
+     * It still does not expose {@code getBuffs()}: keeping iteration inside the manager is deliberate,
+     * and handing out the mutable list would add one more opening for
      * {@code ConcurrentModificationException}.
      *
      * @param kind the buff type to query
@@ -1182,7 +1182,7 @@ public class BuffManager {
     /**
      * <b>A snapshot</b> of every buff of the given class, in <b>attachment order</b> (oldest first).
      *
-     * <p><b>Why a snapshot and not the list.</b> The P1-decision is that {@code getBuffs()} does not
+     * <p><b>Why a snapshot and not the list.</b> It is deliberate that {@code getBuffs()} does not
      * exist, because a caller holding the live list can mutate it (or trip over a
      * {@code ConcurrentModificationException}). A fresh copy keeps that guarantee - the caller may
      * remove or add buffs while iterating without disturbing the manager - while still answering the
@@ -1218,7 +1218,7 @@ public class BuffManager {
             buff.removeBuff(instance);
         }
         buffs.clear();
-        // M-5: also drop the `blocked` flag. It is set when a control buff expires on the very turn it was
+        // Also drop the `blocked` flag. It is set when a control buff expires on the very turn it was
         // blocking, so clearing every buff without clearing it leaves a unit that can never act again --
         // and dispelling it is exactly what a caller would try next.
         blocked = false;

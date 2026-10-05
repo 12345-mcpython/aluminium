@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * HP loss event (P8-6): fired once after someone's HP really decreased.
+ * HP loss event: fired once after someone's HP really decreased.
  *
  * <p>{@code amount = before - after}, i.e. the HP actually lost:
  * <ul>

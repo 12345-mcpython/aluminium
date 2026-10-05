@@ -19,7 +19,7 @@ import java.util.Random;
 
 /**
  * Light cone 2305: the wearer's ELATION damage ignores 20% of the target's defence (its speed clause is the row's, and
- * its 笑点 (laugh points) clause is registered).
+ * its Punchline (笑点) clause is registered).
  *
  * <p>The instance route is what makes "permanently, but only for elation" expressible: it mutates the instance being
  * settled and is filtered by `damage_type`, so nothing can leak into ordinary damage. The expectation is derived from
@@ -67,7 +67,7 @@ public class Cone23057Test {
     }
 
     /**
-     * Discipline 168, re-taught by a 0-red mutation this round: an ownership condition needs a NON-owner in the
+     * Discipline 168: an ownership condition needs a NON-owner in the
      * judge. The cone's rule says `actor == self`, so a teammate's elation damage must NOT be raised -- with only the
      * wearer in the party, `self` and `is_ally` are indistinguishable and the mutation cannot fail.
      */

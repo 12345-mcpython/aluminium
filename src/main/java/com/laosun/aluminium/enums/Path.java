@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Path (命途) (P5-1). The Path determines the base aggro value, and thereby the
+ * Path (命途). The Path determines the base aggro value, and thereby the
  * probability that a single-target / blast enemy attack selects that character.
  *
  * <p>Aggro is "an absolute weight", not a percentage: hit probability =

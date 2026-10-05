@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A <b>named counter with a threshold</b> (2026-09-28): {@code ADD_STACK} plus {@code *_stacks:<name>}.
+ * A <b>named counter with a threshold</b>: {@code ADD_STACK} plus {@code *_stacks:<name>}.
  *
- * <p><b>The sentence that needs it.</b> 寒鸦's Skill: "after our target casts a basic attack, Skill or Ultimate <b>2</b> times on an enemy target in the [承负] state, immediately
+ * <p><b>The sentence that needs it.</b> Hanya (寒鸦)'s Skill: "after our target casts a basic attack, Skill or Ultimate <b>2</b> times on an enemy target in the [承负] state, immediately
  * restore 1 skill point to our side; [承负] ... is automatically removed after triggering the skill-point restoration effect <b>2</b> times" - two counters, each with a threshold, and
  * neither is a turn count or a probability. The engine could already <i>stack</i> ({@code maxStacks}, {@code REMOVE_STACK})
  * but nothing could <b>read</b> a count, so "after N times" had no spelling at all.
@@ -95,7 +95,7 @@ public class StackCounterTest {
     // Helpers
     // ==================================================================
 
-    /** One mark on the enemy's 承负 counter, capped at 2. */
+    /** One mark on the enemy's Bondmate (承负) counter, capped at 2. */
     private static TriggerSpec countMark() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADD_STACK");

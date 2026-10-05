@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * M-11: crediting energy must never <b>take energy away</b>, and must never poison the bar with {@code NaN}.
+ * crediting energy must never <b>take energy away</b>, and must never poison the bar with {@code NaN}.
  *
  * <p>Three ways the old {@code gainEnergy} did one or the other:
  * <ol>

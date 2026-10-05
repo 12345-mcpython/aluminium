@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The 2026-09-28 content pass over the {@code Writable now:} backlog - five relic abilities whose every clause
+ * A content pass over the {@code Writable now:} backlog - five relic abilities whose every clause
  * already had a spelling, written out.
  *
  * <p><b>Why a content pass needs tests at all.</b> Each of these was "already expressible", which is exactly the
@@ -38,7 +38,7 @@ import java.util.Random;
  * energy (8 vs param 3), 310's threshold (50% vs param 0.3) and 313's per-stack CRIT DMG (which is why 313 is
  * still not authored) - so every number below is asserted against the file that was written, not against prose.
  *
- * <p>313 (无主荒星茨冈尼亚, Masterless Desolate Star Tsigonia) stayed registered, and its reason was rewritten: "when an enemy target is killed" needs "the one
+ * <p>313 (无主荒星茨冈尼亚, Sigonia, the Unclaimed Desolation) stays registered, and its reason is rewritten: "when an enemy target is killed" needs "the one
  * who died is an ENEMY", and {@code KILL} fires for any death with the victim as {@code target} - the condition
  * DSL has no camp variable (F-5). A wrong number and a missing spelling in one entry.
  */
@@ -77,11 +77,11 @@ public class RelicAbilityBatchTest {
     private static final int SACERDOS = 121;
     private static final int SKILL_SLOT = 2;
     private static final int ULT_SLOT = 3;
-    /** 生命的翁法罗斯 (Amphoreus, the Eternal Land): the derived-value set (its bonus is a function of Max Energy). */
+    /** Amphoreus, the Eternal Land (生命的翁法罗斯): the derived-value set (its bonus is a function of Max Energy). */
     private static final int AMPHOREUS = 328;
-    /** 出云显世与高天神国 (Izumo Gensei and Takama Divine Realm): the party-composition set (its CRIT Rate needs a teammate on the same Path). */
+    /** Izumo Gensei and Takama Divine Realm (出云显世与高天神国): the party-composition set (its CRIT Rate needs a teammate on the same Path). */
     private static final int IZUMO = 314;
-    /** 盗贼公国塔利亚 (Talia, Kingdom of Banditry): the weakness-gated set (its Break Effect needs a fire-weak enemy). */
+    /** Talia: Kingdom of Banditry (盗贼公国塔利亚): the weakness-gated set (its Break Effect needs a fire-weak enemy). */
     private static final int BANDITRY = 316;
     /** 逐火者的航迹 (Revelry by the Sea): the damage-category set (its boost touches DoT only). */
     private static final int REVELRY = 322;
@@ -289,7 +289,7 @@ public class RelicAbilityBatchTest {
         Assertions.assertEquals(allyBoost + 0.15, boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST), EPS,
                 "「我方全体造成的伤害提高 15%」 reaches a teammate too");
 
-        // M-38: the file states the sentence's disjunction as ONE duration with two ends. Asserted on the shipped
+        // the file states the sentence's disjunction as ONE duration with two ends. Asserted on the shipped
         // 4-piece rather than on a hand-made rule, because the shape of the JSON is half of what this guarantees.
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(SHATTERED_WORLD).at(4)
                 .matching(TriggerEvent.SKILL_CAST,
@@ -302,13 +302,13 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 124 / 319 / 320 -- "装备者及其忆灵" reaches a LATE arrival (M-39)
+    // 124 / 319 / 320 -- "装备者及其忆灵" reaches a LATE arrival
     // ==================================================================
 
     /**
      * The memosprite half of a pre-battle effect lands when the memosprite arrives.
      *
-     * <p>This is the decision M-39 needed: `target: "summon"` cannot be filed at BATTLE_START (nothing may be
+     * <p>Why this is needed: `target: "summon"` cannot be filed at BATTLE_START (nothing may be
      * out, and the selector fails loudly rather than silently missing), so each tier carries a second rule on
      * SUMMONED. Both halves are asserted: the wearer gets hers at the start, the memosprite gets hers when it
      * appears - including for a wearer whose kit summons it mid-fight, which is the case the single BATTLE_START
@@ -399,7 +399,7 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 114 骇域漫游的信使 (Messenger Traversing Hackerspace): the wearer's Ultimate <b>on an ally</b> speeds the whole side up - and aimed at an enemy it
+     * 114 Messenger Traversing Hackerspace (骇域漫游的信使): the wearer's Ultimate <b>on an ally</b> speeds the whole side up - and aimed at an enemy it
      * does nothing at all.
      *
      * <p>Note: Both halves in one case on purpose: the contrast is the whole reason the condition exists (`actor == self`
@@ -432,7 +432,7 @@ public class RelicAbilityBatchTest {
                 "aimed at an ENEMY: 「对己方角色」 does not hold, so nothing is granted");
     }
 
-    /** 118 梦游者钟表匠 (Watchmaker, Master of Dream Machinations): the same trigger, a ratio attribute (+30% Break Effect, 2 turns). */
+    /** 118 Watchmaker, Master of Dream Machinations (梦游者钟表匠): the same trigger, a ratio attribute (+30% Break Effect, 2 turns). */
     @Test
     public void theWatchmakerUltimateRaisesThePartysBreakEffect() {
         Character wearer = wearing(WATCHMAKER);
@@ -447,7 +447,7 @@ public class RelicAbilityBatchTest {
                 "「击破特攻提高#1[i]%」 -- a ratio attribute, so 0.3 is an absolute +30%");
     }
 
-    /** 121 祭司的旧日祭礼 (Sacerdos' Relived Ordeal): the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states. */
+    /** 121 Sacerdos' Relived Ordeal (祭司的旧日祭礼): the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states. */
     @Test
     public void theSacerdosSkillBuffsTheAimedAllyAndStacksTwice() {
         Character wearer = wearing(SACERDOS);
@@ -470,7 +470,7 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 328 生命的翁法罗斯 (Amphoreus, the Eternal Land): "Max Energy >= 200 points, and for every 1 point above it the damage dealt is increased by 0.2%, up to 32%".
+     * 328 Amphoreus, the Eternal Land (生命的翁法罗斯): "Max Energy >= 200 points, and for every 1 point above it the damage dealt is increased by 0.2%, up to 32%".
      *
      * <p>Three points on the curve, which is what the sentence actually says: below the threshold <b>nothing</b>,
      * 40 points over it <b>0.08</b>, and past 360 the <b>32% cap</b>. Note: The value is read off the modifier the rule
@@ -509,7 +509,7 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 314 出云显世与高天神国 (Izumo Gensei and Takama Divine Realm): the CRIT Rate arrives only when a teammate walks the wearer's Path.
+     * 314 Izumo Gensei and Takama Divine Realm (出云显世与高天神国): the CRIT Rate arrives only when a teammate walks the wearer's Path.
      *
      * <p>Note: The value is read off the <b>modifier the rule granted</b>, not off the resolved attribute: the wearer is
      * built with a relic suit, whose random sub-stats may carry CRIT Rate of their own (relic sub-stats become
@@ -544,7 +544,7 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 316 盗贼公国塔利亚 (Talia - Kingdom of Banditry): hitting a <b>fire-weak</b> enemy raises the wearer's Break Effect; anyone else does not.
+     * 316 Talia: Kingdom of Banditry (盗贼公国塔利亚): hitting a <b>fire-weak</b> enemy raises the wearer's Break Effect; anyone else does not.
      *
      * <p>Note: Both sides in one case: the condition is the whole rule, and a rule that ignored the weakness would pass a
      * test that only checked the fire-weak enemy.
@@ -596,7 +596,7 @@ public class RelicAbilityBatchTest {
     }
 
     /**
-     * …and the attribute really reaches the tick: the <b>same</b> DoT hits harder once the wearer holds the boost.
+     * ...and the attribute really reaches the tick: the <b>same</b> DoT hits harder once the wearer holds the boost.
      *
      * <p>Note: This is the half that would silently not work. `DOT_DAMAGE_BOOST` is read by a branch in {@code Battle}'s
      * boost assembly, and an attribute that nothing reads looks exactly like a working rule from the outside -- so the

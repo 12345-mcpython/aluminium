@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1303 阮-梅's zone: "我方全体全属性抗性穿透提高25.00%" for two of HER turns, plus 星魂 1's defence ignore on the same clock.
+ * 1303 Ruan Mei (阮•梅)'s zone: "我方全体全属性抗性穿透提高25.00%" for two of HER turns, plus Eidolon (星魂) 1's defence ignore on the same clock.
  *
  * <p>Both are stated on her Ultimate with `ticks_on: self`, because the document gives the zone her own clock ("自身每回合开始时
  * 结界持续回合数减1") and nothing extra happens when it ends. Two ways: after the cast every ally reads both values, and before

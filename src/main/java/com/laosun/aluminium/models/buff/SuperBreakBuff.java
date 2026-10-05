@@ -3,7 +3,7 @@ package com.laosun.aluminium.models.buff;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * The trigger marker for super break (P4-6): a pure marker, with no numeric value.
+ * The trigger marker for super break: a pure marker, with no numeric value.
  *
  * <p>Semantics (matching Trailblazer - Harmony's ultimate [伴舞]: "after attacking an enemy
  * target that is in the weakness-broken state, converts this attack's toughness reduction

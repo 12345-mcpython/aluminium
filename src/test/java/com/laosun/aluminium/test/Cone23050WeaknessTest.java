@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23050 随心: "when the wearer adds a weakness to an enemy target, restores 1 skill point; this effect can trigger at most 1 time, and casting the Ultimate resets the number of triggerable times".
+ * Light cone 23050 At Will (随心): "when the wearer adds a weakness to an enemy target, restores 1 skill point; this effect can trigger at most 1 time, and casting the Ultimate resets the number of triggerable times".
  *
  * <p>Note: This case builds no fixture: it lets two real pieces of content interact - character `1315`'s own rule adds a Physical weakness to the target on the Ultimate
  * (the reader of this section's twelfth `ADD_ELEMENTAL_WEAKNESS`), and the `23050` rule reacts to "a weakness was added".
- * Note: An earlier spelling used `setTriggerTable` to stuff in a probe; that line replaced the light cone's own table, so the case was really testing
- * "23050 installed but without 23050's rules" - measured `before=2 after=2`, while the weakness really was added.
+ * Note: Stuffing in a probe with `setTriggerTable` would replace the light cone's own table, so the case would really test
+ * "23050 installed but without 23050's rules" - measured `before=2 after=2`, while the weakness really is added.
  *
  * <p>Note: Both preconditions must be asserted, or the case stays green while testing nothing: (1) full energy (`castUltra` returns false outright when it is not full);
  * (2) skill points below the cap (the policy is start 3 / max 5, and at the cap `gainSkillPoint(1)` would be silently truncated).

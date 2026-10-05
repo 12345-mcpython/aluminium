@@ -36,15 +36,15 @@ public class QueueActionManipulationTest {
     // ==================================================================
 
     /**
-     * "Pull someone else to the very front" during an action (simulating P-2 extra turns / P10-4
-     * action advance): at that point the heap top is no longer the actor, and {@code setTopZero()}
+     * "Pull someone else to the very front" during an action (simulating extra turns /
+     * action advance): at that point the heap top is not the actor, and {@code setTopZero()}
      * MUST still reset the actor.
      *
-     * <p>Behaviour before the fix: it reset the heap top (= B, who was pulled up), A's cycle was not
-     * reset to A would act twice in a row.
+     * <p>Resetting the heap top instead (= B, who was pulled up) would leave A's cycle unreset,
+     * so A would act twice in a row.
      *
      * <p>Note: Here A's and B's times are deliberately made unequal (250 vs 18.5): the in-heap order
-     * of equal keys is undefined (see Pfix E4, which is not fixed yet), so asserting "who is the
+     * of equal keys is undefined, so asserting "who is the
      * heap top" would be a coin flip. The "times happen to be equal" case is covered by
      * {@link #actorIsNotSkippedWhenAnotherSignalSitsInThePast}, which only asserts that the actor was
      * reset and does not assert the heap top's identity.
@@ -196,7 +196,7 @@ public class QueueActionManipulationTest {
     // ==================================================================
 
     /**
-     * {@code advanceActionByPercent(…, 1.0)} pushes the action time exactly down to {@code elapsed}:
+     * {@code advanceActionByPercent(..., 1.0)} pushes the action time exactly down to {@code elapsed}:
      * the clock does not go backwards, and the actor is not repeatedly consumed by {@code move()}
      * for "lying in the past".
      */
@@ -223,7 +223,7 @@ public class QueueActionManipulationTest {
      * and {@link Queue#move()} would then wind the global clock backwards.
      *
      * <p>This is not hypothetical: in binary64 {@code a - (a-e)-p >= e} holds mathematically but is
-     * not guaranteed in floating point, and action-bar manipulation (P10-4 action advance / P-2
+     * not guaranteed in floating point, and action-bar manipulation (action advance /
      * extra turn) already schedules signals onto {@code elapsed}, so stacking one more advance on top
      * lands right here.
      *
@@ -255,7 +255,7 @@ public class QueueActionManipulationTest {
      * not act twice.
      *
      * <p>At this point both units' {@code nextActionTime} are 150 - the in-heap order of equal keys
-     * is undefined (Pfix E4), so only "the actor was reset" and "the clock does not go backwards"
+     * is undefined, so only "the actor was reset" and "the clock does not go backwards"
      * are asserted here, and the heap top's identity is not.
      */
     @Test
@@ -284,13 +284,12 @@ public class QueueActionManipulationTest {
     // ==================================================================
 
     /**
-     * L-26: a pending push must survive a speed change.
+     * A pending push must survive a speed change.
      *
      * <p>{@code remaining} and {@code nextActionTime} are two ledgers of one state, and
-     * {@code delayAction} only ever wrote the second one - so the next {@code refreshSpeed} recomputed
-     * the booking from the stale {@code remaining} and threw the push away. Measured before the
-     * fix: a Quantum break's extra delay had literally no observable effect (28.409 with and without
-     * it), which is how this was found.
+     * {@code delayAction} writes only the second one - so the next {@code refreshSpeed} recomputes
+     * the booking from the stale {@code remaining} and throws the push away. Measured: a Quantum
+     * break's extra delay has no observable effect (28.409 with and without it).
      *
      * <p>Both units take the same speed change, so nothing but the push can separate them - which
      * makes this test fail unless <b>both</b> halves are fixed:
@@ -335,7 +334,7 @@ public class QueueActionManipulationTest {
         return EnemyFactory.create(1002011, 90, 1);
     }
 
-    /** The enemy in the team (Ice Edge, 冰锋, 132 speed): first round {@code 10000/132  x  1.5 ~= 113.64}, so it acts before a speed-100 character (150). */
+    /** The enemy in the team (Ice Edge (冰锋), 132 speed): first round {@code 10000/132  x  1.5 ~= 113.64}, so it acts before a speed-100 character (150). */
     private static CanHit dummyOf(Battle battle) {
         return battle.enemies.getFirst();
     }

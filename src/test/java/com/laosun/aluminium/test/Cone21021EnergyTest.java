@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21021 Equivalent Exchange (光锥 21021 等价交换), skill 酣适: `当装备者的回合开始时，随机为 1 个当前能量百分比小于 50% 的我方其他目标
+ * Light cone 21021 Quid Pro Quo (光锥 21021 等价交换), skill Enjoy With Rapture (酣适): `当装备者的回合开始时，随机为 1 个当前能量百分比小于 50% 的我方其他目标
  * 恢复 8 点能量` (the original: `for a randomly chosen ally (excluding the wearer) whose current Energy is lower than 50%`).
  *
  * <p>Note: three controls settle three things at once: the wearer itself is not picked (`excluding the wearer`); a teammate at full energy is not picked (the threshold);
@@ -61,18 +61,17 @@ public class Cone21021EnergyTest {
                 "the wearer is excluded by the text itself: a randomly chosen ally (excluding the wearer)");
     }
 
-    // There used to be another scene here, "only the wearer is below 50%" (plus a "no light cone" control). They were withdrawn, because that one
-    // exposed a real engine gap, not a case written wrong:
+    // Note: the "only the wearer is below 50%" scene (plus a "no light cone" control) is not a case written wrong but an engine gap:
     //
     //   require(...) throws when resolveTarget returns null
     //   "Effect targets "random_ally_below_half_energy" but this event has no such party"
     //
     // Note: while "pick one at random" may legitimately have no candidate (the wearer is the only one low on energy, so it is excluded, so the qualifying set is empty). The correct semantics is
-    // "do nothing", and require treated that as an error. Note: that message is generic (one shared helper says the same sentence to every selector),
-    // so it pointed the diagnosis at "the event type is wrong" -- measured, that was wrong (the 'no light cone' control got 0, which says those 8 points really do come from this clause).
+    // "do nothing", and require treats that as an error. Note: that message is generic (one shared helper says the same sentence to every selector),
+    // so it points the diagnosis at "the event type is wrong" -- measured, that is wrong (the 'no light cone' control gets 0, which says those 8 points really do come from this clause).
     //
-    // The gap has been closed (`8c2ba29`: `resolveTargets` returns an empty list for this one name, following the `lowest_hp_ally` precedent),
-    // so that scene is back -- and it is the one that makes the mutation necessarily red, see the note below.
+    // `resolveTargets` returns an empty list for this one name, following the `lowest_hp_ally` precedent,
+    // and this scene is the one that makes the mutation necessarily red, see the note below.
     @Test
     public void aLoneLowWearerIsStillExcluded() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21021, LEVEL, false, 1));
@@ -95,7 +94,7 @@ public class Cone21021EnergyTest {
         double y = b.getCurrentEnergy() - b0;
         System.out.println("[21021] lone-low wearer=" + w + " allyA=" + x + " allyB=" + y);
         // Note: this scene is for mutation probing: the qualifying set has the wearer as its only candidate (the teammates are all full), so whether "exclude the wearer" or
-        // "below 50%" is torn out, the candidate becomes that one -- here the random degenerates into certainty, and the gain is no longer 0.
+        // "below 50%" is torn out, the candidate becomes that one -- here the random degenerates into certainty, and the gain is not 0.
         Assertions.assertEquals(0.0, w, 1e-9, "the wearer is never a candidate, low or not");
         Assertions.assertEquals(0.0, x, 1e-9, "an ally at full energy is above the threshold");
         Assertions.assertEquals(0.0, y, 1e-9, "and so is the other one");

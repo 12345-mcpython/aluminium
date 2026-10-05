@@ -44,10 +44,10 @@ public class TriggerTableTest {
     /**
      * An ordinary character with <b>no trigger file</b>, used as the "unregistered" control.
      *
-     * <p>Note: Looked up rather than named since 2026-09-2: this was Himeko (姬子) (1003) until her own kit was authored, and
-     * the control having acquired rules broke three of the claims below. See {@link TestCharacters}.
+     * <p>Note: Looked up rather than named: a named character can acquire rules of her own, which would break
+     * three of the claims below. See {@link TestCharacters}.
      */
-    // 2026-09-30: split in two. The "there is no file" facts (`TriggerTables.exists` is false, a lookup is a cache miss)
+    // Note: split in two. The "there is no file" facts (`TriggerTables.exists` is false, a lookup is a cache miss)
     // use a SYNTHETIC id that is never built; every use as a BODY builds 1002 instead, because those claims are about the table
     // the test installs or about the body's own data, not about the body having no rules.
     private static final int NO_TRIGGERS = 999999;
@@ -56,8 +56,8 @@ public class TriggerTableTest {
      * An ally whose ultimate connects with <b>every</b> enemy - the driver for the "per target hit" pair.
      *
      * <p>Named rather than looked up, because the property being asked for is a fact about one character's
-     * <b>skill data</b> (1003's ultimate is 全体攻击, all-target attack, 60 toughness, Fire), not about the engine. Note: She has a rule
-     * file of her own since 2026-09-2, and that is deliberately acceptable here: the number each test measures is
+     * <b>skill data</b> (1003's ultimate is all-target attack (全体攻击), 60 toughness, Fire), not about the engine. Note: She has a rule
+     * file of her own, and that is deliberately acceptable here: the number each test measures is
      * <em>Tribbie's</em> or <em>Robin's</em> energy, which only their own tables can credit, and none of her rules
      * grants energy to anybody ({@code resources/characters/1003.json}).
      */
@@ -181,10 +181,10 @@ public class TriggerTableTest {
      */
     @Test
     public void unregisteredCharacterHasAnEmptyTableAndTheBattleStillRuns() {
-        // 2026-09-30: this test asserts what an EMPTY TABLE does, so it builds the empty table itself instead of borrowing
+        // Note: this test asserts what an EMPTY TABLE does, so it builds the empty table itself instead of borrowing
         // the shared "unregistered character" control. Measured: that control's data matters here -- the assertion below is
         // about the character recovering energy from its own basic attack, and the last file-less id (1506) has max energy 0,
-        // so it read 0.0. Replacing a table is usually a trap (it deletes the rule under test, hit in round 0), but here the
+        // so it reads 0.0. Replacing a table is usually a trap (it deletes the rule under test), but here the
         // empty table IS the subject, which is exactly why it is the right construction.
         Character plain = CharacterFactory.create(1002, 80);
         plain.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1002, java.util.List.of()));
@@ -226,11 +226,9 @@ public class TriggerTableTest {
     /**
      * The trigger fires on the event that happened rather than on "the battle exists".
      *
-     * <p>Note: The expected numbers moved on 2026-09-2: this test used to assert that Robin had <b>no</b>
-     * battle-start rule, because her file held only her talent. Her two 行迹 (trace) abilities now live in the
-     * same file (华彩花腔 to {@code BATTLE_START}, 模进乐段 to {@code SKILL_CAST}), so the counts are
-     * per-event again - which is the actual claim being pinned: an event fires the rules that named
-     * <i>that</i> event and no others.
+     * <p>Note: The numbers are per-event: Robin's two traces (行迹) live in the
+     * same file (Coloratura Cadenza (华彩花腔) to {@code BATTLE_START}, Sequential Passage (模进乐段) to {@code SKILL_CAST}), so the counts are
+     * what is pinned: an event fires the rules that named <i>that</i> event and no others.
      */
     @Test
     public void battleStartAndACastFireDifferentRules() {
@@ -266,8 +264,7 @@ public class TriggerTableTest {
      * <p>Otherwise a content author would write a rule, see nothing happen, and have no way to tell
      * "my condition is wrong" from "the engine never fires this".
      *
-     * <p>The example used to be {@code ULT_CAST}, then {@code TURN_START} / {@code TAKING_HIT}; all
-     * three now have emitters, so the event is taken from the enum instead of being hard-coded. The
+     * <p>The event is taken from the enum instead of being hard-coded: it has an emitter. The
      * companion assertion {@link #everyDeclaredTriggerEventIsEmitted()} is what keeps the vocabulary
      * honest - without it the day every event is wired this test would silently stop covering the
      * rejection path.
@@ -352,13 +349,13 @@ public class TriggerTableTest {
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 2, 0));
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 3, 0));
 
-        // The identity reading is untouched: `self` is still an identity, not a number …
+        // The identity reading is untouched: `self` is still an identity, not a number ...
         TriggerTable selfIdentity = new TriggerTable(1, List.of(
                 trigger("ALLY_ATTACK", List.of("actor == self"), energy(1))));
         owner.setTriggerTable(selfIdentity);
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
 
-        // … and two *names* still get the clearer message rather than "no numeric literal".
+        // ... and two *names* still get the clearer message rather than "no numeric literal".
         IllegalArgumentException twoVariables = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new TriggerTable(1, List.of(
                         trigger("ALLY_ATTACK", List.of("actor == target"), energy(1)))));
@@ -377,10 +374,8 @@ public class TriggerTableTest {
      * An op whose prerequisite phase has not landed is rejected <b>with the phase named</b>, so the
      * author learns what to wait for instead of debugging a rule that can never work.
      *
-     * <p>Note: The example moved on 2026-09-2: it used to be {@code APPLY_BUFF}, which is now wired (it puts
-     * the target into a named state - see {@code TriggerStateTest}). {@code REDUCE_TOUGHNESS} is the one
-     * left, and it is spelled out here rather than derived from the interpreter's private set, because this
-     * test is about the <i>message</i>.
+     * <p>Note: {@code REDUCE_TOUGHNESS} is the op left without a phase, and it is spelled out here rather than
+     * derived from the interpreter's private set, because this test is about the <i>message</i>.
      */
     @Test
     public void plannedButUnwiredOpIsRejectedWithThePhaseNamed() {
@@ -406,7 +401,7 @@ public class TriggerTableTest {
     }
 
     // ==================================================================
-    // 4b. MODIFY_ATTR: the generic stat buff (P10-3)
+    // 4b. MODIFY_ATTR: the generic stat buff
     // ==================================================================
 
     /** The op writes a real modifier onto the owner's attribute. */
@@ -547,10 +542,9 @@ public class TriggerTableTest {
     }
 
     /**
-     * {@code AttributeType.fromString} documents itself as case-insensitive; that used to be false
-     * (the lookup table is lower-cased but the input was not), which only surfaced once data started
-     * naming attributes - every other test here passes {@code ATTACK} and would simply have failed
-     * to load. Mixed case is used here so the normalisation itself is what is under test.
+     * {@code AttributeType.fromString} documents itself as case-insensitive: the lookup table is lower-cased,
+     * so the input has to be lower-cased too, or a mixed-case attribute name simply fails to load.
+     * Mixed case is used here so the normalisation itself is what is under test.
      */
     @Test
     public void modifyAttrOpAcceptsAMixedCaseAttributeName() {
@@ -562,9 +556,9 @@ public class TriggerTableTest {
     }
 
     /**
-     * A misspelled {@code target} used to fall back to "the owner", so {@code "atacker"} behaved
-     * exactly like {@code "self"} - the rule fired and nothing was reported. Now it is a closed set
-     * like the condition variables.
+     * A misspelled {@code target} is refused instead of falling back to "the owner", which would make
+     * {@code "atacker"} behave exactly like {@code "self"} - the rule fires and nothing is reported. It is
+     * a closed set like the condition variables.
      */
     @Test
     public void unknownTargetSelectorIsRejected() {
@@ -694,7 +688,7 @@ public class TriggerTableTest {
         return op("GAIN_ENERGY", amount);
     }
 
-    // ---- MODIFY_ATTR helpers (P10-3) ----
+    // ---- MODIFY_ATTR helpers ----
 
     /** hp 1000 / def 200 / atk 300 / speed 100 - all different, so a mix-up shows up as a number. */
     private static Character character(String name) {

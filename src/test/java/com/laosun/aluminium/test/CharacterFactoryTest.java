@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * P8-1 acceptance: {@code CharacterFactory} + completion of the character identity fields.
+ * acceptance: {@code CharacterFactory} + completion of the character identity fields.
  *
  * <p>This item does not do skill assembly (that is P8-2), so what is asserted here is:
  * element / path / aggro / energy cap / level / panel scaling - that is, "a character's identity

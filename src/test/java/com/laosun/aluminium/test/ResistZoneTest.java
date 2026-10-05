@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * P1-6 acceptance: the resistance zone reads the defender's per-element table
+ * acceptance: the resistance zone reads the defender's per-element table
  * (HSR.md §2.5: resistance zone = 1 - clamp(resistance - penetration), resistance ∈ [-100%, 90%]).
  *
  * <p>Every defender here has DEFENCE = 0 so the resistance zone is isolated.

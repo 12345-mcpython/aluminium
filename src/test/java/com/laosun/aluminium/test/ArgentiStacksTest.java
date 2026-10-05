@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 银枝 (1302), from her own file (2026-09-28): [升格], the talent's per-hit energy, trace 勇气 and Eidolon 1/4.
+ * Argenti (银枝) (1302), from her own file: [升格], the talent's per-hit energy, trace Courage (勇气) and Eidolon 1/4.
  *
- * <p><b>What it needed.</b> Nothing new - which is the point of writing it now: the talent's "for each 1 enemy target hit ... restore 3 energy"
+ * <p><b>What it needed.</b> Nothing new - which is the point: the talent's "for each 1 enemy target hit ... restore 3 energy"
  * is {@code per_target} on {@code GAIN_ENERGY}, [升格] is a <b>stackable named modifier</b> (`max_stacks: 10` + `buff: 升格`),
- * and 勇气's "enemy targets whose current HP percentage <= 50%" is the existing {@code target_hp_percent} condition. The two rules that
+ * and Courage (勇气)'s "enemy targets whose current HP percentage <= 50%" is the existing {@code target_hp_percent} condition. The two rules that
  * read like new vocabulary (Eidolon 4's cap raise, Eidolon 6's defence ignore) are registered instead of approximated.
  */
 public class ArgentiStacksTest {
@@ -71,7 +71,7 @@ public class ArgentiStacksTest {
                 "…and the count is readable by name, which is what Eidolon 4 and any removal would use");
     }
 
-    /** trace 虔诚 grants a stack on her own turn start. */
+    /** trace Piety (虔诚) grants a stack on her own turn start. */
     @Test
     public void herTraceGrantsAStackOnHerTurn() {
         Fixture f = new Fixture();
@@ -83,7 +83,7 @@ public class ArgentiStacksTest {
                 "「回合开始时，立即获得1层【升格】」");
     }
 
-    /** trace 勇气 boosts the instance that lands on a hurt enemy, and only that one. */
+    /** trace Courage (勇气) boosts the instance that lands on a hurt enemy, and only that one. */
     @Test
     public void herTraceBoostsDamageOnHurtEnemies() {
         Fixture f = new Fixture();
@@ -101,7 +101,7 @@ public class ArgentiStacksTest {
      *
      * <p>Note: Measured on the ATTRIBUTE, and the arithmetic has a trap worth stating: Eidolon 4 grants two layers at battle
      * start and they share the talent's stack group, so a cap of 12 is reached by 2 + 10 - twelve more hits still only
-     * add ten. The probe that settled it (round 66) printed, at E0 vs E4: 10 stacks / crit 0.30 against 12 stacks in the
+     * add ten. The probe printed, at E0 vs E4: 10 stacks / crit 0.30 against 12 stacks in the
      * group / crit 0.35 - the raise is real, and an expectation of "base + 12  x  0.025" double-counts those two layers.
      * Note: `stacksOf("升格")` is <b>not</b> usable here either: three modifier groups carry that name (the talent's crit
      * rate, Eidolon 1's crit damage, Eidolon 4's battle-start pair), and a name count adds them up.

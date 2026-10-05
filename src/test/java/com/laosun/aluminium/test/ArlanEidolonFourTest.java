@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1008: "after entering battle, when he takes a lethal attack 阿兰 will not enter the unable-to-fight state, and immediately restores to 25% of his own Max HP.
- * This effect is automatically removed after triggering 1 time or after lasting 2 turns" (2026-10-02).
+ * 1008: "after entering battle, when he takes a lethal attack Arlan (阿兰) will not enter the unable-to-fight state, and immediately restores to 25% of his own Max HP.
+ * This effect is automatically removed after triggering 1 time or after lasting 2 turns".
  *
  * <p>THREE READINGS, ONE VARIABLE EACH: the eidolon rank, the NUMBER of lethal blows, and the NUMBER of his own turns that
  * elapse before the blow. The trace is a state, so it can be asked about directly -- which is what makes "automatically removed" testable.

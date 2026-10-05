@@ -125,7 +125,7 @@ public class RelicTriggerTableTest {
     private static final int BROKEN_KEEL = 310;
     /** Knight of Purity Palace (净庭教宗的圣骑士): DEF +15%; raise the shield the wearer provides by 20%. */
     private static final int KNIGHT_OF_PURITY = 103;
-    /** Self-Enshrouded Recluse (自匿星芒的隐士): the shield provided is raised by 10%; 12% more, and when an ally holds a shield the wearer provided, CRIT DMG +15% (M-53). */
+    /** Self-Enshrouded Recluse (自匿星芒的隐士): the shield provided is raised by 10%; 12% more, and when an ally holds a shield the wearer provided, CRIT DMG +15%. */
     private static final int RECLUSE = 128;
 
     /**
@@ -247,7 +247,7 @@ public class RelicTriggerTableTest {
             // Authored on 2026-09-28, the day a shield could remember WHO created it: "提供的护盾量提高 X%" is the
             // giver's own number (`AttributeType.SHIELD_BOOST`, read by `Battle.boostedShield` from the provider).
             // Note: Set 128's 4-piece ships one of its two sentences: the other one asks, per ally, whether the shield
-            // that ally holds is the wearer's, and a whole-rule condition cannot say that (M-53).
+            // that ally holds is the wearer's, and a whole-rule condition cannot say that.
             "103/4",
             "128/2",
             "128/4",
@@ -686,7 +686,7 @@ public class RelicTriggerTableTest {
      * (stat + ability) shape lives, so missing that tier would hide most of the gap. It was eight before 326
      * (City of Converging Stars) and 115 (The Ashblazing Grand Duke) became authorable, <b>five</b> since
      * 2026-09-2(set 106 joined them), and <b>22</b> once the 1mixed 2-piece abilities that no longer
-     * count as invisible were registered (M-25). It is <b>11</b> since 2026-09-28, when 128's 2-piece
+     * count as invisible were registered. It is <b>11</b> since 2026-09-28, when 128's 2-piece
      * ("提供的护盾量提高10%") became authorable with the shield-amount boost.
      */
     @Test

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23062 随心, sentence 4: `per 1 point of energy spent, increases the ultimate damage dealt this time by #3%, up to #6%`.
+ * Light cone 23062 At Will (随心), sentence 4: `per 1 point of energy spent, increases the ultimate damage dealt this time by #3%, up to #6%`.
  *
  * <p>Note: Why this is unit-level: an ultimate can only be cast at full energy (`Battle.castUltra`'s second line calls `isUltraReady`, and measured, 10 points of energy
  * makes it `return false` directly), so the "two kinds of spend" cannot be produced end to end. Here a `Damage` is built by hand and `castEnergySpent` is set on the instance

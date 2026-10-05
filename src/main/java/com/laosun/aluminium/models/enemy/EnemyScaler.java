@@ -6,7 +6,7 @@ import com.laosun.aluminium.beans.MonsterConfig;
 import com.laosun.aluminium.beans.MonsterTemplate;
 
 /**
- * Enemy attribute value formula (P2-3): multiplies "template base value / stage level group /
+ * Enemy attribute value formula: multiplies "template base value / stage level group /
  * per-instance adjustment / elite group" into the final stat sheet.
  *
  * <pre>

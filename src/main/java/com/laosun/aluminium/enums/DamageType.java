@@ -36,16 +36,16 @@ import java.util.Map;
  *       Note: There is currently no behavioral difference: the crittable and boostable flags of
  *       {@code NORMAL}/{@code SKILL}/{@code ULTRA} are identical, so for now it does not affect the
  *       numbers</td></tr>
- *   <tr><td>{@link #ADDITIONAL} / {@link #TRUE}</td><td>Additional damage / true damage (P1-9)</td></tr>
- *   <tr><td>{@link #BREAK} / {@link #SUPER_BREAK} / {@link #DOT}</td><td>Break / super break / DOT (P4)</td></tr>
+ *   <tr><td>{@link #ADDITIONAL} / {@link #TRUE}</td><td>Additional damage / true damage</td></tr>
+ *   <tr><td>{@link #BREAK} / {@link #SUPER_BREAK} / {@link #DOT}</td><td>Break / super break / DOT</td></tr>
  *   <tr><td>{@link #SKILL} / {@link #ULTRA}</td><td>0 references - cannot be distinguished
  *       until the skill data gains a {@code damage_type} (everything is {@code NORMAL} for now)</td></tr>
  *   <tr><td>{@link #EXTRA}</td><td>0 references - the "extra damage" in the spec, with no source</td></tr>
  *   <tr><td>{@link #TECHNIQUE}</td><td>0 references - technique damage; the technique itself is
- *       currently only attached in {@code Battle.startBattle()} (P8-2) and its effect is not
- *       implemented (P8-6)</td></tr>
+ *       currently only attached in {@code Battle.startBattle()} and its effect is not
+ *       implemented</td></tr>
  *   <tr><td>{@link #MEMORY}</td><td>0 references - memosprite damage, waiting on P9-4 summons</td></tr>
- *   <tr><td>{@link #ELATION}</td><td>0 references - the elation system (P10); not even
+ *   <tr><td>{@link #ELATION}</td><td>0 references - the elation system; not even
  *       {@code elation_basic_level_damage.json} has been loaded yet</td></tr>
  * </table>
  */

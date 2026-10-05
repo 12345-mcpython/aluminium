@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 121 Huohuo (藿藿) 星魂 (Eidolon) 2's third sentence: "...<b>decreases [禳命]'s remaining turns by 1</b>" (2026-10-02).
+ * 121 Huohuo (藿藿) Eidolon (星魂) 2's third sentence: "...<b>decreases [禳命]'s remaining turns by 1</b>".
  *
  * <p>THE SCENE IS COPIED VERBATIM from the shipped judge for the same sentence, `TalismanSavesAnAllyTest.afterLethalBlows`: the same
- * party, the same skill, and -- the detail that cost two rounds -- `SkillExecutor.execute(battle, skill, her,
- * List.of(battle.enemies.getFirst()))`, i.e. the skill is aimed at the ENEMY. Aiming it at the ally leaves her WITHOUT [禳命], which
- * made every earlier reading say "the rule never ran".
+ * party, the same skill, and `SkillExecutor.execute(battle, skill, her,
+ * List.of(battle.enemies.getFirst()))`, i.e. the skill is aimed at the ENEMY. Aiming it at the ally leaves her WITHOUT [禳命], so
+ * every reading says "the rule never ran".
  *
  * <p>The reduction is the mechanism the game's own config uses: `Avatar_Huohuo_00_Rank02_Insert` does
  * `SetModifierValue{ModifierName: "MAvatar_Huohuo_Passive_HealMark", ModifyFunction: "Add", ValueType: "LifeTime"}`, beside a

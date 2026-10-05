@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408："变身期间…施放攻击后回复等同于自身生命上限 20% 的生命值" (while transformed, casting an attack restores HP equal to 20% of her own Max HP) (2026-10-02).
+ * 1408: "变身期间...施放攻击后回复等同于自身生命上限 20% 的生命值" (while transformed, casting an attack restores HP equal to 20% of her own Max HP).
  *
  * <p>TWO-WAY, and the control is the SAME fight without the transformation. She is hurt first through the battle's own damage
  * entry point, so a heal has something to restore.
@@ -68,7 +68,7 @@ public class TransformationHealsOnAttackTest {
         double maxHp = owner.getMaxHp();
         Assertions.assertTrue(hurt < maxHp, "precondition: she was really hurt (" + hurt + " of " + maxHp + ")");
 
-        // Note: Her BASIC attack, not her skill: the document says 卡厄斯兰那 (Khaslana) "拥有 1 个强化普攻和 2 个强化战技" (has 1 enhanced basic attack and 2 enhanced Skills), so the transformed
+        // Note: Her BASIC attack, not her skill: the document says Khaslana (卡厄斯兰那) "拥有 1 个强化普攻和 2 个强化战技" (has 1 enhanced basic attack and 2 enhanced Skills), so the transformed
         // form attacks with the basic slot.
         Skill skill = owner.getSkills().get(SkillType.COMMON);
         Assertions.assertNotNull(skill, "precondition: she has a basic attack");

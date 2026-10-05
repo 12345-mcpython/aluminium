@@ -18,17 +18,17 @@ import java.util.Random;
 /**
  * "while in the [协奏] state, Robin (知更鸟) is immune to control-class negative states" - the immunity, asserted BOTH ways.
  *
- * <p>The clause has been shipped since 2026-09-28, together with clause 3's party ATK boost, in one ULT_CAST rule that carries
- * the name 协奏 (concerto); this class pins what nothing else did: the same control that lands after the countdown cannot land while
+ * <p>The clause has shipped together with clause 3's party ATK boost, in one ULT_CAST rule that carries
+ * the name concerto (协奏); this class pins what nothing else did: the same control that lands after the countdown cannot land while
  * the state lasts, because the immunity ends with the state rather than with a turn count. It also records that ULT_CAST
  * arrives at the tables exactly once per cast.
  *
- * <p>Note: <b>How this class was born.</b> I first wrote a second copy of ③⑤ and measured a party ATK gain of
- * 45.081848 where 0.228 x the pre-cast ATK + 200 is 386.844908 -- and misread that as an engine bug. The duplicate
+ * <p>Note: <b>How this class was born.</b> A second copy of the clauses measured a party ATK gain of
+ * 45.081848 where 0.228 x the pre-cast ATK + 200 is 386.844908 -- which reads like an engine bug. The duplicate
  * was the cause: the first rule computes 386.844908 (her ATK then reads 1206.499) and the second recomputes
  * 45.081848 from that boosted value, replacing the first because both carry the same name. The instrument was too
  * coarse to see it (the counter counts EVENTS, not rules), and the probe that would have shown the existing rule printed
- * into a report I read truncated. See GAPS and HANDOFF's discipline 31.
+ * into a report that was read truncated. See GAPS and HANDOFF's discipline 31.
  */
 public class RobinConcertoTest {
     private static final int ROBIN = 1309;

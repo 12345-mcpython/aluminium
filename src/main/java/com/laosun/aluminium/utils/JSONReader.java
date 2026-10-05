@@ -60,7 +60,7 @@ public final class JSONReader {
         try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             T parsed = GSON.fromJson(reader, type);
             if (parsed == null) {
-                // M-1: the same "the environment is not prepared" case as a missing file, one step
+                // the same "the environment is not prepared" case as a missing file, one step
                 // later. Gson returns null for a zero-byte file or a literal `null`, and handing that
                 // back would put a null *table* into Constant (WEAPONS = frozen(null)) - it then blows
                 // up as an NPE on some unrelated line, or, worse, behaves like a silently empty table.

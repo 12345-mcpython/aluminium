@@ -178,7 +178,7 @@ public class SkillPointPolicyExtensibilityTest {
      *
      * <p>This pins down the boundary of responsibility: whether an enemy action counts towards skill points
      * is the policy's business ({@code StandardSkillPointPolicy} checks {@code Camp.PLAYER}), not
-     * {@code Battle}'s. When "friendly summons" (P9-4) are added later and this rule has to be adjusted,
+     * {@code Battle}'s. When "friendly summons" are added later and this rule has to be adjusted,
      * what changes is the policy, not the engine.
      */
     @Test

@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1402 Aglaea (阿格莱雅)'s talent: "after attacking an enemy in the [间隙织线] state, additionally deal lightning additional damage equal to 30% of Aglaea's ATK".
+ * 1402 Aglaea (阿格莱雅)'s talent: "after attacking an enemy in the [间隙织线] (Seam Stitch) state, additionally deal lightning additional damage equal to 30% of Aglaea's ATK".
  *
- * <p>Note: Both directions, with "while the 衣匠 is on the field" held fixed: the same summon is out in both runs, so the only difference is the state
+ * <p>Note: Both directions, with "while the Garmentmaker (衣匠) is on the field" held fixed: the same summon is out in both runs, so the only difference is the state
  * on the target. The clause's other half -- the state is APPLIED by her attacks -- is a separate sentence and is not claimed here.
  */
 public class AglaeaFissureTest {
@@ -75,13 +75,13 @@ public class AglaeaFissureTest {
         };
         Battle battle = new Battle(List.of(aglaea, ally), List.of(enemy), noCrit);
         battle.startBattle();
-        // "while the 衣匠 is on the field" -- held fixed, and it is also the condition the rule needs.
+        // "while the Garmentmaker (衣匠) is on the field" -- held fixed, and it is also the condition the rule needs.
         battle.summonMemosprite(aglaea);
         if (threaded) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0);
         }
         double before = enemy.getCurrentHp();
-        // Note: COMMON, not SKILL: her Skill heals/summons the 衣匠 (Garmentmaker) (no damage at all), so her attack is the basic one.
+        // Note: COMMON, not SKILL: her Skill heals/summons the Garmentmaker (衣匠) (no damage at all), so her attack is the basic one.
         battle.castImmediate(aglaea.getSkills().get(SkillType.COMMON), aglaea, List.of(enemy));
         double dealt = before - enemy.getCurrentHp();
         Assertions.assertFalse(enemy.isDeath(), "the judged hit must not kill the victim");

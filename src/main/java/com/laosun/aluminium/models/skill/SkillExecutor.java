@@ -45,8 +45,8 @@ import static java.lang.IO.println;
  *
  * <p>After the segments are settled the attack-level event
  * {@link com.laosun.aluminium.models.event.AttackEvent} is broadcast to every ally, carrying
- * the actually-hit targets and the total settled damage - that is where Robin's (知更鸟) [协奏]
- * (Concerto) / Tribbie's (缇宝) field spawn additional damage / true damage from someone else's
+ * the actually-hit targets and the total settled damage - that is where Robin (知更鸟)'s [concerto (协奏)]
+ * (Concerto) / Tribbie (缇宝)'s field spawn additional damage / true damage from someone else's
  * attack.
  *
  * @see SkillEffectType#isDamaging()
@@ -59,7 +59,7 @@ public final class SkillExecutor {
     /**
      * Expands one skill activation into hits, settles them and broadcasts the attack event.
      *
-     * <p>This is the single hook for skill energy gain (P3-2): no matter whether the skill deals
+     * <p>This is the single hook for skill energy gain: no matter whether the skill deals
      * any damage (buffs/shields/heals also gain energy) and no matter whether the params are empty,
      * the caster is settled once through
      * {@link Battle#grantSkillEnergy(CanHit, Skill, Set)} when the cast finishes.
@@ -71,10 +71,10 @@ public final class SkillExecutor {
      */
     public static void execute(Battle battle, Skill skill, CanHit user, List<? extends CanHit> targets) {
         Set<CanHit> hitTargets = new LinkedHashSet<>();   // targets actually hit (including those that died on the spot)
-        // P11-1 (M-40): the pre-cast hook, and the only moment at which a rule can still change what this cast
+        // The pre-cast hook, and the only moment at which a rule can still change what this cast
         // does. It fires before the damage is expanded because "this cast's damage is not mine to deal" is a fact
         // about the CAST: a rule that learns it afterwards (on ULT_CAST, say) can no longer stop the swing.
-        // Which cast this is, computed ONCE and early (2026-09-30): `CAST_SETUP` is the pre-cast hook and the only
+        // Which cast this is, computed ONCE and early: `CAST_SETUP` is the pre-cast hook and the only
         // place a rule can raise something the cast's OWN heal must see, so it has to know the slot -- cones 20001 /
         // 21000 state exactly that. The expression is the same one the after-events use, so the two cannot disagree.
         SkillCategory category = skill == null || skill.getData() == null
@@ -82,15 +82,15 @@ public final class SkillExecutor {
                 : skill.getData().getCategory();
         Battle.PendingCast cast = battle.beginCast(skill, user);
         try {
-            // The AIMED unit, not null (2026-09-30): `targets` is the caller's selection and only its first entry is
+            // The AIMED unit, not null: `targets` is the caller's selection and only its first entry is
             // the main target (see the method's javadoc), so this is exactly the unit the cast is aimed at -- the ally,
             // when the skill is aimed at one. The pre-cast hook is where a rule still has time to change what the cast
-            // does, so it must be able to answer "at WHOM". Reader: light cone 23048 clause 3 ("after the wearer casts
+            // does, so it must be able to answer "at WHOM". Its reader is light cone 23048 clause 3 ("after the wearer casts
             // a skill on a single ally, the TARGET's skill damage rises"), which needs a category-carrying event that
             // fires BEFORE settlement and names the ally -- SKILL_CAST names it but fires after, and it is refused by
             // `from_category` for that reason (see CAST_CARRYING_EVENTS).
             CanHit aimed = targets == null || targets.isEmpty() ? null : targets.getFirst();
-            // The slot rides along (2026-10-02): the comment above already states that the pre-cast hook "has to know the slot",
+            // The slot rides along: the comment above already states that the pre-cast hook "has to know the slot",
             // but the call did not pass one, so `from_skill_id` read 0 on this event -- measured: a rule gated on
             // `self has_state <state>` + `target == self` + `actor is_summon` FIRED, and the same rule plus `from_skill_id == 0` also
             // fired while `from_skill_id == 16` and `== 1141516` did not. Passing it is what makes a NON-attack cast nameable: a
@@ -104,13 +104,13 @@ public final class SkillExecutor {
         } finally {
             battle.endCast(cast);
         }
-        // P8-6: the skill cast event - placed between "damage has been expanded" and "energy has
+        // The skill cast event - placed between "damage has been expanded" and "energy has
         // been settled", so a listener gets both "what was cast" and "who was actually hit".
         // Non-damaging skills fire it too (hitTargets empty), which is exactly the trigger source
         // for effects like "restore skill points after casting a skill".
         //
         // Note: A delegated cast fires it with an EMPTY hit set, and that is the point: the swing happens later, as
-        // whatever the rules deliver it with (for 长夜月's ultimate, `COMMAND_SUMMON` on this very event). So a
+        // whatever the rules deliver it with (for Evernight (长夜月)'s ultimate, `COMMAND_SUMMON` on this very event). So a
         // delegated cast is "no damage of mine", never "no cast happened".
         try {
             broadcastSkillCast(battle, user, skill, hitTargets, targets);
@@ -123,7 +123,7 @@ public final class SkillExecutor {
     }
 
     /**
-     * Fires {@link com.laosun.aluminium.models.event.SkillCastEvent} (P8-6) - 
+     * Fires {@link com.laosun.aluminium.models.event.SkillCastEvent} - 
      * same convention as {@link #broadcastAfterAttack}: every one of our members receives it,
      * and interested parties receive it directly. Deliberately does not require {@code hitTargets} to
      * be non-empty (non-damaging skills fire it too).
@@ -135,7 +135,7 @@ public final class SkillExecutor {
         for (CanHit ally : battle.allies) {
             ally.onSkillCast(battle, user, skill, hits, chosen);
         }
-        // P8-: the same moment, delivered to the data-driven trigger tables.
+        // The same moment, delivered to the data-driven trigger tables.
         //
         // Three events are derived from a cast, because the game's text distinguishes them:
         //   ULT_CAST      "after the wearer uses their Ultimate"   -- owner filters with `actor == self`
@@ -149,9 +149,9 @@ public final class SkillExecutor {
         //
         // The split has to be made here rather than in the data, because the condition DSL has no
         // variable for the kind of cast (it knows actor / target / hit_count only). Note: It is also the
-        // bug that this switch exists to close (2026-09-2): before it, SKILL_CAST meant "any cast that
-        // is not an ultimate", so "when the wearer uses their Skill" rules -- relic set 109's ATK buff,
-        // Robin's 模进乐段 -- also fired on basic attacks. An over-trigger is a wrong number with no
+        // bug that this switch exists to close: if SKILL_CAST meant "any cast that
+        // is not an ultimate", "when the wearer uses their Skill" rules -- relic set 109's ATK buff,
+        // Robin (知更鸟)'s Sequential Passage (模进乐段) -- would also fire on basic attacks. An over-trigger is a wrong number with no
         // error attached, which is exactly what this project treats as the worst failure mode.
         //
         // Everything else (technique, map basic attack, assist, elation damage, talents with an empty
@@ -169,12 +169,12 @@ public final class SkillExecutor {
         // first entry, which for a support cast is the ally chosen. Note: It is NOT "everything the effect
         // reached": an AOE reaches several units and only the first of them is named here, so a rule that
         // cares about coverage still counts `hit_count`, and the per-target events (HP_LOST etc.) carry their
-        // own subject. The distinction is what "make a designated single ally ..." needs (2026-09-28, M-35): before this the
+        // own subject. The distinction is what "make a designated single ally ..." needs: before this the
         // field was null for every cast, and "the ally I chose" was unexpressible.
         CanHit aimed = chosen.isEmpty() ? null : chosen.getFirst();
 
-        // How many of the targets this attack CONNECTED WITH carry its own element's weakness (2026-09-30; reader:
-        // cone 21040). Counted here because this is the only place holding the whole set; the per-target events cannot
+        // How many of the targets this attack CONNECTED WITH carry its own element's weakness (cone 21040).
+        // Counted here because this is the only place holding the whole set; the per-target events cannot
         // reconstruct it, since a multi-target attack fires them one target at a time.
         int weakHitCount = 0;
         if (skill != null && skill.getData() != null && skill.getData().getElement() != null) {
@@ -205,14 +205,14 @@ public final class SkillExecutor {
             // OUR attacks, so the unit it was aimed at is always on the other side -- no rule of ours could ask
             // about it (`target == self` would be permanently false, and there is no selector for "an enemy").
             // Passing it would be information with no reader, which is the shape this project keeps refusing.
-            // Note: category rides along (2026-09-28): "cast a basic attack/Skill/Ultimate 2 times" must tell the three slots apart, and this
+            // Note: category rides along: "cast a basic attack/Skill/Ultimate 2 times" must tell the three slots apart, and this
             // is the one event that fires once per CAST (DEALING_DAMAGE would count hits).
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
         }
     }
 
     /**
-     * Switch for the undispatched diagnostic log of non-damaging skills (item 3 of the P8-2 plan).
+     * Switch for the undispatched diagnostic log of non-damaging skills.
      *
      * <p>{@link #resolveHits} silently returns when "the skill is not a damaging one" - that is,
      * after a heal/shield/buff/control/summon skill is cast nothing at all happens (only the
@@ -220,9 +220,8 @@ public final class SkillExecutor {
      * "went off", there was just no effect. So a toggleable diagnostic is provided here.
      *
      * <p>Why it is off by default: {@code Main}'s demo casts heals and shields every turn, and
-     * having it on by default would flood the output. The plan originally wanted a bare
-     * {@code IO.println}, but in practice that polluted the demo output, so it was changed to an
-     * explicit switch.
+     * having it on by default would flood the output. A bare {@code IO.println} would pollute the demo output, so it is an
+     * explicit switch instead.
      */
     private static boolean logNotDispatched = false;
 
@@ -255,14 +254,14 @@ public final class SkillExecutor {
         println("[SkillExecutor] NOT DISPATCHED: " + data.getSkillType() + " / " + effect
                 + " (" + user.getName() + ", "
                 + (targets == null ? "null" : targets.size() + " target(s)")
-                + ") → owned by " + phase);
+                + ") -> owned by " + phase);
     }
 
     /**
-     * Runs a non-damaging skill's effect (P10-3) instead of doing nothing.
+     * Runs a non-damaging skill's effect instead of doing nothing.
      *
-     * <p><b>What this replaced.</b> This method used to not exist: {@code resolveHits} simply returned,
-     * so a heal / shield / buff / control / summon skill was cast, cost its skill point, granted its
+     * <p><b>What this replaced.</b> Without this, {@code resolveHits} simply returns,
+     * so a heal / shield / buff / control / summon skill is cast, costs its skill point, grants its
      * energy and changed nothing. The demo's "healing" only worked because {@code Main} had grown a
      * second, hand-rolled dispatch path of its own - the engine quietly depending on its caller.
      *
@@ -270,7 +269,7 @@ public final class SkillExecutor {
      * for skills that have an entry in {@code data/skill_effects.json}. The table cannot be derived
      * from {@code skills.json} alone, so anything missing keeps the old behaviour <i>and</i> keeps the
      * diagnostic - {@link #logNotDispatched} names the phase that owns it. Treating "no entry" as
-     * "nothing to do" silently is exactly the bug being fixed here, so the distinction is preserved.
+     * "nothing to do" silently is exactly the bug this distinction avoids, so the distinction is preserved.
      *
      * @param battle  the running battle
      * @param skill   the skill being cast (its identity keys the table)
@@ -343,7 +342,7 @@ public final class SkillExecutor {
      * flat addition.
      *
      * <p>The row is chosen by the skill's <b>current level</b> - its own level from the character file plus this
-     * battle's raises ({@code CanHit.skillLevel}, M-32) - never hardcoded to max level, and the same resolver the
+     * battle's raises ({@code CanHit.skillLevel}) - never hardcoded to max level, and the same resolver the
      * damaging path and {@code TriggerInterpreter.multiplierOf} use.
      *
      * @throws IllegalStateException when the table names a parameter the skill row does not have,
@@ -435,13 +434,13 @@ public final class SkillExecutor {
         if (params == null || params.isEmpty()) {
             return;
         }
-        // ? The description names the base (2026-09-29): "DEF" -> DEF, "Max HP" -> Max HP, otherwise ATK. 18 documents scale a DAMAGE clause
+        // Note: The description names the base: "DEF" -> DEF, "Max HP" -> Max HP, otherwise ATK. 18 documents scale a DAMAGE clause
         // off Max HP and 3 off DEF, and multiplying ATTACK for those dealt the wrong damage.
         AttributeType baseAttribute = data.damageBaseAttribute();
         double base = user.getAttribute(baseAttribute).get() * params.getFirst();
-        // ? A blast states TWO multipliers: the centre and the neighbours (2026-09-29). 1008's ultimate row is
-        // `[1.92, 0.96]`..`[3.2, 1.6]` - the second exactly half the first, matching "320%…and 160% to enemies adjacent to it".
-        // Until this, the centre value was applied to the neighbours too, i.e. double the documented damage on every
+        // Note: A blast states TWO multipliers: the centre and the neighbours. 1008's ultimate row is
+        // `[1.92, 0.96]`..`[3.2, 1.6]` - the second exactly half the first, matching "320%...and 160% to enemies adjacent to it".
+        // Applying the centre value to the neighbours too would double the documented damage on every
         // blast skill in the corpus.
         double neighbourBase = params.size() > 1
                 ? user.getAttribute(baseAttribute).get() * params.get(1)
@@ -450,21 +449,21 @@ public final class SkillExecutor {
 
         double totalDamage = 0;
 
-        // An ElationDamage row reads its params as [hits, per-hit share, final split share] (2026-10-02; readers 8009/8010
+        // An ElationDamage row reads its params as [hits, per-hit share, final split share] (readers 8009/8010
         // slot 20, whose text is "deal #1 instances of damage, each dealing #2% to a random single enemy ... The last deals #3% ..., divided evenly among all enemies").
         // Note: The row's own `skill_effect` is AoEAttack, so without this branch the leading 8 is read as a MULTIPLIER -- 800% damage
         // -- which is the mis-reading the CAST_SKILL comment names as the reason the Elation auto-casts stay registered.
-        // The damage type and the Elation boost already follow the data (2026-09-30 "slice 1b"), so only the row reading is new.
+        // The damage type and the Elation boost already follow the data, so only the row reading is new.
         // Note: `getSkillType()` hands back the DATA's own spelling, which for these rows is `ElationDamage`; the enum's name is
-        // accepted too, so the branch does not depend on which of the two the loader kept (the first version compared a String
-        // to the enum and did not compile).
+        // accepted too, so the branch does not depend on which of the two the loader kept (comparing a String
+        // to the enum does not compile).
         String elationKind = data.getSkillType();
         if (elationKind != null && ("ElationDamage".equalsIgnoreCase(elationKind)
                 || "ELATION_SKILL".equalsIgnoreCase(elationKind))) {
             int elationHits = (int) Math.round(params.getFirst());
             double perHit = params.size() > 1 ? params.get(1) : params.getFirst();
             double perHitBase = user.getAttribute(baseAttribute).get() * perHit;
-            // H-3's rule, applied here too: the row's stance value is the WHOLE skill's toughness reduction, so it is spread
+            // The rule, applied here too: the row's stance value is the WHOLE skill's toughness reduction, so it is spread
             // evenly over the instances this row settles (the hits plus the one final split instance).
             double elationStance = data.stanceFor(true) / Math.max(1, elationHits + 1);
             for (int i = 0; i < elationHits; i++) {
@@ -522,8 +521,8 @@ public final class SkillExecutor {
             }
 
             case BOUNCE -> {
-                // ? Bounce rows disagree on layout (measured 2026-09-29): 1009 `[0.25]` (count in prose), 1108 `[4, 0.28]`
-                // (count first), 1004 `[0.36, 0.65, 0.1, 2]` (count last). Reading a fixed index made shipped Welt compute
+                // Note: Bounce rows disagree on layout (measured): 1009 `[0.25]` (count in prose), 1108 `[4, 0.28]`
+                // (count first), 1004 `[0.36, 0.65, 0.1, 2]` (count last). Reading a fixed index makes shipped Welt compute
                 // `(int) 0.65` = 0 hits, i.e. no damage at all - so both numbers now come from the description's placeholders.
                 Double bounceShare = data.bounceDamageShare();
                 double bounceBase = bounceShare == null
@@ -531,9 +530,9 @@ public final class SkillExecutor {
                         : user.getAttribute(baseAttribute).get() * bounceShare;
                 Integer additional = data.bounceAdditionalHits(bounceShare);
                 int hits = (additional == null ? 0 : additional) + 1;
-                // plus whatever a rule has granted this slot (2026-10-02).
+                // plus whatever a rule has granted this slot.
                 hits += user.skillHitBonus(skill.getSkillSlot());   // "additionally deal N instances": the total is N + 1
-                // H-3: for a bounce, `single` is the total toughness reduction of the whole skill,
+                // The rule for a bounce: `single` is the total toughness reduction of the whole skill,
                 // so it MUST be spread evenly over the hits; otherwise more hits means more reduction
                 double perHitStance = data.stanceFor(true) / Math.max(1, hits);
                 for (int i = 0; i < hits; i++) {
@@ -552,14 +551,14 @@ public final class SkillExecutor {
             }
         }
 
-        // The attack-level event (P8-6). Single implementation lives on Battle, because a summon's attack
+        // The attack-level event. Single implementation lives on Battle, because a summon's attack
         // (EnemySkill) is an attack too and must raise the same notification -- see Battle.fireAfterAttack for
         // which attacks qualify and why derived hits deliberately do not.
         battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage);
     }
 
     /**
-     * The dispatch-table entry a <b>non-damaging</b> cast can really execute, or {@code null} (2026-10-02).
+     * The dispatch-table entry a <b>non-damaging</b> cast can really execute, or {@code null}.
      *
      * <p>Factored out of {@link #dispatchNonDamaging} so that a caller which has to decide <i>before</i> the cast
      * whether it will do anything can ask the same question - {@code CAST_SKILL} refuses loudly when the answer is
@@ -567,7 +566,7 @@ public final class SkillExecutor {
      */
     static SkillEffectSpec deliverableSpec(Skill skill) {
         SkillEffectSpec spec = SkillEffects.forSkill(skill);
-        // A third shape (2026-10-02): "surprise attack" commands a copy of 1412's SKILL, which is a BUFF -- its work is done by the
+        // A third shape: "surprise attack" commands a copy of 1412's SKILL, which is a BUFF -- its work is done by the
         // rule table (`skill_grants_military_merit` on SKILL_CAST), so there is no amount to restore or shield. `Rules` says
         // exactly that, and it has no parameter row to be ambiguous about.
         boolean supported = spec != null
@@ -594,9 +593,9 @@ public final class SkillExecutor {
     }
 
     /**
-     * Settles one hit, reduces toughness (P4-2) and accumulates it into the attack summary.
+     * Settles one hit, reduces toughness and accumulates it into the attack summary.
      *
-     * <p>Toughness reduction follows the "two chains share one nominal value" convention (P4-6):
+     * <p>Toughness reduction follows the "two chains share one nominal value" convention:
      * {@link Battle#reduceToughness} hands back both the amount actually reduced and the excess, and
      * the latter turns into one instance of super break damage when the caster carries
      * {@link SuperBreakBuff}.
@@ -608,12 +607,12 @@ public final class SkillExecutor {
      * @return the settled damage of this hit (0 if the target was dead / invulnerable)
      */
     /**
-     * Which {@link DamageType} a cast produces, read from the parsed skill data (2026-09-30).
+     * Which {@link DamageType} a cast produces, read from the parsed skill data.
      *
      * <p>The only distinction today is Elation: the data spells it {@code ElationDamage} on the attack type, and
      * {@link SkillCategory} has parsed that value since the type table was written -- so a skill the game calls Elation damage
      * settles as {@link DamageType#ELATION}. Everything else stays NORMAL, exactly as before.
-     * Note: Its boost is folded into the base in slice 1b (the type is deliberately not boostable).
+     * Note: Its boost is folded into the base (the type is deliberately not boostable).
      */
     public static DamageType damageTypeOf(SkillData data) {
         if (data != null && data.getCategory() == SkillCategory.ELATION_DAMAGE) {
@@ -628,15 +627,15 @@ public final class SkillExecutor {
             return 0;
         }
         hitTargets.add(target);                      // the fact of hitting (including targets that die afterwards) - "each time 1 target is attacked"
-        // The cast's own category rides along (P10-4): it is what `Battle.assemble` reads to apply a scoped
+        // The cast's own category rides along: it is what `Battle.assemble` reads to apply a scoped
         // DMG boost ("damage dealt by basic attacks/Skills/Ultimates is raised by X%"), which the damage *type* cannot express -- every
         // in-battle cast produces DamageType.NORMAL. `data` is null for a hand-made or placeholder skill, and
         // then the instance has no scoped boost rather than a guessed one.
-        // The DAMAGE TYPE follows the data (2026-09-30; readers: the nine `ElationDamage` skills -- 1501/1502/1505/1506/
-        // 8009/8010/1513, four of them already shipped and until now settling their Elation damage as NORMAL).
-        // The Elation damage boost is folded into the BASE (2026-09-30, slice 1b). `DamageType.ELATION` is deliberately
+        // The DAMAGE TYPE follows the data (readers: the nine `ElationDamage` skills -- 1501/1502/1505/1506/
+        // 8009/8010/1513, four of them already shipped and otherwise settling their Elation damage as NORMAL).
+        // The Elation damage boost is folded into the BASE. `DamageType.ELATION` is deliberately
         // NOT boostable -- the ordinary DMG-boost zone must not touch it -- so its own zone cannot ride `addBoost`, which is
-        // gated on `isBoostable()`. Measured before this line: with `ELATION_DAMAGE_BOOST` at 0.8 the instance still read
+        // gated on `isBoostable()`. Measured: with `ELATION_DAMAGE_BOOST` at 0.8 the instance would still read
         // x1.0. Super break folds `SUPER_BREAK_BOOST` into its base the same way, for the same reason.
         DamageType damageType = damageTypeOf(data);
         double settledBase = damageType == DamageType.ELATION
@@ -644,15 +643,15 @@ public final class SkillExecutor {
                 : base;
         Damage damage = new Damage(user, target, element, damageType, settledBase,
                 data == null ? SkillCategory.UNSPECIFIED : data.getCategory());
-        // ? Which skill caused it (2026-09-28): DEALING_DAMAGE is where a target-bearing clause can ask, and this is the
+        // Note: Which skill caused it: DEALING_DAMAGE is where a target-bearing clause can ask, and this is the
         // only place that knows -- the caller holds the Skill, the instance carries the answer.
         damage.setSkillKey(skillKey);
-        // The attack's hit set rides the instance, like skillKey and stance (2026-09-30):
+        // The attack's hit set rides the instance, like skillKey and stance:
         // a `DEALING_DAMAGE` rule is handed this damage, so "a random one of the enemies HIT" can read it.
         // Note: MEASURED SEMANTICS: the set is snapshotted here, so a PER-HIT reader sees "so far" while a
         // CAST-LEVEL reader ("after the wearer casts a basic attack or skill", firing after settlement) sees all.
         damage.setHitTargets(hitTargets);
-        // Note: The intended toughness reduction rides on the instance (2026-09-28): a `DEALING_DAMAGE` rule is handed this
+        // Note: The intended toughness reduction rides on the instance: a `DEALING_DAMAGE` rule is handed this
         // damage, and "this damage's toughness reduction value" has to be readable there -- 1321/8006's super-break clauses are exactly that.
         // Note: Set BEFORE the settlement below: `DEALING_DAMAGE` is fired from inside `battle.applyDamage`.
         damage.setStance(stanceDamage);
@@ -662,14 +661,14 @@ public final class SkillExecutor {
     }
 
     /**
-     * Toughness reduction (P4-2) + super break (P4-6): only damage that "counts as one attack"
+     * Toughness reduction + super break: only damage that "counts as one attack"
      * reduces toughness.
      *
      * <p>Measured against the data (a full tally of {@code skills.json}): single-target/technique/bounce
      * use {@code single} (30 = 1 unit, 60 = 2, 90 = 3), AOE uses {@code all}, and blast uses
-     * {@code single} (center) + {@code spread} (neighbours) - example: Himeko's (姬子) skill =
+     * {@code single} (center) + {@code spread} (neighbours) - example: Himeko (姬子)'s skill =
      * {@code 60/0/30}. For a bounce, {@code single} is the total for the whole skill and is
-     * spread evenly over the hits (H-3).
+     * spread evenly over the hits.
      *
      * @param stanceDamage the points this hit actually reduces (0 = this shape does not reduce toughness)
      * @return the damage additionally settled by this hit (break damage + super break damage;
@@ -686,7 +685,7 @@ public final class SkillExecutor {
         if (stanceDamage <= 0 || !damage.isCountsAsAttack() || !(target instanceof Enemy enemy)) {
             return 0;                                // additional damage / true damage does not reduce toughness
         }
-        // "raise this attack's toughness reduction value by 100%" (2026-09-28): the reduction this instance causes is multiplied by the attacker's
+        // "raise this attack's toughness reduction value by 100%": the reduction this instance causes is multiplied by the attacker's
         // toughness boosts -- read HERE, the one place that turns a nominal reduction into a settled one, and NOT inside
         // Battle.reduceToughness (which enemy skills and the demo script also call).
         double effectiveStance = stanceDamage * (1 + user.getBuffManager().toughnessBoost());
@@ -697,7 +696,7 @@ public final class SkillExecutor {
     }
 
     /**
-     * Super break (P4-6): converts "the part of the toughness-reduction value that cannot go into
+     * Super break: converts "the part of the toughness-reduction value that cannot go into
      * the toughness bar" into one instance of {@link DamageType#SUPER_BREAK} damage.
      *
      * <p>There are only two trigger conditions: the caster carries {@link SuperBreakBuff} (a pure

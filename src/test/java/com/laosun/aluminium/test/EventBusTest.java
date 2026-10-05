@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Event completion (P8-6): verifies that the new events are emitted at the right time, the
+ * Event completion: verifies that the new events are emitted at the right time, the
  * right number of times, under the right filter conditions.
  *
  * <p>This class tests the events' contract, not battle outcomes - so the assertions

@@ -83,13 +83,13 @@ public final class Constant {
     public static final Map<Integer, MonsterConfig> MONSTER_CONFIGS;
     /**
      * Level group ratios ({@code hard_level_group.json}): group number to level to ratio.
-     * The group number and level come from the stage (StageConfig); at the P2 stage they are passed in
+     * The group number and level come from the stage (StageConfig) and are passed in
      * explicitly by the caller.
      */
     public static final Map<Integer, Map<Integer, HardLevelGroup>> HARD_LEVEL_GROUPS;
 
     /**
-     * Enemy skill table ({@code enemy_skills.json}, self-built in P5-3): {@code monster instance id to skill}.
+     * Enemy skill table ({@code enemy_skills.json}, self-built): {@code monster instance id to skill}.
      *
      * <p>Note: The multipliers in this table are guessed (the data source has no enemy skill table);
      * every entry carries a {@code guessed} flag. See
@@ -106,7 +106,7 @@ public final class Constant {
      * ~35 MB of heap + tens of milliseconds on every {@code Constant} initialization.
      *
      * <p>Note: The second difference from the other data tables: when {@code stage.json} is missing this
-     * returns an empty table instead of throwing. It only serves stage-driven code (P-4/P-5), and
+     * returns an empty table instead of throwing. It only serves stage-driven code, and
      * the static block of `Constant` is the place where "one touch brings down the entire test suite" - 
      * an optional feature must not drag the whole suite down with it. When the stages cannot be loaded,
      * the caller ({@code StageFactory.load}) produces a self-explanatory error.
@@ -118,7 +118,7 @@ public final class Constant {
     }
 
     /**
-     * How many times the stage table has been parsed (0 or 1) - for tests to observe lazy loading only (P-4).
+     * How many times the stage table has been parsed (0 or 1) - for tests to observe lazy loading only.
      *
      * <p>Why it is needed: Java exposes no public API to ask "has this class been initialized" without
      * triggering initialization, so the statement "nobody calls {@link #stages()} so stage.json must not be
@@ -168,7 +168,7 @@ public final class Constant {
 
 
     /**
-     * {@link SkillType} to the skill slot number in {@code skills.json} (P8-2).
+     * {@link SkillType} to the skill slot number in {@code skills.json}.
      *
      * <p>The slot convention in the data: <b>1 basic attack / 2 skill / 3 ultimate / 4 talent / 5 (none) /
      * 6 overworld basic attack / technique</b>, and {@code skill_id = character id x 100 + slot}
@@ -181,7 +181,7 @@ public final class Constant {
      * when building the character (see {@link SkillType#isIntrinsic()}): they are overworld skills, attached
      * at battle start by {@code Battle.startBattle()}. This table is used by both places.
      *
-     * <p>Note: This table must exist in exactly one copy: before the fix, {@code Character.Builder.build()}
+     * <p>Note: This table must exist in exactly one copy: if {@code Character.Builder.build()}
      * wrote {@code new DefaultSkill(cid, 1, level)} for every slot, so basic attack / skill / ultimate / talent
      * all resolved to slot 1; the consequence was that all six slots had the multipliers, toughness
      * reduction, element and {@code sp_need} of the basic attack.
@@ -193,7 +193,7 @@ public final class Constant {
             SkillType.TALENT, 4,
             SkillType.MAZE, 6,
             SkillType.TECHNIQUE, 7,
-            // The Elation damage skills (2026-09-30): the data files them under slots 20 and 21.
+            // The Elation damage skills: the data files them under slots 20 and 21.
             SkillType.ELATION_SKILL, 20,
             SkillType.ELATION_EXTRA, 21);
 
@@ -264,44 +264,44 @@ public final class Constant {
     public static final boolean TRUE_DMG_SKIP_ZONES = true;
 
     /**
-     * Regular basic-attack energy gain (P3 fallback value).
+     * Regular basic-attack energy gain (fallback value when there is no skill data).
      *
-     * <p>Taken from the regular tier of tbgd {@code AvatarSkillConfig.SPBase} (ROADMAP P3-0 definition 2):
+     * <p>Taken from the regular tier of tbgd {@code AvatarSkillConfig.SPBase}:
      * basic attack 20 / skill 30 / ultimate 5 are universal values for all characters, and the data for
      * multi-hit (bouncing) skills is the "per-hit value" (Asta / Sampo / Anaxa / Harmony Trailblazer 6 x 5,
      * Welt 10 x 3); the total is still 30, do not multiply by the number of hits again.
-     * After P3-4 puts skill data into the database, this only serves as the fallback for "when there is no
+     * Skill data, once it is in the database, makes this only the fallback for "when there is no
      * skill data".
      */
     public static final double ENERGY_GAIN_BASIC = 20;
     /**
-     * Regular skill energy gain (P3 fallback value). See {@link #ENERGY_GAIN_BASIC}.
+     * Regular skill energy gain (fallback value when there is no skill data). See {@link #ENERGY_GAIN_BASIC}.
      */
     public static final double ENERGY_GAIN_SKILL = 30;
     /**
-     * Regular ultimate energy gain (P3 fallback value). Ultimates are always 5 (Dan Heng - Imbibitor Lunae
+     * Regular ultimate energy gain (fallback value when there is no skill data). Ultimates are always 5 (Dan Heng - Imbibitor Lunae
      * has 3 hits, Misha has multiple hits, Argenti bounces 6 times - all 5), with no multiplication by hit
      * count; on cast the gauge is zeroed first and then these 5 points are gained.
      */
     public static final double ENERGY_GAIN_ULTRA = 5;
     /**
-     * Baseline energy gain on being hit (P3). The document gives no direct number; it is inferred backwards
+     * Baseline energy gain on being hit. The document gives no direct number; it is inferred backwards
      * from "Natasha E4 recovers an extra 5 points after being attacked" and "Yunli recovers an extra
-     * 15 points after being attacked" that a baseline value of 10 exists; to be calibrated with data in P9.
+     * 15 points after being attacked" that a baseline value of 10 exists.
      */
     public static final double ENERGY_GAIN_HIT = 10;
     /**
-     * Baseline energy gain on kill (P3, pending calibration). It only ever appears in the documents in the
+     * Baseline energy gain on kill. It only ever appears in the documents in the
      * form "extra recovery".
      */
     public static final double ENERGY_GAIN_KILL = 5;
     /**
-     * Baseline energy gain on weakness break (P3, pending calibration). Called on weakness break in P4-4.
+     * Baseline energy gain on weakness break. Called on weakness break.
      */
     public static final double ENERGY_GAIN_BREAK = 5;
 
     /**
-     * Skill point (SP) cap (P8-4): one pool shared by the whole team, not one bar per character.
+     * Skill point (SP) cap: one pool shared by the whole team, not one bar per character.
      *
      * <p>The value comes from the game rules rather than a data table - {@code skills.json} has no
      * skill point field, and of the 638 skills measured, the {@code sp_need} of all 122 basic attacks and all
@@ -312,12 +312,12 @@ public final class Constant {
      * <p>Note: <b>The cap is not always 5</b>: Sparkle's talent "cap +2" and a light cone's "for each character
      * on the Path of Elation +1", and some light cones even trigger on "cap >= 6". The engine currently has
      * no hook for "changing a team-level resource cap" - registered as <b>F-1</b> in
-     * {@code DOC_VS_CODE.md} §F, to be handled around P8-.
+     * {@code DOC_VS_CODE.md} §F.
      */
     public static final int SKILL_POINT_MAX = 5;
 
     /**
-     * Skill points at the start of battle (P8-4). See {@link #SKILL_POINT_MAX}.
+     * Skill points at the start of battle. See {@link #SKILL_POINT_MAX}.
      *
      * <p>Note: <b>The start value is not always 3 either</b>: {@code RELICS.md} gives the 4-piece Passerby set
      * "at the start of battle immediately recover 1 skill point for our side" to start at 4 (5 if two
@@ -328,7 +328,7 @@ public final class Constant {
     public static final int SKILL_POINT_START = 3;
 
     /**
-     * Skill points recovered by one basic attack (P8-4). See {@link #SKILL_POINT_MAX}.
+     * Skill points recovered by one basic attack. See {@link #SKILL_POINT_MAX}.
      */
     public static final int SKILL_POINT_GAIN_BASIC = 1;
 
@@ -343,7 +343,7 @@ public final class Constant {
     public static final int EIDOLON_MAX_RANK = 6;
 
     /**
-     * Weakness break base value table: level to base value (P4-3). The values in the data file are scaled
+     * Weakness break base value table: level to base value. The values in the data file are scaled
      * by 10 x , so use them with {@code /10} (level 80 = 36.5535 to 36.5535).
      *
      * <p>See the unit note in {@code models/BreakDamageCalculator}: this project uniformly uses the "point"
@@ -352,19 +352,19 @@ public final class Constant {
     public static final Map<Integer, Double> BREAKING_RATE;
 
     /**
-     * Weakness break delay ratio (P4-4): at the instant of the break, push the target's action bar back by
+     * Weakness break delay ratio: at the instant of the break, push the target's action bar back by
      * 25% (unit = that target's own action period).
      */
     public static final double BREAK_DELAY_RATIO = 0.25;
 
     /**
-     * Weakness break duration in turns (P4-4): after an enemy is broken it skips this many of its own turns,
+     * Weakness break duration in turns: after an enemy is broken it skips this many of its own turns,
      * then toughness is restored to full.
      */
     public static final int BROKEN_REMAIN_TURNS = 2;
 
     /**
-     * Super break independent DMG boost (P4-6): {@code 1 + SUPER_BREAK_BOOST} is multiplied into super break
+     * Super break independent DMG boost: {@code 1 + SUPER_BREAK_BOOST} is multiplied into super break
      * damage.
      *
      * <p>It is unrelated to the regular DMG boost zone - super break does not take elemental / attack-type
@@ -390,7 +390,7 @@ public final class Constant {
     public static final int DOT_TURNS = 3;
 
     /**
-     * One element's weakness-break effect (P10-1 structure, P10-2 control).
+     * One element's weakness-break effect (structure and control).
      *
      * <p>Note: <b>Still structure over data.</b> The four damaging elements reuse {@link #DOT_RATIO} /
      * {@link #DOT_TURNS} so this table reproduces the pre-table behaviour exactly, and the numbers of the
@@ -443,11 +443,12 @@ public final class Constant {
     }
 
     /**
-     * A control state (P10-2): what sits on the victim while a break's control lasts.
+     * A control state: what sits on the victim while a break's control lasts.
      *
      * <p><b>Why this is a table and not a class per state.</b> The three states differ only in numbers and
      * in one boolean, and the engine already has a primitive for each part - so a control is
-     * <b>composed</b> from them rather than given a class of its own (the P8-0 rule, and the same reason
+     * <b>composed</b> from them rather than given a class of its own (the same rule as the rest of the
+     * trigger table, and the same reason
      * {@code StatModifierBuff} covers every "attribute X becomes X ⊕ v" buff):
      *
      * <table border="1">
@@ -465,50 +466,50 @@ public final class Constant {
      * the table is that the same state can also be applied by a skill, and that path goes through
      * {@code Battle.tryApplyDebuff(…, resistKey)} - where the resistance really does apply.
      *
-     * <p>Note: <b>The state is applied as one {@code ControlBuff}, for both paths</b> (2026-09-2). Before that,
-     * only a break could produce a control and it was composed inline as "a {@code StunBuff} plus maybe a
-     * speed debuff" - so "is this unit frozen" had no answer the condition DSL could read, and the two paths
-     * (break and skill) would have drifted the moment a skill applied one. Now the composition lives in
+     * <p>Note: <b>The state is applied as one {@code ControlBuff}, for both paths</b>. If
+     * only a break could produce a control and it were composed inline as "a {@code StunBuff} plus maybe a
+     * speed debuff", "is this unit frozen" would have no answer the condition DSL could read, and the two paths
+     * (break and skill) would drift the moment a skill applied one. The composition lives in
      * {@code ControlBuff}, which also carries {@link #name} - the spelling the documents and `has_state` use.
      *
      * @param key         the English key {@link BreakEffect#control} uses ({@code "FROZEN"})
-     * @param name        the state's NAME as the documents spell it (冻结, frozen) - what a rule's {@code control}
+     * @param name        the state's NAME as the documents spell it (frozen, 冻结) - what a rule's {@code control}
      *                    argument and the {@code has_state} condition use
      * @param resistKey   the data's specific-resistance key for this state (what a <i>skill</i> must beat)
      * @param turns       how many of the victim's turns it lasts
      * @param blocksAct   {@code true} = the victim cannot act at all; {@code false} = it acts, just slower
-     *                    or later (this is the difference between 冻结 (frozen) and 禁锢 (imprisoned) / 纠缠 (entangled))
-     * @param slowPercent SPEED reduction as a decimal (0.2 = −20%), 0 = no slow
+     *                    or later (this is the difference between frozen (冻结) and imprisoned (禁锢) / entangled (纠缠))
+     * @param slowPercent SPEED reduction as a decimal (0.2 = -20%), 0 = no slow
      */
     public record ControlEffect(String key, String name, String resistKey, int turns, boolean blocksAct,
                                 double slowPercent) {
     }
 
     /**
-     * The control states a break can leave behind (P10-2), keyed by the name {@link BreakEffect#control}
+     * The control states a break can leave behind, keyed by the name {@link BreakEffect#control}
      * uses.
      *
      * <p>Note: <b>Every number here is an example value, {@code TODO data}.</b> The data was probed and it does
      * <b>not</b> contain a break-control table: {@code breaking_rate.json} is level to break base value, and
      * the only descriptions of these states live in the encyclopedia text, which states the mechanics but
-     * not the numbers. What the text <i>did</i> settle is the mechanics, and two of them contradicted the
-     * plan (recorded in {@code ROADMAP.md} P10-2):
+     * not the numbers. What the text settles is the mechanics, and two of them contradict the
+     * plan (recorded in {@code ROADMAP.md}):
      * <ul>
-     *   <li>冻结 (frozen) = <b>cannot act</b> (+ ice damage every turn) - the plan said "while frozen, damage taken +30%",
+     *   <li>frozen (冻结) = <b>cannot act</b> (+ ice damage every turn) - the plan said "while frozen, damage taken +30%",
      *       which nothing in the data supports;</li>
-     *   <li>禁锢 (imprisoned) / 纠缠 (entangled) = <b>action delayed + speed lowered</b>, and the victim still acts.</li>
+     *   <li>imprisoned (禁锢) / entangled (纠缠) = <b>action delayed + speed lowered</b>, and the victim still acts.</li>
      * </ul>
      *
      * <p>{@code turns} is 1 for all three because none of the sources states a break-applied duration, and
      * 1 is the value that makes the state last exactly the victim's next turn - the smallest thing that is
      * observably a control. Do not read it as data.
      *
-     * <p><b>One number did turn out to be traceable after all</b> (P10-6, reading the descriptions):
-     * 瓦尔特's 画地为牢 (1004/) writes {@code 禁锢状态下，敌方目标行动延后#2%，速度降低#3%} with
+     * <p><b>One number is traceable from the descriptions:</b>
+     * Welt (瓦尔特)'s Gravitational Imprisonment (画地为牢) (1004/) writes {@code 禁锢状态下，敌方目标行动延后#2%，速度降低#3%} with
      * {@code param_list = [1, 0.2, 0.1, 15, 0.5]} - i.e. action delayed 20%, speed lowered 10%. The delay matches
-     * {@link #IMPRISON_EXTRA_DELAY} by coincidence (it was a guess), and {@code slowPercent} for
-     * {@code IMPRISONED} was guessed as 0.2 and is <b>corrected to 0.1</b> from that text. The same
-     * caveat as 冻结 (frozen) applies: that is a <i>technique</i>-applied 禁锢 (imprisonment), not a break-applied one, and no
+     * {@link #IMPRISON_EXTRA_DELAY} by coincidence (it was a guess), while {@code slowPercent} for
+     * {@code IMPRISONED} is <b>0.1</b> from that text. The same
+     * caveat as frozen (冻结) applies: that is a <i>technique</i>-applied imprisonment (禁锢), not a break-applied one, and no
      * source gives the latter - so this is the closest available evidence, not a verified break value.
      * {@code ENTANGLED}'s 0.2 has no source at all and stays a plain guess.
      */
@@ -518,12 +519,12 @@ public final class Constant {
             "IMPRISONED", new ControlEffect("IMPRISONED", "禁锢", "STAT_Confine", 1, false, 0.1));
 
     /**
-     * The same three states, keyed by the <b>name the documents spell</b> (冻结 / 纠缠 / 禁锢).
+     * The same three states, keyed by the <b>name the documents spell</b> (frozen / entangled / imprisoned -- 冻结 / 纠缠 / 禁锢).
      *
      * <p><b>Why a second index instead of a second table.</b> The two spellings are needed in different places and
      * must not be maintained twice: {@link BreakEffect#control} names an <i>engine key</i> (the element table is
      * engine data), while a rule's {@code "control"} argument and the {@code has_state} condition use the
-     * <b>name the game text uses</b> - the same convention every other state name follows (协奏 / 触电 / 灼烧).
+     * <b>name the game text uses</b> - the same convention every other state name follows (concerto / shock / burn -- 协奏 / 触电 / 灼烧).
      * A typo in either place is refused at load time ({@code APPLY_CONTROL} resolves the name through this map),
      * which is why the two must agree exactly.
      */
@@ -532,7 +533,7 @@ public final class Constant {
 
     /**
      * Extra action delay of a Freeze break, on top of {@link #BREAK_DELAY_RATIO} (example value,
-     * TODO data). The encyclopedia text says a 冻结 (frozen) "action delayed" but gives no break-applied number.
+     * TODO data). The encyclopedia text says a frozen (冻结) "action delayed" but gives no break-applied number.
      */
     public static final double FREEZE_EXTRA_DELAY = 0.5;
 
@@ -577,12 +578,12 @@ public final class Constant {
      * <p><b>Derived from {@link #BREAK_EFFECTS}</b> rather than listed a second time, so "which elements
      * have a DOT" cannot disagree with the effect table.
      *
-     * <p>Note: <b>No engine code reads this any more.</b> {@code Battle.attachBreakDot} asks
+     * <p>Note: <b>No engine code reads this.</b> {@code Battle.attachBreakDot} asks
      * {@link BreakEffect#hasDot()} of the element's own entry, which is the single judgement point - 
      * and since this set is derived from that same table, the two can never disagree. It survives as a
      * convenience for callers that want the list (tests do: {@code BreakEffectTableTest}); do not
      * reintroduce it as a decision input at a call site, or the "one judgement point" property is lost
-     * again. (P10-0 note: the DOT itself is an ordinary {@code DotBuff} in the buff system now, so
+     * again. (Note: the DOT itself is an ordinary {@code DotBuff} in the buff system, so
      * "which elements get one" is the only thing this constant is about.)
      */
     public static final Set<DamageElement> DOT_ELEMENTS = BREAK_EFFECTS.entrySet().stream()
@@ -591,7 +592,7 @@ public final class Constant {
             .collect(java.util.stream.Collectors.toUnmodifiableSet());
 
     /**
-     * Action value of one round (P-1): 100 for every round after that.
+     * Action value of one round: 100 for every round after that.
      *
      * <p>In this project "action value (AV)" is a time dimension: a unit with speed 100 covers
      * 100 action value in one period, so the {@code elapsed} advanced by
@@ -601,13 +602,13 @@ public final class Constant {
     public static final double ROUND_ACTION_VALUE = 100;
 
     /**
-     * First-round action value multiplier (P-1): the first round totals 150 action value, every round
+     * First-round action value multiplier: the first round totals 150 action value, every round
      * after that 100.
      *
      * <p>So a unit with speed 100 has to wait 150 to act in the first round, then acts every 100 from the
      * second lap on; a unit with speed 200 waits 5 in the first round. This is not "the whole first round is
      * delayed" but rather each unit's first period being stretched 1.5 x - in the first round fast units
-     * can act more often (a speed-240 unit has a period of 41.6and can act 3 times within the first round's
+     * can act more often (a speed-240 unit has a period of 41.6 and can act 3 times within the first round's
      * 150).
      *
      * <p>Note: Only {@link com.laosun.aluminium.Queue#initialize()} (battle start) applies this multiplier;
@@ -626,7 +627,7 @@ public final class Constant {
         // Already immutable: RelicSets.index ends in Map.copyOf, and RelicSetTest pins the identity of
         // this table ("read once and cached"), so wrapping it here would both be redundant and break that.
         RELIC_SETS = RelicSets.table();
-        // Note: Every table below is `frozen(...)` (H-1). `public static final` locks the reference, not the
+        // Note: Every table below is `frozen(...)`. `public static final` locks the reference, not the
         // contents, and Gson hands back mutable LinkedHashMaps whose nesting is mutable too
         // (`SKILLS.get(cid)` is another map, `SKILL_TRACES.get(cid)` a list). One `clear()` or `put()` from
         // any caller -- a test, a future UI, a plugin -- would have silently changed what every later
@@ -679,10 +680,10 @@ public final class Constant {
      * </ul>
      */
     /**
-     * Freezes a loaded table so that no caller can mutate shared engine data (H-1).
+     * Freezes a loaded table so that no caller can mutate shared engine data.
      *
      * <p><b>Why this exists.</b> {@code public static final} locks the <i>reference</i>, not the contents:
-     * every table in the static block used to be a mutable {@code LinkedHashMap} straight out of Gson, and
+     * every table in the static block is a mutable {@code LinkedHashMap} straight out of Gson, and
      * the nesting was mutable as well - {@code SKILLS.get(cid)} is another map, {@code SKILL_TRACES.get(cid)}
      * a list. One {@code Constant.SKILLS.clear()} from anywhere (a test, a future UI, a plugin) would have
      * silently changed what every later consumer <b>in the same JVM</b> sees, with no compile error and no
@@ -737,7 +738,7 @@ public final class Constant {
                 orOne(config.stanceRatio()),
                 config.damageResistance() == null ? Map.of() : Map.copyOf(config.damageResistance()),
                 config.debuffResistance() == null ? Map.of() : Map.copyOf(config.debuffResistance()),
-                // P9-4: the summon roster. `summon_id` is spelled as a list even when a monster has none
+                // The summon roster. `summon_id` is spelled as a list even when a monster has none
                 // (`[]` for 195of them) and occasionally as `[0]` for "none" (one monster, 405301004), so
                 // non-positive entries are dropped here -- once, at load time -- rather than at every read.
                 // Deliberately NOT tolerant of unknown ids as well: a roster entry that names no monster is

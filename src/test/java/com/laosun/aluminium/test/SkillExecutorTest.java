@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P1-8 acceptance: one skill activation expands into the right hits / targets.
+ * acceptance: one skill activation expands into the right hits / targets.
  *
  * <p>Attacker ATK = 100 and defender DEFENCE = 0 (defence zone 1.0), with no boost or crit
  * attributes, so a hit is exactly {@code ATK  x  multiplier}.

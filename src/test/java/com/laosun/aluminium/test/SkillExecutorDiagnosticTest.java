@@ -18,15 +18,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The undispatched diagnostic for non-damaging skills (item 3 of the P8-2 plan).
+ * The undispatched diagnostic for non-damaging skills.
  *
  * <p>Background: {@code SkillExecutor.resolveHits} silently returns when "the skill is not a
  * damaging one" - after a heal/shield/buff/control/summon is cast nothing at all happens (only
  * the energy gain is still given). That is very hard to notice in a real team: in the log the skill
  * "went off", there was just no effect.
  *
- * <p>So a toggleable diagnostic log was added (labelling the owning phase as P6-2 / P10-3 / P10-6 /
- * P9-4). The plan originally wanted a bare {@code IO.println}, but the demo casts heals and shields
+ * <p>So a toggleable diagnostic log was added. The plan originally wanted a bare {@code IO.println}, but the demo casts heals and shields
  * every turn - that would flood the output by default, so it was changed to an explicit switch. This
  * class verifies both "it prints when enabled" and "it does not print by default".
  */
@@ -41,13 +40,12 @@ public class SkillExecutorDiagnosticTest {
     /**
      * A non-damaging skill that has <b>no entry</b> in {@code skill_effects.json} is still reported.
      *
-     * <p>P10-3 wired Restore and Defence, so the diagnostic narrowed to the effects that are genuinely
+     * <p>Restore and Defence are wired, so the diagnostic narrowed to the effects that are genuinely
      * still unimplemented (buff / control / summon). Bronya's (布洛妮娅) skill is a Support skill, so it
      * exercises that path.
      *
-     * <p>Note: This test used to cast Natasha's healing skill and assert the notice, back when healing did
-     * nothing. It was rewritten rather than deleted: the invariant that matters is now "anything the
-     * engine cannot apply must say so", not "healing is broken".
+     * <p>Note: The invariant that matters is "anything the engine cannot apply must say so", not
+     * "healing is broken".
      */
     @Test
     public void skillsWithoutATableEntryAreStillReported() {
@@ -72,7 +70,7 @@ public class SkillExecutorDiagnosticTest {
     public void diagnosticIsOffByDefault() {
         Character natasha = CharacterFactory.create(1105, 80);
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
-        // isolated: 1105 has a file now, and its trace 医者 raises outgoing healing by 10%, which would otherwise
+        // isolated: 1105 has a file now, and its trace Healer (医者) raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
         natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);
@@ -85,13 +83,13 @@ public class SkillExecutorDiagnosticTest {
     }
 
     /**
-     * A {@code Defence} skill with a single percentage term really grants a shield, and is no longer
+     * A {@code Defence} skill with a single percentage term really grants a shield, and is not
      * reported as undispatched.
      *
      * <p>Gepard's (杰帕德) ultimate is {@code 1104 slot 3}: {@code scale = def}, one percentage and one
      * flat term, so it is one of the entries the engine can read unambiguously.
      *
-     * <p>Note: March th's (三月七) skill is deliberately <b>not</b> used here even though it is the obvious
+     * <p>Note: March 7th (三月七)'s skill is deliberately <b>not</b> used here even though it is the obvious
      * shield: its row carries two percentage terms (a shield plus something else), so the ambiguity
      * guard refuses it. That is the guard working as intended, and
      * {@link #ambiguousHealEntriesAreRefusedRatherThanSummed} covers that behaviour.
@@ -144,14 +142,14 @@ public class SkillExecutorDiagnosticTest {
      *
      * <p>The number is the point. Natasha's ultimate (1105 slot 3) is {@code [0.092, 92]} with
      * {@code scale = healer_max_hp}, i.e. <b>9.2% of her own Max HP plus a flat 92</b>. An
-     * ATK-based calculation - which is what the demo used to do by hand - or a dropped flat term both
+     * ATK-based calculation - which is not what the document states - or a dropped flat term both
      * produce a plausible-looking wrong value, and both fail here.
      */
     @Test
     public void healingSkillsHealForTheDocumentedAmount() {
         Character natasha = CharacterFactory.create(1105, 80);
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
-        // isolated: 1105 has a file now, and its trace 医者 raises outgoing healing by 10%, which would otherwise
+        // isolated: 1105 has a file now, and its trace Healer (医者) raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
         natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);
@@ -183,7 +181,7 @@ public class SkillExecutorDiagnosticTest {
     public void mixedHealRowsApplyOnlyTheImmediatePart() {
         Character natasha = CharacterFactory.create(1105, 80);
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
-        // isolated: 1105 has a file now, and its trace 医者 raises outgoing healing by 10%, which would otherwise
+        // isolated: 1105 has a file now, and its trace Healer (医者) raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
         natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);
@@ -208,23 +206,23 @@ public class SkillExecutorDiagnosticTest {
      *
      * <p>The Trailblazer's (开拓者) {@code 8004 slot 2} is categorised {@code Defence}, but its text is
      * "Increases the Trailblazer's DMG Reduction by {@code #1[i]%} and gains 1 stack of Magma Will, with
-     * a {@code #2[i]%} base chance to Taunt…" - no heal, no shield, and no amount phrase, so the table
+     * a {@code #2[i]%} base chance to Taunt..." - no heal, no shield, and no amount phrase, so the table
      * carries no parameters for it and the engine declines.
      *
      * <p>Assuming "the category says Defence, so there must be a shield in here somewhere" is exactly
      * what produces a plausible wrong number.
      *
-     * <p>Note: This replaced a test that used March th's shield as the ambiguous example. Keying the parser
-     * on the game's amount grammar resolved that entry ({@code #3[i]%} there is an HP <i>condition</i>,
-     * not a term of the shield), so March th moved into
+     * <p>Note: This replaced a test that used March 7th (三月七)'s shield as the ambiguous example. Keying the parser
+     * on the game's amount grammar resolves that entry ({@code #3[i]%} there is an HP <i>condition</i>,
+     * not a term of the shield), so March 7th (三月七) moved into
      * {@link #shieldSkillsAreDispatchedAndNotReported} and this test needed a genuinely unsupported one.
      */
     @Test
     public void entriesWithoutAnAmountPhraseAreRefusedRatherThanGuessed() {
         Character trailblazer = CharacterFactory.create(8004, 80);
-        // ? Drop the character file's rules for this cast (2026-09-29): 8004 now ships its talent, which - per the document - shields the party
+        // ? Drop the character file's rules for this cast: 8004 now ships its talent, which - per the document - shields the party
         // whenever he uses Basic ATK, Skill or Ultimate. That is a real rule, not a guess; this test is about the SKILL TABLE declining an entry
-        // that has no amount phrase, so the table path is isolated the same way round 155 isolated an op from the file path.
+        // that has no amount phrase, so the table path is isolated the way the file path is isolated elsewhere.
         trailblazer.setTriggerTable(null);
         Battle battle = newBattle(trailblazer);
 

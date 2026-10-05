@@ -18,14 +18,14 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * The pre-cast hook ({@code TriggerEvent.CAST_SETUP}) and {@code DELEGATE_DAMAGE} (P11-1, M-40).
+ * The pre-cast hook ({@code TriggerEvent.CAST_SETUP}) and {@code DELEGATE_DAMAGE}.
  *
- * <p><b>What this pair is for.</b> A document can say that a skill's damage is somebody else's: 长夜月's ultimate
+ * <p><b>What this pair is for.</b> A document can say that a skill's damage is somebody else's: Evernight (长夜月)'s ultimate
  * "make the memosprite '长夜' deal Ice damage equal to '长夜''s #1[i]% Max HP to all enemies" is the memosprite's swing, and the rule that
  * delivers it as such runs on {@code ULT_CAST} - i.e. <b>after</b> the damage has already been expanded. So the
  * engine's own damage path swings 141303's rows first (with <b>her</b> attack as the base) and the commanded hit
  * lands on top: two instances where the document describes one, the first scaled off the wrong attribute
- * (measured 2026-09-2: 8818.5 of hers + the commanded share, on 1002011). {@code DELEGATE_DAMAGE} is the content
+ * (measured: 8818.5 of hers + the commanded share, on 1002011). {@code DELEGATE_DAMAGE} is the content
  * saying "not mine", and it has to be on the pre-cast event because that is the only moment at which the swing can
  * still be stopped.
  *
@@ -45,9 +45,9 @@ import java.util.Set;
 public class CastSetupTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 - the character whose ultimate is the first user of the op. */
+    /** Evernight (长夜月) - the character whose ultimate is the first user of the op. */
     private static final int OWNER = 1413;
-    /** 姬子 - a plain ally, whose casts must not be affected by 长夜月's rule. */
+    /** Himeko (姬子) - a plain ally, whose casts must not be affected by Evernight (长夜月)'s rule. */
     private static final int ALLY = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -83,17 +83,17 @@ public class CastSetupTest {
         Assertions.assertEquals(0, hpBefore - enemy.getCurrentHp(), EPS,
                 "\"make the memosprite '长夜' ... deal damage\": the damage is the memosprite's, so her cast swings nothing of its own");
         Assertions.assertEquals(BAR, enemy.getStance(), EPS,
-                "…and the toughness of that swing goes with it, to whoever delivers it");
+                "...and the toughness of that swing goes with it, to whoever delivers it");
     }
 
     /** The gate is the slot the rule names, not "the ultimate": another slot delegates just as well. */
     @Test
     public void delegatingAnotherSlotWorksTheSameWay() {
-        // 姬子's Skill rather than 长夜月's: the point is that the gate is the slot the rule names, and 长夜月's own
+        // Himeko (姬子)'s Skill rather than Evernight (长夜月)'s: the point is that the gate is the slot the rule names, and Evernight (长夜月)'s own
         // slot 2 turns out not to be a damaging skill at all - the control is 0 for her, which is exactly what the
         // control in the case above exists to catch (a "delegated nothing" and a "nothing to delegate" read alike).
         double control = hitPointsLost(ALLY, TriggerTable.EMPTY, SKILL_SLOT);
-        Assertions.assertTrue(control > 0, "control: 姬子's Skill deals damage of its own (" + control + ")");
+        Assertions.assertTrue(control > 0, "control: Himeko (姬子)'s Skill deals damage of its own (" + control + ")");
 
         double delegated = hitPointsLost(ALLY,
                 new TriggerTable(ALLY, List.of(delegate("CAST_SETUP", "SKILL", List.of("actor == self")))),
@@ -183,7 +183,7 @@ public class CastSetupTest {
         return hitPointsLost(OWNER, table, slot);
     }
 
-    /** The same, for a caster that is not 长夜月 (the slot gate is not about ultimates, so it needs another). */
+    /** The same, for a caster that is not Evernight (长夜月) (the slot gate is not about ultimates, so it needs another). */
     private static double hitPointsLost(int cid, TriggerTable table, int slot) {
         Character owner = CharacterFactory.create(cid, LEVEL);
         owner.setTriggerTable(table);

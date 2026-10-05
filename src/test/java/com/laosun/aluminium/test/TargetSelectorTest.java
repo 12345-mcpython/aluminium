@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P5-2 / P5-4 acceptance: target selection.
+ * acceptance: target selection.
  *
  * <p>Two strategies: the taunt hard constraint takes priority, then aggro-weighted random.
  */
@@ -131,7 +131,7 @@ public class TargetSelectorTest {
 
     @Test
     public void enemyAttackActuallyRunsThroughPerformAction() {
-        // P5-5's minimal verification: the enemy acts as the actor, uses TargetSelector to pick
+        // 's minimal verification: the enemy acts as the actor, uses TargetSelector to pick
         // a target, and acts through performAction
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         Character victim = Character.fromAttributes("victim", 100_000, 1000, 100, 100);

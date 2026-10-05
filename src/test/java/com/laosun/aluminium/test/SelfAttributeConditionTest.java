@@ -56,19 +56,19 @@ public class SelfAttributeConditionTest {
     private static final int LEVEL = 80;
 
     // The planar 2-pieces authored with this vocabulary. None of them had a rule file before.
-    /** 太空封印站: ATK +12%; SPD >= 120 -> ATK additionally +12%. */
+    /** Space Sealing Station (太空封印站): ATK +12%; SPD >= 120 -> ATK additionally +12%. */
     private static final int SPACE_SEALING_STATION = 301;
-    /** 不老者的仙舟: Max HP +12%; SPD >= 120 -> all of our ATK +8%. */
+    /** Fleet of the Ageless (不老者的仙舟): Max HP +12%; SPD >= 120 -> all of our ATK +8%. */
     private static final int FLEET_OF_THE_AGELESS = 302;
-    /** 筑城者的贝洛伯格: DEF +15%; Effect Hit Rate >= 50% -> DEF additionally +15%. */
+    /** Belobog of the Architects (筑城者的贝洛伯格): DEF +15%; Effect Hit Rate >= 50% -> DEF additionally +15%. */
     private static final int BELOBOG = 304;
-    /** 停转的萨尔索图: CRIT Rate +8%; current CRIT Rate >= 50% -> Ultimate and follow-up attack damage +15%. */
+    /** Inert Salsotto (停转的萨尔索图): CRIT Rate +8%; current CRIT Rate >= 50% -> Ultimate and follow-up attack damage +15%. */
     private static final int INERT_SALSOTTO = 306;
-    /** 盗贼公国塔利亚: Break Effect +16%; SPD >= 145 -> Break Effect additionally +20%. */
+    /** Talia: Kingdom of Banditry (盗贼公国塔利亚): Break Effect +16%; SPD >= 145 -> Break Effect additionally +20%. */
     private static final int TALIA = 307;
-    /** 生命的翁瓦克: Energy Regeneration Rate +5%; SPD >= 120 -> action advances 40% on entering battle. */
+    /** Sprightly Vonwacq (生命的翁瓦克): Energy Regeneration Rate +5%; SPD >= 120 -> action advances 40% on entering battle. */
     private static final int SPRIGHTLY_VONWACQ = 308;
-    /** 繁星竞技场: CRIT Rate +8%; current CRIT Rate >= 0% -> basic attack and Skill damage +20%. */
+    /** Rutilant Arena (繁星竞技场): CRIT Rate +8%; current CRIT Rate >= 0% -> basic attack and Skill damage +20%. */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
 
     /** All seven, for the cases that make a claim about the whole authored batch. */
@@ -351,7 +351,7 @@ public class SelfAttributeConditionTest {
      *
      * <p>Note: <b>This asserts direction, not magnitude, and that is deliberate.</b> The contribution is 12% of
      * the character's <em>base</em> ATK, and base ATK is not readable from outside: a relic-less character's
-     * resolved ATK (892.9for 姬子 at 80) is already base x (traces' percentages), so the measured 90.81 is
+     * resolved ATK (892.9 for Himeko (姬子) at 80) is already base x (traces' percentages), so the measured 90.81 is
      * 12% of 56.6, not of 892.9- the "panel != base x multiplier" trap recorded in {@code engine.md} §22.
      * The magnitude in the file is pinned exactly by {@link #theAuthoredEffectsCarryTheNumbersFromTheText}
      * instead, and the modifier arithmetic by the engine's own tests; what needs an end-to-end case is that

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * March 7th's Eidolon 3 / Eidolon 5 and the level her own document is quoted at (M-32) - content, on top of the engine's
+ * March 7th's Eidolon 3 / Eidolon 5 and the level her own document is quoted at - content, on top of the engine's
  * {@code RAISE_SKILL_LEVEL}.
  *
  * <p><b>What the documents say.</b> Eidolon 3 = "<b>终结技</b>等级+2，最多不超过15级；<b>普攻</b>等级+1，最多不超过10级" (data row

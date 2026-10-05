@@ -19,7 +19,7 @@ import java.util.Set;
 import static com.laosun.aluminium.enums.AttributeType.*;
 
 /**
- * Builds an {@link Enemy} with a correct stat sheet from real monster data (P2-4).
+ * Builds an {@link Enemy} with a correct stat sheet from real monster data.
  *
  * <pre>
  * EnemyFactory.create(1002011, 90, 1)
@@ -28,13 +28,13 @@ import static com.laosun.aluminium.enums.AttributeType.*;
  * </pre>
  *
  * <p>This stage does numbers only: weaknesses and toughness merely move data onto the
- * {@code Enemy}; toughness reduction and weakness break are in P4. Debuff immunity
- * ({@code debuff_resistance}) is wired up in P6-1, the phase table in P9-5, and the summon roster in P9-4.
+ * {@code Enemy}; toughness reduction and weakness break happen in the battle. Debuff immunity
+ * ({@code debuff_resistance}), the phase table and the summon roster are all wired up here.
  *
  * <p>Both the level and the level group come from the stage ({@code StageConfig}), so they are
- * passed in by the caller; the stage-driven part is left to P-4.
+ * passed in by the caller.
  *
- * <p><b>Why the lookup is a separate step.</b> Since P9-4 the same monster data also builds
+ * <p><b>Why the lookup is a separate step.</b> The same monster data also builds
  * {@link com.laosun.aluminium.models.Summon}s ({@code SummonFactory}), which need exactly "which config,
  * which template, what does it scale to" and none of the {@link Enemy}-only fields. {@link #resolve} is
  * that shared half, so the two factories cannot drift apart on the scaling rules or the error messages.
@@ -58,7 +58,7 @@ public final class EnemyFactory {
     /**
      * Looks the monster up and scales it, without deciding what kind of combatant to build.
      *
-     * @param monsterId      a key of {@code monster_config.json}, e.g. 1002011 (Ice Edge 冰锋)
+     * @param monsterId      a key of {@code monster_config.json}, e.g. 1002011 (Ice Edge (冰锋))
      * @param level          the stage level
      * @param hardLevelGroup the stage's hard level group (a monster's own {@code hard_level_group}
      *                       is usually just 1; what really decides difficulty is the stage)
@@ -98,15 +98,15 @@ public final class EnemyFactory {
         MonsterTemplate template = resolved.template();
 
         Enemy enemy = new Enemy(displayName(config, monsterId), statSheet(resolved.stats()).build());
-        enemy.setLevel(level);                                  // P1-4: level enters the defence zone
-        enemy.setDamageResist(config.damageResistance());       // P1-6: the resistance zone takes effect directly
-        enemy.setDebuffResist(config.debuffResistance());        // P6-1: specific debuff resistance
-        enemy.setStanceWeak(Set.copyOf(config.stanceWeak()));   // P2-2: weaknesses (used by P4's toughness-reduction check)
+        enemy.setLevel(level);                                  // level enters the defence zone
+        enemy.setDamageResist(config.damageResistance());       // the resistance zone takes effect directly
+        enemy.setDebuffResist(config.debuffResistance());        // specific debuff resistance
+        enemy.setStanceWeak(Set.copyOf(config.stanceWeak()));   // weaknesses (used by P4's toughness-reduction check)
         enemy.setStance(resolved.stats().stance());
         enemy.setMaxStance(resolved.stats().stance());
         enemy.setStanceCount(template.stanceCount());
         enemy.setStanceType(template.stanceType());
-        enemy.setSummonIds(List.copyOf(config.summonIds()));    // P9-4: what this monster may bring in
+        enemy.setSummonIds(List.copyOf(config.summonIds()));    // what this monster may bring in
         enemy.setSkill(SkillType.COMMON, enemySkillFor(monsterId, template));
         return enemy;
     }
@@ -125,12 +125,12 @@ public final class EnemyFactory {
                 .setBase(DEFENCE, stats.defence())
                 .setBase(SPEED, stats.speed())
                 .setBase(EFFECT_RESISTANCE, stats.effectResistance())
-                // P6-1: effect hit rate MUST land in the stat sheet, otherwise the enemy's hit rate is always 0 (EnemyStats computes it but nobody used it)
+                // Effect hit rate MUST land in the stat sheet, otherwise the enemy's hit rate is always 0 (EnemyStats computes it but nobody used it)
                 .setBase(EFFECT_HIT_RATE, stats.effectHitRate());
     }
 
     /**
-     * Builds the skill an enemy acts with (P5-3).
+     * Builds the skill an enemy acts with.
      *
      * <p>The skill comes from {@code enemy_skills.json} ({@link Constant#ENEMY_SKILLS}).
      * That table covers only the few monsters used for the demo; other monsters have no entry - 

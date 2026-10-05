@@ -4,7 +4,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 
 /**
- * A <b>countdown</b>: a unit that exists on the action order and does nothing but <b>have a turn</b> (M-49).
+ * A <b>countdown</b>: a unit that exists on the action order and does nothing but <b>have a turn</b>.
  *
  * <p><b>Why it is a unit at all.</b> The documents describe things like Robin's (知更鸟) [协奏] as
  * "行动序列上出现[协奏]倒计时，倒计时回合开始时知更鸟退出[协奏]状态并立即行动，倒计时固定拥有 <b>90</b> 点速度" - the

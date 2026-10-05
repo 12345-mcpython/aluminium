@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P6-1 acceptance: effect hit rate and resistance.
+ * acceptance: effect hit rate and resistance.
  *
  * <pre>
  * chance to land = base chance  x  (1 + caster's hit rate)  x  (1 - target's resistance)  x  (1 - specific debuff resistance), clamp [0,1]

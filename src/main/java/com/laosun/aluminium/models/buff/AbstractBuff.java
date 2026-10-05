@@ -37,8 +37,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     protected final boolean permanent;
 
     /**
-     * Whose <b>turn boundaries</b> count this buff's duration down; {@code null} = the unit that carries it
-     * (M-42 ④).
+     * Whose <b>turn boundaries</b> count this buff's duration down; {@code null} = the unit that carries it.
      *
      * <p><b>Why the clock is not always the carrier.</b> Sunday's [蒙福者] says "星期日自身每回合开始时
      * [蒙福者]状态持续回合减1" - the state sits on the ally, but its duration is spent by <b>his</b> turns.
@@ -119,7 +118,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * the owner attacks".
      *
      * <p>Note: The default is an <b>empty set</b>: every existing buff keeps expiring exactly as it did, and a
-     * buff only behaves differently when a rule says {@code "until": …}.
+     * buff only behaves differently when a rule says {@code "until": ...}.
      */
     public enum Lifetime {
         /**
@@ -135,7 +134,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
          */
         NEXT_ULTIMATE,
         /**
-         * Ends when the cast being delivered right now finishes (2026-09-30, cones 20001 / 21000).
+         * Ends when the cast being delivered right now finishes (cones 20001 / 21000).
          *
          * <p>"施放战技和终结技时，治疗量提高 12%" is neither a turn nor permanent: upstream scopes it to the cast
          * itself ({@code MEquip_20001_Main} adds on {@code OnBeforeSkillUse} and removes on {@code OnAfterSkillUse}).
@@ -144,18 +143,18 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
          */
         CAST_END,
     /**
-     * Until the carrier's own turn ends (2026-09-30; readers: cone 23053's "若在同一回合内消耗 >= 4 个战技点"
+     * Until the carrier's own turn ends (cone 23053's "若在同一回合内消耗 >= 4 个战技点"
      * and cone 23061's "我方任意角色在自身同一回合内累计消耗…").
      *
      * <p>The symmetric partner of {@link #CAST_END}: that one scopes a value to one cast, this one to one turn. It is
      * swept by {@code BuffManager.afterMove}, which is the carrier's OWN turn end -- the tick point that already advances
-     * every duration, so no battle handle is needed. Measured before adding it: a plain {@code turns: 1} stack is NOT
+     * every duration, so no battle handle is needed. Measured: a plain {@code turns: 1} stack is NOT
      * cleared by beforeMove / afterMove / tickForeign, so "同一回合内" had no spelling at all.
      */
     TURN_END,
     
     /**
-     * "持续至下一个…回合开始时" (2026-10-02; reader: 1405's [真知], whose text is "持续至下一个那刻夏回合开始时").
+     * "持续至下一个…回合开始时" (1405's [真知], whose text is "持续至下一个那刻夏回合开始时").
      *
      * <p>Ends when the OWNER's own turn starts, which is neither `TURN_END` (the end of the current turn, too early when the buff is granted during that turn) nor `NEXT_ATTACK` (ends when
      * the owner next lands an attack, which the sentence does not say).
@@ -165,7 +164,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
 
     /**
      * The events that end this buff; <b>empty</b> means "no event-based end". Written by whoever creates the
-     * buff (the trigger interpreter, from the rule's {@code "until": …}).
+     * buff (the trigger interpreter, from the rule's {@code "until": ...}).
      *
      * <p><b>Why a set.</b> The game states durations as disjunctions - "持续至装备者下次施放普攻<b>或</b>战技后"
      * (relic set 12) - and the buff ends at the <b>first</b> of the named events: a duration is one fact, however
@@ -229,7 +228,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * way an expiry does it.
      *
      * <p>Safe to call while the manager is iterating its buffs: every traversal goes through
-     * {@code List.copyOf} (M-12), which is what makes "a buff that removes itself on an event" possible at all.
+     * {@code List.copyOf}, which is what makes "a buff that removes itself on an event" possible at all.
      */
     private void endNow() {
         if (owner != null) {
@@ -252,7 +251,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      *
      * <p><b>Why the source is not enough.</b> "战技提供的护盾" (1001 March 7th (三月七) Eidolon 6) names the <i>ability</i>, not just
      * the person: March 7th has two shields of her own (her Skill's and Eidolon 2's at battle start), so "a shield from
-     * 三月七" would heal an ally the star level does not mean to heal - a wrong number with nothing to report. The rule
+     * March 7th (三月七)" would heal an ally the star level does not mean to heal - a wrong number with nothing to report. The rule
      * id is the one handle that tells them apart, and it is stamped where every buff already gets its source
      * ({@code TriggerInterpreter.withSource}).
      */
@@ -261,7 +260,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     protected String ruleId = "";
 
     /**
-     * Whether this buff asks NOT to evict others of its kind (2026-10-02). Measured: `StatModifierBuff` identity is
+     * Whether this buff asks NOT to evict others of its kind. Measured: `StatModifierBuff` identity is
      * `(attribute, modifierType, sourceRole)`, so two rules granting the same attribute evict each other -- while some
      * documents have both in effect at once. Note: Opt-in on purpose: making every different rule coexist broke seven shipped
      * readings, so eviction stays the default and only the effect that says so is exempt.
@@ -279,8 +278,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     }
 
     /**
-     * The <b>name the data gave this buff</b> - "协奏" for a modifier that is an effect <i>of</i> the [协奏] state
-     * (2026-09-28).
+     * The <b>name the data gave this buff</b> - "协奏" for a modifier that is an effect <i>of</i> the [协奏] state.
      *
      * <p><b>Why a name is needed at all.</b> A modifier's lifetime can follow a state instead of a turn count
      * ("处于[协奏]状态时，我方全体攻击力提高…" lasts until the state ends, and the state ends when a countdown's turn
@@ -289,14 +287,14 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * symptom. Naming it lets {@code removeState} reach it.
      *
      * <p>Note: Empty ({@code ""}) means <b>unnamed</b>, and the removal loop skips it: every modifier that does not state a
-     * name keeps exactly the lifetime it had before this field existed.
+     * name is not reachable by {@code removeState}, so it keeps its ordinary lifetime.
      */
     @Getter
     @Setter
     protected String buffName = "";
 
     /**
-     * Whether carrying this buff means <b>the unit does not take its own turns</b> (2026-09-28).
+     * Whether carrying this buff means <b>the unit does not take its own turns</b>.
      *
      * <p>Robin's (知更鸟) [协奏]: "[协奏]状态结束前<b>不会进入自己的回合</b>且无法行动" - while the state lasts she is not in the
      * order at all, and the countdown acts in her place. That is <b>not</b> what a control does: {@code ControlBuff}
@@ -340,7 +338,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * Which <b>class</b> of negative state this buff is, or {@code null} when it belongs to none.
      *
      * <p>It exists for the two sentences that protect against a whole family - "抵抗<b>控制类</b>负面状态的概率提高35%"
-     * (Clara (克拉拉) 守护) and "免疫<b>控制类</b>负面状态" (Cyrene's (长夜月) memosprite "长夜") - and the point is that a <b>new</b> state of
+     * (Clara (克拉拉) Under Protection (守护)) and "免疫<b>控制类</b>负面状态" (Cyrene's (长夜月) memosprite "长夜") - and the point is that a <b>new</b> state of
      * that family is covered the day it is written, instead of falling outside a hand-kept list of resistance keys.
      * Like {@link #isDebuff()}, the answer comes from the buff class itself, which is the only place that knows.
      *

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Talents and follow-up attacks (P8-3), as pure data.
+ * Talents and follow-up attacks, as pure data.
  *
  * <p>The engine capability landed in P8-6/P8-/P8-8 (events, trigger tables, resources) plus the
  * {@code DAMAGE} op and the {@code target} condition variable added here. What remains is content,

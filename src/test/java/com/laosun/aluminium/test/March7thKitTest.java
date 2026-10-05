@@ -26,7 +26,7 @@ import java.util.Random;
  *
  * <p><b>Why her.</b> Her document is a wall of shields: a DEF-scaled shield, a taunt, a freeze, and a counter that
  * needs a shielded ally. Three clauses are complete and pinned here - the shield (a DEF share plus a constant, and
- * a <b>duration</b>), the cleanse (the 行迹"纯洁") and, since 2026-09-2, the 天赋 counter, which is what the
+ * a <b>duration</b>), the cleanse (the "纯洁" (Purify) trace) and the talent (天赋) counter, which is what the
  * {@code has_shield} condition and the {@code per_turn} limit were added for. The rest is <b>registered rather than
  * approximated</b>: every one of those clauses would be a wrong number or a wrong trigger if it were guessed at, and
  * a census of what is missing is worth more than a file that looks finished.
@@ -47,10 +47,10 @@ public class March7thKitTest {
     private static final int SKILL_SLOT = 2;
 
     /**
-     * The 行迹"纯洁": "施放战技时，解除指定我方单体的1个负面效果".
+     * The "纯洁" (Purify) trace: "施放战技时，解除指定我方单体的1个负面效果".
      *
      * <p>Driven through a real cast: her Skill is a `Defence` skill, so what makes this rule reach the right unit is
-     * the cast event carrying the ally it was AIMED at (M-35).
+     * the cast event carrying the ally it was AIMED at.
      */
     @Test
     public void herSkillCleansesOneDebuffFromTheAimedAlly() {
@@ -68,7 +68,7 @@ public class March7thKitTest {
     }
 
     /**
-     * The 战技: the shield absorbs "等同于三月七 <b>5% 防御力 + 60</b>" - a share of HER DEFENCE plus a constant.
+     * The Skill (战技): the shield absorbs "等同于三月七 <b>5% 防御力 + 60</b>" - a share of HER DEFENCE plus a constant.
      *
      * <p>Note: Asserted exactly, off her own DEFENCE as the engine resolves it: that is the whole point of
      * {@code scale: "owner_def"} -- a literal would be wrong for every build and every skill level.
@@ -89,7 +89,7 @@ public class March7thKitTest {
     }
 
     /**
-     * The 天赋"少女的特权": "当持有护盾的我方目标受到敌方目标攻击后，三月七立即向攻击者发起反击…每回合可触发2次".
+     * The talent (天赋) "少女的特权": "当持有护盾的我方目标受到敌方目标攻击后，三月七立即向攻击者发起反击 ...每回合可触发2次".
      *
      * <p>Note: The hit is deliberately one the <b>shield absorbs entirely</b> (HP never moves). That is the case the
      * event choice exists for: "受到攻击后" is about being attacked, not about losing HP, so gating this on
@@ -143,7 +143,7 @@ public class March7thKitTest {
     }
 
     /**
-     * The 终结技"冰刻箭雨之时": "受到攻击的敌方目标有50%基础概率陷入冻结状态，持续1回合".
+     * The Ultimate (终结技) "冰刻箭雨之时": "受到攻击的敌方目标有50%基础概率陷入冻结状态，持续1回合".
      *
      * <p>Note: The ultimate's <b>damage</b> needs no rule (the engine's ordinary AoE path reads 100103's own row), so
      * what is asserted here is the state: the victim cannot act, and "冻结状态" is readable by the condition DSL.
@@ -171,7 +171,7 @@ public class March7thKitTest {
         Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp(),
                 "and the first sentence of the ultimate is the engine's own AoE path, not a rule");
 
-        // The second half of that sentence, and the reason it is one rule: "冻结状态下…每回合开始时受到等同于
+        // The second half of that sentence, and the reason it is one rule: "冻结状态下 ...每回合开始时受到等同于
         // 三月七60%攻击力的冰属性附加伤害".
         com.laosun.aluminium.models.buff.DotBuff ice = enemy.getBuffManager()
                 .findBuff(com.laosun.aluminium.models.buff.DotBuff.class);
@@ -204,7 +204,7 @@ public class March7thKitTest {
     }
 
     /**
-     * The 星魂 2"记忆中的它": "进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+320的护盾，
+     * The Eidolons (星魂) 2 "记忆中的它": "进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+320的护盾，
      * 持续3回合".
      *
      * <p>Note: What this needed was the <b>selector</b> (`lowest_hp_ally`), not a new op: the shield's numbers are the
@@ -242,7 +242,7 @@ public class March7thKitTest {
     }
 
     /**
-     * The 行迹"加护": "战技提供的护盾持续时间增加1回合".
+     * The "加护" (Reinforce) trace: "战技提供的护盾持续时间增加1回合".
      *
      * <p>Note: The +1 is a <b>separate rule</b> from the Skill's shield, and it has to run after it in the same event - 
      * which it does, because effects of one event run in order (only *conditions* are all evaluated up front). The
@@ -265,7 +265,7 @@ public class March7thKitTest {
      *
      * <p><b>Twelve</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
      *
-     * <p>Note: <b>Her Skill's soft taunt is no longer on the registered list</b> (2026-09-29): it was never a missing number.
+     * <p>Note: <b>Her Skill's soft taunt is not on the registered list</b>: it was never a missing number.
      * The sentence states no magnitude, but the skill's {@code param_list} has five slots per level and the prose
      * references four, so the fifth (a constant 5) is the ratio; the game's own ability config attaches its shield
      * modifier with the property {@code AggroAddedRatio} and gates it on the HP% the prose does name, pinning that
@@ -273,12 +273,12 @@ public class March7thKitTest {
      * {@code TAUNT}, which is the hard "can only be selected" and would be a different mechanic rather than a
      * different number. See {@code SoftAggroWeightTest} and the rule's note in {@code characters/1001.json}.
      *
-     * <p>Note: Three clauses came off that list and each is worth a line: Eidolon 1 (2026-09-28) needed a per-cast count of the
+     * <p>Note: Three clauses came off that list and each is worth a line: Eidolon 1 needed a per-cast count of the
      * victims a state actually landed on ({@code "scale": "cast_applied:冻结"}); Eidolon 4's first sentence plus
-     * the 行迹"冰咒" (same day) needed a way to raise another rule's own number ({@code MODIFY_RULE}); Eidolon 4's second
+     * the "冰咒" (Ice Spell) trace needed a way to raise another rule's own number ({@code MODIFY_RULE}); Eidolon 4's second
      * sentence needed an absolute damage addend derived from an attribute ({@code ADD_DAMAGE}); and Eidolon 6 needed a
-     * shield whose <i>origin</i> can be asked ({@code has_shield from_rule}). Eidolons 3/5 came off with {@code M-32}: a
-     * skill level is now content data (a {@code RAISE_SKILL_LEVEL} rule) rather than a fixed {@code damage_level}.
+     * shield whose <i>origin</i> can be asked ({@code has_shield from_rule}). Eidolons 3/5 need no rule at all: a
+     * skill level is content data (a {@code RAISE_SKILL_LEVEL} rule), not a fixed {@code damage_level}.
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {

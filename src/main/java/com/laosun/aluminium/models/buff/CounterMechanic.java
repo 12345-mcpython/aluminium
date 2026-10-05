@@ -7,7 +7,7 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.event.HpLossEvent;
 
 /**
- * Counter-attack (P9-5): while this is attached, losing HP hits the one who caused it back.
+ * Counter-attack: while this is attached, losing HP hits the one who caused it back.
  *
  * <p><b>Retraction (2026-09-24).</b> A previous revision of this Javadoc carried an "OPEN DEFECT" claiming
  * the reaction fired far too often when both sides wore one, based on a measurement showing an enemy lose
@@ -28,7 +28,7 @@ import com.laosun.aluminium.models.event.HpLossEvent;
  * that cast the skill", not necessarily the character itself).
  *
  * <p><b>Generic on purpose.</b> Nothing here is enemy-specific: it is introduced for boss mechanics
- * (P9-5) but a character could carry it too, and it deliberately does not duplicate the follow-up shape
+ *  but a character could carry it too, and it deliberately does not duplicate the follow-up shape
  * that {@code TriggerInterpreter}'s {@code DAMAGE} op already expresses - both end up in
  * {@link Battle#applyAdditionalDamage}, so a counter is {@code ADDITIONAL} damage that
  * <b>does not count as an attack</b> (the victim gains no energy, no toughness is reduced).

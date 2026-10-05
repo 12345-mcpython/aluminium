@@ -3,7 +3,7 @@ package com.laosun.aluminium.models.buff;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * Taunt (P5-2): a pure marker, with no numeric value.
+ * Taunt: a pure marker, with no numeric value.
  *
  * <p>Semantics (the author's definition, not "raise the aggro value by a percentage"):
  * <blockquote>
@@ -41,7 +41,7 @@ public class TauntBuff extends AbstractBuff {
     }
 
     /**
-     * 嘲讽 (taunt) is a negative effect <b>on its bearer</b>: it forces that unit's targeting, which is why it is applied
+     * taunt (嘲讽) is a negative effect <b>on its bearer</b>: it forces that unit's targeting, which is why it is applied
      * to enemies and counts as a debuff rather than as a buff the wearer gives itself.
      */
     @Override

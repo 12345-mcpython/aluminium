@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Gepard (杰帕德)'s freeze, made deterministic (2026-09-28, round 131), and the reason it looked broken for four rounds.
+ * Gepard (杰帕德)'s freeze, made deterministic, and the reason it reads as broken on the default fixture.
  *
- * <p><b>What the source said.</b> `Battle.hitChance` computes
+ * <p><b>What the source says.</b> `Battle.hitChance` computes
  * <pre>baseChance * (1 + EFFECT_HIT_RATE) * (1 - EFFECT_RESISTANCE) * (1 - specific)</pre>
  * where `specific` is, for an enemy target, `enemy.getDebuffResist().getOrDefault(specificResistKey, 0.0)` - and the control's
- * key for 冻结 (frozen) is its own resist key. The monster this project's fixtures use by default carries that key at <b>1.0</b>, so the
- * chance was clamped to <b>0</b> and the roll could never pass: the content was right, the enemy was immune.
+ * key for frozen (冻结) is its own resist key. The monster this project's fixtures use by default carries that key at <b>1.0</b>, so the
+ * chance is clamped to <b>0</b> and the roll can never pass: the content is right, the enemy is immune.
  *
- * <p><b>What makes it deterministic now.</b> A hand-made target with no resistances at all, plus eidolon 1's +35% base chance on
+ * <p><b>What makes it deterministic.</b> A hand-made target with no resistances at all, plus eidolon 1's +35% base chance on
  * top of the 65% in the document - i.e. exactly 100%, against 0 hit-rate and 0 resistance. The freeze then lands whatever
  * `rng` returns, so this single case verifies the control, its per-turn payload, the base-chance amendment, and the choice of
  * target all at once.
@@ -41,7 +41,7 @@ public class GepardFreezeTest {
                 "「有65%的基础概率使受到攻击的敌方目标陷入冻结状态」 + 星魂 1 的 +35% ⇒ 100% base chance");
     }
 
-    /** Note: The control carries its own per-turn payload: "冻结状态下…每回合开始时受到…冰属性附加伤害". */
+    /** Note: The control carries its own per-turn payload: "冻结状态下...每回合开始时受到...冰属性附加伤害". */
     @Test
     public void theFreezeCarriesItsPerTurnDamage() {
         Fixture f = new Fixture(1);

@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1222 Lingsha (灵砂)'s 星魂 2 (Eidolon 2): "施放终结技后，使我方全体击破特攻提高40%，持续3回合" (after casting the ultimate, all of our side's break effect is raised by 40% for 3 turns).
+ * 1222 Lingsha (灵砂)'s Eidolon (星魂) 2: "施放终结技后,使我方全体击破特攻提高40%,持续3回合" (after casting the ultimate, all of our side's break effect is raised by 40% for 3 turns).
  * <p>Judged on a TEAMMATE ("我方全体", all of our side) as an ABSOLUTE +0.40, because BREAKING_EFFECT is a ratio attribute and a share lands as points on those (the
- * flat/ratio distinction measured in round 9).
+ * flat/ratio distinction).
  */
 public class LingshaEidolonBreakEffectTest {
     private static final int LINGSHA = 1222;

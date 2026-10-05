@@ -19,18 +19,19 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "在<b>战技提供的</b>护盾保护下的我方目标…" - a shield is asked about by <b>which rule created it</b>, not just "is there one".
+ * "在<b>战技提供的</b>护盾保护下的我方目标 ..." (an ally <b>under the shield the Skill provides</b>) - a shield is asked about
+ * by <b>which rule created it</b>, not just "is there one".
  *
- * <p><b>Why the DSL needed it.</b> 1001 March 7th's 星魂 6 heals the shielded ally on their turn - but only through the shield
- * her <b>Skill</b> gives. She has two shields of her own (her Skill's and 星魂 2's at battle start), so a condition that
- * asked only "has a shield" - or even "a shield from March 7th" - would also heal through the 星魂 2 one for the three turns it
+ * <p><b>Why the DSL needed it.</b> 1001 March 7th's Eidolon (星魂) 6 heals the shielded ally on their turn - but only through the shield
+ * her <b>Skill</b> gives. She has two shields of her own (her Skill's and Eidolon 2's at battle start), so a condition that
+ * asked only "has a shield" - or even "a shield from March 7th" - would also heal through the Eidolon 2 one for the three turns it
  * lasts: a wrong number with nothing to report. So the shield remembers the rule that created it
  * ({@code CanHit.getShieldRuleId()}, stamped where every buff already gets its source) and the condition can require it:
  * {@code <who> has_shield from_rule <id>}.
  *
  * <p><b>What this file pins.</b> That the origin really distinguishes the two shields, that a raw grant answers "no"
  * (nothing created it), that plain {@code has_shield} is unchanged, that an id which resolves to nothing - or to a rule
- * that makes no shield - is refused at load, and that her file ships 星魂 6 with that condition.
+ * that makes no shield - is refused at load, and that her file ships Eidolon 6 with that condition.
  */
 public class ShieldOriginConditionTest {
     private static final double EPS = 1e-6;
@@ -104,14 +105,14 @@ public class ShieldOriginConditionTest {
     }
 
     // ==================================================================
-    // The shipped content: 1001, 星魂 6
+    // The shipped content: 1001, Eidolon 6
     // ==================================================================
 
     /**
      * Her file ships the clause, and the two shields really are told apart end to end.
      *
      * <p>The measurement is on her <b>real file</b> and her real HEAL: with the Skill's shield up the ally is healed on
-     * their turn; with only the battle-start shield (星魂 2's) up they are not - same battle shape, same eidolon rank.
+     * their turn; with only the battle-start shield (Eidolon 2's) up they are not - same battle shape, same eidolon rank.
      */
     @Test
     public void theShippedEidolonHealsOnlyThroughTheSkillsShield() {
@@ -131,8 +132,8 @@ public class ShieldOriginConditionTest {
      * Whether the condition-gated heal fires for an ally whose shield came from {@code ruleId}.
      *
      * @param fromTheSkill {@code true} to the shield is installed by {@code skill_shield}; {@code false} to by
-     *                     {@code eidolon_shield}
-     * @param asked        the rule the condition names ({@code ""} = the unqualified spelling)
+     *  {@code eidolon_shield}
+     * @param asked the rule the condition names ({@code ""} = the unqualified spelling)
      */
     private static boolean healFires(boolean fromTheSkill, String asked) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);
@@ -247,19 +248,19 @@ public class ShieldOriginConditionTest {
         return effect;
     }
 
-    /** March 7th with her real file, one ally, and 星魂 6: heal on the ally's turn start, through one of the two shields. */
+    /** March 7th with her real file, one ally, and Eidolon 6: heal on the ally's turn start, through one of the two shields. */
     private static double shippedTurnStartHeal(boolean throughTheSkill) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, 6);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(hero, ally), List.of(monster()), fixed());
-        // Note: Hurt the ally BEFORE the battle starts, so 星魂 2's lowest_hp_ally shield really lands on them (at full
+        // Note: Hurt the ally BEFORE the battle starts, so Eidolon 2's lowest_hp_ally shield really lands on them (at full
         // HP everybody ties and the first in party order wins, which would be March 7th herself).
         hurt(ally);
         ally.heal(ally.getMaxHp());
         ally.takeDamage(ally.getMaxHp() * 0.5);
         battle.startBattle();
         if (throughTheSkill) {
-            // The Skill's shield overwrites the battle-start one, and it is the one 星魂 6 names.
+            // The Skill's shield overwrites the battle-start one, and it is the one Eidolon 6 names.
             battle.fireTriggers(TriggerEvent.SKILL_CAST, hero, ally, 0, 0);
         }
         double before = ally.getCurrentHp();

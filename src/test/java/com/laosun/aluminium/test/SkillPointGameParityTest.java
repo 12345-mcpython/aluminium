@@ -19,7 +19,7 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 /**
- * Consistency cross-check between skill points and the game rules (P8-4 re-verification).
+ * Consistency cross-check between skill points and the game rules.
  *
  * <p>This class is not a functional test; it is a probe that "asks the engine one rule at a
  * time": each entry notes the rule's source and the conclusion (consistent / inconsistent / not
@@ -169,11 +169,10 @@ public class SkillPointGameParityTest {
      * The two skill-point facts that are <b>still</b> constants: the party-level cap, and the basic attack's own
      * gain.
      *
-     * <p>Note: This test used to be called {@code characterAndGearSkillPointModifiersAreNotImplemented} and listed six
-     * characters as evidence. <b>One of them is implemented now</b>: Bronya's (布洛妮娅) Eidolon 1 ("施放战技时，有 50% 的固定概率
+     * <p>Note: Bronya's (布洛妮娅) Eidolon 1 ("施放战技时，有 50% 的固定概率
      * 恢复 1 个战技点，该效果有 1 回合的触发冷却") is authored in {@code characters/1101.json} as
      * {@code chance} + {@code cooldown} + {@code min_eidolon}, and pinned by {@code BronyaEidolonTest}. The other
-     * five still have no data, but they now have a <b>shape</b> - a rule on the trigger table that grants a point
+     * five still have no data, but they have a <b>shape</b> - a rule on the trigger table that grants a point
      *  - so what is missing for them is their own numbers rather than engine machinery.
      *
      * <p>What is left here is the narrower claim this test actually asserts: no character can change the
@@ -205,7 +204,7 @@ public class SkillPointGameParityTest {
      * {@code 1213_丹恒-饮月.md}, on the other hand, does not spend a skill point ("casting this
      * skill does not consume a skill point and is not treated as using a skill").
      *
-     * <p>Why it "happens to line up" right now: in this project's data the enhanced basic attacks
+     * <p>Why it "happens to line up": in this project's data the enhanced basic attacks
      * are also {@code "Normal"}, with no separate type (122 {@code Normal} entries measured =
      * 93 characters  x  1 + the multi-tier enhanced basic attacks of Dan Heng - Imbibitor Lunae /
      * Jingliu / Qingque / Boothill), so the engine gives them +1. That is correct for Qingque
@@ -252,8 +251,8 @@ public class SkillPointGameParityTest {
      * Note: <b>Worth noting</b>: the engine judges sides with
      * {@link com.laosun.aluminium.enums.Camp}, not with "is this person player-controlled".
      *
-     * <p>Consequence: if friendly summons / friendly NPCs are added later (memosprites are
-     * P9-4; they are units on our side but not "characters"), and they act with {@code Normal},
+     * <p>Consequence: if friendly summons / friendly NPCs are added later (memosprites
+     * are units on our side but not "characters"), and they act with {@code Normal},
      * they will also add skill points for our side.
      * In the game, memosprite actions can likewise provide skill points, so this behaviour is
      * probably right - but it is currently a side effect rather than an explicit design, so it

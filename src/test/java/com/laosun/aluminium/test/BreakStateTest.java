@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P4-4 acceptance: break's delay/push-back (25% of the action bar), the skipped turn, and toughness
+ * acceptance: break's delay/push-back (25% of the action bar), the skipped turn, and toughness
  * recovery after 2 turns.
  *
  * <p>Anchor: Ice Edge @90/group 1 has speed 132 to action cycle {@code 10000/132 ~= 5.6}.

@@ -20,16 +20,16 @@ import java.util.Random;
 /**
  * 1210 Guinaifen (桂乃芬): the first character whose file is <b>content</b> for the damage-instance vocabulary.
  *
- * <p>Her 逾锋 is "increases the damage dealt to an enemy target in the burning state by 20%" - a bonus that depends on the <i>target's state
+ * <p>Her Walking on Knives (逾锋) is "increases the damage dealt to an enemy target in the burning state by 20%" - a bonus that depends on the <i>target's state
  * at the moment of the hit</i>, which is neither a timed buff nor something {@code ALLY_ATTACK} could drive
  * (that event fires after the attack is settled). It is the first shipped rule that uses
  * {@code DEALING_DAMAGE} + {@code BOOST_DAMAGE}, and the first that reads a state name resolving to a DoT
- * ({@code 灼烧} (Burn) = a Fire {@code DotBuff}) rather than to a {@code StateBuff}.
+ * (Burn ({@code 灼烧}) = a Fire {@code DotBuff}) rather than to a {@code StateBuff}.
  *
- * <p>Her 投狭 (advance 25% at battle start) is in the same file, so this also keeps pinning "one character,
+ * <p>Her Bladed Hoop (投狭) (advance 25% at battle start) is in the same file, so this also keeps pinning "one character,
  * several mechanics, one table" - the property Robin's file established.
  *
- * <p>Her third trace (缘竿: "a Basic ATK has an 80% base chance to burn") is <b>not</b> here: it needs a chance
+ * <p>Her third trace (High Poles (缘竿): "a Basic ATK has an 80% base chance to burn") is <b>not</b> here: it needs a chance
  * roll on a trigger rule and an op that applies a DoT, neither of which exists. Two of three is the honest
  * state, and the file says nothing about the third.
  */
@@ -43,7 +43,7 @@ public class GuinaifenTraceTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // 1210103 逾锋: "increases the damage dealt to an enemy target in the burning state by 20%"
+    // 1210103 Walking on Knives (逾锋): "increases the damage dealt to an enemy target in the burning state by 20%"
     // ==================================================================
 
     @Test
@@ -92,7 +92,7 @@ public class GuinaifenTraceTest {
     }
 
     // ==================================================================
-    // 1210102 投狭: "at the start of the battle, advance Guinaifen's action by 25%"
+    // 1210102 Bladed Hoop (投狭): "at the start of the battle, advance Guinaifen's action by 25%"
     // ==================================================================
 
     @Test
@@ -102,7 +102,7 @@ public class GuinaifenTraceTest {
 
         Assertions.assertTrue(withoutTrace > 0, "precondition: she has a wait to shorten");
         Assertions.assertEquals(0.75 * withoutTrace, withTrace, 1e-6,
-                "the same 25%-of-remaining-wait arithmetic as Robin's 华彩花腔 (Coloratura)");
+                "the same 25%-of-remaining-wait arithmetic as Robin's Coloratura Cadenza (华彩花腔)");
     }
 
     // ==================================================================

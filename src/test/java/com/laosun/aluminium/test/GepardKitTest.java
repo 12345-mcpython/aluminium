@@ -16,26 +16,25 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Gepard (杰帕德) (1104): his kit verified through the engine's own readings (2026-09-28, rounds 12-128).
+ * Gepard (杰帕德) (1104): his kit verified through the engine's own readings.
  *
- * <p><b>Why the shield is read as a NUMBER.</b> The first attempt counted buffs; the source settles it - a shield is
+ * <p><b>Why the shield is read as a NUMBER.</b> The source settles it - a shield is
  * {@code CanHit.getShield()}, and the {@code has_shield} condition is literally {@code who.getShield() <= 0}, so buff counting
- * was blind to it by construction.
+ * is blind to it by construction.
  *
  * <p><b>Why one case needs E1.</b> The control roll is {@code Battle.rng.nextDouble() < hitChance(...)}, i.e. the 65% base
  * chance runs through effect hit rate / effect RES (效果命中 / 效果抵抗) and can genuinely miss - so a fixed roll cannot make the plain skill deterministic.
  * At E1 his own rule says "the base chance to freeze is increased by 35%" (a {@code MODIFY_RULE}), which brings the base chance to 100%; the roll then
  * cannot miss whatever {@code rng} hands back. The case therefore verifies the freeze AND eidolon 1 in one go.
  *
- * <p>Note: <b>An E1 freeze case was REMOVED, not fixed</b> (round 128, measured): the control roll is
+ * <p>Note: <b>The E1 freeze is unverified.</b> The control roll is
  * Battle.rng.nextDouble() < hitChance(...), so a fixed roll cannot make the plain skill deterministic, and even at E1 - where
- * his own rule raises the base chance by 35% - the target did NOT end up frozen under this fixture. Either that MODIFY_RULE
+ * his own rule raises the base chance by 35% - the target does not end up frozen under this fixture. Either that MODIFY_RULE
  * does not reach the control roll, or the monster carries a specific resistance to this control. Answering it needs one source
- * read (where MODIFY_RULE files its modifier and what hitChance's specificResistKey resolves to) before the case is
- * written again; until then the freeze stays unverified rather than flaky.
+ * read (where MODIFY_RULE files its modifier and what hitChance's specificResistKey resolves to); until then the freeze stays unverified rather than flaky.
  *
  * <p><b>Registered</b> in his file: the talent (needs a lethal-blow observable), the technique's shield (needs a "the technique
- * was used" gate), eidolons 2 and 6, and the trace "刚正 (Upright)" (a soft taunt whose number is in no document).
+ * was used" gate), eidolons 2 and 6, and the trace "Integrity (刚正)" (a soft taunt whose number is in no document).
  */
 public class GepardKitTest {
     private static final int GEPARD = 1104;
@@ -82,11 +81,11 @@ public class GepardKitTest {
     }
 
     /**
-     * 行迹 (trace) "刚正 (Upright)": "raises the chance that Gepard (杰帕德) is attacked by enemies" - the number is upstream, not in the prose.
+     * Traces (行迹) "Integrity (刚正)": "raises the chance that Gepard (杰帕德) is attacked by enemies" - the number is upstream, not in the prose.
      *
      * <p>{@code AvatarSkillTreeConfig}'s row for point 1104101 carries {@code ParamList = [3]} and the ability it names
      * attaches {@code M_SkillTree_AggroUp}, which writes {@code AggroAddedRatio} as <b>+parameter</b>; so his weight
-     * becomes  x (1 + 3) = <b> x 4</b>. The sibling trace "战意 (Battle Intent)" is the method's own check: its row says 0.35 and the
+     * becomes  x (1 + 3) = <b> x 4</b>. The sibling trace "Grit (战意)" is the method's own check: its row says 0.35 and the
      * document renders it as "DEFENCE increased by 35%".
      */
     @Test

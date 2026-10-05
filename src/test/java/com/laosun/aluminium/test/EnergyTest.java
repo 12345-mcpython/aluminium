@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 /**
- * P3-1 acceptance: the energy field + the single credit entry point {@code gainEnergy} + the
+ * acceptance: the energy field + the single credit entry point {@code gainEnergy} + the
  * standard provider's numeric mapping.
  *
  * <p>For the numbers see ROADMAP's P3-0: basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 /

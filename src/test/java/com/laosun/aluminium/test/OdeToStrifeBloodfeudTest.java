@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 Cyrene's memosprite Demiurge, memosprite skill 8 "献予'纷争'之诗 / Ode to Strife", the Bloodfeud branch (2026-10-02).
+ * 1415 Cyrene's memosprite Demiurge, memosprite skill 8 "献予'纷争'之诗 / Ode to Strife", the Bloodfeud branch.
  *
  * <p>The game's own words for this skill (data slot 16, SkillID 1141516):
  * "单次生效，对万敌施放时解除万敌陷入的所有控制类负面状态，若万敌处于[血仇]状态，则使其自动施放1次不消耗充能的[弑神登神]，
  * 本次攻击中万敌的暴击伤害提高 #1[i]%，若施放前目标被消灭则对新入场的敌方目标施放。若万敌不处于[血仇]状态，则使万敌行动提前 #2[i]%。"
  *
  * <p>The effect side is 1404's own shipped rule for the same skill -- `REPLACE_SKILL{skill: SKILL, skill_id: 11, turns: 1}` beside
- * `CAST_SKILL{skill: SKILL}` -- minus the `SPEND_RESOURCE{天赋充能, 150}` his hundred-and-fifty rule adds, which is exactly the
+ * `CAST_SKILL{skill: SKILL}` -- minus the `SPEND_RESOURCE{...}` (the talent's charge, 150) his hundred-and-fifty rule adds, which is exactly the
  * "不消耗充能" the sentence states.
  *
  * <p>The trigger became expressible only now: `from_skill_id` carries the SLOT, so on its own it also matches any other unit's slot-16
@@ -56,7 +56,7 @@ public class OdeToStrifeBloodfeudTest {
                 "「使其自动施放 1 次【弑神登神】」-- the swap his own rule performs");
     }
 
-    /** Outside [血仇] the same cast leaves him alone -- the other half of "若…处于…则…". */
+    /** Outside [血仇] the same cast leaves him alone -- the other half of "若 ...处于 ...则 ...". */
     @Test
     public void outsideBloodfeudTheOdeDoesNothing() {
         Character mydei = scene(false);

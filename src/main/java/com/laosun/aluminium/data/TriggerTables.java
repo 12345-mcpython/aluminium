@@ -46,7 +46,7 @@ import java.util.Set;
  * <h2>Two shapes, one of them the rule list</h2>
  * A file is either a bare <b>array</b> of rules - what every file written before resources existed
  * looks like, and still exactly what a character with nothing but rules needs - or an <b>object</b>
- * with a {@code rules} array plus the character's {@code resources} declarations (P8-8):
+ * with a {@code rules} array plus the character's {@code resources} declarations:
  *
  * <pre>
  * [ { "on": "SKILL_CAST", ... } ]                     // rules only

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * P1-1 acceptance: the 12 damage types, the two game rules they carry, and lookup.
+ * acceptance: the 12 damage types, the two game rules they carry, and lookup.
  */
 public class DamageTypeTest {
     @Test

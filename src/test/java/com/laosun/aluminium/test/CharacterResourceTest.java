@@ -20,11 +20,11 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * A character's <b>declared resources</b> (P8-8) and the {@code self_resource:<NAME>} condition that reads them.
+ * A character's <b>declared resources</b> and the {@code self_resource:<NAME>} condition that reads them.
  *
- * <p><b>The hole this closes.</b> Before this, {@code ResourceManager} could hold a value but no content could
- * declare one, and the condition DSL could not read one: {@code gain} answered {@code 0} for an unknown id and
- * {@code value} answered {@code 0} too, so a rule about "充能" (charge) was a no-op that reported nothing. 41 of the 9
+ * <p><b>The hole this closes.</b> Without this, {@code ResourceManager} can hold a value but no content can
+ * declare one, and the condition DSL cannot read one: {@code gain} answers {@code 0} for an unknown id and
+ * {@code value} answers {@code 0} too, so a rule about "充能" (charge) is a no-op that reports nothing. 41 of the 9
  * character documents in the corpus gate something on a count, which is the largest single gap the scan found
  * (ROADMAP §13.) - and a whole family of kits (Acheron's [残梦] (Dreamscape), Feixiao's [飞黄] (Flying Yellow), Cyrene's [追忆] (Recollection)) is built on
  * it.
@@ -50,8 +50,7 @@ public class CharacterResourceTest {
     /** Himeko: the shipped character whose file declares a resource. */
     private static final int HIMEKO = 1003;
     /** An ordinary character with no rules and no declarations ({@link TestCharacters}). */
-    // 2026-09-30: a REAL character with no `resources` block (1002 is a bare rule list). This used to be a cid with
-    // no content file at all, which no longer exists -- see TestCharacters. The assertions here are about DECLARATIONS, and
+    // Note: a REAL character with no `resources` block (1002 is a bare rule list, and it has a content file -- see TestCharacters). The assertions here are about DECLARATIONS, and
     // every one of them installs its own rule table, so the character's own rules never enter the measurement.
     private static final int PLAIN = 1002;
     private static final int LEVEL = 80;
@@ -365,7 +364,7 @@ public class CharacterResourceTest {
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
     }
 
-    /** A plain character carrying {@code charge} of 充能 (charge), registered exactly as the assembly point would. */
+    /** A plain character carrying {@code charge} of charge (充能), registered exactly as the assembly point would. */
     private static Character characterWithCharge(int charge) {
         Character owner = CharacterFactory.create(PLAIN, LEVEL);
         owner.getResources().register(CHARGE, 3, charge);

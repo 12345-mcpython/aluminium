@@ -20,10 +20,10 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * P10-2 acceptance: the three non-damaging break elements leave a control state behind, and the four
+ * The three non-damaging break elements leave a control state behind, and the four
  * damaging ones still do exactly what they did before.
  *
- * <p><b>What "control" means here was decided by the data, not by the plan.</b> The plan said "冻结期受伤害
+ * <p><b>What "control" means here is decided by the data, not by the plan.</b> The plan says "冻结期受伤害
  * +30%"; the encyclopedia text says something else, the same way in six independent entries - 
  * {@code "冻结状态下，敌方目标不能行动同时每回合开始时受到…冰属性伤害"} - and for the other two,
  * {@code "禁锢状态下，敌方目标行动延后#2%，速度降低#4%"} (Welt) and
@@ -32,12 +32,12 @@ import java.util.Set;
  * <table border="1">
  *   <caption>the three states, as the text describes them</caption>
  *   <tr><th>element</th><th>cannot act?</th><th>slows?</th><th>extra delay?</th></tr>
- *   <tr><td>Ice to 冻结</td><td><b>yes</b></td><td>no</td><td>yes</td></tr>
- *   <tr><td>Quantum to 纠缠</td><td>no</td><td>yes</td><td>yes</td></tr>
- *   <tr><td>Imaginary to 禁锢</td><td>no</td><td>yes</td><td>yes</td></tr>
+ *   <tr><td>Ice to frozen (冻结)</td><td><b>yes</b></td><td>no</td><td>yes</td></tr>
+ *   <tr><td>Quantum to entangled (纠缠)</td><td>no</td><td>yes</td><td>yes</td></tr>
+ *   <tr><td>Imaginary to imprisoned (禁锢)</td><td>no</td><td>yes</td><td>yes</td></tr>
  * </table>
  *
- * <p>The damage component of 冻结 (ice damage each turn) and 纠缠 (quantum damage on the next action) is <b>real but not built here</b>:
+ * <p>The damage component of frozen (冻结) (ice damage each turn) and entangled (纠缠) (quantum damage on the next action) is <b>real but not built here</b>:
  * it is a DOT, {@code BreakEffect.dotRatio} is its field, and no source states the break-applied ratio. It
  * stays a recorded TODO instead of an invented number - and {@code BreakEffectTableTest} fails if someone
  * fills one in without deciding.
@@ -47,12 +47,11 @@ import java.util.Set;
  * the element that breaks - no character of that element needs to exist for Ice/Quantum/Imaginary to be
  * testable.
  *
- * <p><b>Why the push is asserted to the digit for 冻结 and not at all for 纠缠/禁锢.</b> A speed change
+ * <p><b>Why the push is asserted to the digit for frozen (冻结) and not at all for entangled (纠缠) / imprisoned (禁锢).</b> A speed change
  * <i>reschedules</i> the pending action ({@code Signal.refreshSpeed} recomputes {@code nextActionTime} from
  * the progress the unit has already made), and the reschedule is larger the bigger the slow is - so for the
  * two states that slow, the movement of the action bar mixes two effects and no threshold can separate them.
- * On this fixture, measured (after the L-26 fix; the numbers were smaller before it, which is what exposed
- * that fix):
+ * On this fixture, measured:
  *
  * <table border="1">
  *   <caption>action-value movement of the same break, by how much it slows</caption>
@@ -124,15 +123,15 @@ public class ControlTest {
         Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("IMPRISONED").slowPercent()),
                 f.speed(), EPS, "imprisonment = speed reduction");
         // Same as entanglement above: no push assertion, and for the same measured reason -- at a 10% slow the
-        // reschedule alone already moves the bar 33.6 against a plain break's 18.94. (Before the L-26 fix
-        // it was 12.63, *below* the baseline, so this case used to be assertable; the fix removed that
-        // accidental discrimination by no longer truncating the reschedule.)
+        // reschedule alone already moves the bar 33.6 against a plain break's 18.94. (A truncated reschedule
+        // would move it 12.63 instead, *below* the baseline, so this case would be assertable for the wrong
+        // reason.)
     }
 
     /**
      * Regression, and the guard on the whole task: a damaging break must be <b>untouched</b>.
      *
-     * <p>It burns (P4-5), it does not touch speed, it does not lock the action, and its delay is exactly the
+     * <p>It burns, it does not touch speed, it does not lock the action, and its delay is exactly the
      * fixed 25% with no element-specific extra. If the control path were wired to every element instead of
      * only the three that have a state, this is what would go red.
      */
@@ -396,7 +395,7 @@ public class ControlTest {
                 "0 would read like 「never」, which is spelled by not writing the rule");
     }
 
-    /** An op that reads none of the magnitude fields refuses them rather than pretending (M-26's rule). */
+    /** An op that reads none of the magnitude fields refuses them rather than pretending. */
     @Test
     public void theMagnitudeFieldsAreRejectedOnAControl() {
         com.laosun.aluminium.beans.EffectSpec effect = TriggerSpecs.applyControl("冻结", 1, null, "target");

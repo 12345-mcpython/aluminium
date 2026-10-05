@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 /**
- * M-1: "the environment is not prepared" must never surface as a far-away NPE.
+ * "the environment is not prepared" must never surface as a far-away NPE.
  *
  * <p>{@code JSONReader} already explained a <b>missing</b> file (an {@link IllegalStateException}
  * naming the path and the generator). The other half was unguarded: {@code GSON.fromJson} returns

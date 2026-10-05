@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `actor_attr:<ATTRIBUTE>`: a magnitude that is a share of the ACTOR's own attribute (2026-10-02).
+ * `actor_attr:<ATTRIBUTE>`: a magnitude that is a share of the ACTOR's own attribute.
  *
- * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "<b>when cast on 开拓者-记忆</b>, raise 开拓者-记忆's ATK, the raise being equal to
- * #1% of <b>德谬歌's Max HP</b>". Read that carefully: the rule belongs to 开拓者-记忆, but the share is of <b>德谬歌</b> -- the unit doing the casting. Neither
- * `self_attr:` (the owner) nor `summon_attr:` (the owner's memosprite, which for 800is 迷迷) names that unit; the actor does.
+ * <p>The reader is 1415's memosprite skill 10 "献予'创世'之诗" -- "<b>when cast on Trailblazer - Remembrance (开拓者-记忆)</b>, raise Trailblazer - Remembrance (开拓者-记忆)'s ATK, the raise being equal to
+ * #1% of <b>Demiurge (德谬歌)'s Max HP</b>". Read that carefully: the rule belongs to Trailblazer - Remembrance (开拓者-记忆), but the share is of <b>Demiurge (德谬歌)</b> -- the unit doing the casting. Neither
+ * `self_attr:` (the owner) nor `summon_attr:` (the owner's memosprite, which for 8007 is Mem (迷迷)) names that unit; the actor does.
  *
  * <p>So this judge is deliberately THREE-way: the gain must equal the actor's share, and must not equal the owner's -- which is the exact
  * mistake the two existing spellings would have made.
@@ -30,7 +30,7 @@ import java.util.Random;
 public class ActorAttrScaleTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
-    private static final int RECIPIENT = 8007;   // 开拓者-记忆, whose own memosprite is 迷迷, NOT 德谬歌
+    private static final int RECIPIENT = 8007;   // Trailblazer - Remembrance (开拓者-记忆), whose own memosprite is Mem (迷迷), NOT Demiurge (德谬歌)
     private static final int MONSTER = 1002011;
     private static final int ODE_OF_ROMANCE = 14;
     private static final double SHARE = 0.1;

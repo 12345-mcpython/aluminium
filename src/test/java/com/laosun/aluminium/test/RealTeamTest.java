@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The real team assembly (P8-5).
+ * The real team assembly.
  *
  * <p>Until P8-5, {@code StageFactory.load} fought with a placeholder team built from
  * {@code Character.fromAttributes}: no element, no path, no real skills, and stat magnitudes chosen by

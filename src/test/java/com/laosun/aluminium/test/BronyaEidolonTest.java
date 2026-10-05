@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1101 Bronya (布洛妮娅): her 阵地 trace and her first <b>Eidolon</b>.
+ * 1101 Bronya (布洛妮娅): her Battlefield (阵地) trace and her first <b>Eidolon</b>.
  *
- * <p>Eidolon 1, 养精蓄锐, is the case {@code engine.md} §9 and {@code SkillPointGameParityTest} had carried as "not
- * implemented" for as long as the trigger table has existed - "施放战技时，有 50% 的固定概率恢复 1 个战技点，该效果
- * 有 1 回合的触发冷却". The missing part was never one hook: it is a rule-level probability, a cooldown, and a
- * way to say "this belongs to an Eidolon", all three of which arrived together, which is why the rule can now be
+ * <p>Eidolon 1, Hone Your Strength (养精蓄锐), is the case {@code engine.md} §9 and {@code SkillPointGameParityTest} carry as "not
+ * implemented": "施放战技时,有 50% 的固定概率恢复 1 个战技点,该效果
+ * 有 1 回合的触发冷却". The missing part is never one hook: it is a rule-level probability, a cooldown, and a
+ * way to say "this belongs to an Eidolon", all three of which are needed together, which is why the rule is
  * written where every other mechanic lives - in her file.
  *
- * <p>Her 阵地 is in the same file (a battle-start party DEF buff), so this also keeps pinning "one character,
+ * <p>Her Battlefield (阵地) trace is in the same file (a battle-start party DEF buff), so this also keeps pinning "one character,
  * several mechanics, one table" - and in this file the three mechanics have three different natures: a trace, an
  * Eidolon, and the relic-style party buff shape.
  */
@@ -34,7 +34,7 @@ public class BronyaEidolonTest {
     private static final double DEFENCE_TRACE = 0.2;
 
     // ==================================================================
-    // 阵地 (the battlefield trace): "战斗开始时，我方全体的防御力提高20%，持续2回合"
+    // Battlefield (阵地) (the battlefield trace): "战斗开始时,我方全体的防御力提高20%,持续2回合"
     // ==================================================================
 
     @Test
@@ -64,7 +64,7 @@ public class BronyaEidolonTest {
     }
 
     // ==================================================================
-    // Eidolon 1, 养精蓄锐
+    // Eidolon 1, Hone Your Strength (养精蓄锐)
     // ==================================================================
 
     @Test
@@ -103,7 +103,7 @@ public class BronyaEidolonTest {
     /**
      * "战技对指定我方目标造成的伤害提高效果的持续时间增加1回合" - and nothing else.
      *
-     * <p>Note: The other half of the assertion is the point: her "作战再部署" trace buff (+20% DEFENCE, 2 turns, applied
+     * <p>Note: The other half of the assertion is the point: her "作战再部署" (Combat Redeployment) trace buff (+20% DEFENCE, 2 turns, applied
      * at {@code BATTLE_START}) is <b>also</b> hers and can still be ticking when she casts her Skill. An
      * {@code EXTEND_BUFF} that meant "lengthen everything I applied" would silently add a turn to it as well - which
      * is why the op requires the buff to be named (by state or by attribute).

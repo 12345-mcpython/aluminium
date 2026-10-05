@@ -19,7 +19,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * P2-4 acceptance: the stat sheet, weaknesses and resistances of the enemies the factory produces are
+ * acceptance: the stat sheet, weaknesses and resistances of the enemies the factory produces are
  * all correct, and the resistance really does enter the damage pipeline.
  *
  * <p>Anchor: Ice Edge 1002011 at group 1 - Lv90 to HP~=16498.296, DEF~=1100, speed 132, weak to

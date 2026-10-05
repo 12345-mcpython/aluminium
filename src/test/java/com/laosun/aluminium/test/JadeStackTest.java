@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1314 翡翠's [当品]: one layer at the enemy's battle entry, fifteen from her technique, and 2.40% critical damage each.
+ * 1314 Jade (翡翠)'s [当品]: one layer at the enemy's battle entry, fifteen from her technique, and 2.40% critical damage each.
  *
  * <p>Both the counter's name and the values come from the data; the technique half is measured with and without
- * `markTechniqueUsed`, which is what its `self has_state 秘技` gate reads.
+ * `markTechniqueUsed`, which is what its `self has_state Technique (秘技)` gate reads.
  */
 public class JadeStackTest {
     private static final int JADE = 1314;
@@ -27,8 +27,8 @@ public class JadeStackTest {
 
     @Test
     public void theTechniqueGrantsFifteenAndTheTraceOne() {
-        Assertions.assertEquals(1, layers(false), "行迹: one layer when a battle starts");
-        Assertions.assertEquals(16, layers(true), "秘技: fifteen more, so sixteen in total");
+        Assertions.assertEquals(1, layers(false), "trace (行迹): one layer when a battle starts");
+        Assertions.assertEquals(16, layers(true), "technique (秘技): fifteen more, so sixteen in total");
     }
 
     /**

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Stack resources (P8-8): the abstraction that lets "stack instead of an energy bar" characters work
+ * Stack resources: the abstraction that lets "stack instead of an energy bar" characters work
  * without a class of their own.
  *
  * <p>The abstraction itself is {@link Resource} (extracted during P8-4, where skill points became its

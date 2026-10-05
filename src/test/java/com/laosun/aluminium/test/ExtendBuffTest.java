@@ -28,14 +28,14 @@ import java.util.Random;
 /**
  * {@code EXTEND_BUFF}: "... increases the duration by 1 turn".
  *
- * <p><b>Why the vocabulary needed it.</b> Ten of the 9documents lengthen a buff that is <b>already up</b> rather
- * than creating a new one - March 7th (三月七)'s 加护 ("increases the duration of the shield provided by the Skill by 1 turn"), Bronya (布洛妮娅)'s eidolon 6, Sampo (桑博)'s 风化,
- * Himeko (姬子)'s 灼烧, Bailu (白露)'s 生息, Huohuo (藿藿)'s 禳命, Gallagher (加拉赫)'s 酩酊 ... Before this op the only way to write one was to <b>fold the +1 into the
+ * <p><b>Why the vocabulary needed it.</b> Documents lengthen a buff that is <b>already up</b> rather
+ * than creating a new one - March 7th (三月七)'s "加护" (Reinforce) ("increases the duration of the shield provided by the Skill by 1 turn"), Bronya (布洛妮娅)'s eidolon 6, Sampo (桑博)'s Wind Shear (风化),
+ * Himeko (姬子)'s Burn (灼烧), Bailu (白露)'s Invigoration (生息), Huohuo (藿藿)'s Divine Provision (禳命), Gallagher (加拉赫)'s Besotted (酩酊) ... Before this op the only way to write one was to <b>fold the +1 into the
  * ability it lengthens</b>, which erases the trace's own line from the data and makes the base ability state a
  * duration that is not its own.
  *
  * <p><b>The two filters, and why neither is optional.</b> Every sentence identifies the buff by its <b>origin</b>
- * ("provided by the Skill") and then by <b>what it is</b>: a state's name (Burning / 生息 / Frozen / shield), or - when the text names an
+ * ("provided by the Skill") and then by <b>what it is</b>: a state's name (Burn / Invigoration / Frozen / shield), or - when the text names an
  * effect rather than a state ("damage increase effect") - the <b>attribute</b> the modifier sits on. "Everything I have on that
  * unit" is deliberately not a spelling, and {@link #itDoesNotLengthenTheOwnersOtherBuffs} is the case that shows why:
  * Bronya's DEFENCE trace buff from {@code BATTLE_START} can still be ticking when she casts her Skill.
@@ -48,7 +48,7 @@ public class ExtendBuffTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** The 加护 (Ward) shape: the same rule applies the shield and then lengthens it. */
+    /** The "加护" (Reinforce) shape: the same rule applies the shield and then lengthens it. */
     @Test
     public void itLengthensTheBuffTheSameRuleJustApplied() {
         Fixture f = new Fixture(
@@ -148,7 +148,8 @@ public class ExtendBuffTest {
     /**
      * Note: Every buff a rule creates records <b>who applied it</b>.
      *
-     * <p>This is what the origin filter rests on, and it used to be true only where a constructor demanded it
+     * <p>This is what the origin filter rests on, and it has to hold everywhere rather than only where a constructor
+     * demands it
      * ({@code DotBuff} needs it for kill credit) - a {@code StateBuff} or a stat modifier could be anonymous, and an
      * anonymous buff would make "the shield provided by the Skill" silently extend nothing at all. The audit is pinned here so that a
      * new buff-creating op has to keep its half of the deal.

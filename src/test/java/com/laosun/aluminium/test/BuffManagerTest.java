@@ -149,7 +149,7 @@ public class BuffManagerTest {
     // ==================================================================
 
     /**
-     * M-5: {@code clearAll()} must clear the <b>blocked</b> flag as well as the list.
+     * {@code clearAll()} must clear the <b>blocked</b> flag as well as the list.
      *
      * <p>{@code blocked} is set when a control buff expires on the turn it was blocking (see
      * {@code stunExpiryStillBlocksTheCurrentTurn}). If clearing every buff leaves that flag standing, the
@@ -173,7 +173,7 @@ public class BuffManagerTest {
     }
 
     /**
-     * M-12: a buff that reacts to damage by attaching <b>another</b> buff must not blow up.
+     * a buff that reacts to damage by attaching <b>another</b> buff must not blow up.
      *
      * <p>{@code onDamage} walked the live {@code buffs} list, and attaching a buff is exactly what a damage
      * reaction does (additional damage applying vulnerability, a counter attaching a marker, …). That is a

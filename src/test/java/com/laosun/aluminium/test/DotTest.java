@@ -22,7 +22,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * P4-5 acceptance: break DOT (first applied first settled, settled at the start of the turn, goes
+ * acceptance: break DOT (first applied first settled, settled at the start of the turn, goes
  * through the zones but cannot crit).
  *
  * <p>Anchor: a target with 100 defence, an Lv80 attacker (defence zone = 1000/1100), no resistance

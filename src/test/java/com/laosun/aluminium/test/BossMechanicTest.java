@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P9-5: counter-attack.
+ * counter-attack.
  *
  * <p>A unit wearing {@link CounterMechanic} hits whoever causes it to lose HP back - the enemy-side
  * mirror of Clara's counter, so bosses are no longer only something to be hit. Each test compares against

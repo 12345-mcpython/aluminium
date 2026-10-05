@@ -44,12 +44,12 @@ public class Battle {
      * Battle state machine (P-3).
      *
      * <pre>
-     *   NOT_STARTED --startBattle()--RUNNING --one side wiped out--WIN / LOSE
+     *  NOT_STARTED --startBattle--RUNNING --one side wiped out--WIN / LOSE
      *                                    |
      *                                   +---- (no rollback) ---+
      * </pre>
      *
-     * <p>{@code WIN} / {@code LOSE} are terminal states: {@link #stepForward()} no longer advances the action bar.
+     * <p>{@code WIN} / {@code LOSE} are terminal states: {@link #stepForward()} does not advance the action bar.
      */
     public enum Status {
         NOT_STARTED, RUNNING, WIN, LOSE
@@ -61,7 +61,7 @@ public class Battle {
 
     /**
      * The <b>player camp's roster</b> - every combatant fighting for us, in battlefield order: our
-     * characters plus any friendly {@link Summon} (a memosprite, Jing Yuan (景元)'s [神君], …).
+     * characters plus any friendly {@link Summon} (a memosprite, Jing Yuan (景元)'s [神君], ...).
      *
      * <p><b>Why this exists next to {@link #characters} rather than replacing it</b> (the friendly half of
      * L-8). The enemy side already has this split - {@link #enemies} is the camp and {@link #enemyUnits()}
@@ -95,13 +95,13 @@ public class Battle {
     /**
      * The <b>enemy camp's roster</b> - every combatant fighting against us, in battlefield order.
      *
-     * <p>Note: <b>Deliberately {@code CanHit}, not {@code Enemy}</b> (L-8). It used to be
-     * {@code List<Enemy>}, which made an enemy-side {@link com.laosun.aluminium.models.Summon}
+     * <p>Note: <b>Deliberately {@code CanHit}, not {@code Enemy}</b> (L-8). Typing it as
+     * {@code List<Enemy>} would make an enemy-side {@link com.laosun.aluminium.models.Summon}
      * <b>structurally impossible to place</b>: the action bar accepts any {@code CanHit}
      * ({@code Queue.addCombatants} takes {@code List<? extends CanHit>}), and camp-agnostic code
      * ({@code TargetSelector}, {@code opposingCamp}) was already written against {@code CanHit},
      * but the roster it had to be registered in only admitted monsters. Widening it here is what
-     * makes P9-4 possible at all.
+     * makes possible at all.
      *
      * <p>Code that needs <b>monster</b> mechanics (toughness, weakness, per-element debuff
      * resistance, phase tables) must ask for them explicitly through {@link #enemyUnits()} rather
@@ -114,8 +114,8 @@ public class Battle {
     public List<CanHit> enemies;
 
     /**
-     * One living unit from the other side, chosen with the battle's own seeded randomness (2026-09-30; reader:
-     * 1505 Evanescia (绯英)'s ultimate, "deals 14% to a random enemy target that deals damage…").
+     * One living unit from the other side, chosen with the battle's own seeded randomness (used by
+     * 1505 Evanescia (绯英)'s ultimate, "deals 14% to a random enemy target that deals damage ...").
      *
      * <p>The roll lives here rather than in the interpreter for the same reason crit does: one seeded source means a judge
      * can pin determinism (same seed -> same pick) and still show the choice varies across seeds.
@@ -174,7 +174,7 @@ public class Battle {
     public ArrayList<CanHit> addRequestItems = new ArrayList<>();
 
     /**
-     * The countdown units this battle has placed on the action order (M-49).
+     * The countdown units this battle has placed on the action order.
      *
      * <p>Kept in their own list, and Note: <b>not</b> in {@link #allies}: a countdown belongs to our camp (our rules react
      * to its turn) but it is not a party member - were it in the roster, "all our side" would buff it, `lowest_hp_ally`
@@ -182,8 +182,8 @@ public class Battle {
      */
     private final List<Countdown> countdowns = new ArrayList<>();
 
-    /** 2026-10-02: the read-only entry point for countdowns (readers: 1408's transformation countdown predicate, and the like predicates at 150/1309).
-     *  Note: The name avoids the field countdowns. */
+    /** Note: the read-only entry point for countdowns (1408's transformation countdown predicate, and the like predicates at 150/1309).
+     *  The name avoids the field countdowns. */
     public List<Countdown> countdownUnits() {
         return List.copyOf(countdowns);
     }
@@ -195,7 +195,7 @@ public class Battle {
      */
     private final List<CanHit> justSummoned = new ArrayList<>();
     /**
-     * Units whose technique was used before this battle (2026-09-29).
+     * Units whose technique was used before this battle.
      *
      * <p>A technique happens OUTSIDE the battle, so the engine cannot observe it; the caller says so with {@link #markTechniqueUsed}, and
      * {@link #startBattle()} turns that into a plain {@code StateBuff} named "秘技" so content can ask for it with the vocabulary it already has
@@ -205,7 +205,7 @@ public class Battle {
     private final List<CanHit> techniqueUsers = new ArrayList<>();
 
     /**
-     * The cast being resolved right now, or {@code null} outside a cast (P11-1, M-40) - what
+     * The cast being resolved right now, or {@code null} outside a cast - what
      * {@link TriggerEvent#CAST_SETUP} hands to the trigger tables.
      *
      * <p><b>Why the battle holds it rather than the trigger context.</b> "A cast is in progress" is a fact about
@@ -247,7 +247,7 @@ public class Battle {
         }
 
         /**
-         * The skill slot being cast (1 = basic attack, 2 = Skill, 3 = ultimate, …, the numbering {@code skills.json}
+         * The skill slot being cast (1 = basic attack, 2 = Skill, 3 = ultimate, ..., the numbering {@code skills.json}
          * itself uses - see {@link Skill#getSkillSlot()}).
          */
         public int slot() {
@@ -305,7 +305,7 @@ public class Battle {
      * <p>Called by the ops that roll for a state ({@code APPLY_CONTROL}, {@code APPLY_DOT}) and only when the roll
      * passed - a resisted application is not an application, which is the whole reason this counter exists.
      *
-     * @param stateName the state's name as the documents spell it (Frozen / Burn / …)
+     * @param stateName the state's name as the documents spell it (Frozen / Burn / ...)
      */
     public void recordCastApplied(String stateName) {
         if (stateName == null || stateName.isBlank()) {
@@ -317,7 +317,7 @@ public class Battle {
     /**
      * How many targets the current cast has applied {@code stateName} to ({@code 0} outside a cast's own events).
      *
-     * @param stateName the state's name (Frozen / Burn / …)
+     * @param stateName the state's name (Frozen / Burn / ...)
      * @return the landed count for this cast
      */
     public int castAppliedCount(String stateName) {
@@ -376,14 +376,14 @@ public class Battle {
     }
 
     /**
-     * Skill points policy (P8-4): one pool shared by the whole team, not one track per character.
+     * Skill points policy ): one pool shared by the whole team, not one track per character.
      *
      * <p>{@code Battle} itself does not know the skill point rules -- it only holds a
      * {@link SkillPointPolicy} and asks it once when "deciding to act" (see {@link #useSkill}).
      * Why split it this way: skill point rules keep growing character-level corrections (Bronya (布洛妮娅)
      * "skill has a 50% chance of +1", Sushang (素裳) "skill on a weakness-broken target +1",
      * Sparkle (花火) "max +2", ...). If all of those branches were added here,
-     * {@code Battle} would fill up with "because of some character" conditionals, violating the P8-0 three-way split.
+     * {@code Battle} would fill up with "because of some character" conditionals, violating the three-way split.
      * See <b>F-8</b> in §F of {@code DOC_VS_CODE.md}.
      *
      * <p>The default is {@link StandardSkillPointPolicy} (start 3 / max 5 / our basic attack +1 / skill -1 /
@@ -394,28 +394,28 @@ public class Battle {
     public SkillPointPolicy skillPointPolicy = new StandardSkillPointPolicy();
 
     /**
-     * Current skill points (P8-4). Equivalent to {@code skillPointPolicy.getValue()}.
+     * Current skill points ). Equivalent to {@code skillPointPolicy.getValue()}.
      */
     public int getSkillPoints() {
         return skillPointPolicy.getValue();
     }
 
     /**
-     * The regular skill point cap (P8-4). Equivalent to {@code skillPointPolicy.getMax()}.
+     * The regular skill point cap ). Equivalent to {@code skillPointPolicy.getMax()}.
      */
     public int getSkillPointMax() {
         return skillPointPolicy.getMax();
     }
 
     /**
-     * Whether there are enough skill points to cast one skill (P8-4).
+     * Whether there are enough skill points to cast one skill ).
      */
     public boolean hasSkillPoint() {
         return skillPointPolicy.canAfford();
     }
 
     /**
-     * Directly restore skill points (P8-4), capped at the regular maximum.
+     * Directly restore skill points ), capped at the regular maximum.
      *
      * <p>For explicit sources other than "basic attack +1": techniques, relics (the 4-piece Passerby set),
      * character mechanics.
@@ -434,7 +434,7 @@ public class Battle {
         if (gained > 0) {
             fireTriggers(TriggerEvent.SKILL_POINT_GAINED, null, null, 0, gained);
         }
-        // What the pool refused (2026-09-30): `asked - credited`. Both numbers are right here, which is why this is computed
+        // What the pool refused: `asked - credited`. Both numbers are right here, which is why this is computed
         // at the call site rather than inside the policy -- the policy reports what it credited, not what it was asked for.
         int overflowed = n - gained;
         if (overflowed > 0) {
@@ -443,7 +443,7 @@ public class Battle {
     }
 
     /**
-     * Spend 1 skill point (P8-4).
+     * Spend 1 skill point ).
      *
      * @return whether the spend succeeded; {@code false} means the count was already 0 (the caller should block this action)
      */
@@ -452,7 +452,7 @@ public class Battle {
     }
 
     /**
-     * Settle skill points for a skill (P8-4). The internal funnel point, shared by {@link #useSkill} and
+     * Settle skill points for a skill ). The internal funnel point, shared by {@link #useSkill} and
      * the heal/shield branches in the demos -- the latter call {@code Battle.heal/grantShield} directly,
      * bypassing {@link #useSkill}, so this has to be called explicitly, otherwise "a healing skill costs no points".
      *
@@ -460,8 +460,8 @@ public class Battle {
      *
      * @param skill the skill to settle
      * @param user  the actor -- must be passed explicitly. Earlier this guessed the actor from
-     *              {@code currentMove}, and in scenarios with no actor (directly-called tests, the demo's
-     *              healing branch) it guessed {@code null}, while {@code null != Camp.PLAYER} silently turned
+     *  {@code currentMove}, and in scenarios with no actor (directly-called tests, the demo's
+     *  healing branch) it guessed {@code null}, while {@code null != Camp.PLAYER} silently turned
      *              the policy into a no-op -- a wrong answer that reports no error. Passing it explicitly makes
      *              this kind of misuse surface as a compile error.
      * @return whether this action may continue (enough skill points); basic attack/ultimate/follow-up attack are always true
@@ -480,10 +480,10 @@ public class Battle {
      */
     @Getter
     private final Random rng;
-    /** The resource a RESOURCE_CHANGED event is about (2026-09-30; reader: 1506's forwarding clause). */
+    /** The resource a RESOURCE_CHANGED event is about (1506's forwarding clause). */
     private String lastChangedResource;
     /**
-     * [WAVE SEQUENCE] how many waves have begun (2026-10-02). A sequence, not a flag: a per-wave cap is a comparison against the
+     * [WAVE SEQUENCE] how many waves have begun. A sequence, not a flag: a per-wave cap is a comparison against the
      * number a rule last fired in, so nothing has to be reset -- the same reason the per-attack cap works that way.
      */
     private int waveSequence;
@@ -499,7 +499,7 @@ public class Battle {
     }
 
     /**
-     * Units that are OWNED but NOT DEPLOYED, whose rules are asked without them ever acting (2026-10-02).
+     * Units that are OWNED but NOT DEPLOYED, whose rules are asked without them ever acting.
      *
      * <p>Two documents start with "takes effect as soon as the character is obtained, no deployment needed" (140's Moon Cocoon's Ward (月茇之庇), 1506's 999 Safety Guard (999安全卫士)), and the data files them under
      * {@code AvatarGlobalBuffConfig} as global support skills. Note: Their tables cannot ride in `characters`: that list is the
@@ -534,7 +534,7 @@ public class Battle {
     }
 
     /**
-     * The CLASS of the debuff that just landed (2026-10-02; reader: 1506's "the enemy applied a control-type
+     * The CLASS of the debuff that just landed (1506's "the enemy applied a control-type
      * debuff to our side"). Same shape as {@link #lastChangedResource}: a battle-level fact the condition DSL reads, set at the one chokepoint
      * every landed debuff passes through. Note: Deliberately NOT folded into an existing argument slot -- the STATE_ENDED magnitude was once
      * put in `hitCount` and every reading of it was 0 until that was found.
@@ -542,7 +542,7 @@ public class Battle {
     private com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass;
 
     /**
-     * The per-battle home of PARTY-scoped resources (2026-09-30; reader: the shared [笑点] (laughs) counter). A resource like
+     * The per-battle home of PARTY-scoped resources (the shared [笑点] (laughs) counter). A resource like
      * that belongs to the party, not to whoever happened to declare it -- `ResourceManager` refuses to keep such a thing
      * per character, and this is the owner it asks for. Registered once at the start of the battle from the declarations.
      */
@@ -588,7 +588,7 @@ public class Battle {
         }
         listenToSkillPointChanges();
         // The units' buff managers hold the battle so a state that leaves a unit can be announced
-        // (2026-10-02; the STATE_ENDED event, whose reader is 1211's "when [生息] ends ...").
+        // (the STATE_ENDED event, whose reader is 1211's "when [生息] ends ...").
         for (Character c : characterQueue) {
             c.getBuffManager().setBattle(this);
         }
@@ -598,7 +598,7 @@ public class Battle {
     }
 
     /**
-     * Wire the skill point policy's change reports into event broadcasting (P8-6).
+     * Wire the skill point policy's change reports into event broadcasting ).
      *
      * <p>The policy reports after it "really credited / really spent", and {@code Battle} only broadcasts --
      * that way {@code Battle} does not need to know the skill point rules (nor to guess what just happened
@@ -664,17 +664,17 @@ public class Battle {
         return true;
     }
 
-    // After releasing ultra skill must call processRequests()!
+    // After releasing ultra skill must call processRequests!
     // NO BEFAN YOY DID IT
 
     /**
-     * The state that means "the ultimate is activated" (2026-10-02): a clause grants it and {@link #isUltraReady} honours it, which is the engine's one spelling of "activating the ultimate".
+     * The state that means "the ultimate is activated": a clause grants it and {@link #isUltraReady} honours it, which is the engine's one spelling of "activating the ultimate".
      * Not from the data -- the documents name the effect, not a state -- so it is named here once, like every other engine-side marker.
      */
     public static final String ULTIMATE_ACTIVATED_STATE = "终结技已激活";
 
     /**
-     * Whether this unit can cast its ultimate right now (P3-4 follow-up): reaching the "ult threshold" is
+     * Whether this unit can cast its ultimate right now follow-up): reaching the "ult threshold" is
      * enough, it does not have to be filled to the maximum.
      *
      * <p>The threshold comes from the skill data's {@code spNeed} (tbgd {@code AvatarSkillConfig.SPNeed},
@@ -695,16 +695,16 @@ public class Battle {
         if (user == null) {
             return false;
         }
-        // P8-8: the gate is the provider's to decide, not "energy is full". Characters who build a
-        // stack resource instead of energy (Acheron [残梦]/ Feixiao [飞黄]/ Cyrene [追忆]…) become
+        // The gate is the provider's to decide, not "energy is full". Characters who build a
+        // stack resource instead of energy (Acheron [残梦]/ Feixiao [飞黄]/ Cyrene [追忆] ...) become
         // ready when their resource fills, and their energy stays at 0 by design -- so the old
         // "must have an energy bar" test would lock them out forever.
         //
-        // `hasEnergyBar()` is therefore NOT checked here: the default implementation inside
+        // `hasEnergyBar` is therefore NOT checked here: the default implementation inside
         // EnergyProvider still applies exactly that rule (plus the threshold), so conventional
         // characters behave as before, while a stack provider may ignore energy entirely.
         if (user.getBuffManager().hasState(ULTIMATE_ACTIVATED_STATE)) {
-            // "activating the ultimate" (2026-10-02; reader: 1415's ultimate, "activates the ultimates of all teammates"): a clause can put a unit in a state where its ultimate is castable
+            // "activating the ultimate" (1415's ultimate, "activates the ultimates of all teammates"): a clause can put a unit in a state where its ultimate is castable
             // NOW, whatever its own provider would say. Without this the sentence had no spelling at all -- readiness was the provider's alone.
             return true;
         }
@@ -744,9 +744,9 @@ public class Battle {
         if (!requestSkill(ultra, user, targets)) {
             return false;
         }
-        // H-5: zero it first (the order in ROADMAP P3-2), then let the ultimate body settle.
+        // H-5: zero it first (the order in ROADMAP), then let the ultimate body settle.
         // Reversing the order eats the energy the ultimate itself earns: the kill energy / break energy
-        // inside processRequests() are both credited to damage.getAttacker() (= the one casting the ultimate),
+        // inside processRequests are both credited to damage.getAttacker (= the one casting the ultimate),
         // so settling first and zeroing afterwards wipes those entries out.
         lastUltEnergySpent = user.getCurrentEnergy();   // read it BEFORE the zeroing below
         user.setCurrentEnergy(0);
@@ -759,7 +759,7 @@ public class Battle {
         return true;
     }
 
-    /** Collects the PARTY-scoped declarations of our side into this battle's own store (2026-09-30). */
+    /** Collects the PARTY-scoped declarations of our side into this battle's own store. */
     /**
      * The energy the ultimate now settling consumed, for {@code ULT_CAST}'s amount.
      *
@@ -793,12 +793,12 @@ public class Battle {
     }
 
     /**
-     * The party's own counter, or {@code null} when this battle has none by that name (2026-09-30).
+     * The party's own counter, or {@code null} when this battle has none by that name.
      *
      * <p>Asked by both sides of the DSL: a `self_resource:NAME` read and a `GAIN_RESOURCE`/`SPEND_RESOURCE` write. They try the
      * unit first, exactly as before, and fall back here -- so nothing changes for a resource a character owns itself.
      */
-    /** The party counter's current value, or 0 when this battle has no such counter (2026-09-30). */
+    /** The party counter's current value, or 0 when this battle has no such counter. */
     public int partyResourceValue(String id) {
         com.laosun.aluminium.models.Resource resource = partyResources.get(id);
         return resource == null ? 0 : resource.value();
@@ -808,7 +808,7 @@ public class Battle {
         return partyResources.get(id);
     }
 
-    /** Notes which resource a change is about, then fires (2026-09-30). */
+    /** Notes which resource a change is about, then fires. */
     /** Records the class of the debuff that just landed (see {@link #lastAppliedDebuffClass()}). */
     public void noteAppliedDebuffClass(com.laosun.aluminium.enums.DebuffClass debuffClass) {
         lastAppliedDebuffClass = debuffClass;
@@ -844,11 +844,11 @@ public class Battle {
         }
         registerPartyResources();   // before any hook, so a BATTLE_START rule can already gain a shared counter
         attachBattleSkills();
-        applyTechniqueStates();   // ? before every BATTLE_START rule, so `self has_state 秘技` already answers
+        applyTechniqueStates();   // before every BATTLE_START rule, so `self has_state 秘技` already answers
         for (Signal signal : queue.snapshot()) {
             signal.getCanHit().onBattleStart(this);
         }
-        // P8-: after the opening hooks, let every combatant's trigger table see BATTLE_START.
+        // Note: after the opening hooks, let every combatant's trigger table see BATTLE_START.
         // Deliberately after `onBattleStart` so an opening buff is already in place when a trigger
         // reads its own state (e.g. "restore 30 energy at the start of battle").
         fireTriggers(TriggerEvent.BATTLE_START);
@@ -857,7 +857,7 @@ public class Battle {
     }
 
     /**
-     * Attach the map skills at the start of a battle (P8-2): map basic attack (slot 6) and
+     * Attach the map skills at the start of a battle ): map basic attack (slot 6) and
      * technique (slot ).
      *
      * <p>Why here and not in {@code CharacterFactory}: these two slots are things on the map,
@@ -866,7 +866,7 @@ public class Battle {
      * while the in-battle basic attack is the {@code Normal} of slot 1; the two are not the same thing.
      *
      * <p>The technique's effect (e.g. Jing Yuan (景元)'s "at the start of the next battle [神君]+3 hits")
-     * has to wait for the P8-6 events plus the trigger table; this method only attaches the skill itself
+     * has to wait for the events plus the trigger table; this method only attaches the skill itself
      * (readable and executable from the data).
      *
      * <p>Only our characters get them: monsters have no map skills ({@code EnemyFactory} installs their own
@@ -892,7 +892,7 @@ public class Battle {
 
     public void stepForward() {
         if (isOver()) {
-            return;                                  // terminal state: the action bar is no longer advanced (P-3)
+            return;                                  // terminal state: the action bar does not advance
         }
         queue.move();
         currentMove = queue.getCurrentActor();
@@ -911,11 +911,11 @@ public class Battle {
      *
      * <p>The rules:
      * <ul>
-     *   <li>A side being wiped out means that side loses -- this uses {@code allMatch(isDeath)}, so
+     *  <li>A side being wiped out means that side loses -- this uses {@code allMatch(isDeath)}, so
      *       an empty list also counts as wiped out (an empty side has simply been cleared).</li>
-     *   <li>At {@link Status#NOT_STARTED} nothing is decided: the battle has not started, so there is no
-     *       outcome to speak of. So this judgement only takes effect after {@link #startBattle()}.</li>
-     *   <li>Both sides wiped out at the same time to {@code LOSE} (loss is checked before win, and it will
+     *  <li>At {@link Status#NOT_STARTED} nothing is decided: the battle has not started, so there is no
+     *  outcome to speak of. So this judgement only takes effect after {@link #startBattle()}.</li>
+     *  <li>Both sides wiped out at the same time to {@code LOSE} (loss is checked before win, and it will
      *       not keep judging from a terminal state).</li>
      * </ul>
      *
@@ -942,7 +942,7 @@ public class Battle {
      * Give {@code actor} an extra turn (P-2): the next {@link #stepForward()} is taken by it,
      * and it costs no action value (the clock does not move to the round does not change, see {@link #getRound()}).
      *
-     * <p>The typical use is a kill-type talent (Seele (希儿) and the like, ROADMAP P5-9): call it inside
+     * <p>The typical use is a kill-type talent (Seele (希儿) and the like, ROADMAP): call it inside
      * {@code afterMove()} -- that is, after {@code queue.setTopZero()} -- so that its normal turn schedule
      * stays untouched and the extra turn is a free one.
      *
@@ -954,7 +954,7 @@ public class Battle {
      * @return {@code true} = scheduled; {@code false} if the target is dead / not in the queue
      */
     /**
-     * Makes a unit act at the next step, outside the action order (2026-10-02; the game's {@code TurnInsertAction}).
+     * Makes a unit act at the next step, outside the action order (the game's {@code TurnInsertAction}).
      */
     public boolean insertAction(CanHit actor) {
         return queue.insertAction(actor);
@@ -988,19 +988,19 @@ public class Battle {
             return;
         }
         CanHit actor = currentMove.getCanHit();
-        // "before the [协奏] state ends it will not enter its own turn and cannot act" (one link of M-49): a suspended unit's turn passes *without it* -- no DOT
+        // "before the [协奏] state ends it will not enter its own turn and cannot act" (one link of a suspended turn): a suspended unit's turn passes *without it* -- no DOT
         // tick, no TURN_START, no own hooks. Note: Deliberately not a control: a control still lets the turn arrive (and
         // the DOTs tick), which is a different sentence; see AbstractBuff#suspendsTurns.
         if (actor.getBuffManager().suspendsTurns()) {
             return;
         }
-        // P4-5: damage over time is settled at the start of the turn -- of any unit, not only an
-        // enemy. The `instanceof Enemy` guard that used to stand here was the visible edge of the old
+        // Damage over time is settled at the start of the turn -- of any unit, not only an
+        // enemy. An `instanceof Enemy` guard here would be the visible edge of the old
         // design (a DOT could only exist on an Enemy); now that a DOT is an ordinary buff there is
-        // nothing enemy-shaped left to test for. The guard is also what kept "the boss burns us"
+        // nothing enemy-shaped left to test for. That guard is also what kept "the boss burns us"
         // inexpressible, so removing it is the point of the migration, not a side effect.
         tickDots(actor);
-        // Note: Immediately after the DOT pass and before the early duration tick (2026-09-28): a regeneration settles N
+        // Note: Immediately after the DOT pass and before the early duration tick: a regeneration settles N
         // times for a `turns: N` buff for exactly the reason the comment below gives for a DOT -- and a `TURN_START`
         // rule could not do it, because that event fires after the tick that removes the buff.
         tickRegens(actor);
@@ -1013,21 +1013,21 @@ public class Battle {
         // for a 1-turn DOT it burns for nothing. `DotBuff` is an early buff precisely so this line is
         // what counts it down.
         actor.getBuffManager().beforeMove();
-        // M-42 (d): and the buffs on the rest of the field whose clock is this unit's ("at the start of Sunday (星期日)'s own every turn the
+        // (d): and the buffs on the rest of the field whose clock is this unit's ("at the start of Sunday (星期日)'s own every turn the
         // [蒙福者] state's remaining turns are reduced by 1"). Swept here rather than inside the manager, because "whose turns count it"
         // is a fact about the battle's turn boundary, not about the unit that happens to carry the buff.
         tickForeignBuffs(actor, true);
         if (actor.isDeath()) {
             return;
         }
-        // P8-: "the turn began", delivered to the data-driven tables. Deliberately here and not as a
+        // Note: "the turn began", delivered to the data-driven tables. Deliberately here and not as a
         // new buff interface: turn boundaries stay `MoveEvent.beforeMove/afterMove` for buffs (see
         // EventBusTest.turnBoundariesAreStillMoveEvent). What is added is only the *data* subscription
         // to the same moment -- a JSON rule cannot implement a Java interface, so without this event
         // "at the beginning of the turn, ..." would have no trigger source at all.
         //
         // Position matters twice over:
-        //   * after `getBuffManager().beforeMove()`, so buffs that expire at this turn boundary are
+        //  * after `getBuffManager.beforeMove`, so buffs that expire at this turn boundary are
         //     already gone and a rule cannot read a dead buff's state;
         //   * before `actor.beforeMove(this)`, i.e. before the actor's own move hook, so a rule that
         //     heals or buffs has taken effect by the time the character actually moves.
@@ -1050,9 +1050,9 @@ public class Battle {
         // `performAction` and its settlement), so the lethal set is cleared at it.
         lethallyHitThisAction.clear();
         fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
-        // "lasting until the start of the next ... turn" ends HERE: the owner's own turn is beginning (2026-10-02).
+        // "lasting until the start of the next ... turn" ends HERE: the owner's own turn is beginning.
         actor.getBuffManager().removeWithLifetime(AbstractBuff.Lifetime.NEXT_TURN_START);
-        // P12 (M-49): a countdown exists to HAVE a turn -- this is the moment its reader waits for
+        // A countdown exists to HAVE a turn -- this is the moment its reader waits for
         // ("at the start of the countdown turn, Robin (知更鸟) exits the [协奏] state and acts immediately"). The countdown has no table of its own, and our
         // characters' tables are what subscribe, so the ordinary ally broadcaster is the right one.
         if (actor instanceof Countdown countdown) {
@@ -1062,7 +1062,7 @@ public class Battle {
     }
 
     /**
-     * Settle the damage over time on one unit (P4-5): first applied, first settled (in application order).
+     * Settle the damage over time on one unit: first applied, first settled (in application order).
      *
      * <p>DOT goes through the full damage zones (it takes DMG boost and defence/resistance; vulnerability/reduction
      * are injected by the {@code onDamage} hook), but it cannot crit -- expressed by {@link DamageType#DOT}'s
@@ -1079,7 +1079,7 @@ public class Battle {
      */
     /**
      * Settles <b>one extra instance</b> of a damage-over-time state on a unit, right now, at {@code percent} of what that
-     * state is currently dealing (2026-09-28).
+     * state is currently dealing.
      *
      * <p>"make the laceration state it is currently under <b>immediately produce 1 instance</b> of damage equal to 85% of the original damage" (1111 Luka (卢卡) talent). It mirrors
      * {@link #tickDots(CanHit)} - same source, element and {@link DamageType#DOT}, same {@code EnergyGrant.KILL_ONLY} - so
@@ -1143,7 +1143,7 @@ public class Battle {
     }
 
     /**
-     * Settle every <b>heal over time</b> on one unit (2026-09-28): the twin of {@link #tickDots(CanHit)}, and placed
+     * Settle every <b>heal over time</b> on one unit: the twin of {@link #tickDots(CanHit)}, and placed
      * right beside it so the two cannot drift apart.
      *
      * <p>"at the start of each of the target's turns, restore to it health equal to 20% of Natasha (娜塔莎)'s Max HP + 192, lasting 2 turns" needs this rather than a
@@ -1175,14 +1175,14 @@ public class Battle {
     }
 
     /**
-     * Weakness break's attached damage over time (P4-5): only Fire/Lightning/Physical/Wind have it.
+     * Weakness break's attached damage over time ): only Fire/Lightning/Physical/Wind have it.
      * Ice = Frozen, Quantum = Entanglement, Imaginary = Imprisonment - those three carry <b>no effect at
      * all</b> today, they are not merely "a different DOT".
      *
-     * <p>The per-element numbers come from {@code Constant.BREAK_EFFECTS} (the P10-1 table: dot ratio,
+     * <p>The per-element numbers come from {@code Constant.BREAK_EFFECTS} (the table: dot ratio,
      * dot turns, control type), which replaced the old "one ratio and one duration for all four
      * elements" pair of scalars. That table also names the control type of the other three elements,
-     * but naming it is where it stops: {@code P10-2}'s control state machine does not exist yet, so
+     * but naming it is where it stops: the control state machine does not exist yet, so
      * {@code hasDot()} is false for them and this method returns above. The honest state is "the four
      * DOT elements are data now; the three control elements are labelled but inert".
      *
@@ -1204,25 +1204,25 @@ public class Battle {
     }
 
     /**
-     * The control part of a weakness break (P10-2): the element's own extra action delay, plus the control
+     * The control part of a weakness break ): the element's own extra action delay, plus the control
      * state itself.
      *
      * <p><b>What the three non-damaging elements do, and how that was decided.</b> The plan said "during the frozen period, the damage taken
      * is +30%, apply control" - a guess. The encyclopedia text was probed instead, and it says something else,
      * consistently across every source that describes the states:
      * <ul>
-     *   <li>Frozen - {@code "while in the frozen state, the enemy target cannot act and at the start of every turn takes ice damage equal to #4% of the caster's ATK"}
+     *  <li>Frozen - {@code "while in the frozen state, the enemy target cannot act and at the start of every turn takes ice damage equal to #4% of the caster's ATK"}
      *       (深寒徘徊者 / 永冬灾影 / March 7th (三月七) / Gepard (杰帕德) / Jingliu (镜流), six independent entries). The damage is <b>ice
      *       damage over time</b>, not a "taken +30%" multiplier - which is why it is <b>not</b> implemented
-     *       here: it is a DOT whose ratio is not in the data, and {@code BreakEffect.dotRatio} is that field.
-     *       See the TODO in P10-2 rather than a number invented here.</li>
-     *   <li>Imprisonment - {@code "while in the imprisoned state, the enemy target's action is delayed by #2% and its speed is reduced by #4%"} (Welt (瓦尔特)).</li>
-     *   <li>Entanglement - {@code ""Entanglement" makes the enemy's action be delayed, and deals additional quantum damage to it on its next action"}
+     *  here: it is a DOT whose ratio is not in the data, and {@code BreakEffect.dotRatio} is that field.
+     *  See the TODO in rather than a number invented here.</li>
+     *  <li>Imprisonment - {@code "while in the imprisoned state, the enemy target's action is delayed by #2% and its speed is reduced by #4%"} (Welt (瓦尔特)).</li>
+     *  <li>Entanglement - {@code ""Entanglement" makes the enemy's action be delayed, and deals additional quantum damage to it on its next action"}
      *       (explicitly about a weakness break with Quantum). The delayed damage is again a DOT, left to the same
      *       TODO.</li>
      * </ul>
      * So all three are <b>action delay</b>, and the difference is Frozen = cannot act versus Imprisonment/Entanglement = acts but slower
-     * (a {@code SPEED} debuff). Both are existing primitives, and since 2026-09-2they are the two parts of
+     * (a {@code SPEED} debuff). Both are existing primitives, and sincethey are the two parts of
      * {@code ControlBuff} - which is what gives a control its <b>name</b>, so "the frozen state" can be asked about no
      * matter which path applied it.
      *
@@ -1241,16 +1241,14 @@ public class Battle {
         }
         // Order: the state first, the one-off push last.
         //
-        // Note: This order used to be load-bearing and no longer is -- recorded because the comment here
-        // claimed the opposite and would otherwise outlive its reason. Before the L-26 fix, a push applied
-        // *before* the slow was recomputed away by the reschedule, so the element's extra delay became
-        // unobservable (measured: 28.409 with and without it). L-26 fixed the loss at its source -- the
-        // ledgers are synchronised and the progress is no longer capped from above -- so a push now
-        // survives a speed change either way. The order is kept because "apply the state, then the
-        // one-off push" is the order the data describes it in, not because correctness depends on it.
+        // NOTE: apply the state first, then the one-off push: that is the order the data describes them in,
+        // not a correctness requirement. A push applied *before* the slow is recomputed away by the
+        // reschedule, which makes the element's extra delay unobservable (measured: 28.409 with and without
+        // it). That loss is fixed at its source -- the ledgers are synchronised and the progress is not
+        // capped from above -- so a push survives a speed change either way.
         Constant.ControlEffect control = breakEffect.controlEffect();
         if (control != null) {
-            // One buff, three parts (2026-09-2): before this, the composition was written out here as "a
+            // One buff, three parts: before this, the composition was written out here as "a
             // StunBuff, plus a SPEED debuff if the element slows" -- which left the state with no name, so
             // nothing could ask "the frozen state" about a break-frozen unit, and an ability-applied control (which
             // needs exactly the same composition plus a resistance roll) had no shared place to live.
@@ -1287,7 +1285,7 @@ public class Battle {
         if (user.isDeath()) {
             return false;
         }
-        // Skill points (P8-4): all the rules are in skillPointPolicy (including the our-side/enemy-side camp
+        // Skill points ): all the rules are in skillPointPolicy (including the our-side/enemy-side camp
         // check); Battle only asks once "does this action hold up" -- it knows no character, see F-8 in §F.
         if (!skillPointPolicy.onSkillCast(user, skill)) {
             return false;
@@ -1308,7 +1306,7 @@ public class Battle {
             queue.removeCombatant(actor);
         } else if (queue.isInActionOrder(actor)) {
             // Note: Only an actor that HAS a place in the order has a cycle to re-time. An inserted action carries a signal that was never
-            // scheduled, and `setTopZero()` would re-time the top of the heap -- i.e. somebody else (2026-10-02).
+            // scheduled, and `setTopZero` would re-time the top of the heap -- i.e. somebody else.
             queue.setTopZero();
         }
         currentMove = null;
@@ -1317,7 +1315,7 @@ public class Battle {
             actor.afterMove(this);
             actor.getBuffManager().afterMove();
             tickForeignBuffs(actor, false);
-            // "at the end of the turn" (2026-09-28): the turn is over HERE -- after the actor's own hook and the late tick, so a rule
+            // "at the end of the turn": the turn is over HERE -- after the actor's own hook and the late tick, so a rule
             // sees the state the turn ended in.
             // A timed weakness is counted in the TARGET's own turns, so it runs down when that unit's turn ends.
             if (actor instanceof com.laosun.aluminium.models.enemy.Enemy ticking) {
@@ -1335,13 +1333,13 @@ public class Battle {
     }
 
     /**
-     * Spends the duration of every buff on the field whose clock belongs to {@code clockOwner} (M-42 ④).
+     * Spends the duration of every buff on the field whose clock belongs to {@code clockOwner}.
      *
      * <p>Iterates the <b>camp</b>, so a buff anchored to one of our characters is found wherever it sits - the
      * point of the feature is that it sits on somebody else.
      *
      * @param clockOwner the unit whose turn boundary this is
-     * @param early      {@code true} = before the move, {@code false} = after it
+     * @param early {@code true} = before the move, {@code false} = after it
      */
     private void tickForeignBuffs(CanHit clockOwner, boolean early) {
         for (CanHit ally : allies) {
@@ -1424,7 +1422,7 @@ public class Battle {
      * The internal settlement entry point: one parameter more than the public version, "which kind of energy
      * gain this instance is allowed to settle".
      *
-     * <p>Why it is needed (the 2026-09-19 rule): one attack action grants the victim energy only once.
+     * <p>Why it is needed (the rule): one attack action grants the victim energy only once.
      * One attack can derive several damage types (skill damage to break damage to super break damage); if every
      * instance granted the victim energy, the victim would gain more energy for "being hit harder" -- which
      * is wrong. So only the main instance of a hit carries {@link EnergyGrant#ALL}; derived instances are
@@ -1438,10 +1436,10 @@ public class Battle {
         }
         double settled = assemble(damage);                       // damage after the zones (this is "how much was dealt")
         double hpBefore = target.getCurrentHp();
-        // Lethal blow (2026-10-02): "when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP".
+        // Lethal blow: "when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP".
         // Note: THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
         // target at full HP, where a heal is a no-op and nothing can ever answer. So the target is dropped to 0 HP first WITHOUT
-        // being marked dead, the tables are asked, and `perish()` is called only if nobody answered -- which is precisely
+        // being marked dead, the tables are asked, and `perish` is called only if nobody answered -- which is precisely
         // "will not fall into the unable-to-fight state".
         boolean lethal = settled >= hpBefore;
         boolean died;
@@ -1463,7 +1461,7 @@ public class Battle {
         }
         double hpLoss = hpBefore - target.getCurrentHp();
         double shieldAbsorbed = target.getLastShieldAbsorbed();
-        // P8-: "I was hit" -- a *different fact* from "I lost HP", and the difference is the whole
+        // Note: "I was hit" -- a *different fact* from "I lost HP", and the difference is the whole
         // point (see TriggerEvent.TAKING_HIT):
         //   * it fires whenever an incoming damage instance lands, even when a shield absorbs all of
         //     it (hpLoss == 0) -- which is what "after the wearer is hit / attacked" means in the
@@ -1474,7 +1472,7 @@ public class Battle {
         // The HP_LOST trigger below keeps its own stricter gate (`hpLoss > 0`), so the two events can
         // never be mistaken for one another.
         fireTriggersForAlly(TriggerEvent.TAKING_HIT, damage.getAttacker(), target, settled);
-        // P8-6: HP loss and being killed are two facts, both emitted here. Placed before the energy
+        // HP loss and being killed are two facts, both emitted here. Placed before the energy
         // settlement -- the event means "an HP change happened", independent of the energy rule (who gains how
         // much, whether it counts as an attack).
         if (hpLoss > 0) {
@@ -1483,7 +1481,7 @@ public class Battle {
             // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
             fireTriggersForAlly(TriggerEvent.HP_LOST, damage.getAttacker(), target, hpLoss);
         }
-        // The DEALER-side fact, and the only post-settlement number that reaches BOTH camps (2026-10-02):
+        // The DEALER-side fact, and the only post-settlement number that reaches BOTH camps:
         // "how much did this hit I dealt actually settle". `TAKING_HIT` above carries the same number but is fired through
         // `fireTriggersForAlly`, which returns 0 for any target that is not on our side -- so an ENEMY victim never
         // announced it, and "to an enemy target ... equal to X% of the original damage" (Himeko (姬子)'s eidolon 6) had no way to read what it had just dealt.
@@ -1496,7 +1494,7 @@ public class Battle {
             // ask WHICH skill produced the kill (see the `from_skill` condition), and the instance already knows.
             fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0, damage.getCastCategory());
         }
-        grantHitAndKillEnergy(target, damage, died, grant);     // P3-2: hit energy gain / kill energy gain
+        grantHitAndKillEnergy(target, damage, died, grant);     // hit energy gain / kill energy gain
         // The return value = the damage this hit actually had effect with = shield-absorbed + HP really lost.
         // The goal is that "hitting a shielded target must not display as 0", while not adding settled to
         // the shield absorption (settled is "the amount dealt", and the part the shield absorbed is already in
@@ -1507,7 +1505,7 @@ public class Battle {
     }
 
     /**
-     * The only energy gain entry point inside battle (P3-2): the rules are decided by {@code target}'s own
+     * The only energy gain entry point inside battle ): the rules are decided by {@code target}'s own
      * {@link com.laosun.aluminium.models.energy.EnergyProvider}; team charging (Tingyun (停云)/Huohuo (藿藿)/
      * Sunday (星期日)) will in the future also grant energy to other targets from here.
      *
@@ -1520,10 +1518,10 @@ public class Battle {
             return 0;
         }
         double added = target.gainEnergy(gain);
-        // P8-6: only emit when the amount actually credited > 0 -- "blocked by the cap" should not count as gaining energy
+        // Only emit when the amount actually credited > 0 -- "blocked by the cap" should not count as gaining energy
         if (added > 0) {
             broadcastEnergyGain(target, added);
-            // P8-: let the data-driven tables see it too (e.g. "when I gain energy, ...").
+            // Note: let the data-driven tables see it too (e.g. "when I gain energy, ...").
             fireTriggersForAlly(TriggerEvent.ENERGY_GAINED, target, target, added);
         }
         return added;
@@ -1541,7 +1539,7 @@ public class Battle {
     }
 
     /**
-     * Skill energy gain hook point (P3-2): called by {@link SkillExecutor} where the skill is executed -- only
+     * Skill energy gain hook point ): called by {@link SkillExecutor} where the skill is executed -- only
      * there does it know the actual hit set (AOE hits everyone, BLAST hits three slots, BOUNCE switches
      * target every instance).
      *
@@ -1563,29 +1561,29 @@ public class Battle {
     }
 
     /**
-     * Toughness reduction + weakness break trigger (P4-2): the only toughness reduction entry point in
+     * Toughness reduction + weakness break trigger ): the only toughness reduction entry point in
      * battle, called by {@link SkillExecutor} after each damage instance settles.
      *
      * <p>The rules (HSR.md §3.2 / §.1):
      * <ul>
      *   <li><b>Only hitting a weakness reduces toughness</b> -- a non-weakness element reduces none of it
      *       ("toughness reduction ignoring weakness" is a character trait of Rappa (乱破)/Himeko (姬子) - Nova
-     *       and the like; wait for P8-to put it in data, do not open a default hole here)</li>
+     *  and the like; wait for to put it in data, do not open a default hole here)</li>
      *   <li><b>But super break is not restricted by weakness</b>: while the enemy is already in the broken
      *       state, the whole nominal toughness reduction counts as "the excess part", regardless of whether
      *       the element hits a weakness (the official wording's only condition is "the enemy is in the
      *       weakness-broken state"). A non-weakness attack on an already broken enemy still produces a super
      *       break instance</li>
-     *   <li>No toughness bar (the data really does contain enemies with {@code stance = 0}) / already broken /
+     *  <li>No toughness bar (the data really does contain enemies with {@code stance = 0}) / already broken /
      *       already dead to no reduction</li>
-     *   <li>Toughness reaching zero to the break is triggered from here ({@code Enemy.reduceStance} does no
+     *  <li>Toughness reaching zero to the break is triggered from here ({@code Enemy.reduceStance} does no
      *       judgement itself)</li>
      * </ul>
      *
-     * <p>The order of the break chain (later tasks add things here): broken state to break damage (P4-3) to 
-     * action delay (P4-4) to attach DOT (P4-5) to break energy gain (P3-3).
+     * <p>The order of the break chain (later tasks add things here): broken state to break damage ) to 
+     * action delay ) to attach DOT ) to break energy gain ).
      *
-     * <p><b>The return value also gives the "excess part" (P4-6)</b>: let the skill's nominal toughness
+     * <p><b>The return value also gives the "excess part" )</b>: let the skill's nominal toughness
      * reduction be {@code S} and the remaining toughness {@code T}; this one {@code S} is split between two
      * chains -- break damage uses {@code min(S,T)} ({@link StanceResult#consumed()}), super break damage uses
      * {@code max(0, S-T)} ({@link StanceResult#overkill()}), and the two always sum to {@code S}.
@@ -1597,7 +1595,7 @@ public class Battle {
      * @param element      the element of this damage instance (decides the weakness, and is also the break
      *                     element)
      * @param stanceDamage the toughness reduction points (the skill's {@code stance_list} value, in units of
-     *                     "points"; not a fixed per-instance value -- for bounces {@link SkillExecutor}
+     *  "points"; not a fixed per-instance value -- for bounces {@link SkillExecutor}
      *                     spreads the total evenly over each instance)
      * @return the toughness reduction result of this instance (how much was actually reduced / how much
      * exceeded / whether a break was triggered)
@@ -1620,7 +1618,7 @@ public class Battle {
      * @param enemy        the target being hit
      * @param element      the element of this instance
      * @param stanceDamage the toughness reduction points
-     * @param fromCast     the category of the cast this reduction belongs to, or {@code null}
+     * @param fromCast the category of the cast this reduction belongs to, or {@code null}
      * @return the toughness reduction result
      */
     public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage,
@@ -1639,7 +1637,7 @@ public class Battle {
         if (enemy.isBroken() || !enemy.hasToughnessBar()) {
             // The toughness bar is empty (already broken / an enemy with stance = 0 in the data) so the whole
             // nominal toughness reduction cannot enter the toughness bar, so all of it counts as "the excess
-            // part" -- that is the input to super break (P4-6).
+            // part" -- that is the input to super break ).
             //
             // The weakness check is deliberately skipped here: the official wording is "after attacking an
             // enemy in the weakness-broken state, this attack's toughness reduction value is converted into 1
@@ -1655,13 +1653,13 @@ public class Battle {
         }
         // H-4: break damage is computed from the value this instance actually reduced, not the skill's nominal toughness reduction
         double consumed = enemy.reduceStance(stanceDamage);
-        double overkill = stanceDamage - consumed;                 // P4-6: the excess part = the input to super break
+        double overkill = stanceDamage - consumed;                 // the excess part = the input to super break
         if (enemy.getStance() > 0) {
             return new StanceResult(consumed, 0, 0, false);        // not emptied: no excess part available
         }
         enemy.breakEnemy(element);
         enemy.setBrokenRemainTurns(Constant.BROKEN_REMAIN_TURNS);
-        // P8-6: the break fact is emitted here (the only entry point -- an already broken enemy never
+        // the break fact is emitted here (the only entry point -- an already broken enemy never
         // reaches this line a second time).
         // Placed before damage/delay/DOT/energy: listeners want the moment of "just got broken".
         broadcastBreak(attacker, enemy, element);
@@ -1672,16 +1670,16 @@ public class Battle {
         // (one attack grants energy only once); but if the main instance did not kill and the break finishes it
         // off, the kill energy gain is still credited to the attacker.
         double breakDamage = applyDamage(enemy,
-                BreakDamageCalculator.build(attacker, enemy, element, consumed), EnergyGrant.KILL_ONLY); // P4-3
-        delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // P4-4 action delay
-        attachBreakDot(attacker, enemy, element);                                                  // P4-5 DOT
-        attachBreakControl(enemy, element);                                                        // P10-2 control state
-        gainBreakEnergy(attacker, enemy);            // P3-3
+                BreakDamageCalculator.build(attacker, enemy, element, consumed), EnergyGrant.KILL_ONLY); 
+        delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // action delay
+        attachBreakDot(attacker, enemy, element);                                                  // DOT
+        attachBreakControl(enemy, element);                                                        // control state
+        gainBreakEnergy(attacker, enemy);            
         return new StanceResult(consumed, overkill, breakDamage, true);
     }
 
     /**
-     * The result of one toughness reduction (P4-6).
+     * The result of one toughness reduction ).
      *
      * <p>The two toughness reduction numbers always sum to this instance's nominal toughness reduction,
      * with nothing double-counted and nothing dropped.
@@ -1690,10 +1688,10 @@ public class Battle {
      * @param overkill    the points beyond the remaining toughness (super break damage uses this; 0 when the
      *                    bar was not emptied)
      * @param breakDamage the settled break damage triggered this time (0 = no break triggered).
-     *                    It is settled inside this method via {@link #applyDamage}, which the caller cannot
+     *  It is settled inside this method via {@link #applyDamage}, which the caller cannot
      *                    reach, so it must be carried out through the return value -- otherwise an attack's
      *                    "total damage" would miss the break chain
-     *                    (see {@code AttackEvent#totalDamage})
+     *  (see {@code AttackEvent#totalDamage})
      * @param broke       whether this instance emptied the toughness and triggered a break
      */
     public record StanceResult(double consumed, double overkill, double breakDamage, boolean broke) {
@@ -1714,7 +1712,7 @@ public class Battle {
     }
 
     /**
-     * Delay the action by a percentage of the target's action period (P4-4): {@code delay = period  x  percent},
+     * Delay the action by a percentage of the target's action period ): {@code delay = period  x  percent},
      * period = {@code 10000 / speed} (consistent with {@code Queue}'s {@code ACTION_THRESHOLD}).
      *
      * @param target  the target being delayed
@@ -1733,10 +1731,10 @@ public class Battle {
     }
 
     /**
-     * Called when a broken enemy's turn comes up (P4-4): decrements the broken turn count, restores toughness
+     * Called when a broken enemy's turn comes up ): decrements the broken turn count, restores toughness
      * at 0, and returns "this turn is skipped".
      *
-     * <p>When the caller (today the {@code Main} demo, in P5-5 the enemy turn execution) gets {@code true},
+     * <p>When the caller (today the {@code Main} demo, in the enemy turn execution) gets {@code true},
      * it must not let it act and goes straight to {@link #afterMove()}.
      *
      * @param enemy the enemy whose turn it is
@@ -1754,7 +1752,7 @@ public class Battle {
     }
 
     /**
-     * A unit's current aggro value (P5-1/P5-2): it decides the probability of the enemy selecting it.
+     * A unit's current aggro value ): it decides the probability of the enemy selecting it.
      *
      * <p>This is the stated weight of {@link #baseAggroOf} with the unit's {@link AttributeType#AGGRO_ADDED_RATIO}
      * applied - "the probability of being attacked is greatly increased" is a <b>soft</b> modifier on the same weighted draw, which is why it is an
@@ -1809,7 +1807,7 @@ public class Battle {
     }
 
     /**
-     * The aggro table: {@code unit to hit probability} (P5-2). The probabilities sum to 1.
+     * The aggro table: {@code unit to hit probability} ). The probabilities sum to 1.
      *
      * @param allies the candidate units (the caller is responsible for filtering out dead targets first)
      * @return an ordered unit to probability mapping; an empty list returns an empty table
@@ -1830,7 +1828,7 @@ public class Battle {
     }
 
     /**
-     * The application chance of a debuff (P6-1):
+     * The application chance of a debuff ):
      *
      * <pre>
      * chance = base chance  x  (1 + caster's effect hit rate%)  x  (1 - victim's effect resistance%)  x  (1 - specific debuff resistance%)
@@ -1838,19 +1836,19 @@ public class Battle {
      *
      * <p>The result is clamped to {@code [0, 1]}:
      * <ul>
-     *   <li>Effect hit rate is a damage zone, so with 32% hit rate an 80% base chance to {@code 0.8  x  1.32 = 1.056 to 1.0}
+     *  <li>Effect hit rate is a damage zone, so with 32% hit rate an 80% base chance to {@code 0.8  x  1.32 = 1.056 to 1.0}
      *       (it never exceeds 100%, but there is also no "excess hit converted into some other benefit");</li>
-     *   <li>Effect resistance multiplies the same way: with 30% resistance a 100% base chance to {@code 0.};</li>
-     *   <li>{@code specificResistKey} is a {@code STAT_*} string from the data (see {@code Enemy.debuffResist}):
-     *       Ice Edge {@code {"STAT_CTRL_Frozen": 1}} makes the key factor {@code (1 - 1) = 0}, i.e. completely immune.
-     *       Only {@link Enemy} has this table; characters do not.</li>
+     *  <li>Effect resistance multiplies the same way: with 30% resistance a 100% base chance to {@code 0.};</li>
+     *  <li>{@code specificResistKey} is a {@code STAT_*} string from the data (see {@code Enemy.debuffResist}):
+     *  Ice Edge {@code {"STAT_CTRL_Frozen": 1}} makes the key factor {@code (1 - 1) = 0}, i.e. completely immune.
+     *  Only {@link Enemy} has this table; characters do not.</li>
      * </ul>
      *
      * <p>Only the probability is computed, no dice are rolled: the roll is in {@link #rollDebuff} (using the
      * injected rng), so an AI can "look only at the expectation" without consuming random numbers.
      *
-     * @param caster            the applier (reads {@code EFFECT_HIT_RATE})
-     * @param target            the victim (reads {@code EFFECT_RESISTANCE} and possibly a specific resistance)
+     * @param caster the applier (reads {@code EFFECT_HIT_RATE})
+     * @param target the victim (reads {@code EFFECT_RESISTANCE} and possibly a specific resistance)
      * @param baseChance        the base chance on the skill panel (0.8 = 80%)
      * @param specificResistKey the specific resistance key; {@code null} or the target is not an enemy to not looked up
      * @return the application chance, falling in {@code [0, 1]}
@@ -1869,7 +1867,7 @@ public class Battle {
     }
 
     /**
-     * After the chance check, whether this debuff is actually applied (P6-1).
+     * After the chance check, whether this debuff is actually applied ).
      *
      * <p>Rolls with the injected {@link #rng}: the same seed to the same battle is reproducible.
      *
@@ -1884,7 +1882,7 @@ public class Battle {
     }
 
     /**
-     * Apply a debuff: the hit check comes first, and only on a hit is {@code addBuff} called (P6-1).
+     * Apply a debuff: the hit check comes first, and only on a hit is {@code addBuff} called ).
      *
      * <p>This is the unified entry point for "a skill applying a debuff" -- do not call {@code addBuff}
      * directly inside a skill, otherwise effect hit rate and resistance are bypassed.
@@ -1911,8 +1909,8 @@ public class Battle {
             return false;
         }
         target.getBuffManager().addBuff(buff);
-        // The one chokepoint every landed debuff passes through (2026-09-29): tell the tables, with the applier as actor.
-        // Tell the tables WHICH FAMILY landed, before the event goes out (2026-10-02): the class is already read one line up for
+        // The one chokepoint every landed debuff passes through: tell the tables, with the applier as actor.
+        // Tell the tables WHICH FAMILY landed, before the event goes out: the class is already read one line up for
         // the resistance roll, so it costs nothing to make the same fact askable.
         noteAppliedDebuffClass(buff.debuffClass());
         fireTriggers(TriggerEvent.DEBUFF_APPLIED, caster, target, 0, 0);
@@ -1921,7 +1919,7 @@ public class Battle {
     }
 
     /**
-     * Healing amount (P6-2): it does not touch {@code Damage}; it is an independent set of damage zones.
+     * Healing amount ): it does not touch {@code Damage}; it is an independent set of damage zones.
      *
      * <pre>
      * healing = base amount  x  (1 + outgoing healing boost)  x  (1 + healing taken boost)
@@ -1936,7 +1934,7 @@ public class Battle {
      * <p>It only computes the number and does not change HP: the execution is in
      * {@link #heal(CanHit, CanHit, double)}.
      *
-     * @param healer     the one applying the heal ({@code null} to only the healing-taken side is computed)
+     * @param healer the one applying the heal ({@code null} to only the healing-taken side is computed)
      * @param target     the one being healed
      * @param baseAmount the base healing amount (skill multiplier  x  attribute + flat value, computed by the caller)
      * @return the final healing amount (may be negative -- when healing reduction > 100%; a caller treating it
@@ -1953,7 +1951,7 @@ public class Battle {
     }
 
     /**
-     * Perform one heal (P6-2): compute the healing amount first, then apply it to the target's HP
+     * Perform one heal ): compute the healing amount first, then apply it to the target's HP
      * ({@code CanHit.heal} caps it itself and does nothing for the dead).
      *
      * @return the HP actually restored (after truncation by the cap; 0 when the target is dead or the
@@ -1970,7 +1968,7 @@ public class Battle {
         double before = target.getCurrentHp();
         target.heal(amount);
         double healed = target.getCurrentHp() - before;
-        // P8-6: only emit when HP was really restored (healing at full HP is 0 and is not a heal event)
+        // only emit when HP was really restored (healing at full HP is 0 and is not a heal event)
         if (healed > 0) {
             broadcastHeal(healer, target, healed);
             fireTriggersForAlly(TriggerEvent.HEALED, healer, target, healed);
@@ -1979,7 +1977,7 @@ public class Battle {
     }
 
     /**
-     * Gain a shield (P6-3).
+     * Gain a shield ).
      *
      * <p><b>No stacking</b>: it directly overwrites the current shield value (shields in this game normally do
      * not stack; a refresh from the same source is treated as an overwrite).
@@ -1996,7 +1994,7 @@ public class Battle {
      * @return the shield value actually set
      */
     /**
-     * Places a <b>countdown</b> on the action order (M-49): a unit that only exists to have a turn at a fixed speed.
+     * Places a <b>countdown</b> on the action order: a unit that only exists to have a turn at a fixed speed.
      *
      * <p>Called by the {@code START_COUNTDOWN} op. The unit is scheduled by the same queue as everybody else, so every
      * mechanic that already moves the action order (advance, delay, weakness break) moves it too - for free and by
@@ -2022,7 +2020,7 @@ public class Battle {
         return countdown;
     }
 
-    /** The countdown units placed so far (M-49), in the order they were started. */
+    /** The countdown units placed so far, in the order they were started. */
     public List<Countdown> countdowns() {
         return java.util.Collections.unmodifiableList(countdowns);
     }
@@ -2069,7 +2067,7 @@ public class Battle {
      * @param provider who is granting it ({@code null} = unknown, so unboosted)
      * @param target   the one gaining the shield (no effect if already dead)
      * @param amount   the shield amount before the provider's boost (<= 0 is treated as clearing the shield)
-     * @param ruleId   the id of the rule granting it ({@code ""} = unnamed)
+     * @param ruleId the id of the rule granting it ({@code ""} = unnamed)
      * @return the shield value actually set
      */
     public double grantShield(CanHit provider, CanHit target, double amount, String ruleId) {
@@ -2078,7 +2076,7 @@ public class Battle {
         }
         double value = boostedShield(provider, amount);
         target.setShield(value, provider, ruleId);
-        // P12 (M-43): "a shield was granted" is its own fact, so "when receiving a shield provided by a teammate" can subscribe to it.
+        // Note: "a shield was granted" is its own fact, so "when receiving a shield provided by a teammate" can subscribe to it.
         // Note: Only a grant that leaves a shield standing (a grant of <= 0 is how this API spells "clear it"), and the
         // actor is the provider -- null for the raw overload, which then correctly fails `actor is_ally`.
         // Note: The TIMED path (`SHIELD` with `turns`) does not come through here: its shield is installed by a
@@ -2115,7 +2113,7 @@ public class Battle {
     }
 
     /**
-     * The members of a unit's opposing camp (P5-5): our side to enemies; enemies to our side.
+     * The members of a unit's opposing camp ): our side to enemies; enemies to our side.
      *
      * <p>It does not filter out the dead (the caller filters as needed): it only answers "whose camp is
      * this", not "who can be hit". If a third camp is introduced in the future
@@ -2132,7 +2130,7 @@ public class Battle {
     }
 
     /**
-     * The members of a unit's <b>own</b> camp - the counterpart of {@link #getOpponents(CanHit)} (2026-10-02).
+     * The members of a unit's <b>own</b> camp - the counterpart of {@link #getOpponents(CanHit)}.
      *
      * <p>It exists because an effect can speak about "our side" without being aimed at it: the state-holder selector
      * ({@code holder_of:同袍}) (the bondmate state) asks which of <i>my</i> units carries a state, and an enemy carrying it would be a
@@ -2150,7 +2148,7 @@ public class Battle {
     }
 
     /**
-     * Break energy gain (P3-3): P4-4 calls this one funnel point at the moment of the break; the rules
+     * Break energy gain ): calls this one funnel point at the moment of the break; the rules
      * still belong to the breaker's own provider (the standard implementation gives 5; Rappa (乱破) +10,
      * Harmony Trailblazer (同谐开拓者) +10, Fugue (忘归人) +3 and the like get their own implementations when the
      * characters are really built).
@@ -2168,7 +2166,7 @@ public class Battle {
     }
 
     // ==================================================================
-    // P8-6 event broadcasting
+    // event broadcasting
     //
     // Broadcast rules (deliberately unified, so that the next batch of events does not invent a third
     // way of writing it):
@@ -2190,7 +2188,7 @@ public class Battle {
     /**
      * Deliver an event to "the directly involved parties + our entire side (de-duplicated)".
      *
-     * @param targets  the directly involved parties (may contain {@code null}, which is skipped)
+     * @param targets the directly involved parties (may contain {@code null}, which is skipped)
      * @param consumer the delivery action
      */
     private void dispatch(Consumer<CanHit> consumer, CanHit... targets) {
@@ -2208,42 +2206,42 @@ public class Battle {
     }
 
     /**
-     * Energy credited (P8-6).
+     * Energy credited ).
      */
     private void broadcastEnergyGain(CanHit target, double added) {
         dispatch(t -> t.onEnergyGain(this, target, added), target);
     }
 
     /**
-     * HP loss (P8-6). {@code source} is this hit's attacker and may be {@code null}.
+     * HP loss ). {@code source} is this hit's attacker and may be {@code null}.
      */
     private void broadcastHpLoss(CanHit target, double before, double after, CanHit source, double amount) {
         dispatch(t -> t.onHpLoss(this, target, before, after, source, amount), target, source);
     }
 
     /**
-     * Kill (P8-6).
+     * Kill ).
      */
     private void broadcastKill(CanHit attacker, CanHit victim) {
         dispatch(t -> t.onKill(this, attacker, victim), victim, attacker);
     }
 
     /**
-     * Heal (P8-6).
+     * Heal ).
      */
     private void broadcastHeal(CanHit healer, CanHit target, double healed) {
         dispatch(t -> t.onHeal(this, healer, target, healed), target, healer);
     }
 
     /**
-     * Weakness break (P8-6).
+     * Weakness break ).
      */
     private void broadcastBreak(CanHit attacker, CanHit target, DamageElement element) {
         dispatch(t -> t.onBreak(this, attacker, target, element), target, attacker);
     }
 
     /**
-     * Skill points credited (P8-6). Only delivered to our side -- skill points are a resource of our team
+     * Skill points credited ). Only delivered to our side -- skill points are a resource of our team
      * and the enemy has no share.
      *
      * <p>"Our team" is the camp ({@code allies}), but only a {@link Character} has anything to do with skill
@@ -2258,7 +2256,7 @@ public class Battle {
     }
 
     /**
-     * Skill points spent (P8-6). Only delivered to our side, same as {@link #broadcastSkillPointGained}.
+     * Skill points spent ). Only delivered to our side, same as {@link #broadcastSkillPointGained}.
      */
     private void broadcastSkillPointSpent(int amount) {
         for (CanHit ally : allies) {
@@ -2267,11 +2265,11 @@ public class Battle {
     }
 
     // ==================================================================
-    // P8-trigger tables
+    // trigger tables
     //
     // The engine fires a named event and each character's data-driven table decides whether to
     // react. Nothing here knows which character it is looking at -- that is the whole point of the
-    // trigger table (P8-0 three-way split).
+    // trigger table three-way split).
     // ==================================================================
 
     /**
@@ -2331,7 +2329,7 @@ public class Battle {
      */
     /**
      * The name of the state that just left a unit, for the duration of a {@link TriggerEvent#STATE_ENDED}
-     * firing (2026-10-02).
+     * firing.
      *
      * <p><b>Why a field and not a context component.</b> The firing chain is four overloads deep, and a name
      * would be a parameter on every one of them for a fact that exactly one event carries. State also has to ride
@@ -2357,7 +2355,7 @@ public class Battle {
     /**
      * The same moment, carrying <b>how many instances of that state</b> the carrier held. Note: The number goes in the AMOUNT
      * slot, not the hit count: measured, `fireTriggers(event, actor, target, int hitCount, double amount)`, and putting it one
-     * place early left `ctx.amount()` at zero -- which is what "50% of it" reads.
+     * place early left `ctx.amount` at zero -- which is what "50% of it" reads.
      */
     public void fireStateEnded(CanHit carrier, String stateName, int magnitude) {
         String previous = lastStateEndedName;
@@ -2379,16 +2377,16 @@ public class Battle {
      * <p>Every character on our side evaluates the event with itself as {@code self}. Two separate
      * facts are handed over because characters need both and they are not the same thing:
      * <ul>
-     *   <li>{@code actor} - who <b>caused</b> the event. "After an ally attacks" is
-     *       {@code actor != self}.</li>
-     *   <li>{@code target} - what it <b>happened to</b>. "After I am hit" is {@code target == self};
+     *  <li>{@code actor} - who <b>caused</b> the event. "After an ally attacks" is
+     *  {@code actor != self}.</li>
+     *  <li>{@code target} - what it <b>happened to</b>. "After I am hit" is {@code target == self};
      *       note the actor there is the attacker, not me.</li>
      * </ul>
      * Enemies have no tables, so nothing is fired for them.
      *
      * @param event    the event that happened
-     * @param actor    who caused it, or {@code null}
-     * @param target   the event's subject, or {@code null}
+     * @param actor who caused it, or {@code null}
+     * @param target the event's subject, or {@code null}
      * @param hitCount how many targets an attack connected with (0 when not applicable)
      * @param amount   the event's magnitude where it has one
      * @return how many rules fired in total
@@ -2446,7 +2444,7 @@ public class Battle {
     }
 
     /**
-     * The same, naming the <b>data row</b> of the skill that produced the event (2026-09-28).
+     * The same, naming the <b>data row</b> of the skill that produced the event.
      *
      * <p>Note: The row, not the slot: an enhanced attack is a row of its own, so "an enhanced basic attack hits ..." and "an enhanced basic attack consumes 2 layers" can be
      * told apart from the ordinary basic attack they replace. Events that no skill produced (a DOT tick, a break) leave it 0.
@@ -2457,7 +2455,7 @@ public class Battle {
     }
 
     /**
-     * The same, plus how many of the hit targets carry the attack's own element weakness (2026-09-30; reader: cone
+     * The same, plus how many of the hit targets carry the attack's own element weakness (cone
      * 21040's "if no fewer than 2 of the attacked enemy targets have the corresponding attribute weakness").
      *
      * <p>A count over a predicate cannot be assembled from the parts: a multi-target attack fires the damage event once
@@ -2469,7 +2467,7 @@ public class Battle {
     }
 
     /**
-     * The same, plus the targets the whole attack hit (2026-09-30; reader: cone 21029).
+     * The same, plus the targets the whole attack hit (cone 21029).
      *
      * <p>Only the side holding the whole set can pass it: a per-hit event fires once per target, so "a random
      * one of the targets that WAS HIT" cannot be assembled from the parts (Note: the argument {@code weakHitCount} makes).
@@ -2487,7 +2485,7 @@ public class Battle {
     }
 
     /**
-     * Note: Kept beside the ten-parameter terminal on purpose (2026-09-30): the other overloads and their call sites still
+     * Note: Kept beside the ten-parameter terminal on purpose: the other overloads and their call sites still
      * forward nine arguments, and REPLACING a signature moves every one of those call sites' type matching with it
                  * (measured: the compiler then reports type mismatches that look like bad arguments but are a missing overload).
      */
@@ -2521,7 +2519,7 @@ public class Battle {
                                 fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount)
                                 .withAttackHitTargets(attackHitTargets));
             }
-            // Takes effect as soon as the character is obtained, no deployment needed (2026-10-02). Note: A SECOND pass, not extra entries in `characters`: that list is what
+            // Takes effect as soon as the character is obtained, no deployment needed. Note: A SECOND pass, not extra entries in `characters`: that list is what
             // the queue is built from, so a listener in it would act. Note: The owner handed to the context is the listener itself,
             // which is what makes "self" mean "the character who owns this warehouse clause" rather than whoever is fighting.
             for (Character listener : warehouseListeners.keySet()) {
@@ -2547,10 +2545,10 @@ public class Battle {
      * Fires an event whose subject is one of our characters (the one who lost HP, was healed, ...).
      *
      * <p>The side check is deliberate: an enemy taking damage should not make our characters react,
-     * and enemy events are not ours to data-ise yet (P9 owns monsters).
+     * and enemy events are not ours to data-ise yet (the enemy side owns monsters).
      *
      * @param event  the event
-     * @param actor  who caused it (may be {@code null})
+     * @param actor who caused it (may be {@code null})
      * @param target the subject; the call is skipped entirely when this is not one of ours
      * @return how many rules fired in total
      */
@@ -2597,7 +2595,7 @@ public class Battle {
     }
 
     /**
-     * The same, stating the <b>instance</b> the event is about as well (2026-10-02).
+     * The same, stating the <b>instance</b> the event is about as well.
      *
      * <p>{@code DAMAGE_SETTLED} is a fact about one damage instance - its amount AND its identity - so the rules that
      * read it must be able to ask the instance's own questions: {@code damage_is_attack} is the guard that keeps a
@@ -2614,14 +2612,14 @@ public class Battle {
      * fired <b>once per attack</b>, after every instance of it has been settled.
      *
      * <p><b>Which attacks fire it.</b> A character's skill activation ({@code SkillExecutor}) and, since
-     * P9-4 memosprites, a summon's own attack ({@code EnemySkill.execute}) - both are attacks the engine drives from
+     * memosprites, a summon's own attack ({@code EnemySkill.execute}) - both are attacks the engine drives from
      * beginning to end. Derived hits still never fire it: additional damage, true damage, DOT ticks and break
      * damage go straight through {@link #applyDamage} and are <em>part of</em> somebody else's attack. That
      * exclusion is not an oversight, it is what makes the notification safe to hand to arbitrary listeners:
      * listeners are allowed to answer an attack by dealing damage (that is how a third-party kit lands), so a
      * derived hit that fired the event again would recurse until {@code MAX_TRIGGER_DEPTH} threw. A follow-up
-     * attack therefore does <b>not</b> consume an {@code "until": "next_attack"} buff - see M-2, which records
-     * that accepted under-consumption rather than hiding it.
+     * attack therefore does <b>not</b> consume an {@code "until": "next_attack"} buff: that accepted
+     * under-consumption is recorded rather than hidden.
      *
      * <p><b>Why it is broadcast to {@link #allies} whatever the attacker's camp.</b> The listeners are buffs on
      * our characters, and every one of them answers with its own question ("is this <em>my</em> attack?" - 
@@ -2645,7 +2643,7 @@ public class Battle {
         attackSequence++;
         List<CanHit> targets = List.copyOf(hitTargets);
         // The attack is over and its hit set is frozen, so content may now ask "a random one of the targets
-        // that WAS HIT" -- the fact only this side holds (2026-09-30; reader: cone 21029). Note: Same early return
+        // that WAS HIT" -- the fact only this side holds (cone 21029). Note: Same early return
         // as above: an attack that hit nothing does not announce itself.
         fireTriggers(TriggerEvent.ATTACK_FINISHED, attacker, mainTarget, targets.size(), totalDamage,
                 null, null, 0, 0, targets);
@@ -2655,17 +2653,17 @@ public class Battle {
     }
 
     /**
-     * Hit energy gain + kill energy gain (P3-2).
+     * Hit energy gain + kill energy gain ).
      *
      * <p><b>The two rules differ, do not gate them with the same switch:</b>
      * <ul>
-     *   <li><b>Hit energy gain</b>: requires this instance to "count as an attack" ({@code countsAsAttack}).
+     *  <li><b>Hit energy gain</b>: requires this instance to "count as an attack" ({@code countsAsAttack}).
      *       Additional damage / true damage, by the official definition, "does not count as dealing 1 attack"
      *        to the one being hit gains no energy.</li>
      *   <li><b>Kill energy gain</b>: it only looks at "did this instance kill the target", regardless of
      *       whether that damage counts as an attack. Any damage attributed to the attacker (basic attack,
      *       skill, break, super break, DOT, additional damage, true damage, ...), as long as it killed the
-     *       monster, settles kill energy gain for {@code damage.getAttacker()}.</li>
+     *  monster, settles kill energy gain for {@code damage.getAttacker()}.</li>
      * </ul>
      *
      * <p>Why they are separate: additional damage/true damage can kill, but the "kill" itself still happened
@@ -2674,7 +2672,7 @@ public class Battle {
      *
      * @param target the one being hit
      * @param damage this hit's damage
-     * @param died   whether this instance killed {@code target}
+     * @param died whether this instance killed {@code target}
      */
     private void grantHitAndKillEnergy(CanHit target, Damage damage, boolean died, EnergyGrant grant) {
         if (!died) {
@@ -2703,7 +2701,7 @@ public class Battle {
 
     /**
      * Kill energy gain: credited to {@code damage.getAttacker()}, not looking at {@code countsAsAttack}
-     * (any damage attributed to a character that kills a monster should give energy, the 2026-09-19 rule).
+     * (any damage attributed to a character that kills a monster should give energy, the rule).
      *
      * <p>But it does look at {@code grant}: a kill is settled only once. So the main instance carries
      * {@link EnergyGrant#ALL} and derived instances (break / super break / DOT / additional damage / true
@@ -2803,7 +2801,7 @@ public class Battle {
      * overload is the honest place for them - a second public way to build and settle an instance is exactly what
      * that invariant exists to prevent.
      *
-     * @param fixedCritRate   {@code 1.0} for "always crits, no roll" ({@code null} = roll normally)
+     * @param fixedCritRate {@code 1.0} for "always crits, no roll" ({@code null} = roll normally)
      * @param fixedCritDamage the crit damage to use ({@code 1.5} = 150%; {@code null} with a rate is refused at load)
      */
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
@@ -2812,7 +2810,7 @@ public class Battle {
     }
 
     /**
-     * The same, with the instance's DAMAGE TYPE stated (2026-09-30; reader: 1505 Evanescia (绯英)'s three elation riders, whose
+     * The same, with the instance's DAMAGE TYPE stated (1505 Evanescia (绯英)'s three elation riders, whose
      * text says "dealing ... physical-attribute <b>elation damage</b>"). A rule-driven rider could only ever be {@code ADDITIONAL} before,
      * so the one thing its sentence names -- the damage type -- had no spelling. {@code null} keeps the old meaning, which is why
      * the six-argument overload above still answers exactly as it did.
@@ -2823,7 +2821,7 @@ public class Battle {
     }
 
     /**
-     * The same, with the instance's CAST CATEGORY stated (2026-10-02; reader: 1415's ode of passage, whose clause is about a "follow-up attack"). Note: The
+     * The same, with the instance's CAST CATEGORY stated (1415's ode of passage, whose clause is about a "follow-up attack"). Note: The
      * body stays here and the six/seven-argument forms delegate to it -- a second way to build and settle an instance is exactly what the single-settlement
      * invariant exists to prevent, as the note above says.
      */
@@ -2832,8 +2830,8 @@ public class Battle {
                                         com.laosun.aluminium.enums.SkillCategory castCategory) {
         Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base, castCategory);
         if (fixedCritRate != null) {
-            // Note: A rate of 0.0 means "never crits" and must not REPORT a crit either (2026-10-02): the flag is what
-            // CRIT_DEALT and `isCrit()` read, so `fixedCrit(true, 0)` would multiply by 1.0 (numerically the same
+            // Note: A rate of 0.0 means "never crits" and must not REPORT a crit either: the flag is what
+            // CRIT_DEALT and `isCrit` read, so `fixedCrit(true, 0)` would multiply by 1.0 (numerically the same
             // damage) while telling every listener that a crit happened -- a wrong fact with no symptom.
             // Note: Measured the same day: this flag does NOT move the number (a rider at `crit_rate: 0.0` settled the
             // same 520.45168 either way), so the choice here is about the REPORT, not about the damage.
@@ -2841,12 +2839,10 @@ public class Battle {
         }
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
         double settled = applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
-        // P10-3 tail: this is the engine's one and only notion of a follow-up attack, so the
+        // This is the engine's one and only notion of a follow-up attack, so the
         // data-facing FOLLOW_UP event is emitted here rather than from a second attack path.
         // Gated on the instance having really connected: an additional-damage sweep swallowed by
         // invulnerability did not land, and "used a Follow-Up ATK" must not be credited for it.
-        // P10-3 tail: this is the engine's one and only notion of a follow-up attack, so the
-        // data-facing FOLLOW_UP event is emitted here rather than from a second attack path.
         //
         // Emitted unconditionally, not gated on the instance having dealt damage: the texts that
         // subscribe read "when the wearer uses a Follow-Up ATK", which is the attack being *used*, and
@@ -2866,7 +2862,7 @@ public class Battle {
      * but it is attributed to the attacker, so on a kill the attacker still settles kill energy gain
      * (see {@link #grantKillEnergy}).
      *
-     * @param base the true damage amount (no longer affected by defence/resistance/DMG boost/crit/vulnerability)
+     * @param base the true damage amount (not affected by defence/resistance/DMG boost/crit/vulnerability)
      * @return the settled value of this instance (0 = no damage dealt)
      */
     public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
@@ -2879,7 +2875,7 @@ public class Battle {
      * The enemy camp's units that may be selected as attack targets (= alive), in battlefield order.
      *
      * <p>Single source of truth for "who can be hit": {@link SkillExecutor} uses it today,
-     * the target selector (P5-4) and wave handling (P-4) must use the same judgement so
+     * the target selector ) and wave handling (P-4) must use the same judgement so
      * that no caller ever picks a corpse (that is where corpse-hitting comes from).
      *
      * <p>Returns {@code CanHit}, not {@code Enemy} (L-8): an enemy-side summon is a legitimate
@@ -2911,13 +2907,13 @@ public class Battle {
         CanHit attacker = damage.getAttacker();
         CanHit defender = damage.getDefender();
 
-        // 0) The base layer lives in Damage.toValue(): the skill multiplier plus any absolute addend
-        //    ("increase the value by an amount equal to 30% of March 7th (三月七)'s defence", ROADMAP M-55), added BEFORE every zone below so it crits and is
+        // 0) The base layer lives in Damage.toValue: the skill multiplier plus any absolute addend
+        //    ("increase the value by an amount equal to 30% of March 7th (三月七)'s defence"), added BEFORE every zone below so it crits and is
         //    boosted exactly like the multiplier. Note: Deliberately not a percentage in the boost zone: that would only
         //    equal the sentence when the base happened to equal the attribute. See Damage#addFlat.
 
         // 1) DMG boost zone: element boost + all-type boost (break/super break/true damage are skipped
-        //    automatically by BoostArea.applies())
+        //  automatically by BoostArea.applies)
         AttributeType elementBoost = AttributeType.getBoostByElement(damage.getElement());
         if (elementBoost != null) {
             damage.addBoost(attacker.getAttribute(elementBoost).get());
@@ -2956,10 +2952,10 @@ public class Battle {
             damage.addBoost(owner.getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get());
         }
 
-        // Scoped boosts (P10-4): "increases the damage dealt by basic attacks / Skills / ultimates by X%". These cannot be gated on the damage
+        // Scoped boosts ): "increases the damage dealt by basic attacks / Skills / ultimates by X%". These cannot be gated on the damage
         // *type* the way the follow-up boost above is -- a basic attack and a skill are both
         // DamageType.NORMAL -- so they are gated on the category of the cast that produced this instance,
-        // which SkillExecutor threads through (`Damage.getCastCategory()`).
+        // which SkillExecutor threads through (`Damage.getCastCategory`).
         //
         // Deliberately conservative about *which* instance carries the category: only the cast's own damage
         // does. Break / super break / DOT / additional instances stay UNSPECIFIED, so "the Skill's DMG" does
@@ -2986,7 +2982,7 @@ public class Battle {
         // error with no symptom.
         // The guard is our OWN fact, not another component's: lastUltEnergySpent is set only on the ultimate
         // path and cleared right after it settles, so "> 0" means exactly "this hit is that ultimate".
-        // Note: An earlier version asked damage.getCastCategory() == ULTRA instead, and measured, that does NOT
+        // Note: An earlier version asked damage.getCastCategory == ULTRA instead, and measured, that does NOT
         // hold on the castImmediate path -- the write was skipped and the clause silently read 0.
         if (lastUltEnergySpent > 0) {
             damage.withCastEnergySpent(lastUltEnergySpent);
@@ -3003,7 +2999,7 @@ public class Battle {
         }
         // "this instance crit" -- the only moment the answer exists. Note: The SUBJECT is the ATTACKER: a crit is an event
         // about the one who dealt it. Passing the victim here looks natural and silently does nothing, because
-        // `fireTriggersForAlly` refuses any subject that is not ours (round 266 measured exactly that).
+        // `fireTriggersForAlly` refuses any subject that is not ours (measured exactly that).
         if (damage.critArea().isCrit()) {
             // subject = the VICTIM, actor = the critter. The victim has to be nameable, because a clause like
             // "removes 1 buff from the attacked enemy target" acts on it. `fireTriggersWithSubject` (unlike its ally-only sibling)
@@ -3019,18 +3015,18 @@ public class Battle {
 
         // 4) Resistance zone: victim resistance - attacker penetration, then clamp (HSR.md §2.5, negative
         //    resistance is fully effective)
-        //    Note: weakness break does not change resistance (§2.5; P4 re-check)
+        //    Note: weakness break does not change resistance (§2.5)
         double rawResist = defender instanceof Enemy enemy
                 ? enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)
                 : 0.0;
-        // "reduces the all-type resistance of all enemies by X%" (2026-09-29): the victim's side of the same zone, subtracted BEFORE
+        // "reduces the all-type resistance of all enemies by X%": the victim's side of the same zone, subtracted BEFORE
         // penetration is applied -- see RESISTANCE_REDUCTION for why it is not folded into the attacker's
         // penetration. Done here rather than inside `ResistArea` so that class's clamp (which exists for
         // penetration) cannot swallow a reduction: negative resistance is meant to be fully effective.
         rawResist -= defender.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
-        // The victim's own counterpart (2026-09-30; reader: cone 21002's "increases all-type resistance"):
+        // The victim's own counterpart (cone 21002's "increases all-type resistance"):
         // stated on the one being hit, so it is subtracted here beside the reducer rather than on the attacker.
-        // Note: Measured sign (2026-09-30, cone 21002): a POSITIVE resistance has to be ADDED here. Writing it as a
+        // Note: Measured sign (cone 21002): a POSITIVE resistance has to be ADDED here. Writing it as a
         // subtraction -- the way the reducer beside it reads -- turned "+8% resistance" into +8% DAMAGE taken
         // (`11.28 -> 68.18 (x1.08)`), because the zone multiplies by (1 - rawResist).
         rawResist += defender.getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get();
@@ -3047,20 +3043,20 @@ public class Battle {
     }
 
     /**
-     * The allies a lethal blow has landed on during the CURRENT action (2026-10-02).
+     * The allies a lethal blow has landed on during the CURRENT action.
      *
-     * <p>Reader: 140 Moon Cocoon's Ward (月茉之庇), "all of those hit by a lethal attack within one action". The set is what makes that ONE clause rather
+     * <p>140 Moon Cocoon's Ward (月茉之庇), "all of those hit by a lethal attack within one action". The set is what makes that ONE clause rather
      * than one save per blow: the same action can land a lethal blow on several allies, and the effect reaches all of them.
      *
      * <p>Note: Cleared when an action starts ({@code TURN_START}, which brackets {@code performAction} and its settlement), so
      * "this action" is the action boundary the engine already had -- not a new one.
      */
     /**
-     * The enemies that ENTERED with the current wave (2026-10-02).
+     * The enemies that ENTERED with the current wave.
      *
      * <p>The word is the game own, and it is an EVENT rather than a target type:
      * `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens for `"Event": "OnWaveMonster"` and answers with a
-     * `TurnInsertAction` -- a wave monster has entered. Reader: 1415's memosprite skill 8,
+     * `TurnInsertAction` -- a wave monster has entered. 1415's memosprite skill 8,
      * "if the target is defeated before the cast, then cast it on a newly entered enemy target".
      */
     private final List<CanHit> waveMonsters = new ArrayList<>();
@@ -3118,18 +3114,18 @@ public class Battle {
     }
 
     private void removeDeadCombatants() {
-        perishOrphanedSummons();                     // P9-4: a summon goes when its master does
+        perishOrphanedSummons();                     // a summon goes when its master does
         for (Signal signal : queue.snapshot()) {
             if (signal.getCanHit().isDeath()) {
                 queue.removeCombatant(signal.getCanHit());
             }
         }
-        releaseBuffsAnchoredToTheDead();             // M-42 ③: a buff spent by MY turns has no clock left
+        releaseBuffsAnchoredToTheDead();             // (3): a buff spent by MY turns has no clock left
         checkResult();                               // P-3: decide the outcome right after clearing the corpses
     }
 
     /**
-     * Takes off every buff whose duration was being spent by a unit that is now dead (M-42 ③).
+     * Takes off every buff whose duration was being spent by a unit that is now dead.
      *
      * <p><b>Why this has to exist.</b> A buff can state that its clock is somebody else's turns
      * ({@code AbstractBuff.ticksOn}, "at the start of Sunday (星期日)'s own every turn the [蒙福者] state's remaining turns are reduced by 1"). If that somebody dies, the
@@ -3140,8 +3136,8 @@ public class Battle {
      * <p>Swept from here rather than from the dying unit's own table because {@code fireTriggers} <b>skips dead
      * units</b>: the unit that needs to react is gone before it could, and the buffs live on other units anyway.
      *
-     * <p>Note: <b>BOTH camps (2026-09-30).</b> This used to walk {@code allies} twice, so the sweep only ever reached
-     * buffs sitting on our own side. A caster on our side can anchor a modifier onto an ENEMY -- 1218's zone is
+     * <p>Note: <b>BOTH camps.</b> Walking {@code allies} twice would leave the sweep reaching
+     * only buffs sitting on our own side. A caster on our side can anchor a modifier onto an ENEMY -- 1218's zone is
      * {@code target: all_enemies} with {@code ticks_on: "self"} -- and that one was never taken off: measured at
      * exactly 1.40x before and after she fell (the {@code AnchorDeathTest} that caught it). The buff's carrier is
      * not necessarily on the dying unit's side.
@@ -3162,12 +3158,12 @@ public class Battle {
     }
 
     /**
-     * Defeats every summon whose master is already down (P9-4).
+     * Defeats every summon whose master is already down.
      *
      * <p>This runs at the top of {@link #removeDeadCombatants}, so the sweep right after it takes the
      * orphan off the action bar in the same pass - the summon stops acting, stops being targetable, and
      * stops counting as a survivor for {@link #checkResult}, all through the ordinary
-     * {@link CanHit#isDeath()} channel rather than a second notion of "no longer here".
+     * {@link CanHit#isDeath()} channel rather than a second notion of "gone".
      *
      * <p><b>Why {@code perish} and not a {@code takeDamage} call.</b> The minion left, it was not beaten
      * down: {@code perish} keeps its HP, so nothing downstream is told "it was hurt". Where the
@@ -3204,7 +3200,7 @@ public class Battle {
     }
 
     /**
-     * Brings a summon onto the field (P9-4).
+     * Brings a summon onto the field ).
      *
      * <p>The summon comes from real monster data ({@code SummonFactory}, keyed by {@code monster_config.json}
      *  - so {@code monster_config.json}'s {@code summon_id} roster on the master tells you the candidates and
@@ -3217,7 +3213,7 @@ public class Battle {
      * silently-empty skill point policy (see ROADMAP §5 lesson 3) - a wrong answer with nothing to see is
      * worse than a required argument.
      *
-     * <p><b>Both camps can summon</b> (the friendly half of L-8 landed on 2026-09-2). The summon joins the
+     * <p><b>Both camps can summon</b> (the friendly half of L-8 landed on). The summon joins the
      * master's own camp: an enemy's minion goes into {@link #enemies}, ours into {@link #allies}, so our side
      * is targetable by the enemy as a whole and our own summon is <b>not</b> a legal target for our attacks
      * (our attacks look at {@code enemies}). The camp is taken from the master rather than passed in - a
@@ -3227,7 +3223,7 @@ public class Battle {
      * one for it would silently make a neutral unit either our ally or our enemy.
      *
      * @param master         the unit calling the summon; supplies the camp, and the level
-     * @param summonId       the summon's own monster id (a key of {@code monster_config.json})
+     * @param summonId the summon's own monster id (a key of {@code monster_config.json})
      * @param hardLevelGroup the stage's hard level group
      * @return the summon, already in its camp's roster and queued to enter the action bar
      * @throws IllegalArgumentException if the master is null, already down, or on a camp with no roster, or
@@ -3426,14 +3422,14 @@ public class Battle {
         System.out.println("================");
     }
 
-    /** Records that this unit used its technique before the battle (2026-09-29). Call before {@link #startBattle()}. */
+    /** Records that this unit used its technique before the battle. Call before {@link #startBattle()}. */
     public void markTechniqueUsed(CanHit unit) {
         if (unit != null && !techniqueUsers.contains(unit)) {
             techniqueUsers.add(unit);
         }
     }
 
-    /** Gives every unit whose technique was used a permanent "秘技" state, before anything reads BATTLE_START (2026-09-29). */
+    /** Gives every unit whose technique was used a permanent "秘技" state, before anything reads BATTLE_START. */
     private void applyTechniqueStates() {
         for (CanHit unit : techniqueUsers) {
             if (unit == null || unit.isDeath()) {

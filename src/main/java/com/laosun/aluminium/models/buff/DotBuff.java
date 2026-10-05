@@ -5,28 +5,28 @@ import com.laosun.aluminium.models.CanHit;
 import lombok.Getter;
 
 /**
- * Damage over time attached to a weakness break (P4-5): burn (Fire) / shock (Lightning) /
+ * Damage over time attached to a weakness break: burn (Fire) / shock (Lightning) /
  * bleed (Physical) / wind shear (Wind).
  *
- * <p><b>It is an ordinary buff, and that is the point.</b> It used to be a parallel model
- * ({@code models.Dot} + {@code Enemy.dots} + {@code Battle.tickDots(Enemy)}), which is the very
- * "second mechanism" P8-0 exists to prevent. Looking at the two side by side, every row is the same
+ * <p><b>It is an ordinary buff, and that is the point.</b> A parallel model
+ * ({@code models.Dot} + {@code Enemy.dots} + {@code Battle.tickDots(Enemy)}) is the very
+ * "second mechanism" this project refuses. Looking at the two side by side, every row is the same
  * idea spelled twice:
  *
  * <table border="1">
- *   <caption>before / after the migration</caption>
- *   <tr><th></th><th>old DOT</th><th>buff system</th></tr>
+ *   <caption>the parallel model against the buff system</caption>
+ *   <tr><th></th><th>a separate DOT model</th><th>buff system</th></tr>
  *   <tr><td>storage</td><td>{@code Enemy.dots}</td><td>{@code BuffManager.buffs}</td></tr>
  *   <tr><td>duration</td><td>{@code Dot.remainingTurns}</td><td>{@code remainingDuration}</td></tr>
  *   <tr><td>countdown</td><td>{@code Dot.tick()}</td><td>{@code tickEffect} + {@code processBuffTick}</td></tr>
  *   <tr><td>expiry</td><td>{@code enemy.removeDot(dot)}</td><td>{@code processBuffTick} removing it</td></tr>
  * </table>
  *
- * <p>The migration is not cosmetic. The old shape was <b>type-impossible to put a DOT on a
- * character</b> - {@code tickDots} took an {@code Enemy} and the list lived on {@code Enemy}, so
- * "the boss burns us" (which HSR does constantly) could not be expressed at all. It also lost
+ * <p>The difference is not cosmetic. The other shape is <b>type-impossible to put a DOT on a
+ * character</b> - {@code tickDots} takes an {@code Enemy} and the list lives on {@code Enemy}, so
+ * "the boss burns us" (which HSR does constantly) cannot be expressed at all. That shape also loses
  * dispel, {@code hasBuff} queries, the shared refresh / stacking rules, and visibility to any
- * buff-driven mechanic. Now a DOT on a {@code Character} is the same code path as a DOT on an
+ * buff-driven mechanic. A DOT on a {@code Character} is the same code path as a DOT on an
  * {@code Enemy}, and that is a tested behaviour rather than an aspiration.
  *
  * <h2>Why this class holds no damage logic</h2>
@@ -41,7 +41,7 @@ import lombok.Getter;
  * </ul>
  * The two halves are kept in step by <b>where</b> they are called, not by shared state:
  * {@code Battle.beforeMove()} settles first and then lets the buff manager tick, so a DOT created
- * with N turns settles exactly N times - the same count the old {@code Dot.tick()} produced.
+ * with N turns settles exactly N times - the same count a {@code Dot.tick()} produces.
  *
  * <h2>Why it is an early buff</h2>
  * {@code isEarlyBuff = true} means the countdown happens in {@code BuffManager.beforeMove()}, i.e. at
@@ -61,7 +61,7 @@ public class DotBuff extends AbstractBuff {
 
     /**
      * DoT element: Fire / Lightning / Physical / Wind (Ice = freeze, Quantum = entanglement,
-     * Imaginary = imprisonment, unified into a table in P10-1).
+     * Imaginary = imprisonment, unified into one table).
      *
      * <p>Read by {@code Battle.tickDots} to build the {@code Damage}, so it decides which RES zone
      * applies and how the hit is reported.
@@ -98,11 +98,11 @@ public class DotBuff extends AbstractBuff {
      *                                  {@code Damage}, and a null source is caught nowhere at all.
      */
     /**
-     * The layer ceiling this application was authored with, or {@code 0} for "no ceiling" (2026-09-28).
+     * The layer ceiling this application was authored with, or {@code 0} for "no ceiling".
      *
      * <p>"the windshear state <b>stacks at most 5 layers</b>": applications may exceed it (a DOT is never evicted -- {@link #isSameKind} says
      * so), but at most this many of them may <b>deal damage</b>. Note: {@code Battle.tickDots} applies it per element, i.e.
-     * per DOCUMENT STATE (two 风化 (windshear) applications are the same state; 风化 and 灼烧 (burn) are not).
+     * per DOCUMENT STATE (two windshear (风化) applications are the same state; windshear (风化) and burn (灼烧) are not).
      */
     private final int maxStacks;
 
@@ -111,12 +111,12 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * A DOT with the <b>document's own name</b> for it (2026-09-30, cone 23006's [游丝]).
+     * A DOT with the <b>document's own name</b> for it (cone 23006's [游丝]).
      *
      * <p>Why a name and not just an element: the corpus has states that ARE damage over time and are asked about by
-     * name ("if that target is not in the [游丝] state"), while the element alone only answers 灼烧 (burn) / 触电 (shock) / 裂伤 (bleed) / 风化 (windshear).
+     * name ("if that target is not in the [游丝] state"), while the element alone only answers burn (灼烧) / shock (触电) / bleed (裂伤) / windshear (风化).
      * Naming one is also how "[游丝] is also considered to be in the shocked state" comes out right for free: a named THUNDER
-     * DOT still answers 触电 (shock) through the element table.
+     * DOT still answers shock (触电) through the element table.
      */
     public DotBuff(CanHit source, DamageElement element, double baseDamage, int turns, int maxStacks, String name) {
         this(source, element, baseDamage, turns, maxStacks);
@@ -162,7 +162,7 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * A DOT is a damage-over-time class negative state (持续伤害类负面状态) - a negative effect that "dispel 1 negative effect" may remove.
+     * A DOT is a damage-over-time class negative state (DoT Debuff, 持续伤害类负面状态) - a negative effect that "dispel 1 negative effect" may remove.
      */
     @Override
     public boolean isDebuff() {
@@ -170,7 +170,7 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * Damage-over-time class (持续伤害类): "resistance to damage-over-time class negative states increased by 50%" (1008 坚韧) is an answer about this family - and because it is
+     * Damage-over-time class (DoT Debuff, 持续伤害类): "resistance to damage-over-time class negative states increased by 50%" (1008 Integrity (坚韧)) is an answer about this family - and because it is
      * the <b>element</b> that makes a DOT a DOT, a fifth element would be covered the day it exists.
      */
     @Override

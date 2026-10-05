@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P5-3 acceptance: enemy skills (data-driven + fallback).
+ * acceptance: enemy skills (data-driven + fallback).
  *
  * <p>Note: For the source of the multipliers see the notes in {@code enemy_skills.json}: there is no
  * enemy skill table in the data source, these multipliers are guesses.

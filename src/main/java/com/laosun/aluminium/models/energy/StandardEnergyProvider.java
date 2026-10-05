@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * <p>Not handled for now: additional attacks (skills whose {@code AttackType} is empty or
  * is neither Normal nor BPSkill) gain no energy, techniques / maze skills gain no energy, and
- * character-level bonuses and special sources are left to their respective providers (P8-3).
+ * character-level bonuses and special sources are left to their respective providers.
  */
 public class StandardEnergyProvider implements EnergyProvider {
 

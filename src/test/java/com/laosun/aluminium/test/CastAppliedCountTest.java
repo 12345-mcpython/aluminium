@@ -24,7 +24,7 @@ import java.util.Random;
  *
  * <p><b>Why the vocabulary needed it.</b> {@code per_target} multiplies by the number of targets an event
  * <i>aimed at</i>; this sentence multiplies by the number the 50%-per-target roll actually <b>let through</b>. Those
- * are different numbers (0…3 against three enemies), and the engine is the only party that knows the second: the
+ * are different numbers (0...3 against three enemies), and the engine is the only party that knows the second: the
  * content cannot compute it, and a rule that guessed "3" would pay three times the text's figure with nothing to
  * report. So {@code APPLY_CONTROL} / {@code APPLY_DOT} record what they landed ({@code Battle.recordCastApplied}),
  * and a rule reads the count as a derived magnitude ({@code "scale": "cast_applied:冻结"}).
@@ -35,7 +35,7 @@ import java.util.Random;
  *   <li>it belongs to <b>one cast</b>: the next cast starts from zero, and nothing later can read the old numbers;</li>
  *   <li>the loader refuses the spelling where the count cannot exist (a non-cast event) and where the state name is
  *       not one this engine rolls for - both are silent-zero mistakes otherwise;</li>
- *   <li>March 7th (三月七)'s own file pays 6 per landed freeze and nothing at 星魂 0.</li>
+ *   <li>March 7th (三月七)'s own file pays 6 per landed freeze and nothing at Eidolon (星魂) 0.</li>
  * </ol>
  */
 public class CastAppliedCountTest {
@@ -64,7 +64,7 @@ public class CastAppliedCountTest {
                 "6 energy × the 3 targets the freeze really landed on");
     }
 
-    /** …and a partial result pays partially: two of three frozen is 12, not 18 and not 0. */
+    /** ...and a partial result pays partially: two of three frozen is 12, not 18 and not 0. */
     @Test
     public void aPartialResultPaysPartially() {
         Assertions.assertEquals(12, energyFromAnUltimate(3, 1) - energyFromAnUltimate(3, 3), EPS);
@@ -169,13 +169,13 @@ public class CastAppliedCountTest {
     }
 
     // ==================================================================
-    // The shipped content: 1001 星魂 (Eidolon) 1
+    // The shipped content: 1001 Eidolon (星魂) 1
     // ==================================================================
 
     /**
-     * The shipped file pays 6 per landed freeze, and only from 星魂 (Eidolon) 1 up.
+     * The shipped file pays 6 per landed freeze, and only from Eidolon (星魂) 1 up.
      *
-     * <p>Both ranks are measured in the same battle shape, so the difference <b>is</b> the Eidolon: the 星魂 (Eidolon) 0 run
+     * <p>Both ranks are measured in the same battle shape, so the difference <b>is</b> the Eidolon: the Eidolon (星魂) 0 run
      * still freezes the same three enemies (that rule belongs to her base kit), and pays nothing for them.
      */
     @Test
@@ -187,7 +187,7 @@ public class CastAppliedCountTest {
                 "「终结技每冻结1个目标，为三月七恢复6点能量」 × the 3 enemies her ultimate froze");
     }
 
-    /** …and her file really states the count, rather than the aim count that would pay the same 18 here. */
+    /** ...and her file really states the count, rather than the aim count that would pay the same 18 here. */
     @Test
     public void theShippedRuleReadsTheLandedCount() {
         // The context's actor is the character: her cast rules are all gated on `actor == self`, so a context
@@ -227,7 +227,7 @@ public class CastAppliedCountTest {
         return castUltimate(battle);
     }
 
-    /** One cast of 三月七 (March 7th)'s ultimate data, measured as the energy it granted. */
+    /** One cast of March 7th (三月七)'s ultimate data, measured as the energy it granted. */
     private static double castUltimate(Battle battle) {
         Character hero = battle.characters.getFirst();
         double before = hero.getCurrentEnergy();
@@ -236,7 +236,7 @@ public class CastAppliedCountTest {
         return hero.getCurrentEnergy() - before;
     }
 
-    /** The shipped 星魂 (Eidolon) 1 measurement: her real file, her real ultimate, {@code rank} Eidolons active. */
+    /** The shipped Eidolon (星魂) 1 measurement: her real file, her real ultimate, {@code rank} Eidolons active. */
     private static double shippedUltimateEnergy(int rank) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, rank);
         Battle battle = ultimateBattle(hero, 3, 0);
@@ -265,7 +265,7 @@ public class CastAppliedCountTest {
     /**
      * The counter's own table plus a freeze that happens on a hit she takes - an application outside any cast.
      *
-     * <p>It is the shape 三月七 (March 7th)'s own talent has (a {@code TAKING_HIT} rule), and the point is that its freeze must
+     * <p>It is the shape March 7th (三月七)'s own talent has (a {@code TAKING_HIT} rule), and the point is that its freeze must
      * not be inherited by the next ultimate.
      */
     private static Character heroWithAnOutOfCastFreeze() {
@@ -281,7 +281,7 @@ public class CastAppliedCountTest {
 
     private static Character hero() {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);
-        // The energy bar is the observable, so it must not be a stack-resource character's (三月七 (March 7th)'s is 120).
+        // The energy bar is the observable, so it must not be a stack-resource character's (March 7th (三月七)'s is 120).
         Assertions.assertTrue(hero.getMaxEnergy() > 0, "precondition: the reader has an energy bar");
         return hero;
     }

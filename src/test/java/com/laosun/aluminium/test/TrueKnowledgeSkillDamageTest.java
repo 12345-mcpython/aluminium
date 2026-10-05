@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Capability (2) and the clause it unlocks (2026-10-02): "... raise the Skill damage dealt by #2(20)%".
+ * Capability (2) and the clause it unlocks: "... raise the Skill damage dealt by #2(20)%".
  *
- * The control is RNG-identical: the ode is cast in BOTH readings, aimed at him in one and at 昔涟 in the other, so the same casts draw the same random numbers and the only difference is
- * whether [真知] landed on him. (Measured: comparing against "no ode at all" moved the basic attack by 0.11% of pure RNG drift, which swamped the gate.)
+ * The control is RNG-identical: the ode is cast in BOTH readings, aimed at him in one and at Cyrene (昔涟) in the other, so the same casts draw the same random numbers and the only difference is
+ * whether True Knowledge (真知) landed on him. (Measured: comparing against "no ode at all" moved the basic attack by 0.11% of pure RNG drift, which swamped the gate.)
  *
- * And one attack per battle, because [真知] is spent by the next attack.
+ * And one attack per battle, because True Knowledge (真知) is spent by the next attack.
  *
  * Note: The share comes from the LEVEL row (measured: 5600 bp). The ratio it produces (1.3948 rather than 1.56) implies a baseline of 0.4184 this round did not trace; registered, not guessed.
  */

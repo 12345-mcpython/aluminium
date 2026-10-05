@@ -17,7 +17,7 @@ import java.util.List;
  * harmless: {@code AbstractBuff.afterAttack} compares {@code attacker == owner} exactly for that reason.
  *
  * <p><b>Which attacks fire it.</b> A character's skill activation ({@code SkillExecutor.execute}) and, since
- * P9-4, a summon's own attack ({@code EnemySkill.execute}) - both are attacks the engine drives from the
+ * a summon's own attack ({@code EnemySkill.execute}) - both are attacks the engine drives from the
  * first segment to the last. Derived hits never do: additional damage / true damage / DOT / break go straight
  * through {@code Battle.applyDamage} and are <em>part of</em> somebody else's attack - in the official
  * definition additional damage "does not count as having caused 1 attack", which also naturally avoids the

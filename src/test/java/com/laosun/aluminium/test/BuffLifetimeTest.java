@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code "until"} - a buff that ends when its <b>owner does something</b> instead of after N turns (P10-4).
+ * {@code "until"} - a buff that ends when its <b>owner does something</b> instead of after N turns.
  *
  * <p><b>Why a lifetime and not a turn count.</b> "持续到施放首次攻击后结束" / "for the next attack" /
  * "the next Skill" are not numbers of turns. Written as {@code turns: 1} the buff expires on the wrong turn
@@ -50,7 +50,7 @@ public class BuffLifetimeTest {
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** 星体差分机 (Celestial Differentiator) - "lasts until the first attack is cast, then ends". */
+    /** Celestial Differentiator (星体差分机) - "lasts until the first attack is cast, then ends". */
     private static final int STELLAR_DIFFERENTIATOR = 305;
 
     // ==================================================================
@@ -344,7 +344,7 @@ public class BuffLifetimeTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule(until))));
         team.add(owner);
         for (int i = 1; i < teamSize; i++) {
-            team.add(CharacterFactory.create(1210, LEVEL));   // 桂乃芬: no rule file of its own
+            team.add(CharacterFactory.create(1210, LEVEL));   // Guinaifen (桂乃芬): no rule file of its own
         }
         Battle battle = new Battle(team, List.of(monster()), new Random(0));
         battle.startBattle();

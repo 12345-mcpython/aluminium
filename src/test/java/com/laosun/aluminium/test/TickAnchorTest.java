@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code "ticks_on": "self"} - a buff whose duration is spent by <b>the rule owner's</b> turns (M-42 ④), and the
- * cleanup when that owner dies (③).
+ * {@code "ticks_on": "self"} - a buff whose duration is spent by <b>the rule owner's</b> turns, and the
+ * cleanup when that owner dies.
  *
- * <p><b>Why the clock is not always the carrier.</b> Sunday's [蒙福者]: "并使目标及其召唤物成为[蒙福者]…星期日自身
- * 每回合开始时[蒙福者]状态持续回合减1，共持续#3[i]回合。…当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除。"
+ * <p><b>Why the clock is not always the carrier.</b> Sunday (星期日)'s [蒙福者]: "并使目标及其召唤物成为[蒙福者]...星期日自身
+ * 每回合开始时[蒙福者]状态持续回合减1，共持续#3[i]回合。...当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除。"
  * The state sits on the <b>ally</b> and is spent by <b>his</b> turns. Counting it down on the carrier's turns - what
  * a timed buff does by default - would end it after a different number of turns in every fight, with nothing to see.
  *
@@ -62,7 +62,7 @@ public class TickAnchorTest {
         Assertions.assertEquals(2, durationOf(ally), "the rule owner's turn does");
     }
 
-    /** …and it expires on his turns, not on hers. */
+    /** ...and it expires on his turns, not on hers. */
     @Test
     public void itExpiresOnTheCastersTurns() {
         Battle battle = battleWith(grantToAlly(true, 2), new Random(0));
@@ -139,13 +139,13 @@ public class TickAnchorTest {
     }
 
     /**
-     * Note: <b>This case used to assert the OPPOSITE</b>, and the change is the point (2026-10-02).
+     * Note: <b>The interesting half is the one that is easy to refuse.</b>
      *
-     * <p>Until {@code ticks_on: "summon"} existed, an anchor was only a <i>clock</i>: the field said whose turn
-     * boundaries spend a duration, so on a {@code permanent} buff - never counted down - it was refused as "ignored".
-     * The same field is now also the <b>anchor</b> ({@code removeBuffsAnchoredTo} asks {@code buff.ticksOn(dead)}),
-     * and "permanent, but it ends when THAT unit disappears" is a sentence two documents write (1402's [至高之姿],
-     * and the 死龙 (the dead dragon) family's "随死龙消失而解除"). So the combination is legal; that it <b>loads</b> is pinned here,
+     * <p>Without {@code ticks_on: "summon"}, an anchor is only a <i>clock</i>: the field says whose turn
+     * boundaries spend a duration, so on a {@code permanent} buff - never counted down - it is refused as "ignored".
+     * The same field is also the <b>anchor</b> ({@code removeBuffsAnchoredTo} asks {@code buff.ticksOn(dead)}),
+     * and "permanent, but it ends when THAT unit disappears" is a sentence two documents write (1402's Supreme Stance (至高之姿),
+     * and the Netherwing (死龙) family's "随死龙消失而解除"). So the combination is legal; that it <b>loads</b> is pinned here,
      * and what it buys is pinned in {@code AglaeaMemospriteTest}.
      */
     @Test

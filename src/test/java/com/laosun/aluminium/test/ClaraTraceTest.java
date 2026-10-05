@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 110 Clara (克拉拉): her 家人 (Family) trace, the first shipped rule that combines a <b>probability</b> with a
+ * 110 Clara (克拉拉): her Family (家人) trace, the first shipped rule that combines a <b>probability</b> with a
  * <b>dispel</b>.
  *
  * <p>"受到攻击时有 35% 的固定概率解除自身 1 个负面效果" is three things at once - an event that fires on every hit
@@ -75,7 +75,7 @@ public class ClaraTraceTest {
     }
 
     /**
-     * Her 守护 (Guardian) trace: "抵抗控制类负面状态的概率提高35%" - a resistance to a whole <b>class</b>, from the real file.
+     * Her Guardian (守护) trace: "抵抗控制类负面状态的概率提高35%" - a resistance to a whole <b>class</b>, from the real file.
      *
      * <p>The number is read back off the character the loader built, which is the point: the op installs a permanent
      * 35% control resistance at BATTLE_START, and nothing else in the file changed. Asserting it here rather than
@@ -91,12 +91,12 @@ public class ClaraTraceTest {
                 "「抵抗控制类负面状态的概率提高35%」");
         Assertions.assertEquals(1, clara.getBuffManager().countBuffs(ClassResistBuff.class), "one contribution");
         Assertions.assertEquals(0, clara.getBuffManager().debuffResistOf(DebuffClass.DOT),
-                "守护 (Guardian) says 控制类 (control class) and nothing about 持续伤害类 (the DOT class)");
+                "Guardian (守护) says control class (控制类) and nothing about the DOT class (持续伤害类)");
         Assertions.assertEquals(0, clara.getBuffManager().debuffCount(),
-                "being harder to control is good for her: a 解除负面 (dispel-negative) must not take it off");
+                "being harder to control is good for her: a dispel-negative (解除负面) must not take it off");
     }
 
-    /** …and it is permanent, which is what a 行迹 (trace) is: two of her own turns do not spend it. */
+    /** ...and it is permanent, which is what a trace (行迹) is: two of her own turns do not spend it. */
     @Test
     public void herGuardianTraceIsNotSpentByTurns() {
         Battle battle = battleWith(fixed(0.9));

@@ -29,7 +29,7 @@ import java.util.Random;
  *
  * <ul>
  *   <li>{@code all_allies} / {@code party} is "our whole side" <b>including</b> the rule's owner - that is pinned
- *       by 302 不老者的仙舟 (the Xianzhou of the Undying)'s "raises the ATK of all of us", which must buff the wearer - so it cannot mean "everyone but
+ *       by 302 Fleet of the Ageless (不老者的仙舟)'s "raises the ATK of all of us", which must buff the wearer - so it cannot mean "everyone but
  *       me";</li>
  *   <li>a condition cannot say it either: conditions filter <b>rules</b> (is this event mine?), not the units an
  *       effect reaches (all of them but one). Those are different questions, and the second one is the effect's
@@ -37,8 +37,8 @@ import java.util.Random;
  * </ul>
  *
  * <p><b>What is really being tested.</b> That the two group selectors differ in exactly one unit, that
- * {@code ADVANCE} reaches every unit in the group (it used to resolve a single target, so "our side" silently
- * advanced only one of them), that the group is the <b>camp</b> (a player-side summon is one of us), that our
+ * {@code ADVANCE} reaches every unit in the group (resolving a single target would silently
+ * advance only one of them), that the group is the <b>camp</b> (a player-side summon is one of us), that our
  * enemies are untouched, and that Robin (知更鸟)'s authored rule does what her sentence says.
  */
 public class OtherAlliesTargetTest {
@@ -158,8 +158,8 @@ public class OtherAlliesTargetTest {
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(ROBIN).matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(robin, robin, null, 0, 0, null, battle));
 
-        // Note: 4 since 2026-09-30: her ultimate's clauses fire four rules on ULT_CAST -- this ADVANCE, the [协奏] state
-        // plus its countdown, the state's own ATK boost plus control immunity, and (new) the zone's 20% defence ignore.
+        // Note: her ultimate's clauses fire four rules on ULT_CAST -- this ADVANCE, the [协奏] state
+        // plus its countdown, the state's own ATK boost plus control immunity, and the zone's 20% defence ignore.
         Assertions.assertEquals(4, rules.size());
         List<EffectSpec> effects = rules.getFirst().effects();
         Assertions.assertEquals(1, effects.size());
@@ -190,7 +190,7 @@ public class OtherAlliesTargetTest {
         battle.processRequests();
         double ownerBefore = timeRemaining(battle, owner);
 
-        // The ULT_CAST event carries the unit the cast was AIMED AT (M-35), which is what "指定" means.
+        // The ULT_CAST event carries the unit the cast was AIMED AT, which is what "指定" means.
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, chosen, 0, 0);
 
         Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS, "「指定我方单体」acts now");

@@ -24,7 +24,7 @@ import java.util.Random;
  * difference between "Misha's counter counts attacks" and "Misha's counter counts attacks once per turn".
  * Without it a data author has to choose between over-triggering and not modelling the mechanic at all, and the
  * over-triggering version is a wrong number with nothing to see. Note: The last form is why {@code per_turn} is a
- * <b>count</b> and not a flag: 三月七's talent counter is "can trigger 2 times per turn", and {@code cooldown: 1} can only ever
+ * <b>count</b> and not a flag: March 7th (三月七)'s talent counter is "can trigger 2 times per turn", and {@code cooldown: 1} can only ever
  * say "once".
  *
  * <p><b>Where the state lives, and why that is the whole design.</b> A trigger table is compiled once
@@ -39,7 +39,7 @@ import java.util.Random;
  * caps at 5, so no test below lets the fingerprint exceed it).
  */
 public class TriggerLimitTest {
-    /** 姬子: her own table is replaced by the rule under test, so nothing else is ever in play. */
+    /** Himeko (姬子): her own table is replaced by the rule under test, so nothing else is ever in play. */
     private static final int OWNER = 1003;
     /** Tingyun: likewise, and used as the "somebody else acted" actor in the two-character cases. */
     private static final int ALLY = 1202;
@@ -207,7 +207,7 @@ public class TriggerLimitTest {
      */
     @Test
     public void twoRulesWithTheSameSourceHaveIndependentLimits() {
-        String shared = "1403 缇宝 trace 1403103";
+        String shared = "1403 Tribbie (缇宝) trace 1403103";
         TriggerSpec limited = TriggerSpecs.rule("ALLY_ATTACK", null, shared, gain(1));
         TriggerSpecs.set(limited, "cooldown", 1);
         TriggerSpec unlimited = TriggerSpecs.rule("ALLY_ATTACK", null, shared, gain(2));

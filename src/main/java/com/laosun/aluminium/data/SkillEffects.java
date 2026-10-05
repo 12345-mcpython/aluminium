@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Loads {@code data/skill_effects.json} (P10-3) - the table that says how to read a non-damaging
+ * Loads {@code data/skill_effects.json} - the table that says how to read a non-damaging
  * skill's parameters, indexed by {@code cid -> slot}.
  *
  * <p>Deliberately shaped like {@link TriggerTables}: loaded once, lazily, from the classpath, and a

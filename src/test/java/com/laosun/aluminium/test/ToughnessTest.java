@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * P4-1 acceptance: an enemy's toughness / broken state.
+ * acceptance: an enemy's toughness / broken state.
  *
  * <p>Anchor: Ice Edge 1002011 @ group 1 - Lv90 to toughness 60 (template 60  x  level group 1).
  * This task only builds the state machine, and reaching zero does not break automatically

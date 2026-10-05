@@ -23,7 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A character's compiled trigger table (P8-): the data form of its mechanics.
+ * A character's compiled trigger table: the data form of its mechanics.
  *
  * <p>Loadable from {@code resources/characters/<cid>.json}; an unregistered character simply has an
  * <b>empty table</b>, which is normal rather than an error (there are 93 characters and only a
@@ -56,7 +56,7 @@ public class TriggerTable {
     private static final java.util.Set<String> SUBJECTS = java.util.Set.of("self", "target", "actor");
 
     /**
-     * The resources this character <b>declares</b> (P8-8): "charge, cap 3 points" written down once, where the
+     * The resources this character <b>declares</b>: "charge, cap 3 points" written down once, where the
      * character is built. Empty for a character with no stacks - the ordinary state, and the reason
      * {@link #isEmpty()} keeps meaning "no rules".
      *
@@ -94,7 +94,7 @@ public class TriggerTable {
     }
 
     /**
-     * The same, with the character's resource declarations (P8-8).
+     * The same, with the character's resource declarations.
      *
      * @param cid       the owning character id (informational; the engine never branches on it)
      * @param specs     the raw rules, may be {@code null}
@@ -317,7 +317,7 @@ public class TriggerTable {
             return;
         }
         if (effect.getEffectPercent() != null) {
-            // A share stated by a SPELLING counts as a number to raise (2026-10-02): the target rule may read its share from the owner's skill (`percent_from_skill_param`),
+            // A share stated by a SPELLING counts as a number to raise: the target rule may read its share from the owner's skill (`percent_from_skill_param`),
             // which is the honest way to write a value that varies with level -- demanding a literal would force a lie.
             boolean statesPercent = named.effects().stream().anyMatch(e -> e.getPercent() != null
                     || e.getPercentFromSkillParam() != null || e.getPercentFromCastParam() != null
@@ -331,7 +331,7 @@ public class TriggerTable {
             return;
         }
         if (effect.getEffectPercentFromResource() != null) {
-            // Same requirement as `effect_percent` (2026-10-02): there must be a number on the target to raise.
+            // Same requirement as `effect_percent`: there must be a number on the target to raise.
             boolean statesPercent = named.effects().stream().anyMatch(e -> e.getPercent() != null);
             if (!statesPercent) {
                 throw new IllegalArgumentException(
@@ -616,7 +616,7 @@ public class TriggerTable {
                                 + "to DEALING_DAMAGE, not " + event.value() + " (source: " + spec.getSource() + ")");
             }
         }
-        // "against all enemies <b>in the shocked state</b>..." (M-53): each effect may name conditions its TARGETS must satisfy. Parsed
+        // "against all enemies <b>in the shocked state</b>...": each effect may name conditions its TARGETS must satisfy. Parsed
         // here, with the rule's own event, so `from_skill` and friends mean the same thing inside a filter.
         List<List<Condition>> targetFilters = new ArrayList<>();
         for (EffectSpec effect : effects) {
@@ -648,7 +648,7 @@ public class TriggerTable {
      *
      * <p>Validated at load time like the other limits: an unknown name would fall back to the owner and
      * count the wrong thing -- a wrong answer with no symptom, and the reason the family needs the field
-     * at all (2026-09-30; readers 1305, 120, 1403).
+     * at all (readers 1305, 120, 1403).
      */
     private static String validatePerSubject(TriggerSpec spec) {
         String subject = spec.getPerSubject();
@@ -845,8 +845,8 @@ public class TriggerTable {
     //                                                                     "when the wearer's speed is >= 145" shape
     //   self_summon_count >= 1    I have a summon of my own on the field <- the memosprite family's
     //                                                                     "while the memosprite is out" / "while a target summoned by the wearer exists"
-    //   self has_state 协奏   I am in the named state 协奏 (concerto)   <- Robin's 即兴装饰 "while in the [concerto] state"
-    //   target has_state 触电 it happened to someone in that state     <- Kafka's "an enemy target in the shocked state"
+    //   self has_state <name>   I am in the named state concerto (协奏)   <- Robin's 即兴装饰 "while in the [concerto] state"
+    //   target has_state <name> it happened to someone in that state     <- Kafka's "an enemy target in the shocked state"
     //
     // `actor` is who caused the event; `target` is what it happened to. WATCH OUT: when I am hit,
     // the actor is the attacker, so "I was hit" is `target == self`, NOT `self`.
@@ -875,7 +875,7 @@ public class TriggerTable {
      * rule is talking about, not on me).
      *
      * <p>{@code self_summon_count} is the one that reads the <b>field</b> rather than the event or the owner:
-     * how many living summons are out whose master is this rule's owner. It is spelled {@code self_}…
+     * how many living summons are out whose master is this rule's owner. It is spelled {@code self_}...
      * although {@code hp_percent} does not bother, because a bare {@code summon_count} would read like "how
      * many summons are on the battlefield" - a different question with a different answer, and one nobody has
      * asked for yet.
@@ -898,15 +898,15 @@ public class TriggerTable {
      * few lines in the same place once some content actually needs it.
      *
      * <p>Note: Package-private rather than private because {@code TriggerInterpreter} spells the <b>same</b> prefix for
-     * an effect's {@code "scale"} ("raises the value by X% of <my own attribute>", M-42): the condition's "read my attribute"
+     * an effect's {@code "scale"} ("raises the value by X% of <my own attribute>"): the condition's "read my attribute"
      * and the effect's "derive from my attribute" are one concept, and two literals would be able to drift.
      */
 /**
- * {@code summon_attr:<ATTRIBUTE>} -- the rule owner MEMOSPRITE's own attribute, as a magnitude: "等同于德谬歌生命上限的 #1%"
+ * {@code summon_attr:<ATTRIBUTE>} -- the rule owner MEMOSPRITE's own attribute (Demiurge (德谬歌)), as a magnitude: "等同于德谬歌生命上限的 #1%"
  * (1415 memosprite skill 10, data slot 13). The sibling of {@link #SELF_ATTR_PREFIX}, one subject further out.
  */
 /**
- * {@code actor_attr:<ATTRIBUTE>} -- the ACTOR's own attribute, as a magnitude: "提高数值等同于德谬歌生命上限的 #1%", where 德谬歌 is the unit
+ * {@code actor_attr:<ATTRIBUTE>} -- the ACTOR's own attribute, as a magnitude: "提高数值等同于德谬歌生命上限的 #1%", where Demiurge (德谬歌) is the unit
  * casting (1415 memosprite skill 10). The sibling of {@link #SELF_ATTR_PREFIX} (the owner) and {@link #SUMMON_ATTR_PREFIX} (the owner's
  * memosprite), one subject across: this one is whoever the event is about.
  */
@@ -920,9 +920,9 @@ static final String SUMMON_ATTR_PREFIX = "summon_attr:";
 static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
     /**
-     * {@code skill_param:<SKILLTYPE>:<index>} -- a parameter of one of the RULE OWNER's OWN skills, at its current level (2026-10-02).
+     * {@code skill_param:<SKILLTYPE>:<index>} -- a parameter of one of the RULE OWNER's OWN skills, at its current level.
      *
-     * <p>Reader: 1403 缇宝's ultimate, whose zone rider deals "等同于缇宝 #3% 生命上限" damage on somebody else's attack. `cast_skill_param:` reads the skill
+     * <p>Its reader is 1403 Tribbie (缇宝)'s ultimate, whose zone rider deals "等同于缇宝 #3% 生命上限" damage on somebody else's attack. `cast_skill_param:` reads the skill
      * that PRODUCED the event (the attack), which is the wrong one; this names the slot instead.
      */
     static final String SKILL_PARAM_PREFIX = "skill_param:";
@@ -941,14 +941,14 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     static final String CAST_APPLIED_PREFIX = "cast_applied:";
 
     /**
-     * The prefix of the other parameterised numeric variable: {@code self_resource:充能} - "how many
-     * stacks of [充能] I have right now".
+     * The prefix of the other parameterised numeric variable: {@code self_resource:<resource>} - "how many
+     * stacks of [a resource] I have right now".
      *
      * <p><b>Why it had to exist.</b> A stack/charge resource is not an attribute (so {@code self_attr} cannot
      * read it), not energy (so {@code self_max_energy} cannot), and not a state (so {@code has_state} cannot):
      * it is a number that lives on the combatant's {@code ResourceManager}. 41 of the 9character documents
-     * gate something on "charge reaches its cap" / "stacks >= N", which is the largest single hole in the corpus - the ops
-     * to <b>write</b> such a resource have existed since P8-8, and nothing could read one back.
+     * gate something on "charge reaches its cap" / "stacks >= N", which is the largest single hole in the corpus: the ops
+     * to <b>write</b> such a resource exist, but nothing can read one back.
      *
      * <p>Note: Reading an <b>undeclared</b> resource answers {@code NaN}, never {@code 0} - "cannot read it, so the
      * condition fails", the same rule {@code self_summon_count} follows. {@code ResourceManager.value} answers
@@ -959,7 +959,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final String SELF_RESOURCE_PREFIX = "self_resource:";
 
     /**
-     * A resource read off the rule owner's <b>summon</b> (2026-10-02; reader: 1141526's [故事], which the sentence puts on the memosprite: "使德谬歌获得 1 点[故事]").
+     * A resource read off the rule owner's <b>summon</b> (1141526's [故事], which the sentence puts on the memosprite: "使德谬歌获得 1 点[故事]").
      *
      * <p>Why the actor will not do: `RESOURCE_CHANGED` is raised with the RULE'S OWNER as both actor and target (measured in `fireResourceChanged`: `CanHit holder = ctx.owner()`), and its
      * delta is measured on that owner's store. So a condition about the summon's own counter has to reach through the owner -- this prefix is that reach.
@@ -981,7 +981,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * mistaken for the operator), hence the lookarounds rather than a plain {@code contains}.
      */
     /**
-     * The keyword of the "the named state just left that unit" condition (2026-10-02).
+     * The keyword of the "the named state just left that unit" condition.
      *
      * <p>Boundary-guarded for the same reason {@link #HAS_STATE} is: a state whose NAME contains the
      * keyword must not be mistaken for the operator. The answer comes from the event
@@ -997,7 +997,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final Set<String> STATE_SUBJECTS = Set.of("self", "actor", "target");
 
     /**
-     * The keyword of the "that attribute of mine/theirs was lowered" condition (2026-09-30; readers: cone 22000's
+     * The keyword of the "that attribute of mine/theirs was lowered" condition (cone 22000's
      * "攻击防御力被降低的敌方目标后恢复能量" and cone 21044's "处于防御降低或减速状态下的敌人").
      *
      * <p>Why not {@code DebuffClass}: that enum names the two FAMILIES the corpus groups states into (control, dot),
@@ -1021,7 +1021,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             Pattern.compile("(?<![\\w])is_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
-     * The {@code is_summon} keyword: "&lt;who&gt; is a memosprite" -- the fourth predicate (2026-10-02).
+     * The {@code is_summon} keyword: "&lt;who&gt; is a memosprite" -- the fourth predicate.
      *
      * <p>Note: Why it was needed: "对万敌施放时…" is 1415's memosprite skill 8, and the only spelling that names a SKILL is
      * {@code from_skill_id}, which carries the SLOT -- so on its own it also matches any other unit's slot-16 skill aimed at the same
@@ -1031,7 +1031,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             Pattern.compile("(?<![\\w])is_summon(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
-     * The {@code is_other_ally} keyword (2026-09-28): "<b>that unit is on our side and is not me</b>".
+     * The {@code is_other_ally} keyword: "<b>that unit is on our side and is not me</b>".
      *
      * <p>Note: Why it exists: the corpus says "卡芙卡的队友对敌方目标施放普攻后…" in 16 files, and neither existing spelling fits - 
      * {@code actor is_ally} counts the owner herself (she is in {@code battle.allies}), while {@code !actor == self} is refused
@@ -1041,16 +1041,16 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             Pattern.compile("(?<![\\w])is_other_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
-     * The {@code is_party_first} keyword (2026-09-30): "<b>that unit is the FIRST CHARACTER of the party</b>".
+     * The {@code is_party_first} keyword: "<b>that unit is the FIRST CHARACTER of the party</b>".
      *
      * <p>Read from {@code battle.characters} -- the roster of characters, in party order -- and NOT from
      * {@code allies}, which has memosprites and servants appended as they are summoned (light cone 21025 and
-     * relic 31both mean the party as formed). Its reader is relic 31: "若装备者不是队伍第一名".
+     * relic 31 both mean the party as formed). Its reader is relic 31: "若装备者不是队伍第一名".
      */
     /**
-     * The Trailblaze Companions group (2026-09-30): the twenty character ids the documentation's glossary lists as
-     * "Trailblaze Companions" -- the Trailblazer (8001-8010), 姬子 (1003), 姬子-启行 (1510), 三月七 (1001, 1224), 长夜月 (1413), 丹恒 (1002),
-     * 丹恒-饮月 (1213), 丹恒-腾荒 (1414), 瓦尔特 (1004), 星期日 (1313).
+     * The Trailblaze Companions group: the twenty character ids the documentation's glossary lists as
+     * "Trailblaze Companions" -- the Trailblazer (8001-8010), Himeko (姬子) (1003), Himeko - Departure (姬子-启行) (1510), March 7th (三月七) (1001, 1224), Evernight (长夜月) (1413), Dan Heng (丹恒) (1002),
+     * Dan Heng - Imbibitor Lunae (丹恒-饮月) (1213), Dan Heng - Permansor Terrae (丹恒-腾荒) (1414), Welt (瓦尔特) (1004), Sunday (星期日) (1313).
      *
      * <p>Note: PROVENANCE: membership is NOT marked by any data field -- AvatarConfig, AvatarCamp and SpecialAvatar were
      * all checked, and a co-occurrence scan over 2253 tables hit 355 generic ones. The ids themselves come from
@@ -1069,7 +1069,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final Pattern HAS_COMPANION_ALLY =
             Pattern.compile("(?<![\\w])has_companion_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
-    /** Companion-group membership, by character id (never by name: 姬子 is a prefix of 姬子-启行). */
+    /** Companion-group membership, by character id (never by name: Himeko (姬子) is a prefix of 姬子-启行). */
     private static boolean isCompanion(CanHit unit) {
         return unit instanceof Character c && TRAILBLAZE_COMPANIONS.contains(c.getCid());
     }
@@ -1084,16 +1084,16 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             Pattern.compile("(?<![\\w])has_same_path_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
-     * The {@code is_same_element_as_self} keyword (2026-09-30): "<b>that unit carries the same element as me</b>".
+     * The {@code is_same_element_as_self} keyword: "<b>that unit carries the same element as me</b>".
      *
      * <p>It is the per-CANDIDATE sibling of {@code damage_element_is_self}: that one asks about the damage instance
      * being settled, this one about a unit -- which is what a per-target filter ({@code target_when}) needs, because
-     * there the candidate sits in {@code target} and the rule's owner in {@code owner()}. Readers: relic set 312's
+     * there the candidate sits in {@code target} and the rule's owner in {@code owner()}. Its reader is relic set 312's
      * "与装备者相同属性的其他我方角色".
      */
     /**
-     * The {@code shares_path_with_an_ally} keyword (2026-09-30): "<b>that unit walks the same Path as somebody else on our
-     * side</b>". Reader: light cone 21046's "if two or more of our characters share any one Path, make those characters...".
+     * The {@code shares_path_with_an_ally} keyword: "<b>that unit walks the same Path as somebody else on our
+     * side</b>". Its reader is light cone 21046's "if two or more of our characters share any one Path, make those characters...".
      *
      * <p>The existing {@code has_same_path_ally} answers for the PARTY (it looks from the rule's owner outward), so as a
      * per-target filter it would pass every candidate -- the sentence names "these characters", not the party. This one is asked
@@ -1107,7 +1107,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
     /**
      * The {@code is_other_same_element_as_self} variant: the same question with the owner excluded --
-     * "与装备者相同属性的其他我方角色" (relic set 312). It exists separately because the\n * owner is not a candidate the sentence means, and because a filter on a BATTLE_START rule cannot state a
+     * "与装备者相同属性的其他我方角色" (relic set 312). It exists separately because the
+     * owner is not a candidate the sentence means, and because a filter on a BATTLE_START rule cannot state a
      * `target`-subjected condition at all (measured: the loader refuses those -- that event carries no
      * actor and no target, so only argument-less keywords work there).
      */
@@ -1172,7 +1173,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     /**
      * The bare keyword {@code damage_is_attack}: "the instance being settled counts as an attack".
      *
-     * <p><b>Why this exists</b> (2026-09-28): additional damage is settled as a real instance with
+     * <p><b>Why this exists</b>: additional damage is settled as a real instance with
      * {@code notCountsAsAttack()} set (see {@code Battle.applyAdditionalDamage}), and it fires {@code DEALING_DAMAGE} like any
      * other instance - so a rule that reacts to "my attack hit a burning target" would react to its own additional damage,
      * forever. {@code !} cannot express the guard (negation is only for party conditions), so the guard is stated positively:
@@ -1187,12 +1188,12 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * only for party conditions), so a rule that needs the OTHER side -- 1415's ode of passage, "when Tribbie casts a follow-up attack and triggers the additional damage of Tribbie's zone, she additionally deals
      * #1 additional damage" -- had no way to say it. Note: The negation lives HERE, where the name announces it; `TriggerTable` records what happened
      * when it lived inside {@code damage_is_attack} instead: cone 23008's energy clause read +0.0, because every ordinary attack failed the
-     * guard it was written to pass (2026-09-30).
+     * guard it was written to pass.
      */
     static final String DAMAGE_IS_ADDITIONAL = "damage_is_additional";
 
     /**
-     * The bare keyword {@code damage_has_no_cast}: "the instance being settled names no cast" (2026-10-02; reader: 1415's passage ode, whose extra hit must react to the ENGINE's
+     * The bare keyword {@code damage_has_no_cast}: "the instance being settled names no cast" (1415's passage ode, whose extra hit must react to the ENGINE's
      * additional damage and not to its own).
      *
      * <p>Measured: the zone's additional damage arrives as {@code type=ADDITIONAL skillKey=0 castCategory=UNSPECIFIED}, while the instances a rule adds carry the {@code cast_category}
@@ -1201,7 +1202,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     static final String DAMAGE_HAS_NO_CAST = "damage_has_no_cast";
 
     /**
-     * The bare keyword "造成与装备者相同属性的伤容" (2026-09-30; readers: light cone 21011 and
+     * The bare keyword "造成与装备者相同属性的伤容" (readers: light cone 21011 and
      * relic set 312). No subject and no value, like {@link #DAMAGE_IS_ATTACK}: the second party is the RULE'S OWNER, so
      * "same Type as the wearer" is the only reading it can have.
      *
@@ -1219,12 +1220,12 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * <p>Note: Checked at load time, because the alternative is the failure mode this project keeps refusing: a rule that
      * loads, fires on every matching event, and silently never matches its condition. A kill and a weakness break both
      * happen while an instance is being settled ({@code Battle.applyDamage} / {@code Battle.reduceToughness}),
-     * {@code DEALING_DAMAGE} is the instance's own event, and {@code ALLY_ATTACK} carries the cast's category since
-     * 2026-09-28 (it is the one event that fires <b>once per cast</b>, which is what "施放 2 次普攻/战技/终结技" counts).
+     * {@code DEALING_DAMAGE} is the instance's own event, and {@code ALLY_ATTACK} carries the cast's category
+     * (it is the one event that fires <b>once per cast</b>, which is what "施放 2 次普攻/战技/终结技" counts).
      */
     private static final Set<TriggerEvent> DAMAGE_CARRYING_EVENTS =
             Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK,
-                    // The settled instance is still the same instance (2026-10-02), so it carries it: that is what
+                    // The settled instance is still the same instance, so it carries it: that is what
                     // makes `damage_is_attack` available as the guard against "额外造成 N 次伤害" re-triggering
                     // itself (additional damage is not an attack).
                     TriggerEvent.DAMAGE_SETTLED);
@@ -1240,7 +1241,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final Set<TriggerEvent> CAST_CARRYING_EVENTS =
             Set.of(TriggerEvent.DEALING_DAMAGE, TriggerEvent.BREAK, TriggerEvent.KILL, TriggerEvent.ALLY_ATTACK,
                     TriggerEvent.CAST_SETUP,
-                    // The settled instance carries its own cast too (2026-10-02): "终结技额外造成 2 次伤害…" needs
+                    // The settled instance carries its own cast too: "终结技额外造成 2 次伤害…" needs
                     // to know WHICH skill produced the damage it is a share of, and `Battle.applyDamage` states the
                     // category when it announces the settlement (the same field KILL already rides).
                     TriggerEvent.DAMAGE_SETTLED,
@@ -1252,8 +1253,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
         String text = raw.trim();
 
-        // "变化的是[NAME]" (2026-09-30; reader: 1506's forwarding clause). Note: FIRST: the chain below is long.
-        // "施加的是控制类／持续伤害类负面状态" (2026-10-02; reader: 1506's warehouse skill). Read like
+        // "变化的是[NAME]" (1506's forwarding clause). Note: FIRST: the chain below is long.
+        // "施加的是控制类／持续伤害类负面状态" (1506's warehouse skill). Read like
         // `resource_changed:` -- a battle-level fact recorded at the chokepoint -- and placed beside it, first in the chain.
         java.util.regex.Matcher debuffClass =
                 java.util.regex.Pattern.compile("debuff_class:([^\\s]+)", java.util.regex.Pattern.CASE_INSENSITIVE)
@@ -1429,7 +1430,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
 
         // `has_shield`: "<who> has_shield" - argument-less like `is_ally` - or "<who> has_shield from_rule <id>",
-        // which asks about the shield's ORIGIN rather than its existence ("the shield provided by the Skill", 1001 星魂 6).
+        // which asks about the shield's ORIGIN rather than its existence ("the shield provided by the Skill", 1001 Eidolon 6).
         Matcher hasShield = HAS_SHIELD.matcher(text);
         if (hasShield.find()) {
             String subject = normalize(text.substring(0, hasShield.start()));
@@ -1469,7 +1470,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             return new DamageIsAttack(raw);
         }
 
-        // The complement (2026-10-02): the instance is additional damage. Positive in its own name, negative in what it tests -- see
+        // The complement: the instance is additional damage. Positive in its own name, negative in what it tests -- see
         // DAMAGE_IS_ADDITIONAL for why that is the honest spelling and not a double negative.
         if (text.trim().equalsIgnoreCase(DAMAGE_IS_ADDITIONAL)) {
             TriggerEvent event = TriggerEvent.fromString(spec.getOn());
@@ -1482,7 +1483,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             return new DamageIsAdditional(raw);
         }
 
-        // And whether the instance names a cast at all (2026-10-02).
+        // And whether the instance names a cast at all.
         if (text.trim().equalsIgnoreCase(DAMAGE_HAS_NO_CAST)) {
             TriggerEvent event = TriggerEvent.fromString(spec.getOn());
             if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
@@ -1658,7 +1659,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             variable = left;
             literal = Double.parseDouble(right);
         } else if (isNumericVariable(left) && isNumericVariable(right)) {
-            // Two variables (2026-09-30; reader: light cone 21012). The left one keeps the existing slots and the right
+            // Two variables (light cone 21012). The left one keeps the existing slots and the right
             // one gets its own, so `target_hp_percent >= self_hp_percent` reads exactly as it is written.
             return new Numeric(left, selfAttributeOf(left, raw, spec), selfResourceOf(left, raw, spec),
                     stacksNameOf(left, raw, spec), left.startsWith(TARGET_STACKS_PREFIX),
@@ -1762,17 +1763,17 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      */
     /** The two spellings that read a named counter ({@code ADD_STACK}); the subject is the prefix. */
     /**
-     * The two counter spellings, shared with the interpreter's {@code scale} family (2026-09-29): a condition says
+     * The two counter spellings, shared with the interpreter's {@code scale} family: a condition says
      * "I have 3 layers", and a scale says "the number is a share of how many layers I have" -- one wording, and making
      * them public is what keeps the two from drifting (the same reason {@link #SELF_ATTR_PREFIX} is not private).
      */
     public static final String SELF_STACKS_PREFIX = "self_stacks:";
     /**
-     * The counter of the unit that CAUSED the event (2026-09-30; reader: cone 23061's "我方任意角色在自身同一回合内累计消耗 >= 4 点战技点").
+     * The counter of the unit that CAUSED the event (cone 23061's "我方任意角色在自身同一回合内累计消耗 >= 4 点战技点").
      *
      * <p>The third subject, and it was missing: {@code self_stacks:} reads the rule's OWNER and {@code target_stacks:}
      * the event's target, but "any of our characters spends" puts the counter on the SPENDER -- a unit that is neither.
-     * With {@code SKILL_POINT_SPENT} now naming its spender as the actor ({@code onSpent(user, amount)}), a rule owned by
+     * With {@code SKILL_POINT_SPENT} naming its spender as the actor ({@code onSpent(user, amount)}), a rule owned by
      * the light cone's wearer can finally read it.
      */
     public static final String ACTOR_STACKS_PREFIX = "actor_stacks:";
@@ -1909,7 +1910,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * <p>Unlike {@code Path.fromName} - which degrades an unknown name to {@link
      * com.laosun.aluminium.enums.Path#OTHER} because data may legitimately carry a Path this build does not know - 
      * a <b>rule file</b> may not: {@code target has_path 同谐} with a typo would silently become "the target is on
-     * some other Path", and for 星期日's sentence that means the exception fires on exactly the units it was
+     * some other Path", and for Sunday (星期日)'s sentence that means the exception fires on exactly the units it was
      * written to exclude. So the name is refused while the file is read.
      */
     private static com.laosun.aluminium.enums.Path requirePath(String name, String raw, TriggerSpec spec) {
@@ -1959,8 +1960,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * target ({@code Battle.startBattle} to {@code fireTriggers(TriggerEvent.BATTLE_START)}). A rule written there
      * as {@code "when": ["actor == self"]} therefore <b>can never fire</b> - and it looks completely reasonable,
      * which is exactly the failure mode this DSL refuses everywhere else: a rule that loads, is filed under the
-     * right event, and silently does nothing. (Written by hand first, caught by the rule failing to grant anything,
-     * 2026-09-2.) On this event "my own table" is already the unit of delivery - the table <i>is</i> the owner's - 
+     * right event, and silently does nothing. (Written by hand first, caught by the rule failing to grant anything.) On this event "my own table" is already the unit of delivery - the table <i>is</i> the owner's - 
      * so the condition was never needed.
      *
      * <p>{@code self} is always carried (the owner exists for every event) and is therefore always allowed.
@@ -2010,7 +2010,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         return token.trim().toLowerCase(Locale.ROOT);
     }
 
-    /** Whether a side may stand as a numeric variable on its own (2026-09-30). */
+    /** Whether a side may stand as a numeric variable on its own. */
     private static boolean isNumericVariable(String token) {
         String name = token == null ? "" : token.trim();
         return NUMERIC_VARIABLES.contains(name) || name.startsWith(SELF_ATTR_PREFIX)
@@ -2097,7 +2097,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * is {@code target == self} - and when I am hit, the actor is the <b>attacker</b>, not me.
      *
      * <p><b>{@code battle}, and why a context carries one.</b> Some questions are about the
-     * <b>field</b> rather than about the event: "忆灵在场时" ("while my memosprite is out") asks what
+     * <b>field</b> rather than about the event: "忆灵在场时" ("while my Memosprite (忆灵) is out") asks what
      * units exist, and "我方全体" has to name them as effect targets. No event can carry that, because
      * it is not a fact about what just happened - it is a fact about the battlefield, and the battlefield
      * is {@link Battle}. It is here for exactly those two questions and nothing else: a condition must
@@ -2148,7 +2148,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
 
         /**
-         * The same context, saying WHICH named state just left its carrier (2026-10-02; the
+         * The same context, saying WHICH named state just left its carrier (the
          * {@code STATE_ENDED} event). Note: The name has to ride here because the state is already gone by the time
          * the event fires, so no condition can read it off the carrier.
          */
@@ -2157,7 +2157,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                     targetFilter, skillId, weakHitCount, attackHitTargets, name);
         }
         /**
-         * The same context, saying <b>which data row</b> of a skill produced this event (2026-09-28).
+         * The same context, saying <b>which data row</b> of a skill produced this event.
          *
          * <p>Note: It is the row, not the slot: `Skill.getSkillSlot()` is what the data tables are indexed by, so an enhanced
          * attack (a row of its own, e.g. 1111's [直冲碎天拳] = 111108) is distinguishable from the ordinary basic attack it
@@ -2190,7 +2190,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
 
         /**
-         * The same context carrying how many hit targets shared the attack's weakness (2026-09-30; reader: cone 21040).
+         * The same context carrying how many hit targets shared the attack's weakness (cone 21040).
          *
          * <p>Note: A COPY helper rather than a wider constructor on purpose: the cast events are built by chaining these
          * ({@code new TriggerContext(..., stateName).withSkillId(...)}), so a value that only the canonical constructor knows is
@@ -2202,7 +2202,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
 
         /**
-         * The same context carrying the targets this attack hit (2026-09-30; reader: cone 21029).
+         * The same context carrying the targets this attack hit (cone 21029).
          *
          * <p>Note: This helper CARRIES {@code weakHitCount} along rather than resetting it: every helper rebuilds the
          * whole record, so one that resets a field it does not own would make the firing ORDER significant.
@@ -2285,7 +2285,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * <p><b>Why a prefix and not a "not equal" spelling per family.</b> Every family would otherwise need its own
      * negation ({@code has_state} / {@code has_path} / the numeric comparisons), and the ones that already have
      * one ({@code actor != self}) would have two ways to say it. One prefix covers the ones that need it, and it
-     * is read <b>before</b> anything else, so {@code !target has_path 同谐} cannot be confused with the {@code !=}
+     * is read <b>before</b> anything else, so negating a {@code has_path} condition cannot be confused with the {@code !=}
      * operator.
      *
      * <p>Note: <b>Only party-reading conditions may be negated</b> (see {@link PartyCondition}), and the check is done
@@ -2443,7 +2443,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * Side test: {@code target is_ally} - "the unit this cast was aimed at is on our side".
      *
      * <p><b>Why the DSL needs it.</b> Three shipped relic abilities say "对<b>己方角色</b>施放终结技/战技时" (sets 114,
-     * 118, 121). Since M-35 a cast event carries the unit it <b>aimed at</b> ({@code ctx.target()}), which is what
+     * 118, 121). A cast event carries the unit it <b>aimed at</b> ({@code ctx.target()}), which is what
      * "对…施放" names - but the event says nothing about that unit's <b>side</b>, and a damaging ultimate aimed at an
      * enemy carries a target too. Without this predicate the rule would fire on every cast of that slot: an
      * over-trigger with nothing to report.
@@ -2454,13 +2454,13 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * opposite <b>and</b> still fails when there is no target at all (a missing party must never become a match).
      */
     /**
-     * {@code <who> is_other_ally} ? the unit is on our side <b>and is not the rule's owner</b> (2026-09-28).
+     * {@code <who> is_other_ally} ? the unit is on our side <b>and is not the rule's owner</b>.
      *
      * <p>The "other" half is the whole point: {@code is_ally} already answers "on our side", and the owner satisfies it. A rule
      * that means "my ALLY did something" must exclude its own actions, or the follow-up it grants would trigger itself.
      */
     /**
-     * {@code <who> is_party_first} ? the unit is the FIRST CHARACTER of the party (2026-09-30). Its reader is relic 31:
+     * {@code <who> is_party_first} ? the unit is the FIRST CHARACTER of the party. Its reader is relic 31:
      * "若装备者不是队伍第一名，则使队伍第一名的攻击力提高" -- one rule needs both halves, so this answers the condition
      * half and {@code party_first} (a target selector) answers the other.
      */
@@ -2662,7 +2662,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * <p><b>Why the condition DSL needs it.</b> March 7th (三月七)'s Talent is "after one of our targets <b>holding a shield</b> is attacked by an enemy target, 三月七
      * immediately launches a counter at the attacker" - the trigger is about a shielded ally, and the engine's shield is a plain number on
      * the combatant ({@code CanHit.getShield()}) that no condition could ask about. 13 of the 9character documents
-     * say "while shielded" somewhere (符玄 / 砂金 / 杰帕德 and the shield family), which makes it the second-largest hole
+     * say "while shielded" somewhere (Fu Xuan (符玄) / Aventurine (砂金) / Gepard (杰帕德) and the shield family), which makes it the second-largest hole
      * after the resource count.
      *
      * <p>Note: <b>"Has a shield" means the value is above 0</b>, not "a shield was granted at some point": a shield
@@ -2670,8 +2670,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * it reads the <b>live</b> value rather than asking the buff manager for a {@code ShieldBuff} - the two agree
      * while a timed shield is up (the buff installs it), and the value is the one the damage path actually drains.
      *
-     * <p>Note: <b>The origin is askable too</b> ({@code has_shield from_rule <id>}, 2026-09-28): "战技提供的护盾" names the
-     * ability, not just the giver, and 三月七 has two shields of her own - so the shield records the rule that created it
+     * <p>Note: <b>The origin is askable too</b> ({@code has_shield from_rule <id>}): "战技提供的护盾" names the
+     * ability, not just the giver, and March 7th (三月七) has two shields of her own - so the shield records the rule that created it
      * ({@code CanHit.getShieldRuleId()}) and this condition can require it. Note: A raw grant states no rule, so a
      * {@code from_rule} question correctly answers "no" for it.
      */
@@ -2716,7 +2716,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     /**
      * {@code from_skill COMMON|SKILL|ULTRA|TALENT} - the instance that caused this event came from that slot.
      *
-     * <p><b>Why the DSL needs it.</b> 1003 Himeko (姬子)'s 星魂 (Eidolon) 4 says "when casting the Skill and breaking an enemy target's weakness, Himeko additionally gains 1 point of charge" and
+     * <p><b>Why the DSL needs it.</b> 1003 Himeko (姬子)'s Eidolon (星魂) 4 says "when casting the Skill and breaking an enemy target's weakness, Himeko additionally gains 1 point of charge" and
      * her ultimate pays per kill "每消灭1个敌方目标". {@code BREAK} and {@code KILL} already carry <b>who</b> caused
      * them ({@code actor}), but not <b>which ability</b>: without this term `actor == self` on a break would also pay for
      * a break left by her basic attack or by her talent's follow-up, which the text excludes - a wrong number with
@@ -2729,7 +2729,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * its damage inline) answers <b>false</b>: the event happened, but nothing can say which skill produced it.
      */
     /**
-     * {@code damage_is_attack} ? "the instance being settled counts as an attack" (2026-09-28).
+     * {@code damage_is_attack} ? "the instance being settled counts as an attack".
      *
      * <p>Additional damage is an instance too, and it is deliberately marked {@code notCountsAsAttack()}, so this is the one
      * question that tells the two apart where it matters: a rule that would otherwise react to its own extra instance.
@@ -2897,7 +2897,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
         @Override
         public boolean test(TriggerContext ctx) {
-            // Note: The negation is correct HERE and was a bug next door: `Damage.countsAsAttack` defaults to true, so `!…` is exactly
+            // Note: The negation is correct HERE and is wrong next door: `Damage.countsAsAttack` defaults to true, so `!...` is exactly
             // "additional damage", which is what this keyword names. In `damage_is_attack` the same expression meant the opposite of
             // that keyword's contract (cone 23008's clause read +0.0).
             return ctx.damage() != null && !ctx.damage().isCountsAsAttack();
@@ -2943,7 +2943,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     }
 
     /**
-     * {@code damage_has_no_cast}: the instance being settled was produced by the ENGINE, not by a rule that named a cast (2026-10-02).
+     * {@code damage_has_no_cast}: the instance being settled was produced by the ENGINE, not by a rule that named a cast.
      */
     private static final class DamageHasNoCast implements Condition {
         private final String raw;
@@ -2979,8 +2979,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
         @Override
         public boolean test(TriggerContext ctx) {
-            // Was `!ctx.damage().isCountsAsAttack()`, i.e. the exact opposite of the keyword's contract (measured
-            // 2026-09-30: a rule guarded by `damage_is_attack` fired on ADDITIONAL damage and never on a real attack --
+            // Was `!ctx.damage().isCountsAsAttack()`, i.e. the exact opposite of the keyword's contract (measured:
+            // a rule guarded by `damage_is_attack` fired on ADDITIONAL damage and never on a real attack --
             // cone 23008's energy clause read +0.0 because of it). `Damage.countsAsAttack` defaults to true, so the
             // negation made every ordinary attack fail the guard it was written to pass.
             return ctx.damage() != null && ctx.damage().isCountsAsAttack();
@@ -3060,7 +3060,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         if (SkillCategory.of(slot) == null) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' names the slot " + slot + ", which is not an in-battle cast "
-                            + "(秘技 / 地图普攻 produce no in-battle damage instance), so the condition could never "
+                            + "(Technique / overworld basic attack produce no in-battle damage instance), so the condition could never "
                             + "hold; use one of " + inBattleSlots() + " (source: " + spec.getSource() + ")");
         }
         return slot;
@@ -3083,7 +3083,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * character data) answers "no", which is the "cannot read it, therefore the condition fails" rule
      * {@link HasState} follows. Note: A Path the build does not recognise is {@link
      * com.laosun.aluminium.enums.Path#OTHER} - that is <b>not</b> equal to any of the nine, so a rule asking for
-     * 同谐 (Harmony) does not accidentally match it.
+     * Harmony (同谐) does not accidentally match it.
      */
     private static final class HasPath implements Condition, PartyCondition {
 
@@ -3132,7 +3132,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * {@code Character.Builder} fills every intrinsic slot, so a character with no such row still carries the slot,
      * holding {@code SkillData}'s not-found placeholder; that is why the test is
      * {@link com.laosun.aluminium.data.SkillData#isLoaded()} rather
-     * than a null check (measured: 姬子 has an {@code ELATION_SKILL} key, and only 8010's is a real row. A
+     * than a null check (measured: Himeko (姬子) has an {@code ELATION_SKILL} key, and only 8010's is a real row. A
      * key-based first version answered "yes" for everyone - i.e. a guard that guards nothing, and the
      * {@code CAST_SKILL} it guards would then have thrown on every ally the document excludes).
      *
@@ -3192,7 +3192,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * never be the accidental outcome of a missing party.
      */
     /**
-     * "That party carries a negative modifier on this attribute" (2026-09-30).
+     * "That party carries a negative modifier on this attribute".
      *
      * <p>A party that does not exist for this event FAILS, exactly like {@link HasState}: "the rule matched" must never
      * be the accidental outcome of a missing party.
@@ -3253,7 +3253,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     }
 
     /**
-     * "[X]结束时": the state NAMED X has just left the subject (2026-10-02).
+     * "[X]结束时": the state NAMED X has just left the subject.
      *
      * <p>Note: It cannot be written as {@code has_state}: the removal happens first, so by the time this event
      * fires the carrier no longer has it. The name rides on the event instead.
@@ -3387,7 +3387,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             if (ctx.battle() == null || ctx.owner() == null) {
                 return false;
             }
-            // Identity, not headcount (2026-09-30; reader: cone 20022's "忆灵消失时移除…[缅怀]"): a summon that has ALREADY
+            // Identity, not headcount (cone 20022's "忆灵消失时移除…[缅怀]"): a summon that has ALREADY
             // DIED is still "one of my summons" -- the camp roster keeps its corpse, and the case that needs this is
             // exactly the KILL whose victim is that corpse. Note: `summonsOf` deliberately answers the LIVING question
             // (self_summon_count reads it, and a headcount of corpses is not what it means), so identity asks the unit
@@ -3430,7 +3430,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         private final double literal;
         private final boolean literalOnLeft;
         /**
-         * The RIGHT-hand side when it is a variable rather than a literal (2026-09-30; reader: light cone 21012's
+         * The RIGHT-hand side when it is a variable rather than a literal (light cone 21012's
          * "当前生命值百分比大于等于装备者自身当前生命值百分比"): the DSL always said comparisons were against a
          * party or a literal, and this is the third shape the corpus actually uses. Four descriptors, exactly like the
          * left-hand variable's, so a two-variable comparison needs no new vocabulary at all.
@@ -3509,14 +3509,14 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             return value(ctx, variable, attribute, resource, stacksName, stacksOnTarget, stacksOnActor);
         }
 
-        /** One reader for every numeric variable, so a comparison can read two of them (2026-09-30). */
+        /** One reader for every numeric variable, so a comparison can read two of them. */
         private double value(TriggerContext ctx, String variable, AttributeType attribute, String resource,
                 String stacksName, boolean stacksOnTarget, boolean stacksOnActor) {
             if (attribute != null) {
                 return ownerAttribute(ctx.owner(), attribute);
             }
             if (resource != null) {
-                // `summon_resource:` reaches through the owner to its summon (2026-10-02): the engine's `RESOURCE_CHANGED` names the RULE'S OWNER, so this is the only way to ask about
+                // `summon_resource:` reaches through the owner to its summon: the engine's `RESOURCE_CHANGED` names the RULE'S OWNER, so this is the only way to ask about
                 // the memosprite's own counter.
                 CanHit resourceHolder = variable.startsWith(SUMMON_RESOURCE_PREFIX) && ctx.battle() != null
                         ? ctx.battle().memospriteOf(ctx.owner())
@@ -3538,7 +3538,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 // "强化普攻命中…": the DATA ROW of the skill that produced this event (0 = the event named none, which
                 // makes the comparison false rather than accidentally true for the row 0 that no skill has).
                 case "from_skill_id" -> ctx.skillId();
-            // The skill that produced a SETTLED damage (2026-10-02): `DAMAGE_SETTLED` hands over the `Damage` but goes through the overload WITHOUT a
+            // The skill that produced a SETTLED damage: `DAMAGE_SETTLED` hands over the `Damage` but goes through the overload WITHOUT a
             // skillId, so `from_skill_id` reads 0 there -- measured, a rule that fires ungated stops firing the moment `from_skill_id == ` is added. The
             // instance carries it (`Damage.getSkillKey()`, "the loader's slot"), so this reads it where the event provides nothing.
             case "damage_skill_key" -> {
@@ -3555,21 +3555,21 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 // "若该目标当前生命值百分比大于等于 30%" -- the OTHER unit's HP, which `hp_percent` cannot ask
                 // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
                 case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());
-                // The ACTOR's share (2026-09-30; reader: light cone 21055's "our target's current HP percentage
+                // The ACTOR's share (light cone 21055's "our target's current HP percentage
                 // is at or above 50%"): "our unit" there is the one dealing the damage, so the third subject.
                 case "actor_hp_percent" -> hpPercent(ctx.actor());
-                // ? The same fraction BEFORE this event's loss (2026-09-29): "降到50%或以下" is a CROSSING, not "is below half", and the
+                // The same fraction BEFORE this event's loss: "降到50%或以下" is a CROSSING, not "is below half", and the
                 // difference is firing once versus firing on every later hit. HP_LOST carries the loss in `amount`, so before = (current + amount) / max.
                 case "target_hp_percent_before" -> ctx.target() == null || ctx.target().getMaxHp() <= 0
                         ? Double.NaN
                         : Math.min(1.0, (ctx.target().getCurrentHp() + ctx.amount()) / ctx.target().getMaxHp());
                 case "self_summon_count" -> summonCount(ctx.owner(), ctx);
                 // "若目标拥有召唤物" - the same question about the OTHER unit. It is a separate name rather
-                // than a subject prefix because the two are asked in the same sentence often (relic 12asks
-                // about the wearer, 星期日's Skill asks about the ally it was cast on).
+                // than a subject prefix because the two are asked in the same sentence often (relic 12 asks
+                // about the wearer, Sunday (星期日)'s Skill asks about the ally it was cast on).
                 case "target_summon_count" -> summonCount(ctx.target(), ctx);
                 // "场上敌方目标数量" -- a count of the OTHER camp as a whole, which no subject prefix fits: `self_*` and
-                // `target_*` are both about one unit. Its reader is 1413 长夜月's talent, whose thresholds are 4+/3/2/1 enemies.
+                // `target_*` are both about one unit. Its reader is 1413 Evernight (长夜月)'s talent, whose thresholds are 4+/3/2/1 enemies.
                 case "enemy_count" -> enemyCount(ctx);
                 // "我方目标数量" -- the mirror of `enemy_count`, and the blocker set 321's entry names ("there is still no
                 // condition on the battlefield's PARTY SIZE, so the number of stacks cannot be computed").
@@ -3596,7 +3596,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
          * <p>Read from the battlefield, so a context with no battle - or a unit that does not exist for this
          * event - answers {@code NaN}: the same "cannot read it, therefore the condition fails" rule the other
          * variables follow, and never a silent "0 summons". Note: That matters more here than elsewhere: a rule
-         * gated on "忆灵在场时" would be <em>silently disabled</em> if a missing battlefield read as "none
+         * gated on "忆灵在场时" ("while my Memosprite (忆灵) is out") would be <em>silently disabled</em> if a missing battlefield read as "none
          * out", which is a wrong answer with no symptom.
          */
         private static double summonCount(CanHit who, TriggerContext ctx) {
@@ -3648,7 +3648,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             if (owner != null && owner.getResources().has(resource)) {
                 return owner.getResources().value(resource);
             }
-            // A PARTY-scoped counter is read from the battle, whichever ally declared it (2026-09-30). Nothing changes for a
+            // A PARTY-scoped counter is read from the battle, whichever ally declared it. Nothing changes for a
             // resource a unit owns itself -- that case answered above.
             if (battle != null && battle.partyResource(resource) != null) {
                 return battle.partyResourceValue(resource);

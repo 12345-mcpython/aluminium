@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "结界持续期间…" - the zone's clock is a COUNTDOWN, so its effects last exactly as long as that unit is alive.
+ * "结界持续期间..." - the zone's clock is a COUNTDOWN, so its effects last exactly as long as that unit is alive.
  *
- * <p>The sentence (行迹 (trace) 千锻魂) has three effects and the upstream modifier writes exactly three properties
+ * <p>The sentence (Traces (行迹), Soul, Tempered ad Mortem (千锻魂)) has three effects and the upstream modifier writes exactly three properties
  * (AggroAddedRatio + AllDamageReduce + HealTakenRatio, from the same row whose ParamList is [10, 0.5, 0.5]). All three are
  * applied named at the Ultimate and taken off on the countdown's turn, which is what "the zone is dispelled when the countdown turn begins" says.
  */
@@ -58,7 +58,7 @@ public class MortenaxZoneTest {
                 "and so does the healing taken bonus");
     }
     /**
-     * 星魂 1: the zone also lowers enemies' resistance, and the countdown takes that off with everything else.
+     * Eidolon 1 (星魂 1): the zone also lowers enemies' resistance, and the countdown takes that off with everything else.
      *
      * <p>Three ways, because the gate is half the clause: rank 1 states 0.2 on every enemy; the countdown removes it; and
      * rank 0 must not state it at all.

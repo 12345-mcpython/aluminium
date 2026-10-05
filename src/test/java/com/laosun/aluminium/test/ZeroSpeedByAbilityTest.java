@@ -11,15 +11,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Two panels whose speed the game's own table gives as ZERO (2026-10-02).
+ * Two panels whose speed the game's own table gives as ZERO.
  *
- * <p>`ExcelOutput/AvatarServantConfig.json` gives 11409 (小伊卡) and 11415 (德谬歌) `SpeedBase "0"` and `SpeedInherit "0"`,
- * and their servant configs keep Speed out of the summoner sync -- an ability moves it. The validator used to refuse a zero
- * HEALTH/SPEED outright, so neither file could exist. `"by_ability": true` is how a panel says "the data states this zero,
+ * <p>`ExcelOutput/AvatarServantConfig.json` gives 11409 (Little Ica, 小伊卡) and 11415 (Demiurge, 德谬歌) `SpeedBase "0"` and `SpeedInherit "0"`,
+ * and their servant configs keep Speed out of the summoner sync -- an ability moves it. Refusing a zero
+ * HEALTH/SPEED outright would mean neither file could exist. `"by_ability": true` is how a panel says "the data states this zero,
  * an ability supplies the real value", which is different from silently accepting a zero nobody stated.
  */
 public class ZeroSpeedByAbilityTest {
-    /** 小伊卡: half of 风堇's Max HP, and the stated zero speed. */
+    /** Little Ica (小伊卡): half of Hyacine (风堇)'s Max HP, and the stated zero speed. */
     @Test
     public void theIcaCarriesTheShareTheDataStates() {
         MemospriteSpec spec = Memosprites.of(1409);
@@ -38,7 +38,7 @@ public class ZeroSpeedByAbilityTest {
                 "the table states 0 -- written down, not hidden");
     }
 
-    /** 德谬歌: all of 昔涟's Max HP, same zero speed. */
+    /** Demiurge (德谬歌): all of Cyrene (昔涟)'s Max HP, same zero speed. */
     @Test
     public void theDemiurgeCarriesHers() {
         MemospriteSpec spec = Memosprites.of(1415);

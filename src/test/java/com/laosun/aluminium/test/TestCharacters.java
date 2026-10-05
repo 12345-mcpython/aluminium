@@ -8,9 +8,9 @@ import com.laosun.aluminium.utils.CharacterFactory;
  * A real character with <b>no trigger file of their own</b> - the "unregistered" control that the trigger-table
  * suites are built on.
  *
- * <p><b>Why it is looked up rather than named.</b> It used to be Himeko (姬子) (1003), spelled as a constant in
- * {@code TriggerTableTest} and {@code RelicTriggerTableTest}, until her kit was authored on 2026-09-2- which
- * turned four unrelated assertions into failures: "no file to empty table", "a character without relics behaves as
+ * <p><b>Why it is looked up rather than named.</b> Naming it and spelling it as a constant in
+ * {@code TriggerTableTest} and {@code RelicTriggerTableTest} breaks the moment that character's kit is authored, which
+ * turns four unrelated assertions into failures: "no file to empty table", "a character without relics behaves as
  * before", and a {@code BATTLE_START} count that went from 1 to 2 because the control itself had acquired a rule.
  * None of those claims is about Himeko; they are all about <em>having no rules</em>. Which character that is, is a
  * fact about the <b>content</b> and changes every time a kit is data-ised (93 characters, a handful written), so
@@ -35,16 +35,17 @@ final class TestCharacters {
      *                               would be asserting the wrong thing
      */
     static int withoutTriggerFile() {
-        // Note: PINNED ON PURPOSE (2026-09-29, round 209/240). This used to return "the lowest id with no trigger
-        // file" -- a MOVING TARGET: shipping 1112 (round 20/240) handed every caller a DIFFERENT character, and
+        // Note: PINNED ON PURPOSE. Returning "the lowest id with no trigger
+        // file" is a MOVING TARGET: shipping 1112 handed every caller a DIFFERENT character, and
         // a suite measuring HP numbers went red far from the change. The id below is a key of
         // data/character_data.json with no content file; if it ever gains one, the guard fails loudly.
-        int cid = 1506;   // 2026-09-30: the pin moved because 1502 Yao Guang was SHIPPED. 1506 (Silver Wolf LV.999 (银狼LV.999)) is now
+        int cid = 1506;   // the pin: 1502 Yao Guang was SHIPPED, so 1506 (Silver Wolf LV.999 (银狼LV.999)) is now
         // the last key of character_data.json without a content file. Note: Its max energy is 0, which is why the suite that
-        // asserted "an empty table still recovers energy" no longer uses this control -- it builds an empty table itself. // 2026-09-30: the pin moved because 1505 绯英 was SHIPPED -- the guard failed loudly
-        // exactly as designed. 1502 Yao Guang is still a key of character_data.json with no content file. Note: Note what the
+        // asserted "an empty table still recovers energy" does not use this control -- it builds an empty table itself. The pin
+        // moved on once more when Evanescia (1505) was SHIPPED -- the guard failed loudly
+        // exactly as designed. Note: What the
         // failure taught: this control is used as a PARTY MEMBER in some suites, so its data (element, speed, whether slot 1
-        // is single-target) can move their numbers. `HimekoChargeTest` now names its own single-target ally for that reason.
+        // is single-target) can move their numbers. `HimekoChargeTest` names its own single-target ally for that reason.
         if (TriggerTables.exists(cid)) {
             throw new IllegalStateException(
                     "Character " + cid + " now has a trigger file, so the \"unregistered character\" control is gone. "

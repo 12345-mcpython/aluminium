@@ -12,7 +12,7 @@ import java.util.Map;
 import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BUFF;
 
 /**
- * P1-3 acceptance (and the P1-2 constructor checks): every zone asserts its own
+ * acceptance (and the P1-2 constructor checks): every zone asserts its own
  * multiplier against a base of 1000, plus the invariants of the zone container.
  *
  * <p>Pure algebra: {@code attacker}/{@code defender} take no part in zone settlement,
@@ -228,7 +228,7 @@ public class DamageZoneTest {
         Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.BUFF).size());
         Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.RELIC).size());
 
-        // Removal by source: a Buff expiring / being dispelled (P10-3) is exactly this opening
+        // Removal by source: a Buff expiring / being dispelled is exactly this opening
         damage.vulnerableArea().removeModifiersFrom(BUFF, 7);
         damage.boostArea().removeModifiersFrom(ModifierSource.BUFF, 3);
 

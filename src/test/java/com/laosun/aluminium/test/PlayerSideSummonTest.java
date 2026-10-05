@@ -51,7 +51,7 @@ public class PlayerSideSummonTest {
     /** Our hero, and the master of the summon. */
     private static final int HERO = 1003;
     private static final int LEVEL = 80;
-    /** 银鬃近卫 - a monster id used as the friendly summon's data. */
+    /** Silvermane Soldier (银鬃近卫) - a monster id used as the friendly summon's data. */
     private static final int MINION = 1002040;
     private static final int GROUP = 1;
 

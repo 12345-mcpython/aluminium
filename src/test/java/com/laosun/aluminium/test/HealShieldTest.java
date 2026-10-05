@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P6-2 / P6-3 acceptance: the healing damage zone and shields.
+ * acceptance: the healing damage zone and shields.
  *
  * <pre>
  * healing = base amount  x  (1 + outgoing healing boost)  x  (1 + heal taken ratio) from the two factors come from different people
@@ -27,7 +27,7 @@ public class HealShieldTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // P6-2 healing damage zone
+    // healing damage zone
     // ==================================================================
 
     @Test
@@ -89,7 +89,7 @@ public class HealShieldTest {
     }
 
     // ==================================================================
-    // P6-3 shield
+    // shield
     // ==================================================================
 
     @Test

@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * P1-9 acceptance: additional damage (附加伤害) and true damage (真实伤害), reproduced from the
+ * acceptance: additional damage (附加伤害) and true damage (真实伤害), reproduced from the
  * real kits of 1309 Robin (知更鸟) and 1403 Tribbie (缇宝) (see {@code E:\code\blog\hsr\1309_知更鸟.md} /
  * {@code 1403_缇宝.md}).
  *

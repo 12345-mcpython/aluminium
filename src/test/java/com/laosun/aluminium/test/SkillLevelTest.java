@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code RAISE_SKILL_LEVEL} and the one level resolver behind it (M-32): "战技等级+1""终结技等级+1" (Skill level +1, Ultimate level +1).
+ * {@code RAISE_SKILL_LEVEL} and the one level resolver behind it: "战技等级+1""终结技等级+1" (Skill level +1, Ultimate level +1).
  *
  * <p><b>The gap.</b> Every skill in this engine is read at level 1 unless a rule pins the row with
  * {@code damage_level}, because a character had no skill levels at all. So "战技等级+1" (Skill level +1) had nowhere to land: writing
