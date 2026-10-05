@@ -887,6 +887,11 @@ public class TriggerTable {
      * an effect's {@code "scale"} (「提高数值等同于<我自己的属性>的 X%」, M-42): the condition's "read my attribute"
      * and the effect's "derive from my attribute" are one concept, and two literals would be able to drift.
      */
+/**
+ * {@code summon_attr:<ATTRIBUTE>} -- the rule owner MEMOSPRITE's own attribute, as a magnitude: "等同于德谬歌生命上限的 #1%"
+ * (1415 memosprite skill 10, data slot 13). The sibling of {@link #SELF_ATTR_PREFIX}, one subject further out.
+ */
+static final String SUMMON_ATTR_PREFIX = "summon_attr:";
     static final String SELF_ATTR_PREFIX = "self_attr:";
 
     /**

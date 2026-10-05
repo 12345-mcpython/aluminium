@@ -2352,6 +2352,20 @@ public final class TriggerInterpreter {
             return effect.getPercent() * Math.abs(ctx.amount())
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (effect.getScale().trim().startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
+            // The owner's MEMOSPRITE (1415 memosprite skill 10). Resolved through `Battle.summonOf`, the same accessor the `summon`
+            // target selector reads, and before the attribute branch because the subject here is not the owner.
+            CanHit fielded = ctx.battle() == null ? null : ctx.battle().summonOf(owner);
+            if (fielded == null) {
+                throw new IllegalStateException("the scale \"" + effect.getScale()
+                        + "\" reads the owner's memosprite, but " + owner.getName()
+                        + " has none on the field; a share of a unit that is not there is not a number");
+            }
+            AttributeType from = AttributeType.fromString(
+                    effect.getScale().trim().substring(TriggerTable.SUMMON_ATTR_PREFIX.length()).trim());
+            return effect.getPercent() * fielded.getAttribute(from).get()
+                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (effect.getScale().trim().startsWith(ABOVE_PREFIX)) {
             // ⭐ 「速度大于等于 120 时…之后**每超过 1 点速度**…」 (2026-10-02): the EXCESS over a
             // stated threshold, as a magnitude. ⚠ `self_max_energy` below is the same shape with the threshold
@@ -3796,6 +3810,20 @@ public final class TriggerInterpreter {
         }
         // A counter scale names a counter, not an attribute: check the shape and stop there.
         String scale = effect.getScale().trim();
+        // The owner MEMOSPRITE's attribute (2026-10-02). Accepted HERE and not in `scaleAttribute`, because that one is shared
+        // with the DAMAGE path, where the subject is the attacker -- teaching it this spelling there would make damage quietly
+        // read the wrong unit. The attribute name is still checked, so a typo is loud at load time.
+        if (scale.startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
+            String summonAttr = scale.substring(TriggerTable.SUMMON_ATTR_PREFIX.length()).trim();
+            if (summonAttr.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " scales off the owner's memosprite but names no attribute: \"" + scale
+                                + "\" (source: " + spec.getSource() + ")");
+            }
+            AttributeType.fromString(summonAttr);
+            requirePercent(effect, op, spec);
+            return;
+        }
         if (scale.startsWith(TriggerTable.SELF_STACKS_PREFIX)
                 || scale.startsWith(TriggerTable.TARGET_STACKS_PREFIX)) {
             String name = scale.substring(scale.indexOf(':') + 1).trim();
