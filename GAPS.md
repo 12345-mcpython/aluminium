@@ -36710,3 +36710,24 @@
 >   ⇒ ⭐ **忆灵没有那个键** ✗（⭐ 它的技能按**槽位**放 ✓）⇒ ⭐ NPE ✓（⭐ 该用 ⭐ `skillAt(slot)` ✓，⭐ 我在别处一直这么用 ✓）；
 >   ⭐ ② ⭐ 那个 NPE 发生在断言**之前** ✗ ⇒ ⭐ 白白花掉一次运行 ✓（⭐ 教训：⭐ **把"前置检查"和"被测读数"分开放** ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2277** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓，⭐ `characters/8007.json` 与 HEAD 完全一致 ✓）。
+
+> **2026-10-02 更新（新目标第 11 轮：🎉🎉🎉 **第 101 件出货 ＝ 关掉那条路上的两处「静默」** ✓✓ —— ⭐ 并**确诊**了上一轮那个阻断 ✓）**）**：
+>
+> * ⭐⭐⭐ **诊断（本轮最有价值的一点 ✓）**：⭐ 上一轮那条规则 ⭐ `extra turn actor = none` ✗ 的原因 **就是** ⭐ **德谬歌不在行动顺序里** ✗ ——
+>   ⭐ `Queue.grantExtraTurn` 要求目标**在 heap 里** ✓，⭐ 而**速度 0 的忆灵在入场时被跳过** ✗（⭐ 那是本会话早先出货的那个 skip ✓）⇒ ⭐ 它 ⭐ **返回 false** ✗。
+> * ✅ **出货内容（两处静默，同一类病 ✓）**：
+>   ⭐ ① ⭐ **`EXTRA_TURN`** ✗：⭐ op 原来 ⭐ **丢掉**了 ⭐ `grantExtraTurn` 的返回值 ✗ ⇒ ⭐ 规则看起来成功了 ✓ ⇒ ⭐ 现在 ⭐ **响亮报错** ✓
+>     （⭐ "…is not in the action order (a memosprite at Speed 0 is skipped when the battle starts), so no extra turn can be granted" ✓）；
+>   ⭐ ② ⭐ **一次被命令的施放** ✗：⭐ `getOpponents` 对 ⭐ **没有阵营**的单位 ⭐ 返回**空表** ✗ ⇒ ⭐ `castSkill` 的 `victims.isEmpty()` ⭐ **静默返回** ✗
+>     ⇒ ⭐ 现在：⭐ 空战场仍是 no-op ✓（⭐ 那是**合法**的 ✓），⭐ 而 ⭐ **无阵营的施放者** ⭐ 报错 ✓（⭐ "reaches nobody: the unit has no camp" ✓）。
+>   ⭐ 两处都是同一句话：⭐ **一个没有发生、也不说的效果** ✗ —— ⭐ 正是本项目拒绝的那类 ✓。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `ExtraTurnLoudnessTest` ⇒ ⭐
+>   `[loud_turn] memosprite -> IllegalStateException: EXTRA_TURN gives 德谬歌 an extra turn, but it is not in the action order (a memosprite at Speed 0 is skipped when the battle starts), so no extra turn can be granted` ✓✓
+>   ＋ ⭐ `[loud_turn] a character in the queue -> extra turn actor = Dan Heng` ✓（⭐ **守卫不是逢人就拒** ✓ —— ⭐ 一个全都拒的守卫与一个都不拒的一样没用 ✓）；
+>   ⭐ **变异** ✓：⭐ 把检查写成 `if (false)` ✗ ⇒ ⭐ **两个用例都红** ✓。
+> * ⭐⭐ **对 `1141513` 第二半的结论（登记 ✓）**：⭐ 那句要 ⭐ **德谬歌获得 1 个额外回合** ✓，⭐ 而 ⭐ **它不在行动顺序里** ✗
+>   ⇒ ⭐⭐ 所以 ⭐ **前置 ＝ 一个"让忆灵进入行动顺序／以额外回合行动"的能力** ✗ —— ⭐ 要么 ⭐ 让被命令的忆灵能进入队列 ✓，
+>   ⭐ 要么 ⭐ 一个"立即行动"的 op ✓（⭐ 现有 ⭐ `ADVANCE` ✓ 也是按队列做的 ✗ ⇒ ⭐ 同样够不着 ✗）。⭐ 不近似，⭐ 登记 ✓。
+> * ⚠⚠ **我自己的两个坑（记 ✓）**：⭐ ① ⭐ `fireTriggers` 的**重载写错** ✗（⭐ 该用单参那个 ✓，⭐ 照 `Cone23011Test` ✓）；
+>   ⭐ ② ⭐ 判据里给单参事件加了 ⭐ `actor == self` ✗ ⇒ ⭐ 那个条件**永远为假** ✗（⭐ 单参事件不带动作方 ✓）⇒ ⭐ 去掉 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2279** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
