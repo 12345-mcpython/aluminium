@@ -2338,3 +2338,12 @@
 - `GAIN_RESOURCE` **不读** `percentFromSkillParam`（它只认 `scaledAmount` / `amountFromEvent` / `amountFromAttr`）⇒ 判据要读份额就用 `MODIFY_ATTR`（它走 `shareOf` / `scale`）；
 - `TICK_DOT`（“立即结算”的出货 op，读者 `1111.json`）**要求 `element`** ⇒ 「所有持续伤害」要**每元素一条**；
 - 条件里**没有**“按 cid 认演员”的写法（只有 `actor == self` / `is_other_ally` / `is_summon` / `is_ally`）。
+
+- ✅ **已出货（2026-10-02）：跨 cid 的份额（`skill_param_cid`）** —— 给 `EffectSpec` 加了一个**独立字段**
+  `skill_param_cid`（`@SerializedName("skill_param_cid")`），而 `ownerSkillParamValue(effect, ctx, spelled)` 里多一分支：字段有值时用已出货的 `allyWithCid` 取那个角色当 holder。
+  ⚠ **为什么是字段而不是拼法里的 cid**（上一轮实测）：`"skill_param:1415|SKILL:0"` 会被加载器拦下 ——
+  `Op MODIFY_ATTR scales off skill slot "1415|SKILL", which is not a SkillType`。
+  ⭐ 判据 `CrossCidSkillParamTest`：同一条规则跑两次（带字段 / 不带），不带时增量**精确等于**主人自己那行的值（0.7），带字段时读到**另一行**（实测 0.24 = `0.12 * 2.0`）。
+  ⭐ 变异（让读数器忽略字段）⇒ 两次都是 0.7 ⇒ 红 ✓。
+  ⚠ 而跨读那一次的**倍数不做断言**：战斗自己会发 `TURN_START`，两次运行里规则被应用的**次数不同**（已写在测试的注释里）。
+- ⭐ 这个能力解开了**三句**：`1141519` 的治疗份额、`1141524` 第一句、`1141522` 最后一句。
