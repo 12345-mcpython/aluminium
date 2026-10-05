@@ -36950,3 +36950,22 @@
 > * ⭐ **可复用的一点（⭐ 即使本轮回滚 ✓）**：⭐ `removeState(AttributeType)` 与 ⭐ `"kind": "own"` 的形状都**已经想清楚** ✓，
 >   ⭐ 且 ⭐ `derived` 那个承重假设的教训也记在案 ✓ ⇒ ⭐ 下一轮只要先把 ⭐ `getSource()` 读明白 ✓，⭐ 整件事就是一次落地 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2282** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
+
+> **2026-10-02 更新（新目标第 22 轮：🎉🎉🎉 **第 105 件出货 ＝ `REMOVE_STATE` 的 `attribute` 与 `"kind": "own"`（按来源摘掉）** ✓✓**）**）**：
+>
+> * ✅ **出货内容（引擎两处 ＋ op 一处 ✓）**：
+>   ⭐ `BuffManager.removeStateFrom(CanHit source, String stateName, AttributeType attribute)` ✓ —— ⭐ 照 ⭐ `extendBuffsFrom` **一直以来的形状** ✓（⭐ `buff.getSource() == source` ＋ ⭐ `isNamed(...)` 两筛 ✓）；
+>   ⭐ `BuffManager.removeState(AttributeType)` ✓ —— ⭐ "按属性"那个匹配 ⭐ `isNamed` **早就会答** ✓，⭐ 只是**移除侧没有入口** ✗；
+>   ⭐ `REMOVE_STATE` 现在收 ⭐ `attribute` ✓ ⭐ 与 ⭐ `"kind": "own"` ✓（⭐ 未知 kind **响亮拒绝** ✓）。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `RemoveBySourceTest` ⇒ ⭐
+>   `[by_source] applied by the OTHER unit: 698.5440000000001 -> 873.1800000000001 ; after the OWNER kind=own sweep: 873.1800000000001` ✓✓
+>   ⇒ ⭐ **别人施加的那份活下来了** ✓ —— ⭐ 这判据刻意只读**筛子本身** ✓（⭐ 因为"有东西被摘掉"这句 ⭐ 一个不做事的筛子也能满足 ✓）；
+>   ⭐ **变异** ✓：⭐ 让筛子忽略来源 ✗ ⇒ ⭐ 回到 ⭐ `698.544` ⇒ 红 ✓。
+> * ⭐⭐⭐ **诊断解释了上一轮那个"两份都被摘"的假象 ✓**：⭐ 诊断输出 ⭐ `[source_diag] owner after both rules: [Dan Heng -> Aglaea]` ✓
+>   —— ⭐⭐ **同一个属性的两次施加会互相替换** ✗（⭐ 只留下一份 ✓）⇒ ⭐ 我上一轮那条断言在检查一份**从不存在的**副本 ✗。
+>   ⇒ ⭐⭐ **教训：⭐ 先弄清"这种东西能同时存在几份" ✗，⭐ 再去断言"另一份还在不在" ✓。**
+>   ⭐ 而 ⭐ `getSource()` 的语义由它**自己的文档**确认 ✓：⭐ *"It is not the same thing as `source`（the **applier**）"* ✓，⭐ 赋值处是 ⭐ `setSource(ctx.owner())` ✓（⭐ 两处 ✓）。
+> * ⭐ **下一轮（⭐ 已具名 ✓）**：⭐ 那条内容（⭐ `1141514` 的"伤害提高 ＋ 无视防御，⭐ 持续至退出【至高之姿】" ✓）现在可以**一次落地** ✓ ——
+>   ⭐ 属性现成 ✓、⭐ 数值走 `percent_from_cast_param` ✓、⭐ 时长走 ⭐ `STATE_ENDED` ＋ ⭐ `kind: "own"` ✓；
+>   ⚠ 只要记住 ⭐ 判据场景必须 ⭐ **召出衣匠** ✗（⭐ `target: "summon"` 的效果需要它在场 ✓，⭐ 引擎会这么提示 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2283** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
