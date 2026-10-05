@@ -10,6 +10,11 @@
       "id": "充能",
       "max": 8,
       "source": "1412 刻律德菈 战技：「使指定我方单体角色获得【军功】并使刻律德菈获得 1 点充能。充能上限 8 点。」（本文件声明它，是因为**规则在本文件**而资源属于 1412 ✓；上限与 1412 文件一致 ✓）"
+    },
+    {
+      "id": "故事",
+      "max": 2147483647,
+      "source": "⚠ 这里是为了满足**加载器的规则**（“规则用到的资源必须在角色自己的文件里声明”）；而**计数真正落在忆灵自己的声明处**（`memosprites/1415.json` 的 `resources`）。"
     }
   ],
   "rules": [
@@ -216,6 +221,61 @@
       ],
       "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】**。」",
       "note": "⭐ 能力数据自己就是这么写的（**实测**）：`AddModifier` **`MServant_CyreneServant_00_AmazingBuff_Hyacine`** + `LayerAddWhenStack: 2`，而前置是 **`ByCompareCharacterID` = 1409** —— 游戏就是“按 cid 点名”，与 `ally_cid:` 是同一件事。⭐ **上限写 99999 是游戏自己的惯例**，不是我编的：提到该修饰的四个文件里，它旁边**没有** `MaxLayer`（`AvatarStatusConfig` 的行甚至没有计数列），而同一个能力文件里“不限”写的就是 `MaxLayer: 99999`（两处）⇒ 缺省就是“不限”。⚠ 不写它的话，引擎的 `StackBuff`（`Math.max(1, maxStacks)`）会只给 **1** 层。⚠ 补上 `from_skill_id == 19`（2026-10-02，回归修正）：没有它时，**任何**忆灵的施放都会触发本条，而队伍里没有风堇时 `ally_cid:1409` 会**抛异常**（实测：全量 22 例红）。数据也支持这道门：该修饰就写在 19 号技能的 `TaskList` 里。"
+    },
+    {
+      "id": "true_self_ode_marks_cyrene",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 26"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "献予「真我」之诗",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」（SkillID 1141526，`SkillCY14`，参数 `[0.3, 3]`）的整句：「昔涟每从1个除德谬歌以外不同的队友处获得【追忆】后，德谬歌施放【花与箭的舞曲】时额外对敌方随机单体造成1次同等于德谬歌0.3%生命上限的冰属性伤害。**昔涟施放终结技后或德谬歌被召唤时，使德谬歌获得 1 点【故事】**，当【故事】达到 3 点时，德谬歌消耗全部【故事】立即获得 1 个额外回合自动施放【花与箭的舞曲】」",
+      "note": "⭐ 与其他诗同形：读到自己被选中时打标记，后续两个触发靠它限定。"
+    },
+    {
+      "id": "true_self_ode_gives_story_on_her_ultimate",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "self has_state 献予「真我」之诗"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "故事",
+          "amount": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "同上：「**昔涟施放终结技后**…使德谬歌获得 1 点【故事】」。",
+      "note": "⭐ 两个触发之一。⚠ 资源落在**忆灵自己的声明处**（`memosprites/1415.json` 的 `resources`）—— 这正是本轮新开的能力。"
+    },
+    {
+      "id": "true_self_ode_gives_story_when_the_memosprite_arrives",
+      "on": "SUMMONED",
+      "when": [
+        "actor is_summon",
+        "self has_state 献予「真我」之诗"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "故事",
+          "amount": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "同上：「…或**德谬歌被召唤时**，使德谬歌获得 1 点【故事】」。",
+      "note": "⭐ 另一个触发。⚠ 下一步才是第四句（该读**召唤物自己**的资源）。"
     }
   ]
 }

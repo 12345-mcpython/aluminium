@@ -48,7 +48,13 @@ public record MemospriteSpec(@SerializedName("name") String name,
                              @SerializedName("attack") Attack attack,
                              @SerializedName("aggro") Double aggro,
                              @SerializedName("servant_id") Integer servantId,
-                             @SerializedName("skills") List<SkillRow> skills) {
+                             @SerializedName("skills") List<SkillRow> skills,
+                             /**
+                              * ⭐ Resources this summon DECLARES (2026-10-02; reader: 1141526’s 【故事】, which the sentence puts on the memosprite).
+                              *
+                              * <p>Before this a summon had no declaration site, so a `GAIN_RESOURCE` aimed at one was accepted by the loader and then silently granted nothing -- measured.
+                              */
+                             @SerializedName("resources") List<com.laosun.aluminium.beans.ResourceSpec> resources) {
 
     /**
      * One 忆灵技能 of this memosprite, as the game states it: a SLOT and the level its row is read at.
@@ -67,16 +73,16 @@ public record MemospriteSpec(@SerializedName("name") String name,
      * only some memosprites.
      */
     public MemospriteSpec(String name, String source, String note, List<Panel> panel) {
-        this(name, source, note, panel, null, null, null, null);
+        this(name, source, note, panel, null, null, null, null, null);
     }
 
     /** The same, with an attack and no aggro — the shape most specs have. */
     public MemospriteSpec(String name, String source, String note, List<Panel> panel, Attack attack) {
-        this(name, source, note, panel, attack, null, null, null);
+        this(name, source, note, panel, attack, null, null, null, null);
     }
     /** The original six, before the servant id and its skill rows existed -- kept so every existing caller still compiles. */
     public MemospriteSpec(String name, String source, String note, List<Panel> panel, Attack attack, Double aggro) {
-        this(name, source, note, panel, attack, aggro, null, null);
+        this(name, source, note, panel, attack, aggro, null, null, null);
     }
 
     /**

@@ -665,3 +665,18 @@
 - ⭐ **因此本轮回滚**：`true_self_ode_gives_story`、`true_self_ode_gives_story_when_the_memosprite_arrives`、【故事】声明、以及**槽位 26 的交付条目**
   （⭐ 加条目会让它"可施放但不做事"，⭐ 与本项目的纪律相悖）。⭐ 而**审计表里槽位 26 的状态恢复为"⛔ 整技能未出货"**，⭐ 原因已写明。
 - ⭐ **本轮同时确认的两件事**：⭐ 【花与箭的舞曲】= **`SkillID 1141501`／槽位 1**；⭐ `EXTRA_TURN` ＋ `CAST_SKILL{skill, skill_id}` 都已出货（`8007.json` 的 `skill_id: 1` 就是数据槽位）。
+
+- ✅ **已出货（新目标第 2 件）：召唤物的资源声明处**。⭐ `MemospriteSpec` 新增一个 record 组件 `resources`（形状就是角色文件用的 `ResourceSpec`），
+  ⭐ `SummonFactory` 新增 `declareResources(summon, spec)` 并在**两个**构造点调用；⭐ 读数是槽位 26 的【故事】。
+  ⭐ 判据 `TrueSelfOdeGivesStoryTest`：`the memosprite's 【故事】 reads 1.0 with the ode and 0.0 without it`；
+  ⭐ 变异（去掉 `declareResources` 的调用）⇒ **RED**（`reads 0.0 with the ode`）—— ⭐ 正是那件能力不存在时的**静默无效果**。
+- ⭐⭐ **两条新事实**：
+  1. ⭐ **加载器自己的规则**：规则里**用到**的资源，**必须**在**角色自己**的文件里声明
+     （实测报错：*"Character 1415 has a rule that uses the resource 【故事】, which the character does not declare"*）
+     ⇒ 所以【故事】在**两处**声明：`characters/1415.json` 满足加载器，`memosprites/1415.json` 才让召唤物**真的有**这个存储。
+  2. ⭐ `GAIN_RESOURCE{target: "summon"}` 在**没有**声明处时**既不报错也不生效** ⇒ 这类"静默无效果"只能靠计数探针发现。
+- ✅ **槽位 26 现有 4 条规则**（打标记 ＋ 终结技给【故事】 ＋ 被召唤时给【故事】）＋ **交付条目** ⇒
+  `11415` 现有 `3,5,13,14,15,16,17,18,19,20,21,22,23,25,26`（15 个）。
+- ⚠ **登记（槽位 26）**：⭐ 同句的另一个触发 **「或德谬歌被召唤时」在判据里没有推动计数器**（⭐ 而终结技那条推动了 ✓）⇒ 逐条登记，不冒充；
+  ⭐ 第一句（**不同队友**的计数）、第二句（额外交付的冰伤，依赖第一句）、第四句（读**召唤物自己**的资源以在 3 点触发）仍登记。
+- ⭐ **审计表的更正**：槽位 26 的状态从"⛔ 整技能未出货"改为"⚠ 第三句的一半已落 ＋ 交付条目已在"。
