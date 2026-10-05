@@ -35131,3 +35131,15 @@
 >   ⭐ **不在我能读到的表里** ✗（⭐ 忆灵技能表无层数字段 ✓；⭐ `StatusConfig`（2457 行 ✓）无该状态名 ✓）⇒ ⭐ 不发明上限 ✓。
 > * ⚠ **我自己的**：⭐ 判据里又踩了 ⭐ `EffectSpec` 的字段名 ✗（⭐ `amount` ✗ 是 `Double` ✓；⭐ `maxStacks` ✗ **不是** `max_stacks` ✗ ✓）
 >   —— ⭐ 这是**第二次**犯同一条 ✓ ⇒ ⭐⭐ **写测试内的 EffectSpec 时，⭐ 字段名照 Java 字段抄 ✓。**
+
+> **2026-10-02 更新（第 61 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但**数据自己确认了 `ally_cid:`** ✓，⭐ 并把层数钉在 `2` ✓）**：
+>
+> * ⭐⭐⭐ **在 `Config/ConfigAbility/Servant/Servant_CyreneServant_00_Ability.json` 里读到（⭐ 目标点名的文件在 `Config/` 下，⭐ 不在 `ExcelOutput/` ✓）**：
+>   ⭐ `"Predicate": { "ByCompareCharacterID" … "FixedValue": { "Value": 1409 } }` ✓ 与
+>   ⭐ `"ModifierName": "MServant_CyreneServant_00_AmazingBuff_Hyacine"` ＋ ⭐ `"LayerAddWhenStack": { "FixedValue": { "Value": 2 } }` ✓
+>   ⇒ ⭐⭐ **游戏本身就是"⭐ 按 cid 点名（1409 ✓）＋ ⭐ 加 2 层 ✗"** ✓ ⇒ ⭐⭐ **上一轮那个 `ally_cid:` 设计是源头确认过的** ✓✓，⭐ 不是猜的 ✓。
+> * ⭐ **层数上限仍不可读** ✗：⭐ `AvatarStatusConfig`（778 行 ✓）里那个状态叫 ⭐ `MServant_CyreneServant_00_AmazingBuff_Hyacine` ✗（`StatusID 10014155` ✓），
+>   ⭐ 而它**没有**计数列 ✓；⭐ 能力文件里的 **5 个 `MaxLayer`** ✗ 都属于别的修饰 ✓（⭐ 两个 `99999` ✗、⭐ 两个动态 ✗、⭐ 一个 `1` ✗），
+>   ⭐ **没有一个挨着 `Hyacine` 那个状态** ✗ ⇒ ⭐ 不发明上限 ✓ ⇒ ⭐ 那句诗仍登记 ✓。
+> * ⭐ **顺带量到的**：⭐ 那个状态的名字空间是 ⭐ `MServant_CyreneServant_00_AmazingBuff_<角色名>` ✗ ✓（⭐ 24 行 ✓：⭐ `_Hyacine`／`_Castorice`／`_Tribbie`／`_Aglaea`／`_Anaxa`／`_Cipher`／`_Evernight` … ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
