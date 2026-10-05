@@ -174,7 +174,10 @@ public final class TriggerInterpreter {
             // ⭐ 「若追加攻击施放前目标被消灭则对敌方随机单体发动」 (2026-09-30; three registered readers:
             // 1220 reason 1, 1221 reason 2, 1305). The preferred target is dead -> take a random enemy.
             // CanHit:88-90 keeps death orthogonal to invulnerability, so this is the clause own wording.
-            "target_else_random_enemy");
+            "target_else_random_enemy",
+            // ⭐ 「被攻击目标中**当前生命值最高**的目标」 (2026-10-02; reader: 1403 缇宝's ultimate, whose zone rider picks that unit, and 1415's
+            // ode of passage, which names that rider). The sibling of `random_hit_enemy`: same pool, a different pick.
+            "highest_hp_attack_hit");
 
     /**
      * The two spellings of "every one of our characters".
@@ -1559,6 +1562,37 @@ public final class TriggerInterpreter {
      * @return the pick, or {@code null} when the set is unknown/empty/entirely friendly -- the caller turns that
      *         into an error, which is the point: never answer 「a random enemy」 for 「a random one that was hit」.
      */
+    /**
+     * The unit with the highest <b>current HP</b> among the ones the attack behind this context hit (2026-10-02).
+     *
+     * <p>⭐ The pool is read exactly as {@link #randomHitEnemy} reads it, for the reason its own comment gives: an `ATTACK_FINISHED` context
+     * carries the attack's FROZEN hit set, while a per-hit context (`DEALING_DAMAGE`) only has its instance's snapshot. ⚠ Reading
+     * `attackHitTargets` alone was the first attempt, and it answered "empty" on precisely the event this selector is for.
+     *
+     * <p>The comparison is 当前生命值 -- absolute current HP, not a percentage -- and the pool is filtered to the owner's opponents, because the
+     * sentence deals DAMAGE to the unit it picks. Returns {@code null} when nothing qualifies; the caller turns that into an error.
+     */
+    private static CanHit highestHitTarget(TriggerContext ctx) {
+        if (ctx.battle() == null) {
+            return null;
+        }
+        java.util.Set<CanHit> pool = !ctx.attackHitTargets().isEmpty()
+                ? new java.util.LinkedHashSet<>(ctx.attackHitTargets())
+                : (ctx.damage() == null ? java.util.Set.of() : ctx.damage().hitTargets());
+        CanHit highest = null;
+        for (CanHit hit : pool) {
+            if (hit == null || hit.isDeath()
+                    || !ctx.battle().getOpponents(ctx.owner()).contains(hit)
+                    || !ctx.passesTargetFilter(hit)) {
+                continue;
+            }
+            if (highest == null || hit.getCurrentHp() > highest.getCurrentHp()) {
+                highest = hit;
+            }
+        }
+        return highest;
+    }
+
     private static CanHit randomHitEnemy(TriggerContext ctx) {
         if (ctx.battle() == null) {
             return null;
@@ -1684,6 +1718,9 @@ public final class TriggerInterpreter {
                             : ctx.battle().waveMonsters().getFirst(),
                     "wave_monster", ctx);
             case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);
+            // ⭐ Among the units this attack hit, the one with the highest CURRENT HP (2026-10-02).
+            case "highest_hp_attack_hit" ->
+                    require(highestHitTarget(ctx), "highest_hp_attack_hit", ctx);
             // ⭐ The fallback (2026-09-30): 「若…目标被消灭则对敌方随机单体发动」. The preferred target
             // is the trigger's own, and CanHit has a real "defeated" flag orthogonal to invulnerability (CanHit:88-90),
             // so a dead preferred target -- and only that -- falls through to the battle's seeded random opponent.
