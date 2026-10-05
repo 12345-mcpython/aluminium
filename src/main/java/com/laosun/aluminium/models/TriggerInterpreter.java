@@ -163,6 +163,9 @@ public final class TriggerInterpreter {
             // this action began. A SET, not a unit -- hence the `all_` prefix, like `all_allies`.
             // The game spells this as an EVENT, `OnWaveMonster`, so the selector is named after it -- an enemy
             // that entered with the current wave.
+            // The SINGLE-target sibling of `wave_monsters`, for `cast_target` -- a commanded cast names ONE aim, and the
+            // game spells the source of that aim as the `OnWaveMonster` event.
+            "wave_monster",
             "wave_monsters",
             "all_allies_lethally_hit_this_action",
             // ⭐ 「随机为 1 个当前能量百分比小于 50% 的我方其他目标」 (light cone 21021). ⚠ The 50%
@@ -1629,6 +1632,13 @@ public final class TriggerInterpreter {
             case "party_first" -> require(partyFirst(ctx), "party_first", ctx);
             case "random_ally_below_half_energy" ->
                     require(randomAllyBelowHalfEnergy(ctx), "random_ally_below_half_energy", ctx);
+            // The enemy that entered with the current wave: a commanded cast needs ONE aim, and `wave_monsters` is the set.
+            // Fails loudly on an empty wave -- an aim that resolves to nobody is the silence this engine refuses.
+            case "wave_monster" -> require(
+                    ctx.battle() == null || ctx.battle().waveMonsters().isEmpty()
+                            ? null
+                            : ctx.battle().waveMonsters().getFirst(),
+                    "wave_monster", ctx);
             case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);
             // ⭐ The fallback (2026-09-30): 「若…目标被消灭则对敌方随机单体发动」. The preferred target
             // is the trigger's own, and CanHit has a real "defeated" flag orthogonal to invulnerability (CanHit:88-90),

@@ -36421,3 +36421,28 @@
 >   （⭐ 与 ⭐ `target_else_random_enemy` 同族 ✓，⭐ 但回退到 ⭐ **新入场的敌人** ✓ —— ⭐ 而 ⭐ `wave_monsters` 本轮已经出货 ✓ ⇒ ⭐ 只差"首选"那一半 ✓）。
 > * * **① 五支现状**：⭐ 前四支 ✅（⭐ 内容里 ✓）；⭐ 第五支 🔵 **选择器已出货 ✓（第 91 件）**，⭐ 而"把它接进那句" ⛔ 登记（⭐ 原因如上 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2264** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 1 轮：🎉🎉🎉 **第 92 件出货 ＝ `wave_monster`（`cast_target` 的单目标瞄准）** ✓✓
+> —— ⭐ 并**纠正**了上一轮"没有可放的位置"那个结论 ✗）**）**：
+>
+> * ✅ **出货内容（引擎一处 ✓）**：⭐ 选择器 ⭐ **`wave_monster`** ✓ —— ⭐ 注册进 `TARGET_SELECTORS` ✓ ＋ ⭐ 加进 ⭐ **单目标**解析器 `resolveSelector` ✓
+>   （⭐ 取 ⭐ `battle.waveMonsters().getFirst()` ✓；⭐ 空波次 ⇒ ⭐ 交给 ⭐ `require` ⭐ **响亮失败** ✓，⭐ 不落回"谁也不打" ✓）。
+>   ⭐ 用途：⭐ `CAST_SKILL` 的 ⭐ **`cast_target`** ✓（⭐ 一次**被命令的**施放瞄准谁 ✓）。
+> * ⭐⭐⭐ **纠正上一轮的结论（重要 ✓）**：⭐ 我上一轮写"⭐ 「原目标已死 ⇒ 换目标」**没有可放的位置** ✗" —— ⭐ **错** ✗。
+>   ⭐ `cast_target` **早就存在** ✓：⭐ `EffectSpec` 的 ⭐ `@SerializedName("cast_target")` ✓（⭐ 2026-10-02 加 ✓），
+>   ⭐ 注释写着 ⭐ *"who a COMMANDED cast is aimed at"* ✓，⭐ 已出货读者是 ⭐ `1414.json` 的 ⭐ `"cast_target": "holder_of:同袍"` ✓；
+>   ⭐ 它走 ⭐ `resolveSelector`（⭐ **单目标** switch ✓），⭐ 而 ⭐ `CAST_SKILL` 里 ⭐ `victims.remove(aimed); victims.addFirst(aimed)` ✓
+>   ⇒ ⭐⭐ 也就是说 ⭐ **它决定主目标** ✓（⭐ `SkillExecutor` 读 ⭐ `targets.getFirst()` ✓）。
+>   ⚠ 我上一轮只看了 ⭐ `castSkill` 的前半（⭐ `target` ＝ 施放者 ✓、⭐ 受害者由技能自解析 ✓）⭐ 就下了结论 ✗ ⇒ ⭐ **读一个方法要读完** ✓。
+> * ✅ **判据（两个用例 ✓）**：⭐ `WaveMonsterAimTest` ⇒ ⭐
+>   ⭐ 正例（⭐ 真波次路径 ✓）：⭐ `the wave brought 4 enemies ; the aim boosted 1 of them (speeds [199.6, 99.6, 99.6, 99.6])` ✓✓
+>     —— ⭐ **恰好一个** ⭐ +100 ✓、⭐ 其余**没被碰** ✓，⭐ 且 ⭐ 它正是 ⭐ `waveMonsters().getFirst()` ✓；
+>   ⭐ 反例：⭐ 空波次 ⇒ ⭐ `IllegalStateException` ✓（⭐ "an aim that resolves to nobody is the silence this engine refuses" ✓）。
+>   ⭐ **实测变异** ✓：⭐ `getFirst()` → `getLast()` ✗ ⇒ ⭐ 定位断言红 ✓。
+> * ⚠ **我判据的第一版也错了（记 ✓）**：⭐ 我用"速度 > 0"当"被触及" ✗ ⇒ ⭐ 数到 **4** 个 ✓（⭐ 这些敌人的**基础速度本来就是 99.6** ✓）
+>   ⇒ ⭐ 改成读 ⭐ **速度增量** ✓（⭐ `> 100` ✓）⭐ 才对 ✓。
+> * ⛔ **内容里那半句仍然不写（按 ⑥ 登记 ✓）**：⭐ 「若施放前**目标被消灭**则…」 ✓ —— ⭐ 一次命令在我们的模型里**没有"原目标"** ✗
+>   （⭐ 受害者由技能自身解析 ✓：⭐ `damaging ? battle.getOpponents(actor) : …` ✓）⇒ ⭐ 无条件把 ⭐ `cast_target` 设成 ⭐ `wave_monster` ✓
+>   ⭐ 是**近似** ✗（⭐ 原句是**有条件的** ✓）⇒ ⭐ **不写** ✓。
+>   ⭐ **前置（已具名 ✓）**：⭐ 一个"**这次命令原本瞄准谁**"的概念 ✓（⭐ 有了它 ⭐ `cast_target: "…_else_wave_monster"` ✓ 才等于原句 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2266** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
