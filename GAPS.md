@@ -1138,3 +1138,19 @@
   ⭐ 因为 `ult_summons_demiurge` ✗（`SUMMON` ✗）⭐ 与 ⭐ `true_self_ode_gives_story_on_her_ultimate` ✗ ⭐ 都在 `ULT_CAST` ✗ 上 ✓
   ⇒ ⭐ **这一半从句在行为上已被另一半覆盖** ✓ ✓ —— ⭐ 所以它应当**登记为"⭐ 与另一半同址、且被「若已在场」的语义挡住 ✗"** ✓，⭐ 而不是当成缺口 ✓。
 - ⛔ **回滚内容**：⭐ `Battle.summonMemosprite` ✗ 里那行 `justSummoned.add(existing)` ✗ ＋ ⭐ 对应判据 ✓。
+
+- ⛔ **新目标第 31 轮：回滚（第 17 次）—— 但槽位 25 那句的**真正阻碍**浮出来了，⭐ 而且量到一条重要的登记规则。**
+- ⭐⭐⭐ **决定性发现**：⭐ 那条规则跑起来后，⭐ 引擎报：
+  > *"Character Dan Heng • Permansor Terrae (1414) has **no memosprite spec**: add `resources/memosprites/1414.json` describing its name and how its panel derives from…"*
+  ⇒ ⭐⭐ **【龙灵】在我们这边根本不是忆灵** ✗ —— ⭐ `1414.json` ✗ 里既没有 `memosprites/1414.json` ✗，
+  ⭐ 而现有规则只把它当作 `holder_of:同袍` ✗ 与 `cast_target` ✗ 那样的**目标**用 ✓
+  ⇒ ⭐ **所以「使【龙灵】的下 3 次攻击…」⭐ 这句的第一步是"⭐ 先把【龙灵】建成忆灵 ✗"** ✓ ✓，
+  ⭐ 而**不是**先做护盾档 ✓ —— ⭐ 这比我第 31 轮开头的判断更靠前 ✓。
+- ⭐⭐ **一条"新 scale 要登记几处"的完整答案（本轮量到 ✓）**：⭐ **四处** ——
+  ⭐ ① `literalBase` ✗ 的分派 `switch` ✗；⭐ ② 共享的已知 scale 集合 ✗；⭐ ③ `DAMAGE` ✗ 自己的白名单（⭐ `maxHpShare` ✗ 那一带 ✓）；
+  ⭐ ④ ⭐ **`scaleAttribute` ✗ 的提前返回**（⭐ L2906-2915 ✓：⭐ 字面 scale **不是** AttributeType，⭐ 必须在那里说"⭐ 返回 null ✗" ✓）。
+  ⭐ 缺 ④ 时的报错正是 *"Op DAMAGE has \"scale\": \"self_shield\", which is not a spelling this op knows"* ✗ ✓ —— ⭐ **而 scale 本身已经实现好了** ✓ ✓。
+- ⛔ **回滚内容**：⭐ `self_shield` ✗ scale（⭐ 四处 ✓）＋ ⭐ `1414.json` ✗ 的两条内容规则（⭐ 计数器与伤害 ✓）＋ ⭐ 判据 ✓ ——
+  ⭐ 按纪律"**没有读者的词汇不算出货**" ✓。⭐ 但**四处登记的清单已入档** ✓，⭐ 下次做护盾档时可直接照做 ✓。
+- ⭐ **另一条本轮确认的引擎行为**：⭐ `target: "summon"` ✗ 的**加载期**校验要求规则自己带 `self_summon_count >= 1` ✗
+  （⭐ 报错原文就点名了这个修法 ✓）—— ⭐ 与本会话第 17 轮、⭐ 第 20 轮遇到的同一条 ✓。
