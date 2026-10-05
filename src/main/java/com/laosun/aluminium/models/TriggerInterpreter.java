@@ -1483,6 +1483,10 @@ public final class TriggerInterpreter {
             // \u2705 The event\u2019s own magnitude (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c\u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d is exactly this -- the
             // amount is not a literal and not an attribute, it is what the trigger just reported.
             amount = (int) Math.round(ctx.amount() * eventShare(effect, ctx));
+        } else if (effect.getAmountFromResource() != null) {
+            // ⭐ The amount IS a resource's value (2026-10-02): a number captured while an ode was cast, handed over when the character later casts.
+            Character owner = requireCharacterOwner(effect, ctx);
+            amount = owner.getResources().value(effect.getAmountFromResource().trim());
         } else if (isCastParamScale(effect)) {
             // ⭐ × percent (2026-10-02): the share is usually BELOW 1 and a resource holds an integer, so content stores basis points (percent: 10000).
             amount = (int) Math.round(castParamValue(effect, ctx,
@@ -4292,6 +4296,7 @@ public final class TriggerInterpreter {
 
     private static void requireAmount(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getAmount() == null && effect.getAmountFromAttr() == null
+                && effect.getAmountFromResource() == null
                 && !Boolean.TRUE.equals(effect.getAmountFromEvent())
                 && !Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
             throw new IllegalArgumentException(
