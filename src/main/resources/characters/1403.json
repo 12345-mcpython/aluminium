@@ -164,5 +164,31 @@
     ],
     "source": "1403 缇宝 天赋: 「…该效果每个角色最多触发 1 次，缇宝施放终结技时重置我方其他角色可触发次数。」",
     "note": "⭐ 「缇宝施放终结技时重置」那一半 ✓（2026-09-30 ✓）：⚠ 用 ⚠ `RESET_TRIGGER_LIMIT` ✗ 只清 ⚠ `talent_followup_on_other_ult` 这一条的计数 ✓ —— ⚠ 而不是清她全部规则的计数 ✓（⚠ 她 `ULT_CAST` 上还有别的规则 ✓，⚠ 清全部就是近似 ✓）。"
+  },
+  {
+    "id": "memosprite_ode_of_passage_makes_his_damage_ignore_defence",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 15"
+    ],
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "献予「门径」之诗",
+        "permanent": true,
+        "target": "self"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "DEFENCE_IGNORE",
+        "percent_from_cast_param": 1,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 14 「献予「门径」之诗」（数据槽位 15，SkillID 1141515）：「整场生效，**对缇宝施放时，使缇宝造成的伤害无视敌方目标 #2% 的防御力。**」",
+    "note": "⭐ `DEFENCE_IGNORE` 是已出货的属性（1302／1303 已在用：「无视敌方目标 30% 的防御力」）；⭐ `#2` **随等级变**（0.06 → 0.168），所以走 `percent_from_cast_param`（索引 1）；⭐ 原句说「**整场生效**」，所以同时留下一个持久印记（就是这句诗的名字）。"
   }
 ]
