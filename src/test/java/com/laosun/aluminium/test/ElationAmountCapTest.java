@@ -16,7 +16,7 @@ import java.util.Random;
  * 100, while 60 mirrors all 60.
  *
  * <p>The energy is delivered as the EVENT's own magnitude through `fireTriggers`, which is exactly the quantity the mirror rule reads --
- * the real crediting path was already exercised by Character1505EnergySyncTest, and this test is about the ceiling.
+ * the real crediting path was already exercised by EvanesciaEnergySyncTest, and this test is about the ceiling.
  */
 public class ElationAmountCapTest {
     private static final int WEARER = 1505;

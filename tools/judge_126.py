@@ -12,8 +12,8 @@ import xml.etree.ElementTree as ET
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 WORK = r'E:\code\java\aluminium'
-JREL = 'src/test/java/com/laosun/aluminium/test/Relic126HelpTest.java'
-NAME = 'Relic126HelpTest'
+JREL = 'src/test/java/com/laosun/aluminium/test/WavestriderCaptainHelpTest.java'
+NAME = 'WavestriderCaptainHelpTest'
 REL = 'src/main/resources/relic_sets/126.json'
 
 JAVA = '''package com.laosun.aluminium.test;
@@ -40,7 +40,7 @@ import java.util.Random;
  * matches; the wearer aiming at THEMSELF does not (that is the `actor != self` half -- the spelling `!actor == self`
  * is refused by the engine); and a plain non-targeted context does not either.
  */
-public class Relic126HelpTest {
+public class WavestriderCaptainHelpTest {
     private static final int LEVEL = 80;
     private static final int WEARER = 1001;
     private static final int ALLY = 1002;

@@ -28,7 +28,7 @@ import java.util.Random;
  * <p>Note: The clearing point is load-bearing and was measured: `nextWave()` runs `waveIndex++` -> `spawnWave` -> `beginWave` -> `WAVE_START`,
  * so forgetting the previous wave happens BEFORE the spawn; on `beginWave()` it would erase the wave that just arrived.
  *
- * <p>The scene is the real one `Cone23011Test` uses -- the generated multi-wave stage 310030 through `WaveManager.nextWave()` -- so the
+ * <p>The scene is the real one `SheAlreadyShutHerEyesTest` uses -- the generated multi-wave stage 310030 through `WaveManager.nextWave()` -- so the
  * wiring is judged, not a hand-fired event.
  */
 public class WaveMonstersTest {

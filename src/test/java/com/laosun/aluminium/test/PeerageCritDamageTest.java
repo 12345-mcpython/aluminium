@@ -21,7 +21,7 @@ import java.util.Random;
  * leaves exactly what a +2% CRIT DMG changes. Both runs make the same six casts; the control removes only [爵位].
  *
  * <p>Note: The crit is forced, not hoped for: the Random returns 0.0 for a crit and 1.0 for "never crits" (the idiom
- * `AnchorDeathTest` and `Cid1220FollowUpCritTest` use).
+ * `AnchorDeathTest` and `FeixiaoFollowUpCritTest` use).
  */
 public class PeerageCritDamageTest {
     private static final int OWNER = 1412;

@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 WORK = r'E:\code\java\aluminium'
 ENG = 'src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java'
-TESTNAME = 'com.laosun.aluminium.test.Cone23062SpendTest'
+TESTNAME = 'com.laosun.aluminium.test.IAmAsYouBeholdSpendTest'
 NL = chr(10)
 
 t = io.open(WORK + '/' + ENG, encoding='utf-8').read()
@@ -41,12 +41,12 @@ saved = io.open(WORK + '/' + BATTLE, encoding='utf-8').read()   # Note: 那行�
 
 
 def run_focused():
-    for f in glob.glob(WORK + r'\build\test-results\test\*Cone23062SpendTest*.xml'):
+    for f in glob.glob(WORK + r'\build\test-results\test\*IAmAsYouBeholdSpendTest*.xml'):
         os.remove(f)
     r = subprocess.run([r'.\gradlew.bat', 'test', '--tests', TESTNAME, '--rerun-tasks', '--console=plain'],
                        cwd=WORK, capture_output=True, text=True, encoding='utf-8', errors='replace')
     outs, reds = [], []
-    for f in glob.glob(WORK + r'\build\test-results\test\*Cone23062SpendTest*.xml'):
+    for f in glob.glob(WORK + r'\build\test-results\test\*IAmAsYouBeholdSpendTest*.xml'):
         try:
             root = ET.parse(f).getroot()
         except Exception:

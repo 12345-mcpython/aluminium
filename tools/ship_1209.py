@@ -15,7 +15,7 @@ import io
 import json
 
 DATA = "src/main/resources/characters/1209.json"
-JUDGE = "src/test/java/com/laosun/aluminium/test/CritChanceStacking1209Test.java"
+JUDGE = "src/test/java/com/laosun/aluminium/test/YanqingCritChanceStackingTest.java"
 IDS = ("skill_soulsteel_sync_and_its_modifiers", "ult_crit_chance_on_self")
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
@@ -58,7 +58,7 @@ import java.util.Random;
  * <p>⭐ FILE-DRIVEN, and the numbers are the claim: 0.2 after the skill, 0.8 after the ult as well. A replaced modifier
  * gives 0.6 at the second reading, which is what the mutation has to produce.
  */
-public class CritChanceStacking1209Test {
+public class YanqingCritChanceStackingTest {
     private static final int OWNER = 1209;
     private static final int MONSTER = 1002011;
 

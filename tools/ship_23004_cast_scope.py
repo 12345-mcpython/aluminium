@@ -16,7 +16,7 @@ import io
 import json
 
 DATA = "src/main/resources/light_cones/23004.json"
-JUDGE = "src/test/java/com/laosun/aluminium/test/Cone23004CastScopeTest.java"
+JUDGE = "src/test/java/com/laosun/aluminium/test/InTheNameOfTheWorldCastScopeTest.java"
 RULE = "cone23004_cast_scope_stats"
 STATS = {"1": (0.18, 0.24), "2": (0.21, 0.28), "3": (0.24, 0.32), "4": (0.27, 0.36), "5": (0.30, 0.40)}
 SOURCE = ("光锥 23004 以世界之名：「当装备者施放战技时，装备者**此次攻击**的"
@@ -86,7 +86,7 @@ import java.util.Random;
  * light cone 20001 ships four `"until": "cast_end"` rules today -- so the during-the-cast half is inherited, and this test
  * pins the half that is this cone's own (the numbers and the expiry).
  */
-public class Cone23004CastScopeTest {
+public class InTheNameOfTheWorldCastScopeTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;

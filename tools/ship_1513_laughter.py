@@ -2,7 +2,7 @@
 
 ⭐⭐ WHY THIS IS A SHIPMENT AND NOT A CAPABILITY: the shared, party-scoped, UNCAPPED resource 「笑点」 already exists -- declared
 in `1502.json` as `{"id": "笑点", "max": 2147483647, "scope": "PARTY"}` with a `source` that says exactly that ("数据里没有上限，
-所以 max 用 Integer.MAX_VALUE"), and `1502`'s own rule already grants five of them, judged by `Character1502Test`.
+所以 max 用 Integer.MAX_VALUE"), and `1502`'s own rule already grants five of them, judged by `YaoGuangTest`.
 What was missing was HER half: `1513.json` declares only 【热意】, so its three sentences could not hand out 笑点.
 
 Document, verbatim (per-clause; the numbers are the sentences' own):
@@ -20,7 +20,7 @@ import io
 import json
 
 DATA = "src/main/resources/characters/1513.json"
-JUDGE = "src/test/java/com/laosun/aluminium/test/Character1513LaughterTest.java"
+JUDGE = "src/test/java/com/laosun/aluminium/test/AventurineWaveflairLaughterTest.java"
 LAUGH = "笑点"
 FERVOR = "热意"
 GRANTS = {"talent_fervor_on_teammate_attack": 1, "skill_fervor": 4, "ult_fervor_and_speed": 6}
@@ -86,9 +86,9 @@ import java.util.Random;
  *
  * <p>⭐⭐ 笑点 is a PARTY-scoped, uncapped counter that already existed (declared by 1502); these three readings are about
  * HER grants, and each one is the sentence's own number. ⚠ The counter is shared, so the assertions are cumulative on purpose --
- * that IS what 「队伍级」 means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
+ * that IS what 「队伍级」 means, and `partyResourceValue` is the accessor `YaoGuangTest` already uses.
  */
-public class Character1513LaughterTest {
+public class AventurineWaveflairLaughterTest {
     private static final int AVENTURINE = 1513;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;

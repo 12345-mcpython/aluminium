@@ -16,7 +16,7 @@ import io
 import json
 
 DATA = "src/main/resources/characters/1401.json"
-JUDGE = "src/test/java/com/laosun/aluminium/test/AttackStacking1401Test.java"
+JUDGE = "src/test/java/com/laosun/aluminium/test/TheHertaAttackStackingTest.java"
 LATER = "ult_attack_advance_and_inspiration"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
@@ -56,7 +56,7 @@ import java.util.Random;
  * `⚠ `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point, which is what the
  * earlier attempt got wrong when it invented an `APPLY_BUFF` rule that never fired.
  */
-public class AttackStacking1401Test {
+public class TheHertaAttackStackingTest {
     private static final int OWNER = 1401;
     private static final int MONSTER = 1002011;
 

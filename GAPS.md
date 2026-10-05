@@ -1178,11 +1178,11 @@
 ⭐ **保留不解码的三类（判据都在脚本里，⭐ 且有实测依据 ✓）**：
 1. ⭐ **控制字符**（`< U+0020`）：⭐ `light_cones/23061.json` ✗（50 处）⭐ 与 `characters/8001.json` ✗（1 处）的 `\u0007` ✗
    —— ⭐ **JSON 字符串里不允许裸控制字符** ✓，⭐ 解码会让文件失效 ✓；
-2. ⭐ **引号／反斜杠**（`U+0022`／`U+0027`／`U+005C`）：⭐ `Cone22008Test.java` ✗ L64 的两处 `\u0022` ✗
+2. ⭐ **引号／反斜杠**（`U+0022`／`U+0027`／`U+005C`）：⭐ `RaceToTheHorizonTest.java` ✗ L64 的两处 `\u0022` ✗
    —— ⭐ 它们在**一个 Java 字符串字面量内部** ✓，⭐ 直接解码会**截断字面量** ✓；
 3. ⭐ **U+FEFF**（BOM）⭐ 与**孤立代理项**（⭐ 不成对的 `\uD800`–`\uDFFF` ✓）—— ⭐ 解码会产生非法 UTF-8 ✓；
    ⭐ 成对的代理项**已经合并**成对应字符（⭐ 星形符号等 BMP 之外的字符 ✓）。
 ⭐ 另有**两处 `\u0000` ✗ 保留**（`SkillCategoryAndResourceTest.java` ✗ 与 `ContentDuplicateGuardTest.java` ✗）—— ⭐ 它们是**判据自己的输入**（⭐ NUL 字符／键分隔符 ✓）✓。
 
-⛔ **未处理（⭐ 与本轮目标无关但顺带发现 ✓）**：⭐ `Cone22008Test.java` ✗ L64 的断言消息文本是**中英混排**的（⭐ `and the eleventh changes nothing: … 10 …` ✓），
+⛔ **未处理（⭐ 与本轮目标无关但顺带发现 ✓）**：⭐ `RaceToTheHorizonTest.java` ✗ L64 的断言消息文本是**中英混排**的（⭐ `and the eleventh changes nothing: … 10 …` ✓），
 ⭐ 不影响判据 ✓；⭐ 若你要统一判据消息的语言，⭐ 这是唯一一处 ✓。

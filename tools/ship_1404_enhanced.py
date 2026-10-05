@@ -141,7 +141,7 @@ public class MydeiBloodfeudSkillsTest {
         him.getResources().gain(CHARGE, 150);
         double enemyBefore = battle.enemies.getFirst().getCurrentHp();
         int chargeBefore = him.getResources().value(CHARGE);
-        // ⚠ The op is what raises RESOURCE_CHANGED (`Cone20024Test` records the same wiring), so the event is fired here the way
+        // ⚠ The op is what raises RESOURCE_CHANGED (`LingeringTearTest` records the same wiring), so the event is fired here the way
         // that judge does it rather than relying on a direct gain.
         battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies.getFirst(), 0, 150);
         battle.processRequests();
