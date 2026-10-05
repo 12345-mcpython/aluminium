@@ -36867,3 +36867,23 @@
 >   ⚠ 但 ⭐ 引擎的时长只有 ⭐ `turns`／⭐ `permanent` ✗ ⇒ ⭐ 写哪个都是**猜** ✗ ⇒ ⭐ **前置具名**：⭐ 一个"**持续到某个状态结束**"的时长 ✗；
 >   ⭐ 「衣匠忆灵天赋的速度提高效果层数立即叠加至上限」 ✗ 也仍登记 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2284** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 18 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但"按属性摘掉"这一个口被钉到了具体函数 ✓）**）**：
+>
+> * ⭐⭐⭐ **路径全量清（⭐ 每一处都读过 ✓）**：
+>   ⭐ `REMOVE_STATE` ✓ 的干活处是 ⭐ `target.getBuffManager().removeState(effect.getBuff())` ✓ = ⭐ **按名字** ✓；
+>   ⭐ 而它的装载期校验是 ⭐ `requireBuff` ✗（⭐ 只要名字 ✓）。
+>   ⭐⭐ 但 ⭐ `BuffManager.isNamed(AbstractBuff buff, String stateName, AttributeType attribute)` ✓ **已经会按属性匹配** ✓：
+>     ⭐ `if (attribute != null) { return buff instanceof StatModifierBuff m && m.getAttribute() == attribute; }` ✓
+>   ⚠ 而 ⭐ `removeState` ⭐ **只有** ⭐ `removeState(String state)` ✗ —— ⭐ 我的脚本**断言**了这一点（⭐ `removeState overloads: ['String state']` ✓）⭐ 并**当场停下** ✗、⭐ 一个字没写 ✓。
+>   ⭐⭐ 那个"按属性"的能力 ⭐ **藏在别处** ✗：⭐ L326 附近有个**私有清扫器** ✓，⭐ 收 ⭐ `(source, stateName, attribute)` ✓
+>     （⭐ `if (buff.isPermanent() || buff.getSource() != source || !isNamed(buff, stateName, attribute)) continue;` ✓）。
+> * ⭐⭐ **下一轮（⭐ 已具名 ✓）**：⭐ 找到那个私有方法的名字与可见性 ✓ ⇒ ⭐ 要么给它一个公开入口 ✓，⭐ 要么让 ⭐ `REMOVE_STATE` ⭐ 走它 ✓。
+> * ⭐ **这一句本身的料已经备齐 ✓**：⭐ 「伤害提高 `#2%` 并无视目标 `#3%` 的防御」 的两个属性都是**现成**的 ✓
+>   （⭐ `ALL_DAMAGE_TYPE_BOOST` ✓ 与 ⭐ `DEFENCE_IGNORE` ✓，⭐ 后者已在 1302／1303 出货 ✓），⭐ 数值走 ⭐ `percent_from_cast_param` ✓（⭐ 索引 1／2 ✓）；
+>   ⭐ 触发用 ⭐ `on: STATE_ENDED` ＋ ⭐ `self state_ended <至高之姿>` ✓（⭐ 该条件形状已存在 ✓，⭐ 而 `至高之姿` 已经在 ⭐ `1402.json:55` 里 ✓）；
+>   ⭐ "加上"的那一半 ⭐ 只能是 ⭐ `permanent` ✓（⭐ 因为它没有回合数 ✓）⇒ ⭐ 靠这条伴随规则把它摘掉 ✓
+>   ⇒ ⭐⭐ **所以整句只差"按属性摘掉"这一个口** ✓。
+> * ⚠⚠ **教训（⭐ 本轮最值的一条 ✓）**：⭐ 我原以为"⭐ `isNamed` 支持属性 ⇒ ⭐ `removeState` 也支持" ✗ ⇒ ⭐ **脚本的断言当场证明没有** ✓
+>   ⇒ ⭐⭐ **一个函数支持某种匹配 ≠ 它对外有那个入口** ✓ —— ⭐ 差一层包装就是一整个能力 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2284** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 脚本拒绝后一个字没写 ✓）。
