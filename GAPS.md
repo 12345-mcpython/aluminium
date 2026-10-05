@@ -36774,3 +36774,31 @@
 >   ⭐ 但 ⭐ **上一轮就该把这几处一起读掉** ✗ —— ⭐ 上一轮我已经知道前置是"插入行动" ✓，⭐ 却量到 `SpeedOverride` 就收工 ✓
 >   ⇒ ⭐⭐ **教训：⭐ 一旦知道前置的名字，⭐ 就把它**整条路**在**同一轮**读完 ✓，⭐ 不要把"读路"和"动手"拆成两轮 ✓**。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2279** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 14 轮：🎉🎉🎉 **第 102 件出货 ＝ `INSERT_ACTION`（插入行动）** ✓✓ —— ⭐ 让**队列之外**的单位立刻行动 ✓）**）**：
+>
+> * ✅ **出货内容（四个文件、六处 ✓）**：
+>   ⭐ `Signal.inserted(CanHit)` ✓ ＋ ⭐ 一个私有空构造 ✓ —— ⭐ 一个**只用来指名行动者、不用来排期**的 signal ✓
+>     （⭐ 因为 ⭐ 速度 0 的单位**没有行动值** ✓，⭐ 正常构造会拒绝 ✓）；
+>   ⭐ `Queue`：⭐ `insertedSignal` ✓ ＋ ⭐ `insertAction(CanHit)` ✓ ＋ ⭐ `isInActionOrder(CanHit)` ✓ ＋ ⭐ `move()` **最前面**的分支 ✓
+>     （⭐ `currentActor = insertedSignal; insertedSignal = null; return 0;` ✓ ⇒ ⭐ **时钟不前进** ✓）；
+>   ⭐ `Battle.insertAction` ✓ 委托 ＋ ⭐ `afterMove()` 的守卫 ✓：⭐ **只有当行动者真的在行动顺序里**才调 ⭐ `setTopZero()` ✓
+>     （⭐ 那种单位才有周期要重算 ✓；⭐ 插入行动的 signal 从未排期 ✓，⭐ `setTopZero()` 会去重算 heap 顶 ⭐ 也就是**别人** ✗）；
+>   ⭐ `TriggerInterpreter`：⭐ `case "INSERT_ACTION"` ✓ ＋ ⭐ 登记进闭集 `WIRED` ✓（⭐ 漏了它就会报 ⭐ `Unknown trigger op` ✓）。
+> * ⭐⭐ **为什么必须是"插入"而不是"额外回合"（⭐ 已量 ✓）**：⭐ 游戏用 ⭐ `SpeedOverride = 0` ⭐ 把忆灵的速度钉在 0 ✓ ⇒
+>   ⭐ 它**没有行动值** ✓ ⇒ ⭐ `Signal` 的构造会拒 ✗、⭐ 队列里也没有它的位置 ✗ ⇒ ⭐ `EXTRA_TURN` **不可能**做到 ✓。
+>   ⭐ 而让这条路**安全**的关键事实也是量出来的 ✓：⭐ `currentMove` **只被当作 `getCanHit()` 读** ✓（⭐ 四处，⭐ 全在 `Battle` ✓）
+>   ⇒ ⭐ 所以一个合成的 signal **不需要排期** ✓，⭐ 只要指得出单位 ✓。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `InsertedActionTest` ⇒
+>   ⭐ `battle.insertAction(德谬歌)` **为真** ✓ → ⭐ 它**不在**行动顺序里（⭐ 前置 ✓）→ ⭐ `stepForward()` 后 ⭐ **当前行动者就是它** ✓ → ⭐ `afterMove()` 不抛 ✓ → ⭐ 再 `stepForward()` 仍能给出正常行动者 ✓
+>   （⭐ `[insert] the step after the inserted action gives: 冰锋` ✓）。
+>   ⭐⭐ **变异（⭐ 而且这一轮它先"没打红" ✓，⭐ 那正是价值所在 ✓）**：⭐ 先写的那版只断言"有人行动" ✗ ⇒ ⭐ 把插入分支改成 `if (false)` ⭐ **仍然全绿** ✗ ✗
+>     ⇒ ⭐ 于是我把判据改成 ⭐ **指名到人**（⭐ `assertSame(demiurge, queue.getCurrentActor().getCanHit())` ✓）⇒ ⭐ 同一个变异现在**打红** ✓✓
+>     ⇒ ⭐⭐ **教训：⭐ "有人行动"不是"它行动了" ✗ —— 断言要落到身份上 ✓**。
+> * ⛔ **新暴露的阻断（⭐ 已具名 ✓）**：⭐ 那个"插入之后让忆灵施放【花与箭的舞曲】"的用例 ✗ 报 ⭐
+>   *"德谬歌 has no SKILL skill, so a CAST_SKILL effect has nothing to read"* ✓
+>   ⇒ ⭐⭐ **忆灵按**槽位**存技能** ✓（⭐ `skillAt(1)` ✓ 能用 ✓），⭐ 而 ⭐ `CAST_SKILL` 走的是 ⭐ `SkillType.SKILL` ✗
+>     ⇒ ⭐ `REPLACE_SKILL{skill: "SKILL", skill_id: 1}` **并没有把它建出来** ✗ ⇒ ⭐ **前置 ＝ 让一次被命令的施放能按槽位指名技能** ✗。
+> * ⚠ **我自己的两个坑**：⭐ ① ⭐ python 的 `print` 撞 ⭐ GBK ✗（⭐ 输出里有 `\u2b50` ✓）⇒ ⭐ 脚本在**打补丁之前**就死了 ✓ ⇒ ⭐ 改成**只写不打印** ✓；
+>   ⭐ ② ⭐ 正则配不上 ⭐ `WIRED` 的声明 ✗ ⇒ ⭐ 改用"`WIRED` 之后第一个字符串之前插入" ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2280** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
