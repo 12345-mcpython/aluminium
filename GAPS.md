@@ -186,3 +186,15 @@
   3. ⭐⭐ **`case` 块必须整段重写** —— 本轮照做，**一次编译通过**；而上一轮三次行手术全坏。
 - ⭐ **`17` 的后两句仍登记**：① “消耗**所有溢出**”（`spendAll` 花的是全部）；
   ② “消耗量 → 死龙天赋【灼掠幹墟的晦翼】伤害倍率”（还需“死龙”与那条天赋）。
+
+- ✅ **已出货（2026-10-02，第 145 件）：新能力 **`SPEND_RESOURCE{overflow_only: true}`**（只花**上限以上**那一段）
+  **＋** `1141517`（生死）**第二句的消耗部分**：「召唤死龙时会消耗**所有溢出【新蕊】**」。
+  判据 `OverflowOnlySpendTest`：`from 14 it leaves 10 ; from 12 it leaves 10`；变异（让新拼法失效）⇒ `leaves 14 / 12` ⇒ 红 ✓。
+  ⭐ 内容：`1407.json`：`on: SUMMONED` + `actor == summon` ⇒ `SPEND_RESOURCE{新蕊, overflow_only: true}`。
+- ⭐⭐⭐ **三条新事实（第 104 轮）**：
+  1. ⭐ **内容里的键是 JSON 拼法** —— 我写了 Java 字段名 `overflowOnly`，而它的 `@SerializedName` 是 `overflow_only`
+     ⇒ **加载器当场拒绝**（*"unknown key … known: […]"*），26 例红；
+  2. `SPEND_RESOURCE` 的 `requireAmount` 在 `if (isCastParamScale(effect)) … else …` 里 ⇒ **一个自带尺寸的新拼法必须同样免检**（像 `spendAll`）；
+  3. ⭐ `Resource` 用**逐字段 `@Getter`** ⇒ `getMax()` 与 `getMaxOverflow()` 都有，而 `ResourceManager` **没有** `max(String)` ⇒ 要 `get(id).getMax()`。
+- ⭐ **仍登记**：① “召唤**死龙**时”的**触发**（我们的 `1407.json` 里并无死龙，规则暂挂在通用 `SUMMONED`）；
+  ② “消耗量 → 死龙天赋【灼掠幹墟的晦翼】伤害倍率”。
