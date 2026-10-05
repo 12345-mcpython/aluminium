@@ -98,6 +98,7 @@ public class EffectSpec {
         copy.element = this.element;
         copy.kind = this.kind;
         copy.effectPercent = this.effectPercent;
+        copy.effectPercentFromResource = effectPercentFromResource;
         copy.effectTurns = this.effectTurns;
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         copy.effectMaxStacks = this.effectMaxStacks;
@@ -834,6 +835,14 @@ return copy;
      */
     @SerializedName("effect_percent")
     private Double effectPercent;
+
+    /**
+     * ⭐ The SIZE of an amendment, carried in a resource (2026-10-02; reader: 1141517 「每消耗 1% 溢出值，使…伤害倍率提高 #2%」).
+     *
+     * <p>Like {@code effect_percent}, but the number is not a literal: it is the value of one of the OWNER's resources, in basis points (the convention {@code percent_from_resource} uses).
+     */
+    @com.google.gson.annotations.SerializedName("effect_percent_from_resource")
+    private String effectPercentFromResource;
     /**
      * {@code MODIFY_RULE}: raise every {@code turns} read of the named rule's effects by this many turns
      * (「终结技的持续时间额外增加 1 回合」，1215 星魂 4).

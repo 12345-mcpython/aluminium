@@ -330,6 +330,16 @@ public class TriggerTable {
             }
             return;
         }
+        if (effect.getEffectPercentFromResource() != null) {
+            // ⭐ Same requirement as `effect_percent` (2026-10-02): there must be a number on the target to raise.
+            boolean statesPercent = named.effects().stream().anyMatch(e -> e.getPercent() != null);
+            if (!statesPercent) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE raises the value of rule \"" + target + "\", but none of that rule's effects "
+                                + "states a \"percent\"; there is no number to raise (source: " + amender.source() + ")");
+            }
+            return;
+        }
         boolean statesAChance = named.effects().stream().anyMatch(e -> e.getBaseChance() != null);
         if (!statesAChance) {
             throw new IllegalArgumentException(

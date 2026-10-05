@@ -267,3 +267,15 @@
   **消耗与捕获必须在同一条规则里**。
 - ⭐ 而 `TriggerSpecs.rule(...)`（测试帮手）的重载里**没有给规则命 id 的那个**：一个被 `MODIFY_RULE`
   引用的规则必须在**同一张表**里有 id ⇒ 隔离判据要么手动构 `TriggerSpec`，要么改用内容文件。
+
+- ✅ **已出货（2026-10-02，第 148 件）：`MODIFY_RULE{effect_percent_from_resource}`（待办 3 完成）**：
+  修正案的**大小来自一个资源**（基点，除 10000）。⭐ **六处改动全部照上一轮的清单一次过** ⇒ **编译第一次就通过**。
+  判据 `AmendmentFromResourceTest`：`the amended rule granted 710.892 with 8000 basis points ; 273.42 with none`（比值 **13/5**）；
+  变异（不除 10000）⇒ 红 ✓。
+- ⭐⭐ **两条新事实（第 109 轮）**：
+  1. **`TriggerSpec` 是 POJO**（`@Getter` / `@NoArgsConstructor`，`private String id`，**无 setter**）⇒ 测试里给规则命 id 要用
+     `TriggerSpecs.set(spec, "id", …)`（反射写入）；而 `TriggerSpecs.rule(…)` 的重载里没有带 id 的那个；
+  2. ⭐ **判据要按属性百分比读**：`MODIFY_ATTR` 缩放的是**属性** ⇒ 两侧读数**之比**才是 `(0.5+0.8)/0.5`，
+     而不是把 `0.5` / `1.3` 当绝对值（第一版判据就是这么红的）。
+- ⭐ **待办表**：第 3 项完成 ✓；**只剩第 4 项**（`17` 第二句的倍率加成）—— 内容已写过一遍，差的是**仪表化**（打印捕获到的资源与已立案的修正量）；
+  以及待办 5（触发精度）与 6（文档收敛）。

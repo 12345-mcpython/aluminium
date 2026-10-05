@@ -882,6 +882,10 @@ public final class TriggerInterpreter {
                                 "Op " + op + " raises a rule's effect value, so \"effect_percent\" must not be 0 "
                                         + "(source: " + spec.getSource() + ")");
                     }
+                } else if (effect.getEffectPercentFromResource() != null) {
+                    // ⭐ A fifth amendment spelling (2026-10-02): the SIZE is a resource, in basis points.
+                    // ⚠ NOT `requireResource`: that checks `resource`, and this spelling names its resource in `effect_percent_from_resource`.
+                    rejectAmendmentExtras(effect, op, spec, "effect_percent_from_resource");
                     rejectAmendmentExtras(effect, op, spec, "effect_percent");
                 } else {
                     requirePercent(effect, op, spec);
@@ -896,7 +900,9 @@ public final class TriggerInterpreter {
                 // ⭐ A CAST_SETUP may file the amendment when the grant lasts the whole battle (2026-10-02; reader: 1141524 第三句). The guard's own reason is
                 // "a bonus granted mid-battle would have to be taken back when whatever granted it ended, and nothing does that" -- and this sentence's grant is 「整场生效」.
                 if (TriggerEvent.fromString(spec.getOn()) != TriggerEvent.BATTLE_START
-                        && TriggerEvent.fromString(spec.getOn()) != TriggerEvent.CAST_SETUP) {
+                        && TriggerEvent.fromString(spec.getOn()) != TriggerEvent.CAST_SETUP
+                        // ⭐ And SUMMONED (2026-10-02; reader: 1141517, whose grant is 「整场生效」): the amendment is filed when the summon arrives.
+                        && TriggerEvent.fromString(spec.getOn()) != TriggerEvent.SUMMONED) {
                     throw new IllegalArgumentException(
                             "Op " + op + " amends a rule for the whole battle, so it only makes sense on "
                                     + "BATTLE_START (a bonus granted mid-battle would have to be taken back when "
@@ -4020,7 +4026,8 @@ public final class TriggerInterpreter {
     private static void requireOneAmendment(EffectSpec effect, String op, TriggerSpec spec) {
         int stated = 0;
         for (Object candidate : new Object[] {effect.getAmount(), effect.getBaseChance(), effect.getPercent(),
-                effect.getEffectPercent(), effect.getEffectTurns(), effect.getEffectMaxStacks()}) {
+                effect.getEffectPercent(), effect.getEffectPercentFromResource(), effect.getEffectTurns(),
+                effect.getEffectMaxStacks()}) {
             if (candidate != null) {
                 stated++;
             }
@@ -4055,6 +4062,10 @@ public final class TriggerInterpreter {
         } else if (effect.getEffectPercent() != null) {
             // 「天赋的伤害提高效果额外提高 10%」: 30% -> 40%, the same rule, raised in place.
             owner.amendRuleEffectPercent(target, effect.getEffectPercent());
+        } else if (effect.getEffectPercentFromResource() != null) {
+            // ⭐ The SAME amendment, sized by a resource in basis points (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」).
+            int basisPoints = resourceAmount(ctx.battle(), owner, effect.getEffectPercentFromResource().trim());
+            owner.amendRuleEffectPercent(target, basisPoints / 10000.0);
         } else {
             owner.addRuleBaseChanceBonus(target, effect.getPercent());
         }
