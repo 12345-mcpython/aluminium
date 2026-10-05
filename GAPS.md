@@ -560,3 +560,23 @@
 - ⭐ **因此槽位 15 的规则仍保留旧形态**（`ATTACK_FINISHED` ＋ 两个状态，绿灯），
   ⭐ 而**下一步的入口**已经只剩一层：读 `applyAdditionalDamage` 内部，看**规则驱动**的 ADDITIONAL 实例与**技能驱动**的
   （`ult_zone_additional_damage` 由 `ATTACK_FINISHED` 触发）在哪个乘区上分叉。
+
+- ⛔ **新目标第 7 件（能力 ③）：再次回滚**（第 7 次）。而这一轮**量出了两个硬数字**，并且**修正了一条已出货判据的故事**。
+- ⭐⭐⭐ **实测（`applyAdditionalDamage` 的返回处）**：
+  ```
+  [probe-settled] base=138.311712 -> settled=90.12793458924534  attacker=Tribbie type=ADDITIONAL castCategory=UNSPECIFIED countsAsAttack=false
+  [probe-settled] base=138.311712 -> settled=82.19667651706368  attacker=Tribbie type=ADDITIONAL castCategory=UNSPECIFIED countsAsAttack=false
+  ```
+  ⇒ ⭐ 一个**新造**的 ADDITIONAL 实例，从 138.311712 的基础结算出来只有 **90.13 / 82.20**（≈ **0.59–0.65 × base**），
+  **不是** `base × 1.3`。
+- ⭐⭐ **因此第 118 轮那条判据（`PassageOdeExtraZoneHitTest`）的期望讲错了故事**：它把
+  `138.311712 × 1.3 = 179.805` 叫作"一次结界伤害"，而**它自己观测到的差值 179.895 其实是 ≈ 两个实例**
+  （2 × 90 ≈ 180 ✓）。⚠ 那条判据**至今是绿灯而且变异会咬**（去掉门径的状态条件后普攻从 575 涨到 801），
+  所以它的**结论**没错，但**它给那个数字配的解释**是错的 ⇒ 已在本行更正。
+- ⭐⭐ **`applyAdditionalDamage` 的注释还揭示了一件重要的事**：⭐ *"with the instance's CAST CATEGORY stated
+  (2026-10-02; **reader: 1415's ode of passage, whose clause is about a 「追加攻击」**)"*
+  ⇒ ⭐ **那个重载就是为这首诗加的** ⇒ 「追加攻击」的表达路径**早已具备**，缺的只是把它用对。
+- ⭐ **而 ③ 的形态下观测到的差值是 35.69**，既不是 90（一个实例）也不是 179.8（两个）⇒ **额外那一下只落了一部分**
+  ⇒ 该量级关系**仍未查明** ⇒ **登记的入口已缩到**：`applyDamage` 的乘区里，为什么同一个 base 会结算出 90.13 与 82.20
+  **两个不同的值**（这说明它**依赖上下文**，而两个上下文的差别就是 ③ 的答案）。
+- ⭐ **槽位 15 的规则仍保留旧形态**（`ATTACK_FINISHED` ＋ 两个状态，绿灯）。
