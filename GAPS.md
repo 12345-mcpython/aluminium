@@ -37299,3 +37299,23 @@
 > * ⭐ **顺带量到的**：⭐ `ATTACK_FINISHED` ✓ 存在 ✓；⭐ 条件清单里 ⭐ **没有**"⭐ 这次实例来自哪个技能／规则 ✗"的拼法 ✗
 >   （⭐ `from_rule` 只管 `has_shield` ✓、⭐ `from_skill` 只认槽位 ✓）⇒ ⭐ 所以 1415 那句的"⭐ 排除自己那一笔"仍需新门 ✓。
 > * **实测（本轮）**：⭐ 内容回滚后 ⭐ 全量 **0**（--rerun-tasks，**2293** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 38 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但找到了**两处真问题** ✓，⭐ 其中一处引擎的注释**逐字警告过** ✓）**）**：
+>
+> * ⭐⭐⭐ **发现 ①：`DAMAGE` 的字面量路径**不读** `percent_from_skill_param`** ✗ —— ⭐ `literalBase` 第一行就是 ⭐
+>   `double share = effect.getPercent() == null ? 0.0 : effect.getPercent();` ✓ ⇒ ⭐ 占比只从 ⭐ `percent` ✗ 取 ✓
+>   ⇒ ⭐ 而 ⭐ 新拼法**在** `MODIFY_ATTR` **上是有效的** ✓（⭐ 上一轮已出货并判过 ✓），⭐ 在 `DAMAGE` **上不是** ✗
+>   ⇒ ⭐⭐ **下一轮具名入口**：⭐ 让 `DAMAGE` 的 `literalBase` 走 ⭐ `shareOf(effect, ctx)` ✗（⭐ 与 ⭐ `derivedMagnitude` ⭐ 一样 ✓ —— ⭐ 那一行我上一轮刚修过 ✓，⭐ 这是**同一族的第二处** ✗）。
+> * ⭐⭐⭐ **发现 ②：⭐ 我的判据自己破坏了场景** ✗ —— ⭐ 我为了"⭐ 只摘掉那一条规则 ✗" ⭐ 用了 ⭐ `setTriggerTable(new TriggerTable(TRIBBIE, List.of()))` ✓
+>   ⇒ ⭐⭐ **而 `literalBase` 上面那段注释逐字警告过这件事** ✗：
+>   ⭐ *"⚠ That detour was my own error, not the engine's: my first probes **replaced the character's table** with a hand-built one to control variables,
+>   which also dropped **`level_convention`**, so the cast ran at the **Lv1 row** (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a
+>   zone discrepancy and **rolled a CORRECT implementation back three times** (M-32's own trap, **sprung by the judge**)."* ✓
+>   ⇒ ⭐⭐ **我这一轮正是被同一个陷阱绊的** ✗（⭐ `rider off` 那一侧的 1.0 ✗ 是我自己摘表造成的 ✓）⇒
+>   ⭐⭐ **下一轮的正确做法**：⭐ 要"⭐ 只差那一条规则 ✗"，⭐ 就用 ⭐ **保留其余规则的**方式 ✗（⭐ 例如 ⭐ 把那条规则从表里**逐条复制**后去掉它 ✓，
+>   ⭐ 或者 ⭐ 让 rider 的**门**在一个场景里不成立 ✓ —— ⭐ 但**绝不能**用空表 ✓）。
+> * ⭐ **顺带量到的（⭐ 有价值 ✓）**：⭐ `DAMAGE` 的字面量路径里 ⭐ 「等同于原伤害 X%」 ✗ ⭐ 的实现注释还记着 ⭐ 一整套教训 ✓：
+>   ⭐ ① ⭐ 在 ⭐ `DEALING_DAMAGE` 上 ⭐ `damage.toValue()` ✗ 是 ⭐ 实际掉血的 **4.2 倍** ✗（⭐ 1093.02 vs ⭐ 260.237584 ✓）⇒ ⭐ 所以那个拼法需要**结算后**的载体 ✓；
+>   ⭐ ② ⭐ 它现在**除以** ⭐ 触发实例自己的因子 ✓（⭐ `toValue() / skillBaseValue` ✓）⇒ ⭐ 否则会**二次乘**区域 ✓；
+>   ⭐ ③ ⭐ 而 ⭐ `damage_type: "TRUE"` ✗ ⭐ 的 rider ⭐ **不要**除 ✓（⭐ 它因子恰好是 1 ✓；⭐ 除错会让 24% 变成 44% ✓）。
+> * **实测（本轮）**：⭐ 内容回滚后 ⭐ 全量 **0**（--rerun-tasks，**2293** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
