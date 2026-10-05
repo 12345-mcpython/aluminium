@@ -15,7 +15,7 @@ T = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 txt = io.open(T, encoding="utf-8").read()
 
 ANCHOR = "                } else if ((effect.getPercent() == null) == (effect.getAmount() == null)) {"
-REPLACEMENT = ("                // \u26a0 `percent_from_cast_param` is a SECOND way to state the share (2026-10-02). The check used to read only\n"
+REPLACEMENT = ("                // ⚠ `percent_from_cast_param` is a SECOND way to state the share (2026-10-02). The check used to read only\n"
                "                // `percent`, so a share from the cast skill with no `scale` was refused as \"neither\" -- and the field's own judge\n"
                "                // never saw it, because a DERIVED modifier (one with a `scale`) skips this branch entirely.\n"
                "                } else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null)\n"

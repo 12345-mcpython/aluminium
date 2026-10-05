@@ -37,9 +37,9 @@ patch(
     '    protected String ruleId = "";',
     '    protected String ruleId = "";\n\n'
     '    /**\n'
-    '     * \u2b50 Whether this buff asks NOT to evict others of its kind (2026-10-02). Measured: `StatModifierBuff` identity is\n'
+    '     * ⭐ Whether this buff asks NOT to evict others of its kind (2026-10-02). Measured: `StatModifierBuff` identity is\n'
     '     * `(attribute, modifierType, sourceRole)`, so two rules granting the same attribute evict each other -- while some\n'
-    '     * documents have both in effect at once. \u26a0 Opt-in on purpose: making every different rule coexist broke seven shipped\n'
+    '     * documents have both in effect at once. ⚠ Opt-in on purpose: making every different rule coexist broke seven shipped\n'
     '     * readings, so eviction stays the default and only the effect that says so is exempt.\n'
     '     */\n'
     '    private boolean keepsSiblings;\n\n'
@@ -59,8 +59,8 @@ patch(
     '    @SerializedName("stackable")\n    private Boolean stackable;',
     '    @SerializedName("stackable")\n    private Boolean stackable;\n\n'
     '    /**\n'
-    '     * \u2b50 {@code "coexist": true} -- this effect must not evict another effect of the same kind (2026-10-02; reader: 1408\'s\n'
-    '     * trace \u300c\u8fdb\u5165\u6218\u6597\u6216\u53d8\u8eab\u7ed3\u675f\u65f6\u653b\u51fb\u529b\u63d0\u9ad8 50%\u300d, which is in effect together with her transformation\'s +80%).\n'
+    '     * ⭐ {@code "coexist": true} -- this effect must not evict another effect of the same kind (2026-10-02; reader: 1408\'s\n'
+    '     * trace 「进入战斗或变身结束时攻击力提高 50%」, which is in effect together with her transformation\'s +80%).\n'
     '     */\n'
     '    @SerializedName("coexist")\n    private Boolean coexist;',
     "EffectSpec.coexist",
@@ -81,7 +81,7 @@ patch(
                 removeBuff(existed);
             }
         }""",
-    """        // \u2b50 An effect may ask NOT to evict (2026-10-02; reader: 1408's trace, whose +50% must live beside her transformation's
+    """        // ⭐ An effect may ask NOT to evict (2026-10-02; reader: 1408's trace, whose +50% must live beside her transformation's
         // +80%). Measured, eviction is load-bearing for three cones and two other kits, so this is opt-in and the default is
         // untouched.
         for (int i = buffs.size() - 1; i >= 0 && !buff.keepsSiblings(); i--) {
@@ -96,7 +96,7 @@ patch(
 patch(
     INTERP,
     """            if (Boolean.TRUE.equals(effect.getPerStackLive())) {""",
-    """            // \u2b50 The ask travels onto the buff (2026-10-02), so `BuffManager` can honour it without knowing about effects.
+    """            // ⭐ The ask travels onto the buff (2026-10-02), so `BuffManager` can honour it without knowing about effects.
             if (Boolean.TRUE.equals(effect.getCoexist())) {
                 buff.setKeepsSiblings(true);
             }

@@ -19,8 +19,8 @@ if len(kept) != len(rules) - 1:
     sys.exit("REFUSING: the combined rule was not found")
 doc["rules"] = kept
 
-SOURCE = ("1408 \u767d\u5384 \u884c\u8ff9 \u7167\u89c1\u82f1\u96c4\u672c\u8272 (1408103): "
-          "\u300c\u8fdb\u5165\u6218\u6597\u6216\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u653b\u51fb\u529b\u63d0\u9ad8 **50%**\u3002\u8be5\u6548\u679c\u6700\u591a\u53e0\u52a0 **2** \u5c42\u300d")
+SOURCE = ("1408 白厄 行迹 照见英雄本色 (1408103): "
+          "「进入战斗或变身结束时，攻击力提高 **50%**。该效果最多叠加 **2** 层」")
 EFFECT = {"op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.5, "permanent": True,
           "max_stacks": 2, "target": "self"}
 doc["rules"].extend([
@@ -29,20 +29,20 @@ doc["rules"].extend([
         "id": "trace_hero_true_colors_on_battle_start",
         "do": [dict(EFFECT)],
         "source": SOURCE,
-        "note": "\u300c**\u8fdb\u5165\u6218\u6597**\u2026\u653b\u51fb\u529b\u63d0\u9ad8 50%\uff0c\u6700\u591a 2 \u5c42\u300d\u21d2 `BATTLE_START` \u21d2 "
-                "`MODIFY_ATTR{ATTACK, 50%, permanent, max_stacks: 2}` \u2713\u3002"
-                "\u26a0 \u540c\u53e5\u7684\u53e6\u4e00\u534a\uff08**\u53d8\u8eab\u7ed3\u675f\u65f6** \u2713\uff09\u662f**\u53e6\u4e00\u6761\u89c4\u5219** \u2713 \u2014\u2014 "
-                "\u26a0 \u5b9e\u6d4b\uff1a\u4e00\u6761\u89c4\u5219\u5199\u4e24\u4e2a\u4e8b\u4ef6\u7684\u62fc\u6cd5\uff08`on_any` \u2717\uff09**\u4e0d\u6210\u7acb** \u2717"
-                "\uff08\u88c5\u8f7d\u5668\uff1a*\"Unknown trigger event 'null'\"* \u2713\uff09\uff0c\u800c\u4e14\u6761\u4ef6\u4e5f\u4e0d\u53ef\u80fd\u5728\u4e24\u4e2a\u4e8b\u4ef6\u4e0a\u540c\u65f6\u6210\u7acb \u2717\u3002",
+        "note": "「**进入战斗**…攻击力提高 50%，最多 2 层」⇒ `BATTLE_START` ⇒ "
+                "`MODIFY_ATTR{ATTACK, 50%, permanent, max_stacks: 2}` ✓。"
+                "⚠ 同句的另一半（**变身结束时** ✓）是**另一条规则** ✓ —— "
+                "⚠ 实测：一条规则写两个事件的拼法（`on_any` ✗）**不成立** ✗"
+                "（装载器：*\"Unknown trigger event 'null'\"* ✓），而且条件也不可能在两个事件上同时成立 ✗。",
     },
     {
         "on": "STATE_ENDED",
         "id": "trace_hero_true_colors_on_transformation_end",
-        "when": ["self state_ended \u53d8\u8eab"],
+        "when": ["self state_ended 变身"],
         "do": [dict(EFFECT)],
         "source": SOURCE,
-        "note": "\u300c**\u53d8\u8eab\u7ed3\u675f\u65f6**\u2026\u653b\u51fb\u529b\u63d0\u9ad8 50%\uff08\u6700\u591a 2 \u5c42\uff09\u300d\u21d2 `STATE_ENDED` \uff0b "
-                "`self state_ended \u53d8\u8eab` \u21d2 \u540c\u4e00\u4e2a\u6548\u679c \u2713\uff08\u4e24\u6761\u89c4\u5219\u5171\u7528 `max_stacks: 2` \u2713\uff09\u3002",
+        "note": "「**变身结束时**…攻击力提高 50%（最多 2 层）」⇒ `STATE_ENDED` ＋ "
+                "`self state_ended 变身` ⇒ 同一个效果 ✓（两条规则共用 `max_stacks: 2` ✓）。",
     },
 ])
 

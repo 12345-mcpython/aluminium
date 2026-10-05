@@ -73,7 +73,7 @@ public class LethalSetTest {
         System.out.println("[lethal] second blow, same action: first +" + (speed(first) - firstBase)
                 + " second +" + (speed(second) - secondBase));
         Assertions.assertTrue(speed(second) > secondBase, "the second victim joins the set");
-        Assertions.assertTrue(speed(first) > firstBase, "\u300c\u5168\u4f53\u300d-- the first is still reached by the effect");
+        Assertions.assertTrue(speed(first) > firstBase, "「全体」-- the first is still reached by the effect");
 
         battle.afterMove();
         battle.processRequests();
@@ -83,7 +83,7 @@ public class LethalSetTest {
                 + " third +" + (speed(third) - thirdBase));
         Assertions.assertTrue(speed(third) > thirdBase, "the new action's victim is in the set");
         Assertions.assertEquals(secondAfterBoundary, speed(second), 1e-6,
-                "\u300c\u5728**\u4e00\u6b21\u884c\u52a8**\u4e2d\u300d-- a blow from the previous action is not");
+                "「在**一次行动**中」-- a blow from the previous action is not");
     }
 
     private static void blow(Battle battle, Character victim) {

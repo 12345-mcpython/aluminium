@@ -27,7 +27,7 @@ NEW = """            case "ADD_DAMAGE" -> {
                 scaleAttribute(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
-                // \u26a0 A COUNT is not an amount (2026-10-02). 「额外造成 #1 次附加伤害」 counts INSTANCES, and this op adds one amount to the
+                // ⚠ A COUNT is not an amount (2026-10-02). 「额外造成 #1 次附加伤害」 counts INSTANCES, and this op adds one amount to the
                 // damage being settled -- a `times` here would be read by nobody and the rule would look right while delivering one flat
                 // addition. The sentence that led here is 1415's ode of passage; its second half is registered rather than approximated.
                 if (effect.getTimes() != null || effect.getTimesFrom() != null) {

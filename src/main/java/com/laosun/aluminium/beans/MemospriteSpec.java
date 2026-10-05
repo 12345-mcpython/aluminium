@@ -60,9 +60,9 @@ public record MemospriteSpec(@SerializedName("name") String name,
      * One 忆灵技能 of this memosprite, as the game states it: a SLOT and the level its row is read at.
      *
      * <p>⚠ Why these two numbers are enough: the engine addresses a skill by `(cid, slot)`, and a memosprite's cid IS its
-     * `ServantID` (\u300cServantID 11415\u300d). Both facts were measured -- `SkillEffects.forSkill` keys on
+     * `ServantID` (「ServantID 11415」). Both facts were measured -- `SkillEffects.forSkill` keys on
      * `skill.getCid()` and `skill.getSkillSlot()`, and `DefaultSkill(cid, slot, level)` is the one implementation.
-     * \u26a0 `skills.json` need not carry a row for it: {@code SkillData} hands back a placeholder for an id the data lacks, which is
+     * ⚠ `skills.json` need not carry a row for it: {@code SkillData} hands back a placeholder for an id the data lacks, which is
      * why a skill whose work is done by the rule table (`"effect": "Rules"`) can exist without parameters.
      */
     public record SkillRow(@SerializedName("slot") Integer slot, @SerializedName("level") Integer level) {

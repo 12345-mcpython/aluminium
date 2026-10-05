@@ -28,8 +28,8 @@ public class UltElationBranchTest {
     private static final int TARGET = 1505;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String LAUGH = "\u7b11\u70b9";
-    private static final String GIFT = "\u597d\u6d3b\u5f53\u8d4f";
+    private static final String LAUGH = "笑点";
+    private static final String GIFT = "好活当赏";
 
     /** "Gains 5 Punchline point(s)" -- onto the SHARED party counter. */
     @Test

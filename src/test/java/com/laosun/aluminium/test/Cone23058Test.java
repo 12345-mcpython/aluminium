@@ -23,7 +23,7 @@ import java.util.Random;
  * Light cone 23058: while the wearer casts an ELATION skill, every enemy takes 15% more damage for 2 turns (its crit
  * damage / energy / energy-cap clauses are the row's and are registered).
  *
- * <p>\u2b50 The op is {@code MODIFY_DAMAGE_TAKEN} WITHOUT a damage type: the sentence says \u300c\u53d7\u5230\u7684\u4f24\u5bb3\u300d, not elation damage --
+ * <p>⭐ The op is {@code MODIFY_DAMAGE_TAKEN} WITHOUT a damage type: the sentence says 「受到的伤害」, not elation damage --
  * unlike 21064, which names elation explicitly. The reading compares an ORDINARY instance, so a wrong damage_type
  * scoping would show up.
  */
@@ -70,7 +70,7 @@ public class Cone23058Test {
         System.out.println("[23058] ordinary instance before=" + before + " after=" + after
                 + " ratio=" + (after / before));
         Assertions.assertEquals(1 + SHARE, after / before, 1e-6,
-                "the sentence says \u53d7\u5230\u7684\u4f24\u5bb3 -- 15% on EVERY damage type, not elation only");
+                "the sentence says 受到的伤害 -- 15% on EVERY damage type, not elation only");
     }
 
     @Test
@@ -82,7 +82,7 @@ public class Cone23058Test {
         Assertions.assertEquals(before, ordinaryHit(battle), 1e-9, "the clause names an ELATION skill (false case)");
     }
 
-    /** \u2605 The spec half: op, share, duration and the target set pinned, so a wrong duration has something to break. */
+    /** ★ The spec half: op, share, duration and the target set pinned, so a wrong duration has something to break. */
     @Test
     public void theSpecPinsTheNumbers() {
         Battle battle = battle(true);
@@ -98,7 +98,7 @@ public class Cone23058Test {
                 System.out.println("[23058] spec percent=" + effect.getPercent() + " damageType=" + effect.getDamageType()
                         + " turns=" + effect.getTurns() + " target=" + effect.getTarget());
                 Assertions.assertEquals(0.15, effect.getPercent(), 1e-9, "15% at rank 1");
-                Assertions.assertNull(effect.getDamageType(), "no damage type -- the sentence says \u53d7\u5230\u7684\u4f24\u5bb3");
+                Assertions.assertNull(effect.getDamageType(), "no damage type -- the sentence says 受到的伤害");
                 Assertions.assertEquals(2, effect.getTurns(), "for 2 turns");
                 Assertions.assertEquals("all_enemies", effect.getTarget(), "on every enemy");
             }

@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23040: losing health -- by the wearer OR by its memosprite -- grants \u3010\u51a5\u82b1\u3011, which makes the wearer's damage
- * ignore 30% of the target\u2019s defence for two turns.
+ * Light cone 23040: losing health -- by the wearer OR by its memosprite -- grants 【冥花】, which makes the wearer's damage
+ * ignore 30% of the target’s defence for two turns.
  *
- * <p>\u2b50 \u300c\u83b7\u5f97\u3010\u51a5\u82b1\u3011\u300d is a STATE, not a stack counter, and a written modifier without `max_stacks` is
+ * <p>⭐ 「获得【冥花】」 is a STATE, not a stack counter, and a written modifier without `max_stacks` is
  * idempotent (measured): a second loss from either side leaves the value at 0.3. This judge pins exactly that, which is what the
  * sentence says -- and my first attempt asserted 0.6, which the engine refused with `expected: &lt;0.6&gt; but was: &lt;0.3&gt;`.
  */
@@ -51,7 +51,7 @@ public class Cone23040Test {
     public void eitherSourceGrantsItOnce() {
         build(true);
         double before = ignore();
-        // \u2605 The MEMOSPRITE loses health FIRST, and that order is the point: the flower is a state, so whichever source fires
+        // ★ The MEMOSPRITE loses health FIRST, and that order is the point: the flower is a state, so whichever source fires
         // first is the only one that can be observed. Firing the wearer's loss first made an `actor == summon` mutation inert
         // (discipline 225) -- measured, the value was already 0.3 by then.
         Summon sprite = battle.summonMemosprite(wearer);
@@ -64,8 +64,8 @@ public class Cone23040Test {
         System.out.println("[23040] defence ignore: before=" + before + " the memosprite's loss=" + afterSprite
                 + " wearer loss=" + afterWearer + " second loss=" + afterAgain);
         Assertions.assertEquals(0.0, before, 1e-9, "nothing before a loss");
-        Assertions.assertEquals(0.3, afterSprite, 1e-9, "the MEMOSPRITE\u2019s loss alone grants \u51a5\u82b1 (actor == summon)");
-        Assertions.assertEquals(0.3, afterWearer, 1e-9, "the wearer\u2019s loss leaves the same state alone");
+        Assertions.assertEquals(0.3, afterSprite, 1e-9, "the MEMOSPRITE’s loss alone grants 冥花 (actor == summon)");
+        Assertions.assertEquals(0.3, afterWearer, 1e-9, "the wearer’s loss leaves the same state alone");
         Assertions.assertEquals(0.3, afterAgain, 1e-9, "and it is a state: a second loss adds nothing");
     }
 
@@ -88,7 +88,7 @@ public class Cone23040Test {
 
     @Test
     public void theWearerAloneGrantsIt() {
-        // \u2605 The two rules grant the SAME state, so a mutation of one is invisible while the other can fire -- measured:
+        // ★ The two rules grant the SAME state, so a mutation of one is invisible while the other can fire -- measured:
         // moving the wearer's rule to ULT_CAST left every earlier reading at 0.3, because the memosprite's rule covered it.
         // With NO memosprite on the field the wearer's rule is the only one that can match.
         build(true);

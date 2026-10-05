@@ -42,7 +42,7 @@ public class ConeEventsTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(unit, ally), List.of(enemy), new Random(0));
         battle.startBattle();
-        // \u26a0 The wearer's OWN file already has TAKING_HIT rules, so counting rules would be wrong (measured: 2).
+        // ⚠ The wearer's OWN file already has TAKING_HIT rules, so counting rules would be wrong (measured: 2).
         // Count the op instead: only our cone applies a burn.
         int burns = 0;
         var dot = (com.laosun.aluminium.beans.EffectSpec) null;
@@ -67,7 +67,7 @@ public class ConeEventsTest {
         // ⚠ The data says 100%–120% at the five ranks, and an unstated chance IS 100% (TriggerTable: "an unstated chance is 100% and has no number to raise"), so the field is omitted.
         Assertions.assertNull(dot.getBaseChance(),
                 "the data says 100-120%, so base_chance is omitted (unstated = 100%)");
-        // Behaviour: the burn lands on the enemy when the WEARER is hit. \u26a0 A base_chance effect still ROLLS against
+        // Behaviour: the burn lands on the enemy when the WEARER is hit. ⚠ A base_chance effect still ROLLS against
         // the target's effect RES, so the applier needs effect hit rate to make this deterministic -- measured: with a
         // bare wearer the roll failed and the enemy carried 0 DoTs.
         unit.getAttribute(AttributeType.EFFECT_HIT_RATE)

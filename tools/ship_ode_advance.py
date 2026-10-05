@@ -19,11 +19,11 @@ if not any(r.get("id") == "memosprite_ode_advances_him_outside_bloodfeud" for r 
         "on": "CAST_SETUP",
         "when": ["target == self", "actor is_summon", "from_skill_id == 16", "!self has_state " + bf],
         "do": [{"op": "ADVANCE", "percent": 1.0, "target": "self"}],
-        "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 8 \u300c\u732e\u4e88\u300c\u7eb7\u4e89\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 16\uff0cSkillID 1141516\uff09\uff1a"
-                   "\u300c\u82e5\u4e07\u654c**\u4e0d**\u5904\u4e8e\u3010\u8840\u4ec7\u3011\u72b6\u6001\uff0c\u5219\u4f7f\u4e07\u654c\u884c\u52a8\u63d0\u524d `#2[i]%`\u300d\u3002"
-                   "\uff08`#2` \u5404\u7ea7\u6052\u4e3a 1\uff0c\u5373 **100%**\uff1b\u5f62\u72b6\u7167 1101\uff0f1212 \u7684 `ADVANCE{percent: 1.0}`\u3002\uff09"),
-        "note": ("\u2605 \u5426\u5b9a\u7528\u7684\u662f**\u73b0\u6210\u7684** `!`\uff1a`HasState` \u672c\u5c31\u5b9e\u73b0\u4e86 `PartyCondition`\uff0c\u6240\u4ee5 `!self has_state <state>` "
-                 "\u662f\u4e00\u4e2a\u666e\u901a\u7684\u5426\u5b9a\uff0c\u4e0d\u9700\u8981\u65b0\u8bcd\u6c47\u3002\uff08\u4e0a\u4e00\u8f6e\u6211\u636e\u6ce8\u91ca\u63a8\u65ad\u8bf4\u5199\u4e0d\u51fa\u6765\uff0c\u800c\u7c7b\u58f0\u660e\u624d\u662f\u5b9a\u8bba\u3002\uff09"),
+        "source": ("1415 昔涟 忆灵技能 8 「献予「纷争」之诗」（数据槽位 16，SkillID 1141516）："
+                   "「若万敌**不**处于【血仇】状态，则使万敌行动提前 `#2[i]%`」。"
+                   "（`#2` 各级恒为 1，即 **100%**；形状照 1101／1212 的 `ADVANCE{percent: 1.0}`。）"),
+        "note": ("★ 否定用的是**现成的** `!`：`HasState` 本就实现了 `PartyCondition`，所以 `!self has_state <state>` "
+                 "是一个普通的否定，不需要新词汇。（上一轮我据注释推断说写不出来，而类声明才是定论。）"),
     })
 if isinstance(d, list):
     doc = rules

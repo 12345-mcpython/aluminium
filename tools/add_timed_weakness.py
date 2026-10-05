@@ -35,10 +35,10 @@ en = read(ENEMY)
 en = sub(en, '    private Set<DamageElement> stanceWeak = Set.of();',
          '    private Set<DamageElement> stanceWeak = Set.of();' + NL + NL
          + '    /**' + NL
-         + '     * \u2b50 Weaknesses an EFFECT inserted, which EXPIRE: element \u21d2 turns still to run (2026-09-30).' + NL
-         + '     * \u26a0 A second table on purpose, not a replacement: {@link #stanceWeak} is DATA (from' + NL
+         + '     * ⭐ Weaknesses an EFFECT inserted, which EXPIRE: element ⇒ turns still to run (2026-09-30).' + NL
+         + '     * ⚠ A second table on purpose, not a replacement: {@link #stanceWeak} is DATA (from' + NL
          + '     * {@code monster_config.json}) and never expires, so every existing reader keeps its meaning.' + NL
-         + '     * \u26a0 Counted in the TARGET\u2019s own turns, matching {@code TURN_END} where it is ticked.' + NL
+         + '     * ⚠ Counted in the TARGET’s own turns, matching {@code TURN_END} where it is ticked.' + NL
          + '     */' + NL
          + '    private final java.util.Map<DamageElement, Integer> timedWeak = new java.util.LinkedHashMap<>();',
          'field')
@@ -54,9 +54,9 @@ en = sub(en, '        java.util.Set<DamageElement> widened = new java.util.HashS
          + '        setStanceWeak(widened);' + NL
          + '    }' + NL + NL
          + '    /**' + NL
-         + '     * \u2b50 \u300c\u6dfb\u52a0\u2026\u5f31\u70b9\uff0c\u6301\u7eed N \u56de\u5408\u300d (1006 \u00b7 1405 \u00b7 1310 \u00b7 1315): the same insertion, but it expires.' + NL
-         + '     * \u26a0 A repeat call REFRESHES the count rather than being ignored -- the text says the weakness lasts N' + NL
-         + '     * turns, and re-inserting an existing one is still that clause firing (unlike {@code WEAKNESS_ADDED},\u2026)' + NL
+         + '     * ⭐ 「添加…弱点，持续 N 回合」 (1006 · 1405 · 1310 · 1315): the same insertion, but it expires.' + NL
+         + '     * ⚠ A repeat call REFRESHES the count rather than being ignored -- the text says the weakness lasts N' + NL
+         + '     * turns, and re-inserting an existing one is still that clause firing (unlike {@code WEAKNESS_ADDED},…)' + NL
          + '     * which the caller guards separately.)' + NL
          + '     */' + NL
          + '    public void addWeakness(DamageElement element, int turns) {' + NL
@@ -65,7 +65,7 @@ en = sub(en, '        java.util.Set<DamageElement> widened = new java.util.HashS
          + '        }' + NL
          + '        timedWeak.put(element, turns);' + NL
          + '    }' + NL + NL
-         + '    /** One of the target\u2019s own turns has ended: run every timed weakness down, dropping the expired. */' + NL
+         + '    /** One of the target’s own turns has ended: run every timed weakness down, dropping the expired. */' + NL
          + '    public void tickTimedWeaknesses() {' + NL
          + '        if (timedWeak.isEmpty()) {' + NL
          + '            return;' + NL
@@ -90,7 +90,7 @@ write(ENEMY, en)
 # ---- Battle: tick on the actor's turn end ---------------------------------------------
 ba = read(BATTLE)
 ba = sub(ba, '            fireTriggers(TriggerEvent.TURN_END, actor, actor, 0, 0);',
-         '            // \u2b50 A timed weakness is counted in the TARGET\u2019s own turns, so it runs down when that unit\u2019s turn ends.' + NL
+         '            // ⭐ A timed weakness is counted in the TARGET’s own turns, so it runs down when that unit’s turn ends.' + NL
          + '            if (actor instanceof com.laosun.aluminium.models.enemy.Enemy ticking) {' + NL
          + '                ticking.tickTimedWeaknesses();' + NL
          + '            }' + NL
@@ -132,7 +132,7 @@ if s.returncode != 0:
                 if m is not None:
                     print('  FAIL %s: %s' % (c.get('name'), (m.get('message') or '')[:280]))
     for l in ((s.stdout or '') + (s.stderr or '')).split(NL):
-        if '.java:' in l or 'error:' in l or '\u9519\u8bef' in l:
+        if '.java:' in l or 'error:' in l or '错误' in l:
             print('  DIAG ' + l.strip()[:180])
     print('REFUSING to commit')
     sys.exit(1)

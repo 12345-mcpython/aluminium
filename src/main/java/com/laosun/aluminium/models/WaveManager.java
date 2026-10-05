@@ -81,7 +81,7 @@ public class WaveManager {
         // Before the spawn, not at `beginWave()`: that runs AFTER it and would erase the wave that just arrived.
         battle.forgetWaveMonsters();
         spawnWave(waveIndex);
-        // \u2605 The wave is on the field: tell the tables (cones 23011 / 23064 grant per-wave effects). Fired with no actor
+        // ★ The wave is on the field: tell the tables (cones 23011 / 23064 grant per-wave effects). Fired with no actor
         // and no subject, exactly like BATTLE_START -- a wave is a fact about the battle, not about one unit. Before
         // checkResult on purpose: the wave's own rules must see a battle that is still running.
         battle.beginWave();        battle.fireTriggers(TriggerEvent.WAVE_START);

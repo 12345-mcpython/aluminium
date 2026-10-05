@@ -11,7 +11,7 @@ import java.util.Random;
 /**
  * Slot 25 「献予「大地」之诗」 (2026-10-02): the audit found this whole skill missing, and these are the two clauses it can carry exactly.
  *
- * \u2b50 Two-sided: with the ode cast at 丹恒•腾荒 he gains the state; with it cast at 昔涟 he does not.
+ * ⭐ Two-sided: with the ode cast at 丹恒•腾荒 he gains the state; with it cast at 昔涟 he does not.
  */
 public class EarthOdeMarksDanHengTest {
     private static final int LEVEL = 80;
@@ -19,7 +19,7 @@ public class EarthOdeMarksDanHengTest {
     private static final int DAN_HENG = 1414;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 25;
-    private static final String STATE = "\u732e\u4e88\u300c\u5927\u5730\u300d\u4e4b\u8bd7";
+    private static final String STATE = "献予「大地」之诗";
 
     @Test
     public void theEarthOdeMarksTheOneItIsCastAt() {

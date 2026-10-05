@@ -9,7 +9,7 @@ import os
 import re
 
 ROOTS = ["E:/turnbasedgamedata"]
-KEYWORDS = ["\u5947\u88ad", "\u5947\u88ad\u7ed3\u675f", "Surprise Attack", "Ambush"]
+KEYWORDS = ["奇袭", "奇袭结束", "Surprise Attack", "Ambush"]
 out = []
 scanned = 0
 skipped = 0

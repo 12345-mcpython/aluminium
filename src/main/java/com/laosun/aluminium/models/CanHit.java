@@ -734,7 +734,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Whether a rule limited to one firing per ATTACK may run now.
      *
      * <p>The sequence is {@code Battle.attackSequence()}: it counts finished attacks, so every instance of the attack in
-     * progress shares one value and the next attack gets a new one. \u2605 Kept beside the cooldown/per-turn state because
+     * progress shares one value and the next attack gets a new one. ★ Kept beside the cooldown/per-turn state because
      * it is the same kind of fact (how often a rule has run) and is cleared with it.
      */
     public boolean isAttackLimitReady(String key, int attackSequence, int cap) {

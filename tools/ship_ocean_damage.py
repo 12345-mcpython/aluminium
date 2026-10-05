@@ -16,7 +16,7 @@ import sys
 HY = "src/main/resources/characters/1410.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 22
-MARK = "\u6696\u6d41"
+MARK = "暖流"
 
 doc = json.load(io.open(HY, encoding="utf-8"))
 # ⚠ measured: 1410.json is a LIST, not an object like 1406/1414 -- handle both shapes
@@ -36,13 +36,13 @@ rules.append({
         "permanent": True,
         "target": "self",
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 22 \u300c\u732e\u4e88\u300c\u6d77\u6d0b\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 22\uff0cSkillID 1141522\uff09\uff1a"
-               "\u300c\u5355\u6b21\u751f\u6548\uff0c\u5bf9\u6d77\u745f\u97f3\u65bd\u653e\u65f6\uff0c\u4f7f\u6d77\u745f\u97f3\u83b7\u5f97\u3010\u6696\u6d41\u3011\u3002\u2026"
-               "**\u672c\u573a\u6218\u6597\u4e2d\uff0c\u6d77\u745f\u97f3\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #1%**\u2026\u300d"),
-    "note": ("\u2b50 \u5f62\u72b6\u7167 1414 \u7684\u6d6a\u6f2b\u4e4b\u8bd7\u4e0e 1406 \u7684\u8be1\u8ba1\u4e4b\u8bd7\uff08**\u540c\u4e00\u5c5e\u6027\u3001\u540c\u4e00\u76ee\u6807\u3001\u6c38\u4e45**\uff09\u3002"
-             "\u2b50 **\u5b9e\u6d4b**\uff1a`#1` \u968f\u7b49\u7ea7\u53d8\uff080.6 \u2192 0.72\uff09\u21d2 `percent_from_cast_param: 0`\uff08\u65bd\u653e\u6280\u80fd\u5c31\u662f\u672c\u6761\u8bd7\uff09\u3002"
-             "\u26d4 \u540c\u53e5\u6700\u540e\u4e00\u53e5\uff08\u4f7f\u76ee\u6807\u8eab\u4e0a\u7684**\u6301\u7eed\u4f24\u5bb3\u7acb\u5373\u4ea7\u751f**\u76f8\u5f53\u4e8e\u539f\u4f24\u5bb3 `#2%`/`#3%` \u7684\u4f24\u5bb3\uff09**\u4ecd\u767b\u8bb0**\uff0c"
-             "\u2605 \u5f62\u72b6\u5df2\u6709\u5148\u4f8b\uff1a`characters/1111.json` \u7684 \u300c\u4f7f\u5176\u5f53\u524d\u627f\u53d7\u7684\u88c2\u4f24\u72b6\u6001**\u7acb\u5373\u4ea7\u751f 1 \u6b21**\u76f8\u5f53\u4e8e\u539f\u4f24\u5bb3 85% \u7684\u4f24\u5bb3\u300d\u3002"),
+    "source": ("1415 昔涟 忆灵技能 22 「献予「海洋」之诗」（数据槽位 22，SkillID 1141522）："
+               "「单次生效，对海瑟音施放时，使海瑟音获得【暖流】。…"
+               "**本场战斗中，海瑟音造成的伤害提高 #1%**…」"),
+    "note": ("⭐ 形状照 1414 的浪漫之诗与 1406 的诡计之诗（**同一属性、同一目标、永久**）。"
+             "⭐ **实测**：`#1` 随等级变（0.6 → 0.72）⇒ `percent_from_cast_param: 0`（施放技能就是本条诗）。"
+             "⛔ 同句最后一句（使目标身上的**持续伤害立即产生**相当于原伤害 `#2%`/`#3%` 的伤害）**仍登记**，"
+             "★ 形状已有先例：`characters/1111.json` 的 「使其当前承受的裂伤状态**立即产生 1 次**相当于原伤害 85% 的伤害」。"),
 })
 if isinstance(doc, list):
     out = rules
@@ -54,9 +54,9 @@ print("ok   1410 now carries %s (%d rules)" % (RULE_ID, len(rules)))
 
 effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) in effects.get("11415", {}):
-    effects["11415"][str(SLOT)]["note"] = ("\u2b50 2026-10-02\uff1a\u672c\u6761\u6280\u80fd\u5df2\u6709**\u4e09\u534a**\u6210\u53e5"
-                                           "\uff08\u3010\u6696\u6d41\u3011\u3001\u6d88\u8017\u56de\u80fd\u3001**\u672c\u573a\u6218\u6597\u4f24\u5bb3\u63d0\u9ad8**\uff09\uff1b"
-                                           "\u5269\u4e0b\u201c\u6301\u7eed\u4f24\u5bb3\u7acb\u5373\u4ea7\u751f\u201d\u4e00\u53e5\u4ecd\u767b\u8bb0\u3002")
+    effects["11415"][str(SLOT)]["note"] = ("⭐ 2026-10-02：本条技能已有**三半**成句"
+                                           "（【暖流】、消耗回能、**本场战斗伤害提高**）；"
+                                           "剩下“持续伤害立即产生”一句仍登记。")
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json 11415/%d note updated" % SLOT)
 
@@ -75,10 +75,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 22 \u300c\u732e\u4e88\u300c\u6d77\u6d0b\u300d\u4e4b\u8bd7\u300d: \u300c\u672c\u573a\u6218\u6597\u4e2d\uff0c\u6d77\u745f\u97f3\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d (2026-10-02).
+ * 1415's memosprite skill 22 「献予「海洋」之诗」: 「本场战斗中，海瑟音造成的伤害提高 #1%」 (2026-10-02).
  *
- * <p>\u2b50 TWO-SIDED without a magic number: the ode takes her boost to exactly the CAST row's own #1 (which runs with level), and a scene without the ode reads a different value.
- * \u26a0 Nothing is replaced -- her table holds the rule under test.
+ * <p>⭐ TWO-SIDED without a magic number: the ode takes her boost to exactly the CAST row's own #1 (which runs with level), and a scene without the ode reads a different value.
+ * ⚠ Nothing is replaced -- her table holds the rule under test.
  */
 public class OceanOdeDamageTest {
     private static final int LEVEL = 80;

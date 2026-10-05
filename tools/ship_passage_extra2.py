@@ -45,19 +45,19 @@ rules.append({
     "when": ["actor == self", "damage_is_follow_up", "self has_state " + ODE],
     "do": [{
         "op": "DAMAGE",
-        "times": 1,                                       # \u300c\u989d\u5916\u9020\u6210 #1 \u6b21\u300d-- #1 is 1 at EVERY level
-        "scale": "original_damage",                       # \u2b50 ONE MORE INSTANCE OF THAT SAME DAMAGE (the engine's own spelling for it)
+        "times": 1,                                       # 「额外造成 #1 次」-- #1 is 1 at EVERY level
+        "scale": "original_damage",                       # ⭐ ONE MORE INSTANCE OF THAT SAME DAMAGE (the engine's own spelling for it)
         "percent": 1.0,
         "element": "Quantum",
         "target": "target",
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 14 \u300c\u732e\u4e88\u300c\u95e8\u5f84\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 15\uff0cSkillID 1141515\uff09\uff1a"
-               "\u300c**\u7f07\u5b9d\u65bd\u653e\u8ffd\u52a0\u653b\u51fb\u89e6\u53d1\u7f07\u5b9d\u7684\u7ed3\u754c\u7684\u9644\u52a0\u4f24\u5bb3\u65f6\uff0c\u4f1a\u989d\u5916\u9020\u6210 #1 \u6b21\u9644\u52a0\u4f24\u5bb3**\u3002\u300d"),
-    "note": ("\u2b50 \u4e09\u4ef6\u662f\u672c\u8f6e\uff0f\u8fd1\u51e0\u8f6e\u51fa\u8d27\u7684\uff1a`SkillCategory.FOLLOW_UP`\u3001`cast_category`\u3001`damage_is_follow_up`\u3002"
-             "\u2b50 \u91cf\u7684\u62fc\u6cd5\u662f `original_damage`\uff08**\u540c\u4e00\u7b14**\uff09\u2014\u2014 \u26a0 \u7b2c\u4e00\u7248\u5199\u6210 `owner_max_hp` + `percent_from_skill_param: \"ULTRA:2\"`\uff0c"
-             "\u5b9e\u6d4b\u53ea\u6709 `1.2479250335691177`\uff08\u800c\u7ed3\u754c\u81ea\u5df1\u90a3\u7b14 \u2248 68\uff09\uff0c\u4e0e\u539f\u53e5\u4e0d\u7b26\uff0c\u5df2\u56de\u6eda\u3002"
-             "\u2b50 \u4e8b\u4ef6\u5fc5\u987b\u662f `DAMAGE_SETTLED`\uff08\u53ea\u6709\u5b83\u5e26 `ctx.damage()`\uff1b\u6302 `FOLLOW_UP` \u4f1a\u88ab\u52a0\u8f7d\u5668\u62d2\u7edd\uff09\u3002"
-             "\u2b50 \u800c\u5b83**\u4e0d\u4f1a**\u9012\u5f52\uff1a\u5b83\u9020\u7684\u90a3\u7b14\u5b9e\u4f8b\u4e0d\u58f0\u660e\u7c7b\u522b\uff0c`damage_is_follow_up` \u5bf9\u5b83\u4e3a\u5047\u3002"),
+    "source": ("1415 昔涟 忆灵技能 14 「献予「门径」之诗」（数据槽位 15，SkillID 1141515）："
+               "「**缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 #1 次附加伤害**。」"),
+    "note": ("⭐ 三件是本轮／近几轮出货的：`SkillCategory.FOLLOW_UP`、`cast_category`、`damage_is_follow_up`。"
+             "⭐ 量的拼法是 `original_damage`（**同一笔**）—— ⚠ 第一版写成 `owner_max_hp` + `percent_from_skill_param: \"ULTRA:2\"`，"
+             "实测只有 `1.2479250335691177`（而结界自己那笔 ≈ 68），与原句不符，已回滚。"
+             "⭐ 事件必须是 `DAMAGE_SETTLED`（只有它带 `ctx.damage()`；挂 `FOLLOW_UP` 会被加载器拒绝）。"
+             "⭐ 而它**不会**递归：它造的那笔实例不声明类别，`damage_is_follow_up` 对它为假。"),
 })
 
 if isinstance(doc, list):
@@ -89,7 +89,7 @@ import java.util.Random;
  * trap is recorded in `literalBase`'s comment, sprung three times by judges).
  *
  * <p>⭐ The reading is the SIZE of the extra instance, not merely that something happened: 「额外造成 #1 次附加伤害」 is one more instance of THAT damage, so the delta must
- * be of the zone rider's own order (~#3 x Max HP), not a token amount. \u26a0 The first version of this clause measured 1.2479250335691177 and was rolled back for it.
+ * be of the zone rider's own order (~#3 x Max HP), not a token amount. ⚠ The first version of this clause measured 1.2479250335691177 and was rolled back for it.
  */
 public class PassageExtraInstanceTest {
     private static final int LEVEL = 80;

@@ -61,7 +61,7 @@ public class SummonedClearsControlTest {
         Assertions.assertTrue(finalAlly.getBuffManager().hasState(CONTROL), "precondition: the control landed");
         Assertions.assertTrue(finalAlly.getBuffManager().hasState(DOT), "precondition: the DOT landed");
 
-        battle.summonServant(cyrene);          // \u26a0 `processRequests` is what reaches `fireSummoned`
+        battle.summonServant(cyrene);          // ⚠ `processRequests` is what reaches `fireSummoned`
         battle.processRequests();
 
         boolean controlAfter = finalAlly.getBuffManager().hasState(CONTROL);
@@ -69,8 +69,8 @@ public class SummonedClearsControlTest {
         System.out.println("[summoned_clears] control -> " + controlAfter + " ; dot -> " + dotAfter);
 
         Assertions.assertFalse(controlAfter,
-                "\u300c\u5fb7\u8c2c\u6b4c\u88ab\u53ec\u5524\u65f6\uff0c\u89e3\u9664\u6211\u65b9\u5168\u4f53**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d-- the control is gone");
+                "「德谬歌被召唤时，解除我方全体**控制类**负面状态」-- the control is gone");
         Assertions.assertTrue(dotAfter,
-                "and the DOT is NOT -- \u300c\u63a7\u5236\u7c7b\u300d names one class, not every debuff");
+                "and the DOT is NOT -- 「控制类」 names one class, not every debuff");
     }
 }

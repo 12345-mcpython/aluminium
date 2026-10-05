@@ -30,7 +30,7 @@ patch(
     """        if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)) {
             return null;                      // handled by derivedMagnitude; not an AttributeType
         }""",
-    """        // \u2b50 `party_resource:<name>` joins this list (2026-10-02): like EVENT_AMOUNT it is a magnitude the op can read
+    """        // ⭐ `party_resource:<name>` joins this list (2026-10-02): like EVENT_AMOUNT it is a magnitude the op can read
         // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
         if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)
                 || raw.startsWith("party_resource:")) {
@@ -59,8 +59,8 @@ if match is None:
     sys.exit("REFUSING: resolveScale's head was not matched")
 indent = match.group(1)
 addition = (
-    indent + "// \u2b50 A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands\n"
-    + indent + "// \u3010\u597d\u6d3b\u5f53\u8d4f\u3011 the \u3010\u7b11\u70b9\u3011 the Aha moment spent). The counter lives on the battle, not on a unit.\n"
+    indent + "// ⭐ A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands\n"
+    + indent + "// 【好活当赏】 the 【笑点】 the Aha moment spent). The counter lives on the battle, not on a unit.\n"
     + indent + "if (key.startsWith(\"party_resource:\")) {\n"
     + indent + "    String counter = key.substring(\"party_resource:\".length()).trim();\n"
     + indent + "    if (ctx.battle() == null || ctx.battle().partyResource(counter) == null) {\n"

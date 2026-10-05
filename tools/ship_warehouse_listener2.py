@@ -29,10 +29,10 @@ patch(
     "    private String lastChangedResource;",
     "    private String lastChangedResource;\n\n"
     "    /**\n"
-    "     * \u2b50 Units that are OWNED but NOT DEPLOYED, whose rules are asked without them ever acting (2026-10-02).\n"
+    "     * ⭐ Units that are OWNED but NOT DEPLOYED, whose rules are asked without them ever acting (2026-10-02).\n"
     "     *\n"
-    "     * <p>Two documents start \u300c\u83b7\u5f97\u8be5\u89d2\u8272\u5373\u751f\u6548\uff0c\u65e0\u9700\u4e0a\u573a\u300d (1407's \u6708\u8307\u4e4b\u5e87, 1506's 999\u5b89\u5168\u536b\u58eb), and the data files them under\n"
-    "     * {@code AvatarGlobalBuffConfig} as global support skills. \u26a0 Their tables cannot ride in `characters`: that list is the\n"
+    "     * <p>Two documents start 「获得该角色即生效，无需上场」 (1407's 月茇之庇, 1506's 999安全卫士), and the data files them under\n"
+    "     * {@code AvatarGlobalBuffConfig} as global support skills. ⚠ Their tables cannot ride in `characters`: that list is the\n"
     "     * roster the QUEUE is built from (L520), so a listener put there would take turns of its own. They are asked by a second\n"
     "     * loop instead, and because they are in neither `allies` nor the queue they are never targeted and never act.\n"
     "     */\n"
@@ -40,7 +40,7 @@ patch(
     "    /**\n"
     "     * Registers a unit whose rules are asked although it is not on the field (see {@link #warehouseListeners}).\n"
     "     *\n"
-    "     * <p>\u26a0 The caller sets the table: this is deliberately about WHOSE rules are heard, not about which rules exist, so a listener\n"
+    "     * <p>⚠ The caller sets the table: this is deliberately about WHOSE rules are heard, not about which rules exist, so a listener\n"
     "     * can carry exactly the global support clauses instead of its whole battle kit.\n"
     "     */\n"
     "    public void registerWarehouseListener(CanHit listener) {\n"
@@ -53,9 +53,9 @@ patch(
 
 patch(
     "            return fired;\n        } finally {\n            triggerDepth--;",
-    "            // \u2b50 \u83b7\u5f97\u8be5\u89d2\u8272\u5373\u751f\u6548\uff0c\u65e0\u9700\u4e0a\u573a (2026-10-02). \u26a0 A SECOND pass, not extra entries in `characters`: that list is what\n"
-    "            // the queue is built from, so a listener in it would act. \u26a0 The owner handed to the context is the listener itself,\n"
-    "            // which is what makes \u300cself\u300d mean \u201cthe character who owns this warehouse clause\u201d rather than whoever is fighting.\n"
+    "            // ⭐ 获得该角色即生效，无需上场 (2026-10-02). ⚠ A SECOND pass, not extra entries in `characters`: that list is what\n"
+    "            // the queue is built from, so a listener in it would act. ⚠ The owner handed to the context is the listener itself,\n"
+    "            // which is what makes 「self」 mean “the character who owns this warehouse clause” rather than whoever is fighting.\n"
     "            for (CanHit listener : warehouseListeners) {\n"
     "                if (listener == null || listener.isDeath()) {\n"
     "                    continue;\n"
@@ -89,7 +89,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u83b7\u5f97\u8be5\u89d2\u8272\u5373\u751f\u6548\uff0c\u65e0\u9700\u4e0a\u573a\u300d -- the load point (2026-10-02).
+ * 「获得该角色即生效，无需上场」 -- the load point (2026-10-02).
  *
  * <p>Two claims, and both matter: a registered listener IS asked (its rule moves its own panel), and it does NOT take a turn of its
  * own (the queue never contains it). The second is why the listener cannot simply be added to `characters`.
@@ -113,7 +113,7 @@ public class WarehouseListenerTest {
         TriggerSpecs.set(mark, "percent", 0.5);
         TriggerSpecs.set(mark, "permanent", Boolean.TRUE);
         TriggerSpecs.set(mark, "target", "self");
-        // \u26a0 A BATTLE_START rule with NO condition: that event carries no actor and no target, and the loader refuses a condition
+        // ⚠ A BATTLE_START rule with NO condition: that event carries no actor and no target, and the loader refuses a condition
         // that asks about either.
         owned.setTriggerTable(new TriggerTable(OWNED,
                 List.of(TriggerSpecs.rule("BATTLE_START", List.of(), mark)), List.of()));
@@ -131,11 +131,11 @@ public class WarehouseListenerTest {
                 + " listener in queue=" + ownedInQueue);
 
         Assertions.assertTrue(ownedGain > 0,
-                "\u300c\u83b7\u5f97\u8be5\u89d2\u8272\u5373\u751f\u6548\u300d-- the listener's own rule ran although it is not on the field");
+                "「获得该角色即生效」-- the listener's own rule ran although it is not on the field");
         Assertions.assertEquals(0.0, fighterGain, 1e-9,
-                "and the mark landed on the LISTENER's panel, whose \u300cself\u300d is the character that owns the clause");
+                "and the mark landed on the LISTENER's panel, whose 「self」 is the character that owns the clause");
         Assertions.assertFalse(ownedInQueue,
-                "\u300c\u65e0\u9700\u4e0a\u573a\u300d-- it must not take a turn, which is why it cannot ride in `characters`");
+                "「无需上场」-- it must not take a turn, which is why it cannot ride in `characters`");
     }
 }
 ''')

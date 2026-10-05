@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * 1415's memosprite skill 21, first sentence (2026-10-02): 「整场生效，对白厄施放后，使白厄获得 #8 点【火种】」 (#8 = 6).
  *
- * \u2b50 Two-sided: with the ode cast at him he gains exactly 6; with no ode he gains nothing. The number is the data row's own `#8`, which is a constant in ParamList.
+ * ⭐ Two-sided: with the ode cast at him he gains exactly 6; with no ode he gains nothing. The number is the data row's own `#8`, which is a constant in ParamList.
  */
 public class WorldOdeFireSeedTest {
     private static final int LEVEL = 80;
@@ -20,7 +20,7 @@ public class WorldOdeFireSeedTest {
     private static final int PHAINON = 1408;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 21;
-    private static final String FIRE_SEED = "\u706b\u79cd";
+    private static final String FIRE_SEED = "火种";
 
     @Test
     public void theOdeGivesHimSixFireSeed() {

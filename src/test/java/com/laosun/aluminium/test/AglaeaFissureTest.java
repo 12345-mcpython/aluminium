@@ -38,7 +38,7 @@ public class AglaeaFissureTest {
                 "the additional damage must land on a 【间隙织线】 target: " + plain + " -> " + threaded);
         double extra = threaded - plain;
         double attack = attackOf();
-        // \u26a0 The arithmetic of a flat addend is pinned by `AddDamageOpTest` (it lands in the BASE layer, so defence and the
+        // ⚠ The arithmetic of a flat addend is pinned by `AddDamageOpTest` (it lands in the BASE layer, so defence and the
         // other zones apply AFTERWARDS). What this test pins is the CONTENT: the clause fires, and its size is 30% of her ATK
         // BEFORE mitigation -- an upper bound. Measured: 122.145 against 209.563 unmitigated.
         Assertions.assertTrue(extra > 0, "the additional damage must be positive: " + extra);

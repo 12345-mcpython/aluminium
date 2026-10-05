@@ -39,7 +39,7 @@ public class StackTimesTest {
     @Test
     public void aPlainStateStaysOne() {
         Character owner = owner(false);
-        // \u26a0 Measured: `stacksOf` counts NAMED instances, and a plain StateBuff carries no name -- so it answers 0 for the
+        // ⚠ Measured: `stacksOf` counts NAMED instances, and a plain StateBuff carries no name -- so it answers 0 for the
         // control either way. `hasState` is what the control's claim is about: the state is there, once, unrepeated.
         System.out.println("[stack-times] plain stacksOf=" + owner.getBuffManager().stacksOf(STATE)
                 + " hasState=" + owner.getBuffManager().hasState(STATE));
@@ -62,7 +62,7 @@ public class StackTimesTest {
 
     private static TriggerTable scene(boolean stackable) {
         EffectSpec grant = effect("GAIN_RESOURCE", "resource", COUNTER, "amount", 7.0);
-        // \u26a0 `max_stacks` is only allowed beside `stackable` (item 60), and the scale only matters for a state that can
+        // ⚠ `max_stacks` is only allowed beside `stackable` (item 60), and the scale only matters for a state that can
         // hold a count -- so the control states neither.
         EffectSpec apply = stackable
                 ? effect("APPLY_BUFF", "buff", STATE, "permanent", Boolean.TRUE, "target", "self",

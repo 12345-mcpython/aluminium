@@ -20,7 +20,7 @@ public class BoothillTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The state lands on the enemy AND on him, and both stack rules read their own event. */
+    /** ⚠ The state lands on the enemy AND on him, and both stack rules read their own event. */
     @Test
     public void theStandoffLandsOnBothAndBothEndsFeedTheStack() {
         Character boothill = CharacterFactory.create(BOOTHILL, LEVEL);
@@ -29,24 +29,24 @@ public class BoothillTest {
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.SKILL_CAST, boothill, enemy, 0, 0);
-        Assertions.assertTrue(enemy.getBuffManager().hasState("\u7edd\u547d\u5bf9\u5cd9"),
-                "\u300c\u4f7f\u6307\u5b9a\u654c\u65b9\u5355\u4f53\u53ca\u81ea\u8eab\u8fdb\u5165\u3010\u7edd\u547d\u5bf9\u5cd9\u3011\u72b6\u6001\u300d -- the ENEMY");
-        Assertions.assertTrue(boothill.getBuffManager().hasState("\u7edd\u547d\u5bf9\u5cd9"),
+        Assertions.assertTrue(enemy.getBuffManager().hasState("绝命对峙"),
+                "「使指定敌方单体及自身进入【绝命对峙】状态」 -- the ENEMY");
+        Assertions.assertTrue(boothill.getBuffManager().hasState("绝命对峙"),
                 "and HIMSELF");
 
-        Assertions.assertEquals(0, boothill.getBuffManager().stacksOf("\u4f18\u52bf\u53e3\u888b"), "nothing before either end condition");
+        Assertions.assertEquals(0, boothill.getBuffManager().stacksOf("优势口袋"), "nothing before either end condition");
         battle.fireTriggers(TriggerEvent.BREAK, boothill, enemy, 0, 0);
-        Assertions.assertEquals(1, boothill.getBuffManager().stacksOf("\u4f18\u52bf\u53e3\u888b"),
-                "\u300c\u5f31\u70b9\u88ab\u51fb\u7834\u540e\u2026\u83b7\u5f971\u5c42\u3010\u4f18\u52bf\u53e3\u888b\u3011\u300d");
+        Assertions.assertEquals(1, boothill.getBuffManager().stacksOf("优势口袋"),
+                "「弱点被击破后…获得1层【优势口袋】」");
         battle.fireTriggers(TriggerEvent.KILL, boothill, enemy, 0, 0);
-        Assertions.assertEquals(2, boothill.getBuffManager().stacksOf("\u4f18\u52bf\u53e3\u888b"),
-                "\u300c\u8be5\u76ee\u6807\u88ab\u6d88\u706d\u2026\u540e\u2026\u83b7\u5f971\u5c42\u300d -- the OTHER event feeds it too");
+        Assertions.assertEquals(2, boothill.getBuffManager().stacksOf("优势口袋"),
+                "「该目标被消灭…后…获得1层」 -- the OTHER event feeds it too");
 
         for (int i = 0; i < 4; i++) {
             battle.fireTriggers(TriggerEvent.BREAK, boothill, enemy, 0, 0);
         }
-        Assertions.assertEquals(3, boothill.getBuffManager().stacksOf("\u4f18\u52bf\u53e3\u888b"),
-                "\u300c\u6700\u591a\u53e0\u52a03\u5c42\u300d -- seven firings must still read three");
+        Assertions.assertEquals(3, boothill.getBuffManager().stacksOf("优势口袋"),
+                "「最多叠加3层」 -- seven firings must still read three");
     }
 
     private static Random fixed() {

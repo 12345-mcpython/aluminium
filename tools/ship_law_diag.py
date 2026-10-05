@@ -15,7 +15,7 @@ import sys
 CERYDRA = "src/main/resources/characters/1412.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 23
-MARK = "\u519b\u529f"
+MARK = "军功"
 
 doc = json.load(io.open(CERYDRA, encoding="utf-8"))
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
@@ -32,13 +32,13 @@ rules.append({
         "attribute": "CRIT_ATTACK",
         "percent_from_cast_param": 0,
         "permanent": True,
-        "target": "all_allies",              # \u26a0 NO target_when in this run -- that is the one variable
+        "target": "all_allies",              # ⚠ NO target_when in this run -- that is the one variable
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 17 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 23\uff0cSkillID 1141523\uff09\uff1a"
-               "\u300c\u6574\u573a\u751f\u6548\uff0c\u5bf9\u523b\u5f8b\u5fb7\u83c8\u65bd\u653e\u540e\uff0c**\u6301\u6709\u3010" + MARK + "\u3011\u7684\u89d2\u8272\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1%**\u3002\u300d"),
-    "note": ("\u26a0 **\u672c\u6b21\u662f\u4e00\u6b21\u5206\u8fa8\u5b9e\u9a8c**\uff1a\u4e0e\u4e0a\u4e00\u6b21\u76f8\u6bd4**\u53ea\u53bb\u6389** "
-             "`target_when`\uff08\u4fdd\u7559 `all_allies`\uff09\u3002\u82e5\u6709\u5370\u8bb0\u7684\u90a3\u4f4d\u73b0\u5728\u52a0\u6210 \u21d2 \u95e8\u662f\u597d\u7684\u3001\u8fc7\u6ee4\u5668\u662f\u62e6\u8def\u7684\uff1b"
-             "\u82e5\u4ecd\u4e0d\u52a8 \u21d2 \u95e8\u672c\u8eab\u6ca1\u6210\u7acb\u3002"),
+    "source": ("1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23，SkillID 1141523）："
+               "「整场生效，对刻律德菈施放后，**持有【" + MARK + "】的角色暴击伤害提高 #1%**。」"),
+    "note": ("⚠ **本次是一次分辨实验**：与上一次相比**只去掉** "
+             "`target_when`（保留 `all_allies`）。若有印记的那位现在加成 ⇒ 门是好的、过滤器是拦路的；"
+             "若仍不动 ⇒ 门本身没成立。"),
 })
 
 if isinstance(doc, list):
@@ -53,8 +53,8 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": "1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 17 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 23\uff09\uff1a\u5de5\u4f5c\u5728\u89c4\u5219\u4fa7\u3002",
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\u3002",
+        "source": "1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23）：工作在规则侧。",
+        "note": "⭐ 没有条目就不可交付。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)

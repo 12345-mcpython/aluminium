@@ -117,7 +117,7 @@
 > *“one firing = one layer: `amount` is not a layer count”* ✓（已在 **1111** 的文件里登记 ✓）。
 > ⇒ **已回滚** ✓；正确做法是**先读现有登记** ✓。1213 **出货天赋** ✓（实测：6 层且封顶 ✓），逆鳞加入同一笔登记 ✓。
 > ⚠ 方法论（本目标第 15–16 次）：
-> 1. **一个看不懂的 0，先怀疑自己的字符串** ✗ —— 本轮那个 0 就是 `\u9C7E`（鱾）与 `\u9CDE`（鳞）的差别 ✓；用**原字符**写测试字符串能避开这类错误 ✓。
+> 1. **一个看不懂的 0，先怀疑自己的字符串** ✗ —— 本轮那个 0 就是 `鱾`（鱾）与 `鳞`（鳞）的差别 ✓；用**原字符**写测试字符串能避开这类错误 ✓。
 > 2. **动手"修"之前，先搜一遍仓库里是否已有这条限制的登记** ✓ —— 本轮若先读 `LukaTest` 的类注释，就不会去改 op ✗；而**旧用例也正是守住这条不变量的东西** ✓。
 > **2026-09-29 第四十五条更新（系统性扫描：没有未处理的效果种类）**：
 > 做法：把 `data/skills.json` 里出现的 **11 种** `skill_effect` 与代码里的**分支**逐个对照 ✓（第 169/170 轮的两个 bug 正是这种对扫找出来的 ✓）。
@@ -234,7 +234,7 @@
 > **2026-09-29 第六十五条更新（出货 1218；三条命名/转义发现 + **一个未决问题**）**：
 > * ✅ **1218 椒丘出货 3 条** ✓：天赋的【烬煨】叠层（**上限 5 ✓ + 持续 2 回合 ✓** —— 两个数都是文档原话 ✓）、「也视为灼烧」的 **180% 攻击力** 持续伤害 ✓、秘技的开场全体伤害 + 1 层 ✓。⭐ **天赋那条刻意不写 `from_skill`** ✓ —— 文档点名**普攻/战技/终结技三种** ✓，写 `from_skill COMMON` 就会**只覆盖普攻** ✗。上限用**超过**来测（七次仍读 5 ✓）；**变异**（5 → 1）⇒ **1 红** ✓。
 > * ✅ **发现一** ✓：`APPLY_DOT` 的 `element` **也要求 `DamageElement` 拼写** ✓（中文 `火` 被拒绝 ✗，`Fire` 才行 ✓）。
-> * ⚠ **发现二（转义两层）** ✓：我在测试里把 **煎（U+714E）** 写成了 **煨（U+7168）** 的位置 ✗，而修它时又**修错了层级** ✗：Java 源里存的是**六个 ASCII 字符** `\u714e` ✓，所以**按字符替换找不到任何东西** ✗，必须**按文本替换** ✓。内容文件**一直是对的** ✓（用码点核对过 ✓）。
+> * ⚠ **发现二（转义两层）** ✓：我在测试里把 **煎（U+714E）** 写成了 **煨（U+7168）** 的位置 ✗，而修它时又**修错了层级** ✗：Java 源里存的是**六个 ASCII 字符** `煎` ✓，所以**按字符替换找不到任何东西** ✗，必须**按文本替换** ✓。内容文件**一直是对的** ✓（用码点核对过 ✓）。
 > * ⚠ **发现三** ✓：内联替换用 `re.sub` 时，**替换串里的 `\u` 会被当转义** ✗ ⇒ 用 **lambda** ✓（与第 186 轮同一家族 ✓）。
 > * ⚠⚠ **未决问题（已登记，不假设也不删除）** ✓：本条规则施加了一条 **火属性 DoT** ✓，但 `hasState("灼烧")` 实测为 **false** ✗ —— 而 `BuffManager.DOT_STATES` 明确是 `FIRE → 灼烧` ✓，且 `hasState` 会遍历 `DotBuff` ✓。⇒ **要么 DoT 没被施加，要么它注册的名字不同** ✗。测试里**删掉了那条断言并原地留下说明** ✓（不假断、也不静默删掉 ✓）。下一步：查 `APPLY_DOT` 的施加路径与 `DotBuff` 写入的名字 ✓。
 > * ⚠ **登记**：终结技的**结界**（统一设为最高层数 ✗・行动时 60% 基础概率叠层✗・最多触发 **6 次** 与**每目标每回合 1 次**✗・每次施放终结技**重置**✗・只提高**终结技**伤害 15.00%✗）、「1 层 15.00% 此后每层 +5.00%」的**递增易伤** ✗、星魂 1（全队加成但条件在**被打目标**身上✗）、星魂 2（改已施加 DoT 的倍率 ✗）。
@@ -4275,7 +4275,7 @@
 >     ⭐「持有…时」写成**与授予状态同一条规则**（两者同生共死 ✓，本句没有提前移除状态的分支 ✓）。
 > * **判据读数（实测 ✓，含"条件为假"读数 ✓）** ✓：
 > >   * `[23035] spec stack max=2 turns=2`
->   * `[23035] spec taken percent=0.18 damage_type=BREAK per_stack=\u711a\u707c`
+>   * `[23035] spec taken percent=0.18 damage_type=BREAK per_stack=焚灼`
 >   * `[23035] break 561.9047752834467 vs 476.19048752834533 ratio=1.1799999999999984 ; ordinary 476.19048752834533 vs 476.19048752834533 ratio=1.0`
 >   * `[23038] ally crit damage baseline(no cone)=0.5 with cone=0.98 ; state on the wearer=true`
 >   * `[23038] without the cone, after the same stimulus: 0.5 (baseline 0.5)`
@@ -4669,10 +4669,10 @@
 > * ✅ **顺手删掉了旧变通** ✓：那条规则原本有 `APPLY_BUFF "游丝"` + `APPLY_DOT` 两条效果 ✗（**同一个事实的第二份** ✗）
 >   ⇒ 现在只剩 `APPLY_DOT` 一条 ✓（`!target has_state 游丝` 守卫保留 ✓）。
 > * **判据读数（实测 ✓）** ✓：
-> >   * `[23006] after one hit: has \u6e38\u4e1d=true has \u89e6\u7535=true`
->   * `[23006] unnamed thunder DOT: has \u6e38\u4e1d=false has \u89e6\u7535=true`
->   * `[23006] spec element=Thunder name=\u6e38\u4e1d percent=0.6 turns=1`
->   * `[23006] without the cone: has \u6e38\u4e1d=false`
+> >   * `[23006] after one hit: has 游丝=true has 触电=true`
+>   * `[23006] unnamed thunder DOT: has 游丝=false has 触电=true`
+>   * `[23006] spec element=Thunder name=游丝 percent=0.6 turns=1`
+>   * `[23006] without the cone: has 游丝=false`
 >   ⭐ 第二行是**镜像读数** ✓：无名雷 DoT 依然是触电 ✓ 但**不是**游丝 ✓ ⇒ 证明"名字"是真正起作用的那个事实 ✓。
 > * **每条变异与对照** ✓：23006 state name 游丝 -> 游丝2=2 | 23006 element Thunder -> Fire=2
 > * ✅ 两条**全部为红** ✓。
@@ -5040,8 +5040,8 @@
 >   = `CAST_SETUP` + `from_category ElationDamage` ✓ + `APPLY_BUFF 风口` ✓ + `MODIFY_ATTR SPEED percent` ✓。
 > * **判据读数（实测 ✓，"×24%" 精确吻合 ✓）** ✓：
 > >   * `[23064] after an ULTRA cast: speed delta=0.0`
->   * `[23064] after an elation cast: speed +23.28 (base 97.0) has \u98ce\u53e3=true`
->   * `[23064] spec state=\u98ce\u53e3 turns=null permanent=true`
+>   * `[23064] after an elation cast: speed +23.28 (base 97.0) has 风口=true`
+>   * `[23064] spec state=风口 turns=null permanent=true`
 >   ⭐ `speed +23.28` 对 base **97.0** ⇒ 恰是 **24%** ✓（比值不是凑出来的 ✓）。
 > * **寿命的证据链（本轮更严格 ✓）** ✓：`Config/ConfigAbility/Equip/Equip45.json` 里
 >   ① **全文件 `"Duration"` 出现 0 次** ✓；② `MEquip_23064_Buff_1` / `_2` 的定义是**整段大括号配对抽出来看的** ✓
@@ -5164,13 +5164,13 @@
 >   ⭐ 笑点由**本光锥自己声明** ✓（第 24 轮做的能力 ✓）。
 > * **判据读数（实测 ✓，含"最多一次"与"重置后再次触发" ✓）** ✓：
 > >   * `[23057] first=20 second=20 after 3 normals=40`
->   * `[23057] a Skill used as an attack: \u666e\u653b\u8ba1\u6570=0`
+>   * `[23057] a Skill used as an attack: 普攻计数=0`
 >   * `[23057] ult on an enemy: laughter=0`
 >   * `[23057] spec rule=cone23057_laughter_on_self_ult on=ULT_CAST`
 >   * `[23057] spec rule=cone23057_normal_attack_count on=ALLY_ATTACK`
->   * `[23057] normal attack 1 -> \u666e\u653b\u8ba1\u6570=1`
->   * `[23057] normal attack 2 -> \u666e\u653b\u8ba1\u6570=2`
->   * `[23057] normal attack 3 -> \u666e\u653b\u8ba1\u6570=0`
+>   * `[23057] normal attack 1 -> 普攻计数=1`
+>   * `[23057] normal attack 2 -> 普攻计数=2`
+>   * `[23057] normal attack 3 -> 普攻计数=0`
 > * ⭐⭐ **本轮最重要的一条实测（纪律 184）** ✓：**同事件的多条规则，后一条能看到前一条的即时效果** ✗ ——
 >   我原本把门槛写成 `< N-1` / `>= N-1` ✗，实测得到 `1,0,1` ✓（第 2 次普攻就提前清空 ✓）：
 >   "计数"先把值加到 2 ✓，紧接着"重置"求值时**就看到 2** ⇒ 条件成立 ⇒ 清空 ✗。
@@ -5204,7 +5204,7 @@
 > * ⭐ **本轮是"零新增能力"的一轮** ✓：三样东西都是**现成的** ✓ —— 这正是第 181 条（先查有没有）与第 25 轮收获的延续 ✓。
 > * **判据读数（实测 ✓，含"两个都算"与"非欢愉技不算" ✓）** ✓：
 > >   * `[23064] counter after each cast: 1,2,0`
->   * `[23064] after two non-elation casts: \u6b22\u6109\u6280\u8ba1\u6570=0`
+>   * `[23064] after two non-elation casts: 欢愉技计数=0`
 >   * `[23064] wave: 2->3 ; casts: 2->2 (two casts) ->3 (three casts)`
 >   * `[23064] spec rule=cone23064_wind_gust`
 >   * `[23064] spec rule=cone23064_elation_cast_count`
@@ -5835,10 +5835,10 @@
 > * **判据读数（实测 ✓）** ✓：
 > >   * `[23024] ult rules=2 ; the ult-extra rule under a plain attack=0`
 >   * `[23024] bubble before=false after a hit=true`
->   * `[23024] spec buff=\u6ce1\u5f71 turns=1 target=target`
+>   * `[23024] spec buff=泡影 turns=1 target=target`
 >   * `[23031] glow after 1/2/3 follow-ups = 1/2/2`
 >   * `[23031] glow before turn end = 2 after = 1`
->   * `[23031] spec attribute=DEFENCE_IGNORE percent=0.27 perStack=self_stacks:\u6d41\u5149 target=self`
+>   * `[23031] spec attribute=DEFENCE_IGNORE percent=0.27 perStack=self_stacks:流光 target=self`
 > * **四条变异（经 `tools/mutate.py` ✓）** ✓：23031 glow cap 2 -> 3=1 | 23031 ignore -> ultimate damage boost=1 | 23031 turn-end decay 1 -> 2=1 | 23024 bubble boost 24 -> 12 percent=0
 > * ⚠ 23024 bubble boost 24 -> 12 percent 实测 **0 红** ✗（下一轮修 ✓）。
 > * **引擎级对照** ✓（先打印候选 ✓ 再按打印出的那行取 ✓）：中和 `APPLY_BUFF` ⇒ **NOT EVIDENCE: the control did not compile, so it proves nothing** ✓。
@@ -5934,7 +5934,7 @@
 > >   * `[21040] without the cone, weak targets 2 -> false`
 >   * `[21040] weak targets 0/1/2/3 -> false/false/true/true`
 >   * `[21040] spec attribute=CRIT_ATTACK percent=0.2 turns=2 target=self`
->   * `[21040] after a real cast on two enemies, the probe counted 0 (weak-to-element hits\u22651 fires once)`
+>   * `[21040] after a real cast on two enemies, the probe counted 0 (weak-to-element hits≥1 fires once)`
 >   ⭐ **阈值两边都测到**：`0/1 ⇒ false` ✓、`2/3 ⇒ true` ✓ —— 这正是"不少于 2 个"的边界 ✓。
 > * **两条变异（内容 ✓ + 引擎 ✓）** ✓：21040 门槛 `>= 2` 改成 `>= 1` ⇒ **reds=1** ✓；
 >   引擎里"从不把目标视为弱点" ⇒ **reds=0** ✓（**接线**也被判据压住 ✓）。
@@ -18741,7 +18741,7 @@
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 3 个提交待补推 ✓）。
 > **2026-10-02 更新（aggro 回收之整千零三十七：✅ **阿哈时刻已进树且全量绿**（`ec30d193` ✓）；⭐ 而判据要的那个语义也读到了：`from_category` ＝「**造成该事件的那次施放属于某类别**」）**：
 > * ✅ **实测（读 `TriggerTable:1103` 附近的常量说明 ✓）** ✓ 原文要点：
->   *`from_category`: "the cast that caused this event was of this CATEGORY" (\u300c\u88c5\u5907\u8005\u65bd\u653e**\u6b22\u6109\u6280**\u65f6\u300d, \u5149\u9525 21064/21066/23058/23064). … the slot names a SKILL SLOT (`SKILL` = an ordinary Skill), while a memosprite's or a **\u6b22\u6109 kit's cast is a category the slot vocabulary does not have at all** — `SkillCategory.ELATION_DAMAGE` is precisely the one `SkillType` lacks.`*
+>   *`from_category`: "the cast that caused this event was of this CATEGORY" (「装备者施放**欢愉技**时」, 光锥 21064/21066/23058/23064). … the slot names a SKILL SLOT (`SKILL` = an ordinary Skill), while a memosprite's or a **欢愉 kit's cast is a category the slot vocabulary does not have at all** — `SkillCategory.ELATION_DAMAGE` is precisely the one `SkillType` lacks.`*
 >   ⇒ ⭐⭐ **两点** ✓：**(i)** 我那条 `from_category ElationDamage` 的写法**有明确来历** ✓（光锥 21064 等在用 ✓ —— ⚠ 而 21064 正是本段某次红过的判据名 ✓ 印证它在欢愉这条线上 ✓）；
 >     **(ii)** ⭐ **判据要满足它，就得让"造成事件的那次施放"真的带这个类别** ✗ ⇒ 也就是**判据必须驱动一次真的欢愉技施放** ✗
 >       （⚠ 不能像 `1215` 那样只 `fireTriggers` 一个事件 ✓ —— 那次的条件是 `from_skill` ✓ 不同 ✓）。
@@ -20647,10 +20647,10 @@
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 > **2026-10-02 更新（aggro 回收之整千一百四十三：🎉🎉🎉 **"星魂开关"**根本不是缺口**** —— 引擎**早就有它**：规则上写 **`min_eidolon`**，与角色构造时的 **`eidolonRank`** 比较 ⇒ ⭐ **上一轮那条登记作废**（⭐ 第三十九次自我纠正））**）**：
 > * ✅ **实测（读 `Character` 的字段与 javadoc ✓）** ✓ 原文要点：
->   > *"How many Eidolon ranks (\u661f\u9b42) are active on this character: `0`\u2013`Constant.EIDOLON_MAX_RANK`. **It is a construction-time
+>   > *"How many Eidolon ranks (星魂) are active on this character: `0`–`Constant.EIDOLON_MAX_RANK`. **It is a construction-time
 >   > property, like the relic suit.** The assembly point decides which ranks are active and hands the number over; **a trigger rule
 >   > that belongs to an Eidolon says so with `min_eidolon`, and the interpreter compares the two.** So the engine never looks an
->   > Eidolon up by cid \u2026 Which is also why `eidolons.json` is **reference material** rather than a loaded table."*
+>   > Eidolon up by cid … Which is also why `eidolons.json` is **reference material** rather than a loaded table."*
 >   ＋ 字段 **`private int eidolonRank;`**（`:142` ✓，且**拷贝时保留** ✓ `:164` ✓）
 >   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **"分层启用"机制**已经存在** ✓ —— 规则上 **`min_eidolon`** ✓，引擎拿角色的 **`eidolonRank`** 比 ✓；
 >   **(ii)** ⭐ **它是"构造期属性"** ✓（⚠ 与遗器套装同类 ✓）⇒ ⭐ **于是"只测基础层"的既有判据只要用 `eidolonRank = 0` 构造就**天然绿** ✓✓
@@ -21587,7 +21587,7 @@
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓。
 > **2026-10-02 更新（aggro 回收之整千一百九十五：⛔ **按纪律登记（第 12 轮后收手）** —— ⚠ 拼写不是原因** ⇒ ⭐ 本条**不再深挖**，转为**已登记**）**）**：
 > * ✅ **实测（grep 我们自己的内容 ✓）** ✓：**`from_category BPSKILL` 在 `1505.json` 里就是这么写的** ✓（⚠ 而且它**有读者、已出货** ✓）
->   ＋ ⭐ `1513.json` 的 note 还记着：*"\u26a0 触发用 **`from_category ElationDamage`** \u2713（**数据值拼写**！用枚举名会被装载期拒绝 \u2717）"* ✓
+>   ＋ ⭐ `1513.json` 的 note 还记着：*"⚠ 触发用 **`from_category ElationDamage`** ✓（**数据值拼写**！用枚举名会被装载期拒绝 ✗）"* ✓
 >   ⇒ ⭐⭐ **所以 `BPSKILL` 是**正确且已被验证**的拼写** ✓ ⇒ ⛔ **"拼写"这条排除** ✓（⭐ 第五十八次自我纠正 ✓）。
 > * ⛔ **本条处置：登记（不再深挖）** ✓ —— ⚠ 已用 **12 轮**，收益/成本倒挂 ✓（⭐ 与本段对 `1408` 的 `#2`、`1413` 忆质上限的处置**一致** ✓）。
 >   ⭐ **登记内容（含全部实测，供将来接手）** ✓：
@@ -21695,8 +21695,8 @@
 > **2026-10-02 更新（aggro 回收之整千二百零一：📌 **下一轮的**两行补丁**（已精确到代码）**）**）**：
 > * ⭐ **改动一（引擎，一处）** ✓：在 **`Battle`** 里、`private final List<Countdown> countdowns = new ArrayList<>();`（`:183` ✓）**之后**加：
 >   ```java
->   /** \u2b50 2026-10-02\uff1a\u5012\u8ba1\u65f6\u7684\u53ea\u8bfb\u5165\u53e3\uff08\u8bfb\u8005\uff1a1408 \u7684\u53d8\u8eab\u5012\u8ba1\u65f6\u5224\u636e\uff0c\u4ee5\u53ca 1507\uff0f1309 \u540c\u7c7b\u5224\u636e\uff09\u3002
->    *  \u26a0 \u540d\u5b57\u907f\u5f00\u5b57\u6bb5 `countdowns`\uff08\u4e0d\u80fd\u540c\u540d\uff09\u3002 */
+>   /** ⭐ 2026-10-02：倒计时的只读入口（读者：1408 的变身倒计时判据，以及 1507／1309 同类判据）。
+>    *  ⚠ 名字避开字段 `countdowns`（不能同名）。 */
 >   public List<Countdown> countdownUnits() {
 >       return List.copyOf(countdowns);
 >   }
@@ -22068,8 +22068,8 @@
 >   ```java
 >   Battle battle = new Battle(List.of(owner, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
 >   battle.startBattle();
->   for (int i = 0; i < 12 && owner.getResources().value("\u65b0\u854a") == 0; i++) { battle.stepForward(); battle.processRequests(); }
->   Assertions.assertTrue(owner.getResources().value("\u65b0\u854a") > 0, "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9\u3010\u65b0\u854a\u3011");
+>   for (int i = 0; i < 12 && owner.getResources().value("新蕊") == 0; i++) { battle.stepForward(); battle.processRequests(); }
+>   Assertions.assertTrue(owner.getResources().value("新蕊") > 0, "每损失 1 点生命值得到 1 点【新蕊】");
 >   ```
 >   ⇒ ⭐ **变异**（把 `HP_LOST` 改成别的、或去掉规则）⇒ ⭐ **必为 0 ⇒ 红** ✓（⭐ 本段对 `1408`／`1501` 的变异同形 ✓）。
 >   ⚠ **注意两点** ✓：① ⭐ **`stepForward()` 的真名要先 `grep`** ✓（⚠ 本段见过它 ✓ —— `Battle:52` 的注释提过 ✓）；② ⭐ **别用 `assertEquals(1, …)`** ✗
@@ -22163,9 +22163,9 @@
 > * ⭐ **下一轮第一步（两次调用 ⇒ 出货）** ✗：⭐ 改脚本的判据为：
 >   ```java
 >   double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
->   owner.takeDamage(<\u4e00\u4e2a\u5c0f\u6570\u503c>, \u2026);   // \u26a0 \u53c2\u6570\u8868\u5148 grep
+>   owner.takeDamage(<一个小数值>, …);   // ⚠ 参数表先 grep
 >   battle.processRequests();
->   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9");
+>   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "每损失 1 点生命值得到 1 点");
 >   ```
 >   ⚠ **并拆成两条断言** ✓（`has(RES)` ✓ ＋ 增量 ✓ —— ⭐ 别让一条断言承担两个未知 ✓）。
 > * ⚠ **并按纪律留一个上限** ✓：⭐ 本条（`1407` 的【新蕊】）已用 **4 轮** ✗ ⇒ ⭐ **若下一轮仍不亮 ⇒ 登记**（⚠ 附"资源已存在／装载通过／三个 HP 相关方法已找到"✓），
@@ -22189,8 +22189,8 @@
 >   double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
 >   owner.takeDamage(100.0);
 >   battle.processRequests();
->   Assertions.assertTrue(owner.getResources().has(RES), "\u3010\u65b0\u854a\u3011\u5df2\u5728\u6218\u6597\u7684\u8d44\u6e90\u8868\u91cc");
->   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9");
+>   Assertions.assertTrue(owner.getResources().has(RES), "【新蕊】已在战斗的资源表里");
+>   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "每损失 1 点生命值得到 1 点");
 >   ```
 >   ⚠ **（两条断言分开 ✓ —— 本段第 56 条的既定做法 ✓）**；⭐ **变异**：⚠ 把 `on: HP_LOST` 改成别的事件 ✗ ⇒ 增量 0 ⇒ **红** ✓。
 > * ⚠ **推送**：本地仍**领先 3** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
@@ -22203,11 +22203,11 @@
 >     ⇒ ⭐ **反过来说：有它、但要用**那个入口**读** ✓）。
 > * ⭐⭐⭐ **于是本条的最后一步精确到一行** ✓（⚠ 下一轮两次调用 ⇒ 出货）✗：
 >   ```java
->   Resource bud = battle.partyResource(RES);          // \u26a0 \u771f\u540d\u5148 grep\uff08\u4f5c\u8005 note \u91cc\u5199\u7684\u662f `partyResource(\u540d)`\uff09
+>   Resource bud = battle.partyResource(RES);          // ⚠ 真名先 grep（作者 note 里写的是 `partyResource(名)`）
 >   double before = bud == null ? 0 : bud.value();
 >   owner.takeDamage(100.0);
 >   battle.processRequests();
->   Assertions.assertEquals(before + 1, battle.partyResource(RES).value(), "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9");
+>   Assertions.assertEquals(before + 1, battle.partyResource(RES).value(), "每损失 1 点生命值得到 1 点");
 >   ```
 >   ⇒ ⭐ **变异**：⭐ 把 `on: HP_LOST` 改成别的事件 ⇒ **增量为 0 ⇒ 红** ✓。
 > * ⭐⭐ **并记一条可复用的纪律（本段第 65 条自我纠正的产物）** ✓：
@@ -22374,9 +22374,9 @@
 >   Character robin = battle.characters.getFirst();
 >   battle.startBattle();
 >   Summon bird = battle.summonMemosprite(robin);
->   Assertions.assertEquals(robin.getMaxHp() * 0.7, bird.getMaxHp(), EPS, "70% \u751f\u547d\u4e0a\u9650");
+>   Assertions.assertEquals(robin.getMaxHp() * 0.7, bird.getMaxHp(), EPS, "70% 生命上限");
 >   Assertions.assertEquals(robin.getAttribute(AttributeType.SPEED).get() * 1.8,
->                           bird.getAttribute(AttributeType.SPEED).get(), EPS, "180% \u901f\u5ea6");
+>                           bird.getAttribute(AttributeType.SPEED).get(), EPS, "180% 速度");
 >   ```
 >   ＋ ⭐ **变异**：把 `memosprites/1512.json` 的 `0.7` 改成 `0.5` ⇒ ⭐ **必红** ✓ ⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
 >   ⚠ **两点注意** ✓：① ⭐ **`Summon.getAttribute` 的真名要先看一眼**（⚠ `CanHit` 有 `getAttribute` ✓ ⇒ ⭐ 大概率可用 ✓）；② ⭐ **签名里 `EPS` 的存在说明面板是**浮点**比例** ✓ ⇒ ⭐ **`assertEquals(..., EPS, ...)` 而不是整数断言** ✓。
@@ -22402,9 +22402,9 @@
 > * ✅ **实测（读 `memosprites/1407.json` ✓）** ✓ 原文：
 >   ```json
 >   { "name": "死龙•玻吕刻斯", "aggro": 100,
->     "panel": [ { "attribute": "HEALTH", "percent": 1.0, "source": "resource:新蕊" },   // ⭐⭐ 龙血 ＝ \u3010\u65b0\u854a\u3011\u4e0a\u9650\u7684 100% ✓
+>     "panel": [ { "attribute": "HEALTH", "percent": 1.0, "source": "resource:新蕊" },   // ⭐⭐ 龙血 ＝ 【新蕊】上限的 100% ✓
 >                { "attribute": "ATTACK", "percent": 1.0, "source": "attr:HEALTH" },
->                { "attribute": "SPEED",  "flat": 165 } ] }                              // ⭐ 165 ✓ \u4e0e\u6587\u6863 `:87` \u4e00\u81f4 ✓
+>                { "attribute": "SPEED",  "flat": 165 } ] }                              // ⭐ 165 ✓ 与文档 `:87` 一致 ✓
 >   ```
 >   ⇒ ⭐⭐⭐ **三条** ✓：
 >   **(i)** ⭐ **"龙血 ＝【新蕊】上限 100%" 已在树** ✓**（⚠ 目标 ③ 里我记的那一项 ✓）；
@@ -25992,7 +25992,7 @@
 > * **实测（本轮）**：回滚后全量 **0**（--rerun-tasks，**2129** 例 ✓）、树干净 ✓（⚠ 3 个提交待补推 ✓）。
 > **2026-10-02 更新（aggro 回收之整千零三十七：✅ **阿哈时刻已进树且全量绿**（`ec30d193` ✓）；⭐ 而判据要的那个语义也读到了：`from_category` ＝「**造成该事件的那次施放属于某类别**」）**：
 > * ✅ **实测（读 `TriggerTable:1103` 附近的常量说明 ✓）** ✓ 原文要点：
->   *`from_category`: "the cast that caused this event was of this CATEGORY" (\u300c\u88c5\u5907\u8005\u65bd\u653e**\u6b22\u6109\u6280**\u65f6\u300d, \u5149\u9525 21064/21066/23058/23064). … the slot names a SKILL SLOT (`SKILL` = an ordinary Skill), while a memosprite's or a **\u6b22\u6109 kit's cast is a category the slot vocabulary does not have at all** — `SkillCategory.ELATION_DAMAGE` is precisely the one `SkillType` lacks.`*
+>   *`from_category`: "the cast that caused this event was of this CATEGORY" (「装备者施放**欢愉技**时」, 光锥 21064/21066/23058/23064). … the slot names a SKILL SLOT (`SKILL` = an ordinary Skill), while a memosprite's or a **欢愉 kit's cast is a category the slot vocabulary does not have at all** — `SkillCategory.ELATION_DAMAGE` is precisely the one `SkillType` lacks.`*
 >   ⇒ ⭐⭐ **两点** ✓：**(i)** 我那条 `from_category ElationDamage` 的写法**有明确来历** ✓（光锥 21064 等在用 ✓ —— ⚠ 而 21064 正是本段某次红过的判据名 ✓ 印证它在欢愉这条线上 ✓）；
 >     **(ii)** ⭐ **判据要满足它，就得让"造成事件的那次施放"真的带这个类别** ✗ ⇒ 也就是**判据必须驱动一次真的欢愉技施放** ✗
 >       （⚠ 不能像 `1215` 那样只 `fireTriggers` 一个事件 ✓ —— 那次的条件是 `from_skill` ✓ 不同 ✓）。
@@ -27898,10 +27898,10 @@
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓（本轮**未改代码** ✓）。
 > **2026-10-02 更新（aggro 回收之整千一百四十三：🎉🎉🎉 **"星魂开关"**根本不是缺口**** —— 引擎**早就有它**：规则上写 **`min_eidolon`**，与角色构造时的 **`eidolonRank`** 比较 ⇒ ⭐ **上一轮那条登记作废**（⭐ 第三十九次自我纠正））**）**：
 > * ✅ **实测（读 `Character` 的字段与 javadoc ✓）** ✓ 原文要点：
->   > *"How many Eidolon ranks (\u661f\u9b42) are active on this character: `0`\u2013`Constant.EIDOLON_MAX_RANK`. **It is a construction-time
+>   > *"How many Eidolon ranks (星魂) are active on this character: `0`–`Constant.EIDOLON_MAX_RANK`. **It is a construction-time
 >   > property, like the relic suit.** The assembly point decides which ranks are active and hands the number over; **a trigger rule
 >   > that belongs to an Eidolon says so with `min_eidolon`, and the interpreter compares the two.** So the engine never looks an
->   > Eidolon up by cid \u2026 Which is also why `eidolons.json` is **reference material** rather than a loaded table."*
+>   > Eidolon up by cid … Which is also why `eidolons.json` is **reference material** rather than a loaded table."*
 >   ＋ 字段 **`private int eidolonRank;`**（`:142` ✓，且**拷贝时保留** ✓ `:164` ✓）
 >   ⇒ ⭐⭐⭐ **三条** ✓：**(i)** ⭐ **"分层启用"机制**已经存在** ✓ —— 规则上 **`min_eidolon`** ✓，引擎拿角色的 **`eidolonRank`** 比 ✓；
 >   **(ii)** ⭐ **它是"构造期属性"** ✓（⚠ 与遗器套装同类 ✓）⇒ ⭐ **于是"只测基础层"的既有判据只要用 `eidolonRank = 0` 构造就**天然绿** ✓✓
@@ -28838,7 +28838,7 @@
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓。
 > **2026-10-02 更新（aggro 回收之整千一百九十五：⛔ **按纪律登记（第 12 轮后收手）** —— ⚠ 拼写不是原因** ⇒ ⭐ 本条**不再深挖**，转为**已登记**）**）**：
 > * ✅ **实测（grep 我们自己的内容 ✓）** ✓：**`from_category BPSKILL` 在 `1505.json` 里就是这么写的** ✓（⚠ 而且它**有读者、已出货** ✓）
->   ＋ ⭐ `1513.json` 的 note 还记着：*"\u26a0 触发用 **`from_category ElationDamage`** \u2713（**数据值拼写**！用枚举名会被装载期拒绝 \u2717）"* ✓
+>   ＋ ⭐ `1513.json` 的 note 还记着：*"⚠ 触发用 **`from_category ElationDamage`** ✓（**数据值拼写**！用枚举名会被装载期拒绝 ✗）"* ✓
 >   ⇒ ⭐⭐ **所以 `BPSKILL` 是**正确且已被验证**的拼写** ✓ ⇒ ⛔ **"拼写"这条排除** ✓（⭐ 第五十八次自我纠正 ✓）。
 > * ⛔ **本条处置：登记（不再深挖）** ✓ —— ⚠ 已用 **12 轮**，收益/成本倒挂 ✓（⭐ 与本段对 `1408` 的 `#2`、`1413` 忆质上限的处置**一致** ✓）。
 >   ⭐ **登记内容（含全部实测，供将来接手）** ✓：
@@ -28946,8 +28946,8 @@
 > **2026-10-02 更新（aggro 回收之整千二百零一：📌 **下一轮的**两行补丁**（已精确到代码）**）**）**：
 > * ⭐ **改动一（引擎，一处）** ✓：在 **`Battle`** 里、`private final List<Countdown> countdowns = new ArrayList<>();`（`:183` ✓）**之后**加：
 >   ```java
->   /** \u2b50 2026-10-02\uff1a\u5012\u8ba1\u65f6\u7684\u53ea\u8bfb\u5165\u53e3\uff08\u8bfb\u8005\uff1a1408 \u7684\u53d8\u8eab\u5012\u8ba1\u65f6\u5224\u636e\uff0c\u4ee5\u53ca 1507\uff0f1309 \u540c\u7c7b\u5224\u636e\uff09\u3002
->    *  \u26a0 \u540d\u5b57\u907f\u5f00\u5b57\u6bb5 `countdowns`\uff08\u4e0d\u80fd\u540c\u540d\uff09\u3002 */
+>   /** ⭐ 2026-10-02：倒计时的只读入口（读者：1408 的变身倒计时判据，以及 1507／1309 同类判据）。
+>    *  ⚠ 名字避开字段 `countdowns`（不能同名）。 */
 >   public List<Countdown> countdownUnits() {
 >       return List.copyOf(countdowns);
 >   }
@@ -29319,8 +29319,8 @@
 >   ```java
 >   Battle battle = new Battle(List.of(owner, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
 >   battle.startBattle();
->   for (int i = 0; i < 12 && owner.getResources().value("\u65b0\u854a") == 0; i++) { battle.stepForward(); battle.processRequests(); }
->   Assertions.assertTrue(owner.getResources().value("\u65b0\u854a") > 0, "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9\u3010\u65b0\u854a\u3011");
+>   for (int i = 0; i < 12 && owner.getResources().value("新蕊") == 0; i++) { battle.stepForward(); battle.processRequests(); }
+>   Assertions.assertTrue(owner.getResources().value("新蕊") > 0, "每损失 1 点生命值得到 1 点【新蕊】");
 >   ```
 >   ⇒ ⭐ **变异**（把 `HP_LOST` 改成别的、或去掉规则）⇒ ⭐ **必为 0 ⇒ 红** ✓（⭐ 本段对 `1408`／`1501` 的变异同形 ✓）。
 >   ⚠ **注意两点** ✓：① ⭐ **`stepForward()` 的真名要先 `grep`** ✓（⚠ 本段见过它 ✓ —— `Battle:52` 的注释提过 ✓）；② ⭐ **别用 `assertEquals(1, …)`** ✗
@@ -29414,9 +29414,9 @@
 > * ⭐ **下一轮第一步（两次调用 ⇒ 出货）** ✗：⭐ 改脚本的判据为：
 >   ```java
 >   double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
->   owner.takeDamage(<\u4e00\u4e2a\u5c0f\u6570\u503c>, \u2026);   // \u26a0 \u53c2\u6570\u8868\u5148 grep
+>   owner.takeDamage(<一个小数值>, …);   // ⚠ 参数表先 grep
 >   battle.processRequests();
->   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9");
+>   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "每损失 1 点生命值得到 1 点");
 >   ```
 >   ⚠ **并拆成两条断言** ✓（`has(RES)` ✓ ＋ 增量 ✓ —— ⭐ 别让一条断言承担两个未知 ✓）。
 > * ⚠ **并按纪律留一个上限** ✓：⭐ 本条（`1407` 的【新蕊】）已用 **4 轮** ✗ ⇒ ⭐ **若下一轮仍不亮 ⇒ 登记**（⚠ 附"资源已存在／装载通过／三个 HP 相关方法已找到"✓），
@@ -29440,8 +29440,8 @@
 >   double before = owner.getResources().has(RES) ? owner.getResources().value(RES) : 0;
 >   owner.takeDamage(100.0);
 >   battle.processRequests();
->   Assertions.assertTrue(owner.getResources().has(RES), "\u3010\u65b0\u854a\u3011\u5df2\u5728\u6218\u6597\u7684\u8d44\u6e90\u8868\u91cc");
->   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9");
+>   Assertions.assertTrue(owner.getResources().has(RES), "【新蕊】已在战斗的资源表里");
+>   Assertions.assertEquals(before + 1, owner.getResources().value(RES), "每损失 1 点生命值得到 1 点");
 >   ```
 >   ⚠ **（两条断言分开 ✓ —— 本段第 56 条的既定做法 ✓）**；⭐ **变异**：⚠ 把 `on: HP_LOST` 改成别的事件 ✗ ⇒ 增量 0 ⇒ **红** ✓。
 > * ⚠ **推送**：本地仍**领先 3** ✗（⚠ 网络连失败 ✓）⇒ 恢复后一次 `git push` ✓。
@@ -29454,11 +29454,11 @@
 >     ⇒ ⭐ **反过来说：有它、但要用**那个入口**读** ✓）。
 > * ⭐⭐⭐ **于是本条的最后一步精确到一行** ✓（⚠ 下一轮两次调用 ⇒ 出货）✗：
 >   ```java
->   Resource bud = battle.partyResource(RES);          // \u26a0 \u771f\u540d\u5148 grep\uff08\u4f5c\u8005 note \u91cc\u5199\u7684\u662f `partyResource(\u540d)`\uff09
+>   Resource bud = battle.partyResource(RES);          // ⚠ 真名先 grep（作者 note 里写的是 `partyResource(名)`）
 >   double before = bud == null ? 0 : bud.value();
 >   owner.takeDamage(100.0);
 >   battle.processRequests();
->   Assertions.assertEquals(before + 1, battle.partyResource(RES).value(), "\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u5f97\u5230 1 \u70b9");
+>   Assertions.assertEquals(before + 1, battle.partyResource(RES).value(), "每损失 1 点生命值得到 1 点");
 >   ```
 >   ⇒ ⭐ **变异**：⭐ 把 `on: HP_LOST` 改成别的事件 ⇒ **增量为 0 ⇒ 红** ✓。
 > * ⭐⭐ **并记一条可复用的纪律（本段第 65 条自我纠正的产物）** ✓：
@@ -29625,9 +29625,9 @@
 >   Character robin = battle.characters.getFirst();
 >   battle.startBattle();
 >   Summon bird = battle.summonMemosprite(robin);
->   Assertions.assertEquals(robin.getMaxHp() * 0.7, bird.getMaxHp(), EPS, "70% \u751f\u547d\u4e0a\u9650");
+>   Assertions.assertEquals(robin.getMaxHp() * 0.7, bird.getMaxHp(), EPS, "70% 生命上限");
 >   Assertions.assertEquals(robin.getAttribute(AttributeType.SPEED).get() * 1.8,
->                           bird.getAttribute(AttributeType.SPEED).get(), EPS, "180% \u901f\u5ea6");
+>                           bird.getAttribute(AttributeType.SPEED).get(), EPS, "180% 速度");
 >   ```
 >   ＋ ⭐ **变异**：把 `memosprites/1512.json` 的 `0.7` 改成 `0.5` ⇒ ⭐ **必红** ✓ ⇒ **全量** ⇒ **闸门** ⇒ ⭐ **出货** ✓。
 >   ⚠ **两点注意** ✓：① ⭐ **`Summon.getAttribute` 的真名要先看一眼**（⚠ `CanHit` 有 `getAttribute` ✓ ⇒ ⭐ 大概率可用 ✓）；② ⭐ **签名里 `EPS` 的存在说明面板是**浮点**比例** ✓ ⇒ ⭐ **`assertEquals(..., EPS, ...)` 而不是整数断言** ✓。
@@ -29653,9 +29653,9 @@
 > * ✅ **实测（读 `memosprites/1407.json` ✓）** ✓ 原文：
 >   ```json
 >   { "name": "死龙•玻吕刻斯", "aggro": 100,
->     "panel": [ { "attribute": "HEALTH", "percent": 1.0, "source": "resource:新蕊" },   // ⭐⭐ 龙血 ＝ \u3010\u65b0\u854a\u3011\u4e0a\u9650\u7684 100% ✓
+>     "panel": [ { "attribute": "HEALTH", "percent": 1.0, "source": "resource:新蕊" },   // ⭐⭐ 龙血 ＝ 【新蕊】上限的 100% ✓
 >                { "attribute": "ATTACK", "percent": 1.0, "source": "attr:HEALTH" },
->                { "attribute": "SPEED",  "flat": 165 } ] }                              // ⭐ 165 ✓ \u4e0e\u6587\u6863 `:87` \u4e00\u81f4 ✓
+>                { "attribute": "SPEED",  "flat": 165 } ] }                              // ⭐ 165 ✓ 与文档 `:87` 一致 ✓
 >   ```
 >   ⇒ ⭐⭐⭐ **三条** ✓：
 >   **(i)** ⭐ **"龙血 ＝【新蕊】上限 100%" 已在树** ✓**（⚠ 目标 ③ 里我记的那一项 ✓）；
@@ -30372,7 +30372,7 @@
 >   ⭐ **变异（把"我这条"的事件改掉）竟然**没变红**** ✓ ⇒ ⭐ 一查：**`1407.json` 里早就有**
 >   ```json
 >   { "id": "talent_newbud_per_hp_lost", "on": "HP_LOST", "when": ["target == self"],
->     "do": [ { "op": "GAIN_RESOURCE", "resource": "\u65b0\u854a", "amountFromEvent": true } ] }
+>     "do": [ { "op": "GAIN_RESOURCE", "resource": "新蕊", "amountFromEvent": true } ] }
 >   ```
 >   ⇒ ⭐⭐ **即：正解早就在树**（⚠ 而且用的正是**本段第 1 件新建的 `amountFromEvent`** ✓）⇒ ⭐ **我加的那条是**重复读者**** ✗
 >     ⇒ ⭐⭐⭐ **已删除** ✓（⭐ 一件文档句子**只能有一个读者** ✓ —— ⚠ 这正是"变异不变红"替我抓出来的 ✓）。
@@ -32958,7 +32958,7 @@
 >   就会**整体中止** ✗ ⇒ ⭐ 其余文件**一个都没复原** ✓ ⇒ ⭐ 必须先确认路径 ✓（⭐ 这与我此前"先确认绝对路径再删/移"是同一条纪律 ✓）。
 > * ⭐⭐ **下一步（极具体、且是"读"而不是"猜" ✓）**：⭐ 重新落这五处 ✓ ⇒ ⭐ 然后 ⭐ **立刻跑 `gradlew compileJava` 并把错误文本读出来** ✓
 >   （⭐ 不许跳过 ✓ —— ⚠ 本轮我就是跳过了它才多花掉两次调用 ✓），⭐ 再补上那处未知错误 ✓。
->   ⭐ 已确认可复用的两条 ✓：⭐ ① `@Getter` 非 fluent ⇒ 用 `getOncePerWave()` ✓；⭐ ② `edit` 的锚点**避开非 ASCII 与转义**（⭐ 我在锚点里写 ✅ 而文件里是字面 `\u2705` ✗ ⇒ 改用纯 ASCII 锚点一次就过 ✓）。
+>   ⭐ 已确认可复用的两条 ✓：⭐ ① `@Getter` 非 fluent ⇒ 用 `getOncePerWave()` ✓；⭐ ② `edit` 的锚点**避开非 ASCII 与转义**（⭐ 我在锚点里写 ✅ 而文件里是字面 `✅` ✗ ⇒ 改用纯 ASCII 锚点一次就过 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2244** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
 > **2026-10-02 更新（aggro 回收之整千四百：⛔ **"每波次限额"第三次尝试仍未建成 ⇒ 回滚** ✓ ——
 > ⭐⭐ 但本轮把卡点**从"未知"缩到"两处之一"** ✓，并钉下三条**结构事实** ✓）**）**：
@@ -34240,7 +34240,7 @@
 >   *"德谬歌 has no SKILL skill, so a CAST_SKILL effect has nothing to read"* ✓
 >   ⇒ ⭐⭐ **忆灵按**槽位**存技能** ✓（⭐ `skillAt(1)` ✓ 能用 ✓），⭐ 而 ⭐ `CAST_SKILL` 走的是 ⭐ `SkillType.SKILL` ✗
 >     ⇒ ⭐ `REPLACE_SKILL{skill: "SKILL", skill_id: 1}` **并没有把它建出来** ✗ ⇒ ⭐ **前置 ＝ 让一次被命令的施放能按槽位指名技能** ✗。
-> * ⚠ **我自己的两个坑**：⭐ ① ⭐ python 的 `print` 撞 ⭐ GBK ✗（⭐ 输出里有 `\u2b50` ✓）⇒ ⭐ 脚本在**打补丁之前**就死了 ✓ ⇒ ⭐ 改成**只写不打印** ✓；
+> * ⚠ **我自己的两个坑**：⭐ ① ⭐ python 的 `print` 撞 ⭐ GBK ✗（⭐ 输出里有 `⭐` ✓）⇒ ⭐ 脚本在**打补丁之前**就死了 ✓ ⇒ ⭐ 改成**只写不打印** ✓；
 >   ⭐ ② ⭐ 正则配不上 ⭐ `WIRED` 的声明 ✗ ⇒ ⭐ 改用"`WIRED` 之后第一个字符串之前插入" ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2280** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
 > **2026-10-02 更新（新目标第 15 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但把最后一件的**病因精确定位到门控** ✓）**）**：
@@ -34535,12 +34535,12 @@
 > * ✅ **出货内容** ✓：⭐ `characters/1403.json` 新增 ⭐ `ult_zone_state` ✓ —— ⭐ `on: ULT_CAST` ＋ ⭐ `when: [actor == self]`
 >   ⇒ ⭐ `APPLY_BUFF{"结界", turns: 2, target: self}` ✓。
 > * ⭐⭐⭐ **为什么（⭐ 本轮读到的原文 ✓）**：⭐ 他的终结技（140303）原话是 ⭐
->   *"\u5f00\u542f\u3010\u7ed3\u754c\u3011\u2026**\u7ed3\u754c\u6301\u7eed\u671f\u95f4**\uff0c\u654c\u65b9\u76ee\u6807\u53d7\u5230\u7684\u4f24\u5bb3\u63d0\u9ad8 #2%\u2026\u53d7\u5230\u6211\u65b9\u76ee\u6807\u653b\u51fb\u540e\uff0c\u6bcf\u6709 1 \u540d\u76ee\u6807\u53d7\u5230\u653b\u51fb\uff0c
->   \u4f1a\u5bf9\u88ab\u653b\u51fb\u76ee\u6807\u4e2d\u5f53\u524d\u751f\u547d\u503c\u6700\u9ad8\u7684\u76ee\u6807\u9020\u6210 1 \u6b21\u7b49\u540c\u4e8e\u7f07\u5b9d **#3%** \u751f\u547d\u4e0a\u9650\u7684\u91cf\u5b50\u5c5e\u6027**\u9644\u52a0\u4f24\u5bb3**\u2026
->   \u3010\u7ed3\u754c\u3011\u6301\u7eed **#4 \u56de\u5408**"* ✓
+>   *"开启【结界】…**结界持续期间**，敌方目标受到的伤害提高 #2%…受到我方目标攻击后，每有 1 名目标受到攻击，
+>   会对被攻击目标中当前生命值最高的目标造成 1 次等同于缇宝 **#3%** 生命上限的量子属性**附加伤害**…
+>   【结界】持续 **#4 回合**"* ✓
 >   ⭐ 而我们内容里 ⭐ **易伤**那半**早已建模** ✓（⭐ `ult_zone_enemy_vulnerability` ⇒ ⭐ `MODIFY_DAMAGE_TAKEN{0.3, turns: 2}` ✓，⭐ 0.3 ＝ 10 级 ✓）⭐
 >   但 ⭐ **「结界持续期间」无处可指** ✗ —— ⭐ 结界是**敌人身上的减益** ✓，⭐ 没有状态说"它开着" ✓ ⇒ ⭐⭐ **所以补的正是那个状态** ✓
->   （⭐ 而这也是 ⭐ 1415 的「门径」之诗点名的东西 ✓：⭐ *"\u7f07\u5b9d\u65bd\u653e\u8ffd\u52a0\u653b\u51fb\u89e6\u53d1**\u7f07\u5b9d\u7684\u7ed3\u754c\u7684\u9644\u52a0\u4f24\u5bb3**\u65f6\u2026"* ✓）。
+>   （⭐ 而这也是 ⭐ 1415 的「门径」之诗点名的东西 ✓：⭐ *"缇宝施放追加攻击触发**缇宝的结界的附加伤害**时…"* ✓）。
 > * ⭐ **数据**：⭐ `#4`（⭐ 持续回合数 ✓）在 `140303` 的 ⭐ **15 级都是 2** ✓ ⇒ ⭐ 写字面量 2 是数据说的话 ✓。
 > * ✅ **判据 ＋ 实测变异** ✓：⭐ `TribbieZoneStateTest` ⇒ ⭐
 >   `[zone_state] right after the ultimate = true ; after two of his turns = false` ✓✓（⭐ 一侧读"开着了" ✗、⭐ 一侧读"自己会结束" ✓ —— ⭐ 永不结束的状态能满足前一半却错在后一半 ✓）；
@@ -36273,3 +36273,10 @@
 > * ⭐ **修正上一轮的判断**：⭐ 正确的第一步是"⭐ 决定【龙灵】在引擎里怎么表示 ✗"（⭐ 依附型次要召唤 ✓），⭐ 而不是直接建忆灵 ✓。
 > * ⭐ **审计表状态更正**：⭐ 槽位 25 第 2、4 句记作"⛔ 阻碍：`【龙灵】`尚未建模"，⭐ 而不是"缺 `self_shield`" ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（工程规范化：把树里的字面 `\uXXXX` 全部转成字符）**：
+>
+> * ⭐ **规模**：⭐ 1764 个被跟踪文件里 **746** 个含字面转义，⭐ 共 **53,970** 处 ⇒ ⭐ 解码 **53,915** 处／**743** 个文件；⭐ 二次扫描为 **0**（⭐ 幂等 ✓）；⭐ 差额 **55** ＝ 被守卫保留 ✓。
+> * ⭐ **保留三类**：⭐ 控制字符（⭐ JSON 不允许裸控制字符 ✓，⭐ 55 处 `\u0007`／`\u0000` ✓）／⭐ 引号与反斜杠（⭐ 会截断 Java 字面量 ✓，⭐ 2 处 ✓）／⭐ BOM 与孤立代理项 ✓；⭐ 成对代理项**已合并** ✓。
+> * ⭐ **验证**：⭐ `compileJava` ✓、⭐ 全量 **rc 0**、⭐ `mechanics` **rc 0** ✓。
+> * ⛔ **顺带发现**：⭐ `Cone22008Test.java` L64 的断言消息是中英混排（⭐ 不影响判据 ✓）。

@@ -37,7 +37,7 @@ public class GentleRainTest {
         Result without = run(false, false, false);
         Assertions.assertEquals(0.06 * with.baseSpeed, with.speed - without.speed, EPSILON,
                 "6% of the base SPD (" + with.baseSpeed + "): " + without.speed + " -> " + with.speed);
-        // \u26a0 CRIT DMG is a RATIO attribute: `percent: 0.15` lands as an absolute addend (fifteen points), unlike SPD where the share scales
+        // ⚠ CRIT DMG is a RATIO attribute: `percent: 0.15` lands as an absolute addend (fifteen points), unlike SPD where the share scales
         // the base. Measured both ways this round; the ally's `baseValue()` for CRIT DMG reads 0.0, so a base-relative expectation is meaningless.
         Assertions.assertEquals(0.15, with.allyCrit - without.allyCrit, EPSILON,
                 "fifteen points of CRIT DMG: " + without.allyCrit + " -> " + with.allyCrit);

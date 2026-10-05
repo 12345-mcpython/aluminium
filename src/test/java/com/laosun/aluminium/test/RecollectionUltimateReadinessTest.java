@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** \u300c\u3010\u8ffd\u5fc6\u3011\u8fbe\u5230 24 \u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u300d\u4e0e\u300c\u5904\u4e8e\u3010\u5f80\u6614\u7684\u6d9f\u6f2a\u3011\u65f6 12 \u70b9\u300d (2026-10-02). */
+/** 「【追忆】达到 24 点时可激活终结技」与「处于【往昔的涟漪】时 12 点」 (2026-10-02). */
 public class RecollectionUltimateReadinessTest {
-    private static final String MEMORY = "\u8ffd\u5fc6";
+    private static final String MEMORY = "追忆";
 
     @Test
     public void theCounterIsWhatMakesHerUltimateCastable() {
@@ -39,7 +39,7 @@ public class RecollectionUltimateReadinessTest {
                     her, List.of(battle.enemies.getFirst()));
             battle.processRequests();
             her = battle.characters.getFirst();
-            Assertions.assertTrue(her.getBuffManager().hasState("\u5f80\u6614\u7684\u6d9f\u6f2a"),
+            Assertions.assertTrue(her.getBuffManager().hasState("往昔的涟漪"),
                     "precondition: the ripple came up with her ultimate");
         }
         her.getResources().gain(MEMORY, seeded);

@@ -28,8 +28,8 @@ elif t.count(anchor) != 1:
     print('REFUSING: the addBoost anchor is not unique (or missing)')
     sys.exit(1)
 else:
-    new = ('        // \u2b50 Both a stated `scale` and a stated ceiling must be read (2026-09-30; reader: light cone 23062).' + NL
-           + '        // \u26a0 This method once ignored `damage_type` the same way -- see the comment above, round 258.' + NL
+    new = ('        // ⭐ Both a stated `scale` and a stated ceiling must be read (2026-09-30; reader: light cone 23062).' + NL
+           + '        // ⚠ This method once ignored `damage_type` the same way -- see the comment above, round 258.' + NL
            + '        double magnitude = effect.getScale() == null || effect.getScale().isBlank()' + NL
            + '                ? effect.getPercent()' + NL
            + '                : derivedMagnitude(effect, ctx);' + NL

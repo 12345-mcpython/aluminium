@@ -68,7 +68,7 @@ public class SkillParamTest {
                 + " (the neighbour is " + neighbour + ") ; the gain = " + gained);
 
         Assertions.assertEquals(expected, gained, Math.abs(expected) * 1e-6,
-                "\u300c\u7b49\u540c\u4e8e\u7f07\u5b9d #3% \u751f\u547d\u4e0a\u9650\u300d-- #3 is a parameter of HIS ultimate, at its own level");
+                "「等同于缇宝 #3% 生命上限」-- #3 is a parameter of HIS ultimate, at its own level");
         Assertions.assertNotEquals(neighbour, gained, Math.abs(expected) * 1e-6,
                 "and the index is load-bearing: the neighbouring member is a different number");
     }

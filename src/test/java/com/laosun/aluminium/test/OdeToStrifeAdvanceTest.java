@@ -51,7 +51,7 @@ public class OdeToStrifeAdvanceTest {
         double after = timeRemaining(battle, mydei);
         System.out.println("[advance] outside bloodfeud: " + before + " -> " + after);
         Assertions.assertTrue(after < before,
-                "\u300c\u5219\u4f7f\u4e07\u654c\u884c\u52a8\u63d0\u524d #2[i]%\u300d-- 100%, so his action value collapses toward zero");
+                "「则使万敌行动提前 #2[i]%」-- 100%, so his action value collapses toward zero");
     }
 
     /** In 【血仇】 the other branch runs instead -- the two halves are mutually exclusive. */
@@ -68,7 +68,7 @@ public class OdeToStrifeAdvanceTest {
         System.out.println("[advance] in bloodfeud: " + before + " -> " + after
                 + " (his SKILL slot = " + mydei.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL).getSkillSlot() + ")");
         Assertions.assertEquals(before, after, EPS,
-                "\u300c\u82e5\u4e07\u654c\u5904\u4e8e\u3010\u8840\u4ec7\u3011\u300d-- that branch commands him instead of advancing him");
+                "「若万敌处于【血仇】」-- that branch commands him instead of advancing him");
     }
 
     // ==================================================================

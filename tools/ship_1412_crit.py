@@ -15,7 +15,7 @@ THE JUDGE'S CLEAN ISOLATION (why it compares a RATIO): the peerage also carries 
 PEN (item 29) and +20% pierce on skill damage (item 30). All three act on crit and non-crit hits ALIKE, so the ratio
 "forced-crit damage / never-crit damage" cancels them -- and a +72% CRIT DMG is exactly what moves that ratio. Both runs use
 the same six casts (so the same Charge and the same state), and the control removes only 【爵位】.
-\u26a0 The crit is forced by the Random the tree itself uses for this (`return 0.0` = always crit; `return 1.0` = never crits,
+⚠ The crit is forced by the Random the tree itself uses for this (`return 0.0` = always crit; `return 1.0` = never crits,
 as `AnchorDeathTest` puts it), so no assertion depends on a dice roll.
 ASCII only.
 """
@@ -25,7 +25,7 @@ import json
 DATA = "src/main/resources/characters/1412.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/PeerageCritDamageTest.java"
 RULE = "peerage_skill_crit_damage"
-PEERAGE = "\u7235\u4f4d"
+PEERAGE = "爵位"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
@@ -37,11 +37,11 @@ rules.append({
     "when": ["actor has_state " + PEERAGE, "from_category BPSKILL"],
     "do": [{"op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.72,
             "instance": True, "permanent": True, "target": "self"}],
-    "source": ("1412 \u523b\u5f8b\u5fb7\u83c8 \u884c\u8ff9\uff08\u6587\u6863 `:67`\uff09\uff1a\u300c\u6301\u6709\u3010\u7235\u4f4d\u3011\u7684\u89d2\u8272\u2026"
-               "\u9020\u6210\u7684**\u6218\u6280\u4f24\u5bb3\u7684\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 72%**\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a`CRIT_ATTACK` \u5c31\u662f\u66b4\u51fb\u4f24\u5bb3 \u2713\uff08\u6570\u636e\uff1a`1412` \u7684 `crit_chance 0.05` \u2f8f `crit_attack 0.5` \u2713\uff09\uff1b"
-             "\u800c instance \u8def\u7531**\u6309\u540d\u652f\u6301\u5b83** \u2713\uff08`ctx.damage().addCritDamage(...)` \u2713\uff09\u3002"
-             "\u201c\u6218\u6280\u4f24\u5bb3\u7684\u201d\u7531 `from_category BPSKILL` \u8868\u8fbe \u2713\u3002"),
+    "source": ("1412 刻律德菈 行迹（文档 `:67`）：「持有【爵位】的角色…"
+               "造成的**战技伤害的暴击伤害提高 72%**」"),
+    "note": ("⭐ 2026-10-02：`CRIT_ATTACK` 就是暴击伤害 ✓（数据：`1412` 的 `crit_chance 0.05` ⾏ `crit_attack 0.5` ✓）；"
+             "而 instance 路由**按名支持它** ✓（`ctx.damage().addCritDamage(...)` ✓）。"
+             "“战技伤害的”由 `from_category BPSKILL` 表达 ✓。"),
 })
 
 if not isinstance(doc, dict):
@@ -66,29 +66,29 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412\uff1a\u300c\u6301\u6709\u3010\u7235\u4f4d\u3011\u7684\u89d2\u8272\u2026\u9020\u6210\u7684\u6218\u6280\u4f24\u5bb3\u7684**\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 72%**\u300d (2026-10-02).
+ * 1412：「持有【爵位】的角色…造成的战技伤害的**暴击伤害提高 72%**」 (2026-10-02).
  *
- * <p>\u2b50 The assertion is about the CRIT MULTIPLIER, not about raw damage: the peerage also carries +16% DEF ignore, +10%
+ * <p>⭐ The assertion is about the CRIT MULTIPLIER, not about raw damage: the peerage also carries +16% DEF ignore, +10%
  * All-Type RES PEN and +20% pierce on skill damage, and all three raise crit and non-crit hits alike -- so dividing them out
- * leaves exactly what a +72% CRIT DMG changes. Both runs make the same six casts; the control removes only \u3010\u7235\u4f4d\u3011.
+ * leaves exactly what a +72% CRIT DMG changes. Both runs make the same six casts; the control removes only 【爵位】.
  *
- * <p>\u26a0 The crit is forced, not hoped for: the Random returns 0.0 for a crit and 1.0 for "never crits" (the idiom
+ * <p>⚠ The crit is forced, not hoped for: the Random returns 0.0 for a crit and 1.0 for "never crits" (the idiom
  * `AnchorDeathTest` and `Cid1220FollowUpCritTest` use).
  */
 public class PeerageCritDamageTest {
     private static final int OWNER = 1412;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String PEERAGE = "\u7235\u4f4d";
+    private static final String PEERAGE = "爵位";
 
-    /** \u2b50 The peer's skill crits harder than the same skill without the peerage. */
+    /** ⭐ The peer's skill crits harder than the same skill without the peerage. */
     @Test
     public void thePeerCritsHarderOnSkillDamage() {
         double withPeer = critRatio(true);
         double without = critRatio(false);
         Assertions.assertTrue(without > 1.0, "precondition: a crit really is bigger than a non-crit (" + without + ")");
         Assertions.assertTrue(withPeer > without,
-                "\u300c\u6218\u6280\u4f24\u5bb3\u7684\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 72%\u300d (crit/non-crit: with=" + withPeer + ", without=" + without + ")");
+                "「战技伤害的暴击伤害提高 72%」 (crit/non-crit: with=" + withPeer + ", without=" + without + ")");
     }
 
     /** forced-crit damage divided by never-crit damage, same scene, same six casts. */

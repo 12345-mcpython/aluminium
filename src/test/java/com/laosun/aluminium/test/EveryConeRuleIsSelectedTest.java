@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * BREADTH: every shipped light cone, every rank, every event -- selected, so the engine validates it.
  *
- * <p>\u26a0 Why this exists (2026-09-30): a rule is validated only when it is SELECTED. Cone 23059 shipped with an
+ * <p>⚠ Why this exists (2026-09-30): a rule is validated only when it is SELECTED. Cone 23059 shipped with an
  * attribute the engine does not have (HP; it is HEALTH) and with a category test on SKILL_CAST (which carries no
  * category, so the rule could never fire), and the FULL SUITE WAS GREEN TWICE. Nothing selected those rules, so
  * nothing checked them. This test does nothing but select: it asks each table for its rules on every event, which is

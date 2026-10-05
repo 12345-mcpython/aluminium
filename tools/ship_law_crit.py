@@ -7,7 +7,7 @@ Measured before writing:
   * 刻律德菈 is cid 1412 in our own data ("Cerydra"), and her file already carries 【军功】 -- this rule reads HER own mark rather than spelling it again;
   * 「持有【军功】的角色」 is `target: "all_allies"` with `target_when: ["target has_state <the mark>"]` -- the shipped vocabulary (1103 uses exactly that shape for 「所有触电状态下的敌方目标」).
 
-\u26d4 Registered rather than written: 「奇袭结束后，使刻律德菈获得 #2 点充能」 -- 「奇袭」 is a state/event our content does not model.
+⛔ Registered rather than written: 「奇袭结束后，使刻律德菈获得 #2 点充能」 -- 「奇袭」 is a state/event our content does not model.
 """
 import io
 import json
@@ -18,7 +18,7 @@ SE = "src/main/resources/data/skill_effects.json"
 SKILLS = "src/main/resources/data/skills.json"
 SLOT = 23
 
-# \u2b50 the mark's own name, taken from the file that APPLIES it -- no second spelling
+# ⭐ the mark's own name, taken from the file that APPLIES it -- no second spelling
 doc = json.load(io.open(CERYDRA, encoding="utf-8"))
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
 marks = []
@@ -28,11 +28,11 @@ for r in rules:
             marks.append(e["buff"])
 if not marks:
     sys.exit("REFUSING: 1412 applies no named mark to read")
-# \u2b50 The sentence names its mark: \u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u300d -- so the mark is looked up BY THAT NAME rather than guessed from a list.
-WANTED = "\u519b\u529f"
-print("1412's named marks: %d ; the sentence's own:\u300c%s\u300d" % (len(set(marks)), WANTED))
+# ⭐ The sentence names its mark: 「持有【军功】的角色」 -- so the mark is looked up BY THAT NAME rather than guessed from a list.
+WANTED = "军功"
+print("1412's named marks: %d ; the sentence's own:「%s」" % (len(set(marks)), WANTED))
 if WANTED not in marks:
-    sys.exit("REFUSING: 1412 never applies \u300c%s\u300d -- the sentence would be naming a state that does not exist" % WANTED)
+    sys.exit("REFUSING: 1412 never applies 「%s」 -- the sentence would be naming a state that does not exist" % WANTED)
 MARK = WANTED
 
 table = json.load(io.open(SKILLS, encoding="utf-8"))
@@ -59,11 +59,11 @@ rules.append({
         "target": "all_allies",
         "target_when": ["target has_state " + MARK],
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 17 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 23\uff0cSkillID 1141523\uff09\uff1a"
-               "\u300c\u6574\u573a\u751f\u6548\uff0c\u5bf9\u523b\u5f8b\u5fb7\u83c8\u65bd\u653e\u540e\uff0c**\u6301\u6709\u3010" + MARK + "\u3011\u7684\u89d2\u8272\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1%**\u3002\u300d"),
-    "note": ("\u2b50 \u300c\u6301\u6709\u3010" + MARK + "\u3011\u7684\u89d2\u8272\u300d\u2192 `target: \"all_allies\"` \u52a0 `target_when: [\"target has_state "
-             + MARK + "\"]`\uff08\u5df2\u51fa\u8d27\u8bcd\u6c47\uff1a1103 \u7528\u540c\u4e00\u5f62\u72b6\u6311\u300c\u6240\u6709\u89e6\u7535\u72b6\u6001\u4e0b\u7684\u654c\u65b9\u76ee\u6807\u300d\uff09\u3002"
-             "\u2b50 `#1` \u968f\u7b49\u7ea7\u53d8\uff08**\u5b9e\u6d4b**\uff09\u2192 `percent_from_cast_param: 0`\u3002\u2b50 \u5370\u8bb0\u540d\u5b57**\u53d6\u81ea 1412 \u81ea\u5df1\u7684\u53e5\u5b50**\uff08\u800c\u4e0d\u662f\u91cd\u5199\u4e00\u904d\uff09\u3002"),
+    "source": ("1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23，SkillID 1141523）："
+               "「整场生效，对刻律德菈施放后，**持有【" + MARK + "】的角色暴击伤害提高 #1%**。」"),
+    "note": ("⭐ 「持有【" + MARK + "】的角色」→ `target: \"all_allies\"` 加 `target_when: [\"target has_state "
+             + MARK + "\"]`（已出货词汇：1103 用同一形状挑「所有触电状态下的敌方目标」）。"
+             "⭐ `#1` 随等级变（**实测**）→ `percent_from_cast_param: 0`。⭐ 印记名字**取自 1412 自己的句子**（而不是重写一遍）。"),
 })
 
 if isinstance(doc, list):
@@ -78,9 +78,9 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 17 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 23\uff09\uff1a"
-                   "\u5de5\u4f5c\u5728**\u89c4\u5219\u4fa7**\uff0c\u6240\u4ee5\u662f `Rules` \u5f62\u72b6\u3002"),
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\u3002",
+        "source": ("1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23）："
+                   "工作在**规则侧**，所以是 `Rules` 形状。"),
+        "note": "⭐ 没有条目就不可交付。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -103,9 +103,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 23 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d: \u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d (2026-10-02).
+ * 1415's memosprite skill 23 「献予「律法」之诗」: 「持有【军功】的角色暴击伤害提高 #1%」 (2026-10-02).
  *
- * <p>\u2b50 The reading is TWO-SIDED, because the sentence names a SUBSET: an ally carrying the mark must gain the crit damage, and an ally without it must not. A
+ * <p>⭐ The reading is TWO-SIDED, because the sentence names a SUBSET: an ally carrying the mark must gain the crit damage, and an ally without it must not. A
  * rule that simply boosted `all_allies` would pass the first half while being wrong about the sentence.
  */
 public class LawOdeCritDamageTest {

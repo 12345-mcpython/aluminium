@@ -24,7 +24,7 @@ public class RemembranceTrailblazerTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The memorisprite arrives with the document's own panel, for both ids. */
+    /** ⚠ The memorisprite arrives with the document's own panel, for both ids. */
     @Test
     public void theSummonArrivesWithTheDocumentedPanel() {
         for (int cid : new int[]{8007, 8008}) {
@@ -36,16 +36,16 @@ public class RemembranceTrailblazerTest {
             battle.castImmediate(tb.getSkills().get(SkillType.SKILL), tb, List.of(enemy));
 
             var mem = battle.memospriteOf(tb);
-            Assertions.assertNotNull(mem, "cid " + cid + ": \u300c\u53ec\u5524\u5fc6\u7075\u8ff7\u8ff7\u300d");
+            Assertions.assertNotNull(mem, "cid " + cid + ": 「召唤忆灵迷迷」");
             Assertions.assertEquals(130, mem.getAttribute(AttributeType.SPEED).get(), 1e-9,
-                    "cid " + cid + ": \u300c\u5fc6\u7075\u8ff7\u8ff7\u521d\u59cb\u62e5\u6709130\u70b9\u901f\u5ea6\u300d");
+                    "cid " + cid + ": 「忆灵迷迷初始拥有130点速度」");
             double expected = tb.getMaxHp() * 0.8 + 640;
             Assertions.assertEquals(expected, mem.getMaxHp(), expected * 0.02,
-                    "cid " + cid + ": \u300c\u7b49\u540c\u4e8e\u5f00\u62d3\u800580%\u751f\u547d\u4e0a\u9650+640\u7684\u751f\u547d\u4e0a\u9650\u300d: expected " + expected + ", got " + mem.getMaxHp());
+                    "cid " + cid + ": 「等同于开拓者80%生命上限+640的生命上限」: expected " + expected + ", got " + mem.getMaxHp());
         }
     }
 
-    /** \u26a0 Casting again does not create a second memosprite — the first is still the one on the field. */
+    /** ⚠ Casting again does not create a second memosprite — the first is still the one on the field. */
     @Test
     public void castingAgainKeepsTheSameMemosprite() {
         Character tb = CharacterFactory.create(8007, LEVEL);
@@ -58,7 +58,7 @@ public class RemembranceTrailblazerTest {
         battle.castImmediate(tb.getSkills().get(SkillType.SKILL), tb, List.of(enemy));
         var second = battle.memospriteOf(tb);
 
-        Assertions.assertSame(first, second, "\u300c\u82e5\u8ff7\u8ff7\u5df2\u5728\u573a\u300d -- the same memosprite, not a second one");
+        Assertions.assertSame(first, second, "「若迷迷已在场」 -- the same memosprite, not a second one");
     }
 
     /** Census: the summon (Skill), the summon (Ultimate) and the level convention. */

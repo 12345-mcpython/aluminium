@@ -29,7 +29,7 @@ public class GepardFreezeTest {
     private static final int GEPARD = 1104;
     private static final int LEVEL = 80;
 
-    /** \u26a0 E1 (65% + 35% = 100%) against a target with no resistances: deterministic, and it proves the whole chain. */
+    /** ⚠ E1 (65% + 35% = 100%) against a target with no resistances: deterministic, and it proves the whole chain. */
     @Test
     public void hisFreezeLandsOnAnUnresistingTarget() {
         Fixture f = new Fixture(1);
@@ -38,10 +38,10 @@ public class GepardFreezeTest {
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.SKILL), f.gepard, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"),
-                "\u300c\u670965%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u53d7\u5230\u653b\u51fb\u7684\u654c\u65b9\u76ee\u6807\u9677\u5165\u51bb\u7ed3\u72b6\u6001\u300d + \u661f\u9b42 1 \u7684 +35% \u21d2 100% base chance");
+                "「有65%的基础概率使受到攻击的敌方目标陷入冻结状态」 + 星魂 1 的 +35% ⇒ 100% base chance");
     }
 
-    /** \u26a0 The control carries its own per-turn payload: 「冻结状态下…每回合开始时受到…冰属性附加伤害」. */
+    /** ⚠ The control carries its own per-turn payload: 「冻结状态下…每回合开始时受到…冰属性附加伤害」. */
     @Test
     public void theFreezeCarriesItsPerTurnDamage() {
         Fixture f = new Fixture(1);
@@ -52,10 +52,10 @@ public class GepardFreezeTest {
         f.battle.tickDots(f.enemy);
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
-                "\u300c\u51bb\u7ed3\u72b6\u6001\u4e0b\uff0c\u654c\u65b9\u76ee\u6807\u4e0d\u80fd\u884c\u52a8\u540c\u65f6\u6bcf\u56de\u5408\u5f00\u59cb\u65f6\u53d7\u5230\u7b49\u540c\u4e8e\u6770\u5e15\u5fb760%\u653b\u51fb\u529b\u7684\u51b0\u5c5e\u6027\u9644\u52a0\u4f24\u5bb3\u300d");
+                "「冻结状态下，敌方目标不能行动同时每回合开始时受到等同于杰帕德60%攻击力的冰属性附加伤害」");
     }
 
-    /** At E0 the chance is the document's 65%, so a roll of 0.0 still lands \u2014 the amendment is not what makes it pass. */
+    /** At E0 the chance is the document's 65%, so a roll of 0.0 still lands — the amendment is not what makes it pass. */
     @Test
     public void atEidolonZeroTheDocumentChanceApplies() {
         Fixture f = new Fixture(0);

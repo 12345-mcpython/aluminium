@@ -26,7 +26,7 @@ public class AnaxaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The ratio, and the control that a basic attack does nothing. */
+    /** ⚠ The ratio, and the control that a basic attack does nothing. */
     @Test
     public void hisSkillLowersTheTargetsDefenceFromEidolonOne() {
         double content = defenceDrop(0);
@@ -37,7 +37,7 @@ public class AnaxaTest {
         Assertions.assertEquals(0.5, content / reference, 0.05,
                 "content " + content + " vs reference " + reference);
         Assertions.assertEquals(0.0, fromBasic, 1e-9,
-                "\u300c\u65bd\u653e**\u6218\u6280**\u51fb\u4e2d\u65f6\u300d -- a basic attack must not lower it");
+                "「施放**战技**击中时」 -- a basic attack must not lower it");
     }
 
     /** mode 0 = the shipped file, 1 = a hand-built -32% reference. Returns the target's DEFENCE drop after a Skill. */

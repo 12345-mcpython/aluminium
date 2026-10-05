@@ -32,18 +32,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u963f\u54c8\u65f6\u523b\u6301\u7eed\u81f3\u672c\u6b21\u6700\u540e\u4e00\u4e2a\u6b22\u6986\u6280\u65bd\u653e\u7ed3\u675f\u300d\u21d2 \u63d0\u524d\u7ed3\u675f\u65f6\u53d1\u3010\u597d\u6d3b\u5f53\u8d4f\u3011 (1513, 2026-10-02).
+ * 「阿哈时刻持续至本次最后一个欢榆技施放结束」⇒ 提前结束时发【好活当赏】 (1513, 2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN. The moment goes on with her elation cast, the pending counter is decremented when an elation attack
+ * <p>⭐ FILE-DRIVEN. The moment goes on with her elation cast, the pending counter is decremented when an elation attack
  * finishes, and at zero the state is removed -- which is the engine's STATE_ENDED, answered here by the reward rule.
  */
 public class AhaMomentTest {
     private static final int OWNER = 1513;
     private static final int MONSTER = 1002011;
-    private static final String MOMENT = "\u963f\u54c8\u65f6\u523b";
-    private static final String REWARD = "\u597d\u6d3b\u5f53\u8d4f";
+    private static final String MOMENT = "阿哈时刻";
+    private static final String REWARD = "好活当赏";
 
-    /** \u2b50 On with the cast, and the reward lands when the counter closes the moment. */
+    /** ⭐ On with the cast, and the reward lands when the counter closes the moment. */
     @Test
     public void theMomentEndsAndTheRewardLands() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

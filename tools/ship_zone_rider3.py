@@ -17,12 +17,12 @@ import sys
 INT = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 TRIBBIE = "src/main/resources/characters/1403.json"
 SKILLS = "src/main/resources/data/skills.json"
-ZONE = "\u7ed3\u754c"
+ZONE = "结界"
 
 # ---------- ① the engine line ----------
 interp = io.open(INT, encoding="utf-8").read()
 OLD = "        double share = effect.getPercent() == null ? 0.0 : effect.getPercent();"
-NEW = ("        // \u26a0 `shareOf`, not the raw field (2026-10-02): a share may also come from one of the owner's own skills (`percent_from_skill_param`),\n"
+NEW = ("        // ⚠ `shareOf`, not the raw field (2026-10-02): a share may also come from one of the owner's own skills (`percent_from_skill_param`),\n"
        "        // and `derivedMagnitude` was fixed for exactly this one round earlier. Same family, same line.\n"
        "        double share = shareOf(effect, ctx);")
 if interp.count(NEW) == 1:
@@ -57,12 +57,12 @@ rules.append({
         "element": "Quantum",
         "target": "highest_hp_attack_hit",
     }],
-    "source": ("1403 \u7f07\u5b9d \u7ec8\u7ed3\u6280 (140303)\uff1a\u300c\u53d7\u5230\u6211\u65b9\u76ee\u6807\u653b\u51fb\u540e\uff0c**\u6bcf\u6709 1 \u540d\u76ee\u6807\u53d7\u5230\u653b\u51fb**\uff0c"
-               "\u4f1a\u5bf9**\u88ab\u653b\u51fb\u76ee\u6807\u4e2d\u5f53\u524d\u751f\u547d\u503c\u6700\u9ad8\u7684\u76ee\u6807**\u9020\u6210 1 \u6b21**\u7b49\u540c\u4e8e\u7f07\u5b9d #3% \u751f\u547d\u4e0a\u9650**\u7684"
-               "\u91cf\u5b50\u5c5e\u6027\u9644\u52a0\u4f24\u5bb3\u3002\u300d"),
-    "note": ("\u2b50 \u6302 `ATTACK_FINISHED`\uff1a\u5b83\u7684\u6ce8\u91ca\u5199\u7740 \u201csettlement complete, **hit set frozen**\u201d \u2014\u2014 "
-             "\u6b63\u662f\u672c\u53e5\u8981\u7684\u201c\u88ab\u653b\u51fb\u76ee\u6807\u201d\u96c6\u5408\uff0c\u800c\u4e14\u5b83**\u5b58\u5728**\u3002\u2b50 `scale` \u662f `owner_max_hp`"
-             "\uff08`self_attr:HEALTH` \u4e0d\u5728 DAMAGE \u5b57\u9762\u91cf\u8def\u5f84\u8ba4\u7684\u96c6\u91cc\uff0c\u9759\u9ed8\u7b97\u6210 1.0\uff0c**\u5b9e\u6d4b**\uff09\u3002"),
+    "source": ("1403 缇宝 终结技 (140303)：「受到我方目标攻击后，**每有 1 名目标受到攻击**，"
+               "会对**被攻击目标中当前生命值最高的目标**造成 1 次**等同于缇宝 #3% 生命上限**的"
+               "量子属性附加伤害。」"),
+    "note": ("⭐ 挂 `ATTACK_FINISHED`：它的注释写着 “settlement complete, **hit set frozen**” —— "
+             "正是本句要的“被攻击目标”集合，而且它**存在**。⭐ `scale` 是 `owner_max_hp`"
+             "（`self_attr:HEALTH` 不在 DAMAGE 字面量路径认的集里，静默算成 1.0，**实测**）。"),
 })
 
 if isinstance(doc, list):
@@ -96,7 +96,7 @@ import java.util.Random;
  *
  * <p>「受到我方目标攻击后，每有1名目标受到攻击，会对被攻击目标中当前生命值最高的目标造成 1 次等同于缇宝 #3% 生命上限的量子属性附加伤害。」
  *
- * <p>The two scenes differ by EXACTLY one rule, and the zone is open in both. \u26a0 An earlier version replaced his table with an EMPTY one to remove that rule, which also
+ * <p>The two scenes differ by EXACTLY one rule, and the zone is open in both. ⚠ An earlier version replaced his table with an EMPTY one to remove that rule, which also
  * dropped `level_convention` -- the trap `literalBase`\\u2019s own comment records being sprung by a judge three times. This one keeps every loaded rule and filters out
  * exactly the rider.
  */

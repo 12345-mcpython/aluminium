@@ -60,8 +60,8 @@ public class HuohuoTalismanLosesATurnTest {
                 + " ; the saved ally survives = " + !ally.isDeath());
 
         Assertions.assertEquals(1, after,
-                "\u300c\u4f7f\u3010禳命\u3011\u7684\u6301\u7eed\u56de\u5408\u6570\u51cf 1\u300d-- her skill granted 2, so the save leaves 1");
+                "「使【禳命】的持续回合数减 1」-- her skill granted 2, so the save leaves 1");
         Assertions.assertTrue(!ally.isDeath(),
-                "\u300c\u4e0d\u4f1a\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d-- answering the lethal event is what cancels the death");
+                "「不会陷入无法战斗状态」-- answering the lethal event is what cancels the death");
     }
 }

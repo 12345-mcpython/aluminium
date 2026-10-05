@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A rule-driven ORDINARY damage instance (2026-09-30), reader 1505 \u7eef\u82f1\u2019s technique:
- * \u300c\u8fdb\u5165\u6218\u6597\u540e\uff0c\u5bf9\u654c\u65b9\u5168\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u7eef\u82f1 100% \u653b\u51fb\u529b\u7684\u7269\u7406\u5c5e\u6027\u4f24\u5bb9\u300d.
+ * A rule-driven ORDINARY damage instance (2026-09-30), reader 1505 绯英’s technique:
+ * 「进入战斗后，对敌方全体造成等同于绯英 100% 攻击力的物理属性伤容」.
  *
- * <p>\u2b50 \u26a0 The first version of this test believed an ordinary instance credits the VICTIM ENERGY inside `applyDamage` and measured
+ * <p>⭐ ⚠ The first version of this test believed an ordinary instance credits the VICTIM ENERGY inside `applyDamage` and measured
  * 0 -> 0: the crediting lives in the attack pipeline, not there, so that reading cannot tell the two paths apart. The real
  * discriminator is {@code countsAsAttack}: additional damage sets `notCountsAsAttack` (which is why a `damage_is_attack` rule must
- * not see it), while an ordinary instance does. A probe rule on the ALLY\u2019s own table measures exactly that -- and it is planted on
+ * not see it), while an ordinary instance does. A probe rule on the ALLY’s own table measures exactly that -- and it is planted on
  * the ally on purpose, because replacing the table of the character under test would delete the very rule being judged.
  */
 public class OrdinaryDamageTest {
@@ -60,13 +60,13 @@ public class OrdinaryDamageTest {
                 "an ORDINARY instance counts as an attack, so the probe saw it -- additional damage would not");
     }
 
-    /** \u2605 The shipped rule, read off the compiled table (discipline 232). */
+    /** ★ The shipped rule, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleSaysOrdinary() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         var rules = elation.getTriggerTable().rulesFor(TriggerEvent.BATTLE_START).stream()
                 .filter(rule -> rule.id().endsWith("technique_damage")).toList();
-        Assertions.assertEquals(1, rules.size(), "the technique\u2019s damage rule");
+        Assertions.assertEquals(1, rules.size(), "the technique’s damage rule");
         var effect = rules.getFirst().effects().getFirst();
         System.out.println("[ordinary] spec " + rules.getFirst().id() + " percent=" + effect.getPercent()
                 + " target=" + effect.getTarget() + " ordinary=" + effect.getOrdinary());

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
  *
  * <p>23013: max HP +18..30% AND healing done +12..20%. The healing attribute is OUTGOING_HEALING_BOOST, the name seven
  * shipped files already use, and it is the right one here because the sentence is about the healing the wearer GIVES.
- * <p>\u26a0 23039's other clause says "healing the wearer RECEIVES", which is the opposite direction; no shipped
+ * <p>⚠ 23039's other clause says "healing the wearer RECEIVES", which is the opposite direction; no shipped
  * content names such an attribute, so it is registered rather than fused onto the outgoing one.
  */
 public class Cone23013And23039Test {

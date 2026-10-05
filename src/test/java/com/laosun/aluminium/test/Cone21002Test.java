@@ -19,8 +19,8 @@ import java.util.Random;
 /**
  * Light cone 21002: with it equipped, the WHOLE party carries +8% all-type resistance, so an incoming hit lands for less.
  *
- * <p>\u2b50 Read on the damage an ally actually takes from the same attack with and without the cone -- the resistance zone is the
- * victim\u2019s side, so the number that moves is the one the ally receives, and the enemy\u2019s own panel is checked to be untouched.
+ * <p>⭐ Read on the damage an ally actually takes from the same attack with and without the cone -- the resistance zone is the
+ * victim’s side, so the number that moves is the one the ally receives, and the enemy’s own panel is checked to be untouched.
  */
 public class Cone21002Test {
     private static final int CONE = 21002;
@@ -61,11 +61,11 @@ public class Cone21002Test {
                 + " ; the ally takes " + plainAlly + " -> " + withAlly + " (x" + (withAlly / plainAlly) + ")"
                 + " ; the wearer takes " + plainWearer + " -> " + withWearer + " (x" + (withWearer / plainWearer) + ")");
         Assertions.assertEquals(0.08, ally.getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get(), 1e-9,
-                "the whole party carries 8% (\u6211\u65b9\u5168\u4f53)");
+                "the whole party carries 8% (我方全体)");
         Assertions.assertTrue(withAlly < plainAlly, "so an incoming hit lands for less");
         Assertions.assertTrue(withWearer < plainWearer, "and the wearer is covered too");
         Assertions.assertEquals(0.0, enemy.getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get(), 1e-9,
-                "the enemy\u2019s own resistance is not touched by our side\u2019s buff (false case)");
+                "the enemy’s own resistance is not touched by our side’s buff (false case)");
     }
 
     @Test

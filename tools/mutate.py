@@ -14,7 +14,7 @@ Effect-level: op, percent, amount, scale, turns, permanent, until, target, attri
 import json
 
 RULE_LEVEL = {'on', 'on_any', 'when', 'id', 'cooldown', 'source', 'note',
-              # \u2605 the rest of a rule's own fields (round 317 taught the tool `chance`, `per_turn`,
+              # ★ the rest of a rule's own fields (round 317 taught the tool `chance`, `per_turn`,
               # `once_per_battle` and `once_per_attack`: it refused them rather than writing them somewhere
               # harmless, which is right -- but the list has to keep up with the vocabulary).
               'chance', 'per_turn', 'once_per_battle', 'once_per_attack', 'per_attack', 'min_eidolon'}
@@ -26,14 +26,14 @@ EFFECT_LEVEL = {
 
 
 def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=None, every=False):
-    """\u2605 `every=True` accepts several matches (round 328): a rule that states the same effect for `self` AND
+    """★ `every=True` accepts several matches (round 328): a rule that states the same effect for `self` AND
     `summon` is ONE clause with two targets, and "touch only one of them" is not a mutation of that clause."""
     """Set `field` on the named rule; returns the value read back from disk."""
     if field not in RULE_LEVEL and field not in EFFECT_LEVEL:
         raise SystemExit('mutation refused: field %r belongs to no known layer' % field)
     raw = json.load(open(path, encoding='utf-8'))
     touched = 0
-    # \u2605 A content file is either {"1": [rules]} (cones, relic sets) or a bare [rules] list (characters): the
+    # ★ A content file is either {"1": [rules]} (cones, relic sets) or a bare [rules] list (characters): the
     # caller passes rank=None for the latter, and the helper used to index it with None and raise.
     rules_here = raw if isinstance(raw, list) else raw[rank]
     for rule in rules_here:
@@ -49,7 +49,7 @@ def mutate(path, rank, rule_id, field, value, effect_op=None, effect_attribute=N
                 if effect_attribute is not None and do.get('attribute') != effect_attribute:
                     continue
                 if field not in do:
-                    # \u26a0 Never INVENT a field: writing `percent` into an effect that has none would make the mutation
+                    # ⚠ Never INVENT a field: writing `percent` into an effect that has none would make the mutation
                     # meaningless (or worse, change the effect's shape). Only overwrite what the author wrote.
                     continue
                 do[field] = value

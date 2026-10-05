@@ -13,10 +13,10 @@ import sys
 
 PATH = "src/main/java/com/laosun/aluminium/Battle.java"
 
-INSERTED = ("        // \u2b50 \u300c\uff08\u82e5\u672a\u56de\u590d\uff09\u5426\u5219\u5c06\u7acb\u5373\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d (1407's \u6708\u8327\u4e4b\u5e87): a death that a deferring state\n"
+INSERTED = ("        // ⭐ 「（若未回复）否则将立即陷入无法战斗状态」 (1407's 月茧之庇): a death that a deferring state\n"
             "        // held is committed HERE -- at the carrier's own turn, before that turn happens -- if nothing removed the\n"
-            "        // state in between. \u26a0 Before the buff tick and before TURN_START, so a heal arriving on this very turn is\n"
-            "        // too late, which is what \u300c\u4e0b\u4e00\u6b21\u56de\u5408\u5f00\u59cb\u524d\u300d states.\n"
+            "        // state in between. ⚠ Before the buff tick and before TURN_START, so a heal arriving on this very turn is\n"
+            "        // too late, which is what 「下一次回合开始前」 states.\n"
             "        if (actor.getCurrentHp() <= 0 && actor.getBuffManager().defersDeath()) {\n"
             "            actor.perish();\n"
             "            return;\n"
@@ -24,7 +24,7 @@ INSERTED = ("        // \u2b50 \u300c\uff08\u82e5\u672a\u56de\u590d\uff09\u5426\
 
 ANCHOR = "        fireTriggers(TriggerEvent.TURN_END, actor, actor, 0, 0);\n"
 NEW = ANCHOR + (
-    "        // \u2b50 \u300c\uff08\u82e5\u672a\u56de\u590d\uff09\u5426\u5219\u5c06\u7acb\u5373\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d (1407's \u6708\u8327\u4e4b\u5e87): a death that a deferring state held\n"
+    "        // ⭐ 「（若未回复）否则将立即陷入无法战斗状态」 (1407's 月茧之庇): a death that a deferring state held\n"
     "        // is committed HERE -- the carrier's turn is over (so it really did 「正常行动」), and the next turn has not begun\n"
     "        // (so a heal or a shield up to this point still saves it). Nothing removed the state, so it falls now.\n"
     "        if (actor.getCurrentHp() <= 0 && actor.getBuffManager().defersDeath()) {\n"

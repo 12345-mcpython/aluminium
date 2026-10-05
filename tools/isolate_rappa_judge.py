@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u654c\u65b9\u76ee\u6807\u7684\u5f31\u70b9\u88ab\u51fb\u7834\u65f6\uff0c\u53d7\u5230\u7684\u51fb\u7834\u4f24\u5bb3\u63d0\u9ad8 2%\u300d (1317:440, 2026-10-02).
+ * 「敌方目标的弱点被击破时，受到的击破伤害提高 2%」 (1317:440, 2026-10-02).
  *
- * <p>\u2b50 Isolated: two runs whose tables differ in exactly ONE number -- the rule's `percent` (0.02 vs 0.0) -- so the gap
- * between them is the 2% and nothing else. \u26a0 Two coarser attempts failed first, and both are recorded in GAPS.md:
+ * <p>⭐ Isolated: two runs whose tables differ in exactly ONE number -- the rule's `percent` (0.02 vs 0.0) -- so the gap
+ * between them is the 2% and nothing else. ⚠ Two coarser attempts failed first, and both are recorded in GAPS.md:
  * comparing BREAK against NORMAL proved nothing (the gap is intrinsic), and comparing her table against no table measured
  * 50% (dropping her table also drops her traces and level_convention).
  */
@@ -43,7 +43,7 @@ public class BreakDamageTakenTest {
     private static final int OWNER = 1317;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 The rule's own contribution is the 2% the sentence states. */
+    /** ⭐ The rule's own contribution is the 2% the sentence states. */
     @Test
     public void theRuleContributesTwoPercent() {
         double on = dealt(0.02);

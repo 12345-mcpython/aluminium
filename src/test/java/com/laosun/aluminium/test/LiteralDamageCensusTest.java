@@ -23,7 +23,7 @@ import java.util.Random;
 public class LiteralDamageCensusTest {
     private static final double DOCUMENT = 1.0;
 
-    /** \u26a0 The three converted rules state the document's 100% literally, with an element and no row. */
+    /** ⚠ The three converted rules state the document's 100% literally, with an element and no row. */
     @Test
     public void theConvertedRulesStateTheDocumentNumberLiterally() {
         for (Object[] target : new Object[][]{{1109, "talent_followup_against_burning"},
@@ -32,7 +32,7 @@ public class LiteralDamageCensusTest {
             String id = (String) target[1];
             JsonObject effect = damageEffectOf(cid, id);
             Assertions.assertFalse(effect.has("skill"),
-                    "cid " + cid + " " + id + ": a row reference is what the audit removed \u2014 the COMMON row says 1.4, not 100%");
+                    "cid " + cid + " " + id + ": a row reference is what the audit removed — the COMMON row says 1.4, not 100%");
             Assertions.assertEquals("self_attr:ATTACK", effect.get("scale").getAsString(), "cid " + cid + " " + id + ": the scale");
             Assertions.assertEquals(DOCUMENT, effect.get("percent").getAsDouble(), 1e-9,
                     "cid " + cid + " " + id + ": the document says 100%");
@@ -64,7 +64,7 @@ public class LiteralDamageCensusTest {
         throw new IllegalStateException("no DAMAGE rule " + ruleId + " for cid " + cid);
     }
 
-    /** \u26a0 The ship still loads: a battle with 1206 runs, so the converted rules pass the loader's validation. */
+    /** ⚠ The ship still loads: a battle with 1206 runs, so the converted rules pass the loader's validation. */
     @Test
     public void herFileStillLoads() {
         var hero = com.laosun.aluminium.utils.CharacterFactory.create(1206, 80);

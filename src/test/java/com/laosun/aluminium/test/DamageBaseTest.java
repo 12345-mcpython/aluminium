@@ -23,27 +23,27 @@ public class DamageBaseTest {
     private static final int DANHENG = 1002;
     private static final int LEVEL = 80;
 
-    /** \u26a0 「等同于琳希#1[i]%生命上限的伤害」 -> HEALTH. */
+    /** ⚠ 「等同于琳希#1[i]%生命上限的伤害」 -> HEALTH. */
     @Test
     public void aMaxHpSentenceNamesMaxHp() {
         Character lynx = CharacterFactory.create(LYNX, LEVEL);
         Assertions.assertEquals(AttributeType.HEALTH, lynx.getSkills().get(SkillType.COMMON).getData().damageBaseAttribute(),
-                "\u300c\u7b49\u540c\u4e8e\u2026\u751f\u547d\u4e0a\u9650\u7684\u4f24\u5bb3\u300d");
+                "「等同于…生命上限的伤害」");
     }
 
-    /** \u26a0 「等同于砂金100%防御力的伤害」 -> DEFENCE. */
+    /** ⚠ 「等同于砂金100%防御力的伤害」 -> DEFENCE. */
     @Test
     public void aDefenceSentenceNamesDefence() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
         Assertions.assertEquals(AttributeType.DEFENCE, aventurine.getSkills().get(SkillType.COMMON).getData().damageBaseAttribute(),
-                "\u300c\u7b49\u540c\u4e8e\u7802\u91d1100%\u9632\u5fa1\u529b\u7684\u4f24\u5bb3\u300d");
+                "「等同于砂金100%防御力的伤害」");
     }
 
-    /** \u26a0 The ordinary case stays ATK: 「等同于丹恒100%攻击力」. */
+    /** ⚠ The ordinary case stays ATK: 「等同于丹恒100%攻击力」. */
     @Test
     public void anAttackSentenceStaysAttack() {
         Character danheng = CharacterFactory.create(DANHENG, LEVEL);
         Assertions.assertEquals(AttributeType.ATTACK, danheng.getSkills().get(SkillType.COMMON).getData().damageBaseAttribute(),
-                "\u300c\u7b49\u540c\u4e8e\u4e39\u6052100%\u653b\u51fb\u529b\u300d");
+                "「等同于丹恒100%攻击力」");
     }
 }

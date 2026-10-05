@@ -26,7 +26,7 @@ public class TrailblazerSiblingTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「每次击破敌方目标的弱点后，攻击力提高20%\u2026\u6700\u591a\u53e0\u52a02\u5c42」. */
+    /** ⚠ 「每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层」. */
     @Test
     public void hisTalentStacksAttackOnBreaksAndStopsAtTwo() {
         Character tb = CharacterFactory.create(TB2, LEVEL);
@@ -42,12 +42,12 @@ public class TrailblazerSiblingTest {
         battle.fireTriggers(TriggerEvent.BREAK, tb, enemy, 0, 0);
         double afterThree = tb.getAttribute(AttributeType.ATTACK).get();
 
-        Assertions.assertTrue(afterOne > before, "\u300c\u6bcf\u6b21\u51fb\u7834\u654c\u65b9\u76ee\u6807\u7684\u5f31\u70b9\u540e\uff0c\u653b\u51fb\u529b\u63d0\u9ad820%\u300d: " + before + " -> " + afterOne);
+        Assertions.assertTrue(afterOne > before, "「每次击破敌方目标的弱点后，攻击力提高20%」: " + before + " -> " + afterOne);
         Assertions.assertTrue(afterTwo > afterOne, "the second layer must add again");
-        Assertions.assertEquals(afterTwo, afterThree, 1e-9, "\u6700\u591a\u53e0\u52a02\u5c42");
+        Assertions.assertEquals(afterTwo, afterThree, 1e-9, "最多叠加2层");
     }
 
-    /** \u26a0 The technique heal, gated on the round-178 marker. */
+    /** ⚠ The technique heal, gated on the round-178 marker. */
     @Test
     public void aDeclaredTechniqueHealsTheParty() {
         Character tb = CharacterFactory.create(TB2, LEVEL);
@@ -64,11 +64,11 @@ public class TrailblazerSiblingTest {
 
         double expected = ally.getMaxHp() * 0.15;
         Assertions.assertEquals(expected, ally.getCurrentHp() - hurt, expected * 0.05,
-                "\u300c\u56de\u590d\u7b49\u540c\u4e8e\u5404\u81ea\u751f\u547d\u4e0a\u965015%\u7684\u751f\u547d\u503c\u300d");
+                "「回复等同于各自生命上限15%的生命值」");
     }
 
 
-    /** \u26a0 The control: without the marker the same battle heals nobody — this is what makes the gate testable. */
+    /** ⚠ The control: without the marker the same battle heals nobody — this is what makes the gate testable. */
     @Test
     public void withoutTheTechniqueNobodyIsHealed() {
         Character tb = CharacterFactory.create(TB2, LEVEL);
@@ -83,7 +83,7 @@ public class TrailblazerSiblingTest {
         battle.startBattle();
 
         Assertions.assertEquals(hurt, ally.getCurrentHp(), 1e-9,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so no heal");
+                "「使用秘技后」 -- undeclared, so no heal");
     }
 
     /** Census: the talent, the technique heal and the level convention. */

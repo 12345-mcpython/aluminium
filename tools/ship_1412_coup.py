@@ -26,9 +26,9 @@ DATA = "src/main/resources/characters/1412.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/CoupDeMainTest.java"
 PIERCE = "coup_de_main"
 ENDS = "coup_de_main_ends"
-PEERAGE = "\u7235\u4f4d"
-MERIT = "\u519b\u529f"
-CHARGE = "\u5145\u80fd"
+PEERAGE = "爵位"
+MERIT = "军功"
+CHARGE = "充能"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
@@ -39,12 +39,12 @@ rules.append({
     "id": PIERCE,
     "when": ["actor has_state " + PEERAGE, "from_category BPSKILL"],
     "do": [{"op": "CAST_SKILL", "skill": "SKILL", "target": "attacker"}],
-    "source": ("1412 \u523b\u5f8b\u5fb7\u83c8\uff08\u6587\u6863 `:67`/`:68`\uff09\uff1a\u300c\u2026\u5bf9\u654c\u65b9\u76ee\u6807\u65bd\u653e\u6218\u6280\u65f6\u89e6\u53d1**\u5947\u88ad**\u300d"
-               "\uff0b\u5b9a\u4e49\u300c**\u5947\u88ad**\uff1a\u590d\u5236\u4e00\u6b21\u5373\u5c06\u65bd\u653e\u7684\u6280\u80fd\u5e76**\u63d0\u524d\u65bd\u653e**\uff0c\u968f\u540e\u65bd\u653e\u539f\u6280\u80fd\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a`CAST_SETUP`\uff08\u5f15\u64ce\u81ea\u8ff0\u7684**\u524d\u7f6e\u94a9\u5b50** \u2713\uff09\uff0b`CAST_SKILL`"
-             "\uff08\u201c**\u4f7f\u5176\u7acb\u5373\u65bd\u653e 1 \u6b21**\u201d \u2713\uff09\u3002\u26a0 \u9632\u9012\u5f52\u5728**\u5f15\u64ce\u4fa7** \u2713"
-             "\uff08`castSkill` \u770b\u65bd\u653e\u6808\uff1a`currentCast().outer() != null` \u21d2 \u8df3\u8fc7 \u2713\uff09\u2014\u2014 "
-             "\u56e0\u4e3a\u6761\u4ef6 DSL \u7684 `!` **\u53ea\u80fd\u5426\u5b9a\u961f\u4f0d\u6761\u4ef6** \u2717\uff0c\u5185\u5bb9\u4fa7\u5199\u4e0d\u51fa\u6765 \u2717\u3002"),
+    "source": ("1412 刻律德菈（文档 `:67`/`:68`）：「…对敌方目标施放战技时触发**奇袭**」"
+               "＋定义「**奇袭**：复制一次即将施放的技能并**提前施放**，随后施放原技能」"),
+    "note": ("⭐ 2026-10-02：`CAST_SETUP`（引擎自述的**前置钩子** ✓）＋`CAST_SKILL`"
+             "（“**使其立即施放 1 次**” ✓）。⚠ 防递归在**引擎侧** ✓"
+             "（`castSkill` 看施放栈：`currentCast().outer() != null` ⇒ 跳过 ✓）—— "
+             "因为条件 DSL 的 `!` **只能否定队伍条件** ✗，内容侧写不出来 ✗。"),
 })
 rules.append({
     "on": "INSERTED_CAST_END",
@@ -52,11 +52,11 @@ rules.append({
     "when": ["actor has_state " + PEERAGE, "self_resource:" + CHARGE + " >= 6"],
     "do": [{"op": "SPEND_RESOURCE", "resource": CHARGE, "amount": 6},
            {"op": "REMOVE_STATE", "buff": PEERAGE, "target": "attacker"}],
-    "source": ("1412 \u523b\u5f8b\u5fb7\u83c8\uff08\u6587\u6863 `:67`\uff09\uff1a\u300c**\u5947\u88ad\u7ed3\u675f\u540e\uff0c\u6d88\u8017 6 \u70b9\u5145\u80fd\u4f7f"
-               "\u3010\u7235\u4f4d\u3011\u53d8\u56de\u3010\u519b\u529f\u3011**\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a\u89e6\u53d1\u7528**\u65b0\u5efa\u7684 `INSERTED_CAST_END`** \u2713\uff08\u201c\u88ab\u547d\u4ee4\u7684\u65bd\u653e\u7ed3\u675f\u201d \u2713\uff09\uff1b"
-             "\u201c\u53d8\u56de\u3010\u519b\u529f\u3011\u201d\u5c31\u662f**\u53d6\u6d88\u3010\u7235\u4f4d\u3011** \u2713\uff08\u6587\u6863\uff1a\u300c\u6301\u6709\u3010\u7235\u4f4d\u3011\u7684\u89d2\u8272"
-             "**\u88ab\u89c6\u4e3a\u540c\u65f6\u6301\u6709\u3010\u519b\u529f\u3011**\u300d \u2713\uff09\uff1b\u95e8\u69db `self_resource:\u5145\u80fd >= 6` \u2713 \u4fdd\u8bc1\u4e0d\u4f1a\u82b1\u4e0d\u8d77 \u2717\u3002"),
+    "source": ("1412 刻律德菈（文档 `:67`）：「**奇袭结束后，消耗 6 点充能使"
+               "【爵位】变回【军功】**」"),
+    "note": ("⭐ 2026-10-02：触发用**新建的 `INSERTED_CAST_END`** ✓（“被命令的施放结束” ✓）；"
+             "“变回【军功】”就是**取消【爵位】** ✓（文档：「持有【爵位】的角色"
+             "**被视为同时持有【军功】**」 ✓）；门槛 `self_resource:充能 >= 6` ✓ 保证不会花不起 ✗。"),
 })
 
 if not isinstance(doc, dict):
@@ -81,35 +81,35 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412\uff1a\u300c\u5947\u88ad\uff1a\u590d\u5236\u4e00\u6b21\u5373\u5c06\u65bd\u653e\u7684\u6280\u80fd\u5e76\u63d0\u524d\u65bd\u653e\uff0c\u968f\u540e\u65bd\u653e\u539f\u6280\u80fd\u3002**\u5947\u88ad\u4e0d\u4f1a\u518d\u6b21\u89e6\u53d1\u5947\u88ad**\u300d\uff0b
- * \u300c\u5947\u88ad\u7ed3\u675f\u540e\uff0c\u6d88\u8017 6 \u70b9\u5145\u80fd\u4f7f\u3010\u7235\u4f4d\u3011\u53d8\u56de\u3010\u519b\u529f\u3011\u300d (2026-10-02).
+ * 1412：「奇袭：复制一次即将施放的技能并提前施放，随后施放原技能。**奇袭不会再次触发奇袭**」＋
+ * 「奇袭结束后，消耗 6 点充能使【爵位】变回【军功】」 (2026-10-02).
  *
- * <p>\u2b50 SAME SCENE, ONE VARIABLE: six casts promote the ally either way; the control merely removes \u3010\u7235\u4f4d\u3011 before the
+ * <p>⭐ SAME SCENE, ONE VARIABLE: six casts promote the ally either way; the control merely removes 【爵位】 before the
  * peer's own skill, so the only difference is whether the copy happens.
  *
- * <p>\u26a0 The upper bound is the anti-recursion proof: two casts, not an unbounded chain.
+ * <p>⚠ The upper bound is the anti-recursion proof: two casts, not an unbounded chain.
  */
 public class CoupDeMainTest {
     private static final int OWNER = 1412;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String PEERAGE = "\u7235\u4f4d";
-    private static final String MERIT = "\u519b\u529f";
-    private static final String CHARGE = "\u5145\u80fd";
+    private static final String PEERAGE = "爵位";
+    private static final String MERIT = "军功";
+    private static final String CHARGE = "充能";
 
-    /** \u2b50 The peer's skill is cast twice -- the copy first, then the original -- and not forever. */
+    /** ⭐ The peer's skill is cast twice -- the copy first, then the original -- and not forever. */
     @Test
     public void thePeerCastsItsSkillTwice() {
         double withCoup = damageDealt(true);
         double without = damageDealt(false);
         Assertions.assertTrue(without > 0, "precondition: the control deals damage (" + without + ")");
         Assertions.assertTrue(withCoup > without * 1.5,
-                "\u300c\u590d\u5236\u4e00\u6b21\u2026\u63d0\u524d\u65bd\u653e\uff0c\u968f\u540e\u65bd\u653e\u539f\u6280\u80fd\u300d (with=" + withCoup + ", without=" + without + ")");
+                "「复制一次…提前施放，随后施放原技能」 (with=" + withCoup + ", without=" + without + ")");
         Assertions.assertTrue(withCoup < without * 2.5,
-                "\u300c\u5947\u88ad\u4e0d\u4f1a\u518d\u6b21\u89e6\u53d1\u5947\u88ad\u300d -- two casts, not a chain (with=" + withCoup + ", without=" + without + ")");
+                "「奇袭不会再次触发奇袭」 -- two casts, not a chain (with=" + withCoup + ", without=" + without + ")");
     }
 
-    /** \u2b50 After the coup, she pays six Charge and the peerage reverts to the merit. */
+    /** ⭐ After the coup, she pays six Charge and the peerage reverts to the merit. */
     @Test
     public void theCoupEndsBySpendingSixCharge() {
         Character owner = CharacterFactory.create(OWNER, 80);
@@ -133,13 +133,13 @@ public class CoupDeMainTest {
         battle.processRequests();
 
         Assertions.assertEquals(charge - 6 + 2, owner.getResources().value(CHARGE), 1e-9,
-                "\u300c\u6d88\u8017 6 \u70b9\u5145\u80fd\u300d\u2014\u2014 \u2757 \u800c\u4e24\u6b21\u65bd\u653e\uff08\u590d\u5236 + \u539f\u6280\u80fd\uff09"
-                        + "\u5404\u7ed9\u5979 +1 \u70b9\uff08\u3010\u519b\u529f\u3011\u90a3\u6761\uff1a\u300c\u65bd\u653e\u666e\u653b\u6216\u6218\u6280\u65f6\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f97 1 \u70b9\u5145\u80fd\u300d\uff09"
-                        + "\uff0c\u6240\u4ee5\u51c0\u53d8\u5316\u662f -4 \u2713 (before=" + charge + ")");
+                "「消耗 6 点充能」—— ❗ 而两次施放（复制 + 原技能）"
+                        + "各给她 +1 点（【军功】那条：「施放普攻或战技时使刻律德菈获得 1 点充能」）"
+                        + "，所以净变化是 -4 ✓ (before=" + charge + ")");
         Assertions.assertFalse(ally.getBuffManager().hasState(PEERAGE),
-                "\u300c\u4f7f\u3010\u7235\u4f4d\u3011\u53d8\u56de\u3010\u519b\u529f\u3011\u300d");
+                "「使【爵位】变回【军功】」");
         Assertions.assertTrue(ally.getBuffManager().hasState(MERIT),
-                "\u201c\u53d8\u56de\u3010\u519b\u529f\u3011\u201d -- the merit is still there");
+                "“变回【军功】” -- the merit is still there");
     }
 
     private static double damageDealt(boolean keepPeerage) {

@@ -15,15 +15,15 @@ import java.util.Random;
 /**
  * `amount_from_previous` gives the MAGNITUDE of what the previous effect moved (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」).
  *
- * \u2b50 The two effects run in one rule, in order: a SPEND of 7, then a GAIN whose size is `amount_from_previous`. A spend arrives as a negative resource delta, so before this the
+ * ⭐ The two effects run in one rule, in order: a SPEND of 7, then a GAIN whose size is `amount_from_previous`. A spend arrives as a negative resource delta, so before this the
  * gain would have been handed -7. Two-sided: the same pair with a GAIN first must still read a positive 7.
  */
 public class SpentAmountIsPositiveTest {
     private static final int LEVEL = 80;
     private static final int SPARE = 1002;
     private static final int MONSTER = 1002011;
-    private static final String SPENT = "\u88ab\u82b1\u6389";
-    private static final String MARK = "\u63a2\u9488\u6570";
+    private static final String SPENT = "被花掉";
+    private static final String MARK = "探针数";
 
     private static TriggerTable table(boolean spendFirst) {
         EffectSpec spend = new EffectSpec();
@@ -62,7 +62,7 @@ public class SpentAmountIsPositiveTest {
         battle.startBattle();
         battle.processRequests();
         spare = battle.characters.getFirst();
-        // \u2b50 Room to grow AND something to spend: at the cap a gain credits nothing, and at zero a spend has nothing to take.
+        // ⭐ Room to grow AND something to spend: at the cap a gain credits nothing, and at zero a spend has nothing to take.
         spare.getResources().register(SPENT, 200, 100);
         spare.getResources().register(MARK, 9999, 0);
         spare.setTriggerTable(table(spendFirst));

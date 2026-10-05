@@ -14,7 +14,7 @@ import sys
 PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 
-PREFIX = "| **\u300c\u81ea\u52a8\u65bd\u653e\u3010\u5f3a\u5316\u6218\u6280\u3011\u300d**"
+PREFIX = "| **「自动施放【强化战技】」**"
 hits = [index for index, line in enumerate(lines) if line.startswith(PREFIX)]
 if len(hits) != 1:
     sys.exit("REFUSING: %d §3 rows start with that prefix" % len(hits))
@@ -22,12 +22,12 @@ lines.pop(hits[0])
 print("ok   the shipped half leaves §3")
 
 # the shipped row
-ROW = ("| **\u300c\u3010\u8840\u4ec7\u3011\u72b6\u6001\u671f\u95f4\u2026\u81ea\u8eab\u56de\u5408\u5f00\u59cb\u65f6\u81ea\u52a8\u65bd\u653e\u3010\u5f11\u738b\u6210\u738b\u3011\u300d** "
-       "| `TURN_START` \uff0b `self has_state \u8840\u4ec7` \uff0b **`REPLACE_SKILL{skill: SKILL, skill_id: 9, turns: 1}`** \uff0b "
-       "`CONSUME_HP{scale: target_current_hp, percent: 0.35}` \uff0b `CAST_SKILL{skill: SKILL}` "
+ROW = ("| **「【血仇】状态期间…自身回合开始时自动施放【弑王成王】」** "
+       "| `TURN_START` ＋ `self has_state 血仇` ＋ **`REPLACE_SKILL{skill: SKILL, skill_id: 9, turns: 1}`** ＋ "
+       "`CONSUME_HP{scale: target_current_hp, percent: 0.35}` ＋ `CAST_SKILL{skill: SKILL}` "
        "| `src/main/resources/characters/1404.json` "
        "| `MydeiBloodfeudSkillsTest` |")
-ANCHOR = "| **\u300c\u6d88\u8017\u7b49\u540c\u4e8e\u2026**\u5f53\u524d**\u751f\u547d\u503c X% \u7684\u751f\u547d\u503c\u300d**"
+ANCHOR = "| **「消耗等同于…**当前**生命值 X% 的生命值」**"
 target = [index for index, line in enumerate(lines) if line.startswith(ANCHOR)]
 if len(target) != 1:
     sys.exit("REFUSING: %d §2 anchors" % len(target))
@@ -35,13 +35,13 @@ lines.insert(target[0] + 1, ROW)
 print("ok   §2 gains the turn-start autocast")
 
 # what remains, as its own §3 row
-ROW3 = ("| **\u300c\u5145\u80fd 150 \u65f6\u81ea\u52a8\u65bd\u653e\u3010\u5f11\u795e\u767b\u795e\u3011\u300d** \u4e0e **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d** "
-       "| \u4e24\u4ef6 \u2717\uff1a\u2460 \u300c\u5145\u80fd \u2265 100\u300d\u90a3\u6761**\u6ca1\u6709\u3010\u8840\u4ec7\u3011\u95e8** \u2717 \u21d2 **\u53cd\u590d**\u89e6\u53d1\u3001\u628a\u5145\u80fd\u62bd\u5e72 \u2717"
-       "\uff08\u5b9e\u6d4b \u2713\uff09\u21d2 \u6512\u4e0d\u5230 150 \u2717\uff1b"
-       "\u2461 \u5728**\u522b\u4eba\u7684\u8868**\u91cc\u547d\u4ee4**\u4ed6**\u65bd\u653e \u2717 \u2014\u2014 `CAST_SKILL` \u653e\u7684\u662f**\u89c4\u5219\u62e5\u6709\u8005\u81ea\u5df1**\u7684\u69fd \u2713\uff08`requireCharacterOwner` \u2713\uff09 "
-       "| `1404`\uff081 \u4f4d\uff09\u3001**`1415` \u7684\u5fc6\u7075\u6280\u80fd 8**\uff081 \u4f4d\uff09 **\u5171 2 \u4f4d** \u2713 "
-       "| \u2460 \u4e00\u4e2a**\u5426\u5b9a\u6761\u4ef6**\uff08\u5982 `self not_state \u8840\u4ec7`\uff09\uff0c\u6216\u8ba9\u90a3\u6761\u53ea\u5728**\u8de8\u8fc7**\u9608\u503c\u65f6\u89e6\u53d1 \u2713\uff1b"
-       "\u2461 \u4e00\u79cd**\u547d\u4ee4\u4ed6\u4eba\u65bd\u653e**\u7684\u5199\u6cd5\uff08`CAST_SKILL` \u52a0\u4e00\u4e2a\u201c\u8c01\u6765\u653e\u201d\u7684\u5bfb\u5740 \u2713\uff09 |")
+ROW3 = ("| **「充能 150 时自动施放【弑神登神】」** 与 **「使万敌自动施放1次不消耗充能的【弑神登神】」** "
+       "| 两件 ✗：① 「充能 ≥ 100」那条**没有【血仇】门** ✗ ⇒ **反复**触发、把充能抽干 ✗"
+       "（实测 ✓）⇒ 攒不到 150 ✗；"
+       "② 在**别人的表**里命令**他**施放 ✗ —— `CAST_SKILL` 放的是**规则拥有者自己**的槽 ✓（`requireCharacterOwner` ✓） "
+       "| `1404`（1 位）、**`1415` 的忆灵技能 8**（1 位） **共 2 位** ✓ "
+       "| ① 一个**否定条件**（如 `self not_state 血仇`），或让那条只在**跨过**阈值时触发 ✓；"
+       "② 一种**命令他人施放**的写法（`CAST_SKILL` 加一个“谁来放”的寻址 ✓） |")
 lines.append(ROW3)
 io.open(PATH, "w", encoding="utf-8", newline="\n").write("\n".join(lines))
 print("ok   §3 names the two remaining blockers")

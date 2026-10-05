@@ -32,7 +32,7 @@ public class SparkleEidolonTest {
     public void rankTwoTurnsEachTalentLayerIntoEightPercentDefenceIgnore() {
         Assertions.assertEquals(0.08, ignoreAfter(2, 1), EPS, "one layer is 8%");
         Assertions.assertEquals(0.24, ignoreAfter(2, 3), EPS, "three layers, the talent's cap, are 24%");
-        Assertions.assertEquals(0.0, ignoreAfter(0, 3), EPS, "\u661f\u9b422 is the gate: without it nothing is stated");
+        Assertions.assertEquals(0.0, ignoreAfter(0, 3), EPS, "星魂2 is the gate: without it nothing is stated");
     }
 
     private static double ignoreAfter(int rank, int layers) {

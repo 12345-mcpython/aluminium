@@ -35,7 +35,7 @@ public class Cid1309AuraTest {
     public void theAuraNamesTheFollowUpScopeAndShare() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        owner.getBuffManager().addBuff(new StateBuff("\u534f\u594f", 3, true));
+        owner.getBuffManager().addBuff(new StateBuff("协奏", 3, true));
         int seen = 0;
         for (var rule : owner.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(owner, owner, enemy, 0, 0))) {
@@ -59,7 +59,7 @@ public class Cid1309AuraTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
         battle.startBattle();
-        owner.getBuffManager().addBuff(new StateBuff("\u534f\u594f", 3, true));
+        owner.getBuffManager().addBuff(new StateBuff("协奏", 3, true));
         ally.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 130901));
         Assertions.assertTrue(ally.getAttribute(AttributeType.CRIT_CHANCE).get() >= 1.0,

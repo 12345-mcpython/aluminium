@@ -39,7 +39,7 @@ public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Permanent plus timed, both stackable: do they add? */
+    /** ⭐ Permanent plus timed, both stackable: do they add? */
     @Test
     public void permanentAndTimedAdd() {
         Assertions.assertEquals(0.4, total(), 1e-6,

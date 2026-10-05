@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23024: hitting a target puts \u3010\u6ce1\u5f71\u3011 on it for one turn (once per attack per target), damage against such targets is 24%
+ * Light cone 23024: hitting a target puts 【泡影】 on it for one turn (once per attack per target), damage against such targets is 24%
  * higher, and Ultimates get another 24% on top.
  */
 public class Cone23024Test {
@@ -24,7 +24,7 @@ public class Cone23024Test {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String BUBBLE = "\u6ce1\u5f71";
+    private static final String BUBBLE = "泡影";
 
     private Character wearer;
     private Enemy enemy;
@@ -50,7 +50,7 @@ public class Cone23024Test {
         boolean after = enemy.getBuffManager().hasState(BUBBLE);
         System.out.println("[23024] bubble before=" + before + " after a hit=" + after);
         Assertions.assertFalse(before, "nothing yet");
-        Assertions.assertTrue(after, "\u51fb\u4e2d\u654c\u65b9\u76ee\u6807\u65f6\u4f7f\u654c\u65b9\u9677\u5165\u3010\u6ce1\u5f71\u3011");
+        Assertions.assertTrue(after, "击中敌方目标时使敌方陷入【泡影】");
     }
 
     @Test
@@ -70,7 +70,7 @@ public class Cone23024Test {
                     Assertions.assertEquals(BUBBLE, effect.getBuff(), "the bubble");
                     Assertions.assertEquals(1, effect.getTurns(), "for one turn");
                     Assertions.assertEquals("target", effect.getTarget(), "on the target");
-                    // \u26a0 `CompiledRule` exposes no once-per-attack accessor (measured), so the flag itself is not readable
+                    // ⚠ `CompiledRule` exposes no once-per-attack accessor (measured), so the flag itself is not readable
                     // from a test: the loader validates it at rule level (TriggerTable line 730 reads spec.getOncePerAttack()),
                     // and this judge pins the effect's shape. Registered as a small reading gap rather than faked here.
                     Assertions.assertEquals(1, effect.getTurns(), "one turn is exactly what the limit rides on");

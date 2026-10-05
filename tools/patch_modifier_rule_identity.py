@@ -35,9 +35,9 @@ NEW = """    @Override
                 || this.sourceRole != that.sourceRole) {
             return false;
         }
-        // \u2b50 Two DIFFERENT rules are two different effects (2026-10-02). Measured: 1408's trace \u300c\u8fdb\u5165\u6218\u6597\u6216\u53d8\u8eab\u7ed3\u675f\u65f6
-        // \u653b\u51fb\u529b\u63d0\u9ad8 50%\u300d and her transformation's \u300c\u53d8\u8eab\u671f\u95f4\u653b\u51fb\u529b\u63d0\u9ad8 80%\u300d were the same kind, so the second evicted the first --
-        // while the documents say both are in effect (a total of +130%). \u26a0 The split is confined to RULES: a buff with no rule
+        // ⭐ Two DIFFERENT rules are two different effects (2026-10-02). Measured: 1408's trace 「进入战斗或变身结束时
+        // 攻击力提高 50%」 and her transformation's 「变身期间攻击力提高 80%」 were the same kind, so the second evicted the first --
+        // while the documents say both are in effect (a total of +130%). ⚠ The split is confined to RULES: a buff with no rule
         // id (every factory-made one) keeps the old tuple as its whole identity, so nothing else moves.
         boolean thisFromRule = this.ruleId != null && !this.ruleId.isBlank();
         boolean thatFromRule = that.ruleId != null && !that.ruleId.isBlank();

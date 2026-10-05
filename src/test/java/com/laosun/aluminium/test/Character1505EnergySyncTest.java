@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 \u7eef\u82f1\u2019s energy sync (2026-09-30): \u300c\u7eef\u82f1\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c\u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d.
+ * 1505 绯英’s energy sync (2026-09-30): 「绯英获得能量时，将同步获得等值的【好活当赏】」.
  *
- * <p>\u2b50 The energy comes from the ENGINE\u2019s own credit (casting a basic attack), not from a hand-written rule, and the old table is
+ * <p>⭐ The energy comes from the ENGINE’s own credit (casting a basic attack), not from a hand-written rule, and the old table is
  * never replaced -- an earlier version of this test did that and silently removed the very rule under test (measured: it read 20,
- * the technique\u2019s gift alone). The expectation is the MEASURED energy delta, so the judge states the rule rather than a number
+ * the technique’s gift alone). The expectation is the MEASURED energy delta, so the judge states the rule rather than a number
  * borrowed from somewhere else.
  */
 public class Character1505EnergySyncTest {
@@ -25,7 +25,7 @@ public class Character1505EnergySyncTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String GIFTS = "\u597d\u6d3b\u5f53\u8d4f";
+    private static final String GIFTS = "好活当赏";
 
     @Test
     public void gainingEnergyMirrorsIntoGifts() {
@@ -44,7 +44,7 @@ public class Character1505EnergySyncTest {
                 + giftsBefore + " -> " + giftsAfter + " (expected " + (giftsBefore + mirrored) + ")");
         Assertions.assertTrue(mirrored > 0, "the cast really credited energy (it credited " + mirrored + ")");
         Assertions.assertEquals(giftsBefore + mirrored, giftsAfter,
-                "every point of energy is mirrored one-for-one into \u3010\u597d\u6d3b\u5f53\u8d4f\u3011");
+                "every point of energy is mirrored one-for-one into 【好活当赏】");
     }
 
     @Test
@@ -55,6 +55,6 @@ public class Character1505EnergySyncTest {
         battle.startBattle();
         int gifts = elation.getResources().value(GIFTS);
         System.out.println("[1505-sync] before any energy is credited the gifts read " + gifts);
-        Assertions.assertEquals(20, gifts, "only the technique\u2019s 20 so far (the false side of the sync)");
+        Assertions.assertEquals(20, gifts, "only the technique’s 20 so far (the false side of the sync)");
     }
 }

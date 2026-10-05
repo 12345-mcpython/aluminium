@@ -19,7 +19,7 @@ spec = io.open(WORK + '/' + SPEC, encoding='utf-8').read()
 old = '    private Integer perTurn;'
 new = ('    private Integer perTurn;' + NL + NL
        + '    /**' + NL
-       + '     * Whose firings {@link #perTurn} and {@link #cooldown} count, when it is not the rule owner \u2014'
+       + '     * Whose firings {@link #perTurn} and {@link #cooldown} count, when it is not the rule owner —'
        + ' the count-and-reset' + NL
        + '     * family (2026-09-30; readers 1305, 1207, 1403) counts on the marked TARGET, on the TRIGGERER, or per UNIT.' + NL
        + '     * One of {@code self} / {@code target} / {@code actor}; absent means the owner, which is what every' + NL

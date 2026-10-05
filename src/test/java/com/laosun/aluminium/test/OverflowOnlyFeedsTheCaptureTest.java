@@ -19,8 +19,8 @@ public class OverflowOnlyFeedsTheCaptureTest {
     private static final int MONSTER = 1002011;
     private static final int MAX = 10;
     private static final int OVERFLOW = 4;
-    private static final String SPENT = "\u88ab\u82b1\u6389";
-    private static final String MARK = "\u63a2\u9488\u6570";
+    private static final String SPENT = "被花掉";
+    private static final String MARK = "探针数";
 
     private static TriggerTable table(boolean overflowOnly) {
         EffectSpec spend = new EffectSpec();

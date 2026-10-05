@@ -49,13 +49,13 @@ rules.append({
         {"op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": SERVANT_SKILL_SLOT, "turns": 1, "target": "summon"},
         {"op": "CAST_SKILL", "skill": "SKILL", "target": "summon"},
     ],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 10 \u300c" + ode + "\u300d\uff08\u6570\u636e\u69fd\u4f4d 13\uff09\uff1a"
-               "\u300c\u672c\u573a\u6218\u6597\u4e2d\uff0c**\u5f00\u62d3\u8005\u2022\u8bb0\u5fc6\u65bd\u653e\u5f3a\u5316\u666e\u653b\u540e\uff0c\u5fb7\u8c2c\u6b4c\u7acb\u5373\u83b7\u5f97 1 \u4e2a\u989d\u5916\u56de\u5408"
-               "\u5e76\u81ea\u52a8\u65bd\u653e\u3010" + memosprite_skill + "\u3011\u300d\u3002"),
-    "note": ("\u2b50 \u89e6\u53d1\u7528 `CAST_SETUP` + `from_skill_id == 4`\uff0c\u800c\u4e0d\u662f `BASIC_ATTACK` \u4e8b\u4ef6\uff1a"
-             "8007 \u69fd\u4f4d 4 \u7684 `skill_effect` \u662f `Enhance`\uff0c\u5c5e\u4e8e**buff \u5f62\u6001**\u7684\u6280\u80fd\uff0c"
-             "\u800c\u8fd9\u7c7b\u6280\u80fd**\u4e09\u4e2a\u4e8b\u4ef6\u90fd\u4e0d\u4f1a\u53d1**\uff08\u672c\u4f1a\u8bdd\u65e9\u5148\u5df2\u91cf\uff09\uff1b"
-             "\u6570\u636e\u91cc\u505a\u8fd9\u4ef6\u4e8b\u7684\u662f `ByCurrentSkillName`\uff0c\u800c\u5728\u6211\u4eec\u8fd9\u91cc\u5c31\u662f `from_skill_id`\u3002"),
+    "source": ("1415 昔涟 忆灵技能 10 「" + ode + "」（数据槽位 13）："
+               "「本场战斗中，**开拓者•记忆施放强化普攻后，德谬歌立即获得 1 个额外回合"
+               "并自动施放【" + memosprite_skill + "】」。"),
+    "note": ("⭐ 触发用 `CAST_SETUP` + `from_skill_id == 4`，而不是 `BASIC_ATTACK` 事件："
+             "8007 槽位 4 的 `skill_effect` 是 `Enhance`，属于**buff 形态**的技能，"
+             "而这类技能**三个事件都不会发**（本会话早先已量）；"
+             "数据里做这件事的是 `ByCurrentSkillName`，而在我们这里就是 `from_skill_id`。"),
 })
 
 if isinstance(doc, list):

@@ -66,7 +66,7 @@ public class Cone21037Test {
     }
 
     /**
-     * \u26a0 The owner gate needs a SECOND ally: with only the wearer in the party, `actor == self` and `actor is_ally`
+     * ⚠ The owner gate needs a SECOND ally: with only the wearer in the party, `actor == self` and `actor is_ally`
      * behave identically, so swapping them changed nothing (measured: 0 red). A teammate's crit is the case that tells
      * them apart -- it must not stack the wearer's layers.
      */

@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1217 \u85ff\u85ff\uff1a\u300c\u65bd\u653e\u6218\u6280\u540e\u85ff\u85ff\u83b7\u5f97\u3010\u79b3\u547d\u3011\uff0c\u6301\u7eed 2 \u56de\u5408\uff0c**\u85ff\u85ff\u6bcf\u56de\u5408\u5f00\u59cb\u65f6**\u6301\u7eed\u56de\u5408\u6570\u51cf 1\u300d (2026-10-02).
+ * 1217 藿藿：「施放战技后藿藿获得【禳命】，持续 2 回合，**藿藿每回合开始时**持续回合数减 1」 (2026-10-02).
  *
- * <p>The point is WHOSE clock spends it: the sentence names \u85ff\u85ff, not the party. \u26a0 The drive is the one a green sibling uses
+ * <p>The point is WHOSE clock spends it: the sentence names 藿藿, not the party. ⚠ The drive is the one a green sibling uses
  * (`ArlanEidolonFourTest`): a timed buff ticks in two halves per turn, and expiry is announced on the late one.
  */
 public class HuohuoTalismanDurationTest {
@@ -52,7 +52,7 @@ public class HuohuoTalismanDurationTest {
 
         SkillExecutor.execute(battle, her.getSkills().get(SkillType.SKILL), her, List.of(her));
         battle.processRequests();
-        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: her skill grants \u3010\u79b3\u547d\u3011");
+        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: her skill grants 【禳命】");
 
         spendTurnOf(battle, ally);
         boolean afterAllyTurn = her.getBuffManager().hasState(STATE);
@@ -64,12 +64,12 @@ public class HuohuoTalismanDurationTest {
                 + " ; after her 1st=" + afterHerFirstTurn + " ; after her 2nd=" + afterHerSecondTurn);
 
         Assertions.assertTrue(afterAllyTurn,
-                "\u300c\u85ff\u85ff\u6bcf\u56de\u5408\u5f00\u59cb\u65f6\u300d-- the clock is HERS, so a teammate's turn costs it nothing");
-        Assertions.assertTrue(afterHerFirstTurn, "\u300c\u6301\u7eed 2 \u56de\u5408\u300d-- one of her turns is not two");
-        Assertions.assertFalse(afterHerSecondTurn, "\u300c\u6301\u7eed\u56de\u5408\u6570\u51cf 1\u300d-- two of her turns spend it");
+                "「藿藿每回合开始时」-- the clock is HERS, so a teammate's turn costs it nothing");
+        Assertions.assertTrue(afterHerFirstTurn, "「持续 2 回合」-- one of her turns is not two");
+        Assertions.assertFalse(afterHerSecondTurn, "「持续回合数减 1」-- two of her turns spend it");
     }
 
-    /** \u26a0 Half a turn is `beforeMove()` alone; a full one is both halves, and expiry lands on the late half. */
+    /** ⚠ Half a turn is `beforeMove()` alone; a full one is both halves, and expiry lands on the late half. */
     private static void spendTurnOf(Battle battle, Character unit) {
         Signal signal = battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == unit).findFirst()

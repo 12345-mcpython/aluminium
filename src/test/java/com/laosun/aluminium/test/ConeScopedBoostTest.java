@@ -53,8 +53,8 @@ public class ConeScopedBoostTest {
         for (var rule : unit.getTriggerTable().matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(unit, unit, unit, 0, 0))) {
             for (var effect : rule.effects()) {
-                // \u26a0 getAttribute() is the SERIALIZED name (a String), not the enum: compare the document spelling.
-                // \u26a0 getAttribute() is the ENUM name (SKILL_DAMAGE_BOOST), not the serialized spelling
+                // ⚠ getAttribute() is the SERIALIZED name (a String), not the enum: compare the document spelling.
+                // ⚠ getAttribute() is the ENUM name (SKILL_DAMAGE_BOOST), not the serialized spelling
                 // (skill_damage_boost) -- the same convention 21006's judge relies on.
                 if ("SKILL_DAMAGE_BOOST".equals(effect.getAttribute())
                         || "ULTIMATE_DAMAGE_BOOST".equals(effect.getAttribute())) {

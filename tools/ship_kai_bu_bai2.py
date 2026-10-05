@@ -23,17 +23,17 @@ if any(isinstance(rule, dict) and rule.get("id") == RULE_ID for rule in rules):
 rules.append({
     "on": "STATE_ENDED",
     "id": RULE_ID,
-    "when": ["actor state_ended \u597d\u6d3b\u5f53\u8d4f"],
-    "do": [{"op": "GAIN_RESOURCE", "resource": "\u597d\u6d3b\u5f53\u8d4f",
+    "when": ["actor state_ended 好活当赏"],
+    "do": [{"op": "GAIN_RESOURCE", "resource": "好活当赏",
             "amountFromEvent": True, "amountPercent": 0.5, "target": "self"}],
-    "source": "1505 \u7eef\u82f1 \u884c\u8ff9 \u5f00\u4e0d\u8d25: \u300c\u961f\u53cb\u6301\u6709\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011**\u7ed3\u675f\u65f6**\uff0c\u7eef\u82f1\u4f1a**\u5c06\u5176\u4e2d\u7684 50%** \u8f6c\u5316\u4e3a\u81ea\u8eab\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d",
-    "note": "\u300c\u961f\u53cb\u6301\u6709\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u7ed3\u675f\u65f6\u2026\u53d6\u5176\u4e2d\u7684 **50%**\u300d\u21d2 `STATE_ENDED` \u21d2 "
-            "`GAIN_RESOURCE{\u597d\u6d3b\u5f53\u8d4f, **amountFromEvent \u00d7 0.5**, target: self}` \u2713\u3002"
-            "\u26a0 \u6761\u4ef6 `actor state_ended \u597d\u6d3b\u5f53\u8d4f` \u2713\uff08\u4e8b\u4ef6\u4ee5 `(carrier, carrier, \u2026)` \u89e6\u53d1 \u2713\uff09\u3002"
-            "\u26a0 \u4e8b\u4ef6\u643a\u5e26\u7684\u91cf\uff08\u672c\u8f6e\uff09\u5c31\u662f**\u88ab\u7ed3\u675f\u72b6\u6001\u7684\u5b9e\u4f8b\u6570** \u2713\u3002"
-            "\u26a0 **\u767b\u8bb0**\uff1a`1513` \u7684\u5956\u52b1\u4ecd\u4ee5**\u666e\u901a\u72b6\u6001**\u65bd\u52a0 \u597d\u6d3b\u5f53\u8d4f \u2717\uff08\u4e0d\u53ef\u53e0\u52a0 \u2717\uff09"
-            "\u21d2 \u771f\u5b9e\u5bf9\u5c40\u91cc\u5b83\u53ea\u6709 **1** \u4e2a\u5b9e\u4f8b \u2717 \u21d2 \u300c50% of it\u300d\u5728\u5b9e\u6218\u91cc\u662f 0.5 \u2717\uff1b"
-            "\u90a3\u6865\u63a5\uff08\u7b11\u70b9 \u2192 \u72b6\u6001\u5c42\u6570\uff09\u5355\u72ec\u767b\u8bb0 \u2713\u3002",
+    "source": "1505 绯英 行迹 开不败: 「队友持有的【好活当赏】**结束时**，绯英会**将其中的 50%** 转化为自身的【好活当赏】」",
+    "note": "「队友持有的【好活当赏】结束时…取其中的 **50%**」⇒ `STATE_ENDED` ⇒ "
+            "`GAIN_RESOURCE{好活当赏, **amountFromEvent × 0.5**, target: self}` ✓。"
+            "⚠ 条件 `actor state_ended 好活当赏` ✓（事件以 `(carrier, carrier, …)` 触发 ✓）。"
+            "⚠ 事件携带的量（本轮）就是**被结束状态的实例数** ✓。"
+            "⚠ **登记**：`1513` 的奖励仍以**普通状态**施加 好活当赏 ✗（不可叠加 ✗）"
+            "⇒ 真实对局里它只有 **1** 个实例 ✗ ⇒ 「50% of it」在实战里是 0.5 ✗；"
+            "那桥接（笑点 → 状态层数）单独登记 ✓。",
 })
 with io.open(CHAR, "w", encoding="utf-8", newline="\n") as handle:
     json.dump(doc, handle, ensure_ascii=False, indent=2)

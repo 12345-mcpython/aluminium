@@ -24,7 +24,7 @@ public class FeixiaoTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The follow-up needs a TEAMMATE, and `per_turn: 1` caps it: the second firing in a turn does nothing. */
+    /** ⚠ The follow-up needs a TEAMMATE, and `per_turn: 1` caps it: the second firing in a turn does nothing. */
     @Test
     public void theFollowUpNeedsATeammateAndFiresOncePerTurn() {
         double first = followUpLoss(true, 1);
@@ -33,12 +33,12 @@ public class FeixiaoTest {
 
         Assertions.assertTrue(first > 0, "a teammate's attack must draw it");
         Assertions.assertEquals(first, twice, 1e-6,
-                "\u300c\u8be5\u6548\u679c\u6bcf\u56de\u5408\u6700\u591a\u89e6\u53d11\u6b21\u300d -- two firings in the same turn must deal ONE instance");
+                "「该效果每回合最多触发1次」 -- two firings in the same turn must deal ONE instance");
         Assertions.assertEquals(0.0, hers, 1e-9,
-                "\u300c\u5f53\u98de\u9704\u7684\u961f\u53cb\u5bf9\u654c\u65b9\u76ee\u6807\u65bd\u653e\u653b\u51fb\u540e\u300d -- her OWN attack must not draw it");
+                "「当飞霄的队友对敌方目标施放攻击后」 -- her OWN attack must not draw it");
     }
 
-    /** \u26a0 The boost the same trigger grants her: 60% for two turns. */
+    /** ⚠ The boost the same trigger grants her: 60% for two turns. */
     @Test
     public void theTriggerAlsoBoostsHerself() {
         Character feixiao = CharacterFactory.create(FEIXIAO, LEVEL);
@@ -51,7 +51,7 @@ public class FeixiaoTest {
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
 
         Assertions.assertEquals(0.6, feixiao.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-9,
-                "\u300c\u53d1\u52a8\u6b64\u653b\u51fb\u65f6\u4f7f\u81ea\u8eab\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad860%\u300d");
+                "「发动此攻击时使自身造成的伤害提高60%」");
     }
 
     /** Fires `times` teammate attacks and returns the total damage they drew; `byTeammate` false means Feixiao herself attacks. */

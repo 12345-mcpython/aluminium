@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * Light cone 21043: the wearer deals 4% more damage for EVERY character holding a shield.
  *
- * <p>\u2b50 This is the \u300c\u573a\u4e0a\u8ba1\u6570\u8c13\u8bcd\u300d row's real shape. It needed an INSTANCE slot for the damage-boost attribute plus a live
+ * <p>⭐ This is the 「场上计数谓词」 row's real shape. It needed an INSTANCE slot for the damage-boost attribute plus a live
  * {@code per_stack} count: a written modifier could only ever be a snapshot, and {@code BOOST_DAMAGE} ignores {@code per_stack}.
  * The judge changes the field BETWEEN hits, so a snapshot would show up as a wrong second reading.
  */

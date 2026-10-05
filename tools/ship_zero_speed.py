@@ -64,7 +64,7 @@ patch(
     DATA,
     """        if ((attribute == AttributeType.HEALTH || attribute == AttributeType.SPEED)
                 && !(positive(entry.percent()) || positive(entry.flat()))) {""",
-    """        // \u26a0 A zero the DATA states is not the same as a value nobody stated (2026-10-02). Measured: the game's own
+    """        // ⚠ A zero the DATA states is not the same as a value nobody stated (2026-10-02). Measured: the game's own
         // `AvatarServantConfig.json` gives 小伊卡 and 德谬歌 `SpeedBase "0"` and `SpeedInherit "0"`, and their servant configs
         // keep Speed OUT of the summoner sync -- an ability moves it. `by_ability` is how a file says that, so a zero can be
         // written down instead of being silently accepted (`positive` alone would hide it).
@@ -76,27 +76,27 @@ patch(
 
 PANELS = {
     "1409": {
-        "name": "\u5c0f\u4f0a\u5361",
-        "source": "1409 \u98ce\u5807 \u5929\u8d4b \u7597\u6108\u4e16\u95f4\u7684\u6668\u66e6 (140904): \u300c\u5fc6\u7075\u5c0f\u4f0a\u5361\u521d\u59cb\u62e5\u6709\u7b49\u540c\u4e8e\u98ce\u5807 50% \u751f\u547d\u4e0a\u9650\u7684\u751f\u547d\u4e0a\u9650\u3002\u300d"
-                  "\uff0b \u6e38\u620f\u8868 `ExcelOutput/AvatarServantConfig.json` \u7b2c 11409 \u884c\uff1a`HPInherit: \"#1\"`\uff08\u6280\u80fd 140904 \u7684\u53c2\u6570 #1 = 0.5 \u2713\uff09\u3001"
-                  "`SpeedBase: \"0\"`\u3001`SpeedInherit: \"0\"`\u3001`Aggro: 100`\u3002",
-        "note": "\u751f\u547d\uff1a\u6587\u6863 **50%** \u2713\u3001\u6e38\u620f\u8868 `HPInherit #1` = **0.5** \u2713 \u2014\u2014 \u4e24\u8fb9\u4e00\u81f4 \u2713\u2713\u3002"
-                "\u901f\u5ea6\uff1a\u6e38\u620f\u8868\u5bf9\u5b83**\u7ed9\u7684\u5c31\u662f 0** \u2717\uff08`SpeedBase` \u4e0e `SpeedInherit` \u5747\u4e3a `\"0\"` \u2713\uff09\uff0c"
-                "\u4e14\u5b83\u81ea\u5df1\u7684 `ConfigCharacter/Servant/Servant_HyacineServant_00_Config.json` \u91cc**\u6ca1\u6709\u4efb\u4f55\u5b57\u9762\u901f\u5ea6** \u2717\uff0c"
-                "\u53ea\u628a `Speed` \u5217\u8fdb `SyncPropertyExceptList`\uff08**\u4e0d\u8ddf\u968f\u53ec\u5524\u8005** \u2713\uff09\u21d2 \u5373**\u7531\u80fd\u529b\u63a8\u52a8** \u2713 \u21d2 \u5199\u6210 `flat: 0` \u2713 **\uff0b `by_ability: true`** \u2713"
-                "\uff08\u26a0 \u800c\u4e0d\u662f\u8ba9\u5b83\u9759\u9ed8\u5730\u63a5\u53d7 0 \u2717\uff09\u3002⚠ \u767b\u8bb0\uff1a\u63a8\u52a8\u5b83\u901f\u5ea6\u7684**\u90a3\u6761\u80fd\u529b**\u5c1a\u672a\u8bfb \u2717\u3002"
-                "\u4ec7\u6068\uff1a\u6e38\u620f\u8868\u7ed9 **100** \u2713\uff08= \u5f15\u64ce\u9ed8\u8ba4 \u2713\uff09\u21d2 \u4e0d\u5199 \u2713\u3002",
+        "name": "小伊卡",
+        "source": "1409 风堇 天赋 疗愈世间的晨曦 (140904): 「忆灵小伊卡初始拥有等同于风堇 50% 生命上限的生命上限。」"
+                  "＋ 游戏表 `ExcelOutput/AvatarServantConfig.json` 第 11409 行：`HPInherit: \"#1\"`（技能 140904 的参数 #1 = 0.5 ✓）、"
+                  "`SpeedBase: \"0\"`、`SpeedInherit: \"0\"`、`Aggro: 100`。",
+        "note": "生命：文档 **50%** ✓、游戏表 `HPInherit #1` = **0.5** ✓ —— 两边一致 ✓✓。"
+                "速度：游戏表对它**给的就是 0** ✗（`SpeedBase` 与 `SpeedInherit` 均为 `\"0\"` ✓），"
+                "且它自己的 `ConfigCharacter/Servant/Servant_HyacineServant_00_Config.json` 里**没有任何字面速度** ✗，"
+                "只把 `Speed` 列进 `SyncPropertyExceptList`（**不跟随召唤者** ✓）⇒ 即**由能力推动** ✓ ⇒ 写成 `flat: 0` ✓ **＋ `by_ability: true`** ✓"
+                "（⚠ 而不是让它静默地接受 0 ✗）。⚠ 登记：推动它速度的**那条能力**尚未读 ✗。"
+                "仇恨：游戏表给 **100** ✓（= 引擎默认 ✓）⇒ 不写 ✓。",
         "panel": [{"attribute": "HEALTH", "percent": 0.5},
                   {"attribute": "SPEED", "flat": 0, "by_ability": True}],
     },
     "1415": {
-        "name": "\u5fb7\u8c2c\u6b4c",
-        "source": "1415 \u6614\u6d9f \u7ec8\u7ed3\u6280 \u8bd7\u7684\u300c\u25e6\u300d\u8a93\u7ea6\u7684\u300c\u221e\u300d (141503/141504): \u300c\u5fb7\u8c2c\u6b4c\u521d\u59cb\u62e5\u6709\u7b49\u540c\u4e8e\u6614\u6d9f 100% \u751f\u547d\u4e0a\u9650\u7684\u751f\u547d\u4e0a\u9650\u3002\u300d"
-                  "\uff0b \u6e38\u620f\u8868\u7b2c 11415 \u884c\uff1a`HPInherit: \"#1\"`\uff08\u6280\u80fd 141503 \u7684\u53c2\u6570 #1 = 1 \u2713\uff09\u3001`SpeedBase: \"0\"`\u3001`SpeedInherit: \"0\"`\u3001`Aggro: 100`\u3002",
-        "note": "\u751f\u547d\uff1a\u6587\u6863 **100%** \u2713\u3001\u6e38\u620f\u8868 `HPInherit #1` = **1** \u2713 \u2014\u2014 \u4e00\u81f4 \u2713\u2713\u3002"
-                "\u901f\u5ea6\uff1a\u540c 1409 \u2014\u2014 \u6e38\u620f\u8868\u7ed9\u7684\u5c31\u662f **0** \u2717\uff0c\u4e14\u81ea\u5df1\u7684\u4f8d\u4ece\u914d\u7f6e\u91cc\u65e0\u5b57\u9762\u901f\u5ea6 \u2717\uff0c`Speed` \u540c\u6837\u5728 `SyncPropertyExceptList` \u91cc \u2713"
-                "\u21d2 \u5199\u6210 `flat: 0` \u2713 **\uff0b `by_ability: true`** \u2713\u3002\u4ec7\u6068 **100** \u2713 \u21d2 \u4e0d\u5199 \u2713\u3002"
-                "\u26a0 \u672c\u4efd\u540c\u65f6\u662f\u76ee\u6807 \u2460-b \u7684\u524d\u63d0 \u2713\uff08\u5979\u7684\u5fc6\u7075\u6280\u80fd\u300c\u5947\u88ad\u7ed3\u675f\u540e\uff0c\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f97 1 \u70b9\u5145\u80fd\u300d\u9700\u5979\u5728\u573a \u2713\uff09\u3002",
+        "name": "德谬歌",
+        "source": "1415 昔涟 终结技 诗的「◦」誓约的「∞」 (141503/141504): 「德谬歌初始拥有等同于昔涟 100% 生命上限的生命上限。」"
+                  "＋ 游戏表第 11415 行：`HPInherit: \"#1\"`（技能 141503 的参数 #1 = 1 ✓）、`SpeedBase: \"0\"`、`SpeedInherit: \"0\"`、`Aggro: 100`。",
+        "note": "生命：文档 **100%** ✓、游戏表 `HPInherit #1` = **1** ✓ —— 一致 ✓✓。"
+                "速度：同 1409 —— 游戏表给的就是 **0** ✗，且自己的侍从配置里无字面速度 ✗，`Speed` 同样在 `SyncPropertyExceptList` 里 ✓"
+                "⇒ 写成 `flat: 0` ✓ **＋ `by_ability: true`** ✓。仇恨 **100** ✓ ⇒ 不写 ✓。"
+                "⚠ 本份同时是目标 ①-b 的前提 ✓（她的忆灵技能「奇袭结束后，使刻律德菈获得 1 点充能」需她在场 ✓）。",
         "panel": [{"attribute": "HEALTH", "percent": 1.0},
                   {"attribute": "SPEED", "flat": 0, "by_ability": True}],
     },

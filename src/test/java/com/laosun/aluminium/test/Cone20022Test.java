@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20022: on the MEMOSPRITE's turn start the wearer and the memosprite each gain one stack of \u3010\u7f05\u6000\u3011 (max 4), and the
+ * Light cone 20022: on the MEMOSPRITE's turn start the wearer and the memosprite each gain one stack of 【缅怀】 (max 4), and the
  * wearer's stacks are removed when the memosprite disappears -- which, on a path where anyone is left to clean, means the
  * memosprite itself was killed.
  *
- * <p>\u2b50 Every word is existing vocabulary. \u300c\u5fc6\u7075\u7684\u56de\u5408」 is {@code TURN_START} + {@code actor == summon} (the selector the
- * engine's own SUMMON_ATTACK note names), \u300c\u5206\u522b\u83b7\u5f97\u300d is two stack effects (target self / target summon), and
- * \u300c\u5fc6\u7075\u6d88\u5931\u65f6\u79fb\u9664\u300d is {@code KILL} with the memosprite as the victim. The path where the MASTER falls was measured
+ * <p>⭐ Every word is existing vocabulary. 「忆灵的回合」 is {@code TURN_START} + {@code actor == summon} (the selector the
+ * engine's own SUMMON_ATTACK note names), 「分别获得」 is two stack effects (target self / target summon), and
+ * 「忆灵消失时移除」 is {@code KILL} with the memosprite as the victim. The path where the MASTER falls was measured
  * and withdrawn: both holders are gone by then, so there is nothing to clean.
  */
 public class Cone20022Test {
@@ -34,7 +34,7 @@ public class Cone20022Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String MEMORIAL = "\u7f05\u6000";
+    private static final String MEMORIAL = "缅怀";
 
     private Character wearer;
     private Enemy enemy;
@@ -58,7 +58,7 @@ public class Cone20022Test {
         int onWearer = wearer.getBuffManager().stacksOf(MEMORIAL);
         int onSprite = sprite.getBuffManager().stacksOf(MEMORIAL);
         System.out.println("[20022] after one memosprite turn: wearer=" + onWearer + " sprite=" + onSprite);
-        Assertions.assertEquals(1, onWearer, "\u5206\u522b\u83b7\u5f97 1 \u5c42: the wearer");
+        Assertions.assertEquals(1, onWearer, "分别获得 1 层: the wearer");
         Assertions.assertEquals(1, onSprite, "and the memosprite");
     }
 
@@ -68,7 +68,7 @@ public class Cone20022Test {
         battle.summonMemosprite(wearer);
         battle.fireTriggers(TriggerEvent.TURN_START, wearer, null, 0, 0);
         System.out.println("[20022] after the WEARER's turn start: " + wearer.getBuffManager().stacksOf(MEMORIAL));
-        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(MEMORIAL), "\u5fc6\u7075\u7684\u56de\u5408 (false case)");
+        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(MEMORIAL), "忆灵的回合 (false case)");
     }
 
     @Test
@@ -83,7 +83,7 @@ public class Cone20022Test {
                 + " ; sprite dead=" + sprite.isDeath());
         Assertions.assertEquals(1, before, "one stack first");
         Assertions.assertTrue(sprite.isDeath(), "the memosprite really died");
-        Assertions.assertEquals(0, after, "\u5fc6\u7075\u6d88\u5931\u65f6\u79fb\u9664");
+        Assertions.assertEquals(0, after, "忆灵消失时移除");
     }
 
     @Test
@@ -103,7 +103,7 @@ public class Cone20022Test {
                         + " amount=" + effect.getAmount() + " max=" + effect.getMaxStacks()
                         + " target=" + effect.getTarget());
                 Assertions.assertEquals("ADD_STACK", effect.getOp(), "the turn start gains");
-                Assertions.assertEquals(4, effect.getMaxStacks(), "\u6700\u591a\u53e0\u52a0 4 \u5c42");
+                Assertions.assertEquals(4, effect.getMaxStacks(), "最多叠加 4 层");
                 if ("summon".equals(effect.getTarget())) {
                     targets++;
                 }

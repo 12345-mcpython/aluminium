@@ -26,12 +26,12 @@ import java.util.Random;
  */
 public class SiblingElationTest {
     private static final int ALLY = 1002;
-    /** \u2b50 The ally whose kit really carries an Elation skill (data slot 20) -- the auto-cast's true side. */
+    /** ⭐ The ally whose kit really carries an Elation skill (data slot 20) -- the auto-cast's true side. */
     private static final int ELATION_ALLY = 1501;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The content's 0.5 against a reference 1.0, and the control, for BOTH ids. */
+    /** ⚠ The content's 0.5 against a reference 1.0, and the control, for BOTH ids. */
     @Test
     public void theUltimateRaisesTheChosenAllysCritDamage() {
         for (int cid : new int[]{8009, 8010}) {
@@ -44,7 +44,7 @@ public class SiblingElationTest {
         }
     }
 
-    /** \u26a0 「施放攻击后，固定恢复10点能量」 -- and the document's number, not just "some energy". */
+    /** ⚠ 「施放攻击后，固定恢复10点能量」 -- and the document's number, not just "some energy". */
     @Test
     public void theTalentGivesTenEnergyPerAttack() {
         for (int cid : new int[]{8009, 8010}) {
@@ -57,7 +57,7 @@ public class SiblingElationTest {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, tb, enemy, 0, 0);
 
             Assertions.assertEquals(10.0, tb.getCurrentEnergy() - before, 1e-6,
-                    "cid " + cid + ": \u300c\u65bd\u653e\u653b\u51fb\u540e\uff0c\u56fa\u5b9a\u6062\u590d10\u70b9\u80fd\u91cf\u300d");
+                    "cid " + cid + ": 「施放攻击后，固定恢复10点能量」");
         }
     }
 

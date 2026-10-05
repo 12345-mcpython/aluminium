@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20024: \u300c\u5f53\u62e5\u6709\u7684\u7b11\u70b9 \u2265 10 \u65f6\uff0c\u88c5\u5907\u8005\u7684\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 20%\u300d.
+ * Light cone 20024: 「当拥有的笑点 ≥ 10 时，装备者的暴击伤害提高 20%」.
  *
- * <p>\u2b50 Three things had to exist together, which is why this took two rounds: the resource must be DECLARED (a cone file
+ * <p>⭐ Three things had to exist together, which is why this took two rounds: the resource must be DECLARED (a cone file
  * may now carry a top-level {@code "resources"} array, and {@code TriggerTable.plus} already carried declarations across a
  * merge), the panel must be re-stated on change ({@code RESOURCE_CHANGED}), and the layer it reads must be re-written with
  * it (a cleared counter does not recompute a written modifier).
@@ -32,7 +32,7 @@ public class Cone20024Test {
     private static final int MONSTER = 1002011;
     private static final int THRESHOLD = 10;
     private static final double BONUS = 0.2;
-    private static final String LAUGHTER = "\u7b11\u70b9";
+    private static final String LAUGHTER = "笑点";
 
     private Character wearer;
     private Enemy enemy;
@@ -75,7 +75,7 @@ public class Cone20024Test {
     }
 
     /**
-     * \u2605 One direction at a time: {@code matching} EVALUATES conditions, so with the resource at 10 only the "met" rule can
+     * ★ One direction at a time: {@code matching} EVALUATES conditions, so with the resource at 10 only the "met" rule can
      * match and with it at 0 only the "lost" one -- the two cannot both be seen from one context. Each half is filtered by
      * rule id as well, because a table also holds the character's own rules.
      */
@@ -100,7 +100,7 @@ public class Cone20024Test {
             for (var effect : rule.effects()) {
                 if ("MODIFY_ATTR".equals(effect.getOp())) {
                     Assertions.assertEquals(BONUS, effect.getPercent(), 1e-9, "20% at rank 1");
-                    Assertions.assertEquals(LAUGHTER + "\u8fbe\u6807", effect.getPerStack(), "read from the panel's layer");
+                    Assertions.assertEquals(LAUGHTER + "达标", effect.getPerStack(), "read from the panel's layer");
                 }
                 if ("ADD_STACK".equals(effect.getOp())) {
                     Assertions.assertEquals(1, effect.getMaxStacks(), "the panel's layer is capped at one");
@@ -133,15 +133,15 @@ public class Cone20024Test {
                 "no cone, no panel (false case)");
     }
 
-    /** \u2605 The WIRING test: the resource moves through a real GAIN_RESOURCE, which is what must fire the event. */
+    /** ★ The WIRING test: the resource moves through a real GAIN_RESOURCE, which is what must fire the event. */
     @Test
     public void aRealOpFiresTheEvent() {
         Character unit = CharacterFactory.create(ALLY, LEVEL);
-        // \u26a0 Declared HERE because 1002's own file declares nothing: an undeclared resource absorbs a gain silently
+        // ⚠ Declared HERE because 1002's own file declares nothing: an undeclared resource absorbs a gain silently
         // (round 23's finding), which is exactly why a cone's file needed a way to declare one.
         unit.getResources().register(LAUGHTER, 999, 0);
         EffectSpec gain = TriggerSpecs.gainResource(LAUGHTER, THRESHOLD);
-        // \u26a0 `GAIN_RESOURCE` credits `resolveTarget(effect, ctx)` -- a hand-built rule must say who (measured round 23:
+        // ⚠ `GAIN_RESOURCE` credits `resolveTarget(effect, ctx)` -- a hand-built rule must say who (measured round 23:
         // without a target the resource never moved, while the event did fire).
         TriggerSpecs.set(gain, "target", "self");
         var pour = TriggerSpecs.rule("TURN_START", null, gain);

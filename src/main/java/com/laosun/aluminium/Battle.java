@@ -114,10 +114,10 @@ public class Battle {
     public List<CanHit> enemies;
 
     /**
-     * \u2705 One living unit from the other side, chosen with the battle\u2019s own seeded randomness (2026-09-30; reader:
-     * 1505 \u7eef\u82f1\u2019s ultimate, \u300c\u5bf9\u968f\u673a\u9020\u6210\u4f24\u5bb9\u7684\u654c\u65b9\u76ee\u6807\u9020\u6210 14%\u2026\u300d).
+     * ✅ One living unit from the other side, chosen with the battle’s own seeded randomness (2026-09-30; reader:
+     * 1505 绯英’s ultimate, 「对随机造成伤容的敌方目标造成 14%…」).
      *
-     * <p>\u2605 The roll lives here rather than in the interpreter for the same reason crit does: one seeded source means a judge
+     * <p>★ The roll lives here rather than in the interpreter for the same reason crit does: one seeded source means a judge
      * can pin determinism (same seed -> same pick) and still show the choice varies across seeds.
      *
      * @return the chosen unit, or {@code null} when the other side is already empty
@@ -332,7 +332,7 @@ public class Battle {
      */
     public void endCastOutcome() {
         castApplied.clear();
-        // \u2605 \u300c\u65bd\u653e\u2026\u65f6\u300d ends here: every event of this cast has been delivered, so a modifier stating
+        // ★ 「施放…时」 ends here: every event of this cast has been delivered, so a modifier stating
         // `"until": "cast_end"` has covered every heal the cast performed and nothing after it. Swept on both sides,
         // because either camp may carry one.
         for (CanHit unit : allies) {
@@ -434,7 +434,7 @@ public class Battle {
         if (gained > 0) {
             fireTriggers(TriggerEvent.SKILL_POINT_GAINED, null, null, 0, gained);
         }
-        // \u2605 What the pool refused (2026-09-30): `asked - credited`. Both numbers are right here, which is why this is computed
+        // ★ What the pool refused (2026-09-30): `asked - credited`. Both numbers are right here, which is why this is computed
         // at the call site rather than inside the policy -- the policy reports what it credited, not what it was asked for.
         int overflowed = n - gained;
         if (overflowed > 0) {
@@ -480,7 +480,7 @@ public class Battle {
      */
     @Getter
     private final Random rng;
-    /** \u2705 The resource a RESOURCE_CHANGED event is about (2026-09-30; reader: 1506\u2019s forwarding clause). */
+    /** ✅ The resource a RESOURCE_CHANGED event is about (2026-09-30; reader: 1506’s forwarding clause). */
     private String lastChangedResource;
     /**
      * [WAVE SEQUENCE] how many waves have begun (2026-10-02). A sequence, not a flag: a per-wave cap is a comparison against the
@@ -542,7 +542,7 @@ public class Battle {
     private com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass;
 
     /**
-     * \u2705 The per-battle home of PARTY-scoped resources (2026-09-30; reader: the shared \u7b11\u70b9 counter). A resource like
+     * ✅ The per-battle home of PARTY-scoped resources (2026-09-30; reader: the shared 笑点 counter). A resource like
      * that belongs to the party, not to whoever happened to declare it -- `ResourceManager` refuses to keep such a thing
      * per character, and this is the owner it asks for. Registered once at the start of the battle from the declarations.
      */
@@ -671,7 +671,7 @@ public class Battle {
      * ⭐ The state that means "终结技已激活" (2026-10-02): a clause grants it and {@link #isUltraReady} honours it, which is the engine's one spelling of "激活终结技".
      * Not from the data -- the documents name the effect, not a state -- so it is named here once, like every other engine-side marker.
      */
-    public static final String ULTIMATE_ACTIVATED_STATE = "\u7ec8\u7ed3\u6280\u5df2\u6fc0\u6d3b";
+    public static final String ULTIMATE_ACTIVATED_STATE = "终结技已激活";
 
     /**
      * Whether this unit can cast its ultimate right now (P3-4 follow-up): **reaching the "ult threshold" is
@@ -759,7 +759,7 @@ public class Battle {
         return true;
     }
 
-    /** \u2705 Collects the PARTY-scoped declarations of our side into this battle\u2019s own store (2026-09-30). */
+    /** ✅ Collects the PARTY-scoped declarations of our side into this battle’s own store (2026-09-30). */
     /**
      * The energy the ultimate now settling consumed, for {@code ULT_CAST}’s amount.
      *
@@ -793,12 +793,12 @@ public class Battle {
     }
 
     /**
-     * \u2705 The party\u2019s own counter, or {@code null} when this battle has none by that name (2026-09-30).
+     * ✅ The party’s own counter, or {@code null} when this battle has none by that name (2026-09-30).
      *
-     * <p>\u2605 Asked by both sides of the DSL: a `self_resource:NAME` read and a `GAIN_RESOURCE`/`SPEND_RESOURCE` write. They try the
+     * <p>★ Asked by both sides of the DSL: a `self_resource:NAME` read and a `GAIN_RESOURCE`/`SPEND_RESOURCE` write. They try the
      * unit first, exactly as before, and fall back here -- so nothing changes for a resource a character owns itself.
      */
-    /** \u2705 The party counter\u2019s current value, or 0 when this battle has no such counter (2026-09-30). */
+    /** ✅ The party counter’s current value, or 0 when this battle has no such counter (2026-09-30). */
     public int partyResourceValue(String id) {
         com.laosun.aluminium.models.Resource resource = partyResources.get(id);
         return resource == null ? 0 : resource.value();
@@ -808,7 +808,7 @@ public class Battle {
         return partyResources.get(id);
     }
 
-    /** \u2705 Notes which resource a change is about, then fires (2026-09-30). */
+    /** ✅ Notes which resource a change is about, then fires (2026-09-30). */
     /** Records the class of the debuff that just landed (see {@link #lastAppliedDebuffClass()}). */
     public void noteAppliedDebuffClass(com.laosun.aluminium.enums.DebuffClass debuffClass) {
         lastAppliedDebuffClass = debuffClass;
@@ -823,7 +823,7 @@ public class Battle {
         lastChangedResource = resource;
     }
 
-    /** \u2705 The resource the change being evaluated is about, or null. */
+    /** ✅ The resource the change being evaluated is about, or null. */
     public String lastChangedResource() {
         return lastChangedResource;
     }
@@ -842,7 +842,7 @@ public class Battle {
                 registerWarehouseListener(member, warehouse);
             }
         }
-        registerPartyResources();   // \u2705 before any hook, so a BATTLE_START rule can already gain a shared counter
+        registerPartyResources();   // ✅ before any hook, so a BATTLE_START rule can already gain a shared counter
         attachBattleSkills();
         applyTechniqueStates();   // ? before every BATTLE_START rule, so `self has_state 秘技` already answers
         for (Signal signal : queue.snapshot()) {
@@ -1046,7 +1046,7 @@ public class Battle {
         // limit belongs to the rule's owner -- a rule of mine that fires on somebody else's attack still
         // comes back on MY turn (TriggerLimitTest.otherPeoplesTurnsDoNotCountTheCooldownDown).
         actor.tickTriggerCooldowns();
-        // \u2b50 \u300c\u4e00\u6b21\u884c\u52a8\u4e2d\u300d begins here: the action boundary already existed (this event brackets
+        // ⭐ 「一次行动中」 begins here: the action boundary already existed (this event brackets
         // `performAction` and its settlement), so the lethal set is cleared at it.
         lethallyHitThisAction.clear();
         fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
@@ -1438,11 +1438,11 @@ public class Battle {
         }
         double settled = assemble(damage);                       // damage after the zones (this is "how much was dealt")
         double hpBefore = target.getCurrentHp();
-        // \u2b50\u2b50 \u81f4\u547d\u4e00\u51fb\uff082026-10-02\uff09: \u300c\u53d7\u5230**\u81f4\u547d\u653b\u51fb**\u65f6\u4e0d\u4f1a\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\uff0c\u800c\u662f**\u56de\u590d**\u7b49\u540c\u4e8e\u81ea\u8eab\u751f\u547d\u4e0a\u9650 20%\uff0f50% \u7684\u751f\u547d\u503c\u300d.
-        // \u26a0 THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
+        // ⭐⭐ 致命一击（2026-10-02）: 「受到**致命攻击**时不会陷入无法战斗状态，而是**回复**等同于自身生命上限 20%／50% 的生命值」.
+        // ⚠ THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
         // target at full HP, where a heal is a no-op and nothing can ever answer. So the target is dropped to 0 HP first WITHOUT
         // being marked dead, the tables are asked, and `perish()` is called only if nobody answered -- which is precisely
-        // \u300c\u4e0d\u4f1a\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d.
+        // 「不会陷入无法战斗状态」.
         boolean lethal = settled >= hpBefore;
         boolean died;
         if (lethal) {
@@ -2457,10 +2457,10 @@ public class Battle {
     }
 
     /**
-     * \u2705 The same, plus how many of the hit targets carry the attack's own element weakness (2026-09-30; reader: cone
-     * 21040's \u300c\u82e5\u6709\u4e0d\u5c11\u4e8e 2 \u4e2a\u88ab\u653b\u51fb\u7684\u654c\u65b9\u76ee\u6807\u5177\u6709\u5bf9\u5e94\u5c5e\u6027\u5f31\u70b9\u300d).
+     * ✅ The same, plus how many of the hit targets carry the attack's own element weakness (2026-09-30; reader: cone
+     * 21040's 「若有不少于 2 个被攻击的敌方目标具有对应属性弱点」).
      *
-     * <p>\u2605 A count over a predicate cannot be assembled from the parts: a multi-target attack fires the damage event once
+     * <p>★ A count over a predicate cannot be assembled from the parts: a multi-target attack fires the damage event once
      * per target, so "how many of them were weak" only exists where the whole set is in hand -- the caster's side.
      */
     public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
@@ -2812,8 +2812,8 @@ public class Battle {
     }
 
     /**
-     * \u2705 The same, with the instance\u2019s DAMAGE TYPE stated (2026-09-30; reader: 1505 \u7eef\u82f1\u2019s three \u6b22\u6109 riders, whose
-     * text says \u300c\u9020\u6210\u2026\u7269\u7406\u5c5e\u6027<b>\u6b22\u6109\u4f24\u5bb9</b>\u300d). A rule-driven rider could only ever be {@code ADDITIONAL} before,
+     * ✅ The same, with the instance’s DAMAGE TYPE stated (2026-09-30; reader: 1505 绯英’s three 欢愉 riders, whose
+     * text says 「造成…物理属性<b>欢愉伤容</b>」). A rule-driven rider could only ever be {@code ADDITIONAL} before,
      * so the one thing its sentence names -- the damage type -- had no spelling. {@code null} keeps the old meaning, which is why
      * the six-argument overload above still answers exactly as it did.
      */
@@ -3001,12 +3001,12 @@ public class Battle {
             boolean isCrit = critRate > 0 && rng.nextDouble() < critRate;
             damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get() + damage.getExtraCritDamage());
         }
-        // \u2605 "this instance crit" -- the only moment the answer exists. \u26a0 The SUBJECT is the ATTACKER: a crit is an event
+        // ★ "this instance crit" -- the only moment the answer exists. ⚠ The SUBJECT is the ATTACKER: a crit is an event
         // about the one who dealt it. Passing the victim here looks natural and silently does nothing, because
         // `fireTriggersForAlly` refuses any subject that is not ours (round 266 measured exactly that).
         if (damage.critArea().isCrit()) {
-            // \u2605 subject = the VICTIM, actor = the critter. The victim has to be nameable, because a clause like
-            // "\u89e3\u9664\u88ab\u653b\u51fb\u654c\u65b9\u76ee\u6807\u7684 1 \u4e2a\u589e\u76ca" acts on it. `fireTriggersWithSubject` (unlike its ally-only sibling)
+            // ★ subject = the VICTIM, actor = the critter. The victim has to be nameable, because a clause like
+            // "解除被攻击敌方目标的 1 个增益" acts on it. `fireTriggersWithSubject` (unlike its ally-only sibling)
             // does not refuse a subject from the other camp -- and enemy crits still reach nobody, because every such
             // rule says `actor == self` and the actor here is whoever dealt it.
             fireTriggersWithSubject(TriggerEvent.CRIT_DEALT, attacker, defender, 0);
@@ -3028,9 +3028,9 @@ public class Battle {
         // penetration. Done here rather than inside `ResistArea` so that class's clamp (which exists for
         // penetration) cannot swallow a reduction: negative resistance is meant to be fully effective.
         rawResist -= defender.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
-        // \u2705 The victim's own counterpart (2026-09-30; reader: cone 21002's \u300c\u5168\u5c5e\u6027\u6297\u6027\u63d0\u9ad8\u300d):
+        // ✅ The victim's own counterpart (2026-09-30; reader: cone 21002's 「全属性抗性提高」):
         // stated on the one being hit, so it is subtracted here beside the reducer rather than on the attacker.
-        // \u26a0 Measured sign (2026-09-30, cone 21002): a POSITIVE resistance has to be ADDED here. Writing it as a
+        // ⚠ Measured sign (2026-09-30, cone 21002): a POSITIVE resistance has to be ADDED here. Writing it as a
         // subtraction -- the way the reducer beside it reads -- turned "+8% resistance" into +8% DAMAGE taken
         // (`711.28 -> 768.18 (x1.08)`), because the zone multiplies by (1 - rawResist).
         rawResist += defender.getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get();
@@ -3049,19 +3049,19 @@ public class Battle {
     /**
      * The allies a lethal blow has landed on during the CURRENT action (2026-10-02).
      *
-     * <p>\u2b50 Reader: 1407 \u6708\u8309\u4e4b\u5e87, \u300c\u5728**\u4e00\u6b21\u884c\u52a8**\u4e2d\u53d7\u5230\u81f4\u547d\u653b\u51fb\u7684**\u5168\u4f53**\u300d. The set is what makes that ONE clause rather
+     * <p>⭐ Reader: 1407 月茉之庇, 「在**一次行动**中受到致命攻击的**全体**」. The set is what makes that ONE clause rather
      * than one save per blow: the same action can land a lethal blow on several allies, and the effect reaches all of them.
      *
-     * <p>\u26a0 Cleared when an action starts ({@code TURN_START}, which brackets {@code performAction} and its settlement), so
+     * <p>⚠ Cleared when an action starts ({@code TURN_START}, which brackets {@code performAction} and its settlement), so
      * "this action" is the action boundary the engine already had -- not a new one.
      */
     /**
      * The enemies that ENTERED with the current wave (2026-10-02).
      *
-     * <p>\u2b50 The word is the game own, and it is an EVENT rather than a target type:
+     * <p>⭐ The word is the game own, and it is an EVENT rather than a target type:
      * `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens for `"Event": "OnWaveMonster"` and answers with a
      * `TurnInsertAction` -- a wave monster has entered. Reader: 1415's memosprite skill 8,
-     * \u300c\u82e5\u65bd\u653e\u524d\u76ee\u6807\u88ab\u6d88\u706d\u5219\u5bf9**\u65b0\u5165\u573a**\u7684\u654c\u65b9\u76ee\u6807\u65bd\u653e\u300d.
+     * 「若施放前目标被消灭则对**新入场**的敌方目标施放」.
      */
     private final List<CanHit> waveMonsters = new ArrayList<>();
 
@@ -3439,7 +3439,7 @@ public class Battle {
             if (unit == null || unit.isDeath()) {
                 continue;
             }
-            unit.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("\u79d8\u6280", 1, true));
+            unit.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("秘技", 1, true));
         }
     }
 

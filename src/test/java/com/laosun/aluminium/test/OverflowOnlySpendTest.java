@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * `SPEND_RESOURCE{overflow_only: true}` spends only the tier above the cap (2026-10-02; reader: 1141517 「召唤死龙时会消耗所有溢出【新蕊】」).
  *
- * \u2b50 The judge tests the CAPABILITY, on a spare character whose hand-built table cannot disturb any loaded content, and with a resource it declares itself.
+ * ⭐ The judge tests the CAPABILITY, on a spare character whose hand-built table cannot disturb any loaded content, and with a resource it declares itself.
  */
 public class OverflowOnlySpendTest {
     private static final int LEVEL = 80;
@@ -24,7 +24,7 @@ public class OverflowOnlySpendTest {
     private static final int MONSTER = 1002011;
     private static final int MAX = 10;
     private static final int OVERFLOW = 4;
-    private static final String MARK = "\u63a2\u9488\u6570";
+    private static final String MARK = "探针数";
 
     private static TriggerTable table() {
         EffectSpec spend = new EffectSpec();

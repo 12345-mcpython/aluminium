@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1502 \u723b\u5149\u2019s ultimate on both counts (2026-09-30): \u300c\u83b7\u5f97 5 \u4e2a\u7b11\u70b9\u2026\u5e76\u4f7f\u6211\u65b9\u5168\u4f53\u76ee\u6807\u5168\u5c5e\u6027\u6297\u6027\u7a7f\u900f\u63d0\u9ad8 10%\uff0c\u6301\u7eed 3 \u56de\u5408\u300d.
+ * 1502 爻光’s ultimate on both counts (2026-09-30): 「获得 5 个笑点…并使我方全体目标全属性抗性穿透提高 10%，持续 3 回合」.
  *
- * <p>\u2b50 The laughs are a PARTY counter (the capability shipped in the previous round), so the judge reads them from the BATTLE and
+ * <p>⭐ The laughs are a PARTY counter (the capability shipped in the previous round), so the judge reads them from the BATTLE and
  * checks that the caster does not carry a private copy -- the same discriminator that made the party store necessary.
  */
 public class Character1502Test {
@@ -23,7 +23,7 @@ public class Character1502Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String LAUGH = "\u7b11\u70b9";
+    private static final String LAUGH = "笑点";
 
     private Character yaoguang;
     private Character ally;
@@ -47,7 +47,7 @@ public class Character1502Test {
         System.out.println("[1502] resistance penetration: herself " + selfBefore + " -> " + selfAfter
                 + " ; the ally " + allyBefore + " -> " + allyAfter);
         Assertions.assertEquals(selfBefore + 0.1, selfAfter, 1e-9, "the caster gains 10%");
-        Assertions.assertEquals(allyBefore + 0.1, allyAfter, 1e-9, "and so does every ally (\u6211\u65b9\u5168\u4f53\u76ee\u6807)");
+        Assertions.assertEquals(allyBefore + 0.1, allyAfter, 1e-9, "and so does every ally (我方全体目标)");
     }
 
     @Test
@@ -56,7 +56,7 @@ public class Character1502Test {
         int before = battle.partyResourceValue(LAUGH);
         battle.castImmediate(yaoguang.getSkills().get(SkillType.ULTRA), yaoguang, List.of());
         int after = battle.partyResourceValue(LAUGH);
-        System.out.println("[1502] \u7b11\u70b9 on the battle: " + before + " -> " + after
+        System.out.println("[1502] 笑点 on the battle: " + before + " -> " + after
                 + " ; the caster holds it herself? " + yaoguang.getResources().has(LAUGH)
                 + " ; the ally? " + ally.getResources().has(LAUGH));
         Assertions.assertEquals(0, before, "the battle starts with none");
@@ -64,7 +64,7 @@ public class Character1502Test {
         Assertions.assertFalse(yaoguang.getResources().has(LAUGH), "which no single unit owns");
     }
 
-    /** \u2605 The shipped rule, read off the compiled table (discipline 232). */
+    /** ★ The shipped rule, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleCarriesTheNumbersAndDuration() {
         build();

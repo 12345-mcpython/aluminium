@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u7ec8\u7ed3\u6280\u4e0e\u79d8\u6280\u7684 +30% \u51fb\u7834\u7279\u653b\u90fd\u8981\u7b97 (8005) (2026-10-02).
+ * 终结技与秘技的 +30% 击破特攻都要算 (8005) (2026-10-02).
  *
  * <p>⭐ FILE-DRIVEN, four readings, and SUPERPOSITION is the claim: with both sources present the two differences must add.
  * ⚠ `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point.

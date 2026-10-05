@@ -15,7 +15,7 @@ ANCHOR = ("            if (buff.duration() <= 0) {\n"
           "                // `remove` by identity: AbstractBuff does not override equals, and a buff that already\n"
           "                // removed itself during the tick simply is not there any more.\n")
 NEW = ("            if (buff.duration() <= 0) {\n"
-       "                // \u2b50 Announce BEFORE the removal (2026-10-02): the event carries the state's name, because a\n"
+       "                // ⭐ Announce BEFORE the removal (2026-10-02): the event carries the state's name, because a\n"
        "                // reader that looked for the state on this unit would already see it gone. `battle` is null for a\n"
        "                // unit built outside a battle, and then there is nobody to tell.\n"
        "                if (battle != null && buff instanceof StateBuff ended) {\n"

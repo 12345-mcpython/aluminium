@@ -13,7 +13,7 @@ Measured before patching:
     read later; the count forms (`target_debuff_count` and friends) are per-hit numbers and stay registered, so the loader
     REFUSES `per_stack_live` with them rather than silently snapshotting.
 
-\u26a0 Fail-safe: the script refuses to run at all if `StatModifierBuff` carries Lombok's `@AllArgsConstructor`, because a new
+⚠ Fail-safe: the script refuses to run at all if `StatModifierBuff` carries Lombok's `@AllArgsConstructor`, because a new
 field would silently change that generated signature (the trap item 62 hit in `DoubleValue.Modifier`).
 """
 import io
@@ -45,9 +45,9 @@ patch(
     "    private final int maxStacks;",
     "    private final int maxStacks;\n"
     "    /**\n"
-    "     * \u2b50 When set, this modifier asks for its share on every read instead of holding the number it was built with\n"
-    "     * (2026-10-02; reader: the fourteen \u300c\u6bcf\u62e5\u6709 1 \u5c42\u2026\u63d0\u9ad8 X%\u300d auras). Only add-percent modifiers may be live -- a\n"
-    "     * pure or multiply share has no spelling for \u300c\u968f\u5c42\u6570\u53d8\u5316\u300d yet, and this refuses rather than guessing.\n"
+    "     * ⭐ When set, this modifier asks for its share on every read instead of holding the number it was built with\n"
+    "     * (2026-10-02; reader: the fourteen 「每拥有 1 层…提高 X%」 auras). Only add-percent modifiers may be live -- a\n"
+    "     * pure or multiply share has no spelling for 「随层数变化」 yet, and this refuses rather than guessing.\n"
     "     */\n"
     "    private java.util.function.DoubleSupplier liveShare;",
     "StatModifierBuff.liveShare: the optional supplier",
@@ -94,9 +94,9 @@ patch(
     '    @SerializedName("stackable")\n    private Boolean stackable;',
     '    @SerializedName("stackable")\n    private Boolean stackable;\n\n'
     '    /**\n'
-    '     * \u2b50 `per_stack` resolved at READ time instead of when the modifier is attached (2026-10-02).\n'
+    '     * ⭐ `per_stack` resolved at READ time instead of when the modifier is attached (2026-10-02).\n'
     '     *\n'
-    '     * <p>\u300c\u827e\u4e1d\u59b2\u6bcf\u62e5\u6709 1 \u5c42\u84c4\u80fd\uff0c\u4f1a\u4f7f\u6211\u65b9\u5168\u4f53\u653b\u51fb\u529b\u63d0\u9ad8 14.00%\uff0c\u6700\u591a 5 \u5c42\u300d: a sustained aura whose number has to follow the count.\n'
+    '     * <p>「艾丝妲每拥有 1 层蓄能，会使我方全体攻击力提高 14.00%，最多 5 层」: a sustained aura whose number has to follow the count.\n'
     '     * A snapshot is right only at the instant it is taken, and re-attaching on every change would stack the buff\n'
     '     * itself. Only the ctx-free forms of `per_stack` may be live, and the loader refuses the others rather than\n'
     '     * silently keeping a snapshot.\n'
@@ -132,7 +132,7 @@ patch(
                 buff.setBuffName(effect.getBuff().trim());""",
     """            if (livePerStack && buff instanceof
                     com.laosun.aluminium.models.buff.StatModifierBuff liveBuff) {
-                // \u2b50 The share is asked for on every read, so the aura follows the count (2026-10-02).
+                // ⭐ The share is asked for on every read, so the aura follows the count (2026-10-02).
                 String counter = counterName(effect);
                 liveBuff.makeLive(() -> magnitude * target.getBuffManager().stacksOf(counter));
             }

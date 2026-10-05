@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23036: the wearer AND its memosprite weave a stack of \u3010\u7ec7\u9526\u3011 with every attack, each layer lifts crit damage, and
+ * Light cone 23036: the wearer AND its memosprite weave a stack of 【织锦】 with every attack, each layer lifts crit damage, and
  * once the stack is full every layer also lifts basic-attack damage.
  *
- * <p>\u2b50 Three readings: the stack from a wearer attack, the stack from a MEMOSPRITE attack, and the crit number at one layer versus
+ * <p>⭐ Three readings: the stack from a wearer attack, the stack from a MEMOSPRITE attack, and the crit number at one layer versus
  * at the cap -- anchored to the crit base the engine reports, so a change in the share cannot hide.
  */
 public class Cone23036Test {
@@ -32,7 +32,7 @@ public class Cone23036Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String BROCADE = "\u7ec7\u9526";
+    private static final String BROCADE = "织锦";
     private static final int CAP = 6;
 
     private Character wearer;
@@ -56,7 +56,7 @@ public class Cone23036Test {
     }
 
     private double critHit() {
-        // \u2605 A NORMAL cast category, because clause \u2463 is scoped by rom_category Normal: measured, the engine refuses an
+        // ★ A NORMAL cast category, because clause ④ is scoped by rom_category Normal: measured, the engine refuses an
         // instance slot for BASIC_ATTACK_DAMAGE_BOOST, so the content limits the BOOST to a basic-attack instance instead.
         return battle.applyDamage(enemy, new Damage(wearer, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000,
                 com.laosun.aluminium.enums.SkillCategory.NORMAL));
@@ -73,7 +73,7 @@ public class Cone23036Test {
         System.out.println("[23036] brocade after the wearer's attack=" + afterWearer
                 + " after the memosprite's attack=" + afterSprite);
         Assertions.assertEquals(1, afterWearer, "the wearer's own attack weaves one");
-        Assertions.assertEquals(2, afterSprite, "and so does the memosprite\u2019s (\u88c5\u5907\u8005\u548c\u5fc6\u7075)");
+        Assertions.assertEquals(2, afterSprite, "and so does the memosprite’s (装备者和忆灵)");
     }
 
     @Test
@@ -84,7 +84,7 @@ public class Cone23036Test {
         }
         int stacks = wearer.getBuffManager().stacksOf(BROCADE);
         System.out.println("[23036] brocade after nine attacks=" + stacks);
-        Assertions.assertEquals(CAP, stacks, "\u6700\u591a\u53e0\u52a0 6 \u5c42");
+        Assertions.assertEquals(CAP, stacks, "最多叠加 6 层");
     }
 
     @Test
@@ -99,9 +99,9 @@ public class Cone23036Test {
         double atCap = critHit();
         double base = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         double perLayer = (atOne - untamed) / untamed * (1 + base);
-        // \u2605 The cap, as the arithmetic both clauses imply: clause \u2462 adds to the crit MULTIPLIER, clause \u2463 multiplies the
+        // ★ The cap, as the arithmetic both clauses imply: clause ③ adds to the crit MULTIPLIER, clause ④ multiplies the
         // damage zone (it is scoped to basic attacks, and this hit is one), so the cap is
-        //   raw \u00d7 (1 + base + 0.54) \u00d7 (1 + 0.54),  where raw = untamed / (1 + base).
+        //   raw × (1 + base + 0.54) × (1 + 0.54),  where raw = untamed / (1 + base).
         double theCap = untamed / (1 + base) * (1 + base + 0.09 * CAP) * (1 + 0.09 * CAP);
         System.out.println("[23036] crit untamed=" + untamed + " one layer=" + atOne + " at cap=" + atCap
                 + " ; per layer=" + perLayer + " ; the cap by arithmetic=" + theCap);

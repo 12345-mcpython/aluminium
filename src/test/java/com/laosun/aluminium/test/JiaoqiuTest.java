@@ -23,7 +23,7 @@ public class JiaoqiuTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 Seven applications, five layers (the document's cap), and the Burn state alongside it. */
+    /** ⚠ Seven applications, five layers (the document's cap), and the Burn state alongside it. */
     @Test
     public void theStacksStopAtFiveAndTheBurnIsReal() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);
@@ -35,14 +35,14 @@ public class JiaoqiuTest {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, jiaoqiu, enemy, 0, 0);
         }
 
-        Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("\u70ec\u7168") : enemy.getBuffManager().stacksOf("\u70ec\u7168"),
-                "\u300c\u3010\u70ec\u7168\u3011\u6700\u591a\u53e0\u52a05\u5c42\u300d -- seven applications must still read five");
+        Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("烬煨") : enemy.getBuffManager().stacksOf("烬煨"),
+                "「【烬煨】最多叠加5层」 -- seven applications must still read five");
         Assertions.assertTrue(enemy.getBuffManager().hasState("灼烧"),
-                "\u300c\u4e5f\u4f1a\u88ab\u89c6\u4e3a\u540c\u65f6\u9677\u5165\u4e86\u707c\u70e7\u72b6\u6001\u300d -- a Fire DotBuff IS \u707c\u70e7 by the engine's own translation");
+                "「也会被视为同时陷入了灼烧状态」 -- a Fire DotBuff IS 灼烧 by the engine's own translation");
         // and this rule applies a Fire DoT. Registered as an open question rather than asserted falsely or deleted silently.
     }
 
-    /** \u26a0 The technique's opening: the AoE and a stack, only when the technique was declared. */
+    /** ⚠ The technique's opening: the AoE and a stack, only when the technique was declared. */
     @Test
     public void theTechniqueHitsAndStacksOnlyWhenDeclared() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);
@@ -54,15 +54,15 @@ public class JiaoqiuTest {
         battle.startBattle();
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
-                "\u300c\u5bf9\u654c\u65b9\u5168\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u6912\u4e18100%\u653b\u51fb\u529b\u7684\u706b\u5c5e\u6027\u4f24\u5bb3\u300d");
-        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("\u70ec\u7168"), "\u5e76\u65bd\u52a01\u5c42\u3010\u70ec\u7168\u3011");
+                "「对敌方全体造成等同于椒丘100%攻击力的火属性伤害」");
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("烬煨"), "并施加1层【烬煨】");
 
         Character plain = CharacterFactory.create(JIAOQIU, LEVEL);
         Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
         Battle plainBattle = new Battle(List.of(plain), List.of(enemy2), fixed());
         double untouched = enemy2.getCurrentHp();
         plainBattle.startBattle();
-        Assertions.assertEquals(untouched, enemy2.getCurrentHp(), 1e-9, "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so nothing");
+        Assertions.assertEquals(untouched, enemy2.getCurrentHp(), 1e-9, "「使用秘技后」 -- undeclared, so nothing");
     }
 
     private static Random fixed() {

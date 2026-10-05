@@ -5,11 +5,11 @@ Measured before writing:
   * and the `ATTACK_FINISHED` fire passes `null, null` for the instance and the cast, so a rule on it cannot ask where the attack came from.
 
 So: an OVERLOAD of `fireAfterAttack` that carries the category (the existing one delegates, so no caller changes), and the DAMAGE op announcing its attack when the rule
-STATES a `cast_category`. \u26a0 Deliberately not passed by `SkillExecutor`: a real cast's category is already available, and touching that path would change the behaviour of
+STATES a `cast_category`. ⚠ Deliberately not passed by `SkillExecutor`: a real cast's category is already available, and touching that path would change the behaviour of
 every shipped skill.
 
 Then the ode's clause can hang on the SAME event as the zone rider -- `ATTACK_FINISHED`, which never fires for an attack that hit nothing -- and ask `from_category:
-FOLLOW_UP`. \u2b50 Its own extra instance states no category, so it announces no attack and cannot re-trigger anything.
+FOLLOW_UP`. ⭐ Its own extra instance states no category, so it announces no attack and cannot re-trigger anything.
 """
 import io
 import json
@@ -18,7 +18,7 @@ import sys
 BAT = "src/main/java/com/laosun/aluminium/Battle.java"
 INT = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 TRIBBIE = "src/main/resources/characters/1403.json"
-ZONE = "\u7ed3\u754c"
+ZONE = "结界"
 
 bat = io.open(BAT, encoding="utf-8").read()
 interp = io.open(INT, encoding="utf-8").read()
@@ -34,10 +34,10 @@ BAT_NEW = """    public void fireAfterAttack(CanHit attacker, CanHit mainTarget,
     }
 
     /**
-     * The same, with the attacking instance's CAST CATEGORY (2026-10-02; reader: 1415's ode of passage, whose clause is about a \u300c\u8ffd\u52a0\u653b\u51fb\u300d).
+     * The same, with the attacking instance's CAST CATEGORY (2026-10-02; reader: 1415's ode of passage, whose clause is about a 「追加攻击」).
      *
-     * <p>\u26a0 An op-driven attack had no way to announce itself at all -- this method had exactly two callers, both of them casts -- and the event it fires passed no
-     * cast, so a rule listening at the attack level could not ask what kind of attack it was. \u2b50 The four-argument form delegates here, so no existing caller changes.
+     * <p>⚠ An op-driven attack had no way to announce itself at all -- this method had exactly two callers, both of them casts -- and the event it fires passed no
+     * cast, so a rule listening at the attack level could not ask what kind of attack it was. ⭐ The four-argument form delegates here, so no existing caller changes.
      */
     public void fireAfterAttack(CanHit attacker, CanHit mainTarget,
                                 Collection<? extends CanHit> hitTargets, double totalDamage,
@@ -58,7 +58,7 @@ INT_ANCHOR = """                    effect.getCastCategory() == null || effect.g
 INT_NEW = """                    effect.getCastCategory() == null || effect.getCastCategory().isBlank()
                             ? null
                             : com.laosun.aluminium.enums.SkillCategory.fromString(effect.getCastCategory().trim()));
-            // \u2b50 A rule that STATES its category is also saying "this was an attack of that kind" (2026-10-02), which is the only way an op-driven attack can
+            // ⭐ A rule that STATES its category is also saying "this was an attack of that kind" (2026-10-02), which is the only way an op-driven attack can
             // announce itself -- `fireAfterAttack` had two callers, both casts. The hit set is the instance's own snapshot (or the attack's, when there is one).
             com.laosun.aluminium.enums.SkillCategory stated =
                     effect.getCastCategory() == null || effect.getCastCategory().isBlank()
@@ -113,11 +113,11 @@ rules.append({
         "element": "Quantum",
         "target": "highest_hp_attack_hit",
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 14 \u300c\u732e\u4e88\u300c\u95e8\u5f84\u300d\u4e4b\u8bd7\u300d\uff1a"
-               "\u300c**\u7f07\u5b9d\u65bd\u653e\u8ffd\u52a0\u653b\u51fb\u89e6\u53d1\u7f07\u5b9d\u7684\u7ed3\u754c\u7684\u9644\u52a0\u4f24\u5bb3\u65f6\uff0c\u4f1a\u989d\u5916\u9020\u6210 #1 \u6b21\u9644\u52a0\u4f24\u5bb3**\u3002\u300d"),
-    "note": ("\u2b50 \u4e0e\u7ed3\u754c rider **\u540c\u4e00\u4e2a\u4e8b\u4ef6**\uff08`ATTACK_FINISHED`\uff09\uff1a\u5b83\u5929\u7136\u4e0d\u4f1a\u4e3a\u201c\u4e00\u4e2a\u4eba\u4e5f\u6ca1\u6253\u5230\u201d\u7684\u653b\u51fb\u53d1\u51fa\u3002"
-             "\u2b50 \u95e8\u662f `from_category FOLLOW_UP`\uff08**\u672c\u8f6e\u65b0\u901a\u7684**\uff1a\u4ed6\u7684\u8ffd\u52a0\u653b\u51fb\u58f0\u660e\u4e86 `cast_category`\uff0cDAMAGE op \u4ece\u800c\u80fd\u201c\u5ba3\u544a\u4e00\u6b21\u653b\u51fb\u201d\uff09"
-             "**\u52a0\u4e0a**\u90a3\u53e5\u8bd7\u7684\u5370\u8bb0\u4e0e\u7ed3\u754c\u72b6\u6001\u3002\u2b50 \u800c\u5b83\u81ea\u5df1\u90a3\u7b14**\u4e0d\u58f0\u660e\u7c7b\u522b**\uff0c\u6240\u4ee5\u5b83\u53d1\u4e0d\u51fa ATTACK_FINISHED\uff0c**\u4e0d\u4f1a\u9012\u5f52**\u3002"),
+    "source": ("1415 昔涟 忆灵技能 14 「献予「门径」之诗」："
+               "「**缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 #1 次附加伤害**。」"),
+    "note": ("⭐ 与结界 rider **同一个事件**（`ATTACK_FINISHED`）：它天然不会为“一个人也没打到”的攻击发出。"
+             "⭐ 门是 `from_category FOLLOW_UP`（**本轮新通的**：他的追加攻击声明了 `cast_category`，DAMAGE op 从而能“宣告一次攻击”）"
+             "**加上**那句诗的印记与结界状态。⭐ 而它自己那笔**不声明类别**，所以它发不出 ATTACK_FINISHED，**不会递归**。"),
 })
 
 if isinstance(doc, list):

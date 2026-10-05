@@ -32,9 +32,9 @@ public class YanqingTraceTest {
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
         double gain = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - before;
         System.out.println("[1209] effectResGain=" + gain + " hasState="
-                + unit.getBuffManager().hasState("\u667a\u5251\u8fde\u5fc3"));
+                + unit.getBuffManager().hasState("智剑连心"));
         Assertions.assertEquals(0.2, gain, 1e-6, "the trace row's own param");
-        Assertions.assertTrue(unit.getBuffManager().hasState("\u667a\u5251\u8fde\u5fc3"),
+        Assertions.assertTrue(unit.getBuffManager().hasState("智剑连心"),
                 "the skill's own rule put the state on her");
     }
 }

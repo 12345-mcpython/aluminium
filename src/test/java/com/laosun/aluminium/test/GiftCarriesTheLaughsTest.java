@@ -26,9 +26,9 @@ public class GiftCarriesTheLaughsTest {
     private static final int EVANESCIA = 1505;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String LAUGHS = "\u7b11\u70b9";
-    private static final String GIFT = "\u597d\u6d3b\u5f53\u8d4f";
-    private static final String MOMENT = "\u963f\u54c8\u65f6\u523b";
+    private static final String LAUGHS = "笑点";
+    private static final String GIFT = "好活当赏";
+    private static final String MOMENT = "阿哈时刻";
 
     /** Four laughs become four instances, and half of them become hers. */
     @Test

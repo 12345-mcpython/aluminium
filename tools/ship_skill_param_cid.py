@@ -21,12 +21,12 @@ FIELD_ANCHOR = "    private Double amountPercent;"
 FIELD_NEW = """    private Double amountPercent;
 
     /**
-     * \u2b50 Whose skill row a {@code skill_param:} / {@code percent_from_skill_param} share is read from, when it is NOT the rule owner's own (2026-10-02).
+     * ⭐ Whose skill row a {@code skill_param:} / {@code percent_from_skill_param} share is read from, when it is NOT the rule owner's own (2026-10-02).
      *
-     * <p>Readers: 1415's odes -- \u300c\u63d0\u9ad8\u6570\u503c\u7b49\u540c\u4e8e\u672c\u6b21\u6cbb\u7597\u6570\u503c\u7684 #1%\u300d (the value is in slot 19's row; the healing is \u98ce\u5807's),
-     * the time ode's memosprite boost (value in slot 24; the damage is the memosprite's skill 7), and the ocean ode's overflow sentence (value in slot 22; the attack is \u6d77\u745f\u97f3's).
+     * <p>Readers: 1415's odes -- 「提高数值等同于本次治疗数值的 #1%」 (the value is in slot 19's row; the healing is 风堇's),
+     * the time ode's memosprite boost (value in slot 24; the damage is the memosprite's skill 7), and the ocean ode's overflow sentence (value in slot 22; the attack is 海瑟音's).
      *
-     * <p>\u26a0 It is a FIELD and not part of the spelling on purpose: measured, a cid inside the slot string is refused --
+     * <p>⚠ It is a FIELD and not part of the spelling on purpose: measured, a cid inside the slot string is refused --
      * {@code Op MODIFY_ATTR scales off skill slot "1415|SKILL", which is not a SkillType}.
      */
     @com.google.gson.annotations.SerializedName("skill_param_cid")
@@ -37,7 +37,7 @@ ACC_NEW = """        copy.amountPercent = amountPercent;
         copy.skillParamCid = skillParamCid;"""
 
 HOLDER_ANCHOR = "            Character owner = requireCharacterOwner(effect, ctx);"
-HOLDER_NEW = """            // \u2b50 a share may name ANOTHER character's row (2026-10-02): the field says whose, and the slot stays a legal SkillType so the loader check still means something
+HOLDER_NEW = """            // ⭐ a share may name ANOTHER character's row (2026-10-02): the field says whose, and the slot stays a legal SkillType so the loader check still means something
             Character owner;
             if (effect.getSkillParamCid() != null) {
                 CanHit found = allyWithCid(ctx, effect.getSkillParamCid());
@@ -56,8 +56,8 @@ for body, old, label in ((spec, FIELD_ANCHOR, "the amountPercent field"), (spec,
     if n != 1:
         sys.exit("REFUSING: %s occurs %d times -- nothing written" % (label, n))
 
-# \u26a0 the holder line is found by CONTENT and keeps its own indentation -- two anchors in this arc died on guessing whitespace
-# \u26a0 the same line appears FIVE times (five readers) -- find the one inside ownerSkillParamValue(EffectSpec, TriggerContext, String)
+# ⚠ the holder line is found by CONTENT and keeps its own indentation -- two anchors in this arc died on guessing whitespace
+# ⚠ the same line appears FIVE times (five readers) -- find the one inside ownerSkillParamValue(EffectSpec, TriggerContext, String)
 lines = interp.split("\n")
 sig = -1
 for i, ln in enumerate(lines):
@@ -113,7 +113,7 @@ import java.util.Random;
  * either the CAST skill or the OWNER's own skill, so {@code skill_param_cid} now says whose row to read -- a FIELD, because putting the cid in the slot spelling is refused
  * (measured: {@code scales off skill slot "1415|SKILL", which is not a SkillType}).
  *
- * <p>\u2b50 The reading is discriminating by construction: the SAME rule runs twice, once with the field and once without, and the two rows hold different numbers -- so the gain over
+ * <p>⭐ The reading is discriminating by construction: the SAME rule runs twice, once with the field and once without, and the two rows hold different numbers -- so the gain over
  * the attribute's own base must equal each row's value.
  */
 public class CrossCidSkillParamTest {

@@ -23,7 +23,7 @@ public class JadeLiveGoodsTest {
     private static final int JADE = 1314;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String GOODS = "\u5f53\u54c1";
+    private static final String GOODS = "当品";
 
     /** Four more layers mean four more 0.50% on ATTACK and four more 2.40% on CRIT DMG. */
     @Test

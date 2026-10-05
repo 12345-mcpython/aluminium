@@ -26,8 +26,8 @@ ANCHOR = """        SkillType slot = SkillType.valueOf(effect.getSkill().trim().
         Skill skill = actor.getSkills().get(slot);"""
 BLOCK = """        SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
         Skill skill = actor.getSkills().get(slot);
-        // \u2b50 A MEMOSPRITE keeps its skills by DATA SLOT, not by SkillType (2026-10-02): its table is `Summon.skillsByDataSlot`, and
-        // \u300c\u81ea\u52a8\u65bd\u653e\u3010\u82b1\u4e0e\u7bad\u7684\u821e\u66f2\u3011\u300d is its slot 1. Commanding that cast used to fail with "has no SKILL skill" because only
+        // ⭐ A MEMOSPRITE keeps its skills by DATA SLOT, not by SkillType (2026-10-02): its table is `Summon.skillsByDataSlot`, and
+        // 「自动施放【花与箭的舞曲】」 is its slot 1. Commanding that cast used to fail with "has no SKILL skill" because only
         // the character table was consulted. The slot is named with `skill_id`, the same field `REPLACE_SKILL` uses for a data row.
         if (skill == null && effect.getSkillId() != null && actor instanceof Summon from) {
             skill = from.skillAt(effect.getSkillId());

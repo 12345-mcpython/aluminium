@@ -18,7 +18,7 @@ interp = io.open(INT, encoding="utf-8").read()
 
 ANCHOR = """        if (TARGET_LOWEST_HP_ALLY.equals(selector)) {"""
 NEW = """        if (selector.startsWith(ALLY_CID_PREFIX)) {
-            // \u2b50 \u300c\u4f7f**\u98ce\u5807**\u83b7\u5f97\u2026\u300d (2026-10-02): a selector that NAMES a character is handled HERE, in the plural path, because absence is not an error --
+            // ⭐ 「使**风堇**获得…」 (2026-10-02): a selector that NAMES a character is handled HERE, in the plural path, because absence is not an error --
             // it is a battle that does not contain that character, and the clause simply does nothing. The singular path's convention is the opposite (it throws), which is why
             // this must not be left to it. Same shape as `lowest_hp_ally` just below.
             int cid = Integer.parseInt(selector.substring(ALLY_CID_PREFIX.length()).trim());
@@ -39,7 +39,7 @@ if "theClauseDoesNothingWhenSheIsNotThere" in s:
 
 EXTRA = '''
     /**
-     * \u2b50 The OTHER half of `ally_cid:`: a battle that does not contain the named character. The clause must do nothing -- not throw. \u26a0 This is not hypothetical: content that
+     * ⭐ The OTHER half of `ally_cid:`: a battle that does not contain the named character. The clause must do nothing -- not throw. ⚠ This is not hypothetical: content that
      * reached this branch with nobody to find turned 22 unrelated judges red before the fix.
      */
     @Test

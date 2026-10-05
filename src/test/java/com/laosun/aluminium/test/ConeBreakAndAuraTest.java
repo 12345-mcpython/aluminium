@@ -48,7 +48,7 @@ public class ConeBreakAndAuraTest {
         withCone.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 230350));
         battle.fireTriggers(TriggerEvent.BREAK, withCone, target, 0, 0);
-        // \u26a0 ADD_STACK builds a COUNTER, not a state hasState() reports (measured: hasState was false while the
+        // ⚠ ADD_STACK builds a COUNTER, not a state hasState() reports (measured: hasState was false while the
         // damage ratio below did move). So the stacking is asserted where it is observable: the ratio and the spec.
         int spec = 0;
         for (var rule : withCone.getTriggerTable().matching(TriggerEvent.BREAK,
@@ -87,7 +87,7 @@ public class ConeBreakAndAuraTest {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23038, LEVEL, false, 1));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = battle(wearer, ally);
-        // \u26a0 No "before" reading in THIS battle: BATTLE_START already applied the aura (measured: 0.98 = 0.5 + 0.48),
+        // ⚠ No "before" reading in THIS battle: BATTLE_START already applied the aura (measured: 0.98 = 0.5 + 0.48),
         // so the baseline has to come from a battle with no cone at all (discipline 141).
         Character reference = CharacterFactory.create(ALLY, LEVEL);
         Character plainWearer = CharacterFactory.create(WEARER, LEVEL);
@@ -96,9 +96,9 @@ public class ConeBreakAndAuraTest {
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemyOf(battle, wearer), 0, 0);
         double afterFollowUp = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23038] ally crit damage baseline(no cone)=" + baseline + " with cone=" + afterFollowUp
-                + " ; state on the wearer=" + wearer.getBuffManager().hasState("\u8c15\u793a"));
+                + " ; state on the wearer=" + wearer.getBuffManager().hasState("谕示"));
         Assertions.assertEquals(baseline + 0.48, afterFollowUp, 1e-9, "the aura gives the party 48 points of crit damage");
-        // \u26a0 The duration has to be PINNED: every reading here happens in the same turn, so shortening the aura is
+        // ⚠ The duration has to be PINNED: every reading here happens in the same turn, so shortening the aura is
         // invisible to them (measured: 2 -> 1 turn gave reds 0). Discipline 147.
         int pinnedTurns = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.FOLLOW_UP,
@@ -114,7 +114,7 @@ public class ConeBreakAndAuraTest {
             }
         }
         Assertions.assertEquals(1, pinnedTurns, "exactly one party aura rule on FOLLOW_UP");
-        Assertions.assertTrue(wearer.getBuffManager().hasState("\u8c15\u793a"), "carried by the state");
+        Assertions.assertTrue(wearer.getBuffManager().hasState("谕示"), "carried by the state");
         // A battle without the cone: the same stimulus changes nothing.
         plainBattle.fireTriggers(TriggerEvent.FOLLOW_UP, plainWearer, enemyOf(plainBattle, plainWearer), 0, 0);
         System.out.println("[23038] without the cone, after the same stimulus: "

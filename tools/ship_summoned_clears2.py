@@ -27,11 +27,11 @@ rules.append({
     "on": "SUMMONED",
     "when": ["actor is_summon"],
     "do": [{"op": "DISPEL", "kind": "control", "target": "all_allies"}],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 05 \u300c\u4f60\u597d\uff0c\u4e16\u754c\u266a\u300d\uff08\u6570\u636e\u69fd\u4f4d 05\uff0cSkillID 1141505\uff09\uff1a"
-               "\u300c\u5fb7\u8c2c\u6b4c\u88ab\u53ec\u5524\u65f6\uff0c**\u89e3\u9664\u6211\u65b9\u5168\u4f53\u63a7\u5236\u7c7b\u8d1f\u9762\u72b6\u6001**\u3002\u300d"),
-    "note": ("\u2b50 \u539f\u53e5**\u6ca1\u6709\u4efb\u4f55\u6570\u503c**\uff08\u53c2\u6570\u8868\u662f\u7a7a\u7684\uff09\u3002\u2b50 \u95e8\u662f `actor is_summon`\uff08**\u5b9e\u6d4b**\uff1a"
-             "`SUMMONED` \u7684 `actor` \u662f**\u88ab\u53ec\u5524\u8005**\uff0c\u800c\u672c\u6587\u4ef6\u7684 `self` \u662f\u5b83\u7684**\u4e3b\u4eba** \u2014\u2014 \u6240\u4ee5 `actor == self` \u6c38\u8fdc\u4e0d\u6210\u7acb\uff09\u3002"
-             "\u2b50 \u201c**\u6240\u6709**\u63a7\u5236\u7c7b\u201d\u662f**\u6309\u7c7b\u522b\u626b**\uff08`AbstractBuff.debuffClass()`\uff09\u3002"),
+    "source": ("1415 昔涟 忆灵技能 05 「你好，世界♪」（数据槽位 05，SkillID 1141505）："
+               "「德谬歌被召唤时，**解除我方全体控制类负面状态**。」"),
+    "note": ("⭐ 原句**没有任何数值**（参数表是空的）。⭐ 门是 `actor is_summon`（**实测**："
+             "`SUMMONED` 的 `actor` 是**被召唤者**，而本文件的 `self` 是它的**主人** —— 所以 `actor == self` 永远不成立）。"
+             "⭐ “**所有**控制类”是**按类别扫**（`AbstractBuff.debuffClass()`）。"),
 })
 
 if isinstance(doc, list):
@@ -48,9 +48,9 @@ if str(SLOT) in effects.get("11415", {}):
 else:
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 05 \u300c\u4f60\u597d\uff0c\u4e16\u754c\u266a\u300d\uff08\u6570\u636e\u69fd\u4f4d 05\uff09\uff1a"
-                   "\u5de5\u4f5c\u5728**\u89c4\u5219\u4fa7**\uff0c\u6240\u4ee5\u662f `Rules` \u5f62\u72b6\u3002"),
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\uff0c\u6574\u6761\u5fc6\u7075\u6280\u80fd\u5c31\u6c38\u8fdc\u65bd\u653e\u4e0d\u4e86\u3002",
+        "source": ("1415 昔涟 忆灵技能 05 「你好，世界♪」（数据槽位 05）："
+                   "工作在**规则侧**，所以是 `Rules` 形状。"),
+        "note": "⭐ 没有条目就不可交付，整条忆灵技能就永远施放不了。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -82,8 +82,8 @@ public class SummonedClearsControlTest {
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String CONTROL = "\u51bb\u7ed3";
-    private static final String DOT = "\u88c2\u4f24";
+    private static final String CONTROL = "冻结";
+    private static final String DOT = "裂伤";
 
     @Test
     public void onlyTheControlClassGoes() {

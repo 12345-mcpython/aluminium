@@ -8,7 +8,7 @@ That last sentence is the one today's vocabulary can carry WHOLE:
   * `requireSignedTurns` means the count may be NEGATIVE, which is what 减1 needs;
   * and the gate is `actor is_summon`: a rule in `characters/1415.json` has the memosprite's MASTER as `self`, so `actor == self` would never hold for its own cast (measured last round on SUMMONED).
 
-\u26d4 Registered rather than written from the same sentence: 「速度保持为0…在场时为界外」 (a property of the memosprite's row, not a rule), 「生命值百分比…相应变化」 (needs a link
+⛔ Registered rather than written from the same sentence: 「速度保持为0…在场时为界外」 (a property of the memosprite's row, not a rule), 「生命值百分比…相应变化」 (needs a link
 between two units' HP), and 「昔涟与德谬歌的生命上限提高 #1%」 (needs a "my master" selector -- measured: the engine has none).
 """
 import io
@@ -37,11 +37,11 @@ rules.append({
     "on": "SKILL_CAST",
     "when": ["actor is_summon"],
     "do": [{"op": "EXTEND_BUFF", "kind": "all", "turns": -1, "target": "self"}],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 03 \u300c\u7b49\u5f85\uff0c\u5728\u6240\u6709\u7684\u8fc7\u53bb\u300d\uff08\u6570\u636e\u69fd\u4f4d 03\uff0cSkillID 1141503\uff09\uff1a"
-               "\u300c**\u5fb7\u8c2c\u6b4c\u65bd\u653e\u6280\u80fd\u540e\u4f7f\u81ea\u8eab\u6240\u6709\u6301\u7eed\u6548\u679c\u6301\u7eed\u56de\u5408\u6570\u51cf 1**\u3002\u300d"),
-    "note": ("\u2b50 **\u6240\u6709**\u2192 `EXTEND_BUFF` \u7684 `\"kind\": \"all\"`\uff08\u5f15\u64ce\u81ea\u5df1\u7684\u6ce8\u91ca\u70b9\u540d\u4e86\u8fd9\u4e2a\u8bfb\u8005\uff1a1506 \u7684\u5929\u8d4b\u4e0e\u5176 E2\uff09\u3002"
-             "\u2b50 **\u51cf 1** \u2192 `turns: -1`\uff08`requireSignedTurns` \u5141\u8bb8\u8d1f\u6570\uff09\u3002\u2b50 **\u95e8\u662f `actor is_summon`**\uff1a"
-             "\u672c\u6587\u4ef6\u7684 `self` \u662f\u5b83\u7684**\u4e3b\u4eba**\uff0c\u6240\u4ee5 `actor == self` \u5bf9\u5b83\u81ea\u5df1\u7684\u65bd\u653e\u6c38\u8fdc\u4e0d\u6210\u7acb\uff08**\u5b9e\u6d4b**\uff09\u3002"),
+    "source": ("1415 昔涟 忆灵技能 03 「等待，在所有的过去」（数据槽位 03，SkillID 1141503）："
+               "「**德谬歌施放技能后使自身所有持续效果持续回合数减 1**。」"),
+    "note": ("⭐ **所有**→ `EXTEND_BUFF` 的 `\"kind\": \"all\"`（引擎自己的注释点名了这个读者：1506 的天赋与其 E2）。"
+             "⭐ **减 1** → `turns: -1`（`requireSignedTurns` 允许负数）。⭐ **门是 `actor is_summon`**："
+             "本文件的 `self` 是它的**主人**，所以 `actor == self` 对它自己的施放永远不成立（**实测**）。"),
 })
 
 if isinstance(doc, list):
@@ -58,10 +58,10 @@ if str(SLOT) in effects.get("11415", {}):
 else:
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 03 \u300c\u7b49\u5f85\uff0c\u5728\u6240\u6709\u7684\u8fc7\u53bb\u300d\uff08\u6570\u636e\u69fd\u4f4d 03\uff09\uff1a"
-                   "\u5de5\u4f5c\u5728**\u89c4\u5219\u4fa7**\uff0c\u6240\u4ee5\u662f `Rules` \u5f62\u72b6\u3002"),
-        "note": ("\u2b50 \u672c\u6761\u6280\u80fd\u7684**\u7b2c\u56db\u53e5**\u5df2\u6210\u53e5\uff1b\u5176\u4f59\u4e09\u53e5\uff08\u901f\u5ea6\u4e3a0\u3001\u751f\u547d\u767e\u5206\u6bd4\u8054\u52a8\u3001\u751f\u547d\u4e0a\u9650 +12%\uff09"
-                 "\u5206\u522b\u662f\u884c\u4e3a\u5c5e\u6027\u3001\u9700\u8981\u4e24\u5355\u4f4d\u94fe\u63a5\u3001\u9700\u8981\u201c\u6211\u7684\u4e3b\u4eba\u201d\u9009\u62e9\u5668\uff08**\u5b9e\u6d4b\uff1a\u5f15\u64ce\u6ca1\u6709**\uff09\u3002"),
+        "source": ("1415 昔涟 忆灵技能 03 「等待，在所有的过去」（数据槽位 03）："
+                   "工作在**规则侧**，所以是 `Rules` 形状。"),
+        "note": ("⭐ 本条技能的**第四句**已成句；其余三句（速度为0、生命百分比联动、生命上限 +12%）"
+                 "分别是行为属性、需要两单位链接、需要“我的主人”选择器（**实测：引擎没有**）。"),
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -95,7 +95,7 @@ public class CastShortensOwnEffectsTest {
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String MARK = "\u6d4b\u8bd5\u6301\u7eed";
+    private static final String MARK = "测试持续";
     private static final String RULE = "after_it_casts_every_ongoing_effect_shortens_by_one";
 
     @Test

@@ -12,9 +12,9 @@ TWO CLAUSES, TWO RULES, because the second has a narrower condition than the fir
   * the 1 point of Coreflame needs only "someone aimed a skill at her" -- the document says 其他任意目标, i.e. ally OR enemy;
   * the +30% crit damage additionally needs the caster to be a teammate, which is `actor is_ally` (the same spelling 8007's
     shipped rider uses).
-\u26a0 The first rule cannot say "anyone but herself" (the DSL's `!` negates only PARTY conditions, per `TriggerTable`), and it does
+⚠ The first rule cannot say "anyone but herself" (the DSL's `!` negates only PARTY conditions, per `TriggerTable`), and it does
 not need to: she cannot aim her own skill at herself.
-\u26a0 The +30% carries NO `buff:` link: it is "持续 3 回合", a duration of its own (the distinction item 36 established).
+⚠ The +30% carries NO `buff:` link: it is "持续 3 回合", a duration of its own (the distinction item 36 established).
 ASCII only.
 """
 import io
@@ -33,12 +33,12 @@ rules.append({
     "on": "SKILL_CAST",
     "id": CORE_RULE,
     "when": ["target == self"],
-    "do": [{"op": "GAIN_RESOURCE", "resource": "\u706b\u79cd", "amount": 1}],
-    "source": ("1408 \u767d\u5384\uff08\u6587\u6863\uff0c\u767d\u5384\u7684\u5929\u8d4b\uff09\uff1a\u300c\u5f53\u767d\u5384\u6210\u4e3a**\u5176\u4ed6\u4efb\u610f\u76ee\u6807**\u7684\u6280\u80fd\u76ee\u6807\u65f6\uff0c"
-               "**\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011**\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a\u5f62\u72b6**\u9010\u5b57\u53d6\u81ea\u5df2\u51fa\u8d27\u7684 `1002.talent_wind_pen`** \u2713"
-             "\uff08`SKILL_CAST` \u662f**\u5e26\u88ab\u7784\u51c6\u5355\u4f4d**\u7684\u65bd\u653e\u4e8b\u4ef6 \u2713 \u21d2 \u201c\u6210\u4e3a\u76ee\u6807\u201d\uff1d`target == self` \u2713\uff09\u3002"
-             "\u26a0 \u201c\u5176\u4ed6\u4efb\u610f\u76ee\u6807\u201d\uff08\u654c\u6216\u53cb\uff09\u65e0\u9700\u989d\u5916\u6761\u4ef6 \u2713\uff0c\u56e0\u4e3a\u5979\u65e0\u6cd5\u628a\u81ea\u5df1\u7684\u6280\u80fd\u7784\u81ea\u5df1 \u2713\u3002"),
+    "do": [{"op": "GAIN_RESOURCE", "resource": "火种", "amount": 1}],
+    "source": ("1408 白厄（文档，白厄的天赋）：「当白厄成为**其他任意目标**的技能目标时，"
+               "**获得 1 点【火种】**」"),
+    "note": ("⭐ 2026-10-02：形状**逐字取自已出货的 `1002.talent_wind_pen`** ✓"
+             "（`SKILL_CAST` 是**带被瞄准单位**的施放事件 ✓ ⇒ “成为目标”＝`target == self` ✓）。"
+             "⚠ “其他任意目标”（敌或友）无需额外条件 ✓，因为她无法把自己的技能瞄自己 ✓。"),
 })
 rules.append({
     "on": "SKILL_CAST",
@@ -46,10 +46,10 @@ rules.append({
     "when": ["actor is_ally", "target == self"],
     "do": [{"op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.30,
             "turns": 3, "target": "self"}],
-    "source": ("1408 \u767d\u5384\uff08\u6587\u6863\uff0c\u767d\u5384\u7684\u5929\u8d4b\uff09\uff1a\u300c**\u82e5\u65bd\u653e\u8005\u4e3a\u767d\u5384\u7684\u961f\u53cb**\uff0c\u8fd8\u4f1a\u4f7f\u767d\u5384\u7684"
-               "**\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 30%**\uff0c\u6301\u7eed **3** \u56de\u5408\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a\u7b2c\u4e8c\u534a\u7684\u6761\u4ef6**\u6bd4\u7b2c\u4e00\u534a\u7a84** \u2713\uff08`actor is_ally` \u2713 \u2014\u2014 \u4e0e `8007` \u5df2\u51fa\u8d27\u7684\u9a91\u624b\u540c\u62fc\u5199 \u2713\uff09"
-             "\u21d2 \u6240\u4ee5**\u5b83\u662f\u5355\u72ec\u4e00\u6761\u89c4\u5219** \u2713\uff1b\u2757 **\u4e0d\u7ed1\u72b6\u6001** \u2713\uff08\u201c\u6301\u7eed 3 \u56de\u5408\u201d\u662f\u5b83\u81ea\u5df1\u7684\u65f6\u957f \u2713\u2014\u2014 \u7b2c 36 \u4ef6\u5df2\u7acb\u7684\u533a\u5206 \u2713\uff09\u3002"),
+    "source": ("1408 白厄（文档，白厄的天赋）：「**若施放者为白厄的队友**，还会使白厄的"
+               "**暴击伤害提高 30%**，持续 **3** 回合」"),
+    "note": ("⭐ 2026-10-02：第二半的条件**比第一半窄** ✓（`actor is_ally` ✓ —— 与 `8007` 已出货的骑手同拼写 ✓）"
+             "⇒ 所以**它是单独一条规则** ✓；❗ **不绑状态** ✓（“持续 3 回合”是它自己的时长 ✓—— 第 36 件已立的区分 ✓）。"),
 })
 
 if not isinstance(doc, dict):
@@ -75,10 +75,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408\uff1a\u300c\u5f53\u767d\u5384\u6210\u4e3a\u5176\u4ed6\u4efb\u610f\u76ee\u6807\u7684\u6280\u80fd\u76ee\u6807\u65f6\uff0c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011\u3002\u82e5\u65bd\u653e\u8005\u4e3a\u767d\u5384\u7684\u961f\u53cb\uff0c\u8fd8\u4f1a\u4f7f\u767d\u5384\u7684
- * \u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 30%\uff0c\u6301\u7eed 3 \u56de\u5408\u300d (2026-10-02).
+ * 1408：「当白厄成为其他任意目标的技能目标时，获得 1 点【火种】。若施放者为白厄的队友，还会使白厄的
+ * 暴击伤害提高 30%，持续 3 回合」 (2026-10-02).
  *
- * <p>\u2b50 SAME SCENE, ONE VARIABLE: 1414 -- whose skill is a shield aimed at a teammate -- casts it either AT 1408 or AT THE ENEMY. The
+ * <p>⭐ SAME SCENE, ONE VARIABLE: 1414 -- whose skill is a shield aimed at a teammate -- casts it either AT 1408 or AT THE ENEMY. The
  * only difference is who was aimed at, which is exactly what the sentence is about.
  */
 public class SkillTargetCoreflameTest {
@@ -86,22 +86,22 @@ public class SkillTargetCoreflameTest {
     private static final int OWNER = 1408;
     private static final int SUPPORT = 1414;
     private static final int MONSTER = 1002011;
-    private static final String COREFLAME = "\u706b\u79cd";
+    private static final String COREFLAME = "火种";
 
-    /** \u2b50 Aimed at: she gains a point of Coreflame and 30% crit damage. */
+    /** ⭐ Aimed at: she gains a point of Coreflame and 30% crit damage. */
     @Test
     public void beingTargetedGrantsCoreflameAndCritDamage() {
         double[] aimedAtHer = scene(true);
-        Assertions.assertEquals(1.0, aimedAtHer[0], EPS, "\u300c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011\u300d");
-        Assertions.assertEquals(0.30, aimedAtHer[1], EPS, "\u300c\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 30%\u300d");
+        Assertions.assertEquals(1.0, aimedAtHer[0], EPS, "「获得 1 点【火种】」");
+        Assertions.assertEquals(0.30, aimedAtHer[1], EPS, "「暴击伤害提高 30%」");
     }
 
-    /** \u26a0 Aimed at an enemy instead: the sentence has not started. */
+    /** ⚠ Aimed at an enemy instead: the sentence has not started. */
     @Test
     public void aimingElsewhereChangesNothing() {
         double[] aimedAway = scene(false);
-        Assertions.assertEquals(0.0, aimedAway[0], EPS, "\u300c\u6210\u4e3a\u2026\u6280\u80fd\u76ee\u6807\u65f6\u300d -- she was not the target");
-        Assertions.assertEquals(0.0, aimedAway[1], EPS, "\u2026so there is no crit damage either");
+        Assertions.assertEquals(0.0, aimedAway[0], EPS, "「成为…技能目标时」 -- she was not the target");
+        Assertions.assertEquals(0.0, aimedAway[1], EPS, "…so there is no crit damage either");
     }
 
     // ==================================================================
@@ -120,7 +120,7 @@ public class SkillTargetCoreflameTest {
 
         Skill skill = support.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: the teammate has a skill");
-        // \u26a0 \u4e24\u6761\u5206\u652f\uff0c\u800c\u4e0d\u662f\u4e00\u4e2a\u4e09\u5143\u8868\u8fbe\u5f0f\uff1a\u4e00\u4e2a\u662f `Character`\u3001\u4e00\u4e2a\u662f `CanHit`\uff0c\u6ca1\u6709\u5171\u540c\u7c7b\u578b\u53ef\u58f0\u660e\u3002
+        // ⚠ 两条分支，而不是一个三元表达式：一个是 `Character`、一个是 `CanHit`，没有共同类型可声明。
         if (aimAtHer) {
             SkillExecutor.execute(battle, skill, support, List.of(owner));
         } else {

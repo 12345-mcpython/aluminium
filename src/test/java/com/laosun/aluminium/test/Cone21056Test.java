@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * Light cone 21056: at battle start the WHOLE party deals 16% more BREAK damage.
  *
- * <p>\u2605 Read through the real break path: {@code Battle.reduceToughness} returns the break damage it settled, so the judge
+ * <p>★ Read through the real break path: {@code Battle.reduceToughness} returns the break damage it settled, so the judge
  * compares a battle WITH the cone against one without -- the number a player would see, not an attribute value.
  */
 public class Cone21056Test {
@@ -64,7 +64,7 @@ public class Cone21056Test {
                 + " (x" + (withWearer / withoutWearer) + ") ; ally " + withoutAlly + " -> " + withAlly
                 + " (x" + (withAlly / withoutAlly) + ")");
         Assertions.assertEquals(1 + SHARE, withWearer / withoutWearer, 0.02, "16% more break damage for the wearer");
-        Assertions.assertEquals(1 + SHARE, withAlly / withoutAlly, 0.02, "and for the ally (\u6211\u65b9\u5168\u4f53)");
+        Assertions.assertEquals(1 + SHARE, withAlly / withoutAlly, 0.02, "and for the ally (我方全体)");
     }
 
     @Test

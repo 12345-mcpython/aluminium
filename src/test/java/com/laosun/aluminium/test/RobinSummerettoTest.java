@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1512 Robin \u2022 Summeretto, from her own file (2026-09-29, round 193): the summon whose panel the document states in full.
+ * 1512 Robin • Summeretto, from her own file (2026-09-29, round 193): the summon whose panel the document states in full.
  *
  * <p>Two numbers are asserted, both from the document: the memosprite's Max HP is 70% of hers and its SPD is 180% of hers. The control shows nothing appears
  * without the Skill.
@@ -30,7 +30,7 @@ public class RobinSummerettoTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0「初始拥有等同于知更鸟\u2022晴歌70%生命上限的生命上限和等同于知更鸟\u2022晴歌180%速度的速度」. */
+    /** ⚠「初始拥有等同于知更鸟•晴歌70%生命上限的生命上限和等同于知更鸟•晴歌180%速度的速度」. */
     @Test
     public void theSummonArrivesWithTheDocumentedPanel() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
@@ -41,16 +41,16 @@ public class RobinSummerettoTest {
         battle.castImmediate(robin.getSkills().get(SkillType.SKILL), robin, List.of(enemy));
 
         var mem = battle.memospriteOf(robin);
-        Assertions.assertNotNull(mem, "\u300c\u53ec\u5524\u5fc6\u7075\u300c\u6674\u7a7a\u4e50\u624b\u300d\u8d1d\u831c\u300d");
+        Assertions.assertNotNull(mem, "「召唤忆灵「晴空乐手」贝茜」");
         double expectedHp = robin.getMaxHp() * 0.7;
         Assertions.assertEquals(expectedHp, mem.getMaxHp(), expectedHp * 0.02,
-                "\u300c70%\u751f\u547d\u4e0a\u9650\u300d: expected " + expectedHp + ", got " + mem.getMaxHp());
+                "「70%生命上限」: expected " + expectedHp + ", got " + mem.getMaxHp());
         double expectedSpeed = robin.getAttribute(AttributeType.SPEED).get() * 1.8;
         Assertions.assertEquals(expectedSpeed, mem.getAttribute(AttributeType.SPEED).get(), expectedSpeed * 0.02,
-                "\u300c180%\u901f\u5ea6\u300d: expected " + expectedSpeed + ", got " + mem.getAttribute(AttributeType.SPEED).get());
+                "「180%速度」: expected " + expectedSpeed + ", got " + mem.getAttribute(AttributeType.SPEED).get());
     }
 
-    /** \u26a0 The control: without the Skill nothing is summoned. */
+    /** ⚠ The control: without the Skill nothing is summoned. */
     @Test
     public void nothingIsSummonedWithoutTheSkill() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
@@ -61,13 +61,13 @@ public class RobinSummerettoTest {
         Assertions.assertNull(battle.memospriteOf(robin), "no Skill, no memosprite");
     }
 
-    /** \u26a0 The file declares the Vibes resource with the document's cap, and the memosprite file states both numbers. */
+    /** ⚠ The file declares the Vibes resource with the document's cap, and the memosprite file states both numbers. */
     @Test
     public void theFilesDeclareTheResourceAndThePanel() {
         JsonObject character = read("/characters/1512.json");
         JsonArray resources = character.getAsJsonArray("resources");
-        Assertions.assertNotNull(resources, "the character file must declare \u6c14\u6c1b\u503c");
-        Assertions.assertEquals(50, resources.get(0).getAsJsonObject().get("max").getAsInt(), "\u300c\u4e0a\u965050\u70b9\u300d");
+        Assertions.assertNotNull(resources, "the character file must declare 气氛值");
+        Assertions.assertEquals(50, resources.get(0).getAsJsonObject().get("max").getAsInt(), "「上限50点」");
 
         JsonObject memo = read("/memosprites/1512.json");
         JsonArray panel = memo.getAsJsonArray("panel");

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23033: energy at the start of the battle, and the \u3010\u96f7\u9041\u3011 state machine -- an Ultimate arms it, two basic attacks
+ * Light cone 23033: energy at the start of the battle, and the 【雷遁】 state machine -- an Ultimate arms it, two basic attacks
  * spend it for a 50% advance, and another Ultimate resets the count.
  */
 public class Cone23033Test {
@@ -25,8 +25,8 @@ public class Cone23033Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String MINE = "\u96f7\u9041";
-    private static final String COUNT = "\u666e\u653b\u8ba1\u6570";
+    private static final String MINE = "雷遁";
+    private static final String COUNT = "普攻计数";
     private static final double RANK_ONE = 0.5;
     private static final double RANK_TWO = 0.55;
 
@@ -68,7 +68,7 @@ public class Cone23033Test {
     }
 
     /**
-     * \u2605 The exact number, not "it went up" (discipline 200): `> 0` cannot tell 30 from 15 -- measured, the `30 -> 15`
+     * ★ The exact number, not "it went up" (discipline 200): `> 0` cannot tell 30 from 15 -- measured, the `30 -> 15`
      * mutation was 0 red until this line existed.
      */
     @Test
@@ -83,7 +83,7 @@ public class Cone23033Test {
     }
 
     /**
-     * \u2605 The advance as a NUMBER, read off the action bar: `Signal.nextActionTime` is public and `Battle.queue.getHeap()` finds a
+     * ★ The advance as a NUMBER, read off the action bar: `Signal.nextActionTime` is public and `Battle.queue.getHeap()` finds a
      * unit's signal, so nothing had to be built -- only used. Judged by RANKS again (discipline 200): the two ranks' shares
      * are 0.5 and 0.55, so their movements must be in that ratio, which a direction-only reading cannot see.
      */
@@ -98,7 +98,7 @@ public class Cone23033Test {
                 "the two ranks' advances must be in the ratio of their shares");
     }
 
-    /** \u2605 How far the wearer's next action moves when the payout fires, at the given superimposition rank. */
+    /** ★ How far the wearer's next action moves when the payout fires, at the given superimposition rank. */
     private double advanceDistance(int rank) {
         wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -141,13 +141,13 @@ public class Cone23033Test {
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.BPSKILL);
         System.out.println("[23033] after a Skill used as an attack: count="
                 + wearer.getBuffManager().stacksOf(COUNT));
-        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "\u666e\u653b only");
+        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "普攻 only");
     }
 
     @Test
     public void theSpecPinsTheShares() {
         Battle battle = battle(true);
-        // \u2605 `matching` evaluates conditions (discipline 182): the payout branch is only reachable once the count is full --
+        // ★ `matching` evaluates conditions (discipline 182): the payout branch is only reachable once the count is full --
         // and the count must be raised through the REAL path (handing the buff manager a StackBuff directly did not show up).
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
         for (int i = 0; i < 2; i++) {

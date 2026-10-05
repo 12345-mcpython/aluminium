@@ -56,7 +56,7 @@ patch(
     """            if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 buff.setBuffName(effect.getBuff().trim());""",
     """            if (Boolean.TRUE.equals(effect.getPerStackLive())) {
-                // \u2b50 \u300c\u6bcf\u62e5\u6709 1 \u5c42\u2026\u63d0\u9ad8 X%\u300d as a SUSTAINED aura (2026-10-02; reader family: fourteen documents). The share is
+                // ⭐ 「每拥有 1 层…提高 X%」 as a SUSTAINED aura (2026-10-02; reader family: fourteen documents). The share is
                 // asked for on every read, so the aura follows the count -- a snapshot would only be right at the instant it
                 // was taken, and re-attaching on every change would stack the buff itself.
                 if (!ctxFreeCounter(effect)) {

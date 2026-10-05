@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * The condition {@code <subject>_debuff:<ATTR>}: "that party carries a negative modifier on this attribute".
  *
- * <p>\u2b50 The FALSE case is the point: an attribute that was RAISED must not satisfy it, and neither must a lowered
+ * <p>⭐ The FALSE case is the point: an attribute that was RAISED must not satisfy it, and neither must a lowered
  * attribute on somebody else. A condition that only looked at "is the number lower than its base" would pass the first
  * reading and fail these.
  */
@@ -36,7 +36,7 @@ public class DebuffOnConditionTest {
     private void build(String condition) {
         owner = CharacterFactory.create(UNIT, LEVEL);
         enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // \u2605 The proven spelling: a bare EffectSpec filled through TriggerSpecs.set (TriggerSpecs.effect has no
+        // ★ The proven spelling: a bare EffectSpec filled through TriggerSpecs.set (TriggerSpecs.effect has no
         // (op, key, value) overload -- measured).
         var pay = new com.laosun.aluminium.beans.EffectSpec();
         TriggerSpecs.set(pay, "op", "GAIN_ENERGY");
@@ -69,7 +69,7 @@ public class DebuffOnConditionTest {
         enemy.getAttribute(AttributeType.DEFENCE)
                 .addModifier(DoubleValue.Modifier.addPercent(0.3, DoubleValue.Modifier.ModifierSource.BUFF, MODIFIER_ID));
         System.out.println("[debuff] after RAISING the enemy's defence: matches=" + matches());
-        Assertions.assertFalse(matches(), "\u9632\u5fa1\u529b\u88ab\u964d\u4f4e is not \u9632\u5fa1\u529b\u88ab\u63d0\u9ad8 (false case)");
+        Assertions.assertFalse(matches(), "防御力被降低 is not 防御力被提高 (false case)");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class DebuffOnConditionTest {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> build("target_debuff:NOT_AN_ATTRIBUTE"));
         System.out.println("[debuff] refused: " + thrown.getMessage());
-        // \u2605 `AttributeType.fromString` THROWS for an unknown spelling rather than returning null (measured:
+        // ★ `AttributeType.fromString` THROWS for an unknown spelling rather than returning null (measured:
         // "Unknown AttributeType: NOT_AN_ATTRIBUTE"), so the message comes from the enum and not from my own branch.
         Assertions.assertTrue(thrown.getMessage().contains("Unknown AttributeType"),
                 "the loader says which attribute it did not recognise");

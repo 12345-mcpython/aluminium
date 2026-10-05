@@ -49,9 +49,9 @@ public class ReasonOdePointAndActionTest {
                 + " ; his action value " + avBefore + " -> " + avAfter);
 
         Assertions.assertEquals(pointsBefore + 1, pointsAfter,
-                "\u300c\u4e3a\u6211\u65b9\u6062\u590d #4 \u4e2a\u6218\u6280\u70b9\u300d-- and #4 is 1 at every level");
+                "「为我方恢复 #4 个战技点」-- and #4 is 1 at every level");
         Assertions.assertTrue(avAfter < avBefore,
-                "\u300c\u4f7f\u90a3\u523b\u590f\u7acb\u5373\u884c\u52a8\u300d-- his action value must come DOWN (" + avBefore + " -> " + avAfter + ")");
+                "「使那刻夏立即行动」-- his action value must come DOWN (" + avBefore + " -> " + avAfter + ")");
     }
 
     /** How much action value the unit still has -- zero means "acts now" (mirrors AglaeaMemospriteTest). */

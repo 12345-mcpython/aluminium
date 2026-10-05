@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
  * <p>23055 was shipped with them and then rolled back: `data/weapons.json` (169 rows) has no row for it, so
  * Weapon.build throws and the card cannot exist in this engine. 23050-23060 misses only that one id.
  *
- * <p>\u26a0 Every value was read from the game data and every attribute name from ALREADY SHIPPED content.
+ * <p>⚠ Every value was read from the game data and every attribute name from ALREADY SHIPPED content.
  */
 public class SixConeStatsTest {
     private static final int LEVEL = 80;

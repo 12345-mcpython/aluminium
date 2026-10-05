@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * Slot 18's 【真知】 half (2026-10-02): 「那刻夏在下一次施放普攻、战技时获得【真知】：…造成的战技伤害提高 #2(20)%」.
  *
- * \u2b50 Two-sided: the ode is cast at HIM, so the state and the raise land on him; a second reading with the ode cast at somebody else must leave him untouched.
+ * ⭐ Two-sided: the ode is cast at HIM, so the state and the raise land on him; a second reading with the ode cast at somebody else must leave him untouched.
  */
 public class ReasonOdeTrueKnowledgeTest {
     private static final int LEVEL = 80;
@@ -21,7 +21,7 @@ public class ReasonOdeTrueKnowledgeTest {
     private static final int OTHER = 1002;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 18;
-    private static final String TRUE_KNOWLEDGE = "\u771f\u77e5";
+    private static final String TRUE_KNOWLEDGE = "真知";
 
     @Test
     public void theReasonOdeGrantsTrueKnowledgeToTheOneItNames() {
@@ -30,7 +30,7 @@ public class ReasonOdeTrueKnowledgeTest {
         System.out.println("[true_knowledge] cast at him: "+at[0]+" and the state is "+at[1]
                 + " ; cast elsewhere: "+elsewhere[0]+" and the state is "+elsewhere[1]);
         Assertions.assertEquals(1.0, at[1], 1e-9, "he gets the state");
-        // \u2b50 The state is the clause that ships; its two numbers are registered (a path selector and a lasting damage-class raise both do not exist yet).
+        // ⭐ The state is the clause that ships; its two numbers are registered (a path selector and a lasting damage-class raise both do not exist yet).
         Assertions.assertEquals(0.0, elsewhere[1], 1e-9, "and casting it elsewhere leaves him alone");
     }
 

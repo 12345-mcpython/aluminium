@@ -19,7 +19,7 @@ public class SpendAllTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1404;
     private static final int MONSTER = 1002011;
-    private static final String RES = "\u70ed\u610f";
+    private static final String RES = "热意";
 
     /** ⭐ The cast spends everything. */
     @Test

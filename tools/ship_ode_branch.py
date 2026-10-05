@@ -31,14 +31,14 @@ rules.append({
         {"op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": 11, "turns": 1, "target": "self"},
         {"op": "CAST_SKILL", "skill": "SKILL", "target": "self"},
     ],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 8 \u300c\u732e\u4e88\u300c\u7eb7\u4e89\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 16\uff0cSkillID 1141516\uff09\uff1a"
-               "\u300c\u82e5\u4e07\u654c\u5904\u4e8e\u3010\u8840\u4ec7\u3011\u72b6\u6001\uff0c\u5219\u4f7f\u5176\u81ea\u52a8\u65bd\u653e 1 \u6b21**\u4e0d\u6d88\u8017\u5145\u80fd**\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d\u3002"
-               "\uff08\u5f62\u72b6\u7167\u62c4 1404 \u81ea\u5df1\u7684 `bloodfeud_godslayer_at_a_hundred_and_fifty`\uff1a\u540c\u4e00\u5bf9 `REPLACE_SKILL` \u52a0 `CAST_SKILL`\uff0c"
-               "\u5dee\u522b\u53ea\u5728\u90a3\u4e00\u6761\u591a\u51fa\u7684 `SPEND_RESOURCE`\u2014\u2014\u6b63\u662f\u300c\u4e0d\u6d88\u8017\u5145\u80fd\u300d\u8fd9\u56db\u4e2a\u5b57\u3002\uff09"),
-    "note": ("\u26a0 \u89e6\u53d1\u70b9\u5728**\u4e07\u654c\u81ea\u5df1\u7684\u8868**\u4e0a\uff0c\u7528 `target == self`\uff08\u5df2\u51fa\u8d27\u7684 20 \u6761\u540c\u5f62\u5f0f\uff0c\u5982 1408 \u7684\u5929\u8d4b\uff09"
-             "\u2014\u2014 \u5b83\u662f\u4e00\u53e5\u201c\u6709\u4eba\u628a\u6280\u80fd\u5bf9\u51c6\u6211\u201d\u7684\u89c4\u5219\u3002\u2605 **\u65b0\u589e\u4e86\u4e00\u4e2a\u8c13\u8bcd `is_summon`**\uff1a"
-             "`from_skill_id` \u8bfb\u7684\u662f**\u69fd\u4f4d**\uff08\u4e0d\u662f\u6570\u636e\u884c id\uff09\uff0c\u5355\u72ec\u7528\u4f1a\u8ba9**\u4efb\u4f55\u5176\u4ed6\u5355\u4f4d\u7684 16 \u53f7\u6280\u80fd**\u6253\u4e2d\u4ed6\u65f6\u4e5f\u8bef\u89e6\u53d1\uff08\u5305\u62ec\u654c\u4eba\uff09\uff1b"
-             "`actor is_summon` \u624d\u80fd\u628a\u201c\u65bd\u653e\u8005\u662f\u5fc6\u7075\u201d\u8bf4\u51fa\u6765\u3002"),
+    "source": ("1415 昔涟 忆灵技能 8 「献予「纷争」之诗」（数据槽位 16，SkillID 1141516）："
+               "「若万敌处于【血仇】状态，则使其自动施放 1 次**不消耗充能**的【弑神登神】」。"
+               "（形状照拄 1404 自己的 `bloodfeud_godslayer_at_a_hundred_and_fifty`：同一对 `REPLACE_SKILL` 加 `CAST_SKILL`，"
+               "差别只在那一条多出的 `SPEND_RESOURCE`——正是「不消耗充能」这四个字。）"),
+    "note": ("⚠ 触发点在**万敌自己的表**上，用 `target == self`（已出货的 20 条同形式，如 1408 的天赋）"
+             "—— 它是一句“有人把技能对准我”的规则。★ **新增了一个谓词 `is_summon`**："
+             "`from_skill_id` 读的是**槽位**（不是数据行 id），单独用会让**任何其他单位的 16 号技能**打中他时也误触发（包括敌人）；"
+             "`actor is_summon` 才能把“施放者是忆灵”说出来。"),
 })
 if isinstance(d, list):
     doc = rules

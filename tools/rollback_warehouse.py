@@ -24,7 +24,7 @@ def drop(path, block, label):
     print("ok   removed %s" % label)
 
 
-drop(BATTLE, '\n\n    /**\n     * \u2b50 Units that are OWNED but NOT DEPLOYED', "the warehouse field")
+drop(BATTLE, '\n\n    /**\n     * ⭐ Units that are OWNED but NOT DEPLOYED', "the warehouse field")
 text = io.open(BATTLE, encoding="utf-8").read()
 start = text.index("    private final java.util.List<Character> warehouseListeners")
 end = text.index("    public void noteChangedResource(String resource) {")
@@ -32,7 +32,7 @@ io.open(BATTLE, "w", encoding="utf-8", newline="\n").write(text[:start] + text[e
 print("ok   removed the registration API")
 
 text = io.open(BATTLE, encoding="utf-8").read()
-start = text.index("            // \u2b50 \u83b7\u5f97\u8be5\u89d2\u8272\u5373\u751f\u6548")
+start = text.index("            // ⭐ 获得该角色即生效")
 end = text.index("            return fired;\n        } finally {\n            triggerDepth--;")
 io.open(BATTLE, "w", encoding="utf-8", newline="\n").write(text[:start] + text[end:])
 print("ok   removed the second dispatch pass")

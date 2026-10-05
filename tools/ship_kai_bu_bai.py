@@ -27,17 +27,17 @@ if any(isinstance(rule, dict) and rule.get("id") == RULE_ID for rule in rules):
 rules.append({
     "on": "STATE_ENDED",
     "id": RULE_ID,
-    "when": ["actor state_ended \u597d\u6d3b\u5f53\u8d4f"],
-    "do": [{"op": "GAIN_RESOURCE", "resource": "\u597d\u6d3b\u5f53\u8d4f",
+    "when": ["actor state_ended 好活当赏"],
+    "do": [{"op": "GAIN_RESOURCE", "resource": "好活当赏",
             "amountFromEvent": True, "amountPercent": 0.5, "target": "self"}],
-    "source": "1505 \u7eef\u82f1 \u884c\u8ff9 \u5f00\u4e0d\u8d25: \u300c\u961f\u53cb\u6301\u6709\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011**\u7ed3\u675f\u65f6**\uff0c\u7eef\u82f1\u4f1a**\u5c06\u5176\u4e2d\u7684 50%** \u8f6c\u5316\u4e3a\u81ea\u8eab\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d",
-    "note": "\u300c\u961f\u53cb\u6301\u6709\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u7ed3\u675f\u65f6\u2026\u53d6\u5176\u4e2d\u7684 50%\u300d\u21d2 `STATE_ENDED` \u21d2 "
-            "`GAIN_RESOURCE{\u597d\u6d3b\u5f53\u8d4f, amountFromEvent \u00d7 0.5, target: self}` \u2713\u3002"
-            "\u26a0 \u6761\u4ef6\u7528 `actor state_ended \u597d\u6d3b\u5f53\u8d4f` \u2713\uff08\u4e8b\u4ef6\u4ee5 `(carrier, carrier, \u2026)` \u89e6\u53d1 \u2713 \u21d2 `actor` \u5c31\u662f\u6301\u6709\u8005 \u2713\uff09\uff1b"
-            "\u26a0 \u4e8b\u4ef6\u643a\u5e26\u7684**\u91cf**\uff08\u672c\u8f6e\u5f15\u64ce\u6539\u52a8 \u2713\uff09\u5c31\u662f\u88ab\u7ed3\u675f\u72b6\u6001\u7684**\u5b9e\u4f8b\u6570** \u2713\u3002"
-            "\u26a0 **\u767b\u8bb0**\uff1a`1513` \u7684\u5956\u52b1\u76ee\u524d\u4ecd\u4ee5**\u666e\u901a\u72b6\u6001**\uff08\u4e0d\u53ef\u53e0\u52a0 \u2717\uff09\u65bd\u52a0 \u597d\u6d3b\u5f53\u8d4f \u2717 "
-            "\u21d2 \u5b83\u8f7d\u7684\u662f**\u4e00\u4e2a**\u5b9e\u4f8b\u800c\u4e0d\u662f\u963f\u54c8\u65f6\u523b\u7684\u300c**\u7b11\u70b9**\u300d\u6570 \u2717 \u21d2 \u771f\u5b9e\u5bf9\u5c40\u91cc\u300c50% of it\u300d\u662f **50% \u00d7 1** \u2717\u3002"
-            "\u672c\u6761\u53ea\u8d1f\u8d23**\u53e5\u5b50\u672c\u8eab** \u2713\uff1b\u90a3\u6865\u63a5\uff08\u7b11\u70b9 \u2192 \u72b6\u6001\u5c42\u6570\uff09\u5355\u72ec\u767b\u8bb0 \u2713\u3002",
+    "source": "1505 绯英 行迹 开不败: 「队友持有的【好活当赏】**结束时**，绯英会**将其中的 50%** 转化为自身的【好活当赏】」",
+    "note": "「队友持有的【好活当赏】结束时…取其中的 50%」⇒ `STATE_ENDED` ⇒ "
+            "`GAIN_RESOURCE{好活当赏, amountFromEvent × 0.5, target: self}` ✓。"
+            "⚠ 条件用 `actor state_ended 好活当赏` ✓（事件以 `(carrier, carrier, …)` 触发 ✓ ⇒ `actor` 就是持有者 ✓）；"
+            "⚠ 事件携带的**量**（本轮引擎改动 ✓）就是被结束状态的**实例数** ✓。"
+            "⚠ **登记**：`1513` 的奖励目前仍以**普通状态**（不可叠加 ✗）施加 好活当赏 ✗ "
+            "⇒ 它载的是**一个**实例而不是阿哈时刻的「**笑点**」数 ✗ ⇒ 真实对局里「50% of it」是 **50% × 1** ✗。"
+            "本条只负责**句子本身** ✓；那桥接（笑点 → 状态层数）单独登记 ✓。",
 })
 with io.open(CHAR, "w", encoding="utf-8", newline="\n") as handle:
     json.dump(doc, handle, ensure_ascii=False, indent=2)

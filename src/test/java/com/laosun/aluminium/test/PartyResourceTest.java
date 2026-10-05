@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A PARTY-scoped resource (2026-09-30): the shared \u7b11\u70b9 counter, reader 1505 \u7eef\u82f1\u2019s skill \u300c\u2026\u5e76\u989d\u5916\u83b7\u5f97 10 \u70b9\u7b11\u70b9\u300d.
+ * A PARTY-scoped resource (2026-09-30): the shared 笑点 counter, reader 1505 绯英’s skill 「…并额外获得 10 点笑点」.
  *
- * <p>\u2b50 `ResourceManager` refuses an unwired scope with the reason this capability answers: \u300c\u4e00\u4e2a party-level resource needs a per-battle
- * owner\u300d. The battle is that owner now, and the judge reads the counter from the BATTLE (not from the caster), which is what makes
+ * <p>⭐ `ResourceManager` refuses an unwired scope with the reason this capability answers: 「一个 party-level resource needs a per-battle
+ * owner」. The battle is that owner now, and the judge reads the counter from the BATTLE (not from the caster), which is what makes
  * it shared rather than a copy per character.
  */
 public class PartyResourceTest {
@@ -24,7 +24,7 @@ public class PartyResourceTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String LAUGH = "\u7b11\u70b9";
+    private static final String LAUGH = "笑点";
 
     private Battle battle;
     private Character elation;
@@ -42,7 +42,7 @@ public class PartyResourceTest {
         int before = battle.partyResourceValue(LAUGH);
         battle.castImmediate(elation.getSkills().get(SkillType.SKILL), elation, List.of());
         int after = battle.partyResourceValue(LAUGH);
-        System.out.println("[party] \u7b11\u70b9 on the battle: " + before + " -> " + after
+        System.out.println("[party] 笑点 on the battle: " + before + " -> " + after
                 + " ; the caster holds it herself? " + elation.getResources().has(LAUGH));
         Assertions.assertEquals(0, before, "the battle starts with none");
         Assertions.assertEquals(10, after, "her skill adds ten to the SHARED counter");
@@ -50,7 +50,7 @@ public class PartyResourceTest {
                 "and the counter does not live on the caster (that is what makes it party-level)");
     }
 
-    /** \u2605 The shipped declaration and rule, read off the compiled character (discipline 232). */
+    /** ★ The shipped declaration and rule, read off the compiled character (discipline 232). */
     @Test
     public void theShippedDeclarationSaysParty() {
         build();

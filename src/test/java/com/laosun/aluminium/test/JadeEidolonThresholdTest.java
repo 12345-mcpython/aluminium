@@ -32,7 +32,7 @@ public class JadeEidolonThresholdTest {
         // ⚠ A difference, not an absolute: the unit carries the game's inherent +0.05 crit chance, so `get() - baseValue()`
         // mixes the two (measured: 0.23 where the clause owns 0.18).
         Assertions.assertEquals(0.18, withTechnique - without, EPS,
-                "\u3010\u5f53\u54c1\u3011\u53e0\u52a0\u81f315\u5c42\u65f6\uff0c\u66b4\u51fb\u7387\u63d0\u9ad818%");
+                "【当品】叠加至15层时，暴击率提高18%");
         // The absence of the clause still reads the game's inherent 5% crit chance, so the control is 0.05.
         Assertions.assertEquals(0.05, without, EPS, "one layer is below the threshold, so only the inherent remains");
     }

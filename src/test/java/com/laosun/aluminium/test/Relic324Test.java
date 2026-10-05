@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Relic set 324, 2-piece (2026-09-30): the same-turn skill-point threshold and the count that pays it out.
  *
- * <p>\u26a0 Two measured lessons are baked in here. First, this reads the rules with {@code rulesFor(event)}, NOT with
+ * <p>⚠ Two measured lessons are baked in here. First, this reads the rules with {@code rulesFor(event)}, NOT with
  * {@code matching(event, ctx)}: matching EVALUATES the conditions, so a context with no stacks answers the payout rule's
  * ">= 4" with false and the list comes back one short (measured). Second, the literals carry the {@code .0} the parser
  * writes for an integral threshold -- that law has now bitten four times, so it is written in from the start.

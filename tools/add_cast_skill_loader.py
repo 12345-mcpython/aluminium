@@ -59,7 +59,7 @@ if s.returncode != 0:
                 if m is not None:
                     print('  FAIL %s: %s' % (c.get('name'), (m.get('message') or '')[:280]))
     for l in ((s.stdout or '') + (s.stderr or '')).split(NL):
-        if '.java:' in l or 'error:' in l or '\u9519\u8bef' in l:
+        if '.java:' in l or 'error:' in l or '错误' in l:
             print('  DIAG ' + l.strip()[:180])
     print('REFUSING to commit')
     sys.exit(1)

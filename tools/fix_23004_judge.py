@@ -8,7 +8,7 @@ import io
 PATH = "src/test/java/com/laosun/aluminium/test/Cone23004CastScopeTest.java"
 OLD = '        Assertions.assertEquals(5, count(raw, "\\"until\\": \\"cast_end\\""),\n' \
       '                "every one of them is scoped to the cast");'
-NEW = '        // \u26a0 TEN, not five: each rank carries TWO effects (effect hit and attack) and both state the lifetime.\n' \
+NEW = '        // ⚠ TEN, not five: each rank carries TWO effects (effect hit and attack) and both state the lifetime.\n' \
       '        Assertions.assertEquals(10, count(raw, "\\"until\\": \\"cast_end\\""),\n' \
       '                "both effects of every rank are scoped to the cast");'
 

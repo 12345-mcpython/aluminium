@@ -26,15 +26,15 @@ public class HertaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「抵抗控制类负面状态的概率提高35%」: the engine keeps a per-class resistance, and it must be up. */
+    /** ⚠ 「抵抗控制类负面状态的概率提高35%」: the engine keeps a per-class resistance, and it must be up. */
     @Test
     public void herPuppetTraceRaisesControlResistance() {
         Fixture f = new Fixture();
         Assertions.assertTrue(f.herta.getBuffManager().debuffResistOf(DebuffClass.CONTROL) > 0,
-                "\u300c\u62b5\u6297\u63a7\u5236\u7c7b\u8d1f\u9762\u72b6\u6001\u7684\u6982\u7387\u63d0\u9ad835%\u300d");
+                "「抵抗控制类负面状态的概率提高35%」");
     }
 
-    /** \u26a0 「若敌方目标当前生命值百分比大于等于50%」: the bonus is per TARGET, so a low-HP enemy must not get it. */
+    /** ⚠ 「若敌方目标当前生命值百分比大于等于50%」: the bonus is per TARGET, so a low-HP enemy must not get it. */
     @Test
     public void theSkillBonusAppliesOnlyToHealthyTargets() {
         Character herta = CharacterFactory.create(HERTA, LEVEL);
@@ -61,7 +61,7 @@ public class HertaTest {
         // Same defence on both sides, so an equal instance would cost each the same ABSOLUTE HP, and the document's 20% has to show up
         // as at least a 10% larger loss. (Shares would differ by construction; a strict `>` is satisfied by float noise.)
         Assertions.assertTrue(healthyLoss > hurtLoss * 1.1,
-                "\u300c\u82e5\u654c\u65b9\u76ee\u6807\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4\u5927\u4e8e\u7b49\u4e8e50%\uff0c\u5219\u5bf9\u8be5\u76ee\u6807\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad820%\u300d -- absolute losses: "
+                "「若敌方目标当前生命值百分比大于等于50%，则对该目标造成的伤害提高20%」 -- absolute losses: "
                         + healthyLoss + " (healthy) vs " + hurtLoss + " (hurt)");
     }
 

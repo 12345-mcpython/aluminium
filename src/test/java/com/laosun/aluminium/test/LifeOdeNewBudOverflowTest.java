@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * 1415's memosprite skill 17, first clause (2026-10-02): 「对遐蝶施放时，【新蕊】可以溢出至 #3%」 (#3 = 2).
  *
- * \u2b50 Two-sided: after the ode lands on her, filling 【新蕊】 far past its cap stops at `max + 2% of max`; without the ode the same fill stops at `max`. Both numbers are the
+ * ⭐ Two-sided: after the ode lands on her, filling 【新蕊】 far past its cap stops at `max + 2% of max`; without the ode the same fill stops at `max`. Both numbers are the
  * engine's: the cap her file declares, and the overflow the sentence widens.
  */
 public class LifeOdeNewBudOverflowTest {
@@ -21,7 +21,7 @@ public class LifeOdeNewBudOverflowTest {
     private static final int CYRENE = 1415;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 17;
-    private static final String BUD = "\u65b0\u854a";
+    private static final String BUD = "新蕊";
     private static final int MAX = 34000;
     private static final int OVERFLOW = 680;
 
@@ -52,7 +52,7 @@ public class LifeOdeNewBudOverflowTest {
             SkillExecutor.execute(battle, ode, sprite, List.of(her));
             battle.processRequests();
         }
-        // \u2b50 \u3010\u65b0\u854a\u3011 is declared `scope: PARTY`, so it lives in the BATTLE's store, not the character's (round 77's measured fact).
+        // ⭐ 【新蕊】 is declared `scope: PARTY`, so it lives in the BATTLE's store, not the character's (round 77's measured fact).
         battle.partyResource(BUD).gain(999_999);
         return battle.partyResourceValue(BUD);
     }

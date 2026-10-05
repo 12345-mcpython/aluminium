@@ -8,9 +8,9 @@ import os
 import re
 
 CORPUS = "E:/turnbasedgamedata/aluminium_texts"
-PATTERNS = ["\u4f7f\u6614\u6d9f\u83b7\u5f97", "\u4f7f\u98ce\u5807\u83b7\u5f97", "\u4f7f\u963f\u683c\u83b1\u96c5\u83b7\u5f97",
-            "\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f97", "\u4f7f\u7075\u7802\u83b7\u5f97", "\u4f7f\u666f\u5143\u83b7\u5f97",
-            "\u4f7f\u6258\u5e15\u83b7\u5f97"]
+PATTERNS = ["使昔涟获得", "使风堇获得", "使阿格莱雅获得",
+            "使刻律德菈获得", "使灵砂获得", "使景元获得",
+            "使托帕获得"]
 
 out = []
 for pattern in PATTERNS:

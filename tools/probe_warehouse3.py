@@ -5,13 +5,13 @@ import re
 
 corpus = "E:/turnbasedgamedata/aluminium_texts"
 out = []
-for name in ("1407_\u9050\u8776.md", "1506_\u94f6\u72fcLV.999.md"):
+for name in ("1407_遐蝶.md", "1506_银狼LV.999.md"):
     path = os.path.join(corpus, name)
     if not os.path.isfile(path):
         out.append("(no %s)" % name)
         continue
     flat = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", io.open(path, encoding="utf-8", errors="replace").read()))
-    match = re.search("\u4ed3\u5e93\u6280\uff08\u5168\u5c40\u8f85\u52a9\uff09", flat)
+    match = re.search("仓库技（全局辅助）", flat)
     if match is None:
         out.append("(%s: no warehouse section heading)" % name)
         continue

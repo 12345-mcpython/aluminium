@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1205 Blade, from his own file (2026-09-29, round 194): the \u3010\u5730\u72f1\u53d8\u3011 state, the technique's Max-HP opening and the charge's cap.
+ * 1205 Blade, from his own file (2026-09-29, round 194): the 【地狱变】 state, the technique's Max-HP opening and the charge's cap.
  *
  * <p>The cap is tested by EXCEEDING it (round 192's lesson): six hits must still read 5.
  */
@@ -24,7 +24,7 @@ public class BladeTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The Skill enters the state. */
+    /** ⚠ The Skill enters the state. */
     @Test
     public void theSkillEntersHellscape() {
         Character blade = CharacterFactory.create(BLADE, LEVEL);
@@ -34,24 +34,24 @@ public class BladeTest {
 
         battle.castImmediate(blade.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), blade, List.of(enemy));
 
-        Assertions.assertTrue(blade.getBuffManager().hasState("\u5730\u72f1\u53d8"),
-                "\u300c\u8fdb\u5165\u3010\u5730\u72f1\u53d8\u3011\u72b6\u6001\u300d");
+        Assertions.assertTrue(blade.getBuffManager().hasState("地狱变"),
+                "「进入【地狱变】状态」");
     }
 
-    /** \u26a0 The technique's 40% of his Max HP, measured against a hand-built 50% in the same pipeline, and the control. */
+    /** ⚠ The technique's 40% of his Max HP, measured against a hand-built 50% in the same pipeline, and the control. */
     @Test
     public void theTechniqueDealsFortyPercentOfHisMaxHp() {
         double content = openingLoss(true);
         double reference = referenceLoss();
         double undeclared = openingLoss(false);
 
-        Assertions.assertEquals(0.0, undeclared, 1e-9, "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so nothing");
+        Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 -- undeclared, so nothing");
         Assertions.assertTrue(reference > 0, "the reference must deal damage");
         Assertions.assertEquals(0.4 / 0.5, content / reference, 0.05,
                 "content " + content + " vs reference " + reference + " (expected " + (0.4 / 0.5) + ")");
     }
 
-    /** \u26a0 The charge cap, tested by exceeding it. */
+    /** ⚠ The charge cap, tested by exceeding it. */
     @Test
     public void theChargeStopsAtFive() {
         Character blade = CharacterFactory.create(BLADE, LEVEL);
@@ -63,8 +63,8 @@ public class BladeTest {
             battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, blade, 0, 0);
         }
 
-        Assertions.assertEquals(5, blade.getBuffManager().stacksOf("\u5145\u80fd"),
-                "\u300c\u6700\u591a\u53e0\u52a05\u5c42\u300d -- six hits must still read five");
+        Assertions.assertEquals(5, blade.getBuffManager().stacksOf("充能"),
+                "「最多叠加5层」 -- six hits must still read five");
     }
 
     /** Runs the opening with or without the technique marker. */
@@ -90,7 +90,7 @@ public class BladeTest {
         TriggerSpecs.set(effect, "element", "Wind");
         TriggerSpecs.set(effect, "target", "all_enemies");
         blade.setTriggerTable(new TriggerTable(BLADE, List.of(TriggerSpecs.rule(
-                TriggerEvent.BATTLE_START.name(), List.of("self has_state \u79d8\u6280"), effect))));
+                TriggerEvent.BATTLE_START.name(), List.of("self has_state 秘技"), effect))));
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(blade), List.of(enemy), fixed());
         battle.markTechniqueUsed(blade);

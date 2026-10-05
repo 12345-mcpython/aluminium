@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * Every light cone rule condition PER SUPERIMPOSITION RANK (2026-09-30).
  *
- * <p>\u2b50 Entry points, both measured: {@code Weapon.build(id, second)} IGNORES its second argument and assembles the
+ * <p>⭐ Entry points, both measured: {@code Weapon.build(id, second)} IGNORES its second argument and assembles the
  * lowest existing tier, while {@code WeaponTriggerTables.of(id, rank)} selects the EXACT rank. This judge uses the
- * latter, so each tier\u2019s own rules are asserted at that tier\u2019s own rank -- which pins \u300cexact rank, no accumulation\u300d
+ * latter, so each tier’s own rules are asserted at that tier’s own rank -- which pins 「exact rank, no accumulation」
  * as a judge rather than a code comment.
  *
- * <p>\u2b50 Prefixes, not equality: {@code source()} is the parser\u2019s spelling for pure-text conditions but a snapshot for a
+ * <p>⭐ Prefixes, not equality: {@code source()} is the parser’s spelling for pure-text conditions but a snapshot for a
  * comparison against a numeric variable, so those are pinned by NAME + OPERATOR. The condition COUNT is asserted too.
  */
 public class ConeConditionLiteralsTest {

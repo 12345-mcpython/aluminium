@@ -23,14 +23,14 @@ import java.util.Random;
  */
 public class CaptureCastParamTest {
     private static final int LEVEL = 80;
-    private static final String CHARGE = "\u5145\u80fd";
+    private static final String CHARGE = "充能";
     @Test
     public void theChargeGainsTheOdeRowsValue() {
         int[] with = run(true);
         int[] without = run(false);
         System.out.println("[capture] row value " + with[2] + " ; charge " + with[0] + " -> " + with[1]
                 + " ; without it " + without[0] + " -> " + without[1]);
-        // \u2b50 The capture stores BASIS POINTS now (percent: 10000), because the row value is a share below 1 while a resource holds an integer -- and her charge is
+        // ⭐ The capture stores BASIS POINTS now (percent: 10000), because the row value is a share below 1 while a resource holds an integer -- and her charge is
         // capped at 8, so the reading saturates there. Both halves are the engine's own numbers: the row value read from the memosprite, and her declared cap.
         Assertions.assertEquals(Math.min(10000 * Math.round(with[2]), 8), with[1],
                 "the charge rises by the captured basis points, capped at her 8");

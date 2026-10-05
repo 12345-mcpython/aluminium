@@ -9,8 +9,8 @@ import sys
 SRC = "GAPS.md"
 lines = io.open(SRC, encoding="utf-8").read().split("\n")
 
-T = "### \u2b50 \u7f3a\u53e3 \u00d7 \u7f3a\u5757"
-THREE = "## \u4e09\u3001\u5df2\u6539\u6b63\u7684\u8fc7\u65f6\u767b\u8bb0"
+T = "### ⭐ 缺口 × 缺块"
+THREE = "## 三、已改正的过时登记"
 
 def find(prefix, start=0):
     for i in range(start, len(lines)):

@@ -12,7 +12,7 @@ OLD = '        double before = enemy.getCurrentHp();\n' \
       '        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, owner, owner, 0, -spent);\n'
 NEW = '        double before = enemy.getCurrentHp();\n' \
       '        // `resource_changed:<name>` reads what the battle was TOLD changed, so a hand-fired event must say so.\n' \
-      '        battle.noteChangedResource("\u5145\u80fd");\n' \
+      '        battle.noteChangedResource("充能");\n' \
       '        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, owner, owner, 0, -spent);\n'
 if text.count(OLD) != 1:
     print("FAIL: fire anchor matched %d times" % text.count(OLD))
@@ -20,8 +20,8 @@ if text.count(OLD) != 1:
 text = text.replace(OLD, NEW)
 
 # 2) prove the MAGNITUDE spelling on HEAL, which is known to route through grantAmount --------------------
-OLD_CASE = text[text.index("    /** \u2b50 A magnitude off the event"):text.index("    /** \u2b50 A repeat count off the event")]
-NEW_CASE = '''    /** \u2b50 A magnitude off the event: heal 1 point per point of health lost. */
+OLD_CASE = text[text.index("    /** ⭐ A magnitude off the event"):text.index("    /** ⭐ A repeat count off the event")]
+NEW_CASE = '''    /** ⭐ A magnitude off the event: heal 1 point per point of health lost. */
     @Test
     public void theMagnitudeFollowsTheEvent() {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);

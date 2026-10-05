@@ -5,7 +5,7 @@ Verbatim (1141519, params [0.36, 12]): 「德谬歌施放忆灵技时，使风�
 Measured: #2 is NOT constant -- it runs 12 at level 1 to 33.6 at level 10 -- so it must be read out of the cast skill's row rather than written as a literal. 风堇 is cid 1409
 in our own data ("Hyacine"), and her file already exists, so this appends.
 
-\u26d4 Registered from the same skill: 「德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】」 (a stack on HER, triggered by the memosprite's cast -- a cross-table target our
+⛔ Registered from the same skill: 「德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】」 (a stack on HER, triggered by the memosprite's cast -- a cross-table target our
 selectors do not have), 「计入小伊卡忆灵技的治疗数值额外提高…」 and 「消耗1层」.
 """
 import io
@@ -17,7 +17,7 @@ HYACINE = "src/main/resources/characters/1409.json"
 SE = "src/main/resources/data/skill_effects.json"
 SKILLS = "src/main/resources/data/skills.json"
 SLOT = 19
-MARK = "\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7"
+MARK = "献予「天空」之诗"
 
 table = json.load(io.open(SKILLS, encoding="utf-8"))
 rows = table["11415"][str(SLOT)].get("param_list") or []
@@ -46,10 +46,10 @@ rules.append({
         "percent": 1.0,
         "target": "self",
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 19\uff0cSkillID 1141519\uff09\uff1a"
-               "\u300c**\u5bf9\u98ce\u5807\u65bd\u653e\u65f6\uff0c\u4e3a\u98ce\u5807\u6062\u590d #2 \u70b9\u80fd\u91cf**\u3002\u300d"),
-    "note": ("\u2b50 `#2` **\u968f\u7b49\u7ea7\u53d8**\uff08**\u5b9e\u6d4b**\uff1a12 \u2192 33.6\uff09\u2192 \u8d70 `cast_skill_param:1`\uff08\u65bd\u653e\u6280\u80fd\u7684\u7b2c 1 \u53c2\u6570\uff09\u3002"
-             "\u2b50 \u5f62\u72b6\u7167 1410 \u7684 `memosprite_ode_of_ocean_spends_itself_for_energy`\uff08\u540c\u4e00\u53e5\u8bdd\u7684\u53e6\u4e00\u4e2a\u5b9e\u4f8b\uff09\u3002"),
+    "source": ("1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）："
+               "「**对风堇施放时，为风堇恢复 #2 点能量**。」"),
+    "note": ("⭐ `#2` **随等级变**（**实测**：12 → 33.6）→ 走 `cast_skill_param:1`（施放技能的第 1 参数）。"
+             "⭐ 形状照 1410 的 `memosprite_ode_of_ocean_spends_itself_for_energy`（同一句话的另一个实例）。"),
 })
 
 if isinstance(doc, list):
@@ -64,8 +64,8 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": "1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 19\uff09\uff1a\u5de5\u4f5c\u5728\u89c4\u5219\u4fa7\u3002",
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\u3002",
+        "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19）：工作在规则侧。",
+        "note": "⭐ 没有条目就不可交付。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -84,9 +84,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d: \u300c\u5bf9\u98ce\u5807\u65bd\u653e\u65f6\uff0c\u4e3a\u98ce\u5807\u6062\u590d #2 \u70b9\u80fd\u91cf\u300d (2026-10-02).
+ * 1415's memosprite skill 19 「献予「天空」之诗」: 「对风堇施放时，为风堇恢复 #2 点能量」 (2026-10-02).
  *
- * <p>\u2b50 Two scenes that differ by exactly one thing: whether the ode was cast at her. #2 runs with the level (12 -> 33.6), so the expected number is read out of the
+ * <p>⭐ Two scenes that differ by exactly one thing: whether the ode was cast at her. #2 runs with the level (12 -> 33.6), so the expected number is read out of the
  * CAST skill's own row rather than written down. Nothing is replaced.
  */
 public class SkyOdeEnergyTest {

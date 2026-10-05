@@ -39,10 +39,10 @@ for rule in rules:
         })
         rule["do"] = effects
         rule["note"] = ((rule.get("note") or "") +
-                        "\n\u2b50 2026-10-02\uff1a\u6587\u6863 `:105`\u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u9020\u6210\u4f24\u5bb3\u65f6"
-                        "**\u65e0\u89c6\u76ee\u6807 16% \u7684\u9632\u5fa1\u529b**\u300d\u2713 \u21d2 \u52a0\u5728**\u6388\u4e88\u3010\u519b\u529f\u3011\u7684\u90a3\u6761\u89c4\u5219**\u91cc \u2713"
-                        "\uff08\u76ee\u6807\u5c31\u662f\u9886\u5230\u519b\u529f\u7684\u90a3\u4f4d \u2713\uff09\u3002"
-                        "\u26a0 **\u5df2\u767b\u8bb0**\uff1a\u540c\u53e5\u7684\u300c\u82e5\u5df2\u5347\u4e3a\u3010\u7235\u4f4d\u3011\u2026\u989d\u5916\u65e0\u89c6 20%\u300d\u9700\u201c**\u8be5\u89d2\u8272\u7684\u6218\u6280\u4f24\u5bb3**\u201d\u8fd9\u4e2a\u9650\u5b9a \u2717\u3002")
+                        "\n⭐ 2026-10-02：文档 `:105`「持有【军功】的角色造成伤害时"
+                        "**无视目标 16% 的防御力**」✓ ⇒ 加在**授予【军功】的那条规则**里 ✓"
+                        "（目标就是领到军功的那位 ✓）。"
+                        "⚠ **已登记**：同句的「若已升为【爵位】…额外无视 20%」需“**该角色的战技伤害**”这个限定 ✗。")
         patched += 1
 if patched != 1:
     raise SystemExit("expected exactly one merit rule, patched " + str(patched))
@@ -71,9 +71,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412\uff1a\u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u9020\u6210\u4f24\u5bb3\u65f6**\u65e0\u89c6\u76ee\u6807 16% \u7684\u9632\u5fa1\u529b**\u300d (2026-10-02).
+ * 1412：「持有【军功】的角色造成伤害时**无视目标 16% 的防御力**」 (2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN: her skill is what grants \u3010\u519b\u529f\u3011, so after it the ALLY should carry the 16% defence ignore -- while she
+ * <p>⭐ FILE-DRIVEN: her skill is what grants 【军功】, so after it the ALLY should carry the 16% defence ignore -- while she
  * herself should not, which is the "false side" this judge also asserts.
  */
 public class MilitaryMeritDefenceIgnoreTest {
@@ -81,7 +81,7 @@ public class MilitaryMeritDefenceIgnoreTest {
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 The merit holder ignores 16% DEF; the caster does not. */
+    /** ⭐ The merit holder ignores 16% DEF; the caster does not. */
     @Test
     public void theMeritHolderIgnoresSixteenPercent() {
         Character owner = CharacterFactory.create(OWNER, 80);
@@ -97,7 +97,7 @@ public class MilitaryMeritDefenceIgnoreTest {
         battle.processRequests();
 
         Assertions.assertEquals(0.16, ally.getAttribute(AttributeType.DEFENCE_IGNORE).get(), 1e-9,
-                "\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u65e0\u89c6 16% \u9632\u5fa1");
+                "持有【军功】的角色无视 16% 防御");
         Assertions.assertEquals(0.0, owner.getAttribute(AttributeType.DEFENCE_IGNORE).get(), 1e-9,
                 "and the caster keeps none of it (the false side)");
     }

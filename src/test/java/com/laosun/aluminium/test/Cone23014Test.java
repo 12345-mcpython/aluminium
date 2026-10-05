@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23014: a teammate being hit or paying health gives the wearer a layer of \u3010\u6708\u8680\u3011 (max 3); every layer lifts the
+ * Light cone 23014: a teammate being hit or paying health gives the wearer a layer of 【月蚀】 (max 3); every layer lifts the
  * wearer's NEXT attack, and a full stack also ignores 12% of the target's defence. The stack is spent by attacking.
  */
 public class Cone23014Test {
@@ -29,7 +29,7 @@ public class Cone23014Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String MOON = "\u6708\u8680";
+    private static final String MOON = "月蚀";
     private static final int CAP = 3;
 
     private Character wearer;
@@ -72,7 +72,7 @@ public class Cone23014Test {
                 + " then two more hits=" + capped);
         Assertions.assertEquals(1, one, "a teammate being hit gives one layer");
         Assertions.assertEquals(2, two, "and a teammate paying health gives another");
-        Assertions.assertEquals(CAP, capped, "\u6700\u591a\u53e0\u52a0 3 \u5c42");
+        Assertions.assertEquals(CAP, capped, "最多叠加 3 层");
     }
 
     @Test
@@ -101,7 +101,7 @@ public class Cone23014Test {
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0);
         int after = wearer.getBuffManager().stacksOf(MOON);
         System.out.println("[23014] stacks after the wearer attacks=" + after);
-        Assertions.assertEquals(0, after, "\u65bd\u653e\u653b\u51fb\u540e\u89e3\u9664");
+        Assertions.assertEquals(0, after, "施放攻击后解除");
     }
 
     @Test
@@ -114,10 +114,10 @@ public class Cone23014Test {
 
     @Test
     public void theSpecPinsTheIgnoreClause() {
-        // \u2605 The one clause whose AMOUNT is not separable from the stack behaviourally (it rides the same instance as the
+        // ★ The one clause whose AMOUNT is not separable from the stack behaviourally (it rides the same instance as the
         // full-stack boost), so the number itself is pinned here.
         build(true);
-        // \u2605\u2605 The rule exists only at a FULL stack, and `matching` evaluates conditions, so the state must be BUILT first --
+        // ★★ The rule exists only at a FULL stack, and `matching` evaluates conditions, so the state must be BUILT first --
         // measured: without this the loop found zero rules and pinned nothing, and `12 -> 6 percent` stayed 0 red.
         for (int i = 0; i < CAP; i++) {
             teammateIsHit();

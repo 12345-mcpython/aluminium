@@ -43,7 +43,7 @@ public class GepardKitTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「为我方全体提供…护盾」: read as the engine reads it — a shield VALUE on each unit. */
+    /** ⚠ 「为我方全体提供…护盾」: read as the engine reads it — a shield VALUE on each unit. */
     @Test
     public void hisUltimateShieldsTheCasterAndTheParty() {
         Fixture f = new Fixture(0);
@@ -52,12 +52,12 @@ public class GepardKitTest {
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.ULTRA), f.gepard, List.of(f.ally));
 
         Assertions.assertTrue(f.gepard.getShield() > 0,
-                "\u300c\u4e3a\u6211\u65b9\u5168\u4f53\u63d0\u4f9b\u80fd\u591f\u62b5\u6d88\u2026\u4f24\u5bb3\u7684\u62a4\u76fe\u300d \u2014 the caster is shielded too");
+                "「为我方全体提供能够抵消…伤害的护盾」 — the caster is shielded too");
         Assertions.assertTrue(f.ally.getShield() > 0,
-                "\u2026and the aimed ally, so the rule is not written for `target` alone");
+                "…and the aimed ally, so the rule is not written for `target` alone");
     }
 
-    /** \u26a0 The trace 「每回合开始时刷新」: his own turn start puts the defence-derived attack bonus on him. */
+    /** ⚠ The trace 「每回合开始时刷新」: his own turn start puts the defence-derived attack bonus on him. */
     @Test
     public void hisTraceRefreshesOnHisTurn() {
         Fixture f = new Fixture(0);
@@ -66,7 +66,7 @@ public class GepardKitTest {
         f.battle.fireTriggers(TriggerEvent.TURN_START, f.gepard, f.gepard, 0, 0);
 
         Assertions.assertTrue(f.gepard.getAttribute(AttributeType.ATTACK).get() > before,
-                "\u300c\u63d0\u9ad8\u7b49\u540c\u4e8e\u81ea\u8eab\u5f53\u524d\u9632\u5fa1\u529b35%\u7684\u653b\u51fb\u529b\uff0c\u6bcf\u56de\u5408\u5f00\u59cb\u65f6\u5237\u65b0\u300d");
+                "「提高等同于自身当前防御力35%的攻击力，每回合开始时刷新」");
     }
 
     /** Census: the clauses are where the notes say they are. */
@@ -100,7 +100,7 @@ public class GepardKitTest {
         battle.startBattle();
 
         Assertions.assertEquals(4.0, battle.aggroOf(gepard) / before, 1e-9,
-                "\u300c\u5091\u5e15\u5fb7\u88ab\u654c\u65b9\u653b\u51fb\u7684\u6982\u7387\u63d0\u9ad8\u300d "
+                "「傑帕德被敌方攻击的概率提高」 "
                         + "-- ParamList [3] reads as weight x (1 + 3)");
         Assertions.assertTrue(battle.aggroOf(gepard) > battle.aggroOf(ally),
                 "and he now outweighs a plain ally, which is the whole point of the trace");

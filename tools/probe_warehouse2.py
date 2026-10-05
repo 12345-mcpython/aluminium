@@ -16,7 +16,7 @@ for cid in ("1407", "1506"):
     for name in pages:
         flat = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", io.open(
             os.path.join(corpus, name), encoding="utf-8", errors="replace").read()))
-        for match in list(re.finditer("\u4ed3\u5e93\u6280", flat))[:3]:
+        for match in list(re.finditer("仓库技", flat))[:3]:
             out.append("   [%s] ...%s..." % (name, flat[max(0, match.start() - 200):match.start() + 420]))
     out.append("")
 

@@ -9,13 +9,13 @@ registration rather than re-checking the tree.
 import io
 
 PATH = "EXPRESSION.md"
-START = "| \u300c\u6309\u6570\u91cf\uff0f\u8ba1\u6570**\u7f29\u653e\u5c5e\u6027**"
-NEW = ("| \u300c**\u6bcf\u5c42 +X%**\u300d\u7684**\u6d3b\u503c\u4fee\u6b63\u5668**\uff08\u957f\u9a7b\u5149\u73af\uff1a\u6570\u503c\u968f\u5c42\u6570**\u88ab\u91cd\u65b0\u8bfb\u53d6**\uff09 "
-       "| \u4e00\u4e2a\u5728**\u8bfb\u53d6\u65f6\u89e3\u6790\u5176\u4efd\u989d**\u7684\u4fee\u6b63\u5668\uff08`DoubleValue` \u7684\u4e00\u7c7b**\u6d3b**\u4fee\u6b63\uff09\uff1a"
-       "\u5feb\u7167\u53ea\u80fd\u5728**\u5e94\u7528\u65f6\u523b**\u7b97\u4e00\u6b21 \u2717\uff0c\u800c\u91cd\u7b97\u53c8\u4f1a\u8ba9 buff \u81ea\u5df1\u53e0\u52a0\uff080.14 \u00d7 (1+2+3+4+5)\uff09\u2717\uff1b"
-       "\u26a0 \u6811\u91cc\u53ea\u89c1\u5230\u6301\u6709**\u6570\u503c**\u7684\u4fee\u6b63\u5668\uff08`multiplyPercent(rate, \u2026)` \u2713\uff09 "
-       "| **14 \u4e2a\u6587\u4ef6**\uff08GAPS \u7b2c 39 \u6761\uff0c2026-09-29 \u91cf\u6d4b \u2713\uff1b\u26a0 \u672c\u8f6e**\u53ea\u8bfb\u5230\u767b\u8bb0**\uff0c\u672a\u9010\u6761\u590d\u6838 \u2717\uff09 "
-       "| \u4e00\u7c7b\u6d3b\u4fee\u6b63\u5668\uff08\u8bfb\u53d6\u65f6\u53d6\u5f53\u524d\u5c42\u6570\uff09\n")
+START = "| 「按数量／计数**缩放属性**"
+NEW = ("| 「**每层 +X%**」的**活值修正器**（长驻光环：数值随层数**被重新读取**） "
+       "| 一个在**读取时解析其份额**的修正器（`DoubleValue` 的一类**活**修正）："
+       "快照只能在**应用时刻**算一次 ✗，而重算又会让 buff 自己叠加（0.14 × (1+2+3+4+5)）✗；"
+       "⚠ 树里只见到持有**数值**的修正器（`multiplyPercent(rate, …)` ✓） "
+       "| **14 个文件**（GAPS 第 39 条，2026-09-29 量测 ✓；⚠ 本轮**只读到登记**，未逐条复核 ✗） "
+       "| 一类活修正器（读取时取当前层数）\n")
 
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 hits = [i for i, line in enumerate(lines) if line.startswith(START)]

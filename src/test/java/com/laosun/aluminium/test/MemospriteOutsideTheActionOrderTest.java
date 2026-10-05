@@ -50,7 +50,7 @@ public class MemospriteOutsideTheActionOrderTest {
         battle.processRequests();
 
         Summon servant = battle.summonServant(summoner);
-        // \u26a0 This is the line that used to throw "Speed must be greater than 0."
+        // ⚠ This is the line that used to throw "Speed must be greater than 0."
         battle.processRequests();
 
         boolean inOrder = battle.getQueueSnapshot().stream().anyMatch(s -> s.getCanHit() == servant);

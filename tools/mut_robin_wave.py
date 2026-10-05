@@ -21,7 +21,7 @@ if mode == "off":
 else:
     if rule.get("when"):
         sys.exit("REFUSING: the gate is still there")
-    rule["when"] = ["self has_state \u79d8\u6280"]
+    rule["when"] = ["self has_state 秘技"]
     print("restored: the gate is back")
 
 with io.open(CHAR, "w", encoding="utf-8", newline="\n") as handle:

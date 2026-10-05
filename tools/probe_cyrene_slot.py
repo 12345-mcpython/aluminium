@@ -31,14 +31,14 @@ import java.util.Random;
 /**
  * Does a TURN_START rule fire on HER table? Probed with an attribute nobody else writes (1415, 2026-10-02).
  *
- * <p>\u26a0 `ALL_DAMAGE_TYPE_BOOST` is written by her talent too, so a delta there proves nothing; `BREAKING_EFFECT` is untouched
+ * <p>⚠ `ALL_DAMAGE_TYPE_BOOST` is written by her talent too, so a delta there proves nothing; `BREAKING_EFFECT` is untouched
  * in her table, which is what makes this a discriminator rather than another confounded reading.
  */
 public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Past the threshold the rule must move an attribute nobody else writes. */
+    /** ⭐ Past the threshold the rule must move an attribute nobody else writes. */
     @Test
     public void theRuleFiresOnHerTable() {
         Assertions.assertEquals(0, untouched(0), 1e-9, "below the threshold, nothing");

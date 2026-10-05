@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 20005: at battle start the WHOLE party's attack rises 8%.
  *
- * <p>\u2b50 One sentence, one rule. The judge reads the wearer AND the ally, because \u300c\u6211\u65b9\u5168\u4f53\u300d that only reached the wearer would
+ * <p>⭐ One sentence, one rule. The judge reads the wearer AND the ally, because 「我方全体」 that only reached the wearer would
  * still look right on a single-unit fixture.
  */
 public class Cone20005Test {
@@ -47,7 +47,7 @@ public class Cone20005Test {
 
     @Test
     public void theWholePartyGainsAttackAtBattleStart() {
-        // \u2605 Baselines from a CONE-LESS battle of the same shape (discipline 169): a bare CharacterFactory.create outside a
+        // ★ Baselines from a CONE-LESS battle of the same shape (discipline 169): a bare CharacterFactory.create outside a
         // battle does not reproduce the value the buff is a share OF (measured: 645.27 vs the 546.8 the 43.75 delta implies).
         Battle baseline = battle(false);
         double wearerBase = wearer.getAttribute(AttributeType.ATTACK).get();
@@ -57,8 +57,8 @@ public class Cone20005Test {
         double allyDelta = ally.getAttribute(AttributeType.ATTACK).get() - allyBase;
         System.out.println("[20005] wearer +" + wearerDelta + " ally +" + allyDelta
                 + " (ally baseline " + allyBase + ")");
-        Assertions.assertTrue(wearerDelta > 0, "\u6211\u65b9\u5168\u4f53 includes the wearer");
-        // \u2605 What this judge CAN attribute: the wearer is 1205, whose own kit raises ATTACK at battle start too (measured
+        Assertions.assertTrue(wearerDelta > 0, "我方全体 includes the wearer");
+        // ★ What this judge CAN attribute: the wearer is 1205, whose own kit raises ATTACK at battle start too (measured
         // +386, far more than 8%), and the buff itself is a share of the unit's PRE-BONUS base -- measured: the ally's +43.75
         // is 8% of 546.9, while its post-bonus ATTACK is 645.27. Reading that base is not something this judge can do yet
         // (registered), so the SHARE is pinned by the spec half and this half pins that both units really moved.

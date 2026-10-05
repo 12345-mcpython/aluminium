@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23057, its laughter clause: \u300c\u5bf9\u81ea\u8eab\u5355\u4f53\u65bd\u653e\u7ec8\u7ed3\u6280\u65f6\uff0c\u83b7\u5f97 20 \u70b9\u3010\u7b11\u70b9\u3011\u3002
- * \u8be5\u6548\u679c\u6700\u591a\u89e6\u53d1 1 \u6b21\uff0c\u65bd\u653e 3 \u6b21\u666e\u653b\u540e\u91cd\u7f6e\u53ef\u89e6\u53d1\u6b21\u6570\u300d.
+ * Light cone 23057, its laughter clause: 「对自身单体施放终结技时，获得 20 点【笑点】。
+ * 该效果最多触发 1 次，施放 3 次普攻后重置可触发次数」.
  *
- * <p>\u2b50 Three rules, and two of them are mutually exclusive on the same event ({@code self_stacks:\u666e\u653b\u8ba1\u6570 < 2} and
+ * <p>⭐ Three rules, and two of them are mutually exclusive on the same event ({@code self_stacks:普攻计数 < 2} and
  * {@code >= 2}), so the third normal attack can only take the RESET branch -- there is no "clear then add" ordering to get
  * wrong.
  */
@@ -30,9 +30,9 @@ public class Cone23057LaughterTest {
     private static final int MONSTER = 1002011;
     private static final int GRANT = 20;
     private static final int CYCLE = 3;
-    private static final String LAUGH = "\u7b11\u70b9";
-    private static final String FLAG = "\u7b11\u70b9\u5df2\u89e6\u53d1";
-    private static final String COUNT = "\u666e\u653b\u8ba1\u6570";
+    private static final String LAUGH = "笑点";
+    private static final String FLAG = "笑点已触发";
+    private static final String COUNT = "普攻计数";
 
     private Character wearer;
     private Enemy enemy;
@@ -74,7 +74,7 @@ public class Cone23057LaughterTest {
         System.out.println("[23057] first=" + first + " second=" + second + " after " + CYCLE
                 + " normals=" + afterReset);
         Assertions.assertEquals(GRANT, first, 1e-9, "a self-targeted Ultimate grants 20");
-        Assertions.assertEquals(GRANT, second, 1e-9, "and a second one does NOT -- \u6700\u591a\u89e6\u53d1 1 \u6b21");
+        Assertions.assertEquals(GRANT, second, 1e-9, "and a second one does NOT -- 最多触发 1 次");
         Assertions.assertEquals(2 * GRANT, afterReset, 1e-9,
                 "after three normal attacks the count is reset, so the next one grants again");
     }
@@ -87,7 +87,7 @@ public class Cone23057LaughterTest {
         for (int i = 1; i <= CYCLE; i++) {
             normalAttack(battle);
             seen[i] = wearer.getBuffManager().stacksOf(COUNT);
-            System.out.println("[23057] normal attack " + i + " -> \u666e\u653b\u8ba1\u6570=" + seen[i]);
+            System.out.println("[23057] normal attack " + i + " -> 普攻计数=" + seen[i]);
         }
         Assertions.assertEquals(0, seen[0], "nothing yet");
         Assertions.assertEquals(1, seen[1], "first normal attack counts");
@@ -100,22 +100,22 @@ public class Cone23057LaughterTest {
         Battle battle = battle(true);
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0);
         System.out.println("[23057] ult on an enemy: laughter=" + laughter());
-        Assertions.assertEquals(0, laughter(), "\u5bf9\u81ea\u8eab is the clause (false case)");
+        Assertions.assertEquals(0, laughter(), "对自身 is the clause (false case)");
     }
 
     @Test
     public void aNonNormalAttackDoesNotCount() {
         Battle battle = battle(true);
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.BPSKILL);
-        System.out.println("[23057] a Skill used as an attack: \u666e\u653b\u8ba1\u6570="
+        System.out.println("[23057] a Skill used as an attack: 普攻计数="
                 + wearer.getBuffManager().stacksOf(COUNT));
-        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "only \u666e\u653b counts");
+        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "only 普攻 counts");
     }
 
     @Test
     public void theSpecPinsTheThreeRules() {
         Battle battle = battle(true);
-        // \u2605 matching() EVALUATES conditions (discipline 182): the grant and the count are reachable from a fresh battle,
+        // ★ matching() EVALUATES conditions (discipline 182): the grant and the count are reachable from a fresh battle,
         // while the RESET branch only holds in a transient state (its gate is "the counter is already full", and the very
         // same event clears it again). That branch is covered BEHAVIOURALLY by theCounterRunsZeroOneTwoThenZero instead of
         // being faked here -- an assertion that has to manufacture an unreachable state would prove nothing about the game.

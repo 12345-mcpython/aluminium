@@ -18,7 +18,7 @@ NEW = """        Character master = CharacterFactory.create(cid, LEVEL, false, n
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        // \u26a0 The summons live on an ACT: 1409's skill and 1415's ultimate, exactly as the sentences say.
+        // ⚠ The summons live on an ACT: 1409's skill and 1415's ultimate, exactly as the sentences say.
         com.laosun.aluminium.models.enemy.Enemy victim = battle.getEnemies().getFirst();
         battle.castImmediate(master.getSkills().get(
                         cid == 1409 ? com.laosun.aluminium.enums.SkillType.SKILL

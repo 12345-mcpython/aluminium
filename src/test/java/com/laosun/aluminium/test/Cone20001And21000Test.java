@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Cones 20001 and 21000: \u300c\u65bd\u653e\u6218\u6280\u548c\u7ec8\u7ed3\u6280\u65f6 / \u65bd\u653e\u7ec8\u7ed3\u6280\u65f6\uff0c\u6cbb\u7597\u91cf\u63d0\u9ad8\u300d -- the window is THE CAST.
+ * Cones 20001 and 21000: 「施放战技和终结技时 / 施放终结技时，治疗量提高」 -- the window is THE CAST.
  *
- * <p>\u2b50 Four readings around the engine's own cast window: absent, raised by the cast's own pre-cast event, and gone once
+ * <p>⭐ Four readings around the engine's own cast window: absent, raised by the cast's own pre-cast event, and gone once
  * the cast's events are done. A `turns: 1` spelling would pass the first three and fail the last -- which is exactly the
  * difference the upstream callback pair states.
  */

@@ -40,7 +40,7 @@ public class TransformationEndClausesTest {
     private static final String STATE = "\\u53d8\\u8eab";
     private static final String SEEDS = "\\u706b\\u79cd";
 
-    /** \u300c\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u4f7f\u6211\u65b9\u5168\u4f53\u901f\u5ea6\u63d0\u9ad8 15%\uff0c\u6301\u7eed 1 \u56de\u5408\u300d -- and \u300c\u6211\u65b9\u5168\u4f53\u300d is read on two units, not one. */
+    /** 「变身结束时，使我方全体速度提高 15%，持续 1 回合」 -- and 「我方全体」 is read on two units, not one. */
     @Test
     public void theEndSpeedsTheWholeParty() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -55,7 +55,7 @@ public class TransformationEndClausesTest {
         battle.processRequests();
         Assertions.assertTrue(owner.getBuffManager().hasState(STATE), "precondition: the transformation is on");
 
-        // \u26a0 Read AFTER the transformation: its own numbers are then already in, so the delta below is the end clause alone.
+        // ⚠ Read AFTER the transformation: its own numbers are then already in, so the delta below is the end clause alone.
         double ownerBefore = owner.getAttribute(AttributeType.SPEED).get();
         double allyBefore = ally.getAttribute(AttributeType.SPEED).get();
         double ownerBase = owner.getAttribute(AttributeType.SPEED).baseValue();
@@ -69,12 +69,12 @@ public class TransformationEndClausesTest {
                 + " ; ally " + allyBefore + " -> " + allyAfter + " (base " + allyBase + ")");
 
         Assertions.assertEquals(ownerBase * 0.15, ownerAfter - ownerBefore, ownerBase * 1e-6,
-                "\u300c\u53d8\u8eab\u7ed3\u675f\u65f6\u2026\u901f\u5ea6\u63d0\u9ad8 15%\u300d-- on her");
+                "「变身结束时…速度提高 15%」-- on her");
         Assertions.assertEquals(allyBase * 0.15, allyAfter - allyBefore, allyBase * 1e-6,
-                "\u300c\u6211\u65b9\u5168\u4f53\u300d-- and on the ally, which is what \u5168\u4f53 means");
+                "「我方全体」-- and on the ally, which is what 全体 means");
     }
 
-    /** \u300c\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u83b7\u5f97 3 \u70b9\u3010\u706b\u79cd\u3011\u300d. */
+    /** 「变身结束时，获得 3 点【火种】」. */
     @Test
     public void theEndGrantsThreeSeeds() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -96,7 +96,7 @@ public class TransformationEndClausesTest {
         System.out.println("[end-clauses] seeds " + before + " -> " + duringTransformation + " -> " + after);
 
         Assertions.assertEquals(duringTransformation + 3, after,
-                "\u300c\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u83b7\u5f97 3 \u70b9\u3010\u706b\u79cd\u3011\u300d");
+                "「变身结束时，获得 3 点【火种】」");
     }
 }
 ''')

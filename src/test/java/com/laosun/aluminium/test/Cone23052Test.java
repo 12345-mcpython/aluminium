@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23052: where the wearer's MEMOSPRITE aims its skill decides what the party gets -- at an ally it marks \u3010\u7a7a\u767d\u3011 and
- * everything the enemies take goes up 10%; at an enemy it marks \u3010\u8bd7\u884c\u3011 and the whole party crits 16% harder.
+ * Light cone 23052: where the wearer's MEMOSPRITE aims its skill decides what the party gets -- at an ally it marks 【空白】 and
+ * everything the enemies take goes up 10%; at an enemy it marks 【诗行】 and the whole party crits 16% harder.
  */
 public class Cone23052Test {
     private static final int CONE = 23052;
@@ -29,8 +29,8 @@ public class Cone23052Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String BLANK = "\u7a7a\u767d";
-    private static final String POEM = "\u8bd7\u884c";
+    private static final String BLANK = "空白";
+    private static final String POEM = "诗行";
 
     private Character wearer;
     private Character ally;
@@ -64,7 +64,7 @@ public class Cone23052Test {
         double after = wearableHit();
         System.out.println("[23052] blank=" + blank + " ; damage on the enemy " + before + " -> " + after
                 + " (x" + (after / before) + ")");
-        Assertions.assertEquals(1, blank, "\u5bf9\u6211\u65b9\u5355\u4f53 gives \u7a7a\u767d");
+        Assertions.assertEquals(1, blank, "对我方单体 gives 空白");
         Assertions.assertEquals(1.1, after / before, 0.02, "and every enemy takes 10% more");
     }
 
@@ -78,7 +78,7 @@ public class Cone23052Test {
         double after = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23052] poem=" + poem + " ; party crit damage " + before + " -> " + after
                 + " (allies: " + ally.getAttribute(AttributeType.CRIT_ATTACK).get() + ")");
-        Assertions.assertEquals(1, poem, "\u5bf9\u654c\u65b9 gives \u8bd7\u884c");
+        Assertions.assertEquals(1, poem, "对敌方 gives 诗行");
         Assertions.assertEquals(before + 0.16, after, 1e-9, "and the party crits 16% harder");
         Assertions.assertEquals(after, ally.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9, "the ALLY too");
     }

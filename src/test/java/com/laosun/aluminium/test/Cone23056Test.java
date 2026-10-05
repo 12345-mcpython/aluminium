@@ -16,7 +16,7 @@ import java.util.List;
  * 40..80% and every enemy takes 20..30% more damage; and every FOUR follow-up attacks grant the same shadow, expressed
  * the way the engine expresses thresholds -- a counter read as a condition on the same event, reset by REMOVE_STACK.
  *
- * <p>\u26a0 Literals carry the {@code .0} the parser writes for an integral threshold (four bites so far).
+ * <p>⚠ Literals carry the {@code .0} the parser writes for an integral threshold (four bites so far).
  */
 public class Cone23056Test {
     private static final int CONE = 23056;

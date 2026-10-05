@@ -26,8 +26,8 @@ if "ABOVE_PREFIX" in text:
 else:
     OLD = ('        if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {\n')
     NEW = ('        if (effect.getScale().trim().startsWith(ABOVE_PREFIX)) {\n'
-           '            // \u2b50 \u300c\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e 120 \u65f6\u2026\u4e4b\u540e**\u6bcf\u8d85\u8fc7 1 \u70b9\u901f\u5ea6**\u2026\u300d (2026-10-02): the EXCESS over a\n'
-           '            // stated threshold, as a magnitude. \u26a0 `self_max_energy` below is the same shape with the threshold\n'
+           '            // ⭐ 「速度大于等于 120 时…之后**每超过 1 点速度**…」 (2026-10-02): the EXCESS over a\n'
+           '            // stated threshold, as a magnitude. ⚠ `self_max_energy` below is the same shape with the threshold\n'
            '            // hard-wired to MAX ENERGY; this is that, parameterised.\n'
            '            String[] parts = effect.getScale().trim().substring(ABOVE_PREFIX.length()).split(":", 2);\n'
            '            if (parts.length != 2) {\n'
@@ -55,10 +55,10 @@ else:
     ANCHOR = '    private static final String EVENT_AMOUNT = "event_amount";\n'
     CONST = (ANCHOR + '\n'
              '    /**\n'
-             '     * \u300c\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e X \u65f6\u2026\u6bcf\u8d85\u8fc7 1 \u70b9\u901f\u5ea6\u2026\u300d (2026-10-02): {@code self_attr_above:<ATTRIBUTE>:<threshold>}.\n'
+             '     * 「速度大于等于 X 时…每超过 1 点速度…」 (2026-10-02): {@code self_attr_above:<ATTRIBUTE>:<threshold>}.\n'
              '     *\n'
-             '     * <p>Like {@link #SELF_MAX_ENERGY} \u2014 the same shape, with the threshold stated instead of implied by the\n'
-             '     * energy cap \u2014 and, like it, not an {@code AttributeType}.\n'
+             '     * <p>Like {@link #SELF_MAX_ENERGY} — the same shape, with the threshold stated instead of implied by the\n'
+             '     * energy cap — and, like it, not an {@code AttributeType}.\n'
              '     */\n'
              '    private static final String ABOVE_PREFIX = "self_attr_above:";\n')
     if text.count(ANCHOR) != 1:
@@ -85,7 +85,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e 120 \u65f6\u2026\u4e4b\u540e\u6bcf\u8d85\u8fc7 1 \u70b9\u901f\u5ea6\u4f7f\u81ea\u8eab\u6b22\u6982\u5ea6\u63d0\u9ad8 1%\u300d (1502:269, 2026-10-02).
+ * 「速度大于等于 120 时…之后每超过 1 点速度使自身欢概度提高 1%」 (1502:269, 2026-10-02).
  *
  * <p>The reading is the EXCESS over the threshold, not the attribute -- which is exactly what separates this spelling
  * from `self_attr:`. A threshold above the character's own speed must therefore give nothing at all.
@@ -94,12 +94,12 @@ public class AboveThresholdTest {
     private static final int OWNER = 1502;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 The magnitude is a share of the EXCESS, and a threshold above the attribute gives nothing. */
+    /** ⭐ The magnitude is a share of the EXCESS, and a threshold above the attribute gives nothing. */
     @Test
     public void theMagnitudeIsTheExcessOverTheThreshold() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         double speed = owner.getAttribute(AttributeType.SPEED).get();
-        // \u26a0 Her own speed at Lv80 is 110 (measured), so the threshold here is 100: below 120 on purpose, because the
+        // ⚠ Her own speed at Lv80 is 110 (measured), so the threshold here is 100: below 120 on purpose, because the
         // spelling is what is under test, not her ability to reach the document's number without buffs.
         Assertions.assertTrue(speed > 100, "precondition: this character is faster than 100 (" + speed + ")");
 

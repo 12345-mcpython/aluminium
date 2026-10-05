@@ -32,7 +32,7 @@ public class LightConeAggroTest {
         double without = aggro(false);
         double with = aggro(true);
         Assertions.assertEquals(2.0, with / without, 1e-9,
-                "\u4f7f\u88c5\u5907\u8005\u53d7\u5230\u653b\u51fb\u7684\u6982\u7387\u63d0\u9ad8 -- and the data says the factor is 2");
+                "使装备者受到攻击的概率提高 -- and the data says the factor is 2");
     }
 
     @Test

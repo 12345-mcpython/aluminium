@@ -11,7 +11,7 @@ PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 
 # 1. the shipped row leaves §3
-SHIPPED = "| \u300c\u961f\u53cb\u6301\u6709\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011"
+SHIPPED = "| 「队友持有的【好活当赏】"
 hits = [index for index, line in enumerate(lines) if line.startswith(SHIPPED)]
 if len(hits) != 1:
     sys.exit("REFUSING: %d rows in §3 start with that prefix" % len(hits))
@@ -20,18 +20,18 @@ print("ok   the shipped row is out of §3")
 
 # 2. §2 gains the three rows it needed, after the 笑点 row
 ROWS = [
-    ("| **\u961f\u53cb\u7684\u72b6\u6001\u7ed3\u675f\u65f6\u53d6\u4e00\u90e8\u5206**\uff08\u300c\u5176\u4e2d\u7684 50% \u8f6c\u5316\u4e3a\u81ea\u8eab\u7684\u2026\u300d\uff09 "
-     "| `STATE_ENDED` \uff0b **\u4e8b\u4ef6\u643a\u5e26\u7684\u91cf**\uff08\u88ab\u7ed3\u675f\u72b6\u6001\u7684**\u5b9e\u4f8b\u6570**\uff09\uff0b `amountFromEvent` \u00d7 `amountPercent` "
-     "| `src/main/resources/characters/1505.json`\u3001`src/main/resources/characters/1513.json` | `GiftCarriesTheLaughsTest`\u3001`KaiBuBaiTest` |"),
-    ("| **\u5c42\u6570\uff1d\u961f\u7ea7\u8ba1\u6570**\uff08\u300c\u5c06\u672c\u6b21\u2026\u8ba1\u5165\u8be5\u72b6\u6001\u300d\uff09 "
-     "| `scale: \"party_resource:<NAME>\"`\uff08\u6218\u6597\u7ea7\u8ba1\u6570\u5f53\u6570\u503c\u8bfb\uff09 | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java` "
+    ("| **队友的状态结束时取一部分**（「其中的 50% 转化为自身的…」） "
+     "| `STATE_ENDED` ＋ **事件携带的量**（被结束状态的**实例数**）＋ `amountFromEvent` × `amountPercent` "
+     "| `src/main/resources/characters/1505.json`、`src/main/resources/characters/1513.json` | `GiftCarriesTheLaughsTest`、`KaiBuBaiTest` |"),
+    ("| **层数＝队级计数**（「将本次…计入该状态」） "
+     "| `scale: \"party_resource:<NAME>\"`（战斗级计数当数值读） | `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java` "
      "| `PartyResourceScaleTest` |"),
-    ("| **\u4e00\u6b21\u65bd\u52a0 N \u4e2a\u53ef\u53e0\u52a0\u72b6\u6001**\uff08\u300c\u5c42\u6570\uff1d\u67d0\u4e2a\u6570\u300d\u7684\u53e6\u4e00\u534a\uff09 "
-     "| `APPLY_BUFF` \uff0b `stackable: true` \uff0b **`max_stacks`** \uff0b `amount`\uff0f`scale` "
-     "| `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java`\u3001`src/main/resources/characters/1513.json` "
+    ("| **一次施加 N 个可叠加状态**（「层数＝某个数」的另一半） "
+     "| `APPLY_BUFF` ＋ `stackable: true` ＋ **`max_stacks`** ＋ `amount`／`scale` "
+     "| `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java`、`src/main/resources/characters/1513.json` "
      "| `StackTimesTest` |"),
 ]
-ANCHOR = "| \u300c\u83b7\u5f97 N \u4e2a**\u7b11\u70b9**\u300d"
+ANCHOR = "| 「获得 N 个**笑点**」"
 target = [index for index, line in enumerate(lines) if line.startswith(ANCHOR)]
 if len(target) != 1:
     sys.exit("REFUSING: %d §2 anchors" % len(target))

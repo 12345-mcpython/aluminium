@@ -1,6 +1,6 @@
 """1401, done properly this time: the technique state comes from the engine's own entry point (2026-10-02).
 
-Last attempt was a false positive: it granted `\u79d8\u6280` by APPENDING an `APPLY_BUFF` rule, which never took effect, so the
+Last attempt was a false positive: it granted `秘技` by APPENDING an `APPLY_BUFF` rule, which never took effect, so the
 technique's +60% was never in the room (`Battle.markTechniqueUsed` is the real entry point, called BEFORE `startBattle`,
 and `applyTechniqueStates()` runs before every BATTLE_START rule).
 
@@ -27,11 +27,11 @@ for r in rules:
             if isinstance(s, dict) and s.get("attribute") == "ATTACK":
                 s["max_stacks"] = 2
         r["note"] = ((r.get("note") or "") +
-                     " \u2b50 2026-10-02\uff1a`\"max_stacks\": 2` \u2713 \u2014\u2014 \u540c\u5c5e\u6027\u4e24\u6765\u6e90\uff08\u79d8\u6280 +60% \u2713 \u4e0e\u7ec8\u7ed3\u6280 +80% \u2713\uff09"
-                     "\u8981\u90fd\u7b97\uff0c**\u540e\u5199\u7684\u90a3\u6761\u5fc5\u987b\u53ef\u53e0\u52a0** \u2713\uff08`StatModifierBuff.isStackable()` \u2261 `maxStacks > 1` \u2713\uff09\uff1b"
-                     "\u672c\u6761\u662f**\u540e\u89e6\u53d1**\u7684\u90a3\u4e2a\uff08`ULT_CAST` \u665a\u4e8e `BATTLE_START` \u2713\uff09\u3002"
-                     "\u26a0 \u5224\u636e\u7528 **`battle.markTechniqueUsed(owner)`** \u5728 `startBattle()` \u4e4b\u524d\u7ed9\u72b6\u6001 \u2713"
-                     "\uff08\u2b50 \u800c**\u4e0d\u662f**\u81ea\u5df1\u9020\u4e00\u6761 `APPLY_BUFF` \u89c4\u5219 \u2717 \u2014\u2014 \u90a3\u6837\u505a\u65f6\u5b83**\u6839\u672c\u6ca1\u751f\u6548** \u2717\uff09\u3002")
+                     " ⭐ 2026-10-02：`\"max_stacks\": 2` ✓ —— 同属性两来源（秘技 +60% ✓ 与终结技 +80% ✓）"
+                     "要都算，**后写的那条必须可叠加** ✓（`StatModifierBuff.isStackable()` ≡ `maxStacks > 1` ✓）；"
+                     "本条是**后触发**的那个（`ULT_CAST` 晚于 `BATTLE_START` ✓）。"
+                     "⚠ 判据用 **`battle.markTechniqueUsed(owner)`** 在 `startBattle()` 之前给状态 ✓"
+                     "（⭐ 而**不是**自己造一条 `APPLY_BUFF` 规则 ✗ —— 那样做时它**根本没生效** ✗）。")
 json.dump(doc, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1401.json: the later ATTACK writer states max_stacks 2")
 
@@ -52,15 +52,15 @@ import java.util.Random;
 /**
  * Her technique's +60% and her ult's +80% ATTACK must both count (1401, 2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, three readings, and the two ratios are the claim: 1.6 with the technique alone, 2.4 with both.
- * `\u26a0 `\u79d8\u6280` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point, which is what the
+ * <p>⭐ FILE-DRIVEN, three readings, and the two ratios are the claim: 1.6 with the technique alone, 2.4 with both.
+ * `⚠ `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point, which is what the
  * earlier attempt got wrong when it invented an `APPLY_BUFF` rule that never fired.
  */
 public class AttackStacking1401Test {
     private static final int OWNER = 1401;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Both sources present means the two increments ADD (model-free: no share of the total is assumed). */
+    /** ⭐ Both sources present means the two increments ADD (model-free: no share of the total is assumed). */
     @Test
     public void bothAttackSourcesAreCounted() {
         double plain = attack(false, false);

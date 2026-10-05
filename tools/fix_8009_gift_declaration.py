@@ -13,7 +13,7 @@ import io
 import json
 import re
 
-GIFT = "\u597d\u6d3b\u5f53\u8d4f"
+GIFT = "好活当赏"
 
 for cid in ("8009", "8010"):
     path = "src/main/resources/characters/%s.json" % cid
@@ -24,9 +24,9 @@ for cid in ("8009", "8010"):
             "id": GIFT,
             "max": 2147483647,
             "initial": 0,
-            "source": ("%s \u7ec8\u7ed3\u6280\uff1a\u300c\u82e5\u76ee\u6807\u62e5\u6709\u6b22\u6109\u6280\uff0c\u76ee\u6807\u989d\u5916\u83b7\u5f97 **10** \u70b9\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d\u3002"
-                       "\u26a0 \u88c5\u8f7d\u5668**\u8981\u6c42\u672c\u6587\u4ef6\u58f0\u660e\u5b83\u81ea\u5df1\u89c4\u5219\u7528\u5230\u7684\u6bcf\u4e00\u4e2a\u8d44\u6e90** \u2713\uff08\u4e0e `1505` \u540c\u540d\u540c\u58f0\u660e \u2713\uff09\uff1b"
-                       "\u6570\u636e\u91cc\u6ca1\u6709\u4e0a\u9650 \u21d2 `Integer.MAX_VALUE` \u2713" % cid),
+            "source": ("%s 终结技：「若目标拥有欢愉技，目标额外获得 **10** 点【好活当赏】」。"
+                       "⚠ 装载器**要求本文件声明它自己规则用到的每一个资源** ✓（与 `1505` 同名同声明 ✓）；"
+                       "数据里没有上限 ⇒ `Integer.MAX_VALUE` ✓" % cid),
         })
         json.dump(doc, io.open(path, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
         print("ok   %s.json declares %s" % (cid, GIFT))

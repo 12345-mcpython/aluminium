@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23006: a hit inflicts \u3010\u6e38\u4e1d\u3011 -- a NAMED thunder damage-over-time -- and a target in \u3010\u6e38\u4e1d\u3011
- * \u300c\u4e5f\u4f1a\u88ab\u89c6\u4e3a\u9677\u5165\u4e86\u89e6\u7535\u72b6\u6001\u300d.
+ * Light cone 23006: a hit inflicts 【游丝】 -- a NAMED thunder damage-over-time -- and a target in 【游丝】
+ * 「也会被视为陷入了触电状态」.
  *
- * <p>\u2b50 The alias is not a second stored fact: a NAMED thunder DOT answers its own name AND the element table's \u89e6\u7535. The
+ * <p>⭐ The alias is not a second stored fact: a NAMED thunder DOT answers its own name AND the element table's 触电. The
  * readings below make that attributable -- including the mirror case of a plain, unnamed thunder DOT.
  */
 public class Cone23006Test {
@@ -39,7 +39,7 @@ public class Cone23006Test {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // \u26a0 A base chance of 1.0 still ROLLS against the victim's effect RES (the project's own rule), so the applier
+        // ⚠ A base chance of 1.0 still ROLLS against the victim's effect RES (the project's own rule), so the applier
         // has to hold EFFECT_HIT_RATE or the DOT never lands and the reading is a silent zero (measured this round).
         wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.EFFECT_HIT_RATE)
                 .addModifier(com.laosun.aluminium.models.DoubleValue.Modifier.pure(
@@ -57,34 +57,34 @@ public class Cone23006Test {
     public void theConeInflictsThreadAndThreadCountsAsShock() {
         Battle battle = battle(true);
         attack(battle);
-        boolean thread = enemy.getBuffManager().hasState("\u6e38\u4e1d");
-        boolean shock = enemy.getBuffManager().hasState("\u89e6\u7535");
-        System.out.println("[23006] after one hit: has \u6e38\u4e1d=" + thread + " has \u89e6\u7535=" + shock);
+        boolean thread = enemy.getBuffManager().hasState("游丝");
+        boolean shock = enemy.getBuffManager().hasState("触电");
+        System.out.println("[23006] after one hit: has 游丝=" + thread + " has 触电=" + shock);
         Assertions.assertTrue(thread, "the named DOT answers to its own name");
-        Assertions.assertTrue(shock, "and to \u89e6\u7535 through the element table -- the alias costs nothing");
+        Assertions.assertTrue(shock, "and to 触电 through the element table -- the alias costs nothing");
     }
 
     @Test
     public void aPlainThunderDotAnswersShockButNotThread() {
         wearer = CharacterFactory.create(WEARER, LEVEL);
         enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // \u2605 The UNNAMED thunder DOT, built directly: the element alone, which is everything this engine could express
+        // ★ The UNNAMED thunder DOT, built directly: the element alone, which is everything this engine could express
         // before today. (An event-driven fixture needs an event that carries a target, and BATTLE_START does not -- measured.)
         enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(
                 wearer, DamageElement.THUNDER, 20, 2));
-        boolean thread = enemy.getBuffManager().hasState("\u6e38\u4e1d");
-        boolean shock = enemy.getBuffManager().hasState("\u89e6\u7535");
-        System.out.println("[23006] unnamed thunder DOT: has \u6e38\u4e1d=" + thread + " has \u89e6\u7535=" + shock);
-        Assertions.assertTrue(shock, "an unnamed thunder DOT is still \u89e6\u7535 -- the element path is untouched");
-        Assertions.assertFalse(thread, "but it is NOT \u6e38\u4e1d: the name is what distinguishes them");
+        boolean thread = enemy.getBuffManager().hasState("游丝");
+        boolean shock = enemy.getBuffManager().hasState("触电");
+        System.out.println("[23006] unnamed thunder DOT: has 游丝=" + thread + " has 触电=" + shock);
+        Assertions.assertTrue(shock, "an unnamed thunder DOT is still 触电 -- the element path is untouched");
+        Assertions.assertFalse(thread, "but it is NOT 游丝: the name is what distinguishes them");
     }
 
     @Test
     public void withoutTheConeTheEnemyIsNotInflicted() {
         Battle battle = battle(false);
         attack(battle);
-        System.out.println("[23006] without the cone: has \u6e38\u4e1d=" + enemy.getBuffManager().hasState("\u6e38\u4e1d"));
-        Assertions.assertFalse(enemy.getBuffManager().hasState("\u6e38\u4e1d"), "no cone, no state (false case)");
+        System.out.println("[23006] without the cone: has 游丝=" + enemy.getBuffManager().hasState("游丝"));
+        Assertions.assertFalse(enemy.getBuffManager().hasState("游丝"), "no cone, no state (false case)");
     }
 
     @Test
@@ -99,8 +99,8 @@ public class Cone23006Test {
                     pinned++;
                     System.out.println("[23006] spec element=" + effect.getElement() + " name=" + effect.getBuff()
                             + " percent=" + effect.getPercent() + " turns=" + effect.getTurns());
-                    Assertions.assertEquals("Thunder", effect.getElement(), "thunder is what makes \u89e6\u7535 true");
-                    Assertions.assertEquals("\u6e38\u4e1d", effect.getBuff(), "the document's name for the state");
+                    Assertions.assertEquals("Thunder", effect.getElement(), "thunder is what makes 触电 true");
+                    Assertions.assertEquals("游丝", effect.getBuff(), "the document's name for the state");
                     Assertions.assertEquals(1, effect.getTurns(), "one turn at rank 1");
                 }
             }

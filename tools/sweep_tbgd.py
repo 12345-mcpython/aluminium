@@ -48,7 +48,7 @@ for rel, n, near, size in hits:
         out.append("     cap-ish: %s" % s.strip()[:150])
 
 # ---------- (2) 奇袭 ----------
-want = "\u5947\u88ad"                      # 奇袭
+want = "奇袭"                      # 奇袭
 hashes = [k for k, v in chs.items() if isinstance(v, str) and want in v]
 out.append("")
 out.append("=== TextMap entries containing %s: %d" % (want, len(hashes)))

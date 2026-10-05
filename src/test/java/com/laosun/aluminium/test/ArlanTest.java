@@ -26,7 +26,7 @@ public class ArlanTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「320%…and 160% to enemies adjacent to it」: the neighbour takes HALF of what the centre takes. */
+    /** ⚠ 「320%…and 160% to enemies adjacent to it」: the neighbour takes HALF of what the centre takes. */
     @Test
     public void hisUltimateHitsNeighboursForHalf() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -43,13 +43,13 @@ public class ArlanTest {
 
         double centreLoss = centreBefore - centre.getCurrentHp();
         double neighbourLoss = ((leftBefore - left.getCurrentHp()) + (rightBefore - right.getCurrentHp())) / 2;
-        Assertions.assertTrue(centreLoss > 0, "\u300c\u5bf9\u6307\u5b9a\u654c\u65b9\u5355\u4f53\u9020\u6210\u2026\u96f7\u5c5e\u6027\u4f24\u5bb3\u300d");
+        Assertions.assertTrue(centreLoss > 0, "「对指定敌方单体造成…雷属性伤害」");
         Assertions.assertEquals(0.5, neighbourLoss / centreLoss, 0.02,
-                "\u300c\u540c\u65f6\u5bf9\u5176\u76f8\u90bb\u76ee\u6807\u9020\u6210\u7b49\u540c\u4e8e\u963f\u5170 160% \u653b\u51fb\u529b\u7684\u96f7\u5c5e\u6027\u4f24\u5bb3\u300d \u2014 the data says 320%/160%: centre "
+                "「同时对其相邻目标造成等同于阿兰 160% 攻击力的雷属性伤害」 — the data says 320%/160%: centre "
                         + centreLoss + " vs neighbours " + neighbourLoss);
     }
 
-    /** \u26a0 「消灭敌方目标时，若当前生命值百分比小于等于30%，则立即回复等同于自身生命上限20%的生命值」. */
+    /** ⚠ 「消灭敌方目标时，若当前生命值百分比小于等于30%，则立即回复等同于自身生命上限20%的生命值」. */
     @Test
     public void hisSurvivalTraceHealsOnAKillBelowThirtyPercent() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -70,10 +70,10 @@ public class ArlanTest {
         battle.fireTriggers(TriggerEvent.KILL, arlan, enemy, 0, 0);
 
         Assertions.assertTrue(arlan.getCurrentHp() > before,
-                "\u300c\u7acb\u5373\u56de\u590d\u7b49\u540c\u4e8e\u81ea\u8eab\u751f\u547d\u4e0a\u965020%\u7684\u751f\u547d\u503c\u300d: " + before + " -> " + arlan.getCurrentHp());
+                "「立即回复等同于自身生命上限20%的生命值」: " + before + " -> " + arlan.getCurrentHp());
     }
 
-    /** \u26a0 「抵抗持续伤害类负面状态的概率提高50%」: the per-class resistance, and only that class. */
+    /** ⚠ 「抵抗持续伤害类负面状态的概率提高50%」: the per-class resistance, and only that class. */
     @Test
     public void hisEnduranceTraceResistsDotOnly() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -82,7 +82,7 @@ public class ArlanTest {
         battle.startBattle();
 
         Assertions.assertTrue(arlan.getBuffManager().debuffResistOf(DebuffClass.DOT) > 0,
-                "\u300c\u62b5\u6297\u6301\u7eed\u4f24\u5bb3\u7c7b\u8d1f\u9762\u72b6\u6001\u7684\u6982\u7387\u63d0\u9ad850%\u300d");
+                "「抵抗持续伤害类负面状态的概率提高50%」");
         Assertions.assertEquals(0.0, arlan.getBuffManager().debuffResistOf(DebuffClass.CONTROL), 1e-9,
                 "it must not become a general resistance to every debuff class");
     }
@@ -92,8 +92,8 @@ public class ArlanTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(ARLAN);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "the survival heal");
-        // \u2b50 2026-10-02: three BATTLE_START rules now, not two -- the eidolon-four trace is applied there (its sentence starts
-        // with \u300c\u8fdb\u5165\u6218\u6597\u540e\u300d), and that trace is what the lethal blow is gated on.
+        // ⭐ 2026-10-02: three BATTLE_START rules now, not two -- the eidolon-four trace is applied there (its sentence starts
+        // with 「进入战斗后」), and that trace is what the lethal blow is gated on.
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the DoT resistance, the level convention, and the eidolon-four trace");
     }

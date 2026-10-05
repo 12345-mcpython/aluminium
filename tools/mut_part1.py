@@ -30,7 +30,7 @@ if mode == "off":
 else:
     if spends:
         sys.exit("REFUSING: the spending effect is still there")
-    reward["do"].append({"op": "SPEND_RESOURCE", "resource": "\u7b11\u70b9", "spendAll": True, "target": "self"})
+    reward["do"].append({"op": "SPEND_RESOURCE", "resource": "笑点", "spendAll": True, "target": "self"})
     print("restored A")
 with io.open(CHAR1513, "w", encoding="utf-8", newline="\n") as handle:
     json.dump(doc, handle, ensure_ascii=False, indent=2)

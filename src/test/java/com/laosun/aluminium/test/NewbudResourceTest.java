@@ -31,15 +31,15 @@ public class NewbudResourceTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(castorice), List.of(enemy), new Random(0));
         battle.startBattle();
-        Assertions.assertNotNull(battle.partyResource("\u65b0\u854a"),
+        Assertions.assertNotNull(battle.partyResource("新蕊"),
                 "the battle must know 【新蕊】 (does the declaration say scope PARTY?)");
-        int before = battle.partyResourceValue("\u65b0\u854a");
+        int before = battle.partyResourceValue("新蕊");
         double hpBefore = castorice.getCurrentHp();
         battle.applyDamage(castorice, new Damage(enemy, castorice, DamageElement.FIRE, DamageType.NORMAL, 300));
         battle.processRequests();
         double lost = hpBefore - castorice.getCurrentHp();
         Assertions.assertTrue(lost > 0, "precondition: the hit landed (" + lost + ")");
-        Assertions.assertEquals((int) Math.round(lost), battle.partyResourceValue("\u65b0\u854a") - before,
+        Assertions.assertEquals((int) Math.round(lost), battle.partyResourceValue("新蕊") - before,
                 "one point of Newbud per point lost (" + lost + " lost)");
     }
 }

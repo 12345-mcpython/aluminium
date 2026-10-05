@@ -8,7 +8,7 @@ Both halves have shipped spellings, measured:
 
 那刻夏 is cid 1405 in our own data ("Anaxa").
 
-\u26d4 Registered: 「使其战技的伤害次数增加 #1 次，持续1回合」 (a count of hits inside his skill) and the 【真知】 clause that follows.
+⛔ Registered: 「使其战技的伤害次数增加 #1 次，持续1回合」 (a count of hits inside his skill) and the 【真知】 clause that follows.
 """
 import io
 import json
@@ -50,11 +50,11 @@ rules.append({
         {"op": "GAIN_SKILL_POINT", "amount": 1},
         {"op": "ADVANCE", "percent": 1.0, "target": "self"},
     ],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 18 \u300c\u732e\u4e88\u300c\u7406\u6027\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 18\uff0cSkillID 1141518\uff09\uff1a"
-               "\u300c\u5355\u6b21\u751f\u6548\uff0c\u5bf9\u90a3\u523b\u590f\u65bd\u653e\u65f6\uff0c**\u4e3a\u6211\u65b9\u6062\u590d #4 \u4e2a\u6218\u6280\u70b9\u5e76\u4f7f\u90a3\u523b\u590f\u7acb\u5373\u884c\u52a8**\u3002\u300d"),
-    "note": ("\u2b50 \u4e24\u534a\u90fd\u6709**\u51fa\u8d27\u62fc\u6cd5**\uff08**\u5b9e\u6d4b**\uff09\uff1a`GAIN_SKILL_POINT`\uff08\u8bfb\u8005 1101\uff1a`{\"amount\": 1}`\uff09"
-             "\u4e0e `ADVANCE`\uff08\u8bfb\u8005 1101\uff1a`{\"percent\": 1.0, \"target\": \"target\"}`\uff09\u3002"
-             "\u2b50 `#4` \u5728 1141518 \u7684**\u5341\u884c\u91cc\u5168\u662f 1**\uff08**\u5b9e\u6d4b**\uff09\u3002"),
+    "source": ("1415 昔涟 忆灵技能 18 「献予「理性」之诗」（数据槽位 18，SkillID 1141518）："
+               "「单次生效，对那刻夏施放时，**为我方恢复 #4 个战技点并使那刻夏立即行动**。」"),
+    "note": ("⭐ 两半都有**出货拼法**（**实测**）：`GAIN_SKILL_POINT`（读者 1101：`{\"amount\": 1}`）"
+             "与 `ADVANCE`（读者 1101：`{\"percent\": 1.0, \"target\": \"target\"}`）。"
+             "⭐ `#4` 在 1141518 的**十行里全是 1**（**实测**）。"),
 })
 
 if isinstance(doc, list):
@@ -69,8 +69,8 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": "1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 18 \u300c\u732e\u4e88\u300c\u7406\u6027\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 18\uff09\uff1a\u5de5\u4f5c\u5728\u89c4\u5219\u4fa7\u3002",
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\u3002",
+        "source": "1415 昔涟 忆灵技能 18 「献予「理性」之诗」（数据槽位 18）：工作在规则侧。",
+        "note": "⭐ 没有条目就不可交付。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -89,9 +89,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 18 \u300c\u732e\u4e88\u300c\u7406\u6027\u300d\u4e4b\u8bd7\u300d: \u300c\u4e3a\u6211\u65b9\u6062\u590d #4 \u4e2a\u6218\u6280\u70b9\u5e76\u4f7f\u90a3\u523b\u590f\u7acb\u5373\u884c\u52a8\u300d (2026-10-02).
+ * 1415's memosprite skill 18 「献予「理性」之诗」: 「为我方恢复 #4 个战技点并使那刻夏立即行动」 (2026-10-02).
  *
- * <p>\u2b50 Two readings, one run: the team's skill points rise by #4 = 1, and his action value DROPS (which is what \u300c\u7acb\u5373\u884c\u52a8\u300d means). A rule that only granted
+ * <p>⭐ Two readings, one run: the team's skill points rise by #4 = 1, and his action value DROPS (which is what 「立即行动」 means). A rule that only granted
  * the point, or only advanced him, cannot pass both. Nothing is replaced.
  */
 public class ReasonOdePointAndActionTest {

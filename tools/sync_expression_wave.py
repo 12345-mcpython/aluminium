@@ -13,12 +13,12 @@ import sys
 
 PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
-ANCHOR = "| **\u300c\u83b7\u5f97\u8be5\u89d2\u8272\u5373\u751f\u6548"
+ANCHOR = "| **「获得该角色即生效"
 target = [index for index, line in enumerate(lines) if line.startswith(ANCHOR)]
 if len(target) != 1:
     sys.exit("REFUSING: %d §2 anchors" % len(target))
-ROW = ("| **\u300c\u6bcf\u4e2a\u6ce2\u6b21\u5f00\u59cb\u65f6\u2026\u300d** "
-       "| `on: \"WAVE_START\"`\uff08\u4e8b\u4ef6\u672c\u5c31\u5b58\u5728 \u2713\uff1b\u26a0 \u5b83\u4e0d\u643a\u5e26 actor\uff0ftarget \u2717 \u21d2 \u6761\u4ef6\u53ea\u80fd\u95ee `self`\uff0f\u8d44\u6e90 \u2713\uff09 "
+ROW = ("| **「每个波次开始时…」** "
+       "| `on: \"WAVE_START\"`（事件本就存在 ✓；⚠ 它不携带 actor／target ✗ ⇒ 条件只能问 `self`／资源 ✓） "
        "| `src/main/resources/characters/1309.json` "
        "| `RobinWaveEnergyTest` |")
 lines.insert(target[0], ROW)

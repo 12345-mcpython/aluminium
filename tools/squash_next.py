@@ -20,7 +20,7 @@ import sys
 
 
 def git(*args):
-    # \u26a0 encoding is explicit: the platform default here is GBK, and a Chinese commit subject kills the decode.
+    # ⚠ encoding is explicit: the platform default here is GBK, and a Chinese commit subject kills the decode.
     out = subprocess.run(["git"] + list(args), capture_output=True, text=True,
                          encoding="utf-8", errors="replace")
     if out.returncode != 0:

@@ -26,7 +26,7 @@ rules.append({
     "when": ["actor is_summon"],
     "do": [{"op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.25, "permanent": True, "target": "self"}],
     "source": "DIAGNOSTIC: does a memosprite's cast fire SKILL_CAST?",
-    "note": "\u26a0 \u4e34\u65f6\u63a2\u9488\u3002",
+    "note": "⚠ 临时探针。",
 })
 rules.append({
     "id": "probe_cast_setup_again",
@@ -34,7 +34,7 @@ rules.append({
     "when": ["actor is_summon"],
     "do": [{"op": "MODIFY_ATTR", "attribute": "DEFENCE", "percent": 0.5, "permanent": True, "target": "self"}],
     "source": "DIAGNOSTIC: the control -- round 52 already proved this one fires.",
-    "note": "\u26a0 \u4e34\u65f6\u63a2\u9488\u3002",
+    "note": "⚠ 临时探针。",
 })
 if isinstance(doc, list):
     out = rules

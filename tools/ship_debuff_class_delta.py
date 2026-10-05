@@ -34,12 +34,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u654c\u65b9\u5bf9\u6211\u65b9\u65bd\u52a0\u4e86**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d\u53ef\u4ee5\u88ab\u95ee\u4e86 (2026-10-02).
+ * 「敌方对我方施加了**控制类**负面状态」可以被问了 (2026-10-02).
  *
- * <p>ONE landed control, TWO watchers: the rule asking for \u300c\u63a7\u5236\u7c7b\u300d must move ATTACK, and the one asking for \u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d must leave
+ * <p>ONE landed control, TWO watchers: the rule asking for 「控制类」 must move ATTACK, and the one asking for 「持续伤害类」 must leave
  * DEFENCE alone. The first is also the proof that the event happened at all, which is what gives the second its meaning.
  *
- * <p>\u26a0 Both readings are DELTAS across `startBattle()`: an earlier version compared `get()` with `baseValue()` and read the constant
+ * <p>⚠ Both readings are DELTAS across `startBattle()`: an earlier version compared `get()` with `baseValue()` and read the constant
  * gap between them (relics, cones, the level convention) as a rule's contribution -- measured, the same +49.61 appears in a scene
  * whose only DEBUFF_APPLIED rule was unfiltered, which is what exposed it.
  */
@@ -56,9 +56,9 @@ public class DebuffClassConditionTest {
                 + " ; dot-watch DEFENCE gain = " + gains[1]);
 
         Assertions.assertTrue(gains[0] > EPS,
-                "\u300c\u63a7\u5236\u7c7b\u300d-- the rule that asked for it fired, so the event really happened");
+                "「控制类」-- the rule that asked for it fired, so the event really happened");
         Assertions.assertEquals(0.0, gains[1], EPS,
-                "\u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d-- the same event does NOT fire the rule that asked for the other family");
+                "「持续伤害类」-- the same event does NOT fire the rule that asked for the other family");
     }
 
     /** { the control-watch's ATTACK gain, the dot-watch's DEFENCE gain } across startBattle(). */
@@ -67,7 +67,7 @@ public class DebuffClassConditionTest {
 
         EffectSpec land = new EffectSpec();
         TriggerSpecs.set(land, "op", "APPLY_CONTROL");
-        // \u26a0 The keys the validator names: `APPLY_CONTROL requires "control"` and `requires "turns"`.
+        // ⚠ The keys the validator names: `APPLY_CONTROL requires "control"` and `requires "turns"`.
         TriggerSpecs.set(land, "control", "\\u51bb\\u7ed3");
         TriggerSpecs.set(land, "turns", 2);
         TriggerSpecs.set(land, "baseChance", 1.0);

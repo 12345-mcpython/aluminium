@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Relic 130, 4-piece (2026-09-30): 「SPD >= 120/160 ⇒ CRIT Rate +10%/18%」.
  *
- * <p>\u26a0 The lower tier MUST carry the upper bound. Without it a wearer at SPD >= 160 satisfies both rules and takes
+ * <p>⚠ The lower tier MUST carry the upper bound. Without it a wearer at SPD >= 160 satisfies both rules and takes
  * +28% instead of the 18% the text says -- a rule that is perfectly legal and would pass a naive shape check. That is
  * why this judge asserts the upper bound, and why the sweep deletes it.
  *

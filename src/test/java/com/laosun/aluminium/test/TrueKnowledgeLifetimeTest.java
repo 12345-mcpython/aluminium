@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u6301\u7eed\u81f3\u4e0b\u4e00\u4e2a\u90a3\u523b\u590f\u56de\u5408\u5f00\u59cb\u65f6\u300d (2026-10-02).
+ * 「持续至下一个那刻夏回合开始时」 (2026-10-02).
  *
- * Slot 18's 【\u771f\u77e5\u3011 was written `until: next_attack`, which ends the moment he next lands an attack -- but the cast that GRANTS it IS an attack, so the state died on the very cast
+ * Slot 18's 【真知】 was written `until: next_attack`, which ends the moment he next lands an attack -- but the cast that GRANTS it IS an attack, so the state died on the very cast
  * that created it. The sentence ends it when his next TURN begins, so this reads the state after that attack.
  */
 public class TrueKnowledgeLifetimeTest {
@@ -21,7 +21,7 @@ public class TrueKnowledgeLifetimeTest {
     private static final int ANAXA = 1405;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 18;
-    private static final String KNOWLEDGE = "\u771f\u77e5";
+    private static final String KNOWLEDGE = "真知";
 
     @Test
     public void theKnowledgeOutlivesTheCastThatGrantedIt() {
@@ -44,8 +44,8 @@ public class TrueKnowledgeLifetimeTest {
                 List.of(battle.enemies.getFirst()));
         battle.processRequests();
         boolean still = battle.characters.get(1).getBuffManager().hasState(KNOWLEDGE);
-        System.out.println("[knowledge_lifetime] after the cast that grants it, 【\u771f\u77e5\u3011 is "
+        System.out.println("[knowledge_lifetime] after the cast that grants it, 【真知】 is "
                 + (still ? "still on him" : "gone"));
-        Assertions.assertTrue(still, "the cast that grants 【\u771f\u77e5\u3011 must not also consume it");
+        Assertions.assertTrue(still, "the cast that grants 【真知】 must not also consume it");
     }
 }

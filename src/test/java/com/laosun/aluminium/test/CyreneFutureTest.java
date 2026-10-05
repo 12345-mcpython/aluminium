@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u6218\u6597\u5f00\u59cb\u65f6\u2026\u5176\u4ed6\u89d2\u8272\u83b7\u5f97\u3010\u672a\u6765\u3011 (2026-10-02). Two-sided: the OTHER ally gets it, 昔涟 herself does not (the text says \u5176\u4ed6).
+ * 战斗开始时…其他角色获得【未来】 (2026-10-02). Two-sided: the OTHER ally gets it, 昔涟 herself does not (the text says 其他).
  */
 public class CyreneFutureTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int ANAXA = 1405;
     private static final int MONSTER = 1002011;
-    private static final String FUTURE = "\u672a\u6765";
+    private static final String FUTURE = "未来";
 
     @Test
     public void onlyTheOthersGetFuture() {
@@ -29,7 +29,7 @@ public class CyreneFutureTest {
         boolean ally = battle.characters.get(1).getBuffManager().hasState(FUTURE);
         boolean her = battle.characters.get(0).getBuffManager().hasState(FUTURE);
         System.out.println("[future] at battle start: the ally has it = " + ally + " ; 昔涟 herself = " + her);
-        Assertions.assertTrue(ally, "another ally gains 【\u672a\u6765\u3011");
-        Assertions.assertFalse(her, "and 昔涟 does not, because the text says \u5176\u4ed6");
+        Assertions.assertTrue(ally, "another ally gains 【未来】");
+        Assertions.assertFalse(her, "and 昔涟 does not, because the text says 其他");
     }
 }

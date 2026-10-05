@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1513\uff1a\u300c\u83b7\u5f97 1\uff0f4\uff0f6 \u4e2a\u7b11\u70b9\u300d\u2014\u2014 \u4e09\u53e5\u5404\u81ea\u7ed9\u7684\u90a3\u4e00\u534a (2026-10-02).
+ * 1513：「获得 1／4／6 个笑点」—— 三句各自给的那一半 (2026-10-02).
  *
- * <p>\u2b50\u2b50 \u7b11\u70b9 is a PARTY-scoped, uncapped counter that ALREADY existed (declared by 1502 as `max: 2147483647`); these
- * readings are about HER grants, each the sentence's own number. \u26a0 The counter is shared, so the sum test is the point --
- * that is what \u300c\u961f\u4f0d\u7ea7\u300d means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
+ * <p>⭐⭐ 笑点 is a PARTY-scoped, uncapped counter that ALREADY existed (declared by 1502 as `max: 2147483647`); these
+ * readings are about HER grants, each the sentence's own number. ⚠ The counter is shared, so the sum test is the point --
+ * that is what 「队伍级」 means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
  */
 public class Character1513LaughterTest {
     private static final int AVENTURINE = 1513;
@@ -33,7 +33,7 @@ public class Character1513LaughterTest {
     private static final int MONSTER = 1002011;
     private static final String LAUGH = "\\u7b11\\u70b9";
 
-    /** \u300c\u6218\u6280\u2026\u83b7\u5f97 4 \u4e2a\u7b11\u70b9\u300d */
+    /** 「战技…获得 4 个笑点」 */
     @Test
     public void herSkillGivesFour() {
         Scene scene = fight();
@@ -42,7 +42,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "\\u300c\\u83b7\\u5f97 4 \\u4e2a\\u7b11\\u70b9\\u300d");
     }
 
-    /** \u300c\u7ec8\u7ed3\u6280\u2026\u83b7\u5f97 6 \u4e2a\u7b11\u70b9\u300d */
+    /** 「终结技…获得 6 个笑点」 */
     @Test
     public void herUltimateGivesSix() {
         Scene scene = fight();
@@ -50,7 +50,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "\\u300c\\u83b7\\u5f97 6 \\u4e2a\\u7b11\\u70b9\\u300d");
     }
 
-    /** \u300c\u961f\u53cb\u65bd\u653e\u653b\u51fb\u540e\u2026\u4ee5\u53ca 1 \u4e2a\u7b11\u70b9\u300d -- a REAL teammate attack, not a hand-fired event. */
+    /** 「队友施放攻击后…以及 1 个笑点」 -- a REAL teammate attack, not a hand-fired event. */
     @Test
     public void aTeammateAttackGivesOne() {
         Scene scene = fight();
@@ -59,7 +59,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "\\u300c\\u4ee5\\u53ca 1 \\u4e2a\\u7b11\\u70b9\\u300d");
     }
 
-    /** \u2b50 THE SHARED COUNTER: all three in one battle sum, because \u7b11\u70b9 is party-scoped. */
+    /** ⭐ THE SHARED COUNTER: all three in one battle sum, because 笑点 is party-scoped. */
     @Test
     public void theCounterIsSharedAcrossTheParty() {
         Scene scene = fight();

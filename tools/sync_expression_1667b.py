@@ -9,23 +9,23 @@ import sys
 PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 
-BAD = "| **\u6309\u5c42\u6570\u5b9e\u65f6\u7f29\u653e**"
+BAD = "| **按层数实时缩放**"
 hits = [i for i, line in enumerate(lines) if line.startswith(BAD)]
 if len(hits) != 1:
     sys.exit("REFUSING: %d rows to replace" % len(hits))
 lines.pop(hits[0])
 
 ROWS = [
-    ("| **\u6309\u5c42\u6570\u5b9e\u65f6\u7f29\u653e\uff08\u5e73\u5766\u5c5e\u6027\uff09**\uff08\u300c\u6bcf\u62e5\u6709 1 \u5c42\u2026\u63d0\u9ad8 X%\u300d\u7684\u6301\u7eed\u5149\u73af\uff09 "
-     "| `MODIFY_ATTR` \u4e0a `per_stack: self_stacks:<NAME>` \uff0b **`per_stack_live: true`**\uff08\u4efd\u989d = `percent \u00d7 \u5f53\u524d\u5c42\u6570`\uff0c**\u6bcf\u6b21\u8bfb\u53d6\u91cd\u7b97**\uff09 "
-     "| `src/main/java/com/laosun/aluminium/models/DoubleValue.java`\u3001`src/main/java/com/laosun/aluminium/models/buff/StatModifierBuff.java` "
+    ("| **按层数实时缩放（平坦属性）**（「每拥有 1 层…提高 X%」的持续光环） "
+     "| `MODIFY_ATTR` 上 `per_stack: self_stacks:<NAME>` ＋ **`per_stack_live: true`**（份额 = `percent × 当前层数`，**每次读取重算**） "
+     "| `src/main/java/com/laosun/aluminium/models/DoubleValue.java`、`src/main/java/com/laosun/aluminium/models/buff/StatModifierBuff.java` "
      "| `PerStackLiveTest` |"),
-    ("| **\u6309\u5c42\u6570\u5b9e\u65f6\u7f29\u653e\uff08\u6bd4\u7387\uff0f\u7edd\u5bf9\u503c\uff09**\uff08\u540c\u4e00\u65cf\u7684\u6d3e\u751f\u5199\u6cd5\uff09 "
-     "| `MODIFY_ATTR` \u4e0a `scale: self_stacks:<NAME>` \uff0b **`per_stack_live: true`**\uff08\u7edd\u5bf9\u503c = `percent \u00d7 \u5f53\u524d\u5c42\u6570 + amount`\uff09 "
-     "| `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java`\u3001`src/main/resources/characters/1314.json` "
+    ("| **按层数实时缩放（比率／绝对值）**（同一族的派生写法） "
+     "| `MODIFY_ATTR` 上 `scale: self_stacks:<NAME>` ＋ **`per_stack_live: true`**（绝对值 = `percent × 当前层数 + amount`） "
+     "| `src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java`、`src/main/resources/characters/1314.json` "
      "| `JadeLiveGoodsTest` |"),
 ]
-ANCHOR = "| \u300c\u83b7\u5f97 N \u4e2a**\u7b11\u70b9**\u300d"
+ANCHOR = "| 「获得 N 个**笑点**」"
 target = [i for i, line in enumerate(lines) if line.startswith(ANCHOR)]
 if len(target) != 1:
     sys.exit("REFUSING: %d §2 anchors" % len(target))

@@ -9,18 +9,18 @@ import sys
 
 PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
-PREFIX = "| \u300c\u4f7f\u3010\u79b3\u547d\u3011\u7684\u6301\u7eed\u56de\u5408\u6570"
+PREFIX = "| 「使【禳命】的持续回合数"
 hits = [index for index, line in enumerate(lines) if line.startswith(PREFIX)]
 if len(hits) != 1:
     sys.exit("REFUSING: %d §3 rows start with that prefix" % len(hits))
 lines.pop(hits[0])
 print("ok   the stale row is out of §3")
 
-ROW = ("| **\u300c\u67d0\u4e2a\u72b6\u6001\u7684\u6301\u7eed\u56de\u5408\u6570\u5728**\u5b83\u81ea\u5df1**\u7684\u56de\u5408\u5f00\u59cb\u65f6\u51cf 1\u300d** "
-       "| `APPLY_BUFF` \uff0b `turns` \uff0b **`ticks_on: \"self\"`**\uff08\u8c01\u7684\u56de\u5408\u82b1\u6389\u65f6\u957f \u2713\uff09 "
+ROW = ("| **「某个状态的持续回合数在**它自己**的回合开始时减 1」** "
+       "| `APPLY_BUFF` ＋ `turns` ＋ **`ticks_on: \"self\"`**（谁的回合花掉时长 ✓） "
        "| `src/main/resources/characters/1217.json` "
        "| `HuohuoTalismanDurationTest` |")
-ANCHOR = "| **\u961f\u53cb\u7684\u72b6\u6001\u7ed3\u675f\u65f6\u53d6\u4e00\u90e8\u5206**"
+ANCHOR = "| **队友的状态结束时取一部分**"
 target = [index for index, line in enumerate(lines) if line.startswith(ANCHOR)]
 if len(target) != 1:
     sys.exit("REFUSING: %d §2 anchors" % len(target))

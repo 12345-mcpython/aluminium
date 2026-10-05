@@ -12,10 +12,10 @@ import java.util.List;
 /**
  * Light cone 23047 (2026-09-30): two of its five clauses.
  *
- * <p>Effect hit +40..60%; when an enemy falls into a debuff the WEARER applied, an 80% base chance puts \u9b42\u8ff7 on it
+ * <p>Effect hit +40..60%; when an enemy falls into a debuff the WEARER applied, an 80% base chance puts 魂迷 on it
  * for 3 turns. The other three clauses are REGISTERED, not approximated: the per-debuff DoT bonus counts "debuffs the
  * wearer applied" (per_stack reads the target's own count), the speed gift belongs to the ATTACKER, and "removes every
- * \u9b42\u8ff7 when the wearer is knocked out" needs a knocked-out event the engine does not fire.
+ * 魂迷 when the wearer is knocked out" needs a knocked-out event the engine does not fire.
  */
 public class Cone23047Test {
     private static final int CONE = 23047;
@@ -43,13 +43,13 @@ public class Cone23047Test {
 
             var ensnare = table.rulesFor(TriggerEvent.DEBUFF_APPLIED).stream()
                     .filter(r -> r.id().equals("cone23047_ensnare")).toList();
-            Assertions.assertEquals(1, ensnare.size(), "rank " + rank + ": the \u9b42\u8ff7 rule");
+            Assertions.assertEquals(1, ensnare.size(), "rank " + rank + ": the 魂迷 rule");
             Assertions.assertEquals(List.of("actor == self"),
                     ensnare.getFirst().conditions().stream().map(c -> c.source()).toList(),
                     "rank " + rank + ": only a debuff the WEARER applied (the event's actor is the applier)");
             var m = ensnare.getFirst().effects().getFirst();
             Assertions.assertEquals("APPLY_BUFF", m.getOp());
-            Assertions.assertEquals("\u9b42\u8ff7", m.getBuff(), "rank " + rank + ": the state's name");
+            Assertions.assertEquals("魂迷", m.getBuff(), "rank " + rank + ": the state's name");
             Assertions.assertEquals(3, m.getTurns(), "rank " + rank + ": three turns");
             Assertions.assertEquals("target", m.getTarget());
             Assertions.assertEquals(0.8, m.getBaseChance(), 1e-9, "rank " + rank + ": an 80% base chance");

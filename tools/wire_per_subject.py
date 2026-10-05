@@ -35,7 +35,7 @@ loop = '        for (CompiledRule rule : rules) {'
 if t.count(loop) != 1:
     bail('the loop anchor is not unique')
 t = t.replace(loop, loop + NL
-              + '            // \u2b50 ONE expression, read at all four sites below (2026-09-30; the count-and-reset family).' + NL
+              + '            // ⭐ ONE expression, read at all four sites below (2026-09-30; the count-and-reset family).' + NL
               + '            // The comment on startTriggerCooldown names the failure this avoids: recording one key while' + NL
               + '            // checking another makes a rule fire forever, or never again.' + NL
               + '            String limitKey = rule.key() + subjectSuffix(rule, ctx);', 1)
@@ -45,8 +45,8 @@ anchor = '    private static void applyOne(Battle battle, EffectSpec effect, Tri
 helper = ('    /**' + NL
           + '     * The suffix that scopes a firing count to another unit, or {@code ""} for the owner.' + NL
           + '     *' + NL
-          + '     * <p>\u300c\u8be5\u6548\u679c\u6bcf\u4e2a\u89d2\u8272\u6700\u591a\u89e6\u53d1 1 \u6b21\u300d counts per TRIGGERER, \u300c\u76ee\u6807\u6bcf\u6709 1 \u4e2a\u8d1f\u9762\u6548\u679c\u300d-style' + NL
-          + '     * limits count per TARGET. \u26a0 The identity is System.identityHashCode: names are for messages and may' + NL
+          + '     * <p>「该效果每个角色最多触发 1 次」 counts per TRIGGERER, 「目标每有 1 个负面效果」-style' + NL
+          + '     * limits count per TARGET. ⚠ The identity is System.identityHashCode: names are for messages and may' + NL
           + '     * repeat, and the counters live on the combatant, so an identity within one battle is exactly the scope' + NL
           + '     * the counters have.' + NL
           + '     */' + NL

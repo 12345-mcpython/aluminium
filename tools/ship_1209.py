@@ -28,11 +28,11 @@ for r in rules:
                 s["max_stacks"] = 2
                 touched += 1
         r["note"] = ((r.get("note") or "") +
-                     " \u2b50 2026-10-02\uff1a`\"max_stacks\": 2` \u2713 \u2014\u2014 \u540c\u4e00\u5355\u4f4d\u540c\u4e00\u69fd\u4e0a\u6709**\u4e24\u4e2a\u6765\u6e90**"
-                     "\uff08\u6218\u6280 +20% \u2713 \u4e0e\u7ec8\u7ed3\u6280 +60% \u2713\uff09\u21d2 ⭐ \u6309\u5b9e\u6d4b\u673a\u5236\uff0c"
-                     "**\u540e\u5199\u7684\u90a3\u6761\u5fc5\u987b\u53ef\u53e0\u52a0** \u2713\uff08`StatModifierBuff.isStackable()` \u2261 `maxStacks > 1` \u2713\uff09\uff0c"
-                     "\u5426\u5219\u540e\u8005\u628a\u524d\u8005**\u66ff\u6362\u6389** \u2717\u3002\u26a0 \u4e24\u6761**\u90fd**\u5199 \u2713\uff0c\u56e0\u4e3a"
-                     "\u201c\u8c01\u5728\u540e\u201d\u53d6\u51b3\u4e8e\u73a9\u5bb6\u987a\u5e8f \u2717\uff1b\u5b9e\u6d4b\u8fc7**\u65e9\u5199\u7684\u90a3\u6761\u5199\u591a\u5c11\u65e0\u6240\u8c13** \u2713\u3002")
+                     " ⭐ 2026-10-02：`\"max_stacks\": 2` ✓ —— 同一单位同一槽上有**两个来源**"
+                     "（战技 +20% ✓ 与终结技 +60% ✓）⇒ ⭐ 按实测机制，"
+                     "**后写的那条必须可叠加** ✓（`StatModifierBuff.isStackable()` ≡ `maxStacks > 1` ✓），"
+                     "否则后者把前者**替换掉** ✗。⚠ 两条**都**写 ✓，因为"
+                     "“谁在后”取决于玩家顺序 ✗；实测过**早写的那条写多少无所谓** ✓。")
 
 print("attributes touched:", touched)
 json.dump(doc, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
@@ -55,14 +55,14 @@ import java.util.Random;
 /**
  * Her skill's +20% and her ult's +60% CRIT CHANCE must both count (1209, 2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, and the numbers are the claim: 0.2 after the skill, 0.8 after the ult as well. A replaced modifier
+ * <p>⭐ FILE-DRIVEN, and the numbers are the claim: 0.2 after the skill, 0.8 after the ult as well. A replaced modifier
  * gives 0.6 at the second reading, which is what the mutation has to produce.
  */
 public class CritChanceStacking1209Test {
     private static final int OWNER = 1209;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Two sources, two shares, and the total. */
+    /** ⭐ Two sources, two shares, and the total. */
     @Test
     public void bothCritChanceSourcesAreCounted() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

@@ -25,7 +25,7 @@ public class HertaTheTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「使用秘技后，下一次战斗开始时大黑塔攻击力提高60%，持续2回合」, and the control. */
+    /** ⚠ 「使用秘技后，下一次战斗开始时大黑塔攻击力提高60%，持续2回合」, and the control. */
     @Test
     public void theTechniqueRaisesHerAttackAndNothingWithoutIt() {
         Character plain = CharacterFactory.create(HERTA, LEVEL);
@@ -43,10 +43,10 @@ public class HertaTheTest {
         double boosted = herta.getAttribute(AttributeType.ATTACK).get();
         double base = herta.getAttribute(AttributeType.ATTACK).baseValue();
         Assertions.assertEquals(base * 0.6, boosted - untouched, base * 0.6 * 0.02,
-                "\u300c\u653b\u51fb\u529b\u63d0\u9ad860%\u300d of the BASE: base " + base + ", gain " + (boosted - untouched));
+                "「攻击力提高60%」 of the BASE: base " + base + ", gain " + (boosted - untouched));
     }
 
-    /** \u26a0 The ultimate's own effects: +80% ATK, a full advance, and one Inspiration stack. */
+    /** ⚠ The ultimate's own effects: +80% ATK, a full advance, and one Inspiration stack. */
     @Test
     public void herUltimateRaisesAttackAdvancesAndGrantsInspiration() {
         Character herta = CharacterFactory.create(HERTA, LEVEL);
@@ -58,17 +58,17 @@ public class HertaTheTest {
         battle.castImmediate(herta.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), herta, List.of(enemy));
 
         Assertions.assertTrue(herta.getAttribute(AttributeType.ATTACK).get() > before,
-                "\u300c\u4f7f\u5927\u9ed1\u5854\u653b\u51fb\u529b\u63d0\u9ad880%\uff0c\u6301\u7eed3\u56de\u5408\u300d");
+                "「使大黑塔攻击力提高80%，持续3回合」");
         // ADD_STACK makes a stack, not a named state: it is read with stacksOf, the same API 8003's Magma Will uses.
-        Assertions.assertEquals(1, herta.getBuffManager().stacksOf("\u7075\u611f"),
-                "\u300c\u83b7\u5f971\u5c42\u3010\u7075\u611f\u3011\u300d");
+        Assertions.assertEquals(1, herta.getBuffManager().stacksOf("灵感"),
+                "「获得1层【灵感】」");
 
-        // \u26a0 The document's cap: five more ultimates must stop at 4, not keep counting (this is what makes the cap testable at all).
+        // ⚠ The document's cap: five more ultimates must stop at 4, not keep counting (this is what makes the cap testable at all).
         for (int i = 0; i < 5; i++) {
             battle.fireTriggers(TriggerEvent.ULT_CAST, herta, herta, 0, 0);
         }
-        Assertions.assertEquals(4, herta.getBuffManager().stacksOf("\u7075\u611f"),
-                "\u300c\u3010\u7075\u611f\u3011\u6700\u591a\u6301\u67094\u5c42\u300d");
+        Assertions.assertEquals(4, herta.getBuffManager().stacksOf("灵感"),
+                "「【灵感】最多持有4层」");
     }
 
     /** Census: the technique, the ultimate and the convention. */

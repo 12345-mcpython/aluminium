@@ -19,9 +19,9 @@ t = io.open(WORK + '/' + ENG, encoding='utf-8').read()
 
 name_anchor = '            "random_enemy", "random_hit_enemy",'
 name_new = ('            "random_enemy", "random_hit_enemy",' + NL
-            + '            // \u2b50 \u300c\u968f\u673a\u4e3a 1 \u4e2a\u5f53\u524d\u80fd\u91cf\u767e\u5206\u6bd4\u5c0f\u4e8e 50% \u7684\u6211\u65b9\u5176\u4ed6\u76ee\u6807\u300d (light cone 21021). \u26a0 The 50%'
+            + '            // ⭐ 「随机为 1 个当前能量百分比小于 50% 的我方其他目标」 (light cone 21021). ⚠ The 50%'
             + NL
-            + '            // threshold is the text\u2019s own and no tier changes it, so it is in the method and registered there.' + NL
+            + '            // threshold is the text’s own and no tier changes it, so it is in the method and registered there.' + NL
             + '            "random_ally_below_half_energy",')
 print('name anchor: %d' % t.count(name_anchor))
 if t.count(name_anchor) != 1:
@@ -41,11 +41,11 @@ t = t.replace(case_anchor, case_new, 1)
 
 method_anchor = '    /** The first character of the party (relic 317), or null when there is no battle. */'
 method_new = ('    /**' + NL
-              + '     * \u300c\u968f\u673a\u4e3a 1 \u4e2a\u5f53\u524d\u80fd\u91cf\u767e\u5206\u6bd4\u5c0f\u4e8e 50% \u7684\u6211\u65b9\u5176\u4ed6\u76ee\u6807\u300d (light cone 21021).' + NL
+              + '     * 「随机为 1 个当前能量百分比小于 50% 的我方其他目标」 (light cone 21021).' + NL
               + '     *' + NL
-              + '     * <p>\u26a0 FILTER FIRST, ROLL SECOND \u2014 the same order `randomHitEnemy` documents: a roll landing on an' + NL
+              + '     * <p>⚠ FILTER FIRST, ROLL SECOND — the same order `randomHitEnemy` documents: a roll landing on an' + NL
               + '     * excluded ally would be dropped rather than re-rolled, which is a wrong answer that reports nothing.' + NL
-              + '     * \u26a0 The 50% is written in rather than carried by a field: the text states it once and no tier changes' + NL
+              + '     * ⚠ The 50% is written in rather than carried by a field: the text states it once and no tier changes' + NL
               + '     * it (the five tiers differ only in how much energy is restored).' + NL
               + '     */' + NL
               + '    private static CanHit randomAllyBelowHalfEnergy(TriggerContext ctx) {' + NL

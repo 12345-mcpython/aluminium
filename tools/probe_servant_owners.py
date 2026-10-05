@@ -49,7 +49,7 @@ for cid in ("1409", "1415"):
         text = re.sub(r"<[^>]+>", " ", body)
         text = re.sub(r"\s+", " ", text)
         out.append("=== %s ===" % name)
-        for keyword in ("\u4f8d\u4ece", "\u53ec\u5524", "\u521d\u59cb\u62e5\u6709"):
+        for keyword in ("侍从", "召唤", "初始拥有"):
             for match in list(re.finditer(keyword, text))[:2]:
                 out.append("  ...%s..." % text[max(0, match.start() - 160):match.start() + 300])
 

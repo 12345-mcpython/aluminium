@@ -20,7 +20,7 @@ public class AcheronTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 One Slashed Dream per Skill, stopped at the document's nine. */
+    /** ⚠ One Slashed Dream per Skill, stopped at the document's nine. */
     @Test
     public void theSkillFeedsSlashedDreamUpToNine() {
         Character acheron = CharacterFactory.create(ACHERON, LEVEL);
@@ -30,19 +30,19 @@ public class AcheronTest {
 
         Assertions.assertEquals(0, dreamOf(acheron), "the document states no initial value, so it starts at 0");
         battle.fireTriggers(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0);
-        Assertions.assertEquals(1, dreamOf(acheron), "\u300c\u83b7\u5f971\u70b9\u3010\u6b8b\u68a6\u3011\u300d");
+        Assertions.assertEquals(1, dreamOf(acheron), "「获得1点【残梦】」");
 
         for (int i = 0; i < 11; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0);
         }
         Assertions.assertEquals(9, dreamOf(acheron),
-                "\u300c\u3010\u6b8b\u68a6\u3011\u8fbe\u52309\u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u300d -- twelve casts must still read nine");
+                "「【残梦】达到9点时可激活终结技」 -- twelve casts must still read nine");
     }
 
 
     /** The declared resource's value, read through the combatant's own manager. */
     private static int dreamOf(Character unit) {
-        return unit.getResources().get("\u6b8b\u68a6").getValue();
+        return unit.getResources().get("残梦").getValue();
     }
 
     private static Random fixed() {

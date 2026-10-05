@@ -45,7 +45,7 @@ patch(
     }
 
     /**
-     * \u2b50 The same moment, carrying <b>how many instances of that state</b> the carrier held. \u26a0 The number goes in the AMOUNT
+     * ⭐ The same moment, carrying <b>how many instances of that state</b> the carrier held. ⚠ The number goes in the AMOUNT
      * slot, not the hit count: measured, `fireTriggers(event, actor, target, int hitCount, double amount)`, and putting it one
      * place early left `ctx.amount()` at zero -- which is what 「将其中的 50%」 reads.
      */
@@ -67,7 +67,7 @@ patch(
         int removed = 0;""",
     """        String wanted = state.trim();
         int removed = 0;
-        // \u2b50 ONE announcement per sweep, carrying the total, so a reader that converts a share of \"it\" sees the total once.
+        // ⭐ ONE announcement per sweep, carrying the total, so a reader that converts a share of \"it\" sees the total once.
         int ending = 0;
         for (AbstractBuff carried : List.copyOf(buffs)) {
             if (carried instanceof StateBuff buff && wanted.equals(buff.getState())) {

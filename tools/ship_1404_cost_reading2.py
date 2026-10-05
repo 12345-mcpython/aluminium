@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404 \u4e07\u654c\uff1a\u3010\u5f11\u738b\u6210\u738b\u3011\u7684\u81ea\u52a8\u65bd\u653e\uff0c\u4ee5\u53ca\u5b83\u7684\u4ee3\u4ef7 (2026-10-02).
+ * 1404 万敌：【弑王成王】的自动施放，以及它的代价 (2026-10-02).
  *
  * <p>Two readings, kept apart because the earlier attempt failed with two independent causes. One reads the COST, the other reads
- * the SWAP by the slot the skill reports. \u26a0 And the cost reading wounds him first: at full HP "35% of CURRENT" and "35% of
+ * the SWAP by the slot the skill reports. ⚠ And the cost reading wounds him first: at full HP "35% of CURRENT" and "35% of
  * MAXIMUM" are the same number, so a reading taken there would pass for either share -- the first version did exactly that.
  */
 public class MydeiBloodfeudSkillsTest {
@@ -39,7 +39,7 @@ public class MydeiBloodfeudSkillsTest {
     private static final int MONSTER = 1002011;
     private static final String BLOODFEUD = "\\u8840\\u4ec7";
 
-    /** \u300c\u6d88\u8017\u7b49\u540c\u4e8e\u4e07\u654c\u5f53\u524d\u751f\u547d\u503c 35% \u7684\u751f\u547d\u503c\u300d-- the cost is paid, on the CURRENT value, at the start of his turn. */
+    /** 「消耗等同于万敌当前生命值 35% 的生命值」-- the cost is paid, on the CURRENT value, at the start of his turn. */
     @Test
     public void theTurnStartPaysTheSkillsCost() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -64,17 +64,17 @@ public class MydeiBloodfeudSkillsTest {
                 + ") ; enemy " + enemyBefore + " -> " + enemyAfter);
 
         Assertions.assertEquals(hpBefore * 0.65, hpAfter, hpBefore * 1e-6,
-                "\u300c\u6d88\u8017\u7b49\u540c\u4e8e\u4e07\u654c\u5f53\u524d\u751f\u547d\u503c 35% \u7684\u751f\u547d\u503c\u300d-- the CURRENT value");
+                "「消耗等同于万敌当前生命值 35% 的生命值」-- the CURRENT value");
         Assertions.assertTrue(hpAfter > hpBefore - 0.35 * maxHp,
                 "and NOT a share of the maximum: that would leave " + (hpBefore - 0.35 * maxHp) + ", and he has " + hpAfter);
         Assertions.assertTrue(enemyAfter < enemyBefore, "and the attack lands");
 
-        // \u26a0 This reading covers the COST half. The other half -- swapping slot 9 in so the cast runs \u3010\u5f11\u738b\u6210\u738b\u3011 -- does NOT
+        // ⚠ This reading covers the COST half. The other half -- swapping slot 9 in so the cast runs 【弑王成王】 -- does NOT
         // work from inside a rule yet, measured: the swap lands in the map while a `CAST_SKILL` later in the same rule still runs the
-        // old row (767.585 against 383.793 for a direct cast of slot 9). Registered in EXPRESSION \u00a73, so the note does not claim it.
+        // old row (767.585 against 383.793 for a direct cast of slot 9). Registered in EXPRESSION §3, so the note does not claim it.
     }
 
-    /** \u26a0 The other half on its own: `REPLACE_SKILL` really installs the row the cast then uses. */
+    /** ⚠ The other half on its own: `REPLACE_SKILL` really installs the row the cast then uses. */
     @Test
     public void theSwapInstallsTheEnhancedRow() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -94,10 +94,10 @@ public class MydeiBloodfeudSkillsTest {
         int slot = him.getSkills().get(SkillType.SKILL).getSkillSlot();
         System.out.println("[mydei-skills] SKILL slot after the swap = " + slot
                 + " ; category = " + him.getSkills().get(SkillType.SKILL).getData().getCategory());
-        Assertions.assertEquals(9, slot, "\u6362\u5165\u7684\u662f**\u69fd 9** \u7684\u884c\uff08\u3010\u5f11\u738b\u6210\u738b\u3011\u7834\u97e7 60/30 \u2713\uff09\uff0c\u800c\u539f\u6765\u662f\u69fd 2");
+        Assertions.assertEquals(9, slot, "换入的是**槽 9** 的行（【弑王成王】破韧 60/30 ✓），而原来是槽 2");
     }
 
-    /** \u26a0 Half a turn is `beforeMove()` alone; a full one is both halves (see `ArlanEidolonFourTest`). */
+    /** ⚠ Half a turn is `beforeMove()` alone; a full one is both halves (see `ArlanEidolonFourTest`). */
     private static void spendTurnOf(Battle battle, Character unit) {
         Signal signal = battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == unit).findFirst()

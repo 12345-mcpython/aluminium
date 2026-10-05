@@ -74,7 +74,7 @@ QUEUE_FIELDS = '''
     }
 '''
 
-MOVE_HEAD = '''        // \u2b50 An inserted action cuts in front of everything, and the clock does not move for it (2026-10-02) -- the same "the clock does not
+MOVE_HEAD = '''        // ⭐ An inserted action cuts in front of everything, and the clock does not move for it (2026-10-02) -- the same "the clock does not
         // move" the extra turn states, but WITHOUT needing a place in the heap, which is what a zero-speed unit cannot have.
         if (insertedSignal != null) {
             currentActor = insertedSignal;
@@ -102,15 +102,15 @@ AFTER_MOVE_NEW = '''        if (actor.isDeath()) {
             actor.getBuffManager().clearAll();
             queue.removeCombatant(actor);
         } else if (queue.isInActionOrder(actor)) {
-            // \u26a0 Only an actor that HAS a place in the order has a cycle to re-time. An inserted action carries a signal that was never
+            // ⚠ Only an actor that HAS a place in the order has a cycle to re-time. An inserted action carries a signal that was never
             // scheduled, and `setTopZero()` would re-time the top of the heap -- i.e. somebody else (2026-10-02).
             queue.setTopZero();
         }'''
 
 OP_ANCHOR = '            case "EXTRA_TURN" -> {'
 OP_BLOCK = '''            case "INSERT_ACTION" -> {
-                // \u2b50 \u300c\u5fb7\u8c2c\u6b4c\u7acb\u5373\u83b7\u5f97 1 \u4e2a\u989d\u5916\u56de\u5408\u5e76\u81ea\u52a8\u65bd\u653e\u3010\u82b1\u4e0e\u7bad\u7684\u821e\u66f2\u3011\u300d(1415 memosprite skill 10): a unit outside the action
-                // order acts now -- the game's `TurnInsertAction`. \u26a0 NOT `EXTRA_TURN`: that one cuts into a queue the unit is already in, and
+                // ⭐ 「德谬歌立即获得 1 个额外回合并自动施放【花与箭的舞曲】」(1415 memosprite skill 10): a unit outside the action
+                // order acts now -- the game's `TurnInsertAction`. ⚠ NOT `EXTRA_TURN`: that one cuts into a queue the unit is already in, and
                 // a memosprite at Speed 0 is not in it at all (the game pins it there with `SpeedOverride`).
                 CanHit acting = require(resolveTarget(effect, ctx), "target", ctx);
                 if (!battle.insertAction(acting)) {

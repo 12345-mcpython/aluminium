@@ -25,18 +25,18 @@ OLD = """        for (CanHit target : resolveTargets(battle, effect, ctx)) {
                         : Boolean.TRUE.equals(effect.getDefersDeath())
                         ? new DeferredDeathBuff(state, turns, permanent)
                         : new StateBuff(state, turns, permanent), effect), effect, ctx), ctx);
-            // \u300c\u4e0d\u4f1a\u8fdb\u5165\u81ea\u5df1\u7684\u56de\u5408\u300d rides on the state itself: a turn is not something a state could give back
+            // 「不会进入自己的回合」 rides on the state itself: a turn is not something a state could give back
             // later, so the flag and the state share one lifetime by construction.
             if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
                 buff.setSuspendsTurns(true);
             }
-            // \u300c\u6709 100% \u7684\u57fa\u7840\u6982\u7387\u4f7f\u654c\u65b9\u2026\u9677\u5165\u3010\u901a\u89e3\u3011\u72b6\u6001\u300d: when the rule states one, the state is ROLLED (effect resistance
+            // 「有 100% 的基础概率使敌方…陷入【通解】状态」: when the rule states one, the state is ROLLED (effect resistance
             // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
             attachRolled(battle, target, buff, effect, ctx);
         }
     }"""
-NEW = """        // \u2b50 How many instances this application carries (2026-10-02; reader: 1513's reward, whose state's INSTANCE COUNT is
-        // the \u3010\u7b26\u70b9\u3011 it spent). A plain state refreshes on re-application, so only a STACKABLE one is repeated --
+NEW = """        // ⭐ How many instances this application carries (2026-10-02; reader: 1513's reward, whose state's INSTANCE COUNT is
+        // the 【符点】 it spent). A plain state refreshes on re-application, so only a STACKABLE one is repeated --
         // otherwise the loop would be a no-op dressed as a feature.
         int times = 1;
         if (Boolean.TRUE.equals(effect.getStackable())) {
@@ -56,12 +56,12 @@ NEW = """        // \u2b50 How many instances this application carries (2026-10-
                             : Boolean.TRUE.equals(effect.getDefersDeath())
                             ? new DeferredDeathBuff(state, turns, permanent)
                             : new StateBuff(state, turns, permanent), effect), effect, ctx), ctx);
-                // \u300c\u4e0d\u4f1a\u8fdb\u5165\u81ea\u5df1\u7684\u56de\u5408\u300d rides on the state itself: a turn is not something a state could give back
+                // 「不会进入自己的回合」 rides on the state itself: a turn is not something a state could give back
                 // later, so the flag and the state share one lifetime by construction.
                 if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
                     buff.setSuspendsTurns(true);
                 }
-                // \u300c\u6709 100% \u7684\u57fa\u7840\u6982\u7387\u4f7f\u654c\u65b9\u2026\u9677\u5165\u3010\u901a\u89e3\u3011\u72b6\u6001\u300d: when the rule states one, the state is ROLLED (effect resistance
+                // 「有 100% 的基础概率使敌方…陷入【通解】状态」: when the rule states one, the state is ROLLED (effect resistance
                 // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
                 attachRolled(battle, target, buff, effect, ctx);
             }

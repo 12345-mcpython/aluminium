@@ -29,7 +29,7 @@ if os.path.exists(global_path):
     out.append("")
     out.append("=== SummonUnitGlobalConfig.json (%d chars) ===" % len(body))
     out.append("  head: %s" % body[:600].replace("\n", " "))
-    for keyword in ("1112", "Numby", "\u8d26\u8d26", "114"):
+    for keyword in ("1112", "Numby", "账账", "114"):
         hits = [m.start() for m in re.finditer(re.escape(keyword), body)]
         out.append("  %-8s hits=%d" % (keyword, len(hits)))
         for start in hits[:2]:

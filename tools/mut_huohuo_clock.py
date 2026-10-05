@@ -9,7 +9,7 @@ import json
 import sys
 
 CHAR = "src/main/resources/characters/1217.json"
-TALISMAN = "\u79b3\u547d"
+TALISMAN = "禳命"
 mode = (sys.argv[1] if len(sys.argv) > 1 else "").strip().lower()
 if mode not in ("a", "b", "c", "off", "on"):
     sys.exit("usage: mut_huohuo_clock.py a|b|off|on")

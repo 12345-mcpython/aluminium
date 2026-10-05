@@ -23,7 +23,7 @@ import java.util.Random;
  * the state lasts, because the immunity ends with the state rather than with a turn count. It also records that ULT_CAST
  * arrives at the tables exactly once per cast.
  *
- * <p>\u26a0 <b>How this class was born.</b> I first wrote a second copy of ③⑤ and measured a party ATK gain of
+ * <p>⚠ <b>How this class was born.</b> I first wrote a second copy of ③⑤ and measured a party ATK gain of
  * 475.0818748 where 0.228 x the pre-cast ATK + 200 is 386.8744908 -- and misread that as an engine bug. The duplicate
  * was the cause: the first rule computes 386.8744908 (her ATK then reads 1206.499) and the second recomputes
  * 475.0818748 from that boosted value, replacing the first because both carry the same name. The instrument was too
@@ -51,16 +51,16 @@ public class RobinConcertoTest {
         battle.startBattle();
         battle.castImmediate(robin.getSkills().get(SkillType.ULTRA), robin, List.of(dummy()));
 
-        Assertions.assertEquals(1, counter.getBuffManager().stacksOf("\u8ba1\u6570"),
+        Assertions.assertEquals(1, counter.getBuffManager().stacksOf("计数"),
                 "ULT_CAST arrives at the tables once per cast (an event count -- it does NOT count the rules that match)");
         battle.fireTriggers(TriggerEvent.TURN_START, injector, robin, 0, 0);
-        Assertions.assertFalse(robin.getBuffManager().hasState("\u51bb\u7ed3"),
-                "\u300c\u5904\u4e8e\u3010\u534f\u594f\u3011\u72b6\u6001\u65f6\uff0c\u77e5\u66f4\u9e1f\u514d\u75ab\u63a7\u5236\u7c7b\u8d1f\u9762\u72b6\u6001\u300d");
+        Assertions.assertFalse(robin.getBuffManager().hasState("冻结"),
+                "「处于【协奏】状态时，知更鸟免疫控制类负面状态」");
 
         battle.fireTriggers(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(robin).getFirst(), robin, 0, 0);
 
         battle.fireTriggers(TriggerEvent.TURN_START, injector, robin, 0, 0);
-        Assertions.assertTrue(robin.getBuffManager().hasState("\u51bb\u7ed3"),
+        Assertions.assertTrue(robin.getBuffManager().hasState("冻结"),
                 "the immunity is named after the state, so the countdown takes it off -- the same control now lands");
     }
 
@@ -68,7 +68,7 @@ public class RobinConcertoTest {
     private static EffectSpec control() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "APPLY_CONTROL");
-        TriggerSpecs.set(effect, "control", "\u51bb\u7ed3");
+        TriggerSpecs.set(effect, "control", "冻结");
         TriggerSpecs.set(effect, "turns", 1);
         TriggerSpecs.set(effect, "baseChance", 1.0);
         TriggerSpecs.set(effect, "target", "target");
@@ -79,7 +79,7 @@ public class RobinConcertoTest {
     private static EffectSpec stack() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADD_STACK");
-        TriggerSpecs.set(effect, "buff", "\u8ba1\u6570");
+        TriggerSpecs.set(effect, "buff", "计数");
         TriggerSpecs.set(effect, "maxStacks", 99);
         TriggerSpecs.set(effect, "permanent", true);
         TriggerSpecs.set(effect, "target", "self");

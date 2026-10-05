@@ -16,17 +16,17 @@ sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 WORK = r'E:\code\java\aluminium'
 PATH = WORK + '/src/main/resources/characters/1410.json'
 RID = 'ult_zone_opens_and_lowers'
-ZONE = '\u7ed3\u754c'                      # 结界
+ZONE = '结界'                      # 结界
 
 NOTE = (
-    '\u2b50 2026-09-30 \u8f6c\u6b63 \u2713\uff1a\u300c\u6d77\u745f\u97f3**\u5c55\u5f00\u7ed3\u754c**\uff0c\u4f7f\u654c\u65b9\u76ee\u6807'
-    '\u653b\u51fb\u529b\u964d\u4f4e 15%\u3001\u9632\u5fa1\u529b\u964d\u4f4e 25%\u2026\u7ed3\u754c\u6301\u7eed 3 \u56de\u5408\uff0c'
-    '\u81ea\u8eab\u6bcf\u56de\u5408\u5f00\u59cb\u65f6\u51cf 1\u3002\u5f53\u6d77\u745f\u97f3\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u65f6\uff0c'
-    '\u7ed3\u754c\u4e5f\u4f1a\u88ab\u89e3\u9664\u300d\u2014\u2014 \u26a0 \u65e7\u767b\u8bb0\u62c5\u5fc3\u201c\u7528\u666e\u901a\u7684 `turns: 3` \u5199'
-    '\u4f1a\u5728**\u7ed3\u754c\u7ed3\u675f\u540e**\u4ecd\u7559\u7740\u201d \u2717\u3002\u2b50 \u7b54\u6848\u4e0d\u662f\u65b0 op\uff0c\u800c\u662f**\u540c\u540d** \u2713\uff1a'
-    '\u4e24\u53e5\u90fd\u5e26 `buff: \u7ed3\u754c` + \u540c\u4e00\u4e2a `turns: 3` + `ticksOn: self` \u21d2 \u65f6\u95f4\u4e00\u5230\u4e24\u53e5\u4e00\u8d77\u6ca1 \u2713\uff1b'
-    '\u800c\u300c\u5979\u5012\u4e0b\u65f6\u7ed3\u754c\u4e5f\u88ab\u89e3\u9664\u300d\u7531 `removeBuffsAnchoredTo` \u627f\u62c5 \u2713'
-    '\uff08\u26a0 \u540c\u6837\u4f9d\u8d56 (b)\uff1a`ticks_on` \u76f4\u5230 `b275250` \u624d\u771f\u6b63\u63a5\u5728 `MODIFY_ATTR` \u4e0a \u2713\uff09\u3002'
+    '⭐ 2026-09-30 转正 ✓：「海瑟音**展开结界**，使敌方目标'
+    '攻击力降低 15%、防御力降低 25%…结界持续 3 回合，'
+    '自身每回合开始时减 1。当海瑟音陷入无法战斗状态时，'
+    '结界也会被解除」—— ⚠ 旧登记担心“用普通的 `turns: 3` 写'
+    '会在**结界结束后**仍留着” ✗。⭐ 答案不是新 op，而是**同名** ✓：'
+    '两句都带 `buff: 结界` + 同一个 `turns: 3` + `ticksOn: self` ⇒ 时间一到两句一起没 ✓；'
+    '而「她倒下时结界也被解除」由 `removeBuffsAnchoredTo` 承担 ✓'
+    '（⚠ 同样依赖 (b)：`ticks_on` 直到 `b275250` 才真正接在 `MODIFY_ATTR` 上 ✓）。'
 )
 
 

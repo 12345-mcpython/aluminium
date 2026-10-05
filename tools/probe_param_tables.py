@@ -11,8 +11,8 @@ import re
 CORPUS = "E:/turnbasedgamedata/aluminium_texts"
 out = []
 
-for name, marker in (("1409_\u98ce\u5807.md", "\u7597\u6108\u4e16\u95f4\u7684\u6668\u66e6"),
-                     ("1415_\u6614\u6d9f.md", "\u8bd7\u7684\u300c\u25e6\u300d\u8a93\u7ea6\u7684\u300c\u221e\u300d")):
+for name, marker in (("1409_风堇.md", "疗愈世间的晨曦"),
+                     ("1415_昔涟.md", "诗的「◦」誓约的「∞」")):
     path = os.path.join(CORPUS, name)
     out.append("=== %s ===" % name)
     if not os.path.exists(path):

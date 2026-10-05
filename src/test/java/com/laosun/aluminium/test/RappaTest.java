@@ -22,7 +22,7 @@ public class RappaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 One Charge per Weakness Break, stopped at the document's ten. */
+    /** ⚠ One Charge per Weakness Break, stopped at the document's ten. */
     @Test
     public void everyBreakAddsOneChargeUpToTen() {
         Character rappa = CharacterFactory.create(RAPPA, LEVEL);
@@ -33,18 +33,18 @@ public class RappaTest {
         Assertions.assertEquals(0, chargeOf(rappa), "the document states no initial value, so it starts at 0");
         battle.fireTriggers(TriggerEvent.BREAK, rappa, enemy, 0, 0);
         Assertions.assertEquals(1, chargeOf(rappa),
-                "\u300c\u6bcf\u5f53\u654c\u65b9\u76ee\u6807\u7684\u5f31\u70b9\u88ab\u51fb\u7834\u65f6\uff0c\u4e71\u7834\u83b7\u5f971\u70b9\u5145\u80fd\u300d");
+                "「每当敌方目标的弱点被击破时，乱破获得1点充能」");
 
         for (int i = 0; i < 11; i++) {
             battle.fireTriggers(TriggerEvent.BREAK, rappa, enemy, 0, 0);
         }
         Assertions.assertEquals(10, chargeOf(rappa),
-                "\u300c\u6700\u591a\u62e5\u670910\u70b9\u5145\u80fd\u300d -- twelve breaks must still read ten");
+                "「最多拥有10点充能」 -- twelve breaks must still read ten");
     }
 
     /** The declared resource's value, read through the combatant's own manager. */
     private static int chargeOf(Character rappa) {
-        return rappa.getResources().get("\u5145\u80fd").getValue();
+        return rappa.getResources().get("充能").getValue();
     }
 
     private static Random fixed() {

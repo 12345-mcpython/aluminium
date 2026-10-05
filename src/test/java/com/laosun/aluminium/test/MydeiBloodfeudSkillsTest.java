@@ -29,8 +29,8 @@ import java.util.Random;
 public class MydeiBloodfeudSkillsTest {
     private static final int MYDEI = 1404;
     private static final int MONSTER = 1002011;
-    private static final String BLOODFEUD = "\u8840\u4ec7";
-    private static final String CHARGE = "\u5929\u8D4B\u5145\u80FD";
+    private static final String BLOODFEUD = "血仇";
+    private static final String CHARGE = "天赋充能";
 
     /** 「消耗等同于万敌当前生命值 35% 的生命值」-- the cost is paid, on the CURRENT value, at the start of his turn. */
     @Test

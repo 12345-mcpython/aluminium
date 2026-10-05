@@ -12,8 +12,8 @@ import java.util.Random;
 /**
  * Slot 15's narrowing (2026-10-02): 「缇宝施放**追加攻击**触发缇宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害」.
  *
- * \u2b50 The control lives INSIDE one battle. The ode is cast at her in both readings, so its other clause (the passage ode's `DEFENCE_IGNORE`, measured to raise every instance she deals from
- * 82.20 to 90.13) applies identically; the only thing that differs is the extra rule's own gate, the state the ode grants. \u26a0 Comparing "ode vs no ode" instead would measure two effects
+ * ⭐ The control lives INSIDE one battle. The ode is cast at her in both readings, so its other clause (the passage ode's `DEFENCE_IGNORE`, measured to raise every instance she deals from
+ * 82.20 to 90.13) applies identically; the only thing that differs is the extra rule's own gate, the state the ode grants. ⚠ Comparing "ode vs no ode" instead would measure two effects
  * at once -- which is what the earlier attempts did.
  */
 public class PassageOdeExtraZoneHitTest {
@@ -22,7 +22,7 @@ public class PassageOdeExtraZoneHitTest {
     private static final int TRIBBIE = 1403;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 15;
-    private static final String GATE = "\u732e\u4e88\u300c\u95e8\u5f84\u300d\u4e4b\u8bd7";
+    private static final String GATE = "献予「门径」之诗";
 
     @Test
     public void theExtraHitOnlyLandsWhileTheOdeIsOnHer() {
@@ -47,7 +47,7 @@ public class PassageOdeExtraZoneHitTest {
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ult, tribbie,
                 List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(tribbie.getBuffManager().hasState("\u7ed3\u754c"), "precondition: the zone is open");
+        Assertions.assertTrue(tribbie.getBuffManager().hasState("结界"), "precondition: the zone is open");
         var sprite = battle.summonServant(battle.characters.get(0));
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);

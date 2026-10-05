@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** \u300c\u5c55\u5f00\u6218\u6280\u7684\u7ed3\u754c\u5e76\u4f7f\u5176\u6ca1\u6709\u6301\u7eed\u65f6\u95f4\u300d (2026-10-02). */
+/** 「展开战技的结界并使其没有持续时间」 (2026-10-02). */
 public class RippleEndlessWardTest {
-    private static final String WARD = "\u7ed3\u754c";
+    private static final String WARD = "结界";
 
     @Test
     public void theUltimateMakesTheWardEndless() {

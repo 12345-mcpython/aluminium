@@ -19,7 +19,7 @@ import java.util.Random;
  * Light cone 21010: hitting the SAME enemy again lifts the damage by 8% a time, up to five layers -- and another enemy starts
  * from nothing, because the layers live on the enemy.
  *
- * <p>\u2b50 The wearer is Dan Heng, NOT the character the earlier attempt used: that one carries a self-stacking combo mechanic of its
+ * <p>⭐ The wearer is Dan Heng, NOT the character the earlier attempt used: that one carries a self-stacking combo mechanic of its
  * own (measured: 514 -> 828 -> 628 over three hits), which made every reading unreadable. The probe also settled the shape
  * itself: an ADD_STACK with `target: target` on a DEALING_DAMAGE event lands on the enemy (1/2/3 after three hits).
  */
@@ -29,7 +29,7 @@ public class Cone21010Test {
     private static final int ALLY = 1003;
     private static final int LEVEL = 80;
     private static final int FIRST = 1002011;
-    private static final String MARK = "\u775a\u51c6";
+    private static final String MARK = "睚准";
 
     private Character wearer;
     private Enemy first;
@@ -65,10 +65,10 @@ public class Cone21010Test {
                 + afterThree + ") ; on the second enemy=" + onSecond + " (stacks " + secondStacks + ")");
         Assertions.assertEquals(1, afterOne, "the first hit marks the target");
         Assertions.assertEquals(3, afterThree, "the third hit has marked it three times");
-        // \u2605 The instance boost is one layer per stack, so hit 3 must be (1 + 0.24) / (1 + 0.08) of hit 1.
+        // ★ The instance boost is one layer per stack, so hit 3 must be (1 + 0.24) / (1 + 0.08) of hit 1.
         Assertions.assertEquals(1.24 / 1.08, three / one, 0.01, "each layer is 8% of the base, added up");
         Assertions.assertEquals(1, secondStacks, "a different enemy carries only its own first mark");
-        Assertions.assertTrue(onSecond < three, "so it does not inherit the first enemy\u2019s layers");
+        Assertions.assertTrue(onSecond < three, "so it does not inherit the first enemy’s layers");
     }
 
     @Test
@@ -79,7 +79,7 @@ public class Cone21010Test {
         }
         int stacks = first.getBuffManager().stacksOf(MARK);
         System.out.println("[21010] after eight hits: stacks=" + stacks);
-        Assertions.assertEquals(5, stacks, "\u6700\u591a\u53e0\u52a0 5 \u5c42");
+        Assertions.assertEquals(5, stacks, "最多叠加 5 层");
     }
 
     @Test

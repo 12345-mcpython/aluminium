@@ -9,8 +9,8 @@ import io
 PATH = "src/main/java/com/laosun/aluminium/models/buff/BuffManager.java"
 ANCHOR = "        String wanted = state.trim();\n        int removed = 0;\n"
 BLOCK = ANCHOR + (
-    "        // \u2b50 ONE announcement per sweep, carrying how many instances it takes (2026-10-02; reader: 1505's \u300c\u5f00\u4e0d\u8d25\u300d,\n"
-    "        // \u300c\u5c06\u5176\u4e2d\u7684 50% \u8f6c\u5316\u4e3a\u81ea\u8eab\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d). A sweep can take several instances of one state, and a reader that\n"
+    "        // ⭐ ONE announcement per sweep, carrying how many instances it takes (2026-10-02; reader: 1505's 「开不败」,\n"
+    "        // 「将其中的 50% 转化为自身的【好活当赏】」). A sweep can take several instances of one state, and a reader that\n"
     "        // turns a share of \"it\" into something must see the total once, not three shrinking numbers.\n"
     "        int ending = 0;\n"
     "        for (AbstractBuff carried : List.copyOf(buffs)) {\n"

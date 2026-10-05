@@ -195,14 +195,14 @@ public final class CharacterFactory {
         // directly, so the cap a rule is gated on is the same number that was registered -- there is one
         // reader of the declaration (`requireReadableResources`), not two.
         for (ResourceSpec spec : table.resources()) {
-                // \u2705 A PARTY-scoped declaration is NOT registered per character (2026-09-30): `ResourceManager.register` itself
-                // refuses an unwired scope because \u300c\u4e00\u4e2a party-level resource needs a PER-BATTLE owner\u300d, and `Battle` is that owner
-                // (it registers these from the party\u2019s declarations at the start of the battle). Registering a copy here as well would
+                // ✅ A PARTY-scoped declaration is NOT registered per character (2026-09-30): `ResourceManager.register` itself
+                // refuses an unwired scope because 「一个 party-level resource needs a PER-BATTLE owner」, and `Battle` is that owner
+                // (it registers these from the party’s declarations at the start of the battle). Registering a copy here as well would
                 // quietly give the declaring character a private counter and the shared one would read 0 -- measured, before this.
                 if ("PARTY".equalsIgnoreCase(spec.scope() == null ? "" : spec.scope().trim())) {
                     continue;
                 }
-            // \u2705 The declared overflow rides along (2026-09-30).
+            // ✅ The declared overflow rides along (2026-09-30).
                 character.getResources().register(spec.id(), spec.max(), spec.initial(),
                         spec.overflow() == null ? 0 : spec.overflow());
         }

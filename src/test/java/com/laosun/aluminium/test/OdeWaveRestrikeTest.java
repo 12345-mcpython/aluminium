@@ -60,7 +60,7 @@ public class OdeWaveRestrikeTest {
         SkillExecutor.execute(battle, ode, demiurge, List.of(mydei));
         battle.processRequests();
         Assertions.assertTrue(mydei.getBuffManager().hasState(MARK),
-                "\u300c\u5bf9\u4e07\u654c\u65bd\u653e\u65f6\u300d-- the ode leaves its mark on him");
+                "「对万敌施放时」-- the ode leaves its mark on him");
 
         int before = mydei.getSkills().get(SkillType.SKILL).getSkillSlot();
         boolean entered = battle.getWaveManager().nextWave();
@@ -69,7 +69,7 @@ public class OdeWaveRestrikeTest {
         System.out.println("[ode] wave monsters = " + battle.waveMonsters().size() + " ; his SKILL slot " + before + " -> " + after);
 
         Assertions.assertEquals(GODSLAYER, after,
-                "\u300c\u5bf9**\u65b0\u5165\u573a**\u7684\u654c\u65b9\u76ee\u6807\u65bd\u653e\u300d-- a wave monster entering makes him restrike");
+                "「对**新入场**的敌方目标施放」-- a wave monster entering makes him restrike");
     }
 
     /** Without the ode's mark, a wave changes nothing -- the gate is the mark, not the wave. */
@@ -89,6 +89,6 @@ public class OdeWaveRestrikeTest {
         System.out.println("[ode] without the mark: his SKILL slot " + before + " -> " + after);
 
         Assertions.assertEquals(before, after,
-                "\u300c\u5bf9\u4e07\u654c\u65bd\u653e\u65f6\u300d-- the clause is about the ode reaching him, not about any wave");
+                "「对万敌施放时」-- the clause is about the ode reaching him, not about any wave");
     }
 }

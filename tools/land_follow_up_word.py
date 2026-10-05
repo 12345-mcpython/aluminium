@@ -8,7 +8,7 @@ The engine's own notion of a follow-up attack is `Battle.applyAdditionalDamage` 
   * `SkillCategory` has no `FOLLOW_UP` value (measured: NORMAL/BPSKILL/ULTRA/MAZE_NORMAL/MAZE/ASSIST/ELATION_DAMAGE/UNSPECIFIED/UNKNOWN);
   * nothing reads an instance's cast category as a condition.
 
-So: the category gains the value, the DAMAGE op can STATE it, and a keyword can ASK it.  \u26a0 The category rides on the INSTANCE because `applyAdditionalDamage`
+So: the category gains the value, the DAMAGE op can STATE it, and a keyword can ASK it.  ⚠ The category rides on the INSTANCE because `applyAdditionalDamage`
 fires `FOLLOW_UP` without one; stamping the damage is what lets the event say what it was.
 """
 import io
@@ -33,9 +33,9 @@ tab = io.open(TAB, encoding="utf-8").read()
 CAT_ANCHOR = '    ELATION_DAMAGE("ElationDamage"),'
 CAT_NEW = '''    ELATION_DAMAGE("ElationDamage"),
     /**
-     * \u2b50 \u300c\u8ffd\u52a0\u653b\u51fb\u300d (2026-10-02). The engine\u2019s own notion of one is {@code Battle.applyAdditionalDamage} -- the method that fires
+     * ⭐ 「追加攻击」 (2026-10-02). The engine’s own notion of one is {@code Battle.applyAdditionalDamage} -- the method that fires
      * {@code TriggerEvent.FOLLOW_UP} -- but an instance could not SAY it was one, so a rule reading an instance could not ask. Reader: 1415's ode of passage,
-     * \u300c\u7f07\u5b9d\u65bd\u653e**\u8ffd\u52a0\u653b\u51fb**\u89e6\u53d1\u7f07\u5b9d\u7684\u7ed3\u754c\u7684\u9644\u52a0\u4f24\u5bb3\u65f6\u2026\u300d, where the follow-up half is load-bearing: an ordinary attack must
+     * 「缇宝施放**追加攻击**触发缇宝的结界的附加伤害时…」, where the follow-up half is load-bearing: an ordinary attack must
      * NOT satisfy it.
      */
     FOLLOW_UP("FollowUp"),'''
@@ -59,7 +59,7 @@ BAT_NEW = """    public double applyAdditionalDamage(CanHit attacker, CanHit tar
     }
 
     /**
-     * The same, with the instance\u2019s CAST CATEGORY stated (2026-10-02; reader: 1415's ode of passage, whose clause is about a \u300c\u8ffd\u52a0\u653b\u51fb\u300d). \u26a0 The
+     * The same, with the instance’s CAST CATEGORY stated (2026-10-02; reader: 1415's ode of passage, whose clause is about a 「追加攻击」). ⚠ The
      * body stays here and the six/seven-argument forms delegate to it -- a second way to build and settle an instance is exactly what the single-settlement
      * invariant exists to prevent, as the note above says.
      */
@@ -73,7 +73,7 @@ SPEC_ANCHOR = '    @SerializedName("damage_type")'
 SPEC_NEW = '''    /**
      * The cast category of the instance a DAMAGE effect produces, spelled as {@code SkillCategory} (2026-10-02).
      *
-     * <p>Reader: 1415's ode of passage, \u300c\u7f07\u5b9d\u65bd\u653e**\u8ffd\u52a0\u653b\u51fb**\u89e6\u53d1\u2026\u65f6\u300d -- the follow-up half has to be stated somewhere, and
+     * <p>Reader: 1415's ode of passage, 「缇宝施放**追加攻击**触发…时」 -- the follow-up half has to be stated somewhere, and
      * `applyAdditionalDamage` fires `FOLLOW_UP` without one.
      */
     @SerializedName("cast_category")
@@ -94,7 +94,7 @@ INT_NEW = """            battle.applyAdditionalDamage(attacker, victim, skill ==
                             ? DamageElement.fromString(effect.getElement().trim())
                             : elementOf(effect, skill), settledBase,
                     effect.getCritRate(), effect.getCritDamage(), damageType,
-                    // \u2b50 The rule may state that this instance is a \u300c\u8ffd\u52a0\u653b\u51fb\u300d (2026-10-02): `applyAdditionalDamage` fires FOLLOW_UP without a
+                    // ⭐ The rule may state that this instance is a 「追加攻击」 (2026-10-02): `applyAdditionalDamage` fires FOLLOW_UP without a
                     // category, so the instance has to carry it for a listener to be able to ask.
                     effect.getCastCategory() == null || effect.getCastCategory().isBlank()
                             ? null
@@ -105,10 +105,10 @@ TAB_CONST_ANCHOR = '    static final String DAMAGE_IS_ADDITIONAL = "damage_is_ad
 TAB_CONST_NEW = '''    static final String DAMAGE_IS_ADDITIONAL = "damage_is_additional";
 
     /**
-     * The bare keyword {@code damage_is_follow_up}: "the instance being settled came from a \u300c\u8ffd\u52a0\u653b\u51fb\u300d" (2026-10-02).
+     * The bare keyword {@code damage_is_follow_up}: "the instance being settled came from a 「追加攻击」" (2026-10-02).
      *
-     * <p>\u2b50 The third of the family, and the one that had no spelling at all: `SkillCategory` did not even have a FOLLOW_UP value, so a rule could not ask the
-     * question the ode of passage asks -- \u300c\u7f07\u5b9d\u65bd\u653e**\u8ffd\u52a0\u653b\u51fb**\u89e6\u53d1\u2026\u65f6\u300d -- and an ordinary attack had no way to be excluded.
+     * <p>⭐ The third of the family, and the one that had no spelling at all: `SkillCategory` did not even have a FOLLOW_UP value, so a rule could not ask the
+     * question the ode of passage asks -- 「缇宝施放**追加攻击**触发…时」 -- and an ordinary attack had no way to be excluded.
      */
     static final String DAMAGE_IS_FOLLOW_UP = "damage_is_follow_up";'''
 
@@ -116,7 +116,7 @@ TAB_PARSE_ANCHOR = "            return new DamageIsAdditional(raw);\n        }"
 TAB_PARSE_NEW = """            return new DamageIsAdditional(raw);
         }
 
-        // \u2b50 The third of the family (2026-10-02).
+        // ⭐ The third of the family (2026-10-02).
         if (text.trim().equalsIgnoreCase(DAMAGE_IS_FOLLOW_UP)) {
             TriggerEvent event = TriggerEvent.fromString(spec.getOn());
             if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
@@ -128,8 +128,8 @@ TAB_PARSE_NEW = """            return new DamageIsAdditional(raw);
             return new DamageIsFollowUp(raw);
         }"""
 
-TAB_CLASS_ANCHOR = "    /** \u2b50 The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack. */"
-TAB_CLASS_NEW = '''    /** \u2b50 "The instance came from a \u300c\u8ffd\u52a0\u653b\u51fb\u300d" (2026-10-02): the instance\u2019s own category, stamped where the rule states one. */
+TAB_CLASS_ANCHOR = "    /** ⭐ The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack. */"
+TAB_CLASS_NEW = '''    /** ⭐ "The instance came from a 「追加攻击」" (2026-10-02): the instance’s own category, stamped where the rule states one. */
     private static final class DamageIsFollowUp implements Condition {
         private final String raw;
 

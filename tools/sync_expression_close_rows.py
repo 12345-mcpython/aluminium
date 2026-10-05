@@ -19,24 +19,24 @@ PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 
 REPLACEMENTS = [
-    ("| **\u300c\u7f29\u77ed\u3010\u7a79\u547d\u3011\u7684\u6301\u7eed**\u65f6\u957f**\u300d**",
-     "| **\u300c\u7f29\u77ed\u3010\u7a79\u547d\u3011\u7684\u6301\u7eed**\u65f6\u957f**\u300d**\uff08`1217` \u85ff\u85ff \u2713\uff09 "
-     "| \u2757 **\u6d4b\u5b9a\uff1a\u5199\u4e0d\u51fa** \u2713 \u2014\u2014 \u5f15\u64ce**\u6ca1\u6709\u4efb\u4f55\u201c\u6539\u65f6\u957f\u201d\u7684 op** \u2717\uff0c"
-     "\u800c\u4e14**\u8d1f\u503c\u88ab\u663e\u5f0f\u62d2\u7edd** \u2713\uff1a`BuffManager.extendBuffsFrom:296` \u662f "
-     "`if (source == null || turns <= 0 || \u2026) return 0;` \u2713\uff0c`extendAllBuffs:319` \u662f `if (turns <= 0) return 0;` \u2713 "
-     "\u21d2 `EXTEND_BUFF` **\u53ea\u80fd\u5ef6\u957f** \u2717\uff08`OPS_WITH_DURATION` \u7684\u4e94\u4e2a\u4e5f\u90fd\u662f\u201c\u6388\u4e88\u201d \u2713\uff09 "
-     "| `1217`\uff081 \u4f4d\uff09 "
-     "| \u4e00\u4e2a**\u7f29\u77ed\u5177\u540d\u72b6\u6001\u65f6\u957f**\u7684 op \u2717 |"),
-    ("| **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d**",
-     "| **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d**\uff08`1415` \u7684\u5fc6\u7075\u6280\u80fd 8 \u2713\uff09 "
-     "| \u2757 **\u8be5\u6280\u80fd\u5728\u4e24\u5f20\u8868\u91cc\u90fd\u6ca1\u6709\u884c\uff0c\u800c\u4e14\u6ca1\u6709\u7b2c\u4e09\u5904** \u2713\uff08\u672c\u8f6e\u6d4b\u5b9a \u2713\uff09\uff1a"
-     "\u2605 `MemospriteSpec` \u53ea\u6709 `name`\uff0f`source`\uff0f`note`\uff0f`panel`\uff0f`attack` \u2713 \u2014\u2014 **\u6ca1\u6709\u4efb\u4f55\u6280\u80fd\u8868** \u2717\uff1b"
-     "\u2605 \u8d44\u6e90\u6811\u91cc**\u6ca1\u6709 `servants/` \u6570\u636e** \u2717\uff08`SERVANT_DIR` \u5e38\u91cf\u5728 \u2713\uff0c\u76ee\u5f55\u4e0d\u5728 \u2717\uff09\uff1b"
-     "\u2605 `skills.json` \u7684\u4e5d\u884c**\u5168\u662f\u5979\u81ea\u5df1\u7684** \u2713\uff08`141501`\u2026`141519`\uff09\uff1b"
-     "\u2605 `skill_effects.json` \u5e26 `1409` \u2713\uff08\u53e6\u4e00\u4f4d\u5fc6\u7075\u4e3b\u4eba \u2713\uff09\u800c**\u65e0 1415** \u2717\u3002"
-     "\u21d2 \u5b83\u7684\u300c\u5bf9\u4e07\u654c\u65bd\u653e\u65f6\u300d**\u6ca1\u6709\u89e6\u53d1\u70b9** \u2717\u3002\u2b50 **\u4e0d\u9020**\uff1a\u8bfb\u8005 **1 \u4f4d** \u2717 \u21d2 \u767b\u8bb0 \u2713 "
-     "| `1415`\uff081 \u4f4d\uff09 "
-     "| \u7ed9\u8be5\u6280\u80fd\u4e00\u6761**\u884c**\uff08\u4f24\u5bb3\u7c7b\u8fdb `skills.json` \u2713\u3001\u975e\u4f24\u5bb3\u8fdb `skill_effects.json` \u2713\uff09\uff1b\u2757**\u8bfb\u8005\u4e0d\u8db3 2 \u4f4d\u524d\u4e0d\u9020** \u2713 |"),
+    ("| **「缩短【穹命】的持续**时长**」**",
+     "| **「缩短【穹命】的持续**时长**」**（`1217` 藿藿 ✓） "
+     "| ❗ **测定：写不出** ✓ —— 引擎**没有任何“改时长”的 op** ✗，"
+     "而且**负值被显式拒绝** ✓：`BuffManager.extendBuffsFrom:296` 是 "
+     "`if (source == null || turns <= 0 || …) return 0;` ✓，`extendAllBuffs:319` 是 `if (turns <= 0) return 0;` ✓ "
+     "⇒ `EXTEND_BUFF` **只能延长** ✗（`OPS_WITH_DURATION` 的五个也都是“授予” ✓） "
+     "| `1217`（1 位） "
+     "| 一个**缩短具名状态时长**的 op ✗ |"),
+    ("| **「使万敌自动施放1次不消耗充能的【弑神登神】」**",
+     "| **「使万敌自动施放1次不消耗充能的【弑神登神】」**（`1415` 的忆灵技能 8 ✓） "
+     "| ❗ **该技能在两张表里都没有行，而且没有第三处** ✓（本轮测定 ✓）："
+     "★ `MemospriteSpec` 只有 `name`／`source`／`note`／`panel`／`attack` ✓ —— **没有任何技能表** ✗；"
+     "★ 资源树里**没有 `servants/` 数据** ✗（`SERVANT_DIR` 常量在 ✓，目录不在 ✗）；"
+     "★ `skills.json` 的九行**全是她自己的** ✓（`141501`…`141519`）；"
+     "★ `skill_effects.json` 带 `1409` ✓（另一位忆灵主人 ✓）而**无 1415** ✗。"
+     "⇒ 它的「对万敌施放时」**没有触发点** ✗。⭐ **不造**：读者 **1 位** ✗ ⇒ 登记 ✓ "
+     "| `1415`（1 位） "
+     "| 给该技能一条**行**（伤害类进 `skills.json` ✓、非伤害进 `skill_effects.json` ✓）；❗**读者不足 2 位前不造** ✓ |"),
 ]
 
 for prefix, replacement in REPLACEMENTS:

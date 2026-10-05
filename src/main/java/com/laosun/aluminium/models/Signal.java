@@ -99,7 +99,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     /**
      * A signal that exists to NAME an actor, not to schedule one (2026-10-02; an inserted action).
      *
-     * <p>\u26a0 It is deliberately outside the normal constructor: a unit whose speed is 0 has no action value at all, which is exactly the case
+     * <p>⚠ It is deliberately outside the normal constructor: a unit whose speed is 0 has no action value at all, which is exactly the case
      * an inserted action has to cover (the game pins a memosprite's speed to 0 with `SpeedOverride`). Such a signal must NEVER enter the heap --
      * nothing re-times it, and `Queue` only ever hands it back as the current actor.
      */
@@ -126,7 +126,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * IT'S IMPORTANT TO CALL WHEN CHANGING SPEED!!!
      */
     /**
-     * \u2705 The signal's owner (2026-09-30; readers: cone 23033's advance judge, and every \u300c\u884c\u52a8\u63d0\u524d / \u5ef6\u540e\u300d sentence that
+     * ✅ The signal's owner (2026-09-30; readers: cone 23033's advance judge, and every 「行动提前 / 延后」 sentence that
      * has to say WHOSE action value moved). {@code Queue.getTimeRemaining(Signal)} and {@code Queue.getActionLength(Signal)} already
      * take a signal, but until now nothing could tie one back to a unit: {@code canHit} is private and had no accessor.
      */

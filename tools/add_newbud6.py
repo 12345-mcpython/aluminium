@@ -14,7 +14,7 @@ import json
 
 PATH = "src/main/resources/characters/1407.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/NewbudResourceTest.java"
-NEWBUD = "\u65b0\u854a"
+NEWBUD = "新蕊"
 
 doc = json.load(io.open(PATH, encoding="utf-8"))
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
@@ -25,28 +25,28 @@ rules.append({
     "id": "talent_newbud_per_hp_lost",
     "when": ["target == self"],
     "do": [{"op": "GAIN_RESOURCE", "resource": NEWBUD, "amountFromEvent": True}],
-    "source": ("1407 \u900d\u8776 \u5929\u8d4b \u638c\u5fc3\u6ea1\u8fc7\u7684\u8352\u829c (140704): "
-               "\u300c\u3010\u65b0\u854a\u3011\u4e0a\u9650\u4e0e\u573a\u4e0a\u5168\u4f53\u89d2\u8272\u7b49\u7ea7\u6709\u5173\uff0c"
-               "\u6211\u65b9\u5168\u4f53\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u900d\u8776\u83b7\u5f97 1 \u70b9\u3010\u65b0\u854a\u3011\u300d"),
-    "note": ("\u2b50 \u7528\u5df2\u6709\u7684 `amountFromEvent` \u2713\uff08\u540c 1506 \u2713\uff09\uff1b"
-             "`when: [\"target == self\"]` \u7167 `Battle.applyDamage:1344` \u7684\u6ce8\u91ca\u5199 \u2713\u3002"
-             "\u26a0 \u4ec5\u300c\u672c\u4eba\u90a3\u4e00\u534a\u300d \u2713\uff1a\u300c\u6211\u65b9\u5168\u4f53\u300d\u90a3\u534a\u770b\u6d3e\u53d1 \u2713\u3002"),
+    "source": ("1407 逍蝶 天赋 掌心溡过的荒芜 (140704): "
+               "「【新蕊】上限与场上全体角色等级有关，"
+               "我方全体每损失 1 点生命值逍蝶获得 1 点【新蕊】」"),
+    "note": ("⭐ 用已有的 `amountFromEvent` ✓（同 1506 ✓）；"
+             "`when: [\"target == self\"]` 照 `Battle.applyDamage:1344` 的注释写 ✓。"
+             "⚠ 仅「本人那一半」 ✓：「我方全体」那半看派发 ✓。"),
 })
 out = {"resources": [{
     "id": NEWBUD,
     "max": 34000,
     "scope": "PARTY",
-    "source": ("1407 \u900d\u8776 \u5929\u8d4b \u638c\u5fc3\u6ea1\u8fc7\u7684\u8352\u829c (140704) \u4e0e\u300c\u673a\u5236\u5907\u6ce8\u300d\uff1a"
-               "\u4f9d\u636e tbgd `Avatar_Castorice_00_Ability.json` \u7684 `Castorice_Passive_MaxCount` "
-               "\u8868\u8fbe\u5f0f `5.3125 \u00d7 \u961f\u4f0d\u6700\u9ad8\u7b49\u7ea7\u00b2`\uff08\u7ed3\u679c \u2264 2000 \u65f6\u94b3\u4e3a 2000\uff09"),
-    "note": ("\u2b50 `\"scope\": \"PARTY\"` **\u662f\u5fc5\u9700\u7684** \u2713\uff1a"
-             "`Battle.registerPartyResources`\uff08`:701`\uff09\u4f1a**\u8df3\u8fc7**\u6240\u6709 `scope` \u4e0d\u662f `PARTY` \u7684\u58f0\u660e \u2713"
-             "\uff08`:707`\uff09\u21d2 \u6ca1\u6709\u5b83\u5c31\u8fdb\u4e0d\u4e86\u6218\u6597\u7684\u8d44\u6e90\u8868 \u2717\uff0c"
-             "`partyResource(\u540d)` \u4f1a\u8fd4\u56de **null** \u2717 \u2014\u2014 \u8fd9\u4e00\u884c\u89e3\u91ca\u4e86\u524d\u9762\u5168\u90e8\u7684 +0 \u2713\u3002"
-             "\u26a0 \u4e0a\u9650 **34,000** = \u6587\u6863\u516c\u5f0f\u5728**\u6ee1\u7ea7 Lv80** \u7684\u503c \u2713"
-             "\uff08\u6587\u6863\u8868\uff1a\u5747\u8861 0 \u21d2 2,125 \u2026 \u6ee1\u7ea7 \u21d2 34,000 \u2713\uff09\uff1b"
-             "\u26a0 \u8d44\u6e90\u53ea\u80fd\u58f0\u660e**\u4e00\u4e2a** `max` \u2717 \u800c\u771f\u5b9e\u4e0a\u9650\u968f\u7b49\u7ea7\u53d8 \u2717"
-             "\u21d2 \u53d6\u6ee1\u7ea7\u503c\u5e76\u5728\u6b64\u8bf4\u660e \u2713\u3002"),
+    "source": ("1407 逍蝶 天赋 掌心溡过的荒芜 (140704) 与「机制备注」："
+               "依据 tbgd `Avatar_Castorice_00_Ability.json` 的 `Castorice_Passive_MaxCount` "
+               "表达式 `5.3125 × 队伍最高等级²`（结果 ≤ 2000 时钳为 2000）"),
+    "note": ("⭐ `\"scope\": \"PARTY\"` **是必需的** ✓："
+             "`Battle.registerPartyResources`（`:701`）会**跳过**所有 `scope` 不是 `PARTY` 的声明 ✓"
+             "（`:707`）⇒ 没有它就进不了战斗的资源表 ✗，"
+             "`partyResource(名)` 会返回 **null** ✗ —— 这一行解释了前面全部的 +0 ✓。"
+             "⚠ 上限 **34,000** = 文档公式在**满级 Lv80** 的值 ✓"
+             "（文档表：均衡 0 ⇒ 2,125 … 满级 ⇒ 34,000 ✓）；"
+             "⚠ 资源只能声明**一个** `max` ✗ 而真实上限随等级变 ✗"
+             "⇒ 取满级值并在此说明 ✓。"),
 }], "rules": rules}
 json.dump(out, io.open(PATH, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1407.json: 新蕊 declared with scope PARTY + the writer")
@@ -68,7 +68,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u3010\u65b0\u854a\u3011 (2026-10-02): \u300c\u6211\u65b9\u5168\u4f53\u6bcf\u635f\u5931 1 \u70b9\u751f\u547d\u503c\u900d\u8776\u83b7\u5f97 1 \u70b9\u3010\u65b0\u854a\u3011\u300d, the carrier's own half.
+ * 【新蕊】 (2026-10-02): 「我方全体每损失 1 点生命值逍蝶获得 1 点【新蕊】」, the carrier's own half.
  *
  * <p>Three facts bound the number: the battle knows the resource (a PARTY scope is what puts it in the registry), the hit
  * really lands through `Battle.applyDamage`, and the gain equals the loss.
@@ -77,7 +77,7 @@ public class NewbudResourceTest {
     private static final int CASTORICE = 1407;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 One point of health lost is one point of Newbud. */
+    /** ⭐ One point of health lost is one point of Newbud. */
     @Test
     public void aPointLostIsAPointOfNewbud() {
         Character castorice = CharacterFactory.create(CASTORICE, 80, false, null, null, 0);

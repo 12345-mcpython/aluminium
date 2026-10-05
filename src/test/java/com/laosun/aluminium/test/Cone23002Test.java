@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 23002's second sentence: after a kill OR after being hit, the wearer gains energy and 24% damage for one turn.
  *
- * <p>\u2b50 Two rules, because the two events are different shapes: a kill makes the wearer the ACTOR, being hit makes it the TARGET.
+ * <p>⭐ Two rules, because the two events are different shapes: a kill makes the wearer the ACTOR, being hit makes it the TARGET.
  * The judge exercises both and pins both shares.
  */
 public class Cone23002Test {

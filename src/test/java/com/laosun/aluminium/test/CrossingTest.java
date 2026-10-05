@@ -27,7 +27,7 @@ public class CrossingTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 Crossing from above half to below it triggers the heal. */
+    /** ⚠ Crossing from above half to below it triggers the heal. */
     @Test
     public void aCrossingTriggersTheHeal() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
@@ -43,10 +43,10 @@ public class CrossingTest {
         battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.PHYSICAL, DamageType.NORMAL, ally.getMaxHp() * 0.1));
 
         Assertions.assertTrue(ally.getCurrentHp() / ally.getMaxHp() > 0.5,
-                "\u300c\u5f53\u6211\u65b9\u4efb\u610f\u5355\u4f53\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4\u964d\u523050%\u6216\u4ee5\u4e0b\u65f6\uff0c\u7f57\u5239\u4f1a\u7acb\u5373\u5bf9\u5176\u89e6\u53d1\u4e00\u6b21\u7b49\u540c\u4e8e\u6218\u6280\u7684\u6548\u679c\u300d -- after the crossing he must be back above half: " + (ally.getCurrentHp() / ally.getMaxHp()));
+                "「当我方任意单体当前生命值百分比降到50%或以下时，罗刹会立即对其触发一次等同于战技的效果」 -- after the crossing he must be back above half: " + (ally.getCurrentHp() / ally.getMaxHp()));
     }
 
-    /** \u26a0 The control: hitting someone who is ALREADY below half is not a crossing. */
+    /** ⚠ The control: hitting someone who is ALREADY below half is not a crossing. */
     @Test
     public void damageBelowTheThresholdIsNotACrossing() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
@@ -60,7 +60,7 @@ public class CrossingTest {
         }
         Assertions.assertFalse(ally.isDeath(), "the fixture must be alive");
         double below = ally.getCurrentHp();
-        // \u26a0 Honest scope: by now the crossing has already fired (that is asserted above) and `cooldown: 2` blocks the rule, so what this case
+        // ⚠ Honest scope: by now the crossing has already fired (that is asserted above) and `cooldown: 2` blocks the rule, so what this case
         // measures is the COOLDOWN, not the `target_hp_percent_before` half of the condition. The crossing case is what verifies the trigger itself.
         Assertions.assertTrue(below / ally.getMaxHp() < 0.5 || below > 0,
                 "the fixture must be below half or already healed by the crossing: " + (below / ally.getMaxHp()));

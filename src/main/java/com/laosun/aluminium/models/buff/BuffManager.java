@@ -339,7 +339,7 @@ public class BuffManager {
      * 使自身**所有**增益效果延长 1 回合」. {@link #extendBuffsFrom} filters by origin on purpose (its own note names 「战技提供的护盾」), so
      * 「所有」 had no spelling; the interpreter reaches this only through an explicit {@code "kind": "all"}, never implicitly.
      *
-     * <p>\u26a0 Permanent and event-bound buffs are skipped for the same reason as above: they are never ticked, so there is no
+     * <p>⚠ Permanent and event-bound buffs are skipped for the same reason as above: they are never ticked, so there is no
      * countdown to lengthen.
      *
      * @param turns how many turns to add
@@ -512,7 +512,7 @@ public class BuffManager {
      * Settles late buffs after the owner's move (tick duration, remove expired).
      */
     public void afterMove() {
-        // \u2605 The carrier's OWN turn just ended (2026-09-30): values scoped to \u300c\u540c\u4e00\u56de\u5408\u5185\u300d go away here. This runs beside the
+        // ★ The carrier's OWN turn just ended (2026-09-30): values scoped to 「同一回合内」 go away here. This runs beside the
         // duration tick, which is the same "this unit's turn is over" moment -- one place, not two.
         removeWithLifetime(AbstractBuff.Lifetime.TURN_END);
         processBuffTick(false);
@@ -990,7 +990,7 @@ public class BuffManager {
     /**
      * Removes every buff whose lifetime names {@code lifetime} -- the cast-scoped one is the current reader.
      *
-     * <p>\u26a0 Over the manager's own list, not {@code allBuffsOf}: that helper compares classes exactly and a modifier may be
+     * <p>⚠ Over the manager's own list, not {@code allBuffsOf}: that helper compares classes exactly and a modifier may be
      * a subclass (the same trap {@link #suspendsTurns} documents).
      *
      * @param lifetime which end-of-event lifetime to drop

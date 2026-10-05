@@ -68,7 +68,7 @@ if "resourceValue" not in factory:
     NEW_SIG = ("    /**\n"
                "     * The same, for a panel that derives from a RESOURCE: {@code resourceValue} answers 「【新蕊】现在是多少」.\n"
                "     *\n"
-               "     * <p>\u26a0 Handed in rather than reached for, because resources live on the battle and this derivation is\n"
+               "     * <p>⚠ Handed in rather than reached for, because resources live on the battle and this derivation is\n"
                "     * deliberately battle-free.\n"
                "     */\n"
                "    public static Summon memosprite(Character master, MemospriteSpec spec,\n"
@@ -112,25 +112,25 @@ public class MemospriteResourcePanelTest {
     private static MemospriteSpec spec(double share, String source) {
         MemospriteSpec.Panel resource = new MemospriteSpec.Panel("HEALTH", share, null, source);
         MemospriteSpec.Panel attribute = new MemospriteSpec.Panel("SPEED", 1.0, null, null);
-        return new MemospriteSpec("\u6b7b\u9f99", "test", "test", List.of(resource, attribute), null, null);
+        return new MemospriteSpec("死龙", "test", "test", List.of(resource, attribute), null, null);
     }
 
     /** ⭐ The panel follows the resource, and an attribute panel beside it does not. */
     @Test
     public void thePanelFollowsTheResource() {
         Character master = CharacterFactory.create(MASTER, LEVEL, false, null, null, 0);
-        double small = SummonFactory.memosprite(master, spec(1.0, "resource:\u65b0\u854a"), name -> 1000)
+        double small = SummonFactory.memosprite(master, spec(1.0, "resource:新蕊"), name -> 1000)
                 .getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get();
-        double large = SummonFactory.memosprite(master, spec(1.0, "resource:\u65b0\u854a"), name -> 4000)
+        double large = SummonFactory.memosprite(master, spec(1.0, "resource:新蕊"), name -> 4000)
                 .getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get();
         Assertions.assertEquals(1000, small, 1e-6, "100% of a 1000-point resource");
         Assertions.assertEquals(4000, large, 1e-6, "and 100% of a 4000-point one");
 
-        double half = SummonFactory.memosprite(master, spec(0.5, "resource:\u65b0\u854a"), name -> 4000)
+        double half = SummonFactory.memosprite(master, spec(0.5, "resource:新蕊"), name -> 4000)
                 .getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get();
         Assertions.assertEquals(2000, half, 1e-6, "the share is applied to the resource");
 
-        double speed = SummonFactory.memosprite(master, spec(1.0, "resource:\u65b0\u854a"), name -> 4000)
+        double speed = SummonFactory.memosprite(master, spec(1.0, "resource:新蕊"), name -> 4000)
                 .getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
         Assertions.assertEquals(master.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get() * 1.0,
                 speed, 1e-6, "the attribute panel beside it still reads the master");

@@ -21,7 +21,7 @@ OLD = """            com.google.gson.annotations.SerializedName name =
             }"""
 NEW = """            com.google.gson.annotations.SerializedName name =
                     field.getAnnotation(com.google.gson.annotations.SerializedName.class);
-            // \u2b50 Gson's own rule (2026-10-02): an annotated field is keyed by the annotation, a plain one by the field's
+            // ⭐ Gson's own rule (2026-10-02): an annotated field is keyed by the annotation, a plain one by the field's
             // name. Collecting only the annotated ones rejected `amountFromEvent` and `amountFromAttr` -- keys the shipped
             // files use and Gson maps -- which the suite showed at once.
             keys.add(name != null ? name.value() : field.getName());"""

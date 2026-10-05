@@ -25,7 +25,7 @@ public class SushangTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「当场上有敌方目标的弱点被击破」: the BREAK event, which fires with the broken unit as its target. */
+    /** ⚠ 「当场上有敌方目标的弱点被击破」: the BREAK event, which fires with the broken unit as its target. */
     @Test
     public void aWeaknessBreakRaisesHerSpeed() {
         Fixture f = new Fixture();
@@ -34,7 +34,7 @@ public class SushangTest {
         f.battle.fireTriggers(TriggerEvent.BREAK, f.sushang, f.enemy, 0, 0);
 
         Assertions.assertTrue(f.sushang.getAttribute(AttributeType.SPEED).get() > before,
-                "\u300c\u5f53\u573a\u4e0a\u6709\u654c\u65b9\u76ee\u6807\u7684\u5f31\u70b9\u88ab\u51fb\u7834\uff0c\u7d20\u88f3\u7684\u901f\u5ea6\u63d0\u9ad820%\uff0c\u6301\u7eed2\u56de\u5408\u300d: "
+                "「当场上有敌方目标的弱点被击破，素裳的速度提高20%，持续2回合」: "
                         + before + " -> " + f.sushang.getAttribute(AttributeType.SPEED).get());
     }
 

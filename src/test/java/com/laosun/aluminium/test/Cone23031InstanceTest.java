@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Light cone 23031 (2026-09-30): the DEF-ignore belongs to the HIT, not to the wearer.
  *
- * <p>\u26a0 PARTIAL ON PURPOSE, and the missing half is written down rather than implied. This asserts the SPELLING: every
+ * <p>⚠ PARTIAL ON PURPOSE, and the missing half is written down rather than implied. This asserts the SPELLING: every
  * DEFENCE_IGNORE effect on DEALING_DAMAGE for this cone carries {@code instance: true}, so it lands on the damage
  * instance and its {@code per_stack} is resolved by {@code perStackFactor} (which knows {@code self_stacks:}). It does
  * NOT yet assert the NUMBER the engine ends up using (0.27 x the 流光 stacks): that runtime judgement is still owed.
@@ -45,7 +45,7 @@ public class Cone23031InstanceTest {
             Assertions.assertEquals("MODIFY_ATTR", effect.getOp());
             Assertions.assertEquals("DEFENCE_IGNORE", effect.getAttribute());
             Assertions.assertEquals(IGNORE[rank - 1], effect.getPercent(), 1e-9, "rank " + rank + ": the magnitude");
-            Assertions.assertEquals("self_stacks:\u6d41\u5149", effect.getPerStack(),
+            Assertions.assertEquals("self_stacks:流光", effect.getPerStack(),
                     "rank " + rank + ": per stack of the cone's own counter");
             Assertions.assertEquals(Boolean.TRUE, effect.getInstance(),
                     "rank " + rank + ": a property of THIS hit -- without it the wearer's attribute moves and per_stack "

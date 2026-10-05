@@ -26,14 +26,14 @@ public class ThresholdConditionTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 `<=` is INCLUSIVE: the boundary value fires. */
+    /** ⚠ `<=` is INCLUSIVE: the boundary value fires. */
     @Test
     public void lessOrEqualFiresOnTheBoundary() {
         Assertions.assertEquals(1, fires("hit_count <= 0", 0), "at the boundary, `<=` must fire");
         Assertions.assertEquals(0, fires("hit_count <= 0", 1), "one above the boundary, it must not");
     }
 
-    /** \u26a0 `>=` is inclusive too, and `>` is not. */
+    /** ⚠ `>=` is inclusive too, and `>` is not. */
     @Test
     public void greaterComparisonsDifferAtTheBoundary() {
         Assertions.assertEquals(0, fires("hit_count >= 2", 1), "one below");
@@ -42,19 +42,19 @@ public class ThresholdConditionTest {
         Assertions.assertEquals(1, fires("hit_count > 2", 3), "one above");
     }
 
-    /** \u26a0 `hp_percent` is a FRACTION, probed with a threshold STRICTER than the fraction can reach. */
+    /** ⚠ `hp_percent` is a FRACTION, probed with a threshold STRICTER than the fraction can reach. */
     @Test
     public void hpPercentIsAFractionNotAPercentage() {
         Assertions.assertEquals(0, firesAfterDamage("hp_percent <= 0.5", false),
                 "at full HP the half-HP gate must not fire");
         Assertions.assertEquals(1, firesAfterDamage("hp_percent <= 0.5", true),
                 "below half HP it must fire");
-        // \u26a0 A LOOSER threshold proves nothing (0.1 is <= 50 as well as <= 0.5), so the units are pinned from the strict side:
+        // ⚠ A LOOSER threshold proves nothing (0.1 is <= 50 as well as <= 0.5), so the units are pinned from the strict side:
         // at full HP the fraction 1.0 is >= 0.5 but never >= 50.
         Assertions.assertEquals(1, firesAtFullHp("hp_percent >= 0.5"),
                 "the fraction reading: 1.0 >= 0.5 at full HP");
         Assertions.assertEquals(0, firesAtFullHp("hp_percent >= 50"),
-                "\u26a0 the percentage reading would make this >= 50 with 1.0, so it must NEVER fire");
+                "⚠ the percentage reading would make this >= 50 with 1.0, so it must NEVER fire");
     }
 
     /** Fires once at FULL HP, so "at or above half" and "at or above 50" can be told apart. */

@@ -26,7 +26,7 @@ public class OncePerAttackLimitTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    // \u26a0 Kept as fields: Battle exposes no "give me my party" accessor (measured), and every reading here needs
+    // ⚠ Kept as fields: Battle exposes no "give me my party" accessor (measured), and every reading here needs
     // the same two units.
     private Character owner;
     private Enemy enemy;

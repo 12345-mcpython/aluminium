@@ -26,18 +26,18 @@ for path in ("src/test/java/com/laosun/aluminium/test/CastSkillCommandsAnotherUn
 
 PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
-PREFIX = "| **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d**"
+PREFIX = "| **「使万敌自动施放1次不消耗充能的【弑神登神】」**"
 hits = [index for index, line in enumerate(lines) if line.startswith(PREFIX)]
 if len(hits) != 1:
     sys.exit("REFUSING: %d rows start with that prefix" % len(hits))
 lines[hits[0]] = (
-    "| **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d**\uff08`1415` \u7684\u5fc6\u7075\u6280\u80fd 8 \u2713\uff09 "
-    "| \u2b50 \u8ba2\u6b63\uff1a\u201c\u547d\u4ee4**\u4ed6\u4eba**\u65bd\u653e\u201d**\u4e0d\u662f**\u524d\u7f6e\u4e86 \u2713 \u2014\u2014 \u5b83\u5df2\u7ecf\u51fa\u8d27 \u2713\uff1a"
-    "`castSkill` \u7684\u65bd\u653e\u8005\u5c31\u662f `resolveTarget(effect, ctx)` \u2713\uff08**\u4e0d\u662f**\u89c4\u5219\u62e5\u6709\u8005 \u2717\uff09\uff0c\u800c `1412` \u7684 `coup_de_main` \u5199\u7684\u5c31\u662f "
-    "`CAST_SKILL{skill: SKILL, target: \"attacker\"}` \u2713\uff1b\u4e14 `holder_of:<\u72b6\u6001>` **\u641c\u7684\u662f\u6574\u961f** \u2713\uff08`battle.getSideOf(ctx.owner())` \u2713\uff09\u3002"
-    "\u2757 **\u771f\u6b63\u5269\u4e0b\u7684\u524d\u7f6e**\uff1a\u540c\u4e00\u53e5\u7684\u53e6\u4e00\u534a \u300c\u89e3\u9664\u4e07\u654c\u9677\u5165\u7684\u6240\u6709**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d\u2717 \u21d2 \u5408\u5e76\u5230\u4e0b\u4e00\u884c\u7684\u7b5b\u9009\u7f3a\u53e3 \u2713\u3002"
-    "\u26a0 \u5c0f\u9677\u9631\uff1a`normalizeTarget` **\u4f1a\u628a\u9009\u62e9\u5668\u5c0f\u5199\u5316** \u2717 \u21d2 \u72b6\u6001\u540d\u8981\u5c0f\u5199 \u2713 "
-    "| `1415`\uff081 \u4f4d\uff09 "
-    "| \u540c\u4e0b\u4e00\u884c\uff08\u4e00\u4e2a**\u201c\u63a7\u5236\u7c7b\u201d\u7b5b\u9009** \u2713\uff09 |")
+    "| **「使万敌自动施放1次不消耗充能的【弑神登神】」**（`1415` 的忆灵技能 8 ✓） "
+    "| ⭐ 订正：“命令**他人**施放”**不是**前置了 ✓ —— 它已经出货 ✓："
+    "`castSkill` 的施放者就是 `resolveTarget(effect, ctx)` ✓（**不是**规则拥有者 ✗），而 `1412` 的 `coup_de_main` 写的就是 "
+    "`CAST_SKILL{skill: SKILL, target: \"attacker\"}` ✓；且 `holder_of:<状态>` **搜的是整队** ✓（`battle.getSideOf(ctx.owner())` ✓）。"
+    "❗ **真正剩下的前置**：同一句的另一半 「解除万敌陷入的所有**控制类**负面状态」✗ ⇒ 合并到下一行的筛选缺口 ✓。"
+    "⚠ 小陷阱：`normalizeTarget` **会把选择器小写化** ✗ ⇒ 状态名要小写 ✓ "
+    "| `1415`（1 位） "
+    "| 同下一行（一个**“控制类”筛选** ✓） |")
 io.open(PATH, "w", encoding="utf-8", newline="\n").write("\n".join(lines))
 print("ok   the row is corrected and merged with the blocked filter")

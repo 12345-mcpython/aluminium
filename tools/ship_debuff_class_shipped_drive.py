@@ -39,10 +39,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u654c\u65b9\u5bf9\u6211\u65b9\u65bd\u52a0\u4e86**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d\u53ef\u4ee5\u88ab\u95ee\u4e86 (2026-10-02).
+ * 「敌方对我方施加了**控制类**负面状态」可以被问了 (2026-10-02).
  *
  * <p>One landed control, two watchers; both readings are deltas across startBattle. The landing is copied from the green
- * `ControlImmunityTest` \u2014 including its measured warning that `all_enemies` aims at the MONSTER \u2014 so that a failure here is about the
+ * `ControlImmunityTest` — including its measured warning that `all_enemies` aims at the MONSTER — so that a failure here is about the
  * filter and not about the scene.
  */
 public class DebuffClassConditionTest {
@@ -57,9 +57,9 @@ public class DebuffClassConditionTest {
         double[] gains = run();
         System.out.println("[debuff-class] control=" + gains[0] + " dot=" + gains[1]);
         Assertions.assertTrue(gains[0] > EPS,
-                "\u300c\u63a7\u5236\u7c7b\u300d-- the rule that asked for it fired, which also proves the event happened");
+                "「控制类」-- the rule that asked for it fired, which also proves the event happened");
         Assertions.assertEquals(0.0, gains[1], EPS,
-                "\u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d-- the same event does NOT fire the rule that asked for the other family");
+                "「持续伤害类」-- the same event does NOT fire the rule that asked for the other family");
     }
 
     /** { the control-watch's ATTACK gain, the dot-watch's DEFENCE gain }. */
@@ -70,7 +70,7 @@ public class DebuffClassConditionTest {
         TriggerSpecs.set(land, "op", "APPLY_CONTROL");
         TriggerSpecs.set(land, "control", FREEZE);
         TriggerSpecs.set(land, "turns", 3);
-        // \u26a0 Verbatim from the green judge: from the applier's side the "enemies" are the monster, and a judge about the rule owner
+        // ⚠ Verbatim from the green judge: from the applier's side the "enemies" are the monster, and a judge about the rule owner
         // wants the control ON the owner's own camp.
         TriggerSpecs.set(land, "target", "other_allies");
 

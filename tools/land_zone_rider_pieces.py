@@ -59,7 +59,7 @@ SHARE_NEW = """    private static double shareOf(EffectSpec effect, TriggerConte
             return effect.getPercent();
         }
         if (effect.getPercentFromSkillParam() != null) {
-            // \u2b50 The share out of one of the owner's OWN skills (2026-10-02): 「等同于缇宝 #3% 生命上限」, where #3 lives in HIS ultimate.
+            // ⭐ The share out of one of the owner's OWN skills (2026-10-02): 「等同于缇宝 #3% 生命上限」, where #3 lives in HIS ultimate.
             return ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim());
         }"""
 
@@ -90,7 +90,7 @@ TIMES_NEW = """                    String from = effect.getTimesFrom().trim();
                     if ("event_amount".equals(from)) {
                         times = (int) Math.abs(ctx.amount());
                     } else if ("hit_count".equals(from)) {
-                        // \u2b50 「每有 1 名目标受到攻击，会…造成 1 次」 (2026-10-02; reader: 1403 \u7f07\u5b9d's zone rider): the repeat count is how many
+                        // ⭐ 「每有 1 名目标受到攻击，会…造成 1 次」 (2026-10-02; reader: 1403 缇宝's zone rider): the repeat count is how many
                         // targets this attack connected with. It belongs HERE and not in `per_target`, which multiplies a magnitude.
                         times = Math.max(0, ctx.hitCount());
                     } else {

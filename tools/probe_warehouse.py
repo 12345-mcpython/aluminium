@@ -17,7 +17,7 @@ if os.path.isfile(index):
     out.append("=== index rows mentioning a 仓库技 column (%d rows) ===" % len(rows))
     for line in rows:
         cells = [cell.strip() for cell in line.strip("|").split("|")]
-        if len(cells) >= 7 and cells[-1] not in ("\u2014", "-", ""):
+        if len(cells) >= 7 and cells[-1] not in ("—", "-", ""):
             out.append("   %s -> %s" % (" | ".join(cells[:3]), cells[-1]))
     out.append("   (rows with a non-empty last column are listed above)")
 
@@ -28,9 +28,9 @@ for name in sorted(os.listdir(corpus)):
     if not name.endswith(".md"):
         continue
     body = io.open(os.path.join(corpus, name), encoding="utf-8", errors="replace").read()
-    if "\u4ed3\u5e93\u6280" in body:
+    if "仓库技" in body:
         flat = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", body))
-        for match in list(re.finditer("\u4ed3\u5e93\u6280", flat))[:1]:
+        for match in list(re.finditer("仓库技", flat))[:1]:
             hits.append("[%s] ...%s..." % (name, flat[max(0, match.start() - 120):match.start() + 260]))
 out.append("   pages: %d" % len(hits))
 out.extend(hits[:12])

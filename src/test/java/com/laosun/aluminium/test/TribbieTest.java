@@ -25,18 +25,18 @@ public class TribbieTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 A teammate's ultimate triggers it; her own does not. */
+    /** ⚠ A teammate's ultimate triggers it; her own does not. */
     @Test
     public void onlyATeammatesUltimateTriggersTheFollowUp() {
         double fromAlly = lossWhenTheEventComesFrom(true);
         double fromSelf = lossWhenTheEventComesFrom(false);
 
-        Assertions.assertTrue(fromAlly > 0, "\u300c\u6211\u65b9\u5176\u4ed6\u89d2\u8272\u65bd\u653e\u7ec8\u7ed3\u6280\u540e\u300d -- a teammate's ultimate must trigger it: " + fromAlly);
+        Assertions.assertTrue(fromAlly > 0, "「我方其他角色施放终结技后」 -- a teammate's ultimate must trigger it: " + fromAlly);
         Assertions.assertEquals(0.0, fromSelf, 1e-9,
-                "\u300c\u6211\u65b9**\u5176\u4ed6**\u89d2\u8272\u300d -- her own ultimate is excluded, and firing the event by hand means no ultimate damage is mixed in: " + fromSelf);
+                "「我方**其他**角色」 -- her own ultimate is excluded, and firing the event by hand means no ultimate damage is mixed in: " + fromSelf);
     }
 
-    /** \u26a0 「进入战斗时获得【神启】，持续3回合」, and the trace's own battle-start energy. */
+    /** ⚠ 「进入战斗时获得【神启】，持续3回合」, and the trace's own battle-start energy. */
     @Test
     public void theTechniqueGrantsNuminosity() {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
@@ -46,8 +46,8 @@ public class TribbieTest {
 
         battle.startBattle();
 
-        Assertions.assertTrue(tribbie.getBuffManager().hasState("\u795e\u542f"),
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\uff0c\u8fdb\u5165\u6218\u6597\u65f6\u83b7\u5f97\u3010\u795e\u542f\u3011\u300d");
+        Assertions.assertTrue(tribbie.getBuffManager().hasState("神启"),
+                "「使用秘技后，进入战斗时获得【神启】」");
     }
 
     /** Census: the ultimate, the skill, the technique, two traces and the convention all live on BATTLE_START/other events as stated. */
@@ -82,7 +82,7 @@ public class TribbieTest {
     }
 
 
-    /** \u26a0 The number itself: 18% of her Max HP must be 0.36 of a hand-built 50% in the same pipeline. */
+    /** ⚠ The number itself: 18% of her Max HP must be 0.36 of a hand-built 50% in the same pipeline. */
     @Test
     public void theFollowUpDealsEighteenPercentOfHerMaxHp() {
         double content = followUpLoss(false);

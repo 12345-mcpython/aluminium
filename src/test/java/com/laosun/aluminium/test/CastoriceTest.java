@@ -22,7 +22,7 @@ public class CastoriceTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The boost needs an HP loss, and its three-stack cap is enforced by exceeding it. */
+    /** ⚠ The boost needs an HP loss, and its three-stack cap is enforced by exceeding it. */
     @Test
     public void theBoostNeedsAnHpLossAndStopsAtThreeStacks() {
         Character castorice = CharacterFactory.create(CASTORICE, LEVEL);
@@ -35,17 +35,17 @@ public class CastoriceTest {
         // Only HP_LOST moves it: an unrelated event must not.
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(0.0, castorice.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-9,
-                "\u300c\u6211\u65b9\u635f\u5931\u751f\u547d\u503c\u65f6\u300d -- an attack that costs no HP does nothing");
+                "「我方损失生命值时」 -- an attack that costs no HP does nothing");
 
         battle.fireTriggers(TriggerEvent.HP_LOST, ally, ally, 0, 100);
         Assertions.assertEquals(0.2, castorice.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-6,
-                "\u300c\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad820%\u300d");
+                "「造成的伤害提高20%」");
 
         for (int i = 0; i < 4; i++) {
             battle.fireTriggers(TriggerEvent.HP_LOST, ally, ally, 0, 100);
         }
         Assertions.assertEquals(0.6, castorice.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-6,
-                "\u300c\u6700\u591a\u53e0\u52a03\u5c42\u300d -- five firings must still read three stacks of 20%");
+                "「最多叠加3层」 -- five firings must still read three stacks of 20%");
     }
 
     private static Random fixed() {

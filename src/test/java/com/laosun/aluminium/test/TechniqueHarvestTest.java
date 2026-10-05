@@ -22,7 +22,7 @@ public class TechniqueHarvestTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「使用秘技后，下一次战斗开始时丹恒攻击力提高40%」. */
+    /** ⚠ 「使用秘技后，下一次战斗开始时丹恒攻击力提高40%」. */
     @Test
     public void aDeclaredTechniqueRaisesHisAttackAtBattleStart() {
         Character plain = CharacterFactory.create(DANHENG, LEVEL);
@@ -36,18 +36,18 @@ public class TechniqueHarvestTest {
 
         double boosted = withTechnique.getAttribute(AttributeType.ATTACK).get();
         Assertions.assertTrue(boosted > untouched,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\uff0c\u4e0b\u4e00\u6b21\u6218\u6597\u5f00\u59cb\u65f6\u4e39\u6052\u653b\u51fb\u529b\u63d0\u9ad840%\u300d: "
+                "「使用秘技后，下一次战斗开始时丹恒攻击力提高40%」: "
                         + untouched + " -> " + boosted);
         // Measured: the gain is 40% of the BASE attack (the engine's `add_percent` convention), not of the current total — 645.2712 -> 864.0072
         // is a gain of 218.736 = 0.4 x 546.84. `baseValue()` reads the base, so the claim is stated in the engine's own terms.
         double base = withTechnique.getAttribute(AttributeType.ATTACK).baseValue();
         double expectedGain = base * 0.4;
         Assertions.assertEquals(expectedGain, boosted - untouched, expectedGain * 0.02,
-                "\u300c\u653b\u51fb\u529b\u63d0\u9ad840%\u300d of the BASE: base " + base + " -> expected gain " + expectedGain
+                "「攻击力提高40%」 of the BASE: base " + base + " -> expected gain " + expectedGain
                         + ", actual gain " + (boosted - untouched));
     }
 
-    /** \u26a0 The control: without the marker his ATK is untouched at battle start. */
+    /** ⚠ The control: without the marker his ATK is untouched at battle start. */
     @Test
     public void withoutTheTechniqueHisAttackIsUntouched() {
         Character plain = CharacterFactory.create(DANHENG, LEVEL);
@@ -57,7 +57,7 @@ public class TechniqueHarvestTest {
         battle.startBattle();
 
         Assertions.assertEquals(before, plain.getAttribute(AttributeType.ATTACK).get(), 1e-9,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- without the technique nothing happens");
+                "「使用秘技后」 -- without the technique nothing happens");
     }
 
     private static Random fixed() {

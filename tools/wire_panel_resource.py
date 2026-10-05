@@ -52,7 +52,7 @@ public class MemospriteResourcePanelTest {
                 null, null);
     }
 
-    /** \u2b50 The panel follows the resource, and the attribute panel beside it does not. */
+    /** ⭐ The panel follows the resource, and the attribute panel beside it does not. */
     @Test
     public void thePanelFollowsTheResource() {
         Character master = CharacterFactory.create(MASTER, LEVEL, false, null, null, 0);
@@ -66,7 +66,7 @@ public class MemospriteResourcePanelTest {
                 "an attribute panel is untouched by the resource reader (100% of the master's own health)");
     }
 
-    /** \u26a0 A resource panel with no reader is refused, not silently derived as 0. */
+    /** ⚠ A resource panel with no reader is refused, not silently derived as 0. */
     @Test
     public void aResourcePanelNeedsAReader() {
         Character master = CharacterFactory.create(MASTER, LEVEL, false, null, null, 0);

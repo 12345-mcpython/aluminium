@@ -18,7 +18,7 @@ if match is None:
     sys.exit("REFUSING: the SELF_MAX_ENERGY branch was not found")
 indent = match.group(1)
 addition = (
-    indent + "// \u2b50 A battle-level PARTY counter (2026-10-02; reader: 1513's reward): the counter lives on the battle, so it is\n"
+    indent + "// ⭐ A battle-level PARTY counter (2026-10-02; reader: 1513's reward): the counter lives on the battle, so it is\n"
     + indent + "// resolved here rather than through `scaleAttribute`, which answers \"which attribute\" and has no answer for it.\n"
     + indent + "if (effect.getScale().trim().startsWith(\"party_resource:\")) {\n"
     + indent + "    return resolveScale(effect.getScale(),\n"

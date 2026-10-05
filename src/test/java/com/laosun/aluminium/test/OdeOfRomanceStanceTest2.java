@@ -29,7 +29,7 @@ public class OdeOfRomanceStanceTest2 {
     private static final int AGLAEA = 1402;
     private static final int MONSTER = 1002011;
     private static final int ODE_OF_ROMANCE = 14;
-    private static final String STANCE = "\u81f3\u9ad8\u4e4b\u59ff";
+    private static final String STANCE = "至高之姿";
 
     @Test
     public void bothBoostsLandAndBothLeaveWithTheStance() {
@@ -65,9 +65,9 @@ public class OdeOfRomanceStanceTest2 {
                 + " pierce +" + servantPierceGain + " (=" + expectedPierce + ")");
 
         Assertions.assertEquals(expectedPierce, pierceGain, Math.abs(expectedPierce) * 1e-6,
-                "\u300c\u5e76\u65e0\u89c6\u76ee\u6807 #3% \u7684\u9632\u5fa1\u300d-- hers");
+                "「并无视目标 #3% 的防御」-- hers");
         Assertions.assertEquals(expectedBoost, servantBoostGain, Math.abs(expectedBoost) * 1e-6,
-                "\u300c\u963f\u683c\u83b1\u96c5**\u4e0e\u8863\u5320**\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #2%\u300d-- the Garmentmaker is named too");
+                "「阿格莱雅**与衣匠**造成的伤害提高 #2%」-- the Garmentmaker is named too");
         Assertions.assertEquals(expectedPierce, servantPierceGain, Math.abs(expectedPierce) * 1e-6,
                 "and it gets the pierce as well");
 
@@ -80,7 +80,7 @@ public class OdeOfRomanceStanceTest2 {
                 + " ; hers pierce = " + aglaea.getAttribute(AttributeType.DEFENCE_IGNORE).get());
 
         Assertions.assertEquals(servantBoostBefore, garmentmaker.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-6,
-                "\u300c\u6301\u7eed\u81f3\u963f\u683c\u83b1\u96c5\u9000\u51fa\u3010" + STANCE + "\u3011\u72b6\u6001\u300d-- the Garmentmaker is back where it started");
+                "「持续至阿格莱雅退出【" + STANCE + "】状态」-- the Garmentmaker is back where it started");
         Assertions.assertEquals(servantPierceBefore, garmentmaker.getAttribute(AttributeType.DEFENCE_IGNORE).get(), 1e-6,
                 "and its pierce is gone");
         Assertions.assertTrue(aglaea.getAttribute(AttributeType.DEFENCE_IGNORE).get() < pierceBefore + expectedPierce,

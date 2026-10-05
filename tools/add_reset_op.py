@@ -29,7 +29,7 @@ def bail(msg):
 # 1) CanHit: clear ONE rule's limits
 old_canhit = '    public void tickTriggerCooldowns() {'
 new_canhit = ('    /**' + NL
-              + '     * Clears the firing limits of ONE rule (\u300c\u65bd\u653e\u7ec8\u7ed3\u6280\u540e\u91cd\u7f6e\u8be5\u6548\u679c\u89e6\u53d1\u6b21\u6570\u300d, 2026-09-30;' + NL
+              + '     * Clears the firing limits of ONE rule (「施放终结技后重置该效果触发次数」, 2026-09-30;' + NL
               + '     * readers 1305, 1207, 1403). ⚠ Deliberately not {@link #resetTriggerLimits()}: that clears EVERY rule of' + NL
               + '     * this combatant, and ULT_CAST carries unrelated rules too.' + NL
               + '     */' + NL

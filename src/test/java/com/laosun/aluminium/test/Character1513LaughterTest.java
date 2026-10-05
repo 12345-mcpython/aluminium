@@ -22,7 +22,7 @@ public class Character1513LaughterTest {
     private static final int AVENTURINE = 1513;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String LAUGH = "\u7b11\u70b9";
+    private static final String LAUGH = "笑点";
 
     /** 「战技…获得 4 个笑点」 */
     @Test
@@ -30,7 +30,7 @@ public class Character1513LaughterTest {
         Scene scene = fight();
         Assertions.assertEquals(0, scene.battle.partyResourceValue(LAUGH), "the battle starts with none");
         scene.battle.castImmediate(scene.her.getSkills().get(SkillType.SKILL), scene.her, List.of());
-        Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "\u300c\u83b7\u5f97 4 \u4e2a\u7b11\u70b9\u300d");
+        Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "「获得 4 个笑点」");
     }
 
     /** 「终结技…获得 6 个笑点」 */
@@ -38,7 +38,7 @@ public class Character1513LaughterTest {
     public void herUltimateGivesSix() {
         Scene scene = fight();
         scene.battle.castImmediate(scene.her.getSkills().get(SkillType.ULTRA), scene.her, List.of());
-        Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "\u300c\u83b7\u5f97 6 \u4e2a\u7b11\u70b9\u300d");
+        Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "「获得 6 个笑点」");
     }
 
     /** 「队友施放攻击后…以及 1 个笑点」 -- a REAL teammate attack, not a hand-fired event. */
@@ -47,7 +47,7 @@ public class Character1513LaughterTest {
         Scene scene = fight();
         scene.battle.castImmediate(scene.mate.getSkills().get(SkillType.COMMON), scene.mate,
                 List.of(scene.battle.enemies.getFirst()));
-        Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "\u300c\u4ee5\u53ca 1 \u4e2a\u7b11\u70b9\u300d");
+        Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "「以及 1 个笑点」");
     }
 
     /** ⭐ THE SHARED COUNTER: all three in one battle sum, because 笑点 is party-scoped. */

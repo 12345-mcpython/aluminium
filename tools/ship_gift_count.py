@@ -27,24 +27,24 @@ if rule is None:
 if rule["do"][0].get("stackable"):
     sys.exit("REFUSING: already carries the count")
 
-LAUGHS_MAX = next(entry.get("max") for entry in doc["resources"] if entry.get("id") == "\u7b11\u70b9")
+LAUGHS_MAX = next(entry.get("max") for entry in doc["resources"] if entry.get("id") == "笑点")
 rule["do"] = [{
     "op": "APPLY_BUFF",
-    "buff": "\u597d\u6d3b\u5f53\u8d4f",
+    "buff": "好活当赏",
     "turns": 2,
     "target": "self",
     "stackable": True,
     "maxStacks": LAUGHS_MAX,
-    "scale": "party_resource:\u7b11\u70b9",
+    "scale": "party_resource:笑点",
     "percent": 1.0,
 }]
 rule["note"] = (
-    "\u300c\u963f\u54c8\u65f6\u523b\u7ed3\u675f\u65f6\uff0c\u4f7f\u53c2\u6f14\u7684\u89d2\u8272\u83b7\u5f97\u672c\u6b21\u8ba1\u5165\u7b11\u70b9\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u72b6\u6001\uff0c\u6301\u7eed 2 \u56de\u5408\u300d\u2713 \u21d2 "
-    "`STATE_ENDED[\"\u81ea\u5df1\u7684\u963f\u54c8\u65f6\u523b\"]` \u21d2 ⭐ **\u53ef\u53e0\u52a0\u72b6\u6001** \u2713\uff0c\u5c42\u6570\uff1d"
-    "`scale: party_resource:\u7b11\u70b9` \u00d7 1 \u2713\uff08\u7b2c 69\uff0b70 \u4ef6\uff1a\u961f\u7ea7\u8ba1\u6570\u53ef\u5f53\u6570\u503c\u8bfb \u2713\u3001\u53ef\u53e0\u52a0\u72b6\u6001\u53ef\u4e00\u6b21\u65bd\u52a0 N \u4e2a\u5b9e\u4f8b \u2713\uff09\u3002"
-    "\u26a0 **\u4e0a\u9650\u7528\u3010\u7b11\u70b9\u3011\u81ea\u5df1\u58f0\u660e\u7684\u4e0a\u9650** \u2713\uff08`max: 2147483647` \u21d2 \u65e0\u4e0a\u9650 \u2713\uff09\u2014\u2014 "
-    "\u4e0d\u81c6\u9020\u6570\u5b57 \u2713\uff1b\u4e0b\u6e38 `1505`\u300c\u5f00\u4e0d\u8d25\u300d\u5c31\u662f\u8bfb\u8fd9\u4e2a\u5c42\u6570\u53d6 50% \u2713\uff08\u7b2c 68 \u4ef6 \u2713\uff09\u3002"
-    "\u26a0 \u540c\u53e5\u300c\u963f\u54c8\u884c\u52a8\u540e\u4f1a\u6d88\u8017\u5168\u90e8\u7b11\u70b9\u300d\uff08\u6d88\u8017 \u2717\uff09\u4ecd\u672a\u5199 \u2713\u3002"
+    "「阿哈时刻结束时，使参演的角色获得本次计入笑点的【好活当赏】状态，持续 2 回合」✓ ⇒ "
+    "`STATE_ENDED[\"自己的阿哈时刻\"]` ⇒ ⭐ **可叠加状态** ✓，层数＝"
+    "`scale: party_resource:笑点` × 1 ✓（第 69＋70 件：队级计数可当数值读 ✓、可叠加状态可一次施加 N 个实例 ✓）。"
+    "⚠ **上限用【笑点】自己声明的上限** ✓（`max: 2147483647` ⇒ 无上限 ✓）—— "
+    "不臆造数字 ✓；下游 `1505`「开不败」就是读这个层数取 50% ✓（第 68 件 ✓）。"
+    "⚠ 同句「阿哈行动后会消耗全部笑点」（消耗 ✗）仍未写 ✓。"
 )
 
 with io.open(CHAR, "w", encoding="utf-8", newline="\n") as handle:

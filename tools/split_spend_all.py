@@ -21,15 +21,15 @@ exec(io.open("tools/add_spend_all3.py", encoding="utf-8").read())
 
 DATA = "src/main/resources/characters/1513.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/SpendAllTest.java"
-RES = "\u70ed\u610f"
+RES = "热意"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
 for r in rules:
     if isinstance(r, dict) and r.get("id") == "elation_spend_all_fervor":
         r["when"] = ["from_category ElationDamage"]
-        r["note"] = ("\u2b50 \u9996\u4e2a `spendAll` \u8bfb\u8005 \u2713\u3002\u26a0 \u89e6\u53d1\u7528 **`from_category ElationDamage`** \u2713"
-                     "\uff08\u6570\u636e\u503c\u62fc\u5199\uff01\u7528\u679a\u4e3e\u540d\u4f1a\u88ab\u88c5\u8f7d\u671f\u62d2\u7edd \u2717\uff09\u3002")
+        r["note"] = ("⭐ 首个 `spendAll` 读者 ✓。⚠ 触发用 **`from_category ElationDamage`** ✓"
+                     "（数据值拼写！用枚举名会被装载期拒绝 ✗）。")
 json.dump(doc if isinstance(doc, dict) else {"rules": rules},
           io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1513.json trigger = from_category ElationDamage")
@@ -50,27 +50,27 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** Which route fails for \u300c\u6bcf\u6d88\u80171\u70b9\u3010\u70ed\u610f\u3011\u989d\u5916 1 \u6b21 21%\u300d (2026-10-02). */
+/** Which route fails for 「每消耗1点【热意】额外 1 次 21%」 (2026-10-02). */
 public class SpendAllTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1404;
     private static final int MONSTER = 1002011;
     private static final String RES = "\\u70ed\\u610f";
 
-    /** \u2b50 The cast spends everything. */
+    /** ⭐ The cast spends everything. */
     @Test
     public void theCastSpendsAllFervor() {
         Assertions.assertTrue(lossByCast(1) > 0, "precondition: the cast lands");
         Assertions.assertTrue(lossByCast(7) > 0, "and for seven points too");
     }
 
-    /** \u2b50 The hand-fired route: the rule DOES scale with the amount (exact multiple still open). */
+    /** ⭐ The hand-fired route: the rule DOES scale with the amount (exact multiple still open). */
     @Test
     public void theRuleScalesWithTheAmount() {
         double one = lossByHand(1);
         double seven = lossByHand(7);
         Assertions.assertTrue(one > 0, "precondition: the hand-fired instance lands (" + one + ")");
-        // \u26a0 Asserted as a DIRECTION, not a multiple: measured 38.808 for one point and 329.868 for seven -- scaling
+        // ⚠ Asserted as a DIRECTION, not a multiple: measured 38.808 for one point and 329.868 for seven -- scaling
         // with the amount (which is what `times_from` buys), but not a clean 7x, and the reason is not yet known. The
         // exact multiple is registered rather than asserted, so this judge never claims more than it measured.
         Assertions.assertTrue(seven > 5 * one,
@@ -110,7 +110,7 @@ public class SpendAllTest {
         Battle battle = primed(start);
         Character owner = (Character) battle.allies.get(0);
         Enemy enemy = (Enemy) battle.enemies.get(0);
-        // \u26a0 The priming itself fires RESOURCE_CHANGED once per point GAINED, and the rule answers those too -- so the
+        // ⚠ The priming itself fires RESOURCE_CHANGED once per point GAINED, and the rule answers those too -- so the
         // baseline is taken AFTER priming and only the hand-fired change is measured.
         battle.processRequests();
         double baseline = enemy.getCurrentHp();

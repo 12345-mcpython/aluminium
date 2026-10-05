@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u6b22\u6109\u6280\u7684\u884c\u9996\u5217\u662f**\u6b21\u6570**\uff1a\u300c\u9020\u6210 **#1** \u6b21\u4f24\u5bb3\uff0c\u6bcf\u6b21\u5bf9\u654c\u65b9\u968f\u673a\u5355\u4f53\u9020\u6210 **#2%**\u2026\u3002**\u6700\u540e**\u9020\u6210 **#3%**\u2026
- * \u7531**\u654c\u65b9\u5168\u4f53\u5747\u5206**\u300d (2026-10-02; readers 8009/8010 slot 20, data row `[8, 0.25, 0.75]` at L15).
+ * 欢愉技的行首列是**次数**：「造成 **#1** 次伤害，每次对敌方随机单体造成 **#2%**…。**最后**造成 **#3%**…
+ * 由**敌方全体均分**」 (2026-10-02; readers 8009/8010 slot 20, data row `[8, 0.25, 0.75]` at L15).
  *
- * <p>\u2b50 THE INSTRUMENT COUNTS INSTANCES, not damage: the sentence is about a NUMBER of hits, and damage would drag in the crit
+ * <p>⭐ THE INSTRUMENT COUNTS INSTANCES, not damage: the sentence is about a NUMBER of hits, and damage would drag in the crit
  * zone and the Elation boost. A test-only rule on the caster adds one counter stack per damage instance it deals.
  */
 public class ElationRowTest {
@@ -41,18 +41,18 @@ public class ElationRowTest {
     private static final int MONSTER = 1002011;
     private static final String COUNTER = "\\u547d\\u4e2d\\u6b21\\u6570";
 
-    /** \u2b50 Eight hits plus the final split instance, with a single enemy that every random draw must pick. */
+    /** ⭐ Eight hits plus the final split instance, with a single enemy that every random draw must pick. */
     @Test
     public void theRowSettlesEightHitsAndTheSplit() {
         Assertions.assertEquals(9, instancesFromTheElationRow(), 0,
                 "8 \\u6b21\\u4f24\\u5bb3 + \\u6700\\u540e\\u4e00\\u6b21\\u5747\\u5206");
     }
 
-    /** \u26a0 And the same reading must NOT be a single 8x instance, which is what the AOE path did before the branch. */
+    /** ⚠ And the same reading must NOT be a single 8x instance, which is what the AOE path did before the branch. */
     @Test
     public void itIsNotOneInstanceOfEightTimesTheShare() {
         Assertions.assertNotEquals(1, instancesFromTheElationRow(),
-                "\u884c\u9996\u5217\u662f\u6b21\u6570\uff0c\u4e0d\u662f\u500d\u7387");
+                "行首列是次数，不是倍率");
     }
 
     // ==================================================================

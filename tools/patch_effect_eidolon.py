@@ -29,9 +29,9 @@ FIELD_ANCHOR = "    private Boolean amountFromEvent;"
 FIELD_ADDITION = '''
 
     /**
-     * \u2b50 2026-10-02\uff1a**\u6548\u679c\u7ea7**\u7684\u661f\u9b42\u5206\u5c42\u3002\u8bfb\u8005\uff1a1505 \u661f\u9b42\u7684 50%\uff0f100%\uff0c
-     * \u4ee5\u53ca 1415 \u7b2c\u4e8c\u534a\u90a3\u6761\u201c\u968f\u5c42\u7ea7\u201d\u7684\u7a7f\u900f\u3002\u89c4\u5219\u7ea7\u7684 `min_eidolon`
-     * \u53ea\u80fd\u5173\u6389\u6574\u6761\u89c4\u5219\uff0c\u800c\u8fd9\u91cc\u8981\u5173\u7684\u53ea\u662f\u5176\u4e2d\u4e00\u6761\u6548\u679c\u3002
+     * ⭐ 2026-10-02：**效果级**的星魂分层。读者：1505 星魂的 50%／100%，
+     * 以及 1415 第二半那条“随层级”的穿透。规则级的 `min_eidolon`
+     * 只能关掉整条规则，而这里要关的只是其中一条效果。
      */
     @com.google.gson.annotations.SerializedName("min_eidolon")
     private Integer minEidolon;'''
@@ -43,7 +43,7 @@ LOOP_ANCHOR = "            effect = amendedEffect(effect, ctx);"
 COPY_ANCHOR = "        copy.amountFromPrevious = amountFromPrevious;"
 COPY_ADDITION = "\n        copy.minEidolon = minEidolon;"
 GATE = '''            if (effect.getMinEidolon() != null && eidolonRankOf(ctx.owner()) < effect.getMinEidolon()) {
-                // \u2b50 2026-10-02: this EFFECT belongs to an Eidolon rank the unit does not have. The rule-level
+                // ⭐ 2026-10-02: this EFFECT belongs to an Eidolon rank the unit does not have. The rule-level
                 // `min_eidolon` cannot express this -- it would switch off the whole rule, base part included.
                 continue;
             }

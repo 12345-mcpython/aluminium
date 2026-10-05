@@ -44,7 +44,7 @@ public class LukaTest {
         f.ultimate();
 
         Assertions.assertEquals(3, f.luka.getBuffManager().stacksOf("斗志"),
-                "\u300c\u65bd\u653e\u7ec8\u7ed3\u6280\u65f6\u83b7\u5f972\u5c42\u3010\u6597\u5fd7\u3011\u300d -- one from the battle start plus two from the ultimate");
+                "「施放终结技时获得2层【斗志】」 -- one from the battle start plus two from the ultimate");
     }
 
     /** ⚠ 「最多可持有 4 层」 holds no matter how often it is applied. */

@@ -23,19 +23,19 @@ public class AshveilTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The reaction fires for a teammate's attack on the Bait, and not for her own. */
+    /** ⚠ The reaction fires for a teammate's attack on the Bait, and not for her own. */
     @Test
     public void theBaitReactionNeedsATeammate() {
         double fromAlly = energyGain(true);
         double fromSelf = energyGain(false);
 
         Assertions.assertEquals(8.0, fromAlly, 1e-6,
-                "\u300c\u56fa\u5b9a\u6062\u590d8\u70b9\u80fd\u91cf\u300d");
+                "「固定恢复8点能量」");
         Assertions.assertEquals(0.0, fromSelf, 1e-6,
-                "\u300c\u6211\u65b9**\u5176\u4ed6**\u76ee\u6807\u653b\u51fb\u540e\u300d -- her own attack must not trigger it");
+                "「我方**其他**目标攻击后」 -- her own attack must not trigger it");
     }
 
-    /** \u26a0 One layer per firing, and a LOUD refusal once the two declared charges are spent (measured, not assumed). */
+    /** ⚠ One layer per firing, and a LOUD refusal once the two declared charges are spent (measured, not assumed). */
     @Test
     public void eachReactionAddsALayerAndNeedsACharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
@@ -49,7 +49,7 @@ public class AshveilTest {
         // Her declaration gives 2 charges. One firing is one layer (ADD_STACK's `amount` is not a layer count, round 172).
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
-        Assertions.assertEquals(2, ashveil.getBuffManager().stacksOf("\u5a6a\u9163"),
+        Assertions.assertEquals(2, ashveil.getBuffManager().stacksOf("婪酣"),
                 "two firings, one layer each");
 
         Assertions.assertThrows(IllegalStateException.class,
@@ -57,7 +57,7 @@ public class AshveilTest {
                 "the engine refuses to spend a charge she does not have");
     }
 
-    /** \u26a0 The technique's opening: the AoE and one Charge, whose declaration makes the gain real. */
+    /** ⚠ The technique's opening: the AoE and one Charge, whose declaration makes the gain real. */
     @Test
     public void theTechniqueHitsAndGrantsCharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
@@ -69,7 +69,7 @@ public class AshveilTest {
         battle.startBattle();
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
-                "\u300c\u5bf9\u654c\u65b9\u5168\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u4e0d\u6b7b\u9014\u653b\u51fb\u529b100%\u7684\u96f7\u5c5e\u6027\u4f24\u5bb3\u300d");
+                "「对敌方全体造成等同于不死途攻击力100%的雷属性伤害」");
     }
 
     /** The energy gain for a teammate's attack; mode false fires it from Ashveil herself. */

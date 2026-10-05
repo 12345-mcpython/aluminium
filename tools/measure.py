@@ -13,7 +13,7 @@ INTERP = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 def members(path):
     """Enum constants, including the ones a `@SerializedName(...)` annotation pushes onto the same line.
 
-    \u26a0 A plain `^\\s{4}NAME\\(` pattern silently MISSES those -- measured on 2026-10-02, in this very script, which is
+    ⚠ A plain `^\\s{4}NAME\\(` pattern silently MISSES those -- measured on 2026-10-02, in this very script, which is
     the mistake already recorded in GAPS ("list an enum's members by reading the file, not by one regex").
     """
     s = io.open(path, encoding="utf-8").read()

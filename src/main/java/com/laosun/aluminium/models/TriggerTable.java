@@ -783,7 +783,7 @@ public class TriggerTable {
     /**
      * The per-ATTACK cap: {@code once_per_attack: true} means one, {@code per_attack: N} means N.
      *
-     * <p>\u26a0 Both at once is refused rather than resolved: they are two spellings of one dimension, and picking one
+     * <p>⚠ Both at once is refused rather than resolved: they are two spellings of one dimension, and picking one
      * silently would make the other a lie.
      */
     private static int validatePerAttack(TriggerSpec spec) {
@@ -997,12 +997,12 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final Set<String> STATE_SUBJECTS = Set.of("self", "actor", "target");
 
     /**
-     * \u2705 The keyword of the "that attribute of mine/theirs was lowered" condition (2026-09-30; readers: cone 22000's
-     * \u300c\u653b\u51fb\u9632\u5fa1\u529b\u88ab\u964d\u4f4e\u7684\u654c\u65b9\u76ee\u6807\u540e\u6062\u590d\u80fd\u91cf\u300d and cone 21044's \u300c\u5904\u4e8e\u9632\u5fa1\u964d\u4f4e\u6216\u51cf\u901f\u72b6\u6001\u4e0b\u7684\u654c\u4eba\u300d).
+     * ✅ The keyword of the "that attribute of mine/theirs was lowered" condition (2026-09-30; readers: cone 22000's
+     * 「攻击防御力被降低的敌方目标后恢复能量」 and cone 21044's 「处于防御降低或减速状态下的敌人」).
      *
-     * <p>\u2605 Why not {@code DebuffClass}: that enum names the two FAMILIES the corpus groups states into (control, dot),
+     * <p>★ Why not {@code DebuffClass}: that enum names the two FAMILIES the corpus groups states into (control, dot),
      * and a lowered attribute belongs to neither. The fact that actually exists in the engine is a MODIFIER whose source is
-     * {@link DoubleValue.Modifier.ModifierSource#DEBUFF}, which is exactly what \u300c\u88ab\u964d\u4f4e\u300d asserts.
+     * {@link DoubleValue.Modifier.ModifierSource#DEBUFF}, which is exactly what 「被降低」 asserts.
      */
     private static final Pattern DEBUFF_ON =
             Pattern.compile("(?<![\\w])(?<subject>self|actor|target)_debuff:(?<attribute>[A-Za-z_]+)",
@@ -1023,7 +1023,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     /**
      * The {@code is_summon} keyword: "&lt;who&gt; is a memosprite" -- the fourth predicate (2026-10-02).
      *
-     * <p>\u26a0 Why it was needed: 「对万敌施放时\u2026」 is 1415's memosprite skill 8, and the only spelling that names a SKILL is
+     * <p>⚠ Why it was needed: 「对万敌施放时…」 is 1415's memosprite skill 8, and the only spelling that names a SKILL is
      * {@code from_skill_id}, which carries the SLOT -- so on its own it also matches any other unit's slot-16 skill aimed at the same
      * target, enemies included. A condition about the CASTER's nature is what makes the trigger exact.
      */
@@ -1052,7 +1052,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * 「开拓同行」 -- 开拓者 (8001-8010), 姬子 (1003), 姬子•启行 (1510), 三月七 (1001, 1224), 长夜月 (1413), 丹恒 (1002),
      * 丹恒•饮月 (1213), 丹恒•腾荒 (1414), 瓦尔特 (1004), 星期日 (1313).
      *
-     * <p>\u26a0 PROVENANCE: membership is NOT marked by any data field -- AvatarConfig, AvatarCamp and SpecialAvatar were
+     * <p>⚠ PROVENANCE: membership is NOT marked by any data field -- AvatarConfig, AvatarCamp and SpecialAvatar were
      * all checked, and a co-occurrence scan over 2253 tables hit 355 generic ones. The ids themselves come from
      * character_data.json; only the GROUPING comes from the documentation's glossary (1510_姬子•启行.md:408 /
      * export_glossary.py:70). If a data marker is ever found, read it and delete this set. Its reader is relic 327.
@@ -1086,17 +1086,17 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     /**
      * The {@code is_same_element_as_self} keyword (2026-09-30): "<b>that unit carries the same element as me</b>".
      *
-     * <p>\u2605 It is the per-CANDIDATE sibling of {@code damage_element_is_self}: that one asks about the damage instance
+     * <p>★ It is the per-CANDIDATE sibling of {@code damage_element_is_self}: that one asks about the damage instance
      * being settled, this one about a unit -- which is what a per-target filter ({@code target_when}) needs, because
-     * there the candidate sits in {@code target} and the rule\u2019s owner in {@code owner()}. Readers: relic set 312\u2019s
-     * \u300c\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027\u7684\u5176\u4ed6\u6211\u65b9\u89d2\u8272\u300d.
+     * there the candidate sits in {@code target} and the rule’s owner in {@code owner()}. Readers: relic set 312’s
+     * 「与装备者相同属性的其他我方角色」.
      */
     /**
      * The {@code shares_path_with_an_ally} keyword (2026-09-30): "<b>that unit walks the same Path as somebody else on our
-     * side</b>". Reader: light cone 21046\u2019s \u300c\u82e5\u6709**\u4e24\u540d\u53ca\u4ee5\u4e0a\u6211\u65b9\u89d2\u8272\u62e5\u6709\u4efb\u610f\u76f8\u540c\u547d\u9014**\uff0c\u4f7f**\u8fd9\u4e9b\u89d2\u8272**\u2026\u300d.
+     * side</b>". Reader: light cone 21046’s 「若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**…」.
      *
-     * <p>\u2605 The existing {@code has_same_path_ally} answers for the PARTY (it looks from the rule\u2019s owner outward), so as a
-     * per-target filter it would pass every candidate -- the sentence names \u300cthese characters\u300d, not the party. This one is asked
+     * <p>★ The existing {@code has_same_path_ally} answers for the PARTY (it looks from the rule’s owner outward), so as a
+     * per-target filter it would pass every candidate -- the sentence names 「these characters」, not the party. This one is asked
      * ABOUT a candidate, exactly like {@code is_same_element_as_self}.
      */
     private static final Pattern SHARES_PATH_WITH_AN_ALLY =
@@ -1107,7 +1107,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
     /**
      * The {@code is_other_same_element_as_self} variant: the same question with the owner excluded --
-     * \u300c\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027\u7684**\u5176\u4ed6**\u6211\u65b9\u89d2\u8272\u300d (relic set 312). \u2605 It exists separately because the\n     * owner is not a candidate the sentence means, and because a filter on a BATTLE_START rule cannot state a
+     * 「与装备者相同属性的**其他**我方角色」 (relic set 312). ★ It exists separately because the\n     * owner is not a candidate the sentence means, and because a filter on a BATTLE_START rule cannot state a
      * `target`-subjected condition at all (measured: the loader refuses those -- that event carries no
      * actor and no target, so only argument-less keywords work there).
      */
@@ -1159,10 +1159,10 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
     /**
      * The {@code from_category} keyword: "the cast that caused this event was of this CATEGORY"
-     * (\u300c\u88c5\u5907\u8005\u65bd\u653e**\u6b22\u6109\u6280**\u65f6\u300d, \u5149\u9525 21064 / 21066 / 23058 / 23064).
+     * (「装备者施放**欢愉技**时」, 光锥 21064 / 21066 / 23058 / 23064).
      *
-     * <p>\u2605 Why it exists next to {@code from_skill}: the slot names a SKILL SLOT ({@code SKILL} = an ordinary Skill), while
-     * a memosprite's or a \u6b22\u6109 kit's cast is a category the slot vocabulary does not have at all --
+     * <p>★ Why it exists next to {@code from_skill}: the slot names a SKILL SLOT ({@code SKILL} = an ordinary Skill), while
+     * a memosprite's or a 欢愉 kit's cast is a category the slot vocabulary does not have at all --
      * {@code SkillCategory.ELATION_DAMAGE} is precisely the one {@code SkillType} lacks. Reading the category directly is
      * the honest spelling for those sentences; {@code from_skill} keeps its meaning for the slot ones.
      */
@@ -1201,13 +1201,13 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     static final String DAMAGE_HAS_NO_CAST = "damage_has_no_cast";
 
     /**
-     * \u2705 The bare keyword \u300c\u9020\u6210**\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027**\u7684\u4f24\u5bb9\u300d (2026-09-30; readers: light cone 21011 and
-     * relic set 312). No subject and no value, like {@link #DAMAGE_IS_ATTACK}: the second party is the RULE\u2019S OWNER, so
+     * ✅ The bare keyword 「造成**与装备者相同属性**的伤容」 (2026-09-30; readers: light cone 21011 and
+     * relic set 312). No subject and no value, like {@link #DAMAGE_IS_ATTACK}: the second party is the RULE’S OWNER, so
      * "same Type as the wearer" is the only reading it can have.
      *
-     * <p>\u2605 The element lives on the unit ({@code Character.element}, set from the character data\u2019s own attribute), not on
+     * <p>★ The element lives on the unit ({@code Character.element}, set from the character data’s own attribute), not on
      * the skill, and the damage instance carries the element it was built with -- so this compares the two directly. For a
-     * memosprite owner the master\u2019s element is the one the sentence means, which is the same convention the MEMORY damage
+     * memosprite owner the master’s element is the one the sentence means, which is the same convention the MEMORY damage
      * hook uses in {@code Battle.assemble}.
      */
     static final String DAMAGE_ELEMENT_IS_SELF = "damage_element_is_self";
@@ -1232,8 +1232,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     /**
      * The events whose context carries the <b>cast category</b>, which is what {@code from_skill} reads.
      *
-     * <p>\u2605 A superset of {@link #DAMAGE_CARRYING_EVENTS}: {@code CAST_SETUP} carries the category without a damage instance,
-     * and it is precisely the event a rule needs for \u300c\u65bd\u653e\u2026\u65f6\u300d -- the modifier must exist while the cast's own
+     * <p>★ A superset of {@link #DAMAGE_CARRYING_EVENTS}: {@code CAST_SETUP} carries the category without a damage instance,
+     * and it is precisely the event a rule needs for 「施放…时」 -- the modifier must exist while the cast's own
      * heal settles, and {@code ULT_CAST} / {@code SKILL_CAST} fire after that. Keeping the sets apart is what lets
      * {@code damage_is_attack} stay damage-only.
      */
@@ -1495,7 +1495,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
 
         // `damage_element_is_self`: the bare-keyword sibling of `damage_is_attack`, one clause further in --
-        // it asks about the instance\u2019s ELEMENT instead of its type, and compares it with the rule owner\u2019s own.
+        // it asks about the instance’s ELEMENT instead of its type, and compares it with the rule owner’s own.
         if (text.trim().equalsIgnoreCase(DAMAGE_ELEMENT_IS_SELF)) {
             TriggerEvent event = TriggerEvent.fromString(spec.getOn());
             if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
@@ -1533,8 +1533,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             return new IsSameElementAsSelf(raw);
         }
 
-        // `<subject>_debuff:<ATTR>`: the party carries a negative modifier on that attribute -- "\u9632\u5fa1\u529b\u88ab\u964d\u4f4e"
-        // / "\u51cf\u901f" name the ATTRIBUTE that was lowered, and a modifier's DEBUFF source is the fact that says so.
+        // `<subject>_debuff:<ATTR>`: the party carries a negative modifier on that attribute -- "防御力被降低"
+        // / "减速" name the ATTRIBUTE that was lowered, and a modifier's DEBUFF source is the fact that says so.
         Matcher debuffOn = DEBUFF_ON.matcher(text);
         if (debuffOn.find()) {
             String subject = normalize(debuffOn.group("subject"));
@@ -1580,7 +1580,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                 + "subject -- who cast it is its own condition, so write for example "
                                 + "\"actor == self\" and \"from_category ELATION_DAMAGE\" (source: " + spec.getSource() + ")");
             }
-            // \u2605 Two spellings, one fact: the skill data says `ElationDamage`, the enum's own name is `ELATION_DAMAGE`.
+            // ★ Two spellings, one fact: the skill data says `ElationDamage`, the enum's own name is `ELATION_DAMAGE`.
             // The project already lives with this pair for attributes (JSON name vs enum name), so both are accepted --
             // `fromString` for the data's spelling, `valueOf` for the engine's.
             SkillCategory wanted = SkillCategory.fromString(stated);
@@ -1658,7 +1658,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             variable = left;
             literal = Double.parseDouble(right);
         } else if (isNumericVariable(left) && isNumericVariable(right)) {
-            // \u2705 Two variables (2026-09-30; reader: light cone 21012). The left one keeps the existing slots and the right
+            // ✅ Two variables (2026-09-30; reader: light cone 21012). The left one keeps the existing slots and the right
             // one gets its own, so `target_hp_percent >= self_hp_percent` reads exactly as it is written.
             return new Numeric(left, selfAttributeOf(left, raw, spec), selfResourceOf(left, raw, spec),
                     stacksNameOf(left, raw, spec), left.startsWith(TARGET_STACKS_PREFIX),
@@ -1768,9 +1768,9 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      */
     public static final String SELF_STACKS_PREFIX = "self_stacks:";
     /**
-     * \u2705 The counter of the unit that CAUSED the event (2026-09-30; reader: cone 23061's \u300c\u6211\u65b9\u4efb\u610f\u89d2\u8272\u5728\u81ea\u8eab\u540c\u4e00\u56de\u5408\u5185\u7d2f\u8ba1\u6d88\u8017 \u2265 4 \u70b9\u6218\u6280\u70b9\u300d).
+     * ✅ The counter of the unit that CAUSED the event (2026-09-30; reader: cone 23061's 「我方任意角色在自身同一回合内累计消耗 ≥ 4 点战技点」).
      *
-     * <p>\u2605 The third subject, and it was missing: {@code self_stacks:} reads the rule's OWNER and {@code target_stacks:}
+     * <p>★ The third subject, and it was missing: {@code self_stacks:} reads the rule's OWNER and {@code target_stacks:}
      * the event's target, but "any of our characters spends" puts the counter on the SPENDER -- a unit that is neither.
      * With {@code SKILL_POINT_SPENT} now naming its spender as the actor ({@code onSpent(user, amount)}), a rule owned by
      * the light cone's wearer can finally read it.
@@ -2010,7 +2010,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         return token.trim().toLowerCase(Locale.ROOT);
     }
 
-    /** \u2605 Whether a side may stand as a numeric variable on its own (2026-09-30). */
+    /** ★ Whether a side may stand as a numeric variable on its own (2026-09-30). */
     private static boolean isNumericVariable(String token) {
         String name = token == null ? "" : token.trim();
         return NUMERIC_VARIABLES.contains(name) || name.startsWith(SELF_ATTR_PREFIX)
@@ -2190,9 +2190,9 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
 
         /**
-         * \u2705 The same context carrying how many hit targets shared the attack's weakness (2026-09-30; reader: cone 21040).
+         * ✅ The same context carrying how many hit targets shared the attack's weakness (2026-09-30; reader: cone 21040).
          *
-         * <p>\u26a0 A COPY helper rather than a wider constructor on purpose: the cast events are built by chaining these
+         * <p>⚠ A COPY helper rather than a wider constructor on purpose: the cast events are built by chaining these
          * ({@code new TriggerContext(..., stateName).withSkillId(...)}), so a value that only the canonical constructor knows is
          * silently dropped by every chain that starts from a compact one -- measured, and the reason this exists.
          */
@@ -2735,10 +2735,10 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * question that tells the two apart where it matters: a rule that would otherwise react to its own extra instance.
      */
     /**
-     * \u2605 \u300c\u62e5\u6709\u4efb\u610f\u76f8\u540c\u547d\u9014\u7684\u89d2\u8272\u300d: whether the candidate has a Path twin on our side. A unit whose Path is
+     * ★ 「拥有任意相同命途的角色」: whether the candidate has a Path twin on our side. A unit whose Path is
      * the placeholder ({@code Path.OTHER}) has no twin by definition -- the same refusal {@code has_same_path_ally} makes.
      */
-    /** \u2705 \u300c\u53d8\u5316\u7684是\u3010NAME\u3011\u300d: the guard that stops a forwarding rule from eating its own output. */
+    /** ✅ 「变化的是【NAME】」: the guard that stops a forwarding rule from eating its own output. */
     /** ✅ 「施加的是【X】类负面状态」: the family of the debuff that just landed (control / dot). */
     private static final class AppliedDebuffClass implements Condition {
         private final String raw;
@@ -2832,7 +2832,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     }
 
     /**
-     * \u2605 \u300c\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027\u7684\u5176\u4ed6\u6211\u65b9\u89d2\u8272\u300d: the candidate\u2019s element against the rule owner\u2019s own. A unit with no
+     * ★ 「与装备者相同属性的其他我方角色」: the candidate’s element against the rule owner’s own. A unit with no
      * element (or the placeholder) is not "the same element" -- the same refusal {@code has_same_path_ally} makes about
      * unknown Paths, because matching two unknowns would be a coincidence dressed as a rule.
      */
@@ -2857,7 +2857,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         @Override
         public boolean test(TriggerContext ctx) {
             if (otherOnly && ctx.target() == ctx.owner()) {
-                return false;          // \u300c\u5176\u4ed6\u6211\u65b9\u89d2\u8272\u300d does not include the wearer
+                return false;          // 「其他我方角色」 does not include the wearer
             }
             com.laosun.aluminium.enums.DamageElement mine = elementOf(ctx.owner());
             com.laosun.aluminium.enums.DamageElement theirs = elementOf(ctx.target());
@@ -2886,7 +2886,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
     }
 
-    /** \u2605 The element half of {@link #DAMAGE_IS_ATTACK}: the instance\u2019s element against the rule owner\u2019s own. */
+    /** ★ The element half of {@link #DAMAGE_IS_ATTACK}: the instance’s element against the rule owner’s own. */
     /** ⭐ The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack. */
     private static final class DamageIsAdditional implements Condition {
         private final String raw;
@@ -2979,7 +2979,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
         @Override
         public boolean test(TriggerContext ctx) {
-            // \u2605 Was `!ctx.damage().isCountsAsAttack()`, i.e. the exact opposite of the keyword's contract (measured
+            // ★ Was `!ctx.damage().isCountsAsAttack()`, i.e. the exact opposite of the keyword's contract (measured
             // 2026-09-30: a rule guarded by `damage_is_attack` fired on ADDITIONAL damage and never on a real attack --
             // cone 23008's energy clause read +0.0 because of it). `Damage.countsAsAttack` defaults to true, so the
             // negation made every ordinary attack fail the guard it was written to pass.
@@ -2992,7 +2992,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
     }
 
-    /** \u2605 {@code from_category}: the causing cast's category, read straight from the event's context. */
+    /** ★ {@code from_category}: the causing cast's category, read straight from the event's context. */
     private static final class FromCategory implements Condition {
 
         private final SkillCategory wanted;
@@ -3192,9 +3192,9 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * never be the accidental outcome of a missing party.
      */
     /**
-     * \u2705 "That party carries a negative modifier on this attribute" (2026-09-30).
+     * ✅ "That party carries a negative modifier on this attribute" (2026-09-30).
      *
-     * <p>\u2605 A party that does not exist for this event FAILS, exactly like {@link HasState}: "the rule matched" must never
+     * <p>★ A party that does not exist for this event FAILS, exactly like {@link HasState}: "the rule matched" must never
      * be the accidental outcome of a missing party.
      */
     private static final class HasDebuffOn implements Condition, PartyCondition {
@@ -3387,9 +3387,9 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             if (ctx.battle() == null || ctx.owner() == null) {
                 return false;
             }
-            // \u2b50 Identity, not headcount (2026-09-30; reader: cone 20022's \u300c\u5fc6\u7075\u6d88\u5931\u65f6\u79fb\u9664\u2026\u3010\u7f05\u6000\u3011\u300d): a summon that has ALREADY
+            // ⭐ Identity, not headcount (2026-09-30; reader: cone 20022's 「忆灵消失时移除…【缅怀】」): a summon that has ALREADY
             // DIED is still "one of my summons" -- the camp roster keeps its corpse, and the case that needs this is
-            // exactly the KILL whose victim is that corpse. \u26a0 `summonsOf` deliberately answers the LIVING question
+            // exactly the KILL whose victim is that corpse. ⚠ `summonsOf` deliberately answers the LIVING question
             // (self_summon_count reads it, and a headcount of corpses is not what it means), so identity asks the unit
             // itself instead. Measured: with the living list, `target == summon` was false for a just-killed memosprite.
             boolean own = subject instanceof Summon summon && summon.getMaster() == ctx.owner();
@@ -3430,8 +3430,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         private final double literal;
         private final boolean literalOnLeft;
         /**
-         * \u2705 The RIGHT-hand side when it is a variable rather than a literal (2026-09-30; reader: light cone 21012's
-         * \u300c\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4**\u5927\u4e8e\u7b49\u4e8e\u88c5\u5907\u8005\u81ea\u8eab\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4**\u300d): the DSL always said comparisons were against a
+         * ✅ The RIGHT-hand side when it is a variable rather than a literal (2026-09-30; reader: light cone 21012's
+         * 「当前生命值百分比**大于等于装备者自身当前生命值百分比**」): the DSL always said comparisons were against a
          * party or a literal, and this is the third shape the corpus actually uses. Four descriptors, exactly like the
          * left-hand variable's, so a two-variable comparison needs no new vocabulary at all.
          */
@@ -3509,7 +3509,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             return value(ctx, variable, attribute, resource, stacksName, stacksOnTarget, stacksOnActor);
         }
 
-        /** \u2605 One reader for every numeric variable, so a comparison can read two of them (2026-09-30). */
+        /** ★ One reader for every numeric variable, so a comparison can read two of them (2026-09-30). */
         private double value(TriggerContext ctx, String variable, AttributeType attribute, String resource,
                 String stacksName, boolean stacksOnTarget, boolean stacksOnActor) {
             if (attribute != null) {
@@ -3527,13 +3527,13 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 // 「每当我方目标对【承负】状态下的敌方目标施放 2 次…」 reads the counter on the ENEMY (target), while a
                 // counter of "how many refunds so far" would be read on the owner -- hence the two spellings. An
                 // unreadable subject gives NaN, like every other variable that needs one.
-                // \u2605 Three subjects now: the owner (self_\u2026), the event's target, and the event's actor -- the last one is what
-                // makes \u300c\u6211\u65b9\u4efb\u610f\u89d2\u8272\u2026\u6d88\u8017\u300d readable from the light cone wearer's own table.
+                // ★ Three subjects now: the owner (self_…), the event's target, and the event's actor -- the last one is what
+                // makes 「我方任意角色…消耗」 readable from the light cone wearer's own table.
                 CanHit holder = stacksOnActor ? ctx.actor() : stacksOnTarget ? ctx.target() : ctx.owner();
                 return holder == null ? Double.NaN : holder.getBuffManager().stacksOf(stacksName);
             }
             return switch (variable) {
-                case "weakness_hit_count" -> ctx.weakHitCount();   // \u2705 how many hit targets share the attack's weakness
+                case "weakness_hit_count" -> ctx.weakHitCount();   // ✅ how many hit targets share the attack's weakness
                     case "hit_count" -> ctx.hitCount();
                 // 「强化普攻命中…」: the DATA ROW of the skill that produced this event (0 = the event named none, which
                 // makes the comparison false rather than accidentally true for the row 0 that no skill has).
@@ -3555,8 +3555,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 // 「若该目标当前生命值百分比大于等于 30%」 -- the OTHER unit's HP, which `hp_percent` cannot ask
                 // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
                 case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());
-                // \u2705 The ACTOR's share (2026-09-30; reader: light cone 21055's \u300c\u6211\u65b9\u76ee\u6807\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4
-                // \u5927\u4e8e\u7b49\u4e8e 50%\u65f6\u300d): "our unit" there is the one dealing the damage, so the third subject.
+                // ✅ The ACTOR's share (2026-09-30; reader: light cone 21055's 「我方目标当前生命值百分比
+                // 大于等于 50%时」): "our unit" there is the one dealing the damage, so the third subject.
                 case "actor_hp_percent" -> hpPercent(ctx.actor());
                 // ? The same fraction BEFORE this event's loss (2026-09-29): 「降到50%或以下」 is a CROSSING, not "is below half", and the
                 // difference is firing once versus firing on every later hit. HP_LOST carries the loss in `amount`, so before = (current + amount) / max.
@@ -3648,12 +3648,12 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             if (owner != null && owner.getResources().has(resource)) {
                 return owner.getResources().value(resource);
             }
-            // \u2705 A PARTY-scoped counter is read from the battle, whichever ally declared it (2026-09-30). Nothing changes for a
+            // ✅ A PARTY-scoped counter is read from the battle, whichever ally declared it (2026-09-30). Nothing changes for a
             // resource a unit owns itself -- that case answered above.
             if (battle != null && battle.partyResource(resource) != null) {
                 return battle.partyResourceValue(resource);
             }
-            // \u26a0 NaN, not 0: "nobody declares that" must fail the condition rather than read as "none left".
+            // ⚠ NaN, not 0: "nobody declares that" must fail the condition rather than read as "none left".
             return Double.NaN;
         }
 

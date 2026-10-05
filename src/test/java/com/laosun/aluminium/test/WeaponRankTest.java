@@ -34,6 +34,6 @@ public class WeaponRankTest {
     @Test
     public void theDefaultIsRankOne() {
         Assertions.assertEquals(1, Weapon.build(20003, 80).getRank(),
-                "\u26a0 before the rank existed the engine always read the first row, so rank 1 is the default");
+                "⚠ before the rank existed the engine always read the first row, so rank 1 is the default");
     }
 }

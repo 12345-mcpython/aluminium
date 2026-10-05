@@ -7,7 +7,7 @@ import io
 import os
 import re
 
-CANDIDATES = ["1112_\u6258\u5e15&\u8d26\u8d26.html", "1112_\u6258\u5e15.html"]
+CANDIDATES = ["1112_托帕&账账.html", "1112_托帕.html"]
 root = "E:/turnbasedgamedata/aluminium_texts"
 path = None
 for name in CANDIDATES:
@@ -28,7 +28,7 @@ text = re.sub(r"&nbsp;?", " ", text)
 text = re.sub(r"\s+", " ", text)
 
 out = ["page: %s" % os.path.basename(path)]
-for keyword in ("\u8d26\u8d26", "\u884c\u8ff9", "\u5929\u8d4b", "\u79d8\u6280", "\u661f\u9b42"):
+for keyword in ("账账", "行迹", "天赋", "秘技", "星魂"):
     hits = [m.start() for m in re.finditer(keyword, text)]
     out.append("\n=== %s (%d hits) ===" % (keyword, len(hits)))
     for start in hits[:6]:

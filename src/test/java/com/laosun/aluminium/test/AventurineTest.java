@@ -27,7 +27,7 @@ public class AventurineTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「为我方全体提供\u2026等同于砂金24.00%防御力+320伤害的护盾【坚垣筹码】，持续3回合」. */
+    /** ⚠ 「为我方全体提供…等同于砂金24.00%防御力+320伤害的护盾【坚垣筹码】，持续3回合」. */
     @Test
     public void hisOpeningShieldUsesHisDefencePlusTheFlatAddend() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -37,25 +37,25 @@ public class AventurineTest {
         battle.startBattle();
 
         double expected = aventurine.getAttribute(AttributeType.DEFENCE).get() * 0.24 + 320;
-        Assertions.assertTrue(aventurine.getShield() > 0, "\u300c\u6211\u65b9\u5168\u4f53\u63d0\u4f9b\u62a4\u76fe\u3010\u575a\u57a3\u7b79\u7801\u3011\u300d -- himself");
-        Assertions.assertTrue(ally.getShield() > 0, "\u300c\u6211\u65b9\u5168\u4f53\u300d -- and his ally");
+        Assertions.assertTrue(aventurine.getShield() > 0, "「我方全体提供护盾【坚垣筹码】」 -- himself");
+        Assertions.assertTrue(ally.getShield() > 0, "「我方全体」 -- and his ally");
         Assertions.assertEquals(expected, aventurine.getShield(), expected * 0.02,
-                "\u300c\u7b49\u540c\u4e8e\u7802\u91d124.00%\u9632\u5fa1\u529b+320\u7684\u62a4\u76fe\u300d: expected " + expected + ", shield " + aventurine.getShield());
+                "「等同于砂金24.00%防御力+320的护盾」: expected " + expected + ", shield " + aventurine.getShield());
     }
 
-    /** \u26a0 「使指定敌方单体陷入【惊惶】状态，持续3回合」. */
+    /** ⚠ 「使指定敌方单体陷入【惊惶】状态，持续3回合」. */
     @Test
     public void hisUltimateUnnervesTheTarget() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
         Enemy enemy = Enemy.fromAttributes("Dummy", 40000, 500, 100, 90);
         Battle battle = new Battle(List.of(aventurine), List.of(enemy), fixed());
         battle.startBattle();
-        Assertions.assertFalse(enemy.getBuffManager().hasState("\u60ca\u60f6"), "precondition: not unnerved yet");
+        Assertions.assertFalse(enemy.getBuffManager().hasState("惊惶"), "precondition: not unnerved yet");
 
         battle.castImmediate(aventurine.getSkills().get(SkillType.ULTRA), aventurine, List.of(enemy));
 
-        Assertions.assertTrue(enemy.getBuffManager().hasState("\u60ca\u60f6"),
-                "\u300c\u4f7f\u6307\u5b9a\u654c\u65b9\u5355\u4f53\u9677\u5165\u3010\u60ca\u60f6\u3011\u72b6\u6001\uff0c\u6301\u7eed3\u56de\u5408\u300d");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("惊惶"),
+                "「使指定敌方单体陷入【惊惶】状态，持续3回合」");
     }
 
     /** Census: the shield, the state and the level convention — and the skill's own shield is the DATA TABLE's job. */

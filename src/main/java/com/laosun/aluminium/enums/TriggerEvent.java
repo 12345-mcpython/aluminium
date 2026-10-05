@@ -57,7 +57,7 @@ public enum TriggerEvent {
      * <p>「受到**致命攻击**时不会陷入无法战斗状态，而是**回复**等同于自身生命上限 20%／50% 的生命值」 — two readers, both registered
      * before this existed (1408's transformed form, and 1104, whose own file records the sentence as missing).
      *
-     * <p>\u2b50 The semantics the sentence states, and why "heal and then take the hit" is NOT it: the text says the unit does
+     * <p>⭐ The semantics the sentence states, and why "heal and then take the hit" is NOT it: the text says the unit does
      * <b>not</b> fall, so the killing blow is <b>cancelled</b> when a listener answers -- if the heal were simply applied first,
      * any hit larger than the heal would still kill, which is the opposite of 「不会陷入无法战斗状态」.
      *
@@ -185,10 +185,10 @@ public enum TriggerEvent {
      */
     SKILL_POINT_GAINED("SKILL_POINT_GAINED", true),
     /**
-     * \u2705 Skill points that were ASKED for but NOT credited, because the pool was already at its cap (2026-09-30; readers:
-     * cone 23021's \u300c\u6062\u590d\u65f6\u6ea2\u51fa\u7684\u6218\u6280\u70b9\u4e5f\u4f1a\u88ab\u8ba1\u7b97\u5728\u5185\u300d and character 1306's \u300c\u82e5\u6218\u6280\u70b9\u6ea2\u51fa\uff0c\u5219\u8bb0\u5f55\u6ea2\u51fa\u7684\u6218\u6280\u70b9\u6570\u300d).
+     * ✅ Skill points that were ASKED for but NOT credited, because the pool was already at its cap (2026-09-30; readers:
+     * cone 23021's 「恢复时溢出的战技点也会被计算在内」 and character 1306's 「若战技点溢出，则记录溢出的战技点数」).
      *
-     * <p>\u2605 Without it the swallowed points are invisible: {@code SKILL_POINT_GAINED} only fires when something was really
+     * <p>★ Without it the swallowed points are invisible: {@code SKILL_POINT_GAINED} only fires when something was really
      * credited (「gained > 0」), so a gain at the cap is indistinguishable from no gain at all. The amount carried here is
      * exactly {@code asked - credited}, computed by {@code Battle.gainSkillPoint}, which is where both numbers are at hand.
      */
@@ -375,7 +375,7 @@ public enum TriggerEvent {
      */
     CRIT_DEALT("CRIT_DEALT", true),
     /**
-     * \u2705 A <b>wave entered the field</b> (2026-09-30; readers: cones 23011 and 23064, \u300c\u6bcf\u4e2a\u6ce2\u6b21\u5f00\u59cb\u65f6\u300d).
+     * ✅ A <b>wave entered the field</b> (2026-09-30; readers: cones 23011 and 23064, 「每个波次开始时」).
      *
      * <p>Fired by {@code WaveManager.nextWave} right after the wave's monsters are spawned, and with neither actor nor
      * subject -- the same shape as {@code BATTLE_START}, because a wave arriving is a fact about the battle rather than
@@ -384,10 +384,10 @@ public enum TriggerEvent {
      */
     WAVE_START("WAVE_START", true),
     /**
-     * \u2705 A <b>resource changed</b> (2026-09-30; readers: cone 20024's \u300c\u5f53\u62e5\u6709\u7684\u7b11\u70b9\u2265 10 \u65f6\u2026\u300d).
+     * ✅ A <b>resource changed</b> (2026-09-30; readers: cone 20024's 「当拥有的笑点≥ 10 时…」).
      *
      * <p>Fired by {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} with the <b>holder</b> as the actor: a battle is at hand
-     * there, while {@code ResourceManager} owns none and so cannot raise a trigger itself. \u26a0 The consequence is stated
+     * there, while {@code ResourceManager} owns none and so cannot raise a trigger itself. ⚠ The consequence is stated
      * rather than hidden -- a resource moved by anything other than those two ops does not announce itself yet.
      */
     RESOURCE_CHANGED("RESOURCE_CHANGED", true),

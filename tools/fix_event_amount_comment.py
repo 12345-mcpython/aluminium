@@ -10,10 +10,10 @@ import io
 import sys
 
 PATH = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
-OLD = ("            // modifier. \u26a0 Not a duplicate of `amount_from_event`: that spelling is read in `gainResource` ONLY\n"
+OLD = ("            // modifier. ⚠ Not a duplicate of `amount_from_event`: that spelling is read in `gainResource` ONLY\n"
        "            // (it was withdrawn from `grantAmount` for exactly that reason), while these readers are all modifiers.\n")
-NEW = ("            // modifier. \u26a0 `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's\n"
-       "            // `talent_phantasm_stack`, one \u3010\u5e7b\u76f8\u3011 layer per point spent). What was missing is this ROUTE --\n"
+NEW = ("            // modifier. ⚠ `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's\n"
+       "            // `talent_phantasm_stack`, one 【幻相】 layer per point spent). What was missing is this ROUTE --\n"
        "            // modifiers read their magnitude here and had no way to ask the event. (It was ALSO withdrawn once from\n"
        "            // `grantAmount`, where `amount_from_event` already served GAIN_RESOURCE; that note lives there.)\n")
 

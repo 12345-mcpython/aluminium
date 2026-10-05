@@ -73,7 +73,7 @@ public class JiaoqiuUltTakenTest {
         // ⚠ `matching` EVALUATES the rule's conditions, so the counter must really be stacked: the character's own ADD_STACK rule
         // (on ALLY_ATTACK) is what creates it -- a hand-made state does not register (round 219/240).
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, unit, enemy, 0, 0);
-        System.out.println("[1218] layers=" + enemy.getBuffManager().stacksOf("\u70ec\u7168"));
+        System.out.println("[1218] layers=" + enemy.getBuffManager().stacksOf("烬煨"));
         var rules = unit.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0));
         double amount = -1;

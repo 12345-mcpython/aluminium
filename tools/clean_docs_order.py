@@ -5,9 +5,9 @@ import sys
 SRC = "GAPS.md"
 lines = io.open(SRC, encoding="utf-8").read().split("\n")
 
-FOUR = "## \u56db\u3001\u672c\u6b21\u5f27"
-THREE = "## \u4e09\u3001\u5df2\u6539\u6b63\u7684\u8fc7\u65f6\u767b\u8bb0"
-APPENDIX = "## \u9644\uff1a"
+FOUR = "## 四、本次弧"
+THREE = "## 三、已改正的过时登记"
+APPENDIX = "## 附："
 
 def find(prefix, start=0):
     for i in range(start, len(lines)):

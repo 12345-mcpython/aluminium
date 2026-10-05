@@ -27,19 +27,19 @@ public class DrRatioTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The reaction needs the MARK: without it a teammate's attack does nothing. */
+    /** ⚠ The reaction needs the MARK: without it a teammate's attack does nothing. */
     @Test
     public void theReactionNeedsTheMark() {
         double beforeMark = reactionLoss(false);
         double afterMark = reactionLoss(true);
 
         Assertions.assertEquals(0.0, beforeMark, 1e-9,
-                "\u300c\u6301\u6709\u3010\u667a\u8005\u7684\u77ed\u89c1\u3011\u7684\u76ee\u6807\u300d -- no mark, no reaction");
+                "「持有【智者的短见】的目标」 -- no mark, no reaction");
         Assertions.assertTrue(afterMark > 0,
-                "\u300c\u7406\u771f\u533b\u751f\u5bf9\u8be5\u76ee\u6807\u53d1\u52a81\u6b21\u5929\u8d4b\u7684\u8ffd\u52a0\u653b\u51fb\u300d: " + afterMark);
+                "「理真医生对该目标发动1次天赋的追加攻击」: " + afterMark);
     }
 
-    /** \u26a0 The technique's 15% slow, against a hand-built -30% reference in the same pipeline. */
+    /** ⚠ The technique's 15% slow, against a hand-built -30% reference in the same pipeline. */
     @Test
     public void theTechniqueSlowsTheEnemiesByFifteenPercent() {
         double content = techniqueSlow(0);

@@ -34,14 +34,14 @@ public class NatashaHealingBoostTest {
 
         Assertions.assertTrue(plain > 0, "the control must compute something, or the ratio below means nothing");
         Assertions.assertEquals(1.1, boosted / plain, 1e-6,
-                "\u300c\u5a1c\u5854\u838e\u63d0\u4f9b\u7684\u6cbb\u7597\u91cf\u63d0\u9ad810%\u300d -- "
+                "「娜塔莎提供的治疗量提高10%」 -- "
                         + "boosted " + boosted + " vs plain " + plain);
     }
 
     /**
      * The healing the given healer computes for a fixed base amount.
      *
-     * <p>\u26a0 {@code Battle.heal} returns the HP <b>actually restored</b> and caps it at what is missing, so a first
+     * <p>⚠ {@code Battle.heal} returns the HP <b>actually restored</b> and caps it at what is missing, so a first
      * version of this test damaged the target by half its HP and then compared two heals that were BOTH clipped to the
      * same 315 HP -- reading 1.0 and looking exactly like a boost that does not work. {@code calculateHeal} is the same
      * formula ({@code base × (1 + outgoing) × (1 + taken)}) without that cap, which is the part the trace changes.

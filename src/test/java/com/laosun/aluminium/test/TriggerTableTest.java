@@ -47,7 +47,7 @@ public class TriggerTableTest {
      * <p>⚠ Looked up rather than named since 2026-09-27: this was 姬子 (1003) until her own kit was authored, and
      * the control having acquired rules broke three of the claims below. See {@link TestCharacters}.
      */
-    // \u2705 2026-09-30: split in two. The "there is no file" facts (`TriggerTables.exists` is false, a lookup is a cache miss)
+    // ✅ 2026-09-30: split in two. The "there is no file" facts (`TriggerTables.exists` is false, a lookup is a cache miss)
     // use a SYNTHETIC id that is never built; every use as a BODY builds 1002 instead, because those claims are about the table
     // the test installs or about the body’s own data, not about the body having no rules.
     private static final int NO_TRIGGERS = 999999;
@@ -181,8 +181,8 @@ public class TriggerTableTest {
      */
     @Test
     public void unregisteredCharacterHasAnEmptyTableAndTheBattleStillRuns() {
-        // \u2705 2026-09-30: this test asserts what an EMPTY TABLE does, so it builds the empty table itself instead of borrowing
-        // the shared "unregistered character" control. Measured: that control\u2019s data matters here -- the assertion below is
+        // ✅ 2026-09-30: this test asserts what an EMPTY TABLE does, so it builds the empty table itself instead of borrowing
+        // the shared "unregistered character" control. Measured: that control’s data matters here -- the assertion below is
         // about the character recovering energy from its own basic attack, and the last file-less id (1506) has max energy 0,
         // so it read 0.0. Replacing a table is usually a trap (it deletes the rule under test, hit in round 70), but here the
         // empty table IS the subject, which is exactly why it is the right construction.

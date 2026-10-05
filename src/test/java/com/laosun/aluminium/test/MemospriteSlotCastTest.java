@@ -81,8 +81,8 @@ public class MemospriteSlotCastTest {
                 + " with slot " + (commanded == null ? "-" : commanded.getSkillSlot()));
 
         Assertions.assertTrue(after < before,
-                "\u300c\u5e76\u81ea\u52a8\u65bd\u653e\u3010\u82b1\u4e0e\u7bad\u7684\u821e\u66f2\u3011\u300d-- the commanded cast really landed");
-        Assertions.assertNotNull(commanded, "\u300c\u3010\u82b1\u4e0e\u7bad\u7684\u821e\u66f2\u3011\u300dis its own slot 1");
+                "「并自动施放【花与箭的舞曲】」-- the commanded cast really landed");
+        Assertions.assertNotNull(commanded, "「【花与箭的舞曲】」is its own slot 1");
         Assertions.assertEquals(MINUET, commanded.getSkillSlot(), "and the slot is the one the rule named");
     }
 }

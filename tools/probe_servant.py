@@ -46,7 +46,7 @@ for rule in rules:
     out.append("  id=%s on=%s when=%s" % (rule.get("id"), rule.get("on"), json.dumps(rule.get("when"), ensure_ascii=False)))
     out.append("     do=%s" % json.dumps(rule.get("do"), ensure_ascii=False)[:260])
     note = rule.get("note") or ""
-    if "\u8d26\u8d26" in note or "\u91d1\u878d\u52a8\u8361" in note:
+    if "账账" in note or "金融动荡" in note:
         out.append("     note=%s" % note[:600])
 
 out.append("")
@@ -59,7 +59,7 @@ for root in ("E:/turnbasedgamedata/aluminium_texts", "E:/turnbasedgamedata"):
         if not name.endswith(".html"):
             continue
         body = io.open(os.path.join(root, name), encoding="utf-8", errors="replace").read()
-        for match in re.finditer("\u91d1\u878d\u52a8\u8361", body):
+        for match in re.finditer("金融动荡", body):
             snippet = re.sub(r"<[^>]+>", "", body[max(0, match.start() - 260):match.start() + 320])
             out.append("  [%s] ...%s..." % (name, snippet.replace("\n", " ")[:420]))
             hits += 1

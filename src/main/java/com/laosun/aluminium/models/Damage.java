@@ -166,9 +166,9 @@ public class Damage {
     /**
      * The targets hit by the attack that produced this instance (2026-09-30).
      *
-     * <p>\u26a0 The engine\u2019s pattern for \u300ca cast-level fact a rule must be able to read\u300d: the caller holds it and
+     * <p>⚠ The engine’s pattern for 「a cast-level fact a rule must be able to read」: the caller holds it and
      * <b>the instance carries the answer</b> (see {@code setSkillKey} / {@code setStance}). An EMPTY set means
-     * \u300cunknown\u300d -- a hand-made or placeholder skill -- so a selector fails rather than guesses.
+     * 「unknown」 -- a hand-made or placeholder skill -- so a selector fails rather than guesses.
      */
     private java.util.Set<CanHit> hitTargets = java.util.Set.of();
 

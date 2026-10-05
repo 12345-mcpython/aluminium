@@ -59,7 +59,7 @@ public class TrailblazerEidolonTest {
         battle.startBattle();
         if (broken) {
             battle.reduceToughness(trailblazer, enemy, element, 999);
-            Assertions.assertTrue(enemy.getBuffManager().hasState("\u5f31\u70b9\u51fb\u7834"),
+            Assertions.assertTrue(enemy.getBuffManager().hasState("弱点击破"),
                     "precondition: emptying the bar of a weak enemy puts it in 弱点击破");
         }
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, trailblazer, enemy, 1, 1000);

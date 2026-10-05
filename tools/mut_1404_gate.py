@@ -12,14 +12,14 @@ mode = (sys.argv[1] if len(sys.argv) > 1 else "").strip().lower()
 if mode not in ("a", "b", "off", "on"):
     sys.exit("usage: mut_1404_gate.py a|b|off|on")
 
-GATE = "!self has_state \u8840\u4ec7"
+GATE = "!self has_state 血仇"
 with io.open(CHAR, encoding="utf-8") as handle:
     doc = json.load(handle)
 hundred = next(entry for entry in doc["rules"]
                if isinstance(entry, dict) and entry.get("id") == "talent_enters_bloodfeud_at_a_hundred")
 fifty = next(entry for entry in doc["rules"]
              if isinstance(entry, dict) and entry.get("id") == "bloodfeud_godslayer_at_a_hundred_and_fifty")
-THRESHOLD = "self_resource:\u5929\u8d4b\u5145\u80fd >= 150"
+THRESHOLD = "self_resource:天赋充能 >= 150"
 
 if mode == "on":
     if GATE not in hundred["when"]:
@@ -32,7 +32,7 @@ else:
     if mode in ("a", "off"):
         hundred["when"] = [term for term in hundred["when"] if term != GATE]
     if mode in ("b", "off"):
-        fifty["when"] = [("self_resource:\u5929\u8d4b\u5145\u80fd >= 160" if ">= 1" in str(term) else term)
+        fifty["when"] = [("self_resource:天赋充能 >= 160" if ">= 1" in str(term) else term)
                          for term in fifty["when"]]
     print("MUTATION %s" % mode)
 

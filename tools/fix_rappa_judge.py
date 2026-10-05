@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u654c\u65b9\u76ee\u6807\u7684\u5f31\u70b9\u88ab\u51fb\u7834\u65f6\uff0c\u53d7\u5230\u7684\u51fb\u7834\u4f24\u5bb3\u63d0\u9ad8 2%\u300d (1317:440, 2026-10-02).
+ * 「敌方目标的弱点被击破时，受到的击破伤害提高 2%」 (1317:440, 2026-10-02).
  *
- * <p>\u2b50 Measured by DIFFERENCE, between two runs that differ only in whether her rules are present. \u26a0 An earlier version
+ * <p>⭐ Measured by DIFFERENCE, between two runs that differ only in whether her rules are present. ⚠ An earlier version
  * compared BREAK damage against NORMAL damage; that gap is INTRINSIC (`DamageType.BREAK` is not boostable and the two
  * types have different base maths), so it proved nothing. The difference below is the rule's own contribution.
  */
@@ -44,7 +44,7 @@ public class BreakDamageTakenTest {
     private static final int OWNER = 1317;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Her rule raises the break damage the enemy takes, and the raise is what the sentence states. */
+    /** ⭐ Her rule raises the break damage the enemy takes, and the raise is what the sentence states. */
     @Test
     public void herRuleRaisesBreakDamageTaken() {
         double withRules = dealt(true);

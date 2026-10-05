@@ -37,7 +37,7 @@ patch(
     '    @SerializedName("stacks")\n    private Integer stacks;',
     '    @SerializedName("stacks")\n    private Integer stacks;\n\n'
     '    /**\n'
-    '     * \u2b50 \u300c\u5c06\u7b11\u70b9**\u8ba1\u5165\u8be5\u72b6\u6001**\u300d: apply this state as a <b>stackable</b> one (2026-10-02; reader: 1505\'s \u3010\u597d\u6d3b\u5f53\u8d4f\u3011).\n'
+    '     * ⭐ 「将笑点**计入该状态**」: apply this state as a <b>stackable</b> one (2026-10-02; reader: 1505\'s 【好活当赏】).\n'
     '     *\n'
     '     * <p>A plain state REFRESHES when re-applied (its identity is its name, deliberately), so a count cannot ride on it;\n'
     '     * this flag selects {@link com.laosun.aluminium.models.buff.StackableStateBuff}, whose instances accumulate and are\n'
@@ -57,7 +57,7 @@ patch(
 patch(
     INTERP,
     "        if (effect.getMaxStacks() != null || effect.getStacks() != null) {",
-    "        // \u26a0 Relaxed for a STACKABLE STATE (2026-10-02): `max_stacks` is otherwise refused on every op but MODIFY_ATTR, and a\n"
+    "        // ⚠ Relaxed for a STACKABLE STATE (2026-10-02): `max_stacks` is otherwise refused on every op but MODIFY_ATTR, and a\n"
     "        // stackable state needs a cap -- that is the whole point of \"counted into that state\".\n"
     "        if (!Boolean.TRUE.equals(effect.getStackable())\n"
     "                && (effect.getMaxStacks() != null || effect.getStacks() != null)) {",

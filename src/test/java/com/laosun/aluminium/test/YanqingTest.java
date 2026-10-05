@@ -21,7 +21,7 @@ public class YanqingTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The Skill applies the state AND its two modifiers, all on himself, all for the document's one turn. */
+    /** ⚠ The Skill applies the state AND its two modifiers, all on himself, all for the document's one turn. */
     @Test
     public void theSkillSyncsAndRaisesBothCritStats() {
         Character yanqing = CharacterFactory.create(YANQING, LEVEL);
@@ -33,34 +33,34 @@ public class YanqingTest {
 
         battle.fireTriggers(TriggerEvent.SKILL_CAST, yanqing, enemy, 0, 0);
 
-        Assertions.assertTrue(yanqing.getBuffManager().hasState("\u667a\u5251\u8fde\u5fc3"),
-                "\u300c\u5e76\u4e3a\u5f66\u537f\u9644\u52a0\u3010\u667a\u5251\u8fde\u5fc3\u3011\u300d");
+        Assertions.assertTrue(yanqing.getBuffManager().hasState("智剑连心"),
+                "「并为彦卿附加【智剑连心】」");
         Assertions.assertEquals(0.2, yanqing.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore, 1e-9,
-                "\u300c\u4e3a\u81ea\u8eab\u63d0\u9ad820.00%\u66b4\u51fb\u7387\u300d");
+                "「为自身提高20.00%暴击率」");
         Assertions.assertEquals(0.3, yanqing.getAttribute(AttributeType.CRIT_ATTACK).get() - dmgBefore, 1e-9,
-                "\u300c\u548c30%\u66b4\u51fb\u4f24\u5bb3\u300d");
+                "「和30%暴击伤害」");
     }
 
-    /** \u26a0 The Ultimate's conditional half: +50% CRIT DMG ONLY while the state is up. */
+    /** ⚠ The Ultimate's conditional half: +50% CRIT DMG ONLY while the state is up. */
     @Test
     public void theUltimateAddsCritDamageOnlyWhileSynced() {
         double synced = ultCritDamageGain(true);
         double unsynced = ultCritDamageGain(false);
 
         Assertions.assertEquals(0.5, synced, 1e-9,
-                "\u300c\u82e5\u5f66\u537f\u5904\u4e8e\u3010\u667a\u5251\u8fde\u5fc3\u3011\u6548\u679c\uff0c\u5219\u4f7f\u5176\u66b4\u51fb\u4f24\u5bb3\u989d\u5916\u63d0\u9ad850%\u300d");
+                "「若彦卿处于【智剑连心】效果，则使其暴击伤害额外提高50%」");
         Assertions.assertEquals(0.0, unsynced, 1e-9,
                 "without the state the extra 50% must not be granted");
     }
 
-    /** \u26a0 A 60% chance, pinned from both sides by the fixture: 0.0 always fires, 1.0 never does. */
+    /** ⚠ A 60% chance, pinned from both sides by the fixture: 0.0 always fires, 1.0 never does. */
     @Test
     public void theFollowUpChanceIsPinnedByTwoFixtures() {
         double always = followUpLoss(0.0);
         double never = followUpLoss(1.0);
 
         Assertions.assertTrue(always > 0,
-                "\u300c\u670960%\u7684\u56fa\u5b9a\u6982\u7387\u53d1\u52a8\u8ffd\u52a0\u653b\u51fb\u300d: a 0.0 roll is below 0.6, so it MUST fire");
+                "「有60%的固定概率发动追加攻击」: a 0.0 roll is below 0.6, so it MUST fire");
         Assertions.assertEquals(0.0, never, 1e-9,
                 "a 1.0 roll is not below 0.6, so it must not fire -- which is what makes this a test of the CHANCE and not of the damage");
     }
@@ -73,7 +73,7 @@ public class YanqingTest {
         battle.startBattle();
         if (synced) {
             // The state is applied DIRECTLY, so the Skill's own CRIT modifiers cannot interfere: this clause is about the Ultimate alone.
-            yanqing.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("\u667a\u5251\u8fde\u5fc3", 1, false));
+            yanqing.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("智剑连心", 1, false));
         }
         double before = yanqing.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.fireTriggers(TriggerEvent.ULT_CAST, yanqing, enemy, 0, 0);

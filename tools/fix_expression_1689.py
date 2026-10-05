@@ -4,7 +4,7 @@ import sys
 
 PATH = "EXPRESSION.md"
 text = io.open(PATH, encoding="utf-8").read()
-OLD = "`GiftCarriesTheLaughsTest`\u3001`KaiBuBaiTest` |"
+OLD = "`GiftCarriesTheLaughsTest`、`KaiBuBaiTest` |"
 NEW = "`GiftCarriesTheLaughsTest` |"
 if text.count(OLD) != 1:
     sys.exit("REFUSING: the anchor appears %d times" % text.count(OLD))

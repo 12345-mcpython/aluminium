@@ -25,7 +25,7 @@ rules.append({
     "when": ["target == self", "actor is_summon", "from_skill_id == 23"],
     "do": [{"op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.25, "permanent": True, "target": "self"}],
     "source": "DIAGNOSTIC: a LITERAL share on CRIT_ATTACK.",
-    "note": "\u26a0 \u4e34\u65f6\u63a2\u9488\u3002",
+    "note": "⚠ 临时探针。",
 })
 rules.append({
     "id": "probe_attack_derived",
@@ -33,7 +33,7 @@ rules.append({
     "when": ["target == self", "actor is_summon", "from_skill_id == 23"],
     "do": [{"op": "MODIFY_ATTR", "attribute": "ATTACK", "percent_from_cast_param": 0, "permanent": True, "target": "self"}],
     "source": "DIAGNOSTIC: a DERIVED share on ATTACK.",
-    "note": "\u26a0 \u4e34\u65f6\u63a2\u9488\u3002",
+    "note": "⚠ 临时探针。",
 })
 if isinstance(doc, list):
     out = rules

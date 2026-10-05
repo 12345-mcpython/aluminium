@@ -25,7 +25,7 @@ public class TribbieZoneStateTest {
     private static final int LEVEL = 80;
     private static final int TRIBBIE = 1403;
     private static final int MONSTER = 1002011;
-    private static final String ZONE = "\u7ed3\u754c";
+    private static final String ZONE = "结界";
 
     @Test
     public void theZoneIsAStateThatEndsOnItsOwn() {
@@ -51,7 +51,7 @@ public class TribbieZoneStateTest {
         System.out.println("[zone_state] right after the ultimate = " + afterUlt
                 + " ; after two of his turns = " + afterTwoTurns);
 
-        Assertions.assertTrue(afterUlt, "\u300c\u5f00\u542f\u3010" + ZONE + "\u3011\u300d-- the state says the zone is open");
-        Assertions.assertFalse(afterTwoTurns, "\u300c\u3010" + ZONE + "\u3011\u6301\u7eed #4 \u56de\u5408\u300d-- #4 is 2 at every level, so it must end");
+        Assertions.assertTrue(afterUlt, "「开启【" + ZONE + "】」-- the state says the zone is open");
+        Assertions.assertFalse(afterTwoTurns, "「【" + ZONE + "】持续 #4 回合」-- #4 is 2 at every level, so it must end");
     }
 }

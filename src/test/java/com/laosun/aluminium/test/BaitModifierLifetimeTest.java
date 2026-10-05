@@ -37,7 +37,7 @@ public class BaitModifierLifetimeTest {
     private static void install(Character bait) {
         EffectSpec strip = new EffectSpec();
         TriggerSpecs.set(strip, "op", "REMOVE_STATE");
-        TriggerSpecs.set(strip, "buff", "\u9972\u997c_state");      // ⚠ read below, not typed twice
+        TriggerSpecs.set(strip, "buff", "饲饼_state");      // ⚠ read below, not typed twice
         EffectSpec cut = new EffectSpec();
         TriggerSpecs.set(cut, "op", "MODIFY_DAMAGE_TAKEN");
         TriggerSpecs.set(cut, "percent", 0.4);
@@ -45,7 +45,7 @@ public class BaitModifierLifetimeTest {
         TriggerSpecs.set(cut, "target", "all_enemies");
         EffectSpec mark = new EffectSpec();
         TriggerSpecs.set(mark, "op", "APPLY_BUFF");
-        TriggerSpecs.set(mark, "buff", "\u9972\u997c_state");
+        TriggerSpecs.set(mark, "buff", "饲饼_state");
         TriggerSpecs.set(mark, "permanent", true);
         TriggerSpecs.set(mark, "target", "target");
         bait.setTriggerTable(new TriggerTable(BAIT, List.of(

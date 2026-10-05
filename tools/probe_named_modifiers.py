@@ -3,7 +3,7 @@
 Mechanism found in `modifyAttr`: an attribute modifier with a duration is a BUFF, and an UNNAMED one shares its identity
 with any other unnamed modifier for the same attribute, so the second replaces the first (measured: 0.2, never 0.4). The
 code's own comment says naming is what lets the state loop address a modifier, and content already names them elsewhere
-(1306's `"buff": "\u53d9\u8ff0\u6027\u8be1\u8ba1"`). So this probe gives each rule its own name and asserts 0.4.
+(1306's `"buff": "叙述性诡计"`). So this probe gives each rule its own name and asserts 0.4.
 
 One number changes between the two readings: the buff names. That is the mutation this capability has to survive.
 ASCII only.
@@ -30,21 +30,21 @@ import java.util.Random;
 /**
  * Two +20% rules on one attribute, each with its OWN buff name (1415, 2026-10-02).
  *
- * <p>\u26a0 Measured before this: with both unnamed the total is 0.2 -- an unnamed modifier shares its identity with any other
+ * <p>⚠ Measured before this: with both unnamed the total is 0.2 -- an unnamed modifier shares its identity with any other
  * unnamed modifier on the same attribute, so the second replaces the first. Naming them is what makes them two.
  */
 public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Named modifiers add; the names are the only difference from the failing reading. */
+    /** ⭐ Named modifiers add; the names are the only difference from the failing reading. */
     @Test
     public void namedModifiersAdd() {
         Assertions.assertEquals(0.4, total(true), 1e-6,
                 "two named +20% modifiers on one attribute must sum to 0.4");
     }
 
-    /** \u26a0 And without names they do not -- the behaviour this capability exists to avoid. */
+    /** ⚠ And without names they do not -- the behaviour this capability exists to avoid. */
     @Test
     public void unnamedModifiersReplace() {
         Assertions.assertEquals(0.2, total(false), 1e-6,

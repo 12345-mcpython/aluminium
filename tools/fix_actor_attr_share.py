@@ -5,7 +5,7 @@ old = """            return effect.getPercent() * subject.getAttribute(from).get
                     + (effect.getAmount() == null ? 0 : effect.getAmount());"""
 if txt.count(old) != 1:
     sys.exit("REFUSING: the actor_attr return occurs %d times" % txt.count(old))
-new = """            // \u26a0\u26a0 The share, not `percent` raw: this branch was written before `shareOf` existed, and left reading `percent`
+new = """            // ⚠⚠ The share, not `percent` raw: this branch was written before `shareOf` existed, and left reading `percent`
             // directly -- so a rule whose share is `percent_from_cast_param` crashed on a null here. Same fix as its sibling below.
             return shareOf(effect, ctx) * subject.getAttribute(from).get()
                     + (effect.getAmount() == null ? 0 : effect.getAmount());"""

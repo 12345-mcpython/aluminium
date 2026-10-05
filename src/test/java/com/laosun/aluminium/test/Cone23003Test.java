@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 23003: an Ultimate aimed at an ALLY restores one skill point -- but only every second such Ultimate.
  *
- * <p>\u2b50 A two-step counter, and the threshold is 2 rather than 1 on purpose: the rules of one event are evaluated IN ORDER and
+ * <p>⭐ A two-step counter, and the threshold is 2 rather than 1 on purpose: the rules of one event are evaluated IN ORDER and
  * see each other's effects, so a threshold of 1 paid on EVERY cast (measured: points 1/2/3 after the first three). With the
  * threshold at 2 the first cast's increment is invisible to the payout, and the same-pass evaluation is harmless.
  */
@@ -28,7 +28,7 @@ public class Cone23003Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String COUNT = "\u7ec8\u7ed3\u8ba1\u6570";
+    private static final String COUNT = "终结计数";
 
     private Character wearer;
     private Enemy enemy;
@@ -97,7 +97,7 @@ public class Cone23003Test {
         int counted = wearer.getBuffManager().stacksOf(COUNT);
         System.out.println("[23003] after an ultimate aimed at an ENEMY: counter=" + counted
                 + " points=" + battle.getSkillPoints());
-        Assertions.assertEquals(0, counted, "\u5bf9\u6211\u65b9\u76ee\u6807 (false case)");
+        Assertions.assertEquals(0, counted, "对我方目标 (false case)");
         Assertions.assertEquals(0, battle.getSkillPoints(), "and nothing is paid");
     }
 

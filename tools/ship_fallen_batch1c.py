@@ -29,7 +29,7 @@ def patch(path, old, new, label, count=1):
 patch(
     PHAINON,
     '''        Assertions.assertEquals(0, coreflameOf(phainon), "the document states no initial value, so it starts at 0");''',
-    '''        // \u26a0 Updated 2026-10-02: the document DOES state one -- her trace 1408101 \u300c\u6218\u6597\u5f00\u59cb\u65f6\uff0c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011\u300d, which is
+    '''        // ⚠ Updated 2026-10-02: the document DOES state one -- her trace 1408101 「战斗开始时，获得 1 点【火种】」, which is
         // now written, so the pool opens at one. The reading is unchanged in kind: it starts where the sentences say.
         Assertions.assertEquals(1, coreflameOf(phainon),
                 "\\u300c\\u6218\\u6597\\u5f00\\u59cb\\u65f6\\uff0c\\u83b7\\u5f97 1 \\u70b9\\u3010\\u706b\\u79cd\\u3011\\u300d");''',
@@ -47,23 +47,23 @@ patch(
 
 patch(
     OVERFLOW,
-    """    /** \u2b50 Past the maximum: seven casts reach fourteen, which a cap of twelve could never allow. */
+    """    /** ⭐ Past the maximum: seven casts reach fourteen, which a cap of twelve could never allow. */
     @Test
     public void thePoolGoesPastItsMaximum() {
         Assertions.assertEquals(14.0, afterCasts(7), 1e-9,
-                "\u300c\u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6ea2\u51fa\u300d-- 14 is above the declared max of 12");
+                "「达到上限后还可溢出」-- 14 is above the declared max of 12");
     }""",
     """    /**
-     * \u2b50 Past the maximum: six casts reach thirteen, which a cap of twelve could never allow.
+     * ⭐ Past the maximum: six casts reach thirteen, which a cap of twelve could never allow.
      *
-     * <p>\u26a0 Updated 2026-10-02: \u300c\u6218\u6597\u5f00\u59cb\u65f6\uff0c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011\u300d is now written (trace 1408101), so the pool opens at one. Seven casts
+     * <p>⚠ Updated 2026-10-02: 「战斗开始时，获得 1 点【火种】」 is now written (trace 1408101), so the pool opens at one. Seven casts
      * would then sit exactly ON the ceiling of 15 and stop isolating "past twelve" -- six reads 1 + 12 = 13, which is the same
      * reading the judge was written for.
      */
     @Test
     public void thePoolGoesPastItsMaximum() {
         Assertions.assertEquals(13.0, afterCasts(6), 1e-9,
-                "\u300c\u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6ea2\u51fa\u300d-- 1 + 12 = 13 is above the declared max of 12");
+                "「达到上限后还可溢出」-- 1 + 12 = 13 is above the declared max of 12");
     }""",
     "the overflow reading moves to six casts",
 )

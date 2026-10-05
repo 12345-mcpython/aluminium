@@ -53,7 +53,7 @@ public class ConeAuraPartyTest {
                 + " ratio=" + (watched / alone));
         Assertions.assertEquals(0.92, watched / alone, 1e-6, "the party takes 8% less");
         Assertions.assertEquals(1.0, control / alone, 1e-6, "without the cone the reading is untouched (false case)");
-        // \u26a0 Same lesson as 23011: pin the duration, or shortening it is invisible to this judge.
+        // ⚠ Same lesson as 23011: pin the duration, or shortening it is invisible to this judge.
         Character owner = wearer(21023);
         int pinned = 0;
         for (var r : owner.getTriggerTable().matching(TriggerEvent.BATTLE_START,
@@ -89,7 +89,7 @@ public class ConeAuraPartyTest {
         double after = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[23011] after the WEARER was hurt: boost " + before + " -> " + after);
         Assertions.assertEquals(before + 0.09, after, 1e-9, "the wearer losing HP raises the party's damage by 9 points");
-        // \u26a0 Durations must be PINNED: every reading above happens in the same turn, so shortening one changes
+        // ⚠ Durations must be PINNED: every reading above happens in the same turn, so shortening one changes
         // nothing (measured: 2 -> 1 turn gave reds 0 until this block existed).
         int pinned = 0;
         for (var r : wearer.getTriggerTable().matching(TriggerEvent.HP_LOST,

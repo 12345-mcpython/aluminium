@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** \u300c\u6fc0\u6d3b\u5168\u4f53\u961f\u53cb\u7684\u7ec8\u7ed3\u6280\u300d (2026-10-02). */
+/** 「激活全体队友的终结技」 (2026-10-02). */
 public class UltimateActivationTest {
     @Test
     public void herUltimateMakesTheOthersReady() {

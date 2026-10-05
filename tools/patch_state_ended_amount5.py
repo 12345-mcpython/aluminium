@@ -4,7 +4,7 @@ Two edits on the current tree:
   1. `fireStateEnded(carrier, name, magnitude)` -- the overload the ready-made patch adds;
   2. `removeState` counts the matching instances FIRST, fires ONCE with that total, then removes them.
 
-\u26a0 How this differs from the round that broke: the in-loop firing is removed by matching the exact three-line block, and
+⚠ How this differs from the round that broke: the in-loop firing is removed by matching the exact three-line block, and
 there is NO "tidy up empty guards" regex here -- that is what silently deleted the inserted block last time, with a green
 compile. The script prints both regions at the end so the code can be read rather than trusted.
 """
@@ -40,8 +40,8 @@ B_NEW = """    public void fireStateEnded(CanHit carrier, String stateName) {
     }
 
     /**
-     * \u2b50 The same moment, carrying <b>how many instances of that state</b> the carrier held (2026-10-02; reader: 1505's
-     * \u300c\u5f00\u4e0d\u8d25\u300d). \u26a0 The caller reads the count BEFORE removing the buffs: by the time this fires the state is
+     * ⭐ The same moment, carrying <b>how many instances of that state</b> the carrier held (2026-10-02; reader: 1505's
+     * 「开不败」). ⚠ The caller reads the count BEFORE removing the buffs: by the time this fires the state is
      * already gone, which is why the name itself rides on the event too.
      */
     public void fireStateEnded(CanHit carrier, String stateName, int magnitude) {
@@ -59,7 +59,7 @@ M_OLD = """        String wanted = state.trim();
         int removed = 0;"""
 M_NEW = """        String wanted = state.trim();
         int removed = 0;
-        // \u2b50 ONE announcement per sweep, carrying the total (2026-10-02; reader: 1505's \u300c\u5f00\u4e0d\u8d25\u300d). A sweep can take
+        // ⭐ ONE announcement per sweep, carrying the total (2026-10-02; reader: 1505's 「开不败」). A sweep can take
         // several instances of one state, and the sentence turns a share of \"it\" into something -- so it must see the total
         // once, not three shrinking numbers.
         int ending = 0;

@@ -26,7 +26,7 @@ public class FuXuanTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 【避厄】's 18% reduction, in the measured convention: damage x (1 - 0.18), compared with a hand-built -36% rule. */
+    /** ⚠ 【避厄】's 18% reduction, in the measured convention: damage x (1 - 0.18), compared with a hand-built -36% rule. */
     @Test
     public void misfortuneAvoidanceCutsTheDamageTheTeamTakes() {
         double plain = hitLoss(false);
@@ -40,7 +40,7 @@ public class FuXuanTest {
                 "18% against a hand-built 36% must be half the reduction");
     }
 
-    /** \u26a0 【鉴知】: 6% of HER max HP as extra max HP, and +12% crit rate, on an ally. */
+    /** ⚠ 【鉴知】: 6% of HER max HP as extra max HP, and +12% crit rate, on an ally. */
     @Test
     public void knowledgeRaisesMaxHpByHerShareAndCritRate() {
         Character fuxuan = CharacterFactory.create(FUXUAN, LEVEL);
@@ -54,12 +54,12 @@ public class FuXuanTest {
 
         battle.castImmediate(fuxuan.getSkills().get(SkillType.SKILL), fuxuan, List.of(ally));
 
-        Assertions.assertTrue(ally.getBuffManager().hasState("\u9274\u77e5"),
-                "\u300c\u5904\u4e8e\u3010\u7a77\u89c2\u9635\u3011\u7684\u6211\u65b9\u5168\u4f53\u83b7\u5f97\u3010\u9274\u77e5\u3011\u300d");
+        Assertions.assertTrue(ally.getBuffManager().hasState("鉴知"),
+                "「处于【穷观阵】的我方全体获得【鉴知】」");
         Assertions.assertEquals(expected, ally.getAttribute(AttributeType.HEALTH).get() - hpBefore, expected * 0.02,
                 "6% of HER max HP: expected " + expected);
         Assertions.assertEquals(0.12, ally.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore, 1e-6,
-                "\u300c\u66b4\u51fb\u7387\u63d0\u9ad812.00%\u300d");
+                "「暴击率提高12.00%」");
     }
 
     /** One fixed hit against an ally, with her talent active or not. */

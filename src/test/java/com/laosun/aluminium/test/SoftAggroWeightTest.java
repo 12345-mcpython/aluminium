@@ -38,7 +38,7 @@ public class SoftAggroWeightTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The ratio multiplies the unit's OWN weight: 100 x (1 + 5) = 600, so two equal allies become 6:1. */
+    /** ⚠ The ratio multiplies the unit's OWN weight: 100 x (1 + 5) = 600, so two equal allies become 6:1. */
     @Test
     public void theRatioMultipliesTheUnitsOwnAggroWeight() {
         Character marked = withAggro(100);
@@ -57,7 +57,7 @@ public class SoftAggroWeightTest {
         Assertions.assertEquals(100.0 / 700, table.get(plain), EPS, "and the other ally is still a candidate");
     }
 
-    /** \u26a0 The guard: a stated change that would zero the weight keeps the weight instead of deleting the unit. */
+    /** ⚠ The guard: a stated change that would zero the weight keeps the weight instead of deleting the unit. */
     @Test
     public void aStatedChangeThatWouldZeroTheWeightDoesNotDeleteTheUnit() {
         Character doomed = withAggro(100);
@@ -72,16 +72,16 @@ public class SoftAggroWeightTest {
         Assertions.assertEquals(1.0, battle.getAggroTable(List.of(doomed)).get(doomed), EPS, "still a legal candidate");
     }
 
-    /** \u26a0 Her Skill's gate, both branches: at or above 30% HP it lands, below it her Skill raises nothing. */
+    /** ⚠ Her Skill's gate, both branches: at or above 30% HP it lands, below it her Skill raises nothing. */
     @Test
     public void herSkillRaisesAggroOnlyWhileTheAimedAllyIsAtThirtyPercentOrMore() {
         Assertions.assertEquals(6.0, aimedAllyWeightRatio(false), 1e-6,
-                "\u300c\u82e5\u8be5\u76ee\u6807\u5f53\u524d\u751f\u547d\u503c\u767e\u5206\u6bd4\u5927\u4e8e\u7b49\u4e8e30%\u300d -- x6 above the gate");
+                "「若该目标当前生命值百分比大于等于30%」 -- x6 above the gate");
         Assertions.assertEquals(1.0, aimedAllyWeightRatio(true), 1e-6,
                 "below 30% the game pins MDF_AggroUp to 0, so the weight must be untouched");
     }
 
-    /** \u26a0 Only the aimed ally is affected, and 星魂 2's battle-start shield carries no aggro at all. */
+    /** ⚠ Only the aimed ally is affected, and 星魂 2's battle-start shield carries no aggro at all. */
     @Test
     public void onlyTheAimedAllyIsAffectedAndTheEidolonShieldIsNot() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
@@ -94,7 +94,7 @@ public class SoftAggroWeightTest {
         battle.castImmediate(march.getSkills().get(SkillType.SKILL), march, List.of(aimed));
 
         Assertions.assertEquals(bystanderBefore, battle.aggroOf(bystander), EPS,
-                "\u300c\u6307\u5b9a\u6211\u65b9\u5355\u4f53\u300d -- only the aimed ally, never the bystander");
+                "「指定我方单体」 -- only the aimed ally, never the bystander");
 
         // 星魂 2 grants a shield at battle start from a DIFFERENT modifier, which has no MDF_AggroUp in the game data.
         Character withEidolon = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);

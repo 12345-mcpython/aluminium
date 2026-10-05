@@ -114,13 +114,13 @@ rules.append({
         "element": "Ice",                # 1415's zone states Ice (1415.json, the 24% rider)
         "target": "target",              # at the unit that took it
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 14 \u300c\u732e\u4e88\u300c\u95e8\u5f84\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 15\uff09\uff1a"
-               "\u300c\u7f07\u5b9d\u65bd\u653e\u8ffd\u52a0\u653b\u51fb\u89e6\u53d1\u7f07\u5b9d\u7684\u7ed3\u754c\u7684\u9644\u52a0\u4f24\u5bb3\u65f6\uff0c"
-               "\u4f1a**\u989d\u5916\u9020\u6210 #1 \u6b21\u9644\u52a0\u4f24\u5bb3**\u3002\u300d"),
-    "note": ("\u2b50 \u4e09\u4ef6\u90fd\u662f**\u73b0\u6210**\u7684\uff1a`times`\uff08DAMAGE op \u5df2\u6536\uff0c\u6ce8\u91ca\u5199\u7740 \"settle N independent times\"\uff09\u3001"
-             "`original_damage`\uff08\u8981\u6c42 `DAMAGE_SETTLED` + `element`\uff0c1003 \u5df2\u5728\u7528\uff09\u3001\u4ee5\u53ca `FOLLOW_UP`/`ADDITIONAL` \u8fd9\u6761**\u552f\u4e00\u5165\u53e3**\u3002"
-             "\u2b50 \u800c `damage_is_additional` \u662f**\u672c\u8f6e\u65b0\u589e**\u7684\u2014\u2014\u5b83\u662f `damage_is_attack` \u7684\u8865\u9762\uff0c"
-             "\u4e4b\u6240\u4ee5\u5fc5\u987b\u662f\u72ec\u7acb\u5173\u952e\u5b57\uff0c`TriggerTable` \u91cc\u8bb0\u7740\u539f\u56e0\uff1a\u5426\u5b9a\u53ea\u5bf9\u961f\u4f0d\u6761\u4ef6\u5f00\u653e\u3002"),
+    "source": ("1415 昔涟 忆灵技能 14 「献予「门径」之诗」（数据槽位 15）："
+               "「缇宝施放追加攻击触发缇宝的结界的附加伤害时，"
+               "会**额外造成 #1 次附加伤害**。」"),
+    "note": ("⭐ 三件都是**现成**的：`times`（DAMAGE op 已收，注释写着 \"settle N independent times\"）、"
+             "`original_damage`（要求 `DAMAGE_SETTLED` + `element`，1003 已在用）、以及 `FOLLOW_UP`/`ADDITIONAL` 这条**唯一入口**。"
+             "⭐ 而 `damage_is_additional` 是**本轮新增**的——它是 `damage_is_attack` 的补面，"
+             "之所以必须是独立关键字，`TriggerTable` 里记着原因：否定只对队伍条件开放。"),
 })
 
 if isinstance(doc, list):

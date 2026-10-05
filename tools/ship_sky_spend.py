@@ -18,12 +18,12 @@ import sys
 HYACINE = "src/main/resources/characters/1409.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 19
-MARK = "\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7"
+MARK = "献予「天空」之诗"
 
 doc = json.load(io.open(HYACINE, encoding="utf-8"))
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
 
-for slot, label in ((2, "\u6218\u6280"), (3, "\u7ec8\u7ed3\u6280")):
+for slot, label in ((2, "战技"), (3, "终结技")):
     rid = "casting_%s_spends_one_layer_of_the_sky_ode" % ("a_skill" if slot == 2 else "the_ultimate")
     if any(r.get("id") == rid for r in rules):
         sys.exit("REFUSING: %s is already there" % rid)
@@ -32,12 +32,12 @@ for slot, label in ((2, "\u6218\u6280"), (3, "\u7ec8\u7ed3\u6280")):
         "on": "SKILL_CAST",
         "when": ["self has_state " + MARK, "from_skill_id == " + str(slot)],
         "do": [{"op": "REMOVE_STACK", "buff": MARK, "amount": 1, "target": "self"}],
-        "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 19\uff0cSkillID 1141519\uff09\uff1a"
-                   "\u300c**\u98ce\u5807\u65bd\u653e" + label + "\u540e\uff0c\u6d88\u80171\u5c42\u3010" + MARK + "\u3011**\u3002\u300d"),
-        "note": ("\u2b50 \u300c\u6218\u6280/\u7ec8\u7ed3\u6280\u300d\u2192 **\u4e24\u6761\u89c4\u5219**\uff08\u69fd\u4f4d 2 \u4e0e 3\uff09\uff1a`from_skill_id` \u6bd4\u7684\u662f "
-                 "`ctx.skillId()`\uff0c\u800c\u5b83\u662f**\u5355\u503c**\uff08**\u5b9e\u6d4b**\uff1a\u51fa\u8d27\u8bfb\u8005 `1111.json` \u5199 `\"from_skill_id == 8\"`\uff09"
-                 "\u2014\u2014 \u4e0d\u53d1\u660e\u4e00\u4e2a\u201c\u4efb\u4e00\u201d\u62fc\u6cd5\u3002"
-                 "\u2b50 \u72b6\u6001\u5728**\u5979\u81ea\u5df1**\u8eab\u4e0a\uff08\u4e0a\u4e00\u8f6e\u51fa\u8d27\uff09\uff0c\u6240\u4ee5 `target: \"self\"`\u3002"),
+        "source": ("1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）："
+                   "「**风堇施放" + label + "后，消耗1层【" + MARK + "】**。」"),
+        "note": ("⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 "
+                 "`ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）"
+                 "—— 不发明一个“任一”拼法。"
+                 "⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。"),
     })
     print("ok   rule for %s (slot %d)" % (label, slot))
 
@@ -51,8 +51,8 @@ print("ok   1409 now carries %d rules" % len(rules))
 
 effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) in effects.get("11415", {}):
-    effects["11415"][str(SLOT)]["note"] = ("\u2b50 2026-10-02\uff1a**\u56db\u53e5\u91cc\u5df2\u6709\u4e09\u53e5**\u6210\u53e5\uff08\u5c42\u6570\u3001\u80fd\u91cf\u3001\u6d88\u8017\uff09\uff1b"
-                                           "\u5269\u4e0b\u4e00\u53e5\u662f\u201c\u6cbb\u7597\u6570\u503c\u8ba1\u5165\u5c0f\u4f0a\u5361\u2026\u201d\u3002")
+    effects["11415"][str(SLOT)]["note"] = ("⭐ 2026-10-02：**四句里已有三句**成句（层数、能量、消耗）；"
+                                           "剩下一句是“治疗数值计入小伊卡…”。")
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json 11415/%d note updated" % SLOT)
 
@@ -74,9 +74,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19, THIRD sentence: \u300c\u98ce\u5807\u65bd\u653e\u6218\u6280/\u7ec8\u7ed3\u6280\u540e\uff0c\u6d88\u80171\u5c42\u3010\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u3011\u300d (2026-10-02).
+ * 1415's memosprite skill 19, THIRD sentence: 「风堇施放战技/终结技后，消耗1层【献予「天空」之诗】」 (2026-10-02).
  *
- * <p>\u2b50 The reading discriminates the SLOT gate three ways in one battle: casting her SKILL (slot 2) spends a layer, casting her ULTIMATE (slot 3) spends another, and casting
+ * <p>⭐ The reading discriminates the SLOT gate three ways in one battle: casting her SKILL (slot 2) spends a layer, casting her ULTIMATE (slot 3) spends another, and casting
  * her BASIC (slot 1) spends none. A rule that fired on any cast -- or on a wrong slot -- cannot pass all three.
  */
 public class SkyOdeSpendTest {
@@ -113,7 +113,7 @@ public class SkyOdeSpendTest {
         System.out.println("[sky_spend] layers after basic = " + afterBasic + " ; after skill = " + afterSkill
                 + " ; after ultimate = " + afterUlt);
 
-        Assertions.assertEquals(3, afterBasic, "\\u300c\\u6218\\u6280/\u7ec8\\u7ed3\\u6280\\u300d-- a BASIC is neither, so it must not spend");
+        Assertions.assertEquals(3, afterBasic, "\\u300c\\u6218\\u6280/终\\u7ed3\\u6280\\u300d-- a BASIC is neither, so it must not spend");
         Assertions.assertEquals(2, afterSkill, "\\u6218\\u6280 (slot 2) spends one");
         Assertions.assertEquals(1, afterUlt, "\\u7ec8\\u7ed3\\u6280 (slot 3) spends another");
     }

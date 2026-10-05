@@ -43,11 +43,11 @@ public class ArcadiaDamageTest {
 
     @Test
     public void theMemoSpriteIsBoostedToo() {
-        // \u26a0 In targets: three characters plus the 忆灵 would be four (nothing missing), so the boosted case is two characters.
+        // ⚠ In targets: three characters plus the 忆灵 would be four (nothing missing), so the boosted case is two characters.
         double fourTargets = memospriteDamage(3);
         double threeTargets = memospriteDamage(2);
         double ratio = threeTargets / fourTargets;
-        // \u26a0 Measured 1.08, not 1.12: the memosprite also carries 1413's own enemy-count talent in another zone, which compresses the
+        // ⚠ Measured 1.08, not 1.12: the memosprite also carries 1413's own enemy-count talent in another zone, which compresses the
         // ratio -- the same effect round 65 measured when a 1.48 zone ratio read 1.1404 on a skill hit. The attribute assertion inside
         // `memospriteDamage` is the exact one; this proves the boost reaches real damage.
         Assertions.assertTrue(fourTargets > 0, "precondition: the 忆灵 landed both hits");
@@ -64,7 +64,7 @@ public class ArcadiaDamageTest {
         return wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
-    /** \u26a0 Takes the number of CHARACTERS: the 忆灵 adds one more target. */
+    /** ⚠ Takes the number of CHARACTERS: the 忆灵 adds one more target. */
     private static double memospriteDamage(int allies) {
         Character master = CharacterFactory.create(MEMOSPRITE_OWNER, LEVEL, true, null,
                 RelicFactory.suit(321, 5, RELIC_LEVEL));
@@ -94,7 +94,7 @@ public class ArcadiaDamageTest {
         return dealt;
     }
 
-    /** \u26a0 A whole turn: SUMMONED and TURN_START both come out of a settle, so nothing may be read without one. */
+    /** ⚠ A whole turn: SUMMONED and TURN_START both come out of a settle, so nothing may be read without one. */
     private static void driveTurn(Battle battle, Character unit) {
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

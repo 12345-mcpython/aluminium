@@ -24,7 +24,7 @@ public class FireflyTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 25% of the REMAINING wait is skipped: what is left is 0.75 of what it was, and nothing moves without firing. */
+    /** ⚠ 25% of the REMAINING wait is skipped: what is left is 0.75 of what it was, and nothing moves without firing. */
     @Test
     public void theSkillLeavesThreeQuartersOfTheWait() {
         Character firefly = CharacterFactory.create(FIREFLY, LEVEL);
@@ -38,10 +38,10 @@ public class FireflyTest {
         double after = remaining(battle, firefly);
 
         Assertions.assertEquals(0.75, after / before, 1e-6,
-                "\u300c\u4f7f\u81ea\u8eab\u4e0b\u4e00\u6b21\u884c\u52a8\u63d0\u524d25%\u300d: " + before + " -> " + after);
+                "「使自身下一次行动提前25%」: " + before + " -> " + after);
     }
 
-    /** \u26a0 100% means the wait is gone. */
+    /** ⚠ 100% means the wait is gone. */
     @Test
     public void theUltimateRemovesTheWaitEntirely() {
         Character firefly = CharacterFactory.create(FIREFLY, LEVEL);
@@ -54,7 +54,7 @@ public class FireflyTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, firefly, enemy, 0, 0);
 
         Assertions.assertEquals(0.0, remaining(battle, firefly), 1e-6,
-                "\u300c\u81ea\u8eab\u884c\u52a8\u63d0\u524d100%\u300d: " + before + " -> 0");
+                "「自身行动提前100%」: " + before + " -> 0");
     }
 
     /** The owner's remaining wait, read off the queue's public snapshot. */

@@ -36,9 +36,9 @@ public class MoonConsumedTest {
         // ⚠ The entry rule listens on SKILL_CAST and its condition is `>= 2` layers, so the event that PUSHES the count to two cannot be the
         // one that observes it: one more SKILL_CAST is what actually fires the entry (round 228/240).
         battle.fireTriggers(TriggerEvent.SKILL_CAST, observer, enemy, 0, 0);
-        System.out.println("[1212] syzygy=" + observer.getBuffManager().stacksOf("\u6714\u671b")
-                + " inZhuanpo=" + observer.getBuffManager().hasState("\u8f6c\u9b44"));
-        Assertions.assertTrue(observer.getBuffManager().hasState("\u8f6c\u9b44"),
+        System.out.println("[1212] syzygy=" + observer.getBuffManager().stacksOf("朔望")
+                + " inZhuanpo=" + observer.getBuffManager().hasState("转魄"));
+        Assertions.assertTrue(observer.getBuffManager().hasState("转魄"),
                 "precondition: two layers of Syzygy put her into Zhuanpo");
         return battle;
     }
@@ -50,7 +50,7 @@ public class MoonConsumedTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = ready(observer, payer, enemy);
         battle.fireTriggers(TriggerEvent.SKILL_CAST, payer, enemy, 0, 0);
-        int layers = observer.getBuffManager().stacksOf("\u6708\u8272");
+        int layers = observer.getBuffManager().stacksOf("月色");
         System.out.println("[1212] afterPrice layers=" + layers + " payerHp=" + payer.getCurrentHp());
         Assertions.assertEquals(1, layers, "paying an HP price stacks one layer of Moon");
     }
@@ -62,9 +62,9 @@ public class MoonConsumedTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = ready(observer, payer, enemy);
         battle.applyDamage(observer, new Damage(enemy, observer, DamageElement.PHYSICAL, DamageType.NORMAL, 40));
-        int afterHit = observer.getBuffManager().stacksOf("\u6708\u8272");
+        int afterHit = observer.getBuffManager().stacksOf("月色");
         battle.fireTriggers(TriggerEvent.SKILL_CAST, payer, enemy, 0, 0);
-        int afterPrice = observer.getBuffManager().stacksOf("\u6708\u8272");
+        int afterPrice = observer.getBuffManager().stacksOf("月色");
         System.out.println("[1212] afterHit=" + afterHit + " afterPrice=" + afterPrice);
         Assertions.assertEquals(1, afterPrice - afterHit, "only the price half is driven here");
     }

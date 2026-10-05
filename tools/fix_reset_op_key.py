@@ -31,7 +31,7 @@ old_t = '    public List<CompiledRule> rulesFor(TriggerEvent event) {'
 new_t = ('    /**' + NL
          + '     * The limiter key of the rule carrying this id, or {@code null} when this table has no such id.' + NL
          + '     *' + NL
-         + '     * <p>\u26a0 An id is optional and a key is not -- that is why both exist (see {@link CompiledRule}), and why' + NL
+         + '     * <p>⚠ An id is optional and a key is not -- that is why both exist (see {@link CompiledRule}), and why' + NL
          + '     * a caller holding an id cannot clear a limit without this lookup. Seven shipped rules have no id at all.' + NL
          + '     */' + NL
          + '    public String keyOf(String id) {' + NL

@@ -10,10 +10,10 @@ PARAMETERS (measured, `skills.json` -> 1404/4/param_list, first row): `[0.15, 0,
 #4 = 0.5, #5 = 0.5. The project authors rules at the FIRST row and raises skill levels with `level_convention` (which 1404 already
 has), so the first row is the right one here.
 
-\u2b50 WHY THE EXIT IS EXACT: the full text names exactly ONE way out of 【血仇】 -- this lethal clause -- so `permanent: true` plus an
+⭐ WHY THE EXIT IS EXACT: the full text names exactly ONE way out of 【血仇】 -- this lethal clause -- so `permanent: true` plus an
 explicit `REMOVE_STATE` here is the sentence, not a shortcut.
 
-\u26a0 REGISTERED, not shipped, from the same paragraph: the state's own stat block (「生命上限提高，数值等同于**当前**生命上限的 #5%」 and
+⚠ REGISTERED, not shipped, from the same paragraph: the state's own stat block (「生命上限提高，数值等同于**当前**生命上限的 #5%」 and
 「**防御力保持为0**」), and 「每损失1%生命值积攒1点充能」 (a ratio of HP lost to max HP, which has no effect-level spelling), and
 「充能达到 #3 点时…获得 1 个额外回合并自动施放【弑神登神】」.
 ASCII only.
@@ -25,8 +25,8 @@ DATA = "src/main/resources/characters/1404.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/BloodfeudTest.java"
 ENTER = "talent_enters_bloodfeud_at_a_hundred"
 LEAVE = "bloodfeud_survives_a_lethal_blow_and_ends"
-STATE = "\u8840\u4ec7"
-CHARGE = "\u5929\u8d4b\u5145\u80fd"
+STATE = "血仇"
+CHARGE = "天赋充能"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 isObject = isinstance(doc, dict)
@@ -44,11 +44,11 @@ rules.append({
            {"op": "APPLY_BUFF", "buff": STATE, "permanent": True, "target": "self"},
            {"op": "HEAL", "scale": "owner_max_hp", "percent": 0.15, "target": "self"},
            {"op": "ADVANCE", "percent": 1.0, "target": "self"}],
-    "source": ("1404 \u4e07\u654c \u5929\u8d4b \u4ee5\u8840\u8fd8\u8840 (140404)\uff1a\u300c**\u5145\u80fd\u8fbe\u5230 100 \u65f6\u6d88\u8017 100 \u70b9\u5145\u80fd\u8fdb\u5165"
-               "\u3010\u8840\u4ec7\u3011\u72b6\u6001**\u5e76\u56de\u590d\u7b49\u540c\u4e8e\u4e07\u654c **15%** \u751f\u547d\u4e0a\u9650\u7684\u751f\u547d\u503c\uff0c\u540c\u65f6**\u884c\u52a8\u63d0\u524d 100%**\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a**\u8fdb\u5165\u3010\u8840\u4ec7\u3011** \u2713\uff08\u9608\u503c 100 \u2713\uff0f\u6d88\u8017 100 \u2713\uff0f\u6cbb\u7597 15% \u2713\uff0f"
-             "\u884c\u52a8\u63d0\u524d 100% \u2713\uff09\u3002\u26a0 **\u4ecd\u767b\u8bb0**\uff1a\u72b6\u6001\u5185\u7684\u5c5e\u6027\u5757\uff08\u751f\u547d\u4e0a\u9650\u63d0\u9ad8\u3001**\u9632\u5fa1\u529b\u4fdd\u6301\u4e3a 0** \u2717\uff09"
-             "\u4e0e\u300c\u6bcf\u635f\u5931 1% \u751f\u547d\u79ef\u6512 1 \u70b9\u5145\u80fd\u300d\u2717\uff08\u6bd4\u503c\u65e0\u6548\u679c\u5c42\u62fc\u6cd5 \u2717\uff09\u3002"),
+    "source": ("1404 万敌 天赋 以血还血 (140404)：「**充能达到 100 时消耗 100 点充能进入"
+               "【血仇】状态**并回复等同于万敌 **15%** 生命上限的生命值，同时**行动提前 100%**」"),
+    "note": ("⭐ 2026-10-02：**进入【血仇】** ✓（阈值 100 ✓／消耗 100 ✓／治疗 15% ✓／"
+             "行动提前 100% ✓）。⚠ **仍登记**：状态内的属性块（生命上限提高、**防御力保持为 0** ✗）"
+             "与「每损失 1% 生命积攒 1 点充能」✗（比值无效果层拼法 ✗）。"),
 })
 rules.append({
     "on": "LETHAL_DAMAGE",
@@ -57,11 +57,11 @@ rules.append({
     "do": [{"op": "SPEND_RESOURCE", "resource": CHARGE, "spendAll": True},
            {"op": "REMOVE_STATE", "buff": STATE, "target": "self"},
            {"op": "HEAL", "scale": "owner_max_hp", "percent": 0.50, "target": "self"}],
-    "source": ("1404 \u4e07\u654c \u5929\u8d4b \u4ee5\u8840\u8fd8\u8840 (140404)\uff1a\u300c\u3010\u8840\u4ec7\u3011\u72b6\u6001\u671f\u95f4\uff0c\u4e07\u654c**\u53d7\u5230\u81f4\u547d\u653b\u51fb\u65f6"
-               "\u4e0d\u4f1a\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\uff0c\u4f46\u4f1a\u6e05\u7a7a\u5145\u80fd\u9000\u51fa\u3010\u8840\u4ec7\u3011\u72b6\u6001**\u5e76\u56de\u590d\u7b49\u540c\u4e8e\u81ea\u8eab **50%** \u751f\u547d\u4e0a\u9650\u7684\u751f\u547d\u503c\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a\u2b50 **`LETHAL_DAMAGE` \u7684\u7b2c\u516d\u4f4d\u8bfb\u8005** \u2713\uff0c\u800c\u4e14\u662f**\u552f\u4e00\u4f1a\u9000\u51fa\u4e00\u4e2a\u72b6\u6001\u7684** \u2713\u3002"
-             "\u2757 **\u201c\u6e05\u7a7a\u5145\u80fd\u201d\u7528 `spendAll`** \u2713\uff08\u5df2\u51fa\u8d27\u62fc\u6cd5\uff0c\u9996\u4e2a\u8bfb\u8005\u662f `1513` \u2713\uff09\u3002"
-             "\u2757 **\u4e3a\u4f55 `permanent` \u662f\u51c6\u786e\u7684** \u2713\uff1a\u5168\u6587\u53ea\u7ed9\u4e86**\u4e00\u4e2a**\u51fa\u53e3\uff08\u5c31\u662f\u672c\u53e5 \u2713\uff09\u3002"),
+    "source": ("1404 万敌 天赋 以血还血 (140404)：「【血仇】状态期间，万敌**受到致命攻击时"
+               "不会陷入无法战斗状态，但会清空充能退出【血仇】状态**并回复等同于自身 **50%** 生命上限的生命值」"),
+    "note": ("⭐ 2026-10-02：⭐ **`LETHAL_DAMAGE` 的第六位读者** ✓，而且是**唯一会退出一个状态的** ✓。"
+             "❗ **“清空充能”用 `spendAll`** ✓（已出货拼法，首个读者是 `1513` ✓）。"
+             "❗ **为何 `permanent` 是准确的** ✓：全文只给了**一个**出口（就是本句 ✓）。"),
 })
 
 if isObject:
@@ -88,18 +88,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404\uff1a\u3010\u8840\u4ec7\u3011\u2014\u2014\u8fdb\u5165\u5b83\uff0c\u4ee5\u53ca\u7ed3\u675f\u5b83\u7684\u81f4\u547d\u4e00\u51fb (2026-10-02).
+ * 1404：【血仇】——进入它，以及结束它的致命一击 (2026-10-02).
  *
- * <p>\u2b50 ONE VARIABLE: whether \u3010\u8840\u4ec7\u3011 is on when the lethal blow lands. His ultimate grants 20 charge, so five of them reach the
+ * <p>⭐ ONE VARIABLE: whether 【血仇】 is on when the lethal blow lands. His ultimate grants 20 charge, so five of them reach the
  * hundred the entry clause needs -- no test-only shortcut into his resource.
  */
 public class BloodfeudTest {
     private static final int MYDEI = 1404;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u8840\u4ec7";
-    private static final String CHARGE = "\u5929\u8d4b\u5145\u80fd";
+    private static final String STATE = "血仇";
+    private static final String CHARGE = "天赋充能";
 
-    /** \u2b50 A hundred charge enters \u3010\u8840\u4ec7\u3011, and a lethal blow then leaves it -- at half his Max HP. */
+    /** ⭐ A hundred charge enters 【血仇】, and a lethal blow then leaves it -- at half his Max HP. */
     @Test
     public void aLethalBlowEndsItAndHeSurvives() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -110,19 +110,19 @@ public class BloodfeudTest {
 
         chargeToAHundred(battle, him);
         Assertions.assertTrue(him.getBuffManager().hasState(STATE),
-                "\u300c\u5145\u80fd\u8fbe\u5230 100 \u65f6\u6d88\u8017 100 \u70b9\u5145\u80fd\u8fdb\u5165\u3010\u8840\u4ec7\u3011\u72b6\u6001\u300d");
+                "「充能达到 100 时消耗 100 点充能进入【血仇】状态」");
 
         battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
 
-        Assertions.assertFalse(him.isDeath(), "\u300c\u4e0d\u4f1a\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d");
+        Assertions.assertFalse(him.isDeath(), "「不会陷入无法战斗状态」");
         Assertions.assertEquals(him.getMaxHp() * 0.50, him.getCurrentHp(), him.getMaxHp() * 0.01,
-                "\u300c\u56de\u590d\u7b49\u540c\u4e8e\u81ea\u8eab 50% \u751f\u547d\u4e0a\u9650\u7684\u751f\u547d\u503c\u300d");
-        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "\u300c\u9000\u51fa\u3010\u8840\u4ec7\u3011\u72b6\u6001\u300d");
-        Assertions.assertEquals(0.0, him.getResources().value(CHARGE), 1e-9, "\u300c\u6e05\u7a7a\u5145\u80fd\u300d");
+                "「回复等同于自身 50% 生命上限的生命值」");
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "「退出【血仇】状态」");
+        Assertions.assertEquals(0.0, him.getResources().value(CHARGE), 1e-9, "「清空充能」");
     }
 
-    /** \u26a0 Without \u3010\u8840\u4ec7\u3011 the same blow kills him -- the clause is the state's, not his. */
+    /** ⚠ Without 【血仇】 the same blow kills him -- the clause is the state's, not his. */
     @Test
     public void withoutBloodfeudTheBlowKills() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -130,11 +130,11 @@ public class BloodfeudTest {
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no \u3010\u8840\u4ec7\u3011 yet");
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no 【血仇】 yet");
 
         battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
-        Assertions.assertTrue(him.isDeath(), "\u3010\u8840\u4ec7\u3011\u72b6\u6001\u671f\u95f4\u624d\u6709\u8fd9\u4e00\u6761");
+        Assertions.assertTrue(him.isDeath(), "【血仇】状态期间才有这一条");
     }
 
     // ==================================================================

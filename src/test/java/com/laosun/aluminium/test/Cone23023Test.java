@@ -15,7 +15,7 @@ import java.util.List;
  * <p>DEF +40..64%; when the wearer grants a shield to an ally, the wearer's CRIT DAMAGE rises 40..64% for 2 turns; when
  * a follow-up attack hits, the enemies that were hit take 10..16% more damage for 2 turns.
  *
- * <p>\u26a0 The tier axis is the SUPERIMPOSITION RANK (exact rank, no accumulation), so every tier is read at its own rank.
+ * <p>⚠ The tier axis is the SUPERIMPOSITION RANK (exact rank, no accumulation), so every tier is read at its own rank.
  */
 public class Cone23023Test {
     private static final int CONE = 23023;

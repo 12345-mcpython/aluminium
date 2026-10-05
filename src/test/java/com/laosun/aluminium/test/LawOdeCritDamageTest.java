@@ -27,7 +27,7 @@ public class LawOdeCritDamageTest {
     private static final int CERYDRA = 1412;
     private static final int PLAIN = 1002;
     private static final int MONSTER = 1002011;
-    private static final String MARK = "\u519b\u529f";
+    private static final String MARK = "军功";
 
     @Test
     public void onlyTheMarkedAllyGainsTheCritDamage() {
@@ -67,8 +67,8 @@ public class LawOdeCritDamageTest {
                 + " ; unmarked gain = " + plainGain);
 
         Assertions.assertEquals(row.get(0), markedGain, Math.abs(row.get(0)) * 1e-6,
-                "\u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d-- and #1 runs with level");
+                "「持有【军功】的角色暴击伤害提高 #1%」-- and #1 runs with level");
         Assertions.assertEquals(0.0, plainGain, 1e-9,
-                "and an ally WITHOUT it gains nothing -- \u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u300d names a subset");
+                "and an ally WITHOUT it gains nothing -- 「持有【军功】的角色」 names a subset");
     }
 }

@@ -14,7 +14,7 @@ WHY THIS HAD TO WAIT, and what unblocked it (all read, not inferred):
   * and the ending itself is `REMOVE_STATE`, the EXPLICIT path -- which announces `STATE_ENDED` (measured in round 1619: a spent
     duration announces too, but this clause is a removal, so it is the road already proven).
 
-\u26a0 REGISTERED, not shipped, from the same sentence: the 960%-ATK finisher 「由敌方全体均分」. No shipped file spells "split this
+⚠ REGISTERED, not shipped, from the same sentence: the 960%-ATK finisher 「由敌方全体均分」. No shipped file spells "split this
 damage evenly among all enemies" (searched the whole tree for 均分: only document text matches), so writing `DAMAGE` with
 `target: all_enemies` would give EVERY enemy the full 960% -- an approximation this span does not allow.
 ASCII only.
@@ -26,36 +26,36 @@ DATA = "src/main/resources/characters/1408.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/TransformationEndsOnLastCountdownTest.java"
 COUNT_RULE = "countdown_turn_counts"
 END_RULE = "last_countdown_turn_ends_the_transformation"
-COUNTER = "\u989d\u5916\u56de\u5408\u8ba1\u6570"
-STATE = "\u53d8\u8eab"
+COUNTER = "额外回合计数"
+STATE = "变身"
 TURNS = 8
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") in (COUNT_RULE, END_RULE))]
 
-# \u26a0 The counter rule goes FIRST: both rules ride the same event, and the check `>= 8` must see the eighth increment.
+# ⚠ The counter rule goes FIRST: both rules ride the same event, and the check `>= 8` must see the eighth increment.
 rules.append({
     "on": "COUNTDOWN_TURN",
     "id": COUNT_RULE,
     "when": ["actor == countdown"],
     "do": [{"op": "GAIN_RESOURCE", "resource": COUNTER, "amount": 1}],
-    "source": ("1408 \u767d\u5384\uff08\u6587\u6863\uff0c\u5361\u5384\u65af\u5170\u90a3\u7684\u989d\u5916\u56de\u5408\uff09\uff1a\u300c\u5361\u5384\u65af\u5170\u90a3\u62e5\u6709 **8** \u4e2a"
-               "\u5361\u5384\u65af\u5170\u90a3\u7684\u989d\u5916\u56de\u5408\u300d\u2713"),
-    "note": ("\u2b50 2026-10-02\uff1a\u2b50 **\u5012\u8ba1\u65f6**\u81ea\u5df1\u6ca1\u6709\u5269\u4f59\u56de\u5408\u8ba1\u6570\u5668** \u2713"
-             "\uff08\u8bfb\u4e86 `Countdown` \u5168\u6587 \u2713 \u4e0e `Battle` \u7684\u5012\u8ba1\u65f6\u56de\u5408\u5904 \u2713\uff09\u21d2 \u201c\u949f\u8d70\u5b8c\u4e86\u201d**\u4e0d\u662f\u5f15\u64ce\u65f6\u523b** \u2717"
-             "\uff0c\u5fc5\u987b\u7531**\u5185\u5bb9\u81ea\u5df1\u6570** \u2713\uff08\u7528\u4e00\u4e2a**\u8d44\u6e90** \u2713 \u2014\u2014 \u5b83\u53ef\u5728\u6761\u4ef6\u91cc\u8bfb \u2713\uff09\u3002"),
+    "source": ("1408 白厄（文档，卡厄斯兰那的额外回合）：「卡厄斯兰那拥有 **8** 个"
+               "卡厄斯兰那的额外回合」✓"),
+    "note": ("⭐ 2026-10-02：⭐ **倒计时**自己没有剩余回合计数器** ✓"
+             "（读了 `Countdown` 全文 ✓ 与 `Battle` 的倒计时回合处 ✓）⇒ “钟走完了”**不是引擎时刻** ✗"
+             "，必须由**内容自己数** ✓（用一个**资源** ✓ —— 它可在条件里读 ✓）。"),
 })
 rules.append({
     "on": "COUNTDOWN_TURN",
     "id": END_RULE,
     "when": ["actor == countdown", "self_resource:" + COUNTER + " >= " + str(TURNS)],
     "do": [{"op": "REMOVE_STATE", "buff": STATE, "target": "self"}],
-    "source": ("1408 \u767d\u5384\uff08\u6587\u6863\uff09\uff1a\u300c\u6700\u540e 1 \u4e2a\u5012\u8ba1\u65f6\u56de\u5408\u2026**\u7ed3\u675f\u53d8\u8eab**\u300d\u2713\uff08\u540c\u53e5\u7684"
-               "\u201c960% \u7531\u654c\u65b9\u5168\u4f53**\u5747\u5206**\u201d\u5df2\u767b\u8bb0 \u2717\uff09"),
-    "note": ("\u2b50 2026-10-02\uff1a\u7528 **`REMOVE_STATE`** \u2713 \u2014\u2014 \u5b83\u662f**\u663e\u5f0f\u79fb\u9664**\u90a3\u6761\u8def \u2713\uff0c"
-             "\u2b50 **\u4f1a\u516c\u544a `STATE_ENDED`** \u2713\uff08\u7b2c 1619 \u8f6e\u5b9e\u6d4b \u2713\uff09\u21d2 \u6240\u4ee5\u76ee\u6807 \u2460 \u7684\u201c**1408 \u53d8\u8eab\u7ed3\u675f**\u201d\u8bfb\u8005\u5230\u8fd9\u91cc**\u771f\u6b63\u63a5\u4e0a** \u2713\u3002"
-             "\u26a0 \u672c\u6761\u89c4\u5219**\u5fc5\u987b\u5728\u8ba1\u6570\u89c4\u5219\u4e4b\u540e** \u2713\uff08\u540c\u4e00\u4e8b\u4ef6\u4e0a\u6309\u6587\u4ef6\u987a\u5e8f \u2713\uff09\uff0c\u5426\u5219\u7b2c 8 \u6b21\u8bfb\u4e0d\u5230 8 \u2717\u3002"),
+    "source": ("1408 白厄（文档）：「最后 1 个倒计时回合…**结束变身**」✓（同句的"
+               "“960% 由敌方全体**均分**”已登记 ✗）"),
+    "note": ("⭐ 2026-10-02：用 **`REMOVE_STATE`** ✓ —— 它是**显式移除**那条路 ✓，"
+             "⭐ **会公告 `STATE_ENDED`** ✓（第 1619 轮实测 ✓）⇒ 所以目标 ① 的“**1408 变身结束**”读者到这里**真正接上** ✓。"
+             "⚠ 本条规则**必须在计数规则之后** ✓（同一事件上按文件顺序 ✓），否则第 8 次读不到 8 ✗。"),
 })
 
 resources = doc.get("resources")
@@ -65,9 +65,9 @@ resources = [r for r in resources if not (isinstance(r, dict) and r.get("id") ==
 resources.append({
     "id": COUNTER,
     "max": TURNS,
-    "source": "1408 \u767d\u5384\uff08\u6587\u6863\uff09\uff1a\u300c\u5361\u5384\u65af\u5170\u90a3\u62e5\u6709 **8** \u4e2a\u5361\u5384\u65af\u5170\u90a3\u7684\u989d\u5916\u56de\u5408\u300d",
-    "note": ("\u2b50 2026-10-02\uff1a\u8fd9\u662f**\u8ba1\u6570\u5668**\uff08\u4e0d\u662f\u6e38\u620f\u91cc\u7684\u8d44\u6e90 \u2713\uff09\u2014\u2014 "
-             "\u56e0\u4e3a\u5f15\u64ce\u91cc**\u6ca1\u6709\u5012\u8ba1\u65f6\u5269\u4f59\u56de\u5408\u8ba1\u6570\u5668** \u2717\uff0c\u800c\u300c\u6700\u540e 1 \u4e2a\u5012\u8ba1\u65f6\u56de\u5408\u300d\u9700\u8981\u6570\u5230 8 \u2713\u3002"),
+    "source": "1408 白厄（文档）：「卡厄斯兰那拥有 **8** 个卡厄斯兰那的额外回合」",
+    "note": ("⭐ 2026-10-02：这是**计数器**（不是游戏里的资源 ✓）—— "
+             "因为引擎里**没有倒计时剩余回合计数器** ✗，而「最后 1 个倒计时回合」需要数到 8 ✓。"),
 })
 if not isinstance(doc, dict):
     raise SystemExit("1408.json must be an object")
@@ -93,30 +93,30 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408\uff1a\u300c\u6700\u540e 1 \u4e2a\u5012\u8ba1\u65f6\u56de\u5408\u2026\u7ed3\u675f\u53d8\u8eab\u300d (2026-10-02).
+ * 1408：「最后 1 个倒计时回合…结束变身」 (2026-10-02).
  *
- * <p>\u2b50 TWO-WAY, and the countdown's turns are driven by the SHIPPED pattern (`CountdownTest`): point `currentMove` at the clock's
+ * <p>⭐ TWO-WAY, and the countdown's turns are driven by the SHIPPED pattern (`CountdownTest`): point `currentMove` at the clock's
  * `Signal` on the action bar and call `beforeMove()`. `stepForward()` does not execute a turn at all -- the tree says so in
  * `ContentWeaknessClausesTest` and this judge does not rely on it.
  */
 public class TransformationEndsOnLastCountdownTest {
     private static final int OWNER = 1408;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u53d8\u8eab";
+    private static final String STATE = "变身";
     private static final int TURNS = 8;
 
-    /** \u2b50 After the eighth countdown turn the transformation is gone. */
+    /** ⭐ After the eighth countdown turn the transformation is gone. */
     @Test
     public void theEighthCountdownTurnEndsIt() {
         Assertions.assertFalse(transformedAfterCountdownTurns(TURNS),
-                "\u300c\u6700\u540e 1 \u4e2a\u5012\u8ba1\u65f6\u56de\u5408\u2026\u7ed3\u675f\u53d8\u8eab\u300d");
+                "「最后 1 个倒计时回合…结束变身」");
     }
 
-    /** \u26a0 One turn earlier the transformation must still be on. */
+    /** ⚠ One turn earlier the transformation must still be on. */
     @Test
     public void oneTurnEarlierItIsStillOn() {
         Assertions.assertTrue(transformedAfterCountdownTurns(TURNS - 1),
-                "\u300c\u6700\u540e 1 \u4e2a\u300d-- the seventh turn is not the last one");
+                "「最后 1 个」-- the seventh turn is not the last one");
     }
 
     // ==================================================================

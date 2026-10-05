@@ -22,7 +22,7 @@ import json
 
 DATA = "src/main/resources/characters/8007.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/MimiCheerTest.java"
-CHEER = "\u8ff7\u8ff7\u7684\u58f0\u63f4"
+CHEER = "迷迷的声援"
 MARK = "advance_and_cheer"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
@@ -34,7 +34,7 @@ if len(targets) != 1:
     raise SystemExit("expected exactly one SKILL_CAST rule, found " + str(len(targets)))
 
 rule = targets[0]
-# \u26a0 Idempotence by OP, not by an invented key: `EffectKeyDisciplineTest` reddened the first draft with "these effect keys
+# ⚠ Idempotence by OP, not by an invented key: `EffectKeyDisciplineTest` reddened the first draft with "these effect keys
 # are not fields of EffectSpec, so Gson drops them silently: {mark=[8007.json]}" -- an invented key is not a marker, it is a
 # silent no-op. Drop any previous copy of these two ops, then append the real ones.
 do = [e for e in (rule.get("do") or []) if not (isinstance(e, dict) and (
@@ -43,14 +43,14 @@ do.append({"op": "ADVANCE", "percent": 1.0, "target": "target"})
 do.append({"op": "APPLY_BUFF", "buff": CHEER, "turns": 3, "target": "target"})
 rule["do"] = do
 rule["source"] = ((rule.get("source") or "") +
-                  "\n\u2b50 2026-10-02\uff08\u6587\u6863 `:143`\uff09\uff1a\u300c\u4f7f\u6307\u5b9a\u6211\u65b9\u5355\u4f53**\u884c\u52a8\u63d0\u524d 100%**"
-                  "\u5e76\u9644\u4e0a\u3010**\u8ff7\u8ff7\u7684\u58f0\u63f4**\u3011\uff0c\u6301\u7eed **3** \u56de\u5408\u300d\u2713")
+                  "\n⭐ 2026-10-02（文档 `:143`）：「使指定我方单体**行动提前 100%**"
+                  "并附上【**迷迷的声援**】，持续 **3** 回合」✓")
 rule["note"] = ((rule.get("note") or "") +
-                "\n\u2b50 2026-10-02\uff1a\u628a\u201c\u63d0\u524d + \u58f0\u63f4\u201d**\u5e76\u8fdb\u672c\u6761** \u2713 "
-                "\u2014\u2014 \u2757 \u7b2c\u4e00\u7248\u53e6\u52a0\u4e86\u4e00\u6761 `SKILL_CAST`\uff0c\u5224\u636e\u7eff\u4e86\u4f46**\u5168\u91cf\u7ea2**\uff1a"
-                "`RemembranceTrailblazerTest.hisFileCarriesTheClauses` \u662f\u4e00\u6761**\u666e\u67e5**\uff08\u6309\u4e8b\u4ef6\u8ba1\u6570\uff09\u2713\uff0c"
-                "\u800c\u5b83\u6070\u597d\u6307\u5411\u6b63\u786e\u505a\u6cd5\uff1a**\u6587\u6863\u90a3\u4e00\u53e5\u5c31\u662f\u8fd9\u4e2a\u6218\u6280\u7684\u6548\u679c** \u2713\u3002"
-                "\u26d0 **\u5df2\u767b\u8bb0**\uff1a\u201c\u7b49\u540c\u4e8e\u539f\u4f24\u5bb3 28% \u7684\u771f\u5b9e\u4f24\u5bb3\u201d \u2717\u3002")
+                "\n⭐ 2026-10-02：把“提前 + 声援”**并进本条** ✓ "
+                "—— ❗ 第一版另加了一条 `SKILL_CAST`，判据绿了但**全量红**："
+                "`RemembranceTrailblazerTest.hisFileCarriesTheClauses` 是一条**普查**（按事件计数）✓，"
+                "而它恰好指向正确做法：**文档那一句就是这个战技的效果** ✓。"
+                "⛐ **已登记**：“等同于原伤害 28% 的真实伤害” ✗。")
 
 if is_dict:
     doc["rules"] = rules
@@ -76,17 +76,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8007\uff1a\u300c\u4f7f\u6307\u5b9a\u6211\u65b9\u5355\u4f53\u884c\u52a8\u63d0\u524d 100% \u5e76\u9644\u4e0a\u3010\u8ff7\u8ff7\u7684\u58f0\u63f4\u3011\uff0c\u6301\u7eed 3 \u56de\u5408\u300d (2026-10-02).
+ * 8007：「使指定我方单体行动提前 100% 并附上【迷迷的声援】，持续 3 回合」 (2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN. The cheer lands on the ally the skill was aimed at, which is also the unit the advance moves.
+ * <p>⭐ FILE-DRIVEN. The cheer lands on the ally the skill was aimed at, which is also the unit the advance moves.
  */
 public class MimiCheerTest {
     private static final int OWNER = 8007;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String CHEER = "\u8ff7\u8ff7\u7684\u58f0\u63f4";
+    private static final String CHEER = "迷迷的声援";
 
-    /** \u2b50 The skill lays the cheer on its target. */
+    /** ⭐ The skill lays the cheer on its target. */
     @Test
     public void theSkillLaysTheCheerOnItsTarget() {
         Character owner = CharacterFactory.create(OWNER, 80);
@@ -103,7 +103,7 @@ public class MimiCheerTest {
         battle.processRequests();
 
         Assertions.assertTrue(ally.getBuffManager().hasState(CHEER),
-                "\u300c\u9644\u4e0a\u3010\u8ff7\u8ff7\u7684\u58f0\u63f4\u3011\u300d");
+                "「附上【迷迷的声援】」");
     }
 }
 ''')

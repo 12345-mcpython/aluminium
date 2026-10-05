@@ -19,7 +19,7 @@ import sys
 CHARS = "src/main/resources/characters/1402.json"
 SKILLS = "src/main/resources/data/skills.json"
 SLOT = 14
-STANCE = "\u81f3\u9ad8\u4e4b\u59ff"
+STANCE = "至高之姿"
 HANDLE = "MServant_CyreneServant_00_AmazingBuff_Aglaea"
 BOOST, PIERCE = "ALL_DAMAGE_TYPE_BOOST", "DEFENCE_IGNORE"
 ENOUGH = "self_summon_count >= 1"
@@ -40,13 +40,13 @@ for new_id in ("memosprite_ode_of_romance_raises_damage_and_pierces_defence",
     if new_id in existing:
         sys.exit("REFUSING: %s is already there" % new_id)
 
-SOURCE = ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 12 \u300c\u732e\u4e88\u300c\u6d6a\u6f2b\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 14\uff09\uff1a"
-          "\u300c\u963f\u683c\u83b1\u96c5\u4e0e\u8863\u5320\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #2% \u5e76\u65e0\u89c6\u76ee\u6807 #3% \u7684\u9632\u5fa1\uff0c"
-          "\u6301\u7eed\u81f3\u963f\u683c\u83b1\u96c5\u9000\u51fa\u3010" + STANCE + "\u3011\u72b6\u6001\u3002\u300d")
-HANDLE_NOTE = ("\u2b50 \u4e24\u4e2a\u4fee\u9970\u90fd\u5e26**\u540d\u5b57**\uff08`buff`\uff09\uff0c\u7528\u7684\u662f\u6e38\u620f\u81ea\u5df1\u7684\u4fee\u9970\u540d "
-               "`" + HANDLE + "`\uff08\u53d6\u81ea `GlobalModifiers`\uff09\u2014\u2014 \u56e0\u4e3a\u65f6\u957f\u662f\u9760**\u70b9\u540d\u518d\u6458\u4e00\u6b21**\u5199\u7684\uff1a"
-               "`AbstractBuff.buffName` + `BuffManager.removeState(String)` \u4f1a\u628a\u5e26\u8be5\u540d\u5b57\u7684 buff \u6458\u4e0b\u6765\u3002"
-               "\u2b50 \u6570\u503c\u90fd\u8d70 `percent_from_cast_param`\uff08#2 \u21d2 \u7d22\u5f15 1\uff0c#3 \u7d22\u5f15 2\uff09\uff0c\u56e0\u4e3a\u5b83\u4eec**\u968f\u7b49\u7ea7\u53d8**\u3002")
+SOURCE = ("1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）："
+          "「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，"
+          "持续至阿格莱雅退出【" + STANCE + "】状态。」")
+HANDLE_NOTE = ("⭐ 两个修饰都带**名字**（`buff`），用的是游戏自己的修饰名 "
+               "`" + HANDLE + "`（取自 `GlobalModifiers`）—— 因为时长是靠**点名再摘一次**写的："
+               "`AbstractBuff.buffName` + `BuffManager.removeState(String)` 会把带该名字的 buff 摘下来。"
+               "⭐ 数值都走 `percent_from_cast_param`（#2 ⇒ 索引 1，#3 索引 2），因为它们**随等级变**。")
 
 def named(target):
     return [{"op": "MODIFY_ATTR", "attribute": BOOST, "percent_from_cast_param": 1,
@@ -60,7 +60,7 @@ rules.append({
     "when": ["target == self", "actor is_summon", "from_skill_id == " + str(SLOT)],
     "do": named("self"),
     "source": SOURCE,
-    "note": HANDLE_NOTE + " \u26a0 \u8fd9\u4e00\u6761\u53ea\u7ba1**\u5979\u81ea\u5df1**\uff0c\u56e0\u4e3a\u300c\u5bf9\u8863\u5320\u4e5f\u751f\u6548\u300d\u9700\u8981\u5fc6\u7075\u5728\u573a\uff0c\u800c\u90a3\u4e2a\u6761\u4ef6\u4e0d\u8be5\u538b\u5728\u5979\u8eab\u4e0a\u3002",
+    "note": HANDLE_NOTE + " ⚠ 这一条只管**她自己**，因为「对衣匠也生效」需要忆灵在场，而那个条件不该压在她身上。",
 })
 rules.append({
     "id": "memosprite_ode_of_romance_also_reaches_the_garmentmaker",
@@ -68,7 +68,7 @@ rules.append({
     "when": ["target == self", "actor is_summon", "from_skill_id == " + str(SLOT), ENOUGH],
     "do": named("summon"),
     "source": SOURCE,
-    "note": "\u300c**\u963f\u683c\u83b1\u96c5\u4e0e\u8863\u5320**\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8\u2026\u300d\u2014\u2014 \u8863\u5320\u90a3\u4e00\u534a\u3002" + HANDLE_NOTE,
+    "note": "「**阿格莱雅与衣匠**造成的伤害提高…」—— 衣匠那一半。" + HANDLE_NOTE,
 })
 rules.append({
     "id": "memosprite_ode_of_romance_ends_with_her_stance",
@@ -76,9 +76,9 @@ rules.append({
     "when": ["self state_ended " + STANCE],
     "do": [{"op": "REMOVE_STATE", "buff": HANDLE, "target": "self"}],
     "source": SOURCE,
-    "note": ("\u2b50 \u8fd9\u5c31\u662f\u300c**\u6301\u7eed\u81f3\u963f\u683c\u83b1\u96c5\u9000\u51fa\u3010" + STANCE + "\u3011\u72b6\u6001**\u300d\u7684\u65f6\u957f\uff1a"
-             "\u4e00\u6761\u770b\u7740 `STATE_ENDED` \u7684\u4f34\u968f\u89c4\u5219\u3002\u5f15\u64ce\u81ea\u5df1\u7684\u65f6\u957f\u53ea\u6709 `turns`\uff0f`permanent`\uff0f"
-             "\u4e00\u4e2a\u95ed\u96c6 `until`\uff08cast_end\u3001next_attack\u3001next_skill\u3001turn_end\uff09\uff0c\u90fd\u8bf4\u4e0d\u4e86\u8fd9\u53e5\u3002"),
+    "note": ("⭐ 这就是「**持续至阿格莱雅退出【" + STANCE + "】状态**」的时长："
+             "一条看着 `STATE_ENDED` 的伴随规则。引擎自己的时长只有 `turns`／`permanent`／"
+             "一个闭集 `until`（cast_end、next_attack、next_skill、turn_end），都说不了这句。"),
 })
 rules.append({
     "id": "memosprite_ode_of_romance_stance_end_also_clears_the_garmentmaker",
@@ -86,7 +86,7 @@ rules.append({
     "when": ["self state_ended " + STANCE, ENOUGH],
     "do": [{"op": "REMOVE_STATE", "buff": HANDLE, "target": "summon"}],
     "source": SOURCE,
-    "note": "\u540c\u4e0a\uff0c\u4f46\u6458\u7684\u662f\u8863\u5320\u8eab\u4e0a\u90a3\u4efd\u3002",
+    "note": "同上，但摘的是衣匠身上那份。",
 })
 
 if isinstance(doc, list):

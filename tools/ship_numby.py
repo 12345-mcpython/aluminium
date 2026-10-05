@@ -21,13 +21,13 @@ CHARACTER = "src/main/resources/characters/1112.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/NumbyServantTest.java"
 
 spec = {
-    "name": "\u8d26\u8d26",
-    "source": "1112 \u6258\u5e15 \u5929\u8d4b \u732a\u5e02\uff1f\uff01 (111204): \u300c\u6218\u6597\u5f00\u59cb\u65f6\u53ec\u5524\u8d26\u8d26\u3002\u8d26\u8d26\u521d\u59cb\u62e5\u6709 **80 \u70b9\u901f\u5ea6**\uff0c"
-              "\u884c\u52a8\u65f6\u53d1\u52a8\u8ffd\u52a0\u653b\u51fb\uff0c\u5bf9\u9677\u5165\u3010\u8d1f\u503a\u8bc1\u660e\u3011\u72b6\u6001\u4e0b\u7684\u654c\u65b9\u5355\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u6258\u5e15 **150% \u653b\u51fb\u529b**\u7684\u706b\u5c5e\u6027\u4f24\u5bb3\u300d",
-    "note": "\u8d26\u8d26\u662f**\u4f8d\u4ece**\uff08\u4e0d\u662f\u5fc6\u7075\uff09\u21d2 \u4f4f `resources/servants/` \u2713\uff08\u5f15\u64ce\u4fa7 `SERVANT_DIR` \u4e0e `SUMMON_SERVANT` \u65e9\u5df2\u5c31\u4f4d \u2713\uff09\u3002"
-            "\u9762\u677f\u53ea\u5199**\u6587\u6863\u7ed9\u5230\u7684**\uff1a**\u901f\u5ea6 80 \u70b9**\uff08\u5e73\u503c \u2713\uff0c\u4e0e\u4e3b\u4eba\u65e0\u5173 \u2713\uff09\uff1b"
-            "\u6587\u6863\u5bf9\u8d26\u8d26\u7684\u751f\u547d\uff0f\u653b\u51fb\uff0f\u4ec7\u6068**\u4e00\u5b57\u672a\u7ed9** \u2717 \u21d2 \u4e0d\u5199 \u2713\uff08\u5f15\u64ce\u7684 `null` \u610f\u4e3a\u201c\u6ca1\u6709\u6587\u6863\u8bf4\u201d \u2713\uff09\u3002"
-            "\u653b\u51fb\u6309**\u4e3b\u4eba\u7684\u653b\u51fb\u529b**\u8ba1\uff08`base: \"ATTACK\"` \u2713\uff09\u00d7 **1.5** \u2713\u3002",
+    "name": "账账",
+    "source": "1112 托帕 天赋 猪市？！ (111204): 「战斗开始时召唤账账。账账初始拥有 **80 点速度**，"
+              "行动时发动追加攻击，对陷入【负债证明】状态下的敌方单体造成等同于托帕 **150% 攻击力**的火属性伤害」",
+    "note": "账账是**侍从**（不是忆灵）⇒ 住 `resources/servants/` ✓（引擎侧 `SERVANT_DIR` 与 `SUMMON_SERVANT` 早已就位 ✓）。"
+            "面板只写**文档给到的**：**速度 80 点**（平值 ✓，与主人无关 ✓）；"
+            "文档对账账的生命／攻击／仇恨**一字未给** ✗ ⇒ 不写 ✓（引擎的 `null` 意为“没有文档说” ✓）。"
+            "攻击按**主人的攻击力**计（`base: \"ATTACK\"` ✓）× **1.5** ✓。",
     "panel": [{"attribute": "SPEED", "flat": 80}],
     "attack": {"element": "Fire", "base": "ATTACK", "percent": 1.5, "shape": "SingleAttack"},
 }
@@ -47,11 +47,11 @@ rules.append({
     "on": "BATTLE_START",
     "id": "talent_summons_numby",
     "do": [{"op": "SUMMON_SERVANT"}],
-    "source": "1112 \u6258\u5e15 \u5929\u8d4b \u732a\u5e02\uff1f\uff01 (111204): \u300c**\u6218\u6597\u5f00\u59cb\u65f6\u53ec\u5524\u8d26\u8d26**\u300d",
-    "note": "\u300c\u6218\u6597\u5f00\u59cb\u65f6\u53ec\u5524\u8d26\u8d26\u300d\u21d2 `BATTLE_START` \u21d2 **`SUMMON_SERVANT`** \u2713\uff08\u65e0\u53c2\u6570 \u2713\uff1a"
-            "\u4f8d\u4ece\u5c5e\u4e8e\u53ec\u5524\u8005 \u2713\uff09\uff1b\u9762\u677f\u4e0e\u653b\u51fb\u5199\u5728 `resources/servants/1112.json` \u2713\u3002"
-            "\u26a0 \u540c\u4e00\u53e5\u8fd8\u8bf4\u300c\u5f53\u6258\u5e15\u9677\u5165**\u65e0\u6cd5\u6218\u6597**\u72b6\u6001\u65f6\u8d26\u8d26\u6d88\u5931\u300d\u2717 \u2014\u2014 \u5f15\u64ce\u5c1a\u65e0"
-            "\u201c\u4e3b\u4eba\u5012\u4e0b\u5219\u4f8d\u4ece\u6d88\u5931\u201d\u7684\u89c4\u5219 \u2717 \u21d2 \u767b\u8bb0 \u2713\u3002",
+    "source": "1112 托帕 天赋 猪市？！ (111204): 「**战斗开始时召唤账账**」",
+    "note": "「战斗开始时召唤账账」⇒ `BATTLE_START` ⇒ **`SUMMON_SERVANT`** ✓（无参数 ✓："
+            "侍从属于召唤者 ✓）；面板与攻击写在 `resources/servants/1112.json` ✓。"
+            "⚠ 同一句还说「当托帕陷入**无法战斗**状态时账账消失」✗ —— 引擎尚无"
+            "“主人倒下则侍从消失”的规则 ✗ ⇒ 登记 ✓。",
 })
 with io.open(CHARACTER, "w", encoding="utf-8", newline="\n") as handle:
     json.dump(doc, handle, ensure_ascii=False, indent=2)

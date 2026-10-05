@@ -17,7 +17,7 @@ import java.util.Random;
  * `talent_party_damage` (round 71 added a byte-identical duplicate, which round 73 removed after the mutation failed to move
  * anything: the original kept supplying 0.2 whatever the duplicate said).
  *
- * <p>\u26a0 Mutating THAT rule is what must turn this red -- a mutation of a duplicate cannot, which is exactly how the
+ * <p>⚠ Mutating THAT rule is what must turn this red -- a mutation of a duplicate cannot, which is exactly how the
  * duplicate was found.
  *
  * <p>Judged on a TEAMMATE (the point of 「我方全体」) and as a DIFFERENCE against the same teammate without her -- so the assertion is

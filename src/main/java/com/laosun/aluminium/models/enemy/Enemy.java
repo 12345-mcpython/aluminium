@@ -248,9 +248,9 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * \u2705 How many elements this one is weak to (2026-09-30; reader: cone 22004's \u300c\u654c\u65b9\u76ee\u6807\u6bcf\u62e5\u67091\u4e2a\u4e0d\u540c\u5c5e\u6027\u7684\u5f31\u70b9\u300d).
+     * ✅ How many elements this one is weak to (2026-09-30; reader: cone 22004's 「敌方目标每拥有1个不同属性的弱点」).
      *
-     * <p>\u2605 The enemy's own data is the answer (its {@code stance_weak} list); no new state is tracked, and a unit with no
+     * <p>★ The enemy's own data is the answer (its {@code stance_weak} list); no new state is tracked, and a unit with no
      * weakness bar (a character, a summon) is not this class at all, so asking one is a type question the caller answers.
      */
     public int weaknessCount() {

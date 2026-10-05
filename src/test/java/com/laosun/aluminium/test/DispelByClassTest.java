@@ -48,7 +48,7 @@ public class DispelByClassTest {
         var control = Constant.CONTROL_EFFECTS.get("IMPRISONED");
         mydei.getBuffManager().addBuff(new ControlBuff(control, 3));
         mydei.getBuffManager().addBuff(new DotBuff(mydei, DamageElement.FIRE, 100, 3));
-        // \u26a0 a ControlBuff counts as TWO debuffs (measured; Cone21001Test says so in the same words), so the pair is 3
+        // ⚠ a ControlBuff counts as TWO debuffs (measured; Cone21001Test says so in the same words), so the pair is 3
         Assertions.assertEquals(3, mydei.getBuffManager().debuffCount(), "precondition: one control (2) and one dot (1)");
 
         Skill ode = demiurge.skillAt(16);
@@ -60,8 +60,8 @@ public class DispelByClassTest {
         int dots = mydei.getBuffManager().countBuffs(DotBuff.class);
         System.out.println("[dispel] after the ode: debuffs = " + left + " ; dots = " + dots);
 
-        Assertions.assertEquals(1, left, "\u300c\u89e3\u9664\u4e07\u654c\u9677\u5165\u7684\u6240\u6709**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d-- one of the two was not that class");
-        Assertions.assertEquals(1, dots, "the damage-over-time is NOT \u63a7\u5236\u7c7b, so it stays");
+        Assertions.assertEquals(1, left, "「解除万敌陷入的所有**控制类**负面状态」-- one of the two was not that class");
+        Assertions.assertEquals(1, dots, "the damage-over-time is NOT 控制类, so it stays");
         // 2 - 1 = 1 and the survivor is the DOT, so the one that went was the control
 
     }

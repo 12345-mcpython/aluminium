@@ -11,10 +11,10 @@ The curve probe said so plainly:
 judged: change ONE variable and compare the DAMAGE. Here the variable is the peerage itself -- the control runs the same six
 casts and then removes 【爵位】, so the scene is identical in every other respect (the discipline "same scene, one variable").
 
-\u2b50 The modifier rides the instance route (`instance: true`), which is the engine's documented way to scope a modifier to a
+⭐ The modifier rides the instance route (`instance: true`), which is the engine's documented way to scope a modifier to a
 damage instance -- `MODIFY_ATTR` with instance=true supports DEFENCE_IGNORE.
 
-\u26a0 A duration is still required on the instance route: the loader refuses without it (verbatim: Op MODIFY_ATTR requires
+⚠ A duration is still required on the instance route: the loader refuses without it (verbatim: Op MODIFY_ATTR requires
 "turns" (how long the buff lasts), "permanent": true ...).
 ASCII only.
 """
@@ -24,7 +24,7 @@ import json
 DATA = "src/main/resources/characters/1412.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/PeeragePierceDamageTest.java"
 RULE = "peerage_skill_extra_pierce"
-PEERAGE = "\u7235\u4f4d"
+PEERAGE = "爵位"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
@@ -36,13 +36,13 @@ rules.append({
     "when": ["actor has_state " + PEERAGE, "from_category BPSKILL"],
     "do": [{"op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.20,
             "instance": True, "permanent": True, "target": "self"}],
-    "source": ("1412 \u523b\u5f8b\u5fb7\u83c8 \u884c\u8ff9\uff08\u6587\u6863 `:105`\uff09\uff1a\u300c\u82e5\u5f53\u524d\u3010\u519b\u529f\u3011\u5df2\u5347\u7ea7\u4e3a"
-               "\u3010\u7235\u4f4d\u3011\uff0c\u5219\u8be5\u89d2\u8272**\u9020\u6210\u6218\u6280\u4f24\u5bb3\u65f6\u989d\u5916\u65e0\u89c6\u76ee\u6807 20%** \u7684\u9632\u5fa1\u529b\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a\u8d70 **instance \u8def\u7531** \u2713\uff08`instance: true` \u2713 \u2014\u2014 \u5f15\u64ce\u6587\u6863\uff1a"
-             "\u201c`MODIFY_ATTR` with instance=true supports DEFENCE_IGNORE\u201d \u2713\uff09\uff0c\u26a0 \u4f46\u4ecd\u9700\u65f6\u957f \u2717"
-             "\uff08\u88c5\u8f7d\u5668\u9010\u5b57\uff1a*requires \"turns\" \u2026 \"permanent\": true*\uff09\u3002"
-             "\u26a0 **\u5224\u636e\u4e0d\u518d\u95ee\u5c5e\u6027\u8868** \u2713\uff08\u5c5e\u6027\u63a2\u9488\u5df2\u91cf\u51fa\uff1a16% \u6052\u5728\u3001\u4e24\u4e2a\u5355\u4f4d\u90fd\u770b\u4e0d\u5230 20% \u2717\uff09"
-             "\u800c\u662f**\u6bd4\u4f24\u5bb3** \u2713\uff08\u540c\u4e00\u573a\u620f\u3001\u53ea\u6362\u201c\u6709\u6ca1\u6709\u7235\u4f4d\u201d \u2713\uff09\u3002"),
+    "source": ("1412 刻律德菈 行迹（文档 `:105`）：「若当前【军功】已升级为"
+               "【爵位】，则该角色**造成战技伤害时额外无视目标 20%** 的防御力」"),
+    "note": ("⭐ 2026-10-02：走 **instance 路由** ✓（`instance: true` ✓ —— 引擎文档："
+             "“`MODIFY_ATTR` with instance=true supports DEFENCE_IGNORE” ✓），⚠ 但仍需时长 ✗"
+             "（装载器逐字：*requires \"turns\" … \"permanent\": true*）。"
+             "⚠ **判据不再问属性表** ✓（属性探针已量出：16% 恒在、两个单位都看不到 20% ✗）"
+             "而是**比伤害** ✓（同一场戏、只换“有没有爵位” ✓）。"),
 })
 
 if not isinstance(doc, dict):
@@ -67,26 +67,26 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412\uff1a\u300c\u82e5\u5df2\u5347\u4e3a\u3010\u7235\u4f4d\u3011\u2026\u8be5\u89d2\u8272\u9020\u6210\u6218\u6280\u4f24\u5bb3\u65f6**\u989d\u5916\u65e0\u89c6 20%** \u9632\u5fa1\u300d (2026-10-02).
+ * 1412：「若已升为【爵位】…该角色造成战技伤害时**额外无视 20%** 防御」 (2026-10-02).
  *
- * <p>\u2b50 SAME SCENE, ONE VARIABLE: both runs reach six Charge (so the merit holder is a peer), cast the same skill at the same
- * enemy; the control then removes \u3010\u7235\u4f4d\u3011. What is compared is the DAMAGE -- because `self_attr:` reads the sheet, and a
+ * <p>⭐ SAME SCENE, ONE VARIABLE: both runs reach six Charge (so the merit holder is a peer), cast the same skill at the same
+ * enemy; the control then removes 【爵位】. What is compared is the DAMAGE -- because `self_attr:` reads the sheet, and a
  * sentence about "when dealing Skill DMG" lives in one settled instance.
  */
 public class PeeragePierceDamageTest {
     private static final int OWNER = 1412;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String PEERAGE = "\u7235\u4f4d";
+    private static final String PEERAGE = "爵位";
 
-    /** \u2b50 A peer's skill hits harder than the same skill without the peerage. */
+    /** ⭐ A peer's skill hits harder than the same skill without the peerage. */
     @Test
     public void thePeerPiercesMoreOnSkillDamage() {
         double withPeer = damageDealt(true);
         double without = damageDealt(false);
         Assertions.assertTrue(without > 0, "precondition: the control deals damage (" + without + ")");
         Assertions.assertTrue(withPeer > without,
-                "\u300c\u989d\u5916\u65e0\u89c6 20% \u9632\u5fa1\u300d (with=" + withPeer + ", without=" + without + ")");
+                "「额外无视 20% 防御」 (with=" + withPeer + ", without=" + without + ")");
     }
 
     private static double damageDealt(boolean keepPeerage) {
@@ -102,7 +102,7 @@ public class PeeragePierceDamageTest {
             SkillExecutor.execute(battle, hers, owner, List.of(ally));
             battle.processRequests();
         }
-        Assertions.assertTrue(ally.getBuffManager().hasState("\u519b\u529f"),
+        Assertions.assertTrue(ally.getBuffManager().hasState("军功"),
                 "precondition: the ally holds the merit");
         Assertions.assertTrue(ally.getBuffManager().hasState(PEERAGE),
                 "precondition: six casts promote the holder");

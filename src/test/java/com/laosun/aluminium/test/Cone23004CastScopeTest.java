@@ -57,9 +57,9 @@ public class Cone23004CastScopeTest {
         System.out.println(printed + " ; after the cast: effectHit=" + hitAfter + " atk=" + atkAfter);
 
         Assertions.assertEquals(hitBefore, hitAfter, 1e-9,
-                "\u300c\u6b64\u6b21\u653b\u51fb\u300d\u7684\u6548\u679c\u547d\u4e2d\u4e0d\u80fd\u6d3b\u8fc7\u8fd9\u4e00\u6b21\u65bd\u653e");
+                "「此次攻击」的效果命中不能活过这一次施放");
         Assertions.assertEquals(atkBefore, atkAfter, 1e-9,
-                "\u653b\u51fb\u529b\u4e5f\u4e00\u6837\uff1a`until: cast_end` \u5230\u6b64\u4e3a\u6b62");
+                "攻击力也一样：`until: cast_end` 到此为止");
     }
 
     /** ⭐ The content guard: every rank carries the rule, with that rank's own two numbers and the cast-end lifetime. */
