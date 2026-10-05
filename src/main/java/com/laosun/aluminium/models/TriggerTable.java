@@ -317,7 +317,11 @@ public class TriggerTable {
             return;
         }
         if (effect.getEffectPercent() != null) {
-            boolean statesPercent = named.effects().stream().anyMatch(e -> e.getPercent() != null);
+            // ⭐ A share stated by a SPELLING counts as a number to raise (2026-10-02): the target rule may read its share from the owner's skill (`percent_from_skill_param`),
+            // which is the honest way to write a value that varies with level -- demanding a literal would force a lie.
+            boolean statesPercent = named.effects().stream().anyMatch(e -> e.getPercent() != null
+                    || e.getPercentFromSkillParam() != null || e.getPercentFromCastParam() != null
+                    || e.getPercentFromResource() != null);
             if (!statesPercent) {
                 throw new IllegalArgumentException(
                         "MODIFY_RULE raises the value of rule \"" + target + "\", but none of that rule's effects "

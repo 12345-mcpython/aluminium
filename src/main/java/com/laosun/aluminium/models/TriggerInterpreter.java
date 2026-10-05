@@ -878,7 +878,10 @@ public final class TriggerInterpreter {
                     }
                     rejectAmendmentExtras(effect, op, spec, "percent");
                 }
-                if (TriggerEvent.fromString(spec.getOn()) != TriggerEvent.BATTLE_START) {
+                // ⭐ A CAST_SETUP may file the amendment when the grant lasts the whole battle (2026-10-02; reader: 1141524 第三句). The guard's own reason is
+                // "a bonus granted mid-battle would have to be taken back when whatever granted it ended, and nothing does that" -- and this sentence's grant is 「整场生效」.
+                if (TriggerEvent.fromString(spec.getOn()) != TriggerEvent.BATTLE_START
+                        && TriggerEvent.fromString(spec.getOn()) != TriggerEvent.CAST_SETUP) {
                     throw new IllegalArgumentException(
                             "Op " + op + " amends a rule for the whole battle, so it only makes sense on "
                                     + "BATTLE_START (a bonus granted mid-battle would have to be taken back when "
@@ -1097,7 +1100,9 @@ public final class TriggerInterpreter {
             return effect;
         }
         EffectSpec amended = effect;
-        if (percentDelta != null) {
+        if (percentDelta != null && effect.getPercent() != null) {
+            // ⭐ Only a LITERAL share is raised in place (2026-10-02). When the share comes from a spelling (`percent_from_skill_param` and friends), writing a `percent`
+            // here would REPLACE it -- `shareOf` reads `percent` first -- so the amendment would erase the rule's own number instead of adding to it. `shareOf` adds it instead.
             amended = amended.withPercent(percentDelta);
         }
         if (turnsDelta != null) {
@@ -2608,6 +2613,23 @@ public final class TriggerInterpreter {
     }
 
     /** The share a magnitude is multiplied by: the stated `percent`, or the cast skill's own parameter. */
+    /**
+     * ⭐ The amendment a `MODIFY_RULE{effect_percent}` filed for the rule that is firing (2026-10-02).
+     *
+     * <p>It is added to a share the effect states by SPELLING -- a literal `percent` is raised by {@code amendedEffect} instead, so a rule is never raised twice.
+     */
+    private static double amendmentDelta(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getPercent() != null) {
+            return 0;
+        }
+        CanHit owner = ctx.owner();
+        if (owner == null || ctx.ruleId() == null) {
+            return 0;
+        }
+        Double delta = owner.ruleEffectPercentBonus(ctx.ruleId());
+        return delta == null ? 0 : delta;
+    }
+
     private static double shareOf(EffectSpec effect, TriggerContext ctx) {
         // ⭐ A share CARRIED IN A RESOURCE, in basis points (2026-10-02): how a number captured at cast time is used later.
         if (effect.getPercentFromResource() != null) {
@@ -2619,7 +2641,8 @@ public final class TriggerInterpreter {
         }
         if (effect.getPercentFromSkillParam() != null) {
             // ⭐ The share out of one of the owner's OWN skills (2026-10-02): 「等同于缇宝 #3% 生命上限」, where #3 lives in HIS ultimate.
-            return ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim());
+            return ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim())
+                    + amendmentDelta(effect, ctx);
         }
         String spelled = effect.getPercentFromCastParam() == null ? null
                 : String.valueOf(effect.getPercentFromCastParam());
