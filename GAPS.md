@@ -2440,3 +2440,13 @@
   ① `EffectSpec` 的字段；② `shareOf` 的分支；③ **加载器的“恰好一个份额”检查**；④ **`modifyAttr` 里选下份额路径的那个条件**（第 2355 行附近）。
   ⭐ 而引擎自己的注释早就写着这件事：*"a share spelling left out of it sends the effect down the flat `amount` arm and unboxes a null"*（实测）。
 - ⭐ **同时更新了 `CaptureCastParamTest`**：捕获现在存基点，而她的「充能」上限是 **8** ⇒ 读数饱和在 8（`charge 0 -> 8`）。
+
+- ✅ **已出货（2026-10-02，第 131 件）：`1141524` 第一句的**捕获半句** ——
+  「对长夜月施放后，「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 `#1%`」里的 **`#1` 已被捕获到她身上**（基点）。
+  ⭐ `characters/1413.json` **无损转成 dict**（原 11 条规则原样）并声明了捕获资源。
+  判据 `TimeOdeBoostTest`：`row value 0.252 ; captured 2520.0 ; without the ode 0.0`；变异（索引 0 → 1）⇒ `10000` ⇒ 红 ✓。
+- ⛔ **同句的加成半句仍登记** —— 而本轮量到两条**投递事实**：
+  1. 忆灵造成的伤害**不会**经 `DEALING_DAMAGE` 送到主人表上（探针：同一条规则里的 `ADD_STACK` 读到 0）；
+  2. 改挂 `DAMAGE_SETTLED` + `actor is_summon` + `from_skill_id == 7` ⇒ **仍为 0**；而同一个文件的 `zone_true_damage_rider`
+     用 `DAMAGE_SETTLED` + **`actor is_ally`** 是**通的**（已出货且有判据）。
+  - ⭐ **下一问**：把门换成 `actor is_ally`，并先量一次 **`from_skill_id` 在 `DAMAGE_SETTLED` 上到底装什么**。
