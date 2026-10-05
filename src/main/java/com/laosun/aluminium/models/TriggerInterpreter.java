@@ -2188,9 +2188,15 @@ public final class TriggerInterpreter {
         boolean derived = (effect.getScale() != null && !effect.getScale().isBlank()) || effect.getPercent() == null;
         // ? A plain modifier is a share OR a flat value (2026-09-29): `amount` alone means "raise the attribute by this many points", which the
         // validator enforces as exactly one of the two.
-        double magnitude = effect.getPercent() != null
-                ? (derived ? derivedMagnitude(effect, ctx) : effect.getPercent())
-                : effect.getAmount();
+        // ⚠⚠ The share may come from the skill parameter now (2026-10-02), so "is a share stated" is NOT `percent != null`:
+        // asking only that sent a `percent_from_cast_param` modifier down the flat `amount` arm and unboxed a null. A share is
+        // `percent` OR `percent_from_cast_param`; the derived flag above already covers the latter.
+        double magnitude;
+        if (effect.getPercent() != null || effect.getPercentFromCastParam() != null) {
+            magnitude = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();
+        } else {
+            magnitude = effect.getAmount();
+        }
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
@@ -2329,9 +2335,58 @@ public final class TriggerInterpreter {
         return percent * holder.getBuffManager().stacksOf(name);
     }
 
+
+    /**
+     * The value of one parameter of the skill that produced the event, at the caster's CURRENT level (2026-10-02).
+     *
+     * <p>⚠ Shared by the {@code cast_skill_param:<index>} scale and by {@code percent_from_cast_param}, so the two cannot drift: the damage
+     * path reads the same row the same way (`multiplierOf` -- `skill.getData().getSkills()`, `attacker.skillLevel(skill)`, `level - 1`).
+     */
+    private static double castParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
+        int index = Integer.parseInt(spelled);
+        CanHit caster = ctx.actor();
+        if (!(caster instanceof Summon from)) {
+            throw new IllegalStateException("the scale \"" + effect.getScale()
+                    + "\" reads the parameter of the skill that produced the event, but the actor is "
+                    + (caster == null ? "nobody" : caster.getName() + ", which is not a memosprite"));
+        }
+        Skill casting = from.skillAt(ctx.skillId());
+        if (casting == null || casting.getData() == null || !casting.getData().isLoaded()) {
+            throw new IllegalStateException("the scale \"" + effect.getScale()
+                    + "\" reads the skill that produced the event, but " + from.getName()
+                    + " has no loaded skill at slot " + ctx.skillId());
+        }
+        var rows = casting.getData().getSkills();
+        int row = caster.skillLevel(casting) - 1;
+        if (row < 0 || row >= rows.size()) {
+            throw new IllegalStateException("skill level " + caster.skillLevel(casting) + " is outside " + from.getName()
+                    + " skill " + ctx.skillId() + " parameter table (rows=" + rows.size() + ")");
+        }
+        var values = rows.get(row);
+        if (index >= values.size()) {
+            throw new IllegalStateException("index " + index + " is outside that skill parameter row (size="
+                    + values.size() + ")");
+        }
+        return values.get(index);
+    }
+
+    /** The share a magnitude is multiplied by: the stated `percent`, or the cast skill's own parameter. */
+    private static double shareOf(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getPercent() != null) {
+            return effect.getPercent();
+        }
+        String spelled = effect.getPercentFromCastParam() == null ? null
+                : String.valueOf(effect.getPercentFromCastParam());
+        if (spelled == null) {
+            throw new IllegalStateException("a magnitude needs a share: neither \"percent\" nor \"percent_from_cast_param\" is stated");
+        }
+        return castParamValue(effect, ctx, spelled);
+    }
     private static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
         Character owner = requireCharacterOwner(effect, ctx);
-        Double fromStacks = stackScale(effect.getScale(), effect.getPercent(), ctx);
+        // ⚠⚠ `stackScale` takes a primitive, so handing it `effect.getPercent()` unboxes a null the moment a rule states
+        // its share as `percent_from_cast_param` instead. The share is what the counter multiplies, so ask for it the one way.
+        Double fromStacks = stackScale(effect.getScale(), shareOf(effect, ctx), ctx);
         if (fromStacks != null) {
             return fromStacks + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
@@ -2353,33 +2408,11 @@ public final class TriggerInterpreter {
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (effect.getScale().trim().startsWith(TriggerTable.CAST_SKILL_PARAM_PREFIX)) {
-            // ⭐ The skill that produced THIS event, and its parameter at the CURRENT level (1415 memosprite skill 10, data slot 13).
+            // The skill that produced THIS event, and its parameter at the CURRENT level (1415 memosprite skill 10).
             int index = Integer.parseInt(
                     effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()).trim());
-            CanHit caster = ctx.actor();
-            if (!(caster instanceof Summon from)) {
-                throw new IllegalStateException("the scale \"" + effect.getScale()
-                        + "\" reads the parameter of the skill that produced the event, but the actor is "
-                        + (caster == null ? "nobody" : caster.getName() + ", which is not a memosprite"));
-            }
-            Skill casting = from.skillAt(ctx.skillId());
-            if (casting == null || casting.getData() == null || !casting.getData().isLoaded()) {
-                throw new IllegalStateException("the scale \"" + effect.getScale()
-                        + "\" reads the skill that produced the event, but " + from.getName()
-                        + " has no loaded skill at slot " + ctx.skillId());
-            }
-            var rows = casting.getData().getSkills();
-            int row = caster.skillLevel(casting) - 1;
-            if (row < 0 || row >= rows.size()) {
-                throw new IllegalStateException("skill level " + caster.skillLevel(casting) + " is outside " + from.getName()
-                        + " skill " + ctx.skillId() + " parameter table (rows=" + rows.size() + ")");
-            }
-            var values = rows.get(row);
-            if (index >= values.size()) {
-                throw new IllegalStateException("the scale \"" + effect.getScale() + "\" names index " + index
-                        + ", which is outside that skill parameter row (size=" + values.size() + ")");
-            }
-            return effect.getPercent() * values.get(index)
+            double share = effect.getPercent() == null ? 1.0 : effect.getPercent();
+            return share * castParamValue(effect, ctx, String.valueOf(index))
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (effect.getScale().trim().startsWith(TriggerTable.ACTOR_ATTR_PREFIX)) {
@@ -2406,7 +2439,7 @@ public final class TriggerInterpreter {
             }
             AttributeType from = AttributeType.fromString(
                     effect.getScale().trim().substring(TriggerTable.SUMMON_ATTR_PREFIX.length()).trim());
-            return effect.getPercent() * fielded.getAttribute(from).get()
+            return shareOf(effect, ctx) * fielded.getAttribute(from).get()
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (effect.getScale().trim().startsWith(ABOVE_PREFIX)) {
@@ -4001,6 +4034,14 @@ public final class TriggerInterpreter {
     }
 
     private static void requirePercent(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getPercentFromCastParam() != null) {
+            if (effect.getPercent() != null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states BOTH \"percent\" and \"percent_from_cast_param\"; the share comes from one of them"
+                                + " (source: " + spec.getSource() + ")");
+            }
+            return;
+        }
         if (effect.getPercent() == null) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"percent\" (source: " + spec.getSource() + ")");

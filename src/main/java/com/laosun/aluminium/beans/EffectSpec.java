@@ -74,6 +74,7 @@ public class EffectSpec {
         copy.castTarget = this.castTarget;
         copy.skill = this.skill;
         copy.damageParam = this.damageParam;
+        copy.percentFromCastParam = this.percentFromCastParam;
         copy.damageLevel = this.damageLevel;
         copy.asAttack = this.asAttack;
         copy.rule = this.rule;
@@ -563,6 +564,15 @@ return copy;
      */
     @SerializedName("damage_param")
     private Integer damageParam;
+
+    /**
+     * The share itself, read from the parameter table of the skill that produced the event (zero-based index into its row), at the
+     * caster's CURRENT level -- 「等同于德谬歌生命上限的 <b>#1%</b>」, where #1 runs with the level. Exactly one of this and
+     * {@code percent} may be stated. ⚠ It exists because some sentences multiply a skill parameter BY an attribute
+     * ({@code "scale": "summon_attr:HEALTH"}), and a single {@code scale} can only name one factor.
+     */
+    @SerializedName("percent_from_cast_param")
+    private Integer percentFromCastParam;
 
     /**
      * Which <b>level row</b> of the skill's parameter table the multiplier is read from; absent means the

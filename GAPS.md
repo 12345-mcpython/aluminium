@@ -36634,3 +36634,30 @@
 > * ⭐ **下一轮**：⭐ 回到 ⭐ `percent_from_cast_param` ✗ —— ⭐ 它的**装载期拒绝**已判据通过 ✓，⭐ 运行期只差那个 ⭐ `getAmount()` 的无保护拆箱 ✗
 >   ⇒ ⭐ 这次先拿 ⭐ **stack trace 的帧** ✓（⚠ 并且 ⭐ `failure` 与 `error` **都要读** ✓ —— ⭐ 上一轮的教训 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2274** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 8 轮：🎉🎉🎉 **第 99 件出货 ＝ `percent_from_cast_param`** ✓✓ —— ⭐ `1141513` 的**第二件前置**落地 ✓，
+> ⭐ 于是"**技能参数 × 属性**"可以相乘 ✓）**）**：
+>
+> * ✅ **出货内容（六处落点 ✓）**：⭐ `EffectSpec` 新字段 ⭐ `percent_from_cast_param` ✓ ＋ ⭐ **`copy()`** ✓（⭐ 见下 ✓）；
+>   ⭐ `requirePercent` 接受它 ✓（⭐ 与 `percent` **恰好一个** ✓，⭐ 两个都给 ⭐ 装载期**响亮拒绝** ✓）；
+>   ⭐ 两个 helper：⭐ `castParamValue` ✓（⭐ 从 `cast_skill_param:` 分支提出 ✓，⭐ 按**施放者的当前等级**取行 ✓）＋ ⭐ `shareOf` ✓；
+>   ⭐ `cast_skill_param:` 分支改用它们 ✓ ＋ ⭐ `summon_attr:` 分支用占比 ✓。
+> * ⭐⭐ **两个无保护拆箱（本轮真凶 ✓，⭐ 都在我新代码的路上 ✓）**：
+>   ⭐ ① ⭐ `magnitude = effect.getPercent() != null ? … : effect.getAmount();` ✗ —— ⭐ "有没有占比"**不能只看 `percent`** ✗
+>     ⇒ ⭐ 改成 ⭐ `percent != null || percentFromCastParam != null` ✓；
+>   ⭐ ② ⭐ **`stackScale(effect.getScale(), effect.getPercent(), ctx)`** ✗ —— ⭐ 它的第二个参数是**原始 `double`** ✗
+>     ⇒ ⭐ 传一个 null 的 `Double` ⭐ **在调用处就拆箱崩** ✓ ⇒ ⭐ 改成传 ⭐ `shareOf(effect, ctx)` ✓（⭐ "占比"的**唯一**问法 ✓）。
+>   ⚠ 而我**第一次猜**的那处（⭐ `MODIFY_RULE` 里的 L807 ✓）⭐ **本来就有 `!= null` 保护** ✗ ⇒ ⭐⭐ **教训：⭐ 先看 stack trace，⭐ 不要先猜行号** ✓
+>     （⭐ 而且 ⭐ 读 JUnit XML 时 ⭐ `failure` 与 `error` **都要看** ✓）。
+> * ⭐⭐ **全量里一个自带的自检抓到了我的疏漏** ✓✓：⭐ `RuleEffectAmendmentTest` ⇒
+>   *"getPercentFromCastParam must survive the copy -- add it to EffectSpec.copy()"* ✗ ⇒ ⭐ 新字段必须进 ⭐ `EffectSpec.copy()` ✓
+>   ⇒ ⭐⭐ **记忆点：⭐ 往 `EffectSpec` 加字段，⭐ `copy()` 也要加 ✓**（⭐ 而且 ⭐ 这条**有测试守着** ✓）。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `PercentFromCastParamScaleTest` ⇒ ⭐
+>   `[percent_param] the row used = [70.0, 1.008, 0.504] ; the memosprite Max HP = 1536.7968 ; expected = 107575.776 ; the gain = 107575.776` ✓✓
+>   ⇒ ⭐ **乘积成立** ✓（⭐ `70 × 1536.7968` ✓）；
+>   ⭐ 第二个用例：⭐ 两种占比同时给出 ⇒ ⭐ `Op MODIFY_ATTR states BOTH "percent" and "percent_from_cast_param"` ✓；
+>   ⭐ **变异** ✓：⭐ 把占比换成 `1.0` ✗ ⇒ ⭐ `expected: <107575.776> but was: <1536.7968>` ⇒ 红 ✓。
+> * ⭐ **本轮复习到的三条旧教训**：⭐ 判据期望值要按 ⭐ **引擎实际用的行**读 ✓（⭐ 那技能的 `70` 每行都一样 ✓）；
+>   ⭐ `TriggerSpecs.set` 的键是 ⭐ **字段名（驼峰）** ✓ 不是 JSON 拼法 ✗；⭐ 变异前 ⭐ 先删 `build/resources` 的拷贝 ✓。
+> * ⭐⭐ **`1141513` 的两件前置现在都齐了** ✓（⭐ `actor_attr:` 第 98 件 ✓、⭐ 本轮 ✓）⇒ ⭐ **下一轮就可以把第一半写成句** ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2275** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
