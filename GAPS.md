@@ -2469,3 +2469,13 @@
   3. `Damage.getSkillKey()` = “**装载器的槽位**”，而结算事件**也携带**那个 `Damage` ⇒ 新条件能读到它；
   4. `target: "summon"` 在这条路上**解析不到单位**（探针 0），而 **`attacker`** 精确且有效；
   5. **加一个条件名要改五处**：`TriggerTable` 的 switch、它的闭集、`UnitDisciplineTest` 的 `KNOWN`、以及文档（★ 而那道数值纪律测试会**主动拓到**漏掉）。
+
+- ⛔ **第 83 轮：内容写了一版、判据未证成 ⇒ 整轮回滚**（第 9 次）。但两处**引擎加固留下了**（它们是已出货能力的一部分）：
+  - ① **`requirePercent`** 必须认 `percent_from_resource`（否则 `TICK_DOT` 这类只走 `requirePercent` 的 op 用不了它）；
+  - ② **`requireNonZeroPercent`** 里的 `effect.getPercent() == 0` **会拆箱 null** ⇒ 已改成 null-safe。
+  - ⭐ 加上之前的“四处”，**实际是六处**：`EffectSpec` 字段、`shareOf` 分支、“恰好一个份额”检查、`modifyAttr` 的份额清单、`requirePercent`、`requireNonZeroPercent`。
+- ⭐ **第 83 轮写对并验证过的部分（回滚前已确认“加载通过”）**：`1410.json` 无损转 dict（21 条规则）、
+  2 条捕获规则、**14 条 `TICK_DOT`**（7 元素 × 2 技能）。⭐ 而回滚的原因是**判据**：
+  - 实测：那个判据里海瑟音的普攻对敌人**完全没有造成伤害**（前后 HP 完全相同，而且加与不加诗都是同一个数）。
+  - ⭐ **下一问**：用**已出货的攻击形状**（`OceanOdeDamageTest` 铸她的**战技**）重搭判据，
+    并改成读**可读的量**（而不是敌人 HP 差）。

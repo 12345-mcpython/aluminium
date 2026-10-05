@@ -4307,6 +4307,17 @@ public final class TriggerInterpreter {
     }
 
     private static void requirePercent(EffectSpec effect, String op, TriggerSpec spec) {
+        // ⭐ A share carried in a resource is a fourth spelling (2026-10-02): the way a number captured at cast time is spent later.
+        if (effect.getPercentFromResource() != null) {
+            if (effect.getPercent() != null || effect.getPercentFromCastParam() != null
+                    || effect.getPercentFromSkillParam() != null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states more than one share (\"percent\" / \"percent_from_cast_param\" / "
+                                + "\"percent_from_skill_param\" / \"percent_from_resource\"); the share comes from exactly one of them (source: "
+                                + spec.getSource() + ")");
+            }
+            return;
+        }
         if (effect.getPercentFromSkillParam() != null) {
             if (effect.getPercent() != null || effect.getPercentFromCastParam() != null) {
                 throw new IllegalArgumentException(
@@ -4413,7 +4424,8 @@ public final class TriggerInterpreter {
      */
     private static void requireNonZeroPercent(EffectSpec effect, String op, TriggerSpec spec) {
         requirePercent(effect, op, spec);
-        if (effect.getPercent() == 0) {
+        // \u26a0 null-safe (2026-10-02): a rule may state its share as `percent_from_resource`, in which case `percent` is null and this comparison used to unbox it.
+        if (effect.getPercent() != null && effect.getPercent() == 0) {
             throw new IllegalArgumentException(
                     "Op " + op + " has \"percent\": 0, which would attach a buff that changes nothing; the "
                             + "magnitude is the point (positive = 受到的伤害提高, negative = 受到的伤害降低) "
