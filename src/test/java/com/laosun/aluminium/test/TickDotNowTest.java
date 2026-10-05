@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code TICK_DOT} (2026-09-28): 「使其当前承受的裂伤状态<b>立即产生 1 次</b>相当于原伤害 85% 的伤害」 (1111 Luka's talent).
+ * {@code TICK_DOT} (2026-09-28): "使其当前承受的裂伤状态<b>立即产生 1 次</b>相当于原伤害 85% 的伤害" (1111 Luka's talent).
  *
- * <p>It mirrors {@code Battle.tickDots} — same source, element, {@code DamageType.DOT} and {@code EnergyGrant.KILL_ONLY} — so
- * it is "the state ticked once more", not a new kind of damage. ⚠ The duration is untouched (the sentence asks for an extra
- * instance of <i>damage</i>), and the layer ceiling is honoured while summing, because 「当前承受的…伤害」 is what the state
+ * <p>It mirrors {@code Battle.tickDots} - same source, element, {@code DamageType.DOT} and {@code EnergyGrant.KILL_ONLY} - so
+ * it is "the state ticked once more", not a new kind of damage. Note: The duration is untouched (the sentence asks for an extra
+ * instance of <i>damage</i>), and the layer ceiling is honoured while summing, because "当前承受的…伤害" is what the state
  * is dealing <b>now</b>.
  */
 public class TickDotNowTest {
@@ -31,7 +31,7 @@ public class TickDotNowTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The extra instance is exactly {@code percent} of what the state was dealing. */
+    /** Note: The extra instance is exactly {@code percent} of what the state was dealing. */
     @Test
     public void theExtraInstanceIsAShareOfTheState() {
         Fixture f = new Fixture();
@@ -45,7 +45,7 @@ public class TickDotNowTest {
                 "「立即产生 1 次相当于原伤害 85% 的伤害」 -- a share of the state's own damage, through the same settlement");
     }
 
-    /** ⚠ It is damage, not ageing: the state keeps its remaining turns. */
+    /** Note: It is damage, not ageing: the state keeps its remaining turns. */
     @Test
     public void theExtraInstanceDoesNotAgeTheState() {
         Fixture f = new Fixture();
@@ -60,7 +60,7 @@ public class TickDotNowTest {
         Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "…and the state is still there");
     }
 
-    /** ⚠ Only the named state ticks: a different element's DOT is left alone. */
+    /** Note: Only the named state ticks: a different element's DOT is left alone. */
     @Test
     public void onlyTheNamedStateTicks() {
         Fixture f = new Fixture();
@@ -71,7 +71,7 @@ public class TickDotNowTest {
         Assertions.assertEquals(0.0, windTick, 1e-9, "no Wind DOT is up, so the Wind state has nothing to settle");
     }
 
-    /** ⚠ A rule that names no share is refused: 「立即产生 1 次」 always comes with a percentage or an amount. */
+    /** Note: A rule that names no share is refused: "立即产生 1 次" always comes with a percentage or an amount. */
     @Test
     public void aMissingShareIsRefused() {
         EffectSpec effect = new EffectSpec();

@@ -7,7 +7,7 @@ import com.laosun.aluminium.models.Resource;
 import com.laosun.aluminium.models.skill.Skill;
 
 /**
- * Standard skill point (SP) policy (P8-4): start at 3, cap 5, **our side's** basic attack +1,
+ * Standard skill point (SP) policy (P8-4): start at 3, cap 5, our side's basic attack +1,
  * skill -1, everything else neutral.
  *
  * <p>Rule table (see the full comparison and gap list in {@code engine.md} §9.6):
@@ -15,31 +15,31 @@ import com.laosun.aluminium.models.skill.Skill;
  * <table border="1">
  *   <tr><th>Skill category</th><th>Skill points</th></tr>
  *   <tr><td>{@link SkillCategory#NORMAL}</td><td>+{@link Constant#SKILL_POINT_GAIN_BASIC}</td></tr>
- *   <tr><td>{@link SkillCategory#BPSKILL}</td><td>-1; if there are not enough, the unit **cannot act**</td></tr>
+ *   <tr><td>{@link SkillCategory#BPSKILL}</td><td>-1; if there are not enough, the unit cannot act</td></tr>
  *   <tr><td>Everything else (including {@code ULTRA}, map skills, and the {@code UNSPECIFIED} of talents/follow-up attacks)</td>
  *       <td>neutral</td></tr>
  * </table>
  *
  * <p><b>Why only our side is counted</b>: enemies also act through {@code Battle.performAction}, and
- * their skills are {@code Normal} as well — without a camp check, every enemy hit would give our side
+ * their skills are {@code Normal} as well - without a camp check, every enemy hit would give our side
  * +1 skill point. The test uses {@link com.laosun.aluminium.enums.Camp#PLAYER} ("a unit on our side")
  * rather than "is it player-controlled": when friendly summons (memosprite, P9-4) are added later they
- * **should** also supply points, and this behaviour is pinned by {@code SkillPointGameParityTest}.
+ * should also supply points, and this behaviour is pinned by {@code SkillPointGameParityTest}.
  *
- * <p>⚠ <b>Known deviation</b> (<b>F-3</b> in §F of {@code DOC_VS_CODE.md}): here {@code NORMAL} is
- * uniformly +1, whereas in the game **enhanced basic attacks have exceptions** — Boothill's (波提欧)
+ * <p>Note: <b>Known deviation</b> (<b>F-3</b> in §F of {@code DOC_VS_CODE.md}): here {@code NORMAL} is
+ * uniformly +1, whereas in the game enhanced basic attacks have exceptions - Boothill's (波提欧)
  * enhanced basic attack "cannot restore skill points", while Qingque's (青雀) enhanced basic attack
  * "restores 1 skill point". In the data both are {@code "Normal"} (there is no separate type), so this
- * implementation is **correct for Qingque and wrong for Boothill**.
- * ⚠ **Do not change it to "enhanced basic attacks are always +0"** (that would break Qingque) — the
- * right fix is a **per-skill skill-point delta field** (a data completion). This class leaves
+ * implementation is correct for Qingque and wrong for Boothill.
+ * Note: Do not change it to "enhanced basic attacks are always +0" (that would break Qingque) - the
+ * right fix is a per-skill skill-point delta field (a data completion). This class leaves
  * {@link #gainForCast} as the override point.
  *
- * <p>⚠ <b>Character-level modifiers are not wired up</b> (F-4 in the same §F): Bronya's (布洛妮娅)
+ * <p>Note: <b>Character-level modifiers are not wired up</b> (F-4 in the same §F): Bronya's (布洛妮娅)
  * "50% chance to +1 on skill", Sushang's (素裳) "+1 on a skill that hits a broken target", Sparkle's
- * (花火) "cap +2" and so on all have to wait for the P8-7 trigger table. This class **deliberately knows
- * no character** — when adding these, extend and override {@link #gainForCast} (or drive it from the
- * P8-7 effect table), and do **not** write {@code cid} checks here.
+ * (花火) "cap +2" and so on all have to wait for the P8-trigger table. This class deliberately knows
+ * no character - when adding these, extend and override {@link #gainForCast} (or drive it from the
+ * P8-effect table), and do not write {@code cid} checks here.
  */
 public class StandardSkillPointPolicy implements SkillPointPolicy {
 
@@ -70,7 +70,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
     }
 
     /**
-     * Exposes the underlying resource — for team-level modifiers like "change the cap / configure an
+     * Exposes the underlying resource - for team-level modifiers like "change the cap / configure an
      * overflow allowance" (Sparkle's (花火) cap +2 and the 10-point overflow store both belong here).
      */
     public Resource resource() {
@@ -78,13 +78,13 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
     }
 
     /**
-     * Reporting hook for the skill points' **actual change** (P8-6).
+     * Reporting hook for the skill points' actual change (P8-6).
      *
      * <p>Why the policy reports it instead of {@code Battle} comparing the before/after values: the
      * policy is the only component that knows "whether it actually went up this time and by how much"
      * (for example, when already at cap after a basic attack the actual credited amount is 0, and no
      * event should be fired). {@code Battle} is only responsible for broadcasting the reported events
-     * to the team — that way {@code Battle} still **does not need to know the skill point rules**
+     * to the team - that way {@code Battle} still does not need to know the skill point rules
      * (see F-8 in §F).
      */
     public interface Listener {
@@ -97,9 +97,9 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
          * Actually spent {@code amount} points ({@code > 0}).
          */
         /**
-         * ✅ A spend, WITH the unit that spent (2026-09-30; reader: cone 23061's 「我方任意角色在自身同一回合内累计消耗 ≥ 4 点战技点」).
+         * A spend, WITH the unit that spent (2026-09-30; reader: cone 23061's "我方任意角色在自身同一回合内累计消耗 >= 4 点战技点").
          *
-         * <p>★ The spender was always known one frame up -- {@code onSkillCast(CanHit user, Skill skill)} is where the
+         * <p>The spender was always known one frame up -- {@code onSkillCast(CanHit user, Skill skill)} is where the
          * policy decides -- and dropping it here is why a trigger rule could not tell who spent. It stays {@code null} for
          * the bare {@link StandardSkillPointPolicy#spend()} path, which has no actor to name, and a rule gated on
          * {@code actor == self} then simply does not fire for it.
@@ -136,11 +136,11 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
         }
         SkillCategory category = categoryOf(skill);
         if (category == null) {
-            return true;                        // no skill data (enemy skill / empty skill) → neutral
+            return true;                        // no skill data (enemy skill / empty skill) to neutral
         }
         return switch (category) {
             case NORMAL -> {
-                // use gain()'s **return value** (the actual credited amount) instead of the nominal
+                // use gain()'s return value (the actual credited amount) instead of the nominal
                 // one: it is 0 when already at cap, and no event should be fired
                 int gained = gain(gainForCast(user, skill, category));
                 if (gained > 0) {
@@ -153,21 +153,21 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
                     listener.onSpent(user, 1);
                     yield true;
                 }
-                yield false;                    // not enough → the action does not happen, and **no** spend event is fired
+                yield false;                    // not enough to the action does not happen, and no spend event is fired
             }
             // ULTRA / MAZE / MAZE_NORMAL / ASSIST / ELATION_DAMAGE /
-            // UNSPECIFIED (talent·follow-up attack) / UNKNOWN (a value the data does not recognise) → neutral
+            // UNSPECIFIED (talent-follow-up attack) / UNKNOWN (a value the data does not recognise) to neutral
             default -> true;
         };
     }
 
     /**
-     * How many skill points one basic attack **should restore** (default
+     * How many skill points one basic attack should restore (default
      * {@link Constant#SKILL_POINT_GAIN_BASIC}).
      *
-     * <p>This is the class's **primary override point**: character-level modifiers such as "Sparkle
+     * <p>This is the class's primary override point: character-level modifiers such as "Sparkle
      * (花火) in the team gives +1" or "an enhanced basic attack restores no points" are produced by a
-     * subclass or the P8-7 effect table overriding it, and **without changing {@code Battle}**.
+     * subclass or the P8-effect table overriding it, and without changing {@code Battle}.
      *
      * @param user     the acting unit
      * @param skill    the skill
@@ -181,8 +181,8 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
     /**
      * Resolves the skill category.
      *
-     * <p>⚠ Go through {@code SkillData.getCategory()} and not a bare-string {@code switch} — the
-     * latter **silently mismatches** when the data side changes a spelling or adds a new value (see
+     * <p>Note: Go through {@code SkillData.getCategory()} and not a bare-string {@code switch} - the
+     * latter silently mismatches when the data side changes a spelling or adds a new value (see
      * F-6 in §F of {@code DOC_VS_CODE.md}).
      *
      * @return {@code null} means "there is no category to speak of" (the skill or its skill data is

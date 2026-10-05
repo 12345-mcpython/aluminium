@@ -20,17 +20,17 @@ import java.util.Random;
 /**
  * `actor_attr:<ATTRIBUTE>`: a magnitude that is a share of the ACTOR's own attribute (2026-10-02).
  *
- * <p>Reader: 1415's memosprite skill 10 「献予「创世」之诗」 -- 「<b>对开拓者•记忆施放时</b>，使开拓者•记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限</b>的
- * #1%」. Read that carefully: the rule belongs to 开拓者•记忆, but the share is of <b>德谬歌</b> -- the unit doing the casting. Neither
- * `self_attr:` (the owner) nor `summon_attr:` (the owner's memosprite, which for 8007 is 迷迷) names that unit; the actor does.
+ * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "<b>对开拓者-记忆施放时</b>，使开拓者-记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限</b>的
+ * #1%". Read that carefully: the rule belongs to 开拓者-记忆, but the share is of <b>德谬歌</b> -- the unit doing the casting. Neither
+ * `self_attr:` (the owner) nor `summon_attr:` (the owner's memosprite, which for 800is 迷迷) names that unit; the actor does.
  *
- * <p>⭐ So this judge is deliberately THREE-way: the gain must equal the actor's share, and must not equal the owner's -- which is the exact
+ * <p>So this judge is deliberately THREE-way: the gain must equal the actor's share, and must not equal the owner's -- which is the exact
  * mistake the two existing spellings would have made.
  */
 public class ActorAttrScaleTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
-    private static final int RECIPIENT = 8007;   // 开拓者•记忆, whose own memosprite is 迷迷, NOT 德谬歌
+    private static final int RECIPIENT = 8007;   // 开拓者-记忆, whose own memosprite is 迷迷, NOT 德谬歌
     private static final int MONSTER = 1002011;
     private static final int ODE_OF_ROMANCE = 14;
     private static final double SHARE = 0.1;

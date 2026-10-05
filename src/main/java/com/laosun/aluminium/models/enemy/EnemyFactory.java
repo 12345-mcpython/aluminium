@@ -23,16 +23,16 @@ import static com.laosun.aluminium.enums.AttributeType.*;
  *
  * <pre>
  * EnemyFactory.create(1002011, 90, 1)
- *   → monster_config[1002011] × monster_template_config[1002011] × hard_level_group[1][90]
- *   → Enemy (attributes / level / resistance / weaknesses / toughness)
+ *    to monster_config[1002011]  x  monster_template_config[1002011]  x  hard_level_group[1][90]
+ *    to Enemy (attributes / level / resistance / weaknesses / toughness)
  * </pre>
  *
- * <p>This stage does **numbers** only: weaknesses and toughness merely move data onto the
+ * <p>This stage does numbers only: weaknesses and toughness merely move data onto the
  * {@code Enemy}; toughness reduction and weakness break are in P4. Debuff immunity
  * ({@code debuff_resistance}) is wired up in P6-1, the phase table in P9-5, and the summon roster in P9-4.
  *
- * <p>Both the level and the level group come from the **stage** ({@code StageConfig}), so they are
- * passed in by the caller; the stage-driven part is left to P7-4.
+ * <p>Both the level and the level group come from the stage ({@code StageConfig}), so they are
+ * passed in by the caller; the stage-driven part is left to P-4.
  *
  * <p><b>Why the lookup is a separate step.</b> Since P9-4 the same monster data also builds
  * {@link com.laosun.aluminium.models.Summon}s ({@code SummonFactory}), which need exactly "which config,
@@ -133,16 +133,16 @@ public final class EnemyFactory {
      * Builds the skill an enemy acts with (P5-3).
      *
      * <p>The skill comes from {@code enemy_skills.json} ({@link Constant#ENEMY_SKILLS}).
-     * That table **covers only the few monsters used for the demo**; other monsters have no entry —
+     * That table covers only the few monsters used for the demo; other monsters have no entry - 
      * in that case it falls back to a default basic attack: multiplier 1.0, single hit, element
      * taken from the monster's own {@code stance_type}. That way "any monster can hit people" and
      * it will not just stand there doing nothing because there is no data.
      *
-     * <p>Element resolution order: the table's {@code element} → the monster's own
-     * {@code stance_type} → physical ({@code stance_type} may also be null; the data really does
+     * <p>Element resolution order: the table's {@code element} to the monster's own
+     * {@code stance_type} to physical ({@code stance_type} may also be null; the data really does
      * contain such entries).
      *
-     * <p>⚠ The multipliers are guesses, see {@link com.laosun.aluminium.beans.EnemySkillData}.
+     * <p>Note: The multipliers are guesses, see {@link com.laosun.aluminium.beans.EnemySkillData}.
      *
      * @param monsterId the monster the data is keyed by (a summon passes its own id, not its master's)
      * @param template  the monster's template, for the element fallback

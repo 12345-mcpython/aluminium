@@ -29,7 +29,7 @@ import java.util.Random;
  * <ul>
  *   <li><b>Stacking is opt-in.</b> {@code StatModifierBuff.isSameKind} historically means "re-applying
  *       this replaces it", and two shipped tests depend on that. A stackable buff must accumulate
- *       <em>without</em> changing that predicate, so both behaviours are asserted here side by side —
+ *       <em>without</em> changing that predicate, so both behaviours are asserted here side by side - 
  *       a change that makes the plain {@code MODIFY_ATTR} start stacking would be a silent buff to
  *       every character in the game.</li>
  *   <li><b>The cap is a cap, not a rolling window.</b> Applying a sixth copy of a 5-stack buff must
@@ -37,7 +37,7 @@ import java.util.Random;
  *       reachable.</li>
  *   <li><b>Removal is exact and per-stack.</b> Each stack is an ordinary buff with its own id, so
  *       removing one must subtract exactly one stack's worth (not "recompute the attribute"), and
- *       expiry must return the attribute to base exactly — the property
+ *       expiry must return the attribute to base exactly - the property
  *       {@code BuffRuleTest.expiryRestoresTheOriginalValueExactly} already pins for one stack.</li>
  *   <li><b>"For the rest of the battle" is a flag, not a big number.</b> A permanent buff is never
  *       ticked, so it survives any number of turns; spelling it {@code Integer.MAX_VALUE} would still
@@ -48,7 +48,7 @@ import java.util.Random;
  */
 public class StatModifierStackingTest {
 
-    /** hp 1000 / def 200 / atk 300 / speed 100 — all different, so a mix-up shows. */
+    /** hp 1000 / def 200 / atk 300 / speed 100 - all different, so a mix-up shows. */
     private static Character hero() {
         return Character.fromAttributes("hero", 1000, 200, 300, 100);
     }
@@ -123,7 +123,7 @@ public class StatModifierStackingTest {
      * "For the rest of the battle": a permanent stack survives any number of turn boundaries.
      *
      * <p>The assertion is deliberately "after many rounds the modifier is still there, with the same
-     * duration" — the concrete meaning of unbounded here. A {@code Integer.MAX_VALUE} duration would
+     * duration" - the concrete meaning of unbounded here. A {@code Integer.MAX_VALUE} duration would
      * pass this too but would eventually expire; the flag cannot.
      */
     @Test
@@ -265,7 +265,7 @@ public class StatModifierStackingTest {
      * did not work the primitive would be a relic-shaped special case rather than a generic one.
      *
      * <p>One "turn" here is a {@code beforeMove}/{@code afterMove} pair: a late buff is ticked by the
-     * {@code afterMove} half, so a 2-turn stack is gone after the second pair — and both stacks were
+     * {@code afterMove} half, so a 2-turn stack is gone after the second pair - and both stacks were
      * created at the same moment, so both must go together, with the attribute back at base exactly.
      */
     @Test
@@ -369,7 +369,7 @@ public class StatModifierStackingTest {
      * The new arguments belong to {@code MODIFY_ATTR} only.
      *
      * <p>Without this check a {@code max_stacks} written on, say, {@code GAIN_ENERGY} would be read by
-     * Gson, ignored by the interpreter, and the rule would load perfectly while doing the wrong thing —
+     * Gson, ignored by the interpreter, and the rule would load perfectly while doing the wrong thing - 
      * the same silent-typo class the closed op vocabulary exists to eliminate.
      */
     @Test
@@ -406,7 +406,7 @@ public class StatModifierStackingTest {
      * A stackable buff that cannot name its own stack group is refused rather than accumulated
      * without a bound.
      *
-     * <p>The invariant is "stackable ⇒ a non-null group key" (only the count of siblings makes a cap
+     * <p>The invariant is "stackable so a non-null group key" (only the count of siblings makes a cap
      * enforceable). A future buff class that forgets the second half would otherwise grow the list for
      * every application, which is exactly what a cap exists to prevent.
      */

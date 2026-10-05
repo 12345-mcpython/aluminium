@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23031: a follow-up attack grants a stack of 【流光】 (max 2), each layer makes Ultimate damage ignore 27% of the
+ * Light cone 23031: a follow-up attack grants a stack of [流光] (max 2), each layer makes Ultimate damage ignore 2% of the
  * target's defence, and the wearer's turn end removes one layer.
  */
 public class Cone23031Test {

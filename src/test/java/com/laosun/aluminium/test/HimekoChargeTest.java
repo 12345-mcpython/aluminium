@@ -20,17 +20,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 姬子 (1003) — the first character whose kit is built on a <b>declared resource</b>.
+ * 姬子 (1003) - the first character whose kit is built on a <b>declared resource</b>.
  *
- * <p><b>Why her.</b> Her document is the corpus's most common shape that had no spelling: 「获得充能，上限3点」,
- * 「若充能达到上限则…」, 「消耗全部充能」. The ops to write such a resource existed since P8-8, but nothing could
- * <em>read</em> one back, and nothing could declare one at all — 41 of the 97 character documents gate something on
- * a count, which is the largest single hole the corpus scan found (ROADMAP §13.7). Her three rules are the reader
+ * <p><b>Why her.</b> Her document is the corpus's most common shape that had no spelling: "获得充能，上限3点",
+ * "若充能达到上限则…", "消耗全部充能". The ops to write such a resource existed since P8-8, but nothing could
+ * <em>read</em> one back, and nothing could declare one at all - 41 of the 9character documents gate something on
+ * a count, which is the largest single hole the corpus scan found (ROADMAP §13.). Her three rules are the reader
  * that pays for both capabilities: {@code self_resource:<NAME>} in the condition DSL, and the {@code resources}
  * block that says what the cap is.
  *
- * <p>⚠ What is <b>not</b> authored, and the capability each clause would need, is listed in
- * {@code characters/1003.json}'s note — 星魂 4's 「施放战技…击破时」 and the ultimate's per-kill energy both need to
+ * <p>Note: What is <b>not</b> authored, and the capability each clause would need, is listed in
+ * {@code characters/1003.json}'s note - 星魂 4's "施放战技…击破时" and the ultimate's per-kill energy both need to
  * know <em>which ability</em> caused the event, which no event carries.
  */
 public class HimekoChargeTest {
@@ -42,7 +42,7 @@ public class HimekoChargeTest {
      * An ordinary character with no rules of their own: the ally who attacks, so nothing but her own table can
      * react ({@link TestCharacters}).
      */
-    // ✅ 2026-09-30: this test’s ally must be SINGLE-TARGET, named here instead of taken from the shared
+    // 2026-09-30: this test's ally must be SINGLE-TARGET, named here instead of taken from the shared
     // "unregistered character" control. Measured: the control used to be 1505, and when it moved to 1502/1506 the
     // bystander enemy in `onePointShortOfTheCapNothingHappens` lost 26.6 HP -- because that test has the ally cast
     // `DefaultSkill(ALLY, 1, 1)` at the FIRST enemy while asserting on the SECOND, and slot 1 is a blast for some
@@ -56,10 +56,10 @@ public class HimekoChargeTest {
     private static final String CHARGE = "充能";
 
     // ==================================================================
-    // The three clauses of 天赋「乘胜追击」
+    // The three clauses of 天赋"乘胜追击"
     // ==================================================================
 
-    /** 「战斗开始时获得1点充能。」 */
+    /** "战斗开始时获得1点充能。" */
     @Test
     public void theBattleStartsHerAtOneCharge() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
@@ -73,7 +73,7 @@ public class HimekoChargeTest {
     }
 
     /**
-     * 「当有敌方目标的弱点被击破时，姬子获得充能，上限3点。」
+     * "当有敌方目标的弱点被击破时，姬子获得充能，上限3点。"
      *
      * <p>Driven through a <b>real</b> weakness break, not by firing the event: two of her Fire basic attacks empty
      * Ice Edge's 60 toughness, and the rule has to fire from inside the engine's own break path.
@@ -95,7 +95,7 @@ public class HimekoChargeTest {
                 "BATTLE_START's 1 plus the break's 1 -- 「当有敌方目标的弱点被击破时，姬子获得充能」");
 
         // Two more breaks: the third point lands, the fourth is swallowed by the cap (overflow is 0 by default,
-        // so 「上限3点」 is enforced by the declaration rather than by arithmetic in the rule).
+        // so "上限3点" is enforced by the declaration rather than by arithmetic in the rule).
         battle.fireTriggers(TriggerEvent.BREAK, himeko, iceEdge, 0, 0);
         Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "the cap is reached");
         battle.fireTriggers(TriggerEvent.BREAK, himeko, iceEdge, 0, 0);
@@ -103,10 +103,10 @@ public class HimekoChargeTest {
     }
 
     /**
-     * 「当我方目标施放攻击后，若姬子的充能达到上限则立即发动1次追加攻击，对敌方全体目标造成…伤害，并消耗全部充能。」
+     * "当我方目标施放攻击后，若姬子的充能达到上限则立即发动1次追加攻击，对敌方全体目标造成…伤害，并消耗全部充能。"
      *
-     * <p>A real ally attack drives it, and the claim is about <b>both</b> enemies: 「敌方全体」 is the thing the
-     * selector had to learn, and the second enemy is the witness — the ally aims at the first one only, so
+     * <p>A real ally attack drives it, and the claim is about <b>both</b> enemies: "敌方全体" is the thing the
+     * selector had to learn, and the second enemy is the witness - the ally aims at the first one only, so
      * anything the second one loses came from her follow-up.
      */
     @Test
@@ -133,7 +133,7 @@ public class HimekoChargeTest {
         Assertions.assertEquals(0, himeko.getResources().value(CHARGE), "「并消耗全部充能」");
     }
 
-    /** Below the cap nothing happens — the same attack, one point short. */
+    /** Below the cap nothing happens - the same attack, one point short. */
     @Test
     public void onePointShortOfTheCapNothingHappens() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
@@ -158,9 +158,9 @@ public class HimekoChargeTest {
      *
      * <p>Asserted against the engine's own settlement of the same base rather than against a recorded number: with
      * crit switched off (so no draw is taken and the value is deterministic) the rule's swing and a hand-made
-     * {@code applyAdditionalDamage} of {@code row × ATTACK} must agree <b>exactly</b> — which is the whole claim of
+     * {@code applyAdditionalDamage} of {@code row  x  ATTACK} must agree <b>exactly</b> - which is the whole claim of
      * {@code skill} + {@code damage_param} + {@code damage_level}. A rule that spelled 1.4 as a literal would pass
-     * this too; a rule that read the Lv1 row (0.7) or column 1 (the cap, 3.0) would not.
+     * this too; a rule that read the Lv1 row (0.) or column 1 (the cap, 3.0) would not.
      */
     @Test
     public void theFollowUpDealsTheTalentRowsLv10Damage() {
@@ -220,17 +220,17 @@ public class HimekoChargeTest {
      *
      * <p>Four clauses exist and each is pinned above; the counts here are what says nothing else was written. The one
      * missing clause would be a wrong number if it were spelled with the vocabulary that exists: the ultimate's
-     * 「每消灭1个敌方目标额外恢复5点能量」 needs to know the kill came from <b>that</b> ultimate — and while the
+     * "每消灭1个敌方目标额外恢复5点能量" needs to know the kill came from <b>that</b> ultimate - and while the
      * attribution now exists ({@code from_skill}, added for 星魂 4 on 2026-09-28), what is still unresolved is a
      * <b>data</b> question: the engine's own rule already credits 5 energy to the killer, and the sentence says
-     * 「**额外**恢复5点」 — whether those are the same 5 has to be settled against the game's numbers, because guessing
-     * it is a silent ±5 energy (registered as {@code M-45}).
+     * "额外恢复5点" - whether those are the same 5 has to be settled against the game's numbers, because guessing
+     * it is a silent +/-5 energy (registered as {@code M-45}).
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
         TriggerTable table = TriggerTables.of(HIMEKO);
-        // ⚠ 2 since M-32: 「战斗开始时获得1点充能」 and the rule that states which level her talent's numbers were
-        // quoted at (「quoted at Lv10」 as a TALENT +9 raise) — before that the level lived in a `damage_level` field
+        // Note: 2 since M-32: "战斗开始时获得1点充能" and the rule that states which level her talent's numbers were
+        // quoted at ("quoted at Lv10" as a TALENT +9 raise) - before that the level lived in a `damage_level` field
         // on the follow-up's damage effect.
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
                 "「战斗开始时获得1点充能」 and the talent's level statement");

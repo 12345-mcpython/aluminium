@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 银枝 (1302), from her own file (2026-09-28): 【升格】, the talent's per-hit energy, 行迹 勇气 and 星魂 1/4.
+ * 银枝 (1302), from her own file (2026-09-28): [升格], the talent's per-hit energy, 行迹 勇气 and 星魂 1/4.
  *
- * <p><b>What it needed.</b> Nothing new — which is the point of writing it now: the talent's 「每击中 1 个敌方目标…恢复 3 点能量」
- * is {@code per_target} on {@code GAIN_ENERGY}, 【升格】 is a <b>stackable named modifier</b> (`max_stacks: 10` + `buff: 升格`),
- * and 勇气's 「当前生命值百分比 ≤ 50% 的敌方目标」 is the existing {@code target_hp_percent} condition. The two rules that
+ * <p><b>What it needed.</b> Nothing new - which is the point of writing it now: the talent's "每击中 1 个敌方目标…恢复 3 点能量"
+ * is {@code per_target} on {@code GAIN_ENERGY}, [升格] is a <b>stackable named modifier</b> (`max_stacks: 10` + `buff: 升格`),
+ * and 勇气's "当前生命值百分比 <= 50% 的敌方目标" is the existing {@code target_hp_percent} condition. The two rules that
  * read like new vocabulary (星魂 4's cap raise, 星魂 6's defence ignore) are registered instead of approximated.
  */
 public class ArgentiStacksTest {
@@ -33,10 +33,10 @@ public class ArgentiStacksTest {
     private static final int MONSTER = 1002011;
 
     /**
-     * All three cast slots feed the talent: 「施放普攻、战技、终结技时…获得 1 层【升格】」.
+     * All three cast slots feed the talent: "施放普攻、战技、终结技时…获得 1 层[升格]".
      *
-     * <p>⚠ The energy half of the same sentence (「每击中 1 个敌方目标…恢复 3 点能量」) is {@code per_target}, and its
-     * arithmetic already has its own pin in {@code CastAppliedCountTest} — the engine exposes no public "current energy"
+     * <p>Note: The energy half of the same sentence ("每击中 1 个敌方目标…恢复 3 点能量") is {@code per_target}, and its
+     * arithmetic already has its own pin in {@code CastAppliedCountTest} - the engine exposes no public "current energy"
      * reader, and inventing one for a test would be a worse trade than pointing at the case that exists. What is pinned
      * here is what this file adds: <b>three rules</b>, one per cast event, each marking exactly once.
      */
@@ -55,7 +55,7 @@ public class ArgentiStacksTest {
     }
 
 
-    /** 【升格】 stacks up to its cap and each stack is a crit-rate step. */
+    /** [升格] stacks up to its cap and each stack is a crit-rate step. */
     @Test
     public void theStacksCapAtTen() {
         Fixture f = new Fixture();
@@ -97,13 +97,13 @@ public class ArgentiStacksTest {
     }
 
     /**
-     * 星魂 4's second half: 「使天赋的效果<b>可叠加上限提高 2 层</b>」 — the cap really does move.
+     * 星魂 4's second half: "使天赋的效果<b>可叠加上限提高 2 层</b>" - the cap really does move.
      *
-     * <p>⚠ Measured on the ATTRIBUTE, and the arithmetic has a trap worth stating: 星魂 4 grants **two** layers at battle
-     * start and they share the talent's stack group, so a cap of 12 is reached by 2 + 10 — twelve more hits still only
+     * <p>Note: Measured on the ATTRIBUTE, and the arithmetic has a trap worth stating: 星魂 4 grants two layers at battle
+     * start and they share the talent's stack group, so a cap of 12 is reached by 2 + 10 - twelve more hits still only
      * add ten. The probe that settled it (round 66) printed, at E0 vs E4: 10 stacks / crit 0.30 against 12 stacks in the
-     * group / crit 0.35 — the raise is real, and an expectation of "base + 12 × 0.025" double-counts those two layers.
-     * ⚠ `stacksOf("升格")` is <b>not</b> usable here either: three modifier groups carry that name (the talent's crit
+     * group / crit 0.35 - the raise is real, and an expectation of "base + 12  x  0.025" double-counts those two layers.
+     * Note: `stacksOf("升格")` is <b>not</b> usable here either: three modifier groups carry that name (the talent's crit
      * rate, 星魂 1's crit damage, 星魂 4's battle-start pair), and a name count adds them up.
      */
     @Test
@@ -119,7 +119,7 @@ public class ArgentiStacksTest {
                 "…and the amendment is filed against the named rule — the mechanism, not a coincidence");
     }
 
-    /** ⚠ Raising the cap of a rule that states none is refused at load: there would be no cap to raise. */
+    /** Note: Raising the cap of a rule that states none is refused at load: there would be no cap to raise. */
     @Test
     public void raisingACapThatDoesNotExistIsRefused() {
         EffectSpec state = new EffectSpec();

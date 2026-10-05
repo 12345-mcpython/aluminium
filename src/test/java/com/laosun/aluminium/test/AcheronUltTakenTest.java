@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1308 Acheron's talent: enemies enter battle with 「受到的终结技伤害提高 8%」, which DamageType.ULTRA scopes.
+ * 1308 Acheron's talent: enemies enter battle with "受到的终结技伤害提高 8%", which DamageType.ULTRA scopes.
  *
  * <p>Judged twice, and both bind the number: the compiled rule's scope and share, and the measured ratio between ultimate and normal damage.
  */

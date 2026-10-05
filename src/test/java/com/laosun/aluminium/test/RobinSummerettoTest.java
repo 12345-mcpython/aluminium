@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1512 Robin • Summeretto, from her own file (2026-09-29, round 193): the summon whose panel the document states in full.
+ * 1512 Robin - Summeretto, from her own file (2026-09-29, round 193): the summon whose panel the document states in full.
  *
- * <p>Two numbers are asserted, both from the document: the memosprite's Max HP is 70% of hers and its SPD is 180% of hers. The control shows nothing appears
+ * <p>Two numbers are asserted, both from the document: the memosprite's Max HP is 0% of hers and its SPD is 180% of hers. The control shows nothing appears
  * without the Skill.
  */
 public class RobinSummerettoTest {
@@ -30,7 +30,7 @@ public class RobinSummerettoTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠「初始拥有等同于知更鸟•晴歌70%生命上限的生命上限和等同于知更鸟•晴歌180%速度的速度」. */
+    /** Note:"初始拥有等同于知更鸟-晴歌0%生命上限的生命上限和等同于知更鸟-晴歌180%速度的速度". */
     @Test
     public void theSummonArrivesWithTheDocumentedPanel() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
@@ -50,7 +50,7 @@ public class RobinSummerettoTest {
                 "「180%速度」: expected " + expectedSpeed + ", got " + mem.getAttribute(AttributeType.SPEED).get());
     }
 
-    /** ⚠ The control: without the Skill nothing is summoned. */
+    /** Note: The control: without the Skill nothing is summoned. */
     @Test
     public void nothingIsSummonedWithoutTheSkill() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
@@ -61,7 +61,7 @@ public class RobinSummerettoTest {
         Assertions.assertNull(battle.memospriteOf(robin), "no Skill, no memosprite");
     }
 
-    /** ⚠ The file declares the Vibes resource with the document's cap, and the memosprite file states both numbers. */
+    /** Note: The file declares the Vibes resource with the document's cap, and the memosprite file states both numbers. */
     @Test
     public void theFilesDeclareTheResourceAndThePanel() {
         JsonObject character = read("/characters/1512.json");

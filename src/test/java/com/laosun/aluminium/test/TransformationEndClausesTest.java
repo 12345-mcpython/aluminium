@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408:「变身结束时」那两句的读数 (2026-10-02).
+ * 1408:"变身结束时"那两句的读数 (2026-10-02).
  *
- * <p>Both clauses hang off the same moment the reward does -- STATE_ENDED for 【变身】 -- so this reads them the way the shipped
+ * <p>Both clauses hang off the same moment the reward does -- STATE_ENDED for [变身] -- so this reads them the way the shipped
  * sibling reads the transformation's block: transform, then remove the state and look.
  */
 public class TransformationEndClausesTest {
@@ -27,7 +27,7 @@ public class TransformationEndClausesTest {
     private static final String STATE = "变身";
     private static final String SEEDS = "火种";
 
-    /** 「变身结束时，使我方全体速度提高 15%，持续 1 回合」 -- and 「我方全体」 is read on two units, not one. */
+    /** "变身结束时，使我方全体速度提高 15%，持续 1 回合" -- and "我方全体" is read on two units, not one. */
     @Test
     public void theEndSpeedsTheWholeParty() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -42,7 +42,7 @@ public class TransformationEndClausesTest {
         battle.processRequests();
         Assertions.assertTrue(owner.getBuffManager().hasState(STATE), "precondition: the transformation is on");
 
-        // ⚠ Read AFTER the transformation: its own numbers are then already in, so the delta below is the end clause alone.
+        // Note: Read AFTER the transformation: its own numbers are then already in, so the delta below is the end clause alone.
         double ownerBefore = owner.getAttribute(AttributeType.SPEED).get();
         double allyBefore = ally.getAttribute(AttributeType.SPEED).get();
         double ownerBase = owner.getAttribute(AttributeType.SPEED).baseValue();
@@ -61,7 +61,7 @@ public class TransformationEndClausesTest {
                 "「我方全体」-- and on the ally, which is what 全体 means");
     }
 
-    /** 「变身结束时，获得 3 点【火种】」. */
+    /** "变身结束时，获得 3 点[火种]". */
     @Test
     public void theEndGrantsThreeSeeds() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -71,7 +71,7 @@ public class TransformationEndClausesTest {
         battle.processRequests();
 
         int before = owner.getResources().value(SEEDS);
-        // ⭐ 「战斗开始时，获得 1 点【火种】」 -- the other half of the same trace line (1408101).
+        // "战斗开始时，获得 1 点[火种]" -- the other half of the same trace line (1408101).
         Assertions.assertEquals(1, before, "「战斗开始时，获得 1 点【火种】」");
         Skill ult = owner.getSkills().get(SkillType.ULTRA);
         SkillExecutor.execute(battle, ult, owner, List.of(owner));
@@ -89,9 +89,9 @@ public class TransformationEndClausesTest {
     }
 
     /**
-     * 「进入战斗或变身结束时，攻击力提高 50%。该效果**最多叠加 2 层**」-- read by firing the end clause more times than the cap allows.
+     * "进入战斗或变身结束时，攻击力提高 50%。该效果最多叠加 2 层"-- read by firing the end clause more times than the cap allows.
      *
-     * <p>⚠ The state is applied directly for these ends: the transformation is only granted by the ultimate, and what this reading
+     * <p>Note: The state is applied directly for these ends: the transformation is only granted by the ultimate, and what this reading
      * is about is the CAP. The seed clause beside it has no cap, so its growth proves the later firings really happened --
      * without that, a flat ATK could just mean "nothing fired".
      */

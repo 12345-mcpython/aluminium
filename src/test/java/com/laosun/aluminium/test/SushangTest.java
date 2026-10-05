@@ -25,7 +25,7 @@ public class SushangTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「当场上有敌方目标的弱点被击破」: the BREAK event, which fires with the broken unit as its target. */
+    /** Note: "当场上有敌方目标的弱点被击破": the BREAK event, which fires with the broken unit as its target. */
     @Test
     public void aWeaknessBreakRaisesHerSpeed() {
         Fixture f = new Fixture();

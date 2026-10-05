@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 18 「献予「理性」之诗」: 「为我方恢复 #4 个战技点并使那刻夏立即行动」 (2026-10-02).
+ * 1415's memosprite skill 18 "献予'理性'之诗": "为我方恢复 #4 个战技点并使那刻夏立即行动" (2026-10-02).
  *
- * <p>⭐ Two readings, one run: the team's skill points rise by #4 = 1, and his action value DROPS (which is what 「立即行动」 means). A rule that only granted
+ * <p>Two readings, one run: the team's skill points rise by #4 = 1, and his action value DROPS (which is what "立即行动" means). A rule that only granted
  * the point, or only advanced him, cannot pass both. Nothing is replaced.
  */
 public class ReasonOdePointAndActionTest {

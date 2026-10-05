@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1112 Topaz &amp; Numby: the skill's 【负债证明】 state and its damage, plus the trace's fire-weakness clause.
+ * 1112 Topaz &amp; Numby: the skill's [负债证明] state and its damage, plus the trace's fire-weakness clause.
  *
  * <p>Both clauses are asserted TWICE: behaviourally (the state lands, the skill's damage lands) and on the COMPILED rule (the condition and the magnitude), because the
  * fixture cannot control an enemy's weakness list and because a "damage > 0" assertion cannot see the authored number.

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「使敌方全体全属性抗性降低 X%」 — the victim's side of the resistance zone, pinned from both ends.
+ * "使敌方全体全属性抗性降低 X%" - the victim's side of the resistance zone, pinned from both ends.
  *
  * <p>The damage pipeline takes the victim's own resistance, subtracts this attribute, and only then applies the
  * attacker's penetration; negative resistance is fully effective, which is why the reduction is not folded into
@@ -50,14 +50,14 @@ public class ResistanceReductionTest {
 
         Assertions.assertEquals(0.2, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
                 "the reduction landed on the victim");
-        // Measured (round 8/270, same pipeline change): 380.9523900226759 -> 476.19048752834533 = x1.25, which is
+        // Measured (round 8/20, same pipeline change): 380.952390022659 -> 46.1904852834533 = x1.25, which is
         // a 20% reduction against a victim whose physical resistance is 20% (0.8 -> 1.0 = 1/0.8). It is also the
         // evidence for the zone's shape: damage is multiplied by (1 - resistance).
         Assertions.assertEquals(1.25, after / before, EPS,
                 "全属性抗性降低 20%: " + before + " -> " + after);
     }
 
-    /** 1321's shipped aura: 「大丽花在场时，敌方全体全属性抗性降低20%」 — a stated 0.2 on every enemy. */
+    /** 1321's shipped aura: "大丽花在场时，敌方全体全属性抗性降低20%" - a stated 0.2 on every enemy. */
     @Test
     public void herAuraStatesTwentyPercentOnEveryEnemy() {
         Character dahlia = CharacterFactory.create(1321, LEVEL);

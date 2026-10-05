@@ -26,17 +26,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code EXTEND_BUFF}: 「…的持续时间增加 1 回合」.
+ * {@code EXTEND_BUFF}: "…的持续时间增加 1 回合".
  *
- * <p><b>Why the vocabulary needed it.</b> Ten of the 97 documents lengthen a buff that is <b>already up</b> rather
- * than creating a new one — 三月七's 加护 (「战技提供的护盾持续时间增加1回合」), 布洛妮娅's 星魂 6, 桑博's 风化, 姬子's
+ * <p><b>Why the vocabulary needed it.</b> Ten of the 9documents lengthen a buff that is <b>already up</b> rather
+ * than creating a new one - 三月七's 加护 ("战技提供的护盾持续时间增加1回合"), 布洛妮娅's 星魂 6, 桑博's 风化, 姬子's
  * 灼烧, 白露's 生息, 藿藿's 禳命, 加拉赫's 酩酊 … Before this op the only way to write one was to <b>fold the +1 into the
  * ability it lengthens</b>, which erases the trace's own line from the data and makes the base ability state a
  * duration that is not its own.
  *
  * <p><b>The two filters, and why neither is optional.</b> Every sentence identifies the buff by its <b>origin</b>
- * (「战技提供的」) and then by <b>what it is</b>: a state's name (灼烧 / 生息 / 冻结 / 护盾), or — when the text names an
- * effect rather than a state (「伤害提高效果」) — the <b>attribute</b> the modifier sits on. "Everything I have on that
+ * ("战技提供的") and then by <b>what it is</b>: a state's name (灼烧 / 生息 / 冻结 / 护盾), or - when the text names an
+ * effect rather than a state ("伤害提高效果") - the <b>attribute</b> the modifier sits on. "Everything I have on that
  * unit" is deliberately not a spelling, and {@link #itDoesNotLengthenTheOwnersOtherBuffs} is the case that shows why:
  * 布洛妮娅's DEFENCE trace buff from {@code BATTLE_START} can still be ticking when she casts her Skill.
  */
@@ -90,7 +90,7 @@ public class ExtendBuffTest {
         Assertions.assertEquals(2, f.buff(StatModifierBuff.class).duration(), "1 + 1");
     }
 
-    /** ⚠ Only the owner's own buffs: 「战技提供的」/「天赋使敌方目标陷入的」 are all about who applied it. */
+    /** Note: Only the owner's own buffs: "战技提供的"/"天赋使敌方目标陷入的" are all about who applied it. */
     @Test
     public void itDoesNotLengthenAnotherUnitsBuff() {
         Fixture f = new Fixture(TriggerSpecs.extendBuff(BuffManager.SHIELD_STATE, null, 1));
@@ -104,7 +104,7 @@ public class ExtendBuffTest {
     }
 
     /**
-     * And only the buff the rule <b>names</b> — the case that ruled out a "everything of mine" spelling.
+     * And only the buff the rule <b>names</b> - the case that ruled out a "everything of mine" spelling.
      *
      * <p>Both buffs below belong to the owner. A filter that lengthened every one of them would look right in every
      * single-buff test and silently add a turn to the other one in a real fight.
@@ -123,11 +123,11 @@ public class ExtendBuffTest {
     }
 
     /**
-     * A permanent buff has no countdown, so there is nothing to lengthen — and that is not an error.
+     * A permanent buff has no countdown, so there is nothing to lengthen - and that is not an error.
      *
-     * <p>⚠ The two effects sit on <b>two events</b> on purpose: with both in one rule the second firing would
+     * <p>Note: The two effects sit on <b>two events</b> on purpose: with both in one rule the second firing would
      * re-apply the state (a same-kind buff replaces), so the duration would look unchanged whether or not the
-     * {@code permanent} guard were there — a test that passes for the wrong reason.
+     * {@code permanent} guard were there - a test that passes for the wrong reason.
      */
     @Test
     public void aPermanentBuffHasNoCountdownToLengthen() {
@@ -146,11 +146,11 @@ public class ExtendBuffTest {
     }
 
     /**
-     * ⚠ Every buff a rule creates records <b>who applied it</b>.
+     * Note: Every buff a rule creates records <b>who applied it</b>.
      *
      * <p>This is what the origin filter rests on, and it used to be true only where a constructor demanded it
-     * ({@code DotBuff} needs it for kill credit) — a {@code StateBuff} or a stat modifier could be anonymous, and an
-     * anonymous buff would make 「战技提供的护盾」 silently extend nothing at all. The audit is pinned here so that a
+     * ({@code DotBuff} needs it for kill credit) - a {@code StateBuff} or a stat modifier could be anonymous, and an
+     * anonymous buff would make "战技提供的护盾" silently extend nothing at all. The audit is pinned here so that a
      * new buff-creating op has to keep its half of the deal.
      */
     @Test

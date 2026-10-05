@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A rule-level probability: 「有 X% 的固定概率…」 ({@code "chance": 0.35}).
+ * A rule-level probability: "有 X% 的固定概率…" ({@code "chance": 0.35}).
  *
  * <p><b>Why it is a rule field and not an effect argument.</b> The texts that need it say "this effect has a
- * chance to happen" — one roll decides the whole rule — and it belongs next to {@code cooldown} /
+ * chance to happen" - one roll decides the whole rule - and it belongs next to {@code cooldown} /
  * {@code once_per_battle}, which are the same kind of statement ("how often may this fire").
  *
  * <p><b>How the tests are made deterministic.</b> The roll goes through the battle's <b>injected</b> generator,
@@ -53,11 +53,11 @@ public class TriggerChanceTest {
      * A failed roll must cost nothing.
      *
      * <p>The point is concrete: with a cooldown too, a rule that started its cooldown on a failed roll would
-     * throw the cooldown away on the (1 - chance) of attempts where it did not fire — a 35% trace would spend
+     * throw the cooldown away on the (1 - chance) of attempts where it did not fire - a 35% trace would spend
      * 65% of its opportunities on nothing.
      *
      * <p>The generator answers 0.9 first and 0.1 afterwards, so the first attempt fails and the second succeeds
-     * <b>in the same turn</b>. A fixed generator would fail both times and prove nothing about the cooldown —
+     * <b>in the same turn</b>. A fixed generator would fail both times and prove nothing about the cooldown - 
      * which is exactly how the first version of this test read.
      */
     @Test

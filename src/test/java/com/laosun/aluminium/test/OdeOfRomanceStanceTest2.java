@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 12 「献予「浪漫」之诗」 -- the two effects whose lifetime is another state (2026-10-02).
+ * 1415's memosprite skill 12 "献予'浪漫'之诗" -- the two effects whose lifetime is another state (2026-10-02).
  *
- * <p>「阿格莱雅与衣匠造成的伤害提高 #2[i]% 并无视目标 #3[i]% 的防御，<b>持续至阿格莱雅退出【至高之姿】状态</b>。」
+ * <p>"阿格莱雅与衣匠造成的伤害提高 #2[i]% 并无视目标 #3[i]% 的防御，<b>持续至阿格莱雅退出[至高之姿]状态</b>。"
  *
- * <p>⭐ Three readings: both boosts land (including on the Garmentmaker, which the sentence names explicitly), and both come off again when the
+ * <p>Three readings: both boosts land (including on the Garmentmaker, which the sentence names explicitly), and both come off again when the
  * stance leaves her. The last one is the sentence's own lifetime, spelled as a companion rule on `STATE_ENDED` with `"kind": "own"` -- the source
  * filter, because removing by name alone also took a `ALL_DAMAGE_TYPE_BOOST` she already carried with it (measured).
  */

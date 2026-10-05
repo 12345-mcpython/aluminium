@@ -4,33 +4,33 @@ import com.laosun.aluminium.enums.ResourceScope;
 import lombok.Getter;
 
 /**
- * A **team-level** numeric resource: it has a current value, a maximum capacity, and an optional
+ * A team-level numeric resource: it has a current value, a maximum capacity, and an optional
  * maximum overflow allowance.
  *
  * <p><b>Why this class has to exist</b>: skill points (SP) (P8-4) and P8-8's stack resources
- * (Acheron's 【残梦】, Feixiao's 【飞黄】, Phainon's 【火种】, Cyrene's 【追忆】, Castorice's 【新蕊】…)
- * are essentially the same thing — a counter that some event adds to or subtracts from, that has a
+ * (Acheron's [残梦], Feixiao's [飞黄], Phainon's [火种], Cyrene's [追忆], Castorice's [新蕊]…)
+ * are essentially the same thing - a counter that some event adds to or subtracts from, that has a
  * capacity cap, and that fires a signal when full. Without extracting it, every character would need
  * a "because of some character" branch inside the engine (violating P8-0's three-way split).
  *
  * <p><b>Three boundaries (all measured in practice, not written off the cuff)</b>:
  * <ol>
- *   <li>The normal path ({@link #gainClamped} / {@link #gain}) **never exceeds {@link #getMax()}**;</li>
- *   <li>Overflow is **explicit and capped**: only after {@link #setMaxOverflow} has configured a
+ *   <li>The normal path ({@link #gainClamped} / {@link #gain}) never exceeds {@link #getMax()};</li>
+ *   <li>Overflow is explicit and capped: only after {@link #setMaxOverflow} has configured a
  *       limit will {@link #gain} store the value above {@code max}, and it is capped at
  *       {@code max + maxOverflow}.
- *       ⚠ By default {@code maxOverflow == 0}, so "overflowing by accident with gain" is impossible;</li>
- *   <li>{@link #setValue} is an **unprotected raw write** (clamped down to 0, up to
- *       {@code max + maxOverflow}), intended for "save restoration / debugging" — normal gameplay
+ *       Note: By default {@code maxOverflow == 0}, so "overflowing by accident with gain" is impossible;</li>
+ *   <li>{@link #setValue} is an unprotected raw write (clamped down to 0, up to
+ *       {@code max + maxOverflow}), intended for "save restoration / debugging" - normal gameplay
  *       should go through gain/spend.</li>
  * </ol>
  *
  * <p>Why overflow is needed: the game really does have mechanics like "cap is 5 but can temporarily
- * be stored up to 10" — Sparkle's ultimate 「restores 4/6 skill points; if skill points overflow when
- * restoring, the overflowed skill point count is recorded, up to 10 points」 (see
+ * be stored up to 10" - Sparkle's ultimate "restores 4/6 skill points; if skill points overflow when
+ * restoring, the overflowed skill point count is recorded, up to 10 points" (see
  * {@code 1306_花火.md}).
  *
- * <p><b>Threading model</b>: like {@code Battle}, used single-threaded, with no synchronization —
+ * <p><b>Threading model</b>: like {@code Battle}, used single-threaded, with no synchronization - 
  * one battle is advanced on one thread.
  *
  * @see com.laosun.aluminium.models.skillpoint.SkillPointPolicy
@@ -68,9 +68,9 @@ public class Resource {
     /**
      * Notified when the resource goes from "not full" to "full" (the rising edge only).
      *
-     * <p><b>Why an edge rather than a level.</b> Feixiao's 【飞黄】 is spent the moment it reaches its
-     * threshold, so a level signal would still fire once in practice — but Cyrene sits at her cap for
-     * many gains in a row (pool 24, and she can keep collecting into overflow up to 27). A level
+     * <p><b>Why an edge rather than a level.</b> Feixiao's [飞黄] is spent the moment it reaches its
+     * threshold, so a level signal would still fire once in practice - but Cyrene sits at her cap for
+     * many gains in a row (pool 24, and she can keep collecting into overflow up to 2). A level
      * signal would fire on every one of those extra gains, which is not what "reached the cap" means.
      * The rising edge fires exactly once per arrival.
      *
@@ -121,14 +121,14 @@ public class Resource {
     }
 
     /**
-     * Whether the **normal** cap has been reached (also true while overflowing).
+     * Whether the normal cap has been reached (also true while overflowing).
      */
     public boolean isFull() {
         return value >= max;
     }
 
     /**
-     * Whether the **absolute** cap has been reached (including the overflow allowance), i.e.
+     * Whether the absolute cap has been reached (including the overflow allowance), i.e.
      * "no more can be added at all".
      */
     public boolean isCapped() {
@@ -140,8 +140,8 @@ public class Resource {
     }
 
     /**
-     * Adds a value and **clamps it to the normal cap** (overflow not allowed), returning the amount
-     * **actually credited**.
+     * Adds a value and clamps it to the normal cap (overflow not allowed), returning the amount
+     * actually credited.
      *
      * <p>When {@code delta <= 0} nothing is done ("adding a negative" is a caller bug; silently
      * ignoring it is friendlier than throwing).
@@ -161,10 +161,10 @@ public class Resource {
     }
 
     /**
-     * Adds a value, **allowed to overflow** up to {@link #getMaxOverflow()} (equivalent to
-     * {@link #gainClamped} when no overflow is configured), returning the amount **actually credited**.
+     * Adds a value, allowed to overflow up to {@link #getMaxOverflow()} (equivalent to
+     * {@link #gainClamped} when no overflow is configured), returning the amount actually credited.
      *
-     * <p>"Overflow" MUST be expressed **explicitly** by the caller: the default overflow allowance is
+     * <p>"Overflow" MUST be expressed explicitly by the caller: the default overflow allowance is
      * 0, so this method's default behavior is exactly the same as {@link #gainClamped}. Only a
      * resource with a configured overflow allowance (for example skill points while Sparkle is on the
      * team) can ever be stored above its cap.
@@ -182,7 +182,7 @@ public class Resource {
     }
 
     /**
-     * Spends a value, never dropping below 0, returning the amount **actually spent**.
+     * Spends a value, never dropping below 0, returning the amount actually spent.
      *
      * @return the amount actually spent; 0 when the resource is empty (the caller should use this to
      * decide that "this spend did not succeed")
@@ -197,7 +197,7 @@ public class Resource {
     }
 
     /**
-     * Spends exactly the given value, **spending none of it at all if there is not enough** (atomic
+     * Spends exactly the given value, spending none of it at all if there is not enough (atomic
      * semantics).
      *
      * <p>This is where it differs from {@link #spend}: when skill points are insufficient it MUST be
@@ -221,14 +221,14 @@ public class Resource {
     /**
      * Sets the maximum overflow allowance ({@code overflow < 0} is treated as 0).
      *
-     * <p><b>Invariant</b>: {@code value ∈ [0, max + maxOverflow]} **always holds**.
-     * So when the allowance is lowered, any stock above the new absolute cap is **clamped away**
-     * (for example {@code max=5, overflow=10, value=15} → set overflow to 0 → value becomes 5).
+     * <p><b>Invariant</b>: {@code value ∈ [0, max + maxOverflow]} always holds.
+     * So when the allowance is lowered, any stock above the new absolute cap is clamped away
+     * (for example {@code max=5, overflow=10, value=15} to set overflow to 0 to value becomes 5).
      *
      * <p>Why lose stock rather than let the value go out of range: once the invariant is broken, all
      * subsequent {@code isCapped()} / {@code missingToMax()} / {@code gain()} decisions become wrong,
-     * and **silently so** (the first version did exactly that: it changed the allowance without
-     * clamping the value, so value could stay at 15 while the absolute cap was 5 — a silent illegal
+     * and silently so (the first version did exactly that: it changed the allowance without
+     * clamping the value, so value could stay at 15 while the absolute cap was 5 - a silent illegal
      * state).
      *
      * <p>In practice this is only triggered by things like "a buff that provides the overflow
@@ -248,7 +248,7 @@ public class Resource {
      * <p>The clamping range is {@code [0, max + maxOverflow]}.
      */
     /**
-     * ✅ The current amount (2026-09-30). `ResourceManager.value(id)` was the only reader; the party-level store holds
+     * The current amount (2026-09-30). `ResourceManager.value(id)` was the only reader; the party-level store holds
      * {@link Resource} objects directly, so the accessor belongs here next to {@code setValue}.
      */
     public int value() {
@@ -291,9 +291,9 @@ public class Resource {
      *
      * <p>Two conditions, both required:
      * <ul>
-     *   <li>it was <b>not</b> full before and is full now — the rising edge, so sitting at the cap
+     *   <li>it was <b>not</b> full before and is full now - the rising edge, so sitting at the cap
      *       across several gains (or gaining into overflow) does not re-fire;</li>
-     *   <li>something was <b>actually credited</b> ({@code gained > 0}) — a gain that was entirely
+     *   <li>something was <b>actually credited</b> ({@code gained > 0}) - a gain that was entirely
      *       clamped away is not "arriving at the cap", it is "already there and nothing happened".</li>
      * </ul>
      */

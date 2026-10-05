@@ -23,7 +23,7 @@ import java.util.Random;
  * Light cone 23058: while the wearer casts an ELATION skill, every enemy takes 15% more damage for 2 turns (its crit
  * damage / energy / energy-cap clauses are the row's and are registered).
  *
- * <p>⭐ The op is {@code MODIFY_DAMAGE_TAKEN} WITHOUT a damage type: the sentence says 「受到的伤害」, not elation damage --
+ * <p>The op is {@code MODIFY_DAMAGE_TAKEN} WITHOUT a damage type: the sentence says "受到的伤害", not elation damage --
  * unlike 21064, which names elation explicitly. The reading compares an ORDINARY instance, so a wrong damage_type
  * scoping would show up.
  */
@@ -82,7 +82,7 @@ public class Cone23058Test {
         Assertions.assertEquals(before, ordinaryHit(battle), 1e-9, "the clause names an ELATION skill (false case)");
     }
 
-    /** ★ The spec half: op, share, duration and the target set pinned, so a wrong duration has something to break. */
+    /** The spec half: op, share, duration and the target set pinned, so a wrong duration has something to break. */
     @Test
     public void theSpecPinsTheNumbers() {
         Battle battle = battle(true);

@@ -20,18 +20,18 @@ import java.util.Random;
 /**
  * P5-3 acceptance: enemy skills (data-driven + fallback).
  *
- * <p>⚠ For the source of the multipliers see the notes in {@code enemy_skills.json}: there is **no**
+ * <p>Note: For the source of the multipliers see the notes in {@code enemy_skills.json}: there is no
  * enemy skill table in the data source, these multipliers are guesses.
  * So what is asserted is "the engine settles correctly by the multiplier", not "this multiplier is
  * the true game value".
  *
- * <p>Expected values are always **derived from the actual panel** (attack power × multiplier ×
- * defence zone), never hardcoded — it was hardcoded once, and that ended up swapping the enemy's
+ * <p>Expected values are always derived from the actual panel (attack power  x  multiplier  x 
+ * defence zone), never hardcoded - it was hardcoded once, and that ended up swapping the enemy's
  * defence and ours.
  */
 public class EnemySkillTest {
     private static final double EPS = 1e-9;
-    /** Victim defence 1000, Lv80 → defence zone = (200 + 10×80) / (1000 + 1000) = 0.5. */
+    /** Victim defence 1000, Lv80 to defence zone = (200 + 10 x 80) / (1000 + 1000) = 0.5. */
     private static final double VICTIM_DEFENCE = 1000;
 
     @Test
@@ -107,7 +107,7 @@ public class EnemySkillTest {
 
     @Test
     public void enemyAttackUsesTheSharedDamagePipeline() {
-        // Enemy crit chance is 0 → no crit; so the settled value = attack power × multiplier × defence zone × resistance zone (characters have no resistance table = 1)
+        // Enemy crit chance is 0 to no crit; so the settled value = attack power  x  multiplier  x  defence zone  x  resistance zone (characters have no resistance table = 1)
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         Character victim = victim();
         Battle battle = new Battle(List.of(victim), List.of(iceEdge), new Random(0));
@@ -125,7 +125,7 @@ public class EnemySkillTest {
         return Character.fromAttributes("victim", 100_000, VICTIM_DEFENCE, 100, 100);
     }
 
-    /** Defence zone = (200 + 10 × attacker level) / (defender defence + 200 + 10 × attacker level). */
+    /** Defence zone = (200 + 10  x  attacker level) / (defender defence + 200 + 10  x  attacker level). */
     private static double defenceZone(int attackerLevel, double defenderDefence) {
         double levelTerm = Constant.DEFENCE_CONST + Constant.DEFENCE_PER_LEVEL * attackerLevel;
         return levelTerm / (defenderDefence + levelTerm);

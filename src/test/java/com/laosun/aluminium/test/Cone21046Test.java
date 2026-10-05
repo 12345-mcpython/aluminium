@@ -20,8 +20,8 @@ import java.util.Random;
 /**
  * Light cone 21046: at battle start the units that share a Path with somebody else on our side gain 16% crit damage.
  *
- * <p>⭐ The candidates’ Paths are collected FIRST and chosen by COUNT (a Path with two members, and one with exactly one), not
- * concluded while iterating -- and every "not applied" claim is compared against that unit’s OWN baseline, because a character’s
+ * <p>The candidates' Paths are collected FIRST and chosen by COUNT (a Path with two members, and one with exactly one), not
+ * concluded while iterating -- and every "not applied" claim is compared against that unit's OWN baseline, because a character's
  * starting crit damage is 0.5, not 0 (both mistakes were made and measured on 2026-09-30).
  */
 public class Cone21046Test {
@@ -47,10 +47,10 @@ public class Cone21046Test {
         }
         Path twinPath = byPath.entrySet().stream().filter(entry -> entry.getValue().size() >= 2)
                 .map(Map.Entry::getKey).findFirst().orElse(null);
-        // ★ The loner is unique WITHIN THE PARTY, not within the pool: measured, every one of the seven Paths in the pool has at
+        // The loner is unique WITHIN THE PARTY, not within the pool: measured, every one of the seven Paths in the pool has at
         // least two members, so "a Path with exactly one member" does not exist there at all. What the sentence means is that
         // these characters have a twin on our side -- so the party is built to contain a pair and a single, and the single's
-        // Path must be neither the pair’s nor the wearer’s (the wearer is on our side too).
+        // Path must be neither the pair's nor the wearer's (the wearer is on our side too).
         Path wearerPath = CharacterFactory.create(WEARER, LEVEL).getPath();
         Path lonerPath = byPath.keySet().stream()
                 .filter(path -> !path.equals(twinPath) && !path.equals(wearerPath))

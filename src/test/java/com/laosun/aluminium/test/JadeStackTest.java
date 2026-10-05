@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1314 翡翠's 【当品】: one layer at the enemy's battle entry, fifteen from her technique, and 2.40% critical damage each.
+ * 1314 翡翠's [当品]: one layer at the enemy's battle entry, fifteen from her technique, and 2.40% critical damage each.
  *
  * <p>Both the counter's name and the values come from the data; the technique half is measured with and without
  * `markTechniqueUsed`, which is what its `self has_state 秘技` gate reads.
@@ -34,7 +34,7 @@ public class JadeStackTest {
     /**
      * 2.40% per layer.
      *
-     * <p>⚠ The absolute delta carries the unit's own inherent +0.5 critical damage (measured: 0.524 for one layer, where
+     * <p>Note: The absolute delta carries the unit's own inherent +0.5 critical damage (measured: 0.524 for one layer, where
      * the clause owns 0.024), so the clause's share is pinned twice: the measured one-layer total, and the difference
      * between sixteen layers and one, which is 15 x 2.4% and does not care what the unit carries.
      */

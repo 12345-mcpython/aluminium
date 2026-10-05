@@ -18,7 +18,7 @@ import java.util.Random;
  * P4-2 acceptance: each damage instance reduces toughness by the skill's {@code stance_list}, only a
  * weakness hit reduces it, and emptying it triggers a weakness break.
  *
- * <p>Anchors: Ice Edge 1002011 @group 1 · Lv90 → toughness 60, weak to fire/lightning (neither ice nor
+ * <p>Anchors: Ice Edge 1002011 @group 1 - Lv90 to toughness 60, weak to fire/lightning (neither ice nor
  * physical reduces it);
  * Himeko 1003's basic attack Fire has toughness reduction {@code single=30}, her skill Blast Fire has
  * {@code single=60 / spread=30}.
@@ -115,11 +115,11 @@ public class ToughnessBattleTest {
     }
 
     /**
-     * H-3: for a bouncing skill, {@code stance_list.single} is the **total toughness reduction of the whole
-     * skill** and must be spread evenly across the hits.
+     * H-3: for a bouncing skill, {@code stance_list.single} is the total toughness reduction of the whole
+     * skill and must be spread evenly across the hits.
      *
      * <p>Anchor (real data): cid 1321 Dahlia slot 4 = Bounce Fire, {@code hits = 5}, {@code single = 9}
-     * → the five hits total 9 points, not 9 points per hit (45 in total).
+     *  to the five hits total 9 points, not 9 points per hit (45 in total).
      * Before the fix this case would see 60 - 45 = 15; after the fix it is 60 - 9 = 51.
      */
     @Test
@@ -135,15 +135,15 @@ public class ToughnessBattleTest {
     }
 
     /**
-     * H-4: weakness break damage is computed from "the value this instance **actually** reduced", not from
+     * H-4: weakness break damage is computed from "the value this instance actually reduced", not from
      * the skill's nominal toughness reduction value.
      *
-     * <p>Ice Edge has toughness 60 and a basic attack reduces 30 → 30 left; the second basic attack is
+     * <p>Ice Edge has toughness 60 and a basic attack reduces 30 to 30 left; the second basic attack is
      * nominally 30 and actually reduces exactly 30 (just emptying it), so here we first set up the scenario
-     * of "30 left taking a 30-point skill". To create **excess** toughness reduction, Himeko's skill is used
+     * of "30 left taking a 30-point skill". To create excess toughness reduction, Himeko's skill is used
      * instead (Blast Fire {@code single=60}) against the remaining 30 toughness: it actually reduces 30 while
      * being nominally 60.
-     * If the nominal value 60 were used to compute the weakness break damage, the result would be **doubled**
+     * If the nominal value 60 were used to compute the weakness break damage, the result would be doubled
      * and this case would fail.
      */
     @Test
@@ -152,7 +152,7 @@ public class ToughnessBattleTest {
         Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
         Battle battle = newBattle(himeko, iceEdge);
 
-        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // basic attack reduces 30 → 30 left
+        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // basic attack reduces 30 to 30 left
         Assertions.assertEquals(30, iceEdge.getStance(), EPS);
 
         double hpBefore = iceEdge.getCurrentHp();
@@ -170,7 +170,7 @@ public class ToughnessBattleTest {
                 "weakness break damage uses the 30 actually reduced, not the nominal 60");
 
         // Reverse assertion: if the nominal value 60 were used by mistake the settled value would be clearly
-        // larger — ensuring this case really can fail
+        // larger - ensuring this case really can fail
         double wrong = (skillDamage + breakDamage * 2) * defenceZone * resistZone;
         Assertions.assertNotEquals(wrong, hpBefore - iceEdge.getCurrentHp(), 1e-6,
                 "the result of the nominal value 60 must differ from this implementation, otherwise this test has no discriminating power");

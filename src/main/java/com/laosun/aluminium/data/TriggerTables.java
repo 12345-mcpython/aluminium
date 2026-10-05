@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Loads character trigger tables from {@code resources/characters/<cid>.json} (P8-7).
+ * Loads character trigger tables from {@code resources/characters/<cid>.json} (P8-).
  *
  * <p>This is the "character content is data" side of the P8-0 three-way split: a character's
  * mechanics live in a JSON file next to the code, and the engine only interprets them.
@@ -32,7 +32,7 @@ import java.util.Set;
  * <ul>
  *   <li>it is <b>hand-written</b>, not produced by the generator;</li>
  *   <li>it lives in {@code characters/}, not {@code data/} (which is gitignored);</li>
- *   <li>it is <b>optional per character</b> — {@code data/} files are all-or-nothing, while here
+ *   <li>it is <b>optional per character</b> - {@code data/} files are all-or-nothing, while here
  *       "this character is not data-ised yet" is the normal case.</li>
  * </ul>
  *
@@ -44,8 +44,8 @@ import java.util.Set;
  * unnoticed.
  *
  * <h2>Two shapes, one of them the rule list</h2>
- * A file is either a bare <b>array</b> of rules — what every file written before resources existed
- * looks like, and still exactly what a character with nothing but rules needs — or an <b>object</b>
+ * A file is either a bare <b>array</b> of rules - what every file written before resources existed
+ * looks like, and still exactly what a character with nothing but rules needs - or an <b>object</b>
  * with a {@code rules} array plus the character's {@code resources} declarations (P8-8):
  *
  * <pre>
@@ -58,7 +58,7 @@ import java.util.Set;
  * them would be churn with a real cost (every one of those files carries a long {@code note} block,
  * so a reformat is a diff nobody can read) and no benefit: the rule list is the whole content of a
  * file that has nothing else to declare. A file that <b>does</b> declare resources must use the
- * object form, because the declarations and the rules that read them belong in one place — the
+ * object form, because the declarations and the rules that read them belong in one place - the
  * resource name is spelled in both.
  *
  * <p>An object with no {@code rules} is <b>refused</b> rather than read as "no rules": the shape
@@ -99,7 +99,7 @@ public final class TriggerTables {
     }.getType();
 
     /**
-     * The keys the object form may carry. Anything else is refused — see the class docs.
+     * The keys the object form may carry. Anything else is refused - see the class docs.
      */
     private static final Set<String> OBJECT_KEYS = Set.of("resources", "rules");
 
@@ -108,7 +108,7 @@ public final class TriggerTables {
      *
      * <p>Read off {@link ResourceSpec}'s own record components rather than typed out again: the two lists are
      * the same list, and a hand-written copy would refuse a valid file the day a field is added (loud, but
-     * wrong) — or, worse, accept one Gson will drop.
+     * wrong) - or, worse, accept one Gson will drop.
      */
     private static final Set<String> RESOURCE_KEYS = resourceKeys();
 
@@ -188,12 +188,12 @@ public final class TriggerTables {
 
     /**
      * [WAREHOUSE] the global-support clauses of a character that is OWNED but need not be deployed
-     * (「获得该角色即生效，无需上场」), read from `warehouse/<cid>.json`.
+     * ("获得该角色即生效，无需上场"), read from `warehouse/<cid>.json`.
      *
      * <p>Deliberately the same parser as `characters/`: same rule keys, same effect keys, same validation, so a warehouse clause cannot
      * be written in a dialect of its own. EMPTY when the character has no warehouse file -- the ordinary case.
      *
-     * <p>⚠ Not cached, unlike {@link #of(int)}: a warehouse clause is read once per battle that registers the listener, and the cache
+     * <p>Note: Not cached, unlike {@link #of(int)}: a warehouse clause is read once per battle that registers the listener, and the cache
      * exists for the per-character table that is asked on every event.
      */
     public static TriggerTable warehouse(int cid) {
@@ -235,7 +235,7 @@ public final class TriggerTables {
                                 "the object form needs a \"rules\" array; only a bare array may omit it "
                                         + "(a character with nothing but rules uses the array form)");
                     }
-                    // ⭐ The same guard, one level deeper (2026-10-02). The comment on the resource check describes this exact trap --
+                    // The same guard, one level deeper (2026-10-02). The comment on the resource check describes this exact trap --
                     // "Gson drops a key it does not know" -- but only the resource declaration was walked, and an effect
                     // writing `maxStacks` (the Java name) was accepted and then dropped, leaving a stackable state with a cap
                     // of 1. The allowed sets come from `EffectSpec`'s and `TriggerSpec`'s own `@SerializedName` annotations,
@@ -274,9 +274,9 @@ public final class TriggerTables {
      * The most specific message in an exception's cause chain.
      *
      * <p>Needed because Gson <b>wraps</b> a failure inside a value object's constructor:
-     * {@code ResourceSpec}'s own rejection of 「max: 0」 arrives as
+     * {@code ResourceSpec}'s own rejection of "max: 0" arrives as
      * {@code RuntimeException("Failed to invoke constructor ... with args [充能, 0, null, null, null]")}, and its
-     * cause — the sentence that says <em>why</em> — is the only useful part. Reporting the wrapper alone would
+     * cause - the sentence that says <em>why</em> - is the only useful part. Reporting the wrapper alone would
      * turn a precise content error into "something went wrong with a constructor", which is the kind of message
      * that makes an author guess.
      *
@@ -305,7 +305,7 @@ public final class TriggerTables {
      * array may be empty, and anything else is not a shape this file understands.
      */
     /**
-     * ⭐ The keys {@link EffectSpec} actually maps, read from its own annotations (2026-10-02).
+     * The keys {@link EffectSpec} actually maps, read from its own annotations (2026-10-02).
      *
      * <p>Reflection rather than a hand-kept list: the failure this guards is exactly a key the loader "knows" and Gson does
      * not, so the two must be the same source of truth.
@@ -317,7 +317,7 @@ public final class TriggerTables {
         for (java.lang.reflect.Field field : com.laosun.aluminium.beans.EffectSpec.class.getDeclaredFields()) {
             com.google.gson.annotations.SerializedName name =
                     field.getAnnotation(com.google.gson.annotations.SerializedName.class);
-            // ⭐ Gson's own rule (2026-10-02): an annotated field is keyed by the annotation, a plain one by the field's
+            // Gson's own rule (2026-10-02): an annotated field is keyed by the annotation, a plain one by the field's
             // name. Collecting only the annotated ones rejected `amountFromEvent` and `amountFromAttr` -- keys the shipped
             // files use and Gson maps -- which the suite showed at once.
             keys.add(name != null ? name.value() : field.getName());
@@ -332,7 +332,7 @@ public final class TriggerTables {
     }
 
     /**
-     * ⭐ The keys {@link com.laosun.aluminium.beans.TriggerSpec} actually maps, read from its own annotations (2026-10-02).
+     * The keys {@link com.laosun.aluminium.beans.TriggerSpec} actually maps, read from its own annotations (2026-10-02).
      *
      * <p>The same reflection the effect guard uses, for the same reason: a key the loader "knows" and Gson does not is a value
      * that vanishes without a word.
@@ -353,7 +353,7 @@ public final class TriggerTables {
         return Set.copyOf(keys);
     }
 
-    /** ⭐ Walks the rules themselves: known keys, and an event to listen to (2026-10-02). */
+    /** Walks the rules themselves: known keys, and an event to listen to (2026-10-02). */
     private static void requireKnownRuleKeys(JsonElement rules) {
         if (rules == null || !rules.isJsonArray()) {
             return;

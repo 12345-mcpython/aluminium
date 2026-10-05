@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A <b>stated</b> crit on a damage instance: 「该伤害暴击率固定为100%，暴击伤害固定为150%」 (知更鸟's 【协奏】 addendum).
+ * A <b>stated</b> crit on a damage instance: "该伤害暴击率固定为100%，暴击伤害固定为150%" (知更鸟's [协奏] addendum).
  *
- * <p><b>The gap it closes.</b> {@code Damage.fixedCrit(boolean, double)} has existed for a while — the crit zone skips
- * the roll for an instance that already knows its outcome — but <b>no op could state it</b>, so the sentence could not
+ * <p><b>The gap it closes.</b> {@code Damage.fixedCrit(boolean, double)} has existed for a while - the crit zone skips
+ * the roll for an instance that already knows its outcome - but <b>no op could state it</b>, so the sentence could not
  * be written at all. This is the content spelling: {@code crit_rate: 1} + {@code crit_damage: 1.5} on a {@code DAMAGE}.
  *
- * <p>⚠ The cases pin the two halves that a careless spelling would get wrong: the instance really is forced to crit
+ * <p>Note: The cases pin the two halves that a careless spelling would get wrong: the instance really is forced to crit
  * (with a fixed RNG that would never crit on its own), and the stated crit damage is used <b>instead of</b> the
  * attacker's own crit damage stat.
  */
@@ -44,9 +44,9 @@ public class FixedCritTest {
 
         Assertions.assertTrue(fixed > normal,
                 "a stated crit must beat an instance that (with this RNG) does not crit: " + normal + " vs " + fixed);
-        // ⚠ The engine states crit damage the way the panel does — as the STAT (1.5 = 150%), and the crit zone
-        // multiplies by (1 + stat). So a stated 150% shows up as 2.5×, exactly like a panel crit damage of 0.5 shows
-        // up as 1.5×. Reading the field as "the multiplier" would have been a silent 1.5 vs 2.5 disagreement.
+        // Note: The engine states crit damage the way the panel does - as the STAT (1.5 = 150%), and the crit zone
+        // multiplies by (1 + stat). So a stated 150% shows up as 2.5 x , exactly like a panel crit damage of 0.5 shows
+        // up as 1.5 x . Reading the field as "the multiplier" would have been a silent 1.5 vs 2.5 disagreement.
         Assertions.assertEquals(1 + 1.5, fixed / normal, 1e-3,
                 "…and by exactly the stated crit damage (150% means ×2.5 in this engine's convention)");
     }
@@ -54,8 +54,8 @@ public class FixedCritTest {
     /**
      * The stated crit damage is what applies, and the panel's own {@code CRIT_ATTACK} is <b>not</b> it.
      *
-     * <p>⚠ The precondition is the evidence: her base crit damage is 0.5 (so the case cannot pass by accident), while
-     * the rule states 1.5 — and the measured ratio must be 1.5.
+     * <p>Note: The precondition is the evidence: her base crit damage is 0.5 (so the case cannot pass by accident), while
+     * the rule states 1.5 - and the measured ratio must be 1.5.
      */
     @Test
     public void theStatedCritDamageWinsOverTheStat() {

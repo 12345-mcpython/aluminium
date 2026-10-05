@@ -15,7 +15,7 @@ import java.util.Random;
 
 /**
  * 1505 绯英, the two clauses her own text states completely (2026-09-30):
- * 「绯英获得等同于暴击伤容 50% 的欢愉度」 and the technique’s 20 【好活当赏】.
+ * "绯英获得等同于暴击伤容 50% 的欢愉度" and the technique's 20 [好活当赏].
  */
 public class Character1505Test {
     private static final int WEARER = 1505;
@@ -77,9 +77,9 @@ public class Character1505Test {
     }
 
     /**
-     * ★ The shipped numbers themselves (2026-09-30). The behavioural tests above build their own effect in Java, so a
+     * The shipped numbers themselves (2026-09-30). The behavioural tests above build their own effect in Java, so a
      * json-only change to `amountPercent` slipped past them -- measured: `0.5 -> 0.25` came back with 0 red. This reads the
-     * character’s OWN compiled rules, which is exactly what the content file says.
+     * character's OWN compiled rules, which is exactly what the content file says.
      */
     @Test
     public void theShippedRulesCarryTheStatedNumbers() {
@@ -100,11 +100,11 @@ public class Character1505Test {
                             "the talent derives the value from the crit-damage panel");
                     Assertions.assertEquals(0.5, effect.getAmountPercent(), 1e-9, "and takes half of it");
                 } else if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
-                    // ✅ the third source (2026-09-30): 「获得能量时同步获得等值【好活当赏】」 -- the amount is the event’s own
+                    // the third source (2026-09-30): "获得能量时同步获得等值[好活当赏]" -- the amount is the event's own
                     Assertions.assertEquals("好活当赏", effect.getResource(),
                             "the mirrored resource is 【好活当赏】");
                 } else if ("DAMAGE".equals(effect.getOp())) {
-                    // ✅ the technique’s own damage (2026-09-30): a rule-driven ORDINARY instance, so it has no `amount` at all
+                    // the technique's own damage (2026-09-30): a rule-driven ORDINARY instance, so it has no `amount` at all
                     Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "100% of her attack");
                     Assertions.assertEquals(Boolean.TRUE, effect.getOrdinary(), "as an ordinary hit");
                 } else {
@@ -114,8 +114,8 @@ public class Character1505Test {
         }
         Assertions.assertEquals(3, seen, "BATTLE_START carries the derive, the technique’s twenty and its damage");
 
-        // ✅ The third clause lives on a DIFFERENT event (2026-09-30): 「获得能量时同步获得等值的【好活当赏】」
-        // is triggered by ENERGY_GAINED, so it is pinned by reading that event’s rules -- the first version of this test counted
+        // The third clause lives on a DIFFERENT event (2026-09-30): "获得能量时同步获得等值的[好活当赏]"
+        // is triggered by ENERGY_GAINED, so it is pinned by reading that event's rules -- the first version of this test counted
         // BATTLE_START only and read 2, which is exactly what made it obvious.
         var theSyncRule = elation.getTriggerTable().rulesFor(
                 com.laosun.aluminium.enums.TriggerEvent.ENERGY_GAINED).stream()

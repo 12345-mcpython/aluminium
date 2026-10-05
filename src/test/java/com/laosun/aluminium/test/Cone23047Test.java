@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 23047 (2026-09-30): two of its five clauses.
+ * Light cone 2304(2026-09-30): two of its five clauses.
  *
  * <p>Effect hit +40..60%; when an enemy falls into a debuff the WEARER applied, an 80% base chance puts 魂迷 on it
  * for 3 turns. The other three clauses are REGISTERED, not approximated: the per-debuff DoT bonus counts "debuffs the

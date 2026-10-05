@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 323, 2 pieces: 「装备者的忆灵在场时，我方全体速度提高#2%」 -- the condition is the wearer's own summon count.
+ * Relic 323, 2 pieces: "装备者的忆灵在场时，我方全体速度提高#2%" -- the condition is the wearer's own summon count.
  *
  * <p>1402's memosprite is summoned with `battle.summonMemosprite`, the same call the existing memosprite test uses.
  */
@@ -44,7 +44,7 @@ public class MemospriteSpeedTierTest {
         double before = ally.getAttribute(AttributeType.SPEED).get();
         if (summon) {
             battle.summonMemosprite(unit);
-            // ⭐ `SUMMONED` is fired when the battle settles its requests (Battle.processRequests), not inside the summon call.
+            // `SUMMONED` is fired when the battle settles its requests (Battle.processRequests), not inside the summon call.
             battle.processRequests();
         }
         double gain = ally.getAttribute(AttributeType.SPEED).get() - before;

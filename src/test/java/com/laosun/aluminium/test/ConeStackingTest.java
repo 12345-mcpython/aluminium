@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Cones 22005 and 21027 (round 249): event-driven ATTACK stacks. Their constant halves are the engine's ability_property, so only
+ * Cones 22005 and 2102(round 249): event-driven ATTACK stacks. Their constant halves are the engine's ability_property, so only
  * the conditional half is written here -- and the text gives no duration, so the 21005 precedent (permanent stacks) is followed.
  */
 public class ConeStackingTest {

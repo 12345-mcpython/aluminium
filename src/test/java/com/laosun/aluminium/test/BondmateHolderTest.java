@@ -19,22 +19,22 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} — 「持有【同袍】的角色」 (2026-10-02, 1414 丹恒•腾荒).
+ * The <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} - "持有[同袍]的角色" (2026-10-02, 1414 丹恒-腾荒).
  *
  * <p><b>Why the vocabulary had to exist.</b> 1414's kit is built on one marker: his skill designates one ally as
- * 【同袍】, and then two other clauses speak about <i>whoever holds it</i> — the trace 神秀 that raises that ally's ATK,
+ * [同袍], and then two other clauses speak about <i>whoever holds it</i> - the trace 神秀 that raises that ally's ATK,
  * and (next) the technique that re-aims his skill at that ally. A condition cannot say it (conditions decide whether a
  * <b>rule</b> runs, not which units an effect reaches), and no fixed selector could either: the holder is not a slot in
  * the roster, it is whoever the state landed on.
  *
  * <p>What each case pins:
  * <ul>
- *   <li>the holder is read — and it is <b>only</b> the holder that is buffed, with the other ally as the control;</li>
+ *   <li>the holder is read - and it is <b>only</b> the holder that is buffed, with the other ally as the control;</li>
  *   <li>nobody holding it reaches <b>nobody</b> (a legal state of the world for these clauses, unlike a missing
  *       {@code summon}, which throws);</li>
  *   <li>an empty state name is refused where the file is read;</li>
- *   <li>and his three shipped clauses actually run: the technique's 【同袍】, the trace that buffs whoever just became
- *       the Bondmate, the trace's 「行动提前 40%」 and the trace's 「【同袍】施放攻击时回复 6 点能量」.</li>
+ *   <li>and his three shipped clauses actually run: the technique's [同袍], the trace that buffs whoever just became
+ *       the Bondmate, the trace's "行动提前 40%" and the trace's "[同袍]施放攻击时回复 6 点能量".</li>
  * </ul>
  */
 public class BondmateHolderTest {
@@ -51,7 +51,7 @@ public class BondmateHolderTest {
     // ==================================================================
 
     /**
-     * ⭐ Only the unit that <b>holds</b> the state is reached — and when nobody holds it, nobody is.
+     * Only the unit that <b>holds</b> the state is reached - and when nobody holds it, nobody is.
      *
      * <p>The control matters twice: the other ally must stay untouched (a resolver that picked the first ally, or the
      * owner, would move it), and the amount must be the owner's own 15% (so a wrong <i>magnitude</i> source shows up
@@ -88,7 +88,7 @@ public class BondmateHolderTest {
                 "nor is the rule's owner (the sentence is about the holder, not about me)");
     }
 
-    /** ⚠ The prefix with no state after it is refused while the file is read. */
+    /** Note: The prefix with no state after it is refused while the file is read. */
     @Test
     public void anEmptyHolderStateIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -108,7 +108,7 @@ public class BondmateHolderTest {
     // 2. His shipped clauses
     // ==================================================================
 
-    /** ⭐ 秘技「使用秘技后获得【同袍】」 — and its control: without the technique there is no Bondmate. */
+    /** 秘技"使用秘技后获得[同袍]" - and its control: without the technique there is no Bondmate. */
     @Test
     public void hisTechniqueGivesHimTheBondmate() {
         Character without = CharacterFactory.create(DHPT, LEVEL);
@@ -127,10 +127,10 @@ public class BondmateHolderTest {
     }
 
     /**
-     * ⭐ 行迹 神秀 「施放战技时，使成为【同袍】的目标攻击力提高，等同于丹恒•腾荒15%攻击力」 — no scaffold.
+     * 行迹 神秀 "施放战技时，使成为[同袍]的目标攻击力提高，等同于丹恒-腾荒15%攻击力" - no scaffold.
      *
      * <p>Two things at once, and both are the reason the selector exists: the ally who was <b>just</b> designated by
-     * this very cast is the one buffed (which is also an assertion about rule ORDER inside the file — the marking has
+     * this very cast is the one buffed (which is also an assertion about rule ORDER inside the file - the marking has
      * to happen first), and the owner is not.
      */
     @Test
@@ -152,7 +152,7 @@ public class BondmateHolderTest {
                 "and not its own owner");
     }
 
-    /** ⭐ 行迹 葳蕤 「战斗开始时，丹恒•腾荒行动提前40%」 — measured on the action bar, against no rules at all. */
+    /** 行迹 葳蕤 "战斗开始时，丹恒-腾荒行动提前40%" - measured on the action bar, against no rules at all. */
     @Test
     public void hisTraceAdvancesHimAtBattleStart() {
         Character plain = CharacterFactory.create(DHPT, LEVEL);
@@ -170,7 +170,7 @@ public class BondmateHolderTest {
                 "「行动提前40%」: " + untouched + " -> " + timeRemaining(battle, him));
     }
 
-    /** ⭐ 行迹 葳蕤 后半 「【同袍】施放攻击时，丹恒•腾荒恢复6点能量」 — gated on the ATTACKER holding it. */
+    /** 行迹 葳蕤 后半 "[同袍]施放攻击时，丹恒-腾荒恢复6点能量" - gated on the ATTACKER holding it. */
     @Test
     public void hisTracePaysEnergyWhenTheBondmateAttacks() {
         Character him = CharacterFactory.create(DHPT, LEVEL);
@@ -194,7 +194,7 @@ public class BondmateHolderTest {
     // Helpers
     // ==================================================================
 
-    /** 「使<持有某个状态的目标>攻击力提高，等同于我自己攻击力的 15%」 — the shape the trace is written in. */
+    /** "使<持有某个状态的目标>攻击力提高，等同于我自己攻击力的 15%" - the shape the trace is written in. */
     private static EffectSpec holderBuff() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -206,7 +206,7 @@ public class BondmateHolderTest {
         return effect;
     }
 
-    /** How much action value the unit still has — the action bar's own answer. */
+    /** How much action value the unit still has - the action bar's own answer. */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

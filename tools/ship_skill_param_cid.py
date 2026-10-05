@@ -56,8 +56,8 @@ for body, old, label in ((spec, FIELD_ANCHOR, "the amountPercent field"), (spec,
     if n != 1:
         sys.exit("REFUSING: %s occurs %d times -- nothing written" % (label, n))
 
-# ⚠ the holder line is found by CONTENT and keeps its own indentation -- two anchors in this arc died on guessing whitespace
-# ⚠ the same line appears FIVE times (five readers) -- find the one inside ownerSkillParamValue(EffectSpec, TriggerContext, String)
+# Note: the holder line is found by CONTENT and keeps its own indentation -- two anchors in this arc died on guessing whitespace
+# Note: the same line appears FIVE times (five readers) -- find the one inside ownerSkillParamValue(EffectSpec, TriggerContext, String)
 lines = interp.split("\n")
 sig = -1
 for i, ln in enumerate(lines):

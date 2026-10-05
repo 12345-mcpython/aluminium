@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** 「【追忆】达到 24 点时可激活终结技」与「处于【往昔的涟漪】时 12 点」 (2026-10-02). */
+/** "[追忆]达到 24 点时可激活终结技"与"处于[往昔的涟漪]时 12 点" (2026-10-02). */
 public class RecollectionUltimateReadinessTest {
     private static final String MEMORY = "追忆";
 

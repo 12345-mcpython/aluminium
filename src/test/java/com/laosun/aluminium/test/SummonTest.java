@@ -33,40 +33,40 @@ import java.util.Random;
  * was usable alone: {@code Battle.enemies} was widened to {@code List<CanHit>} (L-8), so the camp
  * <em>could</em> hold one; and {@code models/Summon} was declared, so the type existed. But production code
  * never called {@code new Summon(...)} anywhere, and {@code monster_config.json}'s {@code summon_id} column
- * — non-empty for <b>692 of 2649 monsters</b> — was not parsed at all. This is the piece that connects them:
+ *  - non-empty for <b>692 of 2649 monsters</b> - was not parsed at all. This is the piece that connects them:
  * the roster travels from the data onto the master, and a factory plus one {@code Battle} call turn an id
  * into a unit standing in the fight.
  *
- * <p><b>What these cases are really guarding.</b> Not "does summon() add to a list" — that would be hard to
+ * <p><b>What these cases are really guarding.</b> Not "does summon() add to a list" - that would be hard to
  * get wrong. They pin the four things that could each be quietly wrong while the feature still looked
  * finished:
  * <ol>
  *   <li>{@code [0]} in the roster is <b>not</b> monster number zero (it is the data's way of writing "none",
  *       and it really occurs), so how that column is read is asserted rather than assumed;</li>
- *   <li>the summon's numbers come from <b>its own</b> data, not its master's — a copy of the master's stat
+ *   <li>the summon's numbers come from <b>its own</b> data, not its master's - a copy of the master's stat
  *       sheet would still "work" and be completely wrong;</li>
  *   <li>a summon admitted <b>mid-battle</b> joins the action bar and can be reached by our attacks: the
  *       opening roster is wired in the constructor, and a later arrival is not;</li>
- *   <li>both ends of the lifecycle — it dies like anything else, and it goes when its master does — and
+ *   <li>both ends of the lifecycle - it dies like anything else, and it goes when its master does - and
  *       <b>that going is not a kill</b>, so no on-kill reward may be paid for it.</li>
  * </ol>
  *
  * <p>The last one is the subtle one, and {@code CanHit.perish()} is where it lives: a minion vanishing with
- * its boss must not hand out 「每消灭 1 敌 +5 能量」. ⚠ <b>Mutation testing corrected my own account of why</b>
- * — I first wrote that {@code takeDamage} would fire the events, and the mutant that swaps {@code perish()}
+ * its boss must not hand out "每消灭 1 敌 +5 能量". Note: <b>Mutation testing corrected my own account of why</b>
+ *  - I first wrote that {@code takeDamage} would fire the events, and the mutant that swaps {@code perish()}
  * for {@code takeDamage(maxHp)} stayed <b>green</b>. It is not {@code CanHit.takeDamage} that pays rewards
  * (it fires nothing); it is {@code Battle.applyDamage}, and this sweep deliberately runs outside it. So the
- * two are told apart by the one thing they really differ on — <b>HP</b> — and that is what the lifecycle case
+ * two are told apart by the one thing they really differ on - <b>HP</b> - and that is what the lifecycle case
  * asserts.
  */
 public class SummonTest {
     private static final double EPS = 1e-6;
 
-    /** 银鬃尉官, whose data roster is 银鬃近卫 ×2. */
+    /** 银鬃尉官, whose data roster is 银鬃近卫  x 2. */
     private static final int MASTER = 1003010;
-    /** One 银鬃近卫 — the id the master's roster names. */
+    /** One 银鬃近卫 - the id the master's roster names. */
     private static final int MINION = 1002040;
-    /** 冰锋, whose roster is empty (the common case: 1957 of 2649). */
+    /** 冰锋, whose roster is empty (the common case: 195of 2649). */
     private static final int NO_ROSTER = 1002011;
     /** The one monster whose roster is spelled {@code [0]}. */
     private static final int ZERO_ROSTER = 405301004;
@@ -82,7 +82,7 @@ public class SummonTest {
     /**
      * The roster's order and its duplicates both survive: it is a roster, not a set.
      *
-     * <p>银鬃尉官 really does summon the same minion twice, so "1002040 ×2" has to stay two entries. A
+     * <p>银鬃尉官 really does summon the same minion twice, so "1002040  x 2" has to stay two entries. A
      * {@code Set} would silently turn it into one, and nothing about the resulting battle would say so.
      */
     @Test
@@ -101,7 +101,7 @@ public class SummonTest {
     }
 
     /**
-     * {@code [0]} means "no summon" — and it is genuinely in the data, so this is not a hypothetical.
+     * {@code [0]} means "no summon" - and it is genuinely in the data, so this is not a hypothetical.
      *
      * <p>Handing 0 to the factory would look up monster 0 and fail. The tempting fix ("skip ids that do not
      * resolve") is worse than the failure: it would make a real data error indistinguishable from "this
@@ -122,7 +122,7 @@ public class SummonTest {
      * The stat sheet is the summon's own, computed by the same rules a monster's is.
      *
      * <p>Compared against {@code EnemyFactory.create} of the <b>same id</b>: if the two paths ever disagree,
-     * one of them has grown a private copy of the scaling rules — and the summon would be the copy nobody
+     * one of them has grown a private copy of the scaling rules - and the summon would be the copy nobody
      * looks at.
      */
     @Test
@@ -138,7 +138,7 @@ public class SummonTest {
         Assertions.assertEquals(LEVEL, summon.getLevel(), "the level enters the defence zone, like any unit's");
     }
 
-    /** It carries its own identity and its own skill — not its master's. */
+    /** It carries its own identity and its own skill - not its master's. */
     @Test
     public void theSummonCarriesItsOwnNameAndSkill() {
         Summon summon = SummonFactory.create(MINION, LEVEL, GROUP, Camp.ENEMY);
@@ -151,7 +151,7 @@ public class SummonTest {
         Assertions.assertEquals(Camp.ENEMY, summon.getCamp(), "the camp is passed in, not assumed");
     }
 
-    /** Two calls give two independent units — a roster entry is not a shared singleton. */
+    /** Two calls give two independent units - a roster entry is not a shared singleton. */
     @Test
     public void eachSummonIsItsOwnInstance() {
         Battle battle = new Battle(List.of(hero()), List.of(master()), new Random(0));
@@ -174,7 +174,7 @@ public class SummonTest {
      *
      * <p>The constructor wires the speed listener and the opening queue for the units it was handed; a unit
      * that arrives later goes through {@code addRequestItems}, like a wave. Both halves matter, so both are
-     * asserted — and so does the fact that entering does not move the clock.
+     * asserted - and so does the fact that entering does not move the clock.
      */
     @Test
     public void aSummonAdmittedMidBattleJoinsTheCampAndTheActionBar() {
@@ -213,9 +213,9 @@ public class SummonTest {
     /**
      * A unit admitted mid-battle can still be re-sorted by a speed change.
      *
-     * <p>{@code Battle}'s constructor wires the "speed changed → reschedule" listener for the units it was
+     * <p>{@code Battle}'s constructor wires the "speed changed to reschedule" listener for the units it was
      * handed; a later arrival gets it only if the admission path remembers to, and forgetting looks like
-     * nothing at all — the summon would simply keep its old action time for the rest of the battle while
+     * nothing at all - the summon would simply keep its old action time for the rest of the battle while
      * every unit created normally re-sorted. So the wiring is asserted rather than assumed.
      */
     @Test
@@ -304,11 +304,11 @@ public class SummonTest {
      *
      * <p>This is why {@code CanHit.perish()} exists rather than a {@code takeDamage} call: a kill would fire
      * {@code HpLoss}/{@code Kill} and hand every on-kill talent in the game its reward for a death nobody
-     * caused. The rule below is the smallest stand-in for that whole family (姬子's 「每消灭 1 敌 +5 能量」),
+     * caused. The rule below is the smallest stand-in for that whole family (姬子's "每消灭 1 敌 +5 能量"),
      * and the assertion is that <b>one death pays once</b>.
      *
-     * <p>The precondition asserts the reward really was paid for the master — including the conventional
-     * kill energy — so the second assertion cannot pass by the rule simply never firing.
+     * <p>The precondition asserts the reward really was paid for the master - including the conventional
+     * kill energy - so the second assertion cannot pass by the rule simply never firing.
      */
     @Test
     public void aSummonLeavingWithItsMasterIsNotAKill() {
@@ -355,7 +355,7 @@ public class SummonTest {
      * The camp comes from the master: the same call puts an enemy's minion in {@code enemies} and ours in
      * {@code allies}.
      *
-     * <p>⚠ This case replaces one that asserted a player-side master was <b>refused</b>. That was true until
+     * <p>Note: This case replaces one that asserted a player-side master was <b>refused</b>. That was true until
      * the friendly half of L-8 landed; the refusal existed because our only roster was
      * {@code List<Character>} and a {@link Summon} had nowhere to go. Now there is {@code allies}, so the
      * contract is the routing rather than the refusal, and the friendly path itself (targeting, party buffs,
@@ -390,7 +390,7 @@ public class SummonTest {
         Assertions.assertEquals(1, battle.enemies.size(), "no half-born summon was left in the roster");
     }
 
-    /** An id that names no monster fails loudly — a roster's job is to be right, not to be skippable. */
+    /** An id that names no monster fails loudly - a roster's job is to be right, not to be skippable. */
     @Test
     public void anUnknownSummonIdFailsLoudly() {
         Battle battle = startedBattle();

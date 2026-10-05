@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1308 Acheron, from her own file (2026-09-29, round 229): the 【残梦】 resource the document caps at 9, beside a stack it never caps at all.
+ * 1308 Acheron, from her own file (2026-09-29, round 229): the [残梦] resource the document caps at 9, beside a stack it never caps at all.
  */
 public class AcheronTest {
     private static final int ACHERON = 1308;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ One Slashed Dream per Skill, stopped at the document's nine. */
+    /** Note: One Slashed Dream per Skill, stopped at the document's nine. */
     @Test
     public void theSkillFeedsSlashedDreamUpToNine() {
         Character acheron = CharacterFactory.create(ACHERON, LEVEL);

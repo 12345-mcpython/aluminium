@@ -16,14 +16,14 @@ import java.util.Random;
 /**
  * 1212 Jingliu, from her own file (2026-09-29, round 225): the Syzygy stack, its cap, and the threshold that fires her Action Advance.
  *
- * <p>The threshold is a `self_stacks:` condition — a form the engine already had — and the Advance is observed as round 216's recipe prescribes: the remaining wait must reach 0.
+ * <p>The threshold is a `self_stacks:` condition - a form the engine already had - and the Advance is observed as round 216's recipe prescribes: the remaining wait must reach 0.
  */
 public class JingliuTest {
     private static final int JINGLIU = 1212;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ One stack per Skill, stopped at the document's three. */
+    /** Note: One stack per Skill, stopped at the document's three. */
     @Test
     public void theSkillAddsOneStackUpToThree() {
         Character jingliu = CharacterFactory.create(JINGLIU, LEVEL);
@@ -42,7 +42,7 @@ public class JingliuTest {
                 "「【朔望】最多可累计3层」 -- five casts must still read three");
     }
 
-    /** ⚠ The threshold: the SECOND cast reaches two stacks and must Advance; the first must not. */
+    /** Note: The threshold: the SECOND cast reaches two stacks and must Advance; the first must not. */
     @Test
     public void theAdvanceNeedsTwoStacks() {
         double afterOne = waitAfterCasts(1);

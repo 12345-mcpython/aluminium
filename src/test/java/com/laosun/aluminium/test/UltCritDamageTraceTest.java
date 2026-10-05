@@ -15,16 +15,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408：「施放终结技时，暴击伤害提高 50%，持续 3 回合」 (2026-10-02).
+ * 1408："施放终结技时，暴击伤害提高 50%，持续 3 回合" (2026-10-02).
  *
- * <p>⭐ TWO-WAY: the same character measured before and after her ultimate, so the only thing that differs is the cast.
+ * <p>TWO-WAY: the same character measured before and after her ultimate, so the only thing that differs is the cast.
  */
 public class UltCritDamageTraceTest {
     private static final double EPS = 1e-9;
     private static final int OWNER = 1408;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ Casting the ultimate raises her crit damage by exactly 50%. */
+    /** Casting the ultimate raises her crit damage by exactly 50%. */
     @Test
     public void theUltimateRaisesCritDamage() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -45,7 +45,7 @@ public class UltCritDamageTraceTest {
                 "「施放终结技时，暴击伤害提高 50%」 (before=" + before + ")");
     }
 
-    /** ⚠ Before the ultimate the trace has not started, so the panel is untouched. */
+    /** Note: Before the ultimate the trace has not started, so the panel is untouched. */
     @Test
     public void beforeTheUltimateThePanelIsUntouched() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

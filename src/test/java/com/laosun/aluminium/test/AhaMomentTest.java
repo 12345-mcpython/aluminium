@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「阿哈时刻持续至本次最后一个欢榆技施放结束」⇒ 结束时发【好活当赏】 (1513, 2026-10-02).
+ * "阿哈时刻持续至本次最后一个欢榆技施放结束" so 结束时发[好活当赏] (1513, 2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN: a real elation cast applies the moment (that is what gives the event its category), and the clock is
+ * <p>FILE-DRIVEN: a real elation cast applies the moment (that is what gives the event its category), and the clock is
  * advanced with `BuffManager.tickForeign` -- the same call the turn loop makes -- because the engine's announcement only
  * happens when a state EXPIRES (measured in BuffManager).
  */
@@ -26,7 +26,7 @@ public class AhaMomentTest {
     private static final String MOMENT = "阿哈时刻";
     private static final String REWARD = "好活当赏";
 
-    /** ⭐ The cast applies it, its expiry announces it, and the reader answers. */
+    /** The cast applies it, its expiry announces it, and the reader answers. */
     @Test
     public void theMomentExpiresAndTheRewardLands() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

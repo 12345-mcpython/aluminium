@@ -13,18 +13,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1008：「进入战斗后，受到致命攻击时阿兰不会陷入无法战斗状态，并立即回复至自身生命上限的 25%。
- * 该效果在触发 1 次后或持续 2 回合后自动解除」 (2026-10-02).
+ * 1008："进入战斗后，受到致命攻击时阿兰不会陷入无法战斗状态，并立即回复至自身生命上限的 25%。
+ * 该效果在触发 1 次后或持续 2 回合后自动解除" (2026-10-02).
  *
- * <p>⭐ THREE READINGS, ONE VARIABLE EACH: the eidolon rank, the NUMBER of lethal blows, and the NUMBER of his own turns that
- * elapse before the blow. The trace is a state, so it can be asked about directly -- which is what makes 「自动解除」 testable.
+ * <p>THREE READINGS, ONE VARIABLE EACH: the eidolon rank, the NUMBER of lethal blows, and the NUMBER of his own turns that
+ * elapse before the blow. The trace is a state, so it can be asked about directly -- which is what makes "自动解除" testable.
  */
 public class ArlanEidolonFourTest {
     private static final int ARLAN = 1008;
     private static final int MONSTER = 1002011;
     private static final String STATE = "绝处反击";
 
-    /** ⭐ At E4 the first lethal blow restores him to a quarter of his Max HP. */
+    /** At E4 the first lethal blow restores him to a quarter of his Max HP. */
     @Test
     public void atEidolonFourHeSurvivesAtAQuarter() {
         double[] result = afterLethalBlows(4, 1, 0);
@@ -33,13 +33,13 @@ public class ArlanEidolonFourTest {
                 "「回复至自身生命上限的 25%」");
     }
 
-    /** ⚠ Below E4 he falls. */
+    /** Note: Below E4 he falls. */
     @Test
     public void belowEidolonFourHeFalls() {
         Assertions.assertTrue(afterLethalBlows(0, 1, 0)[0] <= 0, "星魂 4 才有这一条");
     }
 
-    /** ⭐⭐ 「该效果在触发 1 次后…自动解除」: the second blow in the same battle is NOT answered. */
+    /** "该效果在触发 1 次后…自动解除": the second blow in the same battle is NOT answered. */
     @Test
     public void theFirstBlowConsumesTheTrace() {
         double[] one = afterLethalBlows(4, 1, 0);
@@ -48,7 +48,7 @@ public class ArlanEidolonFourTest {
         Assertions.assertTrue(two[0] <= 0, "第二次**不再**被救（「触发 1 次后自动解除」）");
     }
 
-    /** ⭐⭐ 「或持续 2 回合后自动解除」: after two of HIS turns the trace is gone, even though it never triggered. */
+    /** "或持续 2 回合后自动解除": after two of HIS turns the trace is gone, even though it never triggered. */
     @Test
     public void twoTurnsEndTheTraceUntriggered() {
         double[] fresh = afterLethalBlows(4, 1, 0);
@@ -70,7 +70,7 @@ public class ArlanEidolonFourTest {
             Assertions.assertTrue(him.getBuffManager().hasState(STATE), "precondition: the trace is on him");
         }
 
-        // ⚠ A timed buff ticks on ITS WEARER's turns, in TWO halves: `beforeMove()` is the early tick and `afterMove()` the late
+        // Note: A timed buff ticks on ITS WEARER's turns, in TWO halves: `beforeMove()` is the early tick and `afterMove()` the late
         // one (BuffManager.processBuffTick(true/false)), and a state's expiry is announced on the LATE half. Driving only
         // `beforeMove()` is therefore half a turn, which is what the first version of this judge measured by mistake.
         for (int turn = 0; turn < turns; turn++) {

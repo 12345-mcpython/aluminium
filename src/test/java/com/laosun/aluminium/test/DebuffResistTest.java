@@ -24,25 +24,25 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「抵抗<b>控制类</b>负面状态的概率提高35%」 / 「免疫<b>控制类</b>负面状态」 — protection against a whole <b>family</b>.
+ * "抵抗<b>控制类</b>负面状态的概率提高35%" / "免疫<b>控制类</b>负面状态" - protection against a whole <b>family</b>.
  *
  * <p><b>Why the vocabulary needed it.</b> The engine could already be resistant to <i>one named state</i>
  * ({@code STAT_CTRL_Frozen} and friends, straight from a monster's own data). The corpus asks for something else:
- * 8 of the 97 documents say a unit is <b>immune to the control class</b> (万敌's 【血仇】, 卡厄斯兰那, 长夜月's 忆灵
- * 「长夜」, 银狼LV.999's 【防火墙】, 小伊卡…) and two more say it is <b>35% / 50% more likely to resist</b> a class
- * (克拉拉 守护, 1008 坚韧). A list of keys cannot say that — a control written tomorrow would fall outside the list.
+ * 8 of the 9documents say a unit is <b>immune to the control class</b> (万敌's [血仇], 卡厄斯兰那, 长夜月's 忆灵
+ * "长夜", 银狼LV.999's [防火墙], 小伊卡…) and two more say it is <b>35% / 50% more likely to resist</b> a class
+ * (克拉拉 守护, 1008 坚韧). A list of keys cannot say that - a control written tomorrow would fall outside the list.
  *
  * <p><b>One mechanism, both spellings.</b> A class resistance multiplies the remaining chance by {@code 1 − r}, so
- * {@code percent: 0.35} is 「提高35%」 and {@code percent: 1.0} is 免疫 — the same mechanic at its limit, which is why
+ * {@code percent: 0.35} is "提高35%" and {@code percent: 1.0} is 免疫 - the same mechanic at its limit, which is why
  * one op covers both.
  *
- * <p>⚠ The roll lives in {@code Battle.tryApplyDebuff} and happens <b>even when a rule states no probability</b>: an
- * unstated chance is a 100% <i>base</i> chance, and without that rule every 「免疫控制类负面状态」 clause would have been
+ * <p>Note: The roll lives in {@code Battle.tryApplyDebuff} and happens <b>even when a rule states no probability</b>: an
+ * unstated chance is a 100% <i>base</i> chance, and without that rule every "免疫控制类负面状态" clause would have been
  * silently ineffective against exactly the controls the documents write without a number.
  *
- * <p>⚠ <b>What the corpus says about the class itself</b> (measured 2026-09-28): 「控制类负面状态」 is defined
+ * <p>Note: <b>What the corpus says about the class itself</b> (measured 2026-09-28): "控制类负面状态" is defined
  * <b>in the documents</b>, 28 times, always as the same twelve names (冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，
- * 恐惧，行动锁定，幸福傀儡，怨火灼身). That is why this is a <i>class</i> and not a list of resistance keys — the list is
+ * 恐惧，行动锁定，幸福傀儡，怨火灼身). That is why this is a <i>class</i> and not a list of resistance keys - the list is
  * the game's, it is long, and it grows with the next character. It is also why 嘲讽 is <b>not</b> covered (it is in
  * none of the twelve) and why the class protects against exactly what the engine can apply today (three of the
  * twelve; the rest are registered).
@@ -54,7 +54,7 @@ public class DebuffResistTest {
     private static final int LEVEL = 80;
 
     /**
-     * ⚠ Not 1002011. That one is 冰锋, whose own data carries {@code STAT_CTRL_Frozen = 1.0} — a 「the state lands」
+     * Note: Not 1002011. That one is 冰锋, whose own data carries {@code STAT_CTRL_Frozen = 1.0} - a "the state lands"
      * assertion on it would pass for the wrong reason (and did, in this suite's first draft: 免疫 was indistinguishable
      * from the monster's data). 1003010 has no specific resistances, like {@code ControlTest}'s landing cases.
      */
@@ -64,8 +64,8 @@ public class DebuffResistTest {
      * The arithmetic, driven through the real pipeline with a <b>pinned generator</b>.
      *
      * <p>With the base chance at 1.0 and the enemy's 效果抵抗 at 0, the roll is {@code rng < (1 − classResistance)}: a
-     * generator that always answers 0.7 therefore lands with no resistance, and fails to land at 0.35 (0.65 left) or
-     * 1.0 (nothing left). That is the whole claim — and it fails if the resistance is added anywhere but the roll.
+     * generator that always answers 0.therefore lands with no resistance, and fails to land at 0.35 (0.65 left) or
+     * 1.0 (nothing left). That is the whole claim - and it fails if the resistance is added anywhere but the roll.
      */
     @Test
     public void theClassResistanceRemovesThatShareOfTheChance() {
@@ -98,7 +98,7 @@ public class DebuffResistTest {
         Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "and the victim keeps its turn");
     }
 
-    /** Two appliers add: 35% + 35% is 70%, not two independent rolls (a different curve). */
+    /** Two appliers add: 35% + 35% is 0%, not two independent rolls (a different curve). */
     @Test
     public void twoResistancesOfTheSameClassAddAndClampAtOne() {
         Fixture f = new Fixture();
@@ -115,12 +115,12 @@ public class DebuffResistTest {
     }
 
     /**
-     * ⚠ Identity is (class, <b>applier</b>): a re-application from one applier refreshes <b>its own</b> contribution
+     * Note: Identity is (class, <b>applier</b>): a re-application from one applier refreshes <b>its own</b> contribution
      * instead of adding a second one, while the other applier's stands.
      *
-     * <p>That is what keeps 克拉拉's permanent 35% 守护 alive when a one-turn 【防火墙】-style immunity lands on her and
+     * <p>That is what keeps 克拉拉's permanent 35% 守护 alive when a one-turn [防火墙]-style immunity lands on her and
      * later expires: with class alone as the identity, the timed 100% would have replaced the trace and taken it with
-     * it. The numbers below are chosen so a fourth buff would be visible (0.2 + 0.3 = 0.5, and 0.2 + 0.3 + 0.2 = 0.7).
+     * it. The numbers below are chosen so a fourth buff would be visible (0.2 + 0.3 = 0.5, and 0.2 + 0.3 + 0.2 = 0.).
      */
     @Test
     public void reapplyingFromTheSameApplierRefreshesItsOwnContribution() {
@@ -166,7 +166,7 @@ public class DebuffResistTest {
         Assertions.assertEquals(0.35, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS);
     }
 
-    /** It is a <b>positive</b> effect on its bearer, so 「解除 N 个负面效果」 must not take it off. */
+    /** It is a <b>positive</b> effect on its bearer, so "解除 N 个负面效果" must not take it off. */
     @Test
     public void theResistanceIsNotADebuff() {
         Fixture f = new Fixture(0.0, resist(0.35));
@@ -179,9 +179,9 @@ public class DebuffResistTest {
     }
 
     /**
-     * ⚠ The taunt goes through the same pipeline now.
+     * Note: The taunt goes through the same pipeline now.
      *
-     * <p>「使目标陷入嘲讽状态」 states no probability, i.e. a 100% <b>base</b> chance — which the game still runs through
+     * <p>"使目标陷入嘲讽状态" states no probability, i.e. a 100% <b>base</b> chance - which the game still runs through
      * 效果命中 / 效果抵抗. The engine used to attach the marker unconditionally, which no document says; the fix is
      * pinned here by giving the victim full 效果抵抗.
      */
@@ -197,15 +197,15 @@ public class DebuffResistTest {
     }
 
     /**
-     * A state that is in no class is not covered by any class resistance — and that is the documents' own answer
+     * A state that is in no class is not covered by any class resistance - and that is the documents' own answer
      * here, not a placeholder.
      *
-     * <p>⚠ <b>Measured (2026-09-28).</b> 「控制类负面状态」 is <b>defined by the corpus itself</b>, 28 times, always
-     * the same twelve names: 「冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身」. 嘲讽 is
+     * <p>Note: <b>Measured (2026-09-28).</b> "控制类负面状态" is <b>defined by the corpus itself</b>, 28 times, always
+     * the same twelve names: "冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身". 嘲讽 is
      * <b>not</b> one of them, so leaving {@code TauntBuff} outside the control class matches the game's own list
-     * rather than dodging a decision. ⚠ The other side of that measurement is a registered gap: of those twelve
-     * states the engine implements three (冻结 / 纠缠 / 禁锢, the break trio), so a 「免疫控制类」 clause protects
-     * against everything the engine can currently apply and nothing more — see ROADMAP's register.
+     * rather than dodging a decision. Note: The other side of that measurement is a registered gap: of those twelve
+     * states the engine implements three (冻结 / 纠缠 / 禁锢, the break trio), so a "免疫控制类" clause protects
+     * against everything the engine can currently apply and nothing more - see ROADMAP's register.
      */
     @Test
     public void aClassImmunityDoesNotCoverAStateInNoClass() {
@@ -251,9 +251,9 @@ public class DebuffResistTest {
     /**
      * Whether a control lands on the fixture's enemy, with a class resistance standing and a pinned generator.
      *
-     * <p>⚠ 效果抵抗 = 0 and 效果命中 = +100% so that "a certain base chance" really is certain: otherwise the case would
+     * <p>Note: 效果抵抗 = 0 and 效果命中 = +100% so that "a certain base chance" really is certain: otherwise the case would
      * be measuring 冰锋's own data. The generator is the only randomness left, which is what makes the boundary
-     * (0.65 vs 0.7) an assertion instead of a coin flip.
+     * (0.65 vs 0.) an assertion instead of a coin flip.
      */
     private static boolean freezeLands(double classResist, double roll) {
         Fixture f = new Fixture(roll, TriggerSpecs.applyControl("冻结", 1, null, "target"));
@@ -295,7 +295,7 @@ public class DebuffResistTest {
         }
 
         /**
-         * Attaches one <b>contribution</b> from a named applier — the pair {@code ClassResistBuff} is identified by.
+         * Attaches one <b>contribution</b> from a named applier - the pair {@code ClassResistBuff} is identified by.
          *
          * @param source who grants it; a stand-in is enough, because nothing but its identity is ever compared
          */
@@ -308,7 +308,7 @@ public class DebuffResistTest {
         /**
          * A stand-in applier, <b>cached by index</b>: it never enters the battle, because only its identity matters.
          *
-         * <p>⚠ The cache is the point. {@code applier(2) == applier(2)} has to hold, or a rule about "the same
+         * <p>Note: The cache is the point. {@code applier(2) == applier(2)} has to hold, or a rule about "the same
          * applier again refreshes" would be measuring two different ones.
          */
         private CanHit applier(int index) {
@@ -352,7 +352,7 @@ public class DebuffResistTest {
      * @param kind      {@code "control"} / {@code "dot"}, or {@code null} to leave the field out
      * @param percent   the resistance fraction
      * @param turns     the duration, or {@code null} when {@code permanent} is used
-     * @param permanent {@code true} for 「整场战斗」, or {@code null}
+     * @param permanent {@code true} for "整场战斗", or {@code null}
      */
     private static EffectSpec resistEffect(String kind, double percent, Integer turns, Boolean permanent) {
         EffectSpec effect = new EffectSpec();
@@ -361,7 +361,7 @@ public class DebuffResistTest {
         TriggerSpecs.set(effect, "percent", percent);
         TriggerSpecs.set(effect, "turns", turns);
         TriggerSpecs.set(effect, "permanent", permanent);
-        // Defaulted to the event's subject: 「抵抗…」 protects the unit the rule is about, and self (the engine's
+        // Defaulted to the event's subject: "抵抗…" protects the unit the rule is about, and self (the engine's
         // default when no target is stated) is invisible in a one-unit fixture.
         TriggerSpecs.set(effect, "target", "target");
         return effect;

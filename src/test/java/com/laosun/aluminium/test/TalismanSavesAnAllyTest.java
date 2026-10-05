@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1217：「当藿藿拥有【禳命】时，若我方目标受到致命攻击…立即回复等同于其自身生命上限 50% 的生命值。
- * 该效果单场战斗中可以触发 2 次」 (2026-10-02).
+ * 121："当藿藿拥有[禳命]时，若我方目标受到致命攻击…立即回复等同于其自身生命上限 50% 的生命值。
+ * 该效果单场战斗中可以触发 2 次" (2026-10-02).
  *
- * <p>⭐ ONE VARIABLE per test: the eidolon rank, or the NUMBER OF LETHAL BLOWS. Same party, same skill (which is what puts
- * 【禳命】 on her), same blow.
+ * <p>ONE VARIABLE per test: the eidolon rank, or the NUMBER OF LETHAL BLOWS. Same party, same skill (which is what puts
+ * [禳命] on her), same blow.
  */
 public class TalismanSavesAnAllyTest {
     private static final int HUOHUO = 1217;
@@ -27,7 +27,7 @@ public class TalismanSavesAnAllyTest {
     private static final int MONSTER = 1002011;
     private static final String STATE = "禳命";
 
-    /** ⭐ At E2 the ally survives, at HALF OF ITS OWN Max HP. */
+    /** At E2 the ally survives, at HALF OF ITS OWN Max HP. */
     @Test
     public void atEidolonTwoTheAllySurvives() {
         double[] result = afterLethalBlows(2, 1);
@@ -36,17 +36,17 @@ public class TalismanSavesAnAllyTest {
                 "「回复等同于**其自身**生命上限 50%」-- the VICTIM’s own, not the healer’s");
     }
 
-    /** ⚠ Below E2 the ally falls. */
+    /** Note: Below E2 the ally falls. */
     @Test
     public void belowEidolonTwoTheAllyFalls() {
         Assertions.assertTrue(afterLethalBlows(0, 1)[0] <= 0, "星魂 2 才有这一条");
     }
 
     /**
-     * ⭐⭐ 「该效果单场战斗中可以触发 **2** 次」: the first two blows are answered, the third is not.
+     * "该效果单场战斗中可以触发 2 次": the first two blows are answered, the third is not.
      *
-     * <p>⭐ The count is a shipped spelling, not a new capability: a counter is `ADD_STACK` plus a `self_stacks:` condition
-     * (sample: 1111's 【斗志】). ⚠ The two answered blows each leave her ALLY at half of ITS OWN Max HP, so the third
+     * <p>The count is a shipped spelling, not a new capability: a counter is `ADD_STACK` plus a `self_stacks:` condition
+     * (sample: 1111's [斗志]). Note: The two answered blows each leave her ALLY at half of ITS OWN Max HP, so the third
      * blow is lethal again -- the assertion is about the count, not about a first-blow-only effect.
      */
     @Test
@@ -71,7 +71,7 @@ public class TalismanSavesAnAllyTest {
         battle.startBattle();
         battle.processRequests();
 
-        // Her skill is what puts 【禳命】 on her (2 turns, ticking on her own turns).
+        // Her skill is what puts [禳命] on her (2 turns, ticking on her own turns).
         Skill skill = her.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));

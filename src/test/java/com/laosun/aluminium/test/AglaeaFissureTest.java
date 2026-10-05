@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1402 阿格莱雅's talent: 「攻击处于【间隙织线】状态下的敌人后，额外造成等同于阿格莱雅攻击力30%的雷属性附加伤害」.
+ * 1402 阿格莱雅's talent: "攻击处于[间隙织线]状态下的敌人后，额外造成等同于阿格莱雅攻击力30%的雷属性附加伤害".
  *
- * <p>⚠ Both directions, with 「衣匠在场时」 held fixed: the same summon is out in both runs, so the only difference is the state
+ * <p>Note: Both directions, with "衣匠在场时" held fixed: the same summon is out in both runs, so the only difference is the state
  * on the target. The clause's other half -- the state is APPLIED by her attacks -- is a separate sentence and is not claimed here.
  */
 public class AglaeaFissureTest {
@@ -38,7 +38,7 @@ public class AglaeaFissureTest {
                 "the additional damage must land on a 【间隙织线】 target: " + plain + " -> " + threaded);
         double extra = threaded - plain;
         double attack = attackOf();
-        // ⚠ The arithmetic of a flat addend is pinned by `AddDamageOpTest` (it lands in the BASE layer, so defence and the
+        // Note: The arithmetic of a flat addend is pinned by `AddDamageOpTest` (it lands in the BASE layer, so defence and the
         // other zones apply AFTERWARDS). What this test pins is the CONTENT: the clause fires, and its size is 30% of her ATK
         // BEFORE mitigation -- an upper bound. Measured: 122.145 against 209.563 unmitigated.
         Assertions.assertTrue(extra > 0, "the additional damage must be positive: " + extra);
@@ -75,13 +75,13 @@ public class AglaeaFissureTest {
         };
         Battle battle = new Battle(List.of(aglaea, ally), List.of(enemy), noCrit);
         battle.startBattle();
-        // 「衣匠在场时」 -- held fixed, and it is also the condition the rule needs.
+        // "衣匠在场时" -- held fixed, and it is also the condition the rule needs.
         battle.summonMemosprite(aglaea);
         if (threaded) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0);
         }
         double before = enemy.getCurrentHp();
-        // ⚠ COMMON, not SKILL: her Skill heals/summons the 衣匠 (no damage at all), so her attack is the basic one.
+        // Note: COMMON, not SKILL: her Skill heals/summons the 衣匠 (no damage at all), so her attack is the basic one.
         battle.castImmediate(aglaea.getSkills().get(SkillType.COMMON), aglaea, List.of(enemy));
         double dealt = before - enemy.getCurrentHp();
         Assertions.assertFalse(enemy.isDeath(), "the judged hit must not kill the victim");

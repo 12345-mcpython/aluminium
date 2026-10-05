@@ -27,8 +27,8 @@ public class CharacterConditionCoverageTest {
     private static final int LEVEL = 80;
 
     /**
-     * ⚠ The parser normalises two things we measured: attribute names are LOWERED
-     * ({@code self_attr:breaking_effect}) and integer literals gain a decimal point ({@code >= 1.0}). So the file’s
+     * Note: The parser normalises two things we measured: attribute names are LOWERED
+     * ({@code self_attr:breaking_effect}) and integer literals gain a decimal point ({@code >= 1.0}). So the file's
      * text is normalised the same way before the comparison -- a different threshold still fails.
      */
     private static String normalise(String text) {

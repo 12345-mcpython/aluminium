@@ -46,15 +46,15 @@ public class SkillData {
      * Is this a real row, or the {@link #EMPTY} placeholder the loader hands back for an id the data does not have?
      *
      * <p><b>Why this question needs a name.</b> {@code Character.Builder} fills every intrinsic slot with a
-     * {@code DefaultSkill}, and a slot whose character has no such row still ends up <b>present in the map</b> —
+     * {@code DefaultSkill}, and a slot whose character has no such row still ends up <b>present in the map</b> - 
      * holding this placeholder. So "the slot is there" and "the character has that skill" are different facts, and
      * the difference is invisible to a null check: {@code getData()} answers non-null either way. Measured
      * (2026-10-02): 姬子 carries a {@code ELATION_SKILL} key whose row is this placeholder, while 8010's is a real
-     * one — the first version of the {@code has_skill} condition asked about the key and answered "yes" for every
+     * one - the first version of the {@code has_skill} condition asked about the key and answered "yes" for every
      * character in the game.
      *
-     * <p>⚠ The marker is {@code maxLevel}: a real row has at least one level of parameters, the placeholder has
-     * none ({@code 0}). It is the one field {@code EMPTY} is constructed with that no real row can share — which is
+     * <p>Note: The marker is {@code maxLevel}: a real row has at least one level of parameters, the placeholder has
+     * none ({@code 0}). It is the one field {@code EMPTY} is constructed with that no real row can share - which is
      * why the test that uses this also prints both sides.
      */
     public boolean isLoaded() {
@@ -87,29 +87,29 @@ public class SkillData {
      */
     private final SkillEffectType effect;
     /**
-     * Ultimate activation threshold (the {@code sp_need} of {@code skills.json}): **only ultimates
-     * have a value**, the rest are {@code null}.
+     * Ultimate activation threshold (the {@code sp_need} of {@code skills.json}): only ultimates
+     * have a value, the rest are {@code null}.
      *
-     * <p>It is exactly tbgd's {@code AvatarSkillConfig.SPNeed}. ⚠ **It is NOT equal to the energy
-     * cap**: of the 93 characters, 5 have a 2:1 ratio between the two (Yunli 240/120, Argenti
+     * <p>It is exactly tbgd's {@code AvatarSkillConfig.SPNeed}. Note: It is NOT equal to the energy
+     * cap: of the 93 characters, 5 have a 2:1 ratio between the two (Yunli 240/120, Argenti
      * 180/90, 绯英 480/240, Feixiao 12/6, Cyrene (昔涟) 24/12).
      * See also {@link #spBase}.
      */
     private final Double spNeed;
     /**
-     * **How much energy** is gained by casting this skill (the {@code sp_base} of
+     * How much energy is gained by casting this skill (the {@code sp_base} of
      * {@code skills.json}): tbgd's {@code AvatarSkillConfig.SPBase}.
      *
-     * <p>Regular tiers: basic attack 20 / skill 30 / ultimate 5 — consistent with
+     * <p>Regular tiers: basic attack 20 / skill 30 / ultimate 5 - consistent with
      * {@code Constant.ENERGY_GAIN_*}.
      *
-     * <p>⚠ <b>This field does not drive energy gain at present</b>
+     * <p>Note: <b>This field does not drive energy gain at present</b>
      * ({@link com.laosun.aluminium.models.energy.StandardEnergyProvider} still uses the constants).
-     * The reason is that in the data the {@code sp_base} of **multi-hit / bouncing skills is a
-     * "per-hit" value** (Asta / Sampo / Anaxa / Harmony Trailblazer 6, Welt 10), and it would have
-     * to be multiplied by the hit count to be correct — but multiplying by hit count depends on
+     * The reason is that in the data the {@code sp_base} of multi-hit / bouncing skills is a
+     * "per-hit" value (Asta / Sampo / Anaxa / Harmony Trailblazer 6, Welt 10), and it would have
+     * to be multiplied by the hit count to be correct - but multiplying by hit count depends on
      * the ability config's {@code SPHitRatio} (absent from this project's data). The constants
-     * happen to give the **correct total** instead.
+     * happen to give the correct total instead.
      * The proper data-driven path is ROADMAP P3-4 (aggregate {@code SPHitRatio} first).
      *
      * <p>Value of keeping the read: it is the input for aggregating {@code SPHitRatio}, and it is
@@ -119,13 +119,13 @@ public class SkillData {
     private final Double spBase;
 
     /**
-     * The skill's Chinese description ({@code skill_introduction.chinese}), tags and all — or
+     * The skill's Chinese description ({@code skill_introduction.chinese}), tags and all - or
      * {@code null} when the data has none.
      *
      * <p><b>Why a description is a first-class field.</b> The data states some numbers <b>only in
      * prose</b>: which {@code param_list} slot holds a debuff's base chance is written as
      * "有#4%的基础概率" and nowhere else. The generator already relies on this ({@code skill_effects.json}
-     * records {@code source: "SkillDesc 占位符"}), so the engine reading it too is not a hack — it is
+     * records {@code source: "SkillDesc 占位符"}), so the engine reading it too is not a hack - it is
      * the only way to answer the question at all. Kept raw rather than pre-parsed so that each
      * question (chance now, magnitudes later) can be answered without regenerating the data.
      */
@@ -147,7 +147,7 @@ public class SkillData {
      *
      * @param cid     character id (key of {@code skills.json})
      * @param skillID skill slot id (e.g. 1 = normal attack, 2 = basic skill,
-     *                3 = ultimate, 4 = talent, 6 = maze attack, 7 = technique)
+     *                3 = ultimate, 4 = talent, 6 = maze attack, = technique)
      * @return the skill data for the requested skill
      * @throws IllegalArgumentException if the character / skill id exists but its
      *                                  {@code skill_effect} is missing or unknown
@@ -178,9 +178,9 @@ public class SkillData {
      * The debuff's base chance, read out of the description, or {@code null} when the skill states none.
      *
      * <h2>Which parameter it is (P10-6)</h2>
-     * ⚠ <b>Not a fixed slot.</b> The plan for this task said "the chance is the 3rd {@code param_list}
+     * Note: <b>Not a fixed slot.</b> The plan for this task said "the chance is the 3rd {@code param_list}
      * entry"; measured against the real data that is wrong for <b>every</b> skill examined, and wrong
-     * in the worst way — for Himeko's technique (1003/7) index 3 holds {@code 15}, so the "chance"
+     * in the worst way - for Himeko's technique (1003/) index 3 holds {@code 15}, so the "chance"
      * would be 1500%, clamped to 1.0 by {@link com.laosun.aluminium.Battle#hitChance}, i.e. "always lands" and nothing
      * would look broken.
      *
@@ -190,11 +190,11 @@ public class SkillData {
      * <table border="1">
      *   <caption>skill, the text, and where the number really lives</caption>
      *   <tr><th>skill</th><th>text</th><th>param index</th><th>value</th></tr>
-     *   <tr><td>1003/7 姬子 不完全燃烧</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
-     *   <tr><td>1004/7 瓦尔特 画地为牢</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
-     *   <tr><td>1108/7 桑博 你最闪亮</td><td>{@code 有#2%<u>固定概率</u>} (no 的)</td><td><b>1</b></td><td>1.0</td></tr>
+     *   <tr><td>1003/姬子 不完全燃烧</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
+     *   <tr><td>1004/瓦尔特 画地为牢</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
+     *   <tr><td>1108/桑博 你最闪亮</td><td>{@code 有#2%<u>固定概率</u>} (no 的)</td><td><b>1</b></td><td>1.0</td></tr>
      *   <tr><td>1006/4 银狼 等待程序响应…</td><td>{@code 有#4%的<u>基础概率</u>}</td><td><b>3</b></td><td>0.6</td></tr>
-     *   <tr><td>1307/4 黑天鹅 无端命运的机杼</td><td>{@code 有#2%的<u>基础概率</u>}</td><td><b>1</b></td><td>0.5</td></tr>
+     *   <tr><td>130/4 黑天鹅 无端命运的机杼</td><td>{@code 有#2%的<u>基础概率</u>}</td><td><b>1</b></td><td>0.5</td></tr>
      * </table>
      *
      * <p>So the rule is textual, and the two wordings are <b>not</b> interchangeable in game terms:
@@ -202,15 +202,15 @@ public class SkillData {
      * (what {@link com.laosun.aluminium.Battle#hitChance} computes), while 固定概率 is applied as-is. Both are returned
      * here, because both are "the chance this skill states"; a caller that feeds a 固定概率 through
      * {@code hitChance} will over-apply it. Distinguishing them is left to whoever builds the
-     * Impair dispatch — the data needed to know <i>which</i> debuff is applied is still missing
+     * Impair dispatch - the data needed to know <i>which</i> debuff is applied is still missing
      * (see ROADMAP P10-6), so an API for it here would have no caller.
      *
      * <p>Matching stops at the first hit, which is what the data needs: when a description names the
-     * chance twice (黑天鹅 1307/4) both spellings point at the same placeholder.
+     * chance twice (黑天鹅 130/4) both spellings point at the same placeholder.
      *
      * @return the chance ({@code param_list} of level 1), or {@code null} when the description states
-     * no chance at all — which is a real answer, not a failure: 14 of the 28 {@code Impair}
-     * skills (e.g. 1315/2 波提欧's 【绝命对峙】) apply their effect unconditionally
+     * no chance at all - which is a real answer, not a failure: 14 of the 28 {@code Impair}
+     * skills (e.g. 1315/2 波提欧's [绝命对峙]) apply their effect unconditionally
      */
     public Double debuffChance() {
         if (description == null || skills.isEmpty()) {
@@ -227,7 +227,7 @@ public class SkillData {
                 i++;
             }
             if (i < after.length() && after.charAt(i) == '的') {
-                i++;                                     // 1003/7 writes "的<u>基础概率</u>", 1108/7 does not
+                i++;                                     // 1003/writes "的<u>基础概率</u>", 1108/does not
             }
             String tail = after.substring(i);
             if (!tail.startsWith("基础概率") && !tail.startsWith("固定概率")) {
@@ -241,12 +241,12 @@ public class SkillData {
     }
 
     /**
-     * The enum parsed from the data's {@code attack_type} — **use this to branch**, do not take the
+     * The enum parsed from the data's {@code attack_type} - use this to branch, do not take the
      * bare string from {@link #getSkillType()} and {@code switch}/{@code equals} on it.
      *
      * <p>The problem with the bare string: when the data side changes the spelling or adds a new
-     * type it **fails to match silently** (it falls into {@code default} and is swallowed).
-     * Going through the enum means "data value → engine semantics" is defined in exactly one place
+     * type it fails to match silently (it falls into {@code default} and is swallowed).
+     * Going through the enum means "data value to engine semantics" is defined in exactly one place
      * ({@link SkillCategory#fromString}), and when a new type is added the compiler forces every
      * {@code switch} to take a position.
      *
@@ -258,14 +258,14 @@ public class SkillData {
     }
 
     /**
-     * The toughness <b>one hit</b> of this skill removes — the single place that maps an attack shape onto
+     * The toughness <b>one hit</b> of this skill removes - the single place that maps an attack shape onto
      * {@link Skill.StanceList}'s three columns ({@code single} / {@code all} / {@code spread}).
      *
      * <p><b>Why it lives here rather than in the executor.</b> Two callers need the same answer and must not
      * drift: {@code SkillExecutor} (a skill's own cast) and the trigger interpreter's {@code COMMAND_SUMMON}
-     * (a <b>commanded</b> attack, which is the same swing delivered by a summon). ⚠ It used to be split three
-     * ways — AOE and BLAST read {@code getStanceList()} themselves while only BOUNCE went through a helper — and
-     * a mutant that zeroed the helper's AOE arm survived the whole suite (2026-09-27), which is what a dead
+     * (a <b>commanded</b> attack, which is the same swing delivered by a summon). Note: It used to be split three
+     * ways - AOE and BLAST read {@code getStanceList()} themselves while only BOUNCE went through a helper - and
+     * a mutant that zeroed the helper's AOE arm survived the whole suite (2026-09-2), which is what a dead
      * branch looks like from the outside.
      *
      * <p>{@code mainTarget} is what separates BLAST's centre ({@code single}) from its neighbours ({@code spread}).
@@ -286,7 +286,7 @@ public class SkillData {
     /**
      * A Bounce skill's damage share, taken from the description (2026-09-29).
      *
-     * <p>Bounce rows do not agree on layout: 1009 is `[0.25]` (its 「额外造成4次」 is prose only), 1108 is `[4, 0.28]` (count first) and 1004 is
+     * <p>Bounce rows do not agree on layout: 1009 is `[0.25]` (its "额外造成4次" is prose only), 1108 is `[4, 0.28]` (count first) and 1004 is
      * `[0.36, 0.65, 0.1, 2]` (count last). The only reliable map is the description: the share is the parameter a `#N[i]` placeholder
      * references immediately before a `%`, read the same way {@link #debuffChance()} reads its own.
      *
@@ -333,8 +333,8 @@ public class SkillData {
     /**
      * Which of the caster's attributes a damage clause scales off (2026-09-29).
      *
-     * <p>The description names it: 「等同于砂金100%防御力」 is DEF, 「等同于风堇50%生命上限」 is Max HP, and everything else is ATK. 18 documents scale a damage
-     * clause off Max HP and 3 off DEF, while the executor used to multiply {@code ATTACK} unconditionally — so those skills dealt the wrong damage.
+     * <p>The description names it: "等同于砂金100%防御力" is DEF, "等同于风堇50%生命上限" is Max HP, and everything else is ATK. 18 documents scale a damage
+     * clause off Max HP and 3 off DEF, while the executor used to multiply {@code ATTACK} unconditionally - so those skills dealt the wrong damage.
      */
     public com.laosun.aluminium.enums.AttributeType damageBaseAttribute() {
         if (description != null) {

@@ -29,14 +29,14 @@ import java.util.Set;
  *
  * <p>Relic set bonuses that are not plain stats are "when &lt;event&gt;, do &lt;something the engine
  * can already do&gt;", which is exactly a {@link TriggerTable}. So a set's rules live in
- * {@code resources/relic_sets/<setId>.json} — the same JSON shape as a character's — keyed by the
+ * {@code resources/relic_sets/<setId>.json} - the same JSON shape as a character's - keyed by the
  * <b>worn piece count</b> they need, and the assembly point
  * ({@code CharacterFactory.effectiveTriggerTable}) merges them into the character's own table.
  *
  * <h2>What is piloted here, and why it needs a test of its own</h2>
  * <ul>
  *   <li><b>The threshold is honoured.</b> A rule filed under {@code "4"} must not apply at three
- *       pieces — the failure mode is silent (the buff simply arrives one piece early);</li>
+ *       pieces - the failure mode is silent (the buff simply arrives one piece early);</li>
  *   <li><b>A missing file is an empty rule set, a broken one throws.</b> The distinction is what makes
  *       a typo in a hand-written file visible at load instead of never;</li>
  *   <li><b>Nothing is silently forgotten.</b> Every ability-only bonus in the shipped
@@ -47,36 +47,36 @@ import java.util.Set;
  */
 public class RelicTriggerTableTest {
 
-    /** "Passerby of Wandering Cloud" — 4-piece: at battle start, +1 skill point. */
+    /** "Passerby of Wandering Cloud" - 4-piece: at battle start, +1 skill point. */
     private static final int PASSERBY = 101;
-    /** "Hunter of Glacial Forest" — 4-piece: after the Ultimate, +25% CRIT DMG for 2 turns. */
+    /** "Hunter of Glacial Forest" - 4-piece: after the Ultimate, +25% CRIT DMG for 2 turns. */
     private static final int GLACIAL = 104;
-    /** "Band of Sizzling Thunder" — 4-piece: on Skill, +20% ATK for 1 turn. */
+    /** "Band of Sizzling Thunder" - 4-piece: on Skill, +20% ATK for 1 turn. */
     private static final int SIZZLING = 109;
-    /** "Eagle of Twilight Line" — 4-piece: after the Ultimate, advance forward 25%. */
+    /** "Eagle of Twilight Line" - 4-piece: after the Ultimate, advance forward 25%. */
     private static final int EAGLE = 110;
-    /** "Champion of Streetwise Boxing" — 4-piece: on attacking or being hit, +5% ATK, up to 5 stacks. */
+    /** "Champion of Streetwise Boxing" - 4-piece: on attacking or being hit, +5% ATK, up to 5 stacks. */
     private static final int CHAMPION = 105;
     /** City of Converging Stars (planar), whose 2-piece is authorable now that {@code FOLLOW_UP} exists. */
     private static final int CONVERGING_STARS = 326;
     /** The Ashblazing Grand Duke, whose 2-piece needs the follow-up-only damage boost attribute. */
     private static final int ASHBLAZING = 115;
     /**
-     * 「星如我见的领航员」 — 4-piece: a Skill/Ultimate DMG boost that stacks to 3 and loses one per turn.
+     * "星如我见的领航员" - 4-piece: a Skill/Ultimate DMG boost that stacks to 3 and loses one per turn.
      *
-     * <p>Authored on 2026-09-27, the day two engine changes made it expressible at all: three scoped
+     * <p>Authored on 2026-09-2, the day two engine changes made it expressible at all: three scoped
      * DMG-boost attributes (which scope the +18%) and the {@code REMOVE_STACK} op (the "removes 1 stack"
      * half). Before either, the ability could only have been modelled by dropping part of its text.
      */
     private static final int NAVIGATOR = 131;
     /**
-     * 「戍卫风雪的铁卫」 — its 2-piece ("Reduces DMG taken by 8%") needed a damage-taken zone the data could
-     * not reach; authored on 2026-09-27 once {@code MODIFY_DAMAGE_TAKEN} existed. Its 4-piece stays
+     * "戍卫风雪的铁卫" - its 2-piece ("Reduces DMG taken by 8%") needed a damage-taken zone the data could
+     * not reach; authored on 2026-09-2once {@code MODIFY_DAMAGE_TAKEN} existed. Its 4-piece stays
      * registered: it heals a <b>percentage of Max HP</b>, which {@code HEAL}'s fixed amount cannot express.
      */
     private static final int GUARD_OF_SNOW = 106;
 
-    // The seven MIXED (stat + ability) planar 2-pieces authored on 2026-09-27, when `self_attr` and
+    // The seven MIXED (stat + ability) planar 2-pieces authored on 2026-09-2, when `self_attr` and
     // ADVANCE made their conditional sentence expressible. Before that they were not in this test's
     // world at all -- see MIXED_STAT_AND_ABILITY.
     /** 太空封印站: 攻击力 +12%; SPD >= 120 -> 攻击力额外 +12%. */
@@ -91,7 +91,7 @@ public class RelicTriggerTableTest {
     private static final int TALIA = 307;
     /** 生命的翁瓦克: 能量恢复效率 +5%; SPD >= 120 -> 进入战斗时行动提前 40%. */
     private static final int SPRIGHTLY_VONWACQ = 308;
-    /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 70% -> 普攻与战技伤害 +20%. */
+    /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 0% -> 普攻与战技伤害 +20%. */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
     /** 星体差分机: 暴击伤害 +16%; 暴击伤害 >= 120% -> 暴击率 +60% 直到首次攻击后 (the first user of `until`). */
     private static final int STELLAR_DIFFERENTIATOR = 305;
@@ -101,9 +101,9 @@ public class RelicTriggerTableTest {
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
     /** 哀歌覆国的诗人: 速度 -8%; 战斗前速度 <110/<95 -> 暴击率 +20%/+32%，忆灵同享. */
     private static final int POET = 124;
-    /** 谧宁拾骨地: 生命上限 +12%; 生命上限 ≥ 5000 -> 装备者及忆灵暴击伤害 +28%. */
+    /** 谧宁拾骨地: 生命上限 +12%; 生命上限 >= 5000 -> 装备者及忆灵暴击伤害 +28%. */
     private static final int SERENE_DEMESNE = 319;
-    /** 渊思寂虑的巨树: 速度 +6%; 速度 ≥135/180 -> 装备者及忆灵治疗量 +12%/20%. */
+    /** 渊思寂虑的巨树: 速度 +6%; 速度 >=135/180 -> 装备者及忆灵治疗量 +12%/20%. */
     private static final int RAPT_BROODING = 320;
     /** 熔岩锻铸的火匠: 战技伤害 +12%; 终结技后下一次攻击的火伤 +12%. */
     private static final int FIRESMITH = 107;
@@ -111,7 +111,7 @@ public class RelicTriggerTableTest {
     private static final int VALOROUS = 120;
     /** 再创天地的救世主: 普攻/战技后忆灵在场 -> 装备者与忆灵生命上限 +24%、我方全体伤害 +15%. */
     private static final int SHATTERED_WORLD = 127;
-    /** 苍穹战线格拉默: 攻击力 +12%; 速度 ≥ 135/160 -> 造成的伤害 +12%/18%. */
+    /** 苍穹战线格拉默: 攻击力 +12%; 速度 >= 135/160 -> 造成的伤害 +12%/18%. */
     private static final int GLAMOTH = 311;
     /** 野穗伴行的快枪手: 速度 +6%; 普攻伤害 +10%. */
     private static final int MUSKETEER = 102;
@@ -121,15 +121,15 @@ public class RelicTriggerTableTest {
     private static final int PIONEER = 117;
     /** 识海迷坠的学者: 战技与终结技伤害 +20%; 终结技后下一次战技 +25%. */
     private static final int SCHOLAR = 122;
-    /** 折断的龙骨: 效果抵抗 +10%; 效果抵抗 ≥ 30% 时我方全体暴击伤害 +10%. */
+    /** 折断的龙骨: 效果抵抗 +10%; 效果抵抗 >= 30% 时我方全体暴击伤害 +10%. */
     private static final int BROKEN_KEEL = 310;
-    /** 净庭教宗的圣骑士: 防御力 +15%; 使装备者**提供的**护盾量提高 20%. */
+    /** 净庭教宗的圣骑士: 防御力 +15%; 使装备者提供的护盾量提高 20%. */
     private static final int KNIGHT_OF_PURITY = 103;
     /** 自匿星芒的隐士: 提供的护盾量提高 10%; 再 +12%，且我方目标持有装备者提供的护盾时暴击伤害 +15%(M-53). */
     private static final int RECLUSE = 128;
 
     /**
-     * A set with a registered ability and <b>no</b> rule file — used by the "nothing to merge" case, which must
+     * A set with a registered ability and <b>no</b> rule file - used by the "nothing to merge" case, which must
      * therefore pick a set that is still unwritten (102 was that set until it was authored on 2026-09-28).
      */
     private static final int NO_RULE_SET = 99002;
@@ -147,11 +147,11 @@ public class RelicTriggerTableTest {
      * An ordinary character with <b>no trigger rules of their own</b>, so every rule the tests below see comes
      * from the relic set: the merge must still yield the set's rules, and the counts must be the set's alone.
      *
-     * <p>⚠ Looked up rather than named since 2026-09-27: it was 姬子 (1003) until her kit was authored, which put
+     * <p>Note: Looked up rather than named since 2026-09-2: it was 姬子 (1003) until her kit was authored, which put
      * a {@code BATTLE_START} rule of her own into the counts pinned below. See {@link TestCharacters}.
      */
-    // ✅ 2026-09-30: a REAL character whose own file carries NO BATTLE_START rule (this suite counts them), so the count it
-    // reads is the RELIC SET’s alone. The old witness (a cid with no content file) no longer exists once every character ships.
+    // 2026-09-30: a REAL character whose own file carries NO BATTLE_START rule (this suite counts them), so the count it
+    // reads is the RELIC SET's alone. The old witness (a cid with no content file) no longer exists once every character ships.
     private static final int NO_RULES = 1402;
 
     private static final int STAR = 5;
@@ -188,7 +188,7 @@ public class RelicTriggerTableTest {
             NAVIGATOR + "/" + FOUR_PIECE,
             GUARD_OF_SNOW + "/" + TWO_PIECE,
             GUARD_OF_SNOW + "/" + FOUR_PIECE,
-            // The mixed (stat + ability) effects authored on 2026-09-27 with `self_attr` / `ADVANCE`:
+            // The mixed (stat + ability) effects authored on 2026-09-2with `self_attr` / `ADVANCE`:
             // seven planar 2-pieces whose conditional sentence had no spelling before.
             SPACE_SEALING_STATION + "/" + TWO_PIECE,
             FLEET_OF_THE_AGELESS + "/" + TWO_PIECE,
@@ -197,14 +197,14 @@ public class RelicTriggerTableTest {
             TALIA + "/" + TWO_PIECE,
             SPRIGHTLY_VONWACQ + "/" + TWO_PIECE,
             CELESTIAL_DIFFERENTIATOR + "/" + TWO_PIECE,
-            // Authored on 2026-09-27 once a rule could ask "do I have a summon out?"
+            // Authored on 2026-09-2once a rule could ask "do I have a summon out?"
             // (`self_summon_count`, and `target: "summon"` to address it).
             BANANA_PARADISE + "/" + TWO_PIECE,
             // Authored once a buff could end on an EVENT instead of a turn boundary (`"until"`).
             STELLAR_DIFFERENTIATOR + "/" + TWO_PIECE,
             // Authored on 2026-09-28 in the content pass over the `Writable now:` backlog: the five whose
             // every clause already had a spelling, with the numbers read from `param` (four of the registered
-            // reasons carried a figure read off the English sentence instead — see each file's note).
+            // reasons carried a figure read off the English sentence instead - see each file's note).
             POET + "/" + FOUR_PIECE,
             SERENE_DEMESNE + "/" + TWO_PIECE,
             RAPT_BROODING + "/" + TWO_PIECE,
@@ -220,8 +220,8 @@ public class RelicTriggerTableTest {
             // Authored once "the attacker is MY summon" became expressible (`actor == summon`) and a summon's
             // attack became an event the data can subscribe to (`SUMMON_ATTACK`).
             HERO_OF_TRIUMPHANT_SONG + "/" + FOUR_PIECE,
-            // Authored on 2026-09-27 once a cast event could say WHICH SIDE the unit it aimed at is on
-            // (`target is_ally`): 「对己方角色施放终结技/战技时」 (sets 114, 118, 121) fired on every cast
+            // Authored on 2026-09-2once a cast event could say WHICH SIDE the unit it aimed at is on
+            // (`target is_ally`): "对己方角色施放终结技/战技时" (sets 114, 118, 121) fired on every cast
             // without it, because a damaging ultimate aimed at an enemy carries a target too.
             "114/4",
             "118/4",
@@ -229,10 +229,10 @@ public class RelicTriggerTableTest {
             // Authored on 2026-09-29 (round 95) once `ally_count` existed and it was measured
             // that SUMMONED fires from a settle, so the memosprite half works.
             "321/2",
-            // Authored on 2026-09-29 (round 97): `actor is_ally` covers the wearer AND their
-            // memosprite, and `per_turn` supplies 「每回合最多触发1次」.
+            // Authored on 2026-09-29 (round 9): `actor is_ally` covers the wearer AND their
+            // memosprite, and `per_turn` supplies "每回合最多触发1次".
             "125/4",
-            // Authored on 2026-09-27 once a derived value could read MAX ENERGY
+            // Authored on 2026-09-2once a derived value could read MAX ENERGY
             // (`self_max_energy`, both as a condition and as a scale).
             "328/2",
             // Authored once a condition could ask about the PARTY, not just the owner
@@ -244,9 +244,9 @@ public class RelicTriggerTableTest {
             // Authored once a damage category could be named as an ATTRIBUTE
             // (`DOT_DAMAGE_BOOST`, the sibling of the follow-up one).
             "322/2",
-            // Authored on 2026-09-28, the day a shield could remember WHO created it: 「提供的护盾量提高 X%」 is the
+            // Authored on 2026-09-28, the day a shield could remember WHO created it: "提供的护盾量提高 X%" is the
             // giver's own number (`AttributeType.SHIELD_BOOST`, read by `Battle.boostedShield` from the provider).
-            // ⚠ Set 128's 4-piece ships one of its two sentences: the other one asks, per ally, whether the shield
+            // Note: Set 128's 4-piece ships one of its two sentences: the other one asks, per ally, whether the shield
             // that ally holds is the wearer's, and a whole-rule condition cannot say that (M-53).
             "103/4",
             "128/2",
@@ -257,14 +257,14 @@ public class RelicTriggerTableTest {
      * How many ability-only bonuses the shipped file still cannot express.
      *
      * <p>The invariant is {@code PURE + MIXED = AUTHORED.size() + STILL_REGISTERED}; the individual values
-     * are just where the line currently sits. It went 28 → <b>27</b> on 2026-09-27 (set 131, once
+     * are just where the line currently sits. It went 28 to <b>2</b> on 2026-09-2(set 131, once
      * {@code REMOVE_STACK} existed), then to <b>26</b> (set 106's 2-piece, once
      * {@code MODIFY_DAMAGE_TAKEN} existed), then to <b>25</b> when the same set's 4-piece became
-     * authorable — and then to <b>47</b> when the MIXED effects joined the partition (see
+     * authorable - and then to <b>4</b> when the MIXED effects joined the partition (see
      * {@link #MIXED_STAT_AND_ABILITY}); those 22 mixed entries are not a regression, they are the half of
      * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
-     * family became authorable (sets 103 and 128, three entries — see {@link #KNIGHT_OF_PURITY}).
+     * family became authorable (sets 103 and 128, three entries - see {@link #KNIGHT_OF_PURITY}).
      */
     private static final int STILL_REGISTERED = 1;
 
@@ -274,10 +274,10 @@ public class RelicTriggerTableTest {
     /**
      * Stat + ability bonuses: an unconditional {@code properties} stat <b>plus</b> an ability.
      *
-     * <p>⚠ <b>This half was invisible until 2026-09-27</b> (ROADMAP M-25). The partition below used to skip
+     * <p>Note: <b>This half was invisible until 2026-09-2</b> (ROADMAP M-25). The partition below used to skip
      * every effect with a non-empty {@code properties}, so the common planar-ornament shape
-     * (「攻击力提高 12%。当速度 ≥ 120 时，攻击力额外提高 12%」) had its first clause applied by
-     * {@code RelicSuit} and its second clause <b>silently dropped</b>, with no registry entry to say so —
+     * ("攻击力提高 12%。当速度 >= 120 时，攻击力额外提高 12%") had its first clause applied by
+     * {@code RelicSuit} and its second clause <b>silently dropped</b>, with no registry entry to say so - 
      * "no rule file written" and "somebody forgot" looked exactly alike for that shape. Pinned as its own
      * denominator so the next data update that adds one shows up here.
      */
@@ -286,7 +286,7 @@ public class RelicTriggerTableTest {
     /**
      * How many registered abilities the vocabulary <b>could</b> express today.
      *
-     * <p>The registry's {@code reason} is prose, and prose cannot be checked — except for this one bit, which
+     * <p>The registry's {@code reason} is prose, and prose cannot be checked - except for this one bit, which
      * the authors are asked to spell as a leading {@code "Writable now:"}. Pinning the count keeps the
      * backlog honest in both directions: writing one of these files must lower it deliberately, and a new
      * entry cannot quietly claim to be blocked when the capability exists.
@@ -305,7 +305,7 @@ public class RelicTriggerTableTest {
         assertRuleOn(GLACIAL, TriggerEvent.ULT_CAST);
         assertRuleOn(SIZZLING, TriggerEvent.SKILL_CAST);
         assertRuleOn(EAGLE, TriggerEvent.ULT_CAST);
-        // 105 is the one ability whose text is a disjunction ("attacks **or** is hit"), so it needs a
+        // 105 is the one ability whose text is a disjunction ("attacks or is hit"), so it needs a
         // rule on each of the two events; both are really there, or half the ability is missing.
         assertRuleOn(CHAMPION, TriggerEvent.ALLY_ATTACK);
         assertRuleOn(CHAMPION, TriggerEvent.TAKING_HIT);
@@ -322,7 +322,7 @@ public class RelicTriggerTableTest {
                 "the description states 1 Skill Point literally (param is empty)");
     }
 
-    /** A 4-piece rule file is inactive below four pieces — that is what the threshold key means. */
+    /** A 4-piece rule file is inactive below four pieces - that is what the threshold key means. */
     @Test
     public void aRuleAppliesOnlyFromItsThresholdUpwards() {
         RelicTriggerTables.Rules rules = RelicTriggerTables.of(PASSERBY);
@@ -531,9 +531,9 @@ public class RelicTriggerTableTest {
      * {@code AUTHORED.size()} expressible with today's op vocabulary,
      * {@link #STILL_REGISTERED} not. A change on either side must be deliberate.
      *
-     * <p>⚠ <b>Both kinds are walked, and that is the point of the 2026-09-27 revision.</b> The loop used to
+     * <p>Note: <b>Both kinds are walked, and that is the point of the 2026-09-2revision.</b> The loop used to
      * {@code continue} on any effect with a non-empty {@code properties}, which silently excluded 29
-     * "stat + ability" effects — the majority shape for planar ornaments, whose conditional half was being
+     * "stat + ability" effects - the majority shape for planar ornaments, whose conditional half was being
      * dropped without a registry entry (ROADMAP M-25). The classification is now explicit and both
      * denominators are asserted, so an effect cannot escape the partition by acquiring a stat.
      */
@@ -602,7 +602,7 @@ public class RelicTriggerTableTest {
      *
      * <p>A registry entry whose missing capability has since been built is the one way this file rots: the
      * engine gains an op, and 44 entries keep saying "needs an op". So the authors spell those as a leading
-     * {@code "Writable now:"} and the count is pinned — writing one of them has to lower the number on
+     * {@code "Writable now:"} and the count is pinned - writing one of them has to lower the number on
      * purpose, and an <em>unblocked</em> ability cannot hide inside a reason nobody re-reads.
      */
     @Test
@@ -654,7 +654,7 @@ public class RelicTriggerTableTest {
      * has since been authored (or that never existed) would make the partition look healthy while
      * hiding a gap.
      *
-     * <p>⚠ Walks <b>every</b> ability-bearing effect, not just the pure ones — otherwise the 22 registered
+     * <p>Note: Walks <b>every</b> ability-bearing effect, not just the pure ones - otherwise the 22 registered
      * mixed entries would all look stale, which is how this case failed the first time the M-25 entries
      * landed (it had the same {@code properties().isEmpty()} filter the partition test used to have).
      */
@@ -685,9 +685,9 @@ public class RelicTriggerTableTest {
      * <p>Every planar ornament set's ability sits at the 2-piece tier, and that is where most of the mixed
      * (stat + ability) shape lives, so missing that tier would hide most of the gap. It was eight before 326
      * (City of Converging Stars) and 115 (The Ashblazing Grand Duke) became authorable, <b>five</b> since
-     * 2026-09-27 (set 106 joined them), and <b>22</b> once the 17 mixed 2-piece abilities that no longer
+     * 2026-09-2(set 106 joined them), and <b>22</b> once the 1mixed 2-piece abilities that no longer
      * count as invisible were registered (M-25). It is <b>11</b> since 2026-09-28, when 128's 2-piece
-     * (「提供的护盾量提高10%」) became authorable with the shield-amount boost.
+     * ("提供的护盾量提高10%") became authorable with the shield-amount boost.
      */
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
@@ -744,7 +744,7 @@ public class RelicTriggerTableTest {
     }
 
     /**
-     * Sets a private field reflectively — the trigger beans are Lombok {@code @Getter} only, and the
+     * Sets a private field reflectively - the trigger beans are Lombok {@code @Getter} only, and the
      * project's convention is to build them this way in tests instead of widening the production API.
      */
     private static void set(Object target, String field, Object value) {

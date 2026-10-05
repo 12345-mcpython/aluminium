@@ -27,7 +27,7 @@ public class HysilensTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The Skill raises the damage taken by 20%: a fixed hit costs 1.5x what it cost before (a 40% rule would give 2.0x). */
+    /** Note: The Skill raises the damage taken by 20%: a fixed hit costs 1.5x what it cost before (a 40% rule would give 2.0x). */
     @Test
     public void theSkillRaisesTheDamageTheEnemiesTake() {
         double before = fixedHitLoss(false);
@@ -35,7 +35,7 @@ public class HysilensTest {
         double doubled = referenceHitLoss();
 
         Assertions.assertTrue(before > 0, "the fixture must deal damage");
-        // Measured: a "20% increased damage taken" makes the instance cost damage x 1.2 — the natural reading, and NOT the 1.5 I first assumed.
+        // Measured: a "20% increased damage taken" makes the instance cost damage x 1.2 - the natural reading, and NOT the 1.5 I first assumed.
         Assertions.assertEquals(1.2, after / before, 0.02,
                 "「受到的伤害提高20%」: before " + before + ", after " + after);
         // And the claim is the LINEAR share, with the 1.4 coming from a hand-built 40% rule in the same pipeline.

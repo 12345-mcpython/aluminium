@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 03, fourth sentence: 「德谬歌施放技能后使自身所有持续效果持续回合数减 1」 (2026-10-02).
+ * 1415's memosprite skill 03, fourth sentence: "德谬歌施放技能后使自身所有持续效果持续回合数减 1" (2026-10-02).
  *
- * <p>⭐ One scene, two halves (`self` in this file is the MASTER): an ally's rule puts a 2-turn mark on `all_allies`, the memosprite uses its skill, and one tick follows.
+ * <p>One scene, two halves (`self` in this file is the MASTER): an ally's rule puts a 2-turn mark on `all_allies`, the memosprite uses its skill, and one tick follows.
  * The master's mark went 2 -> 1 and that tick ends it; the memosprite's own is untouched and survives.
  *
- * <p>⚠ A one-turn mark cannot discriminate: `extendDuration` is `Math.max(0, remaining + turns)` and a 1-turn buff ticks away on its own either way.
+ * <p>Note: A one-turn mark cannot discriminate: `extendDuration` is `Math.max(0, remaining + turns)` and a 1-turn buff ticks away on its own either way.
  */
 public class CastShortensOwnEffectsTest {
     private static final int LEVEL = 80;

@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Op {@code ADD_DAMAGE}: 「使反击造成的伤害值提高，提高数值等同于三月七防御力的 30%」 (ROADMAP M-55).
+ * Op {@code ADD_DAMAGE}: "使反击造成的伤害值提高，提高数值等同于三月七防御力的 30%" (ROADMAP M-55).
  *
  * <p>It is the absolute sibling of {@code BOOST_DAMAGE}: that one adds a percentage of the instance, this one adds a
  * <b>value</b> derived from the rule owner's own attribute, into the instance's <b>base layer</b>
- * ({@code Damage.addFlat}) — so it crits and is boosted like the skill multiplier. The difference is the whole point of
+ * ({@code Damage.addFlat}) - so it crits and is boosted like the skill multiplier. The difference is the whole point of
  * the op, and the last case here is the one that would go red if it were spelled as a percentage instead.
  */
 public class AddDamageOpTest {
@@ -31,7 +31,7 @@ public class AddDamageOpTest {
     /**
      * The instance base every case uses.
      *
-     * <p>⚠ Deliberately NOT 100: with a base of 100, "+X" and "+X%" are the same number, so the trap this op
+     * <p>Note: Deliberately NOT 100: with a base of 100, "+X" and "+X%" are the same number, so the trap this op
      * exists to avoid would be invisible to the tests (measured: a mutation that spelled the addend as a boost of
      * {@code value / 100} kept every case green). Any base other than 100 separates them.
      */
@@ -47,13 +47,13 @@ public class AddDamageOpTest {
         double withOp = f.damageTaken(armed(0.30));
 
         double addend = 0.30 * f.owner.getAttribute(AttributeType.DEFENCE).get();
-        // ⚠ Compared as a RATIO: the addend goes through the same zones the base does, so the settled ratio is what
+        // Note: Compared as a RATIO: the addend goes through the same zones the base does, so the settled ratio is what
         // proves where it entered (an absolute growth would depend on the zone factors of this particular fight).
         Assertions.assertEquals((BASE + addend) / BASE, withOp / plain, 0.02,
                 "the settled damage equals a base of 「100 + 30% 防御力」 run through the same zones");
     }
 
-    /** ⚠ The trap: a percentage of the instance and a value equal to 30% DEF are different numbers unless they coincide. */
+    /** Note: The trap: a percentage of the instance and a value equal to 30% DEF are different numbers unless they coincide. */
     @Test
     public void itIsNotAPercentageOfTheInstance() {
         Fixture f = new Fixture(0.30);

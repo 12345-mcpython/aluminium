@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The technique gate (2026-09-29, round 178): a technique happens outside the battle, so the caller declares it and the engine turns it into a state.
+ * The technique gate (2026-09-29, round 18): a technique happens outside the battle, so the caller declares it and the engine turns it into a state.
  *
  * <p>The pair is the measurement: with the marker the party is healed by 15% of EACH ally's own Max HP, and without it nothing happens at all.
  */
@@ -24,7 +24,7 @@ public class TechniqueGateTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ With the technique declared, the party is healed for 15% of its own Max HP. */
+    /** Note: With the technique declared, the party is healed for 15% of its own Max HP. */
     @Test
     public void aDeclaredTechniqueHealsTheParty() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -48,7 +48,7 @@ public class TechniqueGateTest {
                 "「使用秘技后立即为我方全体回复等同于各自生命上限15%的生命值」: expected " + expected + ", healed " + healed);
     }
 
-    /** ⚠ The control: with NO technique declared, the same battle heals nobody. */
+    /** Note: The control: with NO technique declared, the same battle heals nobody. */
     @Test
     public void anUndeclaredTechniqueDoesNothing() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -61,7 +61,7 @@ public class TechniqueGateTest {
                 "without the marker the state must not exist");
     }
 
-    /** ⚠ And the state itself is what content asks for. */
+    /** Note: And the state itself is what content asks for. */
     @Test
     public void theMarkerCreatesTheState() {
         Character tb = CharacterFactory.create(TB, LEVEL);

@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 昔涟's 结界 (2026-10-02): 「结界持续期间，我方全体目标每造成 1 次伤害，都会再额外造成 1 次等同于原伤害 24% 的真实伤害」.
+ * 1415 昔涟's 结界 (2026-10-02): "结界持续期间，我方全体目标每造成 1 次伤害，都会再额外造成 1 次等同于原伤害 24% 的真实伤害".
  *
  * <p>Her own file carries both halves: the skill marks 结界 ({@code APPLY_BUFF} with {@code ticks_on: "self"}), and the
  * rider listens on {@code DAMAGE_SETTLED}. The claim is therefore "with the zone up, an ALLY's attack costs the enemy
- * exactly 24% more than the ally's own settled damage" — the zone itself deals no damage, so the whole difference is
+ * exactly 24% more than the ally's own settled damage" - the zone itself deals no damage, so the whole difference is
  * the rider's.
  */
 public class ElysiumZoneTest {
@@ -28,7 +28,7 @@ public class ElysiumZoneTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ With 结界 up, an ally's attack is followed by a true-damage rider of 24% of what it settled. */
+    /** With 结界 up, an ally's attack is followed by a true-damage rider of 24% of what it settled. */
     @Test
     public void theZoneAddsAQuarterOfTheAllysDamage() {
         double with = enemyLoss(true);

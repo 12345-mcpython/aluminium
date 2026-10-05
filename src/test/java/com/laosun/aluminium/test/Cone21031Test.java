@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Light cone 21031: on a crit, a fixed chance strips one BUFF from the victim, at most once per attack.
  *
- * <p>This is the SPEC half: the op, its direction, the chance and the per-attack limit. ⚠ The LIMIT's behaviour is
+ * <p>This is the SPEC half: the op, its direction, the chance and the per-attack limit. Note: The LIMIT's behaviour is
  * measured by {@code OncePerAttackLimitTest} (a hand-built rule, 1/0/1 across the attack boundary), because the cone's own
  * 16% roll makes a behavioural reading of "at most one" statistical rather than exact.
  */
@@ -42,7 +42,7 @@ public class Cone21031Test {
                     + " op=" + effect.getOp() + " amount=" + effect.getAmount() + " target=" + effect.getTarget());
             Assertions.assertEquals(0.16, rule.chance(), 1e-9,
                     "rank 1 states a 16% fixed chance -- slot #1 of the row, not the crit-rate constant in slot #0");
-            // ⚠ Direction: `DISPEL` cleans OUR side's debuffs; removing an ENEMY's buff is its mirror op.
+            // Note: Direction: `DISPEL` cleans OUR side's debuffs; removing an ENEMY's buff is its mirror op.
             Assertions.assertEquals("REMOVE_BUFF", effect.getOp(), "the victim loses a buff, not a debuff");
             Assertions.assertEquals(1, effect.getAmount(), 1e-9, "one buff");
             Assertions.assertEquals("target", effect.getTarget(), "the victim");

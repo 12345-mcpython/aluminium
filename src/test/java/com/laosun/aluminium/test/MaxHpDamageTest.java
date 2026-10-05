@@ -16,8 +16,8 @@ import java.util.Random;
 /**
  * A literal-ratio damage instance scaled by a Max HP (2026-09-29, round 189): Natasha's trace adds 40% of her own Max HP as physical damage.
  *
- * <p>Measured: 16 documents state damage this way. The assertion puts both instances in the SAME pipeline — the content's rule at 0.4 of her Max HP against a
- * hand-built rule at 0.5 of the same scale — so the engine's factors cancel and the ratio 0.8 is what is checked.
+ * <p>Measured: 16 documents state damage this way. The assertion puts both instances in the SAME pipeline - the content's rule at 0.4 of her Max HP against a
+ * hand-built rule at 0.5 of the same scale - so the engine's factors cancel and the ratio 0.8 is what is checked.
  */
 public class MaxHpDamageTest {
     private static final int NATASHA = 1105;
@@ -25,7 +25,7 @@ public class MaxHpDamageTest {
     private static final double CONTENT = 0.4;
     private static final double REFERENCE = 0.5;
 
-    /** ⚠ The content's 40% against a reference 50%, same pipeline and same scale. */
+    /** Note: The content's 40% against a reference 50%, same pipeline and same scale. */
     @Test
     public void theTraceAddsFortyPercentOfHerMaxHp() {
         double content = basicAttackLoss(false, 0.0);
@@ -36,14 +36,14 @@ public class MaxHpDamageTest {
                 "content " + content + " vs reference " + reference + " (expected ratio " + (CONTENT / REFERENCE) + ")");
     }
 
-    /** ⚠ The control: with no rule installed, a basic attack adds nothing beyond its own data. */
+    /** Note: The control: with no rule installed, a basic attack adds nothing beyond its own data. */
     @Test
     public void withoutTheRuleNothingExtra() {
         Assertions.assertEquals(0.0, basicAttackLoss(false, 0.0) - basicAttackLoss(false, 0.0), 1e-9,
                 "the fixture is deterministic");
     }
 
-    /** ⚠ The engine refuses a Max-HP share it cannot read rather than guessing. */
+    /** Note: The engine refuses a Max-HP share it cannot read rather than guessing. */
     @Test
     public void anUnknownScaleIsRefused() {
         Character hero = CharacterFactory.create(NATASHA, LEVEL);

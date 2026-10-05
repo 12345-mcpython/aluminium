@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 白露 (1211), from her own file (2026-09-28): 【生息】 and the trace that rides on it.
+ * 白露 (1211), from her own file (2026-09-28): [生息] and the trace that rides on it.
  *
- * <p><b>What it needed.</b> The round-63 per-target conditions: 「对于<b>没有</b>【生息】的我方目标…附上【生息】，对于<b>已拥有</b>【生息】的我方目标…
- * 延长 1 回合」 is two branches of one sentence over the same selector, and `target_when` is what keeps them apart.
+ * <p><b>What it needed.</b> The round-63 per-target conditions: "对于<b>没有</b>[生息]的我方目标…附上[生息]，对于<b>已拥有</b>[生息]的我方目标…
+ * 延长 1 回合" is two branches of one sentence over the same selector, and `target_when` is what keeps them apart.
  *
  * <p><b>What is registered</b> (the file's notes): the Skill's random double heal with its decaying multiplier, the
- * talent's 「该效果可以触发 2 次」 (registered whole, because shipping the heal without the count would heal on every hit)
+ * talent's "该效果可以触发 2 次" (registered whole, because shipping the heal without the count would heal on every hit)
  * and its death prevention, 行迹 持明龙脉, and the eidolons.
  */
 public class BailuRegenTest {
@@ -28,7 +28,7 @@ public class BailuRegenTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** The fresh branch: allies without 【生息】 get it. */
+    /** The fresh branch: allies without [生息] get it. */
     @Test
     public void theUltimateGivesRegenerationToThoseWithoutIt() {
         Fixture f = new Fixture();
@@ -39,11 +39,11 @@ public class BailuRegenTest {
         Assertions.assertTrue(f.bailu.getBuffManager().hasState("生息"), "…and 「我方全体」 includes her");
     }
 
-    /** ⚠ An ally that already has it is <b>extended</b>, not re-applied — the other branch of the same sentence. */
+    /** Note: An ally that already has it is <b>extended</b>, not re-applied - the other branch of the same sentence. */
     @Test
     public void anAllyThatAlreadyHasItIsExtended() {
         Fixture f = new Fixture();
-        // ⚠ A hand-built StateBuff carries no `buffName` (only `APPLY_BUFF` sets one), so the precondition counts STATE
+        // Note: A hand-built StateBuff carries no `buffName` (only `APPLY_BUFF` sets one), so the precondition counts STATE
         // buffs rather than named ones -- `stacksOf` is about names and would read 0 here.
         f.ally.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("生息", 1));
         int statesBefore = f.ally.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StateBuff.class).size();
@@ -60,7 +60,7 @@ public class BailuRegenTest {
     @Test
     public void theTraceReducesDamageTakenForTheBearers() {
         Fixture f = new Fixture();
-        // ⚠ Counted rather than "is it non-empty": the reduction zone is also used elsewhere, so an emptiness assertion
+        // Note: Counted rather than "is it non-empty": the reduction zone is also used elsewhere, so an emptiness assertion
         // would have been a claim about the whole battle rather than about this cast.
         int before = f.ally.getBuffManager().allBuffsOf(
                 com.laosun.aluminium.models.buff.ReductionBuff.class).size();

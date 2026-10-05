@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1413 长夜月's talent: 「场上敌方目标数量等于4或以上/3/2/1名时，我方忆灵造成的伤害为原伤害的120%/125%/130%/150%」.
+ * 1413 长夜月's talent: "场上敌方目标数量等于4或以上/3/2/1名时，我方忆灵造成的伤害为原伤害的120%/125%/130%/150%".
  *
  * <p>The whole memosprite chain is exercised here: the damage TYPE (`DamageType.MEMORY`), the scoped boost granted to the MASTER
  * (its table is consulted when its memosprite strikes -- measured), and the `enemy_count` condition.
  *
- * <p>⚠ Judged with the same memosprite hit at FOUR and at ONE enemy: the content grants +0.20 and +0.50, so the ratio must be
+ * <p>Note: Judged with the same memosprite hit at FOUR and at ONE enemy: the content grants +0.20 and +0.50, so the ratio must be
  * 1.50/1.20 = 1.25 exactly -- round 65 measured this zone to hold no other contributions.
  */
 public class EvernightTalentTest {
@@ -65,7 +65,7 @@ public class EvernightTalentTest {
         Summon memosprite = battle.summonMemosprite(master);
         Assertions.assertNotNull(memosprite, "precondition: the 忆灵 is out");
         double before = victim.getCurrentHp();
-        // ⚠ COMMON, not SKILL: a memosprite's stated attack is installed in its COMMON slot.
+        // Note: COMMON, not SKILL: a memosprite's stated attack is installed in its COMMON slot.
         battle.castImmediate(memosprite.getSkills().get(SkillType.COMMON), memosprite, List.of(victim));
         double dealt = before - victim.getCurrentHp();
         Assertions.assertFalse(victim.isDeath(), "the judged hit must not kill the victim");

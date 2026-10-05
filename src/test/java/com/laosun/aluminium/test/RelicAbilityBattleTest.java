@@ -36,30 +36,30 @@ import java.util.Random;
  * <h2>The F-2 case</h2>
  * {@link #openingSkillPointsIncludeThePasserbyFourPiece()} is the end-to-end claim registered as
  * {@code F-2} in {@code DOC_VS_CODE.md}: a team wearing the Passerby of Wandering Cloud 4-piece starts
- * with <b>4</b> skill points instead of 3. It also pins the <b>ordering</b> the claim depends on —
+ * with <b>4</b> skill points instead of 3. It also pins the <b>ordering</b> the claim depends on - 
  * the opening value is assigned when the {@link Battle} is constructed, and {@code BATTLE_START} is
  * fired later by {@code startBattle()}, which is what makes the +1 observable.
  */
 public class RelicAbilityBattleTest {
 
-    /** "Passerby of Wandering Cloud" — 4-piece: at the start of the battle, regenerate 1 skill point. */
+    /** "Passerby of Wandering Cloud" - 4-piece: at the start of the battle, regenerate 1 skill point. */
     private static final int PASSERBY = 101;
-    /** "Hunter of Glacial Forest" — 4-piece: after the Ultimate, +25% CRIT DMG for 2 turns. */
+    /** "Hunter of Glacial Forest" - 4-piece: after the Ultimate, +25% CRIT DMG for 2 turns. */
     private static final int GLACIAL_FOREST = 104;
-    /** "Band of Sizzling Thunder" — 4-piece: on Skill, +20% ATK for 1 turn. */
+    /** "Band of Sizzling Thunder" - 4-piece: on Skill, +20% ATK for 1 turn. */
     private static final int SIZZLING_THUNDER = 109;
-    /** "Eagle of Twilight Line" — 4-piece: after the Ultimate, advance forward 25%. */
+    /** "Eagle of Twilight Line" - 4-piece: after the Ultimate, advance forward 25%. */
     private static final int TWILIGHT_EAGLE = 110;
-    /** "Champion of Streetwise Boxing" — 4-piece: +5% ATK per attack taken/given, up to 5 stacks. */
+    /** "Champion of Streetwise Boxing" - 4-piece: +5% ATK per attack taken/given, up to 5 stacks. */
     private static final int STREETWISE_BOXING = 105;
-    /** "City of Converging Stars" (planar) — 2-piece: on Follow-Up ATK +24% ATK; on a kill +12% CRIT DMG. */
+    /** "City of Converging Stars" (planar) - 2-piece: on Follow-Up ATK +24% ATK; on a kill +12% CRIT DMG. */
     private static final int CONVERGING_STARS = 326;
-    /** "The Ashblazing Grand Duke" — 2-piece: +20% DMG dealt by Follow-Up ATK. */
+    /** "The Ashblazing Grand Duke" - 2-piece: +20% DMG dealt by Follow-Up ATK. */
     private static final int ASHBLAZING = 115;
 
-    /** 「星如我见的领航员」 — 4-piece: a Skill/Ultimate DMG stack counter that grows and shrinks. */
+    /** "星如我见的领航员" - 4-piece: a Skill/Ultimate DMG stack counter that grows and shrinks. */
     private static final int NAVIGATOR = 131;
-    /** 「戍卫风雪的铁卫」 — 2-piece: reduces the damage the wearer takes (a damage-taken zone). */
+    /** "戍卫风雪的铁卫" - 2-piece: reduces the damage the wearer takes (a damage-taken zone). */
     private static final int GUARD_OF_SNOW = 106;
 
     /** Himeko: basic attack / skill / ultimate are all real, damaging skill slots. */
@@ -74,7 +74,7 @@ public class RelicAbilityBattleTest {
     private static final int STAR = 5;
     private static final int LEVEL = 15;
 
-    /** How many pieces a partial suit wears — one short of every set's 4-piece tier. */
+    /** How many pieces a partial suit wears - one short of every set's 4-piece tier. */
     private static final int PARTIAL_PIECES = 3;
 
     /** The four cavern slots, in the order a partial suit fills them. */
@@ -127,7 +127,7 @@ public class RelicAbilityBattleTest {
      * {@link Constant#SKILL_POINT_START}); {@code startBattle()} fires {@code BATTLE_START} later. So
      * the direction of the bonus is "3, then +1", and the observable opening value is 4. Had the
      * trigger fired before the opening assignment, the +1 would have been overwritten and the
-     * registered F-2 claim would be unimplementable — this test is what catches such a reordering.
+     * registered F-2 claim would be unimplementable - this test is what catches such a reordering.
      */
     @Test
     public void theOpeningValueIsAssignedBeforeBattleStartFires() {
@@ -156,7 +156,7 @@ public class RelicAbilityBattleTest {
      * Set 104: after the wearer's Ultimate, +25% CRIT DMG for 2 turns.
      *
      * <p>{@code CRIT DMG} is a <b>ratio</b> attribute, so the rule's {@code percent} is an absolute
-     * addition to it (0.5 → 0.75), not a factor. That is asserted through the modifier the rule
+     * addition to it (0.5 to 0.5), not a factor. That is asserted through the modifier the rule
      * actually installed as well as through the final value, so "the buff is there with the right
      * number" cannot pass by accident.
      */
@@ -186,7 +186,7 @@ public class RelicAbilityBattleTest {
     }
 
     /**
-     * Set 109: on the wearer's <b>Skill</b>, +20% ATK — and <b>not</b> on the Ultimate.
+     * Set 109: on the wearer's <b>Skill</b>, +20% ATK - and <b>not</b> on the Ultimate.
      *
      * <p>Two separate battles rather than one, because re-applying the same stat buff only
      * <em>refreshes</em> it ({@code StatModifierBuff.isSameKind}), so "did it fire again?" would be
@@ -194,7 +194,7 @@ public class RelicAbilityBattleTest {
      * there.
      *
      * <p>ATK is a <b>base</b> attribute, so the rule's {@code percent} is an additive percentage of
-     * the base ({@code base × 1.2 + flat}), which is why the expectation is stated on the modifier
+     * the base ({@code base  x  1.2 + flat}), which is why the expectation is stated on the modifier
      * rather than on a simple ratio of the final value.
      */
     @Test
@@ -259,7 +259,7 @@ public class RelicAbilityBattleTest {
      * once. Two things are asserted separately because they fail differently:
      * <ul>
      *   <li><b>The two halves of the disjunction share one cap.</b> Four attacks plus three hits is
-     *       seven applications of a 5-stack ability, so the total must be exactly 5 — which is only true
+     *       seven applications of a 5-stack ability, so the total must be exactly 5 - which is only true
      *       if {@code ALLY_ATTACK} and {@code TAKING_HIT} accumulate into the <b>same</b> stack group.
      *       (With one counter per rule the total would be 8, and the test would still pass a naive
      *       "did anything accumulate?" check.)</li>
@@ -268,8 +268,8 @@ public class RelicAbilityBattleTest {
      *       {@code HP_LOST} instead, the stack count would stop at 4. That is the exact scenario the
      *       distinction exists for.</li>
      *   <li><b>The stacks actually reach the attribute.</b> Each one is checked to be an
-     *       {@code ADD_PERCENT} of 0.05 — the kind a <b>base</b> attribute needs, because ATK is
-     *       {@code base × (1 + sum of percentages)}: the total is deliberately <em>not</em> asserted as a
+     *       {@code ADD_PERCENT} of 0.05 - the kind a <b>base</b> attribute needs, because ATK is
+     *       {@code base  x  (1 + sum of percentages)}: the total is deliberately <em>not</em> asserted as a
      *       ratio of the character's ATK, since the character carries several other sources of the same
      *       percentage (traces, relics, and this set's own 2-piece stat bonus).</li>
      * </ul>
@@ -294,7 +294,7 @@ public class RelicAbilityBattleTest {
                 "the stacks must reach the attribute");
 
         // Three hits taken, all of them swallowed by a shield: the cap is already reached, so these add
-        // nothing — and they prove the "is hit" half is wired, because HP_LOST never fires here.
+        // nothing - and they prove the "is hit" half is wired, because HP_LOST never fires here.
         battle.grantShield(hero, 10_000_000);
         double hpBefore = hero.getCurrentHp();
         for (int i = 0; i < 3; i++) {
@@ -314,7 +314,7 @@ public class RelicAbilityBattleTest {
      *
      * <p>Split from the test above because that one is already at the cap when the hits land. Here the
      * shield guarantees {@code HP_LOST} does not fire, so a rule hung on it would leave the count at zero
-     * — which is exactly the regression this pins.
+     *  - which is exactly the regression this pins.
      */
     @Test
     public void streetwiseBoxingStacksOnAShieldedHitAsWell() {
@@ -346,7 +346,7 @@ public class RelicAbilityBattleTest {
     /**
      * "For the rest of the battle": the stacks survive every turn boundary.
      *
-     * <p>The observable is the stack count after several full turns — a turn-limited modifier would
+     * <p>The observable is the stack count after several full turns - a turn-limited modifier would
      * have expired (and the count dropped) long before the loop ends.
      */
     @Test
@@ -402,7 +402,7 @@ public class RelicAbilityBattleTest {
      * <p>This is the end-to-end proof that {@code FOLLOW_UP} has a real emitter: the event is fired from
      * {@code Battle.applyAdditionalDamage}, the rule lives in {@code resources/relic_sets/326.json}, and
      * neither half is visible unless both work. Asserting on the resulting <b>attribute value</b> rather
-     * than on "a modifier exists" is deliberate — a rule that fired but applied nothing would pass the
+     * than on "a modifier exists" is deliberate - a rule that fired but applied nothing would pass the
      * weaker check.
      */
     @Test
@@ -427,7 +427,7 @@ public class RelicAbilityBattleTest {
     /**
      * A follow-up attack is not just "an attack": a plain basic attack must leave the bonus alone.
      *
-     * <p>This is why {@code FOLLOW_UP} exists instead of reusing {@code ALLY_ATTACK} — a rule hung on
+     * <p>This is why {@code FOLLOW_UP} exists instead of reusing {@code ALLY_ATTACK} - a rule hung on
      * the latter would fire here too, which the set's text does not allow.
      */
     @Test
@@ -491,7 +491,7 @@ public class RelicAbilityBattleTest {
     }
 
     // ==================================================================
-    // 7. The follow-up-only damage boost: The Ashblazing Grand Duke (115)
+    // . The follow-up-only damage boost: The Ashblazing Grand Duke (115)
     // ==================================================================
 
     /** Ability51150: "Increases the DMG dealt by Follow-Up ATK by 20%." */
@@ -507,7 +507,7 @@ public class RelicAbilityBattleTest {
      * <p>The measurement is a <b>differential between two identically-built battles</b>, one with the set
      * bonus and one with the buffs cleared, rather than an absolute ratio. A ratio would be wrong here:
      * the boost zone is additive with the wearer's element and all-type boosts, so "20% more" is 20
-     * percentage points on that sum, not a factor of 1.2 on the final number — the same trap the ATK
+     * percentage points on that sum, not a factor of 1.2 on the final number - the same trap the ATK
      * buffs above fell into.
      */
     @Test
@@ -556,7 +556,7 @@ public class RelicAbilityBattleTest {
     }
 
     // ==================================================================
-    // 131 「星如我见的领航员」: the stack counter that also comes back down
+    // 131 "星如我见的领航员": the stack counter that also comes back down
     // ==================================================================
 
     /** One stack of the set's boost (param #1[i] = 0.18). */
@@ -565,10 +565,10 @@ public class RelicAbilityBattleTest {
     private static final int NAVIGATOR_MAX_STACKS = 3;
 
     /**
-     * The whole 4-piece ability, in one battle: enter → 1 stack; turn start → 1 off; Skill → 1 on, up to 3;
-     * turn start → 1 off again.
+     * The whole 4-piece ability, in one battle: enter to 1 stack; turn start to 1 off; Skill to 1 on, up to 3;
+     * turn start to 1 off again.
      *
-     * <p><b>Why this is the interesting one.</b> Every other set ability the engine has is monotonic — a buff
+     * <p><b>Why this is the interesting one.</b> Every other set ability the engine has is monotonic - a buff
      * that appears, or a counter that only grows. This one says "…stacking up to 3 time(s) … removes 1
      * stack(s)", so it needed an op that takes a stack <b>back</b> ({@code REMOVE_STACK}); before that it
      * could only have been modelled by dropping the second half of the text, which is why it sat in
@@ -605,7 +605,7 @@ public class RelicAbilityBattleTest {
                 "one comes off per turn start, so the counter never just sits at the cap");
     }
 
-    /** 「或施放终结技后，移除1层」 — the other half of the removal clause. */
+    /** "或施放终结技后，移除1层" - the other half of the removal clause. */
     @Test
     public void navigatorLosesAStackAfterTheWearersUltimate() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
@@ -633,18 +633,18 @@ public class RelicAbilityBattleTest {
     }
 
     // ==================================================================
-    // 106 「戍卫风雪的铁卫」: a damage-taken zone the data could not reach
+    // 106 "戍卫风雪的铁卫": a damage-taken zone the data could not reach
     // ==================================================================
 
     /** The 2-piece's number (param #1[i] = 0.08). */
     private static final double SNOW_REDUCTION = 0.08;
 
     /**
-     * 「受到的伤害降低 8%」 — and the measurement is deliberately taken twice <b>on the same wearer in the
+     * "受到的伤害降低 8%" - and the measurement is deliberately taken twice <b>on the same wearer in the
      * same battle</b>: once with the buff the rule installed and once after removing it.
      *
      * <p>Comparing "a character wearing the set" against "a character wearing nothing" would have been
-     * meaningless here, because the relics themselves carry main and sub stats (DEF, HP) — the damage would
+     * meaningless here, because the relics themselves carry main and sub stats (DEF, HP) - the damage would
      * differ for reasons that have nothing to do with the 8%. Removing one buff leaves everything else
      * identical, so the ratio is the set's rule and nothing else. `TOLERANCE` is the same 1e-9 the other
      * cases use.
@@ -665,7 +665,7 @@ public class RelicAbilityBattleTest {
                 "8% less, in the multiplicative reduction zone");
     }
 
-    /** It is the <b>2-piece</b> tier, so three pieces are already enough — and none of them is not. */
+    /** It is the <b>2-piece</b> tier, so three pieces are already enough - and none of them is not. */
     @Test
     public void guardOfSnowIsATwoPieceAbility() {
         Battle threePieces = newBattle(List.of(partial(HIMEKO, GUARD_OF_SNOW)), true);
@@ -679,7 +679,7 @@ public class RelicAbilityBattleTest {
      * The 4-piece: at the start of the wearer's turn, below half health, heal 8% of Max HP and give 5 Energy.
      *
      * <p>The heal is the interesting half in engine terms: 8% of Max HP is a different number for every
-     * character and level, so it is written as {@code scale: target_max_hp} rather than as a number — which is
+     * character and level, so it is written as {@code scale: target_max_hp} rather than as a number - which is
      * why this ability was registered as unmodellable until that spelling existed.
      */
     @Test
@@ -781,7 +781,7 @@ public class RelicAbilityBattleTest {
      * Runs turns until {@code who} acts, then settles that turn start and end.
      *
      * <p>A turn has to be finished for the next one to begin, and it is the start that the set's removal
-     * clause hangs on — so "the wearer's turn" has to be driven, not simulated by calling the trigger.
+     * clause hangs on - so "the wearer's turn" has to be driven, not simulated by calling the trigger.
      */
     private static void takeTurnOf(Battle battle, Character who) {
         for (int guard = 0; guard < 40; guard++) {
@@ -816,5 +816,5 @@ public class RelicAbilityBattleTest {
         throw new IllegalStateException(unit.getName() + " is not on the action bar");
     }
 
-    /** 繁星璀璨的天才 (Genius of Brilliant Stars), 4-piece: 「造成伤害时无视10%防御；若目标有量子弱点则额外无视10%」. */
+    /** 繁星璀璨的天才 (Genius of Brilliant Stars), 4-piece: "造成伤害时无视10%防御；若目标有量子弱点则额外无视10%". */
 }

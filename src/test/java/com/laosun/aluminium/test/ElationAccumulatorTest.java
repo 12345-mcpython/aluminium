@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英’s energy accumulator (2026-09-30): 「累计获得 240 点能量时…单次获得能量时最多获得 240 点累计值」.
+ * 1505 绯英's energy accumulator (2026-09-30): "累计获得 240 点能量时…单次获得能量时最多获得 240 点累计值".
  *
- * <p>⭐ Two-sided on the same resource: a 300-energy gain adds only 240 (the per-conversion ceiling), a 100-energy gain adds all 100,
- * and two gains in a row accumulate -- which is what 「累计」 means.
+ * <p>Two-sided on the same resource: a 300-energy gain adds only 240 (the per-conversion ceiling), a 100-energy gain adds all 100,
+ * and two gains in a row accumulate -- which is what "累计" means.
  */
 public class ElationAccumulatorTest {
     private static final int WEARER = 1505;
@@ -53,7 +53,7 @@ public class ElationAccumulatorTest {
         Assertions.assertEquals(340, first, "and the counter accumulates rather than resetting");
     }
 
-    /** ★ The shipped rule, read off the compiled table (discipline 232). */
+    /** The shipped rule, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleCarriesTheCeiling() {
         build();

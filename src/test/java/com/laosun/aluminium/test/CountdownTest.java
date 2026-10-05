@@ -21,14 +21,14 @@ import java.util.Random;
 /**
  * The <b>countdown</b> unit (M-49): a unit that exists on the action order in order to <b>have a turn</b>.
  *
- * <p><b>The sentence that needs it.</b> 知更鸟's 【协奏】 lasts 「直到【协奏】倒计时的回合开始」, and that countdown 「固定拥有
- * 90 点速度」 — the state's duration is a fact about the <b>action order</b>, not a number of anybody's turns. A
+ * <p><b>The sentence that needs it.</b> 知更鸟's [协奏] lasts "直到[协奏]倒计时的回合开始", and that countdown "固定拥有
+ * 90 点速度" - the state's duration is a fact about the <b>action order</b>, not a number of anybody's turns. A
  * `turns: N` spelling would be a different duration in every fight (advances, delays and breaks all move the order),
  * which is why the engine had to grow a unit rather than a field.
  *
  * <p><b>What is pinned here.</b> That the countdown is scheduled by the same queue as everybody else, that its turn
  * announces itself ({@code COUNTDOWN_TURN}) so content can answer it with vocabulary that already exists, that it is
- * <b>not</b> a party member (「我方全体」 must not see it) and that it cannot be killed (a stray AoE must not end a
+ * <b>not</b> a party member ("我方全体" must not see it) and that it cannot be killed (a stray AoE must not end a
  * duration early).
  */
 public class CountdownTest {
@@ -58,7 +58,7 @@ public class CountdownTest {
     }
 
     /**
-     * ⚠ `actor == countdown` means <b>my</b> countdown, not "a countdown": another unit's clock must not answer her
+     * Note: `actor == countdown` means <b>my</b> countdown, not "a countdown": another unit's clock must not answer her
      * rule (2026-09-28).
      */
     @Test
@@ -84,7 +84,7 @@ public class CountdownTest {
         Assertions.assertTrue(f.hero.getAttribute(AttributeType.ATTACK).get() > before, "…and hers does");
     }
 
-    /** ⚠ It is not a party member: 「我方全体」 must not see it, or every group sentence would include a clock. */
+    /** Note: It is not a party member: "我方全体" must not see it, or every group sentence would include a clock. */
     @Test
     public void itIsNotInTheParty() {
         Fixture f = new Fixture(null);
@@ -97,7 +97,7 @@ public class CountdownTest {
                 "…and it is not an enemy either");
     }
 
-    /** ⚠ A clock cannot be killed: a stray AoE must not end a duration early. */
+    /** Note: A clock cannot be killed: a stray AoE must not end a duration early. */
     @Test
     public void itCannotBeKilledOrDamaged() {
         Fixture f = new Fixture(null);

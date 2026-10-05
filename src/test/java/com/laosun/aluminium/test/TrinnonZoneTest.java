@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「结界持续期间，敌方目标受到的伤害提高30.00%」 — a ratio, not a presence check, so the number is what is pinned.
+ * "结界持续期间，敌方目标受到的伤害提高30.00%" - a ratio, not a presence check, so the number is what is pinned.
  *
- * <p>The zone's clock is her own (the text says 「结界持续2回合，自身每回合开始时结界持续回合数减1」), which is exactly
+ * <p>The zone's clock is her own (the text says "结界持续2回合，自身每回合开始时结界持续回合数减1"), which is exactly
  * {@code ticks_on: "self"}; the effect itself reaches enemies through the {@code all_enemies} selector.
  */
 public class TrinnonZoneTest {

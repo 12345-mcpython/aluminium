@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 14 「献予「门径」之诗」, the sentence about defence (2026-10-02).
+ * 1415's memosprite skill 14 "献予'门径'之诗", the sentence about defence (2026-10-02).
  *
- * <p>「整场生效，<b>对缇宝施放时，使缇宝造成的伤害无视敌方目标 #2[i]% 的防御力。</b>…」
+ * <p>"整场生效，<b>对缇宝施放时，使缇宝造成的伤害无视敌方目标 #2[i]% 的防御力。</b>…"
  *
  * <p>Two readings: the piercing lands with the value the engine actually reads (this skill's row at the caster's level -- `#2` runs 0.06 -> 0.168),
  * and it lands on 缇宝 ONLY, because the rule lives on his table and is gated on `target == self`.

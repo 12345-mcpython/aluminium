@@ -37,20 +37,20 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     private CanHit canHit;
     /**
-     * The **scheduling sequence number** used to break equal action values (P7 fix E4): the smaller it is, the
+     * The scheduling sequence number used to break equal action values (Pfix E4): the smaller it is, the
      * earlier the combatant acts.
      *
-     * <p>Why it is needed: when {@link #nextActionTime} ties, the order of a {@code PriorityQueue} is **undefined**
+     * <p>Why it is needed: when {@link #nextActionTime} ties, the order of a {@code PriorityQueue} is undefined
      * (it only guarantees the heap top is the smallest element, not the relative order of equal elements). So "which
      * of two equal-speed units acts first" turns into a coin flip, and since
-     * {@link com.laosun.aluminium.Queue#snapshot()} does a stable sort over the heap array —
+     * {@link com.laosun.aluminium.Queue#snapshot()} does a stable sort over the heap array - 
      * <b>the displayed order may not equal the actual acting order</b>.
      *
-     * <p>The tie-break semantics: "**whoever was enqueued first acts first**": {@link #markScheduled()} takes a
+     * <p>The tie-break semantics: "whoever was enqueued first acts first": {@link #markScheduled()} takes a
      * globally increasing number on every "scheduling" (creating a number on entry / re-booking after acting /
      * {@code resetSignal}).
      *
-     * <p>⚠ Action bar manipulation (push-back / pull-forward / proportional pull-forward) does **not** take a new
+     * <p>Note: Action bar manipulation (push-back / pull-forward / proportional pull-forward) does not take a new
      * number, it only changes {@link #nextActionTime}: counting those as "re-scheduling" would produce the
      * counter-intuitive result that "whoever was just pulled forward gets the initiative".
      * So when A is pulled to the same instant as B, B still acts first (B was scheduled earlier).
@@ -59,34 +59,34 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     /**
      * The globally increasing scheduling-sequence number generator.
      *
-     * <p>{@code static} is deliberate: sequence numbers only need to be comparable **within** the same battle,
+     * <p>{@code static} is deliberate: sequence numbers only need to be comparable within the same battle,
      * and many battles may run back to back in the same JVM (in tests especially), so sharing one generator is the
      * simplest approach and the least likely to go wrong.
      */
     private static final AtomicLong SEQUENCE_GENERATOR = new AtomicLong();
     /**
-     * How much **action value** is left until the next action point (P7 fix E2).
+     * How much action value is left until the next action point (Pfix E2).
      *
-     * <p>Why it has to be tracked separately, and **must be a "distance" rather than a "percentage"**:
-     * the first round (P7-1) stretches the cycle to 1.5×, so the denominator of the "current cycle" differs
+     * <p>Why it has to be tracked separately, and must be a "distance" rather than a "percentage":
+     * the first round (P-1) stretches the cycle to 1.5 x , so the denominator of the "current cycle" differs
      * between the first round and the rounds after it (150 vs 100). Once progress is recorded as a percentage it
-     * can no longer be converted when the speed changes — a percentage times the new cycle would change two things
+     * can no longer be converted when the speed changes - a percentage times the new cycle would change two things
      * at once. A <b>distance, however, is speed-independent</b>: "how many squares are left" on the action bar does
      * not change with speed, speed only decides "how many squares are covered per unit of time". Therefore:
      *
      * <ul>
-     *   <li>speed change → the distance stays, and the remaining distance is converted to time at the new speed;</li>
-     *   <li>time advance → the distance shrinks, by exactly the amount of time advanced.</li>
+     *   <li>speed change to the distance stays, and the remaining distance is converted to time at the new speed;</li>
+     *   <li>time advance to the distance shrinks, by exactly the amount of time advanced.</li>
      * </ul>
      *
      * <p>First-round invariant: {@code nextActionTime - elapsed == remaining} holds when
-     * {@code markFirstRound()} is called (both are {@code 1.5 × cycleTime()}), and keeps holding from then on —
+     * {@code markFirstRound()} is called (both are {@code 1.5  x  cycleTime()}), and keeps holding from then on - 
      * this is exactly what the E2 fix has to preserve.
      */
     private double remaining = 0;
     /**
-     * Whether this signal has not yet finished its first-round scheduling (P7-1): the first-round booking is
-     * multiplied by ×1.5.
+     * Whether this signal has not yet finished its first-round scheduling (P-1): the first-round booking is
+     * multiplied by  x 1.5.
      */
     private boolean firstRound = false;
 
@@ -99,7 +99,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     /**
      * A signal that exists to NAME an actor, not to schedule one (2026-10-02; an inserted action).
      *
-     * <p>⚠ It is deliberately outside the normal constructor: a unit whose speed is 0 has no action value at all, which is exactly the case
+     * <p>Note: It is deliberately outside the normal constructor: a unit whose speed is 0 has no action value at all, which is exactly the case
      * an inserted action has to cover (the game pins a memosprite's speed to 0 with `SpeedOverride`). Such a signal must NEVER enter the heap --
      * nothing re-times it, and `Queue` only ever hands it back as the current actor.
      */
@@ -126,7 +126,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * IT'S IMPORTANT TO CALL WHEN CHANGING SPEED!!!
      */
     /**
-     * ✅ The signal's owner (2026-09-30; readers: cone 23033's advance judge, and every 「行动提前 / 延后」 sentence that
+     * The signal's owner (2026-09-30; readers: cone 23033's advance judge, and every "行动提前 / 延后" sentence that
      * has to say WHOSE action value moved). {@code Queue.getTimeRemaining(Signal)} and {@code Queue.getActionLength(Signal)} already
      * take a signal, but until now nothing could tie one back to a unit: {@code canHit} is private and had no accessor.
      */
@@ -139,29 +139,29 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * Recomputes the action time immediately after a speed change (P7 fix E2).
+     * Recomputes the action time immediately after a speed change (Pfix E2).
      *
      * <pre>
      *   progress  = max(remaining / old booking length, 0)   // the old booking length includes the first-round factor
-     *   newLength = new cycle × (first round ? 1.5 : 1)
-     *   remaining = progress × newLength
+     *   newLength = new cycle  x  (first round ? 1.5 : 1)
+     *   remaining = progress  x  newLength
      *   next      = elapsed + remaining
      * </pre>
      *
      * <p>Semantics: <b>the progress already travelled stays unchanged, and the part not yet travelled is recomputed
      * at the new speed</b>.
      * <ul>
-     *   <li>just acted (progress = 0) → the whole round is re-booked at the new speed;</li>
-     *   <li>about to act (progress = 1) → {@code remaining} is still the full round length, i.e.
+     *   <li>just acted (progress = 0) to the whole round is re-booked at the new speed;</li>
+     *   <li>about to act (progress = 1) to {@code remaining} is still the full round length, i.e.
      *       <b>the booking length is not discounted</b>: a speed boost does not let someone "skip ahead out of
      *       thin air", it only shortens the wait proportionally;</li>
-     *   <li>speed change halfway through → the remaining wait is scaled in proportion to the old and new cycles;</li>
-     *   <li><b>pushed back beyond one booking (progress &gt; 1)</b> → the excess is preserved rather than capped
+     *   <li>speed change halfway through to the remaining wait is scaled in proportion to the old and new cycles;</li>
+     *   <li><b>pushed back beyond one booking (progress &gt; 1)</b> to the excess is preserved rather than capped
      *       (L-26). Deliberately <b>not</b> clamped from above: a delayed unit really is more than a round away,
      *       and clamping truncated every push to one full round.</li>
      * </ul>
      *
-     * <p>⚠ The denominator must be "**the length this booking originally had**" ({@link #nextCycleLength()},
+     * <p>Note: The denominator must be "the length this booking originally had" ({@link #nextCycleLength()},
      * which includes the 1.5 of the first round), and must not be {@code cycleTime()}: in the first round the
      * booking is 150 while the cycle is 100, so using 100 as the denominator yields progress = 1.5, and one speed
      * change would erase the first-round factor into "act immediately".
@@ -170,11 +170,11 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     public void refreshSpeed(double elapsed) {
         double oldLength = nextCycleLength();
-        // ⚠ No UPPER clamp (L-26). A unit that has been pushed back by an action delay is legitimately
+        // Note: No UPPER clamp (L-26). A unit that has been pushed back by an action delay is legitimately
         // MORE than one booking away, i.e. `remaining > oldLength`; capping the progress at 1 then
         // rewrote it to exactly one full booking, silently truncating the push. That is why a slowed,
         // delayed unit used to be indistinguishable from a merely slowed one.
-        // The lower clamp stays — the booking must never go negative.
+        // The lower clamp stays - the booking must never go negative.
         double progress = oldLength > 0 ? Math.max(0, remaining / oldLength) : 0;
         refreshSpeed();                              // update speed first, then compute the new cycle
         double newLength = nextCycleLength();
@@ -186,8 +186,8 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * Time advance: the remaining distance shrinks by the same amount (called when
      * {@link com.laosun.aluminium.Queue#move()} moves the clock).
      *
-     * <p>The distance is speed-independent, so this method does **not** need to know the speed, nor does it need a
-     * first-round conversion — advance 75 seconds and the action bar moves forward 75 squares.
+     * <p>The distance is speed-independent, so this method does not need to know the speed, nor does it need a
+     * first-round conversion - advance 5 seconds and the action bar moves forward 5 squares.
      *
      * @param delta the actual time advanced by this step
      */
@@ -196,7 +196,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * The action point has been consumed: book a whole new cycle at the current speed (×1.5 in the first round).
+     * The action point has been consumed: book a whole new cycle at the current speed ( x 1.5 in the first round).
      *
      * @param elapsed the queue's current global clock
      */
@@ -206,9 +206,9 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * Marks this signal as being in its "first round" (P7-1): this booking is multiplied by ×1.5.
+     * Marks this signal as being in its "first round" (P-1): this booking is multiplied by x 1.5.
      *
-     * <p>The length of the first booking is exactly {@code 1.5 × cycleTime()}, so the distance starts from there.
+     * <p>The length of the first booking is exactly {@code 1.5  x  cycleTime()}, so the distance starts from there.
      */
     public void markFirstRound() {
         this.firstRound = true;
@@ -224,10 +224,10 @@ public final class Signal implements Comparable<Signal>, Cloneable {
 
     /**
      * Directly sets "how much action value is left until the action point" and synchronises
-     * {@link #nextActionTime} (P7-2).
+     * {@link #nextActionTime} (P-2).
      *
      * <p>{@code remaining} and {@code nextActionTime} are two ledgers of the same state
-     * (see {@code engine.md} §5.6), so changing one of them means the other must be synchronised —
+     * (see {@code engine.md} §5.6), so changing one of them means the other must be synchronised - 
      * this method exists precisely so that callers do not have to guarantee that themselves.
      *
      * <p>The only caller at the moment is {@link com.laosun.aluminium.Queue#grantExtraTurn}:
@@ -243,7 +243,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * Returns how long "scheduling the next action from the current instant" takes (×1.5 factor in the first round).
+     * Returns how long "scheduling the next action from the current instant" takes ( x 1.5 factor in the first round).
      */
     public double nextCycleLength() {
         return cycleTime() * (firstRound ? Constant.FIRST_ROUND_MULTIPLIER : 1.0);
@@ -262,20 +262,20 @@ public final class Signal implements Comparable<Signal>, Cloneable {
         if (byTime != 0) {
             return byTime;
         }
-        return Long.compare(this.sequence, o.sequence);     // E4: equal action value → whoever was scheduled first acts first
+        return Long.compare(this.sequence, o.sequence);     // E4: equal action value to whoever was scheduled first acts first
     }
 
     /**
-     * Takes a new scheduling sequence number (P7 fix E4). Called by {@link com.laosun.aluminium.Queue} when
+     * Takes a new scheduling sequence number (Pfix E4). Called by {@link com.laosun.aluminium.Queue} when
      * "this signal is (re)scheduled": creating a Signal and enqueueing it ({@code addCombatant()}),
      * {@code setTopZero()} after acting, and {@code resetSignal()}.
      *
-     * <p>⚠ Two places must **not** call it:
+     * <p>Note: Two places must not call it:
      * <ul>
-     *   <li>push-back / pull-forward / proportional pull-forward — those only change the action value. If a
+     *   <li>push-back / pull-forward / proportional pull-forward - those only change the action value. If a
      *       pull-forward also took a new number, it would become the counter-intuitive result "whoever was just
      *       pulled forward gets the initiative";</li>
-     *   <li>{@code initialize()} — it iterates over the heap's **internal array**, whose order is decided by the
+     *   <li>{@code initialize()} - it iterates over the heap's internal array, whose order is decided by the
      *       heap structure, and taking numbers there would break "equal-speed units act in entry order".</li>
      * </ul>
      */

@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * Her talent and her trace both write +20% to the party; both must be counted (1415, 2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN, and the TOTAL is the claim: 0.2 below the threshold (talent alone), 0.4 past it. The measured switch is
+ * <p>FILE-DRIVEN, and the TOTAL is the claim: 0.2 below the threshold (talent alone), 0.4 past it. The measured switch is
  * `max_stacks > 1` -- `StatModifierBuff.isStackable()` is exactly that, and `stackGroupKey()` is the attribute, the
  * modifier type and the source role -- so both writers state 2.
  */
@@ -25,7 +25,7 @@ public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ Talent alone below 180; talent plus trace past it. */
+    /** Talent alone below 180; talent plus trace past it. */
     @Test
     public void theTwoWritersAdd() {
         Assertions.assertEquals(0.2, total(0), 1e-6, "below the threshold, her talent alone");

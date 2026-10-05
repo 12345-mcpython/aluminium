@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * A COUNT is not an amount: `ADD_DAMAGE` refuses `times` instead of ignoring it (2026-10-02).
  *
- * <p>Found while reading 1415's ode of passage, whose second sentence is 「…会<b>额外造成 #1 次附加伤害</b>」. The sentence counts INSTANCES, the
+ * <p>Found while reading 1415's ode of passage, whose second sentence is "…会<b>额外造成 #1 次附加伤害</b>". The sentence counts INSTANCES, the
  * obvious-looking spelling is `ADD_DAMAGE` with `times: 1`, and `ADD_DAMAGE`'s worker is `damage.addFlat(derivedMagnitude(...))` -- it adds ONE
  * amount to the damage being settled. A `times` there would be read by nobody: the rule would load, fire, and deliver one flat addition while
  * looking exactly like the sentence. That is the silence this project refuses, so the field is refused at load time with a message saying what it

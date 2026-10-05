@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408 Phainon, from his own file (2026-09-29, round 222): the 【火种】 resource his transformation kit still lets us declare.
+ * 1408 Phainon, from his own file (2026-09-29, round 222): the [火种] resource his transformation kit still lets us declare.
  */
 public class PhainonTest {
     private static final int PHAINON = 1408;
@@ -22,7 +22,7 @@ public class PhainonTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ Two Coreflame per Skill, and the document's cap of 12 enforced by exceeding it. */
+    /** Note: Two Coreflame per Skill, and the document's cap of 12 enforced by exceeding it. */
     @Test
     public void theSkillFeedsCoreflameUpToTwelve() {
         Character phainon = CharacterFactory.create(PHAINON, LEVEL);
@@ -31,7 +31,7 @@ public class PhainonTest {
         Battle battle = new Battle(List.of(phainon, ally), List.of(enemy), fixed());
         battle.startBattle();
 
-        // ⚠ Updated 2026-10-02: the document DOES state one -- her trace 1408101 「战斗开始时，获得 1 点【火种】」, which is
+        // Note: Updated 2026-10-02: the document DOES state one -- her trace 1408101 "战斗开始时，获得 1 点[火种]", which is
         // now written, so the pool opens at one. The reading is unchanged in kind: it starts where the sentences say.
         Assertions.assertEquals(1, coreflameOf(phainon),
                 "「战斗开始时，获得 1 点【火种】」");
@@ -42,15 +42,15 @@ public class PhainonTest {
         for (int i = 0; i < 9; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
         }
-        // ⚠ 12 -> 15 (2026-10-02, item 39). This expectation was written while the file declared only `max: 12`, and the
-        // document's sentence does not stop there: 「【火种】达到 12 点时可激活终结技，**达到上限后还可最多溢出 3 点**」.
+        // Note: 12 -> 15 (2026-10-02, item 39). This expectation was written while the file declared only `max: 12`, and the
+        // document's sentence does not stop there: "[火种]达到 12 点时可激活终结技，达到上限后还可最多溢出 3 点".
         // The test's INTENT is untouched -- the pool is capped, and ten casts cannot run past the ceiling -- but the ceiling now
         // quotes the whole sentence. The allowance itself is pinned from both sides by `CoreflameOverflowTest`.
         Assertions.assertEquals(15, coreflameOf(phainon),
                 "「达到上限后还可最多溢出 3 点」 -- ten casts (20 points) stop at 12 + 3");
     }
 
-    /** ⚠ The technique restores the TEAM's energy (not hers) and grants one Skill Point. */
+    /** Note: The technique restores the TEAM's energy (not hers) and grants one Skill Point. */
     @Test
     public void theTechniqueFeedsTheTeamButNotHerself() {
         Character phainon = CharacterFactory.create(PHAINON, LEVEL);

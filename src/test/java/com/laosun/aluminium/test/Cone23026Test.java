@@ -16,7 +16,7 @@ import java.util.List;
  * capped at 5 layers. The ultimate consumes the whole counter and grants the flourish: the wearer's ATK up 48..96% and
  * OUR WHOLE SIDE's damage up 24..40%, both for 1 turn.
  *
- * <p>⚠ The two state names come from codepoints on the generator side, because round 307 lost a round to a
+ * <p>Note: The two state names come from codepoints on the generator side, because round 30lost a round to a
  * hand-typed escape that named a different character: measured, the engine said {@code 歌咏} while the judge
  * expected something else. The engine was right.
  */

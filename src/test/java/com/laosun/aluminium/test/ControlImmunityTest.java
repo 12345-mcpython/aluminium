@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408：「卡厄斯兰那**免疫控制类负面状态**」 (2026-10-02).
+ * 1408："卡厄斯兰那免疫控制类负面状态" (2026-10-02).
  *
- * <p>⭐ SAME SCENE, ONE VARIABLE: a spare unit applies 【冻结】 (a control, from the document's own glossary) to her; the only
+ * <p>SAME SCENE, ONE VARIABLE: a spare unit applies [冻结] (a control, from the document's own glossary) to her; the only
  * difference between the two runs is whether she is transformed. The applier carries a hand-built table so the judge can cast a
  * control on demand -- and that unit's own content is irrelevant here, because only HER state is asserted.
  */
@@ -30,13 +30,13 @@ public class ControlImmunityTest {
     private static final String STATE = "变身";
     private static final String FREEZE = "冻结";
 
-    /** ⭐ Transformed: the control does not land. */
+    /** Transformed: the control does not land. */
     @Test
     public void theTransformedFormShrugsOffControl() {
         Assertions.assertFalse(controlledAfter(true), "「卡厄斯兰那免疫控制类负面状态」");
     }
 
-    /** ⚠ Untransformed: the same control lands, so the immunity really is the transformation's. */
+    /** Note: Untransformed: the same control lands, so the immunity really is the transformation's. */
     @Test
     public void withoutTheTransformationTheControlLands() {
         Assertions.assertTrue(controlledAfter(false), "「变身期间」-- outside it she is controlable");
@@ -67,7 +67,7 @@ public class ControlImmunityTest {
         Assertions.assertFalse(owner.getBuffManager().hasState(FREEZE),
                 "precondition: nothing has controlled her yet");
 
-        // ⭐ NOW the control is aimed at her -- AFTER the transformation, which is the whole point. Measured: a control that lands at
+        // NOW the control is aimed at her -- AFTER the transformation, which is the whole point. Measured: a control that lands at
         // BATTLE_START is simply there when the transformation begins, and immunity cannot retroactively remove it.
         Skill theirs = applier.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(theirs, "precondition: the applier has a skill");
@@ -76,13 +76,13 @@ public class ControlImmunityTest {
         return owner.getBuffManager().hasState(FREEZE);
     }
 
-    /** APPLY_CONTROL of 【冻结】 on the rule owner's own target -- the spare aims it at 1408 through the trigger's target. */
+    /** APPLY_CONTROL of [冻结] on the rule owner's own target -- the spare aims it at 1408 through the trigger's target. */
     private static EffectSpec control() {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "APPLY_CONTROL");
         TriggerSpecs.set(e, "control", FREEZE);
         TriggerSpecs.set(e, "turns", 3);
-        // ⚠ `other_allies`, NOT `all_enemies`: from the applier's side the "enemies" are the monster, and the point of the judge is to
+        // Note: `other_allies`, NOT `all_enemies`: from the applier's side the "enemies" are the monster, and the point of the judge is to
         // aim the control AT HER. Measured: with `all_enemies` the control went to the monster and the untransformed run never saw it.
         TriggerSpecs.set(e, "target", "other_allies");
         return e;

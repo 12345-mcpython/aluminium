@@ -32,7 +32,7 @@ import java.util.Random;
  *       ({@code EventBusTest.turnBoundariesAreStillMoveEvent}), and this event adds no buff interface.
  *       It fires once per turn, for the character whose turn it is.</li>
  *   <li><b>{@code TAKING_HIT} is not {@code HP_LOST}.</b> A hit a shield absorbed entirely must fire
- *       {@code TAKING_HIT} and must not fire {@code HP_LOST} — that distinction is the whole reason the
+ *       {@code TAKING_HIT} and must not fire {@code HP_LOST} - that distinction is the whole reason the
  *       second event exists, and it is asserted directly rather than described in a comment.</li>
  *   <li><b>{@code hp_percent} is a closed-set variable.</b> It reads the owner's own HP fraction, and
  *       an unknown variable still fails at load time with the complete list of known names.</li>
@@ -73,7 +73,7 @@ public class TriggerEventWiringTest {
      * Another character's table does not fire on my turn.
      *
      * <p>The event is delivered to <b>every</b> table (each evaluates the context with itself as
-     * {@code self}), so a table that forgot its condition would fire for the whole team — which is
+     * {@code self}), so a table that forgot its condition would fire for the whole team - which is
      * exactly what a naive emitter gets wrong. The observable is energy rather than a stat modifier: a
      * buff would still be sitting there from an earlier turn, while a credit lands only when the rule
      * actually fires.
@@ -115,7 +115,7 @@ public class TriggerEventWiringTest {
      * The same table evaluated with {@code target == self} fires too.
      *
      * <p>The emitter hands the actor over as <b>both</b> {@code actor} and {@code target}, so the two
-     * natural ways to spell "the wearer's turn" cannot diverge — a rule that silently never fires is the
+     * natural ways to spell "the wearer's turn" cannot diverge - a rule that silently never fires is the
      * worst outcome for a data rule, and the action bar makes that failure mode very hard to notice.
      */
     @Test
@@ -140,7 +140,7 @@ public class TriggerEventWiringTest {
      *
      * <p>Two identical rules on the same target, one per event: after the shielded hit, only the
      * TAKING_HIT one has installed its modifier. That is precisely what an ability like
-     * "after the wearer attacks <em>or is hit</em>" needs — behind a shielder, HP loss never happens, so
+     * "after the wearer attacks <em>or is hit</em>" needs - behind a shielder, HP loss never happens, so
      * keying off {@code HP_LOST} would make the relic silently do nothing.
      */
     @Test
@@ -213,8 +213,8 @@ public class TriggerEventWiringTest {
     /**
      * The trigger only fires for our own side, matching {@code HP_LOST}'s broadcast policy.
      *
-     * <p>An enemy being hit is not our content (P9 owns monsters), and — more importantly for the
-     * rule's arithmetic — a relic rule must not accumulate stacks when the wearer is the one
+     * <p>An enemy being hit is not our content (P9 owns monsters), and - more importantly for the
+     * rule's arithmetic - a relic rule must not accumulate stacks when the wearer is the one
      * attacking. {@code fireTriggersForAlly} is the camp check, and this test is what keeps it in
      * place.
      */
@@ -418,7 +418,7 @@ public class TriggerEventWiringTest {
      * Drives an ally's HP down to a fraction of its maximum.
      *
      * <p>Goes through {@link CanHit#takeDamage(double)} rather than poking the HP field, because the
-     * field is private to {@code CanHit} and has no setter — the engine's only way to change HP is the
+     * field is private to {@code CanHit} and has no setter - the engine's only way to change HP is the
      * damage entry point, which is also what a real battle uses.
      */
     private static void setHpFraction(Character character, double fraction) {

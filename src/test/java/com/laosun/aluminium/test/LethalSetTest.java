@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「在一次行动中受到致命攻击的<b>全体</b>」 -- one set, not one save per blow (2026-10-02).
+ * "在一次行动中受到致命攻击的<b>全体</b>" -- one set, not one save per blow (2026-10-02).
  *
- * <p>Reader: 1407 月茇之庇. Its first half was already in the engine (`BuffManager.defersDeath()`: a state may hold the death instead of
+ * <p>Reader: 140月茇之庇. Its first half was already in the engine (`BuffManager.defersDeath()`: a state may hold the death instead of
  * committing it), and what was missing was this: the SAME action can land a lethal blow on several allies and the effect has to reach all
  * of them.
  *
- * <p>⭐ The action boundary is not new either: `TURN_START` (Battle:1031) and `TURN_END` (Battle:1301) already bracket `performAction`
- * (1245) and its settlement (1276), so the set is cleared at the boundary that exists.
+ * <p>The action boundary is not new either: `TURN_START` (Battle:1031) and `TURN_END` (Battle:1301) already bracket `performAction`
+ * (1245) and its settlement (126), so the set is cleared at the boundary that exists.
  *
- * <p>⭐ The rule is built in the test -- `TriggerSpecs.set` / `TriggerSpecs.rule`, the factory `CastSkillTest` uses -- because what is being
- * judged is the SELECTOR, not 1407's sentence. Each lethal blow raises the speed of every ally in the set by 100, so the attribute says
+ * <p>The rule is built in the test -- `TriggerSpecs.set` / `TriggerSpecs.rule`, the factory `CastSkillTest` uses -- because what is being
+ * judged is the SELECTOR, not 140's sentence. Each lethal blow raises the speed of every ally in the set by 100, so the attribute says
  * exactly who was in it.
  */
 public class LethalSetTest {

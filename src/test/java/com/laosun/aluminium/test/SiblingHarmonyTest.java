@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8005, the sibling of 8006 (2026-09-29, round 197): 【伴舞】 and the +30% Break Effect, mirrored where the two documents agree.
+ * 8005, the sibling of 8006 (2026-09-29, round 19): [伴舞] and the +30% Break Effect, mirrored where the two documents agree.
  */
 public class SiblingHarmonyTest {
     private static final int TB = 8005;
@@ -22,7 +22,7 @@ public class SiblingHarmonyTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「持有【伴舞】的我方目标击破特攻提高30%」 -- the state and the modifier, for the party. */
+    /** Note: "持有[伴舞]的我方目标击破特攻提高30%" -- the state and the modifier, for the party. */
     @Test
     public void herUltimateGrantsTheDanceAndTheBreakEffect() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -36,13 +36,13 @@ public class SiblingHarmonyTest {
 
         Assertions.assertTrue(ally.getBuffManager().hasState("伴舞"),
                 "「为我方全体附上【伴舞】效果」");
-        // Measured: BREAKING_EFFECT is a FRACTION attribute whose base is 0, and the engine lands this modifier as an absolute 0.3 — i.e. exactly the
+        // Measured: BREAKING_EFFECT is a FRACTION attribute whose base is 0, and the engine lands this modifier as an absolute 0.3 - i.e. exactly the
         // document's 30%. Asserting a share of the base (the first attempt) expected 0 and compared nothing.
         Assertions.assertEquals(0.3, ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-9,
                 "「击破特攻提高30%」: gain " + (ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before));
     }
 
-    /** ⚠ The technique's own +30% for two turns, gated on the marker, with the control. */
+    /** Note: The technique's own +30% for two turns, gated on the marker, with the control. */
     @Test
     public void theTechniqueRaisesThePartysBreakEffect() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -72,7 +72,7 @@ public class SiblingHarmonyTest {
     public void hisFileCarriesTheClauses() {
         var table = com.laosun.aluminium.data.TriggerTables.of(TB);
         Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST));
-        // 2026-09-30: 2 -- 8005 gained the skill clause 「额外造成 4 次伤害，每次对随机敌方单体」 (times).
+        // 2026-09-30: 2 -- 8005 gained the skill clause "额外造成 4 次伤害，每次对随机敌方单体" (times).
         Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE));
         Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BREAK));
         Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START),

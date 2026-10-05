@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1406's 行迹「偷天换日」(1406103): 「天赋的追加攻击造成的暴击伤害提高 100%」.
+ * 1406's 行迹"偷天换日"(1406103): "天赋的追加攻击造成的暴击伤害提高 100%".
  *
  * <p>A guaranteed crit (CRIT_CHANCE >= 1) rather than fixedCrit, which would bypass the crit zone and hide the modifier entirely.
  */

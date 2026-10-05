@@ -19,7 +19,7 @@ import java.util.Random;
 /**
  * P9-5: counter-attack.
  *
- * <p>A unit wearing {@link CounterMechanic} hits whoever causes it to lose HP back — the enemy-side
+ * <p>A unit wearing {@link CounterMechanic} hits whoever causes it to lose HP back - the enemy-side
  * mirror of Clara's counter, so bosses are no longer only something to be hit. Each test compares against
  * an identically-built battle without the buff, so the measurement is "what the counter added" rather
  * than an absolute damage figure that relic and trace bonuses would make meaningless.
@@ -32,7 +32,7 @@ public class BossMechanicTest {
     private static final int CHARACTER_LEVEL = 80;
     private static final int DURATION = 5;
 
-    /** Counter damage = the wearer's ATK × this. */
+    /** Counter damage = the wearer's ATK  x  this. */
     private static final double RATIO = 0.5;
 
     // ==================================================================
@@ -62,7 +62,7 @@ public class BossMechanicTest {
      */
     @Test
     public void theCounterDoesNotFeedTheOneItHits() {
-        // ⚠ Measured as a differential against the control, NOT as "the hero's energy did not move": the
+        // Note: Measured as a differential against the control, NOT as "the hero's energy did not move": the
         // hero's own attack credits hit energy, so the hero's energy always rises. Both battles perform the
         // same attack, so any difference between them can only come from the counter.
         Battle control = newBattle(false);
@@ -77,10 +77,10 @@ public class BossMechanicTest {
     /**
      * A mutual pair of counters resolves without blowing up, and the first counter still lands.
      *
-     * <p>⚠ <b>This test does not measure the thing that is wrong.</b> It watches the <i>hero's</i> HP,
-     * which is the same whether or not both sides wear a counter (237.23 in both cases). The defect shows
+     * <p>Note: <b>This test does not measure the thing that is wrong.</b> It watches the <i>hero's</i> HP,
+     * which is the same whether or not both sides wear a counter (23.23 in both cases). The defect shows
      * up on the <b>enemy's</b> side: with both sides wearing a counter the enemy loses ~5902 where the
-     * hero's single attack explains ~260 — i.e. the reaction fires far too often. The measurement and the
+     * hero's single attack explains ~260 - i.e. the reaction fires far too often. The measurement and the
      * open question are written up in {@code CounterMechanic}'s Javadoc; whoever picks this up should
      * assert on the enemy's HP loss, which is the observable that actually moves.
      */
@@ -95,7 +95,7 @@ public class BossMechanicTest {
         Assertions.assertTrue(heroHp(battle) < heroMaxHp(battle), "and the exchange really happened");
     }
 
-    /** A wearer that is already down does not counter — a corpse does not hit back. */
+    /** A wearer that is already down does not counter - a corpse does not hit back. */
     @Test
     public void aDeadWearerDoesNotCounter() {
         Battle battle = newBattle(false);
@@ -125,7 +125,7 @@ public class BossMechanicTest {
      *
      * <p>This is the assertion the earlier version of this class should have made. It watches the
      * <b>enemy's</b> HP, the observable that actually moves, rather than the hero's, which is identical
-     * whether or not the chain is bounded — that mistake let the previous version pass while proving
+     * whether or not the chain is bounded - that mistake let the previous version pass while proving
      * nothing, and led to a defect being reported that did not exist.
      *
      * <p>Traced with temporary instrumentation (since removed), both sides wearing a counter and one basic

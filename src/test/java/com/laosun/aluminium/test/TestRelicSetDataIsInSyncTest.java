@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * {@code release_version: "test"}. The relic censuses skip anything so marked. A copy can drift, and a drifting copy
  * would silently change what every relic judge is looking at -- so the drift must fail loudly here.
  *
- * <p>⚠ Measured 2026-09-30: the first version of this guard read BOTH files through {@code getResourceAsStream} with
+ * <p>Note: Measured 2026-09-30: the first version of this guard read BOTH files through {@code getResourceAsStream} with
  * the same path, so it saw null ("/data/relic_sets.json is not on the classpath"). The classpath can only ever show
  * one of the two copies; the two REAL files must be read from disk by path.
  */

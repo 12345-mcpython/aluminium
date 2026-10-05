@@ -20,7 +20,7 @@ import java.util.Random;
  * <p>The caster is 8009 and the target is 1505 -- one of the nine Elation-skill holders (data slot 20), and its own file
  * declares Bondmate-of-Appreciation, so every half of the sentence has somewhere to land.
  *
- * <p>⚠ The ultimate deals NO damage of its own (its first parameter is the crit-damage share it grants), so the enemy's HP
+ * <p>Note: The ultimate deals NO damage of its own (its first parameter is the crit-damage share it grants), so the enemy's HP
  * loss below is the commanded Elation cast and nothing else -- which is also what the mutation removes.
  */
 public class UltElationBranchTest {

@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * A stackable state can be applied N times in one effect (2026-10-02).
  *
- * <p>The reader is 1513's reward, whose state's instance count IS the 【笑点】 it spent -- and 1505's 「开不败」 reads that count
+ * <p>The reader is 1513's reward, whose state's instance count IS the [笑点] it spent -- and 1505's "开不败" reads that count
  * when the state ends.
  */
 public class StackTimesTest {
@@ -39,7 +39,7 @@ public class StackTimesTest {
     @Test
     public void aPlainStateStaysOne() {
         Character owner = owner(false);
-        // ⚠ Measured: `stacksOf` counts NAMED instances, and a plain StateBuff carries no name -- so it answers 0 for the
+        // Note: Measured: `stacksOf` counts NAMED instances, and a plain StateBuff carries no name -- so it answers 0 for the
         // control either way. `hasState` is what the control's claim is about: the state is there, once, unrepeated.
         System.out.println("[stack-times] plain stacksOf=" + owner.getBuffManager().stacksOf(STATE)
                 + " hasState=" + owner.getBuffManager().hasState(STATE));
@@ -62,7 +62,7 @@ public class StackTimesTest {
 
     private static TriggerTable scene(boolean stackable) {
         EffectSpec grant = effect("GAIN_RESOURCE", "resource", COUNTER, "amount", 7.0);
-        // ⚠ `max_stacks` is only allowed beside `stackable` (item 60), and the scale only matters for a state that can
+        // Note: `max_stacks` is only allowed beside `stackable` (item 60), and the scale only matters for a state that can
         // hold a count -- so the control states neither.
         EffectSpec apply = stackable
                 ? effect("APPLY_BUFF", "buff", STATE, "permanent", Boolean.TRUE, "target", "self",

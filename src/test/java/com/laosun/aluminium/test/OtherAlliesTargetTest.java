@@ -21,15 +21,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code target: "other_allies"} — 「除自身以外的队友」, and the group {@code ADVANCE} it exists for.
+ * {@code target: "other_allies"} - "除自身以外的队友", and the group {@code ADVANCE} it exists for.
  *
- * <p><b>Why a new word was needed.</b> 知更鸟's ultimate says 「使<b>除自身以外的队友</b>立即行动」. The op and the
+ * <p><b>Why a new word was needed.</b> 知更鸟's ultimate says "使<b>除自身以外的队友</b>立即行动". The op and the
  * fraction were already there (`ADVANCE percent: 1.0` = skip all of a unit's remaining wait = 立即行动), but the
  * <em>group</em> could not be named:
  *
  * <ul>
- *   <li>{@code all_allies} / {@code party} is "our whole side" <b>including</b> the rule's owner — that is pinned
- *       by 302 不老者的仙舟's 「我方全体攻击力提高」, which must buff the wearer — so it cannot mean "everyone but
+ *   <li>{@code all_allies} / {@code party} is "our whole side" <b>including</b> the rule's owner - that is pinned
+ *       by 302 不老者的仙舟's "我方全体攻击力提高", which must buff the wearer - so it cannot mean "everyone but
  *       me";</li>
  *   <li>a condition cannot say it either: conditions filter <b>rules</b> (is this event mine?), not the units an
  *       effect reaches (all of them but one). Those are different questions, and the second one is the effect's
@@ -47,18 +47,18 @@ public class OtherAlliesTargetTest {
     /** The pair selector this class also covers; spelled once so a rename cannot half-apply. */
     private static final String TARGET_AND_SUMMON = "target_and_summon";
 
-    /** 姬子 — no shipped rule file, so the table under test is the only one in play. */
+    /** 姬子 - no shipped rule file, so the table under test is the only one in play. */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** 知更鸟 — her ultimate's first sentence is the first user of this selector. */
+    /** 知更鸟 - her ultimate's first sentence is the first user of this selector. */
     private static final int ROBIN = 1309;
 
     // ==================================================================
     // 1. The two group selectors differ in one unit
     // ==================================================================
 
-    /** 「除自身以外」: the teammates act now, the owner does not. */
+    /** "除自身以外": the teammates act now, the owner does not. */
     @Test
     public void otherAlliesLeavesTheOwnerOut() {
         Battle battle = new Battle(party(), List.of(dummy()), new Random(0));
@@ -158,7 +158,7 @@ public class OtherAlliesTargetTest {
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(ROBIN).matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(robin, robin, null, 0, 0, null, battle));
 
-        // ⚠ 4 since 2026-09-30: her ultimate's clauses fire four rules on ULT_CAST -- this ADVANCE, the 【协奏】 state
+        // Note: 4 since 2026-09-30: her ultimate's clauses fire four rules on ULT_CAST -- this ADVANCE, the [协奏] state
         // plus its countdown, the state's own ATK boost plus control immunity, and (new) the zone's 20% defence ignore.
         Assertions.assertEquals(4, rules.size());
         List<EffectSpec> effects = rules.getFirst().effects();
@@ -169,14 +169,14 @@ public class OtherAlliesTargetTest {
     }
 
     // ==================================================================
-    // 4. The pair: 「指定我方单体及其召唤物」
+    // 4. The pair: "指定我方单体及其召唤物"
     // ==================================================================
 
     /**
-     * {@code target_and_summon} is the chosen unit <b>and its</b> summon — not the rule owner's.
+     * {@code target_and_summon} is the chosen unit <b>and its</b> summon - not the rule owner's.
      *
      * <p>This is the case that separates it from every neighbouring word: {@code target} alone would leave the
-     * summon standing, and {@code summon} is the <b>rule owner's</b> — so the fixture gives <b>both</b> units a
+     * summon standing, and {@code summon} is the <b>rule owner's</b> - so the fixture gives <b>both</b> units a
      * summon and asserts that only one of the two moves.
      */
     @Test
@@ -202,9 +202,9 @@ public class OtherAlliesTargetTest {
     }
 
     /**
-     * A chosen unit with no summon is just that unit — no error, nothing invented.
+     * A chosen unit with no summon is just that unit - no error, nothing invented.
      *
-     * <p>「及其召唤物」 only has something to add when there is one, and this Skill is cast on ordinary allies all
+     * <p>"及其召唤物" only has something to add when there is one, and this Skill is cast on ordinary allies all
      * the time (that is most of the cast).
      */
     @Test
@@ -241,8 +241,8 @@ public class OtherAlliesTargetTest {
     /**
      * The pair is a <b>list</b>, so an op that resolves exactly one target refuses it loudly.
      *
-     * <p>Pinned because the tempting implementation — let the singular resolver return the chosen unit and ignore
-     * the summon — would silently drop half of 「及其召唤物」.
+     * <p>Pinned because the tempting implementation - let the singular resolver return the chosen unit and ignore
+     * the summon - would silently drop half of "及其召唤物".
      */
     @Test
     public void aSingleTargetOpRefusesThePair() {
@@ -277,7 +277,7 @@ public class OtherAlliesTargetTest {
         return List.of(owner, CharacterFactory.create(1210, LEVEL), CharacterFactory.create(1202, LEVEL));
     }
 
-    /** 「立即行动」: skip all of the target's remaining wait. */
+    /** "立即行动": skip all of the target's remaining wait. */
     private static EffectSpec advance(String selector) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADVANCE");
@@ -286,7 +286,7 @@ public class OtherAlliesTargetTest {
         return effect;
     }
 
-    /** How much action value the unit still has — zero means "acts now". */
+    /** How much action value the unit still has - zero means "acts now". */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「结界持续期间…」 — the zone's clock is a COUNTDOWN, so its effects last exactly as long as that unit is alive.
+ * "结界持续期间…" - the zone's clock is a COUNTDOWN, so its effects last exactly as long as that unit is alive.
  *
  * <p>The sentence (行迹 千锻魂) has three effects and the upstream modifier writes exactly three properties
  * (AggroAddedRatio + AllDamageReduce + HealTakenRatio, from the same row whose ParamList is [10, 0.5, 0.5]). All three are
- * applied named at the Ultimate and taken off on the countdown's turn, which is what 「倒计时回合开始时结界解除」 says.
+ * applied named at the Ultimate and taken off on the countdown's turn, which is what "倒计时回合开始时结界解除" says.
  */
 public class MortenaxZoneTest {
     private static final int MORTENAX = 1507;

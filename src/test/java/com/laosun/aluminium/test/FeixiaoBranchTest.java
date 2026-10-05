@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1220 飞霄's ultimate branches: 「若目标处于弱点击破状态，伤害倍率提高30%」 and 「若目标未处于弱点击破状态，伤害倍率提高30%」.
+ * 1220 飞霄's ultimate branches: "若目标处于弱点击破状态，伤害倍率提高30%" and "若目标未处于弱点击破状态，伤害倍率提高30%".
  *
  * <p>`BOOST_DAMAGE` boosts the DAMAGE INSTANCE, so the judgement is a damage number: measured on a 900k victim with a no-crit Random. Three arms --
  * the character with a synthetic level-only table (D0), the full content with the enemy NOT broken (D1, the negated branch) and with the enemy broken
  * (D2, the mirror branch, broken through the engine with the enemy's own declared weakness).
  *
- * <p>⚠ One caveat stated rather than hidden: the control arm replaces her table, so it also drops any other rule of hers that might touch the
+ * <p>Note: One caveat stated rather than hidden: the control arm replaces her table, so it also drops any other rule of hers that might touch the
  * ultimate's damage. If the ratio comes out above 1.3, that is why -- and the assertion's message carries the measured numbers.
  */
 public class FeixiaoBranchTest {

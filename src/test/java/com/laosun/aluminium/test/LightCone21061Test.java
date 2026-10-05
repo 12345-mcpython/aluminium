@@ -21,7 +21,7 @@ public class LightCone21061Test {
     }
 
     /**
-     * ⚠ The +32% lives on `DEALING_DAMAGE`, i.e. it applies INSIDE a damage instance (measured: reading the attribute outside
+     * Note: The +32% lives on `DEALING_DAMAGE`, i.e. it applies INSIDE a damage instance (measured: reading the attribute outside
      * one shows only the cone stat line, 0.16). So the sentence is pinned by the spec half below, which reads the shipped file.
      */
     @Test

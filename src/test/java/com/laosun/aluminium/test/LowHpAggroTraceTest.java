@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低」 — one sentence, three characters.
+ * "若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低" - one sentence, three characters.
  *
  * <p>The gate is a STATE, not an event, so it is spelled the way the engine already spells state-scoped modifiers: apply
  * it when HP crosses below (HP_LOST) and take it off when HP comes back (HEALED). That pair is the engine's equivalent

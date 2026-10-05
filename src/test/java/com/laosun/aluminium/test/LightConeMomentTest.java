@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「制胜的瞬间 / Moment of Victory」: the aggro doubling, and the two properties its data backs, per rank.
+ * "制胜的瞬间 / Moment of Victory": the aggro doubling, and the two properties its data backs, per rank.
  *
  * <p>The sentence states no number for the aggro half; the data states the factor 2. The two property-backed halves are read
  * by the same rule that identified them -- a slot equal to an `ability_property` value belongs to it.
@@ -41,7 +41,7 @@ public class LightConeMomentTest {
         Assertions.assertEquals(0.16, defenceFive - defenceOne, 1e-9,
                 "defence is 40% at rank 5 and 24% at rank 1, over the base: " + defenceOne + " vs " + defenceFive);
 
-        // ⚠ Effect hit has NO base value (it is a pure percentage), so a ratio over the base is Infinity -- the raw
+        // Note: Effect hit has NO base value (it is a pure percentage), so a ratio over the base is Infinity -- the raw
         // value is the bonus itself, and the progression is asserted on that.
         double hitOne = raw(AttributeType.EFFECT_HIT_RATE, 1);
         double hitFive = raw(AttributeType.EFFECT_HIT_RATE, 5);

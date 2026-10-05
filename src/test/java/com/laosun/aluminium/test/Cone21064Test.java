@@ -21,7 +21,7 @@ import java.util.Random;
 /**
  * Light cone 21064: while the wearer casts an ELATION skill, every enemy takes more elation damage.
  *
- * <p>⭐ What makes it expressible: the cast's CATEGORY reaches the rules on {@code CAST_SETUP}, and `from_category
+ * <p>What makes it expressible: the cast's CATEGORY reaches the rules on {@code CAST_SETUP}, and `from_category
  * ELATION_DAMAGE` is the honest spelling -- `from_skill` reads a SKILL SLOT, and elation is a category the slot
  * vocabulary does not have. The reading is a ratio of the same elation instance before and after, so nothing else can
  * account for the difference.
@@ -40,7 +40,7 @@ public class Cone21064Test {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // ⚠ Crit chance pinned to 0: two hits otherwise differ by the crit roll (measured: 476.19 -> 714.29, exactly
+        // Note: Crit chance pinned to 0: two hits otherwise differ by the crit roll (measured: 46.19 -> 14.29, exactly
         // the 1.5 crit multiplier), and a judge that compares two hits must compare the same arithmetic.
         wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210640));
@@ -84,11 +84,11 @@ public class Cone21064Test {
 
 
     /**
-     * ★ The WIRING test: it casts for real, through {@code SkillExecutor}, so the line that hands the cast category to
+     * The WIRING test: it casts for real, through {@code SkillExecutor}, so the line that hands the cast category to
      * {@code CAST_SETUP} is covered -- the other cases fire the event by hand and therefore judge only the condition
      * (measured: neutralizing that line left them all green).
      *
-     * <p>⚠ The skill is built with {@code DefaultSkill} directly: an elation kit's slot 20/21 has no {@link com.laosun.aluminium.enums.SkillType},
+     * <p>Note: The skill is built with {@code DefaultSkill} directly: an elation kit's slot 20/21 has no {@link com.laosun.aluminium.enums.SkillType},
      * so the loader never asks for it (1513 / 8009 / 8010 all carry one). That is a TEST-side construction, not a new engine
      * accessor -- content does not need to reach the slot, only a judge that wants to exercise a real cast does.
      */

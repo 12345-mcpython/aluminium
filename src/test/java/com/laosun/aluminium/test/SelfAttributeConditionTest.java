@@ -22,26 +22,26 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code self_attr:<ATTRIBUTE>} — a numeric condition on <b>one of my own attribute values</b>.
+ * {@code self_attr:<ATTRIBUTE>} - a numeric condition on <b>one of my own attribute values</b>.
  *
  * <p><b>Why the vocabulary needed it.</b> The condition DSL could already ask about the event
  * ({@code hit_count}), about me ({@code hp_percent}) and about the event's subject
- * ({@code target_debuff_count}), but not about "how much of X do I have" — and that is the most common
+ * ({@code target_debuff_count}), but not about "how much of X do I have" - and that is the most common
  * conditional shape in the game's equipment: 13 of the planar-ornament 2-pieces read
- * 「当装备者的速度/暴击率/击破特攻/生命上限…大于等于 N 时」. The old names were a closed set of three; this one is
- * <b>parameterised</b> over {@link AttributeType}, which is already a validated closed set — so new content
+ * "当装备者的速度/暴击率/击破特攻/生命上限…大于等于 N 时". The old names were a closed set of three; this one is
+ * <b>parameterised</b> over {@link AttributeType}, which is already a validated closed set - so new content
  * needs a new attribute <em>name</em>, not a new engine change. That is the extensibility this exists for.
  *
  * <p><b>What is really being tested.</b> Three things that would each leave a rule which loads fine and
  * quietly does the wrong thing:
  * <ol>
- *   <li><b>The number is read at all</b> — a threshold just below and just at the wearer's value;</li>
+ *   <li><b>The number is read at all</b> - a threshold just below and just at the wearer's value;</li>
  *   <li><b>it is read off the rule's OWNER</b>, not off whoever caused the event. Every trigger table
  *       evaluates the event with itself as {@code self}, so a condition that read the <em>actor</em> would
- *       let one fast character's speed decide another character's buff — and the battle would look normal;</li>
+ *       let one fast character's speed decide another character's buff - and the battle would look normal;</li>
  *   <li><b>the units.</b> Flat attributes are absolute and ratio attributes are fractions, so
- *       {@code self_attr:SPEED >= 145} and {@code self_attr:CRIT_CHANCE >= 0.7} are the same shape on two
- *       different scales. Getting that wrong is a factor of 100 that fails <b>silently</b> — the trap
+ *       {@code self_attr:SPEED >= 145} and {@code self_attr:CRIT_CHANCE >= 0.} are the same shape on two
+ *       different scales. Getting that wrong is a factor of 100 that fails <b>silently</b> - the trap
  *       ROADMAP L-9 already records once.</li>
  * </ol>
  *
@@ -68,7 +68,7 @@ public class SelfAttributeConditionTest {
     private static final int TALIA = 307;
     /** 生命的翁瓦克: 能量恢复效率 +5%; SPD >= 120 -> 进入战斗时行动提前 40%. */
     private static final int SPRIGHTLY_VONWACQ = 308;
-    /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 70% -> 普攻与战技伤害 +20%. */
+    /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 0% -> 普攻与战技伤害 +20%. */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
 
     /** All seven, for the cases that make a claim about the whole authored batch. */
@@ -92,7 +92,7 @@ public class SelfAttributeConditionTest {
      * The attribute is read off the <b>owner</b>, not off whoever caused the event.
      *
      * <p>This is the case that would otherwise be invisible. The rule sits on the slow character; a fast
-     * character acts. If the condition read the actor, the slow character's buff would arrive — some other
+     * character acts. If the condition read the actor, the slow character's buff would arrive - some other
      * unit's speed deciding this unit's mechanics, with nothing in the log to say so.
      */
     @Test
@@ -122,8 +122,8 @@ public class SelfAttributeConditionTest {
     /**
      * A <b>ratio</b> attribute is compared as a fraction, not as a percentage.
      *
-     * <p>{@code self_attr:CRIT_CHANCE >= 0.7} is "70% crit rate or better". An author who writes
-     * {@code >= 70}, or an implementation that scaled the literal, fails here instead of in production —
+     * <p>{@code self_attr:CRIT_CHANCE >= 0.} is "0% crit rate or better". An author who writes
+     * {@code >= 0}, or an implementation that scaled the literal, fails here instead of in production - 
      * where the only symptom would be "this set bonus never seems to do anything". The flat counterpart is
      * asserted in the same case so both scales are on one page: 145 speed is written {@code 145}, and
      * {@code 1.45} is nonsense for it.
@@ -187,11 +187,11 @@ public class SelfAttributeConditionTest {
     /**
      * The prefix with nothing after it gets its own message, not "unknown attribute ''".
      *
-     * <p>⚠ This check is <b>redundant for correctness</b> — an empty name reaches
+     * <p>Note: This check is <b>redundant for correctness</b> - an empty name reaches
      * {@code AttributeType.fromString("")} and is rejected there too. What it buys is the diagnosis: the
      * generic path reports `reads unknown attribute ''`, which reads like a typo in a name that was never
      * written, and the author goes looking for a misspelling. So the assertion is on that message, not on
-     * "an exception was thrown" — a mutant that deletes the check would otherwise stay green, which is
+     * "an exception was thrown" - a mutant that deletes the check would otherwise stay green, which is
      * exactly what happened the first time this was run.
      */
     @Test
@@ -225,8 +225,8 @@ public class SelfAttributeConditionTest {
     /**
      * Each authored set states the attribute, the threshold and the numbers its own text states.
      *
-     * <p>Read back through the loader, and compared against the condition's own printed form — so a wrong
-     * number or a swapped attribute fails here rather than in a battle nobody is measuring. ⚠ The context
+     * <p>Read back through the loader, and compared against the condition's own printed form - so a wrong
+     * number or a swapped attribute fails here rather than in a battle nobody is measuring. Note: The context
      * owner must <b>satisfy</b> the threshold: {@code matching} evaluates the conditions, so a default
      * character would return no rules and the assertions would be about nothing.
      */
@@ -245,7 +245,7 @@ public class SelfAttributeConditionTest {
     }
 
     /**
-     * Set 302's bonus lands on the <b>whole party</b> — the wearer's speed gates it, everyone gets it.
+     * Set 302's bonus lands on the <b>whole party</b> - the wearer's speed gates it, everyone gets it.
      *
      * <p>The mistake this rules out is a missing {@code target: "all_allies"}: the rule would still fire on
      * the wearer's speed and still grant +8% ATK, so a solo test would pass while the ability quietly buffed
@@ -261,7 +261,7 @@ public class SelfAttributeConditionTest {
         Assertions.assertEquals(0.08, effect.getPercent(), EPS, "param #3 is 0.08");
     }
 
-    /** Set 301's conditional extra is `+12% ATK, for the rest of the battle` — the file's own numbers. */
+    /** Set 301's conditional extra is `+12% ATK, for the rest of the battle` - the file's own numbers. */
     @Test
     public void theAuthoredEffectsCarryTheNumbersFromTheText() {
         EffectSpec station = soleEffect(SPACE_SEALING_STATION, AttributeType.SPEED, 200);
@@ -301,7 +301,7 @@ public class SelfAttributeConditionTest {
      *
      * <p>These sets' first sentence ("ATK +12%") is a plain stat that {@code RelicSuit} already applies from
      * the effect's {@code properties}. Writing it as a rule as well would grant it twice, and the symptom
-     * would be "slightly more attack than the game gives" — a wrong number with nothing to see. So each file
+     * would be "slightly more attack than the game gives" - a wrong number with nothing to see. So each file
      * carries exactly one rule, on one event: the conditional half.
      */
     @Test
@@ -322,7 +322,7 @@ public class SelfAttributeConditionTest {
      * Set 308's action advance really moves the wearer's first turn.
      *
      * <p>{@code ADVANCE} pulls a unit forward by a fraction of the action value it still has to run, and the
-     * question this case settles is whether that means anything at {@code BATTLE_START} — the action bar is
+     * question this case settles is whether that means anything at {@code BATTLE_START} - the action bar is
      * built in {@code Battle}'s constructor, so by the time the event fires there is a real "time remaining"
      * to take 40% of, and the wearer's first turn must come measurably earlier than an identical character
      * without the set.
@@ -343,16 +343,16 @@ public class SelfAttributeConditionTest {
      * Wearing it for real: the conditional extra lands on top of the set's own stat, and only above the
      * threshold.
      *
-     * <p>Measured as the difference between two wearers of the <b>identical</b> suit — one above the
-     * threshold, one below — so the suit's main and sub affixes cancel out of the comparison and what is left
-     * is exactly the rule's contribution. ⚠ Comparing a <em>ratio</em> instead does not work: the affixes add
+     * <p>Measured as the difference between two wearers of the <b>identical</b> suit - one above the
+     * threshold, one below - so the suit's main and sub affixes cancel out of the comparison and what is left
+     * is exactly the rule's contribution. Note: Comparing a <em>ratio</em> instead does not work: the affixes add
      * a term of their own, so they do not cancel there (a first version assumed they did and measured 1.069
-     * where it expected 1.107 — the affixes are not negligible).
+     * where it expected 1.10- the affixes are not negligible).
      *
-     * <p>⚠ <b>This asserts direction, not magnitude, and that is deliberate.</b> The contribution is 12% of
+     * <p>Note: <b>This asserts direction, not magnitude, and that is deliberate.</b> The contribution is 12% of
      * the character's <em>base</em> ATK, and base ATK is not readable from outside: a relic-less character's
-     * resolved ATK (892.97 for 姬子 at 80) is already base × (traces' percentages), so the measured 90.81 is
-     * 12% of 756.76, not of 892.97 — the "panel ≠ base × multiplier" trap recorded in {@code engine.md} §22.
+     * resolved ATK (892.9for 姬子 at 80) is already base x (traces' percentages), so the measured 90.81 is
+     * 12% of 56.6, not of 892.9- the "panel != base x multiplier" trap recorded in {@code engine.md} §22.
      * The magnitude in the file is pinned exactly by {@link #theAuthoredEffectsCarryTheNumbersFromTheText}
      * instead, and the modifier arithmetic by the engine's own tests; what needs an end-to-end case is that
      * this condition lets the effect through <b>only</b> above its threshold.

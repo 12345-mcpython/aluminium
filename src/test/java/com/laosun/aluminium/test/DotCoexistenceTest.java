@@ -21,9 +21,9 @@ import java.util.Random;
  * What a repeating DOT <b>already</b> does (2026-09-28), measured because the gap list needed the truth.
  *
  * <p>GAPS #1 says "DOT stacking is blocked". That is only half true, and the half that is false matters: `DotBuff`'s
- * {@code isSameKind} answers {@code false}, so a second application of the same state is <b>not</b> evicted — the DOTs
+ * {@code isSameKind} answers {@code false}, so a second application of the same state is <b>not</b> evicted - the DOTs
  * coexist and (since every DOT is ticked) their damage adds up. What is really missing is the <b>cap</b>: a sentence like
- * 1108's 「风化状态最多叠加 5 层」 states a ceiling, and today nothing enforces one — the loader even forbids the field
+ * 1108's "风化状态最多叠加 5 层" states a ceiling, and today nothing enforces one - the loader even forbids the field
  * (`APPLY_DOT` calls `requireNoStackArguments`), because a *capped* stack needs a policy (refresh? extend? ignore past N?)
  * that no document fixes.
  *

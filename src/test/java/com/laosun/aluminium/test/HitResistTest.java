@@ -20,12 +20,12 @@ import java.util.Random;
  * P6-1 acceptance: effect hit rate and resistance.
  *
  * <pre>
- * chance to land = base chance × (1 + caster's hit rate) × (1 - target's resistance) × (1 - specific debuff resistance), clamp [0,1]
+ * chance to land = base chance  x  (1 + caster's hit rate)  x  (1 - target's resistance)  x  (1 - specific debuff resistance), clamp [0,1]
  * </pre>
  *
- * <p>All three factors are **multiplied** (it is not "hit rate minus resistance"). Anchors (ROADMAP):
- * base 1.0 + hit 0 + resist 0.3 → 0.7; with hit 0.5 → 1.0 (clamp);
- * base 0.8 + hit 0.25 + resist 0.2 → 0.8.
+ * <p>All three factors are multiplied (it is not "hit rate minus resistance"). Anchors (ROADMAP):
+ * base 1.0 + hit 0 + resist 0.3 to 0.; with hit 0.5 to 1.0 (clamp);
+ * base 0.8 + hit 0.25 + resist 0.2 to 0.8.
  */
 public class HitResistTest {
     private static final double EPS = 1e-9;
@@ -59,7 +59,7 @@ public class HitResistTest {
 
     /**
      * Specific debuff resistance: 冰锋's {@code debuff_resistance = {"STAT_CTRL_Frozen": 1}}
-     * → fully immune to freeze (chance 0), other effects are unaffected.
+     *  to fully immune to freeze (chance 0), other effects are unaffected.
      */
     @Test
     public void specificResistanceCanNullifyTheChance() {
@@ -73,7 +73,7 @@ public class HitResistTest {
                 "specific resistance 1.0 → the key factor (1-1) = 0 → fully immune");
 
         // note that 冰锋 itself also has 30% effect resistance (template 0.2 + level group 0.1), so "unaffected by
-        // the specific resistance" ≠ a chance of 1.0, it is 1.0 × (1 - 0.3) = 0.7
+        // the specific resistance" != a chance of 1.0, it is 1.0 x (1 - 0.3) = 0.
         Assertions.assertEquals(0.7,
                 newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_DOT_Burn"), EPS,
                 "a key that was not configured counts as 0 → only the generic 30% effect resistance is left");
@@ -83,7 +83,7 @@ public class HitResistTest {
     }
 
     /**
-     * A character's effect resistance comes from the stat sheet ({@code EFFECT_RESISTANCE}), and there is **no**
+     * A character's effect resistance comes from the stat sheet ({@code EFFECT_RESISTANCE}), and there is no
      * specific resistance table.
      */
     @Test
@@ -98,8 +98,8 @@ public class HitResistTest {
     }
 
     /**
-     * An enemy's effect hit rate **must make it onto the stat sheet**: {@code EnemyScaler} computed 0.32
-     * (group 1·Lv90), but early on {@code EnemyFactory} forgot to write it to the sheet, so the enemy's hit rate was
+     * An enemy's effect hit rate must make it onto the stat sheet: {@code EnemyScaler} computed 0.32
+     * (group 1-Lv90), but early on {@code EnemyFactory} forgot to write it to the sheet, so the enemy's hit rate was
      * always 0 (review report M-5).
      */
     @Test
@@ -123,7 +123,7 @@ public class HitResistTest {
      */
     @Test
     public void tryApplyDebuffGatesOnTheRoll() {
-        // guaranteed to land: hit 0, resist 0, base 1.0 → chance 1.0 (rng.nextDouble() < 1 is always true)
+        // guaranteed to land: hit 0, resist 0, base 1.0 to chance 1.0 (rng.nextDouble() < 1 is always true)
         Character caster = caster(0, 0);
         Enemy target = enemyWithResist(0, null);
         Battle battle = newBattle(caster, target);
@@ -132,7 +132,7 @@ public class HitResistTest {
                 "chance 1.0 → always attached");
         Assertions.assertTrue(target.getBuffManager().hasBuff(StunBuff.class));
 
-        // guaranteed to fail: 冰锋 is immune to freeze → chance 0.0
+        // guaranteed to fail: 冰锋 is immune to freeze to chance 0.0
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         Battle battle2 = newBattle(caster, iceEdge);
         Assertions.assertFalse(battle2.tryApplyDebuff(caster, iceEdge, new StunBuff(2), 1.0, "STAT_CTRL_Frozen"),
@@ -145,7 +145,7 @@ public class HitResistTest {
         Character caster = caster(0, 0);
         Enemy target = enemyWithResist(0.5, null);
 
-        // the same seed → the same sequence of results
+        // the same seed to the same sequence of results
         StringBuilder a = new StringBuilder();
         StringBuilder b = new StringBuilder();
         Battle first = new Battle(List.of(caster), List.of(target), new Random(7));

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * The damage base an HP- or DEF-scaled skill must use (2026-09-29, round 174).
+ * The damage base an HP- or DEF-scaled skill must use (2026-09-29, round 14).
  *
  * <p>Asserted on the MAPPING, not on a damage ratio: `loss / share` is the base times the settlement zones, so comparing it against a raw attribute
  * measures the zones rather than the base (the first version of this test did exactly that and failed for both characters). The behavioural claim is
@@ -23,7 +23,7 @@ public class DamageBaseTest {
     private static final int DANHENG = 1002;
     private static final int LEVEL = 80;
 
-    /** ⚠ 「等同于琳希#1[i]%生命上限的伤害」 -> HEALTH. */
+    /** Note: "等同于琳希#1[i]%生命上限的伤害" -> HEALTH. */
     @Test
     public void aMaxHpSentenceNamesMaxHp() {
         Character lynx = CharacterFactory.create(LYNX, LEVEL);
@@ -31,7 +31,7 @@ public class DamageBaseTest {
                 "「等同于…生命上限的伤害」");
     }
 
-    /** ⚠ 「等同于砂金100%防御力的伤害」 -> DEFENCE. */
+    /** Note: "等同于砂金100%防御力的伤害" -> DEFENCE. */
     @Test
     public void aDefenceSentenceNamesDefence() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -39,7 +39,7 @@ public class DamageBaseTest {
                 "「等同于砂金100%防御力的伤害」");
     }
 
-    /** ⚠ The ordinary case stays ATK: 「等同于丹恒100%攻击力」. */
+    /** Note: The ordinary case stays ATK: "等同于丹恒100%攻击力". */
     @Test
     public void anAttackSentenceStaysAttack() {
         Character danheng = CharacterFactory.create(DANHENG, LEVEL);

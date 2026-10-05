@@ -19,16 +19,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「若施放前目标被消灭则对<b>新入场</b>的敌方目标施放」 -- the selector `wave_monsters` (2026-10-02).
+ * "若施放前目标被消灭则对<b>新入场</b>的敌方目标施放" -- the selector `wave_monsters` (2026-10-02).
  *
- * <p>⭐ The word came out of the game's own data, not out of my head: `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens
+ * <p>The word came out of the game's own data, not out of my head: `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens
  * for `"Event": "OnWaveMonster"` and answers with a `TurnInsertAction` -- an enemy that entered WITH A WAVE. The engine already had waves
  * (`WaveManager` -> `Battle.beginWave`, the counter per-wave limits compare against), so the record is hung on that boundary.
  *
- * <p>⚠ The clearing point is load-bearing and was measured: `nextWave()` runs `waveIndex++` -> `spawnWave` -> `beginWave` -> `WAVE_START`,
+ * <p>Note: The clearing point is load-bearing and was measured: `nextWave()` runs `waveIndex++` -> `spawnWave` -> `beginWave` -> `WAVE_START`,
  * so forgetting the previous wave happens BEFORE the spawn; on `beginWave()` it would erase the wave that just arrived.
  *
- * <p>⭐ The scene is the real one `Cone23011Test` uses -- the generated multi-wave stage 310030 through `WaveManager.nextWave()` -- so the
+ * <p>The scene is the real one `Cone23011Test` uses -- the generated multi-wave stage 310030 through `WaveManager.nextWave()` -- so the
  * wiring is judged, not a hand-fired event.
  */
 public class WaveMonstersTest {

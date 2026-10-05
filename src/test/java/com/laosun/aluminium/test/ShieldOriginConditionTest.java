@@ -19,18 +19,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「在<b>战技提供的</b>护盾保护下的我方目标…」 — a shield is asked about by <b>which rule created it</b>, not just "is there one".
+ * "在<b>战技提供的</b>护盾保护下的我方目标…" - a shield is asked about by <b>which rule created it</b>, not just "is there one".
  *
- * <p><b>Why the DSL needed it.</b> 1001 三月七's 星魂 6 heals the shielded ally on their turn — but only through the shield
+ * <p><b>Why the DSL needed it.</b> 1001 三月七's 星魂 6 heals the shielded ally on their turn - but only through the shield
  * her <b>Skill</b> gives. She has two shields of her own (her Skill's and 星魂 2's at battle start), so a condition that
- * asked only "has a shield" — or even "a shield from 三月七" — would also heal through the 星魂 2 one for the three turns it
+ * asked only "has a shield" - or even "a shield from 三月七" - would also heal through the 星魂 2 one for the three turns it
  * lasts: a wrong number with nothing to report. So the shield remembers the rule that created it
  * ({@code CanHit.getShieldRuleId()}, stamped where every buff already gets its source) and the condition can require it:
  * {@code <who> has_shield from_rule <id>}.
  *
  * <p><b>What this file pins.</b> That the origin really distinguishes the two shields, that a raw grant answers "no"
- * (nothing created it), that plain {@code has_shield} is unchanged, that an id which resolves to nothing — or to a rule
- * that makes no shield — is refused at load, and that her file ships 星魂 6 with that condition.
+ * (nothing created it), that plain {@code has_shield} is unchanged, that an id which resolves to nothing - or to a rule
+ * that makes no shield - is refused at load, and that her file ships 星魂 6 with that condition.
  */
 public class ShieldOriginConditionTest {
     private static final double EPS = 1e-6;
@@ -49,7 +49,7 @@ public class ShieldOriginConditionTest {
                 "…and a different rule of hers is a different shield, even though the giver is the same");
     }
 
-    /** ⚠ The negative case stated the other way: with ONLY the battle-start shield up, the Skill's condition is false. */
+    /** Note: The negative case stated the other way: with ONLY the battle-start shield up, the Skill's condition is false. */
     @Test
     public void theBattleStartShieldDoesNotSatisfyIt() {
         Assertions.assertFalse(healFires(false, "skill_shield"),
@@ -63,7 +63,7 @@ public class ShieldOriginConditionTest {
         Assertions.assertTrue(healFires(true, ""), "…and so is the Skill's");
     }
 
-    /** ⚠ A shield nothing created (a raw grant) states no rule, so a {@code from_rule} question answers no. */
+    /** Note: A shield nothing created (a raw grant) states no rule, so a {@code from_rule} question answers no. */
     @Test
     public void aRawGrantHasNoOrigin() {
         Assertions.assertFalse(healFiresRaw(), "setShield states no rule, and guessing one would be worse");
@@ -75,7 +75,7 @@ public class ShieldOriginConditionTest {
         Assertions.assertTrue(healFiresRawWithPlainCondition());
     }
 
-    /** ⚠ An id that resolves to nothing is refused at load: a condition that can never hold must not load. */
+    /** Note: An id that resolves to nothing is refused at load: a condition that can never hold must not load. */
     @Test
     public void anUnknownRuleIdIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -85,7 +85,7 @@ public class ShieldOriginConditionTest {
         Assertions.assertTrue(refused.getMessage().contains("skill_shield"), "the message lists the ids it knows");
     }
 
-    /** ⚠ An id that names a rule which creates no shield is refused too — the condition could never hold. */
+    /** Note: An id that names a rule which creates no shield is refused too - the condition could never hold. */
     @Test
     public void anIdThatMakesNoShieldIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -111,7 +111,7 @@ public class ShieldOriginConditionTest {
      * Her file ships the clause, and the two shields really are told apart end to end.
      *
      * <p>The measurement is on her <b>real file</b> and her real HEAL: with the Skill's shield up the ally is healed on
-     * their turn; with only the battle-start shield (星魂 2's) up they are not — same battle shape, same eidolon rank.
+     * their turn; with only the battle-start shield (星魂 2's) up they are not - same battle shape, same eidolon rank.
      */
     @Test
     public void theShippedEidolonHealsOnlyThroughTheSkillsShield() {
@@ -130,7 +130,7 @@ public class ShieldOriginConditionTest {
     /**
      * Whether the condition-gated heal fires for an ally whose shield came from {@code ruleId}.
      *
-     * @param fromTheSkill {@code true} → the shield is installed by {@code skill_shield}; {@code false} → by
+     * @param fromTheSkill {@code true} to the shield is installed by {@code skill_shield}; {@code false} to by
      *                     {@code eidolon_shield}
      * @param asked        the rule the condition names ({@code ""} = the unqualified spelling)
      */
@@ -192,7 +192,7 @@ public class ShieldOriginConditionTest {
         ally.getBuffManager().addBuff(shield);
     }
 
-    /** A rule that gives {@code ruleId}'s shield to its owner's ally — the shape a shield rule has. */
+    /** A rule that gives {@code ruleId}'s shield to its owner's ally - the shape a shield rule has. */
     private static TriggerSpec shieldRule(String ruleId) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "SHIELD");
@@ -252,7 +252,7 @@ public class ShieldOriginConditionTest {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, 6);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(hero, ally), List.of(monster()), fixed());
-        // ⚠ Hurt the ally BEFORE the battle starts, so 星魂 2's lowest_hp_ally shield really lands on them (at full
+        // Note: Hurt the ally BEFORE the battle starts, so 星魂 2's lowest_hp_ally shield really lands on them (at full
         // HP everybody ties and the first in party order wins, which would be 三月七 herself).
         hurt(ally);
         ally.heal(ally.getMaxHp());

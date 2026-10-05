@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21001: 「敌方目标每承受 1 个负面效果，装备者对其造成的伤害提高 #1%，最多叠加 #2 层」 at superimposition 5 (24% x 3).
+ * Light cone 21001: "敌方目标每承受 1 个负面效果，装备者对其造成的伤害提高 #1%，最多叠加 #2 层" at superimposition 5 (24% x 3).
  *
  * <p>The expectation is built from the count the ENGINE reports, because that is what the clause counts -- and a fixture cannot assume how many debuffs a given
  * buff class contributes (measured: a `ControlBuff` contributes two).

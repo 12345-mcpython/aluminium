@@ -28,7 +28,7 @@ import java.util.Random;
  *
  * <p>Why it exists: until the merge of 2026-09-30, {@code modifyAttr} resolved {@code per_stack} itself and knew only
  * {@code target_debuff_count} plus a generic counter, so {@code self_stacks:...} fell through to
- * {@code stacksOf("self_stacks:...")} = 0 and the bonus vanished. ⚠ Red-proved: with the old formula in place this
+ * {@code stacksOf("self_stacks:...")} = 0 and the bonus vanished. Note: Red-proved: with the old formula in place this
  * test fails (after == before).
  */
 public class PerStackRuntimeTest {

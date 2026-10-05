@@ -20,17 +20,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code "target": "all_enemies"} — the first selector that reaches the <b>other</b> side as a group.
+ * {@code "target": "all_enemies"} - the first selector that reaches the <b>other</b> side as a group.
  *
  * <p><b>Why it had to exist.</b> Every group selector until now read {@code Battle.allies}:
  * {@code all_allies} / {@code party} / {@code other_allies} are the party, and {@code target} / {@code attacker}
- * are single units. So 「对敌方全体」 — a phrase in a large part of the corpus — had no spelling at all, and the only
+ * are single units. So "对敌方全体" - a phrase in a large part of the corpus - had no spelling at all, and the only
  * way to write it was to hit one enemy, which is a different mechanic. Its first reader is 姬子's Talent
- * (「对敌方全体目标造成等同于姬子140%攻击力的火属性伤害」, {@code HimekoChargeTest}); the same selector is what
- * 云璃's ultimate needs for 「使敌方全体陷入嘲讽状态」.
+ * ("对敌方全体目标造成等同于姬子140%攻击力的火属性伤害", {@code HimekoChargeTest}); the same selector is what
+ * 云璃's ultimate needs for "使敌方全体陷入嘲讽状态".
  *
- * <p>⚠ The failure this guards against is the mirror image: a group selector that read the wrong list would apply
- * 「敌方全体」 to <b>our own team</b>. The battle here has two enemies and our side at full HP for exactly that
+ * <p>Note: The failure this guards against is the mirror image: a group selector that read the wrong list would apply
+ * "敌方全体" to <b>our own team</b>. The battle here has two enemies and our side at full HP for exactly that
  * reason, and the assertion is on both.
  */
 public class AllEnemiesTargetTest {
@@ -59,10 +59,10 @@ public class AllEnemiesTargetTest {
     }
 
     /**
-     * Two enemies take the <b>same</b> instance, because 「全体」 is one effect that reaches each of them.
+     * Two enemies take the <b>same</b> instance, because "全体" is one effect that reaches each of them.
      *
      * <p>Identical monsters in identical state, so equal damage is the observable meaning of "the selector is a
-     * list and the op settles one instance per victim" rather than "the first one is the target". ⚠ Crit is switched
+     * list and the op settles one instance per victim" rather than "the first one is the target". Note: Crit is switched
      * off for the same reason: with a crit rate above 0 the two instances draw different numbers and the equality
      * would be about luck rather than about the selector.
      */
@@ -97,7 +97,7 @@ public class AllEnemiesTargetTest {
      * A group selector is still refused by an op that resolves <b>one</b> unit.
      *
      * <p>{@code EXTRA_TURN} takes a single actor; reaching several through it would have to pick one, silently. The
-     * closed set of selectors is not the same thing as "every op accepts every selector" — this is the other half.
+     * closed set of selectors is not the same thing as "every op accepts every selector" - this is the other half.
      */
     @Test
     public void aSingleTargetOpRefusesTheGroupSelector() {

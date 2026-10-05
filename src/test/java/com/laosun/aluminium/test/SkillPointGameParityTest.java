@@ -21,32 +21,32 @@ import java.util.function.Supplier;
 /**
  * Consistency cross-check between skill points and the game rules (P8-4 re-verification).
  *
- * <p>This class is **not** a functional test; it is a probe that "asks the engine one rule at a
+ * <p>This class is not a functional test; it is a probe that "asks the engine one rule at a
  * time": each entry notes the rule's source and the conclusion (consistent / inconsistent / not
  * implemented). Wherever the engine's behaviour differs from the rule, the assertion states the
- * **engine's current behaviour** and the comment marks the difference, so that next time nobody
+ * engine's current behaviour and the comment marks the difference, so that next time nobody
  * mistakes it for already aligned.
  *
  * <p><b>Rule sources (verified)</b>:
  * <ul>
- *   <li>Party-wide — "skill points are a party-wide shared resource" (9game skill point mechanics
+ *   <li>Party-wide - "skill points are a party-wide shared resource" (9game skill point mechanics
  *       explained);
- *   <li>Cap 5 / basic attack +1 — "each time a character uses a basic attack they restore one
+ *   <li>Cap 5 / basic attack +1 - "each time a character uses a basic attack they restore one
  *       skill point; the skill point cap is 5";
- *   <li><b>Start at 3</b> — the player Q&A states explicitly "normally every battle starts with
+ *   <li><b>Start at 3</b> - the player Q&A states explicitly "normally every battle starts with
  *       three skill points";
- *   <li>The start value is variable — this project's own {@code RELICS.md}: the 4-piece
+ *   <li>The start value is variable - this project's own {@code RELICS.md}: the 4-piece
  *       Passerby set "immediately restores 1 skill point for our side at the start of battle", so
  *       a team wearing it starts at 4 (5 if two characters wear it);
- *   <li>The cap is variable — Sparkle's talent "additionally increases the skill point cap by 2",
+ *   <li>The cap is variable - Sparkle's talent "additionally increases the skill point cap by 2",
  *       and in {@code WEAPONS.md} the Elation light cone "for each character on the Elation path,
  *       the skill point cap increases by 1, up to 3"; there is even a light cone whose trigger
- *       condition is "the skill point cap is greater than or equal to 6" → **the cap is not a
- *       constant 5**.
+ *       condition is "the skill point cap is greater than or equal to 6" to the cap is not a
+ *       constant 5.
  * </ul>
  *
- * <p>⚠ Note: this project's spec document {@code HSR.md} ({@code E:\code\blog\hsr\HSR.md})
- * **has no skill point section at all** — only one sentence in §6.1, "punchline: the counter above
+ * <p>Note: Note: this project's spec document {@code HSR.md} ({@code E:\code\blog\hsr\HSR.md})
+ * has no skill point section at all - only one sentence in §6.1, "punchline: the counter above
  * the skill points", mentions it. So the rule set above is reverse-engineered from the game
  * mechanics and the character documents, not given by the spec.
  */
@@ -57,16 +57,16 @@ public class SkillPointGameParityTest {
     // Consistent
     // ==================================================================
 
-    /** Rule: skill points are **party-wide shared**. Engine: the pool lives on {@code Battle}, not one per character. */
+    /** Rule: skill points are party-wide shared. Engine: the pool lives on {@code Battle}, not one per character. */
     @Test
     public void poolIsPartyWideNotPerCharacter() {
         Character a = CharacterFactory.create(1003, 80);
         Character b = CharacterFactory.create(1001, 80);
         Battle battle = newBattle(List.of(a, b));
 
-        // A spends 1 point, B spends 1 point — if the pool were "one per person", each deducting
+        // A spends 1 point, B spends 1 point - if the pool were "one per person", each deducting
         // their own would be indistinguishable.
-        // Here we spend with A and then look at the pool shown when **someone else** acts, to prove
+        // Here we spend with A and then look at the pool shown when someone else acts, to prove
         // it is the same pool.
         Assertions.assertTrue(battle.spendSkillPoint(), "A spends 1 point");
         Assertions.assertEquals(2, battle.getSkillPoints(), "the pool B sees also dropped by 1 → shared");
@@ -83,7 +83,7 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * Rule: **every battle starts over** (skill points are not inherited across battles).
+     * Rule: every battle starts over (skill points are not inherited across battles).
      *
      * <p>Engine: {@code skillPoints} is an instance field of {@code Battle}, so a new battle is
      * naturally 3.
@@ -101,9 +101,9 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * Rule: at 0 points a **skill cannot be cast** (the button greys out).
+     * Rule: at 0 points a skill cannot be cast (the button greys out).
      *
-     * <p>Engine: {@code performAction} returns false and does not queue → no damage.
+     * <p>Engine: {@code performAction} returns false and does not queue to no damage.
      * This one is consistent with the game (the game "cannot be clicked", the engine "returns false").
      */
     @Test
@@ -121,7 +121,7 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * Rule: an ultimate **does not spend** skill points. Engine consistent.
+     * Rule: an ultimate does not spend skill points. Engine consistent.
      */
     @Test
     public void ultimateDoesNotSpendPoints() {
@@ -143,13 +143,13 @@ public class SkillPointGameParityTest {
     // ==================================================================
 
     /**
-     * ⚠ <b>Inconsistent</b>: in the rule, the body of "basic attack +1" is a **normal attack that
-     * consumes 1 action's worth of action** — whereas the engine decides by
-     * {@code attack_type == "Normal"} — that is, it is correct that **techniques do not enter
-     * battle**, but {@code MazeNormal} (map basic attack) is excluded.
+     * Note: <b>Inconsistent</b>: in the rule, the body of "basic attack +1" is a normal attack that
+     * consumes 1 action's worth of action - whereas the engine decides by
+     * {@code attack_type == "Normal"} - that is, it is correct that techniques do not enter
+     * battle, but {@code MazeNormal} (map basic attack) is excluded.
      *
-     * <p>Engine's current behaviour: {@code MazeNormal} is **neutral** (+0). This is consistent with
-     * the game — a map basic attack is used **before entering battle**, when skill points do not
+     * <p>Engine's current behaviour: {@code MazeNormal} is neutral (+0). This is consistent with
+     * the game - a map basic attack is used before entering battle, when skill points do not
      * exist yet.
      * This probe's purpose is to pin down "why it is excluded", so that later nobody "casually"
      * counts all non-Normal attack types as +1.
@@ -169,12 +169,12 @@ public class SkillPointGameParityTest {
      * The two skill-point facts that are <b>still</b> constants: the party-level cap, and the basic attack's own
      * gain.
      *
-     * <p>⚠ This test used to be called {@code characterAndGearSkillPointModifiersAreNotImplemented} and listed six
-     * characters as evidence. <b>One of them is implemented now</b>: 布洛妮娅's Eidolon 1 (「施放战技时，有 50% 的固定概率
-     * 恢复 1 个战技点，该效果有 1 回合的触发冷却」) is authored in {@code characters/1101.json} as
+     * <p>Note: This test used to be called {@code characterAndGearSkillPointModifiersAreNotImplemented} and listed six
+     * characters as evidence. <b>One of them is implemented now</b>: 布洛妮娅's Eidolon 1 ("施放战技时，有 50% 的固定概率
+     * 恢复 1 个战技点，该效果有 1 回合的触发冷却") is authored in {@code characters/1101.json} as
      * {@code chance} + {@code cooldown} + {@code min_eidolon}, and pinned by {@code BronyaEidolonTest}. The other
-     * five still have no data, but they now have a <b>shape</b> — a rule on the trigger table that grants a point
-     * — so what is missing for them is their own numbers rather than engine machinery.
+     * five still have no data, but they now have a <b>shape</b> - a rule on the trigger table that grants a point
+     *  - so what is missing for them is their own numbers rather than engine machinery.
      *
      * <p>What is left here is the narrower claim this test actually asserts: no character can change the
      * party-level <b>cap</b>, and the basic attack's own gain stays {@code Constant.SKILL_POINT_GAIN_BASIC}.
@@ -196,23 +196,23 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * ⚠ <b>Known deviation</b>: the engine hands out +1 with a blanket
-     * {@code attack_type == "Normal"}, but in the game there are exceptions where **an enhanced
-     * basic attack does not restore a skill point**.
+     * Note: <b>Known deviation</b>: the engine hands out +1 with a blanket
+     * {@code attack_type == "Normal"}, but in the game there are exceptions where an enhanced
+     * basic attack does not restore a skill point.
      *
-     * <p>Evidence: {@code 1315_波提欧.md} "an enhanced basic attack **cannot restore a skill
-     * point**, and can only target an enemy in 【绝命对峙】". The enhanced basic attack of
-     * {@code 1213_丹恒•饮月.md}, on the other hand, **does not spend a skill point** ("casting this
+     * <p>Evidence: {@code 1315_波提欧.md} "an enhanced basic attack cannot restore a skill
+     * point, and can only target an enemy in [绝命对峙]". The enhanced basic attack of
+     * {@code 1213_丹恒-饮月.md}, on the other hand, does not spend a skill point ("casting this
      * skill does not consume a skill point and is not treated as using a skill").
      *
      * <p>Why it "happens to line up" right now: in this project's data the enhanced basic attacks
      * are also {@code "Normal"}, with no separate type (122 {@code Normal} entries measured =
-     * 93 characters × 1 + the multi-tier enhanced basic attacks of Dan Heng • Imbibitor Lunae /
+     * 93 characters  x  1 + the multi-tier enhanced basic attacks of Dan Heng - Imbibitor Lunae /
      * Jingliu / Qingque / Boothill), so the engine gives them +1. That is correct for Qingque
      * ({@code 1201_青雀.md} states explicitly "after casting an enhanced basic attack, restore
-     * 1 skill point") and **wrong** for Boothill.
+     * 1 skill point") and wrong for Boothill.
      *
-     * <p>⚠ But it **MUST NOT be changed to "enhanced basic attacks are always +0"**: that would
+     * <p>Note: But it MUST NOT be changed to "enhanced basic attacks are always +0": that would
      * break Qingque.
      * The real fix is "each skill carries its own skill point gain field", which is a data
      * completion task, not an engine logic problem.
@@ -233,13 +233,13 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * ⚠ <b>Not implemented</b>: the "starting skill point" of relics / light cones.
+     * Note: <b>Not implemented</b>: the "starting skill point" of relics / light cones.
      *
      * <p>{@code RELICS.md}: 4-piece Passerby set "at the start of battle, immediately restore
-     * 1 skill point for our side" → a team wearing it starts at 4 points (5 if two characters
+     * 1 skill point for our side" to a team wearing it starts at 4 points (5 if two characters
      * wear it).
-     * The engine's start value is always {@code SKILL_POINT_START}, and **relic set effects are not
-     * wired up at all** ({@code relic_sets.json} is not even loaded).
+     * The engine's start value is always {@code SKILL_POINT_START}, and relic set effects are not
+     * wired up at all ({@code relic_sets.json} is not even loaded).
      */
     @Test
     public void relicBattleStartSkillPointIsNotImplemented() {
@@ -249,14 +249,14 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * ⚠ <b>Worth noting</b>: the engine judges sides with
+     * Note: <b>Worth noting</b>: the engine judges sides with
      * {@link com.laosun.aluminium.enums.Camp}, not with "is this person player-controlled".
      *
-     * <p>Consequence: if **friendly summons / friendly NPCs** are added later (memosprites are
+     * <p>Consequence: if friendly summons / friendly NPCs are added later (memosprites are
      * P9-4; they are units on our side but not "characters"), and they act with {@code Normal},
-     * they **will also add skill points for our side**.
+     * they will also add skill points for our side.
      * In the game, memosprite actions can likewise provide skill points, so this behaviour is
-     * probably right — but it is currently a **side effect** rather than an explicit design, so it
+     * probably right - but it is currently a side effect rather than an explicit design, so it
      * is pinned down here.
      */
     @Test
@@ -274,7 +274,7 @@ public class SkillPointGameParityTest {
     // ==================================================================
 
     /**
-     * While controlled ({@code StunBuff}) it **can neither act nor have points deducted** — because
+     * While controlled ({@code StunBuff}) it can neither act nor have points deducted - because
      * {@code canAct()} blocks it first.
      *
      * <p>In the game, being controlled means skipping the turn, so naturally no skill point is
@@ -293,8 +293,8 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * Characters that do not produce an energy bar (the 6 that use special resources) are **still
-     * subject to the skill point constraint** — skill points are a party-level resource, unrelated
+     * Characters that do not produce an energy bar (the 6 that use special resources) are still
+     * subject to the skill point constraint - skill points are a party-level resource, unrelated
      * to an individual's energy bar / stack count.
      *
      * <p>In the game Acheron still has to spend skill points to cast a skill; consistent.

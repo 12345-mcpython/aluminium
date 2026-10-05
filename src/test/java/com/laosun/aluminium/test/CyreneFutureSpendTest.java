@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** 「持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】」 (2026-10-02). */
+/** "持有[未来]的我方目标行动时消耗[未来]使昔涟获得 1 点[追忆]" (2026-10-02). */
 public class CyreneFutureSpendTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;

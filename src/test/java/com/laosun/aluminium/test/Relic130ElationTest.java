@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 130's SECOND sentence (2026-09-30): 「每场战斗第一次施放**欢愉技**时，我方全体欢愉度 +10%」.
+ * Relic 130's SECOND sentence (2026-09-30): "每场战斗第一次施放欢愉技时，我方全体欢愉度 +10%".
  *
  * <p>matching() evaluates the conditions, so the category is actually tested: with an Elation cast the rule matches,
  * with a plain skill it must not. The spelling is ElationDamage -- the engine refused ELATION_DAMAGE and said "the

@@ -31,7 +31,7 @@ public class MydeiTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ With the technique declared the enemies are hit; without it, nothing happens at all. */
+    /** Note: With the technique declared the enemies are hit; without it, nothing happens at all. */
     @Test
     public void theTechniqueHitsOnlyWhenDeclared() {
         double declared = openingLoss(true);
@@ -41,7 +41,7 @@ public class MydeiTest {
         Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 -- undeclared, so nothing");
     }
 
-    /** ⚠ The number: 80% of his Max HP must be 1.6 of a hand-built 50% in the same pipeline. */
+    /** Note: The number: 80% of his Max HP must be 1.6 of a hand-built 50% in the same pipeline. */
     @Test
     public void theTechniqueDealsEightyPercentOfHisMaxHp() {
         double content = openingLoss(true);
@@ -52,7 +52,7 @@ public class MydeiTest {
                 "content " + content + " vs reference " + reference + " (expected " + (0.8 / 0.5) + ")");
     }
 
-    /** ⚠ The file declares the charge resource with the document's cap. */
+    /** Note: The file declares the charge resource with the document's cap. */
     @Test
     public void theFileDeclaresTheChargeResource() {
         try (InputStream stream = MydeiTest.class.getResourceAsStream("/characters/1404.json")) {

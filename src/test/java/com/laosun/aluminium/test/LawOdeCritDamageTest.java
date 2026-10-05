@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 23 「献予「律法」之诗」: 「持有【军功】的角色暴击伤害提高 #1%」 (2026-10-02).
+ * 1415's memosprite skill 23 "献予'律法'之诗": "持有[军功]的角色暴击伤害提高 #1%" (2026-10-02).
  *
- * <p>⭐ Nothing is replaced here. The mark 【军功】 is granted by 1412's OWN kit, so the judge casts her skill and lets the game do it -- an earlier version
+ * <p>Nothing is replaced here. The mark [军功] is granted by 1412's OWN kit, so the judge casts her skill and lets the game do it -- an earlier version
  * replaced her whole trigger table with a hand-built mark rule, which silently deleted the very rule under test (the table-replacement trap, again).
  *
- * <p>⭐ The reading is TWO-SIDED: the ally carrying the mark gains the crit damage, the ally without it gains nothing.
+ * <p>The reading is TWO-SIDED: the ally carrying the mark gains the crit damage, the ally without it gains nothing.
  */
 public class LawOdeCritDamageTest {
     private static final int LEVEL = 80;
@@ -42,7 +42,7 @@ public class LawOdeCritDamageTest {
         cerydra = battle.characters.get(1);
         plain = battle.characters.get(2);
 
-        // ⭐ HER OWN skill is what grants 【军功】 -- cast it at herself, and no table is ever replaced
+        // HER OWN skill is what grants [军功] -- cast it at herself, and no table is ever replaced
         var herSkill = cerydra.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(herSkill, "precondition: 1412 has a SKILL");
         SkillExecutor.execute(battle, herSkill, cerydra, List.of(cerydra));

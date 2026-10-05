@@ -15,15 +15,15 @@ import java.util.Random;
 /**
  * Her technique's +60% and her ult's +80% ATTACK must both count (1401, 2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN, three readings, and the two ratios are the claim: 1.6 with the technique alone, 2.4 with both.
- * `⚠ `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point, which is what the
+ * <p>FILE-DRIVEN, three readings, and the two ratios are the claim: 1.6 with the technique alone, 2.4 with both.
+ * `Note: `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point, which is what the
  * earlier attempt got wrong when it invented an `APPLY_BUFF` rule that never fired.
  */
 public class AttackStacking1401Test {
     private static final int OWNER = 1401;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ Both sources present means the two increments ADD (model-free: no share of the total is assumed). */
+    /** Both sources present means the two increments ADD (model-free: no share of the total is assumed). */
     @Test
     public void bothAttackSourcesAreCounted() {
         double plain = attack(false, false);

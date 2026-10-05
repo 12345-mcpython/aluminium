@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23027: break damage ignores 18% of the target's defence.
+ * Light cone 2302: break damage ignores 18% of the target's defence.
  *
- * <p>⭐ Read through the real break path, and ★ scoped by {@code damage_type: BREAK} -- so the judge also checks that an ordinary
+ * <p>Read through the real break path, and scoped by {@code damage_type: BREAK} -- so the judge also checks that an ordinary
  * hit is NOT given the same ignore (the same settlement, a normal damage instance, no boost from this cone).
  */
 public class Cone23027Test {

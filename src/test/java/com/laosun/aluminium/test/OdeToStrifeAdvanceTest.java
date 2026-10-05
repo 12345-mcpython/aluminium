@@ -17,16 +17,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 昔涟's memosprite 德谬歌, 忆灵技能 8 「献予「纷争」之诗」, the other half (2026-10-02):
+ * 1415 昔涟's memosprite 德谬歌, 忆灵技能 8 "献予'纷争'之诗", the other half (2026-10-02):
  *
- * <p>「若万敌<b>不</b>处于【血仇】状态，则使万敌<b>行动提前 100%</b>」 -- `#2` is 1 at every level, i.e. 100%.
+ * <p>"若万敌<b>不</b>处于[血仇]状态，则使万敌<b>行动提前 100%</b>" -- `#2` is 1 at every level, i.e. 100%.
  *
- * <p>⭐ The predicate is the existing `!`: `HasState` already implements `PartyCondition`, so `!self has_state <state>` is an ordinary
+ * <p>The predicate is the existing `!`: `HasState` already implements `PartyCondition`, so `!self has_state <state>` is an ordinary
  * negation and needed no new vocabulary. (An earlier round concluded the opposite from the loader's comments without trying it; the
  * class declaration is what settles it.)
  *
- * <p>⭐ The observable is the shipped one: `battle.queue.getTimeRemaining(signal)`, read exactly as `AglaeaMemospriteTest` reads it --
- * "how much action value the unit still has; zero means it acts now". The second case is the control: in 【血仇】 the OTHER branch runs
+ * <p>The observable is the shipped one: `battle.queue.getTimeRemaining(signal)`, read exactly as `AglaeaMemospriteTest` reads it --
+ * "how much action value the unit still has; zero means it acts now". The second case is the control: in [血仇] the OTHER branch runs
  * (the godslayer command) and his action value must not move.
  */
 public class OdeToStrifeAdvanceTest {
@@ -38,7 +38,7 @@ public class OdeToStrifeAdvanceTest {
     private static final double EPS = 1e-6;
     private static final String BLOODFEUD = "血仇";
 
-    /** Outside 【血仇】 he is advanced: his remaining action value collapses. */
+    /** Outside [血仇] he is advanced: his remaining action value collapses. */
     @Test
     public void outsideBloodfeudTheOdeAdvancesHim() {
         Character mydei = scene(false);
@@ -54,7 +54,7 @@ public class OdeToStrifeAdvanceTest {
                 "「则使万敌行动提前 #2[i]%」-- 100%, so his action value collapses toward zero");
     }
 
-    /** In 【血仇】 the other branch runs instead -- the two halves are mutually exclusive. */
+    /** In [血仇] the other branch runs instead -- the two halves are mutually exclusive. */
     @Test
     public void inBloodfeudItCommandsInsteadOfAdvancing() {
         Character mydei = scene(true);
@@ -76,7 +76,7 @@ public class OdeToStrifeAdvanceTest {
     private Battle battle;
     private Summon lastSummon;
 
-    /** The scene both cases share: 昔涟, 万敌 and her memosprite, with 【血仇】 stated or not. */
+    /** The scene both cases share: 昔涟, 万敌 and her memosprite, with [血仇] stated or not. */
     private Character scene(boolean inBloodfeud) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);

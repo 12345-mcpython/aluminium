@@ -72,8 +72,8 @@ public class Cone23009Test {
         Assertions.assertEquals(before + 0.24, afterHit, 1e-9, "being hit raises damage dealt by 24 points");
         // The wearer attacks: the buff must go away. A hand-built Damage does NOT fire the next_attack lifetime -- measured:
         // the boost stayed at 0.24 -- so the attack has to go through the skill path.
-        // ⚠ A BASIC attack, not the skill: 1205's skill grants a state and deals no damage, and the NEXT_ATTACK lifetime
-        // ends only when its OWNER actually attacks (AbstractBuff:173). Measured with the skill: the boost stayed at 0.24.
+        // Note: A BASIC attack, not the skill: 1205's skill grants a state and deals no damage, and the NEXT_ATTACK lifetime
+        // ends only when its OWNER actually attacks (AbstractBuff:13). Measured with the skill: the boost stayed at 0.24.
         battle.castImmediate(withCone.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON), withCone, List.of(enemy));
         double afterAttack = withCone.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[23009] after attacking: boost=" + afterAttack);

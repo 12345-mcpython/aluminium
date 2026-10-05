@@ -15,16 +15,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「等同于<b>原伤害</b> X%」 — the rider settles to the share the text states (2026-10-02).
+ * "等同于<b>原伤害</b> X%" - the rider settles to the share the text states (2026-10-02).
  *
  * <p>A {@code DAMAGE} effect's value is a <b>base</b>: settlement multiplies it by the instance's zones again, so a
  * scale that reads an already-settled amount has to divide by the triggering instance's own factor
  * ({@code toValue() / skillBaseValue}). Without that division a 40% share lands as 0.4 x the shared zone factor, which
  * is the kind of wrong number that looks entirely plausible.
  *
- * <p>⚠ The long detour this cost was <b>this judge's own fault</b>: an earlier version replaced the character's table
+ * <p>Note: The long detour this cost was <b>this judge's own fault</b>: an earlier version replaced the character's table
  * with a hand-built one to control variables, and that also dropped her {@code level_convention}, so the cast ran at the
- * Lv1 row while the rider used the full ATK — a clean factor 2 that read like a zone discrepancy. Both sides now run at
+ * Lv1 row while the rider used the full ATK - a clean factor 2 that read like a zone discrepancy. Both sides now run at
  * whatever level the character is actually at, and the assertion below is the one that would have caught it at once.
  */
 public class OriginalDamageRiderTest {
@@ -32,7 +32,7 @@ public class OriginalDamageRiderTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ A share lands as that share of what the triggering instance settled. */
+    /** A share lands as that share of what the triggering instance settled. */
     @Test
     public void theRiderSettlesTheShareTheTextStates() {
         double baseline = loss(0.0);
@@ -47,11 +47,11 @@ public class OriginalDamageRiderTest {
     }
 
     /**
-     * ⭐ 姬子's shipped 星魂 6, through her own file.
+     * 姬子's shipped 星魂 6, through her own file.
      *
-     * <p>⚠ <b>The baseline is NOT "her total damage at E0".</b> In the same battle another of her file's rules lands a
-     * 10764.438828 instance, so the E0 total (11482.69) is mostly damage this clause must <b>not</b> scale: 「原伤害」 is
-     * the damage of <b>that cast</b> -- the ultimate's own 718.255731 -- and the two guards ({@code damage_is_attack}
+     * <p>Note: <b>The baseline is NOT "her total damage at E0".</b> In the same battle another of her file's rules lands a
+     * 1064.438828 instance, so the E0 total (11482.69) is mostly damage this clause must <b>not</b> scale: "原伤害" is
+     * the damage of <b>that cast</b> -- the ultimate's own 18.25531 -- and the two guards ({@code damage_is_attack}
      * and {@code from_skill ULTRA}) are what keep the clause off everything else. Reading the comparison the other way
      * round cost two rounds: the expectation was 0.8 x the total instead of 0.8 x what the ultimate itself settled.
      */

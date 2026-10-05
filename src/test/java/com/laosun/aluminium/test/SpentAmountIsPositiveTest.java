@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `amount_from_previous` gives the MAGNITUDE of what the previous effect moved (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」).
+ * `amount_from_previous` gives the MAGNITUDE of what the previous effect moved (2026-10-02; reader: 114151"每消耗 1% 溢出值…").
  *
- * ⭐ The two effects run in one rule, in order: a SPEND of 7, then a GAIN whose size is `amount_from_previous`. A spend arrives as a negative resource delta, so before this the
- * gain would have been handed -7. Two-sided: the same pair with a GAIN first must still read a positive 7.
+ * The two effects run in one rule, in order: a SPEND of , then a GAIN whose size is `amount_from_previous`. A spend arrives as a negative resource delta, so before this the
+ * gain would have been handed -. Two-sided: the same pair with a GAIN first must still read a positive .
  */
 public class SpentAmountIsPositiveTest {
     private static final int LEVEL = 80;
@@ -62,7 +62,7 @@ public class SpentAmountIsPositiveTest {
         battle.startBattle();
         battle.processRequests();
         spare = battle.characters.getFirst();
-        // ⭐ Room to grow AND something to spend: at the cap a gain credits nothing, and at zero a spend has nothing to take.
+        // Room to grow AND something to spend: at the cap a gain credits nothing, and at zero a spend has nothing to take.
         spare.getResources().register(SPENT, 200, 100);
         spare.getResources().register(MARK, 9999, 0);
         spare.setTriggerTable(table(spendFirst));

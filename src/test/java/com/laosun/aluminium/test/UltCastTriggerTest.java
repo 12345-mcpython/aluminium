@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code ULT_CAST} (P8-7 follow-up): the event an ultimate's "after the wearer uses their Ultimate"
+ * {@code ULT_CAST} (P8-follow-up): the event an ultimate's "after the wearer uses their Ultimate"
  * relic bonuses and talents subscribe to.
  *
  * <p>Before this, {@code ULT_CAST} was declared in {@link TriggerEvent} but had no emitter, so a rule
  * naming it was rejected at load time and no content could use it. It is now fired by
- * {@code SkillExecutor.broadcastSkillCast} — the single place a cast is broadcast — and "is this an
+ * {@code SkillExecutor.broadcastSkillCast} - the single place a cast is broadcast - and "is this an
  * ultimate" is read from the <b>parsed skill data</b> ({@code SkillCategory.ULTRA} from
  * {@code skills.json}'s {@code attack_type}), never from a skill's name or slot.
  *
@@ -34,7 +34,7 @@ import java.util.Random;
  * A hand-made table gives the event an <b>unmistakable numeric fingerprint</b>: each event's rule
  * grants a different number of skill points, and the battle is drained to 0 points before every cast.
  * {@code castImmediate} and {@code castUltra} do not go through the skill-point policy, so the point
- * count is a pure count of "which rules ran, how many times" — which is exactly what a contract test
+ * count is a pure count of "which rules ran, how many times" - which is exactly what a contract test
  * needs, and it works without touching the engine's internals.
  *
  * <p>The mutual exclusivity of the cast events is pinned here rather than only in the relic tests,
@@ -42,8 +42,8 @@ import java.util.Random;
  * this was" (see {@code TriggerTable}), so "when the wearer uses their Skill" can only avoid also
  * firing on the ultimate -- or on a basic attack -- if the events cannot both fire.
  *
- * <p><b>2026-09-27: the split is three-way, not two-way.</b> {@code SKILL_CAST} used to mean "any cast
- * that is not an ultimate", so 普攻 fired it too, and shipped content that says 「施放战技时」 (relic set
+ * <p><b>2026-09-2: the split is three-way, not two-way.</b> {@code SKILL_CAST} used to mean "any cast
+ * that is not an ultimate", so 普攻 fired it too, and shipped content that says "施放战技时" (relic set
  * 109's ATK buff, Robin's 模进乐段) silently fired on basic attacks. {@code BASIC_ATTACK} now carries
  * the basic attack, a map attack / technique / talent fires none of the three, and
  * {@code ALLY_ATTACK} is unchanged (every attack that lands, ultimate included).
@@ -65,9 +65,9 @@ public class UltCastTriggerTest {
     /**
      * The skill-point fingerprint of each event, all different so one number identifies the event.
      *
-     * <p>⚠ Kept small on purpose: the pool <b>caps at 5</b> ({@code Constant.SKILL_POINT_MAX}), so a
+     * <p>Note: Kept small on purpose: the pool <b>caps at 5</b> ({@code Constant.SKILL_POINT_MAX}), so a
      * combination whose sum exceeds 5 saturates and can no longer tell "one rule fired" from "two".
-     * That is why these are 1/2/3/4 and not, say, 1/2/4/8 — a lesson learned the hard way (8 + 4
+     * That is why these are 1/2/3/4 and not, say, 1/2/4/8 - a lesson learned the hard way (8 + 4
      * reported 5).
      */
     private static final int ULT_CAST_POINTS = 1;
@@ -87,7 +87,7 @@ public class UltCastTriggerTest {
                         + "is rejected at load time");
     }
 
-    /** One ultimate fires its {@code ULT_CAST} rule — exactly once, not once per hit. */
+    /** One ultimate fires its {@code ULT_CAST} rule - exactly once, not once per hit. */
     @Test
     public void ultCastFiresOncePerUltimate() {
         Battle battle = battleWith(rule("ULT_CAST", null, gainSkillPoint(ULT_CAST_POINTS)));
@@ -156,7 +156,7 @@ public class UltCastTriggerTest {
      *
      * <p>This pins the over-trigger that had shipped rather than a behaviour that was already right:
      * {@code SKILL_CAST} used to mean "any cast that is not an ultimate", so relic set 109
-     * (「施放战技时攻击力提高20%」) was handing out its ATK buff on 普攻 as well — and the note inside
+     * ("施放战技时攻击力提高20%") was handing out its ATK buff on 普攻 as well - and the note inside
      * that file claimed the emitter's split already covered it. The fingerprints (2 vs 4) say which
      * rule ran without touching the engine's internals.
      */
@@ -207,7 +207,7 @@ public class UltCastTriggerTest {
      *
      * <p>This is the half of the old behaviour that was <b>removed</b> rather than split: those
      * categories used to fall into {@code SKILL_CAST} (the {@code else} branch). A rule that needs one
-     * of them must ask for its own event, which is a loud load-time failure until it exists — better
+     * of them must ask for its own event, which is a loud load-time failure until it exists - better
      * than a rule that fires on something the text never mentioned.
      */
     @Test

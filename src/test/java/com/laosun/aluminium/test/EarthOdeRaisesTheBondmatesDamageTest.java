@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** 「当他持有【献予「大地」之诗】时，【同袍】造成的伤害提高 0.12%」 (2026-10-02). */
+/** "当他持有[献予'大地'之诗]时，[同袍]造成的伤害提高 0.12%" (2026-10-02). */
 public class EarthOdeRaisesTheBondmatesDamageTest {
     @Test
     public void theBondmateGainsTheSmallBoost() {
@@ -21,7 +21,7 @@ public class EarthOdeRaisesTheBondmatesDamageTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        // his own skill hands 【同袍】 to the one it is aimed at
+        // his own skill hands [同袍] to the one it is aimed at
         him = battle.characters.get(1);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, him.getSkills().get(SkillType.SKILL), him,
                 List.of(battle.characters.get(2)));

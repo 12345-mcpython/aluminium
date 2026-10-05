@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 行迹「医者」: 「娜塔莎<b>提供的</b>治疗量提高10%」 — the provider's side, read from the healer.
+ * 行迹"医者": "娜塔莎<b>提供的</b>治疗量提高10%" - the provider's side, read from the healer.
  *
  * <p>The reader is {@code OUTGOING_HEALING_BOOST}, which {@code Battle.heal} takes from the unit applying the heal, so the
  * number has to show up as a ratio between two healers healing the same kind of target by the same base amount. The
@@ -41,10 +41,10 @@ public class NatashaHealingBoostTest {
     /**
      * The healing the given healer computes for a fixed base amount.
      *
-     * <p>⚠ {@code Battle.heal} returns the HP <b>actually restored</b> and caps it at what is missing, so a first
+     * <p>Note: {@code Battle.heal} returns the HP <b>actually restored</b> and caps it at what is missing, so a first
      * version of this test damaged the target by half its HP and then compared two heals that were BOTH clipped to the
      * same 315 HP -- reading 1.0 and looking exactly like a boost that does not work. {@code calculateHeal} is the same
-     * formula ({@code base × (1 + outgoing) × (1 + taken)}) without that cap, which is the part the trace changes.
+     * formula ({@code base  x  (1 + outgoing)  x  (1 + taken)}) without that cap, which is the part the trace changes.
      */
     private static double computedHeal(int healerCid) {
         Character healer = CharacterFactory.create(healerCid, LEVEL);

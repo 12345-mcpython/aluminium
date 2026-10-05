@@ -40,7 +40,7 @@ LOAD_BLOCK = '''        // ⭐ The ACTOR's own attribute (2026-10-02; 1415 memos
 
 RUN_ANCHOR = "        if (effect.getScale().trim().startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {"
 RUN_BLOCK = '''        if (effect.getScale().trim().startsWith(TriggerTable.ACTOR_ATTR_PREFIX)) {
-            // ⭐ The unit the event is ABOUT (1415 memosprite skill 10: 「等同于德谬歌生命上限的 #1%」, and 德谬歌 is the actor of the
+            // ⭐ The unit the event is ABOUT (1415 memosprite skill 10: 「等同于德谬歌生命上限的 #1%", and 德谬歌 is the actor of the
             // memosprite skill). Before the attribute branch below, which reads the rule OWNER.
             CanHit subject = ctx.actor();
             if (subject == null) {

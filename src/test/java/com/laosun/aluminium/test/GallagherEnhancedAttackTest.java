@@ -17,11 +17,11 @@ import java.util.Random;
 /**
  * `DEALING_DAMAGE` carries the skill key (2026-09-28, round 121), verified through the shipped clause it was built for.
  *
- * <p>Gallagher's enhanced basic attack says 「并使目标攻击力降低15.00%，持续2回合」. That sentence cannot live on
- * `ALLY_ATTACK` — that event deliberately carries no aim — so it needed an event with <b>both</b> a target and the skill key.
+ * <p>Gallagher's enhanced basic attack says "并使目标攻击力降低15.00%，持续2回合". That sentence cannot live on
+ * `ALLY_ATTACK` - that event deliberately carries no aim - so it needed an event with <b>both</b> a target and the skill key.
  * `DEALING_DAMAGE` has the target, and this round taught its instance to carry the key.
  *
- * <p>⚠ Both preconditions are asserted first (round 109's lesson), and the deeper one too (round 113's): the swapped skill
+ * <p>Note: Both preconditions are asserted first (round 109's lesson), and the deeper one too (round 113's): the swapped skill
  * must actually LOAD, otherwise the attack does nothing at all and a failure below would be blamed on the wrong thing.
  */
 public class GallagherEnhancedAttackTest {
@@ -47,7 +47,7 @@ public class GallagherEnhancedAttackTest {
                 "「并使目标攻击力降低 15.00%，持续 2 回合」 — an ordinary basic attack would not have done this");
     }
 
-    /** ⚠ The negative control: the ordinary basic attack must NOT lower anything. */
+    /** Note: The negative control: the ordinary basic attack must NOT lower anything. */
     @Test
     public void theOrdinaryBasicAttackDoesNothing() {
         Fixture f = new Fixture();

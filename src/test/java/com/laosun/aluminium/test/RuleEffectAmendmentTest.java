@@ -20,10 +20,10 @@ import java.util.Random;
  * {@code MODIFY_RULE}'s <b>third form</b> (2026-09-28): raise another rule's effect <b>value</b> or <b>duration</b>,
  * rather than how often it runs.
  *
- * <p><b>The sentences that need it.</b> 1215 寒鸦 星魂 4 「终结技的持续时间额外增加1回合」 and 星魂 6 「天赋的伤害提高效果额外提高
- * 10%」 (30% → 40%). ⚠ Neither may be written as <i>a second rule with a bigger number</i>: same-kind modifiers
- * <b>refresh instead of stacking</b>, so the extra rule would replace the first — 0.1 instead of 0.4, or a duration that
- * stays at 2 — and nothing would look broken.
+ * <p><b>The sentences that need it.</b> 1215 寒鸦 星魂 4 "终结技的持续时间额外增加1回合" and 星魂 6 "天赋的伤害提高效果额外提高
+ * 10%" (30% to 40%). Note: Neither may be written as <i>a second rule with a bigger number</i>: same-kind modifiers
+ * <b>refresh instead of stacking</b>, so the extra rule would replace the first - 0.1 instead of 0.4, or a duration that
+ * stays at 2 - and nothing would look broken.
  *
  * <p><b>What is pinned here.</b> That the raised value is what the ops actually read, that a duration amendment is
  * installed on the named rule, that the hand-written copy carries <b>every</b> field, and that an amendment naming a
@@ -39,7 +39,7 @@ public class RuleEffectAmendmentTest {
     @Test
     public void theRaisedValueIsWhatTheOpUses() {
         double base = attackOf(new TriggerTable(CID, List.of(boostRule())), 0);
-        // ⚠ The amendment rule comes FIRST: rules of one event run in file order, so an amendment filed after the rule
+        // Note: The amendment rule comes FIRST: rules of one event run in file order, so an amendment filed after the rule
         // it amends would arrive too late to change anything (silently -- the value would simply stay at 30%).
         double withAmendment = attackOf(new TriggerTable(CID, List.of(percentAmendment(), boostRule())), 0);
         double expectedDelta = 0.1 * CharacterFactory.create(CID, LEVEL).getAttribute(AttributeType.ATTACK).get();
@@ -50,12 +50,12 @@ public class RuleEffectAmendmentTest {
     }
 
     /**
-     * The duration amendment is <b>what the effect gets</b>: a 2-turn state lasts 3 turns with 「额外增加1回合」.
+     * The duration amendment is <b>what the effect gets</b>: a 2-turn state lasts 3 turns with "额外增加1回合".
      *
-     * <p>⚠ This case exists because the previous version only asserted the amendment was <i>filed</i>, and deleting
-     * the code that <b>applies</b> it left the test green (measured mutation m2, 0 red) — a pin on the bookkeeping
+     * <p>Note: This case exists because the previous version only asserted the amendment was <i>filed</i>, and deleting
+     * the code that <b>applies</b> it left the test green (measured mutation m2, 0 red) - a pin on the bookkeeping
      * instead of on the behaviour. Getting it to fail took a harness detail worth recording: a {@code StateBuff} is a
-     * <b>late</b> buff, so its duration is counted down in {@code Battle.afterMove()}, not in {@code beforeMove()} —
+     * <b>late</b> buff, so its duration is counted down in {@code Battle.afterMove()}, not in {@code beforeMove()} - 
      * a turn is a move, and a test that only opens turns never runs anything out.
      */
     @Test
@@ -79,7 +79,7 @@ public class RuleEffectAmendmentTest {
     /**
      * Applies a 2-turn named state, runs that many complete turns of its owner, and reports whether it survived.
      *
-     * <p>⚠ Both halves of a move are needed: {@code beforeMove} ticks the EARLY buffs and {@code afterMove} the LATE
+     * <p>Note: Both halves of a move are needed: {@code beforeMove} ticks the EARLY buffs and {@code afterMove} the LATE
      * ones (a state is late), which is exactly what the first version of this case got wrong.
      */
     private static boolean afterOneFullTurn(int turns, boolean amended) {
@@ -116,12 +116,12 @@ public class RuleEffectAmendmentTest {
     }
 
     /**
-     * ⚠ The copy that applies an amendment must carry <b>every</b> field: a field forgotten there would be silently
+     * Note: The copy that applies an amendment must carry <b>every</b> field: a field forgotten there would be silently
      * dropped for exactly the firings that amend something (a wrong number with no symptom).
      */
     @Test
     public void theCopyCarriesEveryField() throws Exception {
-        // ⚠ The bean has getters but no setters (Gson fills it by reflection), so the fields are filled through the
+        // Note: The bean has getters but no setters (Gson fills it by reflection), so the fields are filled through the
         // same reflection helper the other data tests use -- and the comparison below is field-by-field through the
         // getters, which is what catches a field that `copy()` forgot.
         EffectSpec original = new EffectSpec();
@@ -156,7 +156,7 @@ public class RuleEffectAmendmentTest {
         }
     }
 
-    /** ⚠ Naming a rule that states no such field is refused at load: there would be no number to raise. */
+    /** Note: Naming a rule that states no such field is refused at load: there would be no number to raise. */
     @Test
     public void anAmendmentWithNothingToRaiseIsRefused() {
         EffectSpec instant = new EffectSpec();

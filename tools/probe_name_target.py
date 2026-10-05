@@ -20,7 +20,7 @@ for match in re.finditer(r"Set<String> TARGETS?\w*\s*=\s*Set\.of\((.*?)\);", bod
 for keyword in ("character:", "ally_with", "has_state", "by_id", "the_duke"):
     out.append("  keyword %-12s in the interpreter: %s" % (keyword, keyword in body))
 
-# 2. readers: 「使<name>获得」
+# 2. readers: "使<name>获得"
 corpus = "E:/turnbasedgamedata/aluminium_texts"
 NAMES = ["刻律德菈", "托帕", "景元", "灵砂", "昔涟", "风堇",
          "阿格莱雅", "遐蝶", "长夜月", "知更鸟"]

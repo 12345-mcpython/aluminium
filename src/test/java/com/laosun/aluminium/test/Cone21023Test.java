@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21023: at battle start, damage taken is reduced for 5 turns AND 「同时立即为我方全体回复等同于
- * 各自已损失生命值 30% 的生命值」.
+ * Light cone 21023: at battle start, damage taken is reduced for 5 turns AND "同时立即为我方全体回复等同于
+ * 各自已损失生命值 30% 的生命值".
  *
- * <p>⭐ 「各自」 is the whole point of the new `target_lost_hp` scale: the share is read per RECIPIENT, so a
+ * <p>"各自" is the whole point of the new `target_lost_hp` scale: the share is read per RECIPIENT, so a
  * full-HP ally heals nothing while a hurt one heals 30% of its own gap. Measuring both in one battle is what makes this
  * reading attributable.
  */

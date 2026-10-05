@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1306 Sparkle's talent: 「每层【幻相】使敌方全体受到的伤害提高 4.00%，持续 2 回合，最多叠加 3 层」.
+ * 1306 Sparkle's talent: "每层[幻相]使敌方全体受到的伤害提高 4.00%，持续 2 回合，最多叠加 3 层".
  *
  * <p>Judged on the COMPILED rules, and on the counter they depend on: the stacking rule must be there and the scaled zone must read the wearer's own counter.
  */
@@ -67,7 +67,7 @@ public class SparklePhantasmTest {
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, unit, enemy, 1, 0);
         double one = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.QUANTUM, DamageType.NORMAL, 1000));
         System.out.println("[1306] none=" + none + " oneLayer=" + one + " ratio=" + (one / none));
-        // ⚠ The measured ratio is 1.04 x 1.06, and the second factor is NOT this clause: the same event also fires
+        // Note: The measured ratio is 1.04 x 1.06, and the second factor is NOT this clause: the same event also fires
         // `talent_party_damage_on_spend`, which raises every ally's ALL_DAMAGE_TYPE_BOOST by 6%. Stating the product keeps the
         // assertion honest about what the fixture can see (the spec-level judge above isolates this clause).
         Assertions.assertEquals(1.04 * 1.06, one / none, 1e-6,

@@ -19,17 +19,17 @@ import java.util.Random;
  * Firing limits on a trigger rule: {@code cooldown} (in the owner's own turns), {@code per_turn} (a count
  * within one of them) and {@code once_per_battle}.
  *
- * <p><b>Why this vocabulary exists.</b> The game's rule text is full of 「该效果每回合只能触发1次」 /
- * 「该效果有1回合的触发冷却」 / 「单场战斗中只能触发1次」 / 「该效果每回合可触发<b>2</b>次」 — a per-rule limit is the
+ * <p><b>Why this vocabulary exists.</b> The game's rule text is full of "该效果每回合只能触发1次" /
+ * "该效果有1回合的触发冷却" / "单场战斗中只能触发1次" / "该效果每回合可触发<b>2</b>次" - a per-rule limit is the
  * difference between "Misha's counter counts attacks" and "Misha's counter counts attacks once per turn".
  * Without it a data author has to choose between over-triggering and not modelling the mechanic at all, and the
- * over-triggering version is a wrong number with nothing to see. ⚠ The last form is why {@code per_turn} is a
- * <b>count</b> and not a flag: 三月七's 天赋 counter is 「每回合可触发2次」, and {@code cooldown: 1} can only ever
+ * over-triggering version is a wrong number with nothing to see. Note: The last form is why {@code per_turn} is a
+ * <b>count</b> and not a flag: 三月七's 天赋 counter is "每回合可触发2次", and {@code cooldown: 1} can only ever
  * say "once".
  *
  * <p><b>Where the state lives, and why that is the whole design.</b> A trigger table is compiled once
  * and <b>cached per cid</b>, and relic rules are merged into the same table for every character wearing
- * them — so a counter stored on a rule would be shared by every wearer in every battle inside one JVM.
+ * them - so a counter stored on a rule would be shared by every wearer in every battle inside one JVM.
  * The counters therefore live on the combatant ({@code CanHit}), and a battle start clears them. Both
  * halves of that are pinned below ({@link #twoRulesWithTheSameSourceHaveIndependentLimits} and
  * {@link #startingABattleMakesEveryRuleReadyAgain}).
@@ -93,8 +93,8 @@ public class TriggerLimitTest {
      * The subtle half of "the owner's turns": a rule that reacts to <b>other people's</b> actions still
      * counts <b>its owner's</b> turns.
      *
-     * <p>This is what makes 「每回合只能触发1次」 mean "once on my turn" for a talent like Tingyun's
-     * "when the buffed ally kills someone" — the limit belongs to the character whose table it is, not
+     * <p>This is what makes "每回合只能触发1次" mean "once on my turn" for a talent like Tingyun's
+     * "when the buffed ally kills someone" - the limit belongs to the character whose table it is, not
      * to whoever happened to set the event off.
      */
     @Test
@@ -116,7 +116,7 @@ public class TriggerLimitTest {
     // 3. Per-turn count, counted in the owner's turns like the cooldown
     // ==================================================================
 
-    /** 「该效果每回合可触发2次」: the third firing in one turn is refused, the first two are not. */
+    /** "该效果每回合可触发2次": the third firing in one turn is refused, the first two are not. */
     @Test
     public void perTurnTwoLetsTheRuleFireTwiceInOneTurn() {
         Battle battle = battleWith(perTurn(2));
@@ -128,7 +128,7 @@ public class TriggerLimitTest {
         Assertions.assertEquals(2, battle.getSkillPoints(), "exactly two firings paid out");
     }
 
-    /** The count comes back on the owner's own turn — the same moment a cooldown is decremented. */
+    /** The count comes back on the owner's own turn - the same moment a cooldown is decremented. */
     @Test
     public void theTurnLimitComesBackOnTheOwnersOwnTurn() {
         Battle battle = battleWith(perTurn(2));
@@ -148,7 +148,7 @@ public class TriggerLimitTest {
      * Somebody else's turn does not hand the count back.
      *
      * <p>The mirror of {@link #otherPeoplesTurnsDoNotCountTheCooldownDown}, and the reason both limits are
-     * counted on the <b>owner</b>: 「每回合」 belongs to the character whose rule it is, not to whoever happened to
+     * counted on the <b>owner</b>: "每回合" belongs to the character whose rule it is, not to whoever happened to
      * set the event off.
      */
     @Test
@@ -167,7 +167,7 @@ public class TriggerLimitTest {
     }
 
     /**
-     * A per-turn cap and a once-per-battle cap are <b>cumulative</b> — unlike {@code cooldown}, which is
+     * A per-turn cap and a once-per-battle cap are <b>cumulative</b> - unlike {@code cooldown}, which is
      * refused next to {@code per_turn} because the two would each have to start counting at a different firing.
      */
     @Test
@@ -202,7 +202,7 @@ public class TriggerLimitTest {
     }
 
     /**
-     * Two rules may share one provenance string — {@code characters/1403.json} ships exactly that shape,
+     * Two rules may share one provenance string - {@code characters/1403.json} ships exactly that shape,
      * because one trace states two effects. Their limits must stay independent.
      */
     @Test
@@ -275,7 +275,7 @@ public class TriggerLimitTest {
     /**
      * A per-turn cap next to a cooldown is refused: once {@code per_turn > 1} the two limits would each have to
      * start counting at a different firing, and {@code cooldown: 1} is already the {@code per_turn: 1} case of
-     * the same limit — so the pair is never the only way to say something.
+     * the same limit - so the pair is never the only way to say something.
      */
     @Test
     public void aTurnLimitNextToACooldownIsRejectedAtLoadTime() {
@@ -331,7 +331,7 @@ public class TriggerLimitTest {
     }
 
     /**
-     * The same rule with a per-turn count: 「该效果每回合可触发 N 次」.
+     * The same rule with a per-turn count: "该效果每回合可触发 N 次".
      *
      * @param perTurn how many firings one of the owner's turns allows
      */
@@ -387,8 +387,8 @@ public class TriggerLimitTest {
     }
 
     /**
-     * Runs turns until {@code who} is the actor, then settles that turn's start — the moment a cooldown is
-     * counted down and a per-turn counter is cleared — and finishes the turn.
+     * Runs turns until {@code who} is the actor, then settles that turn's start - the moment a cooldown is
+     * counted down and a per-turn counter is cleared - and finishes the turn.
      *
      * <p>Delegates to {@link TestTurns} so the shield suite measures the same moment the same way.
      */

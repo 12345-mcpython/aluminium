@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** Cones 23037 (skill + ultimate damage after an ultimate) and 23034 (a stack for the skill's target). */
+/** Cones 2303(skill + ultimate damage after an ultimate) and 23034 (a stack for the skill's target). */
 public class ConeScopedBoostTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
@@ -53,8 +53,8 @@ public class ConeScopedBoostTest {
         for (var rule : unit.getTriggerTable().matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(unit, unit, unit, 0, 0))) {
             for (var effect : rule.effects()) {
-                // ⚠ getAttribute() is the SERIALIZED name (a String), not the enum: compare the document spelling.
-                // ⚠ getAttribute() is the ENUM name (SKILL_DAMAGE_BOOST), not the serialized spelling
+                // Note: getAttribute() is the SERIALIZED name (a String), not the enum: compare the document spelling.
+                // Note: getAttribute() is the ENUM name (SKILL_DAMAGE_BOOST), not the serialized spelling
                 // (skill_damage_boost) -- the same convention 21006's judge relies on.
                 if ("SKILL_DAMAGE_BOOST".equals(effect.getAttribute())
                         || "ULTIMATE_DAMAGE_BOOST".equals(effect.getAttribute())) {

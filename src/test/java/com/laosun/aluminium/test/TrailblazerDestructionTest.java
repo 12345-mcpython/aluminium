@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8001 Trailblazer (Destruction), from his own file (2026-09-29, round 177): ATK that stacks on weakness breaks.
+ * 8001 Trailblazer (Destruction), from his own file (2026-09-29, round 1): ATK that stacks on weakness breaks.
  *
  * <p>The case asserts the cap: two breaks give the full +40%, and a third changes nothing. Dropping `max_stacks` makes it red.
  */
@@ -24,7 +24,7 @@ public class TrailblazerDestructionTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层」. */
+    /** Note: "每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层". */
     @Test
     public void hisTalentStacksAttackOnBreaksAndStopsAtTwo() {
         Character tb = CharacterFactory.create(TB, LEVEL);

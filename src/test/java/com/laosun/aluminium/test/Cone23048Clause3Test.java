@@ -12,12 +12,12 @@ import java.util.List;
 /**
  * Cone 23048 clause 3 (2026-09-30): the FIRST reader of the aimed unit that CAST_SETUP now carries.
  *
- * <p>「After the wearer casts a skill on a single ally, the TARGET's skill damage rises」 needs one event that (a)
+ * <p>"After the wearer casts a skill on a single ally, the TARGET's skill damage rises" needs one event that (a)
  * carries the category, (b) fires BEFORE settlement, and (c) names the ally. No event had all three: SKILL_CAST names
  * the ally but fires after and is refused by from_category; CAST_SETUP had (a) and (b) with a null target. So the
  * engine gained (c) and this test pins the resulting rule.
  *
- * <p>⚠ target must stay `target` -- the ally the cast was aimed at. `self` would buff the wearer instead, which is
+ * <p>Note: target must stay `target` -- the ally the cast was aimed at. `self` would buff the wearer instead, which is
  * the wrong sentence, so the sweep flips it.
  */
 public class Cone23048Clause3Test {

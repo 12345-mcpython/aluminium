@@ -34,7 +34,7 @@ public class TestSkillGroup1 {
         }
     }
 
-    // Provides a single ally with a shield that can offset damage equal to March 7th's
+    // Provides a single ally with a shield that can offset damage equal to March th's
     // #1% DEF + #4, lasting #2 turn(s). If that target's current HP percentage is greater than or
     // equal to #3, the chance of being attacked by enemies increases by #5%.
 }

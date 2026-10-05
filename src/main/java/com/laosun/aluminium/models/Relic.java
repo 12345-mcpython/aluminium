@@ -28,9 +28,9 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * <p>Multiple creation paths are supported:
  * <ul>
- *   <li>{@link #createRandomLevelZero} — generates a random level-0 relic</li>
- *   <li>{@link #createBySetting} — reconstructs a relic from a JSON/object specification</li>
- *   <li>{@link Builder} — fluent builder for precise control</li>
+ *   <li>{@link #createRandomLevelZero} - generates a random level-0 relic</li>
+ *   <li>{@link #createBySetting} - reconstructs a relic from a JSON/object specification</li>
+ *   <li>{@link Builder} - fluent builder for precise control</li>
  * </ul>
  */
 @Getter
@@ -70,8 +70,8 @@ public class Relic implements Cloneable {
      * The relic set this piece belongs to, or {@link Constant#RELIC_SET_NONE} when it belongs to none.
      *
      * <p>Only {@link RelicSuit} uses this: it is the key that turns "six relics are equipped" into "four of
-     * them are set 102, so set 102's 4-piece bonus applies". A relic built by hand — {@link #create}, or
-     * {@link #createBySetting} (a {@code Setting} has no set id) — carries no set, which is the honest
+     * them are set 102, so set 102's 4-piece bonus applies". A relic built by hand - {@link #create}, or
+     * {@link #createBySetting} (a {@code Setting} has no set id) - carries no set, which is the honest
      * answer for a piece whose set nobody stated.
      */
     public int setId = Constant.RELIC_SET_NONE;

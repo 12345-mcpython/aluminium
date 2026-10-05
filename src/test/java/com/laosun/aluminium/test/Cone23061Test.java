@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23061: ANY of our characters spending 4 skill points inside ITS OWN turn grants the wearer 【闪耀王冠】.
+ * Light cone 23061: ANY of our characters spending 4 skill points inside ITS OWN turn grants the wearer [闪耀王冠].
  *
- * <p>⭐ This is the first consumer of two new pieces: {@code SKILL_POINT_SPENT} names its spender as the actor, and
+ * <p>This is the first consumer of two new pieces: {@code SKILL_POINT_SPENT} names its spender as the actor, and
  * {@code actor_stacks:<NAME>} reads that spender's counter from the WEARER's own rule. The discriminating readings are (a) the
  * spender being the ALLY rather than the wearer and (b) the same four spends split across two of the ally's turns.
  */

@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1504 不死途's 「【饲饵】存在时，敌方全体目标防御力降低 40%」, judged on a HAND-BUILT table.
+ * 1504 不死途's "[饲饵]存在时，敌方全体目标防御力降低 40%", judged on a HAND-BUILT table.
  *
- * <p>⚠ The table carries only the one rule under test. 1504's own file also has a talent that fires on
+ * <p>Note: The table carries only the one rule under test. 1504's own file also has a talent that fires on
  * {@code ALLY_ATTACK} and pays out a follow-up -- and <b>any</b> probe attack is an {@code ALLY_ATTACK}, so a probe run
  * against her real file measures the talent plus the aura (the first draft of this judge read 4.49x and blamed the
  * aura). With the talent out of the picture, the cut is the only thing between the two numbers.
  *
- * <p>⚠ The cut targets {@code all_enemies} and carries the state's name. So when the bait moves, the old enemy keeps
- * the cut -- because the NEW bait is out, and the sentence is 「【饲饵】存在时，敌方全体…」, i.e. it holds while a bait
+ * <p>Note: The cut targets {@code all_enemies} and carries the state's name. So when the bait moves, the old enemy keeps
+ * the cut -- because the NEW bait is out, and the sentence is "[饲饵]存在时，敌方全体…", i.e. it holds while a bait
  * exists at all, not only on the bait itself. What moves is the STATE; the cut is re-laid over the whole camp each cast.
  * That is why the second assertion below expects the cut to SURVIVE the move, not to disappear.
  */
@@ -37,7 +37,7 @@ public class BaitModifierLifetimeTest {
     private static void install(Character bait) {
         EffectSpec strip = new EffectSpec();
         TriggerSpecs.set(strip, "op", "REMOVE_STATE");
-        TriggerSpecs.set(strip, "buff", "饲饼_state");      // ⚠ read below, not typed twice
+        TriggerSpecs.set(strip, "buff", "饲饼_state");      // Note: read below, not typed twice
         EffectSpec cut = new EffectSpec();
         TriggerSpecs.set(cut, "op", "MODIFY_DAMAGE_TAKEN");
         TriggerSpecs.set(cut, "percent", 0.4);
@@ -62,7 +62,7 @@ public class BaitModifierLifetimeTest {
         Battle battle = new Battle(List.of(bait, ally), List.of(first, second), new Random() {
             @Override
             public double nextDouble() {
-                return 1.0;                       // ⚠ never crits: the subject is the cut, not the roll
+                return 1.0;                       // Note: never crits: the subject is the cut, not the roll
             }
         });
         battle.startBattle();

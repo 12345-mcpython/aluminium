@@ -16,14 +16,14 @@ import java.util.Random;
 /**
  * 终结技与秘技的 +30% 击破特攻都要算 (8005) (2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN, four readings, and SUPERPOSITION is the claim: with both sources present the two differences must add.
- * ⚠ `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point.
+ * <p>FILE-DRIVEN, four readings, and SUPERPOSITION is the claim: with both sources present the two differences must add.
+ * Note: `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point.
  */
 public class BreakingEffectStacking8005Test {
     private static final int OWNER = 8005;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ Both sources present means the two differences add. */
+    /** Both sources present means the two differences add. */
     @Test
     public void bothSourcesAreCounted() {
         double plain = read(false, false);

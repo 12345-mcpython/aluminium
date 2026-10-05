@@ -21,7 +21,7 @@ public class MishaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ Exactly 2 Energy per SKILL_POINT_SPENT, and an unrelated event grants nothing. */
+    /** Note: Exactly 2 Energy per SKILL_POINT_SPENT, and an unrelated event grants nothing. */
     @Test
     public void theTalentReturnsEnergyOnEverySkillPointSpent() {
         Character misha = CharacterFactory.create(MISHA, LEVEL);

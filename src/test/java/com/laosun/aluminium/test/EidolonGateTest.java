@@ -21,8 +21,8 @@ import java.util.Random;
  * <p><b>What an Eidolon is, in this engine.</b> Nothing but a number plus a gate: the mechanic itself is an
  * ordinary rule in {@code resources/characters/<cid>.json}, the assembly point hands the character a rank
  * ({@code CharacterFactory.create(..., eidolonRank)}), and the interpreter skips a rule whose
- * {@code min_eidolon} is above it. So {@code eidolons.json} — which has been generated all along and never
- * loaded — stays reference material: its text is what the rule's {@code source} cites, the same as a trace's.
+ * {@code min_eidolon} is above it. So {@code eidolons.json} - which has been generated all along and never
+ * loaded - stays reference material: its text is what the rule's {@code source} cites, the same as a trace's.
  *
  * <p>The cases below pin the two halves that could silently disagree: the gate reads the <b>rule owner's</b> rank
  * (not a teammate's, not a team-wide maximum), and the rank survives a copy (a copy is the same character, so an

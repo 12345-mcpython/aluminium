@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The first <b>content</b> readers of the round-75 pair, from the characters' own files (2026-09-28).
+ * The first <b>content</b> readers of the round-5 pair, from the characters' own files (2026-09-28).
  *
- * <p>「持有【伴舞】的我方目标…攻击处于弱点击破状态下的敌方目标后，会将本次攻击的削韧值转化为 1 次超击破伤害」 (8006) and 「结界持续期间，我方全体的
- * 弱点击破效率提高 50%」 (1321). The engine's own behaviour is pinned in {@link SuperBreakTest} and
+ * <p>"持有[伴舞]的我方目标…攻击处于弱点击破状态下的敌方目标后，会将本次攻击的削韧值转化为 1 次超击破伤害" (8006) and "结界持续期间，我方全体的
+ * 弱点击破效率提高 50%" (1321). The engine's own behaviour is pinned in {@link SuperBreakTest} and
  * {@link ToughnessBoostTest}; what is pinned here is that the <b>files</b> say it.
  *
- * <p>⚠ <b>The discipline this file exists to demonstrate</b>: never hard-code a monster id to mean "it is weak to X" —
+ * <p>Note: <b>The discipline this file exists to demonstrate</b>: never hard-code a monster id to mean "it is weak to X" - 
  * three earlier cases were burned by exactly that (a hard-coded enemy is simply not weak to the element a sentence needs,
  * and the toughness reduction is then zero with no error). Every enemy here is chosen by <b>asking it</b>
  * ({@code hasToughnessBar()} / {@code getStanceWeak()}), and a break uses the element the enemy itself declares.
@@ -34,7 +34,7 @@ public class SuperBreakContentTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
 
-    /** ⚠ Both gates are on the rule: the attacker carries 【伴舞】 and the target is 「处于弱点击破状态」. */
+    /** Note: Both gates are on the rule: the attacker carries [伴舞] and the target is "处于弱点击破状态". */
     @Test
     public void bothGatesAreOnTheRule() {
         Character harmony = CharacterFactory.create(HARMONY, LEVEL);
@@ -63,7 +63,7 @@ public class SuperBreakContentTest {
                 "the conversion rule is one of the file's DEALING_DAMAGE rules (2 since the skill extra-hits clause landed)");
     }
 
-    /** 1321's Skill hands the whole side the toughness boost — 「弱点击破效率提高 50%」. */
+    /** 1321's Skill hands the whole side the toughness boost - "弱点击破效率提高 50%". */
     @Test
     public void herSkillRaisesThePartysToughnessEfficiency() {
         Character bloom = CharacterFactory.create(BLOOM, LEVEL);
@@ -88,7 +88,7 @@ public class SuperBreakContentTest {
         return new TriggerTable.TriggerContext(owner, actor, target, 0, 0, null, battle);
     }
 
-    /** ⚠ An enemy that HAS a toughness bar and a weakness, found by asking rather than assumed. */
+    /** Note: An enemy that HAS a toughness bar and a weakness, found by asking rather than assumed. */
     private static Enemy enemyWithAToughnessBar() {
         for (int id = 1002010; id < 1002100; id++) {
             try {

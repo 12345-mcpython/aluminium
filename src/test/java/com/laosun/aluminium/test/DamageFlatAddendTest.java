@@ -17,17 +17,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「提高数值等同于&lt;某属性&gt;的 Y%」 rides the <b>base layer</b>, not the boost zone (ROADMAP M-55).
+ * "提高数值等同于&lt;某属性&gt;的 Y%" rides the <b>base layer</b>, not the boost zone (ROADMAP M-55).
  *
- * <p>The primitive: {@code Damage.addFlat(value)}. The decision it encodes — an absolute addend is added to the skill
- * multiplier <b>before</b> the zones, so it crits and is boosted exactly like the multiplier — is what these cases pin.
+ * <p>The primitive: {@code Damage.addFlat(value)}. The decision it encodes - an absolute addend is added to the skill
+ * multiplier <b>before</b> the zones, so it crits and is boosted exactly like the multiplier - is what these cases pin.
  * A percentage in the boost zone would be a different number whenever the instance's base differs from the attribute,
- * which is why 「伤害值提高」 cannot reuse {@code addBoost}.
+ * which is why "伤害值提高" cannot reuse {@code addBoost}.
  */
 public class DamageFlatAddendTest {
     private static final double EPS = 1e-6;
 
-    /** The addend survives the zone chain by being part of the base: 100 × 1.5 = 150, not 100 × 1.5 + 50. */
+    /** The addend survives the zone chain by being part of the base: 100  x  1.5 = 150, not 100  x  1.5 + 50. */
     @Test
     public void theAddendIsMultipliedByTheZonesLikeTheBase() {
         Damage damage = damage(100);
@@ -42,7 +42,7 @@ public class DamageFlatAddendTest {
                         + "spelling would have given 100 × 2.0 = 200");
     }
 
-    /** A boost is a percentage of the base; the addend is a value — so they are not interchangeable, and this is the pair. */
+    /** A boost is a percentage of the base; the addend is a value - so they are not interchangeable, and this is the pair. */
     @Test
     public void anAddendIsNotAPercentage() {
         Damage asAddend = damage(100);

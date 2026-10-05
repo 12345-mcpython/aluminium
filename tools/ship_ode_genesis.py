@@ -17,7 +17,7 @@ import io
 import json
 import sys
 
-CHARS = "src/main/resources/characters/8007.json"   # 开拓者•记忆: the sentence names it as the one the ode is cast ON
+CHARS = "src/main/resources/characters/8007.json"   # 开拓者-记忆: the sentence names it as the one the ode is cast ON
 SKILLS = "src/main/resources/data/skills.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 13                                            # data slot for SkillID 1141513 (SkillTriggerKey SkillCY01)

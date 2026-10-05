@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 108, 4 pieces: 「无视其 10% 防御力，若目标拥有量子属性弱点则额外无视 10%」 -- an INSTANCE-scoped modifier.
+ * Relic 108, 4 pieces: "无视其 10% 防御力，若目标拥有量子属性弱点则额外无视 10%" -- an INSTANCE-scoped modifier.
  *
  * <p>The clause is a property of the hit, so it is asserted on the damage instance the battle settles: 10% against any target, 20% against a Quantum-weak one.
  * The expected values come from `relic_sets.json`'s `param`.

@@ -7,15 +7,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * The decisive probe for the enhanced-attack path (2026-09-28, round 113) — <b>no engine change</b>, only questions.
+ * The decisive probe for the enhanced-attack path (2026-09-28, round 113) - <b>no engine change</b>, only questions.
  *
  * <p>Round 112 established that the condition and the context path are fine (`from_skill_id` matches a hand-built context),
  * which left the live path. Reading {@code SkillExecutor} showed the row id IS passed, so the remaining explanation is that
  * the skill {@code REPLACE_SKILL} builds carries <b>no data</b>: {@code SkillData.init} answers {@code EMPTY} when it cannot
  * find the row, an empty skill produces no hits, and {@code SkillExecutor} fires {@code ALLY_ATTACK} only when something was
- * hit — which is exactly the observed silence (no layer, no cost, no attack-down).
+ * hit - which is exactly the observed silence (no layer, no cost, no attack-down).
  *
- * <p>⚠ Why the earlier "precondition" passed anyway: {@code getSkillSlot()} returns the row id whether or not the data was
+ * <p>Note: Why the earlier "precondition" passed anyway: {@code getSkillSlot()} returns the row id whether or not the data was
  * found, so asserting the slot is <b>not</b> proof that the swapped skill can do anything. That is the lesson this class
  * exists to record: assert one level deeper than the identity.
  */
@@ -26,7 +26,7 @@ public class EnhancedSkillDataProbeTest {
     private static final int LUKA_ENHANCED_ROW = 111108;
     private static final int LEVEL = 10;
 
-    /** ⚠ The row exists in the data dump (130108 = Normal/SingleAttack), so a real row must load as NORMAL. */
+    /** Note: The row exists in the data dump (130108 = Normal/SingleAttack), so a real row must load as NORMAL. */
     @Test
     public void gallaghersEnhancedRowLoadsRealData() {
         Skill enhanced = new DefaultSkill(GALLAGHER, GALLAGHER_ENHANCED_ROW, LEVEL);
@@ -37,7 +37,7 @@ public class EnhancedSkillDataProbeTest {
                         + "⚠ It is why the two REPLACE_SKILL clauses were withdrawn: they installed a no-op.");
     }
 
-    /** The same question for 1111's 【直冲碎天拳】. */
+    /** The same question for 1111's [直冲碎天拳]. */
     @Test
     public void lukasEnhancedRowLoadsRealData() {
         Skill enhanced = new DefaultSkill(LUKA, LUKA_ENHANCED_ROW, LEVEL);
@@ -45,7 +45,7 @@ public class EnhancedSkillDataProbeTest {
                 "the same measured fact for 111108");
     }
 
-    /** ⚠ The positive half of the same question: the LOADER KEY is a slot, and slot 8 is the enhanced attack. */
+    /** Note: The positive half of the same question: the LOADER KEY is a slot, and slot 8 is the enhanced attack. */
     @Test
     public void theEnhancedAttackLoadsUnderItsSlot() {
         Assertions.assertEquals(SkillCategory.NORMAL, new DefaultSkill(GALLAGHER, 8, LEVEL).getData().getCategory(),

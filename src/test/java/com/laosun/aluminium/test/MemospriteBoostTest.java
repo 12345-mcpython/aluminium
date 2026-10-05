@@ -22,11 +22,11 @@ import java.util.Random;
 /**
  * The memosprite-SCOPED damage boost: `MEMOSPRITE_DAMAGE_BOOST`, judged through a memosprite's own damage.
  *
- * <p>⚠ Why the boost is granted by a synthetic rule rather than by a light cone: its real reader is 1413 长夜月's
- * 「我方忆灵造成的伤害为原伤害的120%/125%/130%/150%」, which still needs an enemy-count condition the vocabulary does not have.
+ * <p>Note: Why the boost is granted by a synthetic rule rather than by a light cone: its real reader is 1413 长夜月's
+ * "我方忆灵造成的伤害为原伤害的120%/125%/130%/150%", which still needs an enemy-count condition the vocabulary does not have.
  * The capability is what this class judges, and a synthetic grant adds no stats, so with-versus-without isolates it.
  *
- * <p>⚠ And why the gate is not `instanceof Summon`: the documents distinguish 忆灵 from ordinary 召唤物, so the predicate is
+ * <p>Note: And why the gate is not `instanceof Summon`: the documents distinguish 忆灵 from ordinary 召唤物, so the predicate is
  * "this attacker IS what its master's memospriteOf returns" -- pinned here directly.
  *
  * <p>Disciplines 55/56: the victim has ~900k HP, the fixture asserts the hit neither kills it nor empties its bar, and the
@@ -44,7 +44,7 @@ public class MemospriteBoostTest {
         double boosted = memospriteDamage(true);
         Assertions.assertTrue(plain > 0, "precondition: the memosprite landed a hit: " + plain);
         double ratio = boosted / plain;
-        // ⚠ Measured to the digit: this hit's boost zone holds nothing else, so the ratio IS 1 + BOOST (round 52's
+        // Note: Measured to the digit: this hit's boost zone holds nothing else, so the ratio IS 1 + BOOST (round 52's
         // compression was a NORMAL skill hit, whose zone already had contributions). A missing gate gives exactly 1.0.
         Assertions.assertEquals(1 + BOOST, ratio, 1e-9,
                 "a " + BOOST + " memosprite-scoped boost raises this hit by exactly that: "
@@ -67,7 +67,7 @@ public class MemospriteBoostTest {
     /** One hit by the memosprite, against a victim that cannot die, with or without the synthetic grant. */
     private static double memospriteDamage(boolean boosted) {
         Character master = CharacterFactory.create(SUMMONER, LEVEL);
-        // ⚠ Both runs must be equally free of SHIPPED content: 1413's talent is real now and fires at one enemy, and while
+        // Note: Both runs must be equally free of SHIPPED content: 1413's talent is real now and fires at one enemy, and while
         // the boosted run replaces the table, the plain run would keep it -- measured as 222.43 versus 219.46, i.e. the control
         // was contaminated by content rather than by the grant under test.
         master.setTriggerTable(new TriggerTable(9402, List.of()));
@@ -95,7 +95,7 @@ public class MemospriteBoostTest {
         Summon memosprite = battle.summonMemosprite(master);
         Assertions.assertNotNull(memosprite, "precondition: the 忆灵 is out");
         double before = enemy.getCurrentHp();
-        // ⚠ COMMON, not SKILL: a memosprite's stated attack is installed in its COMMON slot (MemospriteAttackTest:78).
+        // Note: COMMON, not SKILL: a memosprite's stated attack is installed in its COMMON slot (MemospriteAttackTest:8).
         battle.castImmediate(memosprite.getSkills().get(SkillType.COMMON), memosprite, List.of(enemy));
         double dealt = before - enemy.getCurrentHp();
         Assertions.assertFalse(enemy.isDeath(), "the judged hit must not kill the victim");

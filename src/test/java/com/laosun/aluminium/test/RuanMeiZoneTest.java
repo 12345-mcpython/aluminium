@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1303 阮•梅's zone: 「我方全体全属性抗性穿透提高25.00%」 for two of HER turns, plus 星魂 1's defence ignore on the same clock.
+ * 1303 阮-梅's zone: "我方全体全属性抗性穿透提高25.00%" for two of HER turns, plus 星魂 1's defence ignore on the same clock.
  *
- * <p>Both are stated on her Ultimate with `ticks_on: self`, because the document gives the zone her own clock (「自身每回合开始时
- * 结界持续回合数减1」) and nothing extra happens when it ends. Two ways: after the cast every ally reads both values, and before
+ * <p>Both are stated on her Ultimate with `ticks_on: self`, because the document gives the zone her own clock ("自身每回合开始时
+ * 结界持续回合数减1") and nothing extra happens when it ends. Two ways: after the cast every ally reads both values, and before
  * it they read nothing -- plus the eidolon's gate.
  */
 public class RuanMeiZoneTest {
@@ -44,9 +44,9 @@ public class RuanMeiZoneTest {
     }
 
     /**
-     * The zone's own clock, which the document gives her: 「自身每回合开始时结界持续回合数减1」.
+     * The zone's own clock, which the document gives her: "自身每回合开始时结界持续回合数减1".
      *
-     * <p>⚠ A WHOLE turn is `beforeMove()` AND `afterMove()`: the countdown is split into an early pass (beforeMove) and a
+     * <p>Note: A WHOLE turn is `beforeMove()` AND `afterMove()`: the countdown is split into an early pass (beforeMove) and a
      * late pass (afterMove) by `if (buff.isEarlyBuff != early) continue;`, and a stat modifier is a LATE buff. Driving only
      * beforeMove leaves the zone standing forever.
      */

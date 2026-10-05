@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The light-cone rule channel, through its first content: 「装备者施放普攻、战技或终结技攻击敌方目标后，分别获取一层【淘气值】」.
+ * The light-cone rule channel, through its first content: "装备者施放普攻、战技或终结技攻击敌方目标后，分别获取一层[淘气值]".
  *
  * <p>The clause carries no rank-varying magnitude, which is why it is the first one authored: the rank axis
  * (`EquipmentSkillConfig`'s `SkillID` + `Level`) is the channel's next step, and content that needs it is registered rather

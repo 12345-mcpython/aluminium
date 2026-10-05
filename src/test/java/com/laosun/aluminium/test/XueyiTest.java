@@ -24,7 +24,7 @@ public class XueyiTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The ratio, the wiring and the control. */
+    /** Note: The ratio, the wiring and the control. */
     @Test
     public void theTechniqueDealsEightyPercentOfHerAttack() {
         double content = openingLoss(0);

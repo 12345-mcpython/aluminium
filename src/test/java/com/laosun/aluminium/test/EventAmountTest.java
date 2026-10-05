@@ -18,21 +18,21 @@ import java.util.Random;
 /**
  * {@code times_from: "event_amount"} (2026-10-02): the REPEAT COUNT follows the triggering event.
  *
- * <p>⚠ The magnitude half was withdrawn the same day: {@code scale: "event_amount"} duplicated the spelling that already
+ * <p>Note: The magnitude half was withdrawn the same day: {@code scale: "event_amount"} duplicated the spelling that already
  * exists -- {@link EffectSpec}'s {@code amount_from_event} (+ {@code amount_percent}), used by four shipped rules
  * (1312 on {@code SKILL_POINT_SPENT}, 1505 twice on {@code ENERGY_GAINED}, 1506 on {@code RESOURCE_CHANGED}). A second
  * name for a thing the engine already had is exactly what this project refuses to keep. What is genuinely new is the
  * count: the existing field carries an AMOUNT, never a number of repetitions.
  *
- * <p>Readers (all with data files): 1408 「每消耗1点【毁伤】造成4次伤害」, 1510 「每消耗1点【源能】额外…1次30%」,
- * 1513 「每消耗1点【热意】…1次21%」.
+ * <p>Readers (all with data files): 1408 "每消耗1点[毁伤]造成4次伤害", 1510 "每消耗1点[源能]额外…1次30%",
+ * 1513 "每消耗1点[热意]…1次21%".
  */
 public class EventAmountTest {
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ Spending three points repeats the instance three times; spending none repeats it not at all. */
+    /** Spending three points repeats the instance three times; spending none repeats it not at all. */
     @Test
     public void theRepeatCountFollowsTheEvent() {
         double one = damage(1);
@@ -64,9 +64,9 @@ public class EventAmountTest {
         Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        // ⚠ `resource_changed:<name>` reads what the battle was TOLD changed, and the SUBJECT must be the enemy: with
-        // the carrier as the target, three repetitions were clamped by its own 1358-point health bar (1047 instead of
-        // 3 x 760.83).
+        // Note: `resource_changed:<name>` reads what the battle was TOLD changed, and the SUBJECT must be the enemy: with
+        // the carrier as the target, three repetitions were clamped by its own 1358-point health bar (104instead of
+        // 3 x 60.83).
         battle.noteChangedResource("充能");
         battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, owner, enemy, 0, -spent);
         battle.processRequests();

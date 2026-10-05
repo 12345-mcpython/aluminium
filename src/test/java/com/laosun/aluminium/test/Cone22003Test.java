@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 22003 (round 247, corrected in 248): the Max HP constant belongs to the engine's ability_property, not to us.
+ * Light cone 22003 (round 24, corrected in 248): the Max HP constant belongs to the engine's ability_property, not to us.
  *
  * <p>Writing it as a rule as well DOUBLE-COUNTED it: measured 4350.02 with the rule against 4060.02 without, i.e. our rule added a second 12%
  * on top of the one Weapon already grants. What is genuinely ours is the other half: after losing OR recovering HP, crit damage +18% for two

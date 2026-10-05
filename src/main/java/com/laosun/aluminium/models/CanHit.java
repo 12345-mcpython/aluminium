@@ -59,11 +59,11 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private int level = 80;
 
     /**
-     * This unit's aggro weight, or {@code 0} for "not stated — use the regular tier" ({@link Battle#aggroOf}).
+     * This unit's aggro weight, or {@code 0} for "not stated - use the regular tier" ({@link Battle#aggroOf}).
      *
      * <p>A {@link Character}'s own aggro comes from the character data (with the path as its fallback); this field
      * is what a unit with <b>no</b> character data can state instead. Its first user is a memosprite: the documents
-     * give servants a line of their own — 「ServantID 11413 · 仇恨: 125」 — and before this {@code aggroOf} answered the
+     * give servants a line of their own - "ServantID 11413 - 仇恨: 125" - and before this {@code aggroOf} answered the
      * 100 fallback for every summon, so an enemy picked its target as if the memosprite were an ordinary character
      * while the game makes it 25% more attractive.
      */
@@ -87,7 +87,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *
      * <p>Orthogonal to {@link #death}: an invulnerable target is still a legal target
      * (an AOE still "hits" it, for 0 damage) but {@code Battle.applyDamage} settles
-     * nothing on it — this is what keeps a transitioning boss from being 鞭尸.
+     * nothing on it - this is what keeps a transitioning boss from being 鞭尸.
      */
     @Setter
     private boolean invulnerable = false;
@@ -99,13 +99,13 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private double currentEnergy = 0;
 
     /**
-     * Energy cap (P3). {@code 0} = no energy bar (1407 遐蝶 is like this): {@link #hasEnergyBar()} is
+     * Energy cap (P3). {@code 0} = no energy bar (140遐蝶 is like this): {@link #hasEnergyBar()} is
      * {@code false}, no energy gain is ever credited, and there is no such thing as "casting the ultimate
      * at full energy".
      *
      * <p>The real caps come from {@code max_energy} in {@code character_data.json} (of the 93 characters
      * only 遐蝶 is null). Many are way off the common tier: 飞霄/白厄 12, 黄泉 9, 昔涟 24,
-     * 流萤/云璃/长夜月 240, 银枝/爻光 180, 阿格莱雅 350, 绯英 480 — see the P3-0 D table in ROADMAP.
+     * 流萤/云璃/长夜月 240, 银枝/爻光 180, 阿格莱雅 350, 绯英 480 - see the P3-0 D table in ROADMAP.
      */
     @Setter
     private double maxEnergy = 0;
@@ -124,8 +124,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *
      * <p>Never {@code null}, like {@code triggerTable}: a character with no stacks simply has an
      * empty manager, so call sites never null-check. This is what lets "stack instead of an energy
-     * bar" characters (Acheron's 【残梦】, Feixiao's 【飞黄】, Cyrene's 【追忆】…) work without a class
-     * of their own — the resource is data, the trigger table fills it, and the energy provider reads
+     * bar" characters (Acheron's [残梦], Feixiao's [飞黄], Cyrene's [追忆]…) work without a class
+     * of their own - the resource is data, the trigger table fills it, and the energy provider reads
      * it to decide whether the ultimate is available.
      */
     @Getter
@@ -136,13 +136,13 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *
      * <p><b>Why the counters live on the combatant and not on the rule.</b> A trigger table is compiled
      * once and <b>cached per cid</b>, and a relic set's rules are merged into the same table instance for
-     * every character wearing it — so a mutable field on a rule would be shared by every wearer, in every
+     * every character wearing it - so a mutable field on a rule would be shared by every wearer, in every
      * battle, for the life of the JVM. That is the leak this project keeps refusing to ship (see the
      * static caches registered as N-1). A combatant owns its own counters, and
      * {@link #onBattleStart(Battle)} clears them.
      *
      * <p>Deliberately without a getter: the maps are mutable, and they are reachable only through the
-     * four methods below, so nothing can tick or clear somebody else's limits by accident — the same
+     * four methods below, so nothing can tick or clear somebody else's limits by accident - the same
      * reasoning that made {@code Queue}'s exposed live heap a registered defect (L-5).
      */
     @Getter(AccessLevel.NONE)
@@ -153,7 +153,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * <p>Kept next to the cooldowns because it is the same kind of fact (battle state, per combatant, keyed by
      * the rule) and because both are cleared at the same moment: the start of this combatant's own turn. A
      * counter stored on the rule would be shared by every wearer of a relic set and by every battle in the JVM
-     * — the reason the cooldowns live here in the first place.
+     *  - the reason the cooldowns live here in the first place.
      */
     @Getter(AccessLevel.NONE)
     private final Map<String, Integer> triggerTurnUses = new HashMap<>();
@@ -187,7 +187,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
 
     /**
      * Per-battle <b>amendments to another rule's own numbers</b>, keyed by that rule's {@code id}
-     * (「天赋的反击效果每回合可触发的次数增加1次」 / 「冻结敌方目标的基础概率提高15%」).
+     * ("天赋的反击效果每回合可触发的次数增加1次" / "冻结敌方目标的基础概率提高15%").
      *
      * <p><b>Why the numbers live here and not on the rule.</b> Exactly like the firing limits above: a trigger table
      * is compiled once and cached per cid, and a relic set's rules are merged into the same instance for every wearer,
@@ -195,7 +195,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * a fact about <b>this combatant in this battle</b> ("I have 星魂 4 active"), so it is stored next to the counters
      * and reset with them.
      *
-     * <p>⚠ Two fields, not one: the two sentences raise two different things, and a single "delta" would make it
+     * <p>Note: Two fields, not one: the two sentences raise two different things, and a single "delta" would make it
      * impossible to say which. A rule can carry both (nothing in the corpus does).
      */
     @Getter(AccessLevel.NONE)
@@ -203,22 +203,22 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     @Getter(AccessLevel.NONE)
     private final Map<String, Double> ruleBaseChanceBonus = new HashMap<>();
     /**
-     * 「终结技的持续时间额外增加 1 回合」/「天赋的伤害提高效果额外提高 10%」: amendments to a named rule's own
+     * "终结技的持续时间额外增加 1 回合"/"天赋的伤害提高效果额外提高 10%": amendments to a named rule's own
      * <b>effect values</b> (2026-09-28).
      *
-     * <p>⚠ Kept separate from {@link #rulePerTurnBonus} / {@link #ruleBaseChanceBonus} because those two change how
-     * <i>often</i> a rule runs, while these change what it <i>does</i> — and unlike a second rule with a bigger number
+     * <p>Note: Kept separate from {@link #rulePerTurnBonus} / {@link #ruleBaseChanceBonus} because those two change how
+     * <i>often</i> a rule runs, while these change what it <i>does</i> - and unlike a second rule with a bigger number
      * (which would <b>replace</b> the first, since same-kind modifiers refresh rather than stack), these raise the one
      * that is already there.
      */
     private final Map<String, Double> ruleEffectPercentBonus = new HashMap<>();
-    /** The duration half of the same idea: 「持续时间额外增加 N 回合」. */
+    /** The duration half of the same idea: "持续时间额外增加 N 回合". */
     private final Map<String, Integer> ruleEffectTurnsBonus = new HashMap<>();
-    /** The cap half: 「可叠加上限提高 N 层」 — filed at battle start, so it is in place before any stack is attached. */
+    /** The cap half: "可叠加上限提高 N 层" - filed at battle start, so it is in place before any stack is attached. */
     private final Map<String, Integer> ruleEffectMaxStacksBonus = new HashMap<>();
 
     /**
-     * Per-battle <b>skill level raises</b> (M-32), keyed by slot: 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5, and the
+     * Per-battle <b>skill level raises</b> (M-32), keyed by slot: "战技等级+1""终结技等级+1" (1001 星魂 3/5, and the
      * same sentence in most characters' kits).
      *
      * <p><b>Why the raise lives here and not on the {@code Skill}.</b> The same reasoning as the rule amendments
@@ -235,7 +235,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private final Map<SkillType, Integer> skillLevelBonus = new HashMap<>();
 
     /**
-     * ⭐ Extra damage SEGMENTS per DATA SLOT (2026-10-02; reader: 1405's 「使其战技的伤害次数增加 3 次」, the ode of reason).
+     * Extra damage SEGMENTS per DATA SLOT (2026-10-02; reader: 1405's "使其战技的伤害次数增加 3 次", the ode of reason).
      *
      * <p>Keyed by the slot number because that is what `Skill.getSkillSlot()` answers with -- the same number `CAST_SKILL{skill_id}` names -- and a skill's hit count itself comes from the data's
      * description (see `SkillExecutor`'s BOUNCE branch), so this is how a rule adds to it at run time.
@@ -279,7 +279,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.camp = other.camp;
         this.level = other.level;
         this.skills = new EnumMap<>(other.skills);
-        // ⚠ Deep-clone the attribute sheet (H-6). `other.attributes.clone()` clones the ARRAY and
+        // Note: Deep-clone the attribute sheet (H-6). `other.attributes.clone()` clones the ARRAY and
         // nothing else, so every DoubleValue inside stayed the same object as the original's -- and
         // buffs mutate those objects in place (BoostDamageBuff.applyEffect calls addModifier on the
         // target's value), so a buff on one combatant showed up on the other's panel. DoubleValue.clone()
@@ -334,10 +334,10 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Replaces the {@link DoubleValue} at the given attribute index.
      *
      * <p>If what is replaced is {@code SPEED} and the value really changed, this notifies
-     * {@link #notifySpeedChanged()} — this is the **only trigger point** for "speed change → reorder the
-     * action bar" (P7 fix E2), so go through here to change speed (or call
+     * {@link #notifySpeedChanged()} - this is the only trigger point for "speed change to reorder the
+     * action bar" (Pfix E2), so go through here to change speed (or call
      * {@code notifySpeedChanged()} after modifying the {@code DoubleValue}),
-     * do **not** quietly change the speed attribute anywhere else.
+     * do not quietly change the speed attribute anywhere else.
      *
      * @param attributeType the attribute to set
      * @param value         the new value object
@@ -362,7 +362,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Callback fired when the speed attribute changes (P7 fix E2).
+     * Callback fired when the speed attribute changes (Pfix E2).
      *
      * <p>{@code Battle} points this at "reschedule this unit's action time" ({@code Queue.refreshSpeed})
      * when it is constructed. Before that, the {@code speed} cached by {@code Signal} was only refreshed at
@@ -393,19 +393,19 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * Current shield value (P6-3). {@code 0} = no shield.
      *
-     * <p>The shield is **drained before HP** ({@link #takeDamage(double)}), and it **does not stack**:
+     * <p>The shield is drained before HP ({@link #takeDamage(double)}), and it does not stack:
      * a new shield has {@code Battle.grantShield} overwrite the old value outright, with no addition.
      *
-     * <p>⚠ Read it through {@link #getShield()}; write it through {@link #setShield(double)} (a raw write that
+     * <p>Note: Read it through {@link #getShield()}; write it through {@link #setShield(double)} (a raw write that
      * installs nothing) or {@link #installShield(double, AbstractBuff)} (a timed shield that takes itself off
-     * again — see {@link com.laosun.aluminium.models.buff.ShieldBuff}).
+     * again - see {@link com.laosun.aluminium.models.buff.ShieldBuff}).
      */
     private double shield = 0;
 
     /**
      * Which buff installed the shield currently up, or {@code null} when nobody owns it (a raw grant, or none).
      *
-     * <p>A new shield overwrites the old one, and the old shield's buff expires later — at which moment
+     * <p>A new shield overwrites the old one, and the old shield's buff expires later - at which moment
      * "clear the shield" would be wrong: the shield standing there is somebody else's. The value alone cannot
      * tell the two apart (two shields of the same size look identical), so the installer is remembered.
      *
@@ -418,11 +418,11 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Who provided the shield currently up, and <b>which rule</b> created it, or {@code null} / {@code ""}.
      *
      * <p><b>Why the shield has to remember this.</b> Two sentences ask about the shield's origin, not its existence:
-     * 「在**战技提供的**护盾保护下的我方目标…」 (1001 三月七 星魂 6) and 「我方目标持有**装备者提供的**护盾时…」 (遗器 128's
-     * 4-piece). Neither can be answered from the number — 三月七's Skill shield and her 星魂 2 shield are both hers — so
+     * "在战技提供的护盾保护下的我方目标…" (1001 三月七 星魂 6) and "我方目标持有装备者提供的护盾时…" (遗器 128's
+     * 4-piece). Neither can be answered from the number - 三月七's Skill shield and her 星魂 2 shield are both hers - so
      * the pair is recorded when the shield is installed and read by the {@code has_shield from_rule …} condition.
      *
-     * <p>⚠ A raw {@link #setShield(double)} says "somebody set the number directly", so it clears both: a shield with
+     * <p>Note: A raw {@link #setShield(double)} says "somebody set the number directly", so it clears both: a shield with
      * no stated origin must not answer "yes" to a question about one.
      */
     private CanHit shieldProvider;
@@ -488,7 +488,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *
      * <p>This is the whole reason the installer is remembered: when a second shield overwrites the first, the
      * first one's buff is removed <b>before</b> the new shield is installed, and it must not clear a shield it
-     * never gave. A drained shield ({@code 0}) is not touched either — there is nothing to take off.
+     * never gave. A drained shield ({@code 0}) is not touched either - there is nothing to take off.
      *
      * @param installer the buff that is expiring
      * @return whether this call took the shield off
@@ -507,7 +507,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * How much of the last {@link #takeDamage(double)} was blocked by the shield (P6-3).
      *
-     * <p>Why it exists: the damage absorbed by the shield **is also damage dealt by this hit** — the return
+     * <p>Why it exists: the damage absorbed by the shield is also damage dealt by this hit - the return
      * value of {@code Battle.applyDamage} has to count "the part that went into the shield", otherwise
      * "hitting a shielded target" would show as dealing 0 damage (kill energy gain / the total damage of
      * the attack event would both be distorted). Every {@code takeDamage} overwrites it.
@@ -533,11 +533,11 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * The same, with the death decision left to the caller ({@code mayDie = false}, 2026-10-02).
      *
-     * <p><b>Why it exists.</b> 「受到**致命攻击**时不会陷入无法战斗状态，而是**回复**…」 needs the target to reach 0 HP and be asked about it
+     * <p><b>Why it exists.</b> "受到致命攻击时不会陷入无法战斗状态，而是回复…" needs the target to reach 0 HP and be asked about it
      * BEFORE it is dead -- a unit at full HP cannot be healed, so announcing the moment before the damage would make the answer a
      * no-op (that was this feature's first, wrong, attempt). With this overload {@code Battle.applyDamage} can drop the target to
      * 0, fire {@link com.laosun.aluminium.enums.TriggerEvent#LETHAL_DAMAGE}, and then call {@link #perish()} only if nothing
-     * answered -- which is exactly 「不会陷入无法战斗状态」.
+     * answered -- which is exactly "不会陷入无法战斗状态".
      */
     public boolean takeDamage(double damage, boolean mayDie) {
         lastShieldAbsorbed = 0;                      // clear it at the start of every settlement so a stale value cannot be read
@@ -548,7 +548,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
             double absorbed = Math.min(shield, damage);
             shield -= absorbed;
             damage -= absorbed;
-            // ⚠ This assignment MUST come **before any return**: when the shield eats all the damage the
+            // Note: This assignment MUST come before any return: when the shield eats all the damage the
             //   code below returns early, and missing this line would let the caller read a stale value
             //   from the previous hit (measured once: the returned damage came out doubled).
             lastShieldAbsorbed = absorbed;
@@ -578,17 +578,17 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * pinned consequence is that a summon which perishes keeps its HP, asserted by
      * {@code SummonTest.theMasterFallingTakesItsSummonWithIt}.
      *
-     * <p>⚠ <b>No kill reward is paid, but not for the reason it first looks like.</b> This method fires no
-     * events, and neither does {@link #takeDamage(double)} — the {@code HpLoss} / {@code Kill} events are
+     * <p>Note: <b>No kill reward is paid, but not for the reason it first looks like.</b> This method fires no
+     * events, and neither does {@link #takeDamage(double)} - the {@code HpLoss} / {@code Kill} events are
      * emitted by {@code Battle.applyDamage}, the pipeline's single settlement entry point. So the thing
-     * that actually keeps a vanishing minion from paying out 「每消灭 1 敌 +5 能量」 is that the callers of
+     * that actually keeps a vanishing minion from paying out "每消灭 1 敌 +5 能量" is that the callers of
      * this method run <b>outside that entry point</b> (the orphan sweep in
      * {@code Battle.removeDeadCombatants}). A future caller that wants a death to pay out must go through
      * {@code Battle.applyDamage} and settle real damage; calling this instead is the way to say "it left,
      * nobody killed it".
      *
      * <p>What the callers must still do, because this method cannot: take the unit out of the roster
-     * ({@code Battle.enemies}) and off the action bar. {@link #isDeath()} alone does not remove anybody —
+     * ({@code Battle.enemies}) and off the action bar. {@link #isDeath()} alone does not remove anybody - 
      * see {@code Battle.removeDeadCombatants}, the one place both happen together.
      *
      * <p>Idempotent; a combatant that is already dead stays dead (and keeps the HP it had).
@@ -604,11 +604,11 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param amount the amount to heal
      */
     /**
-     * Spends HP as a COST (2026-09-29): 「消耗等同于刃生命上限 30% 的生命值」.
+     * Spends HP as a COST (2026-09-29): "消耗等同于刃生命上限 30% 的生命值".
      *
-     * <p>⚠ Deliberately NOT {@code takeDamage}: a price, not an attack -- no shield absorbs it, no {@code HP_LOST} fires
-     * (the texts list them side by side: 「受到伤害<b>或</b>消耗生命值」), and it never kills.
-     * The floor is the documents' own: 「若当前生命值不足…当前生命值降低至 1 点」.
+     * <p>Note: Deliberately NOT {@code takeDamage}: a price, not an attack -- no shield absorbs it, no {@code HP_LOST} fires
+     * (the texts list them side by side: "受到伤害<b>或</b>消耗生命值"), and it never kills.
+     * The floor is the documents' own: "若当前生命值不足…当前生命值降低至 1 点".
      *
      * @return the HP actually spent
      */
@@ -650,18 +650,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * Credit one energy gain (the only entry point for energy growth in P3).
      *
-     * <p>Formula (HSR.md §3.3): {@code final energy gained = base energy gained × (1 + energy regeneration
+     * <p>Formula (HSR.md §3.3): {@code final energy gained = base energy gained  x  (1 + energy regeneration
      * rate%)}; when {@link EnergyGain#affectedByEfficiency()} is {@code false} the efficiency bonus does
      * not apply.
      *
      * @param gain the description of one energy gain
-     * @return the **actually credited amount** (after being truncated by the cap, not the theoretical gain)
+     * @return the actually credited amount (after being truncated by the cap, not the theoretical gain)
      */
     public double gainEnergy(EnergyGain gain) {
         if (gain == null || !hasEnergyBar()) {
             return 0;
         }
-        // A non-positive base is not a gain. ⚠ This guard deliberately keeps its original `<= 0` shape: it
+        // A non-positive base is not a gain. Note: This guard deliberately keeps its original `<= 0` shape: it
         // is NOT where NaN is refused -- `NaN <= 0` is false, so a NaN amount walks past it. That is caught
         // one step down at the product, which is written the way it is for exactly that reason. (Measured
         // while mutating: rewriting this line as `!(amount > 0)` changes no test's outcome, so it would have
@@ -734,7 +734,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Whether a rule limited to one firing per ATTACK may run now.
      *
      * <p>The sequence is {@code Battle.attackSequence()}: it counts finished attacks, so every instance of the attack in
-     * progress shares one value and the next attack gets a new one. ★ Kept beside the cooldown/per-turn state because
+     * progress shares one value and the next attack gets a new one. Kept beside the cooldown/per-turn state because
      * it is the same kind of fact (how often a rule has run) and is cleared with it.
      */
     public boolean isAttackLimitReady(String key, int attackSequence, int cap) {
@@ -789,14 +789,14 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Counts one of <b>this combatant's</b> turns off every cooldown, and clears every per-turn counter.
      *
      * <p>Called by {@code Battle.beforeMove} for the unit whose turn is beginning, just before the
-     * {@code TURN_START} rules fire — so {@code cooldown: 1} means "at most once per own turn", and a
-     * rule that fires on that turn's own event is not immediately blocked again. ⚠ The per-turn counters are
-     * cleared in the same breath, and for the same reason: 「每回合可触发 N 次」 counts <b>my</b> turns, so a rule
+     * {@code TURN_START} rules fire - so {@code cooldown: 1} means "at most once per own turn", and a
+     * rule that fires on that turn's own event is not immediately blocked again. Note: The per-turn counters are
+     * cleared in the same breath, and for the same reason: "每回合可触发 N 次" counts <b>my</b> turns, so a rule
      * reacting to other people's actions gets its N back when my own turn comes round.
      */
     /**
-     * Clears the firing limits of ONE rule (「施放终结技后重置该效果触发次数」, 2026-09-30;
-     * readers 1305, 1207, 1403). ⚠ Deliberately not {@link #resetTriggerLimits()}: that clears EVERY rule of
+     * Clears the firing limits of ONE rule ("施放终结技后重置该效果触发次数", 2026-09-30;
+     * readers 1305, 120, 1403). Note: Deliberately not {@link #resetTriggerLimits()}: that clears EVERY rule of
      * this combatant, and ULT_CAST carries unrelated rules too.
      */
     public void resetTriggerLimit(String key) {
@@ -839,7 +839,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param delta how many levels (a positive whole number)
      */
     /**
-     * ⭐ Adds {@code delta} damage segments to a data slot for the rest of the battle (2026-10-02). A NEGATIVE delta takes them back, which is how a reader states a duration.
+     * Adds {@code delta} damage segments to a data slot for the rest of the battle (2026-10-02). A NEGATIVE delta takes them back, which is how a reader states a duration.
      */
     public void raiseSkillHits(int slot, int delta) {
         if (slot <= 0 || delta == 0) {
@@ -863,8 +863,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * <b>The</b> level a skill is read at: its own level plus this battle's raises.
      *
-     * <p>⚠ <b>One resolver on purpose.</b> Three call sites read a parameter row from a level ({@code SkillExecutor}
-     * twice — damaging skills and generated effect tables — and {@code TriggerInterpreter.multiplierOf} for a
+     * <p>Note: <b>One resolver on purpose.</b> Three call sites read a parameter row from a level ({@code SkillExecutor}
+     * twice - damaging skills and generated effect tables - and {@code TriggerInterpreter.multiplierOf} for a
      * rule-driven {@code DAMAGE}), and they must never disagree: a skill whose damage came from level 11 while its
      * generated effect read level 10 would be a number nobody could explain from the file.
      *
@@ -875,10 +875,10 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         if (skill == null) {
             return 1;
         }
-        // ⚠ Which slot this skill is cannot be read off the skill: `getSkillSlot()` is the data's **int** index and
-        // `getData().getSkillType()` is a **String** (the data's spelling, e.g. "BPSkill"). The first version of this
-        // line passed the int into `Map<SkillType, Integer>.getOrDefault` — which compiles (the int boxes to Object)
-        // and always misses — so the raise was filed and never read, with every test still green on the map's own
+        // Note: Which slot this skill is cannot be read off the skill: `getSkillSlot()` is the data's int index and
+        // `getData().getSkillType()` is a String (the data's spelling, e.g. "BPSkill"). The first version of this
+        // line passed the int into `Map<SkillType, Integer>.getOrDefault` - which compiles (the int boxes to Object)
+        // and always misses - so the raise was filed and never read, with every test still green on the map's own
         // getter. The character's own map is the honest answer: the raise is keyed the way the skills are stored.
         SkillType slot = null;
         if (this instanceof Character character) {
@@ -919,7 +919,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Raises the base chance of the rule named {@code ruleId} by {@code delta} for this battle.
      *
      * @param ruleId the target rule's {@code id}
-     * @param delta  the extra probability, as a fraction of 1 ({@code 0.15} = 「提高15%」)
+     * @param delta  the extra probability, as a fraction of 1 ({@code 0.15} = "提高15%")
      */
     public void addRuleBaseChanceBonus(String ruleId, double delta) {
         if (ruleId == null || ruleId.isBlank()) {
@@ -985,7 +985,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Damage-settlement hook (P1-7), fired for both sides before the zones are multiplied.
+     * Damage-settlement hook (P1-), fired for both sides before the zones are multiplied.
      *
      * <p>The default relays to {@link BuffManager#onDamage(Battle, Damage)}, so buffs can inject
      * vulnerability (易伤) / reduction (减伤) / weakness (虚弱). Subclasses that override it (character
@@ -1001,7 +1001,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Attack-level hook (P1-9), broadcast to every ally once an attack is fully settled.
      *
      * <p>The default relays to {@link BuffManager#afterAttack(Battle, CanHit, CanHit, List, double)},
-     * so buffs like 知更鸟【协奏】/ 缇宝结界 can spawn additional damage (附加伤害) / true damage (真伤) off
+     * so buffs like 知更鸟[协奏]/ 缇宝结界 can spawn additional damage (附加伤害) / true damage (真伤) off
      * someone else's attack. Subclasses that override it <b>must call {@code super}</b>.
      */
     @Override
@@ -1017,7 +1017,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     // ==================================================================
 
     /**
-     * Skill cast (P8-6). **Fired for non-damaging skills too** — it is the trigger source for
+     * Skill cast (P8-6). Fired for non-damaging skills too - it is the trigger source for
      * healing / shielding / pure-buff skills.
      */
     @Override
@@ -1027,7 +1027,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Energy credited (P8-6). {@code actuallyAdded} is the **actual** credited value (after being truncated
+     * Energy credited (P8-6). {@code actuallyAdded} is the actual credited value (after being truncated
      * by the cap).
      */
     @Override
@@ -1036,7 +1036,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * HP loss (P8-6). {@code amount} is the **HP actually lost** (excluding what the shield absorbed).
+     * HP loss (P8-6). {@code amount} is the HP actually lost (excluding what the shield absorbed).
      */
     @Override
     public void onHpLoss(Battle battle, CanHit target, double before, double after,
@@ -1045,7 +1045,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Healing (P8-6). {@code actuallyHealed} is the **actual amount restored** (0 at full HP, in which case
+     * Healing (P8-6). {@code actuallyHealed} is the actual amount restored (0 at full HP, in which case
      * the event is not fired).
      */
     @Override
@@ -1054,7 +1054,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Kill (P8-6). Same definition as kill energy gain: it does **not** look at {@code countsAsAttack}
+     * Kill (P8-6). Same definition as kill energy gain: it does not look at {@code countsAsAttack}
      * (an additional-damage last hit counts too).
      */
     @Override
@@ -1079,7 +1079,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Skill point spent (P8-6). ⚠ It is **not** fired when skill points are insufficient and the action
+     * Skill point spent (P8-6). Note: It is not fired when skill points are insufficient and the action
      * does not go through.
      */
     @Override

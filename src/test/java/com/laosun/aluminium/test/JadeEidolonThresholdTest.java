@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1314 翡翠's 星魂 2: 「【当品】叠加至15层时，翡翠暴击率提高18%」 -- a threshold on the counter she now ships.
+ * 1314 翡翠's 星魂 2: "[当品]叠加至15层时，翡翠暴击率提高18%" -- a threshold on the counter she now ships.
  *
  * <p>Two ways, and the difference is the whole clause: with the technique her battle-start total is sixteen, so the
  * threshold holds; without it she has one layer, so nothing is stated.
@@ -29,7 +29,7 @@ public class JadeEidolonThresholdTest {
     public void sixteenLayersPassTheThresholdAndOneDoesNot() {
         double withTechnique = critChance(true);
         double without = critChance(false);
-        // ⚠ A difference, not an absolute: the unit carries the game's inherent +0.05 crit chance, so `get() - baseValue()`
+        // Note: A difference, not an absolute: the unit carries the game's inherent +0.05 crit chance, so `get() - baseValue()`
         // mixes the two (measured: 0.23 where the clause owns 0.18).
         Assertions.assertEquals(0.18, withTechnique - without, EPS,
                 "【当品】叠加至15层时，暴击率提高18%");

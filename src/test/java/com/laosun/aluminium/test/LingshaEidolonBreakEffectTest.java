@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1222 灵砂's 星魂 2: 「施放终结技后，使我方全体击破特攻提高40%，持续3回合」.
+ * 1222 灵砂's 星魂 2: "施放终结技后，使我方全体击破特攻提高40%，持续3回合".
  *
- * <p>Judged on a TEAMMATE (「我方全体」) as an ABSOLUTE +0.40, because BREAKING_EFFECT is a ratio attribute and a share lands as points on those (the
- * flat/ratio distinction measured in round 97).
+ * <p>Judged on a TEAMMATE ("我方全体") as an ABSOLUTE +0.40, because BREAKING_EFFECT is a ratio attribute and a share lands as points on those (the
+ * flat/ratio distinction measured in round 9).
  */
 public class LingshaEidolonBreakEffectTest {
     private static final int LINGSHA = 1222;

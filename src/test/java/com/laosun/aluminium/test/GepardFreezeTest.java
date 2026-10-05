@@ -16,12 +16,12 @@ import java.util.Random;
  *
  * <p><b>What the source said.</b> `Battle.hitChance` computes
  * <pre>baseChance * (1 + EFFECT_HIT_RATE) * (1 - EFFECT_RESISTANCE) * (1 - specific)</pre>
- * where `specific` is, for an enemy target, `enemy.getDebuffResist().getOrDefault(specificResistKey, 0.0)` — and the control's
+ * where `specific` is, for an enemy target, `enemy.getDebuffResist().getOrDefault(specificResistKey, 0.0)` - and the control's
  * key for 冻结 is its own resist key. The monster this project's fixtures use by default carries that key at <b>1.0</b>, so the
  * chance was clamped to <b>0</b> and the roll could never pass: the content was right, the enemy was immune.
  *
  * <p><b>What makes it deterministic now.</b> A hand-made target with no resistances at all, plus eidolon 1's +35% base chance on
- * top of the 65% in the document — i.e. exactly 100%, against 0 hit-rate and 0 resistance. The freeze then lands whatever
+ * top of the 65% in the document - i.e. exactly 100%, against 0 hit-rate and 0 resistance. The freeze then lands whatever
  * `rng` returns, so this single case verifies the control, its per-turn payload, the base-chance amendment, and the choice of
  * target all at once.
  */
@@ -29,7 +29,7 @@ public class GepardFreezeTest {
     private static final int GEPARD = 1104;
     private static final int LEVEL = 80;
 
-    /** ⚠ E1 (65% + 35% = 100%) against a target with no resistances: deterministic, and it proves the whole chain. */
+    /** Note: E1 (65% + 35% = 100%) against a target with no resistances: deterministic, and it proves the whole chain. */
     @Test
     public void hisFreezeLandsOnAnUnresistingTarget() {
         Fixture f = new Fixture(1);
@@ -41,7 +41,7 @@ public class GepardFreezeTest {
                 "「有65%的基础概率使受到攻击的敌方目标陷入冻结状态」 + 星魂 1 的 +35% ⇒ 100% base chance");
     }
 
-    /** ⚠ The control carries its own per-turn payload: 「冻结状态下…每回合开始时受到…冰属性附加伤害」. */
+    /** Note: The control carries its own per-turn payload: "冻结状态下…每回合开始时受到…冰属性附加伤害". */
     @Test
     public void theFreezeCarriesItsPerTurnDamage() {
         Fixture f = new Fixture(1);
@@ -55,7 +55,7 @@ public class GepardFreezeTest {
                 "「冻结状态下，敌方目标不能行动同时每回合开始时受到等同于杰帕德60%攻击力的冰属性附加伤害」");
     }
 
-    /** At E0 the chance is the document's 65%, so a roll of 0.0 still lands — the amendment is not what makes it pass. */
+    /** At E0 the chance is the document's 65%, so a roll of 0.0 still lands - the amendment is not what makes it pass. */
     @Test
     public void atEidolonZeroTheDocumentChanceApplies() {
         Fixture f = new Fixture(0);

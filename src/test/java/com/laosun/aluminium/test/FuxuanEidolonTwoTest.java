@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1208：「【穷观阵】开启时，若我方目标受到致命伤害…立即回复等同于其自身生命上限 70% 的生命值。
- * 该效果单场战斗中可以触发 1 次」 (2026-10-02).
+ * 1208："[穷观阵]开启时，若我方目标受到致命伤害…立即回复等同于其自身生命上限 0% 的生命值。
+ * 该效果单场战斗中可以触发 1 次" (2026-10-02).
  *
- * <p>⭐ TWO READINGS IN ONE SCENE: the first lethal blow is answered (the ally stands at 70% of its OWN Max HP), and the second is not --
- * which is exactly 「单场战斗中可以触发 1 次」. The zone is opened by her own skill, so no test-only shortcut is used.
+ * <p>TWO READINGS IN ONE SCENE: the first lethal blow is answered (the ally stands at 0% of its OWN Max HP), and the second is not --
+ * which is exactly "单场战斗中可以触发 1 次". The zone is opened by her own skill, so no test-only shortcut is used.
  */
 public class FuxuanEidolonTwoTest {
     private static final int FUXUAN = 1208;
@@ -27,7 +27,7 @@ public class FuxuanEidolonTwoTest {
     private static final int MONSTER = 1002011;
     private static final String ZONE = "鉴知";
 
-    /** ⭐ The first blow is answered; the second kills, because the sentence allows one. */
+    /** The first blow is answered; the second kills, because the sentence allows one. */
     @Test
     public void theFirstBlowIsAnsweredAndTheSecondIsNot() {
         Character her = CharacterFactory.create(FUXUAN, 80, false, null, null, 2);

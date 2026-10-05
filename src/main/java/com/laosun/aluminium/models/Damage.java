@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * One damage instance — always a single hit on a single target (it has carried its own
+ * One damage instance - always a single hit on a single target (it has carried its own
  * damage-zone system since P1-3).
  *
  * <p>A skill that produces N hits builds N {@code Damage} objects; an instance is only
@@ -25,7 +25,7 @@ import java.util.Objects;
  *
  * <p><b>Zones.</b> Every zone is a subclass of {@link Area}: it takes exactly the
  * parameters it needs and outputs one multiplier. {@link #toValue()} walks
- * {@link #damageArea} and multiplies them together — that is the whole settlement.
+ * {@link #damageArea} and multiplies them together - that is the whole settlement.
  *
  * <p><b>Invariants</b> (violating one is a bug, not a style issue):
  * <ul>
@@ -38,7 +38,7 @@ import java.util.Objects;
  *   subclass's {@link Area#min()}/{@link Area#max()} and applied by the {@code final}
  *   {@link Area#getRate()}, so no subclass can bypass it.</li>
  *   <li>"This hit does not use that zone" (break damage is not boosted, DOT cannot
- *   crit) is declared by {@link Area#applies(DamageType)} — never by hoping the
+ *   crit) is declared by {@link Area#applies(DamageType)} - never by hoping the
  *   caller does not add the modifier.</li>
  * </ul>
  */
@@ -67,11 +67,11 @@ public class Damage {
     private final double skillBaseValue;
 
     /**
-     * Which kind of cast produced this instance — the fact behind 「普攻/战技/终结技造成的伤害提高 X%」.
+     * Which kind of cast produced this instance - the fact behind "普攻/战技/终结技造成的伤害提高 X%".
      *
      * <p>It cannot be derived from {@link #type}: a basic attack and a skill are both
      * {@code DamageType.NORMAL}, so "which scope does this instance belong to" has to be carried. Never
-     * {@code null} — "not an in-battle cast" is {@link SkillCategory#UNSPECIFIED}, so no caller null-checks
+     * {@code null} - "not an in-battle cast" is {@link SkillCategory#UNSPECIFIED}, so no caller null-checks
      * and {@code assemble}'s lookup is a plain switch.
      */
     private final SkillCategory castCategory;
@@ -106,15 +106,15 @@ public class Damage {
     private boolean critFixed;
 
     /**
-     * Is this entity the **defender** in this damage segment?
+     * Is this entity the defender in this damage segment?
      *
      * <p>{@code Battle.assemble} broadcasts the {@code DamageEvent} to both the attacker and
      * the defender (§2.2 requires it), so a buff that injects a zone MUST decide for itself
      * "which side am I attached to"; otherwise a vulnerability sitting on the enemy would also
-     * boost that enemy's own outgoing damage. The check goes through here and only here —
+     * boost that enemy's own outgoing damage. The check goes through here and only here - 
      * do not write {@code damage.getDefender() == ...} separately in each buff.
      *
-     * @param entity the entity to test ({@code null} → {@code false})
+     * @param entity the entity to test ({@code null} to {@code false})
      * @return {@code true} = it is the defender of this segment
      */
     public boolean isOnDefenderSide(CanHit entity) {
@@ -122,10 +122,10 @@ public class Damage {
     }
 
     /**
-     * Is this entity the **attacker** in this damage segment (that is how attacker-side
+     * Is this entity the attacker in this damage segment (that is how attacker-side
      * debuffs such as weakness are judged)?
      *
-     * @param entity the entity to test ({@code null} → {@code false})
+     * @param entity the entity to test ({@code null} to {@code false})
      * @return {@code true} = it is the attacker of this segment
      */
     public boolean isOnAttackerSide(CanHit entity) {
@@ -136,9 +136,9 @@ public class Damage {
      * The <b>toughness reduction this instance intends</b>, recorded by {@code SkillExecutor} before the instance is
      * settled (2026-09-28).
      *
-     * <p>「对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次超击破伤害」（1321 大丽花）needs a number
+     * <p>"对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次超击破伤害"（1321 大丽花）needs a number
      * no rule could otherwise reach: the reduction is computed beside the damage and only {@code applyStanceDamage} ever
-     * sees it. It travels on the instance for the same reason {@code addFlat} and {@code fixedCrit} do — the instance is
+     * sees it. It travels on the instance for the same reason {@code addFlat} and {@code fixedCrit} do - the instance is
      * what a {@code DEALING_DAMAGE} rule is handed, and the settlement is still in progress.
      */
     @lombok.Getter
@@ -148,7 +148,7 @@ public class Damage {
      * The skill key (the loader's slot) of the cast that produced this instance (2026-09-28).
      *
      * <p>Why it rides on the instance: {@code DEALING_DAMAGE} is the only event that has BOTH a target and, with this, the
-     * skill -- which is what 「强化普攻命中后使目标…」 needs, because {@code ALLY_ATTACK} deliberately carries no aim.
+     * skill -- which is what "强化普攻命中后使目标…" needs, because {@code ALLY_ATTACK} deliberately carries no aim.
      */
     private int skillKey;
 
@@ -166,9 +166,9 @@ public class Damage {
     /**
      * The targets hit by the attack that produced this instance (2026-09-30).
      *
-     * <p>⚠ The engine’s pattern for 「a cast-level fact a rule must be able to read」: the caller holds it and
+     * <p>Note: The engine's pattern for "a cast-level fact a rule must be able to read": the caller holds it and
      * <b>the instance carries the answer</b> (see {@code setSkillKey} / {@code setStance}). An EMPTY set means
-     * 「unknown」 -- a hand-made or placeholder skill -- so a selector fails rather than guesses.
+     * "unknown" -- a hand-made or placeholder skill -- so a selector fails rather than guesses.
      */
     private java.util.Set<CanHit> hitTargets = java.util.Set.of();
 
@@ -194,7 +194,7 @@ public class Damage {
     /**
      * The full constructor: the same instance, plus which kind of cast produced it.
      *
-     * <p>The category is what makes a <b>scoped</b> DMG boost possible — "普攻造成的伤害提高 X%" must not
+     * <p>The category is what makes a <b>scoped</b> DMG boost possible - "普攻造成的伤害提高 X%" must not
      * reach a skill, and the damage type cannot tell the two apart. Instances that are not an in-battle cast
      * (break, super break, DOT, additional/follow-up, true damage, a technique used outside battle) leave it
      * {@link SkillCategory#UNSPECIFIED}; follow-up damage has its own
@@ -334,17 +334,17 @@ public class Damage {
     }
 
     /**
-     * A flat amount added to this instance's <b>base</b> — 「伤害值提高，提高数值等同于三月七防御力的 30%」.
+     * A flat amount added to this instance's <b>base</b> - "伤害值提高，提高数值等同于三月七防御力的 30%".
      *
      * <p><b>Why it is not {@link #addBoost}.</b> The boost zone is multiplicative ({@code 1 + Σ}) and therefore
-     * expresses "this hit deals X% more"; the documents also state an <b>absolute</b> increase (「提高数值等同于
-     * &lt;某属性&gt; 的 Y%」, 12 of the 97 character files), and folding that number into a percentage zone is only
-     * equal to the sentence when the instance's base happens to equal the attribute — otherwise it is a different
+     * expresses "this hit deals X% more"; the documents also state an <b>absolute</b> increase ("提高数值等同于
+     * &lt;某属性&gt; 的 Y%", 12 of the 9character files), and folding that number into a percentage zone is only
+     * equal to the sentence when the instance's base happens to equal the attribute - otherwise it is a different
      * number that looks right.
      *
      * <p><b>Where it enters.</b> The <b>base layer</b>: {@code Battle.assemble} adds it before the first zone, so the
      * addition takes crit / DMG boost / defence / resistance exactly like the skill multiplier does. That is the
-     * documented decision (ROADMAP M-55, {@code engine.md} 乘区表) rather than an accident: 「伤害<b>值</b>提高」 names a
+     * documented decision (ROADMAP M-55, {@code engine.md} 乘区表) rather than an accident: "伤害<b>值</b>提高" names a
      * value, and a value that did not crit would be a different mechanic from the one the text describes.
      *
      * @param value the amount to add (may be negative, and the assembled total is still floored at 1)
@@ -406,11 +406,11 @@ public class Damage {
     }
 
     /**
-     * Have the effect **dictate** this segment's crit pair (e.g. Robin's additional damage
+     * Have the effect dictate this segment's crit pair (e.g. Robin's additional damage
      * fixes 100% crit rate / 150% crit DMG).
      *
      * <p>Difference from {@link #crit(boolean, double)}: this one sets {@code critFixed},
-     * so {@code Battle.assemble} will **not** roll again from the attacker's stat sheet,
+     * so {@code Battle.assemble} will not roll again from the attacker's stat sheet,
      * nor overwrite it with the sheet's crit DMG.
      *
      * @param isCrit         whether this segment crits
@@ -423,7 +423,7 @@ public class Damage {
     }
 
     /**
-     * Defence zone: (200 + 10 × attacker level) / (effective DEF + 200 + 10 × attacker level).
+     * Defence zone: (200 + 10  x  attacker level) / (effective DEF + 200 + 10  x  attacker level).
      *
      * @param attackerLevel   attacker level
      * @param defenderDefence defender's DEF
@@ -432,9 +432,9 @@ public class Damage {
     /**
      * The energy the cast that produced THIS hit spent, or {@code 0} (2026-09-30; reader: light cone 23062).
      *
-     * <p>⚠ It rides on the instance for the same reason the extras below do: 「每消耗 1 点能量值」
+     * <p>Note: It rides on the instance for the same reason the extras below do: "每消耗 1 点能量值"
      * modifies the hit BEING SETTLED, and {@code DEALING_DAMAGE} is the only event that hands that instance over.
-     * ⚠ Not a constructor parameter like {@code castCategory}: its value is only known after the damage is built
+     * Note: Not a constructor parameter like {@code castCategory}: its value is only known after the damage is built
      * (Battle reads the energy just before zeroing it) and before the settlement.
      */
     private double castEnergySpent = 0;
@@ -459,13 +459,13 @@ public class Damage {
         return castEnergySpent;
     }
 
-    /** 「对陷入负面效果的敌方目标造成伤害时暴击率提高 X%」 is a property of the hit, not of the wearer. */
+    /** "对陷入负面效果的敌方目标造成伤害时暴击率提高 X%" is a property of the hit, not of the wearer. */
     public Damage addCritChance(double value) {
         this.extraCritChance += value;
         return this;
     }
 
-    /** 「对陷入禁锢状态的敌方目标造成伤害时暴击伤害提高 X%」. */
+    /** "对陷入禁锢状态的敌方目标造成伤害时暴击伤害提高 X%". */
     public Damage addCritDamage(double value) {
         this.extraCritDamage += value;
         return this;
@@ -482,7 +482,7 @@ public class Damage {
     }
 
     /**
-     * Adds to the DEF-ignore this instance carries: 「对<某类目标>造成伤害时无视其 X% 防御力」 is a property of this hit,
+     * Adds to the DEF-ignore this instance carries: "对<某类目标>造成伤害时无视其 X% 防御力" is a property of this hit,
      * not of the wearer. `Battle` fires `DEALING_DAMAGE` before it settles the defence zone, so this is read in time.
      */
     public Damage addDefenceIgnore(double value) {
@@ -533,8 +533,8 @@ public class Damage {
      */
     public double toValue() {
         // The base layer = the skill multiplier plus any absolute addend («提高数值等同于…的 Y%», M-55), so the
-        // addition is multiplied by every zone below exactly like the multiplier is. ⚠ A true-damage instance skips
-        // the zones, and it takes the addend the same way — a value is a value.
+        // addition is multiplied by every zone below exactly like the multiplier is. Note: A true-damage instance skips
+        // the zones, and it takes the addend the same way - a value is a value.
         double base = skillBaseValue + flatAddend;
         if (trueDamage && Constant.TRUE_DMG_SKIP_ZONES) {
             return base;
@@ -552,7 +552,7 @@ public class Damage {
      * Per-zone multiplier breakdown of this hit, for logs / UI (which zones multiplied this
      * hit out).
      *
-     * @return an insertion-ordered map: {@code base} → each zone name → {@code final}
+     * @return an insertion-ordered map: {@code base} to each zone name to {@code final}
      */
     public Map<String, Double> breakdown() {
         Map<String, Double> breakdown = new LinkedHashMap<>();
@@ -567,7 +567,7 @@ public class Damage {
     }
 
     /**
-     * A read-only snapshot of the zones used by this hit. For tests and logs only —
+     * A read-only snapshot of the zones used by this hit. For tests and logs only - 
      * the settlement loop iterates the field directly.
      *
      * @return an immutable copy of the zone list, in creation order
@@ -584,7 +584,7 @@ public class Damage {
     /**
      * A damage zone: takes the parameters it needs, outputs one multiplier.
      *
-     * <p>{@link #getRate()} is {@code final} on purpose — every zone's raw rate goes
+     * <p>{@link #getRate()} is {@code final} on purpose - every zone's raw rate goes
      * through {@link #min()}/{@link #max()}, so a subclass cannot forget its cap
      * (vulnerable 3.5, reduction 0.01, …).
      */
@@ -606,7 +606,7 @@ public class Damage {
          *
          * <p>No policy by default ({@code -∞}, symmetric with {@link #max()}'s {@code +∞}):
          * the base class does not invent bounds. Every official floor is declared by the
-         * zone that owns it — reduction 0.01 and weakness 0.2 (HSR.md §2.2), resistance
+         * zone that owns it - reduction 0.01 and weakness 0.2 (HSR.md §2.2), resistance
          * 0.1 (HSR.md §2.5), crit 1.0.
          */
         protected double min() {
@@ -651,7 +651,7 @@ public class Damage {
          * Sanity floor, <b>not</b> a game rule: an accumulating zone never returns a
          * negative multiplier, because a negative factor would flip the sign of the whole
          * hit. There is no negative DMG boost / vulnerability in the game data; zones with an
-         * <i>official</i> floor (reduction 0.01, weakness 0.2 — HSR.md §2.2) override this.
+         * <i>official</i> floor (reduction 0.01, weakness 0.2 - HSR.md §2.2) override this.
          */
         @Override
         protected double min() {
@@ -731,7 +731,7 @@ public class Damage {
     }
 
     /**
-     * Reduction zone: {@code Π(1 - r)} — each {@code r} is clamped to [0,1] on the way in,
+     * Reduction zone: {@code Π(1 - r)} - each {@code r} is clamped to [0,1] on the way in,
      * and the product is then floored at {@link Constant#REDUCTION_MIN}.
      */
     public static final class ReductionArea extends PercentArea {
@@ -811,7 +811,7 @@ public class Damage {
 
     /**
      * Defence zone: {@code (200 + 10L) / (effDef + 200 + 10L)},
-     * where {@code effDef = def × (1 - clamp(DEF ignore))}.
+     * where {@code effDef = def  x  (1 - clamp(DEF ignore))}.
      */
     public static final class DefenceArea extends Area {
         private int attackerLevel = 80;
@@ -863,7 +863,7 @@ public class Damage {
 
         @Override
         protected double rate() {
-            // Resistance zone = 1 - RES, RES ranges over [-1, 0.9] ⇒ resistance zone [0.1, 2.0]
+            // Resistance zone = 1 - RES, RES ranges over [-1, 0.9] so resistance zone [0.1, 2.0]
             // (HSR.md §2.5, negative RES applies at full effect)
             double resolved = Math.clamp(resist - penetration, Constant.RESIST_MIN, Constant.RESIST_MAX);
             return 1 - resolved;

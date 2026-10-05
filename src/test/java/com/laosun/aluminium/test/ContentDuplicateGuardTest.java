@@ -21,10 +21,10 @@ import java.util.stream.Stream;
 /**
  * Within ONE content file, two rules may not be the same sentence written twice.
  *
- * <p>⚠ Why: round 71 added `aura_party_damage_up` to 1415.json, whose file ALREADY had `talent_party_damage` with the same event,
- * the same (empty) conditions and the same effect; it cost rounds 72-74 to find, only because a mutation refused to move.
+ * <p>Note: Why: round 1 added `aura_party_damage_up` to 1415.json, whose file ALREADY had `talent_party_damage` with the same event,
+ * the same (empty) conditions and the same effect; it cost rounds 2-4 to find, only because a mutation refused to move.
  *
- * <p>⚠ And why it prints: round 74's version passed while that duplicate existed. A guard must show its own work -- how many files
+ * <p>Note: And why it prints: round 4's version passed while that duplicate existed. A guard must show its own work -- how many files
  * and rules it saw, and a couple of the signatures it built -- so "it did not fire" can be told apart from "it saw nothing".
  */
 public class ContentDuplicateGuardTest {
@@ -34,7 +34,7 @@ public class ContentDuplicateGuardTest {
     private static final List<String> OPERANDS =
             List.of("attribute", "buff", "resource", "rule", "state", "scale", "target", "permanent", "turns",
                     "percent", "amount", "crit_rate", "crit_damage", "per_stack", "max_stacks",
-                    // ⭐ `element` names WHAT is affected as much as `buff` does (2026-10-02): a Fire damage-over-time and an Ice one are different effects, and
+                    // `element` names WHAT is affected as much as `buff` does (2026-10-02): a Fire damage-over-time and an Ice one are different effects, and
                     // 1415's ocean ode writes one tick rule per element (TICK_DOT has no wildcard spelling) -- without this the guard read those 14 rules as duplicates.
                     "element");
 
@@ -72,11 +72,11 @@ public class ContentDuplicateGuardTest {
                         if (previous != null) {
                             duplicates.add(path + " [" + signature + "] ids " + previous + " / " + rule.get("id"));
                         }
-                        // ⚠ The sibling fault: the same id twice in one file is a copy-paste that survived, and it makes
+                        // Note: The sibling fault: the same id twice in one file is a copy-paste that survived, and it makes
                         // every later reference to that id ambiguous.
                         JsonElement id = rule.get("id");
                         if (id != null && !id.isJsonNull()) {
-                            // ⚠ Scoped by the rank/piece key: per-rank content reuses the rule id across ranks on purpose
+                            // Note: Scoped by the rank/piece key: per-rank content reuses the rule id across ranks on purpose
                             // (each rank states its own numbers), so only a repeat INSIDE one scope is the copy-paste fault.
                             String earlier = ids.put(entry[0] + "\u0000" + id.getAsString(), entry[0]);
                             if (earlier != null) {
@@ -104,7 +104,7 @@ public class ContentDuplicateGuardTest {
             return;
         }
         if (element.isJsonArray()) {
-            // ⚠ NOT the index: appending "#0", "#1", ... made every rule's scope unique, so no duplicate could ever collide
+            // Note: NOT the index: appending "#0", "#1", ... made every rule's scope unique, so no duplicate could ever collide
             // and the guard passed with a byte-identical copy in the file. Position is not meaning.
             for (JsonElement child : element.getAsJsonArray()) {
                 collect(child, scope, out);

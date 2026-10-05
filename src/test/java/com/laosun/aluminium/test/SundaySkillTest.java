@@ -22,37 +22,37 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 星期日（1313）的战技「纸醉金迷」(131302) — the shipped content that the two conditions of M-41 were added for.
+ * 星期日（1313）的战技"纸醉金迷"(131302) - the shipped content that the two conditions of M-41 were added for.
  *
- * <p><b>The document, and what each clause needed.</b> 「使指定我方单体角色<b>及其召唤物</b>立即行动，并使其造成的伤害提高
- * #2[i]%，若目标拥有召唤物，则造成的伤害提高效果额外提高 #4[i]%，持续 #3[i]回合。…当星期日对「同谐」命途的角色施放该
- * 技能时，<b>无法触发</b>立即行动效果。」 —
+ * <p><b>The document, and what each clause needed.</b> "使指定我方单体角色<b>及其召唤物</b>立即行动，并使其造成的伤害提高
+ * #2[i]%，若目标拥有召唤物，则造成的伤害提高效果额外提高 #4[i]%，持续 #3[i]回合。…当星期日对"同谐"命途的角色施放该
+ * 技能时，<b>无法触发</b>立即行动效果。" - 
  * <ul>
- *   <li>「及其召唤物」 is the {@code target_and_summon} selector (M-37): the chosen ally <b>and its</b>
+ *   <li>"及其召唤物" is the {@code target_and_summon} selector (M-3): the chosen ally <b>and its</b>
  *       memosprite, not the caster's;</li>
- *   <li>「若目标拥有召唤物」 is {@code target_summon_count} — the same question 遗器 127 asks about the wearer,
+ *   <li>"若目标拥有召唤物" is {@code target_summon_count} - the same question 遗器 12asks about the wearer,
  *       asked about the ally;</li>
- *   <li>「对同谐…无法触发」 is the {@code !} prefix on {@code target has_path 同谐} — an <b>exception</b>, and the
+ *   <li>"对同谐…无法触发" is the {@code !} prefix on {@code target has_path 同谐} - an <b>exception</b>, and the
  *       reason a negation exists at all (the DSL's condition list is an AND).</li>
  * </ul>
  *
  * <p><b>What is pinned here.</b> That the ally AND its memosprite act; that a 同谐 target does <b>not</b> act
  * (but still gets the damage share, because the sentence only blocks 立即行动); that the share is the
- * document's own arithmetic — 15%, or 15% + 25% = 40% when the target has a summon — for 2 turns; and that the
+ * document's own arithmetic - 15%, or 15% + 25% = 40% when the target has a summon - for 2 turns; and that the
  * file really carries three clauses (a missing one would show up in one of the cases above).
  *
- * <p>⚠ Not authored from this Skill: 「对【蒙福者】施放战技后恢复1个技能点」, which needs his ultimate's state
+ * <p>Note: Not authored from this Skill: "对[蒙福者]施放战技后恢复1个技能点", which needs his ultimate's state
  * (registered as M-42).
  */
 public class SundaySkillTest {
     private static final double EPS = 1e-6;
 
     private static final int SUNDAY = 1313;
-    /** 姬子 — 智识 (Erudition), so the advance happens; and she owns no summon, which is the 15% side. */
+    /** 姬子 - 智识 (Erudition), so the advance happens; and she owns no summon, which is the 15% side. */
     private static final int ERUDITION_ALLY = 1003;
-    /** 知更鸟 — 同谐 (Harmony), so the advance must <b>not</b> happen. */
+    /** 知更鸟 - 同谐 (Harmony), so the advance must <b>not</b> happen. */
     private static final int HARMONY_ALLY = 1309;
-    /** 阿格莱雅 — 记忆 (Remembrance) and a memosprite owner, so she is the "target has a summon" side. */
+    /** 阿格莱雅 - 记忆 (Remembrance) and a memosprite owner, so she is the "target has a summon" side. */
     private static final int MEMOSPRITE_ALLY = 1402;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -60,15 +60,15 @@ public class SundaySkillTest {
     private static final int SKILL_SLOT = 2;
     /** His ultimate's slot. */
     private static final int ULTIMATE_SLOT = 3;
-    /** 姬子's CRIT DMG with no buffs — she is the fixture the derived value is measured against. */
+    /** 姬子's CRIT DMG with no buffs - she is the fixture the derived value is measured against. */
     private static final double HARMONY_BARE_CRIT_DMG =
             CharacterFactory.create(ERUDITION_ALLY, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
 
     // ==================================================================
-    // 1. 「指定我方单体及其召唤物立即行动」
+    // 1. "指定我方单体及其召唤物立即行动"
     // ==================================================================
 
-    /** The chosen ally and its memosprite both act now — the pair, not just the ally. */
+    /** The chosen ally and its memosprite both act now - the pair, not just the ally. */
     @Test
     public void theChosenAllyAndItsSummonActImmediately() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
@@ -88,7 +88,7 @@ public class SundaySkillTest {
     }
 
     /**
-     * 同谐 gets no advance — the sentence's exception, and the half a positive spelling could not express.
+     * 同谐 gets no advance - the sentence's exception, and the half a positive spelling could not express.
      *
      * <p>知更鸟 and Sunday himself are both 同谐, so without the gate this rule would push exactly the units the
      * sentence excludes (and self-cast would push him too).
@@ -150,10 +150,10 @@ public class SundaySkillTest {
     }
 
     // ==================================================================
-    // 2b. The 【蒙福者】 kit: his ultimate's clause and the state it makes
+    // 2b. The [蒙福者] kit: his ultimate's clause and the state it makes
     // ==================================================================
 
-    /** The state and the CRIT DMG it carries land on the ally and its summon — and only on the newest target. */
+    /** The state and the CRIT DMG it carries land on the ally and its summon - and only on the newest target. */
     @Test
     public void theUltimateBlessesTheTargetAndItsSummon() {
         Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
@@ -164,7 +164,7 @@ public class SundaySkillTest {
         Assertions.assertEquals(0.12 * critDamageOf(sunday) + 0.08, critDamageOf(first) - HARMONY_BARE_CRIT_DMG, EPS,
                 "「提高数值等同于星期日#2%暴击伤害+#4%」 -- his own number, not the target's");
 
-        // …and casting it on somebody new takes it off the previous holder: 「仅对…最新的施放目标生效」.
+        // …and casting it on somebody new takes it off the previous holder: "仅对…最新的施放目标生效".
         Character second = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
         Battle next = new Battle(List.of(sunday, first, second), List.of(dummy()), new Random(0));
         next.startBattle();
@@ -181,10 +181,10 @@ public class SundaySkillTest {
     }
 
     /**
-     * 「恢复等同于#1[f1]%能量上限的能量」: 20% of the <b>ally's</b> maximum energy, not a flat number.
+     * "恢复等同于#1[f1]%能量上限的能量": 20% of the <b>ally's</b> maximum energy, not a flat number.
      *
-     * <p>⚠ Measured with the clamp spelled out: the grant is the stated share, capped by the bar. The maximum
-     * differs per character (120/130/140 across the roster), so a flat number would be wrong for all of them — which
+     * <p>Note: Measured with the clamp spelled out: the grant is the stated share, capped by the bar. The maximum
+     * differs per character (120/130/140 across the roster), so a flat number would be wrong for all of them - which
      * is the whole reason the scale exists.
      */
     @Test
@@ -202,7 +202,7 @@ public class SundaySkillTest {
                 "20% of HER maximum (" + max + "), not of his, and not a literal");
     }
 
-    /** His death takes the state off the ally: 「当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除」. */
+    /** His death takes the state off the ally: "当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除". */
     @Test
     public void hisDeathTakesTheStateOff() {
         Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
@@ -232,7 +232,7 @@ public class SundaySkillTest {
         Assertions.assertEquals(2, blessingDuration(ally), "his does");
     }
 
-    /** Casting the Skill on the 【蒙福者】 gives the skill point back -- the sentence's last clause. */
+    /** Casting the Skill on the [蒙福者] gives the skill point back -- the sentence's last clause. */
     @Test
     public void theSkillRefundsItsPointOnTheBlessed() {
         Battle battle = ultimateBattle(ERUDITION_ALLY, null);
@@ -252,7 +252,7 @@ public class SundaySkillTest {
     // ==================================================================
 
     /**
-     * The three clauses are three rules — and the count is what makes the cases above evidence.
+     * The three clauses are three rules - and the count is what makes the cases above evidence.
      *
      * <p>They cannot be read back individually the way 遗器 rules are ({@code matching} only returns rules whose
      * conditions hold, and the two share-clauses are deliberately disjoint), so this pins the shape and the
@@ -288,7 +288,7 @@ public class SundaySkillTest {
         return damageBoostOf(ally);
     }
 
-    /** A real cast of his Skill, aimed at {@code ally} — the path that carries 「指定」 as the event's target. */
+    /** A real cast of his Skill, aimed at {@code ally} - the path that carries "指定" as the event's target. */
     private static void cast(Battle battle, Character sunday, Character ally) {
         battle.castImmediate(new DefaultSkill(SUNDAY, SKILL_SLOT, 1), sunday, List.of(ally));
     }
@@ -297,7 +297,7 @@ public class SundaySkillTest {
         return unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
-    /** How much action value the unit still has — zero means "acts now". */
+    /** How much action value the unit still has - zero means "acts now". */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {
@@ -310,8 +310,8 @@ public class SundaySkillTest {
     /**
      * A battle where Sunday has already cast his ultimate at {@code allyCid}.
      *
-     * <p>⚠ The ally is made <b>faster</b> than him, deliberately: the case below has to observe "her turn, and his
-     * turn has not happened yet", and Sunday's own speed ties with 姬子's — a tie is an arbitrary order, so the
+     * <p>Note: The ally is made <b>faster</b> than him, deliberately: the case below has to observe "her turn, and his
+     * turn has not happened yet", and Sunday's own speed ties with 姬子's - a tie is an arbitrary order, so the
      * window could contain his turn and the measurement would read two ticks as one (it did: 2 instead of 3).
      */
     private static Battle ultimateBattle(int allyCid, Character ignored) {
@@ -328,7 +328,7 @@ public class SundaySkillTest {
         battle.castImmediate(new DefaultSkill(SUNDAY, ULTIMATE_SLOT, 1), sunday, List.of(ally));
     }
 
-    /** The CRIT DMG of the 【蒙福者】 state's modifier, or {@code -1} when it is not attached. */
+    /** The CRIT DMG of the [蒙福者] state's modifier, or {@code -1} when it is not attached. */
     private static int blessingDuration(CanHit who) {
         for (StatModifierBuff buff : who.getBuffManager().allBuffsOf(StatModifierBuff.class)) {
             if (buff.getAttribute() == AttributeType.CRIT_ATTACK) {

@@ -16,20 +16,20 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P7-5 acceptance: {@code StageFactory.load(stageId)} assembles, from a stage, a battle that can be
+ * P-5 acceptance: {@code StageFactory.load(stageId)} assembles, from a stage, a battle that can be
  * fought immediately.
  *
  * <p>Covers:
  * <ol>
  *   <li>Difficulty comes from the stage ({@code hard_level_group} + {@code level} fed to
  *   {@code EnemyFactory});</li>
- *   <li>Wave 1 is already in play and **queued into the action bar** (spawning is queued entry, so
+ *   <li>Wave 1 is already in play and queued into the action bar (spawning is queued entry, so
  *   {@code processRequests()} is easy to miss);</li>
  *   <li>The status is already {@code RUNNING} (not {@code NOT_STARTED}), so full turns can be run;</li>
  *   <li>The error paths: unknown stage / empty team.</li>
  * </ol>
  *
- * <p>⚠ Cases that depend on {@code stage.json} (generator output, not committed) fall back to assume.
+ * <p>Note: Cases that depend on {@code stage.json} (generator output, not committed) fall back to assume.
  */
 public class StageFactoryTest {
 
@@ -56,7 +56,7 @@ public class StageFactoryTest {
      * Difficulty comes from the stage: the same monster has different stat sheets in stages of
      * different level.
      *
-     * <p>This is the core of P7-5 — "hard" is decided by the data, not by multipliers the caller
+     * <p>This is the core of P-5 - "hard" is decided by the data, not by multipliers the caller
      * passes in.
      */
     @Test
@@ -95,7 +95,7 @@ public class StageFactoryTest {
     }
 
     /**
-     * A fixed seed → the whole battle is reproducible (the same stage + the same seed gives the same
+     * A fixed seed to the whole battle is reproducible (the same stage + the same seed gives the same
      * result from two assemblies).
      */
     @Test
@@ -162,7 +162,7 @@ public class StageFactoryTest {
      * The reference team (P8-5): 4 real characters, each with an identity, an energy bar and a light
      * cone of its own path.
      *
-     * <p>Replaces the old P7-5 assertion, which checked 3 placeholders with deliberately distinct
+     * <p>Replaces the old P-5 assertion, which checked 3 placeholders with deliberately distinct
      * speeds. The real roster happens to have distinct speeds too, so the action bar stays meaningful.
      */
     @Test

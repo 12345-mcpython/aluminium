@@ -22,42 +22,42 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code "until"} — a buff that ends when its <b>owner does something</b> instead of after N turns (P10-4).
+ * {@code "until"} - a buff that ends when its <b>owner does something</b> instead of after N turns (P10-4).
  *
- * <p><b>Why a lifetime and not a turn count.</b> 「持续到施放首次攻击后结束」 / 「for the next attack」 /
- * 「the next Skill」 are not numbers of turns. Written as {@code turns: 1} the buff expires on the wrong turn
+ * <p><b>Why a lifetime and not a turn count.</b> "持续到施放首次攻击后结束" / "for the next attack" /
+ * "the next Skill" are not numbers of turns. Written as {@code turns: 1} the buff expires on the wrong turn
  * boundary and survives a turn in which nothing was attacked; written as {@code permanent: true} it never
- * goes away. Both are wrong numbers with nothing to see, which is exactly what this project refuses — so the
+ * goes away. Both are wrong numbers with nothing to see, which is exactly what this project refuses - so the
  * rule names the <b>event</b> that ends it, and the vocabulary is closed
  * ({@code next_attack} / {@code next_skill} / {@code next_ultimate}).
  *
  * <p><b>What the cases guard.</b>
  * <ol>
- *   <li>the event really ends it, and it is the <b>owner's</b> event — the engine broadcasts "an attack
+ *   <li>the event really ends it, and it is the <b>owner's</b> event - the engine broadcasts "an attack
  *       happened" to every member of our side, so without the owner test one character's attack would
  *       consume another's buff;</li>
  *   <li>it is <b>not</b> ticked away: a lifetime is not a turn count, so any number of turn boundaries must
  *       leave it alone. (This is why an event-bound buff is created with the "never ticked" flag, which is
- *       what {@code permanent} means mechanically — see {@code TriggerInterpreter.unticked}.)</li>
+ *       what {@code permanent} means mechanically - see {@code TriggerInterpreter.unticked}.)</li>
  *   <li>the three spellings mean three different events;</li>
- *   <li>the shipped user of it — relic set 305 — grants its 60% CRIT Rate and loses it to the first attack.</li>
+ *   <li>the shipped user of it - relic set 305 - grants its 60% CRIT Rate and loses it to the first attack.</li>
  * </ol>
  */
 public class BuffLifetimeTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子 — the plain character, and the one whose attacks this class drives. */
+    /** 姬子 - the plain character, and the one whose attacks this class drives. */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** 星体差分机 / Celestial Differentiator — 「持续到施放首次攻击后结束」. */
+    /** 星体差分机 / Celestial Differentiator - "持续到施放首次攻击后结束". */
     private static final int STELLAR_DIFFERENTIATOR = 305;
 
     // ==================================================================
     // 1. The event ends it
     // ==================================================================
 
-    /** 「for the next attack」: the owner's attack consumes it. */
+    /** "for the next attack": the owner's attack consumes it. */
     @Test
     public void theOwnersAttackConsumesIt() {
         Battle battle = battleWithBuff("next_attack");
@@ -74,7 +74,7 @@ public class BuffLifetimeTest {
      * A teammate's attack does <b>not</b>.
      *
      * <p>The engine delivers "an attack happened" to every member of our side ({@code AttackEvent} is how
-     * Robin's and Tribbie's third-party kits hear about it), so this is the case that pins the owner test —
+     * Robin's and Tribbie's third-party kits hear about it), so this is the case that pins the owner test - 
      * without it, whoever attacks first would consume everybody's "for the next attack" buff.
      */
     @Test
@@ -92,7 +92,7 @@ public class BuffLifetimeTest {
     /**
      * A lifetime is not a turn count: turn boundaries leave it alone.
      *
-     * <p>Pinned because the tempting implementation — give the buff a placeholder duration — would expire it
+     * <p>Pinned because the tempting implementation - give the buff a placeholder duration - would expire it
      * on the first {@code afterMove}, i.e. a rule that looks like it works and lasts one turn instead of one
      * attack.
      */
@@ -113,9 +113,9 @@ public class BuffLifetimeTest {
     /**
      * An attack that <b>connects with nothing</b> is not an attack: the buff survives it.
      *
-     * <p>「持续到施放首次攻击后结束」 is about an attack that happened, and the engine says an attack happened only
+     * <p>"持续到施放首次攻击后结束" is about an attack that happened, and the engine says an attack happened only
      * when at least one target was hit ({@code Battle.fireAfterAttack}'s first guard). Casting at a battlefield
-     * with nothing left alive is the reachable way to swing and hit nothing — and the tempting implementation,
+     * with nothing left alive is the reachable way to swing and hit nothing - and the tempting implementation,
      * broadcasting "an attack happened" whenever a skill was cast, would burn the buff on the whiff.
      */
     @Test
@@ -153,16 +153,16 @@ public class BuffLifetimeTest {
     }
 
     // ==================================================================
-    // 1b. Several events at once: 「普攻或战技」
+    // 1b. Several events at once: "普攻或战技"
     // ==================================================================
 
     /**
-     * 「持续至装备者下次施放普攻<b>或</b>战技后」 — a duration that names two events ends at the <b>first</b> of them.
+     * "持续至装备者下次施放普攻<b>或</b>战技后" - a duration that names two events ends at the <b>first</b> of them.
      *
-     * <p>Relic set 127's sentence is a disjunction, and it is the case that tells a list of lifetimes apart from
+     * <p>Relic set 12's sentence is a disjunction, and it is the case that tells a list of lifetimes apart from
      * both wrong shapes: a single {@code next_attack} would ignore a Skill that attacks nothing (the case below,
      * which the existing whiff rule pins from the other side), and one buff per event would make the two
-     * <b>replace</b> each other — same kind, same target — so only the later one would ever be up.
+     * <b>replace</b> each other - same kind, same target - so only the later one would ever be up.
      */
     @Test
     public void aDisjunctionEndsAtTheFirstOfItsEvents() {
@@ -220,7 +220,7 @@ public class BuffLifetimeTest {
     /**
      * Every entry of a list is checked, not just the first.
      *
-     * <p>Pinned because the tempting implementation — validate the first name, trust the rest — loads a rule whose
+     * <p>Pinned because the tempting implementation - validate the first name, trust the rest - loads a rule whose
      * file claims two events while the buff only ends on one: a wrong duration with nothing to see.
      */
     @Test
@@ -269,7 +269,7 @@ public class BuffLifetimeTest {
      * The authored 2-piece grants +60% CRIT Rate above 120% CRIT DMG, and the first attack takes it away.
      *
      * <p>End-to-end through the relic loader, the real battle start and a real attack. Measured as a delta
-     * against the same character bare, never as an absolute — her sheet has a CRIT Rate of its own.
+     * against the same character bare, never as an absolute - her sheet has a CRIT Rate of its own.
      */
     @Test
     public void theAuthoredRuleGrantsItsCritRateUntilTheFirstAttack() {
@@ -377,13 +377,13 @@ public class BuffLifetimeTest {
         return effect;
     }
 
-    /** The owner casts its slot-{@code slotNo} skill at the monster — a real cast through the executor. */
+    /** The owner casts its slot-{@code slotNo} skill at the monster - a real cast through the executor. */
     private static void attack(Battle battle, Character actor, int slotNo) {
         battle.castImmediate(new DefaultSkill(OWNER, slotNo, 1), actor, List.of(monster()));
     }
 
     /**
-     * The same cast, but aimed at a <b>given</b> unit — the caller's list is the main target, so aiming at the
+     * The same cast, but aimed at a <b>given</b> unit - the caller's list is the main target, so aiming at the
      * battlefield's own (dead) enemy is how a swing can hit nothing at all.
      */
     private static void attack(Battle battle, Character actor, int slotNo, CanHit target) {

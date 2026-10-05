@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23022: every damage-over-time TYPE the wearer strikes marks one layer of 【先知】, once per type per battle, up to four.
+ * Light cone 23022: every damage-over-time TYPE the wearer strikes marks one layer of [先知], once per type per battle, up to four.
  *
- * <p>⭐ The DoTs are planted by NAME through {@code DotBuff}'s named constructor. The probe measured that a DotBuff planted with a
+ * <p>The DoTs are planted by NAME through {@code DotBuff}'s named constructor. The probe measured that a DotBuff planted with a
  * name answers {@code has_state} and {@code stacksOf} for exactly that name -- all four game names included.
  */
 public class Cone23022Test {
@@ -86,7 +86,7 @@ public class Cone23022Test {
         double after = wearer.getAttribute(AttributeType.ATTACK).get();
         System.out.println("[23022] attack " + before + " -> " + after + " (delta " + (after - before)
                 + ", 5% of the base is " + (0.05 * before) + ")");
-        // ★ The SHARE, as an equality (discipline 200): a percent modifier is a share of the pre-bonus base, so one layer adds
+        // The SHARE, as an equality (discipline 200): a percent modifier is a share of the pre-bonus base, so one layer adds
         // exactly 5% of `before`. Measured, `after > before` survives a `5 -> 2 percent` mutation (0 red).
         Assertions.assertEquals(0.05 * before, after - before, 1e-9, "one layer is 5% of the base, exactly");
     }
@@ -111,9 +111,9 @@ public class Cone23022Test {
 
     @Test
     public void theDotInstanceCarriesTheIgnore() {
-        // ⭐ Read off the INSTANCE, not off a second battle: rules of one DEALING_DAMAGE event are evaluated in order and see
+        // Read off the INSTANCE, not off a second battle: rules of one DEALING_DAMAGE event are evaluated in order and see
         // each other (discipline 212), so the very first DOT instance already granted the seer layer that the ignore rule needs.
-        // Measured: the DOT instance carries 0.072 while an ordinary hit of the same battle carries 0.0 (damage_type: DOT).
+        // Measured: the DOT instance carries 0.02 while an ordinary hit of the same battle carries 0.0 (damage_type: DOT).
         build(true);
         plant(FIRE_NAME, DamageElement.FIRE);
         com.laosun.aluminium.models.Damage dot = new com.laosun.aluminium.models.Damage(wearer, enemy,
@@ -133,9 +133,9 @@ public class Cone23022Test {
 
     @Test
     public void theNoLayerSide() {
-        // ★ The other half of the clause, and the shape that a `when`-dropping mutation cannot survive: with NO DoT on the
+        // The other half of the clause, and the shape that a `when`-dropping mutation cannot survive: with NO DoT on the
         // enemy the four seer rules have nothing to match, so no layer is ever granted -- and then the DOT instance must carry
-        // no ignore at all. ⚠ Measuring this in a battle that HAS a DoT planted does not work: the first DOT instance grants
+        // no ignore at all. Note: Measuring this in a battle that HAS a DoT planted does not work: the first DOT instance grants
         // the layer itself (discipline 212), which is exactly how the gap looked like an engine limitation.
         build(true);
         com.laosun.aluminium.models.Damage dot = new com.laosun.aluminium.models.Damage(wearer, enemy,

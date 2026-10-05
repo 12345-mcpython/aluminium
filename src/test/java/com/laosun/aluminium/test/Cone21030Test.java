@@ -19,7 +19,7 @@ import java.util.Random;
 /**
  * Light cone 21030: the wearer's Ultimate carries extra damage equal to 60% of its own DEFENCE.
  *
- * <p>⭐ Judged by SCALING (discipline 200): the share is a percentage of an attribute whose value the judge can also read,
+ * <p>Judged by SCALING (discipline 200): the share is a percentage of an attribute whose value the judge can also read,
  * so the fixture is measured at rank 1 and at rank 2 and the two extras must be in the ratio of their shares.
  */
 public class Cone21030Test {
@@ -82,10 +82,10 @@ public class Cone21030Test {
     }
 
     /**
-     * ★ The SHARE as an EQUALITY against the engine's own damage formula (discipline 192): the extra is
+     * The SHARE as an EQUALITY against the engine's own damage formula (discipline 192): the extra is
      * {@code percent * DEFENCE} scaled by the defence zone {@code 1 / (DEFENCE + 200 + 10 * level)}.
      *
-     * <p>⚠ A cross-rank ratio does NOT work here: the cone's own props (defence +16% at rank 1, +18% at rank 2) move
+     * <p>Note: A cross-rank ratio does NOT work here: the cone's own props (defence +16% at rank 1, +18% at rank 2) move
      * with the rank as well, so the two ranks differ by more than the share -- measured, the ratio came out 1.293 where
      * the shares alone would say 1.1 (discipline 200: change only the item under test).
      */
@@ -97,7 +97,7 @@ public class Cone21030Test {
         castUltimate(battle);
         double after = hit(battle, SkillCategory.ULTRA);
         double extra = after - before;
-        // ★ Measured, not assumed: the reduction uses the DEFENDER's level (the enemy is level 90 here), and the shape is
+        // Measured, not assumed: the reduction uses the DEFENDER's level (the enemy is level 90 here), and the shape is
         // damage * (1 - def / (def + 200 + 10 * defenderLevel)) -- my first guess used the ATTACKER's level and was 1.5% off.
         double expected = 0.6 * defence * (1 - defence / (defence + 200 + 10 * 90));
         System.out.println("[21030] defence=" + defence + " extra=" + extra + " expected=" + expected);
@@ -118,7 +118,7 @@ public class Cone21030Test {
     }
 
     private double hit(Battle battle, SkillCategory category) {
-        // ★ The category rides on the Damage INSTANCE (measured: applyDamage has no (target, damage, category)
+        // The category rides on the Damage INSTANCE (measured: applyDamage has no (target, damage, category)
         // overload -- the third parameter is an EnergyGrant), which is also why a cast-scoped boost can be scoped at all.
         return battle.applyDamage(enemy, new com.laosun.aluminium.models.Damage(wearer, enemy,
                 com.laosun.aluminium.enums.DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.NORMAL, 1000,

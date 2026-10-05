@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23006: a hit inflicts 【游丝】 -- a NAMED thunder damage-over-time -- and a target in 【游丝】
- * 「也会被视为陷入了触电状态」.
+ * Light cone 23006: a hit inflicts [游丝] -- a NAMED thunder damage-over-time -- and a target in [游丝]
+ * "也会被视为陷入了触电状态".
  *
- * <p>⭐ The alias is not a second stored fact: a NAMED thunder DOT answers its own name AND the element table's 触电. The
+ * <p>The alias is not a second stored fact: a NAMED thunder DOT answers its own name AND the element table's 触电. The
  * readings below make that attributable -- including the mirror case of a plain, unnamed thunder DOT.
  */
 public class Cone23006Test {
@@ -39,7 +39,7 @@ public class Cone23006Test {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // ⚠ A base chance of 1.0 still ROLLS against the victim's effect RES (the project's own rule), so the applier
+        // Note: A base chance of 1.0 still ROLLS against the victim's effect RES (the project's own rule), so the applier
         // has to hold EFFECT_HIT_RATE or the DOT never lands and the reading is a silent zero (measured this round).
         wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.EFFECT_HIT_RATE)
                 .addModifier(com.laosun.aluminium.models.DoubleValue.Modifier.pure(
@@ -68,7 +68,7 @@ public class Cone23006Test {
     public void aPlainThunderDotAnswersShockButNotThread() {
         wearer = CharacterFactory.create(WEARER, LEVEL);
         enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // ★ The UNNAMED thunder DOT, built directly: the element alone, which is everything this engine could express
+        // The UNNAMED thunder DOT, built directly: the element alone, which is everything this engine could express
         // before today. (An event-driven fixture needs an event that carries a target, and BATTLE_START does not -- measured.)
         enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(
                 wearer, DamageElement.THUNDER, 20, 2));

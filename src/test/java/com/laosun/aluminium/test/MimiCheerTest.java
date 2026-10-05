@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8007：「使指定我方单体行动提前 100% 并附上【迷迷的声援】，持续 3 回合」 (2026-10-02).
+ * 800："使指定我方单体行动提前 100% 并附上[迷迷的声援]，持续 3 回合" (2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN. The cheer lands on the ally the skill was aimed at, which is also the unit the advance moves.
+ * <p>FILE-DRIVEN. The cheer lands on the ally the skill was aimed at, which is also the unit the advance moves.
  */
 public class MimiCheerTest {
     private static final int OWNER = 8007;
@@ -24,7 +24,7 @@ public class MimiCheerTest {
     private static final int MONSTER = 1002011;
     private static final String CHEER = "迷迷的声援";
 
-    /** ⭐ The skill lays the cheer on its target. */
+    /** The skill lays the cheer on its target. */
     @Test
     public void theSkillLaysTheCheerOnItsTarget() {
         Character owner = CharacterFactory.create(OWNER, 80);

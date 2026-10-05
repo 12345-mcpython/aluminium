@@ -23,16 +23,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code SUMMONED} — 「被召唤时」, and the reason its timing is part of the contract.
+ * {@code SUMMONED} - "被召唤时", and the reason its timing is part of the contract.
  *
- * <p><b>What the event is for.</b> 长夜月's 忆灵技能3 says 「被召唤时，使自身立即行动」. "Act immediately" was already
- * expressible — {@code ADVANCE percent: 1.0} skips all of a unit's remaining time to act, which is the engine's
- * own reading of 立即行动 — but nothing could fire <em>on arrival</em>, because a summon entering the field was not
+ * <p><b>What the event is for.</b> 长夜月's 忆灵技能3 says "被召唤时，使自身立即行动". "Act immediately" was already
+ * expressible - {@code ADVANCE percent: 1.0} skips all of a unit's remaining time to act, which is the engine's
+ * own reading of 立即行动 - but nothing could fire <em>on arrival</em>, because a summon entering the field was not
  * an event. That is the whole gap this closes.
  *
  * <p><b>Why the timing is the interesting part.</b> A summon enters the action bar through
  * {@code addRequestItems}, which {@code processRequests} drains, so during the summon call itself the unit is on
- * the roster but <b>not yet scheduled</b> — and the one thing a 「被召唤时」 rule almost always wants to do is touch
+ * the roster but <b>not yet scheduled</b> - and the one thing a "被召唤时" rule almost always wants to do is touch
  * its action value. Firing the event at the call site would therefore hand every such rule a unit whose
  * {@code ADVANCE} is silently dropped: the rule runs, nothing happens, and the log says nothing. So the event is
  * fired at the settle point instead, and the case that pins it is a memosprite so slow that "acts immediately" is
@@ -40,14 +40,14 @@ import java.util.Random;
  *
  * <p><b>What else is pinned.</b> That it fires once (and not again on a later settle), that it does not fire for a
  * <em>teammate's</em> summon entering ({@code actor == summon}), and that summoning while one is already out
- * fires nothing — which is what 「若已在场，则…」 clauses depend on.
+ * fires nothing - which is what "若已在场，则…" clauses depend on.
  */
 public class SummonEntryTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 — her 忆灵技能3 is the shipped user of this event. */
+    /** 长夜月 - her 忆灵技能3 is the shipped user of this event. */
     private static final int OWNER = 1413;
-    /** 阿格莱雅 — the second memosprite owner, for "a teammate's summon does not count". */
+    /** 阿格莱雅 - the second memosprite owner, for "a teammate's summon does not count". */
     private static final int TEAMMATE = 1402;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -75,7 +75,7 @@ public class SummonEntryTest {
     }
 
     /**
-     * The unit is already in the action bar when the event fires — otherwise this rule is silently dropped.
+     * The unit is already in the action bar when the event fires - otherwise this rule is silently dropped.
      *
      * <p>The summon is made deliberately slow (speed 1) before it is scheduled, so it would act <b>last</b> on its
      * own: acting first is only possible if the {@code ADVANCE} found it in the queue. That is the difference
@@ -135,9 +135,9 @@ public class SummonEntryTest {
     /**
      * The authored rule is an arrival rule for the owner's own summon, advancing it all the way.
      *
-     * <p>⚠ Her file answers 被召唤时 <b>twice</b> now, and both rules are 「被召唤时」 sentences from the document:
-     * 忆灵技能3 「被召唤时，使自身立即行动」 (the ADVANCE pinned here) and 忆灵技能2 「「长夜」免疫控制类负面状态」
-     * (granted to the memosprite as it arrives — see {@code MemospriteTest}). So the shape assertions select the
+     * <p>Note: Her file answers 被召唤时 <b>twice</b> now, and both rules are "被召唤时" sentences from the document:
+     * 忆灵技能3 "被召唤时，使自身立即行动" (the ADVANCE pinned here) and 忆灵技能2 "'长夜'免疫控制类负面状态"
+     * (granted to the memosprite as it arrives - see {@code MemospriteTest}). So the shape assertions select the
      * ADVANCE rule by its op instead of taking the first one, which is what keeps this case about <b>this</b>
      * sentence rather than about file order.
      */
@@ -164,7 +164,7 @@ public class SummonEntryTest {
     }
 
     /**
-     * End to end: 长夜月 starts the battle, her talent summons 「长夜」, and it is the next unit to act.
+     * End to end: 长夜月 starts the battle, her talent summons "长夜", and it is the next unit to act.
      *
      * <p>Measured as position in the action bar rather than as a remaining-time number: 160 speed would put it
      * near the front anyway, so what the assertion has to show is that nothing is ahead of it.
@@ -205,7 +205,7 @@ public class SummonEntryTest {
         return effect;
     }
 
-    /** 「使自身立即行动」: skip all of the summon's remaining time to act. */
+    /** "使自身立即行动": skip all of the summon's remaining time to act. */
     private static EffectSpec advanceSummon() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADVANCE");
@@ -214,7 +214,7 @@ public class SummonEntryTest {
         return effect;
     }
 
-    /** How much action value the unit still has — zero means "acts now". */
+    /** How much action value the unit still has - zero means "acts now". */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

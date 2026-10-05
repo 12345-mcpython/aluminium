@@ -34,7 +34,7 @@ else:
 
 # ---- 1) #3 is a share that runs with level, so it must come from the row ----
 table = json.load(io.open(SKILLS, encoding="utf-8"))
-# ⚠ The keys of this table are SKILL SLOTS ("3" == SkillType.ULTRA), not full skill ids -- measured.
+# Note: The keys of this table are SKILL SLOTS ("3" == SkillType.ULTRA), not full skill ids -- measured.
 rows = table["1403"]["3"].get("param_list") or []
 if not rows or rows[0][2] == rows[-1][2]:
     sys.exit("REFUSING: #3 does not run with level")
@@ -52,11 +52,11 @@ rules.append({
     "when": ["self has_state " + ZONE],
     "do": [{
         "op": "DAMAGE",
-        "times_from": "hit_count",                                   # 「每有 1 名目标受到攻击」= how many the attack connected with
+        "times_from": "hit_count",                                   # "每有 1 名目标受到攻击"= how many the attack connected with
         "scale": "self_attr:HEALTH",                                 # 缇宝 生命上限
-        "percent_from_skill_param": "ULTRA:2",                       # × #3, out of HIS OWN ultimate, at its own level
+        "percent_from_skill_param": "ULTRA:2",                       #  x  #3, out of HIS OWN ultimate, at its own level
         "element": "Quantum",
-        "target": "highest_hp_attack_hit",                           # 「被攻击目标中当前生命值最高的目标」
+        "target": "highest_hp_attack_hit",                           # "被攻击目标中当前生命值最高的目标"
     }],
     "source": ("1403 缇宝 终结技 (140303)：「受到我方目标攻击后，**每有 1 名目标受到攻击**，"
                "会对**被攻击目标中当前生命值最高的目标**造成 1 次**等同于缇宝 #3% 生命上限**的"
@@ -72,7 +72,7 @@ rules.append({
     "when": ["actor == self", "damage_is_additional"],               # HIS additional damage -- which, in this kit, is the zone's
     "do": [{
         "op": "DAMAGE",
-        "times": 1,                                                  # 「额外造成 #1 次」, and #1 is 1 at EVERY level of 11415/15
+        "times": 1,                                                  # "额外造成 #1 次", and #1 is 1 at EVERY level of 11415/15
         "scale": "original_damage",                                  # one more instance OF THE SAME additional damage
         "percent": 1.0,
         "element": "Quantum",

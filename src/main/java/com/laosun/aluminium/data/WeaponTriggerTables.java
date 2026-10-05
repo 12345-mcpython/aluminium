@@ -22,7 +22,7 @@ import java.util.Map;
  * condition DSL, exactly as {@link RelicTriggerTables} does. What it needed first was a KEY, and {@code Weapon} now keeps the
  * id it was already handed at construction.
  *
- * <p>⚠ <b>The rank axis is the next step, not this one.</b> Upstream states a light cone's numbers per superimposition rank
+ * <p>Note: <b>The rank axis is the next step, not this one.</b> Upstream states a light cone's numbers per superimposition rank
  * ({@code EquipmentSkillConfig}: {@code SkillID} + {@code Level}, five rows; {@code weapons.json} already carries per-level
  * rows too). Until content selects a row by rank, only clauses with NO rank-varying magnitude are authored, and each such
  * file says so in its note rather than approximating a value.
@@ -50,8 +50,8 @@ public final class WeaponTriggerTables {
         if (cached != null) {
             return cached;
         }
-        // ★ A light cone may DECLARE resources (2026-09-30): its file allows a top-level "resources" array next to the
-        // rank keys, the same declaration shape a character's file uses. ⚠ The merged table refuses two declaring
+        // A light cone may DECLARE resources (2026-09-30): its file allows a top-level "resources" array next to the
+        // rank keys, the same declaration shape a character's file uses. Note: The merged table refuses two declaring
         // sides, so this is a cone-side declaration only while no character declares the same name.
         TriggerTable table = new TriggerTable(weaponId, read(weaponId, rank), readResources(weaponId));
         CACHE.put(key, table);
@@ -61,7 +61,7 @@ public final class WeaponTriggerTables {
     /**
      * The resource declarations of a light cone's file ({@code { "resources": [...], "1": [...], ... }}).
      *
-     * <p>★ P8-8's shape, reused: {@code TriggerTable.plus} already carries declarations across a merge, and
+     * <p>P8-8's shape, reused: {@code TriggerTable.plus} already carries declarations across a merge, and
      * {@code CharacterFactory} already registers whatever the merged table declares -- so the only missing piece was a
      * loader that reads them.
      *
@@ -100,12 +100,12 @@ public final class WeaponTriggerTables {
             return GSON.fromJson(flat, new TypeToken<List<TriggerSpec>>() {
             }.getType());                            // one set of rules for every rank
         }
-        // ⚠ The EXACT rank, not "the highest threshold met": a light cone's superimposition does not accumulate the way a
+        // Note: The EXACT rank, not "the highest threshold met": a light cone's superimposition does not accumulate the way a
         // relic set's piece count does. A rank with no row falls back to the lowest one that exists, so a file with fewer
         // rows than the game's five still works.
         com.google.gson.JsonElement exact = file.get(String.valueOf(rank));
         if (exact == null) {
-            // ★ Only NUMERIC keys are ranks: a cone's file may also carry a top-level "resources" declaration, and
+            // Only NUMERIC keys are ranks: a cone's file may also carry a top-level "resources" declaration, and
             // parsing that as a rank would throw. (Measured: the shape is new, the fallback was written before it.)
             String lowest = file.keySet().stream()
                     .filter(key -> !key.isEmpty() && key.chars().allMatch(Character::isDigit))

@@ -28,7 +28,7 @@ CONST_NEW = '''    static final String DAMAGE_IS_ATTACK = "damage_is_attack";
      *
      * <p>⭐ The complement of {@link #DAMAGE_IS_ATTACK}, and it has to be its own keyword: that one is stated positively on purpose (`!` is
      * only for party conditions), so a rule that needs the OTHER side -- 1415's ode of passage, 「缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成
-     * #1 次附加伤害」 -- had no way to say it. ⚠ The negation lives HERE, where the name announces it; `TriggerTable` records what happened
+     * #1 次附加伤害" -- had no way to say it. Note: The negation lives HERE, where the name announces it; `TriggerTable` records what happened
      * when it lived inside {@code damage_is_attack} instead: cone 23008's energy clause read +0.0, because every ordinary attack failed the
      * guard it was written to pass (2026-09-30).
      */
@@ -108,7 +108,7 @@ rules.append({
     "when": ["actor == self", "damage_is_additional"],
     "do": [{
         "op": "DAMAGE",
-        "times": 1,                      # 「额外造成 #1 次」, and #1 is 1 at EVERY level
+        "times": 1,                      # "额外造成 #1 次", and #1 is 1 at EVERY level
         "scale": "original_damage",      # of the instance that just settled -- the zone's own additional damage
         "percent": 1.0,
         "element": "Ice",                # 1415's zone states Ice (1415.json, the 24% rider)

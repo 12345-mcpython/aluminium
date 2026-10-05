@@ -18,8 +18,8 @@ import java.util.Random;
 /**
  * Light cone 21055: while one of OUR units is at half health or more, the damage IT deals is 12% higher.
  *
- * <p>⭐ The subject is the ATTACKER (not the wearer and not the victim), which is why the variable is `actor_hp_percent`. The
- * judge moves the ATTACKER’s health -- the wearer stays untouched, so no other mechanic of the cone’s owner is disturbed.
+ * <p>The subject is the ATTACKER (not the wearer and not the victim), which is why the variable is `actor_hp_percent`. The
+ * judge moves the ATTACKER's health -- the wearer stays untouched, so no other mechanic of the cone's owner is disturbed.
  */
 public class Cone21055Test {
     private static final int CONE = 21055;
@@ -48,8 +48,8 @@ public class Cone21055Test {
     }
 
     private void hurtTheAttacker() {
-        // ★ A bounded loop, because the defence zone does not let a fixed figure land as written (measured: damage of
-        // 0.6 x max HP left the attacker at 57.3%) -- and it stops as soon as the share is really below half, so the unit
+        // A bounded loop, because the defence zone does not let a fixed figure land as written (measured: damage of
+        // 0.6 x max HP left the attacker at 5.3%) -- and it stops as soon as the share is really below half, so the unit
         // cannot be killed by accident (which would make every later reading zero).
         for (int i = 0; i < 8 && attacker.getCurrentHp() / attacker.getMaxHp() >= 0.5; i++) {
             battle.applyDamage(attacker, new Damage(enemy, attacker, DamageElement.FIRE, DamageType.NORMAL,

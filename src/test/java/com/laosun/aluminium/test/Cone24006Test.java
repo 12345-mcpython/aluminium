@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 24006: casting a Skill or Ultimate ON AN ALLY raises THAT ALLY's elation damage by 12% for 2 turns.
  *
- * <p>⭐ Two things carry the clause: the cast events already mean "after the cast", and their target is the unit that was
+ * <p>Two things carry the clause: the cast events already mean "after the cast", and their target is the unit that was
  * aimed at -- so `target is_ally` picks the recipient, and the modifier goes on `target`, not on the wearer. The judge
  * therefore reads THREE units: the aimed ally (raised), the wearer (NOT raised) and an enemy-targeted cast (nothing).
  */

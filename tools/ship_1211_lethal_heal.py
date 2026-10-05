@@ -19,7 +19,7 @@ JUDGE = "src/test/java/com/laosun/aluminium/test/LethalHealOnTeammateTest.java"
 RULE = "talent_heals_a_lethal_hit_on_a_teammate"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
-# ⚠ 1211.json is a BARE LIST (like 1104.json and 1209.json); the file's own shape is preserved on the way out.
+# Note: 1211.json is a BARE LIST (like 1104.json and 1209.json); the file's own shape is preserved on the way out.
 isObject = isinstance(doc, dict)
 rules = doc["rules"] if isObject else doc
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == RULE)]

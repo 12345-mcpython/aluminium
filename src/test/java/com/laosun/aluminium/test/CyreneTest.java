@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 Cyrene, from her own file (2026-09-29, round 230): the 【追忆】 resource and the party boost that needs no condition.
+ * 1415 Cyrene, from her own file (2026-09-29, round 230): the [追忆] resource and the party boost that needs no condition.
  */
 public class CyreneTest {
     private static final int CYRENE = 1415;
@@ -22,7 +22,7 @@ public class CyreneTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ Both writers feed 【追忆】, stopped at the document's twenty-four. */
+    /** Note: Both writers feed [追忆], stopped at the document's twenty-four. */
     @Test
     public void bothWritersFeedRecollectionUpToItsStatedOverflow() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
@@ -43,7 +43,7 @@ public class CyreneTest {
                 "「【追忆】达到24点时可激活终结技」 -- thirty-two casts must still read twenty-four");
     }
 
-    /** ⚠ The party boost, which the document conditions on nothing at all: an ally gains it, an enemy does not. */
+    /** Note: The party boost, which the document conditions on nothing at all: an ally gains it, an enemy does not. */
     @Test
     public void thePartyBoostNeedsNoCondition() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);

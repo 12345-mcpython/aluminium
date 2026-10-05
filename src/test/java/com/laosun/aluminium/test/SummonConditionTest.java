@@ -27,18 +27,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code actor == summon} / {@code target == summon} and the {@code SUMMON_ATTACK} event — 「装备者的忆灵攻击时」.
+ * {@code actor == summon} / {@code target == summon} and the {@code SUMMON_ATTACK} event - "装备者的忆灵攻击时".
  *
  * <p><b>Why the vocabulary needed both halves.</b> A memosprite's attack became a real attack (it deals its own
  * damage and the engine tells our side about it), but <em>data</em> could not act on it:
  *
  * <ul>
  *   <li>the condition DSL could compare {@code actor}/{@code target} against {@code self} only, so "MY summon"
- *       was unwritable — and without it a rule would also fire for a <b>teammate's</b> memosprite, which is an
+ *       was unwritable - and without it a rule would also fire for a <b>teammate's</b> memosprite, which is an
  *       over-trigger, not a near miss;</li>
  *   <li>{@code ALLY_ATTACK} is deliberately <b>not</b> widened to cover summons: three shipped rules mean
- *       「我方其他目标攻击后」 / "after an ally attacks" by it ({@code characters/1309.json},
- *       {@code characters/1403.json}, relic set 105), and whether a memosprite counts as one of those 「目标」 is
+ *       "我方其他目标攻击后" / "after an ally attacks" by it ({@code characters/1309.json},
+ *       {@code characters/1403.json}, relic set 105), and whether a memosprite counts as one of those "目标" is
  *       not something the documents settle. Widening it would silently change what they fire on, so a summon's
  *       attack has an event of its own.</li>
  * </ul>
@@ -46,8 +46,8 @@ import java.util.Random;
  * <p><b>What is really being tested.</b> Four things that would each leave a rule which loads fine and quietly
  * does the wrong thing:
  * <ol>
- *   <li><b>whose</b> summon — the rule owner's, not a teammate's, and not an enemy's minion either;</li>
- *   <li><b>which side</b> is read — {@code actor} for "it attacked", {@code target} for "it was hit";</li>
+ *   <li><b>whose</b> summon - the rule owner's, not a teammate's, and not an enemy's minion either;</li>
+ *   <li><b>which side</b> is read - {@code actor} for "it attacked", {@code target} for "it was hit";</li>
  *   <li>a context with <b>no battlefield</b> cannot answer "is this my summon", so the condition fails for
  *       <em>both</em> polarities ({@code actor != summon} must not silently become true for everyone);</li>
  *   <li>the event fires <b>once per attack</b> and carries the hit count, so an author can tell one target from
@@ -55,18 +55,18 @@ import java.util.Random;
  * </ol>
  *
  * <p>The shipped content is relic set 123 (凯歌祝捷的英豪), whose 4-piece is the first rule in the game's data
- * that says "my memosprite attacked" — checked through the real loader, with the numbers read from the effect's
+ * that says "my memosprite attacked" - checked through the real loader, with the numbers read from the effect's
  * {@code param} rather than from its sentence.
  */
 public class SummonConditionTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 — has a memosprite spec, and a hand-built table replaces her own rules cleanly. */
+    /** 长夜月 - has a memosprite spec, and a hand-built table replaces her own rules cleanly. */
     private static final int OWNER = 1413;
-    /** 阿格莱雅 — the second memosprite owner, for "a teammate's summon does not count". */
+    /** 阿格莱雅 - the second memosprite owner, for "a teammate's summon does not count". */
     private static final int TEAMMATE = 1402;
     /**
-     * 姬子 — a plain character with no memosprite spec at all, i.e. the "owns nothing" side of
+     * 姬子 - a plain character with no memosprite spec at all, i.e. the "owns nothing" side of
      * {@code target_summon_count}.
      */
     private static final int PLAIN = 1003;
@@ -75,7 +75,7 @@ public class SummonConditionTest {
     private static final int OTHER_MONSTER = 8002040;
     /** 凯歌祝捷的英豪: 攻击力 +12%; 忆灵在场 -> 速度 +6%, 忆灵攻击时 -> 双方暴击伤害 +30% / 2 回合. */
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
-    /** The magnitude the fixture rules grant — a ratio attribute, so the delta is exact. */
+    /** The magnitude the fixture rules grant - a ratio attribute, so the delta is exact. */
     private static final double GRANT = 0.5;
 
     // ==================================================================
@@ -147,8 +147,8 @@ public class SummonConditionTest {
     /**
      * "My summon" means <b>any</b> of them, not just the first.
      *
-     * <p>Nothing in the shipped data owns more than one yet — 知更鸟·晴歌's 晴空乐手 is a trio, and the documents
-     * do describe multi-summon characters — so a condition that resolved {@code summon} to the first match would
+     * <p>Nothing in the shipped data owns more than one yet - 知更鸟-晴歌's 晴空乐手 is a trio, and the documents
+     * do describe multi-summon characters - so a condition that resolved {@code summon} to the first match would
      * look right today and be wrong the moment one lands. Two fixture memosprites for one owner is how that shows
      * up: the <em>second</em> one attacking is still "my summon".
      */
@@ -182,7 +182,7 @@ public class SummonConditionTest {
      * A context with <b>no battlefield</b> cannot answer the question, so the condition fails either way.
      *
      * <p>Answering "no battle, therefore not my summon" would make {@code actor != summon} silently true for
-     * every event — a rule meaning "anyone but my summon attacked" would fire on <em>everything</em>, with
+     * every event - a rule meaning "anyone but my summon attacked" would fire on <em>everything</em>, with
      * nothing in the log to say so. That is the rule {@code self_summon_count} already follows by answering
      * {@code NaN}, and it is why the guard comes before the negation is applied.
      */
@@ -199,14 +199,14 @@ public class SummonConditionTest {
     }
 
     // ==================================================================
-    // 1b. `target_summon_count` — the same question about the other unit (M-41)
+    // 1b. `target_summon_count` - the same question about the other unit (M-41)
     // ==================================================================
 
     /**
      * {@code target_summon_count} counts the <b>subject's</b> summons, where {@code self_summon_count} counts the
-     * owner's — the two are one word apart and both are read from the field.
+     * owner's - the two are one word apart and both are read from the field.
      *
-     * <p>Its first user is 星期日's Skill: 「若目标拥有召唤物，则造成的伤害提高效果额外提高…」, i.e. a question about
+     * <p>Its first user is 星期日's Skill: "若目标拥有召唤物，则造成的伤害提高效果额外提高…", i.e. a question about
      * the ally the skill was cast on, not about the caster. The two rules are put on <b>one</b> table and the event
      * carries an ally who owns no summon while the owner owns one: exactly one of them may fire, which is the only
      * arrangement that tells the two variables apart.
@@ -244,7 +244,7 @@ public class SummonConditionTest {
      * With no subject at all the variable is unreadable, and <b>every</b> comparison fails.
      *
      * <p>Pinned because {@code == 0} is the tempting way to write "the target has no summon", and it would be
-     * silently true for every event without a target — a rule that fires on the wrong events with no symptom.
+     * silently true for every event without a target - a rule that fires on the wrong events with no symptom.
      * The same table carries both polarities, and the event with a real (summon-less) subject is the contrast that
      * shows the {@code == 0} rule works when there is something to read.
      */
@@ -323,7 +323,7 @@ public class SummonConditionTest {
     // 4. The shipped content: relic set 123's 4-piece
     // ==================================================================
 
-    /** Both authored rules state what the effect's {@code param} states — including the duration. */
+    /** Both authored rules state what the effect's {@code param} states - including the duration. */
     @Test
     public void theAuthoredRulesStateTheirOwnNumbers() {
         Character wearer = wearer();
@@ -399,7 +399,7 @@ public class SummonConditionTest {
     @Test
     public void theSpeedClauseNeedsTheMemospriteOut() {
         // 阿格莱雅, not 长夜月: her rule summons on her ULTIMATE, so the battlefield really starts without one
-        // (长夜月's 「进入战斗时召唤」 would make the "before" half of this case impossible to reach).
+        // (长夜月's "进入战斗时召唤" would make the "before" half of this case impossible to reach).
         Character wearer = CharacterFactory.create(TEAMMATE, LEVEL, true, null,
                 RelicFactory.suit(HERO_OF_TRIUMPHANT_SONG, 5, 15));
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(100));   // a clean base: +6% is +6
@@ -427,7 +427,7 @@ public class SummonConditionTest {
         return owner;
     }
 
-    /** The 4-piece on 长夜月, whose own rule (BATTLE_START → SUMMON) is left in place. */
+    /** The 4-piece on 长夜月, whose own rule (BATTLE_START to SUMMON) is left in place. */
     private static Character wearer() {
         return CharacterFactory.create(OWNER, LEVEL, true, null,
                 RelicFactory.suit(HERO_OF_TRIUMPHANT_SONG, 5, 15));
@@ -446,7 +446,7 @@ public class SummonConditionTest {
     /**
      * The compiled condition behind one spelling, taken from a table whose rule matches the given subject.
      *
-     * <p>Needed because {@link TriggerTable#matching} only hands back rules whose conditions already hold — the
+     * <p>Needed because {@link TriggerTable#matching} only hands back rules whose conditions already hold - the
      * "no battlefield" case below is precisely the one where they do not, so the condition object has to be
      * obtained from a context in which it does.
      */
@@ -478,7 +478,7 @@ public class SummonConditionTest {
         return character.getAttribute(AttributeType.SPEED).get();
     }
 
-    /** Drives to the given unit's turn and lets {@code beforeMove} run — where TURN_START is fired. */
+    /** Drives to the given unit's turn and lets {@code beforeMove} run - where TURN_START is fired. */
     private static void startItsTurn(Battle battle, CanHit actor) {
         for (int action = 0; action < 20; action++) {
             battle.stepForward();
@@ -531,7 +531,7 @@ public class SummonConditionTest {
         return summon;
     }
 
-    /** A memosprite that hits every enemy for a share of its own Max HP — only reachable through the seam. */
+    /** A memosprite that hits every enemy for a share of its own Max HP - only reachable through the seam. */
     private static MemospriteSpec aoeSpec() {
         return new MemospriteSpec("fixture", "SummonConditionTest", null,
                 List.of(new MemospriteSpec.Panel("HEALTH", 0.5, null),

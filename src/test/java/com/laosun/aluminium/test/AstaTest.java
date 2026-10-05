@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1009 Asta, from her own file (2026-09-29, round 195): the FLAT speed boost, whose base is 17 documents.
+ * 1009 Asta, from her own file (2026-09-29, round 195): the FLAT speed boost, whose base is 1documents.
  *
  * <p>The assertion is absolute because the document is: speed rises by exactly 50 POINTS, not by a share.
  */
@@ -24,7 +24,7 @@ public class AstaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「使我方全体速度提高50点，持续2回合」 -- fifty points, for the party. */
+    /** Note: "使我方全体速度提高50点，持续2回合" -- fifty points, for the party. */
     @Test
     public void herUltimateRaisesEveryAllysSpeedByFiftyPoints() {
         Character asta = CharacterFactory.create(ASTA, LEVEL);
@@ -40,7 +40,7 @@ public class AstaTest {
                 "「使我方全体速度提高50点」: before " + before + ", after " + ally.getAttribute(AttributeType.SPEED).get());
     }
 
-    /** ⚠ The technique's 50%-ATK opening, and its control. */
+    /** Note: The technique's 50%-ATK opening, and its control. */
     @Test
     public void theTechniqueHitsOnlyWhenDeclared() {
         Character asta = CharacterFactory.create(ASTA, LEVEL);

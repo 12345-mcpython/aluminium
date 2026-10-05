@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「每层【当品】额外使翡翠的攻击力提高 0.50%」 follows the layers (2026-10-02).
+ * "每层[当品]额外使翡翠的攻击力提高 0.50%" follows the layers (2026-10-02).
  *
  * <p>Measured before: the clause had no spelling at all -- ATTACK is a flat attribute, the derived form yields an absolute
  * number and a plain modifier yields ONE layer's share. Both of her per_stack clauses also froze the count at attach time,

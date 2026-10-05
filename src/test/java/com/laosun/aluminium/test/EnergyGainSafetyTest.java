@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
  * <p>Three ways the old {@code gainEnergy} did one or the other:
  * <ol>
  *   <li>the guard was {@code gain.amount() <= 0}, and {@code NaN <= 0} is <b>false</b>, so a NaN amount
- *       slipped through to {@code Math.min(…, NaN)} → {@code currentEnergy = NaN}. From then on
+ *       slipped through to {@code Math.min(…, NaN)} to {@code currentEnergy = NaN}. From then on
  *       {@code isEnergyFull()} ({@code NaN >= max} is false) could never be true again: the ultimate
  *       became unreachable for the rest of the battle, silently;</li>
  *   <li>a <b>negative efficiency</b> ({@code ENERGY_REGENERATION_RATE <= -1}) turned the "gain" into a
@@ -72,7 +72,7 @@ public class EnergyGainSafetyTest {
      * a negative amount times a <b>negative efficiency is positive</b>, so {@code -10} with efficiency
      * {@code -2} would be credited as {@code +20}.
      *
-     * <p>Found by mutating the amount guard away and noticing that the NaN case stayed green — the NaN
+     * <p>Found by mutating the amount guard away and noticing that the NaN case stayed green - the NaN
      * amount happens to be caught downstream by the product guard, but this combination is not. Without
      * this test the amount guard would have looked like dead code.
      */

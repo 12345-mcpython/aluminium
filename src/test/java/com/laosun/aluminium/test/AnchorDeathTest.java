@@ -19,20 +19,20 @@ import java.util.Random;
  *
  * <p>The mechanism is {@code BuffManager.removeBuffsAnchoredTo(clockOwner)}, reached from
  * {@code Battle.removeDeadCombatants}, keyed on {@code buff.ticksOn(clockOwner)} -- whose own comment names the failure
- * it prevents: <i>an anchored buff is a **leak** -- its clock was somebody else's turns, and that somebody will never
+ * it prevents: <i>an anchored buff is a leak -- its clock was somebody else's turns, and that somebody will never
  * take another one</i>.
  *
- * <p>⚠ <b>Three measurements, because two are not enough.</b> A first draft compared "with the cut" against "after she
- * fell" and got exactly 1.0 -- both numbers were the same, so the ratio said nothing either way (round 1075: measured at
+ * <p>Note: <b>Three measurements, because two are not enough.</b> A first draft compared "with the cut" against "after she
+ * fell" and got exactly 1.0 -- both numbers were the same, so the ratio said nothing either way (round 105: measured at
  * {@code turns: 3} and {@code turns: 99}, identical). The cut has to be measured against <b>the same enemy before the
  * ultimate</b>, which is the only number that is free of it.
  *
- * <p>⚠ <b>What the anchor IS (rounds 1075-1077).</b> {@code AbstractBuff} falls back to {@code owner} when
+ * <p>Note: <b>What the anchor IS (rounds 105-10).</b> {@code AbstractBuff} falls back to {@code owner} when
  * {@code tickOwner} is null, and {@code owner} is the caster (the same method compares against {@code instance}, the
  * carrier). So the anchor death is the DEFAULT -- dropping {@code ticks_on: "self"} changes nothing about it.
  * {@code ticks_on} picks <b>whose turn spends the duration</b>, which is a different fact; a judge for THAT is owed.
  *
- * <p>⚠ Killing a unit has no setter: {@code takeDamage(9_999_999)} then {@code battle.processRequests()} -- the second
+ * <p>Note: Killing a unit has no setter: {@code takeDamage(9_999_999)} then {@code battle.processRequests()} -- the second
  * call is what lets the engine run its death handling ({@code MemospriteTest}'s pattern).
  */
 public class AnchorDeathTest {
@@ -47,10 +47,10 @@ public class AnchorDeathTest {
         EffectSpec cut = new EffectSpec();
         TriggerSpecs.set(cut, "op", "MODIFY_DAMAGE_TAKEN");
         TriggerSpecs.set(cut, "percent", 0.4);
-        // ⚠ 99: processRequests advances turns below, and a short duration would expire on its own
+        // Note: 99: processRequests advances turns below, and a short duration would expire on its own
         TriggerSpecs.set(cut, "turns", 99);
         TriggerSpecs.set(cut, "target", "all_enemies");
-        TriggerSpecs.set(cut, "ticksOn", "self");     // ⚠ the Java field name; the data spells it ticks_on
+        TriggerSpecs.set(cut, "ticksOn", "self");     // Note: the Java field name; the data spells it ticks_on
         caster.setTriggerTable(new TriggerTable(CASTER, List.of(
                 TriggerSpecs.rule(TriggerEvent.ULT_CAST.name(), List.of("actor == self"), cut))));
         Character probe = CharacterFactory.create(PROBE, LEVEL);
@@ -58,20 +58,20 @@ public class AnchorDeathTest {
         Battle battle = new Battle(List.of(caster, probe), List.of(victim), new Random() {
             @Override
             public double nextDouble() {
-                return 1.0;                       // ⚠ never crits: the subject is the anchor, not the roll
+                return 1.0;                       // Note: never crits: the subject is the anchor, not the roll
             }
         });
         battle.startBattle();
 
-        double baseline = hit(battle, probe, victim);                       // ⚠ no ultimate yet: no cut anywhere
+        double baseline = hit(battle, probe, victim);                       // Note: no ultimate yet: no cut anywhere
         battle.fireTriggers(TriggerEvent.ULT_CAST, caster, victim, 0, 0);
         double withCut = hit(battle, probe, victim);
 
         caster.takeDamage(9_999_999);
         battle.processRequests();
         Assertions.assertTrue(caster.isDeath(), "the caster really did fall");
-        // ⚠ ONE discarded swing first. removeDeadCombatants runs at the END of castImmediate, and processRequests
-        // alone does NOT run it (Battle:573-582) -- so the swing that TRIGGERS the cleanup also settles its own damage
+        // Note: ONE discarded swing first. removeDeadCombatants runs at the END of castImmediate, and processRequests
+        // alone does NOT run it (Battle:53-582) -- so the swing that TRIGGERS the cleanup also settles its own damage
         // before the cleanup happens, and measuring right there still reads the cut up (measured: 1.40x, twice). This
         // discarded swing lets the cleanup finish; the next one sees the settled state.
         hit(battle, probe, victim);

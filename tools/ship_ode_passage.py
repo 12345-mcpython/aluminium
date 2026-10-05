@@ -52,7 +52,7 @@ rules.append({
     "on": "CAST_SETUP",
     "when": ["target == self", "actor is_summon", "from_skill_id == " + str(SLOT)],
     "do": [
-        # 「整场生效」: the ode marks him, so the piercing lasts as long as the battle does
+        # "整场生效": the ode marks him, so the piercing lasts as long as the battle does
         {"op": "APPLY_BUFF", "buff": name, "permanent": True, "target": "self"},
         {"op": "MODIFY_ATTR", "attribute": PIERCE, "percent_from_cast_param": 1,
          "permanent": True, "target": "self"},

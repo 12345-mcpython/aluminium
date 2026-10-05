@@ -17,7 +17,7 @@ import java.util.TreeSet;
  *
  * <p>Every light cone whose ability is not authored must be REGISTERED in {@code light_cones/_unmodelled.json} with
  * the capability it is missing. Before this existed, "5 cones are unwritten" lived only in prose -- and the count
- * itself was wrong (170 vs the real 169 rows), because it came from a file that does not carry abilities at all
+ * itself was wrong (10 vs the real 169 rows), because it came from a file that does not carry abilities at all
  * ({@code data/weapons.json} has zero rows with an ability id).
  *
  * <p><b>The teeth:</b> a registered cone must have NO rule file on the classpath. Authoring one therefore fails this

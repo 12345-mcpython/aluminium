@@ -35,23 +35,23 @@ import java.util.Random;
 /**
  * aluminium engine demo: one complete battle.
  *
- * <p>This `main` only walks through what the engine **actually supports** right now:
+ * <p>This `main` only walks through what the engine actually supports right now:
  * <ul>
- *   <li>Character stats: real data (character_data → level scaling → light cone → relics → traces → extra bonuses)</li>
- *   <li>Enemy stats: real data ({@link EnemyFactory#create} = template × level group × instance coefficient)</li>
+ *   <li>Character stats: real data (character_data to level scaling to light cone to relics to traces to extra bonuses)</li>
+ *   <li>Enemy stats: real data ({@link EnemyFactory#create} = template  x  level group  x  instance coefficient)</li>
  *   <li>Action bar: {@code 10000 / speed}, weakness break push-forward 25%</li>
- *   <li>Turn flow: {@code stepForward → beforeMove → cast → afterMove}</li>
+ *   <li>Turn flow: {@code stepForward to beforeMove to cast to afterMove}</li>
  *   <li>Damage: the full damage zones (DMG boost / crit / defence / resistance / vulnerability) + event hooks</li>
- *   <li>Toughness: toughness reduction → break damage → push-forward → apply DOT → break energy gain</li>
+ *   <li>Toughness: toughness reduction to break damage to push-forward to apply DOT to break energy gain</li>
  *   <li>Super break: with a {@link SuperBreakBuff}, toughness reduction past the toughness bar turns into one extra hit of damage</li>
  *   <li>DOT: settled at the start of the enemy's turn, "applied first, settled first"</li>
  *   <li>Energy: skill energy gain / energy gain when hit / energy gain on kill / the ultimate zeroes energy and then returns 5 / only a full energy bar allows the ultimate</li>
- *   <li>Life and death: HP at zero → removed from the action bar; either side wiped out → battle over (P7-3 state machine)</li>
+ *   <li>Life and death: HP at zero to removed from the action bar; either side wiped out to battle over (P-3 state machine)</li>
  * </ul>
  *
  * <p><b>Things this demo deliberately does not use</b>:
  * <ul>
- *   <li>Stages/waves (P7-4/P7-5 are implemented, see {@code StageFactory}) — here 3 fixed enemies are hand-built,
+ *   <li>Stages/waves (P-4/P-5 are implemented, see {@code StageFactory}) - here 3 fixed enemies are hand-built,
  *       because the point is to display the "weakness / resistance / toughness / skill multiplier" data item by item,
  *       and walking wave by wave would only make that harder to read;</li>
  *   <li>Memosprites (P9-4) are shown in the <b>mechanics</b> demo (<code>--args="mechanics"</code>, scene 4),
@@ -59,7 +59,7 @@ import java.util.Random;
  *       the point is to display the data item by item. The Elation system (P10) is still missing.</li>
  * </ul>
  *
- * <p>The random numbers all come from the injected {@link Random}: a fixed seed → the whole battle is reproducible.
+ * <p>The random numbers all come from the injected {@link Random}: a fixed seed to the whole battle is reproducible.
  */
 public class Main {
 
@@ -67,7 +67,7 @@ public class Main {
      * Skill point (战技点, SP) reserve of the demo AI (P8-4): it only casts the skill when the points are above this
      * value, otherwise it uses the basic attack to get a point back.
      *
-     * <p>This is a **demo strategy**, not an engine rule — the engine only provides "is there enough", and how to spend
+     * <p>This is a demo strategy, not an engine rule - the engine only provides "is there enough", and how to spend
      * it is up to the caller.
      */
     private static final int SKILL_POINT_RESERVE = 1;
@@ -105,8 +105,8 @@ public class Main {
 
         List<Character> team = List.of(himeko(), march7th(), luocha());
 
-        // ── Enemies: real data. Three simple mooks, each with its own weakness/resistance, and all of them
-        //    carry the basic attack from enemy_skills.json ──
+        // -- Enemies: real data. Three simple mooks, each with its own weakness/resistance, and all of them
+        //    carry the basic attack from enemy_skills.json --
         //  冰锋 1002011  weak to fire/lightning, ice resistance 0.2, toughness 60
         //  基层员工 8032010  physical
         //  次元扑满 8002040  a low-multiplier (0.6) trash mob
@@ -115,22 +115,22 @@ public class Main {
                 EnemyFactory.create(8032010, 90, 1),
                 EnemyFactory.create(8002040, 90, 1)));
         for (Enemy enemy : enemies) {
-            // ⚠ This value changed twice as "whether the skill multipliers are real" changed:
-            //   - earlier all six slots resolved to the **basic attack** (fixed in P8-2), and a single-target basic
-            //     attack only does a few hundred damage → so it was set to 12000;
-            //   - after the slots were fixed, skills/ultimates used the **real multipliers** (Himeko's (姬子) skill
-            //     hits 3 targets and does tens of thousands on a single target), so 12000 would be one-shot →
+            // Note: This value changed twice as "whether the skill multipliers are real" changed:
+            //   - earlier all six slots resolved to the basic attack (fixed in P8-2), and a single-target basic
+            //     attack only does a few hundred damage to so it was set to 12000;
+            //   - after the slots were fixed, skills/ultimates used the real multipliers (Himeko's (姬子) skill
+            //     hits 3 targets and does tens of thousands on a single target), so 12000 would be one-shot to 
             //     raised to 30000, which puts the battle back at the scale of "a few dozen actions".
             // The HP cap lives in the HEALTH slot of the attribute array; currentHp has no setter, so after raising
             // the cap we top it up with heal.
             enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(30_000));
             enemy.heal(30_000);
-            enemy.setMaxEnergy(0);               // monsters have no energy bar: maxEnergy == 0 → every energy gain is a no-op
+            enemy.setMaxEnergy(0);               // monsters have no energy bar: maxEnergy == 0 to every energy gain is a no-op
             printEnemy(enemy);
         }
         System.out.println();
 
-        // ── P9-5: an enemy that hits back ─────────────────────────────────────
+        // -- P9-5: an enemy that hits back -------------------------------------
         // 冰锋 wears a counter, so the demo exercises the mechanic instead of only describing it: hit it
         // and it answers with 50% of its ATK. That answer is ADDITIONAL damage, so it does not count as an
         // attack -- the character it lands on gains no energy from it (worth watching in the log below).
@@ -141,11 +141,11 @@ public class Main {
                 + " wears CounterMechanic: counters 50% of its ATK as additional damage");
         System.out.println();
 
-        // ── Battle start ─────────────────────────────────────────────────────
+        // -- Battle start -----------------------------------------------------
         Battle battle = new Battle(team, enemies, new Random(20260919));
         battle.startBattle();
 
-        // A simplified version of Trailblazer·Harmony 【伴舞】: hang a super break marker on a teammate
+        // A simplified version of Trailblazer-Harmony [伴舞]: hang a super break marker on a teammate
         team.getFirst().getBuffManager().addBuff(new SuperBreakBuff(99));
         System.out.println("[Opening] Himeko gains SuperBreakBuff (super break marker)");
         printQueue(battle);
@@ -154,7 +154,7 @@ public class Main {
         int actions = 0;
         while (!battle.isOver() && actions < 60) {
             actions++;
-            // P7-1: the round is derived from the action bar's accumulated action value (150 for the first round,
+            // P-1: the round is derived from the action bar's accumulated action value (150 for the first round,
             // 100 for every round after), it is no longer counted by hand
             System.out.println("────────── Round " + battle.getRound() + " (action " + actions
                     + ", total action value " + fmt(battle.queue.getElapsed()) + ")──────────");
@@ -163,7 +163,7 @@ public class Main {
         }
 
         System.out.println("=".repeat(78));
-        // P7-3: win/lose comes from the Battle state machine, the demo does not count the living itself
+        // P-3: win/lose comes from the Battle state machine, the demo does not count the living itself
         System.out.println(switch (battle.getStatus()) {
             case WIN -> " Battle over: victory (" + battle.getRound() + " rounds / " + actions + " actions)";
             case LOSE ->
@@ -184,19 +184,19 @@ public class Main {
      * rather than to look like a fair fight. Four scenes:
      *
      * <ol>
-     *   <li><b>Break control states</b> (P10-1/P10-2) — 冰 = the victim cannot act, 量子/虚数 = it acts but
+     *   <li><b>Break control states</b> (P10-1/P10-2) - 冰 = the victim cannot act, 量子/虚数 = it acts but
      *       slower and later. Prints the speed and action-value change for each, because those are the
      *       observables the mechanics are made of.</li>
-     *   <li><b>A DOT on our own character</b> (P10-0) — the engine settles it at the start of that
+     *   <li><b>A DOT on our own character</b> (P10-0) - the engine settles it at the start of that
      *       character's turn and expires it after N turns, exactly as it does for a monster. Before the
      *       migration this was impossible: {@code tickDots} took an {@code Enemy}.</li>
-     *   <li><b>An enemy-side summon</b> (L-8) — the camp holds a non-monster, our side can hit it, and the
+     *   <li><b>An enemy-side summon</b> (L-8) - the camp holds a non-monster, our side can hit it, and the
      *       battle is not won while it stands.</li>
-     *   <li><b>A memosprite of our own</b> (P9-4 忆灵) — summoned by its character's own rule, panelled from the
+     *   <li><b>A memosprite of our own</b> (P9-4 忆灵) - summoned by its character's own rule, panelled from the
      *       summoner's resolved sheet, and then taking a turn whose damage is a share of <em>its</em> Max HP.</li>
      * </ol>
      *
-     * <p>⚠ Deliberate demo affordances, each labelled in the output: the enemy's weakness set is rewritten
+     * <p>Note: Deliberate demo affordances, each labelled in the output: the enemy's weakness set is rewritten
      * so that all three control elements can break one target, {@code recoverFromBroken()} is called between
      * elements so each can be shown from a clean state, and the control states are cleared between them.
      * A real fight has none of that; the battle demo is the one that plays fair.
@@ -287,7 +287,7 @@ public class Main {
             }
             boolean isHero = current.getCanHit() == hero;
             double before = hero.getCurrentHp();
-            battle.beforeMove();                    // ← the engine settles DOTs here, before the buff tick
+            battle.beforeMove();                    //  from the engine settles DOTs here, before the buff tick
             if (isHero) {
                 heroTurns++;
                 System.out.println("    turn " + heroTurns + ": HP " + fmt(before) + " → "
@@ -305,7 +305,7 @@ public class Main {
     }
 
     /**
-     * Scene 3: the enemy camp holds a summon — targetable, and counted for the outcome.
+     * Scene 3: the enemy camp holds a summon - targetable, and counted for the outcome.
      */
     private static void enemyCampSummonScene() {
         System.out.println("[3] A summon on the ENEMY side — the camp no longer only accepts monsters (L-8)");
@@ -344,7 +344,7 @@ public class Main {
     }
 
     /**
-     * Remaining action value before the target acts — the observable every action-bar mechanic moves.
+     * Remaining action value before the target acts - the observable every action-bar mechanic moves.
      */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
@@ -358,9 +358,9 @@ public class Main {
     /**
      * Which control buffs the target is wearing, as text (the demo prints rather than asserts).
      *
-     * <p>Since 2026-09-27 the state itself is one {@code ControlBuff} that knows its own name (冻结 / 纠缠 / 禁锢),
-     * so the printout reads the name instead of inferring "a StunBuff means frozen" — the same change that lets a
-     * rule ask 「冻结状态」 about a unit a <i>skill</i> froze rather than only a break.
+     * <p>Since 2026-09-2the state itself is one {@code ControlBuff} that knows its own name (冻结 / 纠缠 / 禁锢),
+     * so the printout reads the name instead of inferring "a StunBuff means frozen" - the same change that lets a
+     * rule ask "冻结状态" about a unit a <i>skill</i> froze rather than only a break.
      */
     private static String describeControl(Enemy enemy) {
         List<String> parts = new ArrayList<>();
@@ -381,26 +381,26 @@ public class Main {
     }
 
     /**
-     * Speed as the engine reads it (there is no {@code getSpeed()} — it is an attribute slot).
+     * Speed as the engine reads it (there is no {@code getSpeed()} - it is an attribute slot).
      */
     private static double speedOf(CanHit unit) {
         return unit.getAttribute(AttributeType.SPEED).get();
     }
 
     /**
-     * "25%" — keeps the output readable for the ratio constants.
+     * "25%" - keeps the output readable for the ratio constants.
      */
     private static String pct(double ratio) {
         return Math.round(ratio * 100) + "%";
     }
 
     /**
-     * Scene 4: one of OUR summons — a memosprite, whose panel is <b>derived from its summoner</b> and which
+     * Scene 4: one of OUR summons - a memosprite, whose panel is <b>derived from its summoner</b> and which
      * then takes its own turn (P9-4 忆灵).
      *
-     * <p>Nothing is fabricated here: 长夜月's own rule file summons 「长夜」 at battle start
-     * ({@code BATTLE_START → SUMMON}), the panel comes from {@code memosprites/1413.json} and the attack is
-     * the memosprite's own 忆灵技能1. The scene prints the derivation itself (share × the summoner's resolved
+     * <p>Nothing is fabricated here: 长夜月's own rule file summons "长夜" at battle start
+     * ({@code BATTLE_START to SUMMON}), the panel comes from {@code memosprites/1413.json} and the attack is
+     * the memosprite's own 忆灵技能1. The scene prints the derivation itself (share  x  the summoner's resolved
      * value) because "the panel is a function of the summoner" is the whole mechanic.
      */
     private static void memospriteScene() {
@@ -475,7 +475,7 @@ public class Main {
         }
 
         // 2) Cast
-        // ⚠ Three actor kinds, not two (P9-4 忆灵): a Summon can be the current actor -- an enemy's minion (L-8) or
+        // Note: Three actor kinds, not two (P9-4 忆灵): a Summon can be the current actor -- an enemy's minion (L-8) or
         // one of our memosprites. Before this branch existed the `else` cast it to Character, so the first
         // summon to reach its own turn in this demo would have died with a ClassCastException rather than
         // doing something visible.
@@ -493,7 +493,7 @@ public class Main {
     }
 
     /**
-     * Our turn: cast the ultimate when energy is full, otherwise use the skill (not a weakness / no SP → fall back to the basic attack).
+     * Our turn: cast the ultimate when energy is full, otherwise use the skill (not a weakness / no SP to fall back to the basic attack).
      */
     private static void characterTurn(Battle battle, Character hero) {
         System.out.println("[Ally] " + hero.getName()
@@ -506,7 +506,7 @@ public class Main {
             return;
         }
 
-        // Enough for the ultimate threshold → ultimate (the engine zeroes the energy first, settles the ultimate
+        // Enough for the ultimate threshold to ultimate (the engine zeroes the energy first, settles the ultimate
         // itself, then gives the caster 5 points back)
         // P3-4: the test is battle.isUltraReady (it reads sp_need from the skill data), the bar does not have to be full
         if (battle.isUltraReady(hero) && hero.getSkills().containsKey(SkillType.ULTRA)) {
@@ -520,12 +520,12 @@ public class Main {
             return;
         }
 
-        // No skill points → basic attack (P8-4) — but a healing/shielding character's **panic button** must not be
+        // No skill points to basic attack (P8-4) - but a healing/shielding character's panic button must not be
         // thrown away just because 1 point is missing, so we first ask once "is there enough"; if not, we go straight
         // to the basic attack and stop dispatching the heal/shield branches.
         //
-        // ⚠ 1 point of **reserve** is kept here: without it all three characters cast a skill on every action, the
-        //    opening 3 points are gone after two actions, and then they can only basic-attack to get points back —
+        // Note: 1 point of reserve is kept here: without it all three characters cast a skill on every action, the
+        //    opening 3 points are gone after two actions, and then they can only basic-attack to get points back - 
         //    over 20 rounds the main DPS would only get one skill off, and the demo would not show what a battle
         //    looks like. Keeping 1 point makes "getting points back" and "spending points" alternate, which is the
         //    rhythm skill points (SP) are supposed to have.
@@ -551,7 +551,7 @@ public class Main {
         boolean castSkill = canUseSkill && skill != null && skill.getData() != null
                 && target.isWeakTo(skill.getData().getElement());
         if (!castSkill) {
-            skill = hero.getSkills().get(SkillType.COMMON);      // not a weakness / short of SP → basic attack
+            skill = hero.getSkills().get(SkillType.COMMON);      // not a weakness / short of SP to basic attack
         }
         if (skill == null) {
             return;
@@ -562,7 +562,7 @@ public class Main {
             System.out.println("        → action failed (dead / controlled / wrong action-bar state)");
             return;
         }
-        // ⚠️ performAction only **queues**; the actual settlement happens in afterMove()'s processRequests().
+        // Note:️ performAction only queues; the actual settlement happens in afterMove()'s processRequests().
         //    We settle explicitly once here so the battle report below gets the real numbers (in the real battle
         //    loop afterMove takes care of it).
         battle.processRequests();
@@ -572,9 +572,9 @@ public class Main {
     /**
      * Healing: pick who to heal, then let the <b>engine</b> compute and apply it.
      *
-     * <p>⚠ This method used to do the arithmetic itself — {@code ATK × param_list[0][0]} — and that was
+     * <p>Note: This method used to do the arithmetic itself - {@code ATK  x  param_list[0][0]} - and that was
      * simply wrong for the character it was used on: Natasha's heal scales off her <b>Max HP</b>, and
-     * the flat {@code +70} term was dropped entirely. It also read the parameter slot by hand, which is
+     * the flat {@code +0} term was dropped entirely. It also read the parameter slot by hand, which is
      * exactly the "engine depending on its caller" shape P10-3 set out to remove.
      *
      * <p>What is left is the one thing that genuinely belongs to the caller: <b>who</b> to heal. The
@@ -596,7 +596,7 @@ public class Main {
     /**
      * Shield: pick who to shield, then let the engine compute and apply it.
      *
-     * <p>Same rewrite as {@link #healTurn} — the {@code DEF × param} arithmetic and the manual energy
+     * <p>Same rewrite as {@link #healTurn} - the {@code DEF  x  param} arithmetic and the manual energy
      * grant used to live here. The scaling attribute is data ({@code scale: "def"} for the shields that
      * are unambiguous), not a convention this method should assume.
      */
@@ -611,9 +611,9 @@ public class Main {
     }
 
     /**
-     * Enemy turn (P5-5): the **engine's own AI**, no longer hitting people by hand.
+     * Enemy turn (P5-5): the engine's own AI, no longer hitting people by hand.
      *
-     * <p>Flow: broken → skip; otherwise use {@link TargetSelector} to pick a living target on our side weighted by
+     * <p>Flow: broken to skip; otherwise use {@link TargetSelector} to pick a living target on our side weighted by
      * aggro, then act with the enemy's own {@link EnemySkill}
      * (the skills come from {@code enemy_skills.json}, and the multipliers are guessed, see the note in that file).
      */
@@ -674,13 +674,13 @@ public class Main {
     }
 
     /**
-     * A summon's turn — an enemy's minion, or one of our memosprites (P9-4 忆灵).
+     * A summon's turn - an enemy's minion, or one of our memosprites (P9-4 忆灵).
      *
      * <p><b>What this method is, and is not.</b> The engine has no opinion about who drives a summon: the
      * action bar schedules it like any other unit and {@code Battle.performAction} casts whatever skill it
-     * was given. This is the demo's policy, written down in one place — attack the opposing camp with the
+     * was given. This is the demo's policy, written down in one place - attack the opposing camp with the
      * {@code COMMON} skill, main target picked by the same aggro-weighted selector the enemies use. A real
-     * client would pick differently (忆灵技能1 says 「优先攻击长夜月上次攻击的敌方目标」 — see ROADMAP §12.5);
+     * client would pick differently (忆灵技能1 says "优先攻击长夜月上次攻击的敌方目标" - see ROADMAP §12.5);
      * the point here is that a summon <b>acts</b>, and that its damage is not a character's.
      *
      * <p>Which side it hits comes from {@code battle.getOpponents(summon)}, never from a hard-coded camp: an
@@ -698,7 +698,7 @@ public class Main {
             return;
         }
         // The damage base is worth printing for a memosprite: its damage is written as a share of an
-        // attribute of *its own* (「等同于「长夜」50%生命上限」), which is the whole reason this class takes
+        // attribute of *its own* ("等同于'长夜'50%生命上限"), which is the whole reason this class takes
         // the attribute as a parameter instead of assuming ATK.
         if (attack instanceof EnemySkill direct) {
             System.out.println("        → damage base " + pct(direct.getMultiplier()) + " of its own "
@@ -825,9 +825,9 @@ public class Main {
     /**
      * The first living <b>monster</b> on the enemy side.
      *
-     * <p>⚠ The enemy camp can also hold a summon (L-8), and this picks around it on purpose: the demo's
+     * <p>Note: The enemy camp can also hold a summon (L-8), and this picks around it on purpose: the demo's
      * skill heuristic asks {@code isWeakTo(...)}, which is a monster-only question, so it may only run
-     * against a monster. Filtering here is the explicit form of "this rule needs an Enemy" — the
+     * against a monster. Filtering here is the explicit form of "this rule needs an Enemy" - the
      * alternative (assuming every entry is one) is exactly what the roster widening removed.
      */
     private static Enemy firstAliveEnemy(Battle battle) {

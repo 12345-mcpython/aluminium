@@ -126,8 +126,8 @@ for l in printed[:2]:
 if code != 0:
     for m in msgs[:3]:
         print('  XMLFAIL ' + m)
-    # ⚠ Print the WHOLE diagnostic, not just the headline: `错误: 找不到符号` is useless without the
-    # `符号:` / `位置:` lines beneath it (paid for three times: 759, 816, 818).
+    # Note: Print the WHOLE diagnostic, not just the headline: `错误: 找不到符号` is useless without the
+    # `符号:` / `位置:` lines beneath it (paid for three times: 59, 816, 818).
     _out = out.split(NL)
     for _i, l in enumerate(_out):
         if '.java:' in l:

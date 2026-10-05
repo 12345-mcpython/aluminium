@@ -24,16 +24,16 @@ import java.util.Random;
 /**
  * Talents and follow-up attacks (P8-3), as pure data.
  *
- * <p>The engine capability landed in P8-6/P8-7/P8-8 (events, trigger tables, resources) plus the
+ * <p>The engine capability landed in P8-6/P8-/P8-8 (events, trigger tables, resources) plus the
  * {@code DAMAGE} op and the {@code target} condition variable added here. What remains is content,
- * and content is JSON — this class asserts that two real characters work with <b>no Java character
+ * and content is JSON - this class asserts that two real characters work with <b>no Java character
  * class</b>, which is the whole point of the P8-0 three-way split.
  *
  * <h2>Where a follow-up attack comes from</h2>
  * The talent slot (4) is the source. That slot's {@code attack_type} is empty, and that is
  * <b>correct rather than a data gap</b>: the talent is a passive, and a passive is not a swing. Its
- * data still carries the complete attack — effect shape, element, toughness values and the per-level
- * multiplier — so the trigger table only has to supply the <i>when</i>:
+ * data still carries the complete attack - effect shape, element, toughness values and the per-level
+ * multiplier - so the trigger table only has to supply the <i>when</i>:
  *
  * <pre>
  *   Clara: "after I am hit, hit back"           -> HP_LOST + target == self + DAMAGE(target=attacker)
@@ -66,10 +66,10 @@ public class TalentTest {
     }
 
     /**
-     * The documented percentage is the talent's <b>level-10</b> multiplier — confirmed against a
+     * The documented percentage is the talent's <b>level-10</b> multiplier - confirmed against a
      * second character rather than assumed.
      *
-     * <p>Himeko's talent says 140% and its data reads {@code [0.7 … 1.4 … 1.75]}, whose 10th row is
+     * <p>Himeko's talent says 140% and its data reads {@code [0.… 1.4 … 1.5]}, whose 10th row is
      * exactly 1.4; Clara's says 160% and her 10th row is exactly 1.6. Two independent hits at the same
      * index means the docs quote level 10, not the maximum.
      */
@@ -126,9 +126,9 @@ public class TalentTest {
     /**
      * The counter deals <b>the talent's multiplier</b>, not some other parameter.
      *
-     * <p>⚠ This assertion is the point of the whole {@code damage_param} field. An earlier version of
+     * <p>Note: This assertion is the point of the whole {@code damage_param} field. An earlier version of
      * this test only checked "the enemy lost HP", and it happily passed when the index was wrong
-     * (parameter 0 is a flag worth 1.0 instead of the 0.8 multiplier) — a mutation test caught that.
+     * (parameter 0 is a flag worth 1.0 instead of the 0.8 multiplier) - a mutation test caught that.
      *
      * <p>The comparison is a <b>ratio against the engine itself</b> rather than a re-derived formula:
      * firing the counter with {@code damage_param} 1 and with 0 must produce damage in exactly the
@@ -155,7 +155,7 @@ public class TalentTest {
      *
      * <p>Separate from the ratio test above on purpose: that one builds its own rule and therefore
      * proves the engine honours {@code damage_param}, while this one proves the shipped file carries
-     * index 1 rather than 0. Mutation-testing showed the difference — flipping the JSON left the ratio
+     * index 1 rather than 0. Mutation-testing showed the difference - flipping the JSON left the ratio
      * test green.
      */
     @Test
@@ -247,7 +247,7 @@ public class TalentTest {
     // ==================================================================
 
     /**
-     * Seele gains an extra turn after a kill, and it is **hers** — the action bar hands the turn back
+     * Seele gains an extra turn after a kill, and it is hers - the action bar hands the turn back
      * to her rather than pushing someone else to the front.
      */
     @Test

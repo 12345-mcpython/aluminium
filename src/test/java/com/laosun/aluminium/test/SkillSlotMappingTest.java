@@ -19,22 +19,22 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Skill **slot mapping** (the core of P8-2): {@code SkillType} → the slot number in {@code skills.json}.
+ * Skill slot mapping (the core of P8-2): {@code SkillType} to the slot number in {@code skills.json}.
  *
  * <p>Before the fix, {@code Character.Builder.build()} wrote every slot as
- * {@code new DefaultSkill(cid, 1, level)} — so basic attack / skill / ultimate / talent **all**
+ * {@code new DefaultSkill(cid, 1, level)} - so basic attack / skill / ultimate / talent all
  * resolved to slot 1, and the multipliers, toughness reduction, element and {@code sp_need} of all
  * six slots were those of the basic attack.
  *
  * <p>Why this bug went unnoticed for so long: the existing `SkillExecutorTest` / `SuperBreakTest`
- * both **construct** `new DefaultSkill(cid, slot, ...)` themselves and never check what the builder
+ * both construct `new DefaultSkill(cid, slot, ...)` themselves and never check what the builder
  * assembled; and `EnergyTest` verifies the provider's dispatch logic. So nobody ever walked the path
  * of "what skill does a character actually get". This class fills that gap.
  */
 public class SkillSlotMappingTest {
     private static final double EPS = 1e-9;
 
-    /** The slot table itself: 1 basic attack / 2 skill / 3 ultimate / 4 talent / 6 map basic attack / 7 technique (5 does not exist in the data). */
+    /** The slot table itself: 1 basic attack / 2 skill / 3 ultimate / 4 talent / 6 map basic attack / technique (5 does not exist in the data). */
     @Test
     public void slotTableIsTheSingleSourceOfTruth() {
         Assertions.assertEquals(Map.of(
@@ -44,7 +44,7 @@ public class SkillSlotMappingTest {
                         SkillType.TALENT, 4,
                         SkillType.MAZE, 6,
                         SkillType.TECHNIQUE, 7,
-                        // ✅ 2026-09-30: the Elation damage skills live in slots 20/21 in `skills.json`
+                        // 2026-09-30: the Elation damage skills live in slots 20/21 in `skills.json`
                         SkillType.ELATION_SKILL, 20,
                         SkillType.ELATION_EXTRA, 21),
                 Constant.SKILL_SLOT);
@@ -67,11 +67,11 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * Map basic attack / technique are **not assembled when the character is created**, but attached
+     * Map basic attack / technique are not assembled when the character is created, but attached
      * in {@code Battle.startBattle()}.
      *
      * <p>This is a deliberate layering: the map basic attack (slot 6, attack type {@code MazeNormal})
-     * and the technique (slot 7, {@code Maze}) are things on the map; the in-battle basic attack is
+     * and the technique (slot , {@code Maze}) are things on the map; the in-battle basic attack is
      * slot 1's {@code Normal}, and the two are not the same thing.
      */
     @Test
@@ -89,7 +89,7 @@ public class SkillSlotMappingTest {
             Assertions.assertTrue(hero.getSkills().containsKey(type), type + " should be intrinsic");
         }
 
-        // After the battle starts: map skills are attached, and resolve to **their own slots**
+        // After the battle starts: map skills are attached, and resolve to their own slots
         Battle battle = newBattle(hero);
         for (SkillType type : new SkillType[]{SkillType.MAZE, SkillType.TECHNIQUE}) {
             Skill attached = hero.getSkills().get(type);
@@ -119,7 +119,7 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * A real character: each slot gets **its own** data, no longer the basic attack's.
+     * A real character: each slot gets its own data, no longer the basic attack's.
      *
      * <p>Using Jing Yuan (1204): basic attack single-target 0.5 / skill blast / ultimate AoE /
      * talent bounce.
@@ -152,7 +152,7 @@ public class SkillSlotMappingTest {
         for (Map.Entry<SkillType, Integer> entry : Constant.SKILL_SLOT.entrySet()) {
             int slot = entry.getValue();
             var raw = Constant.SKILLS.get(cid).get(slot);
-            // ✅ 2026-09-30: the table lists SLOTS, not per-character rows -- only seven characters carry slots 20/21, so a
+            // 2026-09-30: the table lists SLOTS, not per-character rows -- only seven characters carry slots 20/21, so a
             // character without a row for a slot is the normal case (a failure here would assert the opposite).
             if (raw == null) {
                 continue;
@@ -190,8 +190,8 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * Element also follows the slot: Natasha's skill/ultimate are **healing** (in the data
-     * `element = Unknown` → null), while her basic attack deals physical damage.
+     * Element also follows the slot: Natasha's skill/ultimate are healing (in the data
+     * `element = Unknown` to null), while her basic attack deals physical damage.
      */
     @Test
     public void nonDamagingSlotsHaveNoElement() {
@@ -206,7 +206,7 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * The max level differs by slot (basic attack 10 / skill · ultimate · talent 15) — proving that
+     * The max level differs by slot (basic attack 10 / skill - ultimate - talent 15) - proving that
      * "what is read is its own slot's max_level".
      */
     @Test
@@ -219,12 +219,12 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * All 93 characters' four **intrinsic** slots can be assembled (the data is complete, with no
+     * All 93 characters' four intrinsic slots can be assembled (the data is complete, with no
      * EMPTY fallback).
      *
      * <p>The criterion is "the parameter table is non-empty": {@code SkillData.EMPTY}'s parameter
      * table is empty.
-     * The map skills (6/7) are not checked here — they are only attached after the battle starts,
+     * The map skills (6/) are not checked here - they are only attached after the battle starts,
      * and are covered by {@link #mapSkillsAreAttachedAtBattleStartNotAtBuild()}.
      */
     @Test
@@ -242,7 +242,7 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * All 93 characters' **map slots** (6/7) can also be attached after the battle starts, with
+     * All 93 characters' map slots (6/) can also be attached after the battle starts, with
      * non-empty parameters.
      */
     @Test
@@ -260,17 +260,17 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * Skill **level really is wired into damage**: {@code SkillExecutor} takes the parameter row with
+     * Skill level really is wired into damage: {@code SkillExecutor} takes the parameter row with
      * {@code skill.getLevel() - 1}.
      *
-     * <p>⚠ I previously wrote "the level is not wired into damage yet" here — **that was wrong**, and
+     * <p>Note: I previously wrote "the level is not wired into damage yet" here - that was wrong, and
      * it has been corrected.
      * How it came about: I built an level-8 skill but asserted that
      * {@code getData().getSkills().getFirst()} was 1.2, whereas {@code getSkills()} returns the
-     * **entire** per-level table, so {@code getFirst()} of course still returns tier 1.
+     * entire per-level table, so {@code getFirst()} of course still returns tier 1.
      * I mistook my own wrong row lookup for the engine not looking up a row.
      *
-     * <p>The real call chain: {@code skill.getLevel()} → {@code index = level - 1} →
+     * <p>The real call chain: {@code skill.getLevel()} to {@code index = level - 1} to 
      * {@code levels.get(index)}.
      * For the end-to-end view see {@link #skillLevelScalesActualDamage}.
      */
@@ -288,7 +288,7 @@ public class SkillSlotMappingTest {
      * End to end: the ratio of the damage dealt by the same skill at level 1 vs level 8 = the ratio
      * of the multipliers (1.2 / 0.5 = 2.4).
      *
-     * <p>This nails down "level is wired in" — it covers {@code SkillExecutor}'s row lookup, the
+     * <p>This nails down "level is wired in" - it covers {@code SkillExecutor}'s row lookup, the
      * multiplier lookup and the damage pipeline at once.
      */
     @Test
@@ -302,7 +302,7 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * But **a character assembled by the factory starts at skill level 1**: {@code Builder}'s
+     * But a character assembled by the factory starts at skill level 1: {@code Builder}'s
      * {@code skillLevel} initial value is 1; to level up, call {@code skillLevel(type)} (+1) or
      * {@code setSkillLevel(type, level)}.
      *

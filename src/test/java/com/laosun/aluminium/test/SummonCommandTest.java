@@ -27,28 +27,28 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code COMMAND_SUMMON} — 「使忆灵对敌方全体造成等同于忆灵 X% 生命上限的伤害」.
+ * {@code COMMAND_SUMMON} - "使忆灵对敌方全体造成等同于忆灵 X% 生命上限的伤害".
  *
  * <p><b>What the op is.</b> The rule's owner orders its summon to attack <b>now</b>, with the numbers of a skill
- * the rule names. 长夜月's ultimate is the first user: 「召唤忆灵「长夜」，随后使忆灵「长夜」对敌方全体造成等同于
- * 「长夜」#1[i]%生命上限的冰属性伤害」.
+ * the rule names. 长夜月's ultimate is the first user: "召唤忆灵'长夜'，随后使忆灵'长夜'对敌方全体造成等同于
+ * "长夜"#1[i]%生命上限的冰属性伤害".
  *
  * <p><b>Where each number comes from, because that is the whole design.</b>
  * <ul>
  *   <li>the <b>multiplier</b> (2.0 at Lv10), the <b>element</b> (Ice) and the <b>shape</b> (AoEAttack) are read
- *       from the named skill's own data — {@code skill: "ULTRA"} + {@code damage_param: 0} — so they cannot
+ *       from the named skill's own data - {@code skill: "ULTRA"} + {@code damage_param: 0} - so they cannot
  *       drift from {@code skills.json};</li>
- *   <li>⚠ the <b>row</b> has to be stated ({@code damage_level: 10}) because a character's skills are all at
+ *   <li>Note: the <b>row</b> has to be stated ({@code damage_level: 10}) because a character's skills are all at
  *       level 1 in this engine while the document quotes the Lv10 row. Reading "the skill's level" would deal
- *       half the damage with nothing to report — the case below pins the row by measuring the ratio between
+ *       half the damage with nothing to report - the case below pins the row by measuring the ratio between
  *       three levels of the same skill;</li>
- *   <li>the <b>base attribute</b> is the one thing the skill's row does not say: 「等同于<b>忆灵</b>的生命上限」,
- *       not 长夜月's attack — so the rule states it, and the case that doubles the summon's Max HP (and then the
+ *   <li>the <b>base attribute</b> is the one thing the skill's row does not say: "等同于<b>忆灵</b>的生命上限",
+ *       not 长夜月's attack - so the rule states it, and the case that doubles the summon's Max HP (and then the
  *       owner's) is what tells the two apart;</li>
  *   <li>the <b>toughness</b> (90) is the same kind of fact and is therefore <b>not</b> a field of this op either:
  *       it is 141303's own {@code stance_list}, and the engine's ordinary damage path removes it during the cast.
- *       ⚠ Measured through a real cast, because the cases here fire {@code ULT_CAST} by hand and that path removes
- *       no toughness — a hand-fired event would "show" a gap that does not exist.</li>
+ *       Note: Measured through a real cast, because the cases here fire {@code ULT_CAST} by hand and that path removes
+ *       no toughness - a hand-fired event would "show" a gap that does not exist.</li>
  * </ul>
  *
  * <p><b>Whose action it is.</b> The owner's: the summon swings without spending its turn, exactly like a
@@ -58,7 +58,7 @@ import java.util.Random;
 public class SummonCommandTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 — her ultimate is the first user of {@code COMMAND_SUMMON}. */
+    /** 长夜月 - her ultimate is the first user of {@code COMMAND_SUMMON}. */
     private static final int OWNER = 1413;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -153,7 +153,7 @@ public class SummonCommandTest {
     /**
      * The command does not spend the summon's turn, and does not touch its own skill.
      *
-     * <p>「使忆灵…造成伤害」 is the owner's action: the memosprite attacks without acting. Its place in the action
+     * <p>"使忆灵…造成伤害" is the owner's action: the memosprite attacks without acting. Its place in the action
      * bar and its own skill (50% of its Max HP, single target) are both still there afterwards.
      */
     @Test
@@ -221,7 +221,7 @@ public class SummonCommandTest {
     /**
      * A level the skill's table does not have is refused <b>loudly when it fires</b>, not read as something else.
      *
-     * <p>The check cannot be at load time — a rule does not know its owner's cid while it is being read — so the
+     * <p>The check cannot be at load time - a rule does not know its owner's cid while it is being read - so the
      * row bounds are checked where the table is finally in hand. The alternative (clamping, or falling back to
      * the skill's own level) would be a wrong number with nothing to report.
      */
@@ -242,7 +242,7 @@ public class SummonCommandTest {
      * The attack is aimed at a <b>living</b> enemy: a corpse at the head of the camp is skipped.
      *
      * <p>{@code EnemySkill} takes the first entry of the list it is handed as its main target, so a command that
-     * passed the opposing camp unfiltered would swing at a dead unit and settle nothing — a rule that fires and
+     * passed the opposing camp unfiltered would swing at a dead unit and settle nothing - a rule that fires and
      * does nothing, which is the symptom this project keeps closing.
      */
     @Test
@@ -291,7 +291,7 @@ public class SummonCommandTest {
         Assertions.assertTrue(second.getCurrentHp() < secondBefore, "every one of them");
     }
 
-    /** The authored rule states the skill, the column, the row and the base — and nothing it does not need. */
+    /** The authored rule states the skill, the column, the row and the base - and nothing it does not need. */
     @Test
     public void theAuthoredRuleNamesItsSkillAndRow() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -337,9 +337,9 @@ public class SummonCommandTest {
     /**
      * A {@code COMMAND_SUMMON} effect reading {@code column} of the ULTRA skill's row at the given level.
      *
-     * <p>⚠ The column is a <b>0-based array index</b> while the document writes its placeholders 1-based:
-     * 141303's {@code #1[i]} (the Max HP share) is column <b>0</b>. Writing 1 there reads {@code #2} — the
-     * 【至暗之谜】 charge count, which is 2 at <em>every</em> level — and at Lv10 that happens to equal the right
+     * <p>Note: The column is a <b>0-based array index</b> while the document writes its placeholders 1-based:
+     * 141303's {@code #1[i]} (the Max HP share) is column <b>0</b>. Writing 1 there reads {@code #2} - the
+     * [至暗之谜] charge count, which is 2 at <em>every</em> level - and at Lv10 that happens to equal the right
      * answer, so the rule looks correct until the level changes. {@link #theMultiplierComesFromTheStatedRow} is
      * the case that caught it.
      */
@@ -437,7 +437,7 @@ public class SummonCommandTest {
         return battle.allies.stream().mapToDouble(CanHit::getCurrentHp).sum();
     }
 
-    /** How much action value the unit still has — the number an action would reset. */
+    /** How much action value the unit still has - the number an action would reset. */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {
@@ -452,15 +452,15 @@ public class SummonCommandTest {
     }
 
     /**
-     * Casting the ultimate removes the toughness <b>its own skill states</b> — and after M-40 it is the
+     * Casting the ultimate removes the toughness <b>its own skill states</b> - and after M-40 it is the
      * <b>commanded</b> attack that removes it.
      *
      * <p>141303's {@code stance_list} is {@code single 0 / all 90}, so one real cast takes a 90-point bar to 0; the
-     * bar is widened to 300 here so that "90 removed" and "180 removed" cannot read the same. ⚠ The 90 travels with
+     * bar is widened to 300 here so that "90 removed" and "180 removed" cannot read the same. Note: The 90 travels with
      * the <b>swing</b>: since her cast delegates its own damage ({@code DELEGATE_DAMAGE} on {@code CAST_SETUP}),
      * the executor expands no damage and removes no toughness of its own, so this op reads the column off the
      * named skill and hands it to the {@code EnemySkill} the memosprite swings with. That is the same "one source"
-     * rule the element, the shape and the multiplier already follow — which is also why the op still takes no
+     * rule the element, the shape and the multiplier already follow - which is also why the op still takes no
      * stance <b>argument</b>: writing the 90 in the rule would be a second copy of the number, and getting it
      * wrong would be a second helping of toughness.
      *

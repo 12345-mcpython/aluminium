@@ -22,10 +22,10 @@ import java.util.Random;
  * P1-8 acceptance: one skill activation expands into the right hits / targets.
  *
  * <p>Attacker ATK = 100 and defender DEFENCE = 0 (defence zone 1.0), with no boost or crit
- * attributes, so a hit is exactly {@code ATK × multiplier}.
+ * attributes, so a hit is exactly {@code ATK  x  multiplier}.
  *
- * <p>Real data used here is cid 1001 (March 7th): slot 1 = {@code SingleAttack} ×0.5,
- * slot 2 = {@code Defence} (shield, non-damaging), slot 3 = {@code AoEAttack} ×0.9,
+ * <p>Real data used here is cid 1001 (March th): slot 1 = {@code SingleAttack} x 0.5,
+ * slot 2 = {@code Defence} (shield, non-damaging), slot 3 = {@code AoEAttack}  x 0.9,
  * slot 6 = {@code MazeAttack} with empty params. Blast / Bounce do not exist for this
  * character, so those two use a hand-made {@link SkillData} (// TODO data).
  */
@@ -63,9 +63,9 @@ public class SkillExecutorTest {
 
     /** Fabricated data (this character has no Blast / Bounce). */
     private static Skill fakeSkill(SkillEffectType effect, List<Double> params) {
-        // ? The Bounce path reads its numbers from the DESCRIPTION (round 170): the share is the `%`-referenced parameter
-        // and the hit count is the ADDITIONAL count (「额外造成 N 次」), so the fixture states both. params[1] is therefore the
-        // additional count, not the total — the call sites below say 2 to mean three hits.
+        // ? The Bounce path reads its numbers from the DESCRIPTION (round 10): the share is the `%`-referenced parameter
+        // and the hit count is the ADDITIONAL count ("额外造成 N 次"), so the fixture states both. params[1] is therefore the
+        // additional count, not the total - the call sites below say 2 to mean three hits.
         String description = params.size() > 1
                 ? "Deals DMG equal to #1[i]% of ATK to one enemy and additionally deals #2[i] instances of DMG."
                 : "Deals DMG equal to #1[i]% of ATK to one enemy.";
@@ -151,7 +151,7 @@ public class SkillExecutorTest {
         Battle battle = battle(attacker, List.of(first, second, third));
         Skill blast = fakeSkill(SkillEffectType.BLAST, List.of(0.5));
 
-        battle.castImmediate(blast, attacker, List.of(second));      // main target = the middle → all three are hit
+        battle.castImmediate(blast, attacker, List.of(second));      // main target = the middle to all three are hit
 
         Assertions.assertEquals(50, damageTaken(first), EPS);
         Assertions.assertEquals(50, damageTaken(second), EPS);
@@ -167,7 +167,7 @@ public class SkillExecutorTest {
         Battle battle = battle(attacker, List.of(first, second, third));
         Skill blast = fakeSkill(SkillEffectType.BLAST, List.of(0.5));
 
-        battle.castImmediate(blast, attacker, List.of(first));       // main target = leftmost → only the two on the left
+        battle.castImmediate(blast, attacker, List.of(first));       // main target = leftmost to only the two on the left
 
         Assertions.assertEquals(50, damageTaken(first), EPS);
         Assertions.assertEquals(50, damageTaken(second), EPS);
@@ -186,7 +186,7 @@ public class SkillExecutorTest {
         battle.castImmediate(bounce, attacker, List.of(first));
 
         double total = damageTaken(first) + damageTaken(second) + damageTaken(third);
-        Assertions.assertEquals(150, total, EPS);                    // 3 hits × 50
+        Assertions.assertEquals(150, total, EPS);                    // 3 hits  x  50
     }
 
     @Test
@@ -225,7 +225,7 @@ public class SkillExecutorTest {
         Enemy second = enemy("e2");
         Battle battle = battle(attacker, List.of(first, second));
 
-        // TestSkill1 uses slot 3's data (AoE ×0.9) — after delegation it should behave the same as DefaultSkill
+        // TestSkill1 uses slot 3's data (AoE  x 0.9) - after delegation it should behave the same as DefaultSkill
         battle.castImmediate(new TestSkillGroup1.TestSkill1(1), attacker, List.of(first));
 
         Assertions.assertEquals(90, damageTaken(first), EPS);
@@ -235,7 +235,7 @@ public class SkillExecutorTest {
     @Test
     public void bounceRetargetsLivingEnemiesInsteadOfWastingHits() {
         Character attacker = attacker();
-        Enemy fragile = enemy("e1", 100);        // 100 per hit → dies in one hit
+        Enemy fragile = enemy("e1", 100);        // 100 per hit to dies in one hit
         Enemy tough = enemy("e2");
         Battle battle = battle(attacker, List.of(fragile, tough));
         Skill bounce = fakeSkill(SkillEffectType.BOUNCE, List.of(1.0, 2.0));   // 2 additional = 3 hits
@@ -256,7 +256,7 @@ public class SkillExecutorTest {
 
         battle.castImmediate(bounce, attacker, List.of(fragile));
 
-        // No living target left → the remaining hits are voided (no hitting a corpse, and no wasted cast)
+        // No living target left to the remaining hits are voided (no hitting a corpse, and no wasted cast)
         Assertions.assertEquals(100, damageTaken(fragile), EPS);
     }
 

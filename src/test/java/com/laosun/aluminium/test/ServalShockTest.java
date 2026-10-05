@@ -21,12 +21,12 @@ import java.util.Random;
  * 希露瓦 (1103), from her own file (2026-09-28): the shock, the extension, the traces and 星魂 6.
  *
  * <p><b>What it needed.</b> {@code APPLY_DOT} for the shock (base chance and per-turn damage out of her Skill's own row),
- * {@code EXTEND_BUFF} for 「使触电状态下的敌方目标延长 2 回合」 — which needs no condition, because the extension only
- * matches buffs carrying that state's name — and the engine's DOT-by-name resolution, which is what makes both 触电 and
- * 星魂 6's 「对触电状态下的敌方目标」 reachable.
+ * {@code EXTEND_BUFF} for "使触电状态下的敌方目标延长 2 回合" - which needs no condition, because the extension only
+ * matches buffs carrying that state's name - and the engine's DOT-by-name resolution, which is what makes both 触电 and
+ * 星魂 6's "对触电状态下的敌方目标" reachable.
  *
- * <p><b>What is registered</b> (the file's notes): the talent's 「对所有触电状态下的敌方目标」, the blast's neighbour
- * rolls, 星魂 1 and 星魂 4 — three of the four are the same missing piece (`M-53`: an effect reaches what a *selector*
+ * <p><b>What is registered</b> (the file's notes): the talent's "对所有触电状态下的敌方目标", the blast's neighbour
+ * rolls, 星魂 1 and 星魂 4 - three of the four are the same missing piece (`M-53`: an effect reaches what a *selector*
  * names, so a per-target condition cannot filter the set).
  */
 public class ServalShockTest {
@@ -35,7 +35,7 @@ public class ServalShockTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Her trace 摇滚 makes the 80% roll certain — and the same roll misses without an amendment (pinned below). */
+    /** Her trace 摇滚 makes the 80% roll certain - and the same roll misses without an amendment (pinned below). */
     @Test
     public void theShockIsCertainWithHerTrace() {
         Fixture f = new Fixture(0.9);
@@ -45,9 +45,9 @@ public class ServalShockTest {
     }
 
     /**
-     * The trace is filed against her Skill's shock rule — the bookkeeping half of 「基础概率提高20%」.
+     * The trace is filed against her Skill's shock rule - the bookkeeping half of "基础概率提高20%".
      *
-     * <p>⚠ Its behavioural half is the positive case above (a 0.9 roll only lands because of this); the *negative*
+     * <p>Note: Its behavioural half is the positive case above (a 0.9 roll only lands because of this); the *negative*
      * direction (the same roll missing at 0.8) could only be shown by stripping the rule out of a compiled table, which
      * would be testing the removal instead of the number, so it is not claimed here.
      */
@@ -77,9 +77,9 @@ public class ServalShockTest {
     /**
      * 终结技 extends the shock by two turns: 2 settlements become 4, and then it stops.
      *
-     * <p>⚠ Counted rather than read off a duration getter, and on <b>one</b> enemy: 「使触电状态下的敌方目标延长 2 回合」
+     * <p>Note: Counted rather than read off a duration getter, and on <b>one</b> enemy: "使触电状态下的敌方目标延长 2 回合"
      * is about the enemies that are shocked, and the extension's own filter (`BuffManager.isNamed`, which answers a DOT
-     * by its element's state name) is what makes 「触电状态下的」 true without a condition — there is nothing to assert
+     * by its element's state name) is what makes "触电状态下的" true without a condition - there is nothing to assert
      * about an enemy that never had it beyond that the same call does not create one, which the census covers.
      */
     @Test

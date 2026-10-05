@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Stage data ({@code stage.json}, P7-4): {@code stage_id → stage}.
+ * Stage data ({@code stage.json}, P-4): {@code stage_id to stage}.
  *
  * <pre>{@code
  * "103201": {
@@ -19,23 +19,23 @@ import java.util.Map;
  *
  * <p><b>How to read it</b>:
  * <ul>
- *   <li>**Each entry** of {@link #monster()} is one wave (the elements of the {@code List} = waves), so
+ *   <li>Each entry of {@link #monster()} is one wave (the elements of the {@code List} = waves), so
  *       {@code monster().size()} is the number of waves;</li>
- *   <li>each wave is {@code {"Monster0": id, "Monster1": id, …}} — caught with a {@code Map}
+ *   <li>each wave is {@code {"Monster0": id, "Monster1": id, …}} - caught with a {@code Map}
  *       (the key names {@code MonsterN} are just positional indices and carry no semantics);
  *       <b>the order must be {@code Monster0, Monster1, …}</b>, so after deserialisation you have to take the
- *       **insertion order** of the {@link java.util.LinkedHashMap}, it must not be used as an unordered
+ *       insertion order of the {@link java.util.LinkedHashMap}, it must not be used as an unordered
  *       collection;</li>
  *   <li>a monster's level is decided by {@link #level()} + {@link #hardLevelGroup()}, and the two are fed
  *       together into {@code EnemyFactory.create(id, level, hardLevelGroup)}.</li>
  * </ul>
  *
- * <p>⚠ The same monster may appear several times in one wave ({@code Monster0} and {@code Monster2} with the same
- * id) — those are **several independent instances**, not the same one.
+ * <p>Note: The same monster may appear several times in one wave ({@code Monster0} and {@code Monster2} with the same
+ * id) - those are several independent instances, not the same one.
  *
- * <p>⚠ {@code hardLevelGroup} must carry {@code @SerializedName("hard_level_group")}:
+ * <p>Note: {@code hardLevelGroup} must carry {@code @SerializedName("hard_level_group")}:
  * the JSON key is underscore style while Java is camel case, and Gson does not convert automatically. Without it
- * you silently get **0**, and it only shows up when {@code EnemyFactory} reports
+ * you silently get 0, and it only shows up when {@code EnemyFactory} reports
  * "No hard level group 0 at level …".
  */
 public record StageBean(

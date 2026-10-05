@@ -1,7 +1,7 @@
 ﻿import io, json, re, sys
 P = "src/main/resources/characters/1217.json"
 raw = io.open(P, encoding="utf-8").read()
-# ⚠ READ the name out of the file instead of typing the codepoint: that mistake has now cost two rounds.
+# Note: READ the name out of the file instead of typing the codepoint: that mistake has now cost two rounds.
 m = re.search(r'"op": "APPLY_BUFF",\s*"buff": "([^"]+)"', raw)
 if not m:
     sys.exit("REFUSING: no APPLY_BUFF name to copy")

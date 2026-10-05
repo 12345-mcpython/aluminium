@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21012: damage is 20% higher against an enemy whose current HP share is at least the WEARER’S own.
+ * Light cone 21012: damage is 20% higher against an enemy whose current HP share is at least the WEARER'S own.
  *
- * <p>⭐ The comparison is between two variables, which the numeric DSL now reads directly. The judge moves the wearer’s own HP
- * share instead of the enemy’s, so the enemy stays at full health and the two states differ only in the condition.
+ * <p>The comparison is between two variables, which the numeric DSL now reads directly. The judge moves the wearer's own HP
+ * share instead of the enemy's, so the enemy stays at full health and the two states differ only in the condition.
  */
 public class Cone21012Test {
     private static final int CONE = 21012;
@@ -46,8 +46,8 @@ public class Cone21012Test {
     }
 
     private void hurtTheEnemy() {
-        // ★ The enemy is the one to move: lowering ITS share makes `target_hp_percent >= hp_percent` false, while hurting the
-        // wearer would do the opposite (and, measured, also woke that character’s own low-health kit: 666 -> 1000).
+        // The enemy is the one to move: lowering ITS share makes `target_hp_percent >= hp_percent` false, while hurting the
+        // wearer would do the opposite (and, measured, also woke that character's own low-health kit: 666 -> 1000).
         battle.applyDamage(enemy, new Damage(wearer, enemy, DamageElement.FIRE, DamageType.NORMAL,
                 enemy.getMaxHp() * 0.5));
         System.out.println("[21012] the enemy is now at " + enemy.getCurrentHp() + " of " + enemy.getMaxHp());
@@ -60,8 +60,8 @@ public class Cone21012Test {
         build(true);
         double boosted = hit();
         System.out.println("[21012] both at full health: " + plain + " -> " + boosted + " (x" + (boosted / plain) + ")");
-        // ★ 1.4, not 1.2: the cone’s own `properties` already carry +20% ALL_DAMAGE_TYPE_BOOST, and the clause’s instance
-        // boost joins that SAME attribute additively (measured: 476.19 -> 666.67), it does not multiply on top of it.
+        // 1.4, not 1.2: the cone's own `properties` already carry +20% ALL_DAMAGE_TYPE_BOOST, and the clause's instance
+        // boost joins that SAME attribute additively (measured: 46.19 -> 666.6), it does not multiply on top of it.
         Assertions.assertEquals(1.4, boosted / plain, 0.02, "the props’ 20% and the clause’s 20% add up");
     }
 

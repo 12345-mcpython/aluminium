@@ -27,7 +27,7 @@ import java.util.TreeMap;
  * <h2>Why relic abilities are trigger rules and not a second mechanism</h2>
  * Most relic 4-piece bonuses are not stats: they are exactly "when &lt;event&gt;, do &lt;something the
  * engine can already do&gt;" ("at the start of the battle, immediately regenerates 1 Skill Point").
- * That is what {@link TriggerTable} already is — the same JSON shape, the same
+ * That is what {@link TriggerTable} already is - the same JSON shape, the same
  * {@code TriggerInterpreter} op vocabulary, the same condition DSL as
  * {@code resources/characters/<cid>.json}. Relic sets therefore reuse all of it and add no new
  * interpreter, no new op and no per-set Java class. A set that needs a capability the vocabulary does
@@ -53,7 +53,7 @@ import java.util.TreeMap;
  *
  * <h2>Lazy, cached, and loud about malformed files</h2>
  * Shaped like {@link TriggerTables} and {@link RelicSets}: a file is read the first time that set is
- * asked for, and a <b>missing file is an empty rule set rather than an error</b> — most sets have no
+ * asked for, and a <b>missing file is an empty rule set rather than an error</b> - most sets have no
  * rules written, and a fresh checkout has no generated {@code relic_sets.json} at all. A file that
  * <b>exists</b> is a different matter: its thresholds, events, conditions and ops are all validated
  * while it is read, so a typo fails at load instead of silently never firing. The same is true of the
@@ -115,7 +115,7 @@ public final class RelicTriggerTables {
      * The trigger rules of one relic set, by threshold.
      *
      * @param setId       the set id the rules were written for
-     * @param byThreshold threshold → the <b>cumulative</b> table for wearing at least that many pieces
+     * @param byThreshold threshold to the <b>cumulative</b> table for wearing at least that many pieces
      */
     public record Rules(int setId, NavigableMap<Integer, TriggerTable> byThreshold) {
 
@@ -152,7 +152,7 @@ public final class RelicTriggerTables {
      * @param setId   the relic set the ability belongs to
      * @param require the piece count of the bonus (2 or 4)
      * @param ability the client's ability name, exactly as {@code relic_sets.json} spells it
-     * @param reason  which capability is missing — never blank, because a gap without a reason is
+     * @param reason  which capability is missing - never blank, because a gap without a reason is
      *                indistinguishable from a forgotten bonus
      */
     public record Unmodelled(int setId, int require, String ability, String reason) {
@@ -235,7 +235,7 @@ public final class RelicTriggerTables {
      * Turns a parsed set file into the engine's rules-by-threshold table, validating every key.
      *
      * <p>Public rather than private so that the rejections can be tested on a hand-made map instead
-     * of a doctored copy of a shipped file — the same reason
+     * of a doctored copy of a shipped file - the same reason
      * {@link TriggerTable}'s constructor is where trigger specs are validated.
      *
      * @param setId  the set the rules belong to
@@ -245,7 +245,7 @@ public final class RelicTriggerTables {
      * @throws IllegalStateException    when a key is not a positive number, a threshold has no rules,
      *                                  or the set does not declare a bonus at that threshold
      * @throws IllegalArgumentException when a rule itself is invalid (unknown or unwired event,
-     *                                  malformed condition, unknown op) — {@link TriggerTable}'s own
+     *                                  malformed condition, unknown op) - {@link TriggerTable}'s own
      *                                  contract, and what {@link #load} turns into an
      *                                  {@code IllegalStateException} naming the file
      */
@@ -298,8 +298,8 @@ public final class RelicTriggerTables {
     /**
      * Checks that the set really has a bonus at this piece count.
      *
-     * <p>This is the guard against the cheapest possible typo — {@code "4"}: [ … ] on a set whose only
-     * ability is a 2-piece one — which would otherwise produce a rule that can never fire, because no
+     * <p>This is the guard against the cheapest possible typo - {@code "4"}: [ … ] on a set whose only
+     * ability is a 2-piece one - which would otherwise produce a rule that can never fire, because no
      * suit can wear four pieces of a planar ornament set.
      *
      * <p>Skipped when {@code relic_sets.json} is absent (the generated data directory is not in the
@@ -367,10 +367,10 @@ public final class RelicTriggerTables {
     }
 
     /**
-     * Turns the registry's {@code "set id" → entries} map into a flat, validated list.
+     * Turns the registry's {@code "set id" to entries} map into a flat, validated list.
      *
      * <p>Public for the same reason as {@link #parse}: the rejections must be testable on hand-made
-     * data. Every entry is required to name a set, a piece count, an ability and a <b>reason</b> —
+     * data. Every entry is required to name a set, a piece count, an ability and a <b>reason</b> - 
      * an entry without a reason would be a gap nobody can act on.
      *
      * @param parsed the parsed registry, possibly {@code null}

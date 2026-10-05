@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.MonsterTemplate;
  * per-instance adjustment / elite group" into the final stat sheet.
  *
  * <pre>
- * enemy attribute = template base value × level group multiplier × per-instance adjustment × elite group multiplier
+ * enemy attribute = template base value  x  level group multiplier  x  per-instance adjustment  x  elite group multiplier
  * </pre>
  *
  * <p>This chain has been cross-checked against in-game measurements (Despair Starcrusher Swarm King
@@ -20,7 +20,7 @@ import com.laosun.aluminium.beans.MonsterTemplate;
  *   {@code health_modify_ratio} in this project's data), <b>NOT</b> that ghost field
  *   {@code hp_modify_ratio} which is always 1;</li>
  *   <li><b>Effect RES is additive</b>: template value + level group value (Ice Edge (冰锋) 0.2 +
- *   group 1 · Lv90's 0.1 = 0.3 = 30%); multiplying would give 0.02;</li>
+ *   group 1 - Lv90's 0.1 = 0.3 = 30%); multiplying would give 0.02;</li>
  *   <li><b>The elite group multiplier comes from the wave group</b>, not from the monster itself;
  *   this dataset has no such table yet, so it is passed in by the caller as a parameter.</li>
  * </ul>
@@ -28,8 +28,8 @@ import com.laosun.aluminium.beans.MonsterTemplate;
 public final class EnemyScaler {
 
     /**
-     * No elite group bonus (all multipliers 1) — this data directory has no elite_group.json yet;
-     * wiring the table up is left to P7-4 / P9.
+     * No elite group bonus (all multipliers 1) - this data directory has no elite_group.json yet;
+     * wiring the table up is left to P-4 / P9.
      */
     public static final EliteGroup NO_ELITE_BONUS = new EliteGroup(1, 1, 1, 1, 1);
 

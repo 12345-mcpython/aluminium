@@ -23,27 +23,27 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Event completion (P8-6): verifies that the new events are **emitted at the right time, the
- * right number of times, under the right filter conditions**.
+ * Event completion (P8-6): verifies that the new events are emitted at the right time, the
+ * right number of times, under the right filter conditions.
  *
- * <p>This class tests the events' **contract**, not battle outcomes — so the assertions
+ * <p>This class tests the events' contract, not battle outcomes - so the assertions
  * concentrate on "who received it, how many times, carrying what number".
  *
  * <p>Four boundaries deliberately pinned down (all of them places where it is easy to write
  * the wrong thing after adding an event):
  * <ol>
- *   <li>{@link #nonDamagingSkillStillFiresSkillCast()} — heal / shield skills have **no hit
- *       set**; if the implementation says "no hit landed, so do not emit", those effects'
+ *   <li>{@link #nonDamagingSkillStillFiresSkillCast()} - heal / shield skills have no hit
+ *       set; if the implementation says "no hit landed, so do not emit", those effects'
  *       trigger sources would never receive anything;</li>
- *   <li>{@link #fullyShieldedHitFiresNoHpLoss()} — **absorbed by a shield does not count as
- *       HP loss**. HP loss and "taking damage" are two different conventions, and characters
+ *   <li>{@link #fullyShieldedHitFiresNoHpLoss()} - absorbed by a shield does not count as
+ *       HP loss. HP loss and "taking damage" are two different conventions, and characters
  *       that convert lost HP into resources (Castorice / Mydei / Blade) rely on that
  *       distinction;</li>
- *   <li>{@link #failedSkillSpendFiresNoSkillPointSpent()} — **not spent, not consumed**. Otherwise
+ *   <li>{@link #failedSkillSpendFiresNoSkillPointSpent()} - not spent, not consumed. Otherwise
  *       counters of the Misha / Sparkle kind ("per 1 point consumed") would book a consumption
  *       that never happened;</li>
- *   <li>{@link #zeroEnergyCharacterFiresNoEnergyEvent()} — characters with no energy bar
- *       **have no energy event**. The 6 stack-resource characters fall into this class.</li>
+ *   <li>{@link #zeroEnergyCharacterFiresNoEnergyEvent()} - characters with no energy bar
+ *       have no energy event. The 6 stack-resource characters fall into this class.</li>
  * </ol>
  */
 public class EventBusTest {
@@ -63,7 +63,7 @@ public class EventBusTest {
     // 1. Skill cast: both damaging and non-damaging skills must emit
     // ==================================================================
 
-    /** Damaging skill: `SkillCastEvent` carries the **actual hit set**. */
+    /** Damaging skill: `SkillCastEvent` carries the actual hit set. */
     @Test
     public void damagingSkillFiresSkillCastWithHitTargets() {
         Battle battle = newBattle();
@@ -80,10 +80,10 @@ public class EventBusTest {
     }
 
     /**
-     * ⚠ Core boundary: **non-damaging skills must emit SkillCastEvent too**.
+     * Note: Core boundary: non-damaging skills must emit SkillCastEvent too.
      *
      * <p>The heal skill (Luocha 1203 slot 2, `RESTORE`) deals no damage at all, so its
-     * `hitTargets` is **empty**. Effects such as Bronya's "50% chance to restore 1 skill point
+     * `hitTargets` is empty. Effects such as Bronya's "50% chance to restore 1 skill point
      * when casting a skill" and Sushang's "restore 1 skill point after casting a skill on a
      * broken target" have "the cast itself" as their trigger source; if the implementation is
      * written as "no hit landed, so do not emit", they would never receive anything.
@@ -106,7 +106,7 @@ public class EventBusTest {
         Assertions.assertEquals(List.of(luocha), last.chosen(), "but the targets the caller chose must be carried out verbatim");
     }
 
-    /** One cast emits SkillCastEvent **exactly once** (not once per hit). */
+    /** One cast emits SkillCastEvent exactly once (not once per hit). */
     @Test
     public void skillCastFiresOncePerCastNotPerHit() {
         Battle battle = newBattle();
@@ -123,7 +123,7 @@ public class EventBusTest {
     // 2. Energy: emitted only on an actual credit; characters with no energy bar do not emit
     // ==================================================================
 
-    /** Basic attack lands → energy gain → `EnergyEvent`, carrying the **actually credited value** (20). */
+    /** Basic attack lands to energy gain to `EnergyEvent`, carrying the actually credited value (20). */
     @Test
     public void energyEventCarriesTheActuallyCreditedAmount() {
         Battle battle = newBattle();
@@ -138,7 +138,7 @@ public class EventBusTest {
         Assertions.assertEquals(20, last.amount(), EPS, "basic attack conventional energy gain is 20");
     }
 
-    /** When energy is already full the actual credit is 0 → **no emission** ("clipped by the cap" is not an energy gain). */
+    /** When energy is already full the actual credit is 0 to no emission ("clipped by the cap" is not an energy gain). */
     @Test
     public void cappedEnergyFiresNoEvent() {
         Battle battle = newBattle();
@@ -152,9 +152,9 @@ public class EventBusTest {
     }
 
     /**
-     * ⚠ Characters with no energy bar (the 6 stack-resource ones) **have no energy event**.
+     * Note: Characters with no energy bar (the 6 stack-resource ones) have no energy event.
      *
-     * <p>Castorice 1407's `max_energy` is null in the data and `sp_base` is null everywhere,
+     * <p>Castorice 140's `max_energy` is null in the data and `sp_base` is null everywhere,
      * and her provider is {@code NoConventionalEnergyProvider} (all 5 hooks return null), so
      * the code never even reaches the energy-gain entry point.
      */
@@ -175,7 +175,7 @@ public class EventBusTest {
     // 3. HP loss vs taking damage
     // ==================================================================
 
-    /** Taking a normal hit → the HP-loss event carries before/after and the real amount lost. */
+    /** Taking a normal hit to the HP-loss event carries before/after and the real amount lost. */
     @Test
     public void hpLossReportsBeforeAndAfter() {
         Battle battle = newBattle();
@@ -195,12 +195,12 @@ public class EventBusTest {
     }
 
     /**
-     * ⚠ Core boundary: **a shield absorbs it all → not one drop of HP lost → do not emit
-     * HpLossEvent**.
+     * Note: Core boundary: a shield absorbs it all to not one drop of HP lost to do not emit
+     * HpLossEvent.
      *
      * <p>"HP loss" and "taking damage" are two different conventions. Characters that convert
-     * lost HP into resources (Castorice's 【新蕊】, Mydei's 【血仇】, Blade's 【充能】) want the
-     * **amount of HP really lost** — if an event were emitted here and the amount absorbed by
+     * lost HP into resources (Castorice's [新蕊], Mydei's [血仇], Blade's [充能]) want the
+     * amount of HP really lost - if an event were emitted here and the amount absorbed by
      * the shield counted too, they would accumulate stacks out of thin air.
      */
     @Test
@@ -223,7 +223,7 @@ public class EventBusTest {
     // 4. Healing: emitted only when HP is really restored
     // ==================================================================
 
-    /** Heal skill → HP really restored → emit `HealEvent`. */
+    /** Heal skill to HP really restored to emit `HealEvent`. */
     @Test
     public void healEventCarriesActuallyHealed() {
         Character luocha = CharacterFactory.create(1203, 80);
@@ -242,7 +242,7 @@ public class EventBusTest {
         Assertions.assertTrue(last.amount() > 0);
     }
 
-    /** Healing a full-HP target → actual restore 0 → **no emission**. */
+    /** Healing a full-HP target to actual restore 0 to no emission. */
     @Test
     public void healingAFullHpTargetFiresNoEvent() {
         Character luocha = CharacterFactory.create(1203, 80);
@@ -259,7 +259,7 @@ public class EventBusTest {
     // 5. Kill / break
     // ==================================================================
 
-    /** Kill an enemy → `KillEvent`, and the killer is the one who cast the skill. */
+    /** Kill an enemy to `KillEvent`, and the killer is the one who cast the skill. */
     @Test
     public void killEventNamesTheAttacker() {
         Battle battle = newBattle();
@@ -278,12 +278,12 @@ public class EventBusTest {
     }
 
     /**
-     * Additional damage finishing a target off **still emits** KillEvent (same convention as
+     * Additional damage finishing a target off still emits KillEvent (same convention as
      * kill energy gain: it does not look at `countsAsAttack`).
      *
      * <p>This also guards against a reverse mistake: if the implementation hung KillEvent
      * behind the "counts as an attack" gate, then additional damage / true damage / break
-     * finishing a kill would all emit no event — and that is exactly the case Himeko's
+     * finishing a kill would all emit no event - and that is exactly the case Himeko's
      * "ultimate +5 energy per kill" kind of effect most needs to receive.
      */
     @Test
@@ -295,7 +295,7 @@ public class EventBusTest {
 
         enemy.takeDamage(enemy.getCurrentHp() - 1);      // leave 1 HP
 
-        // Additional damage: notCountsAsAttack, but attributed to the attacker → the kill is a fact
+        // Additional damage: notCountsAsAttack, but attributed to the attacker to the kill is a fact
         battle.applyAdditionalDamage(hero, enemy, DamageElement.PHYSICAL, 1000);
 
         Assertions.assertEquals(0, enemy.getCurrentHp(), EPS, "precondition: the additional damage really finished it off");
@@ -303,17 +303,17 @@ public class EventBusTest {
     }
 
     /**
-     * ⚠ **An acceptance criterion that was planned wrong**: the original plan required "DOT
-     * **does not emit** `KillEvent`".
+     * Note: An acceptance criterion that was planned wrong: the original plan required "DOT
+     * does not emit `KillEvent`".
      *
-     * <p>Measurement showed the **opposite**: `tickDots` goes through
+     * <p>Measurement showed the opposite: `tickDots` goes through
      * `Battle.applyDamage(..., KILL_ONLY)`, the same settlement path as a basic attack, so DOT
-     * killing someone **does emit** `KillEvent` — and that is **correct**: effects of Himeko's
+     * killing someone does emit `KillEvent` - and that is correct: effects of Himeko's
      * "ultimate +5 energy per 1 enemy defeated" kind need to know that "a DOT finishing the
      * job also counts as a defeat", consistent with the kill-energy convention (`KILL_ONLY`
-     * only affects the **energy-gain** category, not the fact of "death").
+     * only affects the energy-gain category, not the fact of "death").
      *
-     * <p>So here we assert the **measured behaviour**, and this correction is recorded in
+     * <p>So here we assert the measured behaviour, and this correction is recorded in
      * `engine.md` §4.2 and `ROADMAP` P8-6.
      */
     @Test
@@ -333,7 +333,7 @@ public class EventBusTest {
                 "a DOT kill emits KillEvent too (same convention as kill energy gain; the original plan's 'does not emit' was wrong)");
     }
 
-    /** True damage finishing a target off is the same: damage attributed to the attacker kills the target → emit `KillEvent`. */
+    /** True damage finishing a target off is the same: damage attributed to the attacker kills the target to emit `KillEvent`. */
     @Test
     public void trueDamageKillFiresEvent() {
         Battle battle = newBattle();
@@ -348,7 +348,7 @@ public class EventBusTest {
         Assertions.assertNotNull(probe.last(KILL), "a kill by true damage must emit KillEvent too");
     }
 
-    /** Give the enemy a huge shield → no HP lost → hence no kill (guards against "does not die before the shield breaks" being bypassed by events). */
+    /** Give the enemy a huge shield to no HP lost to hence no kill (guards against "does not die before the shield breaks" being bypassed by events). */
     @Test
     public void shieldedTargetIsNotReportedAsKilled() {
         Battle battle = newBattle();
@@ -367,7 +367,7 @@ public class EventBusTest {
     // 6. Skill points: emitted only when really spent/gained
     // ==================================================================
 
-    /** Basic attack → skill point +1 → emit `SkillPointEvent.onSkillPointGained`. */
+    /** Basic attack to skill point +1 to emit `SkillPointEvent.onSkillPointGained`. */
     @Test
     public void skillPointGainFiresEvent() {
         Battle battle = newBattle();
@@ -383,7 +383,7 @@ public class EventBusTest {
         Assertions.assertEquals(1, last.amount(), EPS);
     }
 
-    /** Skill → skill point -1 → emit `SkillPointEvent.onSkillPointSpent`. */
+    /** Skill to skill point -1 to emit `SkillPointEvent.onSkillPointSpent`. */
     @Test
     public void skillPointSpendFiresEvent() {
         Battle battle = newBattle();
@@ -399,12 +399,12 @@ public class EventBusTest {
     }
 
     /**
-     * ⚠ Core boundary: **not enough skill points, the action does not go through → do not emit
-     * the spend event**.
+     * Note: Core boundary: not enough skill points, the action does not go through to do not emit
+     * the spend event.
      *
-     * <p>Otherwise Misha's "for every 1 skill point our whole team consumes → next ultimate +1
+     * <p>Otherwise Misha's "for every 1 skill point our whole team consumes to next ultimate +1
      * hit" and Sparkle's "restore 1 extra energy when a skill point is consumed" would book a
-     * consumption that **never happened at all**.
+     * consumption that never happened at all.
      */
     @Test
     public void failedSkillSpendFiresNoSkillPointSpent() {
@@ -425,7 +425,7 @@ public class EventBusTest {
         Assertions.assertEquals(0, battle.getSkillPoints(), "the point count did not change either");
     }
 
-    /** Basic attack while skill points are already full → actual credit 0 → do not emit the gain event. */
+    /** Basic attack while skill points are already full to actual credit 0 to do not emit the gain event. */
     @Test
     public void cappedSkillPointsFireNoGainEvent() {
         Battle battle = newBattle();
@@ -442,19 +442,19 @@ public class EventBusTest {
     }
 
     // ==================================================================
-    // 7. Event ordering: which events should a plain "basic attack kills an enemy" emit, and in what order
+    // . Event ordering: which events should a plain "basic attack kills an enemy" emit, and in what order
     // ==================================================================
 
     /**
-     * The actual order within one damage instance: **the cast comes before the energy gain**
+     * The actual order within one damage instance: the cast comes before the energy gain
      * (comparable on the same probe, because both are broadcast to that character).
      *
-     * <p>⚠ Lesson: at first I also wanted to assert here that "HP loss comes before the kill",
-     * but **a single probe cannot see both** — {@code SkillCastEvent}/{@code EnergyEvent} are
-     * broadcast to **our side** (only received if the probe is attached to the character),
-     * whereas {@code HpLossEvent}/{@code KillEvent} go to the **defender** (the probe must be
+     * <p>Note: Lesson: at first I also wanted to assert here that "HP loss comes before the kill",
+     * but a single probe cannot see both - {@code SkillCastEvent}/{@code EnergyEvent} are
+     * broadcast to our side (only received if the probe is attached to the character),
+     * whereas {@code HpLossEvent}/{@code KillEvent} go to the defender (the probe must be
      * attached to the enemy). Forcing a comparison on one probe yields an assertion that is
-     * always vacuously true (both are {@code MAX_VALUE}, and {@code MAX < MAX} is false → the
+     * always vacuously true (both are {@code MAX_VALUE}, and {@code MAX < MAX} is false to the
      * test goes red, but red for a reason that is not an engine bug). So it was split into two,
      * each testing its own thing.
      */
@@ -475,7 +475,7 @@ public class EventBusTest {
     }
 
     /**
-     * The defender's point of view: **HP loss first, then the kill**.
+     * The defender's point of view: HP loss first, then the kill.
      *
      * <p>Both are broadcast to the defender + the killer, so attaching to the enemy lets us
      * see both at once. Use a low-HP enemy so this basic attack really does kill it.
@@ -502,7 +502,7 @@ public class EventBusTest {
     }
 
     /**
-     * Turn events are still expressed by the existing {@code MoveEvent} — do **not** create a
+     * Turn events are still expressed by the existing {@code MoveEvent} - do not create a
      * new event for "turn start".
      *
      * <p>This is pinned so that nobody later adds a `TurnStartEvent`: that would be a
@@ -536,14 +536,14 @@ public class EventBusTest {
     }
 
     /**
-     * A probe buff attached to the target: implements **all** 8 new events and records what it
+     * A probe buff attached to the target: implements all 8 new events and records what it
      * receives into a list.
      *
-     * <p>Deliberately attached to a **buff** rather than subclassing {@code CanHit}: this also
-     * verifies that the forwarding chain "`CanHit` → `BuffManager` → buff" is connected — and
+     * <p>Deliberately attached to a buff rather than subclassing {@code CanHit}: this also
+     * verifies that the forwarding chain "`CanHit` to `BuffManager` to buff" is connected - and
      * that is exactly the path character mechanics will actually use to subscribe to events.
      *
-     * <p>⚠ The buff MUST **explicitly implement** every event interface: `BuffManager`
+     * <p>Note: The buff MUST explicitly implement every event interface: `BuffManager`
      * forwards one by one via {@code instanceof} (it is not "all buffs receive all events").
      */
     private static final class Probe extends AbstractBuff

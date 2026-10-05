@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「获得该角色即生效，无需上场」 -- the load point (2026-10-02).
+ * "获得该角色即生效，无需上场" -- the load point (2026-10-02).
  *
  * <p>Two claims, and both matter: a registered listener IS asked (its rule moves its own panel), and it does NOT take a turn of its
  * own (the queue never contains it). The second is why the listener cannot simply be added to `characters`.
@@ -38,7 +38,7 @@ public class WarehouseListenerTest {
         TriggerSpecs.set(mark, "percent", 0.5);
         TriggerSpecs.set(mark, "permanent", Boolean.TRUE);
         TriggerSpecs.set(mark, "target", "self");
-        // ⚠ A BATTLE_START rule with NO condition: that event carries no actor and no target, and the loader refuses a condition
+        // Note: A BATTLE_START rule with NO condition: that event carries no actor and no target, and the loader refuses a condition
         // that asks about either.
         owned.setTriggerTable(new TriggerTable(OWNED,
                 List.of(TriggerSpecs.rule("BATTLE_START", List.of(), mark)), List.of()));

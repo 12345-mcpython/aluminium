@@ -25,8 +25,8 @@ import sys
 CHARS = "src/main/resources/characters/8007.json"
 SKILLS = "src/main/resources/data/skills.json"
 SLOT = 13          # the ode: SkillID 1141513
-REINFORCED = 4     # 8007/4 "Almighty Companion", skill_effect Enhance
-SERVANT_SKILL_SLOT = 1   # 11415/1 "Minuet of Blooms and Plumes" -- 【花与箭的舞曲】
+REINFORCED = 4     # 800/4 "Almighty Companion", skill_effect Enhance
+SERVANT_SKILL_SLOT = 1   # 11415/1 "Minuet of Blooms and Plumes" -- [花与箭的舞曲]
 
 table = json.load(io.open(SKILLS, encoding="utf-8"))
 ode = table["11415"][str(SLOT)]["name"]["chinese"]
@@ -42,7 +42,7 @@ if any(r.get("id") == RULE_ID for r in rules):
 rules.append({
     "id": RULE_ID,
     "on": "CAST_SETUP",
-    # ⚠ `self_summon_count >= 1` is the gate the engine itself names when `target: "summon"` has nothing to aim at
+    # Note: `self_summon_count >= 1` is the gate the engine itself names when `target: "summon"` has nothing to aim at
     "when": ["actor == self", "from_skill_id == " + str(REINFORCED), "self_summon_count >= 1"],
     "do": [
         {"op": "EXTRA_TURN", "target": "summon"},

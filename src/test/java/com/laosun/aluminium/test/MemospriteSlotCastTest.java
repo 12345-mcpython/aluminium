@@ -14,16 +14,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 10 「献予「创世」之诗」, the second half, end to end (2026-10-02).
+ * 1415's memosprite skill 10 "献予'创世'之诗", the second half, end to end (2026-10-02).
  *
- * <p>「本场战斗中，<b>开拓者•记忆施放强化普攻后，德谬歌立即获得1个额外回合并自动施放【花与箭的舞曲】</b>，…」
+ * <p>"本场战斗中，<b>开拓者-记忆施放强化普攻后，德谬歌立即获得1个额外回合并自动施放[花与箭的舞曲]</b>，…"
  *
  * <p>Four readings, and each would notice a different way this could be wrong:
  * <ol>
  *   <li>the memosprite has NO place in the action order -- measured: the game pins its speed to 0 with `SpeedOverride`, so `EXTRA_TURN` could never
  *       do this and the capability had to be `INSERT_ACTION`;</li>
  *   <li>the reinforced basic attack makes it act: the next step forward hands out the inserted action, and the actor is the MEMOSPRITE;</li>
- *   <li>【花与箭的舞曲】 really lands -- the enemy loses HP;</li>
+ *   <li>[花与箭的舞曲] really lands -- the enemy loses HP;</li>
  *   <li>and it is that skill: the memosprite's own data slot 1, named through `skill_id`.</li>
  * </ol>
  *

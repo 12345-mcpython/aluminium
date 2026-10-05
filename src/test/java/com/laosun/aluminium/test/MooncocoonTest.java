@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1407：「若我方角色受到致命攻击，则…获得【月茧】状态。【月茧】状态下的角色会暂时延后陷入无法战斗状态，
- * 且可以正常行动。若行动后、下一次回合开始前当前生命值提高或获得护盾，则解除【月茧】状态，否则将立即陷入无法战斗状态」 (2026-10-02).
+ * 140："若我方角色受到致命攻击，则…获得[月茧]状态。[月茧]状态下的角色会暂时延后陷入无法战斗状态，
+ * 且可以正常行动。若行动后、下一次回合开始前当前生命值提高或获得护盾，则解除[月茧]状态，否则将立即陷入无法战斗状态" (2026-10-02).
  *
- * <p>⭐ ONE SENTENCE, THREE READINGS: it does not fall; it falls once its own turn is over; a heal before that saves it.
+ * <p>ONE SENTENCE, THREE READINGS: it does not fall; it falls once its own turn is over; a heal before that saves it.
  *
- * <p>⚠ TWO SCENES, because a healing teammate is a confound for the first two readings: measured, 1211's own kit answered
+ * <p>Note: TWO SCENES, because a healing teammate is a confound for the first two readings: measured, 1211's own kit answered
  * the lethal blow and left the victim at half HP, which is a heal, which is exactly what ends the trace. Scene A therefore
  * holds the owner and the victim alone.
  */
@@ -29,7 +29,7 @@ public class MooncocoonTest {
     private static final int MONSTER = 1002011;
     private static final String STATE = "月茧";
 
-    /** ⭐⭐ 「暂时延后陷入无法战斗状态」: the blow is HELD -- the victim is alive, at zero HP, carrying the trace. */
+    /** "暂时延后陷入无法战斗状态": the blow is HELD -- the victim is alive, at zero HP, carrying the trace. */
     @Test
     public void theBlowIsHeld() {
         Scene scene = alone();
@@ -39,7 +39,7 @@ public class MooncocoonTest {
         Assertions.assertTrue(scene.victim.getBuffManager().hasState(STATE), "「获得【月茧】状态」");
     }
 
-    /** ⭐⭐ 「行动后…否则将立即陷入无法战斗状态」: nothing saved it, so its own turn's END commits the death. */
+    /** "行动后…否则将立即陷入无法战斗状态": nothing saved it, so its own turn's END commits the death. */
     @Test
     public void itsOwnTurnEndsIt() {
         Scene scene = alone();
@@ -51,11 +51,11 @@ public class MooncocoonTest {
     }
 
     /**
-     * ⭐⭐ 「若行动后…当前生命值提高…则解除【月茧】状态」: a real heal ends the trace, and then it does NOT fall.
+     * "若行动后…当前生命值提高…则解除[月茧]状态": a real heal ends the trace, and then it does NOT fall.
      *
-     * <p>⚠ The heal is 1211's own answer to the same lethal blow -- i.e. a second, shipped reader of `LETHAL_DAMAGE`
+     * <p>Note: The heal is 1211's own answer to the same lethal blow -- i.e. a second, shipped reader of `LETHAL_DAMAGE`
      * intervening -- which is what makes this a real end-to-end reading: one character's lethal-damage heal fires
-     * `HEALED`, and 1407's trace is removed by it.
+     * `HEALED`, and 140's trace is removed by it.
      */
     @Test
     public void aHealEndsTheTrace() {
@@ -80,7 +80,7 @@ public class MooncocoonTest {
         }
     }
 
-    /** ⭐ The unpolluted scene: nobody in it can heal, so the deferral is observable on its own. */
+    /** The unpolluted scene: nobody in it can heal, so the deferral is observable on its own. */
     private static Scene alone() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character victim = CharacterFactory.create(VICTIM, 80, false, null, null, 0);
@@ -109,7 +109,7 @@ public class MooncocoonTest {
         scene.battle.processRequests();
     }
 
-    /** ⚠ A WHOLE turn: the early tick on `beforeMove`, the late tick and TURN_END on `afterMove`. */
+    /** Note: A WHOLE turn: the early tick on `beforeMove`, the late tick and TURN_END on `afterMove`. */
     private static void takeItsTurn(Scene scene) {
         Signal signal = scene.battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == scene.victim).findFirst()

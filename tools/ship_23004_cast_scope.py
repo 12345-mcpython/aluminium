@@ -72,7 +72,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 光锥 23004 以世界之名：「当装备者施放战技时，装备者此次攻击的效果命中提高 #2%，攻击力提高 #3%」 (2026-10-02).
+ * 光锥 23004 以世界之名：「当装备者施放战技时，装备者此次攻击的效果命中提高 #2%，攻击力提高 #3%" (2026-10-02).
  *
  * <p>⭐ THE SCOPE IS `until: cast_end`, and that is what these readings pin:
  * <ul>

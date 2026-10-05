@@ -15,8 +15,8 @@ import os
 
 BASE = {"HEALTH", "ATTACK", "DEFENCE", "SPEED"}
 STRICT = ["等同于当前", "等同于其当前", "等同于自身当前", "等于当前"]
-# ⚠ The wider net, REPORTED SEPARATELY: a sentence may mean the CURRENT value without writing 「当前」
-# (「提高等同于自身生命上限的 6%」). These need a human reading, so they are not mixed in with the strict hits.
+# Note: The wider net, REPORTED SEPARATELY: a sentence may mean the CURRENT value without writing "当前"
+# ("提高等同于自身生命上限的 6%"). These need a human reading, so they are not mixed in with the strict hits.
 WIDE = ["等同于自身生命上限", "等同于其生命上限",
         "等同于自身防御力", "等同于自身攻击力"]
 

@@ -22,8 +22,8 @@ import java.util.Random;
 /**
  * Light cone 22004: for every element the target is weak to, the wearer deals 4% more damage to it.
  *
- * <p>⭐ Judged as a RATIO of ratios, so the two monsters' defence zones cancel: each is hit with and without the cone and the
- * boosts must be 1 + 0.04n for its own n. The sentence's cap of 7 needs no code -- the game has exactly seven elements.
+ * <p>Judged as a RATIO of ratios, so the two monsters' defence zones cancel: each is hit with and without the cone and the
+ * boosts must be 1 + 0.04n for its own n. The sentence's cap of needs no code -- the game has exactly seven elements.
  */
 public class Cone22004Test {
     private static final int CONE = 22004;

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** Eidolon clauses 「施放X后，<attr>提高N%，持续M回合」, values verified against `eidolons.json`, expectations split by attribute kind. */
+/** Eidolon clauses "施放X后，<attr>提高N%，持续M回合", values verified against `eidolons.json`, expectations split by attribute kind. */
 public class EidolonBatchTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;

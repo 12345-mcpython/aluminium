@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23053, its 【推流】 clause: spending 4 skill points WITHIN ONE TURN grants the state, and it lifts the whole party's
+ * Light cone 23053, its [推流] clause: spending 4 skill points WITHIN ONE TURN grants the state, and it lifts the whole party's
  * elation damage by 20%.
  *
- * <p>⭐ 「同一回合内」 is the new {@code until: turn_end} lifetime, swept at the carrier's own turn end. The
+ * <p>"同一回合内" is the new {@code until: turn_end} lifetime, swept at the carrier's own turn end. The
  * discriminating reading spreads the same four spends over TWO turns: three, then a turn boundary, then one must NOT pay out.
  */
 public class Cone23053PushTest {

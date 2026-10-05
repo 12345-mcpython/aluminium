@@ -21,34 +21,34 @@ import java.util.Random;
 /**
  * A {@code MODIFY_ATTR} whose value is <b>derived</b>: {@code scale: "self_attr:<ATTRIBUTE>"} (P11-2, M-42).
  *
- * <p><b>Why a literal is not enough.</b> 「提高数值等同于大丽花 #1% 的击破特攻 + #3%」 / 「等同于星期日 #2% 暴击伤害 +
- * #4%」 state the granted value as a function of <b>the rule owner's own attribute</b>. `percent` can only be a
+ * <p><b>Why a literal is not enough.</b> "提高数值等同于大丽花 #1% 的击破特攻 + #3%" / "等同于星期日 #2% 暴击伤害 +
+ * #4%" state the granted value as a function of <b>the rule owner's own attribute</b>. `percent` can only be a
  * number, so writing one here would be wrong for every build in which the owner's attribute is not exactly the
- * value the author had in front of them — the classic "wrong number with nothing to see".
+ * value the author had in front of them - the classic "wrong number with nothing to see".
  *
  * <p><b>What each case is for.</b>
  * <ol>
- *   <li>the value really is {@code percent × (the owner's attribute) + amount};</li>
+ *   <li>the value really is {@code percent  x  (the owner's attribute) + amount};</li>
  *   <li>it reads the <b>owner's</b> attribute, not the receiving unit's (they are two different characters, and the
  *       rule's whole point is that the value travels);</li>
- *   <li>it stays <b>absolute</b> even on a base attribute — where a literal {@code percent} would mean "a share of
+ *   <li>it stays <b>absolute</b> even on a base attribute - where a literal {@code percent} would mean "a share of
  *       the target's base". The two readings differ by a factor of the target's own stat, so one case separates
  *       them;</li>
  *   <li>it is <b>computed once</b>: changing the owner's attribute afterwards does not retro-rewrite the buff;</li>
- *   <li>every way of spelling it wrong is refused while the file is read — including the one that used to be
+ *   <li>every way of spelling it wrong is refused while the file is read - including the one that used to be
  *       silently dropped ({@code amount} without a {@code scale}).</li>
  * </ol>
  *
- * <p>The shipped user is 大丽花's trace 「又一场葬礼」 (checked end to end below).
+ * <p>The shipped user is 大丽花's trace "又一场葬礼" (checked end to end below).
  */
 public class DerivedModifierTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子 — a plain character with no rule file of its own; the derived value is put on it. */
+    /** 姬子 - a plain character with no rule file of its own; the derived value is put on it. */
     private static final int OWNER = 1003;
-    /** 停云 — "the other character" the party-wide grant reaches. */
+    /** 停云 - "the other character" the party-wide grant reaches. */
     private static final int ALLY = 1202;
-    /** 大丽花 — her trace is the first content that needs this. */
+    /** 大丽花 - her trace is the first content that needs this. */
     private static final int DAHLIA = 1321;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -59,7 +59,7 @@ public class DerivedModifierTest {
     // 1. The arithmetic
     // ==================================================================
 
-    /** {@code percent × the owner's attribute + amount}, in the attribute's own units. */
+    /** {@code percent  x  the owner's attribute + amount}, in the attribute's own units. */
     @Test
     public void theValueIsAShareOfTheOwnersAttributePlusAFlatPart() {
         Battle battle = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
@@ -87,7 +87,7 @@ public class DerivedModifierTest {
     // ==================================================================
 
     /**
-     * The value comes from the <b>rule owner</b> and is granted to somebody else — the arrangement that makes the
+     * The value comes from the <b>rule owner</b> and is granted to somebody else - the arrangement that makes the
      * two roles distinguishable.
      */
     @Test
@@ -105,9 +105,9 @@ public class DerivedModifierTest {
     /**
      * On a <b>base</b> attribute the derived value is an absolute amount.
      *
-     * <p>⚠ This is the case that separates the two possible readings: a literal {@code percent} on ATTACK means "a
+     * <p>Note: This is the case that separates the two possible readings: a literal {@code percent} on ATTACK means "a
      * share of the target's base ATK", and reading a <i>derived</i> number the same way would multiply it by that
-     * stat. The numbers are chosen so the two answers cannot be confused (50 vs 50 × the target's ATK).
+     * stat. The numbers are chosen so the two answers cannot be confused (50 vs 50  x  the target's ATK).
      */
     @Test
     public void aDerivedValueStaysAbsoluteOnABaseAttribute() {
@@ -145,9 +145,9 @@ public class DerivedModifierTest {
     /**
      * The owner-vs-receiver case where the two are genuinely different <b>objects with different values</b>.
      *
-     * <p>⚠ It has to be an event that <b>carries a target</b>. The party-wide case above fires on {@code BATTLE_START},
-     * where {@code ctx.target()} is null — so "reads the owner" and "reads the target" are the same code path there,
-     * and a mutant that swapped them survived the suite until this case existed (2026-09-27).
+     * <p>Note: It has to be an event that <b>carries a target</b>. The party-wide case above fires on {@code BATTLE_START},
+     * where {@code ctx.target()} is null - so "reads the owner" and "reads the target" are the same code path there,
+     * and a mutant that swapped them survived the suite until this case existed (2026-09-2).
      */
     @Test
     public void theOwnerIsNotSimplyTheEventSubject() {
@@ -226,8 +226,8 @@ public class DerivedModifierTest {
      * {@code actor == self} on {@code BATTLE_START} is refused: that event carries no actor, so the rule could
      * never fire.
      *
-     * <p>⚠ Written by hand first, in the trace just below, and the only reason it was noticed is that nothing was
-     * granted. The event is delivered to every character's own table, so "my own battle start" needs no condition —
+     * <p>Note: Written by hand first, in the trace just below, and the only reason it was noticed is that nothing was
+     * granted. The event is delivered to every character's own table, so "my own battle start" needs no condition - 
      * which is what the message says.
      */
     @Test
@@ -255,10 +255,10 @@ public class DerivedModifierTest {
     // ==================================================================
 
     /**
-     * 「进入战斗时，使其他角色的击破特攻提高，提高数值等同于 24% 大丽花的击破特攻 + 50%，持续 1 回合」.
+     * "进入战斗时，使其他角色的击破特攻提高，提高数值等同于 24% 大丽花的击破特攻 + 50%，持续 1 回合".
      *
      * <p>Measured as a delta on each <b>other</b> character, with her own value read from the built character rather
-     * than hardcoded — the trace's whole point is that the number follows her build.
+     * than hardcoded - the trace's whole point is that the number follows her build.
      */
     @Test
     public void theAuthoredTraceGrantsThePartyHerOwnShare() {

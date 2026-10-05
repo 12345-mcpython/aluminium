@@ -19,54 +19,54 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import java.util.Set;
 
 /**
- * Character factory (P8-1): build a **real character** with one call.
+ * Character factory (P8-1): build a real character with one call.
  *
  * <pre>{@code
  * Character jingYuan = CharacterFactory.create(1204, 80);
  * jingYuan.getElement();      // THUNDER
  * jingYuan.getPath();         // ERUDITION
  * jingYuan.getMaxEnergy();    // 130
- * jingYuan.getAggro();        // 75
+ * jingYuan.getAggro(); // 5
  * }</pre>
  *
- * <p>It is essentially a thin wrapper around {@code Character.builder()} — the stat pipeline
+ * <p>It is essentially a thin wrapper around {@code Character.builder()} - the stat pipeline
  * (level scaling / light cone / relics / traces / extra bonuses) was already complete in P2; what
- * P8-1 added is the **character identity fields**: element, path, aggro, max energy (see
+ * P8-1 added is the character identity fields: element, path, aggro, max energy (see
  * {@code Character.Builder#build()}).
  *
  * <p>Division of labour with {@link Character#fromAttributes}: that one is the test/placeholder
  * entry point (no element, no path, max energy 0, all skills placeholders); this one is the real
- * character entry point. **After P8 all new code uses this one.**
+ * character entry point. After P8 all new code uses this one.
  *
  * <p><b>Skill assembly is wired up in P8-2</b>: a character built by {@code create()} carries
- * {@code DefaultSkill} with the **real slot mapping** (basic attack 1 / skill 2 / ultimate 3 /
+ * {@code DefaultSkill} with the real slot mapping (basic attack 1 / skill 2 / ultimate 3 /
  * talent 4); there is only one mapping table ({@code Constant.SKILL_SLOT}) and the assembly point is
- * {@code Character.Builder#build()} — see {@code engine.md} §7.2. Map basic attack (6) / technique (7)
+ * {@code Character.Builder#build()} - see {@code engine.md} §.2. Map basic attack (6) / technique ()
  * are not installed here; they are attached by {@code Battle.startBattle()}.
  *
- * <p>⚠ This class **only handles character identity and resources** and does not touch skill
+ * <p>Note: This class only handles character identity and resources and does not touch skill
  * multipliers: follow-up attacks/summons are P8-3/P9-4.
  */
 public final class CharacterFactory {
     /**
-     * Characters that go through **stacks/special resources** instead of conventional energy (the
+     * Characters that go through stacks/special resources instead of conventional energy (the
      * "capabilities the engine does not have yet" bucket of the P8-0 three-way split).
      *
-     * <p>What they accumulate in the game is 【追忆】 (Reminiscence) / 【新蕊】 (New Bud) / 【火种】
+     * <p>What they accumulate in the game is [追忆] (Reminiscence) / [新蕊] (New Bud) / [火种]
      * (Kindling) / points; conventional energy gain is meaningless for them. And {@code castUltra}
      * only looks at {@code currentEnergy >= maxEnergy}, so without blocking them they could fill the
      * bar by "getting hit" and fire an ultimate that should not exist (Acheron (黄泉) caps at 9).
      *
      * <p>Putting the check at the assembly point is explicitly allowed by P8-0 (the provider registry /
      * the assembly point are the only places where a cid may appear). Once P8-8's {@code Resource}
-     * lands, this table evolves into a "character → resource implementation" registry.
+     * lands, this table evolves into a "character to resource implementation" registry.
      */
     private static final Set<Integer> SPECIAL_RESOURCE_CHARACTERS = Set.of(
             1220,   // Feixiao (飞霄): stacks (ultimate threshold 6, cap 12)
             1308,   // Acheron (黄泉): stacks (cap 9)
-            1407,   // Castorice (遐蝶): 【新蕊】 (max_energy is null; there was never an energy bar)
-            1408,   // Phainon (白厄): 【火种】 (cap 12)
-            1415,   // Cyrene (昔涟): 【追忆】 (see engine.md §9.5)
+            1407,   // Castorice (遐蝶): [新蕊] (max_energy is null; there was never an energy bar)
+            1408,   // Phainon (白厄): [火种] (cap 12)
+            1415,   // Cyrene (昔涟): [追忆] (see engine.md §9.5)
             1506    // Silver Wolf LV.999 (银狼LV.999): the Elation (欢愉) system
     );
 
@@ -81,10 +81,10 @@ public final class CharacterFactory {
     /**
      * Build a fully promoted real character.
      *
-     * <p>"Fully promoted" means promoted up to the cap for the current level (Lv80 → promoted 6
+     * <p>"Fully promoted" means promoted up to the cap for the current level (Lv80 to promoted 6
      * times), which is exactly the {@code true} in
      * {@code LevelPromotionCalc.calcCharacterRate(level, true)}.
-     * Jing Yuan (景元) Lv80 promoted HP is exactly = {@code 158.4 × 7.35 = 1164.24}, matching the game.
+     * Jing Yuan (景元) Lv80 promoted HP is exactly = {@code 158.4 x .35 = 1164.24}, matching the game.
      *
      * @param cid   character id (see {@code character_data.json})
      * @param level level (1-80)
@@ -111,12 +111,12 @@ public final class CharacterFactory {
     }
 
     /**
-     * Builds a real character **with a light cone**.
+     * Builds a real character with a light cone.
      *
      * <p>The cone has to be supplied here rather than assigned afterwards: the stat-sheet pipeline
      * consumes it during {@code Character.Builder#build()} (the calculator takes the weapon as an
      * input), so {@code character.setWeapon(...)} on an already-built character would change the
-     * field but **not the sheet**.
+     * field but not the sheet.
      *
      * @param cid      character id
      * @param level    level (1-80)
@@ -130,7 +130,7 @@ public final class CharacterFactory {
     }
 
     /**
-     * Builds a real character **with a light cone and a relic suit**.
+     * Builds a real character with a light cone and a relic suit.
      *
      * <p>Both have to be supplied here rather than assigned afterwards, for the same reason as the cone
      * above: the stat-sheet pipeline consumes them during {@code Character.Builder#build()}. A suit handed
@@ -152,13 +152,13 @@ public final class CharacterFactory {
     /**
      * The full entry point: the same character, with a number of active Eidolon ranks (星魂).
      *
-     * <p><b>Why the rank is a parameter here rather than a lookup.</b> This method is the assembly point — the
-     * one place allowed to go from "which character" to "which rules" (P8-0) — and "which Eidolons are active" is
+     * <p><b>Why the rank is a parameter here rather than a lookup.</b> This method is the assembly point - the
+     * one place allowed to go from "which character" to "which rules" (P8-0) - and "which Eidolons are active" is
      * part of that question. The engine never resolves it from the cid, and a rule that belongs to an Eidolon
      * carries {@code min_eidolon} so the gate lives in the same file as the mechanic.
      *
-     * @param eidolonRank how many ranks are active, {@code 0}–{@code Constant.EIDOLON_MAX_RANK} ({@code 0} = none)
-     * @throws IllegalArgumentException when the rank is outside that range — a wrong rank is a content mistake,
+     * @param eidolonRank how many ranks are active, {@code 0}-{@code Constant.EIDOLON_MAX_RANK} ({@code 0} = none)
+     * @throws IllegalArgumentException when the rank is outside that range - a wrong rank is a content mistake,
      *                                  and silently clamping it would make an Eidolon quietly not exist
      */
     public static Character create(int cid, int level, boolean promoted, Weapon weapon, RelicSuit relicSuit,
@@ -178,7 +178,7 @@ public final class CharacterFactory {
         if (relicSuit != null) {
             builder = builder.relicSuit(relicSuit);
         }
-        // P8-7: attach the character's data-driven mechanics. This is the **assembly point** -- the
+        // P8-: attach the character's data-driven mechanics. This is the assembly point -- the
         // one place allowed to go from "which character" to "which rules" (P8-0). Characters with no
         // file get the empty table, which is the normal state for the ones not data-ised yet.
         // Worn relic sets contribute their own rules on top (see `effectiveTriggerTable`).
@@ -190,19 +190,19 @@ public final class CharacterFactory {
         }
         builder = builder.triggerTable(table);
         Character character = builder.build();
-        // P8-8: the resources this character declares (「充能，上限3点」). Registered **after** the build
+        // P8-8: the resources this character declares ("充能，上限3点"). Registered after the build
         // because the manager belongs to the combatant, and from the declaration rather than from the JSON
         // directly, so the cap a rule is gated on is the same number that was registered -- there is one
         // reader of the declaration (`requireReadableResources`), not two.
         for (ResourceSpec spec : table.resources()) {
-                // ✅ A PARTY-scoped declaration is NOT registered per character (2026-09-30): `ResourceManager.register` itself
-                // refuses an unwired scope because 「一个 party-level resource needs a PER-BATTLE owner」, and `Battle` is that owner
-                // (it registers these from the party’s declarations at the start of the battle). Registering a copy here as well would
+                // A PARTY-scoped declaration is NOT registered per character (2026-09-30): `ResourceManager.register` itself
+                // refuses an unwired scope because "一个 party-level resource needs a PER-BATTLE owner", and `Battle` is that owner
+                // (it registers these from the party's declarations at the start of the battle). Registering a copy here as well would
                 // quietly give the declaring character a private counter and the shared one would read 0 -- measured, before this.
                 if ("PARTY".equalsIgnoreCase(spec.scope() == null ? "" : spec.scope().trim())) {
                     continue;
                 }
-            // ✅ The declared overflow rides along (2026-09-30).
+            // The declared overflow rides along (2026-09-30).
                 character.getResources().register(spec.id(), spec.max(), spec.initial(),
                         spec.overflow() == null ? 0 : spec.overflow());
         }
@@ -217,18 +217,18 @@ public final class CharacterFactory {
      * The character's own trigger rules plus those of every relic set it wears enough pieces of.
      *
      * <p>A relic set's rules are the same kind of rule as a character's (same JSON shape, same ops,
-     * same events — see {@link com.laosun.aluminium.data.RelicTriggerTables}), so "which set bonuses
+     * same events - see {@link com.laosun.aluminium.data.RelicTriggerTables}), so "which set bonuses
      * are live" is a table merge rather than a second mechanism. This is the assembly point where the
      * merge happens: whoever builds the character decides, and the engine never looks a table up by
      * cid or by set id at battle time (P8-0).
      *
      * <p>Composition rules, spelled out because they are the whole content of this method:
      * <ul>
-     *   <li>No suit / a suit with no set ids → exactly the character's own table, so an unequipped
+     *   <li>No suit / a suit with no set ids to exactly the character's own table, so an unequipped
      *       character behaves precisely as it did before relic rules existed;</li>
      *   <li>Per set, the rules of the <b>highest threshold met</b> are used, and those already
      *       include the lower tiers ({@code RelicTriggerTables.Rules#at});</li>
-     *   <li>A set with no rule file contributes nothing (most sets today — including the reference
+     *   <li>A set with no rule file contributes nothing (most sets today - including the reference
      *       team's build, so no existing battle changes behaviour).</li>
      * </ul>
      *
@@ -253,14 +253,14 @@ public final class CharacterFactory {
      * Refuses a merged table that reads a resource this character never declares (P8-8).
      *
      * <p><b>Why the check lives here</b>, exactly like {@link #requireSummonable}: {@code self_resource:<NAME>}
-     * is read from the combatant's own {@code ResourceManager}, and a rule file cannot know its own cid — while a
+     * is read from the combatant's own {@code ResourceManager}, and a rule file cannot know its own cid - while a
      * <b>relic</b> rule is shared by every wearer. The assembly point is the first place that knows both the
      * character and the full set of rules it ends up with.
      *
      * <p><b>The failure being prevented.</b> An undeclared resource is not an error at any layer below:
      * {@code ResourceManager.gain} answers {@code 0} ("nothing credited") and {@code value} answers {@code 0}
-     * ("empty"). So a rule that grants 「充能」 would fire and grant nothing, and a rule gated on
-     * {@code self_resource:充能 >= 3} would compile, load, and never fire — the wrong answer with no symptom that
+     * ("empty"). So a rule that grants "充能" would fire and grant nothing, and a rule gated on
+     * {@code self_resource:充能 >= 3} would compile, load, and never fire - the wrong answer with no symptom that
      * this project refuses. Checked at build time so the message arrives while the character is being created,
      * naming the resource and the file to declare it in, rather than never arriving at all.
      *
@@ -293,14 +293,14 @@ public final class CharacterFactory {
     /**
      * Refuses a merged table whose {@code SUMMON} rules this character could never satisfy (P9-4).
      *
-     * <p><b>Why the check lives here.</b> 「进入战斗时召唤忆灵」 is only meaningful for a character with a
+     * <p><b>Why the check lives here.</b> "进入战斗时召唤忆灵" is only meaningful for a character with a
      * memosprite spec ({@code resources/memosprites/<cid>.json}), and a rule file cannot know its own cid:
      * {@link TriggerTable} is compiled from the file alone, and a <b>relic</b> rule is shared by every wearer.
      * The assembly point is the first place that knows both the character and the full set of rules it ends up
      * with, so it is the only place this can be caught at build time instead of in the middle of a battle.
      *
      * <p>The failure mode being prevented: the op would load, fire, and only then throw from inside
-     * {@code SummonFactory} — during {@code startBattle}, with a message about a missing file arriving long
+     * {@code SummonFactory} - during {@code startBattle}, with a message about a missing file arriving long
      * after the rule was written. Here the same message arrives when the character is built.
      *
      * <p><b>Public on purpose.</b> It is the one entry point for "is this character's rule set satisfiable",

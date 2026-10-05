@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1307 Black Swan, from her own file (2026-09-29, round 228): the Arcana stack with its 50 cap, and the Skill's defence shred.
+ * 130Black Swan, from her own file (2026-09-29, round 228): the Arcana stack with its 50 cap, and the Skill's defence shred.
  */
 public class BlackSwanTest {
     private static final int BLACK_SWAN = 1307;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ One Arcana per Skill, stopped at the document's fifty, and exactly 20.80% of the enemy's own defence. */
+    /** Note: One Arcana per Skill, stopped at the document's fifty, and exactly 20.80% of the enemy's own defence. */
     @Test
     public void theSkillStacksArcanaAndShredsDefence() {
         Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);

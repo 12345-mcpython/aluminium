@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23014: a teammate being hit or paying health gives the wearer a layer of 【月蚀】 (max 3); every layer lifts the
+ * Light cone 23014: a teammate being hit or paying health gives the wearer a layer of [月蚀] (max 3); every layer lifts the
  * wearer's NEXT attack, and a full stack also ignores 12% of the target's defence. The stack is spent by attacking.
  */
 public class Cone23014Test {
@@ -114,10 +114,10 @@ public class Cone23014Test {
 
     @Test
     public void theSpecPinsTheIgnoreClause() {
-        // ★ The one clause whose AMOUNT is not separable from the stack behaviourally (it rides the same instance as the
+        // The one clause whose AMOUNT is not separable from the stack behaviourally (it rides the same instance as the
         // full-stack boost), so the number itself is pinned here.
         build(true);
-        // ★★ The rule exists only at a FULL stack, and `matching` evaluates conditions, so the state must be BUILT first --
+        // The rule exists only at a FULL stack, and `matching` evaluates conditions, so the state must be BUILT first --
         // measured: without this the loop found zero rules and pinned nothing, and `12 -> 6 percent` stayed 0 red.
         for (int i = 0; i < CAP; i++) {
             teammateIsHit();

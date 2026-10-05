@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20016: 「装备者当前生命值百分比小于#1[i]%时，暴击率提高#2[i]%」.
+ * Light cone 20016: "装备者当前生命值百分比小于#1[i]%时，暴击率提高#2[i]%".
  *
  * <p>HP is lowered with small steps of `applyDamage` (its value is a skill base, not raw damage) because `Character` has no setter.
  */

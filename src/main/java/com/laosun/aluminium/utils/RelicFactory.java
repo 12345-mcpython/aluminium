@@ -31,7 +31,7 @@ import java.util.StringJoiner;
  *
  * <h2>What it chooses, and why</h2>
  * <ul>
- *   <li><b>Slot</b>: the parts of the named set, mapped through {@link RelicType#fromSetPart(String)} — so a
+ *   <li><b>Slot</b>: the parts of the named set, mapped through {@link RelicType#fromSetPart(String)} - so a
  *       cavern set produces HEAD/HAND/BODY/BOOT and a planar set produces the sphere and the rope. A slot the
  *       set does not come in is rejected rather than silently built.</li>
  *   <li><b>Main attribute</b>: the first entry of a stated preference list that the star level's table
@@ -39,7 +39,7 @@ import java.util.StringJoiner;
  *       (head, hand) have exactly one candidate. The rest are picked for a <b>generic damage dealer</b>, and
  *       deliberately <b>not</b> for a character: the sphere's real main stat is an element damage boost, and
  *       "which element" is a property of the wearer, which this factory does not know and must not guess.
- *       Nothing is deducted from a name — every candidate is checked against the generated table, and if a
+ *       Nothing is deducted from a name - every candidate is checked against the generated table, and if a
  *       star level has none of them the call throws.</li>
  *   <li><b>Sub-attributes</b>: <b>none</b>. Sub-stats are the random part of an in-game relic, so "deriving"
  *       them here would mean inventing numbers that no data file contains. A relic with only a main attribute
@@ -124,7 +124,7 @@ public final class RelicFactory {
     }
 
     /**
-     * Builds every piece of one set — four for a cavern set, two for a planar ornament set.
+     * Builds every piece of one set - four for a cavern set, two for a planar ornament set.
      *
      * @param setId the set id
      * @param star  star rating (2-5)
@@ -141,7 +141,7 @@ public final class RelicFactory {
     }
 
     /**
-     * Builds one suit out of several sets — the shape a real build has, since a 4-piece cavern set and a
+     * Builds one suit out of several sets - the shape a real build has, since a 4-piece cavern set and a
      * 2-piece planar ornament set always come from two different set ids and together fill all six slots.
      *
      * <p>Two sets that want the same slot are rejected: a character has one relic per slot, and adding both

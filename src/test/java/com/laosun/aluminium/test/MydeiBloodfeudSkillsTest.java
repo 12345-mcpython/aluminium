@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404 万敌：【弑王成王】的自动施放，以及它的代价 (2026-10-02).
+ * 1404 万敌：[弑王成王]的自动施放，以及它的代价 (2026-10-02).
  *
  * <p>Two readings, kept apart because the earlier attempt failed with two independent causes. One reads the COST, the other reads
- * the SWAP by the slot the skill reports. ⚠ And the cost reading wounds him first: at full HP "35% of CURRENT" and "35% of
+ * the SWAP by the slot the skill reports. Note: And the cost reading wounds him first: at full HP "35% of CURRENT" and "35% of
  * MAXIMUM" are the same number, so a reading taken there would pass for either share -- the first version did exactly that.
  */
 public class MydeiBloodfeudSkillsTest {
@@ -32,7 +32,7 @@ public class MydeiBloodfeudSkillsTest {
     private static final String BLOODFEUD = "血仇";
     private static final String CHARGE = "天赋充能";
 
-    /** 「消耗等同于万敌当前生命值 35% 的生命值」-- the cost is paid, on the CURRENT value, at the start of his turn. */
+    /** "消耗等同于万敌当前生命值 35% 的生命值"-- the cost is paid, on the CURRENT value, at the start of his turn. */
     @Test
     public void theTurnStartPaysTheSkillsCost() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -62,12 +62,12 @@ public class MydeiBloodfeudSkillsTest {
                 "and NOT a share of the maximum: that would leave " + (hpBefore - 0.35 * maxHp) + ", and he has " + hpAfter);
         Assertions.assertTrue(enemyAfter < enemyBefore, "and the attack lands");
 
-        // ⚠ This reading covers the COST half. The other half -- swapping slot 9 in so the cast runs 【弑王成王】 -- does NOT
+        // Note: This reading covers the COST half. The other half -- swapping slot 9 in so the cast runs [弑王成王] -- does NOT
         // work from inside a rule yet, measured: the swap lands in the map while a `CAST_SKILL` later in the same rule still runs the
-        // old row (767.585 against 383.793 for a direct cast of slot 9). Registered in EXPRESSION §3, so the note does not claim it.
+        // old row (6.585 against 383.93 for a direct cast of slot 9). Registered in EXPRESSION §3, so the note does not claim it.
     }
 
-    /** ⚠ The other half on its own: `REPLACE_SKILL` really installs the row the cast then uses. */
+    /** Note: The other half on its own: `REPLACE_SKILL` really installs the row the cast then uses. */
     @Test
     public void theSwapInstallsTheEnhancedRow() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -90,7 +90,7 @@ public class MydeiBloodfeudSkillsTest {
         Assertions.assertEquals(9, slot, "换入的是**槽 9** 的行（【弑王成王】破韧 60/30 ✓），而原来是槽 2");
     }
 
-    /** ⚠ Half a turn is `beforeMove()` alone; a full one is both halves (see `ArlanEidolonFourTest`). */
+    /** Note: Half a turn is `beforeMove()` alone; a full one is both halves (see `ArlanEidolonFourTest`). */
     private static void spendTurnOf(Battle battle, Character unit) {
         Signal signal = battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == unit).findFirst()
@@ -102,7 +102,7 @@ public class MydeiBloodfeudSkillsTest {
     }
 
     /**
-     * ⭐⭐ And the swap must REACH the cast -- read as a SAME-LEVEL comparison, which is what the first attempt got wrong.
+     * And the swap must REACH the cast -- read as a SAME-LEVEL comparison, which is what the first attempt got wrong.
      *
      * <p>The earlier "proof" compared against a scene whose trigger table had been REPLACED, so `level_convention` never ran there
      * and the two numbers came from different levels. This one installs the same row by hand AFTER the battle has started (so the
@@ -126,7 +126,7 @@ public class MydeiBloodfeudSkillsTest {
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         other.startBattle();
         other.processRequests();
-        // ⚠ AFTER startBattle, so the slot carries the level the convention gives it -- the trap the earlier attempt fell into.
+        // Note: AFTER startBattle, so the slot carries the level the convention gives it -- the trap the earlier attempt fell into.
         byHand.getSkills().put(SkillType.SKILL, new com.laosun.aluminium.models.skill.DefaultSkill(
                 MYDEI, 9, byHand.getSkills().get(SkillType.SKILL).getLevel()));
         double otherBefore = other.enemies.getFirst().getCurrentHp();
@@ -140,7 +140,7 @@ public class MydeiBloodfeudSkillsTest {
                 "「自动施放【弑王成王】」-- the commanded cast runs the row the swap installed, not the slot's original one");
     }
 
-    /** ⭐ The gate: a charge that arrives WHILE 【血仇】 is already on must not be drained again. */
+    /** The gate: a charge that arrives WHILE [血仇] is already on must not be drained again. */
     @Test
     public void aChargeArrivingInBloodfeudIsNotDrainedAgain() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -163,7 +163,7 @@ public class MydeiBloodfeudSkillsTest {
                         + "without this the charge can never reach 150 and the next sentence is unreachable");
     }
 
-    /** 「充能达到 150 点时，立即获得 1 个额外回合并自动施放【弑神登神】」. */
+    /** "充能达到 150 点时，立即获得 1 个额外回合并自动施放[弑神登神]". */
     @Test
     public void theHundredAndFiftyChargeCastsGodslayer() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);

@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1402 阿格莱雅's 「施放攻击时使目标陷入【间隙织线】状态」, judged both ways with 「衣匠在场时」 as the variable.
+ * 1402 阿格莱雅's "施放攻击时使目标陷入[间隙织线]状态", judged both ways with "衣匠在场时" as the variable.
  *
- * <p>⚠ The state is applied by a rule and read back through `hasState`, which is also what the follow-up damage's condition asks --
+ * <p>Note: The state is applied by a rule and read back through `hasState`, which is also what the follow-up damage's condition asks --
  * the two halves of the sentence compose, and this pins the applying half.
  */
 public class AglaeaThreadStateTest {
@@ -54,7 +54,7 @@ public class AglaeaThreadStateTest {
         if (withMemoSprite) {
             battle.summonMemosprite(aglaea);
         }
-        // ⚠ COMMON: her Skill heals/summons, so her attack is the basic one (measured in round 69).
+        // Note: COMMON: her Skill heals/summons, so her attack is the basic one (measured in round 69).
         battle.castImmediate(aglaea.getSkills().get(SkillType.COMMON), aglaea, List.of(enemy));
         return enemy.getBuffManager().hasState(STATE);
     }

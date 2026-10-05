@@ -8,19 +8,19 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 /**
- * M-17: "the environment is not prepared" must never surface as a far-away NPE.
+ * M-1: "the environment is not prepared" must never surface as a far-away NPE.
  *
  * <p>{@code JSONReader} already explained a <b>missing</b> file (an {@link IllegalStateException}
  * naming the path and the generator). The other half was unguarded: {@code GSON.fromJson} returns
  * {@code null} for a zero-byte file or a literal {@code null}, and that {@code null} used to travel
- * into {@code Constant} as e.g. {@code WEAPONS = frozen(null)} — it then surfaced much later as an NPE
+ * into {@code Constant} as e.g. {@code WEAPONS = frozen(null)} - it then surfaced much later as an NPE
  * on an unrelated line, or (worse, because it is silent) as a table that merely looks empty.
  *
  * <p>Why this is the same class of bug as the missing-file branch: the cause is "the data was not
  * generated/regenerated properly", not "the engine has a bug", so it has to be reported where it is
  * detected, with the file name attached.
  *
- * <p>The fixtures live in {@code src/test/resources/data/} — they cannot share the main data
+ * <p>The fixtures live in {@code src/test/resources/data/} - they cannot share the main data
  * directory, which is gitignored (and therefore absent right after a clone). The last case is a
  * control: it reads a real generated file, so the new guard cannot pass by simply always throwing.
  */
@@ -67,7 +67,7 @@ public class JSONReaderTest {
      * The generated files are read through the same method, so the guard must not reject them.
      *
      * <p>Empty is <b>not</b> the same as "unusable" in general: an empty table is a legitimate table.
-     * Only the {@code null} <i>result</i> is rejected — {@code {}} still parses to an empty map, which
+     * Only the {@code null} <i>result</i> is rejected - {@code {}} still parses to an empty map, which
      * is what the loaders that tolerate a missing file rely on.
      */
     @Test

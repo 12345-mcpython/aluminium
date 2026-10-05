@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412：「持有【军功】的角色造成伤害时**无视目标 16% 的防御力**」 (2026-10-02).
+ * 1412："持有[军功]的角色造成伤害时无视目标 16% 的防御力" (2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN: her skill is what grants 【军功】, so after it the ALLY should carry the 16% defence ignore -- while she
+ * <p>FILE-DRIVEN: her skill is what grants [军功], so after it the ALLY should carry the 16% defence ignore -- while she
  * herself should not, which is the "false side" this judge also asserts.
  */
 public class MilitaryMeritDefenceIgnoreTest {
@@ -25,7 +25,7 @@ public class MilitaryMeritDefenceIgnoreTest {
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ The merit holder ignores 16% DEF; the caster does not. */
+    /** The merit holder ignores 16% DEF; the caster does not. */
     @Test
     public void theMeritHolderIgnoresSixteenPercent() {
         Character owner = CharacterFactory.create(OWNER, 80);

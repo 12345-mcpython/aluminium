@@ -16,7 +16,7 @@ import java.util.Random;
  * P5-1 / P5-2 acceptance: path aggro values, the aggro table, and "taunt does not change the numbers".
  *
  * <p>Anchors (fully cross-checked against the {@code aggro} column of {@code character_data.json}):
- * Preservation 150 / Destruction 125 / other 100 / Hunt·Erudition 75.
+ * Preservation 150 / Destruction 125 / other 100 / Hunt-Erudition 5.
  */
 public class AggroTest {
     private static final double EPS = 1e-9;

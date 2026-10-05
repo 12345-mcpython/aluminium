@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 126 (2026-09-30): 「成为其他我方目标的技能目标时，获得 1 层【助力】，最多 2 层；施放终结技时若持有 2 层，
- * 消耗所有【助力】，攻击力 +48%，持续 1 回合」.
+ * Relic 126 (2026-09-30): "成为其他我方目标的技能目标时，获得 1 层[助力]，最多 2 层；施放终结技时若持有 2 层，
+ * 消耗所有[助力]，攻击力 +48%，持续 1 回合".
  *
  * <p>matching() evaluates the conditions, so the three-way guard really is tested: an ALLY aiming at the wearer
  * matches; the wearer aiming at THEMSELF does not (that is the `actor != self` half -- the spelling `!actor == self`

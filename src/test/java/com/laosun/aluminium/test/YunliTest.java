@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1221 Yunli, from her own file (2026-09-29, round 227): the heal's derived-plus-flat amount, and the counter that reaches THE ATTACKER.
+ * 1221 Yunli, from her own file (2026-09-29, round 22): the heal's derived-plus-flat amount, and the counter that reaches THE ATTACKER.
  */
 public class YunliTest {
     private static final int YUNLI = 1221;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The heal is 30% of her ATTACK plus a flat 200, and it heals HER. */
+    /** Note: The heal is 30% of her ATTACK plus a flat 200, and it heals HER. */
     @Test
     public void theSkillHealsHerByASharePlusAFlatAmount() {
         Character yunli = CharacterFactory.create(YUNLI, LEVEL);
@@ -40,7 +40,7 @@ public class YunliTest {
                 "「恢复等同于云璃30.00%攻击力+200的生命值」: expected " + expected);
     }
 
-    /** ⚠ The counter reaches the ATTACKER and nobody else, and its 120% is pinned against a hand-built 240% reference. */
+    /** Note: The counter reaches the ATTACKER and nobody else, and its 120% is pinned against a hand-built 240% reference. */
     @Test
     public void theCounterHitsTheAttackerOnly() {
         double shipped = counterLoss(true);

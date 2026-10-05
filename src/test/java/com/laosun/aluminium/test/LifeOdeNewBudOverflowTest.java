@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 17, first clause (2026-10-02): 「对遐蝶施放时，【新蕊】可以溢出至 #3%」 (#3 = 2).
+ * 1415's memosprite skill 1, first clause (2026-10-02): "对遐蝶施放时，[新蕊]可以溢出至 #3%" (#3 = 2).
  *
- * ⭐ Two-sided: after the ode lands on her, filling 【新蕊】 far past its cap stops at `max + 2% of max`; without the ode the same fill stops at `max`. Both numbers are the
+ * Two-sided: after the ode lands on her, filling [新蕊] far past its cap stops at `max + 2% of max`; without the ode the same fill stops at `max`. Both numbers are the
  * engine's: the cap her file declares, and the overflow the sentence widens.
  */
 public class LifeOdeNewBudOverflowTest {
@@ -34,7 +34,7 @@ public class LifeOdeNewBudOverflowTest {
         Assertions.assertEquals(MAX, without, "and without it there is no overflow to use");
     }
 
-    /** Her 【新蕊】 after asking for far more than any cap. */
+    /** Her [新蕊] after asking for far more than any cap. */
     private static int filled(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character her = CharacterFactory.create(CASTORICE, LEVEL);
@@ -52,7 +52,7 @@ public class LifeOdeNewBudOverflowTest {
             SkillExecutor.execute(battle, ode, sprite, List.of(her));
             battle.processRequests();
         }
-        // ⭐ 【新蕊】 is declared `scope: PARTY`, so it lives in the BATTLE's store, not the character's (round 77's measured fact).
+        // [新蕊] is declared `scope: PARTY`, so it lives in the BATTLE's store, not the character's (round 's measured fact).
         battle.partyResource(BUD).gain(999_999);
         return battle.partyResourceValue(BUD);
     }

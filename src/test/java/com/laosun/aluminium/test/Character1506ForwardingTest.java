@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Resource-change forwarding (2026-09-30): 1506 银狼LV.999’s 「获得笑点时，获得等量【隐藏分】」.
+ * Resource-change forwarding (2026-09-30): 1506 银狼LV.999's "获得笑点时，获得等量[隐藏分]".
  *
- * <p>⭐ The source is 1505’s skill, which grants ten SHARED laughs: the battle’s laugh counter moves, the change carries that
- * resource’s name and its delta, and 1506 turns it into the same number of 【隐藏分】. The false case is the same cast with
+ * <p>The source is 1505's skill, which grants ten SHARED laughs: the battle's laugh counter moves, the change carries that
+ * resource's name and its delta, and 1506 turns it into the same number of [隐藏分]. The false case is the same cast with
  * an ally that has no such clause (1002), so the forwarding is what moves the number.
  */
 public class Character1506ForwardingTest {
@@ -52,7 +52,7 @@ public class Character1506ForwardingTest {
                 "and every one of them became a hidden point -- the forwarding clause");
     }
 
-    /** ★ The false case: the same cast, an ally with no forwarding clause. */
+    /** The false case: the same cast, an ally with no forwarding clause. */
     @Test
     public void anAllyWithoutTheClauseGainsNothing() {
         build(1002);
@@ -66,7 +66,7 @@ public class Character1506ForwardingTest {
         Assertions.assertFalse(other.getResources().has(HIDDEN), "and nothing is forwarded to that ally");
     }
 
-    /** ★ The shipped rule and its scope, read off the compiled table (discipline 232). */
+    /** The shipped rule and its scope, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleWatchesTheResourceItForwards() {
         build(1506);

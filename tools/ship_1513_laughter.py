@@ -54,7 +54,7 @@ for rule in doc["rules"]:
         raise SystemExit("rule " + rule["id"] + " already grants " + LAUGH)
     grant = {"op": "GAIN_RESOURCE", "resource": LAUGH, "amount": amount}
     fervor_at = next((i for i, e in enumerate(ops) if e.get("resource") == FERVOR), None)
-    # ⚠ Order follows the sentence: the talent says 【热意】 first ("1 点【热意】以及 1 个笑点"), the other two say 笑点 first.
+    # Note: Order follows the sentence: the talent says [热意] first ("1 点[热意]以及 1 个笑点"), the other two say 笑点 first.
     if rule["id"] == "talent_fervor_on_teammate_attack" and fervor_at is not None:
         ops.insert(fervor_at + 1, grant)
     elif fervor_at is not None:

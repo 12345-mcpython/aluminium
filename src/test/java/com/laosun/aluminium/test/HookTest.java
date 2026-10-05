@@ -18,14 +18,14 @@ import java.util.Random;
  * 虎克 (1109): his burn and the traces/eidolons that shipped with it (2026-09-28, round 134).
  *
  * <p><b>Why a hand-made target.</b> The project's fixture monster resists controls outright (round 131), and the burn is rolled
- * too — `APPLY_DOT` runs `tryApplyDebuff` with the document's base chance — so an unresisting target is what makes the test
+ * too - `APPLY_DOT` runs `tryApplyDebuff` with the document's base chance - so an unresisting target is what makes the test
  * deterministic rather than lucky.
  */
 public class HookTest {
     private static final int HOOK = 1109;
     private static final int LEVEL = 80;
 
-    /** ⚠ His skill's burn lands as a DOT with the document's magnitude, and the trace pays energy on the ultimate. */
+    /** Note: His skill's burn lands as a DOT with the document's magnitude, and the trace pays energy on the ultimate. */
     @Test
     public void hisBurnLandsAndHisUltimateTracePaysEnergy() {
         Fixture f = new Fixture(0);

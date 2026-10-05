@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 玲可 (1110), from her own file (2026-09-28): 【求生反应】, the two regenerations, and the party cleanse.
+ * 玲可 (1110), from her own file (2026-09-28): [求生反应], the two regenerations, and the party cleanse.
  *
- * <p><b>What it needed.</b> The 「share + constant」 magnitude on `MODIFY_ATTR`, `APPLY_REGEN`, `DISPEL` over a list, and
- * `target_when` for 「若该目标持有【求生反应】则**额外**回复」.
+ * <p><b>What it needed.</b> The "share + constant" magnitude on `MODIFY_ATTR`, `APPLY_REGEN`, `DISPEL` over a list, and
+ * `target_when` for "若该目标持有[求生反应]则额外回复".
  */
 public class LynxTest {
     private static final int LYNX = 1110;
@@ -29,7 +29,7 @@ public class LynxTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The state lands on the aimed ally, and it raises THEIR Max HP. */
+    /** Note: The state lands on the aimed ally, and it raises THEIR Max HP. */
     @Test
     public void herSkillGrantsTheStateAndRaisesMaxHp() {
         Fixture f = new Fixture();

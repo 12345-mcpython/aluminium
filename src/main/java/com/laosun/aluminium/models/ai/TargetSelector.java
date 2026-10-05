@@ -12,9 +12,9 @@ import java.util.Random;
  *
  * <p>Two strategies, in priority order:
  * <ol>
- *   <li><b>Taunt as a hard constraint</b>: if a living taunter exists among the candidates → pick it
+ *   <li><b>Taunt as a hard constraint</b>: if a living taunter exists among the candidates to pick it
  *       directly (see {@link TauntBuff}). Only applies to {@link Intent#SINGLE} and
- *       {@link Intent#BLAST} — the **center** of a single-target and of a blast is constrained; AOE
+ *       {@link Intent#BLAST} - the center of a single-target and of a blast is constrained; AOE
  *       already hits everyone, so nothing needs choosing; bounces are random per hit and are not
  *       constrained.</li>
  *   <li><b>Aggro-weighted random</b>: draw one with probability
@@ -23,7 +23,7 @@ import java.util.Random;
  * </ol>
  *
  * <p><b>What counts as the candidate set</b>: the caller MUST pass "the living opponents". Do not
- * filter by faction here yourself — the single outlet in the engine for "who can be selected as a
+ * filter by faction here yourself - the single outlet in the engine for "who can be selected as a
  * target" is {@code Battle.targetableEnemies()} (for the enemy side) plus the caller's own filtered
  * friendly list; selecting a corpse is exactly where corpse-hitting comes from.
  */
@@ -33,7 +33,7 @@ public final class TargetSelector {
     }
 
     /**
-     * The "intent" of this attack — decides whether taunt constrains target selection.
+     * The "intent" of this attack - decides whether taunt constrains target selection.
      */
     public enum Intent {
         /**
@@ -41,7 +41,7 @@ public final class TargetSelector {
          */
         SINGLE,
         /**
-         * Blast attack (center + adjacent): the **center** is constrained by taunt.
+         * Blast attack (center + adjacent): the center is constrained by taunt.
          */
         BLAST,
         /**
@@ -58,7 +58,7 @@ public final class TargetSelector {
      * Select one primary target according to the intent.
      *
      * @param battle     the battle in progress (used to look up aggro)
-     * @param candidates candidate targets (**must already be filtered for death**; an empty list
+     * @param candidates candidate targets (must already be filtered for death; an empty list
      *                   returns {@code null})
      * @param intent     attack intent
      * @param rng        injected random source (so results are reproducible)
@@ -79,7 +79,7 @@ public final class TargetSelector {
      * A living taunter among the candidates (in theory there should be only one per candidate set;
      * when there are several, take the first).
      *
-     * @return the taunter; none / the intent is not constrained → {@code null}
+     * @return the taunter; none / the intent is not constrained to {@code null}
      */
     private static CanHit findTaunter(List<? extends CanHit> candidates, Intent intent) {
         if (intent != Intent.SINGLE && intent != Intent.BLAST) {

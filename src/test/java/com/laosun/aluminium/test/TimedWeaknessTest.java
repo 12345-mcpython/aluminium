@@ -18,12 +18,12 @@ import java.util.Random;
 
 /**
  * 会过期的弱点（`65f143b`）：`ADD_ELEMENTAL_WEAKNESS` 带 `turns` 时走 {@code Enemy.addWeakness(element, turns)}，
- * 而计时表在**目标自己的回合结束**时递减（`Battle:1203` 的 `TURN_END` 旁）。
+ * 而计时表在目标自己的回合结束时递减（`Battle:1203` 的 `TURN_END` 旁）。
  *
- * <p>⚠ 这个判据**必须驱动真实的回合金流程**（`battle.stepForward()`）。若只调 `enemy.tickTimedWeaknesses()`，
- * `Enemy` 那一半会被覆盖，而 **`Battle:1203` 的接线写错了也不会红** —— 本段见过太多次"判据只覆盖一半"。
+ * <p>Note: 这个判据必须驱动真实的回合金流程（`battle.stepForward()`）。若只调 `enemy.tickTimedWeaknesses()`，
+ * `Enemy` 那一半会被覆盖，而 `Battle:1203` 的接线写错了也不会红 -  - 本段见过太多次"判据只覆盖一半"。
  *
- * <p>⚠ 两句断言缺一不可：「最终失效」证明递减会发生；「不是第一步就掉」证明**计数**对（否则把 `turns: 2`
+ * <p>Note: 两句断言缺一不可："最终失效"证明递减会发生；"不是第一步就掉"证明计数对（否则把 `turns: 2`
  * 写成 `turns: 0` 也会让第一句变绿）。
  */
 public class TimedWeaknessTest {
@@ -36,7 +36,7 @@ public class TimedWeaknessTest {
     public void anInsertedWeaknessExpiresInItsOwnTurns() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // ⚠ 不写死属性：挑一个这个敌人**没有**的。写死会让判据依赖它的属性表
+        // Note: 不写死属性：挑一个这个敌人没有的。写死会让判据依赖它的属性表
         // （实测：1002011 本来就有 Fire，第一次运行就是被这条前置挡住的）。
         DamageElement chosen = null;
         for (DamageElement each : DamageElement.values()) {
@@ -65,8 +65,8 @@ public class TimedWeaknessTest {
 
         int steps = 0;
         while (enemy.isWeakTo(chosen) && !battle.isOver() && steps < 60) {
-            battle.stepForward();      // ⚠ 只把 currentMove 设成下一个行动者（实测：它不执行回合）
-            battle.afterMove();        // ⭐ 结束那次行动 —— 计时弱点的递减就在 afterMove 里面
+            battle.stepForward();      // Note: 只把 currentMove 设成下一个行动者（实测：它不执行回合）
+            battle.afterMove();        // 结束那次行动 - - 计时弱点的递减就在 afterMove 里面
             steps++;
         }
         System.out.println("[timed] " + chosen + " weakness gone after " + steps + " steps (declared turns=" + TURNS
@@ -78,10 +78,10 @@ public class TimedWeaknessTest {
     }
 
     /**
-     * ⚠ **把两半切开**：直接调 `Enemy.tickTimedWeaknesses()`（它是 `public`）。
+     * Note: 把两半切开：直接调 `Enemy.tickTimedWeaknesses()`（它是 `public`）。
      *
-     * <p>上面那条走的是真实回合金流程，⚠ 而它 60 步都没失效 ⇒ 两种可能：`Enemy` 的递减本身坏了，
-     * 或者**那条流程根本没走到敌人的回合**。这一条只问前半 —— ⚠ 若它绿，问题一定在接线上。
+     * <p>上面那条走的是真实回合金流程，Note: 而它 60 步都没失效 so 两种可能：`Enemy` 的递减本身坏了，
+     * 或者那条流程根本没走到敌人的回合。这一条只问前半 -  - Note: 若它绿，问题一定在接线上。
      */
     @Test
     public void theEnemySideRunsDownOnItsOwn() {

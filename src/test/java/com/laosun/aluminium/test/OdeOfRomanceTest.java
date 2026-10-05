@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 12 「献予「浪漫」之诗」 (data slot 14, SkillID 1141514), the half that is expressible today (2026-10-02).
+ * 1415's memosprite skill 12 "献予'浪漫'之诗" (data slot 14, SkillID 1141514), the half that is expressible today (2026-10-02).
  *
- * <p>「单次生效，对阿格莱雅施放时，<b>使阿格莱雅获得【浪漫】</b>并使衣匠忆灵天赋的速度提高效果层数立即叠加至上限。…」
+ * <p>"单次生效，对阿格莱雅施放时，<b>使阿格莱雅获得[浪漫]</b>并使衣匠忆灵天赋的速度提高效果层数立即叠加至上限。…"
  *
- * <p>⭐ TWO readings, because this skill needed TWO things before it could exist at all:
+ * <p>TWO readings, because this skill needed TWO things before it could exist at all:
  * <ul>
  *   <li>the state is applied to the ally the ode is aimed at;</li>
  *   <li>and the skill has a `skill_effects.json` entry, without which `SkillExecutor.canDeliver` refuses it and the ode can NEVER be
@@ -33,7 +33,7 @@ public class OdeOfRomanceTest {
     private static final int ODE_OF_ROMANCE = 14;
     private static final String STATE = "浪漫";
 
-    /** The ode is deliverable, and reaching Aglaea leaves 【浪漫】 on her. */
+    /** The ode is deliverable, and reaching Aglaea leaves [浪漫] on her. */
     @Test
     public void theOdeIsDeliverableAndMarksAglaea() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1317 Rappa, from her own file (2026-09-29, round 209): the Charge that Weakness Break feeds, and the document's cap of 10.
+ * 131Rappa, from her own file (2026-09-29, round 209): the Charge that Weakness Break feeds, and the document's cap of 10.
  *
  * <p>The cap is tested by EXCEEDING it (round 192's lesson): twelve breaks must still read ten.
  */
@@ -22,7 +22,7 @@ public class RappaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ One Charge per Weakness Break, stopped at the document's ten. */
+    /** Note: One Charge per Weakness Break, stopped at the document's ten. */
     @Test
     public void everyBreakAddsOneChargeUpToTen() {
         Character rappa = CharacterFactory.create(RAPPA, LEVEL);

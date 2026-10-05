@@ -28,7 +28,7 @@ rules = doc["rules"] if isinstance(doc, dict) else doc
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == RULE)]
 
 rules.append({
-    # ⚠ `ALLY_ATTACK` (SkillExecutor:203), not `ATTACK_FINISHED` (Battle:2489): the judge measured no heal on the latter, and
+    # Note: `ALLY_ATTACK` (SkillExecutor:203), not `ATTACK_FINISHED` (Battle:2489): the judge measured no heal on the latter, and
     # the former is the one the skill path announces. It is BROADCAST to every member, so `actor == self` is required -- without
     # it a teammate's attack would heal her too.
     "on": "ALLY_ATTACK",

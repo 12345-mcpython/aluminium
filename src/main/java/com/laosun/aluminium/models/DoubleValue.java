@@ -17,11 +17,11 @@ import java.util.Objects;
  *
  * <p>Three modifier types are supported:
  * <ul>
- *   <li>{@link Modifier.ModifierType#ADD_PERCENT} — additive percentage: all add-percent
+ *   <li>{@link Modifier.ModifierType#ADD_PERCENT} - additive percentage: all add-percent
  *   values are summed before multiplying against the base.</li>
- *   <li>{@link Modifier.ModifierType#MULTIPLY_PERCENT} — multiplicative bonus: each
+ *   <li>{@link Modifier.ModifierType#MULTIPLY_PERCENT} - multiplicative bonus: each
  *   multiply-percent is independently multiplied as {@code (1 + pct)}.</li>
- *   <li>{@link Modifier.ModifierType#PURE_VALUE} — flat value added after all
+ *   <li>{@link Modifier.ModifierType#PURE_VALUE} - flat value added after all
  *   multiplicative operations.</li>
  * </ul>
  *
@@ -125,9 +125,9 @@ public final class DoubleValue implements Cloneable {
      * @return the final numeric value
      */
     public double get() {
-        // ⭐ A live modifier has to be re-resolved here, because compute() otherwise runs only when modifiers are attached
+        // A live modifier has to be re-resolved here, because compute() otherwise runs only when modifiers are attached
         // or removed. Scanning costs nothing for the attributes that have none -- which is every attribute until a rule
-        // asks for 「每拥有 1 层…」.
+        // asks for "每拥有 1 层…".
         if (hasLiveModifier()) {
             compute();
         }
@@ -157,8 +157,8 @@ public final class DoubleValue implements Cloneable {
     /**
      * The value a percentage share scales off (2026-09-29).
      *
-     * <p>Added for the capped-modifier path: 「提高50%，最高不超过X的25%」 is a share against a ceiling in absolute units, so the
-     * ceiling has to be divided by THIS number and not by {@link #get()} — the total includes modifiers, and dividing by the
+     * <p>Added for the capped-modifier path: "提高50%，最高不超过X的25%" is a share against a ceiling in absolute units, so the
+     * ceiling has to be divided by THIS number and not by {@link #get()} - the total includes modifiers, and dividing by the
      * total would tighten the cap whenever the target is already buffed.
      */
     public double baseValue() {
@@ -349,9 +349,9 @@ public final class DoubleValue implements Cloneable {
          */
         private int sourceRoleId;
         /**
-         * ⭐ A modifier whose magnitude is resolved when it is READ, not when it was attached (2026-10-02).
+         * A modifier whose magnitude is resolved when it is READ, not when it was attached (2026-10-02).
          *
-         * <p>The reader family is the 「每拥有 1 层…提高 X%」 auras (fourteen documents): their number has to follow the stack
+         * <p>The reader family is the "每拥有 1 层…提高 X%" auras (fourteen documents): their number has to follow the stack
          * count, and a stored number can only be right at the instant it was stored.
          */
         private java.util.function.DoubleSupplier live;
@@ -362,7 +362,7 @@ public final class DoubleValue implements Cloneable {
          * Creates an add-percent modifier from an integer percentage (e.g. 18 means 18%).
          */
         /**
-         * ⭐ A modifier whose ADD_PERCENT share is asked for on every computation (2026-10-02).
+         * A modifier whose ADD_PERCENT share is asked for on every computation (2026-10-02).
          *
          * @param share the supplier, read each time the owning attribute is computed
          */
@@ -374,9 +374,9 @@ public final class DoubleValue implements Cloneable {
         }
 
         /**
-         * ⭐ The same, for a modifier whose magnitude is an ABSOLUTE number in the attribute's own units.
+         * The same, for a modifier whose magnitude is an ABSOLUTE number in the attribute's own units.
          *
-         * <p>The derived form 「每层【当品】使暴击伤害提高 2.40%」 is absolute, and a ratio attribute takes it as
+         * <p>The derived form "每层[当品]使暴击伤害提高 2.40%" is absolute, and a ratio attribute takes it as
          * a pure value -- so the live kind needs a pure factory as well as a percentage one.
          */
         public static Modifier livePure(java.util.function.DoubleSupplier value,

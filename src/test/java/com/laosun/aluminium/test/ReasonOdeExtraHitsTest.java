@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「使其战技的伤害次数增加 3 次」 (2026-10-02).
+ * "使其战技的伤害次数增加 3 次" (2026-10-02).
  *
- * ⭐ One variable: the same battle, the same seed, the same ode; the control takes the three segments back with the op's own negative amount. Nothing else differs, so what moves is the segments.
+ * One variable: the same battle, the same seed, the same ode; the control takes the three segments back with the op's own negative amount. Nothing else differs, so what moves is the segments.
  */
 public class ReasonOdeExtraHitsTest {
     private static final int LEVEL = 80;
@@ -50,7 +50,7 @@ public class ReasonOdeExtraHitsTest {
         Assertions.assertNotNull(skill, "precondition: his skill");
         int slot = skill.getSkillSlot();
         if (!keepTheSegments) {
-            // ⭐ Take back EXACTLY what is there, not a hard-coded three: a control that assumes the bonus sits on this slot cannot see a misdirected one.
+            // Take back EXACTLY what is there, not a hard-coded three: a control that assumes the bonus sits on this slot cannot see a misdirected one.
             aimed.raiseSkillHits(slot, -aimed.skillHitBonus(slot));
         }
         double before = battle.enemies.getFirst().getCurrentHp();

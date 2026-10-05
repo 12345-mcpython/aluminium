@@ -10,8 +10,8 @@ import java.util.List;
 /**
  * Basic action bar behaviour.
  *
- * <p>⚠ The numeric anchors include **P7-1's first-round coefficient 1.5**: the first-round action
- * value for speed 100 = {@code 10000/100 × 1.5 = 150}, and for speed 200 = {@code 50 × 1.5 = 75};
+ * <p>Note: The numeric anchors include P-1's first-round coefficient 1.5: the first-round action
+ * value for speed 100 = {@code 10000/100 x 1.5 = 150}, and for speed 200 = {@code 50 x 1.5 = 5};
  * from the second lap onwards it returns to the normal period (100 / 50).
  */
 public class QueueTest {

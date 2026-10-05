@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Slot 18's 【真知】 half (2026-10-02): 「那刻夏在下一次施放普攻、战技时获得【真知】：…造成的战技伤害提高 #2(20)%」.
+ * Slot 18's [真知] half (2026-10-02): "那刻夏在下一次施放普攻、战技时获得[真知]：…造成的战技伤害提高 #2(20)%".
  *
- * ⭐ Two-sided: the ode is cast at HIM, so the state and the raise land on him; a second reading with the ode cast at somebody else must leave him untouched.
+ * Two-sided: the ode is cast at HIM, so the state and the raise land on him; a second reading with the ode cast at somebody else must leave him untouched.
  */
 public class ReasonOdeTrueKnowledgeTest {
     private static final int LEVEL = 80;
@@ -30,11 +30,11 @@ public class ReasonOdeTrueKnowledgeTest {
         System.out.println("[true_knowledge] cast at him: "+at[0]+" and the state is "+at[1]
                 + " ; cast elsewhere: "+elsewhere[0]+" and the state is "+elsewhere[1]);
         Assertions.assertEquals(1.0, at[1], 1e-9, "he gets the state");
-        // ⭐ The state is the clause that ships; its two numbers are registered (a path selector and a lasting damage-class raise both do not exist yet).
+        // The state is the clause that ships; its two numbers are registered (a path selector and a lasting damage-class raise both do not exist yet).
         Assertions.assertEquals(0.0, elsewhere[1], 1e-9, "and casting it elsewhere leaves him alone");
     }
 
-    /** [his damage boost, does he hold 【真知】] */
+    /** [his damage boost, does he hold [真知]] */
     private static double[] run(boolean aimedAtHim) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character him = CharacterFactory.create(ANAXA, LEVEL);

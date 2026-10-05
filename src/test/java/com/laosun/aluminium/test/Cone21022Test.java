@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21022: 「对处于触电或风化状态的敌方目标造成的伤害提高#2%」 at rank 5.
+ * Light cone 21022: "对处于触电或风化状态的敌方目标造成的伤害提高#2%" at rank 5.
  *
  * <p>The disjunction is two rules, the second requiring the ABSENCE of the first state, so a target carrying both is boosted once.
  */

@@ -13,20 +13,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * P10-3: the generic stat buff / debuff.
  *
- * <p>The point of this class is that **one** buff class covers every "stat X becomes X ⊕ value for N
+ * <p>The point of this class is that one buff class covers every "stat X becomes X ⊕ value for N
  * turns" effect, so 93 characters' buffs stay data instead of becoming 93 Java classes. What has to be
  * pinned is the part that is easy to get quietly wrong:
  *
  * <ul>
- *   <li><b>identity</b> — two different attributes must not evict each other;</li>
- *   <li><b>exactness</b> — expiry must restore the original value, not approximately;</li>
- *   <li><b>coexistence</b> — buff and debuff on the same attribute are separate effects;</li>
- *   <li><b>speed</b> — a speed change must be announced, or the action order keeps the old speed.</li>
+ *   <li><b>identity</b> - two different attributes must not evict each other;</li>
+ *   <li><b>exactness</b> - expiry must restore the original value, not approximately;</li>
+ *   <li><b>coexistence</b> - buff and debuff on the same attribute are separate effects;</li>
+ *   <li><b>speed</b> - a speed change must be announced, or the action order keeps the old speed.</li>
  * </ul>
  */
 public class BuffRuleTest {
 
-    /** hp 1000 / def 200 / atk 300 / speed 100 — deliberately all different, so a mix-up shows. */
+    /** hp 1000 / def 200 / atk 300 / speed 100 - deliberately all different, so a mix-up shows. */
     private static Character hero() {
         return Character.fromAttributes("hero", 1000, 200, 300, 100);
     }

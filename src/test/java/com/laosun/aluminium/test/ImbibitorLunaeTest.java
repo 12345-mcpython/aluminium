@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1213 Dan Heng • Imbibitor Lunae, from his own file (2026-09-29, rounds 171-172).
+ * 1213 Dan Heng - Imbibitor Lunae, from his own file (2026-09-29, rounds 11-12).
  *
- * <p>His talent is the same stackable-modifier shape Argenti's file already ships, and the ultimate's 【逆鳞】 is an ADD_STACK resource.
- * Round 171's "ADD_STACK lands nothing" was a bad escape in the TEST (鱾 is 鱾, not 鳞); rounds 172's hand-built table and file-loaded
+ * <p>His talent is the same stackable-modifier shape Argenti's file already ships, and the ultimate's [逆鳞] is an ADD_STACK resource.
+ * Round 11's "ADD_STACK lands nothing" was a bad escape in the TEST (鱾 is 鱾, not 鳞); rounds 12's hand-built table and file-loaded
  * comparison settled it.
  */
 public class ImbibitorLunaeTest {
@@ -29,7 +29,7 @@ public class ImbibitorLunaeTest {
     private static final String OUTROAR = "亢心";
     private static final String SQUAMA = "逆鳞";
 
-    /** ⚠ 「施放每段攻击后获得1层【亢心】…可叠加6层」: the count reaches the cap and stops there. */
+    /** Note: "施放每段攻击后获得1层[亢心]…可叠加6层": the count reaches the cap and stops there. */
     @Test
     public void hisTalentStacksPerHitUpToTheCap() {
         Character dhil = CharacterFactory.create(DHIL, LEVEL);

@@ -17,32 +17,32 @@ import java.util.Map;
  *
  * <p>The interesting number is <b>0.6</b> and <b>0.5</b> below: a rule that returned a constant, or
  * that read the wrong slot, cannot produce them. 姬子's technique is the trap that makes the plan's
- * index actively dangerous — index 3 there holds {@code 15} (a duration in seconds), which
+ * index actively dangerous - index 3 there holds {@code 15} (a duration in seconds), which
  * {@code hitChance} would clamp to 1.0 and read as "always lands", i.e. a silent wrong answer rather
  * than a visible failure.
  */
 public class DebuffChanceDataTest {
 
     /**
-     * Five anchors, each read off the real description in {@code skills.json} — including the one
-     * with an unusual layout ({@code 1108/7} writes {@code 有#2%<u>固定概率</u>}, with no 的) and the
+     * Five anchors, each read off the real description in {@code skills.json} - including the one
+     * with an unusual layout ({@code 1108/} writes {@code 有#2%<u>固定概率</u>}, with no 的) and the
      * two that are not 100% and not at index 0.
      */
     @Test
     public void theChanceIsThePlaceholderNextToTheProbabilityWording() {
-        // 有<unbreak>#1[i]%</unbreak>的<u>基础概率</u>  →  param[0] = 1
+        // 有<unbreak>#1[i]%</unbreak>的<u>基础概率</u> to param[0] = 1
         Assertions.assertEquals(1.0, SkillData.init(1003, 7).debuffChance(), 1e-9,
                 "姬子 不完全燃烧: #1 → param_list[0]");
-        // 有<unbreak>#1[i]%</unbreak>的<u>基础概率</u>  →  param[0] = 1
+        // 有<unbreak>#1[i]%</unbreak>的<u>基础概率</u> to param[0] = 1
         Assertions.assertEquals(1.0, SkillData.init(1004, 7).debuffChance(), 1e-9,
                 "瓦尔特 画地为牢: #1 → param_list[0]");
-        // 有<unbreak>#2[i]%</unbreak><u>固定概率</u>  →  param[1] = 1  (no 的, and NOT index 0)
+        // 有<unbreak>#2[i]%</unbreak><u>固定概率</u> to param[1] = 1  (no 的, and NOT index 0)
         Assertions.assertEquals(1.0, SkillData.init(1108, 7).debuffChance(), 1e-9,
                 "桑博 你最闪亮: #2 → param_list[1]; this is what proves the slot is read from the text");
-        // 有<color=#f29e38ff><unbreak>#4[i]%</unbreak></color>的<u>基础概率</u>  →  param[3] = 0.6
+        // 有<color=#f29e38ff><unbreak>#4[i]%</unbreak></color>的<u>基础概率</u> to param[3] = 0.6
         Assertions.assertEquals(0.6, SkillData.init(1006, 4).debuffChance(), 1e-9,
                 "银狼 等待程序响应: #4 → param_list[3] = 0.6");
-        // 有<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>的<u>基础概率</u>  →  param[1] = 0.5
+        // 有<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>的<u>基础概率</u> to param[1] = 0.5
         Assertions.assertEquals(0.5, SkillData.init(1307, 4).debuffChance(), 1e-9,
                 "黑天鹅 无端命运的机杼: #2 → param_list[1] = 0.5 (the text names it twice, both #2)");
     }
@@ -66,7 +66,7 @@ public class DebuffChanceDataTest {
     /**
      * A skill whose text states no chance must report <b>no chance</b>, not a fabricated 1.0.
      *
-     * <p>波提欧's 【绝命对峙】 applies its effect with no wording about probability at all, so there is
+     * <p>波提欧's [绝命对峙] applies its effect with no wording about probability at all, so there is
      * nothing to roll. Returning 1.0 would be indistinguishable from "the text said 100%", and that
      * difference matters as soon as a caller decides whether to roll dice.
      */
@@ -81,11 +81,11 @@ public class DebuffChanceDataTest {
      *
      * <p>Two invariants, both measured rather than assumed: whatever is returned is a real chance
      * ({@code 0 < c <= 1}), and at least 14 of the 28 {@code Impair} skills state one. The second
-     * number is the calibration's own coverage — if the textual rule regresses (say a future data
+     * number is the calibration's own coverage - if the textual rule regresses (say a future data
      * update rewords 基础概率), this goes red instead of quietly answering {@code null} for skills
      * that used to work.
      *
-     * <p>The other half — "the skills that report nothing really state no chance" — is not asserted
+     * <p>The other half - "the skills that report nothing really state no chance" - is not asserted
      * here, because checking it would mean re-implementing the same textual rule inside the test and
      * would then pass no matter what the rule said. The five anchors above are what pins the rule.
      */

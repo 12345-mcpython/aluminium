@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code "ticks_on": "self"} — a buff whose duration is spent by <b>the rule owner's</b> turns (M-42 ④), and the
+ * {@code "ticks_on": "self"} - a buff whose duration is spent by <b>the rule owner's</b> turns (M-42 ④), and the
  * cleanup when that owner dies (③).
  *
- * <p><b>Why the clock is not always the carrier.</b> 星期日's 【蒙福者】: 「并使目标及其召唤物成为【蒙福者】…星期日自身
- * 每回合开始时【蒙福者】状态持续回合减1，共持续#3[i]回合。…当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除。」
- * The state sits on the <b>ally</b> and is spent by <b>his</b> turns. Counting it down on the carrier's turns — what
- * a timed buff does by default — would end it after a different number of turns in every fight, with nothing to see.
+ * <p><b>Why the clock is not always the carrier.</b> 星期日's [蒙福者]: "并使目标及其召唤物成为[蒙福者]…星期日自身
+ * 每回合开始时[蒙福者]状态持续回合减1，共持续#3[i]回合。…当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除。"
+ * The state sits on the <b>ally</b> and is spent by <b>his</b> turns. Counting it down on the carrier's turns - what
+ * a timed buff does by default - would end it after a different number of turns in every fight, with nothing to see.
  *
  * <p><b>What is pinned.</b> That the ally's own turns do <b>not</b> spend it; that the caster's turns do, and expire
  * it; that a buff which says nothing still ticks on its carrier (the default must not have moved); that the anchor's
@@ -43,7 +43,7 @@ public class TickAnchorTest {
     // ==================================================================
 
     /**
-     * Two turns pass — one for each character — and the buff has lost exactly one turn's worth: the caster's.
+     * Two turns pass - one for each character - and the buff has lost exactly one turn's worth: the caster's.
      *
      * <p>Written as one case with both orders because "ticks on the caster" and "does not tick on the carrier" are
      * two different claims: an implementation that ticked on <b>everybody's</b> turns would satisfy the first alone.
@@ -77,7 +77,7 @@ public class TickAnchorTest {
     }
 
     /**
-     * A buff that says nothing ticks on the unit carrying it — the ordinary case, which must not have moved.
+     * A buff that says nothing ticks on the unit carrying it - the ordinary case, which must not have moved.
      *
      * <p>Pinned beside the case above because both are about the same mechanism and only the pair shows that the
      * anchor is an <b>option</b> rather than the new default.
@@ -102,8 +102,8 @@ public class TickAnchorTest {
     /**
      * When the unit whose turns spend the buff dies, the buff goes with it.
      *
-     * <p>⚠ The generic reason is stronger than 星期日's sentence: an anchored buff whose clock will never come again
-     * is a <b>leak</b>, not a long duration. And it cannot be written as a rule on the dying unit — {@code
+     * <p>Note: The generic reason is stronger than 星期日's sentence: an anchored buff whose clock will never come again
+     * is a <b>leak</b>, not a long duration. And it cannot be written as a rule on the dying unit - {@code
      * fireTriggers} skips dead units, so its own table never gets the chance.
      */
     @Test
@@ -139,13 +139,13 @@ public class TickAnchorTest {
     }
 
     /**
-     * ⚠ <b>This case used to assert the OPPOSITE</b>, and the change is the point (2026-10-02).
+     * Note: <b>This case used to assert the OPPOSITE</b>, and the change is the point (2026-10-02).
      *
      * <p>Until {@code ticks_on: "summon"} existed, an anchor was only a <i>clock</i>: the field said whose turn
-     * boundaries spend a duration, so on a {@code permanent} buff — never counted down — it was refused as "ignored".
+     * boundaries spend a duration, so on a {@code permanent} buff - never counted down - it was refused as "ignored".
      * The same field is now also the <b>anchor</b> ({@code removeBuffsAnchoredTo} asks {@code buff.ticksOn(dead)}),
-     * and "permanent, but it ends when THAT unit disappears" is a sentence two documents write (1402's 【至高之姿】,
-     * and the 死龙 family's 「随死龙消失而解除」). So the combination is legal; that it <b>loads</b> is pinned here,
+     * and "permanent, but it ends when THAT unit disappears" is a sentence two documents write (1402's [至高之姿],
+     * and the 死龙 family's "随死龙消失而解除"). So the combination is legal; that it <b>loads</b> is pinned here,
      * and what it buys is pinned in {@code AglaeaMemospriteTest}.
      */
     @Test
@@ -196,10 +196,10 @@ public class TickAnchorTest {
 
     private static Battle battleWith(TriggerSpec rule, Random rng) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        // ⚠ The speeds are left alone on purpose: 停云 is faster, so HER turn comes first. That matters because
+        // Note: The speeds are left alone on purpose: 停云 is faster, so HER turn comes first. That matters because
         // `takeTurn` runs the queue up to the requested unit, and any other unit's turn inside that window is a
-        // turn too — the first draft asked for the caster's turn first, got a window that also contained hers, and
-        // read the two ticks as one ("the carrier spends it" — the opposite of what was happening).
+        // turn too - the first draft asked for the caster's turn first, got a window that also contained hers, and
+        // read the two ticks as one ("the carrier spends it" - the opposite of what was happening).
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule)));
         Battle battle = new Battle(List.of(owner, CharacterFactory.create(ALLY, LEVEL)), List.of(dummy()), rng);
         battle.startBattle();
@@ -211,8 +211,8 @@ public class TickAnchorTest {
     /**
      * The remaining duration of <b>the granted</b> modifier, or {@code -1} when it is not attached.
      *
-     * <p>⚠ Filtered by attribute, and that is not tidiness: the ally keeps <b>her own</b> rules (only the rule
-     * owner's table is replaced by the fixture), so she may carry modifiers of her own — reading "the first
+     * <p>Note: Filtered by attribute, and that is not tidiness: the ally keeps <b>her own</b> rules (only the rule
+     * owner's table is replaced by the fixture), so she may carry modifiers of her own - reading "the first
      * StatModifierBuff" measured one of those in the first draft and produced a duration that fell by one per turn
      * of the wrong unit.
      */
@@ -229,7 +229,7 @@ public class TickAnchorTest {
      * Runs turns until {@code who} is the actor, and settles that turn's boundaries (both halves).
      *
      * <p>Both halves matter here: a {@code MODIFY_ATTR} modifier is a <b>late</b> buff, so its duration is spent by
-     * {@code afterMove} — driving only {@code beforeMove} would measure nothing.
+     * {@code afterMove} - driving only {@code beforeMove} would measure nothing.
      */
     private static void takeTurn(Battle battle, Character who) {
         for (int guard = 0; guard < 60; guard++) {

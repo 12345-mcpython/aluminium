@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20004: 「战斗开始时，使装备者的效果命中提高#1%，持续#2回合」 -- the first cone authored from `weapons.json`'s per-rank table.
+ * Light cone 20004: "战斗开始时，使装备者的效果命中提高#1%，持续#2回合" -- the first cone authored from `weapons.json`'s per-rank table.
  *
- * <p>The wearer's EFFECT_HIT_RATE is a RATIO attribute, so `percent` lands as an absolute addend (round 97): the expectation is the rank's own number.
+ * <p>The wearer's EFFECT_HIT_RATE is a RATIO attribute, so `percent` lands as an absolute addend (round 9): the expectation is the rank's own number.
  * Both ranks 1 and 5 are asserted, because a per-rank file whose ranks all held the same value would otherwise pass unnoticed.
  */
 public class Cone20004Test {

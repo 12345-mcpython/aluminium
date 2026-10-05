@@ -4,12 +4,12 @@ import com.laosun.aluminium.models.CanHit;
 import lombok.Getter;
 
 /**
- * A named state (【协奏】/【转魄】/【增幅】/【失重】…) that lasts a number of turns and otherwise does nothing.
+ * A named state ([协奏]/[转魄]/[增幅]/[失重]…) that lasts a number of turns and otherwise does nothing.
  *
  * <p><b>Why this class exists.</b> The rule texts of this game constantly say "while in state X"
- * (「处于【协奏】状态时」/「【转魄】状态下」/「【失重】状态下的目标」), and the trigger table could not ask
- * about any of them — so a mechanic that is otherwise pure data needed a Java class per character, which is
- * exactly what P8-0/P8-7 exist to prevent.
+ * ("处于[协奏]状态时"/"[转魄]状态下"/"[失重]状态下的目标"), and the trigger table could not ask
+ * about any of them - so a mechanic that is otherwise pure data needed a Java class per character, which is
+ * exactly what P8-0/P8-exist to prevent.
  *
  * <p><b>A state is not a new kind of thing here: it is an ordinary buff that carries a name.</b> That is the
  * lesson the DOT migration already taught (a DOT became an ordinary buff and thereby gained duration,
@@ -22,14 +22,14 @@ import lombok.Getter;
  * the state does" in separate places and avoids modelling one mechanic twice.
  *
  * <p><b>Identity is the name, not the class.</b> {@link #isSameKind} compares state names. The default
- * "same class = same buff" ({@link AbstractBuff#isSameKind}) would make applying 【协奏】 evict 【转魄】 —
+ * "same class = same buff" ({@link AbstractBuff#isSameKind}) would make applying [协奏] evict [转魄] - 
  * two unrelated states of the same character, one of them silently gone (the same trap registered as L-14).
  * Re-applying the <b>same</b> state refreshes its duration, which is what the engine's ordinary rule means by
  * "refreshes" and what the game text means by it too.
  *
  * <p><b>Duration ticks late</b> ({@code early = false}, i.e. in {@code afterMove}): a state applied during a
  * turn must not be counted down at the start of that same turn, so "lasts 2 turns" is two of the owner's
- * turns — the same convention {@link StatModifierBuff} uses for buffs granted by an ally.
+ * turns - the same convention {@link StatModifierBuff} uses for buffs granted by an ally.
  */
 @Getter
 public class StateBuff extends AbstractBuff {
@@ -70,7 +70,7 @@ public class StateBuff extends AbstractBuff {
     }
 
     /**
-     * A state never stops its owner acting — otherwise a state wearing off would freeze its owner for a turn.
+     * A state never stops its owner acting - otherwise a state wearing off would freeze its owner for a turn.
      *
      * <p>Control states (眩晕/冻结/纠缠…) are <b>not</b> states in this sense: they are their own buffs that
      * return {@code false} here, and they are applied by their own mechanics, not by {@code APPLY_BUFF}.
@@ -83,8 +83,8 @@ public class StateBuff extends AbstractBuff {
     /**
      * A named state is <b>not</b> classified as a debuff, and that is a decision rather than an oversight: its
      * side is decided by the rule that applied it ({@code APPLY_BUFF} carries a name and a duration, not a sign),
-     * and 【协奏】 and 【失重】 are opposite kinds of thing under one mechanism. The safe direction is "not a
-     * debuff" — a state is never removed by 解除负面效果 by accident — and when content needs a dispellable
+     * and [协奏] and [失重] are opposite kinds of thing under one mechanism. The safe direction is "not a
+     * debuff" - a state is never removed by 解除负面效果 by accident - and when content needs a dispellable
      * state, {@code APPLY_BUFF} gains the side instead of this class guessing.
      */
     @Override

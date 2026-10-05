@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * The condition {@code <subject>_debuff:<ATTR>}: "that party carries a negative modifier on this attribute".
  *
- * <p>⭐ The FALSE case is the point: an attribute that was RAISED must not satisfy it, and neither must a lowered
+ * <p>The FALSE case is the point: an attribute that was RAISED must not satisfy it, and neither must a lowered
  * attribute on somebody else. A condition that only looked at "is the number lower than its base" would pass the first
  * reading and fail these.
  */
@@ -36,7 +36,7 @@ public class DebuffOnConditionTest {
     private void build(String condition) {
         owner = CharacterFactory.create(UNIT, LEVEL);
         enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // ★ The proven spelling: a bare EffectSpec filled through TriggerSpecs.set (TriggerSpecs.effect has no
+        // The proven spelling: a bare EffectSpec filled through TriggerSpecs.set (TriggerSpecs.effect has no
         // (op, key, value) overload -- measured).
         var pay = new com.laosun.aluminium.beans.EffectSpec();
         TriggerSpecs.set(pay, "op", "GAIN_ENERGY");
@@ -86,7 +86,7 @@ public class DebuffOnConditionTest {
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> build("target_debuff:NOT_AN_ATTRIBUTE"));
         System.out.println("[debuff] refused: " + thrown.getMessage());
-        // ★ `AttributeType.fromString` THROWS for an unknown spelling rather than returning null (measured:
+        // `AttributeType.fromString` THROWS for an unknown spelling rather than returning null (measured:
         // "Unknown AttributeType: NOT_AN_ATTRIBUTE"), so the message comes from the enum and not from my own branch.
         Assertions.assertTrue(thrown.getMessage().contains("Unknown AttributeType"),
                 "the loader says which attribute it did not recognise");

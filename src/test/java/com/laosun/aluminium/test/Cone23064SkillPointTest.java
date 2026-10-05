@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23064, its last sentence: 「每个波次开始时或装备者每施放 3 次欢愉技后，
- * 恢复 1 个战技点」.
+ * Light cone 23064, its last sentence: "每个波次开始时或装备者每施放 3 次欢愉技后，
+ * 恢复 1 个战技点".
  *
- * <p>⭐ Both gates are written "fill first, judge on the full value" (discipline 184): the counting rule stops at the cap and
+ * <p>Both gates are written "fill first, judge on the full value" (discipline 184): the counting rule stops at the cap and
  * the granting rule fires on the same event once the counter is full, clearing it.
  */
 public class Cone23064SkillPointTest {

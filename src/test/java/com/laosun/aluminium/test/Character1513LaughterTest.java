@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1513：「获得 1／4／6 个笑点」—— 三句各自给的那一半 (2026-10-02).
+ * 1513："获得 1／4／6 个笑点" -  - 三句各自给的那一半 (2026-10-02).
  *
- * <p>⭐⭐ 笑点 is a PARTY-scoped, uncapped counter that ALREADY existed (declared by 1502 as `max: 2147483647`); these
- * readings are about HER grants, each the sentence's own number. ⚠ The counter is shared, so the sum test is the point --
- * that is what 「队伍级」 means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
+ * <p>笑点 is a PARTY-scoped, uncapped counter that ALREADY existed (declared by 1502 as `max: 21448364`); these
+ * readings are about HER grants, each the sentence's own number. Note: The counter is shared, so the sum test is the point --
+ * that is what "队伍级" means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
  */
 public class Character1513LaughterTest {
     private static final int AVENTURINE = 1513;
@@ -24,7 +24,7 @@ public class Character1513LaughterTest {
     private static final int MONSTER = 1002011;
     private static final String LAUGH = "笑点";
 
-    /** 「战技…获得 4 个笑点」 */
+    /** "战技…获得 4 个笑点" */
     @Test
     public void herSkillGivesFour() {
         Scene scene = fight();
@@ -33,7 +33,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "「获得 4 个笑点」");
     }
 
-    /** 「终结技…获得 6 个笑点」 */
+    /** "终结技…获得 6 个笑点" */
     @Test
     public void herUltimateGivesSix() {
         Scene scene = fight();
@@ -41,7 +41,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "「获得 6 个笑点」");
     }
 
-    /** 「队友施放攻击后…以及 1 个笑点」 -- a REAL teammate attack, not a hand-fired event. */
+    /** "队友施放攻击后…以及 1 个笑点" -- a REAL teammate attack, not a hand-fired event. */
     @Test
     public void aTeammateAttackGivesOne() {
         Scene scene = fight();
@@ -50,7 +50,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "「以及 1 个笑点」");
     }
 
-    /** ⭐ THE SHARED COUNTER: all three in one battle sum, because 笑点 is party-scoped. */
+    /** THE SHARED COUNTER: all three in one battle sum, because 笑点 is party-scoped. */
     @Test
     public void theCounterIsSharedAcrossTheParty() {
         Scene scene = fight();

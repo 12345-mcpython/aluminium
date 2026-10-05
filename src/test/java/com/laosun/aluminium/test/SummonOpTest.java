@@ -25,17 +25,17 @@ import java.util.Random;
  *
  * <p><b>Where this sits in the chain.</b> {@code resources/memosprites/<cid>.json} says how a memosprite's
  * panel derives from its summoner, {@code Battle.summonMemosprite} puts one on the field, and this op is what
- * lets <b>content</b> ask for it: 「进入战斗时召唤忆灵「长夜」」 (1413) and 「召唤忆灵衣匠」 (1402) are now rule files
+ * lets <b>content</b> ask for it: "进入战斗时召唤忆灵'长夜'" (1413) and "召唤忆灵衣匠" (1402) are now rule files
  * rather than prose.
  *
  * <p><b>Three design choices, each pinned below.</b>
  * <ol>
  *   <li>No arguments and no {@code target}: a memosprite belongs to its summoner, so there is nothing to point
- *       at — and a stray {@code target} is <b>refused</b> rather than quietly ignored (a stray argument is a
+ *       at - and a stray {@code target} is <b>refused</b> rather than quietly ignored (a stray argument is a
  *       rule that does something other than what the file says);</li>
  *   <li>idempotent per summoner: firing again keeps the memosprite already out, because two copies of it
- *       would be a wrong state the player cannot see. The documents' 「若已在场，则使其生命值回复至上限」 is the
- *       refresh, and that is <b>not</b> modelled — a no-op is the honest stand-in;</li>
+ *       would be a wrong state the player cannot see. The documents' "若已在场，则使其生命值回复至上限" is the
+ *       refresh, and that is <b>not</b> modelled - a no-op is the honest stand-in;</li>
  *   <li>a character whose rules use this op but has no memosprite spec is refused <b>when the character is
  *       built</b>, not mid-battle: only the assembly point knows both the cid and the merged rules, since a
  *       relic rule is shared by every wearer.</li>
@@ -44,11 +44,11 @@ import java.util.Random;
 public class SummonOpTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 — 「进入战斗时召唤忆灵「长夜」」, authored in characters/1413.json. */
+    /** 长夜月 - "进入战斗时召唤忆灵'长夜'", authored in characters/1413.json. */
     private static final int CASTORICE_LIKE = 1413;
-    /** 阿格莱雅 — 「召唤忆灵衣匠」 on her Ultimate, authored in characters/1402.json. */
+    /** 阿格莱雅 - "召唤忆灵衣匠" on her Ultimate, authored in characters/1402.json. */
     private static final int AGLAEA = 1402;
-    /** 姬子 — a character with no memosprite spec, for the refusal cases. */
+    /** 姬子 - a character with no memosprite spec, for the refusal cases. */
     private static final int NO_MEMOSPRITE = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -80,14 +80,14 @@ public class SummonOpTest {
     /** The op is the only thing her file says so far, and the loader reads exactly it. */
     @Test
     public void herFileContainsTheSummoningClauseAndHerLevel() {
-        // ⚠ 2 since M-32: the summoning clause and the rule that states which level her ultimate's numbers were
-        // quoted at (「quoted at Lv10」 as an ULTRA +9 raise). Before that, the level lived in a `damage_level` field
+        // Note: 2 since M-32: the summoning clause and the rule that states which level her ultimate's numbers were
+        // quoted at ("quoted at Lv10" as an ULTRA +9 raise). Before that, the level lived in a `damage_level` field
         // on the damage effect, so the file had one battle-start rule.
         Assertions.assertEquals(2, TriggerTables.of(CASTORICE_LIKE).ruleCount(TriggerEvent.BATTLE_START));
         Assertions.assertFalse(TriggerTables.of(CASTORICE_LIKE).isEmpty());
     }
 
-    /** 阿格莱雅's Ultimate summons 衣匠 — and it is HER Ultimate, not a teammate's. */
+    /** 阿格莱雅's Ultimate summons 衣匠 - and it is HER Ultimate, not a teammate's. */
     @Test
     public void herUltimateSummonsItAndSomeoneElsesDoesNot() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -173,14 +173,14 @@ public class SummonOpTest {
     }
 
     /**
-     * The assembly point really calls that check — a rule file alone cannot be trusted to be consistent.
+     * The assembly point really calls that check - a rule file alone cannot be trusted to be consistent.
      *
      * <p>Driven through {@code CharacterFactory.create} with a <b>relic</b> whose rules summon (a test-resource
      * fixture, {@code src/test/resources/relic_sets/99001.json}) on a character with no memosprite spec. The
      * relic half is the harder one and the reason the check lives at assembly at all: a relic rule is shared by
      * every wearer, so no rule file can know the cid it will be checked against.
      *
-     * <p>⚠ The fixture lives on set <b>99001</b>: its 2-piece is a plain stat (so that tier is outside the census) and it has no rule file of its own, so this fixture shadows nothing: a file in {@code src/test/resources} shadows the shipped -- which is exactly why it must not sit on a set that HAS a rule file (set 108 did, and hid its 4-piece)
+     * <p>Note: The fixture lives on set <b>99001</b>: its 2-piece is a plain stat (so that tier is outside the census) and it has no rule file of its own, so this fixture shadows nothing: a file in {@code src/test/resources} shadows the shipped -- which is exactly why it must not sit on a set that HAS a rule file (set 108 did, and hid its 4-piece)
      * file of the same name, and 103 became real content on 2026-09-28 (see the fixture's own note).
      *
      * <p>Without a case like this, "the check is correct" and "the check is never called" look identical.

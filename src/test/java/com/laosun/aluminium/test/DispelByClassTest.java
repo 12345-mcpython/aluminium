@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 昔涟's memosprite 德谬歌, 忆灵技能 8 「献予「纷争」之诗」: 「对万敌施放时解除万敌陷入的所有<b>控制类</b>负面状态」 (2026-10-02).
+ * 1415 昔涟's memosprite 德谬歌, 忆灵技能 8 "献予'纷争'之诗": "对万敌施放时解除万敌陷入的所有<b>控制类</b>负面状态" (2026-10-02).
  *
- * <p>⭐ Why this needed an engine piece: `DISPEL` removed the newest N debuffs and nothing else, so it could not say 「控制类」. A class is a
+ * <p>Why this needed an engine piece: `DISPEL` removed the newest N debuffs and nothing else, so it could not say "控制类". A class is a
  * property of the state itself (`AbstractBuff.debuffClass()`, also what class resistance reads), and the vocabulary already existed as a
  * CONDITION (`debuff_class:control`) and as `RESIST_DEBUFF`'s `"kind"`; this gives the op the same word.
  *
- * <p>⭐ The reading is discriminating because the victim carries BOTH kinds: a control and a damage-over-time. Only the control may go --
+ * <p>The reading is discriminating because the victim carries BOTH kinds: a control and a damage-over-time. Only the control may go --
  * a mutant that names `dot` instead moves the removal to the other one and fails both assertions.
  */
 public class DispelByClassTest {
@@ -48,7 +48,7 @@ public class DispelByClassTest {
         var control = Constant.CONTROL_EFFECTS.get("IMPRISONED");
         mydei.getBuffManager().addBuff(new ControlBuff(control, 3));
         mydei.getBuffManager().addBuff(new DotBuff(mydei, DamageElement.FIRE, 100, 3));
-        // ⚠ a ControlBuff counts as TWO debuffs (measured; Cone21001Test says so in the same words), so the pair is 3
+        // Note: a ControlBuff counts as TWO debuffs (measured; Cone21001Test says so in the same words), so the pair is 3
         Assertions.assertEquals(3, mydei.getBuffManager().debuffCount(), "precondition: one control (2) and one dot (1)");
 
         Skill ode = demiurge.skillAt(16);

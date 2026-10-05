@@ -17,8 +17,8 @@ import java.util.Random;
 /**
  * 8002, the sibling id of 8001 (2026-09-29, round 182): the same Trailblazer (Destruction) kit, verified number by number.
  *
- * <p>Same three assertions as 8001's file: the break-triggered ATK stacking with its cap, the technique heal gated on the round-178 marker, and the
- * census. Shipping the sibling under the same document is the point — the two ids state the same numbers.
+ * <p>Same three assertions as 8001's file: the break-triggered ATK stacking with its cap, the technique heal gated on the round-18 marker, and the
+ * census. Shipping the sibling under the same document is the point - the two ids state the same numbers.
  */
 public class TrailblazerSiblingTest {
     private static final int TB2 = 8002;
@@ -26,7 +26,7 @@ public class TrailblazerSiblingTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层」. */
+    /** Note: "每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层". */
     @Test
     public void hisTalentStacksAttackOnBreaksAndStopsAtTwo() {
         Character tb = CharacterFactory.create(TB2, LEVEL);
@@ -47,7 +47,7 @@ public class TrailblazerSiblingTest {
         Assertions.assertEquals(afterTwo, afterThree, 1e-9, "最多叠加2层");
     }
 
-    /** ⚠ The technique heal, gated on the round-178 marker. */
+    /** Note: The technique heal, gated on the round-18 marker. */
     @Test
     public void aDeclaredTechniqueHealsTheParty() {
         Character tb = CharacterFactory.create(TB2, LEVEL);
@@ -68,7 +68,7 @@ public class TrailblazerSiblingTest {
     }
 
 
-    /** ⚠ The control: without the marker the same battle heals nobody — this is what makes the gate testable. */
+    /** Note: The control: without the marker the same battle heals nobody - this is what makes the gate testable. */
     @Test
     public void withoutTheTechniqueNobodyIsHealed() {
         Character tb = CharacterFactory.create(TB2, LEVEL);

@@ -20,10 +20,10 @@ import java.util.Random;
  *
  * <p>Until P8-5, {@code StageFactory.load} fought with a placeholder team built from
  * {@code Character.fromAttributes}: no element, no path, no real skills, and stat magnitudes chosen by
- * hand. This class pins what replaced it — a 4-character team from {@link CharacterFactory}, each
+ * hand. This class pins what replaced it - a 4-character team from {@link CharacterFactory}, each
  * carrying a light cone of its own path.
  *
- * <p>⚠ The point of these assertions is that the team is **real**, not merely that it is non-empty:
+ * <p>Note: The point of these assertions is that the team is real, not merely that it is non-empty:
  * the placeholder team satisfied "size == 3 and everyone has HP", so a test that only checks that
  * would pass against the old code too.
  */
@@ -52,7 +52,7 @@ public class RealTeamTest {
     }
 
     /**
-     * Every member has a **distinct identity**: different cid, different element/path combination.
+     * Every member has a distinct identity: different cid, different element/path combination.
      *
      * <p>Guards against the assembly accidentally producing four copies of the same character, which
      * "size == 4" alone would not catch.
@@ -104,7 +104,7 @@ public class RealTeamTest {
     }
 
     /**
-     * ⚠ {@code WeaponData.rarity} really binds. It was missing from the bean until P8-5 even though
+     * Note: {@code WeaponData.rarity} really binds. It was missing from the bean until P8-5 even though
      * {@code weapons.json} has the field, which is the classic silent-Gson failure this project keeps
      * hitting: the pick would then always see {@code rarity == 0} and quietly fall back to sorting by
      * id alone (i.e. 3-star starter cones).

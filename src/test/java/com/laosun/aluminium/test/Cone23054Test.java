@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * is up 10..14% and crit damage 30..60%, with the wearer's own energy regeneration up 12..20%; and at every wave start
  * the wearer recovers a flat 15 energy.
  *
- * <p>⚠ The other trigger of the grant -- "or casting the ultimate ON AN ALLY" -- is REGISTERED: the engine would
+ * <p>Note: The other trigger of the grant -- "or casting the ultimate ON AN ALLY" -- is REGISTERED: the engine would
  * have to judge that the ultimate landed on our side.
  */
 public class Cone23054Test {

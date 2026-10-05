@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408：「变身期间…施放攻击后回复等同于自身生命上限 20% 的生命值」 (2026-10-02).
+ * 1408："变身期间…施放攻击后回复等同于自身生命上限 20% 的生命值" (2026-10-02).
  *
- * <p>⭐ TWO-WAY, and the control is the SAME fight without the transformation. She is hurt first through the battle's own damage
+ * <p>TWO-WAY, and the control is the SAME fight without the transformation. She is hurt first through the battle's own damage
  * entry point, so a heal has something to restore.
  */
 public class TransformationHealsOnAttackTest {
@@ -25,7 +25,7 @@ public class TransformationHealsOnAttackTest {
     private static final int MONSTER = 1002011;
     private static final String STATE = "变身";
 
-    /** ⭐ Transformed, an attack heals her for a fifth of her (raised) Max HP. */
+    /** Transformed, an attack heals her for a fifth of her (raised) Max HP. */
     @Test
     public void anAttackHealsTheTransformedHer() {
         double healed = healFromOneAttack(true);
@@ -33,7 +33,7 @@ public class TransformationHealsOnAttackTest {
                 "「回复等同于自身生命上限 20% 的生命值」 (share of Max HP)");
     }
 
-    /** ⚠ Without the transformation the sentence has not started, so no attack heals her. */
+    /** Note: Without the transformation the sentence has not started, so no attack heals her. */
     @Test
     public void withoutTheTransformationNothingIsHealed() {
         Assertions.assertEquals(0.0, healFromOneAttack(false), 1e-9,
@@ -59,7 +59,7 @@ public class TransformationHealsOnAttackTest {
         Assertions.assertEquals(transform, owner.getBuffManager().hasState(STATE),
                 "precondition: the transformation is " + (transform ? "on" : "off"));
 
-        // ⚠ HALF OF CURRENT HP, never half of MAX HP: the transformation raises Max HP (to 3.7x) WITHOUT filling the pool, so
+        // Note: HALF OF CURRENT HP, never half of MAX HP: the transformation raises Max HP (to 3.x) WITHOUT filling the pool, so
         // "50% of Max HP" is lethal here -- and a dead unit heals nothing, which is exactly how the first three attempts
         // measured a healthy 0.0 and looked like a broken HEAL. Measured: hurt=0.0 of 5312.8 after that hit.
         battle.applyTrueDamage(battle.enemies.get(0), owner, DamageElement.ICE, owner.getCurrentHp() * 0.5);
@@ -68,7 +68,7 @@ public class TransformationHealsOnAttackTest {
         double maxHp = owner.getMaxHp();
         Assertions.assertTrue(hurt < maxHp, "precondition: she was really hurt (" + hurt + " of " + maxHp + ")");
 
-        // ⚠ Her BASIC attack, not her skill: the document says 卡厄斯兰那「拥有 1 个强化普攻和 2 个强化战技」, so the transformed
+        // Note: Her BASIC attack, not her skill: the document says 卡厄斯兰那"拥有 1 个强化普攻和 2 个强化战技", so the transformed
         // form attacks with the basic slot.
         Skill skill = owner.getSkills().get(SkillType.COMMON);
         Assertions.assertNotNull(skill, "precondition: she has a basic attack");

@@ -67,7 +67,7 @@ public class Cone21044Test {
     @Test
     public void theSpecPinsTheShareAndTheAttribute() {
         build();
-        // ★ Arm the condition FIRST (discipline 182): `matching` evaluates conditions, and without a lowered attribute
+        // Arm the condition FIRST (discipline 182): `matching` evaluates conditions, and without a lowered attribute
         // no cone rule exists at all -- which is how the `24 -> 12 percent` mutation escaped this half (measured: 0 red).
         lower(AttributeType.DEFENCE);
         lower(AttributeType.SPEED);

@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1218's two per-layer clauses: 「每层【烬煨】使目标的全属性抗性降低3%」 and
- * 「1层时使敌人受到的伤害提高15.00%，此后每叠加1层提高5.00%」.
+ * 1218's two per-layer clauses: "每层[烬煨]使目标的全属性抗性降低3%" and
+ * "1层时使敌人受到的伤害提高15.00%，此后每叠加1层提高5.00%".
  *
  * <p>The counter's name is a literal copied from the data file by the script that wrote this test. It is deliberately NOT
  * an escape: a hand-typed escape once named a different character and read as "the engine loses the counter" for three
@@ -39,7 +39,7 @@ public class StackScaledMagnitudeTest {
     /**
      * The vulnerability zone, judged on what is robust.
      *
-     * <p>⚠ Why not the exact formula: the three measurements fire a different NUMBER of events (one layer marks one stack
+     * <p>Note: Why not the exact formula: the three measurements fire a different NUMBER of events (one layer marks one stack
      * with one event, three layers mark three), so the shared generator sits at a different point when the damage is
      * settled and the crit roll can differ. The exact curve is therefore pinned by construction (`amount: 0.1` +
      * `percent: 0.05` per layer, recorded in the rule's note), and this test pins the direction and the magnitude:
@@ -86,7 +86,7 @@ public class StackScaledMagnitudeTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         // A generator that never crits (0.99 is above any crit chance) and never misses a base-chance roll: without it
         // the three measurements sit at different points in the shared stream, the crit flips, and the damage ratio
-        // reflects the roll rather than the zone (measured: d1/d0 read 1.378 instead of ~1.19).
+        // reflects the roll rather than the zone (measured: d1/d0 read 1.38 instead of ~1.19).
         Random noCrit = new Random(0) {
             @Override
             public double nextDouble() {

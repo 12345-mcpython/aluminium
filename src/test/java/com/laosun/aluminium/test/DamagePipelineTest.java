@@ -28,7 +28,7 @@ import java.util.Random;
 public class DamagePipelineTest {
     private static final double EPS = 1e-6;
     private static final double BASE = 1000.0;
-    /** The level term of the defence zone when the attacker is level 80: 200 + 10 × 80. */
+    /** The level term of the defence zone when the attacker is level 80: 200 + 10  x  80. */
     private static final double LEVEL_TERM = 1000.0;
 
     private static Character attacker() {
@@ -74,13 +74,13 @@ public class DamagePipelineTest {
 
     @Test
     public void critFollowsTheInjectedRandom() {
-        // the first value of Random(0) ≈ 0.7310 — it is used to pin down both the "crit / no crit" branches
+        // the first value of Random(0) ~= 0.310 - it is used to pin down both the "crit / no crit" branches
         double firstRoll = new Random(0).nextDouble();
         Assertions.assertTrue(firstRoll > 0.5 && firstRoll < 0.9,
                 "assertion premise: the first value of Random(0) should lie in 0.5 ~ 0.9, actual " + firstRoll);
 
-        Assertions.assertEquals(1000, critSettled(0.5, 1.0), EPS);   // roll > 0.5 → no crit
-        Assertions.assertEquals(2000, critSettled(0.9, 1.0), EPS);   // roll < 0.9 → crit
+        Assertions.assertEquals(1000, critSettled(0.5, 1.0), EPS);   // roll > 0.5 to no crit
+        Assertions.assertEquals(2000, critSettled(0.9, 1.0), EPS);   // roll < 0.9 to crit
     }
 
     @Test

@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
  * {@code .gitignore} (the only one checked in is the patch file {@code monster_attack_modify_ratio.json}),
  * so right after a {@code git clone} none of these files exist and they must first be produced with the
  * generator script in the README. When a file is missing, this class throws {@link IllegalStateException}
- * carrying the file name and generation guidance — see {@link #fromJSON(String, Type)}.
+ * carrying the file name and generation guidance - see {@link #fromJSON(String, Type)}.
  *
  * <p>The same is true for the other way data can be unusable: a file that exists but parses to
  * {@code null} (zero bytes, or a literal {@code null}). It is reported at the same place, with the same
@@ -48,7 +48,7 @@ public final class JSONReader {
         InputStream stream = JSONReader.class.getResourceAsStream(resourcePath);
         if (stream == null) {
             // Deliberately neither throwing NPE nor returning null: missing data means "the environment is
-            // not prepared", not "the code has a bug", so the error MUST be self-explanatory — otherwise a
+            // not prepared", not "the code has a bug", so the error MUST be self-explanatory - otherwise a
             // newcomer only sees an ExceptionInInitializerError unrelated to the real cause (any exception
             // thrown from Constant's static block turns into that).
             throw new IllegalStateException("""
@@ -60,9 +60,9 @@ public final class JSONReader {
         try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             T parsed = GSON.fromJson(reader, type);
             if (parsed == null) {
-                // M-17: the same "the environment is not prepared" case as a missing file, one step
+                // M-1: the same "the environment is not prepared" case as a missing file, one step
                 // later. Gson returns null for a zero-byte file or a literal `null`, and handing that
-                // back would put a null *table* into Constant (WEAPONS = frozen(null)) — it then blows
+                // back would put a null *table* into Constant (WEAPONS = frozen(null)) - it then blows
                 // up as an NPE on some unrelated line, or, worse, behaves like a silently empty table.
                 // A file that merely has no rows is unaffected: `{ }` parses to an empty map, not null.
                 throw new IllegalStateException("""

@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code "target": "lowest_hp_ally"} — 「当前<b>生命值百分比</b>最低的我方目标」.
+ * {@code "target": "lowest_hp_ally"} - "当前<b>生命值百分比</b>最低的我方目标".
  *
  * <p><b>Why the vocabulary needed it.</b> "The most hurt ally" is a place an effect <b>reaches</b>, and before this
- * selector the only tool was a <b>condition</b> — which filters <i>rules</i> ("is this event mine?"), not the units
- * an effect lands on. So 三月七's 星魂 2 (「进入战斗时，为当前生命值百分比最低的我方目标提供…护盾」) and 藿藿's
- * 【禎命】 / 灵砂's 【浮元】 (heal that unit) had no spelling at all.
+ * selector the only tool was a <b>condition</b> - which filters <i>rules</i> ("is this event mine?"), not the units
+ * an effect lands on. So 三月七's 星魂 2 ("进入战斗时，为当前生命值百分比最低的我方目标提供…护盾") and 藿藿's
+ * [禎命] / 灵砂's [浮元] (heal that unit) had no spelling at all.
  *
- * <p>⚠ <b>The one thing this suite exists to pin: percentage, not points.</b> With allies at 100/1000 and 900/10000
- * the answer differs — 10% versus 9% — so a selector that quietly compared absolute HP would look right in every
+ * <p>Note: <b>The one thing this suite exists to pin: percentage, not points.</b> With allies at 100/1000 and 900/10000
+ * the answer differs - 10% versus 9% - so a selector that quietly compared absolute HP would look right in every
  * two-ally test and be wrong in a real fight. {@link #theLowestShareWinsRatherThanTheLowestNumberOfPoints} is that
  * case, and it is built so that the number of <i>points</i> points at the other ally.
  */
@@ -72,7 +72,7 @@ public class LowestHpAllyTest {
         Assertions.assertEquals(500, ally.getCurrentHp(), 1.0, "and the later one did not");
     }
 
-    /** A corpse is not "the most hurt ally" — and a heal would not land on it anyway. */
+    /** A corpse is not "the most hurt ally" - and a heal would not land on it anyway. */
     @Test
     public void theDeadAreSkipped() {
         Character hero = character("hero", 1000);
@@ -117,7 +117,7 @@ public class LowestHpAllyTest {
     /**
      * The selector is a <b>list</b>, so an op that resolves one unit refuses it.
      *
-     * <p>It always resolves to exactly one unit — but that is a property of the party's <i>state</i>, not of the
+     * <p>It always resolves to exactly one unit - but that is a property of the party's <i>state</i>, not of the
      * selector, and the list resolver is the one that has a battlefield to answer with. Keeping it on that side is
      * what makes {@code HEAL} / {@code SHIELD} / {@code ADVANCE} work without any of them knowing about it.
      */

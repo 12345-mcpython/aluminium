@@ -5,12 +5,12 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.DoubleValue;
 
 /**
- * Speed boost (a test double from before P7-3 / also a minimal sample for P10-4):
- * {@code SPEED × (1 + rate)}.
+ * Speed boost (a test double from before P-3 / also a minimal sample for P10-4):
+ * {@code SPEED  x  (1 + rate)}.
  *
- * <p>Its reason to exist is to **trigger a speed change**, so that the reordering chain
- * {@code Battle.onSpeedChanged} → {@code Queue.refreshSpeed} can be verified to be really connected
- * (P7 fix E2). The production speed buff will be made together with P10-4.
+ * <p>Its reason to exist is to trigger a speed change, so that the reordering chain
+ * {@code Battle.onSpeedChanged} to {@code Queue.refreshSpeed} can be verified to be really connected
+ * (Pfix E2). The production speed buff will be made together with P10-4.
  *
  * <p>The template for attribute-type buffs: {@code applyEffect} attaches a {@link DoubleValue.Modifier}
  * (carrying its own id), {@code removeBuff} removes it precisely by id, and {@code tickEffect} only

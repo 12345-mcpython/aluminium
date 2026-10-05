@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test;
  * {@link SkillCategory} (enumification of the data's {@code attack_type}) and
  * {@link Resource} (a bounded party-level resource).
  *
- * <p>The reason both exist is **stability**:
+ * <p>The reason both exist is stability:
  * <ul>
- *   <li>{@code SkillCategory} eliminates the class of bugs "bare string switch → a spelling change
+ *   <li>{@code SkillCategory} eliminates the class of bugs "bare string switch to a spelling change
  *       in the data silently fails to match" ({@code DOC_VS_CODE.md} §F, F-6);</li>
  *   <li>{@code Resource} gives "cap / overflow / atomic spend" a named boundary semantics, shared
- *       by skill points and the P8-8 stack resource ({@code DOC_VS_CODE.md} §F, F-1/F-7).
+ *       by skill points and the P8-8 stack resource ({@code DOC_VS_CODE.md} §F, F-1/F-).
  * </ul>
  */
 public class SkillCategoryAndResourceTest {
@@ -24,7 +24,7 @@ public class SkillCategoryAndResourceTest {
     // SkillCategory: parsing must be robust (the data is an external artifact)
     // ==================================================================
 
-    /** All 7 values that really exist in the data must parse correctly. */
+    /** All values that really exist in the data must parse correctly. */
     @Test
     public void knownValuesRoundTrip() {
         Assertions.assertEquals(SkillCategory.NORMAL, SkillCategory.fromString("Normal"));
@@ -36,7 +36,7 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(SkillCategory.ELATION_DAMAGE, SkillCategory.fromString("ElationDamage"));
     }
 
-    /** {@code value()} must be able to look the original data value back up — otherwise writing back to the data later would not line up. */
+    /** {@code value()} must be able to look the original data value back up - otherwise writing back to the data later would not line up. */
     @Test
     public void valueMatchesTheDataString() {
         Assertions.assertEquals("Normal", SkillCategory.NORMAL.value());
@@ -49,10 +49,10 @@ public class SkillCategoryAndResourceTest {
     }
 
     /**
-     * {@code null} / empty string → {@code UNSPECIFIED}, **not** {@code UNKNOWN}.
+     * {@code null} / empty string to {@code UNSPECIFIED}, not {@code UNKNOWN}.
      *
      * <p>This distinction matters a lot: the {@code attack_type} of talents and follow-up attacks is
-     * simply empty in the data (94 entries measured); that is a **legitimate empty**, not
+     * simply empty in the data (94 entries measured); that is a legitimate empty, not
      * "the data is broken".
      */
     @Test
@@ -65,10 +65,10 @@ public class SkillCategoryAndResourceTest {
     }
 
     /**
-     * ⚠ <b>Core stability assertion</b>: an unrecognized value **does not throw**, it degrades to
+     * Note: <b>Core stability assertion</b>: an unrecognized value does not throw, it degrades to
      * {@code UNKNOWN}.
      *
-     * <p>The data is an external artifact — blowing up the engine because of one new type is a
+     * <p>The data is an external artifact - blowing up the engine because of one new type is a
      * stability problem. Here "safe degradation + observability" is chosen
      * ({@code isKnownValue()} lets the caller decide whether to speak up).
      */
@@ -84,7 +84,7 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(SkillCategory.UNKNOWN, SkillCategory.fromString("Normal2"));
     }
 
-    /** Case-insensitive + trimming — a non-uniform style on the data side should not fail to match. */
+    /** Case-insensitive + trimming - a non-uniform style on the data side should not fail to match. */
     @Test
     public void parsingIsCaseInsensitiveAndTrims() {
         Assertions.assertEquals(SkillCategory.NORMAL, SkillCategory.fromString("normal"));
@@ -112,7 +112,7 @@ public class SkillCategoryAndResourceTest {
     // Resource: the three boundaries
     // ==================================================================
 
-    /** The regular path does not cross the cap, and returns the **actual** amount credited. */
+    /** The regular path does not cross the cap, and returns the actual amount credited. */
     @Test
     public void gainClampedStopsAtMax() {
         Resource r = new Resource("sp", 5, 3);
@@ -126,7 +126,7 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(5, r.getValue());
     }
 
-    /** Adding a non-positive number is a caller bug: ignored silently, and **must not** turn into a deduction. */
+    /** Adding a non-positive number is a caller bug: ignored silently, and must not turn into a deduction. */
     @Test
     public void nonPositiveGainIsIgnored() {
         Resource r = new Resource("sp", 5, 3);
@@ -137,7 +137,7 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(3, r.getValue(), "must not be deducted by 'adding a negative number'");
     }
 
-    /** Overflow is **not allowed** by default: with no allowance configured, {@code gain} and {@code gainClamped} are equivalent. */
+    /** Overflow is not allowed by default: with no allowance configured, {@code gain} and {@code gainClamped} are equivalent. */
     @Test
     public void overflowIsOffByDefault() {
         Resource r = new Resource("sp", 5, 5);
@@ -149,10 +149,10 @@ public class SkillCategoryAndResourceTest {
 
     /**
      * Only with an overflow allowance configured can it be stored above the cap, and it is
-     * **capped at max + overflow**.
+     * capped at max + overflow.
      *
      * <p>Corresponds to Sparkle's ultimate "restore 4/6 skill points; if skill points overflow when
-     * restoring, record the number of overflowing skill points, up to 10" ({@code 1306_花火.md}) —
+     * restoring, record the number of overflowing skill points, up to 10" ({@code 1306_花火.md}) - 
      * the engine side only provides the "can overflow and is capped" capability.
      */
     @Test
@@ -171,13 +171,13 @@ public class SkillCategoryAndResourceTest {
     }
 
     /**
-     * Lowering the overflow allowance **clamps the out-of-range stored value**, keeping the
-     * invariant {@code value ≤ max + overflow} true.
+     * Lowering the overflow allowance clamps the out-of-range stored value, keeping the
+     * invariant {@code value <= max + overflow} true.
      *
-     * <p>⚠ This is where my first version was wrong: at the time it only changed the allowance
+     * <p>Note: This is where my first version was wrong: at the time it only changed the allowance
      * without clamping the value, so it could produce an illegal state like
-     * {@code max=5, overflow=0, value=15} — after which every {@code isCapped()} / {@code gain()}
-     * judgement is off, and it **raises no error**.
+     * {@code max=5, overflow=0, value=15} - after which every {@code isCapped()} / {@code gain()}
+     * judgement is off, and it raises no error.
      */
     @Test
     public void loweringOverflowReclampsToKeepTheInvariant() {
@@ -234,7 +234,7 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(0, r.getValue(), "a failed spend must not deduct into the negative");
     }
 
-    /** {@code setValue} is an unprotected raw write, but it **still clamps** (used for save restoration). */
+    /** {@code setValue} is an unprotected raw write, but it still clamps (used for save restoration). */
     @Test
     public void setValueClampsButDoesNotFail() {
         Resource r = new Resource("sp", 5, 0);
@@ -249,14 +249,14 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(8, r.getValue(), "clamped to max + overflow");
     }
 
-    /** The initial value is clamped too — passing an out-of-range value to the constructor should neither blow up nor leave an illegal state. */
+    /** The initial value is clamped too - passing an out-of-range value to the constructor should neither blow up nor leave an illegal state. */
     @Test
     public void initialValueIsClamped() {
         Assertions.assertEquals(5, new Resource("sp", 5, 99).getValue());
         Assertions.assertEquals(0, new Resource("sp", 5, -99).getValue());
     }
 
-    /** Illegal constructor arguments must **fail fast** (these are coding errors, not data errors, and must not be silent). */
+    /** Illegal constructor arguments must fail fast (these are coding errors, not data errors, and must not be silent). */
     @Test
     public void invalidConstructionFailsFast() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new Resource(null, 5, 0));

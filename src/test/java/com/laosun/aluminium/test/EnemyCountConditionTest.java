@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The `enemy_count` condition variable: 「场上敌方目标数量」, whose reader is 1413 长夜月's talent.
+ * The `enemy_count` condition variable: "场上敌方目标数量", whose reader is 1413 长夜月's talent.
  *
- * <p>⚠ The event matters: `enemyCount` returns NaN when there is no battlefield in context (the rule this whole vocabulary
+ * <p>Note: The event matters: `enemyCount` returns NaN when there is no battlefield in context (the rule this whole vocabulary
  * follows -- "cannot read it" must fail, never read as zero), and BATTLE_START can be exactly that. Measured: on BATTLE_START the
  * four-enemy case did NOT fire, and the one-enemy case "passed" for the same reason -- a condition that never evaluates also
  * passes a negative case. So the rule hangs on TURN_START and the fixture drives a turn.
@@ -30,7 +30,7 @@ public class EnemyCountConditionTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** ⚠ Measured: a battle opens with 3 skill points. */
+    /** Note: Measured: a battle opens with 3 skill points. */
     private static final int OPENING = 3;
 
     @Test

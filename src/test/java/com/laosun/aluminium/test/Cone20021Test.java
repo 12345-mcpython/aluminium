@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * Light cone 20021: the FIRST time the wearer summons a memosprite, one skill point and 12 energy come back.
  *
- * <p>⭐ 「首次」 is the rule-level {@code once_per_battle}, and the judge measures it by firing SUMMONED twice: the second must
+ * <p>"首次" is the rule-level {@code once_per_battle}, and the judge measures it by firing SUMMONED twice: the second must
  * change nothing. The spec half pins the once-per-battle flag, because a rule that fires every time would still pass a
  * single-summon reading.
  */
@@ -53,7 +53,7 @@ public class Cone20021Test {
         int pointsSecond = battle.getSkillPoints() - points - pointsFirst;
         System.out.println("[20021] first summon: energy +" + afterFirst + " points +" + pointsFirst
                 + " ; second: energy +" + afterSecond + " points +" + pointsSecond);
-        // ★ The VALUE, not just "something happened" (discipline 192): `> 0` cannot tell 12 from 6 -- measured, the
+        // The VALUE, not just "something happened" (discipline 192): `> 0` cannot tell 12 from 6 -- measured, the
         // `12 -> 6` mutation was 0 red until this line existed.
         Assertions.assertEquals(12.0, afterFirst, 1e-9, "12 energy at rank 1");
         Assertions.assertTrue(pointsFirst >= 1, "and at least one skill point");

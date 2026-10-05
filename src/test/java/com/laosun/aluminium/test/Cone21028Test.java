@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21028: 「生命上限提高#1%。施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」 -- the first `on_any` reader.
+ * Light cone 21028: "生命上限提高#1%。施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值" -- the first `on_any` reader.
  *
  * <p>HEALTH is FLAT and its base value MOVES when the battle starts (the cone's own HEALTH stat is applied), so the share is taken against the post-start base.
  * The party heal is only 2% of max HP, so the wounds are small on purpose: a bigger one would kill the ally and leave the skill path with nobody to heal,

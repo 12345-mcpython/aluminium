@@ -82,7 +82,7 @@ tab = io.open(TAB, encoding="utf-8").read()
 CONST_ANCHOR = 'static final String SUMMON_ATTR_PREFIX = "summon_attr:";'
 CONST_BLOCK = '''
 /**
- * {@code cast_skill_param:<index>} -- a parameter of the skill that produced the event, at its CURRENT level: 「等同于德谬歌生命上限的 #1%」
+ * {@code cast_skill_param:<index>} -- a parameter of the skill that produced the event, at its CURRENT level: 「等同于德谬歌生命上限的 #1%"
  * (1415 memosprite skill 10). The damage path reads the same row through {@code multiplierOf}.
  */
 static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";

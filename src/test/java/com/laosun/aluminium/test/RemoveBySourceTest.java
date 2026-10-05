@@ -18,10 +18,10 @@ import java.util.Random;
 /**
  * `REMOVE_STATE` with `"kind": "own"`: take off only what THIS rule owner applied (2026-10-02).
  *
- * <p>Reader: 1415 memosprite skill 12, whose lifetime is 「持续至阿格莱雅退出【至高之姿】状态」. Removing by NAME alone took a pre-existing
+ * <p>Reader: 1415 memosprite skill 12, whose lifetime is "持续至阿格莱雅退出[至高之姿]状态". Removing by NAME alone took a pre-existing
  * `ALL_DAMAGE_TYPE_BOOST` of hers as well, so the removal needed the origin filter `EXTEND_BUFF` has always used.
  *
- * <p>⭐ The reading is the FILTER, not "something was removed": a modifier the owner did NOT apply must survive a `kind: "own"` sweep, and the
+ * <p>The reading is the FILTER, not "something was removed": a modifier the owner did NOT apply must survive a `kind: "own"` sweep, and the
  * same sweep without that kind must take it. Both halves run here, because either one alone is satisfiable by a filter that does nothing.
  *
  * <p>Diagnosed on the way here: two applications of the SAME attribute on the same unit REPLACE each other (only one modifier remained), which

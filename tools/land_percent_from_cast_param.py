@@ -118,7 +118,7 @@ print("ok   requirePercent")
 # 3) the branch body becomes a call, and the helpers go in beside it
 start = txt.index(a3)
 end = txt.index("            return effect.getPercent() * values.get(index)", start)
-old_body_end = txt.index("\n        }\n", end) + len("\n        }\n")   # ⚠ include the branch own closing brace, or a stray one closes the method
+old_body_end = txt.index("\n        }\n", end) + len("\n        }\n")   # Note: include the branch own closing brace, or a stray one closes the method
 new_branch = ('        if (effect.getScale().trim().startsWith(TriggerTable.CAST_SKILL_PARAM_PREFIX)) {\n'
               '            // The skill that produced THIS event, and its parameter at the CURRENT level (1415 memosprite skill 10).\n'
               '            int index = Integer.parseInt(\n'

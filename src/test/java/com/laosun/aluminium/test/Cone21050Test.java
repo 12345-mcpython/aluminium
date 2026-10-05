@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * Light cone 21050: when the wearer's MEMOSPRITE casts a skill on an ALLY, the whole party's damage rises 8% for 3 turns.
  *
- * <p>⭐ Every word already exists: {@code actor == summon} narrows the event to the rule owner's own memosprite (the
+ * <p>Every word already exists: {@code actor == summon} narrows the event to the rule owner's own memosprite (the
  * selector the engine's SUMMON_ATTACK note names) and {@code target is_ally} says the cast was aimed at our side. The judge
  * drives a real cast by a real memosprite, and checks the two ways it must NOT fire: a character's own Skill, and the
  * memosprite aiming at an enemy.
@@ -57,7 +57,7 @@ public class Cone21050Test {
     public void aMemospriteSupportSkillLiftsTheParty() {
         Battle battle = battle(true);
         double before = partyBoost();
-        // ★ ON THE FIELD: `actor == summon` reads battle.summonsOf(owner), so a sprite built but never summoned
+        // ON THE FIELD: `actor == summon` reads battle.summonsOf(owner), so a sprite built but never summoned
         // answers nothing (measured: the positive case read 0 while the false cases passed).
         var sprite = battle.summonMemosprite(wearer);
         battle.castImmediate(new DefaultSkill(WEARER, 2, LEVEL), sprite, List.of(ally));
@@ -80,7 +80,7 @@ public class Cone21050Test {
     public void aMemospriteSkillOnAnEnemyDoesNotFire() {
         Battle battle = battle(true);
         double before = partyBoost();
-        // ★ ON THE FIELD: `actor == summon` reads battle.summonsOf(owner), so a sprite built but never summoned
+        // ON THE FIELD: `actor == summon` reads battle.summonsOf(owner), so a sprite built but never summoned
         // answers nothing (measured: the positive case read 0 while the false cases passed).
         var sprite = battle.summonMemosprite(wearer);
         battle.castImmediate(new DefaultSkill(WEARER, 2, LEVEL), sprite, List.of(enemy));

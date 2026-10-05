@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20015: 「当装备者施放普攻后，使下一次行动提前#1[i]%」 -- ADVANCE, the spelling shipped relics 110 and 308 already use.
- * Light cone 21017: 「使装备者普攻和战技造成的伤害提高#1[i]%」 -- two attributes, so the two rules cannot collide.
+ * Light cone 20015: "当装备者施放普攻后，使下一次行动提前#1[i]%" -- ADVANCE, the spelling shipped relics 110 and 308 already use.
+ * Light cone 2101: "使装备者普攻和战技造成的伤害提高#1[i]%" -- two attributes, so the two rules cannot collide.
  */
 public class Cone20015And21017Test {
     private static final int WEARER = 1001;
@@ -38,7 +38,7 @@ public class Cone20015And21017Test {
         double after = timeRemaining(battle, unit);
         System.out.println("[20015] avBefore=" + before + " avAfter=" + after + " ratio=" + (after / before));
         Assertions.assertFalse(Double.isNaN(before), "precondition: the wearer is in the queue");
-        // ⭐ Measured semantics: ADVANCE takes a SHARE OF THE CURRENT action value (148.51 -> 118.81 is exactly 1 - 0.20).
+        // Measured semantics: ADVANCE takes a SHARE OF THE CURRENT action value (148.51 -> 118.81 is exactly 1 - 0.20).
         Assertions.assertEquals(1 - 0.2, after / before, 1e-6,
                 "the advance is a share of the current action value: " + before + " -> " + after);
     }

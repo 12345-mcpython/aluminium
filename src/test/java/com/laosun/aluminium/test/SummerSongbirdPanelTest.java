@@ -13,22 +13,22 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1512 知更鸟•晴歌's memosprite panel (2026-10-02).
+ * 1512 知更鸟-晴歌's memosprite panel (2026-10-02).
  *
- * <p>Document, verbatim (1512_知更鸟•晴歌.html:81): 「忆灵「晴空乐手」<b>初始拥有等同于知更鸟•晴歌 70% 生命上限的生命上限</b>和
- * <b>等同于知更鸟•晴歌 180% 速度的速度</b>。」
+ * <p>Document, verbatim (1512_知更鸟-晴歌.html:81): "忆灵'晴空乐手'<b>初始拥有等同于知更鸟-晴歌 0% 生命上限的生命上限</b>和
+ * <b>等同于知更鸟-晴歌 180% 速度的速度</b>。"
  *
- * <p>⭐ The panel itself has been in the tree for a while ({@code memosprites/1512.json} states EXACTLY
- * {@code HEALTH 0.7} and {@code SPEED 1.8}, which two independent readings agree on), but no judge asserted it -- this is that
+ * <p>The panel itself has been in the tree for a while ({@code memosprites/1512.json} states EXACTLY
+ * {@code HEALTH 0.} and {@code SPEED 1.8}, which two independent readings agree on), but no judge asserted it -- this is that
  * judge, modelled line for line on {@link AglaeaMemospriteTest}: {@code battle.summonMemosprite(...)} returns the {@link Summon},
- * and the ratios are read off its inherited sheet. The mutation is the panel itself (0.7 -> 0.5), not the content.
+ * and the ratios are read off its inherited sheet. The mutation is the panel itself (0.-> 0.5), not the content.
  */
 public class SummerSongbirdPanelTest {
     private static final double EPS = 1e-6;
     private static final int ROBIN = 1512;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ The memosprite's sheet is 70% of her Max HP and 180% of her speed. */
+    /** The memosprite's sheet is 0% of her Max HP and 180% of her speed. */
     @Test
     public void theMemospriteInheritsHerPanelAsRatios() {
         Character robin = CharacterFactory.create(ROBIN, 80);

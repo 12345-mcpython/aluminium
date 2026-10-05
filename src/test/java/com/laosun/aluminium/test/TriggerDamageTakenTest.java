@@ -23,22 +23,22 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The {@code MODIFY_DAMAGE_TAKEN} op: 「受到的伤害提高 X%」（易伤）and 「受到的伤害降低 X%」（减伤）as data.
+ * The {@code MODIFY_DAMAGE_TAKEN} op: "受到的伤害提高 X%"（易伤）and "受到的伤害降低 X%"（减伤）as data.
  *
  * <p><b>Why a separate op was needed.</b> Both are damage <i>zones</i>, not attributes: the engine has had
  * {@link VulnerabilityBuff} / {@link ReductionBuff} since P1, and they work by injecting into the settlement
- * of each hit — but no rule could create one, because {@code MODIFY_ATTR} changes an {@code AttributeType}
- * and nothing named "incoming damage ×0.92" is an attribute. Relic set 106's 2-piece ("Reduces DMG taken by
+ * of each hit - but no rule could create one, because {@code MODIFY_ATTR} changes an {@code AttributeType}
+ * and nothing named "incoming damage  x 0.92" is an attribute. Relic set 106's 2-piece ("Reduces DMG taken by
  * 8%") is registered as unmodelled for exactly that reason and is the first user.
  *
  * <p><b>The sign picks the zone</b>, mirroring {@code MODIFY_ATTR}'s sign convention. Each case checks all
- * three of: the number moved in the right direction, by the right amount, and through the right buff class —
+ * three of: the number moved in the right direction, by the right amount, and through the right buff class - 
  * because a mixed-up sign would still move the number, just the other way.
  *
  * <p><b>Why the measurements are taken on the 1,000,000-HP dummy</b> and not on a character: a 1000-point hit
  * would nearly empty a level-80 character's HP bar, and {@code takeDamage} clamps at zero, so the measured
  * "HP lost" would be the bar's remainder rather than the hit (the first version of this test read 351 where
- * it expected 779). Both numbers below are therefore exact, and the ratio between them is what is asserted —
+ * it expected 9). Both numbers below are therefore exact, and the ratio between them is what is asserted - 
  * the vulnerability/reduction zones are multiplicative, so an unrelated additive boost (Himeko's own fire DMG
  * traces) cancels out of the ratio instead of having to be neutralised.
  */
@@ -79,7 +79,7 @@ public class TriggerDamageTakenTest {
     /**
      * The C-1 boundary: a vulnerability on the defender must not boost the damage that defender <b>deals</b>.
      *
-     * <p>This is the trap both buffs guard with {@code damage.isOnDefenderSide(owner)} — without it a 易伤
+     * <p>This is the trap both buffs guard with {@code damage.isOnDefenderSide(owner)} - without it a 易伤
      * sitting on the enemy would also be an output bonus for the enemy. Pinned at the content level, because
      * this op is the first way for <b>data</b> to attach one.
      */
@@ -244,7 +244,7 @@ public class TriggerDamageTakenTest {
     }
 
     /**
-     * The same, carrying both a turn count and {@code permanent} — the combination that must be refused.
+     * The same, carrying both a turn count and {@code permanent} - the combination that must be refused.
      *
      * <p>It targets the event's subject (the dummy), like the measurable cases: a rule with no
      * {@code target} lands on its own owner, which made the first version of the permanence test assert

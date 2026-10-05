@@ -27,14 +27,14 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  * every relic set the character wears enough pieces of: a {@code require == 2} effect needs two relics
  * sharing a {@link Relic#setId}, a {@code require == 4} effect needs four. The numbers come from
  * {@link Constant#RELIC_SETS} and each property is resolved with
- * {@link AttributeType#fromGameProperty(String)} — a property name the engine cannot map throws with the
+ * {@link AttributeType#fromGameProperty(String)} - a property name the engine cannot map throws with the
  * name instead of being skipped.
  *
- * <p>⚠ <b>What is still not applied</b>: a 4-piece bonus that is an <em>ability</em> rather than stats
+ * <p>Note: <b>What is still not applied</b>: a 4-piece bonus that is an <em>ability</em> rather than stats
  * ("at the start of the battle, immediately regenerates 1 Skill Point") is not a stat-sheet effect and
  * this class contributes nothing for it. Such abilities are executed by <b>trigger rules</b>
  * ({@code resources/relic_sets/<setId>.json}, loaded by
- * {@link com.laosun.aluminium.data.RelicTriggerTables} and attached at the assembly point), not here —
+ * {@link com.laosun.aluminium.data.RelicTriggerTables} and attached at the assembly point), not here - 
  * see that class. An ability whose text the current op vocabulary cannot express is registered as an
  * explicit gap ({@code relic_sets/_unmodelled.json}, reported as {@code F-10} in {@code DOC_VS_CODE.md})
  * rather than being silently forgotten; {@link RelicSet.Effect#hasAbility()} and
@@ -171,10 +171,10 @@ public final class RelicSuit implements Cloneable {
      *
      * <p>Derived from the equipped pieces on every call (there is no cached state to invalidate when a relic
      * is swapped). Besides being the implementation of the bonus maths, this is how a caller can ask "which
-     * bonuses are live" — including the ability-only effects listed in
+     * bonuses are live" - including the ability-only effects listed in
      * {@link RelicSet.Effect#hasAbility()}, which this class can select but not execute.
      *
-     * <p>⚠ The order of the returned list is <b>unspecified</b> across different sets (the piece counts come
+     * <p>Note: The order of the returned list is <b>unspecified</b> across different sets (the piece counts come
      * out of a hash map); within one set the effects keep the data's order, so a 2-piece effect precedes its
      * 4-piece effect. Callers that need a stable order should not rely on it.
      *
@@ -204,7 +204,7 @@ public final class RelicSuit implements Cloneable {
      * <p>A fresh map on every call (there is no cached state to invalidate when a relic is swapped),
      * so the caller may mutate it freely.
      *
-     * @return set id → worn piece count; empty for an empty suit
+     * @return set id to worn piece count; empty for an empty suit
      */
     public Int2IntOpenHashMap piecesPerSet() {
         Int2IntOpenHashMap piecesPerSet = new Int2IntOpenHashMap();

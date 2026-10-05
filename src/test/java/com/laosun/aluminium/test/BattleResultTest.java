@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P7-3 acceptance: the win/loss state machine.
+ * P-3 acceptance: the win/loss state machine.
  *
  * <pre>
- *   NOT_STARTED ──startBattle()──▶ RUNNING ──one side wiped out──▶ WIN / LOSE (terminal, never reverted)
+ *   NOT_STARTED --startBattle()--RUNNING --one side wiped out--WIN / LOSE (terminal, never reverted)
  * </pre>
  *
  * <p>Key points:
  * <ul>
- *   <li>After a terminal state {@code stepForward()} **no longer advances** the action bar;</li>
+ *   <li>After a terminal state {@code stepForward()} no longer advances the action bar;</li>
  *   <li>While {@code NOT_STARTED} no win/loss is judged (the battle has not begun, so there is no
  *   win or loss to speak of);</li>
- *   <li>An **empty list** on one side also counts as "wiped out" (cleared out).</li>
+ *   <li>An empty list on one side also counts as "wiped out" (cleared out).</li>
  * </ul>
  */
 public class BattleResultTest {
@@ -46,7 +46,7 @@ public class BattleResultTest {
     }
 
     /**
-     * All enemies wiped out → WIN, and after the terminal state the action bar no longer advances.
+     * All enemies wiped out to WIN, and after the terminal state the action bar no longer advances.
      */
     @Test
     public void wipingOutTheEnemiesWinsAndStopsTheClock() {
@@ -69,7 +69,7 @@ public class BattleResultTest {
     }
 
     /**
-     * Our side wiped out → LOSE.
+     * Our side wiped out to LOSE.
      */
     @Test
     public void wipingOutThePartyLoses() {
@@ -86,7 +86,7 @@ public class BattleResultTest {
     }
 
     /**
-     * Both sides wiped out at the same time → LOSE (loss is judged before win).
+     * Both sides wiped out at the same time to LOSE (loss is judged before win).
      *
      * <p>This rule was set because "at the same time" must have a definite outcome and must not
      * waver with the order of judgment.
@@ -106,7 +106,7 @@ public class BattleResultTest {
     }
 
     /**
-     * Before the battle starts ({@code NOT_STARTED}), not even a full wipe is judged a loss — the
+     * Before the battle starts ({@code NOT_STARTED}), not even a full wipe is judged a loss - the
      * battle has not begun.
      */
     @Test

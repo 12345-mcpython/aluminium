@@ -95,7 +95,7 @@ public class AttributeBuilder {
     /**
      * Adds a percentage-point modifier. Equivalent to {@link #addPure} and kept
      * for semantic clarity. Should NOT be used for HEALTH_PERCENT, ATTACK_PERCENT,
-     * DEFENCE_PERCENT, or SPEED_PERCENT — those should use {@link #addPercent}.
+     * DEFENCE_PERCENT, or SPEED_PERCENT - those should use {@link #addPercent}.
      *
      * @param type    the attribute to modify
      * @param percent the value as a decimal

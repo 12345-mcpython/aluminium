@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 117, 4 pieces: crit damage against targets carrying 2/4 debuffs, doubled for one turn after the wearer applies a debuff.
+ * Relic 11, 4 pieces: crit damage against targets carrying 2/4 debuffs, doubled for one turn after the wearer applies a debuff.
  *
  * <p>The doubling's trigger is exercised through `Battle.tryApplyDebuff` with the wearer as caster -- the chokepoint that emits `DEBUFF_APPLIED`.
  */

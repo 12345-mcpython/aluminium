@@ -27,7 +27,7 @@ STATE = "变身"
 
 def add_rule(path, rule):
     doc = json.load(io.open(path, encoding="utf-8"))
-    # ⚠ Some character files are BARE LISTS and some are objects (measured: 1104.json is a list -- "must be an object" is what the
+    # Note: Some character files are BARE LISTS and some are objects (measured: 1104.json is a list -- "must be an object" is what the
     # first version of this script said, and it wrote nothing). The file's own shape is preserved on the way out.
     if isinstance(doc, dict):
         rules = doc["rules"]

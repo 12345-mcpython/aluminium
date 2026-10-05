@@ -34,7 +34,7 @@ doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") in (COUNT_RULE, END_RULE))]
 
-# ⚠ The counter rule goes FIRST: both rules ride the same event, and the check `>= 8` must see the eighth increment.
+# Note: The counter rule goes FIRST: both rules ride the same event, and the check `>= 8` must see the eighth increment.
 rules.append({
     "on": "COUNTDOWN_TURN",
     "id": COUNT_RULE,

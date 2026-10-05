@@ -17,24 +17,24 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code CAST_SKILL}: 「使<那个单位>立即施放 1 次…」 — the op that lets a rule command somebody else to cast.
+ * {@code CAST_SKILL}: "使<那个单位>立即施放 1 次…" - the op that lets a rule command somebody else to cast.
  *
  * <p><b>Why this file exists now.</b> The op was added on 2026-09-30 by loosening {@code commandSummon}, and on
  * 2026-10-02 the <b>first attempt to make it fire</b> found that it could never have worked: it read the multiplier
  * through {@code multiplierOf}, which requires {@code damage_param}, and <b>all nine</b> rules using it (none of which
  * states one) died with a {@code NullPointerException}; it also hard-coded {@code DamageType.NORMAL} and gave a blast's
- * neighbours the centre's number. Nothing caught any of it, because no test ever let the op run — a green suite is not
+ * neighbours the centre's number. Nothing caught any of it, because no test ever let the op run - a green suite is not
  * a verification.
  *
  * <p>Now it hands the cast to {@link com.laosun.aluminium.models.skill.SkillExecutor}, the engine's own path, so there
  * is <b>one</b> reading of a skill's row. What each case below pins:
  * <ul>
- *   <li>the commanded cast IS that unit's own cast — same units, same numbers (and <b>not zero</b>, or "the same"
+ *   <li>the commanded cast IS that unit's own cast - same units, same numbers (and <b>not zero</b>, or "the same"
  *       would be satisfied by two silent no-ops);</li>
- *   <li>a BLAST keeps the row's two columns apart — the defect that survived here after §24.10 fixed it elsewhere;</li>
+ *   <li>a BLAST keeps the row's two columns apart - the defect that survived here after §24.10 fixed it elsewhere;</li>
  *   <li>the damage TYPE comes from the skill's data, not from the op (observed through a {@code damage_type: ELATION}
  *       taken-modifier, which is a fact about the instance rather than about the op);</li>
- *   <li>two shipped rules actually deal damage — 1404's turn-start auto-cast and 1504's commanded talent;</li>
+ *   <li>two shipped rules actually deal damage - 1404's turn-start auto-cast and 1504's commanded talent;</li>
  *   <li>and the fields that would be a <b>second</b> reading of the row are refused at load time rather than ignored.</li>
  * </ul>
  */
@@ -49,9 +49,9 @@ public class CastSkillTest {
     private static final int BLAST_CASTER = 1404;
     /** 火花: her ELATION_SKILL is the only kind of skill that settles as a non-NORMAL damage type. */
     private static final int ELATION_CASTER = 1501;
-    /** 丹恒•腾荒: the commanded cast of a NON-damaging skill (his skill is a {@code Defence} shield). */
+    /** 丹恒-腾荒: the commanded cast of a NON-damaging skill (his skill is a {@code Defence} shield). */
     private static final int DHPT = 1414;
-    /** 阮•梅: her skill is a {@code Support} buff with no {@code skill_effects.json} entry -- undeliverable. */
+    /** 阮-梅: her skill is a {@code Support} buff with no {@code skill_effects.json} entry -- undeliverable. */
     private static final int UNDELIVERABLE = 1303;
 
     // ==================================================================
@@ -61,7 +61,7 @@ public class CastSkillTest {
     /**
      * The commanded cast deals exactly what that unit's own cast would: same actor, same skill, same victims.
      *
-     * <p>The two battles are built identically (same seed, same units) and differ only in <b>who is asked</b> — a rule
+     * <p>The two battles are built identically (same seed, same units) and differ only in <b>who is asked</b> - a rule
      * commands 停云 to cast her ultimate, versus 停云 casting it herself through the engine's own entry point. The
      * control matters: a comparison of two no-ops also reads as "identical", so the damage must be positive.
      */
@@ -103,7 +103,7 @@ public class CastSkillTest {
     }
 
     /**
-     * ⭐ A BLAST's neighbours take the row's <b>second</b> column, not the centre's.
+     * A BLAST's neighbours take the row's <b>second</b> column, not the centre's.
      *
      * <p>This is the defect that was fixed on the caster-side path in §24.10 (1008's row is {@code [1.92, 0.96]}) and
      * that {@code CAST_SKILL} kept, because it hand-built its own attack with one multiplier for every victim.
@@ -127,7 +127,7 @@ public class CastSkillTest {
         battle.startBattle();
         double[] before = {left.getCurrentHp(), centre.getCurrentHp(), right.getCurrentHp()};
 
-        // ⚠ A commanded cast is aimed at the FIRST living opponent (the op's `target` names who CASTS, not who is
+        // Note: A commanded cast is aimed at the FIRST living opponent (the op's `target` names who CASTS, not who is
         // hit), so the blast is centred on the left unit and its only neighbour is the middle one.
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, caster, 0, 0);
 
@@ -152,7 +152,7 @@ public class CastSkillTest {
     /**
      * The instance's damage <b>type</b> follows the skill, not the op: an Elation skill settles as {@code ELATION}.
      *
-     * <p>Observed rather than asserted on the op's source: a rule that raises 「受到的欢愉伤害」 by 100% is applied to
+     * <p>Observed rather than asserted on the op's source: a rule that raises "受到的欢愉伤害" by 100% is applied to
      * the enemies, and the commanded Elation cast must then land twice as hard. If the op still stamped
      * {@code NORMAL} (its old, hard-coded behaviour), the modifier would match nothing and the two numbers would be
      * equal.
@@ -171,7 +171,7 @@ public class CastSkillTest {
     /**
      * Commands 火花's Elation skill and answers the enemies' total HP loss.
      *
-     * @param elationVulnerability also apply 「受到的欢愉伤害提高 100%」 to the enemies first
+     * @param elationVulnerability also apply "受到的欢愉伤害提高 100%" to the enemies first
      */
     private static double elationCastDamage(boolean elationVulnerability) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -201,14 +201,14 @@ public class CastSkillTest {
     // 3. Shipped content, no scaffold
     // ==================================================================
 
-    /** ⭐ 1404 万敌 「自身回合开始时自动施放【弑王成王】」 — the rule fires and the skill really lands. */
+    /** 1404 万敌 "自身回合开始时自动施放[弑王成王]" - the rule fires and the skill really lands. */
     @Test
     public void hisTurnStartAutoCastDealsDamage() {
         Character him = CharacterFactory.create(BLAST_CASTER, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(him), List.of(enemy), new Random(0));
         battle.startBattle();
-        // ⚠ 「【血仇】状态期间…自身回合开始时自动施放【弑王成王】」: the gate is part of the sentence, so the scene
+        // Note: "[血仇]状态期间…自身回合开始时自动施放[弑王成王]": the gate is part of the sentence, so the scene
         // enters the state. The rule used to fire unconditionally, which is the defect that gate corrects.
         him.getBuffManager().addBuff(
                 new com.laosun.aluminium.models.buff.StateBuff("血仇", 9, true));
@@ -221,7 +221,7 @@ public class CastSkillTest {
                 "the commanded cast moved the enemy's HP (" + before + " -> " + enemy.getCurrentHp() + ")");
     }
 
-    /** ⭐ 1504 不死途 「随后立即对【饲饵】发动 1 次获得强化的天赋追加攻击」 — the commanded TALENT lands. */
+    /** 1504 不死途 "随后立即对[饲饵]发动 1 次获得强化的天赋追加攻击" - the commanded TALENT lands. */
     @Test
     public void hisUltimateCommandsHisTalentRightNow() {
         Character him = CharacterFactory.create(1504, LEVEL);
@@ -241,10 +241,10 @@ public class CastSkillTest {
     // ==================================================================
 
     /**
-     * ⚠ A {@code damage_param} on this op is a load-time refusal, not a silent no-op.
+     * Note: A {@code damage_param} on this op is a load-time refusal, not a silent no-op.
      *
      * <p>It is the exact field whose absence used to make the op explode: the old implementation needed it and the
-     * loader never asked. Now the op reads the skill's own row, so naming a column would be a second reading — and a
+     * loader never asked. Now the op reads the skill's own row, so naming a column would be a second reading - and a
      * field the engine ignores without a word is the failure mode this project ranks worst.
      */
     @Test
@@ -262,15 +262,15 @@ public class CastSkillTest {
         Assertions.assertTrue(refused.getMessage().contains("damage_param"), refused.getMessage());
     }
 
-    /** ⭐ 1414 丹恒•腾荒 秘技 「下一次战斗开始时自动对持有【同袍】的角色施放1次战技，此次战技不消耗战技点」. */
+    /** 1414 丹恒-腾荒 秘技 "下一次战斗开始时自动对持有[同袍]的角色施放1次战技，此次战技不消耗战技点". */
     @Test
     public void aCommandedSupportCastShieldsOurSide() {
-        // ⚠ The Bondmate is 1414 HIMSELF (his technique grants it to him), and he is deliberately NOT first in the
+        // Note: The Bondmate is 1414 HIMSELF (his technique grants it to him), and he is deliberately NOT first in the
         // party: an aim that fell back to "the first ally" would re-designate the wrong unit, which is what
         // `cast_target: holder_of:同袍` exists to prevent.
         Character ally = CharacterFactory.create(CASTER, LEVEL);
         Character him = CharacterFactory.create(DHPT, LEVEL);
-        // ⚠ Read BEFORE the battle starts: the shield is computed inside the cast, i.e. BEFORE the post-cast
+        // Note: Read BEFORE the battle starts: the shield is computed inside the cast, i.e. BEFORE the post-cast
         // SKILL_CAST event that raises his ATK by the 神秀 trace -- so the number to compare against is this one.
         double attackBefore = him.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
         Battle battle = new Battle(List.of(ally, him), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
@@ -288,7 +288,7 @@ public class CastSkillTest {
                 "the shield is the skill's OWN Lv10 row -- which also pins that `level_convention` ran BEFORE the "
                         + "commanded cast (at Lv1 the row would be 0.14 x ATK + 100)");
         Assertions.assertEquals(expected, ally.getShield(), 1e-6, "「为我方全体提供…护盾」: the ally too");
-        // ⚠ THE discriminating assertion for the op's side choice: a non-damaging cast reaches OUR camp. The ally's
+        // Note: THE discriminating assertion for the op's side choice: a non-damaging cast reaches OUR camp. The ally's
         // shield above cannot show it (his own SKILL_CAST rule grants one to all_allies anyway), but a shield on the
         // ENEMY can only come from the commanded cast.
         Assertions.assertEquals(0.0, battle.enemies.getFirst().getShield(), 1e-9,
@@ -300,16 +300,16 @@ public class CastSkillTest {
                         + "(one commanded cast, both halves of the clause)");
     }
 
-    /** 1414's ATK right now — a named helper so the assertion above reads as the claim it is. */
+    /** 1414's ATK right now - a named helper so the assertion above reads as the claim it is. */
     private static double Attack(Character who) {
         return who.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
     }
 
     /**
-     * ⚠ A skill the engine has no definition for is refused <b>loudly</b> rather than cast into nothing.
+     * Note: A skill the engine has no definition for is refused <b>loudly</b> rather than cast into nothing.
      *
-     * <p>1303 阮•梅's skill is a {@code Support} buff and {@code skill_effects.json} has no entry for her, so there is
-     * nothing to deliver: the commanded cast would fire, announce itself, and change nothing at all — the exact
+     * <p>1303 阮-梅's skill is a {@code Support} buff and {@code skill_effects.json} has no entry for her, so there is
+     * nothing to deliver: the commanded cast would fire, announce itself, and change nothing at all - the exact
      * silence this engine refuses. (1414's own skill IS deliverable: it is a {@code Defence} shield.)
      */
     @Test
@@ -327,7 +327,7 @@ public class CastSkillTest {
         Assertions.assertTrue(refused.getMessage().contains("skill_effects.json"), refused.getMessage());
     }
 
-    /** ⚠ {@code cast_target} is read by this op alone, so another op stating it is refused while the file is read. */
+    /** Note: {@code cast_target} is read by this op alone, so another op stating it is refused while the file is read. */
     @Test
     public void castTargetOnAnotherOpIsRefused() {
         EffectSpec effect = new EffectSpec();

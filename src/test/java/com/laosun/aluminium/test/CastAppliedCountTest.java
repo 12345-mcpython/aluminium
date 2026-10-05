@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * 「终结技<b>每冻结1个目标</b>，为三月七恢复6点能量」 — a magnitude that is the <b>outcome</b> of the cast, not its aim.
+ * "终结技<b>每冻结1个目标</b>，为三月七恢复6点能量" - a magnitude that is the <b>outcome</b> of the cast, not its aim.
  *
  * <p><b>Why the vocabulary needed it.</b> {@code per_target} multiplies by the number of targets an event
  * <i>aimed at</i>; this sentence multiplies by the number the 50%-per-target roll actually <b>let through</b>. Those
@@ -31,17 +31,17 @@ import java.util.Random;
  *
  * <p><b>The four things this file pins.</b>
  * <ol>
- *   <li>the count is the <b>landed</b> one — a resisted application is not counted (the whole reason it exists);</li>
+ *   <li>the count is the <b>landed</b> one - a resisted application is not counted (the whole reason it exists);</li>
  *   <li>it belongs to <b>one cast</b>: the next cast starts from zero, and nothing later can read the old numbers;</li>
  *   <li>the loader refuses the spelling where the count cannot exist (a non-cast event) and where the state name is
- *       not one this engine rolls for — both are silent-zero mistakes otherwise;</li>
+ *       not one this engine rolls for - both are silent-zero mistakes otherwise;</li>
  *   <li>三月七's own file pays 6 per landed freeze and nothing at 星魂 0.</li>
  * </ol>
  */
 public class CastAppliedCountTest {
     private static final double EPS = 1e-6;
 
-    /** 三月七 — the reader, and the character whose energy bar makes the count observable. */
+    /** 三月七 - the reader, and the character whose energy bar makes the count observable. */
     private static final int MARCH_7TH = 1001;
     private static final int LEVEL = 80;
     private static final int ULTIMATE_SLOT = 3;
@@ -71,12 +71,12 @@ public class CastAppliedCountTest {
     }
 
     /**
-     * ⚠ The case that separates this from {@code per_target: true}.
+     * Note: The case that separates this from {@code per_target: true}.
      *
-     * <p>Three targets are aimed at and none can be frozen — the aim count is 3 and the landed count is 0. So the
+     * <p>Three targets are aimed at and none can be frozen - the aim count is 3 and the landed count is 0. So the
      * counter's own contribution must be <b>exactly nothing</b> here: the comparison is against the same cast with
      * no counter rule at all, which cancels the skill's own energy and leaves only what the counter added. An
-     * implementation that read the aim count would add 3 × 6 = 18 and go red.
+     * implementation that read the aim count would add 3  x  6 = 18 and go red.
      */
     @Test
     public void theAimedCountIsNotTheLandedCount() {
@@ -88,10 +88,10 @@ public class CastAppliedCountTest {
     }
 
     /**
-     * ⚠ A state applied <b>outside</b> a cast must not be paid for by the next one.
+     * Note: A state applied <b>outside</b> a cast must not be paid for by the next one.
      *
-     * <p>The counter can be written by an op that is not part of a cast at all — a {@code TAKING_HIT} rule that
-     * freezes whoever hit her is the live example — so "one cast" has to be enforced at the <b>start</b> of a cast as
+     * <p>The counter can be written by an op that is not part of a cast at all - a {@code TAKING_HIT} rule that
+     * freezes whoever hit her is the live example - so "one cast" has to be enforced at the <b>start</b> of a cast as
      * well as at the end of one. This is the case that pins the start: the same ultimate is cast twice, once in a
      * battle where an out-of-cast freeze already happened and once in a battle where it did not, and the counter's
      * contribution must be identical (nothing landed in either ultimate).
@@ -115,7 +115,7 @@ public class CastAppliedCountTest {
     /**
      * The count belongs to <b>one cast</b>, and the record is gone once that cast's events have been delivered.
      *
-     * <p>Both halves matter: a second cast must not add to the first (that would make 「每冻结1个目标」 pay for
+     * <p>Both halves matter: a second cast must not add to the first (that would make "每冻结1个目标" pay for
      * freezes from earlier turns), and a rule firing outside the window must not read a stale number at all.
      */
     @Test
@@ -131,7 +131,7 @@ public class CastAppliedCountTest {
         Assertions.assertEquals(12, second, EPS, "the second cast starts from zero instead of adding to the first");
     }
 
-    /** ⚠ A rule that reads the count on an event outside a cast is refused at load, not answered with 0. */
+    /** Note: A rule that reads the count on an event outside a cast is refused at load, not answered with 0. */
     @Test
     public void readingTheCountOutsideACastIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -142,7 +142,7 @@ public class CastAppliedCountTest {
         Assertions.assertTrue(refused.getMessage().contains("ULT_CAST"), "the message lists the cast events");
     }
 
-    /** ⚠ A state name this engine does not roll for is refused: a typo would make the counter answer 0 forever. */
+    /** Note: A state name this engine does not roll for is refused: a typo would make the counter answer 0 forever. */
     @Test
     public void anUnknownStateNameIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -215,7 +215,7 @@ public class CastAppliedCountTest {
      * The energy one ultimate of {@code hero}'s table grants, with {@code immune} of the {@code enemies} unable to be
      * frozen.
      *
-     * <p>⚠ The generator is pinned at 0 so a stated base chance of 1 is certain: every uncertainty is removed except
+     * <p>Note: The generator is pinned at 0 so a stated base chance of 1 is certain: every uncertainty is removed except
      * the one being measured (which targets the roll let through).
      */
     private static double energyFromAnUltimate(int enemies, int immune) {
@@ -253,7 +253,7 @@ public class CastAppliedCountTest {
         return hero;
     }
 
-    /** The same cast with the counter rule removed — the control for "what did the counter itself add". */
+    /** The same cast with the counter rule removed - the control for "what did the counter itself add". */
     private static Character freezeOnlyHero() {
         Character hero = hero();
         hero.setTriggerTable(new TriggerTable(MARCH_7TH, List.of(
@@ -263,7 +263,7 @@ public class CastAppliedCountTest {
     }
 
     /**
-     * The counter's own table plus a freeze that happens on a hit she takes — an application outside any cast.
+     * The counter's own table plus a freeze that happens on a hit she takes - an application outside any cast.
      *
      * <p>It is the shape 三月七's own talent has (a {@code TAKING_HIT} rule), and the point is that its freeze must
      * not be inherited by the next ultimate.

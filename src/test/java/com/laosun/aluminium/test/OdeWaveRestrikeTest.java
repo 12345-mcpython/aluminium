@@ -19,15 +19,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 8, the fifth clause: 「若施放前目标被消灭则对<b>新入场</b>的敌方目标施放」 (2026-10-02).
+ * 1415's memosprite skill 8, the fifth clause: "若施放前目标被消灭则对<b>新入场</b>的敌方目标施放" (2026-10-02).
  *
- * <p>⭐ What tbgd says the clause IS, read out of `GlobalModifiers` in `Servant_CyreneServant_00_Ability.json`:
+ * <p>What tbgd says the clause IS, read out of `GlobalModifiers` in `Servant_CyreneServant_00_Ability.json`:
  * `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens for <b>`OnWaveMonster`</b> and answers with
  * `TurnInsertAction{TargetType: ModifierOwnerEntity, AutoCast: true}` -- when a wave monster enters, <b>万敌 himself acts again</b>. The
  * victims are the skill's own business, which is exactly what our `CAST_SKILL` already does.
  *
  * <p>So the clause is two facts, and both are content now: a durable mark the ode puts on him, and the restrike when a wave arrives.
- * ⚠ The English text's "the target gets defeated" is NOT what that data states -- the game's predicate is `ByTargetAliveState` on the
+ * Note: The English text's "the target gets defeated" is NOT what that data states -- the game's predicate is `ByTargetAliveState` on the
  * MODIFIER OWNER -- so that half is registered rather than invented.
  */
 public class OdeWaveRestrikeTest {

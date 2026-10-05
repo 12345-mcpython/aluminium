@@ -14,20 +14,20 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1506 银狼LV.999 仓库技「999安全卫士」: 「若敌方目标对我方施加了控制类负面状态，则使我方全体获得【防火墙】…该效果每个波次最多触发 1 次」.
+ * 1506 银狼LV.999 仓库技"999安全卫士": "若敌方目标对我方施加了控制类负面状态，则使我方全体获得[防火墙]…该效果每个波次最多触发 1 次".
  *
  * <p>This is what three shipped pieces were for: the warehouse LOAD POINT (she is owned but not deployed), the CONTROL-CLASS FILTER
- * (「控制类负面状态」), and the PER-WAVE CAP (「每个波次最多触发 1 次」). The rule itself is read from the real content file
+ * ("控制类负面状态"), and the PER-WAVE CAP ("每个波次最多触发 1 次"). The rule itself is read from the real content file
  * `resources/warehouse/1506.json` -- so the readings below are about the file, not about a scene built in this test.
  *
- * <p>Timing is the document's own: the control that TRIGGERS the clause still lands; 【防火墙】 is what immunises the ones after it.
+ * <p>Timing is the document's own: the control that TRIGGERS the clause still lands; [防火墙] is what immunises the ones after it.
  */
 public class WarehouseFirewallTest {
     private static final int FIGHTER = 1002;
     private static final int WOLF = 1506;
     private static final int MONSTER = 1002011;
 
-    /** The trigger grants 【防火墙】, and the NEXT control is refused; the wave cap holds it to one grant. */
+    /** The trigger grants [防火墙], and the NEXT control is refused; the wave cap holds it to one grant. */
     @Test
     public void theFirewallAnswersTheNextControl() {
         Character fighter = CharacterFactory.create(FIGHTER, 80, false, null, null, 0);
@@ -44,14 +44,14 @@ public class WarehouseFirewallTest {
         battle.processRequests();
         battle.beginWave();
 
-        // ⚠ NOT a hand-fired event: the debuff CLASS the clause asks about is recorded by the real landing path
+        // Note: NOT a hand-fired event: the debuff CLASS the clause asks about is recorded by the real landing path
         // (`Battle.tryApplyDebuff`), so a synthesised DEBUFF_APPLIED carries no family and would match nothing.
         boolean firstLanded = battle.tryApplyDebuff(battle.enemies.getFirst(), fighter,
                 new ControlBuff(com.laosun.aluminium.Constant.CONTROL_EFFECTS.get("FROZEN"), 2), 1.0, "STAT_CTRL_Frozen");
         battle.processRequests();
         boolean firewallOn = fighter.getBuffManager().hasState("防火墙");
 
-        // and the payoff: the NEXT control on her is refused -- 【防火墙】 is what answers it
+        // and the payoff: the NEXT control on her is refused -- [防火墙] is what answers it
         boolean landedAfter = battle.tryApplyDebuff(battle.enemies.getFirst(), fighter,
                 new ControlBuff(com.laosun.aluminium.Constant.CONTROL_EFFECTS.get("FROZEN"), 2), 1.0, "STAT_CTRL_Frozen");
         Assertions.assertTrue(firstLanded, "precondition: the TRIGGERING control really landed");

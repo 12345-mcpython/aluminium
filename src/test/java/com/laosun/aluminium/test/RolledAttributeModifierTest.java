@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「有100%的<b>基础概率</b>额外使该目标的全属性抗性降低10.00%」 -- a ROLLED attribute modifier.
+ * "有100%的<b>基础概率</b>额外使该目标的全属性抗性降低10.00%" -- a ROLLED attribute modifier.
  *
  * <p>MODIFY_ATTR used to attach directly, so a base chance had no effect on it; it now goes through the same
  * {@code attachRolled} pipeline as APPLY_DOT / APPLY_BUFF / MODIFY_DAMAGE_TAKEN. Seventeen corpus documents roll a base
@@ -96,9 +96,9 @@ public class RolledAttributeModifierTest {
     /**
      * The victim's attribute after the technique, over that same victim's base value.
      *
-     * <p>⚠ The fixture checks its own premise: a base chance is rolled through the resistance pipeline, which includes the
+     * <p>Note: The fixture checks its own premise: a base chance is rolled through the resistance pipeline, which includes the
      * victim's SPECIFIC resistance (a {@code STAT_*} key in the monster data), and the first monster in the probe range
-     * resists attack-down -- so 1217's clause legitimately does nothing to it. The loop therefore walks the monster range
+     * resists attack-down -- so 121's clause legitimately does nothing to it. The loop therefore walks the monster range
      * and uses the first one the clause reaches, and fails loudly if there is none (a fixture that silently finds no
      * victim would make the assertion below meaningless).
      */
@@ -112,7 +112,7 @@ public class RolledAttributeModifierTest {
             } catch (RuntimeException ignored) {
                 continue;                                  // not in the data
             }
-            // ⚠ A generator fixed at 0.0, not `new Random(0)`: its first draw is ~0.7244, so a 75% base chance passes
+            // Note: A generator fixed at 0.0, not `new Random(0)`: its first draw is ~0.244, so a 5% base chance passes
             // only barely and any victim-side resistance (specific or effect) turns the roll into a failure.
             Battle battle = new Battle(List.of(owner, partner), List.of(candidate), new Random() {
                 @Override
@@ -122,8 +122,8 @@ public class RolledAttributeModifierTest {
             });
             battle.markTechniqueUsed(owner);
             battle.startBattle();
-            // ⚠ The cast event is opt-in: the techniques hang on BATTLE_START while 1004's slow hangs on SKILL_CAST, and
-            // firing SKILL_CAST for everyone broke 1217 -- her own Skill rule dispels a negative effect from its target
+            // Note: The cast event is opt-in: the techniques hang on BATTLE_START while 1004's slow hangs on SKILL_CAST, and
+            // firing SKILL_CAST for everyone broke 121-- her own Skill rule dispels a negative effect from its target
             // and removed the reduction the technique had just applied. It is fired directly rather than casting the
             // skill, because a bounce cast would deal damage and could kill the monster under inspection.
             if (fireSkillCast) {
@@ -137,7 +137,7 @@ public class RolledAttributeModifierTest {
         }
         throw new AssertionError("no monster in the probed range takes the " + attribute + " reduction");
     }
-    /** 1004's Skill: 75% base chance, 10% slow, two turns -- the sixth stale registration refuted. */
+    /** 1004's Skill: 5% base chance, 10% slow, two turns -- the sixth stale registration refuted. */
     @Test
     public void weltsSkillSlowsTheTargetThroughItsBaseChance() {
         Assertions.assertEquals(0.9, appliedRatio(1004, AttributeType.SPEED, true), 1e-6,

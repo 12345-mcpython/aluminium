@@ -15,14 +15,14 @@ import java.util.Random;
 /**
  * Her skill's +20% and her ult's +60% CRIT CHANCE must both count (1209, 2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN, and the numbers are the claim: 0.2 after the skill, 0.8 after the ult as well. A replaced modifier
+ * <p>FILE-DRIVEN, and the numbers are the claim: 0.2 after the skill, 0.8 after the ult as well. A replaced modifier
  * gives 0.6 at the second reading, which is what the mutation has to produce.
  */
 public class CritChanceStacking1209Test {
     private static final int OWNER = 1209;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ Two sources, two shares, and the total. */
+    /** Two sources, two shares, and the total. */
     @Test
     public void bothCritChanceSourcesAreCounted() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

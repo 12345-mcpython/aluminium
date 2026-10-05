@@ -25,7 +25,7 @@ RULE = "e6_extends_soulsteel_on_kill"
 STATE = "智剑连心"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
-# ⚠ Some character files are BARE LISTS (measured: 1104.json and 1209.json) and some are objects (1408.json). The file's own shape
+# Note: Some character files are BARE LISTS (measured: 1104.json and 1209.json) and some are objects (1408.json). The file's own shape
 # is preserved on the way out -- the first version of the 1104 script said "must be an object" and wrote nothing.
 isObject = isinstance(doc, dict)
 rules = doc["rules"] if isObject else doc

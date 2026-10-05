@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Loads {@code data/skill_effects.json} (P10-3) — the table that says how to read a non-damaging
+ * Loads {@code data/skill_effects.json} (P10-3) - the table that says how to read a non-damaging
  * skill's parameters, indexed by {@code cid -> slot}.
  *
  * <p>Deliberately shaped like {@link TriggerTables}: loaded once, lazily, from the classpath, and a
- * <b>missing file is an empty table rather than an error</b> — the table is generated separately and
+ * <b>missing file is an empty table rather than an error</b> - the table is generated separately and
  * the engine must still run without it (it just cannot dispatch heals, which is exactly the state
  * before this task).
  *
@@ -42,8 +42,8 @@ public final class SkillEffects {
     /**
      * The effect spec for a skill, or {@code null} when there is none.
      *
-     * <p>{@code null} is the normal answer for most skills — only Restore / Defence are in the table
-     * today, and only for the characters where the parameters could be parsed — so callers must
+     * <p>{@code null} is the normal answer for most skills - only Restore / Defence are in the table
+     * today, and only for the characters where the parameters could be parsed - so callers must
      * handle it rather than assume the table covers everything.
      *
      * @param skill the skill being cast
@@ -58,7 +58,7 @@ public final class SkillEffects {
     }
 
     /**
-     * How many times the resource was actually read — lets a test assert "loaded once".
+     * How many times the resource was actually read - lets a test assert "loaded once".
      */
     public static int loadCount() {
         return LOAD_COUNT.get();

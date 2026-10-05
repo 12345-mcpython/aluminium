@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1406 Cipher, from her own file (2026-09-29, round 207): the Patron reaction (with its per-turn limiter) and the Skill's own attack share.
+ * 1406 Cipher, from her own file (2026-09-29, round 20): the Patron reaction (with its per-turn limiter) and the Skill's own attack share.
  */
 public class CipherTest {
     private static final int CIPHER = 1406;
@@ -24,7 +24,7 @@ public class CipherTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The reaction needs the Patron mark, and its 150% is compared with a hand-built 300% reference in the same pipeline. */
+    /** Note: The reaction needs the Patron mark, and its 150% is compared with a hand-built 300% reference in the same pipeline. */
     @Test
     public void theReactionNeedsThePatronAndDealsItsShare() {
         double unmarked = reactionLoss(true, false);
@@ -38,7 +38,7 @@ public class CipherTest {
                 "150% against a hand-built 300% reference: " + marked + " vs " + reference);
     }
 
-    /** ⚠ 「使赛飞儿的攻击力提高30%」 -- a share of her own BASE attack. */
+    /** Note: "使赛飞儿的攻击力提高30%" -- a share of her own BASE attack. */
     @Test
     public void theSkillRaisesHerOwnAttack() {
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);
@@ -71,9 +71,9 @@ public class CipherTest {
             TriggerSpecs.set(markEffect, "buff", "老主顾");
             TriggerSpecs.set(markEffect, "permanent", true);
             TriggerSpecs.set(markEffect, "target", "target");
-            // ⚠ The reference must carry her presence aura too. Round 1040 shipped 「赛飞儿在场时，敌方全体受到的伤害提高
-            // 40%」, and this path REPLACES her whole trigger table -- so without this line the aura lands on the shipped
-            // side only and the ratio drifts 0.5 -> 0.7. Same shape as the crit clause recorded below (round 242).
+            // Note: The reference must carry her presence aura too. Round 1040 shipped "赛飞儿在场时，敌方全体受到的伤害提高
+            // 40%", and this path REPLACES her whole trigger table -- so without this line the aura lands on the shipped
+            // side only and the ratio drifts 0.5 -> 0.. Same shape as the crit clause recorded below (round 242).
             EffectSpec aura = new EffectSpec();
             TriggerSpecs.set(aura, "op", "MODIFY_DAMAGE_TAKEN");
             TriggerSpecs.set(aura, "percent", 0.4);
@@ -99,7 +99,7 @@ public class CipherTest {
     }
 
     /**
-     * ⚠ Returns 1.0, i.e. NEVER crits (2026-09-29, round 242). It used to return 0.0, which forced every hit to crit -- and that silently
+     * Note: Returns 1.0, i.e. NEVER crits (2026-09-29, round 242). It used to return 0.0, which forced every hit to crit -- and that silently
      * coupled this test to 1406's 追加攻击 crit-damage clause: the shipped path carries it, the hand-built reference (which REPLACES her
      * trigger table) does not, so the 150%/300% comparison drifted from 0.5 to 0.833 the moment that clause shipped. The test's subject is
      * the BASE SHARE, so measuring it without crits is both the minimal fix and the more honest reading.

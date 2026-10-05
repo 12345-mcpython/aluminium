@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1212 Jingliu's 【月色】: 「我方目标受到伤害或消耗生命值时，镜流获得 1 层【月色】」.
+ * 1212 Jingliu's [月色]: "我方目标受到伤害或消耗生命值时，镜流获得 1 层[月色]".
  *
- * <p>The fixture walks the documented precondition chain: two layers of 【朔望】 are what puts her into 【转魄】, and only then can either half of the disjunction stack. The
+ * <p>The fixture walks the documented precondition chain: two layers of [朔望] are what puts her into [转魄], and only then can either half of the disjunction stack. The
  * two halves are separated by making 1205's shipped skill pay an HP price (HP_CONSUMED) versus a plain hit on the observer (TAKING_HIT).
  */
 public class MoonConsumedTest {
@@ -30,10 +30,10 @@ public class MoonConsumedTest {
     private Battle ready(Character observer, Character payer, Enemy enemy) {
         Battle battle = new Battle(List.of(observer, payer), List.of(enemy), new Random(0));
         battle.startBattle();
-        // Chain: 1 layer on SKILL_CAST, 1 on ULT_CAST -> 2 layers -> the entry rule grants 【转魄】.
+        // Chain: 1 layer on SKILL_CAST, 1 on ULT_CAST -> 2 layers -> the entry rule grants [转魄].
         battle.fireTriggers(TriggerEvent.SKILL_CAST, observer, enemy, 0, 0);
         battle.fireTriggers(TriggerEvent.ULT_CAST, observer, enemy, 0, 0);
-        // ⚠ The entry rule listens on SKILL_CAST and its condition is `>= 2` layers, so the event that PUSHES the count to two cannot be the
+        // Note: The entry rule listens on SKILL_CAST and its condition is `>= 2` layers, so the event that PUSHES the count to two cannot be the
         // one that observes it: one more SKILL_CAST is what actually fires the entry (round 228/240).
         battle.fireTriggers(TriggerEvent.SKILL_CAST, observer, enemy, 0, 0);
         System.out.println("[1212] syzygy=" + observer.getBuffManager().stacksOf("朔望")

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20003: 「防御力提高#1%。当装备者当前生命值百分比小于#2%时，其防御力额外提高#3%」 at rank 5.
+ * Light cone 20003: "防御力提高#1%。当装备者当前生命值百分比小于#2%时，其防御力额外提高#3%" at rank 5.
  *
  * <p>DEFENCE is flat (each share scales the post-start base). The two clauses are mutually exclusive branches, so exactly one modifier exists at any time.
  */
@@ -35,7 +35,7 @@ public class Cone20003Test {
         System.out.println("[20003] healthyGain=" + healthy[0] + " base=" + healthy[1]
                 + " middleGain=" + middle[0] + " middleHp=" + middle[2]
                 + " hurtGain=" + hurt[0] + " hp=" + hurt[2]);
-        // ⭐ The band between the two thresholds: above #2, so ONLY the base branch may apply. Without this reading, a file whose
+        // The band between the two thresholds: above #2, so ONLY the base branch may apply. Without this reading, a file whose
         // branches stop being exhaustive (e.g. base gated on hp >= 90%) would still pass.
         Assertions.assertTrue(middle[2] >= 0.5 && middle[2] < 0.9, "precondition: inside the untested band");
         Assertions.assertEquals(0.32 * middle[1], middle[0], 1e-6, "above the threshold only #1 applies");

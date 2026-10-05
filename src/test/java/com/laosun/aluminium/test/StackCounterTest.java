@@ -18,8 +18,8 @@ import java.util.Random;
 /**
  * A <b>named counter with a threshold</b> (2026-09-28): {@code ADD_STACK} plus {@code *_stacks:<name>}.
  *
- * <p><b>The sentence that needs it.</b> 寒鸦's 战技: 「每当我方目标对【承负】状态下的敌方目标施放 <b>2</b> 次普攻、战技、终结技后，立即为
- * 我方恢复 1 个战技点；【承负】…会在触发 <b>2</b> 次战技点恢复效果后自动解除」 — two counters, each with a threshold, and
+ * <p><b>The sentence that needs it.</b> 寒鸦's 战技: "每当我方目标对[承负]状态下的敌方目标施放 <b>2</b> 次普攻、战技、终结技后，立即为
+ * 我方恢复 1 个战技点；[承负]…会在触发 <b>2</b> 次战技点恢复效果后自动解除" - two counters, each with a threshold, and
  * neither is a turn count or a probability. The engine could already <i>stack</i> ({@code maxStacks}, {@code REMOVE_STACK})
  * but nothing could <b>read</b> a count, so "after N times" had no spelling at all.
  *
@@ -74,7 +74,7 @@ public class StackCounterTest {
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("承负"));
     }
 
-    /** ⚠ A name that no effect in this file creates is refused at load: it would be a condition that never holds. */
+    /** Note: A name that no effect in this file creates is refused at load: it would be a condition that never holds. */
     @Test
     public void anUndeclaredCounterNameIsRefusedAtLoad() {
         Character hero = CharacterFactory.create(HANYA, LEVEL);

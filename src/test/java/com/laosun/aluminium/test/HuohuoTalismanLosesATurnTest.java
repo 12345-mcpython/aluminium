@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1217 藿藿 星魂 2 的第三句：「…<b>使【禳命】的持续回合数减 1</b>」 (2026-10-02).
+ * 121藿藿 星魂 2 的第三句："…<b>使[禳命]的持续回合数减 1</b>" (2026-10-02).
  *
- * <p>⭐ THE SCENE IS COPIED VERBATIM from the shipped judge for the same sentence, `TalismanSavesAnAllyTest.afterLethalBlows`: the same
+ * <p>THE SCENE IS COPIED VERBATIM from the shipped judge for the same sentence, `TalismanSavesAnAllyTest.afterLethalBlows`: the same
  * party, the same skill, and -- the detail that cost two rounds -- `SkillExecutor.execute(battle, skill, her,
- * List.of(battle.enemies.getFirst()))`, i.e. the skill is aimed at the ENEMY. Aiming it at the ally leaves her WITHOUT 【禳命】, which
+ * List.of(battle.enemies.getFirst()))`, i.e. the skill is aimed at the ENEMY. Aiming it at the ally leaves her WITHOUT [禳命], which
  * made every earlier reading say "the rule never ran".
  *
- * <p>⭐ The reduction is the mechanism the game's own config uses: `Avatar_Huohuo_00_Rank02_Insert` does
+ * <p>The reduction is the mechanism the game's own config uses: `Avatar_Huohuo_00_Rank02_Insert` does
  * `SetModifierValue{ModifierName: "MAvatar_Huohuo_Passive_HealMark", ModifyFunction: "Add", ValueType: "LifeTime"}`, beside a
  * `SetDynamicValueByAddValue{AddValue: -1, Min: 0}` on the same count. So it is a negative `turns` on the existing `EXTEND_BUFF` -- one
  * mechanism, not two dialects.
@@ -44,7 +44,7 @@ public class HuohuoTalismanLosesATurnTest {
         battle.startBattle();
         battle.processRequests();
 
-        // Her skill is what puts 【禳命】 on her -- and it is aimed at the ENEMY, exactly as the shipped judge drives it.
+        // Her skill is what puts [禳命] on her -- and it is aimed at the ENEMY, exactly as the shipped judge drives it.
         Skill skill = her.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));

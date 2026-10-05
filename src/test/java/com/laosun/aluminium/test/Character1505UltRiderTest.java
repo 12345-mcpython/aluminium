@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英’s ultimate rider (2026-09-30): 「当绯英持有【好活当赏】时，施放终结技可对敌方全体造成 12% 的物理属性欢愉伤容」.
+ * 1505 绯英's ultimate rider (2026-09-30): "当绯英持有[好活当赏]时，施放终结技可对敌方全体造成 12% 的物理属性欢愉伤容".
  *
- * <p>⭐ The rider is wired to CAST_SETUP, which fires ONCE per cast: on DEALING_DAMAGE an all-target ultimate would produce one
- * instance per victim and the rider would follow N times. The judge reads the two enemies’ health and pins the shipped rule too,
+ * <p>The rider is wired to CAST_SETUP, which fires ONCE per cast: on DEALING_DAMAGE an all-target ultimate would produce one
+ * instance per victim and the rider would follow N times. The judge reads the two enemies' health and pins the shipped rule too,
  * because "more damage than without" alone cannot see a change to the percentage or the type.
  */
 public class Character1505UltRiderTest {
@@ -51,7 +51,7 @@ public class Character1505UltRiderTest {
         Assertions.assertTrue(withGifts > without, "holding 【好活当赏】 adds the all-enemy Elation rider");
     }
 
-    /** ★ The shipped rule, read off the compiled table (discipline 232): the number, the scope and the type. */
+    /** The shipped rule, read off the compiled table (discipline 232): the number, the scope and the type. */
     @Test
     public void theShippedUltRiderStatesItsNumberScopeAndType() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

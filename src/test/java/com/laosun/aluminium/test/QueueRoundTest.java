@@ -12,16 +12,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P7-1 acceptance: round-based action value.
+ * P-1 acceptance: round-based action value.
  *
  * <pre>
- * first round total action value 150, then 100 per round      ⇒ each unit's **first cycle** = 10000/speed × 1.5
+ * first round total action value 150, then 100 per round so each unit's first cycle = 10000/speed  x  1.5
  * </pre>
  *
  * <p>Meaning: a unit with speed 100 waits 150 in the first round (from the second lap it acts every
- * 100); a unit with speed 200 waits 75 in the first round — so **a fast unit gets an extra action
- * within the first round**
- * (a unit with speed 240 has a cycle of 41.67, so it can act 3 times within the first round's 150).
+ * 100); a unit with speed 200 waits 5 in the first round - so a fast unit gets an extra action
+ * within the first round
+ * (a unit with speed 240 has a cycle of 41.6, so it can act 3 times within the first round's 150).
  */
 public class QueueRoundTest {
     private static final double EPS = 1e-9;
@@ -49,7 +49,7 @@ public class QueueRoundTest {
 
     @Test
     public void fastUnitActsBeforeTheFirstRoundEnds() {
-        // speed 200: first round 75, so it can act twice within 150 (t=75, t=125)
+        // speed 200: first round 5, so it can act twice within 150 (t=5, t=125)
         Queue q = new Queue(List.of(character("speed200", 200)));
 
         Assertions.assertEquals(75, q.move(), EPS, "the first action is at 75");
@@ -61,7 +61,7 @@ public class QueueRoundTest {
 
     @Test
     public void firstRoundMultiplierDoesNotChangeTheOrder() {
-        // everyone ×1.5 ⇒ the first-round order matches the pure speed order
+        // everyone  x 1.5 so the first-round order matches the pure speed order
         Character slow = character("slow", 100);
         Character mid = character("mid", 150);
         Character fast = character("fast", 200);
@@ -79,7 +79,7 @@ public class QueueRoundTest {
         Queue q = new Queue(List.of(character("speed100", 100)));
 
         Assertions.assertEquals(1, q.getRound(), "elapsed = 0");
-        q.move();                                    // elapsed = 150 → the first round ends
+        q.move();                                    // elapsed = 150 to the first round ends
         Assertions.assertEquals(1, q.getRound(), "elapsed = 150 still counts as round 1");
         q.setTopZero();
 
@@ -104,7 +104,7 @@ public class QueueRoundTest {
 
     @Test
     public void midBattleJoinerIsNotStretched() {
-        // P7-1 only affects initialize(): entering mid-battle uses the normal cycle (deliberate — see the note on addCombatant)
+        // P-1 only affects initialize(): entering mid-battle uses the normal cycle (deliberate - see the note on addCombatant)
         Queue q = new Queue(List.of(character("speed100", 100)));
         q.move();
         q.setTopZero();                              // elapsed = 150
@@ -112,7 +112,7 @@ public class QueueRoundTest {
         Character joiner = character("joiner", 100);
         q.addCombatant(joiner);
 
-        // joiner is queued at elapsed + 100 = 250; the current heap top is speed100 (elapsed+100 = 250) —
+        // joiner is queued at elapsed + 100 = 250; the current heap top is speed100 (elapsed+100 = 250) - 
         // both have the same value, so which goes first is decided by the heap; here we only assert that
         // "joiner waits 100, not 150"
         Assertions.assertEquals(100, q.getTimeRemaining(q.getHeap().stream()

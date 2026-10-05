@@ -19,8 +19,8 @@ import java.util.Random;
  * A modifier (or a resistance) that carries <b>the name the data gave it</b>, so a state's own effect can be removed
  * with the state (2026-09-28).
  *
- * <p><b>The sentence that needs it.</b> 知更鸟's 【协奏】 grants the party an ATK boost and a crowd-control immunity
- * that last 「处于【协奏】状态时」 — <b>as long as the state does</b>, and that state ends when a countdown's turn
+ * <p><b>The sentence that needs it.</b> 知更鸟's [协奏] grants the party an ATK boost and a crowd-control immunity
+ * that last "处于[协奏]状态时" - <b>as long as the state does</b>, and that state ends when a countdown's turn
  * arrives, which is not a turn count at all. Removal by name existed only for <b>states</b>, so those two effects could
  * only be written as {@code permanent}: a buff that never comes off, i.e. a wrong number with no symptom.
  *
@@ -33,7 +33,7 @@ public class NamedBuffTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** 「协奏」 as a state, plus an ATTACK boost and an immunity that carry the same name. */
+    /** "协奏" as a state, plus an ATTACK boost and an immunity that carry the same name. */
     @Test
     public void removingTheStateTakesItsNamedEffectsWithIt() {
         Fixture f = new Fixture();
@@ -51,7 +51,7 @@ public class NamedBuffTest {
                         + "only be `permanent` and would have stayed forever)");
     }
 
-    /** ⚠ An UNNAMED modifier is not touched by any name: the field must not change existing content's lifetime. */
+    /** Note: An UNNAMED modifier is not touched by any name: the field must not change existing content's lifetime. */
     @Test
     public void anUnnamedModifierIsNotTouched() {
         Fixture f = new Fixture();
@@ -91,7 +91,7 @@ public class NamedBuffTest {
         }
     }
 
-    /** A state 「协奏」 plus an ATTACK boost and a control immunity, all naming {@code name} (null = unnamed). */
+    /** A state "协奏" plus an ATTACK boost and a control immunity, all naming {@code name} (null = unnamed). */
     private static List<TriggerSpec> stateAndEffects(String name) {
         EffectSpec state = new EffectSpec();
         TriggerSpecs.set(state, "op", "APPLY_BUFF");

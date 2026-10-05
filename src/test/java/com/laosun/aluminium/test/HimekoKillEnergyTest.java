@@ -19,16 +19,16 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * 「每消灭1个敌方目标<b>额外</b>恢复姬子5点能量」 — the kill credit that rides on <b>her ultimate</b>.
+ * "每消灭1个敌方目标<b>额外</b>恢复姬子5点能量" - the kill credit that rides on <b>her ultimate</b>.
  *
  * <p><b>Why the reading needed settling first.</b> The engine already credits <b>any</b> killer 5 energy
- * ({@code Constant.ENERGY_GAIN_KILL}), and this sentence also says 5 — one credit or two? The document answers it: the
+ * ({@code Constant.ENERGY_GAIN_KILL}), and this sentence also says 5 - one credit or two? The document answers it: the
  * skill's own {@code param_list} states the 5 ({@code 100303} Lv10 = {@code [1.38, 5]}), the general credit is a rule
- * about the kill happening, and the text says 「**额外**恢复」 (it would read 「恢复5点能量」 if it were that same 5).
- * Hence +5 on top — and this file measures that total.
+ * about the kill happening, and the text says "额外恢复" (it would read "恢复5点能量" if it were that same 5).
+ * Hence +5 on top - and this file measures that total.
  *
- * <p>⚠ <b>How the first version of this case went wrong, kept as a warning</b>: it left the enemy at 20% HP, which her
- * Lv1 ultimate (1.38 × ATK ≈ 966) cannot take off a 30000-HP monster — so <b>neither</b> run killed anything, the
+ * <p>Note: <b>How the first version of this case went wrong, kept as a warning</b>: it left the enemy at 20% HP, which her
+ * Lv1 ultimate (1.38  x  ATK ~= 966) cannot take off a 30000-HP monster - so <b>neither</b> run killed anything, the
  * difference was 0, and the "control" was not a control at all. The fixture now leaves the enemy at 1 HP and asserts
  * the precondition it depends on.
  */
@@ -46,9 +46,9 @@ public class HimekoKillEnergyTest {
         double killed = ultimateEnergy(true);
         double survived = ultimateEnergy(false);
 
-        // ⚠ Measured: killed = 10, survived = 5 (2026-09-28). The difference is HER five and nothing else -- the
+        // Note: Measured: killed = 10, survived = 5 (2026-09-28). The difference is HER five and nothing else -- the
         // general kill credit is folded into the attack's own energy («one attack grants energy only once»,
-        // Battle.grantHitAndKillEnergy), so 「额外」 really is an extra credit rather than a relabelling of the
+        // Battle.grantHitAndKillEnergy), so "额外" really is an extra credit rather than a relabelling of the
         // standard one. That is the reading this case exists to pin.
         Assertions.assertEquals(5, killed - survived, 1.0,
                 "「每消灭1个敌方目标额外恢复姬子5点能量」 adds exactly 5 on top of the cast's own energy ("
@@ -56,7 +56,7 @@ public class HimekoKillEnergyTest {
     }
 
     /**
-     * ⚠ A kill she did not cause pays her nothing: the general credit follows the killer, and her sentence names her
+     * Note: A kill she did not cause pays her nothing: the general credit follows the killer, and her sentence names her
      * ultimate.
      */
     @Test

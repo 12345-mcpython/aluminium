@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「「长夜」被攻击的概率提高」 — the memosprite's own aggro weight, which is a different unit from its master.
+ * "'长夜'被攻击的概率提高" - the memosprite's own aggro weight, which is a different unit from its master.
  *
- * <p>The number rides in the parameter her prose never names: 忆灵技能2's table is {@code [0.25 … 0.7, 3]}, the first value
- * being the 「伤害提高 50%」 the text does quote (Lv6 = 0.5) and the second a constant 3 it never mentions. The servant
+ * <p>The number rides in the parameter her prose never names: 忆灵技能2's table is {@code [0.25 … 0., 3]}, the first value
+ * being the "伤害提高 50%" the text does quote (Lv6 = 0.5) and the second a constant 3 it never mentions. The servant
  * config's property set is exactly {@code {AggroAddedRatio, AllDamageTypeAddedRatio, SpeedAddedRatio}} and its passive
  * writes {@code AggroAddedRatio}, so 3 reads as weight x (1 + 3) on top of the spec's own {@code "aggro": 125}.
  *
- * <p>⚠ The other half of that sentence, 「免疫控制类负面状态」, has been shipped since the memosprite work as
+ * <p>Note: The other half of that sentence, "免疫控制类负面状态", has been shipped since the memosprite work as
  * {@code RESIST_DEBUFF kind control percent 1.0} on the same event -- which is why nothing about it appears here.
  */
 public class EvernightMemospriteAggroTest {

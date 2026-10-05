@@ -18,20 +18,20 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * P7-4 acceptance: stage data ({@code stage.json}) + waves.
+ * P-4 acceptance: stage data ({@code stage.json}) + waves.
  *
  * <p>Covers two kinds of thing:
  * <ol>
  *   <li>The data layer: how {@link StageBean} is read (a wave = an element of {@code monster}; the
  *   order within a wave = the N order of {@code MonsterN});</li>
- *   <li>The flow layer: {@link WaveManager} spawning monsters wave by wave, and **an empty enemy
- *   team does not equal a win** (the seam between P7-3 × P7-4).</li>
+ *   <li>The flow layer: {@link WaveManager} spawning monsters wave by wave, and an empty enemy
+ *   team does not equal a win (the seam between P-3 x P-4).</li>
  * </ol>
  *
- * <p>⚠ Tests that depend on {@code stage.json} fall back to {@link Assumptions#assumeFalse}:
+ * <p>Note: Tests that depend on {@code stage.json} fall back to {@link Assumptions#assumeFalse}:
  * that table is produced by a generator, and when it has not been generated
  * {@link Constant#stages()} is an empty table (deliberately designed not to drag down the whole
- * test suite — see the notes on {@code Constant.stages()}).
+ * test suite - see the notes on {@code Constant.stages()}).
  */
 public class WaveManagerTest {
 
@@ -53,7 +53,7 @@ public class WaveManagerTest {
     }
 
     /**
-     * The data layer: the real {@code stage.json} — stage 103201 is 1 wave of 3.
+     * The data layer: the real {@code stage.json} - stage 103201 is 1 wave of 3.
      */
     @Test
     public void stageDataHasTheExpectedShape() {
@@ -66,7 +66,7 @@ public class WaveManagerTest {
     }
 
     /**
-     * The data layer: a multi-wave stage (310030 has 3 waves) — the wave count comes directly from
+     * The data layer: a multi-wave stage (310030 has 3 waves) - the wave count comes directly from
      * the number of elements of {@code monster}.
      */
     @Test
@@ -153,12 +153,12 @@ public class WaveManagerTest {
     }
 
     /**
-     * The core seam: **an empty enemy team ≠ a win**. While waves remain unentered, {@code checkResult()}
+     * The core seam: an empty enemy team != a win. While waves remain unentered, {@code checkResult()}
      * must not judge a win.
      *
-     * <p>This is the easiest place to trip between P7-3 and P7-4: P7-3's criterion is "one side is
-     * wiped out", whereas in wave mode "the enemy team is empty" merely means **this wave has not
-     * entered yet**.
+     * <p>This is the easiest place to trip between P-3 and P-4: P-3's criterion is "one side is
+     * wiped out", whereas in wave mode "the enemy team is empty" merely means this wave has not
+     * entered yet.
      */
     @Test
     public void pendingWavesDoNotCountAsAWonBattle() {
@@ -194,7 +194,7 @@ public class WaveManagerTest {
     }
 
     /**
-     * In a multi-wave stage, wiping out wave 1 does **not** judge a win; after entering wave 2 the
+     * In a multi-wave stage, wiping out wave 1 does not judge a win; after entering wave 2 the
      * battle continues.
      */
     @Test
@@ -225,7 +225,7 @@ public class WaveManagerTest {
     }
 
     /**
-     * When our side is wiped out, it is a loss even if waves remain unentered — "should we enter
+     * When our side is wiped out, it is a loss even if waves remain unentered - "should we enter
      * another wave" cannot save a team wipe.
      */
     @Test
@@ -242,7 +242,7 @@ public class WaveManagerTest {
     }
 
     /**
-     * Monsters entering mid-battle start from the **current action value**, rather than resetting to
+     * Monsters entering mid-battle start from the current action value, rather than resetting to
      * 0 and starting a new round.
      */
     @Test
@@ -269,7 +269,7 @@ public class WaveManagerTest {
     }
 
     /**
-     * An ordinary battle with no wave manager is unaffected (P7-3's behavior is unchanged).
+     * An ordinary battle with no wave manager is unaffected (P-3's behavior is unchanged).
      */
     @Test
     public void battlesWithoutWavesBehaveAsBefore() {
@@ -287,7 +287,7 @@ public class WaveManagerTest {
      * The stage table is parsed at most once; repeated access hits the cache.
      *
      * <p>The lazy-loading guardrail ("the static block does not parse stage.json") is in
-     * {@link StageLazyLoadTest} — that is a separate class because other cases in this class would
+     * {@link StageLazyLoadTest} - that is a separate class because other cases in this class would
      * load the table first.
      */
     @Test
@@ -313,7 +313,7 @@ public class WaveManagerTest {
 
     // ==================================================================
 
-    /** Builds a battle with "an empty enemy team + a wave manager" (P7-4's standard usage). */
+    /** Builds a battle with "an empty enemy team + a wave manager" (P-4's standard usage). */
     private static Battle waveBattle(int stageId) {
         StageBean stage = stage(stageId);
         Battle battle = new Battle(List.of(character()), new ArrayList<>(), new Random(0));
@@ -321,7 +321,7 @@ public class WaveManagerTest {
         return battle;
     }
 
-    /** Fetches a stage; skips if there is no data (stage.json is produced by a generator — see the class docs). */
+    /** Fetches a stage; skips if there is no data (stage.json is produced by a generator - see the class docs). */
     private static StageBean stage(int stageId) {
         StageBean stage = Constant.stages().get(stageId);
         Assumptions.assumeFalse(Constant.stages().isEmpty(),

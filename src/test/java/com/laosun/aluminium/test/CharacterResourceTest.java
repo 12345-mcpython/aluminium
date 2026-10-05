@@ -24,15 +24,15 @@ import java.util.Set;
  *
  * <p><b>The hole this closes.</b> Before this, {@code ResourceManager} could hold a value but no content could
  * declare one, and the condition DSL could not read one: {@code gain} answered {@code 0} for an unknown id and
- * {@code value} answered {@code 0} too, so a rule about 「充能」 was a no-op that reported nothing. 41 of the 97
+ * {@code value} answered {@code 0} too, so a rule about "充能" was a no-op that reported nothing. 41 of the 9
  * character documents in the corpus gate something on a count, which is the largest single gap the scan found
- * (ROADMAP §13.7) — and a whole family of kits (Acheron's 【残梦】, Feixiao's 【飞黄】, Cyrene's 【追忆】) is built on
+ * (ROADMAP §13.) - and a whole family of kits (Acheron's [残梦], Feixiao's [飞黄], Cyrene's [追忆]) is built on
  * it.
  *
  * <p><b>Three things are pinned here</b>, each of which would otherwise be a rule that loads and quietly does the
  * wrong thing:
  * <ol>
- *   <li>the file shapes — the object form that declares resources, and the bare array that stays valid for every
+ *   <li>the file shapes - the object form that declares resources, and the bare array that stays valid for every
  *       character with nothing but rules;</li>
  *   <li>that an <b>undeclared</b> resource fails both the read and the write, at build time, rather than reading as
  *       0;</li>
@@ -40,8 +40,8 @@ import java.util.Set;
  *       event's actor.</li>
  * </ol>
  *
- * <p>The fixtures under {@code src/test/resources/characters/} are the loader's own fixtures — the same trick
- * {@code relic_sets/113.json} uses for relic rules — so the shapes are exercised through {@link TriggerTables}
+ * <p>The fixtures under {@code src/test/resources/characters/} are the loader's own fixtures - the same trick
+ * {@code relic_sets/113.json} uses for relic rules - so the shapes are exercised through {@link TriggerTables}
  * rather than by calling Gson directly.
  */
 public class CharacterResourceTest {
@@ -50,9 +50,9 @@ public class CharacterResourceTest {
     /** 姬子: the shipped character whose file declares a resource. */
     private static final int HIMEKO = 1003;
     /** An ordinary character with no rules and no declarations ({@link TestCharacters}). */
-    // ✅ 2026-09-30: a REAL character with no `resources` block (1002 is a bare rule list). This used to be a cid with
+    // 2026-09-30: a REAL character with no `resources` block (1002 is a bare rule list). This used to be a cid with
     // no content file at all, which no longer exists -- see TestCharacters. The assertions here are about DECLARATIONS, and
-    // every one of them installs its own rule table, so the character’s own rules never enter the measurement.
+    // every one of them installs its own rule table, so the character's own rules never enter the measurement.
     private static final int PLAIN = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -143,11 +143,11 @@ public class CharacterResourceTest {
     /**
      * The declaration's own validation runs on the <b>JSON</b> path, not only when built by hand.
      *
-     * <p>Gson constructs records through their canonical constructor, which is the compact one — the alternative
-     * would be a validator that silently never ran for real content — but it <b>wraps</b> what that constructor
+     * <p>Gson constructs records through their canonical constructor, which is the compact one - the alternative
+     * would be a validator that silently never ran for real content - but it <b>wraps</b> what that constructor
      * throws, so the reason arrives as the cause. That is exactly why {@code TriggerTables} reports the deepest
      * message in the chain (see the zero-cap fixture case above, which asserts the sentence itself): a content
-     * error must not be reduced to 「Failed to invoke constructor」.
+     * error must not be reduced to "Failed to invoke constructor".
      */
     @Test
     public void theDeclarationIsValidatedOnTheJsonPath() {
@@ -180,7 +180,7 @@ public class CharacterResourceTest {
         Assertions.assertEquals(3, himeko.getResources().get(CHARGE).getMax(), "with the declared cap");
     }
 
-    /** And a character who declares nothing gets nothing — no resource appears out of the engine's sleeve. */
+    /** And a character who declares nothing gets nothing - no resource appears out of the engine's sleeve. */
     @Test
     public void aCharacterWithoutDeclarationsHasNoResources() {
         Assertions.assertEquals(0, CharacterFactory.create(PLAIN, LEVEL).getResources().size());
@@ -228,9 +228,9 @@ public class CharacterResourceTest {
     }
 
     /**
-     * ⚠ An <b>undeclared</b> resource fails the condition instead of reading as 0.
+     * Note: An <b>undeclared</b> resource fails the condition instead of reading as 0.
      *
-     * <p>The threshold is deliberately {@code >= 0}, which <em>any</em> number would satisfy — so this test fails
+     * <p>The threshold is deliberately {@code >= 0}, which <em>any</em> number would satisfy - so this test fails
      * the moment the read falls back to {@code ResourceManager.value}'s 0, which is the silent wrong answer the
      * whole declaration exists to prevent. (For a shipped character the state is unreachable: the assembly point
      * refuses a rule that names a resource its character never declares.)
@@ -372,7 +372,7 @@ public class CharacterResourceTest {
         return owner;
     }
 
-    /** A rule gated on 「充能达到上限」. */
+    /** A rule gated on "充能达到上限". */
     private static TriggerSpec chargeThresholdRule() {
         return ruleWithCondition("self_resource:" + CHARGE + " >= 3");
     }

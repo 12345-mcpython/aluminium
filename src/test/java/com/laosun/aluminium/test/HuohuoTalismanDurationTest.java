@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1217 藿藿：「施放战技后藿藿获得【禳命】，持续 2 回合，**藿藿每回合开始时**持续回合数减 1」 (2026-10-02).
+ * 121藿藿："施放战技后藿藿获得[禳命]，持续 2 回合，藿藿每回合开始时持续回合数减 1" (2026-10-02).
  *
- * <p>The point is WHOSE clock spends it: the sentence names 藿藿, not the party. ⚠ The drive is the one a green sibling uses
+ * <p>The point is WHOSE clock spends it: the sentence names 藿藿, not the party. Note: The drive is the one a green sibling uses
  * (`ArlanEidolonFourTest`): a timed buff ticks in two halves per turn, and expiry is announced on the late one.
  */
 public class HuohuoTalismanDurationTest {
@@ -54,7 +54,7 @@ public class HuohuoTalismanDurationTest {
         Assertions.assertFalse(afterHerSecondTurn, "「持续回合数减 1」-- two of her turns spend it");
     }
 
-    /** ⚠ Half a turn is `beforeMove()` alone; a full one is both halves, and expiry lands on the late half. */
+    /** Note: Half a turn is `beforeMove()` alone; a full one is both halves, and expiry lands on the late half. */
     private static void spendTurnOf(Battle battle, Character unit) {
         Signal signal = battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == unit).findFirst()

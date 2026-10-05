@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「持续至下一个那刻夏回合开始时」 (2026-10-02).
+ * "持续至下一个那刻夏回合开始时" (2026-10-02).
  *
- * Slot 18's 【真知】 was written `until: next_attack`, which ends the moment he next lands an attack -- but the cast that GRANTS it IS an attack, so the state died on the very cast
+ * Slot 18's [真知] was written `until: next_attack`, which ends the moment he next lands an attack -- but the cast that GRANTS it IS an attack, so the state died on the very cast
  * that created it. The sentence ends it when his next TURN begins, so this reads the state after that attack.
  */
 public class TrueKnowledgeLifetimeTest {

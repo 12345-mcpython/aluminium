@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * ⭐ CHARACTERISATION of the {@code target_weakness_count} variable (2026-09-30, step two of the cone-22004 diagnosis): a rule
+ * CHARACTERISATION of the {@code target_weakness_count} variable (2026-09-30, step two of the cone-22004 diagnosis): a rule
  * guarded by "the target is weak to at least one element" must fire for a monster that has weaknesses and NOT for one that has
  * none.
  *
- * <p>★ The event is fired by a real damage instance, so the target in the context is the unit that was hit -- which is the
+ * <p>The event is fired by a real damage instance, so the target in the context is the unit that was hit -- which is the
  * question this step exists to answer, one question at a time.
  */
 public class TargetWeaknessCountTest {

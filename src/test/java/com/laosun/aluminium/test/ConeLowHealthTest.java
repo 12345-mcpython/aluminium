@@ -16,7 +16,7 @@ import java.util.Random;
 
 /**
  * The low-health family, and a kill-triggered one: 20003 (defence, plus an extra below half health), 20016 (crit rate below a health threshold) and
- * 20007 (attack after a kill).
+ * 2000(attack after a kill).
  *
  * <p>The condition is judged by firing BATTLE_START twice: healthy (must not fire) and wounded (must fire). NOTE the fixture drives current HP --
  * `takeDamage` -- and checks `getCurrentHp() / getMaxHp()`, because `HEALTH.get()` is the max-HP STAT, which is what blocked the previous attempt.

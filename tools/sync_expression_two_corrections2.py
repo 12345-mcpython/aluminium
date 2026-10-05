@@ -33,7 +33,7 @@ for prefix, replacement in REPLACEMENTS:
         sys.exit("REFUSING %s: %d rows" % (prefix[:24], len(hits)))
     lines[hits[0]] = replacement
 
-# ⚠ ENCODE FIRST: opening the file for writing truncates it, so a later encode error would leave it EMPTY.
+# Note: ENCODE FIRST: opening the file for writing truncates it, so a later encode error would leave it EMPTY.
 payload = "\n".join(lines).encode("utf-8")
 with io.open(PATH, "wb") as handle:
     handle.write(payload)

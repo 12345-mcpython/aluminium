@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 129, four pieces (2026-09-30): 「装备者及其忆灵造成的欢愉伤容无视目标 10% 防御」.
+ * Relic set 129, four pieces (2026-09-30): "装备者及其忆灵造成的欢愉伤容无视目标 10% 防御".
  *
- * <p>⭐ Two-sided on the same wearer: an ELATION instance is bigger with the set on, an ordinary one is untouched -- the scope is
+ * <p>Two-sided on the same wearer: an ELATION instance is bigger with the set on, an ordinary one is untouched -- the scope is
  * the whole point of the clause, and it is the capability that was measured when the Elation slice landed.
  */
 public class Relic129Test {
@@ -27,7 +27,7 @@ public class Relic129Test {
     private static final int ALLY = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** ⚠ Relic pieces cap at level 15, not at the character’s level (measured: a RelicException said so). */
+    /** Note: Relic pieces cap at level 15, not at the character's level (measured: a RelicException said so). */
     private static final int RELIC_LEVEL = 15;
 
     private Battle battle;
@@ -57,9 +57,9 @@ public class Relic129Test {
         double normalSet = settled(DamageType.NORMAL);
         System.out.println("[129] ELATION " + elationPlain + " -> " + elationSet + " (x" + (elationSet / elationPlain)
                 + ") ; NORMAL " + normalPlain + " -> " + normalSet + " (x" + (normalSet / normalPlain) + ")");
-        // ⚠ The cross-build comparison is NOT a clean control (measured): the relic pieces move the wearer’s own panel, and
+        // Note: The cross-build comparison is NOT a clean control (measured): the relic pieces move the wearer's own panel, and
         // `DamageType.ELATION` is deliberately not boostable, so the two ratios are not comparable. What IS specific: ignoring
-        // 10% of the target’s DEF lifts an Elation instance by a small, bounded factor. The scope and the number are pinned by
+        // 10% of the target's DEF lifts an Elation instance by a small, bounded factor. The scope and the number are pinned by
         // the spec half below.
         double factor = elationSet / elationPlain;
         System.out.println("[129] the Elation factor is " + factor + " ; the ordinary one " + (normalSet / normalPlain)
