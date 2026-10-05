@@ -127,3 +127,15 @@
   而第 96 轮把它挂在了**他自己的 `ULT_CAST`** 上 ⇒ 任何变身都会得到它，于是弄坏了已出货的
   `TransformationEndsOnLastCountdownTest`（它钉的是“**没见过诗**的角色：最后 1 个倒计时回合结束变身”）。
   ⭐ 改成两条：状态由 `CAST_SETUP` + `from_skill_id == 21` 授予；暴击率仍挂变身但**由状态把门** ⇒ 既有判据重新通过 ✓。
+
+- ✅ **已出货（2026-10-02，第 143 件）：`1141521`（负世）**第六句成句** ⇒ ⭐⭐ **该技能六句全部成句** ✓✓：
+  「…**额外回合开始时，卡厄斯兰那消耗等同于当前生命值 `#2%` 的生命值**」（`#2 = 0.15`）。
+  ⭐ 实现：`CONSUME_HP{scale: "target_current_hp", percent: 0.15, target: "self"}`，门是 `COUNTDOWN_TURN` + `actor == countdown` + `self has_state 永续的燃烧`。
+  判据 `WorldOdeExtraTurnCostsHpTest`：`with the state he lost 215.3844 of 1435.896 (15% would be 215.3844) ; without it he lost 0.0`；
+  变异（`0.15` → `0.10`）⇒ `lost 143.59` ⇒ 红 ✓。
+- ⭐⭐ **两条引擎事实（第 100 轮）**：
+  1. ⚠ **`owner_current_hp` 通过校验但没有实现**（报文原话：*"Scale 'owner_current_hp' passed validation but has no implementation"*）
+     ⇒ **校验集与实现集不一致** —— 一个真实的引擎瑕疵（已登记，未动它）；
+  2. ⭐ **“消耗者自己的当前生命”的出货拼法就是 `target_current_hp`** —— 它的注释原话：
+     *"⚠ `target` is the unit being resolved (for CONSUME_HP, the spender)"*。
+- ⭐ **账：忆灵技能只剩 `17`（生死）一个**（它要【新蕊】溢出与死龙天赋倍率）。

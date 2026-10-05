@@ -581,6 +581,24 @@
       ],
       "source": "1415 昔涟 忆灵技能 21：「整场生效，对白厄施放后，使白厄获得 #8 点【火种】，**且在变身时获得【永续的燃烧】**…」—— 它是**诗的一部分**，所以由诗的落下授予。",
       "note": "⭐ **修正的理由**：原话里该句属于诗的句子，而不是他自己变身的一部分 ⇒ 没有诗就没有这个状态（**实测**：旧实现把它挂在他的 `ULT_CAST` 上，结果弄坏了已出货的 `TransformationEndsOnLastCountdownTest`）。"
+    },
+    {
+      "id": "world_ode_extra_turn_costs_hp",
+      "on": "COUNTDOWN_TURN",
+      "when": [
+        "actor == countdown",
+        "self has_state 永续的燃烧"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.15,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「**额外回合开始时，卡厄斯兰那消耗等同于当前生命值 #2% 的生命值**」（#2 = 0.15）。",
+      "note": "⭐ “**当前**生命值”⇒ `scale` 用**主人自己的当前生命**（已出货的同类写法是 `owner_max_hp`）；⭐ 而“额外回合开始时”就是 `COUNTDOWN_TURN`（第 99 轮已确定它怎么驱动）。  ⭐ **2026-10-02 实测修正**：`owner_current_hp` **通过校验但没有实现**（读到 *\"Scale 'owner_current_hp' passed validation but has no implementation\"*）；而已出货的 `target_current_hp` 的注释原话就是“for CONSUME_HP, the spender” ⇒ 它正是“消耗者自己的当前生命”。"
     }
   ]
 }
