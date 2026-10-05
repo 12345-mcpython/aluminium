@@ -54,7 +54,9 @@ public class TribbieTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(TRIBBIE);
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),
+        // ★ 4 since 2026-10-02: `ult_zone_state` joins the three -- 「结界持续期间」 had no state to name,
+        // and 1415's ode of passage needs one (「缇宝的结界的附加伤害」).
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
                 "the follow-up trigger, and (2026-09-29) the zone's 「敌方目标受到的伤害提高30%」" + " with `ticks_on: self` for the zone's own clock");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "Numinosity");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.FOLLOW_UP), "the damage boost");
