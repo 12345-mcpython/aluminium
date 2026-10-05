@@ -440,6 +440,54 @@
       ],
       "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」（SkillID 1141526，`SkillCY14`，参数 `[0.3, 3]`）：「…德谬歌施放【花与箭的舞曲】时**额外**对敌方随机单体造成 1 次同等于德谬歌 **0.3%生命上限**的冰属性伤害」。",
       "note": "⭐ **2026-10-02**：数值用 **level-10 行的 `#1` = 0.3%**（槽位 26 的参数表在 level 1 是 `[0.3, 3]`；本库的 `level_convention` 对昔涟系列统一用 Lv10 行）。**两处新引擎件**：① `times_from: \"resource:<名字>\"`（重复次数读**事件的 actor**）；② `actor_max_hp`（“**施放者**的生命上限”；而 `owner_max_hp` 读的是规则主人昔涟）。⭐ 【花与箭的舞曲】= `SkillID 1141501`，即忆灵的 **`COMMON`** 槽（数据槽位 1）。"
+    },
+    {
+      "id": "ult_enters_the_ripple_and_sharpens",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "往昔的涟漪",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.5,
+          "permanent": true,
+          "target": "self",
+          "coexist": true,
+          "max_stacks": 1
+        }
+      ],
+      "source": "1415 昔涟 终结技 诗的「◦」誓约的「∞」 (141503/141504)：「召唤忆灵德谬歌，使其立即获得 1 个额外回合并激活全体队友的终结技，随后**进入【往昔的涟漪】状态**，获得强化普攻。昔涟和德谬歌的**暴击率提高**，展开战技的结界并使其没有持续时间」。",
+      "note": "⭐ **2026-10-02：审计发现整个终结技只有 `SUMMON` 一条**（`ult_summons_demiurge`），而原话还包含本条的**进入【往昔的涟漪】**与**暴击率提高**。⭐ 【往昔的涟漪】正是槽位 26 那一档（「叙述【追忆】达到 12 点时可激活终结技」）的前提。⛔ 仍登记：「使德谬歌**立即获得 1 个额外回合**」、「**激活全体队友的终结技**」（引擎有 `Battle.isUltraReady`，但没有把它置位的 op）、「使结界没有持续时间」。"
+    },
+    {
+      "id": "talent_cleanses_in_the_ripple_at_twelve",
+      "on": "RESOURCE_CHANGED",
+      "when": [
+        "self has_state 往昔的涟漪",
+        "self_resource:追忆 >= 12"
+      ],
+      "do": [
+        {
+          "op": "DISPEL",
+          "kind": "control",
+          "target": "self"
+        },
+        {
+          "op": "DISPEL",
+          "kind": "dot",
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时可激活终结技并解除自身所有负面效果，**处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技**」。",
+      "note": "⭐ **2026-10-02**：阈值由数据确认 —— `141503` 的 **Lv10** 行是 `[1, 24, 0.5, 12]`，即 `#4` = **12**、`#2` = **24**（两档阈值都在同一行里）。⭐ 「可激活终结技」本身仍登记：引擎有 `Battle.isUltraReady`，但**没有把它置位的 op**（能量满才能放）。"
     }
   ]
 }
