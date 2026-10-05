@@ -806,3 +806,18 @@
 - ⛔ **因此本轮回滚**：`talent_spends_future_for_recollection` 一条（⭐ 上一轮的【未来】**授予**保留 ✓）。
 - ⭐ **一条可复用的事实（新）**：⭐ **状态与计数器是两个家族** —— ⭐ `self/actor_stacks:<名字>` ✗ 读计数器，
   ⭐ `self/actor has_state <名字>` ✗ 读状态；⭐ 用错时**不报错、只是恒假** ✓。
+
+- ✅ **已出货（新目标第 8 件）：天赋的【未来】消耗**（⭐ 原话「⭐ 持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】 ✗」）。
+  ⭐ 形状：`TURN_START` ✗ ＋ 条件 **`actor has_state 未来`** ✗ ⇒ ⭐ `REMOVE_STATE{buff: 未来, target: "attacker"}` ✗ ＋ ⭐ `GAIN_RESOURCE{追忆, 1}` ✗ ✓。
+  ⭐ 判据 `CyreneFutureSpendTest`：`after the ally acts: 【未来】 still on it = false ; 昔涟's 【追忆】 0.0 -> 1.0` ✓；
+  ⭐ **变异（门换成 `actor_stacks:未来 >= 1`）⇒ RED**（⭐ `still on it = true` ＋ `0.0 -> 0.0` ✓）。
+- ⭐⭐⭐ **三条引擎事实（本轮与上一轮量到，全部有实测）**：
+  1. ⭐ **状态与计数器是两个家族**：⭐ `self/actor_stacks:<名字>` ✗ 读**计数器**，⭐ 对 `APPLY_BUFF` ✗ 造的**状态恒假、且不报错**；
+     ⭐ 状态要用 ⭐ `self/actor has_state <名字>` ✗ ✓（⭐ 变异即证明 ✓）。
+  2. ⭐ **`REMOVE_STACK{buff, amount}` 拿不掉一个 buff** ✗ —— ⭐ 而 `BuffManager.removeNamedStacks` ✗ **根本不看 `permanent`** ✓
+     ⇒ ⭐ 问题在 **op 的选择**：⭐ **`REMOVE_STATE`** ✗（⭐ 该 arm 自述 *"takes all of them off"* ✓）**可以** ✓。
+  3. ⭐ **`target` 在"⭐ 不带目标的 `TURN_START` ✗"上不可用** ✗ —— ⭐ 实测：三个旧判据因此报
+     *"Effect targets \"target\" but this event has no such party"* ✗ ⇒ ⭐ 改用 **`attacker`** ✗ ✓ ⇒ ⭐ 全量恢复 **0** ✓。
+- ⛔ **仍登记**：⭐ 【追忆】达 24 点（⭐ 【往昔的涟漪】下 12 点）可激活终结技并解除自身所有负面效果、上限后可溢出至 27 点 ✓；
+  ⭐ 槽位 18 的「战技伤害次数 +3」✓；⭐ 槽位 26 的第一句（⭐ **不同队友**的计数 ✓）与第二句 ✓。
+- ⭐ **进展说明**：⭐ 槽位 26 第一句的前置（⭐ 「⭐ 使昔涟获得 1 点【追忆】 ✗」）**已经落地** ✓ ⇒ ⭐ 剩下的只是"⭐ **哪些队友**给过 ✗"⭐ 这一层去重 ✓。

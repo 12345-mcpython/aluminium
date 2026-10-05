@@ -36071,3 +36071,13 @@
 > * ⛔ **回滚**：`talent_spends_future_for_recollection`（⭐ 上一轮的【未来】授予保留 ✓）。
 > * ⭐ **可复用**：⭐ **状态与计数器是两个家族**，⭐ 用错时**不报错、只是恒假**。
 > * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 12 轮：✅ 出货天赋的【未来】消耗 ＋ 三条引擎事实）**：
+>
+> * ✅ **形状**：`TURN_START` ＋ **`actor has_state 未来`** ⇒ **`REMOVE_STATE{buff: 未来, target: "attacker"}`** ＋ `GAIN_RESOURCE{追忆, 1}`。
+> * ⭐ **判据**：`still on it = false ; 昔涟's 【追忆】 0.0 -> 1.0`；⭐ **变异（门换成 `actor_stacks:`）⇒ RED** ✓。
+> * ⭐⭐⭐ **三条事实**：（1）⭐ **状态与计数器是两个家族**（⭐ `*_stacks:` 读计数器、对状态**恒假且不报错**）；
+>   （2）⭐ **`REMOVE_STACK` 拿不掉 buff**（⭐ `removeNamedStacks` 不看 `permanent` ✓）⇒ ⭐ **`REMOVE_STATE` 可以**；
+>   （3）⭐ **`target` 在"不带目标的 `TURN_START`"上不可用**（⭐ 实测三个旧判据因此挂掉 ✓）⇒ ⭐ 用 **`attacker`** ✓ ⇒ ⭐ 全量恢复 **0** ✓。
+> * ⛔ **仍登记**：⭐ 【追忆】24/12 点激活终结技与溢出至 27；⭐ 槽位 18 的命中次数；⭐ 槽位 26 的第一、二句。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
