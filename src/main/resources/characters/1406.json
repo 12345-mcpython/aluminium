@@ -185,5 +185,25 @@
       }
     ],
     "note": "「赛飞儿**在场时**，敌方全体目标**受到的伤害提高 40%**」—— ⭐ 2026-09-30 转正 ✓：⚠ 旧登记写“需要某角色在场时对全体敌方生效的通道”✗ —— 而那个通道**已经存在** ✓：withSource 给每个 buff 记下 source = ctx.owner()，而 BuffManager.removeBuffsAnchoredTo 由 Battle.removeDeadCombatants 调用 ⇒ **她倒下时它自动被摘** ✓，正是“在场”的语义。⚠ 判据必须断言**两件**：伤害 +40% ✓，以及**她倒下后它消失** ✗。"
+  },
+  {
+    "id": "memosprite_ode_of_trickery_raises_her_damage",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 20"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent_from_cast_param": 0,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 20 「献予「诡计」之诗」（数据槽位 20，SkillID 1141520）：「整场生效，对赛飞儿施放时，**使赛飞儿造成的伤害提高 #1%**。」",
+    "note": "⭐ 形状照 1414 的浪漫之诗（同一属性 `ALL_DAMAGE_TYPE_BOOST`，`target: \"self\"`，永久）。⭐ `#1` 随等级变（**实测**：0.18 → 0.504）→ `percent_from_cast_param: 0`。⛔ 同句的两句降防**已登记**：【老主顾】我们没建模，而「【老主顾】**以外**的敌方目标」需要一个**否定过滤**，`target_when` 没有。"
   }
 ]
