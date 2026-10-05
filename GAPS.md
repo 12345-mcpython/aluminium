@@ -37053,3 +37053,27 @@
 > * ⚠ **我自己的**：⭐ 本轮 7 次调用**全是读** ✗ —— ⚠ 但每一步都是"下一步必须知道"的 ✓，
 >   ⭐ 尤其那句"唯一入口"的注释 ✗：⭐ 它恰好阻止了我去造第二条结算路 ✓（⭐ 那会破坏 ⭐ `DamagePipelineTest` 守的"单次结算"不变式 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2287** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 27 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但 `1141515` 第二句**只差一个关键字**了 ✓，⭐ 而且其余三件全部现成 ✓）**）**：
+>
+> * ⭐⭐⭐ **三件现成（⭐ 都读到了，⭐ 不必再动引擎 ✓）**：
+>   ⭐ ① ⭐ **`times`** ✓ —— ⭐ `DAMAGE` op **已经**收它 ✓，⭐ 注释写着 ⭐ *"`times` says **settle N independent times**"* ✓，
+>     ⭐ 而调用处就是 ⭐ `for (repeat…) for (victim…) damage(battle, effect, ctx, victim);` ✓；
+>   ⭐ ② ⭐ **`original_damage`** ✓ —— ⭐ 要求事件 ⭐ `DAMAGE_SETTLED` ✓ ＋ ⭐ `element` ✓，⭐ 且有**出货读者** ✓：
+>     ⭐ `1003.json:22` ⭐ `DAMAGE{times: 2, scale: "original_damage", percent: 0.4, element: "Fire", target: "random_enemy"}` ✓（⭐ 姬子的「额外造成 2 次伤害…等同于原伤害 40%」✓）；
+>   ⭐ ③ ⭐ **结界** ✓ —— ⭐ `1415.json:69` ⭐ `percent: 0.24, element: "Ice", damage_type: "TRUE"` ✓（⭐ 引擎那条唯一入口的注释**点名了它** ✓：
+>     ⭐ *"…and **1415 昔涟's 结界 (24%)**, both 「等同于原伤害 X% 的真实伤害」"* ✓）。
+> * ⛔ **唯一缺的一件：⭐ 一个"这次结算的实例是附加伤害"的**正面**条件** ✗**：
+>   ⭐ 现有关键字里只有 ⭐ `damage_is_attack` ✓（⭐ *"true exactly when the instance is an ordinary attack, and false for additional damage"* ✓），
+>   ⭐ 而 ⭐ 我需要的是它的**互补面** ✗ ⇒ ⭐⭐ 而 ⭐ **它的注释恰好说明了为什么要新增一个正面关键字** ✗：
+>     ⭐ *"⚠ `!` cannot express the guard (**negation is only for party conditions**), so the guard is stated positively"* ✓✓
+>   ⇒ ⭐⭐ **所以下一轮的做法非常小 ✓**：⭐ 新增一个 ⭐ **`damage_is_additional`** ✓（⭐ 与 ⭐ `damage_is_attack` 对称 ✓，⭐ 取 ⭐ `!ctx.damage().isCountsAsAttack()` ✓ ——
+>     ⚠ 而 `TriggerTable:2853` 的注释提到 ⭐ *"Was `!ctx.damage().isCountsAsAttack()`, i.e. the exact opposite of the keyword's contract"* ✓
+>     ⇒ ⭐⭐ **那句话正是"别把它塞进 `damage_is_attack`"的警告** ✓ ⇒ ⭐ 所以是**新关键字** ✓，⭐ 不是改旧的 ✓）。
+> * ⭐⭐ **内容一次就位（⭐ 下一轮 ✓）**：⭐ `1403.json` 一条 ⭐ `on: DAMAGE_SETTLED` ＋ ⭐ `when: [actor == self, damage_is_additional]`
+>   ⇒ ⭐ `DAMAGE{times: 1, scale: "original_damage", percent: 1.0, element: "Ice", target: "target"}` ✓
+>   （⭐ `#1` ＝ **1** 在十级都一样 ✓ ⇒ ⭐ `times: 1` 是数据说的话 ✓；⭐ `actor` 在 ⭐ `DAMAGE_SETTLED` 上是**攻击者** ✓ —— ⭐ `TriggerEvent:264` 的文档写着 ✓）。
+> * ⚠ **我自己的**：⭐ 本轮 8 次调用**全是读** ✗ —— ⚠ 但两次"差点走错"都被文档拦住了 ✓：
+>   ⭐ ① ⭐ 我本想去给 ⭐ `DAMAGE` 加 `times` ✗ ⇒ ⭐ 它**已经有了** ✓；
+>   ⭐ ② ⭐ 我本想用 ⭐ `!damage_is_attack` ✗ ⇒ ⭐ 文档明确说 ⭐ **否定只对队伍条件开放** ✗ ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2287** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
