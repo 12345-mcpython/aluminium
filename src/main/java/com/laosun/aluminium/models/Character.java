@@ -68,6 +68,15 @@ public class Character extends CanHit {
     private int cid;
 
     /**
+     * This character's own data id (its file name under {@code resources/characters/}) (2026-10-02).
+     *
+     * <p>Reader: the {@code ally_cid:<cid>} selector -- 「德谬歌施放忆灵技时，使<b>风堇</b>获得2层…」 names a character, and nothing in the selector set could.
+     */
+    public int getCid() {
+        return cid;
+    }
+
+    /**
      * This character's mechanics, as data (P8-7).
      *
      * <p>Never {@code null}: an unregistered character holds {@link TriggerTable#EMPTY}. That way

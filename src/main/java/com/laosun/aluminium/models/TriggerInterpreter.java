@@ -1717,7 +1717,27 @@ public final class TriggerInterpreter {
      *
      * @param selector the selector token (already lower-cased and trimmed)
      */
+    /** ⭐ 「向**风堇**…」: a selector that names a character by cid (2026-10-02). */
+    static final String ALLY_CID_PREFIX = "ally_cid:";
+
+    /** The party member whose cid is this one, or {@code null} when nobody matches. */
+    private static CanHit allyWithCid(TriggerContext ctx, int cid) {
+        if (ctx.battle() == null) {
+            return null;
+        }
+        for (Character member : ctx.battle().characters) {
+            if (member.getCid() == cid) {
+                return member;
+            }
+        }
+        return null;
+    }
+
     private static CanHit resolveSelector(String selector, EffectSpec effect, TriggerContext ctx) {
+        if (selector.startsWith(ALLY_CID_PREFIX)) {
+            int cid = Integer.parseInt(selector.substring(ALLY_CID_PREFIX.length()).trim());
+            return require(allyWithCid(ctx, cid), selector, ctx);
+        }
         return switch (selector) {
             case "self" -> ctx.owner();
             case "target" -> require(ctx.target(), "target", ctx);
@@ -4175,6 +4195,19 @@ public final class TriggerInterpreter {
         if (effect.getTarget() == null || effect.getTarget().isBlank()) {
             if (effect.getCastTarget() != null && !effect.getCastTarget().isBlank()) {
                 requireSelectorSpelling(effect.getCastTarget(), "cast_target", op, spec);
+            }
+            return;
+        }
+        // ⭐ A selector FAMILY, admitted by prefix (2026-10-02): `ally_cid:<cid>` names a character outright. The closed set below stays closed --
+        // this is an explicit door, not a fallback, which is why it is checked BEFORE the membership test.
+        if (effect.getTarget().startsWith(ALLY_CID_PREFIX)) {
+            String rest = effect.getTarget().substring(ALLY_CID_PREFIX.length()).trim();
+            try {
+                Integer.parseInt(rest);
+            } catch (NumberFormatException notANumber) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " names \"" + effect.getTarget() + "\", whose part after \"" + ALLY_CID_PREFIX
+                                + "\" must be a cid (source: " + spec.getSource() + ")");
             }
             return;
         }

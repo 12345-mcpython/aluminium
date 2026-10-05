@@ -1,0 +1,7 @@
+TextMap entries containing the state name: 6
+  hash 10250082219593006238 -> 德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】。对风堇施放时，为风堇恢复能量。风堇持有【献予「天空」之诗】并提供
+  hash 3195157591843010775 -> 德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】。对风堇施放时，为风堇恢复<color=#f29e38ff><un
+  hash 12399410741650866922 -> 献予「天空」之诗
+  hash 5943790019529126162 -> 风堇的治疗数值计入小伊卡忆灵技的累计治疗数值额外提高，提高数值等同于本次治疗数值的<color=#f29e38ff><u
+  hash 10185317294639697359 -> 献予「天空」之诗
+files mentioning a layer/stack limit field: ['AvatarStatusConfig.json', 'MonsterStatusConfig.json', 'StatusConfig.json']
