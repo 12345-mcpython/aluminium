@@ -668,6 +668,12 @@ public class Battle {
     // NO BEFAN YOY DID IT
 
     /**
+     * ⭐ The state that means "终结技已激活" (2026-10-02): a clause grants it and {@link #isUltraReady} honours it, which is the engine's one spelling of "激活终结技".
+     * Not from the data -- the documents name the effect, not a state -- so it is named here once, like every other engine-side marker.
+     */
+    public static final String ULTIMATE_ACTIVATED_STATE = "\u7ec8\u7ed3\u6280\u5df2\u6fc0\u6d3b";
+
+    /**
      * Whether this unit can cast its ultimate right now (P3-4 follow-up): **reaching the "ult threshold" is
      * enough, it does not have to be filled to the maximum**.
      *
@@ -697,6 +703,11 @@ public class Battle {
         // `hasEnergyBar()` is therefore NOT checked here: the default implementation inside
         // EnergyProvider still applies exactly that rule (plus the threshold), so conventional
         // characters behave as before, while a stack provider may ignore energy entirely.
+        if (user.getBuffManager().hasState(ULTIMATE_ACTIVATED_STATE)) {
+            // ⭐ 「激活终结技」 (2026-10-02; reader: 1415's ultimate, "激活**全体队友**的终结技」): a clause can put a unit in a state where its ultimate is castable
+            // NOW, whatever its own provider would say. Without this the sentence had no spelling at all -- readiness was the provider's alone.
+            return true;
+        }
         return user.getEnergyProvider().canCastUltra(user, ultraEnergyCost(user));
     }
 
