@@ -522,3 +522,24 @@
   （两条路都一样）⇒ 按纪律"没有可归因效果的词汇不算出货"。
 - ⭐ **一条可复用的实测**：`Battle.memospriteOf(CanHit)` 的语义是"**这个主人的忆灵**"，
   而 `SummonFactory.servant(...)` 对同一个 spec 造出来的**也是它** —— 所以该方法是"主人的忆灵"，不是"某种到达"。
+
+- ⛔ **新目标第 5 件：再次回滚（第 5 次）—— 而这次的结论是**那件能力从来不需要**，且我新加的条件是冗余的**。
+- ⭐⭐⭐ **实测（决定性）**：把遐蝶的五条 `SUMMONED` 规则**全部**换回旧的 `actor == summon`，
+  判据里"**别人**的召唤物到达"那一侧**仍然是精确的 0.0**：
+  ```
+  MUTANT (all five back to `actor == summon`) -> green
+  [dragon_arrival] the enemy lost 0.0 when 昔涟's sprite arrived, and 7630.021910260697 when her own dragon did
+  ```
+  ⇒ ⭐⭐ **`actor == summon` 本来就表示"规则主人**自己**的召唤物"**，不是"任何一个召唤物"。
+  ⇒ 所以「召唤**死龙**时」**从一开始就不需要收紧**，而我本轮加的 `actor_is_my_summon`（常量 ＋ 解析支 ＋ 条件类）**与旧拼法不可区分** ⇒ 按纪律回滚。
+- ⭐⭐ **两次探针（同一轮内）把链条量清了**：
+  ```
+  [probe-summoned] fired for actor=死龙•玻吕刻斯 target=null amount=0.0            ← fireTriggers(SUMMONED) 只调用一次
+  [probe-apply]    a 新蕊 rule is being applied: owner=Castorice actor=死龙 target=null effects=3   ← 链条规则只应用一次
+  ```
+  ⇒ ⭐ **第 111 轮登记的"对一次到达触发两次"在当前代码上不可复现** ⇒ 它很可能是**那一轮我自己的守卫实验**造成的假象
+  （那轮我反复切换 `moved > 0` 守卫）⇒ 该项**重新归类**为"已消除"，而不是"待查"。
+- ⭐ **保留的两条可复用事实**：`Battle.summonsOf(CanHit)` 的签名是 `public List<Summon> summonsOf(CanHit master)`；
+  而 `SummonFactory.servant(master, spec)` 与 `memosprite(master, spec)` 对同一 spec 造出**同一个单位**（同名、`memospriteOf` 都指向它）。
+- ⭐ **于是目标里四件的最终状态**：① ✅ 出货；② ✅ 出货；③ ⏳ **词汇已在**（`damage_is_additional`），卡在自触发守卫与量级来源；
+  ④ ✅ **已消除**（不需要）。
