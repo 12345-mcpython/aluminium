@@ -37077,3 +37077,27 @@
 >   ⭐ ① ⭐ 我本想去给 ⭐ `DAMAGE` 加 `times` ✗ ⇒ ⭐ 它**已经有了** ✓；
 >   ⭐ ② ⭐ 我本想用 ⭐ `!damage_is_attack` ✗ ⇒ ⭐ 文档明确说 ⭐ **否定只对队伍条件开放** ✗ ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2287** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 28 轮：🎉🎉🎉 **第 109 件出货 ＝ `damage_is_additional`** ✓✓）**）**：
+>
+> * ✅ **出货内容（⭐ 三处，⭐ 完全照它兄弟的镜子 ✓）**：⭐ `TriggerTable` 新增常量 ⭐ `damage_is_additional` ✓（⭐ 紧挨 `damage_is_attack` ✓）；
+>   ⭐ 解释处 ✓（⭐ 复用 ⭐ `DAMAGE_CARRYING_EVENTS` 的校验 ✓，⭐ 报错信息互换 ✓）；⭐ 条件类 ⭐ `DamageIsAdditional` ✓
+>   —— ⭐ `return ctx.damage() != null && !ctx.damage().isCountsAsAttack();` ✓
+> * ⭐⭐⭐ **为什么必须是独立关键字（⭐ 这是引擎自己记着的一段历史 ✓）**：⭐ `damage_is_attack` 的注释写着
+>   ⭐ *"⚠ `!` cannot express the guard（**negation is only for party conditions**）, so the guard is stated positively"* ✓；
+>   ⭐ 而 ⭐ `TriggerTable` 里还记着 ⭐ **把否定塞进那个关键字**的后果 ✗：
+>   ⭐ *"Was `!ctx.damage().isCountsAsAttack()`… a rule guarded by `damage_is_attack` fired on ADDITIONAL damage and never on a real attack —
+>   **cone 23008's energy clause read +0.0** because of it."* ✓ ⇒ ⭐⭐ **所以新关键字＝新的正面名字 ✓，⭐ 否定只住在它自己的名字下面 ✓**。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `DamageIsAdditionalTest`（⭐ **刻意两侧** ✓ —— ⭐ 单侧读法 ⭐ 一个"永远答同一个值"的条件也能满足 ✓）⇒
+>   ⭐ `[is_additional] before = 974.4986602055312 ; after an ADDITIONAL instance = 975.4986602055312 ; after an ORDINARY one = 975.4986602055312` ✓✓
+>   ⭐ **变异** ✓：⭐ 把判定取反 ✗ ⇒ ⭐ `after an ADDITIONAL = 975.49（未变） ; after an ORDINARY = 976.49（触发了）` ⇒ ⭐ **完全镜像** ⇒ 红 ✓。
+> * ⛔ **`1141515` 第二句：⭐ 本轮写了又回滚（⭐ 这是诚实的选择 ✓）**：⭐ 我写出的是 ⭐
+>   `on: DAMAGE_SETTLED` ＋ ⭐ `when: [actor == self, damage_is_additional]` ⇒ ⭐ `DAMAGE{times: 1, scale: "original_damage", percent: 1.0, element: "Ice", target: "target"}` ✓
+>   ⚠ **但它过宽** ✗：⭐ 原句的条件是 ⭐ *"触发**结界**的附加伤害时"* ✗，⭐ 而 ⭐ `damage_is_additional` ✗ ⭐ 对**任何**附加伤害都成立 ✗
+>   （⭐ 包括反击 ✗、⭐ 甚至真伤 ✓）⇒ ⭐ 按纪律 ⭐ **不写** ✓，⭐ 只留关键字 ✓。
+>   ⇒ ⭐⭐ **下一轮具名入口**：⭐ 一个"⭐ **这次附加伤害来自谁／来自哪个 rider**"的把手 ✗ ——
+>   ⭐ 候选：⭐ 按**施加者**（1415 ✓）⭐ 或 ⭐ 按 ⭐ **那条 rider 规则的 id** ✓；⭐ 而 ⭐ 引擎里 ⭐ `Damage` **已经带** ⭐ `attacker` ✓ ⭐ 与 ⭐ `castCategory` ✓
+>   ⇒ ⭐⭐ 也许 ⭐ 只差 ⭐ 一个"⭐ `actor == self` 之外的**来源**条件" ✗。
+> * ⚠ **我自己的坑**：⭐ 判据里写了 ⭐ `amount: 1` ✗ ⇒ ⭐ `EffectSpec.amount` 是 **`Double`** ✗（⭐ 这个坑我犯过不止一次 ✓）⇒ ⭐ 改成 `1.0` ✓；
+>   ⭐ 而且第一版判据里留了残渣 ✓（⭐ 未用的列表、⭐ 一句无意义的 `getTriggerTable()` ✓）⇒ ⭐ 重写干净 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2288** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
