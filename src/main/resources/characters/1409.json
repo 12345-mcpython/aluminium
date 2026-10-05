@@ -83,5 +83,41 @@
     ],
     "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**对风堇施放时，为风堇恢复 #2 点能量**。」",
     "note": "⭐ `#2` **随等级变**（**实测**：12 → 33.6）→ 走 `cast_skill_param:1`。⭐ 而 `GAIN_ENERGY` 本来**只收** `amount` 或 `target_max_energy` 的份额（**实测**：`ENERGY_SCALES = Set.of(\"target_max_energy\")`）—— **本轮给它加了第三种拼法**。"
+  },
+  {
+    "id": "casting_a_skill_spends_one_layer_of_the_sky_ode",
+    "on": "SKILL_CAST",
+    "when": [
+      "self has_state 献予「天空」之诗",
+      "from_skill_id == 2"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STACK",
+        "buff": "献予「天空」之诗",
+        "amount": 1,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**风堇施放战技后，消耗1层【献予「天空」之诗】**。」",
+    "note": "⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 `ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）—— 不发明一个“任一”拼法。⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。"
+  },
+  {
+    "id": "casting_the_ultimate_spends_one_layer_of_the_sky_ode",
+    "on": "ULT_CAST",
+    "when": [
+      "self has_state 献予「天空」之诗",
+      "from_skill_id == 3"
+    ],
+    "do": [
+      {
+        "op": "REMOVE_STACK",
+        "buff": "献予「天空」之诗",
+        "amount": 1,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**风堇施放终结技后，消耗1层【献予「天空」之诗】**。」",
+    "note": "⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 `ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）—— 不发明一个“任一”拼法。⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。  ⚠ 终结技要挂 `ULT_CAST`（2026-10-02 实测：`SkillExecutor` 里 `case ULTRA` 发的是 `ULT_CAST`，而战技才发 `SKILL_CAST`）。"
   }
 ]
