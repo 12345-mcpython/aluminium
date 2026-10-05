@@ -107,5 +107,24 @@
     ],
     "source": "1402 阿格莱雅 天赋: 「衣匠在场时，阿格莱雅施放攻击时使目标陷入【间隙织线】状态」",
     "note": "「**衣匠在场时**，阿格莱雅**施放攻击时使目标陷入【间隙织线】状态**」—— ① `on: DEALING_DAMAGE` ✓（\"施放攻击\"涵盖普攻/战技/终结技 ✓）；② 「衣匠在场时」用 **`self_summon_count >= 1`** ✓；③ 状态名 **抄自文档** ✓，且**施加**用 `APPLY_BUFF` ✓、**检查**用 `has_state` ✓ —— 第 69/270 轮的测试**已实测**两者是同一机制 ✓（用 `APPLY_BUFF` 施加的状态，`has_state` 能匹配 ✓）⇒ 天赋的前后两半**可以互相衔接** ✓；⚠ ④ **登记**：「**【间隙织线】仅对最新被施加的目标生效**」✗ —— 这是一条**唯一性**规则 ✓（新目标被标记时旧目标失去 ✓），现有词汇里**没有**表达它的方式 ✗ ⇒ **登记而不近似** ✓。\n\n⭐ 2026-09-30 转正：「【间隙织线】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE` 先把这个名字从**全体**摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ `TriggerInterpreter:2515` 的注释原话：*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half of 星期日的【蒙福者】*；⚠ 而 `1215` 的注记说得更直白：*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）—— 每次施放都会跑一遍。"
+  },
+  {
+    "id": "memosprite_ode_of_romance_marks_aglaea",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 14"
+    ],
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "浪漫",
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」：「**对阿格莱雅施放时，使阿格莱雅获得【浪漫】**」。",
+    "note": "★ `from_skill_id == 14` 是该技能的**数据槽位**（数据项 SkillID 1141514 ⇒ 槽位 14），与已出货的第五句同形。⚠ 原句的其余四部分（衣匠天赋叠层、攻击后消耗回能、伤害提高 #2%、无视目标 #3% 防御）**未写**，已逐条登记。"
   }
 ]

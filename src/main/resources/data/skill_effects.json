@@ -589,6 +589,11 @@
       "effect": "Rules",
       "source": "1415 昔涟's memosprite 德谬歌, 忆灵技能 8 'Ode to Strife' (tbgd: ServantID 11415, 效果 辅助, 效果ID [10000001, 10000011]): the skill itself delivers nothing -- its work is done by the rule table (dispel control-class debuffs on Mydei, command him to cast, or advance him), exactly the shape 1412's 奇袭 needed.",
       "note": "The third kind (`Rules`) is what a skill whose work is elsewhere uses; it has no parameter row to be ambiguous about. Keyed by the SERVANT's cid and the data slot, because SkillEffects.forSkill keys on the SKILL's own cid and slot."
+    },
+    "14": {
+      "effect": "Rules",
+      "source": "1415 昔涟 忆灵技能 12 (数据槽位 14, SkillID 1141514, SkillTriggerKey SkillCY02): 「单次生效，对阿格莱雅施放时，使阿格莱雅获得【浪漫】…」它的工作在**规则侧**，所以是 `Rules` 形状。",
+      "note": "⭐ 没有条目就不可交付（`SkillExecutor.canDeliver`），而整条忆灵技能就永远施放不了。"
     }
   }
 }
