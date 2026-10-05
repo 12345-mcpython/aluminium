@@ -78,6 +78,8 @@ public class WaveManager {
             return false;
         }
         waveIndex++;
+        // Before the spawn, not at `beginWave()`: that runs AFTER it and would erase the wave that just arrived.
+        battle.forgetWaveMonsters();
         spawnWave(waveIndex);
         // \u2605 The wave is on the field: tell the tables (cones 23011 / 23064 grant per-wave effects). Fired with no actor
         // and no subject, exactly like BATTLE_START -- a wave is a fact about the battle, not about one unit. Before
@@ -139,6 +141,7 @@ public class WaveManager {
     private void spawnWave(int index) {
         for (int monsterId : stage.monsterIds(index)) {
             Enemy enemy = EnemyFactory.create(monsterId, stage.level(), stage.hardLevelGroup());
+            battle.noteWaveMonster(enemy);
             battle.enemies.add(enemy);
             battle.addRequestItems.add(enemy);           // processRequests pushes it into the action bar
         }

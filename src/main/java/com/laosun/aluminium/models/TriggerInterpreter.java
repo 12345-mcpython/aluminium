@@ -161,6 +161,9 @@ public final class TriggerInterpreter {
             "random_enemy", "random_hit_enemy",
             // \u2b50 \u300c\u5728**\u4e00\u6b21\u884c\u52a8**\u4e2d\u53d7\u5230\u81f4\u547d\u653b\u51fb\u7684**\u5168\u4f53**\u300d (1407 \u6708\u8309\u4e4b\u5e87): the allies a lethal blow has landed on since
             // this action began. A SET, not a unit -- hence the `all_` prefix, like `all_allies`.
+            // The game spells this as an EVENT, `OnWaveMonster`, so the selector is named after it -- an enemy
+            // that entered with the current wave.
+            "wave_monsters",
             "all_allies_lethally_hit_this_action",
             // ⭐ 「随机为 1 个当前能量百分比小于 50% 的我方其他目标」 (light cone 21021). ⚠ The 50%
             // threshold is the text’s own and no tier changes it, so it is in the method and registered there.
@@ -1689,6 +1692,14 @@ public final class TriggerInterpreter {
         if (selector.startsWith(HOLDER_OF_PREFIX)) {
             return holderOf(battle, effect.getTarget(), ctx);
         }
+        if ("wave_monsters".equals(selector)) {
+            if (battle == null) {
+                throw new IllegalStateException(
+                        "Effect targets \"wave_monsters\" but no battle was supplied to read the current wave");
+            }
+            return battle.waveMonsters();
+        }
+
         if ("all_allies_lethally_hit_this_action".equals(selector)) {
             if (battle == null) {
                 throw new IllegalStateException(
