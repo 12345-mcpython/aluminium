@@ -37101,3 +37101,22 @@
 > * ⚠ **我自己的坑**：⭐ 判据里写了 ⭐ `amount: 1` ✗ ⇒ ⭐ `EffectSpec.amount` 是 **`Double`** ✗（⭐ 这个坑我犯过不止一次 ✓）⇒ ⭐ 改成 `1.0` ✓；
 >   ⭐ 而且第一版判据里留了残渣 ✓（⭐ 未用的列表、⭐ 一句无意义的 `getTriggerTable()` ✓）⇒ ⭐ 重写干净 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2288** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 29 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但 `1141515` 第二句的阻断**移到了缇宝自己的表上** ✓，⭐ 而且"来源"的把手现成 ✓）**）**：
+>
+> * ⭐⭐⭐ **先说好消息：`Damage` 已经带**来源** ✓** —— ⭐ 它的字段是 ⭐ `attacker` ✓、⭐ `defender` ✓、⭐ `element` ✓、⭐ `type` ✓、
+>   ⭐ `skillBaseValue` ✓、⭐ `castCategory` ✓、⭐ **`skillKey`** ✓（⭐ 注释：⭐ *"…with the skill -- which is what 「强化普攻命中后使目标…」 needs"* ✓）⇒
+>   ⭐⭐ **所以"这次伤害是哪个技能造成的"是可寻址的** ✓。
+> * ⭐⭐ **而阻断不在那句诗上，在缇宝自己的表上** ✗：⭐ `1403.json` 有 10 条规则 ✓，⭐ 其中与"结界／追加攻击"有关的三条是：
+>   ⭐ `talent_followup_on_other_ult` ✓ —— ⭐ `on: ULT_CAST` ⇒ ⭐ `DAMAGE{scale: "owner_max_hp", percent: 0.18}` ✓（⭐ **他的追加攻击** ✓）；
+>   ⭐ `ult_zone_enemy_vulnerability` ✓ —— ⭐ `on: ULT_CAST` ⇒ ⭐ **`MODIFY_DAMAGE_TAKEN`** ✗（⭐ 那是**易伤** ✓，⭐ **不是**附加伤害 ✗）；
+>   ⭐ `trace_damage_boost_after_followup` ✓ —— ⭐ `on: FOLLOW_UP` ⇒ ⭐ `MODIFY_ATTR` ✓。
+>   ⇒ ⭐⭐ **原句说的「缇宝的结界的<u>附加伤害</u>」在我们内容里不存在** ✗ —— ⭐ 他的结界只有**易伤** ✓。
+> * ⭐ **因此第二句的链条是**：⭐ ① 先要有 ⭐ **缇宝结界的那笔附加伤害** ✗（⭐ 这是**他**的表上缺的一条内容 ✓，⭐ 不是那句诗的 ✓）；
+>   ⭐ ② 然后 ⭐ 那句诗 ⭐ 才能 ⭐ `on: DAMAGE_SETTLED` ＋ ⭐ **按来源**（⭐ `skillKey` ✓ 或 ⭐ `attacker` ✓）⭐ 认出**正是那一笔** ✗，⭐ 再 ⭐ `DAMAGE{times: 1, scale: "original_damage", …}` ✓。
+> * ⭐ **下一轮的入口（已具名 ✓）**：⭐ 从 tbgd 读 ⭐ **缇宝终结技与天赋的原话** ✗（⚠ 我那两张表的字段名猜错了 ✓ ——
+>   ⭐ `AvatarSkillConfig` 里没有 `AvatarID`／`SkillType` 这两个名字 ✗ ⇒ ⭐ 先用 ⭐ **已有的 1403.json 的 `source` 字段** ✓ 反查它的技能 id ✓，
+>   ⭐ 或 ⭐ 直接按 ⭐ **skill id** 前缀 ⭐ `1403` ✓ 过滤 ✓ —— ⭐ 这一步只需一次读 ✓）。
+> * ⚠ **我自己的坑**：⭐ 我按"⭐ 猜的字段名"去查表 ✗（⭐ `AvatarID`／`SkillType` ✓）⇒ ⭐ 0 行 ✓，⭐ 白花一次调用 ✓
+>   ⇒ ⭐⭐ **教训：⭐ 读 ExcelOutput 的表，⭐ 先看它的**列名**（⭐ 一行 `list(row.keys())` 就够 ✓），⭐ 别按印象写 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2288** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
