@@ -309,6 +309,48 @@
       ],
       "source": "1415 昔涟 忆灵技能 8 「献予「纷争」之诗」（数据槽位 16，SkillID 1141516）：「对万敌施放时**解除万敌陷入的所有控制类负面状态**」。（本条不带量：原句的「**所有**」不说数量，而 `kind` 单独出现即表示“该类全部”。）",
       "note": "★ 本轮给 `DISPEL` 加了**类别过滤**：它之前只能移除最近的 N 个，而类别是状态自己的属性`AbstractBuff.debuffClass()`。词汇本来就有（条件 `debuff_class:control`，以及 `RESIST_DEBUFF` 的 `kind`）。"
+    },
+    {
+      "id": "memosprite_ode_marks_him_for_the_battle",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 16"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "献予「纷争」之诗",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 8（数据槽位 16）：那句把状态挂在他身上的部分。（对应 tbgd 的 `MServant_CyreneServant_00_AmazingBuff_Mydeimos`：一个持续到战斗结束的 modifier。）",
+      "note": "★ 持久（`permanent: true`），因为它是“这句话还在他身上”这个事实本身。"
+    },
+    {
+      "id": "memosprite_ode_restrikes_when_a_wave_monster_enters",
+      "on": "WAVE_START",
+      "when": [
+        "self has_state 献予「纷争」之诗"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "SKILL",
+          "skill_id": 11,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 8：「若施放前目标被消灭则对**新入场**的敌方目标施放」。（tbgd 里它就是 `OnWaveMonster` ⇒ `TurnInsertAction{TargetType: ModifierOwnerEntity, AutoCast: true}`：有波次怪物入场，则**他自己**再行动一次；打谁是**技能自己**的事。）",
+      "note": "⚠ 本条只写了原句里**能被证实**的那半：「对**新入场**的敌方目标施放」。❗「若施放前**目标被消灭**」那半**没写** ✗：游戏的谓词是 `ByTargetAliveState{ModifierOwnerEntity}`（看的是**万敌自己**还在不在），而不是看某个敌人死没死 ✗。"
     }
   ]
 }
