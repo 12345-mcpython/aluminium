@@ -187,6 +187,25 @@
       ],
       "source": "1415 昔涟 忆灵技能 24 「献予「岁月」之诗」（数据槽位 24，SkillID 1141524）：「整场生效，对**长夜月**施放后，**「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%**」—— 本条只做**捕获**（把 #1 存成基点），下一条在伤害时用它。",
       "note": "⭐ 为什么要捕获：该数字在 24 号行里，而忆灵技能行**任何份额拼法都读不到**（`Summon` 按 `int` 数据槽位存）；但**施放那一刻**读得到（`castParamValue` 走 actor）。⭐ 而 `#1` 是个**小于 1 的份额**（0.09 → 0.252）而资源是整数 ⇒ 存**基点**（`percent: 10000`）。"
+    },
+    {
+      "id": "time_ode_boosts_the_memosprite_dream_skill",
+      "on": "DAMAGE_SETTLED",
+      "when": [
+        "actor is_ally",
+        "damage_skill_key == 7"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent_from_resource": "长夜的迷梦增伤",
+          "permanent": true,
+          "target": "attacker"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 24：「「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%」。",
+      "note": "⭐ **实测**：`DAMAGE_SETTLED` 是**广播**（不带 `skillId`，所以 `from_skill_id` 在它上是 0），而 `DEALING_DAMAGE` 只送到**攻击者**的表（主人表收不到）。两边都不行 ⇒ 本轮加了条件 `damage_skill_key`（读事件已携带的 `Damage.getSkillKey()`，文档原话：“the loader's slot”）⇒ 在 `DAMAGE_SETTLED` 上精确限定到 7 号。⭐ 而份额用 `percent_from_resource` 读回捕获的基点（捕获那条已出货）。  ⚠ 门换成 `actor is_ally`（2026-10-02）：探针实测过它在 DAMAGE_SETTLED 上会发（读到 1），而 `actor is_summon` 在这里未命中。  ⭐ 目标改成 `attacker`（2026-10-02 实测）：`target: \"summon\"` 在这里**解析不到任何单位**（探针读到 0），而造成这次伤害的 actor **就是那个忆灵** ⇒ 更精确。"
     }
   ],
   "resources": [

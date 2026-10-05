@@ -872,7 +872,7 @@ public class TriggerTable {
      */
     private static final Set<String> NUMERIC_VARIABLES =
             Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
-                    "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id", "target_dot_count",
+                    "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id", "damage_skill_key", "target_dot_count",
             "actor_hp_percent");
 
     /**
@@ -3460,6 +3460,13 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 // 「强化普攻命中…」: the DATA ROW of the skill that produced this event (0 = the event named none, which
                 // makes the comparison false rather than accidentally true for the row 0 that no skill has).
                 case "from_skill_id" -> ctx.skillId();
+            // ⭐ The skill that produced a SETTLED damage (2026-10-02): `DAMAGE_SETTLED` hands over the `Damage` but goes through the overload WITHOUT a
+            // skillId, so `from_skill_id` reads 0 there -- measured, a rule that fires ungated stops firing the moment `from_skill_id == 7` is added. The
+            // instance carries it (`Damage.getSkillKey()`, "the loader's slot"), so this reads it where the event provides nothing.
+            case "damage_skill_key" -> {
+                com.laosun.aluminium.models.Damage hit = ctx.damage();
+                yield hit == null ? 0 : hit.getSkillKey();
+            }
                 case "hp_percent" -> hpPercent(ctx.owner());
                 case "target_weakness_count" -> ctx.target() instanceof com.laosun.aluminium.models.enemy.Enemy weak
                             ? weak.weaknessCount() : 0;

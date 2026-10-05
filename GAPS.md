@@ -2457,3 +2457,15 @@
   - ② 同一条加上 `from_skill_id == 7` ⇒ **0** ✗；换成**数据行 id** `1141307` ⇒ **仍是 0** ✗。
   ⭐⭐ **所以 `from_skill_id` 在伤害事件上装的既不是数据槽位、也不是数据行 id** ✗ —— 而这**同时解释了第 80 轮 `DEALING_DAMAGE` 那次失败**（当时也是按 7 做门）。
   - ⭐ **下一问**：把 `from_skill_id` 在 `DAMAGE_SETTLED` 上**实际装的值**量出来（例如逐个候选值探，或用一条把它记进资源的规则）—— 一旦知道，加成半句就能**精确**落地。
+
+- ✅ **已出货（2026-10-02，第 132 件）：`1141524` 第一句**整句成句** ——
+  「对长夜月施放后，「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%」。
+  ⭐ 两半：① 施放时**捕获** #1（基点）；② 她忆灵的 **7 号**伤害结算时用 `percent_from_resource` 加成。
+  ⭐ 新增条件 **`damage_skill_key`**（读事件已携带的 `Damage.getSkillKey()`，文档原话 “the loader's slot”）。
+  判据 `TimeOdeBoostTest`：`row value 0.252 ; captured 2520.0 ; boost 0.252`；变异（改盯 6 号）⇒ `boost 0.0` ⇒ 红 ✓。
+- ⭐⭐⭐ **五条新事实（第 80–82 轮实测）**：
+  1. `DAMAGE_SETTLED` 是**广播**，但走**不带 `skillId`** 的重载 ⇒ **`from_skill_id` 在它上恒为 0**；
+  2. `DEALING_DAMAGE` **只送到攻击者**的表 ⇒ 主人表收不到忆灵的伤害；
+  3. `Damage.getSkillKey()` = “**装载器的槽位**”，而结算事件**也携带**那个 `Damage` ⇒ 新条件能读到它；
+  4. `target: "summon"` 在这条路上**解析不到单位**（探针 0），而 **`attacker`** 精确且有效；
+  5. **加一个条件名要改五处**：`TriggerTable` 的 switch、它的闭集、`UnitDisciplineTest` 的 `KNOWN`、以及文档（★ 而那道数值纪律测试会**主动拓到**漏掉）。
