@@ -389,3 +389,16 @@
   `DEFENCE_IGNORE`（`defence_ignore`）、`RESISTANCE_REDUCTION` ⇒ **槽位 20 的后两句“防御力降低 10%/6%”是表达得出来的**
   （`MODIFY_ATTR{attribute: DEFENCE_PERCENT, percent: 负值}`）；而否定条件（`!target has_state 老主顾`）也早已出货。
   ⭐ **下一步**：在 `1406.json` 里写两条（老主顾 −10%、其余 −6%），并用敌人的 `DEFENCE_PERCENT` 做判据。
+
+- ✅ **已出货（2026-10-02，第 151 件）：槽位 20（**诡计**）的**后两句**成句 ⇒ **诡计三句齐**：
+  「…并使**【老主顾】的防御力降低 #2(10)%**，**【老主顾】以外的敌方目标的防御力降低 #3(6)%**」。
+  ⭐ 内容：**两条规则写在 `1406.json`（赛飞儿自己的文件）**，而“只对带【老主顾】的目标”用 **`target_when`**（脚本抄自 `1106.json`）。
+  判据 `TrickeryOdeDefenceTest`：`the marked one's defence fell 0.1 ; the unmarked one's 0.0600000000000001`；
+  变异（B 的 -6% → -12%）⇒ `unmarked 0.12` ⇒ **红** ✓（A 的 -10% → -20% 同样红）。
+- ⭐⭐ **一条重要新事实（第 117 轮）**：⭐ **拿掉 `target_when` 不会改变读数**（变异没咬）——
+  因为**同属性修正互相替换**（后落的赢），两条规则都命中时只剩一个值 ⇒
+  **判据能测“数值”，而测不到“条件本身”**；要测条件，必须让两条规则命中的**属性不同**。
+- ⭐⭐ **两条惯用法确认**：
+  1. 「对某角色」⇒ 规则写在**该角色自己的文件**里，`when: ["target == self", "actor is_summon", "from_skill_id == N"]`；
+  2. **逐目标条件** = `target_when: ["target has_state …"]`（脚本在 `1106.json`）。
+- ⭐ 而 `Character` 取技能是 **`getSkills().get(SkillType.X)`**（**不是** `skillAt`，那是 `Summon` 的）。
