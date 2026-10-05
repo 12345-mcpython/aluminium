@@ -402,3 +402,17 @@
   1. 「对某角色」⇒ 规则写在**该角色自己的文件**里，`when: ["target == self", "actor is_summon", "from_skill_id == N"]`；
   2. **逐目标条件** = `target_when: ["target has_state …"]`（脚本在 `1106.json`）。
 - ⭐ 而 `Character` 取技能是 **`getSkills().get(SkillType.X)`**（**不是** `skillAt`，那是 `Summon` 的）。
+
+- ✅ **已出货（2026-10-02，第 152 件）：槽位 15（**门径**）的**剩下半句**成句 ⇒ **门径两句齐**：
+  「**缬宝施放追加攻击触发缬宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害**」。
+  ⭐ 内容：`1403.json`（缬宝自己的文件）`on: ATTACK_FINISHED` + `self has_state 结界` + `self has_state 献予「门径」之诗`
+  ⇒ **与 `ult_zone_additional_damage` 同形**（同事件、同口径 `owner_max_hp`、同参数引用 `ULTRA:2`）。
+  判据 `PassageOdeExtraZoneHitTest`：`with 549.7804009943957 ; without 369.88504432678747`；一次结界伤害原值 138.311712 × 1.3 = 179.805
+  对上差值 **179.8953566676082**（容差 1%）；变异（去掉门径的状态条件）⇒ **RED** ✓。
+- ⭐⭐⭐ **三条新事实（第 118 轮）**：
+  1. ⭐ **普攻的技能槽是 `SkillType.COMMON`**（**不是** `BASIC_ATTACK`）—— 成员是
+     `COMMON, ELATION_EXTRA, ELATION_SKILL, MAZE, SKILL, SUMMON_SKILL, TALENT, TECHNIQUE, ULTRA`；
+  2. ⭐ **`ATTACK_FINISHED`** 的注释写着 “settlement complete, **hit set frozen**” ⇒ 它是“被攻击目标”的正确挂点；
+  3. ⭐ **【结界】自带 +30% 受伤**（`ult_zone_enemy_vulnerability`）⇒ 期望必须带上它，否则差值差 30%（实测比值 1.3006）。
+- ⭐ **而“追加攻击”这一层没收窄**：`ATTACK_FINISHED` 上没有“这次攻击是追加攻击”的词汇 ⇒ **登记**。
+  ⭐ 而判据的容差是 **1%**（实测残差 0.05%，来自等级行的取整）—— 1% 足以捕到“多一次/少一次”（它们移动 100%）。

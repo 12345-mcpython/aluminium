@@ -225,5 +225,24 @@
     ],
     "source": "1403 缇宝 终结技 (140303)：「受到我方目标攻击后，**每有 1 名目标受到攻击**，会对**被攻击目标中当前生命值最高的目标**造成 1 次**等同于缇宝 #3% 生命上限**的量子属性附加伤害。」",
     "note": "⭐ 挂 `ATTACK_FINISHED`：它的注释写着 “settlement complete, **hit set frozen**” —— 正是本句要的“被攻击目标”集合，而且它**存在**。⭐ `scale` 是 `owner_max_hp`（`self_attr:HEALTH` 不在 DAMAGE 字面量路径认的集里，静默算成 1.0，**实测**）。"
+  },
+  {
+    "id": "passage_ode_adds_one_more_zone_hit",
+    "on": "ATTACK_FINISHED",
+    "when": [
+      "self has_state 结界",
+      "self has_state 献予「门径」之诗"
+    ],
+    "do": [
+      {
+        "op": "DAMAGE",
+        "scale": "owner_max_hp",
+        "percent_from_skill_param": "ULTRA:2",
+        "element": "Quantum",
+        "target": "highest_hp_attack_hit"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 15 「献予「门径」之诗」（SkillID 1141515，`SkillCY03`，参数 `[1, 0.06, 3]`）：「…**缬宝施放追加攻击触发缬宝的结界的附加伤害时，会额外造成 #1 次附加伤害**」（#1 = 1）。",
+    "note": "⭐ **为何与结界那条同形**：“额外造成 1 次附加伤害”就是**再来一次结界的附加伤害**（`ult_zone_additional_damage` 的同一事件、同一口径、同一参数引用）。⭐ 而门径自己那条已经给她挂了 `献予「门径」之诗`，所以条件可靠。⚠ **而“追加攻击”这一层没收窄**（`ATTACK_FINISHED` 上没有“这次攻击是追加攻击”的词汇）—— **登记**。"
   }
 ]
