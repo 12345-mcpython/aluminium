@@ -35437,3 +35437,16 @@
 > * ⭐ **下一问（有现成先例）**：抄 `Cone21026Test` 的 `settled(which)`（注释：“0 = clean, 1 = 灼烧, 2 = 裂伤, 3 = both”）
 >   —— **“给敌人上灼烧”在本仓库里已有现成做法**。
 > * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（第 85 轮：🎉 **第 133 件出货 ＝ `1141522` 最后一句整句成句** ✓ —— ⭐⭐ 「献予「海洋」之诗」**四句全部成句**）**：
+>
+> * ✅ **判据读数**：`[ocean_tick] the enemy loses 107.2 from the basic-attack half (0.3) ; 142.93 from the skill half (0.4) ; 1.0 with no ode` ✓✓
+>   ⇒ ⭐ **份额大的那半咬得更狠** —— 这正是句子的主张（即时伤害是“捕获到的那个份额”的份额）；
+>   ⭐ **变异**（两个已捕获份额对调）⇒ 两个数字互换 ⇒ 红 ✓。
+> * ⭐⭐ **两条新事实**：
+>   1. **判据里给敌人上 DoT 的出货做法**：`enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3))`（抄 `Cone21026Test`）
+>      —— 靠 `APPLY_DOT` 规则**上不上去**（两轮的探针都读到 `灼烧 = false`）；
+>   2. **`ContentDuplicateGuardTest` 的签名里原本没有 `element`** ⇒ 一元素一条的 tick 规则被读成重复
+>      ⇒ 已把 `element` 加进操作数清单（**改进守卫**，不是放宽）。
+> * ⭐ **引擎加固累计**（都是新份额拼法暴露的）：`requirePercent`、`requireNonZeroPercent`、**`tickDot`**（改用 `shareOf`）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks，**2311** 例）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

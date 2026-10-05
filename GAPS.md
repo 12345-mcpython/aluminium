@@ -2487,3 +2487,14 @@
   ⭐ **下一问（有现成先例）**：抄 `src/test/java/…/Cone21026Test.java` 的 `settled(which)`（它的注释写着
   “0 = clean, 1 = 灼烧, 2 = 裂伤, 3 = both”）—— 说明**“给敌人上灼烧”在本仓库里已有现成做法**。
 - ⭐ 而内容（21 条规则，含 **14 条 `TICK_DOT`**）**加载通过** ✓ —— 只是未证 ⇒ 回滚。下一轮：先把判据的灼烧做对，再把内容拿回来。
+
+- ✅ **已出货（2026-10-02，第 133 件）：`1141522` 最后一句整句成句 ⇒ ⭐⭐ **「献予「海洋」之诗」四句全部成句** ✓✓。
+  ⭐ 两半：① 施放时捕获两个份额（`#2` 给普攻 0.3、`#3` 给战技 0.4，基点）；
+  ② 她普攻/战技命中后，对目标**每个元素一条** `TICK_DOT`（共 14 条）用 `percent_from_resource` 立即结算。
+  判据 `OceanOdeTickDotTest`：`107.2 from the basic-attack half (0.3) ; 142.93 from the skill half (0.4) ; 1.0 with no ode` ✓✓；
+  变异（两个份额对调）⇒ 数字互换 ⇒ 红 ✓。
+- ⭐⭐ **两条新事实（第 83–85 轮，花了两轮才学到）**：
+  1. **判据里给敌人上 DoT 的出货做法**：`enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3))`
+     （抄 `Cone21026Test`）—— 靠 `APPLY_DOT` 规则去上它**不成**（探针：`灼烧 = false`）。
+  2. **`ContentDuplicateGuardTest` 的签名里原本没有 `element`** ⇒ 一元素一条的 DoT 规则被读成“同一句写两遍”。
+     已把 `element` 加进它的操作数清单（**改进守卫**：火 tick 与冰 tick 本就是不同效果）。
