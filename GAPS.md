@@ -2544,3 +2544,19 @@
      铸她的战技会抛 `DELEGATE_DAMAGE names ULTRA (slot 3) but the cast in progress is slot 2` —— **本条与本轮句子无关**，已单独登记。
 - ⭐ **第 88 轮那次事故的正确做法已验证**：先把 `gainResource` **整个梯子**（L1470–1516）读出来，
   再把那一行 `} else if (isCastParamScale(effect)) {` **整行换成** `} else if (getAmountFromResource() != null) { … } else if (isCastParamScale(effect)) {` —— 形状平衡，一次编译通过。
+
+- ⭐⭐⭐ **第 90 轮：`1141524` 第三句的**形状完全查清了**（下一轮可直接落）**：
+  - 原句：「长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 `#3%`」（`#3 = 0.06`）。
+  - ⭐ **`MODIFY_RULE` 正好就是这件事**（已出货）：`} else if (effect.getEffectPercent() != null) {` ——
+    注释原话：*"「天赋的伤害提高效果额外提高 10%」: 30% -> 40%, the same rule, raised in place"*，
+    调用 `owner.amendRuleEffectPercent(target, effect.getEffectPercent())` ⇒ 拼法：**`MODIFY_RULE{rule: <id>, effect_percent: #3}`**。
+    ⭐ 数学上正好：`(0.264 + 0.06) × CD` = `0.264 × CD + 0.06 × CD`。
+  - ⭐ **前提那个“效果”的原话**（`AvatarSkillConfig.json` 的 `141302`「白昼悄然离去」）：
+    「消耗长夜月当前 `#6%` 的生命值**召唤**忆灵「长夜」，并**使我方全体忆灵的暴击伤害提高，
+    提高数值等同于长夜月暴击伤害的 `#1%`**，持续 `#2` 回合…」（`#1`: **0.12 → 0.264**）。
+    ⭐ 能力侧的机制（`Avatar_Evernight_00_Ability.json`）：块名 **`MAvatar_Evernight_00_Skill02_Buff_PointB3`**，
+    走 `CriticalDamageBase` → `MDF_CritBase` → `StackProperty … CriticalDamageConvert`。
+  - ⛔ **而它尚未建模**（我们 `1413.json` 的 16 条里没有任何 CRIT 规则），且它的目标是“**我方全体忆灵**”——
+    而第 82 轮实测过 **`target: "summon"` 解析不到任何单位**。
+  - ⭐ **下一步两件**：① 先给她战技建一条可被 `MODIFY_RULE` 寻得到的暴伤规则（需先解决“全体忆灵”选择器）；
+    ② 再用 `MODIFY_RULE{rule: …, effect_percent: #3}` 落第三句。
