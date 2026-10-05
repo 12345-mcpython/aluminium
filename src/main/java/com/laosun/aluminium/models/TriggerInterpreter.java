@@ -496,7 +496,8 @@ public final class TriggerInterpreter {
                     requirePercent(effect, op, spec);
                 // ⚠ `percent_from_cast_param` is a SECOND way to state the share (2026-10-02): a share from the cast skill with
                 // no `scale` is exactly as well-formed as one with `percent`, and this check used to call it "neither".
-                } else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null)
+                } else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null
+                        && effect.getPercentFromSkillParam() == null)
                         == (effect.getAmount() == null)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs exactly one of \"percent\" (a share) or \"amount\" (a flat value) unless it also states a \"scale\", in which "
@@ -1263,11 +1264,17 @@ public final class TriggerInterpreter {
                 // ⭐ 「每消耗 1 点…额外 1 次」 (2026-10-02): the repeat count can follow the event.
                 int times = effect.getTimes() == null ? 1 : effect.getTimes();
                 if (effect.getTimesFrom() != null) {
-                    if (!"event_amount".equals(effect.getTimesFrom().trim())) {
+                    String from = effect.getTimesFrom().trim();
+                    if ("event_amount".equals(from)) {
+                        times = (int) Math.abs(ctx.amount());
+                    } else if ("hit_count".equals(from)) {
+                        // ⭐ 「每有 1 名目标受到攻击，会…造成 1 次」 (2026-10-02; reader: 1403 缇宝's zone rider): the repeat count is how many
+                        // targets this attack connected with. It belongs HERE and not in `per_target`, which multiplies a magnitude.
+                        times = Math.max(0, ctx.hitCount());
+                    } else {
                         throw new IllegalStateException("times_from '" + effect.getTimesFrom()
-                                + "' is not a spelling this engine has: only \"event_amount\"");
+                                + "' is not a spelling this engine has: only \"event_amount\" and \"hit_count\"");
                     }
-                    times = (int) Math.abs(ctx.amount());
                     if (times <= 0) {
                         return;
                     }
@@ -2444,8 +2451,14 @@ public final class TriggerInterpreter {
      * the slot the scale names. Same row lookup (`getData().getSkills()` at `skillLevel`, then the index), so the two cannot drift.
      */
     private static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx) {
+        return ownerSkillParamValue(effect, ctx,
+                effect.getScale().trim().substring(TriggerTable.SKILL_PARAM_PREFIX.length()));
+    }
+
+    /** The same read, for a caller that spells the slot itself (`percent_from_skill_param`). */
+    private static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
         Character owner = requireCharacterOwner(effect, ctx);
-        String[] parts = effect.getScale().trim().substring(TriggerTable.SKILL_PARAM_PREFIX.length()).split(":", 2);
+        String[] parts = spelled.split(":", 2);
         int index = Integer.parseInt(parts[1].trim());
         SkillType slot = SkillType.valueOf(parts[0].trim().toUpperCase(Locale.ROOT));
         Skill named = owner.getSkills().get(slot);
@@ -2499,6 +2512,10 @@ public final class TriggerInterpreter {
     private static double shareOf(EffectSpec effect, TriggerContext ctx) {
         if (effect.getPercent() != null) {
             return effect.getPercent();
+        }
+        if (effect.getPercentFromSkillParam() != null) {
+            // ⭐ The share out of one of the owner's OWN skills (2026-10-02): 「等同于缇宝 #3% 生命上限」, where #3 lives in HIS ultimate.
+            return ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim());
         }
         String spelled = effect.getPercentFromCastParam() == null ? null
                 : String.valueOf(effect.getPercentFromCastParam());
@@ -4200,6 +4217,15 @@ public final class TriggerInterpreter {
     }
 
     private static void requirePercent(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getPercentFromSkillParam() != null) {
+            if (effect.getPercent() != null || effect.getPercentFromCastParam() != null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states more than one share (\"percent\" / \"percent_from_cast_param\" / "
+                                + "\"percent_from_skill_param\"); the share comes from exactly one of them (source: "
+                                + spec.getSource() + ")");
+            }
+            return;
+        }
         if (effect.getPercentFromCastParam() != null) {
             if (effect.getPercent() != null) {
                 throw new IllegalArgumentException(

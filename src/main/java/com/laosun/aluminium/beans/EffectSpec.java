@@ -75,6 +75,7 @@ public class EffectSpec {
         copy.skill = this.skill;
         copy.damageParam = this.damageParam;
         copy.percentFromCastParam = this.percentFromCastParam;
+        copy.percentFromSkillParam = this.percentFromSkillParam;
         copy.damageLevel = this.damageLevel;
         copy.asAttack = this.asAttack;
         copy.rule = this.rule;
@@ -571,6 +572,15 @@ return copy;
      * {@code percent} may be stated. ⚠ It exists because some sentences multiply a skill parameter BY an attribute
      * ({@code "scale": "summon_attr:HEALTH"}), and a single {@code scale} can only name one factor.
      */
+    /**
+     * The share itself, read from one of the RULE OWNER's OWN skills as {@code "<SKILLTYPE>:<index>"} (2026-10-02).
+     *
+     * <p>The sibling of {@link #percentFromCastParam}: that one reads the skill that produced the event, this one reads a slot the rule names -- which is
+     * what 「造成 1 次等同于缇宝 #3% 生命上限的…附加伤害」 needs, since #3 belongs to his ULTIMATE while the rider hangs on somebody else's attack.
+     */
+    @SerializedName("percent_from_skill_param")
+    private String percentFromSkillParam;
+
     @SerializedName("percent_from_cast_param")
     private Integer percentFromCastParam;
 

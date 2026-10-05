@@ -37209,3 +37209,30 @@
 >   ⭐ 但 ⭐ `DAMAGE` **拒绝** ⭐ `times` 与 ⭐ `per_target` **同时给** ✗（⭐ 注释：⭐ "one repeats the whole settlement and the other multiplies a single one, so the pair has two readings" ✓）
 >   ⇒ ⭐⭐ **所以要么全不给**（⭐ 让它按目标各一次 ✓）**要么用 `times_from`** ✗ ⇒ ⭐ 下一轮读那段注释再定 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2292** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 34 轮：⚠ **内容全部回滚** ✗ —— ⭐ 但 **两件引擎能力落地** ✓ ＋ ⭐ **三个关键事实量到** ✓，
+> ⭐ 其中一个是引擎**抓住**的递归 ✓）**）**：
+>
+> * ✅ **落地的引擎能力（⚠ 本轮**还没有判据** ⇒ 下一轮**先**给它们各配判据 ✓）**：
+>   ⭐ ① ⭐ **`percent_from_skill_param: "<SKILLTYPE>:<index>"`** ✓ —— ⭐ **占比**取自 ⭐ **持有者自己的**技能 ✓，
+>     ⭐ 是 ⭐ `percent_from_cast_param` 的**兄弟** ✓（⭐ 后者读的是 ⭐ **造成事件的那个技能** ✗）；⭐ `shareOf` ✓ ＋ ⭐ `requirePercent` ✓
+>     ＋ ⭐ "⭐ 恰好一个 share" 的检查 ✓ 都接上了 ✓；
+>   ⭐ ② ⭐ **`times_from: "hit_count"`** ✓ —— ⭐ 次数 ＝ ⭐ **这次攻击命中的目标数** ✓（⭐ `ctx.hitCount()` ✓）。
+>     ⚠ 为什么不是 ⭐ `per_target` ✗：⭐ 它是**幅度乘数** ✗ —— ⭐ 引擎自己的代码 ⭐ `amount * ctx.hitCount()` ✓；
+>     ⭐ 所以 ⭐ `DAMAGE` **拒绝** ⭐ `times` 与 ⭐ `per_target` 同时出现 ✓ 是有道理的 ✓。
+> * ⭐⭐⭐ **本轮最重要的发现（⭐ 引擎抓住的 ✓）**：⭐ 那句诗的 rider ⭐ **自己递归** ✗ ——
+>   ⭐ `Trigger recursion exceeded 8 levels while firing DEALING_DAMAGE; a trigger table is probably reacting to its own effect` ✓✓
+>   ⇒ ⭐ 它挂在 ⭐ `DAMAGE_SETTLED` ＋ ⭐ `damage_is_additional` ✗，⭐ 而 ⭐ 它造成的**新实例本身也是附加伤害** ✗ ⇒ ⭐ **永远** ✗
+>   ⇒ ⭐⭐ **正是 ⭐ `damage_is_attack` 的文档预言的** ✓：⭐ *"a rule that reacts to 'my attack hit a burning target' would react to its own
+>   additional damage, **forever**"* ✓✓ ⇒ ⭐⭐ **下一轮第一问：⭐ 一个"排除我自己刚造的那个实例"的门** ✗ ——
+>   ⚠ 而 ⭐ `from_rule` ✗ **不是它** ✗（⭐ 它的文档：⭐ *"The `from_rule` qualifier of **`has_shield`**"* ✗ ⇒ ⭐ 只是 `has_shield` 的限定词 ✓）。
+> * ⭐⭐ **第二个发现：缇宝那条结界 rider 太急** ✗ —— ⭐ 门是 ⭐ "⭐ 结界开着" ✗、⭐ 事件是 ⭐ `ALLY_ATTACK` ✗ ⇒ ⭐ **每一次友方攻击**都开火 ✗，
+>   ⭐ 哪怕 ⭐ **没有命中集** ✗ ⇒ ⭐ 选择器**响亮抛错** ✗ ✓ ⇒ ⭐ 四个红：⭐ `TribbieZoneStateTest`／⭐ `TrinnonZoneTest` ✗（⭐ 选择器抛错 ✓）
+>   ＋ ⭐ `RelicTriggerTableTest`／⭐ `TriggerDataBindingTest` ✗（⭐ 数条数的守卫：⭐ `expected: <1> but was: <2>` ✓）
+>   ⇒ ⭐⭐ **两条教训**：⭐ ① ⭐ 需要一个"⭐ 这次攻击**确实有目标**"的**门** ✗（⭐ 而不是让选择器在空集时安静跳过 ✗ —— ⭐ 那是静默 ✓）；
+>   ⭐ ② ⭐ **内容一加，数条数的守卫就会说话** ✓ ⇒ ⭐ 要跟着改并写明原因 ✓（⭐ 上一轮的 `TribbieTest` 就是这么办的 ✓）。
+> * ⭐ **第三个发现（⭐ 白跑一次换来的 ✓）**：⭐ `skill_param`／`percent_from_skill_param` 里的槽位是 ⭐ `SkillType` ✓，
+>   ⭐ 而 ⭐ `skills.json` 的键 ⭐ **也**就是槽位 ✗ —— ⭐ `"3"` ＝ ⭐ `ULTRA` ✓，⭐ **不是** ⭐ `"303"` ✗。
+> * ⭐ **状态**：⭐ 内容**全部回滚** ✓（⭐ 引擎两件保留 ✓），⭐ 全量 **rc 0**（**2292** 例 ✓）、⭐ `mechanics` **rc 0** ✓、⭐ 树干净 ✓ 已推送 ✓。
+>   ⚠ 按纪律 ⭐ **没有判据的引擎能力不计为出货** ✗ ⇒ ⭐ **下一轮先补判据** ✓。
+> * **实测（本轮）**：⭐ 全量 **0**、`mechanics` **rc 0**、树干净 ✓ 已推送 ✓。
