@@ -35157,3 +35157,14 @@
 >   ⭐⭐ **教训：⭐ 一条 `when` 写得越宽，⭐ 它在新队伍里的失败面就越大 ✓ —— ⭐ 加规则前先问"⭐ 它在**别的**判据的战场上会不会触发 ✗" ✓。**
 > * ⭐ **仍锋利的一处（已登记 ✓）**：⭐ `ally_cid:` ✗ ⭐ 在点名者不在场时**抛异常** ✗，⭐ 而引擎惯例是**空列表** ✗ ✓（⭐ `resolveTargets` 里 `lowest_hp_ally` 旁的原话 ✓）。
 > 
+> **2026-10-02 更新（第 63 轮：🎉 **第 125 件出货 ＝ `ally_cid:` 在点名者不在场时静默不生效** ✓ —— ⭐ 上一轮那处锋利的边磨平了）**：
+>
+> * ✅ **改法**：⭐ 把 `ally_cid:<cid>` ✗ ⭐ 从**单数**路径移到**复数**路径 ✓ —— ⭐ 因为两条路径的惯例**正好相反** ✓（**实测**）：
+>   ⭐ 单数路径用 ⭐ `require(...)` ✗ ⭐ **抛异常** ✓（`random_ally_below_half_energy` 也是 ✓）；⭐ 而复数路径的惯例**明文写在** `lowest_hp_ally` 旁边 ✓：
+>   ⭐ `return lowest == null ? List.of() : List.of(lowest);` ✗ ＋ ⭐ 注释 ⭐ 「clause does nothing」 ✓ ⇒ ⭐⭐ **"空列表，不是错误"** ✓。
+> * ✅ **判据现在读两侧** ✓（⭐ `SkyOdeStackTest` 两条 ✓）：
+>   ⭐ `[sky_stacks] the named character has 2 ; the other ally has 0` ✓
+>   ⭐ `[sky_stacks] with the named character absent: no throw, and the bystander has 0` ✓✓
+>   ⇒ ⭐ 第二条**正是**上一轮让 22 例红的那条路 ✓（⭐ 现在它是一条**断言** ✓，⭐ 不再只是"⭐ 碰巧没炸 ✗" ✓）。
+> * ✅ **实测变异**：⭐ 把 ⭐ `List.of()` ✗ 改回 ⭐ `List.of(require(...))` ✗ ⇒ ⭐ 第二条报 ⭐ `Unexpected exception thrown: IllegalStateException` ⇒ 红 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2304** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
